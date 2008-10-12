@@ -151,7 +151,7 @@ sub concise_stashref {
 	my $codeobj = svref_2object($coderef);
 	next unless ref $codeobj eq 'B::CV';
 	try { concise_cv_obj($order, $codeobj, $k) };
-	warn "err {$@->message} on {dump::view($codeobj)}" if $@;
+	warn "err $($@->message) on $(dump::view($codeobj))" if $@;
     }
 }
 
@@ -306,7 +306,7 @@ sub compile {
     my @args = compileOpts(< @_);
     return sub {
 	my @newargs = compileOpts(< @_); # accept new rendering options
-	warn "disregarding non-options: {join ' ',@newargs}\n" if (nelems @newargs);
+	warn "disregarding non-options: $(join ' ',@newargs)\n" if (nelems @newargs);
 
 	for ( @args) {
             my $objname = $_;
@@ -344,8 +344,7 @@ sub compile {
 		} else {
 		    $objname = "main::" . $objname unless $objname =~ m/::/;
 		    print $walkHandle "$objname:\n";
-		    no strict 'refs';
-		    unless (exists &$objname) {
+		    unless (exists &{*{Symbol::fetch_glob($objname)}}) {
 			print $walkHandle "err: unknown function ($objname)\n";
 			return;
 		    }
@@ -413,7 +412,7 @@ sub base_n {
     my $x = shift;
     return "-" . base_n(-$x) if $x +< 0;
     my $str = "";
-    do { $str .= substr($chars, $x % $base, 1) } while $x = int($x / $base);
+    { $str .= substr($chars, $x % $base, 1) } while $x = int($x / $base);
     $str = join '', reverse split m//, $str if $big_endian;
     return $str;
 }
@@ -438,8 +437,10 @@ sub walk_topdown {
     my($op, $sub, $level) = < @_;
     $sub->($op, $level);
     if ($op->flags ^&^ OPf_KIDS) {
-	for (my $kid = $op->first; $$kid; $kid = $kid->sibling) {
+	my $kid = $op->first;
+        while ($$kid) {
 	    walk_topdown($kid, $sub, $level + 1);
+            $kid = $kid->sibling;
 	}
     }
     elsif (class($op) eq "PMOP") {
@@ -469,7 +470,7 @@ sub walk_exec {
     my @lines;
     my @todo = @(\@($top, \@lines));
     while ((nelems @todo) and my($op, $targ) = < @{shift @todo}) {
-	for (; $$op; $op = $op->next) {
+	while ($$op) {
 	    last if %opsseen{$$op}++;
 	    push @$targ, $op;
 	    my $name = $op->name;
@@ -486,6 +487,8 @@ sub walk_exec {
                 %labels{${$op->lastop}} = "LAST";
                 %labels{${$op->redoop}} = "REDO";
 	    }
+
+            $op = $op->next;
 	}
     }
     walklines(\@lines, 0);
@@ -496,7 +499,7 @@ sub sequence {
     my($op) = < @_;
     my $oldop = 0;
     return if class($op) eq "NULL" or exists %sequence_num{$$op};
-    for (; $$op; $op = $op->next) {
+    while ($$op) {
 	last if exists %sequence_num{$$op};
 	my $name = $op->name;
 	if ($name =~ m/^(null|scalar|lineseq|scope)$/) {
@@ -524,6 +527,8 @@ sub sequence {
 	    }
 	}
 	$oldop = $op;
+    } continue {
+        $op = $op->next;
     }
 }
 
@@ -536,26 +541,26 @@ sub fmt_line {    # generate text-line for op.
     return '' if $hr->{goto} and $hr->{goto} eq '-';	# no goto nowhere
 
     # spec: (?(text1#varText2)?)
-    $text =~ s/\(\?\(([^\#]*?)\#(\w+)([^\#]*?)\)\?\)/{
-	$hr->{$2} ? $1.$hr->{$2}.$3 : ""}/g;
+    $text =~ s/\(\?\(([^\#]*?)\#(\w+)([^\#]*?)\)\?\)/$(
+	$hr->{$2} ? $1.$hr->{$2}.$3 : "" )/g;
 
     # spec: (x(exec_text;basic_text)x)
-    $text =~ s/\(x\((.*?);(.*?)\)x\)/{$order eq "exec" ? $1 : $2}/gs;
+    $text =~ s/\(x\((.*?);(.*?)\)x\)/$( $order eq "exec" ? $1 : $2 )/gs;
 
     # spec: (*(text)*)
-    $text =~ s/\(\*\(([^;]*?)\)\*\)/{$1 x $level}/gs;
+    $text =~ s/\(\*\(([^;]*?)\)\*\)/$( $1 x $level )/gs;
 
     # spec: (*(text1;text2)*)
-    $text =~ s/\(\*\((.*?);(.*?)\)\*\)/{$1 x ($level - 1) . $2 x ($level+>0)}/gs;
+    $text =~ s/\(\*\((.*?);(.*?)\)\*\)/$( $1 x ($level - 1) . $2 x ($level+>0) )/gs;
 
     # convert #Var to tag=>val form: Var\t#var
-    $text =~ s/\#([A-Z][a-z]+)(\d+)?/{"\t" . ucfist($1) . "\t" . lc("#$1$2")
-}/gs;
+    $text =~ s/\#([A-Z][a-z]+)(\d+)?/$( "\t" . ucfist($1) . "\t" . lc("#$1$2")
+)/gs;
 
     # spec: #varN
-    $text =~ s/\#([a-zA-Z]+)(\d+)/{sprintf("\%-$2s", $hr->{$1})}/g;
+    $text =~ s/\#([a-zA-Z]+)(\d+)/$( sprintf("\%-$2s", $hr->{$1}) )/g;
 
-    $text =~ s/\#([a-zA-Z]+)/{$hr->{$1}}/g;	# populate #var's
+    $text =~ s/\#([a-zA-Z]+)/$( $hr->{$1} )/g;	# populate #var's
     $text =~ s/[ \t]*~+[ \t]*/ /g;		# squeeze tildes
 
     $text = "# $hr->{src}\n$text" if $show_src and $hr->{src};
@@ -616,7 +621,7 @@ our %priv; # used to display each opcode's BASEOP.op_private values
 %priv{$_}->{2} = "FTACCESS"
   for @( ("ftrread", "ftrwrite", "ftrexec", "fteread", "ftewrite", "fteexec"));
 %priv{"entereval"}->{2} = "HAS_HH";
-{
+do {
   # Stacked filetests are post 5.8.x
   %priv{$_}->{4} = "FTSTACKED"
     for @( ("ftrread", "ftrwrite", "ftrexec", "fteread", "ftewrite", "fteexec",
@@ -627,7 +632,7 @@ our %priv; # used to display each opcode's BASEOP.op_private values
   # Lexical $_ is post 5.8.x
   %priv{$_}->{2} = "GREPLEX"
     for @( ("mapwhile", "mapstart", "grepwhile", "grepstart"));
-}
+};
 
 our %hints; # used to display each COP's op_hints values
  <
@@ -912,18 +917,21 @@ sub tree {
     my $op = shift;
     my $level = shift;
     my $style = @tree_decorations[$tree_style];
-    my($space, $single, $kids, $kid, $nokid, $last, $lead, $size) = < @$style;
+    my($space, $single, $kids, $nokid, $last, $lead, $size) = < @$style;
     my $name = concise_op($op, $level, $treefmt);
     if (not $op->flags ^&^ OPf_KIDS) {
 	return $name . "\n";
     }
     my @lines;
-    for (my $kid = $op->first; $$kid; $kid = $kid->sibling) {
+    my $kid = $op->first;
+    while ($$kid) {
 	push @lines, < tree($kid, $level+1);
+        $kid = $kid->sibling;
     }
-    my $i;
-    for ($i = ((nelems @lines)-1); substr(@lines[$i], 0, 1) eq " "; $i--) {
+    my $i = (nelems @lines)-1;
+    while (substr(@lines[$i], 0, 1) eq " ") {
 	@lines[$i] = $space . @lines[$i];
+        $i--;
     }
     if ($i +> 0) {
 	@lines[$i] = $last . @lines[$i];
@@ -979,7 +987,7 @@ sub tree {
 # Remember, this needs to stay the last things in the module.
 
 # Why is this different for MacOS?  Does it matter?
-my $cop_seq_mnum = $^O eq 'MacOS' ? 15 : 14;
+my $cop_seq_mnum = $^O eq 'MacOS' ? 14 : 13;
 $cop_seq_base = svref_2object(eval 'sub{0;}')->START->cop_seq + $cop_seq_mnum;
 
 1;

@@ -2,7 +2,7 @@ print "1..2\n";
 
 use Digest;
 
-{
+do {
     package Digest::Dummy;
     use vars < qw($VERSION @ISA);
     $VERSION = 1;
@@ -17,7 +17,7 @@ use Digest;
     }
     sub add {}
     sub digest { shift->{d} }
-}
+};
 
 my $d;
 $d = Digest->new("Dummy");

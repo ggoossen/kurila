@@ -31,7 +31,7 @@ sub getopts {
   $args ||= \@ARGV;
 
   $target->aside(
-    "Starting switch processing.  Scanning arguments [{join ' ',@$args}]\n"
+    "Starting switch processing.  Scanning arguments [$(join ' ',@$args)]\n"
   ) if $target->can('aside');
 
   return unless (nelems @$args);
@@ -49,7 +49,7 @@ sub getopts {
       shift @$args;
       last;
     }
-    my $method = "opt_{$first}_with";
+    my $method = "opt_$($first)_with";
     if( $target->can($method) ) {  # it's argumental
       if($rest eq '') {   # like -f bar
         shift @$args;
@@ -95,7 +95,7 @@ sub getopts {
   
 
   $target->aside(
-    "Ending switch processing.  Args are [{join ' ',@$args}] with $error_count errors.\n"
+    "Ending switch processing.  Args are [$(join ' ',@$args)] with $error_count errors.\n"
   ) if $target->can('aside');
 
   $error_count == 0;

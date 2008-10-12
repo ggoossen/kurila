@@ -34,7 +34,7 @@ ok( !eq_array(\@first_run, \@second_run),
 
 
 # Check that srand() isn't affected by $_
-{   
+do {   
     local $_ = 42;
     srand();
     @first_run  =mk_rand;
@@ -44,7 +44,7 @@ ok( !eq_array(\@first_run, \@second_run),
 
     ok( !eq_array(\@first_run, \@second_run),
                        'srand(), no arg, not affected by $_');
-}
+};
 
 # This test checks whether Perl called srand for you.
 @first_run  = @( `$^X -le "print int rand 100 for 1..100"` );

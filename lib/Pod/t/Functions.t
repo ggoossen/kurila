@@ -44,7 +44,7 @@ my( undef, $path ) = < fileparse( $0 );
 my $pod_functions = File::Spec->catfile( 
     $path, File::Spec->updir, 'Functions.pm' );
 
-SKIP: {
+SKIP: do {
 	my $test_out = do { local $/; ~< *DATA }; 
 	
 	skip( "Can't fork '$^X': $!", 1) 
@@ -54,7 +54,7 @@ SKIP: {
 	    unless close $fh;
 
 	is( $fake_out, $test_out, 'run as plain program' );
-}
+};
 
 =head1 NAME
 

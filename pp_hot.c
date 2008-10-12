@@ -2201,26 +2201,9 @@ PP(pp_entersub)
     ENTER;
     SAVETMPS;
 
-  retry:
     if (!CvROOT(cv) && !CvXSUB(cv)) {
-	SV* sub_name;
-
-	/* anonymous or undef'd function leaves us no recourse */
-	if (CvANON(cv) || !(gv = CvGV(cv)))
-	    DIE(aTHX_ "Undefined subroutine called");
-
-	/* glob assignment */
-	if (cv != GvCV(gv)) {
-	    cv = GvCV(gv);
-	    if (!cv)
-		DIE(aTHX_ "Not a CODE reference");
-	    goto retry;
-	}
-
-	/* sorry */
-	sub_name = sv_newmortal();
-	gv_efullname3(sub_name, gv, NULL);
-	DIE(aTHX_ "Undefined subroutine &%"SVf" called", SVfARG(sub_name));
+	DIE(aTHX_ "Undefined subroutine called",
+	    SvPVX_const(loc_desc(SvLOCATION(cv))));
     }
 
     gimme = GIMME_V;
@@ -2269,8 +2252,6 @@ PP(pp_entersub)
 		AvREAL_off(av);
 		AvREIFY_on(av);
 	    }
-	    cx->blk_sub.savearray = GvAV(PL_defgv);
-	    GvAV(PL_defgv) = (AV*)SvREFCNT_inc_simple(av);
 	    CX_CURPAD_SAVE(cx->blk_sub);
 	    cx->blk_sub.argarray = av;
 	    ++MARK;
@@ -2352,16 +2333,18 @@ PP(pp_entersub)
 void
 Perl_sub_crush_depth(pTHX_ CV *cv)
 {
+    SV** name = NULL;
+    SV* loc;
+
     PERL_ARGS_ASSERT_SUB_CRUSH_DEPTH;
 
-    if (CvANON(cv))
-	Perl_warner(aTHX_ packWARN(WARN_RECURSION), "Deep recursion on anonymous subroutine");
-    else {
-	SV* const tmpstr = sv_newmortal();
-	gv_efullname3(tmpstr, CvGV(cv), NULL);
-	Perl_warner(aTHX_ packWARN(WARN_RECURSION), "Deep recursion on subroutine \"%"SVf"\"",
-		    SVfARG(tmpstr));
+    loc = SvLOCATION((SV*)cv);
+    if (loc && SvAVOK(loc)) {
+	name = av_fetch(SvAV(loc), 3, FALSE);
     }
+    Perl_warner(aTHX_ packWARN(WARN_RECURSION), 
+	"Deep recursion on subroutine \"%s\"",
+	(name ? SvPVX_const(*name) : "(unknown)" ));
 }
 
 PP(pp_aelem)

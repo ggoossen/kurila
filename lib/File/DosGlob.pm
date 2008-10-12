@@ -135,7 +135,7 @@ sub doglob_Mac {
 		# if a '*' or '?' is preceded by an odd count of '\', temporary delete 
 		# it (and its preceding backslashes), i.e. don't treat '\*' and '\?' as 
 		# wildcards
-		$tmp_head =~ s/(\\*)([*?])/{$2 x ((length($1) + 1) % 2)}/g;
+		$tmp_head =~ s/(\\*)([*?])/$($2 x ((length($1) + 1) % 2))/g;
 	
 		if ($tmp_head =~ m/[*?]/) { # if there are wildcards ...	
 		@globdirs = doglob_Mac('d', $head);
@@ -156,7 +156,7 @@ sub doglob_Mac {
 	# if a '*' or '?' is preceded by an odd count of '\', temporary delete 
 	# it (and its preceding backslashes), i.e. don't treat '\*' and '\?' as 
 	# wildcards
-	$tmp_tail =~ s/(\\*)([*?])/{$2 x ((length($1) + 1) % 2)}/g;
+	$tmp_tail =~ s/(\\*)([*?])/$($2 x ((length($1) + 1) % 2))/g;
 	
 	unless ($tmp_tail =~ m/[*?]/) { # if there are wildcards ...
 	    $not_esc_head = $head = '' if $head eq ':';
@@ -178,7 +178,7 @@ sub doglob_Mac {
 	$_ =~ s:([].+^\-\${}[|]):\\$1:g;
 	# and convert DOS-style wildcards to regex,
 	# but only if they are not escaped
-	$_ =~ s/(\\*)([*?])/{$1 . ('.' x ((length($1) + 1) % 2)) . $2}/g;
+	$_ =~ s/(\\*)([*?])/$($1 . ('.' x ((length($1) + 1) % 2)) . $2)/g;
 
 	#print "regex: '$_', head: '$head', unescaped head: '$not_esc_head'\n";
 	my $matchsub = eval 'sub { $_[0] =~ m|^' . $_ . '\z|ios }';
@@ -241,7 +241,7 @@ sub _expand_volume {
 			$vol_pat =~ s:([].+^\-\${}[|]):\\$1:g;
 			# and convert DOS-style wildcards to regex,
 			# but only if they are not escaped
-			$vol_pat =~ s/(\\*)([*?])/{$1 . ('.' x ((length($1) + 1) % 2)) . $2}/g;
+			$vol_pat =~ s/(\\*)([*?])/$($1 . ('.' x ((length($1) + 1) % 2)) . $2)/g;
 			#print "volume regex: '$vol_pat' \n";
 				
 			foreach my $volume ( @mounted_volumes) {
@@ -273,7 +273,7 @@ sub _preprocess_pattern {
 	foreach my $p ( @pat) {
 		my $proceed;
 		# resolve any updirs, e.g. "*HD:t?p::a*" -> "*HD:a*"
-		do {
+		{
 			$proceed = ($p =~ s/^(.*):[^:]+::(.*?)\z/$1:$2/);  
 		} while ($proceed);
 		# remove a single trailing colon, e.g. ":*:" -> ":*"
@@ -325,7 +325,7 @@ sub glob {
     #   abc3 will be the original {3} (and drop the {}).
     #   abc1 abc2 will be put in @appendpat.
     # This was just the esiest way, not nearly the best.
-    REHASH: {
+    REHASH: do {
 	my @appendpat = @( () );
 	for ( @pat) {
 	    # There must be a "," I.E. abc{efg} is not what we want.
@@ -359,7 +359,7 @@ sub glob {
 	    }
 	    goto REHASH;
 	}
-    }
+    };
     for (  @pat ) {
 	s/\\{/\{/g;
 	s/\\}/\}/g;
@@ -389,7 +389,7 @@ sub glob {
     return @{delete %entries{$cxix}};
 }
 
-{
+do {
     no strict 'refs';
 
     sub import {
@@ -399,7 +399,7 @@ sub glob {
     my $callpkg = ($sym =~ s/^GLOBAL_//s ? 'CORE::GLOBAL' : caller(0));
     *{Symbol::fetch_glob($callpkg.'::'.$sym)} = \&{*{Symbol::fetch_glob($pkg.'::'.$sym)}} if $sym eq 'glob';
     }
-}
+};
 1;
 
 __END__

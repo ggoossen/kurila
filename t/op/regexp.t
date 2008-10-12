@@ -119,11 +119,11 @@ foreach ( @tests) {
     $reason = '' unless defined $reason;
     my $input = join(':', @($pat,$subject,$result,$repl,$expect));
     $pat = "'$pat'" unless $pat =~ m/^[:'\/]/;
-    $pat =~ s/\$\{(\w+)\}/{eval '$'.$1}/g;
+    $pat =~ s/\$\{(\w+)\}/$(eval '$'.$1)/g;
     $pat =~ s/\\n/\n/g;
     my $keep = ($repl =~ m/\$\^MATCH/) ? 'p' : '';
-    $subject = eval qq("$subject"); die "error in '$subject': $@" if $@;
-    $expect  = eval qq("$expect"); die "error in '$expect': $@" if $@;
+    $subject = eval qq("$subject"); die "error in '$subject': $($@->message)" if $@;
+    $expect  = eval qq("$expect"); die "error in '$expect': $($@->message)" if $@;
     my $todo = $qr_embed_thr && ($result =~ s/t//);
     my $skip = ($skip_amp ? ($result =~ s/B//i) : ($result =~ s/B//));
     $reason = 'skipping $&' if $reason eq  '' && $skip_amp;
@@ -140,7 +140,7 @@ foreach ( @tests) {
                 $utf8;
                 $study;
                 pos(\$subject)=0;
-                \$match = ( \$subject =~ m{$pat}{$keep}g );
+                \$match = ( \$subject =~ m$($pat)$($keep)g );
                 \$got = pos(\$subject);
 EOFCODE
         }
@@ -149,7 +149,7 @@ EOFCODE
                 $utf8;
                 my \$RE = qr$pat;
                 $study;
-                \$match = (\$subject =~ m/(?:)\$RE(?:)/{$keep}) while \$c--;
+                \$match = (\$subject =~ m/(?:)\$RE(?:)/$($keep)) while \$c--;
                 \$got = "$repl";
 EOFCODE
         }
@@ -159,7 +159,7 @@ EOFCODE
 	 	# clone the pattern the other way.
                 my \$RE = threads->new(sub \{qr$pat\})->join();
                 $study;
-                \$match = (\$subject =~ m/(?:)\$RE(?:)/{$keep}) while \$c--;
+                \$match = (\$subject =~ m/(?:)\$RE(?:)/$($keep)) while \$c--;
                 \$got = "$repl";
 EOFCODE
         }
@@ -174,13 +174,13 @@ EOFCODE
         #$code.=qq[\n\$expect="$expect";\n];
         #use Devel::Peek;
         #die Dump($code) if $pat=~/\\h/ and $subject=~/\x{A0}/;
-	{
+	do {
 	    # Probably we should annotate specific tests with which warnings
 	    # categories they're known to trigger, and hence should be
 	    # disabled just for that test
 	    no warnings < qw(uninitialized regexp);
 	    eval $code;
-	}
+	};
 	my $err = $@;
 	if ($result eq 'c') {
 	    if ($err->{description} !~ m!^\Q$expect!) { print "not ok $test (compile) $input => `$err'\n"; next TEST }
@@ -195,7 +195,7 @@ EOFCODE
 	    next TEST;
 	}
 	elsif ($err) {
-	    print "not ok $test $input => error: '{$@->message}'\n{dump::view($code)}\n"; next TEST;
+	    print "not ok $test $input => error: '$($@->message)'\n$(dump::view($code))\n"; next TEST;
 	}
 	elsif ($result =~ m/^n/) {
 	    if ($match) { print "not ok $test ($study) $input => false positive\n"; next TEST }

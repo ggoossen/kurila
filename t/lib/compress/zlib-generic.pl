@@ -46,22 +46,22 @@ sub myGZreadFile
 }
 
 
-{
+do {
 
     title "Testing $CompressClass Errors";
 
-}
+};
 
 
-{
+do {
     title "Testing $UncompressClass Errors";
 
-}
+};
 
-{
+do {
     title "Testing $CompressClass and $UncompressClass";
 
-    {
+    do {
         title "flush" ;
 
 
@@ -72,16 +72,16 @@ hello world
 this is a test
 EOM
 
-        {
+        do {
           my $x ;
           ok $x = $CompressClass-> new( $name)  ;
 
           ok $x->write($hello), "write" ;
           ok $x->flush(Z_FINISH), "flush";
           ok $x->close, "close" ;
-        }
+        };
 
-        {
+        do {
           my $uncomp;
           ok my $x = $UncompressClass-> new( $name, -Append => 1)  ;
 
@@ -92,8 +92,8 @@ EOM
 
           ok $x->close ;
           is $uncomp, $hello ;
-        }
-    }
+        };
+    };
 
 
     if ($CompressClass ne 'RawDeflate')
@@ -102,23 +102,23 @@ EOM
         #========================================
 
         my $buffer = '';
-        {
+        do {
           my $x ;
           ok $x = $CompressClass-> new((\$buffer)) ;
           ok $x->close ;
       
-        }
+        };
 
         my $keep = $buffer ;
         my $uncomp= '';
-        {
+        do {
           my $x ;
           ok $x = $UncompressClass-> new((\$buffer, Append => 1))  ;
 
           1 while $x->read($uncomp) +> 0  ;
 
           ok $x->close ;
-        }
+        };
 
         ok $uncomp eq '' ;
         ok $buffer eq $keep ;
@@ -126,7 +126,7 @@ EOM
     }
 
     
-    {
+    do {
         title "inflateSync on plain file";
 
         my $hello = "I am a HAL 9000 computer" x 2001 ;
@@ -145,9 +145,9 @@ EOM
         ok $rest eq $hello ;
 
         ok $k->close();
-    }
+    };
 
-    {
+    do {
         title "$CompressClass: inflateSync for real";
 
         # create a deflate stream with flush points
@@ -189,9 +189,9 @@ EOM
         ok $rest eq $goodbye, " got expected output" ;
 
         ok $k->close();
-    }
+    };
 
-    {
+    do {
         title "$CompressClass: inflateSync no FLUSH point";
 
         # create a deflate stream with flush points
@@ -221,9 +221,9 @@ EOM
      
         ok $k->close();
         is $k->inflateSync(), 0 ;
-    }
+    };
 
-}
+};
 
 
 1;

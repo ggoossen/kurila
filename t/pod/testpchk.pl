@@ -35,8 +35,8 @@ sub msgcmp( $ $ ) {
    for ($lines) {
       ## remove filenames from error messages to avoid any
       ## filepath naming differences between OS platforms
-      s/(at line \S+ in file) .*\W(\w+\.[tT])\s*$/{"$1 ".lc($2)}/;
-      s/.*\W(\w+\.[tT]) (has \d+ pod syntax error)/{lc($1)." $2"}/;
+      s/(at line \S+ in file) .*\W(\w+\.[tT])\s*$/$("$1 ".lc($2))/;
+      s/.*\W(\w+\.[tT]) (has \d+ pod syntax error)/$(lc($1)." $2")/;
    }
    return $lines[0] ne $lines[1];
 }
@@ -77,7 +77,7 @@ sub testpodchecker( @ ) {
    my %opts = %( (ref @_[0] eq 'HASH') ? < %{shift()} : () );
    my @testpods = @_;
    my ($testname, $testdir) = ("", "");
-   my ($podfile, $cmpfile) = ("", "");
+   my $cmpfile = "";
    my ($outfile, $errfile) = ("", "");
    my $passes = 0;
    my $failed = 0;
@@ -85,7 +85,7 @@ sub testpodchecker( @ ) {
 
    print "1..", nelems @testpods, "\n"  unless (%opts{'-xrgen'});
 
-   for $podfile ( @testpods) {
+   for my $podfile ( @testpods) {
       ($testname, $_) = < fileparse($podfile);
       $testdir ||=  $_;
       $testname  =~ s/\.t$//;

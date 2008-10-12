@@ -27,7 +27,7 @@ sub num_equal {
           } elsif ($left !~ m/[^0-9]/) {
             print "# Got $left\n";
           } else {
-            $left =~ s/([^-a-zA-Z0-9_+])/{sprintf "\\\%03o", ord $1}/g;
+            $left =~ s/([^-a-zA-Z0-9_+])/$(sprintf "\\\%03o", ord $1)/g;
             print "# Got \"$left\"\n";
           }
         }

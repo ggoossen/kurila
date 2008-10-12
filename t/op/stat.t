@@ -49,20 +49,20 @@ open(FOO, ">", "$tmpfile") || DIE("Can't open temp test file: $!");
 my($nlink, $mtime, $ctime) = < @(stat(*FOO))[[@($NLINK, $MTIME, $CTIME)]];
 
 #nlink should if link support configured in Perl.
-SKIP: {
+SKIP: do {
     skip "No link count - Hard link support not built in.", 1
 	unless %Config{d_link};
 
     is($nlink, 1, 'nlink on regular file');
-}
+};
 
-SKIP: {
+SKIP: do {
   skip "mtime and ctime not reliable", 2
     if $Is_MSWin32 or $Is_NetWare or $Is_Cygwin or $Is_Dos or $Is_MacOS or $Is_Darwin;
 
   ok( $mtime,           'mtime' );
   is( $mtime, $ctime,   'mtime == ctime' );
-}
+};
 
 
 # Cygwin seems to have a 3 second granularity on its timestamps.
@@ -75,7 +75,7 @@ close(FOO);
 sleep 2;
 
 
-SKIP: {
+SKIP: do {
     unlink $tmpfile_link;
     my $lnk_result = try { link $tmpfile, $tmpfile_link };
     skip "link() unimplemented", 6 if $@ and $@->{description} =~ m/unimplemented/;
@@ -86,15 +86,15 @@ SKIP: {
 
     my($nlink, $mtime, $ctime) = < @(stat($tmpfile))[[@($NLINK, $MTIME, $CTIME)]];
 
-    SKIP: {
+    SKIP: do {
         skip "No link count", 1 if %Config{dont_use_nlink};
         skip "Cygwin9X fakes hard links by copying", 1
           if %Config{myuname} =~ m/^cygwin_(?:9\d|me)\b/i;
 
         is($nlink, 2,     'Link count on hard linked file' );
-    }
+    };
 
-    SKIP: {
+    SKIP: do {
         my $cwd = File::Spec->rel2abs($Curdir);
         skip "Solaris tmpfs has different mtime/ctime link semantics", 2
                                      if $Is_Solaris and $cwd =~ m#^/tmp# and
@@ -121,9 +121,9 @@ SKIP: {
 # this test.
 DIAG
         }
-    }
+    };
 
-}
+};
 
 # truncate and touch $tmpfile.
 open(F, ">", "$tmpfile") || DIE("Can't open temp test file: $!");
@@ -150,29 +150,29 @@ ok(-s $tmpfile,     '   and -s');
 # Strip all access rights from the file.
 ok( chmod(0000, $tmpfile),     'chmod 0000' );
 
-SKIP: {
+SKIP: do {
     skip "-r, -w and -x have different meanings on VMS", 3 if $Is_VMS;
 
-    SKIP: {
+    SKIP: do {
         # Going to try to switch away from root.  Might not work.
         my $olduid = $>;
         try { $> = 1; };
         skip "Can't test -r or -w meaningfully if you're superuser", 2
           if $> == 0;
 
-        SKIP: {
+        SKIP: do {
             skip "Can't test -r meaningfully?", 1 if $Is_Dos || $Is_Cygwin;
             ok(!-r $tmpfile,    "   -r");
-        }
+        };
 
         ok(!-w $tmpfile,    "   -w");
 
         # switch uid back (may not be implemented)
         try { $> = $olduid; };
-    }
+    };
 
     ok(! -x $tmpfile,   '   -x');
-}
+};
 
 
 
@@ -180,12 +180,12 @@ ok(chmod(0700,$tmpfile),    'chmod 0700');
 ok(-r $tmpfile,     '   -r');
 ok(-w $tmpfile,     '   -w');
 
-SKIP: {
+SKIP: do {
     skip "-x simply determines if a file ends in an executable suffix", 1
       if $Is_Dosish || $Is_MacOS;
 
     ok(-x $tmpfile,     '   -x');
-}
+};
 
 ok(  -f $tmpfile,   '   -f');
 ok(! -d $tmpfile,   '   !-d');
@@ -195,7 +195,7 @@ ok(  -d $Curdir,          '-d cwd' );
 ok(! -f $Curdir,          '!-f cwd' );
 
 
-SKIP: {
+SKIP: do {
     unlink($tmpfile_link);
     my $symlink_rslt = try { symlink $tmpfile, $tmpfile_link };
     skip "symlink not implemented", 3 if $@ and $@->{description} =~ m/unimplemented/;
@@ -203,7 +203,7 @@ SKIP: {
     is( $@, '',     'symlink() implemented' );
     ok( $symlink_rslt,      'symlink() ok' );
     ok(-l $tmpfile_link,    '-l');
-}
+};
 
 ok(-o $tmpfile,     '-o');
 
@@ -212,7 +212,7 @@ ok(-e $tmpfile,     '-e');
 unlink($tmpfile_link);
 ok(! -e $tmpfile_link,  '   -e on unlinked file');
 
-SKIP: {
+SKIP: do {
     skip "No character, socket or block special files", 6
       if $Is_MSWin32 || $Is_NetWare || $Is_Dos;
     skip "/dev isn't available to test against", 6
@@ -273,22 +273,22 @@ SKIP: {
 	is($c1, $c2, "ls and @_[1] agreeing on /dev ($c1 $c2)");
     };
 
-SKIP: {
+SKIP: do {
     skip("DG/UX ls -L broken", 3) if $Is_DGUX;
 
     $try->('b', '-b');
     $try->('c', '-c');
     $try->('s', '-S');
 
-}
+};
 
 ok(! -b $Curdir,    '!-b cwd');
 ok(! -c $Curdir,    '!-c cwd');
 ok(! -S $Curdir,    '!-S cwd');
 
-}
+};
 
-SKIP: {
+SKIP: do {
     my($cnt, $uid);
     $cnt = $uid = 0;
 
@@ -313,18 +313,18 @@ SKIP: {
     isnt($cnt, 0,    'found some programs');
     isnt($uid, 0,    '  found some setuid programs');
     ok($uid +< $cnt,  "    they're not all setuid");
-}
+};
 
 
 # To assist in automated testing when a controlling terminal (/dev/tty)
 # may not be available (at, cron  rsh etc), the PERL_SKIP_TTY_TEST env var
 # can be set to skip the tests that need a tty.
-SKIP: {
+SKIP: do {
     skip "These tests require a TTY", 4 if %ENV{PERL_SKIP_TTY_TEST};
 
     my $TTY = $Is_Rhapsody ? "/dev/ttyp0" : "/dev/tty";
 
-    SKIP: {
+    SKIP: do {
         skip "Test uses unixisms", 2 if $Is_MSWin32 || $Is_NetWare;
         skip "No TTY to test -t with", 2 unless -e $TTY;
 
@@ -333,24 +333,24 @@ SKIP: {
         ok(-t *TTY,  '-t');
         ok(-c *TTY,  'tty is -c');
         close(TTY);
-    }
+    };
     ok(! -t *TTY,    '!-t on closed TTY filehandle');
 
-    {
+    do {
         local our $TODO = 'STDIN not a tty when output is to pipe' if $Is_VMS;
         ok(-t,          '-t on STDIN');
-    }
-}
+    };
+};
 
 my $Null = File::Spec->devnull;
-SKIP: {
+SKIP: do {
     skip "No null device to test with", 1 unless -e $Null;
     skip "We know Win32 thinks '$Null' is a TTY", 1 if $Is_MSWin32;
 
     open(NULL, "<", $Null) or DIE("Can't open $Null: $!");
     ok(! -t *NULL,   'null device is not a TTY');
     close(NULL);
-}
+};
 
 
 # These aren't strictly "stat" calls, but so what?
@@ -358,15 +358,15 @@ my $statfile = File::Spec->catfile($Curdir, 'op', 'stat.t');
 ok(  -T $statfile,    '-T');
 ok(! -B $statfile,    '!-B');
 
-SKIP: {
+SKIP: do {
      skip("DG/UX", 1) if $Is_DGUX;
 ok(-B $Perl,      '-B');
-}
+};
 
 ok(! -T $Perl,    '!-T');
 
 open(FOO, "<",$statfile);
-SKIP: {
+SKIP: do {
     try { -T *FOO; };
     skip "-T/B on filehandle not implemented", 15 if $@ and $@->{description} =~ m/not implemented/;
 
@@ -396,16 +396,16 @@ SKIP: {
     ok(eof FOO,         'at EOF');
     ok(-T *FOO,          '   still -T');
     ok(-B *FOO,          '   now -B');
-}
+};
 close(FOO);
 
 
-SKIP: {
+SKIP: do {
     skip "No null device to test with", 2 unless -e $Null;
 
     ok(-T $Null,  'null device is -T');
     ok(-B $Null,  '    and -B');
-}
+};
 
 
 # and now, a few parsing tests:
@@ -433,7 +433,7 @@ is( "$@", "", "lstat _ ok after lstat" );
 try { -l _ };
 is( "$@", "", "-l _ ok after lstat" );
   
-SKIP: {
+SKIP: do {
     skip "No lstat", 2 unless %Config{d_lstat};
 
     # bug id 20020124.004
@@ -449,7 +449,7 @@ SKIP: {
               qr/^The stat preceding -l _ wasn't an lstat/,
               '-l _ croaks after -T _' );
     unlink $linkname or print "# unlink $linkname failed: $!\n";
-}
+};
 
 print "# Zzz...\n";
 sleep(3);
@@ -458,15 +458,15 @@ unlink $f;
 ok (open(S, ">", "$f"), 'can create tmp file');
 close S or die;
 my @a = @( stat $f );
-print "# time=$^T, stat=({join ' ',@a})\n";
+print "# time=$^T, stat=($(join ' ',@a))\n";
 my @b = @(-M _, -A _, -C _);
-print "# -MAC=({join ' ',@b})\n";
+print "# -MAC=($(join ' ',@b))\n";
 ok( (-M _) +< 0, 'negative -M works');
 ok( (-A _) +< 0, 'negative -A works');
 ok( (-C _) +< 0, 'negative -C works');
 ok(unlink($f), 'unlink tmp file');
 
-{
+do {
     ok(open(F, ">", $tmpfile), 'can create temp file');
     close F;
     chmod 0077, $tmpfile;
@@ -476,9 +476,9 @@ ok(unlink($f), 'unlink tmp file');
     my $s2 = -s _;
     is($s1, $s2, q(-T _ doesn't break the statbuffer));
     unlink $tmpfile;
-}
+};
 
-SKIP: {
+SKIP: do {
     skip "No dirfd()", 9 unless %Config{d_dirfd} || %Config{d_dir_dd_fd};
     ok(opendir(DIR, "."), 'Can open "." dir') || diag "Can't open '.':  $!";
     ok(stat(*DIR), "stat() on dirhandle works"); 
@@ -495,9 +495,9 @@ SKIP: {
     ok(-f *DIR);
     closedir DIR or die $!;
     close DIR or die $!;
-}
+};
 
-{
+do {
     # RT #8244: *FILE{IO} does not behave like *FILE for stat() and -X() operators
     ok(open(F, ">", $tmpfile), 'can create temp file');
     my @thwap = @( stat *F{IO} );
@@ -508,7 +508,7 @@ SKIP: {
 
     #PVIO's hold dirhandle information, so let's test them too.
 
-    SKIP: {
+    SKIP: do {
         skip "No dirfd()", 9 unless %Config{d_dirfd} || %Config{d_dir_dd_fd};
         ok(opendir(DIR, "."), 'Can open "." dir') || diag "Can't open '.':  $!";
         ok(stat(*DIR{IO}), "stat() on *DIR\{IO\} works");
@@ -526,8 +526,8 @@ SKIP: {
 	ok(-f *DIR{IO});
 	closedir DIR or die $!;
 	close DIR or die $!;
-    }
-}
+    };
+};
 
 END {
     chmod 0666, $tmpfile;

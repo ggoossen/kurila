@@ -130,9 +130,6 @@ PERL_CALLCONV bool	Perl_Gv_AMupdate(pTHX_ HV* stash)
 #define PERL_ARGS_ASSERT_GV_AMUPDATE	\
 	assert(stash)
 
-PERL_CALLCONV CV*	Perl_gv_handler(pTHX_ HV* stash, I32 id)
-			__attribute__warn_unused_result__;
-
 PERL_CALLCONV OP*	Perl_append_elem(pTHX_ I32 optype, OP* first, OP* last);
 PERL_CALLCONV OP*	Perl_append_list(pTHX_ I32 optype, LISTOP* first, LISTOP* last);
 PERL_CALLCONV I32	Perl_apply(pTHX_ I32 type, SV** mark, SV** sp)
@@ -140,13 +137,6 @@ PERL_CALLCONV I32	Perl_apply(pTHX_ I32 type, SV** mark, SV** sp)
 			__attribute__nonnull__(pTHX_3);
 #define PERL_ARGS_ASSERT_APPLY	\
 	assert(mark); assert(sp)
-
-PERL_CALLCONV void	Perl_apply_attrs_string(pTHX_ const char *stashpv, CV *cv, const char *attrstr, STRLEN len)
-			__attribute__nonnull__(pTHX_1)
-			__attribute__nonnull__(pTHX_2)
-			__attribute__nonnull__(pTHX_3);
-#define PERL_ARGS_ASSERT_APPLY_ATTRS_STRING	\
-	assert(stashpv); assert(cv); assert(attrstr)
 
 PERL_CALLCONV void	Perl_av_clear(pTHX_ AV *av)
 			__attribute__nonnull__(pTHX_1);
@@ -1476,12 +1466,6 @@ PERL_CALLCONV int	Perl_magic_existspack(pTHX_ SV* sv, const MAGIC* mg)
 #define PERL_ARGS_ASSERT_MAGIC_EXISTSPACK	\
 	assert(sv); assert(mg)
 
-PERL_CALLCONV int	Perl_magic_freeovrld(pTHX_ SV* sv, MAGIC* mg)
-			__attribute__nonnull__(pTHX_1)
-			__attribute__nonnull__(pTHX_2);
-#define PERL_ARGS_ASSERT_MAGIC_FREEOVRLD	\
-	assert(sv); assert(mg)
-
 PERL_CALLCONV int	Perl_magic_get(pTHX_ SV* sv, MAGIC* mg)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2);
@@ -1927,7 +1911,7 @@ PERL_CALLCONV OP*	Perl_newLOOPEX(pTHX_ I32 type, OP* label)
 #define PERL_ARGS_ASSERT_NEWLOOPEX	\
 	assert(label)
 
-PERL_CALLCONV OP*	Perl_newLOOPOP(pTHX_ I32 flags, I32 debuggable, OP* expr, OP* block, SV* location)
+PERL_CALLCONV OP*	Perl_newLOOPOP(pTHX_ I32 flags, I32 debuggable, OP* expr, OP* block, bool once, SV* location)
 			__attribute__malloc__
 			__attribute__warn_unused_result__;
 
@@ -1960,7 +1944,13 @@ PERL_CALLCONV OP*	Perl_newSTATEOP(pTHX_ I32 flags, char* label, OP* o, SV* locat
 			__attribute__malloc__
 			__attribute__warn_unused_result__;
 
-PERL_CALLCONV CV*	Perl_newSUB(pTHX_ I32 floor, OP* o, OP* proto, OP* block);
+PERL_CALLCONV CV*	Perl_newSUB(pTHX_ I32 floor, OP* proto, OP* block);
+PERL_CALLCONV void	Perl_process_special_block(pTHX_ const I32 key, CV *const cv)
+			__attribute__nonnull__(pTHX_2);
+#define PERL_ARGS_ASSERT_PROCESS_SPECIAL_BLOCK	\
+	assert(cv)
+
+PERL_CALLCONV CV*	Perl_newNAMEDSUB(pTHX_ I32 floor, OP* o, OP* proto, OP* block);
 PERL_CALLCONV CV *	Perl_newXS_flags(pTHX_ const char *name, XSUBADDR_t subaddr, const char *const filename, const char *const proto, U32 flags)
 			__attribute__nonnull__(pTHX_2)
 			__attribute__nonnull__(pTHX_3);
@@ -3818,8 +3808,6 @@ PERL_CALLCONV int	Perl_magic_killbackrefs(pTHX_ SV *sv, MAGIC *mg)
 #define PERL_ARGS_ASSERT_MAGIC_KILLBACKREFS	\
 	assert(sv); assert(mg)
 
-PERL_CALLCONV OP*	Perl_newANONATTRSUB(pTHX_ I32 floor, OP *proto, OP *attrs, OP *block);
-PERL_CALLCONV CV*	Perl_newATTRSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *attrs, OP *block);
 #ifdef PERL_MAD
 PERL_CALLCONV OP *	Perl_newMYSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *attrs, OP *block)
 			__attribute__noreturn__;
@@ -3829,11 +3817,6 @@ PERL_CALLCONV void	Perl_newMYSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *attrs, O
 			__attribute__noreturn__;
 
 #endif
-PERL_CALLCONV OP *	Perl_my_attrs(pTHX_ OP *o, OP *attrs)
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_MY_ATTRS	\
-	assert(o)
-
 PERL_CALLCONV void	Perl_boot_core_xsutils(pTHX);
 #if defined(USE_ITHREADS)
 PERL_CALLCONV PERL_CONTEXT*	Perl_cx_dup(pTHX_ PERL_CONTEXT* cx, I32 ix, I32 max, CLONE_PARAMS* param)
@@ -4363,33 +4346,10 @@ STATIC void	S_simplify_sort(pTHX_ OP *o)
 #define PERL_ARGS_ASSERT_SIMPLIFY_SORT	\
 	assert(o)
 
-STATIC const char*	S_gv_ename(pTHX_ GV *gv)
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_GV_ENAME	\
-	assert(gv)
-
-STATIC OP *	S_my_kid(pTHX_ OP *o, OP *attrs, OP **imopsp)
-			__attribute__nonnull__(pTHX_3);
+STATIC OP *	S_my_kid(pTHX_ OP *o, OP **imopsp)
+			__attribute__nonnull__(pTHX_2);
 #define PERL_ARGS_ASSERT_MY_KID	\
 	assert(imopsp)
-
-STATIC OP *	S_dup_attrlist(pTHX_ OP *o)
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_DUP_ATTRLIST	\
-	assert(o)
-
-STATIC void	S_apply_attrs(pTHX_ HV *stash, SV *target, OP *attrs, bool for_my)
-			__attribute__nonnull__(pTHX_1)
-			__attribute__nonnull__(pTHX_2);
-#define PERL_ARGS_ASSERT_APPLY_ATTRS	\
-	assert(stash); assert(target)
-
-STATIC void	S_apply_attrs_my(pTHX_ HV *stash, OP *target, OP *attrs, OP **imopsp)
-			__attribute__nonnull__(pTHX_1)
-			__attribute__nonnull__(pTHX_2)
-			__attribute__nonnull__(pTHX_4);
-#define PERL_ARGS_ASSERT_APPLY_ATTRS_MY	\
-	assert(stash); assert(target); assert(imopsp)
 
 STATIC void	S_bad_type(pTHX_ I32 n, const char *t, const char *name, const OP *kid)
 			__attribute__nonnull__(pTHX_2)
@@ -4424,13 +4384,6 @@ STATIC OP*	S_too_many_arguments(pTHX_ OP *o, const char* name)
 	assert(o); assert(name)
 
 STATIC OP*	S_ref_array_or_hash(pTHX_ OP* cond);
-STATIC void	S_process_special_blocks(pTHX_ const char *const fullname, GV *const gv, CV *const cv)
-			__attribute__nonnull__(pTHX_1)
-			__attribute__nonnull__(pTHX_2)
-			__attribute__nonnull__(pTHX_3);
-#define PERL_ARGS_ASSERT_PROCESS_SPECIAL_BLOCKS	\
-	assert(fullname); assert(gv); assert(cv)
-
 #endif
 #if defined(PL_OP_SLAB_ALLOC)
 PERL_CALLCONV void*	Perl_Slab_Alloc(pTHX_ size_t sz)
@@ -4642,11 +4595,6 @@ STATIC I32	S_dopoptolabel(pTHX_ const char *label)
 
 STATIC I32	S_dopoptoloop(pTHX_ I32 startingblock)
 			__attribute__warn_unused_result__;
-
-STATIC void	S_save_lines(pTHX_ AV *array, SV *sv)
-			__attribute__nonnull__(pTHX_2);
-#define PERL_ARGS_ASSERT_SAVE_LINES	\
-	assert(sv)
 
 STATIC bool	S_doeval(pTHX_ int gimme, OP** startop, CV* outside, U32 seq);
 STATIC PerlIO *	S_check_type_and_open(pTHX_ const char *name)
@@ -5452,11 +5400,6 @@ STATIC bool	S_isa_lookup(pTHX_ HV *stash, const char * const name, const HV * co
 			__attribute__nonnull__(pTHX_2);
 #define PERL_ARGS_ASSERT_ISA_LOOKUP	\
 	assert(name)
-
-STATIC const COP*	S_closest_cop(pTHX_ const COP *cop, const OP *o)
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_CLOSEST_COP	\
-	assert(cop)
 
 #endif
 

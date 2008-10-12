@@ -15,7 +15,7 @@ use Carp;
 $VERSION = "1.02";
 $VERSION = eval $VERSION;
 
-{
+do {
     package IPC::Semaphore::stat;
 
     use Class::Struct < qw(struct);
@@ -30,7 +30,7 @@ $VERSION = eval $VERSION;
 	otime	=> '$',
 	nsems	=> '$',
     );
-}
+};
 
 sub new {
     (nelems @_) == 4 || croak 'new ' . __PACKAGE__ . '( KEY, NSEMS, FLAGS )';

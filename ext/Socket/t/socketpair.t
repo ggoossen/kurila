@@ -16,7 +16,7 @@ BEGIN {
     }
 }
 
-{
+do {
     # This was in the BEGIN block, but since Test::More 0.47 added support to
     # detect forking, we don't need to fork before Test::More initialises.
 
@@ -44,7 +44,7 @@ BEGIN {
 # Since you don't have perlio you might get failures with UTF-8 locales.
 EOF
     }
-}
+};
 
 use Socket;
 use Test::More;
@@ -112,7 +112,7 @@ is ($buffer, $expect, "content what we expected?");
 ok (shutdown(LEFT, SHUT_WR), "shutdown left for writing");
 # This will hang forever if eof is buggy, and alarm doesn't interrupt system
 # Calls. Hence the child process minder.
-SKIP: {
+SKIP: do {
   skip "SCO Unixware / OSR have a bug with shutdown",2 if $^O =~ m/^(?:svr|sco)/;
   local %SIG{ALRM} = sub { warn "EOF on right took over 3 seconds" };
   local $TODO = "Known problems with unix sockets on $^O"
@@ -124,11 +124,11 @@ SKIP: {
       if $^O eq 'unicos' || $^O eq 'unicosmk';
   is ($!, '', 'and $! should report no error');
   alarm 60;
-}
+};
 
 my $err = $!;
 %SIG{PIPE} = 'IGNORE';
-{
+do {
   local %SIG{ALRM}
     = sub { warn "syswrite to left didn't fail within 3 seconds" };
   alarm 3;
@@ -138,14 +138,14 @@ my $err = $!;
   $err = $!;
   is ($ans, undef, "syswrite to shutdown left should fail");
   alarm 60;
-}
-{
+};
+do {
   # This may need skipping on some OSes - restoring value saved above
   # should help
   $! = $err;
   ok ((%!{EPIPE} or %!{ESHUTDOWN}), '$! should be EPIPE or ESHUTDOWN')
     or printf "\$\!=\%d(\%s)\n", $err, $err;
-}
+};
 
 my @gripping = @(chr 255, chr 127);
 foreach ( @gripping) {
@@ -167,7 +167,7 @@ ok (close RIGHT, "close right");
 # I suspect we also need a self destruct time-bomb for these, as I don't see any
 # guarantee that the stack won't drop a UDP packet, even if it is for localhost.
 
-SKIP: {
+SKIP: do {
   skip "No usable SOCK_DGRAM for socketpair", 24 if ($^O =~ m/^(MSWin32|os2)\z/);
   local $TODO = "socketpair not supported on $^O" if $^O eq 'nto';
 
@@ -192,13 +192,13 @@ foreach ( @right) {
 # stream socket, so our writes will become joined:
 my ($total);
 $total = join '', @right;
-foreach $expect ( @right) {
+foreach my $expect ( @right) {
   undef $buffer;
   is (sysread (LEFT, $buffer, length $total), length $expect, "read on left");
   is ($buffer, $expect, "content what we expected?");
 }
 $total = join '', @left;
-foreach $expect ( @left) {
+foreach my $expect ( @left) {
   undef $buffer;
   is (sysread (RIGHT, $buffer, length $total), length $expect, "read on right");
   is ($buffer, $expect, "content what we expected?");
@@ -209,7 +209,7 @@ ok (shutdown(LEFT, 1), "shutdown left for writing");
 # eof uses buffering. eof is indicated by a sysread of zero.
 # but for a datagram socket there's no way it can know nothing will ever be
 # sent
-SKIP: {
+SKIP: do {
   skip "$^O does length 0 udp reads", 2 if ($^O eq 'os390');
 
   my $alarmed = 0;
@@ -220,7 +220,7 @@ SKIP: {
   is (sysread (RIGHT, $buffer, 1), undef,
       "read on right should be interrupted");
   is ($alarmed, 1, "alarm should have fired");
-}
+};
 
 alarm 30;
 
@@ -231,7 +231,7 @@ foreach ( @gripping) {
 }
 
 $total = join '', @gripping;
-foreach $expect ( @gripping) {
+foreach my $expect ( @gripping) {
   undef $buffer;
   is (sysread (LEFT, $buffer, length $total), length $expect, "read on left");
   is ($buffer, $expect, "content what we expected?");
@@ -240,7 +240,7 @@ foreach $expect ( @gripping) {
 ok (close LEFT, "close left");
 ok (close RIGHT, "close right");
 
-} # end of DGRAM SKIP
+}; # end of DGRAM SKIP
 
 kill "INT", $child or warn "Failed to kill child process $child: $!";
 exit 0;

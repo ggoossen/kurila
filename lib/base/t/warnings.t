@@ -9,16 +9,16 @@ BEGIN {
     $^WARN_HOOK = sub { $warnings = @_[0]->{description} };
 }
 
-{
+do {
     package Foo;
     use fields < qw(thing);
-}
+};
 
-{
+do {
     package Bar;
     use fields < qw(stuff);
     use base < qw(Foo);
-}
+};
 
 main::like $warnings,
        '/^Bar is inheriting from Foo but already has its own fields!/',

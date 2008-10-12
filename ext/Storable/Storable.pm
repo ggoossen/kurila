@@ -32,9 +32,9 @@ $VERSION = '2.18';
 # Use of Log::Agent is optional
 #
 
-{
+do {
     eval "use Log::Agent";
-}
+};
 
 #
 # They might miss :flock in Fcntl
@@ -57,7 +57,7 @@ sub CLONE {
 }
 
 # Can't Autoload cleanly as this clashes 8.3 with &retrieve
-sub retrieve_fd { &fd_retrieve }		# Backward compatibility
+sub retrieve_fd { &fd_retrieve( < @_ ) }		# Backward compatibility
 
 # By default restricted hashes are downgraded on earlier perls.
 
@@ -246,7 +246,7 @@ sub _store {
 	local *FILE;
 	if ($use_locking) {
 		open(FILE, ">>", "$file") || logcroak "can't write into $file: $!";
-		unless (&CAN_FLOCK) {
+		unless (&CAN_FLOCK( < @_ )) {
 			logcarp "Storable::lock_store: fcntl/flock emulation broken on $^O";
 			return undef;
 		}
@@ -370,7 +370,7 @@ sub _retrieve {
 	my $self;
 	my $da = $@;							# Could be from exception handler
 	if ($use_locking) {
-		unless (&CAN_FLOCK) {
+		unless (&CAN_FLOCK( < @_ )) {
 			logcarp "Storable::lock_store: fcntl/flock emulation broken on $^O";
 			return undef;
 		}

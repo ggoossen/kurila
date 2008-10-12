@@ -38,7 +38,7 @@ is ($@, "");
 
 # warn and die hooks should be disabled during constant folding
 
-{
+do {
     my $c = 0;
     local $^WARN_HOOK = sub { $c++   };
     eval q{
@@ -52,4 +52,4 @@ is ($@, "");
     };
     like ($@->{description}, qr/division/, "eval caught division");
     is($c, 2, "missing die hook");
-}
+};

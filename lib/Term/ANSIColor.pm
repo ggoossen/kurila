@@ -118,7 +118,7 @@ sub color {
         $attribute .= %attributes{$_} . ';';
     }
     chop $attribute;
-    ($attribute ne '') ? "\e[{$attribute}m" : undef;
+    ($attribute ne '') ? "\e[$($attribute)m" : undef;
 }
 
 # Return a list of named color attributes for a given set of escape codes.

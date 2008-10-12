@@ -52,7 +52,7 @@ sub FETCH
     return $self->{GOT}->{$key} if exists $self->{VALID}->{$key}  ;
 
     my $pkg = ref $self ;
-    croak "{$pkg}::FETCH - Unknown element '$key'" ;
+    croak "$($pkg)::FETCH - Unknown element '$key'" ;
 }
 
 
@@ -73,7 +73,7 @@ sub STORE
     }
     
     my $pkg = ref $self ;
-    croak "{$pkg}::STORE - Unknown element '$key'" ;
+    croak "$($pkg)::STORE - Unknown element '$key'" ;
 }
 
 sub DELETE 
@@ -104,7 +104,7 @@ sub NotHere
     my $self = shift ;
     my $method = shift ;
 
-    croak ref($self) . " does not define the method {$method}" ;
+    croak ref($self) . " does not define the method $($method)" ;
 }
 
 sub FIRSTKEY { my $self = shift ; $self->NotHere("FIRSTKEY") }
@@ -178,7 +178,7 @@ require Tie::Hash;
 require Exporter;
 BEGIN {
     $use_XSLoader = 1 ;
-    { try { require XSLoader } ; }
+    do { try { require XSLoader } ; };
 
     if ($@) {
         $use_XSLoader = 0 ;
@@ -285,7 +285,7 @@ sub CLEAR
         push @keys, $key;
         $status = $self->seq($key, $value, R_NEXT());
     }
-    foreach $key (reverse @keys) {
+    foreach my $key (reverse @keys) {
         my $s = $self->del($key); 
     }
 }
@@ -299,8 +299,7 @@ sub STORESIZE
     my $current_length = $self->length() ;
 
     if ($length +< $current_length) {
-	my $key ;
-        for ($key = $current_length - 1 ; $key +>= $length ; -- $key)
+        for my $key ( reverse ( $length .. $current_length - 1 ) )
 	  { $self->del($key) }
     }
     elsif ($length +> $current_length) {
@@ -317,13 +316,12 @@ sub find_dup
     my $db        = shift ;
     my ($origkey, $value_wanted) = < @_ ;
     my ($key, $value) = ($origkey, 0);
-    my ($status) = 0 ;
 
-    for ($status = $db->seq($key, $value, R_CURSOR() ) ;
-         $status == 0 ;
-         $status = $db->seq($key, $value, R_NEXT() ) ) {
-
+    my $status = $db->seq($key, $value, R_CURSOR());
+    while ($status == 0) {
         return 0 if $key eq $origkey and $value eq $value_wanted ;
+
+        $status = $db->seq($key, $value, R_NEXT() );
     }
 
     return $status ;
@@ -356,19 +354,19 @@ sub get_dup
     my %values	  = %( () ) ;
     my @values    = @( () ) ;
     my $counter   = 0 ;
-    my $status    = 0 ;
  
     # iterate through the database until either EOF ($status == 0)
     # or a different key is encountered ($key ne $origkey).
-    for ($status = $db->seq($key, $value, R_CURSOR()) ;
-	 $status == 0 and $key eq $origkey ;
-         $status = $db->seq($key, $value, R_NEXT()) ) {
+    my $status = $db->seq($key, $value, R_CURSOR());
+    while ( $status == 0 and $key eq $origkey ) {
  
         # save the value or count number of matches
         if ($flag)
           { ++ %values{$value} }
         else
           { push (@values, $value) }
+
+        $status = $db->seq($key, $value, R_NEXT());
     }
  
     return  $flag ? %values : @values;

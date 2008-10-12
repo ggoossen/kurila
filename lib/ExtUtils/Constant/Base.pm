@@ -498,7 +498,7 @@ sub switch_clause {
       @best = @($rms, $max - $min, $i, \%spread);
     }
   }
-  die "Internal error. Failed to pick a switch point for {join ' ',@names}"
+  die "Internal error. Failed to pick a switch point for $(join ' ',@names)"
     unless defined @best[2];
   # use Data::Dumper; print Dumper (@best);
   my ($offset, $best) = < @best[[@(2,3)]];
@@ -858,12 +858,12 @@ sub C_constant {
         }
         $params = $self->params ($what);
         push @subs, < $self->C_constant (\%(package=>$package,
-					subname=>"{$subname}_$i",
+					subname=>"$($subname)_$i",
 					default_type => $default_type,
 					types => $what, indent => $indent,
 					breakout => \@($i, $items)),
 				       < @{@by_length[$i]});
-        $body .= "    return {$subname}_$i ("
+        $body .= "    return $($subname)_$i ("
 	  # Eg "aTHX_ "
 	  . $self->C_constant_prefix_param($params)
 	    # Probably "name"

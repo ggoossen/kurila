@@ -199,7 +199,7 @@ sub plan {
     }
     else {
         my @args = grep { defined } @( ($cmd, $arg));
-        die("plan() doesn't understand {join ' ',@args}");
+        die("plan() doesn't understand $(join ' ',@args)");
     }
 
     return 1;
@@ -614,7 +614,7 @@ sub cmp_ok {
     my($self, $got, $type, $expect, $name) = < @_;
 
     my $test;
-    {
+    do {
         local($@,$!);  # isolate eval
 
         my $code = $self->_caller_context;
@@ -625,7 +625,7 @@ sub cmp_ok {
         $test = eval "
 $code" . "\$got $type \$expect;";
 
-    }
+    };
     local $Level = $Level + 1;
     my $ok = $self->ok($test, $name);
 
@@ -878,7 +878,7 @@ sub _regex_ok {
         return $ok;
     }
 
-    {
+    do {
         my $test;
         my $code = $self->_caller_context;
 
@@ -894,7 +894,7 @@ $code" . q{$test = $this =~ m/$usable_regex/ ? 1 : 0};
 
         local $Level = $Level + 1;
         $ok = $self->ok( $test, $name );
-    }
+    };
 
     unless( $ok ) {
         $this = dump::view($this);

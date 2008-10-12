@@ -18,10 +18,10 @@ my $EXTRA_ABSPATH_TESTS = (%Config{prefix} =~ m/\//) && $^O ne 'cygwin';
 $tests += 4 if $EXTRA_ABSPATH_TESTS;
 plan tests => $tests;
 
-SKIP: {
+SKIP: do {
   skip "no need to check for blib/ in the core", 1 if %ENV{PERL_CORE};
   like %INC{'Cwd.pm'}, qr{blib}i, "Cwd should be loaded from blib/ during testing";
-}
+};
 
 my $IsVMS = $^O eq 'VMS';
 my $IsMacOS = $^O eq 'MacOS';
@@ -32,13 +32,13 @@ ok( !defined(&chdir),           'chdir() not exported by default' );
 ok( !defined(&abs_path),        '  nor abs_path()' );
 ok( !defined(&fast_abs_path),   '  nor fast_abs_path()');
 
-{
+do {
   my @fields = qw(PATH IFS CDPATH ENV BASH_ENV);
   my $before = grep exists %ENV{$_}, @fields;
   cwd();
   my $after = grep exists %ENV{$_}, @fields;
   is(nelems($before), nelems($after), "cwd() shouldn't create spurious entries in \%ENV");
-}
+};
 
 # XXX force Cwd to bootsrap its XSUBs since we have set @INC = "../lib"
 # XXX and subsequent chdir()s can make them impossible to find
@@ -62,7 +62,7 @@ if ($^O eq 'MSWin32') {
 }
 $pwd_cmd =~ s=\\=/=g if ($^O eq 'dos');
 
-SKIP: {
+SKIP: do {
     skip "No native pwd command found to test against", 4 unless $pwd_cmd;
 
     print "# native pwd = '$pwd_cmd'\n";
@@ -75,7 +75,7 @@ SKIP: {
     $start =~ s,\\,/,g if ($^O eq 'MSWin32' || $^O eq "NetWare");
     # DCL SHOW DEFAULT has leading spaces
     $start =~ s/^\s+// if $IsVMS;
-    SKIP: {
+    SKIP: do {
         skip("'$pwd_cmd' failed, nothing to test against", 4) if $?;
         skip("/afs seen, paths unlikely to match", 4) if $start =~ m|/afs/|;
 
@@ -103,8 +103,8 @@ SKIP: {
 	is($getcwd,     $start, 'getcwd()');
 	is($fastcwd,    $start, 'fastcwd()');
 	is($fastgetcwd, $start, 'fastgetcwd()');
-    }
-}
+    };
+};
 
 my @test_dirs = qw{_ptrslt_ _path_ _to_ _a_ _dir_};
 my $Test_Dir     = File::Spec->catdir(< @test_dirs);
@@ -118,12 +118,12 @@ foreach my $func (qw(cwd getcwd fastcwd fastgetcwd)) {
   dir_ends_with( $result, $Test_Dir, "$func()" );
 }
 
-{
+do {
   # Some versions of File::Path (e.g. that shipped with perl 5.8.5)
   # call getcwd() with an argument (perhaps by calling it as a
   # method?), so make sure that doesn't die.
   is getcwd(), getcwd('foo'), "Call getcwd() with an argument";
-}
+};
 
 # Cwd::chdir should also update $ENV{PWD}
 dir_ends_with( %ENV{PWD}, $Test_Dir, 'Cwd::chdir() updates $ENV{PWD}' );
@@ -136,24 +136,24 @@ for (1..nelems @test_dirs) {
 
 rmtree(@test_dirs[0], 0, 0);
 
-{
+do {
   my $check = ($IsVMS   ? qr|\b((?i)t)\]$| :
 	       $IsMacOS ? qr|\bt:$| :
 			  qr|\bt$| );
   
   like(%ENV{PWD}, $check);
-}
+};
 
-{
+do {
   # Make sure abs_path() doesn't trample $ENV{PWD}
   my $start_pwd = %ENV{PWD};
   mkpath(\@($Test_Dir), 0, 0777);
   Cwd::abs_path($Test_Dir);
   is %ENV{PWD}, $start_pwd;
   rmtree(@test_dirs[0], 0, 0);
-}
+};
 
-SKIP: {
+SKIP: do {
     skip "no symlinks on this platform", 2+$EXTRA_ABSPATH_TESTS unless %Config{d_symlink};
 
     mkpath(\@($Test_Dir), 0, 0777);
@@ -173,7 +173,7 @@ SKIP: {
 
     rmtree(@test_dirs[0], 0, 0);
     1 while unlink "linktest";
-}
+};
 
 if (%ENV{PERL_CORE}) {
     chdir '../ext/Cwd/t';
@@ -195,15 +195,15 @@ path_ends_with(Cwd::_perl_abs_path($path), 'cwd.t', '_perl_abs_path() can be inv
 
 
   
-SKIP: {
+SKIP: do {
   my $file;
-  {
+  do {
     my $root = Cwd::abs_path(File::Spec->rootdir);	# Add drive letter?
     local *FH;
     opendir FH, $root or skip("Can't opendir($root): $!", 2+$EXTRA_ABSPATH_TESTS);
     ($file) = < grep {-f $_ and not -l $_} map File::Spec->catfile($root, $_), @( readdir FH);
     closedir FH;
-  }
+  };
   skip "No plain file in root directory to test with", 2+$EXTRA_ABSPATH_TESTS unless $file;
   
   $file = VMS::Filespec::rmsexpand($file) if $^O eq 'VMS';
@@ -211,7 +211,7 @@ SKIP: {
   is Cwd::fast_abs_path($file), $file, 'fast_abs_path() works on files in the root directory';
   is Cwd::_perl_abs_path($file), $file, '_perl_abs_path() works on files in the root directory'
     if $EXTRA_ABSPATH_TESTS;
-}
+};
 
 
 #############################################

@@ -265,7 +265,7 @@ tryeq_sloppy $T++, 18446744073709551616/2, 9223372036854775808;
 tryeq_sloppy $T++, 18446744073709551616/4294967296, 4294967296;
 tryeq_sloppy $T++, 18446744073709551616/9223372036854775808, 2;
 
-{
+do {
   # The peephole optimiser is wrong to think that it can substitute intops
   # in place of regular ops, because i_multiply can overflow.
   # Bug reported by "Sisyphus" <kalinabears@hdc.com.au>
@@ -282,7 +282,7 @@ tryeq_sloppy $T++, 18446744073709551616/9223372036854775808, 2;
   my $t = time;
   my $t1000 = time() * 1000;
   tryok $T++, abs($t1000 -1000 * $t) +<= 2000;
-}
+};
 
 my $vms_no_ieee;
 if ($^O eq 'VMS') {

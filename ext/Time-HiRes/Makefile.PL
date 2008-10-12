@@ -95,7 +95,7 @@ __EOD__
 	    $errornull = '';
 	}
 
-        $cccmd = "%Config{'cc'} -o $tmp $ccflags $tmp.c {join ' ',@$LIBS} $errornull"
+        $cccmd = "%Config{'cc'} -o $tmp $ccflags $tmp.c $(join ' ',@$LIBS) $errornull"
 	    unless defined $cccmd;
 
        if ($^O eq 'VMS') {
@@ -335,7 +335,7 @@ sub init {
 	do $hints;
 	if (exists $self->{LIBS}) {
 	    $LIBS = $self->{LIBS};
-	    print "Extra libraries: {join ' ',@$LIBS}...\n";
+	    print "Extra libraries: $(join ' ',@$LIBS)...\n";
 	}
     }
 
@@ -766,8 +766,7 @@ sub doConstants {
                                            PROXYSUBS => 1,
 					  );
     } else {
-        my $file;
-	foreach $file (@('const-c.inc', 'const-xs.inc')) {
+	foreach my $file (@('const-c.inc', 'const-xs.inc')) {
 	    my $fallback = File::Spec->catfile('fallback', $file);
 	    local $/;
 	    open IN, "<$fallback" or die "Can't open $fallback: $!";
@@ -814,6 +813,6 @@ EOM
     }
 }
 
-&main;
+&main( < @_ );
 
 # EOF

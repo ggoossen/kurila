@@ -13,25 +13,6 @@ use warnings;
 #  for partial back-compat to 5.[68].x
 our $VERSION = '1.00';
 
-package # hide me from PAUSE
-    next;
-
-sub can { mro::_nextcan(@_[0], 0) }
-
-sub method {
-    my $method = mro::_nextcan(@_[0], 1);
-    goto &$method;
-}
-
-package # hide me from PAUSE
-    maybe::next;
-
-sub method {
-    my $method = mro::_nextcan(@_[0], 0);
-    goto &$method if defined $method;
-    return;
-}
-
 1;
 
 __END__
@@ -42,10 +23,7 @@ mro - Method Resolution Order
 
 =head1 SYNOPSIS
 
-  use mro; # enables next::method and friends globally
-
-  use mro 'c3'; # enable C3 MRO for this class (Perl Kurila default)
-  use mro 'dfs'; # enable DFS MRO for this class
+  use mro;
 
 =head1 DESCRIPTION
 
@@ -211,86 +189,6 @@ deleted (not a normal occurence, but it can happen
 if someone does something like C<undef %PkgName::>),
 the number will be reset to either C<0> or C<1>,
 depending on how completely package was wiped out.
-
-=head2 next::method
-
-This is somewhat like C<SUPER>, but it uses the C3 method
-resolution order to get better consistency in multiple
-inheritance situations.  Note that while inheritance in
-general follows whichever MRO is in effect for the
-given class, C<next::method> only uses the C3 MRO.
-
-One generally uses it like so:
-
-  sub some_method {
-    my $self = shift;
-    my $superclass_answer = $self->next::method(@_);
-    return $superclass_answer + 1;
-  }
-
-Note that you don't (re-)specify the method name.
-It forces you to always use the same method name
-as the method you started in.
-
-It can be called on an object or a class, of course.
-
-The way it resolves which actual method to call is:
-
-=over 4
-
-=item 1
-
-First, it determines the linearized C3 MRO of
-the object or class it is being called on.
-
-=item 2
-
-Then, it determines the class and method name
-of the context it was invoked from.
-
-=item 3
-
-Finally, it searches down the C3 MRO list until
-it reaches the contextually enclosing class, then
-searches further down the MRO list for the next
-method with the same name as the contextually
-enclosing method.
-
-=back
-
-Failure to find a next method will result in an
-exception being thrown (see below for alternatives).
-
-This is substantially different than the behavior
-of C<SUPER> under complex multiple inheritance.
-(This becomes obvious when one realizes that the
-common superclasses in the C3 linearizations of
-a given class and one of its parents will not
-always be ordered the same for both.)
-
-B<Caveat>: Calling C<next::method> from methods defined outside the class:
-
-There is an edge case when using C<next::method> from within a subroutine
-which was created in a different module than the one it is called from. It
-sounds complicated, but it really isn't. Here is an example which will not
-work correctly:
-
-  *Foo::foo = sub { (shift)->next::method(@_) };
-
-The problem exists because the anonymous subroutine being assigned to the
-C<*Foo::foo> glob will show up in the call stack as being called
-C<__ANON__> and not C<foo> as you might expect. Since C<next::method> uses
-C<caller> to find the name of the method it was called in, it will fail in
-this case. 
-
-But fear not, there's a simple solution. The module C<Sub::Name> will
-reach into the perl internals and assign a name to an anonymous subroutine
-for you. Simply do this:
-
-  use Sub::Name 'subname';
-  *Foo::foo = subname 'Foo::foo' => sub { (shift)->next::method(@_) };
-
-and things will Just Work.
 
 =head2 next::can
 

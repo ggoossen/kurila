@@ -20,7 +20,7 @@ while( ~< *DATA ) {
     $parser->parse_from_filehandle(\*IN,\*OUT);
 
     open OUT, '<', $output or die $!;
-    my $returned; { local $/; $returned = ~< *OUT; }
+    my $returned; do { local $/; $returned = ~< *OUT; };
     
     unless( $returned eq $expected ) {
        print < map { s/^/\#/mg; $_; }

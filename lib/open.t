@@ -53,7 +53,7 @@ is( $^OPEN, ":raw :crlf\0:raw :crlf",
 	'should set multi types, multi layer' );
 is( %^H{'open_IO'}, 'crlf', 'should record last layer set in %^H' );
 
-SKIP: {
+SKIP: do {
     skip("no perlio, no :utf8", 12) unless (PerlIO::Layer->find( 'perlio'));
 
     eval <<EOE;
@@ -175,9 +175,9 @@ EOE
 	ok($ok == (nelems @a),
 	   "checking syswrite() output on :utf8 streams by reading it back in");
     }
-}
+};
 
-SKIP: {
+SKIP: do {
     skip("no perlio", 1) unless (PerlIO::Layer->find( 'perlio'));
     use open IN => ':non-existent';
     try {
@@ -185,7 +185,7 @@ SKIP: {
     };
     like($@->{description}, qr/Can't locate Symbol|Recursive call/i,
 	 "test for an endless loop in PerlIO_find_layer");
-}
+};
 
 END {
     1 while unlink "utf8";

@@ -318,7 +318,7 @@ sub next_todo {
     my $cv = $ent->[1];
     my $gv = $cv->GV;
     my $name = $self->gv_name($gv);
-    {
+    do {
 	$self->{'subs_declared'}->{$name} = 1;
 	if ($name eq "BEGIN") {
 	    my $use_dec = $self->begin_is_use($cv);
@@ -343,8 +343,8 @@ sub next_todo {
 	    }
 	    $name =~ s/^\Q$stash\E::(?!\z|.*::)//;
 	}
-        return "{$p}{$l}sub $name " . $self->deparse_sub($cv);
-    }
+        return "$($p)$($l)sub $name " . $self->deparse_sub($cv);
+    };
 }
 
 # Return a "use" declaration for this BEGIN block, if appropriate
@@ -414,10 +414,12 @@ sub begin_is_use {
     return unless $self->const_sv($svop)->PV eq $module;
 
     # Pull out the arguments
-    for ($svop=$svop->sibling; $svop->name ne "method_named";
-		$svop = $svop->sibling) {
+    $svop=$svop->sibling;
+    while ($svop->name ne "method_named") {
 	$args .= ", " if length($args);
 	$args .= $self->deparse($svop, 6);
+
+        $svop = $svop->sibling;
     }
 
     my $use = 'use';
@@ -479,9 +481,8 @@ sub stash_subs {
 
 sub print_protos {
     my $self = shift;
-    my $ar;
     my @ret;
-    foreach $ar ( @{$self->{'protos_todo'}}) {
+    foreach my $ar ( @{$self->{'protos_todo'}}) {
 	my $proto = (defined $ar->[1] ? " (". $ar->[1] . ")" : "");
 	push @ret, "sub " . $ar->[0] .  "$proto;\n";
     }
@@ -556,7 +557,7 @@ sub new {
     return $self;
 }
 
-{
+do {
     # Mask out the bits that L<warnings::register> uses
     my $WARN_MASK;
     BEGIN {
@@ -565,7 +566,7 @@ sub new {
     sub WARN_MASK () {
 	return $WARN_MASK;
     }
-}
+};
 
 # Initialise the contextual information, either from
 # defaults provided with the ambient_pragmas method,
@@ -678,10 +679,10 @@ sub ambient_pragmas {
 	    || $name eq 'utf8') {
 	    require "$name.pm";
 	    if ($val) {
-		$hint_bits ^|^= ${%::{"{$name}::"}->{"hint_bits"}};
+		$hint_bits ^|^= ${%::{"$($name)::"}->{"hint_bits"}};
 	    }
 	    else {
-		$hint_bits ^&^= ^~^${%::{"{$name}::"}->{"hint_bits"}};
+		$hint_bits ^&^= ^~^${%::{"$($name)::"}->{"hint_bits"}};
 	    }
 	}
 
@@ -765,8 +766,7 @@ sub indent {
     my @lines = split(m/\n/, $txt);
     my $leader = "";
     my $level = 0;
-    my $line;
-    for $line ( @lines) {
+    for my $line ( @lines) {
 	my $cmd = substr($line, 0, 1);
 	if ($cmd eq "\t" or $cmd eq "\b") {
 	    $level += ($cmd eq "\t" ? 1 : -1) * $self->{'indent_size'};
@@ -814,8 +814,10 @@ sub deparse_sub {
 	my $lineseq = $cv->ROOT->first;
 	if ($lineseq->name eq "lineseq") {
 	    my @ops;
-	    for(my$o=$lineseq->first; $$o; $o=$o->sibling) {
+	    my$o=$lineseq->first;
+            while ($$o) {
 		push @ops, $o;
+                $o=$o->sibling;
 	    }
 	    $body = $self->lineseq(undef, < @ops).";";
 	    my $scope_en = $self->find_scope_en($lineseq);
@@ -1070,10 +1072,16 @@ sub scopeop {
 	    return "$body $name $cond";
 	}
     } else {
-	$kid = $op->first;
+        if ($op->last->name eq "scope") {
+            $kid = $op->last->first->last;
+        }
+        else {
+            $kid = $op->first;
+        }
     }
-    for (; !null($kid); $kid = $kid->sibling) {
+    while(!null($kid)) {
 	push @kids, $kid;
+        $kid = $kid->sibling;
     }
     if ($cx +> 0) { # inside an expression, (a do {} while for lineseq)
         if ($cx == 26) { # inside double quote
@@ -1102,8 +1110,10 @@ sub deparse_root {
     < %$self{[qw'curstash warnings hints hinthash']} = < @oldv;
     my @kids;
     return if null $op->first; # Can happen, e.g., for Bytecode without -k
-    for (my $kid = $op->first->sibling; !null($kid); $kid = $kid->sibling) {
+    my $kid = $op->first->sibling;
+    while (!null($kid)) {
 	push @kids, $kid;
+        $kid = $kid->sibling;
     }
     $self->walk_lineseq($op, \@kids,
 			sub { print $self->indent(@_[0].';');
@@ -1114,7 +1124,8 @@ sub deparse_root {
 sub walk_lineseq {
     my ($self, $op, $kids, $callback) = < @_;
     my @kids = @$kids;
-    for (my $i = 0; $i +< nelems @kids; $i++) {
+    my $i = 0;
+    while ( $i +< nelems(@kids) ) {
 	my $expr = "";
 	if (is_state @kids[$i]) {
 	    $expr = $self->deparse(@kids[$i++], 0);
@@ -1130,6 +1141,8 @@ sub walk_lineseq {
 	$expr .= $self->deparse(@kids[$i], ((nelems @kids) != 1)/2);
 	$expr =~ s/;\n?\z//;
 	$callback->($expr, $i);
+    } continue {
+        $i++;
     }
 }
 
@@ -1198,14 +1211,15 @@ sub lex_in_scope {
 
 sub populate_curcvlex {
     my $self = shift;
-    for (my $cv = $self->{'curcv'}; class($cv) eq "CV"; $cv = $cv->OUTSIDE) {
+    my $cv = $self->{'curcv'};
+    while (class($cv) eq "CV") {
 	my $padlist = $cv->PADLIST;
 	# an undef CV still in lexical chain
 	next if class($padlist) eq "SPECIAL";
 	my @padlist = $padlist->ARRAY;
 	my @ns = @padlist[0]->ARRAY;
 
-	for (my $i=0; $i+<nelems @ns; ++$i) {
+	for my $i (0 .. nelems(@ns) -1) {
 	    next if class(@ns[$i]) eq "SPECIAL";
 	    next if @ns[$i]->FLAGS ^&^ SVpad_OUR;  # Skip "our" vars
 	    if (class(@ns[$i]) eq "PV") {
@@ -1220,6 +1234,8 @@ sub populate_curcvlex {
 
 	    push @{$self->{'curcvlex'}->{$name}}, \@($seq_st, $seq_en);
 	}
+    } continue {
+        $cv = $cv->OUTSIDE;
     }
 }
 
@@ -1234,7 +1250,8 @@ sub find_scope {
 
     my @queue = @($op);
     while(my $op = shift @queue ) {
-	for (my $o=$op->first; $$o; $o=$o->sibling) {
+	my $o=$op->first;
+        while ($$o) {
 	    if ($o->name =~ m/^pad.v$/ && $o->private ^&^ OPpLVAL_INTRO) {
 		my $s = int($self->padname_sv($o->targ)->COP_SEQ_RANGE_LOW);
 		my $e = $self->padname_sv($o->targ)->COP_SEQ_RANGE_HIGH;
@@ -1250,7 +1267,9 @@ sub find_scope {
 	    }
 	    elsif ($o->flags ^&^ OPf_KIDS) {
 		unshift (@queue, $o);
-	    }
+	    };
+
+            $o=$o->sibling;
 	}
     }
 
@@ -1728,9 +1747,11 @@ sub anon_hash_or_list {
                           "anonhash" => \@('%(',')')){$op->name}};
     my($expr, @exprs);
     $op = $op->first->sibling; # skip pushmark
-    for (; !null($op); $op = $op->sibling) {
+    while (!null($op)) {
 	$expr = $self->deparse($op, 6);
 	push @exprs, $expr;
+
+        $op = $op->sibling;
     }
     return $pre . join(", ", @exprs) . $post;
 }
@@ -1739,6 +1760,12 @@ sub pp_anonlist {
     my $self = shift;
     my ($op, $cx) = < @_;
     return $self->anon_hash_or_list($op, $cx);
+}
+
+sub pp_anonscalar {
+    my $self = shift;
+    my ($op, $cx) = < @_;
+    return "\$( " . $self->deparse($op->first, 6) . " )";
 }
 
 *pp_anonhash = \&pp_anonlist;
@@ -2068,8 +2095,9 @@ sub pp_repeat {
     if (null($right)) { # list repeat; count is inside left-side ex-list
 	my $kid = $left->first->sibling; # skip pushmark
 	my @exprs;
-	for (; !null( <$kid->sibling); $kid = $kid->sibling) {
+	while (!null($kid->sibling)) {
 	    push @exprs, < $self->deparse($kid, 6);
+            $kid = $kid->sibling;
 	}
 	$right = $kid;
 	$left = "(" . join(", ", @exprs). ")";
@@ -2177,8 +2205,9 @@ sub listop {
 	push @exprs, < $self->deparse( <$kid->first, 6);
 	$kid = $kid->sibling;
     }
-    for (; !null($kid); $kid = $kid->sibling) {
+    while (!null($kid)) {
 	push @exprs, $self->deparse($kid, 6);
+        $kid = $kid->sibling;
     }
     if ($parens) {
 	return "$name(" . join(", ", @exprs) . ")";
@@ -2333,9 +2362,10 @@ sub indirop {
     elsif ($name eq "sort" && $op->private ^&^ OPpSORT_DESCEND) {
 	$indir = '{$b cmp $a} ';
     }
-    for (; !null($kid); $kid = $kid->sibling) {
+    while (!null($kid)) {
 	$expr = $self->deparse($kid, 6);
 	push @exprs, $expr;
+        $kid = $kid->sibling;
     }
     my $name2 = $name;
     if ($name eq "sort" && $op->private ^&^ OPpSORT_REVERSE) {
@@ -2378,9 +2408,10 @@ sub mapop {
 	$code = $self->deparse($code, 24) . ", ";
     }
     $kid = $kid->sibling;
-    for (; !null($kid); $kid = $kid->sibling) {
+    while (!null($kid)) {
 	$expr = $self->deparse($kid, 6);
 	push @exprs, $expr if defined $expr;
+        $kid = $kid->sibling;
     }
     return $self->maybe_parens_func($name, $code . join(", ", @exprs), $cx, 5);
 }
@@ -2395,9 +2426,9 @@ sub pp_list {
     my($op, $cx) = < @_;
     my($expr, @exprs);
     my $kid = $op->first->sibling; # skip pushmark
-    my $lop;
     my $local = "either"; # could be local(...), my(...), state(...) or our(...)
-    for ($lop = $kid; !null($lop); $lop = $lop->sibling) {
+    my $lop = $kid;
+    while (!null($lop)) {
 	# This assumes that no other private flags equal 128, and that
 	# OPs that store things other than flags in their op_private,
 	# like OP_AELEMFAST, won't be immediate children of a list.
@@ -2437,10 +2468,12 @@ sub pp_list {
 	    ($local = "", last) if $local =~ m/^(?:my|our|state)$/;
 	    $local = "local";
 	}
+    } continue {
+        $lop = $lop->sibling;
     }
     $local = "" if $local eq "either"; # no point if it's all undefs
     return $self->deparse($kid, $cx) if null $kid->sibling and not $local;
-    for (; !null($kid); $kid = $kid->sibling) {
+    while (!null($kid)) {
 	if ($local) {
 	    if (class($kid) eq "UNOP" and $kid->first->name eq "gvsv") {
 		$lop = $kid->first;
@@ -2454,6 +2487,8 @@ sub pp_list {
 	    $expr = $self->deparse($kid, 6);
 	}
 	push @exprs, $expr;
+
+        $kid = $kid->sibling;
     }
     if ($local) {
 	return "$local(" . join(", ", @exprs) . ")";
@@ -2592,8 +2627,9 @@ sub loop_common {
 	my $state = $body->first;
 	my $cuddle = $self->{'cuddle'};
 	my @states;
-	for (; $$state != $$cont; $state = $state->sibling) {
+	while ($$state != $$cont) {
 	    push @states, $state;
+            $state = $state->sibling;
 	}
 	$body = $self->lineseq(undef, < @states);
 	if (defined $cond and not is_scope $cont and $self->{'expand'} +< 3) {
@@ -2947,22 +2983,26 @@ sub slice {
     my $self = shift;
     my ($op, $cx, $left, $right, $regname, $padname) = < @_;
     my $last;
-    my(@elems, $kid, $array, $list);
+    my(@elems, $array, $list);
     if (class($op) eq "LISTOP") {
 	$last = $op->last;
     } else { # ex-hslice inside delete()
-	for ($kid = $op->first; !null $kid->sibling; $kid = $kid->sibling) {}
+	my $kid = $op->first;
+        while (!null $kid->sibling) {
+            $kid = $kid->sibling;
+        }
 	$last = $kid;
     }
     $array = $last;
     $array = $array->first
 	if $array->name eq $regname or $array->name eq "null";
     $array = $self->elem_or_slice_array_name($array,$left,$padname,0);
-    $kid = $op->first->sibling; # skip pushmark
+    my $kid = $op->first;
     if ($kid->name eq "list") {
 	$kid = $kid->first->sibling; # skip list, pushmark
-	for (; !null $kid; $kid = $kid->sibling) {
+	while (!null $kid) {
 	    push @elems, $self->deparse($kid, 6);
+            $kid = $kid->sibling;
 	}
 	$list = join(", ", @elems);
     } else {
@@ -3016,15 +3056,16 @@ sub _method {
 	$kid = $kid->first->sibling; # skip pushmark
 	$obj = $kid;
 	$kid = $kid->sibling;
-	for (; not null $kid; $kid = $kid->sibling) {
+	while (not null $kid) {
 	    push @exprs, $kid;
+            $kid = $kid->sibling;
 	}
     } else {
 	$obj = $kid;
 	$kid = $kid->sibling;
-	for (; !null ($kid->sibling) && $kid->name ne "method_named";
-	      $kid = $kid->sibling) {
-	    push @exprs, $kid
+	while (!null ($kid->sibling) && $kid->name ne "method_named") {
+	    push @exprs, $kid;
+            $kid = $kid->sibling;
 	}
 	$meth = $kid;
     }
@@ -3160,8 +3201,9 @@ sub pp_entersub {
     }
     $kid = $op->first;
     $kid = $kid->first->sibling; # skip ex-list, pushmark
-    for (; not null $kid->sibling; $kid = $kid->sibling) {
+    while (not null $kid->sibling) {
 	push @exprs, $kid;
+        $kid = $kid->sibling;
     }
     my $simple = 0;
     my $proto = undef;
@@ -3194,7 +3236,7 @@ sub pp_entersub {
     # Doesn't matter how many prototypes there are, if
     # they haven't happened yet!
     my $declared;
-    {
+    do {
 	no strict 'refs';
 	no warnings 'uninitialized';
 	$declared = exists $self->{'subs_declared'}->{$kid}
@@ -3202,13 +3244,14 @@ sub pp_entersub {
 		 defined %{Symbol::stash($self->{'curstash'})}{$kid}
 		 && !exists
 		     $self->{'subs_deparsed'}->{$self->{'curstash'}."::".$kid}
-		 && defined prototype $self->{'curstash'}."::".$kid
+		 && defined prototype(
+                     \&{*{Symbol::fetch_glob($self->{'curstash'}."::".$kid)}})
 	       );
 	if (!$declared && defined($proto)) {
 	    # Avoid "too early to check prototype" warning
 	    ($amper, $proto) = ('&');
 	}
-    }
+    };
 
     my $args;
     if ($declared and defined $proto and not $amper) {
@@ -3260,7 +3303,7 @@ sub uninterp {
     return $str;
 }
 
-{
+do {
 my $bal;
 BEGIN {
     use re "eval";
@@ -3295,7 +3338,7 @@ sub re_uninterp {
           | \\[uUlLQE]
           )
 
-	/{defined($4) && length($4) ? "$1$2$4" : "$1$2\\$3"}/xg;
+	/$(defined($4) && length($4) ? "$1$2$4" : "$1$2\\$3")/xg;
 
     return $str;
 }
@@ -3323,11 +3366,11 @@ sub re_uninterp_extended {
           | \\[uUlLQE]
           )
 
-	/{defined($4) && length($4) ? "$1$2$4" : "$1$2\\$3"}/xg;
+	/$(defined($4) && length($4) ? "$1$2$4" : "$1$2\\$3")/xg;
 
     return $str;
 }
-}
+};
 
 my %unctrl = # portable to to EBCDIC
     %(
@@ -3367,7 +3410,7 @@ my %unctrl = # portable to to EBCDIC
 # character escapes, but not delimiters that might need to be escaped
 sub escape_str { # ASCII, UTF8
     my($str) = < @_;
-    $str =~ s/(.)/{ord($1) +> 255 ? sprintf("\\x\{\%x\}", ord($1)) : $1}/g;
+    $str =~ s/(.)/$(ord($1) +> 255 ? sprintf("\\x\{\%x\}", ord($1)) : $1)/g;
     $str =~ s/\a/\\a/g;
 #    $str =~ s/\cH/\\b/g; # \b means something different in a regex
     $str =~ s/\t/\\t/g;
@@ -3375,8 +3418,8 @@ sub escape_str { # ASCII, UTF8
     $str =~ s/\e/\\e/g;
     $str =~ s/\f/\\f/g;
     $str =~ s/\r/\\r/g;
-    $str =~ s/([\cA-\cZ])/{%unctrl{$1}}/g;
-    $str =~ s/([[:^print:]])/{sprintf("\\\%03o", ord($1))}/g;
+    $str =~ s/([\cA-\cZ])/$(%unctrl{$1})/g;
+    $str =~ s/([[:^print:]])/$(sprintf("\\\%03o", ord($1)))/g;
     return $str;
 }
 
@@ -3384,9 +3427,9 @@ sub escape_str { # ASCII, UTF8
 # Leave whitespace unmangled.
 sub escape_extended_re {
     my($str) = < @_;
-    $str =~ s/(.)/{ord($1) +> 255 ? sprintf("\\x\{\%x\}", ord($1)) : $1}/g;
-    $str =~ s/([[:^print:]])/{
-	($1 =~ m![ \t\n]!) ? $1 : sprintf("\\\%03o", ord($1))}/g;
+    $str =~ s/(.)/$(ord($1) +> 255 ? sprintf("\\x\{\%x\}", ord($1)) : $1)/g;
+    $str =~ s/([[:^print:]])/$(
+	($1 =~ m![ \t\n]!) ? $1 : sprintf("\\\%03o", ord($1)))/g;
     $str =~ s/\n/\n\f/g;
     return $str;
 }
@@ -3411,11 +3454,11 @@ sub re_unback {
 sub balanced_delim {
     my($str) = < @_;
     my @str = split m//, $str;
-    my($ar, $open, $close, $fail, $c, $cnt, $last_bs);
-    for $ar (@(\@('[',']'), \@('(',')'), \@('<','>'), \@('{','}'))) {
+    my($open, $close, $fail, $cnt, $last_bs);
+    for my $ar (@(\@('[',']'), \@('(',')'), \@('<','>'), \@('{','}'))) {
 	($open, $close) = < @$ar;
 	$fail = 0; $cnt = 0; $last_bs = 0;
-	for $c ( @str) {
+	for my $c ( @str) {
 	    if ($c eq $open) {
 		$fail = 1 if $last_bs;
 		$cnt++;
@@ -3493,8 +3536,10 @@ sub const {
     }
     # convert a version object into the "v1.2.3" string in its V magic
     if ($sv->FLAGS ^&^ SVs_RMG) {
-	for (my $mg = $sv->MAGIC; $mg; $mg = $mg->MOREMAGIC) {
+	my $mg = $sv->MAGIC;
+        while ($mg) {
 	    return $mg->PTR if $mg->TYPE eq 'V';
+            $mg = $mg->MOREMAGIC;
 	}
     }
 
@@ -3538,7 +3583,7 @@ sub const {
 	my $str = "$nv";
 	if ($str != $nv) {
 	    # failing that, try using more precision
-	    $str = sprintf("\%.{$max_prec}g", $nv);
+	    $str = sprintf("\%.$($max_prec)g", $nv);
 #	    if (pack("F", $str) ne pack("F", $nv)) {
 	    if ($str != $nv) {
 		# not representable in decimal with whatever sprintf()
@@ -3564,11 +3609,13 @@ sub const {
 	    return "sub " . $self->deparse_sub($ref);
 	}
 	if ($ref->FLAGS ^&^ SVs_SMG) {
-	    for (my $mg = $ref->MAGIC; $mg; $mg = $mg->MOREMAGIC) {
+	    my $mg = $ref->MAGIC;
+            while ($mg) {
 		if ($mg->TYPE eq 'r') {
 		    my $re = re_uninterp( <escape_str( <re_unback( <$mg->precomp)));
 		    return single_delim("qr", "", $re);
 		}
+                $mg = $mg->MOREMAGIC;
 	    }
 	}
 	
@@ -3677,21 +3724,21 @@ sub pp_stringify { maybe_targmy(< @_, \&dquote) }
 # note that tr(from)/to/ is OK, but not tr/from/(to)
 sub double_delim {
     my($from, $to) = < @_;
-    my($succeed, $delim);
+    my($succeed);
     if ($from !~ m[/] and $to !~ m[/]) {
 	return "/$from/$to/";
     } elsif (($succeed, $from) = < balanced_delim($from) and $succeed) {
 	if (($succeed, $to) = < balanced_delim($to) and $succeed) {
 	    return "$from$to";
 	} else {
-	    for $delim (@('/', '"', '#')) { # note no `'' -- s''' is special
+	    for my $delim (@('/', '"', '#')) { # note no `'' -- s''' is special
 		return "$from$delim$to$delim" if index($to, $delim) == -1;
 	    }
 	    $to =~ s[/][\\/]g;
 	    return "$from/$to/";
 	}
     } else {
-	for $delim (@('/', '"', '#')) { # note no '
+	for my $delim (@('/', '"', '#')) { # note no '
 	    return "$delim$from$delim$to$delim"
 		if index($to . $from, $delim) == -1;
 	}
@@ -3734,18 +3781,21 @@ sub pchr { # ASCII
 
 sub collapse {
     my(@chars) = @_;
-    my($str, $c, $tr) = ("");
-    for ($c = 0; $c +< nelems @chars; $c++) {
+    my($str, $tr) = ("");
+    my $c = 0;
+    while ($c +< nelems @chars) {
 	$tr = @chars[$c];
 	$str .= pchr($tr);
 	if ($c +<=( (nelems @chars)-1) - 2 and @chars[$c + 1] == $tr + 1 and
 	    @chars[$c + 2] == $tr + 2)
 	{
-	    for (; $c +<=( (nelems @chars)-1)-1 and @chars[$c + 1] == @chars[$c] + 1; $c++)
-	      {}
+	    while( $c +<=( (nelems @chars)-1)-1 and @chars[$c + 1] == @chars[$c] + 1 ) {
+                $c++;
+            }
 	    $str .= "-";
 	    $str .= pchr(@chars[$c]);
 	}
+        $c++;
     }
     return $str;
 }
@@ -3934,8 +3984,9 @@ sub pp_split {
     }
     $ary = $self->stash_variable('@', < $self->gv_name($gv)) if $gv;
 
-    for (; !null($kid); $kid = $kid->sibling) {
+    while (!null($kid)) {
 	push @exprs, $self->deparse($kid, 6);
+        $kid = $kid->sibling;
     }
 
     # handle special case of split(), and split(' ') that compiles to /\s+/

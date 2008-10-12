@@ -9,10 +9,10 @@ plan( tests => 52 );
 
 our $test;
 
-{
+do {
     my @lol = @(\qw(a b c), \@(), \qw(1 2 3));
     my @mapped = map  {scalar nelems @$_} @lol;
-    cmp_ok("{join ' ',@mapped}", 'eq', "3 0 3", 'map scalar list of list');
+    cmp_ok("$(join ' ',@mapped)", 'eq', "3 0 3", 'map scalar list of list');
 
     my @grepped = grep {scalar nelems @$_} @lol;
     cmp_ok( (join ' ', map { dump::view($_) } @grepped), 'eq',
@@ -20,10 +20,10 @@ our $test;
     $test++;
 
     @grepped = grep { $_ } @mapped;
-    cmp_ok( "{join ' ',@grepped}", 'eq',  "3 3", 'grep basic');
-}
+    cmp_ok( "$(join ' ',@grepped)", 'eq',  "3 3", 'grep basic');
+};
 
-{
+do {
     my @res;
 
     @res = map({$_} @( ("geronimo")));
@@ -126,40 +126,40 @@ our $test;
            {$_^&^"X"} @( ("bodine"));
     cmp_ok( scalar(nelems @res), '==', 1, 'no paren binand X linefeed grep nr');
     cmp_ok( @res[0], 'eq', 'bodine', 'no paren binand X linefeed grep is');
-}
+};
 
-{
+do {
     # Tests for "for" in "map" and "grep"
     # Used to dump core, bug [perl #17771]
 
     my @x;
     my $y = '';
     @x = map { $y .= $_ for 1..2; 1 } 3..4;
-    cmp_ok( "{join ' ',@x},$y",'eq',"1 1,1212", '[perl #17771] for in map 1');
+    cmp_ok( "$(join ' ',@x),$y",'eq',"1 1,1212", '[perl #17771] for in map 1');
 
     $y = '';
     @x = map { $y .= $_ for 1..2; $y .= $_ } 3..4;
-    cmp_ok( "{join ' ',@x},$y",'eq',"123 123124,123124", '[perl #17771] for in map 2');
+    cmp_ok( "$(join ' ',@x),$y",'eq',"123 123124,123124", '[perl #17771] for in map 2');
 
     $y = '';
     @x = map { for (1..2) { $y .= $_ } $y .= $_ } 3..4;
-    cmp_ok( "{join ' ',@x},$y",'eq',"123 123124,123124", '[perl #17771] for in map 3');
+    cmp_ok( "$(join ' ',@x),$y",'eq',"123 123124,123124", '[perl #17771] for in map 3');
 
     $y = '';
     @x = grep { $y .= $_ for 1..2; 1 } 3..4;
-    cmp_ok( "{join ' ',@x},$y",'eq',"3 4,1212", '[perl #17771] for in grep 1');
+    cmp_ok( "$(join ' ',@x),$y",'eq',"3 4,1212", '[perl #17771] for in grep 1');
 
     $y = '';
     @x = grep { for (1..2) { $y .= $_ } 1 } 3..4;
-    cmp_ok( "{join ' ',@x},$y",'eq',"3 4,1212", '[perl #17771] for in grep 2');
+    cmp_ok( "$(join ' ',@x),$y",'eq',"3 4,1212", '[perl #17771] for in grep 2');
 
     # Add also a sample test from [perl #18153].  (The same bug).
     $a = 1; map {if ($a){}} @( (2));
     pass( '[perl #18153] (not dead yet)' ); # no core dump is all we need
-}
+};
 
-{
+do {
     # This shouldn't loop indefinitively.
     my @empty = map { while (1) {} } @( ());
-    cmp_ok("{join ' ',@empty}", 'eq', '', 'staying alive');
-}
+    cmp_ok("$(join ' ',@empty)", 'eq', '', 'staying alive');
+};

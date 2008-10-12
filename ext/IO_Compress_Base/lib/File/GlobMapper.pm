@@ -89,7 +89,7 @@ sub new
     }
 
     #if (whatever)
-    {
+    do {
         my $missing = grep { ! -e $_ } @inputFiles ;
 
         if ($missing)
@@ -97,7 +97,7 @@ sub new
             $Error = "$missing input files do not exist";
             return undef ;
         }
-    }
+    };
 
     $self->{InputFiles} = \@inputFiles ;
 
@@ -285,11 +285,11 @@ sub _parseOutputGlob
                   [^/]        # a non-slash character
                         *     # repeated 0 or more times (0 means me)
               )
-            }{{
+            }{$(
               $1
                   ? (getpwnam($1))[[7]]
                   : ( %ENV{HOME} || %ENV{LOGDIR} )
-            }}x;
+            )}x;
 
     }
 
@@ -303,9 +303,9 @@ sub _parseOutputGlob
     my $noPreBS = '(?<!\\)' ; # no preceeding backslash
     #warn "noPreBS = '$noPreBS'\n";
 
-    #$string =~ s/${noPreBS}\$(\d)/\${$1}/g;
-    $string =~ s/$noPreBS(?:)#(\d)/\{\$$1\}/g;
-    $string =~ s#$noPreBS(?:)\*#\{\$inFile\}#g;
+    #$string =~ s/${noPreBS}\$(\d)/\$\$($1)/g;
+    $string =~ s/$noPreBS(?:)#(\d)/\$(\$$1)/g;
+    $string =~ s#$noPreBS(?:)\*#\$(\$inFile)#g;
     $string = '"' . $string . '"';
 
     #print "OUTPUT '$self->{OutputGlob}' => '$string'\n";

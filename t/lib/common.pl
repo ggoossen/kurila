@@ -25,7 +25,7 @@ my @prgs = @( () ) ;
 my @w_files = @( () ) ;
 
 if ((nelems @ARGV))
-  { print "ARGV = [{join ' ',@ARGV}]\n" ;
+  { print "ARGV = [$(join ' ',@ARGV)]\n" ;
     if ($Is_MacOS) {
       @w_files = map { s#^#:lib:$pragma_name:#; $_ } @ARGV
     } else {
@@ -52,11 +52,11 @@ foreach my $file ( @w_files) {
     }
     close $got_file if $got_files;
 
-    {
+    do {
         local $/ = undef;
         $files++;
         @prgs = @(< @prgs, $file, < split "\n########\n", ~< *F) ;
-    }
+    };
     close F ;
 }
 
@@ -94,7 +94,7 @@ for ( @prgs){
     if ($todo_reason && $todo_reason =~ s/^\?//) {
 	my $temp = eval $todo_reason;
 	if ($@) {
-	    die "# In TODO code reason:\n# $todo_reason\n{$@->message}";
+	    die "# In TODO code reason:\n# $todo_reason\n$($@->message)";
 	}
 	$todo_reason = $temp;
     }
@@ -221,7 +221,7 @@ sub randomMatch
     my @got = sort split "\n", $got ;
     my @expected = sort split "\n", $expected ;
 
-   return "{join ' ',@got}" eq "{join ' ',@expected}";
+   return "$(join ' ',@got)" eq "$(join ' ',@expected)";
 
 }
 

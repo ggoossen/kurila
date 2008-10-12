@@ -42,10 +42,10 @@ foreach my $file (@(
     $parser->parse_file( source_path($file));
 
     open(IN, "<", $precooked) or die "Can't read-open $precooked: $!";
-    {
+    do {
       local $/;
       $strings[1] = ~< *IN;
-    }
+    };
     close(IN);
 
     for ($strings) { s/\s+/ /g; s/^\s+//s; s/\s+$//s; }
@@ -69,11 +69,11 @@ foreach my $file (@(
       if($at +> 10) {
         $at -= 5;
       }
-      {
+      do {
         print "# ", substr($strings[0],$at,20), "\n";
         print "# ", substr($strings[1],$at,20), "\n";
         print "#      ^...";
-      }
+      };
     
       ok 0;
       printf "# Unequal lengths \%s and \%s\n", length($strings[0]), length($strings[1]);

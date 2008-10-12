@@ -127,7 +127,7 @@ sub get_subname {
     }
   }
 
-  return ($info->{sub} eq '(eval)') ? 'try {...}' : $info->{sub};
+  return (($info->{sub}||'') eq '(eval)') ? 'try {...}' : $info->{sub};
 }
 
 # Figures out what call (from the point of view of the caller)
@@ -135,7 +135,7 @@ sub get_subname {
 sub long_error_loc {
   my $i;
   my $lvl = $CarpLevel;
-  {
+  do {
     my $pkg = caller(++$i);
     unless(defined($pkg)) {
       # This *shouldn't* happen.
@@ -152,7 +152,7 @@ sub long_error_loc {
     redo if %CarpInternal{$pkg};
     redo unless 0 +> --$lvl;
     redo if %Internal{$pkg};
-  }
+  };
   return $i - 1;
 }
 
@@ -210,7 +210,7 @@ sub short_error_loc {
   my $cache = \%();
   my $i = 1;
   my $lvl = $CarpLevel;
-  {
+  do {
     my $called = caller($i++);
     my $caller = caller($i);
 
@@ -221,7 +221,7 @@ sub short_error_loc {
     redo if trusts($called, $caller, $cache);
     redo if trusts($caller, $called, $cache);
     redo unless 0 +> --$lvl;
-  }
+  };
   return $i - 1;
 }
 

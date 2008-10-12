@@ -12,7 +12,7 @@ BEGIN {
 use strict;
 use Test::More tests => 1;
 
-{
+do {
     package Parent;
 
     sub foo { 42 }
@@ -24,7 +24,7 @@ use Test::More tests => 1;
     package Child;
 
     base->import( <qw(Middle Parent));
-}
+};
 
 is_deeply \ @Child::ISA, \qw(Middle),
           'base.pm will not add to @ISA if you already are-a';

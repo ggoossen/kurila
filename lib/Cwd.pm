@@ -381,14 +381,14 @@ sub fastcwd_ {
 
     my($orig_cdev, $orig_cino) = stat('.');
     ($cdev, $cino) = ($orig_cdev, $orig_cino);
-    for (;;) {
+    while (1) {
 	my $direntry;
 	($odev, $oino) = ($cdev, $cino);
 	CORE::chdir('..') || return undef;
 	($cdev, $cino) = stat('.');
 	last if $odev == $cdev && $oino == $cino;
 	opendir(my $dir, '.') || return undef;
-	for (;;) {
+	while (1) {
 	    $direntry = readdir($dir);
 	    last unless defined $direntry;
 	    next if $direntry eq '.';
@@ -476,8 +476,7 @@ sub chdir {
     } else {
 	my @curdir = split(m#/#,%ENV{'PWD'});
 	@curdir = @('') unless (nelems @curdir);
-	my $component;
-	foreach $component (split(m#/#, $newdir)) {
+	foreach my $component (split(m#/#, $newdir)) {
 	    next if $component eq '.';
 	    pop(@curdir),next if $component eq '..';
 	    push(@curdir,$component);
@@ -523,7 +522,6 @@ sub _perl_abs_path
 
     $cwd = '';
     $dotdots = $start;
-    do
     {
 	$dotdots .= '/..';
 	@pst = @cst;
@@ -545,18 +543,16 @@ sub _perl_abs_path
 	}
 	else
 	{
-	    do
-	    {
+            {
 		unless (defined ($dir = readdir($parent)))
 	        {
-		    war("readdir($dotdots): $!");
+		    warn("readdir($dotdots): $!");
 		    closedir($parent);
 		    return '';
 		}
 		@tst[0] = @pst[0]+1 unless (@tst = @( lstat("$dotdots/$dir") ))
-	    }
-	    while ($dir eq '.' || $dir eq '..' || @tst[0] != @pst[0] ||
-		   @tst[1] != @pst[1]);
+	    } while ( $dir eq '.' || $dir eq '..' || @tst[0] != @pst[0] ||
+                        @tst[1] != @pst[1] )
 	}
 	$cwd = (defined $dir ? "$dir" : "" ) . "/$cwd" ;
 	closedir($parent);

@@ -42,7 +42,7 @@ foreach my $line ( @tests) {
 	print "ok ",$test++,"\n";
     }
     else {
-	print "not ok ",$test++," got: {join ' ',@got} == {join ' ',@get} left: {join ' ',@x} == {join ' ',@leave}\n";
+	print "not ok ",$test++," got: $(join ' ',@got) == $(join ' ',@get) left: $(join ' ',@x) == $(join ' ',@leave)\n";
     }
 }
 

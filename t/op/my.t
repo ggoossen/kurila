@@ -1,6 +1,6 @@
 #!./perl
 
-print "1..36\n";
+print "1..34\n";
 
 our ($a, $b, $c, $d, $x, $y, @b, @c, %d, $k);
 
@@ -10,8 +10,8 @@ sub foo {
     my $d;
     $c = "ok 3\n";
     $d = "ok 4\n";
-    { my($a, undef, $c) = ("ok 9\n", "not ok 10\n", "ok 10\n");
-      ($x, $y) = ($a, $c); }
+    do { my($a, undef, $c) = ("ok 9\n", "not ok 10\n", "ok 10\n");
+      ($x, $y) = ($a, $c); };
     print $a, $b;
     $c . $d;
 }
@@ -32,7 +32,7 @@ sub foo2 {
     my(@c, %d);
     @c = @( "ok 13\n" );
     %d{''} = "ok 14\n";
-    { my($a,< @c) = ("ok 19\n", "ok 20\n"); ($x, $y) = ($a, < @c); }
+    do { my($a,< @c) = ("ok 19\n", "ok 20\n"); ($x, $y) = ($a, < @c); };
     print $a, < @b;
     @c[0] . %d{''};
 }
@@ -69,13 +69,7 @@ continue {
     print("not "), last unless $i +> 0;
 }
 print "ok 23\n";
-
-$j = 5;
-for (my $i = 0; (my $k = $i) +< $j; ++$i) {
-    print("not "), last unless $i +>= 0 && $i +< $j && $i == $k;
-}
 print "ok 24\n";
-print "not " if defined $k;
 print "ok 25\n";
 
 foreach my $i (@(26, 27)) {
@@ -117,14 +111,3 @@ sub foo3 {
 try { foo3(); foo3(); };
 print "not " if $@;
 print "ok 34\n";
-
-# my $foo = undef should always assign [perl #37776]
-{
-    my $count = 35;
-    loop:
-    my $test = undef;
-    print "not " if defined $test;
-    print "ok $count\n";
-    $test = 42;
-    goto loop if ++$count +< 37;
-}

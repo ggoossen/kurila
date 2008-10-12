@@ -147,7 +147,7 @@ sub split_command {
     my $len_left = int($self->max_exec_len * 0.70);
     $len_left -= length $self->_expand_macros($cmd);
 
-    do {
+    {
         my $arg_str = '';
         my @next_args;
         while( @next_args = @( splice(@args, 0, 2) ) ) {
@@ -177,9 +177,9 @@ sub split_command {
 sub _expand_macros {
     my($self, $cmd) = < @_;
 
-    $cmd =~ s{\$\((\w+)\)}{{
+    $cmd =~ s{\$\((\w+)\)}{$(
         defined $self->{$1} ? $self->{$1} : "\$($1)"
-    }};
+    )};
     return $cmd;
 }
 
@@ -489,8 +489,8 @@ clean :: clean_subdirs
     push @dirs, < $self->extra_clean_files;
 
     # Occasionally files are repeated several times from different sources
-    { my(%f) = %( < map { ($_ => 1) } grep { defined $_ } @files ); @files = keys %f; }
-    { my(%d) = %( < map { ($_ => 1) } grep { defined $_ } @dirs );  @dirs  = keys %d; }
+    do { my(%f) = %( < map { ($_ => 1) } grep { defined $_ } @files ); @files = keys %f; };
+    do { my(%d) = %( < map { ($_ => 1) } grep { defined $_ } @dirs );  @dirs  = keys %d; };
 
     push @m, < map "\t$_\n", $self->split_command('- $(RM_F)',  < @files);
     push @m, < map "\t$_\n", $self->split_command('- $(RM_RF)', < @dirs);
@@ -695,7 +695,7 @@ END
 
     my @man_cmds;
     foreach my $section (qw(1 3)) {
-        my $pods = $self->{"MAN{$section}PODS"};
+        my $pods = $self->{"MAN$($section)PODS"};
         push @man_cmds, < $self->split_command(<<CMD, < %$pods);
 	\$(NOECHO) \$(POD2MAN) --section=$section --perm_rw=\$(PERM_RW)
 CMD
@@ -842,8 +842,8 @@ sub realclean {
     }
 
     # Occasionally files are repeated several times from different sources
-    { my(%f) = %( < map { ($_ => 1) } @files );  @files = keys %f; }
-    { my(%d) = %( < map { ($_ => 1) } @dirs );   @dirs  = keys %d; }
+    do { my(%f) = %( < map { ($_ => 1) } @files );  @files = keys %f; };
+    do { my(%d) = %( < map { ($_ => 1) } @dirs );   @dirs  = keys %d; };
 
     my $rm_cmd  = join "\n\t", map { "$_" } 
                     $self->split_command('- $(RM_F)',  < @files);
@@ -1101,7 +1101,7 @@ sub init_INSTALL_from_PREFIX {
     foreach my $num (@(1, 3)) {
         my $k = 'installsiteman'.$num.'dir';
 
-        $self->{uc $k} ||= uc "\$(installman{$num}dir)"
+        $self->{uc $k} ||= uc "\$(installman$($num)dir)"
           unless %Config{$k};
     }
 
@@ -1110,7 +1110,7 @@ sub init_INSTALL_from_PREFIX {
 
         unless( %Config{$k} ) {
             $self->{uc $k}  ||= %Config{usevendorprefix}
-                              ? uc "\$(installman{$num}dir)"
+                              ? uc "\$(installman$($num)dir)"
                               : '';
         }
     }

@@ -111,13 +111,13 @@ sub _sock_info {
 sub _error {
     my $sock = shift;
     my $err = shift;
-    {
+    do {
       local($!);
       my $title = ref($sock).": ";
       $@ = join("", @( @_[0] =~ m/^$title/ ? "" : $title, < @_));
       $sock->close()
 	if(defined fileno($sock));
-    }
+    };
     $! = $err;
     return undef;
 }

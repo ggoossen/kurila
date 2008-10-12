@@ -32,7 +32,7 @@ isnt($x ** .5, 2, "power still floating point");
 
 is(++$x, 5.5, "++ still floating point");
  
-SKIP: {
+SKIP: do {
     my $ivsize = %Config{ivsize};
     skip "ivsize == $ivsize", 2 unless $ivsize == 4 || $ivsize == 8;
 
@@ -43,12 +43,12 @@ SKIP: {
 	$z = 2**63 - 1;
 	is($z + 1, -9223372036854775808, "left shift");
     }
-}
+};
 
 is(^~^0, -1, "signed instead of unsigned");
 
 # [perl #38485] use integer; 0x80000000/-1;
-SKIP: {
+SKIP: do {
     my $ivsize = %Config{ivsize};
     skip "ivsize == $ivsize", 4 unless $ivsize == 4 || $ivsize == 8;
 
@@ -61,4 +61,4 @@ SKIP: {
     try { $biff = $iv_min % -1 };
     is($@, '', 'IV_MIN % -1 succeeds');
     is($biff, 0, 'IV_MIN % -1 == 0');
-}
+};

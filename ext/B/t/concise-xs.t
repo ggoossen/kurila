@@ -148,7 +148,7 @@ my $testpkgs = \%(
 	XS => \qw( svref_2object perlstring opnumber main_start
 		   main_root main_cv ),
 
-	constant => \@( <qw/ ASSIGN CVf_LOCKED
+	constant => \qw/ ASSIGN CVf_LOCKED
 		     CVf_METHOD LIST_CONTEXT OP_CONST OP_LIST OP_RV2SV
 		     OP_STRINGIFY OPf_KIDS OPf_MOD OPf_REF OPf_SPECIAL
 		     OPf_STACKED OPf_WANT OPf_WANT_LIST OPf_WANT_SCALAR
@@ -162,7 +162,7 @@ my $testpkgs = \%(
 		     PMf_MULTILINE PMf_SINGLELINE
 		     POSTFIX SVf_FAKE SVf_IOK SVf_NOK SVf_POK SVf_ROK
 		     SVpad_OUR SVs_RMG SVs_SMG SWAP_CHILDREN OPpPAD_STATE
-		     /, 'RXf_SKIPWHITE'),
+		     RXf_SKIPWHITE/,
 		 ),
 
     POSIX => \%( dflt => 'constant',			# all but 252/589
@@ -305,7 +305,7 @@ sub test_pkg {
     }
     foreach my $fn (reverse sort keys %stash) {
 	next if %stash{$fn} eq 'skip';
-	my $res = checkXS("{$pkg}::$fn", %stash{$fn});
+	my $res = checkXS("$($pkg)::$fn", %stash{$fn});
 	if ($res ne '1') {
 	    push @{%report{$pkg}->{$res}}, $fn;
 	}
@@ -338,7 +338,7 @@ sub render {
 
     my $walker = B::Concise::compile($func_name);
     try { $walker->() };
-    diag("err: {$@->message} $buf") if $@;
+    diag("err: $($@->message) $buf") if $@;
     diag("verbose: $buf") if %opts{V};
 
     return  @($buf, $@);
@@ -366,7 +366,7 @@ END {
 
 	foreach my $pkg (sort keys %report) {
 	    for my $type (keys %matchers) {
-		print "$pkg: $type: {join ' ',@{%report{$pkg}->{$type}}}\n"
+		print "$pkg: $type: $(join ' ',@{%report{$pkg}->{$type}})\n"
 		    if (nelems @{%report{$pkg}->{$type}});
 	    }
 	}

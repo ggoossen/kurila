@@ -47,7 +47,7 @@ Level 0                0 | A |
 
 =cut
 
-{
+do {
     package Test::O;
     use mro 'c3';
     
@@ -84,7 +84,7 @@ Level 0                0 | A |
     package Test::A;
     use base ('Test::B', 'Test::C');
     use mro 'c3';
-}
+};
 
 ok(eq_array(
     mro::get_linear_isa('Test::A'),

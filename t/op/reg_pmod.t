@@ -35,13 +35,13 @@ foreach my $test ( @tests) {
               : $p eq '(?p)' ? m/(?p)$pat/
               :                m/$pat/
               => $test_name;
-    SKIP: {
+    SKIP: do {
         skip "/$pat/$p failed to match", 3
             unless $ok;
         is($^PREMATCH,  $l, _u "$test_name: ^PREMATCH",$l);
         is($^MATCH,     $m, _u "$test_name: ^MATCH",$m );
         is($^POSTMATCH, $r, _u "$test_name: ^POSTMATCH",$r );
-    }
+    };
 }
 is($W,"","No warnings should be produced");
 ok(!defined $^MATCH, "No /p in scope so ^MATCH is undef");

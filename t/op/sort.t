@@ -4,21 +4,20 @@ BEGIN {
     require './test.pl';
 }
 use warnings;
-plan( tests => 77 );
+plan( tests => 57 );
 
 our (@a, @b);
 
 # these shouldn't hang
-{
+do {
     no warnings;
-    sort { for ($_ = 0;; $_++) {} } @a;
     sort { while(1) {}            } @a;
     sort { while(1) { last; }     } @a;
     sort { while(0) { last; }     } @a;
 
     # Change 26011: Re: A surprising segfault
     map scalar(sort( @(+()))), @( ('')x68);
-}
+};
 
 sub Backwards { ($a cmp $b) +< 0 ? 1 : ($a cmp $b) +> 0 ? -1 : 0 }
 sub Backwards_stacked($$) { my($x,$y) = < @_; ($x cmp $y) +< 0 ? 1 : ($x cmp $y) +> 0 ? -1 : 0 }
@@ -67,143 +66,89 @@ cmp_ok($x,'eq',$expected,'upper first 4');
 $" = ' ';
 @a = @( () );
 @b = reverse @a;
-cmp_ok("{join ' ',@b}",'eq',"",'reverse 1');
+cmp_ok("$(join ' ',@b)",'eq',"",'reverse 1');
 
 @a = @(1);
 @b = reverse @a;
-cmp_ok("{join ' ',@b}",'eq',"1",'reverse 2');
+cmp_ok("$(join ' ',@b)",'eq',"1",'reverse 2');
 
 @a = @(1,2);
 @b = reverse @a;
-cmp_ok("{join ' ',@b}",'eq',"2 1",'reverse 3');
+cmp_ok("$(join ' ',@b)",'eq',"2 1",'reverse 3');
 
 @a = @(1,2,3);
 @b = reverse @a;
-cmp_ok("{join ' ',@b}",'eq',"3 2 1",'reverse 4');
+cmp_ok("$(join ' ',@b)",'eq',"3 2 1",'reverse 4');
 
 @a = @(1,2,3,4);
 @b = reverse @a;
-cmp_ok("{join ' ',@b}",'eq',"4 3 2 1",'reverse 5');
+cmp_ok("$(join ' ',@b)",'eq',"4 3 2 1",'reverse 5');
 
 @a = @(10,2,3,4);
 @b = sort {$a <+> $b;} @a;
-cmp_ok("{join ' ',@b}",'eq',"2 3 4 10",'sort numeric');
-
-our $sub = 'Backwards';
-$x = join('', sort $sub @harry);
-$expected = $upperfirst ? 'xdogcatCainAbel' : 'CainAbelxdogcat';
-
-cmp_ok($x,'eq',$expected,'sorter sub name in var 1');
-
-$sub = 'Backwards_stacked';
-$x = join('', sort $sub @harry);
-$expected = $upperfirst ? 'xdogcatCainAbel' : 'CainAbelxdogcat';
-
-cmp_ok($x,'eq',$expected,'sorter sub name in var 2');
+cmp_ok("$(join ' ',@b)",'eq',"2 3 4 10",'sort numeric');
 
 # literals, combinations
 
 @b = sort ( @(4,1,3,2));
-cmp_ok("{join ' ',@b}",'eq','1 2 3 4','just sort');
+cmp_ok("$(join ' ',@b)",'eq','1 2 3 4','just sort');
 
 
 @b = sort grep { $_ } @( (4,1,3,2));
-cmp_ok("{join ' ',@b}",'eq','1 2 3 4','grep then sort');
+cmp_ok("$(join ' ',@b)",'eq','1 2 3 4','grep then sort');
 
 
 @b = sort map { $_ } @( (4,1,3,2));
-cmp_ok("{join ' ',@b}",'eq','1 2 3 4','map then sort');
+cmp_ok("$(join ' ',@b)",'eq','1 2 3 4','map then sort');
 
 
 @b = sort reverse ( @(4,1,3,2));
-cmp_ok("{join ' ',@b}",'eq','1 2 3 4','reverse then sort');
+cmp_ok("$(join ' ',@b)",'eq','1 2 3 4','reverse then sort');
 
 
 
-sub twoface { no warnings 'redefine'; *twoface = sub { $a <+> $b }; &twoface }
+sub twoface { no warnings 'redefine'; *twoface = sub { $a <+> $b }; &twoface( < @_ ) }
 try { @b = sort twoface @(4,1,3,2) };
-cmp_ok("{join ' ',@b}",'eq','1 2 3 4','redefine sort sub inside the sort sub');
+cmp_ok("$(join ' ',@b)",'eq','1 2 3 4','redefine sort sub inside the sort sub');
 
-
-try { no warnings 'redefine'; *twoface = sub { &Backwards } };
-ok(!$@,"redefining sort subs outside the sort \$@=[$@]");
-
-@b = sort twoface @(4,1,3,2);
-cmp_ok("{join ' ',@b}",'eq','4 3 2 1','twoface redefinition');
-
-{
-  no warnings 'redefine';
-  *twoface = sub { *twoface = \&Backwards_other; $a <+> $b };
-}
-
-@b = sort twoface @(4,1,9,5);
-ok("{join ' ',@b}" eq "1 4 5 9", 'redefinition should not take effect during the sort');
-
-{
-  no warnings 'redefine';
-  *twoface = sub {
-                 eval 'sub twoface { $a <+> $b }';
-		 die($@ eq "" ? "good\n" : "bad\n");
-		 $a <+> $b;
-	       };
-}
-dies_like( sub { @b = sort twoface @(4,1) },
-           qr/^good/, 'twoface eval');
-
-eval <<'CODE';
-    # "sort 'one', 'two'" should not try to parse "'one" as a sort sub
-    my @result = sort @('one', 'two');
-CODE
-cmp_ok($@,'eq','',q(one is not a sub));
-
-{
+do {
   my $sortsub = \&Backwards;
   my $sortglobr = \*Backwards;
-  my $sortname = 'Backwards';
   @b = sort $sortsub @(4,1,3,2);
-  cmp_ok("{join ' ',@b}",'eq','4 3 2 1','sortname 1');
-  @b = sort $sortname @(4,1,3,2);
-  cmp_ok("{join ' ',@b}",'eq','4 3 2 1','sortname 3');
+  cmp_ok("$(join ' ',@b)",'eq','4 3 2 1','sortname 1');
   @b = sort $sortglobr @(4,1,3,2);
-  cmp_ok("{join ' ',@b}",'eq','4 3 2 1','sortname 4');
-}
+  cmp_ok("$(join ' ',@b)",'eq','4 3 2 1','sortname 4');
+};
 
-{
-  my $sortsub = \&Backwards_stacked;
-  my $sortglobr = \*Backwards_stacked;
-  my $sortname = 'Backwards_stacked';
-  @b = sort $sortsub @(4,1,3,2);
-  cmp_ok("{join ' ',@b}",'eq','4 3 2 1','sortname 5');
-  @b = sort $sortname @(4,1,3,2);
-  cmp_ok("{join ' ',@b}",'eq','4 3 2 1','sortname 7');
-  @b = sort $sortglobr @(4,1,3,2);
-  cmp_ok("{join ' ',@b}",'eq','4 3 2 1','sortname 8');
-}
+do {
+    local our $TODO = 'decide how sort gets its arguments';
+    my $sortsub = \&Backwards_stacked;
+    my $sortglobr = \*Backwards_stacked;
+    @b = sort $sortsub, @(4,1,3,2);
+    cmp_ok("$(join ' ',@b)",'eq','4 3 2 1','sortname 5');
+    @b = sort $sortglobr, @(4,1,3,2);
+    cmp_ok("$(join ' ',@b)",'eq','4 3 2 1','sortname 8');
+};
 
-our ($sortsub, $sortglob, $sortglobr, $sortname);
-{
+our ($sortsub, $sortglob, $sortglobr);
+do {
   local $sortsub = \&Backwards;
   local $sortglobr = \*Backwards;
-  local $sortname = 'Backwards';
   @b = sort $sortsub @(4,1,3,2);
-  cmp_ok("{join ' ',@b}",'eq','4 3 2 1','sortname local 1');
-  @b = sort $sortname @(4,1,3,2);
-  cmp_ok("{join ' ',@b}",'eq','4 3 2 1','sortname local 3');
+  cmp_ok("$(join ' ',@b)",'eq','4 3 2 1','sortname local 1');
   @b = sort $sortglobr @(4,1,3,2);
-  cmp_ok("{join ' ',@b}",'eq','4 3 2 1','sortname local 4');
-}
+  cmp_ok("$(join ' ',@b)",'eq','4 3 2 1','sortname local 4');
+};
 
-{
-  local $sortsub = \&Backwards_stacked;
-  local $sortglobr = \*Backwards_stacked;
-  local $sortname = 'Backwards_stacked';
-  @b = sort $sortsub @(4,1,3,2);
-  cmp_ok("{join ' ',@b}",'eq','4 3 2 1','sortname local 5');
-  @b = sort $sortname @(4,1,3,2);
-  cmp_ok("{join ' ',@b}",'eq','4 3 2 1','sortname local 7');
-  @b = sort $sortglobr @(4,1,3,2);
-  cmp_ok("{join ' ',@b}",'eq','4 3 2 1','sortname local 8');
-}
+do {
+    local our $TODO = 'decide how sort gets its arguments';
+    local $sortsub = \&Backwards_stacked;
+    local $sortglobr = \*Backwards_stacked;
+    @b = sort $sortsub, @(4,1,3,2);
+    cmp_ok("$(join ' ',@b)",'eq','4 3 2 1','sortname local 5');
+    @b = sort $sortglobr, @(4,1,3,2);
+    cmp_ok("$(join ' ',@b)",'eq','4 3 2 1','sortname local 8');
+};
 
 ## exercise sort builtins... ($a <=> $b already tested)
 @a = @( 5, 19, 1996, 255, 90 );
@@ -211,7 +156,7 @@ our ($sortsub, $sortglob, $sortglobr, $sortname);
     my $dummy;		# force blockness
     return $b <+> $a
 } @a;
-cmp_ok("{join ' ',@b}",'eq','1996 255 90 19 5','force blockness');
+cmp_ok("$(join ' ',@b)",'eq','1996 255 90 19 5','force blockness');
 
 $x = join('', sort { $a cmp $b } @harry);
 $expected = $upperfirst ? 'AbelCaincatdogx' : 'catdogxAbelCain';
@@ -221,13 +166,13 @@ $x = join('', sort { $b cmp $a } @harry);
 $expected = $upperfirst ? 'xdogcatCainAbel' : 'CainAbelxdogcat';
 cmp_ok($x,'eq',$expected,'b cmp a');
 
-{
+do {
     use integer;
     @b = sort { $a <+> $b } @a;
-    cmp_ok("{join ' ',@b}",'eq','5 19 90 255 1996','integer a <=> b');
+    cmp_ok("$(join ' ',@b)",'eq','5 19 90 255 1996','integer a <=> b');
 
     @b = sort { $b <+> $a } @a;
-    cmp_ok("{join ' ',@b}",'eq','1996 255 90 19 5','integer b <=> a');
+    cmp_ok("$(join ' ',@b)",'eq','1996 255 90 19 5','integer b <=> a');
 
     $x = join('', sort { $a cmp $b } @harry);
     $expected = $upperfirst ? 'AbelCaincatdogx' : 'catdogxAbelCain';
@@ -237,7 +182,7 @@ cmp_ok($x,'eq',$expected,'b cmp a');
     $expected = $upperfirst ? 'xdogcatCainAbel' : 'CainAbelxdogcat';
     cmp_ok($x,'eq',$expected,'integer b cmp a');
 
-}
+};
 
 
 
@@ -248,101 +193,87 @@ cmp_ok($x,'eq','123',q(optimized-away comparison block doesn't take any other ar
 package Foo;
 @a = @( 5, 19, 1996, 255, 90 );
 @b = sort { $b <+> $a } @a;
-main::cmp_ok("{join ' ',@b}",'eq','1996 255 90 19 5','not in main:: 1');
-
-
-@b = sort main::Backwards_stacked @a;
-main::cmp_ok("{join ' ',@b}",'eq','90 5 255 1996 19','not in main:: 2');
-
+main::cmp_ok("$(join ' ',@b)",'eq','1996 255 90 19 5','not in main:: 1');
 
 # check if context for sort arguments is handled right
 
 
 # test against a reentrancy bug
-{
+do {
     package Bar;
     sub compare { $a cmp $b }
-    sub reenter { my @force = sort @( compare < qw/a b/) }
-}
-{
+    sub reenter { my @force = sort \&compare, qw/a b/ }
+};
+do {
     my($def, $init) = (0, 0);
     @b = sort {
 	$def = 1 if defined $Bar::a;
 	Bar::reenter() unless $init++;
 	$a <+> $b
     } qw/4 3 1 2/;
-    main::cmp_ok("{join ' ',@b}",'eq','1 2 3 4','reenter 1');
+    main::cmp_ok("$(join ' ',@b)",'eq','1 2 3 4','reenter 1');
 
     main::ok(!$def,'reenter 2');
-}
+};
 
 
-{
+do {
     sub routine { @("one", "two") };
     @a = sort(routine(1));
-    main::cmp_ok("{join ' ',@a}",'eq',"one two",'bug id 19991001.003');
-}
+    main::cmp_ok("$(join ' ',@a)",'eq',"one two",'bug id 19991001.003');
+};
 
 package main;
 
 # check for in-place optimisation of @a = sort @a
-{
+do {
     my ($r1,$r2,@a);
     our @g;
     @g = @(3,2,1); $r1 = \@g[2]; @g = sort @g; $r2 = \@g[0];
-    is "{join ' ',@g}", "1 2 3", "inplace sort of global";
+    is "$(join ' ',@g)", "1 2 3", "inplace sort of global";
 
     @a = qw(b a c); $r1 = \@a[1]; @a =sort @a; $r2 = \@a[0];
-    is "{join ' ',@a}", "a b c", "inplace sort of lexical";
+    is "$(join ' ',@a)", "a b c", "inplace sort of lexical";
 
     @g = @(2,3,1); $r1 = \@g[1]; @g =sort { $b <+> $a } @g; $r2 = \@g[0];
-    is "{join ' ',@g}", "3 2 1", "inplace reversed sort of global";
+    is "$(join ' ',@g)", "3 2 1", "inplace reversed sort of global";
 
     @g = @(2,3,1);
     $r1 = \@g[1]; @g =sort { $a+<$b?1:$a+>$b?-1:0 } @g; $r2 = \@g[0];
-    is "{join ' ',@g}", "3 2 1", "inplace custom sort of global";
-
-    sub mysort { $b cmp $a };
-    @a = qw(b c a); $r1 = \@a[1]; @a = sort mysort @a; $r2 = \@a[0];
-    is "{join ' ',@a}", "c b a", "inplace sort with function of lexical";
+    is "$(join ' ',@g)", "3 2 1", "inplace custom sort of global";
 
     #  [perl #29790] don't optimise @a = ('a', sort @a) !
 
     @g = @(3,2,1); @g = @('0', < sort @g);
-    is "{join ' ',@g}", "0 1 2 3", "un-inplace sort of global";
+    is "$(join ' ',@g)", "0 1 2 3", "un-inplace sort of global";
     @g = @(3,2,1); @g = @( <sort( @g),'4');
-    is "{join ' ',@g}", "1 2 3 4", "un-inplace sort of global 2";
+    is "$(join ' ',@g)", "1 2 3 4", "un-inplace sort of global 2";
 
     @a = qw(b a c); @a = @('x', < sort @a);
-    is "{join ' ',@a}", "x a b c", "un-inplace sort of lexical";
+    is "$(join ' ',@a)", "x a b c", "un-inplace sort of lexical";
     @a = qw(b a c); @a = @(( <sort @a), 'x');
-    is "{join ' ',@a}", "a b c x", "un-inplace sort of lexical 2";
+    is "$(join ' ',@a)", "a b c x", "un-inplace sort of lexical 2";
 
     @g = @(2,3,1); @g = @('0', < sort { $b <+> $a } @g);
-    is "{join ' ',@g}", "0 3 2 1", "un-inplace reversed sort of global";
+    is "$(join ' ',@g)", "0 3 2 1", "un-inplace reversed sort of global";
     @g = @(2,3,1); @g = @(( <sort { $b <+> $a } @g),'4');
-    is "{join ' ',@g}", "3 2 1 4", "un-inplace reversed sort of global 2";
+    is "$(join ' ',@g)", "3 2 1 4", "un-inplace reversed sort of global 2";
 
     @g = @(2,3,1); @g = @('0', < sort { $a+<$b?1:$a+>$b?-1:0 } @g);
-    is "{join ' ',@g}", "0 3 2 1", "un-inplace custom sort of global";
+    is "$(join ' ',@g)", "0 3 2 1", "un-inplace custom sort of global";
     @g = @(2,3,1); @g = @(( <sort { $a+<$b?1:$a+>$b?-1:0 } @g),'4');
-    is "{join ' ',@g}", "3 2 1 4", "un-inplace custom sort of global 2";
-
-    @a = qw(b c a); @a = @('x', < sort mysort @a);
-    is "{join ' ',@a}", "x c b a", "un-inplace sort with function of lexical";
-    @a = qw(b c a); @a = @((< sort mysort @a),'x');
-    is "{join ' ',@a}", "c b a x", "un-inplace sort with function of lexical 2";
-}
+    is "$(join ' ',@g)", "3 2 1 4", "un-inplace custom sort of global 2";
+};
 
 # test that optimized {$b cmp $a} and {$b <=> $a} remain stable
 # (new in 5.9) without overloading
-{ no warnings;
+do { no warnings;
 my @input = qw/5first 6first 5second 6second/;
 @b = sort { $b <+> $a }@input;
-is "{join ' ',@b}" , "6first 6second 5first 5second", "optimized \{$b <=> $a\} without overloading" ;
+is "$(join ' ',@b)" , "6first 6second 5first 5second", "optimized \{$b <=> $a\} without overloading" ;
 @input =sort {$b <+> $a} @input;
-is "{join ' ',@input}" , "6first 6second 5first 5second","inline optimized \{$b <=> $a\} without overloading" ;
-};
+is "$(join ' ',@input)" , "6first 6second 5first 5second","inline optimized \{$b <=> $a\} without overloading" ;
+};;
 
 my @output;
 #dies_like( sub { @output = sort {goto sub {}} 1,2; },
@@ -350,33 +281,7 @@ main::dies_like( sub { @output = sort {goto sub {}} @( 1,2); },
                  qr(^Can't goto subroutine outside a subroutine),
                  'goto subr outside subr');
 
-sub goto_sub {goto sub{}}
-main::dies_like( sub { @output = sort goto_sub @(1,2); },
-                 qr(^Can't goto subroutine from a sort sub),
-                 'goto subr from a sort sub');
-
-
-main::dies_like( sub { @output = sort {goto label} @( 1,2); },
-           qr(^Can't "goto" out of a pseudo block),
-           'goto out of a pseudo block 1');
-
-
-
-sub goto_label {goto label}
-label: try { @output = sort goto_label @(1,2); };
-my $fail_msg = q(Can't "goto" out of a pseudo block);
-main::cmp_ok(substr($@->{description},0,length($fail_msg)),'eq',$fail_msg,'goto out of a pseudo block 2');
-
-
-
-sub self_immolate {undef &self_immolate; $a<+>$b}
-main::dies_like( sub { @output = sort self_immolate @(1,2,3) },
-                 qr(^Can't undef active subroutine),
-                 'undef active subr');
-
-
-
-{
+do {
     my $failed = 0;
 
     sub rec {
@@ -385,23 +290,23 @@ main::dies_like( sub { @output = sort self_immolate @(1,2,3) },
 	    return 1;
 	}
 	if ($n+<5) { rec($n+1); }
-	else { () = < sort rec @(1,2); }
+	else { () = < sort \&rec, @(1,2); }
 
 	$failed = 1 if !defined $n;
     }
 
     rec(1);
     main::ok(!$failed, "sort from active sub");
-}
+};
 
 # $a and $b are set in the package the sort() is called from,
 # *not* the package the sort sub is in. This is longstanding
 # de facto behaviour that shouldn't be broken.
 package main;
 my $answer = "good";
-() = < sort OtherPack::foo @(1,2,3,4);
+() = < sort \&OtherPack::foo, @(1,2,3,4);
 
-{
+do {
     package OtherPack;
     no warnings 'once';
     sub foo {
@@ -409,7 +314,7 @@ my $answer = "good";
 	defined($a) || defined($b) || !defined($main::a) || !defined($main::b);
 	$main::a <+> $main::b;
     }
-}
+};
 
 main::cmp_ok($answer,'eq','good','sort subr called from other package');
 
@@ -437,7 +342,7 @@ sub foo {(1+$a) <+> (1+$b)}
 my $refcnt = &Internals::SvREFCNT(\&foo);
 @output = sort @( foo 3,7,9);
 main::is($refcnt, &Internals::SvREFCNT(\&foo), "sort sub refcnt");
-$fail_msg = q(Modification of a read-only value attempted);
+my $fail_msg = q(Modification of a read-only value attempted);
 # Sorting a read-only array in-place shouldn't be allowed
 my @readonly =1..10;
 Internals::SvREADONLY(@readonly, 1);
@@ -449,14 +354,9 @@ main::cmp_ok(substr($@->{description},0,length($fail_msg)),'eq',$fail_msg,'in-pl
 
 # Using return() should be okay even in a deeper context
 @b = sort {while (1) {return  $a <+> $b} } 1..10;
-main::is("{join ' ',@b}", "1 2 3 4 5 6 7 8 9 10", "return within loop");
+main::is("$(join ' ',@b)", "1 2 3 4 5 6 7 8 9 10", "return within loop");
 
 # Using return() should be okay even if there are other items
 # on the stack at the time.
 @b = sort {$_ = ($a<+>$b) + do{return $b<+> $a}} 1..10;
-main::is("{join ' ',@b}", "10 9 8 7 6 5 4 3 2 1", "return with SVs on stack");
-
-# As above, but with a sort sub rather than a sort block.
-sub ret_with_stacked { $_ = ($a<+>$b) + do {return $b <+> $a} }
-@b = sort ret_with_stacked 1..10;
-main::is("{join ' ',@b}", "10 9 8 7 6 5 4 3 2 1", "return with SVs on stack");
+main::is("$(join ' ',@b)", "10 9 8 7 6 5 4 3 2 1", "return with SVs on stack");

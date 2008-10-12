@@ -64,7 +64,7 @@ sub import {
 
         next if grep $_->isa($base), @( ($inheritor, < @bases));
 
-        {
+        do {
             eval "require $base";
             # Only ignore "Can't locate" errors from our eval require.
             # Other fatal errors (syntax etc) must be reported.
@@ -73,10 +73,10 @@ sub import {
                 die(<<ERROR);
 Base class package "$base" is empty.
     (Perhaps you need to 'use' the module which defines that package first,
-    or make that module available in \@INC (\@INC contains: {join ' ',@INC}).
+    or make that module available in \@INC (\@INC contains: $(join ' ',@INC)).
 ERROR
             }
-        }
+        };
         push @bases, $base;
 
         if ( has_fields($base) || has_attr($base) ) {

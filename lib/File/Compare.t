@@ -47,24 +47,24 @@ print "not " unless
 print "ok 8\n";
 
 # filehandle and same file
-{
+do {
   my $fh;
   open ($fh, "<", "README") or print "not ";
   binmode($fh);
   print "not " unless compare($fh,"README") == 0;
   print "ok 9\n";
   close $fh;
-}
+};
 
 # filehandle and different (but existing) file.
-{
+do {
   my $fh;
   open ($fh, "<", "README") or print "not ";
   binmode($fh);
   print "not " unless compare_text($fh,"TEST") == 1;
   print "ok 10\n";
   close $fh;
-}
+};
 
 # Different file with contents of known file,
 # will use File::Temp to do this, skip rest of
@@ -82,7 +82,7 @@ try {
   open my $tfhSP, ">", "$filename "
       or die "Could not open '$filename ' for writing: $!";
   binmode($tfhSP);
-  {
+  do {
     local $/; #slurp
     my $fh;
     open($fh, "<",'README');
@@ -92,7 +92,7 @@ try {
     close($fh);
     print $tfhSP $data;
     close($tfhSP);
-  }
+  };
   seek($tfh,0,0);
   @donetests[0] = compare($tfh, 'README');
   @donetests[1] = compare($filename, 'README');
@@ -100,7 +100,7 @@ try {
   @donetests[2] = compare('README', "$filename ");
   unlink "$filename ";
 };
-print "# problem '{$@->message}' when testing with a temporary file\n" if $@;
+print "# problem '$($@->message)' when testing with a temporary file\n" if $@;
 
 if ((nelems @donetests) == 3) {
   print "not " unless @donetests[0] == 0;

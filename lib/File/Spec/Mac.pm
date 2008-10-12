@@ -355,8 +355,8 @@ sub rootdir {
 #  volume is returned, since that's the closest in concept.
 #
     return '' unless $macfiles;
-    my $system = Mac::Files::FindFolder( <&Mac::Files::kOnSystemDisk, <
-	&Mac::Files::kSystemFolderType);
+    my $system = Mac::Files::FindFolder( <&Mac::Files::kOnSystemDisk( < @_ ), <
+	&Mac::Files::kSystemFolderType( < @_ ));
     $system =~ s/:.*\Z(?!\n)/:/s;
     return $system;
 }
@@ -544,7 +544,7 @@ sub splitdir {
 	while ($sep || $directories) {
 		if (length($sep) +> 1) {
 			my $updir_count = length($sep) - 1;
-			for (my $i=0; $i+<$updir_count; $i++) {
+			for my $i (0 .. $updir_count -1) {
 				# push '::' updir_count times;
 				# simulate Unix '..' updirs
 				push (@result, '::');
@@ -645,7 +645,7 @@ sub _resolve_updirs {
 	my $proceed;
 
 	# resolve any updirs, e.g. "HD:tmp::file" -> "HD:file"
-	do {
+	{
 		$proceed = ($path =~ s/^(.*):[^:]+::(.*?)\z/$1:$2/);
 	} while ($proceed);
 

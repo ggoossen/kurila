@@ -6,11 +6,11 @@ die $@ if $@ and !%ENV{PERL_CORE_MINITEST};
 
 print "1..21\n";
 
-{
+do {
 no strict 'refs';
 my $foo = *STDOUT{IO};
 print $foo "ok 1\n";
-}
+};
 
 print "ok 2\n","ok 3\n","ok 4\n";
 print STDOUT "ok 5\n";
@@ -35,10 +35,10 @@ print "ok","11";
 my @x = @("ok","12\nok","13\nok");
 my @y = @("15\nok","16");
 print < @x,"14\nok",< @y;
-{
+do {
     local $\ = "ok 17\n# null =>[\000]\nok 18\n";
     print "";
-}
+};
 
 $\ = '';
 
@@ -48,11 +48,11 @@ if (!exists &Errno::EBADF) {
     $! = 0;
     no warnings 'unopened';
     print NONEXISTENT "foo";
-    print "not " if ($! != &Errno::EBADF);
+    print "not " if ($! != &Errno::EBADF( < @_ ));
     print "ok 19\n";
 }
 
-{
+do {
     # Change 26009: pp_print didn't extend the stack
     #               before pushing its return value
     # to make sure only that these obfuscated sentences will not crash.
@@ -62,4 +62,4 @@ if (!exists &Errno::EBADF) {
 
     map print(+()), @(('')x68);
     print "ok 21\n";
-}
+};

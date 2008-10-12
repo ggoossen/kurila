@@ -29,13 +29,13 @@ $XS_VERSION = $VERSION;
 sub import {
     my $this = shift;
     for my $i (@_) {
-	if (($i eq 'clock_getres'    && !&d_clock_getres)    ||
-	    ($i eq 'clock_gettime'   && !&d_clock_gettime)   ||
-	    ($i eq 'clock_nanosleep' && !&d_clock_nanosleep) ||
-	    ($i eq 'clock'           && !&d_clock)           ||
-	    ($i eq 'nanosleep'       && !&d_nanosleep)       ||
-	    ($i eq 'usleep'          && !&d_usleep)          ||
-	    ($i eq 'ualarm'          && !&d_ualarm)) {
+	if (($i eq 'clock_getres'    && !&d_clock_getres( < @_ ))    ||
+	    ($i eq 'clock_gettime'   && !&d_clock_gettime( < @_ ))   ||
+	    ($i eq 'clock_nanosleep' && !&d_clock_nanosleep( < @_ )) ||
+	    ($i eq 'clock'           && !&d_clock( < @_ ))           ||
+	    ($i eq 'nanosleep'       && !&d_nanosleep( < @_ ))       ||
+	    ($i eq 'usleep'          && !&d_usleep( < @_ ))          ||
+	    ($i eq 'ualarm'          && !&d_ualarm( < @_ ))) {
 	    require Carp;
 	    Carp::croak("Time::HiRes::$i(): unimplemented in this platform");
 	}

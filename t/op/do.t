@@ -2,20 +2,6 @@
 
 our (@x, @y, $result, $x, $y, @t, $u);
 
-sub foo1
-{
-    ok(@_[0]);
-    'value';
-}
-
-sub foo2
-{
-    shift;
-    ok(@_[0]);
-    $x = 'value';
-    $x;
-}
-
 my $test = 1;
 sub ok {
     my($ok, $name) = < @_;
@@ -31,31 +17,10 @@ sub ok {
     return $ok;
 }
 
-print "1..19\n";
+print "1..6\n";
 
-# Test do &sub and proper @_ handling.
-@_[0] = 0;
-$result = do foo1(1);
-
+$result = do { ok 1; 'value';};
 ok( $result eq 'value',  ":$result: eq :value:" );
-ok( @_[0] == 0 );
-
-@_[0] = 0;
-$result = do foo2(0,1,0);
-ok( $result eq 'value', ":$result: eq :value:" );
-ok( @_[0] == 0 );
-
-$result = do{ ok 1; 'value';};
-ok( $result eq 'value',  ":$result: eq :value:" );
-
-sub blather {
-    ok 1 foreach  @_;
-}
-
-do blather("ayep","sho nuff");
-@x = @("jeepers", "okydoke");
-@y = @("uhhuh", "yeppers");
-do blather(< @x,"noofie",< @y);
 
 unshift @INC, '.';
 

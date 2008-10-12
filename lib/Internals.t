@@ -53,10 +53,10 @@ is(@foo[1], 'bar');
 
 ### Read-only array element
 
-{
+do {
     local our $TODO = 1;
     ok( !Internals::SvREADONLY @foo[2] );
-}
+};
 @foo[2] = 'baz';
 is(@foo[2], 'baz');
 
@@ -72,10 +72,10 @@ try { @foo[1] = 'bork'; };
 like($@->message, $ro_err, 'Read-only array element moved');
 is(@foo[1], 'baz');
 
-{
+do {
     local our $TODO = 1;
     ok( !Internals::SvREADONLY @foo[2] );
-}
+};
 @foo[2] = 'qux';
 is(@foo[2], 'qux');
 
@@ -87,11 +87,11 @@ try { @foo[2] = 86; };
 like($@->message, $ro_err, q/Can't modify read-only array element/);
 try { undef(@foo[2]); };
 like($@->message, $ro_err, q/Can't undef read-only array element/);
-TODO: {
+TODO: do {
     local $TODO = 'Due to restricted hashes implementation';
     try { delete(@foo[2]); };
     like($@ && $@->message, $ro_err, q/Can't delete read-only array element/);
-}
+};
 
 ok( !Internals::SvREADONLY @foo[2], 0 );
 ok( !Internals::SvREADONLY @foo[2] );
@@ -110,11 +110,11 @@ ok(  Internals::SvREADONLY %foo, 1 );
 ok(  Internals::SvREADONLY %foo );
 try { undef(%foo); };
 like($@->message, $ro_err, q/Can't undef read-only hash/);
-TODO: {
+TODO: do {
     local $TODO = 'Due to restricted hashes implementation';
     try { %foo = %('ping' => 'pong'); };
     like($@->message, $ro_err, q/Can't modify read-only hash/);
-}
+};
 try { %foo{'baz'} = 123; };
 like($@->message, qr/Attempt to access disallowed key/, q/Can't add to a read-only hash/);
 
@@ -150,11 +150,11 @@ ok( !Internals::SvREADONLY %foo{foo}, 0 );
 ok( !Internals::SvREADONLY %foo{foo} );
 
 is(  Internals::SvREFCNT(\$foo), 2 );
-{
+do {
     my $bar = \$foo;
     is(  Internals::SvREFCNT(\$foo), 3 );
     is(  Internals::SvREFCNT(\$bar), 2 );
-}
+};
 is(  Internals::SvREFCNT(\$foo), 2 );
 
 is(  Internals::SvREFCNT(\@foo), 2 );

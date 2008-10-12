@@ -39,7 +39,7 @@ sub parse_from_file {
    and print "About to call new Pod::Man ",
     $Pod::Man::VERSION ? "(v$Pod::Man::VERSION) " : '',
     "with options: ",
-    (nelems @options) ? "[{join ' ',@options}]" : "(nil)", "\n";
+    (nelems @options) ? "[$(join ' ',@options)]" : "(nil)", "\n";
   ;
 
   Pod::Man->new(< @options)->parse_from_file(< @_);

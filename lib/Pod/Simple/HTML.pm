@@ -353,13 +353,13 @@ sub do_middle {
   # Namely, divert all content to a string, which we output after the index.
   my $fh = $self->output_fh;
   my $content = '';
-  {
+  do {
     # Our horrible bait and switch:
     $self->output_string( \$content );
     $self->_do_middle_main_loop;
     $self->abandon_output_string();
     $self->output_fh($fh);
-  }
+  };
   print $fh $self->index_as_html();
   print $fh $content;
 
@@ -574,7 +574,7 @@ sub do_pod_link {
   DEBUG and printf "Resolving \"\%s\" \"\%s\"...\n",
    $to || "(nil)",  $section || "(nil)";
    
-  {
+  do {
     # An early hack:
     my $complete_url = $self->resolve_pod_link_by_table($to, $section);
     if( $complete_url ) {
@@ -585,7 +585,7 @@ sub do_pod_link {
       DEBUG +> 4 and print " resolve_pod_link_by_table(T,S)", 
        " didn't return anything interesting.\n";
     }
-  }
+  };
 
   if(defined $to and length $to) {
     # Give this routine first hack again
@@ -649,13 +649,15 @@ sub pagepath_url_escape { shift->general_url_escape(< @_) }
 sub general_url_escape {
   my($self, $string) = < @_;
  
-  $string =~ s/([^\x[00]-\x[FF]])/{join '', map sprintf('%%%02X',$_), @( unpack 'C*', $1)}/g;
+  $string =~ s/([^\x[00]-\x[FF]])/$(
+     join '', map sprintf('%%%02X',$_), @( unpack 'C*', $1)
+    )/g;
      # express Unicode things as urlencode(utf(orig)).
   
   # A pretty conservative escaping, behoovey even for query components
   #  of a URL (see RFC 2396)
   
-  $string =~ s/([^-_\.!~*()abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789])/{sprintf('%%%02X',ord($1))}/g;
+  $string =~ s/([^-_\.!~*()abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789])/$(sprintf('%%%02X',ord($1)))/g;
    # Yes, stipulate the list without a range, so that this can work right on
    #  all charsets that this module happens to run under.
    # Altho, hmm, what about that ord?  Presumably that won't work right
@@ -768,7 +770,7 @@ sub linearize_tokens {  # self, tokens
 
 sub unicode_escape_url {
   my($self, $string) = < @_;
-  $string =~ s/([^\x[00]-\x[FF]])/{'('.ord($1).')'}/g;
+  $string =~ s/([^\x[00]-\x[FF]])/$('('.ord($1).')')/g;
     #  Turn char 1234 into "(1234)"
   return $string;
 }
@@ -776,8 +778,7 @@ sub unicode_escape_url {
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 sub esc { # a function.
   my $x = shift;
-  $x =~ s/([^-\n\t !\#\$\%\(\)\*\+,\.\~\/\:\;=\?\@\[\\\]\^_\`\{\|\}abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789])/{'&#'.(ord($1)).';'
-}/g;
+  $x =~ s/([^-\n\t !\#\$\%\(\)\*\+,\.\~\/\:\;=\?\@\[\\\]\^_\`\{\|\}abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789])/$('&#'.(ord($1)).';')/g;
   return $x;
   # Leave out "- so that "--" won't make it thru in X-generated comments
   #  with text in them.

@@ -33,7 +33,7 @@ sub parse_from_file {
    and print "About to call new Pod::Text ",
     $Pod::Text::VERSION ? "(v$Pod::Text::VERSION) " : '',
     "with options: ",
-    (nelems @options) ? "[{join ' ',@options}]" : "(nil)", "\n";
+    (nelems @options) ? "[$(join ' ',@options)]" : "(nil)", "\n";
   ;
 
   Pod::Text->new(< @options)->parse_from_file(< @_);

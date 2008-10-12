@@ -116,6 +116,11 @@ static __inline__ HV* inline_SvHV(pTHX_ SV *sv) {
     return (HV*)sv;
 }
 
+#define CvREFCNT_inc(cv) inline_CvREFCNT_inc(aTHX_ cv)
+static __inline__ CV* inline_CvREFCNT_inc(pTHX_ CV* cv) {
+    return (CV*)SvREFCNT_inc((SV*)cv);
+}
+
 #define SVcpREPLACE(sv_d, sv_s) inline_SVcpREPLACE(&sv_d, sv_s)
 static __inline__ void inline_SVcpREPLACE(pTHX_ SV**sv_d, SV*sv_s) {
   SvREFCNT_inc(sv_s);
@@ -168,4 +173,21 @@ static __inline__ SV* inline_loc_desc(pTHX_ SV *loc) {
             );
     }
     return str;
+}
+
+/* Location retrieval */
+#define loc_name(loc) inline_loc_name(aTHX_ loc)
+static __inline__ SV* inline_loc_name(pTHX_ SV *loc) {
+    SV * str = sv_2mortal(newSVpv("", 0));
+    if (loc && SvAVOK(loc)) {
+        Perl_sv_catpvf(aTHX_ str, "%s",
+                       SvPVX_const(*av_fetch((AV*)loc, 3, FALSE))
+            );
+    }
+    return str;
+}
+
+#define SvNAME(sv) inline_SvNAME(aTHX_ sv)
+static __inline__ SV* inline_SvNAME(pTHX_ SV *sv) {
+    return loc_name(SvLOCATION(sv));
 }

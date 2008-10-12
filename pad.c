@@ -200,7 +200,17 @@ Perl_pad_new(pTHX_ int flags)
 	AvREIFY_only(a0);
     }
     else {
-	av_store(pad, 0, NULL);
+        AV * const a0 = newAV();			/* will be @_ */
+	SV * namesv;
+	av_extend(a0, 0);
+	av_store(pad, 0, (SV*)a0);
+
+	namesv = newSV_type(SVt_PVNV);
+	sv_setpv(namesv, "@_");
+	COP_SEQ_RANGE_LOW_set(namesv, 0);	/* min */
+	COP_SEQ_RANGE_HIGH_set(namesv, PAD_MAX);		/* max */
+
+	av_store(padname, 0, namesv);
     }
 
     AvREAL_off(padlist);
@@ -214,7 +224,7 @@ Perl_pad_new(pTHX_ int flags)
     PL_curpad		= AvARRAY(PL_comppad);
 
     if (! (flags & padnew_CLONE)) {
-	PL_comppad_name_fill = 0;
+	PL_comppad_name_fill = 1;
 	PL_min_intro_pending = 0;
 	PL_padix	     = 0;
 	PL_cv_has_eval	     = 0;
@@ -614,7 +624,7 @@ Perl_pad_findmy(pTHX_ const char *name)
 
     nameav = (AV*)AvARRAY(CvPADLIST(PL_compcv))[0];
     name_svp = AvARRAY(nameav);
-    for (offset = AvFILLp(nameav); offset > 0; offset--) {
+    for (offset = AvFILLp(nameav); offset >= 0; offset--) {
         const SV * const namesv = name_svp[offset];
 	if (namesv && namesv != &PL_sv_undef
 	    && !SvFAKE(namesv)
@@ -694,11 +704,11 @@ S_pad_findlex(pTHX_ const char *name, const CV* cv, U32 seq, int warn,
     /* first, search this pad */
 
     if (padlist) { /* not an undef CV */
-	I32 fake_offset = 0;
+	I32 fake_offset = -1;
         const AV * const nameav = (AV*)AvARRAY(padlist)[0];
 	SV * const * const name_svp = AvARRAY(nameav);
 
-	for (offset = AvFILLp(nameav); offset > 0; offset--) {
+	for (offset = AvFILLp(nameav); offset >= 0; offset--) {
             const SV * const namesv = name_svp[offset];
 	    if (namesv && namesv != &PL_sv_undef
 		    && strEQ(SvPVX_const(namesv), name))
@@ -711,8 +721,8 @@ S_pad_findlex(pTHX_ const char *name, const CV* cv, U32 seq, int warn,
 	    }
 	}
 
-	if (offset > 0 || fake_offset > 0 ) { /* a match! */
-	    if (offset > 0) { /* not fake */
+	if (offset >= 0 || fake_offset >= 0 ) { /* a match! */
+	    if (offset >= 0) { /* not fake */
 		fake_offset = 0;
 		*out_name_sv = name_svp[offset]; /* return the namesv */
 
@@ -906,8 +916,6 @@ Perl_pad_sv(pTHX_ PADOFFSET po)
     dVAR;
     ASSERT_CURPAD_ACTIVE("pad_sv");
 
-    if (!po)
-	Perl_croak(aTHX_ "panic: pad_sv po");
     DEBUG_X(PerlIO_printf(Perl_debug_log,
 	"Pad 0x%"UVxf"[0x%"UVxf"] sv:      %ld sv=0x%"UVxf"\n",
 	PTR2UV(PL_comppad), PTR2UV(PL_curpad), (long)po, PTR2UV(PL_curpad[po]))
@@ -1399,13 +1407,13 @@ S_cv_dump(pTHX_ const CV *cv, const char *title)
 		  (CvANON(cv) ? "ANON"
 		   : (cv == PL_main_cv) ? "MAIN"
 		   : CvUNIQUE(cv) ? "UNIQUE"
-		   : CvGV(cv) ? GvNAME(CvGV(cv)) : "UNDEFINED"),
+		   : "SUB"),
 		  PTR2UV(outside),
 		  (!outside ? "null"
 		   : CvANON(outside) ? "ANON"
 		   : (outside == PL_main_cv) ? "MAIN"
 		   : CvUNIQUE(outside) ? "UNIQUE"
-		   : CvGV(outside) ? GvNAME(CvGV(outside)) : "UNDEFINED"));
+		   : "UNDEFINED"));
 
     PerlIO_printf(Perl_debug_log,
 		    "    PADLIST = 0x%"UVxf"\n", PTR2UV(padlist));
@@ -1469,7 +1477,6 @@ Perl_cv_clone(pTHX_ CV *proto)
     CvFLAGS(cv) = CvFLAGS(proto) & ~(CVf_CLONE);
     CvCLONED_on(cv);
 
-    CvGV(cv)		= CvGV(proto);
     OP_REFCNT_LOCK;
     CvROOT(cv)		= OpREFCNT_inc(CvROOT(proto));
     OP_REFCNT_UNLOCK;

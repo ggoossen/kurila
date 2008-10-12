@@ -1543,7 +1543,7 @@ Cvnewsub_simple(class, name, block)
 
     CODE:
         o = newSVOP(OP_CONST, 0, name, NULL);
-        mycv = newSUB(start_subparse(0), o, Nullop, block);
+        mycv = newNAMEDSUB(start_subparse(0), o, Nullop, block);
         /*op_free(o); */
         RETVAL = mycv;
     OUTPUT:

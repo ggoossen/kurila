@@ -73,7 +73,7 @@ sub numf {
    #  backtrack so it un-eats the rightmost three, and then we
    #  insert the comma there.
 
-  $num =~ s<(.,)><{$1 eq ',' ? '.' : ','}>g if ref($handle) and $handle->{'numf_comma'};
+  $num =~ s<(.,)><$($1 eq ',' ? '.' : ',')>g if ref($handle) and $handle->{'numf_comma'};
    # This is just a lame hack instead of using Number::Format
   return $num;
 }
@@ -134,9 +134,9 @@ sub failure_handler_auto {
   $lex->{$phrase} ||= ($value = $handle->_compile($phrase));
 
   # Dumbly copied from sub maketext:
-  {
+  do {
     try { $value = &$value($handle, < @_) };
-  }
+  };
   # If we make it here, there was an exception thrown in the
   #  call to $value, and so scream:
   if($@) {
@@ -223,9 +223,9 @@ sub maketext {
   return $$value if ref($value) eq 'SCALAR';
   return $value unless ref($value) eq 'CODE';
   
-  {
+  do {
     try { $value = &$value($handle, < @_) };
-  }
+  };
   # If we make it here, there was an exception thrown in the
   #  call to $value, and so scream:
   if($@) {
@@ -378,16 +378,16 @@ sub _try_use {   # Basically a wrapper around "require Modulename"
   return %tried{@_[0]} if exists %tried{@_[0]};  # memoization
 
   my $module = @_[0];   # ASSUME sane module name!
-  { no strict 'refs';
+  do { no strict 'refs';
     return (%tried{$module} = 1)
      if %{*{Symbol::fetch_glob($module . "::Lexicon")}} or @{*{Symbol::fetch_glob($module . "::ISA")}};
     # weird case: we never use'd it, but there it is!
-  }
+  };
 
   print " About to use $module ...\n" if DEBUG;
-  {
+  do {
     eval "require $module"; # used to be "use $module", but no point in that.
-  }
+  };
   if($@) {
     print "Error using $module \: $@\n" if DEBUG +> 1;
     return %tried{$module} = 0;

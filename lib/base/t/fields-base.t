@@ -192,9 +192,9 @@ use base < qw(B9);
 
 package main;
 
-{
+do {
     my $w = 0;
-    local %SIG{__WARN__} = sub { $w++ };
+    local %^WARN_HOOK = sub { $w++ };
     
     B9->_mk_obj();
     # used tp emit a warning that pseudohashes are deprecated, because
@@ -202,12 +202,12 @@ package main;
     D9->_mk_obj();
     
     is ($w, 0, "pseudohash warnings in derived class with no fields of it's own");	
-}
+};
 
 # [perl #31078] an intermediate class with no additional fields caused
 # hidden fields in base class to get stomped on
 
-{
+do {
     package X;
     use fields < qw(X1 _X2);
     sub new {
@@ -246,4 +246,4 @@ package main;
 
 	my $c = Z->new();
 	is($c->get_X2, '_x2', "empty intermediate class");
-}
+};

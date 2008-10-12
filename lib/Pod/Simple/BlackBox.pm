@@ -213,7 +213,7 @@ sub parse_lines {             # Usage: $parser->parse_lines(@lines)
          # by now it's safe to consider the previous paragraph as done.
                 
         push @$paras, $new; # the new incipient paragraph
-        DEBUG +> 1 and print "Starting new @{$paras}[-1]->[0] para at line %{$self}{'line_count'}\n";
+        DEBUG +> 1 and print "Starting new @$($paras)[-1]->[0] para at line %{$self}{'line_count'}\n";
         
       } elsif($line =~ m/^\s/s) {
 
@@ -295,7 +295,7 @@ sub _handle_encoding_line {
       $self->{'_transcoder'}->(< @x);
     };
     $@ && die( $enc_error =
-      "Really unexpected error setting up encoding $e: {$@->message}\nAborting"
+      "Really unexpected error setting up encoding $e: $($@->message)\nAborting"
     );
 
   } else {
@@ -303,7 +303,7 @@ sub _handle_encoding_line {
 
     # Note unsupported, and complain
     DEBUG and print " Encoding [$e] is unsupported.",
-      "\nSupporteds: {join ' ',@supported}\n";
+      "\nSupporteds: $(join ' ',@supported)\n";
     my $suggestion = '';
 
     # Look for a near match:
@@ -321,7 +321,7 @@ sub _handle_encoding_line {
     $enc_error = join '', @( 
       "This document probably does not appear as it should, because its ",
       "\"=encoding $e\" line calls for an unsupported encoding.",
-      $suggestion, "  [$encmodver\'s supported encodings are: {join ' ',@supported}]")
+      $suggestion, "  [$encmodver\'s supported encodings are: $(join ' ',@supported)]")
     ;
 
     $self->scream( $self->{'line_count'}, $enc_error );
@@ -370,7 +370,7 @@ sub _handle_encoding_second_level {
 
 #~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`~`
 
-{
+do {
 my $m = -321;   # magic line number
 
 sub _gen_errata {
@@ -416,7 +416,7 @@ sub _gen_errata {
   return @out;
 }
 
-}
+};
 
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
@@ -757,7 +757,7 @@ sub _ponder_paragraph_buffer {
       } elsif( $para_type =~ s/^=//s
         and defined( $para_type = $self->{'accept_directives'}->{$para_type} )
       ) {
-        DEBUG +> 1 and print " Pondering known directive @{$para}[0] as $para_type\n";
+        DEBUG +> 1 and print " Pondering known directive @$($para)[0] as $para_type\n";
       } else {
         # An unknown directive!
         DEBUG +> 1 and printf "Unhandled directive \%s (Handled: \%s)\n",
@@ -844,7 +844,7 @@ sub _ponder_for {
     return 1;
   }
 
-  for(my $i = 2; $i +< nelems @$para; ++$i) {
+  for my $i (2 .. nelems(@$para) -1) {
     if($para->[$i] =~ s/^\s*(\S+)\s*//s) {
       $target = $1;
       last;
@@ -1357,12 +1357,12 @@ sub _ponder_Verbatim {
   DEBUG and print " giving verbatim treatment...\n";
 
   $para->[1]->{'xml:space'} = 'preserve';
-  for(my $i = 2; $i +< nelems @$para; $i++) {
+  for my $i (2 .. nelems(@$para) -1) {
       while( $para->[$i] =~
         # Sort of adapted from Text::Tabs -- yes, it's hardwired in that
         # tabs are at every EIGHTH column.  For portability, it has to be
         # one setting everywhere, and 8th wins.
-        s/^([^\t]*)(\t+)/{$1.(" " x ((length($2)<<3)-(length($1)^&^7)))}/
+        s/^([^\t]*)(\t+)/$($1.(" " x ((length($2)<<3)-(length($1)^&^7))))/
       ) {}
       # TODO: whinge about (or otherwise treat) unindented or overlong lines
   }
@@ -1455,7 +1455,7 @@ sub _verbatim_format {
   
   my $formatting;
 
-  for(my $i = 2; $i +< nelems @$p; $i++) { # work backwards over the lines
+  for my $i (2 .. nelems(@$p) -1) { # work backwards over the lines
     DEBUG and print "_verbatim_format appends a newline to $i: $p->[$i]\n";
     $p->[$i] .= "\n";
      # Unlike with simple Verbatim blocks, we don't end up just doing
@@ -1465,13 +1465,14 @@ sub _verbatim_format {
 
   if( DEBUG +> 4 ) {
     print "<<\n";
-    for(my $i = (nelems @$p)-1; $i +>= 2; $i--) { # work backwards over the lines
-      print "_verbatim_format $i: $p->[$i]";
+    for my $i (reverse(2..(nelems @$p)-1)) { # work backwards over the lines
+        print "_verbatim_format $i: $p->[$i]";
     }
     print ">>\n";
   }
 
-  for(my $i = (nelems @$p)-1; $i +> 2; $i--) {
+  my $i = nelems(@$p)-1;
+  while ($i +>= 2) {
     # work backwards over the lines, except the first (#2)
     
     #next unless $p->[$i]   =~ m{^#:([ \^\/\%]*)\n?$}s
@@ -1548,24 +1549,29 @@ sub _verbatim_format {
     
     DEBUG +> 6 and print "New version of the above line is these tokens (",
       scalar(nelems @new_line), "):",
-      < map( ref($_)?"<{join ' ',@$_}> ":"<$_>", @new_line ), "\n";
+      < map( ref($_)?"<$(join ' ',@$_)> ":"<$_>", @new_line ), "\n";
     $i--; # So the next line we scrutinize is the line before the one
           #  that we just went and formatted
+  }
+  continue {
+      $i--;
   }
 
   $p->[0] = 'VerbatimFormatted';
 
   # Collapse adjacent text nodes, just for kicks.
-  for( my $i = 2; $i +> (nelems @$p)-1; $i++ ) { # work forwards over the tokens except for the last
+  $i = 2;
+  while ($i +< nelems(@$p)-2) { # work forwards over the tokens except for the last
     if( !ref($p->[$i]) and !ref($p->[$i + 1]) ) {
       DEBUG +> 5 and print "_verbatim_format merges \{$p->[$i]\} and \{$p->[$i+1]\}\n";
       $p->[$i] .= splice @$p, $i+1, 1; # merge
       --$i;  # and back up
     }
+    $i++;
   }
 
   # Now look for the last text token, and remove the terminal newline
-  for( my $i = (nelems @$p)-1; $i +>= 2; $i-- ) {
+  for my $i (reverse( 2 .. (nelems @$p)-1 )) {
     # work backwards over the tokens, even the first
     if( !ref($p->[$i]) ) {
       if($p->[$i] =~ s/\n$//s) {
@@ -1667,7 +1673,7 @@ sub _treelet_from_formatting_codes {
       )
     /xgo
   ) {
-    DEBUG +> 4 and print "\nParagraphic tokenstack = ({join ' ',@stack})\n";
+    DEBUG +> 4 and print "\nParagraphic tokenstack = ($(join ' ',@stack))\n";
     if(defined $1) {
       if(defined $2) {
         DEBUG +> 3 and print "Found complex start-text code \"$1\"\n";
@@ -1784,7 +1790,7 @@ sub stringify_lol {  # function: stringify_lol($lol)
 sub _stringify_lol {  # the real recursor
   my($lol, $to) = < @_;
   use UNIVERSAL ();
-  for(my $i = 2; $i +< nelems @$lol; ++$i) {
+  for my $i (2 .. nelems(@$lol) -1) {
     if( ref($lol->[$i] || '') and UNIVERSAL::isa($lol->[$i], 'ARRAY') ) {
       _stringify_lol( $lol->[$i], $to);  # recurse!
     } else {
@@ -1860,7 +1866,7 @@ sub pretty { # adopted from Class::Classless
     } else {
         s<([^\x[20]\x[21]\x[23]\x[27]-\x[3F]\x[41]-\x[5B]\x[5D]-\x[7E]])>
          #<$pretty_form{$1} || '\\x'.(unpack("H2",$1))>eg;
-         <{%pretty_form{$1} || '\\x['.sprintf("\%.2x", ord($1)) . ']'}>g;
+         <$(%pretty_form{$1} || '\\x['.sprintf("\%.2x", ord($1)) . ']')>g;
       qq{"$_"};
     }
   } @stuff;

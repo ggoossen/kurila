@@ -43,7 +43,7 @@ sub TEST {
 
   ok(($t eq $WANT and not $@), $name);
   if ($@) {
-      diag("error: {$@->message}");
+      diag("error: $($@->message)");
   }
   elsif ($t ne $WANT) {
       diag("--Expected--\n$WANT\n--Got--\n$t\n");
@@ -65,7 +65,7 @@ sub TEST {
   }
   ok($t eq $WANT and not $@);
   if ($@) {
-      diag("error: {$@->message}");
+      diag("error: $($@->message)");
   }
   elsif ($t ne $WANT) {
       diag("--Expected--\n$WANT\n--Got--\n$t\n");
@@ -74,9 +74,9 @@ sub TEST {
 
 sub SKIP_TEST {
     my $reason = shift;
-  SKIP: {
+  SKIP: do {
         skip $reason, 3;
-    }
+    };
 }
 
 $TMAX = 8; $XS = 0;

@@ -50,7 +50,7 @@ isa_ok(\42, 'SCALAR');
 
 # can_ok() & isa_ok should call can() & isa() on the given object, not 
 # just class, in case of custom can()
-{
+do {
        local *Foo::can;
        local *Foo::isa;
        *Foo::can = sub { @_[0]->[0] };
@@ -61,7 +61,7 @@ isa_ok(\42, 'SCALAR');
        $foo->[0] = 1;
        can_ok( $foo, 'blah');
        isa_ok( $foo, 'blah');
-}
+};
 
 
 pass('pass() passed');
@@ -147,14 +147,14 @@ cmp_ok(0, '||', 1,          '       ||');
 
 
 # Piers pointed out sometimes people override isa().
-{
+do {
     package Wibble;
     sub isa {
         my($self, $class) = < @_;
         return 1 if $class eq 'Wibblemeister';
     }
     sub new { bless \%() }
-}
+};
 isa_ok( Wibble->new, 'Wibblemeister' );
 
 my $sub = sub {};

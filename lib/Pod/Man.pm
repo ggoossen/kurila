@@ -229,7 +229,7 @@ sub _handle_text {
 sub method_for_element {
     my ($self, $element) = < @_;
     $element =~ s/-/_/g;
-    $element =~ s/([A-Z])/{lc($1)}/g;
+    $element =~ s/([A-Z])/$(lc($1))/g;
     $element =~ s/[^_a-z0-9]//g;
     return $element;
 }
@@ -345,9 +345,9 @@ sub format_text {
     # <Data> blocks.
     if ($convert) {
         if (ASCII) {
-            $text =~ s/(\\|[^\x{00}-\x{7F}])/{%ESCAPES{ord ($1)} || "X"}/g;
+            $text =~ s/(\\|[^\x{00}-\x{7F}])/$(%ESCAPES{ord ($1)} || "X")/g;
         } else {
-            $text =~ s/(\\)/{%ESCAPES{ord ($1)} || "X"}/g;
+            $text =~ s/(\\)/$(%ESCAPES{ord ($1)} || "X")/g;
         }
     }
 
@@ -437,19 +437,19 @@ sub guesswork {
         ( (?: [a-zA-Z\']+ \\-)+ )
         ( [a-zA-Z\']+ ) (?= [\)\".?!,;:]* (?:\s|\Z|\\\ ) )
         \b
-    } {{
+    } {$( do {
         my ($prefix, $hyphen, $main, $suffix) = ($1, $2, $3, $4);
         $hyphen ||= '';
         $main =~ s/\\-/-/g;
         $prefix . $hyphen . $main . $suffix;
-    }}gx;
+    } )}gx;
 
     # Translate "--" into a real em-dash if it's used like one.  This means
     # that it's either surrounded by whitespace, it follows a regular word, or
     # it occurs between two regular words.
     if (%$self{MAGIC_EMDASH}) {
-        s{          (\s) \\-\\- (\s)                } {{ $1 . '\*(--' . $2 }}gx;
-        s{ (\b[a-zA-Z]+) \\-\\- (\s|\Z|[a-zA-Z]+\b) } {{ $1 . '\*(--' . $2 }}gx;
+        s{          (\s) \\-\\- (\s)                } {$( $1 . '\*(--' . $2 )}gx;
+        s{ (\b[a-zA-Z]+) \\-\\- (\s|\Z|[a-zA-Z]+\b) } {$( $1 . '\*(--' . $2 )}gx;
     }
 
     # Make words in all-caps a little bit smaller; they look better that way.
@@ -466,9 +466,9 @@ sub guesswork {
             ( ^ | [\s\(\"\'\`\[\{<>] | \\\  )                   # (1)
             ( [A-Z] [A-Z] (?: [/A-Z+:\d_\$&] | \\- )* )         # (2)
             (?= [\s>\}\]\(\)\'\".?!,;] | \\*\(-- | \\\  | $ )   # (3)
-        } {{
+        } {$(
             $1 . '\s-1' . $2 . '\s0'
-        }}gx;
+        )}gx;
     }
 
     # Note that from this point forward, we have to adjust for \s-1 and \s-0
@@ -483,9 +483,9 @@ sub guesswork {
         s{
             ( \b | \\s-1 )
             ( [A-Za-z_] ([:\w] | \\s-?[01])+ \(\) )
-        } {{
+        } {$(
             $1 . '\f(IS' . $2 . '\f(IE'
-        }}gx;
+        )}gx;
     }
 
     # Change references to manual pages to put the page name in italics but
@@ -500,9 +500,9 @@ sub guesswork {
             ( \b | \\s-1 )
             ( [A-Za-z_] (?:[.:\w] | \\- | \\s-?[01])+ )
             ( \( \d [a-z]* \) )
-        } {{
+        } {$(
             $1 . '\f(IS' . $2 . '\f(IE\|' . $3
-        }}gx;
+        )}gx;
     }
 
     # Convert simple Perl variable references to a fixed-width font.  Be
@@ -513,16 +513,16 @@ sub guesswork {
            ( ^ | \s+ )
            ( [\$\@%] [\w:]+ )
            (?! \( )
-        } {{
+        } {$(
             $1 . '\f(FS' . $2 . '\f(FE'
-        }}gx;
+        )}gx;
     }
 
     # Fix up double quotes.  Unfortunately, we miss this transformation if the
     # quoted text contains any code with formatting codes and there's not much
     # we can effectively do about that, which makes it somewhat unclear if
     # this is really a good idea.
-    s{ \" ([^\"]+) \" } {{ '\*(L"' . $1 . '\*(R"' }}gx;
+    s{ \" ([^\"]+) \" } {$( '\*(L"' . $1 . '\*(R"' )}gx;
 
     # Make C++ into \*(C+, which is a squinched version.
     if (%$self{MAGIC_CPP}) {
@@ -562,7 +562,7 @@ sub mapfonts {
     my $last = '\fR';
     $text =~ s#
         \\f\((.)(.)
-    #{
+    #$( do {
         my $sequence = '';
         my $f;
         if ($last ne '\fR') { $sequence = '\fP' }
@@ -575,7 +575,7 @@ sub mapfonts {
             $last = $f;
             $sequence;
         }
-    }#gx;
+    })#gx;
     return $text;
 }
 
@@ -590,10 +590,10 @@ sub textmapfonts {
     my %magic = %(F => \$fixed, B => \$bold, I => \$italic);
     $text =~ s#
         \\f\((.)(.)
-    #{
+    #$( do {
         ${ %magic{$1} } += ($2 eq 'S') ? 1 : -1;
         %$self{FONTS}->{ ($fixed && 1) . ($bold && 1) . ($italic && 1) };
-    }#gx;
+    })#gx;
     return $text;
 }
 
@@ -793,8 +793,7 @@ sub devise_title {
         my ($volume, $dirs, $file) = < File::Spec->splitpath ($name);
         my @dirs = File::Spec->splitdir ($dirs);
         my $cut = 0;
-        my $i;
-        for ($i = 0; $i +< nelems @dirs; $i++) {
+        for my $i (0 .. nelems(@dirs) -1) {
             if (@dirs[$i] =~ m/perl/) {
                 $cut = $i + 1;
                 $cut++ if (@dirs[$i + 1] && @dirs[$i + 1] eq 'lib');

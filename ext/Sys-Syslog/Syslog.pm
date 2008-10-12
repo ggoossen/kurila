@@ -1,57 +1,54 @@
 package Sys::Syslog;
 use strict;
 use warnings::register;
-use Carp;
 use Fcntl < qw(O_WRONLY);
 use File::Basename;
 use POSIX < qw(strftime setlocale LC_TIME);
 use Socket ':all';
 require Exporter;
 
-{
+do {
     our $VERSION = '0.24';
     our @ISA = qw(Exporter);
 
     our %EXPORT_TAGS = %(
         standard => \qw(openlog syslog closelog setlogmask),
         extended => \qw(setlogsock),
-        macros => \@( <
+        macros => \@(
             # levels
-            qw(
+            < qw(
                 LOG_ALERT LOG_CRIT LOG_DEBUG LOG_EMERG LOG_ERR 
                 LOG_INFO LOG_NOTICE LOG_WARNING
-            ), < 
+            ),
 
             # standard facilities
-            qw(
+            < qw(
                 LOG_AUTH LOG_AUTHPRIV LOG_CRON LOG_DAEMON LOG_FTP LOG_KERN
                 LOG_LOCAL0 LOG_LOCAL1 LOG_LOCAL2 LOG_LOCAL3 LOG_LOCAL4
                 LOG_LOCAL5 LOG_LOCAL6 LOG_LOCAL7 LOG_LPR LOG_MAIL LOG_NEWS
                 LOG_SYSLOG LOG_USER LOG_UUCP
-            ), <
+            ),
             # Mac OS X specific facilities
-            qw( LOG_INSTALL LOG_LAUNCHD LOG_NETINFO LOG_RAS LOG_REMOTEAUTH ), <
+            < qw( LOG_INSTALL LOG_LAUNCHD LOG_NETINFO LOG_RAS LOG_REMOTEAUTH ),
             # modern BSD specific facilities
-            qw( LOG_CONSOLE LOG_NTP LOG_SECURITY ), <
+            < qw( LOG_CONSOLE LOG_NTP LOG_SECURITY ),
             # IRIX specific facilities
-            qw( LOG_AUDIT LOG_LFMT ), <
+            < qw( LOG_AUDIT LOG_LFMT ),
 
             # options
-            qw(
+            < qw(
                 LOG_CONS LOG_PID LOG_NDELAY LOG_NOWAIT LOG_ODELAY LOG_PERROR 
-            ), < 
+            ),
 
             # others macros
-            qw(
+            < qw(
                 LOG_FACMASK LOG_NFACILITIES LOG_PRIMASK 
                 LOG_MASK LOG_UPTO
-            ), 
+            ),
         ),
     );
 
-    our @EXPORT = @(
-        < @{%EXPORT_TAGS{standard}}, 
-    );
+    our @EXPORT = @{%EXPORT_TAGS{standard}};
 
     our @EXPORT_OK = @(
         < @{%EXPORT_TAGS{extended}}, 
@@ -67,7 +64,7 @@ require Exporter;
         push @ISA, 'DynaLoader';
         Sys::Syslog->bootstrap($VERSION);
     };
-}
+};
 
 
 # 
@@ -84,10 +81,11 @@ my $syslog_send;                # coderef of the function used to send messages
 my $syslog_path = undef;        # syslog path for "stream" and "unix" mechanisms
 my $syslog_xobj = undef;        # if defined, holds the external object used to send messages
 my $transmit_ok = 0;            # flag to indicate if the last message was transmited
+my $sock_timeout  = 0;          # socket timeout, see below
 my $current_proto = undef;      # current mechanism used to transmit messages
 my $ident = '';                 # identifiant prepended to each message
 $facility = '';                 # current facility
-my $maskpri = LOG_UPTO(&LOG_DEBUG);     # current log mask
+my $maskpri = LOG_UPTO(LOG_DEBUG());     # current log mask
 
 my %options = %(
     ndelay  => 0, 
@@ -116,8 +114,10 @@ if (not $@) {
 my @defaultMethods = @connectMethods;
 my @fallbackMethods = @( () );
 
+$sock_timeout = 0.25 if $^O =~ m/darwin/;
+
 # coderef for a nicer handling of errors
-my $err_sub = %options{nofatal} ? \&warnings::warnif : \&croak;
+my $err_sub = %options{nofatal} ? \&warnings::warnif : sub { die shift; };
 
 
 sub openlog {
@@ -132,7 +132,7 @@ sub openlog {
         %options{$opt} = 1 if exists %options{$opt}
     }
 
-    $err_sub = %options{nofatal} ? \&warnings::warnif : \&croak;
+    $err_sub = %options{nofatal} ? \&warnings::warnif : sub { die shift; };
     return 1 unless %options{ndelay};
     connect_log();
 }
@@ -163,8 +163,8 @@ sub setlogsock {
 	if (not defined $syslog_path) {
 	    my @try = qw(/dev/log /dev/conslog);
 
-            if (length &_PATH_LOG) {        # Undefined _PATH_LOG is "".
-		unshift @try, < &_PATH_LOG;
+            if (length _PATH_LOG()) {        # Undefined _PATH_LOG is "".
+		unshift @try, _PATH_LOG();
             }
 
 	    for my $try ( @try) {
@@ -197,7 +197,7 @@ sub setlogsock {
         }
 
     } elsif (lc $setsock eq 'pipe') {
-        for my $path (@($syslog_path, < &_PATH_LOG, "/dev/log")) {
+        for my $path (@: $syslog_path, _PATH_LOG(), "/dev/log") {
             next unless defined $path and length $path and -p $path and -w _;
             $syslog_path = $path;
             last
@@ -244,8 +244,8 @@ sub setlogsock {
 	@connectMethods = qw(console);
 
     } else {
-        croak "Invalid argument passed to setlogsock; must be 'stream', 'pipe', ",
-              "'unix', 'native', 'eventlog', 'tcp', 'udp' or 'inet'"
+        die "Invalid argument passed to setlogsock; must be 'stream', 'pipe', "
+          . "'unix', 'native', 'eventlog', 'tcp', 'udp' or 'inet'";
     }
 
     return 1;
@@ -266,8 +266,8 @@ sub syslog {
 
     local $facility = $facility;    # may need to change temporarily.
 
-    croak "syslog: expecting argument \$priority" unless defined $priority;
-    croak "syslog: expecting argument \$format"   unless defined $mask;
+    die "syslog: expecting argument \$priority" unless defined $priority;
+    die "syslog: expecting argument \$format"   unless defined $mask;
 
     @words = split(m/\W+/, $priority, 2);    # Allow "level" or "level|facility".
     undef $numpri;
@@ -276,21 +276,21 @@ sub syslog {
     foreach ( @words) {
 	$num = xlate($_);		    # Translate word to number.
 	if ($num +< 0) {
-	    croak "syslog: invalid level/facility: $_"
+	    die "syslog: invalid level/facility: $_"
 	}
-	elsif ($num +<= &LOG_PRIMASK) {
-	    croak "syslog: too many levels given: $_" if defined $numpri;
+	elsif ($num +<= LOG_PRIMASK()) {
+	    die "syslog: too many levels given: $_" if defined $numpri;
 	    $numpri = $num;
 	    return 0 unless LOG_MASK($numpri) ^&^ $maskpri;
 	}
 	else {
-	    croak "syslog: too many facilities given: $_" if defined $numfac;
+	    die "syslog: too many facilities given: $_" if defined $numfac;
 	    $facility = $_;
 	    $numfac = $num;
 	}
     }
 
-    croak "syslog: level must be given" unless defined $numpri;
+    die "syslog: level must be given" unless defined $numpri;
 
     if (not defined $numfac) {  # Facility not specified in this call.
 	$facility = 'user' unless $facility;
@@ -301,13 +301,13 @@ sub syslog {
 
     if ($mask =~ m/\%m/) {
         # escape percent signs for sprintf()
-        $error =~ s/%/\%\%/g if (nelems @_);
+        $error =~ s/%/\%\%/g if @_;
         # replace %m with $error, if preceded by an even number of percent signs
         $mask =~ s/(?<!\%)((?:\%\%)*)\%m/$1$error/g;
     }
 
     $mask .= "\n" unless $mask =~ m/\n$/;
-    $message = (nelems @_) ? sprintf($mask, < @_) : $mask;
+    $message = @_ ? sprintf($mask, < @_) : $mask;
 
     # See CPAN-RT#24431. Opened on Apple Radar as bug #4944407 on 2007.01.21
     chomp $message if $^O =~ m/darwin/;
@@ -336,7 +336,7 @@ sub syslog {
     # then we'll get ECONNREFUSED on the send). So what we
     # want to do at this point is to fallback onto a different
     # connection method.
-    while (scalar nelems @fallbackMethods || $syslog_send) {
+    while (@fallbackMethods || $syslog_send) {
 	if ($failed && (time - $fail_time) +> 60) {
 	    # it's been a while... maybe things have been fixed
 	    @fallbackMethods = @( () );
@@ -382,7 +382,7 @@ sub _syslog_send_console {
 	    return 1;
 	} else {
 	    if (waitpid($pid, 0) +>= 0) {
-	    	return  @($? >> 8);
+	    	return  $? >> 8;
 	    } else {
 		# it's possible that the caller has other
 		# plans for SIGCHLD, so let's not interfere
@@ -595,7 +595,7 @@ sub connect_stream {
 sub connect_pipe {
     my ($errs) = < @_;
 
-    $syslog_path ||= &_PATH_LOG || "/dev/log";
+    $syslog_path ||= _PATH_LOG() || "/dev/log";
 
     if (not -w $syslog_path) {
         push @$errs, "$syslog_path is not writable";
@@ -662,7 +662,7 @@ sub connect_native {
         $logopt += xlate($opt) if %options{$opt}
     }
 
-    try { openlog_xs($ident, $logopt, < xlate($facility)) };
+    try { openlog_xs($ident, $logopt, xlate($facility)) };
     if ($@) {
         push @$errs, $@->message;
         return 0;
@@ -706,7 +706,7 @@ sub connection_ok {
 
     my $rin = '';
     vec($rin, fileno(SYSLOG), 1) = 1;
-    my $ret = select $rin, undef, $rin, 0.25;
+    my $ret = select $rin, undef, $rin, $sock_timeout;
     return $ret ? 0 : 1;
 }
 

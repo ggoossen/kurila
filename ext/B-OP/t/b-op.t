@@ -4,7 +4,7 @@ use Test::More tests => 3;
 
 use B < qw|svref_2object|;
 
-{
+do {
     # cop_io
     use open IN  => ":crlf", OUT => ":bytes";
     sub foo {
@@ -15,10 +15,10 @@ use B < qw|svref_2object|;
     is ref($cop), "B::COP", "start opcode";
     isa_ok($cop->io, "B::PV");
     is $cop->io->sv, ":crlf\0:bytes";
-}
+};
 
-{
+do {
     # new
     my $op = B::OP->new('null', 0, undef);
     $op->free;
-}
+};

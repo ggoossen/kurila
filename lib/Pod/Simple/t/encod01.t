@@ -53,12 +53,12 @@ sub source_path {
 
 print "# Testing that $thefile parses right.\n";
 my $outstring;
-{
+do {
   my $p = Pod::Simple::DumpAsXML->new;
   $p->output_string( \$outstring );
   $p->parse_file( $thefile );
   undef $p;
-}
+};
 ok 1 ; # make sure it parsed at all
 ok( $outstring && length($outstring) ); # make sure it parsed to something.
 #print $outstring;

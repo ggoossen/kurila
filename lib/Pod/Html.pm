@@ -424,8 +424,8 @@ sub pod2html {
 
     # put a title in the HTML file if one wasn't specified
     if ($Title eq '') {
-	TITLE_SEARCH: {
- 	    for (my $i = 0; $i +< nelems @poddata; $i++) {
+	TITLE_SEARCH: do {
+ 	    for my $i (0 .. nelems(@poddata) -1) {
 		if (@poddata[$i] =~ m/^=head1\s*NAME\b/m) {
  		    for my $para ( @poddata[[@($i, $i+1)]] ) {
 			last TITLE_SEARCH
@@ -434,11 +434,11 @@ sub pod2html {
 		}
 
 	    }
-	}
+	};
     }
     if (!$Title and $Podfile =~ m/\.pod\z/) {
 	# probably a split pod so take first =head[12] as title
- 	for (my $i = 0; $i +< nelems @poddata; $i++) {
+ 	for my $i (0 .. nelems(@poddata) -1) {
 	    last if ($Title) = @poddata[$i] =~ m/^=head[12]\s*(.*)/;
 	}
 	warn "adopted '$Title' as title for $Podfile\n"
@@ -629,7 +629,7 @@ END_OF_TAIL
 
 sub usage {
     my $podfile = shift;
-    warn "$0: $podfile: {join ' ',@_}\n" if (nelems @_);
+    warn "$0: $podfile: $(join ' ',@_)\n" if (nelems @_);
     die <<END_OF_USAGE;
 Usage:  $0 --help --htmlroot=<name> --infile=<name> --outfile=<name>
            --podpath=<name>:...:<name> --podroot=<name>
@@ -850,8 +850,8 @@ sub load_cache {
 #
 sub scan_podpath {
     my($podroot, $recurse, $append) = < @_;
-    my($pwd, $dir);
-    my($libpod, $dirname, $pod, @files, @poddata);
+    my($pwd);
+    my($dirname, @files, @poddata);
 
     unless($append) {
 	%Items = %( () );
@@ -862,12 +862,12 @@ sub scan_podpath {
     $pwd = getcwd();
     chdir($podroot)
 	|| die "$0: error changing to directory $podroot: $!\n";
-    foreach $dir ( @Podpath) {
+    foreach my $dir ( @Podpath) {
 	scan_dir($dir, $recurse);
     }
 
     # scan the pods listed in @Libpods for =item directives
-    foreach $libpod ( @Libpods) {
+    foreach my $libpod ( @Libpods) {
 	# if the page isn't defined then we won't know where to find it
 	# on the system.
 	next unless defined %Pages{$libpod} && %Pages{$libpod};
@@ -884,7 +884,7 @@ sub scan_podpath {
 	    closedir(DIR);
 
 	    # scan each .pod and .pm file for =item directives
-	    foreach $pod ( @files) {
+	    foreach my $pod ( @files) {
 		open(POD, "<", "$dirname/$pod") ||
 		    die "$0: error opening $dirname/$pod for input: $!\n";
 		@poddata = @( ~< *POD );
@@ -903,7 +903,7 @@ sub scan_podpath {
 	} elsif (%Pages{$libpod} =~ m/([^:]*\.pod):/ ||
 		 %Pages{$libpod} =~ m/([^:]*\.pm):/) {
 	    # scan the .pod or .pm file for =item directives
-	    $pod = $1;
+	    my $pod = $1;
 	    open(POD, "<", "$pod") ||
 		die "$0: error opening $pod for input: $!\n";
 	    @poddata = @( ~< *POD );
@@ -1064,13 +1064,13 @@ sub scan_headings {
 #
 sub scan_items {
     my( $itemref, $pod, < @poddata ) = < @_;
-    my($i, $item);
+    my( $item);
     local $_;
 
     $pod =~ s/\.pod\z//;
     $pod .= ".html" if $pod;
 
-    foreach $i (0..(nelems @poddata)-1) {
+    foreach my $i (0..(nelems @poddata)-1) {
 	my $txt = depod( @poddata[$i] );
 
 	# figure out what kind of item it is.
@@ -1133,7 +1133,7 @@ sub emit_item_tag($$$){
 
     print HTML '<strong>';
     if (%Items_Named{$item}++) {
-	print HTML < process_text( \$otext );
+	print HTML process_text( \$otext );
     } else {
         my $name = $item;
         $name = anchorify($name);
@@ -1325,11 +1325,11 @@ sub process_pre {
     $rest = $$text;
 
     # insert spaces in place of tabs
-    $rest =~ s#(.+)#{
+    $rest =~ s#(.+)#$( do {
 	    my $line = $1;
-            1 while $line =~ s/^(.*?)(\t+)/$1{' ' x ((length($2) * 8 - length($1) % 8))}/;
+            1 while $line =~ s/^(.*?)(\t+)/$($1 . ' ' x ((length($2) * 8 - length($1) % 8)))/;
 	    $line;
-	}#g;
+	})#g;
 
     # convert some special chars to HTML escapes
     $rest = html_escape($rest);
@@ -1338,7 +1338,7 @@ sub process_pre {
     # the preformatted text.
     $rest =~ s{
 	         (\s*)(perl\w+)
-	      }{{
+	      }{$( do {
 		 if ( defined %Pages{$2} ){	# is a link
 		     qq($1<a href="$Htmlroot/%Pages{$2}">$2</a>);
 		 } elsif (defined %Pages{dosify($2)}) {	# is a link
@@ -1347,10 +1347,10 @@ sub process_pre {
 		     "$1$2";
 		 }
 	      
-}}xg;
+})}xg;
      $rest =~ s{
 		 (<a\ href="?) ([^>:]*:)? ([^>:]*) \.pod: ([^>:]*:)?
-               }{{
+               }{$( do {
                   my $url ;
                   if ( $Htmlfileurl ne '' ){
 		     # Here, we take advantage of the knowledge
@@ -1367,7 +1367,7 @@ sub process_pre {
 		  }
 		  "$1$url" ;
 	       
-}}xg;
+})}xg;
 
     # Look for embedded URLs and make them into links.  We don't
     # relativize them since they are best left as the author intended.
@@ -1387,7 +1387,7 @@ sub process_pre {
     my $ltrs = '\w';
     my $gunk = '/#~:.?+=&%@!\-';
     my $punc = '.:!?\-;';
-    my $any  = "{$ltrs}{$gunk}{$punc}";
+    my $any  = "$($ltrs)$($gunk)$($punc)";
 
     $rest =~ s{
 	\b			# start at word boundary
@@ -1647,7 +1647,7 @@ sub process_text1($$;$$){
         # failing this, we try to find the next best thing...
         my( $url, $ltext, $fid );
 
-        RESOLVE: {
+        RESOLVE: do {
             if( defined $ident ){
                 ## try to resolve $ident as an item
 	        ( $url, $fid ) = < coderef( $page, $ident );
@@ -1696,7 +1696,7 @@ sub process_text1($$;$$){
             # warning; show some text.
             $linktext = $opar unless defined $linktext;
             warn "$0: $Podfile: cannot resolve L<$opar> in paragraph $Paragraph.\n" unless $Quiet;
-        }
+        };
 
         # now we have a URL or just plain code
         $$rstr = $linktext . '>' . $$rstr;
@@ -1817,8 +1817,8 @@ sub dosify {
     return lc($str) if $^O eq 'VMS';     # VMS just needs casing
     if ($Is83) {
         $str = lc $str;
-        $str =~ s/(\.\w+)/{substr ($1,0,4)}/g;
-        $str =~ s/(\w+)/{substr ($1,0,8)}/g;
+        $str =~ s/(\.\w+)/$(substr ($1,0,4))/g;
+        $str =~ s/(\w+)/$(substr ($1,0,8))/g;
     }
     return $str;
 }
@@ -2127,7 +2127,7 @@ sub depod1($;$$){
   return $res;
 }
 
-{
+do {
     my %seen;   # static fragment record hash
 
 sub fragment_id_readable {
@@ -2162,7 +2162,7 @@ sub fragment_id_readable {
     }
 
     $text;
-}}
+}};
 
 my @HC;
 sub fragment_id_obfuscated {  # This was the old "_2d_2d__"
@@ -2172,9 +2172,9 @@ sub fragment_id_obfuscated {  # This was the old "_2d_2d__"
     # text? Normalize by obfuscating the fragment id to make it unique
     $text =~ s/\s+/_/sg;
 
-    $text =~ s{(\W)}{{
+    $text =~ s{(\W)}{$(
         defined( @HC[ord($1)] ) ? @HC[ord($1)]
-        : ( @HC[ord($1)] = sprintf( "\%\%\%02X", ord($1) ) ) }}gx;
+        : ( @HC[ord($1)] = sprintf( "\%\%\%02X", ord($1) ) ) )}gx;
     $text = substr( $text, 0, 50 );
 
     $text;

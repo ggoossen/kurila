@@ -6,10 +6,10 @@ require ExtUtils::MM;
 our $VERSION = 6.44;
 our @ISA = qw(ExtUtils::MM);
 
-{
+do {
     package MY;
     our @ISA = qw(ExtUtils::MY);
-}
+};
 
 sub DESTROY {}
 

@@ -35,12 +35,12 @@ sub bar { }
 my $newaction=POSIX::SigAction->new(\&foo, POSIX::SigSet->new(SIGUSR1), 0);
 my $oldaction=POSIX::SigAction->new(\&bar, POSIX::SigSet->new(), 0);
 
-{
+do {
 	my $bad;
 	local($^WARN_HOOK)=sub { $bad=1; };
 	sigaction(SIGHUP, $newaction, $oldaction);
 	ok(!$bad, "no warnings");
-}
+};
 
 ok($oldaction->{HANDLER} eq 'DEFAULT' ||
    $oldaction->{HANDLER} eq 'IGNORE', $oldaction->{HANDLER});
@@ -52,11 +52,11 @@ is($oldaction->{HANDLER}, \&foo);
 
 ok($oldaction->{MASK}->ismember(SIGUSR1), "SIGUSR1 ismember MASK");
 
-SKIP: {
+SKIP: do {
     skip("sigaction() thinks different in $^O", 1)
 	if $^O eq 'linux' || $^O eq 'unicos';
     is($oldaction->{FLAGS}, 0);
-}
+};
 
 $newaction=POSIX::SigAction->new('IGNORE');
 sigaction(SIGHUP, $newaction);
@@ -69,10 +69,10 @@ is(%SIG{HUP}, undef);
 
 $newaction=POSIX::SigAction->new(sub { $ok10=1; });
 sigaction(SIGHUP, $newaction);
-{
+do {
 	local($^W)=0;
 	kill 'HUP', $$;
-}
+};
 ok($ok10, "SIGHUP handler called");
 
 is(ref(%SIG{HUP}), 'CODE');
@@ -112,21 +112,21 @@ try {
 };
 ok($@, "any object not good as new action");
 
-SKIP: {
+SKIP: do {
     skip("SIGCONT not trappable in $^O", 1)
 	if ($^O eq 'VMS');
     $newaction=POSIX::SigAction->new(sub { $ok10=1; });
     if (try { SIGCONT; 1 }) {
 	sigaction(SIGCONT, POSIX::SigAction->new('DEFAULT'));
-	{
+	do {
 	    local($^W)=0;
 	    kill 'CONT', $$;
-	}
+	};
     }
     ok(!$bad18, "SIGCONT trappable");
-}
+};
 
-{
+do {
     local $^WARN_HOOK = sub { }; # Just suffer silently.
 
     my $hup20;
@@ -147,7 +147,7 @@ SKIP: {
     sigaction("HUP", $newaction);
     kill "HUP", $$;
     is ($hup21, 1);
-}
+};
 
 # "safe" attribute.
 # for this one, use the accessor instead of the attribute
@@ -175,7 +175,7 @@ $ok = 0;
 kill 'HUP', $$;
 ok($ok, "safe signal delivery must work");
 
-SKIP: {
+SKIP: do {
     eval 'use POSIX qw(%SIGRT SIGRTMIN SIGRTMAX); scalar %SIGRT + SIGRTMIN() + SIGRTMAX()';
     $@					# POSIX did not exort
     || SIGRTMIN() +< 0 || SIGRTMAX() +< 0	# HP-UX 10.20 exports both as -1
@@ -189,9 +189,9 @@ SKIP: {
     is(%SIGRT{SIGRTMIN}, $h, "handler set & get");
     kill 'SIGRTMIN', $$;
     is($sigrtmin, 1, "SIGRTMIN handler works");
-}
+};
 
-SKIP: {
+SKIP: do {
     eval 'use POSIX qw(SA_SIGINFO); SA_SIGINFO';
     skip("no SA_SIGINFO", 1) if $@;
     sub hiphup {
@@ -200,7 +200,7 @@ SKIP: {
     my $act = POSIX::SigAction->new(\&hiphup, 0, SA_SIGINFO);
     sigaction(SIGHUP, $act);
     kill 'HUP', $$;
-}
+};
 
 try { sigaction(-999, "foo"); };
 like($@->{description}, qr/Negative signals/,

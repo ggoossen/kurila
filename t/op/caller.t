@@ -3,7 +3,7 @@
 
 BEGIN {
     require './test.pl';
-    plan( tests => 77 );
+    plan( tests => 76 );
 }
 
 use strict;
@@ -24,7 +24,7 @@ is( @c[3], "(eval)", "subroutine name in an eval ''" );
 ok( !@c[4], "hasargs false in an eval ''" );
 
 sub { @c = @( caller(0) ) } -> ();
-is( @c[3], "main::__ANON__", "anonymous subroutine name" );
+is( @c[3], undef, "anonymous subroutine name" );
 ok( @c[4], "hasargs true with anon sub" );
 
 # Bug 20020517.003, used to dump core
@@ -42,8 +42,6 @@ sub callf { f(); }
 callf();
 is( @c[3], "main::callf", "subroutine name" );
 ok( @c[4], "hasargs true with callf()" );
-&callf;
-ok( !@c[4], "hasargs false with &callf" );
 
 try { f() };
 is( @c[3], "(eval)", "subroutine name in an eval \{\}" );
@@ -54,7 +52,7 @@ is( @c[3], "(eval)", "subroutine name in an eval ''" );
 ok( !@c[4], "hasargs false in an eval ''" );
 
 sub { f() } -> ();
-is( @c[3], "main::__ANON__", "anonymous subroutine name" );
+is( @c[3], 'main::__ANON__', "anonymous subroutine name" );
 ok( @c[4], "hasargs true with anon sub" );
 
 sub foo2 { f() }
@@ -91,7 +89,7 @@ sub testwarn {
     check_bits( @(caller(0))[9], $w, "warnings match caller ($id)");
 }
 
-{
+do {
     use bytes;
     no warnings;
     # Build the warnings mask dynamically
@@ -118,7 +116,7 @@ sub testwarn {
     BEGIN { check_bits( $^WARNING_BITS, $registered,
 			'warning bits on via "use warnings::register"' ) }
     testwarn($registered, 'following w::r');
-}
+};
 
 
 # The next two cases test for a bug where caller ignored evals if

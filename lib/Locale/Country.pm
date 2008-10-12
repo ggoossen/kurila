@@ -259,9 +259,9 @@ sub _code2codeset
 # initialisation code - stuff the DATA into the ALPHA2 hash
 #
 #=======================================================================
-{
+do {
     my   ($alpha2, $alpha3, $numeric);
-    my   ($country, @countries);
+    my   (@countries);
     local $_;
 
 
@@ -272,7 +272,7 @@ sub _code2codeset
         ($alpha2, $alpha3, $numeric, < @countries) = < split(m/:/, $_);
 
         $CODES->[LOCALE_CODE_ALPHA_2]->{$alpha2} = @countries[0];
-	foreach $country ( @countries)
+	foreach my $country ( @countries)
 	{
 	    $COUNTRIES->[LOCALE_CODE_ALPHA_2]->{lc "$country"} = $alpha2;
 	}
@@ -280,7 +280,7 @@ sub _code2codeset
 	if ($alpha3)
 	{
             $CODES->[LOCALE_CODE_ALPHA_3]->{$alpha3} = @countries[0];
-	    foreach $country ( @countries)
+	    foreach my $country ( @countries)
 	    {
 		$COUNTRIES->[LOCALE_CODE_ALPHA_3]->{lc "$country"} = $alpha3;
 	    }
@@ -289,7 +289,7 @@ sub _code2codeset
 	if ($numeric)
 	{
             $CODES->[LOCALE_CODE_NUMERIC]->{$numeric} = @countries[0];
-	    foreach $country ( @countries)
+	    foreach my $country ( @countries)
 	    {
 		$COUNTRIES->[LOCALE_CODE_NUMERIC]->{lc "$country"} = $numeric;
 	    }
@@ -298,7 +298,7 @@ sub _code2codeset
     }
 
     close(DATA);
-}
+};
 
 1;
 

@@ -25,7 +25,7 @@ $want_comma =~ s/ => /,/g;
 
 ####################### XS Tests #####################
 
-SKIP: {
+SKIP: do {
     skip 'XS extension not loaded', 3 unless (defined &Data::Dumper::Dumpxs);
     is (Data::Dumper::DumperX($HASH), $WANT, 
 	'XS: Default hash key/value separator: " => "');
@@ -34,11 +34,11 @@ SKIP: {
     my $dd = Data::Dumper->new(\@( $HASH ))->Pair(',');
     is ($dd->Dumpxs(), $want_comma, 
 	'XS: Data::Dumper->new([ $HASH ])->Pair(",")->Dumpxs()');
-};
+};;
 
 ###################### Perl Tests ####################
 
-{
+do {
     is ($Data::Dumper::Pair, ' => ', 'Perl: $Data::Dumper::Pair eq " => "');
     is (Data::Dumper::Dumper($HASH), $WANT, 
 	'Perl: Default hash key/value separator: " => "');
@@ -48,4 +48,4 @@ SKIP: {
     is ($dd->Pair(), ',', 
 	'Perl: Data::Dumper->new([ $HASH ])->Pair(",")->Pair() eq ","');
     is ($dd->Dump(), $want_comma, 'Perl: Data::Dumper->new([ $HASH ])->Pair(",")->Dump()');
-}
+};

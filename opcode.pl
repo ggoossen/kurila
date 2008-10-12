@@ -628,7 +628,7 @@ prototype	subroutine prototype	ck_null		s%	S
 srefgen		single ref constructor	ck_null		fs1	S
 ref		reference-type operator	ck_fun		stu%	S?
 bless		bless			ck_fun		s@	S S?
-anonscalar	anonymous scalar ($())	ck_fun		$	S
+anonscalar	anonymous scalar ($())	ck_fun		1	S
 
 # Pushy I/O.
 
@@ -769,7 +769,7 @@ quotemeta	quotemeta		ck_fun		stu%	S?
 rv2av		array dereference	ck_rvconst	dt1	
 aelemfast	constant array element	ck_null		s$	A S
 aelem		array element		ck_null		s2	A S
-aslice		array slice		ck_null		m@	A L
+aslice		array slice		ck_null		@	A S
 
 # Hashes.
 
@@ -781,13 +781,13 @@ delete		delete			ck_delete	%	S
 exists		exists			ck_exists	is%	S
 rv2hv		hash dereference	ck_rvconst	dt1	
 helem		hash element		ck_null		s2	H S
-hslice		hash slice		ck_null		m@	H L
+hslice		hash slice		ck_null		@	H A
 
 # Explosives and implosives.
 
 unpack		unpack			ck_unpack	@	S S?
 pack		pack			ck_fun		mst@	S L
-split		split			ck_split	t@	S S S
+split		split			ck_split	@	S S S
 join		join or string		ck_fun		mst@	S L
 
 # List operators.
@@ -807,7 +807,7 @@ pop		pop			ck_shift	s%	A?
 shift		shift			ck_shift	s%	A?
 unshift		unshift			ck_fun		imsT@	A L
 sort		sort			ck_sort		dm@	C? L
-reverse		reverse			ck_fun		mt@	L
+reverse		reverse			ck_fun		t@	S
 
 grepstart	grep			ck_grep		dm@	C L
 grepwhile	grep iterator		ck_null		dt|	

@@ -69,10 +69,10 @@ foreach my $file (@(
 
   print "# Reading $precooked...\n";
   open(IN, "<", $precooked) or die "Can't read-open $precooked: $!";
-  {
+  do {
     local $/;
     push @out, ~< *IN;
-  }
+  };
   close(IN);
   print "#   ", length(@out[-1]), " bytes pulled in.\n";
   
@@ -142,11 +142,11 @@ sub compare2 {
     if($at +> 10) {
       $at -= 5;
     }
-    {
+    do {
       print "# ", substr(@out[0],$at,20), "\n";
       print "# ", substr(@out[1],$at,20), "\n";
       print "#      ^...";
-    }
+    };
     
     
     

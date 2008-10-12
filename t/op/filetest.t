@@ -27,7 +27,7 @@ eval '$> = 1';		# so switch uid (may not be implemented)
 
 print "# oldeuid = $oldeuid, euid = $>\n";
 
-SKIP: {
+SKIP: do {
     if (!%Config{d_seteuid}) {
 	skip('no seteuid');
     } 
@@ -40,7 +40,7 @@ SKIP: {
     else {
 	ok( !-w 'TEST' );
     }
-}
+};
 
 # Scripts are not -x everywhere so cannot test that.
 
@@ -52,17 +52,17 @@ ok( -r 'op' );
 
 # this would fail for the euid 1
 # (unless we have unpacked the source code as uid 1...)
-SKIP: {
+SKIP: do {
     if (%Config{d_seteuid}) {
 	ok( -w 'op' );
     } else {
 	skip('no seteuid');
     }
-}
+};
 
 ok( -x 'op' ); # Hohum.  Are directories -x everywhere?
 
-is( "{join ' ',@{\ grep -r, qw(foo io noo op zoo)}}", "io op" );
+is( "$(join ' ', grep -r, qw(foo io noo op zoo))", "io op" );
 
 # Test stackability of filetest operators
 

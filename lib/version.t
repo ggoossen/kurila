@@ -118,7 +118,7 @@ sub BaseTests {
 	"Version string contains invalid data; ignoring");
 
     # from here on out capture the warning and test independently
-    {
+    do {
     my $warning;
     local $^WARN_HOOK = sub { $warning = @_[0]->{description} };
     $version = $CLASS->new("99 and 44/100 pure");
@@ -227,7 +227,7 @@ sub BaseTests {
     ok ( !try { $version*3 }, "noop *" );
     ok ( !try { abs($version) }, "noop abs" );
 
-SKIP: {
+SKIP: do {
     skip "version require'd instead of use'd, cannot test qv", 3
     	if defined $no_qv;
     # test the qv() sub
@@ -237,7 +237,7 @@ SKIP: {
     $version = qv(1.2);
     is ( $version->stringify, "v1.2", 'qv(1.2) == "1.2.0"' );
     isa_ok( qv('5.008'), $CLASS );
-}
+};
 
     # test creation from existing version object
     diag "create new from existing version" if $Verbose;
@@ -270,7 +270,7 @@ SKIP: {
     my $error_regex = 'does not define \$...::VERSION';
     
     
-    {
+    do {
 	open F, ">", "aaa.pm" or die "Cannot open aaa.pm: $!\n";
 	print F "package aaa;\n\$aaa::VERSION=0.58;\n1;\n";
 	close F;
@@ -301,9 +301,9 @@ SKIP: {
 		'Replacement eval works with single digit');
 	
 	unlink 'aaa.pm';
-    }
+    };
 
-    { # dummy up some variously broken modules for testing
+    do { # dummy up some variously broken modules for testing
 	open F, ">", "xxx.pm" or die "Cannot open xxx.pm: $!\n";
 	print F "1;\n";
 	close F;
@@ -316,9 +316,9 @@ SKIP: {
 	    'Replacement handles modules without package or VERSION'); 
 	ok (!defined($version), "Called as class method");
 	unlink 'xxx.pm';
-    }
+    };
     
-    { # dummy up some variously broken modules for testing
+    do { # dummy up some variously broken modules for testing
 	open F, ">", "yyy.pm" or die "Cannot open yyy.pm: $!\n";
 	print F "package yyy;\n#look ma no VERSION\n1;\n";
 	close F;
@@ -329,9 +329,9 @@ SKIP: {
 	unlike ($@, qr/$error_regex/,
 	    'Replacement handles modules without VERSION'); 
 	unlink 'yyy.pm';
-    }
+    };
 
-    { # dummy up some variously broken modules for testing
+    do { # dummy up some variously broken modules for testing
 	open F, ">", "zzz.pm" or die "Cannot open zzz.pm: $!\n";
 	print F "package zzz;\nour \@VERSION = ();\n1;\n";
 	close F;
@@ -342,9 +342,9 @@ SKIP: {
 	unlike ($@, qr/$error_regex/,
 	    'Replacement handles modules without VERSION'); 
 	unlink 'zzz.pm';
-    }
+    };
 
-SKIP: 	{
+SKIP: 	do {
 	diag "Tests with v-strings" if $Verbose;
 	$version = $CLASS->new(v1.2.3);
 	is($version->stringify, "v1.2.3", '"$version" == 1.2.3');
@@ -355,7 +355,7 @@ SKIP: 	{
 	    if defined $no_qv;
 	$version = qv("v1.2.3");
 	ok($version->stringify == "v1.2.3", 'v-string initialized qv()');
-    }
+    };
 
     diag "Tests with real-world (malformed) data" if $Verbose;
 
@@ -397,9 +397,9 @@ SKIP: 	{
     $version = $CLASS->new(0.000001);
     unlike($warning, qr/^Version string '1e-06' contains invalid data/,
     	"Very small version objects");
-    }
+    };
 
-SKIP: {
+SKIP: do {
 	# dummy up a legal module for testing RT#19017
 	open F, ">", "www.pm" or die "Cannot open www.pm: $!\n";
 	print F <<"EOF";
@@ -429,7 +429,7 @@ EOF
 	cmp_ok ( "www"->VERSION, 'eq', '0.0.4', 'No undef warnings' );
 
 	unlink 'www.pm';
-    }
+    };
 
     open F, ">", "vvv.pm" or die "Cannot open vvv.pm: $!\n";
     print F <<"EOF";
@@ -446,7 +446,7 @@ EOF
     isa_ok( qv(1.2), "vvv");
     unlink 'vvv.pm';
 
-SKIP: {
+SKIP: do {
 	open F, ">", "uuu.pm" or die "Cannot open uuu.pm: $!\n";
 	print F <<"EOF";
 package uuu;
@@ -461,9 +461,9 @@ EOF
 	like ($@->{description}, qr/^uuu version v1.1.0 required/,
 	    "User typed extended so we error with extended"); 
 	unlink 'uuu.pm';
-    }
+    };
 
-SKIP: {
+SKIP: do {
 	# test locale handling
 	my $warning;
 	local $^WARN_HOOK = sub { $warning = @_[0] };
@@ -471,7 +471,7 @@ SKIP: {
 	my $loc;
 	while ( ~< *DATA) {
 	    chomp;
-	    $loc = POSIX::setlocale(&POSIX::LC_ALL, $_);
+	    $loc = POSIX::setlocale(&POSIX::LC_ALL( < @_ ), $_);
 	    last if POSIX::localeconv()->{decimal_point} eq ',';
 	}
 	skip 'Cannot test locale handling without a comma locale', 4
@@ -484,19 +484,19 @@ SKIP: {
 	    "Process locale-dependent floating point");
 	is ($v, "1.23", "Locale doesn't apply to version objects");
 	ok ($v == $ver, "Comparison to locale floating point");
-    }
+    };
 
     eval 'my $v = $CLASS->new("1._1");';
     unlike($@, qr/^Invalid version format \(alpha with zero width\)/,
     	"Invalid version format 1._1");
 
-    {
+    do {
 	my $warning;
 	local $^WARN_HOOK = sub { $warning = @_[0] };
 	try { my $v = $CLASS->new(^~^0); };
 	unlike($@, qr/Integer overflow in version/, "Too large version");
 	like($warning->{description}, qr/Integer overflow in version/, "Too large version");
-    }
+    };
 
 }
 

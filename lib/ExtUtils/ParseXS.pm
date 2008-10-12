@@ -257,7 +257,7 @@ sub process_file {
   $BLOCK_re= '\s*(' . join('|', qw(
 				   REQUIRE BOOT CASE PREINIT INPUT INIT CODE PPCODE OUTPUT
 				   CLEANUP ALIAS ATTRS PROTOTYPES PROTOTYPE VERSIONCHECK INCLUDE
-				   SCOPE INTERFACE INTERFACE_MACRO C_ARGS POSTCALL OVERLOAD FALLBACK
+				   SCOPE INTERFACE INTERFACE_MACRO C_ARGS POSTCALL FALLBACK
 				  )) . "|$END)\\s*:";
 
   
@@ -277,12 +277,14 @@ EOM
   print("#line 1 \"$filepathname\"\n")
     if $WantLineNumbers;
 
-  firstmodule:
-  local $_;
-  while ( ~< $FH) {
+  my $line;
+firstmodule:
+  while ($line = ~< $FH) {
+    $_ = $line;
     if (m/^=/) {
       my $podstartline = iohandle::input_line_number($FH);
-      do {
+      {
+        $_ = $line;
 	if (m/^=cut\s*$/) {
 	  # We can't just write out a /* */ comment, as our embedded
 	  # POD might itself be in a comment. We can't put a /**/
@@ -303,7 +305,7 @@ EOM
 	  next firstmodule
 	}
 	
-      } while ( ~< $FH);
+      } while ($line = ~< $FH);
       # At this point $. is at end of file so die won't state the start
       # of the problem, and as we haven't yet read any lines &death won't
       # show the correct line in the message either.
@@ -315,7 +317,7 @@ EOM
     
     print $_;
   }
-  unless (defined $_) {
+  unless (defined $line) {
     warn "Didn't find a 'MODULE ... PACKAGE ... PREFIX' line\n";
     exit 0; # Not a fatal error for the caller process
   }
@@ -329,7 +331,7 @@ EOF
 
   print 'ExtUtils::ParseXS::CountLines'->end_marker, "\n" if $WantLineNumbers;
 
-  $lastline    = $_;
+  $lastline    = $line;
   $lastline_no = iohandle::input_line_number($FH);
 
  PARAGRAPH:
@@ -340,18 +342,18 @@ EOF
   if ($Overload) # make it findable with fetchmethod
   {
     print < Q(<<"EOF");
-#XS(XS_{$Packid}_nil); /* prototype to pass -Wmissing-prototypes */
-#XS(XS_{$Packid}_nil)
+#XS(XS_$($Packid)_nil); /* prototype to pass -Wmissing-prototypes */
+#XS(XS_$($Packid)_nil)
 #\{
 #   XSRETURN_EMPTY;
 #\}
 #
 EOF
     unshift(@InitFileCode, <<"MAKE_FETCHMETHOD_WORK");
-    /* Making a sub named "{$Package}::()" allows the package */
+    /* Making a sub named "$($Package)::()" allows the package */
     /* to be findable via fetchmethod(), and causes */
     /* overload::Overloaded("$Package") to return true. */
-    newXS("{$Package}::()", XS_{$Packid}_nil, file$proto);
+    newXS("$($Package)::()", XS_$($Packid)_nil, file$proto);
 MAKE_FETCHMETHOD_WORK
   }
 
@@ -528,13 +530,13 @@ sub process_para {
     $_ = shift(@line);
     while (my $kwd = check_keyword("REQUIRE|PROTOTYPES|FALLBACK|VERSIONCHECK|INCLUDE")) {
       no strict 'refs';
-      &{*{Symbol::fetch_glob("{$kwd}_handler")}}() ;
+      &{*{Symbol::fetch_glob("$($kwd)_handler")}}() ;
       next PARAGRAPH unless (nelems @line) ;
       $_ = shift(@line);
     }
 
     if (check_keyword("BOOT")) {
-      &check_cpp;
+      &check_cpp( < @_ );
       push (@BootCode, "#line @line_no[(nelems @line_no) - nelems @line] \"$filepathname\"")
 	if $WantLineNumbers && @line[0] !~ m/^\s*#\s*line\b/;
       push (@BootCode, < @line, "") ;
@@ -566,7 +568,7 @@ sub process_para {
     $class = "$4 $class" if $4;
     ($pname = $func_name) =~ s/^($Prefix)?/$Packprefix/;
     (my $clean_func_name = $func_name) =~ s/^$Prefix//;
-    $Full_func_name = "{$Packid}_$clean_func_name";
+    $Full_func_name = "$($Packid)_$clean_func_name";
     if ($Is_VMS) {
       $Full_func_name = $SymSet->addsym($Full_func_name);
     }
@@ -693,7 +695,7 @@ sub process_para {
     # Detect CODE: blocks which use ST(n)= or XST_m*(n,v)
     #   to set explicit return values.
     $EXPLICIT_RETURN = ($CODE &&
-			("{join ' ', @line}" =~ m/(\bST\s*\([^;]*=) | (\bXST_m\w+\s*\()/x ));
+			("$(join ' ', @line)" =~ m/(\bST\s*\([^;]*=) | (\bXST_m\w+\s*\()/x ));
     $ALIAS  = grep(m/^\s*ALIAS\s*:/, @line);
     $INTERFACE  = grep(m/^\s*INTERFACE\s*:/, @line);
 
@@ -735,7 +737,7 @@ EOF
     if ($ALIAS)
       { print Q(<<"EOF") if $cond }
 #    if ($cond)
-#       Perl_croak(aTHX_ "Usage: \%s(\%s)", GvNAME(CvGV(cv)), "$report_args");
+#       Perl_croak(aTHX_ "Usage: \%s(\%s)", SvPVX_const(SvNAME(cv)), "$report_args");
 EOF
     else
       { print Q(<<"EOF") if $cond }
@@ -769,9 +771,9 @@ EOF
     push(@line, "$END:");
     push(@line_no, @line_no[-1]);
     $_ = '';
-    &check_cpp;
+    &check_cpp( < @_ );
     while ((nelems @line)) {
-      &CASE_handler if check_keyword("CASE");
+      &CASE_handler( < @_ ) if check_keyword("CASE");
       print Q(<<"EOF");
 #   $except [[
 EOF
@@ -784,7 +786,7 @@ EOF
       $gotRETVAL = 0;
 	
       INPUT_handler() ;
-      process_keyword("INPUT|PREINIT|INTERFACE_MACRO|C_ARGS|ALIAS|ATTRS|PROTOTYPE|SCOPE|OVERLOAD") ;
+      process_keyword("INPUT|PREINIT|INTERFACE_MACRO|C_ARGS|ALIAS|ATTRS|PROTOTYPE|SCOPE") ;
 
       print Q(<<"EOF") if $ScopeThisXSUB;
 #   ENTER;
@@ -826,7 +828,7 @@ EOF
 	}
 	print $deferred;
 	
-        process_keyword("INIT|ALIAS|ATTRS|PROTOTYPE|INTERFACE_MACRO|INTERFACE|C_ARGS|OVERLOAD") ;
+        process_keyword("INIT|ALIAS|ATTRS|PROTOTYPE|INTERFACE_MACRO|INTERFACE|C_ARGS") ;
 	
 	if (check_keyword("PPCODE")) {
 	  print_section();
@@ -848,7 +850,7 @@ EOF
 	    if ($func_name eq 'new') {
 	      $func_name = "$class";
 	    } else {
-	      print "{$class}::";
+	      print "$($class)::";
 	    }
 	  } elsif (defined($class)) {
 	    if ($func_name eq 'new') {
@@ -870,7 +872,7 @@ EOF
       # $wantRETVAL set if 'RETVAL =' autogenerated
       ($wantRETVAL, $ret_type) = (0, 'void') if $RETVAL_no_return;
       undef %outargs ;
-      process_keyword("POSTCALL|OUTPUT|ALIAS|ATTRS|PROTOTYPE|OVERLOAD");
+      process_keyword("POSTCALL|OUTPUT|ALIAS|ATTRS|PROTOTYPE");
       
       &generate_output(%var_types{$_}, %args_match{$_}, $_, $DoSetMagic)
 	for grep %in_out{$_} =~ m/OUT$/, keys %in_out;
@@ -918,7 +920,7 @@ EOF
       generate_output(%var_types{$_}, $num++, $_, 0, 1) for  @outlist;
       
       # do cleanup
-      process_keyword("CLEANUP|ALIAS|ATTRS|PROTOTYPE|OVERLOAD") ;
+      process_keyword("CLEANUP|ALIAS|ATTRS|PROTOTYPE") ;
       
       print Q(<<"EOF") if $ScopeThisXSUB;
 #   ]]
@@ -1011,7 +1013,7 @@ EOF
     elsif ((nelems @Attributes)) {
       push(@InitFileCode, Q(<<"EOF"));
 #        cv = newXS(\"$pname\", XS_$Full_func_name, file);
-#        apply_attrs_string("$Package", cv, "{join ' ',@Attributes}", 0);
+#        apply_attrs_string("$Package", cv, "$(join ' ',@Attributes)", 0);
 EOF
     }
     elsif ($interface) {
@@ -1028,7 +1030,7 @@ EOF
     }
     else {
       push(@InitFileCode,
-	   "        {$newXS}(\"$pname\", XS_$Full_func_name, file$proto);\n");
+	   "        $($newXS)(\"$pname\", XS_$Full_func_name, file$proto);\n");
     }
 }
 
@@ -1083,12 +1085,13 @@ sub check_keyword {
 
 sub print_section {
     # the "do" is required for right semantics
-    do { $_ = shift(@line) } while !m/\S/ && nelems @line;
+    { $_ = shift(@line) } while !m/\S/ && nelems @line;
 
     print("#line ", @line_no[(nelems @line_no) - (nelems @line) -1], " \"$filepathname\"\n")
 	if $WantLineNumbers && !m/^\s*#\s*line\b/ && !m/^#if XSubPPtmp/;
-    for (;  defined($_) && !m/^$BLOCK_re/o;  $_ = shift(@line)) {
+    while (defined($_) && !m/^$BLOCK_re/) {
 	print "$_\n";
+        $_ = shift(@line);
     }
     print 'ExtUtils::ParseXS::CountLines'->end_marker, "\n" if $WantLineNumbers;
 }
@@ -1100,8 +1103,9 @@ sub merge_section {
       $_ = shift(@line);
     }
 
-    for (;  defined($_) && !m/^$BLOCK_re/o;  $_ = shift(@line)) {
+    while (defined($_) && !m/^$BLOCK_re/) {
       $in .= "$_\n";
+      $_ = shift(@line);
     }
     chomp $in;
     return $in;
@@ -1112,7 +1116,7 @@ sub process_keyword($)
     my($pattern) = < @_ ;
     my $kwd ;
 
-    &{*{Symbol::fetch_glob("{$kwd}_handler")}}()
+    &{*{Symbol::fetch_glob("$($kwd)_handler")}}()
       while $kwd = check_keyword($pattern) ;
   }
 
@@ -1126,7 +1130,7 @@ sub CASE_handler {
 }
 
 sub INPUT_handler {
-  for (;  !m/^$BLOCK_re/o;  $_ = shift(@line)) {
+  while (!m/^$BLOCK_re/) {
     last if m/^\s*NOT_IMPLEMENTED_YET/;
     next unless m/\S/;		# skip blank lines
 
@@ -1194,10 +1198,13 @@ sub INPUT_handler {
       print ";\n";
     }
   }
+  continue {
+      $_ = shift(@line);
+  }
 }
 
 sub OUTPUT_handler {
-  for (;  !m/^$BLOCK_re/o;  $_ = shift(@line)) {
+  while (!m/^$BLOCK_re/) {
     next unless m/\S/;
     if (m/^\s*SETMAGIC\s*:\s*(ENABLE|DISABLE)\s*/) {
       $DoSetMagic = ($1 eq "ENABLE" ? 1 : 0);
@@ -1225,6 +1232,9 @@ sub OUTPUT_handler {
     }
     delete %in_out{$outarg} 	# No need to auto-OUTPUT
       if exists %in_out{$outarg} and %in_out{$outarg} =~ m/OUT$/;
+  }
+  continue {
+      $_ = shift(@line);
   }
 }
 
@@ -1308,35 +1318,27 @@ sub GetAliases
 
 sub ATTRS_handler ()
   {
-    for (;  !m/^$BLOCK_re/o;  $_ = shift(@line)) {
+    while (!m/^$BLOCK_re/) {
       next unless m/\S/;
       TrimWhitespace($_) ;
       push @Attributes, $_;
+    }
+    continue {
+        $_ = shift(@line);
     }
   }
 
 sub ALIAS_handler ()
   {
-    for (;  !m/^$BLOCK_re/o;  $_ = shift(@line)) {
+    while (!m/^$BLOCK_re/) {
       next unless m/\S/;
       TrimWhitespace($_) ;
       GetAliases($_) if $_ ;
     }
-  }
-
-sub OVERLOAD_handler()
-{
-  for (;  !m/^$BLOCK_re/o;  $_ = shift(@line)) {
-    next unless m/\S/;
-    TrimWhitespace($_) ;
-    while ( s/^\s*([\w:"\\)\+\-\*\/\%\<\>\.\&\|\^\!\~\{\}\=]+)\s*//) {
-      $Overload = 1 unless $Overload;
-      my $overload = "$Package\::(".$1 ;
-      push(@InitFileCode,
-	   "        newXS(\"$overload\", XS_$Full_func_name, file$proto);\n");
+    continue {
+        $_ = shift(@line);
     }
-  }  
-}
+  }
 
 sub FALLBACK_handler()
 {
@@ -1398,7 +1400,7 @@ sub PROTOTYPE_handler ()
     death("Error: Only 1 PROTOTYPE definition allowed per xsub")
       if $proto_in_this_xsub ++ ;
 
-    for (;  !m/^$BLOCK_re/o;  $_ = shift(@line)) {
+    while (!m/^$BLOCK_re/) {
       next unless m/\S/;
       $specified = 1 ;
       TrimWhitespace($_) ;
@@ -1414,6 +1416,9 @@ sub PROTOTYPE_handler ()
 	$ProtoThisXSUB = C_string($_) ;
       }
     }
+    continue { 
+        $_ = shift(@line);
+    }
 
     # If no prototype specified, then assume empty prototype ""
     $ProtoThisXSUB = 2 unless $specified ;
@@ -1427,7 +1432,7 @@ sub SCOPE_handler ()
     death("Error: Only 1 SCOPE declaration allowed per xsub")
       if $scope_in_this_xsub ++ ;
 
-    for (;  !m/^$BLOCK_re/o;  $_ = shift(@line)) {
+    while (!m/^$BLOCK_re/) {
       next unless m/\S/;
       TrimWhitespace($_) ;
       if ($_ =~ m/^DISABLE/i) {
@@ -1435,6 +1440,9 @@ sub SCOPE_handler ()
       } elsif ($_ =~ m/^ENABLE/i) {
 	$ScopeThisXSUB = 1
       }
+    }
+    continue {
+        $_ = shift(@line);
     }
 
   }
@@ -1503,11 +1511,12 @@ EOF
     # non-blank line
 
     # skip leading blank lines
-    while ( ~< $FH) {
-      last unless m/^\s*$/ ;
+    my $line;
+    while ($line = ~< $FH) {
+      last unless $line =~ m/^\s*$/ ;
     }
 
-    $lastline = $_ ;
+    $lastline = $line ;
     $lastline_no = iohandle::input_line_number($FH);
 
   }
@@ -1580,8 +1589,8 @@ sub ProtoString ($)
 sub check_cpp {
   my @cpp = grep(m/^\#\s*(?:if|e\w+)/, @line);
   if ((nelems @cpp)) {
-    my ($cpp, $cpplevel);
-    for $cpp ( @cpp) {
+    my ($cpplevel);
+    for my $cpp ( @cpp) {
       if ($cpp =~ m/^\#\s*if/) {
 	$cpplevel++;
       } elsif (!$cpplevel) {
@@ -1628,7 +1637,7 @@ sub fetch_para {
     $lastline = "";
   }
 
-  for (;;) {
+  while (1) {
     # Skip embedded PODs
     while ($lastline =~ m/^=/) {
       while ($lastline = ~< $FH) {
@@ -1699,7 +1708,7 @@ sub Warn
     # work out the line number
     my $line_no = @line_no[(nelems @line_no) - (nelems @line) -1] ;
 
-    print STDERR "{join ' ',@_} in $filename, line $line_no\n" ;
+    print STDERR "$(join ' ',@_) in $filename, line $line_no\n" ;
   }
 
 sub blurt
@@ -1717,7 +1726,7 @@ sub death
 sub evalqq {
     my $x = shift;
     my $ex = eval qq/"$x"/;
-    die "error in '$x': {$@->message}" if $@;
+    die "error in '$x': $($@->message)" if $@;
     return $ex;
 }
 
@@ -1758,7 +1767,7 @@ sub generate_init {
     $subexpr =~ s/\$arg/ST(ix_$var)/g;
     $subexpr =~ s/\n\t/\n\t\t/g;
     $subexpr =~ s/is not of (.*\")/[arg \%d] is not of $1, ix_$var + 1/g;
-    $subexpr =~ s/\$var/{$var}\[ix_$var - $argoff]/;
+    $subexpr =~ s/\$var/$($var)\[ix_$var - $argoff]/;
     $expr =~ s/DO_ARRAY_ELEM/$subexpr/;
   }
   if ($expr =~ m#/\*.*scope.*\*/#i) {  # "scope" in C comments
@@ -1825,7 +1834,7 @@ sub generate_output {
       $subexpr = %output_expr{%type_kind{$subtype}};
       $subexpr =~ s/ntype/subtype/g;
       $subexpr =~ s/\$arg/ST(ix_$var)/g;
-      $subexpr =~ s/\$var/{$var}\[ix_$var]/g;
+      $subexpr =~ s/\$var/$($var)\[ix_$var]/g;
       $subexpr =~ s/\n\t/\n\t\t/g;
       $expr =~ s/DO_ARRAY_ELEM\n/$subexpr/;
       eval "print qq\a$expr\a";

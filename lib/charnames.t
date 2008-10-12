@@ -48,7 +48,7 @@ sub to_bytes {
     unpack"U0a*", shift;
 }
 
-{
+do {
   use charnames ':full';
 
   print "not " unless to_bytes("\N{CYRILLIC SMALL LETTER BE}") eq $encoded_be;
@@ -59,9 +59,9 @@ sub to_bytes {
   print "not " unless to_bytes("\N{be},\N{alpha},\N{hebrew:bet}")
     eq "$encoded_be,$encoded_alpha,$encoded_bet";
   print "ok 5\n";
-}
+};
 
-{
+do {
     use charnames ':full';
     print "not " unless "\x{263a}" eq "\N{WHITE SMILING FACE}";
     print "ok 6\n";
@@ -77,9 +77,9 @@ sub to_bytes {
     print "ok 11\n";
     print "not " unless sprintf("\%vx", "\x{ff}\N{WHITE SMILING FACE}") eq "ff.263a";
     print "ok 12\n";
-}
+};
 
-{
+do {
    use charnames < qw(:full);
    use utf8;
 
@@ -88,24 +88,24 @@ sub to_bytes {
 
     print "not " unless ord($x) == ord($named);
     print "ok 13\n";
-}
+};
 
-{
+do {
    use charnames < qw(:full);
    use utf8;
    print "not " unless "\x{100}\N{CENT SIGN}" eq "\x{100}"."\N{CENT SIGN}";
    print "ok 14\n";
-}
+};
 
-{
+do {
   use charnames ':full';
 
   print "not "
       unless to_bytes("\N{DESERET SMALL LETTER ENG}") eq $encoded_deseng;
   print "ok 15\n";
-}
+};
 
-{
+do {
   # 20001114.001
 
   no utf8; # naked Latin-1
@@ -118,18 +118,18 @@ sub to_bytes {
   } else {
       print "ok 16 # Skip: not Latin-1\n";
   }
-}
+};
 
-{
+do {
     print "not " unless charnames::viacode(0x1234) eq "ETHIOPIC SYLLABLE SEE";
     print "ok 17\n";
 
     # Unused Hebrew.
     print "not " if defined charnames::viacode(0x0590);
     print "ok 18\n";
-}
+};
 
-{
+do {
     print "not " unless
 	sprintf("\%04X", charnames::vianame("GOTHIC LETTER AHSA")) eq "10330";
     print "ok 19\n";
@@ -137,9 +137,9 @@ sub to_bytes {
     print "not " if
 	defined charnames::vianame("NONE SUCH");
     print "ok 20\n";
-}
+};
 
-{
+do {
     # check that caching at least hasn't broken anything
 
     print "not " unless charnames::viacode(0x1234) eq "ETHIOPIC SYLLABLE SEE";
@@ -149,7 +149,7 @@ sub to_bytes {
 	sprintf("\%04X", charnames::vianame("GOTHIC LETTER AHSA")) eq "10330";
     print "ok 22\n";
 
-}
+};
 
 print "not " unless "\N{CHARACTER TABULATION}" eq "\t";
 print "ok 23\n";
@@ -200,7 +200,7 @@ print "ok 32\n";
 print "not " unless "\N{BOM}" eq chr(0xFEFF);
 print "ok 33\n";
 
-{
+do {
     use warnings 'deprecated';
 
     print "not " unless "\N{HORIZONTAL TABULATION}" eq "\t";
@@ -216,16 +216,16 @@ print "ok 33\n";
 
     print "not " if grep { m/"VERTICAL TABULATION" is deprecated/ } @WARN;
     print "ok 37\n";
-}
+};
 
 print "not " unless charnames::viacode(0xFEFF) eq "ZERO WIDTH NO-BREAK SPACE";
 print "ok 38\n";
 
-{
+do {
     use warnings;
     print "not " unless ord("\N{BOM}") == 0xFEFF;
     print "ok 39\n";
-}
+};
 
 print "not " unless ord("\N{ZWNJ}") == 0x200C;
 print "ok 40\n";
@@ -236,7 +236,7 @@ print "ok 41\n";
 print "not " unless "\N{U+263A}" eq "\N{WHITE SMILING FACE}";
 print "ok 42\n";
 
-{
+do {
     print "not " unless
 	0x3093 == charnames::vianame("HIRAGANA LETTER N");
     print "ok 43\n";
@@ -244,7 +244,7 @@ print "ok 42\n";
     print "not " unless
 	0x0397 == charnames::vianame("GREEK CAPITAL LETTER ETA");
     print "ok 44\n";
-}
+};
 
 print "not " if defined charnames::viacode(0x110000);
 print "ok 45\n";
@@ -262,9 +262,9 @@ my $i = 0;
 END { if ($tmpfile) { 1 while unlink $tmpfile; } }
 
 my @prgs;
-{   local $/ = undef;
+do {   local $/ = undef;
     @prgs = split "\n########\n", ~< *DATA;
-    }
+    };
 
 my $i = 46;
 for ( @prgs) {

@@ -115,8 +115,7 @@ my $IsVMS = $^O eq 'VMS';
 
 sub bits {
     my $bits = 0;
-    my $sememe;
-    foreach $sememe ( @_) {
+    foreach my $sememe ( @_) {
 	# Those hints are defined in vms/vmsish.h :
 	# HINT_M_VMSISH_STATUS and HINT_M_VMSISH_TIME
         $bits ^|^= 0x40000000, next if $sememe eq 'status' || $sememe eq '$?';
@@ -132,7 +131,7 @@ sub import {
     $^H ^|^= bits((nelems @_) ? < @_ : < qw(status time));
     my $sememe;
 
-    foreach $sememe (@((nelems @_) ? < @_ : < qw(exit hushed))) {
+    foreach my $sememe (@((nelems @_) ? < @_ : < qw(exit hushed))) {
         %^H{'vmsish_exit'}   = 1 if $sememe eq 'exit';
         vmsish::hushed(1) if $sememe eq 'hushed';
     }
@@ -143,9 +142,8 @@ sub unimport {
 
     shift;
     $^H ^&^= ^~^ bits((nelems @_) ? < @_ : < qw(status time));
-    my $sememe;
 
-    foreach $sememe (@((nelems @_) ? < @_ : < qw(exit hushed))) {
+    foreach my $sememe (@((nelems @_) ? < @_ : < qw(exit hushed))) {
         %^H{'vmsish_exit'}   = 0 if $sememe eq 'exit';
         vmsish::hushed(0) if $sememe eq 'hushed';
     }

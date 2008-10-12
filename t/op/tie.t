@@ -42,13 +42,13 @@ EXPECT
 
 # standard behaviour, without any extra references
 use Tie::Hash ;
-{package Tie::HashUntie;
+package Tie::HashUntie;
  use base 'Tie::StdHash';
  sub UNTIE
   {
    print STDERR "Untied\n";
   }
-}
+package main;
 our %h;
 tie %h, 'Tie::HashUntie';
 untie %h;
@@ -151,22 +151,22 @@ our ($A, $B, $C);
 our %H;
 $A = tie our %h, 'Tie::StdHash';
 $C = $B = tied %H ;
-{
+do {
     use warnings 'untie';
     use Tie::Hash ;
     tie %h, 'Tie::StdHash';
     untie %h;
-}
+};
 untie %H;
 EXPECT
 ########
 
 # Forbidden aggregate self-ties
 sub Self::TIEHASH { bless @_[1], @_[0] }
-{
+do {
     my %c;
     tie %c, 'Self', \%c;
-}
+};
 EXPECT
 Self-ties of arrays and hashes are not supported at - line 6 character 5.
 ########
@@ -175,9 +175,9 @@ Self-ties of arrays and hashes are not supported at - line 6 character 5.
 use Tie::Hash ;
 tie our %tied, 'Tie::StdHash';
 our %hash;
-{ local %hash{'foo'} } warn "plain hash bad unlocalize" if exists %hash{'foo'};
-{ local %tied{'foo'} } warn "tied hash bad unlocalize" if exists %tied{'foo'};
-{ local %ENV{'foo'}  } warn "\%ENV bad unlocalize" if exists %ENV{'foo'};
+do { local %hash{'foo'} }; warn "plain hash bad unlocalize" if exists %hash{'foo'};
+do { local %tied{'foo'} }; warn "tied hash bad unlocalize" if exists %tied{'foo'};
+do { local %ENV{'foo'}  }; warn "\%ENV bad unlocalize" if exists %ENV{'foo'};
 EXPECT
 ########
 
@@ -193,12 +193,12 @@ Can't modify constant item in tie at - line 3 character 5.
 print exists %ENV{FooA} ? 1 : 0, "\n";
 print exists %ENV{FooB} ? 2 : 0, "\n";
 print exists %ENV{FooC} ? 3 : 0, "\n";
-{
+do {
     local %ENV{[qw(FooA FooC)]} = ();
     print exists %ENV{FooA} ? 4 : 0, "\n";
     print exists %ENV{FooB} ? 5 : 0, "\n";
     print exists %ENV{FooC} ? 6 : 0, "\n";
-}
+};
 print exists %ENV{FooA} ? 7 : 0, "\n";
 print exists %ENV{FooB} ? 8 : 0, "\n";
 print exists %ENV{FooC} ? 9 : 0, "\n"; # this should not exist
@@ -269,9 +269,9 @@ EXPECT
 ########
 our %h;
 sub TIEHASH { bless \@(), 'main' }
-{
+do {
     local %h;
     tie %h, 'main';
-}
+};
 print "tied\n" if tied %h;
 EXPECT

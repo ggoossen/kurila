@@ -211,7 +211,7 @@ err_ok( <<ERR );
 ERR
 
 
-{
+do {
     my $warnings;
     local $^WARN_HOOK = sub { $warnings .= @_[0]->message };
 
@@ -226,7 +226,7 @@ ERR
     My::Test::like $warnings,
      qq[/^Argument "foo" isn't numeric in .* at $Filename line 211 character 50\\\.\n/];
 
-}
+};
 
 
 #line 84

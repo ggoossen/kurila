@@ -255,7 +255,7 @@ sub GetOptionsFromString($@) {
     my $ret = GetOptionsFromArray($args, < @_);
     if ( (nelems @$args) ) {
         $ret = 0;
-        warn("GetOptionsFromString: Excess data \"{join ' ',@$args}\" in string \"$string\"\n");
+        warn("GetOptionsFromString: Excess data \"$(join ' ',@$args)\" in string \"$string\"\n");
     }
     return $ret;
 }
@@ -283,7 +283,7 @@ sub GetOptionsFromArray($@) {
 	   '$Revision: 2.74 $', ") ",
 	   "called from package \"$pkg\".",
 	   "\n  ",
-	   "argv: ({join ' ',@$argv})",
+	   "argv: ($(join ' ',@$argv))",
 	   "\n  ",
 	   "autoabbrev=$autoabbrev,".
 	   "bundling=$bundling,",
@@ -386,7 +386,7 @@ sub GetOptionsFromArray($@) {
 
 	# Copy the linkage. If omitted, link to global variable.
 	if ( (nelems @optionlist) +> 0 && ref(@optionlist[0]) ) {
-	    print STDERR ("=> link \"$orig\" to {dump::view(@optionlist[0])}\n")
+	    print STDERR ("=> link \"$orig\" to $(dump::view(@optionlist[0]))\n")
 		if $debug;
 	    my $rl = ref(%linkage{$orig} = shift (@optionlist));
 
@@ -465,7 +465,7 @@ sub GetOptionsFromArray($@) {
 	my ($arrow, $k, $v);
 	$arrow = "=> ";
 	while ( ($k,$v) = each(%opctl) ) {
-	    print STDERR ($arrow, "\%opctl\{$k\} = {dump::view($v)} ",
+	    print STDERR ($arrow, "\%opctl\{$k\} = $(dump::view($v)) ",
                           dump::view(OptCtl($v)), "\n");
 	    $arrow = "   ";
 	}
@@ -797,7 +797,7 @@ sub ParseOptionSpec ($$) {
     my $entry;
     if ( $spec eq '' || $spec eq '+' || $spec eq '!' ) {
 	# Fields are hard-wired here.
-	$entry = \@($spec,$orig,undef, CTL_DEST_SCALAR,0,0);
+        $entry = \@($spec,$orig,undef, CTL_DEST_SCALAR,0,0);
     }
     elsif ( $spec =~ m/^:(-?\d+|\+)([@%])?$/ ) {
 	my $def = $1;
@@ -939,7 +939,7 @@ sub FindOption ($$$$$) {
 	my $pat = quotemeta ($opt);
 	# Look up in option names.
 	my @hits = grep (m/^$pat/, @names);
-	print STDERR ("=> ", scalar(nelems @hits), " hits ({join ' ',@hits}) with \"$pat\" ",
+	print STDERR ("=> ", scalar(nelems @hits), " hits ($(join ' ',@hits)) with \"$pat\" ",
 		      "out of ", scalar(nelems @names), "\n") if $debug;
 
 	# Check for ambiguous results.
@@ -1254,8 +1254,7 @@ sub Configure (@) {
 	  $longprefix ) = < @{shift(@options)};
     }
 
-    my $opt;
-    foreach $opt (  @options ) {
+    foreach my $opt (  @options ) {
 	my $try = lc ($opt);
 	my $action = 1;
 	if ( $try =~ m/^no_?(.*)$/s ) {

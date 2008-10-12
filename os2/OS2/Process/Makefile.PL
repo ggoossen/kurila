@@ -23,7 +23,7 @@ sub create_constants {
   for ( @try) {
     $src_dir = $_, last if -d "$_/utils" and -r "$_/utils/h2xs";
   }
-  warn("Can't find \$PERL_SRC/utils/h2xs in {join ' ',@try}, falling back to no constants"),
+  warn("Can't find \$PERL_SRC/utils/h2xs in $(join ' ',@try), falling back to no constants"),
     return unless defined $src_dir;
   # Can't name it *::Constants, otherwise constants.xs would overwrite it...
   # This produces warnings from PSZ-conversion on WS_* constants.

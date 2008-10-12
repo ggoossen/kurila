@@ -22,7 +22,7 @@ sub SWASHNEW_real {
     my ($class, $type, $list, $minbits, $none) = < @_;
     local $^D = 0 if $^D;
 
-    print STDERR "SWASHNEW {join ' ',@_}\n" if DEBUG;
+    print STDERR "SWASHNEW $(join ' ',@_)\n" if DEBUG;
 
     ##
     ## Get the list of codepoints for the type.
@@ -64,7 +64,7 @@ sub SWASHNEW_real {
         print STDERR "type = $type\n" if DEBUG;
 
       GETFILE:
-        {
+        do {
 	    ##
 	    ## It could be a user-defined property.
 	    ##
@@ -72,7 +72,7 @@ sub SWASHNEW_real {
 	    my $caller1 = $type =~ s/(.+)::// ? $1 : caller(1);
 
 	    if (defined $caller1 && $type =~ m/^(?:\w+)$/) {
-		my $prop = Symbol::fetch_glob("{$caller1}::$type");
+		my $prop = Symbol::fetch_glob("$($caller1)::$type");
 		if (exists &{*{$prop}}) {
 		    $list = &{*{$prop}};
 		    last GETFILE;
@@ -136,12 +136,12 @@ sub SWASHNEW_real {
             print STDERR "canonical = $canonical\n" if DEBUG;
 
             require "unicore/Canonical.pl";
-	    { no warnings "uninitialized";
+	    do { no warnings "uninitialized";
             if (my $base = (%utf8::Canonical{$canonical} || %utf8::Canonical{ lc %utf8::PropertyAlias{$canonical} })) {
                 $file = "unicore/lib/gc_sc/$base.pl";
                 last GETFILE;
             }
-            }
+            };
 
 	    ##
 	    ## See if it's a user-level "To".
@@ -178,7 +178,7 @@ sub SWASHNEW_real {
             ##
 
             return $type;
-        }
+        };
 
 	if (defined $file) {
 	    print STDERR "found it (file='$file')\n" if DEBUG;
@@ -250,7 +250,7 @@ sub SWASHNEW_real {
 		if ($c eq 'utf8') {
 		    $subobj = SWASHNEW_real('utf8', $t, "", $minbits, 0);
 		}
-		elsif (exists &$name) {
+		elsif (exists &{*{Symbol::fetch_glob($name)}}) {
 		    $subobj = SWASHNEW_real('utf8', $name, "", $minbits, 0);
 		}
 		elsif ($c =~ m/^([0-9a-fA-F]+)/) {

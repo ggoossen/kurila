@@ -31,9 +31,8 @@ sub shownamearray {
     my ($name, $av) = < @_;
     my @els = $av->ARRAY;
     my $count = (nelems @els);
-    my $i;
     print $walkHandle "$name has $count entries\n";
-    for ($i = 0; $i +< $count; $i++) {
+    for my $i (0 .. $count -1) {
 	my $sv = @els[$i];
 	if (class($sv) ne "SPECIAL") {
 	    printf $walkHandle "$i: \%s (0x\%lx) \%s\n", class($sv), $$sv, $sv->PVX;
@@ -48,9 +47,8 @@ sub showvaluearray {
     my ($name, $av) = < @_;
     my @els = $av->ARRAY;
     my $count = (nelems @els);
-    my $i;
     print $walkHandle "$name has $count entries\n";
-    for ($i = 0; $i +< $count; $i++) {
+    for my $i (0 .. $count -1 ) {
 	printf $walkHandle "$i: \%s\n", @els[$i]->terse;
 	#print $walkHandle "$i: %s\n", B::Concise::concise_sv($els[$i]);
     }
@@ -71,7 +69,7 @@ sub newlex { # drop-in for showlex
     my $count = (nelems @names);
     print $walkHandle "$objname Pad has $count entries\n";
     printf $walkHandle "0: \%s\n", @names[0]->terse unless $nosp1;
-    for (my $i = 1; $i +< $count; $i++) {
+    for my $i (1..$count -1) {
 	printf $walkHandle "$i: \%s = \%s\n", @names[$i]->terse, @vals[$i]->terse
 	    unless $nosp1 and @names[$i]->terse =~ m/SPECIAL/;
     }
@@ -104,7 +102,7 @@ sub compile {
 	    next unless $objname;	# skip nulls w/o carping
 
 	    if (ref $objname) {
-		print $walkHandle "B::Showlex::compile({dump::view($objname)})\n";
+		print $walkHandle "B::Showlex::compile($(dump::view($objname)))\n";
 		$objref = $objname;
                 $objname = dump::view($objname);
 	    } else {

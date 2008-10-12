@@ -47,7 +47,7 @@ sub MY::postamble {
 "
 B\$(OBJ_EXT) : defsubs.h
 
-defsubs.h :: {join ' ',@headers} defsubs_h.PL
+defsubs.h :: $(join ' ',@headers) defsubs_h.PL
 	\$(PERL) -I\$(INST_ARCHLIB) -I\$(INST_LIB) -I\$(PERL_ARCHLIB) -I\$(PERL_LIB) defsubs_h.PL defsubs.h $headerpath
 "
 }
@@ -55,6 +55,6 @@ defsubs.h :: {join ' ',@headers} defsubs_h.PL
 sub MY::processPL {
     my $text = shift->SUPER::processPL(< @_);
     # Append our extra parameter
-    $text =~ s/^(\t.*defsubs_h\.PL.*)/{$1 . ' ' . headerpath()}/m;
+    $text =~ s/^(\t.*defsubs_h\.PL.*)/$1 $(headerpath())/m;
     $text;
 }

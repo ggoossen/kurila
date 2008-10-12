@@ -14,7 +14,7 @@ use Carp;
 $VERSION = "1.02";
 $VERSION = eval $VERSION;
 
-{
+do {
     package IPC::Msg::stat;
 
     use Class::Struct < qw(struct);
@@ -33,7 +33,7 @@ $VERSION = eval $VERSION;
 	rtime	=> '$',
 	ctime	=> '$',
     );
-}
+};
 
 sub new {
     (nelems @_) == 3 || croak 'new IPC::Msg ( KEY , FLAGS )';

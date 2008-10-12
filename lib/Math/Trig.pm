@@ -115,7 +115,7 @@ sub acos_real {
 
 sub asin_real {
     my $z = @_[0];
-    return  &pip2 if @_[0] +>=  1;
+    return  &pip2( < @_ ) if @_[0] +>=  1;
     return -&pip2 if @_[0] +<= -1;
     return CORE::atan2($z, CORE::sqrt(1-$z*$z));
 }
@@ -176,7 +176,7 @@ sub great_circle_distance {
 sub great_circle_direction {
     my ( $theta0, $phi0, $theta1, $phi1 ) = < @_;
 
-    my $distance = &great_circle_distance;
+    my $distance = &great_circle_distance( < @_ );
 
     my $lat0 = pip2 - $phi0;
     my $lat1 = pip2 - $phi1;

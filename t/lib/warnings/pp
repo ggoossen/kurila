@@ -48,24 +48,3 @@ no warnings 'misc' ;
 my $b = \%( 1,2,3);
 EXPECT
 Odd number of elements in anonymous hash at - line 3 character 10.
-########
-# pp.c
-use warnings 'misc';
-sub foo () { 1 }
-undef &foo;
-no warnings 'misc';
-sub bar () { 2 }
-undef &bar;
-EXPECT
-Constant subroutine foo undefined at - line 4 character 1.
-########
-# pp.c
-our ($foo, $bar);
-use warnings 'misc';
-$foo = sub () { 3 };
-undef &$foo;
-no warnings 'misc';
-$bar = sub () { 4 };
-undef &$bar;
-EXPECT
-Constant subroutine (anonymous) undefined at - line 5 character 1.

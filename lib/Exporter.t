@@ -43,7 +43,7 @@ BEGIN {
 }
 
 
-{
+do {
 package Testing;
 require Exporter;
 our @ISA = qw(Exporter);
@@ -93,14 +93,14 @@ foreach my $tag (keys %tags) {
 }
 main::ok( $ok, 'export_ok_tags()' );
 
-}
-{
+};
+do {
 package Foo;
 Testing->import;
 
 main::ok( defined &lifejacket,      'simple import' );
 
-my $got = try {&lifejacket};
+my $got = try {&lifejacket( < @_ )};
 main::ok ( $@ eq "", 'check we can call the imported subroutine')
   or print STDERR "# \$\@ is $@\n";
 main::ok ( $got eq 'lifejacket', 'and that it gave the correct result')
@@ -118,7 +118,7 @@ main::ok ( $got eq 'Is', 'and that it gave the correct result')
   or print STDERR "# expected 'Is', got " .
   (defined $got ? "'$got'" : "undef") . "\n";
 
-}
+};
 package Bar;
 my @imports = qw($seatbelt &Above stuff @wailing %left);
 Testing->import(< @imports);
@@ -159,13 +159,13 @@ main::ok( (!grep { eval "defined $_" } map { m/^\w/ ? "&$_" : $_ }
 main::ok( !defined &lifejacket, 'further denial' );
 
 
-{
+do {
   package More::Testing;
   our @ISA = qw(Exporter);
   our $VERSION = 0;
   try { More::Testing->require_version(0); 1 };
   main::ok(!$@,       'require_version(0) and $VERSION = 0');
-}
+};
 
 package Moving::Target;
 our @ISA = qw(Exporter);

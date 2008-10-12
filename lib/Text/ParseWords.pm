@@ -29,9 +29,9 @@ sub shellwords {
 
 sub quotewords {
     my($delim, $keep, < @lines) = < @_;
-    my($line, @words, @allwords);
+    my(@words, @allwords);
 
-    foreach $line ( @lines) {
+    foreach my $line ( @lines) {
 	@words = parse_line($delim, $keep, $line);
 	return() unless ((nelems @words) || !length($line));
 	push(@allwords, < @words);
@@ -43,9 +43,9 @@ sub quotewords {
 
 sub nested_quotewords {
     my($delim, $keep, < @lines) = < @_;
-    my($i, @allwords);
+    my(@allwords);
 
-    for ($i = 0; $i +< nelems @lines; $i++) {
+    for my $i (0 .. nelems(@lines) -1) {
 	@{@allwords[$i]} = parse_line($delim, $keep, @lines[$i]);
 	return() unless ((nelems @{@allwords[$i]}) || !length(@lines[$i]));
     }
@@ -135,7 +135,7 @@ sub old_shellwords {
     s/\A\s+//;
     while ($_ ne '') {
 	my $field = substr($_, 0, 0);	# leave results tainted
-	for (;;) {
+	while (1) {
 	    if (s/\A"(([^"\\]|\\.)*)"//s) {
 		($snippet = $1) =~ s#\\(.)#$1#sg;
 	    }

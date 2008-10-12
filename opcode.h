@@ -1497,7 +1497,7 @@ EXTCONST U32 PL_opargs[] = {
 	0x00002206,	/* srefgen */
 	0x0001368c,	/* ref */
 	0x00122804,	/* bless */
-	0x00002c00,	/* anonscalar */
+	0x00002200,	/* anonscalar */
 	0x00013688,	/* backtick */
 	0x00012808,	/* glob */
 	0x0001d608,	/* readline */
@@ -1599,7 +1599,7 @@ EXTCONST U32 PL_opargs[] = {
 	0x00000248,	/* rv2av */
 	0x00026c04,	/* aelemfast */
 	0x00026404,	/* aelem */
-	0x00046801,	/* aslice */
+	0x00026800,	/* aslice */
 	0x00009600,	/* each */
 	0x00009608,	/* values */
 	0x00003608,	/* keys */
@@ -1608,10 +1608,10 @@ EXTCONST U32 PL_opargs[] = {
 	0x00003614,	/* exists */
 	0x00000248,	/* rv2hv */
 	0x00028404,	/* helem */
-	0x00048801,	/* hslice */
+	0x00068800,	/* hslice */
 	0x00122800,	/* unpack */
 	0x0004280d,	/* pack */
-	0x00222808,	/* split */
+	0x00222800,	/* split */
 	0x0004280d,	/* join */
 	0x00004801,	/* list */
 	0x00448400,	/* lslice */
@@ -1626,7 +1626,7 @@ EXTCONST U32 PL_opargs[] = {
 	0x00017604,	/* shift */
 	0x0004691d,	/* unshift */
 	0x0005a841,	/* sort */
-	0x00004809,	/* reverse */
+	0x00002808,	/* reverse */
 	0x0004a841,	/* grepstart */
 	0x00000648,	/* grepwhile */
 	0x0004a841,	/* mapstart */

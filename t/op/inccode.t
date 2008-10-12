@@ -196,7 +196,7 @@ my $ret = "";
 $ret ||= do 'abc.pl';
 is( $ret, 'abc', 'do "abc.pl" sees return value' );
 
-{
+do {
     my $filename = $^O eq 'MacOS' ? ':Foo:Foo.pm' : './Foo.pm';
     #local @INC; # local fails on tied @INC
     my @old_INC = @INC; # because local doesn't work on tied arrays
@@ -204,11 +204,11 @@ is( $ret, 'abc', 'do "abc.pl" sees return value' );
     try { require $filename; };
     is( $filename, 'seen', 'the coderef sees fully-qualified pathnames' );
     @INC = @old_INC;
-}
+};
 
 exit if $minitest;
 
-SKIP: {
+SKIP: do {
     skip( "No PerlIO available", 3 ) unless $has_perlio;
     pop @INC;
 
@@ -227,13 +227,13 @@ SKIP: {
         '/custom/path/to/Publius/Vergilius/Maro.pm', '%INC set correctly');
     is( our $file, '/custom/path/to/Publius/Vergilius/Maro.pm',
         '__FILE__ set correctly' );
-    {
+    do {
         my $warning;
         local $^WARN_HOOK = sub { $warning = shift };
         Publius::Vergilius::Maro::complain();
         like($warning->message, qr{barf at /custom/path/to/Publius/Vergilius/Maro.pm}, 'warn() reports correct file source' );
-    }
-}
+    };
+};
 pop @INC;
 
 if ($can_fork) {
@@ -267,7 +267,7 @@ if ($can_fork) {
 
     @::bbblplast = @( () );
     require BBBLPLAST5;
-    is ("{join ' ',@main::bbblplast}", "0 1 2 3 4 5", "All ran");
+    is ("$(join ' ',@main::bbblplast)", "0 1 2 3 4 5", "All ran");
 
     foreach (keys %INC) {
 	delete %INC{$_} if m/^BBBLPLAST/;

@@ -78,15 +78,15 @@ $p =~ s/, +/,\n/g;
 $p =~ s/^/#  /mg;
 print $p;
 
-{
+do {
 my $names = join "|", sort keys %$name2where;
 ok $names, "Zonk::Pronk|hinkhonk::Glunk|perlzuk|squaa::Glunk|zikzik";
-}
+};
 
-{
+do {
 my $names = join "|", sort values %$where2name;
 ok $names, "Zonk::Pronk|hinkhonk::Glunk|hinkhonk::Glunk|perlzuk|squaa::Glunk|zikzik";
-}
+};
 
 print "# OK, bye from ", __FILE__, "\n";
 ok 1;

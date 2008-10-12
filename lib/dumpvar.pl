@@ -129,8 +129,8 @@ sub ShortArray {
   my $shortmore = "";
   $shortmore = " ..." if $tArrayDepth +< (nelems @{@_[0]})-1 ;
   if (!grep(ref $_, @{@_[0]})) {
-    $short = "0..{join ' ',@{@_[0]}}-1  '" . 
-      join("' '", @{@_[0]}[[0..$tArrayDepth]]) . "'$shortmore";
+    $short = "0..$(join ' ',@$(@_[0]))-1  '" . 
+      join("' '", @$(@_[0])[[0..$tArrayDepth]]) . "'$shortmore";
     return $short if length $short +<= $compactDump;
   }
   undef;
@@ -140,13 +140,13 @@ sub DumpElem {
   my $short = &stringify(@_[0], ref @_[0]);
   if ($veryCompact && ref @_[0]
       && (ref @_[0] eq 'ARRAY' and !grep(ref $_, @{@_[0]}) )) {
-    my $end = "0..{join ' ',@{$v}}-1  '" . 
-      join("' '", @{@_[0]}[[0..$tArrayDepth]]) . "'$shortmore";
+    my $end = "0..$(join ' ',@$($v))-1  '" . 
+      join("' '", @$(@_[0])[[0..$tArrayDepth]]) . "'$shortmore";
   } elsif ($veryCompact && ref @_[0]
       && (ref @_[0] eq 'HASH') and !grep(ref $_, values %{@_[0]})) {
     my $end = 1;
-	  $short = $sp . "0..{join ' ',@{$v}}-1  '" . 
-	    join("' '", @{$v}[[0..$tArrayDepth]]) . "'$shortmore";
+	  $short = $sp . "0..$(join ' ',@$($v))-1  '" . 
+	    join("' '", @$($v)[[0..$tArrayDepth]]) . "'$shortmore";
   } else {
     print "$short\n";
     unwrap(@_[0],@_[1],@_[2]) if ref @_[0];
@@ -186,7 +186,7 @@ sub unwrap {
       if (!$dumpReused && defined $address) { 
 	%address{$address}++ ;
 	if ( %address{$address} +> 1 ) { 
-	  print "{$sp}-> REUSED_ADDRESS\n" ; 
+	  print "$($sp)-> REUSED_ADDRESS\n" ; 
 	  return ; 
 	} 
       }
@@ -195,7 +195,7 @@ sub unwrap {
       $address = "$v" . "";	# To avoid a bug with globs
       %address{$address}++ ;
       if ( %address{$address} +> 1 ) { 
-	print "{$sp}*DUMPED_GLOB*\n" ; 
+	print "$($sp)*DUMPED_GLOB*\n" ; 
 	return ; 
       } 
     }
@@ -257,7 +257,7 @@ sub unwrap {
 
 	if ($compactDump && !grep(ref $_, @{$v})) {
 	  if ((nelems @$v)) {
-	    $short = $sp . "0..{join ' ',@{$v}}-1  " . 
+	    $short = $sp . "0..$(join ' ',@$($v))-1  " . 
 	      join(" ", map {exists $v->[$_] ? < stringify $v->[$_] : "empty"} @( ( <0..$tArrayDepth))
 		  ) . "$shortmore";
 	  } else {
@@ -451,7 +451,7 @@ sub dumpsub {
                  || ($subdump && ($s = findsubs($subref)) && %DB::sub{$s});
     $place = '???' unless defined $place;
     $s = $sub unless defined $s;
-    print( (' ' x $off) .  "&{dump::view($s)} in $place\n" );
+    print( (' ' x $off) .  "&$(dump::view($s)) in $place\n" );
 }
 
 sub findsubs {

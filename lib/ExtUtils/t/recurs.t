@@ -105,17 +105,17 @@ ok( -e $submakefile, 'sub Makefile written' );
 
 my $inst_script = File::Spec->catdir(File::Spec->updir, 'cgi');
 ok( open(MAKEFILE, "<", $submakefile) ) || diag("Can't open $submakefile: $!");
-{ local $/;  
+do { local $/;  
   like( ~< *MAKEFILE, qr/^\s*INST_SCRIPT\s*=\s*\Q$inst_script\E/m, 
         'prepend .. not stomping WriteMakefile args' ) 
-}
+};
 close MAKEFILE;
 
 
-{
+do {
     # Quiet "make test" failure noise
     close *STDERR;
 
     my $test_out = run("$make test");
     isnt $?, 0, 'test failure in a subdir causes make to fail';
-}
+};

@@ -44,13 +44,11 @@
 #define get_context		Perl_get_context
 #define set_context		Perl_set_context
 #define Gv_AMupdate		Perl_Gv_AMupdate
-#define gv_handler		Perl_gv_handler
 #ifdef PERL_CORE
 #define append_elem		Perl_append_elem
 #define append_list		Perl_append_list
 #define apply			Perl_apply
 #endif
-#define apply_attrs_string	Perl_apply_attrs_string
 #define av_clear		Perl_av_clear
 #define av_delete		Perl_av_delete
 #define av_exists		Perl_av_exists
@@ -402,7 +400,6 @@
 #define magic_clearpack		Perl_magic_clearpack
 #define magic_clearsig		Perl_magic_clearsig
 #define magic_existspack	Perl_magic_existspack
-#define magic_freeovrld		Perl_magic_freeovrld
 #define magic_get		Perl_magic_get
 #define magic_getdefelem	Perl_magic_getdefelem
 #define magic_getnkeys		Perl_magic_getnkeys
@@ -533,6 +530,8 @@
 #define newSLICEOP		Perl_newSLICEOP
 #define newSTATEOP		Perl_newSTATEOP
 #define newSUB			Perl_newSUB
+#define process_special_block	Perl_process_special_block
+#define newNAMEDSUB		Perl_newNAMEDSUB
 #define newXS_flags		Perl_newXS_flags
 #define newXS			Perl_newXS
 #define newAVREF		Perl_newAVREF
@@ -1034,15 +1033,12 @@
 #ifdef PERL_CORE
 #define magic_killbackrefs	Perl_magic_killbackrefs
 #endif
-#define newANONATTRSUB		Perl_newANONATTRSUB
-#define newATTRSUB		Perl_newATTRSUB
 #ifdef PERL_MAD
 #define newMYSUB		Perl_newMYSUB
 #else
 #define newMYSUB		Perl_newMYSUB
 #endif
 #ifdef PERL_CORE
-#define my_attrs		Perl_my_attrs
 #define boot_core_xsutils	Perl_boot_core_xsutils
 #endif
 #if defined(USE_ITHREADS)
@@ -1164,18 +1160,13 @@
 #define newDEFSVOP		S_newDEFSVOP
 #define new_logop		S_new_logop
 #define simplify_sort		S_simplify_sort
-#define gv_ename		S_gv_ename
 #define my_kid			S_my_kid
-#define dup_attrlist		S_dup_attrlist
-#define apply_attrs		S_apply_attrs
-#define apply_attrs_my		S_apply_attrs_my
 #define bad_type		S_bad_type
 #define no_bareword_allowed	S_no_bareword_allowed
 #define no_fh_allowed		S_no_fh_allowed
 #define too_few_arguments	S_too_few_arguments
 #define too_many_arguments	S_too_many_arguments
 #define ref_array_or_hash	S_ref_array_or_hash
-#define process_special_blocks	S_process_special_blocks
 #endif
 #endif
 #if defined(PL_OP_SLAB_ALLOC)
@@ -1253,7 +1244,6 @@
 #define dopoptoeval		S_dopoptoeval
 #define dopoptolabel		S_dopoptolabel
 #define dopoptoloop		S_dopoptoloop
-#define save_lines		S_save_lines
 #define doeval			S_doeval
 #define check_type_and_open	S_check_type_and_open
 #endif
@@ -1480,7 +1470,6 @@
 #if defined(PERL_IN_UNIVERSAL_C) || defined(PERL_DECL_PROT)
 #ifdef PERL_CORE
 #define isa_lookup		S_isa_lookup
-#define closest_cop		S_closest_cop
 #endif
 #endif
 #if defined(PERL_IN_LOCALE_C) || defined(PERL_DECL_PROT)
@@ -2254,13 +2243,11 @@
 #define get_context		Perl_get_context
 #define set_context		Perl_set_context
 #define Gv_AMupdate(a)		Perl_Gv_AMupdate(aTHX_ a)
-#define gv_handler(a,b)		Perl_gv_handler(aTHX_ a,b)
 #ifdef PERL_CORE
 #define append_elem(a,b,c)	Perl_append_elem(aTHX_ a,b,c)
 #define append_list(a,b,c)	Perl_append_list(aTHX_ a,b,c)
 #define apply(a,b,c)		Perl_apply(aTHX_ a,b,c)
 #endif
-#define apply_attrs_string(a,b,c,d)	Perl_apply_attrs_string(aTHX_ a,b,c,d)
 #define av_clear(a)		Perl_av_clear(aTHX_ a)
 #define av_delete(a,b,c)	Perl_av_delete(aTHX_ a,b,c)
 #define av_exists(a,b)		Perl_av_exists(aTHX_ a,b)
@@ -2599,7 +2586,6 @@
 #define magic_clearpack(a,b)	Perl_magic_clearpack(aTHX_ a,b)
 #define magic_clearsig(a,b)	Perl_magic_clearsig(aTHX_ a,b)
 #define magic_existspack(a,b)	Perl_magic_existspack(aTHX_ a,b)
-#define magic_freeovrld(a,b)	Perl_magic_freeovrld(aTHX_ a,b)
 #define magic_get(a,b)		Perl_magic_get(aTHX_ a,b)
 #define magic_getdefelem(a,b)	Perl_magic_getdefelem(aTHX_ a,b)
 #define magic_getnkeys(a,b)	Perl_magic_getnkeys(aTHX_ a,b)
@@ -2721,14 +2707,16 @@
 #define newFOROP(a,b,c,d,e,f,g,h)	Perl_newFOROP(aTHX_ a,b,c,d,e,f,g,h)
 #define newLOGOP(a,b,c,d,e)	Perl_newLOGOP(aTHX_ a,b,c,d,e)
 #define newLOOPEX(a,b)		Perl_newLOOPEX(aTHX_ a,b)
-#define newLOOPOP(a,b,c,d,e)	Perl_newLOOPOP(aTHX_ a,b,c,d,e)
+#define newLOOPOP(a,b,c,d,e,f)	Perl_newLOOPOP(aTHX_ a,b,c,d,e,f)
 #define newNULLLIST()		Perl_newNULLLIST(aTHX)
 #define newOP(a,b,c)		Perl_newOP(aTHX_ a,b,c)
 #define newPROG(a)		Perl_newPROG(aTHX_ a)
 #define newRANGE(a,b,c)		Perl_newRANGE(aTHX_ a,b,c)
 #define newSLICEOP(a,b,c)	Perl_newSLICEOP(aTHX_ a,b,c)
 #define newSTATEOP(a,b,c,d)	Perl_newSTATEOP(aTHX_ a,b,c,d)
-#define newSUB(a,b,c,d)		Perl_newSUB(aTHX_ a,b,c,d)
+#define newSUB(a,b,c)		Perl_newSUB(aTHX_ a,b,c)
+#define process_special_block(a,b)	Perl_process_special_block(aTHX_ a,b)
+#define newNAMEDSUB(a,b,c,d)	Perl_newNAMEDSUB(aTHX_ a,b,c,d)
 #define newXS_flags(a,b,c,d,e)	Perl_newXS_flags(aTHX_ a,b,c,d,e)
 #define newXS(a,b,c)		Perl_newXS(aTHX_ a,b,c)
 #define newAVREF(a,b)		Perl_newAVREF(aTHX_ a,b)
@@ -3219,15 +3207,12 @@
 #ifdef PERL_CORE
 #define magic_killbackrefs(a,b)	Perl_magic_killbackrefs(aTHX_ a,b)
 #endif
-#define newANONATTRSUB(a,b,c,d)	Perl_newANONATTRSUB(aTHX_ a,b,c,d)
-#define newATTRSUB(a,b,c,d,e)	Perl_newATTRSUB(aTHX_ a,b,c,d,e)
 #ifdef PERL_MAD
 #define newMYSUB(a,b,c,d,e)	Perl_newMYSUB(aTHX_ a,b,c,d,e)
 #else
 #define newMYSUB(a,b,c,d,e)	Perl_newMYSUB(aTHX_ a,b,c,d,e)
 #endif
 #ifdef PERL_CORE
-#define my_attrs(a,b)		Perl_my_attrs(aTHX_ a,b)
 #define boot_core_xsutils()	Perl_boot_core_xsutils(aTHX)
 #endif
 #if defined(USE_ITHREADS)
@@ -3351,18 +3336,13 @@
 #define newDEFSVOP(a)		S_newDEFSVOP(aTHX_ a)
 #define new_logop(a,b,c,d,e)	S_new_logop(aTHX_ a,b,c,d,e)
 #define simplify_sort(a)	S_simplify_sort(aTHX_ a)
-#define gv_ename(a)		S_gv_ename(aTHX_ a)
-#define my_kid(a,b,c)		S_my_kid(aTHX_ a,b,c)
-#define dup_attrlist(a)		S_dup_attrlist(aTHX_ a)
-#define apply_attrs(a,b,c,d)	S_apply_attrs(aTHX_ a,b,c,d)
-#define apply_attrs_my(a,b,c,d)	S_apply_attrs_my(aTHX_ a,b,c,d)
+#define my_kid(a,b)		S_my_kid(aTHX_ a,b)
 #define bad_type(a,b,c,d)	S_bad_type(aTHX_ a,b,c,d)
 #define no_bareword_allowed(a)	S_no_bareword_allowed(aTHX_ a)
 #define no_fh_allowed(a)	S_no_fh_allowed(aTHX_ a)
 #define too_few_arguments(a,b)	S_too_few_arguments(aTHX_ a,b)
 #define too_many_arguments(a,b)	S_too_many_arguments(aTHX_ a,b)
 #define ref_array_or_hash(a)	S_ref_array_or_hash(aTHX_ a)
-#define process_special_blocks(a,b,c)	S_process_special_blocks(aTHX_ a,b,c)
 #endif
 #endif
 #if defined(PL_OP_SLAB_ALLOC)
@@ -3448,7 +3428,6 @@
 #define dopoptoeval(a)		S_dopoptoeval(aTHX_ a)
 #define dopoptolabel(a)		S_dopoptolabel(aTHX_ a)
 #define dopoptoloop(a)		S_dopoptoloop(aTHX_ a)
-#define save_lines(a,b)		S_save_lines(aTHX_ a,b)
 #define doeval(a,b,c,d)		S_doeval(aTHX_ a,b,c,d)
 #define check_type_and_open(a)	S_check_type_and_open(aTHX_ a)
 #endif
@@ -3676,7 +3655,6 @@
 #if defined(PERL_IN_UNIVERSAL_C) || defined(PERL_DECL_PROT)
 #ifdef PERL_CORE
 #define isa_lookup(a,b,c)	S_isa_lookup(aTHX_ a,b,c)
-#define closest_cop(a,b)	S_closest_cop(aTHX_ a,b)
 #endif
 #endif
 #if defined(PERL_IN_LOCALE_C) || defined(PERL_DECL_PROT)

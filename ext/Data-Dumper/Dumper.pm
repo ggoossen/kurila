@@ -83,7 +83,7 @@ sub new {
   return bless($s, $c);
 }
 
-{
+do {
   # Packed numeric addresses take less memory. Plus pack is faster than sprintf
   *init_refaddr_format = sub {};
 
@@ -91,7 +91,7 @@ sub new {
     require Scalar::Util;
     pack "J", Scalar::Util::refaddr(shift);
   };
-}
+};
 
 #
 # add-to or query the table of already seen references
@@ -155,7 +155,7 @@ sub Names {
 }
 
 sub Dump {
-    return &Dumpperl;
+    return &Dumpperl( < @_ );
 }
 
 #
@@ -165,14 +165,14 @@ sub Dump {
 our @post;
 sub Dumpperl {
   my($s) = shift;
-  my(@out, $val, $name);
+  my(@out, $name);
   my($i) = 0;
   local(@post);
   init_refaddr_format();
 
   $s = $s->new(< @_) unless ref $s;
 
-  for $val ( @{$s->{todump}}) {
+  for my $val ( @{$s->{todump}}) {
     my $out = "";
     @post = @();
     $name = $s->{names}->[$i++];
@@ -202,11 +202,11 @@ sub Dumpperl {
     }
 
     my $valstr;
-    {
+    do {
       local($s->{apad}) = $s->{apad};
       $s->{apad} .= ' ' x (length($name) + 3) if $s->{indent} +>= 2;
       $valstr = $s->_dump($val, $name);
-    }
+    };
 
     $valstr = "$name = " . $valstr . ';' if (nelems @post) or !$s->{terse};
     $out .= $s->{pad} . $valstr . $s->{sep};
@@ -252,7 +252,7 @@ sub _dump {
         my $freezer = $s->{freezer};
         if ($freezer and UNIVERSAL::can($val, $freezer)) {
             try { $val->?$freezer() };
-            warn "WARNING(Freezer method call failed): {$@->message}" if $@;
+            warn "WARNING(Freezer method call failed): $($@->message)" if $@;
         }
 
         require Scalar::Util;
@@ -385,9 +385,8 @@ sub _dump {
         }
 
         if ($s->{purity}) {
-            my $k;
             local ($s->{level}) = 0;
-            for $k (qw(SCALAR ARRAY HASH)) {
+            for my $k (qw(SCALAR ARRAY HASH)) {
                 my $gval = *$rval{$k};
                 next unless defined $gval;
                 next if $k eq "SCALAR" && ! defined $$gval;  # always there
@@ -414,13 +413,13 @@ sub _dump {
           }
     }
     elsif ($realtype eq 'ARRAY') {
-        my($v, $pad, $mname);
+        my($pad, $mname);
         my($i) = 0;
         $out .= '@(';
         $pad = $s->{sep} . $s->{pad} . $s->{apad};
         $mname = $name . '->';
         $mname .= '->' if $mname =~ m/^\*.+\{[A-Z]+\}$/;
-        for $v ( @$rval) {
+        for my $v ( @$rval) {
             $sname = $mname . '[' . $i . ']';
             $out .= $pad . $ipad . '#' . $i if $s->{indent} +>= 3;
             $out .= $pad . $ipad . $s->_dump($v, $sname);
@@ -473,7 +472,7 @@ sub _dump {
             require B::Deparse;
             my $sub =  'sub ' . (B::Deparse->new)->coderef2text($rval);
             my $pad    =  $s->{sep} . $s->{pad} . $s->{apad} . $s->{xpad} x ($s->{level} - 1);
-            $sub    =~ s/\n/{$pad}/gs;
+            $sub    =~ s/\n/$pad/gs;
             $out   .=  $sub;
         } else {
             $out .= 'sub { "DUMMY" }';
@@ -633,8 +632,8 @@ my %esc = %(
 sub qquote {
   local($_) = shift;
   s/([\\\"\@\$\{\}])/\\$1/g;
-  my $bytes; { use bytes; $bytes = length }
-  s/([^\x[00]-\x[7f]])/{'\x'.sprintf("[\%02x]",ord($1))}/g if $bytes +> length;
+  my $bytes; do { use bytes; $bytes = length };
+  s/([^\x[00]-\x[7f]])/$('\x'.sprintf("[\%02x]",ord($1)))/g if $bytes +> length;
   return qq("$_") unless 
     m/[^ !"\#\$%&'()*+,\-.\/0-9:;<=>?\@A-Z[\\\]^_`a-z{|}~]/;  # fast exit
 
@@ -642,11 +641,11 @@ sub qquote {
   s/([\a\b\t\n\f\r\e])/%esc{$1}/g;
 
     # no need for 3 digits in escape for these
-    s/([\0-\037])(?!\d)/{'\'.sprintf('%o',ord($1))}/g;
-    s/([\0-\037\177])/{'\'.sprintf('\%03o',ord($1))}/g;
+    s/([\0-\037])(?!\d)/$('\'.sprintf('%o',ord($1)))/g;
+    s/([\0-\037\177])/$('\'.sprintf('\%03o',ord($1)))/g;
     # all but last branch below not supported --BEHAVIOR SUBJECT TO CHANGE--
     if ($high eq "iso8859") {
-      s/([\200-\240])/{'\'.sprintf('%o',ord($1))}/g;
+      s/([\200-\240])/$('\'.sprintf('%o',ord($1)))/g;
     } elsif ($high eq "utf8") {
 #     use utf8;
 #     $str =~ s/([^\040-\176])/sprintf "\\x{%04x}", ord($1)/ge;
@@ -654,7 +653,7 @@ sub qquote {
         # leave it as it is
     } else {
         use utf8;
-        s/([^\040-\176])/{sprintf "\\x\{\%04x\}", ord($1)}/g;
+        s/([^\040-\176])/$(sprintf "\\x\{\%04x\}", ord($1))/g;
     }
 
   return qq("$_");

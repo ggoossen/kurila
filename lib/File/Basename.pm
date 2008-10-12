@@ -158,9 +158,8 @@ sub fileparse {
       
 
   my $tail   = '';
-  my $suffix = '';
   if ((nelems @suffices)) {
-    foreach $suffix ( @suffices) {
+    foreach my $suffix ( @suffices) {
       my $pat = ($igncase ? '(?i)' : '') . "($suffix)\$";
       if ($basename =~ s/$pat//s) {
         $taint .= substr($suffix,0,0);
@@ -365,11 +364,12 @@ call only.
 
 =cut
 
+my (@Ignore_Case, @Types);
 
 BEGIN {
-
-my @Ignore_Case = qw(MacOS VMS AmigaOS OS2 RISCOS MSWin32 MSDOS DOS Epoc);
-my @Types = @(< @Ignore_Case, < qw(Unix));
+    @Ignore_Case = qw(MacOS VMS AmigaOS OS2 RISCOS MSWin32 MSDOS DOS Epoc);
+    @Types = @(< @Ignore_Case, < qw(Unix));
+}
 
 sub fileparse_set_fstype {
     my $old = $Fileparse_fstype;
@@ -387,8 +387,6 @@ sub fileparse_set_fstype {
     }
 
     return $old;
-}
-
 }
 
 

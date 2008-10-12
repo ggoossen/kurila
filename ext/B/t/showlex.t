@@ -15,7 +15,7 @@ use strict;
 use Config;
 use B::Showlex ();
 
-plan tests => 15;
+plan tests => 14;
 
 my $verbose = (nelems @ARGV); # set if ANY ARGS
 
@@ -28,18 +28,10 @@ $path = '"-I../lib" "-Iperl_root:[lib]"' if $Is_VMS;   # gets too long otherwise
 my $redir = $Is_MacOS ? "" : "2>&1";
 my $is_thread = %Config{use5005threads} && %Config{use5005threads} eq 'define';
 
-if ($is_thread) {
-    ok "# use5005threads: test skipped\n";
-} else {
-    $a = `$^X $path "-MO=Showlex" -e "my \@one" $redir`;
-    like ($a, qr/sv_undef.*PVNV.*\@one.*sv_undef.*AV/s,
-	  "canonical usage works");
-}
-
 # v1.01 tests
 
 my ($na,$nb,$nc);	# holds regex-strs
-my ($out, $newlex);	# output, option-flag
+my ($out);	# output, option-flag
 
 sub padrep {
     my ($varname,$newlex) = < @_;
@@ -48,7 +40,7 @@ sub padrep {
 	: "PVNV \\\(0x[0-9a-fA-F]+\\\) \\$varname\n";
 }
 
-for $newlex (@('', '-newlex')) {
+for my $newlex (@('', '-newlex')) {
 
     $out = runperl ( switches => \@("-MO=Showlex,$newlex"),
 		     prog => 'my ($a,$b)', stderr => 1 );
@@ -59,7 +51,7 @@ for $newlex (@('', '-newlex')) {
 
     print $out if $verbose;
 
-SKIP: {
+SKIP: do {
     skip "no perlio in this build", 5
     unless %Config::Config{useperlio};
 
@@ -94,15 +86,15 @@ SKIP: {
     my $asub = sub {
 	my ($self,< %props)=< @_;
 	my $total;
-	{ # inner block vars
+	do { # inner block vars
 	    my (@fib)=@(1,2);
-	    for (my $i=2; $i+<10; $i++) {
+	    for my $i (2..9) {
 		@fib[$i] = @fib[$i-2] + @fib[$i-1];
 	    }
 	    for my $i(0..10) {
 		$total += $i;
 	    }
-	}
+	};
     };
     $walker = B::Showlex::compile($asub, $newlex, -nosp);
     $walker->();
@@ -111,5 +103,5 @@ SKIP: {
     $walker = B::Concise::compile($asub, '-exec');
     $walker->();
 
-}
+};
 }

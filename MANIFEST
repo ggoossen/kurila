@@ -2214,7 +2214,6 @@ t/io/tell.t			See if file seeking works
 t/io/through.t			See if pipe passes data intact
 t/io/utf8.t			See if file seeking works
 t/japh/abigail.t		Obscure tests
-t/lex/attrs.t			See if attributes on declarations work
 t/lex/chars.t			See if character escapes work
 t/lex/qq.t			See if qq works
 t/lex/qr.t			See if qr work
@@ -2303,7 +2302,6 @@ t/lib/warnings/op		Tests for op.c for warnings.t
 t/lib/warnings/pad		Tests for pad.c for warnings.t
 t/lib/warnings/perl		Tests for perl.c for warnings.t
 t/lib/warnings/perlio		Tests for perlio.c for warnings.t
-t/lib/warnings/perly		Tests for perly.y for warnings.t
 t/lib/warnings/pp		Tests for pp.c for warnings.t
 t/lib/warnings/pp_ctl		Tests for pp_ctl.c for warnings.t
 t/lib/warnings/pp_hot		Tests for pp_hot.c for warnings.t
@@ -2328,12 +2326,6 @@ t/mro/complex_c3.t		mro tests
 t/mro/dbic_c3.t			mro tests
 t/mro/inconsistent_c3.t		mro tests
 t/mro/method_caching.t		mro tests
-t/mro/next_edgecases.t		mro tests
-t/mro/next_goto.t		mro tests
-t/mro/next_inanon.t		mro tests
-t/mro/next_ineval.t		mro tests
-t/mro/next_method.t		mro tests
-t/mro/next_skip.t		mro tests
 t/mro/pkg_gen.t		mro tests
 t/mro/recursion_c3.t		mro tests
 t/mro/vulcan_c3.t		mro tests
@@ -2367,7 +2359,6 @@ t/op/exec.t			See if exec, system and qx work
 t/op/exp.t			See if math functions work
 t/op/filetest.t			See if file tests work
 t/op/fork.t			See if fork works
-t/op/fun.t			See if op.c:Perl_ck_fun works
 t/op/getpid.t			See if $$ and getppid work with threads
 t/op/getppid.t			See if getppid works
 t/op/glob.t			See if <*> works

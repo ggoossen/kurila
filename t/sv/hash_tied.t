@@ -12,11 +12,11 @@ tie $h, 'TIED_HASH';
 $h{aap} = 'noot';
 is($h{aap}, 'noot');
 
-TODO: {
+TODO: do {
     todo_skip("hash to key assignment", 1);
     $h{aap} = %( teun => 'vuur' );
     is($h{aap}{teun}, 'vuur');
-}
+};
 
 
 package TIED_HASH;

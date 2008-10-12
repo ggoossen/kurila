@@ -86,7 +86,7 @@ if ($perl =~ m#^\.\.#) {
 my $pl2bat = "$topdir\\win32\\bin\\pl2bat";
 unless (-f "$pl2bat.bat") {
     my @args = @($perl, ("$pl2bat.pl") x 2);
-    print "{join ' ',@args}\n";
+    print "$(join ' ',@args)\n";
     system(< @args) unless defined $::Cross::platform;
 }
 my $make = shift;

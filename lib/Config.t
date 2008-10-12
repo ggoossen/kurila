@@ -56,7 +56,7 @@ ok(exists %Config{ccflags_nolargefiles}, "has ccflags_nolargefiles");
 
 # Utility functions.
 
-{
+do {
     # make sure we can export what we say we can export.
     package Foo;
     my @exports = qw(myconfig config_sh config_vars config_re);
@@ -64,7 +64,7 @@ ok(exists %Config{ccflags_nolargefiles}, "has ccflags_nolargefiles");
     foreach my $func ( @exports) {
 	main::ok( __PACKAGE__->can($func), "$func exported" );
     }
-}
+};
 
 like(Config::myconfig(), qr/osname=\Q%Config{osname}\E/,   "myconfig");
 like(Config::config_sh(), qr/osname='\Q%Config{osname}\E'/, "config_sh");
@@ -75,7 +75,7 @@ foreach my $line ( Config::config_re('c.*')) {
 }
 
 my ($out1, $out2);
-{
+do {
     my $out = \$("");
     open my $fakeout, '>>', $out or die;
     local *STDOUT = *$fakeout{IO};
@@ -87,7 +87,7 @@ my ($out1, $out2);
     Config::config_vars('d_bork');	# non-regex, non-existent cfg-var
     $out2 = $$out;
     $$out = "";
-}
+};
 
 like($out1, qr/^cc='\Q%Config{cc}\E';/, "found config_var cc");
 like($out2, qr/^d_bork='UNKNOWN';/, "config_var d_bork is UNKNOWN");
@@ -112,7 +112,7 @@ like($@->{description}, qr/Config is read-only/, "no CLEAR");
 
 ok( exists %Config{d_fork}, "still d_fork");
 
-{
+do {
     package FakeOut;
 
     sub TIEHANDLE {
@@ -127,7 +127,7 @@ ok( exists %Config{d_fork}, "still d_fork");
 	my $self = shift;
 	$$self .= join('', @_);
     }
-}
+};
 
 # Signal-related variables
 # (this is actually a regression test for Configure.)
@@ -175,7 +175,7 @@ my $failed;
 foreach my $lib (qw(applibexp archlibexp privlibexp sitearchexp sitelibexp
 		     vendorarchexp vendorlibexp vendorlib_stem)) {
   my $dir = %Config{$lib};
-  SKIP: {
+  SKIP: do {
     skip "lib $lib not in \@INC on Win32" if $^O eq 'MSWin32';
     skip "lib $lib not defined" unless defined $dir;
     skip "lib $lib not set" unless length $dir;
@@ -183,6 +183,6 @@ foreach my $lib (qw(applibexp archlibexp privlibexp sitearchexp sitelibexp
 
     ok (exists %orig_inc{$dir}, "Expect $lib '$dir' to be in \@INC")
       or $failed++;
-  }
+  };
 }
 _diag ('@INC is:', @orig_inc) if $failed;

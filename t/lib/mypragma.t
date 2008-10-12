@@ -15,7 +15,7 @@ BEGIN {
 }
 
 is(mypragma::in_effect(), undef, "pragma not in effect yet");
-{
+do {
     is(mypragma::in_effect(), undef, "pragma not in effect yet");
     eval qq{is(mypragma::in_effect(), undef, "pragma not in effect yet"); 1}
 	or die $@;
@@ -28,17 +28,17 @@ is(mypragma::in_effect(), undef, "pragma not in effect yet");
     eval qq{is(mypragma::in_effect(), 42,
 	       "pragma is in effect within this eval"); 1} or die $@;
 
-    {
+    do {
       no mypragma;
       is(mypragma::in_effect(), 0, "pragma no longer in effect");
       eval qq{is(mypragma::in_effect(), 0, "pragma no longer in effect"); 1}
 	or die $@;
-    }
+    };
 
     is(mypragma::in_effect(), 42, "pragma is in effect within this block");
     eval qq{is(mypragma::in_effect(), 42,
 	       "pragma is in effect within this eval"); 1} or die $@;
-}
+};
 is(mypragma::in_effect(), undef, "pragma no longer in effect");
 eval qq{is(mypragma::in_effect(), undef, "pragma not in effect"); 1} or die $@;
 

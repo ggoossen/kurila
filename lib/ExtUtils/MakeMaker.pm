@@ -185,17 +185,17 @@ sub eval_in_x {
     my($self,$dir) = < @_;
     chdir $dir or warn("Couldn't change to directory $dir: $!");
 
-    {
+    do {
         package main;
         do './Makefile.PL';
-    };
+    };;
     if ($@) {
 #         if ($@ =~ /prerequisites/) {
 #             die "MakeMaker WARNING: $@";
 #         } else {
 #             warn "WARNING from evaluation of $dir/Makefile.PL: $@";
 #         }
-        die "ERROR from evaluation of $dir/Makefile.PL: {$@->message}";
+        die "ERROR from evaluation of $dir/Makefile.PL: $($@->message)";
     }
 }
 
@@ -362,14 +362,14 @@ sub new {
         $self->{ARGS}->{$k} = $self->{$k};
     }
 
-    if ("{join ' ',@ARGV}" =~ m/\bPREREQ_PRINT\b/) {
+    if ("$(join ' ',@ARGV)" =~ m/\bPREREQ_PRINT\b/) {
         require Data::Dumper;
         print Data::Dumper->Dump(\@($self->{PREREQ_PM}), \qw(PREREQ_PM));
         exit 0;
     }
 
     # PRINT_PREREQ is RedHatism.
-    if ("{join ' ',@ARGV}" =~ m/\bPRINT_PREREQ\b/) {
+    if ("$(join ' ',@ARGV)" =~ m/\bPRINT_PREREQ\b/) {
         print join(" ", map { "perl($_)>=$self->{PREREQ_PM}->{$_} " } 
                         sort keys %{$self->{PREREQ_PM}}), "\n";
         exit 0;
@@ -428,7 +428,7 @@ END
     
     if (defined $self->{CONFIGURE}) {
         if (ref $self->{CONFIGURE} eq 'CODE') {
-            %configure_att = %( < %{&{$self->{CONFIGURE}}} );
+            %configure_att = %( < %{ $self->{CONFIGURE}->( < @_ ) } );
             $self = \%( < %$self, < %configure_att );
         } else {
             die "Attribute 'CONFIGURE' to WriteMakefile() not a code reference\n";
@@ -437,14 +437,14 @@ END
 
     my $newclass = ++$PACKNAME;
     local @Parent = @Parent;    # Protect against non-local exits
-    {
+    do {
         print "Blessing Object into class [$newclass]\n" if $Verbose+>=2;
         mv_all_methods("MY",$newclass);
         bless $self, $newclass;
         push @Parent, $self;
         require ExtUtils::MY;
         @{*{Symbol::fetch_glob("$newclass\:\:ISA")}} = @( 'MM' );
-    }
+    };
 
     if (defined @Parent[-2]){
         $self->{PARENT} = @Parent[-2];
@@ -546,12 +546,12 @@ END
 # This Makefile is for the $self->{NAME} extension to perl.
 #
 # It was generated automatically by MakeMaker version
-# {dump::view($VERSION)} (Revision: $Revision) from the contents of
+# $(dump::view($VERSION)) (Revision: $Revision) from the contents of
 # Makefile.PL. Don't edit this file, edit Makefile.PL instead.
 #
 #       ANY CHANGES MADE HERE WILL BE LOST!
 #
-#   MakeMaker ARGV: {dump::view($argv)}
+#   MakeMaker ARGV: $(dump::view($argv))
 #
 #   MakeMaker Parameters:
 END
@@ -605,7 +605,7 @@ END
         $self->eval_in_subdirs if (nelems @{$self->{DIR}});
     }
 
-    foreach my $section (  @MM_Sections ){
+    foreach my $section (  @MM_Sections ) {
         # Support for new foo_target() methods.
         my $method = $section;
         $method .= '_target' unless $self->can($method);
@@ -685,10 +685,10 @@ sub parse_args{
         my($name, $value) = ($1, $2);
         if ($value =~ m/^~(\w+)?/) { # tilde with optional username
             $value =~ s [^~(\w*)]
-                [{$1 ?
-                 ((getpwnam($1))[[7]] || "~$1") :
-                 (getpwuid($>))[[7]]
-                 }]x;
+                [$($1 ?
+                   ((getpwnam($1))[[7]] || "~$1") :
+                   (getpwuid($>))[[7]]
+                 )]x;
         }
 
         # Remember the original args passed it.  It will be useful later.
@@ -756,7 +756,7 @@ sub check_hints {
     return unless -d $hint_dir;
 
     # First we look for the best hintsfile we have
-    my($hint)="{$^O}_%Config{osvers}";
+    my($hint)="$($^O)_%Config{osvers}";
     $hint =~ s/\./_/g;
     $hint =~ s/_$//;
     return unless $hint;
@@ -814,24 +814,24 @@ sub mv_all_methods {
         # standard, we try to enable the next line again. It was
         # commented out until MM 5.23
 
-        next unless defined &{Symbol::fetch_glob("{$from}::$method")};
+        next unless defined &{Symbol::fetch_glob("$($from)::$method")};
 
-        {
-            *{Symbol::fetch_glob("{$to}::$method")} = \&{Symbol::fetch_glob("{$from}::$method")};
+        do {
+            *{Symbol::fetch_glob("$($to)::$method")} = \&{Symbol::fetch_glob("$($from)::$method")};
 
             # If we delete a method, then it will be undefined and cannot
             # be called.  But as long as we have Makefile.PLs that rely on
             # %MY:: being intact, we have to fill the hole with an
             # inheriting method:
 
-            {
+            do {
                 package MY;
                 my $super = "SUPER::".$method;
                 *{Symbol::fetch_glob($method)} = sub {
                     shift->?$super(< @_);
                 };
-            }
-        }
+            };
+        };
     }
 
     # We have to clean out %INC also, because the current directory is

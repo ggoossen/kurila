@@ -151,8 +151,7 @@ sub init
      unless(($script =~ m#/# || ($dosish && $script =~ m#\\#))
             && -f $script)
       {
-       my $dir;
-       foreach $dir ( File::Spec->path)
+       foreach my $dir ( File::Spec->path)
         {
         my $scr = File::Spec->catfile($dir, $script);
 

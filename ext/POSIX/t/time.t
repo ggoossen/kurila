@@ -11,7 +11,7 @@ use Test::More tests => 9;
 # Those with a working tzset() should be able to use the TZ below.
 %ENV{TZ} = "UTC0UTC";
 
-SKIP: {
+SKIP: do {
     # It looks like POSIX.xs claims that only VMS and Mac OS traditional
     # don't have tzset().  Win32 works to call the function, but it doesn't
     # actually do anything.  Cygwin works in some places, but not others.  The
@@ -22,11 +22,11 @@ SKIP: {
     tzset();
     my @tzname = tzname();
     like(@tzname[0], qr/(GMT|UTC)/i, "tzset() to GMT/UTC");
-    SKIP: {
+    SKIP: do {
         skip "Mac OS X/Darwin doesn't handle this", 1 if $^O =~ m/darwin/i;
         like(@tzname[1], qr/(GMT|UTC)/i, "The whole year?");
-    }
-}
+    };
+};
 
 # asctime and ctime...Let's stay below INT_MAX for 32-bits and
 # positive for some picky systems.
@@ -47,13 +47,13 @@ setlocale(LC_TIME, $orig_loc) || die "Cannot setlocale() back to orig: $!";
 like(clock(), qr/\d*/, "clock() returns a numeric value");
 ok(clock() +>= 0, "...and it returns something >= 0");
 
-SKIP: {
+SKIP: do {
     skip "No difftime()", 1 if %Config{d_difftime} ne 'define';
     is(difftime(2, 1), 1, "difftime()");
-}
+};
 
-SKIP: {
+SKIP: do {
     skip "No mktime()", 1 if %Config{d_mktime} ne 'define';
     my $time = time();
     is(mktime(localtime($time)), $time, "mktime()");
-}
+};

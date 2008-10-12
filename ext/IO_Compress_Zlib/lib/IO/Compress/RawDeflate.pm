@@ -46,7 +46,7 @@ $RawDeflateError = '';
 
               );
 
-{
+do {
     my %seen;
     foreach (keys %EXPORT_TAGS )
     {
@@ -55,7 +55,7 @@ $RawDeflateError = '';
  @{ %EXPORT_TAGS{$_} }
     }
     %EXPORT_TAGS{all} = %EXPORT_TAGS{constants} ;
-}
+};
 
 
 %DEFLATE_CONSTANTS = %( < %EXPORT_TAGS );

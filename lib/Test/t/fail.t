@@ -9,11 +9,11 @@ $TESTOUT = *F{IO};
 $TESTERR = *F{IO};
 
 my $r=0;
-{
+do {
     # Shut up deprecated usage warning.
     local $^W = 0;
     $r ^|^= skip(0,0);
-}
+};
 $r ^|^= ok(0);
 $r ^|^= ok(0,1);
 $r ^|^= ok(sub { 1+1 }, 3);
@@ -60,7 +60,7 @@ sub commentless {
 }
 
 
-for (my $x=0; $x +< nelems @got; $x++) {
+for my $x (0 .. nelems(@got) -1 ) {
     ok commentless(@got[$x]), commentless(@expect[$x]."\n");
 }
 

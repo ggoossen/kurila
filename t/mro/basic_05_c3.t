@@ -18,32 +18,32 @@ while building DBIx::Class. Thanks Matt!!!!
 
 =cut
 
-{
+do {
     package Diamond_A;
     use mro 'c3'; 
 
     sub foo { 'Diamond_A::foo' }
-}
-{
+};
+do {
     package Diamond_B;
     use base 'Diamond_A';
     use mro 'c3';     
 
     sub foo { 'Diamond_B::foo => ' . (shift)->SUPER::foo }
-}
-{
+};
+do {
     package Diamond_C;
     use mro 'c3';    
     use base 'Diamond_A';     
 
-}
-{
+};
+do {
     package Diamond_D;
     use base ('Diamond_C', 'Diamond_B');
     use mro 'c3';    
     
     sub foo { 'Diamond_D::foo => ' . (shift)->SUPER::foo }    
-}
+};
 
 ok(eq_array(
     mro::get_linear_isa('Diamond_D'),

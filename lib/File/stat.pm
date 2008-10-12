@@ -46,14 +46,14 @@ sub stat ($) {
     my $st = populate(CORE::stat $arg);
     return $st if $st;
 	my $fh;
-    {
+    do {
 		local $!;
 		no strict 'refs';
 		require Symbol;
                 my ($pkg) = caller();
 		$fh = \*{ Symbol::fetch_glob( $pkg . "::" . $arg) };
 		return unless defined fileno $fh;
-	}
+	};
     return populate(CORE::stat $fh);
 }
 

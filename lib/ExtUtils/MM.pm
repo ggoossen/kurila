@@ -34,12 +34,12 @@ away.
 
 =cut
 
-{
+do {
     # Convenient alias.
     package MM;
     our @ISA = qw(ExtUtils::MM);
     sub DESTROY {}
-}
+};
 
 sub _is_win95 {
     # miniperl might not have the Win32 functions available and we need

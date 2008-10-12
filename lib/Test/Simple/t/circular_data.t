@@ -40,7 +40,7 @@ $s = \$s;
 ok( eq_array (\@($s), \@($r)) );
 
 
-{
+do {
     # Classic set of circular scalar refs.
     my($a,$b,$c);
     $a = \$b;
@@ -54,10 +54,10 @@ ok( eq_array (\@($s), \@($r)) );
 
     is_deeply( $a, $a );
     is_deeply( $a, $d );
-}
+};
 
 
-{
+do {
     # rt.cpan.org 11623
     # Make sure the circular ref checks don't get confused by a reference 
     # which is simply repeating.
@@ -68,4 +68,4 @@ ok( eq_array (\@($s), \@($r)) );
     is_deeply( \@($a, $a), \@($b, $c) );
     is_deeply( \%( foo => $a, bar => $a ), \%( foo => $b, bar => $c ) );
     is_deeply( \@(\$a, \$a), \@(\$b, \$c) );
-}
+};

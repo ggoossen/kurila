@@ -14,13 +14,13 @@ plan tests => 1 + 3 * nelems @constants;
 use_ok('I18N::Langinfo', 'langinfo', < @constants);
 
 for my $constant ( @constants) {
-    SKIP: {
+    SKIP: do {
         my $string = try { langinfo(eval "$constant()") };
         is( $@ && $@->message, '', "calling langinfo() with $constant" );
         skip "returned string was empty, skipping next two tests", 2 unless $string;
         ok( defined $string, "checking if the returned string is defined" );
         cmp_ok( length($string), '+>=', 1, "checking if the returned string has a positive length" );
-    }
+    };
 }
 
 exit(0);

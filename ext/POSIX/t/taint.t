@@ -41,11 +41,11 @@ read($testfd, $buffer, 2) if $testfd +> 2;
 is( $buffer, "#!",	                          '    read' );
 ok(tainted($buffer),                          '    scalar tainted');
 
-TODO: {
+TODO: do {
     local $TODO = "POSIX::read won't taint an array element";
 
     read($testfd, @buffer[1], 2) if $testfd +> 2;
 
     is( @buffer[1], "./",	                      '    read' );
     ok(tainted(@buffer[1]),                       '    array element tainted');
-}
+};

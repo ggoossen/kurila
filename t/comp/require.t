@@ -11,7 +11,7 @@ my @fjles_to_delete = qw (bleah.pm bleah.do bleah.flg urkkk.pm urkkk.pmc
 krunch.pm krunch.pmc whap.pm whap.pmc cirlceA.pm circleB.pm);
 
 
-my $total_tests = 27;
+my $total_tests = 26;
 
 print "1..$total_tests\n";
 
@@ -123,7 +123,7 @@ sub write_file_not_thing {
 EOT
 }
 
-{
+do {
     # Right. We really really need Config here.
     require Config;
     die "Failed to load Config for some reason"
@@ -168,21 +168,7 @@ EOT
     } else {
 	print "not ok $pmc_dies\n";
     }
-}
-
-#  [perl #49472] Attributes + Unkown Error
-
-{
-    do_require
-	'use strict;sub MODIFY_CODE_ATTRIBUTE{} sub f:Blah {$nosuchvar}';
-    my $err = $@ && $@->message;
-    $err .= "\n" unless $err =~ m/\n$/;
-    unless ($err =~ m/Global symbol "\$nosuchvar" requires /) {
-	$err =~ s/^/# /mg;
-	print "{$err}not ";
-    }
-    print "ok ", ++$i, " [perl #49472]\n";
-}
+};
 
 # circular require
 
@@ -203,7 +189,7 @@ print "ok ", ++$i, " circular require\n";
 require utf8;
 my $utf8 = utf8::chr(0xFEFF);
 
-$i++; do_require(qq({$utf8}print "ok $i\n"; 1;\n));
+$i++; do_require(qq($($utf8)print "ok $i\n"; 1;\n));
 
 END {
     foreach my $file ( @fjles_to_delete) {

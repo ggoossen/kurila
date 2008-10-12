@@ -17,7 +17,7 @@ BEGIN {
 use OptreeCheck;
 use Config;
 plan tests	=> 17;
-SKIP: {
+SKIP: do {
 skip "no perlio in this build", 22 unless %Config::Config{useperlio};
 
 pass("OPTIMIZER TESTS - VAR INITIALIZATION");
@@ -316,7 +316,7 @@ EOT_EOT
 # 8  <@> leave[1 ref] vKP/REFC
 EONT_EONT
 
-} #skip
+}; #skip
 
 __END__
 

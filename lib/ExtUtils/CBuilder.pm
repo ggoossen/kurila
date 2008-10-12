@@ -62,7 +62,7 @@ my $load = sub {
   @ISA = @($mod);
 };
 
-{
+do {
   my @package = split m/::/, __PACKAGE__;
   
   if (grep {-e File::Spec->catfile($_, < @package, 'Platform', $^O) . '.pm'} @INC) {
@@ -75,7 +75,7 @@ my $load = sub {
   } else {
     $load->(__PACKAGE__ . "::Base");
   }
-}
+};
 
 sub os_type { %OSTYPES{$^O} }
 

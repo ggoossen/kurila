@@ -198,15 +198,15 @@ sub f {
 f()->();
 EXPECT
 Variable "$x" is not available at (eval 1) line 2 character 4.
-    (eval) called at - line 6 character 11.
-    main::__ANON__ called at - line 8 character 4.
+    main::__ANON__ called at - line 6 character 11.
+     called at - line 8 character 4.
 ########
 use warnings 'closure' ;
-{
+do {
     my $x = 1;
     our $y = \$x; # force abandonment rather than clear-in-place at scope exit
     sub f2 { eval '$x' }
-}
+};
 f2();
 EXPECT
 Variable "$x" is not available at (eval 1) line 2 character 4.
@@ -237,9 +237,9 @@ EXPECT
 ########
 use warnings 'misc' ;
 my $x;
-{
+do {
     my $x;
-}
+};
 EXPECT
 
 ########
@@ -266,15 +266,15 @@ EXPECT
 # TODO
 use warnings 'misc' ;
 our $x;
-{
+do {
     our $x;
-}
+};
 our $x;
 no warnings 'misc' ;
 our $y;
-{
+do {
     our $y;
-}
+};
 our $y;
 EXPECT
 "our" variable $x redeclared at - line 4.
@@ -284,40 +284,40 @@ EXPECT
 ########
 use warnings 'misc' ;
 our $x;
-{
+do {
     my $x;
-}
+};
 no warnings 'misc' ;
 our $y;
-{
+do {
     my $y;
-}
+};
 EXPECT
 
 ########
 use warnings 'misc' ;
 my $x;
-{
+do {
     our $x;
-}
+};
 no warnings 'misc' ;
 my $y;
-{
+do {
     our $y;
-}
+};
 EXPECT
 
 ########
 use warnings 'misc' ;
 my $x;
-{
+do {
     my $x;
-}
+};
 no warnings 'misc' ;
 my $y;
-{
+do {
     my $y;
-}
+};
 EXPECT
 
 ########

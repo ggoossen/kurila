@@ -32,8 +32,6 @@ Perl_mfree
 Perl_get_context
 Perl_set_context
 Perl_Gv_AMupdate
-Perl_gv_handler
-Perl_apply_attrs_string
 Perl_av_clear
 Perl_av_delete
 Perl_av_exists
@@ -299,6 +297,8 @@ Perl_newRANGE
 Perl_newSLICEOP
 Perl_newSTATEOP
 Perl_newSUB
+Perl_process_special_block
+Perl_newNAMEDSUB
 Perl_newXS_flags
 Perl_newXS
 Perl_newAV
@@ -647,8 +647,6 @@ Perl_sv_force_normal
 Perl_sv_force_normal_flags
 Perl_tmps_grow
 Perl_sv_rvweaken
-Perl_newANONATTRSUB
-Perl_newATTRSUB
 Perl_newMYSUB
 Perl_cx_dup
 Perl_si_dup

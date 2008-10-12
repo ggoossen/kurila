@@ -107,7 +107,7 @@ eval "use testuse v1.01 q(freda)";
 isnt( ref $@, '' );
 is $testimport->[1], "joe", "testimport is still 'joe'";
 
-{
+do {
     local $testuse::VERSION = 35.36;
     eval "use testuse v33.55";
     is ($@, '');
@@ -140,10 +140,10 @@ is $testimport->[1], "joe", "testimport is still 'joe'";
 
     eval "use testuse v33.55";
     is ($@, '');
-}
+};
 
 
-{
+do {
     # Regression test for patch 14937: 
     #   Check that a .pm file with no package or VERSION doesn't core.
     open F, ">", "xxx.pm" or die "Cannot open xxx.pm: $!\n";
@@ -152,4 +152,4 @@ is $testimport->[1], "joe", "testimport is still 'joe'";
     eval "use lib '.'; use xxx v3;";
     like ($@->message, qr/^xxx defines neither package nor VERSION--version check failed at/);
     unlink 'xxx.pm';
-}
+};

@@ -99,11 +99,9 @@ END_EXTERN_C
 START_EXTERN_C
 #  include "pp_proto.h"
 Ap	|bool	|Gv_AMupdate	|NN HV* stash
-ApR	|CV*	|gv_handler	|NULLOK HV* stash|I32 id
 p	|OP*	|append_elem	|I32 optype|NULLOK OP* first|NULLOK OP* last
 p	|OP*	|append_list	|I32 optype|NULLOK LISTOP* first|NULLOK LISTOP* last
 p	|I32	|apply		|I32 type|NN SV** mark|NN SV** sp
-ApM	|void	|apply_attrs_string|NN const char *stashpv|NN CV *cv|NN const char *attrstr|STRLEN len
 Apd	|void	|av_clear	|NN AV *av
 Apd	|SV*	|av_delete	|NN AV *av|I32 key|I32 flags
 ApdR	|bool	|av_exists	|NN AV *av|I32 key
@@ -428,7 +426,6 @@ p	|int	|magic_clearisa	|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_clearpack|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_clearsig	|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_existspack|NN SV* sv|NN const MAGIC* mg
-p	|int	|magic_freeovrld|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_get	|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_getdefelem|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_getnkeys	|NN SV* sv|NN MAGIC* mg
@@ -536,14 +533,16 @@ Apa	|OP*	|newFOROP	|I32 flags|NULLOK char* label|line_t forline \
 				|NULLOK OP* sv|NN OP* expr|NULLOK OP* block|NULLOK OP* cont|NULLOK SV* location
 Apa	|OP*	|newLOGOP	|I32 optype|I32 flags|NN OP *first|NN OP *other|NULLOK SV* location
 Apa	|OP*	|newLOOPEX	|I32 type|NN OP* label
-Apa	|OP*	|newLOOPOP	|I32 flags|I32 debuggable|NULLOK OP* expr|NULLOK OP* block|NULLOK SV* location
+Apa	|OP*	|newLOOPOP	|I32 flags|I32 debuggable|NULLOK OP* expr|NULLOK OP* block|bool once|NULLOK SV* location
 Apa	|OP*	|newNULLLIST
 Apa	|OP*	|newOP		|I32 optype|I32 flags|NULLOK SV* location
 Ap	|void	|newPROG	|NN OP* o
 Apa	|OP*	|newRANGE	|I32 flags|NN OP* left|NN OP* right
 Apa	|OP*	|newSLICEOP	|I32 flags|NULLOK OP* subscript|NULLOK OP* listop
 Apa	|OP*	|newSTATEOP	|I32 flags|NULLOK char* label|NULLOK OP* o|NULLOK SV* location
-Ap	|CV*	|newSUB		|I32 floor|NULLOK OP* o|NULLOK OP* proto|NULLOK OP* block
+Ap	|CV*	|newSUB		|I32 floor|NULLOK OP* proto|NULLOK OP* block
+Ap	|void	|process_special_block	|const I32 key|NN CV *const cv
+Ap	|CV*	|newNAMEDSUB		|I32 floor|NULLOK OP* o|NULLOK OP* proto|NULLOK OP* block
 ApM	|CV *	|newXS_flags	|NULLOK const char *name|NN XSUBADDR_t subaddr\
 				|NN const char *const filename \
 				|NULLOK const char *const proto|U32 flags
@@ -1043,15 +1042,12 @@ Apd	|void	|sv_force_normal_flags|NN SV *const sv|const U32 flags
 Ap	|void	|tmps_grow	|I32 n
 Apd	|SV*	|sv_rvweaken	|NN SV *const sv
 p	|int	|magic_killbackrefs|NN SV *sv|NN MAGIC *mg
-Ap	|OP*	|newANONATTRSUB	|I32 floor|NULLOK OP *proto|NULLOK OP *attrs|NULLOK OP *block
-Ap	|CV*	|newATTRSUB	|I32 floor|NULLOK OP *o|NULLOK OP *proto|NULLOK OP *attrs|NULLOK OP *block
 #ifdef PERL_MAD
 Apr	|OP *	|newMYSUB	|I32 floor|NULLOK OP *o|NULLOK OP *proto \
 				|NULLOK OP *attrs|NULLOK OP *block
 #else
 Apr	|void	|newMYSUB	|I32 floor|NULLOK OP *o|NULLOK OP *proto|NULLOK OP *attrs|NULLOK OP *block
 #endif
-p	|OP *	|my_attrs	|NN OP *o|NULLOK OP *attrs
 p	|void	|boot_core_xsutils
 #if defined(USE_ITHREADS)
 ApR	|PERL_CONTEXT*|cx_dup	|NULLOK PERL_CONTEXT* cx|I32 ix|I32 max|NN CLONE_PARAMS* param
@@ -1185,19 +1181,13 @@ s	|OP*	|scalarboolean	|NN OP *o
 sR	|OP*	|newDEFSVOP     |NULLOK SV* location
 sR	|OP*	|new_logop	|I32 type|I32 flags|NN OP **firstp|NN OP **otherp|NULLOK SV *location
 s	|void	|simplify_sort	|NN OP *o
-s	|const char*	|gv_ename	|NN GV *gv
-s	|OP *	|my_kid		|NULLOK OP *o|NULLOK OP *attrs|NN OP **imopsp
-s	|OP *	|dup_attrlist	|NN OP *o
-s	|void	|apply_attrs	|NN HV *stash|NN SV *target|NULLOK OP *attrs|bool for_my
-s	|void	|apply_attrs_my	|NN HV *stash|NN OP *target|NULLOK OP *attrs|NN OP **imopsp
+s	|OP *	|my_kid		|NULLOK OP *o|NN OP **imopsp
 s	|void	|bad_type	|I32 n|NN const char *t|NN const char *name|NN const OP *kid
 s	|void	|no_bareword_allowed|NN const OP *o
 sR	|OP*	|no_fh_allowed|NN OP *o
 sR	|OP*	|too_few_arguments|NN OP *o|NN const char* name
 sR	|OP*	|too_many_arguments|NN OP *o|NN const char* name
 s	|OP*	|ref_array_or_hash|NULLOK OP* cond
-s	|void	|process_special_blocks	|NN const char *const fullname\
-					|NN GV *const gv|NN CV *const cv
 #endif
 #if defined(PL_OP_SLAB_ALLOC)
 Apa	|void*	|Slab_Alloc	|size_t sz
@@ -1279,7 +1269,6 @@ sR	|OP*	|dofindlabel	|NN OP *o|NN const char *label|NN OP **opstack|NN OP **opli
 sR	|I32	|dopoptoeval	|I32 startingblock
 sR	|I32	|dopoptolabel	|NN const char *label
 sR	|I32	|dopoptoloop	|I32 startingblock
-s	|void	|save_lines	|NULLOK AV *array|NN SV *sv
 s	|bool	|doeval		|int gimme|NULLOK OP** startop|NULLOK CV* outside|U32 seq
 sR	|PerlIO *|check_type_and_open|NN const char *name
 #ifndef PERL_DISABLE_PMC
@@ -1531,7 +1520,6 @@ s	|void	|printbuf	|NN const char *const fmt|NN const char *const s
 
 #if defined(PERL_IN_UNIVERSAL_C) || defined(PERL_DECL_PROT)
 s	|bool|isa_lookup	|NULLOK HV *stash|NN const char * const name|NULLOK const HV * const name_stash
-s	|const COP*|closest_cop	|NN const COP *cop|NULLOK const OP *o
 #endif
 
 #if defined(PERL_IN_LOCALE_C) || defined(PERL_DECL_PROT)

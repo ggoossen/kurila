@@ -112,7 +112,7 @@ sub errno {
 
 sub creat {
     usage "creat(filename, mode)" if (nelems @_) != 2;
-    &open(@_[0], &O_WRONLY ^|^ &O_CREAT ^|^ &O_TRUNC, @_[1]);
+    &open(@_[0], &O_WRONLY( < @_ ) ^|^ &O_CREAT( < @_ ) ^|^ &O_TRUNC( < @_ ), @_[1]);
 }
 
 sub fcntl {
@@ -314,7 +314,7 @@ sub gets {
 }
 
 sub perror {
-    print STDERR "{join ' ',@_}: " if (nelems @_);
+    print STDERR "$(join ' ',@_): " if (nelems @_);
     print STDERR $!,"\n";
 }
 
@@ -879,14 +879,14 @@ sub load_imports {
 );
 
 # Exporter::export_tags();
-{
+do {
   # De-duplicate the export list: 
   my %export;
  <  %export{[ map {< @$_} values %EXPORT_TAGS]} = ();
   # Doing the de-dup with a temporary hash has the advantage that the SVs in
   # @EXPORT are actually shared hash key sacalars, which will save some memory.
   push @EXPORT, < keys %export;
-}
+};
 
 @EXPORT_OK = qw(
 		abs
@@ -962,18 +962,18 @@ package POSIX::SigRt;
 
 
 sub _init {
-    $_SIGRTMIN = &POSIX::SIGRTMIN;
-    $_SIGRTMAX = &POSIX::SIGRTMAX;
+    $_SIGRTMIN = &POSIX::SIGRTMIN( < @_ );
+    $_SIGRTMAX = &POSIX::SIGRTMAX( < @_ );
     $_sigrtn   = $_SIGRTMAX - $_SIGRTMIN;
 }
 
 sub _croak {
-    &_init unless defined $_sigrtn;
+    &_init( < @_ ) unless defined $_sigrtn;
     die "POSIX::SigRt not available" unless defined $_sigrtn && $_sigrtn +> 0;
 }
 
 sub _getsig {
-    &_croak;
+    &_croak( < @_ );
     my $rtsig = @_[0];
     # Allow (SIGRT)?MIN( + n)?, a common idiom when doing these things in C.
     $rtsig = $_SIGRTMIN + ($1 || 0)
@@ -988,7 +988,7 @@ sub _exist {
 }
 
 sub _check {
-    my ($rtsig, $ok) = < &_exist;
+    my ($rtsig, $ok) = < &_exist( < @_ );
     die "No POSIX::SigRt signal @_[1] (valid range SIGRTMIN..SIGRTMAX, or $_SIGRTMIN..$_SIGRTMAX)"
 	unless $ok;
     return $rtsig;
@@ -1003,12 +1003,12 @@ sub new {
     POSIX::sigaction($rtsig, $sigact);
 }
 
-sub EXISTS { &_exist }
-sub FETCH  { my $rtsig = &_check;
+sub EXISTS { &_exist( < @_ ) }
+sub FETCH  { my $rtsig = &_check( < @_ );
 	     my $oa = POSIX::SigAction->new();
 	     POSIX::sigaction($rtsig, undef, $oa);
 	     return $oa->{HANDLER} }
-sub STORE  { my $rtsig = &_check; new($rtsig, @_[2], $SIGACTION_FLAGS) }
-sub DELETE { delete %SIG{ &_check } }
-sub CLEAR  { &_exist; delete %SIG{[ <&POSIX::SIGRTMIN .. &POSIX::SIGRTMAX ]} }
-sub SCALAR { &_croak; $_sigrtn + 1 }
+sub STORE  { my $rtsig = &_check( < @_ ); new($rtsig, @_[2], $SIGACTION_FLAGS) }
+sub DELETE { delete %SIG{ &_check( < @_ ) } }
+sub CLEAR  { &_exist( < @_ ); delete %SIG{[ <&POSIX::SIGRTMIN( < @_ ) .. &POSIX::SIGRTMAX( < @_ ) ]} }
+sub SCALAR { &_croak( < @_ ); $_sigrtn + 1 }

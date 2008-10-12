@@ -44,16 +44,15 @@ sub lexical
     my(@b) = @( unpack ("C*", $b) ) ;
 
     my $len = ((nelems @a) +> nelems @b ? (nelems @b) : nelems @a) ;
-    my $i = 0 ;
 
-    foreach $i ( 0 .. $len -1) {
+    foreach my $i ( 0 .. $len -1) {
         return @a[$i] - @b[$i] if @a[$i] != @b[$i] ;
     }
 
     return (nelems @a) - nelems @b ;
 }
 
-{
+do {
     package Redirect ;
     use Symbol ;
 
@@ -73,7 +72,7 @@ sub lexical
 	close $self->[0] ;
 	select($self->[1]) ;
     }
-}
+};
 
 sub docat
 { 
@@ -264,7 +263,7 @@ ok( ((nelems @keys)-1) == 31) ;
 
 #Check that the keys can be retrieved in order
 my @b = keys %h ;
-my @c = sort lexical @b ;
+my @c = sort \&lexical, @b ;
 is_deeply(\@b, \@c);
 
 %h{'foo'} = '';
@@ -283,20 +282,20 @@ ok( $result) ;
 
 # check cache overflow and numeric keys and contents
 my $ok = 1;
-for ($i = 1; $i +< 200; $i++) { %h{$i + 0} = $i + 0; }
-for ($i = 1; $i +< 200; $i++) { $ok = 0 unless %h{$i} == $i; }
+for my $i (1..199) { %h{$i + 0} = $i + 0; }
+for my $i (1..199) { $ok = 0 unless %h{$i} == $i; }
 ok( $ok);
 
 ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
    $blksize,$blocks) = stat($Dfile);
 ok( $size +> 0 );
  
-{
+do {
     local $TODO = "hash slice assignment";
     < %h{[0..200]} = < 200..400;
     my @foo = %h{[0..200]};
     ok( join(':',200..400) eq join(':', @foo) );
-}
+};
 
 # Now check all the non-tie specific stuff
 
@@ -491,17 +490,17 @@ ok( nelems( $YY->get_dup('Wall') ) == 4 );
 
 # now in list context
 my @unknown = $YY->get_dup('Unknown') ;
-ok( "{join ' ',@unknown}" eq "" );
+ok( "$(join ' ',@unknown)" eq "" );
 
 my @smith = $YY->get_dup('Smith') ;
-ok( "{join ' ',@smith}" eq "John" );
+ok( "$(join ' ',@smith)" eq "John" );
 
-{
+do {
 my @wall = $YY->get_dup('Wall') ;
 my %wall ;
  <%wall{[ @wall]} = < @wall ;
 ok( ((nelems @wall) == 4 && %wall{'Larry'} && %wall{'Stone'} && %wall{'Brick'}) );
-}
+};
 
 # hash
 my %unknown = %( < $YY->get_dup('Unknown', 1) ) ;
@@ -543,10 +542,10 @@ tie(%k, 'DB_File',$Dfile3, O_RDWR^|^O_CREAT, 0640, $dbh3 ) or die $!;
  
 my @Keys = qw( 0123 12 -1234 9 987654321 def  ) ;
 my (@srt_1, @srt_2, @srt_3);
-{ 
+do { 
   no warnings 'numeric' ;
   @srt_1 = sort { $a <+> $b } @Keys ; 
-}
+};
 @srt_2 = sort { $a cmp $b } @Keys ;
 @srt_3 = sort { length $a <+> length $b } @Keys ;
  
@@ -592,7 +591,7 @@ ok( $i == 0);
 untie %h ;
 unlink $Dfile1 ;
 
-{
+do {
    # sub-class test
 
    package Another ;
@@ -686,9 +685,9 @@ EOM
     untie(%h);
     unlink "SubDB.pm", "dbbtree.tmp" ;
 
-}
+};
 
-{
+do {
    # DBM Filter tests
    use warnings ;
    use strict ;
@@ -792,9 +791,9 @@ EOM
    undef $db ;
    untie %h;
    unlink $Dfile;
-}
+};
 
-{    
+do {    
     # DBM Filter with a closure
 
     use warnings ;
@@ -814,7 +813,7 @@ EOM
 
 	return sub { ++$count ; 
 		     push @kept, $_ ; 
-		     %result{$name} = "$name - $count: [{join ' ',@kept}]" ;
+		     %result{$name} = "$name - $count: [$(join ' ',@kept)]" ;
 		   }
     }
 
@@ -856,9 +855,9 @@ EOM
     undef $db ;
     untie %h;
     unlink $Dfile;
-}		
+};		
 
-{
+do {
    # DBM Filter recursion detection
    use warnings ;
    use strict ;
@@ -875,15 +874,15 @@ EOM
    undef $db ;
    untie %h;
    unlink $Dfile;
-}
+};
 
 
-{
+do {
    # Examples from the POD
 
 
   my $file = "xyzt" ;
-  {
+  do {
     my $redirect = Redirect->new( $file) ;
 
     # BTREE example 1
@@ -926,7 +925,7 @@ EOM
     untie %h ;
 
     unlink "tree" ;
-  }  
+  };  
 
   delete $DB_BTREE->{'compare'} ;
 
@@ -936,7 +935,7 @@ Smith
 Wall
 EOM
    
-  {
+  do {
     my $redirect = Redirect->new( $file) ;
 
     # BTREE example 2
@@ -972,7 +971,7 @@ EOM
     untie %h ;
 
     unlink $filename ;
-  }  
+  };  
 
   ok( docat_del($file) eq ($db185mode ? <<'EOM' : <<'EOM') ) ;
 Smith	-> John
@@ -988,7 +987,7 @@ Wall	-> Larry
 mouse	-> mickey
 EOM
 
-  {
+  do {
     my $redirect = Redirect->new( $file) ;
 
     # BTREE example 3
@@ -1019,15 +1018,16 @@ EOM
     # iterate through the btree using seq
     # and print each key/value pair.
     $key = $value = 0 ;
-    for ($status = $x->seq($key, $value, R_FIRST) ;
-         $status == 0 ;
-         $status = $x->seq($key, $value, R_NEXT) )
-      {  print "$key	-> $value\n" }
+    $status = $x->seq($key, $value, R_FIRST);
+    while ($status == 0 ) {
+         print "$key	-> $value\n";
+         $status = $x->seq($key, $value, R_NEXT);
+     }
  
  
     undef $x ;
     untie %h ;
-  }
+  };
 
   ok( docat_del($file) eq ($db185mode == 1 ? <<'EOM' : <<'EOM') ) ;
 Smith	-> John
@@ -1044,7 +1044,7 @@ mouse	-> mickey
 EOM
 
 
-  {
+  do {
     my $redirect = Redirect->new( $file) ;
 
     # BTREE example 4
@@ -1072,17 +1072,17 @@ EOM
     print "There are %hash{'Brick'} Brick Walls\n" ;
 
     my @list = sort $x->get_dup("Wall") ;
-    print "Wall =>	[{join ' ',@list}]\n" ;
+    print "Wall =>	[$(join ' ',@list)]\n" ;
 
     @list = $x->get_dup("Smith") ;
-    print "Smith =>	[{join ' ',@list}]\n" ;
+    print "Smith =>	[$(join ' ',@list)]\n" ;
  
     @list = $x->get_dup("Dog") ;
-    print "Dog =>	[{join ' ',@list}]\n" ; 
+    print "Dog =>	[$(join ' ',@list)]\n" ; 
  
     undef $x ;
     untie %h ;
-  }
+  };
 
   ok( docat_del($file) eq <<'EOM') ;
 Wall occurred 3 times
@@ -1093,7 +1093,7 @@ Smith =>	[John]
 Dog =>	[]
 EOM
 
-  {
+  do {
     my $redirect = Redirect->new( $file) ;
 
     # BTREE example 5
@@ -1121,14 +1121,14 @@ EOM
     
     undef $x ;
     untie %h ;
-  }
+  };
 
   ok( docat_del($file) eq <<'EOM') ;
 Larry Wall is  there
 Harry Wall is not there
 EOM
 
-  {
+  do {
     my $redirect = Redirect->new( $file) ;
 
     # BTREE example 6
@@ -1157,13 +1157,13 @@ EOM
     untie %h ;
 
     unlink $filename ;
-  }
+  };
 
   ok( docat_del($file) eq <<'EOM') ;
 Larry Wall is not there
 EOM
 
-  {
+  do {
     my $redirect = Redirect->new( $file) ;
 
     # BTREE example 7
@@ -1200,11 +1200,11 @@ EOM
 
     $key = $value = 0 ;
     print "IN ORDER\n" ;
-    for ($st = $x->seq($key, $value, R_FIRST) ;
-	 $st == 0 ;
-         $st = $x->seq($key, $value, R_NEXT) )
-	
-      {  print "$key	-> $value\n" }
+    $st = $x->seq($key, $value, R_FIRST);
+    while ($st == 0) {
+        print "$key	-> $value\n";
+        $st = $x->seq($key, $value, R_NEXT);
+    }
  
     print "\nPARTIAL MATCH\n" ;
 
@@ -1217,7 +1217,7 @@ EOM
 
     unlink $filename ;
 
-  }
+  };
 
   ok( docat_del($file) eq <<'EOM') ;
 IN ORDER
@@ -1232,7 +1232,7 @@ A	-> Smith	-> John
 a	-> mouse	-> mickey
 EOM
 
-}
+};
 
 #{
 #   # R_SETCURSOR
@@ -1261,7 +1261,7 @@ EOM
 #   unlink $Dfile;
 #}
 
-{
+do {
     # Bug ID 20001013.009
     #
     # test that $hash{KEY} = undef doesn't produce the warning
@@ -1281,9 +1281,9 @@ EOM
     ok( $a eq "") ;
     untie %h ;
     unlink $Dfile;
-}
+};
 
-{
+do {
     # test that %hash = () doesn't produce the warning
     #     Argument "" isn't numeric in entersub
     use warnings ;
@@ -1301,9 +1301,9 @@ EOM
     ok( $a eq "") ;
     untie %h ;
     unlink $Dfile;
-}
+};
 
-{
+do {
     # When iterating over a tied hash using "each", the key passed to FETCH
     # will be recycled and passed to NEXTKEY. If a Source Filter modifies the
     # key in FETCH via a filter_fetch_key method we need to check that the
@@ -1333,19 +1333,19 @@ EOM
     ok( $bad_key == 0);
 
     $bad_key = 0 ;
-    foreach $k (keys %h) {}
+    foreach my $k (keys %h) {}
     ok( $bad_key == 0);
 
     $bad_key = 0 ;
-    foreach $v (values %h) {}
+    foreach my $v (values %h) {}
     ok( $bad_key == 0);
 
     undef $db ;
     untie %h ;
     unlink $Dfile;
-}
+};
 
-{
+do {
     # now an error to pass 'compare' a non-code reference
     my $dbh = DB_File::BTREEINFO->new() ;
 
@@ -1355,7 +1355,7 @@ EOM
     try { $dbh->{prefix} = 2 };
     ok( $@->{description} =~ m/^Key 'prefix' not associated with a code reference at/);
 
-}
+};
 
 
 #{
@@ -1383,7 +1383,7 @@ EOM
 ok(1);
 ok(1);
 
-{
+do {
     # Check that two callbacks don't interact
     my %hash1 ;
     my %hash2 ;
@@ -1416,9 +1416,9 @@ ok(1);
     ok( safeUntie \%hash1);
     ok( safeUntie \%hash2);
     unlink $Dfile, $Dfile2;
-}
+};
 
-{
+do {
    # Check that DBM Filter can cope with read-only $_
 
    use warnings ;
@@ -1460,9 +1460,9 @@ ok(1);
    undef $db ;
    untie %h;
    unlink $Dfile;
-}
+};
 
-{
+do {
    # Check low-level API works with filter
 
    use warnings ;
@@ -1506,11 +1506,11 @@ ok(1);
    undef $db ;
    untie %h;
    unlink $Dfile;
-}
+};
 
 
 
-{
+do {
     # Regression Test for bug 30237
     # Check that substr can be used in the key to db_put
     # and that db_put does not trigger the warning
@@ -1585,9 +1585,8 @@ ok(1);
 
     my %bad = %( () ) ;
     $key = '';
-    for ($status = $db->seq($key, $value, R_FIRST ) ;
-         $status == 0 ;
-         $status = $db->seq($key, $value, R_NEXT ) ) {
+    $status = $db->seq($key, $value, R_FIRST );
+    while ($status == 0 ) {
 
         #print "# key [$key] value [$value]\n" ;
         if (defined %remember{$key} && defined $value && 
@@ -1597,6 +1596,8 @@ ok(1);
         else {
             %bad{$key} = $value ;
         }
+
+        $status = $db->seq($key, $value, R_NEXT );
     }
     
     ok nkeys %bad == 0 ;
@@ -1626,5 +1627,5 @@ ok(1);
     undef $db ;
     untie %h;
     unlink $Dfile;
-}
+};
 exit ;

@@ -140,7 +140,7 @@ if ($^O eq 'VMS') {
 $/ = "\n";
 
 # see if open/readline/close work on our and my variables
-{
+do {
     if (open our $T, "<", "./foo") {
         my $line = ~< $T;
 	print "# $line\n";
@@ -151,9 +151,9 @@ $/ = "\n";
 	print "not ";
     }
     print "ok 16\n";
-}
+};
 
-{
+do {
     if (open my $T, "<", "./foo") {
         my $line = ~< $T;
 	print "# $line\n";
@@ -164,7 +164,7 @@ $/ = "\n";
 	print "not ";
     }
     print "ok 17\n";
-}
+};
 
 # Get rid of the temp file
 END { unlink "./foo"; }

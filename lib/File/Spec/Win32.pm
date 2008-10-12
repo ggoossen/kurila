@@ -265,7 +265,7 @@ sub splitdir {
         # since there was a trailing separator, add a file name to the end, 
         # then do the split, then replace it with ''.
         #
-        my @directories = split( m|[\\/]|, "{$directories}dummy" ) ;
+        my @directories = split( m|[\\/]|, "$($directories)dummy" ) ;
         @directories[( (nelems @directories)-1) ]= '' ;
         return @directories ;
     }

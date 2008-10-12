@@ -130,7 +130,7 @@ sub erase {
     my ($stem, $leaf);
 
     no strict 'refs';
-    $pkg = "{$pkg}::";	# expand to full symbol table name
+    $pkg = "$($pkg)::";	# expand to full symbol table name
     ($stem, $leaf) = $pkg =~ m/(.*)::(\w+::)$/;
 
     # The 'my $foo' is needed! Without it you get an
@@ -234,8 +234,7 @@ sub share_from {
     # Check that 'from' package actually exists
 #     croak("Package \"$pkg\" does not exist")
 # 	unless %{Symbol::stash("$pkg")};
-    my $arg;
-    foreach $arg ( @$vars) {
+    foreach my $arg ( @$vars) {
 	# catch some $safe->share($var) errors:
 	my ($var, $type);
 	$type = $1 if ($var = $arg) =~ s/^(\W)//;

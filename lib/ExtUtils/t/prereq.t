@@ -34,7 +34,7 @@ END {
 ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
   diag("chdir failed: $!");
 
-{
+do {
     close *STDOUT;
     my $stdout = '';
     open *STDOUT, '>>', \$stdout or die;
@@ -131,4 +131,4 @@ MakeMaker FATAL: prerequisites not found.
 Please install these modules first and rerun 'perl Makefile.PL'.
 END
 
-}
+};

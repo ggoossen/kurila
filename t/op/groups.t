@@ -49,7 +49,7 @@ quit() if (($^O eq 'MSWin32' || $^O eq 'NetWare') or $^O =~ m/lynxos/i);
 #
 # and the groups= might be after, before, or between uid=... and gid=...
 
-GROUPS: {
+GROUPS: do {
     # prefer 'id' over 'groups' (is this ever wrong anywhere?)
     # and 'id -a' over 'id -Gn' (the former is good about spaces in group names)
     if (($groups = `id -a 2>/dev/null`) ne '') {
@@ -81,7 +81,7 @@ EOM
     }
     # Okay, not today.
     quit();
-}
+};
 
 chomp($groups);
 
@@ -108,9 +108,9 @@ if ($groups =~ m/groups=(.+)( [ug]id=|$)/) {
 	}
     }
     print "# groups=$gr\n";
-    print "# g0 = {join ' ',@g0}\n";
-    print "# g1 = {join ' ',@g1}\n";
-    $groups = "{join ' ',@g1}";
+    print "# g0 = $(join ' ',@g0)\n";
+    print "# g1 = $(join ' ',@g1)\n";
+    $groups = "$(join ' ',@g1)";
 }
 
 print "1..2\n";
@@ -132,7 +132,7 @@ for (split(' ', $^GID)) {
     }
 }
 
-print "# gr = {join ' ',@gr}\n";
+print "# gr = $(join ' ',@gr)\n";
 
 my %did;
 if ($^O =~ m/^(?:uwin|cygwin|interix|solaris)$/) {

@@ -22,9 +22,9 @@ if (length("$one\\n") == 3) {print "ok 6\n";} else {print "not ok 6\n";}
 if (length("$one\\\n") == 3) {print "ok 7\n";} else {print "not ok 7\n";}
 if (length("\\n$one") == 3) {print "ok 8\n";} else {print "not ok 8\n";}
 if (length("\\\n$one") == 3) {print "ok 9\n";} else {print "not ok 9\n";}
-if (length("\\{$one}") == 2) {print "ok 10\n";} else {print "not ok 10\n";}
+if (length("\\$($one)") == 2) {print "ok 10\n";} else {print "not ok 10\n";}
 
-if ("{$one}b" eq "ab") { print "ok 11\n";} else {print "not ok 11\n";}
+if ("$($one)b" eq "ab") { print "ok 11\n";} else {print "not ok 11\n";}
 
 my @foo = @(1,2,3);
 if ("@foo[1]b" eq "2b") { print "ok 12\n";} else {print "not ok 12\n";}

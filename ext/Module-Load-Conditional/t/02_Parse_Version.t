@@ -9,20 +9,20 @@ my $Verbose = (nelems @ARGV) ? 1 : 0;
 use_ok( $Class );
 
 ### versions that should parse
-{   for my $str (  __PACKAGE__->_succeed ) {
+do {   for my $str (  __PACKAGE__->_succeed ) {
         my $res = $Class->?$Meth( $str, $Verbose );
         ok( defined $res,       "String '$str' identified as version string" );
 
-        is( $res->vcmp(0), 1,              "   Version is '{$res->stringify}'" );
+        is( $res->vcmp(0), 1,              "   Version is '$($res->stringify)'" );
     }             
-}
+};
 
 ### version that should fail
-{   for my $str (  __PACKAGE__->_fail ) {
+do {   for my $str (  __PACKAGE__->_fail ) {
         my $res = $Class->?$Meth( $str, $Verbose );
         ok( ! defined $res,     "String '$str' is not a version string" );
     }
-}    
+};    
 
 
 ################################

@@ -394,7 +394,7 @@ sub getCmdLine {	# import assistant
 	    # uhh this WORKS. but it's inscrutable
 	    # grep s/$opt=(\w+)/grep {$_ eq $1} @ARGV and $gOpts{$opt}=$1/e, @ARGV;
 	    my $tval;  # temp
-	    if (grep s/$opt=(\w+)/{$tval=$1}/, @ARGV) {
+	    if (grep s/$opt=(\w+)/$($tval=$1)/, @ARGV) {
 		# check val before accepting
 		my @allowed = @{%gOpts{$opt}};
 		if (grep { $_ eq $tval } @allowed) {
@@ -413,7 +413,7 @@ sub getCmdLine {	# import assistant
 	    %gOpts{$opt} = (grep m/^$opt/, @ARGV) ? 1 : 0;
 
 	    # override with 'foo' if 'opt=foo' appears
-	    grep s/$opt=(.*)/{%gOpts{$opt}=$1}/, @ARGV;
+	    grep s/$opt=(.*)/$(%gOpts{$opt}=$1)/, @ARGV;
 	}
      }
     print("$0 heres current state:\n", < mydumper(\%gOpts))
@@ -431,7 +431,7 @@ sub checkOptree {
     my ($rendering);
 
     print "checkOptree args: ", <mydumper($tc) if $tc->{dump};
-    SKIP: {
+    SKIP: do {
 	skip("$tc->{skip} $tc->{name}", 1) if $tc->{skip};
 
 	return runSelftest($tc) if %gOpts{selftest};
@@ -449,7 +449,7 @@ sub checkOptree {
 	    $tc->mkCheckRex($want);
 	    $tc->mylike();
 	}
-    }
+    };
     return;
 }
 
@@ -525,11 +525,11 @@ sub getRendering {
 	    # treat as source, and wrap into subref 
 	    #  in caller's package ( to test arg-fixup, comment next line)
 	    my $pkg = '{ package '.caller(1) .';';
-	    {
+	    do {
 		no strict;
 		no warnings;
 		$code = eval "$pkg sub \{ $code \} \}";
-	    }
+	    };
 	    # return errors
 	    if ($@) { push @errs, $@->message }
 	}
@@ -697,10 +697,10 @@ sub mkCheckRex {
 	       [^()]*?			# which might be followed by something
 	      )?
 	      \\\)			# closing literal )
-	     !{'(?:next|db)state\([^()]*?' .
+	     !$( '(?:next|db)state\([^()]*?' .
 	      ($1 ? '\(eval \d+\)[^()]*' : '')	# Match the eval if present
 	      . '\)'
-}!msgx;
+)!msgx;
     # widened for -terse mode
     $str =~ s/(?:next|db)state/(?:next|db)state/msg;
 

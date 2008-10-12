@@ -14,7 +14,7 @@ The xx:: prefixes are just to be sure these bogus declarations never stomp on re
 
 =cut
 
-{
+do {
     package xx::DBIx::Class::Core; use mro 'c3';
     our @ISA = qw/
       xx::DBIx::Class::Serialize::Storable
@@ -88,7 +88,7 @@ The xx:: prefixes are just to be sure these bogus declarations never stomp on re
     package xx::DBIx::Class::Serialize::Storable; our @ISA = @( () ); use mro 'c3';
     package xx::DBIx::Class::Relationship::Accessor; our @ISA = @( () ); use mro 'c3';
     package xx::DBIx::Class::Relationship::CascadeActions; our @ISA = @( () ); use mro 'c3';
-}
+};
 
 ok(eq_array(
     mro::get_linear_isa('xx::DBIx::Class::Core'),

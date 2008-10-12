@@ -27,14 +27,14 @@ for ( @MANIFEST) {
 
      my ($name, $thing);
      my $foundit=0;
-     {
+     do {
 	 local $/="";
 	 while ( ~< *MOD) {
 	     next unless m/^=head1 NAME/;
 	     $foundit++;
 	     last;
 	 }
-     }
+     };
      unless ($foundit) {
 	 warn "$filename missing =head1 NAME (okay if there is respective .pod)\n";
 	 next;

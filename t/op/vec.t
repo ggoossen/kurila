@@ -50,11 +50,11 @@ is(vec($x, 0, 8), 0xE2);
 no utf8;
 
 # A variation of [perl #20933]
-{
+do {
     my $s = "";
     vec($s, 0, 1) = 0;
     vec($s, 1, 1) = 1;
     my @r;
     @r[$_] = \ vec $s, $_, 1 for @( (0, 1));
     ok(!(${ @r[0] } != 0 || ${ @r[1] } != 1)); 
-}
+};
