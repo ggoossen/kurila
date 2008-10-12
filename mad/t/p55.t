@@ -149,13 +149,11 @@ my $x = pi;
 ########
 sub ok($$) { }
 #BEGIN { ok(1, 2, ); }
-########
-for (my $i=0; $i+<3; $i++) { }
-########
-for (; $a+<3; $a++) { }
-########
+#######
 #
-s//{m#.#}/g;
+s//$(m#.#)/g;
+########
+BEGIN { 1; }
 ########
 # Reduced test case from t/io/layers.t
 sub PerlIO::F_UTF8 () { 0x00008000 } # from perliol.h
@@ -188,8 +186,11 @@ BEGIN {
 }
 use foobar;
 ########
+1; # 1
+2; # 2;
+########
 # operator with modify TARGET_MY
-my ($nc_attempt, $within);
+my ($nc_attempt, $within)  ;
 $nc_attempt = 0+ ($within eq 'other_sub') ;
 ########
 # __END__ section
