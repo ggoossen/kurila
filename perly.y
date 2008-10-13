@@ -493,7 +493,6 @@ subrout	:	SUB startsub subname proto subbody
 #else
                             CV* new = newSUB($2, NULL, $3);
                             process_special_block(IVAL($1), new);
-                            SvREFCNT_dec(new);
                             $$ = (OP*)NULL;
 #endif
                         }

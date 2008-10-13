@@ -705,7 +705,7 @@ sub connection_ok {
     );
 
     my $rin = '';
-    vec($rin, fileno(SYSLOG), 1) = 1;
+    vec($rin, fileno(SYSLOG), 1, 1);
     my $ret = select $rin, undef, $rin, $sock_timeout;
     return $ret ? 0 : 1;
 }

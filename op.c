@@ -944,6 +944,7 @@ Perl_scalarvoid(pTHX_ OP *o)
 	    break;
 	goto func_ops;
     case OP_SUBSTR:
+    case OP_VEC:
 	if (o->op_private == 4)
 	    break;
 	/* FALL THROUGH */
@@ -959,7 +960,6 @@ Perl_scalarvoid(pTHX_ OP *o)
     case OP_HEX:
     case OP_OCT:
     case OP_LENGTH:
-    case OP_VEC:
     case OP_INDEX:
     case OP_RINDEX:
     case OP_SPRINTF:
@@ -1431,7 +1431,6 @@ Perl_mod(pTHX_ OP *o, I32 type)
 	if (type != OP_SASSIGN)
 	    goto nomod;
 	goto lvalue_func;
-    case OP_VEC:
       lvalue_func:
 	if (o->op_flags & OPf_KIDS)
 	    mod(cBINOPo->op_first->op_sibling, type);

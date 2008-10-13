@@ -749,7 +749,7 @@ abs		abs			ck_fun		fsTu%	S?
 
 length		length			ck_fun		ifsTu%	S?
 substr		substr			ck_substr	st@	S S S? S?
-vec		vec			ck_fun		ist@	S S S
+vec		vec			ck_fun		ist@	S S S S?
 
 index		index			ck_index	isT@	S S S?
 rindex		rindex			ck_index	isT@	S S S?
