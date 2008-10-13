@@ -3487,9 +3487,6 @@ Perl_get_vtbl(pTHX_ int vtbl_id)
     case want_vtbl_taint:
 	result = &PL_vtbl_taint;
 	break;
-    case want_vtbl_vec:
-	result = &PL_vtbl_vec;
-	break;
     case want_vtbl_bm:
 	result = &PL_vtbl_bm;
 	break;
