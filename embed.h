@@ -407,7 +407,6 @@
 #define magic_getsig		Perl_magic_getsig
 #define magic_gettaint		Perl_magic_gettaint
 #define magic_getuvar		Perl_magic_getuvar
-#define magic_getvec		Perl_magic_getvec
 #define magic_len		Perl_magic_len
 #define magic_nextpack		Perl_magic_nextpack
 #define magic_regdata_cnt	Perl_magic_regdata_cnt
@@ -433,7 +432,6 @@
 #define magic_setsig		Perl_magic_setsig
 #define magic_settaint		Perl_magic_settaint
 #define magic_setuvar		Perl_magic_setuvar
-#define magic_setvec		Perl_magic_setvec
 #define magic_setutf8		Perl_magic_setutf8
 #define magic_set_all_env	Perl_magic_set_all_env
 #define magic_sizepack		Perl_magic_sizepack
@@ -2591,7 +2589,6 @@
 #define magic_getsig(a,b)	Perl_magic_getsig(aTHX_ a,b)
 #define magic_gettaint(a,b)	Perl_magic_gettaint(aTHX_ a,b)
 #define magic_getuvar(a,b)	Perl_magic_getuvar(aTHX_ a,b)
-#define magic_getvec(a,b)	Perl_magic_getvec(aTHX_ a,b)
 #define magic_len(a,b)		Perl_magic_len(aTHX_ a,b)
 #define magic_nextpack(a,b,c)	Perl_magic_nextpack(aTHX_ a,b,c)
 #define magic_regdata_cnt(a,b)	Perl_magic_regdata_cnt(aTHX_ a,b)
@@ -2617,7 +2614,6 @@
 #define magic_setsig(a,b)	Perl_magic_setsig(aTHX_ a,b)
 #define magic_settaint(a,b)	Perl_magic_settaint(aTHX_ a,b)
 #define magic_setuvar(a,b)	Perl_magic_setuvar(aTHX_ a,b)
-#define magic_setvec(a,b)	Perl_magic_setvec(aTHX_ a,b)
 #define magic_setutf8(a,b)	Perl_magic_setutf8(aTHX_ a,b)
 #define magic_set_all_env(a,b)	Perl_magic_set_all_env(aTHX_ a,b)
 #define magic_sizepack(a,b)	Perl_magic_sizepack(aTHX_ a,b)

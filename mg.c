@@ -154,7 +154,6 @@ S_is_container_magic(const MAGIC *mg)
     case PERL_MAGIC_regex_global:
     case PERL_MAGIC_qr:
     case PERL_MAGIC_taint:
-    case PERL_MAGIC_vec:
     case PERL_MAGIC_vstring:
     case PERL_MAGIC_utf8:
     case PERL_MAGIC_defelem:
@@ -1845,30 +1844,6 @@ Perl_magic_settaint(pTHX_ SV *sv, MAGIC *mg)
     return 0;
 }
 
-int
-Perl_magic_getvec(pTHX_ SV *sv, MAGIC *mg)
-{
-    SV * const lsv = LvTARG(sv);
-
-    PERL_ARGS_ASSERT_MAGIC_GETVEC;
-    PERL_UNUSED_ARG(mg);
-
-    if (lsv)
-        sv_setuv(sv, do_vecget(lsv, LvTARGOFF(sv), LvTARGLEN(sv)));
-    else
-        SvOK_off(sv);
-
-    return 0;
-}
-
-int
-Perl_magic_setvec(pTHX_ SV *sv, MAGIC *mg)
-{
-    PERL_ARGS_ASSERT_MAGIC_SETVEC;
-    PERL_UNUSED_ARG(mg);
-    do_vecset();      /* XXX slurp this routine */
-    return 0;
-}
 
 int
 Perl_magic_getdefelem(pTHX_ SV *sv, MAGIC *mg)

@@ -433,7 +433,6 @@ p	|int	|magic_getpack	|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_getsig	|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_gettaint	|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_getuvar	|NN SV* sv|NN MAGIC* mg
-p	|int	|magic_getvec	|NN SV* sv|NN MAGIC* mg
 p	|U32	|magic_len	|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_nextpack	|NN SV *sv|NN MAGIC *mg|NN SV *key
 p	|U32	|magic_regdata_cnt|NN SV* sv|NN MAGIC* mg
@@ -455,7 +454,6 @@ p	|int	|magic_setregexp|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_setsig	|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_settaint	|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_setuvar	|NN SV* sv|NN MAGIC* mg
-p	|int	|magic_setvec	|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_setutf8	|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_set_all_env|NN SV* sv|NN MAGIC* mg
 p	|U32	|magic_sizepack	|NN SV* sv|NN MAGIC* mg

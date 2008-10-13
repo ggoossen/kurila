@@ -3765,7 +3765,6 @@ Gid_t getegid (void);
 #define PERL_MAGIC_taint	  't' /* Taintedness */
 #define PERL_MAGIC_uvar		  'U' /* Available for use by extensions */
 #define PERL_MAGIC_uvar_elem	  'u' /* Reserved for use by extensions */
-#define PERL_MAGIC_vec		  'v' /* vec() lvalue */
 #define PERL_MAGIC_vstring	  'V' /* SV was vstring literal */
 #define PERL_MAGIC_utf8		  'w' /* Cached UTF-8 information */
 #define PERL_MAGIC_defelem	  'y' /* Shadow "foreach" iterator variable /
@@ -4525,7 +4524,6 @@ enum {		/* pass one of these to get_vtbl */
     want_vtbl_glob,
     want_vtbl_mglob,
     want_vtbl_taint,
-    want_vtbl_vec,
     want_vtbl_bm,
     want_vtbl_uvar,
     want_vtbl_defelem,
@@ -4951,18 +4949,6 @@ MGVTBL_SET(
     PL_vtbl_taint,
     MEMBER_TO_FPTR(Perl_magic_gettaint),
     MEMBER_TO_FPTR(Perl_magic_settaint),
-    0,
-    0,
-    0,
-    0,
-    0,
-    0
-);
-
-MGVTBL_SET(
-    PL_vtbl_vec,
-    MEMBER_TO_FPTR(Perl_magic_getvec),
-    MEMBER_TO_FPTR(Perl_magic_setvec),
     0,
     0,
     0,
