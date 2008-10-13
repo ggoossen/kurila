@@ -30,6 +30,26 @@ sub compare {
     my $from_fh;
     my $to_fh;
 
+    my $fail_open1 = sub { return -1; };
+    my $fail_open2 =
+      sub {
+          if ($closefrom) {
+              my $status = $!;
+              $! = 0;
+              close $from_fh;
+              $! = $status unless $!;
+          }
+          return $fail_open1->();
+      };
+
+  # All of these contortions try to preserve error messages...
+    my $fail_inner =
+      sub {
+          close($to_fh) || return $fail_open2->() if $closeto;
+          close($from_fh) || return $fail_open1->() if $closefrom;
+          return 1;
+      };
+
     croak("from undefined") unless (defined $from);
     croak("to undefined") unless (defined $to);
 
@@ -39,7 +59,7 @@ sub compare {
     } elsif (ref(\$from) eq 'GLOB') {
 	$from_fh = \$from;
     } else {
-	open($from_fh,"<",$from) or goto fail_open1;
+	open($from_fh,"<",$from) or return $fail_open1->();
 	unless ($text_mode) {
 	    binmode $from_fh;
 	    $fromsize = -s $from_fh;
@@ -53,29 +73,29 @@ sub compare {
     } elsif (ref(\$to) eq 'GLOB') {
 	$to_fh = \$to;
     } else {
-	open($to_fh,"<",$to) or goto fail_open2;
+	open($to_fh,"<",$to) or return $fail_open2->();
 	binmode $to_fh unless $text_mode;
 	$closeto = 1;
     }
 
     if (!$text_mode && $closefrom && $closeto) {
 	# If both are opened files we know they differ if their size differ
-	goto fail_inner if $fromsize != -s $to_fh;
+	return $fail_inner->() if $fromsize != -s $to_fh;
     }
 
     if ($text_mode) {
 	local $/ = "\n";
 	my ($fline,$tline);
 	while (defined($fline = ~< $from_fh)) {
-	    goto fail_inner unless defined($tline = ~< $to_fh);
+	    return $fail_inner->() unless defined($tline = ~< $to_fh);
 	    if (ref $size) {
 		# $size contains ref to comparison function
-		goto fail_inner if &$size($fline, $tline);
+		return $fail_inner->() if &$size($fline, $tline);
 	    } else {
-		goto fail_inner if $fline ne $tline;
+		return $fail_inner->() if $fline ne $tline;
 	    }
 	}
-	goto fail_inner if defined($tline = ~< $to_fh);
+	return $fail_inner->() if defined($tline = ~< $to_fh);
     }
     else {
 	unless (defined($size) && $size +> 0) {
@@ -88,39 +108,16 @@ sub compare {
 	$fbuf = $tbuf = '';
 	while(defined($fr = read($from_fh,$fbuf,$size)) && $fr +> 0) {
 	    unless (defined($tr = read($to_fh,$tbuf,$fr)) && $tbuf eq $fbuf) {
-		goto fail_inner;
+		return $fail_inner->();
 	    }
 	}
-	goto fail_inner if defined($tr = read($to_fh,$tbuf,$size)) && $tr +> 0;
+	return $fail_inner->() if defined($tr = read($to_fh,$tbuf,$size)) && $tr +> 0;
     }
 
-    close($to_fh) || goto fail_open2 if $closeto;
-    close($from_fh) || goto fail_open1 if $closefrom;
+    close($to_fh) || return $fail_open2->() if $closeto;
+    close($from_fh) || return $fail_open1->() if $closefrom;
 
     return 0;
-    
-  # All of these contortions try to preserve error messages...
-  fail_inner:
-    do {
-        close($to_fh) || goto fail_open2 if $closeto;
-        close($from_fh) || goto fail_open1 if $closefrom;
-    };
-
-    return 1;
-
-  fail_open2:
-    do {
-        if ($closefrom) {
-            my $status = $!;
-            $! = 0;
-            close $from_fh;
-            $! = $status unless $!;
-        }
-    };
-  fail_open1:
-    do {
-        return -1;
-    }
 }
 
 *cmp = \&compare;
