@@ -824,7 +824,7 @@ sub balance_cols {
 	my $minheight = 0;
 	while (1) {
 		my @cols;
-		pos($$src) = $pos;
+		pos($$src, $pos);
 		my $medheight = int(($maxheight+$minheight+1)/2);
 		for my $f ( @$group) {
 			$f->{done} = 0;
@@ -1139,9 +1139,9 @@ sub form {
 			 : $page->{feed}->{other}   ? $page->{feed}->{other}->($sect_opts)
 			 : "";
 			length and s/\n?\z/\n/ for @( $header, $footer);  # NOT for $feed 
-			my $bodyfn = $page->{body}{$pagetype}
-					  || $page->{body}{$parity}
-					  || $page->{body}{other}
+			my $bodyfn = $page->{body}->{$pagetype}
+					  || $page->{body}->{$parity}
+					  || $page->{body}->{other}
 					  || \&std_body;
 			my $bodylen = $pagelen - linecount($header) - linecount($footer);
 			my ($pagetext, $more) = < make_page($section, $sect_opts, $bodylen);
@@ -1342,16 +1342,16 @@ sub break_at {
 			$ws ||= qr/\s/;
 			unless (m/\G (?=$lit_hy|($ws)$wsnzw|\z|\n|\r) /gcx) {
 				if ($last_breakable +<= $reslen) {
-					pos() -= $reslen-$last_breakable;
+					pos($_, pos($_) - $reslen-$last_breakable);
 					substr($res,$last_breakable, undef, "");
 				}
 				elsif ($reslen +> $hylen) {
 					if ($res =~ m/\S\S\S{$hylen}$/) {
-						pos() -= $hylen;
+						pos($_, pos($_) - $hylen);
 						substr($res,-$hylen, undef, $hyphen);
 					}
 					elsif ($res =~ s/(\S+)$//) {
-						pos() -= length($1);
+						pos($_, pos($_) - length($1));
 					}
 				}
 			}

@@ -5,7 +5,7 @@
 package main;
 require './test.pl';
 
-plan( tests => 29 );
+plan( tests => 28 );
 
 my($x);
 
@@ -47,7 +47,7 @@ sub noot {
 
 # Test that various syntaxes are allowed
 
-for (qw(getc pos readlink undef umask ~<*ARGV ~<*FOO ~<$foo -f)) {
+for (qw(getc readlink undef umask ~<*ARGV ~<*FOO ~<$foo -f)) {
     our $foo;
     eval "sub \{ $_ // 0 \}";
     is($@, '', "$_ // ... compiles");

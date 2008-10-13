@@ -716,11 +716,7 @@ PERL_CALLCONV UV	Perl_do_vecget(pTHX_ SV* sv, I32 offset, I32 size)
 #define PERL_ARGS_ASSERT_DO_VECGET	\
 	assert(sv)
 
-PERL_CALLCONV void	Perl_do_vecset(pTHX_ SV* sv)
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_DO_VECSET	\
-	assert(sv)
-
+PERL_CALLCONV void	Perl_do_vecset(pTHX);
 PERL_CALLCONV void	Perl_do_vop(pTHX_ I32 optype, SV* sv, SV* left, SV* right)
 			__attribute__nonnull__(pTHX_2)
 			__attribute__nonnull__(pTHX_3)

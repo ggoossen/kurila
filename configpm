@@ -119,9 +119,9 @@ package Config;
 # use vars pulls in Carp
 
 BEGIN {
-   my @heavy_subs = @(qw|myconfig fetch_string FIRSTKEY NEXTKEY EXISTS STORE config_sh config_re
-                       config_vars|);
-   for (< @heavy_subs) { undef Symbol::fetch_glob($_)->*; }
+   my @heavy_subs = qw|myconfig fetch_string FIRSTKEY NEXTKEY EXISTS STORE config_sh config_re
+                       config_vars|;
+   for (@heavy_subs) { undef Symbol::fetch_glob($_)->*; }
 }
 
 ENDOFBEG

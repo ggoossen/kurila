@@ -2807,25 +2807,19 @@ PP(pp_substr)
 PP(pp_vec)
 {
     dVAR; dSP; dTARGET;
-    register const IV size   = POPi;
-    register const IV offset = POPi;
-    register SV * const src = POPs;
-    const I32 lvalue = PL_op->op_flags & OPf_MOD;
 
     SvTAINTED_off(TARG);		/* decontaminate */
-    if (lvalue) {			/* it's an lvalue! */
-	/* always use a mortal for lvalues */
-	TARG = sv_newmortal();
-	sv_upgrade(TARG, SVt_PVLV);
-	sv_magic(TARG, NULL, PERL_MAGIC_vec, NULL, 0);
-	LvTYPE(TARG) = 'v';
-	LvTARG(TARG) = SvREFCNT_inc_simple(src);
-	LvTARGOFF(TARG) = offset;
-	LvTARGLEN(TARG) = size;
-    }
 
-    sv_setuv(TARG, do_vecget(src, offset, size));
-    PUSHs(TARG);
+    if (MAXARG > 3) {			/* it's an lvalue! */
+	do_vecset();      /* XXX slurp this routine */
+    }
+    else {
+	register const IV size   = POPi;
+	register const IV offset = POPi;
+	register SV * const src = POPs;
+	sv_setuv(TARG, do_vecget(src, offset, size));
+	PUSHs(TARG);
+    }
     RETURN;
 }
 
