@@ -1051,7 +1051,7 @@ case 2:
                             TOKEN_GETMAD((ps[(1) - (4)].val.p_tkval),op_scope,'L');
                             TOKEN_GETMAD((ps[(2) - (4)].val.i_tkval),op_scope,'o');
                             (yyval.opval) = newSTATEOP(0, PVAL((ps[(1) - (4)].val.p_tkval)), op_scope, LOCATION((ps[(2) - (4)].val.i_tkval)));
-                            (yyval.opval) = scope((yyval.opval));
+                            /* $$ = scope($$); should work */
 			;}
     break;
 

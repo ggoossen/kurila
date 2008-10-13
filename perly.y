@@ -970,7 +970,7 @@ termdo	:       DO term	%prec UNIOP                     /* do $filename */
                             TOKEN_GETMAD($1,op_scope,'L');
                             TOKEN_GETMAD($2,op_scope,'o');
                             $$ = newSTATEOP(0, PVAL($1), op_scope, LOCATION($2));
-                            $$ = scope($$);
+                            /* $$ = scope($$); should work */
 			}
         ;
 
