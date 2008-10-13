@@ -212,10 +212,6 @@ local our $TODO
 sub ok($;$) { }
 ok my $x = "foobar";
 ########
-# LABLE without a statement.
- LABLE: ;
- LABLE: $a;
-########
 # TODO do not execute CHECK block
 CHECK { die; }
 ########
@@ -250,9 +246,9 @@ s/$foo/$bar/;
 my ($foo, $bar);
 $a =~ s/$foo/$bar/;
 ########
-$a =~ s|(abc)|{uc($1)}|;
+$a =~ s|(abc)|$(uc($1))|;
 ########
-my $msg = "ce ºtii tu, bã ?\n";
+my $msg = "ce ºtii tu, bã ?\n"   ;
 use utf8;
 my $msg = "ce ºtii tu, bã ?\n";
 ########
@@ -280,7 +276,7 @@ my (<%hash) = (1,2);
 my %h;
 (<%h) = < (%h);
 ########
-{
+do {
    # comment
 }
 ########
@@ -292,3 +288,30 @@ binmode ':foo', $a;
 my $str = shift;
 $str =~ s{(foo)}{$(sprintf("=\%02X", ord($1)))}g;
 $str;
+########
+SKIP: do {
+    print 1;
+}
+########
+print "arg";
+SKIP: do {
+    print 1;
+}
+########
+print "arg";
+SKIP: do {
+    print 1;
+}    ;
+
+sub foo {
+    print "bar";
+}
+########
+print ;  ;
+########
+package main;
+print "arg";
+########
+pos($a);
+########
+LABEL: for (@: 1) { print "arg" }
