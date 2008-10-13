@@ -137,21 +137,45 @@ sub copy {
     local($\) = '';
 
     my $from_h;
+    my $to_h;
+
+    my $fail_open1 = sub { return 0; };
+    my $fail_open2 =
+      sub {
+          if ($closefrom) {
+              $status = $!;
+              $! = 0;
+              close $from_h;
+              $! = $status unless $!;
+          }
+          return $fail_open1->();
+      };
+    # All of these contortions try to preserve error messages...
+    my $fail_inner =
+      sub {
+          if ($closeto) {
+              $status = $!;
+              $! = 0;
+              close $to_h;
+              $! = $status unless $!;
+          }
+          return $fail_open2->();
+      };
+
     if ($from_a_handle) {
        $from_h = $from;
     } else {
 	$from = _protect($from) if $from =~ m/^\s/s;
-       open($from_h, "<", "$from\0") or goto fail_open1;
+       open($from_h, "<", "$from\0") or return $fail_open1->();
        binmode $from_h or die "($!,$^E)";
 	$closefrom = 1;
     }
 
-    my $to_h;
     if ($to_a_handle) {
        $to_h = $to;
     } else {
 	$to = _protect($to) if $to =~ m/^\s/s;
-       open($to_h,">", "$to\0") or goto fail_open2;
+       open($to_h,">", "$to\0") or return $fail_open2->();
        binmode $to_h or die "($!,$^E)";
 	$closeto = 1;
     }
@@ -169,45 +193,21 @@ sub copy {
     while (1) {
 	my ($r, $w, $t);
        defined($r = sysread($from_h, $buf, $size))
-	    or goto fail_inner;
+	    or return $fail_inner->();
 	last unless $r;
 	$w = 0;
         while ($w +< $r) {
             $t = syswrite($to_h, $buf, $r - $w, $w)
-              or goto fail_inner;
+              or return $fail_inner->();
             $w += $t;
 	}
     }
 
-    close($to_h) || goto fail_open2 if $closeto;
-    close($from_h) || goto fail_open1 if $closefrom;
+    close($to_h) || return $fail_open2->() if $closeto;
+    close($from_h) || return $fail_open1->() if $closefrom;
 
     # Use this idiom to avoid uninitialized value warning.
     return 1;
-
-    # All of these contortions try to preserve error messages...
-  fail_inner:
-    do {
-        if ($closeto) {
-            $status = $!;
-            $! = 0;
-            close $to_h;
-            $! = $status unless $!;
-        }
-    };
-  fail_open2:
-    do {
-        if ($closefrom) {
-            $status = $!;
-            $! = 0;
-            close $from_h;
-            $! = $status unless $!;
-        }
-    };
-  fail_open1:
-    do {
-        return 0;
-    };
 }
 
 sub move {
