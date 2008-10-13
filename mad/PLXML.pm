@@ -652,7 +652,7 @@ sub args { 'S?' }
 
 package PLXML::op_pos;
 
-our @ISA = ('PLXML::baseop_unop');
+our @ISA = ('PLXML::listop');
 
 sub key { 'pos' }
 sub desc { 'match position' }

@@ -365,7 +365,7 @@ loop	:	label WHILE remember '(' texpr ')'
 			  $$ = block_end($4,
                               innerop = newFOROP(0, PVAL($1), (line_t)IVAL($2),
                                   $5, $7, $9, $10, LOCATION($2)));
-			  TOKEN_GETMAD($1,((LISTOP*)innerop)->op_first,'L');
+			  TOKEN_GETMAD($1,((LISTOP*)innerop)->op_first->op_sibling,'L');
 			  TOKEN_GETMAD($2,((LISTOP*)innerop)->op_first->op_sibling,'W');
 			  TOKEN_GETMAD($3,((LISTOP*)innerop)->op_first->op_sibling,'d');
 			  TOKEN_GETMAD($6,((LISTOP*)innerop)->op_first->op_sibling,'(');
@@ -376,7 +376,7 @@ loop	:	label WHILE remember '(' texpr ')'
 			  $$ = block_end($3,
 			     innerop = newFOROP(0, PVAL($1), (line_t)IVAL($2),
                                  $4, $6, $8, $9, LOCATION($2)));
-			  TOKEN_GETMAD($1,((LISTOP*)innerop)->op_first,'L');
+			  TOKEN_GETMAD($1,((LISTOP*)innerop)->op_first->op_sibling,'L');
 			  TOKEN_GETMAD($2,((LISTOP*)innerop)->op_first->op_sibling,'W');
 			  TOKEN_GETMAD($5,((LISTOP*)innerop)->op_first->op_sibling,'(');
 			  TOKEN_GETMAD($7,((LISTOP*)innerop)->op_first->op_sibling,')');
@@ -955,19 +955,23 @@ termdo	:       DO term	%prec UNIOP                     /* do $filename */
 			}
 	|	DO block cont %prec '('               /* do { code */
                         {
-                            $$ = newSTATEOP(0, NULL,
+                            OP* op_scope =
                                 scope(newWHILEOP(0, 1, (LOOP*)(OP*)NULL,
-                                        LOCATION($1), (OP*)NULL, $2, $3, 0)),
+                                        LOCATION($1), (OP*)NULL, $2, $3, 0));
+                            TOKEN_GETMAD($1,op_scope,'o');
+                            $$ = newSTATEOP(0, NULL, op_scope,
                                 LOCATION($1));
                             $$ = scope($$);
                         }
 	|	LABEL DO block cont %prec '('               /* do { code */
                         {
-                            $$ = newSTATEOP(0, PVAL($1),
+                            OP* op_scope = 
                                 scope(newWHILEOP(0, 1, (LOOP*)(OP*)NULL,
-                                        LOCATION($2), (OP*)NULL, $3, $4, 0)),
-                                LOCATION($2));
-                            TOKEN_GETMAD($1,$$,'L');
+                                        LOCATION($2), (OP*)NULL, $3, $4, 0));
+                            TOKEN_GETMAD($1,op_scope,'L');
+                            TOKEN_GETMAD($2,op_scope,'o');
+                            $$ = newSTATEOP(0, PVAL($1), op_scope, LOCATION($2));
+                            $$ = scope($$);
 			}
         ;
 

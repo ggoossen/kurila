@@ -2695,28 +2695,50 @@ sub lineseq {
 	my $kid = shift @kids;
 	my $thing = $kid->ast($self, @_);
 	next unless defined $thing;
-	if ($::curstate ne $::prevstate) {
-	    if ($::prevstate) {
-		push @newstuff, $::prevstate->madness(';');
-		push @{$newprev->{Kids}}, @newstuff if $newprev;
-		@newstuff = ();
-	    }
-	    $::prevstate = $::curstate;
-	    $newprev = $thing;
-	    push @retval, $thing;
-	}
-	elsif ($::prevstate) {
-	    push @newstuff, $thing;
-	}
-	else {
-	    push @retval, $thing;
-	}
+        if ( $::version->{branch} eq 'kurila' and $::version->{'v'} >= v1.14 ) {
+            if ($kid->{mp}{U} or $kid->{mp}{n} or $kid->{mp}{'&'} or
+                  ( ($kid->{mp}{null_type} || '') =~ m/^(peg|nullstatement|package)$/ )
+              ) {
+                push @newstuff, $thing;
+            }
+            else {
+                push @retval, $thing;
+                push @retval, @newstuff;
+                @newstuff = ();
+            }
+        }
+        else {
+            if ($::curstate ne $::prevstate) {
+                if ($::prevstate) {
+                    push @newstuff, $::prevstate->madness(';');
+                    push @{$newprev->{Kids}}, @newstuff if $newprev;
+                    @newstuff = ();
+                }
+                $::prevstate = $::curstate;
+                $newprev = $thing;
+                push @retval, $thing;
+            }
+            elsif ($::prevstate) {
+                push @newstuff, $thing;
+            }
+            else {
+                push @retval, $thing;
+            }
+        }
     }
-    if ($::prevstate) {
-	push @newstuff, $::prevstate->madness(';');
-	push @{$newprev->{Kids}}, @newstuff if $newprev;
-	@newstuff = ();
-	$::prevstate = 0;
+
+    if ( $::version->{branch} eq 'kurila' and $::version->{'v'} >= v1.14 ) {
+        push @retval, $self->madness(';');
+        push @retval, @newstuff;
+    }
+    else {
+        if ($::prevstate) {
+            push @newstuff, $::prevstate->madness(';');
+            push @{$newprev->{Kids}}, @newstuff if $newprev;
+            @newstuff = ();
+            $::prevstate = 0;
+        }
+        push @retval, $self->madness(';');
     }
     return @retval;
 }
@@ -2731,8 +2753,13 @@ sub blockast {
     my @newkids = $self->PLXML::op_lineseq::lineseq(@_);
     push @retval, @newkids;
 
-    push @retval, $self->madness('; }');
+    push @retval, $self->madness('}');
     return $self->newtype->new(Kids => [@retval]);
+}
+
+sub ast {
+    my $self = shift;
+    $self->blockast(@_);
 }
 
 package PLXML::op_nextstate;
@@ -2751,7 +2778,7 @@ sub ast {
     my $self = shift;
 
     my @newkids;
-    push @newkids, $self->madness('L');
+    push @newkids, $self->madness(';');
     $::curstate = $self;
     return $self->newtype->new(Kids => [@newkids]);
 }
@@ -2787,11 +2814,11 @@ sub ast {
     }
 
     local $::curstate;
-    push @retval, $self->madness('o {');
+    push @retval, $self->madness('L o {');
 
     my @newkids = $self->PLXML::op_lineseq::lineseq(@_);
     push @retval, @newkids;
-    push @retval, $self->madness(q/; }/);
+    push @retval, $self->madness(q/}/);
     my $retval = $self->newtype->new(Kids => [@retval]);
 
     if ($$self{mp}{C}) {
@@ -2818,9 +2845,7 @@ sub ast {
     local $::curstate;
 
     my @newkids;
-    push @newkids, $self->madness('o');
-
-    push @newkids, $self->madness('{');
+    push @newkids, $self->madness('L o {');
     push @newkids, $self->PLXML::op_lineseq::lineseq(@_);
     push @newkids, $self->madness('; }');
 
