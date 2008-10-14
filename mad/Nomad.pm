@@ -27,6 +27,13 @@ sub xml_to_p5 {
     $::curenc = 0;		# start in utf8.
     $options{'version'} =~ m/(\w+)[-]([\d.]+)$/ or die "invalid version: '$options{version}'";
     $::version = { branch => $1, 'v' => qv($2)};
+    if ($options{'version_from'}
+         and $options{'version_from'} =~ m/(\w+)[-]([\d.]+)$/) {
+        $::version_from = { branch => $1, 'v' => qv($2)};
+    }
+    else {
+        $::version_from  = $::version;
+    }
 
     # parse file
     use XML::Parser;
@@ -2695,7 +2702,7 @@ sub lineseq {
 	my $kid = shift @kids;
 	my $thing = $kid->ast($self, @_);
 	next unless defined $thing;
-        if ( $::version->{branch} eq 'kurila' and $::version->{'v'} >= v1.14 ) {
+        if ( $::version_from->{branch} eq 'kurila' and $::version_from->{'v'} > v1.14 ) {
             if ($kid->{mp}{U} or $kid->{mp}{n} or $kid->{mp}{'&'} or
                   ( ($kid->{mp}{null_type} || '') =~ m/^(peg|nullstatement|package)$/ )
               ) {
@@ -2727,7 +2734,7 @@ sub lineseq {
         }
     }
 
-    if ( $::version->{branch} eq 'kurila' and $::version->{'v'} >= v1.14 ) {
+    if ( $::version_from->{branch} eq 'kurila' and $::version_from->{'v'} > v1.14 ) {
         push @retval, $self->madness(';');
         push @retval, @newstuff;
     }
@@ -2738,7 +2745,6 @@ sub lineseq {
             @newstuff = ();
             $::prevstate = 0;
         }
-        push @retval, $self->madness(';');
     }
     return @retval;
 }
@@ -2753,13 +2759,22 @@ sub blockast {
     my @newkids = $self->PLXML::op_lineseq::lineseq(@_);
     push @retval, @newkids;
 
+    if ( not ( $::version_from->{branch} eq 'kurila' 
+                 and $::version_from->{'v'} > v1.14 ) ) {
+        push @retval, $self->madness(';');
+    }
     push @retval, $self->madness('}');
     return $self->newtype->new(Kids => [@retval]);
 }
 
 sub ast {
     my $self = shift;
-    $self->blockast(@_);
+    if ( $::version_from->{branch} eq 'kurila' and $::version_from->{'v'} > v1.14 ) {
+        return $self->blockast(@_);
+    }
+    else {
+        return $self->SUPER::ast(@_);
+    }
 }
 
 package PLXML::op_nextstate;
@@ -2769,7 +2784,13 @@ sub newtype { return "P5AST::statement" }
 sub astnull {
     my $self = shift;
     my @newkids;
-    push @newkids, $self->madness('L');
+    if ( $::version_from->{branch} eq 'kurila' 
+           and $::version_from->{'v'} > v1.14 ) {
+        push @newkids, $self->madness(';');
+    }
+    else {
+        push @newkids, $self->madness('L');
+    }
     $::curstate = $self;
     return P5AST::statement->new(Kids => [@newkids]);
 }
@@ -2778,7 +2799,13 @@ sub ast {
     my $self = shift;
 
     my @newkids;
-    push @newkids, $self->madness(';');
+    if ( $::version_from->{branch} eq 'kurila' 
+           and $::version_from->{'v'} > v1.14 ) {
+        push @newkids, $self->madness(';');
+    }
+    else {
+        push @newkids, $self->madness('L');
+    }
     $::curstate = $self;
     return $self->newtype->new(Kids => [@newkids]);
 }
@@ -2818,6 +2845,10 @@ sub ast {
 
     my @newkids = $self->PLXML::op_lineseq::lineseq(@_);
     push @retval, @newkids;
+    if ( not ( $::version_from->{branch} eq 'kurila' 
+                 and $::version_from->{'v'} > v1.14 ) ) {
+        push @retval, $self->madness(';');
+    }
     push @retval, $self->madness(q/}/);
     my $retval = $self->newtype->new(Kids => [@retval]);
 
@@ -2847,7 +2878,10 @@ sub ast {
     my @newkids;
     push @newkids, $self->madness('L o {');
     push @newkids, $self->PLXML::op_lineseq::lineseq(@_);
-    push @newkids, $self->madness('; }');
+    if ( $::version_from->{branch} eq 'kurila' and $::version_from->{'v'} > v1.14 ) {
+        push @newkids, $self->madness(';');
+    }
+    push @newkids, $self->madness('}');
 
     my @folded = $self->madness('C');
     if (@folded) {
