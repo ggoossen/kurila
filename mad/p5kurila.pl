@@ -842,6 +842,9 @@ sub sv_array_hash {
     for my $op (map { $xml->findnodes("//op_$_") } qw|padav rv2av anonlist|) {
         my $flags = $op->att('flags') || '';
         my $main_prop = $op->tag eq "op_anonlist" ? 'square_open' : 'ary';
+        if ( $op->tag eq "op_anonlist" and $flags =~ m/\bSPECIAL\b/) {
+            next;
+        }
         if ($flags =~ m/SCALAR/ and $flags !~ m/REF/) {
             set_madprop($op, $main_prop, 'nelems(' . get_madprop($op, $main_prop));
             set_madprop($op, 'round_open', "");
@@ -886,7 +889,7 @@ sub sv_array_hash {
 
     # add '<' in front of subcalls in list context.
     for my $op (map { $xml->findnodes("//op_$_") } qw|entersub|) {
-        next unless $op->att('flags') =~ m/LIST/; # must be list context.
+        next unless ($op->att('flags')||'') =~ m/LIST/; # must be list context.
 
         next if (get_madprop($op->parent, 'comma') || '') eq '=&gt;'; # skip if preceded by '=>'
 
