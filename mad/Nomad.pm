@@ -2924,7 +2924,8 @@ sub ast {
     else {
 	push @retval, '';
     }
-    if (ref $range eq 'PLXML::op_null' and $$self{flags} =~ /SPECIAL/) {
+    if (ref $range eq 'PLXML::op_null'
+          and ($::version->{branch} eq "perl" ? $$self{flags} =~ m/STACKED/ : $$self{flags} =~ m/SPECIAL/) ) {
 	my (undef,$min,$max) = @{$range->{Kids}};
 	push @retval, $min->ast($self,@_);
 	if (defined $max) {
