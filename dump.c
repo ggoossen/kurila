@@ -588,8 +588,6 @@ S_pm_description(pTHX_ const PMOP *pm)
 	sv_catpv(desc, ",CONTINUE");
     if (pmflags & PMf_RETAINT)
 	sv_catpv(desc, ",RETAINT");
-    if (pmflags & PMf_EVAL)
-	sv_catpv(desc, ",EVAL");
     return desc;
 }
 

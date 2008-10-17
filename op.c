@@ -2777,11 +2777,8 @@ Perl_pmruntime(pTHX_ OP *o, OP *expr, bool isreg)
     }
 
     if (repl) {
-	OP *curop;
-	if (pm->op_pmflags & PMf_EVAL) {
-	    curop = NULL;
-	}
-	else if (repl->op_type == OP_CONST)
+	OP *curop = NULL;
+	if (repl->op_type == OP_CONST)
 	    curop = repl;
 	if (curop == repl
 	    && !(repl_has_vars
