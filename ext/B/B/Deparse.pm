@@ -17,7 +17,7 @@ use B < qw(class main_root main_start main_cv svref_2object opnumber perlstring
 	 OPpSORT_REVERSE OPpSORT_DESCEND OPpITER_REVERSED
 	 SVf_IOK SVf_NOK SVf_ROK SVf_POK SVpad_OUR SVf_FAKE SVs_RMG SVs_SMG
          CVf_METHOD CVf_LOCKED
-	 PMf_KEEP PMf_GLOBAL PMf_CONTINUE PMf_EVAL
+	 PMf_KEEP PMf_GLOBAL PMf_CONTINUE
 	 PMf_MULTILINE PMf_SINGLELINE PMf_FOLD PMf_EXTENDED RXf_SKIPWHITE);
 our $VERSION = 0.86;
 use strict;
@@ -4034,11 +4034,7 @@ sub pp_subst {
 	    $repl = $repl->first;
 	    $flags .= "e";
 	}
-	if ($op->pmflags ^&^ PMf_EVAL) {
-	    $repl = $self->deparse($repl->first, 0);
-	} else {
-	    $repl = $self->dq($repl);	
-	}
+        $repl = $self->dq($repl);	
     }
     my $extended = ($op->pmflags ^&^ PMf_EXTENDED);
     if (null $kid) {
@@ -4052,7 +4048,6 @@ sub pp_subst {
     } else {
 	($re) = $self->regcomp($kid, 1, $extended);
     }
-    $flags .= "e" if $op->pmflags ^&^ PMf_EVAL;
     $flags .= "g" if $op->pmflags ^&^ PMf_GLOBAL;
     $flags .= "i" if $op->pmflags ^&^ PMf_FOLD;
     $flags .= "m" if $op->pmflags ^&^ PMf_MULTILINE;
