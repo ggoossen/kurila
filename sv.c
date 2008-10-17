@@ -2634,7 +2634,7 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV* sstr, const I32 flags)
         && dtype != stype ) {
 	/* FIXME the assignment should be done before old values ore DESTROYed */
 	Perl_sv_clear_body(aTHX_ dstr);
-	SvFLAGS(dstr) = dtype = SVt_NULL;
+	dtype = SvTYPE(dstr);
     }
 
     /* There's a lot of redundancy below but we're going for speed here */
@@ -4309,6 +4309,13 @@ you'll want to call C<sv_free()> (or its macro wrapper C<SvREFCNT_dec>)
 instead.
 
 =cut
+
+=pod sv_clear_body
+
+clears the sv, except keep the object
+
+=cut
+
 */
 
 void
@@ -4319,6 +4326,7 @@ Perl_sv_clear_body(pTHX_ SV *const sv)
     const struct body_details *const sv_type_details
 	= bodies_by_type + type;
     HV *stash;
+
 
     if (type <= SVt_IV) {
 	/* See the comment in sv.h about the collusion between this early
@@ -4331,52 +4339,10 @@ Perl_sv_clear_body(pTHX_ SV *const sv)
 	    else
 	        SvREFCNT_dec(target);
 	}
+	SvFLAGS(sv) = SVt_NULL;
 	return;
     }
 
-    if (SvOBJECT(sv)) {
-	if (PL_defstash) {		/* Still have a symbol table? */
-	    dSP;
-	    GV* destructor = gv_fetchmethod(SvSTASH(sv), "DESTROY");
-	    if (destructor) {
-		SV* const tmpref = newRV(sv);
-		SvREADONLY_on(tmpref);   /* DESTROY() could be naughty */
-		ENTER;
-		PUSHSTACKi(PERLSI_DESTROY);
-		EXTEND(SP, 2);
-		PUSHMARK(SP);
-		PUSHs(tmpref);
-		PUTBACK;
-		call_sv((SV*)GvCV(destructor), G_DISCARD|G_EVAL|G_KEEPERR|G_VOID);
-		
-		POPSTACK;
-		SPAGAIN;
-		LEAVE;
-		if(SvREFCNT(tmpref) < 2) {
-		    /* tmpref is not kept alive! */
-		    SvREFCNT(sv)--;
-		    SvRV_set(tmpref, NULL);
-		    SvROK_off(tmpref);
-		}
-		SvREFCNT_dec(tmpref);
-	    }
-
-	    if (SvREFCNT(sv)) {
-		if (PL_in_clean_objs)
-		    Perl_croak(aTHX_ "DESTROY created new reference to dead object '%s'",
-			  HvNAME_get(stash));
-		/* DESTROY gave object new lease on life */
-		return;
-	    }
-	}
-
-	if (SvOBJECT(sv)) {
-	    SvREFCNT_dec(SvSTASH(sv));	/* possibly of changed persuasion */
-	    SvOBJECT_off(sv);	/* Curse the object. */
-	    if (type != SVt_PVIO)
-		--PL_sv_objcount;	/* XXX Might want something more general */
-	}
-    }
     if (type >= SVt_PVMG) {
 	if (type == SVt_PVMG && SvPAD_OUR(sv)) {
 	    SvREFCNT_dec(SvOURGV(sv));
@@ -4495,6 +4461,8 @@ Perl_sv_clear_body(pTHX_ SV *const sv)
     else if (sv_type_details->body_size) {
 	my_safefree(SvANY(sv));
     }
+
+    SvFLAGS(sv) = SvOBJECT(sv) ? SVt_PVMG | SVs_OBJECT : SVt_NULL;
 }
 
 void
@@ -4505,6 +4473,50 @@ Perl_sv_clear(pTHX_ register SV *const sv)
     PERL_ARGS_ASSERT_SV_CLEAR;
     assert(SvREFCNT(sv) == 0);
     assert(SvTYPE(sv) != SVTYPEMASK);
+
+    if (SvOBJECT(sv)) {
+	if (PL_defstash) {		/* Still have a symbol table? */
+	    dSP;
+	    GV* destructor = gv_fetchmethod(SvSTASH(sv), "DESTROY");
+	    if (destructor) {
+		SV* const tmpref = newRV(sv);
+		SvREADONLY_on(tmpref);   /* DESTROY() could be naughty */
+		ENTER;
+		PUSHSTACKi(PERLSI_DESTROY);
+		EXTEND(SP, 2);
+		PUSHMARK(SP);
+		PUSHs(tmpref);
+		PUTBACK;
+		call_sv((SV*)GvCV(destructor), G_DISCARD|G_EVAL|G_KEEPERR|G_VOID);
+		
+		POPSTACK;
+		SPAGAIN;
+		LEAVE;
+		if(SvREFCNT(tmpref) < 2) {
+		    /* tmpref is not kept alive! */
+		    SvREFCNT(sv)--;
+		    SvRV_set(tmpref, NULL);
+		    SvROK_off(tmpref);
+		}
+		SvREFCNT_dec(tmpref);
+	    }
+
+	    if (SvREFCNT(sv)) {
+		if (PL_in_clean_objs)
+		    Perl_croak(aTHX_ "DESTROY created new reference to dead object '%s'",
+			HvNAME_get(SvSTASH(sv)));
+		/* DESTROY gave object new lease on life */
+		return;
+	    }
+	}
+
+	if (SvOBJECT(sv)) {
+	    SvREFCNT_dec(SvSTASH(sv));	/* possibly of changed persuasion */
+	    SvOBJECT_off(sv);	/* Curse the object. */
+	    if (SvTYPE(sv) != SVt_PVIO)
+		--PL_sv_objcount;	/* XXX Might want something more general */
+	}
+    }
 
     Perl_sv_clear_body(aTHX_ sv);
     SvFLAGS(sv) &= SVf_BREAK;
