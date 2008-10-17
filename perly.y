@@ -79,7 +79,7 @@
 %token <i_tkval> FUNC0 FUNC1 FUNC UNIOP LSTOP
 %token <i_tkval> RELOP EQOP MULOP ADDOP
 %token <i_tkval> DO NOAMP
-%token <i_tkval> ANONARY ANONARYL ANONHSH ANONSCALAR ANONSCALARL
+%token <i_tkval> ANONARY ANONARYL ANONHSH ANONHSHL ANONSCALAR ANONSCALARL
 %token <i_tkval> LOCAL MY MYSUB REQUIRE
 %token <i_tkval> COLONATTR
 %token <i_tkval> SPECIALBLOCK
@@ -113,7 +113,7 @@
 %right <i_tkval> ASSIGNOP
 %right <i_tkval> '?' ':'
 %right <i_tkval> '<'
-%right ANONARYL ANONSCALARL
+%right ANONHSHL ANONARYL ANONSCALARL
 %nonassoc DOTDOT
 %left <i_tkval> OROR DORDOR
 %left <i_tkval> ANDAND
@@ -641,6 +641,11 @@ listop	:	LSTOP indirob argexpr /* map {...} @args or print $fh @args */
                             $$ = convert(IVAL($1), 0, $2, LOCATION($1));
                             TOKEN_GETMAD($1,$$,'o');
                             APPEND_MADPROPS_PV("listop", $$, '>');
+			}
+        |       ANONHSHL listexpr  /* %: ... */
+                        {
+                            $$ = newANONHASH($2, LOCATION($1));
+                            TOKEN_GETMAD($1,$$,'{');
 			}
         |       ANONARYL listexpr  /* @: ... */
                         {
