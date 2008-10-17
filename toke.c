@@ -3478,6 +3478,11 @@ Perl_yylex(pTHX)
 	    s += 2;
 	    OPERATOR(ANONHSH);
 	}
+	if (s[1] == ':' && s[2] != ':') {
+	    /* array constructor */
+	    s += 2;
+	    OPERATOR(ANONHSHL);
+	}
 
 	PL_tokenbuf[0] = '%';
 	s = scan_ident(s, PL_bufend, PL_tokenbuf + 1,
