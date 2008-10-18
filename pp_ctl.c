@@ -784,7 +784,7 @@ Perl_die_where(pTHX_ SV *msv)
     PERL_ARGS_ASSERT_DIE_WHERE;
 
     if (ERRSV != msv) {
-	SVcpREPLACE(ERRSV, msv);
+	sv_setsv(ERRSV, msv);
     }
 
     if (PL_in_eval) {
@@ -2209,7 +2209,7 @@ S_doeval(pTHX_ int gimme, OP** startop, CV* outside, U32 seq)
 	    PUTBACK;
 	    call_sv(PL_errorcreatehook, G_SCALAR);
 	    SPAGAIN;
-	    SVcpREPLACE(ERRSV, POPs);
+	    sv_setsv(ERRSV, POPs);
 	    PUTBACK;
 
 	    POPSTACK;
