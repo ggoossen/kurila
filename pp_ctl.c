@@ -976,24 +976,6 @@ PP(pp_caller)
 	PUSHs(&PL_sv_undef);
 	PUSHs(&PL_sv_undef);
     }
-    if (CxTYPE(cx) == CXt_SUB && CxHASARGS(cx)
-	&& CopSTASH_eq(PL_curcop, PL_debstash))
-    {
-	AV * const ary = cx->blk_sub.argarray;
-	const int off = AvARRAY(ary) - AvALLOC(ary);
-
-	if (!PL_dbargs) {
-	    GV* const tmpgv = gv_fetchpvs("DB::args", GV_ADD, SVt_PVAV);
-	    PL_dbargs = GvAV(gv_AVadd(tmpgv));
-	    GvMULTI_on(tmpgv);
-	    AvREAL_off(PL_dbargs);	/* XXX should be REIFY (see av.h) */
-	}
-
-	if (AvMAX(PL_dbargs) < AvFILLp(ary) + off)
-	    av_extend(PL_dbargs, AvFILLp(ary) + off);
-	Copy(AvALLOC(ary), AvARRAY(PL_dbargs), AvFILLp(ary) + 1 + off, SV*);
-	AvFILLp(PL_dbargs) = AvFILLp(ary) + off;
-    }
     /* XXX only hints propagated via op_private are currently
      * visible (others are not easily accessible, since they
      * use the global PL_hints) */
@@ -1616,6 +1598,7 @@ PP(pp_goto)
 	    I32 items = 0;
 	    I32 oldsave;
 	    bool reified = 0;
+	    SV* args = NULL;
 
 	    if (!CvROOT(cv) && !CvXSUB(cv)) {
 		DIE(aTHX_ "Goto undefined subroutine");
@@ -1640,29 +1623,11 @@ PP(pp_goto)
 	    }
 	    else if (CxMULTICALL(cx))
 		DIE(aTHX_ "Can't goto subroutine from a sort sub (or similar callback)");
-	    if (CxTYPE(cx) == CXt_SUB && CxHASARGS(cx)) {
-		/* put @_ back onto stack */
-		AV* av = cx->blk_sub.argarray;
-
-		items = AvFILLp(av) + 1;
+	    args = newSVsv(PAD_SVl(0));
+	    if (CvISXSUB(cv)) {	/* put GvAV(defgv) back onto stack */
+		items = AvFILLp(args) + 1;
 		EXTEND(SP, items+1); /* @_ could have been extended. */
-		Copy(AvARRAY(av), SP + 1, items, SV*);
-		CLEAR_ARGARRAY(av);
-		/* abandon @_ if it got reified */
-		if (AvREAL(av)) {
-		    reified = 1;
-		    SvREFCNT_dec(av);
-		    av = newAV();
-		    av_extend(av, items-1);
-		    AvREIFY_only(av);
-		    PAD_SVl(0) = (SV*)(cx->blk_sub.argarray = av);
-		}
-	    }
-	    else if (CvISXSUB(cv)) {	/* put GvAV(defgv) back onto stack */
-		AV* const av = GvAV(PL_defgv);
-		items = AvFILLp(av) + 1;
-		EXTEND(SP, items+1); /* @_ could have been extended. */
-		Copy(AvARRAY(av), SP + 1, items, SV*);
+		Copy(AvARRAY(args), SP + 1, items, SV*);
 	    }
 	    mark = SP;
 	    SP += items;
@@ -1716,38 +1681,11 @@ PP(pp_goto)
 		PAD_SET_CUR_NOSAVE(padlist, CvDEPTH(cv));
 		if (CxHASARGS(cx))
 		{
-		    AV* const av = (AV*)PAD_SVl(0);
-
 		    CX_CURPAD_SAVE(cx->blk_sub);
-		    cx->blk_sub.argarray = av;
 
-		    if (items >= AvMAX(av) + 1) {
-			SV **ary = AvALLOC(av);
-			if (AvARRAY(av) != ary) {
-			    AvMAX(av) += AvARRAY(av) - AvALLOC(av);
-			    AvARRAY(av) = ary;
-			}
-			if (items >= AvMAX(av) + 1) {
-			    AvMAX(av) = items - 1;
-			    Renew(ary,items+1,SV*);
-			    AvALLOC(av) = ary;
-			    AvARRAY(av) = ary;
-			}
-		    }
-		    ++mark;
-		    Copy(mark,AvARRAY(av),items,SV*);
-		    AvFILLp(av) = items - 1;
-		    assert(!AvREAL(av));
-		    if (reified) {
-			/* transfer 'ownership' of refcnts to new @_ */
-			AvREAL_on(av);
-			AvREIFY_off(av);
-		    }
-		    while (items--) {
-			if (*mark)
-			    SvTEMP_off(*mark);
-			mark++;
-		    }
+		    SAVECLEARSV(PAD_SVl(0));
+
+		    PAD_SVl(0) = args;
 		}
 		if (PERLDB_SUB) {	/* Checking curstash breaks DProf. */
 		    Perl_get_db_sub(aTHX_ NULL, cv);
