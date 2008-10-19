@@ -16,61 +16,49 @@ sub import {
     my $untrapped = 0;
     local $_;
 
-  Arg_loop:
-    while ((nelems @_)) {
-	$_ = shift;
-	if (m/^[A-Z][A-Z0-9]*$/) {
-	    $saw_sig++;
-	    unless ($untrapped and %SIG{$_} and %SIG{$_} ne 'DEFAULT') {
-		print "Installing handler $(dump::view($handler)) for $_\n" if $Verbose;
-		%SIG{$_} = $handler;
-	    }
-	}
-	elsif ($_ eq 'normal-signals') {
-	    unshift @_, < grep(exists %SIG{$_}, qw(HUP INT PIPE TERM));
-	}
-	elsif ($_ eq 'error-signals') {
-	    unshift @_, < grep(exists %SIG{$_},
-			     qw(ABRT BUS EMT FPE ILL QUIT SEGV SYS TRAP));
-	}
-	elsif ($_ eq 'old-interface-signals') {
-	    unshift @_,
-	    < grep(exists %SIG{$_},
-		 qw(ABRT BUS EMT FPE ILL PIPE QUIT SEGV SYS TERM TRAP));
-	}
-    	elsif ($_ eq 'stack-trace') {
-	    $handler = \&handler_traceback;
-	}
-	elsif ($_ eq 'die') {
-	    $handler = \&handler_die;
-	}
-	elsif ($_ eq 'handler') {
-	    (nelems @_) or die "No argument specified after 'handler'";
-	    $handler = shift;
-	    unless (ref $handler or $handler eq 'IGNORE'
-			or $handler eq 'DEFAULT') {
-    	    	require Symbol;
-		$handler = Symbol::qualify($handler, (caller)[[0]]);
-	    }
-	}
-	elsif ($_ eq 'untrapped') {
-	    $untrapped = 1;
-	}
-	elsif ($_ eq 'any') {
-	    $untrapped = 0;
-	}
-	elsif ($_ =~ m/^\d/) {
-	    $VERSION +>= $_ or die "sigtrap.pm version $_ required,"
-		    	    	    	. " but this is only version $VERSION";
-	}
-	else {
-	    die "Unrecognized argument $_";
-	}
-    }
-    unless ($saw_sig) {
+    {
+        while ((nelems @_)) {
+            $_ = shift;
+            if (m/^[A-Z][A-Z0-9]*$/) {
+                $saw_sig++;
+                unless ($untrapped and %SIG{$_} and %SIG{$_} ne 'DEFAULT') {
+                    print "Installing handler $(dump::view($handler)) for $_\n" if $Verbose;
+                    %SIG{$_} = $handler;
+                }
+            } elsif ($_ eq 'normal-signals') {
+                unshift @_, < grep(exists %SIG{$_}, qw(HUP INT PIPE TERM));
+            } elsif ($_ eq 'error-signals') {
+                unshift @_, < grep(exists %SIG{$_},
+                                   qw(ABRT BUS EMT FPE ILL QUIT SEGV SYS TRAP));
+            } elsif ($_ eq 'old-interface-signals') {
+                unshift @_,
+                  < grep(exists %SIG{$_},
+                         qw(ABRT BUS EMT FPE ILL PIPE QUIT SEGV SYS TERM TRAP));
+            } elsif ($_ eq 'stack-trace') {
+                $handler = \&handler_traceback;
+            } elsif ($_ eq 'die') {
+                $handler = \&handler_die;
+            } elsif ($_ eq 'handler') {
+                (nelems @_) or die "No argument specified after 'handler'";
+                $handler = shift;
+                unless (ref $handler or $handler eq 'IGNORE'
+                          or $handler eq 'DEFAULT') {
+                    require Symbol;
+                    $handler = Symbol::qualify($handler, (caller)[[0]]);
+                }
+            } elsif ($_ eq 'untrapped') {
+                $untrapped = 1;
+            } elsif ($_ eq 'any') {
+                $untrapped = 0;
+            } elsif ($_ =~ m/^\d/) {
+                $VERSION +>= $_ or die "sigtrap.pm version $_ required,"
+                  . " but this is only version $VERSION";
+            } else {
+                die "Unrecognized argument $_";
+            }
+        }
 	@_ = qw(old-interface-signals);
-	goto Arg_loop;
-    }
+    } while ( ! $saw_sig );
 }
 
 sub handler_die {
