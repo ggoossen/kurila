@@ -749,7 +749,7 @@ Perl_do_op_dump(pTHX_ I32 level, PerlIO *file, const OP *o)
     }
     {
 	SV* loc = o->op_location;
-	Perl_dump_indent(aTHX_ level, file, "  LOCATION = ");
+	Perl_dump_indent(aTHX_ level, file, "LOCATION = ");
 	if (loc && SvAVOK(loc)) {
 	    SV** ary = AvARRAY((AV*)loc);
 	    I32 len = av_len((AV*)loc);
