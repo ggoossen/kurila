@@ -180,9 +180,9 @@ Perl_offer_nice_chunk(pTHX_ void *const chunk, const U32 chunk_size)
 	VALGRIND_MAKE_MEM_NOACCESS(&SvARENA_CHAIN(p), sizeof(void*));	\
 	VALGRIND_MAKE_MEM_DEFINED(&SvFLAGS(p), sizeof(U32));	\
 	VALGRIND_MAKE_MEM_DEFINED(&SvREFCNT(p), sizeof(U32));	\
+	PL_sv_root = (p); /* Disable to do memory debugging */	\
 	--PL_sv_count;					\
     } STMT_END
-/* 	PL_sv_root = (p); /\* Disable to do memory debugging *\/	\ */
 
 #define uproot_SV(p) \
     STMT_START {					\
