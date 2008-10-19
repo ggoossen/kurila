@@ -82,10 +82,12 @@ is(recurse1(500), 500, 'recursive goto &foo');
 
 # [perl #32039] Chained goto &sub drops data too early. 
 
+my $chained_goto_ok;
 sub a32039 { @_=@("foo"); goto &b32039; }
 sub b32039 { goto &c32039; }
-sub c32039 { is(@_[0], 'foo', 'chained &goto') }
+sub c32039 { $chained_goto_ok = (@_[0] eq 'foo') }
 a32039();
+ok($chained_goto_ok, 'chained &goto');
 
 # goto &foo not allowed in evals
 

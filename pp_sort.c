@@ -1619,7 +1619,6 @@ PP(pp_sort)
 			AV * const av = (AV*)PAD_SVl(0);
 
 			CX_CURPAD_SAVE(cx->blk_sub);
-			cx->blk_sub.argarray = av;
 		    }
 
 		}
