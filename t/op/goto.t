@@ -53,7 +53,7 @@ $::LINE = __LINE__ + 1;
 do {
     my $wherever = 'NOWHERE';
     try { goto $wherever };
-    like($@->{description}, qr/Can't find label NOWHERE/, 'goto NOWHERE sets $@');
+    like($@->{description}, qr/goto must have sub/, 'goto NOWHERE sets $@');
 };
 
 # see if a modified @_ propagates

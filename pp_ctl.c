@@ -1524,67 +1524,12 @@ PP(pp_redo)
     return redo_op;
 }
 
-STATIC OP *
-S_dofindlabel(pTHX_ OP *o, const char *label, OP **opstack, OP **oplimit)
-{
-    dVAR;
-    OP **ops = opstack;
-    static const char too_deep[] = "Target of goto is too deeply nested";
-
-    PERL_ARGS_ASSERT_DOFINDLABEL;
-
-    if (ops >= oplimit)
-	Perl_croak(aTHX_ too_deep);
-    if (o->op_type == OP_LEAVE ||
-	o->op_type == OP_SCOPE ||
-	o->op_type == OP_LEAVELOOP ||
-	o->op_type == OP_LEAVESUB ||
-	o->op_type == OP_LEAVETRY)
-    {
-	*ops++ = cUNOPo->op_first;
-	if (ops >= oplimit)
-	    Perl_croak(aTHX_ too_deep);
-    }
-    *ops = 0;
-    if (o->op_flags & OPf_KIDS) {
-	OP *kid;
-	/* First try all the kids at this level, since that's likeliest. */
-	for (kid = cUNOPo->op_first; kid; kid = kid->op_sibling) {
-	    if ((kid->op_type == OP_NEXTSTATE || kid->op_type == OP_DBSTATE) &&
-		    kCOP->cop_label && strEQ(kCOP->cop_label, label))
-		return kid;
-	}
-	for (kid = cUNOPo->op_first; kid; kid = kid->op_sibling) {
-	    if (kid == PL_lastgotoprobe)
-		continue;
-	    if (kid->op_type == OP_NEXTSTATE || kid->op_type == OP_DBSTATE) {
-	        if (ops == opstack)
-		    *ops++ = kid;
-		else if (ops[-1]->op_type == OP_NEXTSTATE ||
-		         ops[-1]->op_type == OP_DBSTATE)
-		    ops[-1] = kid;
-		else
-		    *ops++ = kid;
-	    }
-	    if ((o = dofindlabel(kid, label, ops, oplimit)))
-		return o;
-	}
-    }
-    *ops = 0;
-    return 0;
-}
-
 PP(pp_goto)
 {
     dVAR; dSP;
     OP *retop = NULL;
-    I32 ix;
-    register PERL_CONTEXT *cx;
-#define GOTO_DEPTH 64
-    OP *enterops[GOTO_DEPTH];
-    const char *label = NULL;
     const bool do_dump = (PL_op->op_type == OP_DUMP);
-    static const char must_have_label[] = "goto must have label";
+    static const char must_have_sub[] = "goto must have sub";
 
     if (PL_op->op_flags & OPf_STACKED) {
 	SV * const sv = POPs;
@@ -1702,121 +1647,14 @@ PP(pp_goto)
 	    }
 	}
 	else {
-	    label = SvPV_nolen_const(sv);
-	    if (!(do_dump || *label))
-		DIE(aTHX_ must_have_label);
+	    DIE(aTHX_ must_have_sub);
 	}
     }
     else if (PL_op->op_flags & OPf_SPECIAL) {
-	if (! do_dump)
-	    DIE(aTHX_ must_have_label);
+	DIE(aTHX_ must_have_sub);
     }
     else
-	label = cPVOP->op_pv;
-
-    if (label && *label) {
-	OP *gotoprobe = NULL;
-	bool leaving_eval = FALSE;
-	bool in_block = FALSE;
-	PERL_CONTEXT *last_eval_cx = NULL;
-
-	/* find label */
-
-	PL_lastgotoprobe = NULL;
-	*enterops = 0;
-	for (ix = cxstack_ix; ix >= 0; ix--) {
-	    cx = &cxstack[ix];
-	    switch (CxTYPE(cx)) {
-	    case CXt_EVAL:
-		leaving_eval = TRUE;
-                if (!CxTRYBLOCK(cx)) {
-		    gotoprobe = (last_eval_cx ?
-				last_eval_cx->blk_eval.old_eval_root :
-				PL_eval_root);
-		    last_eval_cx = cx;
-		    break;
-                }
-                /* else fall through */
-	    case CXt_LOOP_LAZYIV:
-	    case CXt_LOOP_LAZYSV:
-	    case CXt_LOOP_FOR:
-	    case CXt_LOOP_PLAIN:
-		gotoprobe = cx->blk_oldcop->op_sibling;
-		break;
-	    case CXt_SUBST:
-		continue;
-	    case CXt_BLOCK:
-		if (ix) {
-		    gotoprobe = cx->blk_oldcop->op_sibling;
-		    in_block = TRUE;
-		} else
-		    gotoprobe = PL_main_root;
-		break;
-	    case CXt_SUB:
-		if (CvDEPTH(cx->blk_sub.cv) && !CxMULTICALL(cx)) {
-		    gotoprobe = CvROOT(cx->blk_sub.cv);
-		    break;
-		}
-		/* FALL THROUGH */
-	    case CXt_NULL:
-		DIE(aTHX_ "Can't \"goto\" out of a pseudo block");
-	    default:
-		if (ix)
-		    DIE(aTHX_ "panic: goto");
-		gotoprobe = PL_main_root;
-		break;
-	    }
-	    if (gotoprobe) {
-		retop = dofindlabel(gotoprobe, label,
-				    enterops, enterops + GOTO_DEPTH);
-		if (retop)
-		    break;
-	    }
-	    PL_lastgotoprobe = gotoprobe;
-	}
-	if (!retop)
-	    DIE(aTHX_ "Can't find label %s", label);
-
-	/* if we're leaving an eval, check before we pop any frames
-           that we're not going to punt, otherwise the error
-	   won't be caught */
-
-	if (leaving_eval && *enterops && enterops[1]) {
-	    I32 i;
-            for (i = 1; enterops[i]; i++)
-                if (enterops[i]->op_type == OP_ENTERITER)
-                    DIE(aTHX_ "Can't \"goto\" into the middle of a foreach loop");
-	}
-
-	/* pop unwanted frames */
-
-	if (ix < cxstack_ix) {
-	    I32 oldsave;
-
-	    if (ix < 0)
-		ix = 0;
-	    dounwind(ix);
-	    TOPBLOCK(cx);
-	    oldsave = PL_scopestack[PL_scopestack_ix];
-	    LEAVE_SCOPE(oldsave);
-	}
-
-	/* push wanted frames */
-
-	if (*enterops && enterops[1]) {
-	    OP * const oldop = PL_op;
-	    ix = enterops[1]->op_type == OP_ENTER && in_block ? 2 : 1;
-	    for (; enterops[ix]; ix++) {
-		PL_op = enterops[ix];
-		/* Eventually we may want to stack the needed arguments
-		 * for each op.  For now, we punt on the hard ones. */
-		if (PL_op->op_type == OP_ENTERITER)
-		    DIE(aTHX_ "Can't \"goto\" into the middle of a foreach loop");
-		CALL_FPTR(PL_op->op_ppaddr)(aTHX);
-	    }
-	    PL_op = oldop;
-	}
-    }
+	DIE(aTHX_ must_have_sub);
 
     if (do_dump) {
 #ifdef VMS
