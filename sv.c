@@ -2633,7 +2633,16 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV* sstr, const I32 flags)
 	    || stype == SVt_PVAV || stype == SVt_PVHV || stype == SVt_PVCV )
         && dtype != stype ) {
 	/* FIXME the assignment should be done before old values ore DESTROYed */
-	Perl_sv_clear_body(aTHX_ dstr);
+	if (SvOBJECT(dstr)) {
+	    HV* package = SvSTASH(dstr);
+	    Perl_sv_clear_body(aTHX_ dstr);
+	    sv_upgrade( dstr, SVt_PVMG);
+	    SvFLAGS(dstr) |= SVs_OBJECT;
+	    SvSTASH(dstr) = package;
+	}
+	else {
+	    Perl_sv_clear_body(aTHX_ dstr);
+	}
 	dtype = SvTYPE(dstr);
     }
 
@@ -4462,7 +4471,7 @@ Perl_sv_clear_body(pTHX_ SV *const sv)
 	my_safefree(SvANY(sv));
     }
 
-    SvFLAGS(sv) = SvOBJECT(sv) ? SVt_PVMG | SVs_OBJECT : SVt_NULL;
+    SvFLAGS(sv) = SVt_NULL;
 }
 
 void
