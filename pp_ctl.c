@@ -944,11 +944,19 @@ PP(pp_caller)
 	if (SvLOCATION(cv) && SvAVOK(SvLOCATION(cv)))
 	    name = av_fetch(SvAV(SvLOCATION(cv)), 3, FALSE);
 	mPUSHs( name ? newSVsv(*name) : &PL_sv_undef );
-	PUSHs(boolSV(CxHASARGS(cx)));
+
+	if (CxHASARGS(cx)) {
+	    AV * const padlist = CvPADLIST(cv);
+	    SV ** pad = av_fetch(padlist, cx->blk_sub.olddepth + 1, 0);
+	    SV ** args = av_fetch( SvAV(*pad), 0, 0);
+	    mPUSHs(newSVsv( *args ) );
+	}
+	else
+	    PUSHs(&PL_sv_undef);
     }
     else {
 	PUSHs(newSVpvs_flags("(eval)", SVs_TEMP));
-	mPUSHi(0);
+	PUSHs(&PL_sv_undef);
     }
     gimme = (I32)cx->blk_gimme;
     if (gimme == G_VOID)
