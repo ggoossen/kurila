@@ -231,6 +231,7 @@ XS(XS_Symbol_glob_name);
 XS(XS_dump_view);
 XS(XS_error_create);
 XS(XS_error_message);
+XS(XS_error_stacktrace);
 XS(XS_error_write_to_stderr);
 XS(XS_ref_address);
 XS(XS_ref_reftype);
@@ -298,6 +299,7 @@ Perl_boot_core_UNIVERSAL(pTHX)
     
     newXS("error::create", XS_error_create, file);
     newXS("error::message", XS_error_message, file);
+    newXS("error::stacktrace", XS_error_stacktrace, file);
     newXS("error::write_to_stderr", XS_error_write_to_stderr, file);
 
     newXS("ref::address", XS_ref_address, file);
@@ -878,6 +880,34 @@ XS(XS_error_message)
 	    if (sv) {
 		sv_catsv(res, *sv);
 	    }
+	}
+
+	PUSHs(res);
+	XSRETURN(1);
+    }
+}
+
+XS(XS_error_stacktrace)
+{
+    dVAR;
+    dXSARGS;
+    PERL_UNUSED_ARG(cv);
+    if (items < 1)
+	Perl_croak(aTHX_ "Usage: error::stacktrace()");
+    SP -= items;
+    {
+	HV *err;
+	SV *res = sv_newmortal();
+	sv_setpvn(res, "", 0);
+	
+	if (sv_isobject(ST(0))) {
+	    err = (HV*)SvRV(ST(0));
+	}
+	else
+	    Perl_croak(aTHX_ "not an error object");
+
+	{
+	    SV **sv;
 
 	    sv = hv_fetchs(err, "location", 0);
 	    if (sv) {
@@ -928,7 +958,6 @@ XS(XS_error_message)
 	XSRETURN(1);
     }
 }
-
 XS(XS_error_write_to_stderr) {
     dXSARGS;
     STRLEN msglen;
@@ -944,6 +973,20 @@ XS(XS_error_write_to_stderr) {
     PUTBACK;
 
     call_method("message", G_SCALAR);
+    SPAGAIN;
+    tmpsv = POPs;
+    message = SvPV_const(tmpsv, msglen);
+
+    LEAVE;
+
+    write_to_stderr(message, msglen);
+
+    ENTER;
+    PUSHMARK(SP);
+    PUSHs(ST(0));
+    PUTBACK;
+
+    call_method("stacktrace", G_SCALAR);
     SPAGAIN;
     tmpsv = POPs;
     message = SvPV_const(tmpsv, msglen);
