@@ -1491,7 +1491,7 @@ sub tempdir  {
       } elsif (%options{TMPDIR}) {
 
 	# Prepend tmpdir
-	$template = File::Spec->catdir( <File::Spec->tmpdir, $template);
+	$template = File::Spec->catdir(File::Spec->tmpdir, $template);
 
       }
 
