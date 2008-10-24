@@ -1508,7 +1508,7 @@ do {
         $warning = @_[0]->message;
     };
     my $out = pack("u99", "foo" x 99);
-    like($warning, qr/Field too wide in 'u' format in pack at /,
+    like($warning, qr/Field too wide in 'u' format in pack/,
          "Warn about too wide uuencode");
     is($out, ("_" . "9F]O" x 21 . "\n") x 4 . "M" . "9F]O" x 15 . "\n",
        "Use max width in case of too wide uuencode");

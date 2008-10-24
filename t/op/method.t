@@ -125,7 +125,7 @@ do {
 is(do { eval 'my $e = bless \%(), "E::A"; E::A->foo()';
 	  $@->message =~ m/^\QCan't locate object method "foo" via package "E::A"/ ? 1 : $@->message}, 1);
 is(do { eval 'my $e = bless \%(), "E::B"; $e->foo()';  
-	  $@->message =~ m/^\QCan't locate object method "foo" via package "E::B" at/ ? 1 : $@}, 1);
+	  $@->message =~ m/^\QCan't locate object method "foo" via package "E::B"/ ? 1 : $@}, 1);
 is(do { eval 'E::C->foo()';
 	  $@->message =~ m/^\QCan't locate object method "foo" via package "E::C" (perhaps / ? 1 : $@}, 1);
 
@@ -136,9 +136,9 @@ is(do { eval 'my $e = bless \%(), "UNIVERSAL"; $e->E::E::foo()';
 
 my $e = bless \%(), "E::F";  # force package to exist
 is(do { eval 'UNIVERSAL->E::F::foo()';
-	  $@->message =~ m/^\QCan't locate object method "foo" via package "E::F" at/ ? 1 : $@}, 1);
+	  $@->message =~ m/^\QCan't locate object method "foo" via package "E::F"/ ? 1 : $@}, 1);
 is(do { eval '$e = bless \%(), "UNIVERSAL"; $e->E::F::foo()';
-	  $@->message =~ m/^\QCan't locate object method "foo" via package "E::F" at/ ? 1 : $@}, 1);
+	  $@->message =~ m/^\QCan't locate object method "foo" via package "E::F"/ ? 1 : $@}, 1);
 
 # TODO: we need some tests for the SUPER:: pseudoclass
 
