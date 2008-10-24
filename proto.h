@@ -124,6 +124,11 @@ END_EXTERN_C
 
 /* functions with flag 'n' should come before here */
 START_EXTERN_C
+PERL_INLINE_CALLCONV const char*	Perl_SvPVX_const(pTHX_ SV *sv)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_SVPVX_CONST	\
+	assert(sv)
+
 #  include "pp_proto.h"
 PERL_CALLCONV bool	Perl_Gv_AMupdate(pTHX_ HV* stash)
 			__attribute__nonnull__(pTHX_1);

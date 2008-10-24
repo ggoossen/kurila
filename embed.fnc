@@ -10,6 +10,7 @@
 :	A		member of public API
 :	m		Implemented as a macro - no export, no
 :			proto, no #define
+:       i               function is inline
 :	d		function has documentation with its source
 :	s		static function, should have an S_ prefix in
 :			source file; for macros (m), suffix the usage
@@ -97,6 +98,7 @@ END_EXTERN_C
 
 /* functions with flag 'n' should come before here */
 START_EXTERN_C
+Aip	|const char*	|SvPVX_const	|NN SV *sv
 #  include "pp_proto.h"
 Ap	|bool	|Gv_AMupdate	|NN HV* stash
 p	|OP*	|append_elem	|I32 optype|NULLOK OP* first|NULLOK OP* last

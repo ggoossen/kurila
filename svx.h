@@ -191,3 +191,7 @@ static __inline__ SV* inline_loc_name(pTHX_ SV *loc) {
 static __inline__ SV* inline_SvNAME(pTHX_ SV *sv) {
     return loc_name(SvLOCATION(sv));
 }
+
+const char* Perl_SvPVX_const(pTHX_ SV *sv) {
+    return (sv)->sv_u.svu_pv;
+}

@@ -31,6 +31,7 @@ Perl_realloc
 Perl_mfree
 Perl_get_context
 Perl_set_context
+Perl_SvPVX_const
 Perl_Gv_AMupdate
 Perl_av_clear
 Perl_av_delete
