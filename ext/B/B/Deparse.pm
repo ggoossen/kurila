@@ -1226,7 +1226,7 @@ sub populate_curcvlex {
 		# Probably that pesky lexical @_
 		next;
 	    }
-            my $name = @ns[$i]->PVX;
+            my $name = @ns[$i]->PVX_const;
 	    my ($seq_st, $seq_en) =
 		(@ns[$i]->FLAGS ^&^ SVf_FAKE)
 		    ? (0, 999999)
@@ -2711,7 +2711,7 @@ sub pp_null {
 sub padname {
     my $self = shift;
     my $targ = shift;
-    return $self->padname_sv($targ)->PVX;
+    return $self->padname_sv($targ)->PVX_const;
 }
 
 sub padany {

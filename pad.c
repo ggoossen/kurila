@@ -625,7 +625,7 @@ Perl_pad_findmy(pTHX_ const char *name)
     nameav = (AV*)AvARRAY(CvPADLIST(PL_compcv))[0];
     name_svp = AvARRAY(nameav);
     for (offset = AvFILLp(nameav); offset >= 0; offset--) {
-        const SV * const namesv = name_svp[offset];
+        SV * const namesv = name_svp[offset];
 	if (namesv && namesv != &PL_sv_undef
 	    && !SvFAKE(namesv)
 	    && (SvPAD_OUR(namesv))

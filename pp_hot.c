@@ -1982,7 +1982,7 @@ PP(pp_subst)
 	{
 	    SvPV_free(TARG);
 	}
-	SvPV_set(TARG, SvPVX(dstr));
+	SvPV_set(TARG, SvPVX_mutable(dstr));
 	SvCUR_set(TARG, SvCUR(dstr));
 	SvLEN_set(TARG, SvLEN(dstr));
 	SvPV_set(dstr, NULL);

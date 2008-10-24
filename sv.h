@@ -930,6 +930,8 @@ in gv.h: */
 #endif
 #define SvRVx(sv) SvRV(sv)
 
+#define I_SvPVX(sv) (sv)->sv_u.svu_pv
+
 #ifdef PERL_DEBUG_COW
 /* Need -0.0 for SvNVX to preserve IEEE FP "negative zero" because
    +0.0 + -0.0 => +0.0 but -0.0 + -0.0 => -0.0 */
@@ -938,11 +940,6 @@ in gv.h: */
 #  define SvNVX(sv) (-0.0 + ((XPVNV*) SvANY(sv))->xnv_u.xnv_nv)
 #  define SvRV(sv) (0 + (sv)->sv_u.svu_rv)
 /* Don't test the core XS code yet.  */
-#  if defined (PERL_CORE) && PERL_DEBUG_COW > 1
-#    define SvPVX(sv) (0 + (assert(!SvREADONLY(sv)), (sv)->sv_u.svu_pv))
-#  else
-#  define SvPVX(sv) SvPVX_mutable(sv)
-#  endif
 #  define SvCUR(sv) (0 + ((XPV*) SvANY(sv))->xpv_cur)
 #  define SvLEN(sv) (0 + ((XPV*) SvANY(sv))->xpv_len)
 #  define SvEND(sv) ((sv)->sv_u.svu_pv + ((XPV*)SvANY(sv))->xpv_cur)
@@ -960,14 +957,6 @@ in gv.h: */
 
 #  if defined (DEBUGGING) && defined(__GNUC__) && !defined(PERL_GCC_BRACE_GROUPS_FORBIDDEN)
 /* These get expanded inside other macros that already use a variable _sv  */
-#    define SvPVX(sv)							\
-	(*({ SV *const _svi = (SV *) (sv);				\
-	    assert(SvTYPE(_svi) >= SVt_PV);				\
-	    assert(SvTYPE(_svi) != SVt_PVAV);				\
-	    assert(SvTYPE(_svi) != SVt_PVHV);				\
-	    assert(!isGV_with_GP(_svi));				\
-	    &((_svi)->sv_u.svu_pv);					\
-	 }))
 #    define SvCUR(sv)							\
 	(*({ SV *const _svi = (SV *) (sv);				\
 	    assert(SvTYPE(_svi) >= SVt_PV);				\
@@ -1026,7 +1015,6 @@ in gv.h: */
 	    &(((XPVMG*) SvANY(_svi))->xmg_stash);			\
 	  }))
 #  else
-#    define SvPVX(sv) ((sv)->sv_u.svu_pv)
 #    define SvCUR(sv) ((XPV*) SvANY(sv))->xpv_cur
 #    define SvIVX(sv) ((XPVIV*) SvANY(sv))->xiv_iv
 #    define SvUVX(sv) ((XPVUV*) SvANY(sv))->xuv_uv
@@ -1037,20 +1025,9 @@ in gv.h: */
 #  endif
 #endif
 
-#ifndef PERL_POISON
-/* Given that these two are new, there can't be any existing code using them
- *  as LVALUEs  */
-#  define SvPVX_mutable(sv)	(0 + (sv)->sv_u.svu_pv)
-#else
-/* Except for the poison code, which uses & to scribble over the pointer after
-   free() is called.  */
-#  define SvPVX_mutable(sv)	((sv)->sv_u.svu_pv)
-#endif
-
 #define SvIVXx(sv) SvIVX(sv)
 #define SvUVXx(sv) SvUVX(sv)
 #define SvNVXx(sv) SvNVX(sv)
-#define SvPVXx(sv) SvPVX(sv)
 #define SvLENx(sv) SvLEN(sv)
 #define SvENDx(sv) ((PL_Sv = (sv)), SvEND(PL_Sv))
 
@@ -1134,7 +1111,7 @@ in gv.h: */
 			     SvPV_set(sv, SvPVX_mutable(sv) - zok);	\
 			     SvFLAGS(sv) &= ~SVf_OOK;			\
 			 }						\
-			 Safefree(SvPVX(sv));				\
+			 Safefree(SvPVX_mutable(sv));				\
 		     }							\
 		 } STMT_END
 
@@ -1355,7 +1332,7 @@ Like C<sv_catsv> but doesn't process magic.
 
 #define SvPV_flags(sv, lp, flags) \
     ((SvFLAGS(sv) & (SVf_POK)) == SVf_POK \
-     ? ((lp = SvCUR(sv)), SvPVX(sv)) : sv_2pv_flags(sv, &lp, flags))
+     ? ((lp = SvCUR(sv)), SvPVX_mutable(sv)) : sv_2pv_flags(sv, &lp, flags))
 #define SvPV_flags_const(sv, lp, flags) \
     ((SvFLAGS(sv) & (SVf_POK)) == SVf_POK \
      ? ((lp = SvCUR(sv)), SvPVX_const(sv)) : \
@@ -1378,10 +1355,10 @@ Like C<sv_catsv> but doesn't process magic.
 
 #define SvPV_force_flags(sv, lp, flags) \
     ((SvFLAGS(sv) & (SVf_POK|SVf_THINKFIRST)) == SVf_POK \
-    ? ((lp = SvCUR(sv)), SvPVX(sv)) : sv_pvn_force_flags(sv, &lp, flags))
+    ? ((lp = SvCUR(sv)), SvPVX_mutable(sv)) : sv_pvn_force_flags(sv, &lp, flags))
 #define SvPV_force_flags_nolen(sv, flags) \
     ((SvFLAGS(sv) & (SVf_POK|SVf_THINKFIRST)) == SVf_POK \
-    ? SvPVX(sv) : sv_pvn_force_flags(sv, 0, flags))
+    ? SvPVX_mutable(sv) : sv_pvn_force_flags(sv, 0, flags))
 #define SvPV_force_flags_mutable(sv, lp, flags) \
     ((SvFLAGS(sv) & (SVf_POK|SVf_THINKFIRST)) == SVf_POK \
     ? ((lp = SvCUR(sv)), SvPVX_mutable(sv)) \
@@ -1389,7 +1366,7 @@ Like C<sv_catsv> but doesn't process magic.
 
 #define SvPV_nolen(sv) \
     ((SvFLAGS(sv) & (SVf_POK)) == SVf_POK \
-     ? SvPVX(sv) : sv_2pv_flags(sv, 0, SV_GMAGIC))
+     ? SvPVX_mutable(sv) : sv_2pv_flags(sv, 0, SV_GMAGIC))
 
 #define SvPV_nolen_const(sv) \
     ((SvFLAGS(sv) & (SVf_POK)) == SVf_POK \
@@ -1606,7 +1583,7 @@ Returns a pointer to the character buffer.
     } STMT_END
 
 
-#define SvGROW(sv,len) (SvLEN(sv) < (len) ? sv_grow(sv,len) : SvPVX(sv))
+#define SvGROW(sv,len) (SvLEN(sv) < (len) ? sv_grow(sv,len) : SvPVX_mutable(sv))
 #define SvGROW_mutable(sv,len) \
     (SvLEN(sv) < (len) ? sv_grow(sv,len) : SvPVX_mutable(sv))
 #define Sv_Grow sv_grow

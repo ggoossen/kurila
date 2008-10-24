@@ -231,7 +231,7 @@ PP(pp_substcont)
 	    {
 		SvPV_free(targ);
 	    }
-	    SvPV_set(targ, SvPVX(dstr));
+	    SvPV_set(targ, SvPVX_mutable(dstr));
 	    SvCUR_set(targ, SvCUR(dstr));
 	    SvLEN_set(targ, SvLEN(dstr));
 	    SvPV_set(dstr, NULL);
@@ -2077,7 +2077,7 @@ S_doopen_pm(pTHX_ const char *name, const STRLEN namelen)
 
     if (namelen > 3 && memEQs(name + namelen - 3, 3, ".pm")) {
 	SV *const pmcsv = newSV(namelen + 2);
-	char *const pmc = SvPVX(pmcsv);
+	char *const pmc = SvPVX_mutable(pmcsv);
 	Stat_t pmcstat;
 
 	memcpy(pmc, name, namelen);

@@ -2348,7 +2348,7 @@ S_reg_check_named_buff_matched(pTHX_ const regexp *rex, const regnode *scan)
     I32 n;
     RXi_GET_DECL(rex,rexi);
     SV *sv_dat=(SV*)rexi->data->data[ ARG( scan ) ];
-    I32 *nums=(I32*)SvPVX(sv_dat);
+    I32 *nums=(I32*)SvPVX_mutable(sv_dat);
 
     PERL_ARGS_ASSERT_REG_CHECK_NAMED_BUFF_MATCHED;
 

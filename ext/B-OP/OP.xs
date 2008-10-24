@@ -1074,7 +1074,7 @@ SVOP_new(class, type, flags, sv, location)
         typenum = op_name_to_num(type); /* XXX More classes here! */
         if (typenum == OP_GVSV) {
             if (*(SvPV_nolen(sv)) == '$') 
-                param = (SV*)gv_fetchpv(SvPVX(sv)+1, TRUE, SVt_PV);
+                param = (SV*)gv_fetchpv(SvPVX_const(sv)+1, TRUE, SVt_PV);
             else
             Perl_croak(aTHX_ 
             "First character to GVSV was not dollar");
@@ -1196,7 +1196,7 @@ SvPV(sv,...)
   } 
   ST(0) = sv_newmortal();
   if( SvPOK(sv) ) { 
-    sv_setpvn(ST(0), SvPVX(sv), SvCUR(sv));
+    sv_setpvn(ST(0), SvPVX_const(sv), SvCUR(sv));
   }
   else {
     /* XXX for backward compatibility, but should fail */
@@ -1241,7 +1241,7 @@ OP_ppaddr(o)
 	sv_setpvn(sv, "PL_ppaddr[OP_", 13);
 	sv_catpv(sv, PL_op_name[o->op_type]);
 	for (i=13; (STRLEN)i < SvCUR(sv); ++i)
-	    SvPVX(sv)[i] = toUPPER(SvPVX(sv)[i]);
+	    SvPVX_mutable(sv)[i] = toUPPER(SvPVX_const(sv)[i]);
 	sv_catpv(sv, "]");
 	ST(0) = sv;
 

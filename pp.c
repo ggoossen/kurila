@@ -1408,7 +1408,7 @@ PP(pp_repeat)
 		     Perl_croak(aTHX_ oom_string_extend);
 	        MEM_WRAP_CHECK_1(max, char, oom_string_extend);
 		SvGROW(TARG, max + 1);
-		repeatcpy(SvPVX(TARG) + len, SvPVX(TARG), len, count - 1);
+		repeatcpy(SvPVX_const(TARG) + len, SvPVX_mutable(TARG), len, count - 1);
 		SvCUR_set(TARG, SvCUR(TARG) * count);
 	    }
 	    *SvEND(TARG) = '\0';
@@ -2851,7 +2851,7 @@ PP(pp_index)
 	   will trigger magic and overloading again, as will fbm_instr()
 	*/
 	big = newSVpvn_flags(big_p, biglen, SVs_TEMP);
-	big_p = SvPVX(big);
+	big_p = SvPVX_mutable(big);
     }
     if (SvGMAGICAL(little) || (is_index && !SvOK(little))) {
 	/* index && SvOK() is a hack. fbm_instr() calls SvPV_const, which will
@@ -2863,7 +2863,7 @@ PP(pp_index)
 	   because data access has side effects.
 	*/
 	little = newSVpvn_flags(little_p, llen, SVs_TEMP);
-	little_p = SvPVX(little);
+	little_p = SvPVX_mutable(little);
     }
 
     if (MAXARG < 3)
@@ -2945,7 +2945,7 @@ PP(pp_chr)
 
     if (IN_CODEPOINTS) {
 	SvGROW(TARG, (STRLEN)UNISKIP(value)+1);
-	tmps = uvchr_to_utf8_flags(SvPVX(TARG), value, 0);
+	tmps = uvchr_to_utf8_flags(SvPVX_const(TARG), value, 0);
 	SvCUR_set(TARG, tmps - SvPVX_const(TARG));
 	*tmps = '\0';
 	(void)SvPOK_only(TARG);
@@ -2959,7 +2959,7 @@ PP(pp_chr)
 
     SvGROW(TARG,2);
     SvCUR_set(TARG, 1);
-    tmps = SvPVX(TARG);
+    tmps = SvPVX_mutable(TARG);
     *tmps++ = (char)value;
     *tmps = '\0';
     (void)SvPOK_only(TARG);
@@ -3172,7 +3172,7 @@ PP(pp_uc)
 		 * million times.  Or we could try guessing how much to
 		 allocate without allocating too much.  Such is life. */
 		SvGROW(dest, min);
-		d = SvPVX(dest) + o;
+		d = SvPVX_mutable(dest) + o;
 	    }
 	    Copy(tmpbuf, d, ulen, char);
 	    d += ulen;
@@ -3274,7 +3274,7 @@ PP(pp_lc)
 		 * million times.  Or we could try guessing how much to
 		 allocate without allocating too much.  Such is life. */
 		SvGROW(dest, min);
-		d = SvPVX(dest) + o;
+		d = SvPVX_mutable(dest) + o;
 	    }
 	    Copy(tmpbuf, d, ulen, char);
 	    d += ulen;
@@ -3308,7 +3308,7 @@ PP(pp_quotemeta)
 	register char *d;
 	SvUPGRADE(TARG, SVt_PV);
 	SvGROW(TARG, (len * 2) + 1);
-	d = SvPVX(TARG);
+	d = SvPVX_mutable(TARG);
 	if (IN_CODEPOINTS) {
 	    while (len) {
 		if (UTF8_IS_CONTINUED(*s)) {

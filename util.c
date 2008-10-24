@@ -1127,7 +1127,7 @@ Perl_vform(pTHX_ const char *pat, va_list *args)
     SV * const sv = mess_alloc();
     PERL_ARGS_ASSERT_VFORM;
     sv_vsetpvfn(sv, pat, strlen(pat), args, NULL, 0, NULL);
-    return SvPVX(sv);
+    return SvPVX_mutable(sv);
 }
 
 #if defined(PERL_IMPLICIT_CONTEXT)
@@ -4120,12 +4120,12 @@ Perl_getcwd_sv(pTHX_ register SV *sv)
 
 	if (pathlen) {
 	    /* shift down */
-	    Move(SvPVX_const(sv), SvPVX(sv) + namelen + 1, pathlen, char);
+	    Move(SvPVX_const(sv), SvPVX_mutable(sv) + namelen + 1, pathlen, char);
 	}
 
 	/* prepend current directory to the front */
-	*SvPVX(sv) = '/';
-	Move(dp->d_name, SvPVX(sv)+1, namelen, char);
+	*SvPVX_mutable(sv) = '/';
+	Move(dp->d_name, SvPVX_mutable(sv)+1, namelen, char);
 	pathlen += (namelen + 1);
 
 #ifdef VOID_CLOSEDIR
@@ -5732,7 +5732,7 @@ Perl_my_cxt_init(pTHX_ int *index, size_t size)
 	}
     }
     /* newSV() allocates one more than needed */
-    p = (void*)SvPVX(newSV(size-1));
+    p = (void*)SvPVX_mutable(newSV(size-1));
     PL_my_cxt_list[*index] = p;
     Zero(p, size, char);
     return p;
@@ -5798,7 +5798,7 @@ Perl_my_cxt_init(pTHX_ const char *my_cxt_key, size_t size)
     }
     PL_my_cxt_keys[index] = my_cxt_key;
     /* newSV() allocates one more than needed */
-    p = (void*)SvPVX(newSV(size-1));
+    p = (void*)SvPVX-mutable(newSV(size-1));
     PL_my_cxt_list[index] = p;
     Zero(p, size, char);
     return p;

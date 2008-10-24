@@ -1695,11 +1695,11 @@ strxfrm(src)
           char *p = SvPV(src,srclen);
           srclen++;
           ST(0) = sv_2mortal(newSV(srclen*4+1));
-          dstlen = strxfrm(SvPVX(ST(0)), p, (size_t)srclen);
+          dstlen = strxfrm(SvPVX_mutable(ST(0)), p, (size_t)srclen);
           if (dstlen > srclen) {
               dstlen++;
               SvGROW(ST(0), dstlen);
-              strxfrm(SvPVX(ST(0)), p, (size_t)dstlen);
+              strxfrm(SvPVX_mutable(ST(0)), p, (size_t)dstlen);
               dstlen--;
           }
           SvCUR_set(ST(0), dstlen);

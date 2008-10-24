@@ -4174,7 +4174,7 @@ Perl_cv_ckproto_len(pTHX_ const CV *cv, const GV *gv, const char *p,
        relying on SvCUR, and doubling up the buffer to hold CvFILE().  */
     if (((!p != !SvPOK(cv)) /* One has prototype, one has not.  */
 	 || (p && (len != SvCUR(cv) /* Not the same length.  */
-		   || memNE(p, SvPVX_const(cv), len))))
+		 || memNE(p, SvPVX_const((SV*)cv), len))))
 	 && ckWARN_d(WARN_PROTOTYPE)) {
 	SV* const msg = sv_newmortal();
 	SV* name = NULL;
@@ -6007,7 +6007,7 @@ Perl_ck_require(pTHX_ OP *o)
 		}
 	    }   
 
-	    s = SvPVX(sv);
+	    s = SvPVX_mutable(sv);
 	    len = SvCUR(sv);
 	    end = s + len;
 	    for (; s < end; s++) {

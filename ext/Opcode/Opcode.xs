@@ -341,7 +341,7 @@ CODE:
     STRLEN len = opset_len;
 
     opset = sv_2mortal(new_opset(aTHX_ opset));	/* verify and clone opset */
-    bitmap = SvPVX(opset);
+    bitmap = SvPVX_mutable(opset);
     while(len-- > 0)
 	bitmap[len] = ~bitmap[len];
     /* take care of extra bits beyond PL_maxo in last byte	*/
@@ -386,7 +386,7 @@ CODE:
     STRLEN len, on;
 
     SV * const opset = sv_2mortal(new_opset(aTHX_ Nullsv));
-    char * const bitmap = SvPVX(opset);
+    char * const bitmap = SvPVX_mutable(opset);
     for (i = 0; i < items; i++) {
 	const char *opname;
 	on = 1;
@@ -428,7 +428,7 @@ CODE:
 	sv_setsv(mask, sv_2mortal(new_opset(aTHX_ PERMITING ? opset_all : Nullsv)));
     else
 	verify_opset(aTHX_ mask,1); /* croaks */
-    bitmap = SvPVX(mask);
+    bitmap = SvPVX_mutable(mask);
     for (i = 1; i < items; i++) {
 	const char *opname;
 	int on = PERMITING ? 0 : 1;		/* deny = mask bit on	*/
@@ -519,7 +519,7 @@ opmask()
 CODE:
     ST(0) = sv_2mortal(new_opset(aTHX_ Nullsv));
     if (PL_op_mask) {
-	char * const bitmap = SvPVX(ST(0));
+	char * const bitmap = SvPVX_mutable(ST(0));
 	int myopcode;
 	for(myopcode=0; myopcode < PL_maxo; ++myopcode) {
 	    if (PL_op_mask[myopcode])

@@ -46,7 +46,7 @@ multicall_pad_push(pTHX_ AV *padlist, int depth)
 
 	for ( ;ix > 0; ix--) {
 	    if (names_fill >= ix && names[ix] != &PL_sv_undef) {
-		const char sigil = SvPVX(names[ix])[0];
+		const char sigil = SvPVX_const(names[ix])[0];
 		if ((SvFLAGS(names[ix]) & SVf_FAKE) || sigil == '&') {
 		    /* outer lexical or anon code */
 		    av_store(newpad, ix, SvREFCNT_inc(oldpad[ix]));

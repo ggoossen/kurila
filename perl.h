@@ -4588,7 +4588,7 @@ struct perl_debug_pad {
 };
 
 #define PERL_DEBUG_PAD(i)	&(PL_debug_pad.pad[i])
-#define PERL_DEBUG_PAD_ZERO(i)	(SvPVX(PERL_DEBUG_PAD(i))[0] = 0, \
+#define PERL_DEBUG_PAD_ZERO(i)	(SvPVX_mutable(PERL_DEBUG_PAD(i))[0] = 0, \
 	(((XPV*) SvANY(PERL_DEBUG_PAD(i)))->xpv_cur = 0), \
 	PERL_DEBUG_PAD(i))
 
@@ -5363,7 +5363,7 @@ typedef struct am_table_short AMTS;
 
 /* Clones the per-interpreter data. */
 #define MY_CXT_CLONE \
-	my_cxt_t *my_cxtp = (my_cxt_t*)SvPVX(newSV(sizeof(my_cxt_t)-1));\
+	my_cxt_t *my_cxtp = (my_cxt_t*)SvPVX_mutable(newSV(sizeof(my_cxt_t)-1));\
 	Copy(PL_my_cxt_list[MY_CXT_INDEX], my_cxtp, 1, my_cxt_t);\
 	PL_my_cxt_list[MY_CXT_INDEX] = my_cxtp				\
 
@@ -5393,7 +5393,7 @@ typedef struct am_table_short AMTS;
 
 /* Clones the per-interpreter data. */
 #define MY_CXT_CLONE \
-	my_cxt_t *my_cxtp = (my_cxt_t*)SvPVX(newSV(sizeof(my_cxt_t)-1));\
+	my_cxt_t *my_cxtp = (my_cxt_t*)SvPVX_mutable(newSV(sizeof(my_cxt_t)-1));\
 	Copy(PL_my_cxt_list[my_cxt_index], my_cxtp, 1, my_cxt_t);\
 	PL_my_cxt_list[my_cxt_index] = my_cxtp				\
 
