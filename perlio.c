@@ -5162,7 +5162,7 @@ PerlIO_tmpfile(void)
      /*
       * I have no idea how portable mkstemp() is ... NI-S
       */
-     const int fd = mkstemp(SvPVX(sv));
+     const int fd = mkstemp(SvPVX_const(sv));
      if (fd >= 0) {
 	  f = PerlIO_fdopen(fd, "w+");
 	  if (f)

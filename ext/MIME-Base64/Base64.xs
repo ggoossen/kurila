@@ -132,7 +132,7 @@ encode_base64(sv,...)
 	RETVAL = newSV(rlen ? rlen : 1);
 	SvPOK_on(RETVAL);	
 	SvCUR_set(RETVAL, rlen);
-	r = SvPVX(RETVAL);
+	r = SvPVX_mutable(RETVAL);
 
 	/* encode */
 	for (chunk=0; len > 0; len -= 3, chunk++) {
@@ -190,7 +190,7 @@ decode_base64(sv)
 	    RETVAL = newSV(rlen ? rlen : 1);
 	}
         SvPOK_on(RETVAL);
-        r = SvPVX(RETVAL);
+        r = SvPVX_mutable(RETVAL);
 
 	while (str < end) {
 	    int i = 0;
@@ -229,7 +229,7 @@ decode_base64(sv)
 	}
 
       thats_it:
-	SvCUR_set(RETVAL, r - SvPVX(RETVAL));
+	SvCUR_set(RETVAL, r - SvPVX_mutable(RETVAL));
 	*r = '\0';
 
 	OUTPUT:
@@ -371,7 +371,7 @@ decode_qp(sv)
         CODE:
 	RETVAL = newSV(len ? len : 1);
         SvPOK_on(RETVAL);
-        r = SvPVX(RETVAL);
+        r = SvPVX_mutable(RETVAL);
 	while (str < end) {
 	    if (*str == ' ' || *str == '\t') {
 		if (!whitespace)
@@ -425,7 +425,7 @@ decode_qp(sv)
 	    }
         }
 	*r = '\0';
-	SvCUR_set(RETVAL, r - SvPVX(RETVAL));
+	SvCUR_set(RETVAL, r - SvPVX_mutable(RETVAL));
 
         OUTPUT:
 	RETVAL

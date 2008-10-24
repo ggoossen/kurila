@@ -33,13 +33,17 @@ our @G = sort(glob("op/*.t"));
 if (@G[0] =~ m#.*\](\w+\.t)#i) {
     # grep is to convert filespecs returned from glob under VMS to format
     # identical to that returned by readdir
-    @G = grep(s#.*\](\w+\.t).*#op/$1#i, @(glob( <"op/*.t")));
+    @G = grep(s#.*\](\w+\.t).*#op/$1#i, @(glob("op/*.t")));
 }
-while ((nelems @R) && nelems @G && @G[0] eq ($^O eq 'MacOS' ? ':op:' : 'op/').@R[0]) {
-	shift(@R);
-	shift(@G);
+while (@R && @G && @G[0] eq ($^O eq 'MacOS' ? ':op:' : 'op/').@R[0]) {
+    shift(@R);
+    shift(@G);
 }
-if ((nelems @R) == 0 && (nelems @G) == 0) { print "ok 3\n"; } else { print "not ok 3\n"; }
+if ((nelems @R) == 0 && (nelems @G) == 0) {
+    print "ok 3\n";
+} else {
+    print "not ok 3\n";
+}
 
 our ($fh, @fh, %fh);
 if (opendir($fh, "op")) { print "ok 4\n"; } else { print "not ok 4\n"; }

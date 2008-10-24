@@ -1687,7 +1687,7 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 			while (++s && *s) {
 			    if (isSPACE(*s)) {
 				if (!popt_copy) {
-				    popt_copy = SvPVX(sv_2mortal(newSVpv(popt,0)));
+				    popt_copy = SvPVX_mutable(sv_2mortal(newSVpv(popt,0)));
 				    s = popt_copy + (s - popt);
 				    d = popt_copy + (d - popt);
 				}
@@ -2716,7 +2716,7 @@ Perl_moreswitches(pTHX_ const char *s)
 	      }
 	      PL_rs = newSVpvs("");
 	      SvGROW(PL_rs, (STRLEN)(UNISKIP(rschar) + 1));
-	      tmps = SvPVX(PL_rs);
+	      tmps = SvPVX_mutable(PL_rs);
 	      uvchr_to_utf8(tmps, rschar);
 	      SvCUR_set(PL_rs, UNISKIP(rschar));
 	 }
@@ -2860,7 +2860,7 @@ Perl_moreswitches(pTHX_ const char *s)
 	    STRLEN numlen;
 	    PL_ors_sv = newSVpvs("\n");
 	    numlen = 3 + (*s == '0');
-	    *SvPVX(PL_ors_sv) = (char)grok_oct(s, &numlen, &flags, NULL);
+	    *SvPVX_mutable(PL_ors_sv) = (char)grok_oct(s, &numlen, &flags, NULL);
 	    s += numlen;
 	}
 	else {
@@ -3125,7 +3125,7 @@ Perl_my_unexec(pTHX)
     sv_catpvs(prog, "/perl");
     sv_catpvs(file, ".perldump");
 
-    unexec(SvPVX(file), SvPVX(prog), &etext, sbrk(0), 0);
+    unexec(SvPVX_mutable(file), SvPVX_mutable(prog), &etext, sbrk(0), 0);
     /* unexec prints msg to stderr in case of failure */
     PerlProc_exit(status);
 #else
@@ -4378,11 +4378,11 @@ S_init_perllib(pTHX)
 	    macperl = "";
 	
 	Perl_sv_setpvf(aTHX_ privdir, "%slib:", macperl);
-	if (PerlLIO_stat(SvPVX(privdir), &tmpstatbuf) >= 0 && S_ISDIR(tmpstatbuf.st_mode))
-	    incpush(SvPVX(privdir), TRUE, FALSE, TRUE, FALSE);
+	if (PerlLIO_stat(SvPVX_mutable(privdir), &tmpstatbuf) >= 0 && S_ISDIR(tmpstatbuf.st_mode))
+	    incpush(SvPVX_mutable(privdir), TRUE, FALSE, TRUE, FALSE);
 	Perl_sv_setpvf(aTHX_ privdir, "%ssite_perl:", macperl);
-	if (PerlLIO_stat(SvPVX(privdir), &tmpstatbuf) >= 0 && S_ISDIR(tmpstatbuf.st_mode))
-	    incpush(SvPVX(privdir), TRUE, FALSE, TRUE, FALSE);
+	if (PerlLIO_stat(SvPVX_mutable(privdir), &tmpstatbuf) >= 0 && S_ISDIR(tmpstatbuf.st_mode))
+	    incpush(SvPVX_mutable(privdir), TRUE, FALSE, TRUE, FALSE);
 	
    	SvREFCNT_dec(privdir);
     }
@@ -4524,12 +4524,12 @@ S_incpush(pTHX_ const char *dir, bool addsubdirs, bool addoldvers, bool usesep,
 	    p = NULL;	/* break out */
 	}
 #ifdef MACOS_TRADITIONAL
-	if (!strchr(SvPVX(libdir), ':')) {
+	if (!strchr(SvPVX_mutable(libdir), ':')) {
 	    char buf[256];
 
-	    sv_setpv(libdir, MacPerl_CanonDir(SvPVX(libdir), buf, 0));
+	    sv_setpv(libdir, MacPerl_CanonDir(SvPVX_mutable(libdir), buf, 0));
 	}
-	if (SvPVX(libdir)[SvCUR(libdir)-1] != ':')
+	if (SvPVX_mutable(libdir)[SvCUR(libdir)-1] != ':')
 	    sv_catpvs(libdir, ":");
 #endif
 
@@ -4553,7 +4553,7 @@ S_incpush(pTHX_ const char *dir, bool addsubdirs, bool addoldvers, bool usesep,
 	 * The intent is that /usr/local/bin/perl and .../../lib/perl5
 	 * generates /usr/local/lib/perl5
 	 */
-	    const char *libpath = SvPVX(libdir);
+	    const char *libpath = SvPVX_const(libdir);
 	    STRLEN libpath_len = SvCUR(libdir);
 	    if (libpath_len >= 4 && memEQ (libpath, ".../", 4)) {
 		/* Game on!  */
@@ -4568,7 +4568,7 @@ S_incpush(pTHX_ const char *dir, bool addsubdirs, bool addoldvers, bool usesep,
 		   SvPOK() won't be true.  */
 		assert(caret_X);
 		assert(SvPOKp(caret_X));
-		prefix_sv = newSVpvn(SvPVX(caret_X), SvCUR(caret_X));
+		prefix_sv = newSVpvn(SvPVX_const(caret_X), SvCUR(caret_X));
 		/* Firstly take off the leading .../
 		   If all else fail we'll do the paths relative to the current
 		   directory.  */
@@ -4577,14 +4577,14 @@ S_incpush(pTHX_ const char *dir, bool addsubdirs, bool addoldvers, bool usesep,
 		   mortal copies that the mg_get of tainting creates, and
 		   corruption that seems to come via the save stack.
 		   I guess that the save stack isn't correctly set up yet.  */
-		libpath = SvPVX(libdir);
+		libpath = SvPVX_const(libdir);
 		libpath_len = SvCUR(libdir);
 
 		/* This would work more efficiently with memrchr, but as it's
 		   only a GNU extension we'd need to probe for it and
 		   implement our own. Not hard, but maybe not worth it?  */
 
-		prefix = SvPVX(prefix_sv);
+		prefix = SvPVX_const(prefix_sv);
 		lastslash = strrchr(prefix, '/');
 
 		/* First time in with the *lastslash = '\0' we just wipe off

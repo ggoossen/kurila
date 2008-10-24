@@ -124,7 +124,7 @@ bitflip_key(pTHX_ IV action, SV *field) {
 
 	if (len) {
 	    SV *newkey = newSV(len);
-	    char *new_p = SvPVX(newkey);
+	    char *new_p = SvPVX_mutable(newkey);
 
             while (len--)
                 *new_p++ = *p++ ^ 32;
@@ -149,7 +149,7 @@ rot13_key(pTHX_ IV action, SV *field) {
 
 	if (len) {
 	    SV *newkey = newSV(len);
-	    char *new_p = SvPVX(newkey);
+	    char *new_p = SvPVX_mutable(newkey);
 
 	    /* There's a deliberate fencepost error here to loop len + 1 times
 	       to copy the trailing \0  */

@@ -73,7 +73,7 @@ S_isa_lookup(pTHX_ HV *stash, const char * const name, const HV* const name_stas
 			    SVfARG(basename_sv), hvname);
 	    continue;
 	}
-        if(name_stash == basestash || strEQ(name, SvPVX(basename_sv)))
+        if(name_stash == basestash || strEQ(name, SvPVX_const(basename_sv)))
 	    return TRUE;
     }
 
@@ -1890,7 +1890,7 @@ XS(XS_dump_view)
 	    STRLEN charlen;
 	    sv_grow(retsv, 3 + grow + 2*backslashes + single_quotes
 		    + 2*qq_escapables + normal);
-	    rstart = r = SvPVX(retsv);
+	    rstart = r = SvPVX_mutable(retsv);
 
 	    *r++ = '"';
 
@@ -1926,7 +1926,7 @@ XS(XS_dump_view)
 	} else {
 	    /* Single quotes.  */
 	    sv_grow(retsv, 3 + backslashes + single_quotes + qq_escapables + normal);
-	    rstart = r = SvPVX(retsv);
+	    rstart = r = SvPVX_mutable(retsv);
 	    *r++ = '\'';
 	    for (s = src; s < send; s ++) {
 		*r++ = *s;
@@ -1994,7 +1994,7 @@ XS(XS_dump_view)
 		    }
 
 		    sv_grow(retsv, len);
-		    buffer = SvPVX(retsv);
+		    buffer = SvPVX_mutable(retsv);
 		    buffer_end = retval = buffer + len;
 
 		    /* Working backwards  */

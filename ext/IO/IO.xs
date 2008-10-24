@@ -238,7 +238,7 @@ PPCODE:
 #ifdef HAS_POLL
     const int nfd = (items - 1) / 2;
     SV *tmpsv = NEWSV(999,nfd * sizeof(struct pollfd));
-    struct pollfd *fds = (struct pollfd *)SvPVX(tmpsv);
+    struct pollfd *fds = (struct pollfd *)SvPVX_mutable(tmpsv);
     int i,j,ret;
     for(i=1, j=0  ; j < nfd ; j++) {
 	fds[j].fd = SvIV(ST(i));

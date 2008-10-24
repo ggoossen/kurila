@@ -44,6 +44,7 @@
 #define get_context		Perl_get_context
 #define set_context		Perl_set_context
 #define SvPVX_const		Perl_SvPVX_const
+#define SvPVX_mutable		Perl_SvPVX_mutable
 #define Gv_AMupdate		Perl_Gv_AMupdate
 #ifdef PERL_CORE
 #define append_elem		Perl_append_elem
@@ -2239,6 +2240,7 @@
 #define get_context		Perl_get_context
 #define set_context		Perl_set_context
 #define SvPVX_const(a)		Perl_SvPVX_const(aTHX_ a)
+#define SvPVX_mutable(a)	Perl_SvPVX_mutable(aTHX_ a)
 #define Gv_AMupdate(a)		Perl_Gv_AMupdate(aTHX_ a)
 #ifdef PERL_CORE
 #define append_elem(a,b,c)	Perl_append_elem(aTHX_ a,b,c)

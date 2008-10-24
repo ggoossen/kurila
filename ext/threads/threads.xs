@@ -1543,7 +1543,7 @@ BOOT:
 #ifdef USE_ITHREADS
     SV *my_pool_sv = *hv_fetch(PL_modglobal, MY_POOL_KEY,
                                sizeof(MY_POOL_KEY)-1, TRUE);
-    my_pool_t *my_poolp = (my_pool_t*)SvPVX(newSV(sizeof(my_pool_t)-1));
+    my_pool_t *my_poolp = (my_pool_t*)SvPVX_mutable(newSV(sizeof(my_pool_t)-1));
 
     MY_CXT_INIT;
 

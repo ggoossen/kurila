@@ -87,7 +87,7 @@ is($$pv_ret, $pv, "Test object_2svref()");
 is($pv_ref->PV(), $pv, "Test PV()");
 try { is($pv_ref->RV(), $pv, "Test RV()"); };
 ok($@, "Test RV()");
-is($pv_ref->PVX(), $pv, "Test PVX()");
+is($pv_ref->PVX_const(), $pv, "Test PVX()");
 
 my $nv = 1.1;
 my $nv_ref = B::svref_2object(\$nv);

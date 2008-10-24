@@ -318,7 +318,7 @@ Perl_sv_pvn(pTHX_ SV *sv, STRLEN *lp)
 
     if (SvPOK(sv)) {
 	*lp = SvCUR(sv);
-	return SvPVX(sv);
+	return SvPVX_mutable(sv);
     }
     return sv_2pv(sv, lp);
 }
@@ -331,7 +331,7 @@ Perl_sv_pvn_nomg(pTHX_ register SV *sv, STRLEN *lp)
 
     if (SvPOK(sv)) {
 	*lp = SvCUR(sv);
-	return SvPVX(sv);
+	return SvPVX_mutable(sv);
     }
     return sv_2pv_flags(sv, lp, 0);
 }
@@ -346,7 +346,7 @@ Perl_sv_pv(pTHX_ SV *sv)
     PERL_ARGS_ASSERT_SV_PV;
 
     if (SvPOK(sv))
-        return SvPVX(sv);
+        return SvPVX_mutable(sv);
 
     return sv_2pv(sv, NULL);
 }

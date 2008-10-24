@@ -99,6 +99,7 @@ END_EXTERN_C
 /* functions with flag 'n' should come before here */
 START_EXTERN_C
 Aip	|const char*	|SvPVX_const	|NN SV *sv
+Aip	|char*	|SvPVX_mutable	|NN SV *sv
 #  include "pp_proto.h"
 Ap	|bool	|Gv_AMupdate	|NN HV* stash
 p	|OP*	|append_elem	|I32 optype|NULLOK OP* first|NULLOK OP* last

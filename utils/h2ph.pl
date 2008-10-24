@@ -90,26 +90,27 @@ while (defined (my $file = next_file())) {
         "no warnings 'redefine';\n\n";
 
     while (defined (local $_ = next_line($file))) {
-	if (s/^\s*\#\s*//) {
-            my $emit = sub {
-                $new = reindent($new);
-                $args = reindent($args);
-                if ($t ne '') {
-                    $new =~ s/(['\\])/\\$1/g;   #']);
-                    if ($opt_h) {
-                        print OUT $t,
-                          "eval \"\\n#line $eval_index $outfile\\n\" . 'sub $name $proto\{\n$t    $($args)eval q($new);\n$t\}' unless defined(\&$name);\n";
-                        $eval_index++;
-                    } else {
-                        print OUT $t,
-                          "eval 'sub $name $proto\{\n$t    $($args)eval q($new);\n$t\}' unless defined(\&$name);\n";
-                    }
+        my $proto;
+        my $emit = sub {
+            $new = reindent($new);
+            $args = reindent($args);
+            if ($t ne '') {
+                $new =~ s/(['\\])/\\$1/g;   #']);
+                if ($opt_h) {
+                    print OUT $t,
+                      "eval \"\\n#line $eval_index $outfile\\n\" . 'sub $name $proto\{\n$t    $($args)eval q($new);\n$t\}' unless defined(\&$name);\n";
+                    $eval_index++;
                 } else {
-                    print OUT "unless(defined(\&$name)) \{\n    sub $name $proto\{\n\t$($args)eval q($new);\n    \}\n\}\n";
+                    print OUT $t,
+                      "eval 'sub $name $proto\{\n$t    $($args)eval q($new);\n$t\}' unless defined(\&$name);\n";
                 }
-                %curargs = %( () );
-            };
+            } else {
+                print OUT "unless(defined(\&$name)) \{\n    sub $name $proto\{\n\t$($args)eval q($new);\n    \}\n\}\n";
+            }
+            %curargs = %( () );
+        };
 
+	if (s/^\s*\#\s*//) {
 	    if (s/^define\s+(\w+)//) {
 		$name = $1;
 		$new = '';
@@ -117,7 +118,7 @@ while (defined (my $file = next_file())) {
 		s/\(\w+\s*\(\*\)\s*\(\w*\)\)\s*(-?\d+)/$1/; # (int (*)(foo_t))0
 		if (s/^\(([\w,\s]*)\)//) {
 		    $args = $1;
-		    my $proto = '() ';
+		    $proto = '() ';
 		    if ($args ne '') {
 			$proto = '';
 			foreach my $arg (split(m/,\s*/,$args)) {
