@@ -177,7 +177,8 @@ sub write_protos {
 	    $func = "S_$plain_func";
 	}
 	else {
-	    $retval = "PERL_CALLCONV $splint_flags$retval";
+	    $retval = ($flags =~ m/i/ ? "PERL_INLINE_CALLCONV" : "PERL_CALLCONV" )
+              . " $splint_flags$retval";
 	    if ($flags =~ m/[bp]/) {
 		$func = "Perl_$plain_func";
 	    } else {

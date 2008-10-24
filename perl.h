@@ -4702,6 +4702,9 @@ struct tempsym; /* defined in pp_pack.c */
 #    define PERL_CALLCONV
 #  endif
 #endif
+#ifndef PERL_INLINE_CALLCONV
+#  define PERL_INLINE_CALLCONV static __inline__
+#endif
 #undef PERL_CKDEF
 #undef PERL_PPDEF
 #define PERL_CKDEF(s)	PERL_CALLCONV OP *s (pTHX_ OP *o);
