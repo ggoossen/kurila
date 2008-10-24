@@ -4,8 +4,8 @@ TODO
 
 __END__
 # 8signal
-BEGIN { $| = 1; $^WARN_HOOK = sub { print "WARN -- $(@_[0]->message)" } }
-BEGIN { $^DIE_HOOK  = sub { print "DIE -- $(@_[0]->message)" } }
+BEGIN { $| = 1; $^WARN_HOOK = sub { print "WARN -- $(@_[0]->message)\n" } }
+BEGIN { $^DIE_HOOK  = sub { print "DIE -- $(@_[0]->message)\n" } }
 $a =+ 1 ;
 use warnings < qw(syntax) ;
 $a =+ 1 ;
@@ -13,6 +13,6 @@ use warnings FATAL => < qw(syntax) ;
 $a =+ 1 ;
 print "The End.\n" ;
 EXPECT
-WARN -- Reversed += operator at - line 6 character 4.
+WARN -- Reversed += operator
 Reversed += operator at - line 8 character 4.
 ########

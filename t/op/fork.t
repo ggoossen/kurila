@@ -336,11 +336,11 @@ child died at - line 5 character 14.
 ########
 if (my $pid = fork) {
     try { die "parent died" };
-    print $@->message;
+    print $@->message, $@->stacktrace;
 }
 else {
     sleep 1; try { die "child died" };
-    print $@->message;
+    print $@->message, $@->stacktrace;
 }
 EXPECT
 parent died at - line 2 character 11.
@@ -351,11 +351,11 @@ child died at - line 6 character 20.
 my $pid;
 if (eval q{$pid = fork}) {
     eval q{ die "parent died" };
-    print $@->message;
+    print $@->message, $@->stacktrace;
 }
 else {
     sleep 1; eval q{ die "child died" };
-    print $@->message;
+    print $@->message, $@->stacktrace;
 }
 EXPECT
 parent died at (eval 2) line 1 character 2.

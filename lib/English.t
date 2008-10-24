@@ -1,7 +1,7 @@
 #!./perl -i.inplace
 # note the extra switch, for the test below
 
-use Test::More tests => 34;
+use Test::More tests => 35;
 
 use English < qw( -no_match_vars ) ;
 use Config;
@@ -92,8 +92,11 @@ like( ~< *DATA, qr/second paragraph..\z/s, '$INPUT_RECORD_SEPARATOR' );
 try { is( $EXCEPTIONS_BEING_CAUGHT, 1, '$EXCEPTIONS_BEING_CAUGHT' ) };
 ok( !$EXCEPTIONS_BEING_CAUGHT, '$EXCEPTIONS_BEING_CAUGHT should be false' );
 
-try { local *F; my $f = 'asdasdasd'; ++$f while -e $f; open(F, "<", $f); };
-is( $OS_ERROR, $ERRNO, '$OS_ERROR' );
+do { my $f = 'asdasdasd'; ++$f while -e $f; open(my $fh, "<", $f); };
+is( 0+$OS_ERROR, Errno::ENOENT(), "\$OS_ERROR" );
+do { my $f = 'asdasdasd'; ++$f while -e $f; open(my $fh, "<", $f); };
+is( 0+$ERRNO, Errno::ENOENT(), '$OS_ERROR' );
+do { my $f = 'asdasdasd'; ++$f while -e $f; open(my $fh, "<", $f); };
 ok( %OS_ERROR_FLAGS{ENOENT}, '%OS_ERROR_FLAGS(ENOENT should be set)' );
 
 package C;

@@ -150,6 +150,6 @@ do {
     print F "1;\n";
     close F;
     eval "use lib '.'; use xxx v3;";
-    like ($@->message, qr/^xxx defines neither package nor VERSION--version check failed at/);
+    like ($@->message, qr/^xxx defines neither package nor VERSION--version check failed/);
     unlink 'xxx.pm';
 };
