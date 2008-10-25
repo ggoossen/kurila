@@ -4,7 +4,7 @@ use Test::More  'no_plan';
 my $Class   = 'Module::Loaded';
 my @Funcs   = qw[mark_as_loaded mark_as_unloaded is_loaded];
 my $Mod     = 'Foo::Bar'.$$;
-my $Strict  = 'strict';
+my $Strict  = 'error';
 
 ### load the thing
 do {   use_ok( $Class );
@@ -31,6 +31,7 @@ do {   ok( mark_as_unloaded($Mod), "$Mod now marked as unloaded" );
 };
 
 ### check for an already loaded module
+use error;
 do {   my $where = is_loaded( $Strict );
     ok( $where,                 "$Strict loaded" );
     ok( mark_as_unloaded( $Strict ),
