@@ -727,7 +727,7 @@ Perl_parser_free(pTHX_  const yy_parser *parser)
     else if (parser->rsfp && parser->old_parser
 			  && parser->rsfp != parser->old_parser->rsfp)
 	PerlIO_close(parser->rsfp);
-    SvREFCNT_dec(parser->rsfp_filters);
+    AvREFCNT_dec(parser->rsfp_filters);
 
     Safefree(parser->stack);
     Safefree(parser->lex_brackstack);
@@ -10558,7 +10558,7 @@ Perl_start_subparse(pTHX_ U32 flags)
     save_item(PL_subname);
     SAVESPTR(PL_compcv);
 
-    SVcpSTEAL(PL_compcv, (CV*)newSV_type(SVt_PVCV));
+    CVcpSTEAL(PL_compcv, (CV*)newSV_type(SVt_PVCV));
     CvFLAGS(PL_compcv) |= flags;
 
     PL_subline = PL_parser->lex_line_number;

@@ -538,7 +538,7 @@ perl_destruct(pTHXx)
 	PL_main_root = NULL;
     }
     PL_main_start = NULL;
-    SVcpNULL(PL_main_cv);
+    CVcpNULL(PL_main_cv);
     PL_dirty = TRUE;
 
     /* Tell PerlIO we are about to tear things apart in case
@@ -678,7 +678,7 @@ perl_destruct(pTHXx)
     Safefree(PL_osname);	/* $^O */
     PL_osname = NULL;
 
-    SVcpNULL(PL_op_sequence);
+    HVcpNULL(PL_op_sequence);
 
     SVcpNULL(PL_statname);
     PL_statgv = NULL;
@@ -699,14 +699,14 @@ perl_destruct(pTHXx)
     PL_efloatsize = 0;
 
     /* startup and shutdown function lists */
-    SVcpNULL(PL_beginav);
-    SvREFCNT_dec(PL_beginav_save);
-    SvREFCNT_dec(PL_endav);
-    SvREFCNT_dec(PL_checkav);
-    SvREFCNT_dec(PL_checkav_save);
-    SVcpNULL(PL_unitcheckav);
-    SvREFCNT_dec(PL_unitcheckav_save);
-    SvREFCNT_dec(PL_initav);
+    AVcpNULL(PL_beginav);
+    AvREFCNT_dec(PL_beginav_save);
+    AvREFCNT_dec(PL_endav);
+    AvREFCNT_dec(PL_checkav);
+    AvREFCNT_dec(PL_checkav_save);
+    AVcpNULL(PL_unitcheckav);
+    AvREFCNT_dec(PL_unitcheckav_save);
+    AvREFCNT_dec(PL_initav);
     PL_beginav_save = NULL;
     PL_endav = NULL;
     PL_checkav = NULL;
@@ -716,12 +716,12 @@ perl_destruct(pTHXx)
 
     /* shortcuts just get cleared */
     PL_envgv = NULL;
-    SvREFCNT_dec(PL_incgv);
+    GvREFCNT_dec(PL_incgv);
     PL_incgv = NULL;
     PL_hintgv = NULL;
-    SvREFCNT_dec(PL_errgv);
+    GvREFCNT_dec(PL_errgv);
     PL_errgv = NULL;
-    SvREFCNT_dec(PL_globalstash);
+    HvREFCNT_dec(PL_globalstash);
     PL_globalstash = NULL;
     PL_argvgv = NULL;
     PL_argvoutgv = NULL;
@@ -738,12 +738,12 @@ perl_destruct(pTHXx)
     PL_dbargs = NULL;
     PL_debstash = NULL;
 
-    SvREFCNT_dec(PL_argvout_stack);
+    AvREFCNT_dec(PL_argvout_stack);
     PL_argvout_stack = NULL;
 
-    SvREFCNT_dec(PL_modglobal);
+    HvREFCNT_dec(PL_modglobal);
     PL_modglobal = NULL;
-    SvREFCNT_dec(PL_preambleav);
+    AvREFCNT_dec(PL_preambleav);
     PL_preambleav = NULL;
     SvREFCNT_dec(PL_subname);
     PL_subname = NULL;
@@ -805,24 +805,24 @@ perl_destruct(pTHXx)
     if (!specialWARN(PL_compiling.cop_warnings))
 	PerlMemShared_free(PL_compiling.cop_warnings);
     PL_compiling.cop_warnings = NULL;
-    SvREFCNT_dec(PL_compiling.cop_hints_hash);
+    HvREFCNT_dec(PL_compiling.cop_hints_hash);
     PL_compiling.cop_hints_hash = NULL;
     CopSTASH_free(&PL_compiling);
 
     /* Prepare to destruct main symbol table.  */
 
-    SVcpNULL(PL_curstash);
+    HVcpNULL(PL_curstash);
 
     hv = PL_defstash;
     PL_defstash = 0;
-    SvREFCNT_dec(hv);
+    HvREFCNT_dec(hv);
     SVcpNULL(PL_curstname);
 
     /* clear queued errors */
     SvREFCNT_dec(PL_errors);
     PL_errors = NULL;
 
-    SvREFCNT_dec(PL_isarev);
+    HvREFCNT_dec(PL_isarev);
     PL_isarev = NULL;
 
     FREETMPS;
@@ -848,10 +848,10 @@ perl_destruct(pTHXx)
 /* 	; */
 
     /* clear *_ */
-    SvREFCNT_dec(PL_defgv);
+    GvREFCNT_dec(PL_defgv);
     PL_defgv = NULL;
 
-    SvREFCNT_dec(PL_fdpid);		/* needed in io_close() */
+    AvREFCNT_dec(PL_fdpid);		/* needed in io_close() */
     PL_fdpid = NULL;
 
 #ifdef HAVE_INTERP_INTERN
@@ -893,7 +893,7 @@ perl_destruct(pTHXx)
 	HvTOTALKEYS(PL_strtab) = 0;
 	HvFILL(PL_strtab) = 0;
     }
-    SvREFCNT_dec(PL_strtab);
+    HvREFCNT_dec(PL_strtab);
 
 #ifdef USE_ITHREADS
     /* free the pointer tables used for cloning */
@@ -1325,7 +1325,7 @@ perl_parse(pTHXx_ XSINIT_t xsinit, int argc, char **argv, char **env)
 	PL_main_root = NULL;
     }
     PL_main_start = NULL;
-    SVcpNULL(PL_main_cv);
+    CVcpNULL(PL_main_cv);
 
     time(&PL_basetime);
     oldscope = PL_scopestack_ix;
@@ -1781,7 +1781,7 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 	}
     }
 
-    SVcpSTEAL(PL_compcv, (CV*)newSV_type(SVt_PVCV));
+    CVcpSTEAL(PL_compcv, (CV*)newSV_type(SVt_PVCV));
     CVcpREPLACE(PL_main_cv, PL_compcv);
     CvUNIQUE_on(PL_compcv);
 
@@ -4168,7 +4168,7 @@ S_nuke_stacks(pTHX)
 	PL_curstackinfo = PL_curstackinfo->si_next;
     while (PL_curstackinfo) {
 	PERL_SI *p = PL_curstackinfo->si_prev;
-	SvREFCNT_dec(PL_curstackinfo->si_stack);
+	AvREFCNT_dec(PL_curstackinfo->si_stack);
 	PL_curstackinfo->si_stack = NULL;
 	Safefree(PL_curstackinfo->si_cxstack);
 	Safefree(PL_curstackinfo);
@@ -4561,7 +4561,7 @@ S_incpush(pTHX_ const char *dir, bool addsubdirs, bool addoldvers, bool usesep,
 		/* Going to use the SV just as a scratch buffer holding a C
 		   string:  */
 		SV *prefix_sv;
-		char *prefix;
+		const char *prefix;
 		char *lastslash;
 
 		/* $^X is *the* source of taint if tainting is on, hence

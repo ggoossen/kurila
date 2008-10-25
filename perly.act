@@ -408,7 +408,7 @@ case 2:
                             /* SvREFCNT_dec(new);  leak reference */
 #else
                             CV* new = newNAMEDSUB((ps[(2) - (5)].val.ionlyval), (ps[(3) - (5)].val.opval), (ps[(4) - (5)].val.opval), (ps[(5) - (5)].val.opval));
-                            SvREFCNT_dec(new);
+                            CvREFCNT_dec(new);
                             (yyval.opval) = (OP*)NULL;
 #endif
 			;}

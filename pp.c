@@ -344,7 +344,7 @@ PP(pp_prototype)
     }
     cv = sv_2cv(TOPs, &gv, 0);
     if (cv && SvPOK(cv))
-	ret = newSVpvn_flags(SvPVX_const(cv), SvCUR(cv), SVs_TEMP);
+	ret = newSVpvn_flags(SvPVX_const((SV*)cv), SvCUR(cv), SVs_TEMP);
   set:
     SETs(ret);
     RETURN;
@@ -1408,7 +1408,7 @@ PP(pp_repeat)
 		     Perl_croak(aTHX_ oom_string_extend);
 	        MEM_WRAP_CHECK_1(max, char, oom_string_extend);
 		SvGROW(TARG, max + 1);
-		repeatcpy(SvPVX_const(TARG) + len, SvPVX_mutable(TARG), len, count - 1);
+		repeatcpy(SvPVX_mutable(TARG) + len, SvPVX_mutable(TARG), len, count - 1);
 		SvCUR_set(TARG, SvCUR(TARG) * count);
 	    }
 	    *SvEND(TARG) = '\0';
@@ -2945,7 +2945,7 @@ PP(pp_chr)
 
     if (IN_CODEPOINTS) {
 	SvGROW(TARG, (STRLEN)UNISKIP(value)+1);
-	tmps = uvchr_to_utf8_flags(SvPVX_const(TARG), value, 0);
+	tmps = uvchr_to_utf8_flags(SvPVX_mutable(TARG), value, 0);
 	SvCUR_set(TARG, tmps - SvPVX_const(TARG));
 	*tmps = '\0';
 	(void)SvPOK_only(TARG);

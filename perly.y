@@ -476,7 +476,7 @@ subrout	:	SUB startsub subname proto subbody
                             /* SvREFCNT_dec(new);  leak reference */
 #else
                             CV* new = newNAMEDSUB($2, $3, $4, $5);
-                            SvREFCNT_dec(new);
+                            CvREFCNT_dec(new);
                             $$ = (OP*)NULL;
 #endif
 			}

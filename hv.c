@@ -1666,10 +1666,10 @@ S_hfreeentries(pTHX_ HV *hv)
 		/* So donate them to regular backref magic to keep them safe.
 		   The sv_magic will increase the reference count of the AV,
 		   so we need to drop it first. */
-		SvREFCNT_dec(iter->xhv_backreferences);
+		AvREFCNT_dec(iter->xhv_backreferences);
 		if (AvFILLp(iter->xhv_backreferences) == -1) {
 		    /* Turns out that the array is empty. Just free it.  */
-		    SvREFCNT_dec(iter->xhv_backreferences);
+		    AvREFCNT_dec(iter->xhv_backreferences);
 
 		} else {
 		    sv_magic((SV*)hv, (SV*)iter->xhv_backreferences,
@@ -1687,8 +1687,8 @@ S_hfreeentries(pTHX_ HV *hv)
 	    iter->xhv_eiter = NULL;	/* HvEITER(hv) = NULL */
 
             if((meta = iter->xhv_mro_meta)) {
-                if(meta->mro_linear_c3)  SvREFCNT_dec(meta->mro_linear_c3);
-                if(meta->mro_nextmethod) SvREFCNT_dec(meta->mro_nextmethod);
+                if(meta->mro_linear_c3)  AvREFCNT_dec(meta->mro_linear_c3);
+                if(meta->mro_nextmethod) HvREFCNT_dec(meta->mro_nextmethod);
                 Safefree(meta);
                 iter->xhv_mro_meta = NULL;
             }

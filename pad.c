@@ -302,7 +302,7 @@ Perl_pad_undef(pTHX_ CV* cv)
 
 		if (SvREFCNT(comppad) < 2) { /* allow for /(?{ sub{} })/  */
 		    curpad[ix] = NULL;
-		    SvREFCNT_dec(innercv);
+		    CvREFCNT_dec(innercv);
 		    inner_rc--;
 		}
 
@@ -325,10 +325,10 @@ Perl_pad_undef(pTHX_ CV* cv)
 
     ix = AvFILLp(padlist);
     while (ix >= 0) {
-	const SV* const sv = AvARRAY(padlist)[ix--];
+	SV* const sv = AvARRAY(padlist)[ix--];
 	if (sv) {
 	    if (sv == (SV*)PL_comppad_name)
-		SVcpNULL(PL_comppad_name)
+		AVcpNULL(PL_comppad_name)
 	    else if (sv == (SV*)PL_comppad) {
 		PL_comppad = NULL;
 		PL_curpad = NULL;
@@ -709,7 +709,7 @@ S_pad_findlex(pTHX_ const char *name, const CV* cv, U32 seq, int warn,
 	SV * const * const name_svp = AvARRAY(nameav);
 
 	for (offset = AvFILLp(nameav); offset >= 0; offset--) {
-            const SV * const namesv = name_svp[offset];
+            SV * const namesv = name_svp[offset];
 	    if (namesv && namesv != &PL_sv_undef
 		    && strEQ(SvPVX_const(namesv), name))
 	    {
@@ -864,7 +864,7 @@ S_pad_findlex(pTHX_ const char *name, const CV* cv, U32 seq, int warn,
 
 	new_offset = pad_add_name(
 	    SvPVX_const(*out_name_sv),
-	    SvOURGV(*out_name_sv),
+		(SvPAD_OUR(*out_name_sv) ? SvOURGV(*out_name_sv) : NULL),
 	    1,  /* fake */
 	    SvPAD_STATE(*out_name_sv) ? 1 : 0 /* state variable ? */
 	);
@@ -1060,7 +1060,7 @@ Perl_pad_leavemy(pTHX)
     }
     /* "Deintroduce" my variables that are leaving with this scope. */
     for (off = AvFILLp(PL_comppad_name); off > PL_comppad_name_fill; off--) {
-	const SV * const sv = svp[off];
+	SV * const sv = svp[off];
 	if (sv && sv != &PL_sv_undef && !SvFAKE(sv) && COP_SEQ_RANGE_HIGH(sv) == PAD_MAX) {
 	    COP_SEQ_RANGE_HIGH_set(sv, PL_cop_seqmax);
 	    DEBUG_Xv(PerlIO_printf(Perl_debug_log,
@@ -1342,7 +1342,7 @@ Perl_do_dump_pad(pTHX_ I32 level, PerlIO *file, PADLIST *padlist, int full)
     );
 
     for (ix = 1; ix <= AvFILLp(pad_name); ix++) {
-        const SV *namesv = pname[ix];
+        SV *namesv = pname[ix];
 	if (namesv && namesv == &PL_sv_undef) {
 	    namesv = NULL;
 	}
@@ -1472,7 +1472,7 @@ Perl_cv_clone(pTHX_ CV *proto)
     ENTER;
     SAVESPTR(PL_compcv);
 
-    SVcpSTEAL(PL_compcv, (CV*)newSV_type(SvTYPE(proto)));
+    CVcpSTEAL(PL_compcv, (CV*)newSV_type(SvTYPE(proto)));
     cv = (CV*)SvREFCNT_inc(PL_compcv);
     CvFLAGS(cv) = CvFLAGS(proto) & ~(CVf_CLONE);
     CvCLONED_on(cv);
@@ -1485,7 +1485,7 @@ Perl_cv_clone(pTHX_ CV *proto)
     CvOUTSIDE_SEQ(cv) = CvOUTSIDE_SEQ(proto);
 
     if (SvPOK(proto))
-	sv_setpvn((SV*)cv, SvPVX_const(proto), SvCUR(proto));
+	sv_setpvn((SV*)cv, SvPVX_const((SV*)proto), SvCUR(proto));
 
     CvPADLIST(cv) = pad_new(padnew_CLONE|padnew_SAVE);
 
@@ -1559,7 +1559,7 @@ Perl_cv_clone(pTHX_ CV *proto)
 	 */
 	SV* const const_sv = op_const_sv(CvSTART(cv), cv);
 	if (const_sv) {
-	    SvREFCNT_dec(cv);
+	    CvREFCNT_dec(cv);
 	    cv = newCONSTSUB(NULL, const_sv);
 	}
 	else {

@@ -103,6 +103,8 @@ Aip	|SV*	|HvSv	|NN HV *hv
 Aip	|SV*	|AvSv	|NN AV *av
 Aip	|SV*	|CvSv	|NN CV *cv
 Aip	|SV*	|GvSv	|NN GV *cv
+Aip	|SV*	|IoSv	|NN struct io *cv
+Aip	|SV*	|ReSv	|NN REGEXP *cv
 
 Aip	|const char*	|SvPVX_const	|NN SV *sv
 Aip	|char*	|SvPVX_mutable	|NN SV *sv
@@ -1418,7 +1420,7 @@ ERs	|I32	|reg_check_named_buff_matched	|NN const regexp *rex \
 #  ifdef DEBUGGING
 Es	|void	|dump_exec_pos	|NN const char *locinput|NN const regnode *scan|NN const char *loc_regeol\
 				|NN const char *loc_bostr|NN const char *loc_reg_starttry|const bool do_utf8
-Es	|void	|debug_start_match|NN const REGEXP *prog|const bool do_utf8|NN const char *start|NN const char *end|NN const char *blurb
+Es	|void	|debug_start_match|NN REGEXP *prog|const bool do_utf8|NN const char *start|NN const char *end|NN const char *blurb
 #  endif
 #endif
 

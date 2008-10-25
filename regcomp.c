@@ -8781,7 +8781,7 @@ Perl_re_intuit_string(pTHX_ REGEXP * const r)
 void
 Perl_pregfree(pTHX_ REGEXP *r)
 {
-    SvREFCNT_dec(r);
+    ReREFCNT_dec(r);
 }
 
 void
@@ -8798,7 +8798,7 @@ Perl_pregfree2(pTHX_ REGEXP *rx)
     } else {
         CALLREGFREE_PVT(rx); /* free the private data */
         if (RXp_PAREN_NAMES(r))
-            SvREFCNT_dec(RXp_PAREN_NAMES(r));
+            HvREFCNT_dec(RXp_PAREN_NAMES(r));
     }        
     if (r->substrs) {
         if (r->anchored_substr)

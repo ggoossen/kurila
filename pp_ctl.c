@@ -1586,7 +1586,7 @@ PP(pp_goto)
 	    SP += items;
 	    if (CxTYPE(cx) == CXt_SUB &&
 		!(CvDEPTH(cx->blk_sub.cv) = cx->blk_sub.olddepth))
-		SvREFCNT_dec(cx->blk_sub.cv);
+		CvREFCNT_dec(cx->blk_sub.cv);
 	    oldsave = PL_scopestack[PL_scopestack_ix - 1];
 	    LEAVE_SCOPE(oldsave);
 
@@ -1910,7 +1910,7 @@ S_doeval(pTHX_ int gimme, OP** startop, CV* outside, U32 seq)
     PUSHMARK(SP);
 
     SAVESPTR(PL_compcv);
-    SVcpSTEAL(PL_compcv, (CV*)newSV_type(SVt_PVCV));
+    CVcpSTEAL(PL_compcv, (CV*)newSV_type(SVt_PVCV));
     CvEVAL_on(PL_compcv);
     assert(CxTYPE(&cxstack[cxstack_ix]) == CXt_EVAL);
     cxstack[cxstack_ix].blk_eval.cv = PL_compcv;
@@ -1932,9 +1932,9 @@ S_doeval(pTHX_ int gimme, OP** startop, CV* outside, U32 seq)
 
     /* XXX:ajgo do we really need to alloc an AV for begin/checkunit */
     SAVESPTR(PL_beginav);
-    SVcpSTEAL(PL_beginav, newAV());
+    AVcpSTEAL(PL_beginav, newAV());
     SAVESPTR(PL_unitcheckav);
-    SVcpSTEAL(PL_unitcheckav, newAV());
+    AVcpSTEAL(PL_unitcheckav, newAV());
 
 #ifdef PERL_MAD
     SAVEBOOL(PL_madskills);
@@ -1970,7 +1970,7 @@ S_doeval(pTHX_ int gimme, OP** startop, CV* outside, U32 seq)
 
 	msg = SvPVx_nolen_const(ERRSV);
 	if (optype == OP_REQUIRE) {
-	    const SV * const nsv = cx->blk_eval.old_namesv;
+	    SV * const nsv = cx->blk_eval.old_namesv;
 	    (void)hv_store(GvHVn(PL_incgv), SvPVX_const(nsv), SvCUR(nsv),
                           &PL_sv_undef, 0);
 	    Perl_croak(aTHX_ "%sCompilation failed in require",
@@ -2424,7 +2424,7 @@ PP(pp_require)
     SAVEHINTS();
     PL_hints = DEFAULT_HINTS;
     if (PL_compiling.cop_hints_hash) {
-	SvREFCNT_dec(PL_compiling.cop_hints_hash);
+	HvREFCNT_dec(PL_compiling.cop_hints_hash);
 	PL_compiling.cop_hints_hash = newHV();
     }
 
@@ -2541,7 +2541,7 @@ PP(pp_entereval)
     }
     if (PL_compiling.cop_hints_hash) {
 	HINTS_REFCNT_LOCK;
-	SvREFCNT_dec(PL_compiling.cop_hints_hash);
+	HvREFCNT_dec(PL_compiling.cop_hints_hash);
 	HINTS_REFCNT_UNLOCK;
     }
     PL_compiling.cop_hints_hash = PL_curcop->cop_hints_hash;

@@ -364,7 +364,7 @@ and check for NULL.
    writers? Specifically, the value 1 assumes that the wrapped version always
    has exactly one character at the end, a ')'. Will that always be true?  */
 #define RX_PRELEN(prog)		(RX_WRAPLEN(prog) - ((struct regexp *)SvANY(prog))->pre_prefix - 1)
-#define RX_WRAPPED(prog)	SvPVX_mutable(prog)
+#define RX_WRAPPED(prog)	SvPVX_mutable(ReSv(prog))
 #define RX_WRAPLEN(prog)	SvCUR(prog)
 #define RX_CHECK_SUBSTR(prog)	(((struct regexp *)SvANY(prog))->check_substr)
 #define RX_REFCNT(prog)		SvREFCNT(prog)
@@ -459,14 +459,7 @@ and check for NULL.
 	SvREFCNT_inc(zwapp);						\
 	zwapp;								\
     })
-#  define ReREFCNT_dec(re)						\
-    ({									\
-	/* This is here to generate a casting warning if incorrect.  */	\
-	REGEXP *const boff = (re);					\
-	SvREFCNT_dec(boff);						\
-    })
 #else
-#  define ReREFCNT_dec(re)	SvREFCNT_dec(re)
 #  define ReREFCNT_inc(re)	((REGEXP *) SvREFCNT_inc(re))
 #endif
 

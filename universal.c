@@ -1267,7 +1267,7 @@ XS(XS_PerlIO_get_layers)
 		  }
 	     }
 
-	     SvREFCNT_dec(av);
+	     AvREFCNT_dec(av);
 
 	     XPUSHs((SV*)retav);
 
@@ -1327,7 +1327,7 @@ XS(XS_Internals_set_hint_hash)
 	Perl_croak(aTHX_ "Internals::set_hint_hash $hashref");
     hv = SvRV(ST(0));
     if (items == 1 && SvTYPE(hv) == SVt_PVHV) {
-	SvREFCNT_dec(PL_compiling.cop_hints_hash);
+	HvREFCNT_dec(PL_compiling.cop_hints_hash);
 	PL_compiling.cop_hints_hash = (HV*)SvREFCNT_inc(hv);
     }
 }
