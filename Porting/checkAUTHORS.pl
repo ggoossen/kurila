@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-use strict;
+
 use Text::Wrap;
 $Text::Wrap::columns = 80;
 my ($committer, $patch, $log);

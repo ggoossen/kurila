@@ -1,6 +1,5 @@
 package Digest;
 
-use strict;
 use vars < qw($VERSION %MMAP $AUTOLOAD);
 
 $VERSION = "1.15";

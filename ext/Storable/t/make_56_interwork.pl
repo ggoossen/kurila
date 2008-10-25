@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-use strict;
+
 
 use Config;
 use Storable < qw(freeze thaw);

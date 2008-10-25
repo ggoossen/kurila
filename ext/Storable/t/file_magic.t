@@ -1,6 +1,6 @@
 #!perl -w
 
-use strict;
+
 use Test::More;
 use Storable < qw(store nstore);
 use Config < qw(%Config);

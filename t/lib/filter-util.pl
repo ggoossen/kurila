@@ -1,5 +1,4 @@
-
-use strict ;
+ 
 use warnings;
 
 use vars < qw( $Perl $Inc);

@@ -10,7 +10,6 @@ BEGIN {
     }
 }
 
-use strict;
 use Config;
 
 use Test::More;

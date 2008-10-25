@@ -9,7 +9,6 @@ BEGIN {
     require './test.pl';		# we use runperl from 'test.pl', so can't use Test::More
 }
 
-use strict;
 
 plan tests => 151;
 

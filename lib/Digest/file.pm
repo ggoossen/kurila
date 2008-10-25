@@ -1,6 +1,5 @@
 package Digest::file;
 
-use strict;
 
 use Exporter ();
 use Carp < qw(croak);

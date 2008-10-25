@@ -1,5 +1,5 @@
 package Pod::Html;
-use strict;
+
 require Exporter;
 
 use vars < qw($VERSION @ISA @EXPORT @EXPORT_OK);

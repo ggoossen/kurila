@@ -1,4 +1,4 @@
-use strict;
+
 use Test::More 'no_plan';
 
 ### use && import ###

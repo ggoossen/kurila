@@ -4,7 +4,6 @@ BEGIN {
     require './test.pl';
 }
 
-use strict;
 use warnings;
 
 plan (13);

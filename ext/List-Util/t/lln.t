@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 
-use strict;
+
 use Test::More tests => 14;
 use Scalar::Util < qw(looks_like_number);
 

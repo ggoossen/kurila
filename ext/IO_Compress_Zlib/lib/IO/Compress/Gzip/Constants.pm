@@ -1,6 +1,5 @@
 package IO::Compress::Gzip::Constants;
-
-use strict ;
+ 
 use warnings;
 use bytes;
 

@@ -1,5 +1,5 @@
 package Sys::Syslog;
-use strict;
+
 use warnings::register;
 use Fcntl < qw(O_WRONLY);
 use File::Basename;

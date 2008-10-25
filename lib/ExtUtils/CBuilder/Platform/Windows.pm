@@ -1,6 +1,5 @@
 package ExtUtils::CBuilder::Platform::Windows;
 
-use strict;
 use warnings;
 
 use File::Basename;

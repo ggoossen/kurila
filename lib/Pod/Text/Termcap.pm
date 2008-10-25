@@ -21,7 +21,6 @@ use Pod::Text ();
 use POSIX ();
 use Term::Cap;
 
-use strict;
 use vars < qw(@ISA $VERSION);
 use utf8;
 

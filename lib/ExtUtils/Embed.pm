@@ -15,7 +15,7 @@ use vars < qw(@ISA @EXPORT $VERSION
 	    @Extensions $Verbose $lib_ext
 	    $opt_o $opt_s 
 	    );
-use strict;
+
 
 $VERSION = '1.26_01';
 

@@ -21,7 +21,6 @@ sub BEGIN {
     }
 }
 
-use strict;
 BEGIN {
     if (!eval q{
        use Test::More;

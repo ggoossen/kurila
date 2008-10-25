@@ -1,6 +1,5 @@
 package ExtUtils::MM_BeOS;
 
-use strict;
 
 =head1 NAME
 

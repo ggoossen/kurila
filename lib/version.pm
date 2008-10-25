@@ -1,7 +1,6 @@
 #!perl -w
 package version;
 
-use strict;
 
 use vars < qw(@ISA $VERSION $CLASS *qv);
 

@@ -2,7 +2,7 @@ package Time::Local;
 
 require Exporter;
 use Config;
-use strict;
+
 use integer;
 
 use vars < qw( $VERSION @ISA @EXPORT @EXPORT_OK );

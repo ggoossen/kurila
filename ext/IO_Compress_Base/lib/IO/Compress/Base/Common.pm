@@ -1,6 +1,5 @@
 package IO::Compress::Base::Common;
-
-use strict ;
+ 
 use warnings;
 use bytes;
 
@@ -482,7 +481,6 @@ sub ParseParameters
 
 #package IO::Compress::Base::Parameters;
 
-use strict;
 use warnings;
 use Carp;
 

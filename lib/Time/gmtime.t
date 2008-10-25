@@ -12,7 +12,6 @@ BEGIN {
     unless ($hasgm) { print "1..0 # Skip: no gmtime\n"; exit 0 }
 }
 
-use strict;
 
 our @gmtime;
 

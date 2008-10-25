@@ -1,6 +1,5 @@
 package File::Fetch;
 
-use strict;
 use FileHandle;
 use File::Copy;
 use File::Spec;

@@ -1,7 +1,6 @@
 
 package IO::Uncompress::Base ;
-
-use strict ;
+ 
 use warnings;
 use bytes;
 

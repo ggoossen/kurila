@@ -5,7 +5,6 @@ package Pod::Simple::RTF;
 #sub Pod::Simple::DEBUG () {4};
 #sub Pod::Simple::PullParser::DEBUG () {4};
 
-use strict;
 use vars < qw($VERSION @ISA %Escape $WRAP %Tagmap);
 $VERSION = '2.02';
 use Pod::Simple::PullParser ();

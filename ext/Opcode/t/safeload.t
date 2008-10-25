@@ -15,7 +15,6 @@ BEGIN {
     delete %INC{"version.pm"};
 }
 
-use strict;
 use Test::More;
 use Safe;
 plan(tests => 1);

@@ -1,6 +1,6 @@
 #! perl
 
-use strict;
+
 
 use Config;
 use File::Path < qw(mkpath);

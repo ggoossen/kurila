@@ -6,7 +6,7 @@ use Getopt::Long < qw(GetOptions);
 use Pod::Usage < qw(pod2usage);
 use Cwd < qw(cwd);
 use File::Spec;
-use strict;
+
 
 my %opt = %(
   frames  => 3,

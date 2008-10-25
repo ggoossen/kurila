@@ -26,7 +26,6 @@ Rafael Garcia-Suarez
 
 package mypragma;
 
-use strict;
 use warnings;
 
 sub import {

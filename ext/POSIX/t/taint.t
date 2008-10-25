@@ -13,7 +13,7 @@ use Scalar::Util < qw/tainted/;
 
 
 use POSIX < qw(fcntl_h open read mkfifo);
-use strict ;
+ 
 
 $| = 1;
 

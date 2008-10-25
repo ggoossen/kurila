@@ -1,7 +1,7 @@
 package MakeMaker::Test::Utils;
 
 use File::Spec;
-use strict;
+
 use Config;
 
 use vars < qw($VERSION @ISA @EXPORT);

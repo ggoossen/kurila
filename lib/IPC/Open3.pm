@@ -1,6 +1,5 @@
 package IPC::Open3;
 
-use strict;
 our ($VERSION, @ISA, @EXPORT);
 
 require Exporter;

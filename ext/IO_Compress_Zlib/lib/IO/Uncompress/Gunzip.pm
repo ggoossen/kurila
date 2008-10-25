@@ -3,8 +3,7 @@ package IO::Uncompress::Gunzip ;
 
 
 # for RFC1952
-
-use strict ;
+ 
 use warnings;
 use bytes;
 

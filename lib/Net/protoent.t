@@ -10,7 +10,6 @@ BEGIN {
     unless ($haspe) { print "1..0 # Skip: no netdb.h\n"; exit 0 }
 }
 
-use strict;
 
 our @protoent;
 

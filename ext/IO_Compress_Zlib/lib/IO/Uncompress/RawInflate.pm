@@ -1,7 +1,6 @@
 package IO::Uncompress::RawInflate ;
 # for RFC1951
-
-use strict ;
+ 
 use warnings;
 use bytes;
 

@@ -1,6 +1,5 @@
 package File::stat;
 
-use strict;
 use warnings;
 
 our(@EXPORT, @EXPORT_OK, %EXPORT_TAGS);

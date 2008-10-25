@@ -138,7 +138,6 @@ Filehandles returned by these functions support the seekable methods.
 
 # 5.6.0 gives us S_IWOTH, S_IWGRP, our and auto-vivifying filehandls
 # People would like a version on 5.004 so give them what they want :-)
-use strict;
 use Carp;
 use File::Spec v0.8;
 use File::Path < qw/ rmtree /;
@@ -2340,7 +2339,7 @@ security enhancements.
 package File::Temp::Dir;
 
 use File::Path < qw/ rmtree /;
-use strict;
+
 
 # private class specifically to support tempdir objects
 # created by File::Temp->newdir

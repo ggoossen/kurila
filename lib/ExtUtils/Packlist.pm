@@ -1,6 +1,5 @@
 package ExtUtils::Packlist;
 
-use strict;
 use Config;
 use vars < qw($VERSION $Relocations);
 $VERSION = '1.43';

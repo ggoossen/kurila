@@ -24,7 +24,6 @@ Typically, it is invoked as:
 
 =cut
 
-use strict;
 
 my ($ext1, $ext2) = < map {quotemeta} grep {!m/^--/} @ARGV;
 my %opts = %(

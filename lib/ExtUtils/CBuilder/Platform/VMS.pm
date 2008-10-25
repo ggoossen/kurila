@@ -1,6 +1,5 @@
 package ExtUtils::CBuilder::Platform::VMS;
 
-use strict;
 use ExtUtils::CBuilder::Base;
 
 use vars < qw($VERSION @ISA);

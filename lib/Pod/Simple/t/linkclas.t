@@ -1,7 +1,6 @@
 
 ### Test the basic sanity of the link-section treelet class
 
-use strict;
 use Test::More;
 plan tests => 6;
 

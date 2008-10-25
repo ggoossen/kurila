@@ -8,7 +8,6 @@ use Config;
 use File::Path;
 use File::Spec::Functions;
 
-use strict;
 use warnings;
 our $pragma_name;
 

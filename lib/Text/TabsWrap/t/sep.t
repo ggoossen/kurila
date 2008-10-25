@@ -90,7 +90,6 @@ plan tests => 1 +nelems @tests;
 use Text::Wrap;
 $Text::Wrap::separator = '=';
 
-use strict;
 my $rerun = %ENV{'PERL_DL_NONLAZY'} ? 0 : 1;
 
 my @st = @tests;

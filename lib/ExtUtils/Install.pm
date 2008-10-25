@@ -1,5 +1,5 @@
 package ExtUtils::Install;
-use strict;
+
 
 use vars < qw(@ISA @EXPORT $VERSION $MUST_REBOOT %Config);
 

@@ -1,6 +1,5 @@
 package File::Spec::Epoc;
 
-use strict;
 use vars < qw($VERSION @ISA);
 
 $VERSION = '3.2701';

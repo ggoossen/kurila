@@ -1,5 +1,4 @@
 # -*-perl-*-
-use strict;
 use Test < qw(:DEFAULT $TESTOUT $TESTERR $ntest);
 
 ### This test is crafted in such a way as to prevent Test::Harness from

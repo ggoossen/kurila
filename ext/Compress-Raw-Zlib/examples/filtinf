@@ -1,8 +1,7 @@
 #!/usr/local/bin/perl
 
 use Compress::Raw::Zlib ;
-
-use strict ;
+ 
 use warnings ;
 
 binmode STDIN;

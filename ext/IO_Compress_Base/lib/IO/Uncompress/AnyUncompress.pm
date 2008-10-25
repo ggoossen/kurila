@@ -1,6 +1,5 @@
 package IO::Uncompress::AnyUncompress ;
 
-use strict;
 use warnings;
 use bytes;
 

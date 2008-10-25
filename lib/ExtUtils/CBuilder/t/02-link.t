@@ -9,7 +9,6 @@ BEGIN {
   }
 }
 
-use strict;
 use Test;
 BEGIN { 
   if ($^O eq 'MSWin32') {

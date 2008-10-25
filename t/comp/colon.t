@@ -7,7 +7,7 @@
 #	-- Robin Barker <rmb@cise.npl.co.uk>
 #
 
-use strict;
+
 
 $_ = '';	# to avoid undef warning on m// etc.
 

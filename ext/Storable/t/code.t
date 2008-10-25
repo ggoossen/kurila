@@ -6,7 +6,7 @@
 #  in the README file that comes with the distribution.
 #
 
-use strict;
+
 use Test::More;
 use B::Deparse v0.61;
 use File::Spec v0.8;

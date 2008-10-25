@@ -1,6 +1,5 @@
 package File::Spec::Unix;
 
-use strict;
 our ($VERSION);
 
 $VERSION = '3.2701';

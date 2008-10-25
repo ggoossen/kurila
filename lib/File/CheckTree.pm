@@ -4,7 +4,7 @@ use Cwd;
 use Exporter;
 use File::Spec;
 use warnings;
-use strict;
+
 
 our $VERSION = '4.3';
 our @ISA     = qw(Exporter);

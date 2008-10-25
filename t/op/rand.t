@@ -15,7 +15,7 @@
 # The Art of Computer Programming, Donald E. Knuth, volume 2,
 # chapter 3. ISBN 0-201-03822-6 (v. 2)
 
-use strict;
+
 use Config;
 
 require "./test.pl";

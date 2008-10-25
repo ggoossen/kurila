@@ -11,7 +11,6 @@ BEGIN {
     unless ($haspw) { print "1..0 # Skip: no pwd.h\n"; exit 0 }
 }
 
-use strict;
 our ($uid, @pwent);
 
 BEGIN {

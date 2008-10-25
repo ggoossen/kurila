@@ -92,7 +92,6 @@ you reload the C<Foo> module afterwards.
 
 =cut
 
-use strict;
 
 require Exporter;
 our @ISA = qw(Exporter);

@@ -1,6 +1,5 @@
 package ExtUtils::Command::MM;
 
-use strict;
 use warnings;
 
 require Exporter;

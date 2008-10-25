@@ -1,6 +1,5 @@
 package ExtUtils::Constant::ProxySubs;
 
-use strict;
 use vars < qw($VERSION @ISA %type_to_struct %type_from_struct %type_to_sv
 	    %type_to_C_value %type_is_a_problem %type_num_args
 	    %type_temporary);

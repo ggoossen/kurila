@@ -1,7 +1,6 @@
 package ExtUtils::MM_Unix;
 
 
-use strict;
 
 use ExtUtils::MakeMaker::Config;
 use File::Basename < qw(basename dirname);

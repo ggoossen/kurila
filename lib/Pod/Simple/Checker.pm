@@ -3,7 +3,7 @@
 # text comes out of Pod::BlackBox's _gen_errata
 
 package Pod::Simple::Checker;
-use strict;
+
 use utf8;
 use Carp ();
 use Pod::Simple::Methody ();

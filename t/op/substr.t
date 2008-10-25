@@ -3,7 +3,7 @@
 #P = start of string  Q = start of substr  R = end of substr  S = end of string
 
 use warnings ;
-use strict;
+
 
 our ($w, $FATAL_MSG, $x);
 

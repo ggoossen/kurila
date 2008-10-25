@@ -14,7 +14,6 @@ BEGIN {
     }
 }
 
-use strict;
 use Test::More;
 use Safe;
 

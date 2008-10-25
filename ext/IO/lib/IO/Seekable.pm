@@ -94,7 +94,6 @@ Derived from FileHandle.pm by Graham Barr E<lt>gbarr@pobox.comE<gt>
 
 =cut
 
-use strict;
 our($VERSION, @EXPORT, @ISA);
 use IO::Handle ();
 # XXX we can't get these from IO::Handle or we'll get prototype

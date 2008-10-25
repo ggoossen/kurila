@@ -3,7 +3,6 @@ package Class::Struct;
 ## See POD after __END__
 
 
-use strict;
 use warnings::register;
 our(@ISA, @EXPORT, $VERSION);
 

@@ -11,7 +11,6 @@ use Test::More;
 
 plan tests => 20;
 
-use strict;
 
 require Tie::SubstrHash;
 

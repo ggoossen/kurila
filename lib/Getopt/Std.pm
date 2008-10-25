@@ -1,7 +1,6 @@
 package Getopt::Std;
 require Exporter;
 
-use strict;
 
 =head1 NAME
 

@@ -3,7 +3,7 @@
 # in the current directory and its subdirectories
 
 use warnings;
-use strict;
+
 use File::Find;
 
 my %files;

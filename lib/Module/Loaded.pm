@@ -1,6 +1,5 @@
 package Module::Loaded;
 
-use strict;
 use Carp < qw[carp];
 
 BEGIN { use base 'Exporter';

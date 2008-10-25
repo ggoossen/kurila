@@ -19,7 +19,6 @@ use Opcode < qw(
 	opmask_add full_opset empty_opset define_optag
 );
 
-use strict;
 
 plan tests => 16;
 

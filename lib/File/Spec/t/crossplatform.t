@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-use strict;
+
 use File::Spec;
 use lib File::Spec->catfile('t', 'lib');
 use Test::More;
@@ -45,7 +45,7 @@ foreach my $platform ( @platforms) {
     local *{Symbol::fetch_glob("File::Spec::Mac::rootdir")} = sub { "Macintosh HD:" };
     local *{Symbol::fetch_glob("File::Spec::Win32::_cwd")}  = sub { "C:\\foo" };
     $^W = $save_w;
-    use strict 'refs';
+    
 
 
     my ($file, $base, $result);

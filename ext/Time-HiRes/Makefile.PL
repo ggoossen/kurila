@@ -8,7 +8,7 @@
 
 use Config;
 use ExtUtils::MakeMaker;
-use strict;
+
 
 my $VERBOSE = %ENV{VERBOSE};
 my $DEFINE;

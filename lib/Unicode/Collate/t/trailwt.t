@@ -13,7 +13,6 @@ BEGIN {
 use Test::More;
 BEGIN { plan tests => 58 };
 
-use strict;
 use warnings;
 use Unicode::Collate;
 

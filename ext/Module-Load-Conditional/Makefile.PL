@@ -1,5 +1,5 @@
 use ExtUtils::MakeMaker;
-use strict;
+
 
 WriteMakefile (
     NAME            => 'Module::Load::Conditional',

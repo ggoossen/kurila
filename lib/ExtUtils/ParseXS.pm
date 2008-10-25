@@ -5,7 +5,7 @@ use Config;
 use File::Basename;
 use File::Spec;
 use Symbol;
-use strict;
+
 
 require Exporter;
 
@@ -1899,7 +1899,6 @@ sub map_type {
 package
   ExtUtils::ParseXS::CountLines;
 
-use strict;
 our ($SECTION_END_MARKER);
 
 sub PUSHED {

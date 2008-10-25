@@ -6,7 +6,6 @@ BEGIN {
    print "1..8\n";
 }
 
-use strict;
 use Fatal < qw(open close);
 
 my $i = 1;

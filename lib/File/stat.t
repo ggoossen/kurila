@@ -1,7 +1,7 @@
 #!./perl
 
 use Test::More;
-use strict;
+
 
 our @stat;
 

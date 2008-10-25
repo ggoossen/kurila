@@ -1,6 +1,5 @@
 package FileHandle;
 
-use strict;
 our($VERSION, @ISA, @EXPORT, @EXPORT_OK);
 
 $VERSION = "2.01";

@@ -1,6 +1,5 @@
 package Thread::Queue;
 
-use strict;
 use warnings;
 
 our $VERSION = '2.06';

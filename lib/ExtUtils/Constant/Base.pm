@@ -1,6 +1,5 @@
 package ExtUtils::Constant::Base;
 
-use strict;
 use vars < qw($VERSION);
 use Text::Wrap;
 use ExtUtils::Constant::Utils < qw(C_stringify perl_stringify);

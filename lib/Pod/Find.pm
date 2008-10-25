@@ -46,7 +46,6 @@ files/directories like RCS, CVS, SCCS, .svn are ignored.
 
 =cut
 
-use strict;
 #use diagnostics;
 use Exporter;
 use File::Spec;

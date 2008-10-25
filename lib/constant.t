@@ -8,7 +8,6 @@ BEGIN {				# ...and save 'em for later
 END { print STDERR < @warnings }
 
 
-use strict;
 use Test::More tests => 88;
 my $TB = Test::More->builder;
 

@@ -22,7 +22,6 @@ BEGIN {
     require 'st-dump.pl';
 }
 
-use strict;
 
 use utf8;
 

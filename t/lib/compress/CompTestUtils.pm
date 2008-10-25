@@ -1,8 +1,7 @@
 package CompTestUtils;
 
 package main ;
-
-use strict ;
+ 
 use warnings;
 use bytes;
 

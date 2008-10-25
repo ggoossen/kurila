@@ -4,7 +4,7 @@ package PerlIO::via::QuotedPrint;
 # Make sure we do things by the book from now on
 
 our $VERSION = '0.06';
-use strict;
+
 
 # Make sure the encoding/decoding stuff is available
 

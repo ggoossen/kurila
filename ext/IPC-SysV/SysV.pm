@@ -6,7 +6,6 @@
 
 package IPC::SysV;
 
-use strict;
 use vars < qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $VERSION $XS_VERSION);
 use Carp;
 use Config;

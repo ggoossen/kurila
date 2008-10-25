@@ -1,6 +1,5 @@
 ## IPC::Cmd test suite ###
 
-use strict;
 use File::Spec ();
 use Test::More 'no_plan';
 

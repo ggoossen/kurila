@@ -1,6 +1,6 @@
 #!/usr/bin/perl -T
 
-use strict;
+
 use Config;
 
 BEGIN {

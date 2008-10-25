@@ -11,7 +11,6 @@ BEGIN {
 }
 chdir 't';
 
-use strict;
 
 use Test::More tests => 66;
 use Cwd;

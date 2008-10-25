@@ -11,7 +11,7 @@ local $Data::Dumper::Sortkeys = 1;
 use Data::Dumper;
 use Config;
 use utf8;
-use strict;
+
 my $Is_ebcdic = defined(%Config{'ebcdic'}) && %Config{'ebcdic'} eq 'define';
 
 $Data::Dumper::Pad = "#";

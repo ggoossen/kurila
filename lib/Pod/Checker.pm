@@ -338,7 +338,6 @@ get the well-known behavior.
 
 #############################################################################
 
-use strict;
 #use diagnostics;
 use Exporter;
 use Pod::Parser;

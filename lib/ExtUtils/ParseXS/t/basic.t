@@ -8,7 +8,7 @@ BEGIN {
     @INC = qw(../.. ../../.. .);
   }
 }
-use strict;
+
 use Test;
 BEGIN { plan tests => 10 };
 use DynaLoader;

@@ -7,7 +7,6 @@
 
 package IO::Poll;
 
-use strict;
 use IO::Handle;
 use Exporter ();
 our(@ISA, @EXPORT_OK, @EXPORT, $VERSION);

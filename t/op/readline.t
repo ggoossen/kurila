@@ -54,7 +54,6 @@ foreach my $l (@(1, 21)) {
   is ($k, "$perl rules\n", 'rcatline to COW sv for length ' . length $perl);
 }
 
-use strict;
 use File::Spec;
 
 open F, '<', 'File::Spec'->curdir and sysread F, $_, 1;

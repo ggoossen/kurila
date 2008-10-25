@@ -1,6 +1,5 @@
 package Fatal;
 
-use strict;
 our($Debug, $VERSION);
 
 $VERSION = 1.06;

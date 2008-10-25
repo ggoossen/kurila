@@ -1,6 +1,5 @@
 package IO::Compress::Deflate ;
-
-use strict ;
+ 
 use warnings;
 use bytes;
 

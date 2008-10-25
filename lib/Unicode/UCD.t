@@ -1,6 +1,6 @@
 #!perl -w
 
-use strict;
+
 use Unicode::UCD;
 use Test::More;
 use utf8;

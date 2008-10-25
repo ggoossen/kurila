@@ -40,7 +40,6 @@
 
 my $file;
 
-use strict;
 use warnings FATAL=>"all";
 use vars < qw($iters $numtests $bang $ffff $nulnul $OP $utf8);
 use vars < qw($qr $skip_amp $qr_embed $qr_embed_thr); # set by our callers
@@ -69,7 +68,6 @@ BEGIN {
     }
 }
 
-use strict;
 use warnings FATAL=>"all";
 use vars < qw($iters $numtests $bang $ffff $nulnul $OP);
 use vars < qw($qr $skip_amp $qr_embed $qr_embed_thr); # set by our callers

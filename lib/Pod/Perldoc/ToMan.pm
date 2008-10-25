@@ -1,6 +1,6 @@
 
 package Pod::Perldoc::ToMan;
-use strict;
+
 use warnings;
 
 # This class is unlike ToText.pm et al, because we're NOT paging thru

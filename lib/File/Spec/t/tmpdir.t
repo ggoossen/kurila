@@ -1,4 +1,4 @@
-use strict;
+
 use Test;
 
 # Grab all of the plain routines from File::Spec

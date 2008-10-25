@@ -1,6 +1,6 @@
 
 package Pod::Simple::HTML;
-use strict;
+
 use Pod::Simple::PullParser ();
 use vars < qw(
   @ISA %Tagmap $Computerese $LamePad $Linearization_Limit $VERSION

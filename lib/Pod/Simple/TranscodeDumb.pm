@@ -2,7 +2,7 @@
 ## This module is to be use()'d only by Pod::Simple::Transcode
 
 package Pod::Simple::TranscodeDumb;
-use strict;
+
 use vars < qw($VERSION %Supported);
 $VERSION = '2.02';
 # This module basically pretends it knows how to transcode, except

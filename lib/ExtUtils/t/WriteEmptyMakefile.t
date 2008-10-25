@@ -14,7 +14,6 @@ BEGIN {
 
 chdir 't';
 
-use strict;
 use Test::More tests => 4;
 
 use ExtUtils::MakeMaker < qw(WriteEmptyMakefile);

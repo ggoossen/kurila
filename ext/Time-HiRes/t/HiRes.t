@@ -9,7 +9,6 @@ use Time::HiRes v1.9704 < qw(tv_interval);
 
 print "ok 1\n";
 
-use strict;
 
 my $have_gettimeofday	 = &Time::HiRes::d_gettimeofday( < @_ );
 my $have_usleep		 = &Time::HiRes::d_usleep( < @_ );

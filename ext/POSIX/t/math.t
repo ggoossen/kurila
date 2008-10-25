@@ -1,6 +1,6 @@
 #!perl -w
 
-use strict;
+
 
 use POSIX;
 use Test::More tests => 14;

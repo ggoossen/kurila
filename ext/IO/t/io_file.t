@@ -1,6 +1,6 @@
 #!./perl -w
 
-use strict;
+
 use bytes;
 require(%ENV{PERL_CORE} ? "./test.pl" : "./t/test.pl");
 plan(tests => ($^O =~ m/MSWin32/ ? 9 : 6));

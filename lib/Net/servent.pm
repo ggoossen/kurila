@@ -1,5 +1,5 @@
 package Net::servent;
-use strict;
+
 
 our $VERSION = '1.01';
 our(@EXPORT, @EXPORT_OK, %EXPORT_TAGS);

@@ -1,6 +1,5 @@
 package OS2::ExtAttr;
 
-use strict;
 use XSLoader;
 
 our $VERSION = '0.02';

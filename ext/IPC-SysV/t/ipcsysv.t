@@ -20,7 +20,7 @@ else {
 # Later the sem* tests will import more for themselves.
 
 use IPC::SysV < qw(IPC_PRIVATE IPC_NOWAIT IPC_STAT IPC_RMID S_IRWXU);
-use strict;
+
 
 my $msg;
 my $sem;

@@ -421,7 +421,6 @@ with re-writing this manpage.
 
 #############################################################################
 
-use strict;
 #use diagnostics;
 use Config;
 use Exporter;

@@ -1,6 +1,5 @@
 package ExtUtils::MakeMaker::bytes;
 
-use strict;
 
 our $VERSION = 6.44;
 

@@ -6,7 +6,6 @@
 
 package IO::Socket::INET;
 
-use strict;
 our(@ISA, $VERSION);
 use IO::Socket;
 use Socket;

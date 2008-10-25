@@ -2,7 +2,7 @@
 # Time-stamp: "2004-03-30 16:33:31 AST"
 
 package Locale::Maketext;
-use strict;
+
 use vars < qw( @ISA $VERSION $MATCH_SUPERS $USING_LANGUAGE_TAGS
              $USE_LITERALS $MATCH_SUPERS_TIGHTLY);
 use Carp ();

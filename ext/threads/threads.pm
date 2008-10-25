@@ -1,7 +1,6 @@
 package threads;
 
 
-use strict;
 use warnings;
 
 our $VERSION = '1.69';

@@ -10,8 +10,7 @@ use IO::Compress::Base::Common v2.006 ;
 use Compress::Raw::Zlib v2.006 ;
 use IO::Compress::Gzip v2.006 ;
 use IO::Uncompress::Gunzip v2.006 ;
-
-use strict ;
+ 
 use warnings ;
 use bytes ;
 our ($VERSION, $XS_VERSION, @ISA, @EXPORT);

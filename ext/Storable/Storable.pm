@@ -9,7 +9,6 @@ require DynaLoader;
 require Exporter;
 package Storable;
 
-use strict;
 
 our @ISA = qw(Exporter DynaLoader);
 

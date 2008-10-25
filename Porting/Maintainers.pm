@@ -4,7 +4,6 @@
 
 package Maintainers;
 
-use strict;
 
 use lib "Porting";
 

@@ -1,4 +1,4 @@
-use strict;
+
 use Config;
 
 sub to_string {

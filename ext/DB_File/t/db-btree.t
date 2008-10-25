@@ -1,7 +1,7 @@
 #!./perl -w
 
 use warnings;
-use strict;
+
 use Config;
  
 BEGIN {
@@ -597,7 +597,7 @@ do {
    package Another ;
 
    use warnings ;
-   use strict ;
+    
 
    open(FILE, ">", "SubDB.pm") or die "Cannot open SubDB.pm: $!\n" ;
    print FILE <<'EOM' ;
@@ -690,7 +690,7 @@ EOM
 do {
    # DBM Filter tests
    use warnings ;
-   use strict ;
+    
    my (%h, $db) ;
    my ($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
    unlink $Dfile;
@@ -797,7 +797,7 @@ do {
     # DBM Filter with a closure
 
     use warnings ;
-    use strict ;
+     
     my (%h, $db) ;
 
     unlink $Dfile;
@@ -860,7 +860,7 @@ do {
 do {
    # DBM Filter recursion detection
    use warnings ;
-   use strict ;
+    
    my (%h, $db) ;
    unlink $Dfile;
 
@@ -889,7 +889,7 @@ do {
     ###
 
     use warnings FATAL => < qw(all) ;
-    use strict ;
+     
     use DB_File ;
 
     my %h ;
@@ -942,7 +942,7 @@ EOM
     ###
 
     use warnings FATAL => < qw(all) ;
-    use strict ;
+     
     use DB_File ;
 
     my ($filename, %h);
@@ -994,7 +994,7 @@ EOM
     ###
 
     use warnings FATAL => < qw(all) ;
-    use strict ;
+     
     use DB_File ;
  
     my ($filename, $x, %h, $status, $key, $value);
@@ -1051,7 +1051,7 @@ EOM
     ###
 
     use warnings FATAL => < qw(all) ;
-    use strict ;
+     
     use DB_File ;
  
     my ($filename, $x, %h);
@@ -1100,7 +1100,7 @@ EOM
     ###
 
     use warnings FATAL => < qw(all) ;
-    use strict ;
+     
     use DB_File ;
  
     my ($filename, $x, %h, $found);
@@ -1135,7 +1135,7 @@ EOM
     ###
 
     use warnings FATAL => < qw(all) ;
-    use strict ;
+     
     use DB_File ;
  
     my ($filename, $x, %h, $found);
@@ -1170,7 +1170,7 @@ EOM
     ###
 
     use warnings FATAL => < qw(all) ;
-    use strict ;
+     
     use DB_File ;
     use Fcntl ;
 
@@ -1267,7 +1267,7 @@ do {
     # test that $hash{KEY} = undef doesn't produce the warning
     #     Use of uninitialized value in null operation 
     use warnings ;
-    use strict ;
+     
     use DB_File ;
 
     unlink $Dfile;
@@ -1287,7 +1287,7 @@ do {
     # test that %hash = () doesn't produce the warning
     #     Argument "" isn't numeric in entersub
     use warnings ;
-    use strict ;
+     
     use DB_File ;
 
     unlink $Dfile;
@@ -1311,7 +1311,7 @@ do {
     # Also Test "keys" & "values" while we are at it.
 
     use warnings ;
-    use strict ;
+     
     use DB_File ;
 
     unlink $Dfile;
@@ -1422,7 +1422,7 @@ do {
    # Check that DBM Filter can cope with read-only $_
 
    use warnings ;
-   use strict ;
+    
    my (%h, $db) ;
    unlink $Dfile;
 
@@ -1466,7 +1466,7 @@ do {
    # Check low-level API works with filter
 
    use warnings ;
-   use strict ;
+    
    my (%h, $db) ;
    my $Dfile = "xxy.db";
    unlink $Dfile;
@@ -1519,7 +1519,7 @@ do {
 
 
     use warnings ;
-    use strict ;
+     
     my (%h, $db) ;
     my $Dfile = "xxy.db";
     unlink $Dfile;

@@ -1,7 +1,7 @@
 #!./perl -T
 
 use warnings;
-use strict;
+
 $|++;
 
 =pod

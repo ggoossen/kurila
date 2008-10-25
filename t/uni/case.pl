@@ -4,7 +4,7 @@ require "./test.pl";
 
 require bytes;
 use utf8;
-use strict;
+
 
 sub unidump {
     join " ", map { sprintf "\%04X", $_ } @( unpack "U*", @_[0]);

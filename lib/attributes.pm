@@ -6,7 +6,6 @@ our @EXPORT_OK = qw(get reftype);
 our @EXPORT = @( () );
 our %EXPORT_TAGS = %(ALL => \@(< @EXPORT, < @EXPORT_OK));
 
-use strict;
 
 ## forward declaration(s) rather than wrapping the bootstrap call in BEGIN{}
 #sub reftype ($) ;

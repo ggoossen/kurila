@@ -11,7 +11,6 @@ BEGIN {
 }
 chdir 't';
 
-use strict;
 use Test::More tests => 9;
 
 use File::Spec;

@@ -1,6 +1,6 @@
 #!perl
 
-use strict;
+
 use warnings;
 use Getopt::Long;
 use File::Basename;

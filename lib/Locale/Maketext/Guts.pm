@@ -4,7 +4,7 @@ BEGIN { *zorp = sub { return scalar nelems @_ } unless defined &zorp; }
  # Just so we're nice and define SOMETHING in "our" package.
 
 package Locale::Maketext;
-use strict;
+
 use vars < qw($USE_LITERALS $GUTSPATH);
 
 BEGIN {

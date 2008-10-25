@@ -2,7 +2,7 @@
 # Time-stamp: "2004-06-20 21:47:55 ADT"
 
 package I18N::LangTags::Detect;
-use strict;
+
 
 use vars < qw( @ISA $VERSION $MATCH_SUPERS $USING_LANGUAGE_TAGS
              $USE_LITERALS $MATCH_SUPERS_TIGHTLY);

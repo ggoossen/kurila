@@ -14,7 +14,7 @@
 # Todo: Print more stats on a db file, e.g. no of records
 #       add log/txn/lock files
 
-use strict ;
+ 
 
 my %Data =
 	%(

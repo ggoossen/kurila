@@ -1,6 +1,6 @@
 #!./perl
 
-use strict;
+
 
 use Test::More;
 use Time::Local;

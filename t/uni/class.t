@@ -48,7 +48,6 @@ sub test_regexp ($$) {
   }
 }
 
-use strict;
 
 my $str;
 

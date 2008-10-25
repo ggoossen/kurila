@@ -1,7 +1,6 @@
 # Module makefile for threads::shared (using ExtUtils::MakeMaker)
 
 
-use strict;
 use warnings;
 
 use ExtUtils::MakeMaker;

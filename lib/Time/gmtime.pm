@@ -1,5 +1,5 @@
 package Time::gmtime;
-use strict;
+
 
 use Time::tm;
 

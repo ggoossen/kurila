@@ -13,7 +13,7 @@ package DB_File::HASHINFO ;
 
 
 use warnings;
-use strict;
+
 use Carp;
 require Tie::Hash;
 @DB_File::HASHINFO::ISA = qw(Tie::Hash);
@@ -114,7 +114,7 @@ sub CLEAR    { my $self = shift ; $self->NotHere("CLEAR") }
 package DB_File::RECNOINFO ;
 
 use warnings;
-use strict ;
+ 
 
 @DB_File::RECNOINFO::ISA = qw(DB_File::HASHINFO) ;
 
@@ -132,7 +132,7 @@ sub TIEHASH
 package DB_File::BTREEINFO ;
 
 use warnings;
-use strict ;
+ 
 
 @DB_File::BTREEINFO::ISA = qw(DB_File::HASHINFO) ;
 
@@ -158,7 +158,7 @@ sub TIEHASH
 package DB_File ;
 
 use warnings;
-use strict;
+
 our ($VERSION, @ISA, @EXPORT, $DB_BTREE, $DB_HASH, $DB_RECNO);
 our ($db_version, $use_XSLoader, $splice_end_array, $Error);
 use Carp;

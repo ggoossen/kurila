@@ -2,7 +2,6 @@
 # this file as a template for defsubs.h
 # Extracting defsubs.h (with variable substitutions)
 #!perl -w
-use strict;
 use File::Spec;
 my (undef, $headerpath) = < @ARGV;
 my ($out) = __FILE__ =~ m/(^.*)\.PL/i;

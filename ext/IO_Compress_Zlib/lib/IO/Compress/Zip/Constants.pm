@@ -1,6 +1,5 @@
 package IO::Compress::Zip::Constants;
-
-use strict ;
+ 
 use warnings;
 
 require Exporter;

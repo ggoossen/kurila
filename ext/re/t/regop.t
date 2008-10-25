@@ -8,7 +8,6 @@ BEGIN {
     }
 }
 
-use strict;
 BEGIN { require "./test.pl"; }
 our $NUM_SECTS;
 chomp(my @strs= grep { !m/^\s*\#/ } @( ~< *DATA));
