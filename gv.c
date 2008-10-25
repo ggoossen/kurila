@@ -425,7 +425,7 @@ Perl_gv_fetchmeth(pTHX_ HV *stash, const char *name, STRLEN len, I32 level)
              *  2. method isn't a stub (else AUTOLOAD fails spectacularly)
              */
             if (topgv && (GvREFCNT(topgv) == 1) && (CvROOT(cand_cv) || CvXSUB(cand_cv))) {
-                  if ((old_cv = GvCV(topgv))) SvREFCNT_dec(old_cv);
+                  if ((old_cv = GvCV(topgv))) CvREFCNT_dec(old_cv);
                   SvREFCNT_inc_simple_void_NN(cand_cv);
                   GvCV(topgv) = cand_cv;
                   GvCVGEN(topgv) = topgen_cmp;
@@ -440,7 +440,7 @@ Perl_gv_fetchmeth(pTHX_ HV *stash, const char *name, STRLEN len, I32 level)
         if(candidate) {
             cand_cv = GvCV(candidate);
             if (topgv && (GvREFCNT(topgv) == 1) && (CvROOT(cand_cv) || CvXSUB(cand_cv))) {
-                  if ((old_cv = GvCV(topgv))) SvREFCNT_dec(old_cv);
+                  if ((old_cv = GvCV(topgv))) CvREFCNT_dec(old_cv);
                   SvREFCNT_inc_simple_void_NN(cand_cv);
                   GvCV(topgv) = cand_cv;
                   GvCVGEN(topgv) = topgen_cmp;
@@ -1303,7 +1303,7 @@ Perl_gp_ref(pTHX_ GP *gp)
 	    /* If the GP they asked for a reference to contains
                a method cache entry, clear it first, so that we
                don't infect them with our cached entry */
-	    SvREFCNT_dec(gp->gp_cv);
+	    CvREFCNT_dec(gp->gp_cv);
 	    gp->gp_cv = NULL;
 	    gp->gp_cvgen = 0;
 	}
@@ -1334,7 +1334,7 @@ Perl_gp_free(pTHX_ GV *gv)
     }
 
     SvREFCNT_dec(gp->gp_sv);
-    SvREFCNT_dec(gp->gp_av);
+    AvREFCNT_dec(gp->gp_av);
     /* FIXME - another reference loop GV -> symtab -> GV ?
        Somehow gp->gp_hv can end up pointing at freed garbage.  */
     if (gp->gp_hv && SvTYPE(gp->gp_hv) == SVt_PVHV) {
@@ -1342,10 +1342,10 @@ Perl_gp_free(pTHX_ GV *gv)
 	if (PL_stashcache && hvname)
 	    (void)hv_delete(PL_stashcache, hvname, HvNAMELEN_get(gp->gp_hv),
 		      G_DISCARD);
-	SvREFCNT_dec(gp->gp_hv);
+	HvREFCNT_dec(gp->gp_hv);
     }
     SvREFCNT_dec(gp->gp_io);
-    SvREFCNT_dec(gp->gp_cv);
+    CvREFCNT_dec(gp->gp_cv);
 
     Safefree(gp);
     GvGP(gv) = 0;

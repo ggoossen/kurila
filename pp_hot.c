@@ -2246,7 +2246,7 @@ PP(pp_entersub)
 	if (hasargs) {
 	    AV* const av = newAV();
 	    SAVECLEARSV(PAD_SVl(0));
-	    PAD_SVl(0) = AvSV(av);
+	    PAD_SVl(0) = AvSv(av);
 	    if (AvREAL(av)) {
 		/* @_ is normally not REAL--this should only ever
 		 * happen when DB::sub() calls things that modify @_ */

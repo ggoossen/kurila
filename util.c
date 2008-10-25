@@ -1324,7 +1324,7 @@ Perl_vdie(pTHX_ const char* pat, va_list *args)
 	av_push(locav, newSViv(PL_parser->lex_line_number));
 	av_push(locav, newSViv((PL_parser->bufptr - PL_parser->linestart +
 		    PL_parser->lex_charoffset) + 1));
-	location = AvSV(locav);
+	location = AvSv(locav);
     }
     msv = vdie_croak_common(location, pat, args);
     die_where(msv);

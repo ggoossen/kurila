@@ -124,6 +124,27 @@ END_EXTERN_C
 
 /* functions with flag 'n' should come before here */
 START_EXTERN_C
+PERL_INLINE_CALLCONV SV*	Perl_HvSv(pTHX_ HV *hv)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_HVSV	\
+	assert(hv)
+
+PERL_INLINE_CALLCONV SV*	Perl_AvSv(pTHX_ AV *av)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_AVSV	\
+	assert(av)
+
+PERL_INLINE_CALLCONV SV*	Perl_CvSv(pTHX_ CV *cv)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_CVSV	\
+	assert(cv)
+
+PERL_INLINE_CALLCONV SV*	Perl_GvSv(pTHX_ GV *cv)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_GVSV	\
+	assert(cv)
+
+
 PERL_INLINE_CALLCONV const char*	Perl_SvPVX_const(pTHX_ SV *sv)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_SVPVX_CONST	\

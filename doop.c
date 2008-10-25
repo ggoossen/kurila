@@ -653,7 +653,7 @@ Perl_do_kv(pTHX)
 	}
 	PUTBACK;
     }
-    XPUSHs(AvSV(res));
+    XPUSHs(AvSv(res));
     RETURN;
 }
 

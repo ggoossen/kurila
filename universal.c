@@ -702,7 +702,7 @@ AV* S_context_info(pTHX_ const PERL_CONTEXT *cx) {
     else
 	av_push(av, newSVpv(stashname, 0));
     if (cx->blk_oldop->op_location) {
-	sv_setsv(AvSV(av), cx->blk_oldop->op_location);
+	sv_setsv(AvSv(av), cx->blk_oldop->op_location);
     } else {
 	av_push(av, newSVpv("unknown location", 0));
     }
