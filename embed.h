@@ -45,6 +45,10 @@
 #define set_context		Perl_set_context
 #define SvPVX_const		Perl_SvPVX_const
 #define SvPVX_mutable		Perl_SvPVX_mutable
+#define AvREFCNT_dec(a)		Perl_SvREFCNT_dec(aTHX_ AvSV(a))
+#define HvREFCNT_dec(a)		Perl_SvREFCNT_dec(aTHX_ HvSV(a))
+#define CvREFCNT_dec(a)		Perl_SvREFCNT_dec(aTHX_ CvSV(a))
+#define GvREFCNT_dec(a)		Perl_SvREFCNT_dec(aTHX_ GvSV(a))
 #define SvREFCNT_dec		Perl_SvREFCNT_dec
 #define SvIV			Perl_SvIV
 #define SvUV			Perl_SvUV
@@ -2245,6 +2249,10 @@
 #define set_context		Perl_set_context
 #define SvPVX_const(a)		Perl_SvPVX_const(aTHX_ a)
 #define SvPVX_mutable(a)	Perl_SvPVX_mutable(aTHX_ a)
+#define AvREFCNT_dec(a)		Perl_SvREFCNT_dec(aTHX_ AvSV(a))
+#define HvREFCNT_dec(a)		Perl_SvREFCNT_dec(aTHX_ HvSV(a))
+#define CvREFCNT_dec(a)		Perl_SvREFCNT_dec(aTHX_ CvSV(a))
+#define GvREFCNT_dec(a)		Perl_SvREFCNT_dec(aTHX_ GvSV(a))
 #define SvREFCNT_dec(a)		Perl_SvREFCNT_dec(aTHX_ a)
 #define SvIV(a)			Perl_SvIV(aTHX_ a)
 #define SvUV(a)			Perl_SvUV(aTHX_ a)
