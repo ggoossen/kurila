@@ -842,6 +842,9 @@ sub sv_array_hash {
     for my $op (map { $xml->findnodes("//op_$_") } qw|padav rv2av anonlist|) {
         my $flags = $op->att('flags') || '';
         my $main_prop = $op->tag eq "op_anonlist" ? 'square_open' : 'ary';
+        if ( $op->tag eq "op_anonlist" and $flags =~ m/\bSPECIAL\b/) {
+            next;
+        }
         if ($flags =~ m/SCALAR/ and $flags !~ m/REF/) {
             set_madprop($op, $main_prop, 'nelems(' . get_madprop($op, $main_prop));
             set_madprop($op, 'round_open', "");
@@ -886,7 +889,7 @@ sub sv_array_hash {
 
     # add '<' in front of subcalls in list context.
     for my $op (map { $xml->findnodes("//op_$_") } qw|entersub|) {
-        next unless $op->att('flags') =~ m/LIST/; # must be list context.
+        next unless ($op->att('flags')||'') =~ m/LIST/; # must be list context.
 
         next if (get_madprop($op->parent, 'comma') || '') eq '=&gt;'; # skip if preceded by '=>'
 
@@ -1087,6 +1090,20 @@ sub doblock {
     }
 }
 
+sub remove_use_strict {
+    my $xml = shift;
+    for my $mad ($xml->findnodes(qq|//mad_op[\@key="use"]|)) {
+        next unless $mad->child(0)->att("PV") eq "strict.pm";
+        set_madprop($mad->child(0), "value", "", wsbefore => '');
+        my ($args) = $mad->parent->findnodes(qq|mad_op[\@key="bigarrow"]|);
+        $args->delete if $args;
+        my $wsbefore = get_madprop($mad->parent->parent, "operator", "wsbefore");
+        $wsbefore =~ s/&#xA;$//;
+        set_madprop($mad->parent->parent, "operator", "", wsbefore => $wsbefore);
+        set_madprop($mad->parent->parent, "semicolon", "");
+    }
+}
+
 my $from; # floating point number with starting version of kurila.
 GetOptions("from=s" => \$from);
 $from =~ m/(\w+)[-]([\d.]+)$/ or die "invalid from: '$from'";
@@ -1177,7 +1194,8 @@ if ($from->{branch} ne "kurila" or $from->{v} < qv '1.14') {
 
 #ampcall($twig);
 #doblock($twig);
-lvalue_subs( $twig, "vec" );
+#lvalue_subs( $twig, "vec" );
+remove_use_strict($twig);
 
 # print
 $twig->print( pretty_print => 'indented' );

@@ -46,7 +46,10 @@ sub convert {
     }
 
     # XML back to Perl 5
-    return Nomad::xml_to_p5( input => "$file.xml", version => $to_version );
+    return Nomad::xml_to_p5( input => "$file.xml",
+                             version => $to_version,
+                             version_from => $from_version,
+                         );
 }
 
 1;
