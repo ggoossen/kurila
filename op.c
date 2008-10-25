@@ -2267,7 +2267,7 @@ Perl_token_getmad(pTHX_ MADTOKEN* tk, OP* o, char slot)
     /* faked up qw list? */
     if (slot == '(' &&
 	tm->mad_type == MAD_SV &&
-	SvPVX((SV*)tm->mad_val)[0] == 'q')
+	SvPVX_const((SV*)tm->mad_val)[0] == 'q')
 	    slot = 'x';
 
     if (o) {
