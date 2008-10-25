@@ -100,6 +100,11 @@ static __inline__ SV* inline_AvSV(pTHX_ AV *av) {
     return (SV*)av;
 }
 
+#define CvSV(cv) inline_CvSV(aTHX_ cv)
+static __inline__ SV* inline_CvSV(pTHX_ CV *cv) {
+    return (SV*)cv;
+}
+
 #define SvAV(sv) inline_SvAV(aTHX_ sv)
 static __inline__ AV* inline_SvAV(pTHX_ SV *sv) {
     return (AV*)sv;

@@ -375,7 +375,7 @@ Perl_gv_fetchmeth(pTHX_ HV *stash, const char *name, STRLEN len, I32 level)
             }
             else {
                 /* stale cache entry, junk it and move on */
-	        SvREFCNT_dec(cand_cv);
+	        CvREFCNT_dec(cand_cv);
 	        GvCV(topgv) = cand_cv = NULL;
 	        GvCVGEN(topgv) = 0;
             }

@@ -10,6 +10,7 @@
 :	A		member of public API
 :	m		Implemented as a macro - no export, no
 :			proto, no #define
+:       S               Has Cv, Hv, Av, Gv macros
 :       i               function is inline
 :	d		function has documentation with its source
 :	s		static function, should have an S_ prefix in
@@ -100,7 +101,7 @@ END_EXTERN_C
 START_EXTERN_C
 Aip	|const char*	|SvPVX_const	|NN SV *sv
 Aip	|char*	|SvPVX_mutable	|NN SV *sv
-Aip	|void	|SvREFCNT_dec	|NULLOK SV *sv
+AipS	|void	|SvREFCNT_dec	|NULLOK SV *sv
 Aip	|IV	|SvIV	|NN SV *sv
 Aip	|UV	|SvUV	|NN SV *sv
 Aip	|NV	|SvNV	|NN SV *sv
