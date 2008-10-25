@@ -286,23 +286,6 @@ perform the upgrade if necessary.  See C<svtype>.
 #define SvREFCNT_inc_void_NN(sv)	(void)(++SvREFCNT((SV*)(sv)))
 #define SvREFCNT_inc_simple_void_NN(sv)	(void)(++SvREFCNT((SV*)(sv)))
 
-#if defined(__GNUC__) && !defined(PERL_GCC_BRACE_GROUPS_FORBIDDEN)
-#  define SvREFCNT_dec(sv)		\
-    ({					\
-	SV * const _sv = (SV*)(sv);	\
-	if (_sv) {			\
-	    if (SvREFCNT(_sv)) {	\
-		if (--(SvREFCNT(_sv)) == 0) {			\
-		    Perl_sv_free2(aTHX_ _sv);	} 		\
-	    } else {			\
-		sv_free(_sv);		\
-	    }				\
-	}				\
-    })
-#else
-#define SvREFCNT_dec(sv)	sv_free((SV*)(sv))
-#endif
-
 #define SVTYPEMASK	0xff
 #define SvTYPE(sv)	((svtype)((sv)->sv_flags & SVTYPEMASK))
 
