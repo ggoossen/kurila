@@ -441,8 +441,8 @@ walk_table {
                     my $a1 = @az[0];
                     (my $xvname = $func) =~ s/^Sv/$xv/;
                     my $ret_convert = $retval =~ m/SV/;
-                    my $call = "Perl_" . $func . "(aTHX_ " . $xv . "SV" . "($a1)$alist)";
-                    print $em "#define $xvname(" . $a1 . $alist . ")\t\t" . ($ret_convert ? "Sv" . uc($xv) . "($call)" : $call ) . "\n";
+                    my $call = "Perl_" . $func . "(aTHX_ " . $xv . "Sv" . "($a1)$alist)";
+                    print $em "#define $xvname(" . $a1 . $alist . ")\t\t" . ($ret_convert ? "Sv" . $xv . "($call)" : $call ) . "\n";
                 }
             }
 	}
@@ -527,8 +527,8 @@ walk_table {
                     my $a1 = @az[0];
                     (my $xvname = $func) =~ s/^Sv/$xv/;
                     my $ret_convert = $retval =~ m/SV/;
-                    my $call = "Perl_" . $func . "(aTHX_ " . $xv . "SV" . "($a1)$alist)";
-                    print $em "#define $xvname(" . $a1 . $alist . ")\t\t" . ($ret_convert ? "Sv" . uc($xv) . "($call)" : $call ) . "\n";
+                   my $call = "Perl_" . $func . "(aTHX_ " . $xv . "Sv" . "($a1)$alist)";
+                    print $em "#define $xvname(" . $a1 . $alist . ")\t\t" . ($ret_convert ? "Sv" . $xv . "($call)" : $call ) . "\n";
                 }
             }
 	}

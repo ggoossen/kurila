@@ -3364,7 +3364,7 @@ PP(pp_aslice)
 	Perl_croak(aTHX_ "array slice indices must be an ARRAY not %s", Ddesc((SV*)slice));
 
     slice = av_mortalcopy(slice);
-    XPUSHs(AvSV(slice));
+    XPUSHs(AvSv(slice));
     sliceitem = AvARRAY(slice);
 
     if ( ! sliceitem )
@@ -3488,7 +3488,7 @@ PP(pp_delete)
 	}
 
 	if ( ! discard)
-	    XPUSHs(AvSV(slicecopy));
+	    XPUSHs(AvSv(slicecopy));
     }
     else {
 	SV *keysv = POPs;
@@ -3577,10 +3577,10 @@ PP(pp_hslice)
 	Perl_croak(aTHX_ "Not a HASH");
 
     if ( ! SvAVOK(slice) )
-	Perl_croak(aTHX_ "%s expected an ARRAY but got %s", OP_DESC(PL_op), Ddesc(AvSV(slice)));
+	Perl_croak(aTHX_ "%s expected an ARRAY but got %s", OP_DESC(PL_op), Ddesc(AvSv(slice)));
 
     slice = av_mortalcopy(slice);
-    XPUSHs(AvSV(slice));
+    XPUSHs(AvSv(slice));
 
     sliceitem = AvARRAY(slice);
     if (!sliceitem)
@@ -4086,7 +4086,7 @@ PP(pp_push)
 
     if ( ! SvAVOK(ary) ) {
 	Perl_croak(aTHX_ "First argument to %s must be an ARRAY not %s", 
-	    OP_DESC(PL_op), Ddesc(AvSV(ary)));
+	    OP_DESC(PL_op), Ddesc(AvSv(ary)));
     }
 
     {
@@ -4383,7 +4383,7 @@ PP(pp_split)
     PUTBACK;
     LEAVE_SCOPE(oldsave); /* may undo an earlier SWITCHSTACK */
     SPAGAIN;
-    XPUSHs(AvSV(av));
+    XPUSHs(AvSv(av));
     RETURN;
 }
 

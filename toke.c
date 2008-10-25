@@ -5327,7 +5327,7 @@ Perl_yylex(pTHX)
 		    }
 		}
 		start_force(PL_curforce);
-		NEXTVAL_NEXTTOKE.opval = newSVOP(OP_CONST, 0, AvSV(av), S_curlocation());
+		NEXTVAL_NEXTTOKE.opval = newSVOP(OP_CONST, 0, AvSv(av), S_curlocation());
 		force_next(THING);
 	    }
 	    if (PL_lex_stuff.str_sv) {

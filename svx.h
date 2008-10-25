@@ -95,15 +95,10 @@ static __inline__ AV* inline_av_mortalcopy(pTHX_ AV *av) {
     return (AV*)sv_mortalcopy((SV*)av);
 }
 
-#define AvSV(av) inline_AvSV(aTHX_ av)
-static __inline__ SV* inline_AvSV(pTHX_ AV *av) {
-    return (SV*)av;
-}
-
-#define CvSV(cv) inline_CvSV(aTHX_ cv)
-static __inline__ SV* inline_CvSV(pTHX_ CV *cv) {
-    return (SV*)cv;
-}
+SV* Perl_AvSv(pTHX_ AV *av) { return (SV*)av; }
+SV* Perl_HvSv(pTHX_ HV *hv) { return (SV*)hv; }
+SV* Perl_CvSv(pTHX_ CV *cv) { return (SV*)cv; }
+SV* Perl_GvSv(pTHX_ GV *gv) { return (SV*)gv; }
 
 #define SvAV(sv) inline_SvAV(aTHX_ sv)
 static __inline__ AV* inline_SvAV(pTHX_ SV *sv) {

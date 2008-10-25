@@ -391,14 +391,14 @@ PP(pp_grepstart)
 
     if (PL_stack_base + *PL_markstack_ptr == SP) {
 	(void)POPMARK;
-	mXPUSHs(AvSV(newAV()));
+	mXPUSHs(AvSv(newAV()));
 	RETURNOP(PL_op->op_next->op_next);
     }
 
     PL_stack_sp = PL_stack_base + *PL_markstack_ptr + 1;
 
     src = sv_mortalcopy(POPs);
-    dst = sv_2mortal(AvSV(newAV()));
+    dst = sv_2mortal(AvSv(newAV()));
 
     if ( ! SvOK(src) ) {
 	(void)POPMARK;
@@ -562,7 +562,7 @@ PP(pp_flop)
 	}
     }
 
-    XPUSHs(AvSV(res));
+    XPUSHs(AvSv(res));
     RETURN;
 }
 
@@ -1817,7 +1817,7 @@ Perl_sv_compile_2op(pTHX_ SV *sv, OP** startop, const char *code, PAD** padp)
     PL_op = &dummy;
     PL_op->op_type = OP_ENTEREVAL;
     PL_op->op_flags = 0;			/* Avoid uninit warning. */
-    PL_op->op_location = oldop ? newSVsv(oldop->op_location) : AvSV(newAV());
+    PL_op->op_location = oldop ? newSVsv(oldop->op_location) : AvSv(newAV());
     PUSHBLOCK(cx, CXt_EVAL|(IN_PERL_COMPILETIME ? 0 : CXp_REAL), SP);
     PUSHEVAL(cx, 0);
 

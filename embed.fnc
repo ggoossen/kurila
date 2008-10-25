@@ -99,6 +99,11 @@ END_EXTERN_C
 
 /* functions with flag 'n' should come before here */
 START_EXTERN_C
+Aip	|SV*	|HvSv	|NN HV *hv
+Aip	|SV*	|AvSv	|NN AV *av
+Aip	|SV*	|CvSv	|NN CV *cv
+Aip	|SV*	|GvSv	|NN GV *cv
+
 Aip	|const char*	|SvPVX_const	|NN SV *sv
 Aip	|char*	|SvPVX_mutable	|NN SV *sv
 AipS	|void	|SvREFCNT_dec	|NULLOK SV *sv

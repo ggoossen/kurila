@@ -31,6 +31,10 @@ Perl_realloc
 Perl_mfree
 Perl_get_context
 Perl_set_context
+Perl_HvSv
+Perl_AvSv
+Perl_CvSv
+Perl_GvSv
 Perl_SvPVX_const
 Perl_SvPVX_mutable
 Perl_SvREFCNT_dec
