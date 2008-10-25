@@ -162,7 +162,8 @@ START_EXTERN_C
 
 #define OP_NAME(o) ((o)->op_type == OP_CUSTOM ? custom_op_name(o) : \\
                     PL_op_name[(o)->op_type])
-#define OP_DESC(o) ((o)->op_type == OP_CUSTOM ? custom_op_desc(o) : \\
+#define OP_DESC(o) ( ! (o) ? "???" : \\
+                    (o)->op_type == OP_CUSTOM ? custom_op_desc(o) : \\
                     PL_op_desc[(o)->op_type])
 
 #ifndef DOINIT

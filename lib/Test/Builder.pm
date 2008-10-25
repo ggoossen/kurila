@@ -485,20 +485,8 @@ sub is_num {
 sub _is_diag {
     my($self, $got, $type, $expect) = < @_;
 
-    foreach my $val (@(\$got, \$expect)) {
-        if( defined $$val ) {
-            if( $type eq 'eq' ) {
-                # quote and force string context
-                $$val = dump::view($$val);
-            }
-        }
-        else {
-            $$val = 'undef';
-        }
-    }
-
     local $Level = $Level + 1;
-    return $self->diag(sprintf <<DIAGNOSTIC, $got, $expect);
+    return $self->diag(sprintf <<DIAGNOSTIC, dump::view($got), dump::view($expect));
          got: \%s
     expected: \%s
 DIAGNOSTIC

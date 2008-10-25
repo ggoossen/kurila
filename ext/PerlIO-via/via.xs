@@ -418,7 +418,7 @@ PerlIOVia_read(pTHX_ PerlIO * f, void *vbuf, Size_t count)
 				 Nullsv);
 	    if (result) {
 		rd = (SSize_t) SvIV(result);
-		Move(SvPVX(buf), vbuf, rd, char);
+		Move(SvPVX_const(buf), vbuf, rd, char);
 		return rd;
 	    }
 	}
@@ -486,7 +486,7 @@ PerlIOVia_get_base(pTHX_ PerlIO * f)
     if (PerlIOBase(f)->flags & PERLIO_F_CANREAD) {
 	PerlIOVia *s = PerlIOSelf(f, PerlIOVia);
 	if (s->var) {
-	    return (STDCHAR *) SvPVX(s->var);
+	    return (STDCHAR *) SvPVX_mutable(s->var);
 	}
     }
     return (STDCHAR *) NULL;

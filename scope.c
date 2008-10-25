@@ -711,7 +711,7 @@ Perl_leave_scope(pTHX_ I32 base)
 	    PL_localizing = 0;
 	    SvREFCNT_dec(value);
 	    if (av) /* actually an av, hv or gv */
-		SvREFCNT_dec(av);
+		AvREFCNT_dec(av);
 	    break;
 	case SAVEt_GENERIC_PVREF:		/* generic pv */
 	    ptr = SSPOPPTR;
@@ -745,7 +745,7 @@ Perl_leave_scope(pTHX_ I32 base)
 	    av = (AV*)SSPOPPTR;
 	    gv = (GV*)SSPOPPTR;
 	    if (GvAV(gv)) {
-		SvREFCNT_dec(GvAV(gv));
+		AvREFCNT_dec(GvAV(gv));
 	    }
 	    GvAV(gv) = av;
 	    if (SvMAGICAL(av)) {
@@ -758,7 +758,7 @@ Perl_leave_scope(pTHX_ I32 base)
 	    hv = (HV*)SSPOPPTR;
 	    gv = (GV*)SSPOPPTR;
 	    if (GvHV(gv)) {
-		SvREFCNT_dec(GvHV(gv));
+		HvREFCNT_dec(GvHV(gv));
 	    }
 	    GvHV(gv) = hv;
 	    if (SvMAGICAL(hv)) {
@@ -814,7 +814,7 @@ Perl_leave_scope(pTHX_ I32 base)
             /* putting a method back into circulation ("local")*/
 	    if (GvCVu(gv) && (hv=GvSTASH(gv)) && HvNAME_get(hv))
                 mro_method_changed_in(hv);
-	    SvREFCNT_dec(gv);
+	    GvREFCNT_dec(gv);
 	    break;
 	case SAVEt_FREESV:
 	    ptr = SSPOPPTR;
@@ -894,7 +894,7 @@ Perl_leave_scope(pTHX_ I32 base)
 	    hv = (HV*)ptr;
 	    ptr = SSPOPPTR;
 	    (void)hv_delete(hv, (char*)ptr, (I32)SSPOPINT, G_DISCARD);
-	    SvREFCNT_dec(hv);
+	    HvREFCNT_dec(hv);
 	    Safefree(ptr);
 	    break;
 	case SAVEt_DESTRUCTOR_X:
@@ -929,7 +929,7 @@ Perl_leave_scope(pTHX_ I32 base)
 		    goto restore_sv;
 		}
 	    }
-	    SvREFCNT_dec(av);
+	    AvREFCNT_dec(av);
 	    SvREFCNT_dec(value);
 	    break;
 	case SAVEt_HELEM:		/* hash element */
@@ -948,7 +948,7 @@ Perl_leave_scope(pTHX_ I32 base)
 		    goto restore_sv;
 		}
 	    }
-	    SvREFCNT_dec(hv);
+	    HvREFCNT_dec(hv);
 	    SvREFCNT_dec(sv);
 	    SvREFCNT_dec(value);
 	    break;
@@ -961,7 +961,7 @@ Perl_leave_scope(pTHX_ I32 base)
 		GvHV(PL_hintgv) = NULL;
 	    }
 	    *(I32*)&PL_hints = (I32)SSPOPINT;
-	    SvREFCNT_dec(PL_compiling.cop_hints_hash);
+	    HvREFCNT_dec(PL_compiling.cop_hints_hash);
  	    PL_compiling.cop_hints_hash = (HV*) SSPOPPTR;
 	    if (PL_hints & HINT_LOCALIZE_HH) {
 		SvREFCNT_dec((SV*)GvHV(PL_hintgv));

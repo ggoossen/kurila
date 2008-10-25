@@ -1044,13 +1044,7 @@ Perl_scalarvoid(pTHX_ OP *o)
 	    no_bareword_allowed(o);
 	else {
 	    if (ckWARN(WARN_VOID)) {
-		if (SvOK(sv)) {
-		    SV* msv = sv_2mortal(Perl_newSVpvf(aTHX_
-				"a constant (%"SVf")", sv));
-		    useless = SvPV_nolen(msv);
-		}
-		else
-		    useless = "a constant (undef)";
+		useless = "a constant";
 		/* don't warn on optimised away booleans, eg 
 		 * use constant Foo, 5; Foo || print; */
 		if (cSVOPo->op_private & OPpCONST_SHORTCIRCUIT)
@@ -1891,8 +1885,8 @@ Perl_newPROG(pTHX_ OP *o)
     }
     else {
 	if (o->op_type == OP_STUB) {
-	    SVcpNULL(PL_comppad_name);
-	    SVcpNULL(PL_compcv);
+	    AVcpNULL(PL_comppad_name);
+	    CVcpNULL(PL_compcv);
 	    S_op_destroy(aTHX_ o);
 	    return;
 	}
@@ -1903,7 +1897,7 @@ Perl_newPROG(pTHX_ OP *o)
 	OpREFCNT_set(PL_main_root, 1);
 	PL_main_root->op_next = 0;
 	CALL_PEEP(PL_main_start);
-	SVcpNULL(PL_compcv);
+	CVcpNULL(PL_compcv);
 
 	/* Register with debugger */
 	if (PERLDB_INTER) {
@@ -2777,11 +2771,8 @@ Perl_pmruntime(pTHX_ OP *o, OP *expr, bool isreg)
     }
 
     if (repl) {
-	OP *curop;
-	if (pm->op_pmflags & PMf_EVAL) {
-	    curop = NULL;
-	}
-	else if (repl->op_type == OP_CONST)
+	OP *curop = NULL;
+	if (repl->op_type == OP_CONST)
 	    curop = repl;
 	if (curop == repl
 	    && !(repl_has_vars
@@ -4138,7 +4129,7 @@ Perl_cv_undef(pTHX_ CV *cv)
 
     /* remove CvOUTSIDE unless this is an undef rather than a free */
     if (!SvREFCNT(cv) && CvOUTSIDE(cv)) {
-	SvREFCNT_dec(CvOUTSIDE(cv));
+	CvREFCNT_dec(CvOUTSIDE(cv));
 	CvOUTSIDE(cv) = NULL;
     }
     if (CvCONST(cv)) {
@@ -4183,7 +4174,7 @@ Perl_cv_ckproto_len(pTHX_ const CV *cv, const GV *gv, const char *p,
        relying on SvCUR, and doubling up the buffer to hold CvFILE().  */
     if (((!p != !SvPOK(cv)) /* One has prototype, one has not.  */
 	 || (p && (len != SvCUR(cv) /* Not the same length.  */
-		   || memNE(p, SvPVX_const(cv), len))))
+		 || memNE(p, SvPVX_const((SV*)cv), len))))
 	 && ckWARN_d(WARN_PROTOTYPE)) {
 	SV* const msg = sv_newmortal();
 	SV* name = NULL;
@@ -4377,7 +4368,7 @@ Perl_newNAMEDSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *block)
 	    }
 	}
 
-	SVcpNULL(PL_compcv);
+	CVcpNULL(PL_compcv);
 	cv = NULL;
 	return NULL;
     }
@@ -4390,7 +4381,7 @@ Perl_newNAMEDSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *block)
 		: "Subroutine %s redefined",
 		name);
 	}
-	SvREFCNT_dec(GvCV(gv));
+	CvREFCNT_dec(GvCV(gv));
     }
     GvCV(gv) = CvREFCNT_inc(cv);
 
@@ -4678,7 +4669,7 @@ Perl_newXS(pTHX_ const char *name, XSUBADDR_t subaddr, const char *filename)
 		    : "Subroutine %s redefined",
 		    name);
 	    }
-	    SvREFCNT_dec(GvCV(gv));
+	    CvREFCNT_dec(GvCV(gv));
 	}
     }
 
@@ -4696,7 +4687,7 @@ Perl_newXS(pTHX_ const char *name, XSUBADDR_t subaddr, const char *filename)
     if ( ! name)
 	CvANON_on(cv);
 
-    SvLOCATION(cv) = AvSV(newAV());
+    SvLOCATION(cv) = AvSv(newAV());
     av_store(SvAV(SvLOCATION((SV*)cv)), 3, newSVpv(name, 0));
 
     return cv;
@@ -6016,7 +6007,7 @@ Perl_ck_require(pTHX_ OP *o)
 		}
 	    }   
 
-	    s = SvPVX(sv);
+	    s = SvPVX_mutable(sv);
 	    len = SvCUR(sv);
 	    end = s + len;
 	    for (; s < end; s++) {
@@ -6845,7 +6836,7 @@ Perl_peep(pTHX_ register OP *o)
 	    }
 	    else if ((o->op_private & OPpEARLY_CV) && ckWARN(WARN_PROTOTYPE)) {
 		GV * const gv = cGVOPo_gv;
-		if (SvTYPE(gv) == SVt_PVGV && GvCV(gv) && SvPVX_const(GvCV(gv))) {
+		if (SvTYPE(gv) == SVt_PVGV && GvCV(gv) && SvPVX_const((SV*)GvCV(gv))) {
 		    /* XXX could check prototype here instead of just carping */
                     SV * const sv = sv_newmortal();
                     gv_efullname3(sv, gv, NULL);

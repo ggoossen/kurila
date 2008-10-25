@@ -221,10 +221,10 @@ do {
 #   Failed test '       == with strings'
 #   at $0 line 211.
 #          got: 42
-#     expected: foo
+#     expected: 'foo'
 ERR
     My::Test::like $warnings,
-     qq[/^Argument "foo" isn't numeric in .* at $Filename line 211 character 50\\\.\n/];
+     qq[/^Argument "foo" isn't numeric in .*/];
 
 };
 

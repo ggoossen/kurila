@@ -35,7 +35,7 @@ sub shownamearray {
     for my $i (0 .. $count -1) {
 	my $sv = @els[$i];
 	if (class($sv) ne "SPECIAL") {
-	    printf $walkHandle "$i: \%s (0x\%lx) \%s\n", class($sv), $$sv, $sv->PVX;
+	    printf $walkHandle "$i: \%s (0x\%lx) \%s\n", class($sv), $$sv, $sv->PVX_const;
 	} else {
 	    printf $walkHandle "$i: \%s\n", $sv->terse;
 	    #printf $walkHandle "$i: \%s\n", B::Concise::concise_sv($sv);

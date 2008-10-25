@@ -1982,7 +1982,7 @@ PP(pp_subst)
 	{
 	    SvPV_free(TARG);
 	}
-	SvPV_set(TARG, SvPVX(dstr));
+	SvPV_set(TARG, SvPVX_mutable(dstr));
 	SvCUR_set(TARG, SvCUR(dstr));
 	SvLEN_set(TARG, SvLEN(dstr));
 	SvPV_set(dstr, NULL);
@@ -2244,7 +2244,9 @@ PP(pp_entersub)
 	SAVECOMPPAD();
 	PAD_SET_CUR_NOSAVE(padlist, CvDEPTH(cv));
 	if (hasargs) {
-	    AV* const av = (AV*)PAD_SVl(0);
+	    AV* const av = newAV();
+	    SAVECLEARSV(PAD_SVl(0));
+	    PAD_SVl(0) = AvSv(av);
 	    if (AvREAL(av)) {
 		/* @_ is normally not REAL--this should only ever
 		 * happen when DB::sub() calls things that modify @_ */
@@ -2253,7 +2255,6 @@ PP(pp_entersub)
 		AvREIFY_on(av);
 	    }
 	    CX_CURPAD_SAVE(cx->blk_sub);
-	    cx->blk_sub.argarray = av;
 	    ++MARK;
 
 	    if (items > AvMAX(av) + 1) {

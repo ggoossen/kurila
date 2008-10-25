@@ -588,8 +588,6 @@ S_pm_description(pTHX_ const PMOP *pm)
 	sv_catpv(desc, ",CONTINUE");
     if (pmflags & PMf_RETAINT)
 	sv_catpv(desc, ",RETAINT");
-    if (pmflags & PMf_EVAL)
-	sv_catpv(desc, ",EVAL");
     return desc;
 }
 
@@ -751,7 +749,7 @@ Perl_do_op_dump(pTHX_ I32 level, PerlIO *file, const OP *o)
     }
     {
 	SV* loc = o->op_location;
-	Perl_dump_indent(aTHX_ level, file, "  LOCATION = ");
+	Perl_dump_indent(aTHX_ level, file, "LOCATION = ");
 	if (loc && SvAVOK(loc)) {
 	    SV** ary = AvARRAY((AV*)loc);
 	    I32 len = av_len((AV*)loc);
@@ -1180,7 +1178,6 @@ static const struct { const char type; const char *name; } magic_names[] = {
 	{ PERL_MAGIC_sigelem,        "sigelem(s)" },
 	{ PERL_MAGIC_taint,          "taint(t)" },
 	{ PERL_MAGIC_uvar_elem,      "uvar_elem(u)" },
-	{ PERL_MAGIC_vec,            "vec(v)" },
 	{ PERL_MAGIC_vstring,        "vstring(V)" },
 	{ PERL_MAGIC_utf8,           "utf8(w)" },
 	{ PERL_MAGIC_defelem,        "defelem(y)" },
@@ -1211,7 +1208,6 @@ Perl_do_magic_dump(pTHX_ I32 level, PerlIO *file, const MAGIC *mg, I32 nest, I32
             else if (v == &PL_vtbl_isa)        s = "isa";
             else if (v == &PL_vtbl_mglob)      s = "mglob";
             else if (v == &PL_vtbl_taint)      s = "taint";
-            else if (v == &PL_vtbl_vec)        s = "vec";
             else if (v == &PL_vtbl_bm)         s = "bm";
             else if (v == &PL_vtbl_uvar)       s = "uvar";
             else if (v == &PL_vtbl_defelem)    s = "defelem";

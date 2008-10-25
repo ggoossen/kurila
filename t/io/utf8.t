@@ -245,11 +245,11 @@ do {
     undef $@;
     my $line = ~< *F;
     my ($chrE4, $chrF6) = ("E4", "F6");
-    like( $@->message, qr/utf8 "\\x$chrE4" does not map to Unicode .+/,
+    like( $@->message, qr/utf8 "\\x$chrE4" does not map to Unicode/,
 	  "<:utf8 readline must warn about bad utf8");
     undef $@;
     $line .= ~< *F;
-    like( $@->message, qr/utf8 "\\x$chrF6" does not map to Unicode .+/,
+    like( $@->message, qr/utf8 "\\x$chrF6" does not map to Unicode/,
 	  "<:utf8 rcatline must warn about bad utf8");
     close F;
 };

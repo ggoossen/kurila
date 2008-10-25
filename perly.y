@@ -79,7 +79,7 @@
 %token <i_tkval> FUNC0 FUNC1 FUNC UNIOP LSTOP
 %token <i_tkval> RELOP EQOP MULOP ADDOP
 %token <i_tkval> DO NOAMP
-%token <i_tkval> ANONARY ANONARYL ANONHSH ANONSCALAR ANONSCALARL
+%token <i_tkval> ANONARY ANONARYL ANONHSH ANONHSHL ANONSCALAR ANONSCALARL
 %token <i_tkval> LOCAL MY MYSUB REQUIRE
 %token <i_tkval> COLONATTR
 %token <i_tkval> SPECIALBLOCK
@@ -113,7 +113,7 @@
 %right <i_tkval> ASSIGNOP
 %right <i_tkval> '?' ':'
 %right <i_tkval> '<'
-%right ANONARYL ANONSCALARL
+%right ANONHSHL ANONARYL ANONSCALARL
 %nonassoc DOTDOT
 %left <i_tkval> OROR DORDOR
 %left <i_tkval> ANDAND
@@ -476,7 +476,7 @@ subrout	:	SUB startsub subname proto subbody
                             /* SvREFCNT_dec(new);  leak reference */
 #else
                             CV* new = newNAMEDSUB($2, $3, $4, $5);
-                            SvREFCNT_dec(new);
+                            CvREFCNT_dec(new);
                             $$ = (OP*)NULL;
 #endif
 			}
@@ -641,6 +641,11 @@ listop	:	LSTOP indirob argexpr /* map {...} @args or print $fh @args */
                             $$ = convert(IVAL($1), 0, $2, LOCATION($1));
                             TOKEN_GETMAD($1,$$,'o');
                             APPEND_MADPROPS_PV("listop", $$, '>');
+			}
+        |       ANONHSHL listexpr  /* %: ... */
+                        {
+                            $$ = newANONHASH($2, LOCATION($1));
+                            TOKEN_GETMAD($1,$$,'{');
 			}
         |       ANONARYL listexpr  /* @: ... */
                         {
@@ -970,7 +975,7 @@ termdo	:       DO term	%prec UNIOP                     /* do $filename */
                             TOKEN_GETMAD($1,op_scope,'L');
                             TOKEN_GETMAD($2,op_scope,'o');
                             $$ = newSTATEOP(0, PVAL($1), op_scope, LOCATION($2));
-                            $$ = scope($$);
+                            /* $$ = scope($$); should work */
 			}
         ;
 

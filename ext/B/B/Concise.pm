@@ -752,7 +752,7 @@ sub concise_op {
     } elsif (%h{targ}) {
 	my $padname = (($curcv->PADLIST->ARRAY)[0]->ARRAY)[%h{targ}];
 	if (defined $padname and class($padname) ne "SPECIAL") {
-	    %h{targarg}  = $padname->PVX;
+	    %h{targarg}  = $padname->PVX_const;
 	    if ($padname->FLAGS ^&^ SVf_FAKE) {
 		    # These changes relate to the jumbo closure fix.
 		    # See changes 19939 and 20005

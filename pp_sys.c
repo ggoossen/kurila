@@ -390,7 +390,7 @@ PP(pp_glob)
     SVcpSTEAL(PL_rs, newSVpvs("\000"));
 #ifndef DOSISH
 #ifndef CSH
-    *SvPVX(PL_rs) = '\n';
+    *SvPVX_mutable(PL_rs) = '\n';
 #endif	/* !CSH */
 #endif	/* !DOSISH */
 
@@ -950,20 +950,20 @@ PP(pp_sselect)
 	    Sv_Grow(sv, growsize);
 	}
 	j = SvCUR(sv);
-	s = SvPVX(sv) + j;
+	s = SvPVX_mutable(sv) + j;
 	while (++j <= growsize) {
 	    *s++ = '\0';
 	}
 
 #if BYTEORDER != 0x1234 && BYTEORDER != 0x12345678
-	s = SvPVX(sv);
+	s = SvPVX_mutable(sv);
 	Newx(fd_sets[i], growsize, char);
 	for (offset = 0; offset < growsize; offset += masksize) {
 	    for (j = 0, k=ORDERBYTE; j < masksize; j++, (k >>= 4))
 		fd_sets[i][j+offset] = s[(k % masksize) + offset];
 	}
 #else
-	fd_sets[i] = SvPVX(sv);
+	fd_sets[i] = SvPVX_mutable(sv);
 #endif
     }
 
@@ -988,7 +988,7 @@ PP(pp_sselect)
 	if (fd_sets[i]) {
 	    sv = SP[i];
 #if BYTEORDER != 0x1234 && BYTEORDER != 0x12345678
-	    s = SvPVX(sv);
+	    s = SvPVX_mutable(sv);
 	    for (offset = 0; offset < growsize; offset += masksize) {
 		for (j = 0, k=ORDERBYTE; j < masksize; j++, (k >>= 4))
 		    s[(k % masksize) + offset] = fd_sets[i][j+offset];
@@ -1017,7 +1017,7 @@ Perl_setdefout(pTHX_ GV *gv)
     dVAR;
     SvREFCNT_inc_simple_void(gv);
     if (PL_defoutgv)
-	SvREFCNT_dec(PL_defoutgv);
+	GvREFCNT_dec(PL_defoutgv);
     PL_defoutgv = gv;
 }
 
@@ -1055,13 +1055,13 @@ PP(pp_getc)
     }
     TAINT;
     sv_setpvn(TARG, " ", 1);
-    *SvPVX(TARG) = PerlIO_getc(IoIFP(GvIOp(gv))); /* should never be EOF */
+    *SvPVX_mutable(TARG) = PerlIO_getc(IoIFP(GvIOp(gv))); /* should never be EOF */
     if (PerlIO_isutf8(IoIFP(GvIOp(gv)))) {
 	/* Find out how many bytes the char needs */
 	Size_t len = UTF8SKIP(SvPVX_const(TARG));
 	if (len > 1) {
 	    SvGROW(TARG,len+1);
-	    len = PerlIO_read(IoIFP(GvIOp(gv)),SvPVX(TARG)+1,len-1);
+	    len = PerlIO_read(IoIFP(GvIOp(gv)),SvPVX_mutable(TARG)+1,len-1);
 	    SvCUR_set(TARG,1+len);
 	}
     }
@@ -1474,7 +1474,8 @@ PP(pp_send)
 	const int flags = SvIV(*++MARK);
 	if (SP > MARK) {
 	    STRLEN mlen;
-	    char * const sockbuf = SvPVx(*++MARK, &mlen);
+	    char * const sockbuf = SvPV_mutable(MARK[1], mlen);
+	    MARK++;
 	    retval = PerlSock_sendto(PerlIO_fileno(IoIFP(io)), buffer, blen,
 				     flags, (struct sockaddr *)sockbuf, mlen);
 	}
@@ -2129,7 +2130,7 @@ PP(pp_ssockopt)
 	SvCUR_set(sv,256);
 	*SvEND(sv) ='\0';
 	len = SvCUR(sv);
-	if (PerlSock_getsockopt(fd, lvl, optname, SvPVX(sv), &len) < 0)
+	if (PerlSock_getsockopt(fd, lvl, optname, SvPVX_mutable(sv), &len) < 0)
 	    goto nuts2;
 	SvCUR_set(sv, len);
 	*SvEND(sv) ='\0';
@@ -2204,11 +2205,11 @@ PP(pp_getpeername)
     fd = PerlIO_fileno(IoIFP(io));
     switch (optype) {
     case OP_GETSOCKNAME:
-	if (PerlSock_getsockname(fd, (struct sockaddr *)SvPVX(sv), &len) < 0)
+	if (PerlSock_getsockname(fd, (struct sockaddr *)SvPVX_mutable(sv), &len) < 0)
 	    goto nuts2;
 	break;
     case OP_GETPEERNAME:
-	if (PerlSock_getpeername(fd, (struct sockaddr *)SvPVX(sv), &len) < 0)
+	if (PerlSock_getpeername(fd, (struct sockaddr *)SvPVX_mutable(sv), &len) < 0)
 	    goto nuts2;
 #if defined(VMS_DO_SOCKETS) && defined (DECCRTL_SOCKETS)
 	{

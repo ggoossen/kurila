@@ -708,7 +708,7 @@ Perl_nextargv(pTHX_ register GV *gv)
 	SAVEFREESV(sv);
 	sv_setsv(GvSVn(gv),sv);
 	SvSETMAGIC(GvSV(gv));
-	PL_oldname = SvPVx(GvSV(gv), &oldlen);
+	PL_oldname = SvPV_const(GvSV(gv), oldlen);
 	if ( ! PL_inplace) {
 	    if (oldlen == 1 && *PL_oldname == '-') {
 		if (do_openn(gv,"-", 1, FALSE, O_RDONLY,0,NULL,NULL,0)) {
@@ -888,7 +888,7 @@ Perl_nextargv(pTHX_ register GV *gv)
 	{
 	    GV * const oldout = (GV*)av_pop(PL_argvout_stack);
 	    setdefout(oldout);
-	    SvREFCNT_dec(oldout);
+	    GvREFCNT_dec(oldout);
 	    return NULL;
 	}
 	setdefout(gv_fetchpvs("STDOUT", GV_ADD|GV_NOTQUAL, SVt_PVIO));

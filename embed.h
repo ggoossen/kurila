@@ -43,6 +43,24 @@
 #endif
 #define get_context		Perl_get_context
 #define set_context		Perl_set_context
+#define HvSv			Perl_HvSv
+#define AvSv			Perl_AvSv
+#define CvSv			Perl_CvSv
+#define GvSv			Perl_GvSv
+#define IoSv			Perl_IoSv
+#define ReSv			Perl_ReSv
+#define SvPVX_const		Perl_SvPVX_const
+#define SvPVX_mutable		Perl_SvPVX_mutable
+#define AvREFCNT_dec(a)		Perl_SvREFCNT_dec(aTHX_ AvSv(a))
+#define HvREFCNT_dec(a)		Perl_SvREFCNT_dec(aTHX_ HvSv(a))
+#define CvREFCNT_dec(a)		Perl_SvREFCNT_dec(aTHX_ CvSv(a))
+#define GvREFCNT_dec(a)		Perl_SvREFCNT_dec(aTHX_ GvSv(a))
+#define IoREFCNT_dec(a)		Perl_SvREFCNT_dec(aTHX_ IoSv(a))
+#define ReREFCNT_dec(a)		Perl_SvREFCNT_dec(aTHX_ ReSv(a))
+#define SvREFCNT_dec		Perl_SvREFCNT_dec
+#define SvIV			Perl_SvIV
+#define SvUV			Perl_SvUV
+#define SvNV			Perl_SvNV
 #define Gv_AMupdate		Perl_Gv_AMupdate
 #ifdef PERL_CORE
 #define append_elem		Perl_append_elem
@@ -407,7 +425,6 @@
 #define magic_getsig		Perl_magic_getsig
 #define magic_gettaint		Perl_magic_gettaint
 #define magic_getuvar		Perl_magic_getuvar
-#define magic_getvec		Perl_magic_getvec
 #define magic_len		Perl_magic_len
 #define magic_nextpack		Perl_magic_nextpack
 #define magic_regdata_cnt	Perl_magic_regdata_cnt
@@ -433,7 +450,6 @@
 #define magic_setsig		Perl_magic_setsig
 #define magic_settaint		Perl_magic_settaint
 #define magic_setuvar		Perl_magic_setuvar
-#define magic_setvec		Perl_magic_setvec
 #define magic_setutf8		Perl_magic_setutf8
 #define magic_set_all_env	Perl_magic_set_all_env
 #define magic_sizepack		Perl_magic_sizepack
@@ -1238,7 +1254,6 @@
 #if defined(PERL_IN_PP_CTL_C) || defined(PERL_DECL_PROT)
 #ifdef PERL_CORE
 #define docatch			S_docatch
-#define dofindlabel		S_dofindlabel
 #define dopoptoeval		S_dopoptoeval
 #define dopoptolabel		S_dopoptolabel
 #define dopoptoloop		S_dopoptoloop
@@ -2240,6 +2255,24 @@
 #endif
 #define get_context		Perl_get_context
 #define set_context		Perl_set_context
+#define HvSv(a)			Perl_HvSv(aTHX_ a)
+#define AvSv(a)			Perl_AvSv(aTHX_ a)
+#define CvSv(a)			Perl_CvSv(aTHX_ a)
+#define GvSv(a)			Perl_GvSv(aTHX_ a)
+#define IoSv(a)			Perl_IoSv(aTHX_ a)
+#define ReSv(a)			Perl_ReSv(aTHX_ a)
+#define SvPVX_const(a)		Perl_SvPVX_const(aTHX_ a)
+#define SvPVX_mutable(a)	Perl_SvPVX_mutable(aTHX_ a)
+#define AvREFCNT_dec(a)		Perl_SvREFCNT_dec(aTHX_ AvSv(a))
+#define HvREFCNT_dec(a)		Perl_SvREFCNT_dec(aTHX_ HvSv(a))
+#define CvREFCNT_dec(a)		Perl_SvREFCNT_dec(aTHX_ CvSv(a))
+#define GvREFCNT_dec(a)		Perl_SvREFCNT_dec(aTHX_ GvSv(a))
+#define IoREFCNT_dec(a)		Perl_SvREFCNT_dec(aTHX_ IoSv(a))
+#define ReREFCNT_dec(a)		Perl_SvREFCNT_dec(aTHX_ ReSv(a))
+#define SvREFCNT_dec(a)		Perl_SvREFCNT_dec(aTHX_ a)
+#define SvIV(a)			Perl_SvIV(aTHX_ a)
+#define SvUV(a)			Perl_SvUV(aTHX_ a)
+#define SvNV(a)			Perl_SvNV(aTHX_ a)
 #define Gv_AMupdate(a)		Perl_Gv_AMupdate(aTHX_ a)
 #ifdef PERL_CORE
 #define append_elem(a,b,c)	Perl_append_elem(aTHX_ a,b,c)
@@ -2591,7 +2624,6 @@
 #define magic_getsig(a,b)	Perl_magic_getsig(aTHX_ a,b)
 #define magic_gettaint(a,b)	Perl_magic_gettaint(aTHX_ a,b)
 #define magic_getuvar(a,b)	Perl_magic_getuvar(aTHX_ a,b)
-#define magic_getvec(a,b)	Perl_magic_getvec(aTHX_ a,b)
 #define magic_len(a,b)		Perl_magic_len(aTHX_ a,b)
 #define magic_nextpack(a,b,c)	Perl_magic_nextpack(aTHX_ a,b,c)
 #define magic_regdata_cnt(a,b)	Perl_magic_regdata_cnt(aTHX_ a,b)
@@ -2617,7 +2649,6 @@
 #define magic_setsig(a,b)	Perl_magic_setsig(aTHX_ a,b)
 #define magic_settaint(a,b)	Perl_magic_settaint(aTHX_ a,b)
 #define magic_setuvar(a,b)	Perl_magic_setuvar(aTHX_ a,b)
-#define magic_setvec(a,b)	Perl_magic_setvec(aTHX_ a,b)
 #define magic_setutf8(a,b)	Perl_magic_setutf8(aTHX_ a,b)
 #define magic_set_all_env(a,b)	Perl_magic_set_all_env(aTHX_ a,b)
 #define magic_sizepack(a,b)	Perl_magic_sizepack(aTHX_ a,b)
@@ -3420,7 +3451,6 @@
 #if defined(PERL_IN_PP_CTL_C) || defined(PERL_DECL_PROT)
 #ifdef PERL_CORE
 #define docatch(a)		S_docatch(aTHX_ a)
-#define dofindlabel(a,b,c,d)	S_dofindlabel(aTHX_ a,b,c,d)
 #define dopoptoeval(a)		S_dopoptoeval(aTHX_ a)
 #define dopoptolabel(a)		S_dopoptolabel(aTHX_ a)
 #define dopoptoloop(a)		S_dopoptoloop(aTHX_ a)

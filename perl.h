@@ -3765,7 +3765,6 @@ Gid_t getegid (void);
 #define PERL_MAGIC_taint	  't' /* Taintedness */
 #define PERL_MAGIC_uvar		  'U' /* Available for use by extensions */
 #define PERL_MAGIC_uvar_elem	  'u' /* Reserved for use by extensions */
-#define PERL_MAGIC_vec		  'v' /* vec() lvalue */
 #define PERL_MAGIC_vstring	  'V' /* SV was vstring literal */
 #define PERL_MAGIC_utf8		  'w' /* Cached UTF-8 information */
 #define PERL_MAGIC_defelem	  'y' /* Shadow "foreach" iterator variable /
@@ -4525,7 +4524,6 @@ enum {		/* pass one of these to get_vtbl */
     want_vtbl_glob,
     want_vtbl_mglob,
     want_vtbl_taint,
-    want_vtbl_vec,
     want_vtbl_bm,
     want_vtbl_uvar,
     want_vtbl_defelem,
@@ -4590,7 +4588,7 @@ struct perl_debug_pad {
 };
 
 #define PERL_DEBUG_PAD(i)	&(PL_debug_pad.pad[i])
-#define PERL_DEBUG_PAD_ZERO(i)	(SvPVX(PERL_DEBUG_PAD(i))[0] = 0, \
+#define PERL_DEBUG_PAD_ZERO(i)	(SvPVX_mutable(PERL_DEBUG_PAD(i))[0] = 0, \
 	(((XPV*) SvANY(PERL_DEBUG_PAD(i)))->xpv_cur = 0), \
 	PERL_DEBUG_PAD(i))
 
@@ -4703,6 +4701,9 @@ struct tempsym; /* defined in pp_pack.c */
 #  else
 #    define PERL_CALLCONV
 #  endif
+#endif
+#ifndef PERL_INLINE_CALLCONV
+#  define PERL_INLINE_CALLCONV static __inline__
 #endif
 #undef PERL_CKDEF
 #undef PERL_PPDEF
@@ -4951,18 +4952,6 @@ MGVTBL_SET(
     PL_vtbl_taint,
     MEMBER_TO_FPTR(Perl_magic_gettaint),
     MEMBER_TO_FPTR(Perl_magic_settaint),
-    0,
-    0,
-    0,
-    0,
-    0,
-    0
-);
-
-MGVTBL_SET(
-    PL_vtbl_vec,
-    MEMBER_TO_FPTR(Perl_magic_getvec),
-    MEMBER_TO_FPTR(Perl_magic_setvec),
     0,
     0,
     0,
@@ -5374,7 +5363,7 @@ typedef struct am_table_short AMTS;
 
 /* Clones the per-interpreter data. */
 #define MY_CXT_CLONE \
-	my_cxt_t *my_cxtp = (my_cxt_t*)SvPVX(newSV(sizeof(my_cxt_t)-1));\
+	my_cxt_t *my_cxtp = (my_cxt_t*)SvPVX_mutable(newSV(sizeof(my_cxt_t)-1));\
 	Copy(PL_my_cxt_list[MY_CXT_INDEX], my_cxtp, 1, my_cxt_t);\
 	PL_my_cxt_list[MY_CXT_INDEX] = my_cxtp				\
 
@@ -5404,7 +5393,7 @@ typedef struct am_table_short AMTS;
 
 /* Clones the per-interpreter data. */
 #define MY_CXT_CLONE \
-	my_cxt_t *my_cxtp = (my_cxt_t*)SvPVX(newSV(sizeof(my_cxt_t)-1));\
+	my_cxt_t *my_cxtp = (my_cxt_t*)SvPVX_mutable(newSV(sizeof(my_cxt_t)-1));\
 	Copy(PL_my_cxt_list[my_cxt_index], my_cxtp, 1, my_cxt_t);\
 	PL_my_cxt_list[my_cxt_index] = my_cxtp				\
 

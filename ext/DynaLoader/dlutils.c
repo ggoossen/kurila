@@ -37,7 +37,7 @@ typedef struct {
 
 START_MY_CXT
 
-#define dl_last_error	(SvPVX(MY_CXT.x_dl_last_error))
+#define dl_last_error	(SvPVX_mutable(MY_CXT.x_dl_last_error))
 #define dl_nonlazy	(MY_CXT.x_dl_nonlazy)
 #ifdef DL_LOADONCEONLY
 #define dl_loaded_files	(MY_CXT.x_dl_loaded_files)

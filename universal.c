@@ -73,7 +73,7 @@ S_isa_lookup(pTHX_ HV *stash, const char * const name, const HV* const name_stas
 			    SVfARG(basename_sv), hvname);
 	    continue;
 	}
-        if(name_stash == basestash || strEQ(name, SvPVX(basename_sv)))
+        if(name_stash == basestash || strEQ(name, SvPVX_const(basename_sv)))
 	    return TRUE;
     }
 
@@ -231,6 +231,7 @@ XS(XS_Symbol_glob_name);
 XS(XS_dump_view);
 XS(XS_error_create);
 XS(XS_error_message);
+XS(XS_error_stacktrace);
 XS(XS_error_write_to_stderr);
 XS(XS_ref_address);
 XS(XS_ref_reftype);
@@ -298,6 +299,7 @@ Perl_boot_core_UNIVERSAL(pTHX)
     
     newXS("error::create", XS_error_create, file);
     newXS("error::message", XS_error_message, file);
+    newXS("error::stacktrace", XS_error_stacktrace, file);
     newXS("error::write_to_stderr", XS_error_write_to_stderr, file);
 
     newXS("ref::address", XS_ref_address, file);
@@ -700,7 +702,7 @@ AV* S_context_info(pTHX_ const PERL_CONTEXT *cx) {
     else
 	av_push(av, newSVpv(stashname, 0));
     if (cx->blk_oldop->op_location) {
-	sv_setsv(AvSV(av), cx->blk_oldop->op_location);
+	sv_setsv(AvSv(av), cx->blk_oldop->op_location);
     } else {
 	av_push(av, newSVpv("unknown location", 0));
     }
@@ -878,6 +880,34 @@ XS(XS_error_message)
 	    if (sv) {
 		sv_catsv(res, *sv);
 	    }
+	}
+
+	PUSHs(res);
+	XSRETURN(1);
+    }
+}
+
+XS(XS_error_stacktrace)
+{
+    dVAR;
+    dXSARGS;
+    PERL_UNUSED_ARG(cv);
+    if (items < 1)
+	Perl_croak(aTHX_ "Usage: error::stacktrace()");
+    SP -= items;
+    {
+	HV *err;
+	SV *res = sv_newmortal();
+	sv_setpvn(res, "", 0);
+	
+	if (sv_isobject(ST(0))) {
+	    err = (HV*)SvRV(ST(0));
+	}
+	else
+	    Perl_croak(aTHX_ "not an error object");
+
+	{
+	    SV **sv;
 
 	    sv = hv_fetchs(err, "location", 0);
 	    if (sv) {
@@ -928,7 +958,6 @@ XS(XS_error_message)
 	XSRETURN(1);
     }
 }
-
 XS(XS_error_write_to_stderr) {
     dXSARGS;
     STRLEN msglen;
@@ -944,6 +973,20 @@ XS(XS_error_write_to_stderr) {
     PUTBACK;
 
     call_method("message", G_SCALAR);
+    SPAGAIN;
+    tmpsv = POPs;
+    message = SvPV_const(tmpsv, msglen);
+
+    LEAVE;
+
+    write_to_stderr(message, msglen);
+
+    ENTER;
+    PUSHMARK(SP);
+    PUSHs(ST(0));
+    PUTBACK;
+
+    call_method("stacktrace", G_SCALAR);
     SPAGAIN;
     tmpsv = POPs;
     message = SvPV_const(tmpsv, msglen);
@@ -1224,7 +1267,7 @@ XS(XS_PerlIO_get_layers)
 		  }
 	     }
 
-	     SvREFCNT_dec(av);
+	     AvREFCNT_dec(av);
 
 	     XPUSHs((SV*)retav);
 
@@ -1284,7 +1327,7 @@ XS(XS_Internals_set_hint_hash)
 	Perl_croak(aTHX_ "Internals::set_hint_hash $hashref");
     hv = SvRV(ST(0));
     if (items == 1 && SvTYPE(hv) == SVt_PVHV) {
-	SvREFCNT_dec(PL_compiling.cop_hints_hash);
+	HvREFCNT_dec(PL_compiling.cop_hints_hash);
 	PL_compiling.cop_hints_hash = (HV*)SvREFCNT_inc(hv);
     }
 }
@@ -1847,7 +1890,7 @@ XS(XS_dump_view)
 	    STRLEN charlen;
 	    sv_grow(retsv, 3 + grow + 2*backslashes + single_quotes
 		    + 2*qq_escapables + normal);
-	    rstart = r = SvPVX(retsv);
+	    rstart = r = SvPVX_mutable(retsv);
 
 	    *r++ = '"';
 
@@ -1883,7 +1926,7 @@ XS(XS_dump_view)
 	} else {
 	    /* Single quotes.  */
 	    sv_grow(retsv, 3 + backslashes + single_quotes + qq_escapables + normal);
-	    rstart = r = SvPVX(retsv);
+	    rstart = r = SvPVX_mutable(retsv);
 	    *r++ = '\'';
 	    for (s = src; s < send; s ++) {
 		*r++ = *s;
@@ -1951,7 +1994,7 @@ XS(XS_dump_view)
 		    }
 
 		    sv_grow(retsv, len);
-		    buffer = SvPVX(retsv);
+		    buffer = SvPVX_mutable(retsv);
 		    buffer_end = retval = buffer + len;
 
 		    /* Working backwards  */
