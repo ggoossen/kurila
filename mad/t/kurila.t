@@ -36,8 +36,9 @@ sub p5convert {
     is($output, $expected) or $TODO or die;
 }
 
-t_lval_vec();
+t_remove_strict();
 die;
+t_lval_vec();
 t_block();
 t_ampcall();
 t_array_simplify();
@@ -1387,5 +1388,27 @@ sub t_lval_vec {
 vec($a, 1, 1) = 1;
 ----
 vec($a, 1, 1, 1);
+END
+}
+
+sub t_remove_strict {
+    p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
+BEGIN { %INC{"strict.pm"} = 1 }
+#before
+use strict;
+#after
+----
+BEGIN { %INC{"strict.pm"} = 1 }
+#before
+#after
+====
+BEGIN { %INC{"strict.pm"} = 1 }
+#before
+no strict 'refs';
+#after
+----
+BEGIN { %INC{"strict.pm"} = 1 }
+#before
+#after
 END
 }
