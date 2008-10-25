@@ -101,6 +101,9 @@ START_EXTERN_C
 Aip	|const char*	|SvPVX_const	|NN SV *sv
 Aip	|char*	|SvPVX_mutable	|NN SV *sv
 Aip	|void	|SvREFCNT_dec	|NULLOK SV *sv
+Aip	|IV	|SvIV	|NN SV *sv
+Aip	|UV	|SvUV	|NN SV *sv
+Aip	|NV	|SvNV	|NN SV *sv
 #  include "pp_proto.h"
 Ap	|bool	|Gv_AMupdate	|NN HV* stash
 p	|OP*	|append_elem	|I32 optype|NULLOK OP* first|NULLOK OP* last
