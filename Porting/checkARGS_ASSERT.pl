@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-use strict;
+
 
 # Print out any PERL_ARGS_ASSERT* macro that was declared but not used.
 

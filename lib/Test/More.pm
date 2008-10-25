@@ -1,6 +1,5 @@
 package Test::More;
 
-use strict;
 
 use vars < qw($VERSION @ISA @EXPORT %EXPORT_TAGS $TODO);
 $VERSION = '0.78';

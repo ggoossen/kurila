@@ -13,7 +13,6 @@ BEGIN {
 	require Fcntl; Fcntl->import( < qw(/^O_/ /^SEEK_/));
 }
 
-use strict;
 
 $| = 1;
 

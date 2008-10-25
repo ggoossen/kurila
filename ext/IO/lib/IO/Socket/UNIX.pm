@@ -6,7 +6,6 @@
 
 package IO::Socket::UNIX;
 
-use strict;
 our(@ISA, $VERSION);
 use IO::Socket;
 use Carp;

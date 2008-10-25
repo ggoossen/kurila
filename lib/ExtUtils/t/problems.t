@@ -4,7 +4,6 @@ BEGIN {
   unshift @INC, 'lib', '../../lib';
 }
 
-use strict;
 use Test::More tests => 6;
 use ExtUtils::MM;
 use MakeMaker::Test::Setup::Problem;

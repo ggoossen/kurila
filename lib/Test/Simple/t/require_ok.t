@@ -10,7 +10,6 @@ BEGIN {
     }
 }
 
-use strict;
 use Test::More tests => 8;
 
 # Symbol and Class::Struct are both non-XS core modules back to 5.004.

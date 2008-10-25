@@ -1,4 +1,4 @@
-use strict;
+
 use Cwd;
 my $CWD = getcwd();
 $CWD =~ s!^[a-z]:!!i;

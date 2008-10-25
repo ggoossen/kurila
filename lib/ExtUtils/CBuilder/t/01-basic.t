@@ -9,7 +9,6 @@ BEGIN {
   }
 }
 
-use strict;
 use Test;
 BEGIN { plan tests => 11 }
 

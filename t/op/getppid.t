@@ -7,7 +7,7 @@
 # attempt 2 reparentings and see if the PID both orphaned grandchildren get is
 # the same. (and not ours)
 
-use strict;
+
 use Config;
 
 BEGIN {

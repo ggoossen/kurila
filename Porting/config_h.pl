@@ -8,7 +8,7 @@
 # You may distribute under the terms of either the GNU General Public
 # License or the Artistic License, as specified in the README file.
 
-use strict;
+
 use warnings;
 
 my ($cSH, $ch, < @ch, < %ch) = ("config_h.SH");

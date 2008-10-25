@@ -10,7 +10,6 @@ my $no_signedness = '';
 
 plan tests => 14651;
 
-use strict;
 use warnings < qw(FATAL all);
 use Config;
 

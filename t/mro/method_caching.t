@@ -1,6 +1,6 @@
 #!./perl
 
-use strict;
+
 use warnings;
 no warnings 'redefine'; # we do a lot of this
 no warnings 'prototype'; # we do a lot of this

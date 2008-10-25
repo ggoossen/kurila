@@ -1,6 +1,6 @@
 
 package Pod::Simple::Debug;
-use strict;
+
 
 sub import {
   my($value,$variable);

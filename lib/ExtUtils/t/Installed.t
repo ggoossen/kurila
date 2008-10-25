@@ -2,7 +2,6 @@
 
 my $Is_VMS = $^O eq 'VMS';
 
-use strict;
 
 use Config;
 use Cwd;

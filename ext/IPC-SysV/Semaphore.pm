@@ -8,7 +8,7 @@ package IPC::Semaphore;
 
 use IPC::SysV < qw(GETNCNT GETZCNT GETVAL SETVAL GETPID GETALL SETALL
 		 IPC_STAT IPC_SET IPC_RMID);
-use strict;
+
 use vars < qw($VERSION);
 use Carp;
 

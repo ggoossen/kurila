@@ -9,7 +9,7 @@
 # we should test as many as we can.
 #
 
-use strict;
+
 
 BEGIN { require "./test.pl" }
 

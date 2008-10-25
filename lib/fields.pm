@@ -1,6 +1,5 @@
 package fields;
 
-use strict;
 unless( eval q{require warnings::register; warnings::register->import; 1} ) {
     *warnings::warnif = sub { 
         require Carp;

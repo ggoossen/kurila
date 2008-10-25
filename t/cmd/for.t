@@ -2,7 +2,6 @@
 
 print "1..37\n";
 
-use strict;
 
 our (@x, $y, $c, @ary, $loop_count, @array, $r, $TODO);
 

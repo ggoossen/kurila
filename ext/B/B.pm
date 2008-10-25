@@ -29,7 +29,6 @@ BEGIN {
     XSLoader::load 'B';
 }
 
-use strict;
 @B::SV::ISA = @( 'B::OBJECT' );
 @B::NULL::ISA = @( 'B::SV' );
 @B::PV::ISA = @( 'B::SV' );

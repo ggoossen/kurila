@@ -1,5 +1,5 @@
 #!perl -w
-use strict;
+
 use vars '$file';
 
 $file = "storable-testfile.$$";

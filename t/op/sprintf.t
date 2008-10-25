@@ -9,7 +9,7 @@
 use warnings;
 use version;
 use Config;
-use strict;
+
 
 my @tests = @( () );
 my ($i, $template, $data, $result, $comment, $w, $x, $evalData, $n, $p);

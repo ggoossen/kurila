@@ -4,7 +4,6 @@ BEGIN {
     push @INC, 'lib';
 }
 
-use strict;
 use warnings;
 use Test::More tests => 14;
 

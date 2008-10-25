@@ -2,7 +2,6 @@
 
 use Config;
 
-use strict;
 use Test::More tests => 14;
 BEGIN {use_ok('File::Glob', ':glob')};
 use Cwd ();

@@ -9,7 +9,6 @@
 
 use kurila;
 
-use strict;
 my $perl = $^X;
 
 require 'regen_lib.pl';

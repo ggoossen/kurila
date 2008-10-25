@@ -1,6 +1,6 @@
 
 package Pod::Perldoc::ToText;
-use strict;
+
 use warnings;
 
 use base < qw(Pod::Perldoc::BaseTo);

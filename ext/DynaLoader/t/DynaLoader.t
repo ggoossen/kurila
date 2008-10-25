@@ -1,6 +1,6 @@
 #!/usr/bin/perl -wT
 
-use strict;
+
 use Config;
 use Test::More;
 my %modules;

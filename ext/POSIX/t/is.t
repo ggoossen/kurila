@@ -10,7 +10,7 @@ BEGIN {
 }
 
 use POSIX;
-use strict ;
+ 
 
 # E.g. \t might or might not be isprint() depending on the locale,
 # so let's reset to the default.

@@ -1,6 +1,5 @@
 package ExtUtils::CBuilder::Platform::aix;
 
-use strict;
 use ExtUtils::CBuilder::Platform::Unix;
 use File::Spec;
 

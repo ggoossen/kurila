@@ -1,6 +1,5 @@
 package ExtUtils::Constant::Utils;
 
-use strict;
 use vars < qw($VERSION @EXPORT_OK @ISA);
 
 @ISA = @( 'Exporter' );

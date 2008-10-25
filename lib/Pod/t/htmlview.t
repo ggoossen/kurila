@@ -5,7 +5,6 @@ BEGIN {
    require "pod2html-lib.pl";
 }
 
-use strict;
 use Test::More tests => 1;
 
 convert_n_test("htmlview", "html rendering");

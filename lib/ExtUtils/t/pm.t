@@ -12,7 +12,6 @@ BEGIN {
     }
 }
 
-use strict;
 use Test::More tests => 5;
 
 use MakeMaker::Test::Utils;

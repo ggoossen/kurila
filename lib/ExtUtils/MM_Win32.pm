@@ -1,6 +1,5 @@
 package ExtUtils::MM_Win32;
 
-use strict;
 
 
 =head1 NAME

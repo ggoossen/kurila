@@ -7,7 +7,6 @@ BEGIN {
     }
 }
 
-use strict;
 use warnings;
 
 # Can't use Test::More, that would set exported_to()

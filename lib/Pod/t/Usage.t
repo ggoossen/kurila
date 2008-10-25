@@ -1,5 +1,5 @@
 #!perl
-use strict;
+
 
 use File::Basename;
 use File::Spec;

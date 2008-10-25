@@ -17,7 +17,7 @@ BEGIN {
 #########################
 
 use Test;
-use strict;
+
 use warnings;
 BEGIN { plan tests => 70 };
 use Unicode::Normalize < qw(:all);

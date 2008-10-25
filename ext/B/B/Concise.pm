@@ -8,8 +8,7 @@ package B::Concise;
 # asks for the BEGIN blocks in her program. Update the comments and
 # the count in concise_specials if you add or delete one. The
 # -MO=Concise counts as use #1.
-
-use strict; # use #2
+ # use #2
 use warnings; # uses #3 and #4, since warnings uses Carp
 
 use Exporter (); # use #5

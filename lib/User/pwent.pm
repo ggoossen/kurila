@@ -2,7 +2,6 @@ package User::pwent;
 
 our $VERSION = '1.00';
 
-use strict;
 use warnings;
 
 use Config;

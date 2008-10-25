@@ -13,7 +13,6 @@ BEGIN {
 }
 
 # use warnings;
-use strict;
 use ExtUtils::MakeMaker;
 use ExtUtils::Constant < qw (C_constant);
 use File::Spec;

@@ -5,7 +5,6 @@ BEGIN {
     plan( tests => 8 );
 }
 
-use strict;
 
 # first, with delete
 # simple removal

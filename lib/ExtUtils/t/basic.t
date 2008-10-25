@@ -7,7 +7,6 @@ BEGIN {
   unshift @INC, 'lib';
 }
 
-use strict;
 use Config;
 use ExtUtils::MakeMaker;
 

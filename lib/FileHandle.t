@@ -15,7 +15,7 @@ BEGIN {
 }
 
 use FileHandle;
-use strict 'subs';
+
 
 (\*STDOUT)->autoflush( 1);
 

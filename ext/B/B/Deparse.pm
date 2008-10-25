@@ -20,7 +20,7 @@ use B < qw(class main_root main_start main_cv svref_2object opnumber perlstring
 	 PMf_KEEP PMf_GLOBAL PMf_CONTINUE
 	 PMf_MULTILINE PMf_SINGLELINE PMf_FOLD PMf_EXTENDED RXf_SKIPWHITE);
 our $VERSION = 0.86;
-use strict;
+
 use warnings ();
 
 # Changes between 0.50 and 0.51:

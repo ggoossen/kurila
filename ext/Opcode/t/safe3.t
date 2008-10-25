@@ -12,7 +12,6 @@ BEGIN {
     }
 }
 
-use strict;
 use warnings;
 use POSIX < qw(ceil);
 use Test::More tests => 2;

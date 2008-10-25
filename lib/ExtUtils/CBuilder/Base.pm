@@ -1,6 +1,5 @@
 package ExtUtils::CBuilder::Base;
 
-use strict;
 use File::Spec;
 use File::Basename;
 use Config;

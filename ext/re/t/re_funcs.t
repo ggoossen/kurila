@@ -8,7 +8,6 @@ BEGIN {
 	}
 }
 
-use strict;
 use warnings;
 
 use Test::More; # test count at bottom of file

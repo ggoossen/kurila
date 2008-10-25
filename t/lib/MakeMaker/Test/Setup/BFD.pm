@@ -4,7 +4,6 @@ our @ISA = qw(Exporter);
 require Exporter;
 our @EXPORT = qw(setup_recurs teardown_recurs);
 
-use strict;
 use File::Path;
 use File::Basename;
 use MakeMaker::Test::Utils;

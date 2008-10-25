@@ -1,6 +1,5 @@
 package Unicode::UCD;
 
-use strict;
 use warnings;
 
 our $VERSION = '0.25';

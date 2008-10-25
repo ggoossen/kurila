@@ -1,7 +1,7 @@
 #!./perl -Tw
 # Testing Cwd under taint mode.
 
-use strict;
+
 
 use Cwd;
 

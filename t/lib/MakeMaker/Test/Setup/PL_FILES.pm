@@ -4,7 +4,6 @@ our @ISA = qw(Exporter);
 require Exporter;
 our @EXPORT = qw(setup teardown);
 
-use strict;
 use File::Path;
 use File::Basename;
 use File::Spec;

@@ -1,6 +1,5 @@
 package File::Spec::Cygwin;
 
-use strict;
 use vars < qw(@ISA $VERSION);
 require File::Spec::Unix;
 

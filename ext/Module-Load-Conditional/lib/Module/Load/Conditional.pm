@@ -1,6 +1,5 @@
 package Module::Load::Conditional;
 
-use strict;
 
 use Module::Load;
 use Params::Check <                       qw[check];

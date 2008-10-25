@@ -1,6 +1,5 @@
 package ExtUtils::Installed;
 
-use strict;
 use Carp qw();
 use ExtUtils::Packlist;
 use ExtUtils::MakeMaker;

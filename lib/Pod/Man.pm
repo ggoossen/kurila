@@ -26,7 +26,6 @@
 package Pod::Man;
 
 
-use strict;
 use utf8;
 use vars < qw(@ISA %ESCAPES $PREAMBLE $VERSION);
 

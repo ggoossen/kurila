@@ -41,7 +41,6 @@ BEGIN {
     require './test.pl';
 }
 
-use strict;
 
 $|=1;
 

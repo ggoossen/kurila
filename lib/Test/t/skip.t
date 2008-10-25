@@ -1,5 +1,4 @@
 # -*-perl-*-
-use strict;
 use Test < qw($TESTOUT $TESTERR $ntest plan ok skip); 
 plan tests => 6;
 

@@ -3,7 +3,7 @@
                 # we build the new one
 
 use kurila;
-use strict;
+
 
 BEGIN {
     # Get function prototypes

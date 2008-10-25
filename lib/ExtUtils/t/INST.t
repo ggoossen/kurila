@@ -15,7 +15,6 @@ BEGIN {
     }
 }
 
-use strict;
 use Test::More tests => 26;
 use MakeMaker::Test::Utils;
 use MakeMaker::Test::Setup::BFD;

@@ -5,7 +5,7 @@
 #
 
 package Locale::Country;
-use strict;
+
 
 require Exporter;
 use Carp;

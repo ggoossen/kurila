@@ -12,7 +12,6 @@ BEGIN {
     require './test.pl';	# for which_perl() etc
 }
 
-use strict;
 
 my $Perl = which_perl();
 

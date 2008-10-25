@@ -36,7 +36,6 @@ usage: $0  [ options ]
     --no-glossary       don't include Porting/Glossary in lib/Config.pod
 EOF
 
-use strict;
 
 our (%Config, $Config_SH_expanded);
 

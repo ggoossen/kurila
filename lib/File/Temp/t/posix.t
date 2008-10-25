@@ -1,7 +1,7 @@
 #!/usr/local/bin/perl -w
 # Test for File::Temp - POSIX functions
 
-use strict;
+
 use Test;
 BEGIN { plan tests => 6}
 

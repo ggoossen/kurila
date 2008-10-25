@@ -3,7 +3,7 @@
 package IO;
 
 use XSLoader ();
-use strict;
+
 use warnings;
 
 our $VERSION = "1.23_01";

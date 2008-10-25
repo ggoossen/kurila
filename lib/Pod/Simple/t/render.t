@@ -1,5 +1,4 @@
 
-use strict;
 use utf8;
 use charnames ':full';
 

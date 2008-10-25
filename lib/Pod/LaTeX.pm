@@ -24,7 +24,6 @@ C<Pod::LaTeX> is a derived class from L<Pod::Select|Pod::Select>.
 =cut
 
 
-use strict;
 require Pod::ParseUtils;
 use base < qw/ Pod::Select /;
 

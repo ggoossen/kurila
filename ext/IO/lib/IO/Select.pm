@@ -6,7 +6,6 @@
 
 package IO::Select;
 
-use     strict;
 use warnings::register;
 use     vars < qw($VERSION @ISA);
 require Exporter;

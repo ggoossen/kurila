@@ -1,6 +1,5 @@
 # t/html-para.t
 
-use strict;
 use Test;
 BEGIN { plan tests => 8 };
 

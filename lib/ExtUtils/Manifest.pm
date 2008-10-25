@@ -6,7 +6,7 @@ use File::Basename;
 use File::Copy 'copy';
 use File::Find;
 use File::Spec;
-use strict;
+
 
 use vars < qw($VERSION @ISA @EXPORT_OK 
           $Is_MacOS $Is_VMS 

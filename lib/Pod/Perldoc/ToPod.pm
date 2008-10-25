@@ -8,7 +8,7 @@
 
 
 package Pod::Perldoc::ToPod;
-use strict;
+
 use warnings;
 
 use base < qw(Pod::Perldoc::BaseTo);

@@ -1,7 +1,6 @@
 # $Id: /local/ExtUtils-MakeMaker/lib/ExtUtils/MakeMaker.pm 54639 2008-02-29T00:06:55.056100Z schwern  $
 package ExtUtils::MakeMaker;
 
-use strict;
 
 require Exporter;
 use ExtUtils::MakeMaker::Config;

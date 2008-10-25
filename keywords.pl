@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-use strict;
+
 
 require 'regen_lib.pl';
 

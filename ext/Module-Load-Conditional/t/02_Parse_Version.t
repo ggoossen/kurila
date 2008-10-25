@@ -1,5 +1,4 @@
 
-use strict;
 use Test::More  'no_plan';
 
 my $Class   = 'Module::Load::Conditional';

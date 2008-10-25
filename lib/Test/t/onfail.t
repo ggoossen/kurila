@@ -1,6 +1,5 @@
 # -*-perl-*-
 
-use strict;
 use Test < qw($ntest plan ok $TESTOUT $TESTERR);
 use vars < qw($mycnt);
 

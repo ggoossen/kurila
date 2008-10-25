@@ -1,6 +1,6 @@
 #!./perl
 
-use strict;
+
 use Config;
 
 use Test::More tests => 15;

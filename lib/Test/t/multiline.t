@@ -2,7 +2,6 @@
 
 BEGIN { open(STDERR, ">", "&STDOUT");  }
 
-use strict;
 use Test; plan tests => 2, todo => \@(1,2); # actually false failure
 
 # perl -Ilib -It/noinck t/multiline.t

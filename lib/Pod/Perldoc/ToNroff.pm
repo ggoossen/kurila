@@ -1,6 +1,6 @@
 
 package Pod::Perldoc::ToNroff;
-use strict;
+
 use warnings;
 
 # This is unlike ToMan.pm in that it emits the raw nroff source!

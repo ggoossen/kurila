@@ -1,7 +1,6 @@
 
 use lib 't';
  
-use strict;
 use warnings;
 use bytes;
 

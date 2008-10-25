@@ -1,6 +1,5 @@
 package utf8;
 
-use strict;
 use warnings;
 
 sub DEBUG () { 0 }

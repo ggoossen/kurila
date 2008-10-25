@@ -95,7 +95,6 @@ push(@Root::bar, "18"); # Two steps to prevent "Identifier used only once..."
 print "$Root::foo\n";
 print join(' ',@{$cpt->varglob('bar')}) . "\n";
 
-use strict;
 
 print 1 ? "ok 19\n" : "not ok 19\n";
 print 1 ? "ok 20\n" : "not ok 20\n";

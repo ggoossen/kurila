@@ -8,7 +8,6 @@ BEGIN {
 	}
 }
 
-use strict;
 
 use Test::More tests => 13;
 require_ok( 're' );

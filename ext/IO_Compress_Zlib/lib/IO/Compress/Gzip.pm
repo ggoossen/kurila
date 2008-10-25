@@ -1,8 +1,7 @@
 
 package IO::Compress::Gzip ;
 
-
-use strict ;
+ 
 use warnings;
 use bytes;
 

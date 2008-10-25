@@ -5,7 +5,7 @@
 #
 
 package Locale::Script;
-use strict;
+
 
 require Exporter;
 use Carp;

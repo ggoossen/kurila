@@ -31,7 +31,6 @@ The values are the original list elements.
 
 =cut
 
-use strict;
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(abbrev);

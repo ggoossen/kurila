@@ -14,7 +14,7 @@ plan(tests => 66);
 
 use POSIX < qw(fcntl_h signal_h limits_h _exit getcwd open read strftime write
 	     errno);
-use strict 'subs';
+
 
 $| = 1;
 
@@ -274,7 +274,7 @@ ok( POSIX::isalnum(undef),'isalnum undef' );
 dies_like( sub { POSIX::isalpha(\@()) }, qr/reference as string/,   'isalpha []' );
 dies_like( sub { POSIX::isprint(\@()) }, qr/reference as string/,   'isalpha []' );
 
-try { use strict; POSIX->import("S_ISBLK"); my $x = S_ISBLK };
+try {  POSIX->import("S_ISBLK"); my $x = S_ISBLK };
 unlike( $@, qr/Can't use string .* as a symbol ref/, "Can import autoloaded constants" );
  
 # Check that output is not flushed by _exit. This test should be last

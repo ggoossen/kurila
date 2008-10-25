@@ -1,6 +1,5 @@
 package ExtUtils::Constant::XS;
 
-use strict;
 use vars < qw($VERSION %XS_Constant %XS_TypeSet @ISA @EXPORT_OK);
 use ExtUtils::Constant::Utils 'perl_stringify';
 require ExtUtils::Constant::Base;

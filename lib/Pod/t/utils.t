@@ -3,7 +3,6 @@
 
 use Test::More tests => 21;
 
-use strict;
 use Pod::ParseUtils;
 
 # First test the hyperlinks

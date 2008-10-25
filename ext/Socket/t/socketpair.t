@@ -48,7 +48,7 @@ EOF
 
 use Socket;
 use Test::More;
-use strict;
+
 use warnings;
 use Errno;
 

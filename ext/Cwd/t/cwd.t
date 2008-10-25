@@ -2,7 +2,6 @@
 
 use Cwd;
 
-use strict;
 use Config;
 use File::Spec;
 use File::Path;

@@ -9,7 +9,7 @@
 # will need to adjust it to match (assuming it is correct).
 
 use Test;
-use strict;
+
 
 BEGIN { plan tests => 177 }
 

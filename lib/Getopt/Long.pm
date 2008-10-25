@@ -31,7 +31,6 @@ package Getopt::Long;
 ################ Module Preamble ################
 
 
-use strict;
 
 use vars < qw($VERSION);
 $VERSION        =  2.37;

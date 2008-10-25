@@ -3,7 +3,7 @@
 BEGIN {
     require './test.pl';
 }
-use strict;
+
 
 plan tests => 24;
 

@@ -3,7 +3,7 @@
 use Config;
 use File::Basename < qw(&basename &dirname);
 use Cwd;
-use strict;
+
 
 # List explicitly here the variables you want Configure to
 # generate.  Metaconfig only looks for shell variables, so you

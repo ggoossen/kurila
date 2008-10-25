@@ -1,7 +1,7 @@
 #!./perl
 
 use warnings;
-use strict;
+
 use feature ":5.10";
 use Test::More tests => 56;
 
@@ -100,7 +100,7 @@ is($a, $b);
 #Re: perlbug #35857, patch #24505
 #handle warnings::register-ed packages properly.
 package B::Deparse::Wrapper;
-use strict;
+
 use warnings;
 use warnings::register;
 sub getcode {
@@ -109,7 +109,7 @@ sub getcode {
 }
 
 package main;
-use strict;
+
 use warnings;
 sub test {
    my $val = shift;

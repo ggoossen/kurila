@@ -6,7 +6,7 @@
 # Originally by Larry Shatzer
 #
 
-use strict;
+
 use File::Find;
 
 find(

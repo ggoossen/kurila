@@ -5,7 +5,7 @@ BEGIN {
         @INC = @(File::Spec->rel2abs('../lib') );
     }
 }
-use strict;
+
 
 #sub Pod::Simple::Search::DEBUG () {5};
 

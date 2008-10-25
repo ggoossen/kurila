@@ -1,6 +1,5 @@
 package ExtUtils::MM_UWIN;
 
-use strict;
 our $VERSION = 6.44;
 
 require ExtUtils::MM_Unix;

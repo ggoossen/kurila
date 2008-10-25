@@ -1,7 +1,7 @@
 #!./perl
 
 use warnings;
-use strict;
+
 use Text::ParseWords;
 use Test::More tests => 27;
 

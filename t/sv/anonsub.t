@@ -4,7 +4,7 @@
 # fresh_perl_is, and fresh_perl_is uses a closure -- a special
 # case of what this program tests for.
 
-use strict;
+
 BEGIN { require "./test.pl" }
 
 my $Is_VMS = $^O eq 'VMS';

@@ -1,6 +1,5 @@
 package Test::Builder::Tester::Color;
 
-use strict;
 
 require Test::Builder::Tester;
 

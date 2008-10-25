@@ -10,7 +10,6 @@ BEGIN {
     require 'regen_lib.pl';
 }
 
-use strict;
 
 my (@enums, @names);
 while ( ~< *DATA) {

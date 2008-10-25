@@ -1,5 +1,5 @@
 package Net::protoent;
-use strict;
+
 
 our $VERSION = '1.00';
 our(@EXPORT, @EXPORT_OK, %EXPORT_TAGS);

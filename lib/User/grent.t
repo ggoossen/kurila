@@ -12,7 +12,6 @@ BEGIN {
     unless ($hasgr) { plan skip_all => "no grp.h"; }
 }
 
-use strict;
 our ($gid, @grent);
 BEGIN {
     $gid = $^O ne 'cygwin' ? 0 : 18;

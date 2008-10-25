@@ -10,7 +10,7 @@ BEGIN {
 
 $|  = 1;
 use warnings;
-use strict;
+
 use Test::More tests => 56;
 
 BEGIN { use_ok( 'B' ); }

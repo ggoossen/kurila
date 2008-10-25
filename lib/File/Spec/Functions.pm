@@ -1,7 +1,7 @@
 package File::Spec::Functions;
 
 use File::Spec;
-use strict;
+
 
 our (@ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS, $VERSION);
 

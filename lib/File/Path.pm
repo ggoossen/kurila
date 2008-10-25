@@ -508,7 +508,6 @@ it under the same terms as Perl itself.
 
 =cut
 
-use strict;
 
 use Cwd 'getcwd';
 use File::Basename ();

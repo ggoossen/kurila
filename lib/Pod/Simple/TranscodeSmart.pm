@@ -3,7 +3,7 @@
 ## This module is to be use()'d only by Pod::Simple::Transcode
 
 package Pod::Simple::TranscodeSmart;
-use strict;
+
 use Pod::Simple;
 require Encode;
 

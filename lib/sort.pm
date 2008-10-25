@@ -10,7 +10,6 @@ $sort::mergesort_bit   = 0x00000002;
 $sort::sort_bits       = 0x000000FF; # allow 256 different ones
 $sort::stable_bit      = 0x00000100;
 
-use strict;
 
 sub import {
     shift;

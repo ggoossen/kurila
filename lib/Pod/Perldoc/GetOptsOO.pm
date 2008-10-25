@@ -1,6 +1,6 @@
 
 package Pod::Perldoc::GetOptsOO;
-use strict;
+
 
 # Rather like Getopt::Std's getopts
 #  Call Pod::Perldoc::GetOptsOO::getopts($object, \@ARGV, $truth)

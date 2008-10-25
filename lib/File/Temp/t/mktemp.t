@@ -3,7 +3,7 @@
 # Test for mktemp family of commands in File::Temp
 # Use STANDARD safe level for these tests
 
-use strict;
+
 use Test;
 BEGIN { plan tests => 9 }
 

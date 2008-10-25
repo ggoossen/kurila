@@ -12,7 +12,6 @@ BEGIN {
     }
 }
 
-use strict;
 use File::Path;
 use Config;
 

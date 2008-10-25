@@ -1,6 +1,5 @@
 package Hash::Util;
 
-use strict;
 use warnings;
 use warnings::register;
 use Scalar::Util < qw(reftype);

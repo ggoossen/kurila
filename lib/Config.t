@@ -8,7 +8,6 @@ BEGIN {
     use_ok('Config');
 }
 
-use strict;
 
 # Some (safe?) bets.
 

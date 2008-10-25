@@ -174,7 +174,6 @@ or you can try using the 4-argument form of Term::ReadLine->new().
 
 =cut
 
-use strict;
 
 package Term::ReadLine::Stub;
 our @ISA = qw'Term::ReadLine::Tk Term::ReadLine::TermCap';

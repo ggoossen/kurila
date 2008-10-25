@@ -1,6 +1,5 @@
 package ExtUtils::MM_Any;
 
-use strict;
 our $VERSION = '6.44';
 
 use File::Spec;

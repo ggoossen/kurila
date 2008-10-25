@@ -1,6 +1,6 @@
 
 package Pod::Perldoc;
-use strict;
+
 use warnings;
 use Config '%Config';
 
@@ -61,7 +61,7 @@ $Pod2man = "pod2man" . ( %Config{'versiononly'} ? %Config{'version'} : '' );
 # Option accessors...
 
 foreach my $subname ( map "opt_$_", split '', q{mhlvriFfXqnTdUL}) {
-  *{Symbol::fetch_glob($subname)} = do{ use strict 'refs';  sub () { shift->_elem($subname, < @_) } };
+  *{Symbol::fetch_glob($subname)} = do{   sub () { shift->_elem($subname, < @_) } };
 }
 
 # And these are so that GetOptsOO knows they take options:

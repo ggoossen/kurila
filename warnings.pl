@@ -7,7 +7,7 @@ BEGIN {
     push @INC, './lib';
 }
 use kurila;
-use strict ;
+ 
 
 sub DEFAULT_ON  () { 1 }
 sub DEFAULT_OFF () { 2 }

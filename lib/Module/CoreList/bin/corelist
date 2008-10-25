@@ -79,7 +79,7 @@ requested perl versions.
 use Module::CoreList;
 use Getopt::Long;
 use Pod::Usage;
-use strict;
+
 use warnings;
 
 my %Opts;

@@ -8,7 +8,6 @@
 use Test;
 BEGIN { plan tests => 13 }
 
-use strict;
 use File::Spec;
 
 # Set up END block - this needs to happen before we load

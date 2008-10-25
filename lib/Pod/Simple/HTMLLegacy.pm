@@ -1,6 +1,6 @@
 
 package Pod::Simple::HTMLLegacy;
-use strict;
+
 
 use vars < qw($VERSION);
 use Getopt::Long;

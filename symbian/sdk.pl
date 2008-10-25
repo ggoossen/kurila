@@ -1,4 +1,4 @@
-use strict;
+
 
 my $SYMBIAN_VERSION;
 my $SYMBIAN_ROOT;

@@ -184,7 +184,7 @@ do {
 # Additional tests by Tom Phoenix <rootbeer@teleport.com>.
 
 do {
-    use strict;
+    
 
     use vars < qw!$test!;
     my($debugging, %expected);

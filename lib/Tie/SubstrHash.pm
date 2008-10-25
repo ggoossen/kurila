@@ -1,6 +1,5 @@
 package Tie::SubstrHash;
 
-use strict;
 
 our $VERSION = '1.00';
 

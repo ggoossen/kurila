@@ -1,7 +1,7 @@
 package Test::Builder;
 
 use kurila;
-use strict;
+
 
 our $VERSION = '0.78_01';
 $VERSION = try { $VERSION }; # make the alpha version come out as a number

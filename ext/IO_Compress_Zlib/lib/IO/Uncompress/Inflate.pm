@@ -1,7 +1,6 @@
 package IO::Uncompress::Inflate ;
 # for RFC1950
-
-use strict ;
+ 
 use warnings;
 use bytes;
 

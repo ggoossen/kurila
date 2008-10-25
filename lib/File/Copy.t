@@ -1,7 +1,7 @@
 #!./perl
 
 use Test::More;
-use strict;
+
 
 my $TB = Test::More->builder;
 

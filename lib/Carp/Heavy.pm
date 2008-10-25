@@ -1,7 +1,6 @@
 # Carp::Heavy uses some variables in common with Carp.
 package Carp;
 
-use strict;
 
 =head1 NAME
 

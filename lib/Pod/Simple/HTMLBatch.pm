@@ -1,6 +1,6 @@
 
 package Pod::Simple::HTMLBatch;
-use strict;
+
 use vars < qw( $VERSION $HTML_RENDER_CLASS $HTML_EXTENSION
  $CSS $JAVASCRIPT $SLEEPY $SEARCH_CLASS @ISA
 );

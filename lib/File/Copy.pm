@@ -7,7 +7,6 @@
 
 package File::Copy;
 
-use strict;
 use warnings;
 use File::Spec;
 use Config;

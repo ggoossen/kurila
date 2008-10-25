@@ -20,7 +20,7 @@ package Pod::Simple::BlackBox;
 # Every node in a treelet is a ['name', {attrhash}, ...children...]
 
 use integer; # vroom!
-use strict;
+
 BEGIN {
   *DEBUG = sub{0} unless defined &DEBUG
 }

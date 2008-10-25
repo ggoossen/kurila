@@ -29,7 +29,6 @@ BEGIN {
     }
 }
 
-use strict;
 use vars < qw($file_magic_str $other_magic $network_magic $byteorder
             $major $minor $minor_write $fancy);
 

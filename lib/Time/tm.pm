@@ -1,5 +1,5 @@
 package Time::tm;
-use strict;
+
 
 our $VERSION = '1.00';
 

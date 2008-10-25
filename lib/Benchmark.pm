@@ -1,6 +1,5 @@
 package Benchmark;
 
-use strict;
 
 
 =head1 NAME
