@@ -30,7 +30,7 @@ use IO::Handle;
 
 use Nomad;
 
-my $version = "kurila-1.14";
+my $version = "kurila-1.15";
 
 sub p55 {
     my ($input, $msg) = @_;
@@ -118,8 +118,6 @@ our %failing = map { $_, 1 } qw|
 
 ../t/op/attrhand.t
 
-../t/op/symbolcache.t
-
 ../t/op/exec.t
 
 ../t/arch/64bitint.t
@@ -176,7 +174,7 @@ sub something : TypeCheck(
     return 42;
 }
 ########
-# TODO symbol table t/op/symbolcache.t
+# symbol table t/op/symbolcache.t
 sub replaced2 { 'func' }
 BEGIN { undef $main::{replaced2} }
 ########
@@ -284,7 +282,7 @@ try { }
 ########
 binmode ':foo', $a;
 ########
-# TODO substitute with $(..)
+# substitute with $(..)
 my $str = shift;
 $str =~ s{(foo)}{$(sprintf("=\%02X", ord($1)))}g;
 $str;
