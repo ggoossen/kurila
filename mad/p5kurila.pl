@@ -1090,6 +1090,20 @@ sub doblock {
     }
 }
 
+sub remove_use_strict {
+    my $xml = shift;
+    for my $mad ($xml->findnodes(qq|//mad_op[\@key="use"]|)) {
+        next unless $mad->child(0)->att("PV") eq "strict.pm";
+        set_madprop($mad->child(0), "value", "", wsbefore => '');
+        my ($args) = $mad->parent->findnodes(qq|mad_op[\@key="bigarrow"]|);
+        $args->delete if $args;
+        my $wsbefore = get_madprop($mad->parent->parent, "operator", "wsbefore");
+        $wsbefore =~ s/&#xA;$//;
+        set_madprop($mad->parent->parent, "operator", "", wsbefore => $wsbefore);
+        set_madprop($mad->parent->parent, "semicolon", "");
+    }
+}
+
 my $from; # floating point number with starting version of kurila.
 GetOptions("from=s" => \$from);
 $from =~ m/(\w+)[-]([\d.]+)$/ or die "invalid from: '$from'";
@@ -1180,7 +1194,8 @@ if ($from->{branch} ne "kurila" or $from->{v} < qv '1.14') {
 
 #ampcall($twig);
 #doblock($twig);
-lvalue_subs( $twig, "vec" );
+#lvalue_subs( $twig, "vec" );
+remove_use_strict($twig);
 
 # print
 $twig->print( pretty_print => 'indented' );
