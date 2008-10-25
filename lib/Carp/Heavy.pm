@@ -275,7 +275,6 @@ sub trusts {
 # Takes a package and gives a list of those trusted directly
 sub trusts_directly {
     my $class = shift;
-    no strict 'refs';
     no warnings 'once'; 
     return (nelems @{*{Symbol::fetch_glob("$class\::CARP_NOT")}})
       ? @{*{Symbol::fetch_glob("$class\::CARP_NOT")}}

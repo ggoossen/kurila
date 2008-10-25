@@ -423,7 +423,7 @@ time consistently with style argument, default is 'all' not 'noc' any more.
 =cut
 
 # evaluate something in a clean lexical environment
-sub _doeval { no strict;  eval shift }
+sub _doeval { eval shift }
 
 #
 # put any lexicals at file scope AFTER here

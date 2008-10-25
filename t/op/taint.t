@@ -7,7 +7,6 @@
 # better than having no tests at all, right?
 #
 
-use strict;
 use Config;
 use File::Spec::Functions;
 
@@ -664,7 +663,6 @@ SKIP: do {
     SKIP: do {
         skip "shm*() not available", 1 unless %Config{d_shm};
 
-        no strict 'subs';
         my $sent = "foobar";
         my $rcvd;
         my $size = 2000;
@@ -696,7 +694,6 @@ SKIP: do {
     SKIP: do {
         skip "msg*() not available", 1 unless %Config{d_msg};
 
-	no strict 'subs';
 	my $id = msgget(IPC_PRIVATE(), IPC_CREAT() ^|^ S_IRWXU());
 
 	my $sent      = "message";

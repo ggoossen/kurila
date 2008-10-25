@@ -56,7 +56,6 @@ print < @a;
 print @{@ref[1]}[0];
 print < @{@ref[2]}[[@(0)]];
 do {
-    no strict 'refs';
     print < @{*{Symbol::fetch_glob('d')}};
 };
 curr_test($test+4);
@@ -312,7 +311,6 @@ is (runperl(
 ), '', 'freeing self-referential typeglob');
 
 TODO: do {
-    no strict 'refs';
     my $name1 = "\0Chalk";
     my $name2 = "\0Cheese";
 

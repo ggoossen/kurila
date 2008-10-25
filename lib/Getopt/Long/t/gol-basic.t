@@ -1,7 +1,5 @@
 #!./perl -w
 
-no strict;
-
 use Test::More;
 
 use Getopt::Long < qw(:config no_ignore_case);

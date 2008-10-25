@@ -529,7 +529,6 @@ sub process_para {
 
     $_ = shift(@line);
     while (my $kwd = check_keyword("REQUIRE|PROTOTYPES|FALLBACK|VERSIONCHECK|INCLUDE")) {
-      no strict 'refs';
       &{*{Symbol::fetch_glob("$($kwd)_handler")}}() ;
       next PARAGRAPH unless (nelems @line) ;
       $_ = shift(@line);

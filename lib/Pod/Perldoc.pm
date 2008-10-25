@@ -61,7 +61,6 @@ $Pod2man = "pod2man" . ( %Config{'versiononly'} ? %Config{'version'} : '' );
 # Option accessors...
 
 foreach my $subname ( map "opt_$_", split '', q{mhlvriFfXqnTdUL}) {
-  no strict 'refs';
   *{Symbol::fetch_glob($subname)} = do{ use strict 'refs';  sub () { shift->_elem($subname, < @_) } };
 }
 

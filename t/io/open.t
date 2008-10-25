@@ -218,7 +218,6 @@ do {
     ok( open(STDOUT,     ">&", $stdout),        'restore dupped STDOUT from lexical fh');
 
     do {
-	use strict; # the below should not warn
 	ok( open(my $stdout, ">&", 'STDOUT'),         'dup STDOUT into lexical fh');
     };
 

@@ -488,7 +488,6 @@ sub ioctl {
 # any new code should just chech defined(&CONSTANT_NAME)
 
 sub constant {
-    no strict 'refs';
     my $name = shift;
     (($name =~ m/^(SEEK_(SET|CUR|END)|_IO[FLN]BF)$/) && defined &{*{Symbol::fetch_glob($name)}})
 	? &{*{Symbol::fetch_glob($name)}}() : undef;

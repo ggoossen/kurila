@@ -146,7 +146,6 @@ sub self_and_super_versions { map {
 }
 
 # Also consider magic like:
-#   no strict 'refs';
 #   my %class2SomeHashr =
 #     map { defined(%{"$_\::SomeHash"}) ? ($_ => \%{"$_\::SomeHash"}) : () }
 #         Class::ISA::self_and_super_path($class);
@@ -155,7 +154,6 @@ sub self_and_super_versions { map {
 #
 # Or even consider this incantation for doing something like hash-data
 # inheritance:
-#   no strict 'refs';
 #   %union_hash = 
 #     map { defined(%{"$_\::SomeHash"}) ? %{"$_\::SomeHash"}) : () }
 #         reverse(Class::ISA::self_and_super_path($class));
@@ -187,7 +185,6 @@ sub self_and_super_path {
     next unless defined($current = shift @in_stack) && length($current);
     print "At $current\n" if $Debug;
     push @out, $current;
-    no strict 'refs';
     unshift @in_stack,
       < map
         { my $c = $_; # copy, to avoid being destructive

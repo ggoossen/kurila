@@ -38,7 +38,6 @@ eval 'use Config';          #  Defaults assumed if this fails
 
 require bytes;
 use utf8;
-use strict;
 
 BEGIN {
   require "./test.pl";

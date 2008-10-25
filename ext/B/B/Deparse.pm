@@ -3237,7 +3237,6 @@ sub pp_entersub {
     # they haven't happened yet!
     my $declared;
     do {
-	no strict 'refs';
 	no warnings 'uninitialized';
 	$declared = exists $self->{'subs_declared'}->{$kid}
 	    || (

@@ -1,7 +1,5 @@
 #!./perl -w
 
-# use strict;
-
 print "1..51\n";
 
 my $test = 1;

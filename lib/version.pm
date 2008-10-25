@@ -13,7 +13,6 @@ $CLASS = 'version';
 sub import {
     my ($class) = < @_;
     my $callpkg = caller();
-    no strict 'refs';
     
     *{Symbol::fetch_glob($callpkg."::qv")} = 
 	    sub {return bless version::qv(shift), $class }

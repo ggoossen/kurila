@@ -113,7 +113,6 @@ my %global = %( < map {$_ => 1} qw(ARGV ARGVOUT ENV INC SIG STDERR STDIN STDOUT)
 #
 sub gensym () {
     my $name = "GEN" . $genseq++;
-    no strict 'refs';
     my $ref = \*{Symbol::qualify_to_ref($genpkg . "::" . $name)};
     $ref = \*{Symbol::qualify_to_ref($genpkg . "::" . $name)};  # second time to supress only-used once warning.
     delete %{Symbol::stash($genpkg)}{$name};

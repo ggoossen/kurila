@@ -1,8 +1,5 @@
 package base;
 
-use strict;
-no strict < qw(refs subs);
-
 use vars < qw($VERSION);
 $VERSION = '2.13';
 

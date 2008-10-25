@@ -114,7 +114,6 @@ sub getopt (;$$) {
 	        %$hash{$first} = $rest;
 	    }
 	    else {
-                no strict 'refs';
 	        ${*{Symbol::fetch_glob("opt_$first")}} = $rest;
 	        push( @EXPORT, "\$opt_$first" );
 	    }
@@ -124,7 +123,6 @@ sub getopt (;$$) {
 	        %$hash{$first} = 1;
 	    }
 	    else {
-                no strict 'refs';
 	        ${*{Symbol::fetch_glob("opt_$first")}} = 1;
 	        push( @EXPORT, "\$opt_$first" );
 	    }
@@ -247,7 +245,6 @@ sub getopts ($;$) {
 		    %$hash{$first} = $rest;
 		}
 		else {
-                    no strict 'refs';
 		    ${*{Symbol::fetch_glob("opt_$first")}} = $rest;
 		    push( @EXPORT, "\$opt_$first" );
 		}

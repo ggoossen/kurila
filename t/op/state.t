@@ -5,7 +5,6 @@ BEGIN {
     require './test.pl';
 }
 
-use strict;
 use feature "state";
 
 plan tests => 58;

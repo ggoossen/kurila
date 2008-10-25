@@ -3,7 +3,6 @@
 BEGIN {
     require './test.pl';
 }
-use strict;
 
 skip_all "remove smartmach from kurila";
 exit 0;

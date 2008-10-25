@@ -64,7 +64,7 @@ sub struct {
     # Create constructor.
 
     die "function 'new' already defined in package $class"
-        if do { no strict 'refs'; defined &{Symbol::fetch_glob($class . "::new")} };
+        if do { defined &{Symbol::fetch_glob($class . "::new")} };
 
     my @methods = @( () );
     my %refs = %( () );

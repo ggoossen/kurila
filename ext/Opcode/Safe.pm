@@ -129,7 +129,6 @@ sub erase {
     my $pkg = $obj->root();
     my ($stem, $leaf);
 
-    no strict 'refs';
     $pkg = "$($pkg)::";	# expand to full symbol table name
     ($stem, $leaf) = $pkg =~ m/(.*)::(\w+::)$/;
 
@@ -230,7 +229,6 @@ sub share_from {
     my $no_record = shift || 0;
     my $root = $obj->root();
     croak("vars not an array ref") unless ref $vars eq 'ARRAY';
-    no strict 'refs';
     # Check that 'from' package actually exists
 #     croak("Package \"$pkg\" does not exist")
 # 	unless %{Symbol::stash("$pkg")};

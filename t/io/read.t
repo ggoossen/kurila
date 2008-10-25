@@ -4,7 +4,6 @@ BEGIN {
     require './test.pl';
 }
 
-use strict;
 eval 'use Errno';
 die $@ if $@ and !%ENV{PERL_CORE_MINITEST};
 

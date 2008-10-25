@@ -36,8 +36,6 @@ IO::Handle->import(< grep { $_ ne 'pipe' } @( < @EXPORT, < @EXPORT_OK));
 # that were in the old FileHandle class must be imported, too.
 #
 do {
-    no strict 'refs';
-
     my %import = %(
 	'IO::Handle' =>
 	    \qw(new_from_fd fdopen close fileno getc ungetc gets

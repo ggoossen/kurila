@@ -1391,7 +1391,6 @@ sub _change_S_to_nbsp { #  a recursive function
 #-----------------------------------------------------------------------------
 
 sub _accessorize {  # A simple-minded method-maker
-  no strict 'refs';
   foreach my $attrname ( @_) {
     next if $attrname =~ m/::/; # a hack
     *{Symbol::fetch_glob(caller() . '::' . $attrname)} = sub {
