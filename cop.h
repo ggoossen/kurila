@@ -395,7 +395,7 @@ struct block_loop {
 	    SvREFCNT_dec(cx->blk_loop.state_u.lazysv.end);		\
 	}								\
 	if (CxTYPE(cx) == CXt_LOOP_FOR)					\
-	    SvREFCNT_dec(cx->blk_loop.state_u.ary.ary);
+	    AvREFCNT_dec(cx->blk_loop.state_u.ary.ary);
 
 /* context common to subroutines, evals and loops */
 struct block {

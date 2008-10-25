@@ -144,6 +144,16 @@ PERL_INLINE_CALLCONV SV*	Perl_GvSv(pTHX_ GV *cv)
 #define PERL_ARGS_ASSERT_GVSV	\
 	assert(cv)
 
+PERL_INLINE_CALLCONV SV*	Perl_IoSv(pTHX_ struct io *cv)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_IOSV	\
+	assert(cv)
+
+PERL_INLINE_CALLCONV SV*	Perl_ReSv(pTHX_ REGEXP *cv)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_RESV	\
+	assert(cv)
+
 
 PERL_INLINE_CALLCONV const char*	Perl_SvPVX_const(pTHX_ SV *sv)
 			__attribute__nonnull__(pTHX_1);
@@ -5072,7 +5082,7 @@ STATIC void	S_dump_exec_pos(pTHX_ const char *locinput, const regnode *scan, con
 #define PERL_ARGS_ASSERT_DUMP_EXEC_POS	\
 	assert(locinput); assert(scan); assert(loc_regeol); assert(loc_bostr); assert(loc_reg_starttry)
 
-STATIC void	S_debug_start_match(pTHX_ const REGEXP *prog, const bool do_utf8, const char *start, const char *end, const char *blurb)
+STATIC void	S_debug_start_match(pTHX_ REGEXP *prog, const bool do_utf8, const char *start, const char *end, const char *blurb)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_3)
 			__attribute__nonnull__(pTHX_4)

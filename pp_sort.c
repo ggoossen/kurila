@@ -1616,8 +1616,6 @@ PP(pp_sort)
 
 		    if (hasargs) {
 			/* This is mostly copied from pp_entersub */
-			AV * const av = (AV*)PAD_SVl(0);
-
 			CX_CURPAD_SAVE(cx->blk_sub);
 		    }
 
@@ -1631,7 +1629,7 @@ PP(pp_sort)
 		    sort_flags);
 
 	    if (!(flags & OPf_SPECIAL)) {
-		LEAVESUB(cv);
+		LEAVESUB((SV*)cv);
 		if (!is_xsub)
 		    CvDEPTH(cv)--;
 	    }

@@ -270,7 +270,7 @@ S_mro_get_linear_isa_c3(pTHX_ HV* stash, I32 level)
             if(!winner) {
                 /* we have to do some cleanup before we croak */
 
-                SvREFCNT_dec(retval);
+                AvREFCNT_dec(retval);
                 Safefree(heads);
 
                 Perl_croak(aTHX_ "Inconsistent hierarchy during C3 merge of class '%s': "

@@ -99,6 +99,8 @@ SV* Perl_AvSv(pTHX_ AV *av) { return (SV*)av; }
 SV* Perl_HvSv(pTHX_ HV *hv) { return (SV*)hv; }
 SV* Perl_CvSv(pTHX_ CV *cv) { return (SV*)cv; }
 SV* Perl_GvSv(pTHX_ GV *gv) { return (SV*)gv; }
+SV* Perl_ReSv(pTHX_ REGEXP *re) { return (SV*)re; }
+SV* Perl_IoSv(pTHX_ struct io *io) { return (SV*)io; }
 
 #define SvAV(sv) inline_SvAV(aTHX_ sv)
 static __inline__ AV* inline_SvAV(pTHX_ SV *sv) {
@@ -123,7 +125,13 @@ static __inline__ void inline_SVcpREPLACE(pTHX_ SV**sv_d, SV*sv_s) {
 }
 
 #define SVcpNULL(sv) { SvREFCNT_dec(sv); sv = NULL; }
+#define AVcpNULL(sv) { AvREFCNT_dec(sv); sv = NULL; }
+#define HVcpNULL(sv) { HvREFCNT_dec(sv); sv = NULL; }
+#define CVcpNULL(sv) { CvREFCNT_dec(sv); sv = NULL; }
+
 #define SVcpSTEAL(sv_d, sv_s) { SvREFCNT_dec(sv_d); sv_d = sv_s; }
+#define AVcpSTEAL(sv_d, sv_s) { AvREFCNT_dec(sv_d); sv_d = sv_s; }
+#define CVcpSTEAL(sv_d, sv_s) { CvREFCNT_dec(sv_d); sv_d = sv_s; }
 
 
 #define XVcpREPLACE(XV) \

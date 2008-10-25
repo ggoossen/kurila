@@ -2267,7 +2267,7 @@ Perl_sv_2pv_flags(pTHX_ register SV *const sv, STRLEN *const lp, const I32 flags
 		const SV *const referent = (SV*)SvRV(sv);
 
 		if (referent && SvTYPE(referent) == SVt_REGEXP) {
-		    const REGEXP * const re = (REGEXP *)referent;
+		    REGEXP * const re = (REGEXP *)referent;
 		    I32 seen_evals = 0;
 
 		    assert(re);
@@ -2538,7 +2538,7 @@ S_glob_assign_ref(pTHX_ SV *const dstr, SV *const sstr)
 	    if (stype == SVt_PVCV) {
 		/*if (GvCVGEN(dstr) && (GvCV(dstr) != (CV*)sref || GvCVGEN(dstr))) {*/
 		if (GvCVGEN(dstr)) {
-		    SvREFCNT_dec(GvCV(dstr));
+		    CvREFCNT_dec(GvCV(dstr));
 		    GvCV(dstr) = NULL;
 		    GvCVGEN(dstr) = 0; /* Switch off cacheness. */
 		}
@@ -4134,7 +4134,7 @@ Perl_sv_kill_backrefs(pTHX_ SV *const sv, AV *const av)
 	    svp++;
 	}
     }
-    SvREFCNT_dec(av); /* remove extra count added by sv_add_backref() */
+    AvREFCNT_dec(av); /* remove extra count added by sv_add_backref() */
     return 0;
 }
 
@@ -4354,7 +4354,7 @@ Perl_sv_clear_body(pTHX_ SV *const sv)
 
     if (type >= SVt_PVMG) {
 	if (type == SVt_PVMG && SvPAD_OUR(sv)) {
-	    SvREFCNT_dec(SvOURGV(sv));
+	    GvREFCNT_dec(SvOURGV(sv));
 	} else if (SvMAGIC(sv))
 	    mg_free(sv);
     }
@@ -4520,7 +4520,7 @@ Perl_sv_clear(pTHX_ register SV *const sv)
 	}
 
 	if (SvOBJECT(sv)) {
-	    SvREFCNT_dec(SvSTASH(sv));	/* possibly of changed persuasion */
+	    HvREFCNT_dec(SvSTASH(sv));	/* possibly of changed persuasion */
 	    SvOBJECT_off(sv);	/* Curse the object. */
 	    if (SvTYPE(sv) != SVt_PVIO)
 		--PL_sv_objcount;	/* XXX Might want something more general */
@@ -6917,7 +6917,7 @@ Perl_sv_bless(pTHX_ SV *const sv, HV *const stash)
 	if (SvOBJECT(tmpRef)) {
 	    if (SvTYPE(tmpRef) != SVt_PVIO)
 		--PL_sv_objcount;
-	    SvREFCNT_dec(SvSTASH(tmpRef));
+	    HvREFCNT_dec(SvSTASH(tmpRef));
 	}
     }
     SvOBJECT_on(tmpRef);

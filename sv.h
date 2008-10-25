@@ -900,7 +900,10 @@ in gv.h: */
 #endif
 
 #define SvOURGV(sv) \
-       (SvPAD_OUR(sv) ? ((XPVMG*) SvANY(sv))->xmg_u.xmg_ourgv : NULL)
+    ({ assert(SvPAD_OUR(sv));		       \
+	((XPVMG*) SvANY(sv))->xmg_u.xmg_ourgv; \
+     })
+
 #define SvOURGV_set(sv, st)                                 \
         STMT_START {                                           \
            assert(SvTYPE(sv) == SVt_PVMG);                     \

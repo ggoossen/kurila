@@ -1344,7 +1344,7 @@ Perl_gp_free(pTHX_ GV *gv)
 		      G_DISCARD);
 	HvREFCNT_dec(gp->gp_hv);
     }
-    SvREFCNT_dec(gp->gp_io);
+    IoREFCNT_dec(gp->gp_io);
     CvREFCNT_dec(gp->gp_cv);
 
     Safefree(gp);

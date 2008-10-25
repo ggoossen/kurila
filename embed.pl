@@ -436,7 +436,7 @@ walk_table {
 		$ret .= hide($func,"Perl_$func");
 	    }
             if ($flags =~ m/S/) {
-                for my $xv (qw|Av Hv Cv Gv|) {
+                for my $xv (qw|Av Hv Cv Gv Io Re|) {
                     my $alist = join(",", @: '', < @az[[1..nelems(@args)-1]]);
                     my $a1 = @az[0];
                     (my $xvname = $func) =~ s/^Sv/$xv/;
@@ -522,7 +522,7 @@ walk_table {
 		$ret .= $alist . ")\n";
 	    }
             if ($flags =~ m/S/) {
-                for my $xv (qw|Av Hv Cv Gv|) {
+                for my $xv (qw|Av Hv Cv Gv Io Re|) {
                     my $alist = join(",", @: '', < @az[[1..nelems(@args)-1]]);
                     my $a1 = @az[0];
                     (my $xvname = $func) =~ s/^Sv/$xv/;

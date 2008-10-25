@@ -2241,7 +2241,7 @@ regmatch(), slabs allocated since entry are freed.
 #ifdef DEBUGGING
 
 STATIC void
-S_debug_start_match(pTHX_ const REGEXP *prog, const bool do_utf8, 
+S_debug_start_match(pTHX_ REGEXP *prog, const bool do_utf8, 
     const char *start, const char *end, const char *blurb)
 {
     const bool utf8_pat= RX_EXTFLAGS(prog) & RXf_PMf_UTF8 ? 1 : 0;
