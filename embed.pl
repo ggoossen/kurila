@@ -10,6 +10,8 @@ BEGIN {
     require 'regen_lib.pl';
 }
 
+my @az ='a'..'z';
+
 my $SPLINT = 0; # Turn true for experimental splint support http://www.splint.org
 
 #
@@ -177,13 +179,18 @@ sub write_protos {
 	    $func = "S_$plain_func";
 	}
 	else {
-	    $retval = "PERL_CALLCONV $splint_flags$retval";
+	    $retval = ($flags =~ m/i/ ? "PERL_INLINE_CALLCONV" : "PERL_CALLCONV" )
+              . " $splint_flags$retval";
 	    if ($flags =~ m/[bp]/) {
 		$func = "Perl_$plain_func";
 	    } else {
 		$func = $plain_func;
 	    }
 	}
+        my $xv_macros = $func =~ m/Xv/;
+        if ($xv_macros) {
+            $func =~ s/Xv/Sv/;
+        }
 	$ret .= "$retval\t$func(";
 	if ( $has_context ) {
 	    $ret .= (nelems @args) ? "pTHX_ " : "pTHX";
@@ -428,6 +435,16 @@ walk_table {
 	    elsif ($flags =~ m/p/) {
 		$ret .= hide($func,"Perl_$func");
 	    }
+            if ($flags =~ m/S/) {
+                for my $xv (qw|Av Hv Cv Gv Io Re|) {
+                    my $alist = join(",", @: '', < @az[[1..nelems(@args)-1]]);
+                    my $a1 = @az[0];
+                    (my $xvname = $func) =~ s/^Sv/$xv/;
+                    my $ret_convert = $retval =~ m/SV/;
+                    my $call = "Perl_" . $func . "(aTHX_ " . $xv . "Sv" . "($a1)$alist)";
+                    print $em "#define $xvname(" . $a1 . $alist . ")\t\t" . ($ret_convert ? "Sv" . $xv . "($call)" : $call ) . "\n";
+                }
+            }
 	}
 	if ($ret ne '' && $flags !~ m/A/) {
 	    if ($flags =~ m/E/) {
@@ -467,8 +484,6 @@ print $em <<'END';
 
 END
 
-my @az ='a'..'z';
-
 $ifdef_state = '';
 walk_table {
     my $ret = "";
@@ -506,6 +521,16 @@ walk_table {
 		$ret .= "_ " if $alist;
 		$ret .= $alist . ")\n";
 	    }
+            if ($flags =~ m/S/) {
+                for my $xv (qw|Av Hv Cv Gv Io Re|) {
+                    my $alist = join(",", @: '', < @az[[1..nelems(@args)-1]]);
+                    my $a1 = @az[0];
+                    (my $xvname = $func) =~ s/^Sv/$xv/;
+                    my $ret_convert = $retval =~ m/SV/;
+                   my $call = "Perl_" . $func . "(aTHX_ " . $xv . "Sv" . "($a1)$alist)";
+                    print $em "#define $xvname(" . $a1 . $alist . ")\t\t" . ($ret_convert ? "Sv" . $xv . "($call)" : $call ) . "\n";
+                }
+            }
 	}
 	unless ($flags =~ m/A/) {
 	    if ($flags =~ m/E/) {

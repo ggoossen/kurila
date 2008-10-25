@@ -212,7 +212,6 @@ struct block_sub {
     OP *	retop;	/* op to execute on exit from sub */
     /* Above here is the same for sub and eval.  */
     CV *	cv;
-    AV *	argarray;
     I32		olddepth;
     PAD		*oldcomppad;
 };
@@ -264,20 +263,6 @@ struct block_sub {
 		CopFILE((COP*)CvSTART((CV*)cx->blk_sub.cv)),		\
 		CopLINE((COP*)CvSTART((CV*)cx->blk_sub.cv)));		\
 									\
-	if (CxHASARGS(cx)) {						\
-	    /* abandon @_ if it got reified */				\
-	    if (AvREAL(cx->blk_sub.argarray)) {				\
-		const SSize_t fill = AvFILLp(cx->blk_sub.argarray);	\
-		SvREFCNT_dec(cx->blk_sub.argarray);			\
-		cx->blk_sub.argarray = newAV();				\
-		av_extend(cx->blk_sub.argarray, fill);			\
-		AvREIFY_only(cx->blk_sub.argarray);			\
-		CX_CURPAD_SV(cx->blk_sub, 0) = (SV*)cx->blk_sub.argarray;	\
-	    }								\
-	    else {							\
-		CLEAR_ARGARRAY(cx->blk_sub.argarray);			\
-	    }								\
-	}								\
 	sv = (SV*)cx->blk_sub.cv;					\
 	if (sv && (CvDEPTH((CV*)sv) = cx->blk_sub.olddepth))		\
 	    sv = NULL;						\
@@ -410,7 +395,7 @@ struct block_loop {
 	    SvREFCNT_dec(cx->blk_loop.state_u.lazysv.end);		\
 	}								\
 	if (CxTYPE(cx) == CXt_LOOP_FOR)					\
-	    SvREFCNT_dec(cx->blk_loop.state_u.ary.ary);
+	    AvREFCNT_dec(cx->blk_loop.state_u.ary.ary);
 
 /* context common to subroutines, evals and loops */
 struct block {

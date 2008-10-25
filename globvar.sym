@@ -60,7 +60,6 @@ vtbl_sv
 vtbl_taint
 vtbl_utf8
 vtbl_uvar
-vtbl_vec
 warn_nl
 warn_nosemi
 warn_reserved

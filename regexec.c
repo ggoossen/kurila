@@ -2241,7 +2241,7 @@ regmatch(), slabs allocated since entry are freed.
 #ifdef DEBUGGING
 
 STATIC void
-S_debug_start_match(pTHX_ const REGEXP *prog, const bool do_utf8, 
+S_debug_start_match(pTHX_ REGEXP *prog, const bool do_utf8, 
     const char *start, const char *end, const char *blurb)
 {
     const bool utf8_pat= RX_EXTFLAGS(prog) & RXf_PMf_UTF8 ? 1 : 0;
@@ -2348,7 +2348,7 @@ S_reg_check_named_buff_matched(pTHX_ const regexp *rex, const regnode *scan)
     I32 n;
     RXi_GET_DECL(rex,rexi);
     SV *sv_dat=(SV*)rexi->data->data[ ARG( scan ) ];
-    I32 *nums=(I32*)SvPVX(sv_dat);
+    I32 *nums=(I32*)SvPVX_mutable(sv_dat);
 
     PERL_ARGS_ASSERT_REG_CHECK_NAMED_BUFF_MATCHED;
 

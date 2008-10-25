@@ -344,7 +344,7 @@ PP(pp_prototype)
     }
     cv = sv_2cv(TOPs, &gv, 0);
     if (cv && SvPOK(cv))
-	ret = newSVpvn_flags(SvPVX_const(cv), SvCUR(cv), SVs_TEMP);
+	ret = newSVpvn_flags(SvPVX_const((SV*)cv), SvCUR(cv), SVs_TEMP);
   set:
     SETs(ret);
     RETURN;
@@ -1408,7 +1408,7 @@ PP(pp_repeat)
 		     Perl_croak(aTHX_ oom_string_extend);
 	        MEM_WRAP_CHECK_1(max, char, oom_string_extend);
 		SvGROW(TARG, max + 1);
-		repeatcpy(SvPVX(TARG) + len, SvPVX(TARG), len, count - 1);
+		repeatcpy(SvPVX_mutable(TARG) + len, SvPVX_mutable(TARG), len, count - 1);
 		SvCUR_set(TARG, SvCUR(TARG) * count);
 	    }
 	    *SvEND(TARG) = '\0';
@@ -2851,7 +2851,7 @@ PP(pp_index)
 	   will trigger magic and overloading again, as will fbm_instr()
 	*/
 	big = newSVpvn_flags(big_p, biglen, SVs_TEMP);
-	big_p = SvPVX(big);
+	big_p = SvPVX_mutable(big);
     }
     if (SvGMAGICAL(little) || (is_index && !SvOK(little))) {
 	/* index && SvOK() is a hack. fbm_instr() calls SvPV_const, which will
@@ -2863,7 +2863,7 @@ PP(pp_index)
 	   because data access has side effects.
 	*/
 	little = newSVpvn_flags(little_p, llen, SVs_TEMP);
-	little_p = SvPVX(little);
+	little_p = SvPVX_mutable(little);
     }
 
     if (MAXARG < 3)
@@ -2945,7 +2945,7 @@ PP(pp_chr)
 
     if (IN_CODEPOINTS) {
 	SvGROW(TARG, (STRLEN)UNISKIP(value)+1);
-	tmps = uvchr_to_utf8_flags(SvPVX(TARG), value, 0);
+	tmps = uvchr_to_utf8_flags(SvPVX_mutable(TARG), value, 0);
 	SvCUR_set(TARG, tmps - SvPVX_const(TARG));
 	*tmps = '\0';
 	(void)SvPOK_only(TARG);
@@ -2959,7 +2959,7 @@ PP(pp_chr)
 
     SvGROW(TARG,2);
     SvCUR_set(TARG, 1);
-    tmps = SvPVX(TARG);
+    tmps = SvPVX_mutable(TARG);
     *tmps++ = (char)value;
     *tmps = '\0';
     (void)SvPOK_only(TARG);
@@ -3172,7 +3172,7 @@ PP(pp_uc)
 		 * million times.  Or we could try guessing how much to
 		 allocate without allocating too much.  Such is life. */
 		SvGROW(dest, min);
-		d = SvPVX(dest) + o;
+		d = SvPVX_mutable(dest) + o;
 	    }
 	    Copy(tmpbuf, d, ulen, char);
 	    d += ulen;
@@ -3274,7 +3274,7 @@ PP(pp_lc)
 		 * million times.  Or we could try guessing how much to
 		 allocate without allocating too much.  Such is life. */
 		SvGROW(dest, min);
-		d = SvPVX(dest) + o;
+		d = SvPVX_mutable(dest) + o;
 	    }
 	    Copy(tmpbuf, d, ulen, char);
 	    d += ulen;
@@ -3308,7 +3308,7 @@ PP(pp_quotemeta)
 	register char *d;
 	SvUPGRADE(TARG, SVt_PV);
 	SvGROW(TARG, (len * 2) + 1);
-	d = SvPVX(TARG);
+	d = SvPVX_mutable(TARG);
 	if (IN_CODEPOINTS) {
 	    while (len) {
 		if (UTF8_IS_CONTINUED(*s)) {
@@ -3364,7 +3364,7 @@ PP(pp_aslice)
 	Perl_croak(aTHX_ "array slice indices must be an ARRAY not %s", Ddesc((SV*)slice));
 
     slice = av_mortalcopy(slice);
-    XPUSHs(AvSV(slice));
+    XPUSHs(AvSv(slice));
     sliceitem = AvARRAY(slice);
 
     if ( ! sliceitem )
@@ -3488,7 +3488,7 @@ PP(pp_delete)
 	}
 
 	if ( ! discard)
-	    XPUSHs(AvSV(slicecopy));
+	    XPUSHs(AvSv(slicecopy));
     }
     else {
 	SV *keysv = POPs;
@@ -3577,10 +3577,10 @@ PP(pp_hslice)
 	Perl_croak(aTHX_ "Not a HASH");
 
     if ( ! SvAVOK(slice) )
-	Perl_croak(aTHX_ "%s expected an ARRAY but got %s", OP_DESC(PL_op), Ddesc(AvSV(slice)));
+	Perl_croak(aTHX_ "%s expected an ARRAY but got %s", OP_DESC(PL_op), Ddesc(AvSv(slice)));
 
     slice = av_mortalcopy(slice);
-    XPUSHs(AvSV(slice));
+    XPUSHs(AvSv(slice));
 
     sliceitem = AvARRAY(slice);
     if (!sliceitem)
@@ -4086,7 +4086,7 @@ PP(pp_push)
 
     if ( ! SvAVOK(ary) ) {
 	Perl_croak(aTHX_ "First argument to %s must be an ARRAY not %s", 
-	    OP_DESC(PL_op), Ddesc(AvSV(ary)));
+	    OP_DESC(PL_op), Ddesc(AvSv(ary)));
     }
 
     {
@@ -4383,7 +4383,7 @@ PP(pp_split)
     PUTBACK;
     LEAVE_SCOPE(oldsave); /* may undo an earlier SWITCHSTACK */
     SPAGAIN;
-    XPUSHs(AvSV(av));
+    XPUSHs(AvSv(av));
     RETURN;
 }
 

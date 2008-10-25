@@ -306,7 +306,7 @@ dl_load_file(filename, flags=0)
       }
       else {
         symdsc.dsc$w_length = SvCUR(reqSV);
-        symdsc.dsc$a_pointer = SvPVX(reqSV);
+        symdsc.dsc$a_pointer = SvPVX_mutable(reqSV);
         DLDEBUG(2,PerlIO_printf(Perl_debug_log, "\t$dl_require_symbols[0] = %.*s\n",
                           symdsc.dsc$w_length, symdsc.dsc$a_pointer));
         sts = my_find_image_symbol(&(dlptr->name),&symdsc,
@@ -337,7 +337,7 @@ dl_find_symbol(librefptr,symname)
     CODE:
     struct libref thislib = *((struct libref *)librefptr);
     struct dsc$descriptor_s
-      symdsc = {SvCUR(symname),DSC$K_DTYPE_T,DSC$K_CLASS_S,SvPVX(symname)};
+      symdsc = {SvCUR(symname),DSC$K_DTYPE_T,DSC$K_CLASS_S,SvPVX_mutable(symname)};
     void (*entry)();
     vmssts sts;
 

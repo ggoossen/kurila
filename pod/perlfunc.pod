@@ -634,7 +634,7 @@ print a stack trace.  The value of EXPR indicates how many call frames
 to go back before the current one.
 
     #  0         1          2      3            4
-    ($package, $filename, $line, $subroutine, $hasargs,
+    ($package, $filename, $line, $subroutine, $args,
 
     #  5          6          7            8       9         10
     $wantarray, $evaltext, $is_require, $hints, $bitmask, $hinthash)
@@ -649,7 +649,7 @@ $subroutine is C<(eval)>, but $evaltext is undefined.  (Note also that
 each C<use> statement creates a C<require> frame inside an C<eval EXPR>
 frame.)  $subroutine may also be C<(unknown)> if this particular
 subroutine happens to have been deleted from the symbol table.
-C<$hasargs> is true if a new instance of C<@_> was set up for the frame.
+C<$args> is has the value of C<@_> of the frame or C<undef> if the frame has no C<@_>.
 C<$hints> and C<$bitmask> contain pragmatic hints that the caller was
 compiled with.  The C<$hints> and C<$bitmask> values are subject to change
 between versions of Perl, and are not meant for external use.
@@ -658,15 +658,10 @@ C<$hinthash> is a reference to a hash containing the value of C<%^H> when the
 caller was compiled, or C<undef> if C<%^H> was empty. Do not modify the values
 of this hash, as they are the actual values stored in the optree.
 
-Furthermore, when called from within the DB package, caller returns more
-detailed information: it sets the list variable C<@DB::args> to be the
-arguments with which the subroutine was invoked.
-
 Be aware that the optimizer might have optimized call frames away before
 C<caller> had a chance to get the information.  That means that C<caller(N)>
 might not return information about the call frame you expect it do, for
-C<< N > 1 >>.  In particular, C<@DB::args> might have information from the
-previous time C<caller> was called.
+C<< N > 1 >>.
 
 =item chdir EXPR
 X<chdir>

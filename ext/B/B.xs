@@ -562,7 +562,11 @@ PARENT_FAKELEX_FLAGS(sv)
 MODULE = B	PACKAGE = B::PV		PREFIX = Sv
 
 char*
-SvPVX(sv)
+SvPVX_const(sv)
+	B::PV	sv
+
+char*
+SvPVX_mutable(sv)
 	B::PV	sv
 
 B::SV

@@ -1538,7 +1538,7 @@ PP(pp_sort)
     av = SvAV(sv_mortalcopy(POPs));
     if ( ! SvAVOK(av) ) {
 	Perl_croak(aTHX_ "%s expected ARRAY but got %s", 
-	    OP_DESC(PL_op), Ddesc(AvSV(av)));
+	    OP_DESC(PL_op), Ddesc(AvSv(av)));
     }
     p1 = p2 = AvARRAY(av);
     max = AvFILL(av) + 1;
@@ -1616,10 +1616,7 @@ PP(pp_sort)
 
 		    if (hasargs) {
 			/* This is mostly copied from pp_entersub */
-			AV * const av = (AV*)PAD_SVl(0);
-
 			CX_CURPAD_SAVE(cx->blk_sub);
-			cx->blk_sub.argarray = av;
 		    }
 
 		}
@@ -1632,7 +1629,7 @@ PP(pp_sort)
 		    sort_flags);
 
 	    if (!(flags & OPf_SPECIAL)) {
-		LEAVESUB(cv);
+		LEAVESUB((SV*)cv);
 		if (!is_xsub)
 		    CvDEPTH(cv)--;
 	    }
@@ -1664,7 +1661,7 @@ PP(pp_sort)
     
     LEAVE;
     PL_stack_sp = ORIGMARK;
-    *++PL_stack_sp = AvSV(av);
+    *++PL_stack_sp = AvSv(av);
     return nextop;
 }
 

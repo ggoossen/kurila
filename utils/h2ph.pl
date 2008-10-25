@@ -90,6 +90,26 @@ while (defined (my $file = next_file())) {
         "no warnings 'redefine';\n\n";
 
     while (defined (local $_ = next_line($file))) {
+        my $proto;
+        my $emit = sub {
+            $new = reindent($new);
+            $args = reindent($args);
+            if ($t ne '') {
+                $new =~ s/(['\\])/\\$1/g;   #']);
+                if ($opt_h) {
+                    print OUT $t,
+                      "eval \"\\n#line $eval_index $outfile\\n\" . 'sub $name $proto\{\n$t    $($args)eval q($new);\n$t\}' unless defined(\&$name);\n";
+                    $eval_index++;
+                } else {
+                    print OUT $t,
+                      "eval 'sub $name $proto\{\n$t    $($args)eval q($new);\n$t\}' unless defined(\&$name);\n";
+                }
+            } else {
+                print OUT "unless(defined(\&$name)) \{\n    sub $name $proto\{\n\t$($args)eval q($new);\n    \}\n\}\n";
+            }
+            %curargs = %( () );
+        };
+
 	if (s/^\s*\#\s*//) {
 	    if (s/^define\s+(\w+)//) {
 		$name = $1;
@@ -98,7 +118,7 @@ while (defined (my $file = next_file())) {
 		s/\(\w+\s*\(\*\)\s*\(\w*\)\)\s*(-?\d+)/$1/; # (int (*)(foo_t))0
 		if (s/^\(([\w,\s]*)\)//) {
 		    $args = $1;
-		    my $proto = '() ';
+		    $proto = '() ';
 		    if ($args ne '') {
 			$proto = '';
 			foreach my $arg (split(m/,\s*/,$args)) {
@@ -111,23 +131,7 @@ while (defined (my $file = next_file())) {
 		    s/^\s+//;
 		    expr();
 		    $new =~ s/(["\\])/\\$1/g;       #"]);
-		  EMIT:
-		    $new = reindent($new);
-		    $args = reindent($args);
-		    if ($t ne '') {
-			$new =~ s/(['\\])/\\$1/g;   #']);
-			if ($opt_h) {
-			    print OUT $t,
-                            "eval \"\\n#line $eval_index $outfile\\n\" . 'sub $name $proto\{\n$t    $($args)eval q($new);\n$t\}' unless defined(\&$name);\n";
-                            $eval_index++;
-			} else {
-			    print OUT $t,
-                            "eval 'sub $name $proto\{\n$t    $($args)eval q($new);\n$t\}' unless defined(\&$name);\n";
-			}
-		    } else {
-                      print OUT "unless(defined(\&$name)) \{\n    sub $name $proto\{\n\t$($args)eval q($new);\n    \}\n\}\n";
-		    }
-		    %curargs = %( () );
+                    $emit->();
 		} else {
 		    s/^\s+//;
 		    expr();
@@ -339,7 +343,7 @@ while (defined (my $file = next_file())) {
 	    $new =~ s/&$_\b/\$$_/g for  @local_variables;
 	    $new =~ s/(["\\])/\\$1/g;       #"]);
 	    # now that's almost like a macro (we hope)
-	    goto EMIT;
+            $emit->();
 	}
     }
     %Is_converted{$file} = 1;

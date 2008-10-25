@@ -154,7 +154,6 @@ S_is_container_magic(const MAGIC *mg)
     case PERL_MAGIC_regex_global:
     case PERL_MAGIC_qr:
     case PERL_MAGIC_taint:
-    case PERL_MAGIC_vec:
     case PERL_MAGIC_vstring:
     case PERL_MAGIC_utf8:
     case PERL_MAGIC_defelem:
@@ -706,7 +705,7 @@ Perl_magic_len(pTHX_ SV *sv, MAGIC *mg)
 #define SvRTRIM(sv) STMT_START { \
     if (SvPOK(sv)) { \
         STRLEN len = SvCUR(sv); \
-        char * const p = SvPVX(sv); \
+        char * const p = SvPVX_mutable(sv); \
 	while (len > 0 && isSPACE(p[len-1])) \
 	   --len; \
 	SvCUR_set(sv, len); \
@@ -1845,30 +1844,6 @@ Perl_magic_settaint(pTHX_ SV *sv, MAGIC *mg)
     return 0;
 }
 
-int
-Perl_magic_getvec(pTHX_ SV *sv, MAGIC *mg)
-{
-    SV * const lsv = LvTARG(sv);
-
-    PERL_ARGS_ASSERT_MAGIC_GETVEC;
-    PERL_UNUSED_ARG(mg);
-
-    if (lsv)
-        sv_setuv(sv, do_vecget(lsv, LvTARGOFF(sv), LvTARGLEN(sv)));
-    else
-        SvOK_off(sv);
-
-    return 0;
-}
-
-int
-Perl_magic_setvec(pTHX_ SV *sv, MAGIC *mg)
-{
-    PERL_ARGS_ASSERT_MAGIC_SETVEC;
-    PERL_UNUSED_ARG(mg);
-    do_vecset();      /* XXX slurp this routine */
-    return 0;
-}
 
 int
 Perl_magic_getdefelem(pTHX_ SV *sv, MAGIC *mg)
@@ -2145,7 +2120,7 @@ Perl_magic_set(pTHX_ SV *sv, MAGIC *mg)
 
 		    old_cop_hints_hash = PL_compiling.cop_hints_hash;
 		    PL_compiling.cop_hints_hash = newHVhv(PL_compiling.cop_hints_hash);
-		    SvREFCNT_dec(old_cop_hints_hash);
+		    HvREFCNT_dec(old_cop_hints_hash);
 
 		    tmp = out ? newSVpvn_flags(out + 1, start + len - out - 1, 0) : newSVpvs_flags("", 0);
 		    (void)hv_store_ent(PL_compiling.cop_hints_hash, 
@@ -2791,7 +2766,7 @@ Perl_magic_sethint(pTHX_ SV *sv, MAGIC *mg)
 
     /* copy the hash, to preserve the old one */
     new_hinthash = newHVhv(PL_compiling.cop_hints_hash);
-    SvREFCNT_dec(PL_compiling.cop_hints_hash);
+    HvREFCNT_dec(PL_compiling.cop_hints_hash);
     PL_compiling.cop_hints_hash = new_hinthash;
 
     (void)hv_store_ent(PL_compiling.cop_hints_hash, (SV *)mg->mg_ptr, newSVsv(sv), 0);
@@ -2823,7 +2798,7 @@ Perl_magic_clearhint(pTHX_ SV *sv, MAGIC *mg)
 
     /* copy the hash, to preserve the old one */
     new_hinthash = newHVhv(PL_compiling.cop_hints_hash);
-    SvREFCNT_dec(PL_compiling.cop_hints_hash);
+    HvREFCNT_dec(PL_compiling.cop_hints_hash);
     PL_compiling.cop_hints_hash = new_hinthash;
 
     (void)hv_delete_ent(PL_compiling.cop_hints_hash, (SV *)mg->mg_ptr, 0, 0);

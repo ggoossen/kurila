@@ -2,7 +2,7 @@
 
 BEGIN { require './test.pl'; }
 
-plan( tests => 26 );
+plan( tests => 33 );
 
 # simple error object.
 do {
@@ -10,7 +10,9 @@ do {
     ok $err, "error object created";
     is ref $err, "error";
     is $err->{description}, "my message";
-    is $err->message, "my message at filetest.t line 33 character 11.\n", "message function";
+    is $err->message, "my message", "message function";
+    is $err->stacktrace, " at filetest.t line 33 character 11.\n",
+      "stacktrace function";
 };
 
 # a bit more complex one, with stack trace.
@@ -22,8 +24,9 @@ do {
     is( (nelems $err->{stack}), 2);
     is((join '**', $err->{stack}[0]), "../lib/error.t**$line2**29**main::new_error**");
     is((join '**', $err->{stack}[1]), "../lib/error.t**$line3**15**main::new_error2**");
-    is $err->message, <<MSG ;
-my message
+    is $err->message, "my message";
+    is $err->stacktrace, <<MSG;
+
     main::new_error called at ../lib/error.t line $line2 character 29.
     main::new_error2 called at ../lib/error.t line $line3 character 15.
 MSG
@@ -38,8 +41,9 @@ do {
     is defined $@, 1, '$@ is set';
     is ref $@, "error", '$@ is an error object';
     is $@->{description}, "foobar";
-    is $@->message, <<MSG;
-foobar at ../lib/error.t line $line2 character 31.
+    is $@->message, "foobar";
+    is $@->stacktrace, <<MSG;
+ at ../lib/error.t line $line2 character 31.
     (eval) called at ../lib/error.t line $line1 character 5.
 MSG
 };
@@ -54,8 +58,9 @@ do {
     };
     is defined $err, 1, '$@ is set';
     is ref $err, "error", '$@ is error object';
-    is $err->message, <<MSG;
-my die at ../lib/error.t line $line1 character 15.
+    is $err->message, "my die";
+    is $err->stacktrace, <<MSG;
+ at ../lib/error.t line $line1 character 15.
     (eval) called at ../lib/error.t line $line1 character 9.
     (eval) called at ../lib/error.t line $line2 character 5.
 MSG
@@ -69,8 +74,9 @@ do {
         die;
     };
     is ref $@, "error", '$@ is an error object';
-    is $@->message, <<MSG;
-reuse die at ../lib/error.t line $line1 character 15.
+    is $@->message, "reuse die";
+    is $@->stacktrace, <<MSG;
+ at ../lib/error.t line $line1 character 15.
     (eval) called at ../lib/error.t line $line1 character 9.
     (eval) called at ../lib/error.t line $line2 character 5.
 reraised at ../lib/error.t line $($line1+1) character 9.
@@ -83,8 +89,9 @@ do {
     try { my $foo = "xx"; $$foo; }; $line1 = __LINE__;
     is defined $@, 1, '$@ is set';
     is ref $@, 'error', '$@ is an error object';
-    is $@->message, <<MSG;
-Can't use PLAINVALUE as a SCALAR REF at ../lib/error.t line $line1 character 26.
+    is $@->message, "Can't use PLAINVALUE as a SCALAR REF";
+    is $@->stacktrace, <<MSG;
+ at ../lib/error.t line $line1 character 26.
     (eval) called at ../lib/error.t line $line1 character 5.
 MSG
 };
@@ -108,8 +115,9 @@ do {
     eval 'undef foo'; my $line = __LINE__;
     is defined $@, 1, '$@ is set';
     is ref $@, 'error', '$@ is error object';
-    is $@->message, <<MSG ;
-Can't modify constant item in undef operator at (eval 9) line 1 character 7.
+    is $@->message, "Can't modify constant item in undef operator";
+    is $@->stacktrace, <<MSG ;
+ at (eval 9) line 1 character 7.
     (eval) called at ../lib/error.t line $line character 5.
 MSG
 };

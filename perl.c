@@ -538,7 +538,7 @@ perl_destruct(pTHXx)
 	PL_main_root = NULL;
     }
     PL_main_start = NULL;
-    SVcpNULL(PL_main_cv);
+    CVcpNULL(PL_main_cv);
     PL_dirty = TRUE;
 
     /* Tell PerlIO we are about to tear things apart in case
@@ -678,7 +678,7 @@ perl_destruct(pTHXx)
     Safefree(PL_osname);	/* $^O */
     PL_osname = NULL;
 
-    SVcpNULL(PL_op_sequence);
+    HVcpNULL(PL_op_sequence);
 
     SVcpNULL(PL_statname);
     PL_statgv = NULL;
@@ -699,14 +699,14 @@ perl_destruct(pTHXx)
     PL_efloatsize = 0;
 
     /* startup and shutdown function lists */
-    SVcpNULL(PL_beginav);
-    SvREFCNT_dec(PL_beginav_save);
-    SvREFCNT_dec(PL_endav);
-    SvREFCNT_dec(PL_checkav);
-    SvREFCNT_dec(PL_checkav_save);
-    SVcpNULL(PL_unitcheckav);
-    SvREFCNT_dec(PL_unitcheckav_save);
-    SvREFCNT_dec(PL_initav);
+    AVcpNULL(PL_beginav);
+    AvREFCNT_dec(PL_beginav_save);
+    AvREFCNT_dec(PL_endav);
+    AvREFCNT_dec(PL_checkav);
+    AvREFCNT_dec(PL_checkav_save);
+    AVcpNULL(PL_unitcheckav);
+    AvREFCNT_dec(PL_unitcheckav_save);
+    AvREFCNT_dec(PL_initav);
     PL_beginav_save = NULL;
     PL_endav = NULL;
     PL_checkav = NULL;
@@ -716,12 +716,12 @@ perl_destruct(pTHXx)
 
     /* shortcuts just get cleared */
     PL_envgv = NULL;
-    SvREFCNT_dec(PL_incgv);
+    GvREFCNT_dec(PL_incgv);
     PL_incgv = NULL;
     PL_hintgv = NULL;
-    SvREFCNT_dec(PL_errgv);
+    GvREFCNT_dec(PL_errgv);
     PL_errgv = NULL;
-    SvREFCNT_dec(PL_globalstash);
+    HvREFCNT_dec(PL_globalstash);
     PL_globalstash = NULL;
     PL_argvgv = NULL;
     PL_argvoutgv = NULL;
@@ -738,12 +738,12 @@ perl_destruct(pTHXx)
     PL_dbargs = NULL;
     PL_debstash = NULL;
 
-    SvREFCNT_dec(PL_argvout_stack);
+    AvREFCNT_dec(PL_argvout_stack);
     PL_argvout_stack = NULL;
 
-    SvREFCNT_dec(PL_modglobal);
+    HvREFCNT_dec(PL_modglobal);
     PL_modglobal = NULL;
-    SvREFCNT_dec(PL_preambleav);
+    AvREFCNT_dec(PL_preambleav);
     PL_preambleav = NULL;
     SvREFCNT_dec(PL_subname);
     PL_subname = NULL;
@@ -805,24 +805,24 @@ perl_destruct(pTHXx)
     if (!specialWARN(PL_compiling.cop_warnings))
 	PerlMemShared_free(PL_compiling.cop_warnings);
     PL_compiling.cop_warnings = NULL;
-    SvREFCNT_dec(PL_compiling.cop_hints_hash);
+    HvREFCNT_dec(PL_compiling.cop_hints_hash);
     PL_compiling.cop_hints_hash = NULL;
     CopSTASH_free(&PL_compiling);
 
     /* Prepare to destruct main symbol table.  */
 
-    SVcpNULL(PL_curstash);
+    HVcpNULL(PL_curstash);
 
     hv = PL_defstash;
     PL_defstash = 0;
-    SvREFCNT_dec(hv);
+    HvREFCNT_dec(hv);
     SVcpNULL(PL_curstname);
 
     /* clear queued errors */
     SvREFCNT_dec(PL_errors);
     PL_errors = NULL;
 
-    SvREFCNT_dec(PL_isarev);
+    HvREFCNT_dec(PL_isarev);
     PL_isarev = NULL;
 
     FREETMPS;
@@ -848,10 +848,10 @@ perl_destruct(pTHXx)
 /* 	; */
 
     /* clear *_ */
-    SvREFCNT_dec(PL_defgv);
+    GvREFCNT_dec(PL_defgv);
     PL_defgv = NULL;
 
-    SvREFCNT_dec(PL_fdpid);		/* needed in io_close() */
+    AvREFCNT_dec(PL_fdpid);		/* needed in io_close() */
     PL_fdpid = NULL;
 
 #ifdef HAVE_INTERP_INTERN
@@ -893,7 +893,7 @@ perl_destruct(pTHXx)
 	HvTOTALKEYS(PL_strtab) = 0;
 	HvFILL(PL_strtab) = 0;
     }
-    SvREFCNT_dec(PL_strtab);
+    HvREFCNT_dec(PL_strtab);
 
 #ifdef USE_ITHREADS
     /* free the pointer tables used for cloning */
@@ -1325,7 +1325,7 @@ perl_parse(pTHXx_ XSINIT_t xsinit, int argc, char **argv, char **env)
 	PL_main_root = NULL;
     }
     PL_main_start = NULL;
-    SVcpNULL(PL_main_cv);
+    CVcpNULL(PL_main_cv);
 
     time(&PL_basetime);
     oldscope = PL_scopestack_ix;
@@ -1687,7 +1687,7 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 			while (++s && *s) {
 			    if (isSPACE(*s)) {
 				if (!popt_copy) {
-				    popt_copy = SvPVX(sv_2mortal(newSVpv(popt,0)));
+				    popt_copy = SvPVX_mutable(sv_2mortal(newSVpv(popt,0)));
 				    s = popt_copy + (s - popt);
 				    d = popt_copy + (d - popt);
 				}
@@ -1781,7 +1781,7 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 	}
     }
 
-    SVcpSTEAL(PL_compcv, (CV*)newSV_type(SVt_PVCV));
+    CVcpSTEAL(PL_compcv, (CV*)newSV_type(SVt_PVCV));
     CVcpREPLACE(PL_main_cv, PL_compcv);
     CvUNIQUE_on(PL_compcv);
 
@@ -2716,7 +2716,7 @@ Perl_moreswitches(pTHX_ const char *s)
 	      }
 	      PL_rs = newSVpvs("");
 	      SvGROW(PL_rs, (STRLEN)(UNISKIP(rschar) + 1));
-	      tmps = SvPVX(PL_rs);
+	      tmps = SvPVX_mutable(PL_rs);
 	      uvchr_to_utf8(tmps, rschar);
 	      SvCUR_set(PL_rs, UNISKIP(rschar));
 	 }
@@ -2860,7 +2860,7 @@ Perl_moreswitches(pTHX_ const char *s)
 	    STRLEN numlen;
 	    PL_ors_sv = newSVpvs("\n");
 	    numlen = 3 + (*s == '0');
-	    *SvPVX(PL_ors_sv) = (char)grok_oct(s, &numlen, &flags, NULL);
+	    *SvPVX_mutable(PL_ors_sv) = (char)grok_oct(s, &numlen, &flags, NULL);
 	    s += numlen;
 	}
 	else {
@@ -3125,7 +3125,7 @@ Perl_my_unexec(pTHX)
     sv_catpvs(prog, "/perl");
     sv_catpvs(file, ".perldump");
 
-    unexec(SvPVX(file), SvPVX(prog), &etext, sbrk(0), 0);
+    unexec(SvPVX_mutable(file), SvPVX_mutable(prog), &etext, sbrk(0), 0);
     /* unexec prints msg to stderr in case of failure */
     PerlProc_exit(status);
 #else
@@ -4168,7 +4168,7 @@ S_nuke_stacks(pTHX)
 	PL_curstackinfo = PL_curstackinfo->si_next;
     while (PL_curstackinfo) {
 	PERL_SI *p = PL_curstackinfo->si_prev;
-	SvREFCNT_dec(PL_curstackinfo->si_stack);
+	AvREFCNT_dec(PL_curstackinfo->si_stack);
 	PL_curstackinfo->si_stack = NULL;
 	Safefree(PL_curstackinfo->si_cxstack);
 	Safefree(PL_curstackinfo);
@@ -4378,11 +4378,11 @@ S_init_perllib(pTHX)
 	    macperl = "";
 	
 	Perl_sv_setpvf(aTHX_ privdir, "%slib:", macperl);
-	if (PerlLIO_stat(SvPVX(privdir), &tmpstatbuf) >= 0 && S_ISDIR(tmpstatbuf.st_mode))
-	    incpush(SvPVX(privdir), TRUE, FALSE, TRUE, FALSE);
+	if (PerlLIO_stat(SvPVX_mutable(privdir), &tmpstatbuf) >= 0 && S_ISDIR(tmpstatbuf.st_mode))
+	    incpush(SvPVX_mutable(privdir), TRUE, FALSE, TRUE, FALSE);
 	Perl_sv_setpvf(aTHX_ privdir, "%ssite_perl:", macperl);
-	if (PerlLIO_stat(SvPVX(privdir), &tmpstatbuf) >= 0 && S_ISDIR(tmpstatbuf.st_mode))
-	    incpush(SvPVX(privdir), TRUE, FALSE, TRUE, FALSE);
+	if (PerlLIO_stat(SvPVX_mutable(privdir), &tmpstatbuf) >= 0 && S_ISDIR(tmpstatbuf.st_mode))
+	    incpush(SvPVX_mutable(privdir), TRUE, FALSE, TRUE, FALSE);
 	
    	SvREFCNT_dec(privdir);
     }
@@ -4524,12 +4524,12 @@ S_incpush(pTHX_ const char *dir, bool addsubdirs, bool addoldvers, bool usesep,
 	    p = NULL;	/* break out */
 	}
 #ifdef MACOS_TRADITIONAL
-	if (!strchr(SvPVX(libdir), ':')) {
+	if (!strchr(SvPVX_mutable(libdir), ':')) {
 	    char buf[256];
 
-	    sv_setpv(libdir, MacPerl_CanonDir(SvPVX(libdir), buf, 0));
+	    sv_setpv(libdir, MacPerl_CanonDir(SvPVX_mutable(libdir), buf, 0));
 	}
-	if (SvPVX(libdir)[SvCUR(libdir)-1] != ':')
+	if (SvPVX_mutable(libdir)[SvCUR(libdir)-1] != ':')
 	    sv_catpvs(libdir, ":");
 #endif
 
@@ -4553,7 +4553,7 @@ S_incpush(pTHX_ const char *dir, bool addsubdirs, bool addoldvers, bool usesep,
 	 * The intent is that /usr/local/bin/perl and .../../lib/perl5
 	 * generates /usr/local/lib/perl5
 	 */
-	    const char *libpath = SvPVX(libdir);
+	    const char *libpath = SvPVX_const(libdir);
 	    STRLEN libpath_len = SvCUR(libdir);
 	    if (libpath_len >= 4 && memEQ (libpath, ".../", 4)) {
 		/* Game on!  */
@@ -4561,14 +4561,14 @@ S_incpush(pTHX_ const char *dir, bool addsubdirs, bool addoldvers, bool usesep,
 		/* Going to use the SV just as a scratch buffer holding a C
 		   string:  */
 		SV *prefix_sv;
-		char *prefix;
+		const char *prefix;
 		char *lastslash;
 
 		/* $^X is *the* source of taint if tainting is on, hence
 		   SvPOK() won't be true.  */
 		assert(caret_X);
 		assert(SvPOKp(caret_X));
-		prefix_sv = newSVpvn(SvPVX(caret_X), SvCUR(caret_X));
+		prefix_sv = newSVpvn(SvPVX_const(caret_X), SvCUR(caret_X));
 		/* Firstly take off the leading .../
 		   If all else fail we'll do the paths relative to the current
 		   directory.  */
@@ -4577,14 +4577,14 @@ S_incpush(pTHX_ const char *dir, bool addsubdirs, bool addoldvers, bool usesep,
 		   mortal copies that the mg_get of tainting creates, and
 		   corruption that seems to come via the save stack.
 		   I guess that the save stack isn't correctly set up yet.  */
-		libpath = SvPVX(libdir);
+		libpath = SvPVX_const(libdir);
 		libpath_len = SvCUR(libdir);
 
 		/* This would work more efficiently with memrchr, but as it's
 		   only a GNU extension we'd need to probe for it and
 		   implement our own. Not hard, but maybe not worth it?  */
 
-		prefix = SvPVX(prefix_sv);
+		prefix = SvPVX_const(prefix_sv);
 		lastslash = strrchr(prefix, '/');
 
 		/* First time in with the *lastslash = '\0' we just wipe off

@@ -8,7 +8,7 @@ BEGIN {
     require "./test.pl";
 }
 
-plan tests => 101;
+plan tests => 88;
 
 $a = \%();
 bless $a, "Bob";
@@ -86,8 +86,8 @@ ok $a->isa("Female");
 ok (!Cedric->isa('Programmer'));
 
 my $b = 'abc';
-my @refs = qw(SCALAR SCALAR     LVALUE      GLOB ARRAY HASH CODE);
-my @vals = @(  \$b,   \3.14, \vec($b,1,1), \*b,  \@(),  \%(), sub {} );
+my @refs = qw(SCALAR SCALAR     GLOB ARRAY HASH CODE);
+my @vals = @(  \$b,   \3.14, \*b,  \@(),  \%(), sub {} );
 for my $p (0 .. nelems(@refs) -1) {
     for my $q (0 .. nelems(@vals) -1) {
         is UNIVERSAL::isa(@vals[$p], @refs[$q]), ($p==$q or $p+$q==1);

@@ -180,9 +180,9 @@ Perl_offer_nice_chunk(pTHX_ void *const chunk, const U32 chunk_size)
 	VALGRIND_MAKE_MEM_NOACCESS(&SvARENA_CHAIN(p), sizeof(void*));	\
 	VALGRIND_MAKE_MEM_DEFINED(&SvFLAGS(p), sizeof(U32));	\
 	VALGRIND_MAKE_MEM_DEFINED(&SvREFCNT(p), sizeof(U32));	\
+	PL_sv_root = (p); /* Disable to do memory debugging */	\
 	--PL_sv_count;					\
     } STMT_END
-/* 	PL_sv_root = (p); /\* Disable to do memory debugging *\/	\ */
 
 #define uproot_SV(p) \
     STMT_START {					\
@@ -1159,7 +1159,7 @@ Perl_sv_upgrade(pTHX_ register SV *const sv, svtype new_type)
 	if (old_type == SVt_IV) {
 	    assert(!SvROK(sv));
 	} else if (old_type >= SVt_PV) {
-	    assert(SvPVX_const(sv) == 0);
+	    assert(sv->sv_u.svu_pv == NULL);
 	}
 
 	if (old_type >= SVt_PVMG) {
@@ -1277,8 +1277,8 @@ Perl_sv_backoff(pTHX_ register SV *const sv)
     SvOOK_offset(sv, delta);
     
     SvLEN_set(sv, SvLEN(sv) + delta);
-    SvPV_set(sv, SvPVX(sv) - delta);
-    Move(s, SvPVX(sv), SvCUR(sv)+1, char);
+    SvPV_set(sv, SvPVX_mutable(sv) - delta);
+    Move(s, SvPVX_mutable(sv), SvCUR(sv)+1, char);
     SvFLAGS(sv) &= ~SVf_OOK;
     return 0;
 }
@@ -2220,7 +2220,7 @@ Perl_sv_2pv_flags(pTHX_ register SV *const sv, STRLEN *const lp, const I32 flags
 		return SvPVX_mutable(sv);
 	    if (flags & SV_CONST_RETURN)
 		return (char *)SvPVX_const(sv);
-	    return SvPVX(sv);
+	    return SvPVX_mutable(sv);
 	}
 	if (SvIOKp(sv) || SvNOKp(sv)) {
 	    char tbuf[64];  /* Must fit sprintf/Gconvert of longest IV/NV */
@@ -2267,7 +2267,7 @@ Perl_sv_2pv_flags(pTHX_ register SV *const sv, STRLEN *const lp, const I32 flags
 		const SV *const referent = (SV*)SvRV(sv);
 
 		if (referent && SvTYPE(referent) == SVt_REGEXP) {
-		    const REGEXP * const re = (REGEXP *)referent;
+		    REGEXP * const re = (REGEXP *)referent;
 		    I32 seen_evals = 0;
 
 		    assert(re);
@@ -2371,7 +2371,7 @@ Perl_sv_2pv_flags(pTHX_ register SV *const sv, STRLEN *const lp, const I32 flags
 	return (char *)SvPVX_const(sv);
     if (flags & SV_MUTABLE_RETURN)
 	return SvPVX_mutable(sv);
-    return SvPVX(sv);
+    return SvPVX_mutable(sv);
 }
 
 /*
@@ -2538,7 +2538,7 @@ S_glob_assign_ref(pTHX_ SV *const dstr, SV *const sstr)
 	    if (stype == SVt_PVCV) {
 		/*if (GvCVGEN(dstr) && (GvCV(dstr) != (CV*)sref || GvCVGEN(dstr))) {*/
 		if (GvCVGEN(dstr)) {
-		    SvREFCNT_dec(GvCV(dstr));
+		    CvREFCNT_dec(GvCV(dstr));
 		    GvCV(dstr) = NULL;
 		    GvCVGEN(dstr) = 0; /* Switch off cacheness. */
 		}
@@ -2633,8 +2633,17 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV* sstr, const I32 flags)
 	    || stype == SVt_PVAV || stype == SVt_PVHV || stype == SVt_PVCV )
         && dtype != stype ) {
 	/* FIXME the assignment should be done before old values ore DESTROYed */
-	Perl_sv_clear_body(aTHX_ dstr);
-	SvFLAGS(dstr) = dtype = SVt_NULL;
+	if (SvOBJECT(dstr)) {
+	    HV* package = SvSTASH(dstr);
+	    Perl_sv_clear_body(aTHX_ dstr);
+	    sv_upgrade( dstr, SVt_PVMG);
+	    SvFLAGS(dstr) |= SVs_OBJECT;
+	    SvSTASH(dstr) = package;
+	}
+	else {
+	    Perl_sv_clear_body(aTHX_ dstr);
+	}
+	dtype = SvTYPE(dstr);
     }
 
     /* There's a lot of redundancy below but we're going for speed here */
@@ -2775,7 +2784,7 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV* sstr, const I32 flags)
 	    const char *const ptr = SvPV_const(sstr, len);
 
             SvGROW(dstr, len + 1);
-            Copy(ptr, SvPVX(dstr), len + 1, char);
+            Copy(ptr, SvPVX_mutable(dstr), len + 1, char);
             SvCUR_set(dstr, len);
 	    SvPOK_only(dstr);
 	} else {
@@ -2926,7 +2935,7 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV* sstr, const I32 flags)
                Have to copy the string.  */
 	    STRLEN len = SvCUR(sstr);
             SvGROW(dstr, len + 1);	/* inlined from sv_setpvn */
-            Move(SvPVX_const(sstr),SvPVX(dstr),len,char);
+            Move(SvPVX_const(sstr),SvPVX_mutable(dstr),len,char);
             SvCUR_set(dstr, len);
             *SvEND(dstr) = '\0';
         } else {
@@ -3207,7 +3216,7 @@ Perl_sv_setpv(pTHX_ register SV *const sv, register const char *const ptr)
     SvUPGRADE(sv, SVt_PV);
 
     SvGROW(sv, len + 1);
-    Move(ptr,SvPVX(sv),len+1,char);
+    Move(ptr,SvPVX_mutable(sv),len+1,char);
     SvCUR_set(sv, len);
     (void)SvPOK_only(sv);		/* validate pointer */
     SvTAINT(sv);
@@ -3401,7 +3410,7 @@ Perl_sv_force_normal_flags(pTHX_ register SV *const sv, const U32 flags)
                 SvPOK_off(sv);
             } else {
                 SvGROW(sv, cur + 1);
-                Move(pvx,SvPVX(sv),cur,char);
+                Move(pvx,SvPVX_mutable(sv),cur,char);
                 SvCUR_set(sv, cur);
                 *SvEND(sv) = '\0';
             }
@@ -3428,7 +3437,7 @@ Perl_sv_force_normal_flags(pTHX_ register SV *const sv, const U32 flags)
 	    SvPV_set(sv, NULL);
 	    SvLEN_set(sv, 0);
 	    SvGROW(sv, len + 1);
-	    Move(pvx,SvPVX(sv),len,char);
+	    Move(pvx,SvPVX_mutable(sv),len,char);
 	    *SvEND(sv) = '\0';
 	    unshare_hek(SvSHARED_HEK_FROM_PV(pvx));
 	}
@@ -3482,7 +3491,7 @@ Perl_sv_chop(pTHX_ register SV *const sv, register const char *const ptr)
 	    const char *pvx = SvPVX_const(sv);
 	    const STRLEN len = SvCUR(sv);
 	    SvGROW(sv, len + 1);
-	    Move(pvx,SvPVX(sv),len,char);
+	    Move(pvx,SvPVX_mutable(sv),len,char);
 	    *SvEND(sv) = '\0';
 	}
 	SvFLAGS(sv) |= SVf_OOK;
@@ -3492,7 +3501,7 @@ Perl_sv_chop(pTHX_ register SV *const sv, register const char *const ptr)
     }
     SvLEN_set(sv, SvLEN(sv) - delta);
     SvCUR_set(sv, SvCUR(sv) - delta);
-    SvPV_set(sv, SvPVX(sv) + delta);
+    SvPV_set(sv, SvPVX_mutable(sv) + delta);
 
     p = (U8 *)SvPVX_const(sv);
 
@@ -3553,7 +3562,7 @@ Perl_sv_catpvn_flags(pTHX_ register SV *const dsv, register const char *sstr, re
     SvGROW(dsv, dlen + slen + 1);
     if (sstr == dstr)
 	sstr = SvPVX_const(dsv);
-    Move(sstr, SvPVX(dsv) + dlen, slen, char);
+    Move(sstr, SvPVX_mutable(dsv) + dlen, slen, char);
     SvCUR_set(dsv, SvCUR(dsv) + slen);
     *SvEND(dsv) = '\0';
     (void)SvPOK_only(dsv);		/* validate pointer */
@@ -3624,7 +3633,7 @@ Perl_sv_catpv(pTHX_ register SV *const sv, register const char *ptr)
     SvGROW(sv, tlen + len + 1);
     if (ptr == junk)
 	ptr = SvPVX_const(sv);
-    Move(ptr,SvPVX(sv)+tlen,len+1,char);
+    Move(ptr,SvPVX_mutable(sv)+tlen,len+1,char);
     SvCUR_set(sv, SvCUR(sv) + len);
     (void)SvPOK_only(sv);		/* validate pointer */
     SvTAINT(sv);
@@ -3862,9 +3871,6 @@ Perl_sv_magic(pTHX_ register SV *const sv, SV *const obj, const int how,
 	break;
     case PERL_MAGIC_uvar:
 	vtable = &PL_vtbl_uvar;
-	break;
-    case PERL_MAGIC_vec:
-	vtable = &PL_vtbl_vec;
 	break;
     case PERL_MAGIC_rhash:
     case PERL_MAGIC_symtab:
@@ -4128,7 +4134,7 @@ Perl_sv_kill_backrefs(pTHX_ SV *const sv, AV *const av)
 	    svp++;
 	}
     }
-    SvREFCNT_dec(av); /* remove extra count added by sv_add_backref() */
+    AvREFCNT_dec(av); /* remove extra count added by sv_add_backref() */
     return 0;
 }
 
@@ -4161,7 +4167,7 @@ Perl_sv_insert(pTHX_ SV *const bigstr, const STRLEN offset, const STRLEN len,
     (void)SvPOK_only(bigstr);
     if (offset + len > curlen) {
 	SvGROW(bigstr, offset+len+1);
-	Zero(SvPVX(bigstr)+curlen, offset+len-curlen, char);
+	Zero(SvPVX_mutable(bigstr)+curlen, offset+len-curlen, char);
 	SvCUR_set(bigstr, offset+len);
     }
 
@@ -4181,12 +4187,12 @@ Perl_sv_insert(pTHX_ SV *const bigstr, const STRLEN offset, const STRLEN len,
 	return;
     }
     else if (i == 0) {
-	Move(little,SvPVX(bigstr)+offset,len,char);
+	Move(little,SvPVX_mutable(bigstr)+offset,len,char);
 	SvSETMAGIC(bigstr);
 	return;
     }
 
-    big = SvPVX(bigstr);
+    big = SvPVX_mutable(bigstr);
     mid = big + offset;
     midend = mid + len;
     bigend = big + SvCUR(bigstr);
@@ -4312,6 +4318,13 @@ you'll want to call C<sv_free()> (or its macro wrapper C<SvREFCNT_dec>)
 instead.
 
 =cut
+
+=pod sv_clear_body
+
+clears the sv, except keep the object
+
+=cut
+
 */
 
 void
@@ -4322,6 +4335,7 @@ Perl_sv_clear_body(pTHX_ SV *const sv)
     const struct body_details *const sv_type_details
 	= bodies_by_type + type;
     HV *stash;
+
 
     if (type <= SVt_IV) {
 	/* See the comment in sv.h about the collusion between this early
@@ -4334,55 +4348,13 @@ Perl_sv_clear_body(pTHX_ SV *const sv)
 	    else
 	        SvREFCNT_dec(target);
 	}
+	SvFLAGS(sv) = SVt_NULL;
 	return;
     }
 
-    if (SvOBJECT(sv)) {
-	if (PL_defstash) {		/* Still have a symbol table? */
-	    dSP;
-	    GV* destructor = gv_fetchmethod(SvSTASH(sv), "DESTROY");
-	    if (destructor) {
-		SV* const tmpref = newRV(sv);
-		SvREADONLY_on(tmpref);   /* DESTROY() could be naughty */
-		ENTER;
-		PUSHSTACKi(PERLSI_DESTROY);
-		EXTEND(SP, 2);
-		PUSHMARK(SP);
-		PUSHs(tmpref);
-		PUTBACK;
-		call_sv((SV*)GvCV(destructor), G_DISCARD|G_EVAL|G_KEEPERR|G_VOID);
-		
-		POPSTACK;
-		SPAGAIN;
-		LEAVE;
-		if(SvREFCNT(tmpref) < 2) {
-		    /* tmpref is not kept alive! */
-		    SvREFCNT(sv)--;
-		    SvRV_set(tmpref, NULL);
-		    SvROK_off(tmpref);
-		}
-		SvREFCNT_dec(tmpref);
-	    }
-
-	    if (SvREFCNT(sv)) {
-		if (PL_in_clean_objs)
-		    Perl_croak(aTHX_ "DESTROY created new reference to dead object '%s'",
-			  HvNAME_get(stash));
-		/* DESTROY gave object new lease on life */
-		return;
-	    }
-	}
-
-	if (SvOBJECT(sv)) {
-	    SvREFCNT_dec(SvSTASH(sv));	/* possibly of changed persuasion */
-	    SvOBJECT_off(sv);	/* Curse the object. */
-	    if (type != SVt_PVIO)
-		--PL_sv_objcount;	/* XXX Might want something more general */
-	}
-    }
     if (type >= SVt_PVMG) {
 	if (type == SVt_PVMG && SvPAD_OUR(sv)) {
-	    SvREFCNT_dec(SvOURGV(sv));
+	    GvREFCNT_dec(SvOURGV(sv));
 	} else if (SvMAGIC(sv))
 	    mg_free(sv);
     }
@@ -4479,10 +4451,10 @@ Perl_sv_clear_body(pTHX_ SV *const sv)
             }
 	}
 #else
-	else if (SvPVX_const(sv) && SvLEN(sv))
-	    Safefree(SvPVX_mutable(sv));
-	else if (SvPVX_const(sv) && SvREADONLY(sv) && SvFAKE(sv)) {
-	    unshare_hek(SvSHARED_HEK_FROM_PV(SvPVX_const(sv)));
+	else if (I_SvPVX(sv) && SvLEN(sv))
+	    Safefree(I_SvPVX(sv));
+	else if (I_SvPVX(sv) && SvREADONLY(sv) && SvFAKE(sv)) {
+	    unshare_hek(SvSHARED_HEK_FROM_PV(I_SvPVX(sv)));
 	    SvFAKE_off(sv);
 	}
 #endif
@@ -4498,6 +4470,8 @@ Perl_sv_clear_body(pTHX_ SV *const sv)
     else if (sv_type_details->body_size) {
 	my_safefree(SvANY(sv));
     }
+
+    SvFLAGS(sv) = SVt_NULL;
 }
 
 void
@@ -4508,6 +4482,50 @@ Perl_sv_clear(pTHX_ register SV *const sv)
     PERL_ARGS_ASSERT_SV_CLEAR;
     assert(SvREFCNT(sv) == 0);
     assert(SvTYPE(sv) != SVTYPEMASK);
+
+    if (SvOBJECT(sv)) {
+	if (PL_defstash) {		/* Still have a symbol table? */
+	    dSP;
+	    GV* destructor = gv_fetchmethod(SvSTASH(sv), "DESTROY");
+	    if (destructor) {
+		SV* const tmpref = newRV(sv);
+		SvREADONLY_on(tmpref);   /* DESTROY() could be naughty */
+		ENTER;
+		PUSHSTACKi(PERLSI_DESTROY);
+		EXTEND(SP, 2);
+		PUSHMARK(SP);
+		PUSHs(tmpref);
+		PUTBACK;
+		call_sv((SV*)GvCV(destructor), G_DISCARD|G_EVAL|G_KEEPERR|G_VOID);
+		
+		POPSTACK;
+		SPAGAIN;
+		LEAVE;
+		if(SvREFCNT(tmpref) < 2) {
+		    /* tmpref is not kept alive! */
+		    SvREFCNT(sv)--;
+		    SvRV_set(tmpref, NULL);
+		    SvROK_off(tmpref);
+		}
+		SvREFCNT_dec(tmpref);
+	    }
+
+	    if (SvREFCNT(sv)) {
+		if (PL_in_clean_objs)
+		    Perl_croak(aTHX_ "DESTROY created new reference to dead object '%s'",
+			HvNAME_get(SvSTASH(sv)));
+		/* DESTROY gave object new lease on life */
+		return;
+	    }
+	}
+
+	if (SvOBJECT(sv)) {
+	    HvREFCNT_dec(SvSTASH(sv));	/* possibly of changed persuasion */
+	    SvOBJECT_off(sv);	/* Curse the object. */
+	    if (SvTYPE(sv) != SVt_PVIO)
+		--PL_sv_objcount;	/* XXX Might want something more general */
+	}
+    }
 
     Perl_sv_clear_body(aTHX_ sv);
     SvFLAGS(sv) &= SVf_BREAK;
@@ -5639,7 +5657,7 @@ screamer2:
     }
 
 return_string_or_null:
-    return (SvCUR(sv) - append) ? SvPVX(sv) : NULL;
+    return (SvCUR(sv) - append) ? SvPVX_mutable(sv) : NULL;
 }
 
 /*
@@ -5723,7 +5741,7 @@ Perl_sv_inc(pTHX_ register SV *const sv)
 	SvIV_set(sv, 1);
 	return;
     }
-    d = SvPVX(sv);
+    d = SvPVX_mutable(sv);
     while (isALPHA(*d)) d++;
     while (isDIGIT(*d)) d++;
     if (*d) {
@@ -5796,7 +5814,7 @@ Perl_sv_inc(pTHX_ register SV *const sv)
     /* oh,oh, the number grew */
     SvGROW(sv, SvCUR(sv) + 2);
     SvCUR_set(sv, SvCUR(sv) + 1);
-    for (d = SvPVX(sv) + SvCUR(sv); d > SvPVX_const(sv); d--)
+    for (d = SvPVX_mutable(sv) + SvCUR(sv); d > SvPVX_const(sv); d--)
 	*d = d[-1];
     if (isDIGIT(d[1]))
 	*d = '1';
@@ -6580,9 +6598,9 @@ Perl_sv_pvn_force_flags(pTHX_ SV *const sv, STRLEN *const lp, const I32 flags)
 		sv_unref(sv);
 	    SvUPGRADE(sv, SVt_PV);		/* Never FALSE */
 	    SvGROW(sv, len + 1);
-	    Move(s,SvPVX(sv),len,char);
+	    Move(s,SvPVX_mutable(sv),len,char);
 	    SvCUR_set(sv, len);
-	    SvPVX(sv)[len] = '\0';
+	    SvPVX_mutable(sv)[len] = '\0';
 	}
 	if (!SvPOK(sv)) {
 	    SvPOK_on(sv);		/* validate pointer */
@@ -6899,7 +6917,7 @@ Perl_sv_bless(pTHX_ SV *const sv, HV *const stash)
 	if (SvOBJECT(tmpRef)) {
 	    if (SvTYPE(tmpRef) != SVt_PVIO)
 		--PL_sv_objcount;
-	    SvREFCNT_dec(SvSTASH(tmpRef));
+	    HvREFCNT_dec(SvSTASH(tmpRef));
 	}
     }
     SvOBJECT_on(tmpRef);
@@ -8552,8 +8570,8 @@ Perl_parser_dup(pTHX_ const yy_parser *const proto, CLONE_PARAMS *const param)
     parser->linestr	= sv_dup_inc(proto->linestr, param);
 
     {
-	char * const ols = SvPVX(proto->linestr);
-	char * const ls  = SvPVX(parser->linestr);
+	char * const ols = SvPVX_mutable(proto->linestr);
+	char * const ls  = SvPVX_mutable(parser->linestr);
 
 	parser->bufptr	    = ls + (proto->bufptr >= ols ?
 				    proto->bufptr -  ols : 0);
@@ -8924,7 +8942,7 @@ Perl_rvpv_dup(pTHX_ SV *dstr, const SV *sstr, CLONE_PARAMS* param)
 	    }
 	    else {
 		/* Some other special case - random pointer */
-		SvPV_set(dstr, SvPVX(sstr));		
+		SvPV_set(dstr, SvPVX_mutable(sstr));		
 	    }
 	}
     }
@@ -9266,10 +9284,6 @@ Perl_cx_dup(pTHX_ PERL_CONTEXT *cxs, I32 ix, I32 max, CLONE_PARAMS* param)
 		ncx->blk_sub.cv		= (ncx->blk_sub.olddepth == 0
 					   ? cv_dup_inc(ncx->blk_sub.cv, param)
 					   : cv_dup(ncx->blk_sub.cv,param));
-		ncx->blk_sub.argarray	= (CxHASARGS(ncx)
-					   ? av_dup_inc(ncx->blk_sub.argarray,
-							param)
-					   : NULL);
 		ncx->blk_sub.oldcomppad = (PAD*)ptr_table_fetch(PL_ptr_table,
 					   ncx->blk_sub.oldcomppad);
 		break;
@@ -10512,14 +10526,14 @@ Perl_sv_recode_to_utf8(pTHX_ SV *sv, SV *encoding)
 	s = SvPV_const(uni, len);
 	if (s != SvPVX_const(sv)) {
 	    SvGROW(sv, len + 1);
-	    Move(s, SvPVX(sv), len + 1, char);
+	    Move(s, SvPVX_mutable(sv), len + 1, char);
 	    SvCUR_set(sv, len);
 	}
 	FREETMPS;
 	LEAVE;
-	return SvPVX(sv);
+	return SvPVX_mutable(sv);
     }
-    return SvPOKp(sv) ? SvPVX(sv) : NULL;
+    return SvPOKp(sv) ? SvPVX_mutable(sv) : NULL;
 }
 
 /* ---------------------------------------------------------------------

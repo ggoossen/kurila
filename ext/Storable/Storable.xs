@@ -324,7 +324,7 @@ typedef struct stcxt {
 	SV *self = newSV(sizeof(stcxt_t) - 1);			\
 	SV *my_sv = newRV_noinc(self);					\
 	sv_bless(my_sv, gv_stashpv("Storable::Cxt", GV_ADD));	\
-	cxt = (stcxt_t *)SvPVX(self);					\
+	cxt = (stcxt_t *)SvPVX_mutable(self);					\
 	Zero(cxt, 1, stcxt_t);							\
 	cxt->my_sv = my_sv;								\
   } STMT_END
@@ -337,7 +337,7 @@ typedef struct stcxt {
 
 #define dSTCXT_PTR(T,name)							\
 	T name = ((perinterp_sv && SvIOK(perinterp_sv) && SvIVX(perinterp_sv)	\
-				? (T)SvPVX(SvRV(INT2PTR(SV*,SvIVX(perinterp_sv)))) : (T) 0))
+				? (T)SvPVX_mutable(SvRV(INT2PTR(SV*,SvIVX(perinterp_sv)))) : (T) 0))
 #define dSTCXT										\
 	dSTCXT_SV;										\
 	dSTCXT_PTR(stcxt_t *, cxt)
@@ -1497,7 +1497,7 @@ static stcxt_t *allocate_context(pTHX_ stcxt_t *parent_cxt)
  */
 static void free_context(pTHX_ stcxt_t *cxt)
 {
-	stcxt_t *prev = (stcxt_t *)(cxt->prev ? SvPVX(SvRV(cxt->prev)) : 0);
+	stcxt_t *prev = (stcxt_t *)(cxt->prev ? SvPVX_mutable(SvRV(cxt->prev)) : 0);
 
 	TRACEME(("free_context"));
 
@@ -2032,7 +2032,7 @@ static int store_scalar(pTHX_ stcxt_t *cxt, SV *sv)
             wlen = (I32) len; /* WLEN via STORE_SCALAR expects I32 */
             STORE_SCALAR(pv, wlen);
             TRACEME(("ok (scalar 0x%"UVxf" '%s', length = %"IVdf")",
-                     PTR2UV(sv), SvPVX(sv), (IV)len));
+                     PTR2UV(sv), SvPVX_mutable(sv), (IV)len));
 	} else
             CROAK(("Can't determine type of %s(0x%"UVxf")",
                    sv_reftype(sv, FALSE),
@@ -3783,7 +3783,7 @@ static SV *retrieve_idx_blessed(pTHX_ stcxt_t *cxt, const char *cname)
 	if (!sva)
 		CROAK(("Class name #%"IVdf" should have been seen already", (IV) idx));
 
-	classname = SvPVX(*sva);	/* We know it's a PV, by construction */
+	classname = SvPVX_mutable(*sva);	/* We know it's a PV, by construction */
 
 	TRACEME(("class ID %d => %s", idx, classname));
 
@@ -3988,7 +3988,7 @@ static SV *retrieve_hook(pTHX_ stcxt_t *cxt, const char *cname)
 			CROAK(("Class name #%"IVdf" should have been seen already",
 				(IV) idx));
 
-		classname = SvPVX(*sva);	/* We know it's a PV, by construction */
+		classname = SvPVX_mutable(*sva);	/* We know it's a PV, by construction */
 		TRACEME(("class ID %d => %s", idx, classname));
 
 	} else {
@@ -4041,7 +4041,7 @@ static SV *retrieve_hook(pTHX_ stcxt_t *cxt, const char *cname)
 
 	frozen = NEWSV(10002, len2);
 	if (len2) {
-		SAFEREAD(SvPVX(frozen), len2, frozen);
+		SAFEREAD(SvPVX_mutable(frozen), len2, frozen);
 		SvCUR_set(frozen, len2);
 		*SvEND(frozen) = '\0';
 	}
@@ -4541,14 +4541,14 @@ static SV *retrieve_lscalar(pTHX_ stcxt_t *cxt, const char *cname)
 	 * this way, it's worth the hassle and risk.
 	 */
 
-	SAFEREAD(SvPVX(sv), len, sv);
+	SAFEREAD(SvPVX_mutable(sv), len, sv);
 	SvCUR_set(sv, len);				/* Record C string length */
 	*SvEND(sv) = '\0';				/* Ensure it's null terminated anyway */
 	(void) SvPOK_only(sv);			/* Validate string pointer */
 	if (cxt->s_tainted)				/* Is input source tainted? */
 		SvTAINT(sv);				/* External data cannot be trusted */
 
-	TRACEME(("large scalar len %"IVdf" '%s'", (IV) len, SvPVX(sv)));
+	TRACEME(("large scalar len %"IVdf" '%s'", (IV) len, SvPVX_const(sv)));
 	TRACEME(("ok (retrieve_lscalar at 0x%"UVxf")", PTR2UV(sv)));
 
 	return sv;
@@ -4602,10 +4602,10 @@ static SV *retrieve_scalar(pTHX_ stcxt_t *cxt, const char *cname)
 		 * work done by sv_setpv. Since we're going to allocate lots of scalars
 		 * this way, it's worth the hassle and risk.
 		 */
-		SAFEREAD(SvPVX(sv), len, sv);
+		SAFEREAD(SvPVX_mutable(sv), len, sv);
 		SvCUR_set(sv, len);			/* Record C string length */
 		*SvEND(sv) = '\0';			/* Ensure it's null terminated anyway */
-		TRACEME(("small scalar len %d '%s'", len, SvPVX(sv)));
+		TRACEME(("small scalar len %d '%s'", len, SvPVX_const(sv)));
 	}
 
 	(void) SvPOK_only(sv);			/* Validate string pointer */
@@ -5961,7 +5961,7 @@ void
 DESTROY(self)
     SV *self
 PREINIT:
-	stcxt_t *cxt = (stcxt_t *)SvPVX(SvRV(self));
+	stcxt_t *cxt = (stcxt_t *)SvPVX_mutable(SvRV(self));
 PPCODE:
 	if (kbuf)
 		Safefree(kbuf);

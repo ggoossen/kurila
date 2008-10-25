@@ -19,4 +19,4 @@ my $NEWPROTO = 'Prototype mismatch:';
 sub sub0 { 1 }
 sub sub0 { 2 }
 
-ok 1, $warn =~ s/Subroutine sub0 redefined[^\n]+\n//s;
+ok 1, $warn =~ s/Subroutine sub0 redefined//s;

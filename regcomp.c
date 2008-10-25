@@ -3059,7 +3059,7 @@ S_study_chunk(pTHX_ RExC_state_t *pRExC_state, regnode **scanp,
 			    /* What was added is a constant string */
 			    if (mincount > 1) {
 				SvGROW(last_str, (mincount * l) + 1);
-				repeatcpy(SvPVX(last_str) + l,
+				repeatcpy(SvPVX_mutable(last_str) + l,
 					  SvPVX_const(last_str), l, mincount - 1);
 				SvCUR_set(last_str, SvCUR(last_str) * mincount);
 				/* Add additional parts. */
@@ -4488,7 +4488,7 @@ Perl_reg_named_buff_fetch(pTHX_ REGEXP * const r, SV * const namesv,
         if (he_str) {
             IV i;
             SV* sv_dat=HeVAL(he_str);
-            I32 *nums=(I32*)SvPVX(sv_dat);
+            I32 *nums=(I32*)SvPVX_mutable(sv_dat);
             for ( i=0; i<SvIVX(sv_dat); i++ ) {
                 if ((I32)(rx->nparens) >= nums[i]
                     && rx->offs[nums[i]].start != -1
@@ -4569,7 +4569,7 @@ Perl_reg_named_buff_nextkey(pTHX_ REGEXP * const r, const U32 flags)
             IV i;
             IV parno = 0;
             SV* sv_dat = HeVAL(temphe);
-            I32 *nums = (I32*)SvPVX(sv_dat);
+            I32 *nums = (I32*)SvPVX_mutable(sv_dat);
             for ( i = 0; i < SvIVX(sv_dat); i++ ) {
                 if ((I32)(rx->lastparen) >= nums[i] &&
                     rx->offs[nums[i]].start != -1 &&
@@ -4629,7 +4629,7 @@ Perl_reg_named_buff_all(pTHX_ REGEXP * const r, const U32 flags)
             IV i;
             IV parno = 0;
             SV* sv_dat = HeVAL(temphe);
-            I32 *nums = (I32*)SvPVX(sv_dat);
+            I32 *nums = (I32*)SvPVX_mutable(sv_dat);
             for ( i = 0; i < SvIVX(sv_dat); i++ ) {
                 if ((I32)(rx->lastparen) >= nums[i] &&
                     rx->offs[nums[i]].start != -1 &&
@@ -5164,7 +5164,7 @@ S_reg(pTHX_ RExC_state_t *pRExC_state, I32 paren, I32 *flagp,U32 depth)
                                but the arrays are likely to be quite small, so
                                for now we punt -- dmq */
                             IV count = SvIV(sv_dat);
-                            I32 *pv = (I32*)SvPVX(sv_dat);
+                            I32 *pv = (I32*)SvPVX_mutable(sv_dat);
                             IV i;
                             for ( i = 0 ; i < count ; i++ ) {
                                 if ( pv[i] == RExC_npar ) {
@@ -5244,7 +5244,7 @@ S_reg(pTHX_ RExC_state_t *pRExC_state, I32 paren, I32 *flagp,U32 depth)
                 {
     		    SV *sv_dat = reg_scan_name(pRExC_state,
     		        SIZE_ONLY ? REG_RSN_RETURN_NULL : REG_RSN_RETURN_DATA);
-    		     num = sv_dat ? *((I32 *)SvPVX(sv_dat)) : 0;
+    		     num = sv_dat ? *((I32 *)SvPVX_mutable(sv_dat)) : 0;
                 }
                 goto gen_recurse_regop;
                 /* NOT REACHED */
@@ -5460,7 +5460,7 @@ S_reg(pTHX_ RExC_state_t *pRExC_state, I32 paren, I32 *flagp,U32 depth)
 		        RExC_parse++;
 		        sv_dat = reg_scan_name(pRExC_state,
     		            SIZE_ONLY ? REG_RSN_RETURN_NULL : REG_RSN_RETURN_DATA);
-    		        parno = sv_dat ? *((I32 *)SvPVX(sv_dat)) : 0;
+    		        parno = sv_dat ? *((I32 *)SvPVX_mutable(sv_dat)) : 0;
 		    }
 		    ret = reganode(pRExC_state,INSUBP,parno); 
 		    goto insert_if_check_paren;
@@ -6267,11 +6267,11 @@ S_reg_namedseq(pTHX_ RExC_state_t *pRExC_state, UV *valuep)
         if (!table || !(PL_hints & HINT_LOCALIZE_HH)) {
             vFAIL2("Constant(\\N{%s}) unknown: "
                   "(possibly a missing \"use charnames ...\")",
-                  SvPVX(sv_name));
+                  SvPVX_const(sv_name));
         }
         if (!cvp || !SvOK(*cvp)) { /* when $^H{charnames} = undef; */
             vFAIL2("Constant(\\N{%s}): "
-                  "$^H{charnames} is not defined",SvPVX(sv_name));
+                  "$^H{charnames} is not defined",SvPVX_const(sv_name));
         }
         
         
@@ -6311,7 +6311,7 @@ S_reg_namedseq(pTHX_ RExC_state_t *pRExC_state, UV *valuep)
             
             if ( !sv_str || !SvOK(sv_str) ) {
                 vFAIL2("Constant(\\N{%s}): Call to &{$^H{charnames}} "
-                      "did not return a defined value",SvPVX(sv_name));
+                      "did not return a defined value",SvPVX_const(sv_name));
             }
             if (hv_store_ent( RExC_charnames, sv_name, sv_str, 0))
                 cached = 1;
@@ -6343,13 +6343,13 @@ S_reg_namedseq(pTHX_ RExC_state_t *pRExC_state, UV *valuep)
             if (numlen<len && SIZE_ONLY && ckWARN(WARN_REGEXP)) {
                 vWARN2(RExC_parse,
                     "Ignoring excess chars from \\N{%s} in character class",
-                    SvPVX(sv_name)
+                    SvPVX_const(sv_name)
                 );
             }        
         } else if (SIZE_ONLY && ckWARN(WARN_REGEXP)) {
             vWARN2(RExC_parse,
                     "Ignoring zero length \\N{%s} in character class",
-                    SvPVX(sv_name)
+                    SvPVX_const(sv_name)
                 );
         }
         if (sv_name)    
@@ -8594,7 +8594,7 @@ Perl_regprop(pTHX_ const regexp *prog, SV *sv, const regnode *o)
             else {
                 AV *list= (AV *)progi->data->data[ progi->name_list_idx ];
                 SV *sv_dat=(SV*)progi->data->data[ ARG( o ) ];
-                I32 *nums=(I32*)SvPVX(sv_dat);
+                I32 *nums=(I32*)SvPVX_mutable(sv_dat);
                 SV **name= av_fetch(list, nums[0], 0 );
                 I32 n;
                 if (name) {
@@ -8781,7 +8781,7 @@ Perl_re_intuit_string(pTHX_ REGEXP * const r)
 void
 Perl_pregfree(pTHX_ REGEXP *r)
 {
-    SvREFCNT_dec(r);
+    ReREFCNT_dec(r);
 }
 
 void
@@ -8798,7 +8798,7 @@ Perl_pregfree2(pTHX_ REGEXP *rx)
     } else {
         CALLREGFREE_PVT(rx); /* free the private data */
         if (RXp_PAREN_NAMES(r))
-            SvREFCNT_dec(RXp_PAREN_NAMES(r));
+            HvREFCNT_dec(RXp_PAREN_NAMES(r));
     }        
     if (r->substrs) {
         if (r->anchored_substr)

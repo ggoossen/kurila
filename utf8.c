@@ -1862,7 +1862,7 @@ S_swash_get(pTHX_ SV* swash, UV start, UV span)
     scur   = octets ? (span * octets) : (span + 7) / 8;
     swatch = newSV(scur);
     SvPOK_on(swatch);
-    s = SvPVX(swatch);
+    s = SvPVX_mutable(swatch);
     if (octets && none) {
 	const char* const e = s + scur;
 	while (s < e) {
@@ -1885,7 +1885,7 @@ S_swash_get(pTHX_ SV* swash, UV start, UV span)
 	(void)memzero((char*)s, scur + 1);
     }
     SvCUR_set(swatch, scur);
-    s = SvPVX(swatch);
+    s = SvPVX_mutable(swatch);
 
     /* read $swash->{LIST} */
     l = SvPV(*listsvp, lcur);
@@ -2279,7 +2279,7 @@ Perl_pv_uni_display(pTHX_ SV *dsv, const char *spv, STRLEN len, STRLEN pvlim, UV
     if (truncated)
 	 sv_catpvs(dsv, "...");
     
-    return SvPVX(dsv);
+    return SvPVX_mutable(dsv);
 }
 
 /*

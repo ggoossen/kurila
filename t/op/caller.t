@@ -17,22 +17,22 @@ ok( (!nelems @c), "caller(0) in main program" );
 
 try { @c = @( caller(0) ) };
 is( @c[3], "(eval)", "subroutine name in an eval \{\}" );
-ok( !@c[4], "hasargs false in an eval \{\}" );
+is( @c[4], undef, "args undef in an eval \{\}" );
 
 eval q{ @c = (Caller(0))[3] };
 is( @c[3], "(eval)", "subroutine name in an eval ''" );
-ok( !@c[4], "hasargs false in an eval ''" );
+is( @c[4], undef, "args undef in an eval ''" );
 
 sub { @c = @( caller(0) ) } -> ();
 is( @c[3], undef, "anonymous subroutine name" );
-ok( @c[4], "hasargs true with anon sub" );
+ok( defined @c[4], "hasargs defined with anon sub" );
 
 # Bug 20020517.003, used to dump core
 sub foo { @c = @( caller(0) ) }
 my $fooref = \(delete %main::{foo});
 *$fooref -> ();
 is( @c[3], "main::foo", "unknown subroutine name" );
-ok( @c[4], "hasargs true with unknown sub" );
+ok( defined @c[4], "args true with unknown sub" );
 
 print "# Tests with caller(1)\n";
 
@@ -41,25 +41,26 @@ sub f { @c = @( caller(1) ) }
 sub callf { f(); }
 callf();
 is( @c[3], "main::callf", "subroutine name" );
-ok( @c[4], "hasargs true with callf()" );
+ok( defined @c[4], "args true with callf()" );
 
 try { f() };
 is( @c[3], "(eval)", "subroutine name in an eval \{\}" );
-ok( !@c[4], "hasargs false in an eval \{\}" );
+is( @c[4], undef, "args undef in an eval \{\}" );
 
 eval q{ f() };
 is( @c[3], "(eval)", "subroutine name in an eval ''" );
-ok( !@c[4], "hasargs false in an eval ''" );
+is( @c[4], undef, "args false in an eval ''" );
 
-sub { f() } -> ();
+sub { f() } -> ("myarg");
 is( @c[3], 'main::__ANON__', "anonymous subroutine name" );
-ok( @c[4], "hasargs true with anon sub" );
+ok( ( nelems(@c[4]) == 1 and @c[4][0] eq "myarg" ),
+    "args is correct with anon sub" );
 
 sub foo2 { f() }
 my $fooref2 = \(delete %main::{foo2});
 *$fooref2 -> ();
 is( @c[3], "main::foo2", "unknown subroutine name" );
-ok( @c[4], "hasargs true with unknown sub" );
+ok( defined @c[4], "hasargs true with unknown sub" );
 
 # See if caller() returns the correct warning mask
 

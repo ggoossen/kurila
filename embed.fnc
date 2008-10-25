@@ -10,6 +10,8 @@
 :	A		member of public API
 :	m		Implemented as a macro - no export, no
 :			proto, no #define
+:       S               Has Cv, Hv, Av, Gv macros
+:       i               function is inline
 :	d		function has documentation with its source
 :	s		static function, should have an S_ prefix in
 :			source file; for macros (m), suffix the usage
@@ -97,6 +99,19 @@ END_EXTERN_C
 
 /* functions with flag 'n' should come before here */
 START_EXTERN_C
+Aip	|SV*	|HvSv	|NN HV *hv
+Aip	|SV*	|AvSv	|NN AV *av
+Aip	|SV*	|CvSv	|NN CV *cv
+Aip	|SV*	|GvSv	|NN GV *cv
+Aip	|SV*	|IoSv	|NN struct io *cv
+Aip	|SV*	|ReSv	|NN REGEXP *cv
+
+Aip	|const char*	|SvPVX_const	|NN SV *sv
+Aip	|char*	|SvPVX_mutable	|NN SV *sv
+AipS	|void	|SvREFCNT_dec	|NULLOK SV *sv
+Aip	|IV	|SvIV	|NN SV *sv
+Aip	|UV	|SvUV	|NN SV *sv
+Aip	|NV	|SvNV	|NN SV *sv
 #  include "pp_proto.h"
 Ap	|bool	|Gv_AMupdate	|NN HV* stash
 p	|OP*	|append_elem	|I32 optype|NULLOK OP* first|NULLOK OP* last
@@ -433,7 +448,6 @@ p	|int	|magic_getpack	|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_getsig	|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_gettaint	|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_getuvar	|NN SV* sv|NN MAGIC* mg
-p	|int	|magic_getvec	|NN SV* sv|NN MAGIC* mg
 p	|U32	|magic_len	|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_nextpack	|NN SV *sv|NN MAGIC *mg|NN SV *key
 p	|U32	|magic_regdata_cnt|NN SV* sv|NN MAGIC* mg
@@ -455,7 +469,6 @@ p	|int	|magic_setregexp|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_setsig	|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_settaint	|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_setuvar	|NN SV* sv|NN MAGIC* mg
-p	|int	|magic_setvec	|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_setutf8	|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_set_all_env|NN SV* sv|NN MAGIC* mg
 p	|U32	|magic_sizepack	|NN SV* sv|NN MAGIC* mg
@@ -1263,7 +1276,6 @@ sR	|char *	|sv_exp_grow	|NN SV *sv|STRLEN needed
 pR	|I32	|dopoptosub_at	|NN const PERL_CONTEXT* cxstk|I32 startingblock
 #if defined(PERL_IN_PP_CTL_C) || defined(PERL_DECL_PROT)
 sR	|OP*	|docatch	|NULLOK OP *o
-sR	|OP*	|dofindlabel	|NN OP *o|NN const char *label|NN OP **opstack|NN OP **oplimit
 sR	|I32	|dopoptoeval	|I32 startingblock
 sR	|I32	|dopoptolabel	|NN const char *label
 sR	|I32	|dopoptoloop	|I32 startingblock
@@ -1408,7 +1420,7 @@ ERs	|I32	|reg_check_named_buff_matched	|NN const regexp *rex \
 #  ifdef DEBUGGING
 Es	|void	|dump_exec_pos	|NN const char *locinput|NN const regnode *scan|NN const char *loc_regeol\
 				|NN const char *loc_bostr|NN const char *loc_reg_starttry|const bool do_utf8
-Es	|void	|debug_start_match|NN const REGEXP *prog|const bool do_utf8|NN const char *start|NN const char *end|NN const char *blurb
+Es	|void	|debug_start_match|NN REGEXP *prog|const bool do_utf8|NN const char *start|NN const char *end|NN const char *blurb
 #  endif
 #endif
 

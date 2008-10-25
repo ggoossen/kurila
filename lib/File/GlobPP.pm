@@ -8,6 +8,9 @@ sub glob {
     local $/ = "\0";
     my $files = @( ~< $outfh );
     close $outfh or die;
+    for ($files) {
+        s/\0$//;
+    }
     return $files;
 }
 
