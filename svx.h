@@ -204,3 +204,14 @@ char* Perl_SvPVX_mutable(pTHX_ SV *sv) {
     assert(!isGV_with_GP(sv));
     return I_SvPVX(sv);
 }
+
+void Perl_SvREFCNT_dec(pTHX_ SV *sv) {
+    if (sv) {
+        if (SvREFCNT(sv)) {
+            if (--(SvREFCNT(sv)) == 0)
+                Perl_sv_free2(aTHX_ sv);
+        } else {
+            sv_free(sv);
+        }
+    }
+}

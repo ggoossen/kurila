@@ -134,6 +134,7 @@ PERL_INLINE_CALLCONV char*	Perl_SvPVX_mutable(pTHX_ SV *sv)
 #define PERL_ARGS_ASSERT_SVPVX_MUTABLE	\
 	assert(sv)
 
+PERL_INLINE_CALLCONV void	Perl_SvREFCNT_dec(pTHX_ SV *sv);
 #  include "pp_proto.h"
 PERL_CALLCONV bool	Perl_Gv_AMupdate(pTHX_ HV* stash)
 			__attribute__nonnull__(pTHX_1);
