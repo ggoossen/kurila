@@ -113,7 +113,6 @@ delete @refary[0]->[3];
 cmp_ok( scalar(nelems @{@refary[0]}),'==',1,'one down');
 
 do {
-    no strict 'subs';
     my @a = @( 33 );
     my $b = \@a[0];
     my $c = \delete @a['bar'];

@@ -130,7 +130,7 @@ sub _try_use {   # Basically a wrapper around "require Modulename"
   return %tried{@_[0]} if exists %tried{@_[0]};  # memoization
 
   my $module = @_[0];   # ASSUME sane module name!
-  do { no strict 'refs';
+  do {
     return @(%tried{$module} = 1)
      if defined(%{*{Symbol::fetch_glob($module . "::Lexicon")}}) or defined(@{*{Symbol::fetch_glob($module . "::ISA")}});
     # weird case: we never use'd it, but there it is!

@@ -43,7 +43,6 @@ sub import {
 	}
         $closure_import_func = Symbol::fetch_glob($closure_import_func);
 
-        no strict 'refs';
 	my $load_sub = sub {
 	    unless (%INC{$pm}) {
 		require $pm;

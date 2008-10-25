@@ -365,7 +365,6 @@ SKIP: do {
     select STDOUT;
 
     do {
-	use strict;
 	print FH "x\n" x 200;
 	ok(truncate(*FH, 200), "fh resize to 200");
     };
@@ -399,7 +398,6 @@ SKIP: do {
 	select STDOUT;
 
 	do {
-	    use strict;
 	    print FH "x\n" x 200;
 	    ok(truncate(*FH{IO}, 100), "fh resize by IO slot");
 	};

@@ -203,7 +203,6 @@ SKIP: do {
 	    our $AUTOLOAD = 'garbage';
 	    sub AUTOLOAD { print "# in AUTOLOAD body: $AUTOLOAD\n" }
 	};
-        no strict 'subs';
 	($res,$err) = < render('-basic', 'Bar::auto_func');
 	like ($res, qr/unknown function \(Bar::auto_func\)/,
 	      "Bar::auto_func seen as unknown function");
@@ -213,7 +212,6 @@ SKIP: do {
 
     };
     do {
-        no strict 'subs';
         ($res,$err) = < render('-basic', 'Foo::bar');
         like ($res, qr/unknown function \(Foo::bar\)/,
               "BC::compile detects fn-name as unknown function");

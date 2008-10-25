@@ -6,7 +6,6 @@ BEGIN {
     require './test.pl';
 }
 
-use strict;
 use Config;
 
 BEGIN {

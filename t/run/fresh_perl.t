@@ -234,7 +234,6 @@ EXPECT
 destroyed
 ########
 # TODO
-no strict "refs";
 package X;
 sub any { bless \%() }
 my $f = "FH000"; # just to thwart any future optimisations

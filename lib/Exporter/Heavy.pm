@@ -1,8 +1,5 @@
 package Exporter::Heavy;
 
-use strict;
-no strict 'refs';
-
 # On one line so MakeMaker will see it.
 require Exporter;  our $VERSION = $Exporter::VERSION;
 

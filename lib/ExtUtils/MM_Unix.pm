@@ -2695,7 +2695,6 @@ sub parse_version {
         next unless m/(?<!\\)([\$*])(([\w\:\']*)\bVERSION)\b.*\=/;
         my $eval = qq|
             package ExtUtils::MakeMaker::_version;
-            no strict;
             BEGIN \{ try \{
                 # Ensure any version() routine which might have leaked
                 # into this package has been deleted.  Interferes with

@@ -108,7 +108,6 @@ sub compile {
 	    } else {
 		$objname = "main::$objname" unless $objname =~ m/::/;
 		print $walkHandle "$objname:\n";
-		no strict 'refs';
 		die "err: unknown function ($objname)\n"
 		    unless *{$objname}{CODE};
 		$objref = \&$objname;

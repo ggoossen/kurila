@@ -17,8 +17,6 @@ my $saved_filename = $^O eq 'MacOS' ? ':0' : './0';
 
 cmp_ok($warns,'==',0,'no warns at start');
 
-no strict 'subs';
-
 open(FILE, ">","$saved_filename");
 ok(defined('FILE'),'created work file');
 print FILE "1\n";

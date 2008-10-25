@@ -226,7 +226,6 @@ sub walksymtable {
     my $sym;
     my $ref;
     my $fullname;
-    no strict 'refs';
     $prefix = '' unless defined $prefix;
     for my $sym (keys %$symref) {
         my $ref = $symref->{$_};

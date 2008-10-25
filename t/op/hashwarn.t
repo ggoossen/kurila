@@ -3,7 +3,6 @@
 require './test.pl';
 plan( tests => 8 );
 
-use strict;
 use warnings;
 
 use vars < qw{ @warnings };

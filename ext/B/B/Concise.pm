@@ -287,7 +287,6 @@ sub compileOpts {
 	}
 	elsif ($o =~ m/^-stash=(.*)/) {
 	    my $pkg = $1;
-	    no strict 'refs';
 	    eval "require $pkg" unless %{Symbol::stash($pkg)};
 	    push @render_packs, $pkg;
 	}
@@ -354,7 +353,6 @@ sub compile {
 	    }
 	}
 	for my $pkg ( @render_packs) {
-	    no strict 'refs';
 	    concise_stashref($order, \%{Symbol::stash($pkg)});
 	}
 

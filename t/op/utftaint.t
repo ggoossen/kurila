@@ -1,7 +1,6 @@
 #!./perl -T
 # tests whether tainting works with UTF-8
 
-use strict;
 use Config;
 
 # How to identify taint when you see it

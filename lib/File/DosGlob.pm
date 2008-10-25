@@ -390,8 +390,6 @@ sub glob {
 }
 
 do {
-    no strict 'refs';
-
     sub import {
     my $pkg = shift;
     return unless (nelems @_);

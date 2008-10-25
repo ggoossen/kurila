@@ -34,7 +34,6 @@ sub parse_file {
 	next unless m/([\$*])(([\w\:\']*)\bVERSION)\b.*\=/;
 	my $eval = qq{
 	    package ExtUtils::MakeMaker::_version;
-	    no strict;
 	    local $1$2;
 	    \$$2=undef; do \{
 		$_

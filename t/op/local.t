@@ -243,7 +243,6 @@ while (m/(o.+?),/gc) {
 
 do {
     # BUG 20001205.22
-    no strict 'subs';
     my %x;
     %x{a} = 1;
     do { local %x{b} = 1; };

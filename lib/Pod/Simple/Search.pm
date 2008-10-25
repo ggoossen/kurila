@@ -613,7 +613,6 @@ sub contains_pod {
 
 sub _accessorize {  # A simple-minded method-maker
   shift;
-  no strict 'refs';
   foreach my $attrname ( @_) {
     *{Symbol::fetch_glob(caller() . '::' . $attrname)} = sub {
       use strict;

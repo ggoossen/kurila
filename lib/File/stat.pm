@@ -48,7 +48,6 @@ sub stat ($) {
 	my $fh;
     do {
 		local $!;
-		no strict 'refs';
 		require Symbol;
                 my ($pkg) = caller();
 		$fh = \*{ Symbol::fetch_glob( $pkg . "::" . $arg) };

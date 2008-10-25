@@ -1,8 +1,5 @@
 package ExtUtils::Mksymlists;
 
-use strict < qw[ subs refs ];
-# no strict 'vars';  # until filehandles are exempted
-
 use Carp;
 use Exporter;
 use Config;

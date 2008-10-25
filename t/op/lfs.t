@@ -12,8 +12,6 @@ BEGIN {
 	}
 }
 
-use strict;
-
 our @s;
 our $fail;
 

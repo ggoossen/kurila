@@ -1,5 +1,5 @@
 #!./perl
-use strict;
+
 require './test.pl';
 
 $^I = 'bak*';

@@ -38,7 +38,6 @@ require Exporter;
 
 foreach my $meth ( @( < @EXPORT, < @EXPORT_OK )) {
     my $sub = File::Spec->can($meth);
-    no strict 'refs';
     *{Symbol::fetch_glob($meth)} = sub {&$sub('File::Spec', < @_)};
 }
 

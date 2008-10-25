@@ -233,7 +233,6 @@ my $LOCKFLAG;
 unless ($^O eq 'MacOS') {
   for my $oflag (qw/ NOFOLLOW BINARY LARGEFILE NOINHERIT /) {
     my ($bit, $func) = (0, "Fcntl::O_" . $oflag);
-    no strict 'refs';
     $OPENFLAGS ^|^= $bit if try {
       # Make sure that redefined die handlers do not cause problems
       # e.g. CGI::Carp
@@ -262,7 +261,6 @@ unless ($^O eq 'MacOS') {
   for my $oflag (qw/ TEMPORARY /) {
     my ($bit, $func) = (0, "Fcntl::O_" . $oflag);
     local($@);
-    no strict 'refs';
     $OPENTEMPFLAGS ^|^= $bit if try {
       # Make sure that redefined die handlers do not cause problems
       # e.g. CGI::Carp

@@ -17,7 +17,6 @@ BEGIN {
      plan(13);
 }
 
-use strict;
 use warnings;
 use threads;
 
@@ -115,7 +114,6 @@ EOI
 
 
 TODO: {
-    no strict 'vars';   # Accessing $TODO from test.pl
     local our $TODO = 'refcount issues with threads';
 
 # Scalars leaked: 1

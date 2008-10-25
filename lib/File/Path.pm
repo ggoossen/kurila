@@ -733,7 +733,6 @@ sub _rmtree {
                 @files = @( () );
             }
             else {
-		no strict 'refs';
 		if (!defined ${*{Symbol::fetch_glob("^TAINT")}} or ${*{Symbol::fetch_glob("^TAINT")}}) {
                     # Blindly untaint dir names if taint mode is
                     # active, or any perl < 5.006

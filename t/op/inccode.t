@@ -14,7 +14,6 @@ if (!$minitest) {
     }
 }
 
-use strict;
 use File::Spec;
 
 require "./test.pl";

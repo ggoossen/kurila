@@ -69,7 +69,6 @@ sub import
     # Export subroutine names
     my $caller = caller();
     foreach my $sym (< @EXPORT) {
-        no strict 'refs';
         *{Symbol::fetch_glob($caller.'::'.$sym)} = \&{$sym};
     }
 
