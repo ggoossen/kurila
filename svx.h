@@ -37,12 +37,9 @@ static __inline__ const char* inlineDdesc(pTHX_ SV *sv) {
 
 
 /* Let us hope that bitmaps for UV and IV are the same */
-#define SvIV(sv) iiSvIV(aTHX_ sv)
-#define SvUV(sv) iiSvUV(aTHX_ sv)
-#define SvNV(sv) iiSvNV(aTHX_ sv)
-static __inline__ IV iiSvIV(pTHX_ SV *sv) { return SvIOK(sv) ? SvIVX(sv) : sv_2iv(sv); }
-static __inline__ UV iiSvUV(pTHX_ SV *sv) { return SvIOK(sv) ? SvUVX(sv) : sv_2uv(sv); }
-static __inline__ NV iiSvNV(pTHX_ SV *sv) { return SvNOK(sv) ? SvNVX(sv) : sv_2nv(sv); }
+IV Perl_SvIV(pTHX_ SV *sv) { return SvIOK(sv) ? SvIVX(sv) : sv_2iv(sv); }
+UV Perl_SvUV(pTHX_ SV *sv) { return SvIOK(sv) ? SvUVX(sv) : sv_2uv(sv); }
+NV Perl_SvNV(pTHX_ SV *sv) { return SvNOK(sv) ? SvNVX(sv) : sv_2nv(sv); }
 
 #define SvIV_nomg(sv) (SvIOK(sv) ? SvIVX(sv) : sv_2iv_flags(sv, 0))
 #define SvUV_nomg(sv) (SvIOK(sv) ? SvUVX(sv) : sv_2uv_flags(sv, 0))

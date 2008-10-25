@@ -46,6 +46,9 @@
 #define SvPVX_const		Perl_SvPVX_const
 #define SvPVX_mutable		Perl_SvPVX_mutable
 #define SvREFCNT_dec		Perl_SvREFCNT_dec
+#define SvIV			Perl_SvIV
+#define SvUV			Perl_SvUV
+#define SvNV			Perl_SvNV
 #define Gv_AMupdate		Perl_Gv_AMupdate
 #ifdef PERL_CORE
 #define append_elem		Perl_append_elem
@@ -2243,6 +2246,9 @@
 #define SvPVX_const(a)		Perl_SvPVX_const(aTHX_ a)
 #define SvPVX_mutable(a)	Perl_SvPVX_mutable(aTHX_ a)
 #define SvREFCNT_dec(a)		Perl_SvREFCNT_dec(aTHX_ a)
+#define SvIV(a)			Perl_SvIV(aTHX_ a)
+#define SvUV(a)			Perl_SvUV(aTHX_ a)
+#define SvNV(a)			Perl_SvNV(aTHX_ a)
 #define Gv_AMupdate(a)		Perl_Gv_AMupdate(aTHX_ a)
 #ifdef PERL_CORE
 #define append_elem(a,b,c)	Perl_append_elem(aTHX_ a,b,c)
