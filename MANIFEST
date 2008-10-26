@@ -1466,7 +1466,6 @@ lib/Test/Simple/t/fork.t	Test::More fork tests
 lib/Test/Simple/t/has_plan2.t	Test::More->plan tests
 lib/Test/Simple/t/has_plan.t	Test::Builder->plan tests
 lib/Test/Simple/t/import.t	Test::More test, importing functions
-lib/Test/Simple/t/is_deeply_dne_bug.t	Test::More test
 lib/Test/Simple/t/is_deeply_fail.t	Test::More test, is_deeply()
 lib/Test/Simple/t/is_deeply_with_threads.t	Test::More test
 lib/Test/Simple/t/is_fh.t	Test::Builder test, _is_fh()
