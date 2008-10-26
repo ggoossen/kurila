@@ -605,7 +605,6 @@ do {
    package SubDB ;
 
    use warnings ;
-   use strict ;
    our (@ISA, @EXPORT);
 
    require Exporter ;
@@ -1236,7 +1235,6 @@ EOM
 
 #{
 #   # R_SETCURSOR
-#   use strict ;
 #   my (%h, $db) ;
 #   unlink $Dfile;
 #

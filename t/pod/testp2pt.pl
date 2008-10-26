@@ -13,7 +13,6 @@ BEGIN {
    push @INC, < map { 'File::Spec'->catfile($_, 'lib') } @( ($PARENTDIR, $THISDIR));
 }
 
-#use strict;
 #use diagnostics;
 use Exporter;
 #use File::Compare;

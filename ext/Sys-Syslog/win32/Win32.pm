@@ -1,5 +1,4 @@
 package Sys::Syslog::Win32;
-use strict;
 use warnings;
 use Carp;
 use File::Spec;

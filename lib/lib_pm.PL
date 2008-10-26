@@ -48,8 +48,6 @@ package lib;
 
 $useConfig
 
-use strict;
-
 my \$archname         = $Config_archname;
 my \$version          = $Config_version;
 my \@inc_version_list = \@( $Config_inc_version_list );

@@ -406,7 +406,6 @@ do {
    package SubDB ;
 
    use warnings ;
-   use strict ;
    our (@ISA, @EXPORT);
 
    require Exporter ;

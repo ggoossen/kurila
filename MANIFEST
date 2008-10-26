@@ -1082,8 +1082,6 @@ lib/I18N/LangTags/t/20_locales.t	See whether I18N::LangTags works
 lib/I18N/LangTags/t/50_super.t	See whether I18N::LangTags works
 lib/I18N/LangTags/t/55_supers_strict.t	See whether I18N::LangTags works
 lib/I18N/LangTags/t/80_all_env.t	See whether I18N::LangTags works
-lib/if.pm			For "use if"
-lib/if.t			Tests for "use if"
 lib/integer.pm			For "use integer"
 lib/integer.t			For "use integer" testing
 lib/Internals.t			For Internals::* testing
@@ -1483,8 +1481,6 @@ lib/Test/Simple/t/no_plan.t	Test::Simple test, forgot the plan
 lib/Test/Simple/TODO		Test::Simple TODO
 lib/Test/Simple/t/ok_obj.t	Test::Builder object tests
 lib/Test/Simple/t/output.t	Test::Builder test, output methods
-lib/Test/Simple/t/overload.t		Test::Simple test
-lib/Test/Simple/t/overload_threads.t	Test::Simple test
 lib/Test/Simple/t/plan_bad.t		Test::Simple test
 lib/Test/Simple/t/plan_is_noplan.t	Test::Simple test, no_plan
 lib/Test/Simple/t/plan_no_plan.t	Test::More test, plan() w/no_plan

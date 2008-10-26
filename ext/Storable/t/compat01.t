@@ -16,7 +16,6 @@ BEGIN {
     }
 }
 
-use strict;
 use Storable qw(retrieve);
 
 my $file = "xx-$$.pst";

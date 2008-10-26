@@ -336,7 +336,6 @@ package Errno;
 our (\@EXPORT_OK,\%EXPORT_TAGS,\@ISA,\$VERSION,\%errno);
 use Exporter ();
 use Config;
-use strict;
 
 "\%Config\{'archname'\}-\%Config\{'osvers'\}" eq
 "%Config{'archname'}-%Config{'osvers'}" or

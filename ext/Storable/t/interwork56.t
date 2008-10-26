@@ -22,7 +22,6 @@ BEGIN {
 }
 
 use Storable qw(freeze thaw);
-use strict;
 use Test::More tests=>30;
 
 use vars qw(%tests);

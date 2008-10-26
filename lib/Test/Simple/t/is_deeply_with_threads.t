@@ -2,7 +2,6 @@
 
 # Test to see if is_deeply() plays well with threads.
 
-use strict;
 use Config;
 
 BEGIN {
