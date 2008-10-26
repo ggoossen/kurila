@@ -1423,8 +1423,6 @@ lib/sigtrap.pm			For trapping an abort and giving traceback
 lib/sigtrap.t			See if sigtrap works
 lib/sort.pm			For "use sort"
 lib/sort.t			See if "use sort" works
-lib/strict.pm			For "use strict"
-lib/strict.t			See if strictures work
 lib/Symbol.pm			Symbol table manipulation routines
 lib/Symbol.t			See if Symbol works
 lib/Term/ANSIColor/ChangeLog	Term::ANSIColor
