@@ -4388,7 +4388,7 @@ Perl_newNAMEDSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *block)
     if (SvAVOK(SvLOCATION((SV*)cv))) {
 	SV* namesv = newSVpv(HvNAME_get(GvSTASH(gv)), 0);
 	sv_catpvf(namesv, "::%s", GvNAME_get(gv));
-	av_store(SvAV(SvLOCATION((SV*)cv)), 3, namesv);
+	av_store(SvAv(SvLOCATION((SV*)cv)), 3, namesv);
     }
 
     GvCVGEN(gv) = 0;
@@ -4688,7 +4688,7 @@ Perl_newXS(pTHX_ const char *name, XSUBADDR_t subaddr, const char *filename)
 	CvANON_on(cv);
 
     SvLOCATION(cv) = AvSv(newAV());
-    av_store(SvAV(SvLOCATION((SV*)cv)), 3, newSVpv(name, 0));
+    av_store(SvAv(SvLOCATION((SV*)cv)), 3, newSVpv(name, 0));
 
     return cv;
 }
@@ -4713,7 +4713,7 @@ Perl_newANONSUB(pTHX_ I32 floor, OP *proto, OP *block)
     if (SvLOCATION(sub) && SvAVOK(SvLOCATION(sub))) {
 	SV* namesv = newSVpv(HvNAME_get(PL_curstash), 0);
 	sv_catpvf(namesv, "::__ANON__");
-	av_store(SvAV(SvLOCATION(sub)), 3, namesv);
+	av_store(SvAv(SvLOCATION(sub)), 3, namesv);
     }
     return newUNOP(OP_SREFGEN, 0,
 	newSVOP(OP_ANONCODE, 0, sub, block->op_location),
@@ -6386,7 +6386,7 @@ Perl_ck_subr(pTHX_ OP *o)
     if (PERLDB_SUB && PL_curstash != PL_debstash)
 	o->op_private |= OPpENTERSUB_DB;
     if (cv && SvLOCATION(cv) && SvAVOK(SvLOCATION(cv)))
-	namesv = av_fetch(SvAV(SvLOCATION(cv)), 3, 0);
+	namesv = av_fetch(SvAv(SvLOCATION(cv)), 3, 0);
     while (o2 != cvop) {
 	OP* o3;
 	if (PL_madskills && o2->op_type == OP_STUB) {

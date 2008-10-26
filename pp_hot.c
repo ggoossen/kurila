@@ -2030,7 +2030,7 @@ PP(pp_grepwhile)
     LEAVE;					/* exit inner scope */
 
     /* All done yet? */
-    if ( av_len(SvAV(*src)) == -1 ) {
+    if ( av_len(SvAv(*src)) == -1 ) {
 	const I32 gimme = GIMME_V;
 
 	LEAVE;					/* exit outer scope */
@@ -2048,7 +2048,7 @@ PP(pp_grepwhile)
 	SAVEVPTR(PL_curpm);
 
 	/* set $_ to the new source item */
-	srcitem = av_shift(SvAV(*src));
+	srcitem = av_shift(SvAv(*src));
 	XPUSHs(srcitem);
 	SvTEMP_off(srcitem);
 	if (PL_op->op_private & OPpGREP_LEX) {
@@ -2341,7 +2341,7 @@ Perl_sub_crush_depth(pTHX_ CV *cv)
 
     loc = SvLOCATION((SV*)cv);
     if (loc && SvAVOK(loc)) {
-	name = av_fetch(SvAV(loc), 3, FALSE);
+	name = av_fetch(SvAv(loc), 3, FALSE);
     }
     Perl_warner(aTHX_ packWARN(WARN_RECURSION), 
 	"Deep recursion on subroutine \"%s\"",

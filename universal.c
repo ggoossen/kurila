@@ -712,7 +712,7 @@ AV* S_context_info(pTHX_ const PERL_CONTEXT *cx) {
 	CV* cv = cx->blk_sub.cv;
 	SV** name = NULL;
 	if (SvLOCATION(cv) && SvAVOK(SvLOCATION(cv)))
-	    name = av_fetch(SvAV(SvLOCATION(cv)), 3, FALSE);
+	    name = av_fetch(SvAv(SvLOCATION(cv)), 3, FALSE);
 	av_push(av, name ? newSVsv(*name) : &PL_sv_undef );
     }
     else {
@@ -832,7 +832,7 @@ XS(XS_error_create)
 	    SV *sv = sv_newmortal();
 	    sv_setpvn(sv,"",0);
 	    if ( items >= 2 ) {
-		if (location && SvAVOK(location) && av_len(SvAV(location)) >= 2) {
+		if (location && SvAVOK(location) && av_len(SvAv(location)) >= 2) {
 		    Perl_sv_catpvf(aTHX_ sv, " at %s line %"IVdf" character %"IVdf".",
 			SvPVX_const(*av_fetch((AV*)location, 0, FALSE)),
 			SvIV(*av_fetch((AV*)location, 1, FALSE)),
