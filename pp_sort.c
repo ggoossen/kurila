@@ -1535,7 +1535,7 @@ PP(pp_sort)
 	PL_sortcop = NULL;
     }
 
-    av = SvAV(sv_mortalcopy(POPs));
+    av = SvAv(sv_mortalcopy(POPs));
     if ( ! SvAVOK(av) ) {
 	Perl_croak(aTHX_ "%s expected ARRAY but got %s", 
 	    OP_DESC(PL_op), Ddesc(AvSv(av)));

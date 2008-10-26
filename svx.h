@@ -102,13 +102,13 @@ SV* Perl_GvSv(pTHX_ GV *gv) { return (SV*)gv; }
 SV* Perl_ReSv(pTHX_ REGEXP *re) { return (SV*)re; }
 SV* Perl_IoSv(pTHX_ struct io *io) { return (SV*)io; }
 
-#define SvAV(sv) inline_SvAV(aTHX_ sv)
-static __inline__ AV* inline_SvAV(pTHX_ SV *sv) {
+AV* Perl_SvAv(pTHX_ SV *sv) {
+    assert(SvAVOK(sv));
     return (AV*)sv;
 }
 
-#define SvHV(sv) inline_SvHV(aTHX_ sv)
-static __inline__ HV* inline_SvHV(pTHX_ SV *sv) {
+HV* Perl_SvHv(pTHX_ SV *sv) {
+    assert(SvHVOK(sv));
     return (HV*)sv;
 }
 

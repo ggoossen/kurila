@@ -408,7 +408,7 @@ PP(pp_grepstart)
     if ( ! SvAVOK(src) )
 	Perl_croak(aTHX_ "%s expected an array but got %s", OP_DESC(PL_op), Ddesc(src));
     
-    if ( av_len(SvAV(src)) == -1 ) {
+    if ( av_len(SvAv(src)) == -1 ) {
 	(void)POPMARK;
 	XPUSHs(dst);
 	RETURNOP(PL_op->op_next->op_next);
@@ -428,7 +428,7 @@ PP(pp_grepstart)
     ENTER;					/* enter inner scope */
     SAVEVPTR(PL_curpm);
 
-    srcitem = av_shift(SvAV(src));
+    srcitem = av_shift(SvAv(src));
     if (PL_op->op_type == OP_GREPSTART)
 	XPUSHs(srcitem);
     if (PL_op->op_private & OPpGREP_LEX) {
@@ -452,7 +452,7 @@ PP(pp_mapwhile)
     SV** dst;
 
     dst = PL_stack_base + PL_markstack_ptr[-1] + 0;
-    src = SvAV(*(PL_stack_base + PL_markstack_ptr[-1] + 1));
+    src = SvAv(*(PL_stack_base + PL_markstack_ptr[-1] + 1));
 
     /* if there are new items, push them into the destination list */
     if (items && gimme != G_VOID) {
@@ -942,13 +942,13 @@ PP(pp_caller)
 	CV* cv = cx->blk_sub.cv;
 	SV** name = NULL;
 	if (SvLOCATION(cv) && SvAVOK(SvLOCATION(cv)))
-	    name = av_fetch(SvAV(SvLOCATION(cv)), 3, FALSE);
+	    name = av_fetch(SvAv(SvLOCATION(cv)), 3, FALSE);
 	mPUSHs( name ? newSVsv(*name) : &PL_sv_undef );
 
 	if (CxHASARGS(cx)) {
 	    AV * const padlist = CvPADLIST(cv);
 	    SV ** pad = av_fetch(padlist, cx->blk_sub.olddepth + 1, 0);
-	    SV ** args = av_fetch( SvAV(*pad), PAD_ARGS_INDEX, 0);
+	    SV ** args = av_fetch( SvAv(*pad), PAD_ARGS_INDEX, 0);
 	    mPUSHs(newSVsv( *args ) );
 	}
 	else
