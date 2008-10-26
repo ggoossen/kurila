@@ -1,6 +1,5 @@
 #!./perl -w
 BEGIN { @INC = @('lib') }
-use strict;
 
 BEGIN {
     use Config;
