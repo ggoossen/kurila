@@ -365,7 +365,7 @@ msgrcv		msgrcv
 semget		semget
 semctl		semctl
 semop		semop
-require		use strict
+require		use error
 dofile		do 'file'
 entereval	eval "1+1"
 leaveeval	eval "1+1"

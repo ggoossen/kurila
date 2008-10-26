@@ -11,7 +11,6 @@ BEGIN {
   }
 }
 
-use strict;
 use utf8;
 use Test::More 'no_plan';
 

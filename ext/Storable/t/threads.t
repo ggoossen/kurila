@@ -33,8 +33,6 @@ BEGIN {
 
 use Test::More;
 
-use strict;
-
 use threads;
 use Storable qw(nfreeze);
 

@@ -1,4 +1,3 @@
-use strict;
 use Test;
 use Win32;
 

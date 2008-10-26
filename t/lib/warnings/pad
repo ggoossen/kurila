@@ -322,8 +322,7 @@ EXPECT
 
 ########
 # an our var being introduced should suppress errors about global syms
-use strict;
-use warnings;
+
 our $x unless $x;
 EXPECT
 

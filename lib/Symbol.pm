@@ -31,7 +31,6 @@ Symbol - manipulate Perl symbols and their names
     print qualify(\*x), "\n";              # returns \*x
     print qualify(\*x, "FOO"), "\n";       # returns \*x
 
-    use strict refs;
     print { qualify_to_ref $fh } "foo!\n";
     $ref = qualify_to_ref $name, $pkg;
 

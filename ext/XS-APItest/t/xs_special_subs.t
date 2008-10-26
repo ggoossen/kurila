@@ -13,7 +13,6 @@ BEGIN {
     $XS::APItest::WARNINGS_ON_BOOTSTRAP = 1;
 }
 
-use strict;
 use warnings;
 our $uc;
 BEGIN { $uc = 1; }

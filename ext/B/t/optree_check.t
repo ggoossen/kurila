@@ -111,7 +111,7 @@ checkOptree ( name	=> 'empty code or prog',
     
 checkOptree
     (  name	=> "self strict, catch err",
-       prog	=> 'use strict; bogus',
+       prog	=> 'bogus',
        errs	=> 'Bareword "bogus" not allowed while "strict subs" in use at -e line 1.',
        expect	=> "nextstate",	# simple expectations
        expect_nt => "nextstate",

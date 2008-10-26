@@ -240,7 +240,7 @@ sub _compile {
   } elsif((nelems @code) +> 1) { # most cases, presumably!
     unshift @code, "join '',@(\n";
   }
-  unshift @code, "use strict; sub \{\n";
+  unshift @code, "sub \{\n";
   push @code, ")\}\n";
 
   print < @code if DEBUG;

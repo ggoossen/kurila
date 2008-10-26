@@ -1,4 +1,3 @@
-use strict;
 use File::Spec;
 
 ### only run interactive tests when there's someone that can answer them

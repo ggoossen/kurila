@@ -16,7 +16,7 @@ BEGIN {
 
 BEGIN { require './test.pl'; }
 
-plan tests => 16;
+plan tests => 12;
 
 my $STDOUT = './results-0';
 my $STDERR = './results-1';
@@ -100,35 +100,6 @@ tryrun(\%(PERL5OPT => '-w'), \@('-e', 'print $main::x'),
 Use of uninitialized value \$main::x in print at -e line 1 character 1.
 });
 
-tryrun(\%(PERL5OPT => '-Mstrict'), \@('-e', 'print $x'),
-    "", 
-    qq{Global symbol "\$x" requires explicit package name at -e line 1, at end of line
-Execution of -e aborted due to compilation errors.\n});
-
-# Fails in 5.6.0
-tryrun(\%(PERL5OPT => '-Mstrict -w'), \@('-e', 'print $x'),
-    "", 
-    qq{Global symbol "\$x" requires explicit package name at -e line 1, at end of line
-Execution of -e aborted due to compilation errors.\n});
-
-# Fails in 5.6.0
-tryrun(\%(PERL5OPT => '-w -Mstrict'), \@('-e', 'print $main::x'),
-    "", 
-    <<ERROR
-Name "main::x" used only once: possible typo
-Use of uninitialized value \$main::x in print at -e line 1 character 1.
-ERROR
-    );
-
-# Fails in 5.6.0
-tryrun(\%(PERL5OPT => '-w -Mstrict'), \@('-e', 'print $main::x'),
-    "", 
-    <<ERROR
-Name "main::x" used only once: possible typo
-Use of uninitialized value \$main::x in print at -e line 1 character 1.
-ERROR
-    );
-
 tryrun(\%(PERL5OPT => '-MExporter'), \@('-e0'),
     "", 
     "");
@@ -138,8 +109,8 @@ tryrun(\%(PERL5OPT => '-MExporter -MExporter'), \@('-e0'),
     "", 
     "");
 
-tryrun(\%(PERL5OPT => '-Mstrict -Mwarnings'), 
-    \@('-e', 'print "ok" if %INC{"strict.pm"} and %INC{"warnings.pm"}'),
+tryrun(\%(PERL5OPT => '-Mwarnings'), 
+    \@('-e', 'print "ok" if %INC{"warnings.pm"}'),
     "ok",
     "");
 

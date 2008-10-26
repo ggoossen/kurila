@@ -370,7 +370,6 @@ EOT
 
   print FH <<'EOT';
 
-use strict;
 EOT
   printf FH "use warnings;\n";
   print FH <<'EOT';
@@ -399,7 +398,6 @@ EOT
   open FH, ">", "$testpl" or die "open >$testpl: $!\n";
   # Standard test header (need an option to suppress this?)
   print FH <<"EOT" or die $!;
-use strict;
 use $package < qw($(join ' ',@$export_names));
 
 print "1..2\n";

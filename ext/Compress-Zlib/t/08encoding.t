@@ -5,7 +5,6 @@ BEGIN {
 }
 
 use lib < qw(t t/compress);
-use strict;
 use warnings;
 use bytes;
 

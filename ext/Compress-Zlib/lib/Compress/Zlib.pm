@@ -851,7 +851,6 @@ be used safely.
 Here is an example script which uses the interface. It implements a
 I<gzcat> function.
 
-    use strict ;
     use warnings ;
     
     use Compress::Zlib ;
@@ -876,7 +875,6 @@ I<gzcat> function.
 Below is a script which makes use of C<gzreadline>. It implements a
 very simple I<grep> like script.
 
-    use strict ;
     use warnings ;
     
     use Compress::Zlib ;
@@ -907,7 +905,6 @@ This script, I<gzstream>, does the opposite of the I<gzcat> script
 above. It reads from standard input and writes a gzip data stream to
 standard output.
 
-    use strict ;
     use warnings ;
     
     use Compress::Zlib ;
@@ -1174,7 +1171,6 @@ Returns the total number of compressed bytes output from deflate.
 Here is a trivial example of using C<deflate>. It simply reads standard
 input, deflates it and writes it to standard output.
 
-    use strict ;
     use warnings ;
 
     use Compress::Zlib ;
@@ -1322,7 +1318,6 @@ Returns the total number of uncompressed bytes output from inflate.
 
 Here is an example of using C<inflate>.
 
-    use strict ;
     use warnings ;
     
     use Compress::Zlib ;

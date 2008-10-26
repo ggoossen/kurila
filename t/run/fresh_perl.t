@@ -110,14 +110,6 @@ push(@a, 1, 2, 3,)
 ########
 quotemeta ""
 ########
-package FOO;sub new {bless \%(FOO => 'BAR')};
-package main;
-use strict 'vars';   
-my $self = FOO->new();
-print %$self{FOO};
-EXPECT
-BAR
-########
 $_="foo";
 s/.{1}//s;
 print;
@@ -270,14 +262,12 @@ sub re {
 }
 EXPECT
 ########
-use strict;
 my $foo = "ZZZ\n";
 END { print $foo }
 EXPECT
 ZZZ
 ########
 eval '
-use strict;
 my $foo = "ZZZ\n";
 END { print $foo }
 ';

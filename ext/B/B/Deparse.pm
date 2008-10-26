@@ -4345,10 +4345,6 @@ directives, B<pragmas>. These are:
 
 =item *
 
-use strict;
-
-=item *
-
 use warnings;
 
 =item *
@@ -4489,7 +4485,7 @@ the main:: package, the code will include a package declaration.
 =item *
 
 The only pragmas to be completely supported are: C<use warnings>,
-C<use strict 'refs'>, C<use bytes>, and C<use integer>. (C<$[>, which
+C<use bytes>, and C<use integer>. (C<$[>, which
 behaves like a pragma, is also supported.)
 
 Excepting those listed above, we're currently unable to guarantee that

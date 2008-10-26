@@ -12,8 +12,6 @@ require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(process_file);
 
-# use strict;  # One of these days...
-
 my(@XSStack);	# Stack of conditionals and INCLUDEs
 my($XSS_work_idx, $cpp_next_tmp);
 

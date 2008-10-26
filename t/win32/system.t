@@ -16,7 +16,6 @@ use File::Path;
 use File::Copy;
 use Config;
 use Cwd;
-use strict;
 
 $| = 1;
 

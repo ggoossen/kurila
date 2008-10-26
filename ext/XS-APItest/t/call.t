@@ -16,7 +16,6 @@ BEGIN {
 }
 
 use warnings;
-use strict;
 
 # Test::More doesn't have fresh_perl_is() yet
 # use Test::More tests => 240;

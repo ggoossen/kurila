@@ -124,7 +124,6 @@ my $x=sub { @( ++$q,++$p ) };
 test($x);
 eval <<EOFCODE and test($x);
    package bar;
-   use strict;
    use warnings;
    use warnings::register;
    package main;

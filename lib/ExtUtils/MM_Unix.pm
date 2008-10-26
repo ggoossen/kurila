@@ -1588,7 +1588,7 @@ sub init_main {
 
             if (-f $self->catfile($dir,"config_h.SH")   &&
                 -f $self->catfile($dir,"perl.h")        &&
-                -f $self->catfile($dir,"lib","strict.pm")
+                -f $self->catfile($dir,"lib","error.pm")
             ) {
                 $self->{PERL_SRC}=$dir ;
                 last;
@@ -1715,10 +1715,10 @@ EOP
 
     $self->{LIBPERL_A} ||= "libperl$self->{LIB_EXT}";
 
-    # make a simple check if we find strict
+    # make a simple check if we find error.pm
     warn "Warning: PERL_LIB ($self->{PERL_LIB}) seems not to be a perl library directory
-        (strict.pm not found)"
-        unless -f $self->catfile("$self->{PERL_LIB}","strict.pm") ||
+        (error.pm not found)"
+        unless -f $self->catfile("$self->{PERL_LIB}","error.pm") ||
                $self->{NAME} eq "ExtUtils::MakeMaker";
 }
 

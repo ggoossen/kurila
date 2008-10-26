@@ -296,7 +296,6 @@ Here's C<modrm>, a little utility to cleanly remove an installed module.
 
     #!/usr/local/bin/perl -w
 
-    use strict;
     use IO::Dir;
     use ExtUtils::Packlist;
     use ExtUtils::Installed;
