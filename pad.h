@@ -339,6 +339,8 @@ Clone the state variables associated with running and compiling pads.
     PL_pad_reset_pending	= proto_perl->Ipad_reset_pending;	\
     PL_cop_seqmax		= proto_perl->Icop_seqmax;
 
+#define PAD_PARENTPAD_INDEX 0
+#define PAD_ARGS_INDEX  1
 /*
  * Local variables:
  * c-indentation-style: bsd
