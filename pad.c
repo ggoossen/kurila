@@ -200,17 +200,17 @@ Perl_pad_new(pTHX_ int flags)
 	AvREIFY_only(a0);
     }
     else {
-        AV * const a0 = newAV();			/* will be @_ */
-	SV * namesv;
-	av_extend(a0, 0);
-	av_store(pad, 0, (SV*)a0);
+	{
+	    /* add @_ */
+	    AV * const a0 = newAV();			/* will be @_ */
+	    SV * namesv = newSV_type(SVt_PVNV);
+	    sv_setpv(namesv, "@_");
+	    COP_SEQ_RANGE_LOW_set(namesv, 0);	/* min */
+	    COP_SEQ_RANGE_HIGH_set(namesv, PAD_MAX);		/* max */
 
-	namesv = newSV_type(SVt_PVNV);
-	sv_setpv(namesv, "@_");
-	COP_SEQ_RANGE_LOW_set(namesv, 0);	/* min */
-	COP_SEQ_RANGE_HIGH_set(namesv, PAD_MAX);		/* max */
-
-	av_store(padname, 0, namesv);
+	    av_store(pad, PAD_ARGS_INDEX, (SV*)a0);
+	    av_store(padname, PAD_ARGS_INDEX, namesv);
+	}
     }
 
     AvREAL_off(padlist);

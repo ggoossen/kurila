@@ -948,7 +948,7 @@ PP(pp_caller)
 	if (CxHASARGS(cx)) {
 	    AV * const padlist = CvPADLIST(cv);
 	    SV ** pad = av_fetch(padlist, cx->blk_sub.olddepth + 1, 0);
-	    SV ** args = av_fetch( SvAV(*pad), 0, 0);
+	    SV ** args = av_fetch( SvAV(*pad), PAD_ARGS_INDEX, 0);
 	    mPUSHs(newSVsv( *args ) );
 	}
 	else
@@ -1576,7 +1576,7 @@ PP(pp_goto)
 	    }
 	    else if (CxMULTICALL(cx))
 		DIE(aTHX_ "Can't goto subroutine from a sort sub (or similar callback)");
-	    args = newSVsv(PAD_SVl(0));
+	    args = newSVsv(PAD_SVl(PAD_ARGS_INDEX));
 	    if (CvISXSUB(cv)) {	/* put GvAV(defgv) back onto stack */
 		items = AvFILLp(args) + 1;
 		EXTEND(SP, items+1); /* @_ could have been extended. */
@@ -1636,9 +1636,9 @@ PP(pp_goto)
 		{
 		    CX_CURPAD_SAVE(cx->blk_sub);
 
-		    SAVECLEARSV(PAD_SVl(0));
+		    SAVECLEARSV(PAD_SVl(PAD_ARGS_INDEX));
 
-		    PAD_SVl(0) = args;
+		    PAD_SVl(PAD_ARGS_INDEX) = args;
 		}
 		if (PERLDB_SUB) {	/* Checking curstash breaks DProf. */
 		    Perl_get_db_sub(aTHX_ NULL, cv);
