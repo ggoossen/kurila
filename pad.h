@@ -203,6 +203,10 @@ Restore the old pad saved into the local variable opad by PAD_SAVE_LOCAL()
 #define PAD_BASE_SV(padlist, po) \
 	(AvARRAY(padlist)[1]) 	\
 	    ? AvARRAY((AV*)(AvARRAY(padlist)[1]))[po] : NULL;
+
+#define PADLIST_NAMESV(padlist, po) \
+    ( (AvARRAY(padlist)[0])					\
+	? AvARRAY((AV*)(AvARRAY(padlist)[0]))[po] : NULL )
     
 
 #define PAD_SET_CUR_NOSAVE(padlist,nth) \
@@ -339,7 +343,7 @@ Clone the state variables associated with running and compiling pads.
     PL_pad_reset_pending	= proto_perl->Ipad_reset_pending;	\
     PL_cop_seqmax		= proto_perl->Icop_seqmax;
 
-#define PAD_PARENTPAD_INDEX 0
+#define PAD_PARENTPADLIST_INDEX 0
 #define PAD_ARGS_INDEX  1
 /*
  * Local variables:

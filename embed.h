@@ -3782,7 +3782,7 @@
 #endif
 #if defined(PERL_IN_PAD_C) || defined(PERL_DECL_PROT)
 #ifdef PERL_CORE
-#define pad_findlex(a,b,c,d,e,f,g)	S_pad_findlex(aTHX_ a,b,c,d,e,f,g)
+#define pad_findlex(a,b,c,d)	S_pad_findlex(aTHX_ a,b,c,d)
 #endif
 #  if defined(DEBUGGING)
 #ifdef PERL_CORE

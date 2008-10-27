@@ -118,6 +118,7 @@ do {
     my $ok = 'not ok';
     do_eval3('print "$ok ' . $x++ . '\n"');
     do_eval3('eval q[print "$ok ' . $x++ . '\n"]');
+    print "# sub with eval\n";
     do_eval3('sub { eval q[print "$ok ' . $x++ . '\n"] }->()');
 };
 
