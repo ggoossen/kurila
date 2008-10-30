@@ -388,7 +388,7 @@ for my $code (@('{$blah = 45}','=xx')) {
 $code = '{$blah = 45}';
 $blah = 12;
 eval "m/(?$code)/"; die if $@;
-ok($blah == 45);
+ok($blah == 45, "match with executable code inside an eval");
 
 $blah = 12;
 m/(?{$blah = 45})/;

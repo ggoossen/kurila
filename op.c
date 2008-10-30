@@ -4709,6 +4709,8 @@ OP *
 Perl_newANONSUB(pTHX_ I32 floor, OP *proto, OP *block)
 {
     SV* sub = (SV*)newSUB(floor, proto, scalar(block));
+    SV* padflags = PADLIST_NAMESV(CvPADLIST(sub), PAD_FLAGS_INDEX);
+    SvIV_set(padflags, SvIV(padflags) & ~PADf_LATE);
     SVcpREPLACE(SvLOCATION(sub), block->op_location);
     if (SvLOCATION(sub) && SvAVOK(SvLOCATION(sub))) {
 	SV* namesv = newSVpv(HvNAME_get(PL_curstash), 0);

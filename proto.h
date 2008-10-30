@@ -5590,7 +5590,7 @@ STATIC void	S_deb_stack_n(pTHX_ SV** stack_base, I32 stack_min, I32 stack_max, I
 
 #endif
 
-PERL_CALLCONV PADLIST*	Perl_pad_new(pTHX_ int flags)
+PERL_CALLCONV PADLIST*	Perl_pad_new(pTHX_ int flags, PAD *parent_padnames, PAD *parent_pad, IV parent_seq)
 			__attribute__malloc__
 			__attribute__warn_unused_result__;
 
@@ -5641,11 +5641,12 @@ PERL_CALLCONV void	Perl_pad_push(pTHX_ PADLIST *padlist, int depth)
 
 
 #if defined(PERL_IN_PAD_C) || defined(PERL_DECL_PROT)
-STATIC PADOFFSET	S_pad_findlex(pTHX_ const char *name, const CV* cv, U32 seq, int warn)
+STATIC PADOFFSET	S_pad_findlex(pTHX_ const char *name, PAD* padnames, PAD* pad, U32 seq, int warn)
 			__attribute__nonnull__(pTHX_1)
-			__attribute__nonnull__(pTHX_2);
+			__attribute__nonnull__(pTHX_2)
+			__attribute__nonnull__(pTHX_3);
 #define PERL_ARGS_ASSERT_PAD_FINDLEX	\
-	assert(name); assert(cv)
+	assert(name); assert(padnames); assert(pad)
 
 #  if defined(DEBUGGING)
 STATIC void	S_cv_dump(pTHX_ const CV *cv, const char *title)

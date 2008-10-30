@@ -10562,7 +10562,11 @@ Perl_start_subparse(pTHX_ U32 flags)
     CvFLAGS(PL_compcv) |= flags;
 
     PL_subline = PL_parser->lex_line_number;
-    CvPADLIST(PL_compcv) = pad_new(padnew_SAVE|padnew_SAVESUB);
+    CvPADLIST(PL_compcv) = pad_new(padnew_SAVE|padnew_SAVESUB
+	|(flags & CVf_ANON ? padnew_LATE : 0),
+	PADLIST_PADNAMES(CvPADLIST(outsidecv)), 
+	PADLIST_BASEPAD(CvPADLIST(outsidecv)), 
+	PL_cop_seqmax);
     CvOUTSIDE(PL_compcv) = (CV*)SvREFCNT_inc_simple(outsidecv);
     CvOUTSIDE_SEQ(PL_compcv) = PL_cop_seqmax;
 
