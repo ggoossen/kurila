@@ -10551,13 +10551,13 @@ Perl_start_subparse(pTHX_ U32 flags)
     const I32 oldsavestack_ix = PL_savestack_ix;
     CV* const outsidecv = PL_compcv;
 
-    if ( ! ( flags & CVf_ANON ) ) {
-	if ( CvFLAGS(PL_compcv) & CVf_ANON ) {
-	    Perl_croak(aTHX_ "non-anon sub inside a anon sub");
-	}
-    }
 
     if (PL_compcv) {
+	if ( ! ( flags & CVf_ANON ) ) {
+	    if ( CvFLAGS(PL_compcv) & CVf_ANON ) {
+		Perl_croak(aTHX_ "non-anon sub inside a anon sub");
+	    }
+	}
 	assert(SvTYPE(PL_compcv) == SVt_PVCV);
     }
     SAVEI32(PL_subline);
@@ -10570,8 +10570,8 @@ Perl_start_subparse(pTHX_ U32 flags)
     PL_subline = PL_parser->lex_line_number;
     CvPADLIST(PL_compcv) = pad_new(padnew_SAVE|padnew_SAVESUB
 	|(flags & CVf_ANON ? padnew_LATE : 0),
-	PADLIST_PADNAMES(CvPADLIST(outsidecv)), 
-	PADLIST_BASEPAD(CvPADLIST(outsidecv)), 
+	outsidecv ? PADLIST_PADNAMES(CvPADLIST(outsidecv)) : NULL, 
+	outsidecv ? PADLIST_BASEPAD(CvPADLIST(outsidecv)) : NULL, 
 	PL_cop_seqmax);
 
     return oldsavestack_ix;
