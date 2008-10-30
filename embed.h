@@ -3762,7 +3762,7 @@
 #endif
 #endif
 #ifdef PERL_CORE
-#define pad_new(a)		Perl_pad_new(aTHX_ a)
+#define pad_new(a,b,c,d)	Perl_pad_new(aTHX_ a,b,c,d)
 #define pad_undef(a)		Perl_pad_undef(aTHX_ a)
 #define pad_tmprefcnt(a)	Perl_pad_tmprefcnt(aTHX_ a)
 #define pad_add_name(a,b,c,d)	Perl_pad_add_name(aTHX_ a,b,c,d)
@@ -3782,7 +3782,7 @@
 #endif
 #if defined(PERL_IN_PAD_C) || defined(PERL_DECL_PROT)
 #ifdef PERL_CORE
-#define pad_findlex(a,b,c,d)	S_pad_findlex(aTHX_ a,b,c,d)
+#define pad_findlex(a,b,c,d,e)	S_pad_findlex(aTHX_ a,b,c,d,e)
 #endif
 #  if defined(DEBUGGING)
 #ifdef PERL_CORE

@@ -150,12 +150,13 @@ can be OR'ed together:
 */
 
 PADLIST *
-Perl_pad_new(pTHX_ int flags)
+Perl_pad_new(pTHX_ int flags, PAD* parent_padnames, PAD* parent_pad, IV parent_seq)
 {
     dVAR;
     AV *padlist, *padname, *pad;
 
     ASSERT_CURPAD_LEGAL("pad_new");
+    assert( ! parent_padnames || (parent_padnames != parent_pad));
 
     /* XXX DAPM really need a new SAVEt_PAD which restores all or most
      * vars (based on flags) rather than storing vals + addresses for
@@ -188,6 +189,15 @@ Perl_pad_new(pTHX_ int flags)
     padname	= newAV();
     pad		= newAV();
 
+    {
+	/* add parent_pad */
+	av_store(padname, PAD_PARENTPADNAMES_INDEX, SvREFCNT_inc(parent_padnames));
+	av_store(padname, PAD_PARENTPAD_INDEX, SvREFCNT_inc(parent_pad));
+	av_store(padname, PAD_PARENTSEQ_INDEX, newSViv(parent_seq));
+	av_store(padname, PAD_FLAGS_INDEX, 
+            newSViv( (flags & padnew_LATE) ? PADf_LATE : 0 ));
+    }
+
     if (flags & padnew_CLONE) {
 	/* XXX DAPM  I dont know why cv_clone needs it
 	 * doing differently yet - perhaps this separate branch can be
@@ -202,13 +212,12 @@ Perl_pad_new(pTHX_ int flags)
     else {
 	{
 	    /* add @_ */
-	    AV * const a0 = newAV();			/* will be @_ */
 	    SV * namesv = newSV_type(SVt_PVNV);
 	    sv_setpv(namesv, "@_");
 	    COP_SEQ_RANGE_LOW_set(namesv, 0);	/* min */
 	    COP_SEQ_RANGE_HIGH_set(namesv, PAD_MAX);		/* max */
 
-	    av_store(pad, PAD_ARGS_INDEX, (SV*)a0);
+	    av_store(pad, PAD_ARGS_INDEX, AvSv(newAV()));
 	    av_store(padname, PAD_ARGS_INDEX, namesv);
 	}
     }
@@ -289,7 +298,7 @@ Perl_pad_undef(pTHX_ CV* cv)
 	SV ** const namepad = AvARRAY(comppad_name);
 	AV *  const comppad = (AV*)AvARRAY(padlist)[1];
 	SV ** const curpad = AvARRAY(comppad);
-	for (ix = AvFILLp(comppad_name); ix > 0; ix--) {
+	for (ix = AvFILLp(comppad_name); ix >= PAD_NAME_START_INDEX; ix--) {
 	    SV * const namesv = namepad[ix];
 	    if (namesv && namesv != &PL_sv_undef
 		&& *SvPVX_const(namesv) == '&')
@@ -611,7 +620,11 @@ Perl_pad_findmy(pTHX_ const char *name)
     PERL_ARGS_ASSERT_PAD_FINDMY;
 
     pad_peg("pad_findmy");
-    offset = pad_findlex(name, PL_compcv, PL_cop_seqmax, 1);
+    offset = pad_findlex(name,
+	PADLIST_PADNAMES(CvPADLIST(PL_compcv)),
+	PADLIST_BASEPAD(CvPADLIST(PL_compcv)),
+	PL_cop_seqmax, 
+	1);
     if ((PADOFFSET)offset != NOT_IN_PAD) 
 	return offset;
 
@@ -621,7 +634,7 @@ Perl_pad_findmy(pTHX_ const char *name)
 
     nameav = (AV*)AvARRAY(CvPADLIST(PL_compcv))[0];
     name_svp = AvARRAY(nameav);
-    for (offset = AvFILLp(nameav); offset > 0; offset--) {
+    for (offset = AvFILLp(nameav); offset >= PAD_NAME_START_INDEX; offset--) {
         SV * const namesv = name_svp[offset];
 	if (namesv && namesv != &PL_sv_undef
 	    && !SvFAKE(namesv)
@@ -643,7 +656,12 @@ PADOFFSET
 Perl_find_rundefsvoffset(pTHX)
 {
     dVAR;
-    return pad_findlex("$_", find_runcv(NULL), PL_curcop->cop_seq, 1);
+    CV* cv = find_runcv(NULL);
+    return pad_findlex("$_", 
+	PADLIST_PADNAMES(CvPADLIST(cv)),
+	PADLIST_BASEPAD(CvPADLIST(cv)),
+	PL_curcop->cop_seq, 
+	1);
 }
 
 /*
@@ -673,31 +691,26 @@ the parent pad.
  * all CVs (eg XSUBs), but suffices for the CVs found in a lexical chain */
 #define CvCOMPILED(cv)	CvROOT(cv)
 
-/* the CV does late binding of its lexicals */
-#define CvLATE(cv) (CvANON(cv))
-
-
 STATIC PADOFFSET
-S_pad_findlex(pTHX_ const char *name, const CV* cv, U32 seq, int warn)
+S_pad_findlex(pTHX_ const char *name, PAD *padnames, PAD* pad, U32 seq, int warn)
 {
     dVAR;
     I32 offset, new_offset;
-    const AV * const padlist = CvPADLIST(cv);
 
     PERL_ARGS_ASSERT_PAD_FINDLEX;
 
     DEBUG_Xv(PerlIO_printf(Perl_debug_log,
-	"Pad findlex cv=0x%"UVxf" searching \"%s\" seq=%d\n",
-	PTR2UV(cv), name, (int)seq));
+	"Pad findlex padnames=0x%"UVxf" pad=0x%"UVxf" searching \"%s\" seq=%d\n",
+	    PTR2UV(padnames), PTR2UV(pad), name, (int)seq));
 
     /* first, search this pad */
 
-    if (padlist) { /* not an undef CV */
+    if (pad) { /* not an undef CV */
 	I32 fake_offset = -1;
-        const AV * const nameav = (AV*)AvARRAY(padlist)[0];
+        const AV * const nameav = padnames;
 	SV * const * const name_svp = AvARRAY(nameav);
 
-	for (offset = AvFILLp(nameav); offset >= 0; offset--) {
+	for (offset = AvFILLp(nameav); offset >= PAD_NAME_START_INDEX; offset--) {
             SV * const namesv = name_svp[offset];
 	    if (namesv && namesv != &PL_sv_undef
 		    && strEQ(SvPVX_const(namesv), name))
@@ -710,8 +723,8 @@ S_pad_findlex(pTHX_ const char *name, const CV* cv, U32 seq, int warn)
 	    }
 	}
 
-	if (offset > 0 || fake_offset > 0 ) { /* a match! */
-	    if (offset > 0) { /* not fake */
+	if (offset >= PAD_NAME_START_INDEX || fake_offset >= PAD_NAME_START_INDEX ) { /* a match! */
+	    if (offset >= PAD_NAME_START_INDEX) { /* not fake */
 		fake_offset = 0;
 
 		/* set PAD_FAKELEX_MULTI if this lex can have multiple
@@ -722,14 +735,14 @@ S_pad_findlex(pTHX_ const char *name, const CV* cv, U32 seq, int warn)
 		 * lexes as not multi as viewed from evals. */
 
 		DEBUG_Xv(PerlIO_printf(Perl_debug_log,
-			"Pad findlex cv=0x%"UVxf" matched: offset=%ld\n",
-			PTR2UV(cv), (long)offset));
+			"Pad findlex padnames=0x%"UVxf" pad=0x%"UVxf" matched: offset=%ld\n",
+			PTR2UV(padnames), PTR2UV(pad), (long)offset));
 	    }
 	    else { /* fake match */
 		offset = fake_offset;
 		DEBUG_Xv(PerlIO_printf(Perl_debug_log,
-		    "Pad findlex cv=0x%"UVxf" matched: offset=%ld\n",
-		    PTR2UV(cv), (long)offset
+			"Pad findlex padnames=0x%"UVxf" pad=0x%"UVxf" matched: offset=%ld\n",
+			PTR2UV(padnames), PTR2UV(pad), (long)offset
 		));
 	    }
 
@@ -738,61 +751,64 @@ S_pad_findlex(pTHX_ const char *name, const CV* cv, U32 seq, int warn)
 	}
     }
 
-    /* it's not in this pad - try above */
-
-    if (!CvOUTSIDE(cv))
-	return NOT_IN_PAD;
-
-    offset = pad_findlex(name, CvOUTSIDE(cv), CvOUTSIDE_SEQ(cv), 1);
-    if ((PADOFFSET)offset == NOT_IN_PAD)
-	return NOT_IN_PAD;
-
-    /* found in an outer CV. Add appropriate fake entry to this pad */
-
     {
-        PADLIST* parent_padlist = CvPADLIST(CvOUTSIDE(cv));
-        SV ** out_name_sv = av_fetch(SvAv(*av_fetch(parent_padlist, 0, 0)), offset, 0);
-        SV ** out_sv = av_fetch(SvAv(*av_fetch(parent_padlist, CvDEPTH(CvOUTSIDE(cv)) ? CvDEPTH(CvOUTSIDE(cv)) : 1, 0)), offset, 0);
-        PADLIST *padlist = CvPADLIST(cv);
+	/* it's not in this pad - try above */
+        SV** parent_padnames = av_fetch(padnames, PAD_PARENTPADNAMES_INDEX, 0);
 
-        SV *new_namesv;
-        AV *  const ocomppad_name = PL_comppad_name;
-        PAD * const ocomppad = PL_comppad;
-        AVcpREPLACE(PL_comppad_name, (AV*)AvARRAY(padlist)[0]);
-        PL_comppad = (AV*)AvARRAY(padlist)[1];
-        PL_curpad = AvARRAY(PL_comppad);
+	if ( ! parent_padnames )
+	    return NOT_IN_PAD;
 
-        new_offset = pad_add_name(
-            SvPVX_const(*out_name_sv),
-                (SvPAD_OUR(*out_name_sv) ? SvOURGV(*out_name_sv) : NULL),
-                1,  /* fake */
-                SvPAD_STATE(*out_name_sv) ? 1 : 0 /* state variable ? */
-            );
+        SV* parent_pad = *av_fetch(padnames, PAD_PARENTPAD_INDEX, 0);
+        SV* parent_seq = *av_fetch(padnames, PAD_PARENTSEQ_INDEX, 0);
 
-        new_namesv = AvARRAY(PL_comppad_name)[new_offset];
+	offset = pad_findlex(name, SvAv(*parent_padnames), SvAv(parent_pad), SvIV(parent_seq), 1);
+	if ((PADOFFSET)offset == NOT_IN_PAD)
+	    return NOT_IN_PAD;
 
-        PARENT_PAD_INDEX_set(new_namesv, 0);
+	{
+	    /* found in an outer CV. Add appropriate fake entry to this pad */
+	    SV ** out_name_sv = av_fetch(SvAv(*parent_padnames), offset, 0);
 
-        if (SvPAD_OUR(new_namesv)) {
-            NOOP;   /* do nothing */
-        }
-        else if (CvLATE(cv) && !CvCOMPILED(cv)) {
-            /* delayed creation - just note the offset within parent pad */
-            PARENT_PAD_INDEX_set(new_namesv, offset);
-            CvCLONE_on(cv);
-        }
-        else {
-            /* immediate creation - capture outer value right now */
-            av_store(PL_comppad, new_offset, SvREFCNT_inc(*out_sv));
-            DEBUG_Xv(PerlIO_printf(Perl_debug_log,
-                    "Pad findlex cv=0x%"UVxf" saved captured sv 0x%"UVxf" at offset %ld\n",
-                    PTR2UV(cv), PTR2UV(*out_sv), (long)new_offset));
-        }
+	    SV *new_namesv;
+	    AV *  const ocomppad_name = PL_comppad_name;
+	    PAD * const ocomppad = PL_comppad;
+            SV* padflags = *av_fetch(padnames, PAD_FLAGS_INDEX, 0);
+
+	    AVcpREPLACE(PL_comppad_name, padnames);
+	    PL_comppad = pad;
+	    PL_curpad = AvARRAY(PL_comppad);
+
+	    new_offset = pad_add_name(
+		SvPVX_const(*out_name_sv),
+		    (SvPAD_OUR(*out_name_sv) ? SvOURGV(*out_name_sv) : NULL),
+		    1,  /* fake */
+		    SvPAD_STATE(*out_name_sv) ? 1 : 0 /* state variable ? */
+		);
+
+	    new_namesv = AvARRAY(PL_comppad_name)[new_offset];
+
+	    PARENT_PAD_INDEX_set(new_namesv, 0);
+
+	    if (SvPAD_OUR(new_namesv)) {
+		NOOP;   /* do nothing */
+	    }
+	    else if (SvIV(padflags) & PADf_LATE) {
+		/* delayed creation - just note the offset within parent pad */
+		PARENT_PAD_INDEX_set(new_namesv, offset);
+		SvIV_set(padflags, SvIV(padflags) | PADf_CLONE);
+	    }
+	    else {
+		SV ** out_sv = av_fetch(SvAv(parent_pad), offset, 0);
+		av_store(PL_comppad, new_offset, SvREFCNT_inc(*out_sv));
+		DEBUG_Xv(PerlIO_printf(Perl_debug_log,
+			"Pad findlex padnames=0x%"UVxf" pad=0x%"UVxf" saved captured sv 0x%"UVxf" at offset %ld\n",
+			PTR2UV(padnames), PTR2UV(pad), PTR2UV(*out_sv), (long)new_offset));
+	    }
  
-        AVcpREPLACE(PL_comppad_name, ocomppad_name);
-        PL_comppad = ocomppad;
-        PL_curpad = ocomppad ? AvARRAY(ocomppad) : NULL;
-
+	    AVcpREPLACE(PL_comppad_name, ocomppad_name);
+	    PL_comppad = ocomppad;
+	    PL_curpad = ocomppad ? AvARRAY(ocomppad) : NULL;
+	}
     }
     return new_offset;
 }
@@ -1095,6 +1111,7 @@ Perl_pad_tidy(pTHX_ padtidy_type type)
      */
 
     if (PL_cv_has_eval || PL_perldb) {
+
         const CV *cv;
 	for (cv = PL_compcv ;cv; cv = CvOUTSIDE(cv)) {
 	    if (cv != PL_compcv && CvCOMPILED(cv))
@@ -1240,7 +1257,7 @@ Perl_do_dump_pad(pTHX_ I32 level, PerlIO *file, PADLIST *padlist, int full)
 	    PTR2UV(pad_name), PTR2UV(pname), PTR2UV(pad), PTR2UV(ppad)
     );
 
-    for (ix = 1; ix <= AvFILLp(pad_name); ix++) {
+    for (ix = PAD_NAME_START_INDEX; ix <= AvFILLp(pad_name); ix++) {
         SV *namesv = pname[ix];
 	if (namesv && namesv == &PL_sv_undef) {
 	    namesv = NULL;
@@ -1348,25 +1365,15 @@ Perl_cv_clone(pTHX_ CV *proto)
     const I32 fpad = AvFILLp(protopad);
     CV* cv;
     SV** outpad;
-    CV* outside;
-    long depth;
 
     PERL_ARGS_ASSERT_CV_CLONE;
 
     assert(!CvUNIQUE(proto));
 
-    /* Since cloneable anon subs can be nested, CvOUTSIDE may point
-     * to a prototype; we instead want the cloned parent who called us.
-     * Note that in general for formats, CvOUTSIDE != find_runcv */
-
-    outside = CvOUTSIDE(proto);
-    if (outside && CvCLONE(outside) && ! CvCLONED(outside))
-	outside = find_runcv(NULL);
-    depth = CvDEPTH(outside);
-    assert(depth);
-    if (!depth)
-	depth = 1;
-    assert(CvPADLIST(outside));
+    PAD* parent_padnames = PADLIST_PADNAMES(protopadlist);
+    PAD* parent_pad = PL_comppad;
+    outpad = AvARRAY(parent_pad);
+    assert(outpad == PL_curpad);
 
     ENTER;
     SAVESPTR(PL_compcv);
@@ -1380,23 +1387,22 @@ Perl_cv_clone(pTHX_ CV *proto)
     CvROOT(cv)		= OpREFCNT_inc(CvROOT(proto));
     OP_REFCNT_UNLOCK;
     CvSTART(cv)		= CvSTART(proto);
-    CvOUTSIDE(cv)	= (CV*)SvREFCNT_inc_simple(outside);
-    CvOUTSIDE_SEQ(cv) = CvOUTSIDE_SEQ(proto);
 
     if (SvPOK(proto))
 	sv_setpvn((SV*)cv, SvPVX_const((SV*)proto), SvCUR(proto));
 
-    CvPADLIST(cv) = pad_new(padnew_CLONE|padnew_SAVE);
+    CvPADLIST(cv) = pad_new(padnew_CLONE|padnew_SAVE,
+        parent_padnames,
+	parent_pad,
+	0);
 
     av_fill(PL_comppad, fpad);
-    for (ix = fname; ix >= 0; ix--)
+    for (ix = fname; ix >= PAD_NAME_START_INDEX; ix--)
 	av_store(PL_comppad_name, ix, SvREFCNT_inc(pname[ix]));
 
     PL_curpad = AvARRAY(PL_comppad);
 
-    outpad = AvARRAY(AvARRAY(CvPADLIST(outside))[depth]);
-
-    for (ix = fpad; ix > 0; ix--) {
+    for (ix = fpad; ix >= PAD_NAME_START_INDEX; ix--) {
 	SV* const namesv = (ix <= fname) ? pname[ix] : NULL;
 	SV *sv = NULL;
 	if (namesv && namesv != &PL_sv_undef) { /* lexical */
@@ -1443,7 +1449,6 @@ Perl_cv_clone(pTHX_ CV *proto)
 
     DEBUG_Xv(
 	PerlIO_printf(Perl_debug_log, "\nPad CV clone\n");
-	cv_dump(outside, "Outside");
 	cv_dump(proto,	 "Proto");
 	cv_dump(cv,	 "To");
     );
@@ -1495,7 +1500,7 @@ Perl_pad_push(pTHX_ PADLIST *padlist, int depth)
 	SV** const names = AvARRAY(svp[0]);
 	AV *av;
 
-	for ( ;ix > 0; ix--) {
+	for ( ;ix >= PAD_NAME_START_INDEX; ix--) {
 	    if (names_fill >= ix && names[ix] != &PL_sv_undef) {
 		const char sigil = SvPVX_const(names[ix])[0];
 		if ((SvFLAGS(names[ix]) & SVf_FAKE)

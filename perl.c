@@ -1785,7 +1785,7 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
     CVcpREPLACE(PL_main_cv, PL_compcv);
     CvUNIQUE_on(PL_compcv);
 
-    CvPADLIST(PL_compcv) = pad_new(0);
+    CvPADLIST(PL_compcv) = pad_new(0, NULL, NULL, 0);
 
     if (xsinit)
 	(*xsinit)(aTHX);	/* in case linked C routines want magical variables */

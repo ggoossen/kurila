@@ -354,7 +354,7 @@ PP(pp_anoncode)
 {
     dVAR; dSP;
     CV* cv = (CV*)PAD_SV(PL_op->op_targ);
-    if (CvCLONE(cv))
+    if ( SvIV(PADLIST_NAMESV(CvPADLIST(cv), PAD_FLAGS_INDEX)) & PADf_CLONE )
 	cv = (CV*)sv_2mortal((SV*)cv_clone(cv));
     EXTEND(SP,1);
     PUSHs((SV*)cv);

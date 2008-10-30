@@ -1920,7 +1920,15 @@ S_doeval(pTHX_ int gimme, OP** startop, CV* outside, U32 seq)
 
     /* set up a scratch pad */
 
-    CvPADLIST(PL_compcv) = pad_new(padnew_SAVE);
+    if (outside) {
+	CvPADLIST(PL_compcv) = pad_new(padnew_SAVE, 
+	    PADLIST_PADNAMES(CvPADLIST(outside)), 
+	    SvAv(AvARRAY(CvPADLIST(outside))[CvDEPTH(outside) || 1]), 
+	    seq);
+    }
+    else {
+	CvPADLIST(PL_compcv) = pad_new(padnew_SAVE,  NULL, NULL, seq);
+    }
     PL_op = NULL; /* avoid PL_op and PL_curpad referring to different CVs */
 
     /* make sure we compile in the right package */
