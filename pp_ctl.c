@@ -1919,8 +1919,8 @@ S_doeval(pTHX_ int gimme, OP** startop, CV* outside, U32 seq)
 
     if (outside) {
 	CvPADLIST(PL_compcv) = pad_new(padnew_SAVE, 
-	    PADLIST_PADNAMES(CvPADLIST(outside)), 
-	    SvAv(AvARRAY(CvPADLIST(outside))[CvDEPTH(outside) || 1]), 
+	    PADLIST_PADNAMES(CvPADLIST(outside)),
+	    SvAv(AvARRAY(CvPADLIST(outside))[CvDEPTH(outside) ? CvDEPTH(outside) : 1]),
 	    seq);
     }
     else {

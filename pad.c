@@ -241,9 +241,11 @@ Perl_pad_new(pTHX_ int flags, PAD* parent_padnames, PAD* parent_pad, IV parent_s
 
     DEBUG_X(PerlIO_printf(Perl_debug_log,
 	  "Pad 0x%"UVxf"[0x%"UVxf"] new:       compcv=0x%"UVxf
-	      " name=0x%"UVxf" flags=0x%"UVxf"\n",
+            " names=0x%"UVxf" parent_names=0x%"UVxf" parent_pad=0x%"UVxf
+            " flags=0x%"UVxf"\n",
 	  PTR2UV(PL_comppad), PTR2UV(PL_curpad), PTR2UV(PL_compcv),
-	      PTR2UV(padname), (UV)flags
+            PTR2UV(padname), PTR2UV(parent_padnames), PTR2UV(parent_pad),
+            (UV)flags
 	)
     );
 
