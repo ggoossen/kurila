@@ -10551,6 +10551,12 @@ Perl_start_subparse(pTHX_ U32 flags)
     const I32 oldsavestack_ix = PL_savestack_ix;
     CV* const outsidecv = PL_compcv;
 
+    if ( ! ( flags & CVf_ANON ) ) {
+	if ( CvFLAGS(PL_compcv) & CVf_ANON ) {
+	    Perl_croak(aTHX_ "non-anon sub inside a anon sub");
+	}
+    }
+
     if (PL_compcv) {
 	assert(SvTYPE(PL_compcv) == SVt_PVCV);
     }
