@@ -5,6 +5,7 @@ package ExtUtils::MM_Unix;
 use ExtUtils::MakeMaker::Config;
 use File::Basename < qw(basename dirname);
 use DirHandle;
+use Cwd 'cwd';
 
 our %Config_Override;
 
@@ -2428,7 +2429,6 @@ $(MAKE_APERL_FILE) : $(FIRST_MAKEFILE) pm_to_blib
 	# Once the patch to minimod.PL is in the distribution, I can
 	# drop it
 	return if $File::Find::name =~ m:auto/$self->{FULLEXT}/$self->{BASEEXT}$self->{LIB_EXT}\z:;
-	use Cwd 'cwd';
 	%static{cwd() . "/" . $_}++;
     }, < grep( -d $_, @{$searchdirs || \@()}) );
 
