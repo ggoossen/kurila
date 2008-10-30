@@ -292,8 +292,6 @@ Perl_pad_undef(pTHX_ CV* cv)
      * children, or integrate this loop with general cleanup */
 
     if (!PL_dirty) { /* don't bother during global destruction */
-	CV * const outercv = CvOUTSIDE(cv);
-        const U32 seq = CvOUTSIDE_SEQ(cv);
 	AV *  const comppad_name = (AV*)AvARRAY(padlist)[0];
 	SV ** const namepad = AvARRAY(comppad_name);
 	AV *  const comppad = (AV*)AvARRAY(padlist)[1];
@@ -313,20 +311,6 @@ Perl_pad_undef(pTHX_ CV* cv)
 		    curpad[ix] = NULL;
 		    CvREFCNT_dec(innercv);
 		    inner_rc--;
-		}
-
-		/* in use, not just a prototype */
-		if (inner_rc && (CvOUTSIDE(innercv) == cv)) {
-		    assert(0);
-		    /* don't relink to grandfather if he's being freed */
-		    if (outercv && SvREFCNT(outercv)) {
-			CvOUTSIDE(innercv) = outercv;
-			CvOUTSIDE_SEQ(innercv) = seq;
-			SvREFCNT_inc_simple_void_NN(outercv);
-		    }
-		    else {
-			CvOUTSIDE(innercv) = NULL;
-		    }
 		}
 	    }
 	}
@@ -1112,16 +1096,16 @@ Perl_pad_tidy(pTHX_ padtidy_type type)
 
     if (PL_cv_has_eval || PL_perldb) {
 
-        const CV *cv;
-	for (cv = PL_compcv ;cv; cv = CvOUTSIDE(cv)) {
-	    if (cv != PL_compcv && CvCOMPILED(cv))
-		break; /* no need to mark already-compiled code */
-	    if (CvANON(cv)) {
-		DEBUG_Xv(PerlIO_printf(Perl_debug_log,
-		    "Pad clone on cv=0x%"UVxf"\n", PTR2UV(cv)));
-		CvCLONE_on(cv);
-	    }
-	}
+/*         const CV *cv; */
+/* 	for (cv = PL_compcv ;cv; cv = CvOUTSIDE(cv)) { */
+/* 	    if (cv != PL_compcv && CvCOMPILED(cv)) */
+/* 		break; /\* no need to mark already-compiled code *\/ */
+/* 	    if (CvANON(cv)) { */
+/* 		DEBUG_Xv(PerlIO_printf(Perl_debug_log, */
+/* 		    "Pad clone on cv=0x%"UVxf"\n", PTR2UV(cv))); */
+/* 		CvCLONE_on(cv); */
+/* 	    } */
+/* 	} */
     }
 
     /* extend curpad to match namepad */
@@ -1311,25 +1295,18 @@ STATIC void
 S_cv_dump(pTHX_ const CV *cv, const char *title)
 {
     dVAR;
-    const CV * const outside = CvOUTSIDE(cv);
     AV* const padlist = CvPADLIST(cv);
 
     PERL_ARGS_ASSERT_CV_DUMP;
 
     PerlIO_printf(Perl_debug_log,
-		  "  %s: CV=0x%"UVxf" (%s), OUTSIDE=0x%"UVxf" (%s)\n",
+		  "  %s: CV=0x%"UVxf" (%s)\n",
 		  title,
 		  PTR2UV(cv),
 		  (CvANON(cv) ? "ANON"
 		   : (cv == PL_main_cv) ? "MAIN"
 		   : CvUNIQUE(cv) ? "UNIQUE"
-		   : "SUB"),
-		  PTR2UV(outside),
-		  (!outside ? "null"
-		   : CvANON(outside) ? "ANON"
-		   : (outside == PL_main_cv) ? "MAIN"
-		   : CvUNIQUE(outside) ? "UNIQUE"
-		   : "UNDEFINED"));
+		   : "SUB"));
 
     PerlIO_printf(Perl_debug_log,
 		    "    PADLIST = 0x%"UVxf"\n", PTR2UV(padlist));

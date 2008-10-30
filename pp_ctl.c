@@ -1915,9 +1915,6 @@ S_doeval(pTHX_ int gimme, OP** startop, CV* outside, U32 seq)
     assert(CxTYPE(&cxstack[cxstack_ix]) == CXt_EVAL);
     cxstack[cxstack_ix].blk_eval.cv = PL_compcv;
 
-    CvOUTSIDE_SEQ(PL_compcv) = seq;
-    CvOUTSIDE(PL_compcv) = (CV*)SvREFCNT_inc_simple(outside);
-
     /* set up a scratch pad */
 
     if (outside) {
