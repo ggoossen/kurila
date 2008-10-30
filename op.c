@@ -4127,11 +4127,6 @@ Perl_cv_undef(pTHX_ CV *cv)
 
     pad_undef(cv);
 
-    /* remove CvOUTSIDE unless this is an undef rather than a free */
-    if (!SvREFCNT(cv) && CvOUTSIDE(cv)) {
-	CvREFCNT_dec(CvOUTSIDE(cv));
-	CvOUTSIDE(cv) = NULL;
-    }
     if (CvCONST(cv)) {
 	SvREFCNT_dec((SV*)CvXSUBANY(cv).any_ptr);
 	CvCONST_off(cv);
@@ -4155,10 +4150,6 @@ Perl_cv_tmprefcnt(pTHX_ CV *cv)
     }
     pad_tmprefcnt(cv);
 
-    /* remove CvOUTSIDE unless this is an undef rather than a free */
-    if (!SvREFCNT(cv) && CvOUTSIDE(cv)) {
-	SvTMPREFCNT_inc(CvOUTSIDE(cv));
-    }
     if (CvCONST(cv)) {
 	SvTMPREFCNT_inc((SV*)CvXSUBANY(cv).any_ptr);
     }

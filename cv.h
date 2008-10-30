@@ -20,10 +20,6 @@ typedef U16 cv_flags_t;
 	void	(*xcv_xsub) (pTHX_ CV*);					\
     }		xcv_root_u;							\
     AV *	xcv_padlist;							\
-    CV *	xcv_outside;							\
-    U32		xcv_outside_seq; /* the COP sequence (at the point of our	\
-				  * compilation) in the lexically enclosing	\
-				  * sub */					\
     cv_flags_t	xcv_flags
 
 struct xpvcv {
@@ -68,9 +64,7 @@ Null CV pointer.
 #  define CvDEPTH(sv)	((XPVCV*)SvANY(sv))->xiv_u.xivu_i32
 #endif
 #define CvPADLIST(sv)	((XPVCV*)SvANY(sv))->xcv_padlist
-#define CvOUTSIDE(sv)	((XPVCV*)SvANY(sv))->xcv_outside
 #define CvFLAGS(sv)	((XPVCV*)SvANY(sv))->xcv_flags
-#define CvOUTSIDE_SEQ(sv) ((XPVCV*)SvANY(sv))->xcv_outside_seq
 
 #define CVf_METHOD	0x0001	/* CV is explicitly marked as a method */
 #define CVf_LOCKED	0x0002	/* CV locks itself or first arg on entry */
@@ -135,63 +129,6 @@ static __inline__ U32 CvSPECIAL(CV *cv) { return CvUNIQUE(cv) && SvFAKE(cv); }
 
 /* Flags for newXS_flags  */
 #define XS_DYNAMIC_FILENAME	0x01	/* The filename isn't static  */
-
-/*
-=head1 CV reference counts and CvOUTSIDE
-
-=for apidoc m|bool|CvWEAKOUTSIDE|CV *cv
-
-Each CV has a pointer, C<CvOUTSIDE()>, to its lexically enclosing
-CV (if any). Because pointers to anonymous sub prototypes are
-stored in C<&> pad slots, it is a possible to get a circular reference,
-with the parent pointing to the child and vice-versa. To avoid the
-ensuing memory leak, we do not increment the reference count of the CV
-pointed to by C<CvOUTSIDE> in the I<one specific instance> that the parent
-has a C<&> pad slot pointing back to us. In this case, we set the
-C<CvWEAKOUTSIDE> flag in the child. This allows us to determine under what
-circumstances we should decrement the refcount of the parent when freeing
-the child.
-
-CvWEAKOUTSIDE has been removed.
-
-There is a further complication with non-closure anonymous subs (i.e. those
-that do not refer to any lexicals outside that sub). In this case, the
-anonymous prototype is shared rather than being cloned. This has the
-consequence that the parent may be freed while there are still active
-children, eg
-
-    BEGIN { $a = sub { eval '$x' } }
-
-In this case, the BEGIN is freed immediately after execution since there
-are no active references to it: the anon sub prototype has
-C<CvWEAKOUTSIDE> set since it's not a closure, and $a points to the same
-CV, so it doesn't contribute to BEGIN's refcount either.  When $a is
-executed, the C<eval '$x'> causes the chain of C<CvOUTSIDE>s to be followed,
-and the freed BEGIN is accessed.
-
-To avoid this, whenever a CV and its associated pad is freed, any
-C<&> entries in the pad are explicitly removed from the pad, and if the
-refcount of the pointed-to anon sub is still positive, then that
-child's C<CvOUTSIDE> is set to point to its grandparent. This will only
-occur in the single specific case of a non-closure anon prototype
-having one or more active references (such as C<$a> above).
-
-One other thing to consider is that a CV may be merely undefined
-rather than freed, eg C<undef &foo>. In this case, its refcount may
-not have reached zero, but we still delete its pad and its C<CvROOT> etc.
-Since various children may still have their C<CvOUTSIDE> pointing at this
-undefined CV, we keep its own C<CvOUTSIDE> for the time being, so that
-the chain of lexical scopes is unbroken. For example, the following
-should print 123:
-
-    my $x = 123;
-    sub tmp { sub { eval '$x' } }
-    my $a = tmp();
-    undef &tmp;
-    print  $a->();
-
-=cut
-*/
 
 /*
  * Local variables:

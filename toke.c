@@ -10567,8 +10567,6 @@ Perl_start_subparse(pTHX_ U32 flags)
 	PADLIST_PADNAMES(CvPADLIST(outsidecv)), 
 	PADLIST_BASEPAD(CvPADLIST(outsidecv)), 
 	PL_cop_seqmax);
-    CvOUTSIDE(PL_compcv) = (CV*)SvREFCNT_inc_simple(outsidecv);
-    CvOUTSIDE_SEQ(PL_compcv) = PL_cop_seqmax;
 
     return oldsavestack_ix;
 }
