@@ -921,14 +921,6 @@ B::AV
 CvPADLIST(cv)
 	B::CV	cv
 
-B::CV
-CvOUTSIDE(cv)
-	B::CV	cv
-
-U32
-CvOUTSIDE_SEQ(cv)
-	B::CV	cv
-
 void
 CvXSUB(cv)
 	B::CV	cv
