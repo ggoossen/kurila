@@ -2244,9 +2244,8 @@ PP(pp_entersub)
 	SAVECOMPPAD();
 	PAD_SET_CUR_NOSAVE(padlist, CvDEPTH(cv));
 	if (hasargs) {
-	    AV* const av = newAV();
+	    AV* av = PAD_SVl(PAD_ARGS_INDEX);
 	    SAVECLEARSV(PAD_SVl(PAD_ARGS_INDEX));
-	    PAD_SVl(PAD_ARGS_INDEX) = AvSv(av);
 	    if (AvREAL(av)) {
 		/* @_ is normally not REAL--this should only ever
 		 * happen when DB::sub() calls things that modify @_ */
