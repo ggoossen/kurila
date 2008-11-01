@@ -5642,7 +5642,7 @@ PERL_CALLCONV void	Perl_pad_savelex(pTHX_ PAD *padnames, PAD* pad, U32 seq)
 
 
 #if defined(PERL_IN_PAD_C) || defined(PERL_DECL_PROT)
-STATIC PADOFFSET	S_pad_findlex(pTHX_ const char *name, PAD* padnames, PAD* pad, U32 seq, int warn)
+STATIC PADOFFSET	S_pad_findlex(pTHX_ const char *name, PAD* padnames, PAD* pad, U32 seq)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2)
 			__attribute__nonnull__(pTHX_3);
