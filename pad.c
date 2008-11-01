@@ -1125,9 +1125,11 @@ Perl_pad_tidy(pTHX_ padtidy_type type)
 		SvPADTMP_on(PL_curpad[ix]);
 	}
     }
+    av_store(PL_comppad_name, PAD_PARENTPADNAMES_INDEX, &PL_sv_undef);
+    av_store(PL_comppad_name, PAD_PARENTPAD_INDEX, &PL_sv_undef);
+    av_store(PL_comppad_name, PAD_PARENTSEQ_INDEX, &PL_sv_undef);
     PL_curpad = AvARRAY(PL_comppad);
 }
-
 
 /*
 =for apidoc pad_free
