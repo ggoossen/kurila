@@ -287,37 +287,6 @@ Perl_pad_undef(pTHX_ CV* cv)
 	    PTR2UV(cv), PTR2UV(padlist), PTR2UV(PL_comppad))
     );
 
-    /* detach any '&' anon children in the pad; if afterwards they
-     * are still live, fix up their CvOUTSIDEs to point to our outside,
-     * bypassing us. */
-    /* XXX DAPM for efficiency, we should only do this if we know we have
-     * children, or integrate this loop with general cleanup */
-
-    if (!PL_dirty) { /* don't bother during global destruction */
-	AV *  const comppad_name = (AV*)AvARRAY(padlist)[0];
-	SV ** const namepad = AvARRAY(comppad_name);
-	AV *  const comppad = (AV*)AvARRAY(padlist)[1];
-	SV ** const curpad = AvARRAY(comppad);
-	for (ix = AvFILLp(comppad_name); ix >= PAD_NAME_START_INDEX; ix--) {
-	    SV * const namesv = namepad[ix];
-	    if (namesv && namesv != &PL_sv_undef
-		&& *SvPVX_const(namesv) == '&')
-	    {
-		CV * const innercv = (CV*)curpad[ix];
-		U32 inner_rc = SvREFCNT(innercv);
-		assert(inner_rc);
-		namepad[ix] = NULL;
-		SvREFCNT_dec(namesv);
-
-		if (SvREFCNT(comppad) < 2) { /* allow for /(?{ sub{} })/  */
-		    curpad[ix] = NULL;
-		    CvREFCNT_dec(innercv);
-		    inner_rc--;
-		}
-	    }
-	}
-    }
-
     ix = AvFILLp(padlist);
     while (ix >= 0) {
 	SV* const sv = AvARRAY(padlist)[ix--];
