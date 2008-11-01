@@ -8557,7 +8557,6 @@ Perl_parser_dup(pTHX_ const yy_parser *const proto, CLONE_PARAMS *const param)
     parser->sublex_info	= proto->sublex_info; /* XXX not quite right */
     parser->linestr	= sv_dup_inc(proto->linestr, param);
     parser->expect	= proto->expect;
-    parser->copline	= proto->copline;
     parser->last_lop_op	= proto->last_lop_op;
     parser->lex_state	= proto->lex_state;
     parser->rsfp	= fp_dup(proto->rsfp, '<', param);
