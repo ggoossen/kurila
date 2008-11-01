@@ -102,7 +102,6 @@ typedef U64TYPE PADOFFSET;
 typedef enum {
 	padtidy_SUB,		/* tidy up a pad for a sub, */
 	padtidy_SUBCLONE,	/* a cloned sub, */
-	padtidy_FORMAT		/* or a format */
 } padtidy_type;
 
 /* ASSERT_CURPAD_LEGAL and ASSERT_CURPAD_ACTIVE respectively determine
