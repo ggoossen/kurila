@@ -52,7 +52,6 @@
 #define PL_sublex_info		(PL_parser->sublex_info)
 #define PL_linestr		(PL_parser->linestr)
 #define PL_expect		(PL_parser->expect)
-#define PL_copline		(PL_parser->copline)
 #define PL_bufptr		(PL_parser->bufptr)
 #define PL_oldbufptr		(PL_parser->oldbufptr)
 #define PL_oldoldbufptr		(PL_parser->oldoldbufptr)
@@ -670,7 +669,6 @@ Perl_lex_start(pTHX_ SV *line, PerlIO *rsfp, bool new_filter)
     parser->nexttoke = 0;
 #endif
     parser->error_count = oparser ? oparser->error_count : 0;
-    parser->copline = NOLINE;
     parser->lex_state = LEX_NORMAL;
     parser->expect = XSTATE;
     parser->rsfp = rsfp;
@@ -3804,8 +3802,6 @@ Perl_yylex(pTHX)
 	    break;
 	}
 	pl_yylval.i_tkval.ival = PL_parser->lex_line_number;
-	if (isSPACE(*s) || *s == '#')
-	    PL_copline = NOLINE;   /* invalidate current command line number */
 	TOKEN('{');
     case '}':
 	s++;

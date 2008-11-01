@@ -2915,7 +2915,6 @@ Perl_package(pTHX_ OP *o)
     sv_setsv(PL_curstname, sv);
 
     PL_hints |= HINT_BLOCK_SCOPE;
-    PL_parser->copline = NOLINE;
     PL_parser->expect = XSTATE;
 
 #ifndef PERL_MAD
@@ -3037,7 +3036,6 @@ Perl_utilize(pTHX_ int aver, I32 floor, OP *version, OP *idop, OP *arg)
      */
 
     PL_hints |= HINT_BLOCK_SCOPE;
-    PL_parser->copline = NOLINE;
     PL_parser->expect = XSTATE;
     PL_cop_seqmax++; /* Purely for B::*'s benefit */
 
@@ -4033,7 +4031,6 @@ Perl_newFOROP(pTHX_ I32 flags, char *label, line_t forline, OP *sv, OP *expr, OP
     wop = newWHILEOP(flags, 1, loop, location, newOP(OP_ITER, 0, location), block, cont, 0);
     if (madsv)
 	op_getmad(madsv, (OP*)loop, 'v');
-    PL_parser->copline = forline;
     return newSTATEOP(0, label, wop, location);
 }
 
@@ -4427,8 +4424,6 @@ Perl_newSUB(pTHX_ I32 floor, OP *proto, OP *block)
 	if (PL_madskills)
 	    goto install_block;
 	op_free(block);
-	if (PL_parser)
-	    PL_parser->copline = NOLINE;
 	LEAVE_SCOPE(floor);
 	return cv;
     }
@@ -4477,8 +4472,6 @@ Perl_newSUB(pTHX_ I32 floor, OP *proto, OP *block)
     }
 
   done:
-    if (PL_parser)
-	PL_parser->copline = NOLINE;
     SvREFCNT_inc(cv);
     LEAVE_SCOPE(floor);
     return cv;

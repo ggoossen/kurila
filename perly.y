@@ -150,11 +150,10 @@ prog	:	progstart
 
 /* An ordinary block */
 block	:	'{' remember lineseq '}'
-			{ if (PL_parser->copline > (line_t)IVAL($1))
-			      PL_parser->copline = (line_t)IVAL($1);
+			{
                             $$ = block_end($2, $3);
-			  TOKEN_GETMAD($1,$$,'{');
-			  TOKEN_GETMAD($4,$$,'}');
+                            TOKEN_GETMAD($1,$$,'{');
+                            TOKEN_GETMAD($4,$$,'}');
 			}
 	;
 
@@ -170,11 +169,10 @@ progstart:
 
 
 mblock	:	'{' mremember lineseq '}'
-			{ if (PL_parser->copline > (line_t)IVAL($1))
-			      PL_parser->copline = (line_t)IVAL($1);
+			{
                             $$ = block_end($2, $3);
-			  TOKEN_GETMAD($1,$$,'{');
-			  TOKEN_GETMAD($4,$$,'}');
+                            TOKEN_GETMAD($1,$$,'{');
+                            TOKEN_GETMAD($4,$$,'}');
 			}
 	;
 
@@ -212,7 +210,6 @@ line	:	cond
                         {
                             $$ = IF_MAD( newOP(OP_NULL, 0, LOCATION($1)),
                                     (OP*)NULL);
-                            PL_parser->copline = NOLINE;
                             TOKEN_GETMAD($1,$$,';');
                             APPEND_MADPROPS_PV("nullstatement",$$,'>');
                             PL_parser->expect = XSTATE;
@@ -278,34 +275,34 @@ else	:	/* NULL */
 			  TOKEN_GETMAD($1,$$,'o');
 			}
 	|	ELSIF '(' mexpr ')' mblock else
-			{ PL_parser->copline = (line_t)IVAL($1);
+			{ 
 			    $$ = newCONDOP(0, $3, scope($5), $6, LOCATION($1));
 			    PL_hints |= HINT_BLOCK_SCOPE;
-			  TOKEN_GETMAD($1,$$,'I');
-			  TOKEN_GETMAD($2,$$,'(');
-			  TOKEN_GETMAD($4,$$,')');
-                          APPEND_MADPROPS_PV("if", $$, '>');
+                            TOKEN_GETMAD($1,$$,'I');
+                            TOKEN_GETMAD($2,$$,'(');
+                            TOKEN_GETMAD($4,$$,')');
+                            APPEND_MADPROPS_PV("if", $$, '>');
 			}
 	;
 
 /* Real conditional expressions */
 cond	:	IF '(' remember mexpr ')' mblock else
-			{ PL_parser->copline = (line_t)IVAL($1);
+			{
 			    $$ = block_end($3,
                                 newCONDOP(0, $4, scope($6), $7, LOCATION($1)));
-			  TOKEN_GETMAD($1,$$,'I');
-			  TOKEN_GETMAD($2,$$,'(');
-			  TOKEN_GETMAD($5,$$,')');
-                          APPEND_MADPROPS_PV("if", $$, '>');
+                            TOKEN_GETMAD($1,$$,'I');
+                            TOKEN_GETMAD($2,$$,'(');
+                            TOKEN_GETMAD($5,$$,')');
+                            APPEND_MADPROPS_PV("if", $$, '>');
 			}
 	|	UNLESS '(' remember miexpr ')' mblock else
-			{ PL_parser->copline = (line_t)IVAL($1);
+			{
 			    $$ = block_end($3,
                                 newCONDOP(0, $4, scope($6), $7, LOCATION($1)));
-			  TOKEN_GETMAD($1,$$,'I');
-			  TOKEN_GETMAD($2,$$,'(');
-			  TOKEN_GETMAD($5,$$,')');
-                          APPEND_MADPROPS_PV("if", $$, '>');
+                            TOKEN_GETMAD($1,$$,'I');
+                            TOKEN_GETMAD($2,$$,'(');
+                            TOKEN_GETMAD($5,$$,')');
+                            APPEND_MADPROPS_PV("if", $$, '>');
 			}
 	;
 
@@ -337,7 +334,6 @@ loop	:	label WHILE remember '(' texpr ')'
                     mintro mblock cont
 			{
                             OP *innerop;
-                            PL_parser->copline = (line_t)IVAL($2);
 			    $$ = block_end($3,
                                 newSTATEOP(0, PVAL($1),
                                     innerop = newWHILEOP(0, 1, (LOOP*)(OP*)NULL,
@@ -349,16 +345,16 @@ loop	:	label WHILE remember '(' texpr ')'
 			}
 
 	|	label UNTIL '(' remember iexpr ')' mintro mblock cont
-			{ OP *innerop;
-                            PL_parser->copline = (line_t)IVAL($2);
+			{ 
+                            OP *innerop;
 			    $$ = block_end($4,
 				   newSTATEOP(0, PVAL($1),
 				     innerop = newWHILEOP(0, 1, (LOOP*)(OP*)NULL,
                                          LOCATION($2), $5, $8, $9, $7), LOCATION($2)));
-			  TOKEN_GETMAD($1,innerop,'L');
-			  TOKEN_GETMAD($2,innerop,'W');
-			  TOKEN_GETMAD($3,innerop,'(');
-			  TOKEN_GETMAD($6,innerop,')');
+                            TOKEN_GETMAD($1,innerop,'L');
+                            TOKEN_GETMAD($2,innerop,'W');
+                            TOKEN_GETMAD($3,innerop,'(');
+                            TOKEN_GETMAD($6,innerop,')');
 			}
 	|	label FOR MY remember my_scalar '(' mexpr ')' mblock cont
 			{ OP *innerop;

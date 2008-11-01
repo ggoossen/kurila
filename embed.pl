@@ -302,7 +302,6 @@ walk_table(\&write_global_sym, "global.sym", undef, "# ex: set ro:\n");
 # XXX others that may need adding
 #       warnhook
 #       hints
-#       copline
 my @extvars = qw(sv_undef sv_yes sv_no na dowarn
 		 curcop compiling
 		 tainting tainted stack_base stack_sp sv_arenaroot
