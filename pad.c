@@ -1307,6 +1307,8 @@ Perl_cv_clone(pTHX_ CV *proto)
     SV** const ppad = AvARRAY(protopad);
     const I32 fname = AvFILLp(protopad_name);
     const I32 fpad = AvFILLp(protopad);
+    PAD* parent_padnames = PADLIST_PADNAMES(protopadlist);
+    PAD* parent_pad = PL_comppad;
     CV* cv;
     SV** outpad;
 
@@ -1314,8 +1316,6 @@ Perl_cv_clone(pTHX_ CV *proto)
 
     assert(!CvUNIQUE(proto));
 
-    PAD* parent_padnames = PADLIST_PADNAMES(protopadlist);
-    PAD* parent_pad = PL_comppad;
     outpad = AvARRAY(parent_pad);
     assert(outpad == PL_curpad);
 
@@ -1491,13 +1491,13 @@ Perl_pad_savelex(pTHX_ PAD *padnames, PAD* pad, U32 seq)
 {
     dVAR;
 
-    PERL_ARGS_ASSERT_PAD_SAVELEX;
-
     SV** parent_padnamesref = av_fetch(padnames, PAD_PARENTPADNAMES_INDEX, 0);
+
+    PERL_ARGS_ASSERT_PAD_SAVELEX;
 
     while (parent_padnamesref) {
 	I32 offset;
-	SV* parent_padnames = *parent_padnamesref;
+	AV* parent_padnames = SvAv(*parent_padnamesref);
 	for (offset = av_len(parent_padnames);
 	     offset >= PAD_NAME_START_INDEX;
 	     offset--) {
