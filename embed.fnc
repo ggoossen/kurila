@@ -537,11 +537,6 @@ Ap	|OP*	|newANONSUB	|I32 floor|NULLOK OP* proto|NULLOK OP* block
 Apa	|OP*	|newASSIGNOP	|I32 flags|NULLOK OP* left|I32 optype|NULLOK OP* right|NULLOK SV* location
 Apa	|OP*	|newCONDOP	|I32 flags|NN OP* first|NULLOK OP* trueop|NULLOK OP* falseop|NULLOK SV* location
 Apd	|CV*	|newCONSTSUB	|NULLOK const char* name|NULLOK SV* sv
-#ifdef PERL_MAD
-Ap	|OP*	|newFORM	|I32 floor|NULLOK OP* o|NULLOK OP* block
-#else
-Ap	|void	|newFORM	|I32 floor|NULLOK OP* o|NULLOK OP* block
-#endif
 Apa	|OP*	|newFOROP	|I32 flags|NULLOK char* label \
 				|NULLOK OP* sv|NN OP* expr|NULLOK OP* block|NULLOK OP* cont|NULLOK SV* location
 Apa	|OP*	|newLOGOP	|I32 optype|I32 flags|NN OP *first|NN OP *other|NULLOK SV* location

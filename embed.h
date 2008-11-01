@@ -530,11 +530,6 @@
 #define newASSIGNOP		Perl_newASSIGNOP
 #define newCONDOP		Perl_newCONDOP
 #define newCONSTSUB		Perl_newCONSTSUB
-#ifdef PERL_MAD
-#define newFORM			Perl_newFORM
-#else
-#define newFORM			Perl_newFORM
-#endif
 #define newFOROP		Perl_newFOROP
 #define newLOGOP		Perl_newLOGOP
 #define newLOOPEX		Perl_newLOOPEX
@@ -2731,12 +2726,7 @@
 #define newASSIGNOP(a,b,c,d,e)	Perl_newASSIGNOP(aTHX_ a,b,c,d,e)
 #define newCONDOP(a,b,c,d,e)	Perl_newCONDOP(aTHX_ a,b,c,d,e)
 #define newCONSTSUB(a,b)	Perl_newCONSTSUB(aTHX_ a,b)
-#ifdef PERL_MAD
-#define newFORM(a,b,c)		Perl_newFORM(aTHX_ a,b,c)
-#else
-#define newFORM(a,b,c)		Perl_newFORM(aTHX_ a,b,c)
-#endif
-#define newFOROP(a,b,c,d,e,f,g,h)	Perl_newFOROP(aTHX_ a,b,c,d,e,f,g,h)
+#define newFOROP(a,b,c,d,e,f,g)	Perl_newFOROP(aTHX_ a,b,c,d,e,f,g)
 #define newLOGOP(a,b,c,d,e)	Perl_newLOGOP(aTHX_ a,b,c,d,e)
 #define newLOOPEX(a,b)		Perl_newLOOPEX(aTHX_ a,b)
 #define newLOOPOP(a,b,c,d,e,f)	Perl_newLOOPOP(aTHX_ a,b,c,d,e,f)

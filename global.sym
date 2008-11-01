@@ -299,7 +299,6 @@ Perl_newANONSUB
 Perl_newASSIGNOP
 Perl_newCONDOP
 Perl_newCONSTSUB
-Perl_newFORM
 Perl_newFOROP
 Perl_newLOGOP
 Perl_newLOOPEX

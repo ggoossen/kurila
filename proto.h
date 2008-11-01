@@ -1923,15 +1923,10 @@ PERL_CALLCONV OP*	Perl_newCONDOP(pTHX_ I32 flags, OP* first, OP* trueop, OP* fal
 	assert(first)
 
 PERL_CALLCONV CV*	Perl_newCONSTSUB(pTHX_ const char* name, SV* sv);
-#ifdef PERL_MAD
-PERL_CALLCONV OP*	Perl_newFORM(pTHX_ I32 floor, OP* o, OP* block);
-#else
-PERL_CALLCONV void	Perl_newFORM(pTHX_ I32 floor, OP* o, OP* block);
-#endif
-PERL_CALLCONV OP*	Perl_newFOROP(pTHX_ I32 flags, char* label, line_t forline, OP* sv, OP* expr, OP* block, OP* cont, SV* location)
+PERL_CALLCONV OP*	Perl_newFOROP(pTHX_ I32 flags, char* label, OP* sv, OP* expr, OP* block, OP* cont, SV* location)
 			__attribute__malloc__
 			__attribute__warn_unused_result__
-			__attribute__nonnull__(pTHX_5);
+			__attribute__nonnull__(pTHX_4);
 #define PERL_ARGS_ASSERT_NEWFOROP	\
 	assert(expr)
 
