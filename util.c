@@ -1248,7 +1248,7 @@ Perl_vdie_common(pTHX_ SV *msv, bool warn)
 
 	ENTER;
 	save_re_context();
-	SAVESPTR(hook);
+	SAVESPTR(*hook);
 	SVcpREPLACE(*hook, PERL_DIEHOOK_FATAL);
 
 	PUSHSTACKi(warn ? PERLSI_WARNHOOK : PERLSI_DIEHOOK);
