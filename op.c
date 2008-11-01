@@ -4427,7 +4427,10 @@ Perl_newSUB(pTHX_ I32 floor, OP *proto, OP *block)
 	if (PL_madskills)
 	    goto install_block;
 	op_free(block);
-	goto done;
+	if (PL_parser)
+	    PL_parser->copline = NOLINE;
+	LEAVE_SCOPE(floor);
+	return cv;
     }
 
     cv = PL_compcv;
