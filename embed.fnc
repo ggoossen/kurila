@@ -1624,7 +1624,7 @@ pdX	|void	|pad_push	|NN PADLIST *padlist|int depth
 pd	|void	|pad_savelex	|NN PAD *padnames|NN PAD* pad|U32 seq
 
 #if defined(PERL_IN_PAD_C) || defined(PERL_DECL_PROT)
-sd	|PADOFFSET|pad_findlex	|NN const char *name|NN PAD* padnames|NN PAD* pad|U32 seq|int warn
+sd	|PADOFFSET|pad_findlex	|NN const char *name|NN PAD* padnames|NN PAD* pad|U32 seq
 #  if defined(DEBUGGING)
 sd	|void	|cv_dump	|NN const CV *cv|NN const char *title
 #  endif

@@ -578,8 +578,8 @@ Perl_pad_findmy(pTHX_ const char *name)
     offset = pad_findlex(name,
 	PADLIST_PADNAMES(CvPADLIST(PL_compcv)),
 	PADLIST_BASEPAD(CvPADLIST(PL_compcv)),
-	PL_cop_seqmax, 
-	1);
+	PL_cop_seqmax
+	);
     if ((PADOFFSET)offset != NOT_IN_PAD) 
 	return offset;
 
@@ -615,8 +615,7 @@ Perl_find_rundefsvoffset(pTHX)
     return pad_findlex("$_", 
 	PADLIST_PADNAMES(CvPADLIST(cv)),
 	PADLIST_BASEPAD(CvPADLIST(cv)),
-	PL_curcop->cop_seq, 
-	1);
+	PL_curcop->cop_seq);
 }
 
 /*
@@ -647,7 +646,7 @@ the parent pad.
 #define CvCOMPILED(cv)	CvROOT(cv)
 
 STATIC PADOFFSET
-S_pad_findlex(pTHX_ const char *name, PAD *padnames, PAD* pad, U32 seq, int warn)
+S_pad_findlex(pTHX_ const char *name, PAD *padnames, PAD* pad, U32 seq)
 {
     dVAR;
     I32 offset, new_offset;
@@ -709,14 +708,16 @@ S_pad_findlex(pTHX_ const char *name, PAD *padnames, PAD* pad, U32 seq, int warn
     {
 	/* it's not in this pad - try above */
         SV** parent_padnames = av_fetch(padnames, PAD_PARENTPADNAMES_INDEX, 0);
+	SV* parent_pad;
+	SV* parent_seq;
 
 	if ( ! parent_padnames )
 	    return NOT_IN_PAD;
 
-        SV* parent_pad = *av_fetch(padnames, PAD_PARENTPAD_INDEX, 0);
-        SV* parent_seq = *av_fetch(padnames, PAD_PARENTSEQ_INDEX, 0);
+        parent_pad = *av_fetch(padnames, PAD_PARENTPAD_INDEX, 0);
+        parent_seq = *av_fetch(padnames, PAD_PARENTSEQ_INDEX, 0);
 
-	offset = pad_findlex(name, SvAv(*parent_padnames), SvAv(parent_pad), SvIV(parent_seq), 1);
+	offset = pad_findlex(name, SvAv(*parent_padnames), SvAv(parent_pad), SvIV(parent_seq));
 	if ((PADOFFSET)offset == NOT_IN_PAD)
 	    return NOT_IN_PAD;
 
@@ -1502,7 +1503,7 @@ Perl_pad_savelex(pTHX_ PAD *padnames, PAD* pad, U32 seq)
 	     offset--) {
             SV ** const namesv = av_fetch(parent_padnames, offset, 0);
 	    if (namesv && *namesv != &PL_sv_undef) {
-		pad_findlex(SvPVX_const(*namesv), padnames, pad, seq, 0);
+		pad_findlex(SvPVX_const(*namesv), padnames, pad, seq);
 	    }
 	}
 	
