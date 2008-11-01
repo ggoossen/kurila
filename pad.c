@@ -1125,13 +1125,6 @@ Perl_pad_tidy(pTHX_ padtidy_type type)
 		SvPADTMP_on(PL_curpad[ix]);
 	}
     }
-    else if (type == padtidy_FORMAT) {
-	PADOFFSET ix;
-	for (ix = AvFILLp(PL_comppad); ix > 0; ix--) {
-	    if (!SvPADMY(PL_curpad[ix]) && !SvIMMORTAL(PL_curpad[ix]))
-		SvPADTMP_on(PL_curpad[ix]);
-	}
-    }
     PL_curpad = AvARRAY(PL_comppad);
 }
 
