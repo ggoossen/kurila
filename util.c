@@ -1240,22 +1240,16 @@ Perl_vdie_common(pTHX_ SV *msv, bool warn)
 	return FALSE;
     }
 
+    if (SvRV(oldhook) && (SvTYPE(SvRV(oldhook)) == SVt_PVCV) )
+	cv = SvRV(oldhook);
 
-    ENTER;
-    SAVESPTR(*hook);
-    *hook = PERL_DIEHOOK_IGNORE;
-    if (SvOK(oldhook))
-	cv = sv_2cv(oldhook, &gv, 0);
-    LEAVE;
     if (cv && !CvDEPTH(cv) && (CvROOT(cv) || CvXSUB(cv))) {
 	dSP;
 
 	ENTER;
 	save_re_context();
-/* 	if (warn) { */
-	SAVESPTR(*hook);
-	*hook = PERL_DIEHOOK_FATAL;
-/* 	} */
+	SAVESPTR(hook);
+	SVcpREPLACE(*hook, PERL_DIEHOOK_FATAL);
 
 	PUSHSTACKi(warn ? PERLSI_WARNHOOK : PERLSI_DIEHOOK);
 	PUSHMARK(SP);
