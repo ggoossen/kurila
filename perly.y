@@ -261,7 +261,7 @@ sideff	:	error
                             TOKEN_GETMAD($2,$$,'w');
 			}
 	|	expr FOR expr
-			{ $$ = newFOROP(0, NULL, (line_t)IVAL($2),
+			{ $$ = newFOROP(0, NULL,
 					(OP*)NULL, $3, $1, (OP*)NULL, LOCATION($2));
 			  TOKEN_GETMAD($2,((LISTOP*)$$)->op_first->op_sibling,'w');
 			}
@@ -359,7 +359,7 @@ loop	:	label WHILE remember '(' texpr ')'
 	|	label FOR MY remember my_scalar '(' mexpr ')' mblock cont
 			{ OP *innerop;
 			  $$ = block_end($4,
-                              innerop = newFOROP(0, PVAL($1), (line_t)IVAL($2),
+                              innerop = newFOROP(0, PVAL($1),
                                   $5, $7, $9, $10, LOCATION($2)));
 			  TOKEN_GETMAD($1,((LISTOP*)innerop)->op_first->op_sibling,'L');
 			  TOKEN_GETMAD($2,((LISTOP*)innerop)->op_first->op_sibling,'W');
@@ -370,7 +370,7 @@ loop	:	label WHILE remember '(' texpr ')'
 	|	label FOR remember mydef '(' mexpr ')' mblock cont
 			{ OP *innerop;
 			  $$ = block_end($3,
-			     innerop = newFOROP(0, PVAL($1), (line_t)IVAL($2),
+			     innerop = newFOROP(0, PVAL($1),
                                  $4, $6, $8, $9, LOCATION($2)));
 			  TOKEN_GETMAD($1,((LISTOP*)innerop)->op_first->op_sibling,'L');
 			  TOKEN_GETMAD($2,((LISTOP*)innerop)->op_first->op_sibling,'W');
