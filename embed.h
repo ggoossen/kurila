@@ -1579,6 +1579,7 @@
 #define pad_tidy		Perl_pad_tidy
 #define do_dump_pad		Perl_do_dump_pad
 #define pad_push		Perl_pad_push
+#define pad_savelex		Perl_pad_savelex
 #endif
 #if defined(PERL_IN_PAD_C) || defined(PERL_DECL_PROT)
 #ifdef PERL_CORE
@@ -3779,6 +3780,7 @@
 #define pad_tidy(a)		Perl_pad_tidy(aTHX_ a)
 #define do_dump_pad(a,b,c,d)	Perl_do_dump_pad(aTHX_ a,b,c,d)
 #define pad_push(a,b)		Perl_pad_push(aTHX_ a,b)
+#define pad_savelex(a,b,c)	Perl_pad_savelex(aTHX_ a,b,c)
 #endif
 #if defined(PERL_IN_PAD_C) || defined(PERL_DECL_PROT)
 #ifdef PERL_CORE

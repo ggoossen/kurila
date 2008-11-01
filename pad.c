@@ -1485,6 +1485,30 @@ Perl_pad_push(pTHX_ PADLIST *padlist, int depth)
     }
 }
 
+void
+Perl_pad_savelex(pTHX_ PAD *padnames, PAD* pad, U32 seq)
+{
+    dVAR;
+
+    PERL_ARGS_ASSERT_PAD_SAVELEX;
+
+    SV** parent_padnamesref = av_fetch(padnames, PAD_PARENTPADNAMES_INDEX, 0);
+
+    while (parent_padnamesref) {
+	I32 offset;
+	SV* parent_padnames = *parent_padnamesref;
+	for (offset = av_len(parent_padnames);
+	     offset >= PAD_NAME_START_INDEX;
+	     offset--) {
+            SV ** const namesv = av_fetch(parent_padnames, offset, 0);
+	    if (namesv && *namesv != &PL_sv_undef) {
+		pad_findlex(SvPVX_const(*namesv), padnames, pad, seq, 0);
+	    }
+	}
+	
+	parent_padnamesref = av_fetch(parent_padnames, PAD_PARENTPADNAMES_INDEX, 0);
+    }
+}
 
 /*
  * Local variables:

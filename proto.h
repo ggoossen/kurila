@@ -5639,6 +5639,12 @@ PERL_CALLCONV void	Perl_pad_push(pTHX_ PADLIST *padlist, int depth)
 #define PERL_ARGS_ASSERT_PAD_PUSH	\
 	assert(padlist)
 
+PERL_CALLCONV void	Perl_pad_savelex(pTHX_ PAD *padnames, PAD* pad, U32 seq)
+			__attribute__nonnull__(pTHX_1)
+			__attribute__nonnull__(pTHX_2);
+#define PERL_ARGS_ASSERT_PAD_SAVELEX	\
+	assert(padnames); assert(pad)
+
 
 #if defined(PERL_IN_PAD_C) || defined(PERL_DECL_PROT)
 STATIC PADOFFSET	S_pad_findlex(pTHX_ const char *name, PAD* padnames, PAD* pad, U32 seq, int warn)
