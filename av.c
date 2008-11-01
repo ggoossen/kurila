@@ -281,7 +281,10 @@ Perl_av_store(pTHX_ register AV *av, I32 key, SV *val)
     if (SvSMAGICAL(av)) {
 	const MAGIC* const mg = SvMAGIC(av);
 	if (val != &PL_sv_undef) {
-	    sv_magic(val, (SV*)av, toLOWER(mg->mg_type), 0, key);
+	    SV* ref = newRV_inc(mg->mg_obj);
+	    sv_rvweaken(ref);
+	    sv_magic(val, ref, toLOWER(mg->mg_type), 0, key);
+	    SvREFCNT_dec(ref);
 	}
 	if (PL_delaymagic && mg->mg_type == PERL_MAGIC_isa)
 	    PL_delaymagic |= DM_ARRAY;
