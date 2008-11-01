@@ -4980,6 +4980,11 @@ Perl_ck_eval(pTHX_ OP *o)
 	cUNOPo->op_first->op_sibling = hhop;
 	o->op_private |= OPpEVAL_HAS_HH;
     }
+    pad_savelex(
+	PADLIST_PADNAMES(CvPADLIST(PL_compcv)),
+        PADLIST_BASEPAD(CvPADLIST(PL_compcv)),
+	PL_cop_seqmax
+	);
     return o;
 }
 

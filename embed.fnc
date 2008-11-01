@@ -1626,6 +1626,7 @@ pd	|void	|pad_block_start|int full
 pd	|void	|pad_tidy	|padtidy_type type
 pd 	|void	|do_dump_pad	|I32 level|NN PerlIO *file|NULLOK PADLIST *padlist|int full
 pdX	|void	|pad_push	|NN PADLIST *padlist|int depth
+pd	|void	|pad_savelex	|NN PAD *padnames|NN PAD* pad|U32 seq
 
 #if defined(PERL_IN_PAD_C) || defined(PERL_DECL_PROT)
 sd	|PADOFFSET|pad_findlex	|NN const char *name|NN PAD* padnames|NN PAD* pad|U32 seq|int warn
