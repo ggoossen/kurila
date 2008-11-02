@@ -556,7 +556,7 @@ sub best {
     my ($srcFile, $dstFile) = < @_;
 
     my $is_exception = grep $srcFile =~ m/$_/, @Exceptions;
-    if ($is_exception or !%Config{d_link} or -l $srcFile) {
+    if ($is_exception or ! config_value("d_link") or -l $srcFile) {
 	cp($srcFile, $dstFile);
     } else {
 	ln($srcFile, $dstFile) or cp($srcFile, $dstFile);

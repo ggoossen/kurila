@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 use Config;
 
-my $arch = "%Config{'archname'}-%Config{'osvers'}";
+my $arch = config_value('archname') . "-" . config_value('osvers');
 my $got = "";
 if (-e 'arch.txt') {
     open my $in, "<", "arch.txt" or die "Can't read 'arch.txt': $!";
