@@ -85,7 +85,7 @@ die $usage if %opts{help};
 #Sanity checks
 
 -x  "./perl" . config_value("exe_ext")
-  or warn "./perl%Config{exe_ext} not found!  Have you run make?\n";
+  or warn "./perl$(config_value('exe_ext')) not found!  Have you run make?\n";
 -d  "%opts{destdir}$(config_value('installprivlib'))"
 	|| warn "Perl library directory $(config_value('installprivlib')) not found.
 		Have you run make install?.  (Installing anyway.)\n";
