@@ -85,9 +85,7 @@ sub _feature_init {
                         $feep;
                     };
 
-        exists %Config{ "d_" . $feep }
-            || die("$IE Configure doesn't d_$feep");
-        %Groks{$short} = defined %Config{ "d_" . $feep };
+        %Groks{$short} = defined config_value("d_" . $feep);
     }
     # assume that any that are left are always there
     for my $feep ( grep m/^\$pw_/s, @EXPORT_OK) {
