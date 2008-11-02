@@ -1972,13 +1972,13 @@ pod/perlutil.pod		utilities packaged with the Perl distribution
 pod/perlvar.pod			Perl predefined variables
 pod/perlxs.pod			Perl XS application programming interface
 pod/perlxstut.pod		Perl XS tutorial
-pod/pod2html.PL			Precursor for translator to turn pod into HTML
-pod/pod2latex.PL		Precursor for translator to turn pod into LaTeX
-pod/pod2man.PL			Precursor for translator to turn pod into manpage
-pod/pod2text.PL			Precursor for translator to turn pod into text
-pod/pod2usage.PL		Pod-Parser - print usage messages from POD docs
-pod/podchecker.PL		Pod-Parser - Pod::Checker::podchecker() CLI
-pod/podselect.PL		Pod-Parser - Pod::Select::podselect() CLI
+pod/pod2html.pl			Precursor for translator to turn pod into HTML
+pod/pod2latex.pl		Precursor for translator to turn pod into LaTeX
+pod/pod2man.pl			Precursor for translator to turn pod into manpage
+pod/pod2text.pl			Precursor for translator to turn pod into text
+pod/pod2usage.pl		Pod-Parser - print usage messages from POD docs
+pod/podchecker.pl		Pod-Parser - Pod::Checker::podchecker() CLI
+pod/podselect.pl		Pod-Parser - Pod::Select::podselect() CLI
 pod/roffitall			troff the whole man page set
 pod/rofftoc			Generate a table of contents in troff format
 pod/splitman			Splits perlfunc into multiple man pages

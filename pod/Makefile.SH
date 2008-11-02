@@ -67,6 +67,9 @@ PERL = ../miniperl
 PERLILIB = $(PERL) -I../lib
 REALPERL = ../perl
 
+# From MakeMaker.
+FIXIN = "-I../lib" "-MExtUtils::MY" -e "MY->fixin(shift @ARGV)"
+
 all: $(CONVERTERS) man
 
 converters: $(CONVERTERS)
@@ -130,17 +133,21 @@ check:	checkpods
 	$(PERL) -I../lib checkpods $(POD)
 
 # Dependencies.
-pod2latex:	pod2latex.PL ../lib/Config.pm
-	$(LDLIBPTH) $(PERL) -I../lib pod2latex.PL
+pod2html:	pod2html.pl ../config.sh
+	$(CPS) $@.pl $@
+	$(LDLIBPTH) $(PERL) $(FIXIN) $@
 
-pod2html:	pod2html.PL ../lib/Config.pm
-	$(LDLIBPTH) $(PERL) -I ../lib pod2html.PL
+pod2latex:	pod2latex.pl ../config.sh
+	$(CPS) $@.pl $@
+	$(LDLIBPTH) $(PERL) $(FIXIN) $@
 
-pod2man:	pod2man.PL ../lib/Config.pm
-	$(LDLIBPTH) $(PERL) -I ../lib pod2man.PL
+pod2man:	pod2man.pl ../config.sh
+	$(CPS) $@.pl $@
+	$(LDLIBPTH) $(PERL) $(FIXIN) $@
 
-pod2text:	pod2text.PL ../lib/Config.pm
-	$(LDLIBPTH) $(PERL) -I ../lib pod2text.PL
+pod2text:	pod2text.pl ../config.sh
+	$(CPS) $@.pl $@
+	$(LDLIBPTH) $(PERL) $(FIXIN) $@
 
 checkpods:	checkpods.PL ../lib/Config.pm
 	$(LDLIBPTH) $(PERL) -I ../lib checkpods.PL

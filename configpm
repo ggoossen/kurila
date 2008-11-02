@@ -37,7 +37,7 @@ usage: $0  [ options ]
 EOF
 
 
-our (%Config, $Config_SH_expanded);
+our ($Config_SH_expanded);
 
 my $how_many_common = 22;
 
@@ -118,7 +118,7 @@ package Config;
 # use vars pulls in Carp
 
 BEGIN {
-   my @heavy_subs = qw|myconfig fetch_string FIRSTKEY NEXTKEY EXISTS STORE config_sh config_re
+   my @heavy_subs = qw|myconfig fetch_string FIRSTKEY NEXTKEY config_sh config_re
                        config_vars|;
    for (@heavy_subs) { undef Symbol::fetch_glob($_)->*; }
 }
@@ -135,7 +135,7 @@ package Config;
 # use strict;
 # use warnings; Pulls in Carp
 # use vars pulls in Carp
-@Config::EXPORT = qw(%%Config);
+@Config::EXPORT = qw(config_value config_keys);
 @Config::EXPORT_OK = qw(myconfig config_sh config_vars config_re);
 
 # Need to stub all the functions to make code such as print Config::config_sh
@@ -143,15 +143,12 @@ package Config;
 
 my %%Export_Cache = %%( < map {($_ => 1)} @(< @Config::EXPORT, < @Config::EXPORT_OK) );
 
-our %%Config;
-
 # Define our own import method to avoid pulling in the full Exporter:
 sub import {
     my $pkg = shift;
     @_ = @Config::EXPORT unless @_;
 
-    my @funcs = @( < grep $_ ne '%%Config', @_ );
-    my $export_Config = (nelems @funcs) +< (nelems @_) ? 1 : 0;
+    my @funcs = @_;
 
     my $callpkg = caller(0);
     foreach my $func (@funcs) {
@@ -160,7 +157,6 @@ sub import {
 	*{Symbol::fetch_glob($callpkg.'::'.$func)} = \&{*{Symbol::fetch_glob($func)}};
     }
 
-    *{Symbol::fetch_glob("$callpkg\::Config")} = \%%Config if $export_Config;
     return;
 }
 
@@ -701,8 +697,28 @@ for my $name (< @heavy_subs) {
 }
 
 # tie returns the object, so the value returned to require will be true.
-tie %%Config, 'Config', \%%(
+my %%Config = %%(
 %s);
+
+sub config_value {
+    my $key = shift;
+
+    return %%Config{$key} if exists %%Config{$key};
+
+    return fetch_string(\%%Config, $key);
+}
+
+sub config_keys {
+    require "Config_heavy.pl";
+    my @keys;
+    my $key = FIRSTKEY();
+    while (defined $key) {
+        push @keys, $key;
+        $key = NEXTKEY();
+    }
+    return @keys;
+}
+
 ENDOFTIE
 
 
@@ -973,11 +989,11 @@ require $Config_heavy;
 Config->import();
 
 die "$0: $Config_PM not valid"
-	unless %Config{'PERL_CONFIG_SH'} eq 'true';
+	unless config_value('PERL_CONFIG_SH') eq 'true';
 
 die "$0: error processing $Config_PM"
-	if defined(%Config{'an impossible name'})
-	or %Config{'PERL_CONFIG_SH'} ne 'true' # test cache
+	if defined(config_value('an impossible name'))
+	or config_value('PERL_CONFIG_SH') ne 'true' # test cache
 	;
 
 die "$0: error processing $Config_PM"
