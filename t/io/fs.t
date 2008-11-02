@@ -23,7 +23,7 @@ else {
 }
 chomp($wd);
 
-my $has_link            = %Config{d_link};
+my $has_link            = config_value('d_link');
 my $accurate_timestamps =
     !($^O eq 'MSWin32' || $^O eq 'NetWare' ||
       $^O eq 'dos'     || $^O eq 'os2'     ||

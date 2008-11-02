@@ -8,11 +8,6 @@ BEGIN {
 	print "1..0 # Skip: not perlio\n";
 	exit 0;
     }
-    eval 'use Encode';
-    if ($@->{description} =~ m/dynamic loading not available/) {
-        print "1..0 # miniperl cannot load Encode\n";
-	exit 0;
-    }
     # Makes testing easier.
     %ENV{PERLIO} = 'stdio' if exists %ENV{PERLIO} && %ENV{PERLIO} eq '';
     if (exists %ENV{PERLIO} && %ENV{PERLIO} !~ m/^(stdio|perlio|mmap)$/) {
@@ -28,7 +23,7 @@ use Config;
 my $DOSISH    = $^O =~ m/^(?:MSWin32|os2|dos|NetWare|mint)$/ ? 1 : 0;
    $DOSISH    = 1 if !$DOSISH and $^O =~ m/^uwin/;
 my $NONSTDIO  = exists %ENV{PERLIO} && %ENV{PERLIO} ne 'stdio'     ? 1 : 0;
-my $FASTSTDIO = %Config{d_faststdio} && %Config{usefaststdio}      ? 1 : 0;
+my $FASTSTDIO = config_value('d_faststdio') && config_value('usefaststdio') ? 1 : 0;
 my $UTF8_STDIN;
 if ($^UNICODE ^&^ 1) {
     if ($^UNICODE ^&^ 64) {
@@ -60,12 +55,10 @@ __EOH__
 
 SKIP: do {
     # FIXME - more of these could be tested without Encode or full perl
-    skip("This perl does not have Encode", $NTEST)
-	unless " %Config{extensions} " =~ m/ Encode /;
     skip("miniperl does not have Encode", $NTEST) if %ENV{PERL_CORE_MINITEST};
 
     sub check {
-	my ($result, $expected, $id) = @_;
+	my ($result, $expected, $id) = < @_;
 	# An interesting dance follows where we try to make the following
 	# IO layer stack setups to compare equal:
 	#
@@ -90,7 +83,7 @@ SKIP: do {
 	    }
 	} elsif (!$FASTSTDIO && !$DOSISH) {
 	    splice(@$result, 0, 2, "stdio")
-		if @$result +>= 2 &&
+		if nelems(@$result) +>= 2 &&
 		   $result->[0] eq "unix" &&
 		   $result->[1] eq "perlio";
 	} elsif ($DOSISH) {
@@ -105,8 +98,8 @@ SKIP: do {
 	    # which will make new ones not stick.
 	    @$expected = grep { $_ ne 'crlf' } @$expected;
 	}
-	my $n = scalar @$expected;
-	is(scalar @$result, $n, "$id - layers == $n");
+	my $n = nelems @$expected;
+	is(nelems(@$result), $n, "$id - layers == $n");
 	for my $i (0 .. $n -1) {
 	    my $j = $expected->[$i];
 	    if (ref $j eq 'CODE') {
