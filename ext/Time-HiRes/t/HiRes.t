@@ -51,7 +51,7 @@ use Config;
 
 use Time::HiRes q(gettimeofday);
 
-my $have_alarm = %Config{d_alarm};
+my $have_alarm = config_value('d_alarm');
 my $have_fork  = %Config{d_fork};
 my $waitfor = 180; # 30-45 seconds is normal (load affects this).
 my $timer_pid;

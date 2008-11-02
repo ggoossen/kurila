@@ -417,23 +417,3 @@ ok 1
 ######## [ID 20020623.009] nested eval/sub segfaults
 our $eval = eval 'sub { eval q|sub { %S }| }';
 $eval->(\%());
-######## "Segfault using HTML::Entities", Richard Jolly <richardjolly@mac.com>, <A3C7D27E-C9F4-11D8-B294-003065AE00B6@mac.com> in perl-unicode@perl.org
--lw
-# SKIP: use Config; %ENV{PERL_CORE_MINITEST} or " %Config::Config{'extensions'} " !~ m[ Encode ] # Perl configured without Encode module
-BEGIN {
-  eval 'require Encode';
-  if ($@) { exit 0 } # running minitest?
-}
-# Test case cut down by jhi
-use Carp;
-$^WARN_HOOK = sub { $@ = shift };
-use Encode;
-use utf8;
-my $t = "\x[E9]";
-$t =~ s/([^a])/{''}/g;
-$@ =~ s/ at .*/ at/;
-print $@;
-print "Good" if $t eq "\x[E9]";
-EXPECT
-
-Good

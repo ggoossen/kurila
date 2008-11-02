@@ -4,10 +4,6 @@ use TestInit;
 use Config;
 
 BEGIN {
-    if (%Config{'extensions'} !~ m/\bIO\b/ && $^O ne 'VMS') {
-	print "1..0\n";
-	exit 0;
-    }
     if ($^O eq 'mpeix') {
 	print "1..0 # Skip: broken on MPE/iX\n";
 	exit 0;
@@ -77,7 +73,7 @@ if ($^O eq 'dos')
 my ($rd,$wr) = < FileHandle::pipe;
 
 if ($^O eq 'VMS' || $^O eq 'os2' || $^O eq 'amigaos' || $^O eq 'MSWin32' || $^O eq 'NetWare' ||
-    %Config{d_fork} ne 'define') {
+    config_value('d_fork') ne 'define') {
   $wr->autoflush;
   $wr->printf("ok \%d\n",11);
   print < $rd->getline;

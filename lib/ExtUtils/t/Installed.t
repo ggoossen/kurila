@@ -13,13 +13,14 @@ use Test::More tests => 63;
 
 BEGIN { use_ok( 'ExtUtils::Installed' ) }
 
-my $mandirs =  !!%Config{man1direxp} + !!%Config{man3direxp};
+my $mandirs =  !!config_value("man1direxp") + !!config_value("man3direxp");
 
 # saves having to qualify package name for class methods
 my $ei = bless( \%(), 'ExtUtils::Installed' );
 
 # Make sure meta info is available
-$ei->{':private:'}->{Config} = \%Config;
+$ei->{':private:'}->{Config} = \%:<
+  map { ($_ => config_value($_)) } config_keys();
 $ei->{':private:'}->{INC} = \@INC;
 
 # _is_prefix
@@ -33,7 +34,7 @@ ok( $ei->_is_type(0, 'all'), '_is_type() should be true for type of "all"' );
 
 foreach my $path (qw( man1dir man3dir )) {
     SKIP: do {
-        my $dir = %Config{$path.'exp'};
+        my $dir = config_value($path.'exp');
         skip("no man directory $path on this system", 2 ) unless $dir;
 
         my $file = $dir . '/foo';
@@ -43,14 +44,14 @@ foreach my $path (qw( man1dir man3dir )) {
 }
 
 # VMS 5.6.1 doesn't seem to have $Config{prefixexp}
-my $prefix = %Config{prefix} || %Config{prefixexp};
+my $prefix = config_value("prefix") || config_value("prefixexp");
 
 # You can concatenate /foo but not foo:, which defaults in the current
 # directory
 $prefix = VMS::Filespec::unixify($prefix) if $Is_VMS;
 
 # ActivePerl 5.6.1/631 has $Config{prefixexp} as 'p:' for some reason
-$prefix = %Config{prefix} if $prefix eq 'p:' && $^O eq 'MSWin32';
+$prefix = config_value("prefix") if $prefix eq 'p:' && $^O eq 'MSWin32';
 
 ok( $ei->_is_type( File::Spec->catfile($prefix, 'bar'), 'prog'),
         "... should find prog file under $prefix" );
@@ -144,7 +145,9 @@ do {
 # Do the same thing as the last block, but with overrides for
 # %Config and @INC.
 do {
-    my $config_override = \%( < %Config::Config );
+    my $config_override = \%:<
+      map { $_ => Config::config_value($_) }
+      Config::config_keys();
     $config_override->{archlibexp} = cwd();
     $config_override->{sitearchexp} = $fake_mod_dir;
     $config_override->{version} = 'fake_test_version';

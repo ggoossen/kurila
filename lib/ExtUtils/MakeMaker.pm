@@ -5,6 +5,7 @@ package ExtUtils::MakeMaker;
 require Exporter;
 use ExtUtils::MakeMaker::Config;
 use File::Path;
+use Config 'config_value';
 
 our $Verbose = 0;       # exported
 our @Parent;            # needs to be localized
@@ -194,7 +195,7 @@ sub eval_in_x {
 #         } else {
 #             warn "WARNING from evaluation of $dir/Makefile.PL: $@";
 #         }
-        die "ERROR from evaluation of $dir/Makefile.PL: $($@->message)";
+        die "ERROR from evaluation of $dir/Makefile.PL: $($@->message . $@->stacktrace)";
     }
 }
 
@@ -904,7 +905,9 @@ sub flush {
         }
     }
 
-    system("%Config::Config{eunicefix} $finalname") unless %Config::Config{eunicefix} eq ":";
+    if ( not config_value("eunicefix") eq ":" ) {
+        system(config_value('eunicefix') . " $finalname");
+    }
 }
 
 

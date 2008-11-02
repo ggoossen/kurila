@@ -2,10 +2,6 @@
 
 BEGIN {
     require Config;
-    if ((%Config::Config{'extensions'} !~ m/\bB\b/) ){
-        print "1..0 # Skip -- Perl configured without B module\n";
-        exit 0;
-    }
     require './test.pl';
 }
 
@@ -53,7 +49,7 @@ for my $newlex (@('', '-newlex')) {
 
 SKIP: do {
     skip "no perlio in this build", 5
-    unless %Config::Config{useperlio};
+    unless Config::config_value("useperlio");
 
     our $buf = 'arb startval';
     my $ak = B::Showlex::walk_output (\$buf);

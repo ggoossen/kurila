@@ -1,13 +1,5 @@
 #!./perl
 
-BEGIN {
-    require Config;
-    if ((%Config::Config{'extensions'} !~ m/\bre\b/) ){
-	print "1..0 # Skip -- Perl configured without re module\n";
-	exit 0;
-    }
-}
-
 BEGIN { require "./test.pl"; }
 our $NUM_SECTS;
 chomp(my @strs= grep { !m/^\s*\#/ } @( ~< *DATA));

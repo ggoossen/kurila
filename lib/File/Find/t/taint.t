@@ -18,7 +18,7 @@ BEGIN {
 
     # Remove insecure directories from PATH
     my @path;
-    my $sep = %Config{path_sep};
+    my $sep = config_value("path_sep");
     foreach my $dir (split(m/\Q$sep/,%ENV{'PATH'}))
     {
 	##

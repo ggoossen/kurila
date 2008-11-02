@@ -118,7 +118,7 @@ sub walk_output { # updates $walkHandle
     if (ref $handle eq 'SCALAR') {
 	require Config;
 	die "no perlio in this build, can't call walk_output (\\\$scalar)\n"
-	    unless %Config::Config{useperlio};
+	    unless Config::config_value("useperlio");
 	# in 5.8+, open(FILEHANDLE,MODE,REFERENCE) writes to string
 	open my $tmp, '>', $handle;	# but cant re-set existing STDOUT
 	$walkHandle = $tmp;		# so use my $tmp as intermediate var

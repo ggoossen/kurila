@@ -1,11 +1,5 @@
 use TestInit;
 use Config;
-BEGIN {
-    if (%Config{'extensions'} !~ m/\bXS\/Typemap\b/) {
-        print "1..0 # Skip: XS::Typemap was not built\n";
-        exit 0;
-    }
-}
 
 use Test::More tests => 84;
 

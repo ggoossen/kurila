@@ -288,6 +288,6 @@ if ($^O eq 'vos') {
                             $Is_VMS ||
 			    (defined %ENV{PERLIO} &&
 			     %ENV{PERLIO} eq 'unix' &&
-			     %Config::Config{useperlio}));
+			     Config::config_value("useperlio")));
  _exit(0);
 }

@@ -9,10 +9,6 @@ BEGIN {
 	exit 0;
     }
     use Config;
-    unless (" %Config{extensions} " =~ m/ Fcntl /) {
-	print "1..0 # Skip: no Fcntl (how did you get this far?)\n";
-	exit 0;
-    }
 }
 
 use Test::More tests => 6;

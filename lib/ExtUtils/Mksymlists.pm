@@ -73,7 +73,7 @@ sub _write_aix {
 sub _write_os2 {
     my($data) = < @_;
     require Config;
-    my $threaded = (%Config::Config{archname} =~ m/-thread/ ? " threaded" : "");
+    my $threaded = "";
 
     if (not $data->{DLBASE}) {
         ($data->{DLBASE} = $data->{NAME}) =~ s/.*:://;
@@ -81,15 +81,15 @@ sub _write_os2 {
     }
     my $distname = $data->{DISTNAME} || $data->{NAME};
     $distname = "Distribution $distname";
-    my $patchlevel = " pl%Config{perl_patchlevel}" || '';
+    my $patchlevel = " pl$(config_value('perl_patchlevel'))" || '';
     my $comment = sprintf "Perl (v\%s\%s\%s) module \%s", 
-      %Config::Config{version}, $threaded, $patchlevel, $data->{NAME};
+      Config::config_value("version"), $threaded, $patchlevel, $data->{NAME};
     chomp $comment;
     if ($data->{INSTALLDIRS} and $data->{INSTALLDIRS} eq 'perl') {
         $distname = 'perl5-porters@perl.org';
         $comment = "Core $comment";
     }
-    $comment = "$comment (Perl-config: %Config{config_args})";
+    $comment = "$comment (Perl-config: $(config_value('config_args')))";
     $comment = substr($comment, 0, 200) . "...)" if length $comment +> 203;
     rename "$data->{FILE}.def", "$data->{FILE}_def.old";
 
@@ -125,7 +125,7 @@ sub _write_win32 {
     open( my $def, ">", "$data->{FILE}.def" )
         or croak("Can't create $data->{FILE}.def: $!\n");
     # put library name in quotes (it could be a keyword, like 'Alias')
-    if (%Config::Config{'cc'} !~ m/^gcc/i) {
+    if (Config::config_value('cc') !~ m/^gcc/i) {
         print $def "LIBRARY \"$data->{DLBASE}\"\n";
     }
     print $def "EXPORTS\n  ";
@@ -135,7 +135,7 @@ sub _write_win32 {
     # NOTE: DynaLoader itself only uses the names without underscores,
     # so this is only to cover the case when the extension DLL may be
     # linked to directly from C. GSAR 97-07-10
-    if (%Config::Config{'cc'} =~ m/^bcc/i) {
+    if (Config::config_value('cc') =~ m/^bcc/i) {
         for ( @{$data->{DL_VARS}}, < @{$data->{FUNCLIST}}) {
             push @syms, "_$_", "$_ = _$_";
         }
@@ -163,7 +163,7 @@ sub _write_vms {
     require Config; # a reminder for once we do $^O
     require ExtUtils::XSSymSet;
 
-    my($isvax) = %Config::Config{'archname'} =~ m/VAX/i;
+    my($isvax) = Config::config_value('archname') =~ m/VAX/i;
     my($set) = < ExtUtils::XSSymSet->new;
 
     rename "$data->{FILE}.opt", "$data->{FILE}.opt_old";
@@ -179,7 +179,7 @@ sub _write_vms {
     # the GSMATCH criteria for a dynamic extension
 
     print $opt "case_sensitive=yes\n"
-        if %Config::Config{d_vms_case_sensitive_symbols};
+        if Config::config_value("d_vms_case_sensitive_symbols");
 
     foreach my $sym ( @{$data->{FUNCLIST}}) {
         my $safe = $set->addsym($sym);

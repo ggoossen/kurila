@@ -1,12 +1,7 @@
 #!./perl -w
 
 BEGIN {
-	require Config;
-	if ((%Config::Config{'extensions'} !~ m/\bB\b/) ){
-		print "1..0 # Skip -- Perl configured without B module\n";
-		exit 0;
-	}
-	require './test.pl';
+    require './test.pl';
 }
 
 use Config;

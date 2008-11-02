@@ -6,10 +6,6 @@ BEGIN {
 	exit 0;
     }
     require Config;
-    if ((%Config::Config{'extensions'} !~ m!\bPerlIO/via\b!) ){
-        print "1..0 # Skip -- Perl configured without PerlIO::via module\n";
-        exit 0;
-    }
 }
 
 use warnings;

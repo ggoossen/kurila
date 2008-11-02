@@ -6,10 +6,6 @@ BEGIN {
 	exit 0;
     }
     require Config;
-    if ((%Config::Config{'extensions'} !~ m!\bPerlIO/scalar\b!) ){
-        print "1..0 # Skip -- Perl configured without PerlIO::scalar module\n";
-        exit 0;
-    }
 }
 
 use Fcntl qw(SEEK_SET SEEK_CUR SEEK_END); # Not 0, 1, 2 everywhere.

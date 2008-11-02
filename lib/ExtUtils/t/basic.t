@@ -95,10 +95,10 @@ like( $ppd_html,
 like( $ppd_html, qr{^\s*<IMPLEMENTATION>}m,          '  <IMPLEMENTATION>');
 like( $ppd_html, qr{^\s*<DEPENDENCY NAME="strict" VERSION="0,0,0,0" />}m,
                                                            '  <DEPENDENCY>' );
-like( $ppd_html, qr{^\s*<OS NAME="%Config{osname}" />}m,
+like( $ppd_html, qr{^\s*<OS NAME="$(Config::config_value('osname'))" />}m,
                                                            '  <OS>'      );
-my $archname = %Config{archname};
-$archname .= "-". substr(%Config{version},0,3);
+my $archname = config_value('archname');
+$archname .= "-". substr(config_value("version"),0,3);
 like( $ppd_html, qr{^\s*<ARCHITECTURE NAME="$archname" />}m,
                                                            '  <ARCHITECTURE>');
 like( $ppd_html, qr{^\s*<CODEBASE HREF="" />}m,            '  <CODEBASE>');

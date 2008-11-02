@@ -11,18 +11,6 @@ BEGIN {
 }
 
 
-# Turn on threads here, if available, since this test tends to find
-# lots of threading bugs.
-use Config;
-BEGIN {
-    if( %Config{useithreads} ) {
-        require threads;
-        'threads'->import;
-    }
-}
-
-
-
 use Test::More tests => 5;
 
 my $Test = Test::More->builder;

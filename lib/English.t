@@ -71,7 +71,7 @@ is( $DEBUGGING, $^D, '$DEBUGGING' );
 
 is( $WARNING, 0, '$WARNING' );
 like( $EXECUTABLE_NAME, qr/perl/i, '$EXECUTABLE_NAME' );
-is( $OSNAME, %Config{osname}, '$OSNAME' );
+is( $OSNAME, config_value("osname"), '$OSNAME' );
 
 # may be non-portable
 ok( $SYSTEM_FD_MAX +>= 2, '$SYSTEM_FD_MAX should be at least 2' );

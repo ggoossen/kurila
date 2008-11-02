@@ -6,7 +6,7 @@ BEGIN {
         @INC = @( '../lib' );
     }
     use Config;
-    unless (%Config{usedl}) {
+    unless (config_value("usedl")) {
 	print "1..0 # no usedl, skipping\n";
 	exit 0;
     }
@@ -34,7 +34,7 @@ my $lib = %ENV{PERL_CORE} ? '../../../lib' : '../../blib/lib';
 my $runperl = "$perl \"-I$lib\"";
 print "# perl=$perl\n";
 
-my $make = %Config{make};
+my $make = config_value("make");
 $make = %ENV{MAKE} if exists %ENV{MAKE};
 if ($^O eq 'MSWin32' && $make eq 'nmake') { $make .= " -nologo"; }
 
@@ -166,7 +166,7 @@ sub build_and_run {
 
   if ($^O eq 'VMS') { $make =~ s{ all}{}; }
 
-  if (%Config{usedl}) {
+  if (config_value("usedl")) {
     print "ok $realtest # This is dynamic linking, so no need to make perl\n";
   } else {
     my $makeperl = "$make perl";

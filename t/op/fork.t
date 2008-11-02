@@ -239,8 +239,8 @@ EXPECT
 $| = 1;
 $\ = "\n";
 fork()
- ? do { require Config; print(%Config::Config{osname} eq $^O); }
- : do { require Config; print(%Config::Config{osname} eq $^O); }
+ ? do { require Config; print(Config::config_value("osname") eq $^O); }
+ : do { require Config; print(Config::config_value("osname") eq $^O); }
 EXPECT
 1
 1

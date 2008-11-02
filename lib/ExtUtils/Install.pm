@@ -1218,7 +1218,7 @@ sub DESTROY {
         }
         $plural = $i+>1 ? "all those files" : "this file";
         my $inst = (_invokant() eq 'ExtUtils::MakeMaker')
-                 ? ( %Config::Config{make} || 'make' ).' install UNINST=1'
+                 ? ( config_value("make") || 'make' ).' install UNINST=1'
                  : './Build install uninst=1';
         print "## Running '$inst' will unlink $plural for you.\n";
     }

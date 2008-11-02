@@ -350,15 +350,13 @@ our %gOpts = 	# values are replaced at runtime !!
 # ponie uses it, it's going to be used by something official at least
 # in the interim. So it's nice for tests to all pass.
 
-our $threaded = 1
-  if %Config::Config{useithreads} || %Config::Config{use5005threads};
-our $platform = ($threaded) ? "threaded" : "plain";
-our $thrstat = ($threaded)  ? "threaded" : "nonthreaded";
+our $platform = "plain";
+our $thrstat = "nonthreaded";
 
 our %modes = %(
 	      both	=> \@( 'expect', 'expect_nt'),
-	      native	=> \@( ($threaded) ? 'expect' : 'expect_nt'),
-	      cross	=> \@( !($threaded) ? 'expect' : 'expect_nt'),
+	      native	=> \@( 'expect_nt'),
+	      cross	=> \@( !'expect_nt'),
 	      expect	=> \@( 'expect' ),
 	      expect_nt	=> \@( 'expect_nt' ),
 	      );
