@@ -3,7 +3,7 @@ BEGIN { @INC = @('lib') }
 
 BEGIN {
     use Config;
-    if (%Config{userelocatableinc}) {
+    if (config_value("userelocatableinc")) {
 	# This might be a considered a hack. Need to get information about the
 	# configuration from Config.pm *before* Config.pm expands any .../
 	# prefixes.
@@ -11,9 +11,9 @@ BEGIN {
 	# So we set $^X to pretend that we're the already installed perl, so
 	# Config.pm doesits ... expansion off that location.
 
-	my $location = %Config{initialinstalllocation};
+	my $location = config_value("initialinstalllocation");
 	die <<'OS' unless defined $location;
-%Config{initialinstalllocation} is not defined - can't install a relocatable
+config_value("initialinstalllocation") is not defined - can't install a relocatable
 perl without this.
 OS
 	$^X = "$location/perl";
@@ -35,18 +35,18 @@ use ExtUtils::Packlist;
 use Pod::Man;
 use vars < qw($packlist);
 
-if (%Config{d_umask}) {
+if (config_value("d_umask")) {
     umask(022); # umasks like 077 aren't that useful for installations
 }
 
 %ENV{SHELL} = 'sh' if $^O eq 'os2';
 
-my $ver = %Config{version};     # Not used presently.
+my $ver = config_value("version");     # Not used presently.
 $^V =~ m/kurila-(\d+).(\d+)/ or die "Invalid \$^V";
 my ($release, $patchlevel) = ($1, $2);
 warn "Patchlevel of perl ($patchlevel)" .
-    "and patchlevel of config.sh (%Config{'KURILA_VERSION'}) don't match\n"
-	if $patchlevel != %Config{'KURILA_VERSION'};
+    "and patchlevel of config.sh ($(config_value('KURILA_VERSION'))) don't match\n"
+	if $patchlevel != config_value('KURILA_VERSION');
 
 my $usage =
 "Usage:  installman --man1dir=/usr/wherever --man1ext=1
@@ -54,10 +54,10 @@ my $usage =
 		   --batchlimit=40
 	           --notify --verbose --silent --help
 	Defaults are:
-	man1dir = %Config{'installman1dir'};
-	man1ext = %Config{'man1ext'};
-	man3dir = %Config{'installman3dir'};
-	man3ext = %Config{'man3ext'};
+	man1dir = config_value('installman1dir');
+	man1ext = config_value('man1ext');
+	man3dir = config_value('installman3dir');
+	man3ext = config_value('man3ext');
 	--notify  (or -n) just lists commands that would be executed.
         --verbose (or -V) report all progress.
         --silent  (or -S) be silent. Only report errors.\n";
@@ -70,13 +70,13 @@ GetOptions( \%opts,
 die $usage if %opts{help};
 %opts{destdir} //= '';
 
-%opts{man1dir} = "%opts{destdir}%Config{'installman1dir'}"
+%opts{man1dir} = "%opts{destdir}" . config_value('installman1dir')
     unless defined(%opts{man1dir}); 
-%opts{man1ext} = %Config{'man1ext'}
+%opts{man1ext} = config_value('man1ext')
     unless defined(%opts{man1ext}); 
-%opts{man3dir} = "%opts{destdir}%Config{'installman3dir'}"
+%opts{man3dir} = "%opts{destdir}" . config_value('installman3dir')
     unless defined(%opts{man3dir}); 
-%opts{man3ext} = %Config{'man3ext'}
+%opts{man3ext} = config_value('man3ext')
     unless defined(%opts{man3ext}); 
 %opts{silent} ||= %opts{S};
 %opts{notify} ||= %opts{n};
@@ -84,15 +84,16 @@ die $usage if %opts{help};
 
 #Sanity checks
 
--x  "./perl%Config{exe_ext}" 
+-x  "./perl" . config_value("exe_ext")
   or warn "./perl%Config{exe_ext} not found!  Have you run make?\n";
--d  "%opts{destdir}%Config{'installprivlib'}"
-	|| warn "Perl library directory %Config{'installprivlib'} not found.
+-d  "%opts{destdir}$(config_value('installprivlib'))"
+	|| warn "Perl library directory $(config_value('installprivlib')) not found.
 		Have you run make install?.  (Installing anyway.)\n";
--x "t/perl%Config{exe_ext}"		|| warn "WARNING: You've never run 'make test'!!!" .
+-x "t/perl$(config_value('exe_ext'))"		|| warn "WARNING: You've never run 'make test'!!!" .
 	"  (Installing anyway.)\n";
 
-$packlist = ExtUtils::Packlist->new("%opts{destdir}%Config{installarchlib}/.packlist");
+$packlist = ExtUtils::Packlist->new(
+    "%opts{destdir}$(config_value('installarchlib'))/.packlist");
 
 
 # Install the main pod pages.
