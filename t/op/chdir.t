@@ -8,7 +8,7 @@ my $IsVMS   = $^O eq 'VMS';
 my $IsMacOS = $^O eq 'MacOS';
 
 # For an op regression test, I don't want to rely on "use constant" working.
-my $has_fchdir = (%Config{d_fchdir} || "") eq "define";
+my $has_fchdir = (config_value("d_fchdir") || "") eq "define";
 
 # Might be a little early in the testing process to start using these,
 # but I can't think of a way to write this test without them.
@@ -40,7 +40,8 @@ $Cwd = abs_path;
 
 SKIP: do {
     skip("no fchdir", 16) unless $has_fchdir;
-    my $has_dirfd = (%Config{d_dirfd} || %Config{d_dir_dd_fd} || "") eq "define";
+    my $has_dirfd = (config_value("d_dirfd")
+                       || config_value("d_dir_dd_fd") || "") eq "define";
     ok(opendir(my $dh, "."), "opendir .");
     ok(open(my $fh, "<", "op"), "open op");
     ok(chdir($fh), "fchdir op");
@@ -153,7 +154,7 @@ sub clean_env {
 
         # Can't actually delete SYS$ stuff on VMS.
         next if $IsVMS && $env eq 'SYS$LOGIN';
-        next if $IsVMS && $env eq 'HOME' && !%Config{'d_setenv'};
+        next if $IsVMS && $env eq 'HOME' && ! config_value('d_setenv');
 
         unless ($IsMacOS) { # ENV on MacOS is "special" :-)
             # On VMS, %ENV is many layered.
@@ -191,7 +192,7 @@ foreach my $key ( @magic_envs) {
 
 do {
     clean_env;
-    if (($IsVMS || $IsMacOS) && !%Config{'d_setenv'}) {
+    if (($IsVMS || $IsMacOS) && ! config_value('d_setenv')) {
         pass("Can't reset HOME, so chdir() test meaningless");
     } else {
         ok( !chdir(),                   'chdir() w/o any ENV set' );

@@ -8,7 +8,7 @@ use TestInit;
 use Config;
 
 BEGIN {
-    unless (%Config{'d_fork'}) {
+    unless (config_value('d_fork')) {
         print "1..0 # Skip: no fork\n";
         exit 0;
     }
@@ -124,22 +124,22 @@ tryrun(\%(PERL5OPT => '-t'),
     '-1',
     '');
 
-tryrun(\%(PERLLIB => "foobar%Config{path_sep}42"),
+tryrun(\%(PERLLIB => "foobar$(config_value('path_sep'))42"),
     \@('-e', 'print < grep { $_ eq "foobar" } @INC'),
     'foobar',
     '');
 
-tryrun(\%(PERLLIB => "foobar%Config{path_sep}42"),
+tryrun(\%(PERLLIB => "foobar$(config_value('path_sep'))42"),
     \@('-e', 'print < grep { $_ eq "42" } @INC'),
     '42',
     '');
 
-tryrun(\%(PERL5LIB => "foobar%Config{path_sep}42"),
+tryrun(\%(PERL5LIB => "foobar$(config_value('path_sep'))42"),
     \@('-e', 'print < grep { $_ eq "foobar" } @INC'),
     'foobar',
     '');
 
-tryrun(\%(PERL5LIB => "foobar%Config{path_sep}42"),
+tryrun(\%(PERL5LIB => "foobar$(config_value('path_sep'))42"),
     \@('-e', 'print < grep { $_ eq "42" } @INC'),
     '42',
     '');

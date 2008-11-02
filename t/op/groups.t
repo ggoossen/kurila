@@ -143,7 +143,7 @@ if ($^O =~ m/^(?:uwin|cygwin|interix|solaris)$/) {
 	$gr1 = join(' ', sort grep defined $_ && !%did{$_}++, @gr);
 }
 
-if (%Config{myuname} =~ m/^cygwin_nt/i) {  <# basegroup on CYGWIN_NT has id = 0.
+if (config_value("myuname") =~ m/^cygwin_nt/i) {  <# basegroup on CYGWIN_NT has id = 0.
     %basegroup{[@($pwgid,$pwgnam)]} = (0,0);
 } else { <
     %basegroup{[@($pwgid,$pwgnam)]} = (1,1);
@@ -155,7 +155,7 @@ if ($gr1 eq $gr2 || ($gr1 eq '' && $gr2 eq $pwgid)) {
     print "ok 1\n";
     $ok1++;
 }
-elsif (%Config{myuname} =~ m/^cygwin_nt/i) { # basegroup on CYGWIN_NT has id = 0.
+elsif (config_value("myuname") =~ m/^cygwin_nt/i) { # basegroup on CYGWIN_NT has id = 0.
     # Retry in default unix mode
     %basegroup = %( $pwgid => 1, $pwgnam => 1 );
     $gr2 = join(' ', grep(!%basegroup{$_}++, sort split(' ',$groups)));

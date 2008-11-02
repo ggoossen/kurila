@@ -24,7 +24,7 @@ sub nok ($;$) {
 }
 
 use Config;
-my $have_alarm = %Config{d_alarm};
+my $have_alarm = config_value('d_alarm');
 sub alarm_ok (&) {
     my $test = shift;
 

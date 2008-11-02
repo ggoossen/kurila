@@ -1,4 +1,4 @@
-###### begin =include pod2usage.PL #####
+###### begin =include pod2usage.pl #####
 NAME
     pod2usage - print usage messages from embedded pod docs in files
 
@@ -54,4 +54,4 @@ AUTHOR
     Based on code for pod2text(1) written by Tom Christiansen
     <tchrist@mox.perl.com>
 
-###### end =include pod2usage.PL #####
+###### end =include pod2usage.pl #####
