@@ -52,7 +52,7 @@ use Config;
 use Time::HiRes q(gettimeofday);
 
 my $have_alarm = config_value('d_alarm');
-my $have_fork  = %Config{d_fork};
+my $have_fork  = config_value('d_fork');
 my $waitfor = 180; # 30-45 seconds is normal (load affects this).
 my $timer_pid;
 my $TheEnd;
@@ -219,7 +219,7 @@ unless ($have_gettimeofday) {
  print "# s = $s, n = $n, s/n = ", abs($s)/$n, "\n";
 }
 
-my $has_ualarm = %Config{d_ualarm};
+my $has_ualarm = config_value('d_ualarm');
 
 $has_ualarm ||= $xdefine =~ m/-DHAS_UALARM/;
 
@@ -321,7 +321,7 @@ unless (   defined &Time::HiRes::gettimeofday
 unless (   defined &Time::HiRes::setitimer
 	&& defined &Time::HiRes::getitimer
 	&& has_symbol('ITIMER_VIRTUAL')
-	&& %Config{sig_name} =~ m/\bVTALRM\b/
+	&& config_value("sig_name") =~ m/\bVTALRM\b/
         && $^O !~ m/^(nto)$/) { # nto: QNX 6 has the API but no implementation
     for (18..19) {
 	print "ok $_ # Skip: no virtual interval timers\n";
