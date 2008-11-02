@@ -7,13 +7,7 @@ my $has_perlio;
 use Config;
 
 BEGIN {
-    $can_fork = %Config{'d_fork'} || %Config{'d_pseudofork'};
-
-    if ($^O eq "hpux" or %Config{'extensions'} !~ m/\bSocket\b/ &&
-        !(($^O eq 'VMS') && %Config{d_socket})) {
-	print "1..0\n";
-	exit 0;
-    }
+    $can_fork = config_value('d_fork') || config_value('d_pseudofork');
 }
 
 do {
@@ -54,7 +48,7 @@ use Errno;
 
 my $skip_reason;
 
-if( !%Config{d_alarm} ) {
+if( ! config_value('d_alarm') ) {
   plan skip_all => "alarm() not implemented on this platform";
 } elsif( !$can_fork ) {
   plan skip_all => "fork() not implemented on this platform";

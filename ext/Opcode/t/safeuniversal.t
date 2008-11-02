@@ -2,13 +2,6 @@
 
 use Config;
 
-BEGIN {
-    if (%Config{'extensions'} !~ m/\bOpcode\b/) {
-	print "1..0\n";
-	exit 0;
-    }
-}
-
 use Test::More;
 use Safe;
 plan(tests => 4);

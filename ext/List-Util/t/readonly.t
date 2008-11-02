@@ -2,16 +2,7 @@
 
 use Config;
 
-BEGIN {
-    unless (-d 'blib') {
-	if (%Config{extensions} !~ m/\bList\/Util\b/) {
-	    print "1..0 # Skip: List::Util was not built\n";
-	    exit 0;
-	}
-    }
-}
-
-use Scalar::Util qw(readonly);
+use Scalar::Util < qw(readonly);
 use Test::More tests => 11;
 
 ok( readonly(1),	'number constant');

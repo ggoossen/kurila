@@ -1,19 +1,10 @@
 #!./perl
 
 use Config;
-BEGIN {
-    unless (-d 'blib') {
-	keys %Config; # Silence warning
-	if (%Config{extensions} !~ m/\bList\/Util\b/) {
-	    print "1..0 # Skip: List::Util was not built\n";
-	    exit 0;
-	}
-    }
-}
 
 use Test::More tests => 6;
 
-use List::Util qw(sum);
+use List::Util < qw(sum);
 
 my $v = sum;
 is( $v,	undef,	'no args');

@@ -3,7 +3,6 @@
 BEGIN {
     use Config;
     use Test::More;
-    plan skip_all => "POSIX is unavailable" if %Config{'extensions'} !~ m!\bPOSIX\b!;
 }
 
 use File::Spec;

@@ -2,19 +2,12 @@
 
 use Config;
 
-BEGIN {
-    if ($^O ne 'VMS' and %Config{'extensions'} !~ m/\bPOSIX\b/) {
-	print "1..0\n";
-	exit 0;
-    }
-}
-
 use POSIX;
  
 
 # E.g. \t might or might not be isprint() depending on the locale,
 # so let's reset to the default.
-setlocale(LC_ALL, 'C') if %Config{d_setlocale};
+setlocale(LC_ALL, 'C') if config_value("d_setlocale");
 
 $| = 1;
 

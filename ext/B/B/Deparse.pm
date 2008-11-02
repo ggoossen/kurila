@@ -1222,7 +1222,7 @@ sub populate_curcvlex {
 	for my $i (0 .. nelems(@ns) -1) {
 	    next if class(@ns[$i]) eq "SPECIAL";
 	    next if @ns[$i]->FLAGS ^&^ SVpad_OUR;  # Skip "our" vars
-	    if (class(@ns[$i]) eq "PV") {
+	    if (class(@ns[$i]) eq "PV" or class(@ns[$i]) eq "IV") {
 		# Probably that pesky lexical @_
 		next;
 	    }

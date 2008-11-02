@@ -9,7 +9,7 @@ my $db_file;
 BEGIN {
     use Config;
     foreach (qw/DB_File/) {
-        if (%Config{extensions} =~ m/\b$_\b/) {
+        if (config_value('extensions') =~ m/\b$_\b/) {
             $db_file = $_;
             last;
         }
@@ -102,7 +102,7 @@ SKIP: do {
 };
 
 # Now try to load well known XS modules
-my $extensions = %Config{'dynamic_ext'};
+my $extensions = config_value('dynamic_ext');
 $extensions =~ s|/|::|g;
 
 for my $module (sort keys %modules) {

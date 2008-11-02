@@ -2,20 +2,11 @@
 
 use Config;
 
-BEGIN {
-    unless (-d 'blib') {
-	if (%Config{extensions} !~ m/\bList\/Util\b/) {
-	    print "1..0 # Skip: List::Util was not built\n";
-	    exit 0;
-	}
-    }
-}
-
 use Test::More tests => 23;
 
-use Scalar::Util qw(reftype);
-use vars qw($t $y $x *F);
-use Symbol qw(gensym);
+use Scalar::Util < qw(reftype);
+use vars < qw($t $y $x *F);
+use Symbol < qw(gensym);
 
 # Ensure we do not trigger and tied methods
 tie *F, 'MyTie';

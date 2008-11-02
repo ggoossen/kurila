@@ -41,7 +41,7 @@ like( $@->message, q{/^Can't locate loadable object for module Thwack in @INC/},
         "calling XSLoader::load() under a package with no XS part" );
 
 # Now try to load well known XS modules
-my $extensions = %Config{'extensions'};
+my $extensions = config_value('extensions');
 $extensions =~ s|/|::|g;
 
 for my $module (sort keys %modules) {

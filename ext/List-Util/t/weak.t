@@ -2,16 +2,6 @@
 
 use Config;
 
-BEGIN {
-    unless (-d 'blib') {
-	keys %Config; # Silence warning
-	if (%Config{extensions} !~ m/\bList\/Util\b/) {
-	    print "1..0 # Skip: List::Util was not built\n";
-	    exit 0;
-	}
-    }
-}
-
 use Scalar::Util ();
 use Test::More  (grep { m/weaken/ } < @Scalar::Util::EXPORT_FAIL)
 			? (skip_all => 'weaken requires XS version')
@@ -25,7 +15,7 @@ else {
   *Dump = sub {};
 }
 
-Scalar::Util->import(qw(weaken isweak));
+Scalar::Util->import( < qw(weaken isweak));
 
 if(1) {
 
@@ -35,11 +25,11 @@ my ($y,$z);
 # Case 1: two references, one is weakened, the other is then undef'ed.
 #
 
-{
+do {
 	my $x = "foo";
 	$y = \$x;
 	$z = \$x;
-}
+};
 print "# START\n";
 Dump($y); Dump($z);
 
@@ -73,10 +63,10 @@ Dump($y); Dump($z);
 
 print "# CASE 2:\n";
 
-{
+do {
 	my $x = "foo";
 	$y = \$x;
-}
+};
 
 ok( ref($y) );
 print "# BW: \n";
@@ -94,22 +84,19 @@ print "# EXITBLOCK\n";
 #
 
 my $flag = 0;
-{
+do {
 	my $y = bless \%(), 'Dest';
 	Dump($y);
-	print "# 1: {dump::view($y)}\n";
 	$y->{Self} = $y;
 	Dump($y);
-	print "# 2: {dump::view($y)}\n";
 	$y->{Flag} = \$flag;
-	print "# 3: {dump::view($y)}\n";
 	weaken($y->{Self});
 	print "# WKED\n";
 	ok( ref($y) );
 	print "# VALS: HASH ", dump::view($y),"   SELF ", dump::view(\$y->{Self}),"  Y ", dump::view(\$y), 
 		"    FLAG: ", dump::view(\$y->{Flag}),"\n";
 	print "# VPRINT\n";
-}
+};
 print "# OUT $flag\n";
 ok( $flag == 1 );
 
@@ -124,7 +111,7 @@ print "# FLAGU\n";
 #
 
 $flag = 0;
-{
+do {
 	my $y = bless \%(), 'Dest';
 	my $x = bless \%(), 'Dest';
 	$x->{Ref} = $y;
@@ -132,7 +119,7 @@ $flag = 0;
 	$x->{Flag} = \$flag;
 	$y->{Flag} = \$flag;
 	weaken($x->{Ref});
-}
+};
 ok( $flag == 2 );
 
 #
@@ -140,11 +127,11 @@ ok( $flag == 2 );
 #
 
 our ($y, $z);
-{
+do {
 	my $x = "foo";
 	$y = \$x;
 	$z = \$x;
-}
+};
 
 print "# CASE5\n";
 Dump($y);
@@ -179,9 +166,9 @@ ok(!isweak($x->{Z}));
 # Case 7: test weaken on a read only ref
 #
 
-SKIP: {
+SKIP: do {
     # in a MAD build, constants have refcnt 2, not 1
-    skip("Test does not work with MAD", 5) if exists %Config{mad};
+    skip("Test does not work with MAD", 5) if config_value("mad");
 
     $a = eval '\"hello"';
     ok(ref($a)) or print "# didn't get a ref from eval\n";
@@ -193,7 +180,7 @@ SKIP: {
     ok($$b eq "hello") or print "# b is '$$b'\n";
     $a="";
     ok(not $b) or print "# b didn't go away\n";
-}
+};
 
 package Dest;
 

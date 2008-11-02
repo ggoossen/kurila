@@ -2,15 +2,6 @@
 
 use Config;
 
-BEGIN {
-    unless (-d 'blib') {
-	if (%Config{extensions} !~ m/\bList\/Util\b/) {
-	    print "1..0 # Skip: List::Util was not built\n";
-	    exit 0;
-	}
-    }
-}
-
 use Scalar::Util ();
 use Test::More  (grep { m/set_prototype/ } < @Scalar::Util::EXPORT_FAIL)
 			? (skip_all => 'set_prototype requires XS version')

@@ -4,13 +4,6 @@ $|=1;
 
 use Config;
 
-BEGIN {
-    if (%Config{'extensions'} !~ m/\bOpcode\b/ && %Config{'osname'} ne 'VMS') {
-        print "1..0\n";
-        exit 0;
-    }
-}
-
 use Test::More;
 
 use Opcode < qw(
