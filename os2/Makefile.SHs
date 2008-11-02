@@ -432,12 +432,6 @@ do
 	fi
 done
 
-# ext/threads is marked as NORECURS, so we need to specialcase it
-if echo "$static_ext $dynamic_ext" | grep -q threads/shared ; then
-   preci="$preci ext/threads/%/Makefile.aout"
-   dirs="$dirs ext/threads"
-fi
-
 $spitshell >>Makefile <<!GROK!THIS!
 .PRECIOUS : $preci
 

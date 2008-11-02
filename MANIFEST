@@ -582,51 +582,6 @@ ext/Sys-Syslog/win32/PerlLog_dll.uu	Sys::Syslog extension Win32 related file
 ext/Sys-Syslog/win32/PerlLog.mc	Sys::Syslog extension Win32 related file
 ext/Sys-Syslog/win32/PerlLog_RES.uu	Sys::Syslog extension Win32 related file
 ext/Sys-Syslog/win32/Win32.pm	Sys::Syslog extension Win32 related file
-ext/threads/hints/hpux.pl	Hint file for HPUX
-ext/threads/hints/linux.pl	Hint file for Linux
-ext/threads/Makefile.PL		ithreads
-ext/threads-shared/hints/linux.pl	thread shared variables
-ext/threads-shared/Makefile.PL	thread shared variables
-ext/threads-shared/shared.pm	thread shared variables
-ext/threads-shared/shared.xs	thread shared variables
-ext/threads-shared/t/0nothread.t	Tests for basic shared array functionality.
-ext/threads-shared/t/av_refs.t	Tests for arrays containing references
-ext/threads-shared/t/av_simple.t	Tests for basic shared array functionality.
-ext/threads-shared/t/blessed.t	Test blessed shared variables
-ext/threads-shared/t/cond.t	Test condition variables
-ext/threads-shared/t/disabled.t	Test threads::shared when threads are disabled.
-ext/threads-shared/t/hv_refs.t	Test shared hashes containing references
-ext/threads-shared/t/hv_simple.t	Tests for basic shared hash functionality.
-ext/threads-shared/t/no_share.t	Tests for disabled share on variables.
-ext/threads-shared/t/object.t	Shared objects tests
-ext/threads-shared/t/shared_attr.t	Test :shared attribute
-ext/threads-shared/t/stress.t	Stress test
-ext/threads-shared/t/sv_refs.t	thread shared variables
-ext/threads-shared/t/sv_simple.t	thread shared variables
-ext/threads-shared/t/waithires.t	Test sub-second cond_timedwait
-ext/threads-shared/t/wait.t	Test cond_wait and cond_timedwait
-ext/threads/t/basic.t		ithreads
-ext/threads/t/blocks.t		Test threads in special blocks
-ext/threads/t/context.t		Explicit thread context
-ext/threads/t/end.t		Test end functions
-ext/threads/t/err.t		Test $thr->error()
-ext/threads/t/exit.t		Test exit and die in threads
-ext/threads/t/free2.t		More ithread destruction tests
-ext/threads/t/free.t		Test ithread destruction
-ext/threads/threads.pm		ithreads
-ext/threads/threads.xs		ithreads
-ext/threads/t/join.t		Testing the join function
-ext/threads/t/kill.t		Tests thread signalling
-ext/threads/t/libc.t		testing libc functions for threadsafety
-ext/threads/t/list.t		Test threads->list()
-ext/threads/t/problems.t	Test various memory problems
-ext/threads/t/stack_env.t	Tests for stack limits
-ext/threads/t/stack.t		Tests for stack limits
-ext/threads/t/state.t		Tests state methods
-ext/threads/t/stress_cv.t	Test with multiple threads, coderef cv argument.
-ext/threads/t/stress_re.t	Test with multiple threads, string cv argument and regexes.
-ext/threads/t/stress_string.t	Test with multiple threads, string cv argument.
-ext/threads/t/thread.t		General ithread tests from thr5005
 ext/Time-HiRes/Changes		Time::HiRes extension
 ext/Time-HiRes/fallback/const-c.inc	Time::HiRes extension
 ext/Time-HiRes/fallback/const-xs.inc	Time::HiRes extension
