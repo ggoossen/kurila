@@ -17,7 +17,7 @@ WriteMakefile(
     VERSION_FROM        => 'Storable.pm',
 );
 
-my $ivtype = %Config{ivtype};
+my $ivtype = config_value("ivtype");
 
 # I don't know if the VMS folks ever supported long long on 5.6.x
 if ($ivtype and $ivtype eq 'long long' and $^O !~ m/^MSWin/) {
