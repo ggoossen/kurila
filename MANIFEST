@@ -1498,14 +1498,12 @@ lib/Test/Simple/t/tbt_04line_num.t	Test::Builder::Tester test
 lib/Test/Simple/t/tbt_05faildiag.t	Test::Builder::Tester test
 lib/Test/Simple/t/tbt_06errormess.t	Test::Builder::Tester test
 lib/Test/Simple/t/tbt_07args.t	Test::Builder::Tester test
-lib/Test/Simple/t/threads.t	Test::Builder thread-safe checks
 lib/Test/Simple/t/thread_taint.t	Test::Simple test
 lib/Test/Simple/t/todo.t	Test::More test, TODO tests
 lib/Test/Simple/t/try.t		Test::More test
 lib/Test/Simple/t/undef.t	Test::More test, undefs don't cause warnings
 lib/Test/Simple/t/useing.t	Test::More test, compile test
 lib/Test/Simple/t/use_ok.t	Test::More test, use_ok()
-lib/Test/Simple/t/utf8.t	Test::More test
 lib/Test/t/fail.t		See if Test works
 lib/Test/t/mix.t		See if Test works
 lib/Test/t/multiline.t		See if Test works
