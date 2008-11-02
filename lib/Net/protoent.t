@@ -6,7 +6,7 @@ BEGIN {
     $haspe = 1 unless $@ && $@->{description} =~ m/unimplemented|unsupported/i;
     unless ($haspe) { print "1..0 # Skip: no getprotobyname\n"; exit 0 }
     use Config;
-    $haspe = 0 unless %Config{'i_netdb'} eq 'define';
+    $haspe = 0 unless config_value('i_netdb') eq 'define';
     unless ($haspe) { print "1..0 # Skip: no netdb.h\n"; exit 0 }
 }
 

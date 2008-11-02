@@ -1467,7 +1467,6 @@ lib/Test/Simple/t/has_plan2.t	Test::More->plan tests
 lib/Test/Simple/t/has_plan.t	Test::Builder->plan tests
 lib/Test/Simple/t/import.t	Test::More test, importing functions
 lib/Test/Simple/t/is_deeply_fail.t	Test::More test, is_deeply()
-lib/Test/Simple/t/is_deeply_with_threads.t	Test::More test
 lib/Test/Simple/t/is_fh.t	Test::Builder test, _is_fh()
 lib/Test/Simple/t/lib/Dummy.pm	Test::More test module
 lib/Test/Simple/t/lib/MyOverload.pm	Test::More test module 
@@ -2444,8 +2443,6 @@ t/op/sub.t			See if subroutines work
 t/op/symbolcache.t		See if undef/delete works on stashes with functions
 t/op/sysio.t			See if sysread and syswrite work
 t/op/taint.t			See if tainting works
-t/op/threads_create.pl		Ancillary file for t/op/threads.t
-t/op/threads.t			Misc. tests for perl features with threads
 t/op/tie.t			See if tie/untie functions work
 t/op/time.t			See if time functions work
 t/op/undef.t			See if undef works

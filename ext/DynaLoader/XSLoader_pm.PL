@@ -11,7 +11,7 @@ sub to_string {
 1 while unlink "XSLoader.pm";
 open OUT, ">", "XSLoader.pm" or die $!;
 print OUT <<'EOT';
-# Generated from XSLoader.pm.PL (resolved %Config::Config value)
+# Generated from XSLoader.pm.PL (resolved config_value() value)
 
 package XSLoader;
 
@@ -22,7 +22,7 @@ our $VERSION = "0.08";
 
 EOT
 
-print OUT '  my $dl_dlext = ', to_string(%Config::Config{'dlext'}), ";\n" ;
+print OUT '  my $dl_dlext = ', to_string(Config::config_value('dlext')), ";\n" ;
 
 print OUT <<'EOT';
 

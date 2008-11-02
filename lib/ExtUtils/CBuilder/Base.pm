@@ -2,7 +2,7 @@ package ExtUtils::CBuilder::Base;
 
 use File::Spec;
 use File::Basename;
-use Config;
+use Config < qw(config_value config_keys);
 use Text::ParseWords;
 
 use vars < qw($VERSION);
@@ -15,8 +15,9 @@ sub new {
   $self->{properties}->{perl} = $class->find_perl_interpreter
     or warn "Warning: Can't locate your perl binary";
 
-  while (my ($k,$v) = each %Config) {
-    $self->{config}->{$k} = $v unless exists $self->{config}->{$k};
+  for my $k (config_keys) {
+      my $v = config_value($k);
+      $self->{config}->{$k} = $v unless exists $self->{config}->{$k};
   }
   return $self;
 }
@@ -24,7 +25,7 @@ sub new {
 sub find_perl_interpreter {
   my $perl;
   File::Spec->file_name_is_absolute($perl = $^X)
-    or -f ($perl = %Config::Config{perlpath})
+    or -f ($perl = Config::config_value("perlpath"))
     or ($perl = $^X);
   return $perl;
 }

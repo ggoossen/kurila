@@ -143,7 +143,7 @@ for my $cross_partition_test (0..1) {
   unlink "lib/file-$$" or die "unlink: $!";
 
   SKIP: do {
-    skip "Testing symlinks", 3 unless %Config{d_symlink};
+    skip "Testing symlinks", 3 unless config_value("d_symlink");
 
     open(F, ">", "file-$$") or die $!;
     print F "dummy content\n";
@@ -164,7 +164,7 @@ for my $cross_partition_test (0..1) {
 
   SKIP: do {
     skip "Testing hard links", 3 
-         if !%Config{d_link} or $^O eq 'MSWin32' or $^O eq 'cygwin';
+         if !config_value("d_link") or $^O eq 'MSWin32' or $^O eq 'cygwin';
 
     open(F, ">", "file-$$") or die $!;
     print F "dummy content\n";

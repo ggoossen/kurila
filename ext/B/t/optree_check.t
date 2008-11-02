@@ -1,13 +1,5 @@
 #!perl
 
-BEGIN {
-    if ((%Config::Config{'extensions'} !~ m/\bB\b/) ){
-        print "1..0 # Skip -- Perl configured without B module\n";
-        exit 0;
-    }
-    # require 'test.pl'; # now done by OptreeCheck
-}
-
 use OptreeCheck;
 
 =head1 OptreeCheck selftest harness
@@ -26,7 +18,7 @@ plan tests => $tests;
 
 SKIP: {
     skip "no perlio in this build", $tests
-    unless %Config::Config{useperlio};
+    unless Config::config_value("useperlio");
 
 
 pass("REGEX TEST HARNESS SELFTEST");

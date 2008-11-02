@@ -75,7 +75,7 @@ ok( add_file('foo'), 'add a temporary file' );
 # Some platforms don't have chmod or an executable bit, in which case
 # this call will do nothing or fail, but on the platforms where chmod()
 # works, we test the executable bit is copied
-chmod( 0744, 'foo') if %Config{'chmod'};
+chmod( 0744, 'foo') if config_value('chmod');
 
 # there shouldn't be a MANIFEST there
 my ($res, $warn) = < catch_warning( \&mkmanifest );

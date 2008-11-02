@@ -426,8 +426,8 @@ sub dl_findfile {
     my (@args) = @_;
     my (@dirs);   # which directories to search
     my (@found);         # full paths to real files we have found
-    #my $dl_ext= <<=to_string(config_value('dlext'))>>; # %Config::Config{'dlext'} suffix for perl extensions
-    #my $dl_so = <<=to_string(config_value('so'))>>; # %Config::Config{'so'} suffix for shared libraries
+    #my $dl_ext= <<=to_string(config_value('dlext'))>>; # config_value('dlext') suffix for perl extensions
+    #my $dl_so = <<=to_string(config_value('so'))>>; # config_value('so') suffix for shared libraries
 
     print STDERR "dl_findfile(@args)\n" if $dl_debug;
 

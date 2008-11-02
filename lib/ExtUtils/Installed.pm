@@ -92,7 +92,8 @@ sub new {
         );
     }
     else {
-        $self->{':private:'}->{Config} = \%Config;
+        $self->{':private:'}->{Config} = \%:<
+          map { ($_ => config_value($_)) } config_keys();
     }
     
     for my $tuple (@(\@(inc_override => INC => \ @INC ),
@@ -119,7 +120,7 @@ sub new {
 
     my @dirs = @( $self->{':private:'}->{Config}->{archlibexp},
                  $self->{':private:'}->{Config}->{sitearchexp}, <
-                 split(m/\Q%Config{path_sep}\E/, $perl5lib),
+                 split(m/\Q$(config_value("path_sep"))\E/, $perl5lib),
                  < @{$self->{':private:'}->{EXTRA}},
                );   
     
@@ -315,7 +316,7 @@ information from the .packlist files.
 The new() function searches for all the installed .packlists on the system, and
 stores their contents. The .packlists can be queried with the functions
 described below. Where it searches by default is determined by the settings found
-in C<%Config::Config>, and what the value is of the PERL5LIB environment variable.
+in C<Config::config_value>, and what the value is of the PERL5LIB environment variable.
 
 =head1 FUNCTIONS
 
@@ -325,13 +326,13 @@ in C<%Config::Config>, and what the value is of the PERL5LIB environment variabl
 
 This takes optional named parameters. Without parameters, this
 searches for all the installed .packlists on the system using
-information from C<%Config::Config> and the default module search
+information from C<Config::config_value> and the default module search
 paths C<@INC>. The packlists are read using the
 L<ExtUtils::Packlist> module.
 
 If the named parameter C<config_override> is specified,
 it should be a reference to a hash which contains all information
-usually found in C<%Config::Config>. For example, you can obtain
+usually found in C<Config::config_value>. For example, you can obtain
 the configuration information for a separate perl installation and
 pass that in.
 

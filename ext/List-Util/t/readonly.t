@@ -42,8 +42,5 @@ sub tryreadonly
 }
 
 $var = 123;
-{
-    local $TODO = %Config::Config{useithreads} ? "doesn't work with threads" : undef;
-    ok( tryreadonly("abc"), 'reference a constant in a sub');
-}
+ok( tryreadonly("abc"), 'reference a constant in a sub');
 ok( !tryreadonly($var), 'reference a non-constant in a sub');

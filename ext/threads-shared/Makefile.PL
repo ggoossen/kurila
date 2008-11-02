@@ -30,7 +30,7 @@ sub have_cc
     if ($@) {
         try { require Config; };   # Everyone else
     }
-    my @chunks = split(m/ /, %Config::Config{cc});
+    my @chunks = split(m/ /, Config::config_value("cc"));
     # $Config{cc} may contain args; try to find out the program part
     while ((nelems @chunks)) {
         if (check_cc("$(join ' ',@chunks)")) {

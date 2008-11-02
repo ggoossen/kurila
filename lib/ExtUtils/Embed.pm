@@ -29,7 +29,7 @@ $VERSION = '1.26_01';
 #*canon = \&ExtUtils::Miniperl::canon;
 
 $Verbose = 0;
-$lib_ext = %Config{lib_ext} || '.a';
+$lib_ext = config_value("lib_ext") || '.a';
 
 sub is_cmd { $0 eq '-e' }
 
@@ -132,7 +132,7 @@ sub xsi_body {
 
 sub static_ext {
     unless (scalar nelems @Extensions) {
-      my $static_ext = %Config{static_ext};
+      my $static_ext = config_value("static_ext");
       $static_ext =~ s/^\s+//;
       @Extensions = sort split m/\s+/, $static_ext;
 	unshift @Extensions, < qw(DynaLoader);
@@ -146,19 +146,19 @@ sub _escape {
 }
 
 sub _ldflags {
-    my $ldflags = %Config{ldflags};
+    my $ldflags = config_value("ldflags");
     _escape(\$ldflags);
     return $ldflags;
 }
 
 sub _ccflags {
-    my $ccflags = %Config{ccflags};
+    my $ccflags = config_value("ccflags");
     _escape(\$ccflags);
     return $ccflags;
 }
 
 sub _ccdlflags {
-    my $ccdlflags = %Config{ccdlflags};
+    my $ccdlflags = config_value("ccdlflags");
     _escape(\$ccdlflags);
     return $ccdlflags;
 }
@@ -185,13 +185,13 @@ sub ldopts {
        }
     }
     $std = 1 unless scalar nelems @link_args;
-    my $sep = %Config{path_sep} || ':';
+    my $sep = config_value("path_sep") || ':';
     @path = @( $path ? < split(m/\Q$sep/, $path) : < @INC );
 
     push(@potential_libs, < @link_args)    if scalar nelems @link_args;
     # makemaker includes std libs on windows by default
     if ($^O ne 'MSWin32' and defined($std)) {
-	push(@potential_libs, %Config{perllibs});
+	push(@potential_libs, config_value("perllibs"));
     }
 
     push(@mods, < static_ext()) if $std;
@@ -224,18 +224,18 @@ sub ldopts {
 
     my $libperl;
     if ($^O eq 'MSWin32') {
-	$libperl = %Config{libperl};
+	$libperl = config_value("libperl");
     }
-    elsif ($^O eq 'os390' && %Config{usedl}) {
+    elsif ($^O eq 'os390' && config_value("usedl")) {
 	# Nothing for OS/390 (z/OS) dynamic.
     } else {
 	$libperl = (grep(m/^-l\w*perl\w*$/, @link_args))[0]
-	    || (%Config{libperl} =~ m/^lib(\w+)(\Q$lib_ext\E|\.\Q%Config{dlext}\E)$/
+	    || (config_value("libperl") =~ m/^lib(\w+)(\Q$lib_ext\E|\.\Q$(config_value("dlext"))\E)$/
 		? "-l$1" : '')
 		|| "-lperl";
     }
 
-    my $lpath = File::Spec->catdir(%Config{archlibexp}, 'CORE');
+    my $lpath = File::Spec->catdir(config_value("archlibexp"), 'CORE');
     $lpath = qq["$lpath"] if $^O eq 'MSWin32';
     my($extralibs, $bsloadlibs, $ldloadlibs, $ld_run_path) = <
 	MM->ext(join ' ', @( "-L$lpath", $libperl, < @potential_libs));
@@ -262,7 +262,7 @@ sub ccdlflags {
 }
 
 sub perl_inc {
-    my $dir = File::Spec->catdir(%Config{archlibexp}, 'CORE');
+    my $dir = File::Spec->catdir(config_value("archlibexp"), 'CORE');
     $dir = qq["$dir"] if $^O eq 'MSWin32';
     my_return(" -I$dir ");
 }

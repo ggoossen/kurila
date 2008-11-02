@@ -10,11 +10,6 @@ BEGIN {
     chdir('t') if -d 't';
     if (%ENV{PERL_CORE}){
 	@INC = @('.', '../lib', '../ext/Storable/t');
-        require Config;
-        if (%Config::Config{'extensions'} !~ m/\bStorable\b/) {
-            print "1..0 # Skip: Storable was not built\n";
-            exit 0;
-        }
     } else {
         if (!eval "require Hash::Util") {
             if ($@->{description} =~ m/Can\'t locate Hash\/Util\.pm in \@INC/s) {

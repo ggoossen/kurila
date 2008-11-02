@@ -96,11 +96,7 @@ Looking at ../foo2, you'll see 34 occurrences of the following error:
 
 BEGIN {
     require Config;
-    if ((%Config::Config{'extensions'} !~ m/\bB\b/) ){
-        print "1..0 # Skip -- Perl configured without B module\n";
-        exit 0;
-    }
-    unless (%Config::Config{useperlio}) {
+    unless (Config::config_value("useperlio")) {
         print "1..0 # Skip -- Perl configured without perlio\n";
         exit 0;
     }
