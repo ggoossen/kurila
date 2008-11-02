@@ -14,10 +14,6 @@ BEGIN {
     } else {
 	unshift @INC, 't';
     }
-    if (%ENV{PERL_CORE} and %Config{'extensions'} !~ m/\bStorable\b/) {
-        print "1..0 # Skip: Storable was not built\n";
-        exit 0;
-    }
     require 'st-dump.pl';
 }
 
