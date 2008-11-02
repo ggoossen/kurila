@@ -1129,7 +1129,7 @@ _cleaner2:
 	-rmdir lib/Data
 	-rmdir lib/Filter/Util lib/IO/Socket
 	-rmdir lib/List lib/MIME lib/Scalar lib/Sys
-	-rmdir lib/threads lib/XS
+	-rmdir lib/XS
 	-rm -f cygcrypt-0.dll cygwin1.dll
 	-rm -f lib/ExtUtils/CBuilder/t/libcompilet.dll.a
 	-rm -f lib/ExtUtils/ParseXS/t/libXSTest.dll.a

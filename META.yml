@@ -26,9 +26,6 @@ no_index:
     - ext/Storable
     - ext/Sys/Syslog
     - ext/Text/Soundex
-    - ext/threads/hints
-    - ext/threads/shared
-    - ext/threads/t
     - ext/Time/HiRes
     - ext/Time/Piece
     - ext/Unicode/Normalize
@@ -108,8 +105,6 @@ no_index:
     - ext/DynaLoader/XSLoader_pm.PL
     - ext/Filter/t/call.t
     - ext/Opcode/Safe.pm
-    - ext/threads/threads.pm
-    - ext/threads/threads.xs
     - lib/Archive/Extract.pm
     - lib/Archive/Tar.pm
     - lib/Attribute/Handlers.pm
