@@ -3,7 +3,7 @@
 use Config;
 
 BEGIN {
-    if (not %Config{'d_readdir'}) {
+    if (not config_value('d_readdir')) {
 	print "1..0 # Skip: readdir() not available\n";
 	exit 0;
     }

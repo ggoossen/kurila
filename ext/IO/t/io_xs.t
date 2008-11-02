@@ -3,13 +3,7 @@
 use Config;
 
 BEGIN {
-    if(%ENV{PERL_CORE}) {
-        if (%Config{'extensions'} !~ m/\bIO\b/) {
-	    print "1..0 # Skip: IO extension not built\n";
-	    exit 0;
-        }
-    }
-    if( $^O eq 'VMS' && %Config{'vms_cc_type'} ne 'decc' ) {
+    if( $^O eq 'VMS' && config_value('vms_cc_type') ne 'decc' ) {
         print "1..0 # Skip: not compatible with the VAXCRTL\n";
         exit 0;
     }

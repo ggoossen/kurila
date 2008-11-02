@@ -421,7 +421,7 @@ END
 	    $test++;
 	  }
 
-	  if (%Config{d_fork} and $^O ne 'VMS' and $^O ne 'MSWin32' and $^O ne 'NetWare') {
+	  if (config_value('d_fork') and $^O ne 'VMS' and $^O ne 'MSWin32' and $^O ne 'NetWare') {
 	    # Fork off a new perl to run the tests.
 	    # (This is so we can catch spurious warnings.)
 	    $| = 1; print ""; $| = 0; # flush output before forking

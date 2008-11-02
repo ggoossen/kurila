@@ -4,13 +4,7 @@ use Config;
 
 BEGIN {
     my $reason;
-    if (%ENV{PERL_CORE} and %Config{'extensions'} !~ m/\bSocket\b/) {
-	$reason = 'Socket extension unavailable';
-    }
-    elsif (%ENV{PERL_CORE} and %Config{'extensions'} !~ m/\bIO\b/) {
-	$reason = 'IO extension unavailable';
-    }
-    elsif ($^O eq 'os2') {
+    if ($^O eq 'os2') {
 	require IO::Socket;
 
 	try {IO::Socket::pack_sockaddr_un('/foo/bar') || 1}

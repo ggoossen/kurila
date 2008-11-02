@@ -154,7 +154,7 @@ do {
     if ($^O eq 'qnx') {
 	chomp($wd = `/usr/bin/fullpath -t`);
     }
-    elsif($Is_Cygwin || %Config{'d_procselfexe'}) {
+    elsif($Is_Cygwin || config_value('d_procselfexe')) {
        # Cygwin turns the symlink into the real file
        chomp($wd = `pwd`);
        $wd =~ s#/t$##;

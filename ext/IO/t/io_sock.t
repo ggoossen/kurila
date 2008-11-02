@@ -11,13 +11,7 @@ BEGIN {
 		     %Config{ccflags} =~ m/-DPERL_IMPLICIT_SYS/
 		    );
     my $reason;
-    if (%ENV{PERL_CORE} and %Config{'extensions'} !~ m/\bSocket\b/) {
-	$reason = 'Socket extension unavailable';
-    }
-    elsif (%ENV{PERL_CORE} and %Config{'extensions'} !~ m/\bIO\b/) {
-	$reason = 'IO extension unavailable';
-    }
-    elsif (!$can_fork) {
+    if (!$can_fork) {
         $reason = 'no fork';
     }
     if ($reason) {
