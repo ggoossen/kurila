@@ -6,7 +6,7 @@ BEGIN {
 
 BEGIN {
     use Config;
-    if( !%Config{d_alarm} ) {
+    if( ! config_value('d_alarm') ) {
         skip_all("alarm() not implemented on this platform");
     }
 }

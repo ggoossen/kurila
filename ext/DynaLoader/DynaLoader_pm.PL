@@ -121,7 +121,7 @@ if (%ENV{PERL_BUILD_EXPAND_CONFIG_VARS}) {
 }
 else {
     print OUT <<'EOT';
-our ($dl_dlext, $dl_so, $dlsrc) = < %Config::Config{[qw(dlext so dlsrc)]};
+our ($dl_dlext, $dl_so, $dlsrc) = < map { config_value($_) } qw(dlext so dlsrc);
 EOT
 }
 

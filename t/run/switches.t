@@ -224,8 +224,13 @@ do {
     local $TODO = '';   # these ones should work on VMS
 
     my (undef, $v) = < split m/-/, $^V;
+    my $archname = config_value('archname');
     like( runperl( switches => \@('-v') ),
-	  qr/This is kurila, v$v (?:DEVEL\w+ )?built for \Q%Config{archname}\E.+Copyright.+Gerard Goossen.+Artistic License.+GNU General Public License/s,
+	  qr/This[ ]is[ ]kurila,[  ]v$v [ ] (?:DEVEL\w+[ ])? built[ ]for[ ]
+             \Q$archname\E .+
+             Copyright .+
+             Gerard[ ]Goossen.+Artistic[ ]License .+
+             GNU[ ]General[ ]Public[ ]License/x,
           '-v looks okay' );
 
 };
@@ -236,7 +241,7 @@ do {
     local $TODO = '';   # these ones should work on VMS
 
     like( runperl( switches => \@('-h') ),
-	  qr/Usage: .+(?i:perl(?:%Config{_exe})?).+switches.+programfile.+arguments/,
+	  qr/Usage: .+(?i:perl(?:$(config_value('_exe')))?).+switches.+programfile.+arguments/,
           '-h looks okay' );
 
 };

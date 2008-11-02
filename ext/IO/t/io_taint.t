@@ -2,13 +2,6 @@
 
 use Config;
 
-BEGIN {
-    if (%ENV{PERL_CORE} and %Config{'extensions'} !~ m/\bIO\b/ && $^O ne 'VMS') {
-	print "1..0\n";
-	exit 0;
-    }
-}
-
 END { unlink "./__taint__$$" }
 
 print "1..3\n";
