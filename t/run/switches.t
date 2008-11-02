@@ -6,7 +6,7 @@
 
 BEGIN { require "./test.pl"; }
 
-plan(tests => 64);
+plan(tests => 63);
 
 use Config;
 
@@ -202,11 +202,6 @@ do {
     chomp( $r=runperl( switches => \@('-V:osname') ) );
     is( $r, "osname='$^O';", 'perl -V:osname');
 
-    # lookup a nonexistent var
-    chomp( $r=runperl( switches => \@('-V:this_var_makes_switches_test_fail') ) );
-    is( $r, "this_var_makes_switches_test_fail='UNKNOWN';",
-        'perl -V:unknown var');
-
     # regexp lookup
     # platforms that don't like this quoting can either skip this test
     # or fix test.pl _quote_args
@@ -230,7 +225,7 @@ do {
              \Q$archname\E .+
              Copyright .+
              Gerard[ ]Goossen.+Artistic[ ]License .+
-             GNU[ ]General[ ]Public[ ]License/x,
+             GNU[ ]General[ ]Public[ ]License/xs,
           '-v looks okay' );
 
 };

@@ -2352,7 +2352,6 @@ t/op/exec.t			See if exec, system and qx work
 t/op/exp.t			See if math functions work
 t/op/filetest.t			See if file tests work
 t/op/fork.t			See if fork works
-t/op/getpid.t			See if $$ and getppid work with threads
 t/op/getppid.t			See if getppid works
 t/op/glob.t			See if <*> works
 t/op/goto.t			See if goto works
@@ -2365,7 +2364,6 @@ t/op/hashwarn.t			See if warnings for bad hash assignments work
 t/op/inccode.t			See if coderefs work in @INC
 t/op/inc.t			See if inc/dec of integers near 32 bit limit work
 t/op/index.t			See if index works
-t/op/index_thr.t		See if index works in another thread
 t/op/int.t			See if int works
 t/op/join.t			See if join works
 t/op/kill0.t			See if kill(0, $pid) works
@@ -2395,7 +2393,6 @@ t/op/or.t			See if || works in weird situations
 t/op/override.t			See if operator overriding works
 t/op/pack.t			See if pack and unpack work
 t/op/pat.t			See if esoteric patterns work
-t/op/pat_thr.t			See if esoteric patterns work in another thread
 t/op/pos.t			See if pos works
 t/op/pow.t			See if ** works
 t/op/push.t			See if push and pop work
@@ -2414,11 +2411,9 @@ t/op/ref_eq.t			See if \== and \!= work
 t/op/ref.t			See if refs and objects work
 t/op/reftype.t			See if ref::reftype works
 t/op/reg_email.t		See if regex recursion works by parsing email addresses
-t/op/reg_email_thr.t		See if regex recursion works by parsing email addresses in another thread
 t/op/regexp_noamp.t		See if regular expressions work with optimizations
 t/op/regexp_notrie.t		See if regular expressions work without trie optimisation
 t/op/regexp_qr_embed.t		See if regular expressions work with embedded qr//
-t/op/regexp_qr_embed_thr.t	See if regular expressions work with embedded qr// in another thread
 t/op/regexp_qr.t		See if regular expressions work as qr//
 t/op/regexp.t			See if regular expressions work
 t/op/regexp_trielist.t		See if regular expressions work with trie optimisation
@@ -2445,7 +2440,6 @@ t/op/state.t			See if state variables work
 t/op/stat.t			See if stat works
 t/op/study.t			See if study works
 t/op/substr.t			See if substr works
-t/op/substr_thr.t		See if substr works in another thread
 t/op/subst.t			See if substitution works
 t/op/substT.t			See if substitution works with -T
 t/op/sub.t			See if subroutines work

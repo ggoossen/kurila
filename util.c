@@ -1240,7 +1240,7 @@ Perl_vdie_common(pTHX_ SV *msv, bool warn)
 	return FALSE;
     }
 
-    if (SvRV(oldhook) && (SvTYPE(SvRV(oldhook)) == SVt_PVCV) )
+    if ( SvOK(oldhook) && SvRV(oldhook) && (SvTYPE(SvRV(oldhook)) == SVt_PVCV) )
 	cv = SvRV(oldhook);
 
     if (cv && !CvDEPTH(cv) && (CvROOT(cv) || CvXSUB(cv))) {

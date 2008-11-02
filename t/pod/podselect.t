@@ -13,6 +13,6 @@ exit( ($passed == 1) ? 0 : -1 )  unless %ENV{HARNESS_ACTIVE};
 
 __END__
 
-=include podselect.PL
+=include podselect.pl
 
 
