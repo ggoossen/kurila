@@ -35,7 +35,8 @@ sub _expansion {
     if ($op ne 'eq' and $op ne 'ne') {die "wrong eq-ne arg"};
     if ($expr =~ m[^(.*?)<<\|\$\^O-$op-$os>>(.*?)$]s) {
         my ($if,$el) = ($1,$2);
-        if (($op eq 'eq' and ($^O eq $os || %Config{osname} eq $os)) || ($op eq 'ne' and ($^O ne $os || %Config{osname} ne $os))) {
+        if (($op eq 'eq' and ($^O eq $os || config_value("osname") eq $os))
+              || ($op eq 'ne' and ($^O ne $os || config_value("osname") ne $os))) {
             return $if
         }
         else {
@@ -44,7 +45,8 @@ sub _expansion {
     }
     else {
         # #if;#endif
-        if (($op eq 'eq' and ($^O eq $os || %Config{osname} eq $os)) || ($op eq 'ne' and ($^O ne $os || %Config{osname} ne $os))) {
+        if (($op eq 'eq' and ($^O eq $os || config_value("osname") eq $os))
+              || ($op eq 'ne' and ($^O ne $os || config_value("osname") ne $os))) {
             return $expr
         }
         else {
@@ -113,9 +115,9 @@ EOT
 
 if (%ENV{PERL_BUILD_EXPAND_CONFIG_VARS}) {
     print OUT "our (\$dl_dlext, \$dl_so, \$dlsrc) = (", <
-              to_string(%Config{'dlext'}), ",", <
-              to_string(%Config{'so'}), ",", <
-              to_string(%Config{'dlsrc'}), ")\n;" ;
+              to_string(config_value('dlext')), ",", <
+              to_string(config_value('so')), ",", <
+              to_string(config_value('dlsrc')), ")\n;" ;
 }
 else {
     print OUT <<'EOT';
