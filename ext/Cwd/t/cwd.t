@@ -13,7 +13,7 @@ require VMS::Filespec if $^O eq 'VMS';
 my $tests = 30;
 # _perl_abs_path() currently only works when the directory separator
 # is '/', so don't test it when it won't work.
-my $EXTRA_ABSPATH_TESTS = (%Config{prefix} =~ m/\//) && $^O ne 'cygwin';
+my $EXTRA_ABSPATH_TESTS = (config_value('prefix') =~ m/\//) && $^O ne 'cygwin';
 $tests += 4 if $EXTRA_ABSPATH_TESTS;
 plan tests => $tests;
 
@@ -51,8 +51,8 @@ my $pwd_cmd =
         "cd" :
     ($IsMacOS) ?
         "pwd" :
-        (grep { -x && -f } map { "$_/$pwd%Config{exe_ext}" }
-	                   split m/%Config{path_sep}/, %ENV{PATH})[0];
+        (grep { -x && -f } map { "$_/$pwd$(config_value('exe_ext'))" }
+	                   split m/$(config_value('path_sep'))/, %ENV{PATH})[0];
 
 $pwd_cmd = 'SHOW DEFAULT' if $IsVMS;
 if ($^O eq 'MSWin32') {
@@ -153,7 +153,7 @@ do {
 };
 
 SKIP: do {
-    skip "no symlinks on this platform", 2+$EXTRA_ABSPATH_TESTS unless %Config{d_symlink};
+    skip "no symlinks on this platform", 2+$EXTRA_ABSPATH_TESTS unless config_value('d_symlink');
 
     mkpath(\@($Test_Dir), 0, 0777);
     symlink $Test_Dir, "linktest";

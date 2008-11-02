@@ -6,7 +6,7 @@ use Config;
 
 BEGIN {
 	# Don't bother if there are no quad offsets.
-	if (%Config{lseeksize} +< 8) {
+	if (config_value('lseeksize') +< 8) {
 		print "1..0 # Skip: no 64-bit file offsets\n";
 		exit(0);
 	}

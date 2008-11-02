@@ -2,16 +2,6 @@
 
 use Config;
 
-BEGIN {
-    if (%Config{'extensions'} !~ m/\bOpcode\b/
-	&& %Config{'extensions'} !~ m/\bPOSIX\b/
-	&& %Config{'osname'} ne 'VMS')
-    {
-	print "1..0\n";
-	exit 0;
-    }
-}
-
 use warnings;
 use POSIX < qw(ceil);
 use Test::More tests => 2;

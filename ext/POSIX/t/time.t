@@ -48,12 +48,12 @@ like(clock(), qr/\d*/, "clock() returns a numeric value");
 ok(clock() +>= 0, "...and it returns something >= 0");
 
 SKIP: do {
-    skip "No difftime()", 1 if %Config{d_difftime} ne 'define';
+    skip "No difftime()", 1 if config_value('d_difftime') ne 'define';
     is(difftime(2, 1), 1, "difftime()");
 };
 
 SKIP: do {
-    skip "No mktime()", 1 if %Config{d_mktime} ne 'define';
+    skip "No mktime()", 1 if config_value('d_mktime') ne 'define';
     my $time = time();
     is(mktime(localtime($time)), $time, "mktime()");
 };

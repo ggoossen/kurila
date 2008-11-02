@@ -14,7 +14,7 @@ BEGIN {
     elsif ($^O =~ m/^(?:qnx|nto|vos|MSWin32)$/ ) {
 	$reason = "UNIX domain sockets not implemented on $^O";
     }
-    elsif (! %Config{'d_fork'}) {
+    elsif (! config_value('d_fork')) {
 	$reason = 'no fork';
     }
     if ($reason) {

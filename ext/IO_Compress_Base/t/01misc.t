@@ -68,9 +68,6 @@ sub My::testParseParameters()
     do {
         use Config;
 
-        skip 'readonly + threads', 1
-            if %Config{useithreads};
-
         try { ParseParameters(1, \%('Fred' => \@(1, 1, Parse_writable_scalar, 0)), Fred => 'abc') ; };
         like $@->{description}, mkErr("Parameter 'Fred' not writable"), 
                 "wanted writable, got readonly";

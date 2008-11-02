@@ -1,6 +1,6 @@
 BEGIN {
     use Config;
-    unless (%Config{d_fork}) {
+    unless (config_value('d_fork')) {
 	print "1..0 # Skip: no fork\n";
 	exit 0;
     }

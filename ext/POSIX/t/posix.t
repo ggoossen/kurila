@@ -2,13 +2,6 @@
 
 use Config;
 
-BEGIN {
-    if ($^O ne 'VMS' and %Config{'extensions'} !~ m/\bPOSIX\b/) {
-	print "1..0\n";
-	exit 0;
-    }
-}
-
 BEGIN { require "./test.pl"; }
 plan(tests => 66);
 
@@ -81,8 +74,8 @@ SKIP: do {
 	# So the kill() must not be done with this config in order to
 	# finish the test.
 	# For others (darwin & freebsd), let the test fail without crashing.
-	my $todo = $^O eq 'netbsd' && %Config{osvers}=~m/^1\.6/;
-	my $why_todo = "# TODO $^O %Config{osvers} seems to lose blocked signals";
+	my $todo = $^O eq 'netbsd' && config_value('osvers')=~m/^1\.6/;
+	my $why_todo = "# TODO $^O config_value('osvers') seems to lose blocked signals";
 	if (!$todo) { 
 	  kill 'HUP', $$; 
 	} else {
@@ -92,7 +85,7 @@ SKIP: do {
 	sleep 1;
 
 	$todo = 1 if ($^O eq 'freebsd')
-		  || ($^O eq 'darwin' && %Config{osvers} +<= v6.6);
+		  || ($^O eq 'darwin' && config_value('osvers') +<= v6.6);
 	printf "\%s 11 - masked SIGINT received \%s\n",
 	    $sigint_called ? "ok" : "not ok",
 	    $todo ? $why_todo : '';
@@ -139,19 +132,19 @@ like( getcwd(), qr/$pat/, 'getcwd' );
 # Check string conversion functions.
 
 SKIP: do { 
-    skip("strtod() not present", 1) unless %Config{d_strtod};
+    skip("strtod() not present", 1) unless config_value('d_strtod');
 
-    my $lc = &POSIX::setlocale(&POSIX::LC_NUMERIC( < @_ ), 'C') if %Config{d_setlocale};
+    my $lc = &POSIX::setlocale(&POSIX::LC_NUMERIC( < @_ ), 'C') if config_value('d_setlocale');
 
     # we're just checking that strtod works, not how accurate it is
     my ($n, $x) = < &POSIX::strtod('3.14159_OR_SO');
     ok((abs("3.14159" - $n) +< 1e-6) && ($x == 6), 'strtod works');
 
-    &POSIX::setlocale(&POSIX::LC_NUMERIC( < @_ ), $lc) if %Config{d_setlocale};
+    &POSIX::setlocale(&POSIX::LC_NUMERIC( < @_ ), $lc) if config_value('d_setlocale');
 };
 
 SKIP: do {
-    skip("strtol() not present", 2) unless %Config{d_strtol};
+    skip("strtol() not present", 2) unless config_value('d_strtol');
 
     my ($n, $x) = < &POSIX::strtol('21_PENGUINS');
     is($n, 21, 'strtol() number');
@@ -159,7 +152,7 @@ SKIP: do {
 };
 
 SKIP: do {
-    skip("strtoul() not present", 2) unless %Config{d_strtoul};
+    skip("strtoul() not present", 2) unless config_value('d_strtoul');
 
     my ($n, $x) = < &POSIX::strtoul('88_TEARS');
     is($n, 88, 'strtoul() number');
@@ -184,12 +177,12 @@ sub try_strftime {
     is($got, $expect, "validating mini_mktime() and strftime(): $expect");
 }
 
-my $lc = &POSIX::setlocale(&POSIX::LC_TIME( < @_ ), 'C') if %Config{d_setlocale};
+my $lc = &POSIX::setlocale(&POSIX::LC_TIME( < @_ ), 'C') if config_value('d_setlocale');
 try_strftime("Wed Feb 28 00:00:00 1996 059", 0,0,0, 28,1,96);
 SKIP: do {
     skip("VC++ 8 and Vista's CRTs regard 60 seconds as an invalid parameter", 1)
-	if ($Is_W32 and ((%Config{cc} eq 'cl' and
-	                 %Config{ccversion} =~ m/^(\d+)/ and $1 +>= 14) or
+	if ($Is_W32 and ((config_value("cc") eq 'cl' and
+	                 config_value("ccversion") =~ m/^(\d+)/ and $1 +>= 14) or
 	                 (Win32::GetOSVersion())[1] +>= 6));
 
     try_strftime("Thu Feb 29 00:00:60 1996 060", 60,0,-24, 30,1,96);
@@ -201,7 +194,7 @@ try_strftime("Mon Feb 28 00:00:00 2000 059", 0,0,0, 28,1,100);
 try_strftime("Tue Feb 29 00:00:00 2000 060", 0,0,0, 0,2,100);
 try_strftime("Wed Mar 01 00:00:00 2000 061", 0,0,0, 1,2,100);
 try_strftime("Fri Mar 31 00:00:00 2000 091", 0,0,0, 31,2,100);
-&POSIX::setlocale(&POSIX::LC_TIME( < @_ ), $lc) if %Config{d_setlocale};
+&POSIX::setlocale(&POSIX::LC_TIME( < @_ ), $lc) if config_value("d_setlocale");
 
 do {
     for my $test (@(0, 1)) {

@@ -4,22 +4,13 @@ use warnings;
 
 use Config;
  
-BEGIN {
-    if(-d "lib" && -f "TEST") {
-        if (%Config{'extensions'} !~ m/\bDB_File\b/ ) {
-            print "1..0 # Skip: DB_File was not built\n";
-            exit 0;
-        }
-    }
-}
-
 BEGIN
 {
     if ($^O eq 'darwin'
-	&& ( <split(m/\./, %Config{osvers}))[[0]] +< 7 # Mac OS X 10.3 == Darwin 7
-	&& %Config{db_version_major} == 1
-	&& %Config{db_version_minor} == 0
-	&& %Config{db_version_patch} == 0) {
+	&& ( <split(m/\./, config_value("osvers")))[[0]] +< 7 # Mac OS X 10.3 == Darwin 7
+	&& config_value("db_version_major") == 1
+	&& config_value("db_version_minor") == 0
+	&& config_value("db_version_patch") == 0) {
 	warn <<EOM;
 #
 # This test is known to crash in Mac OS X versions 10.2 (or earlier)

@@ -3,10 +3,6 @@
 use Config;
 
 BEGIN {
-    if (%Config{'extensions'} !~ m/\bOpcode\b/) {
-	print "1..0\n";
-	exit 0;
-    }
     # Can we load the version module ?
     try { require version; 1 } or do {
 	print "1..0 # no version.pm\n";

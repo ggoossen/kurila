@@ -3,13 +3,10 @@ BEGIN {
     require './test.pl';
 }
 
-if (%Config{'extensions'} !~ m/\bIPC\/SysV\b/) {
-    skip_all('IPC::SysV was not built');
-}
-elsif (%Config{'d_sem'} ne 'define') {
+if (config_value('d_sem') ne 'define') {
     skip_all('$Config{d_sem} undefined');
 }
-elsif (%Config{'d_msg'} ne 'define') {
+elsif (config_value('d_msg') ne 'define') {
     skip_all('$Config{d_msg} undefined');
 }
 else {
@@ -53,10 +50,10 @@ my $perm = S_IRWXU;
 SKIP: do {
 
 skip( 'lacking d_msgget d_msgctl d_msgsnd d_msgrcv', 6 ) unless
-    %Config{'d_msgget'} eq 'define' &&
-    %Config{'d_msgctl'} eq 'define' &&
-    %Config{'d_msgsnd'} eq 'define' &&
-    %Config{'d_msgrcv'} eq 'define';
+    config_value('d_msgget') eq 'define' &&
+    config_value('d_msgctl') eq 'define' &&
+    config_value('d_msgsnd') eq 'define' &&
+    config_value('d_msgrcv') eq 'define';
 
     $msg = msgget(IPC_PRIVATE, $perm);
     # Very first time called after machine is booted value may be 0 
@@ -139,8 +136,8 @@ EOM
 SKIP: do {
 
     skip('lacking d_semget d_semctl', 11) unless
-        %Config{'d_semget'} eq 'define' &&
-        %Config{'d_semctl'} eq 'define';
+        config_value('d_semget') eq 'define' &&
+        config_value('d_semctl') eq 'define';
 
     use IPC::SysV < qw(IPC_CREAT GETALL SETALL);
 

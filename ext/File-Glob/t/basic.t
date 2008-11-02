@@ -67,7 +67,7 @@ SKIP: do {
 SKIP: do {
     skip $^O, 2 if $^O eq 'mpeix' or $^O eq 'MSWin32' or $^O eq 'NetWare'
 	or $^O eq 'os2' or $^O eq 'VMS' or $^O eq 'cygwin';
-    skip "AFS", 2 if Cwd::cwd() =~ m#^%Config{'afsroot'}#s;
+    skip "AFS", 2 if Cwd::cwd() =~ m#^$(config_value('afsroot'))#s;
     skip "running as root", 2 if not $>;
 
     my $dir = "pteerslo";

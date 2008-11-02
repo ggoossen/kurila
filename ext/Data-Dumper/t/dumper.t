@@ -12,8 +12,6 @@ use Data::Dumper;
 use Config;
 use utf8;
 
-my $Is_ebcdic = defined(%Config{'ebcdic'}) && %Config{'ebcdic'} eq 'define';
-
 $Data::Dumper::Pad = "#";
 my $TMAX;
 my $XS;
@@ -31,14 +29,6 @@ sub TEST {
   my $t = eval $string;
   $t =~ s/([A-Z]+)\(0x[0-9a-f]+\)/$1(0xdeadbeef)/g
       if ($WANT =~ m/deadbeef/);
-  if ($Is_ebcdic) {
-      # these data need massaging with non ascii character sets
-      # because of hashing order differences
-      $WANT = join("\n",sort(split(m/\n/,$WANT)));
-      $WANT =~ s/\,$//mg;
-      $t    = join("\n",sort(split(m/\n/,$t)));
-      $t    =~ s/\,$//mg;
-  }
 
   ok(($t eq $WANT and not $@), $name);
   if ($@) {
@@ -55,13 +45,6 @@ sub TEST {
   $t = eval $string;
   $t =~ s/([A-Z]+)\(0x[0-9a-f]+\)/$1(0xdeadbeef)/g
       if ($WANT =~ m/deadbeef/);
-  if ($Is_ebcdic) {
-      # here too there are hashing order differences
-      $WANT = join("\n",sort(split(m/\n/,$WANT)));
-      $WANT =~ s/\,$//mg;
-      $t    = join("\n",sort(split(m/\n/,$t)));
-      $t    =~ s/\,$//mg;
-  }
   ok($t eq $WANT and not $@);
   if ($@) {
       diag("error: $($@->message)");
