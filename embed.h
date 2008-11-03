@@ -3756,7 +3756,7 @@
 #define pad_new(a,b,c,d)	Perl_pad_new(aTHX_ a,b,c,d)
 #define pad_undef(a)		Perl_pad_undef(aTHX_ a)
 #define pad_tmprefcnt(a)	Perl_pad_tmprefcnt(aTHX_ a)
-#define pad_add_name(a,b,c,d)	Perl_pad_add_name(aTHX_ a,b,c,d)
+#define pad_add_name(a,b,c)	Perl_pad_add_name(aTHX_ a,b,c)
 #define pad_add_anon(a,b)	Perl_pad_add_anon(aTHX_ a,b)
 #define pad_check_dup(a,b,c)	Perl_pad_check_dup(aTHX_ a,b,c)
 #endif

@@ -10,7 +10,7 @@
 package B::Deparse;
 use B < qw(class main_root main_start main_cv svref_2object opnumber perlstring
 	 OPf_WANT OPf_WANT_VOID OPf_WANT_SCALAR OPf_WANT_LIST
-	 OPf_KIDS OPf_REF OPf_STACKED OPf_SPECIAL OPf_MOD OPpPAD_STATE
+	 OPf_KIDS OPf_REF OPf_STACKED OPf_SPECIAL OPf_MOD
 	 OPpLVAL_INTRO OPpOUR_INTRO OPpENTERSUB_AMPER OPpSLICE OPpCONST_BARE
 	 OPpTARGET_MY
 	 OPpEXISTS_SUB OPpSORT_NUMERIC OPpSORT_INTEGER
@@ -996,7 +996,7 @@ sub maybe_my {
     my $self = shift;
     my($op, $cx, $text) = < @_;
     if ($op->private ^&^ OPpLVAL_INTRO and not $self->{'avoid_local'}->{$$op}) {
-	my $my = $op->private ^&^ OPpPAD_STATE ? "state" : "my";
+	my $my = "my";
 	if (want_scalar($op)) {
 	    return "$my $text";
 	} else {
@@ -2446,13 +2446,9 @@ sub pp_list {
 	    last;
 	}
 	if ($lop->name =~ m/^pad[ash]v$/) {
-	    if ($lop->private ^&^ OPpPAD_STATE) { # state()
-		($local = "", last) if $local =~ m/^(?:local|our|my)$/;
-		$local = "state";
-	    } else { # my()
-		($local = "", last) if $local =~ m/^(?:local|our|state)$/;
-		$local = "my";
-	    }
+            # my()
+            ($local = "", last) if $local =~ m/^(?:local|our|state)$/;
+            $local = "my";
 	} elsif ($lop->name =~ m/^(gv|rv2)[ash]v$/
 			&& $lop->private ^&^ OPpOUR_INTRO
 		or $lop->name eq "null" && $lop->first->name eq "gvsv"

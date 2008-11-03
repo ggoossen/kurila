@@ -247,7 +247,6 @@ sprintf
 sqrt
 srand
 stat
-state
 study
 sub
 substr

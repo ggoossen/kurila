@@ -5,14 +5,13 @@ our $VERSION = '1.13';
 # (feature name) => (internal name, used in %^H)
 my %feature = %(
     switch => 'feature_switch',
-    state  => "feature_state",
 );
 
 # NB. the latest bundle must be loaded by the -E switch (see toke.c)
 
 my %feature_bundle = %(
-    "5.10" => \qw(switch state),
-    "5.11" => \qw(switch state),
+    "5.10" => \qw(switch),
+    "5.11" => \qw(switch),
 );
 
 # special case
@@ -79,13 +78,6 @@ C<use feature 'switch'> tells the compiler to enable the Perl 6
 given/when construct.
 
 See L<perlsyn/"Switch statements"> for details.
-
-=head2 the 'state' feature
-
-C<use feature 'state'> tells the compiler to enable C<state>
-variables.
-
-See L<perlsub/"Persistent Private Variables"> for details.
 
 =head1 FEATURE BUNDLES
 

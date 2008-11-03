@@ -1616,7 +1616,7 @@ B_PAD_allocmy(char* name)
         PL_comppad =           *(AV**) av_fetch(CvPADLIST(PL_compcv), 1, 0);
         PL_curpad            = AvARRAY(PL_comppad);
         
-        RETVAL = Perl_pad_add_name(aTHX_ name, NULL, FALSE, FALSE);
+        RETVAL = Perl_pad_add_name(aTHX_ name, NULL, FALSE);
 
         PL_comppad = old_comppad;
         PL_curpad  = old_curpad;

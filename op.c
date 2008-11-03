@@ -374,12 +374,10 @@ Perl_allocmy(pTHX_ const char *const name)
     {
 	/* name[2] is true if strlen(name) > 2  */
 	if (!isPRINT(name[1]) || strchr("\t\n\r\f", name[1])) {
-	    yyerror(Perl_form(aTHX_ "Can't use global %c^%c%s in \"%s\"",
-			      name[0], toCTRL(name[1]), name + 2,
-			      PL_parser->in_my == KEY_state ? "state" : "my"));
+	    yyerror(Perl_form(aTHX_ "Can't use global %c^%c%s in \"my\"",
+		    name[0], toCTRL(name[1]), name + 2));
 	} else {
-	    yyerror(Perl_form(aTHX_ "Can't use global %s in \"%s\"",name,
-			      PL_parser->in_my == KEY_state ? "state" : "my"));
+	    yyerror(Perl_form(aTHX_ "Can't use global %s in \"my\"",name));
 	}
     }
 
@@ -404,16 +402,11 @@ Perl_allocmy(pTHX_ const char *const name)
 			   );
     }
 
-    off = pad_add_name(name,
-		       ourgv,
-		       0, /*  not fake */
-		       PL_parser->in_my == KEY_state
+    off = pad_add_name(
+	name,
+	ourgv,
+	0 /*  not fake */
     );
-    /* anon sub prototypes contains state vars should always be cloned,
-     * otherwise the state var would be shared between anon subs */
-
-    if (PL_parser->in_my == KEY_state && CvANON(PL_compcv))
-	CvCLONE_on(PL_compcv);
 
     return off;
 }
@@ -1675,8 +1668,7 @@ S_my_kid(pTHX_ OP *o, OP **imopsp)
 	    yyerror(Perl_form(aTHX_ "Can't declare %s in \"%s\"",
 			OP_DESC(o),
 			PL_parser->in_my == KEY_our
-			    ? "our"
-			    : PL_parser->in_my == KEY_state ? "state" : "my"));
+			    ? "our" : "my"));
 	}
 	o->op_private |= OPpOUR_INTRO;
 	return o;
@@ -1687,14 +1679,11 @@ S_my_kid(pTHX_ OP *o, OP **imopsp)
 	yyerror(Perl_form(aTHX_ "Can't declare %s in \"%s\"",
 			  OP_DESC(o),
 			  PL_parser->in_my == KEY_our
-			    ? "our"
-			    : PL_parser->in_my == KEY_state ? "state" : "my"));
+			    ? "our" : "my"));
 	return o;
     }
     o->op_flags |= OPf_MOD;
     o->op_private |= OPpLVAL_INTRO;
-    if (PL_parser->in_my == KEY_state)
-	o->op_private |= OPpPAD_STATE;
     return o;
 }
 
@@ -3279,19 +3268,8 @@ Perl_newASSIGNOP(pTHX_ I32 flags, OP *left, I32 optype, OP *right, SV *location)
 		    if (!(lop->op_private & OPpLVAL_INTRO))
 			maybe_common_vars = TRUE;
 
-		    if (lop->op_private & OPpPAD_STATE) {
-			if (left->op_private & OPpLVAL_INTRO) {
-			    /* Each variable in state($a, $b, $c) = ... */
-			}
-			else {
-			    /* Each state variable in
-			       (state $a, my $b, our $c, $d, undef) = ... */
-			}
-			yyerror(no_list_state);
-		    } else {
-			/* Each my variable in
-			   (state $a, my $b, our $c, $d, undef) = ... */
-		    }
+		    /* Each my variable in
+		       (my $b, our $c, $d, undef) = ... */
 		} else if (lop->op_type == OP_UNDEF ||
 			   lop->op_type == OP_PUSHMARK) {
 		    /* undef may be interesting in
@@ -3308,19 +3286,6 @@ Perl_newASSIGNOP(pTHX_ I32 flags, OP *left, I32 optype, OP *right, SV *location)
 		    || left->op_type == OP_PADANY))
 	{
 	    maybe_common_vars = FALSE;
-	    if (left->op_private & OPpPAD_STATE) {
-		/* All single variable list context state assignments, hence
-		   state ($a) = ...
-		   (state $a) = ...
-		   state @a = ...
-		   state (@a) = ...
-		   (state @a) = ...
-		   state %a = ...
-		   state (%a) = ...
-		   (state %a) = ...
-		*/
-		yyerror(no_list_state);
-	    }
 	}
 
 	/* PL_generation sorcery:
@@ -3544,7 +3509,6 @@ S_new_logop(pTHX_ I32 type, I32 flags, OP** firstp, OP** otherp, SV *location)
 		o2 = other;
 	    if ((o2->op_type == OP_PADSV)
 		&& o2->op_private & OPpLVAL_INTRO
-		&& !(o2->op_private & OPpPAD_STATE)
 		&& ckWARN(WARN_DEPRECATED))
 	    {
 		Perl_warner(aTHX_ packWARN(WARN_DEPRECATED),
