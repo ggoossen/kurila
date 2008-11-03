@@ -9,7 +9,7 @@
 use Config;
 require './test.pl'; # for runperl()
 
-print "1..133\n";
+print "1..61\n";
 
 my $test = 1;
 sub test (&) {
@@ -207,13 +207,14 @@ do {
     );
 
     # Our innermost sub is either named or anonymous
-    for my $inner_type (qw!named anon!) {
+    for my $inner_type (qw!anon!) {
       # And it may be declared at filescope, within a named
       # sub, or within an anon sub
       for my $where_declared (qw!filescope in_named in_anon!) {
+
 	# And that, in turn, may be within a foreach loop,
 	# a naked block, or another named sub
-	for my $within (qw!foreach other_sub!) {
+	for my $within (qw!foreach!) {
 
 	  # Here are a number of variables which show what's
 	  # going on, in a way.
