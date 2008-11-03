@@ -5599,7 +5599,7 @@ PERL_CALLCONV void	Perl_pad_tmprefcnt(pTHX_ CV* cv)
 #define PERL_ARGS_ASSERT_PAD_TMPREFCNT	\
 	assert(cv)
 
-PERL_CALLCONV PADOFFSET	Perl_pad_add_name(pTHX_ const char *name, GV* ourgv, bool clone, bool state)
+PERL_CALLCONV PADOFFSET	Perl_pad_add_name(pTHX_ const char *name, GV* ourgv, bool clone)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_PAD_ADD_NAME	\
 	assert(name)

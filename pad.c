@@ -345,7 +345,7 @@ If fake, it means we're cloning an existing entry
 =cut */
 
 PADOFFSET
-Perl_pad_add_name(pTHX_ const char *name, GV* ourgv, bool fake, bool state)
+Perl_pad_add_name(pTHX_ const char *name, GV* ourgv, bool fake)
 {
     dVAR;
     const PADOFFSET offset = pad_alloc(OP_PADSV, SVs_PADMY);
@@ -362,9 +362,6 @@ Perl_pad_add_name(pTHX_ const char *name, GV* ourgv, bool fake, bool state)
 	SvPAD_OUR_on(namesv);
 	SvOURGV_set(namesv, ourgv);
 	SvREFCNT_inc((SV*)ourgv);
-    }
-    else if (state) {
-	SvPAD_STATE_on(namesv);
     }
 
     av_store(PL_comppad_name, offset, namesv);
@@ -542,7 +539,7 @@ Perl_pad_check_dup(pTHX_ const char *name, bool is_our, const HV *ourstash)
 		break; /* "our" masking "our" */
 	    Perl_warner(aTHX_ packWARN(WARN_MISC),
 		"\"%s\" variable %s masks earlier declaration in same %s",
-		(is_our ? "our" : PL_parser->in_my == KEY_my ? "my" : "state"),
+		(is_our ? "our" : "my" ),
 		name,
 		(COP_SEQ_RANGE_HIGH(sv) == PAD_MAX ? "scope" : "statement"));
 	    --off;
@@ -737,8 +734,7 @@ S_pad_findlex(pTHX_ const char *name, PAD *padnames, PAD* pad, U32 seq)
 	    new_offset = pad_add_name(
 		SvPVX_const(*out_name_sv),
 		    (SvPAD_OUR(*out_name_sv) ? SvOURGV(*out_name_sv) : NULL),
-		    1,  /* fake */
-		    SvPAD_STATE(*out_name_sv) ? 1 : 0 /* state variable ? */
+		    1  /* fake */
 		);
 
 	    new_namesv = AvARRAY(PL_comppad_name)[new_offset];
@@ -1356,7 +1352,7 @@ Perl_cv_clone(pTHX_ CV *proto)
 		/* formats may have an inactive parent,
 		   while my $x if $false can leave an active var marked as
 		   stale. And state vars are always available */
-		if (SvPADSTALE(sv) && !SvPAD_STATE(namesv)) {
+		if (SvPADSTALE(sv)) {
 		    if (ckWARN(WARN_CLOSURE))
 			Perl_warner(aTHX_ packWARN(WARN_CLOSURE),
 			    "Variable \"%s\" is not available", SvPVX_const(namesv));
@@ -1376,9 +1372,6 @@ Perl_cv_clone(pTHX_ CV *proto)
 		else
 		    sv = newSV(0);
 		SvPADMY_on(sv);
-		/* reset the 'assign only once' flag on each state var */
-		if (SvPAD_STATE(namesv))
-		    SvPADSTALE_on(sv);
 	    }
 	}
 	else if (IS_PADGV(ppad[ix]) || IS_PADCONST(ppad[ix])) {

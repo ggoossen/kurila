@@ -5179,7 +5179,6 @@ Perl_yylex(pTHX)
 
 	case KEY_our:
 	case KEY_my:
-	case KEY_state:
 	    PL_in_my = (U16)tmp;
 	    s = SKIPSPACE1(s);
 	    if (isIDFIRST_lazy_if(s,UTF)) {
@@ -7210,15 +7209,6 @@ Perl_keyword (pTHX_ const char *name, I32 len, bool all_keywords)
             case 't':
               switch (name[2])
               {
-                case 'a':
-                  if (name[3] == 't' &&
-                      name[4] == 'e')
-                  {                               /* state      */
-                    return (all_keywords || FEATURE_IS_ENABLED("state") ? KEY_state : 0);
-                  }
-
-                  goto unknown;
-
                 case 'u':
                   if (name[3] == 'd' &&
                       name[4] == 'y')

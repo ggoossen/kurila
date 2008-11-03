@@ -1611,7 +1611,7 @@ pda	|PADLIST*|pad_new	|int flags|NULLOK PAD *parent_padnames|NULLOK PAD *parent_
 pd	|void	|pad_undef	|NN CV* cv
 pd	|void	|pad_tmprefcnt	|NN CV* cv
 pd	|PADOFFSET|pad_add_name	|NN const char *name\
-				|NULLOK GV* ourgv|bool clone|bool state
+				|NULLOK GV* ourgv|bool clone
 pd	|PADOFFSET|pad_add_anon	|NN SV* sv|OPCODE op_type
 pd	|void	|pad_check_dup	|NN const char* name|bool is_our|NN const HV* ourstash
 #ifdef DEBUGGING

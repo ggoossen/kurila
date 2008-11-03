@@ -206,7 +206,6 @@ sprintf ($@)
 sqrt (_)
 srand (;$)
 stat (*)
-state undef
 study undef
 sub undef
 substr ($$;$$)

@@ -1469,7 +1469,6 @@ Perl_do_sv_dump(pTHX_ I32 level, PerlIO *file, SV *sv, I32 nest, I32 maxnest, bo
 	if (SvPAD_OUR(sv))	sv_catpv(d, "OUR,");
 	/* FALL THROUGH */
     case SVt_PVNV:
-	if (SvPAD_STATE(sv))	sv_catpv(d, "STATE,");
 	goto evaled_or_uv;
     case SVt_PVAV:
 	break;

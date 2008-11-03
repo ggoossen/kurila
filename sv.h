@@ -880,23 +880,14 @@ in gv.h: */
 #define SvPAD_OUR(sv)	\
 	((SvFLAGS(sv) & (SVpad_NAME|SVpad_OUR)) == (SVpad_NAME|SVpad_OUR))
 
-#define SvPAD_STATE(sv)	\
-	((SvFLAGS(sv) & (SVpad_NAME|SVpad_STATE)) == (SVpad_NAME|SVpad_STATE))
-
 #if defined (DEBUGGING) && defined(__GNUC__) && !defined(PERL_GCC_BRACE_GROUPS_FORBIDDEN)
 #define SvPAD_OUR_on(sv)	({					\
 	    SV *const whap = (SV *) (sv);				\
 	    assert(SvTYPE(whap) == SVt_PVMG);				\
 	    (SvFLAGS(whap) |= SVpad_NAME|SVpad_OUR);			\
 	})
-#define SvPAD_STATE_on(sv)	({					\
-	    SV *const whap = (SV *) (sv);				\
-	    assert(SvTYPE(whap) == SVt_PVNV || SvTYPE(whap) == SVt_PVMG); \
-	    (SvFLAGS(whap) |= SVpad_NAME|SVpad_STATE);			\
-	})
 #else
 #  define SvPAD_OUR_on(sv)	(SvFLAGS(sv) |= SVpad_NAME|SVpad_OUR)
-#  define SvPAD_STATE_on(sv)	(SvFLAGS(sv) |= SVpad_NAME|SVpad_STATE)
 #endif
 
 #define SvOURGV(sv) \
