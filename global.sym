@@ -39,6 +39,7 @@ Perl_IoSv
 Perl_ReSv
 Perl_SvAv
 Perl_SvHv
+Perl_SvCv
 Perl_SvPVX_const
 Perl_SvPVX_mutable
 Perl_SvREFCNT_dec

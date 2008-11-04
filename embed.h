@@ -51,6 +51,7 @@
 #define ReSv			Perl_ReSv
 #define SvAv			Perl_SvAv
 #define SvHv			Perl_SvHv
+#define SvCv			Perl_SvCv
 #define SvPVX_const		Perl_SvPVX_const
 #define SvPVX_mutable		Perl_SvPVX_mutable
 #define AvREFCNT_dec(a)		Perl_SvREFCNT_dec(aTHX_ AvSv(a))
@@ -2261,6 +2262,7 @@
 #define ReSv(a)			Perl_ReSv(aTHX_ a)
 #define SvAv(a)			Perl_SvAv(aTHX_ a)
 #define SvHv(a)			Perl_SvHv(aTHX_ a)
+#define SvCv(a)			Perl_SvCv(aTHX_ a)
 #define SvPVX_const(a)		Perl_SvPVX_const(aTHX_ a)
 #define SvPVX_mutable(a)	Perl_SvPVX_mutable(aTHX_ a)
 #define AvREFCNT_dec(a)		Perl_SvREFCNT_dec(aTHX_ AvSv(a))
