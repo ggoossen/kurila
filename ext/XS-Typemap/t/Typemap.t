@@ -3,7 +3,6 @@ use Config;
 
 use Test::More tests => 84;
 
-use strict;
 use warnings;
 use utf8;
 use XS::Typemap;

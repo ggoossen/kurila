@@ -64,8 +64,8 @@ isa_ok( $mm, 'ExtUtils::MakeMaker' );
 is( $mm->{NAME}, 'Big::Dummy',  'NAME' );
 is( $mm->{VERSION}, 0.01,            'VERSION' );
 
-my $config_prefix = %Config{installprefixexp} || %Config{installprefix} ||
-                    %Config{prefixexp}        || %Config{prefix};
+my $config_prefix = config_value("installprefixexp") || config_value("installprefix") ||
+                    config_value("prefixexp")        || config_value("prefix");
 is( $mm->{PERLPREFIX}, $config_prefix,   'PERLPREFIX' );
 
 is( !!$mm->{PERL_CORE}, !!%ENV{PERL_CORE}, 'PERL_CORE' );
