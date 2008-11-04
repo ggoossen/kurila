@@ -20,10 +20,10 @@ BEGIN {
     # lib.pm is documented to only work with Unix filepaths.
     @lib_dir  =qw(stuff moo);
     $Lib_Dir  = join "/",@lib_dir;
-    $Arch_Dir = join "/", @( <@lib_dir, %Config{archname});
+    $Arch_Dir = join "/", @( <@lib_dir, config_value("archname"));
 
     # create the auto/ directory and a module
-    $Auto_Dir = File::Spec->catdir(<@lib_dir, %Config{archname},'auto');
+    $Auto_Dir = File::Spec->catdir(<@lib_dir, config_value("archname"),'auto');
     $Module   = File::Spec->catfile(<@lib_dir, 'Yup.pm');
 
     mkpath \@($Auto_Dir);
@@ -79,7 +79,7 @@ BEGIN {
 
 no lib $Lib_Dir;
 
-unlike( do { eval 'use lib %Config{installsitelib};'; $@ || '' },
+unlike( do { eval 'use lib config_value("installsitelib");'; $@ || '' },
 	qr/::Config is read-only/, 'lib handles readonly stuff' );
 
 BEGIN {
