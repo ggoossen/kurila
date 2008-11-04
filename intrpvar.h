@@ -513,7 +513,6 @@ PERLVAR(IProc,		struct IPerlProc*)
 #endif
 
 PERLVAR(Iptr_table,	PTR_TBL_t*)
-PERLVARI(Ibeginav_save, AV*, NULL)	/* save BEGIN{}s when compiling */
 
 PERLVAR(Ibody_arenas, void*) /* pointer to list of body-arenas */
 
