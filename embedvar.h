@@ -68,7 +68,6 @@
 #define PL_argvout_stack	(vTHX->Iargvout_stack)
 #define PL_argvoutgv		(vTHX->Iargvoutgv)
 #define PL_basetime		(vTHX->Ibasetime)
-#define PL_beginav		(vTHX->Ibeginav)
 #define PL_bitcount		(vTHX->Ibitcount)
 #define PL_body_arenas		(vTHX->Ibody_arenas)
 #define PL_body_roots		(vTHX->Ibody_roots)
@@ -352,7 +351,6 @@
 #define PL_Iargvout_stack	PL_argvout_stack
 #define PL_Iargvoutgv		PL_argvoutgv
 #define PL_Ibasetime		PL_basetime
-#define PL_Ibeginav		PL_beginav
 #define PL_Ibitcount		PL_bitcount
 #define PL_Ibody_arenas		PL_body_arenas
 #define PL_Ibody_roots		PL_body_roots
