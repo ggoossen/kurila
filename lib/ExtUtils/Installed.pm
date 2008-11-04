@@ -1,6 +1,5 @@
 package ExtUtils::Installed;
 
-use Carp qw();
 use ExtUtils::Packlist;
 use ExtUtils::MakeMaker;
 use Config;
@@ -103,7 +102,7 @@ sub new {
         if ( %args{$arg} ) {
             try {
                 $self->{':private:'}->{$key} = \ @{%args{$arg}};
-            } or Carp::croak(
+            } or die(
                 "The '$arg' parameter must be an array reference."
             );
         }
@@ -114,15 +113,15 @@ sub new {
     do {
         my %dupe;
         @{$self->{':private:'}->{INC}} = grep { -e $_ && !%dupe{$_}++ }
- @(            < @{$self->{':private:'}->{INC}}, < @{$self->{':private:'}->{EXTRA}});        
-    };                
+          @: < @{$self->{':private:'}->{INC}}, < @{$self->{':private:'}->{EXTRA}};
+    };
     my $perl5lib = defined %ENV{PERL5LIB} ? %ENV{PERL5LIB} : "";
 
     my @dirs = @( $self->{':private:'}->{Config}->{archlibexp},
-                 $self->{':private:'}->{Config}->{sitearchexp}, <
-                 split(m/\Q$(config_value("path_sep"))\E/, $perl5lib),
+                 $self->{':private:'}->{Config}->{sitearchexp},
+                 < split(m/\Q$(config_value("path_sep"))\E/, $perl5lib),
                  < @{$self->{':private:'}->{EXTRA}},
-               );   
+               );
     
     # File::Find does not know how to deal with VMS filepaths.
     if( $Is_VMS ) {
@@ -162,7 +161,7 @@ sub new {
 
         # Find the top-level module file in @INC
         $self->{$module}->{version} = '';
-        foreach my $dir ( @{$self->{':private:'}->{INC}}) {
+        foreach my $dir ( @{$self->{':private:'}->{INC}} ) {
             my $p = File::Spec->catfile($dir, $modfile);
             if (-r $p) {
                 $module = _module_name($p, $module) if $Is_VMS;
@@ -266,19 +265,19 @@ sub directory_tree {
 
 sub validate {
     my ($self, $module, $remove) = < @_;
-    Carp::croak("$module is not installed") if (! exists($self->{$module}));
+    die("$module is not installed") if (! exists($self->{$module}));
     return $self->{$module}->{packlist}->validate($remove);
 }
 
 sub packlist {
     my ($self, $module) = < @_;
-    Carp::croak("$module is not installed") if (! exists($self->{$module}));
+    die("$module is not installed") if (! exists($self->{$module}));
     return $self->{$module}->{packlist};
 }
 
 sub version {
     my ($self, $module) = < @_;
-    Carp::croak("$module is not installed") if (! exists($self->{$module}));
+    die("$module is not installed") if (! exists($self->{$module}));
     return $self->{$module}->{version};
 }
 
