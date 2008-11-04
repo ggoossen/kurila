@@ -9,7 +9,7 @@ use File::Path;
 use File::Basename;
 use File::Spec;
 
-use Test::More tests => 63;
+use Test::More tests => 51;
 
 BEGIN { use_ok( 'ExtUtils::Installed' ) }
 
@@ -94,53 +94,6 @@ FAKE
 close FAKEMOD;
 
 my $fake_mod_dir = File::Spec->catdir(cwd(), 'auto', 'FakeMod');
-do {
-    # avoid warning and death by localizing glob
-    local *ExtUtils::Installed::Config;
-    %ExtUtils::Installed::Config = %(
-        < ( map { ($_ => config_value($_)) } config_keys ),
-        archlibexp         => cwd(),
-        sitearchexp        => $fake_mod_dir,
-    );
-
-    # necessary to fool new()
-    push @INC, $fake_mod_dir;
-
-    my $realei = ExtUtils::Installed->new();
-    isa_ok( $realei, 'ExtUtils::Installed' );
-    isa_ok( $realei->{Perl}->{packlist}, 'ExtUtils::Packlist' );
-    is( $realei->{Perl}->{version}, config_value("version"),
-        'new() should set Perl version from %Config' );
-
-    ok( exists $realei->{FakeMod}, 'new() should find modules with .packlists');
-    isa_ok( $realei->{FakeMod}->{packlist}, 'ExtUtils::Packlist' );
-    is( $realei->{FakeMod}->{version}, '1.1.1',
-	'... should find version in modules' );
-};
-
-# Now try this using PERL5LIB
-do {
-    local %ENV{PERL5LIB} = join config_value("path_sep"), @( $fake_mod_dir);
-    local *ExtUtils::Installed::Config;
-    %ExtUtils::Installed::Config = %(
-        < ( map { ($_ => config_value($_)) } config_keys() ),
-        archlibexp         => cwd(),
-        sitearchexp        => cwd(),
-    );
-
-    my $realei = ExtUtils::Installed->new();
-    isa_ok( $realei, 'ExtUtils::Installed' );
-    isa_ok( $realei->{Perl}->{packlist}, 'ExtUtils::Packlist' );
-    is( $realei->{Perl}->{version}, config_value("version"),
-        'new() should set Perl version from %Config' );
-
-    ok( exists $realei->{FakeMod},
-        'new() should find modules with .packlists using PERL5LIB'
-    );
-    isa_ok( $realei->{FakeMod}->{packlist}, 'ExtUtils::Packlist' );
-    is( $realei->{FakeMod}->{version}, '1.1.1',
-	'... should find version in modules' );
-};
 
 # Do the same thing as the last block, but with overrides for
 # %Config and @INC.
@@ -168,6 +121,8 @@ do {
     is( $realei->{FakeMod}->{version}, '1.1.1',
 	'... should find version in modules' );
 };
+
+push @INC, $fake_mod_dir;
 
 # Check if extra_libs works.
 do {
