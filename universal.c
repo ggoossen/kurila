@@ -1271,7 +1271,7 @@ XS(XS_PerlIO_get_layers)
 
 	     XPUSHs((SV*)retav);
 
-	     XSRETURN(nitem);
+	     XSRETURN(1);
 	}
     }
 #endif

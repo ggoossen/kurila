@@ -125,7 +125,7 @@ print $output CCODE->($curr_test+4);
 $TB->current_test($curr_test+4);
 
 eval q{ CCODE->{foo} };
-ok scalar($@->{description} =~ m/^Constant is not a HASH/);
+like($@->{description}, qr/^Expected a HASH ref but got a CODE ref/);
 
 
 # Allow leading underscore

@@ -7,6 +7,8 @@ static __inline__ datatype inlineDtype(pTHX_ SV *sv) {
         return Dt_ARRAY;
     else if (SvHVOK(sv))
         return Dt_HASH;
+    else if (SvCVOK(sv))
+        return Dt_CODE;
     else if (SvTYPE(sv) == SVt_PVGV)
         return Dt_GLOB;
     else if (SvROK(sv))
@@ -26,6 +28,7 @@ static __inline__ const char* inlineDdesc(pTHX_ SV *sv) {
     case Dt_UNDEF: return "UNDEF";
     case Dt_ARRAY: return "ARRAY";
     case Dt_HASH: return "HASH";
+    case Dt_CODE: return "CODE";
     case Dt_REF: return "REF";
     case Dt_PLAIN: return "PLAINVALUE";
     case Dt_IO: return "IO";
