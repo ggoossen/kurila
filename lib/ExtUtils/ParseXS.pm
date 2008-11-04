@@ -1830,7 +1830,7 @@ sub generate_output {
 	unless defined %output_expr{%type_kind{$subtype}} ;
       $subexpr = %output_expr{%type_kind{$subtype}};
       $subexpr =~ s/ntype/subtype/g;
-      $subexpr =~ s/\$arg/ST(ix_$var)/g;
+      $subexpr =~ s/\$arg/tmp_$var/g;
       $subexpr =~ s/\$var/$($var)\[ix_$var]/g;
       $subexpr =~ s/\n\t/\n\t\t/g;
       $expr =~ s/DO_ARRAY_ELEM\n/$subexpr/;
