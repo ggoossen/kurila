@@ -79,18 +79,6 @@ PP(pp_regcomp)
     SV *tmpstr;
     REGEXP *re = NULL;
 
-    /* prevent recompiling under /o and ithreads. */
-#if defined(USE_ITHREADS)
-    if (pm->op_pmflags & PMf_KEEP && PM_GETRE(pm)) {
-	if (PL_op->op_flags & OPf_STACKED) {
-	    dMARK;
-	    SP = MARK;
-	}
-	else
-	    (void)POPs;
-	RETURN;
-    }
-#endif
     if (PL_op->op_flags & OPf_STACKED) {
 	/* multiple args; concatentate them */
 	dMARK; dORIGMARK;
@@ -129,11 +117,7 @@ PP(pp_regcomp)
             U32 pm_flags = pm->op_pmflags & PMf_COMPILETIME;
 	    if (re) {
 	        ReREFCNT_dec(re);
-#ifdef USE_ITHREADS
-		PM_SETRE(pm, (REGEXP*) &PL_sv_undef);
-#else
 		PM_SETRE(pm, NULL);	/* crucial if regcomp aborts */
-#endif
 	    } else if (PL_curcop->cop_hints_hash) {
 	        SV **ptr = hv_fetch(PL_curcop->cop_hints_hash, "regcomp", 7, 0);
                 if (ptr && *ptr && SvIOK(*ptr) && SvIV(*ptr))
@@ -168,14 +152,12 @@ PP(pp_regcomp)
 	pm = PL_curpm;
 
 
-#if !defined(USE_ITHREADS)
     /* can't change the optree at runtime either */
     /* PMf_KEEP is handled differently under threads to avoid these problems */
     if (pm->op_pmflags & PMf_KEEP) {
 	pm->op_private &= ~OPpRUNTIME;	/* no point compiling again */
 	cLOGOP->op_first->op_next = PL_op->op_next;
     }
-#endif
     RETURN;
 }
 
@@ -1085,9 +1067,6 @@ PP(pp_enteriter)
     const I32 gimme = GIMME_V;
     SV **svp;
     U8 cxtype = CXt_LOOP_FOR;
-#ifdef USE_ITHREADS
-    PAD *iterdata;
-#endif
 
     ENTER;
     SAVETMPS;
@@ -1099,20 +1078,13 @@ PP(pp_enteriter)
 		    SVs_PADSTALE, SVs_PADSTALE);
 	}
 	SAVEPADSVANDMORTALIZE(PL_op->op_targ);
-#ifndef USE_ITHREADS
 	svp = &PAD_SVl(PL_op->op_targ);		/* "my" variable */
-#else
-	iterdata = NULL;
-#endif
     }
     else {
 	GV * const gv = (GV*)POPs;
 	svp = &GvSV(gv);			/* symbol table variable */
 	SAVEGENERICSV(*svp);
 	*svp = newSV(0);
-#ifdef USE_ITHREADS
-	iterdata = (PAD*)gv;
-#endif
     }
 
     if (PL_op->op_private & OPpITER_DEF)
@@ -1121,11 +1093,7 @@ PP(pp_enteriter)
     ENTER;
 
     PUSHBLOCK(cx, cxtype, SP);
-#ifdef USE_ITHREADS
-    PUSHLOOP_FOR(cx, iterdata, MARK, PL_op->op_targ);
-#else
     PUSHLOOP_FOR(cx, svp, MARK, 0);
-#endif
     if (PL_op->op_flags & OPf_SPECIAL) {
 	SV * const right = POPs;
 	dPOPss;

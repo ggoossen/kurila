@@ -1931,26 +1931,7 @@ S_regtry(pTHX_ regmatch_info *reginfo, char **startpos)
         }
         if (!PL_reg_curpm) {
 	    Newxz(PL_reg_curpm, 1, PMOP);
-#ifdef USE_ITHREADS
-            {
-		SV* const repointer = &PL_sv_undef;
-                /* this regexp is also owned by the new PL_reg_curpm, which
-		   will try to free it.  */
-                av_push(PL_regex_padav, repointer);
-                PL_reg_curpm->op_pmoffset = av_len(PL_regex_padav);
-                PL_regex_pad = AvARRAY(PL_regex_padav);
-            }
-#endif      
         }
-#ifdef USE_ITHREADS
-	/* It seems that non-ithreads works both with and without this code.
-	   So for efficiency reasons it seems best not to have the code
-	   compiled when it is not needed.  */
-	/* This is safe against NULLs: */
-	ReREFCNT_dec(PM_GETRE(PL_reg_curpm));
-	/* PM_reg_curpm owns a reference to this regexp.  */
-	ReREFCNT_inc(rx);
-#endif
 	PM_SETRE(PL_reg_curpm, rx);
 	PL_reg_oldcurpm = PL_curpm;
 	PL_curpm = PL_reg_curpm;

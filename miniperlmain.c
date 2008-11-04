@@ -85,21 +85,6 @@ main(int argc, char **argv, char **env)
     PERL_SYS_INIT3(&argc,&argv,&env);
 #endif
 
-#if defined(USE_ITHREADS)
-    /* XXX Ideally, this should really be happening in perl_alloc() or
-     * perl_construct() to keep libperl.a transparently fork()-safe.
-     * It is currently done here only because Apache/mod_perl have
-     * problems due to lack of a call to cancel pthread_atfork()
-     * handlers when shared objects that contain the handlers may
-     * be dlclose()d.  This forces applications that embed perl to
-     * call PTHREAD_ATFORK() explicitly, but if and only if it hasn't
-     * been called at least once before in the current process.
-     * --GSAR 2001-07-20 */
-    PTHREAD_ATFORK(Perl_atfork_lock,
-                   Perl_atfork_unlock,
-                   Perl_atfork_unlock);
-#endif
-
     if (!PL_do_undump) {
 	my_perl = perl_alloc();
 	if (!my_perl)

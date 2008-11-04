@@ -146,26 +146,11 @@ S_init_tls_and_interp(PerlInterpreter *my_perl)
     dVAR;
     if (!PL_curinterp) {			
 	PERL_SET_INTERP(my_perl);
-#if defined(USE_ITHREADS)
-	INIT_THREADS;
-	ALLOC_THREAD_KEY;
-	PERL_SET_THX(my_perl);
-	OP_REFCNT_INIT;
-	HINTS_REFCNT_INIT;
-	MUTEX_INIT(&PL_dollarzero_mutex);
-#  endif
 #ifdef PERL_IMPLICIT_CONTEXT
 	MUTEX_INIT(&PL_my_ctx_mutex);
 #  endif
     }
-#if defined(USE_ITHREADS)
-    else
-#else
-    /* This always happens for non-ithreads  */
-#endif
-    {
-	PERL_SET_THX(my_perl);
-    }
+    PERL_SET_THX(my_perl);
 }
 
 
@@ -353,12 +338,6 @@ perl_construct(pTHXx)
     sv_setpvn(PERL_DEBUG_PAD(0), "", 0);	/* For regex debugging. */
     sv_setpvn(PERL_DEBUG_PAD(1), "", 0);	/* ext/re needs these */
     sv_setpvn(PERL_DEBUG_PAD(2), "", 0);	/* even without DEBUGGING. */
-#ifdef USE_ITHREADS
-    /* First entry is a list of empty elements. It needs to be initialised
-       else all hell breaks loose in S_find_uninit_var().  */
-    Perl_av_create_and_push(aTHX_ &PL_regex_padav, newSVpvs(""));
-    PL_regex_pad = AvARRAY(PL_regex_padav);
-#endif
 #ifdef USE_REENTRANT_API
     Perl_reentrant_init(aTHX);
 #endif
@@ -575,12 +554,7 @@ perl_destruct(pTHXx)
      */
 #ifndef PERL_MICRO
 #if defined(USE_ENVIRON_ARRAY) && !defined(PERL_USE_SAFE_PUTENV)
-    if (environ != PL_origenviron && !PL_use_safe_putenv
-#ifdef USE_ITHREADS
-	/* only main thread can free environ[0] contents */
-	&& PL_curinterp == aTHX
-#endif
-	)
+    if (environ != PL_origenviron && !PL_use_safe_putenv)
     {
 	I32 i;
 
@@ -612,17 +586,6 @@ perl_destruct(pTHXx)
 
     /* reset so print() ends up where we expect */
     setdefout(NULL);
-
-#ifdef USE_ITHREADS
-    /* the syntax tree is shared between clones
-     * so op_free(PL_main_root) only ReREFCNT_dec's
-     * REGEXPs in the parent interpreter
-     * we need to manually ReREFCNT_dec for the clones
-     */
-    SvREFCNT_dec(PL_regex_padav);
-    PL_regex_padav = NULL;
-    PL_regex_pad = NULL;
-#endif
 
     SvREFCNT_dec((SV*) PL_stashcache);
     PL_stashcache = NULL;
@@ -893,12 +856,6 @@ perl_destruct(pTHXx)
     }
     HvREFCNT_dec(PL_strtab);
 
-#ifdef USE_ITHREADS
-    /* free the pointer tables used for cloning */
-    ptr_table_free(PL_ptr_table);
-    PL_ptr_table = (PTR_TBL_t*)NULL;
-#endif
-
     /* free special SVs */
 
     SvREFCNT(&PL_sv_yes) = 0;
@@ -1080,30 +1037,6 @@ perl_free(pTHXx)
     PerlMem_free(aTHXx);
 #endif
 }
-
-#if defined(USE_ITHREADS)
-/* provide destructors to clean up the thread key when libperl is unloaded */
-#ifndef WIN32 /* handled during DLL_PROCESS_DETACH in win32/perllib.c */
-
-#if defined(__hpux) && !(defined(__ux_version) && __ux_version <= 1020) && !defined(__GNUC__)
-#pragma fini "perl_fini"
-#elif defined(__sun) && !defined(__GNUC__)
-#pragma fini (perl_fini)
-#endif
-
-static void
-#if defined(__GNUC__)
-__attribute__((destructor))
-#endif
-perl_fini(void)
-{
-    dVAR;
-    if (PL_curinterp  && !PL_veto_cleanup)
-	FREE_THREAD_KEY;
-}
-
-#endif /* WIN32 */
-#endif /* THREADS */
 
 void
 Perl_call_atexit(pTHX_ ATEXIT_t fn, void *ptr)
@@ -4277,11 +4210,7 @@ S_init_postdump_symbols(pTHX_ register int argc, register char **argv, register 
 	if (!env)
 	    env = environ;
 	env_is_not_environ = env != environ;
-	if (env_is_not_environ
-#  ifdef USE_ITHREADS
-	    && PL_curinterp == aTHX
-#  endif
-	   )
+	if (env_is_not_environ)
 	{
 	    environ[0] = NULL;
 	}

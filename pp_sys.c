@@ -3441,20 +3441,7 @@ PP(pp_fork)
     PUSHi(childpid);
     RETURN;
 #else
-#  if defined(USE_ITHREADS) && defined(PERL_IMPLICIT_SYS)
-    dSP; dTARGET;
-    Pid_t childpid;
-
-    EXTEND(SP, 1);
-    PERL_FLUSHALL_FOR_CHILD;
-    childpid = PerlProc_fork();
-    if (childpid == -1)
-	RETSETUNDEF;
-    PUSHi(childpid);
-    RETURN;
-#  else
     DIE(aTHX_ PL_no_func, "fork");
-#  endif
 #endif
 }
 
@@ -3473,12 +3460,7 @@ PP(pp_wait)
 	  PERL_ASYNC_CHECK();
 	}
     }
-#  if defined(USE_ITHREADS) && defined(PERL_IMPLICIT_SYS)
-    /* 0 and -1 are both error returns (the former applies to WNOHANG case) */
-    STATUS_NATIVE_CHILD_SET((childpid && childpid != -1) ? argflags : -1);
-#  else
     STATUS_NATIVE_CHILD_SET((childpid > 0) ? argflags : -1);
-#  endif
     XPUSHi(childpid);
     RETURN;
 #else
@@ -3503,12 +3485,7 @@ PP(pp_waitpid)
 	  PERL_ASYNC_CHECK();
 	}
     }
-#  if defined(USE_ITHREADS) && defined(PERL_IMPLICIT_SYS)
-    /* 0 and -1 are both error returns (the former applies to WNOHANG case) */
-    STATUS_NATIVE_CHILD_SET((result && result != -1) ? argflags : -1);
-#  else
     STATUS_NATIVE_CHILD_SET((result > 0) ? argflags : -1);
-#  endif
     SETi(result);
     RETURN;
 #else

@@ -65,23 +65,6 @@ Anod	|int	|perl_run	|NN PerlInterpreter *my_perl
 Anod	|int	|perl_parse	|NN PerlInterpreter *my_perl|XSINIT_t xsinit \
 				|int argc|NULLOK char** argv|NULLOK char** env
 AnpR	|bool	|doing_taint	|int argc|NULLOK char** argv|NULLOK char** env
-#if defined(USE_ITHREADS)
-Anod	|PerlInterpreter*|perl_clone|NN PerlInterpreter *proto_perl|UV flags
-#  if defined(PERL_IMPLICIT_SYS)
-Ano	|PerlInterpreter*|perl_clone_using \
-				|NN PerlInterpreter *proto_perl \
-				|UV flags \
-				|NN struct IPerlMem* ipM \
-				|NN struct IPerlMem* ipMS \
-				|NN struct IPerlMem* ipMP \
-				|NN struct IPerlEnv* ipE \
-				|NN struct IPerlStdIO* ipStd \
-				|NN struct IPerlLIO* ipLIO \
-				|NN struct IPerlDir* ipD \
-				|NN struct IPerlSock* ipS \
-				|NN struct IPerlProc* ipP
-#  endif
-#endif
 
 Aanop	|Malloc_t|malloc	|MEM_SIZE nbytes
 Aanop	|Malloc_t|calloc	|MEM_SIZE elements|MEM_SIZE size
@@ -570,9 +553,6 @@ ApaR	|HV*	|newHVhv	|NULLOK HV *hv
 Ap	|void	|hv_sethv	|NN HV *dstr|NN HV *sstr
 Apa	|IO*	|newIO
 Apa	|OP*	|newLISTOP	|I32 type|I32 flags|NULLOK OP* first|NULLOK OP* last|NULLOK SV* location
-#ifdef USE_ITHREADS
-Apa	|OP*	|newPADOP	|I32 type|I32 flags|NN SV* sv|NULLOK SV* location
-#endif
 Apa	|OP*	|newPMOP	|I32 type|I32 flags|NULLOK SV* location
 Apa	|OP*	|newPVOP	|I32 type|I32 flags|NULLOK char* pv|NULLOK SV* location
 Apa	|SV*	|newRV		|NN SV *const sv
@@ -679,9 +659,6 @@ Ap	|void	|pregfree2	|NN REGEXP *rx
 Ap	|void	|preg_tmprefcnt	|NN REGEXP *rx
 EXp	|REGEXP*|reg_temp_copy	|NN REGEXP* r
 Ap	|void	|regfree_internal|NN REGEXP *const rx
-#if defined(USE_ITHREADS)
-Ap	|void*	|regdupe_internal|NN REGEXP * const r|NN CLONE_PARAMS* param
-#endif
 Ap	|REGEXP*|pregcomp	|NN const SV * const pattern|const U32 flags
 Ap	|REGEXP*|re_compile	|NN const SV * const pattern|U32 flags
 Ap	|char*	|re_intuit_start|NN REGEXP * const rx|NULLOK SV* sv|NN char* strpos \
@@ -1058,34 +1035,12 @@ Apr	|OP *	|newMYSUB	|I32 floor|NULLOK OP *o|NULLOK OP *proto \
 Apr	|void	|newMYSUB	|I32 floor|NULLOK OP *o|NULLOK OP *proto|NULLOK OP *attrs|NULLOK OP *block
 #endif
 p	|void	|boot_core_xsutils
-#if defined(USE_ITHREADS)
-ApR	|PERL_CONTEXT*|cx_dup	|NULLOK PERL_CONTEXT* cx|I32 ix|I32 max|NN CLONE_PARAMS* param
-ApR	|PERL_SI*|si_dup	|NULLOK PERL_SI* si|NN CLONE_PARAMS* param
-Apa	|ANY*	|ss_dup		|NN PerlInterpreter* proto_perl|NN CLONE_PARAMS* param
-ApR	|void*	|any_dup	|NULLOK void* v|NN const PerlInterpreter* proto_perl
-ApR	|HE*	|he_dup		|NULLOK const HE* e|bool shared|NN CLONE_PARAMS* param
-ApR	|HEK*	|hek_dup	|NULLOK HEK* e|NN CLONE_PARAMS* param
-Ap	|void	|re_dup_guts	|NN const REGEXP *sstr|NN REGEXP *dstr \
-				|NN CLONE_PARAMS* param
-Ap	|PerlIO*|fp_dup		|NULLOK PerlIO *const fp|const char type|NN CLONE_PARAMS *const param
-ApR	|DIR*	|dirp_dup	|NULLOK DIR *const dp
-ApR	|GP*	|gp_dup		|NULLOK GP *const gp|NN CLONE_PARAMS *const param
-ApR	|MAGIC*	|mg_dup		|NULLOK MAGIC *mg|NN CLONE_PARAMS *const param
-ApR	|SV*	|sv_dup		|NULLOK const SV* sstr|NN CLONE_PARAMS* param
-Ap	|void	|rvpv_dup	|NN SV* dstr|NN const SV *sstr|NN CLONE_PARAMS* param
-Ap	|yy_parser*|parser_dup	|NULLOK const yy_parser *const proto|NN CLONE_PARAMS *const param
-#endif
 Apa	|PTR_TBL_t*|ptr_table_new
 ApR	|void*	|ptr_table_fetch|NN PTR_TBL_t *tbl|NULLOK const void *sv
 Ap	|void	|ptr_table_store|NN PTR_TBL_t *tbl|NULLOK const void *oldsv|NN void *newsv
 Ap	|void	|ptr_table_split|NN PTR_TBL_t *tbl
 Ap	|void	|ptr_table_clear|NULLOK PTR_TBL_t *tbl
 Ap	|void	|ptr_table_free|NULLOK PTR_TBL_t *tbl
-#if defined(USE_ITHREADS)
-#  if defined(HAVE_INTERP_INTERN)
-Ap	|void	|sys_intern_dup	|NN struct interp_intern* src|NN struct interp_intern* dst
-#  endif
-#endif
 #if defined(HAVE_INTERP_INTERN)
 Ap	|void	|sys_intern_clear
 Ap	|void	|sys_intern_init
@@ -1836,9 +1791,6 @@ XEMop	|void	|emulate_cop_io	|NN const COP *const c|NN SV *const sv
 XEMop	|REGEXP *|get_re_arg|NULLOK SV *sv
 
 p	|struct mro_meta*	|mro_meta_init	|NN HV* stash
-#if defined(USE_ITHREADS)
-p	|struct mro_meta*	|mro_meta_dup	|NN struct mro_meta* smeta|NN CLONE_PARAMS* param
-#endif
 Apd	|AV*	|mro_get_linear_isa|NN HV* stash
 #if defined(PERL_IN_MRO_C) || defined(PERL_DECL_PROT)
 sd	|AV*	|mro_get_linear_isa_c3|NN HV* stash|I32 level

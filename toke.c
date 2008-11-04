@@ -3612,11 +3612,6 @@ Perl_yylex(pTHX)
 		    if (len == 6 && strnEQ(SvPVX_mutable(sv), "unique", len)) {
 			sv_free(sv);
 			if (PL_in_my == KEY_our) {
-#ifdef USE_ITHREADS
-			    GvUNIQUE_on(cGVOPx_gv(pl_yylval.opval));
-#else
-			    /* skip to avoid loading attributes.pm */
-#endif
 			    deprecate(":unique");
 			}
 			else
