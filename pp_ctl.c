@@ -1904,8 +1904,6 @@ S_doeval(pTHX_ int gimme, OP** startop, CV* outside, U32 seq)
     }
 
     /* XXX:ajgo do we really need to alloc an AV for begin/checkunit */
-    SAVESPTR(PL_beginav);
-    AVcpSTEAL(PL_beginav, newAV());
     SAVESPTR(PL_unitcheckav);
     AVcpSTEAL(PL_unitcheckav, newAV());
 

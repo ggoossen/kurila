@@ -3225,8 +3225,6 @@ Perl_newASSIGNOP(pTHX_ I32 flags, OP *left, I32 optype, OP *right, SV *location)
     }
 
     if (is_list_assignment(left)) {
-	static const char no_list_state[] = "Initialization of state variables"
-            " in list context currently forbidden";
 	OP *curop;
 	bool maybe_common_vars = TRUE;
 	bool expand_assignment = FALSE;
@@ -4463,11 +4461,14 @@ Perl_process_special_block(pTHX_ const I32 key, CV *const cv)
     switch(key) {
     case KEY_BEGIN:
     {
+	AV* call_av;
 	const I32 oldscope = PL_scopestack_ix;
 	ENTER;
 
-	Perl_av_create_and_push(aTHX_ &PL_beginav, (SV*)cv);
-	call_list(oldscope, PL_beginav);
+	call_av = newAV();
+	av_2mortal(call_av);
+	av_push(call_av, SvREFCNT_inc(CvSv(cv)));
+	call_list(oldscope, call_av);
 
 	PL_curcop = &PL_compiling;
 	CopHINTS_set(&PL_compiling, PL_hints);

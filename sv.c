@@ -10090,8 +10090,6 @@ perl_clone_using(PerlInterpreter *proto_perl, UV flags,
     PL_globalstash	= hv_dup(proto_perl->Iglobalstash, param);
     PL_curstname	= sv_dup_inc(proto_perl->Icurstname, param);
 
-    PL_beginav		= av_dup_inc(proto_perl->Ibeginav, param);
-    PL_beginav_save	= av_dup_inc(proto_perl->Ibeginav_save, param);
     PL_unitcheckav      = av_dup_inc(proto_perl->Iunitcheckav, param);
     PL_endav		= av_dup_inc(proto_perl->Iendav, param);
     PL_checkav		= av_dup_inc(proto_perl->Icheckav, param);
@@ -11101,7 +11099,6 @@ Perl_refcnt_check(pTHX)
     SvTMPREFCNT_inc(PL_compcv);
     SvTMPREFCNT_inc(PL_diehook);
     SvTMPREFCNT_inc(PL_main_cv);
-    SvTMPREFCNT_inc(PL_beginav);
     SvTMPREFCNT_inc(PL_unitcheckav);
     SvTMPREFCNT_inc(PL_rs);
     SvTMPREFCNT_inc(PL_fdpid);
