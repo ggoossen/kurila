@@ -22,8 +22,10 @@ do { my ($hint_bits, $warning_bits, $hinthash);
 $/ = "\n####\n";
 while ( ~< *DATA) {
     chomp;
-    s/#\s*(.*)$//mg;
-    my ($num, $todo, $testname) = $1 =~ m/(\d+)\s*(TODO)?\s*(.*)/;
+    my ($num, $testname, $todo);
+    if (s/#\s*(.*)$//mg) {
+        ($num, $todo, $testname) = $1 =~ m/(\d*)\s*(TODO)?\s*(.*)/;
+    }
     my ($input, $expected);
     if (m/(.*)\n>>>>\n(.*)/s) {
 	($input, $expected) = ($1, $2);
@@ -52,7 +54,11 @@ while ( ~< *DATA) {
 }
 
 use constant 'c', 'stuff';
-is((eval "sub ".$deparse->coderef2text(\&c))->(), 'stuff');
+do {
+    my $deparsed_txt = "sub ".$deparse->coderef2text(\&c);
+    my $deparsed_sub = eval $deparsed_txt; die if $@;
+    is($deparsed_sub->(), 'stuff');
+};
 
 my $a = 0;
 is("\{\n    (-1) ** \$a;\n\}", $deparse->coderef2text(sub{(-1) ** $a }));
@@ -281,25 +287,6 @@ my $bar;
 ####
 # 45
 1; # was 'say'
-####
-# 46 state vars
-state $x = 42;
-####
-# 47 state var assignment
-do {
-    my $y = (state $x = 42);
-};
->>>>
-do {
-    my $y = state $x = 42
-};
-####
-# 48 state vars in anoymous subroutines
-$main::a = sub {
-    state $x;
-    return $x++;
-}
-;
 ####
 # 49 match
 do {

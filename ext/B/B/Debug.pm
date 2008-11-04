@@ -4,14 +4,6 @@ our $VERSION = '1.05_02';
 
 use B < qw(peekop class walkoptree walkoptree_exec
          main_start main_root cstring sv_undef @specialsv_name);
-# <=5.008 had @specialsv_name exported from B::Asmdata
-BEGIN {
-    use Config;
-    my $ithreads = %Config{'useithreads'} eq 'define';
-    eval qq{
-	sub ITHREADS() \{ $ithreads \}
-    }; die $@ if $@;
-}
 
 my %done_gv;
 
@@ -80,12 +72,7 @@ sub B::PMOP::debug {
     $op->B::LISTOP::debug();
     printf "\top_pmreplroot\t0x\%x\n", ${$op->pmreplroot};
     printf "\top_pmreplstart\t0x\%x\n", ${$op->pmreplstart};
-    if (ITHREADS) {
-      printf "\top_pmstashpv\t\%s\n", < cstring( <$op->pmstashpv);
-      printf "\top_pmoffset\t\%d\n", < $op->pmoffset;
-    } else {
-      printf "\top_pmstash\t\%s\n", < cstring( <$op->pmstash);
-    }
+    printf "\top_pmstash\t\%s\n", < cstring( <$op->pmstash);
     printf "\top_precomp->precomp\t\%s\n", < cstring( <$op->precomp);
     printf "\top_pmflags\t0x\%x\n", < $op->pmflags;
     printf "\top_reflags\t0x\%x\n", < $op->reflags;
