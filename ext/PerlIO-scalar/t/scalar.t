@@ -8,11 +8,11 @@ BEGIN {
     require Config;
 }
 
-use Fcntl qw(SEEK_SET SEEK_CUR SEEK_END); # Not 0, 1, 2 everywhere.
+use Fcntl < qw(SEEK_SET SEEK_CUR SEEK_END); # Not 0, 1, 2 everywhere.
 
 $| = 1;
 
-use Test::More tests => 55;
+use Test::More tests => 52;
 
 my $fh;
 my $var = "aaa\n";
@@ -93,11 +93,7 @@ open $fh, '<', \42;
 is( ~< $fh, "42", "reading from non-string scalars");
 close $fh;
 
-{ package P; sub TIESCALAR {bless \%()} sub FETCH { "shazam" } }
-tie my $p, 'P'; open $fh, '<', \$p;
-is( ~< $fh, "shazam", "reading from magic scalars");
-
-{
+do {
     use warnings;
     my $warn = 0;
     local $^WARN_HOOK = sub { $warn++ };
@@ -105,9 +101,9 @@ is( ~< $fh, "shazam", "reading from magic scalars");
     print $fh "foo";
     close $fh;
     is($warn, 0, "no warnings when writing to an undefined scalar");
-}
+};
 
-{
+do {
     use warnings;
     my $warn = 0;
     local $^WARN_HOOK = sub { $warn++ };
@@ -116,28 +112,9 @@ is( ~< $fh, "shazam", "reading from magic scalars");
         close $fh;
     }
     is($warn, 0, "no warnings when reusing a lexical");
-}
+};
 
-{
-    use warnings;
-    my $warn = 0;
-    local $^WARN_HOOK = sub { $warn++ };
-
-    my $fetch = 0;
-    {
-        package MgUndef;
-        sub TIESCALAR { bless \@() }
-        sub FETCH { $fetch++; return undef }
-    }
-    tie my $scalar, 'MgUndef';
-
-    open my $fh, '<', \$scalar;
-    close $fh;
-    is($warn, 0, "no warnings reading a magical undef scalar");
-    is($fetch, 1, "FETCH only called once");
-}
-
-{
+do {
     use warnings;
     my $warn = 0;
     local $^WARN_HOOK = sub { $warn++ };
@@ -146,15 +123,15 @@ is( ~< $fh, "shazam", "reading from magic scalars");
     open my $fh, '<', \$scalar;
     close $fh;
     is($warn, 0, "no warnings reading an undef, allocated scalar");
-}
+};
 
 my $data = "a non-empty PV";
 $data = undef;
 open(MEM, '<', \$data) or die "Fail: $!\n";
-my $x = join '', ~< *MEM;
+my $x = join '', @: ~< *MEM;
 is($x, '');
 
-{
+do {
     # [perl #35929] verify that works with $/ (i.e. test PerlIOScalar_unread)
     my $s = <<'EOF';
 line A
@@ -166,10 +143,10 @@ EOF
     my $ln = ~< *F;
     close F;
     is($ln, $s, "[perl #35929]");
-}
+};
 
 # [perl #40267] PerlIO::scalar doesn't respect readonly-ness
-{
+do {
     ok(!(defined open(F, '>', \undef)), "[perl #40267] - $!");
     close F;
 
@@ -180,9 +157,9 @@ EOF
     ok(open(F, '<', $ro), $!);
     is( ~< *F, 43);
     close F;
-}
+};
 
-{
+do {
     # Check that we zero fill when needed when seeking,
     # and that seeking negative off the string does not do bad things.
 
@@ -223,5 +200,5 @@ EOF
     ok(seek(F, 0, SEEK_SET));
     ok(!seek(F,  -50, SEEK_CUR), $!);
     ok(!seek(F, -150, SEEK_END), $!);
-}
+};
 

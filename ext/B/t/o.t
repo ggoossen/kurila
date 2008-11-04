@@ -38,7 +38,7 @@ isnt( @lines[1], 'Compiling!', 'Output should not be printed with -q switch' );
 
 SKIP: do {
 	skip( '-q redirection does not work without PerlIO', 2)
-		unless %Config{useperlio};
+		unless config_value("useperlio");
 	is( @lines[1], "[Compiling!", '... but should be in $O::BEGIN_output' );
 
 	@args[1] = '-MO=-qq,success,foo,bar';

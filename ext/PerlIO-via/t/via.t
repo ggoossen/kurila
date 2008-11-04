@@ -27,13 +27,13 @@ ok( (print $fh $a), "print to output file");
 ok( close($fh), 'close output file');
 
 ok( open($fh,"<via(PerlIO::via::QuotedPrint)", $tmp), 'open QuotedPrint for input');
-{ local $/; $b = ~< $fh }
+do { local $/; $b = ~< $fh };
 ok( close($fh), "close input file");
 
 is($a, $b, 'compare original data with filtered version');
 
 
-{
+do {
     my $warnings = '';
     local $^WARN_HOOK = sub { $warnings = @_[0]->{description} };
 
@@ -57,9 +57,9 @@ is($a, $b, 'compare original data with filtered version');
 
     close($fh);
 
-{
+do {
 package Incomplete::Module; 
-}
+};
 
     $warnings = '';
     no warnings 'layer';
@@ -70,7 +70,7 @@ package Incomplete::Module;
     no warnings 'layer';
     ok( ! open($fh,">via(Unknown::Module)", $tmp), 'open via Unknown::Module will fail');
     is( $warnings, "",  "don't warn about unknown package" );
-}
+};
 
 my $obj = '';
 sub Foo::PUSHED			{ $obj = shift; -1; }
