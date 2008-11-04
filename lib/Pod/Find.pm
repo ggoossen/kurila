@@ -128,8 +128,8 @@ sub pod_find
 
     if(%opts{-script}) {
         require Config;
-        push(@search, %Config::Config{scriptdir})
-            if -d %Config::Config{scriptdir};
+        push(@search, Config::config_value('scriptdir'))
+            if -d Config::config_value('scriptdir');
         %opts{-perl} = 1;
     }
 
@@ -171,7 +171,7 @@ sub pod_find
               qq!^(?i:\:?site_perl\:|\:?pod\:(?=.*?\\.pod\\z))*!;
         } else {
             $SIMPLIFY_RX =
-              qq!^(?i:site(_perl)?/|\Q%Config::Config{archname}\E/|\\d+\\.\\d+([_.]?\\d+)?/|pod/(?=.*?\\.pod\\z))*!;
+              qq!^(?i:site(_perl)?/|\Q$(Config::config_value('archname'))\E/|\\d+\\.\\d+([_.]?\\d+)?/|pod/(?=.*?\\.pod\\z))*!;
         }
     }
 
@@ -410,14 +410,14 @@ sub pod_where {
 
     # Add location of pod documentation for perl man pages (eg perlfunc)
     # This is a pod directory in the private install tree
-    #my $perlpoddir = File::Spec->catdir($Config::Config{'installprivlib'},
+    #my $perlpoddir = File::Spec->catdir(Config::config_value('installprivlib'),
     #					'pod');
     #push (@search_dirs, $perlpoddir)
     #  if -d $perlpoddir;
 
     # Add location of binaries such as pod2text
-    push (@search_dirs, %Config::Config{'scriptdir'})
-      if -d %Config::Config{'scriptdir'};
+    push (@search_dirs, Config::config_value('scriptdir'))
+      if -d Config::config_value('scriptdir');
   }
 
   warn "Search path is: ".join(' ', @search_dirs)."\n"
