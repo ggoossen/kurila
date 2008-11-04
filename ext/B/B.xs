@@ -276,9 +276,6 @@ B::AV
 B_unitcheck_av()
 
 B::AV
-B_begin_av()
-
-B::AV
 B_end_av()
 
 B::GV
