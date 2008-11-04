@@ -221,6 +221,16 @@ the value to perl it is processed in the same way as for T_IV.
 
 Its behaviour is identical to using an C<int> type in XS with T_IV.
 
+=cut
+
+int
+T_INT( iv )
+  int iv
+ CODE:
+  RETVAL = iv;
+ OUTPUT:
+  RETVAL
+
 =item T_ENUM
 
 An enum value. Used to transfer an enum component
@@ -261,11 +271,31 @@ This is for unsigned integers. It is equivalent to using T_UV
 but explicitly casts the variable to type C<unsigned int>.
 The default type for C<unsigned int> is T_UV.
 
+=cut
+
+unsigned int
+T_U_INT( iv )
+  unsigned int iv
+ CODE:
+  RETVAL = iv;
+ OUTPUT:
+  RETVAL
+
 =item T_SHORT
 
 Short integers. This is equivalent to T_IV but explicitly casts
 the return to type C<short>. The default typemap for C<short>
 is T_IV.
+
+=cut
+
+short
+T_SHORT( iv )
+  short iv
+ CODE:
+  RETVAL = iv;
+ OUTPUT:
+  RETVAL
 
 =item T_U_SHORT
 
@@ -291,6 +321,16 @@ T_U_SHORT( in )
 Long integers. This is equivalent to T_IV but explicitly casts
 the return to type C<long>. The default typemap for C<long>
 is T_IV.
+
+=cut
+
+long
+T_LONG( in )
+  long in
+ CODE:
+  RETVAL = in;
+ OUTPUT:
+  RETVAL
 
 =item T_U_LONG
 
@@ -626,9 +666,11 @@ void
 T_OPAQUEPTR_OUT_struct( test )
   astruct * test
  PPCODE:
-  XPUSHs(sv_2mortal(newSViv(test->a)));
-  XPUSHs(sv_2mortal(newSViv(test->b)));
-  XPUSHs(sv_2mortal(newSVnv(test->c)));
+  AV* res = newAV();
+  av_push(res, newSViv(test->a));
+  av_push(res, newSViv(test->b));
+  av_push(res, newSVnv(test->c));
+  mXPUSHs(AvSv(res));
 
 
 =item T_OPAQUE
@@ -776,7 +818,7 @@ T_ARRAY( dummy, array, ... )
   RETVAL
  CLEANUP:
   Safefree(array);
-  XSRETURN(size_RETVAL);
+  XSRETURN(1);
 
 
 =item T_STDIO
