@@ -253,8 +253,6 @@ BOOT:
 #define B_main_cv()	PL_main_cv
 #define B_init_av()	PL_initav
 #define B_inc_gv()	PL_incgv
-#define B_check_av()	PL_checkav_save
-#define B_unitcheck_av()	PL_unitcheckav_save
 #define B_end_av()	PL_endav
 #define B_sub_generation()	PL_sub_generation
 #define B_defstash()	PL_defstash

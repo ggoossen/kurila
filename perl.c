@@ -665,14 +665,10 @@ perl_destruct(pTHXx)
     AVcpNULL(PL_beginav);
     AvREFCNT_dec(PL_endav);
     AvREFCNT_dec(PL_checkav);
-    AvREFCNT_dec(PL_checkav_save);
     AVcpNULL(PL_unitcheckav);
-    AvREFCNT_dec(PL_unitcheckav_save);
     AvREFCNT_dec(PL_initav);
     PL_endav = NULL;
     PL_checkav = NULL;
-    PL_checkav_save = NULL;
-    PL_unitcheckav_save = NULL;
     PL_initav = NULL;
 
     /* shortcuts just get cleared */
@@ -4648,16 +4644,7 @@ Perl_call_list(pTHX_ I32 oldscope, AV *paramList)
 
     while (av_len(paramList) >= 0) {
 	cv = (CV*)av_shift(paramList);
-	if (PL_savebegin) {
-	    if (paramList == PL_checkav) {
-		/* save PL_checkav for compiler */
-		Perl_av_create_and_push(aTHX_ &PL_checkav_save, (SV*)cv);
-	    }
-	    else if (paramList == PL_unitcheckav) {
-		/* save PL_unitcheckav for compiler */
-		Perl_av_create_and_push(aTHX_ &PL_unitcheckav_save, (SV*)cv);
-	    }
-	} else {
+	if ( ! PL_savebegin ) {
 	    if (!PL_madskills)
 		SAVEFREESV(cv);
 	}

@@ -563,9 +563,6 @@ PERLVAR(Iutf8_idcont,	SV *)
 
 PERLVAR(Isort_RealCmp,  SVCOMPARE_t)
 
-PERLVARI(Icheckav_save, AV*, NULL)	/* save CHECK{}s when compiling */
-PERLVARI(Iunitcheckav_save, AV*, NULL)	/* save UNITCHECK{}s when compiling */
-
 PERLVARI(Iclocktick, long, 0)	/* this many times() ticks in a second */
 
 PERLVARI(Iin_load_module, int, 0)	/* to prevent recursions in PerlIO_find_layer */

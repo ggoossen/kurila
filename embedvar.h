@@ -73,7 +73,6 @@
 #define PL_body_arenas		(vTHX->Ibody_arenas)
 #define PL_body_roots		(vTHX->Ibody_roots)
 #define PL_checkav		(vTHX->Icheckav)
-#define PL_checkav_save		(vTHX->Icheckav_save)
 #define PL_chopset		(vTHX->Ichopset)
 #define PL_clocktick		(vTHX->Iclocktick)
 #define PL_colors		(vTHX->Icolors)
@@ -292,7 +291,6 @@
 #define PL_uid			(vTHX->Iuid)
 #define PL_unicode		(vTHX->Iunicode)
 #define PL_unitcheckav		(vTHX->Iunitcheckav)
-#define PL_unitcheckav_save	(vTHX->Iunitcheckav_save)
 #define PL_unlockhook		(vTHX->Iunlockhook)
 #define PL_unsafe		(vTHX->Iunsafe)
 #define PL_utf8_alnum		(vTHX->Iutf8_alnum)
@@ -359,7 +357,6 @@
 #define PL_Ibody_arenas		PL_body_arenas
 #define PL_Ibody_roots		PL_body_roots
 #define PL_Icheckav		PL_checkav
-#define PL_Icheckav_save	PL_checkav_save
 #define PL_Ichopset		PL_chopset
 #define PL_Iclocktick		PL_clocktick
 #define PL_Icolors		PL_colors
@@ -578,7 +575,6 @@
 #define PL_Iuid			PL_uid
 #define PL_Iunicode		PL_unicode
 #define PL_Iunitcheckav		PL_unitcheckav
-#define PL_Iunitcheckav_save	PL_unitcheckav_save
 #define PL_Iunlockhook		PL_unlockhook
 #define PL_Iunsafe		PL_unsafe
 #define PL_Iutf8_alnum		PL_utf8_alnum
