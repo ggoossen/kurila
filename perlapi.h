@@ -182,8 +182,6 @@ END_EXTERN_C
 #define PL_body_roots		(*Perl_Ibody_roots_ptr(aTHX))
 #undef  PL_checkav
 #define PL_checkav		(*Perl_Icheckav_ptr(aTHX))
-#undef  PL_checkav_save
-#define PL_checkav_save		(*Perl_Icheckav_save_ptr(aTHX))
 #undef  PL_chopset
 #define PL_chopset		(*Perl_Ichopset_ptr(aTHX))
 #undef  PL_clocktick
@@ -620,8 +618,6 @@ END_EXTERN_C
 #define PL_unicode		(*Perl_Iunicode_ptr(aTHX))
 #undef  PL_unitcheckav
 #define PL_unitcheckav		(*Perl_Iunitcheckav_ptr(aTHX))
-#undef  PL_unitcheckav_save
-#define PL_unitcheckav_save	(*Perl_Iunitcheckav_save_ptr(aTHX))
 #undef  PL_unlockhook
 #define PL_unlockhook		(*Perl_Iunlockhook_ptr(aTHX))
 #undef  PL_unsafe
