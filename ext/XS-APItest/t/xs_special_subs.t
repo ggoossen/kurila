@@ -4,10 +4,6 @@ use TestInit;
 use Config;
 
 BEGIN {
-    if (%Config{'extensions'} !~ m/\bXS\/APItest\b/) {
-        print "1..0 # Skip: XS::APItest was not built\n";
-        exit 0;
-    }
     # Hush the used only once warning.
     $XS::APItest::WARNINGS_ON_BOOTSTRAP = $MacPerl::Architecture;
     $XS::APItest::WARNINGS_ON_BOOTSTRAP = 1;

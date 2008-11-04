@@ -983,11 +983,7 @@ sub OptreeCheck::gentest {
     if ($got =~ m/got \'.*?\n(.*)\n\# \'\n\# expected/s) {
 	my $goldentxt = $1;
 	#and plug it into the test-src
-	if ($threaded) {
-	    $testcode =~ s/ThreadedRef/$goldentxt/;
-	} else {
-	    $testcode =~ s/NonThreadRef/$goldentxt/;
-	}
+        $testcode =~ s/NonThreadRef/$goldentxt/;
 	my $b4 = q{expect => <<EOT_EOT, expect_nt => <<EONT_EONT};
 	my $af = q{expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT'};
 	$testcode =~ s/$b4/$af/;

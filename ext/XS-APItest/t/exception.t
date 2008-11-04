@@ -2,13 +2,6 @@
 use TestInit;
 use Config;
 
-BEGIN {
-    if (%Config{'extensions'} !~ m/\bXS\/APItest\b/) {
-        print "1..0 # Skip: XS::APItest was not built\n";
-        exit 0;
-    }
-}
-
 use Test::More tests => 10;
 
 BEGIN { use_ok('XS::APItest') };
