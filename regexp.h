@@ -149,9 +149,6 @@ typedef struct regexp_engine {
     SV*     (*named_buff_iter) (pTHX_ REGEXP * const rx, const SV * const lastkey,
                                 const U32 flags);
     SV*     (*qr_package)(pTHX_ REGEXP * const rx);
-#ifdef USE_ITHREADS
-    void*   (*dupe) (pTHX_ REGEXP * const rx, CLONE_PARAMS *param);
-#endif
 } regexp_engine;
 
 /*

@@ -530,16 +530,6 @@ PERLVAR(Inumeric_radix_sv,	SV *)	/* The radix separator if not '.' */
 
 #endif
 
-#if defined(USE_ITHREADS)
-PERLVAR(Iregex_pad,     SV**)		/* Shortcut into the array of
-					   regex_padav */
-PERLVAR(Iregex_padav,   AV*)		/* All regex objects, indexed via the
-					   values in op_pmoffset of pmop.
-					   Entry 0 is an SV whose PV is a
-					   "packed" list of IVs listing
-					   the now-free slots in the array */
-#endif
-
 #ifdef USE_REENTRANT_API
 PERLVAR(Ireentrant_buffer, REENTR*)	/* here we store the _r buffers */
 #endif

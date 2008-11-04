@@ -1028,9 +1028,6 @@ static void S_dump_op_rest (pTHX_ I32 level, PerlIO *file, const OP *o)
     case OP_AELEMFAST:
     case OP_GVSV:
     case OP_GV:
-#ifdef USE_ITHREADS
-	Perl_dump_indent(aTHX_ level, file, "PADIX = %" IVdf "\n", (IV)cPADOPo->op_padix);
-#else
 	if ( ! PL_op->op_flags & OPf_SPECIAL) { /* not lexical */
 	    if (cSVOPo->op_sv) {
 		SV * const tmpsv = sv_2mortal(newSV(0));
@@ -1043,16 +1040,11 @@ static void S_dump_op_rest (pTHX_ I32 level, PerlIO *file, const OP *o)
 	    else
 		Perl_dump_indent(aTHX_ level, file, "GV = NULL\n");
 	}
-#endif
 	break;
     case OP_CONST:
     case OP_HINTSEVAL:
     case OP_METHOD_NAMED:
-#ifndef USE_ITHREADS
-	/* with ITHREADS, consts are stored in the pad, and the right pad
-	 * may not be active here, so skip */
 	Perl_dump_indent(aTHX_ level, file, "SV = %s\n", SvPEEK(cSVOPo_sv));
-#endif
 	break;
     case OP_NEXTSTATE:
     case OP_DBSTATE:
@@ -2557,9 +2549,6 @@ Perl_do_op_xmldump(pTHX_ I32 level, PerlIO *file, const OP *o)
 	}
     case OP_GVSV:
     case OP_GV:
-#ifdef USE_ITHREADS
-	S_xmldump_attr(aTHX_ level, file, "padix=\"%" IVdf "\"", (IV)cPADOPo->op_padix);
-#else
 	if (cSVOPo->op_sv) {
 	    SV * const tmpsv1 = newSVpvn(NULL, 0);
 	    SV * const tmpsv2 = newSVpvn("", 0);
@@ -2576,16 +2565,11 @@ Perl_do_op_xmldump(pTHX_ I32 level, PerlIO *file, const OP *o)
 	}
 	else
 	    S_xmldump_attr(aTHX_ level, file, "gv=\"NULL\"");
-#endif
 	break;
     case OP_CONST:
     case OP_HINTSEVAL:
     case OP_METHOD_NAMED:
-#ifndef USE_ITHREADS
-	/* with ITHREADS, consts are stored in the pad, and the right pad
-	 * may not be active here, so skip */
 	S_xmldump_attr(aTHX_ level, file, "%s", sv_xmlpeek(cSVOPo_sv));
-#endif
 	break;
     case OP_ANONCODE:
 	if (!contents) {

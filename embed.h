@@ -31,10 +31,6 @@
 #if defined(PERL_IMPLICIT_SYS)
 #endif
 #define doing_taint		Perl_doing_taint
-#if defined(USE_ITHREADS)
-#  if defined(PERL_IMPLICIT_SYS)
-#  endif
-#endif
 #if defined(MYMALLOC)
 #ifdef PERL_CORE
 #define malloced_size		Perl_malloced_size
@@ -557,9 +553,6 @@
 #define hv_sethv		Perl_hv_sethv
 #define newIO			Perl_newIO
 #define newLISTOP		Perl_newLISTOP
-#ifdef USE_ITHREADS
-#define newPADOP		Perl_newPADOP
-#endif
 #define newPMOP			Perl_newPMOP
 #define newPVOP			Perl_newPVOP
 #define newRV			Perl_newRV
@@ -682,9 +675,6 @@
 #define reg_temp_copy		Perl_reg_temp_copy
 #endif
 #define regfree_internal	Perl_regfree_internal
-#if defined(USE_ITHREADS)
-#define regdupe_internal	Perl_regdupe_internal
-#endif
 #define pregcomp		Perl_pregcomp
 #define re_compile		Perl_re_compile
 #define re_intuit_start		Perl_re_intuit_start
@@ -1053,33 +1043,12 @@
 #ifdef PERL_CORE
 #define boot_core_xsutils	Perl_boot_core_xsutils
 #endif
-#if defined(USE_ITHREADS)
-#define cx_dup			Perl_cx_dup
-#define si_dup			Perl_si_dup
-#define ss_dup			Perl_ss_dup
-#define any_dup			Perl_any_dup
-#define he_dup			Perl_he_dup
-#define hek_dup			Perl_hek_dup
-#define re_dup_guts		Perl_re_dup_guts
-#define fp_dup			Perl_fp_dup
-#define dirp_dup		Perl_dirp_dup
-#define gp_dup			Perl_gp_dup
-#define mg_dup			Perl_mg_dup
-#define sv_dup			Perl_sv_dup
-#define rvpv_dup		Perl_rvpv_dup
-#define parser_dup		Perl_parser_dup
-#endif
 #define ptr_table_new		Perl_ptr_table_new
 #define ptr_table_fetch		Perl_ptr_table_fetch
 #define ptr_table_store		Perl_ptr_table_store
 #define ptr_table_split		Perl_ptr_table_split
 #define ptr_table_clear		Perl_ptr_table_clear
 #define ptr_table_free		Perl_ptr_table_free
-#if defined(USE_ITHREADS)
-#  if defined(HAVE_INTERP_INTERN)
-#define sys_intern_dup		Perl_sys_intern_dup
-#  endif
-#endif
 #if defined(HAVE_INTERP_INTERN)
 #define sys_intern_clear	Perl_sys_intern_clear
 #define sys_intern_init		Perl_sys_intern_init
@@ -1818,11 +1787,6 @@
 #ifdef PERL_CORE
 #define mro_meta_init		Perl_mro_meta_init
 #endif
-#if defined(USE_ITHREADS)
-#ifdef PERL_CORE
-#define mro_meta_dup		Perl_mro_meta_dup
-#endif
-#endif
 #define mro_get_linear_isa	Perl_mro_get_linear_isa
 #if defined(PERL_IN_MRO_C) || defined(PERL_DECL_PROT)
 #ifdef PERL_CORE
@@ -2242,10 +2206,6 @@
 #if defined(PERL_IMPLICIT_SYS)
 #endif
 #define doing_taint		Perl_doing_taint
-#if defined(USE_ITHREADS)
-#  if defined(PERL_IMPLICIT_SYS)
-#  endif
-#endif
 #if defined(MYMALLOC)
 #ifdef PERL_CORE
 #define malloced_size		Perl_malloced_size
@@ -2754,9 +2714,6 @@
 #define hv_sethv(a,b)		Perl_hv_sethv(aTHX_ a,b)
 #define newIO()			Perl_newIO(aTHX)
 #define newLISTOP(a,b,c,d,e)	Perl_newLISTOP(aTHX_ a,b,c,d,e)
-#ifdef USE_ITHREADS
-#define newPADOP(a,b,c,d)	Perl_newPADOP(aTHX_ a,b,c,d)
-#endif
 #define newPMOP(a,b,c)		Perl_newPMOP(aTHX_ a,b,c)
 #define newPVOP(a,b,c,d)	Perl_newPVOP(aTHX_ a,b,c,d)
 #define newRV(a)		Perl_newRV(aTHX_ a)
@@ -2877,9 +2834,6 @@
 #define reg_temp_copy(a)	Perl_reg_temp_copy(aTHX_ a)
 #endif
 #define regfree_internal(a)	Perl_regfree_internal(aTHX_ a)
-#if defined(USE_ITHREADS)
-#define regdupe_internal(a,b)	Perl_regdupe_internal(aTHX_ a,b)
-#endif
 #define pregcomp(a,b)		Perl_pregcomp(aTHX_ a,b)
 #define re_compile(a,b)		Perl_re_compile(aTHX_ a,b)
 #define re_intuit_start(a,b,c,d,e,f)	Perl_re_intuit_start(aTHX_ a,b,c,d,e,f)
@@ -3239,33 +3193,12 @@
 #ifdef PERL_CORE
 #define boot_core_xsutils()	Perl_boot_core_xsutils(aTHX)
 #endif
-#if defined(USE_ITHREADS)
-#define cx_dup(a,b,c,d)		Perl_cx_dup(aTHX_ a,b,c,d)
-#define si_dup(a,b)		Perl_si_dup(aTHX_ a,b)
-#define ss_dup(a,b)		Perl_ss_dup(aTHX_ a,b)
-#define any_dup(a,b)		Perl_any_dup(aTHX_ a,b)
-#define he_dup(a,b,c)		Perl_he_dup(aTHX_ a,b,c)
-#define hek_dup(a,b)		Perl_hek_dup(aTHX_ a,b)
-#define re_dup_guts(a,b,c)	Perl_re_dup_guts(aTHX_ a,b,c)
-#define fp_dup(a,b,c)		Perl_fp_dup(aTHX_ a,b,c)
-#define dirp_dup(a)		Perl_dirp_dup(aTHX_ a)
-#define gp_dup(a,b)		Perl_gp_dup(aTHX_ a,b)
-#define mg_dup(a,b)		Perl_mg_dup(aTHX_ a,b)
-#define sv_dup(a,b)		Perl_sv_dup(aTHX_ a,b)
-#define rvpv_dup(a,b,c)		Perl_rvpv_dup(aTHX_ a,b,c)
-#define parser_dup(a,b)		Perl_parser_dup(aTHX_ a,b)
-#endif
 #define ptr_table_new()		Perl_ptr_table_new(aTHX)
 #define ptr_table_fetch(a,b)	Perl_ptr_table_fetch(aTHX_ a,b)
 #define ptr_table_store(a,b,c)	Perl_ptr_table_store(aTHX_ a,b,c)
 #define ptr_table_split(a)	Perl_ptr_table_split(aTHX_ a)
 #define ptr_table_clear(a)	Perl_ptr_table_clear(aTHX_ a)
 #define ptr_table_free(a)	Perl_ptr_table_free(aTHX_ a)
-#if defined(USE_ITHREADS)
-#  if defined(HAVE_INTERP_INTERN)
-#define sys_intern_dup(a,b)	Perl_sys_intern_dup(aTHX_ a,b)
-#  endif
-#endif
 #if defined(HAVE_INTERP_INTERN)
 #define sys_intern_clear()	Perl_sys_intern_clear(aTHX)
 #define sys_intern_init()	Perl_sys_intern_init(aTHX)
@@ -4020,11 +3953,6 @@
 #endif
 #ifdef PERL_CORE
 #define mro_meta_init(a)	Perl_mro_meta_init(aTHX_ a)
-#endif
-#if defined(USE_ITHREADS)
-#ifdef PERL_CORE
-#define mro_meta_dup(a,b)	Perl_mro_meta_dup(aTHX_ a,b)
-#endif
 #endif
 #define mro_get_linear_isa(a)	Perl_mro_get_linear_isa(aTHX_ a)
 #if defined(PERL_IN_MRO_C) || defined(PERL_DECL_PROT)

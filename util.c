@@ -1637,10 +1637,6 @@ void
 Perl_my_setenv(pTHX_ const char *nam, const char *val)
 {
   dVAR;
-#ifdef USE_ITHREADS
-  /* only parent thread can modify process environment */
-  if (PL_curinterp == aTHX)
-#endif
   {
 #ifndef PERL_USE_SAFE_PUTENV
     if (!PL_use_safe_putenv) {
@@ -2590,13 +2586,6 @@ void
 Perl_atfork_lock(void)
 {
    dVAR;
-#if defined(USE_ITHREADS)
-    /* locks must be held in locking order (if any) */
-#  ifdef MYMALLOC
-    MUTEX_LOCK(&PL_malloc_mutex);
-#  endif
-    OP_REFCNT_LOCK;
-#endif
 }
 
 /* this is called in both parent and child after the fork() */
@@ -2604,13 +2593,6 @@ void
 Perl_atfork_unlock(void)
 {
     dVAR;
-#if defined(USE_ITHREADS)
-    /* locks must be released in same order as in atfork_lock() */
-#  ifdef MYMALLOC
-    MUTEX_UNLOCK(&PL_malloc_mutex);
-#  endif
-    OP_REFCNT_UNLOCK;
-#endif
 }
 
 Pid_t
@@ -2618,15 +2600,9 @@ Perl_my_fork(void)
 {
 #if defined(HAS_FORK)
     Pid_t pid;
-#if defined(USE_ITHREADS) && !defined(HAS_PTHREAD_ATFORK)
-    atfork_lock();
-    pid = fork();
-    atfork_unlock();
-#else
     /* atfork_lock() and atfork_unlock() are installed as pthread_atfork()
      * handlers elsewhere in the code */
     pid = fork();
-#endif
     return pid;
 #else
     /* this "canna happen" since nothing should be calling here if !HAS_FORK */
@@ -2702,12 +2678,6 @@ Perl_rsignal(pTHX_ int signo, Sighandler_t handler)
     dVAR;
     struct sigaction act, oact;
 
-#ifdef USE_ITHREADS
-    /* only "parent" interpreter can diddle signals */
-    if (PL_curinterp != aTHX)
-	return (Sighandler_t) SIG_ERR;
-#endif
-
     act.sa_handler = (void(*)(int))handler;
     sigemptyset(&act.sa_mask);
     act.sa_flags = 0;
@@ -2745,12 +2715,6 @@ Perl_rsignal_save(pTHX_ int signo, Sighandler_t handler, Sigsave_t *save)
 
     PERL_ARGS_ASSERT_RSIGNAL_SAVE;
 
-#ifdef USE_ITHREADS
-    /* only "parent" interpreter can diddle signals */
-    if (PL_curinterp != aTHX)
-	return -1;
-#endif
-
     act.sa_handler = (void(*)(int))handler;
     sigemptyset(&act.sa_mask);
     act.sa_flags = 0;
@@ -2769,11 +2733,6 @@ int
 Perl_rsignal_restore(pTHX_ int signo, Sigsave_t *save)
 {
     dVAR;
-#ifdef USE_ITHREADS
-    /* only "parent" interpreter can diddle signals */
-    if (PL_curinterp != aTHX)
-	return -1;
-#endif
 
     return sigaction(signo, save, (struct sigaction *)NULL);
 }
@@ -2783,12 +2742,6 @@ Perl_rsignal_restore(pTHX_ int signo, Sigsave_t *save)
 Sighandler_t
 Perl_rsignal(pTHX_ int signo, Sighandler_t handler)
 {
-#if defined(USE_ITHREADS) && !defined(WIN32)
-    /* only "parent" interpreter can diddle signals */
-    if (PL_curinterp != aTHX)
-	return (Sighandler_t) SIG_ERR;
-#endif
-
     return PerlProc_signal(signo, handler);
 }
 
@@ -2805,12 +2758,6 @@ Perl_rsignal_state(pTHX_ int signo)
     dVAR;
     Sighandler_t oldsig;
 
-#if defined(USE_ITHREADS) && !defined(WIN32)
-    /* only "parent" interpreter can diddle signals */
-    if (PL_curinterp != aTHX)
-	return (Sighandler_t) SIG_ERR;
-#endif
-
     PL_sig_trapped = 0;
     oldsig = PerlProc_signal(signo, sig_trap);
     PerlProc_signal(signo, oldsig);
@@ -2822,11 +2769,6 @@ Perl_rsignal_state(pTHX_ int signo)
 int
 Perl_rsignal_save(pTHX_ int signo, Sighandler_t handler, Sigsave_t *save)
 {
-#if defined(USE_ITHREADS) && !defined(WIN32)
-    /* only "parent" interpreter can diddle signals */
-    if (PL_curinterp != aTHX)
-	return -1;
-#endif
     *save = PerlProc_signal(signo, handler);
     return (*save == (Sighandler_t) SIG_ERR) ? -1 : 0;
 }
@@ -2834,11 +2776,6 @@ Perl_rsignal_save(pTHX_ int signo, Sighandler_t handler, Sigsave_t *save)
 int
 Perl_rsignal_restore(pTHX_ int signo, Sigsave_t *save)
 {
-#if defined(USE_ITHREADS) && !defined(WIN32)
-    /* only "parent" interpreter can diddle signals */
-    if (PL_curinterp != aTHX)
-	return -1;
-#endif
     return (PerlProc_signal(signo, *save) == (Sighandler_t) SIG_ERR) ? -1 : 0;
 }
 
@@ -3347,22 +3284,7 @@ void *
 Perl_get_context(void)
 {
     dVAR;
-#if defined(USE_ITHREADS)
-#  ifdef OLD_PTHREADS_API
-    pthread_addr_t t;
-    if (pthread_getspecific(PL_thr_key, &t))
-	Perl_croak_nocontext("panic: pthread_getspecific");
-    return (void*)t;
-#  else
-#    ifdef I_MACH_CTHREADS
-    return (void*)cthread_data(cthread_self());
-#    else
-    return (void*)PTHREAD_GETSPECIFIC(PL_thr_key);
-#    endif
-#  endif
-#else
     return (void*)NULL;
-#endif
 }
 
 void
@@ -3370,16 +3292,7 @@ Perl_set_context(void *t)
 {
     dVAR;
     PERL_ARGS_ASSERT_SET_CONTEXT;
-#if defined(USE_ITHREADS)
-#  ifdef I_MACH_CTHREADS
-    cthread_set_data(cthread_self(), t);
-#  else
-    if (pthread_setspecific(PL_thr_key, t))
-	Perl_croak_nocontext("panic: pthread_setspecific");
-#  endif
-#else
     PERL_UNUSED_ARG(t);
-#endif
 }
 
 #endif /* !PERL_GET_CONTEXT_DEFINED */
@@ -5276,24 +5189,6 @@ Perl_get_hash_seed(pTHX)
      return myseed;
 }
 
-#ifdef USE_ITHREADS
-bool
-Perl_stashpv_hvname_match(pTHX_ const COP *c, const HV *hv)
-{
-    const char * const stashpv = CopSTASHPV(c);
-    const char * const name = HvNAME_get(hv);
-    PERL_UNUSED_CONTEXT;
-    PERL_ARGS_ASSERT_STASHPV_HVNAME_MATCH;
-
-    if (stashpv == name)
-	return TRUE;
-    if (stashpv && name)
-	if (strEQ(stashpv, name))
-	    return TRUE;
-    return FALSE;
-}
-#endif
-
 
 #ifdef PERL_GLOBAL_STRUCT
 
@@ -5648,10 +5543,6 @@ Perl_my_clearenv(pTHX)
     PerlEnv_clearenv();
 #  else /* ! (PERL_IMPLICIT_SYS || WIN32) */
 #    if defined(USE_ENVIRON_ARRAY)
-#      if defined(USE_ITHREADS)
-    /* only the parent thread can clobber the process environment */
-    if (PL_curinterp == aTHX)
-#      endif /* USE_ITHREADS */
     {
 #      if ! defined(PERL_USE_SAFE_PUTENV)
     if ( !PL_use_safe_putenv) {

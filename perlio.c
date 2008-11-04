@@ -497,14 +497,6 @@ PerlIO_debug(const char *fmt, ...)
     }
     if (PL_perlio_debug_fd > 0) {
 	dTHX;
-#ifdef USE_ITHREADS
-	const char * const s = CopFILE(PL_curcop);
-	/* Use fixed buffer as sv_catpvf etc. needs SVs */
-	char buffer[1024];
-	const STRLEN len1 = my_snprintf(buffer, sizeof(buffer), "%.40s:%" IVdf " ", s ? s : "(none)", (IV) CopLINE(PL_curcop));
-	const STRLEN len2 = my_vsnprintf(buffer + len1, sizeof(buffer) - len1, fmt, ap);
-	PerlLIO_write(PL_perlio_debug_fd, buffer, len1 + len2);
-#else
 	const char *s = SvPV_nolen_const(loc_filename(PL_curcop->op_location));
 	STRLEN len;
 	SV * const sv = Perl_newSVpvf(aTHX_ "%s:%" IVdf " ", s ? s : "(none)",
@@ -514,7 +506,6 @@ PerlIO_debug(const char *fmt, ...)
 	s = SvPV_const(sv, len);
 	PerlLIO_write(PL_perlio_debug_fd, s, len);
 	SvREFCNT_dec(sv);
-#endif
     }
     va_end(ap);
 }
@@ -668,29 +659,9 @@ PerlIO_clone_list(pTHX_ PerlIO_list_t *proto, CLONE_PARAMS *param)
 void
 PerlIO_clone(pTHX_ PerlInterpreter *proto, CLONE_PARAMS *param)
 {
-#ifdef USE_ITHREADS
-    PerlIO **table = &proto->Iperlio;
-    PerlIO *f;
-    PL_perlio = NULL;
-    PL_known_layers = PerlIO_clone_list(aTHX_ proto->Iknown_layers, param);
-    PL_def_layerlist = PerlIO_clone_list(aTHX_ proto->Idef_layerlist, param);
-    PerlIO_allocate(aTHX); /* root slot is never used */
-    PerlIO_debug("Clone %p from %p\n",(void*)aTHX,(void*)proto);
-    while ((f = *table)) {
-	    int i;
-	    table = (PerlIO **) (f++);
-	    for (i = 1; i < PERLIO_TABLE_SIZE; i++) {
-		if (*f) {
-		    (void) fp_dup(f, 0, param);
-		}
-		f++;
-	    }
-	}
-#else
     PERL_UNUSED_CONTEXT;
     PERL_UNUSED_ARG(proto);
     PERL_UNUSED_ARG(param);
-#endif
 }
 
 void
@@ -699,9 +670,6 @@ PerlIO_destruct(pTHX)
     dVAR;
     PerlIO **table = &PL_perlio;
     PerlIO *f;
-#ifdef USE_ITHREADS
-    PerlIO_debug("Destruct %p\n",(void*)aTHX);
-#endif
     while ((f = *table)) {
 	int i;
 	table = (PerlIO **) (f++);
@@ -2310,9 +2278,6 @@ S_more_refcounted_fds(pTHX_ const int new_fd) {
     new_array = (int*) realloc(PL_perlio_fd_refcnt, new_max * sizeof(int));
 
     if (!new_array) {
-#ifdef USE_ITHREADS
-	MUTEX_UNLOCK(&PL_perlio_mutex);
-#endif
 	/* Can't use PerlIO to write as it allocates memory */
 	PerlLIO_write(PerlIO_fileno(Perl_error_log),
 		      PL_no_mem, strlen(PL_no_mem));
@@ -2344,9 +2309,6 @@ PerlIOUnix_refcnt_inc(int fd)
     if (fd >= 0) {
 	dVAR;
 
-#ifdef USE_ITHREADS
-	MUTEX_LOCK(&PL_perlio_mutex);
-#endif
 	if (fd >= PL_perlio_fd_refcnt_size)
 	    S_more_refcounted_fds(aTHX_ fd);
 
@@ -2358,9 +2320,6 @@ PerlIOUnix_refcnt_inc(int fd)
 	PerlIO_debug("refcnt_inc: fd %d refcnt=%d\n",
 		     fd, PL_perlio_fd_refcnt[fd]);
 
-#ifdef USE_ITHREADS
-	MUTEX_UNLOCK(&PL_perlio_mutex);
-#endif
     } else {
 	Perl_croak(aTHX_ "refcnt_inc: fd %d < 0\n", fd);
     }
@@ -2373,9 +2332,6 @@ PerlIOUnix_refcnt_dec(int fd)
     int cnt = 0;
     if (fd >= 0) {
 	dVAR;
-#ifdef USE_ITHREADS
-	MUTEX_LOCK(&PL_perlio_mutex);
-#endif
 	if (fd >= PL_perlio_fd_refcnt_size) {
 	    Perl_croak(aTHX_ "refcnt_dec: fd %d >= refcnt_size %d\n",
 		       fd, PL_perlio_fd_refcnt_size);
@@ -2386,9 +2342,6 @@ PerlIOUnix_refcnt_dec(int fd)
 	}
 	cnt = --PL_perlio_fd_refcnt[fd];
 	PerlIO_debug("refcnt_dec: fd %d refcnt=%d\n", fd, cnt);
-#ifdef USE_ITHREADS
-	MUTEX_UNLOCK(&PL_perlio_mutex);
-#endif
     } else {
 	Perl_croak(aTHX_ "refcnt_dec: fd %d < 0\n", fd);
     }
@@ -2400,11 +2353,7 @@ PerlIO_cleanup(pTHX)
 {
     dVAR;
     int i;
-#ifdef USE_ITHREADS
-    PerlIO_debug("Cleanup layers for %p\n",(void*)aTHX);
-#else
     PerlIO_debug("Cleanup layers\n");
-#endif
 
     /* Raise STDIN..STDERR refcount so we don't close them */
     for (i=0; i < 3; i++)
@@ -3157,35 +3106,7 @@ PerlIOStdio_close(pTHX_ PerlIO *f)
 	    saveerr = errno;
 	    invalidate = PerlIOStdio_invalidate_fileno(aTHX_ stdio);
 	    if (!invalidate) {
-#ifdef USE_ITHREADS
-		MUTEX_LOCK(&PL_perlio_mutex);
-		/* Right. We need a mutex here because for a brief while we
-		   will have the situation that fd is actually closed. Hence if
-		   a second thread were to get into this block, its dup() would
-		   likely return our fd as its dupfd. (after all, it is closed)
-		   Then if we get to the dup2() first, we blat the fd back
-		   (messing up its temporary as a side effect) only for it to
-		   then close its dupfd (== our fd) in its close(dupfd) */
-
-		/* There is, of course, a race condition, that any other thread
-		   trying to input/output/whatever on this fd will be stuffed
-		   for the duration of this little manoeuvrer. Perhaps we
-		   should hold an IO mutex for the duration of every IO
-		   operation if we know that invalidate doesn't work on this
-		   platform, but that would suck, and could kill performance.
-
-		   Except that correctness trumps speed.
-		   Advice from klortho #11912. */
-#endif
 		dupfd = PerlLIO_dup(fd);
-#ifdef USE_ITHREADS
-		if (dupfd < 0) {
-		    MUTEX_UNLOCK(&PL_perlio_mutex);
-		    /* Oh cXap. This isn't going to go well. Not sure if we can
-		       recover from here, or if closing this particular FILE *
-		       is a good idea now.  */
-		}
-#endif
 	    }
 	}
         result = PerlSIO_fclose(stdio);
@@ -3203,9 +3124,6 @@ PerlIOStdio_close(pTHX_ PerlIO *f)
 	if (dupfd >= 0) {
 	    PerlLIO_dup2(dupfd,fd);
 	    PerlLIO_close(dupfd);
-#ifdef USE_ITHREADS
-	    MUTEX_UNLOCK(&PL_perlio_mutex);
-#endif
 	}
 	return result;
     }
