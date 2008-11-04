@@ -107,6 +107,7 @@ Aip	|SV*	|IoSv	|NN struct io *cv
 Aip	|SV*	|ReSv	|NN REGEXP *cv
 Aip	|AV*	|SvAv	|NN SV *sv
 Aip	|HV*	|SvHv	|NN SV *sv
+Aip	|CV*	|SvCv	|NN SV *sv
 
 Aip	|const char*	|SvPVX_const	|NN SV *sv
 Aip	|char*	|SvPVX_mutable	|NN SV *sv

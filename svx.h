@@ -115,6 +115,11 @@ HV* Perl_SvHv(pTHX_ SV *sv) {
     return (HV*)sv;
 }
 
+CV* Perl_SvCv(pTHX_ SV *sv) {
+    assert(SvCVOK(sv));
+    return (CV*)sv;
+}
+
 #define CvREFCNT_inc(cv) inline_CvREFCNT_inc(aTHX_ cv)
 static __inline__ CV* inline_CvREFCNT_inc(pTHX_ CV* cv) {
     return (CV*)SvREFCNT_inc((SV*)cv);

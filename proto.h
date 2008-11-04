@@ -164,6 +164,11 @@ PERL_INLINE_CALLCONV HV*	Perl_SvHv(pTHX_ SV *sv)
 #define PERL_ARGS_ASSERT_SVHV	\
 	assert(sv)
 
+PERL_INLINE_CALLCONV CV*	Perl_SvCv(pTHX_ SV *sv)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_SVCV	\
+	assert(sv)
+
 
 PERL_INLINE_CALLCONV const char*	Perl_SvPVX_const(pTHX_ SV *sv)
 			__attribute__nonnull__(pTHX_1);
