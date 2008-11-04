@@ -3,7 +3,7 @@
 my $Is_VMS = $^O eq 'VMS';
 
 
-use Config;
+use Config < qw|config_keys config_value|;
 use Cwd;
 use File::Path;
 use File::Basename;
@@ -98,7 +98,7 @@ do {
     # avoid warning and death by localizing glob
     local *ExtUtils::Installed::Config;
     %ExtUtils::Installed::Config = %(
-        < %Config,
+        < ( map { ($_ => config_value($_)) } config_keys ),
         archlibexp         => cwd(),
         sitearchexp        => $fake_mod_dir,
     );
@@ -109,7 +109,7 @@ do {
     my $realei = ExtUtils::Installed->new();
     isa_ok( $realei, 'ExtUtils::Installed' );
     isa_ok( $realei->{Perl}->{packlist}, 'ExtUtils::Packlist' );
-    is( $realei->{Perl}->{version}, %Config{version},
+    is( $realei->{Perl}->{version}, config_value("version"),
         'new() should set Perl version from %Config' );
 
     ok( exists $realei->{FakeMod}, 'new() should find modules with .packlists');
@@ -120,10 +120,10 @@ do {
 
 # Now try this using PERL5LIB
 do {
-    local %ENV{PERL5LIB} = join %Config{path_sep}, @( $fake_mod_dir);
+    local %ENV{PERL5LIB} = join config_value("path_sep"), @( $fake_mod_dir);
     local *ExtUtils::Installed::Config;
     %ExtUtils::Installed::Config = %(
-        < %Config,
+        < ( map { ($_ => config_value($_)) } config_keys() ),
         archlibexp         => cwd(),
         sitearchexp        => cwd(),
     );
@@ -131,7 +131,7 @@ do {
     my $realei = ExtUtils::Installed->new();
     isa_ok( $realei, 'ExtUtils::Installed' );
     isa_ok( $realei->{Perl}->{packlist}, 'ExtUtils::Packlist' );
-    is( $realei->{Perl}->{version}, %Config{version},
+    is( $realei->{Perl}->{version}, config_value("version"),
         'new() should set Perl version from %Config' );
 
     ok( exists $realei->{FakeMod},
@@ -198,11 +198,11 @@ is( (nelems $ei->modules), 3,    'modules() in scalar context' );
 # files
 $ei->{goodmod} = \%(
         packlist => \%(
-                (%Config{man1direxp} ?
-                    (File::Spec->catdir(%Config{man1direxp}, 'foo') => 1) :
+                (config_value("man1direxp") ?
+                    (File::Spec->catdir(config_value("man1direxp"), 'foo') => 1) :
                         ()),
-                (%Config{man3direxp} ?
-                    (File::Spec->catdir(%Config{man3direxp}, 'bar') => 1) :
+                (config_value("man3direxp") ?
+                    (File::Spec->catdir(config_value("man3direxp"), 'bar') => 1) :
                         ()),
                 File::Spec->catdir($prefix, 'foobar') => 1,
                 foobaz  => 1,
@@ -217,8 +217,8 @@ dies_like( sub { $ei->files('goodmod', 'badtype' ) },
 my @files;
 SKIP: do {
     skip('no man directory man1dir on this system', 2)
-      unless %Config{man1direxp};
-    @files = $ei->files('goodmod', 'doc', %Config{man1direxp});
+      unless config_value("man1direxp");
+    @files = $ei->files('goodmod', 'doc', config_value("man1direxp"));
     is( scalar nelems @files, 1, '... should find doc file under given dir' );
     is( nelems(grep { m/foo$/ } @files), 1, '... checking file name' );
 };
@@ -254,13 +254,13 @@ is( join(' ', @files), join(' ', @dirs), '... should sort output' );
 # directory_tree
 my $expectdirs =
        ($mandirs == 2) &&
-       (dirname(%Config{man1direxp}) eq dirname(%Config{man3direxp}))
+       (dirname(config_value("man1direxp")) eq dirname(config_value("man3direxp")))
        ? 3 : 2;
 
 SKIP: do {
     skip('no man directories on this system', 1) unless $mandirs;
-    @dirs = $ei->directory_tree('goodmod', 'doc', %Config{man1direxp} ?
-       dirname(%Config{man1direxp}) : dirname(%Config{man3direxp}));
+    @dirs = $ei->directory_tree('goodmod', 'doc', config_value("man1direxp") ?
+       dirname(config_value("man1direxp")) : dirname(config_value("man3direxp")));
     is( scalar nelems @dirs, $expectdirs,
         'directory_tree() should report intermediate dirs to those requested' );
 };

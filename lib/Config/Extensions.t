@@ -8,7 +8,7 @@ BEGIN {
 
 use Test::More 'no_plan';
 
-BEGIN {use_ok 'Config::Extensions', '%Extensions'};
+use Config::Extensions '%Extensions';
 
 use Config;
 
@@ -23,11 +23,11 @@ while (my ($key, $val) = each %Extensions) {
     # Back to the format in Config
     $raw_ext =~ s!::!/!g;
     my $re = qr/\b\Q$raw_ext\E\b/;
-    like(%Config{extensions}, $re, "$key was built");
+    like(config_value("extensions"), $re, "$key was built");
     unless (%types{$val}) {
 	fail("$key is $val");
 	next;
     }
     my $type = $val . '_ext';
-    like(%Config{$type}, $re, "$key is $type");
+    like(config_value($type), $re, "$key is $type");
 }
