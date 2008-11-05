@@ -2,21 +2,18 @@
 
 use Config;
 
-use Test::More tests => 23;
+use Test::More tests => 11;
 
 use Scalar::Util < qw(refaddr);
-use vars < qw($t $y $x *F);
+use vars < qw($t $y $x);
 use Symbol < qw(gensym);
-
-# Ensure we do not trigger and tied methods
-tie *F, 'MyTie';
 
 my $i = 1;
 foreach my $v (@: undef, 10, 'string') {
   is(refaddr($v), undef, "not " . (defined($v) ? "'$v'" : "undef"));
 }
 
-foreach my $r (@: \%(), \$t, \@(), \*F, sub {}) {
+foreach my $r (@: \%(), \$t, \@(), sub {}) {
   my $n = dump::view($r);
   $n =~ m/0x(\w+)/;
   my $addr = do { local $^W; hex $1 };
@@ -24,11 +21,6 @@ foreach my $r (@: \%(), \$t, \@(), \*F, sub {}) {
   is( refaddr($r), $addr, $n);
   is( ref($r), $before, $n);
 }
-
-package MyTie;
-
-sub TIEHANDLE { bless \%() }
-sub DESTROY {}
 
 package Hash3;
 
