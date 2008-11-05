@@ -10,7 +10,7 @@ use warnings 'this-should-never-be-a-warning-category' ;
 EXPECT
 Unknown warnings category 'this-should-never-be-a-warning-category' at .../warnings.pm line xxx.
     warnings::import called at - line 3 character 1.
-BEGIN failed--compilation aborted
+    BEGIN called at - line 3 character 1.
 ########
 
 # Check compile time scope of pragma
@@ -127,6 +127,7 @@ my $a ; chop $a ;
 EXPECT
 Reversed += operator at abc.pm line 2 character 7.
     (eval) called at - line 2 character 1.
+    BEGIN called at - line 2 character 1.
 Use of uninitialized value $a in scalar chop at - line 3 character 9.
 ########
 

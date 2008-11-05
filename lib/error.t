@@ -106,7 +106,7 @@ do {
 do {
     fresh_perl_is('BEGIN { die "foobar" }', <<MSG );
 foobar at - line 1 character 9.
-BEGIN failed--compilation aborted
+    BEGIN called at - line 1 character 1.
 MSG
 };
 
