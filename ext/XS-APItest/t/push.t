@@ -1,11 +1,5 @@
 use TestInit;
 use Config;
-BEGIN {
-    if (%Config{'extensions'} !~ m/\bXS\/APItest\b/) {
-        print "1..0 # Skip: XS::APItest was not built\n";
-        exit 0;
-    }
-}
 
 use Test::More tests => 9;
 
@@ -17,7 +11,7 @@ my @mpushp = @( < mpushp() );
 my @mpushn = @( < mpushn() );
 my @mpushi = @( < mpushi() );
 my @mpushu = @( < mpushu() );
-ok(eq_array(\@mpushp, \@(qw(one two three))), 'mPUSHp()');
+ok(eq_array(\@mpushp, \qw(one two three)), 'mPUSHp()');
 ok(eq_array(\@mpushn, \@(0.5, -0.25, 0.125)), 'mPUSHn()');
 ok(eq_array(\@mpushi, \@(-1, 2, -3)),         'mPUSHi()');
 ok(eq_array(\@mpushu, \@(1, 2, 3)),           'mPUSHu()');
