@@ -19,7 +19,7 @@ use Fatal qw|open close|;
 
 use Convert;
 
-my $from = 'kurila-1.14';
+my $from = 'kurila-1.15';
 my $to = 'kurila-1.15';
 
 sub p5convert {
@@ -36,6 +36,7 @@ sub p5convert {
     is($output, $expected) or $TODO or die;
 }
 
+t_call_parens();
 t_remove_strict();
 die;
 t_lval_vec();
@@ -1410,5 +1411,23 @@ no strict 'refs';
 BEGIN { %INC{"strict.pm"} = 1 }
 #before
 #after
+END
+}
+
+sub t_call_parens {
+    p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
+sub foo { }
+foo 1, 2;
+foo(1, 2);
+----
+sub foo { }
+foo( 1, 2);
+foo(1, 2);
+====
+sub BAR() { 3 }
+BAR;
+----
+sub BAR() { 3 }
+BAR();
 END
 }
