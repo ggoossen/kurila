@@ -1,0 +1,46 @@
+=head1 NAME
+
+kurila115delta - what is new for Perl Kurila 1.15
+
+=head1 DESCRIPTION
+
+This document describes differences between Perl Kurila 1.14 and Perl Kurila 1.15
+
+=head1 Highlights In Perl Kurila 1.15
+
+=head1 Core Enhancements
+
+
+=head1 KNOWN BUGS
+
+=head2 Documentation
+
+Documentation has not been updated for many of the changes for kurila.
+
+=head2 Self referential assignment problems
+
+Assigning some value to a part of itself behaves unexpected.
+
+=head2 Tied hashes with complex data
+
+Tied hashes do not work correctly with complex data
+structures. Assigning arrays or hashes to a value of tied hash might
+behave strange.
+
+=head2 Limited platform support
+
+Perl Kurila has only been tested/build for x86_64-linux-gnu-thread-multi platform.
+
+=head1 SEE ALSO
+
+The F<INSTALL> file for how to build Perl Kurila.
+
+The F<README> file for general stuff.
+
+The F<Artistic> and F<Copying> files for copyright information.
+
+=head1 HISTORY
+
+Written by Gerard Goossen <F<gerard@tty.nl>>.
+
+=cut
