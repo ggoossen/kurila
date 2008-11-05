@@ -47,6 +47,7 @@ foreach my $const (qw(
 		      SVt_PVHV
 		      PAD_FAKELEX_ANON
 		      PAD_FAKELEX_MULTI
+                      PAD_NAME_START_INDEX
 		      ))
  {
   doconst($const);

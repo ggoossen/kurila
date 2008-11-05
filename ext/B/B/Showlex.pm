@@ -31,7 +31,7 @@ sub shownamearray {
     my @els = $av->ARRAY;
     my $count = (nelems @els);
     print $walkHandle "$name has $count entries\n";
-    for my $i (0 .. $count -1) {
+    for my $i (B::PAD_NAME_START_INDEX .. $count -1) {
 	my $sv = @els[$i];
 	if (class($sv) ne "SPECIAL") {
 	    printf $walkHandle "$i: \%s (0x\%lx) \%s\n", class($sv), $$sv, $sv->PVX_const;
