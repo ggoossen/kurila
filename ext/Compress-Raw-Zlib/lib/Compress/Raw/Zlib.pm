@@ -5,8 +5,7 @@ require Exporter;
 use Carp ;
 
 #use Parse::Parameters;
-
-use strict ;
+ 
 use warnings ;
 use bytes ;
 our ($VERSION, $XS_VERSION, @ISA, @EXPORT);

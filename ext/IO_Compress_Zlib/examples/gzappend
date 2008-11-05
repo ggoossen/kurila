@@ -1,7 +1,7 @@
 #!/usr/local/bin/perl
 
 use IO::Compress::Gzip < qw( $GzipError );
-use strict ;
+ 
 use warnings ;
 
 die "Usage: gzappend gz-file file...\n"

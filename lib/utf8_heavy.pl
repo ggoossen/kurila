@@ -1,6 +1,5 @@
 package utf8;
 
-use strict;
 use warnings;
 
 sub DEBUG () { 0 }
@@ -153,8 +152,6 @@ sub SWASHNEW_real {
 		my $map = $caller0 . "::" . $type;
 
 		if (exists &{*{Symbol::fetch_glob($map)}}) {
-		    no strict 'refs';
-		    
 		    $list = &{*{Symbol::fetch_glob($map)}};
 		    last GETFILE;
 		}

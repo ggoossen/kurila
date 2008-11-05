@@ -8,11 +8,10 @@ BEGIN {
     $hasgr = 1 unless $@ && $@->{description} =~ m/unimplemented/;
     unless ($hasgr) { plan skip_all => "no getgrgid"; }
     use Config;
-    $hasgr = 0 unless %Config{'i_grp'} eq 'define';
+    $hasgr = 0 unless config_value('i_grp') eq 'define';
     unless ($hasgr) { plan skip_all => "no grp.h"; }
 }
 
-use strict;
 our ($gid, @grent);
 BEGIN {
     $gid = $^O ne 'cygwin' ? 0 : 18;

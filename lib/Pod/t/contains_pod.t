@@ -4,7 +4,7 @@
 #
 # $Id$
 
-use strict;
+
 
 use Test::More tests => 1;
 

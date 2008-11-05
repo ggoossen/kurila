@@ -10,11 +10,7 @@ BEGIN {
 use Test::More;
 use Config;
 
-my $Can_Fork = %Config{d_fork} ||
-               (($^O eq 'MSWin32' || $^O eq 'NetWare') and
-                %Config{useithreads} and 
-                %Config{ccflags} =~ m/-DPERL_IMPLICIT_SYS/
-               );
+my $Can_Fork = config_value('d_fork');
 
 if( !$Can_Fork ) {
     plan skip_all => "This system cannot fork";

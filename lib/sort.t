@@ -22,7 +22,6 @@ BEGIN {
     }
 }
 
-use strict;
 use warnings;
 
 use Test::More tests => (nelems @TestSizes) * 2	# sort() tests

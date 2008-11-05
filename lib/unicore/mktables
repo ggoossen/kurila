@@ -2,7 +2,6 @@
 ## Any files created or read by this program should be listed in 'mktables.lst'
 
 #!/usr/bin/perl -w
-use strict;
 use File::Spec;
 
 ##

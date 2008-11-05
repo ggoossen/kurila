@@ -1,7 +1,7 @@
 
 package Pod::Simple::Progress;
 our $VERSION = "1.01";
-use strict;
+
 
 # Objects of this class are used for noting progress of an
 #  operation every so often.  Messages delivered more often than that

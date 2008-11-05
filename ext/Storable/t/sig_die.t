@@ -15,13 +15,8 @@ sub BEGIN {
     } else {
        unshift @INC, 't';
     }
-    if (%ENV{PERL_CORE} and %Config{'extensions'} !~ m/\bStorable\b/) {
-        print "1..0 # Skip: Storable was not built\n";
-        exit 0;
-    }
 }
 
-use strict;
 BEGIN {
     if (!eval q{
        use Test::More;

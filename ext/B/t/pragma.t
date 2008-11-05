@@ -7,14 +7,8 @@ BEGIN {    ## no critic strict
     else {
         unshift @INC, 't';
     }
-    require Config;
-    if ( ( %Config::Config{'extensions'} !~ m/\bB\b/ ) ) {
-        print "1..0 # Skip -- Perl configured without B module\n";
-        exit 0;
-    }
 }
 
-use strict;
 use warnings;
 use Test::More tests => 3 * 3;
 use B 'svref_2object';

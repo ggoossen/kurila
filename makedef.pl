@@ -138,19 +138,10 @@ if ($define{PERL_IMPLICIT_SYS}) {
     $define{PL_OP_SLAB_ALLOC} = 1;
 }
 
-if ($define{USE_ITHREADS}) {
-    if (!$define{MULTIPLICITY}) {
-        $define{MULTIPLICITY} = 1;
-    }
-}
-
 $define{PERL_IMPLICIT_CONTEXT} ||=
     $define{USE_ITHREADS} ||
     $define{MULTIPLICITY} ;
 
-if ($define{USE_ITHREADS} && $PLATFORM ne 'win32' && $^O ne 'darwin') {
-    $define{USE_REENTRANT_API} = 1;
-}
 
 # perl.h logic duplication ends
 
@@ -170,9 +161,6 @@ if ($PLATFORM =~ /^win(?:32|ce)$/) {
     if ($define{PERL_IMPLICIT_SYS}) {
 	output_symbol("perl_get_host_info");
 	output_symbol("perl_alloc_override");
-    }
-    if ($define{USE_ITHREADS} and $define{PERL_IMPLICIT_SYS}) {
-	output_symbol("perl_clone_host");
     }
 }
 elsif ($PLATFORM eq 'os2') {
@@ -466,12 +454,6 @@ elsif ($PLATFORM eq 'os2') {
 		    CroakWinError
 		    PL_do_undump
 		    )]);
-    emit_symbols([qw(os2_cond_wait
-		     pthread_join
-		     pthread_create
-		     pthread_detach
-		    )])
-      if $define{'USE_5005THREADS'} or $define{'USE_ITHREADS'};
 }
 elsif ($PLATFORM eq 'MacOS') {
     skip_symbols [qw(
@@ -643,16 +625,9 @@ if ($define{'MYMALLOC'}) {
 		    MallocCfg_ptr
 		    MallocCfgP_ptr
 		    )];
-    if ($define{'USE_ITHREADS'}) {
-	emit_symbols [qw(
-			PL_malloc_mutex
-			)];
-    }
-    else {
 	skip_symbols [qw(
 			PL_malloc_mutex
 			)];
-    }
 }
 else {
     skip_symbols [qw(
@@ -672,11 +647,9 @@ if ($define{'PERL_USE_SAFE_PUTENV'}) {
                   )];
 }
 
-unless ($define{'USE_ITHREADS'}) {
     skip_symbols [qw(
 		    PL_thr_key
 		    )];
-}
 
 # USE_5005THREADS symbols. Kept as reference for easier removal
     skip_symbols [qw(
@@ -706,7 +679,6 @@ unless ($define{'USE_ITHREADS'}) {
 		    Perl_sv_lock
 		    )];
 
-unless ($define{'USE_ITHREADS'}) {
     skip_symbols [qw(
 		    PL_op_mutex
 		    PL_regex_pad
@@ -746,7 +718,6 @@ unless ($define{'USE_ITHREADS'}) {
 		    Perl_regdupe_internal
 		    Perl_newPADOP
 		    )];
-}
 
 unless ($define{'PERL_IMPLICIT_CONTEXT'}) {
     skip_symbols [qw(
@@ -1115,16 +1086,9 @@ if ($define{'USE_PERLIO'}) {
 	emit_symbols \@layer_syms;
 	emit_symbols [qw(perlsio_binmode)];
     }
-    if ($define{'USE_ITHREADS'}) {
-	emit_symbols [qw(
-			PL_perlio_mutex
-			)];
-    }
-    else {
 	skip_symbols [qw(
 			PL_perlio_mutex
 			)];
-    }
 } else {
 	# -Uuseperlio
 	# Skip the PerlIO layer symbols - although

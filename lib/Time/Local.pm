@@ -2,7 +2,7 @@ package Time::Local;
 
 require Exporter;
 use Config;
-use strict;
+
 use integer;
 
 use vars < qw( $VERSION @ISA @EXPORT @EXPORT_OK );
@@ -28,12 +28,12 @@ use constant SECS_PER_MINUTE => 60;
 use constant SECS_PER_HOUR   => 3600;
 use constant SECS_PER_DAY    => 86400;
 
-my $MaxInt = ( ( 1 << ( 8 * %Config{ivsize} - 2 ) ) - 1 ) * 2 + 1;
+my $MaxInt = ( ( 1 << ( 8 * config_value('ivsize') - 2 ) ) - 1 ) * 2 + 1;
 my $MaxDay = int( ( $MaxInt - ( SECS_PER_DAY / 2 ) ) / SECS_PER_DAY ) - 1;
 
 if ( $^O eq 'MacOS' ) {
     # time_t is unsigned...
-    $MaxInt = ( 1 << ( 8 * %Config{ivsize} ) ) - 1;
+    $MaxInt = ( 1 << ( 8 * config_value('ivsize') ) ) - 1;
 }
 
 # Determine the EPOC day for this machine

@@ -110,9 +110,9 @@ syswrite() on closed filehandle STDIN at - line 6 character 1.
 # pp_sys.c [pp_flock]
 use Config; 
 BEGIN { 
-  if ( !%Config{d_flock} &&
-       !%Config{d_fcntl_can_lock} &&
-       !%Config{d_lockf} ) {
+  if ( !config_value("d_flock") &&
+       !config_value("d_fcntl_can_lock") &&
+       !config_value("d_lockf") ) {
     print <<EOM ;
 SKIPPED
 # flock not present
@@ -145,7 +145,7 @@ Can't use an undefined value as a symbol reference at - line 20 character 6.
 use warnings 'io' ;
 use Config; 
 BEGIN { 
-  if ( $^O ne 'VMS' and ! %Config{d_socket}) {
+  if ( $^O ne 'VMS' and ! config_value("d_socket")) {
     print <<EOM ;
 SKIPPED
 # send not present
@@ -345,7 +345,7 @@ Non-string passed as bitmask at - line 4 character 1.
 ########
 use Config;
 BEGIN {
-    if (!%Config{d_fchdir}) {
+    if (!config_value("d_fchdir")) {
 	print <<EOM;
 SKIPPED
 # fchdir not present

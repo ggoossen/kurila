@@ -28,9 +28,6 @@ PERLVAR(Gcurinterp,	PerlInterpreter *)
 					/* currently running interpreter
 					 * (initial parent interpreter under
 					 * useithreads) */
-#if defined(USE_ITHREADS)
-PERLVAR(Gthr_key,	perl_key)	/* key to retrieve per-thread struct */
-#endif
 
 /* constants (these are not literals to facilitate pointer comparisons)
  * (PERLVARISC really does create variables, despite its looks) */
@@ -41,19 +38,6 @@ PERLVARISC(Gpatleave,	"\\.^$@dDwWsSbB+*?|()-nrtfeaxc0123456789[{]}")
 
 /* XXX does anyone even use this? */
 PERLVARI(Gdo_undump,	bool,	FALSE)	/* -u or dump seen? */
-
-#if defined(MYMALLOC) && defined(USE_ITHREADS)
-PERLVAR(Gmalloc_mutex,	perl_mutex)	/* Mutex for malloc */
-#endif
-
-#if defined(USE_ITHREADS)
-PERLVAR(Gop_mutex,	perl_mutex)	/* Mutex for op refcounting */
-#endif
-
-#ifdef USE_ITHREADS
-PERLVAR(Gdollarzero_mutex, perl_mutex)	/* Modifying $0 */
-#endif
-
 
 /* This is constant on most architectures, a global on OS/2 */
 #ifdef OS2
@@ -136,18 +120,7 @@ PERLVAR(Gtimesbase, struct tms)
 /* allocate a unique index to every module that calls MY_CXT_INIT */
 
 #ifdef PERL_IMPLICIT_CONTEXT
-# ifdef USE_ITHREADS
-PERLVAR(Gmy_ctx_mutex, perl_mutex)
-# endif
 PERLVARI(Gmy_cxt_index, int, 0)
-#endif
-
-#if defined(USE_ITHREADS)
-PERLVAR(Ghints_mutex, perl_mutex)    /* Mutex for refcounted he refcounting */
-#endif
-
-#if defined(USE_ITHREADS)
-PERLVAR(Gperlio_mutex, perl_mutex)    /* Mutex for perlio fd refcounts */
 #endif
 
 /* this is currently set without MUTEX protection, so keep it a type which

@@ -24,7 +24,7 @@ use Test::More 'no_plan';
 use Storable < qw(store retrieve freeze thaw nstore nfreeze);
 require 'testlib.pl';
 use vars '$file';
-use strict;
+
 
 sub tester {
   my ($contents, $sub, $testersub, $what) = < @_;

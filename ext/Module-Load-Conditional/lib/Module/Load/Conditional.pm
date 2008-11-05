@@ -1,6 +1,5 @@
 package Module::Load::Conditional;
 
-use strict;
 
 use Module::Load;
 use Params::Check <                       qw[check];
@@ -179,7 +178,6 @@ sub check_install {
 
         ### find the version by inspecting the package
         if( defined $filename && $FIND_VERSION ) {
-            no strict 'refs';
             $href->{version} = ${*{Symbol::fetch_glob( "$args->{module}"."::VERSION")} }; 
         }
     }     
@@ -308,7 +306,6 @@ sub _parse_version {
         
         ### this creates a string to be eval'd, like:
         # package Module::Load::Conditional::_version;
-        # no strict;
         # 
         # local $VERSION;
         # $VERSION=undef; do {
@@ -317,7 +314,6 @@ sub _parse_version {
         
         my $eval = qq{
             package Module::Load::Conditional::_version;
-            no strict;
 
             our \$VERSION;
             local $1$2;

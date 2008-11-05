@@ -1,7 +1,6 @@
 # Carp::Heavy uses some variables in common with Carp.
 package Carp;
 
-use strict;
 
 =head1 NAME
 
@@ -275,7 +274,6 @@ sub trusts {
 # Takes a package and gives a list of those trusted directly
 sub trusts_directly {
     my $class = shift;
-    no strict 'refs';
     no warnings 'once'; 
     return (nelems @{*{Symbol::fetch_glob("$class\::CARP_NOT")}})
       ? @{*{Symbol::fetch_glob("$class\::CARP_NOT")}}

@@ -1,7 +1,6 @@
 package Opcode;
 
 
-use strict;
 
 our($VERSION, @ISA, @EXPORT_OK);
 

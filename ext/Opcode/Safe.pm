@@ -1,6 +1,5 @@
 package Safe;
 
-use strict;
 
 $Safe::VERSION = "2.16";
 
@@ -20,8 +19,8 @@ sub lexless_anon_sub {
     # Uses a closure (on $__ExPr__) to pass in the code to be executed.
     # (eval on one line to keep line numbers as expected by caller)
     eval sprintf
-    'package %s; %s strict; sub { @_= @(); eval q[my $__ExPr__;] . $__ExPr__; }',
-		@_[0], @_[1] ? 'use' : 'no';
+    'package %s; sub { @_= @(); eval q[my $__ExPr__;] . $__ExPr__; }',
+		@_[0];
 }
 
 use Carp;
@@ -129,7 +128,6 @@ sub erase {
     my $pkg = $obj->root();
     my ($stem, $leaf);
 
-    no strict 'refs';
     $pkg = "$($pkg)::";	# expand to full symbol table name
     ($stem, $leaf) = $pkg =~ m/(.*)::(\w+::)$/;
 
@@ -230,7 +228,6 @@ sub share_from {
     my $no_record = shift || 0;
     my $root = $obj->root();
     croak("vars not an array ref") unless ref $vars eq 'ARRAY';
-    no strict 'refs';
     # Check that 'from' package actually exists
 #     croak("Package \"$pkg\" does not exist")
 # 	unless %{Symbol::stash("$pkg")};

@@ -374,12 +374,10 @@ Perl_allocmy(pTHX_ const char *const name)
     {
 	/* name[2] is true if strlen(name) > 2  */
 	if (!isPRINT(name[1]) || strchr("\t\n\r\f", name[1])) {
-	    yyerror(Perl_form(aTHX_ "Can't use global %c^%c%s in \"%s\"",
-			      name[0], toCTRL(name[1]), name + 2,
-			      PL_parser->in_my == KEY_state ? "state" : "my"));
+	    yyerror(Perl_form(aTHX_ "Can't use global %c^%c%s in \"my\"",
+		    name[0], toCTRL(name[1]), name + 2));
 	} else {
-	    yyerror(Perl_form(aTHX_ "Can't use global %s in \"%s\"",name,
-			      PL_parser->in_my == KEY_state ? "state" : "my"));
+	    yyerror(Perl_form(aTHX_ "Can't use global %s in \"my\"",name));
 	}
     }
 
@@ -404,16 +402,11 @@ Perl_allocmy(pTHX_ const char *const name)
 			   );
     }
 
-    off = pad_add_name(name,
-		       ourgv,
-		       0, /*  not fake */
-		       PL_parser->in_my == KEY_state
+    off = pad_add_name(
+	name,
+	ourgv,
+	0 /*  not fake */
     );
-    /* anon sub prototypes contains state vars should always be cloned,
-     * otherwise the state var would be shared between anon subs */
-
-    if (PL_parser->in_my == KEY_state && CvANON(PL_compcv))
-	CvCLONE_on(PL_compcv);
 
     return off;
 }
@@ -1675,8 +1668,7 @@ S_my_kid(pTHX_ OP *o, OP **imopsp)
 	    yyerror(Perl_form(aTHX_ "Can't declare %s in \"%s\"",
 			OP_DESC(o),
 			PL_parser->in_my == KEY_our
-			    ? "our"
-			    : PL_parser->in_my == KEY_state ? "state" : "my"));
+			    ? "our" : "my"));
 	}
 	o->op_private |= OPpOUR_INTRO;
 	return o;
@@ -1687,14 +1679,11 @@ S_my_kid(pTHX_ OP *o, OP **imopsp)
 	yyerror(Perl_form(aTHX_ "Can't declare %s in \"%s\"",
 			  OP_DESC(o),
 			  PL_parser->in_my == KEY_our
-			    ? "our"
-			    : PL_parser->in_my == KEY_state ? "state" : "my"));
+			    ? "our" : "my"));
 	return o;
     }
     o->op_flags |= OPf_MOD;
     o->op_private |= OPpLVAL_INTRO;
-    if (PL_parser->in_my == KEY_state)
-	o->op_private |= OPpPAD_STATE;
     return o;
 }
 
@@ -2915,7 +2904,6 @@ Perl_package(pTHX_ OP *o)
     sv_setsv(PL_curstname, sv);
 
     PL_hints |= HINT_BLOCK_SCOPE;
-    PL_parser->copline = NOLINE;
     PL_parser->expect = XSTATE;
 
 #ifndef PERL_MAD
@@ -3016,6 +3004,12 @@ Perl_utilize(pTHX_ int aver, I32 floor, OP *version, OP *idop, OP *arg)
 		    newSTATEOP(0, NULL, veop, (veop ? veop : idop)->op_location)),
 		newSTATEOP(0, NULL, imop, (imop ? imop : idop)->op_location) ));
 	
+	SVcpSTEAL( SvLOCATION(CvSv(cv)), 
+	    idop->op_location ? newSVsv(idop->op_location) : AvSv(newAV()) );
+	if (SvAVOK(SvLOCATION((SV*)cv))) {
+	    av_store(SvAv(SvLOCATION((SV*)cv)), LOC_NAME_INDEX, newSVpv("use", 0));
+	}
+
 	process_special_block(KEY_BEGIN, cv);
     }
 
@@ -3037,7 +3031,6 @@ Perl_utilize(pTHX_ int aver, I32 floor, OP *version, OP *idop, OP *arg)
      */
 
     PL_hints |= HINT_BLOCK_SCOPE;
-    PL_parser->copline = NOLINE;
     PL_parser->expect = XSTATE;
     PL_cop_seqmax++; /* Purely for B::*'s benefit */
 
@@ -3238,8 +3231,6 @@ Perl_newASSIGNOP(pTHX_ I32 flags, OP *left, I32 optype, OP *right, SV *location)
     }
 
     if (is_list_assignment(left)) {
-	static const char no_list_state[] = "Initialization of state variables"
-            " in list context currently forbidden";
 	OP *curop;
 	bool maybe_common_vars = TRUE;
 	bool expand_assignment = FALSE;
@@ -3281,19 +3272,8 @@ Perl_newASSIGNOP(pTHX_ I32 flags, OP *left, I32 optype, OP *right, SV *location)
 		    if (!(lop->op_private & OPpLVAL_INTRO))
 			maybe_common_vars = TRUE;
 
-		    if (lop->op_private & OPpPAD_STATE) {
-			if (left->op_private & OPpLVAL_INTRO) {
-			    /* Each variable in state($a, $b, $c) = ... */
-			}
-			else {
-			    /* Each state variable in
-			       (state $a, my $b, our $c, $d, undef) = ... */
-			}
-			yyerror(no_list_state);
-		    } else {
-			/* Each my variable in
-			   (state $a, my $b, our $c, $d, undef) = ... */
-		    }
+		    /* Each my variable in
+		       (my $b, our $c, $d, undef) = ... */
 		} else if (lop->op_type == OP_UNDEF ||
 			   lop->op_type == OP_PUSHMARK) {
 		    /* undef may be interesting in
@@ -3310,19 +3290,6 @@ Perl_newASSIGNOP(pTHX_ I32 flags, OP *left, I32 optype, OP *right, SV *location)
 		    || left->op_type == OP_PADANY))
 	{
 	    maybe_common_vars = FALSE;
-	    if (left->op_private & OPpPAD_STATE) {
-		/* All single variable list context state assignments, hence
-		   state ($a) = ...
-		   (state $a) = ...
-		   state @a = ...
-		   state (@a) = ...
-		   (state @a) = ...
-		   state %a = ...
-		   state (%a) = ...
-		   (state %a) = ...
-		*/
-		yyerror(no_list_state);
-	    }
 	}
 
 	/* PL_generation sorcery:
@@ -3546,7 +3513,6 @@ S_new_logop(pTHX_ I32 type, I32 flags, OP** firstp, OP** otherp, SV *location)
 		o2 = other;
 	    if ((o2->op_type == OP_PADSV)
 		&& o2->op_private & OPpLVAL_INTRO
-		&& !(o2->op_private & OPpPAD_STATE)
 		&& ckWARN(WARN_DEPRECATED))
 	    {
 		Perl_warner(aTHX_ packWARN(WARN_DEPRECATED),
@@ -3909,7 +3875,7 @@ Perl_newWHILEOP(pTHX_ I32 flags, I32 debuggable, LOOP *loop, SV* location,
 }
 
 OP *
-Perl_newFOROP(pTHX_ I32 flags, char *label, line_t forline, OP *sv, OP *expr, OP *block, OP *cont, SV *location)
+Perl_newFOROP(pTHX_ I32 flags, char *label, OP *sv, OP *expr, OP *block, OP *cont, SV *location)
 {
     dVAR;
     LOOP *loop;
@@ -4033,7 +3999,6 @@ Perl_newFOROP(pTHX_ I32 flags, char *label, line_t forline, OP *sv, OP *expr, OP
     wop = newWHILEOP(flags, 1, loop, location, newOP(OP_ITER, 0, location), block, cont, 0);
     if (madsv)
 	op_getmad(madsv, (OP*)loop, 'v');
-    PL_parser->copline = forline;
     return newSTATEOP(0, label, wop, location);
 }
 
@@ -4127,11 +4092,6 @@ Perl_cv_undef(pTHX_ CV *cv)
 
     pad_undef(cv);
 
-    /* remove CvOUTSIDE unless this is an undef rather than a free */
-    if (!SvREFCNT(cv) && CvOUTSIDE(cv)) {
-	CvREFCNT_dec(CvOUTSIDE(cv));
-	CvOUTSIDE(cv) = NULL;
-    }
     if (CvCONST(cv)) {
 	SvREFCNT_dec((SV*)CvXSUBANY(cv).any_ptr);
 	CvCONST_off(cv);
@@ -4155,10 +4115,6 @@ Perl_cv_tmprefcnt(pTHX_ CV *cv)
     }
     pad_tmprefcnt(cv);
 
-    /* remove CvOUTSIDE unless this is an undef rather than a free */
-    if (!SvREFCNT(cv) && CvOUTSIDE(cv)) {
-	SvTMPREFCNT_inc(CvOUTSIDE(cv));
-    }
     if (CvCONST(cv)) {
 	SvTMPREFCNT_inc((SV*)CvXSUBANY(cv).any_ptr);
     }
@@ -4388,7 +4344,7 @@ Perl_newNAMEDSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *block)
     if (SvAVOK(SvLOCATION((SV*)cv))) {
 	SV* namesv = newSVpv(HvNAME_get(GvSTASH(gv)), 0);
 	sv_catpvf(namesv, "::%s", GvNAME_get(gv));
-	av_store(SvAV(SvLOCATION((SV*)cv)), 3, namesv);
+	av_store(SvAv(SvLOCATION((SV*)cv)), 3, namesv);
     }
 
     GvCVGEN(gv) = 0;
@@ -4436,7 +4392,8 @@ Perl_newSUB(pTHX_ I32 floor, OP *proto, OP *block)
 	if (PL_madskills)
 	    goto install_block;
 	op_free(block);
-	goto done;
+	LEAVE_SCOPE(floor);
+	return cv;
     }
 
     cv = PL_compcv;
@@ -4483,8 +4440,6 @@ Perl_newSUB(pTHX_ I32 floor, OP *proto, OP *block)
     }
 
   done:
-    if (PL_parser)
-	PL_parser->copline = NOLINE;
     SvREFCNT_inc(cv);
     LEAVE_SCOPE(floor);
     return cv;
@@ -4512,11 +4467,22 @@ Perl_process_special_block(pTHX_ const I32 key, CV *const cv)
     switch(key) {
     case KEY_BEGIN:
     {
+	AV* call_av;
 	const I32 oldscope = PL_scopestack_ix;
 	ENTER;
 
-	Perl_av_create_and_push(aTHX_ &PL_beginav, (SV*)cv);
-	call_list(oldscope, PL_beginav);
+	if ( ! SvLOCATION(CvSv(cv)) )
+	    SvLOCATION(CvSv(cv)) = AvSv(newAV());
+	if (SvAVOK(SvLOCATION((SV*)cv))) {
+	    av_store(SvAv(SvLOCATION((SV*)cv)),
+		LOC_NAME_INDEX,
+		newSVpv("BEGIN", 0));
+	}
+
+	call_av = newAV();
+	av_2mortal(call_av);
+	av_push(call_av, SvREFCNT_inc(CvSv(cv)));
+	call_list(oldscope, call_av);
 
 	PL_curcop = &PL_compiling;
 	CopHINTS_set(&PL_compiling, PL_hints);
@@ -4688,7 +4654,7 @@ Perl_newXS(pTHX_ const char *name, XSUBADDR_t subaddr, const char *filename)
 	CvANON_on(cv);
 
     SvLOCATION(cv) = AvSv(newAV());
-    av_store(SvAV(SvLOCATION((SV*)cv)), 3, newSVpv(name, 0));
+    av_store(SvAv(SvLOCATION((SV*)cv)), 3, newSVpv(name, 0));
 
     return cv;
 }
@@ -4708,16 +4674,21 @@ Perl_newANONHASH(pTHX_ OP *o, SV* location)
 OP *
 Perl_newANONSUB(pTHX_ I32 floor, OP *proto, OP *block)
 {
-    SV* sub = (SV*)newSUB(floor, proto, scalar(block));
-    SVcpREPLACE(SvLOCATION(sub), block->op_location);
+    SV* location = sv_mortalcopy(block->op_location);
+    SV* sub = (SV*)newSUB(floor, proto, block);
+    if (CvPADLIST(sub)) {
+	SV* padflags = PADLIST_NAMESV(CvPADLIST(sub), PAD_FLAGS_INDEX);
+	SvIV_set(padflags, SvIV(padflags) & ~PADf_LATE);
+    }
+    SVcpREPLACE(SvLOCATION(sub), location);
     if (SvLOCATION(sub) && SvAVOK(SvLOCATION(sub))) {
 	SV* namesv = newSVpv(HvNAME_get(PL_curstash), 0);
 	sv_catpvf(namesv, "::__ANON__");
-	av_store(SvAV(SvLOCATION(sub)), 3, namesv);
+	av_store(SvAv(SvLOCATION(sub)), 3, namesv);
     }
     return newUNOP(OP_SREFGEN, 0,
-	newSVOP(OP_ANONCODE, 0, sub, block->op_location),
-	block->op_location);
+	newSVOP(OP_ANONCODE, 0, sub, location),
+	location);
 }
 
 OP *
@@ -4985,6 +4956,11 @@ Perl_ck_eval(pTHX_ OP *o)
 	cUNOPo->op_first->op_sibling = hhop;
 	o->op_private |= OPpEVAL_HAS_HH;
     }
+    pad_savelex(
+	PADLIST_PADNAMES(CvPADLIST(PL_compcv)),
+        PADLIST_BASEPAD(CvPADLIST(PL_compcv)),
+	PL_cop_seqmax
+	);
     return o;
 }
 
@@ -6386,7 +6362,7 @@ Perl_ck_subr(pTHX_ OP *o)
     if (PERLDB_SUB && PL_curstash != PL_debstash)
 	o->op_private |= OPpENTERSUB_DB;
     if (cv && SvLOCATION(cv) && SvAVOK(SvLOCATION(cv)))
-	namesv = av_fetch(SvAV(SvLOCATION(cv)), 3, 0);
+	namesv = av_fetch(SvAv(SvLOCATION(cv)), 3, 0);
     while (o2 != cvop) {
 	OP* o3;
 	if (PL_madskills && o2->op_type == OP_STUB) {

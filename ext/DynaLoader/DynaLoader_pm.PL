@@ -35,7 +35,8 @@ sub _expansion {
     if ($op ne 'eq' and $op ne 'ne') {die "wrong eq-ne arg"};
     if ($expr =~ m[^(.*?)<<\|\$\^O-$op-$os>>(.*?)$]s) {
         my ($if,$el) = ($1,$2);
-        if (($op eq 'eq' and ($^O eq $os || %Config{osname} eq $os)) || ($op eq 'ne' and ($^O ne $os || %Config{osname} ne $os))) {
+        if (($op eq 'eq' and ($^O eq $os || config_value("osname") eq $os))
+              || ($op eq 'ne' and ($^O ne $os || config_value("osname") ne $os))) {
             return $if
         }
         else {
@@ -44,7 +45,8 @@ sub _expansion {
     }
     else {
         # #if;#endif
-        if (($op eq 'eq' and ($^O eq $os || %Config{osname} eq $os)) || ($op eq 'ne' and ($^O ne $os || %Config{osname} ne $os))) {
+        if (($op eq 'eq' and ($^O eq $os || config_value("osname") eq $os))
+              || ($op eq 'ne' and ($^O ne $os || config_value("osname") ne $os))) {
             return $expr
         }
         else {
@@ -113,13 +115,13 @@ EOT
 
 if (%ENV{PERL_BUILD_EXPAND_CONFIG_VARS}) {
     print OUT "our (\$dl_dlext, \$dl_so, \$dlsrc) = (", <
-              to_string(%Config{'dlext'}), ",", <
-              to_string(%Config{'so'}), ",", <
-              to_string(%Config{'dlsrc'}), ")\n;" ;
+              to_string(config_value('dlext')), ",", <
+              to_string(config_value('so')), ",", <
+              to_string(config_value('dlsrc')), ")\n;" ;
 }
 else {
     print OUT <<'EOT';
-our ($dl_dlext, $dl_so, $dlsrc) = < %Config::Config{[qw(dlext so dlsrc)]};
+our ($dl_dlext, $dl_so, $dlsrc) = < map { config_value($_) } qw(dlext so dlsrc);
 EOT
 }
 
@@ -154,7 +156,7 @@ our @dl_modules;              # Modules we have loaded
 EOT
 
 my $cfg_dl_library_path = <<'EOT';
-push(@dl_library_path, < split(' ', %Config::Config{libpth}));
+push(@dl_library_path, < split(' ', config_value('libpth')));
 EOT
 
 sub dquoted_comma_list {
@@ -190,14 +192,14 @@ my $ldlibpthname_defined;
 my $pthsep;
 
 if (%ENV{PERL_BUILD_EXPAND_CONFIG_VARS}) {
-    $ldlibpthname         = to_string(%Config::Config{ldlibpthname});
-    $ldlibpthname_defined = to_string(defined %Config::Config{ldlibpthname} ? 1 : 0);
-    $pthsep               = to_string(%Config::Config{path_sep});
+    $ldlibpthname         = to_string(config_value("ldlibpthname"));
+    $ldlibpthname_defined = to_string(defined config_value("ldlibpthname") ? 1 : 0);
+    $pthsep               = to_string(config_value("path_sep"));
 }
 else {
-    $ldlibpthname         = q(%Config::Config{ldlibpthname});
-    $ldlibpthname_defined = q(defined %Config::Config{ldlibpthname});
-    $pthsep               = q(%Config::Config{path_sep});
+    $ldlibpthname         = q(config_value("ldlibpthname"));
+    $ldlibpthname_defined = q(defined config_value("ldlibpthname"));
+    $pthsep               = q(config_value("path_sep"));
 }
 print OUT <<EOT;
 my \$ldlibpthname         = $ldlibpthname;
@@ -348,7 +350,7 @@ sub bootstrap {
     die("Can't locate loadable object for module $module in \@INC (\@INC contains: $(join ' ', @INC))")
 	unless $file;	# wording similar to error from 'require'
 
-    <<$^O-eq-VMS>>$file = uc($file) if %Config::Config{d_vms_case_sensitive_symbols};<</$^O-eq-VMS>>
+    <<$^O-eq-VMS>>$file = uc($file) if config_value("d_vms_case_sensitive_symbols");<</$^O-eq-VMS>>
     my $bootname = "boot_$module";
     $bootname =~ s/\W/_/g;
     @dl_require_symbols = @($bootname);
@@ -424,8 +426,8 @@ sub dl_findfile {
     my (@args) = @_;
     my (@dirs);   # which directories to search
     my (@found);         # full paths to real files we have found
-    #my $dl_ext= <<=to_string(%Config::Config{'dlext'})>>; # %Config::Config{'dlext'} suffix for perl extensions
-    #my $dl_so = <<=to_string(%Config::Config{'so'})>>; # %Config::Config{'so'} suffix for shared libraries
+    #my $dl_ext= <<=to_string(config_value('dlext'))>>; # config_value('dlext') suffix for perl extensions
+    #my $dl_so = <<=to_string(config_value('so'))>>; # config_value('so') suffix for shared libraries
 
     print STDERR "dl_findfile(@args)\n" if $dl_debug;
 

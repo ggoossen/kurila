@@ -12,7 +12,6 @@ BEGIN {
 }
 chdir 't';
 
-use strict;
 use File::Path;
 use File::Spec;
 

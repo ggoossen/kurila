@@ -7,7 +7,6 @@ BEGIN {
     }
 }
 
-use strict;
 use Test::Builder;
 
 my $unplanned;

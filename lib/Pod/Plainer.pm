@@ -1,5 +1,5 @@
 package Pod::Plainer;
-use strict;
+
 use Pod::Parser;
 our @ISA = qw(Pod::Parser);
 our $VERSION = '0.01';

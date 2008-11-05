@@ -6,7 +6,6 @@
 
 BEGIN {
     require "./test.pl";
-    require Config;
 }
 
 # Tests don't have names yet.

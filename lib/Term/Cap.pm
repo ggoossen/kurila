@@ -14,7 +14,6 @@ sub croak
     goto &Carp::croak;
 }
 
-use strict;
 
 use vars < qw($VERSION $VMS_TERMCAP);
 use vars < qw($termpat $state $first $entry);

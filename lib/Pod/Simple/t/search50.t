@@ -5,7 +5,7 @@ BEGIN {
         @INC = @(File::Spec->rel2abs('../lib') );
     }
 }
-use strict;
+
 
 #sub Pod::Simple::Search::DEBUG () {5};
 
@@ -39,18 +39,18 @@ ok $found;
 
 print "# Found $found items in $t seconds!\n# See...\n";
 
-print "# OK, making sure strict and strict.pm were in there...\n";
-ok( ($name2where->{'strict'} || 'huh???'), '/strict\.(pod|pm)$/');
+print "# OK, making sure warnings and warnings.pm were in there...\n";
+ok( ($name2where->{'warnings'} || 'huh???'), '/warnings\.(pod|pm)$/');
 
-my  $strictpath = $name2where->{'strict'};
-if( $strictpath ) {
-  my @x = @($x->find('strict')||'(nil)', $strictpath);
+my  $warningspath = $name2where->{'warnings'};
+if( $warningspath ) {
+  my @x = @($x->find('warnings')||'(nil)', $warningspath);
   print "# Comparing \"@x[0]\" to \"@x[1]\"\n";
   for( @x) { s{[/\\]}{/}g; }
   print "#        => \"@x[0]\" to \"@x[1]\"\n";
-  ok @x[0], @x[1], " find('strict') should match survey's name2where\{strict\}";
+  ok @x[0], @x[1], " find('warnings') should match survey's name2where\{warnings\}";
 } else {
-  ok 0;  # no 'thatpath/strict.pm' means can't test find()
+  ok 0;  # no 'thatpath/warnings.pm' means can't test find()
 }
 
 ok 1;

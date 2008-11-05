@@ -1,6 +1,5 @@
 package ExtUtils::MM_Win95;
 
-use strict;
 
 our $VERSION = '6.44';
 

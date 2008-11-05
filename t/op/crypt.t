@@ -5,7 +5,7 @@ BEGIN {
 
     require "./test.pl";
 
-    if( !%Config{d_crypt} ) {
+    if( ! config_value("d_crypt") ) {
         skip_all("crypt unimplemented");
     }
     else {

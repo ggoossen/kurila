@@ -6,11 +6,10 @@ BEGIN {
     $hasse = 1 unless $@ && $@->{description} =~ m/unimplemented|unsupported/i;
     unless ($hasse) { print "1..0 # Skip: no getservbyname\n"; exit 0 }
     use Config;
-    $hasse = 0 unless %Config{'i_netdb'} eq 'define';
+    $hasse = 0 unless config_value('i_netdb') eq 'define';
     unless ($hasse) { print "1..0 # Skip: no netdb.h\n"; exit 0 }
 }
 
-use strict;
 
 our @servent;
 

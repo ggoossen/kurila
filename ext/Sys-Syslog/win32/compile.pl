@@ -1,5 +1,4 @@
 #!perl 
-use strict;
 use warnings;
 use File::Basename;
 use File::Copy;
@@ -87,7 +86,6 @@ print "Updated Win32.pm and relevent message files\n";
 
 __END__
 package Sys::Syslog::Win32;
-use strict;
 use warnings;
 use Carp;
 use File::Spec;

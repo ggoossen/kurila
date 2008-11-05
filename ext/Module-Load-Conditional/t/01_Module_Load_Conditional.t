@@ -2,7 +2,6 @@
 
 BEGIN { use FindBin; }
 
-use strict;
 use File::Spec ();
 use Test::More 'no_plan';
 

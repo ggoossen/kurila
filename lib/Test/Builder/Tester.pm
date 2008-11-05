@@ -1,6 +1,5 @@
 package Test::Builder::Tester;
 
-use strict;
 our $VERSION = "1.13";
 
 use Test::Builder;

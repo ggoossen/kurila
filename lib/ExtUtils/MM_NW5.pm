@@ -18,7 +18,6 @@ the semantics.
 
 =cut 
 
-use strict;
 use ExtUtils::MakeMaker::Config;
 use File::Basename;
 

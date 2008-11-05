@@ -5,19 +5,9 @@ use Config;
 use utf8;
 
 BEGIN {
-    my $can_fork = %Config{d_fork} ||
-		    (($^O eq 'MSWin32' || $^O eq 'NetWare') and
-		     %Config{useithreads} and 
-		     %Config{ccflags} =~ m/-DPERL_IMPLICIT_SYS/
-		    );
+    my $can_fork = config_value("d_fork");
     my $reason;
-    if (%ENV{PERL_CORE} and %Config{'extensions'} !~ m/\bSocket\b/) {
-	$reason = 'Socket extension unavailable';
-    }
-    elsif (%ENV{PERL_CORE} and %Config{'extensions'} !~ m/\bIO\b/) {
-	$reason = 'IO extension unavailable';
-    }
-    elsif (!$can_fork) {
+    if (!$can_fork) {
         $reason = 'no fork';
     }
     if ($reason) {

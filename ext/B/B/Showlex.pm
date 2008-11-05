@@ -2,7 +2,6 @@ package B::Showlex;
 
 our $VERSION = '1.02';
 
-use strict;
 use B < qw(svref_2object comppadlist class);
 use B::Terse ();
 use B::Concise ();
@@ -32,7 +31,7 @@ sub shownamearray {
     my @els = $av->ARRAY;
     my $count = (nelems @els);
     print $walkHandle "$name has $count entries\n";
-    for my $i (0 .. $count -1) {
+    for my $i (B::PAD_NAME_START_INDEX .. $count -1) {
 	my $sv = @els[$i];
 	if (class($sv) ne "SPECIAL") {
 	    printf $walkHandle "$i: \%s (0x\%lx) \%s\n", class($sv), $$sv, $sv->PVX_const;
@@ -108,7 +107,6 @@ sub compile {
 	    } else {
 		$objname = "main::$objname" unless $objname =~ m/::/;
 		print $walkHandle "$objname:\n";
-		no strict 'refs';
 		die "err: unknown function ($objname)\n"
 		    unless *{$objname}{CODE};
 		$objref = \&$objname;

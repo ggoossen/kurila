@@ -3,7 +3,6 @@ package Text::Tabs;
 
 require Exporter;
 
-use strict;
 
 our @ISA = @('Exporter');
 our @EXPORT = qw(expand unexpand $tabstop);

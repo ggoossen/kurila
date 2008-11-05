@@ -12,7 +12,7 @@ BEGIN {
 }
 
 use Test::More;
-use strict;
+
 use warnings;
 
 use Unicode::Collate;

@@ -1028,9 +1028,6 @@ static void S_dump_op_rest (pTHX_ I32 level, PerlIO *file, const OP *o)
     case OP_AELEMFAST:
     case OP_GVSV:
     case OP_GV:
-#ifdef USE_ITHREADS
-	Perl_dump_indent(aTHX_ level, file, "PADIX = %" IVdf "\n", (IV)cPADOPo->op_padix);
-#else
 	if ( ! PL_op->op_flags & OPf_SPECIAL) { /* not lexical */
 	    if (cSVOPo->op_sv) {
 		SV * const tmpsv = sv_2mortal(newSV(0));
@@ -1043,16 +1040,11 @@ static void S_dump_op_rest (pTHX_ I32 level, PerlIO *file, const OP *o)
 	    else
 		Perl_dump_indent(aTHX_ level, file, "GV = NULL\n");
 	}
-#endif
 	break;
     case OP_CONST:
     case OP_HINTSEVAL:
     case OP_METHOD_NAMED:
-#ifndef USE_ITHREADS
-	/* with ITHREADS, consts are stored in the pad, and the right pad
-	 * may not be active here, so skip */
 	Perl_dump_indent(aTHX_ level, file, "SV = %s\n", SvPEEK(cSVOPo_sv));
-#endif
 	break;
     case OP_NEXTSTATE:
     case OP_DBSTATE:
@@ -1469,7 +1461,6 @@ Perl_do_sv_dump(pTHX_ I32 level, PerlIO *file, SV *sv, I32 nest, I32 maxnest, bo
 	if (SvPAD_OUR(sv))	sv_catpv(d, "OUR,");
 	/* FALL THROUGH */
     case SVt_PVNV:
-	if (SvPAD_STATE(sv))	sv_catpv(d, "STATE,");
 	goto evaled_or_uv;
     case SVt_PVAV:
 	break;
@@ -1770,23 +1761,10 @@ Perl_do_sv_dump(pTHX_ I32 level, PerlIO *file, SV *sv, I32 nest, I32 maxnest, bo
 	}
 	Perl_dump_indent(aTHX_ level, file, "  DEPTH = %"IVdf"\n", (IV)CvDEPTH(sv));
 	Perl_dump_indent(aTHX_ level, file, "  FLAGS = 0x%"UVxf"\n", (UV)CvFLAGS(sv));
-	Perl_dump_indent(aTHX_ level, file, "  OUTSIDE_SEQ = %"UVuf"\n", (UV)CvOUTSIDE_SEQ(sv));
 	Perl_dump_indent(aTHX_ level, file, "  PADLIST = 0x%"UVxf"\n", PTR2UV(CvPADLIST(sv)));
 	if (nest < maxnest) {
 	    do_dump_pad(level+1, file, CvPADLIST(sv), 0);
 	}
-	{
-	    const CV * const outside = CvOUTSIDE(sv);
-	    Perl_dump_indent(aTHX_ level, file, "  OUTSIDE = 0x%"UVxf" (%s)\n",
-			PTR2UV(outside),
-			(!outside ? "null"
-			 : CvANON(outside) ? "ANON"
-			 : (outside == PL_main_cv) ? "MAIN"
-			 : CvUNIQUE(outside) ? "UNIQUE"
-			 : "UNDEFINED"));
-	}
-	if (nest < maxnest && (CvCLONE(sv) || CvCLONED(sv)))
-	    do_sv_dump(level+1, file, (SV*)CvOUTSIDE(sv), nest+1, maxnest, dumpops, pvlim);
 	break;
     case SVt_PVGV:
     case SVt_PVLV:
@@ -2571,9 +2549,6 @@ Perl_do_op_xmldump(pTHX_ I32 level, PerlIO *file, const OP *o)
 	}
     case OP_GVSV:
     case OP_GV:
-#ifdef USE_ITHREADS
-	S_xmldump_attr(aTHX_ level, file, "padix=\"%" IVdf "\"", (IV)cPADOPo->op_padix);
-#else
 	if (cSVOPo->op_sv) {
 	    SV * const tmpsv1 = newSVpvn(NULL, 0);
 	    SV * const tmpsv2 = newSVpvn("", 0);
@@ -2590,16 +2565,11 @@ Perl_do_op_xmldump(pTHX_ I32 level, PerlIO *file, const OP *o)
 	}
 	else
 	    S_xmldump_attr(aTHX_ level, file, "gv=\"NULL\"");
-#endif
 	break;
     case OP_CONST:
     case OP_HINTSEVAL:
     case OP_METHOD_NAMED:
-#ifndef USE_ITHREADS
-	/* with ITHREADS, consts are stored in the pad, and the right pad
-	 * may not be active here, so skip */
 	S_xmldump_attr(aTHX_ level, file, "%s", sv_xmlpeek(cSVOPo_sv));
-#endif
 	break;
     case OP_ANONCODE:
 	if (!contents) {

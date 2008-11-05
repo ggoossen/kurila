@@ -1,6 +1,6 @@
 #! perl -w
 
-use strict ;
+ 
 
 $::VERSION = '2.006' ;
 

@@ -10,11 +10,9 @@ my $no_signedness = '';
 
 plan tests => 14651;
 
-use strict;
 use warnings < qw(FATAL all);
 use Config;
 
-my $Is_EBCDIC = (defined %Config{ebcdic} && %Config{ebcdic} eq 'define');
 my $Perl = which_perl();
 my @valid_errors = @(qr/^Invalid type '\w'/);
 
@@ -22,11 +20,11 @@ my $ByteOrder = 'unknown';
 my $maybe_not_avail = '(?:hto[bl]e|[bl]etoh)';
 if ($no_endianness) {
   push @valid_errors, qr/^Invalid type '[<>]'/;
-} elsif (%Config{byteorder} =~ m/^1234(?:5678)?$/) {
+} elsif (config_value("byteorder") =~ m/^1234(?:5678)?$/) {
   $ByteOrder = 'little';
   $maybe_not_avail = '(?:htobe|betoh)';
 }
-elsif (%Config{byteorder} =~ m/^(?:8765)?4321$/) {
+elsif (config_value("byteorder") =~ m/^(?:8765)?4321$/) {
   $ByteOrder = 'big';
   $maybe_not_avail = '(?:htole|letoh)';
 }
@@ -39,12 +37,13 @@ if ($no_signedness) {
 }
 
 for my $size (@( 16, 32, 64) ) {
-  if (defined %Config{"u$($size)size"} and (%Config{"u$($size)size"}||0) != ($size >> 3)) {
+  if (defined config_value("u$($size)size")
+        and (config_value("u$($size)size")||0) != ($size >> 3)) {
     push @valid_errors, qr/^Perl_my_$maybe_not_avail$size\(\) not available/;
   }
 }
 
-my $IsTwosComplement = pack('i', -1) eq "\x[FF]" x %Config{intsize};
+my $IsTwosComplement = pack('i', -1) eq "\x[FF]" x config_value("intsize");
 print "# \$IsTwosComplement = $IsTwosComplement\n";
 
 sub is_valid_error
@@ -118,7 +117,6 @@ do {
 
 do {
     my $sum = 129; # ASCII
-    $sum = 103 if $Is_EBCDIC;
 
     my $x;
     is( ($x = unpack("\%32B*", "Now is the time for all good blurfl")), $sum );
@@ -292,7 +290,7 @@ do {
     # Is this a stupid thing to do on VMS, VOS and other unusual platforms?
 
     skip("-- the IEEE infinity model is unavailable in this configuration.", 1)
-       if (($^O eq 'VMS') && !defined(%Config{useieee}));
+       if ($^O eq 'VMS') && !defined(config_value("useieee"));
 
     skip("-- $^O has serious fp indigestion on w-packed infinities", 1)
        if (
@@ -319,7 +317,7 @@ do {
  SKIP: do {
 
     skip("-- the full range of an IEEE double may not be available in this configuration.", 3)
-       if (($^O eq 'VMS') && !defined(%Config{useieee}));
+       if ($^O eq 'VMS') && !defined(config_value("useieee"));
 
     skip("-- $^O does not like 2**1023", 3)
        if (($^O eq 'ultrix'));
@@ -394,9 +392,9 @@ print "# test the pack lengths of s S i I l L n N v V + modifiers\n";
 
 my @lengths = @( <
   qw(s 2 S 2 i -4 I -4 l 4 L 4 n 2 N 4 v 2 V 4 n! 2 N! 4 v! 2 V! 4),
-  's!'  => %Config{shortsize}, 'S!'  => %Config{shortsize},
-  'i!'  => %Config{intsize},   'I!'  => %Config{intsize},
-  'l!'  => %Config{longsize},  'L!'  => %Config{longsize},
+  's!'  => config_value("shortsize"), 'S!'  => config_value("shortsize"),
+  'i!'  => config_value("intsize"),   'I!'  => config_value("intsize"),
+  'l!'  => config_value("longsize"),  'L!'  => config_value("longsize"),
 );
 
 while (my ($base, $expect) = splice @lengths, 0, 2) {
@@ -519,9 +517,9 @@ foreach (@(
 
 print "# packing native shorts/ints/longs\n";
 
-is(length(pack("s!", 0)), %Config{shortsize});
-is(length(pack("i!", 0)), %Config{intsize});
-is(length(pack("l!", 0)), %Config{longsize});
+is(length(pack("s!", 0)), config_value("shortsize"));
+is(length(pack("i!", 0)), config_value("intsize"));
+is(length(pack("l!", 0)), config_value("longsize"));
 ok(length(pack("s!", 0)) +<= length(pack("i!", 0)));
 ok(length(pack("i!", 0)) +<= length(pack("l!", 0)));
 is(length(pack("i!", 0)), length(pack("i", 0)));
@@ -561,7 +559,7 @@ sub numbers_with_total {
     # UVs (in which case ~0 is NV, ~0-1 will be the same NV) then we can't
     # correctly in perl calculate UV totals for long checksums, as pp_unpack
     # is using UV maths, and we've only got NVs.
-    $skip_if_longer_than = %Config{nv_preserves_uv_bits};
+    $skip_if_longer_than = config_value("nv_preserves_uv_bits");
   }
 
   foreach (@('', 1, 2, 3, 15, 16, 17, 31, 32, 33, 53, 54, 63, 64, 65)) {
@@ -859,7 +857,7 @@ do {
   foreach (@(
            \@('a/a*/a*', '212ab345678901234567','ab3456789012'),
            \@('a/a*/a*', '3012ab345678901234567', 'ab3456789012'),
-           \@('a/a*/b*', '212ab', $Is_EBCDIC ? '100000010100' : '100001100100'),)
+           \@('a/a*/b*', '212ab', '100001100100'),)
   )
   {
     my ($pat, $in, $expect) = < @$_;
@@ -908,8 +906,6 @@ EOP
 
 
 SKIP: do {
-    skip("(EBCDIC and) version strings are bad idea", 2) if $Is_EBCDIC;
-
     use utf8; # for sprintf.
     is("1.20.300.4000", sprintf "\%vd", pack("U*",1,20,300,4000));
     is("1.20.300.4000", sprintf "\%vd", pack("  U*",1,20,300,4000));
@@ -920,7 +916,7 @@ use utf8;
 
 isnt("\x{1}\x{14}\x{12c}\x{fa0}", sprintf "\%vd", pack("C0U*",1,20,300,4000));
 
-my $rslt = $Is_EBCDIC ? "156 67" : "199 162";
+my $rslt = "199 162";
 is(join(" ", @( unpack("C*", "\x{1e2}"))), $rslt);
 
 # does pack U create Unicode?
@@ -937,8 +933,6 @@ is("$(join ' ', @: unpack('U*', pack('U*', 100, 200)))", "100 200");
 };
 
 SKIP: do {
-    skip "Not for EBCDIC", 4 if $Is_EBCDIC;
-
     use utf8;
     # does pack U0C create Unicode?
     is("$(join ' ', @: pack('U0C*', 100, 195, 136))", "\x{64}"."\x{c8}");
@@ -1424,9 +1418,9 @@ do { # struct {char c1; double d; char cc[2];}
   is($b, "$(join ' ',@a)");
 };
 
-is(length(pack("j", 0)), %Config{ivsize});
-is(length(pack("J", 0)), %Config{uvsize});
-is(length(pack("F", 0)), %Config{nvsize});
+is(length(pack("j", 0)), config_value("ivsize"));
+is(length(pack("J", 0)), config_value("uvsize"));
+is(length(pack("F", 0)), config_value("nvsize"));
 
 numbers ('j', -2147483648, -1, 0, 1, 2147483647);
 numbers ('J', 0, 1, 2147483647, 2147483648, 4294967295);
@@ -1436,7 +1430,7 @@ SKIP: do {
 
     skip "Long doubles not in use", 166 if $@->{description} =~ m/Invalid type/;
 
-    is(length(pack("D", 0)), %Config{longdblsize});
+    is(length(pack("D", 0)), config_value("longdblsize"));
     numbers ('D', -(2**34), -1, 0, 1, 2**34);
 };
 

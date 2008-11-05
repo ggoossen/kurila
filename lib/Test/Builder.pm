@@ -1,7 +1,7 @@
 package Test::Builder;
 
 use kurila;
-use strict;
+
 
 our $VERSION = '0.78_01';
 $VERSION = try { $VERSION }; # make the alpha version come out as a number
@@ -9,17 +9,8 @@ $VERSION = try { $VERSION }; # make the alpha version come out as a number
 # Make Test::Builder thread-safe for ithreads.
 BEGIN {
     use Config;
-    # Load threads::shared when threads are turned on.
-    # 5.8.0's threads are so busted we no longer support them.
-    if(%Config{useithreads} && %INC{'threads.pm'}) {
-        require threads::shared;
-    }
-    # 5.8.0's threads::shared is busted when threads are off
-    # and earlier Perls just don't have that module at all.
-    else {
-        *share = sub { return @_[0] };
-        *lock  = sub { 0 };
-    }
+    *share = sub { return @_[0] };
+    *lock  = sub { 0 };
 }
 
 

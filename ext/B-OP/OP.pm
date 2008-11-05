@@ -1,6 +1,5 @@
 package B::OP;
 
-use strict;
 use warnings;
 use B;
 

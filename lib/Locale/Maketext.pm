@@ -2,7 +2,7 @@
 # Time-stamp: "2004-03-30 16:33:31 AST"
 
 package Locale::Maketext;
-use strict;
+
 use vars < qw( @ISA $VERSION $MATCH_SUPERS $USING_LANGUAGE_TAGS
              $USE_LITERALS $MATCH_SUPERS_TIGHTLY);
 use Carp ();
@@ -378,7 +378,7 @@ sub _try_use {   # Basically a wrapper around "require Modulename"
   return %tried{@_[0]} if exists %tried{@_[0]};  # memoization
 
   my $module = @_[0];   # ASSUME sane module name!
-  do { no strict 'refs';
+  do {
     return (%tried{$module} = 1)
      if %{*{Symbol::fetch_glob($module . "::Lexicon")}} or @{*{Symbol::fetch_glob($module . "::ISA")}};
     # weird case: we never use'd it, but there it is!
@@ -401,7 +401,6 @@ sub _try_use {   # Basically a wrapper around "require Modulename"
 
 sub _lex_refs {  # report the lexicon references for this handle's class
   # returns an arrayREF!
-  no strict 'refs';
   my $class = ref(@_[0]) || @_[0];
   print "Lex refs lookup on $class\n" if DEBUG +> 1;
   return %isa_scan{$class} if exists %isa_scan{$class};  # memoization!

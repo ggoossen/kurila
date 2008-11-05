@@ -508,7 +508,6 @@ it under the same terms as Perl itself.
 
 =cut
 
-use strict;
 
 use Cwd 'getcwd';
 use File::Basename ();
@@ -733,7 +732,6 @@ sub _rmtree {
                 @files = @( () );
             }
             else {
-		no strict 'refs';
 		if (!defined ${*{Symbol::fetch_glob("^TAINT")}} or ${*{Symbol::fetch_glob("^TAINT")}}) {
                     # Blindly untaint dir names if taint mode is
                     # active, or any perl < 5.006

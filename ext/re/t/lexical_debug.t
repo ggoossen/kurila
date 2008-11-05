@@ -1,15 +1,5 @@
 #!./perl
 
-BEGIN {
-    require Config;
-    if ((%Config::Config{'extensions'} !~ m/\bre\b/) ){
-	print "1..0 # Skip -- Perl configured without re module\n";
-	exit 0;
-    }
-}
-
-use strict;
-
 # must use a BEGIN or the prototypes wont be respected meaning 
     # tests could pass that shouldn't
 BEGIN { require "./test.pl"; }

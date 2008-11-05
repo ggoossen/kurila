@@ -1,9 +1,9 @@
 package ExtUtils::Install;
-use strict;
 
-use vars < qw(@ISA @EXPORT $VERSION $MUST_REBOOT %Config);
 
-use Config < qw(%Config);
+use vars < qw(@ISA @EXPORT $VERSION $MUST_REBOOT);
+
+use Config < qw(config_value);
 use Cwd < qw(cwd);
 use Exporter;
 use ExtUtils::Packlist;
@@ -969,16 +969,16 @@ sub install_default {
   my $INST_MAN1DIR = File::Spec->catdir($Curdir,'blib','man1');
   my $INST_MAN3DIR = File::Spec->catdir($Curdir,'blib','man3');
   install(\%(
-           read => "%Config{sitearchexp}/auto/$FULLEXT/.packlist",
-           write => "%Config{installsitearch}/auto/$FULLEXT/.packlist",
+           read => config_value("sitearchexp") . "/auto/$FULLEXT/.packlist",
+           write => config_value("installsitearch") . "/auto/$FULLEXT/.packlist",
            $INST_LIB => (directory_not_empty($INST_ARCHLIB)) ?
-                         %Config{installsitearch} :
-                         %Config{installsitelib},
-           $INST_ARCHLIB => %Config{installsitearch},
-           $INST_BIN => %Config{installbin} ,
-           $INST_SCRIPT => %Config{installscript},
-           $INST_MAN1DIR => %Config{installman1dir},
-           $INST_MAN3DIR => %Config{installman3dir},
+                         config_value("installsitearch") :
+                         config_value("installsitelib"),
+           $INST_ARCHLIB => config_value("installsitearch"),
+           $INST_BIN => config_value("installbin") ,
+           $INST_SCRIPT => config_value("installscript"),
+           $INST_MAN1DIR => config_value("installman1dir"),
+           $INST_MAN3DIR => config_value("installman3dir"),
           ),1,0,0);
 }
 
@@ -1043,15 +1043,15 @@ sub inc_uninstall {
     my $file = (File::Spec->splitpath($filepath))[2];
     my %seen_dir = %( () );
     
-    my @PERL_ENV_LIB = split %Config{path_sep}, defined %ENV{'PERL5LIB'}
+    my @PERL_ENV_LIB = split config_value("path_sep"), defined %ENV{'PERL5LIB'}
       ? %ENV{'PERL5LIB'} : %ENV{'PERLLIB'} || '';
         
     my @dirs=@( < @PERL_ENV_LIB, 
-               < @INC, < 
-               %Config{[qw(archlibexp
+               < @INC,
+               < map { config_value($_) } qw(archlibexp
                           privlibexp
                           sitearchexp
-                          sitelibexp)]});        
+                          sitelibexp));
     
     #warn join "\n","---",@dirs,"---";
     my $seen_ours;
@@ -1218,7 +1218,7 @@ sub DESTROY {
         }
         $plural = $i+>1 ? "all those files" : "this file";
         my $inst = (_invokant() eq 'ExtUtils::MakeMaker')
-                 ? ( %Config::Config{make} || 'make' ).' install UNINST=1'
+                 ? ( config_value("make") || 'make' ).' install UNINST=1'
                  : './Build install uninst=1';
         print "## Running '$inst' will unlink $plural for you.\n";
     }

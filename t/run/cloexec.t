@@ -34,14 +34,13 @@
 
 BEGIN {
     use Config;
-    if (!%Config{'d_fcntl'}) {
+    if (! config_value('d_fcntl')) {
         print("1..0 # Skip: fcntl() is not available\n");
         exit(0);
     }
     require './test.pl';
 }
 
-use strict;
 
 $|=1;
 

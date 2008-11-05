@@ -12,7 +12,6 @@ if ($^O eq 'mpeix') {
 
 $| = 1;
 
-use strict;
 
 my %tests = %(
 	 1 => \@(   0,   0),

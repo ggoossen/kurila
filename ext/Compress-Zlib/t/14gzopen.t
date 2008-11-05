@@ -8,7 +8,6 @@ use lib < qw(t t/compress);
 
 use IO::Uncompress::Gunzip v2.006 ;
 
-use strict;
 use warnings;
 use bytes;
 

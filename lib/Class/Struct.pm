@@ -3,7 +3,6 @@ package Class::Struct;
 ## See POD after __END__
 
 
-use strict;
 use warnings::register;
 our(@ISA, @EXPORT, $VERSION);
 
@@ -64,7 +63,7 @@ sub struct {
     # Create constructor.
 
     die "function 'new' already defined in package $class"
-        if do { no strict 'refs'; defined &{Symbol::fetch_glob($class . "::new")} };
+        if do { defined &{Symbol::fetch_glob($class . "::new")} };
 
     my @methods = @( () );
     my %refs = %( () );

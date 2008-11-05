@@ -5,7 +5,7 @@
 #
 
 package Locale::Constants;
-use strict;
+
 
 require Exporter;
 

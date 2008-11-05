@@ -1,6 +1,5 @@
 package File::Spec::Unix;
 
-use strict;
 our ($VERSION);
 
 $VERSION = '3.2701';
@@ -142,7 +141,6 @@ sub _tmpdir {
     my $self = shift;
     my @dirlist = @_;
     do {
-	no strict 'refs';
 	if (${*{Symbol::fetch_glob("\cTAINT")}}) { # Check for taint mode on perl >= 5.8.0
             require Scalar::Util;
 	    @dirlist = grep { ! Scalar::Util::tainted($_) } @dirlist;

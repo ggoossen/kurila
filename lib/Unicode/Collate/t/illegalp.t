@@ -14,7 +14,6 @@ BEGIN {
 use Test::More;
 BEGIN { plan tests => 17 };
 
-use strict;
 use warnings;
 
 ok(1);

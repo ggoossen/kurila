@@ -1,7 +1,6 @@
 package Locale::Maketext::Simple;
 $Locale::Maketext::Simple::VERSION = '0.18';
 
-use strict;
 
 =head1 NAME
 
@@ -114,7 +113,6 @@ sub import {
     my ($loc, $loc_lang) = < $class->load_loc(< %args);
     $loc ||= $class->default_loc(< %args);
 
-    no strict 'refs';
     *{Symbol::fetch_glob(caller(0) . "::%args{Export}")} = $loc if %args{Export};
     *{Symbol::fetch_glob(caller(0) . "::%args{Export}_lang")} = $loc_lang || sub { 1 };
 }

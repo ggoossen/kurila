@@ -1,5 +1,5 @@
 package Devel::switchd;
-use strict; BEGIN { } # use strict; BEGIN { ... } to incite [perl #21890]
+ BEGIN { }
 sub import { print "import<$(join ' ',@_)>;" }
 1;
 

@@ -1,6 +1,5 @@
 package ExtUtils::Command;
 
-use strict;
 use File::Copy;
 use File::Compare;
 use File::Basename;

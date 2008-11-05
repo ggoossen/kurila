@@ -1,6 +1,5 @@
 package Digest;
 
-use strict;
 use vars < qw($VERSION %MMAP $AUTOLOAD);
 
 $VERSION = "1.15";
@@ -32,7 +31,6 @@ sub new
 	my $class = $_;
 	my @args;
 	($class, < @args) = < @$class if ref($class);
-	no strict 'refs';
 	unless (exists %{*{Symbol::fetch_glob("$class\::")}}{"VERSION"}) {
 	    eval "require $class";
 	    if ($@) {

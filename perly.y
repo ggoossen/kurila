@@ -150,11 +150,10 @@ prog	:	progstart
 
 /* An ordinary block */
 block	:	'{' remember lineseq '}'
-			{ if (PL_parser->copline > (line_t)IVAL($1))
-			      PL_parser->copline = (line_t)IVAL($1);
+			{
                             $$ = block_end($2, $3);
-			  TOKEN_GETMAD($1,$$,'{');
-			  TOKEN_GETMAD($4,$$,'}');
+                            TOKEN_GETMAD($1,$$,'{');
+                            TOKEN_GETMAD($4,$$,'}');
 			}
 	;
 
@@ -170,11 +169,10 @@ progstart:
 
 
 mblock	:	'{' mremember lineseq '}'
-			{ if (PL_parser->copline > (line_t)IVAL($1))
-			      PL_parser->copline = (line_t)IVAL($1);
+			{
                             $$ = block_end($2, $3);
-			  TOKEN_GETMAD($1,$$,'{');
-			  TOKEN_GETMAD($4,$$,'}');
+                            TOKEN_GETMAD($1,$$,'{');
+                            TOKEN_GETMAD($4,$$,'}');
 			}
 	;
 
@@ -212,7 +210,6 @@ line	:	cond
                         {
                             $$ = IF_MAD( newOP(OP_NULL, 0, LOCATION($1)),
                                     (OP*)NULL);
-                            PL_parser->copline = NOLINE;
                             TOKEN_GETMAD($1,$$,';');
                             APPEND_MADPROPS_PV("nullstatement",$$,'>');
                             PL_parser->expect = XSTATE;
@@ -264,7 +261,7 @@ sideff	:	error
                             TOKEN_GETMAD($2,$$,'w');
 			}
 	|	expr FOR expr
-			{ $$ = newFOROP(0, NULL, (line_t)IVAL($2),
+			{ $$ = newFOROP(0, NULL,
 					(OP*)NULL, $3, $1, (OP*)NULL, LOCATION($2));
 			  TOKEN_GETMAD($2,((LISTOP*)$$)->op_first->op_sibling,'w');
 			}
@@ -278,34 +275,34 @@ else	:	/* NULL */
 			  TOKEN_GETMAD($1,$$,'o');
 			}
 	|	ELSIF '(' mexpr ')' mblock else
-			{ PL_parser->copline = (line_t)IVAL($1);
+			{ 
 			    $$ = newCONDOP(0, $3, scope($5), $6, LOCATION($1));
 			    PL_hints |= HINT_BLOCK_SCOPE;
-			  TOKEN_GETMAD($1,$$,'I');
-			  TOKEN_GETMAD($2,$$,'(');
-			  TOKEN_GETMAD($4,$$,')');
-                          APPEND_MADPROPS_PV("if", $$, '>');
+                            TOKEN_GETMAD($1,$$,'I');
+                            TOKEN_GETMAD($2,$$,'(');
+                            TOKEN_GETMAD($4,$$,')');
+                            APPEND_MADPROPS_PV("if", $$, '>');
 			}
 	;
 
 /* Real conditional expressions */
 cond	:	IF '(' remember mexpr ')' mblock else
-			{ PL_parser->copline = (line_t)IVAL($1);
+			{
 			    $$ = block_end($3,
                                 newCONDOP(0, $4, scope($6), $7, LOCATION($1)));
-			  TOKEN_GETMAD($1,$$,'I');
-			  TOKEN_GETMAD($2,$$,'(');
-			  TOKEN_GETMAD($5,$$,')');
-                          APPEND_MADPROPS_PV("if", $$, '>');
+                            TOKEN_GETMAD($1,$$,'I');
+                            TOKEN_GETMAD($2,$$,'(');
+                            TOKEN_GETMAD($5,$$,')');
+                            APPEND_MADPROPS_PV("if", $$, '>');
 			}
 	|	UNLESS '(' remember miexpr ')' mblock else
-			{ PL_parser->copline = (line_t)IVAL($1);
+			{
 			    $$ = block_end($3,
                                 newCONDOP(0, $4, scope($6), $7, LOCATION($1)));
-			  TOKEN_GETMAD($1,$$,'I');
-			  TOKEN_GETMAD($2,$$,'(');
-			  TOKEN_GETMAD($5,$$,')');
-                          APPEND_MADPROPS_PV("if", $$, '>');
+                            TOKEN_GETMAD($1,$$,'I');
+                            TOKEN_GETMAD($2,$$,'(');
+                            TOKEN_GETMAD($5,$$,')');
+                            APPEND_MADPROPS_PV("if", $$, '>');
 			}
 	;
 
@@ -337,7 +334,6 @@ loop	:	label WHILE remember '(' texpr ')'
                     mintro mblock cont
 			{
                             OP *innerop;
-                            PL_parser->copline = (line_t)IVAL($2);
 			    $$ = block_end($3,
                                 newSTATEOP(0, PVAL($1),
                                     innerop = newWHILEOP(0, 1, (LOOP*)(OP*)NULL,
@@ -349,21 +345,21 @@ loop	:	label WHILE remember '(' texpr ')'
 			}
 
 	|	label UNTIL '(' remember iexpr ')' mintro mblock cont
-			{ OP *innerop;
-                            PL_parser->copline = (line_t)IVAL($2);
+			{ 
+                            OP *innerop;
 			    $$ = block_end($4,
 				   newSTATEOP(0, PVAL($1),
 				     innerop = newWHILEOP(0, 1, (LOOP*)(OP*)NULL,
                                          LOCATION($2), $5, $8, $9, $7), LOCATION($2)));
-			  TOKEN_GETMAD($1,innerop,'L');
-			  TOKEN_GETMAD($2,innerop,'W');
-			  TOKEN_GETMAD($3,innerop,'(');
-			  TOKEN_GETMAD($6,innerop,')');
+                            TOKEN_GETMAD($1,innerop,'L');
+                            TOKEN_GETMAD($2,innerop,'W');
+                            TOKEN_GETMAD($3,innerop,'(');
+                            TOKEN_GETMAD($6,innerop,')');
 			}
 	|	label FOR MY remember my_scalar '(' mexpr ')' mblock cont
 			{ OP *innerop;
 			  $$ = block_end($4,
-                              innerop = newFOROP(0, PVAL($1), (line_t)IVAL($2),
+                              innerop = newFOROP(0, PVAL($1),
                                   $5, $7, $9, $10, LOCATION($2)));
 			  TOKEN_GETMAD($1,((LISTOP*)innerop)->op_first->op_sibling,'L');
 			  TOKEN_GETMAD($2,((LISTOP*)innerop)->op_first->op_sibling,'W');
@@ -374,7 +370,7 @@ loop	:	label WHILE remember '(' texpr ')'
 	|	label FOR remember mydef '(' mexpr ')' mblock cont
 			{ OP *innerop;
 			  $$ = block_end($3,
-			     innerop = newFOROP(0, PVAL($1), (line_t)IVAL($2),
+			     innerop = newFOROP(0, PVAL($1),
                                  $4, $6, $8, $9, LOCATION($2)));
 			  TOKEN_GETMAD($1,((LISTOP*)innerop)->op_first->op_sibling,'L');
 			  TOKEN_GETMAD($2,((LISTOP*)innerop)->op_first->op_sibling,'W');
@@ -488,10 +484,12 @@ subrout	:	SUB startsub subname proto subbody
                             TOKEN_GETMAD($1,$$,'d');
                             APPEND_MADPROPS_PV("sub", $$, '<');
                             CV* new = newSUB($2, NULL, $3);
+                            SVcpREPLACE(SvLOCATION(CvSv(new)), LOCATION($1));
                             process_special_block(IVAL($1), new);
                             /* SvREFCNT_dec(new);  leak reference */
 #else
                             CV* new = newSUB($2, NULL, $3);
+                            SVcpREPLACE(SvLOCATION(CvSv(new)), LOCATION($1));
                             process_special_block(IVAL($1), new);
                             $$ = (OP*)NULL;
 #endif
@@ -667,12 +665,13 @@ listop	:	LSTOP indirob argexpr /* map {...} @args or print $fh @args */
 			}
 	|	LSTOPSUB startanonsub block /* sub f(&@);   f { foo } ... */
 			{
-			  $<opval>$ = newANONSUB($2, 0, $3); }
+                            $<opval>$ = newANONSUB($2, 0, scalar($3)); }
 		    listexpr		%prec LSTOP  /* ... @bar */
-			{ $$ = newUNOP(OP_ENTERSUB, OPf_STACKED,
-				 append_elem(OP_LIST,
-                                     prepend_elem(OP_LIST, $<opval>4, $5), $1), $1->op_location);
-                          APPEND_MADPROPS_PV("listop", $$, '>');
+			{ 
+                            $$ = newUNOP(OP_ENTERSUB, OPf_STACKED,
+                                append_elem(OP_LIST,
+                                    prepend_elem(OP_LIST, $<opval>4, $5), $1), $1->op_location);
+                            APPEND_MADPROPS_PV("listop", $$, '>');
 			}
 	;
 
@@ -944,9 +943,9 @@ termunop : '-' term %prec UMINUS                       /* -$x */
 anonymous:
 	ANONSUB startanonsub proto block	%prec '('
 			{
-			  $$ = newANONSUB($2, $3, $4);
-			  TOKEN_GETMAD($1,$$,'o');
-			  OP_GETMAD($3,$$,'s');
+                            $$ = newANONSUB($2, $3, scalar($4));
+                            TOKEN_GETMAD($1,$$,'o');
+                            OP_GETMAD($3,$$,'s');
 			}
 
     ;

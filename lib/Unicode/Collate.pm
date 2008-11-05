@@ -6,7 +6,6 @@ BEGIN {
     }
 }
 
-use strict;
 use warnings;
 use Carp;
 use File::Spec;

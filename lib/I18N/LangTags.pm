@@ -3,7 +3,7 @@
 # Sean M. Burke <sburke@cpan.org>
 
 package I18N::LangTags;
-use strict;
+
 use vars < qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $VERSION %Panic);
 require Exporter;
 @ISA = qw(Exporter);

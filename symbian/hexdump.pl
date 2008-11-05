@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-use strict;
+
 
 die "$0: EPOCROOT unset\n" unless exists %ENV{EPOCROOT};
 die "$0: EPOCROOT directory does exists\n" unless -d %ENV{EPOCROOT};

@@ -2,16 +2,12 @@
 
 BEGIN {
     require Config;
-    if ((%Config::Config{'extensions'} !~ m/\bB\b/) ){
-        print "1..0 # Skip -- Perl configured without B module\n";
-        exit 0;
-    }
     require './test.pl';
 }
 
 $| = 1;
 use warnings;
-use strict;
+
 use Config;
 use B::Showlex ();
 
@@ -26,7 +22,8 @@ my $Is_MacOS = $^O eq 'MacOS';
 my $path = join " ", map { qq["-I$_"] } @INC;
 $path = '"-I../lib" "-Iperl_root:[lib]"' if $Is_VMS;   # gets too long otherwise
 my $redir = $Is_MacOS ? "" : "2>&1";
-my $is_thread = %Config{use5005threads} && %Config{use5005threads} eq 'define';
+
+my $start_index = B::PAD_NAME_START_INDEX();
 
 # v1.01 tests
 
@@ -46,14 +43,14 @@ for my $newlex (@('', '-newlex')) {
 		     prog => 'my ($a,$b)', stderr => 1 );
     $na = padrep('$a',$newlex);
     $nb = padrep('$b',$newlex);
-    like ($out, qr/1: $na/ms, 'found $a in "my ($a,$b)"');
-    like ($out, qr/2: $nb/ms, 'found $b in "my ($a,$b)"');
+    like ($out, qr/5: $na/ms, 'found $a in "my ($a,$b)"');
+    like ($out, qr/6: $nb/ms, 'found $b in "my ($a,$b)"');
 
     print $out if $verbose;
 
 SKIP: do {
     skip "no perlio in this build", 5
-    unless %Config::Config{useperlio};
+    unless Config::config_value("useperlio");
 
     our $buf = 'arb startval';
     my $ak = B::Showlex::walk_output (\$buf);
@@ -62,8 +59,9 @@ SKIP: do {
     $walker->();
     $na = padrep('$foo',$newlex);
     $nb = padrep('$bar',$newlex);
-    like ($buf, qr/1: $na/ms, 'found $foo in "sub { my ($foo,$bar) }"');
-    like ($buf, qr/2: $nb/ms, 'found $bar in "sub { my ($foo,$bar) }"');
+    like ($buf, qr/$($start_index+1): $na/ms,
+       'found $foo in "sub { my ($foo,$bar) }"');
+    like ($buf, qr/$($start_index+2): $nb/ms, 'found $bar in "sub { my ($foo,$bar) }"');
 
     print $buf if $verbose;
 
@@ -76,9 +74,9 @@ SKIP: do {
     $na = padrep('$scalar',$newlex);
     $nb = padrep('@arr',$newlex);
     $nc = padrep('%hash',$newlex);
-    like ($buf, qr/1: $na/ms, 'found $scalar in "'. $src .'"');
-    like ($buf, qr/2: $nb/ms, 'found @arr    in "'. $src .'"');
-    like ($buf, qr/3: $nc/ms, 'found %hash   in "'. $src .'"');
+    like ($buf, qr/$($start_index+1): $na/ms, 'found $scalar in "'. $src .'"');
+    like ($buf, qr/$($start_index+2): $nb/ms, 'found @arr    in "'. $src .'"');
+    like ($buf, qr/$($start_index+3): $nc/ms, 'found %hash   in "'. $src .'"');
 
     print $buf if $verbose;
 

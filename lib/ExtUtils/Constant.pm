@@ -91,7 +91,7 @@ C<undef>.  The value of the macro is not needed.
 =cut
 
 use warnings;
-use strict;
+
 
 use Exporter;
 use ExtUtils::Constant::Utils < qw(C_stringify);

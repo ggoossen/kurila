@@ -1,5 +1,5 @@
 package Moped::Msg;
-use strict;
+
 use vars < qw(@ISA $VERSION);
 require DynaLoader;
 @ISA = qw(DynaLoader);

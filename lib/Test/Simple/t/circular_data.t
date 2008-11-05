@@ -12,7 +12,6 @@ BEGIN {
     }
 }
 
-use strict;
 use Test::More tests => 11;
 
 my $a1 = \@( 1, 2, 3 );

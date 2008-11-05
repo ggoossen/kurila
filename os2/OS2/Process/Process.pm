@@ -246,8 +246,6 @@ sub const_import {
   my $val = os2constant($sym);
   my $p = caller(1);
 
-  # no strict;
-
   *{"$p\::$sym"} = sub () { $val };
   ();			# needed by import()
 }

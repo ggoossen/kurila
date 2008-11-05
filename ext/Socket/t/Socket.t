@@ -6,12 +6,7 @@ use Test::More;
 
 our $has_alarm;
 BEGIN {
-    if (%Config{'extensions'} !~ m/\bSocket\b/ && 
-        !(($^O eq 'VMS') && %Config{d_socket})) {
-	print "1..0\n";
-	exit 0;
-    }
-    $has_alarm = %Config{d_alarm};
+    $has_alarm = config_value('d_alarm');
 }
 	
 use Socket < qw(:all);
@@ -27,7 +22,8 @@ sub alarmed  { $alarmed = 1 }
 if (socket(T, PF_INET, SOCK_STREAM, IPPROTO_TCP)) {
 
   arm(5);
-  my $host = $^O eq 'MacOS' || ($^O eq 'irix' && %Config{osvers} == 5) ?
+  my $host = $^O eq 'MacOS' ||
+    ($^O eq 'irix' && config_value('osvers') == 5) ?
                  '127.0.0.1' : 'localhost';
   my $localhost = inet_aton($host);
 

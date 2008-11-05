@@ -1,6 +1,5 @@
 package ExtUtils::CBuilder::Platform::os2;
 
-use strict;
 use ExtUtils::CBuilder::Platform::Unix;
 
 use vars < qw($VERSION @ISA);

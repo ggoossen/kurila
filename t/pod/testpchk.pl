@@ -15,7 +15,6 @@ BEGIN {
 
 use Pod::Checker;
 use vars < qw(@ISA @EXPORT $MYPKG);
-#use strict;
 #use diagnostics;
 use Exporter;
 #use File::Compare;

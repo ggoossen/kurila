@@ -1,7 +1,7 @@
 #!./perl -Tw
 # Testing Cwd under taint mode.
 
-use strict;
+
 
 use Cwd;
 
@@ -17,7 +17,6 @@ my @Functions = qw(getcwd cwd fastcwd fastgetcwd
                   );
 
 foreach my $func ( @Functions) {
-    no strict 'refs';
     my $cwd;
     try { $cwd = &{*{Symbol::fetch_glob('Cwd::'.$func)}} };
     is( $@, '',		"$func() should not explode under taint mode" );

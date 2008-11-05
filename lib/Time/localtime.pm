@@ -1,5 +1,5 @@
 package Time::localtime;
-use strict;
+
 
 use Time::tm;
 

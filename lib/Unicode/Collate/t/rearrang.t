@@ -14,7 +14,6 @@ BEGIN {
 use Test::More;
 BEGIN { plan tests => 23 };
 
-use strict;
 use warnings;
 use Unicode::Collate;
 

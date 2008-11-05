@@ -1,9 +1,8 @@
 package MakeUtil ;
 package main ;
+ 
 
-use strict ;
-
-use Config < qw(%Config);
+use Config;
 use File::Copy;
 
 

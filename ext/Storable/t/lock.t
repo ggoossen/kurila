@@ -15,19 +15,15 @@ BEGIN {
     } else {
 	unshift @INC, 't';
     }
-    if (%ENV{PERL_CORE} and %Config{'extensions'} !~ m/\bStorable\b/) {
-        print "1..0 # Skip: Storable was not built\n";
-        exit 0;
-    }
 
     require 'st-dump.pl';
 }
 
 use Storable < qw(lock_store lock_retrieve);
 
-unless (&Storable::CAN_FLOCK( < @_ )) {
+unless (Storable::CAN_FLOCK()) {
     print "1..0 # Skip: fcntl/flock emulation broken on this platform\n";
-	exit 0;
+    exit 0;
 }
 
 print "1..5\n";

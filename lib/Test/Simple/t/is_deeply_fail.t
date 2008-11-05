@@ -10,7 +10,6 @@ BEGIN {
     }
 }
 
-use strict;
 
 use Test::Builder;
 require Test::Simple::Catch;

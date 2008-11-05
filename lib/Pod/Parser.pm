@@ -199,7 +199,7 @@ for the setting and unsetting of parse-options.
 #############################################################################
 
 use vars < qw(@ISA);
-use strict;
+
 #use diagnostics;
 use Pod::InputObjects;
 use Exporter;

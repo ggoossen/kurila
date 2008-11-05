@@ -1,6 +1,5 @@
 package IPC::Cmd;
 
-use strict;
 
 BEGIN {
 

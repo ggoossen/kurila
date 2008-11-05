@@ -7,7 +7,6 @@
 # better than having no tests at all, right?
 #
 
-use strict;
 use Config;
 use File::Spec::Functions;
 
@@ -23,12 +22,12 @@ BEGIN {
    $old_env_path = %ENV{'PATH'};
    $old_env_dcl_path = %ENV{'DCL$PATH'};
    $old_env_term = %ENV{'TERM'};
-  if ($^O eq 'VMS' && !defined(%Config{d_setenv})) {
+  if ($^O eq 'VMS' && !defined(config_value('d_setenv'))) {
       %ENV{PATH} = %ENV{PATH};
       %ENV{TERM} = %ENV{TERM} ne ''? %ENV{TERM} : 'dummy';
   }
-  if (%Config{'extensions'} =~ m/\bIPC\/SysV\b/
-      && (%Config{d_shm} || %Config{d_msg})) {
+  if (config_value('extensions') =~ m/\bIPC\/SysV\b/
+      && (config_value('d_shm') || config_value('d_msg'))) {
       try { require IPC::SysV };
       unless ($@) {
 	  $ipcsysv++;
@@ -146,9 +145,9 @@ my $TEST = catfile(curdir(), 'TEST');
 do {
     %ENV{'DCL$PATH'} = '' if $Is_VMS;
 
-    if ($Is_MSWin32 && %Config{ccname} =~ m/bcc32/ && ! -f 'cc3250mt.dll') {
+    if ($Is_MSWin32 && config_value('ccname') =~ m/bcc32/ && ! -f 'cc3250mt.dll') {
 	my $bcc_dir;
-	foreach my $dir (split m/%Config{path_sep}/, %ENV{PATH}) {
+	foreach my $dir (split m/$(config_value('path_sep'))/, %ENV{PATH}) {
 	    if (-f "$dir/cc3250mt.dll") {
 		$bcc_dir = $dir and last;
 	    }
@@ -366,21 +365,21 @@ do {
                qr/^Insecure dependency/);
 
     SKIP: do {
-        skip "chown() is not available", 2 unless %Config{d_chown};
+        skip "chown() is not available", 2 unless config_value('d_chown');
 
 	dies_like( sub { chown -1, -1, $TAINT },
                    qr/^Insecure dependency/);
     };
 
     SKIP: do {
-        skip "link() is not available", 2 unless %Config{d_link};
+        skip "link() is not available", 2 unless config_value('d_link');
 
 	dies_like( sub { link $TAINT, '' },
                    qr/^Insecure dependency/);
     };
 
     SKIP: do {
-        skip "symlink() is not available", 2 unless %Config{d_symlink};
+        skip "symlink() is not available", 2 unless config_value('d_symlink');
 
 	dies_like( sub { symlink $TAINT, '' },
                    qr/^Insecure dependency/);
@@ -399,7 +398,7 @@ do {
                qr/^Insecure dependency/);
 
     SKIP: do {
-        skip "chroot() is not available", 2 unless %Config{d_chroot};
+        skip "chroot() is not available", 2 unless config_value('d_chroot');
 
 	dies_like( sub { chroot $TAINT },
                    qr/^Insecure dependency/);
@@ -473,14 +472,14 @@ do {
                qr/^Insecure dependency/);
 
     SKIP: do {
-        skip "setpgrp() is not available", 2 unless %Config{d_setpgrp};
+        skip "setpgrp() is not available", 2 unless config_value('d_setpgrp');
 
 	dies_like( sub { setpgrp 0, $TAINT0 },
                    qr/^Insecure dependency/);
     };
 
     SKIP: do {
-        skip "setpriority() is not available", 2 unless %Config{d_setprior};
+        skip "setpriority() is not available", 2 unless config_value('d_setprior');
 
 	dies_like( sub { setpriority 0, $TAINT0, $TAINT0 },
                    qr/^Insecure dependency/);
@@ -490,7 +489,7 @@ do {
 # Some miscellaneous operations can't use tainted data.
 do {
     SKIP: do {
-        skip "syscall() is not available", 2 unless %Config{d_syscall};
+        skip "syscall() is not available", 2 unless config_value('d_syscall');
 
 	dies_like( sub { syscall $TAINT },
                    qr/^Insecure dependency/);
@@ -508,7 +507,7 @@ do {
                    qr/^Insecure dependency/);
 
         SKIP: do {
-            skip "fcntl() is not available", 2 unless %Config{d_fcntl};
+            skip "fcntl() is not available", 2 unless config_value('d_fcntl');
 
 	    dies_like( sub { fcntl FOO, $TAINT0, $foo },
                        qr/^Insecure dependency/);
@@ -607,7 +606,7 @@ do {
 
     SKIP: do {
         # pretty hard to imagine not
-        skip "readdir() is not available", 1 unless %Config{d_readdir};
+        skip "readdir() is not available", 1 unless config_value('d_readdir');
 
 	local(*D);
 	opendir(D, "op") or die "opendir: $!\n";
@@ -618,7 +617,7 @@ do {
 
     SKIP: do {
         skip "readlink() or symlink() is not available" unless 
-          %Config{d_readlink} && %Config{d_symlink};
+          config_value('d_readlink') && config_value('d_symlink');
 
 	my $symlink = "sl$$";
 	unlink($symlink);
@@ -662,9 +661,8 @@ SKIP: do {
 
     # test shmread
     SKIP: do {
-        skip "shm*() not available", 1 unless %Config{d_shm};
+        skip "shm*() not available", 1 unless config_value('d_shm');
 
-        no strict 'subs';
         my $sent = "foobar";
         my $rcvd;
         my $size = 2000;
@@ -694,9 +692,8 @@ SKIP: do {
 
     # test msgrcv
     SKIP: do {
-        skip "msg*() not available", 1 unless %Config{d_msg};
+        skip "msg*() not available", 1 unless config_value('d_msg');
 
-	no strict 'subs';
 	my $id = msgget(IPC_PRIVATE(), IPC_CREAT() ^|^ S_IRWXU());
 
 	my $sent      = "message";
@@ -1115,9 +1112,7 @@ do {
 
 do {
     SKIP: do {
-	skip "fork() is not available", 3 unless %Config{'d_fork'};
-	skip "opening |- is not stable on threaded OpenBSD with taint", 3
-            if %Config{useithreads} && $Is_OpenBSD;
+	skip "fork() is not available", 3 unless config_value('d_fork');
 
 	%ENV{'PATH'} = $TAINT;
 	local %SIG{'PIPE'} = 'IGNORE';
@@ -1203,7 +1198,7 @@ do {
 
 # This may bomb out with the alarm signal so keep it last
 SKIP: do {
-    skip "No alarm()"  unless %Config{d_alarm};
+    skip "No alarm()"  unless config_value('d_alarm');
     # Test from RT #41831]
     # [PATCH] Bug & fix: hang when using study + taint mode (perl 5.6.1, 5.8.x)
 

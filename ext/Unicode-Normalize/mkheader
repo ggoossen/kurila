@@ -18,7 +18,7 @@
 #    unfcmp.h
 #    unfexc.h
 #
-use strict;
+
 use warnings;
 use File::Spec;
 

@@ -7,6 +7,8 @@ static __inline__ datatype inlineDtype(pTHX_ SV *sv) {
         return Dt_ARRAY;
     else if (SvHVOK(sv))
         return Dt_HASH;
+    else if (SvCVOK(sv))
+        return Dt_CODE;
     else if (SvTYPE(sv) == SVt_PVGV)
         return Dt_GLOB;
     else if (SvROK(sv))
@@ -26,6 +28,7 @@ static __inline__ const char* inlineDdesc(pTHX_ SV *sv) {
     case Dt_UNDEF: return "UNDEF";
     case Dt_ARRAY: return "ARRAY";
     case Dt_HASH: return "HASH";
+    case Dt_CODE: return "CODE";
     case Dt_REF: return "REF";
     case Dt_PLAIN: return "PLAINVALUE";
     case Dt_IO: return "IO";
@@ -102,14 +105,19 @@ SV* Perl_GvSv(pTHX_ GV *gv) { return (SV*)gv; }
 SV* Perl_ReSv(pTHX_ REGEXP *re) { return (SV*)re; }
 SV* Perl_IoSv(pTHX_ struct io *io) { return (SV*)io; }
 
-#define SvAV(sv) inline_SvAV(aTHX_ sv)
-static __inline__ AV* inline_SvAV(pTHX_ SV *sv) {
+AV* Perl_SvAv(pTHX_ SV *sv) {
+    assert(SvAVOK(sv));
     return (AV*)sv;
 }
 
-#define SvHV(sv) inline_SvHV(aTHX_ sv)
-static __inline__ HV* inline_SvHV(pTHX_ SV *sv) {
+HV* Perl_SvHv(pTHX_ SV *sv) {
+    assert(SvHVOK(sv));
     return (HV*)sv;
+}
+
+CV* Perl_SvCv(pTHX_ SV *sv) {
+    assert(SvCVOK(sv));
+    return (CV*)sv;
 }
 
 #define CvREFCNT_inc(cv) inline_CvREFCNT_inc(aTHX_ cv)
@@ -177,13 +185,15 @@ static __inline__ SV* inline_loc_desc(pTHX_ SV *loc) {
     return str;
 }
 
+#define LOC_NAME_INDEX 3
+
 /* Location retrieval */
 #define loc_name(loc) inline_loc_name(aTHX_ loc)
 static __inline__ SV* inline_loc_name(pTHX_ SV *loc) {
     SV * str = sv_2mortal(newSVpv("", 0));
     if (loc && SvAVOK(loc)) {
         Perl_sv_catpvf(aTHX_ str, "%s",
-                       SvPVX_const(*av_fetch((AV*)loc, 3, FALSE))
+                       SvPVX_const(*av_fetch((AV*)loc, LOC_NAME_INDEX, FALSE))
             );
     }
     return str;

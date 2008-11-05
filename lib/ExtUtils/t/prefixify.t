@@ -10,7 +10,6 @@ BEGIN {
     }
 }
 
-use strict;
 use Test::More;
 
 if( $^O eq 'VMS' ) {

@@ -4769,7 +4769,6 @@ sub cmd_i {
         foreach my $isa ( split( m/\s+/, $line ) ) {
             $evalarg = $isa;
             ($isa) = &eval;
-            no strict 'refs';
             print join(
                 ', ',
                 map {    # snaffled unceremoniously from Class::ISA

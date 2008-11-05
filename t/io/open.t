@@ -218,7 +218,6 @@ do {
     ok( open(STDOUT,     ">&", $stdout),        'restore dupped STDOUT from lexical fh');
 
     do {
-	use strict; # the below should not warn
 	ok( open(my $stdout, ">&", 'STDOUT'),         'dup STDOUT into lexical fh');
     };
 
@@ -227,7 +226,7 @@ do {
 };
 
 SKIP: do {
-    skip "This perl uses perlio", 1 if %Config{useperlio};
+    skip "This perl uses perlio", 1 if config_value("useperlio");
     skip "miniperl cannot be relied on to load \%Errno"
 	if %ENV{PERL_CORE_MINITEST};
     # Force the reference to %! to be run time by writing ! as {"!"}
@@ -255,7 +254,7 @@ do {
 };
     
 SKIP: do {
-    skip("These tests use perlio", 5) unless %Config{useperlio};
+    skip("These tests use perlio", 5) unless config_value("useperlio");
     my $w;
     use warnings 'layer';
     local $^WARN_HOOK = sub { $w = shift->message };

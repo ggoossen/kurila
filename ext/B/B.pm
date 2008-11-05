@@ -22,14 +22,12 @@ BEGIN {
                            sub_generation amagic_generation perlstring
                            walkoptree_slow walkoptree walkoptree_exec walksymtable
                            parents comppadlist sv_undef compile_stats timing_info
-                           begin_av init_av check_av end_av regex_padav dowarn defstash
+                           init_av end_av regex_padav dowarn defstash
                            curstash warnhook diehook inc_gv @optype @specialsv_name
-                           unitcheck_av
                       );
     XSLoader::load 'B';
 }
 
-use strict;
 @B::SV::ISA = @( 'B::OBJECT' );
 @B::NULL::ISA = @( 'B::SV' );
 @B::PV::ISA = @( 'B::SV' );
@@ -226,7 +224,6 @@ sub walksymtable {
     my $sym;
     my $ref;
     my $fullname;
-    no strict 'refs';
     $prefix = '' unless defined $prefix;
     for my $sym (keys %$symref) {
         my $ref = $symref->{$_};

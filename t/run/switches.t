@@ -6,7 +6,7 @@
 
 BEGIN { require "./test.pl"; }
 
-plan(tests => 64);
+plan(tests => 63);
 
 use Config;
 
@@ -202,11 +202,6 @@ do {
     chomp( $r=runperl( switches => \@('-V:osname') ) );
     is( $r, "osname='$^O';", 'perl -V:osname');
 
-    # lookup a nonexistent var
-    chomp( $r=runperl( switches => \@('-V:this_var_makes_switches_test_fail') ) );
-    is( $r, "this_var_makes_switches_test_fail='UNKNOWN';",
-        'perl -V:unknown var');
-
     # regexp lookup
     # platforms that don't like this quoting can either skip this test
     # or fix test.pl _quote_args
@@ -224,8 +219,13 @@ do {
     local $TODO = '';   # these ones should work on VMS
 
     my (undef, $v) = < split m/-/, $^V;
+    my $archname = config_value('archname');
     like( runperl( switches => \@('-v') ),
-	  qr/This is kurila, v$v (?:DEVEL\w+ )?built for \Q%Config{archname}\E.+Copyright.+Gerard Goossen.+Artistic License.+GNU General Public License/s,
+	  qr/This[ ]is[ ]kurila,[  ]v$v [ ] (?:DEVEL\w+[ ])? built[ ]for[ ]
+             \Q$archname\E .+
+             Copyright .+
+             Gerard[ ]Goossen.+Artistic[ ]License .+
+             GNU[ ]General[ ]Public[ ]License/xs,
           '-v looks okay' );
 
 };
@@ -236,7 +236,7 @@ do {
     local $TODO = '';   # these ones should work on VMS
 
     like( runperl( switches => \@('-h') ),
-	  qr/Usage: .+(?i:perl(?:%Config{_exe})?).+switches.+programfile.+arguments/,
+	  qr/Usage: .+(?i:perl(?:$(config_value('_exe')))?).+switches.+programfile.+arguments/,
           '-h looks okay' );
 
 };

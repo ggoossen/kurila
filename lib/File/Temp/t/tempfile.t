@@ -1,7 +1,7 @@
 #!/usr/local/bin/perl -w
 # Test for File::Temp - tempfile function
 
-use strict;
+
 use Test;
 BEGIN { plan tests => 22}
 use File::Spec;

@@ -12,7 +12,6 @@ BEGIN {
     }
 }
 
-use strict;
 use MIME::Base64 < qw(decode_base64);
 
 print "1..1\n";

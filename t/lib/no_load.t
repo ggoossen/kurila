@@ -3,7 +3,7 @@
 # Check that certain modules don't get loaded when other modules are used.
 #
 
-use strict;
+
 use warnings;
 
 require "./test.pl";

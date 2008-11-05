@@ -11,7 +11,7 @@ our $VERSION = 2006.1117;
 
 use vars < qw($VERSION $columns $debug $break $huge $unexpand $tabstop
 	$separator $separator2);
-use strict;
+
 
 BEGIN	{
 	$columns = 76;  # <= screen width

@@ -79,18 +79,6 @@ PP(pp_regcomp)
     SV *tmpstr;
     REGEXP *re = NULL;
 
-    /* prevent recompiling under /o and ithreads. */
-#if defined(USE_ITHREADS)
-    if (pm->op_pmflags & PMf_KEEP && PM_GETRE(pm)) {
-	if (PL_op->op_flags & OPf_STACKED) {
-	    dMARK;
-	    SP = MARK;
-	}
-	else
-	    (void)POPs;
-	RETURN;
-    }
-#endif
     if (PL_op->op_flags & OPf_STACKED) {
 	/* multiple args; concatentate them */
 	dMARK; dORIGMARK;
@@ -129,11 +117,7 @@ PP(pp_regcomp)
             U32 pm_flags = pm->op_pmflags & PMf_COMPILETIME;
 	    if (re) {
 	        ReREFCNT_dec(re);
-#ifdef USE_ITHREADS
-		PM_SETRE(pm, (REGEXP*) &PL_sv_undef);
-#else
 		PM_SETRE(pm, NULL);	/* crucial if regcomp aborts */
-#endif
 	    } else if (PL_curcop->cop_hints_hash) {
 	        SV **ptr = hv_fetch(PL_curcop->cop_hints_hash, "regcomp", 7, 0);
                 if (ptr && *ptr && SvIOK(*ptr) && SvIV(*ptr))
@@ -168,14 +152,12 @@ PP(pp_regcomp)
 	pm = PL_curpm;
 
 
-#if !defined(USE_ITHREADS)
     /* can't change the optree at runtime either */
     /* PMf_KEEP is handled differently under threads to avoid these problems */
     if (pm->op_pmflags & PMf_KEEP) {
 	pm->op_private &= ~OPpRUNTIME;	/* no point compiling again */
 	cLOGOP->op_first->op_next = PL_op->op_next;
     }
-#endif
     RETURN;
 }
 
@@ -408,7 +390,7 @@ PP(pp_grepstart)
     if ( ! SvAVOK(src) )
 	Perl_croak(aTHX_ "%s expected an array but got %s", OP_DESC(PL_op), Ddesc(src));
     
-    if ( av_len(SvAV(src)) == -1 ) {
+    if ( av_len(SvAv(src)) == -1 ) {
 	(void)POPMARK;
 	XPUSHs(dst);
 	RETURNOP(PL_op->op_next->op_next);
@@ -428,7 +410,7 @@ PP(pp_grepstart)
     ENTER;					/* enter inner scope */
     SAVEVPTR(PL_curpm);
 
-    srcitem = av_shift(SvAV(src));
+    srcitem = av_shift(SvAv(src));
     if (PL_op->op_type == OP_GREPSTART)
 	XPUSHs(srcitem);
     if (PL_op->op_private & OPpGREP_LEX) {
@@ -452,7 +434,7 @@ PP(pp_mapwhile)
     SV** dst;
 
     dst = PL_stack_base + PL_markstack_ptr[-1] + 0;
-    src = SvAV(*(PL_stack_base + PL_markstack_ptr[-1] + 1));
+    src = SvAv(*(PL_stack_base + PL_markstack_ptr[-1] + 1));
 
     /* if there are new items, push them into the destination list */
     if (items && gimme != G_VOID) {
@@ -942,13 +924,13 @@ PP(pp_caller)
 	CV* cv = cx->blk_sub.cv;
 	SV** name = NULL;
 	if (SvLOCATION(cv) && SvAVOK(SvLOCATION(cv)))
-	    name = av_fetch(SvAV(SvLOCATION(cv)), 3, FALSE);
+	    name = av_fetch(SvAv(SvLOCATION(cv)), 3, FALSE);
 	mPUSHs( name ? newSVsv(*name) : &PL_sv_undef );
 
 	if (CxHASARGS(cx)) {
 	    AV * const padlist = CvPADLIST(cv);
 	    SV ** pad = av_fetch(padlist, cx->blk_sub.olddepth + 1, 0);
-	    SV ** args = av_fetch( SvAV(*pad), 0, 0);
+	    SV ** args = av_fetch( SvAv(*pad), PAD_ARGS_INDEX, 0);
 	    mPUSHs(newSVsv( *args ) );
 	}
 	else
@@ -1085,9 +1067,6 @@ PP(pp_enteriter)
     const I32 gimme = GIMME_V;
     SV **svp;
     U8 cxtype = CXt_LOOP_FOR;
-#ifdef USE_ITHREADS
-    PAD *iterdata;
-#endif
 
     ENTER;
     SAVETMPS;
@@ -1099,20 +1078,13 @@ PP(pp_enteriter)
 		    SVs_PADSTALE, SVs_PADSTALE);
 	}
 	SAVEPADSVANDMORTALIZE(PL_op->op_targ);
-#ifndef USE_ITHREADS
 	svp = &PAD_SVl(PL_op->op_targ);		/* "my" variable */
-#else
-	iterdata = NULL;
-#endif
     }
     else {
 	GV * const gv = (GV*)POPs;
 	svp = &GvSV(gv);			/* symbol table variable */
 	SAVEGENERICSV(*svp);
 	*svp = newSV(0);
-#ifdef USE_ITHREADS
-	iterdata = (PAD*)gv;
-#endif
     }
 
     if (PL_op->op_private & OPpITER_DEF)
@@ -1121,11 +1093,7 @@ PP(pp_enteriter)
     ENTER;
 
     PUSHBLOCK(cx, cxtype, SP);
-#ifdef USE_ITHREADS
-    PUSHLOOP_FOR(cx, iterdata, MARK, PL_op->op_targ);
-#else
     PUSHLOOP_FOR(cx, svp, MARK, 0);
-#endif
     if (PL_op->op_flags & OPf_SPECIAL) {
 	SV * const right = POPs;
 	dPOPss;
@@ -1576,7 +1544,7 @@ PP(pp_goto)
 	    }
 	    else if (CxMULTICALL(cx))
 		DIE(aTHX_ "Can't goto subroutine from a sort sub (or similar callback)");
-	    args = newSVsv(PAD_SVl(0));
+	    args = newSVsv(PAD_SVl(PAD_ARGS_INDEX));
 	    if (CvISXSUB(cv)) {	/* put GvAV(defgv) back onto stack */
 		items = AvFILLp(args) + 1;
 		EXTEND(SP, items+1); /* @_ could have been extended. */
@@ -1636,9 +1604,9 @@ PP(pp_goto)
 		{
 		    CX_CURPAD_SAVE(cx->blk_sub);
 
-		    SAVECLEARSV(PAD_SVl(0));
+		    SAVECLEARSV(PAD_SVl(PAD_ARGS_INDEX));
 
-		    PAD_SVl(0) = args;
+		    PAD_SVl(PAD_ARGS_INDEX) = args;
 		}
 		if (PERLDB_SUB) {	/* Checking curstash breaks DProf. */
 		    Perl_get_db_sub(aTHX_ NULL, cv);
@@ -1915,12 +1883,17 @@ S_doeval(pTHX_ int gimme, OP** startop, CV* outside, U32 seq)
     assert(CxTYPE(&cxstack[cxstack_ix]) == CXt_EVAL);
     cxstack[cxstack_ix].blk_eval.cv = PL_compcv;
 
-    CvOUTSIDE_SEQ(PL_compcv) = seq;
-    CvOUTSIDE(PL_compcv) = (CV*)SvREFCNT_inc_simple(outside);
-
     /* set up a scratch pad */
 
-    CvPADLIST(PL_compcv) = pad_new(padnew_SAVE);
+    if (outside) {
+	CvPADLIST(PL_compcv) = pad_new(padnew_SAVE, 
+	    PADLIST_PADNAMES(CvPADLIST(outside)),
+	    SvAv(AvARRAY(CvPADLIST(outside))[CvDEPTH(outside) ? CvDEPTH(outside) : 1]),
+	    seq);
+    }
+    else {
+	CvPADLIST(PL_compcv) = pad_new(padnew_SAVE,  NULL, NULL, seq);
+    }
     PL_op = NULL; /* avoid PL_op and PL_curpad referring to different CVs */
 
     /* make sure we compile in the right package */
@@ -1931,8 +1904,6 @@ S_doeval(pTHX_ int gimme, OP** startop, CV* outside, U32 seq)
     }
 
     /* XXX:ajgo do we really need to alloc an AV for begin/checkunit */
-    SAVESPTR(PL_beginav);
-    AVcpSTEAL(PL_beginav, newAV());
     SAVESPTR(PL_unitcheckav);
     AVcpSTEAL(PL_unitcheckav, newAV());
 

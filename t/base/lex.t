@@ -126,7 +126,7 @@ print $foo;
 # Tests for new extended control-character variables
 # MJD 19990227
 
-do { no strict 'refs';
+do {
   my $CX = "^X";
   my $CXY  ="^RE_TRIE_MAXBUF";
   ${*{Symbol::fetch_glob($CX)}} = 17;
@@ -256,7 +256,6 @@ do {
 # => should only quote foo::bar if it isn't a real sub. AMS, 20010621
 
 sub xyz::foo { "bar" }
-no strict 'subs';
 my %str = %(
     foo      => 1,
     xyz::foo => 1,

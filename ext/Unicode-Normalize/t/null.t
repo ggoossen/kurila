@@ -16,7 +16,6 @@ BEGIN {
 
 #########################
 
-use strict;
 use warnings;
 
 use Unicode::Normalize < qw(:all);

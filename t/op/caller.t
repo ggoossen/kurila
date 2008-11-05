@@ -6,8 +6,6 @@ BEGIN {
     plan( tests => 76 );
 }
 
-use strict;
-
 my @c;
 
 print "# Tests with caller(0)\n";

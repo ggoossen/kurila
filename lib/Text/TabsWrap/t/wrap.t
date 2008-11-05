@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use strict;
+
 
 my @tests =split(m/\nEND\n/s, <<DONE);
 TEST1

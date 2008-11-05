@@ -10,7 +10,7 @@
 package B::Deparse;
 use B < qw(class main_root main_start main_cv svref_2object opnumber perlstring
 	 OPf_WANT OPf_WANT_VOID OPf_WANT_SCALAR OPf_WANT_LIST
-	 OPf_KIDS OPf_REF OPf_STACKED OPf_SPECIAL OPf_MOD OPpPAD_STATE
+	 OPf_KIDS OPf_REF OPf_STACKED OPf_SPECIAL OPf_MOD
 	 OPpLVAL_INTRO OPpOUR_INTRO OPpENTERSUB_AMPER OPpSLICE OPpCONST_BARE
 	 OPpTARGET_MY
 	 OPpEXISTS_SUB OPpSORT_NUMERIC OPpSORT_INTEGER
@@ -20,7 +20,7 @@ use B < qw(class main_root main_start main_cv svref_2object opnumber perlstring
 	 PMf_KEEP PMf_GLOBAL PMf_CONTINUE
 	 PMf_MULTILINE PMf_SINGLELINE PMf_FOLD PMf_EXTENDED RXf_SKIPWHITE);
 our $VERSION = 0.86;
-use strict;
+
 use warnings ();
 
 # Changes between 0.50 and 0.51:
@@ -996,7 +996,7 @@ sub maybe_my {
     my $self = shift;
     my($op, $cx, $text) = < @_;
     if ($op->private ^&^ OPpLVAL_INTRO and not $self->{'avoid_local'}->{$$op}) {
-	my $my = $op->private ^&^ OPpPAD_STATE ? "state" : "my";
+	my $my = "my";
 	if (want_scalar($op)) {
 	    return "$my $text";
 	} else {
@@ -1212,17 +1212,20 @@ sub lex_in_scope {
 sub populate_curcvlex {
     my $self = shift;
     my $cv = $self->{'curcv'};
-    while (class($cv) eq "CV") {
-	my $padlist = $cv->PADLIST;
+    my $padlist = $cv->PADLIST;
+    my $parentpadlist;
+    while ($padlist) {
 	# an undef CV still in lexical chain
-	next if class($padlist) eq "SPECIAL";
+        last if class($padlist) eq "SPECIAL";
 	my @padlist = $padlist->ARRAY;
 	my @ns = @padlist[0]->ARRAY;
+        my $padflags = @ns[0];
+        $parentpadlist = @ns[1];
 
-	for my $i (0 .. nelems(@ns) -1) {
+	for my $i (4 .. nelems(@ns) -1) {
 	    next if class(@ns[$i]) eq "SPECIAL";
 	    next if @ns[$i]->FLAGS ^&^ SVpad_OUR;  # Skip "our" vars
-	    if (class(@ns[$i]) eq "PV") {
+	    if (class(@ns[$i]) eq "PV" or class(@ns[$i]) eq "IV") {
 		# Probably that pesky lexical @_
 		next;
 	    }
@@ -1235,7 +1238,7 @@ sub populate_curcvlex {
 	    push @{$self->{'curcvlex'}->{$name}}, \@($seq_st, $seq_en);
 	}
     } continue {
-        $cv = $cv->OUTSIDE;
+        $padlist = $parentpadlist;
     }
 }
 
@@ -1400,13 +1403,13 @@ sub declare_hinthash {
     for my $key (keys %$to) {
 	next if %ignored_hints{$key};
 	if (!defined $from->{$key} or $from->{$key} ne $to->{$key}) {
-	    push @decls, qq(\$^H\{'$key'\} = q($to->{$key}););
+	    push @decls, qq(\%^H\{'$key'\} = q($to->{$key}););
 	}
     }
     for my $key (keys %$from) {
 	next if %ignored_hints{$key};
 	if (!exists $to->{$key}) {
-	    push @decls, qq(delete \$^H\{'$key'\};);
+	    push @decls, qq(delete \%^H\{'$key'\};);
 	}
     }
     (nelems @decls) or return '';
@@ -1771,7 +1774,7 @@ sub pp_anonscalar {
 *pp_anonhash = \&pp_anonlist;
 
 sub pp_srefgen {
-    my $self = shift;	
+    my $self = shift;
     my($op, $cx) = < @_;
     my $kid = $op->first;
     if ($kid->name eq "null") {
@@ -2446,13 +2449,9 @@ sub pp_list {
 	    last;
 	}
 	if ($lop->name =~ m/^pad[ash]v$/) {
-	    if ($lop->private ^&^ OPpPAD_STATE) { # state()
-		($local = "", last) if $local =~ m/^(?:local|our|my)$/;
-		$local = "state";
-	    } else { # my()
-		($local = "", last) if $local =~ m/^(?:local|our|state)$/;
-		$local = "my";
-	    }
+            # my()
+            ($local = "", last) if $local =~ m/^(?:local|our|state)$/;
+            $local = "my";
 	} elsif ($lop->name =~ m/^(gv|rv2)[ash]v$/
 			&& $lop->private ^&^ OPpOUR_INTRO
 		or $lop->name eq "null" && $lop->first->name eq "gvsv"
@@ -3237,7 +3236,6 @@ sub pp_entersub {
     # they haven't happened yet!
     my $declared;
     do {
-	no strict 'refs';
 	no warnings 'uninitialized';
 	$declared = exists $self->{'subs_declared'}->{$kid}
 	    || (
@@ -4346,10 +4344,6 @@ directives, B<pragmas>. These are:
 
 =item *
 
-use strict;
-
-=item *
-
 use warnings;
 
 =item *
@@ -4490,7 +4484,7 @@ the main:: package, the code will include a package declaration.
 =item *
 
 The only pragmas to be completely supported are: C<use warnings>,
-C<use strict 'refs'>, C<use bytes>, and C<use integer>. (C<$[>, which
+C<use bytes>, and C<use integer>. (C<$[>, which
 behaves like a pragma, is also supported.)
 
 Excepting those listed above, we're currently unable to guarantee that

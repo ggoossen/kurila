@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w -I.
 
-use strict;
+
 our @tests =split(m/\nEND\n/s, <<DONE);
 TEST1
 Cyberdog Information
@@ -55,7 +55,6 @@ print "1..$numtests\n";
 
 use Text::Wrap;
 
-use strict;
 
 my $rerun = %ENV{'PERL_DL_NONLAZY'} ? 0 : 1;
 

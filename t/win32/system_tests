@@ -2,7 +2,7 @@
 
 use Config;
 use Cwd;
-use strict;
+
 
 $| = 1;
 

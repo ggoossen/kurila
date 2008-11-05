@@ -1,16 +1,8 @@
 #!./perl
 
-BEGIN {
-    require Config;
-    if ((%Config::Config{'extensions'} !~ m/\bB\b/) ){
-        print "1..0 # Skip -- Perl configured without B module\n";
-        exit 0;
-    }
-}
-
 $|  = 1;
 use warnings;
-use strict;
+
 use Config;
 use Test::More tests=>3;
 
@@ -37,20 +29,11 @@ $a =~ s/\s+/ /g;
 $a =~ s/\b(s|foo|bar|ullsv)\b\s?//g;
 $a =~ s/^\s+//;
 $a =~ s/\s+$//;
-my $is_thread = %Config{use5005threads} && %Config{use5005threads} eq 'define';
-if ($is_thread) {
-    $b=<<EOF;
-leave enter nextstate label leaveloop enterloop null and defined null
-threadsv readline rvgv gv lineseq nextstate sassign null pushmark split pushre
-threadsv const null pushmark rvav gv nextstate subst const unstack
-EOF
-} else {
-    $b=<<EOF;
+$b=<<EOF;
 leave enter nextstate label leaveloop enterloop null and defined null
 padsv readline rvgv gv lineseq leave enter nextstate sassign split pushre
 padsv const rvav gv nextstate subst const unstack
 EOF
-}
 $b=~s/\n/ /g;$b=~s/\s+/ /g;
 $b =~ s/\s+$//;
 is($a, $b);

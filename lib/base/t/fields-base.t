@@ -14,7 +14,6 @@ BEGIN {
     };
 }
 
-use strict;
 use Test::More tests => 26;
 
 BEGIN { use_ok('base'); }
@@ -128,7 +127,6 @@ my %EXPECT = %(
              );
 
 while(my($class, $efields) = each %EXPECT) {
-    no strict 'refs';
     my %fields = %( < %{*{Symbol::fetch_glob($class.'::FIELDS')}} );
     my %expected_fields;
     foreach my $idx (1..nelems @$efields) {

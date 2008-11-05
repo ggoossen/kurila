@@ -7,7 +7,6 @@ BEGIN {
 }
 
 use warnings;
-use strict;
 plan tests => 16;
 our $TODO;
 

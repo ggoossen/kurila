@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-use strict;
+
 
 require 'regen_lib.pl';
 
@@ -247,7 +247,6 @@ sprintf
 sqrt
 srand
 stat
-state
 study
 sub
 substr

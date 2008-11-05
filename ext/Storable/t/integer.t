@@ -16,7 +16,7 @@ use Config;
 
 use Test::More;
 use Storable < qw (dclone store retrieve freeze thaw nstore nfreeze);
-use strict;
+
 
 my $max_uv = ^~^0;
 my $max_uv_m1 = ^~^0 ^^^ 1;

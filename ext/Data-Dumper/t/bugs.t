@@ -2,7 +2,7 @@
 #
 # regression tests for old bugs that don't fit other categories
 
-use strict;
+
 use Test::More tests => 3;
 use Data::Dumper;
 

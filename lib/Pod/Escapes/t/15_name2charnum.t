@@ -7,7 +7,6 @@ BEGIN {
 
 # Time-stamp: "2004-04-27 19:53:22 ADT"
 
-use strict;
 use Test;
 
 my @them;

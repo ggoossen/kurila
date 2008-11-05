@@ -1,6 +1,6 @@
 #!perl -T
 
-use strict;
+
 use Config;
 use File::Spec;
 use Test::More;
@@ -14,16 +14,6 @@ use warnings < qw(closure deprecated exiting glob io misc numeric once overflow
 
 my $is_Win32  = $^O =~ m/win32/i;
 my $is_Cygwin = $^O =~ m/cygwin/i;
-
-# if testing in core, check that the module is at least available
-if (%ENV{PERL_CORE}) {
-    plan skip_all => "Sys::Syslog was not build" 
-        unless %Config{'extensions'} =~ m/\bSyslog\b/;
-}
-
-# we also need Socket
-plan skip_all => "Socket was not build" 
-    unless %Config{'extensions'} =~ m/\bSocket\b/;
 
 my $tests;
 plan tests => $tests;

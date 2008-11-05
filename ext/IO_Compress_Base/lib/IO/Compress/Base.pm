@@ -1,8 +1,7 @@
 
 package IO::Compress::Base ;
 
-
-use strict ;
+ 
 use warnings;
 
 use IO::Compress::Base::Common v2.006 ;

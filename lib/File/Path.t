@@ -1,6 +1,5 @@
 # Path.t -- tests for module File::Path
 
-use strict;
 
 use Test::More tests => 94;
 

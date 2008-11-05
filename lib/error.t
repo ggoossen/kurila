@@ -106,7 +106,7 @@ do {
 do {
     fresh_perl_is('BEGIN { die "foobar" }', <<MSG );
 foobar at - line 1 character 9.
-BEGIN failed--compilation aborted
+    BEGIN called at - line 1 character 1.
 MSG
 };
 
@@ -124,9 +124,9 @@ MSG
 
 # Compilation error with '#line X'
 do {
-    fresh_perl_is("use strict;\n\$x = 1;\n\$y = 1;\n", <<'MSG' );
-Global symbol "$x" requires explicit package name at - line 2, near "$x "
-Global symbol "$y" requires explicit package name at - line 3, near "$y "
+    fresh_perl_is("\$x = 1;\n\$y = 1;\n", <<'MSG' );
+Global symbol "$x" requires explicit package name at - line 1, near "$x "
+Global symbol "$y" requires explicit package name at - line 2, near "$y "
 Execution of - aborted due to compilation errors.
 MSG
 };

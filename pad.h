@@ -95,13 +95,13 @@ typedef U64TYPE PADOFFSET;
 #define padnew_CLONE	1	/* this pad is for a cloned CV */
 #define padnew_SAVE	2	/* save old globals */
 #define padnew_SAVESUB	4	/* also save extra stuff for start of sub */
+#define padnew_LATE     8       /* set the PADf_LATE flag */
 
 /* values for the pad_tidy() function */
 
 typedef enum {
 	padtidy_SUB,		/* tidy up a pad for a sub, */
 	padtidy_SUBCLONE,	/* a cloned sub, */
-	padtidy_FORMAT		/* or a format */
 } padtidy_type;
 
 /* ASSERT_CURPAD_LEGAL and ASSERT_CURPAD_ACTIVE respectively determine
@@ -203,7 +203,15 @@ Restore the old pad saved into the local variable opad by PAD_SAVE_LOCAL()
 #define PAD_BASE_SV(padlist, po) \
 	(AvARRAY(padlist)[1]) 	\
 	    ? AvARRAY((AV*)(AvARRAY(padlist)[1]))[po] : NULL;
+
+#define PADLIST_NAMESV(padlist, po) \
+    ( (AvARRAY(padlist)[0])					\
+	? AvARRAY((AV*)(AvARRAY(padlist)[0]))[po] : NULL )
     
+#define PADLIST_PADNAMES(padlist) \
+    ( (PAD*)(AvARRAY(padlist)[0]) )
+#define PADLIST_BASEPAD(padlist) \
+    ( (PAD*)(AvARRAY(padlist)[1]) )
 
 #define PAD_SET_CUR_NOSAVE(padlist,nth) \
 	PL_comppad = (PAD*) (AvARRAY(padlist)[nth]);		\
@@ -338,6 +346,16 @@ Clone the state variables associated with running and compiling pads.
     PL_padix_floor		= proto_perl->Ipadix_floor;		\
     PL_pad_reset_pending	= proto_perl->Ipad_reset_pending;	\
     PL_cop_seqmax		= proto_perl->Icop_seqmax;
+
+#define PAD_FLAGS_INDEX 0
+#define PAD_PARENTPADNAMES_INDEX 1
+#define PAD_PARENTPAD_INDEX 2
+#define PAD_PARENTSEQ_INDEX 3
+#define PAD_ARGS_INDEX  4
+#define PAD_NAME_START_INDEX PAD_ARGS_INDEX
+
+#define PADf_LATE  0x1
+#define PADf_CLONE 0x2
 
 /*
  * Local variables:

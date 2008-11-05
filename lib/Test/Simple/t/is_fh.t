@@ -10,7 +10,6 @@ BEGIN {
     }
 }
 
-use strict;
 use Test::More tests => 7;
 
 ok( !Test::Builder->is_fh("foo"), 'string is not a filehandle' );

@@ -6,15 +6,14 @@ use Config;
 
 my $can_fork   = 0;
 my $minitest   = %ENV{PERL_CORE_MINITEST};
-my $has_perlio = %Config{useperlio};
+my $has_perlio = config_value("useperlio");
 
 if (!$minitest) {
-    if (%Config{d_fork} && try { require POSIX; 1 } ) {
+    if (config_value("d_fork") && try { require POSIX; 1 } ) {
 	$can_fork = 1;
     }
 }
 
-use strict;
 use File::Spec;
 
 require "./test.pl";

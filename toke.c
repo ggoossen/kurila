@@ -52,7 +52,6 @@
 #define PL_sublex_info		(PL_parser->sublex_info)
 #define PL_linestr		(PL_parser->linestr)
 #define PL_expect		(PL_parser->expect)
-#define PL_copline		(PL_parser->copline)
 #define PL_bufptr		(PL_parser->bufptr)
 #define PL_oldbufptr		(PL_parser->oldbufptr)
 #define PL_oldoldbufptr		(PL_parser->oldoldbufptr)
@@ -670,7 +669,6 @@ Perl_lex_start(pTHX_ SV *line, PerlIO *rsfp, bool new_filter)
     parser->nexttoke = 0;
 #endif
     parser->error_count = oparser ? oparser->error_count : 0;
-    parser->copline = NOLINE;
     parser->lex_state = LEX_NORMAL;
     parser->expect = XSTATE;
     parser->rsfp = rsfp;
@@ -3614,11 +3612,6 @@ Perl_yylex(pTHX)
 		    if (len == 6 && strnEQ(SvPVX_mutable(sv), "unique", len)) {
 			sv_free(sv);
 			if (PL_in_my == KEY_our) {
-#ifdef USE_ITHREADS
-			    GvUNIQUE_on(cGVOPx_gv(pl_yylval.opval));
-#else
-			    /* skip to avoid loading attributes.pm */
-#endif
 			    deprecate(":unique");
 			}
 			else
@@ -3804,8 +3797,6 @@ Perl_yylex(pTHX)
 	    break;
 	}
 	pl_yylval.i_tkval.ival = PL_parser->lex_line_number;
-	if (isSPACE(*s) || *s == '#')
-	    PL_copline = NOLINE;   /* invalidate current command line number */
 	TOKEN('{');
     case '}':
 	s++;
@@ -5183,7 +5174,6 @@ Perl_yylex(pTHX)
 
 	case KEY_our:
 	case KEY_my:
-	case KEY_state:
 	    PL_in_my = (U16)tmp;
 	    s = SKIPSPACE1(s);
 	    if (isIDFIRST_lazy_if(s,UTF)) {
@@ -7214,15 +7204,6 @@ Perl_keyword (pTHX_ const char *name, I32 len, bool all_keywords)
             case 't':
               switch (name[2])
               {
-                case 'a':
-                  if (name[3] == 't' &&
-                      name[4] == 'e')
-                  {                               /* state      */
-                    return (all_keywords || FEATURE_IS_ENABLED("state") ? KEY_state : 0);
-                  }
-
-                  goto unknown;
-
                 case 'u':
                   if (name[3] == 'd' &&
                       name[4] == 'y')
@@ -10549,9 +10530,16 @@ Perl_start_subparse(pTHX_ U32 flags)
 {
     dVAR;
     const I32 oldsavestack_ix = PL_savestack_ix;
-    CV* const outsidecv = PL_compcv;
+    CV* outsidecv = PL_compcv;
+
 
     if (PL_compcv) {
+	if ( ! ( flags & CVf_ANON ) ) {
+	    if ( CvFLAGS(PL_compcv) & CVf_ANON ) {
+		/* Hide outsidecv if it isn't compiled yet */
+		outsidecv = NULL;
+	    }
+	}
 	assert(SvTYPE(PL_compcv) == SVt_PVCV);
     }
     SAVEI32(PL_subline);
@@ -10562,9 +10550,11 @@ Perl_start_subparse(pTHX_ U32 flags)
     CvFLAGS(PL_compcv) |= flags;
 
     PL_subline = PL_parser->lex_line_number;
-    CvPADLIST(PL_compcv) = pad_new(padnew_SAVE|padnew_SAVESUB);
-    CvOUTSIDE(PL_compcv) = (CV*)SvREFCNT_inc_simple(outsidecv);
-    CvOUTSIDE_SEQ(PL_compcv) = PL_cop_seqmax;
+    CvPADLIST(PL_compcv) = pad_new(padnew_SAVE|padnew_SAVESUB
+	|(flags & CVf_ANON ? padnew_LATE : 0),
+	outsidecv ? PADLIST_PADNAMES(CvPADLIST(outsidecv)) : NULL, 
+	outsidecv ? PADLIST_BASEPAD(CvPADLIST(outsidecv)) : NULL, 
+	PL_cop_seqmax);
 
     return oldsavestack_ix;
 }

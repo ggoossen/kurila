@@ -10,7 +10,6 @@ BEGIN {
     }
 }
 
-use strict;
 use Test::More tests => 4;
 
 use_ok('ExtUtils::MakeMaker::bytes');

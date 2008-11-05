@@ -5,14 +5,12 @@ use Config;
 use File::Basename;
 use File::Spec;
 use Symbol;
-use strict;
+
 
 require Exporter;
 
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(process_file);
-
-# use strict;  # One of these days...
 
 my(@XSStack);	# Stack of conditionals and INCLUDEs
 my($XSS_work_idx, $cpp_next_tmp);
@@ -529,7 +527,6 @@ sub process_para {
 
     $_ = shift(@line);
     while (my $kwd = check_keyword("REQUIRE|PROTOTYPES|FALLBACK|VERSIONCHECK|INCLUDE")) {
-      no strict 'refs';
       &{*{Symbol::fetch_glob("$($kwd)_handler")}}() ;
       next PARAGRAPH unless (nelems @line) ;
       $_ = shift(@line);
@@ -1030,7 +1027,14 @@ EOF
     }
     else {
       push(@InitFileCode,
-	   "        $($newXS)(\"$pname\", XS_$Full_func_name, file$proto);\n");
+	   "        CV* CV_$Full_func_name = $($newXS)(\"$pname\", XS_$Full_func_name, file$proto);\n");
+      if ($pname =~ m/::(BEGIN|INIT|UNITCHECK|CHECK|END)$/) {
+          my $keyword = $1;
+          push @InitFileCode,
+            "        SvREFCNT_inc(CV_$Full_func_name);\n";
+          push @InitFileCode,
+            "        process_special_block(Perl_keyword(aTHX_ STR_WITH_LEN(\"$keyword\"), FALSE), CV_$Full_func_name);\n";
+      }
     }
 }
 
@@ -1833,7 +1837,7 @@ sub generate_output {
 	unless defined %output_expr{%type_kind{$subtype}} ;
       $subexpr = %output_expr{%type_kind{$subtype}};
       $subexpr =~ s/ntype/subtype/g;
-      $subexpr =~ s/\$arg/ST(ix_$var)/g;
+      $subexpr =~ s/\$arg/tmp_$var/g;
       $subexpr =~ s/\$var/$($var)\[ix_$var]/g;
       $subexpr =~ s/\n\t/\n\t\t/g;
       $expr =~ s/DO_ARRAY_ELEM\n/$subexpr/;
@@ -1900,7 +1904,6 @@ sub map_type {
 package
   ExtUtils::ParseXS::CountLines;
 
-use strict;
 our ($SECTION_END_MARKER);
 
 sub PUSHED {

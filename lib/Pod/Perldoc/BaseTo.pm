@@ -1,6 +1,6 @@
 
 package Pod::Perldoc::BaseTo;
-use strict;
+
 use warnings;
 
 sub is_pageable        { '' }

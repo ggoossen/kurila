@@ -236,8 +236,6 @@ do that.  Use at your own risk.  Have fun blowing holes in your foot.
 
     #!/usr/bin/perl -w
     
-    use strict;
-    
     use File::Spec;
     use File::Find;
     use ExtUtils::Manifest qw(maniread);

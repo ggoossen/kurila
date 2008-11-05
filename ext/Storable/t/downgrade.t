@@ -18,7 +18,6 @@ use Storable 'thaw';
 
 require utf8;
 
-use strict;
 use vars < qw(@RESTRICT_TESTS %R_HASH %U_HASH $UTF8_CROAK $RESTRICTED_CROAK);
 
 @RESTRICT_TESTS = @('Locked hash', 'Locked hash placeholder',

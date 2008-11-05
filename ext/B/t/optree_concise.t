@@ -8,10 +8,6 @@ BEGIN {
 	push @INC, "../../t";
     }
     require Config;
-    if ((%Config::Config{'extensions'} !~ m/\bB\b/) ){
-        print "1..0 # Skip -- Perl configured without B module\n";
-        exit 0;
-    }
     # require 'test.pl'; # now done by OptreeCheck
 }
 
@@ -22,7 +18,7 @@ use Config;
 my $tests = 10;
 plan tests => $tests;
 SKIP: do {
-skip "no perlio in this build", $tests unless %Config::Config{useperlio};
+skip "no perlio in this build", $tests unless Config::config_value("useperlio");
 
 $^WARN_HOOK = sub {
     my $err = shift;

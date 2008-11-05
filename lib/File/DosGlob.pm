@@ -10,7 +10,7 @@
 package File::DosGlob;
 
 our $VERSION = '1.01';
-use strict;
+
 use warnings;
 
 sub doglob {
@@ -390,8 +390,6 @@ sub glob {
 }
 
 do {
-    no strict 'refs';
-
     sub import {
     my $pkg = shift;
     return unless (nelems @_);

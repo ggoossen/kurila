@@ -1,15 +1,8 @@
 use TestInit;
 use Config;
-BEGIN {
-    if (%Config{'extensions'} !~ m/\bXS\/Typemap\b/) {
-        print "1..0 # Skip: XS::Typemap was not built\n";
-        exit 0;
-    }
-}
 
 use Test::More tests => 84;
 
-use strict;
 use warnings;
 use utf8;
 use XS::Typemap;
@@ -20,13 +13,13 @@ ok(1);
 # Some inheritance trees to check ISA relationships
 BEGIN {
   package intObjPtr::SubClass;
-  use base qw/ intObjPtr /;
+  use base < qw/ intObjPtr /;
   sub xxx { 1; }
 }
 
 BEGIN {
   package intRefIvPtr::SubClass;
-  use base qw/ intRefIvPtr /;
+  use base < qw/ intRefIvPtr /;
   sub xxx { 1 }
 }
 
@@ -127,7 +120,7 @@ ok( ! T_BOOL(undef) );
 print "# T_U_SHORT\n";
 
 is( T_U_SHORT(32000), 32000);
-if (%Config{shortsize} == 2) {
+if (config_value('shortsize') == 2) {
   ok( T_U_SHORT(65536) != 65536); # probably dont want to test edge cases
 } else {
   ok(1); # e.g. Crays have shortsize 4 (T3X) or 8 (CXX and SVX)
@@ -146,7 +139,7 @@ print "# T_CHAR\n";
 
 is( T_CHAR("a"), "a");
 is( T_CHAR("-"), "-");
-is( T_CHAR( <bytes::chr(128)),bytes::chr(128));
+is( T_CHAR(bytes::chr(128)),bytes::chr(128));
 ok( T_CHAR(chr(256)) ne chr(256));
 
 # T_U_CHAR
@@ -162,7 +155,7 @@ ok( T_U_CHAR(300) != 300);
 print "# T_FLOAT\n";
 
 # limited precision
-is( sprintf("%6.3f", <T_FLOAT(52.345)), sprintf("%6.3f",52.345));
+is( sprintf("\%6.3f", T_FLOAT(52.345)), sprintf("\%6.3f",52.345));
 
 # T_NV
 print "# T_NV\n";
@@ -172,7 +165,7 @@ is( T_NV(52.345), 52.345);
 # T_DOUBLE
 print "# T_DOUBLE\n";
 
-is( sprintf("%6.3f", <T_DOUBLE(52.345)), sprintf("%6.3f",52.345));
+is( sprintf("\%6.3f", T_DOUBLE(52.345)), sprintf("\%6.3f",52.345));
 
 # T_PV
 print "# T_PV\n";
@@ -249,7 +242,7 @@ print "# T_OPAQUEPTR with a struct\n";
 
 my @test = @(5,6,7);
 $p = T_OPAQUEPTR_IN_struct(< @test);
-my @result = @( < T_OPAQUEPTR_OUT_struct($p) );
+my @result = T_OPAQUEPTR_OUT_struct($p);
 is(scalar(nelems @result),scalar(nelems @test));
 for (0..((nelems @test)-1)) {
   is(@result[$_], @test[$_]);
@@ -285,6 +278,7 @@ for (0..((nelems @opq)-1)) {
 # T_ARRAY
 print "# T_ARRAY\n";
 my @inarr = @(1,2,3,4,5,6,7,8,9,10);
+T_ARRAY( 5, < @inarr );
 my @outarr = @( < T_ARRAY( 5, < @inarr ) );
 is(scalar(nelems @outarr), scalar(nelems @inarr));
 
@@ -314,7 +308,7 @@ if (defined $fh) {
   ok(print $fh "@lines[1]");
 
   # close it using XS if using perlio, using Perl otherwise
-  ok( %Config{useperlio} ? T_STDIO_close( $fh ) : close( $fh ) );
+  ok( config_value('useperlio') ? T_STDIO_close( $fh ) : close( $fh ) );
 
   # open from perl, and check contents
   open($fh, "<", "$testfile");

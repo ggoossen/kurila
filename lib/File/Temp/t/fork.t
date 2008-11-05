@@ -3,7 +3,6 @@ $| = 1;
 
 # Note that because fork loses test count we do not use Test::More
 
-use strict;
 
 BEGIN {
     require Config;

@@ -1,7 +1,6 @@
 package re;
 
 # pragma for controlling the regex engine
-use strict;
 use warnings;
 
 our $VERSION     = "0.09";

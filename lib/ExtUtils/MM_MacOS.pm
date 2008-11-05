@@ -1,6 +1,5 @@
 package ExtUtils::MM_MacOS;
 
-use strict;
 
 our $VERSION = 6.44;
 

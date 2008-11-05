@@ -4,7 +4,6 @@ our $VERSION = '2.02';
 use Pod::Simple ();
 BEGIN {our @ISA = @('Pod::Simple')}
 
-use strict;
 use utf8;
 
 use Carp ();

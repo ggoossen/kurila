@@ -1,12 +1,6 @@
 #!./perl -w
 $|=1;
 use Config;
-BEGIN {
-    if (%Config{'extensions'} !~ m/\bOpcode\b/ && %Config{'osname'} ne 'VMS') {
-        print "1..0\n";
-        exit 0;
-    }
-}
 
 print "1..0\n# TODO for changes pckage system";
 exit;
@@ -66,7 +60,7 @@ our @glob = qw(not ok 16);
 sub sayok { print "ok $(join ' ',@_)\n" }
 
 $cpt->share( <qw($foo %bar @baz sayok));
-$cpt->share('$"') unless %Config{use5005threads};
+$cpt->share('$"');
 
 $cpt->reval(q{
     package other;
@@ -95,7 +89,6 @@ push(@Root::bar, "18"); # Two steps to prevent "Identifier used only once..."
 print "$Root::foo\n";
 print join(' ',@{$cpt->varglob('bar')}) . "\n";
 
-use strict;
 
 print 1 ? "ok 19\n" : "not ok 19\n";
 print 1 ? "ok 20\n" : "not ok 20\n";

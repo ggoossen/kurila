@@ -96,7 +96,7 @@ if ($^O eq 'VMS') { # privlib is perl_root:[lib] OK but not under mms
 else {
     $compare = %ENV{PERL_CORE} ?
       'File::Spec'->catfile( 'File::Spec'->updir, 'lib','File','Find.pm')
-      : 'File::Spec'->catfile(%Config::Config{privlib},"File","Find.pm");
+      : 'File::Spec'->catfile(Config::config_value("privlib"),"File","Find.pm");
     ok(_canon($result),_canon($compare));
 }
 

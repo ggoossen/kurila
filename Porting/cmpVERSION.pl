@@ -7,7 +7,7 @@
 # Original by slaven@rezic.de, modified by jhi.
 #
 
-use strict;
+
 
 use ExtUtils::MakeMaker;
 use File::Compare;

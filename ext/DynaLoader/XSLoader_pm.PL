@@ -1,4 +1,4 @@
-use strict;
+
 use Config;
 
 sub to_string {
@@ -11,20 +11,18 @@ sub to_string {
 1 while unlink "XSLoader.pm";
 open OUT, ">", "XSLoader.pm" or die $!;
 print OUT <<'EOT';
-# Generated from XSLoader.pm.PL (resolved %Config::Config value)
+# Generated from XSLoader.pm.PL (resolved config_value() value)
 
 package XSLoader;
 
 our $VERSION = "0.08";
-
-#use strict;
 
 # enable debug/trace messages from DynaLoader perl code
 # $dl_debug = %ENV{PERL_DL_DEBUG} || 0 unless defined $dl_debug;
 
 EOT
 
-print OUT '  my $dl_dlext = ', to_string(%Config::Config{'dlext'}), ";\n" ;
+print OUT '  my $dl_dlext = ', to_string(Config::config_value('dlext')), ";\n" ;
 
 print OUT <<'EOT';
 

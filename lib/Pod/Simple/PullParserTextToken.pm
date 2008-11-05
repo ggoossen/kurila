@@ -2,7 +2,7 @@
 package Pod::Simple::PullParserTextToken;
 use Pod::Simple::PullParserToken ();
 our @ISA = @('Pod::Simple::PullParserToken');
-use strict;
+
 
 sub new {  # Class->new(text);
   my $class = shift;

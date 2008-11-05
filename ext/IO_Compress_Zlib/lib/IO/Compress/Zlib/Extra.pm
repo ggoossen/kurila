@@ -1,7 +1,6 @@
 package IO::Compress::Zlib::Extra;
 
-
-use strict ;
+ 
 use warnings;
 use bytes;
 

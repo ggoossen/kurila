@@ -19,7 +19,7 @@ BEGIN {
 use Unicode::Normalize < qw(:all);
 
 use Test;
-use strict;
+
 use warnings;
 
 use utf8;

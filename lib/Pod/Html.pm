@@ -1,5 +1,5 @@
 package Pod::Html;
-use strict;
+
 require Exporter;
 
 use vars < qw($VERSION @ISA @EXPORT @EXPORT_OK);
@@ -481,7 +481,7 @@ END_OF_BLOCK
 <head>
 <title>$Title</title>$csslink
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<link rev="made" href="mailto:%Config{perladmin}" />
+<link rev="made" href="mailto:$(config_value('perladmin'))" />
 </head>
 
 <body$bodystyle>
@@ -677,7 +677,7 @@ sub parse_command_line {
 	$opt_netscape,$opt_outfile,$opt_podpath,$opt_podroot,$opt_quiet,
 	$opt_recurse,$opt_title,$opt_verbose,$opt_hiddendirs);
 
-    unshift @ARGV, < split ' ', %Config{pod2html} if %Config{pod2html};
+    unshift @ARGV, < split ' ', config_value('pod2html') if config_value('pod2html');
     my $result = GetOptions(
 			    'backlink=s' => \$opt_backlink,
 			    'cachedir=s' => \$opt_cachedir,

@@ -2,7 +2,6 @@
 package Test;
 # Time-stamp: "2004-04-28 21:46:51 ADT"
 
-use strict;
 
 use vars ( <qw($VERSION @ISA @EXPORT @EXPORT_OK $ntest $TestLevel), < #public-ish
           qw($TESTOUT $TESTERR %Program_Lines $told_about_diff

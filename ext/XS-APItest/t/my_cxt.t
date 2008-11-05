@@ -6,20 +6,8 @@
 my $threads;
 use TestInit;
 use Config;
-BEGIN {
-    if (%Config{'extensions'} !~ m/\bXS\/APItest\b/) {
-	# Look, I'm using this fully-qualified variable more than once!
-	my $arch = $MacPerl::Architecture;
-        print "1..0 # Skip: XS::APItest was not built\n";
-        exit 0;
-    }
-    $threads = %Config{'useithreads'};
-    # must 'use threads' before 'use Test::More'
-    eval 'use threads' if $threads;
-}
 
 use warnings;
-use strict;
 
 use Test::More tests => 16;
 
@@ -29,14 +17,14 @@ BEGIN {
 
 is(my_cxt_getint(), 99, "initial int value");
 is(my_cxt_getsv($_),  "initial", "initial SV value$_")
-    foreach '', ' (context arg)';
+    foreach @: '', ' (context arg)';
 
 my_cxt_setint(1234);
 is(my_cxt_getint(), 1234, "new int value");
 
 my_cxt_setsv("abcd");
 is(my_cxt_getsv($_),  "abcd", "new SV value$_")
-    foreach '', ' (context arg)';
+    foreach @: '', ' (context arg)';
 
 sub do_thread {
     is(my_cxt_getint(), 1234, "initial int value (child)");
@@ -50,11 +38,11 @@ sub do_thread {
 	    foreach '', ' (context arg)';
 }
 
-SKIP: {
+SKIP: do {
     skip "No threads", 6 unless $threads;
     threads->create(\&do_thread)->join;
-}
+};
 
 is(my_cxt_getint(), 1234,  "int value preserved after join");
 is(my_cxt_getsv($_),  "abcd", "SV value preserved after join$_")
-        foreach '', ' (context arg)';
+        foreach @: '', ' (context arg)';

@@ -421,7 +421,6 @@ with re-writing this manpage.
 
 #############################################################################
 
-use strict;
 #use diagnostics;
 use Config;
 use Exporter;
@@ -538,7 +537,7 @@ sub pod2usage {
              and  %opts{"-output"} \== \*STDOUT )
     {
        ## spit out the entire PODs. Might as well invoke perldoc
-       my $progpath = File::Spec->catfile(%Config{scriptdir}, "perldoc");
+       my $progpath = File::Spec->catfile(config_value('scriptdir'), "perldoc");
        system($progpath, %opts{"-input"});
        if($?) {
          # RT16091: fall back to more if perldoc failed

@@ -56,7 +56,7 @@ foreach ('09'..'08') {
 is(join(",", @y), join(",", @x));
 
 # check bounds
-if (%Config{ivsize} == 8) {
+if (config_value('ivsize') == 8) {
   @a = eval "0x7ffffffffffffffe..0x7fffffffffffffff";
   $a = "9223372036854775806 9223372036854775807";
   @b = eval "-0x7fffffffffffffff..-0x7ffffffffffffffe";
@@ -265,7 +265,7 @@ foreach my $ii (@(^~^0, ^~^0+1, ^~^0+(^~^0>>4))) {
 # Test lower range limit
 my $MIN_INT = -1-$MAX_INT;
 
-if (! %Config{d_nv_preserves_uv}) {
+if (! config_value('d_nv_preserves_uv')) {
     # $MIN_INT needs adjustment when IV won't fit into an NV
     my $NV = $MIN_INT - 1;
     my $OFFSET = 1;

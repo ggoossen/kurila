@@ -4,7 +4,6 @@
 # Summary of, well, things.
 
 
-use strict;
 use Test;
 my @modules;
 BEGIN {

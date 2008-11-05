@@ -1,6 +1,5 @@
 package Params::Check;
 
-use strict;
 
 use Locale::Maketext::Simple    Style => 'gettext';
 

@@ -320,11 +320,7 @@
 #    define croak2	croak
 #    define warn2	warn
 #  endif
-#  if defined(USE_5005THREADS) || defined(USE_ITHREADS)
-#     define PERL_MAYBE_ALIVE	PL_thr_key
-#  else
-#     define PERL_MAYBE_ALIVE	1
-#  endif
+#   define PERL_MAYBE_ALIVE	1
 #else
 #  ifdef PERL_FOR_X2P
 #    include "../EXTERN.h"

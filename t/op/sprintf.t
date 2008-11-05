@@ -9,7 +9,7 @@
 use warnings;
 use version;
 use Config;
-use strict;
+
 
 my @tests = @( () );
 my ($i, $template, $data, $result, $comment, $w, $x, $evalData, $n, $p);
@@ -87,7 +87,7 @@ for my  $i (1 .. nelems(@tests)) {
     my $skip = 0;
     if ($comment =~ s/\s+skip:\s*(.*)//) {
 	my $os  = $1;
-	my $osv = exists %Config{osvers} ? %Config{osvers} : "0";
+	my $osv = config_value('osvers');
 	# >comment skip: all<
 	if ($os =~ m/\ball\b/i) {
 	    $skip = 1;

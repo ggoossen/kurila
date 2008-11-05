@@ -7,7 +7,6 @@ BEGIN {
 
 # Time-stamp: "2004-05-07 15:43:11 ADT"
 
-use strict;
 use Test;
 use utf8;
 

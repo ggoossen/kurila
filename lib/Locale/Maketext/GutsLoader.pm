@@ -1,6 +1,6 @@
 
 package Locale::Maketext::GutsLoader;
-use strict;
+
 sub zorp { return scalar nelems @_ }
 
 BEGIN {
