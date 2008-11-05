@@ -119,17 +119,17 @@ oo
 BEGIN { die "phooey" }
 EXPECT
 phooey at - line 1 character 9.
-BEGIN failed--compilation aborted
+    BEGIN called at - line 1 character 1.
 ########
 BEGIN { 1/0 }
 EXPECT
 Illegal division by zero at - line 1 character 10.
-BEGIN failed--compilation aborted
+    BEGIN called at - line 1 character 1.
 ########
 BEGIN { undef = 0 }
 EXPECT
 Modification of a read-only value attempted at - line 1 character 14.
-BEGIN failed--compilation aborted
+    BEGIN called at - line 1 character 1.
 ########
 my @a; @a[2] = 1; for (@a) { $_ = 2 } print join(' ', @a) . "\n"
 EXPECT

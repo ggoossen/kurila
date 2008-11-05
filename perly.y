@@ -484,10 +484,12 @@ subrout	:	SUB startsub subname proto subbody
                             TOKEN_GETMAD($1,$$,'d');
                             APPEND_MADPROPS_PV("sub", $$, '<');
                             CV* new = newSUB($2, NULL, $3);
+                            SVcpREPLACE(SvLOCATION(CvSv(new)), LOCATION($1));
                             process_special_block(IVAL($1), new);
                             /* SvREFCNT_dec(new);  leak reference */
 #else
                             CV* new = newSUB($2, NULL, $3);
+                            SVcpREPLACE(SvLOCATION(CvSv(new)), LOCATION($1));
                             process_special_block(IVAL($1), new);
                             $$ = (OP*)NULL;
 #endif

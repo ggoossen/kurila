@@ -767,13 +767,14 @@ STATIC AV* S_error_backtrace(pTHX)
 /* 	    continue; */
 /* 	} */
 
-	/* stop on BEGIN/CHECK/.../END blocks */
+	/* make stack entry */
+	av_push(trace, SvREFCNT_inc((SV*)S_context_info(aTHX_ &ccstack[cxix]) ));
+
+	/* stop after BEGIN/CHECK/.../END blocks */
 	if ((CxTYPE(&ccstack[cxix]) == CXt_SUB) &&
 	    (CvSPECIAL(ccstack[cxix].blk_sub.cv)))
 	    break;
 
-	/* make stack entry */
-	av_push(trace, SvREFCNT_inc((SV*)S_context_info(aTHX_ &ccstack[cxix]) ));
 
 	cxix = dopoptosub_at(ccstack, cxix - 1);
     }
