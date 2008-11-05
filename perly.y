@@ -665,12 +665,13 @@ listop	:	LSTOP indirob argexpr /* map {...} @args or print $fh @args */
 			}
 	|	LSTOPSUB startanonsub block /* sub f(&@);   f { foo } ... */
 			{
-			  $<opval>$ = newANONSUB($2, 0, $3); }
+                            $<opval>$ = newANONSUB($2, 0, scalar($3)); }
 		    listexpr		%prec LSTOP  /* ... @bar */
-			{ $$ = newUNOP(OP_ENTERSUB, OPf_STACKED,
-				 append_elem(OP_LIST,
-                                     prepend_elem(OP_LIST, $<opval>4, $5), $1), $1->op_location);
-                          APPEND_MADPROPS_PV("listop", $$, '>');
+			{ 
+                            $$ = newUNOP(OP_ENTERSUB, OPf_STACKED,
+                                append_elem(OP_LIST,
+                                    prepend_elem(OP_LIST, $<opval>4, $5), $1), $1->op_location);
+                            APPEND_MADPROPS_PV("listop", $$, '>');
 			}
 	;
 
@@ -942,9 +943,9 @@ termunop : '-' term %prec UMINUS                       /* -$x */
 anonymous:
 	ANONSUB startanonsub proto block	%prec '('
 			{
-			  $$ = newANONSUB($2, $3, $4);
-			  TOKEN_GETMAD($1,$$,'o');
-			  OP_GETMAD($3,$$,'s');
+                            $$ = newANONSUB($2, $3, scalar($4));
+                            TOKEN_GETMAD($1,$$,'o');
+                            OP_GETMAD($3,$$,'s');
 			}
 
     ;
