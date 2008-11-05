@@ -4672,26 +4672,8 @@ Perl_call_list(pTHX_ I32 oldscope, AV *paramList)
 		    LEAVE;
 		JMPENV_POP;
 
-		/* report compilation errors */
-		if (SvROK(atsv) && SvTYPE(SvRV(atsv)) == SVt_PVHV) {
-		    SV** desc = hv_fetchs( (HV*)SvRV(atsv), "notes", TRUE );
-		    if (desc) {
-			if ( ! SvPOK(*desc) )
-			    sv_setpvn(*desc, "", 0);
-			Perl_sv_catpvf(aTHX_ *desc, "%s failed--call queue aborted",
-			    paramList == PL_checkav ? "CHECK"
-			    : paramList == PL_initav ? "INIT"
-			    : paramList == PL_unitcheckav ? "UNITCHECK"
-			    : paramList == PL_endav ? "END"
-			    : "???");
-		    }
-		}
-
 		Perl_vdie_common(aTHX_ atsv, FALSE);
 		die_where(atsv);
-
-		/* really die */
-		    Perl_croak(aTHX_ "BEGIN failed--compilation aborted");
 		/* NOTREACHED */
 	    }
 	    break;

@@ -185,13 +185,15 @@ static __inline__ SV* inline_loc_desc(pTHX_ SV *loc) {
     return str;
 }
 
+#define LOC_NAME_INDEX 3
+
 /* Location retrieval */
 #define loc_name(loc) inline_loc_name(aTHX_ loc)
 static __inline__ SV* inline_loc_name(pTHX_ SV *loc) {
     SV * str = sv_2mortal(newSVpv("", 0));
     if (loc && SvAVOK(loc)) {
         Perl_sv_catpvf(aTHX_ str, "%s",
-                       SvPVX_const(*av_fetch((AV*)loc, 3, FALSE))
+                       SvPVX_const(*av_fetch((AV*)loc, LOC_NAME_INDEX, FALSE))
             );
     }
     return str;

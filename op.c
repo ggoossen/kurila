@@ -3004,6 +3004,12 @@ Perl_utilize(pTHX_ int aver, I32 floor, OP *version, OP *idop, OP *arg)
 		    newSTATEOP(0, NULL, veop, (veop ? veop : idop)->op_location)),
 		newSTATEOP(0, NULL, imop, (imop ? imop : idop)->op_location) ));
 	
+	SVcpSTEAL( SvLOCATION(CvSv(cv)), 
+	    idop->op_location ? newSVsv(idop->op_location) : AvSv(newAV()) );
+	if (SvAVOK(SvLOCATION((SV*)cv))) {
+	    av_store(SvAv(SvLOCATION((SV*)cv)), LOC_NAME_INDEX, newSVpv("use", 0));
+	}
+
 	process_special_block(KEY_BEGIN, cv);
     }
 
@@ -4464,6 +4470,14 @@ Perl_process_special_block(pTHX_ const I32 key, CV *const cv)
 	AV* call_av;
 	const I32 oldscope = PL_scopestack_ix;
 	ENTER;
+
+	if ( ! SvLOCATION(CvSv(cv)) )
+	    SvLOCATION(CvSv(cv)) = AvSv(newAV());
+	if (SvAVOK(SvLOCATION((SV*)cv))) {
+	    av_store(SvAv(SvLOCATION((SV*)cv)),
+		LOC_NAME_INDEX,
+		newSVpv("BEGIN", 0));
+	}
 
 	call_av = newAV();
 	av_2mortal(call_av);
