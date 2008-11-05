@@ -91,15 +91,17 @@ things, Changing old design decisions, Readable, modifiable perl source
 
 =item SEE ALSO
 
-L<kurila113delta> What is new for Perl Kurila 1.13, L<kurila112delta> What
-is new for Perl Kurila 1.12, L<kurila111delta> What is new for Perl Kurila
-1.11, L<kurila110delta> What is new for Perl Kurila 1.10, L<kurila19delta>
-What is new for Perl Kurila 1.9, L<kurila18delta> What is new for Perl
-Kurila 1.8, L<kurila17delta> What is new for Perl Kurila 1.7,
-L<kurila16delta> What is new for Perl Kurila 1.6, L<kurila15delta> What is
-new for Perl Kurila 1.5, L<kurila14delta> What is new for Perl Kurila 1.4,
-L<kurila13delta> What is new for Perl Kurila 1.3, L<kurila02delta> What is
-new for Perl Kurila 0.2, L<kurila01delta> What is new for Perl Kurila 0.1
+L<kurila115delta> What is new for Perl Kurila 1.15, L<kurila114delta> What
+is new for Perl Kurila 1.14, L<kurila113delta> What is new for Perl Kurila
+1.13, L<kurila112delta> What is new for Perl Kurila 1.12, L<kurila111delta>
+What is new for Perl Kurila 1.11, L<kurila110delta> What is new for Perl
+Kurila 1.10, L<kurila19delta> What is new for Perl Kurila 1.9,
+L<kurila18delta> What is new for Perl Kurila 1.8, L<kurila17delta> What is
+new for Perl Kurila 1.7, L<kurila16delta> What is new for Perl Kurila 1.6,
+L<kurila15delta> What is new for Perl Kurila 1.5, L<kurila14delta> What is
+new for Perl Kurila 1.4, L<kurila13delta> What is new for Perl Kurila 1.3,
+L<kurila02delta> What is new for Perl Kurila 0.2, L<kurila01delta> What is
+new for Perl Kurila 0.1
 
 =item AUTHOR
 
@@ -2854,8 +2856,7 @@ IO::Handle->output_field_separator EXPR, $OUTPUT_FIELD_SEPARATOR, $OFS, $,
 X<$,> X<$OFS> X<$OUTPUT_FIELD_SEPARATOR>,
 IO::Handle->output_record_separator EXPR, $OUTPUT_RECORD_SEPARATOR, $ORS,
 $\ X<$\> X<$ORS> X<$OUTPUT_RECORD_SEPARATOR>, $LIST_SEPARATOR, $" X<$">
-X<$LIST_SEPARATOR>, $SUBSCRIPT_SEPARATOR, $SUBSEP, $; X<$;> X<$SUBSEP>
-X<SUBSCRIPT_SEPARATOR>, @LAST_MATCH_START, @- X<@-> X<@LAST_MATCH_START>,
+X<$LIST_SEPARATOR>, @LAST_MATCH_START, @- X<@-> X<@LAST_MATCH_START>,
 C<$^PREMATCH> is the same as C<substr($var, 0, @-[0])>, C<$^MATCH> is the
 same as C<substr($var, @-[0], @+[0] - @-[0])>, C<$^POSTMATCH> is the same
 as C<substr($var, @+[0])>, C<$1> is the same as C<substr($var, @-[1], @+[1]
@@ -11870,125 +11871,6 @@ regnames($all), regnames_count()
 
 =back
 
-=head2 threadshared::shared, threads::shared - Perl extension for sharing
-data structures between threads
-
-=over 4
-
-=item VERSION
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=item EXPORT
-
-=item FUNCTIONS
-
-share VARIABLE, is_shared VARIABLE, lock VARIABLE, cond_wait VARIABLE,
-cond_wait CONDVAR, LOCKVAR, cond_timedwait VARIABLE, ABS_TIMEOUT,
-cond_timedwait CONDVAR, ABS_TIMEOUT, LOCKVAR, cond_signal VARIABLE,
-cond_broadcast VARIABLE
-
-=item OBJECTS
-
-=item NOTES
-
-=item BUGS AND LIMITATIONS
-
-=item SEE ALSO
-
-=item AUTHOR
-
-=back
-
-=head2 threads - Perl interpreter-based threads
-
-=over 4
-
-=item VERSION
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-$thr = threads->create(FUNCTION, ARGS), $thr->join(), $thr->detach(),
-threads->detach(), threads->self(), $thr->tid(), threads->tid(), "$thr",
-threads->object($tid), threads->yield(), threads->list(),
-threads->list(threads::all), threads->list(threads::running),
-threads->list(threads::joinable), $thr1->equal($thr2), async BLOCK;,
-$thr->error(), $thr->_handle(), threads->_handle()
-
-=item EXITING A THREAD
-
-threads->exit(), threads->exit(status), die(), exit(status), use threads
-'exit' => 'threads_only', threads->create({'exit' => 'thread_only'}, ...),
-$thr->set_thread_exit_only(boolean), threads->set_thread_exit_only(boolean)
-
-=item THREAD STATE
-
-$thr->is_running(), $thr->is_joinable(), $thr->is_detached(),
-threads->is_detached()
-
-=item THREAD CONTEXT
-
-=over 4
-
-=item Explicit context
-
-=item Implicit context
-
-=item $thr->wantarray()
-
-=item threads->wantarray()
-
-=back
-
-=item THREAD STACK SIZE
-
-threads->get_stack_size();, $size = $thr->get_stack_size();, $old_size =
-threads->set_stack_size($new_size);, use threads ('stack_size' => VALUE);,
-$ENV{'PERL5_ITHREADS_STACK_SIZE'}, threads->create({'stack_size' => VALUE},
-FUNCTION, ARGS), $thr2 = $thr1->create(FUNCTION, ARGS)
-
-=item THREAD SIGNALLING
-
-$thr->kill('SIG...');
-
-=item WARNINGS
-
-Perl exited with active threads:, Thread creation failed: pthread_create
-returned #, Thread # terminated abnormally: .., Using minimum thread stack
-size of #, Thread creation failed: pthread_attr_setstacksize(I<SIZE>)
-returned 22
-
-=item ERRORS
-
-This Perl not built to support threads, Cannot change stack size of an
-existing thread, Cannot signal threads without safe signals, Unrecognized
-signal name: ..
-
-=item BUGS AND LIMITATIONS
-
-Thread-safe modules, Using non-thread-safe modules, Current working
-directory, Environment variables, Parent-child threads, Creating threads
-inside special blocks, Unsafe signals, Perl has been built with
-C<PERL_OLD_SIGNALS> (see C<perl -V>), The environment variable
-C<PERL_SIGNALS> is set to C<unsafe> (see L<perlrun/"PERL_SIGNALS">), The
-module L<Perl::Unsafe::Signals> is used, Returning closures from threads,
-Returning objects from threads, Perl Bugs and the CPAN Version of
-L<threads>
-
-=item REQUIREMENTS
-
-=item SEE ALSO
-
-=item AUTHOR
-
-=item ACKNOWLEDGEMENTS
-
-=back
-
 =head2 attributes - get/set subroutine or variable attributes
 
 =over 4
@@ -12028,22 +11910,6 @@ FETCH_I<type>_ATTRIBUTES, MODIFY_I<type>_ATTRIBUTES
 =back
 
 =item EXAMPLES
-
-=item SEE ALSO
-
-=back
-
-=head2 autouse - postpone load of modules until a function is used
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=item WARNING
-
-=item AUTHOR
 
 =item SEE ALSO
 
@@ -12233,8 +12099,6 @@ message
 
 =item The 'switch' feature
 
-=item the 'state' feature
-
 =back
 
 =item FEATURE BUNDLES
@@ -12274,20 +12138,6 @@ new, phash
 =item Limitation with regard to C<_>
 
 =back
-
-=back
-
-=head2 if - C<use> a Perl module if a condition holds
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=item BUGS
-
-=item AUTHOR
 
 =back
 
@@ -12406,8 +12256,6 @@ This probably does nothing, This works only on 5.10+
 
 =item mro::get_pkg_gen($classname)
 
-=item next::method
-
 =item next::can
 
 =item maybe::next::method
@@ -12478,109 +12326,6 @@ L<Class::C3>
 
 =back
 
-=head2 overload - Package for overloading Perl operations
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=over 4
-
-=item Declaration of overloaded functions
-
-=item Calling Conventions for Binary Operations
-
-FALSE, TRUE, C<undef>
-
-=item Calling Conventions for Unary Operations
-
-=item Calling Conventions for Mutators
-
-C<++> and C<-->, C<x=> and other assignment versions
-
-=item Overloadable Operations
-
-I<Arithmetic operations>, I<Comparison operations>, I<Bit operations>,
-I<Increment and decrement>, I<Transcendental functions>, I<Boolean, string
-and numeric conversion>, I<Iteration>, I<Dereferencing>, I<Special>
-
-=item Inheritance and overloading
-
-Strings as values of C<use overload> directive, Overloading of an operation
-is inherited by derived classes
-
-=back
-
-=item SPECIAL SYMBOLS FOR C<use overload>
-
-=over 4
-
-=item Last Resort
-
-=item Fallback
-
-C<undef>, TRUE, defined, but FALSE
-
-=item Smart Match
-
-=item Copy Constructor
-
-B<Example>
-
-=back
-
-=item MAGIC AUTOGENERATION
-
-I<Assignment forms of arithmetic operations>, I<Conversion operations>,
-I<Increment and decrement>, C<abs($a)>, I<Unary minus>, I<Negation>,
-I<Concatenation>, I<Comparison operations>, I<Iterator>, I<Dereferencing>,
-I<Copy operator>
-
-=item Minimal set of overloaded operations
-
-=item Losing overloading
-
-=item Run-time Overloading
-
-=item Public functions
-
-overload::StrVal(arg), overload::Overloaded(arg), overload::Method(obj,op)
-
-=item Overloading constants
-
-integer, float, binary, q, qr
-
-=item IMPLEMENTATION
-
-=item Metaphor clash
-
-=item Cookbook
-
-=over 4
-
-=item Two-face scalars
-
-=item Two-face references
-
-=item Symbolic calculator
-
-=item I<Really> symbolic calculator
-
-=back
-
-=item AUTHOR
-
-=item DIAGNOSTICS
-
-Odd number of arguments for overload::constant, `%s' is not an overloadable
-type, `%s' is not a code reference
-
-=item BUGS
-
-=back
-
 =head2 sigtrap - Perl pragma to enable simple signal handling
 
 =over 4
@@ -12620,60 +12365,6 @@ B<untrapped>, B<any>, I<signal>, I<number>
 =item DESCRIPTION
 
 =item CAVEATS
-
-=back
-
-=head2 strict - Perl pragma to restrict unsafe constructs
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-C<strict refs>, C<strict vars>, C<strict subs>
-
-=item HISTORY
-
-=back
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=back
-
-=head2 threadshared, threads::shared - Perl extension for sharing data
-structures between threads
-
-=over 4
-
-=item VERSION
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=item EXPORT
-
-=item FUNCTIONS
-
-share VARIABLE, is_shared VARIABLE, lock VARIABLE, cond_wait VARIABLE,
-cond_wait CONDVAR, LOCKVAR, cond_timedwait VARIABLE, ABS_TIMEOUT,
-cond_timedwait CONDVAR, ABS_TIMEOUT, LOCKVAR, cond_signal VARIABLE,
-cond_broadcast VARIABLE
-
-=item OBJECTS
-
-=item NOTES
-
-=item BUGS AND LIMITATIONS
-
-=item SEE ALSO
-
-=item AUTHOR
 
 =back
 
@@ -13209,24 +12900,6 @@ label, stash, stashpv, file, cop_seq, line, warnings, io, hints
 =item SYNOPSIS
 
 =item DESCRIPTION
-
-=item AUTHOR
-
-=back
-
-=head2 B::Xref - Generates cross reference reports for Perl programs
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=item OPTIONS
-
-C<-oFILENAME>, C<-r>, C<-d>, C<-D[tO]>
-
-=item BUGS
 
 =item AUTHOR
 
@@ -13816,18 +13489,11 @@ myconfig(), config_sh(), config_re($regex), config_vars(@names)
 
 =back
 
-C<_a>, C<_exe>, C<_o>
-
 =over 4
 
 =item a
 
 =back
-
-C<afs>, C<afsroot>, C<alignbytes>, C<ansi2knr>, C<aphostname>,
-C<api_revision>, C<api_subversion>, C<api_version>, C<api_versionstring>,
-C<ar>, C<archlib>, C<archlibexp>, C<archname>, C<archname64>, C<archobjs>,
-C<asctime_r_proto>, C<awk>
 
 =over 4
 
@@ -13835,21 +13501,11 @@ C<asctime_r_proto>, C<awk>
 
 =back
 
-C<baserev>, C<bash>, C<bin>, C<binexp>, C<bison>, C<byacc>, C<byteorder>
-
 =over 4
 
 =item c
 
 =back
-
-C<c>, C<castflags>, C<cat>, C<cc>, C<cccdlflags>, C<ccdlflags>, C<ccflags>,
-C<ccflags_uselargefiles>, C<ccname>, C<ccsymbols>, C<ccversion>, C<cf_by>,
-C<cf_email>, C<cf_time>, C<chgrp>, C<chmod>, C<chown>, C<clocktype>,
-C<comm>, C<compress>, C<contains>, C<cp>, C<cpio>, C<cpp>, C<cpp_stuff>,
-C<cppccsymbols>, C<cppflags>, C<cpplast>, C<cppminus>, C<cpprun>,
-C<cppstdin>, C<cppsymbols>, C<crypt_r_proto>, C<cryptlib>, C<csh>,
-C<ctermid_r_proto>, C<ctime_r_proto>
 
 =over 4
 
@@ -13857,120 +13513,11 @@ C<ctermid_r_proto>, C<ctime_r_proto>
 
 =back
 
-C<d__fwalk>, C<d_access>, C<d_accessx>, C<d_aintl>, C<d_alarm>,
-C<d_archlib>, C<d_asctime_r>, C<d_atolf>, C<d_atoll>,
-C<d_attribute_format>, C<d_attribute_malloc>, C<d_attribute_nonnull>,
-C<d_attribute_noreturn>, C<d_attribute_pure>, C<d_attribute_unused>,
-C<d_attribute_warn_unused_result>, C<d_bcmp>, C<d_bcopy>, C<d_bsd>,
-C<d_bsdgetpgrp>, C<d_bsdsetpgrp>, C<d_builtin_choose_expr>,
-C<d_builtin_expect>, C<d_bzero>, C<d_c99_variadic_macros>, C<d_casti32>,
-C<d_castneg>, C<d_charvspr>, C<d_chown>, C<d_chroot>, C<d_chsize>,
-C<d_class>, C<d_clearenv>, C<d_closedir>, C<d_cmsghdr_s>, C<d_const>,
-C<d_copysignl>, C<d_cplusplus>, C<d_crypt>, C<d_crypt_r>, C<d_csh>,
-C<d_ctermid>, C<d_ctermid_r>, C<d_ctime_r>, C<d_cuserid>, C<d_dbl_dig>,
-C<d_dbminitproto>, C<d_difftime>, C<d_dir_dd_fd>, C<d_dirfd>,
-C<d_dirnamlen>, C<d_dlerror>, C<d_dlopen>, C<d_dlsymun>, C<d_dosuid>,
-C<d_drand48_r>, C<d_drand48proto>, C<d_dup2>, C<d_eaccess>, C<d_endgrent>,
-C<d_endgrent_r>, C<d_endhent>, C<d_endhostent_r>, C<d_endnent>,
-C<d_endnetent_r>, C<d_endpent>, C<d_endprotoent_r>, C<d_endpwent>,
-C<d_endpwent_r>, C<d_endsent>, C<d_endservent_r>, C<d_eofnblk>,
-C<d_eunice>, C<d_faststdio>, C<d_fchdir>, C<d_fchmod>, C<d_fchown>,
-C<d_fcntl>, C<d_fcntl_can_lock>, C<d_fd_macros>, C<d_fd_set>,
-C<d_fds_bits>, C<d_fgetpos>, C<d_finite>, C<d_finitel>, C<d_flexfnam>,
-C<d_flock>, C<d_flockproto>, C<d_fork>, C<d_fp_class>, C<d_fpathconf>,
-C<d_fpclass>, C<d_fpclassify>, C<d_fpclassl>, C<d_fpos64_t>, C<d_frexpl>,
-C<d_fs_data_s>, C<d_fseeko>, C<d_fsetpos>, C<d_fstatfs>, C<d_fstatvfs>,
-C<d_fsync>, C<d_ftello>, C<d_ftime>, C<d_futimes>, C<d_Gconvert>,
-C<d_getcwd>, C<d_getespwnam>, C<d_getfsstat>, C<d_getgrent>,
-C<d_getgrent_r>, C<d_getgrgid_r>, C<d_getgrnam_r>, C<d_getgrps>,
-C<d_gethbyaddr>, C<d_gethbyname>, C<d_gethent>, C<d_gethname>,
-C<d_gethostbyaddr_r>, C<d_gethostbyname_r>, C<d_gethostent_r>,
-C<d_gethostprotos>, C<d_getitimer>, C<d_getlogin>, C<d_getlogin_r>,
-C<d_getmnt>, C<d_getmntent>, C<d_getnbyaddr>, C<d_getnbyname>,
-C<d_getnent>, C<d_getnetbyaddr_r>, C<d_getnetbyname_r>, C<d_getnetent_r>,
-C<d_getnetprotos>, C<d_getpagsz>, C<d_getpbyname>, C<d_getpbynumber>,
-C<d_getpent>, C<d_getpgid>, C<d_getpgrp>, C<d_getpgrp2>, C<d_getppid>,
-C<d_getprior>, C<d_getprotobyname_r>, C<d_getprotobynumber_r>,
-C<d_getprotoent_r>, C<d_getprotoprotos>, C<d_getprpwnam>, C<d_getpwent>,
-C<d_getpwent_r>, C<d_getpwnam_r>, C<d_getpwuid_r>, C<d_getsbyname>,
-C<d_getsbyport>, C<d_getsent>, C<d_getservbyname_r>, C<d_getservbyport_r>,
-C<d_getservent_r>, C<d_getservprotos>, C<d_getspnam>, C<d_getspnam_r>,
-C<d_gettimeod>, C<d_gmtime_r>, C<d_gnulibc>, C<d_grpasswd>, C<d_hasmntopt>,
-C<d_htonl>, C<d_ilogbl>, C<d_inc_version_list>, C<d_index>, C<d_inetaton>,
-C<d_int64_t>, C<d_isascii>, C<d_isfinite>, C<d_isinf>, C<d_isnan>,
-C<d_isnanl>, C<d_killpg>, C<d_lchown>, C<d_ldbl_dig>,
-C<d_libm_lib_version>, C<d_link>, C<d_localtime_r>,
-C<d_localtime_r_needs_tzset>, C<d_locconv>, C<d_lockf>, C<d_longdbl>,
-C<d_longlong>, C<d_lseekproto>, C<d_lstat>, C<d_madvise>,
-C<d_malloc_good_size>, C<d_malloc_size>, C<d_mblen>, C<d_mbstowcs>,
-C<d_mbtowc>, C<d_memchr>, C<d_memcmp>, C<d_memcpy>, C<d_memmove>,
-C<d_memset>, C<d_mkdir>, C<d_mkdtemp>, C<d_mkfifo>, C<d_mkstemp>,
-C<d_mkstemps>, C<d_mktime>, C<d_mmap>, C<d_modfl>, C<d_modfl_pow32_bug>,
-C<d_modflproto>, C<d_mprotect>, C<d_msg>, C<d_msg_ctrunc>,
-C<d_msg_dontroute>, C<d_msg_oob>, C<d_msg_peek>, C<d_msg_proxy>,
-C<d_msgctl>, C<d_msgget>, C<d_msghdr_s>, C<d_msgrcv>, C<d_msgsnd>,
-C<d_msync>, C<d_munmap>, C<d_mymalloc>, C<d_nice>, C<d_nl_langinfo>,
-C<d_nv_preserves_uv>, C<d_nv_zero_is_allbits_zero>, C<d_off64_t>,
-C<d_old_pthread_create_joinable>, C<d_oldpthreads>, C<d_oldsock>,
-C<d_open3>, C<d_pathconf>, C<d_pause>, C<d_perl_otherlibdirs>,
-C<d_phostname>, C<d_pipe>, C<d_poll>, C<d_portable>, C<d_PRId64>,
-C<d_PRIeldbl>, C<d_PRIEUldbl>, C<d_PRIfldbl>, C<d_PRIFUldbl>,
-C<d_PRIgldbl>, C<d_PRIGUldbl>, C<d_PRIi64>, C<d_printf_format_null>,
-C<d_PRIo64>, C<d_PRIu64>, C<d_PRIx64>, C<d_PRIXU64>, C<d_procselfexe>,
-C<d_pseudofork>, C<d_pthread_atfork>, C<d_pthread_attr_setscope>,
-C<d_pthread_yield>, C<d_pwage>, C<d_pwchange>, C<d_pwclass>,
-C<d_pwcomment>, C<d_pwexpire>, C<d_pwgecos>, C<d_pwpasswd>, C<d_pwquota>,
-C<d_qgcvt>, C<d_quad>, C<d_random_r>, C<d_readdir>, C<d_readdir64_r>,
-C<d_readdir_r>, C<d_readlink>, C<d_readv>, C<d_recvmsg>, C<d_rename>,
-C<d_rewinddir>, C<d_rmdir>, C<d_safebcpy>, C<d_safemcpy>, C<d_sanemcmp>,
-C<d_sbrkproto>, C<d_scalbnl>, C<d_sched_yield>, C<d_scm_rights>,
-C<d_SCNfldbl>, C<d_seekdir>, C<d_select>, C<d_sem>, C<d_semctl>,
-C<d_semctl_semid_ds>, C<d_semctl_semun>, C<d_semget>, C<d_semop>,
-C<d_sendmsg>, C<d_setegid>, C<d_seteuid>, C<d_setgrent>, C<d_setgrent_r>,
-C<d_setgrps>, C<d_sethent>, C<d_sethostent_r>, C<d_setitimer>,
-C<d_setlinebuf>, C<d_setlocale>, C<d_setlocale_r>, C<d_setnent>,
-C<d_setnetent_r>, C<d_setpent>, C<d_setpgid>, C<d_setpgrp>, C<d_setpgrp2>,
-C<d_setprior>, C<d_setproctitle>, C<d_setprotoent_r>, C<d_setpwent>,
-C<d_setpwent_r>, C<d_setregid>, C<d_setresgid>, C<d_setresuid>,
-C<d_setreuid>, C<d_setrgid>, C<d_setruid>, C<d_setsent>, C<d_setservent_r>,
-C<d_setsid>, C<d_setvbuf>, C<d_sfio>, C<d_shm>, C<d_shmat>,
-C<d_shmatprototype>, C<d_shmctl>, C<d_shmdt>, C<d_shmget>, C<d_sigaction>,
-C<d_signbit>, C<d_sigprocmask>, C<d_sigsetjmp>, C<d_sitearch>,
-C<d_snprintf>, C<d_sockatmark>, C<d_sockatmarkproto>, C<d_socket>,
-C<d_socklen_t>, C<d_sockpair>, C<d_socks5_init>,
-C<d_sprintf_returns_strlen>, C<d_sqrtl>, C<d_srand48_r>, C<d_srandom_r>,
-C<d_sresgproto>, C<d_sresuproto>, C<d_statblks>, C<d_statfs_f_flags>,
-C<d_statfs_s>, C<d_statvfs>, C<d_stdio_cnt_lval>, C<d_stdio_ptr_lval>,
-C<d_stdio_ptr_lval_nochange_cnt>, C<d_stdio_ptr_lval_sets_cnt>,
-C<d_stdio_stream_array>, C<d_stdiobase>, C<d_stdstdio>, C<d_strchr>,
-C<d_strcoll>, C<d_strctcpy>, C<d_strerrm>, C<d_strerror>, C<d_strerror_r>,
-C<d_strftime>, C<d_strlcat>, C<d_strlcpy>, C<d_strtod>, C<d_strtol>,
-C<d_strtold>, C<d_strtoll>, C<d_strtoq>, C<d_strtoul>, C<d_strtoull>,
-C<d_strtouq>, C<d_strxfrm>, C<d_suidsafe>, C<d_symlink>, C<d_syscall>,
-C<d_syscallproto>, C<d_sysconf>, C<d_sysernlst>, C<d_syserrlst>,
-C<d_system>, C<d_tcgetpgrp>, C<d_tcsetpgrp>, C<d_telldir>,
-C<d_telldirproto>, C<d_time>, C<d_times>, C<d_tm_tm_gmtoff>,
-C<d_tm_tm_zone>, C<d_tmpnam_r>, C<d_truncate>, C<d_ttyname_r>, C<d_tzname>,
-C<d_u32align>, C<d_ualarm>, C<d_umask>, C<d_uname>, C<d_union_semun>,
-C<d_unordered>, C<d_unsetenv>, C<d_usleep>, C<d_usleepproto>, C<d_ustat>,
-C<d_vendorarch>, C<d_vendorbin>, C<d_vendorlib>, C<d_vendorscript>,
-C<d_vfork>, C<d_void_closedir>, C<d_voidsig>, C<d_voidtty>, C<d_volatile>,
-C<d_vprintf>, C<d_vsnprintf>, C<d_wait4>, C<d_waitpid>, C<d_wcstombs>,
-C<d_wctomb>, C<d_writev>, C<d_xenix>, C<date>, C<db_hashtype>,
-C<db_prefixtype>, C<db_version_major>, C<db_version_minor>,
-C<db_version_patch>, C<defvoidused>, C<direntrytype>, C<dlext>, C<dlsrc>,
-C<doublesize>, C<drand01>, C<drand48_r_proto>, C<dtrace>, C<dynamic_ext>
-
 =over 4
 
 =item e
 
 =back
-
-C<eagain>, C<ebcdic>, C<echo>, C<egrep>, C<emacs>, C<endgrent_r_proto>,
-C<endhostent_r_proto>, C<endnetent_r_proto>, C<endprotoent_r_proto>,
-C<endpwent_r_proto>, C<endservent_r_proto>, C<eunicefix>, C<exe_ext>,
-C<expr>, C<extensions>, C<extras>
 
 =over 4
 
@@ -13978,26 +13525,11 @@ C<expr>, C<extensions>, C<extras>
 
 =back
 
-C<fflushall>, C<fflushNULL>, C<find>, C<firstmakefile>, C<flex>,
-C<fpossize>, C<fpostype>, C<freetype>, C<from>, C<full_ar>, C<full_csh>,
-C<full_sed>
-
 =over 4
 
 =item g
 
 =back
-
-C<gccansipedantic>, C<gccosandvers>, C<gccversion>, C<getgrent_r_proto>,
-C<getgrgid_r_proto>, C<getgrnam_r_proto>, C<gethostbyaddr_r_proto>,
-C<gethostbyname_r_proto>, C<gethostent_r_proto>, C<getlogin_r_proto>,
-C<getnetbyaddr_r_proto>, C<getnetbyname_r_proto>, C<getnetent_r_proto>,
-C<getprotobyname_r_proto>, C<getprotobynumber_r_proto>,
-C<getprotoent_r_proto>, C<getpwent_r_proto>, C<getpwnam_r_proto>,
-C<getpwuid_r_proto>, C<getservbyname_r_proto>, C<getservbyport_r_proto>,
-C<getservent_r_proto>, C<getspnam_r_proto>, C<gidformat>, C<gidsign>,
-C<gidsize>, C<gidtype>, C<glibpth>, C<gmake>, C<gmtime_r_proto>,
-C<gnulibc_version>, C<grep>, C<groupcat>, C<groupstype>, C<gzip>
 
 =over 4
 
@@ -14005,44 +13537,11 @@ C<gnulibc_version>, C<grep>, C<groupcat>, C<groupstype>, C<gzip>
 
 =back
 
-C<h_fcntl>, C<h_sysfile>, C<hint>, C<hostcat>, C<html1dir>, C<html1direxp>,
-C<html3dir>, C<html3direxp>
-
 =over 4
 
 =item i
 
 =back
-
-C<i16size>, C<i16type>, C<i32size>, C<i32type>, C<i64size>, C<i64type>,
-C<i8size>, C<i8type>, C<i_arpainet>, C<i_assert>, C<i_bsdioctl>,
-C<i_crypt>, C<i_db>, C<i_dbm>, C<i_dirent>, C<i_dld>, C<i_dlfcn>,
-C<i_fcntl>, C<i_float>, C<i_fp>, C<i_fp_class>, C<i_gdbm>, C<i_grp>,
-C<i_ieeefp>, C<i_inttypes>, C<i_langinfo>, C<i_libutil>, C<i_limits>,
-C<i_locale>, C<i_machcthr>, C<i_malloc>, C<i_math>, C<i_memory>,
-C<i_mntent>, C<i_ndbm>, C<i_netdb>, C<i_neterrno>, C<i_netinettcp>,
-C<i_niin>, C<i_poll>, C<i_prot>, C<i_pthread>, C<i_pwd>, C<i_rpcsvcdbm>,
-C<i_sfio>, C<i_sgtty>, C<i_shadow>, C<i_socks>, C<i_stdarg>, C<i_stddef>,
-C<i_stdlib>, C<i_string>, C<i_sunmath>, C<i_sysaccess>, C<i_sysdir>,
-C<i_sysfile>, C<i_sysfilio>, C<i_sysin>, C<i_sysioctl>, C<i_syslog>,
-C<i_sysmman>, C<i_sysmode>, C<i_sysmount>, C<i_sysndir>, C<i_sysparam>,
-C<i_sysresrc>, C<i_syssecrt>, C<i_sysselct>, C<i_syssockio>, C<i_sysstat>,
-C<i_sysstatfs>, C<i_sysstatvfs>, C<i_systime>, C<i_systimek>,
-C<i_systimes>, C<i_systypes>, C<i_sysuio>, C<i_sysun>, C<i_sysutsname>,
-C<i_sysvfs>, C<i_syswait>, C<i_termio>, C<i_termios>, C<i_time>,
-C<i_unistd>, C<i_ustat>, C<i_utime>, C<i_values>, C<i_varargs>,
-C<i_varhdr>, C<i_vfork>, C<ignore_versioned_solibs>, C<inc_version_list>,
-C<inc_version_list_init>, C<incpath>, C<inews>, C<initialinstalllocation>,
-C<installarchlib>, C<installbin>, C<installhtml1dir>, C<installhtml3dir>,
-C<installman1dir>, C<installman3dir>, C<installprefix>,
-C<installprefixexp>, C<installprivlib>, C<installscript>,
-C<installsitearch>, C<installsitebin>, C<installsitehtml1dir>,
-C<installsitehtml3dir>, C<installsitelib>, C<installsiteman1dir>,
-C<installsiteman3dir>, C<installsitescript>, C<installstyle>,
-C<installusrbinperl>, C<installvendorarch>, C<installvendorbin>,
-C<installvendorhtml1dir>, C<installvendorhtml3dir>, C<installvendorlib>,
-C<installvendorman1dir>, C<installvendorman3dir>, C<installvendorscript>,
-C<intsize>, C<issymlink>, C<ivdformat>, C<ivsize>, C<ivtype>
 
 =over 4
 
@@ -14050,21 +13549,11 @@ C<intsize>, C<issymlink>, C<ivdformat>, C<ivsize>, C<ivtype>
 
 =back
 
-C<known_extensions>, C<ksh>
-
 =over 4
 
 =item l
 
 =back
-
-C<ld>, C<lddlflags>, C<ldflags>, C<ldflags_uselargefiles>, C<ldlibpthname>,
-C<less>, C<lib_ext>, C<libc>, C<libperl>, C<libpth>, C<libs>, C<libsdirs>,
-C<libsfiles>, C<libsfound>, C<libspath>, C<libswanted>,
-C<libswanted_uselargefiles>, C<line>, C<lint>, C<lkflags>, C<ln>, C<lns>,
-C<localtime_r_proto>, C<locincpth>, C<loclibpth>, C<longdblsize>,
-C<longlongsize>, C<longsize>, C<lp>, C<lpr>, C<ls>, C<lseeksize>,
-C<lseektype>
 
 =over 4
 
@@ -14072,23 +13561,11 @@ C<lseektype>
 
 =back
 
-C<mad>, C<madlyh>, C<madlyobj>, C<madlysrc>, C<mail>, C<mailx>, C<make>,
-C<make_set_make>, C<mallocobj>, C<mallocsrc>, C<malloctype>, C<man1dir>,
-C<man1direxp>, C<man1ext>, C<man3dir>, C<man3direxp>, C<man3ext>,
-C<mips_type>, C<mistrustnm>, C<mkdir>, C<mmaptype>, C<modetype>, C<more>,
-C<multiarch>, C<mv>, C<myarchname>, C<mydomain>, C<myhostname>, C<myuname>
-
 =over 4
 
 =item n
 
 =back
-
-C<n>, C<need_va_copy>, C<netdb_hlen_type>, C<netdb_host_type>,
-C<netdb_name_type>, C<netdb_net_type>, C<nm>, C<nm_opt>, C<nm_so_opt>,
-C<nonxs_ext>, C<nroff>, C<nv_overflows_integers_at>,
-C<nv_preserves_uv_bits>, C<nveformat>, C<nvEUformat>, C<nvfformat>,
-C<nvFUformat>, C<nvgformat>, C<nvGUformat>, C<nvsize>, C<nvtype>
 
 =over 4
 
@@ -14096,17 +13573,11 @@ C<nvFUformat>, C<nvgformat>, C<nvGUformat>, C<nvsize>, C<nvtype>
 
 =back
 
-C<o_nonblock>, C<obj_ext>, C<old_pthread_create_joinable>, C<optimize>,
-C<orderlib>, C<osname>, C<osvers>, C<otherlibdirs>
-
 =over 4
 
 =item p
 
 =back
-
-C<package>, C<pager>, C<passcat>, C<patchlevel>, C<path_sep>, C<perl>,
-C<perl5>
 
 =over 4
 
@@ -14114,20 +13585,11 @@ C<perl5>
 
 =back
 
-C<PERL_API_REVISION>, C<PERL_API_SUBVERSION>, C<PERL_API_VERSION>,
-C<PERL_CONFIG_SH>, C<PERL_PATCHLEVEL>, C<perl_patchlevel>,
-C<PERL_REVISION>, C<PERL_SUBVERSION>, C<PERL_VERSION>, C<perladmin>,
-C<perllibs>, C<perlpath>, C<pg>, C<phostname>, C<pidtype>, C<plibpth>,
-C<pmake>, C<pr>, C<prefix>, C<prefixexp>, C<privlib>, C<privlibexp>,
-C<procselfexe>, C<prototype>, C<ptrsize>
-
 =over 4
 
 =item q
 
 =back
-
-C<quadkind>, C<quadtype>
 
 =over 4
 
@@ -14135,36 +13597,11 @@ C<quadkind>, C<quadtype>
 
 =back
 
-C<randbits>, C<randfunc>, C<random_r_proto>, C<randseedtype>, C<ranlib>,
-C<rd_nodata>, C<readdir64_r_proto>, C<readdir_r_proto>, C<revision>, C<rm>,
-C<rm_try>, C<rmail>, C<run>, C<runnm>
-
 =over 4
 
 =item s
 
 =back
-
-C<sched_yield>, C<scriptdir>, C<scriptdirexp>, C<sed>, C<seedfunc>,
-C<selectminbits>, C<selecttype>, C<sendmail>, C<setgrent_r_proto>,
-C<sethostent_r_proto>, C<setlocale_r_proto>, C<setnetent_r_proto>,
-C<setprotoent_r_proto>, C<setpwent_r_proto>, C<setservent_r_proto>, C<sh>,
-C<shar>, C<sharpbang>, C<shmattype>, C<shortsize>, C<shrpenv>, C<shsharp>,
-C<sig_count>, C<sig_name>, C<sig_name_init>, C<sig_num>, C<sig_num_init>,
-C<sig_size>, C<signal_t>, C<sitearch>, C<sitearchexp>, C<sitebin>,
-C<sitebinexp>, C<sitehtml1dir>, C<sitehtml1direxp>, C<sitehtml3dir>,
-C<sitehtml3direxp>, C<sitelib>, C<sitelib_stem>, C<sitelibexp>,
-C<siteman1dir>, C<siteman1direxp>, C<siteman3dir>, C<siteman3direxp>,
-C<siteprefix>, C<siteprefixexp>, C<sitescript>, C<sitescriptexp>,
-C<sizesize>, C<sizetype>, C<sleep>, C<smail>, C<so>, C<sockethdr>,
-C<socketlib>, C<socksizetype>, C<sort>, C<spackage>, C<spitshell>,
-C<sPRId64>, C<sPRIeldbl>, C<sPRIEUldbl>, C<sPRIfldbl>, C<sPRIFUldbl>,
-C<sPRIgldbl>, C<sPRIGUldbl>, C<sPRIi64>, C<sPRIo64>, C<sPRIu64>,
-C<sPRIx64>, C<sPRIXU64>, C<srand48_r_proto>, C<srandom_r_proto>, C<src>,
-C<sSCNfldbl>, C<ssizetype>, C<startperl>, C<startsh>, C<static_ext>,
-C<stdchar>, C<stdio_base>, C<stdio_bufsiz>, C<stdio_cnt>, C<stdio_filbuf>,
-C<stdio_ptr>, C<stdio_stream_array>, C<strerror_r_proto>, C<strings>,
-C<submit>, C<subversion>, C<sysman>
 
 =over 4
 
@@ -14172,27 +13609,11 @@ C<submit>, C<subversion>, C<sysman>
 
 =back
 
-C<tail>, C<tar>, C<targetarch>, C<tbl>, C<tee>, C<test>, C<timeincl>,
-C<timetype>, C<tmpnam_r_proto>, C<to>, C<touch>, C<tr>, C<trnl>, C<troff>,
-C<ttyname_r_proto>
-
 =over 4
 
 =item u
 
 =back
-
-C<u16size>, C<u16type>, C<u32size>, C<u32type>, C<u64size>, C<u64type>,
-C<u8size>, C<u8type>, C<uidformat>, C<uidsign>, C<uidsize>, C<uidtype>,
-C<uname>, C<uniq>, C<uquadtype>, C<use5005threads>, C<use64bitall>,
-C<use64bitint>, C<usecrosscompile>, C<usedl>, C<usedtrace>,
-C<usefaststdio>, C<useithreads>, C<uselargefiles>, C<uselongdouble>,
-C<usemallocwrap>, C<usemorebits>, C<usemultiplicity>, C<usemymalloc>,
-C<usenm>, C<useopcode>, C<useperlio>, C<useposix>, C<usereentrant>,
-C<userelocatableinc>, C<usesfio>, C<useshrplib>, C<usesitecustomize>,
-C<usesocks>, C<usethreads>, C<usevendorprefix>, C<usevfork>, C<usrinc>,
-C<uuname>, C<uvoformat>, C<uvsize>, C<uvtype>, C<uvuformat>, C<uvxformat>,
-C<uvXUformat>
 
 =over 4
 
@@ -14200,21 +13621,11 @@ C<uvXUformat>
 
 =back
 
-C<vendorarch>, C<vendorarchexp>, C<vendorbin>, C<vendorbinexp>,
-C<vendorhtml1dir>, C<vendorhtml1direxp>, C<vendorhtml3dir>,
-C<vendorhtml3direxp>, C<vendorlib>, C<vendorlib_stem>, C<vendorlibexp>,
-C<vendorman1dir>, C<vendorman1direxp>, C<vendorman3dir>,
-C<vendorman3direxp>, C<vendorprefix>, C<vendorprefixexp>, C<vendorscript>,
-C<vendorscriptexp>, C<version>, C<version_patchlevel_string>,
-C<versiononly>, C<vi>, C<voidflags>
-
 =over 4
 
 =item x
 
 =back
-
-C<xlibpth>
 
 =over 4
 
@@ -14222,15 +13633,11 @@ C<xlibpth>
 
 =back
 
-C<yacc>, C<yaccflags>
-
 =over 4
 
 =item z
 
 =back
-
-C<zcat>, C<zip>
 
 =over 4
 
@@ -17259,17 +16666,6 @@ unlock_hashref_recurse, hash_ref_unlocked, legal_ref_keys, hidden_ref_keys
 =item AUTHOR
 
 =item SEE ALSO
-
-=back
-
-=head2 I18N::Collate - compare 8-bit scalar data according to the current
-locale
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
 
 =back
 
@@ -24539,99 +23935,6 @@ unexpand(1)
 =item OVERRIDES
 
 =item EXAMPLES
-
-=item LICENSE
-
-=back
-
-=head2 Thread - Manipulate threads in Perl (for old code only)
-
-=over 4
-
-=item DEPRECATED
-
-=item HISTORY
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=item FUNCTIONS
-
-$thread = Thread->new(\&start_sub), $thread = Thread->new(\&start_sub,
-LIST), lock VARIABLE, async BLOCK;, Thread->self, Thread->list, cond_wait
-VARIABLE, cond_signal VARIABLE, cond_broadcast VARIABLE, yield
-
-=item METHODS
-
-join, detach, equal, tid, done
-
-=item DEFUNCT
-
-lock(\&sub), eval, flags
-
-=item SEE ALSO
-
-=back
-
-=head2 Thread::Queue - Thread-safe queues
-
-=over 4
-
-=item VERSION
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-Ordinary scalars, Array refs, Hash refs, Scalar refs, Objects based on the
-above
-
-=item QUEUE CREATION
-
-->new(), ->new(LIST)
-
-=item BASIC METHODS
-
-->enqueue(LIST), ->dequeue(), ->dequeue(COUNT), ->dequeue_nb(),
-->dequeue_nb(COUNT), ->pending()
-
-=item ADVANCED METHODS
-
-->peek(), ->peek(INDEX), ->insert(INDEX, LIST), ->extract(),
-->extract(INDEX), ->extract(INDEX, COUNT)
-
-=item NOTES
-
-=item LIMITATIONS
-
-=item SEE ALSO
-
-=item MAINTAINER
-
-=item LICENSE
-
-=back
-
-=head2 Thread::Semaphore - Thread-safe semaphores
-
-=over 4
-
-=item VERSION
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=item METHODS
-
-->new(), ->new(NUMBER), ->down(), ->down(NUMBER), ->up(), ->up(NUMBER)
-
-=item NOTES
-
-=item SEE ALSO
-
-=item MAINTAINER
 
 =item LICENSE
 

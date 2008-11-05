@@ -8,14 +8,12 @@
 # This program is free software; you may redistribute it and/or modify it
 # under the same terms as Perl itself.
 
-use Getopt::Long qw(GetOptions);
+use Getopt::Long < qw(GetOptions);
 use Pod::Man ();
-use Pod::Usage qw(pod2usage);
-
-use strict;
+use Pod::Usage < qw(pod2usage);
 
 # Silence -w warnings.
-use vars qw($running_under_some_shell);
+use vars < qw($running_under_some_shell);
 
 # Insert -- into @ARGV before any single dash argument to hide it from
 # Getopt::Long; we want to interpret it as meaning stdin.
@@ -47,7 +45,7 @@ delete %options{lax};
 
 # Initialize and run the formatter, pulling a pair of input and output off at
 # a time.
-my $parser = Pod::Man->new (%options);
+my $parser = Pod::Man->new( < %options);
 my @files;
 do {
     @files = splice (@ARGV, 0, 2);

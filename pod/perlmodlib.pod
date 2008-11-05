@@ -51,10 +51,6 @@ The following pragmas are defined (and have their own documentation).
 
 Get/set subroutine or variable attributes
 
-=item autouse
-
-Postpone load of modules until a function is used
-
 =item base
 
 Establish an ISA relationship with base classes at compile time
@@ -95,10 +91,6 @@ Compile-time class fields
 
 Control the filetest permission operators
 
-=item if
-
-C<use> a Perl module if a condition holds
-
 =item integer
 
 Use integer arithmetic instead of floating point
@@ -127,10 +119,6 @@ Set default PerlIO layers for input and output
 
 Restrict unsafe operations when compiling
 
-=item overload
-
-Package for overloading Perl operations
-
 =item re
 
 Alter regular expression behaviour
@@ -142,18 +130,6 @@ Enable simple signal handling
 =item sort
 
 Control sort() behaviour
-
-=item strict
-
-Restrict unsafe constructs
-
-=item threads
-
-Perl interpreter-based threads
-
-=item threads::shared
-
-Perl extension for sharing data structures between threads
 
 =item utf8
 
@@ -220,10 +196,6 @@ Show lexical variables used in functions or files
 =item B::Terse
 
 Walk Perl syntax tree, printing terse info about ops
-
-=item B::Xref
-
-Generates cross reference reports for Perl programs
 
 =item Benchmark
 
@@ -588,10 +560,6 @@ Process single-character switches with switch clustering
 =item Hash::Util
 
 A selection of general-utility hash subroutines
-
-=item I18N::Collate
-
-Compare 8-bit scalar data according to the current locale
 
 =item I18N::LangTags
 
@@ -1128,18 +1096,6 @@ Expand and unexpand tabs per the unix expand(1) and unexpand(1)
 =item Text::Wrap
 
 Line wrapping to form simple paragraphs
-
-=item Thread
-
-Manipulate threads in Perl (for old code only)
-
-=item Thread::Queue
-
-Thread-safe queues
-
-=item Thread::Semaphore
-
-Thread-safe semaphores
 
 =item Tie::Hash
 

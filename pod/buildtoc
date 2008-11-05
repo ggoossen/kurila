@@ -1,6 +1,5 @@
 #!/usr/bin/perl -w
 
-use strict;
 use vars < qw($masterpodfile %Build %Targets $Verbose $Up %Ignore
 	    @Master %Readmes %Pods %Aux %Readmepods %Pragmata %Modules
 	    %Copies);
@@ -163,7 +162,7 @@ do {
   }
 
   # None of these filenames will be boolean false
-  @disk_pods = @( glob("*.pod") );
+  @disk_pods = glob("*.pod");
  <  %disk_pods{[ @disk_pods]} = < @disk_pods;
  <
   # Things we copy from won't be in perl.pod
@@ -603,10 +602,10 @@ sub do_nmake {
   die "$0: $name contains discontiguous README copies" if $sections +> 1;
   # Now remove the other copies that follow
   1 while $makefile =~ s/\0\tcopy .*\n/\0/gm;
-  $makefile =~ s/\0+/{join ("", &generate_nmake_1( < @_ ))}/s;
+  $makefile =~ s/\0+/$(join ("", &generate_nmake_1( < @_ )))/s;
 
   $makefile =~ s{(del /f [^\n]+checkpods[^\n]+).*?(pod2html)}
-    {{"$1\n" . &generate_nmake_2( < @_ )."\n\t    $2"}}s;
+    {$("$1\n" . &generate_nmake_2( < @_ )."\n\t    $2")}s;
   $makefile;
 }
 
@@ -623,7 +622,7 @@ sub do_perlpod {
 		    |\s*\n		# blank line
 		   )+
 		  }
-	  {{$1 . join "", &generate_perlpod( < @_ )}}mx) {
+	  {$($1 . join "", &generate_perlpod( < @_ ))}mx) {
     die "$0: Failed to insert amendments in do_perlpod";
   }
   $pod;
@@ -635,7 +634,7 @@ sub do_podmak {
   foreach my $variable (qw(pod man html tex)) {
     die "$0: could not find $variable in $name"
       unless $body =~ s{\n\U$variable\E = (?:[^\n]*\\\n)*[^\n]*}
-	{{"\n" . generate_pod_mak ($variable)}}s;
+	{$("\n" . generate_pod_mak ($variable))}s;
   }
   $body;
 }
@@ -649,7 +648,7 @@ sub do_vms {
   die "$0: $name contains no pod assignments" if $sections +< 1;
   die "$0: $name contains $sections discontigous pod assignments"
     if $sections +> 1;
-  $makefile =~ s/\0+/{join "\n", @( '', < &generate_descrip_mms_1( < @_ ))}/s;
+  $makefile =~ s/\0+/$(join "\n", @( '', < &generate_descrip_mms_1( < @_ )))/s;
 
   die "$0: $name contains NUL bytes" if $makefile =~ m/\0/;
 
@@ -666,7 +665,7 @@ sub do_vms {
   die "$0: $name contains no copy rules" if $sections +< 1;
   die "$0: $name contains $sections discontigous copy rules"
     if $sections +> 1;
-  $makefile =~ s/\0+/{join "\n", @( '', < &generate_descrip_mms_2( < @_ ))}/s;
+  $makefile =~ s/\0+/$(join "\n", @( '', < &generate_descrip_mms_2( < @_ )))/s;
   $makefile;
 }
 
@@ -686,7 +685,7 @@ sub do_unix {
   my @copy_rules = map "\t-\@test -f pod/%Copies{$_} && cd pod && \$(LNS) %Copies{$_} $_ && cd .. && echo \"pod/$_\" >> extra.pods # See buildtoc",
     keys %Copies;
 
-  $makefile_SH =~ s/\0+/{join "\n", @( '', < @copy_rules, '')}/s;
+  $makefile_SH =~ s/\0+/$(join "\n", @( '', < @copy_rules, ''))/s;
   $makefile_SH;
 
 }
@@ -708,10 +707,7 @@ while (my ($target, $name) = each %Targets) {
   my @orig = @( ~< *THING );
   my $orig = join '', @orig;
   close THING;
-  my @new = @( do {
-    no strict 'refs';
-    &{"do_$target"}($target, < @orig);
-  } );
+  my @new = &{"do_$target"}($target, < @orig);
   my $new = join '', @new;
   if ($new eq $orig) {
     print "Was not modified\n" if $Verbose;
