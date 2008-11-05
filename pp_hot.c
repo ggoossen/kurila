@@ -2243,7 +2243,10 @@ PP(pp_entersub)
 	SAVECOMPPAD();
 	PAD_SET_CUR_NOSAVE(padlist, CvDEPTH(cv));
 	if (hasargs) {
-	    AV* av = SvAv(PAD_SVl(PAD_ARGS_INDEX));
+	    AV* av;
+	    SV* avsv = PAD_SVl(PAD_ARGS_INDEX);
+	    sv_upgrade(avsv, SVt_PVAV);
+	    av = SvAv(avsv);
 	    SAVECLEARSV(PAD_SVl(PAD_ARGS_INDEX));
 	    if (AvREAL(av)) {
 		/* @_ is normally not REAL--this should only ever
