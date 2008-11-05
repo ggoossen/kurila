@@ -2,14 +2,11 @@
 
 use Config;
 
-use Test::More tests => 23;
+use Test::More tests => 20;
 
 use Scalar::Util < qw(reftype);
-use vars < qw($t $y $x *F);
+use vars < qw($t $y $x);
 use Symbol < qw(gensym);
-
-# Ensure we do not trigger and tied methods
-tie *F, 'MyTie';
 
 my @test = @(
  \@( undef, 1,		'number'	),
@@ -18,13 +15,12 @@ my @test = @(
  \@( ARRAY  => \@(),	'ARRAY ref'	),
  \@( SCALAR => \$t,	'SCALAR ref'	),
  \@( REF    => \(\$t),	'REF ref'	),
- \@( GLOB   => \*F,	'tied GLOB ref'	),
  \@( GLOB   => gensym,	'GLOB ref'	),
  \@( CODE   => sub {},	'CODE ref'	),
 # \@( IO => *STDIN{IO} ) the internal sv_reftype returns UNKNOWN
 );
 
-foreach my $test (< @test) {
+foreach my $test (@test) {
   my($type,$what, $n) = < @$test;
 
   is( reftype($what), $type, $n);
