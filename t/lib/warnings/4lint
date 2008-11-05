@@ -69,6 +69,7 @@ my $a ; chop $a ;
 EXPECT
 Reversed += operator at abc.pm line 4 character 4.
     (eval) called at - line 2 character 1.
+    BEGIN called at - line 2 character 1.
 Use of uninitialized value $a in scalar chop at - line 3 character 9.
 ########
 -W
@@ -101,6 +102,7 @@ my $a ; chop $a ;
 EXPECT
 Reversed += operator at abc.pm line 4 character 4.
     (eval) called at - line 2 character 1.
+    BEGIN called at - line 2 character 1.
 Use of uninitialized value $a in scalar chop at - line 3 character 9.
 ########
 -W
