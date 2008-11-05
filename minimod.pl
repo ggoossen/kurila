@@ -13,7 +13,6 @@
 
 BEGIN { unshift @INC, "lib" }
 
-use strict;
 
 print <<'END';
 # This File keeps the contents of miniperlmain.c.

@@ -42,9 +42,9 @@ Perl_do_join(pTHX_ register SV *sv, SV *delim, register SV *av)
     if ( ! SvAVOK(av) ) {
 	Perl_croak(aTHX_ "%s expected an ARRAY but got %s", OP_DESC(PL_op), Ddesc(av));
     }
-    items = av_len(SvAV(av)) + 1;
+    items = av_len(SvAv(av)) + 1;
 
-    mark = AvARRAY(SvAV(av));
+    mark = AvARRAY(SvAv(av));
 
     len = (items > 0 ? (delimlen * (items - 1) ) : 0);
     SvUPGRADE(sv, SVt_PV);
@@ -60,7 +60,7 @@ Perl_do_join(pTHX_ register SV *sv, SV *delim, register SV *av)
 	SvGROW(sv, len + 1);		/* so try to pre-extend */
 
 	mark = AvARRAY(av);
-	items = av_len(SvAV(av)) + 1;
+	items = av_len(SvAv(av)) + 1;
     }
 
     sv_setpvn(sv, "", 0);

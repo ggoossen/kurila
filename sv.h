@@ -82,6 +82,7 @@ typedef enum {
     Dt_REF,
     Dt_ARRAY,
     Dt_HASH,
+    Dt_CODE,
     Dt_IO,
     Dt_GLOB,
     Dt_COMPLEX
@@ -710,12 +711,14 @@ Set the actual length of the string which is in the SV.  See C<SvIV_set>.
 
 #define SvAVOK(sv)              (SvTYPE(sv) == SVt_PVAV)
 #define SvHVOK(sv)              (SvTYPE(sv) == SVt_PVHV)
+#define SvCVOK(sv)              (SvTYPE(sv) == SVt_PVCV)
 #define SvIOOK(sv)              (SvTYPE(sv) == SVt_PVIO)
 
 #define SvPVOK(sv)		((SvTYPE(sv) == SVt_BIND)		\
 				 ? (SvFLAGS(SvRV(sv)) & SVf_OK)		\
 				 : (SvFLAGS(sv) & SVf_OK))
-#define SvOK(sv)		(SvAVOK(sv) || SvHVOK(sv) || SvPVOK(sv) || SvIOOK(sv) )
+#define SvOK(sv)		(SvAVOK(sv) || SvHVOK(sv) || SvPVOK(sv) \
+	|| SvIOOK(sv) || SvCVOK(sv) )
 #define SvOK_off(sv)		( SvAVOK(sv) || SvHVOK(sv) ? sv_setsv(sv, NULL) : SvPVOK_off(sv) )
 #define SvPVOK_off(sv)		(assert_not_ROK(sv) assert_not_glob(sv)	\
 				 SvFLAGS(sv) &=	~(SVf_OK|		\
@@ -880,23 +883,14 @@ in gv.h: */
 #define SvPAD_OUR(sv)	\
 	((SvFLAGS(sv) & (SVpad_NAME|SVpad_OUR)) == (SVpad_NAME|SVpad_OUR))
 
-#define SvPAD_STATE(sv)	\
-	((SvFLAGS(sv) & (SVpad_NAME|SVpad_STATE)) == (SVpad_NAME|SVpad_STATE))
-
 #if defined (DEBUGGING) && defined(__GNUC__) && !defined(PERL_GCC_BRACE_GROUPS_FORBIDDEN)
 #define SvPAD_OUR_on(sv)	({					\
 	    SV *const whap = (SV *) (sv);				\
 	    assert(SvTYPE(whap) == SVt_PVMG);				\
 	    (SvFLAGS(whap) |= SVpad_NAME|SVpad_OUR);			\
 	})
-#define SvPAD_STATE_on(sv)	({					\
-	    SV *const whap = (SV *) (sv);				\
-	    assert(SvTYPE(whap) == SVt_PVNV || SvTYPE(whap) == SVt_PVMG); \
-	    (SvFLAGS(whap) |= SVpad_NAME|SVpad_STATE);			\
-	})
 #else
 #  define SvPAD_OUR_on(sv)	(SvFLAGS(sv) |= SVpad_NAME|SVpad_OUR)
-#  define SvPAD_STATE_on(sv)	(SvFLAGS(sv) |= SVpad_NAME|SVpad_STATE)
 #endif
 
 #define SvOURGV(sv) \

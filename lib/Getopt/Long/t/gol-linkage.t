@@ -1,7 +1,5 @@
 #!./perl -w
 
-no strict;
-
 use Getopt::Long;
 
 print "1..32\n";

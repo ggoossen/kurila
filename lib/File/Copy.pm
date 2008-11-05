@@ -7,7 +7,6 @@
 
 package File::Copy;
 
-use strict;
 use warnings;
 use File::Spec;
 use Config;
@@ -82,8 +81,9 @@ sub copy {
         return 1;
     }
 
-    if (((%Config{d_symlink} && %Config{d_readlink}) || %Config{d_link}) &&
-	!($^O eq 'MSWin32' || $^O eq 'os2')) {
+    if (( (config_value("d_symlink") && config_value("d_readlink"))
+            || config_value("d_link"))
+          && !($^O eq 'MSWin32' || $^O eq 'os2')) {
 	my @fs = @( stat($from) );
 	if ((nelems @fs)) {
 	    my @ts = @( stat($to) );

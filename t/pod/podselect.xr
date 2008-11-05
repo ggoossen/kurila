@@ -1,4 +1,4 @@
-###### begin =include podselect.PL #####
+###### begin =include podselect.pl #####
 NAME
     podselect - print selected sections of pod documentation on standard
     output
@@ -41,4 +41,4 @@ AUTHOR
     Based on code for Pod::Text::pod2text(1) written by Tom Christiansen
     <tchrist@mox.perl.com>
 
-###### end =include podselect.PL #####
+###### end =include podselect.pl #####

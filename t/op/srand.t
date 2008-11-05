@@ -2,8 +2,6 @@
 
 # Test srand.
 
-use strict;
-
 require "./test.pl";
 plan(tests => 4);
 

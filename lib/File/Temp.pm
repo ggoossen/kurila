@@ -138,7 +138,6 @@ Filehandles returned by these functions support the seekable methods.
 
 # 5.6.0 gives us S_IWOTH, S_IWGRP, our and auto-vivifying filehandls
 # People would like a version on 5.004 so give them what they want :-)
-use strict;
 use Carp;
 use File::Spec v0.8;
 use File::Path < qw/ rmtree /;
@@ -233,7 +232,6 @@ my $LOCKFLAG;
 unless ($^O eq 'MacOS') {
   for my $oflag (qw/ NOFOLLOW BINARY LARGEFILE NOINHERIT /) {
     my ($bit, $func) = (0, "Fcntl::O_" . $oflag);
-    no strict 'refs';
     $OPENFLAGS ^|^= $bit if try {
       # Make sure that redefined die handlers do not cause problems
       # e.g. CGI::Carp
@@ -262,7 +260,6 @@ unless ($^O eq 'MacOS') {
   for my $oflag (qw/ TEMPORARY /) {
     my ($bit, $func) = (0, "Fcntl::O_" . $oflag);
     local($@);
-    no strict 'refs';
     $OPENTEMPFLAGS ^|^= $bit if try {
       # Make sure that redefined die handlers do not cause problems
       # e.g. CGI::Carp
@@ -2342,7 +2339,7 @@ security enhancements.
 package File::Temp::Dir;
 
 use File::Path < qw/ rmtree /;
-use strict;
+
 
 # private class specifically to support tempdir objects
 # created by File::Temp->newdir

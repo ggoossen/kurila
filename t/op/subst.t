@@ -502,7 +502,6 @@ do { # [perl #27940] perlbug: [\x00-\x1f] works, [\c@-\c_] does not
 do {
     $_ = "xy";
     no warnings 'uninitialized';
-    no strict 'refs';
     m/(((((((((x)))))))))(z)/;	# clear $10
     s/(((((((((x)))))))))(y)/${*{Symbol::fetch_glob(10)}}/;
     is($_,"y","RT#6006: \$_ eq '$_'");

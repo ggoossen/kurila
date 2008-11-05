@@ -31,7 +31,6 @@ Symbol - manipulate Perl symbols and their names
     print qualify(\*x), "\n";              # returns \*x
     print qualify(\*x, "FOO"), "\n";       # returns \*x
 
-    use strict refs;
     print { qualify_to_ref $fh } "foo!\n";
     $ref = qualify_to_ref $name, $pkg;
 
@@ -92,7 +91,6 @@ you reload the C<Foo> module afterwards.
 
 =cut
 
-use strict;
 
 require Exporter;
 our @ISA = qw(Exporter);
@@ -113,7 +111,6 @@ my %global = %( < map {$_ => 1} qw(ARGV ARGVOUT ENV INC SIG STDERR STDIN STDOUT)
 #
 sub gensym () {
     my $name = "GEN" . $genseq++;
-    no strict 'refs';
     my $ref = \*{Symbol::qualify_to_ref($genpkg . "::" . $name)};
     $ref = \*{Symbol::qualify_to_ref($genpkg . "::" . $name)};  # second time to supress only-used once warning.
     delete %{Symbol::stash($genpkg)}{$name};

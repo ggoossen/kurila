@@ -10,7 +10,6 @@ BEGIN {
     }
 }
 
-use strict;
 use Config;
 
 use Test::More;
@@ -53,7 +52,6 @@ ok( !-r $Makefile, "PREREQ_PRINT produces no $Makefile" );
 is( $?, 0,         '  exited normally' );
 do {
     package _Prereq::Print;
-    no strict;
     my $PREREQ_PM = undef;  # shut up "used only once" warning.
     eval $prereq_out;
     die if $@;

@@ -4,13 +4,6 @@ $|=1;
 
 use Config;
 
-BEGIN {
-    if (%Config{'extensions'} !~ m/\bOpcode\b/ && %Config{'osname'} ne 'VMS') {
-        print "1..0\n";
-        exit 0;
-    }
-}
-
 use Test::More;
 
 use Opcode < qw(
@@ -19,7 +12,6 @@ use Opcode < qw(
 	opmask_add full_opset empty_opset define_optag
 );
 
-use strict;
 
 plan tests => 16;
 

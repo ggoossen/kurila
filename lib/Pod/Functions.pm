@@ -1,5 +1,5 @@
 package Pod::Functions;
-use strict;
+
 
 =head1 NAME
 

@@ -7,11 +7,10 @@ BEGIN {
     unless ($haspw) { print "1..0 # Skip: no getpwuid\n"; exit 0 }
     use Config;
     # VMS's pwd.h struct passwd conflicts with the one in vmsish.h
-    $haspw = 0 unless ( %Config{'i_pwd'} eq 'define' || $^O eq 'VMS' );
+    $haspw = 0 unless ( config_value('i_pwd') eq 'define' || $^O eq 'VMS' );
     unless ($haspw) { print "1..0 # Skip: no pwd.h\n"; exit 0 }
 }
 
-use strict;
 our ($uid, @pwent);
 
 BEGIN {

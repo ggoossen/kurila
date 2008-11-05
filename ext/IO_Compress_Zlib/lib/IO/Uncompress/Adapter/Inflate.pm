@@ -1,6 +1,5 @@
 package IO::Uncompress::Adapter::Inflate;
 
-use strict;
 use warnings;
 use bytes;
 

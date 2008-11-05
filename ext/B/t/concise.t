@@ -1,15 +1,9 @@
 #!./perl
 
 BEGIN {
-    require Config;
-    if ((%Config::Config{'extensions'} !~ m/\bB\b/) ){
-        print "1..0 # Skip -- Perl configured without B module\n";
-        exit 0;
-    }
     require './test.pl';		# we use runperl from 'test.pl', so can't use Test::More
 }
 
-use strict;
 
 plan tests => 151;
 
@@ -75,7 +69,7 @@ is ($@, '', "walk_output() accepts obj that can print");
 # test that walk_output accepts a HANDLE arg
 SKIP: do {
     skip("no perlio in this build", 4)
-        unless %Config::Config{useperlio};
+        unless Config::config_value("useperlio");
 
     foreach my $foo (@(\*STDOUT, \*STDERR)) {
 	try {  walk_output($foo) };
@@ -134,7 +128,7 @@ sub render {
 SKIP: do {
     # tests output to GLOB, using perlio feature directly
     skip "no perlio on this build", 127
-	unless %Config::Config{useperlio};
+	unless Config::config_value("useperlio");
     
     set_style_standard('concise');  # MUST CALL before output needed
     
@@ -203,7 +197,6 @@ SKIP: do {
 	    our $AUTOLOAD = 'garbage';
 	    sub AUTOLOAD { print "# in AUTOLOAD body: $AUTOLOAD\n" }
 	};
-        no strict 'subs';
 	($res,$err) = < render('-basic', 'Bar::auto_func');
 	like ($res, qr/unknown function \(Bar::auto_func\)/,
 	      "Bar::auto_func seen as unknown function");
@@ -213,7 +206,6 @@ SKIP: do {
 
     };
     do {
-        no strict 'subs';
         ($res,$err) = < render('-basic', 'Foo::bar');
         like ($res, qr/unknown function \(Foo::bar\)/,
               "BC::compile detects fn-name as unknown function");

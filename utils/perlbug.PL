@@ -64,11 +64,11 @@ print "Extracting $file (with variable substitutions)\n";
 my $extract_version = sprintf("\%vd", $^V);
 
 print OUT <<"!GROK!THIS!";
-%Config{startperl}
-    eval 'exec %Config{perlpath} -S \$0 \$\{1+"\$@"\}'
+$(config_value("startperl"))
+    eval 'exec $(config_value("perlpath")) -S \$0 \$\{1+"\$@"\}'
 	if \$running_under_some_shell;
 
-my \$config_tag1 = '$extract_version - %Config{cf_time}';
+my \$config_tag1 = '$extract_version - $(config_value("cf_time"))';
 
 my \$patchlevel_date = $patchlevel_date;
 my \$patch_tags = '$patch_tags';
@@ -155,7 +155,7 @@ my( $file, $usefile, $cc, $address, $bugaddress, $testaddress, $thanksaddress,
 
 my $perl_version = $^V ? sprintf("%vd", $^V) : $];
 
-my $config_tag2 = "$perl_version - $Config{cf_time}";
+my $config_tag2 = "$perl_version - $(config_value('cf_time'))";
 
 Init();
 
@@ -736,7 +736,7 @@ Environment for perl $perl_version:
 EOF
     my @env =
         qw(PATH LD_LIBRARY_PATH LANG PERL_BADLANG SHELL HOME LOGDIR LANGUAGE);
-    push @env, $Config{ldlibpthname} if $Config{ldlibpthname} ne '';
+    push @env, config_value("ldlibpthname') if config_value("ldlibpthname") ne '';
     push @env, grep /^(?:PERL|LC_|LANG|CYGWIN)/, keys %ENV;
     my %env;
     @env{@env} = @env;
@@ -1381,5 +1381,5 @@ None known (guess what must have been used to report them?)
 
 close OUT or die "Can't close $file: $!";
 chmod 0755, $file or die "Can't reset permissions for $file: $!\n";
-exec("%Config{'eunicefix'} $file") if %Config{'eunicefix'} ne ':';
+exec("$(config_value('eunicefix')) $file") if config_value('eunicefix') ne ':';
 chdir $origdir;

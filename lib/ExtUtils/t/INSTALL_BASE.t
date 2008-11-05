@@ -12,7 +12,6 @@ BEGIN {
     }
 }
 
-use strict;
 use File::Path;
 use Config;
 
@@ -58,8 +57,8 @@ my @installed_files =
   @('../dummy-install/lib/perl5/Big/Dummy.pm',
    '../dummy-install/lib/perl5/Big/Liar.pm',
    '../dummy-install/bin/program',
-   "../dummy-install/lib/perl5/%Config{archname}/perllocal.pod",
-   "../dummy-install/lib/perl5/%Config{archname}/auto/Big/Dummy/.packlist"
+   "../dummy-install/lib/perl5/$(config_value('archname'))/perllocal.pod",
+   "../dummy-install/lib/perl5/$(config_value('archname'))/auto/Big/Dummy/.packlist"
   );
 
 foreach my $file ( @installed_files) {

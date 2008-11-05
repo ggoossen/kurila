@@ -1,6 +1,6 @@
 
 package Pod::Perldoc::ToChecker;
-use strict;
+
 use warnings;
 use vars < qw(@ISA);
 

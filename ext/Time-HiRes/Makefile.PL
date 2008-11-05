@@ -8,7 +8,7 @@
 
 use Config;
 use ExtUtils::MakeMaker;
-use strict;
+
 
 my $VERBOSE = %ENV{VERBOSE};
 my $DEFINE;
@@ -21,8 +21,8 @@ use vars < qw($self); # Used in 'sourcing' the hints.
 # TBD: Can we just use $Config(exe_ext) here instead of this complex
 #      expression?
 my $ld_exeext = ($^O eq 'cygwin' ||
-                 $^O eq 'os2' && %Config{ldflags} =~ m/-Zexe\b/) ? '.exe' :
-                (($^O eq 'vos') ? %Config{exe_ext} : '');
+                 $^O eq 'os2' && config_value("ldflags") =~ m/-Zexe\b/) ? '.exe' :
+                (($^O eq 'vos') ? config_value("exe_ext") : '');
 
 unless(%ENV{PERL_CORE}) {
     %ENV{PERL_CORE} = 1 if grep { $_ eq 'PERL_CORE=1' } @ARGV;
@@ -45,7 +45,7 @@ sub try_compile_and_link {
     my ($tmp) = "tmp$$";
     local(*TMPC);
 
-    my $obj_ext = %Config{obj_ext} || ".o";
+    my $obj_ext = config_value("obj_ext") || ".o";
     unlink("$tmp.c", "$tmp$obj_ext");
 
     if (open(TMPC, ">", "$tmp.c")) {
@@ -62,7 +62,7 @@ sub try_compile_and_link {
 	    my $updir = File::Spec->updir;
 	    $COREincdir = File::Spec->catdir(($updir) x 2);
 	} else {
-	    $COREincdir = File::Spec->catdir(%Config{'archlibexp'}, 'CORE');
+	    $COREincdir = File::Spec->catdir(config_value('archlibexp'), 'CORE');
 	}
 
 	if (%ENV{PERL_CORE}) {
@@ -75,17 +75,17 @@ __EOD__
             }
         }
 
-	my $ccflags = %Config{'ccflags'} . ' ' . "-I$COREincdir";
+	my $ccflags = config_value('ccflags') . ' ' . "-I$COREincdir";
 
 	if ($^O eq 'VMS') {
 	    if (%ENV{PERL_CORE}) {
 		# Fragile if the extensions change hierarchy within
 		# the Perl core but this should do for now.
-                $cccmd = "%Config{'cc'} /include=([---]) $tmp.c";
+                $cccmd = "$(config_value('cc')) /include=([---]) $tmp.c";
 	    } else {
-		my $perl_core = %Config{'installarchlib'};
+		my $perl_core = config_value('installarchlib');
 		$perl_core =~ s/\]$/.CORE]/;
-                $cccmd = "%Config{'cc'} /include=(perl_root:[000000],$perl_core) $tmp.c";
+                $cccmd = "$(config_value('cc')) /include=(perl_root:[000000],$perl_core) $tmp.c";
 	    }
         }
 
@@ -95,7 +95,7 @@ __EOD__
 	    $errornull = '';
 	}
 
-        $cccmd = "%Config{'cc'} -o $tmp $ccflags $tmp.c $(join ' ',@$LIBS) $errornull"
+        $cccmd = "$(config_value('cc')) -o $tmp $ccflags $tmp.c $(join ' ',@$LIBS) $errornull"
 	    unless defined $cccmd;
 
        if ($^O eq 'VMS') {
@@ -106,7 +106,8 @@ __EOD__
 	    close CMDFILE;
 	    system("\@ $tmp.com");
 	    $ok = $?==0;
-	    for (@("$tmp.c", "$tmp$obj_ext", "$tmp.com", "$tmp%Config{exe_ext}")) {
+	    for (@: "$tmp.c", "$tmp$obj_ext", "$tmp.com",
+                 $tmp . config_value('exe_ext')) {
 		1 while unlink $_;
 	    }
         }
@@ -159,7 +160,7 @@ EOH
 
 sub has_gettimeofday {
     # confusing but true (if condition true ==> -DHAS_GETTIMEOFDAY already)
-    return 0 if %Config{d_gettimeod};
+    return 0 if config_value("d_gettimeod");
     return 1 if try_compile_and_link(<<EOM);
 $TIME_HEADERS
 static int foo()
@@ -341,7 +342,7 @@ sub init {
 
     $DEFINE = '';
 
-    if (%Config{d_syscall}) {
+    if (config_value("d_syscall")) {
 	print "Have syscall()... looking for syscall.h... ";
 	if (has_include('syscall.h')) {
 	    $SYSCALL_H = 'syscall.h';
@@ -352,7 +353,7 @@ sub init {
 	print "No syscall()...\n";
     }
 
-    if (%Config{d_syscall}) {
+    if (config_value("d_syscall")) {
 	if (defined $SYSCALL_H) {
 	    print "found <$SYSCALL_H>.\n";
 	} else {
@@ -362,8 +363,8 @@ sub init {
 
     print "Looking for gettimeofday()... ";
     my $has_gettimeofday;
-    if (exists %Config{d_gettimeod}) {
-	$has_gettimeofday++ if %Config{d_gettimeod};
+    if (defined config_value("d_gettimeod")) {
+	$has_gettimeofday++ if config_value("d_gettimeod");
     } elsif (has_gettimeofday()) {
 	$DEFINE .= ' -DHAS_GETTIMEOFDAY';
 	$has_gettimeofday++;
@@ -387,8 +388,8 @@ EOD
 
     print "Looking for setitimer()... ";
     my $has_setitimer;
-    if (exists %Config{d_setitimer}) {
-        $has_setitimer++ if %Config{d_setitimer};
+    if (defined config_value("d_setitimer")) {
+        $has_setitimer++ if config_value("d_setitimer");
     } elsif (has_x("setitimer(ITIMER_REAL, 0, 0)")) {
         $has_setitimer++;
         $DEFINE .= ' -DHAS_SETITIMER';
@@ -402,8 +403,8 @@ EOD
 
     print "Looking for getitimer()... ";
     my $has_getitimer;
-    if (exists %Config{'d_getitimer'}) {
-        $has_getitimer++ if %Config{'d_getitimer'};
+    if (defined config_value('d_getitimer')) {
+        $has_getitimer++ if config_value('d_getitimer');
     } elsif (has_x("getitimer(ITIMER_REAL, 0)")) {
         $has_getitimer++;
         $DEFINE .= ' -DHAS_GETITIMER';
@@ -423,8 +424,8 @@ EOD
 
     print "Looking for ualarm()... ";
     my $has_ualarm;
-    if (exists %Config{d_ualarm}) {
-        $has_ualarm++ if %Config{d_ualarm};
+    if (defined config_value("d_ualarm")) {
+        $has_ualarm++ if config_value("d_ualarm");
     } elsif (has_x ("ualarm (0, 0)")) {
         $has_ualarm++;
 	$DEFINE .= ' -DHAS_UALARM';
@@ -442,8 +443,8 @@ EOD
 
     print "Looking for usleep()... ";
     my $has_usleep;
-    if (exists %Config{d_usleep}) {
-	$has_usleep++ if %Config{d_usleep};
+    if (defined config_value("d_usleep")) {
+	$has_usleep++ if config_value("d_usleep");
     } elsif (has_x ("usleep (0)")) {
 	$has_usleep++;
 	$DEFINE .= ' -DHAS_USLEEP';
@@ -454,7 +455,7 @@ EOD
     } else {
 	print "NOT found.\n";
         print "Let's see if you have select()... ";
-        if (%Config{'d_select'}) {
+        if (config_value('d_select')) {
 	    print "found.\n";
 	    print "We can make a Time::HiRes::usleep().\n";
 	} else {
@@ -472,9 +473,9 @@ EOD
 	    $DEFINE .= ' -DTIME_HIRES_NANOSLEEP';
 	}
     }
-    elsif (exists %Config{d_nanosleep}) {
+    elsif (defined config_value("d_nanosleep")) {
 	print "believing \$Config\{d_nanosleep\}... ";
-	if (%Config{d_nanosleep}) {
+	if (config_value("d_nanosleep")) {
 	    $has_nanosleep++;
 	    $DEFINE .= ' -DTIME_HIRES_NANOSLEEP';
 	}
@@ -501,8 +502,8 @@ EOD
 
     print "Looking for clock_gettime()... ";
     my $has_clock_gettime;
-    if (exists %Config{d_clock_gettime}) {
-        $has_clock_gettime++ if %Config{d_clock_gettime}; # Unlikely...
+    if (defined config_value("d_clock_gettime")) {
+        $has_clock_gettime++ if config_value("d_clock_gettime"); # Unlikely...
     } elsif (has_clock_xxx('gettime')) {
         $has_clock_gettime++;
 	$DEFINE .= ' -DTIME_HIRES_CLOCK_GETTIME';
@@ -523,8 +524,8 @@ EOD
 
     print "Looking for clock_getres()... ";
     my $has_clock_getres;
-    if (exists %Config{d_clock_getres}) {
-        $has_clock_getres++ if %Config{d_clock_getres}; # Unlikely...
+    if (defined config_value("d_clock_getres")) {
+        $has_clock_getres++ if config_value("d_clock_getres"); # Unlikely...
     } elsif (has_clock_xxx('getres')) {
         $has_clock_getres++;
 	$DEFINE .= ' -DTIME_HIRES_CLOCK_GETRES';
@@ -545,8 +546,8 @@ EOD
 
     print "Looking for clock_nanosleep()... ";
     my $has_clock_nanosleep;
-    if (exists %Config{d_clock_nanosleep}) {
-        $has_clock_nanosleep++ if %Config{d_clock_nanosleep}; # Unlikely...
+    if (defined config_value("d_clock_nanosleep")) {
+        $has_clock_nanosleep++ if config_value("d_clock_nanosleep"); # Unlikely...
     } elsif (has_clock_nanosleep()) {
         $has_clock_nanosleep++;
 	$DEFINE .= ' -DTIME_HIRES_CLOCK_NANOSLEEP';
@@ -560,8 +561,8 @@ EOD
 
     print "Looking for clock()... ";
     my $has_clock;
-    if (exists %Config{d_clock}) {
-        $has_clock++ if %Config{d_clock}; # Unlikely...
+    if (defined config_value("d_clock")) {
+        $has_clock++ if config_value("d_clock"); # Unlikely...
     } elsif (has_clock()) {
         $has_clock++;
 	$DEFINE .= ' -DTIME_HIRES_CLOCK';
@@ -790,7 +791,7 @@ sub main {
     }
     doMakefile;
     doConstants;
-    my $make = %Config{'make'} || "make";
+    my $make = config_value('make') || "make";
     unless (exists %ENV{PERL_CORE} && %ENV{PERL_CORE}) {
 	print  <<EOM;
 Now you may issue '$make'.  Do not forget also '$make test'.

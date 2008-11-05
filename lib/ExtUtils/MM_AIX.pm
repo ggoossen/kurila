@@ -1,6 +1,5 @@
 package ExtUtils::MM_AIX;
 
-use strict;
 our $VERSION = '6.44';
 
 require ExtUtils::MM_Unix;

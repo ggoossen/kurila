@@ -3,7 +3,7 @@
 # test for $Data::Dumper::Pair AKA Data::Dumper->new([ ... ])->Pair('...')
 #
 
-use strict;
+
 use vars < qw($want_colon $want_comma);
 use Test::More tests => 9;
 

@@ -1,6 +1,5 @@
 package XS::APItest;
 
-use strict;
 use warnings;
 use Carp;
 

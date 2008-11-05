@@ -293,7 +293,6 @@ PERLVAR(Idbargs,	AV *)		/* args to call listed by caller function */
 PERLVAR(Idebstash,	HV *)		/* symbol table for perldb package */
 PERLVAR(Iglobalstash,	HV *)		/* global keyword overrides imported here */
 PERLVAR(Icurstname,	SV *)		/* name of current package */
-PERLVAR(Ibeginav,	AV *)		/* names of BEGIN subroutines */
 PERLVAR(Iendav,		AV *)		/* names of END subroutines */
 PERLVAR(Iunitcheckav,	AV *)		/* names of UNITCHECK subroutines */
 PERLVAR(Icheckav,	AV *)		/* names of CHECK subroutines */
@@ -513,7 +512,6 @@ PERLVAR(IProc,		struct IPerlProc*)
 #endif
 
 PERLVAR(Iptr_table,	PTR_TBL_t*)
-PERLVARI(Ibeginav_save, AV*, NULL)	/* save BEGIN{}s when compiling */
 
 PERLVAR(Ibody_arenas, void*) /* pointer to list of body-arenas */
 
@@ -529,16 +527,6 @@ PERLVARI(Irehash_seed_set, bool, FALSE)	/* 582 hash initialized? */
 
 PERLVAR(Inumeric_radix_sv,	SV *)	/* The radix separator if not '.' */
 
-#endif
-
-#if defined(USE_ITHREADS)
-PERLVAR(Iregex_pad,     SV**)		/* Shortcut into the array of
-					   regex_padav */
-PERLVAR(Iregex_padav,   AV*)		/* All regex objects, indexed via the
-					   values in op_pmoffset of pmop.
-					   Entry 0 is an SV whose PV is a
-					   "packed" list of IVs listing
-					   the now-free slots in the array */
 #endif
 
 #ifdef USE_REENTRANT_API
@@ -573,9 +561,6 @@ PERLVAR(Iutf8_idstart,	SV *)
 PERLVAR(Iutf8_idcont,	SV *)
 
 PERLVAR(Isort_RealCmp,  SVCOMPARE_t)
-
-PERLVARI(Icheckav_save, AV*, NULL)	/* save CHECK{}s when compiling */
-PERLVARI(Iunitcheckav_save, AV*, NULL)	/* save UNITCHECK{}s when compiling */
 
 PERLVARI(Iclocktick, long, 0)	/* this many times() ticks in a second */
 

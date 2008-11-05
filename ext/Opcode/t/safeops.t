@@ -8,13 +8,7 @@ BEGIN {
     }
 }
 use Config;
-BEGIN {
-    if (%Config{'extensions'} !~ m/\bOpcode\b/ && %Config{'osname'} ne 'VMS') {
-        print "1..0\n"; exit 0;
-    }
-}
 
-use strict;
 use Test::More;
 use Safe;
 
@@ -366,7 +360,7 @@ msgrcv		msgrcv
 semget		semget
 semctl		semctl
 semop		semop
-require		use strict
+require		use error
 dofile		do 'file'
 entereval	eval "1+1"
 leaveeval	eval "1+1"

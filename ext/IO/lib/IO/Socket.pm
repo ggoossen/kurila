@@ -10,7 +10,7 @@ package IO::Socket;
 use IO::Handle;
 use Socket v1.3;
 use Carp;
-use strict;
+
 our(@ISA, $VERSION, @EXPORT_OK);
 use Exporter;
 use Errno;

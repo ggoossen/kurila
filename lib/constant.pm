@@ -1,5 +1,5 @@
 package constant;
-use strict;
+
 use warnings::register;
 
 use vars < qw($VERSION %declared);

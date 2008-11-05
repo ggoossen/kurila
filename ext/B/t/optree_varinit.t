@@ -8,17 +8,13 @@ BEGIN {
 	push @INC, "../../t";
     }
     require Config;
-    if ((%Config::Config{'extensions'} !~ m/\bB\b/) ){
-        print "1..0 # Skip -- Perl configured without B module\n";
-        exit 0;
-    }
     # require 'test.pl'; # now done by OptreeCheck
 }
 use OptreeCheck;
 use Config;
 plan tests	=> 17;
 SKIP: do {
-skip "no perlio in this build", 22 unless %Config::Config{useperlio};
+skip "no perlio in this build", 22 unless Config::config_value("useperlio");
 
 pass("OPTIMIZER TESTS - VAR INITIALIZATION");
 

@@ -1,4 +1,4 @@
-use strict;
+
 use warnings;
 
 use ExtUtils::MakeMaker ;
@@ -6,7 +6,7 @@ use ExtUtils::Constant < qw(WriteConstants);
 use Config ;
 
 # OS2 is a special case, so check for it now.
-my $OS2 = "-DOS2" if %Config{'osname'} eq 'os2' ;
+my $OS2 = "-DOS2" if config_value('osname') eq 'os2' ;
 
 my $LIB = "-ldb" ;
 # so is win32

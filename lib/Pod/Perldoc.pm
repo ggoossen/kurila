@@ -1,8 +1,8 @@
 
 package Pod::Perldoc;
-use strict;
+
 use warnings;
-use Config '%Config';
+use Config 'config_value';
 
 use Fcntl;    # for sysopen
 use File::Spec::Functions < qw(catfile catdir splitdir);
@@ -48,11 +48,12 @@ $Temp_File_Lifetime ||= 60 * 60 * 24 * 5;
 
 
 #..........................................................................
-do { my $pager = %Config{'pager'};
+do { my $pager = config_value('pager');
   push @Pagers, $pager if -x (split m/\s+/, $pager)[0] or IS_VMS;
 };
-$Bindir  = %Config{'scriptdirexp'};
-$Pod2man = "pod2man" . ( %Config{'versiononly'} ? %Config{'version'} : '' );
+$Bindir  = config_value('scriptdirexp');
+$Pod2man = "pod2man" .
+  ( config_value('versiononly') ? config_value('version') : '' );
 
 # End of class-init stuff
 #
@@ -61,8 +62,7 @@ $Pod2man = "pod2man" . ( %Config{'versiononly'} ? %Config{'version'} : '' );
 # Option accessors...
 
 foreach my $subname ( map "opt_$_", split '', q{mhlvriFfXqnTdUL}) {
-  no strict 'refs';
-  *{Symbol::fetch_glob($subname)} = do{ use strict 'refs';  sub () { shift->_elem($subname, < @_) } };
+  *{Symbol::fetch_glob($subname)} = do{   sub () { shift->_elem($subname, < @_) } };
 }
 
 # And these are so that GetOptsOO knows they take options:
@@ -258,7 +258,7 @@ Options:
     -M FormatterModuleNameToUse
     -w formatter_option:option_value
     -L translation_code   Choose doc translation (if any)
-    -X   use index if present (looks for pod.idx at %Config{archlib})
+    -X   use index if present (looks for pod.idx at $(config_value('archlib')))
     -q   Search the text of questions (not answers) in perlfaq[1-9]
 
 PageName|ModuleName...
@@ -629,7 +629,7 @@ sub options_processing {
     my $self = shift;
     
     if ($self->opt_X) {
-        my $podidx = "%Config{'archlib'}/pod.idx";
+        my $podidx = config_value('archlib') . "/pod.idx";
         $podidx = "" unless -f $podidx && -r _ && -M _ +<= 7;
         $self->{'podidx'} = $podidx;
     }
@@ -724,7 +724,7 @@ sub grand_search_init {
                 push(@searchdirs,'perl_root:[lib.pod]')  # installed pods
             }
             else {
-                push(@searchdirs, < grep(-d, split(%Config{path_sep},
+                push(@searchdirs, < grep(-d, split(config_value("path_sep"),
                                                  %ENV{'PATH'})));
             }
         }

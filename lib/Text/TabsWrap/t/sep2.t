@@ -1,6 +1,6 @@
 #!/usr/bin/perl -I.
 
-use strict;
+
 
 my @tests =split(m/\nEND\n/s, <<DONE);
 TEST1
@@ -107,7 +107,6 @@ plan tests => 1 +nelems @tests;
 use Text::Wrap;
 $Text::Wrap::separator2 = '=';
 
-use strict;
 my $rerun = %ENV{'PERL_DL_NONLAZY'} ? 0 : 1;
 
 my @st = @tests;

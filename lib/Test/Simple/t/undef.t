@@ -10,7 +10,6 @@ BEGIN {
     }
 }
 
-use strict;
 use Test::More tests => 18;
 
 BEGIN { $^W = 1; }

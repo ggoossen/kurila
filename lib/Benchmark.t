@@ -1,7 +1,7 @@
 #!./perl -w
 
 use warnings;
-use strict;
+
 use vars < qw($foo $bar $baz $ballast);
 use Test::More tests => 192;
 

@@ -1,6 +1,5 @@
 package TestModule;
 
-use strict;
 require Exporter;
 use vars < qw(@EXPORT @EXPORT_OK @ISA);
 

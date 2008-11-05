@@ -3,7 +3,6 @@
 use Test;
 use File::Spec;
 #use utf8;
-use strict;
 #use Pod::Simple::Debug (10);
 
 BEGIN { plan tests => 6 }

@@ -8,7 +8,6 @@ use Config;
 use File::Path;
 use File::Spec::Functions;
 
-use strict;
 use warnings;
 our $pragma_name;
 
@@ -202,9 +201,10 @@ for ( @prgs){
     }
     print $out_file $src, "\n########\n" if $got_files;
  
-    print_err_line( $switch, $prog, $expected, $results, $todo, $file ) unless $ok;
-
     our $TODO = $todo ? $todo_reason : 0;
+
+    print_err_line( $switch, $prog, $expected, $results, $todo, $file ) unless $ok or $TODO;
+
     ok($ok);
 
     foreach ( @temps)

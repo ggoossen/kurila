@@ -22,7 +22,7 @@ package MY;
 
 BEGIN {
     use Config;
-    unless (defined %Config{usedl}) {
+    unless (defined config_value("usedl")) {
 	eval <<'__EOMM__';
 sub xs_c {
     my($self) = shift;

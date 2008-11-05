@@ -12,7 +12,6 @@ BEGIN {
     require './test.pl';	# for which_perl() etc
 }
 
-use strict;
 
 my $Perl = which_perl();
 
@@ -111,14 +110,6 @@ push(@a, 1, 2, 3,)
 ########
 quotemeta ""
 ########
-package FOO;sub new {bless \%(FOO => 'BAR')};
-package main;
-use strict 'vars';   
-my $self = FOO->new();
-print %$self{FOO};
-EXPECT
-BAR
-########
 $_="foo";
 s/.{1}//s;
 print;
@@ -128,17 +119,17 @@ oo
 BEGIN { die "phooey" }
 EXPECT
 phooey at - line 1 character 9.
-BEGIN failed--compilation aborted
+    BEGIN called at - line 1 character 1.
 ########
 BEGIN { 1/0 }
 EXPECT
 Illegal division by zero at - line 1 character 10.
-BEGIN failed--compilation aborted
+    BEGIN called at - line 1 character 1.
 ########
 BEGIN { undef = 0 }
 EXPECT
 Modification of a read-only value attempted at - line 1 character 14.
-BEGIN failed--compilation aborted
+    BEGIN called at - line 1 character 1.
 ########
 my @a; @a[2] = 1; for (@a) { $_ = 2 } print join(' ', @a) . "\n"
 EXPECT
@@ -234,7 +225,6 @@ EXPECT
 destroyed
 ########
 # TODO
-no strict "refs";
 package X;
 sub any { bless \%() }
 my $f = "FH000"; # just to thwart any future optimisations
@@ -272,14 +262,12 @@ sub re {
 }
 EXPECT
 ########
-use strict;
 my $foo = "ZZZ\n";
 END { print $foo }
 EXPECT
 ZZZ
 ########
 eval '
-use strict;
 my $foo = "ZZZ\n";
 END { print $foo }
 ';
@@ -429,23 +417,3 @@ ok 1
 ######## [ID 20020623.009] nested eval/sub segfaults
 our $eval = eval 'sub { eval q|sub { %S }| }';
 $eval->(\%());
-######## "Segfault using HTML::Entities", Richard Jolly <richardjolly@mac.com>, <A3C7D27E-C9F4-11D8-B294-003065AE00B6@mac.com> in perl-unicode@perl.org
--lw
-# SKIP: use Config; %ENV{PERL_CORE_MINITEST} or " %Config::Config{'extensions'} " !~ m[ Encode ] # Perl configured without Encode module
-BEGIN {
-  eval 'require Encode';
-  if ($@) { exit 0 } # running minitest?
-}
-# Test case cut down by jhi
-use Carp;
-$^WARN_HOOK = sub { $@ = shift };
-use Encode;
-use utf8;
-my $t = "\x[E9]";
-$t =~ s/([^a])/{''}/g;
-$@ =~ s/ at .*/ at/;
-print $@;
-print "Good" if $t eq "\x[E9]";
-EXPECT
-
-Good

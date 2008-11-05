@@ -8,8 +8,6 @@ BEGIN {
     require './test.pl';
 }
 
-use strict;
-
 my $null;
 
 $! = 1;

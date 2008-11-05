@@ -2,7 +2,7 @@
 
 # Test the private _can_write_dir() function.
 
-use strict;
+
 use ExtUtils::Install;
 use File::Spec;
 do { package FS;  our @ISA = qw(File::Spec); };

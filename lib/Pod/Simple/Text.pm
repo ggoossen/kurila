@@ -1,7 +1,6 @@
 
 package Pod::Simple::Text;
 
-use strict;
 use utf8;
 
 use Carp ();

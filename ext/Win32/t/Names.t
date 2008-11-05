@@ -1,4 +1,3 @@
-use strict;
 BEGIN {
     eval "use Test::More";
     return unless $@;

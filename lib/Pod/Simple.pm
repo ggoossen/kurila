@@ -1,6 +1,6 @@
 
 package Pod::Simple;
-use strict;
+
 BEGIN           { *DEBUG = sub () {0} unless defined &DEBUG }
 use integer;
 use Pod::Escapes v1.03 ();
@@ -1391,11 +1391,10 @@ sub _change_S_to_nbsp { #  a recursive function
 #-----------------------------------------------------------------------------
 
 sub _accessorize {  # A simple-minded method-maker
-  no strict 'refs';
   foreach my $attrname ( @_) {
     next if $attrname =~ m/::/; # a hack
     *{Symbol::fetch_glob(caller() . '::' . $attrname)} = sub {
-      use strict;
+      
       die "Accessor usage: \$obj->$attrname() or \$obj->$attrname(\$new_value)"
         unless ((nelems @_) == 1 or (nelems @_) == 2) and ref @_[0];
       ((nelems @_) == 1) ?  @_[0]->{$attrname}

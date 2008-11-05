@@ -6,10 +6,10 @@ use Config;
 
 my $TEST_COUNT = 11;
 
-if (%Config{'d_sem'} ne 'define') {
+if (config_value('d_sem') ne 'define') {
     skip_all('$Config{d_sem} undefined');
 }
-elsif (%Config{'d_msg'} ne 'define') {
+elsif (config_value('d_msg') ne 'define') {
     skip_all('$Config{d_msg} undefined');
 }
 else {

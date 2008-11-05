@@ -1,7 +1,7 @@
 #!/usr/local/bin/perl -w
 # Test for File::Temp - OO interface
 
-use strict;
+
 use Test::More tests => 30;
 use File::Spec;
 

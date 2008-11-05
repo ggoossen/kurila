@@ -3,7 +3,6 @@
 BEGIN { require './test.pl'; }
 BEGIN { plan( tests => 14 ); }
 
-use strict;
 use warnings;
 
 use compsub;

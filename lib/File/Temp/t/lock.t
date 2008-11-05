@@ -2,7 +2,6 @@
 # Test O_EXLOCK
 
 use Test::More;
-use strict;
 use Fcntl;
 
 BEGIN {

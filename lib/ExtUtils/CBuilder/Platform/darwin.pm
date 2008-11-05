@@ -1,6 +1,5 @@
 package ExtUtils::CBuilder::Platform::darwin;
 
-use strict;
 use ExtUtils::CBuilder::Platform::Unix;
 
 use vars < qw($VERSION @ISA);

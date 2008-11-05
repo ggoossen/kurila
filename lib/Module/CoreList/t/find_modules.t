@@ -1,5 +1,5 @@
 #!perl -w
-use strict;
+
 use Module::CoreList;
 use Test::More tests => 5;
 

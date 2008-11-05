@@ -1,6 +1,5 @@
 package Test::Builder::Module;
 
-use strict;
 
 use Test::Builder;
 

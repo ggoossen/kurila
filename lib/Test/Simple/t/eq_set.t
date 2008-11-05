@@ -11,7 +11,6 @@ BEGIN {
 }
 chdir 't';
 
-use strict;
 use Test::More;
 
 plan tests => 3;

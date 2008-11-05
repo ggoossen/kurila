@@ -1,6 +1,5 @@
 package File::stat;
 
-use strict;
 use warnings;
 
 our(@EXPORT, @EXPORT_OK, %EXPORT_TAGS);
@@ -48,7 +47,6 @@ sub stat ($) {
 	my $fh;
     do {
 		local $!;
-		no strict 'refs';
 		require Symbol;
                 my ($pkg) = caller();
 		$fh = \*{ Symbol::fetch_glob( $pkg . "::" . $arg) };

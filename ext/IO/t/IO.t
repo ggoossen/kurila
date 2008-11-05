@@ -1,14 +1,5 @@
 #!/usr/bin/perl -w
 
-BEGIN {
-	require Config;
-	if (%Config::Config{'extensions'} !~ m/\bSocket\b/) {
-		print "1..0 # Skip: Socket not built - IO.pm uses Socket";
-		exit 0;
-	}
-}
-
-use strict;
 use File::Path;
 use File::Spec;
 require(%ENV{PERL_CORE} ? "./test.pl" : "./t/test.pl");

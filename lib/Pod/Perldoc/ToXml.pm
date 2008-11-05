@@ -1,6 +1,6 @@
 
 package Pod::Perldoc::ToXml;
-use strict;
+
 use warnings;
 use vars < qw($VERSION);
 

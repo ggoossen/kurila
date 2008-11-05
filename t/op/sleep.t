@@ -3,7 +3,6 @@
 require "./test.pl";
 plan( tests => 4 );
 
-use strict;
 use warnings;
 
 my $start = time;

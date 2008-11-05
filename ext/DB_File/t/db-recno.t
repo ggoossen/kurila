@@ -1,18 +1,9 @@
 #!./perl -w
 
 use warnings;
-use strict;
+
 use Config;
  
-BEGIN {
-    if(-d "lib" && -f "TEST") {
-        if (%Config{'extensions'} !~ m/\bDB_File\b/ ) {
-            print "1..0 # Skip: DB_File was not built\n";
-            exit 0;
-        }
-    }
-}
-
 use DB_File; 
 use Fcntl;
 our ($dbh, $Dfile, $bad_ones, $FA);
@@ -87,9 +78,9 @@ sub bad_one
 # tests 61, 63, 64 and 65.
 EOM
         if ($^O eq 'darwin'
-	    && %Config{db_version_major} == 1
-	    && %Config{db_version_minor} == 0
-	    && %Config{db_version_patch} == 0) {
+	    && config_value("db_version_major") == 1
+	    && config_value("db_version_minor") == 0
+	    && config_value("db_version_patch") == 0) {
 	    print STDERR <<EOM ;
 #
 # For example Mac OS X 10.2 (or earlier) has such an old

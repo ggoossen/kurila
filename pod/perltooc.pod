@@ -168,7 +168,6 @@ the %ClassData hash.  Each of these methods is used to fetch or store
 values to the specific, named class attribute.
 
     for my $datum (keys %ClassData) {
-	no strict "refs";	# to register new methods in package
 	*$datum = sub {
 	    shift;	# XXX: ignore calling class/object
 	    $ClassData{$datum} = shift if @_;
@@ -238,7 +237,6 @@ class of that object.
 	my $obclass = shift;	
 	my $class   = ref($obclass) || $obclass;
 	my $varname = $class . "::CData1";
-	no strict "refs"; 	# to access package data symbolically
 	$$varname = shift if @_;
 	return $$varname;
     } 
@@ -258,7 +256,6 @@ What about just using a single hash for everything and then cloning
 methods?  What would that look like?  The only difference would be the
 closure used to produce new method entries for the class's symbol table.
 
-    no strict "refs";	
     *$datum = sub {
 	my $obclass = shift;	
 	my $class   = ref($obclass) || $obclass;

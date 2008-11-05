@@ -5,7 +5,7 @@ BEGIN{
 	use Config;
 	eval 'use POSIX';
 	if($@ || $^O eq 'MSWin32' || $^O eq 'NetWare' || $^O eq 'dos' ||
-	   $^O eq 'MacOS' || ($^O eq 'VMS' && !%Config{'d_sigaction'})) {
+	   $^O eq 'MacOS' || ($^O eq 'VMS' && ! config_value('d_sigaction'))) {
 		print "1..0\n";
 		exit 0;
 	}
@@ -13,7 +13,6 @@ BEGIN{
 
 use Test::More tests => 31;
 
-use strict;
 use vars < qw/$bad $bad7 $ok10 $bad18 $ok/;
 
 $^W=1;
@@ -179,7 +178,7 @@ SKIP: do {
     eval 'use POSIX qw(%SIGRT SIGRTMIN SIGRTMAX); scalar %SIGRT + SIGRTMIN() + SIGRTMAX()';
     $@					# POSIX did not exort
     || SIGRTMIN() +< 0 || SIGRTMAX() +< 0	# HP-UX 10.20 exports both as -1
-    || SIGRTMIN() +> %Config{sig_count}	# AIX 4.3.3 exports bogus 888 and 999
+    || SIGRTMIN() +> config_value('sig_count')	# AIX 4.3.3 exports bogus 888 and 999
 	and skip("no SIGRT signals", 4);
     ok(SIGRTMAX() +> SIGRTMIN(), "SIGRTMAX > SIGRTMIN");
     is(scalar %SIGRT, SIGRTMAX() - SIGRTMIN() + 1, "scalar SIGRT");

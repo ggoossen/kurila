@@ -1,5 +1,4 @@
 package File::Find;
-use strict;
 use warnings;
 use warnings::register;
 our $VERSION = '1.12';
@@ -415,7 +414,6 @@ our @ISA = qw(Exporter);
 our @EXPORT = qw(find finddepth);
 
 
-use strict;
 my $Is_VMS;
 my $Is_MacOS;
 

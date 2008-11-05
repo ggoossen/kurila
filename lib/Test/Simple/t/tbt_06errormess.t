@@ -5,7 +5,6 @@ use Symbol;
 use Test::Builder;
 use Test::Builder::Tester;
 
-use strict;
 
 # argh! now we need to test the thing we're testing.  Basically we need
 # to pretty much reimplement the whole code again.  This is very

@@ -2,7 +2,6 @@
 package Pod::Simple::LinkSection;
   # Based somewhat dimly on Array::Autojoin
 
-use strict;
 use Pod::Simple::BlackBox;
 
 sub tack_on {

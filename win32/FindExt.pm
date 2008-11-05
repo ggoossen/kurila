@@ -2,7 +2,6 @@ package FindExt;
 
 our $VERSION = '1.02';
 
-use strict;
 use warnings;
 
 my $no = join('|',qw(GDBM_File ODBM_File NDBM_File DB_File

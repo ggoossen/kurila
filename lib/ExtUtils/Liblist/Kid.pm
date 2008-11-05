@@ -7,7 +7,6 @@ package ExtUtils::Liblist::Kid;
 
 # Broken out of MakeMaker from version 4.11
 
-use strict;
 our $VERSION = 6.44;
 
 use Config;
@@ -25,19 +24,20 @@ sub _unix_os2_ext {
     my($self,$potential_libs, $verbose, $give_libs) = < @_;
     $verbose ||= 0;
 
-    if ($^O =~ 'os2' and %Config{perllibs}) { 
+    if ($^O =~ 'os2' and config_value("perllibs")) { 
 	# Dynamic libraries are not transitive, so we may need including
 	# the libraries linked against perl.dll again.
 
 	$potential_libs .= " " if $potential_libs;
-	$potential_libs .= %Config{perllibs};
+	$potential_libs .= config_value("perllibs");
     }
     return  @("", "", "", "",  @($give_libs ? \@() : ())) unless $potential_libs;
     warn "Potential libraries are '$potential_libs':\n" if $verbose;
 
-    my($so)   = %Config{so};
-    my($libs) = defined %Config{perllibs} ? %Config{perllibs} : %Config{libs};
-    my $Config_libext = %Config{lib_ext} || ".a";
+    my($so)   = config_value("so");
+    my($libs) = defined config_value("perllibs") 
+      ? config_value("perllibs") : config_value("libs");
+    my $Config_libext = config_value("lib_ext") || ".a";
 
 
     # compute $extralibs, $bsloadlibs and $ldloadlibs from
@@ -45,7 +45,7 @@ sub _unix_os2_ext {
     # this is a rewrite of Andy Dougherty's extliblist in perl
 
     my(@searchpath); # from "-L/path" entries in $potential_libs
-    my @libpath = split " ", %Config{'libpth'};
+    my @libpath = split " ", config_value("libpth");
     my(@ldloadlibs, @bsloadlibs, @extralibs, @ld_run_path, %ld_run_path_seen);
     my(@libs, %libs_seen);
     my($fullname, @fullname);
@@ -64,9 +64,9 @@ sub _unix_os2_ext {
 	    }
 	    my($rtype) = $ptype;
 	    if (($ptype eq '-R') or ($ptype eq '-Wl,-R')) {
-		if (%Config{'lddlflags'} =~ m/-Wl,-R/) {
+		if (config_value('lddlflags') =~ m/-Wl,-R/) {
 		    $rtype = '-Wl,-R';
-		} elsif (%Config{'lddlflags'} =~ m/-R/) {
+		} elsif (config_value('lddlflags') =~ m/-R/) {
 		    $rtype = '-R';
 		}
 	    }
@@ -123,9 +123,9 @@ sub _unix_os2_ext {
 			# Comparison deliberately backwards
 			$mb cmp $ma;} @fullname )[0];
 	    } elsif (-f ($fullname="$thispth/lib$thislib.$so")
-		 && ((%Config{'dlsrc'} ne "dl_dld.xs") || ($thislib eq "m"))){
+		 && ((config_value('dlsrc') ne "dl_dld.xs") || ($thislib eq "m"))){
 	    } elsif (-f ($fullname="$thispth/lib$($thislib)_s$Config_libext")
-                 && (! %Config{'archname'} =~ m/RM\d\d\d-svr4/)
+                 && (! config_value('archname') =~ m/RM\d\d\d-svr4/)
 		 && ($thislib .= "_s") ){ # we must explicitly use _s version
 	    } elsif (-f ($fullname="$thispth/lib$thislib$Config_libext")){
 	    } elsif (-f ($fullname="$thispth/$thislib$Config_libext")){
@@ -169,14 +169,15 @@ sub _unix_os2_ext {
 	    # We have to special-case the NeXT, because math and ndbm 
 	    # are both in libsys_s
 	    unless ($in_perl || 
-		(%Config{'osname'} eq 'next' &&
+		(config_value('osname') eq 'next' &&
 		    ($thislib eq 'm' || $thislib eq 'ndbm')) ){
 		push(@extralibs, "-l$thislib");
 	    }
 
 	    # We might be able to load this archive file dynamically
-	    if ( (%Config{'dlsrc'} =~ m/dl_next/ && (%Config{'osvers'} cmp '4_0') +<= 0)
-	    ||   (%Config{'dlsrc'} =~ m/dl_dld/) )
+	    if ( (config_value('dlsrc') =~ m/dl_next/ &&
+                    (config_value('osvers') cmp '4_0') +<= 0)
+	    ||   (config_value('dlsrc') =~ m/dl_dld/) )
 	    {
 		# We push -l$thislib instead of $fullname because
 		# it avoids hardwiring a fixed path into the .bs file.
@@ -223,14 +224,14 @@ sub _win32_ext {
     # (caller should probably use the list in $Config{libs})
     return  @("", "", "", "",  @($give_libs ? \@() : ())) unless $potential_libs;
 
-    my $cc		= %Config{cc};
+    my $cc		= config_value("cc");
     my $VC		= $cc =~ m/^cl/i;
     my $BC		= $cc =~ m/^bcc/i;
     my $GC		= $cc =~ m/^gcc/i;
-    my $so		= %Config{'so'};
-    my $libs		= %Config{'perllibs'};
-    my $libpth		= %Config{'libpth'};
-    my $libext		= %Config{'lib_ext'} || ".lib";
+    my $so		= config_value('so');
+    my $libs		= config_value('perllibs');
+    my $libpth		= config_value('libpth');
+    my $libext		= config_value('lib_ext') || ".lib";
     my(@libs, %libs_seen);
 
     if ($libs and $potential_libs !~ m/:nodefault/i) { 
@@ -259,7 +260,7 @@ sub _win32_ext {
     my($fullname);
 
     # add "$Config{installarchlib}/CORE" to default search path
-    push @libpath, "%Config{installarchlib}/CORE";
+    push @libpath, config_value("installarchlib") . "/CORE";
 
     if ($VC and exists %ENV{LIB} and %ENV{LIB}) {
         push @libpath, < split m/;/, %ENV{LIB};
@@ -374,10 +375,10 @@ sub _vms_ext {
   $verbose ||= 0;
 
   my(@crtls,$crtlstr);
-  @crtls = @( (%Config{'ldflags'} =~ m-/Debug-i ? %Config{'dbgprefix'} : '')
+  @crtls = @( (config_value('ldflags') =~ m-/Debug-i ? config_value('dbgprefix') : '')
               . 'PerlShr/Share' );
-  push(@crtls, < grep { not m/\(/ } split m/\s+/, %Config{'perllibs'});
-  push(@crtls, < grep { not m/\(/ } split m/\s+/, %Config{'libc'});
+  push(@crtls, < grep { not m/\(/ } split m/\s+/, config_value('perllibs'));
+  push(@crtls, < grep { not m/\(/ } split m/\s+/, config_value('libc'));
   # In general, we pass through the basic libraries from %Config unchanged.
   # The one exception is that if we're building in the Perl source tree, and
   # a library spec could be resolved via a logical name, we go to some trouble
@@ -387,9 +388,9 @@ sub _vms_ext {
     my($locspec,$type);
     foreach my $lib ( @crtls) { 
       if (($locspec,$type) = $lib =~ m{^([\w\$-]+)(/\w+)?} and $locspec =~ m/perl/i) {
-        if    (lc $type eq '/share')   { $locspec .= %Config{'exe_ext'}; }
-        elsif (lc $type eq '/library') { $locspec .= %Config{'lib_ext'}; }
-        else                           { $locspec .= %Config{'obj_ext'}; }
+        if    (lc $type eq '/share')   { $locspec .= config_value('exe_ext'); }
+        elsif (lc $type eq '/library') { $locspec .= config_value('lib_ext'); }
+        else                           { $locspec .= config_value('obj_ext'); }
         $locspec = $self->catfile($self->{PERL_SRC},$locspec);
         $lib = "$locspec$type" if -e $locspec;
       }
@@ -404,7 +405,7 @@ sub _vms_ext {
 
   my(%found,@fndlibs,$ldlib);
   my $cwd = cwd();
-  my($so,$lib_ext,$obj_ext) = < %Config{[@('so','lib_ext','obj_ext')]};
+  my($so,$lib_ext,$obj_ext) = < map { config_value($_) } @: 'so','lib_ext','obj_ext';
   # List of common Unix library names and their VMS equivalents
   # (VMS equivalent of '' indicates that the library is automatically
   # searched by the linker, and should be skipped here.)
@@ -414,7 +415,7 @@ sub _vms_ext {
                  'socket' => '', 'X11' => 'DECW$XLIBSHR',
                  'Xt' => 'DECW$XTSHR', 'Xm' => 'DECW$XMLIBSHR',
                  'Xmu' => 'DECW$XMULIBSHR');
-  if (%Config{'vms_cc_type'} ne 'decc') { %libmap{'curses'} = 'VAXCCURSE'; }
+  if (config_value('vms_cc_type') ne 'decc') { %libmap{'curses'} = 'VAXCCURSE'; }
 
   warn "Potential libraries are '$potential_libs'\n" if $verbose;
 
@@ -427,7 +428,7 @@ sub _vms_ext {
     push(@libs,$1),   next if $lib =~ m/^-l(.*)/;
     push(@libs,$lib);
   }
-  push(@dirs, <split(' ',%Config{'libpth'}));
+  push(@dirs, <split(' ',config_value('libpth')));
 
   # Now make sure we've got VMS-syntax absolute directory specs
   # (We don't, however, check whether someone's hidden a relative

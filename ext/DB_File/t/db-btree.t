@@ -1,25 +1,16 @@
 #!./perl -w
 
 use warnings;
-use strict;
+
 use Config;
  
-BEGIN {
-    if(-d "lib" && -f "TEST") {
-        if (%Config{'extensions'} !~ m/\bDB_File\b/ ) {
-            print "1..0 # Skip: DB_File was not built\n";
-            exit 0;
-        }
-    }
-}
-
 BEGIN
 {
     if ($^O eq 'darwin'
-	&& ( <split(m/\./, %Config{osvers}))[[0]] +< 7 # Mac OS X 10.3 == Darwin 7
-	&& %Config{db_version_major} == 1
-	&& %Config{db_version_minor} == 0
-	&& %Config{db_version_patch} == 0) {
+	&& ( <split(m/\./, config_value("osvers")))[[0]] +< 7 # Mac OS X 10.3 == Darwin 7
+	&& config_value("db_version_major") == 1
+	&& config_value("db_version_minor") == 0
+	&& config_value("db_version_patch") == 0) {
 	warn <<EOM;
 #
 # This test is known to crash in Mac OS X versions 10.2 (or earlier)
@@ -597,7 +588,7 @@ do {
    package Another ;
 
    use warnings ;
-   use strict ;
+    
 
    open(FILE, ">", "SubDB.pm") or die "Cannot open SubDB.pm: $!\n" ;
    print FILE <<'EOM' ;
@@ -605,7 +596,6 @@ do {
    package SubDB ;
 
    use warnings ;
-   use strict ;
    our (@ISA, @EXPORT);
 
    require Exporter ;
@@ -690,7 +680,7 @@ EOM
 do {
    # DBM Filter tests
    use warnings ;
-   use strict ;
+    
    my (%h, $db) ;
    my ($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
    unlink $Dfile;
@@ -797,7 +787,7 @@ do {
     # DBM Filter with a closure
 
     use warnings ;
-    use strict ;
+     
     my (%h, $db) ;
 
     unlink $Dfile;
@@ -860,7 +850,7 @@ do {
 do {
    # DBM Filter recursion detection
    use warnings ;
-   use strict ;
+    
    my (%h, $db) ;
    unlink $Dfile;
 
@@ -889,7 +879,7 @@ do {
     ###
 
     use warnings FATAL => < qw(all) ;
-    use strict ;
+     
     use DB_File ;
 
     my %h ;
@@ -942,7 +932,7 @@ EOM
     ###
 
     use warnings FATAL => < qw(all) ;
-    use strict ;
+     
     use DB_File ;
 
     my ($filename, %h);
@@ -994,7 +984,7 @@ EOM
     ###
 
     use warnings FATAL => < qw(all) ;
-    use strict ;
+     
     use DB_File ;
  
     my ($filename, $x, %h, $status, $key, $value);
@@ -1051,7 +1041,7 @@ EOM
     ###
 
     use warnings FATAL => < qw(all) ;
-    use strict ;
+     
     use DB_File ;
  
     my ($filename, $x, %h);
@@ -1100,7 +1090,7 @@ EOM
     ###
 
     use warnings FATAL => < qw(all) ;
-    use strict ;
+     
     use DB_File ;
  
     my ($filename, $x, %h, $found);
@@ -1135,7 +1125,7 @@ EOM
     ###
 
     use warnings FATAL => < qw(all) ;
-    use strict ;
+     
     use DB_File ;
  
     my ($filename, $x, %h, $found);
@@ -1170,7 +1160,7 @@ EOM
     ###
 
     use warnings FATAL => < qw(all) ;
-    use strict ;
+     
     use DB_File ;
     use Fcntl ;
 
@@ -1236,7 +1226,6 @@ EOM
 
 #{
 #   # R_SETCURSOR
-#   use strict ;
 #   my (%h, $db) ;
 #   unlink $Dfile;
 #
@@ -1267,7 +1256,7 @@ do {
     # test that $hash{KEY} = undef doesn't produce the warning
     #     Use of uninitialized value in null operation 
     use warnings ;
-    use strict ;
+     
     use DB_File ;
 
     unlink $Dfile;
@@ -1287,7 +1276,7 @@ do {
     # test that %hash = () doesn't produce the warning
     #     Argument "" isn't numeric in entersub
     use warnings ;
-    use strict ;
+     
     use DB_File ;
 
     unlink $Dfile;
@@ -1311,7 +1300,7 @@ do {
     # Also Test "keys" & "values" while we are at it.
 
     use warnings ;
-    use strict ;
+     
     use DB_File ;
 
     unlink $Dfile;
@@ -1422,7 +1411,7 @@ do {
    # Check that DBM Filter can cope with read-only $_
 
    use warnings ;
-   use strict ;
+    
    my (%h, $db) ;
    unlink $Dfile;
 
@@ -1466,7 +1455,7 @@ do {
    # Check low-level API works with filter
 
    use warnings ;
-   use strict ;
+    
    my (%h, $db) ;
    my $Dfile = "xxy.db";
    unlink $Dfile;
@@ -1519,7 +1508,7 @@ do {
 
 
     use warnings ;
-    use strict ;
+     
     my (%h, $db) ;
     my $Dfile = "xxy.db";
     unlink $Dfile;

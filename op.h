@@ -191,7 +191,6 @@ Deprecated.  Use C<GIMME_V> instead.
   /* OP_RV2?V, OP_GVSV, OP_ENTERITER only */
 #define OPpOUR_INTRO		16	/* Variable was in an our() */
   /* OP_PADSV only */
-#define OPpPAD_STATE		16	/* is a "state" pad */
   /* for OP_RV2?V, lower bits carry hints (currently only HINT_STRICT_REFS) */
 
 /* Private for OPs with TARGLEX */

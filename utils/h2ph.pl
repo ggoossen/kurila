@@ -1,6 +1,6 @@
 #! perl
 
-use strict;
+
 
 use Config;
 use File::Path < qw(mkpath);
@@ -18,7 +18,7 @@ my @inc_dirs = inc_dirs() if $opt_a;
 
 my $Exit = 0;
 
-my $Dest_dir = $opt_d || %Config{installsitearch};
+my $Dest_dir = $opt_d || config_value("installsitearch");
 die "Destination directory $Dest_dir doesn't exist or isn't a directory\n"
     unless -d $Dest_dir;
 
@@ -376,7 +376,7 @@ sub expr {
 	s/^0X([0-9A-F]+)[UL]*//i
 	    && do {my $hex = $1;
 		   $hex =~ s/^0+//;
-		   if (length $hex +> 8 && !%Config{use64bitint}) {
+		   if (length $hex +> 8 && !config_value("use64bitint")) {
 		       # Croak if nv_preserves_uv_bits < 64 ?
 		       $new .=         hex(substr($hex, -8)) +
 			       2**32 * hex(substr($hex,  0, -8));
@@ -700,20 +700,20 @@ sub queue_includes_from
 }
 
 
-# Determine include directories; %Config{usrinc} should be enough for (all
+# Determine include directories; config_value("usrinc") should be enough for (all
 # non-GCC?) C compilers, but gcc uses an additional include directory.
 sub inc_dirs
 {
-    my $from_gcc    = `LC_ALL=C %Config{cc} -v 2>&1`;
+    my $from_gcc    = `LC_ALL=C config_value("cc") -v 2>&1`;
     if( !( $from_gcc =~ s:^Reading specs from (.*?)/specs\b.*:$1/include:s ) )
     { # gcc-4+ :
-       $from_gcc   = `LC_ALL=C %Config{cc} -print-search-dirs 2>&1`;
+       $from_gcc   = `LC_ALL=C config_value("cc") -print-search-dirs 2>&1`;
        if ( !($from_gcc =~ s/^install:\s*([^\s]+[^\s\/])([\s\/]*).*$/$1\/include/s) )
        {
            $from_gcc = '';
        };
     };
-    length($from_gcc) ? @($from_gcc, %Config{usrinc}) : @(%Config{usrinc});
+    length($from_gcc) ? @($from_gcc, config_value("usrinc")) : @(config_value("usrinc"));
 }
 
 
@@ -778,7 +778,7 @@ sub _extract_cc_defines
 {
     my %define;
     my $allsymbols  = join " ",
-	%Config{[@('ccsymbols', 'cppsymbols', 'cppccsymbols')]};
+	map { config_value($_) } @('ccsymbols', 'cppsymbols', 'cppccsymbols');
 
     # Split compiler pre-definitions into `key=value' pairs:
     while ($allsymbols =~ m/([^\s]+)=((\\\s|[^\s])+)/g) {

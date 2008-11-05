@@ -40,10 +40,9 @@
 
 my $file;
 
-use strict;
 use warnings FATAL=>"all";
 use vars < qw($iters $numtests $bang $ffff $nulnul $OP $utf8);
-use vars < qw($qr $skip_amp $qr_embed $qr_embed_thr); # set by our callers
+use vars < qw($qr $skip_amp $qr_embed); # set by our callers
 
 
 BEGIN {
@@ -54,22 +53,8 @@ BEGIN {
     if (defined $file) {
 	open TESTS, "<", $file or die "Can't open $file";
     }
-
-    if ($qr_embed_thr) {
-	require Config;
-	if (!%Config::Config{useithreads}) {
-	    print "1..0 # Skip: no ithreads\n";
-		exit 0;
-	}
-	if (%ENV{PERL_CORE_MINITEST}) {
-	    print "1..0 # Skip: no dynamic loading on miniperl, no threads\n";
-		exit 0;
-	}
-	require threads;
-    }
 }
 
-use strict;
 use warnings FATAL=>"all";
 use vars < qw($iters $numtests $bang $ffff $nulnul $OP);
 use vars < qw($qr $skip_amp $qr_embed $qr_embed_thr); # set by our callers

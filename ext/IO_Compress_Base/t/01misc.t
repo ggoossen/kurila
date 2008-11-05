@@ -6,7 +6,7 @@ BEGIN {
 }
 
 use lib < qw(t t/compress);
-use strict;
+
 use warnings;
 use bytes;
 
@@ -67,9 +67,6 @@ sub My::testParseParameters()
   SKIP:
     do {
         use Config;
-
-        skip 'readonly + threads', 1
-            if %Config{useithreads};
 
         try { ParseParameters(1, \%('Fred' => \@(1, 1, Parse_writable_scalar, 0)), Fred => 'abc') ; };
         like $@->{description}, mkErr("Parameter 'Fred' not writable"), 

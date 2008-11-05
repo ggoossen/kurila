@@ -23,12 +23,12 @@ else {
 }
 chomp($wd);
 
-my $has_link            = %Config{d_link};
+my $has_link            = config_value('d_link');
 my $accurate_timestamps =
     !($^O eq 'MSWin32' || $^O eq 'NetWare' ||
       $^O eq 'dos'     || $^O eq 'os2'     ||
       $^O eq 'mint'    || $^O eq 'cygwin'  ||
-      $^O eq 'amigaos' || $wd =~ m#%Config{afsroot}/# ||
+      $^O eq 'amigaos' || $wd =~ m#$(config_value('afsroot'))/# ||
       $Is_MacOS
      );
 
@@ -101,7 +101,7 @@ SKIP: do {
      $blksize,$blocks) = stat('c');
 
     SKIP: do {
-        skip "no nlink", 1 if %Config{dont_use_nlink};
+        skip "no nlink", 1 if config_value('dont_use_nlink');
 
         is($nlink, 3, "link count of triply-linked file");
     };
@@ -174,7 +174,7 @@ SKIP: do {
 };
 
 SKIP: do {
-    skip "no fchmod", 5 unless (%Config{d_fchmod} || "") eq "define";
+    skip "no fchmod", 5 unless (config_value('d_fchmod') || "") eq "define";
     ok(open(my $fh, "<", "a"), "open a");
     is(chmod(0, $fh), 1, "fchmod");
     $mode = @(stat "a")[2];
@@ -191,20 +191,20 @@ SKIP: do {
 };
 
 SKIP: do {
-    skip "no fchown", 1 unless (%Config{d_fchown} || "") eq "define";
+    skip "no fchown", 1 unless (config_value('d_fchown') || "") eq "define";
     open(my $fh, "<", "a");
     is(chown(-1, -1, $fh), 1, "fchown");
 };
 
 SKIP: do {
-    skip "has fchmod", 1 if (%Config{d_fchmod} || "") eq "define";
+    skip "has fchmod", 1 if (config_value('d_fchmod') || "") eq "define";
     open(my $fh, "<", "a");
     try { chmod(0777, $fh); };
     like($@->{description}, qr/^The fchmod function is unimplemented at/, "fchmod is unimplemented");
 };
 
 SKIP: do {
-    skip "has fchown", 1 if (%Config{d_fchown} || "") eq "define";
+    skip "has fchown", 1 if (config_value('d_fchown') || "") eq "define";
     open(my $fh, "<", "a");
     try { chown(0, 0, $fh); };
     like($@->{description}, qr/^The f?chown function is unimplemented at/, "fchown is unimplemented");
@@ -231,7 +231,7 @@ isnt($atime, 500000000, 'atime');
 isnt($mtime, 500000000 + $delta, 'mtime');
 
 SKIP: do {
-    skip "no futimes", 4 unless (%Config{d_futimes} || "") eq "define";
+    skip "no futimes", 4 unless (config_value('d_futimes') || "") eq "define";
     open(my $fh, "<", 'b');
     $foo = (utime 500000000,500000000 + $delta, $fh);
     is($foo, 1, "futime");
@@ -294,7 +294,7 @@ sub check_utime_result {
 }
 
 SKIP: do {
-    skip "has futimes", 1 if (%Config{d_futimes} || "") eq "define";
+    skip "has futimes", 1 if (config_value('d_futimes') || "") eq "define";
     open(my $fh, "<", "b") || die;
     try { utime(undef, undef, $fh); };
     like($@->{description}, qr/^The futimes function is unimplemented at/, "futimes is unimplemented");
@@ -365,7 +365,6 @@ SKIP: do {
     select STDOUT;
 
     do {
-	use strict;
 	print FH "x\n" x 200;
 	ok(truncate(*FH, 200), "fh resize to 200");
     };
@@ -399,7 +398,6 @@ SKIP: do {
 	select STDOUT;
 
 	do {
-	    use strict;
 	    print FH "x\n" x 200;
 	    ok(truncate(*FH{IO}, 100), "fh resize by IO slot");
 	};

@@ -126,9 +126,7 @@ EOT
 do {
     # Right. We really really need Config here.
     require Config;
-    die "Failed to load Config for some reason"
-	unless %Config::Config{version};
-    my $ccflags = %Config::Config{ccflags};
+    my $ccflags = Config::config_value("ccflags");
     die "Failed to get ccflags for some reason" unless defined $ccflags;
 
     my $simple = ++$i;

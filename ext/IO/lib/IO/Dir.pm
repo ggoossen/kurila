@@ -7,7 +7,6 @@
 package IO::Dir;
 
 
-use strict;
 use Carp;
 use Symbol;
 use Exporter;

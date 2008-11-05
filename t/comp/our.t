@@ -6,9 +6,6 @@ BEGIN {
 
 print "1..1\n";
 
-use strict;
-
-no strict 'vars';
 
 our $y = 1;
 do {

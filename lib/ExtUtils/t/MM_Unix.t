@@ -24,7 +24,6 @@ BEGIN {
 
 use ExtUtils::MM_Unix;
 
-use strict;
 use File::Spec;
 
 my $class = 'ExtUtils::MM_Unix';

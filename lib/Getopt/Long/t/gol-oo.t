@@ -1,7 +1,5 @@
 #!./perl -w
 
-no strict;
-
 use Getopt::Long;
 my $want_version="2.24";
 die("Getopt::Long version $want_version required--this is only version ".

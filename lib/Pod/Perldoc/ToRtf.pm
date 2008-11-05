@@ -1,6 +1,6 @@
 
 package Pod::Perldoc::ToRtf;
-use strict;
+
 use warnings;
 use vars < qw($VERSION);
 

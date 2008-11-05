@@ -6,14 +6,13 @@ BEGIN {
         @INC = @( '../lib' );
     }
     use Config;
-    unless (%Config{usedl}) {
+    unless (config_value("usedl")) {
 	print "1..0 # no usedl, skipping\n";
 	exit 0;
     }
 }
 
 # use warnings;
-use strict;
 use ExtUtils::MakeMaker;
 use ExtUtils::Constant < qw (C_constant);
 use File::Spec;
@@ -35,7 +34,7 @@ my $lib = %ENV{PERL_CORE} ? '../../../lib' : '../../blib/lib';
 my $runperl = "$perl \"-I$lib\"";
 print "# perl=$perl\n";
 
-my $make = %Config{make};
+my $make = config_value("make");
 $make = %ENV{MAKE} if exists %ENV{MAKE};
 if ($^O eq 'MSWin32' && $make eq 'nmake') { $make .= " -nologo"; }
 
@@ -167,7 +166,7 @@ sub build_and_run {
 
   if ($^O eq 'VMS') { $make =~ s{ all}{}; }
 
-  if (%Config{usedl}) {
+  if (config_value("usedl")) {
     print "ok $realtest # This is dynamic linking, so no need to make perl\n";
   } else {
     my $makeperl = "$make perl";
@@ -371,7 +370,6 @@ EOT
 
   print FH <<'EOT';
 
-use strict;
 EOT
   printf FH "use warnings;\n";
   print FH <<'EOT';
@@ -400,7 +398,6 @@ EOT
   open FH, ">", "$testpl" or die "open >$testpl: $!\n";
   # Standard test header (need an option to suppress this?)
   print FH <<"EOT" or die $!;
-use strict;
 use $package < qw($(join ' ',@$export_names));
 
 print "1..2\n";

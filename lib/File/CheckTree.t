@@ -4,7 +4,6 @@ use Test::More;
 
 BEGIN { plan tests => 8 }
 
-use strict;
 
 BEGIN {
 # Cwd::cwd does an implicit "require Win32", but

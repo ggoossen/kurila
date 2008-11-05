@@ -4,8 +4,6 @@ BEGIN {
     require './test.pl';
 }
 
-# use strict;
-
 plan tests => 57;
 
 my @comma = @("key", "value");

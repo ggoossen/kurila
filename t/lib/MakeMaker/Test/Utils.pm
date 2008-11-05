@@ -1,7 +1,7 @@
 package MakeMaker::Test::Utils;
 
 use File::Spec;
-use strict;
+
 use Config;
 
 use vars < qw($VERSION @ISA @EXPORT);
@@ -73,7 +73,7 @@ sub which_perl {
     # VMS should have 'perl' aliased properly
     return $perl if $Is_VMS;
 
-    $perl .= %Config{exe_ext} unless $perl =~ m/%Config{exe_ext}$/i;
+    $perl .= config_value("exe_ext") unless $perl =~ m/$(config_value("exe_ext"))$/i;
 
     my $perlpath = 'File::Spec'->rel2abs( $perl );
     unless( $Is_MacOS || -x $perlpath ) {
@@ -111,7 +111,7 @@ sub perl_lib {
     $lib = 'File::Spec'->rel2abs($lib);
     my @libs = @($lib);
     push @libs, %ENV{PERL5LIB} if exists %ENV{PERL5LIB};
-    %ENV{PERL5LIB} = join(%Config{path_sep}, @libs);
+    %ENV{PERL5LIB} = join(config_value("path_sep"), @libs);
     unshift @INC, $lib;
 }
 
@@ -161,7 +161,7 @@ Returns a good guess at the make to run.
 =cut
 
 sub make {
-    my $make = %Config{make};
+    my $make = config_value("make");
     $make = %ENV{MAKE} if exists %ENV{MAKE};
 
     return $make;

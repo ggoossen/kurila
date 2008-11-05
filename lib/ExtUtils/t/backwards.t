@@ -13,7 +13,6 @@ BEGIN {
     }
 }
 
-use strict;
 use Test::More tests => 2;
 
 require ExtUtils::MakeMaker;

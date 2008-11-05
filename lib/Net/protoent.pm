@@ -1,5 +1,5 @@
 package Net::protoent;
-use strict;
+
 
 our $VERSION = '1.00';
 our(@EXPORT, @EXPORT_OK, %EXPORT_TAGS);
@@ -35,7 +35,6 @@ sub getprotobyname   ($)  { populate(CORE::getprotobyname(shift)) }
 sub getprotobynumber ($)  { populate(CORE::getprotobynumber(shift)) } 
 
 sub getproto ($;$) {
-    no strict 'refs';
     return &{'getprotoby' . (@_[0]=~m/^\d+$/ ? 'number' : 'name')}(< @_);
 }
 

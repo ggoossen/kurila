@@ -1,6 +1,5 @@
 package File::Fetch;
 
-use strict;
 use FileHandle;
 use File::Copy;
 use File::Spec;
@@ -156,7 +155,6 @@ do {
     );
     
     for my $method ( keys %$Tmpl ) {
-        no strict 'refs';
         *{Symbol::fetch_glob($method)} = sub {
                         my $self = shift;
                         $self->{$method} = @_[0] if (nelems @_);

@@ -36,9 +36,8 @@ usage: $0  [ options ]
     --no-glossary       don't include Porting/Glossary in lib/Config.pod
 EOF
 
-use strict;
 
-our (%Config, $Config_SH_expanded);
+our ($Config_SH_expanded);
 
 my $how_many_common = 22;
 
@@ -119,7 +118,7 @@ package Config;
 # use vars pulls in Carp
 
 BEGIN {
-   my @heavy_subs = qw|myconfig fetch_string FIRSTKEY NEXTKEY EXISTS STORE config_sh config_re
+   my @heavy_subs = qw|myconfig fetch_string FIRSTKEY NEXTKEY config_sh config_re
                        config_vars|;
    for (@heavy_subs) { undef Symbol::fetch_glob($_)->*; }
 }
@@ -136,7 +135,7 @@ package Config;
 # use strict;
 # use warnings; Pulls in Carp
 # use vars pulls in Carp
-@Config::EXPORT = qw(%%Config);
+@Config::EXPORT = qw(config_value config_keys);
 @Config::EXPORT_OK = qw(myconfig config_sh config_vars config_re);
 
 # Need to stub all the functions to make code such as print Config::config_sh
@@ -144,17 +143,13 @@ package Config;
 
 my %%Export_Cache = %%( < map {($_ => 1)} @(< @Config::EXPORT, < @Config::EXPORT_OK) );
 
-our %%Config;
-
 # Define our own import method to avoid pulling in the full Exporter:
 sub import {
     my $pkg = shift;
     @_ = @Config::EXPORT unless @_;
 
-    my @funcs = @( < grep $_ ne '%%Config', @_ );
-    my $export_Config = (nelems @funcs) +< (nelems @_) ? 1 : 0;
+    my @funcs = @_;
 
-    no strict 'refs';
     my $callpkg = caller(0);
     foreach my $func (@funcs) {
 	die qq{"$func" is not exported by the $(__PACKAGE__) module\n}
@@ -162,7 +157,6 @@ sub import {
 	*{Symbol::fetch_glob($callpkg.'::'.$func)} = \&{*{Symbol::fetch_glob($func)}};
     }
 
-    *{Symbol::fetch_glob("$callpkg\::Config")} = \%%Config if $export_Config;
     return;
 }
 
@@ -456,7 +450,7 @@ my $summary_expanded;
 
 sub myconfig {
     return $summary_expanded if $summary_expanded;
-    ($summary_expanded = $summary) =~ s!\$(\w+)!$( do { my $c = %Config::Config{$1}; defined($c) ? $c : 'undef' } )!g;
+    ($summary_expanded = $summary) =~ s!\$(\w+)!$( do { my $c = config_value($1); defined($c) ? $c : 'undef' } )!g;
     $summary_expanded;
 }
 
@@ -577,25 +571,6 @@ $heavy_txt .= <<'ENDOFEND';
     $len +> 0 ? substr($Config_SH_expanded, $pos, $len) : undef;
 }
 
-sub EXISTS {
-    return 1 if exists(@_[0]->{@_[1]});
-
-    return(index($Config_SH_expanded, "\n@_[1]='") != -1
-ENDOFEND
-if (%seen_quotes{'"'}) {
-$heavy_txt .= <<'ENDOFEND';
-           or index($Config_SH_expanded, "\n@_[1]=\"") != -1
-ENDOFEND
-}
-$heavy_txt .= <<'ENDOFEND';
-          );
-}
-
-sub STORE  { die "\%Config::Config is read-only\n" }
-*DELETE = \&STORE;
-*CLEAR  = \&STORE;
-
-
 sub config_sh {
     substr $Config_SH_expanded, 1, $config_sh_len;
 }
@@ -621,8 +596,7 @@ sub config_vars {
 	    print < map "$_$lnend", @( @matches ? <@matches : "$qry: not found")		if !$notag;
 	    print < map { s/\w+=//; "$_$lnend" } @( @matches ? <@matches : "$qry: not found")	if  $notag;
 	} else {
-	    my $v = (exists %Config::Config{$qry}) ? %Config::Config{$qry}
-						   : 'UNKNOWN';
+	    my $v = config_value($qry);
 	    $v = 'undef' unless defined $v;
 	    print "$($prfx)'$($v)'$lnend";
 	}
@@ -703,8 +677,28 @@ for my $name (< @heavy_subs) {
 }
 
 # tie returns the object, so the value returned to require will be true.
-tie %%Config, 'Config', \%%(
+my %%Config = %%(
 %s);
+
+sub config_value {
+    my $key = shift;
+
+    return %%Config{$key} if exists %%Config{$key};
+
+    return fetch_string(\%%Config, $key);
+}
+
+sub config_keys {
+    require "Config_heavy.pl";
+    my @keys;
+    my $key = FIRSTKEY();
+    while (defined $key) {
+        push @keys, $key;
+        $key = NEXTKEY();
+    }
+    return @keys;
+}
+
 ENDOFTIE
 
 
@@ -975,11 +969,11 @@ require $Config_heavy;
 Config->import();
 
 die "$0: $Config_PM not valid"
-	unless %Config{'PERL_CONFIG_SH'} eq 'true';
+	unless config_value('PERL_CONFIG_SH') eq 'true';
 
 die "$0: error processing $Config_PM"
-	if defined(%Config{'an impossible name'})
-	or %Config{'PERL_CONFIG_SH'} ne 'true' # test cache
+	if defined(config_value('an impossible name'))
+	or config_value('PERL_CONFIG_SH') ne 'true' # test cache
 	;
 
 die "$0: error processing $Config_PM"

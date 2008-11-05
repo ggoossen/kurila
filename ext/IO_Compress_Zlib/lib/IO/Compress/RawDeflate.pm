@@ -1,8 +1,7 @@
 package IO::Compress::RawDeflate ;
 
 # create RFC1951
-#
-use strict ;
+# 
 use warnings;
 use bytes;
 

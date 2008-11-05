@@ -17,7 +17,6 @@ use Math::Trig v1.16 < qw(:pi);
 
 my $pip2 = pi / 2;
 
-use strict;
 
 use vars < qw($x $y $z);
 

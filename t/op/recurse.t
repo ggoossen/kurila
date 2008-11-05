@@ -9,8 +9,6 @@ BEGIN {
     plan(tests => 28);
 }
 
-use strict;
-
 sub gcd {
     return gcd(@_[0] - @_[1], @_[1]) if (@_[0] +> @_[1]);
     return gcd(@_[0], @_[1] - @_[0]) if (@_[0] +< @_[1]);

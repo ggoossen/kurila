@@ -13,7 +13,7 @@ package DB_File::HASHINFO ;
 
 
 use warnings;
-use strict;
+
 use Carp;
 require Tie::Hash;
 @DB_File::HASHINFO::ISA = qw(Tie::Hash);
@@ -114,7 +114,7 @@ sub CLEAR    { my $self = shift ; $self->NotHere("CLEAR") }
 package DB_File::RECNOINFO ;
 
 use warnings;
-use strict ;
+ 
 
 @DB_File::RECNOINFO::ISA = qw(DB_File::HASHINFO) ;
 
@@ -132,7 +132,7 @@ sub TIEHASH
 package DB_File::BTREEINFO ;
 
 use warnings;
-use strict ;
+ 
 
 @DB_File::BTREEINFO::ISA = qw(DB_File::HASHINFO) ;
 
@@ -158,7 +158,7 @@ sub TIEHASH
 package DB_File ;
 
 use warnings;
-use strict;
+
 our ($VERSION, @ISA, @EXPORT, $DB_BTREE, $DB_HASH, $DB_RECNO);
 our ($db_version, $use_XSLoader, $splice_end_array, $Error);
 use Carp;
@@ -665,7 +665,6 @@ database, delete keys/value pairs and finally how to enumerate the
 contents of the database.
 
     use warnings ;
-    use strict ;
     use DB_File ;
     our (%h, $k, $v) ;
 
@@ -716,7 +715,6 @@ BTREE uses. Instead of using the normal lexical ordering, a case
 insensitive compare function will be used.
 
     use warnings ;
-    use strict ;
     use DB_File ;
 
     my %h ;
@@ -814,7 +812,6 @@ want to manipulate a BTREE database with duplicate keys. Consider this
 code:
 
     use warnings ;
-    use strict ;
     use DB_File ;
 
     my ($filename, %h) ;
@@ -869,7 +866,6 @@ and the API in general.
 Here is the script above rewritten using the C<seq> API method.
 
     use warnings ;
-    use strict ;
     use DB_File ;
 
     my ($filename, $x, %h, $status, $key, $value) ;
@@ -941,7 +937,6 @@ So assuming the database created above, we can use C<get_dup> like
 this:
 
     use warnings ;
-    use strict ;
     use DB_File ;
 
     my ($filename, $x, %h) ;
@@ -991,7 +986,6 @@ returns 0. Otherwise the method returns a non-zero value.
 Assuming the database from the previous example:
 
     use warnings ;
-    use strict ;
     use DB_File ;
 
     my ($filename, $x, %h, $found) ;
@@ -1030,7 +1024,6 @@ Otherwise the method returns a non-zero value.
 Again assuming the existence of the C<tree> database
 
     use warnings ;
-    use strict ;
     use DB_File ;
 
     my ($filename, $x, %h, $found) ;
@@ -1075,7 +1068,6 @@ In the example script below, the C<match> sub uses this feature to find
 and print the first matching key/value pair given a partial key.
 
     use warnings ;
-    use strict ;
     use DB_File ;
     use Fcntl ;
 
@@ -1183,7 +1175,6 @@ of Perl earlier than 5.004_57 this example won't work -- see
 L<Extra RECNO Methods> for a workaround).
 
     use warnings ;
-    use strict ;
     use DB_File ;
 
     my $filename = "text" ;
@@ -1277,7 +1268,6 @@ described above. It also makes use of the API interface directly (see
 L<THE API INTERFACE>).
 
     use warnings ;
-    use strict ;
     my (@h, $H, $file, $i) ;
     use DB_File ;
     use Fcntl ;
@@ -1629,7 +1619,6 @@ sure you have already guessed, this is a problem that DBM Filters can
 fix very easily.
 
     use warnings ;
-    use strict ;
     use DB_File ;
 
     my %hash ;
@@ -1672,7 +1661,6 @@ when reading.
 Here is a DBM Filter that does it:
 
     use warnings ;
-    use strict ;
     use DB_File ;
     my %hash ;
     my $filename = "filt" ;
@@ -1839,7 +1827,6 @@ I<ggh> script (available from your nearest CPAN archive in
 F<authors/id/TOMC/scripts/nshist.gz>).
 
     use warnings ;
-    use strict ;
     use DB_File ;
     use Fcntl ;
 
@@ -1996,7 +1983,6 @@ C<strict 'subs'> pragma (or the full strict pragma) in your script.
 Consider this script:
 
     use warnings ;
-    use strict ;
     use DB_File ;
     my %x ;
     tie %x, DB_File, "filename" ;

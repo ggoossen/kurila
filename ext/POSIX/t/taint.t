@@ -1,19 +1,13 @@
 #!./perl -Tw
 
 use Config;
-BEGIN {
-    if ($^O ne 'VMS' and %Config{'extensions'} !~ m/\bPOSIX\b/) {
-	print "1..0\n";
-	exit 0;
-    }
-}
 
 use Test::More tests => 7;
 use Scalar::Util < qw/tainted/;
 
 
 use POSIX < qw(fcntl_h open read mkfifo);
-use strict ;
+ 
 
 $| = 1;
 

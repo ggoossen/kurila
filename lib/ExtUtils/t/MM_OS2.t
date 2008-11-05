@@ -11,7 +11,6 @@ BEGIN {
 }
 chdir 't';
 
-use strict;
 use Test::More;
 if ($^O =~ m/os2/i) {
 	plan( tests => 32 );

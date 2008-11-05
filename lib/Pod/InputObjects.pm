@@ -77,7 +77,6 @@ sections which follow.
 
 #############################################################################
 
-use strict;
 #use diagnostics;
 #use Carp;
 

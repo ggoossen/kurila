@@ -1,7 +1,6 @@
 
 package Pod::Simple::Transcode;
 
-use strict;
 
 our @ISA;
 

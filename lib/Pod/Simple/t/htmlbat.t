@@ -1,7 +1,6 @@
 # Testing HTMLBatch
 
 # Time-stamp: "2004-05-24 02:07:47 ADT"
-use strict;
 
 #sub Pod::Simple::HTMLBatch::DEBUG () {5};
 

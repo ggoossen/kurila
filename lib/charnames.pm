@@ -1,5 +1,5 @@
 package charnames;
-use strict;
+
 use warnings;
 use File::Spec;
 our $VERSION = '1.06';

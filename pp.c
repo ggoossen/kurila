@@ -354,7 +354,8 @@ PP(pp_anoncode)
 {
     dVAR; dSP;
     CV* cv = (CV*)PAD_SV(PL_op->op_targ);
-    if (CvCLONE(cv))
+    if ( CvPADLIST(cv) && 
+	( SvIV(PADLIST_NAMESV(CvPADLIST(cv), PAD_FLAGS_INDEX)) & PADf_CLONE ) )
 	cv = (CV*)sv_2mortal((SV*)cv_clone(cv));
     EXTEND(SP,1);
     PUSHs((SV*)cv);
@@ -3461,7 +3462,7 @@ PP(pp_delete)
 	if ( ! SvAVOK(slice) )
 	    Perl_croak(aTHX_ "slice expected an array as slice index, but got %s", Ddesc(slice));
 
-	slicecopy = av_mortalcopy(SvAV(slice));
+	slicecopy = av_mortalcopy(SvAv(slice));
 	items = AvARRAY(slicecopy);
 	avlen = av_len(slicecopy);
 
@@ -3472,7 +3473,7 @@ PP(pp_delete)
 		Perl_croak(aTHX_ "array slice expected an array but got a %s", Ddesc(sv));
 
 	    for (i = 0; i <= avlen; i++) {
-		SV * const delsv = av_delete(SvAV(sv), SvIV(items[i]), 0);
+		SV * const delsv = av_delete(SvAv(sv), SvIV(items[i]), 0);
 		SVcpREPLACE(items[i], delsv ? delsv : &PL_sv_undef );
 	    }
 	}
@@ -3482,7 +3483,7 @@ PP(pp_delete)
 		Perl_croak(aTHX_ "hash slice expected an array but got a %s", Ddesc(sv));
 
 	    for (i = 0; i <= avlen; i++) {
-		SV * const delsv = hv_delete_ent(SvHV(sv), items[i], 0, 0);
+		SV * const delsv = hv_delete_ent(SvHv(sv), items[i], 0, 0);
 		SVcpREPLACE(items[i], delsv ? delsv : &PL_sv_undef );
 	    }
 	}
@@ -4168,7 +4169,7 @@ PP(pp_reverse)
     }
 
     ary = AvARRAY(av);
-    end = ary + av_len(SvAV(av));
+    end = ary + av_len(SvAv(av));
     
     if (ary) {
 	while (ary < end) {

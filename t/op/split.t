@@ -159,7 +159,6 @@ do {
     # bug id 20000427.003 
 
     use warnings;
-    use strict;
 
     my $sushi = "\x{b36c}\x{5a8c}\x{ff5b}\x{5079}\x{505b}";
 

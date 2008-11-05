@@ -2,7 +2,6 @@
 # this file as a template for defsubs.h
 # Extracting defsubs.h (with variable substitutions)
 #!perl -w
-use strict;
 use File::Spec;
 my (undef, $headerpath) = < @ARGV;
 my ($out) = __FILE__ =~ m/(^.*)\.PL/i;
@@ -48,6 +47,7 @@ foreach my $const (qw(
 		      SVt_PVHV
 		      PAD_FAKELEX_ANON
 		      PAD_FAKELEX_MULTI
+                      PAD_NAME_START_INDEX
 		      ))
  {
   doconst($const);

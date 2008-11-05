@@ -1,6 +1,5 @@
 package ExtUtils::MY;
 
-use strict;
 require ExtUtils::MM;
 
 our $VERSION = 6.44;

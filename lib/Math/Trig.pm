@@ -7,7 +7,6 @@
 require Exporter;
 package Math::Trig;
 
-use strict;
 
 use vars < qw($VERSION $PACKAGE @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 

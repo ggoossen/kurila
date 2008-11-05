@@ -253,10 +253,9 @@ BOOT:
 #define B_main_cv()	PL_main_cv
 #define B_init_av()	PL_initav
 #define B_inc_gv()	PL_incgv
-#define B_check_av()	PL_checkav_save
-#define B_unitcheck_av()	PL_unitcheckav_save
-#define B_begin_av()	PL_beginav_save
 #define B_end_av()	PL_endav
+#define B_check_av()	PL_checkav
+#define B_unitcheck_av()	PL_unitcheckav
 #define B_sub_generation()	PL_sub_generation
 #define B_defstash()	PL_defstash
 #define B_curstash()	PL_curstash
@@ -277,9 +276,6 @@ B_check_av()
 
 B::AV
 B_unitcheck_av()
-
-B::AV
-B_begin_av()
 
 B::AV
 B_end_av()
@@ -919,14 +915,6 @@ CvDEPTH(cv)
 
 B::AV
 CvPADLIST(cv)
-	B::CV	cv
-
-B::CV
-CvOUTSIDE(cv)
-	B::CV	cv
-
-U32
-CvOUTSIDE_SEQ(cv)
 	B::CV	cv
 
 void

@@ -1,6 +1,6 @@
 #!/usr/local/bin/perl
 
-use strict ;
+ 
 use warnings ;
 use IO::Compress::Gzip < qw(gzip $GzipError);
 

@@ -10,7 +10,6 @@ BEGIN {
     }
 }
 
-use strict;
 
 require Test::Simple::Catch;
 my($out, $err) = < Test::Simple::Catch::caught();

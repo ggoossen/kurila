@@ -1,6 +1,5 @@
 
  # Time-stamp: "2004-03-30 17:52:14 AST"
-use strict;
 use Test;
 BEGIN { plan tests => 64 };
 BEGIN { ok 1 }

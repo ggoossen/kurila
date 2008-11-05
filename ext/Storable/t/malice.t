@@ -23,17 +23,12 @@ BEGIN {
 	# This lets us distribute Test::More in t/
 	unshift @INC, 't';
     }
-    if (%ENV{PERL_CORE} and %Config{'extensions'} !~ m/\bStorable\b/) {
-        print "1..0 # Skip: Storable was not built\n";
-        exit 0;
-    }
 }
 
-use strict;
 use vars < qw($file_magic_str $other_magic $network_magic $byteorder
             $major $minor $minor_write $fancy);
 
-$byteorder = %Config{byteorder};
+$byteorder = config_value('byteorder');
 
 $file_magic_str = 'pst0';
 $other_magic = 7 + length $byteorder;
@@ -79,14 +74,14 @@ sub test_header {
     # Network order header has no sizes
   } else {
     is ($header->{byteorder}, $byteorder, "byte order");
-    is ($header->{intsize}, %Config{intsize}, "int size");
-    is ($header->{longsize}, %Config{longsize}, "long size");
+    is ($header->{intsize}, config_value('intsize'), "int size");
+    is ($header->{longsize}, config_value('longsize'), "long size");
  SKIP: do {
 	skip ("No \$Config\{prtsize\} on this perl version ($^V)", 1)
-	    unless defined %Config{ptrsize};
-	is ($header->{ptrsize}, %Config{ptrsize}, "long size");
+	    unless defined config_value('ptrsize');
+	is ($header->{ptrsize}, config_value('ptrsize'), "long size");
     };
-    is ($header->{nvsize}, %Config{nvsize} || %Config{doublesize} || 8,
+    is ($header->{nvsize}, config_value('nvsize') || config_value('doublesize') || 8,
         "nv size"); # 5.00405 doesn't even have doublesize in config.
   }
 }
@@ -246,7 +241,7 @@ my $length = -s $file;
 die "Don't seem to have written file '$file' as I can't get its length: $!"
   unless defined $file;
 
-die "Expected file to be $expected bytes (sizeof long is %Config{longsize}) but it is $length"
+die "Expected file to be $expected bytes (sizeof long is $(config_value('longsize'))) but it is $length"
   unless $length == $expected;
 
 # Read the contents into memory:
@@ -274,7 +269,7 @@ $length = -s $file;
 die "Don't seem to have written file '$file' as I can't get its length: $!"
   unless defined $file;
 
-die "Expected file to be $expected bytes (sizeof long is %Config{longsize}) but it is $length"
+die "Expected file to be $expected bytes (sizeof long is $(config_value('longsize'))) but it is $length"
   unless $length == $expected;
 
 # Read the contents into memory:

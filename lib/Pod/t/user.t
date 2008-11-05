@@ -7,7 +7,7 @@
 #       Adriano Rodrigues Ferreira <ferreira@triang.com.br>
 
 use Test;
-use strict;
+
 
 BEGIN { plan tests => 17 }
 

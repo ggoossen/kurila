@@ -1,6 +1,6 @@
 
 package Pod::Simple::XMLOutStream;
-use strict;
+
 use utf8;
 use Carp ();
 use Pod::Simple ();

@@ -8,8 +8,7 @@ package B::Concise;
 # asks for the BEGIN blocks in her program. Update the comments and
 # the count in concise_specials if you add or delete one. The
 # -MO=Concise counts as use #1.
-
-use strict; # use #2
+ # use #2
 use warnings; # uses #3 and #4, since warnings uses Carp
 
 use Exporter (); # use #5
@@ -119,7 +118,7 @@ sub walk_output { # updates $walkHandle
     if (ref $handle eq 'SCALAR') {
 	require Config;
 	die "no perlio in this build, can't call walk_output (\\\$scalar)\n"
-	    unless %Config::Config{useperlio};
+	    unless Config::config_value("useperlio");
 	# in 5.8+, open(FILEHANDLE,MODE,REFERENCE) writes to string
 	open my $tmp, '>', $handle;	# but cant re-set existing STDOUT
 	$walkHandle = $tmp;		# so use my $tmp as intermediate var
@@ -287,7 +286,6 @@ sub compileOpts {
 	}
 	elsif ($o =~ m/^-stash=(.*)/) {
 	    my $pkg = $1;
-	    no strict 'refs';
 	    eval "require $pkg" unless %{Symbol::stash($pkg)};
 	    push @render_packs, $pkg;
 	}
@@ -354,7 +352,6 @@ sub compile {
 	    }
 	}
 	for my $pkg ( @render_packs) {
-	    no strict 'refs';
 	    concise_stashref($order, \%{Symbol::stash($pkg)});
 	}
 

@@ -1,11 +1,11 @@
 package ExtUtils::MM_Unix;
 
 
-use strict;
 
 use ExtUtils::MakeMaker::Config;
 use File::Basename < qw(basename dirname);
 use DirHandle;
+use Cwd 'cwd';
 
 our %Config_Override;
 
@@ -1589,7 +1589,7 @@ sub init_main {
 
             if (-f $self->catfile($dir,"config_h.SH")   &&
                 -f $self->catfile($dir,"perl.h")        &&
-                -f $self->catfile($dir,"lib","strict.pm")
+                -f $self->catfile($dir,"lib","error.pm")
             ) {
                 $self->{PERL_SRC}=$dir ;
                 last;
@@ -1716,10 +1716,10 @@ EOP
 
     $self->{LIBPERL_A} ||= "libperl$self->{LIB_EXT}";
 
-    # make a simple check if we find strict
+    # make a simple check if we find error.pm
     warn "Warning: PERL_LIB ($self->{PERL_LIB}) seems not to be a perl library directory
-        (strict.pm not found)"
-        unless -f $self->catfile("$self->{PERL_LIB}","strict.pm") ||
+        (error.pm not found)"
+        unless -f $self->catfile("$self->{PERL_LIB}","error.pm") ||
                $self->{NAME} eq "ExtUtils::MakeMaker";
 }
 
@@ -2429,7 +2429,6 @@ $(MAKE_APERL_FILE) : $(FIRST_MAKEFILE) pm_to_blib
 	# Once the patch to minimod.PL is in the distribution, I can
 	# drop it
 	return if $File::Find::name =~ m:auto/$self->{FULLEXT}/$self->{BASEEXT}$self->{LIB_EXT}\z:;
-	use Cwd 'cwd';
 	%static{cwd() . "/" . $_}++;
     }, < grep( -d $_, @{$searchdirs || \@()}) );
 
@@ -2695,7 +2694,6 @@ sub parse_version {
         next unless m/(?<!\\)([\$*])(([\w\:\']*)\bVERSION)\b.*\=/;
         my $eval = qq|
             package ExtUtils::MakeMaker::_version;
-            no strict;
             BEGIN \{ try \{
                 # Ensure any version() routine which might have leaked
                 # into this package has been deleted.  Interferes with

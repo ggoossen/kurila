@@ -1,4 +1,4 @@
-use strict;
+
 use MIME::Base64;
 
 print "1..283\n";

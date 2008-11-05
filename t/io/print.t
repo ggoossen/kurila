@@ -1,13 +1,11 @@
 #!./perl
 
-use strict 'vars';
 eval 'use Errno';
 die $@ if $@ and !%ENV{PERL_CORE_MINITEST};
 
 print "1..21\n";
 
 do {
-no strict 'refs';
 my $foo = *STDOUT{IO};
 print $foo "ok 1\n";
 };

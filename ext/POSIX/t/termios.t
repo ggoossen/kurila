@@ -3,10 +3,8 @@
 BEGIN {
     use Config;
     use Test::More;
-    plan skip_all => "POSIX is unavailable" 
-        if %Config{'extensions'} !~ m!\bPOSIX\b!;
 }
-use strict;
+
 use POSIX;
 BEGIN {
     plan skip_all => "POSIX::Termios not implemented" 

@@ -6,7 +6,7 @@
 #
 
 package Locale::Currency;
-use strict;
+
 
 require Exporter;
 

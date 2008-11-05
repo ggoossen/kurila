@@ -172,10 +172,6 @@ END_EXTERN_C
 #define PL_argvoutgv		(*Perl_Iargvoutgv_ptr(aTHX))
 #undef  PL_basetime
 #define PL_basetime		(*Perl_Ibasetime_ptr(aTHX))
-#undef  PL_beginav
-#define PL_beginav		(*Perl_Ibeginav_ptr(aTHX))
-#undef  PL_beginav_save
-#define PL_beginav_save		(*Perl_Ibeginav_save_ptr(aTHX))
 #undef  PL_bitcount
 #define PL_bitcount		(*Perl_Ibitcount_ptr(aTHX))
 #undef  PL_body_arenas
@@ -184,8 +180,6 @@ END_EXTERN_C
 #define PL_body_roots		(*Perl_Ibody_roots_ptr(aTHX))
 #undef  PL_checkav
 #define PL_checkav		(*Perl_Icheckav_ptr(aTHX))
-#undef  PL_checkav_save
-#define PL_checkav_save		(*Perl_Icheckav_save_ptr(aTHX))
 #undef  PL_chopset
 #define PL_chopset		(*Perl_Ichopset_ptr(aTHX))
 #undef  PL_clocktick
@@ -488,10 +482,6 @@ END_EXTERN_C
 #define PL_reg_state		(*Perl_Ireg_state_ptr(aTHX))
 #undef  PL_regdummy
 #define PL_regdummy		(*Perl_Iregdummy_ptr(aTHX))
-#undef  PL_regex_pad
-#define PL_regex_pad		(*Perl_Iregex_pad_ptr(aTHX))
-#undef  PL_regex_padav
-#define PL_regex_padav		(*Perl_Iregex_padav_ptr(aTHX))
 #undef  PL_reginterp_cnt
 #define PL_reginterp_cnt	(*Perl_Ireginterp_cnt_ptr(aTHX))
 #undef  PL_regmatch_slab
@@ -626,8 +616,6 @@ END_EXTERN_C
 #define PL_unicode		(*Perl_Iunicode_ptr(aTHX))
 #undef  PL_unitcheckav
 #define PL_unitcheckav		(*Perl_Iunitcheckav_ptr(aTHX))
-#undef  PL_unitcheckav_save
-#define PL_unitcheckav_save	(*Perl_Iunitcheckav_save_ptr(aTHX))
 #undef  PL_unlockhook
 #define PL_unlockhook		(*Perl_Iunlockhook_ptr(aTHX))
 #undef  PL_unsafe
@@ -698,30 +686,20 @@ END_EXTERN_C
 #define PL_curinterp		(*Perl_Gcurinterp_ptr(NULL))
 #undef  PL_do_undump
 #define PL_do_undump		(*Perl_Gdo_undump_ptr(NULL))
-#undef  PL_dollarzero_mutex
-#define PL_dollarzero_mutex	(*Perl_Gdollarzero_mutex_ptr(NULL))
 #undef  PL_fold_locale
 #define PL_fold_locale		(*Perl_Gfold_locale_ptr(NULL))
 #undef  PL_global_struct_size
 #define PL_global_struct_size	(*Perl_Gglobal_struct_size_ptr(NULL))
 #undef  PL_hexdigit
 #define PL_hexdigit		(*Perl_Ghexdigit_ptr(NULL))
-#undef  PL_hints_mutex
-#define PL_hints_mutex		(*Perl_Ghints_mutex_ptr(NULL))
 #undef  PL_interp_size
 #define PL_interp_size		(*Perl_Ginterp_size_ptr(NULL))
 #undef  PL_interp_size_5_10_0
 #define PL_interp_size_5_10_0	(*Perl_Ginterp_size_5_10_0_ptr(NULL))
-#undef  PL_malloc_mutex
-#define PL_malloc_mutex		(*Perl_Gmalloc_mutex_ptr(NULL))
 #undef  PL_mmap_page_size
 #define PL_mmap_page_size	(*Perl_Gmmap_page_size_ptr(NULL))
-#undef  PL_my_ctx_mutex
-#define PL_my_ctx_mutex		(*Perl_Gmy_ctx_mutex_ptr(NULL))
 #undef  PL_my_cxt_index
 #define PL_my_cxt_index		(*Perl_Gmy_cxt_index_ptr(NULL))
-#undef  PL_op_mutex
-#define PL_op_mutex		(*Perl_Gop_mutex_ptr(NULL))
 #undef  PL_op_seq
 #define PL_op_seq		(*Perl_Gop_seq_ptr(NULL))
 #undef  PL_op_sequence
@@ -734,8 +712,6 @@ END_EXTERN_C
 #define PL_perlio_fd_refcnt	(*Perl_Gperlio_fd_refcnt_ptr(NULL))
 #undef  PL_perlio_fd_refcnt_size
 #define PL_perlio_fd_refcnt_size	(*Perl_Gperlio_fd_refcnt_size_ptr(NULL))
-#undef  PL_perlio_mutex
-#define PL_perlio_mutex		(*Perl_Gperlio_mutex_ptr(NULL))
 #undef  PL_ppaddr
 #define PL_ppaddr		(*Perl_Gppaddr_ptr(NULL))
 #undef  PL_revision
@@ -762,8 +738,6 @@ END_EXTERN_C
 #define PL_subversion		(*Perl_Gsubversion_ptr(NULL))
 #undef  PL_sv_placeholder
 #define PL_sv_placeholder	(*Perl_Gsv_placeholder_ptr(NULL))
-#undef  PL_thr_key
-#define PL_thr_key		(*Perl_Gthr_key_ptr(NULL))
 #undef  PL_timesbase
 #define PL_timesbase		(*Perl_Gtimesbase_ptr(NULL))
 #undef  PL_use_safe_putenv

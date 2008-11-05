@@ -96,11 +96,7 @@ Looking at ../foo2, you'll see 34 occurrences of the following error:
 
 BEGIN {
     require Config;
-    if ((%Config::Config{'extensions'} !~ m/\bB\b/) ){
-        print "1..0 # Skip -- Perl configured without B module\n";
-        exit 0;
-    }
-    unless (%Config::Config{useperlio}) {
+    unless (Config::config_value("useperlio")) {
         print "1..0 # Skip -- Perl configured without perlio\n";
         exit 0;
     }
@@ -139,7 +135,7 @@ my $testpkgs = \%(
 		  main_start main_root main_cv init_av inc_gv hash
 		  end_av dowarn diehook defstash curstash
 		  cstring comppadlist check_av cchar cast_I32 bootstrap
-		  begin_av sub_generation address
+		  sub_generation address
                   set_main_start set_main_root fudge unitcheck_av),
     ),
 
@@ -161,7 +157,7 @@ my $testpkgs = \%(
 		     PMf_EXTENDED PMf_FOLD PMf_GLOBAL PMf_KEEP
 		     PMf_MULTILINE PMf_SINGLELINE
 		     POSTFIX SVf_FAKE SVf_IOK SVf_NOK SVf_POK SVf_ROK
-		     SVpad_OUR SVs_RMG SVs_SMG SWAP_CHILDREN OPpPAD_STATE
+		     SVpad_OUR SVs_RMG SVs_SMG SWAP_CHILDREN
 		     RXf_SKIPWHITE/,
 		 ),
 

@@ -1,7 +1,6 @@
 package ExtUtils::Packlist;
 
-use strict;
-use Config;
+use Config < qw(config_value config_keys);
 use vars < qw($VERSION $Relocations);
 $VERSION = '1.43';
 $VERSION = eval $VERSION;
@@ -35,11 +34,12 @@ time relative to $^X, and generates a regexp that matches them
 sub __find_relocations
 {
     my %paths;
-    while (my ($raw_key, $raw_val) = each %Config) {
+    for my $raw_key (keys config_keys) {
+        my $raw_val = config_value($raw_key);
 	my $exp_key = $raw_key . "exp";
-	next unless exists %Config{$exp_key};
+	next unless defined config_value($exp_key);
 	next unless $raw_val =~ m!\.\.\./!;
-	%paths{%Config{$exp_key}}++;
+	%paths{config_value($exp_key)}++;
     }
     # Longest prefixes go first in the alternatives
     my $alternations = join "|", map {quotemeta $_}
@@ -126,7 +126,7 @@ while (defined($line = ~< $fh))
       $key = $1;
       $data = \%( < map { < split('=', $_) } split(' ', $2));
 
-      if (%Config{userelocatableinc} && $data->{relocate_as})
+      if (config_value("userelocatableinc") && $data->{relocate_as})
       {
 	  require File::Spec;
 	  require Cwd;
@@ -153,7 +153,7 @@ open($fh, ">", "$packfile") || die("Can't open file $packfile: $!");
 foreach my $key (sort(keys(%{$self->{data} || \%()})))
    {
        my $data = $self->{data}->{$key};
-       if (%Config{userelocatableinc}) {
+       if (config_value("userelocatableinc")) {
 	   $Relocations ||= __find_relocations();
 	   if ($packfile =~ $Relocations) {
 	       # We are writing into a subdirectory of a run-time relocated
@@ -297,7 +297,6 @@ Here's C<modrm>, a little utility to cleanly remove an installed module.
 
     #!/usr/local/bin/perl -w
 
-    use strict;
     use IO::Dir;
     use ExtUtils::Packlist;
     use ExtUtils::Installed;

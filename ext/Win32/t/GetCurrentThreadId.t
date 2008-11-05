@@ -1,4 +1,3 @@
-use strict;
 use Config qw(%Config);
 use Test;
 use Win32;

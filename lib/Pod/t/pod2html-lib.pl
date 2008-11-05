@@ -1,6 +1,6 @@
 require Cwd;
 require Pod::Html;
-require Config;
+use Config < qw(config_value);
 use File::Spec::Functions;
 
 sub convert_n_test {
@@ -26,10 +26,7 @@ sub convert_n_test {
 	local $/;
 	# expected
 	$expect = ~< *DATA;
-	$expect =~ s/\[PERLADMIN\]/%Config::Config{perladmin}/;
-	if (ord("A") == 193) { # EBCDIC.
-	    $expect =~ s/item_mat_3c_21_3e/item_mat_4c_5a_6e/;
-	}
+	$expect =~ s/\[PERLADMIN\]/$(config_value('perladmin'))/;
 
 	# result
 	open my $in, "<", $outfile or die "cannot open $outfile: $!";

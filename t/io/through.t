@@ -7,7 +7,6 @@ BEGIN {
     }
 }
 
-use strict;
 require './test.pl';
 
 my $Perl = which_perl();

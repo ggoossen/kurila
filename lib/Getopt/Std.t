@@ -1,6 +1,6 @@
 #!./perl -wT
 
-use strict;
+
 use Test::More tests => 21;
 use Getopt::Std;
 

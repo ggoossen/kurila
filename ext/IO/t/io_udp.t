@@ -5,16 +5,9 @@ use Config;
 BEGIN {
     my $reason;
 
-    if (%ENV{PERL_CORE} and %Config{'extensions'} !~ m/\bSocket\b/) {
-      $reason = 'Socket was not built';
-    }
-    elsif (%ENV{PERL_CORE} and %Config{'extensions'} !~ m/\bIO\b/) {
-      $reason = 'IO was not built';
-    }
-    elsif ($^O eq 'apollo') {
+    if ($^O eq 'apollo') {
       $reason = "unknown *FIXME*";
     }
-    undef $reason if $^O eq 'VMS' and %Config{d_socket};
     if ($reason) {
 	print "1..0 # Skip: $reason\n";
 	exit 0;

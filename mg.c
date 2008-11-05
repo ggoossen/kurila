@@ -1553,11 +1553,15 @@ Perl_magic_setisa(pTHX_ SV *sv, MAGIC *mg)
     /* The first case occurs via setisa,
        the second via setisa_elem, which
        calls this same magic */
-    stash = GvSTASH(
-        SvTYPE(mg->mg_obj) == SVt_PVGV
-            ? (GV*)mg->mg_obj
-            : (GV*)SvMAGIC(mg->mg_obj)->mg_obj
-    );
+    if (SvTYPE(mg->mg_obj) == SVt_PVGV) {
+	stash = GvSTASH((GV*)mg->mg_obj);
+    }
+    else {
+	SV* gv = SvRV(mg->mg_obj);
+	if ( ! gv )
+	    return 0;
+	stash = GvSTASH(gv);
+    }
 
     mro_isa_changed_in(stash);
 

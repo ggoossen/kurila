@@ -1,7 +1,6 @@
 package Win32;
 
 BEGIN {
-    use strict;
     use vars qw|$VERSION $XS_VERSION @ISA @EXPORT @EXPORT_OK|;
 
     require Exporter;

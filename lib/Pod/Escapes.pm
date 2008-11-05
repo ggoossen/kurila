@@ -3,7 +3,7 @@
 # Time-stamp: "2004-05-07 15:31:25 ADT"
 package Pod::Escapes;
 require Exporter;
-use strict;
+
 our @ISA = @('Exporter');
 our $VERSION = '1.04';
 our @EXPORT_OK = qw(

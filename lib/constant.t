@@ -8,7 +8,6 @@ BEGIN {				# ...and save 'em for later
 END { print STDERR < @warnings }
 
 
-use strict;
 use Test::More tests => 88;
 my $TB = Test::More->builder;
 
@@ -126,7 +125,7 @@ print $output CCODE->($curr_test+4);
 $TB->current_test($curr_test+4);
 
 eval q{ CCODE->{foo} };
-ok scalar($@->{description} =~ m/^Constant is not a HASH/);
+like($@->{description}, qr/^Expected a HASH ref but got a CODE ref/);
 
 
 # Allow leading underscore

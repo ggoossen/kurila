@@ -2,16 +2,11 @@
 use TestInit;
 use Config;
 BEGIN {
-    if (%Config{'extensions'} !~ m/\bXS\/APItest\b/) {
-        print "1..0 # Skip: XS::APItest was not built\n";
-        exit 0;
-    }
     # Hush the used only once warning.
     $XS::APItest::WARNINGS_ON_BOOTSTRAP = $MacPerl::Architecture;
     $XS::APItest::WARNINGS_ON_BOOTSTRAP = 1;
 }
 
-use strict;
 use warnings;
 our $uc;
 BEGIN { $uc = 1; }
@@ -93,16 +88,16 @@ is($XS::APItest::INIT_called_PP, undef, "INIT not called (too late)");
 is($XS::APItest::END_called, undef, "END not yet called");
 is($XS::APItest::END_called_PP, undef, "END not yet called");
 
-{
+do {
     my @trap;
     local $^WARN_HOOK = sub { push @trap, @_[0]->{description} };
     require XS::APItest;
 
-    @trap = sort < @trap;
+    @trap = sort @trap;
     is(scalar nelems @trap, 2, "There were 2 warnings");
     is(@trap[0], "Too late to run CHECK block");
     is(@trap[1], "Too late to run INIT block");
-}
+};
 
 print "# Second body\n";
 is($XS::APItest::BEGIN_called, 1, "BEGIN called");

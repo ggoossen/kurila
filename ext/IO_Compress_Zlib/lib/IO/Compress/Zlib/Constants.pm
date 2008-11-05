@@ -1,7 +1,6 @@
 
 package IO::Compress::Zlib::Constants ;
-
-use strict ;
+ 
 use warnings;
 use bytes;
 

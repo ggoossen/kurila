@@ -1,6 +1,6 @@
 package OptreeCheck;
 use base 'Exporter';
-use strict;
+
 use warnings;
 use vars < qw($TODO $Level $using_open);
 require "./test.pl";
@@ -350,15 +350,13 @@ our %gOpts = 	# values are replaced at runtime !!
 # ponie uses it, it's going to be used by something official at least
 # in the interim. So it's nice for tests to all pass.
 
-our $threaded = 1
-  if %Config::Config{useithreads} || %Config::Config{use5005threads};
-our $platform = ($threaded) ? "threaded" : "plain";
-our $thrstat = ($threaded)  ? "threaded" : "nonthreaded";
+our $platform = "plain";
+our $thrstat = "nonthreaded";
 
 our %modes = %(
 	      both	=> \@( 'expect', 'expect_nt'),
-	      native	=> \@( ($threaded) ? 'expect' : 'expect_nt'),
-	      cross	=> \@( !($threaded) ? 'expect' : 'expect_nt'),
+	      native	=> \@( 'expect_nt'),
+	      cross	=> \@( !'expect_nt'),
 	      expect	=> \@( 'expect' ),
 	      expect_nt	=> \@( 'expect_nt' ),
 	      );
@@ -526,7 +524,6 @@ sub getRendering {
 	    #  in caller's package ( to test arg-fixup, comment next line)
 	    my $pkg = '{ package '.caller(1) .';';
 	    do {
-		no strict;
 		no warnings;
 		$code = eval "$pkg sub \{ $code \} \}";
 	    };
@@ -986,11 +983,7 @@ sub OptreeCheck::gentest {
     if ($got =~ m/got \'.*?\n(.*)\n\# \'\n\# expected/s) {
 	my $goldentxt = $1;
 	#and plug it into the test-src
-	if ($threaded) {
-	    $testcode =~ s/ThreadedRef/$goldentxt/;
-	} else {
-	    $testcode =~ s/NonThreadRef/$goldentxt/;
-	}
+        $testcode =~ s/NonThreadRef/$goldentxt/;
 	my $b4 = q{expect => <<EOT_EOT, expect_nt => <<EONT_EONT};
 	my $af = q{expect => <<'EOT_EOT', expect_nt => <<'EONT_EONT'};
 	$testcode =~ s/$b4/$af/;

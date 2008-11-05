@@ -1,6 +1,6 @@
 #!./perl
 
-use strict;
+
 use warnings;
 
 require q(./test.pl); plan(tests => 2);

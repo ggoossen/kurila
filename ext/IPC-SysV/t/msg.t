@@ -3,9 +3,9 @@ use Config;
 BEGIN {
     my $reason;
 
-    if (%Config{'d_sem'} ne 'define') {
+    if (config_value('d_sem') ne 'define') {
       $reason = '%Config{d_sem} undefined';
-    } elsif (%Config{'d_msg'} ne 'define') {
+    } elsif (config_value('d_msg') ne 'define') {
       $reason = '%Config{d_msg} undefined';
     }
     if ($reason) {

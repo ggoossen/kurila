@@ -5,7 +5,6 @@ BEGIN {
     }
 }
 
-use strict;
 
 #sub Pod::Simple::Search::DEBUG () {5};
 

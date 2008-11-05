@@ -1,6 +1,5 @@
 package File::Spec;
 
-use strict;
 our (@ISA, $VERSION);
 
 $VERSION = '3.2701';

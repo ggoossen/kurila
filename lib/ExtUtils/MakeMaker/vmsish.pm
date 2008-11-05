@@ -1,6 +1,5 @@
 package ExtUtils::MakeMaker::vmsish;
 
-use strict;
 
 our $VERSION = 6.44;
 

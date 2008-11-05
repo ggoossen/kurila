@@ -2,7 +2,7 @@
 
 #Causes Text::Wrap to die...
 use warnings;
-use strict;
+
 use Text::Wrap;
 
 my $toPrint = "(1) Category\t(2 or greater) New Category\n\n"; 

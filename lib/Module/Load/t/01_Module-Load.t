@@ -3,7 +3,6 @@ BEGIN {
     push @INC, "../lib/Module/Load/t/to_load";
 } 
 
-use strict;
 use Module::Load;
 use Test::More tests => 13;
 

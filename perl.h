@@ -75,12 +75,6 @@
 #  endif
 #endif
 
-#ifdef USE_ITHREADS
-#  if !defined(MULTIPLICITY)
-#    define MULTIPLICITY
-#  endif
-#endif
-
 #ifdef PERL_GLOBAL_STRUCT_PRIVATE
 #  ifndef PERL_GLOBAL_STRUCT
 #    define PERL_GLOBAL_STRUCT
@@ -124,12 +118,6 @@
  * if a "large" stack frame is allocated.              *
  * gcc on MARM does not generate calls like these.     */
 #   define USE_HEAP_INSTEAD_OF_STACK
-#endif
-
-#/* Use the reentrant APIs like localtime_r and getpwent_r */
-/* Win32 has naturally threadsafe libraries, no need to use any _r variants. */
-#if defined(USE_ITHREADS) && !defined(USE_REENTRANT_API) && !defined(NETWARE) && !defined(WIN32) && !defined(PERL_DARWIN)
-#   define USE_REENTRANT_API
 #endif
 
 /* <--- here ends the logic shared by perl.h and makedef.pl */
@@ -275,16 +263,6 @@
 #define CALLREG_PACKAGE(rx) \
     CALL_FPTR(RX_ENGINE(rx)->qr_package)(aTHX_ (rx))
 
-#if defined(USE_ITHREADS)         
-#define CALLREGDUPE(prog,param) \
-    Perl_re_dup(aTHX_ (prog),(param))
-
-#define CALLREGDUPE_PVT(prog,param) \
-    (prog ? CALL_FPTR(RX_ENGINE(prog)->dupe)(aTHX_ (prog),(param)) \
-          : (REGEXP *)NULL) 
-#endif
-
-
 
 
 
@@ -332,11 +310,7 @@
 #  define PERL_UNUSED_VAR(x) ((void)x)
 #endif
 
-#ifdef USE_ITHREADS
-#  define PERL_UNUSED_CONTEXT PERL_UNUSED_ARG(my_perl)
-#else
-#  define PERL_UNUSED_CONTEXT
-#endif
+#define PERL_UNUSED_CONTEXT
 
 #define NOOP /*EMPTY*/(void)0
 #if !defined(HASATTRIBUTE_UNUSED) && defined(__cplusplus)
@@ -592,9 +566,6 @@ register struct op *Perl_op asm(stringify(OP_IN_REGISTER));
 /* HP-UX 10.X CMA (Common Multithreaded Architecure) insists that
    pthread.h must be included before all other header files.
 */
-#if defined(USE_ITHREADS) && defined(PTHREAD_H_FIRST) && defined(I_PTHREAD)
-#  include <pthread.h>
-#endif
 
 #ifndef _TYPES_		/* If types.h defines this it's easy. */
 #   ifndef major		/* Does everyone's types.h define this? */
@@ -2750,49 +2721,6 @@ typedef struct clone_params CLONE_PARAMS;
 #endif
 #endif /* #ifndef PERL_MICRO */ 
 
-/* USE_5005THREADS needs to be after unixish.h as <pthread.h> includes
- * <sys/signal.h> which defines NSIG - which will stop inclusion of <signal.h>
- * this results in many functions being undeclared which bothers C++
- * May make sense to have threads after "*ish.h" anyway
- */
-
-#if defined(USE_ITHREADS)
-#  ifdef NETWARE
-#   include <nw5thread.h>
-#  else
-#  ifdef FAKE_THREADS
-#    include "fakethr.h"
-#  else
-#    ifdef WIN32
-#      include <win32thread.h>
-#    else
-#      ifdef OS2
-#        include "os2thread.h"
-#      else
-#        ifdef I_MACH_CTHREADS
-#          include <mach/cthreads.h>
-#          if (defined(NeXT) || defined(__NeXT__)) && defined(PERL_POLLUTE_MALLOC)
-#            define MUTEX_INIT_CALLS_MALLOC
-#          endif
-typedef cthread_t	perl_os_thread;
-typedef mutex_t		perl_mutex;
-typedef condition_t	perl_cond;
-typedef void *		perl_key;
-#        else /* Posix threads */
-#          ifdef I_PTHREAD
-#            include <pthread.h>
-#          endif
-typedef pthread_t	perl_os_thread;
-typedef pthread_mutex_t	perl_mutex;
-typedef pthread_cond_t	perl_cond;
-typedef pthread_key_t	perl_key;
-#        endif /* I_MACH_CTHREADS */
-#      endif /* OS2 */
-#    endif /* WIN32 */
-#  endif /* FAKE_THREADS */
-#endif	/* NETWARE */
-#endif /* USE_ITHREADS */
-
 #if defined(WIN32)
 #  include "win32.h"
 #endif
@@ -3984,17 +3912,8 @@ typedef Sighandler_t Sigsave_t;
 
 #ifdef USE_PERLIO
 EXTERN_C void PerlIO_teardown(void);
-# ifdef USE_ITHREADS
-#  define PERLIO_INIT MUTEX_INIT(&PL_perlio_mutex)
-#  define PERLIO_TERM 				\
-	STMT_START {				\
-		PerlIO_teardown();		\
-		MUTEX_DESTROY(&PL_perlio_mutex);\
-	} STMT_END
-# else
 #  define PERLIO_INIT
 #  define PERLIO_TERM	PerlIO_teardown()
-# endif
 #else
 #  define PERLIO_INIT
 #  define PERLIO_TERM
@@ -4442,9 +4361,6 @@ EXTCONST char PL_bincompat_options[] =
 #  endif
 #  ifdef USE_IEEE
 			     " USE_IEEE"
-#  endif
-#  ifdef USE_ITHREADS
-			     " USE_ITHREADS"
 #  endif
 #  ifdef USE_LARGE_FILES
 			     " USE_LARGE_FILES"

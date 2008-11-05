@@ -4,7 +4,6 @@ BEGIN {
     require './test.pl';
 }
 
-use strict;
 plan( tests => 49 );
 
 require bytes;

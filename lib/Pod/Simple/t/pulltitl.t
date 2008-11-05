@@ -1,5 +1,4 @@
 
-use strict;
 use charnames ':full';
 use Test;
 BEGIN { plan tests => 104 };

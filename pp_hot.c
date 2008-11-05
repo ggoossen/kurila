@@ -193,8 +193,7 @@ PP(pp_padsv)
     XPUSHs(TARG);
     if (PL_op->op_flags & OPf_MOD) {
 	if (PL_op->op_private & OPpLVAL_INTRO)
-	    if (!(PL_op->op_private & OPpPAD_STATE))
-		SAVECLEARSV(PAD_SVl(PL_op->op_targ));
+	    SAVECLEARSV(PAD_SVl(PL_op->op_targ));
         if (PL_op->op_private & OPpDEREF) {
 	    PUTBACK;
 	    vivify_ref(PAD_SVl(PL_op->op_targ), PL_op->op_private & OPpDEREF);
@@ -2030,7 +2029,7 @@ PP(pp_grepwhile)
     LEAVE;					/* exit inner scope */
 
     /* All done yet? */
-    if ( av_len(SvAV(*src)) == -1 ) {
+    if ( av_len(SvAv(*src)) == -1 ) {
 	const I32 gimme = GIMME_V;
 
 	LEAVE;					/* exit outer scope */
@@ -2048,7 +2047,7 @@ PP(pp_grepwhile)
 	SAVEVPTR(PL_curpm);
 
 	/* set $_ to the new source item */
-	srcitem = av_shift(SvAV(*src));
+	srcitem = av_shift(SvAv(*src));
 	XPUSHs(srcitem);
 	SvTEMP_off(srcitem);
 	if (PL_op->op_private & OPpGREP_LEX) {
@@ -2244,9 +2243,11 @@ PP(pp_entersub)
 	SAVECOMPPAD();
 	PAD_SET_CUR_NOSAVE(padlist, CvDEPTH(cv));
 	if (hasargs) {
-	    AV* const av = newAV();
-	    SAVECLEARSV(PAD_SVl(0));
-	    PAD_SVl(0) = AvSv(av);
+	    AV* av;
+	    SV* avsv = PAD_SVl(PAD_ARGS_INDEX);
+	    sv_upgrade(avsv, SVt_PVAV);
+	    av = SvAv(avsv);
+	    SAVECLEARSV(PAD_SVl(PAD_ARGS_INDEX));
 	    if (AvREAL(av)) {
 		/* @_ is normally not REAL--this should only ever
 		 * happen when DB::sub() calls things that modify @_ */
@@ -2341,7 +2342,7 @@ Perl_sub_crush_depth(pTHX_ CV *cv)
 
     loc = SvLOCATION((SV*)cv);
     if (loc && SvAVOK(loc)) {
-	name = av_fetch(SvAV(loc), 3, FALSE);
+	name = av_fetch(SvAv(loc), 3, FALSE);
     }
     Perl_warner(aTHX_ packWARN(WARN_RECURSION), 
 	"Deep recursion on subroutine \"%s\"",
@@ -2554,24 +2555,13 @@ S_method_common(pTHX_ SV* meth, U32* hashp)
 	}
 	if (!sep || ((sep - name) == 5 && strnEQ(name, "SUPER", 5))) {
 	    /* the method name is unqualified or starts with SUPER:: */
-#ifndef USE_ITHREADS
 	    if (sep)
 		stash = CopSTASH(PL_curcop);
-#else
-	    bool need_strlen = 1;
-	    if (sep) {
-		packname = CopSTASHPV(PL_curcop);
-	    }
-	    else
-#endif
 	    if (stash) {
 		HEK * const packhek = HvNAME_HEK(stash);
 		if (packhek) {
 		    packname = HEK_KEY(packhek);
 		    packlen = HEK_LEN(packhek);
-#ifdef USE_ITHREADS
-		    need_strlen = 0;
-#endif
 		} else {
 		    goto croak;
 		}
@@ -2582,11 +2572,6 @@ S_method_common(pTHX_ SV* meth, U32* hashp)
 		Perl_croak(aTHX_
 			   "Can't use anonymous symbol table for method lookup");
 	    }
-#ifdef USE_ITHREADS
-	    if (need_strlen)
-		packlen = strlen(packname);
-#endif
-
 	}
 	else {
 	    /* the method name is qualified */

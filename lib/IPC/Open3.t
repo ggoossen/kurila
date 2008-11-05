@@ -14,7 +14,6 @@ BEGIN {
     $^WARN_HOOK = sub { die < @_ };
 }
 
-use strict;
 use IO::Handle;
 use IPC::Open3;
 

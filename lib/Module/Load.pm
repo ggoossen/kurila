@@ -2,7 +2,6 @@ package Module::Load;
 
 our $VERSION = '0.12';
 
-use strict;
 use File::Spec ();
 
 sub import {

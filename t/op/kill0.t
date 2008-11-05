@@ -10,8 +10,6 @@ BEGIN {
     }
 }
 
-use strict;
-
 plan tests => 2;
 
 ok( kill(0, $$), 'kill(0, $pid) returns true if $pid exists' );
