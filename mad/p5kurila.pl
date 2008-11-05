@@ -1104,6 +1104,22 @@ sub remove_use_strict {
     }
 }
 
+sub add_call_parens {
+    my $xml = shift;
+    for my $op ($xml->findnodes("//op_entersub")) {
+        if ( not get_madprop($op, "null_type") ) {
+            my $gvop = $op->child(0)->child(1);
+            if (my $value = get_madprop($gvop, "value") ) {
+                set_madprop($gvop, "value", $value . "()");
+            }
+        }
+        elsif ( get_madprop($op, "null_type") eq "noamp" ) {
+            set_madprop($op, "round_open", "(");
+            set_madprop($op, "round_close", ")");
+        }
+    }
+}
+
 my $from; # floating point number with starting version of kurila.
 GetOptions("from=s" => \$from);
 $from =~ m/(\w+)[-]([\d.]+)$/ or die "invalid from: '$from'";
@@ -1192,10 +1208,14 @@ if ($from->{branch} ne "kurila" or $from->{v} < qv '1.14') {
 }
 #simplify_array($twig);
 
-#ampcall($twig);
-#doblock($twig);
-#lvalue_subs( $twig, "vec" );
-remove_use_strict($twig);
+if ($from->{branch} ne "kurila" or $from->{v} < qv '1.15') {
+    ampcall($twig);
+    doblock($twig);
+    lvalue_subs( $twig, "vec" );
+    remove_use_strict($twig);
+}
+
+#add_call_parens($twig);
 
 # print
 $twig->print( pretty_print => 'indented' );
