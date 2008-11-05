@@ -4674,7 +4674,7 @@ Perl_newANONHASH(pTHX_ OP *o, SV* location)
 OP *
 Perl_newANONSUB(pTHX_ I32 floor, OP *proto, OP *block)
 {
-    SV* sub = (SV*)newSUB(floor, proto, scalar(block));
+    SV* sub = (SV*)newSUB(floor, proto, block);
     if (CvPADLIST(sub)) {
 	SV* padflags = PADLIST_NAMESV(CvPADLIST(sub), PAD_FLAGS_INDEX);
 	SvIV_set(padflags, SvIV(padflags) & ~PADf_LATE);
