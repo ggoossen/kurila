@@ -23,6 +23,8 @@ my $path = join " ", map { qq["-I$_"] } @INC;
 $path = '"-I../lib" "-Iperl_root:[lib]"' if $Is_VMS;   # gets too long otherwise
 my $redir = $Is_MacOS ? "" : "2>&1";
 
+my $start_index = B::PAD_NAME_START_INDEX();
+
 # v1.01 tests
 
 my ($na,$nb,$nc);	# holds regex-strs
@@ -41,8 +43,8 @@ for my $newlex (@('', '-newlex')) {
 		     prog => 'my ($a,$b)', stderr => 1 );
     $na = padrep('$a',$newlex);
     $nb = padrep('$b',$newlex);
-    like ($out, qr/1: $na/ms, 'found $a in "my ($a,$b)"');
-    like ($out, qr/2: $nb/ms, 'found $b in "my ($a,$b)"');
+    like ($out, qr/5: $na/ms, 'found $a in "my ($a,$b)"');
+    like ($out, qr/6: $nb/ms, 'found $b in "my ($a,$b)"');
 
     print $out if $verbose;
 
@@ -57,8 +59,9 @@ SKIP: do {
     $walker->();
     $na = padrep('$foo',$newlex);
     $nb = padrep('$bar',$newlex);
-    like ($buf, qr/1: $na/ms, 'found $foo in "sub { my ($foo,$bar) }"');
-    like ($buf, qr/2: $nb/ms, 'found $bar in "sub { my ($foo,$bar) }"');
+    like ($buf, qr/$($start_index+1): $na/ms,
+       'found $foo in "sub { my ($foo,$bar) }"');
+    like ($buf, qr/$($start_index+2): $nb/ms, 'found $bar in "sub { my ($foo,$bar) }"');
 
     print $buf if $verbose;
 
@@ -71,9 +74,9 @@ SKIP: do {
     $na = padrep('$scalar',$newlex);
     $nb = padrep('@arr',$newlex);
     $nc = padrep('%hash',$newlex);
-    like ($buf, qr/1: $na/ms, 'found $scalar in "'. $src .'"');
-    like ($buf, qr/2: $nb/ms, 'found @arr    in "'. $src .'"');
-    like ($buf, qr/3: $nc/ms, 'found %hash   in "'. $src .'"');
+    like ($buf, qr/$($start_index+1): $na/ms, 'found $scalar in "'. $src .'"');
+    like ($buf, qr/$($start_index+2): $nb/ms, 'found @arr    in "'. $src .'"');
+    like ($buf, qr/$($start_index+3): $nc/ms, 'found %hash   in "'. $src .'"');
 
     print $buf if $verbose;
 
