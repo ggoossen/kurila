@@ -8,8 +8,46 @@ This document describes differences between Perl Kurila 1.14 and Perl Kurila 1.1
 
 =head1 Highlights In Perl Kurila 1.15
 
+Lots of bug fixes and minor changes.
+
 =head1 Core Enhancements
 
+=head2 blocks must be executed with C<do>
+
+A block by itself is no longer allowed, C<do> can be used to make a block
+by itself.
+
+=head2 Lexical scoped $_ in C<for> and C<while(~<$fh)> blocks
+
+A C<for> loop without a loop variable or a C<while(~<$fh)>,
+introduces a lexical C<$_>, which is used as the loop variable.
+
+=head2 C<pos> and C<vec> use have an additional argument instead of use of lvalue.
+
+C<pos> and C<vec> can not be used a lvalue, instead they accept an
+additional parameter.
+
+=head2 Minor changes
+
+=over 2
+
+=item C<for> loops can only be used with arrays, not as a C-style for loop.
+
+=item No calling implicit passing of @_ when calling a sub with C<&>.
+
+=item C<do> can only be used to execute a block or a file, not to call a sub.
+
+=item Code execution inside a string using C<{}> has been removed.
+
+=item C<goto> can only be used to goto subroutines, not to go to a label.
+
+=item The subroutine argument variable C<@_>, is now a lexical variable.
+
+=back
+
+=head2 Lots of bugfixes
+
+The are lots of minor internal bugs fixed.
 
 =head1 KNOWN BUGS
 
