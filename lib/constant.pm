@@ -8,10 +8,10 @@ $VERSION = '1.15';
 #=======================================================================
 
 # Some names are evil choices.
-my %keywords = %( < map +($_, 1), qw{ BEGIN INIT CHECK UNITCHECK END DESTROY } );
+my %keywords = %( < map { ($_, 1) } qw{ BEGIN INIT CHECK UNITCHECK END DESTROY } );
 
-my %forced_into_main = %( < map +($_, 1),
-    qw{ STDIN STDOUT STDERR ARGV ARGVOUT ENV INC SIG } );
+my %forced_into_main = %:< map { ($_, 1) }
+    qw{ STDIN STDOUT STDERR ARGV ARGVOUT ENV INC SIG };
 
 my %forbidden = %(< %keywords, < %forced_into_main);
 
@@ -36,7 +36,7 @@ sub import {
 	}
 	$constants = shift;
     } else {
-	$constants->{+shift} = undef;
+	$constants->{shift(@_)} = undef;
     }
 
     foreach my $name ( keys %$constants ) {
