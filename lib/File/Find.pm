@@ -1318,7 +1318,7 @@ $File::Find::dont_use_nlink = 1
 # See, e.g. hints/machten.sh for MachTen 2.2.
 unless ($File::Find::dont_use_nlink) {
     require Config;
-    $File::Find::dont_use_nlink = 1 if config::config_value('dont_use_nlink');
+    $File::Find::dont_use_nlink = 1 if Config::config_value('dont_use_nlink');
 }
 
 # We need a function that checks if a scalar is tainted. Either use the
