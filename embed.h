@@ -1418,7 +1418,6 @@
 #define skipspace		S_skipspace
 #define swallow_bom		S_swallow_bom
 #define checkcomma		S_checkcomma
-#define feature_is_enabled	S_feature_is_enabled
 #define force_ident		S_force_ident
 #define incline			S_incline
 #define intuit_more		S_intuit_more
@@ -3581,7 +3580,6 @@
 #define skipspace(a)		S_skipspace(aTHX_ a)
 #define swallow_bom(a)		S_swallow_bom(aTHX_ a)
 #define checkcomma(a,b,c)	S_checkcomma(aTHX_ a,b,c)
-#define feature_is_enabled(a,b)	S_feature_is_enabled(aTHX_ a,b)
 #define force_ident(a,b)	S_force_ident(aTHX_ a,b)
 #define incline(a)		S_incline(aTHX_ a)
 #define intuit_more(a)		S_intuit_more(aTHX_ a)

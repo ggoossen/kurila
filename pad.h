@@ -205,8 +205,7 @@ Restore the old pad saved into the local variable opad by PAD_SAVE_LOCAL()
 	    ? AvARRAY((AV*)(AvARRAY(padlist)[1]))[po] : NULL;
 
 #define PADLIST_NAMESV(padlist, po) \
-    ( (AvARRAY(padlist)[0])					\
-	? AvARRAY((AV*)(AvARRAY(padlist)[0]))[po] : NULL )
+    ( AvARRAY((AV*)(AvARRAY(padlist)[0]))[po] )
     
 #define PADLIST_PADNAMES(padlist) \
     ( (PAD*)(AvARRAY(padlist)[0]) )

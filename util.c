@@ -1197,7 +1197,6 @@ bool
 Perl_vdie_common(pTHX_ SV *msv, bool warn)
 {
     dVAR;
-    GV *gv;
     CV *cv = NULL;
     SV **const hook = warn ? &PL_warnhook : &PL_diehook;
     /* sv_2cv might call Perl_croak() or Perl_warner() */

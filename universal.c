@@ -1221,7 +1221,6 @@ XS(XS_PerlIO_get_layers)
 					IoIFP(io) : IoOFP(io));
 	     I32 i;
 	     const I32 last = av_len(av);
-	     I32 nitem = 0;
 	     AV* retav = (AV*)sv_2mortal((SV*)newAV());
 	     
 	     for (i = last; i >= 0; i -= 3) {
