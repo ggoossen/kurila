@@ -129,7 +129,7 @@ sub batch_convert {
     #  string like "/thing:/also:/whatever/perl" (":"-delim, as usual)
     #  or, under MSWin, like "c:/thing;d:/also;c:/whatever/perl" (";"-delim!)
     require Config;
-    my $ps = quotemeta( %Config::Config{'path_sep'} || ":" );
+    my $ps = quotemeta( config::config_value('path_sep') || ":" );
     $dirs = \ grep length($_), split qr/$ps/, $dirs;
   }
 
@@ -1150,7 +1150,7 @@ I<that> is because ":" often comes up in paths, like
 C<"c:/perl/lib">.)
 
 (Exactly what separator character should be used, is gotten from
-C<$Config::Config{'path_sep'}>, via the L<Config> module.)
+C<config::config_value('path_sep')>, via the L<Config> module.)
 
 =item $batchconv->batch_convert( ... , undef );
 

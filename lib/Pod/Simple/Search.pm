@@ -238,7 +238,7 @@ sub _path2modname {
     and(  $x eq 'site_perl'
        or($x eq 'pod' and (nelems @m) == 1 and $shortname =~ m{^perl.*\.pod$}s )
        or $x =~ m{\\d+\\.z\\d+([_.]?\\d+)?}  # if looks like a vernum
-       or $x eq lc( %Config::Config{'archname'} )
+       or $x eq lc( Config::config_value('archname') )
   )) { shift @m }
 
   my $name = join '::', @( < @m, $shortname);
@@ -536,13 +536,13 @@ sub find {
 
     # Add location of pod documentation for perl man pages (eg perlfunc)
     # This is a pod directory in the private install tree
-    #my $perlpoddir = File::Spec->catdir($Config::Config{'installprivlib'},
+    #my $perlpoddir = File::Spec->catdir(Config::config_value('installprivlib'),
     #					'pod');
     #push (@search_dirs, $perlpoddir)
     #  if -d $perlpoddir;
 
     # Add location of binaries such as pod2text:
-    push @search_dirs, %Config::Config{'scriptdir'};
+    push @search_dirs, Config::config_value('scriptdir');
      # and if that's undef or q{} or nonexistent, we just ignore it later
   }
 
@@ -960,7 +960,7 @@ for example, which is usually in F<pod/perlfunc> in most Perl dists.)
 
 The C<verbose> and C<inc> attributes influence the behavior of this
 search; notably, C<inc>, if true, adds @INC I<and also
-$Config::Config{'scriptdir'}> to the list of directories to search.
+Config::config_value('scriptdir')> to the list of directories to search.
 
 It is common to simply say C<< $filename = Pod::Simple::Search-> new 
 ->find("perlvar") >> so that just the @INC (well, and scriptdir)
