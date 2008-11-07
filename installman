@@ -150,7 +150,7 @@ sub pod2man {
     # dir ('.'), values are names relative to $poddir.
     my %modpods;
     if (@script) {
-	%modpods = %( < map {+"$poddir/$_", $_} @script);
+	%modpods = %( < map {"$poddir/$_", $_} @script);
     }
     else {
 	File::Find::find(\%(no_chdir=>1,
