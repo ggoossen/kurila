@@ -10,12 +10,10 @@ BEGIN {
     }
 }
 
-use Test::More tests => 4;
+use Test::More tests => 2;
 
-BEGIN { 
-    use_ok 'ExtUtils::MakeMaker'; 
-    use_ok 'ExtUtils::MM_VMS';
-}
+use ExtUtils::MakeMaker;
+use ExtUtils::MM_VMS;
 
 # Why 1?  Because a common mistake is for the regex to run in scalar context
 # thus getting the count of captured elements (1) rather than the value of $1

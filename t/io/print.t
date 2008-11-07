@@ -58,6 +58,6 @@ do {
     map print(< reverse @($_)), @(('')x68);
     print "ok 20\n";
 
-    map print(+()), @(('')x68);
+    map print(), @(('')x68);
     print "ok 21\n";
 };

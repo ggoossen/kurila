@@ -292,7 +292,7 @@ my $yyy = 2;
 my $test = 60;
 sub fred4 { 
     my $zzz = 3;
-    print +($zzz == 3  && eval '$zzz' == 3) ? 'ok' : 'not ok', " $test\n";
+    print( ($zzz == 3  && eval '$zzz' == 3) ? 'ok' : 'not ok', " $test\n");
     $test++;
     print eval '$yyy' == 2 ? 'ok' : 'not ok', " $test\n";
     $test++;
@@ -302,14 +302,14 @@ eval q{
     fred4();
     sub fred5 {
 	my $zzz = 4;
-	print +($zzz == 4  && eval '$zzz' == 4) ? 'ok' : 'not ok', " $test\n";
+	print( ($zzz == 4  && eval '$zzz' == 4) ? 'ok' : 'not ok', " $test\n" );
 	$test++;
 	print eval '$yyy' == 2 ? 'ok' : 'not ok', " $test\n";
 	$test++;
 	goto &fred4;
     }
     fred5();
-};
+}; die if $@;
 fred5();
 do { my $yyy = 88; my $zzz = 99; fred5(); };
 eval q{ my $yyy = 888; my $zzz = 999; fred5(); };

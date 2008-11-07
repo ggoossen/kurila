@@ -13,28 +13,6 @@ Unknown warnings category 'this-should-never-be-a-warning-category' at .../warni
     BEGIN called at - line 3 character 1.
 ########
 
-# Check compile time scope of pragma
-use warnings 'syntax' ;
-do {
-    no warnings ;
-    my $a =+ 1 ;
-};
-my $a =+ 1 ;
-EXPECT
-Reversed += operator at - line 8 character 7.
-########
-
-# Check compile time scope of pragma
-no warnings;
-do {
-    use warnings 'syntax' ;
-    my $a =+ 1 ;
-};
-my $a =+ 1 ;
-EXPECT
-Reversed += operator at - line 6 character 11.
-########
-
 # Check runtime scope of pragma
 use warnings 'uninitialized' ;
 do {
@@ -68,67 +46,12 @@ EXPECT
 Use of uninitialized value $b in scalar chop at - line 6 character 24.
     main::__ANON__ called at - line 8 character 1.
 ########
-
-use warnings 'syntax' ;
-my $a =+ 1 ;
-EXPECT
-Reversed += operator at - line 3 character 7.
-########
 -w
 no warnings 'reserved' ;
 foo.bar;
 EXPECT
 Useless use of concatenation (.) or string in void context at - line 3 character 4.
 Bareword "foo" not allowed while "strict subs" in use at - line 3 character 1.
-########
-
---FILE-- abc
-my $a =+ 1 ;
-1;
---FILE-- 
-use warnings 'syntax' ;
-require "./abc";
-EXPECT
-
-########
-
---FILE-- abc
-use warnings 'syntax' ;
-1;
---FILE-- 
-require "./abc";
-my $a =+ 1 ;
-EXPECT
-
-########
-
---FILE-- abc
-use warnings 'syntax' ;
-my $a =+ 1 ;
-1;
---FILE-- 
-use warnings 'uninitialized' ;
-require "./abc";
-my $a ; chop $a ;
-EXPECT
-Reversed += operator at ./abc line 2 character 7.
-    (require) called at - line 2 character 1.
-Use of uninitialized value $a in scalar chop at - line 3 character 9.
-########
-
---FILE-- abc.pm
-use warnings 'syntax' ;
-my $a =+ 1 ;
-1;
---FILE-- 
-use warnings 'uninitialized' ;
-use abc;
-my $a ; chop $a ;
-EXPECT
-Reversed += operator at abc.pm line 2 character 7.
-    (eval) called at - line 2 character 1.
-    BEGIN called at - line 2 character 1.
-Use of uninitialized value $a in scalar chop at - line 3 character 9.
 ########
 
 # Check scope of pragma with eval
@@ -192,61 +115,6 @@ Use of uninitialized value $b in scalar chop at - line 10 character 13.
 use warnings;
 do {
     no warnings ;
-    try {
-        my $a =+ 1 ;
-    }; print STDERR $@ ;
-    my $a =+ 1 ;
-};
-EXPECT
-
-########
-
-# Check scope of pragma with eval
-use warnings;
-do {
-    no warnings ;
-    try {
-        use warnings 'syntax' ;
-        my $a =+ 1 ;
-    }; print STDERR $@ ;
-    my $a =+ 1 ;
-};
-EXPECT
-Reversed += operator at - line 8 character 15.
-########
-
-# Check scope of pragma with eval
-no warnings;
-do {
-    use warnings 'syntax' ;
-    try {
-        my $a =+ 1 ;
-    }; print STDERR $@ ;
-    my $a =+ 1 ;
-};
-EXPECT
-Reversed += operator at - line 7 character 15.
-Reversed += operator at - line 9 character 11.
-########
-
-# Check scope of pragma with eval
-no warnings;
-do {
-    use warnings 'syntax' ;
-    try {
-        no warnings ;
-        my $a =+ 1 ;
-    }; print STDERR $@ ;
-    my $a =+ 1 ;
-};
-EXPECT
-Reversed += operator at - line 10 character 11.
-########
-
-# Check scope of pragma with eval
-use warnings;
-do {
-    no warnings ;
     eval '
         my $b ; chop $b ;
     '; print STDERR $@ ;
@@ -298,76 +166,3 @@ do {
 };
 EXPECT
 Use of uninitialized value $b in scalar chop at - line 10 character 13.
-########
-
-# Check scope of pragma with eval
-use warnings;
-do {
-    no warnings ;
-    eval '
-        my $a =+ 1 ;
-    '; print STDERR $@ ;
-    my $a =+ 1 ;
-};
-EXPECT
-
-########
-
-# Check scope of pragma with eval
-use warnings;
-do {
-    no warnings ;
-    eval q[ 
-        use warnings 'syntax' ;
-        my $a =+ 1 ;
-    ]; print STDERR $@;
-    my $a =+ 1 ;
-};
-EXPECT
-Reversed += operator at (eval 1) line 3 character 49.
-    (eval) called at - line 6 character 5.
-########
-
-# Check scope of pragma with eval
-no warnings;
-do {
-    use warnings 'syntax' ;
-    eval '
-        my $a =+ 1 ;
-    '; print STDERR $@;
-    my $a =+ 1 ;
-};
-EXPECT
-Reversed += operator at - line 9 character 11.
-Reversed += operator at (eval 1) line 2 character 16.
-    (eval) called at - line 6 character 5.
-########
-
-# Check scope of pragma with eval
-no warnings;
-do {
-    use warnings 'syntax' ;
-    eval '
-        no warnings ;
-        my $a =+ 1 ;
-    '; print STDERR $@;
-    my $a =+ 1 ;
-};
-EXPECT
-Reversed += operator at - line 10 character 11.
-########
-
-# Check the additive nature of the pragma
-my $a =+ 1 ;
-my $a ; chop $a ;
-use warnings 'syntax' ;
-$a =+ 1 ;
-my $b ; chop $b ;
-use warnings 'uninitialized' ;
-my $c ; chop $c ;
-no warnings 'syntax' ;
-$a =+ 1 ;
-EXPECT
-Reversed += operator at - line 6 character 4.
-Use of uninitialized value $c in scalar chop at - line 9 character 9.
-########

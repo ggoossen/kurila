@@ -256,17 +256,3 @@ do {
 };
 EXPECT
 Use of uninitialized value $b in scalar chop at - line 10 character 13.
-########
-
-# Check scope of pragma with eval
-BEGIN {  $^W = 1 }
-do {
-    no warnings ;
-    eval '
-        my $a =+ 1 ;
-    '; print STDERR $@ ;
-    my $a =+ 1 ;
-};
-EXPECT
-
-########

@@ -97,7 +97,7 @@ my_test_test("basic meta meta test");
 
 start_testing();
 $out->expect("not ok 1 - foo");
-$err->expect("#     Failed test ($0 at line ".line_num(+1).")");
+$err->expect("#     Failed test ($0 at line ".line_num(1).")");
 fail("foo");
 my_test_test("basic meta meta test 2");
 
@@ -111,7 +111,7 @@ my_test_test("meta meta test with tbt");
 start_testing();
 $out->expect("ok 1 - bar");
 test_out("not ok 1 - foo");
-test_err("#     Failed test ($0 at line ".line_num(+1).")");
+test_err("#     Failed test ($0 at line ".line_num(1).")");
 fail("foo");
 test_test("bar");
 my_test_test("meta meta test with tbt2 ");

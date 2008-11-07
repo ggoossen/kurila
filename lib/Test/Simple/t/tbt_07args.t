@@ -92,7 +92,7 @@ my_test_test("basic meta meta test");
 
 start_testing();
 $out->expect("not ok 1 - foo");
-$err->expect("#     Failed test ($0 at line ".line_num(+1).")");
+$err->expect("#     Failed test ($0 at line ".line_num(1).")");
 fail("foo");
 my_test_test("basic meta meta test 2");
 
@@ -106,7 +106,7 @@ my_test_test("meta meta test with tbt");
 start_testing();
 $out->expect("ok 1 - bar");
 test_out("not ok 1 - foo");
-test_err("#     Failed test ($0 at line ".line_num(+1).")");
+test_err("#     Failed test ($0 at line ".line_num(1).")");
 fail("foo");
 test_test("bar");
 my_test_test("meta meta test with tbt2 ");
@@ -175,7 +175,7 @@ $out->expect("ok 1 - bar");
 
 # set up what the inner wrapper expects
 test_out("not ok 1 - foo this is wrong");
-test_fail(+3);
+test_fail(3);
 
 # the actual test function that we are testing
 ok("0","foo");

@@ -181,9 +181,9 @@ $a = 12_3; print "$a\n";
 $a = 123_; print "$a\n";		#  6
 $a = eval "_+123"; print "$a\n";		#  7	string)
 $a = eval "+_123"; print "$a\n";		#( 8	string)
-$a = +1_23; print "$a\n";
-$a = +12_3; print "$a\n";
-$a = +123_; print "$a\n";		# 11
+$a = 1_23; print "$a\n";
+$a = 12_3; print "$a\n";
+$a = 123_; print "$a\n";		# 11
 $a = eval "_-123"; print "$a\n";		#(12	string)
 $a = -_123; print "$a\n";		#(13	string)
 $a = -1_23; print "$a\n";
@@ -193,10 +193,10 @@ $a = 123._456; print "$a\n";		# 17
 $a = 123.4_56; print "$a\n";
 $a = 123.45_6; print "$a\n";
 $a = 123.456_; print "$a\n";		# 20
-$a = +123._456; print "$a\n";		# 21
-$a = +123.4_56; print "$a\n";	
-$a = +123.45_6; print "$a\n";	
-$a = +123.456_; print "$a\n";		# 24
+$a = 123._456; print "$a\n";		# 21
+$a = 123.4_56; print "$a\n";	
+$a = 123.45_6; print "$a\n";	
+$a = 123.456_; print "$a\n";		# 24
 $a = -123._456; print "$a\n";		# 25
 $a = -123.4_56; print "$a\n";	
 $a = -123.45_6; print "$a\n";
@@ -222,9 +222,9 @@ $a = 12_3; print "$a\n";
 $a = 123_; print "$a\n";
 $a = eval "_+123"; print "$a\n";
 $a = eval "+_123"; print "$a\n";
-$a = +1_23; print "$a\n";
-$a = +12_3; print "$a\n";
-$a = +123_; print "$a\n";
+$a = 1_23; print "$a\n";
+$a = 12_3; print "$a\n";
+$a = 123_; print "$a\n";
 $a = eval "_-123"; print "$a\n";
 $a = -_123; print "$a\n";
 $a = -1_23; print "$a\n";
@@ -234,10 +234,10 @@ $a = 123._456; print "$a\n";
 $a = 123.4_56; print "$a\n";
 $a = 123.45_6; print "$a\n";
 $a = 123.456_; print "$a\n";
-$a = +123._456; print "$a\n";
-$a = +123.4_56; print "$a\n";
-$a = +123.45_6; print "$a\n";
-$a = +123.456_; print "$a\n";
+$a = 123._456; print "$a\n";
+$a = 123.4_56; print "$a\n";
+$a = 123.45_6; print "$a\n";
+$a = 123.456_; print "$a\n";
 $a = -123._456; print "$a\n";
 $a = -123.4_56; print "$a\n";
 $a = -123.45_6; print "$a\n";
@@ -259,12 +259,12 @@ $a = 12.34e1__2; printf("%.0f\n", $a);
 EXPECT
 OPTIONS regex
 Misplaced _ in number at - line 6 character 5.
-Misplaced _ in number at - line 11 character 7.
+Misplaced _ in number at - line 11 character 5.
 Misplaced _ in number at - line 16 character 7.
 Misplaced _ in number at - line 17 character 5.
 Misplaced _ in number at - line 20 character 5.
-Misplaced _ in number at - line 21 character 7.
-Misplaced _ in number at - line 24 character 7.
+Misplaced _ in number at - line 21 character 5.
+Misplaced _ in number at - line 24 character 5.
 Misplaced _ in number at - line 25 character 7.
 Misplaced _ in number at - line 28 character 7.
 Misplaced _ in number at - line 29 character 5.
@@ -383,20 +383,20 @@ yelp at foo line 30 character 18.
     (eval) called at - line 3 character 1.
 ########
 # toke.c
-my $a = rand + 4 ;
+my $a = rand - 4 ;
 EXPECT
 Warning: Use of "rand" without parentheses is ambiguous at - line 2 character 13.
 ########
 # toke.c
 $^W = 0 ;
-my $a = rand + 4 ;
+my $a = rand - 4 ;
 do {
     no warnings 'ambiguous' ;
-    $a = rand + 4 ;
+    $a = rand - 4 ;
     use warnings 'ambiguous' ;
-    $a = rand + 4 ;
+    $a = rand - 4 ;
 };
-$a = rand + 4 ;
+$a = rand - 4 ;
 EXPECT
 Warning: Use of "rand" without parentheses is ambiguous at - line 3 character 13.
 Warning: Use of "rand" without parentheses is ambiguous at - line 8 character 14.

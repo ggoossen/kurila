@@ -37,8 +37,6 @@ do {   ### list of commands and regexes matching output ###
         # command                                    # output regex
         \@( "$^X -v",                                  qr/gerard\s+goossen/i, ),
         \@( \@($^X, '-v'),                               qr/gerard\s+goossen/i, ),
-        \@( "$^X -eprint+42 | $^X -neprint",           qr/42/,            ),
-        \@( \@($^X, <qw[-eprint+42 |], $^X, < qw|-neprint|), qr/42/,            ),
     );
 
     diag( "Running tests that print only to stdout" ) if $Verbose;
@@ -111,8 +109,8 @@ do {   ### list of commands and regexes matching output ###
 do {   ### list of commands and regexes matching output ###
     my $map = \@(
         # command                                    # output regex
-        \@( "$^X -ewarn+42",                          qr/^42 /, ),
-        \@( \@($^X, '-ewarn+42'),                       qr/^42 /, ),
+        \@( "$^X -e'warn 42'",                          qr/^42 /, ),
+        \@( \@($^X, "-e'warn 42'"),                       qr/^42 /, ),
     );
 
     diag( "Running tests that print only to stderr" ) if $Verbose;

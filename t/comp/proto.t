@@ -47,7 +47,7 @@ ok( 1 == no_proto(5) );
 
 ok( 4 == &no_proto( < @_ ) );
 
-ok( 1 == no_proto +6 );
+ok( 1 == no_proto 6 );
 
 ok( 4 == no_proto(< @_) );
 
@@ -89,7 +89,7 @@ sub one_args ($) {
 
 ok( 1 == one_args(1) );
 
-ok( 1 == one_args +5 );
+ok( 1 == one_args 5 );
 
 ok( 4 == &one_args( < @_ ) );
 
@@ -121,7 +121,7 @@ sub over_one_args ($@) {
 
 ok( 1 == over_one_args(1) );
 ok( 2 == over_one_args(1,2) );
-ok( 1 == over_one_args +5 );
+ok( 1 == over_one_args 5 );
 ok( 4 == &over_one_args( < @_ ) );
 ok( 2 == &over_one_args(1,2) );
 ok( 5 == &over_one_args(1,< @_) );
@@ -152,7 +152,7 @@ sub one_or_two ($;$) {
 
 ok( 1 == one_or_two(1) );
 ok( 2 == one_or_two(1,3) );
-ok( 1 == one_or_two +5 );
+ok( 1 == one_or_two 5 );
 ok( 4 == &one_or_two( < @_ ) );
 ok( 3 == &one_or_two(1,2,3) );
 ok( 5 == &one_or_two(1,< @_) );

@@ -236,7 +236,7 @@ failure, the error message is stored in C<$@>.
 sub new {
     my $this = shift;
     my $class = ref($this) || $this;
-    my $self = +\%();
+    my $self = \%();
     bless $self, $class;
     $self->initialize();
     if(defined @_[0]) {

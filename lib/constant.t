@@ -117,7 +117,7 @@ use constant CARRAY	=> \@( undef, "ok 39\n" );
 use constant CCODE	=> sub { "ok @_[0]\n" };
 
 my $output = $TB->output ;
-print $output ${+CSCALAR};
+print $output ${$: CSCALAR};
 print $output CHASH->{foo};
 print $output CARRAY->[1];
 print $output CCODE->($curr_test+4);
@@ -240,11 +240,11 @@ use constant \%(
 	SPIT   => sub { shift },
 );
 
-is nelems(@{+FAMILY}), THREE;
-is nelems(@{+FAMILY}), nelems @{RFAM->[0]};
+is nelems(@{$:FAMILY}), THREE;
+is nelems(@{$:FAMILY}), nelems @{RFAM->[0]};
 is FAMILY->[2], RFAM->[0]->[2];
 is AGES->{FAMILY->[1]}, 28;
-is THREE**3, SPIT->((nelems @{+FAMILY})**3);
+is THREE**3, SPIT->((nelems @{$:FAMILY})**3);
 
 # Allow name of digits/underscores only if it begins with underscore
 do {

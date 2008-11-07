@@ -3,43 +3,6 @@ Check existing $^W functionality
 
 __END__
 
-# warnable code, warnings disabled
-$a =+ 3 ;
-EXPECT
-
-########
--w
-# warnable code, warnings enabled via command line switch
-my $x;
-$x =+ 3 ;
-EXPECT
-Reversed += operator at - line 4 character 4.
-########
-#! perl -w
-# warnable code, warnings enabled via #! line
-my $x;
-$x =+ 3 ;
-EXPECT
-Reversed += operator at - line 4 character 4.
-########
-
-# warnable code, warnings enabled via compile time $^W
-BEGIN { $^W = 1 }
-my $x;
-$x =+ 3 ;
-EXPECT
-Reversed += operator at - line 5 character 4.
-########
-
-# compile-time warnable code, warnings enabled via runtime $^W
-# so no warning printed.
-$^W = 1 ;
-my $x;
-$x =+ 3 ;
-EXPECT
-
-########
-
 # warnable code, warnings enabled via runtime $^W
 $^W = 1 ;
 my $b ; chop $b ;

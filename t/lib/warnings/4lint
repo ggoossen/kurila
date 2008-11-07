@@ -2,16 +2,6 @@ Check lint
 
 __END__
 -W
-# lint: check compile time $^W is zapped
-BEGIN { $^W = 0 ;}
-$a = 1 ;
-$a =+ 1 ;
-close STDIN ; print STDIN "abc" ;
-EXPECT
-Reversed += operator at - line 5 character 4.
-print() on closed filehandle STDIN at - line 6 character 15.
-########
--W
 # lint: check runtime $^W is zapped
 $^W = 0 ;
 close STDIN ; print STDIN "abc" ;
@@ -26,16 +16,6 @@ do {
 };
 EXPECT
 print() on closed filehandle STDIN at - line 5 character 17.
-########
--W
-# lint: check "no warnings" is zapped
-no warnings ;
-$a = 1 ;
-$a =+ 1 ;
-close STDIN ; print STDIN "abc" ;
-EXPECT
-Reversed += operator at - line 5 character 4.
-print() on closed filehandle STDIN at - line 6 character 15.
 ########
 -W
 # lint: check "no warnings" is zapped
@@ -54,71 +34,6 @@ do {
 };
 EXPECT
 print() on closed filehandle STDIN at - line 5 character 17.
-########
--W
---FILE-- abc.pm
-package abc;
-no warnings 'syntax' ;
-my $a = 0;
-$a =+ 1 ;
-1;
---FILE-- 
-no warnings 'uninitialized' ;
-use abc;
-my $a ; chop $a ;
-EXPECT
-Reversed += operator at abc.pm line 4 character 4.
-    (eval) called at - line 2 character 1.
-    BEGIN called at - line 2 character 1.
-Use of uninitialized value $a in scalar chop at - line 3 character 9.
-########
--W
---FILE-- abc
-package abc;
-no warnings 'syntax' ;
-my $a = 0;
-$a =+ 1 ;
-1;
---FILE-- 
-no warnings 'uninitialized' ;
-require "./abc";
-my $a ; chop $a ;
-EXPECT
-Reversed += operator at ./abc line 4 character 4.
-    (require) called at - line 2 character 1.
-Use of uninitialized value $a in scalar chop at - line 3 character 9.
-########
--W
---FILE-- abc.pm
-package abc;
-BEGIN {$^W = 0}
-my $a = 0 ;
-$a =+ 1 ;
-1;
---FILE-- 
-$^W = 0 ;
-use abc;
-my $a ; chop $a ;
-EXPECT
-Reversed += operator at abc.pm line 4 character 4.
-    (eval) called at - line 2 character 1.
-    BEGIN called at - line 2 character 1.
-Use of uninitialized value $a in scalar chop at - line 3 character 9.
-########
--W
---FILE-- abc
-BEGIN {$^W = 0}
-my $a = 0 ;
-$a =+ 1 ;
-1;
---FILE-- 
-$^W = 0 ;
-require "./abc";
-my $a ; chop $a ;
-EXPECT
-Reversed += operator at ./abc line 3 character 4.
-    (require) called at - line 2 character 1.
-Use of uninitialized value $a in scalar chop at - line 3 character 9.
 ########
 -W
 # Check scope of pragma with eval
@@ -180,54 +95,3 @@ EXPECT
 Use of uninitialized value $b in scalar chop at (eval 1) line 3 character 40.
     (eval) called at - line 6 character 5.
 Use of uninitialized value $b in scalar chop at - line 10 character 13.
-########
--W
-# Check scope of pragma with eval
-use warnings;
-do {
-    my $a = "1"; my $b = "2";
-    no warnings ;
-    eval q[ 
-        use warnings 'syntax' ;
-        $a =+ 1 ;
-    ]; print STDERR $@;
-    $a =+ 1 ;
-};
-EXPECT
-Reversed += operator at - line 11 character 8.
-Reversed += operator at (eval 1) line 3 character 46.
-    (eval) called at - line 7 character 5.
-########
--W
-# Check scope of pragma with eval
-no warnings;
-do {
-    my $a = "1"; my $b = "2";
-    use warnings 'syntax' ;
-    eval '
-        $a =+ 1 ;
-    '; print STDERR $@;
-    $a =+ 1 ;
-};
-EXPECT
-Reversed += operator at - line 10 character 8.
-Reversed += operator at (eval 1) line 2 character 13.
-    (eval) called at - line 7 character 5.
-########
--W
-# Check scope of pragma with eval
-no warnings;
-do {
-    my $a = "1"; my $b = "2";
-    use warnings 'syntax' ;
-    eval '
-        no warnings ;
-        $a =+ 1 ;
-    '; print STDERR $@;
-    $a =+ 1 ;
-};
-EXPECT
-Reversed += operator at - line 11 character 8.
-Reversed += operator at (eval 1) line 3 character 35.
-    (eval) called at - line 7 character 5.
-########

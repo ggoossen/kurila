@@ -1033,7 +1033,7 @@ EOF
           push @InitFileCode,
             "        SvREFCNT_inc(CV_$Full_func_name);\n";
           push @InitFileCode,
-            "        process_special_block(Perl_keyword(aTHX_ STR_WITH_LEN(\"$keyword\"), FALSE), CV_$Full_func_name);\n";
+            "        process_special_block(Perl_keyword(aTHX_ STR_WITH_LEN(\"$keyword\")), CV_$Full_func_name);\n";
       }
     }
 }

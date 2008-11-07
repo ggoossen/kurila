@@ -896,6 +896,12 @@ termunop : '-' term %prec UMINUS                       /* -$x */
 			{ $$ = newUNOP(OP_NEGATE, 0, scalar($2), LOCATION($1));
 			  TOKEN_GETMAD($1,$$,'o');
 			}
+	|	'+' term %prec UMINUS                  /* +$x */
+			{
+                            Perl_croak_at(aTHX_ LOCATION($1),
+                                "unary plus (+) reserved");
+                            $$ = $2;
+			}
 	|	'!' term                               /* !$x */
 			{ $$ = newUNOP(OP_NOT, 0, scalar($2), LOCATION($1));
 			  TOKEN_GETMAD($1,$$,'o');

@@ -3,7 +3,7 @@
 print "1..145\n";
 
 sub tryok ($$) {
-   print +(@_[1] ? "ok" : "not ok"), " @_[0]\n";
+   print( (@_[1] ? "ok" : "not ok"), " @_[0]\n" );
 }
 sub tryeq ($$$) {
   if (@_[1] == @_[2]) {
@@ -92,12 +92,12 @@ tryeq $T++, 1 + 1, 2;
 tryeq $T++, 4 + -2, 2;
 tryeq $T++, -10 + 100, 90;
 tryeq $T++, -7 + -9, -16;
-tryeq $T++, -63 + +2, -61;
+tryeq $T++, -63 + 2, -61;
 tryeq $T++, 4 + -1, 3;
 tryeq $T++, -1 + 1, 0;
-tryeq $T++, +29 + -29, 0;
+tryeq $T++, 29 + -29, 0;
 tryeq $T++, -1 + 4, 3;
-tryeq $T++, +4 + -17, -13;
+tryeq $T++, 4 + -17, -13;
 
 # subtraction
 tryeq $T++, 3 - 1, 2;
@@ -126,7 +126,7 @@ tryeq $T++, 2147483647 - -2147483648, 4294967295;
 # UV - IV promote to NV
 tryeq $T++, 4294967294 - -3, 4294967297;
 # IV - IV promote to NV
-tryeq $T++, -2147483648 - +1, -2147483649;
+tryeq $T++, -2147483648 - 1, -2147483649;
 # UV - UV promote to IV
 tryeq $T++, 2147483648 - 2147483650, -2;
 # IV - UV promote to IV
@@ -157,10 +157,10 @@ $s -= 1;
 tryeq $T++, $s, -1;
 undef $s;
 $s -= -1;
-tryeq $T++, $s, +1;
+tryeq $T++, $s, 1;
 undef $s;
 $s -= -4294967290;
-tryeq $T++, $s, +4294967290;
+tryeq $T++, $s, 4294967290;
 undef $s;
 $s -= 4294967290;
 tryeq $T++, $s, -4294967290;
@@ -169,7 +169,7 @@ $s -= 4294967297;
 tryeq $T++, $s, -4294967297;
 undef $s;
 $s -= -4294967297;
-tryeq $T++, $s, +4294967297;
+tryeq $T++, $s, 4294967297;
 
 # Multiplication
 
