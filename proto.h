@@ -5205,11 +5205,6 @@ STATIC void	S_checkcomma(pTHX_ const char *s, const char *name, const char *what
 #define PERL_ARGS_ASSERT_CHECKCOMMA	\
 	assert(s); assert(name); assert(what)
 
-STATIC bool	S_feature_is_enabled(pTHX_ const char *const name, STRLEN namelen)
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_FEATURE_IS_ENABLED	\
-	assert(name)
-
 STATIC void	S_force_ident(pTHX_ const char *s, int kind)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_FORCE_IDENT	\
