@@ -190,8 +190,8 @@ sub can_run {
         return MM->maybe_command($command);
 
     } else {
-        for my $dir (
-            split m/\Q$(Config::config_value('path_sep'))\E/, %ENV{PATH}),
+        for my $dir (@:
+            < split(m/\Q$(Config::config_value('path_sep'))\E/, %ENV{PATH}),
             File::Spec->curdir
         ) {
             my $abs = File::Spec->catfile($dir, $command);
