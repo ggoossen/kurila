@@ -284,7 +284,7 @@ PP(pp_prototype)
     if (SvPOK(TOPs) && SvCUR(TOPs) >= 7) {
 	const char * s = SvPVX_const(TOPs);
 	if (strnEQ(s, "CORE::", 6)) {
-	    const int code = keyword(s + 6, SvCUR(TOPs) - 6, 1);
+	    const int code = keyword(s + 6, SvCUR(TOPs) - 6);
 	    if (code < 0) {	/* Overridable. */
 #define MAX_ARGS_OP ((sizeof(I32) - 1) * 2)
 		int i = 0, n = 0, seen_question = 0, defgv = 0;

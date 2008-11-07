@@ -400,7 +400,7 @@ ApR	|bool	|is_utf8_print	|NN const char *p
 ApR	|bool	|is_utf8_punct	|NN const char *p
 ApR	|bool	|is_utf8_xdigit	|NN const char *p
 ApR	|bool	|is_utf8_mark	|NN const char *p
-pP	|I32	|keyword	|NN const char* name|I32 len|bool all_keywords
+pP	|I32	|keyword	|NN const char* name|I32 len
 Ap	|void	|leave_scope	|I32 base
 EXp	|void	|lex_end
 p	|void	|lex_start	|NULLOK SV* line|NULLOK PerlIO *rsfp|bool new_filter

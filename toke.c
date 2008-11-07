@@ -1282,7 +1282,7 @@ S_force_word(pTHX_ register char *start, int token, int check_keyword, int allow
 	(allow_initial_tick && *s == '\'') )
     {
 	s = scan_word(s, PL_tokenbuf, sizeof PL_tokenbuf, allow_pack, &len);
-	if (check_keyword && keyword(PL_tokenbuf, len, 0))
+	if (check_keyword && keyword(PL_tokenbuf, len))
 	    return start;
 	start_force(PL_curforce);
 	if (PL_madskills)
@@ -3568,7 +3568,7 @@ Perl_yylex(pTHX)
 		I32 tmp;
 		SV *sv;
 		d = scan_word(s, PL_tokenbuf, sizeof PL_tokenbuf, FALSE, &len);
-		if (isLOWER(*s) && (tmp = keyword(PL_tokenbuf, len, 0))) {
+		if (isLOWER(*s) && (tmp = keyword(PL_tokenbuf, len))) {
 		    if (tmp < 0) tmp = -tmp;
 		    switch (tmp) {
 		    case KEY_or:
@@ -4043,7 +4043,7 @@ Perl_yylex(pTHX)
 		    char tmpbuf[sizeof PL_tokenbuf];
 		    int t2;
 		    scan_word(s, tmpbuf, sizeof tmpbuf, TRUE, &len);
-		    if ((t2 = keyword(tmpbuf, len, 0))) {
+		    if ((t2 = keyword(tmpbuf, len))) {
 			/* binary operators exclude handle interpretations */
 			switch (t2) {
 			case -KEY_x:
@@ -4300,7 +4300,7 @@ Perl_yylex(pTHX)
 	}
 
 	/* Check for keywords */
-	tmp = keyword(PL_tokenbuf, len, 0);
+	tmp = keyword(PL_tokenbuf, len);
 
 	/* Is this a word before a => operator? */
 	if (*d == '=' && d[1] == '>') {
@@ -4789,7 +4789,7 @@ Perl_yylex(pTHX)
 		s += 2;
 		d = s;
 		s = scan_word(s, PL_tokenbuf, sizeof PL_tokenbuf, FALSE, &len);
-		if (!(tmp = keyword(PL_tokenbuf, len, 0)))
+		if (!(tmp = keyword(PL_tokenbuf, len)))
 		    Perl_croak(aTHX_ "CORE::%s is not a keyword", PL_tokenbuf);
 		if (tmp < 0)
 		    tmp = -tmp;
@@ -5953,7 +5953,7 @@ S_pending_ident(pTHX)
  */
 
 I32
-Perl_keyword (pTHX_ const char *name, I32 len, bool all_keywords)
+Perl_keyword (pTHX_ const char *name, I32 len)
 {
     dVAR;
 
@@ -9256,7 +9256,7 @@ S_checkcomma(pTHX_ const char *s, const char *name, const char *what)
 	    s++;
 	if (*s == ',') {
 	    GV* gv;
-	    if (keyword(w, s - w, 0))
+	    if (keyword(w, s - w))
 		return;
 
 	    gv = gv_fetchpvn_flags(w, s - w, 0, SVt_PVCV);
