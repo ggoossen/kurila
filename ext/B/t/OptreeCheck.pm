@@ -338,7 +338,7 @@ our %gOpts = 	# values are replaced at runtime !!
 
 
 # Not sure if this is too much cheating. Officially we say that
-# $Config::Config{usethreads} is true if some sort of threading is in
+# Config::config_value('usethreads') is true if some sort of threading is in
 # use, in which case we ought to be able to use it in place of the ||
 # below.  However, it is now possible to Configure perl with "threads"
 # but neither ithreads or 5005threads, which forces the re-entrant
