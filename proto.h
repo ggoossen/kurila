@@ -1387,7 +1387,7 @@ PERL_CALLCONV bool	Perl_is_utf8_mark(pTHX_ const char *p)
 #define PERL_ARGS_ASSERT_IS_UTF8_MARK	\
 	assert(p)
 
-PERL_CALLCONV I32	Perl_keyword(pTHX_ const char* name, I32 len, bool all_keywords)
+PERL_CALLCONV I32	Perl_keyword(pTHX_ const char* name, I32 len)
 			__attribute__pure__
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_KEYWORD	\

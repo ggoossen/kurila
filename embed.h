@@ -2541,7 +2541,7 @@
 #define is_utf8_xdigit(a)	Perl_is_utf8_xdigit(aTHX_ a)
 #define is_utf8_mark(a)		Perl_is_utf8_mark(aTHX_ a)
 #ifdef PERL_CORE
-#define keyword(a,b,c)		Perl_keyword(aTHX_ a,b,c)
+#define keyword(a,b)		Perl_keyword(aTHX_ a,b)
 #endif
 #define leave_scope(a)		Perl_leave_scope(aTHX_ a)
 #if defined(PERL_CORE) || defined(PERL_EXT)
