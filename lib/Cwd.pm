@@ -323,7 +323,8 @@ sub _backtick_pwd {
 
 unless (%METHOD_MAP{$^O}->{cwd} or defined &cwd) {
     # The pwd command is not available in some chroot(2)'ed environments
-    my $sep = %Config::Config{path_sep} || ':';
+    require Config;
+    my $sep = Config::config_value("path_sep") || ':';
     my $os = $^O;  # Protect $^O from tainting
 
 

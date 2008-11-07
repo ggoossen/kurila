@@ -1,6 +1,6 @@
 BEGIN {
     use Config;
-    if (%Config::Config{'extensions'} !~ m/\bEncode\b/) {
+    if (Config::config_value('extensions') !~ m/\bEncode\b/) {
       print "1..0 # Skip: Encode was not built\n";
       exit 0;
     }
