@@ -896,14 +896,6 @@ termunop : '-' term %prec UMINUS                       /* -$x */
 			{ $$ = newUNOP(OP_NEGATE, 0, scalar($2), LOCATION($1));
 			  TOKEN_GETMAD($1,$$,'o');
 			}
-	|	'+' term %prec UMINUS                  /* +$x */
-			{ $$ = IF_MAD(
-                                newUNOP(OP_NULL, 0, $2, LOCATION($1)),
-				    $2
-				);
-			  TOKEN_GETMAD($1,$$,'+');
-                          APPEND_MADPROPS_PV("unary+",$$,'>');
-			}
 	|	'!' term                               /* !$x */
 			{ $$ = newUNOP(OP_NOT, 0, scalar($2), LOCATION($1));
 			  TOKEN_GETMAD($1,$$,'o');

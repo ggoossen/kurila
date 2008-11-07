@@ -3443,9 +3443,7 @@ Perl_yylex(pTHX)
 		Aop(OP_ADD);
 	    }
 	    else {
-		if (isSPACE(*s) || !isSPACE(*PL_bufptr))
-		    check_uni();
-		OPERATOR('+');
+		yyerror(Perl_form(aTHX_ "unary plus (+) reserved"));
 	    }
 	}
 
