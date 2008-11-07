@@ -3417,7 +3417,7 @@ Perl_yylex(pTHX)
 		Aop(OP_ADD);
 	    }
 	    else {
-		yyerror(Perl_form(aTHX_ "unary plus (+) reserved"));
+		OPERATOR('+');
 	    }
 	}
 

@@ -33,7 +33,7 @@ do {   ok( allow( 42, qr/^\d+$/ ), "Allow based on regex" );
     ### check if the subs for allow get what you expect ###
     for my $thing (@(1,'foo',\@(1))) {
         allow( $thing, 
-           sub { is_deeply(+shift,$thing,  "Allow coderef gets proper args") } 
+           sub { is_deeply(shift,$thing,  "Allow coderef gets proper args") } 
         );
     }
 };
@@ -223,7 +223,7 @@ do {   ### check if the subs for allow get what you expect ###
     for my $thing (@(1,'foo',\@(1))) {
         my $tmpl = \%(
             foo => \%( allow =>
-                    sub { is_deeply(+shift,$thing,  
+                    sub { is_deeply(shift,$thing,  
                                     "   Allow coderef gets proper args") } 
             )
         );
@@ -300,7 +300,7 @@ do {
         id_list     => \%( default        => \@(),
                          strict_type    => 1
                     ),
-        phone       => \%( allow          => sub { 1 if +shift } ),
+        phone       => \%( allow          => sub { 1 if shift } ),
         bureau      => \%( default        => 'NSA',
                          no_override    => 1
                     ),

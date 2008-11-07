@@ -31,16 +31,16 @@ test_test("testing failing");
 
 test_out("not ok 1");
 test_out("not ok 2");
-test_fail(+2);
-test_fail(+1);
+test_fail(2);
+test_fail(1);
 fail();  fail();
 test_test("testing failing on the same line with no name");
 
 
 test_out("not ok 1 - name");
 test_out("not ok 2 - name");
-test_fail(+2);
-test_fail(+1);
+test_fail(2);
+test_fail(1);
 fail("name");  fail("name");
 test_test("testing failing on the same line with the same name");
 

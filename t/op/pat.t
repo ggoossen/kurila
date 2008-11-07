@@ -1855,7 +1855,7 @@ do {
 	"xx.*$c", "x.*$c$c", "$c.*xx", "$c$c.*x", "xx.*(?=$c)", "(?=$c).*xx",)
     ) {
 	ok( not "xxx" =~ m/$re/ );
-	ok( not +($subst = "xxx") =~ s/$re// );
+	ok( not( ($subst = "xxx") =~ s/$re// ));
     }
     for my $re (@("xx.*$c*", "$c*.*xx")) {
 	ok( "xxx" =~ m/$re/ );
@@ -1867,7 +1867,7 @@ do {
 	($subst = "xx$c") =~ s/$re//;
 	ok( $subst eq $c );
 	ok( not "xy$c" =~ m/$re/ );
-	ok( not +($subst = "xy$c") =~ m/$re/ );
+	ok( not (($subst = "xy$c") =~ m/$re/ ));
     }
     for my $re (@("xy$c*z", "x$c*yz")) {
 	ok( "xyz" =~ m/$re/ );
@@ -1959,7 +1959,7 @@ if (!%ENV{PERL_SKIP_PSYCHO_TEST}){
 	    my $s = $char . "f" x $len;
 	    my $r = $s =~ m/$char([f]*)/gc;
             ok($r, " # TODO <$type x $len>");
-	    ok(+(!$r or pos($s) == $len + 1), " # TODO <$type x $len> pos $( pos($s) )");
+	    ok((!$r or pos($s) == $len + 1), " # TODO <$type x $len> pos $( pos($s) )");
 	}
     }
 } else {

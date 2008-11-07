@@ -24,7 +24,7 @@ while( ~< *DATA ) {
     
     unless( $returned eq $expected ) {
        print < map { s/^/\#/mg; $_; }
- map {+$_}               # to avoid readonly values
+ map { $: $_ }               # to avoid readonly values
  @(                   "EXPECTED:\n", $expected, "GOT:\n", $returned);
        print "not ";
     }

@@ -49,7 +49,7 @@ q{cd some/dir && command1
 };
 
 do {
-    is +ExtUtils::MM_Unix->cd(< @cd_args),
+    is ExtUtils::MM_Unix->cd(< @cd_args),
 q{cd some/dir && command1
 	cd some/dir && command2};
 };
@@ -58,7 +58,7 @@ SKIP: do {
     skip("VMS' cd requires vmspath which is only on VMS", 1) unless $Is_VMS;
     
     use ExtUtils::MM_VMS;
-    is +ExtUtils::MM_VMS->cd(< @cd_args),
+    is ExtUtils::MM_VMS->cd(< @cd_args),
 q{startdir = F$Environment("Default")
 	Set Default [.some.dir]
 	command1

@@ -2,18 +2,6 @@ Check FATAL functionality
 
 __END__
 
-# Check compile time warning
-use warnings FATAL => 'syntax' ;
-do {
-    no warnings ;
-    $a =+ 1 ;
-};
-$a =+ 1 ;
-print STDERR "The End.\n" ;
-EXPECT
-Reversed += operator at - line 8 character 4.
-########
-
 # Check runtime scope of pragma
 use warnings FATAL => 'uninitialized' ;
 do {
@@ -77,52 +65,6 @@ Use of uninitialized value $b in scalar chop at - line 8 character 9.
 
 # Check scope of pragma with eval
 no warnings ;
-try {
-    use warnings FATAL => 'syntax' ;
-    $a =+ 1 ;
-}; print STDERR "-- $($@->message)\n" ;
-$a =+ 1 ;
-print STDERR "The End.\n" ;
-EXPECT
-Reversed += operator at - line 6 character 8.
-########
-
-# Check scope of pragma with eval
-use warnings FATAL => 'syntax' ;
-try {
-    $a =+ 1 ;
-}; print STDERR "-- $($@->message)" ;
-$a =+ 1 ;
-print STDERR "The End.\n" ;
-EXPECT
-Reversed += operator at - line 5 character 8.
-########
-
-# Check scope of pragma with eval
-use warnings FATAL => 'syntax' ;
-try {
-    no warnings ;
-    $a =+ 1 ;
-}; print STDERR $@;
-$a =+ 1 ;
-print STDERR "The End.\n" ;
-EXPECT
-Reversed += operator at - line 8 character 4.
-########
-
-# Check scope of pragma with eval
-no warnings ;
-try {
-    use warnings FATAL => 'syntax' ;
-}; print STDERR $@;
-$a =+ 1 ;
-print STDERR "The End.\n" ;
-EXPECT
-The End.
-########
-
-# Check scope of pragma with eval
-no warnings ;
 eval q[ 
     use warnings FATAL => 'uninitialized' ;
     my $b ; chop $b ;
@@ -156,28 +98,3 @@ my $b ; chop $b ;
 print STDERR "The End.\n" ;
 EXPECT
 Use of uninitialized value $b in scalar chop at - line 8 character 9.
-########
-
-# Check scope of pragma with eval
-no warnings ;
-eval q[ 
-    use warnings FATAL => 'syntax' ;
-    $a =+ 1 ;
-
-]; print STDERR "-- $($@->message)\n";
-$a =+ 1 ;
-print STDERR "The End.\n" ;
-EXPECT
--- Reversed += operator
-The End.
-########
-
-# Check scope of pragma with eval
-use warnings FATAL => 'syntax' ;
-eval '
-    $a =+ 1 ;
-'; print STDERR "-- $($@->message)\n";
-print STDERR "The End.\n" ;
-EXPECT
--- Reversed += operator
-The End.

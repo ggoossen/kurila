@@ -231,7 +231,7 @@ do {
   # Let's make sure that normal array interpolation still works right
   # For some reason, this appears not to be tested anywhere else.
   my @a = @(1,2,3);
-  print +((">$(join ' ',@a)<" eq ">1 2 3<") ? '' : 'not '), "ok $test\n";
+  print( ((">$(join ' ',@a)<" eq ">1 2 3<") ? '' : 'not '), "ok $test\n");
   ++$test;
 
   # Ditto.
