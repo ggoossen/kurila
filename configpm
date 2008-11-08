@@ -450,7 +450,8 @@ my $summary_expanded;
 
 sub myconfig {
     return $summary_expanded if $summary_expanded;
-    ($summary_expanded = $summary) =~ s!\$(\w+)!$( do { my $c = config_value($1); defined($c) ?? $c !! 'undef' } )!g;
+    ($summary_expanded = $summary) =~ s{\$(\w+)}
+              {$( do { my $c = config_value($1); defined($c) ?? $c !! 'undef' } )}g;
     $summary_expanded;
 }
 
