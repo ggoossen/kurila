@@ -257,16 +257,16 @@ sub link {
     print "  ln $from $to\n" if %opts{verbose};
     try {
         CORE::link($from, $to)
-            ? $success++
-            : ($from =~ m#^/afs/# || $to =~ m#^/afs/#)
-              ? die "AFS"  # okay inside try {}
-              : warn "Couldn't link $from to $to: $!\n"
+            ?? $success++
+            !! ($from =~ m#^/afs/# || $to =~ m#^/afs/#)
+              ?? die "AFS"  # okay inside try {}
+              !! warn "Couldn't link $from to $to: $!\n"
           unless %opts{notify};
     };
     if ($@) {
         File::Copy::copy($from, $to)
-            ? $success++
-            : warn "Couldn't copy $from to $to: $!\n"
+            ?? $success++
+            !! warn "Couldn't copy $from to $to: $!\n"
           unless %opts{notify};
     }
     $success;

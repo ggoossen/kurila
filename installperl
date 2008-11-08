@@ -45,7 +45,7 @@ BEGIN {
     if ($Is_VMS) { eval 'use VMS::Filespec;' }
 }
 
-my $scr_ext = ($Is_VMS ? '.Com' : $Is_W32 ? '.bat' : '');
+my $scr_ext = ($Is_VMS ?? '.Com' !! $Is_W32 ?? '.bat' !! '');
 
 use File::Find;
 use File::Compare;
@@ -74,15 +74,15 @@ my $mainperldir = "/usr/bin";
 my $exe_ext = config_value("exe_ext");
 
 # Allow ``make install PERLNAME=something_besides_perl'':
-my $perl = defined(%ENV{PERLNAME}) ? %ENV{PERLNAME} : 'perl';
+my $perl = defined(%ENV{PERLNAME}) ?? %ENV{PERLNAME} !! 'perl';
 
 # This is the base used for versioned names, like "perl5.6.0".
 # It's separate because a common use of $PERLNAME is to install
 # perl as "perl5", if that's used as base for versioned files you
 # get "perl55.6.0".
 my $perl_verbase = defined(%ENV{PERLNAME_VERBASE})
-		    ? %ENV{PERLNAME_VERBASE}
-		    : $perl;
+		    ?? %ENV{PERLNAME_VERBASE}
+		    !! $perl;
 my $dbg = '';
 my $ndbg = '';
 if ( $Is_VMS ) {
@@ -152,7 +152,7 @@ close SCRIPTS;
 
 if ($scr_ext) { @scripts = map { "$_$scr_ext" } @scripts; }
 
-my @pods = $nopods ? () : glob("pod/*.pod");
+my @pods = $nopods ?? () !! glob("pod/*.pod");
 
 # Specify here any .pm files that are actually architecture-dependent.
 # (Those included with XS extensions under ext/ are automatically
@@ -365,7 +365,7 @@ if ($d_dosuid) {
 # Install library files.
 
 my ($do_installarchlib, $do_installprivlib) = (0, 0);
-my $vershort = $Is_Cygwin ? substr($ver,0,-2) : $ver;
+my $vershort = $Is_Cygwin ?? substr($ver,0,-2) !! $ver;
 
 mkpath($installprivlib, $verbose, 0777);
 mkpath($installarchlib, $verbose, 0777);
@@ -555,7 +555,7 @@ if ($versiononly) {
 # Install pod pages.  Where? I guess in $installprivlib/pod
 # ($installprivlib/pods for cygwin).
 
-my $pod = ($Is_Cygwin || $Is_Darwin || $Is_VMS || $Is_W32) ? 'pods' : 'pod';
+my $pod = ($Is_Cygwin || $Is_Darwin || $Is_VMS || $Is_W32) ?? 'pods' !! 'pod';
 if ( !$versiononly || ($installprivlib =~ m/\Q$vershort/)) {
     mkpath("$($installprivlib)/$pod", $verbose, 0777);
 
@@ -590,7 +590,7 @@ if ( !$versiononly || ($installprivlib =~ m/\Q$vershort/)) {
 
 if (!$versiononly && $otherperls) {
     my ($path, @path);
-    my $dirsep = ($Is_OS2 || $Is_W32 || $Is_NetWare) ? ';' : ':' ;
+    my $dirsep = ($Is_OS2 || $Is_W32 || $Is_NetWare) ?? ';' !! ':' ;
     ($path = %ENV{"PATH"}) =~ s:\\:/:g ;
     @path = @(split(m/$dirsep/, $path));
     if ($Is_VMS) {
@@ -698,19 +698,19 @@ sub link {
     $xfrom =~ s/^\Q$destdir\E// if $destdir;
     my $xto = $to;
     $xto =~ s/^\Q$destdir\E// if $destdir;
-    print $verbose ? "  ln $xfrom $xto\n" : "  $xto\n" unless $silent;
+    print $verbose ?? "  ln $xfrom $xto\n" !! "  $xto\n" unless $silent;
     try {
 	CORE::link($from, $to)
-	    ? $success++
-	    : ($from =~ m#^/afs/# || $to =~ m#^/afs/#)
-	      ? die "AFS"  # okay inside try {}
-	      : die "Couldn't link $from to $to: $!\n"
+	    ?? $success++
+	    !! ($from =~ m#^/afs/# || $to =~ m#^/afs/#)
+	      ?? die "AFS"  # okay inside try {}
+	      !! die "Couldn't link $from to $to: $!\n"
 	  unless $nonono;
 	$packlist->{$xto} = \%( from => $xfrom, type => 'link' );
     };
     if ($@) {
 	warn "Replacing link() with File::Copy::copy(): $($@->message)";
-	print $verbose ? "  cp $from $xto\n" : "  $xto\n" unless $silent;
+	print $verbose ?? "  cp $from $xto\n" !! "  $xto\n" unless $silent;
 	print "  creating new version of $xto\n"
 		 if $Is_VMS and -e $to and !$silent;
 	unless ($nonono or File::Copy::copy($from, $to) and ++$success) {
@@ -739,7 +739,7 @@ sub copy {
 
     my $xto = $to;
     $xto =~ s/^\Q$destdir\E// if $destdir;
-    print $verbose ? "  cp $from $xto\n" : "  $xto\n" unless $silent;
+    print $verbose ?? "  cp $from $xto\n" !! "  $xto\n" unless $silent;
     print "  creating new version of $xto\n" if $Is_VMS and -e $to and !$silent;
     unless ($nonono or File::Copy::copy($from, $to)) {
 	# Might have been that F::C::c can't overwrite the target
@@ -769,7 +769,7 @@ sub samepath {
 sub installlib {
     my $dir = $File::Find::dir;
     $dir =~ s#^\.(?![^/])/?##;
-    local($depth) = $dir ? "lib/$dir" : "lib";
+    local($depth) = $dir ?? "lib/$dir" !! "lib";
 
     my $name = $_;
 
