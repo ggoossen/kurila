@@ -44,7 +44,7 @@ $VERSION = '2.16';
 # class already, use that.  Otherwise, use any Pod::Simple debug function
 # that's defined, and failing that, define a debug level of 10.
 BEGIN {
-    my $parent = defined (&Pod::Simple::DEBUG) ? \&Pod::Simple::DEBUG : undef;
+    my $parent = defined (&Pod::Simple::DEBUG) ?? \&Pod::Simple::DEBUG !! undef;
     unless (defined &DEBUG) {
         *DEBUG = $parent || sub () { 10 };
     }
@@ -111,7 +111,7 @@ sub new {
 }
 
 # Translate a font string into an escape.
-sub toescape { (length (@_[0]) +> 1 ? '\f(' : '\f') . @_[0] }
+sub toescape { (length (@_[0]) +> 1 ?? '\f(' !! '\f') . @_[0] }
 
 # Determine which fonts the user wishes to use and store them in the object.
 # Regular, italic, bold, and bold-italic are constants, but the fixed width
@@ -565,7 +565,7 @@ sub mapfonts {
         my $sequence = '';
         my $f;
         if ($last ne '\fR') { $sequence = '\fP' }
-        ${ %magic{$1} } += ($2 eq 'S') ? 1 : -1;
+        ${ %magic{$1} } += ($2 eq 'S') ?? 1 !! -1;
         $f = %$self{FONTS}->{ ($fixed && 1) . ($bold && 1) . ($italic && 1) };
         if ($f eq $last) {
             '';
@@ -590,7 +590,7 @@ sub textmapfonts {
     $text =~ s#
         \\f\((.)(.)
     #$( do {
-        ${ %magic{$1} } += ($2 eq 'S') ? 1 : -1;
+        ${ %magic{$1} } += ($2 eq 'S') ?? 1 !! -1;
         %$self{FONTS}->{ ($fixed && 1) . ($bold && 1) . ($italic && 1) };
     })#gx;
     return $text;
@@ -626,8 +626,8 @@ sub switchquotes {
             $nroff =~ s/\\\*\(C\'/%$self{RQUOTE}/g;
             $troff =~ s/\\\*\(C[\'\`]//g;
         }
-        $nroff = qq("$nroff") . ($extra ? " $extra" : '');
-        $troff = qq("$troff") . ($extra ? " $extra" : '');
+        $nroff = qq("$nroff") . ($extra ?? " $extra" !! '');
+        $troff = qq("$troff") . ($extra ?? " $extra" !! '');
 
         # Work around the Solaris nroff bug where \f(CW\fP leaves the font set
         # to Roman rather than the actual previous font when used in headings.
@@ -646,7 +646,7 @@ sub switchquotes {
             return "$command $nroff\n";
         }
     } else {
-        $text = qq("$text") . ($extra ? " $extra" : '');
+        $text = qq("$text") . ($extra ?? " $extra" !! '');
         return "$command $text\n";
     }
 }
@@ -671,7 +671,7 @@ sub makespace {
     my ($self) = < @_;
     $self->output (".PD\n") if %$self{ITEMS} +> 1;
     %$self{ITEMS} = 0;
-    $self->output (%$self{INDENT} +> 0 ? ".Sp\n" : ".PP\n")
+    $self->output (%$self{INDENT} +> 0 ?? ".Sp\n" !! ".PP\n")
         if %$self{NEEDSPACE};
 }
 
@@ -810,7 +810,7 @@ sub devise_title {
 
         # Remove empty directories when building the module name; they
         # occur too easily on Unix by doubling slashes.
-        $name = join ('::', @( (< grep { $_ ? $_ : () } @dirs), $file));
+        $name = join ('::', @( (< grep { $_ ?? $_ !! () } @dirs), $file));
     }
     return  @($name, $section);
 }
@@ -1068,7 +1068,7 @@ sub cmd_x {
 # a URL.
 sub cmd_l {
     my ($self, $attrs, $text) = < @_;
-    return %$attrs{type} eq 'url' ? "<$text>" : $text;
+    return %$attrs{type} eq 'url' ?? "<$text>" !! $text;
 }
 
 ##############################################################################
@@ -1200,7 +1200,7 @@ sub item_common {
         $self->output ( $self->protect ( $self->textmapfonts ($text)));
         %$self{NEEDSPACE} = 1;
     }
-    $self->outindex ($index ? ('Item', $index) : ());
+    $self->outindex ($index ?? ('Item', $index) !! ());
 }
 
 # Dispatch the item commands to the appropriate place.

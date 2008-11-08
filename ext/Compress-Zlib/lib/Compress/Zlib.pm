@@ -115,7 +115,7 @@ sub gzopen($$)
     %defOpts{Strategy} = Z_HUFFMAN_ONLY() if $mode =~ m/h/i;
     %defOpts{Append}   = 1                if $mode =~ m/a/i;
 
-    my $infDef = $writing ? 'deflate' : 'inflate';
+    my $infDef = $writing ?? 'deflate' !! 'inflate';
     my @params = @( () ) ;
 
     croak "gzopen: file parameter is not a filehandle or filename"
@@ -155,7 +155,7 @@ sub Compress::Zlib::gzFile::gzread
     return _set_gzerr(Z_STREAM_ERROR())
         if $self->[1] ne 'inflate';
 
-    my $len = defined @_[1] ? @_[1] : 4096 ; 
+    my $len = defined @_[1] ?? @_[1] !! 4096 ; 
 
     my $gz = $self->[0] ;
     my $status = $gz->read(@_[0], $len) ; 
@@ -175,7 +175,7 @@ sub Compress::Zlib::gzFile::gzreadline
         @_[0] = $gz->getline() ; 
     };
     _save_gzerr($gz, 1);
-    return defined @_[0] ? length @_[0] : 0 ;
+    return defined @_[0] ?? length @_[0] !! 0 ;
 }
 
 sub Compress::Zlib::gzFile::gzwrite
@@ -221,7 +221,7 @@ sub Compress::Zlib::gzFile::gzflush
     my $gz = $self->[0] ;
     my $status = $gz->flush($f) ;
     my $err = _save_gzerr($gz);
-    return $status ? 0 : $err;
+    return $status ?? 0 !! $err;
 }
 
 sub Compress::Zlib::gzFile::gzclose
@@ -231,7 +231,7 @@ sub Compress::Zlib::gzFile::gzclose
 
     my $status = $gz->close() ;
     my $err = _save_gzerr($gz);
-    return $status ? 0 : $err;
+    return $status ?? 0 !! $err;
 }
 
 sub Compress::Zlib::gzFile::gzsetparams
@@ -274,7 +274,7 @@ sub compress($;$)
         $in = \@_[0] ;
     }
 
-    my $level = ((nelems @_) == 2 ? @_[1] : Z_DEFAULT_COMPRESSION() );
+    my $level = ((nelems @_) == 2 ?? @_[1] !! Z_DEFAULT_COMPRESSION() );
 
     ($x) = < Compress::Raw::Zlib::Deflate->new( -AppendOutput => 1, -Level => $level);
     $x or return undef ;
@@ -341,7 +341,7 @@ sub deflateInit(@)
                 $got->value('Bufsize'),
                 $got->value('Dictionary')) ;
 
-    my $x = ($status == Z_OK() ? bless $obj, "Zlib::OldDeflate"  : undef) ;
+    my $x = ($status == Z_OK() ?? bless $obj, "Zlib::OldDeflate"  !! undef) ;
     return $x;
 }
 
@@ -366,7 +366,7 @@ sub inflateInit(@)
                                 $got->value('Bufsize'), 
                                 $got->value('Dictionary')) ;
 
-    my $x = ($status == Z_OK() ? bless $obj, "Zlib::OldInflate"  : undef) ;
+    my $x = ($status == Z_OK() ?? bless $obj, "Zlib::OldInflate"  !! undef) ;
 
     return $x;
 }
@@ -418,7 +418,7 @@ sub memGzip($)
   my $out;
 
   # if the deflation buffer isn't a reference, make it one
-  my $string = (ref @_[0] ? @_[0] : \@_[0]) ;
+  my $string = (ref @_[0] ?? @_[0] !! \@_[0]) ;
 
   IO::Compress::Gzip::gzip($string, \$out, Minimal => 1)
       or return undef ;
@@ -489,12 +489,12 @@ sub _removeGzipHeader($)
 sub memGunzip($)
 {
     # if the buffer isn't a reference, make it one
-    my $string = (ref @_[0] ? @_[0] : \@_[0]);
+    my $string = (ref @_[0] ?? @_[0] !! \@_[0]);
  
     _removeGzipHeader($string) == Z_OK() 
         or return undef;
      
-    my $bufsize = length $$string +> 4096 ? length $$string : 4096 ;
+    my $bufsize = length $$string +> 4096 ?? length $$string !! 4096 ;
     my ($x) = < Compress::Raw::Zlib::Inflate->new(\%(-WindowBits => - MAX_WBITS(),
                          -Bufsize => $bufsize));
     $x or return undef;

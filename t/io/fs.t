@@ -120,7 +120,7 @@ SKIP: do {
     };
 };
 
-$newmode = (($^O eq 'MSWin32') || ($^O eq 'NetWare')) ? 0444 : 0777;
+$newmode = (($^O eq 'MSWin32') || ($^O eq 'NetWare')) ?? 0444 !! 0777;
 
 is(chmod($newmode,'a'), 1, "chmod succeeding");
 
@@ -217,7 +217,7 @@ is(rename('a','b'), 1, "rename a b");
 
 is($ino, undef, "ino of renamed file a should be undef");
 
-$delta = $accurate_timestamps ? 1 : 2;	# Granularity of time on the filesystem
+$delta = $accurate_timestamps ?? 1 !! 2;	# Granularity of time on the filesystem
 chmod 0777, 'b';
 
 $foo = (utime 500000000,500000000 + $delta,'b');

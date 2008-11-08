@@ -279,7 +279,7 @@ sub scan
         while ! *$self->{EndStream} && $len +>= 0 ;
 
     #return $len if $len < 0 ? $len : 0 ;
-    return $len +< 0 ? 0 : 1 ;
+    return $len +< 0 ?? 0 !! 1 ;
 }
 
 sub zap

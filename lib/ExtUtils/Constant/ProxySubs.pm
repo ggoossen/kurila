@@ -60,7 +60,7 @@ $VERSION = '0.06';
 
 sub type_to_C_value {
     my ($self, $type) = < @_;
-    return %type_to_C_value{$type} || sub {return map {ref $_ ? < @$_ : $_} @_ };
+    return %type_to_C_value{$type} || sub {return map {ref $_ ?? < @$_ !! $_} @_ };
 }
 
 # TODO - figure out if there is a clean way for the type_to_sv code to
@@ -82,7 +82,7 @@ sub type_to_C_value {
      
 while (my ($type, $value) = each %XS_TypeSet) {
     %type_num_args{$type}
-	= defined $value ? ref $value ? scalar nelems @$value : 1 : 0;
+	= defined $value ?? ref $value ?? scalar nelems @$value !! 1 !! 0;
 }
 %type_num_args{''} = 0;
 
@@ -202,7 +202,7 @@ $($c_subname)_add_symbol($pthx HV *hash, const char *name, I32 namelen, SV *valu
 
 EOADD
 
-    print $c_fh $explosives ? <<"EXPLODE" : "\n";
+    print $c_fh $explosives ?? <<"EXPLODE" !! "\n";
 
 static int
 Im_sorry_Dave(pTHX_ SV *sv, MAGIC *mg)
@@ -296,10 +296,10 @@ EOBOOT
 	die "Can't find structure definition for type $type"
 	    unless defined $struct;
 
-	my $struct_type = $type ? lc($type) . '_s' : 'notfound_s';
+	my $struct_type = $type ?? lc($type) . '_s' !! 'notfound_s';
 	print $c_fh "struct $struct_type $struct;\n";
 
-	my $array_name = 'values_for_' . ($type ? lc $type : 'notfound');
+	my $array_name = 'values_for_' . ($type ?? lc $type !! 'notfound');
 	print $xs_fh <<"EOBOOT";
 
     static const struct $struct_type $array_name\[] =
@@ -331,7 +331,7 @@ EOBOOT
     # Terminate the list with a NULL
 	print $xs_fh "        \{ NULL, 0", (", 0" x $number_of_args), " \} \};\n";
 
-	%iterator{$type} = "value_for_" . ($type ? lc $type : 'notfound');
+	%iterator{$type} = "value_for_" . ($type ?? lc $type !! 'notfound');
 
 	print $xs_fh <<"EOBOOT";
 	const struct $struct_type *%iterator{$type} = $array_name;
@@ -357,7 +357,7 @@ EOBOOT
 	while (value_for_notfound->name) \{
 EOBOOT
 
-    print $xs_fh $explosives ? <<"EXPLODE" : << "DONT";
+    print $xs_fh $explosives ?? <<"EXPLODE" !! << "DONT";
 	    SV *tripwire = newSV(0);
 	    
 	    sv_magicext(tripwire, 0, PERL_MAGIC_ext, &not_defined_vtbl, 0, 0);
@@ -458,7 +458,7 @@ constant_not_found()
 
 EOBOOT
 
-    print $xs_fh $explosives ? <<"EXPLODE" : <<"DONT";
+    print $xs_fh $explosives ?? <<"EXPLODE" !! <<"DONT";
 
 void
 $xs_subname(sv)

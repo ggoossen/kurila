@@ -145,7 +145,7 @@ sub declared ($) {
     my $name = shift;
     $name =~ s/^::/main::/;
     my $pkg = caller;
-    my $full_name = $name =~ m/::/ ? $name : "$($pkg)::$name";
+    my $full_name = $name =~ m/::/ ?? $name !! "$($pkg)::$name";
     %constant::declared{$full_name};
 }
 

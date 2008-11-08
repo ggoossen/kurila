@@ -44,7 +44,7 @@ sub new {
 
     # $ENV{HOME} is usually not set on Windows.  The default Term::Cap path
     # may not work on Solaris.
-    my $home = exists %ENV{HOME} ? "%ENV{HOME}/.termcap:" : '';
+    my $home = exists %ENV{HOME} ?? "%ENV{HOME}/.termcap:" !! '';
     %ENV{TERMPATH} = $home . '/etc/termcap:/usr/share/misc/termcap'
                            . ':/usr/share/lib/termcap';
 

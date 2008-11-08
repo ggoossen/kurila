@@ -32,13 +32,13 @@ sub TRUE  () {1}
 sub FALSE () {return}
 
 BEGIN {
- *IS_VMS     = $^O eq 'VMS'     ? \&TRUE : \&FALSE unless defined &IS_VMS;
- *IS_MSWin32 = $^O eq 'MSWin32' ? \&TRUE : \&FALSE unless defined &IS_MSWin32;
- *IS_Dos     = $^O eq 'dos'     ? \&TRUE : \&FALSE unless defined &IS_Dos;
- *IS_OS2     = $^O eq 'os2'     ? \&TRUE : \&FALSE unless defined &IS_OS2;
- *IS_Cygwin  = $^O eq 'cygwin'  ? \&TRUE : \&FALSE unless defined &IS_Cygwin;
- *IS_Linux   = $^O eq 'linux'   ? \&TRUE : \&FALSE unless defined &IS_Linux;
- *IS_HPUX    = $^O =~ m/hpux/   ? \&TRUE : \&FALSE unless defined &IS_HPUX;
+ *IS_VMS     = $^O eq 'VMS'     ?? \&TRUE !! \&FALSE unless defined &IS_VMS;
+ *IS_MSWin32 = $^O eq 'MSWin32' ?? \&TRUE !! \&FALSE unless defined &IS_MSWin32;
+ *IS_Dos     = $^O eq 'dos'     ?? \&TRUE !! \&FALSE unless defined &IS_Dos;
+ *IS_OS2     = $^O eq 'os2'     ?? \&TRUE !! \&FALSE unless defined &IS_OS2;
+ *IS_Cygwin  = $^O eq 'cygwin'  ?? \&TRUE !! \&FALSE unless defined &IS_Cygwin;
+ *IS_Linux   = $^O eq 'linux'   ?? \&TRUE !! \&FALSE unless defined &IS_Linux;
+ *IS_HPUX    = $^O =~ m/hpux/   ?? \&TRUE !! \&FALSE unless defined &IS_HPUX;
 }
 
 $Temp_File_Lifetime ||= 60 * 60 * 24 * 5;
@@ -53,7 +53,7 @@ do { my $pager = config_value('pager');
 };
 $Bindir  = config_value('scriptdirexp');
 $Pod2man = "pod2man" .
-  ( config_value('versiononly') ? config_value('version') : '' );
+  ( config_value('versiononly') ?? config_value('version') !! '' );
 
 # End of class-init stuff
 #
@@ -75,7 +75,7 @@ sub opt_w_with { # Specify an option for the formatter subclass
   my($self, $value) = < @_;
   if($value =~ m/^([-_a-zA-Z][-_a-zA-Z0-9]*)(?:[=\:](.*?))?$/s) {
     my $option = $1;
-    my $option_value = defined($2) ? $2 : "TRUE";
+    my $option_value = defined($2) ?? $2 !! "TRUE";
     $option =~ s/[-]+/_/g;  # tolerate "foo-bar" for "foo_bar"
     $self->add_formatter_option( $option, $option_value );
   } else {
@@ -114,9 +114,9 @@ sub opt_V { # report version and exit
     "Perldoc v$VERSION, under perl $^V for $^O",
 
     (defined(&Win32::BuildNumber) and defined &Win32::BuildNumber())
-     ? (" (win32 build ", < &Win32::BuildNumber(), ")") : (),
+     ?? (" (win32 build ", < &Win32::BuildNumber(), ")") !! (),
     
-    (chr(65) eq 'A') ? () : " (non-ASCII)",
+    (chr(65) eq 'A') ?? () !! " (non-ASCII)",
     
     "\n",)
   ;
@@ -211,13 +211,13 @@ sub aside {  # If we're in -v or DEBUG mode, say this.
   my $self = shift;
   if( DEBUG or $self->opt_v ) {
     my $out = join( '', @(
-      DEBUG ? do {
+      DEBUG ?? do {
         my $callsub = (caller(1))[[3]];
         my $package = quotemeta(__PACKAGE__ . '::');
         $callsub =~ s/^$package/'/os;
          # the o is justified, as $package really won't change.
         $callsub . ": ";
-      } : '',
+      } !! '',
       < @_,)
     );
     if(DEBUG) { print $out } else { print STDERR $out }
@@ -427,7 +427,7 @@ sub process {
       # for when we're apparently in a module or extension directory
     
     my @found = $self->grand_search_init(\@pages);
-    exit (IS_VMS ? 98962 : 1) unless (nelems @found);
+    exit (IS_VMS ?? 98962 !! 1) unless (nelems @found);
     
     if ($self->opt_l) {
         DEBUG and print "We're in -l mode, so byebye after this:\n";
@@ -495,7 +495,7 @@ sub find_good_formatter_class {
     if( $c->can('parse_from_file') ) {
       DEBUG +> 4 and print "Settling on $c\n";
       my $v = $c->VERSION;
-      $v = ( defined $v and length $v ) ? " version $v" : '';
+      $v = ( defined $v and length $v ) ?? " version $v" !! '';
       $self->aside("Formatter class $c$v successfully loaded!\n");
       $good_class_found = $c;
       last;
@@ -741,7 +741,7 @@ sub grand_search_init {
             }
             else {
                 print STDERR "No " .
-                    ($self->opt_m ? "module" : "documentation") . " found for \"$page\".\n";
+                    ($self->opt_m ?? "module" !! "documentation") . " found for \"$page\".\n";
                 if ( (nelems @{ $self->{'found'} }) ) {
                     print STDERR "However, try\n";
                     for my $dir ( @{ $self->{'found'} }) {
@@ -860,7 +860,7 @@ sub search_perlfunc {
 
     # Functions like -r, -e, etc. are listed under `-X'.
     my $search_re = ($self->opt_f =~ m/^-[rwxoRWXOeszfdlpSbctugkTBMAC]$/)
-                        ? '(?:I<)?-X' : quotemeta($self->opt_f) ;
+                        ?? '(?:I<)?-X' !! quotemeta($self->opt_f) ;
 
     DEBUG +> 2 and
      print "Going to perlfunc-scan for $search_re in $perlfunc\n";
@@ -960,8 +960,8 @@ sub render_findings {
   my $formatter_class = $self->{'formatter_class'}
    || die "No formatter class set!?";
   my $formatter = $formatter_class->can('new')
-    ? $formatter_class->new
-    : $formatter_class
+    ?? $formatter_class->new
+    !! $formatter_class
   ;
 
   if(! nelems @$found_things) {
@@ -985,7 +985,7 @@ sub render_findings {
     foreach my $f ( @{ $self->{'formatter_switches'} || \@() }) {
       my($switch, $value, $silent_fail) = < @$f;
       if( $formatter->can($switch) ) {
-        try { $formatter->?$switch( defined($value) ? $value : () ) };
+        try { $formatter->?$switch( defined($value) ?? $value !! () ) };
         warn "Got an error when setting $formatter_class\->$switch:\n$@\n"
          if $@;
       } else {
@@ -1138,8 +1138,8 @@ sub MSWin_perldoc_tempfile {
       time(),
       $$,
       defined( &Win32::GetTickCount )
-        ? (Win32::GetTickCount() ^&^ 0xff)
-        : int(rand 256)
+        ?? (Win32::GetTickCount() ^&^ 0xff)
+        !! int(rand 256)
        # Under MSWin, $$ values get reused quickly!  So if we ran
        # perldoc foo and then perldoc bar before there was time for
        # time() to increment time."_$$" would likely be the same

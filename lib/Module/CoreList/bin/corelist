@@ -123,18 +123,18 @@ while ((nelems @ARGV)) {
 	    ($mod, $ver) = < split m/=/, shift @ARGV;
 	} else {
 	    $mod = shift @ARGV;
-	    $ver = ((nelems @ARGV) && @ARGV[0] =~ m/^\d/) ? shift @ARGV : "";
+	    $ver = ((nelems @ARGV) && @ARGV[0] =~ m/^\d/) ?? shift @ARGV !! "";
 	}
 
 	if ($mod !~ m|^/(.*)/([imosx]*)$|) { # not a regex
 	    module_version($mod,$ver);
 	} else {
 	    my $re;
-	    try { $re = $2 ? qr/(?$2)($1)/ : qr/$1/; }; # trap exceptions while building regex
+	    try { $re = $2 ?? qr/(?$2)($1)/ !! qr/$1/; }; # trap exceptions while building regex
 	    if ($@) {
 		# regex errors are usually like 'Quantifier follow nothing in regex; marked by ...'
 		# then we drop text after ';' to shorten message
-		my $errmsg = $@->{description} =~ m/(.*);/ ? $1 : $@;
+		my $errmsg = $@->{description} =~ m/(.*);/ ?? $1 !! $@;
 		warn "\n$mod  is a bad regex: $errmsg\n";
 		next;
 	    }
@@ -164,8 +164,8 @@ sub module_version {
     }
 
     my $ret = %Opts{d}
-	? Module::CoreList->first_release_by_date(< @_)
-	: Module::CoreList->first_release(< @_);
+	?? Module::CoreList->first_release_by_date(< @_)
+	!! Module::CoreList->first_release(< @_);
     my $msg = $mod;
     $msg .= " $ver" if $ver;
 

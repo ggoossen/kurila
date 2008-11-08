@@ -56,10 +56,10 @@ Filenames with * and ? will be glob expanded.
 =cut
 
 # VMS uses % instead of ? to mean "one character"
-my $wild_regex = $Is_VMS ? '*%' : '*?';
+my $wild_regex = $Is_VMS ?? '*%' !! '*?';
 sub expand_wildcards
 {
- @ARGV = map(m/[$wild_regex]/o ? < glob($_) : $_, @ARGV);
+ @ARGV = map(m/[$wild_regex]/o ?? < glob($_) !! $_, @ARGV);
 }
 
 
@@ -267,7 +267,7 @@ shell's idea of true and false).
 
 sub test_f
 {
- exit(-f @ARGV[0] ? 0 : 1);
+ exit(-f @ARGV[0] ?? 0 !! 1);
 }
 
 =item test_d
@@ -281,7 +281,7 @@ not (ie. shell's idea of true and false).
 
 sub test_d
 {
- exit(-d @ARGV[0] ? 0 : 1);
+ exit(-d @ARGV[0] ?? 0 !! 1);
 }
 
 =item dos2unix

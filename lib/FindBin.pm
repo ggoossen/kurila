@@ -188,8 +188,8 @@ sub init
        last unless defined $linktext;
 
        $script = (File::Spec->file_name_is_absolute($linktext))
-                  ? $linktext
-                  : File::Spec->catfile($RealBin, $linktext);
+                  ?? $linktext
+                  !! File::Spec->catfile($RealBin, $linktext);
       }
 
      # Get absolute paths to directories

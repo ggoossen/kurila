@@ -10,8 +10,8 @@ my $WIN;
 if (%ENV{PATH} =~ m!\\Symbian\\(.+?)\\(.+?)\\Epoc32\\gcc\\bin!i) {
     $SYMBIAN_VERSION = $1;
     $SDK_NAME = $2;
-    $WIN = ($SDK_NAME =~ m!_CW!i || $SDK_NAME eq '8.1a') ?
-	'winscw' : 'wins';
+    $WIN = ($SDK_NAME =~ m!_CW!i || $SDK_NAME eq '8.1a') ??
+	'winscw' !! 'wins';
     %ENV{WIN} = $WIN; 
     if ($SDK_NAME =~ m!Series60_v20!) {
 	$SDK_VARIANT = 'S60';
@@ -69,7 +69,7 @@ if (open(GCC, "-|", "gcc -v 2>&1")) {
 
 die "$0: failed to locate the Symbian SDK\n" unless defined $SYMBIAN_ROOT;
 
-my $UARM = %ENV{UARM} ? %ENV{UARM} : "urel";
+my $UARM = %ENV{UARM} ?? %ENV{UARM} !! "urel";
 my $UREL = "$SYMBIAN_ROOT\\epoc32\\release\\-ARM-\\$UARM";
 if ($SYMBIAN_ROOT eq 'C:\Symbian\6.1\Series60' && %ENV{WIN} eq 'winscw') {
     $UREL = "C:\\Symbian\\Series60_1_2_CW\\epoc32\\release\\-ARM-\\urel";

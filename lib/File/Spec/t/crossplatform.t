@@ -75,23 +75,23 @@ foreach my $platform ( @platforms) {
     
     # abs2rel('A:/foo/bar', 'B:/foo')    ->  'A:/foo/bar'
     $base = $module->catpath($other_v, $module->catdir($module->rootdir, 'foo'), '');
-    $result = volumes_differ($module, $file, $base) ? $file : $module->catfile('bar', 'file');
+    $result = volumes_differ($module, $file, $base) ?? $file !! $module->catfile('bar', 'file');
     is $module->abs2rel($file, $base), $result, "$platform->abs2rel($file, $base)";
 
     # abs2rel('A:/foo/bar', '/foo')      ->  'A:/foo/bar'
     $base = $module->catpath('', $module->catdir($module->rootdir, 'foo'), '');
-    $result = volumes_differ($module, $file, $base) ? $file : $module->catfile('bar', 'file');
+    $result = volumes_differ($module, $file, $base) ?? $file !! $module->catfile('bar', 'file');
     is $module->abs2rel($file, $base), $result, "$platform->abs2rel($file, $base)";
 
     # abs2rel('/foo/bar/file', 'A:/foo')    ->  '/foo/bar'
     $file = $module->catpath('', $module->catdir($module->rootdir, 'foo', 'bar'), 'file');
     $base = $module->catpath($v, $module->catdir($module->rootdir, 'foo'), '');
-    $result = volumes_differ($module, $file, $base) ? $module->rel2abs($file) : $module->catfile('bar', 'file');
+    $result = volumes_differ($module, $file, $base) ?? $module->rel2abs($file) !! $module->catfile('bar', 'file');
     is $module->abs2rel($file, $base), $result, "$platform->abs2rel($file, $base)";
     
     # abs2rel('/foo/bar', 'B:/foo')    ->  '/foo/bar'
     $base = $module->catpath($other_v, $module->catdir($module->rootdir, 'foo'), '');
-    $result = volumes_differ($module, $file, $base) ? $module->rel2abs($file) : $module->catfile('bar', 'file');
+    $result = volumes_differ($module, $file, $base) ?? $module->rel2abs($file) !! $module->catfile('bar', 'file');
     is $module->abs2rel($file, $base), $result, "$platform->abs2rel($file, $base)";
     
     # abs2rel('/foo/bar', '/foo')      ->  'bar'

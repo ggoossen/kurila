@@ -70,7 +70,7 @@ sub macro_to_ifdef {
 	return $macro->[0];
     }
     if (defined $macro && $macro ne "" && $macro ne "1") {
-	return $macro ? "#ifdef $macro\n" : "#if 0\n";
+	return $macro ?? "#ifdef $macro\n" !! "#if 0\n";
     }
     return "";
 }
@@ -361,7 +361,7 @@ sub return_clause {
   #      return PERL_constant_ISIV;
   $clause
     .= $self->assign (\%(indent=>$indent, type=>$type, pre=>$pre, post=>$post,
-		       item=>$item), ref $value ? < @$value : $value);
+		       item=>$item), ref $value ?? < @$value !! $value);
 
   if (defined $macro && $macro ne "" && $macro ne "1") {
     ##else
@@ -372,7 +372,7 @@ sub return_clause {
       my $notdef = $self->return_statement_for_notdef();
       $clause .= "$indent$notdef\n" if defined $notdef;
     } else {
-      my @default = @( ref $default ? < @$default : $default );
+      my @default = @( ref $default ?? < @$default !! $default );
       $type = shift @default;
       $clause .= $self->assign (\%(indent=>$indent, type=>$type, pre=>$pre,
 				 post=>$post, item=>$item), < @default);
@@ -517,8 +517,8 @@ sub switch_clause {
     foreach my $thisone (sort {
 	# Deal with the case of an item actually being an array ref to 1 or 2
 	# hashrefs. Don't assign to $a or $b, as they're aliases to the orignal
-	my $l = ref $a eq 'ARRAY' ? ($a->[0]) : $a;
-	my $r = ref $b eq 'ARRAY' ? ($b->[0]) : $b;
+	my $l = ref $a eq 'ARRAY' ?? ($a->[0]) !! $a;
+	my $r = ref $b eq 'ARRAY' ?? ($b->[0]) !! $b;
 	# Sort by weight first
 	($r->{weight} || 0) <+> ($l->{weight} || 0)
 	    # Sort equal weights by name

@@ -62,7 +62,7 @@ sub make_tmp_file {
 }
 
 my $Perl = which_perl();
-my $quote = $Is_VMS || $Is_Win32 ? '"' : "'";
+my $quote = $Is_VMS || $Is_Win32 ?? '"' !! "'";
 
 my $tmperr             = 'cloexece.tmp';
 my $tmpfile1           = 'cloexec1.tmp';

@@ -50,7 +50,7 @@ $cpt->reval(q{
     print defined($main::bar)		? "not ok 5\n" : "ok 5\n";
     print defined($main::bar)		? "not ok 6\n" : "ok 6\n";
 });
-print $@ ? "not ok 7\n#$($@->message)" : "ok 7\n";
+print $@ ?? "not ok 7\n#$($@->message)" !! "ok 7\n";
 
 our $foo = "ok 8\n";
 our %bar = %(key => "ok 9\n");
@@ -76,7 +76,7 @@ $cpt->reval(q{
     %bar{new} = "ok 15\n";
     @glob = @(qw(ok 16));
 });
-print $@ ? "not ok 13\n#$($@->message)" : "ok 13\n";
+print $@ ?? "not ok 13\n#$($@->message)" !! "ok 13\n";
 $" = ' ';
 print $foo, %bar{new}, "$(join ' ',@glob)\n";
 
@@ -90,28 +90,28 @@ print "$Root::foo\n";
 print join(' ',@{$cpt->varglob('bar')}) . "\n";
 
 
-print 1 ? "ok 19\n" : "not ok 19\n";
-print 1 ? "ok 20\n" : "not ok 20\n";
+print 1 ?? "ok 19\n" !! "not ok 19\n";
+print 1 ?? "ok 20\n" !! "not ok 20\n";
 
 my $m1 = $cpt->mask;
 $cpt->trap("negate");
 my $m2 = $cpt->mask;
 my @masked = opset_to_ops($m1);
-print $m2 eq opset("negate", < @masked) ? "ok 21\n" : "not ok 21\n";
+print $m2 eq opset("negate", < @masked) ?? "ok 21\n" !! "not ok 21\n";
 
-print try { $cpt->mask("a bad mask") } ? "not ok 22\n" : "ok 22\n";
+print try { $cpt->mask("a bad mask") } ?? "not ok 22\n" !! "ok 22\n";
 
-print $cpt->reval("2 + 2") == 4 ? "ok 23\n" : "not ok 23\n";
+print $cpt->reval("2 + 2") == 4 ?? "ok 23\n" !! "not ok 23\n";
 
 $cpt->mask( <empty_opset);
 my $t_scalar = $cpt->reval('print wantarray ? "not ok 24\n" : "ok 24\n"');
-print $cpt->reval('our @ary=(6,7,8);@ary') == 3 ? "ok 25\n" : "not ok 25\n";
+print $cpt->reval('our @ary=(6,7,8);@ary') == 3 ?? "ok 25\n" !! "not ok 25\n";
 my @t_array  = $cpt->reval('print wantarray ? "ok 26\n" : "not ok 26\n"; (2,3,4)');
-print @t_array[2] == 4 ? "ok 27\n" : "not ok 27\n";
+print @t_array[2] == 4 ?? "ok 27\n" !! "not ok 27\n";
 
 my $t_scalar2 = $cpt->reval('die "foo bar"; 1');
-print defined $t_scalar2 ? "not ok 28\n" : "ok 28\n";
-print $@ && $@->{description} =~ m/foo bar/ ? "ok 29\n" : "not ok 29\n";
+print defined $t_scalar2 ?? "not ok 28\n" !! "ok 28\n";
+print $@ && $@->{description} =~ m/foo bar/ ?? "ok 29\n" !! "not ok 29\n";
 
 # --- rdo
   
@@ -124,7 +124,7 @@ if ($@) {
     die "Eek! Attempting to open $nosuch failed, but \$! is still 0" unless $!;
     $! = 0;
     $cpt->rdo($nosuch);
-    print $! == $errno ? "ok $t\n" : sprintf "not ok $t # \"$!\" is \%d (expected \%d)\n", $!, $errno; $t++;
+    print $! == $errno ?? "ok $t\n" !! sprintf "not ok $t # \"$!\" is \%d (expected \%d)\n", $!, $errno; $t++;
 } else {
     die "Eek! Didn't expect $nosuch to be there.";
 }

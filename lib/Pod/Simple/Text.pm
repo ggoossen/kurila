@@ -10,8 +10,8 @@ use vars < qw( @ISA $VERSION $FREAKYMODE);
 $VERSION = '2.02';
 @ISA = @('Pod::Simple::Methody');
 BEGIN { *DEBUG = defined(&Pod::Simple::DEBUG)
-          ? \&Pod::Simple::DEBUG
-          : sub() {0}
+          ?? \&Pod::Simple::DEBUG
+          !! sub() {0}
       }
 
 use Text::Wrap v98.112902 ();
@@ -42,8 +42,8 @@ sub start_head3 {  @_[0]->{'Thispara'} = '' }
 sub start_head4 {  @_[0]->{'Thispara'} = '' }
 
 sub start_Verbatim    { @_[0]->{'Thispara'} = ''   }
-sub start_item_bullet { @_[0]->{'Thispara'} = $FREAKYMODE ? '' : '* ' }
-sub start_item_number { @_[0]->{'Thispara'} = $FREAKYMODE ? '' : "@_[1]->{'number'}. "  }
+sub start_item_bullet { @_[0]->{'Thispara'} = $FREAKYMODE ?? '' !! '* ' }
+sub start_item_number { @_[0]->{'Thispara'} = $FREAKYMODE ?? '' !! "@_[1]->{'number'}. "  }
 sub start_item_text   { @_[0]->{'Thispara'} = ''   }
 
 sub start_over_bullet  { ++@_[0]->{'Indent'} }

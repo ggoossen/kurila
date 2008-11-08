@@ -77,14 +77,14 @@ ok 18
 
 # previous line intentionally left blank.
 
-print <<E1 eq "foo\n\n" ? "ok 19\n" : "not ok 19\n";
+print <<E1 eq "foo\n\n" ?? "ok 19\n" !! "not ok 19\n";
 $( <<E2
 foo
 E2
 )
 E1
 
-print <<E1 eq "foo\n\n" ? "ok 20\n" : "not ok 20\n";
+print <<E1 eq "foo\n\n" ?? "ok 20\n" !! "not ok 20\n";
 $(
   <<E2
 foo
@@ -99,23 +99,23 @@ do {
     @ary[0] = 'ABC';
 };
 
-print "%foo{$bar}" eq "BAZ" ? "ok 21\n" : "not ok 21\n";
+print "%foo{$bar}" eq "BAZ" ?? "ok 21\n" !! "not ok 21\n";
 
-print "$($foo)\{$bar\}" eq "FOO\{BAR\}" ? "ok 22\n" : "not ok 22\n";
-print "$(%foo{$bar})" eq "BAZ" ? "ok 23\n" : "not ok 23\n";
+print "$($foo)\{$bar\}" eq "FOO\{BAR\}" ?? "ok 22\n" !! "not ok 22\n";
+print "$(%foo{$bar})" eq "BAZ" ?? "ok 23\n" !! "not ok 23\n";
 
 #print "FOO:" =~ m/$foo[:]/ ? "ok 24\n" : "not ok 24\n";
 print "ok 24\n";
-print "ABC" =~ m/^@ary[$A]$/ ? "ok 25\n" : "not ok 25\n";
+print "ABC" =~ m/^@ary[$A]$/ ?? "ok 25\n" !! "not ok 25\n";
 #print "FOOZ" =~ m/^$foo[$A-Z]$/ ? "ok 26\n" : "not ok 26\n";
 print "ok 26\n";
 
 # MJD 19980425
 ($X, < @X) = < qw(a b c d); 
-print "d" =~ m/^@X[-1]$/ ? "ok 27\n" : "not ok 27\n";
-print "a1" !~ m/^@X[-1]$/ ? "ok 28\n" : "not ok 28\n";
+print "d" =~ m/^@X[-1]$/ ?? "ok 27\n" !! "not ok 27\n";
+print "a1" !~ m/^@X[-1]$/ ?? "ok 28\n" !! "not ok 28\n";
 
-print (((q{{\{\(}} . q{{\)\}}}) eq '{\{\(}} . q{{\)\}}') ? "ok 29\n" : "not ok 29\n");
+print (((q{{\{\(}} . q{{\)\}}}) eq '{\{\(}} . q{{\)\}}') ?? "ok 29\n" !! "not ok 29\n");
 
 $foo = "not ok 30\n";
 $foo =~ s/^not /$(substr(<<EOF, 0, 0))/;
@@ -231,7 +231,7 @@ do {
   # Let's make sure that normal array interpolation still works right
   # For some reason, this appears not to be tested anywhere else.
   my @a = @(1,2,3);
-  print( ((">$(join ' ',@a)<" eq ">1 2 3<") ? '' : 'not '), "ok $test\n");
+  print( ((">$(join ' ',@a)<" eq ">1 2 3<") ?? '' !! 'not '), "ok $test\n");
   ++$test;
 
   # Ditto.
@@ -263,9 +263,9 @@ my %str = %(
 );
 
 my $test = 51;
-print ((exists %str{foo}      ? "" : "not ")."ok $test\n"); ++$test;
-print ((exists %str{bar}      ? "" : "not ")."ok $test\n"); ++$test;
-print ((exists %str{'xyz::bar'} ? "" : "not ")."ok $test\n"); ++$test;
+print ((exists %str{foo}      ?? "" !! "not ")."ok $test\n"); ++$test;
+print ((exists %str{bar}      ?? "" !! "not ")."ok $test\n"); ++$test;
+print ((exists %str{'xyz::bar'} ?? "" !! "not ")."ok $test\n"); ++$test;
 
 sub foo::::::bar { print "ok $test\n"; $test++ }
 foo::::::bar;

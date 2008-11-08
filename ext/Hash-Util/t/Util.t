@@ -253,7 +253,7 @@ do {
       }
 
       my $message
-	= ($lock ? 'locked' : 'not locked') . ' keys ' . join ',', @usekeys;
+	= ($lock ?? 'locked' !! 'not locked') . ' keys ' . join ',', @usekeys;
 
       is (nkeys %target, nkeys %clean, "scalar keys for $message");
       is (nelems( values %target), nelems(values %clean),

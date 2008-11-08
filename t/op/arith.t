@@ -3,7 +3,7 @@
 print "1..145\n";
 
 sub tryok ($$) {
-   print( (@_[1] ? "ok" : "not ok"), " @_[0]\n" );
+   print( (@_[1] ?? "ok" !! "not ok"), " @_[0]\n" );
 }
 sub tryeq ($$$) {
   if (@_[1] == @_[2]) {

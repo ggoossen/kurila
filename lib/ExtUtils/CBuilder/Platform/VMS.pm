@@ -29,7 +29,7 @@ sub arg_defines {
   return  @('/define=(' 
           . join(',', @( 
 		 < @config_defines,
-                 < map "\"$_" . ( length(%args{$_}) ? "=%args{$_}" : '') . "\"", 
+                 < map "\"$_" . ( length(%args{$_}) ?? "=%args{$_}" !! '') . "\"", 
                      keys %args)) 
           . ')');
 }
@@ -126,7 +126,7 @@ sub _liblist_ext {
   $verbose ||= 0;
 
   my(@crtls,$crtlstr);
-  @crtls = @( ($self->{'config'}->{'ldflags'} =~ m-/Debug-i ? $self->{'config'}->{'dbgprefix'} : '')
+  @crtls = @( ($self->{'config'}->{'ldflags'} =~ m-/Debug-i ?? $self->{'config'}->{'dbgprefix'} !! '')
               . 'PerlShr/Share' );
   push(@crtls, < grep { not m/\(/ } split m/\s+/, $self->{'config'}->{'perllibs'});
   push(@crtls, < grep { not m/\(/ } split m/\s+/, $self->{'config'}->{'libc'});
@@ -147,11 +147,11 @@ sub _liblist_ext {
       }
     }
   }
-  $crtlstr = (nelems @crtls) ? join(' ', @crtls) : '';
+  $crtlstr = (nelems @crtls) ?? join(' ', @crtls) !! '';
 
   unless ($potential_libs) {
     warn "Result:\n\tEXTRALIBS: \n\tLDLOADLIBS: $crtlstr\n" if $verbose;
-    return  @('', '', $crtlstr, '',  @($give_libs ? \@() : ()));
+    return  @('', '', $crtlstr, '',  @($give_libs ?? \@() !! ()));
   }
 
   my(@dirs,@libs,%found,@fndlibs,$ldlib);
@@ -285,9 +285,9 @@ sub _liblist_ext {
   push @fndlibs, < map { "$_/Share"   } @{%found{SHR}} if exists %found{SHR};
   my $lib = join(' ', @fndlibs);
 
-  $ldlib = $crtlstr ? "$lib $crtlstr" : $lib;
+  $ldlib = $crtlstr ?? "$lib $crtlstr" !! $lib;
   warn "Result:\n\tEXTRALIBS: $lib\n\tLDLOADLIBS: $ldlib\n" if $verbose;
-  return @($lib, '', $ldlib, '', ($give_libs ? \@flibs : ()));
+  return @($lib, '', $ldlib, '', ($give_libs ?? \@flibs !! ()));
 }
 
 1;

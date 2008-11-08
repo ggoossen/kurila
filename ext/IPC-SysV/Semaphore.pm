@@ -39,8 +39,8 @@ sub new {
     my $id = semget(@_[0],@_[1],@_[2]);
 
     defined($id)
-	? bless \$id, $class
-	: undef;
+	?? bless \$id, $class
+	!! undef;
 }
 
 sub id {
@@ -58,7 +58,7 @@ sub getncnt {
     my $self = shift;
     my $sem = shift;
     my $v = semctl($$self,$sem,GETNCNT,0);
-    $v ? 0 + $v : undef;
+    $v ?? 0 + $v !! undef;
 }
 
 sub getzcnt {
@@ -66,7 +66,7 @@ sub getzcnt {
     my $self = shift;
     my $sem = shift;
     my $v = semctl($$self,$sem,GETZCNT,0);
-    $v ? 0 + $v : undef;
+    $v ?? 0 + $v !! undef;
 }
 
 sub getval {
@@ -74,7 +74,7 @@ sub getval {
     my $self = shift;
     my $sem = shift;
     my $v = semctl($$self,$sem,GETVAL,0);
-    $v ? 0 + $v : undef;
+    $v ?? 0 + $v !! undef;
 }
 
 sub getpid {
@@ -82,7 +82,7 @@ sub getpid {
     my $self = shift;
     my $sem = shift;
     my $v = semctl($$self,$sem,GETPID,0);
-    $v ? 0 + $v : undef;
+    $v ?? 0 + $v !! undef;
 }
 
 sub op {
@@ -119,7 +119,7 @@ sub set {
     }
 
     my $v = semctl($$self,0,IPC_SET,$ds->pack);
-    $v ? 0 + $v : undef;
+    $v ?? 0 + $v !! undef;
 }
 
 sub getall {

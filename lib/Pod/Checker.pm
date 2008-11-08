@@ -560,7 +560,7 @@ sub initialize {
     $self->{_NUM_WARNINGS} = 0;
     $self->{-quiet} ||= 0;
     # set the error handling subroutine
-    $self->errorsub($self->{-quiet} ? sub { 1; } : 'poderror');
+    $self->errorsub($self->{-quiet} ?? sub { 1; } !! 'poderror');
     $self->{_commands} = 0; # total number of POD commands encountered
     $self->{_list_stack} = \@(); # stack for nested lists
     $self->{_have_begin} = ''; # stores =begin
@@ -604,17 +604,17 @@ The error level, should be 'WARNING' or 'ERROR'.
 # Invoked as $self->poderror( @args ), or $self->poderror( {%opts}, @args )
 sub poderror {
     my $self = shift;
-    my %opts = %( (ref @_[0]) ? < %{shift()} : () );
+    my %opts = %( (ref @_[0]) ?? < %{shift()} !! () );
 
     ## Retrieve options
     chomp( my $msg  = (%opts{-msg} || "")."$(join ' ',@_)" );
-    my $line = (exists %opts{-line}) ? " at line %opts{-line}" : "";
-    my $file = (exists %opts{-file}) ? " in file %opts{-file}" : "";
+    my $line = (exists %opts{-line}) ?? " at line %opts{-line}" !! "";
+    my $file = (exists %opts{-file}) ?? " in file %opts{-file}" !! "";
     unless (exists %opts{-severity}) {
        ## See if can find severity in message prefix
        %opts{-severity} = $1  if ( $msg =~ s/^\**\s*([A-Z]{3,}):\s+// );
     }
-    my $severity = (exists %opts{-severity}) ? "*** %opts{-severity}: " : "";
+    my $severity = (exists %opts{-severity}) ?? "*** %opts{-severity}: " !! "";
 
     ## Increment error count and print message "
     ++($self->{_NUM_ERRORS}) 
@@ -637,7 +637,7 @@ Set (if argument specified) and retrieve the number of errors found.
 =cut
 
 sub num_errors {
-   return ((nelems @_) +> 1) ?  @(@_[0]->{_NUM_ERRORS} = @_[1]) : @_[0]->{_NUM_ERRORS};
+   return ((nelems @_) +> 1) ??  @(@_[0]->{_NUM_ERRORS} = @_[1]) !! @_[0]->{_NUM_ERRORS};
 }
 
 ##################################
@@ -649,7 +649,7 @@ Set (if argument specified) and retrieve the number of warnings found.
 =cut
 
 sub num_warnings {
-   return ((nelems @_) +> 1) ?  @(@_[0]->{_NUM_WARNINGS} = @_[1]) : @_[0]->{_NUM_WARNINGS};
+   return ((nelems @_) +> 1) ??  @(@_[0]->{_NUM_WARNINGS} = @_[1]) !! @_[0]->{_NUM_WARNINGS};
 }
 
 ##################################
@@ -662,8 +662,8 @@ found in the C<=head1 NAME> section.
 =cut
 
 sub name {
-    return ((nelems @_) +> 1 && @_[1]) ?
-         @(@_[0]->{-name} = @_[1]) : @_[0]->{-name};  
+    return ((nelems @_) +> 1 && @_[1]) ??
+         @(@_[0]->{-name} = @_[1]) !! @_[0]->{-name};  
 }
 
 ##################################
@@ -861,12 +861,12 @@ sub command {
                 my $type;
                 if($arg =~ m/^[*]\s*(\S*.*)/) {
                   $type = 'bullet';
-                  $self->{_list_item_contents} = $1 ? 1 : 0;
+                  $self->{_list_item_contents} = $1 ?? 1 !! 0;
                   $arg = $1;
                 }
                 elsif($arg =~ m/^\d+\.?\s*(\S*)/) {
                   $type = 'number';
-                  $self->{_list_item_contents} = $1 ? 1 : 0;
+                  $self->{_list_item_contents} = $1 ?? 1 !! 0;
                   $arg = $1;
                 }
                 else {

@@ -50,7 +50,7 @@ sub hasEncode()
             Encode->import();
         };
 
-        $HAS_ENCODE = $@ ? 0 : 1 ;
+        $HAS_ENCODE = $@ ?? 0 !! 1 ;
     }
 
     return $HAS_ENCODE;
@@ -76,7 +76,7 @@ sub getEncoding($$$)
 our ($needBinmode);
 $needBinmode = ($^O eq 'MSWin32' || 
                     (eval ' $^UNICODE || $^UTF8LOCALE '))
-                    ? 1 : 1 ;
+                    ?? 1 !! 1 ;
 
 sub setBinModeInput($)
 {
@@ -249,7 +249,7 @@ sub Validator::new
     }
     
     die("$reportClass: input and output $inType are identical")
-        if $inType eq $outType && (ref @_[0] ? @_[0] \== @_[1] : @_[0] eq @_[1] && @_[0] ne '-' );
+        if $inType eq $outType && (ref @_[0] ?? @_[0] \== @_[1] !! @_[0] eq @_[1] && @_[0] ne '-' );
 
     if ($inType eq 'fileglob') # && $outType ne 'fileglob'
     {
@@ -500,7 +500,7 @@ sub IO::Compress::Base::Parameters::setError
 {
     my $self = shift ;
     my $error = shift ;
-    my $retval = (nelems @_) ? shift : undef ;
+    my $retval = (nelems @_) ?? shift !! undef ;
 
     $self->{Error} = $error ;
     return $retval;
@@ -678,7 +678,7 @@ sub IO::Compress::Base::Parameters::_checkType
         return $self->setError("Parameter '$key' must be an unsigned int, got '$value'")
             if $validate && $value !~ m/^\d+$/;
 
-        $$output = defined $value ? $value : 0 ;    
+        $$output = defined $value ?? $value !! 0 ;    
         return 1;
     }
     elsif ($type ^&^ Parse_signed)
@@ -688,19 +688,19 @@ sub IO::Compress::Base::Parameters::_checkType
         return $self->setError("Parameter '$key' must be a signed int, got '$value'")
             if $validate && $value !~ m/^-?\d+$/;
 
-        $$output = defined $value ? $value : 0 ;    
+        $$output = defined $value ?? $value !! 0 ;    
         return 1 ;
     }
     elsif ($type ^&^ Parse_boolean)
     {
         return $self->setError("Parameter '$key' must be an int, got '$value'")
             if $validate && defined $value && $value !~ m/^\d*$/;
-        $$output =  defined $value ? $value != 0 : 0 ;    
+        $$output =  defined $value ?? $value != 0 !! 0 ;    
         return 1;
     }
     elsif ($type ^&^ Parse_string)
     {
-        $$output = defined $value ? $value : "" ;    
+        $$output = defined $value ?? $value !! "" ;    
         return 1;
     }
 

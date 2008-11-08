@@ -18,13 +18,13 @@ my $tcount = 0;
 
 sub ok {
   $tcount++;
-  my $not = @_[0] ? '' : 'not ';
+  my $not = @_[0] ?? '' !! 'not ';
   print "$($not)ok $tcount\n";
 }
 
 print "1..10\n";
 
-my $DIR = $^O eq 'MacOS' ? ":" : ".";
+my $DIR = $^O eq 'MacOS' ?? ":" !! ".";
 
 my $dot = IO::Dir->new( $DIR);
 ok(defined($dot));

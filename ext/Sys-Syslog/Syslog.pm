@@ -117,7 +117,7 @@ my @fallbackMethods = @( () );
 $sock_timeout = 0.25 if $^O =~ m/darwin/;
 
 # coderef for a nicer handling of errors
-my $err_sub = %options{nofatal} ? \&warnings::warnif : sub { die shift; };
+my $err_sub = %options{nofatal} ?? \&warnings::warnif !! sub { die shift; };
 
 
 sub openlog {
@@ -132,7 +132,7 @@ sub openlog {
         %options{$opt} = 1 if exists %options{$opt}
     }
 
-    $err_sub = %options{nofatal} ? \&warnings::warnif : sub { die shift; };
+    $err_sub = %options{nofatal} ?? \&warnings::warnif !! sub { die shift; };
     return 1 unless %options{ndelay};
     connect_log();
 }
@@ -307,7 +307,7 @@ sub syslog {
     }
 
     $mask .= "\n" unless $mask =~ m/\n$/;
-    $message = @_ ? sprintf($mask, < @_) : $mask;
+    $message = @_ ?? sprintf($mask, < @_) !! $mask;
 
     # See CPAN-RT#24431. Opened on Apple Radar as bug #4944407 on 2007.01.21
     chomp $message if $^O =~ m/darwin/;
@@ -438,7 +438,7 @@ sub xlate {
     $name = "Sys::Syslog::$name";
     # Can't have just try { &$name } || -1 because some LOG_XXX may be zero.
     my $value = try { &{*{Symbol::fetch_glob($name)}} };
-    defined $value ? $value : -1;
+    defined $value ?? $value !! -1;
 }
 
 
@@ -706,7 +706,7 @@ sub connection_ok {
     my $rin = '';
     vec($rin, fileno(SYSLOG), 1, 1);
     my $ret = select $rin, undef, $rin, $sock_timeout;
-    return $ret ? 0 : 1;
+    return $ret ?? 0 !! 1;
 }
 
 sub disconnect_log {

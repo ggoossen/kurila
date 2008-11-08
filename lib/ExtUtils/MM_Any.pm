@@ -102,7 +102,7 @@ This is useful for code like:
 sub os_flavor_is {
     my $self = shift;
     my %flavors = %( < map { ($_ => 1) } $self->os_flavor );
-    return (grep { %flavors{$_} } @_) ? 1 : 0;
+    return (grep { %flavors{$_} } @_) ?? 1 !! 0;
 }
 
 
@@ -177,7 +177,7 @@ sub _expand_macros {
     my($self, $cmd) = < @_;
 
     $cmd =~ s{\$\((\w+)\)}{$(
-        defined $self->{$1} ? $self->{$1} : "\$($1)"
+        defined $self->{$1} ?? $self->{$1} !! "\$($1)"
     )};
     return $cmd;
 }
@@ -205,7 +205,7 @@ sub echo {
     my @cmds = map { '$(NOECHO) $(ECHO) '.$self->quote_literal($_) } 
                split m/\n/, $text;
     if( $file ) {
-        my $redirect = $appending ? '>>' : '>';
+        my $redirect = $appending ?? '>>' !! '>';
         @cmds[0] .= " $redirect $file";
         $_ .= " >> $file" foreach @cmds[[1..((nelems @cmds)-1)]];
     }
@@ -462,8 +462,8 @@ clean :: clean_subdirs
 
     if( %attribs{FILES} ) {
         # Use @dirs because we don't know what's in here.
-        push @dirs, ref %attribs{FILES}                ?
-                        < @{%attribs{FILES}}             : <
+        push @dirs, ref %attribs{FILES}                ??
+                        < @{%attribs{FILES}}             !! <
                         split m/\s+/, %attribs{FILES}   ;
     }
 
@@ -584,8 +584,8 @@ before tar-ing (or shar-ing).
 sub distdir {
     my($self) = shift;
 
-    my $meta_target = $self->{NO_META} ? '' : 'distmeta';
-    my $sign_target = !$self->{SIGN}   ? '' : 'distsignature';
+    my $meta_target = $self->{NO_META} ?? '' !! 'distmeta';
+    my $sign_target = !$self->{SIGN}   ?? '' !! 'distsignature';
 
     return sprintf <<'MAKE_FRAG', $meta_target, $sign_target;
 create_distdir :
@@ -734,8 +734,8 @@ MAKE_FRAG
     }
 
     my $author_value = defined $self->{AUTHOR}
-        ? "\n    - $self->{AUTHOR}"
-        : undef;
+        ?? "\n    - $self->{AUTHOR}"
+        !! undef;
 
     # Use a list to preserve order.
     my @meta_to_mm = @(
@@ -746,7 +746,7 @@ MAKE_FRAG
         author       => $author_value,
         generated_by => 
                 "ExtUtils::MakeMaker version $ExtUtils::MakeMaker::VERSION",
-        distribution_type => $self->{PM} ? 'module' : 'script',
+        distribution_type => $self->{PM} ?? 'module' !! 'script',
     );
 
     my $meta = "--- #YAML:1.0\n";
@@ -1109,8 +1109,8 @@ sub init_INSTALL_from_PREFIX {
 
         unless( %Config{$k} ) {
             $self->{uc $k}  ||= %Config{usevendorprefix}
-                              ? uc "\$(installman$($num)dir)"
-                              : '';
+                              ?? uc "\$(installman$($num)dir)"
+                              !! '';
         }
     }
 
@@ -1121,19 +1121,19 @@ sub init_INSTALL_from_PREFIX {
 
     unless( %Config{installvendorbin} ) {
         $self->{INSTALLVENDORBIN} ||= %Config{usevendorprefix} 
-                                    ? %Config{installbin}
-                                    : '';
+                                    ?? %Config{installbin}
+                                    !! '';
     }
     unless( %Config{installvendorscript} ) {
         $self->{INSTALLVENDORSCRIPT} ||= %Config{usevendorprefix}
-                                       ? %Config{installscript}
-                                       : '';
+                                       ?? %Config{installscript}
+                                       !! '';
     }
 
 
     my $iprefix = %Config{installprefixexp} || %Config{installprefix} || 
                   %Config{prefixexp}        || %Config{prefix} || '';
-    my $vprefix = %Config{usevendorprefix}  ? %Config{vendorprefixexp} : '';
+    my $vprefix = %Config{usevendorprefix}  ?? %Config{vendorprefixexp} !! '';
     my $sprefix = %Config{siteprefixexp}    || '';
 
     # 5.005_03 doesn't have a siteprefix.
@@ -1165,7 +1165,7 @@ sub init_INSTALL_from_PREFIX {
 
     if( $self->{LIBSTYLE} ) {
         $libstyle = $self->{LIBSTYLE};
-        $manstyle = $self->{LIBSTYLE} eq 'lib/perl5' ? 'lib/perl5' : '';
+        $manstyle = $self->{LIBSTYLE} eq 'lib/perl5' ?? 'lib/perl5' !! '';
     }
 
     # Some systems, like VOS, set installman*dir to '' if they can't
@@ -1663,7 +1663,7 @@ tests in t/*.t.
 
 sub find_tests {
     my($self) = shift;
-    return -d 't' ? 't/*.t' : '';
+    return -d 't' ?? 't/*.t' !! '';
 }
 
 

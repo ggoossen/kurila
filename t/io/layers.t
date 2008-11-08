@@ -15,15 +15,15 @@ BEGIN {
 	print "1..0 # PERLIO='%ENV{PERLIO}' unknown\n";
 	exit 0;
     }
-    $PERLIO = exists %ENV{PERLIO} ? %ENV{PERLIO} : "(undef)";
+    $PERLIO = exists %ENV{PERLIO} ?? %ENV{PERLIO} !! "(undef)";
 }
 
 use Config;
 
-my $DOSISH    = $^O =~ m/^(?:MSWin32|os2|dos|NetWare|mint)$/ ? 1 : 0;
+my $DOSISH    = $^O =~ m/^(?:MSWin32|os2|dos|NetWare|mint)$/ ?? 1 !! 0;
    $DOSISH    = 1 if !$DOSISH and $^O =~ m/^uwin/;
-my $NONSTDIO  = exists %ENV{PERLIO} && %ENV{PERLIO} ne 'stdio'     ? 1 : 0;
-my $FASTSTDIO = config_value('d_faststdio') && config_value('usefaststdio') ? 1 : 0;
+my $NONSTDIO  = exists %ENV{PERLIO} && %ENV{PERLIO} ne 'stdio'     ?? 1 !! 0;
+my $FASTSTDIO = config_value('d_faststdio') && config_value('usefaststdio') ?? 1 !! 0;
 my $UTF8_STDIN;
 if ($^UNICODE ^&^ 1) {
     if ($^UNICODE ^&^ 64) {
@@ -36,7 +36,7 @@ if ($^UNICODE ^&^ 1) {
 } else {
     $UTF8_STDIN = 0;
 }
-my $NTEST = 32 - (($DOSISH || !$FASTSTDIO) ? 7 : 0) - ($DOSISH ? 5 : 0)
+my $NTEST = 32 - (($DOSISH || !$FASTSTDIO) ?? 7 !! 0) - ($DOSISH ?? 5 !! 0)
     + $UTF8_STDIN;
 
 sub PerlIO::F_UTF8 () { 0x00008000 } # from perliol.h
@@ -107,13 +107,13 @@ SKIP: do {
 	    } else {
 		is($result[$i], $j,
 		   sprintf("$id - $i is \%s",
-			   defined $j ? $j : "undef"));
+			   defined $j ?? $j !! "undef"));
 	    }
 	}
     }
 
     check(PerlIO::get_layers(\*STDIN),
-	  $UTF8_STDIN ? @( "stdio", "utf8" ) : @( "stdio" ),
+	  $UTF8_STDIN ?? @( "stdio", "utf8" ) !! @( "stdio" ),
 	  "STDIN");
 
     open(F, ">:crlf", "afile");

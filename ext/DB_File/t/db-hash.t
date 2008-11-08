@@ -130,7 +130,7 @@ my ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
 
 my %noMode = %( < map { $_, 1} qw( amigaos MSWin32 NetWare cygwin ) ) ;
 
-ok(16, ($mode ^&^ 0777) == (($^O eq 'os2' || $^O eq 'MacOS') ? 0666 : 0640) ||
+ok(16, ($mode ^&^ 0777) == (($^O eq 'os2' || $^O eq 'MacOS') ?? 0666 !! 0640) ||
    %noMode{$^O} );
 
 my ($key, $value, $i);

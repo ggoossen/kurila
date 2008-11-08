@@ -28,12 +28,12 @@ my $fh = (FileHandle->new( "./TEST", O_RDONLY)
 
 
 my $buffer = ~< $fh;
-print $buffer eq "#!./perl\n" ? "ok 3\n" : "not ok 3\n";
+print $buffer eq "#!./perl\n" ?? "ok 3\n" !! "not ok 3\n";
  $fh->
 
 ungetc( ord 'A');
 CORE::read($fh, my $buf,1);
-print $buf eq 'A' ? "ok 4\n" : "not ok 4\n";
+print $buf eq 'A' ?? "ok 4\n" !! "not ok 4\n";
 
 close $fh;
 
@@ -90,4 +90,4 @@ else {
   }
 }
 
-print FileHandle->new('','r') ? "not ok 12\n" : "ok 12\n";
+print FileHandle->new('','r') ?? "not ok 12\n" !! "ok 12\n";

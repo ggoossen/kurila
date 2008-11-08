@@ -491,8 +491,8 @@ sub cmd_item_block  { my $self = shift; $self->item_common ('block',  < @_) }
 ##############################################################################
 
 # The simple ones.
-sub cmd_b { return @_[0]->{alt} ? "``@_[2]''" : @_[2] }
-sub cmd_f { return @_[0]->{alt} ? "\"@_[2]\"" : @_[2] }
+sub cmd_b { return @_[0]->{alt} ?? "``@_[2]''" !! @_[2] }
+sub cmd_f { return @_[0]->{alt} ?? "\"@_[2]\"" !! @_[2] }
 sub cmd_i { return '*' . @_[2] . '*' }
 sub cmd_x { return '' }
 
@@ -525,15 +525,15 @@ sub cmd_c {
 
     # If we didn't return, go ahead and quote the text.
     return %$self{opt_alt}
-        ? "``$text''"
-        : "%$self{LQUOTE}$text%$self{RQUOTE}";
+        ?? "``$text''"
+        !! "%$self{LQUOTE}$text%$self{RQUOTE}";
 }
 
 # Links reduce to the text that we're given, wrapped in angle brackets if it's
 # a URL.
 sub cmd_l {
     my ($self, $attrs, $text) = < @_;
-    return %$attrs{type} eq 'url' ? "<$text>" : $text;
+    return %$attrs{type} eq 'url' ?? "<$text>" !! $text;
 }
 
 ##############################################################################

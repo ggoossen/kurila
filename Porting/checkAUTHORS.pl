@@ -15,7 +15,7 @@ my $result = GetOptions ("rank" => \$rank,		    # rank authors
 			 "reverse" => \$reverse,
 			);
 
-if (!$result or (($rank||0) + ($ta||0) + ((nelems @authors) ? 1 : 0) != 1) or !nelems @ARGV) {
+if (!$result or (($rank||0) + ($ta||0) + ((nelems @authors) ?? 1 !! 0) != 1) or !nelems @ARGV) {
   die <<"EOS";
 $0 --rank Changelogs                        # rank authors by patches
 $0 --acknowledged <authors file> Changelogs # Display unacknowledged authors
@@ -206,12 +206,12 @@ sub display_ordered {
   my $i = (nelems @sorted);
   return unless (nelems @sorted);
   my $sum = 0;
-  foreach my $i (@($reverse ? < 0 ..( (nelems @sorted)-1) : < reverse 0 ..( (nelems @sorted)-1))) {
+  foreach my $i (@($reverse ?? < 0 ..( (nelems @sorted)-1) !! < reverse 0 ..( (nelems @sorted)-1))) {
     next unless @sorted[$i];
     my $prefix;
     $sum += $i * nelems @{@sorted[$i]};
     # Value to display is either this one, or the cumulative sum.
-    my $value = $cumulative ? $sum : $i;
+    my $value = $cumulative ?? $sum !! $i;
     if ($percentage) {
 	$prefix = sprintf "\%6.2f:\t", 100 * $value / $total;
     } else {

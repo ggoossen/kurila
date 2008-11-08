@@ -383,9 +383,9 @@ sub cmd_for {
 
 # The simple formatting ones.  These are here mostly so that subclasses can
 # override them and do more complicated things.
-sub seq_b { return @_[0]->{alt} ? "``@_[1]''" : @_[1] }
-sub seq_c { return @_[0]->{alt} ? "``@_[1]''" : "`@_[1]'" }
-sub seq_f { return @_[0]->{alt} ? "\"@_[1]\"" : @_[1] }
+sub seq_b { return @_[0]->{alt} ?? "``@_[1]''" !! @_[1] }
+sub seq_c { return @_[0]->{alt} ?? "``@_[1]''" !! "`@_[1]'" }
+sub seq_f { return @_[0]->{alt} ?? "\"@_[1]\"" !! @_[1] }
 sub seq_i { return '*' . @_[1] . '*' }
 
 # The complicated one.  Handle links.  Since this is plain text, we can't
@@ -427,8 +427,8 @@ sub seq_l {
         $text = "the $manpage manpage" if length $manpage;
     } elsif ($section =~ m/^[:\w]+(?:\(\))?/) {
         $text .= 'the ' . $section . ' entry';
-        $text .= (length $manpage) ? " in the $manpage manpage"
-                                   : " elsewhere in this document";
+        $text .= (length $manpage) ?? " in the $manpage manpage"
+                                   !! " elsewhere in this document";
     } else {
         $section =~ s/^\"\s*//;
         $section =~ s/\s*\"$//;

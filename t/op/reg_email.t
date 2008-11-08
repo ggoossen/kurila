@@ -75,7 +75,7 @@ sub run_tests {
     while (~< *DATA) {
 	chomp;
 	next if m/^#/;
-	print m/^$email$/ ? "ok " : "not ok ", ++ $count, "\n";
+	print m/^$email$/ ?? "ok " !! "not ok ", ++ $count, "\n";
     }
 }
 

@@ -28,15 +28,15 @@ ok(1);
 
 require Cwd;
 my $THISDIR = Cwd::cwd();
-my $VERBOSE = %ENV{PERL_CORE} ? 0 : (%ENV{TEST_VERBOSE} || 0);
-my $lib_dir = %ENV{PERL_CORE} ? 
+my $VERBOSE = %ENV{PERL_CORE} ?? 0 !! (%ENV{TEST_VERBOSE} || 0);
+my $lib_dir = %ENV{PERL_CORE} ?? 
   'File::Spec'->catdir('pod', 'testpods', 'lib')
-  : 'File::Spec'->catdir($THISDIR,'lib');
+  !! 'File::Spec'->catdir($THISDIR,'lib');
 our $Qlib_dir;
 if ($^O eq 'VMS') {
-    $lib_dir = %ENV{PERL_CORE} ?
+    $lib_dir = %ENV{PERL_CORE} ??
       VMS::Filespec::unixify( <'File::Spec'->catdir('pod', 'testpods', 'lib'))
-      : VMS::Filespec::unixify( <'File::Spec'->catdir($THISDIR,'-','lib','pod'));
+      !! VMS::Filespec::unixify( <'File::Spec'->catdir($THISDIR,'-','lib','pod'));
     $Qlib_dir = $lib_dir;
     $Qlib_dir =~ s#\/#::#g;
 }
@@ -45,11 +45,11 @@ print "### searching $lib_dir\n";
 my %pods = %( < pod_find($lib_dir) );
 my $result = join(',', sort values %pods);
 print "### found $result\n";
-my $compare = %ENV{PERL_CORE} ? 
+my $compare = %ENV{PERL_CORE} ?? 
   join(',', sort qw(
     Pod::Stuff
 ))
-  : join(',', sort qw(
+  !! join(',', sort qw(
     Pod::Checker
     Pod::Find
     Pod::InputObjects
@@ -94,9 +94,9 @@ if ($^O eq 'VMS') { # privlib is perl_root:[lib] OK but not under mms
     ok($result,$compare);
 }
 else {
-    $compare = %ENV{PERL_CORE} ?
+    $compare = %ENV{PERL_CORE} ??
       'File::Spec'->catfile( 'File::Spec'->updir, 'lib','File','Find.pm')
-      : 'File::Spec'->catfile(Config::config_value("privlib"),"File","Find.pm");
+      !! 'File::Spec'->catfile(Config::config_value("privlib"),"File","Find.pm");
     ok(_canon($result),_canon($compare));
 }
 
@@ -105,13 +105,13 @@ my $searchpod = 'Stuff';
 print "### searching for $searchpod.pod\n";
 $result = pod_where(
   \%( -dirs => \@( 'File::Spec'->catdir(
-    %ENV{PERL_CORE} ? () : < qw(t), 'pod', 'testpods', 'lib', 'Pod') ),
+    %ENV{PERL_CORE} ?? () !! < qw(t), 'pod', 'testpods', 'lib', 'Pod') ),
     -verbose => $VERBOSE ), $searchpod)
   || "undef - $searchpod.pod not found!";
 print "### found $result\n";
 
 $compare = 'File::Spec'->catfile(
-    %ENV{PERL_CORE} ? () : < qw(t),
+    %ENV{PERL_CORE} ?? () !! < qw(t),
     'pod', 'testpods', 'lib', 'Pod' ,'Stuff.pm');
 ok(_canon($result),_canon($compare));
 

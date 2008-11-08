@@ -47,7 +47,7 @@ my $txt;
 sub alias (@)
 {
   (nelems @_) or return %alias3;
-  my $alias = ref @_[0] ? @_[0] : \%( < @_ );
+  my $alias = ref @_[0] ?? @_[0] !! \%( < @_ );
  <  %alias3{[keys %$alias]} = < values %$alias;
 } # alias
 
@@ -116,7 +116,7 @@ sub charnames
     unless (defined $hexstr) {
       if (%^H{charnames_short} and $name =~ m/^(.+?):(.+)/s) {
 	my ($script, $cname) = ($1, $2);
-	my $case = $cname =~ m/[[:upper:]]/ ? "CAPITAL" : "SMALL";
+	my $case = $cname =~ m/[[:upper:]]/ ?? "CAPITAL" !! "SMALL";
         my $uc_cname = uc($cname);
         my $uc_script = uc($script);
 	if ($txt =~ m/($hexre)\t\t$uc_script (?:$case )?LETTER \Q$uc_cname\E$/m) {
@@ -128,7 +128,7 @@ sub charnames
     ## If we still don't have it, check for the name among the loaded
     ## scripts.
     if (not defined $hexstr) {
-      my $case = $name =~ m/[[:upper:]]/ ? "CAPITAL" : "SMALL";
+      my $case = $name =~ m/[[:upper:]]/ ?? "CAPITAL" !! "SMALL";
       for my $script ( @{%^H{charnames_scripts}}) {
         my $ucname = uc($name);
 	if ($txt =~ m/($hexre)\t\t$script (?:$case )?LETTER \Q$ucname\E$/m) {

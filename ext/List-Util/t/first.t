@@ -2,7 +2,7 @@
 
 use List::Util < qw(first);
 use Test::More;
-plan tests => ($::PERL_ONLY ? 13 : 15);
+plan tests => ($::PERL_ONLY ?? 13 !! 15);
 my $v;
 
 ok(defined &first,	'defined');

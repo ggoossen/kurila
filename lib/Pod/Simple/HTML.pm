@@ -153,12 +153,12 @@ my @_to_accept;
 
 sub changes {
   return map {; m/^([-_:0-9a-zA-Z]+)=([-_:0-9a-zA-Z]+)$/s
-     ? ( $1, => "\n<$2>", "/$1", => "</$2>\n" ) : die "Funky $_"
+     ?? ( $1, => "\n<$2>", "/$1", => "</$2>\n" ) !! die "Funky $_"
   } @_;
 }
 sub changes2 {
   return map {; m/^([-_:0-9a-zA-Z]+)=([-_:0-9a-zA-Z]+)$/s
-     ? ( $1, => "<$2>", "/$1", => "</$2>" ) : die "Funky $_"
+     ?? ( $1, => "<$2>", "/$1", => "</$2>" ) !! die "Funky $_"
   } @_;
 }
 
@@ -247,8 +247,8 @@ sub do_beginning {
   if($self->html_css) {
     my $link =
     $self->html_css =~ m/</
-     ? $self->html_css # It's a big blob of markup, let's drop it in
-     : sprintf(        # It's just a URL, so let's wrap it up
+     ?? $self->html_css # It's a big blob of markup, let's drop it in
+     !! sprintf(        # It's just a URL, so let's wrap it up
       qq[<link rel="stylesheet" type="text/css" title="pod_stylesheet" href="\%s">\n], <
       $self->html_css,
     );
@@ -259,8 +259,8 @@ sub do_beginning {
   if($self->html_javascript) {
     my $link =
     $self->html_javascript =~ m/</
-     ? $self->html_javascript # It's a big blob of markup, let's drop it in
-     : sprintf(        # It's just a URL, so let's wrap it up
+     ?? $self->html_javascript # It's a big blob of markup, let's drop it in
+     !! sprintf(        # It's just a URL, so let's wrap it up
       qq[<script type="text/javascript" src="\%s"></script>\n], <
       $self->html_javascript,
     );
@@ -611,7 +611,7 @@ sub do_pod_link {
 
   #DEBUG and print "So far [", $to||'nil', "] [", $section||'nil', "]\n";
 
-  my $out = (defined $to and length $to) ? $to : '';
+  my $out = (defined $to and length $to) ?? $to !! '';
   $out .= "#" . $section if defined $section and length $section;
   
   unless(length $out) { # sanity check
@@ -676,8 +676,8 @@ sub resolve_pod_page_link {
   # resolve_pod_page_link must return a properly escaped URL
   my $self = shift;
   return $self->batch_mode()
-   ? $self->resolve_pod_page_link_batch_mode(< @_)
-   : $self->resolve_pod_page_link_singleton_mode(< @_)
+   ?? $self->resolve_pod_page_link_batch_mode(< @_)
+   !! $self->resolve_pod_page_link_singleton_mode(< @_)
   ;
 }
 

@@ -189,8 +189,8 @@ sub doglob_Mac {
 	    next INNER if $cond eq 'd' and ! -d "$not_esc_head$e";
 		
 		if (&$matchsub($e)) {
-			my $leave = (($not_esc_head eq ':') && (-f "$not_esc_head$e")) ? 
-		            	"$e" : "$not_esc_head$e";
+			my $leave = (($not_esc_head eq ':') && (-f "$not_esc_head$e")) ?? 
+		            	"$e" !! "$not_esc_head$e";
 			#
 			# On Mac OS, the two glob metachars '*' and '?' and the escape 
 			# char '\' are valid characters for file and directory names. 
@@ -378,7 +378,7 @@ sub glob {
 		@pat = _preprocess_pattern(< @pat);
 		# expand volume names
 		@pat = _expand_volume(< @pat);
-		%entries{$cxix} = (nelems @pat) ? \_un_escape( < doglob_Mac(1,< @pat) ) : \@();
+		%entries{$cxix} = (nelems @pat) ?? \_un_escape( < doglob_Mac(1,< @pat) ) !! \@();
 	} else {
 		%entries{$cxix} = \doglob(1,< @pat);
     }
@@ -394,7 +394,7 @@ do {
     my $pkg = shift;
     return unless (nelems @_);
     my $sym = shift;
-    my $callpkg = ($sym =~ s/^GLOBAL_//s ? 'CORE::GLOBAL' : caller(0));
+    my $callpkg = ($sym =~ s/^GLOBAL_//s ?? 'CORE::GLOBAL' !! caller(0));
     *{Symbol::fetch_glob($callpkg.'::'.$sym)} = \&{*{Symbol::fetch_glob($pkg.'::'.$sym)}} if $sym eq 'glob';
     }
 };

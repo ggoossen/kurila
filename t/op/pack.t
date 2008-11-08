@@ -221,7 +221,7 @@ do {
 
   # Check that the warning behaviour on the modifiers !, < and > is as we
   # expect it for this perl.
-  my $can_endian = $no_endianness ? '' : 'sSiIlLqQjJfFdDpP';
+  my $can_endian = $no_endianness ?? '' !! 'sSiIlLqQjJfFdDpP';
   my $can_shriek = 'sSiIlL';
   $can_shriek .= 'nNvV' unless $no_signedness;
   # h and H can't do either, so act as sanity checks in blead
@@ -507,9 +507,9 @@ foreach (@(
 )
 {
     my ($what, $template, $in, $out) = < @$_;
-    my $got = $what eq 'u' ? (unpack $template, $in) : (pack $template, $in);
+    my $got = $what eq 'u' ?? (unpack $template, $in) !! (pack $template, $in);
     unless (is($got, $out)) {
-        my $un = $what eq 'u' ? 'un' : '';
+        my $un = $what eq 'u' ?? 'un' !! '';
         print "# $($un)pack ('$template', "._qq($in).') gave '._qq($out).
             ' not '._qq($got)."\n";
     }
@@ -598,7 +598,7 @@ sub numbers_with_total {
         } else {
             $calc_sum = $total;
             # Shift into range by some multiple of the total
-            my $mult = $max_p1 ? int ($total / $max_p1) : undef;
+            my $mult = $max_p1 ?? int ($total / $max_p1) !! undef;
             # Need this to make sure that -1 + (~0+1) is ~0 (ie still integer)
             $calc_sum = $total - $mult;
             $calc_sum -= $mult * $max;
@@ -623,7 +623,7 @@ sub numbers_with_total {
                 && ($calc_sum +<= $sum * $delta && $calc_sum +>= $sum / $delta)) {
                 pass ("unpack '\%$_$format' gave $sum, expected $calc_sum");
             } else {
-                my $text = ref $total ? &$total($len) : $total;
+                my $text = ref $total ?? &$total($len) !! $total;
                 fail;
                 print "# For list (" . join (", ", @_) . ") (total $text)"
                     . " packed with $format unpack '\%$_$format' gave $sum,"
@@ -716,7 +716,7 @@ sub byteorder
         skip "cannot compare native byteorder with big-/little-endian", 1
             if $ByteOrder eq 'unknown';
 
-        is($nat, $ByteOrder eq 'big' ? $be : $le);
+        is($nat, $ByteOrder eq 'big' ?? $be !! $le);
       };
       is($be, (join '', reverse( split m//, $le)));
       my @x = @( try { unpack "$format$format>$format<", $nat.$be.$le } );
@@ -799,7 +799,7 @@ SKIP: do {
           skip "cannot compare native byteorder with big-/little-endian", 1
               if $ByteOrder eq 'unknown';
 
-          is($nat, $ByteOrder eq 'big' ? $be : $le);
+          is($nat, $ByteOrder eq 'big' ?? $be !! $le);
         };
 
         is($be, @ref[$i]);
@@ -1032,8 +1032,8 @@ foreach (@(
 
   my $got = try {unpack $template, $in};
   is($@, '');
-  (nelems @out) ? is( $got, @out[0] ) # 1 or more items; should get first
-       : ok( !defined $got ) # 0 items; should get undef
+  (nelems @out) ?? is( $got, @out[0] ) # 1 or more items; should get first
+       !! ok( !defined $got ) # 0 items; should get undef
     or printf "# scalar unpack ('$template', \%s) gave \%s expected \%s\n", <
               _qq($in), < encode_list ($got), < encode_list (@out[0]);
 }
@@ -1088,7 +1088,7 @@ do {
     my $t = shift;
     for my $mod (qw( < > )) {
       $t =~ s/((?:(?:[SILQJFDP]!?$mod|[^SILQJFDP\W]!?)(?:\d+|\*|\[(?:[^]]+)\])?\/?)\{2,\})/$( do {
-              my $x = $1; $x =~ s!$mod!!g ? "($x)$mod" : $x })/ig;
+              my $x = $1; $x =~ s!$mod!!g ?? "($x)$mod" !! $x })/ig;
     }
     return $t;
   }
@@ -1316,7 +1316,7 @@ do {  # Repeat count [SUBEXPR]
      push @codes, 'd';	# Keep the count the same
    }
 
-   push @codes, < map { m/^[silqjfdp]/i ? ("$_<", "$_>") : () } @codes;
+   push @codes, < map { m/^[silqjfdp]/i ?? ("$_<", "$_>") !! () } @codes;
 
    my %val;
  <   %val{[ @codes]} = < map { m/ [Xx]  (?{ undef })
@@ -1342,7 +1342,7 @@ do {  # Repeat count [SUBEXPR]
        my @list1 = @list;
        @list1 = @( (< @list1) x $c ) unless $type =~ m/[XxAaZBbHhP]/;
        for my $groupend (@('', ')2', ')[8]')) {
-	   my $groupbegin = ($groupend ? '(' : '');
+	   my $groupbegin = ($groupend ?? '(' !! '');
 	   $c = 1;
 	   $c = $1 if $groupend =~ m/(\d+)/;
 	   my @list2 = @( (< @list1) x $c );
@@ -1444,7 +1444,7 @@ foreach my $template (qw(A Z c C s S i I l L n N v V q Q j J f d F D u U w)) {
     if ($@) {
       die unless $@->{description} =~ m/Invalid type '$template'/;
       skip ("$template not supported on this perl",
-            %cant_checksum{$template} ? 4 : 8);
+            %cant_checksum{$template} ?? 4 !! 8);
     }
     my @unpack4 = @( unpack "$($template)4", $packed );
     my @unpack = @( unpack "$($template)*", $packed );

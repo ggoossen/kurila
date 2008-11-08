@@ -68,7 +68,7 @@ sub opts {
         # --opt=smth
         (< map {m/^--([\-_\w]+)=(.*)$/} @ARGV),
         # --opt --no-opt --noopt
-        (< map {m/^no-?(.*)$/i?($1=>0):($_=>1)} map {m/^--([\-_\w]+)$/} @ARGV),
+        (< map {m/^no-?(.*)$/i??($1=>0)!!($_=>1)} map {m/^--([\-_\w]+)$/} @ARGV),
     );
 
     my %opts = %(< %Allowed_Opts, < %given_opts);
@@ -307,7 +307,7 @@ my $s = fetch_string (\%(), 'ivsize');
 
 # However, ivtype and ivsize will not vary for sane fat binaries
 
-my $f = $t eq 'long' ? 'L!' : $s == 8 ? 'Q': 'I';
+my $f = $t eq 'long' ?? 'L!' !! $s == 8 ?? 'Q'!! 'I';
 
 my $byteorder_code;
 if ($s == 4 || $s == 8) {
@@ -641,7 +641,7 @@ ENDOFSET
 foreach my $key (keys %Common) {
     my $value = fetch_string (\%(), $key);
     # Is it safe on the LHS of => ?
-    my $qkey = $key =~ m/^[A-Za-z_][A-Za-z0-9_]*$/ ? $key : "'$key'";
+    my $qkey = $key =~ m/^[A-Za-z_][A-Za-z0-9_]*$/ ?? $key !! "'$key'";
     if (defined $value) {
 	# Quote things for a '' string
 	$value =~ s!\\!\\\\!g;
@@ -854,7 +854,7 @@ EOF
   }
   elsif (!$text || !m/\A\t/) {
     warn "Expected a Configure variable header",
-      ($text ? " or another paragraph of description" : () );
+      ($text ?? " or another paragraph of description" !! () );
   }
   s/n't/n\00t/g;		# leave can't, won't etc untouched
   s/^\t\s+(.*)/\n$1/gm;		# Indented lines ===> new paragraph

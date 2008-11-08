@@ -98,8 +98,8 @@ my $CanMoveAtBoot = ($Is_Win32 || $Is_cygwin);
 # *note* CanMoveAtBoot is only incidentally the same condition as below
 # this needs not hold true in the future.
 my $Has_Win32API_File = ($Is_Win32 || $Is_cygwin)
-    ? (try {require Win32API::File; 1} || 0)
-    : 0;
+    ?? (try {require Win32API::File; 1} || 0)
+    !! 0;
 
 
 my $Inc_uninstall_warn_handler;
@@ -171,8 +171,8 @@ sub _move_file_at_boot { #XXX OS-SPECIFIC
          unless $CanMoveAtBoot;
 
     my $descr= ref $target
-                ? "'$file' for deletion"
-                : "'$file' for installation as '$target'";
+                ?? "'$file' for deletion"
+                !! "'$file' for installation as '$target'";
 
     if ( ! $Has_Win32API_File ) {
 
@@ -193,7 +193,7 @@ sub _move_file_at_boot { #XXX OS-SPECIFIC
     _chmod( 0666, $target ) unless ref $target;
 
     if (Win32API::File::MoveFileEx( $file, $target, $opts )) {
-        $MUST_REBOOT ||= ref $target ? 0 : 1;
+        $MUST_REBOOT ||= ref $target ?? 0 !! 1;
         return 1;
     } else {
         my @msg=@(
@@ -454,8 +454,8 @@ sub _mkpath {
     if (!$can) {
         my @msg=@(
             "Can't create '$dir'",
-            $root ? "Do not have write permissions on '$root'"
-                  : "Unknown Error"
+            $root ?? "Do not have write permissions on '$root'"
+                  !! "Unknown Error"
         );
         if ($dry_run) {
             _warnonce < @msg;
@@ -727,7 +727,7 @@ sub install { #XXX OS-SPECIFIC
         # 5.5.3's File::Find missing no_chdir option
         # XXX OS-SPECIFIC
         # File::Find seems to always be Unixy except on MacPerl :(
-        my $current_directory= $Is_MacPerl ? $Curdir : '.';
+        my $current_directory= $Is_MacPerl ?? $Curdir !! '.';
         find(sub {
             my ($mode,$size,$atime,$mtime) = < @(stat)[[@:2,7,8,9]];
 
@@ -798,7 +798,7 @@ sub install { #XXX OS-SPECIFIC
                 utime($atime,$mtime + $Is_VMS,$targetfile) unless $dry_run+>1;
 
 
-                $mode = 0444 ^|^ ( $mode ^&^ 0111 ? 0111 : 0 );
+                $mode = 0444 ^|^ ( $mode ^&^ 0111 ?? 0111 !! 0 );
                 $mode = $mode ^|^ 0222
                   if $realtarget ne $targetfile;
                 _chmod( $mode, $targetfile, $verbose );
@@ -816,7 +816,7 @@ sub install { #XXX OS-SPECIFIC
         if ( $uninstall_shadows ) {
             inc_uninstall($sourcefile,$ffd, $verbose,
                           $dry_run,
-                          $realtarget ne $targetfile ? $realtarget : "",
+                          $realtarget ne $targetfile ?? $realtarget !! "",
                           $result);
         }
 
@@ -960,7 +960,7 @@ Consider its use discouraged.
 
 sub install_default {
   (nelems @_) +< 2 or Carp::croak("install_default should be called with 0 or 1 argument");
-  my $FULLEXT = (nelems @_) ? shift : @ARGV[0];
+  my $FULLEXT = (nelems @_) ?? shift !! @ARGV[0];
   defined $FULLEXT or die "Do not know to where to write install log";
   my $INST_LIB = File::Spec->catdir($Curdir,"blib","lib");
   my $INST_ARCHLIB = File::Spec->catdir($Curdir,"blib","arch");
@@ -971,8 +971,8 @@ sub install_default {
   install(\%(
            read => config_value("sitearchexp") . "/auto/$FULLEXT/.packlist",
            write => config_value("installsitearch") . "/auto/$FULLEXT/.packlist",
-           $INST_LIB => (directory_not_empty($INST_ARCHLIB)) ?
-                         config_value("installsitearch") :
+           $INST_LIB => (directory_not_empty($INST_ARCHLIB)) ??
+                         config_value("installsitearch") !!
                          config_value("installsitelib"),
            $INST_ARCHLIB => config_value("installsitearch"),
            $INST_BIN => config_value("installbin") ,
@@ -1044,7 +1044,7 @@ sub inc_uninstall {
     my %seen_dir = %( () );
     
     my @PERL_ENV_LIB = split config_value("path_sep"), defined %ENV{'PERL5LIB'}
-      ? %ENV{'PERL5LIB'} : %ENV{'PERLLIB'} || '';
+      ?? %ENV{'PERL5LIB'} !! %ENV{'PERLLIB'} || '';
         
     my @dirs=@( < @PERL_ENV_LIB, 
                < @INC,
@@ -1209,17 +1209,17 @@ sub DESTROY {
         my $self = shift;
         my($i,$plural);
         foreach my $file (sort keys %$self) {
-            $plural = (nelems @{$self->{$file}}) +> 1 ? "s" : "";
+            $plural = (nelems @{$self->{$file}}) +> 1 ?? "s" !! "";
             print "## Differing version$plural of $file found. You might like to\n";
             for (0..(nelems @{$self->{$file}})-1) {
                 print "rm ", $self->{$file}->[$_], "\n";
                 $i++;
             }
         }
-        $plural = $i+>1 ? "all those files" : "this file";
+        $plural = $i+>1 ?? "all those files" !! "this file";
         my $inst = (_invokant() eq 'ExtUtils::MakeMaker')
-                 ? ( config_value("make") || 'make' ).' install UNINST=1'
-                 : './Build install uninst=1';
+                 ?? ( config_value("make") || 'make' ).' install UNINST=1'
+                 !! './Build install uninst=1';
         print "## Running '$inst' will unlink $plural for you.\n";
     }
 }

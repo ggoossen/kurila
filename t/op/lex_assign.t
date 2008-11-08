@@ -75,7 +75,7 @@ for ( @INPUT) {
     if ($op =~ m/^'\?\?\?'/ or $comment =~ m/skip\(.*\Q$^O\E.*\)/i) {
       skip("$comment", 1);
     }
-    $integer = ($comment =~ m/^i_/) ? "use integer" : '' ;
+    $integer = ($comment =~ m/^i_/) ?? "use integer" !! '' ;
   
     eval <<EOE . <<'EOE';
     local \$^WARN_HOOK = \\&wrn;

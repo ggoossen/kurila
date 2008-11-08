@@ -82,7 +82,7 @@ sub poll {
 	push(@poll,$fd => $mask);
     }
 
-    my $ret = (nelems @poll) ? _poll(defined($timeout) ? $timeout * 1000 : -1,< @poll) : 0;
+    my $ret = (nelems @poll) ?? _poll(defined($timeout) ?? $timeout * 1000 !! -1,< @poll) !! 0;
 
     return $ret
 	unless $ret +> 0;
@@ -101,8 +101,8 @@ sub events {
     my $fd = fileno($io);
     $io = dump::view($io);
     exists $self->[1]->{$fd} and exists $self->[0]->{$fd}->{$io} 
-                ? $self->[1]->{$fd} ^&^ ($self->[0]->{$fd}->{$io}^|^POLLHUP^|^POLLERR^|^POLLNVAL)
-	: 0;
+                ?? $self->[1]->{$fd} ^&^ ($self->[0]->{$fd}->{$io}^|^POLLHUP^|^POLLERR^|^POLLNVAL)
+	!! 0;
 }
 
 sub remove {

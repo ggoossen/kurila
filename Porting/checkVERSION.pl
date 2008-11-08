@@ -17,7 +17,7 @@ find(
 		 print "$File::Find::name\n";
 	     }
 	 }
-     }, (nelems @ARGV) ? shift : ".");
+     }, (nelems @ARGV) ?? shift !! ".");
 
 sub parse_file {
     my $parsefile = shift;
@@ -28,7 +28,7 @@ sub parse_file {
 
     my $inpod = 0;
     while ( ~< *FH) {
-	$inpod = m/^=(?!cut)/ ? 1 : m/^=cut/ ? 0 : $inpod;
+	$inpod = m/^=(?!cut)/ ?? 1 !! m/^=cut/ ?? 0 !! $inpod;
 	next if $inpod || m/^\s*\#/;
 	chomp;
 	next unless m/([\$*])(([\w\:\']*)\bVERSION)\b.*\=/;

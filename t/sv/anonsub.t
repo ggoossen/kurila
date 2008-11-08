@@ -34,14 +34,14 @@ for ( @prgs){
     open TEST, ">", "$tmpfile";
     print TEST "$prog\n";
     close TEST or die "Could not close: $!";
-    my $results = $Is_VMS ?
-		`$^X "-I[-.lib]" $switch $tmpfile 2>&1` :
-		  $Is_MSWin32 ?
-		    `.\\perl -I../lib $switch $tmpfile 2>&1` :
-		      $Is_MacOS ?  
-			`$^X -I::lib $switch $tmpfile` :
-			    $Is_NetWare ?
-				`perl -I../lib $switch $tmpfile 2>&1` :
+    my $results = $Is_VMS ??
+		`$^X "-I[-.lib]" $switch $tmpfile 2>&1` !!
+		  $Is_MSWin32 ??
+		    `.\\perl -I../lib $switch $tmpfile 2>&1` !!
+		      $Is_MacOS ??  
+			`$^X -I::lib $switch $tmpfile` !!
+			    $Is_NetWare ??
+				`perl -I../lib $switch $tmpfile 2>&1` !!
 				    `./perl $switch $tmpfile 2>&1`;
     my $status = $?;
     $results =~ s/\n+$//;

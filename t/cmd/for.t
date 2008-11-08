@@ -47,9 +47,9 @@ sub foo {
     }
 }
 
-print foo(1) == 1 ? "ok" : "not ok", " 8\n";
-print foo(2) == 2 ? "ok" : "not ok", " 9\n";
-print foo(5) == 5 ? "ok" : "not ok", " 10\n";
+print foo(1) == 1 ?? "ok" !! "not ok", " 8\n";
+print foo(2) == 2 ?? "ok" !! "not ok", " 9\n";
+print foo(5) == 5 ?? "ok" !! "not ok", " 10\n";
 
 sub bar {
     return  @(1, 2, 4);
@@ -59,7 +59,7 @@ our $a = 0;
 foreach my $b ( bar()) {
     $a += $b;
 }
-print $a == 7 ? "ok" : "not ok", " 11\n";
+print $a == 7 ?? "ok" !! "not ok", " 11\n";
 
 # loop over expand on empty list
 sub baz { return () }
@@ -72,7 +72,7 @@ $loop_count = 0;
 for ("-3" .. "0") {
     $loop_count++;
 }
-print $loop_count == 4 ? "ok" : "not ok", " 13\n";
+print $loop_count == 4 ?? "ok" !! "not ok", " 13\n";
 
 print "ok 14\n";
 
@@ -91,7 +91,7 @@ do {
     my %h;
     %h{foo} = bless \@(), 'X';
     delete %h{foo} for @( %h{foo}, 1);
-    print $x == 1 ? "ok" : "not ok", " 15 - double destroy, x=$x\n";
+    print $x == 1 ?? "ok" !! "not ok", " 15 - double destroy, x=$x\n";
 };
 
 # A lot of tests to check that reversed for works.

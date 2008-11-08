@@ -81,7 +81,7 @@ my $clone = dclone($empty_string_obj);
 # If still here after the dclone the fix (#17543) worked.
 print ref $clone eq ref $empty_string_obj &&
       $$clone eq $$empty_string_obj &&
-      $$clone eq '' ? "ok 10\n" : "not ok 10\n";
+      $$clone eq '' ?? "ok 10\n" !! "not ok 10\n";
 
 
 # Do not fail if Tie::Hash and/or Tie::StdHash is not available

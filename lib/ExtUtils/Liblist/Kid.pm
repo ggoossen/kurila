@@ -31,12 +31,12 @@ sub _unix_os2_ext {
 	$potential_libs .= " " if $potential_libs;
 	$potential_libs .= config_value("perllibs");
     }
-    return  @("", "", "", "",  @($give_libs ? \@() : ())) unless $potential_libs;
+    return  @("", "", "", "",  @($give_libs ?? \@() !! ())) unless $potential_libs;
     warn "Potential libraries are '$potential_libs':\n" if $verbose;
 
     my($so)   = config_value("so");
     my($libs) = defined config_value("perllibs") 
-      ? config_value("perllibs") : config_value("libs");
+      ?? config_value("perllibs") !! config_value("libs");
     my $Config_libext = config_value("lib_ext") || ".a";
 
 
@@ -205,11 +205,11 @@ sub _unix_os2_ext {
     }
 
     unless( $found ) {
-        return  @('','','','', $give_libs ? \@libs : ());
+        return  @('','','','', $give_libs ?? \@libs !! ());
     }
     else {
         return  @("$(join ' ',@extralibs)", "$(join ' ',@bsloadlibs)", "$(join ' ',@ldloadlibs)",
-                join(":", @ld_run_path),  @($give_libs ? \@libs : ()));
+                join(":", @ld_run_path),  @($give_libs ?? \@libs !! ()));
     }
 }
 
@@ -222,7 +222,7 @@ sub _win32_ext {
 
     # If user did not supply a list, we punt.
     # (caller should probably use the list in $Config{libs})
-    return  @("", "", "", "",  @($give_libs ? \@() : ())) unless $potential_libs;
+    return  @("", "", "", "",  @($give_libs ?? \@() !! ())) unless $potential_libs;
 
     my $cc		= config_value("cc");
     my $VC		= $cc =~ m/^cl/i;
@@ -353,11 +353,11 @@ sub _win32_ext {
 
     }
 
-    return  @('','','','',  @($give_libs ? \@libs : ())) unless $found;
+    return  @('','','','',  @($give_libs ?? \@libs !! ())) unless $found;
 
     # make sure paths with spaces are properly quoted
-    @extralibs = map { (m/\s/ && !m/^".*"$/) ? qq["$_"] : $_ } @extralibs;
-    @libs = map { (m/\s/ && !m/^".*"$/) ? qq["$_"] : $_ } @libs;
+    @extralibs = map { (m/\s/ && !m/^".*"$/) ?? qq["$_"] !! $_ } @extralibs;
+    @libs = map { (m/\s/ && !m/^".*"$/) ?? qq["$_"] !! $_ } @libs;
     $lib = join(' ', @extralibs);
 
     # normalize back to backward slashes (to help braindead tools)
@@ -366,7 +366,7 @@ sub _win32_ext {
     $lib =~ s,/,\\,g;
 
     warn "Result: $lib\n" if $verbose;
-    return @($lib, '', $lib, '', ($give_libs ? \@libs : ()));
+    return @($lib, '', $lib, '', ($give_libs ?? \@libs !! ()));
 }
 
 
@@ -375,7 +375,7 @@ sub _vms_ext {
   $verbose ||= 0;
 
   my(@crtls,$crtlstr);
-  @crtls = @( (config_value('ldflags') =~ m-/Debug-i ? config_value('dbgprefix') : '')
+  @crtls = @( (config_value('ldflags') =~ m-/Debug-i ?? config_value('dbgprefix') !! '')
               . 'PerlShr/Share' );
   push(@crtls, < grep { not m/\(/ } split m/\s+/, config_value('perllibs'));
   push(@crtls, < grep { not m/\(/ } split m/\s+/, config_value('libc'));
@@ -396,11 +396,11 @@ sub _vms_ext {
       }
     }
   }
-  $crtlstr = (nelems @crtls) ? join(' ', @crtls) : '';
+  $crtlstr = (nelems @crtls) ?? join(' ', @crtls) !! '';
 
   unless ($potential_libs) {
     warn "Result:\n\tEXTRALIBS: \n\tLDLOADLIBS: $crtlstr\n" if $verbose;
-    return  @('', '', $crtlstr, '',  @($give_libs ? \@() : ()));
+    return  @('', '', $crtlstr, '',  @($give_libs ?? \@() !! ()));
   }
 
   my(%found,@fndlibs,$ldlib);
@@ -538,9 +538,9 @@ sub _vms_ext {
   push @fndlibs, < map { "$_/Share"   } @{%found{SHR}} if exists %found{SHR};
   my $lib = join(' ', @fndlibs);
 
-  $ldlib = $crtlstr ? "$lib $crtlstr" : $lib;
+  $ldlib = $crtlstr ?? "$lib $crtlstr" !! $lib;
   warn "Result:\n\tEXTRALIBS: $lib\n\tLDLOADLIBS: $ldlib\n" if $verbose;
-  return @($lib, '', $ldlib, '', ($give_libs ? \@flibs : ()));
+  return @($lib, '', $ldlib, '', ($give_libs ?? \@flibs !! ()));
 }
 
 1;

@@ -280,7 +280,7 @@ sub new
     $self->{normalization} = 'NFD'
 	if ! exists $self->{normalization};
     $self->{rearrange} = $self->{rearrangeTable} ||
-	($self->{UCA_Version} +<= 11 ? $DefaultRearrange : \@())
+	($self->{UCA_Version} +<= 11 ?? $DefaultRearrange !! \@())
 	if ! exists $self->{rearrange};
     $self->{backwards} = $self->{backwardsTable}
 	if ! exists $self->{backwards};
@@ -391,7 +391,7 @@ sub parseEntry
 	# if and only if "all" CEs are [.0000.0000.0000].
     }
 
-    $self->{mapping}->{$entry} = $is_L3_ignorable ? \@() : \@key;
+    $self->{mapping}->{$entry} = $is_L3_ignorable ?? \@() !! \@key;
 
     if ((nelems @uv) +> 1) {
 	(!$self->{maxlength}->{@uv[0]} || $self->{maxlength}->{@uv[0]} +< nelems @uv)
@@ -414,14 +414,14 @@ sub _varCE
 
     if ($var) {
 	return pack(VCE_TEMPLATE, $var, 0, 0, 0,
-		$vbl eq 'blanked' ? @wt[3] : @wt[0]);
+		$vbl eq 'blanked' ?? @wt[3] !! @wt[0]);
     }
     elsif ($vbl eq 'blanked') {
 	return $vce;
     }
     else {
 	return pack(VCE_TEMPLATE, $var, < @wt[[0..2]],
-	    $vbl eq 'shifted' && @wt[0]+@wt[1]+@wt[2] ? Shift4Wt : 0);
+	    $vbl eq 'shifted' && @wt[0]+@wt[1]+@wt[2] ?? Shift4Wt !! 0);
     }
 }
 
@@ -567,7 +567,7 @@ sub splitEnt
 	    next;
 	}
 
-	push @buf, $wLen ? \@($jcps, $i_orig, $i + 1) : $jcps;
+	push @buf, $wLen ?? \@($jcps, $i_orig, $i + 1) !! $jcps;
 
     }
     continue {
@@ -628,7 +628,7 @@ sub getWt
 	    }
 
 	    @hangulCE = map({
-		    $map->{$_} ? < @{ $map->{$_} } : < $der->($_);
+		    $map->{$_} ?? < @{ $map->{$_} } !! < $der->($_);
 		} @decH);
 	}
 	return map _varCE($vbl, $_), @hangulCE;
@@ -637,10 +637,10 @@ sub getWt
 	my $cjk  = $self->{overrideCJK};
 	return map { _varCE($vbl, $_) }
  @(	    $cjk
-		? < map(pack(VCE_TEMPLATE, NON_VAR, < @$_), &$cjk($u))
-		: defined $cjk && $self->{UCA_Version} +<= 8 && $u +< 0x10000
-		    ? _uideoCE_8($u)
-		    : < $der->($u));
+		?? < map(pack(VCE_TEMPLATE, NON_VAR, < @$_), &$cjk($u))
+		!! defined $cjk && $self->{UCA_Version} +<= 8 && $u +< 0x10000
+		    ?? _uideoCE_8($u)
+		    !! < $der->($u));
     }
     else {
 	return map { _varCE($vbl, $_) } $der->($u);
@@ -762,11 +762,11 @@ sub _derivCE_14 {
     my $u = shift;
     my $base =
 	(CJK_UidIni  +<= $u && $u +<= CJK_UidF41)
-	    ? 0xFB40 : # CJK
+	    ?? 0xFB40 !! # CJK
 	(CJK_ExtAIni +<= $u && $u +<= CJK_ExtAFin ||
 	 CJK_ExtBIni +<= $u && $u +<= CJK_ExtBFin)
-	    ? 0xFB80   # CJK ext.
-	    : 0xFBC0;  # others
+	    ?? 0xFB80   # CJK ext.
+	    !! 0xFBC0;  # others
 
     my $aaaa = $base + ($u >> 15);
     my $bbbb = ($u ^&^ 0x7FFF) ^|^ 0x8000;
@@ -779,11 +779,11 @@ sub _derivCE_9 {
     my $u = shift;
     my $base =
 	(CJK_UidIni  +<= $u && $u +<= CJK_UidFin)
-	    ? 0xFB40 : # CJK
+	    ?? 0xFB40 !! # CJK
 	(CJK_ExtAIni +<= $u && $u +<= CJK_ExtAFin ||
 	 CJK_ExtBIni +<= $u && $u +<= CJK_ExtBFin)
-	    ? 0xFB80   # CJK ext.
-	    : 0xFBC0;  # others
+	    ?? 0xFB80   # CJK ext.
+	    !! 0xFBC0;  # others
 
     my $aaaa = $base + ($u >> 15);
     my $bbbb = ($u ^&^ 0x7FFF) ^|^ 0x8000;
@@ -810,7 +810,7 @@ sub _isUIdeo {
     my ($u, $uca_vers) = < @_;
     return (
 	(CJK_UidIni +<= $u &&
-	    ($uca_vers +>= 14 ? ( $u +<= CJK_UidF41) : ($u +<= CJK_UidFin)))
+	    ($uca_vers +>= 14 ?? ( $u +<= CJK_UidF41) !! ($u +<= CJK_UidFin)))
 		||
 	(CJK_ExtAIni +<= $u && $u +<= CJK_ExtAFin)
 		||
@@ -844,7 +844,7 @@ sub _decompHangul {
     return  @(
 	Hangul_LBase + $li,
 	Hangul_VBase + $vi,
-	$ti ? (Hangul_TBase + $ti) : (),
+	$ti ?? (Hangul_TBase + $ti) !! (),
     );
 }
 
@@ -862,11 +862,11 @@ sub _isIllegal {
 sub getHST {
     my $u = shift;
     return
-	Hangul_LIni +<= $u && $u +<= Hangul_LFin || $u == Hangul_LFill ? "L" :
-	Hangul_VIni +<= $u && $u +<= Hangul_VFin	     ? "V" :
-	Hangul_TIni +<= $u && $u +<= Hangul_TFin	     ? "T" :
-	Hangul_SIni +<= $u && $u +<= Hangul_SFin ?
-	    ($u - Hangul_SBase) % Hangul_TCount ? "LVT" : "LV" : "";
+	Hangul_LIni +<= $u && $u +<= Hangul_LFin || $u == Hangul_LFill ?? "L" !!
+	Hangul_VIni +<= $u && $u +<= Hangul_VFin	     ?? "V" !!
+	Hangul_TIni +<= $u && $u +<= Hangul_TFin	     ?? "T" !!
+	Hangul_SIni +<= $u && $u +<= Hangul_SFin ??
+	    ($u - Hangul_SBase) % Hangul_TCount ?? "LVT" !! "LV" !! "";
 }
 
 
@@ -878,7 +878,7 @@ sub _nonIgnorAtLevel($$)
     my $wt = shift;
     return if ! defined $wt;
     my $lv = shift;
-    return grep($wt->[$_-1] != 0, MinLevel..$lv) ? TRUE : FALSE;
+    return grep($wt->[$_-1] != 0, MinLevel..$lv) ?? TRUE !! FALSE;
 }
 
 ##
@@ -921,7 +921,7 @@ sub index
     my $str  = shift;
     my $len  = length($str);
     my $subE = $self->splitEnt(shift);
-    my $pos  = (nelems @_) ? shift : 0;
+    my $pos  = (nelems @_) ?? shift !! 0;
        $pos  = 0 if $pos +< 0;
     my $grob = shift;
 
@@ -930,14 +930,14 @@ sub index
 		$self->{variable} ne 'non-ignorable';
 
     if (! nelems @$subE) {
-	my $temp = $pos +<= 0 ? 0 : $len +<= $pos ? $len : $pos;
+	my $temp = $pos +<= 0 ?? 0 !! $len +<= $pos ?? $len !! $pos;
 	return $grob
-	    ? map(\@($_, 0), $temp..$len)
-	    : @($temp,0);
+	    ?? map(\@($_, 0), $temp..$len)
+	    !! @($temp,0);
     }
     $len +< $pos
 	and return;
-    my $strE = $self->splitEnt($pos ? substr($str, $pos) : $str, TRUE);
+    my $strE = $self->splitEnt($pos ?? substr($str, $pos) !! $str, TRUE);
     (nelems @$strE)
 	or return;
 
@@ -1000,7 +1000,7 @@ sub index
 		    @finPos[-1] = $strE->[$i]->[2];
 		} elsif ($to_be_pushed) {
 		    push @strWt, \@( \@wt );
-		    push @iniPos, $found_base ? NOMATCHPOS : $strE->[$i]->[1];
+		    push @iniPos, $found_base ?? NOMATCHPOS !! $strE->[$i]->[1];
 		    @finPos[-1] = NOMATCHPOS if $found_base;
 		    push @finPos, $strE->[$i]->[2];
 		    $found_base++;
@@ -1034,8 +1034,8 @@ sub index
     }
 
     return $grob
-	? @g_ret
-	: ();
+	?? @g_ret
+	!! ();
 }
 
 ##
@@ -1073,7 +1073,7 @@ sub gmatch
 sub subst
 {
     my $self = shift;
-    my $code = ref @_[2] eq 'CODE' ? @_[2] : FALSE;
+    my $code = ref @_[2] eq 'CODE' ?? @_[2] !! FALSE;
 
     if (my($pos,$len) = < $self->index(@_[0], @_[1])) {
 	if ($code) {
@@ -1095,7 +1095,7 @@ sub subst
 sub gsubst
 {
     my $self = shift;
-    my $code = ref @_[2] eq 'CODE' ? @_[2] : FALSE;
+    my $code = ref @_[2] eq 'CODE' ?? @_[2] !! FALSE;
     my $cnt = 0;
 
     # Replacement is carried out from the end, then use reverse.

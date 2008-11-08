@@ -306,7 +306,7 @@ sub Build_Aliases()
 	%utf8::PropValueAlias{$prop}->{lc @data[0]} = @data[1];
 	%utf8::PVA_reverse{$prop}->{lc @data[1]} = @data[0];
 
-	my $abbr_class = ($prop eq 'gc' or $prop eq 'sc') ? 'gc_sc' : $prop;
+	my $abbr_class = ($prop eq 'gc' or $prop eq 'sc') ?? 'gc_sc' !! $prop;
 	%utf8::PVA_abbr_map{$abbr_class}->{lc @data[0]} = @data[0];
     }
     close PVA;
@@ -971,7 +971,7 @@ sub UnicodeData_Txt()
         if ($name =~ m/^<(.+), (First|Last)>$/)
         {
             $name = $1;
-            gencat($name, $cat, $code, $2 eq 'First' ? 'Append' : 'Extend');
+            gencat($name, $cat, $code, $2 eq 'First' ?? 'Append' !! 'Extend');
             #New_Prop(In => $name, $General{$name}, Fuzzy => 1);
         }
         else
@@ -1775,8 +1775,8 @@ sub WriteAllMappings()
             my $filename;
             do {
                 ## 'Is' items lose 'Is' from the basename.
-                $filename = $Type eq 'Is' ?
-		    (%PVA_reverse{sc}->{$Name} || $Name) :
+                $filename = $Type eq 'Is' ??
+		    (%PVA_reverse{sc}->{$Name} || $Name) !!
 		    "$Type$Name";
 
                 $filename =~ s/[^\w_]+/_/g; # "L&" -> "L_"
@@ -1823,7 +1823,7 @@ sub WriteAllMappings()
                     }
                 }
 
-                my $TypeToShow = $Type eq 'Is' ? "" : $Type;
+                my $TypeToShow = $Type eq 'Is' ?? "" !! $Type;
                 my $OrigProp;
 
                 $Comment = "This file supports:\n";
@@ -1837,10 +1837,10 @@ sub WriteAllMappings()
                     } else {
                         $Comment .= "\t$Prop\n";
                     }
-                    my $MyDesc = ($N eq $Name) ? $Desc : "Alias for $OrigProp ($Desc)";
+                    my $MyDesc = ($N eq $Name) ?? $Desc !! "Alias for $OrigProp ($Desc)";
 
                     push @MAP, sprintf("\%s \%-42s \%s\n",
-                                       $IsFuzzy ? '*' : ' ', $Prop, $MyDesc);
+                                       $IsFuzzy ?? '*' !! ' ', $Prop, $MyDesc);
                 }
                 if ($Desc) {
                     $Comment .= "\nMeaning: $Desc\n";
@@ -1922,7 +1922,7 @@ sub WriteAllMappings()
         for my $Name (sort keys %Exact)
         {
             my $File = %Exact{$Name};
-            $Name = $Name =~ m/\W/ ? qq/'$Name'/ : " $Name ";
+            $Name = $Name =~ m/\W/ ?? qq/'$Name'/ !! " $Name ";
             my $Text = sprintf("\%-15s => \%s,\n", $Name, qq/'$File'/);
             push @OUT, Text::Tabs::unexpand($Text);
         }
@@ -1952,7 +1952,7 @@ sub WriteAllMappings()
             } else {
                 $Trail = "";
             }
-            $Name = $Name =~ m/\W/ ? qq/'$Name'/ : " $Name ";
+            $Name = $Name =~ m/\W/ ?? qq/'$Name'/ !! " $Name ";
             my $Text = sprintf("  \%-41s => \%s,\n$Trail", $Name, qq/'$File'/);
             push @OUT, Text::Tabs::unexpand($Text);
         }

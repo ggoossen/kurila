@@ -493,7 +493,7 @@ sub splitpod {
 	open(SPLITOUT, ">$poddir/$file") ||
 	    die "$0: error opening $poddir/$file for output: $!\n";
 	@poddata[$i] =~ s,L<([^<>]*)>,$(
-			defined %heads{anchorify($1)} ? "L<$dir/$1>" : "L<$1>"
+			defined %heads{anchorify($1)} ?? "L<$dir/$1>" !! "L<$1>"
 		     ),g;
 	print SPLITOUT @poddata[$i]."\n\n";
 	print SPLITOUT "=over 4\n\n";
@@ -520,7 +520,7 @@ sub installdir {
     @pmlist  = @( () );	# .pm files to install
 
     # should files in this directory get an index?
-    $doindex = (grep($_ eq "$podroot/$dir", @$splitdirs) ? 0 : 1);
+    $doindex = (grep($_ eq "$podroot/$dir", @$splitdirs) ?? 0 !! 1);
 
     opendir(DIR, "$podroot/$dir")
 	|| die "$0: error opening directory $podroot/$dir: $!\n";
@@ -602,9 +602,9 @@ sub runpod2html {
 	"--podpath=".join(":", @podpath),
 	"--podroot=$podroot", "--netscape",
 	"--header",
-	($doindex ? "--index" : "--noindex"),
-	"--" . ($recurse ? "" : "no") . "recurse",
-	(((nelems @libpods)-1) +>= 0) ? "--libpods=" . join(":", @libpods) : "",
+	($doindex ?? "--index" !! "--noindex"),
+	"--" . ($recurse ?? "" !! "no") . "recurse",
+	(((nelems @libpods)-1) +>= 0) ?? "--libpods=" . join(":", @libpods) !! "",
 	"--infile=$podroot/$pod", "--outfile=$htmldir/$html");
     die "$0: error running $pod2html: $!\n" if $?;
 }

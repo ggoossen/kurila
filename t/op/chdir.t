@@ -29,7 +29,7 @@ my $Cwd = abs_path;
 # Let's get to a known position
 SKIP: do {
     my ($vol,$dir) = < splitpath(abs_path,1);
-    my $test_dir = $IsVMS ? 'T' : 't';
+    my $test_dir = $IsVMS ?? 'T' !! 't';
     skip("Already in t/", 2) if (splitdir($dir))[-1] eq $test_dir;
 
     ok( chdir($test_dir),     'chdir($test_dir)');
@@ -185,7 +185,7 @@ foreach my $key ( @magic_envs) {
     no warnings 'uninitialized';
 
     clean_env;
-    %ENV{$key} = catdir $Cwd, ($IsVMS ? 'OP' : 'op');
+    %ENV{$key} = catdir $Cwd, ($IsVMS ?? 'OP' !! 'op');
 
     check_env($key);
 }

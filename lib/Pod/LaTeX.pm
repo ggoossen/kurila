@@ -1524,7 +1524,7 @@ sub head {
   }
 
   # Check to see whether section should be unnumbered
-  my $star = ($level +>= $self->LevelNoNum ? '*' : '');
+  my $star = ($level +>= $self->LevelNoNum ?? '*' !! '');
 
   # Section
   $self->_output("\\" .@LatexSections[$level] .$star ."\{$paragraph\\label\{".$label ."\}\\index\{".$index."\}\}\n");
@@ -1673,7 +1673,7 @@ be called to create a Label() without prefixing a previous setting.
 sub _create_label {
   my $self = shift;
   my $paragraph = shift;
-  my $suppress = ((nelems @_) ? 1 : 0 );
+  my $suppress = ((nelems @_) ?? 1 !! 0 );
 
   # Remove latex commands
   $paragraph = $self->_clean_latex_commands($paragraph);
@@ -1714,7 +1714,7 @@ sub-entries in an index.
 sub _create_index {
   my $self = shift;
   my $paragraph = shift;
-  my $suppress = ((nelems @_) ? 1 : 0 );
+  my $suppress = ((nelems @_) ?? 1 !! 0 );
 
   # Remove latex commands
   $paragraph = $self->_clean_latex_commands($paragraph);

@@ -5,7 +5,7 @@ use Test::More 'no_plan';
 use Params::Check < qw|check last_error allow|;
 
 ### verbose is good for debugging ###
-$Params::Check::VERBOSE = $Params::Check::VERBOSE = @ARGV[0] ? 1 : 0;
+$Params::Check::VERBOSE = $Params::Check::VERBOSE = @ARGV[0] ?? 1 !! 0;
 
 ### basic things first, allow function ###
 
@@ -82,7 +82,7 @@ do {   my $tmpl = \%( Foo => \%( default => 1 ) );
     for (@(1,0)) {
         local $Params::Check::PRESERVE_CASE = $_;
         
-        my $expect = $_ ? \%( Foo => 42 ) : \%( Foo => 1 );
+        my $expect = $_ ?? \%( Foo => 42 ) !! \%( Foo => 1 );
         
         my $rv = check( $tmpl, \%( Foo => 42 ) );
         ok( $rv,                "check() call using PRESERVE_CASE: $_" );
@@ -122,7 +122,7 @@ do {   my $foo;
     for(@( 1, 0) ) {
         local   $Params::Check::NO_DUPLICATES = $_;
         
-        my $expect = $_ ? undef : 42;
+        my $expect = $_ ?? undef !! 42;
         
         my $rv = check( $tmpl, \%( foo => 42 ) );
         ok( $rv,                    "check() call with store key, no_dup: $_" );

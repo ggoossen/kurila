@@ -366,7 +366,7 @@ for my $op ( @ops) {
 	    %OP_IS_FILETEST{$op} = %opnum{$op} if $arg =~ s/-//;
 	    %OP_IS_FT_ACCESS{$op} = %opnum{$op} if $arg =~ s/\+//;
         }
-	my $argnum = ($arg =~ s/\?//) ? 8 : 0;
+	my $argnum = ($arg =~ s/\?//) ?? 8 !! 0;
         die "op = $op, arg = $arg\n"
 	    unless exists %argnum{$arg};
 	$argnum += %argnum{$arg};

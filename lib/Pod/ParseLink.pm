@@ -93,7 +93,7 @@ sub parselink {
         }
         my ($name, $section) = < _parse_section ($link);
         my $inferred = $text || _infer_text ($name, $section);
-        my $type = ($name && $name =~ m/\(\S*\)/) ? 'man' : 'pod';
+        my $type = ($name && $name =~ m/\(\S*\)/) ?? 'man' !! 'pod';
         return  @($text, $inferred, $name, $section, $type);
     }
 }

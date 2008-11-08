@@ -31,9 +31,9 @@ sub parse_from_file {
   defined(&Pod::Perldoc::DEBUG)
    and Pod::Perldoc::DEBUG()
    and print "About to call new Pod::Text ",
-    $Pod::Text::VERSION ? "(v$Pod::Text::VERSION) " : '',
+    $Pod::Text::VERSION ?? "(v$Pod::Text::VERSION) " !! '',
     "with options: ",
-    (nelems @options) ? "[$(join ' ',@options)]" : "(nil)", "\n";
+    (nelems @options) ?? "[$(join ' ',@options)]" !! "(nil)", "\n";
   ;
 
   Pod::Text->new(< @options)->parse_from_file(< @_);

@@ -125,14 +125,14 @@ do {
         ExtUtils::Command::chmod();
 
         is( (@(stat($Testfile))[2] ^&^ 07777) ^&^ 0700,
-            ($^O eq 'vos' ? 0500 : 0400), 'change a file to read-only' );
+            ($^O eq 'vos' ?? 0500 !! 0400), 'change a file to read-only' );
 
         # change a file to write-only
         @ARGV = @( '0200', $Testfile );
         ExtUtils::Command::chmod();
 
         is( (@(stat($Testfile))[2] ^&^ 07777) ^&^ 0700,
-            ($^O eq 'vos' ? 0700 : 0200), 'change a file to write-only' );
+            ($^O eq 'vos' ?? 0700 !! 0200), 'change a file to write-only' );
     };
 
     # change a file to read-write
@@ -142,7 +142,7 @@ do {
     is_deeply( \@ARGV, \@orig_argv, 'chmod preserves @ARGV' );
 
     is( (@(stat($Testfile))[2] ^&^ 07777) ^&^ 0700,
-        ($^O eq 'vos' ? 0700 : 0600), 'change a file to read-write' );
+        ($^O eq 'vos' ?? 0700 !! 0600), 'change a file to read-write' );
 
 
     SKIP: do {
@@ -169,14 +169,14 @@ do {
         ExtUtils::Command::chmod();
 
         is( (@(stat('testdir'))[2] ^&^ 07777) ^&^ 0700,
-            ($^O eq 'vos' ? 0500 : 0400), 'change a dir to read-only' );
+            ($^O eq 'vos' ?? 0500 !! 0400), 'change a dir to read-only' );
 
         # change a dir to write-only
         @ARGV = @( '0200', 'testdir' );
         ExtUtils::Command::chmod();
 
         is( (@(stat('testdir'))[2] ^&^ 07777) ^&^ 0700,
-            ($^O eq 'vos' ? 0700 : 0200), 'change a dir to write-only' );
+            ($^O eq 'vos' ?? 0700 !! 0200), 'change a dir to write-only' );
 
         @ARGV = @('testdir');
         rm_rf;
@@ -232,7 +232,7 @@ do {
         chdir 'ecmddir';
 
         # % means 'match one character' on VMS.  Everything else is ?
-        my $match_char = $^O eq 'VMS' ? '%' : '?';
+        my $match_char = $^O eq 'VMS' ?? '%' !! '?';
         (@ARGV[0] = $file) =~ s/.\z/$match_char/;
 
         # this should find the file

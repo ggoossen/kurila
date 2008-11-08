@@ -179,7 +179,7 @@ sub write_protos {
 	    $func = "S_$plain_func";
 	}
 	else {
-	    $retval = ($flags =~ m/i/ ? "PERL_INLINE_CALLCONV" : "PERL_CALLCONV" )
+	    $retval = ($flags =~ m/i/ ?? "PERL_INLINE_CALLCONV" !! "PERL_CALLCONV" )
               . " $splint_flags$retval";
 	    if ($flags =~ m/[bp]/) {
 		$func = "Perl_$plain_func";
@@ -193,7 +193,7 @@ sub write_protos {
         }
 	$ret .= "$retval\t$func(";
 	if ( $has_context ) {
-	    $ret .= (nelems @args) ? "pTHX_ " : "pTHX";
+	    $ret .= (nelems @args) ?? "pTHX_ " !! "pTHX";
 	}
 	if ((nelems @args)) {
 	    my $n;
@@ -245,17 +245,17 @@ sub write_protos {
 	    push @attrs, "__attribute__pure__";
 	}
 	if( $flags =~ m/f/ ) {
-	    my $prefix	= $has_context ? 'pTHX_' : '';
+	    my $prefix	= $has_context ?? 'pTHX_' !! '';
 	    my $args	= scalar nelems @args;
  	    my $pat	= $args - 1;
 	    my $macro	= (nelems @nonnull) && @nonnull[-1] == $pat  
-				? '__attribute__format__'
-				: '__attribute__format__null_ok__';
+				?? '__attribute__format__'
+				!! '__attribute__format__null_ok__';
 	    push @attrs, sprintf "\%s(__printf__,\%s\%d,\%s\%d)", $macro,
 				$prefix, $pat, $prefix, $args;
 	}
 	if ( (nelems @nonnull) ) {
-	    my @pos = map { $has_context ? "pTHX_$_" : $_ } @nonnull;
+	    my @pos = map { $has_context ?? "pTHX_$_" !! $_ } @nonnull;
 	    push @attrs, < map { sprintf( "__attribute__nonnull__(\%s)", $_ ) } @pos;
 	}
 	if ( (nelems @attrs) ) {
@@ -268,7 +268,7 @@ sub write_protos {
 	    $ret .= "\n#define PERL_ARGS_ASSERT_\U$plain_func\E\t\\\n\t"
 		. join '; ', map "assert($_)", @names_of_nn;
 	}
-	$ret .= (nelems @attrs) ? "\n\n" : "\n";
+	$ret .= (nelems @attrs) ?? "\n\n" !! "\n";
     }
     $ret;
 }
@@ -371,12 +371,12 @@ sub undefine ($) {
 sub hide ($$) {
     my ($from, $to) = < @_;
     my $t = int(length($from) / 8);
-    "#define $from" . "\t" x ($t +< 3 ? 3 - $t : 1) . "$to\n";
+    "#define $from" . "\t" x ($t +< 3 ?? 3 - $t !! 1) . "$to\n";
 }
 
 sub bincompat_var ($$) {
     my ($pfx, $sym) = < @_;
-    my $arg = ($pfx eq 'G' ? 'NULL' : 'aTHX');
+    my $arg = ($pfx eq 'G' ?? 'NULL' !! 'aTHX');
     undefine("PL_$sym") . hide("PL_$sym", "(*Perl_$($pfx)$($sym)_ptr($arg))");
 }
 
@@ -441,7 +441,7 @@ walk_table {
                     (my $xvname = $func) =~ s/^Sv/$xv/;
                     my $ret_convert = $retval =~ m/SV/;
                     my $call = "Perl_" . $func . "(aTHX_ " . $xv . "Sv" . "($a1)$alist)";
-                    print $em "#define $xvname(" . $a1 . $alist . ")\t\t" . ($ret_convert ? "Sv" . $xv . "($call)" : $call ) . "\n";
+                    print $em "#define $xvname(" . $a1 . $alist . ")\t\t" . ($ret_convert ?? "Sv" . $xv . "($call)" !! $call ) . "\n";
                 }
             }
 	}
@@ -510,7 +510,7 @@ walk_table {
 		my $alist = join(",", @az[[0..$args-1]]);
 		$ret = "#define $func($alist)";
 		my $t = int(length($ret) / 8);
-		$ret .=  "\t" x ($t +< 4 ? 4 - $t : 1);
+		$ret .=  "\t" x ($t +< 4 ?? 4 - $t !! 1);
 		if ($flags =~ m/s/) {
 		    $ret .= "S_$func(aTHX";
 		}
@@ -527,7 +527,7 @@ walk_table {
                     (my $xvname = $func) =~ s/^Sv/$xv/;
                     my $ret_convert = $retval =~ m/SV/;
                    my $call = "Perl_" . $func . "(aTHX_ " . $xv . "Sv" . "($a1)$alist)";
-                    print $em "#define $xvname(" . $a1 . $alist . ")\t\t" . ($ret_convert ? "Sv" . $xv . "($call)" : $call ) . "\n";
+                    print $em "#define $xvname(" . $a1 . $alist . ")\t\t" . ($ret_convert ?? "Sv" . $xv . "($call)" !! $call ) . "\n";
                 }
             }
 	}

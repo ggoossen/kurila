@@ -75,7 +75,7 @@ sub recurse1 {
 }
 sub recurse2 {
     my $x = shift;
-    @_[0] ? 1 + recurse1(@_[0] - 1) : 0
+    @_[0] ?? 1 + recurse1(@_[0] - 1) !! 0
 }
 is(recurse1(500), 500, 'recursive goto &foo');
 

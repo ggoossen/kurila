@@ -236,13 +236,13 @@ sub share_from {
 	my ($var, $type);
 	$type = $1 if ($var = $arg) =~ s/^(\W)//;
 	# warn "share_from $pkg $type $var";
-	*{Symbol::fetch_glob($root."::$var")} = (!$type)       ? \&{*{Symbol::fetch_glob($pkg."::$var")}}
-			  : ($type eq '&') ? \&{*{Symbol::fetch_glob($pkg."::$var")}}
-			  : ($type eq '$') ? \${*{Symbol::fetch_glob($pkg."::$var")}}
-			  : ($type eq '@') ? \@{*{Symbol::fetch_glob($pkg."::$var")}}
-			  : ($type eq '%') ? \%{*{Symbol::fetch_glob($pkg."::$var")}}
-			  : ($type eq '*') ?  *{Symbol::fetch_glob($pkg."::$var")}
-			  : croak(qq(Can't share "$type$var" of unknown type));
+	*{Symbol::fetch_glob($root."::$var")} = (!$type)       ?? \&{*{Symbol::fetch_glob($pkg."::$var")}}
+			  !! ($type eq '&') ?? \&{*{Symbol::fetch_glob($pkg."::$var")}}
+			  !! ($type eq '$') ?? \${*{Symbol::fetch_glob($pkg."::$var")}}
+			  !! ($type eq '@') ?? \@{*{Symbol::fetch_glob($pkg."::$var")}}
+			  !! ($type eq '%') ?? \%{*{Symbol::fetch_glob($pkg."::$var")}}
+			  !! ($type eq '*') ??  *{Symbol::fetch_glob($pkg."::$var")}
+			  !! croak(qq(Can't share "$type$var" of unknown type));
     }
     $obj->share_record($pkg, $vars) unless $no_record or !$vars;
 }

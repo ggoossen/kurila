@@ -43,8 +43,8 @@ do {
 sub _is_win95 {
     # miniperl might not have the Win32 functions available and we need
     # to run in miniperl.
-    return defined &Win32::IsWin95 ? Win32::IsWin95() 
-                                   : ! defined %ENV{SYSTEMROOT}; 
+    return defined &Win32::IsWin95 ?? Win32::IsWin95() 
+                                   !! ! defined %ENV{SYSTEMROOT}; 
 }
 
 my %Is = %( () );
@@ -52,7 +52,7 @@ my %Is = %( () );
 %Is{OS2}    = $^O eq 'os2';
 %Is{MacOS}  = $^O eq 'MacOS';
 if( $^O eq 'MSWin32' ) {
-    _is_win95() ? %Is{Win95} = 1 : %Is{Win32} = 1;
+    _is_win95() ?? %Is{Win95} = 1 !! %Is{Win32} = 1;
 }
 %Is{UWIN}   = $^O =~ m/^uwin(-nt)?$/;
 %Is{Cygwin} = $^O eq 'cygwin';

@@ -114,7 +114,7 @@ sub test_corrupt {
 sub test_things {
   my ($contents, $sub, $what, $isnetwork) = < @_;
   my $isfile = $what eq 'file';
-  my $file_magic = $isfile ? length $file_magic_str : 0;
+  my $file_magic = $isfile ?? length $file_magic_str !! 0;
 
   my $header = Storable::read_magic ($contents);
   test_header ($header, $isfile, $isnetwork);
@@ -128,7 +128,7 @@ sub test_things {
 
   # Now lets check the short version:
   test_truncated ($contents, $sub, $file_magic
-                  + ($isnetwork ? $network_magic : $other_magic), $what);
+                  + ($isnetwork ?? $network_magic !! $other_magic), $what);
 
   my $copy;
   if ($isfile) {

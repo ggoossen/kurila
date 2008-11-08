@@ -502,8 +502,8 @@ sub _gettemp {
 	$fh = VMS::Stdio::vmssysopen($path, $OPENFLAGS, 0600, 'fop=dlt');
 	$open_success = $fh;
       } else {
-	my $flags = ( (%options{"unlink_on_close"} && !$KEEP_ALL) ?
-		      $OPENTEMPFLAGS :
+	my $flags = ( (%options{"unlink_on_close"} && !$KEEP_ALL) ??
+		      $OPENTEMPFLAGS !!
 		      $OPENFLAGS );
 	$flags ^|^= $LOCKFLAG if (defined $LOCKFLAG && %options{use_exlock});
 	$open_success = sysopen($fh, $path, $flags, 0600);
@@ -869,8 +869,8 @@ do {
   sub cleanup {
     if (!$KEEP_ALL) {
       # Files
-      my @files = @(exists %files_to_unlink{$$} ?
-		   < @{ %files_to_unlink{$$} } : () );
+      my @files = @(exists %files_to_unlink{$$} ??
+		   < @{ %files_to_unlink{$$} } !! () );
       foreach my $file ( @files) {
 	# close the filehandle without checking its state
 	# in order to make real sure that this is closed
@@ -884,8 +884,8 @@ do {
 	}
       }
       # Dirs
-      my @dirs = @(exists %dirs_to_unlink{$$} ?
-		  < @{ %dirs_to_unlink{$$} } : () );
+      my @dirs = @(exists %dirs_to_unlink{$$} ??
+		  < @{ %dirs_to_unlink{$$} } !! () );
       foreach my $dir ( @dirs) {
 	if (-d $dir) {
 	  rmtree($dir, $DEBUG, 0);
@@ -1003,12 +1003,12 @@ sub new {
   %args = %( < map { uc($_), %args{$_} } keys %args );
 
   # see if they are unlinking (defaulting to yes)
-  my $unlink = (exists %args{UNLINK} ? %args{UNLINK} : 1 );
+  my $unlink = (exists %args{UNLINK} ?? %args{UNLINK} !! 1 );
   delete %args{UNLINK};
 
   # template (store it in an error so that it will
   # disappear from the arg list of tempfile
-  my @template = @( exists %args{TEMPLATE} ? %args{TEMPLATE} : () );
+  my @template = @( exists %args{TEMPLATE} ?? %args{TEMPLATE} !! () );
   delete %args{TEMPLATE};
 
   # Protect OPEN
@@ -1057,9 +1057,9 @@ sub newdir {
 
   # need to handle args as in tempdir because we have to force CLEANUP
   # default without passing CLEANUP to tempdir
-  my $template = (scalar(nelems @_) % 2 == 1 ? shift(@_) : undef );
+  my $template = (scalar(nelems @_) % 2 == 1 ?? shift(@_) !! undef );
   my %options = %( < @_ );
-  my $cleanup = (exists %options{CLEANUP} ? %options{CLEANUP} : 1 );
+  my $cleanup = (exists %options{CLEANUP} ?? %options{CLEANUP} !! 1 );
 
   delete %options{CLEANUP};
 
@@ -1284,7 +1284,7 @@ sub tempfile {
 	       );
 
   # Check to see whether we have an odd or even number of arguments
-  my $template = (scalar(nelems @_) % 2 == 1 ? shift(@_) : undef);
+  my $template = (scalar(nelems @_) % 2 == 1 ?? shift(@_) !! undef);
 
   # Read the options and merge with defaults
   %options = %(< %options, < @_)  if (nelems @_);
@@ -1458,7 +1458,7 @@ sub tempdir  {
 		);
 
   # Check to see whether we have an odd or even number of arguments
-  my $template = (scalar(nelems @_) % 2 == 1 ? shift(@_) : undef );
+  my $template = (scalar(nelems @_) % 2 == 1 ?? shift(@_) !! undef );
 
   # Read the options and merge with defaults
   %options = %(< %options, < @_)  if (nelems @_);
@@ -1925,7 +1925,7 @@ sub unlink0 {
     #   on Win9x the link count remains 1
     # On NFS the link count may still be 1 but we cant know that
     # we are on NFS
-    return  @( @fh[3] == 0 or $^O eq 'cygwin' ? 1 : 0);
+    return  @( @fh[3] == 0 or $^O eq 'cygwin' ?? 1 !! 0);
 
   } else {
     _deferred_unlink($fh, $path, 0);

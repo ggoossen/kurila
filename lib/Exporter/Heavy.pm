@@ -78,7 +78,7 @@ sub heavy_export {
 		    @names = @($spec); # is a normal symbol name
 		}
 
-		warn "Import ".($remove ? "del":"add").": $(join ' ',@names) "
+		warn "Import ".($remove ?? "del"!!"add").": $(join ' ',@names) "
 		    if $Exporter::Verbose;
 
 		if ($remove) {
@@ -143,7 +143,7 @@ sub heavy_export {
 	    # Build cache of symbols. Optimise the lookup by adding
 	    # barewords twice... both with and without a leading &.
 	    # (Technique could be applied to $export_cache at cost of memory)
-	    my @expanded = map { m/^\w/ ? ($_, '&'.$_) : $_ } @$fail;
+	    my @expanded = map { m/^\w/ ?? ($_, '&'.$_) !! $_ } @$fail;
 	    warn "$($pkg)::EXPORT_FAIL cached: $(join ' ',@expanded)" if $Exporter::Verbose;
  <	    %{$fail_cache}{[ @expanded]} = (1) x nelems @expanded;
 	}
@@ -171,10 +171,10 @@ sub heavy_export {
 	$type = $1;
 	no warnings 'once';
 	*{Symbol::fetch_glob("$($callpkg)::$sym")} =
-	    $type eq '&' ? \&{*{Symbol::fetch_glob("$($pkg)::$sym")}} :
-	    $type eq '$' ? \${*{Symbol::fetch_glob("$($pkg)::$sym")}} :
-	    $type eq '@' ? \@{*{Symbol::fetch_glob("$($pkg)::$sym")}} :
-	    $type eq '%' ? \%{*{Symbol::fetch_glob("$($pkg)::$sym")}} :
+	    $type eq '&' ?? \&{*{Symbol::fetch_glob("$($pkg)::$sym")}} !!
+	    $type eq '$' ?? \${*{Symbol::fetch_glob("$($pkg)::$sym")}} !!
+	    $type eq '@' ?? \@{*{Symbol::fetch_glob("$($pkg)::$sym")}} !!
+	    $type eq '%' ?? \%{*{Symbol::fetch_glob("$($pkg)::$sym")}} !!
 	    warn("Can't export symbol: $type$sym");
     }
 }
@@ -195,9 +195,9 @@ sub _push_tags {
     my @nontag = @( () );
     my $export_tags = \%{*{Symbol::fetch_glob("$($pkg)::EXPORT_TAGS")}};
     push(@{*{Symbol::fetch_glob("$($pkg)::$var")}},
-	< map { $export_tags->{$_} ? < @{$export_tags->{$_}} 
-                                 : do { push(@nontag,$_); $_ } }
- @(		(nelems @$syms) ? < @$syms : < keys %$export_tags));
+	< map { $export_tags->{$_} ?? < @{$export_tags->{$_}} 
+                                 !! do { push(@nontag,$_); $_ } }
+ @(		(nelems @$syms) ?? < @$syms !! < keys %$export_tags));
     if ((nelems @nontag) and $^W) {
 	# This may change to a die one day
 	warn(join(", ", @nontag)." are not tags of $pkg");

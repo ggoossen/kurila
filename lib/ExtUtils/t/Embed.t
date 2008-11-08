@@ -142,13 +142,13 @@ if ($^O eq 'VMS' && !$status) {
   print "# $(join ' ',@cmd2)\n";
   $status = system(join(' ', @cmd2)); 
 }
-print (($status? 'not ': '')."ok 1\n");
+print (($status?? 'not '!! '')."ok 1\n");
 
 my $embed_test = File::Spec->catfile(File::Spec->curdir, $exe);
 $embed_test = "run/nodebug $exe" if $^O eq 'VMS';
 print "# embed_test = $embed_test\n";
 $status = system($embed_test);
-print (($status? 'not ':'')."ok 9 # system returned $status\n");
+print (($status?? 'not '!!'')."ok 9 # system returned $status\n");
 unlink($exe,"embed_test.c",$obj);
 unlink("$exe.manifest") if $cl and config_value('ccversion') =~ m/^(\d+)/ and $1 +>= 14;
 unlink("$exe" . config_value("exe_ext")) if $skip_exe;

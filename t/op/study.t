@@ -8,8 +8,8 @@ sub ok ($;$) {
     local $_;
 
     # You have to do it this way or VMS will get confused.
-    printf "\%s $test\%s\n", $ok   ? 'ok' : 'not ok',
-                           $name ? " - $name" : '';
+    printf "\%s $test\%s\n", $ok   ?? 'ok' !! 'not ok',
+                           $name ?? " - $name" !! '';
 
     printf "# Failed test at line \%d\n", (caller($Ok_Level))[[2]] unless $ok;
 

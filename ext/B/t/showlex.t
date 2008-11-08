@@ -21,7 +21,7 @@ my $Is_MacOS = $^O eq 'MacOS';
 
 my $path = join " ", map { qq["-I$_"] } @INC;
 $path = '"-I../lib" "-Iperl_root:[lib]"' if $Is_VMS;   # gets too long otherwise
-my $redir = $Is_MacOS ? "" : "2>&1";
+my $redir = $Is_MacOS ?? "" !! "2>&1";
 
 my $start_index = B::PAD_NAME_START_INDEX();
 
@@ -33,8 +33,8 @@ my ($out);	# output, option-flag
 sub padrep {
     my ($varname,$newlex) = < @_;
     return ($newlex)
-	? 'PVNV \(0x[0-9a-fA-F]+\) "\'.$varname.'" = '
-	: "PVNV \\\(0x[0-9a-fA-F]+\\\) \\$varname\n";
+	?? 'PVNV \(0x[0-9a-fA-F]+\) "\'.$varname.'" = '
+	!! "PVNV \\\(0x[0-9a-fA-F]+\\\) \\$varname\n";
 }
 
 for my $newlex (@('', '-newlex')) {

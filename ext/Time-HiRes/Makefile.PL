@@ -21,8 +21,8 @@ use vars < qw($self); # Used in 'sourcing' the hints.
 # TBD: Can we just use $Config(exe_ext) here instead of this complex
 #      expression?
 my $ld_exeext = ($^O eq 'cygwin' ||
-                 $^O eq 'os2' && config_value("ldflags") =~ m/-Zexe\b/) ? '.exe' :
-                (($^O eq 'vos') ? config_value("exe_ext") : '');
+                 $^O eq 'os2' && config_value("ldflags") =~ m/-Zexe\b/) ?? '.exe' !!
+                (($^O eq 'vos') ?? config_value("exe_ext") !! '');
 
 unless(%ENV{PERL_CORE}) {
     %ENV{PERL_CORE} = 1 if grep { $_ eq 'PERL_CORE=1' } @ARGV;
@@ -322,7 +322,7 @@ EOM
 
 sub DEFINE {
     my ($def, $val) = < @_;
-    my $define = defined $val ? "$def=$val" : $def ;
+    my $define = defined $val ?? "$def=$val" !! $def ;
     unless ($DEFINE =~ m/(?:^| )-D\Q$define\E(?: |$)/) {
 	$DEFINE .= " -D$define";
     }
@@ -495,7 +495,7 @@ EOD
         print "(It's still not portable, though.)\n";
     } else {
 	print "NOT found.\n";
-	my $nt = ($^O eq 'os2' ? '' : 'not');
+	my $nt = ($^O eq 'os2' ?? '' !! 'not');
         print "You can$nt mix subsecond sleeps with signals.\n";
         print "(It would not be portable anyway.)\n";
     }

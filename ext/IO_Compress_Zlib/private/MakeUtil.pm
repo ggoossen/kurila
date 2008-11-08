@@ -215,7 +215,7 @@ sub doUpDown
 
     return if -d @_[0];
 
-    local ($^I) = ($^O eq 'VMS') ? "_bak" : ".bak";
+    local ($^I) = ($^O eq 'VMS') ?? "_bak" !! ".bak";
     local (@ARGV) = @(shift);
  
     while ( ~< *ARGV)
@@ -243,7 +243,7 @@ sub doUpDownViaCopy
 
     return if -d $file ;
 
-    my $backup = $file . ($^O eq 'VMS') ? "_bak" : ".bak";
+    my $backup = $file . ($^O eq 'VMS') ?? "_bak" !! ".bak";
 
     copy($file, $backup)
         or die "Cannot copy $file to $backup: $!";

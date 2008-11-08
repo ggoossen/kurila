@@ -10,7 +10,7 @@ use Cwd ();
 %ENV{PATH} = "/bin";
 delete %ENV{[qw(BASH_ENV CDPATH ENV IFS)]};
 my @correct = @( () );
-if (opendir(D, $^O eq "MacOS" ? ":" : ".")) {
+if (opendir(D, $^O eq "MacOS" ?? ":" !! ".")) {
    @correct = grep { !m/^\./ } sort @( readdir(D));
    closedir D;
 }
@@ -86,7 +86,7 @@ is_deeply(\@a, \@('a', 'b'));
 
 @a = bsd_glob(
     '{TES?,doesntexist*,a,b}',
-    GLOB_BRACE ^|^ GLOB_NOMAGIC ^|^ ($^O eq 'VMS' ? GLOB_NOCASE : 0)
+    GLOB_BRACE ^|^ GLOB_NOMAGIC ^|^ ($^O eq 'VMS' ?? GLOB_NOCASE !! 0)
 );
 
 # Working on t/TEST often causes this test to fail because it sees Emacs temp
@@ -96,7 +96,7 @@ is_deeply(\@a, \@('a', 'b'));
 
 print "# $(join ' ',@a)\n";
 
-is_deeply(\@a, \@(($^O eq 'VMS'? 'test.' : 'TEST'), 'a', 'b'));
+is_deeply(\@a, \@(($^O eq 'VMS'?? 'test.' !! 'TEST'), 'a', 'b'));
 
 # "~" should expand to $ENV{HOME}
 %ENV{HOME} = "sweet home";

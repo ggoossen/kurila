@@ -15,7 +15,7 @@ sub import {
     warnings::warnif('deprecated', qq{Parameterless "use IO" deprecated})
         if (nelems @_) == 0 ;
     
-    my @l = @( (nelems @_) ? < @_ : < qw(Handle Seekable File Socket Dir) );
+    my @l = @( (nelems @_) ?? < @_ !! < qw(Handle Seekable File Socket Dir) );
 
     eval join("", map { "require IO::" . @(m/(\w+)/)[0] . ";\n" } @l)
 	or die $@;

@@ -537,19 +537,19 @@ sub _error {
         push @{${$arg->{error}}}, \%($object => "$message: $!");
     }
     else {
-        warn(defined($object) ? "$message for $object: $!" : "$message: $!");
+        warn(defined($object) ?? "$message for $object: $!" !! "$message: $!");
     }
 }
 
 sub mkpath {
     my $old_style = (
         UNIVERSAL::isa(@_[0],'ARRAY')
-        or ((nelems @_) == 2 and ((defined @_[1] && ! ref @_[1]) ? @_[1] =~ m/\A\d+\z/ : 1))
+        or ((nelems @_) == 2 and ((defined @_[1] && ! ref @_[1]) ?? @_[1] =~ m/\A\d+\z/ !! 1))
         or ((nelems @_) == 3
-            and ((defined @_[1] && ! ref @_[1]) ? @_[1] =~ m/\A\d+\z/ : 1)
-            and ((defined @_[2] && ! ref @_[2]) ? @_[2] =~ m/\A\d+\z/ : 1)
+            and ((defined @_[1] && ! ref @_[1]) ?? @_[1] =~ m/\A\d+\z/ !! 1)
+            and ((defined @_[2] && ! ref @_[2]) ?? @_[2] =~ m/\A\d+\z/ !! 1)
         )
-    ) ? 1 : 0;
+    ) ?? 1 !! 0;
 
     my $arg;
     my $paths;
@@ -558,8 +558,8 @@ sub mkpath {
         my ($verbose, $mode);
         ($paths, $verbose, $mode) = < @_;
         $paths = \@($paths) unless UNIVERSAL::isa($paths,'ARRAY');
-        $arg->{verbose} = defined $verbose ? $verbose : 0;
-        $arg->{mode}    = defined $mode    ? $mode    : 0777;
+        $arg->{verbose} = defined $verbose ?? $verbose !! 0;
+        $arg->{mode}    = defined $mode    ?? $mode    !! 0777;
     }
     else {
         if ((nelems @_) +> 0 and UNIVERSAL::isa(@_[-1], 'HASH')) {
@@ -580,7 +580,7 @@ sub _mkpath {
     my $arg   = shift;
     my $paths = shift;
 
-    local($")=$Is_MacOS ? ":" : "/";
+    local($")=$Is_MacOS ?? ":" !! "/";
     my(@created);
     foreach my $path ( @$paths) {
         next unless length($path);
@@ -619,7 +619,7 @@ sub _mkpath {
 }
 
 sub rmtree {
-    my $old_style = (UNIVERSAL::isa(@_[0],'ARRAY')) ? 1 : 0;
+    my $old_style = (UNIVERSAL::isa(@_[0],'ARRAY')) ?? 1 !! 0;
 
     my $arg;
     my $paths;
@@ -681,8 +681,8 @@ sub _rmtree {
         # opposed to being truly canonical, anchored from the root (/).
 
         my $canon = $arg->{prefix}
-            ? File::Spec->catfile($arg->{prefix}, $root)
-            : $root
+            ?? File::Spec->catfile($arg->{prefix}, $root)
+            !! $root
         ;
 
         my ($ldev, $lino, $perm) = < @(lstat $root)[[0..2]];
@@ -747,7 +747,7 @@ sub _rmtree {
                 # Deleting large numbers of files from VMS Files-11
                 # filesystems is faster if done in reverse ASCIIbetical order.
                 # include '.' to '.;' from blead patch #31775
-                @files = map {$_ eq '.' ? '.;' : $_} reverse @files;
+                @files = map {$_ eq '.' ?? '.;' !! $_} reverse @files;
                 ($root = VMS::Filespec::unixify($root)) =~ s/\.dir\z//;
             }
             @files = grep {$_ ne $updir and $_ ne $curdir} @files;
@@ -781,7 +781,7 @@ sub _rmtree {
 
             if ($arg->{depth} or !$arg->{keep_root}) {
                 if ($arg->{safe} &&
-		($Is_VMS ? !&VMS::Filespec::candelete($root) : !-w $root)) {
+		($Is_VMS ?? !&VMS::Filespec::candelete($root) !! !-w $root)) {
                     print "skipped $root\n" if $arg->{verbose};
                     next ROOT_DIR;
 	    }
@@ -797,7 +797,7 @@ sub _rmtree {
 	    }
 	    else {
                     _error($arg, "cannot remove directory", $canon);
-                    if (!chmod($perm, ($Is_VMS ? < VMS::Filespec::fileify($root) : $root))
+                    if (!chmod($perm, ($Is_VMS ?? < VMS::Filespec::fileify($root) !! $root))
                     ) {
                         _error($arg, sprintf("cannot restore permissions to 0\%o",$perm), $canon);
                     }
@@ -811,8 +811,8 @@ sub _rmtree {
                 if $Is_VMS && !File::Spec->file_name_is_absolute($root);
 
             if ($arg->{safe} &&
-		($Is_VMS ? !&VMS::Filespec::candelete($root)
-		         : !(-l $root || -w $root)))
+		($Is_VMS ?? !&VMS::Filespec::candelete($root)
+		         !! !(-l $root || -w $root)))
 	    {
                 print "skipped $root\n" if $arg->{verbose};
                 next ROOT_DIR;

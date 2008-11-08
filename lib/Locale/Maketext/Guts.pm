@@ -67,9 +67,9 @@ sub _compile {
             $big_pile .= @c[-1];
             if($USE_LITERALS and (
               (ord('A') == 65)
-               ? @c[-1] !~ m<[^\x20-\x7E]>s
+               ?? @c[-1] !~ m<[^\x20-\x7E]>s
                   # ASCII very safe chars
-               : @c[-1] !~ m/[^ !"\#\$%&'()*+,\-.\/0-9:;<=>?\@A-Z[\\\]^_`a-z{|}~\x07]/s
+               !! @c[-1] !~ m/[^ !"\#\$%&'()*+,\-.\/0-9:;<=>?\@A-Z[\\\]^_`a-z{|}~\x07]/s
                   # EBCDIC very safe chars
             )) {
               # normal case -- all very safe chars
@@ -165,9 +165,9 @@ sub _compile {
               @code[-1] .= '@_[' . (0 + $1) . '], ';
             } elsif($USE_LITERALS and (
               (ord('A') == 65)
-               ? $p !~ m<[^\x20-\x7E]>s
+               ?? $p !~ m<[^\x20-\x7E]>s
                   # ASCII very safe chars
-               : $p !~ m/[^ !"\#\$%&'()*+,\-.\/0-9:;<=>?\@A-Z[\\\]^_`a-z{|}~\x07]/s
+               !! $p !~ m/[^ !"\#\$%&'()*+,\-.\/0-9:;<=>?\@A-Z[\\\]^_`a-z{|}~\x07]/s
                   # EBCDIC very safe chars            
             )) {
               # Normal case: a literal containing only safe characters
@@ -259,7 +259,7 @@ sub _die_pointing {
   my $i = index(@_[0], "\n");
 
   my $pointy;
-  my $pos = pos(@_[0]) - (defined(@_[2]) ? @_[2] : 0) - 1;
+  my $pos = pos(@_[0]) - (defined(@_[2]) ?? @_[2] !! 0) - 1;
   if($pos +< 1) {
     $pointy = "^=== near there\n";
   } else { # we need to space over

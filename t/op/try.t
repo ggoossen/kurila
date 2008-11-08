@@ -29,7 +29,7 @@ do {
 do {
     try {
 	try { goto foo; };
-	print ($@ ? "ok $test\n" : "not ok $test\n");
+	print ($@ ?? "ok $test\n" !! "not ok $test\n");
 	return;
     };
     print "not ok $test\n" if $@;

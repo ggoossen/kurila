@@ -41,7 +41,7 @@ BEGIN {
   else                 { *UNICODE = sub() {1} }
 }
 if(DEBUG +> 2) {
-  print "# We are ", ASCII ? '' : 'not ', "in ASCII-land\n";
+  print "# We are ", ASCII ?? '' !! 'not ', "in ASCII-land\n";
   print "# We are under a Unicode-safe Perl.\n";
 }
 
@@ -135,7 +135,7 @@ sub output_string {
   my $this = shift;
   return $this->{'output_string'} unless (nelems @_);  # GET.
   
-  my $x = (defined(@_[0]) and ref(@_[0])) ? @_[0] : \( @_[0] );
+  my $x = (defined(@_[0]) and ref(@_[0])) ?? @_[0] !! \( @_[0] );
   $$x = '' unless defined $$x;
   DEBUG +> 4 and print "# Output string set to $x ($$x)\n";
   $this->{'output_fh'} = undef;
@@ -593,8 +593,8 @@ sub _wrap_up {
   return unless $nixx or $merge;
 
   DEBUG +> 2 and print "\nStarting _wrap_up traversal.\n",
-   $merge ? (" Merge mode on\n") : (),
-   $nixx  ? (" Nix-X mode on\n") : (),
+   $merge ?? (" Merge mode on\n") !! (),
+   $nixx  ?? (" Nix-X mode on\n") !! (),
   ;    
   
 
@@ -665,11 +665,11 @@ sub _remap_sequences {
   ;
   DEBUG +> 3 and print " Map: ",
     join('; ', map "$_=" . (
-        ref($map->{$_}) ? join(",", @{$map->{$_}}) : $map->{$_}
+        ref($map->{$_}) ?? join(",", @{$map->{$_}}) !! $map->{$_}
       ),
       sort keys %$map ),
     ("B~C~E~F~I~L~S~X~Z" eq join '~', sort keys %$map)
-     ? "  (all normal)\n" : "\n"
+     ?? "  (all normal)\n" !! "\n"
   ;
 
   # A recursive algorithm implemented iteratively!  Whee!
@@ -692,8 +692,8 @@ sub _remap_sequences {
         } else  {
           print "   Code $was<> maps to ",
            ref($is)
-            ? ( "tags ", < map("$_<", @$is), '...', < map('>', @$is), "\n" )
-            : "tag $is<...>.\n";
+            ?? ( "tags ", < map("$_<", @$is), '...', < map('>', @$is), "\n" )
+            !! "tag $is<...>.\n";
         }
       }
       
@@ -773,7 +773,7 @@ sub _ponder_extend {
     my $new_letter = $1;
     my $fallbacks_one = $2;
     my $elements_one;
-    $elements_one = defined($3) ? $3 : $1;
+    $elements_one = defined($3) ?? $3 !! $1;
 
     DEBUG +> 2 and print "Extensor has good syntax.\n";
 
@@ -855,7 +855,7 @@ sub _ponder_extend {
     } else {
       # We have to use the fallback(s), which might be '0', or '1'.
       $self->{'accept_codes'}->{$new_letter}
-        = ((nelems @fallbacks) == 1) ? @fallbacks[0] : \@fallbacks;
+        = ((nelems @fallbacks) == 1) ?? @fallbacks[0] !! \@fallbacks;
       DEBUG +> 2 and print
        "Extensor maps $new_letter => fallbacks $(join ' ',@fallbacks).\n";
     }
@@ -1237,7 +1237,7 @@ sub _treat_Ls {  # Process our dear dear friends, the L<...> sequences
       }
       
       # And update children to be the link-text:
-      @$ell = @( <@$ell[[@(0,1)]], defined($link_text) ? splice(@$link_text) : '');
+      @$ell = @( <@$ell[[@(0,1)]], defined($link_text) ?? splice(@$link_text) !! '');
       
       DEBUG +> 2 and print "End of L-parsing for this node $treelet->[$i]\n";
 
@@ -1315,7 +1315,7 @@ sub _treat_Es {
 
       $charnum  = Pod::Escapes::e2charnum($content);
       DEBUG +> 1 and print " Considering E<$content> with char ",
-        defined($charnum) ? $charnum : "undef", ".\n";
+        defined($charnum) ?? $charnum !! "undef", ".\n";
 
       if(!defined( $charnum )) {
         DEBUG +> 1 and print "I don't know how to deal with E<$content>.\n";
@@ -1397,8 +1397,8 @@ sub _accessorize {  # A simple-minded method-maker
       
       die "Accessor usage: \$obj->$attrname() or \$obj->$attrname(\$new_value)"
         unless ((nelems @_) == 1 or (nelems @_) == 2) and ref @_[0];
-      ((nelems @_) == 1) ?  @_[0]->{$attrname}
-                : (@_[0]->{$attrname} = @_[1]);
+      ((nelems @_) == 1) ??  @_[0]->{$attrname}
+                !! (@_[0]->{$attrname} = @_[1]);
     };
   }
   # Ya know, they say accessories make the ensemble!

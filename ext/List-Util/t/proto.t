@@ -4,8 +4,8 @@ use Config;
 
 use Scalar::Util ();
 use Test::More  (grep { m/set_prototype/ } < @Scalar::Util::EXPORT_FAIL)
-			? (skip_all => 'set_prototype requires XS version')
-			: (tests => 9);
+			?? (skip_all => 'set_prototype requires XS version')
+			!! (tests => 9);
 
 Scalar::Util->import('set_prototype');
 

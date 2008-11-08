@@ -9,9 +9,9 @@ my %done_gv;
 
 sub _printop {
   my $op = shift;
-  my $addr = ${$op} ? $op->ppaddr : '';
+  my $addr = ${$op} ?? $op->ppaddr !! '';
   $addr =~ s/^PL_ppaddr// if $addr;
-  return sprintf "0x\%x \%s \%s", ${$op}, ${$op} ? class($op) : '', $addr;
+  return sprintf "0x\%x \%s \%s", ${$op}, ${$op} ?? class($op) !! '', $addr;
 }
 
 sub B::OP::debug {
@@ -82,7 +82,7 @@ sub B::PMOP::debug {
 sub B::COP::debug {
     my ($op) = < @_;
     $op->B::OP::debug();
-    my $cop_io = class($op->io) eq 'SPECIAL' ? '' : $op->io->as_string;
+    my $cop_io = class($op->io) eq 'SPECIAL' ?? '' !! $op->io->as_string;
     printf <<'EOT', $op->label, $op->stashpv, $op->cop_seq, ${$op->warnings}, cstring($cop_io);
 	cop_label	"%s"
 	cop_stashpv	"%s"

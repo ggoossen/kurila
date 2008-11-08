@@ -14,5 +14,5 @@ if ($@) {
 	$e =~ s/^/# /gm;
 	print $e;
 }
-print $@ ? "not ok 1\n" : "ok 1\n";
+print $@ ?? "not ok 1\n" !! "ok 1\n";
 

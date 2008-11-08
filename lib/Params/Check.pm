@@ -17,7 +17,7 @@ BEGIN {
     @EXPORT_OK  =   qw[check allow last_error];
 
     $VERSION                = '0.26';
-    $VERBOSE                = $^W ? 1 : 0;
+    $VERBOSE                = $^W ?? 1 !! 0;
     $NO_DUPLICATES          = 0;
     $STRIP_LEADING_DASHES   = 0;
     $STRICT_TYPE            = 0;
@@ -366,7 +366,7 @@ sub check {
     ### leaving the user with a few set variables
     for my $key (keys %defs) {
         if( my $ref = %utmpl{$key}->{'store'} ) {
-            $$ref = $NO_DUPLICATES ? delete %defs{$key} : %defs{$key};
+            $$ref = $NO_DUPLICATES ?? delete %defs{$key} !! %defs{$key};
         }
     }
 
@@ -528,8 +528,8 @@ sub _sanity_check_and_defaults {
 sub _safe_eq {
     ### only do a straight 'eq' if they're both defined ###
     return defined(@_[0]) && defined(@_[1])
-                ? @_[0] eq @_[1]
-                : defined(@_[0]) eq defined(@_[1]);
+                ?? @_[0] eq @_[1]
+                !! defined(@_[0]) eq defined(@_[1]);
 }
 
 sub _who_was_it {

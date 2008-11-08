@@ -110,7 +110,7 @@ if ( defined $type->{Versions}->{$version} )
 {
      $ver_string = $type->{Versions}->{$version}->[1];
      if ($type->{Versions}->{$version}->[0] )
-       { $encrypt = @info[6] ? "Enabled" : "Disabled" }
+       { $encrypt = @info[6] ?? "Enabled" !! "Disabled" }
      else
        { $encrypt = "Not Supported" }
 }

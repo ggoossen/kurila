@@ -24,7 +24,7 @@ BEGIN {
    $old_env_term = %ENV{'TERM'};
   if ($^O eq 'VMS' && !defined(config_value('d_setenv'))) {
       %ENV{PATH} = %ENV{PATH};
-      %ENV{TERM} = %ENV{TERM} ne ''? %ENV{TERM} : 'dummy';
+      %ENV{TERM} = %ENV{TERM} ne ''?? %ENV{TERM} !! 'dummy';
   }
   if (config_value('extensions') =~ m/\bIPC\/SysV\b/
       && (config_value('d_shm') || config_value('d_msg'))) {
@@ -43,10 +43,10 @@ my $Is_NetWare  = $^O eq 'NetWare';
 my $Is_Dos      = $^O eq 'dos';
 my $Is_Cygwin   = $^O eq 'cygwin';
 my $Is_OpenBSD  = $^O eq 'openbsd';
-my $Invoke_Perl = $Is_VMS      ? 'MCR Sys$Disk:[]Perl.exe' :
-                  $Is_MSWin32  ? '.\perl'               :
-                  $Is_MacOS    ? ':perl'                :
-                  $Is_NetWare  ? 'perl'                 : 
+my $Invoke_Perl = $Is_VMS      ?? 'MCR Sys$Disk:[]Perl.exe' !!
+                  $Is_MSWin32  ?? '.\perl'               !!
+                  $Is_MacOS    ?? ':perl'                !!
+                  $Is_NetWare  ?? 'perl'                 !! 
                                  './perl'               ;
 my @MoreEnv = qw/IFS CDPATH ENV BASH_ENV/;
 
@@ -130,7 +130,7 @@ sub test ($;$) {
 }
 
 # We need an external program to call.
-my $ECHO = ($Is_MSWin32 ? ".\\echo$$" : $Is_MacOS ? ":echo$$" : ($Is_NetWare ? "echo$$" : "./echo$$"));
+my $ECHO = ($Is_MSWin32 ?? ".\\echo$$" !! $Is_MacOS ?? ":echo$$" !! ($Is_NetWare ?? "echo$$" !! "./echo$$"));
 END { unlink $ECHO }
 open PROG, ">", "$ECHO" or die "Can't create $ECHO: $!";
 print PROG 'print "$(join q| |, @ARGV)\n"', "\n";
@@ -161,7 +161,7 @@ do {
 	    }; die if $@;
 	}
     }
-    %ENV{PATH} = ($Is_Cygwin) ? '/usr/bin' : '';
+    %ENV{PATH} = ($Is_Cygwin) ?? '/usr/bin' !! '';
     delete %ENV{[@MoreEnv]};
     %ENV{TERM} = 'dumb';
 
@@ -1015,22 +1015,22 @@ TERNARY_CONDITIONALS: do {
     test tainted( $tainted_true );
     test tainted( $tainted_false );
 
-    my $result = $tainted_true ? "True" : "False";
+    my $result = $tainted_true ?? "True" !! "False";
     test $result eq "True";
     test !tainted( $result );
 
-    $result = $tainted_false ? "True" : "False";
+    $result = $tainted_false ?? "True" !! "False";
     test $result eq "False";
     test !tainted( $result );
 
     my $untainted_whatever = "The Fabulous Johnny Cash";
     my $tainted_whatever = "Soft Cell" . $TAINT;
 
-    $result = $tainted_true ? $tainted_whatever : $untainted_whatever;
+    $result = $tainted_true ?? $tainted_whatever !! $untainted_whatever;
     test $result eq "Soft Cell";
     test tainted( $result );
 
-    $result = $tainted_false ? $tainted_whatever : $untainted_whatever;
+    $result = $tainted_false ?? $tainted_whatever !! $untainted_whatever;
     test $result eq "The Fabulous Johnny Cash";
     test !tainted( $result );
 };

@@ -7,8 +7,8 @@ use File::Spec;
 use lib File::Spec->catdir('t', 'lib');
 
 use Test::More (-x $^X
-		? (tests => 5)
-		: (skip_all => "Can't find an executable file")
+		?? (tests => 5)
+		!! (skip_all => "Can't find an executable file")
 	       );
 
 BEGIN {                                # Set up a tiny script file

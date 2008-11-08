@@ -182,7 +182,7 @@ my @CharinfoRanges = @(
 # CJK Ideographs
   \@( 0x4E00,   0x9FA5,   \&han_charname,   undef  ),
 # Hangul Syllables
-  \@( 0xAC00,   0xD7A3,   $hasHangulUtil ? \&getHangulName : \&hangul_charname,  \&hangul_decomp ),
+  \@( 0xAC00,   0xD7A3,   $hasHangulUtil ?? \&getHangulName !! \&hangul_charname,  \&hangul_decomp ),
 # Non-Private Use High Surrogates
   \@( 0xD800,   0xDB7F,   undef,   undef  ),
 # Private Use High Surrogates
@@ -211,8 +211,8 @@ sub charinfo {
         $rcode = $hexk;
 	$rcode =~ s/^0+//;
 	$rcode =  sprintf("\%04X", hex($rcode));
-        $rname = $range->[2] ? $range->[2]->($code) : '';
-        $rdec  = $range->[3] ? $range->[3]->($code) : '';
+        $rname = $range->[2] ?? $range->[2]->($code) !! '';
+        $rdec  = $range->[3] ?? $range->[3]->($code) !! '';
         $hexk  = sprintf("\%06X", $range->[0]); # replace by the first
         last;
       }
@@ -374,7 +374,7 @@ sub _charscripts {
 	    local $_;
 	    while ( ~< $SCRIPTSFH) {
 		if (m/^([0-9A-F]+)(?:\.\.([0-9A-F]+))?\s+;\s+(\w+)/) {
-		    my ($lo, $hi) = (hex($1), $2 ? hex($2) : hex($1));
+		    my ($lo, $hi) = (hex($1), $2 ?? hex($2) !! hex($1));
 		    my $script = lc($3);
 		    $script =~ s/\b(\w)/$(uc($1))/g;
 		    my $subrange = \@( $lo, $hi, $script );
@@ -830,7 +830,7 @@ sub casespec {
 
     _casespec() unless %CASESPEC;
 
-    return ref %CASESPEC{$code} ? dclone %CASESPEC{$code} : %CASESPEC{$code};
+    return ref %CASESPEC{$code} ?? dclone %CASESPEC{$code} !! %CASESPEC{$code};
 }
 
 =head2 namedseq()

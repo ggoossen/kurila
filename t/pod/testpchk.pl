@@ -25,7 +25,7 @@ $MYPKG = try { (caller)[[0]] };
 
 sub stripname( $ ) {
    local $_ = shift;
-   return m/(\w[.\w]*)\s*$/ ? $1 : $_;
+   return m/(\w[.\w]*)\s*$/ ?? $1 !! $_;
 }
 
 sub msgcmp( $ $ ) {
@@ -73,7 +73,7 @@ sub testpodcheck( @ ) {
 }
 
 sub testpodchecker( @ ) {
-   my %opts = %( (ref @_[0] eq 'HASH') ? < %{shift()} : () );
+   my %opts = %( (ref @_[0] eq 'HASH') ?? < %{shift()} !! () );
    my @testpods = @_;
    my ($testname, $testdir) = ("", "");
    my $cmpfile = "";

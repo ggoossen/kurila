@@ -23,8 +23,8 @@ if (%ENV{PERL_BUILD_EXPAND_CONFIG_VARS}) {
     my @Config_inc_version_list =
 	reverse split m/ /, config_value("inc_version_list");
     $Config_inc_version_list =
-	(nelems @Config_inc_version_list) ?
-	    qq($(join ' ',@Config_inc_version_list)) : q(());
+	(nelems @Config_inc_version_list) ??
+	    qq($(join ' ',@Config_inc_version_list)) !! q(());
 } else {
     $useConfig = 'use Config;';
     $Config_archname = q($(config_value('archname')));

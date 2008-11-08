@@ -408,7 +408,7 @@ sub getCmdLine {	# import assistant
         else { # handle scalars
 
 	    # if 'opt' is present, true
-	    %gOpts{$opt} = (grep m/^$opt/, @ARGV) ? 1 : 0;
+	    %gOpts{$opt} = (grep m/^$opt/, @ARGV) ?? 1 !! 0;
 
 	    # override with 'foo' if 'opt=foo' appears
 	    grep s/$opt=(.*)/$(%gOpts{$opt}=$1)/, @ARGV;
@@ -487,7 +487,7 @@ sub label {
     return $tc->{name} if $tc->{name};
 
     my $buf = (ref $tc->{bcopts}) 
-	? join(',', @{$tc->{bcopts}}) : $tc->{bcopts};
+	?? join(',', @{$tc->{bcopts}}) !! $tc->{bcopts};
 
     foreach (qw( note prog code )) {
 	$buf .= " $_: $tc->{$_}" if $tc->{$_} and not ref $tc->{$_};
@@ -569,7 +569,7 @@ sub get_bcopts {
     my @opts = @( () );
     if ($tc->{bcopts}) {
 	@opts = @( (ref $tc->{bcopts} eq 'ARRAY')
-	    ? < @{$tc->{bcopts}} : ($tc->{bcopts}) );
+	    ?? < @{$tc->{bcopts}} !! ($tc->{bcopts}) );
     }
     return @opts;
 }
@@ -695,7 +695,7 @@ sub mkCheckRex {
 	      )?
 	      \\\)			# closing literal )
 	     !$( '(?:next|db)state\([^()]*?' .
-	      ($1 ? '\(eval \d+\)[^()]*' : '')	# Match the eval if present
+	      ($1 ?? '\(eval \d+\)[^()]*' !! '')	# Match the eval if present
 	      . '\)'
 )!msgx;
     # widened for -terse mode
@@ -722,7 +722,7 @@ sub mkCheckRex {
     $str = "(-e .*?)?(B::Concise::compile.*?)?\n" . $str
 	unless $tc->{noanchors} or $tc->{rxnoorder};
     
-    my $qr = ($tc->{noanchors})	? qr/$str/ms : qr/^$str$/ms ;
+    my $qr = ($tc->{noanchors})	?? qr/$str/ms !! qr/^$str$/ms ;
 
     $tc->{rex}		= $qr;
     $tc->{rexstr}	= $str;

@@ -19,7 +19,7 @@ my $loaded;
 sub import {
     load_imports() unless $loaded++;
     my $this = shift;
-    my @list = map { m/^\w+_h$/ ? ":$_" : $_ } @_;
+    my @list = map { m/^\w+_h$/ ?? ":$_" !! $_ } @_;
     local $Exporter::ExportLevel = 1;
     Exporter::import($this,< @list);
 }
@@ -91,8 +91,8 @@ sub opendir {
     usage "opendir(directory)" if (nelems @_) != 1;
     my $dirhandle;
     CORE::opendir($dirhandle, @_[0])
-	? $dirhandle
-	: undef;
+	?? $dirhandle
+	!! undef;
 }
 
 sub readdir {
@@ -337,7 +337,7 @@ sub puts {
 
 sub remove {
     usage "remove(filename)" if (nelems @_) != 1;
-    (-d @_[0]) ? CORE::rmdir(@_[0]) : CORE::unlink(@_[0]);
+    (-d @_[0]) ?? CORE::rmdir(@_[0]) !! CORE::unlink(@_[0]);
 }
 
 sub rename {

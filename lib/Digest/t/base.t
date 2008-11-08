@@ -24,7 +24,7 @@ do {
    sub digest {
 	my $self = shift;
 	my $len = length($$self);
-	my $first = ($len +> 0) ? substr($$self, 0, 1) : "X";
+	my $first = ($len +> 0) ?? substr($$self, 0, 1) !! "X";
 	$$self = "";
 	return sprintf "$first\%04d", $len;
    }
@@ -47,10 +47,10 @@ $ctx->add("foo");
 ok($ctx->digest, "f0003");
 
 $ctx->add("foo");
-ok($ctx->hexdigest, $EBCDIC ? "86f0f0f0f3" : "6630303033");
+ok($ctx->hexdigest, $EBCDIC ?? "86f0f0f0f3" !! "6630303033");
 
 $ctx->add("foo");
-ok($ctx->b64digest, $EBCDIC ? "hvDw8PM" : "ZjAwMDM");
+ok($ctx->b64digest, $EBCDIC ?? "hvDw8PM" !! "ZjAwMDM");
 
 open(F, ">", "xxtest$$") || die;
 binmode(F);
@@ -69,7 +69,7 @@ try {
 };
 ok($@->{description} =~ m/^Number of bits must be multiple of 8/);
 
-$ctx->add_bits($EBCDIC ? "11100100" : "01010101");
+$ctx->add_bits($EBCDIC ?? "11100100" !! "01010101");
 ok($ctx->digest, "U0001");
 
 try {

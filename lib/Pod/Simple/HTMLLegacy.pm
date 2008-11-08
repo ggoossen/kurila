@@ -45,7 +45,7 @@ sub pod2html {
     warn "OK, processed args [$(join ' ',@args)] ...\n";
     warn sprintf
       " Verbose: \%s\n Index: \%s\n Infile: \%s\n Outfile: \%s\n Title: \%s\n",
-      < map defined($_) ? $_ : "(nil)", @(
+      < map defined($_) ?? $_ !! "(nil)", @(
        $verbose,     $index,     $infile,     $outfile,     $title,)
     ;
     *Pod::Simple::HTML::DEBUG = sub(){1};

@@ -126,7 +126,7 @@ sub get_subname {
     }
   }
 
-  return (($info->{sub}||'') eq '(eval)') ? 'try {...}' : $info->{sub};
+  return (($info->{sub}||'') eq '(eval)') ?? 'try {...}' !! $info->{sub};
 }
 
 # Figures out what call (from the point of view of the caller)
@@ -276,8 +276,8 @@ sub trusts_directly {
     my $class = shift;
     no warnings 'once'; 
     return (nelems @{*{Symbol::fetch_glob("$class\::CARP_NOT")}})
-      ? @{*{Symbol::fetch_glob("$class\::CARP_NOT")}}
-      : @{*{Symbol::fetch_glob("$class\::ISA")}};
+      ?? @{*{Symbol::fetch_glob("$class\::CARP_NOT")}}
+      !! @{*{Symbol::fetch_glob("$class\::ISA")}};
 }
 
 1;

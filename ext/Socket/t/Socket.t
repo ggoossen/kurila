@@ -23,8 +23,8 @@ if (socket(T, PF_INET, SOCK_STREAM, IPPROTO_TCP)) {
 
   arm(5);
   my $host = $^O eq 'MacOS' ||
-    ($^O eq 'irix' && config_value('osvers') == 5) ?
-                 '127.0.0.1' : 'localhost';
+    ($^O eq 'irix' && config_value('osvers') == 5) ??
+                 '127.0.0.1' !! 'localhost';
   my $localhost = inet_aton($host);
 
   SKIP:

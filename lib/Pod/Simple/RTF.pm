@@ -101,12 +101,12 @@ sub new {
   $new->accept_codes('VerbatimFormatted');
   DEBUG +> 2 and print "To accept: ", join(' ', @_to_accept), "\n";
   $new->doc_lang(
-    (  %ENV{'RTFDEFLANG'} || '') =~ m/^(\d{1,10})$/s ? $1
-    : (%ENV{'RTFDEFLANG'} || '') =~ m/^0?x([a-fA-F0-9]{1,10})$/s ? hex($1)
+    (  %ENV{'RTFDEFLANG'} || '') =~ m/^(\d{1,10})$/s ?? $1
+    !! (%ENV{'RTFDEFLANG'} || '') =~ m/^0?x([a-fA-F0-9]{1,10})$/s ?? hex($1)
                                       # yes, tolerate hex!
-    : (%ENV{'RTFDEFLANG'} || '') =~ m/^([a-fA-F0-9]{4})$/s ? hex($1)
+    !! (%ENV{'RTFDEFLANG'} || '') =~ m/^([a-fA-F0-9]{4})$/s ?? hex($1)
                                       # yes, tolerate even more hex!
-    : '1033'
+    !! '1033'
   );
 
   $new->head1_halfpoint_size(32);
@@ -222,7 +222,7 @@ sub do_middle {      # the main work
           DEBUG +> 3 and print "    verbatim line count: $line_count\n";
         }
         $self->unget_token($next);
-        $self->{'rtfkeep'} = ($line_count +> 15) ? '' : '\keepn' ;     
+        $self->{'rtfkeep'} = ($line_count +> 15) ?? '' !! '\keepn' ;     
 
       } elsif( $tagname =~ m/^item-/s ) {
         my @to_unget;
@@ -255,13 +255,13 @@ sub do_middle {      # the main work
 
             DEBUG +> 1 and printf "    item-* before \%s(\%s) \%s keepn'd.\n", <
               @to_unget[-1]->type,
-              @to_unget[-1]->can('tagname') ? < @to_unget[-1]->tagname : '',
-              $self->{'rtfitemkeepn'} ? "gets" : "doesn't get";
+              @to_unget[-1]->can('tagname') ?? < @to_unget[-1]->tagname !! '',
+              $self->{'rtfitemkeepn'} ?? "gets" !! "doesn't get";
             last;
           } elsif ((nelems @to_unget) +> 40) {
             DEBUG +> 1 and print "    item-* now has too many tokens (",
               scalar(nelems @to_unget),
-              (DEBUG +> 4) ? (q<: >, < map( <$_->dump, @to_unget)) : (),
+              (DEBUG +> 4) ?? (q<: >, < map( <$_->dump, @to_unget)) !! (),
               ") to be keepn'd.\n";
             last; # give up
           }
@@ -480,10 +480,10 @@ END
 use integer;
 sub rtf_esc {
   my $x; # scratch
-  ($x = (((nelems @_) == 1) ? @_[0] : join '', @_)
+  ($x = (((nelems @_) == 1) ?? @_[0] !! join '', @_)
   ) =~ s/([F\x00-\x1F\-\\\{\}\x7F-\xFF])/%Escape{$1}/g;  # ESCAPER
   # Escape \, {, }, -, control chars, and 7f-ff.
-  $x =~ s/([^\x[00]-\x[FF]])/$('\\uc1\\u'.((ord($1)+<32768)?ord($1):(ord($1)-65536)).'?')/g;
+  $x =~ s/([^\x[00]-\x[FF]])/$('\\uc1\\u'.((ord($1)+<32768)??ord($1)!!(ord($1)-65536)).'?')/g;
   return $x;
 }
 
@@ -495,10 +495,10 @@ sub rtf_esc_codely {
   #  looks just like a normal dash character).
   
   my $x; # scratch
-  ($x = (((nelems @_) == 1) ? @_[0] : join '', @_)
+  ($x = (((nelems @_) == 1) ?? @_[0] !! join '', @_)
   ) =~ s/([F\x00-\x1F\\\{\}\x7F-\xFF])/%Escape{$1}/g;  # ESCAPER
   # Escape \, {, }, -, control chars, and 7f-ff.
-  $x =~ s/([^\x00-\xFF])/$('\\uc1\\u'.((ord($1)+<32768)?ord($1):(ord($1)-65536)).'?')/g;
+  $x =~ s/([^\x00-\xFF])/$('\\uc1\\u'.((ord($1)+<32768)??ord($1)!!(ord($1)-65536)).'?')/g;
   return $x;
 }
 

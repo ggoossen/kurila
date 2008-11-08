@@ -483,7 +483,7 @@ sub print_protos {
     my $self = shift;
     my @ret;
     foreach my $ar ( @{$self->{'protos_todo'}}) {
-	my $proto = (defined $ar->[1] ? " (". $ar->[1] . ")" : "");
+	my $proto = (defined $ar->[1] ?? " (". $ar->[1] . ")" !! "");
 	push @ret, "sub " . $ar->[0] .  "$proto;\n";
     }
     delete $self->{'protos_todo'};
@@ -575,8 +575,8 @@ sub init {
     my $self = shift;
 
     $self->{'warnings'} = defined ($self->{'ambient_warnings'})
-				? $self->{'ambient_warnings'} ^&^ WARN_MASK
-				: undef;
+				?? $self->{'ambient_warnings'} ^&^ WARN_MASK
+				!! undef;
     $self->{'hints'}    = $self->{'ambient_hints'};
     $self->{'hinthash'} = $self->{'ambient_hinthash'};
 
@@ -600,13 +600,13 @@ sub compile {
 	    my $bs = perlstring($O::savebackslash) || 'undef';
 	    print qq(BEGIN \{ \$/ = $fs; \$\\ = $bs; \}\n);
 	}
-	my @BEGINs  = @( B::begin_av->isa("B::AV") ? < B::begin_av->ARRAY : () );
+	my @BEGINs  = @( B::begin_av->isa("B::AV") ?? < B::begin_av->ARRAY !! () );
 	my @UNITCHECKs = @( B::unitcheck_av->isa("B::AV")
-	    ? < B::unitcheck_av->ARRAY
-	    : () );
-	my @CHECKs  = @( B::check_av->isa("B::AV") ? < B::check_av->ARRAY : () );
-	my @INITs   = @( B::init_av->isa("B::AV") ? < B::init_av->ARRAY : () );
-	my @ENDs    = @( B::end_av->isa("B::AV") ? < B::end_av->ARRAY : () );
+	    ?? < B::unitcheck_av->ARRAY
+	    !! () );
+	my @CHECKs  = @( B::check_av->isa("B::AV") ?? < B::check_av->ARRAY !! () );
+	my @INITs   = @( B::init_av->isa("B::AV") ?? < B::init_av->ARRAY !! () );
+	my @ENDs    = @( B::end_av->isa("B::AV") ?? < B::end_av->ARRAY !! () );
 	for my $block ( @(< @BEGINs, < @UNITCHECKs, < @CHECKs, < @INITs, < @ENDs)) {
 	    $self->todo($block, 0);
 	}
@@ -626,7 +626,7 @@ sub compile {
 
 	# Print __DATA__ section, if necessary
 	my $laststash = defined $self->{'curcop'}
-	    ? $self->{'curcop'}->stash->NAME : $self->{'curstash'};
+	    ?? $self->{'curcop'}->stash->NAME !! $self->{'curstash'};
 	if (defined *{Symbol::fetch_glob($laststash."::DATA")}{IO}) {
 	    print "package $laststash;\n"
 		unless $laststash eq $self->{'curstash'};
@@ -769,7 +769,7 @@ sub indent {
     for my $line ( @lines) {
 	my $cmd = substr($line, 0, 1);
 	if ($cmd eq "\t" or $cmd eq "\b") {
-	    $level += ($cmd eq "\t" ? 1 : -1) * $self->{'indent_size'};
+	    $level += ($cmd eq "\t" ?? 1 !! -1) * $self->{'indent_size'};
 	    if ($self->{'use_tabs'}) {
 		$leader = "\t" x ($level / 8) . " " x ($level % 8);
 	    } else {
@@ -954,10 +954,10 @@ sub maybe_parens_func {
 sub maybe_local {
     my $self = shift;
     my($op, $cx, $text) = < @_;
-    my $our_intro = ($op->name =~ m/^(gv|rv2)[ash]v$/) ? OPpOUR_INTRO : 0;
+    my $our_intro = ($op->name =~ m/^(gv|rv2)[ash]v$/) ?? OPpOUR_INTRO !! 0;
     if ($op->private ^&^ (OPpLVAL_INTRO^|^$our_intro)
 	and not $self->{'avoid_local'}->{$$op}) {
-	my $our_local = ($op->private ^&^ OPpLVAL_INTRO) ? "local" : "our";
+	my $our_local = ($op->private ^&^ OPpLVAL_INTRO) ?? "local" !! "our";
 	if( $our_local eq 'our' ) {
 	    # XXX This assertion fails code with non-ASCII identifiers,
 	    # like ./ext/Encode/t/jperl.t
@@ -1020,7 +1020,7 @@ sub lineseq {
     my($expr, @exprs);
 
     my $out_cop = $self->{'curcop'};
-    my $out_seq = defined($out_cop) ? $out_cop->cop_seq : undef;
+    my $out_seq = defined($out_cop) ?? $out_cop->cop_seq !! undef;
     my $limit_seq;
     if (defined $root) {
 	$limit_seq = $out_seq;
@@ -1091,7 +1091,7 @@ sub scopeop {
         }
     } else {
 	my $lineseq = $self->lineseq($op, < @kids);
-	return length ($lineseq) ? "$lineseq;" : "";
+	return length ($lineseq) ?? "$lineseq;" !! "";
     }
 }
 
@@ -1189,7 +1189,7 @@ sub stash_variable {
 	return "$prefix$name";
     }
 
-    my $v = ($prefix eq '$#' ? '@' : $prefix) . $name;
+    my $v = ($prefix eq '$#' ?? '@' !! $prefix) . $name;
     return "$prefix$name" if $name =~ m/^(\W|_$)/; # no stash for magic variables.
     return $prefix .$self->{'curstash'}.'::'. $name if 1; # if $self->lex_in_scope($v);
     return "$prefix$name";
@@ -1232,8 +1232,8 @@ sub populate_curcvlex {
             my $name = @ns[$i]->PVX_const;
 	    my ($seq_st, $seq_en) =
 		(@ns[$i]->FLAGS ^&^ SVf_FAKE)
-		    ? (0, 999999)
-		    : (@ns[$i]->COP_SEQ_RANGE_LOW, @ns[$i]->COP_SEQ_RANGE_HIGH);
+		    ?? (0, 999999)
+		    !! (@ns[$i]->COP_SEQ_RANGE_LOW, @ns[$i]->COP_SEQ_RANGE_HIGH);
 
 	    push @{$self->{'curcvlex'}->{$name}}, \@($seq_st, $seq_en);
 	}
@@ -1478,7 +1478,7 @@ sub pfixop {
     my($op, $cx, $name, $prec, $flags) = (< @_, 0);
     my $kid = $op->first;
     $kid = $self->deparse($kid, $prec);
-    return $self->maybe_parens(($flags ^&^ POSTFIX) ? "$kid$name" : "$name$kid",
+    return $self->maybe_parens(($flags ^&^ POSTFIX) ?? "$kid$name" !! "$name$kid",
 			       $cx, $prec);
 }
 
@@ -1529,7 +1529,7 @@ sub unop {
 
 	return $self->maybe_parens_unop($name, $kid, $cx);
     } else {
-	return $name .  ($op->flags ^&^ OPf_SPECIAL ? "()" : "");
+	return $name .  ($op->flags ^&^ OPf_SPECIAL ?? "()" !! "");
     }
 }
 
@@ -1610,7 +1610,7 @@ sub pp_readline {
 	$kid = $op->first;
 	return $self->maybe_parens_unop($name, $kid, $cx);
     } else {
-	return $name .  ($op->flags ^&^ OPf_SPECIAL ? "()" : "");
+	return $name .  ($op->flags ^&^ OPf_SPECIAL ?? "()" !! "");
     }
 }
 
@@ -1711,7 +1711,7 @@ sub pp_delete {
 sub pp_require {
     my $self = shift;
     my($op, $cx) = < @_;
-    my $opname = $op->flags ^&^ OPf_SPECIAL ? 'CORE::require' : 'require';
+    my $opname = $op->flags ^&^ OPf_SPECIAL ?? 'CORE::require' !! 'require';
     if (class($op) eq "UNOP" and $op->first->name eq "const"
 	and $op->first->private ^&^ OPpCONST_BARE)
     {
@@ -1824,7 +1824,7 @@ sub dq_unop {
        $kid = $kid->sibling if not null < $kid->sibling;
        return $self->maybe_parens_unop($name, $kid, $cx);
     } else {
-       return $name .  ($op->flags ^&^ OPf_SPECIAL ? "()" : "");
+       return $name .  ($op->flags ^&^ OPf_SPECIAL ?? "()" !! "");
     }
 }
 
@@ -1922,7 +1922,7 @@ sub assoc_class {
 	# their associativity).
 	return assoc_class($op->first);
     }
-    return $name . ($op->flags ^&^ OPf_STACKED ? "=" : "");
+    return $name . ($op->flags ^&^ OPf_STACKED ?? "=" !! "");
 }
 
 # Left associative operators, like `+', for which
@@ -2125,7 +2125,7 @@ sub pp_flop {
     my $self = shift;
     my($op, $cx) = < @_;
     my $flip = $op->first;
-    my $type = ($flip->flags ^&^ OPf_SPECIAL) ? "..." : "..";
+    my $type = ($flip->flags ^&^ OPf_SPECIAL) ?? "..." !! "..";
     return $self->range( <$flip->first, $cx, $type);
 }
 
@@ -2359,8 +2359,8 @@ sub indirop {
 	$kid = $kid->sibling;
     }
     if ($name eq "sort" && $op->private ^&^ (OPpSORT_NUMERIC ^|^ OPpSORT_INTEGER)) {
-	$indir = ($op->private ^&^ OPpSORT_DESCEND) ? '{$b <+> $a} '
-						  : '{$a <+> $b} ';
+	$indir = ($op->private ^&^ OPpSORT_DESCEND) ?? '{$b <+> $a} '
+						  !! '{$a <+> $b} ';
     }
     elsif ($name eq "sort" && $op->private ^&^ OPpSORT_DESCEND) {
 	$indir = '{$b cmp $a} ';
@@ -2895,7 +2895,7 @@ sub elem_or_slice_array_name
     } elsif ($array->name eq "gv") {
 	$array = $self->gv_name( <$self->gv_or_padgv($array));
 	if ($array !~ m/::/) {
-	    my $prefix = ($left eq '[' ? '@' : '%');
+	    my $prefix = ($left eq '[' ?? '@' !! '%');
 	    $array = $self->{curstash}.'::'.$array
 		if $self->lex_in_scope($prefix . $array);
 	}
@@ -2957,7 +2957,7 @@ sub elem {
 	return $array_name . $left . $idx . $right;
     } else {
 	# $x[20][3]{hi} or expr->[20]
-	my $arrow = is_subscriptable($array) ? "" : "->";
+	my $arrow = is_subscriptable($array) ?? "" !! "->";
 	return $self->deparse($array, 24) . $arrow . $left . $idx . $right;
     }
 
@@ -2975,7 +2975,7 @@ sub pp_gelem {
     my $scope = is_scope($glob);
     $glob = $self->deparse($glob, 0);
     $part = $self->deparse($part, 1);
-    return "*" . ($scope ? "\{$glob\}" : $glob) . "\{$part\}";
+    return "*" . ($scope ?? "\{$glob\}" !! $glob) . "\{$part\}";
 }
 
 sub slice {
@@ -3228,7 +3228,7 @@ sub pp_entersub {
 	$kid = $self->deparse($kid, 24);
     } else {
 	$prefix = "";
-	my $arrow = is_subscriptable($kid->first) ? "" : "->";
+	my $arrow = is_subscriptable($kid->first) ?? "" !! "->";
 	$kid = $self->deparse($kid, 24) . $arrow;
     }
 
@@ -3272,7 +3272,7 @@ sub pp_entersub {
 	# it back.
 	$kid =~ s/^CORE::GLOBAL:://;
 
-	my $dproto = defined($proto) ? $proto : "undefined";
+	my $dproto = defined($proto) ?? $proto !! "undefined";
         if (!$declared) {
 	    return "$kid(" . $args . ")";
 	} elsif ($dproto eq "") {
@@ -3336,7 +3336,7 @@ sub re_uninterp {
           | \\[uUlLQE]
           )
 
-	/$(defined($4) && length($4) ? "$1$2$4" : "$1$2\\$3")/xg;
+	/$(defined($4) && length($4) ?? "$1$2$4" !! "$1$2\\$3")/xg;
 
     return $str;
 }
@@ -3364,7 +3364,7 @@ sub re_uninterp_extended {
           | \\[uUlLQE]
           )
 
-	/$(defined($4) && length($4) ? "$1$2$4" : "$1$2\\$3")/xg;
+	/$(defined($4) && length($4) ?? "$1$2$4" !! "$1$2\\$3")/xg;
 
     return $str;
 }
@@ -3408,7 +3408,7 @@ my %unctrl = # portable to to EBCDIC
 # character escapes, but not delimiters that might need to be escaped
 sub escape_str { # ASCII, UTF8
     my($str) = < @_;
-    $str =~ s/(.)/$(ord($1) +> 255 ? sprintf("\\x\{\%x\}", ord($1)) : $1)/g;
+    $str =~ s/(.)/$(ord($1) +> 255 ?? sprintf("\\x\{\%x\}", ord($1)) !! $1)/g;
     $str =~ s/\a/\\a/g;
 #    $str =~ s/\cH/\\b/g; # \b means something different in a regex
     $str =~ s/\t/\\t/g;
@@ -3425,9 +3425,9 @@ sub escape_str { # ASCII, UTF8
 # Leave whitespace unmangled.
 sub escape_extended_re {
     my($str) = < @_;
-    $str =~ s/(.)/$(ord($1) +> 255 ? sprintf("\\x\{\%x\}", ord($1)) : $1)/g;
+    $str =~ s/(.)/$(ord($1) +> 255 ?? sprintf("\\x\{\%x\}", ord($1)) !! $1)/g;
     $str =~ s/([[:^print:]])/$(
-	($1 =~ m![ \t\n]!) ? $1 : sprintf("\\\%03o", ord($1)))/g;
+	($1 =~ m![ \t\n]!) ?? $1 !! sprintf("\\\%03o", ord($1)))/g;
     $str =~ s/\n/\n\f/g;
     return $str;
 }
@@ -3702,7 +3702,7 @@ sub pp_backtick {
     my($op, $cx) = < @_;
     # skip pushmark if it exists (readpipe() vs ``)
     my $child = $op->first->sibling->isa('B::NULL')
-	? $op->first->first : $op->first->sibling;
+	?? $op->first->first !! $op->first->sibling;
     return single_delim("qx", '`', < $self->dq($child));
 }
 

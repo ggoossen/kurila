@@ -64,15 +64,15 @@ sub copy {
     my $to = shift;
 
     my $from_a_handle = (ref($from)
-			 ? (ref($from) eq 'GLOB'
+			 ?? (ref($from) eq 'GLOB'
 			    || UNIVERSAL::isa($from, 'GLOB')
                             || UNIVERSAL::isa($from, 'IO::Handle'))
-			 : (ref(\$from) eq 'GLOB'));
+			 !! (ref(\$from) eq 'GLOB'));
     my $to_a_handle =   (ref($to)
-			 ? (ref($to) eq 'GLOB'
+			 ?? (ref($to) eq 'GLOB'
 			    || UNIVERSAL::isa($to, 'GLOB')
                             || UNIVERSAL::isa($to, 'IO::Handle'))
-			 : (ref(\$to) eq 'GLOB'));
+			 !! (ref(\$to) eq 'GLOB'));
 
     if (_eq($from, $to)) { # works for references, too
 	warn("'$from' and '$to' are identical (not copied)");
@@ -184,7 +184,7 @@ sub copy {
 	$size = shift(@_) + 0;
 	die("Bad buffer size for copy: $size\n") unless ($size +> 0);
     } else {
-	$size = tied(*$from_h) ? 0 : -s $from_h || 0;
+	$size = tied(*$from_h) ?? 0 !! -s $from_h || 0;
 	$size = 1024 if ($size +< 512);
 	$size = $Too_Big if ($size +> $Too_Big);
     }

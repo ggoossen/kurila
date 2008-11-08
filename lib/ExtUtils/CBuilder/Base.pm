@@ -129,7 +129,7 @@ sub have_compiler {
     @lib_files = $self->link(objects => $obj_file, module_name => 'compilet');
   };
   warn $@ if $@;
-  my $result = $self->{have_compiler} = $@ ? 0 : 1;
+  my $result = $self->{have_compiler} = $@ ?? 0 !! 1;
   
   foreach ( grep defined, @( $tmpfile, $obj_file, < @lib_files)) {
     1 while unlink;
@@ -170,7 +170,7 @@ sub prelink {
     NAME     => %args{dl_name},		# Name of the Perl module
     DLBASE   => %args{dl_base},		# Basename of DLL file
     FILE     => %args{dl_file},		# Dir + Basename of symlist file
-    VERSION  => (defined %args{dl_version} ? %args{dl_version} : '0.0'),
+    VERSION  => (defined %args{dl_version} ?? %args{dl_version} !! '0.0'),
   );
   
   # Mksymlists will create one of these files
@@ -205,7 +205,7 @@ sub _do_link {
 		      $self->extra_link_args_after_prelink(< %args, dl_name => %args{module_name},
 							   prelink_res => \@temp_files));
 
-  my @output = @( %args{lddl} ? < $self->arg_share_object_file($out) : < $self->arg_exec_file($out) );
+  my @output = @( %args{lddl} ?? < $self->arg_share_object_file($out) !! < $self->arg_exec_file($out) );
   my @shrp = $self->split_like_shell($cf->{shrpenv});
   my @ld = $self->split_like_shell($cf->{ld});
   

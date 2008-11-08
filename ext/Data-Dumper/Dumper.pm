@@ -105,9 +105,9 @@ sub Seen {
       if (defined $v and ref $v) {
 	$id = format_refaddr($v);
 	if ($k =~ m/^[*](.*)$/) {
-	  $k = (ref $v eq 'ARRAY') ? ( "\\\@" . $1 ) :
-	       (ref $v eq 'HASH')  ? ( "\\\%" . $1 ) :
-	       (ref $v eq 'CODE')  ? ( "\\\&" . $1 ) :
+	  $k = (ref $v eq 'ARRAY') ?? ( "\\\@" . $1 ) !!
+	       (ref $v eq 'HASH')  ?? ( "\\\%" . $1 ) !!
+	       (ref $v eq 'CODE')  ?? ( "\\\&" . $1 ) !!
 				     (   "\$" . $1 ) ;
 	}
 	elsif ($k !~ m/^\$/) {
@@ -179,9 +179,9 @@ sub Dumpperl {
     if (defined $name) {
       if ($name =~ m/^[*](.*)$/) {
 	if (defined $val) {
-	  $name = (ref::svtype($val) eq 'ARRAY') ? ( '@' . $1 ) :
-		  (ref::svtype($val) eq 'HASH')  ? ( '%' . $1 ) :
-		  (ref::svtype($val) eq 'CODE')  ? ( '*' . $1 ) :
+	  $name = (ref::svtype($val) eq 'ARRAY') ?? ( '@' . $1 ) !!
+		  (ref::svtype($val) eq 'HASH')  ?? ( '%' . $1 ) !!
+		  (ref::svtype($val) eq 'CODE')  ?? ( '*' . $1 ) !!
                                                    ( '$' . $1 ) ;
 	}
 	else {
@@ -257,7 +257,7 @@ sub _dump {
 
         require Scalar::Util;
         $realpack = Scalar::Util::blessed($val);
-        $realtype = $realpack ? Scalar::Util::reftype($val) : ref $val;
+        $realtype = $realpack ?? Scalar::Util::reftype($val) !! ref $val;
         my $id = format_refaddr($val);
 
         # if it has a name, we need to either look it up, or keep a tab
@@ -267,8 +267,8 @@ sub _dump {
             if (exists $s->{seen}->{$id}) {
                 #	if ($s->{expdepth} < $s->{level}) {
                 if ($s->{purity} and $s->{level} +> 0) {
-                    $out = ($realtype eq 'HASH')  ? '\%()' :
-                      ($realtype eq 'ARRAY') ? '\@()' :
+                    $out = ($realtype eq 'HASH')  ?? '\%()' !!
+                      ($realtype eq 'ARRAY') ?? '\@()' !!
                         'do{my $o}' ;
                     push @post, $name . " = " . $s->{seen}->{$id}->[0];
                 } else {
@@ -286,9 +286,9 @@ sub _dump {
                 #        }
             } else {
                 # store our name
-                $s->{seen}->{$id} = \@( (($name =~ m/^[@%]/)     ? ('\' . $name ) :
+                $s->{seen}->{$id} = \@( (($name =~ m/^[@%]/)     ?? ('\' . $name ) !!
 			     ($realtype eq 'CODE' and
-			      $name =~ m/^[*](.*)$/) ? ('\&' . $1 )   :
+			      $name =~ m/^[*](.*)$/) ?? ('\&' . $1 )   !!
                                          $name          ),
                                         $val );
             }
@@ -448,8 +448,8 @@ sub _dump {
                 $keys = \ sort keys %$rval;
             }
         }
-        while (($k, $v) = ! $sortkeys ? (each %$rval) :
-               (nelems @$keys) ? ($key = shift(@$keys), $rval->{$key}) :
+        while (($k, $v) = ! $sortkeys ?? (each %$rval) !!
+               (nelems @$keys) ?? ($key = shift(@$keys), $rval->{$key}) !!
                () ) {
             my $nk = $s->_dump($k, "");
             $nk = $1 if !$s->{quotekeys} and $nk =~ m/^[\"\']([A-Za-z_]\w*)[\"\']$/;
@@ -549,72 +549,72 @@ sub Indent {
 
 sub Pair {
     my($s, $v) = < @_;
-    defined($v) ? do { ($s->{pair} = $v); return $s} : $s->{pair};
+    defined($v) ?? do { ($s->{pair} = $v); return $s} !! $s->{pair};
 }
 
 sub Pad {
   my($s, $v) = < @_;
-  defined($v) ? do { ($s->{pad} = $v); return $s} : $s->{pad};
+  defined($v) ?? do { ($s->{pad} = $v); return $s} !! $s->{pad};
 }
 
 sub Varname {
   my($s, $v) = < @_;
-  defined($v) ? do {($s->{varname} = $v); return $s} : $s->{varname};
+  defined($v) ?? do {($s->{varname} = $v); return $s} !! $s->{varname};
 }
 
 sub Purity {
   my($s, $v) = < @_;
-  defined($v) ? do {($s->{purity} = $v); return $s} : $s->{purity};
+  defined($v) ?? do {($s->{purity} = $v); return $s} !! $s->{purity};
 }
 
 sub Useqq {
   my($s, $v) = < @_;
-  defined($v) ? do {($s->{useqq} = $v); return $s} : $s->{useqq};
+  defined($v) ?? do {($s->{useqq} = $v); return $s} !! $s->{useqq};
 }
 
 sub Terse {
   my($s, $v) = < @_;
-  defined($v) ? do {($s->{terse} = $v); return $s} : $s->{terse};
+  defined($v) ?? do {($s->{terse} = $v); return $s} !! $s->{terse};
 }
 
 sub Freezer {
   my($s, $v) = < @_;
-  defined($v) ? do {($s->{freezer} = $v); return $s} : $s->{freezer};
+  defined($v) ?? do {($s->{freezer} = $v); return $s} !! $s->{freezer};
 }
 
 sub Toaster {
   my($s, $v) = < @_;
-  defined($v) ? do {($s->{toaster} = $v); return $s} : $s->{toaster};
+  defined($v) ?? do {($s->{toaster} = $v); return $s} !! $s->{toaster};
 }
 
 sub Deepcopy {
   my($s, $v) = < @_;
-  defined($v) ? do {($s->{deepcopy} = $v); return $s} : $s->{deepcopy};
+  defined($v) ?? do {($s->{deepcopy} = $v); return $s} !! $s->{deepcopy};
 }
 
 sub Quotekeys {
   my($s, $v) = < @_;
-  defined($v) ? do {($s->{quotekeys} = $v); return $s} : $s->{quotekeys};
+  defined($v) ?? do {($s->{quotekeys} = $v); return $s} !! $s->{quotekeys};
 }
 
 sub Bless {
   my($s, $v) = < @_;
-  defined($v) ? do {($s->{'bless'} = $v); return $s} : $s->{'bless'};
+  defined($v) ?? do {($s->{'bless'} = $v); return $s} !! $s->{'bless'};
 }
 
 sub Maxdepth {
   my($s, $v) = < @_;
-  defined($v) ? do {($s->{'maxdepth'} = $v); return $s} : $s->{'maxdepth'};
+  defined($v) ?? do {($s->{'maxdepth'} = $v); return $s} !! $s->{'maxdepth'};
 }
 
 sub Sortkeys {
   my($s, $v) = < @_;
-  defined($v) ? do {($s->{'sortkeys'} = $v); return $s} : $s->{'sortkeys'};
+  defined($v) ?? do {($s->{'sortkeys'} = $v); return $s} !! $s->{'sortkeys'};
 }
 
 sub Deparse {
   my($s, $v) = < @_;
-  defined($v) ? do {($s->{'deparse'} = $v); return $s} : $s->{'deparse'};
+  defined($v) ?? do {($s->{'deparse'} = $v); return $s} !! $s->{'deparse'};
 }
 
 # used by qquote below

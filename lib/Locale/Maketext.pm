@@ -51,9 +51,9 @@ sub numerate {
 
   return '' unless (nelems @forms);
   if((nelems @forms) == 1) { # only the headword form specified
-    return $s ? @forms[0] :  @(@forms[0] . 's'); # very cheap hack.
+    return $s ?? @forms[0] !!  @(@forms[0] . 's'); # very cheap hack.
   } else { # sing and plural were specified
-    return $s ? @forms[0] : @forms[1];
+    return $s ?? @forms[0] !! @forms[1];
   }
 }
 
@@ -73,7 +73,7 @@ sub numf {
    #  backtrack so it un-eats the rightmost three, and then we
    #  insert the comma there.
 
-  $num =~ s<(.,)><$($1 eq ',' ? '.' : ',')>g if ref($handle) and $handle->{'numf_comma'};
+  $num =~ s<(.,)><$($1 eq ',' ?? '.' !! ',')>g if ref($handle) and $handle->{'numf_comma'};
    # This is just a lame hack instead of using Number::Format
   return $num;
 }
@@ -406,7 +406,7 @@ sub _lex_refs {  # report the lexicon references for this handle's class
   return %isa_scan{$class} if exists %isa_scan{$class};  # memoization!
 
   my @lex_refs;
-  my $seen_r = ref(@_[1]) ? @_[1] : \%();
+  my $seen_r = ref(@_[1]) ?? @_[1] !! \%();
 
   if( defined( *{Symbol::fetch_glob($class . '::Lexicon')}{'HASH'} )) {
     push @lex_refs, *{Symbol::fetch_glob($class . '::Lexicon')}{'HASH'};

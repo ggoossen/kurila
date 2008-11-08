@@ -12,8 +12,8 @@ BEGIN {
 require './test.pl';
 plan( tests => 16 );
 
-my $wanted_filename = $^O eq 'VMS' ? '0.' : '0';
-my $saved_filename = $^O eq 'MacOS' ? ':0' : './0';
+my $wanted_filename = $^O eq 'VMS' ?? '0.' !! '0';
+my $saved_filename = $^O eq 'MacOS' ?? ':0' !! './0';
 
 cmp_ok($warns,'==',0,'no warns at start');
 
@@ -45,7 +45,7 @@ cmp_ok($seen,'==',1,'seen in do/while');
 seek(FILE,0,0);
 $seen = 0;
 my $name;
-while (($seen ? $dummy : $name) = ~< *FILE )
+while (($seen ?? $dummy !! $name) = ~< *FILE )
  {
   $seen++ if $name eq '0';
  }
@@ -61,7 +61,7 @@ while (%where{$seen} = ~< *FILE)
 cmp_ok($seen,'==',1,'seen in hash while()');
 close FILE;
 
-opendir(DIR,($^O eq 'MacOS' ? ':' : '.'));
+opendir(DIR,($^O eq 'MacOS' ?? ':' !! '.'));
 ok(defined('DIR'),'opened current directory');
 $seen = 0;
 while (my $name = readdir(DIR))
@@ -73,7 +73,7 @@ cmp_ok($seen,'==',1,'saw work file once');
 rewinddir(DIR);
 $seen = 0;
 $dummy = '';
-while (($seen ? $dummy : $name) = readdir(DIR))
+while (($seen ?? $dummy !! $name) = readdir(DIR))
  {
   $seen++ if $name eq $wanted_filename;
  }
@@ -101,7 +101,7 @@ cmp_ok($seen,'==',1,'seen in each');
 
 $seen = 0;
 $dummy = '';
-while (($seen ? $dummy : my $name) = each %hash)
+while (($seen ?? $dummy !! my $name) = each %hash)
  {
   $seen++ if $name eq '0';
  }

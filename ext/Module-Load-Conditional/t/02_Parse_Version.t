@@ -3,7 +3,7 @@ use Test::More  'no_plan';
 
 my $Class   = 'Module::Load::Conditional';
 my $Meth    = '_parse_version';
-my $Verbose = (nelems @ARGV) ? 1 : 0;
+my $Verbose = (nelems @ARGV) ?? 1 !! 0;
 
 use_ok( $Class );
 

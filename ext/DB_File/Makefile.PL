@@ -20,7 +20,7 @@ WriteMakefile(
 	OBJECT		=> 'version$(OBJ_EXT) DB_File$(OBJ_EXT)',
 	XSPROTOARG	=> '-noprototypes',
 	DEFINE		=> $OS2 || "",
-	INC		=> ($^O eq "MacOS" ? "-i ::::db:include" : ""),
+	INC		=> ($^O eq "MacOS" ?? "-i ::::db:include" !! ""),
         XS_VERSION      => eval MM->parse_version('DB_File.pm'),
         LICENSE  => 'perl',
         ABSTRACT_FROM => 'DB_File.pm',

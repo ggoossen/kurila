@@ -19,9 +19,9 @@ do {
     map scalar(sort( @())), @( ('')x68);
 };
 
-sub Backwards { ($a cmp $b) +< 0 ? 1 : ($a cmp $b) +> 0 ? -1 : 0 }
-sub Backwards_stacked($$) { my($x,$y) = < @_; ($x cmp $y) +< 0 ? 1 : ($x cmp $y) +> 0 ? -1 : 0 }
-sub Backwards_other { ($a cmp $b) +< 0 ? 1 : ($a cmp $b) +> 0 ? -1 : 0 }
+sub Backwards { ($a cmp $b) +< 0 ?? 1 !! ($a cmp $b) +> 0 ?? -1 !! 0 }
+sub Backwards_stacked($$) { my($x,$y) = < @_; ($x cmp $y) +< 0 ?? 1 !! ($x cmp $y) +> 0 ?? -1 !! 0 }
+sub Backwards_other { ($a cmp $b) +< 0 ?? 1 !! ($a cmp $b) +> 0 ?? -1 !! 0 }
 
 my $upperfirst = ('A' cmp 'a') +< 0;
 
@@ -43,23 +43,23 @@ our @harry = @('dog','cat','x','Cain','Abel');
 our @george = @('gone','chased','yz','punished','Axed');
 
 our $x = join('', sort @harry);
-our $expected = $upperfirst ? 'AbelCaincatdogx' : 'catdogxAbelCain';
+our $expected = $upperfirst ?? 'AbelCaincatdogx' !! 'catdogxAbelCain';
 
 cmp_ok($x,'eq',$expected,'upper first 1');
 
 $x = join('', sort( { Backwards } @harry));
-$expected = $upperfirst ? 'xdogcatCainAbel' : 'CainAbelxdogcat';
+$expected = $upperfirst ?? 'xdogcatCainAbel' !! 'CainAbelxdogcat';
 
 cmp_ok($x,'eq',$expected,'upper first 2');
 
 $x = join('', sort( { Backwards_stacked($a, $b) } @harry));
-$expected = $upperfirst ? 'xdogcatCainAbel' : 'CainAbelxdogcat';
+$expected = $upperfirst ?? 'xdogcatCainAbel' !! 'CainAbelxdogcat';
 
 cmp_ok($x,'eq',$expected,'upper first 3');
 
 $x = join('', sort @( < @george, 'to', < @harry));
-$expected = $upperfirst ?
-    'AbelAxedCaincatchaseddoggonepunishedtoxyz' :
+$expected = $upperfirst ??
+    'AbelAxedCaincatchaseddoggonepunishedtoxyz' !!
     'catchaseddoggonepunishedtoxyzAbelAxedCain' ;
 
 cmp_ok($x,'eq',$expected,'upper first 4');
@@ -159,11 +159,11 @@ do {
 cmp_ok("$(join ' ',@b)",'eq','1996 255 90 19 5','force blockness');
 
 $x = join('', sort { $a cmp $b } @harry);
-$expected = $upperfirst ? 'AbelCaincatdogx' : 'catdogxAbelCain';
+$expected = $upperfirst ?? 'AbelCaincatdogx' !! 'catdogxAbelCain';
 cmp_ok($x,'eq',$expected,'a cmp b');
 
 $x = join('', sort { $b cmp $a } @harry);
-$expected = $upperfirst ? 'xdogcatCainAbel' : 'CainAbelxdogcat';
+$expected = $upperfirst ?? 'xdogcatCainAbel' !! 'CainAbelxdogcat';
 cmp_ok($x,'eq',$expected,'b cmp a');
 
 do {
@@ -175,11 +175,11 @@ do {
     cmp_ok("$(join ' ',@b)",'eq','1996 255 90 19 5','integer b <=> a');
 
     $x = join('', sort { $a cmp $b } @harry);
-    $expected = $upperfirst ? 'AbelCaincatdogx' : 'catdogxAbelCain';
+    $expected = $upperfirst ?? 'AbelCaincatdogx' !! 'catdogxAbelCain';
     cmp_ok($x,'eq',$expected,'integer a cmp b');
 
     $x = join('', sort { $b cmp $a } @harry);
-    $expected = $upperfirst ? 'xdogcatCainAbel' : 'CainAbelxdogcat';
+    $expected = $upperfirst ?? 'xdogcatCainAbel' !! 'CainAbelxdogcat';
     cmp_ok($x,'eq',$expected,'integer b cmp a');
 
 };
@@ -239,7 +239,7 @@ do {
     is "$(join ' ',@g)", "3 2 1", "inplace reversed sort of global";
 
     @g = @(2,3,1);
-    $r1 = \@g[1]; @g =sort { $a+<$b?1:$a+>$b?-1:0 } @g; $r2 = \@g[0];
+    $r1 = \@g[1]; @g =sort { $a+<$b??1!!$a+>$b??-1!!0 } @g; $r2 = \@g[0];
     is "$(join ' ',@g)", "3 2 1", "inplace custom sort of global";
 
     #  [perl #29790] don't optimise @a = ('a', sort @a) !
@@ -259,9 +259,9 @@ do {
     @g = @(2,3,1); @g = @(( <sort { $b <+> $a } @g),'4');
     is "$(join ' ',@g)", "3 2 1 4", "un-inplace reversed sort of global 2";
 
-    @g = @(2,3,1); @g = @('0', < sort { $a+<$b?1:$a+>$b?-1:0 } @g);
+    @g = @(2,3,1); @g = @('0', < sort { $a+<$b??1!!$a+>$b??-1!!0 } @g);
     is "$(join ' ',@g)", "0 3 2 1", "un-inplace custom sort of global";
-    @g = @(2,3,1); @g = @(( <sort { $a+<$b?1:$a+>$b?-1:0 } @g),'4');
+    @g = @(2,3,1); @g = @(( <sort { $a+<$b??1!!$a+>$b??-1!!0 } @g),'4');
     is "$(join ' ',@g)", "3 2 1 4", "un-inplace custom sort of global 2";
 };
 

@@ -12,7 +12,7 @@ my $BUILD_ZLIB = 0 ;
 my $OLD_ZLIB = '' ;
 my $WALL = '' ;
 my $GZIP_OS_CODE = -1 ;
-my $USE_PPPORT_H = (%ENV{PERL_CORE}) ? '' : '-DUSE_PPPORT_H';
+my $USE_PPPORT_H = (%ENV{PERL_CORE}) ?? '' !! '-DUSE_PPPORT_H';
 
 #$WALL = ' -pedantic ' if $Config{'cc'} =~ /gcc/ ;
 #$WALL = ' -Wall -Wno-comment ' if $Config{'cc'} =~ /gcc/ ;
@@ -72,8 +72,8 @@ WriteMakefile(
 
     (
       $BUILD_ZLIB
-        ? < zlib_files($ZLIB_LIB)
-        : (LIBS => \@( "-L$ZLIB_LIB -lz " ))
+        ?? < zlib_files($ZLIB_LIB)
+        !! (LIBS => \@( "-L$ZLIB_LIB -lz " ))
     ),
       
     ABSTRACT_FROM => 'lib/Compress/Raw/Zlib.pm',
@@ -235,8 +235,8 @@ sub ParseCONFIG
     }
 
     $GZIP_OS_CODE = defined %ENV{'GZIP_OS_CODE'} 
-                          ? %ENV{'GZIP_OS_CODE'} 
-                          : %Info{'GZIP_OS_CODE'} ;
+                          ?? %ENV{'GZIP_OS_CODE'} 
+                          !! %Info{'GZIP_OS_CODE'} ;
 
 	die "GZIP_OS_CODE not 'AUTO_DETECT' or a number between 0 and 255\n"
 	   unless uc $GZIP_OS_CODE eq 'AUTO_DETECT'

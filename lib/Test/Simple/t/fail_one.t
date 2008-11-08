@@ -33,7 +33,7 @@ sub ok ($;$) {
     print $ok;
     $test_num++;
 
-    return $test ? 1 : 0;
+    return $test ?? 1 !! 0;
 }
 
 

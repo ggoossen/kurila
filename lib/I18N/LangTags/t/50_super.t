@@ -64,7 +64,7 @@ foreach my $in ( @in) {
     #print "{@in}{@should}\n";
   };
   my @out = implicate_supers(
-    ("$(join ' ',@in)" eq 'NIX') ? () : < @in
+    ("$(join ' ',@in)" eq 'NIX') ?? () !! < @in
   );
   #print "O: ", join(' ', map "<$_>", @out), "\n";
   @out = @( 'NIX' ) unless (nelems @out);

@@ -32,11 +32,11 @@ sub _do_link {
     my $lib = DynaLoader::mod2fname(\split m/::/, %args{module_name});
 
     # Now know the basename, find directory parts via lib_file, or objects
-    my $objs = ( (ref %args{objects}) ? %args{objects} : \@(%args{objects}) );
+    my $objs = ( (ref %args{objects}) ?? %args{objects} !! \@(%args{objects}) );
     my $near_obj = $self->lib_file(< @$objs);
-    my $ref_file = ( defined %args{lib_file} ? %args{lib_file} : $near_obj );
-    my $lib_dir = ($ref_file =~ m,(.*)[/\\],s ? "$1/" : '' );
-    my $exp_dir = ($near_obj =~ m,(.*)[/\\],s ? "$1/" : '' );
+    my $ref_file = ( defined %args{lib_file} ?? %args{lib_file} !! $near_obj );
+    my $lib_dir = ($ref_file =~ m,(.*)[/\\],s ?? "$1/" !! '' );
+    my $exp_dir = ($near_obj =~ m,(.*)[/\\],s ?? "$1/" !! '' );
 
     %args{dl_file} = $1 if $near_obj =~ m,(.*)\.,s; # put ExportList near OBJ
     %args{lib_file} = "$lib_dir$lib.$self->{config}->{dlext}";	# DLL file
@@ -61,8 +61,8 @@ sub extra_link_args_after_prelink {
   die "No .def file created by `prelink' stage"
     unless (nelems @DEF) or not nelems @{%args{prelink_res}};
 
-  my @after_libs = @($OS2::is_aout ? ()
-      : $self->perl_inc() . "/libperl_override$self->{config}->{lib_ext}");
+  my @after_libs = @($OS2::is_aout ?? ()
+      !! $self->perl_inc() . "/libperl_override$self->{config}->{lib_ext}");
   # , "-L", "-lperl"
   return @(@after_libs, @DEF);
 }

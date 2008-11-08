@@ -266,7 +266,7 @@ sub new {
     ## If they are in the argument list, they will override the defaults.
     my $self = \%(
           -name       => undef,
-          -text       => ((nelems @_) == 1) ? shift : undef,
+          -text       => ((nelems @_) == 1) ?? shift !! undef,
           -file       => '<unknown-file>',
           -line       => 0,
           -prefix     => '=',
@@ -471,7 +471,7 @@ sub new {
     ## certain values by specifying them *before* the arguments passed.
     ## If they are in the argument list, they will override the defaults.
     my $self = \%(
-          -name       => ((nelems @_) == 1) ? @_[0] : undef,
+          -name       => ((nelems @_) == 1) ?? @_[0] !! undef,
           -file       => '<unknown-file>',
           -line       => 0,
           -ldelim     => '<',
@@ -484,7 +484,7 @@ sub new {
     if ( (ref $ptree) =~ m/^(ARRAY)?$/ ) {
         ## We have an array-ref, or a normal scalar. Pass it as an
         ## an argument to the ptree-constructor
-        $ptree = Pod::ParseTree->new($1 ? \@($ptree) : $ptree);
+        $ptree = Pod::ParseTree->new($1 ?? \@($ptree) !! $ptree);
     }
     $self->{'-ptree'} = $ptree;
 
@@ -613,7 +613,7 @@ sub raw_text {
    my $self = shift;
    my $text = $self->{'-name'} . $self->{'-ldelim'};
    for (  $self->{'-ptree'}->children ) {
-      $text .= (ref $_) ? $_->raw_text : $_;
+      $text .= (ref $_) ?? $_->raw_text !! $_;
    }
    $text .= $self->{'-rdelim'};
    return $text;
@@ -755,7 +755,7 @@ sub new {
     my $this = shift;
     my $class = ref($this) || $this;
 
-    my $self = ((nelems @_) == 1  and  ref @_[0]) ? @_[0] : \@();
+    my $self = ((nelems @_) == 1  and  ref @_[0]) ?? @_[0] !! \@();
 
     ## Bless ourselves into the desired class and perform any initialization
     bless $self, $class;
@@ -782,7 +782,7 @@ children for the top node.
 sub top {
    my $self = shift;
    if ((nelems @_) +> 0) {
-      @{ $self } = @( ((nelems @_) == 1  and  ref @_[0]) ? ${ nelems @_ } : < @_ );
+      @{ $self } = @( ((nelems @_) == 1  and  ref @_[0]) ?? ${ nelems @_ } !! < @_ );
    }
    return $self;
 }
@@ -806,7 +806,7 @@ children for the top node.
 sub children {
    my $self = shift;
    if ((nelems @_) +> 0) {
-      @{ $self } = @( ((nelems @_) == 1  and  ref @_[0]) ? ${ nelems @_ } : < @_ );
+      @{ $self } = @( ((nelems @_) == 1  and  ref @_[0]) ?? ${ nelems @_ } !! < @_ );
    }
    return @{ $self };
 }
@@ -884,7 +884,7 @@ sub raw_text {
    my $self = shift;
    my $text = "";
    for (  @$self ) {
-      $text .= (ref $_) ? $_->raw_text : $_;
+      $text .= (ref $_) ?? $_->raw_text !! $_;
    }
    return $text;
 }

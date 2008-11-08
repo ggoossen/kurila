@@ -183,7 +183,7 @@ else
 	print "ok 28\n";
 }
 
-my $nel = ord("A") == 193 ? qr/^(?:\x15|\x25)$/ : qr/^\x85$/;
+my $nel = ord("A") == 193 ?? qr/^(?:\x15|\x25)$/ !! qr/^\x85$/;
 
 print "not " unless "\N{NEXT LINE (NEL)}" =~ $nel;
 print "ok 29\n";
@@ -325,10 +325,10 @@ print "ok 74\n";
 # (or at least should be). So assert that that it's true here.
 
 my $names = do "unicore/Name.pl";
-print defined $names ? "ok 75\n" : "not ok 75\n";
+print defined $names ?? "ok 75\n" !! "not ok 75\n";
 if (ord('A') == 65) { # as on ASCII or UTF-8 machines
   my $non_ascii = $names =~ s/[^\0-\177]//g;
-  print $non_ascii ? "not ok 76 # $non_ascii\n" : "ok 76\n";
+  print $non_ascii ?? "not ok 76 # $non_ascii\n" !! "ok 76\n";
 } else {
   print "ok 76\n";
 }

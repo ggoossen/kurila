@@ -19,7 +19,7 @@ my $Is_VMS_VAX = 0;
 if ($^O eq 'VMS') {
     my $hw_model;
     chomp($hw_model = `write sys\$output f\$getsyi("HW_MODEL")`);
-    $Is_VMS_VAX = $hw_model +< 1024 ? 1 : 0;
+    $Is_VMS_VAX = $hw_model +< 1024 ?? 1 !! 0;
 }
 
 # No %Config.
@@ -46,7 +46,7 @@ while ( ~< *DATA) {
 
     $evalData = eval $data;
     die if $@;
-    $evalData = ref $evalData ? $evalData : \@($evalData);
+    $evalData = ref $evalData ?? $evalData !! \@($evalData);
     push @tests, \@($template, $evalData, $result, $comment, $data);
 }
 
@@ -93,11 +93,11 @@ for my  $i (1 .. nelems(@tests)) {
 	    $skip = 1;
 	# >comment skip: VMS hpux:10.20<
 	} elsif ($os =~ m/\b$^O(?::(\S+))?\b/i) {
-	    my $vsn = defined $1 ? $1 : "0";
+	    my $vsn = defined $1 ?? $1 !! "0";
 	    # Only compare on the the first pair of digits, as numeric
 	    # compares don't like 2.6.10-3mdksmp or 2.6.8-24.10-default
 	    s/^(\d+(\.\d+)?).*/$1/ for @( $osv, $vsn);
-	    $skip = $vsn ? ($osv +<= $vsn ? 1 : 0) : 1;
+	    $skip = $vsn ?? ($osv +<= $vsn ?? 1 !! 0) !! 1;
 	}
 	$skip and $comment =~ s/$/, failure expected on $^O $osv/;
     }
@@ -122,9 +122,9 @@ for my  $i (1 .. nelems(@tests)) {
 			  " Suppressed: exponent out of range?\n");
 	}
     else {
-	$y = ($x eq $y ? "" : " => $y");
+	$y = ($x eq $y ?? "" !! " => $y");
 	print("not ok $i >$template< >$data< >$result< $x$y",
-	    $comment ? " # $comment\n" : "\n");
+	    $comment ?? " # $comment\n" !! "\n");
     }
 }
 

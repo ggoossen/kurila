@@ -4,7 +4,7 @@ use Config;
 
 use List::Util < qw(reduce min);
 use Test::More;
-plan tests => ($::PERL_ONLY ? 19 : 21);
+plan tests => ($::PERL_ONLY ?? 19 !! 21);
 
 my $v = reduce {};
 
@@ -17,7 +17,7 @@ $v = reduce { $a / $b } 6;
 is( $v,	6,	'one arg');
 
 my @a = map { rand } 0 .. 20;
-$v = reduce { $a +< $b ? $a : $b } < @a;
+$v = reduce { $a +< $b ?? $a !! $b } < @a;
 is( $v,	min(< @a),	'min');
 
 @a = map { pack("C", int(rand(256))) } 0 .. 20;

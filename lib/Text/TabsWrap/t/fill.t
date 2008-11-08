@@ -56,7 +56,7 @@ print "1..$numtests\n";
 use Text::Wrap;
 
 
-my $rerun = %ENV{'PERL_DL_NONLAZY'} ? 0 : 1;
+my $rerun = %ENV{'PERL_DL_NONLAZY'} ?? 0 !! 1;
 
 my $tn = 1;
 while ((nelems @tests)) {

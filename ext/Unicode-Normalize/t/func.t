@@ -10,7 +10,7 @@ BEGIN {
 BEGIN {
     if (%ENV{PERL_CORE}) {
         chdir('t') if -d 't';
-        @INC = @( $^O eq 'MacOS' ? < qw(::lib) : < qw(../lib) );
+        @INC = @( $^O eq 'MacOS' ?? < qw(::lib) !! < qw(../lib) );
     }
 }
 
@@ -87,17 +87,17 @@ ok(getComposite(0xADF8, 0x11AF), 0xAE00);
 sub uprops {
   my $uv = shift;
   my $r = "";
-     $r .= isExclusion($uv)   ? 'X' : 'x';
-     $r .= isSingleton($uv)   ? 'S' : 's';
-     $r .= isNonStDecomp($uv) ? 'N' : 'n'; # Non-Starter Decomposition
-     $r .= isComp_Ex($uv)     ? 'F' : 'f'; # Full exclusion (X + S + N)
-     $r .= isComp2nd($uv)     ? 'B' : 'b'; # B = M = Y
-     $r .= isNFD_NO($uv)      ? 'D' : 'd';
-     $r .= isNFC_MAYBE($uv)   ? 'M' : 'm'; # Maybe
-     $r .= isNFC_NO($uv)      ? 'C' : 'c';
-     $r .= isNFKD_NO($uv)     ? 'K' : 'k';
-     $r .= isNFKC_MAYBE($uv)  ? 'Y' : 'y'; # maYbe
-     $r .= isNFKC_NO($uv)     ? 'G' : 'g';
+     $r .= isExclusion($uv)   ?? 'X' !! 'x';
+     $r .= isSingleton($uv)   ?? 'S' !! 's';
+     $r .= isNonStDecomp($uv) ?? 'N' !! 'n'; # Non-Starter Decomposition
+     $r .= isComp_Ex($uv)     ?? 'F' !! 'f'; # Full exclusion (X + S + N)
+     $r .= isComp2nd($uv)     ?? 'B' !! 'b'; # B = M = Y
+     $r .= isNFD_NO($uv)      ?? 'D' !! 'd';
+     $r .= isNFC_MAYBE($uv)   ?? 'M' !! 'm'; # Maybe
+     $r .= isNFC_NO($uv)      ?? 'C' !! 'c';
+     $r .= isNFKD_NO($uv)     ?? 'K' !! 'k';
+     $r .= isNFKC_MAYBE($uv)  ?? 'Y' !! 'y'; # maYbe
+     $r .= isNFKC_NO($uv)     ?? 'G' !! 'g';
   return $r;
 }
 
@@ -180,7 +180,7 @@ my $sCtg = "\x{30DB}\x{309A}";
 ok(composeContiguous($sCtg), "\x{30DD}");
 ok($sCtg, "\x{30DB}\x{309A}");
 
-sub answer { defined @_[0] ? @_[0] ? "YES" : "NO" : "MAYBE" }
+sub answer { defined @_[0] ?? @_[0] ?? "YES" !! "NO" !! "MAYBE" }
 
 ok(answer(checkNFD("")),  "YES");
 ok(answer(checkNFC("")),  "YES");

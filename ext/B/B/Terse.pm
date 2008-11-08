@@ -18,14 +18,14 @@ sub terse {
 
 sub compile {
     my @args = @_;
-    my $order = (nelems @args) ? shift(@args) : "";
+    my $order = (nelems @args) ?? shift(@args) !! "";
     $order = "-exec" if $order eq "exec";
     unshift @args, $order if $order ne "";
     B::Concise::compile("-terse", < @args);
 }
 
 sub indent {
-    my ($level) = (nelems @_) ? shift : 0;
+    my ($level) = (nelems @_) ?? shift !! 0;
     return "    " x $level;
 }
 

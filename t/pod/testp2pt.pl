@@ -132,7 +132,7 @@ sub testpodinc2plaintext( @ ) {
 }
 
 sub testpodplaintext( @ ) {
-   my %opts = %( (ref @_[0] eq 'HASH') ? < %{shift()} : () );
+   my %opts = %( (ref @_[0] eq 'HASH') ?? < %{shift()} !! () );
    my @testpods = @_;
    my ($testname, $testdir) = ("", "");
    my $cmpfile = "";

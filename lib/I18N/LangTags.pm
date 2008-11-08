@@ -111,7 +111,7 @@ sub is_language_tag {
          -           # separator
          [a-z0-9]{1,8}  # subtag  
       )*
-    $/xs ? 1 : 0;
+    $/xs ?? 1 !! 0;
 }
 
 ###########################################################################
@@ -140,7 +140,7 @@ sub extract_language_tags {
 
   my($text) =
     @_[0] =~ m/(.+)/  # to make for an untainted result
-    ? $1 : ''
+    ?? $1 !! ''
   ;
   
   return grep(!m/^[ixIX]$/s, @( # 'i' and 'x' aren't good tags
@@ -193,7 +193,7 @@ sub same_language_tag {
    # encode_language_tag($lang1) eq and encode_language_tag($lang2)
    # being true if $lang1 and $lang2 are both undef
 
-  return $el1 eq &encode_language_tag(@_[1]) ? 1 : 0;
+  return $el1 eq &encode_language_tag(@_[1]) ?? 1 !! 0;
 }
 
 ###########################################################################
@@ -302,7 +302,7 @@ sub is_dialect_of {
   $lang1 .= '-';
   $lang2 .= '-';
   return
-    (substr($lang1, 0, length($lang2)) eq $lang2) ? 1 : 0;
+    (substr($lang1, 0, length($lang2)) eq $lang2) ?? 1 !! 0;
 }
 
 ###########################################################################
@@ -357,7 +357,7 @@ sub super_languages {
   my @supers = @( () );
   foreach my $bit ( @l1_subtags) {
     push @supers, 
-      scalar(nelems @supers) ? (@supers[-1] . '-' . $bit) : $bit;
+      scalar(nelems @supers) ?? (@supers[-1] . '-' . $bit) !! $bit;
   }
   pop @supers if (nelems @supers);
   shift @supers if (nelems @supers) && @supers[0] =~ m<^[iIxX]$>s;
@@ -396,7 +396,7 @@ don't worry about it.
 sub locale2language_tag {
   my $lang =
     @_[0] =~ m/(.+)/  # to make for an untainted result
-    ? $1 : ''
+    ?? $1 !! ''
   ;
 
   return $lang if &is_language_tag($lang); # like "en"
@@ -690,8 +690,8 @@ do {
   my($k,$v);
   while((nelems @panic)) {
     ($k,$v) = splice(@panic,0,2);
-    foreach my $k (@(ref($k) ? < @$k : $k)) {
-      foreach my $v (@(ref($v) ? < @$v : $v)) {
+    foreach my $k (@(ref($k) ?? < @$k !! $k)) {
+      foreach my $v (@(ref($v) ?? < @$v !! $v)) {
         push @{%Panic{$k} ||= \@()}, $v unless $k eq $v;
       }
     }

@@ -19,7 +19,7 @@ ok 1;
 eval " binmode(STDOUT, ':utf8') ";
 
 print "# Pod::Escapes version $Pod::Escapes::VERSION\n";
-print "# I'm ", (chr(65) eq 'A') ? '' : 'not ', "in ASCII world.\n";
+print "# I'm ", (chr(65) eq 'A') ?? '' !! 'not ', "in ASCII world.\n";
 print "#\n#------------------------\n#\n";
 
 foreach my $quotie (qw( \n \r \cm \cj \t \f \b \a \e )) {

@@ -9,8 +9,8 @@ use Pod::Simple::Text;
 
 BEGIN {
   *mytime = defined(&Win32::GetTickCount)
-    ? sub () {Win32::GetTickCount() / 1000}
-    : sub () {time()}
+    ?? sub () {Win32::GetTickCount() / 1000}
+    !! sub () {time()}
 }
 
 $Pod::Simple::Text::FREAKYMODE = 1;

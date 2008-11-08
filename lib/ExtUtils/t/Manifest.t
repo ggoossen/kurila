@@ -248,7 +248,7 @@ do {
         'mymanifest.skip excluded via mydefault.skip' );
     ok( ! exists $files->{'mydefault.skip'},
         'mydefault.skip excluded via mydefault.skip' );
-    my $extsep = $Is_VMS ? '_' : '.';
+    my $extsep = $Is_VMS ?? '_' !! '.';
     %Files{"$_.bak"}++ for @( ('MANIFEST', "MANIFEST$($extsep)SKIP"));
 };
 

@@ -46,7 +46,7 @@ sub parse_lines {             # Usage: $parser->parse_lines(@lines)
 
   DEBUG +> 5 and
    print "#  About to parse lines: ",
-     join(' ', map defined($_) ? "[$_]" : "EOF", @_), "\n";
+     join(' ', map defined($_) ?? "[$_]" !! "EOF", @_), "\n";
 
   my $paras = ($self->{'paras'} ||= \@());
    # paragraph buffer.  Because we need to defer processing of =over
@@ -472,7 +472,7 @@ sub _ponder_paragraph_buffer {
      )
     ;
     DEBUG and print "# Starting ", 
-      $starting_contentless ? 'contentless' : 'contentful',
+      $starting_contentless ?? 'contentless' !! 'contentful',
       " document\n"
     ;
     
@@ -480,7 +480,7 @@ sub _ponder_paragraph_buffer {
       ($scratch = 'Document'),
       \%(
         'start_line' => $paras->[0]->[1]->{'start_line'},
-        $starting_contentless ? ( 'contentless' => 1 ) : (),
+        $starting_contentless ?? ( 'contentless' => 1 ) !! (),
       ),
     );
   }
@@ -913,7 +913,7 @@ sub _ponder_begin {
   
   foreach my $target_name (@( <
     split(',', $content, -1),
-    $neg ? () : '*')
+    $neg ?? () !! '*')
   ) {
     DEBUG +> 2 and
      print " Considering whether =begin $content matches $target_name\n";
@@ -945,10 +945,10 @@ sub _ponder_begin {
   $para->[1]->{'~ignore'}   = (! $dont_ignore) || 0;
   $para->[1]->{'~resolve'}  = $to_resolve || 0;
 
-  DEBUG +> 1 and print " Making note to ", $dont_ignore ? 'not ' : '',
+  DEBUG +> 1 and print " Making note to ", $dont_ignore ?? 'not ' !! '',
     "ignore contents of this region\n";
   DEBUG +> 1 and $dont_ignore and print " Making note to treat contents as ",
-    ($to_resolve ? 'verbatim/plain' : 'data'), " paragraphs\n";
+    ($to_resolve ?? 'verbatim/plain' !! 'data'), " paragraphs\n";
   DEBUG +> 1 and print " (Stack now: ", < $self->_dump_curr_open(), ")\n";
 
   push @$curr_open, $para;
@@ -974,8 +974,8 @@ sub _ponder_end {
       $para->[1]->{'start_line'},
       "'=end' without a target?" . (
         ( (nelems @$curr_open) and $curr_open->[-1]->[0] eq '=for' )
-        ? ( " (Should be \"=end " . $curr_open->[-1]->[1]->{'target'} . '")' )
-        : ''
+        ?? ( " (Should be \"=end " . $curr_open->[-1]->[1]->{'target'} . '")' )
+        !! ''
       )
     );
     DEBUG and print "Ignoring targetless =end\n";
@@ -1534,9 +1534,9 @@ sub _verbatim_format {
         #print "SNARING $+\n";
         push @new_line, \@(
           (
-            $3 ? 'VerbatimB'  :
-            $4 ? 'VerbatimI'  :
-            $5 ? 'VerbatimBI' : die("Should never get called")
+            $3 ?? 'VerbatimB'  !!
+            $4 ?? 'VerbatimI'  !!
+            $5 ?? 'VerbatimBI' !! die("Should never get called")
           ), \%(),
           substr($p->[$i-1], pos($formatting)-length($1), length($1))
         );
@@ -1549,7 +1549,7 @@ sub _verbatim_format {
     
     DEBUG +> 6 and print "New version of the above line is these tokens (",
       scalar(nelems @new_line), "):",
-      < map( ref($_)?"<$(join ' ',@$_)> ":"<$_>", @new_line ), "\n";
+      < map( ref($_)??"<$(join ' ',@$_)> "!!"<$_>", @new_line ), "\n";
     $i--; # So the next line we scrutinize is the line before the one
           #  that we just went and formatted
   }
@@ -1808,9 +1808,9 @@ sub _dump_curr_open { # return a string representation of the stack
   return '[empty]' unless (nelems @$curr_open);
   return join '; ', map {;
            ($_->[0] eq '=for')
-             ? ( ($_->[1]->{'~really'} || '=over')
+             ?? ( ($_->[1]->{'~really'} || '=over')
                . ' ' . $_->[1]->{'target'})
-             : $_->[0]
+             !! $_->[0]
         }
  @$curr_open
   ;

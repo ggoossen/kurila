@@ -11,7 +11,7 @@ sub new {  # Class->new(text);
 
 # Purely accessors:
 
-sub text { ((nelems @_) == 2) ?  @(@_[0]->[1] = @_[1]) : @_[0]->[1] }
+sub text { ((nelems @_) == 2) ??  @(@_[0]->[1] = @_[1]) !! @_[0]->[1] }
 
 sub text_r { \ @_[0]->[1] }
 

@@ -34,7 +34,7 @@ sub lexical
     my(@a) = @( unpack ("C*", $a) ) ;
     my(@b) = @( unpack ("C*", $b) ) ;
 
-    my $len = ((nelems @a) +> nelems @b ? (nelems @b) : nelems @a) ;
+    my $len = ((nelems @a) +> nelems @b ?? (nelems @b) !! nelems @a) ;
 
     foreach my $i ( 0 .. $len -1) {
         return @a[$i] - @b[$i] if @a[$i] != @b[$i] ;
@@ -160,7 +160,7 @@ my ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
 
 my %noMode = %( < map { $_, 1} qw( amigaos MSWin32 NetWare cygwin ) ) ;
 
-ok( ($mode ^&^ 0777) == (($^O eq 'os2' || $^O eq 'MacOS') ? 0666 : 0640)
+ok( ($mode ^&^ 0777) == (($^O eq 'os2' || $^O eq 'MacOS') ?? 0666 !! 0640)
    || %noMode{$^O} );
 
 my ($key, $value, $i);
@@ -963,7 +963,7 @@ EOM
     unlink $filename ;
   };  
 
-  ok( docat_del($file) eq ($db185mode ? <<'EOM' : <<'EOM') ) ;
+  ok( docat_del($file) eq ($db185mode ?? <<'EOM' !! <<'EOM') ) ;
 Smith	-> John
 Wall	-> Brick
 Wall	-> Brick
@@ -1019,7 +1019,7 @@ EOM
     untie %h ;
   };
 
-  ok( docat_del($file) eq ($db185mode == 1 ? <<'EOM' : <<'EOM') ) ;
+  ok( docat_del($file) eq ($db185mode == 1 ?? <<'EOM' !! <<'EOM') ) ;
 Smith	-> John
 Wall	-> Brick
 Wall	-> Brick
@@ -1103,10 +1103,10 @@ EOM
     $x = tie %h, "DB_File", $filename, O_RDWR^|^O_CREAT, 0640, $DB_BTREE 
 	or die "Cannot open $filename: $!\n";
 
-    $found = ( $x->find_dup("Wall", "Larry") == 0 ? "" : "not") ; 
+    $found = ( $x->find_dup("Wall", "Larry") == 0 ?? "" !! "not") ; 
     print "Larry Wall is $found there\n" ;
     
-    $found = ( $x->find_dup("Wall", "Harry") == 0 ? "" : "not") ; 
+    $found = ( $x->find_dup("Wall", "Harry") == 0 ?? "" !! "not") ; 
     print "Harry Wall is $found there\n" ;
     
     undef $x ;
@@ -1140,7 +1140,7 @@ EOM
 
     $x->del_dup("Wall", "Larry") ;
 
-    $found = ( $x->find_dup("Wall", "Larry") == 0 ? "" : "not") ; 
+    $found = ( $x->find_dup("Wall", "Larry") == 0 ?? "" !! "not") ; 
     print "Larry Wall is $found there\n" ;
     
     undef $x ;

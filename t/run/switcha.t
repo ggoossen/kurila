@@ -7,4 +7,4 @@ BEGIN {
     push @ARGV, 'run/switchp.aux';
     $i = 0;
 }
-print((@F[0] eq "ok" ? "ok " : "not ok "),++$i,"\n");
+print((@F[0] eq "ok" ?? "ok " !! "not ok "),++$i,"\n");

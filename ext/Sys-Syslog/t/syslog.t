@@ -19,7 +19,7 @@ my $tests;
 plan tests => $tests;
 
 # any remaining warning should be severly punished
-BEGIN { eval "use Test::NoWarnings"; $tests = $@ ? 0 : 1; }
+BEGIN { eval "use Test::NoWarnings"; $tests = $@ ?? 0 !! 1; }
 
 BEGIN { $tests += 1 }
 # ok, now loads them
@@ -64,7 +64,7 @@ SKIP: do {
 
     # The only known $^O eq 'svr4' that needs this is NCR MP-RAS,
     # but assuming 'stream' in SVR4 is probably not that bad.
-    my $sock_type = $^O =~ m/^(solaris|irix|svr4|powerux)$/ ? 'stream' : 'unix';
+    my $sock_type = $^O =~ m/^(solaris|irix|svr4|powerux)$/ ?? 'stream' !! 'unix';
 
     try { setlogsock($sock_type) };
     is( $@, '', "setlogsock() called with '$sock_type'" );

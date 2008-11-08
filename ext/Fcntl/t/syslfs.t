@@ -133,14 +133,14 @@ my $sysseek = sysseek(BIG, 5_000_000_000, SEEK_SET);
 unless (! $r && defined $sysseek && $sysseek == 5_000_000_000) {
     $sysseek = 'undef' unless defined $sysseek;
     explain("seeking past 2GB failed: ",
-	    $r ? 'signal '.($r ^&^ 0x7f) : "$! (sysseek returned $sysseek)");
+	    $r ?? 'signal '.($r ^&^ 0x7f) !! "$! (sysseek returned $sysseek)");
     bye();
 }
 
 # The syswrite will fail if there are are filesize limitations (process or fs).
 my $syswrite = syswrite(BIG, "big");
 print "# syswrite failed: $! (syswrite returned ",
-      defined $syswrite ? $syswrite : 'undef', ")\n"
+      defined $syswrite ?? $syswrite !! 'undef', ")\n"
     unless defined $syswrite && $syswrite == 3;
 my $close     = close BIG;
 print "# close failed: $!\n" unless $close;

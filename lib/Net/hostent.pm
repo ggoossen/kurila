@@ -47,7 +47,7 @@ sub gethostbyaddr ($;$) {
     my ($addr, $addrtype);
     $addr = shift;
     require Socket unless (nelems @_);
-    $addrtype = (nelems @_) ? shift : Socket::AF_INET();
+    $addrtype = (nelems @_) ?? shift !! Socket::AF_INET();
     populate(CORE::gethostbyaddr($addr, $addrtype)) 
 } 
 

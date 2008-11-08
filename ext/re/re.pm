@@ -135,7 +135,7 @@ sub bits {
                          . join(", ",sort keys %flags ) );
                 }
             }
-            _load_unload($on ? 1 : $^RE_DEBUG_FLAGS);
+            _load_unload($on ?? 1 !! $^RE_DEBUG_FLAGS);
             last;
         } elsif ($s eq 'debug' or $s eq 'debugcolor') {
 	    setcolor() if $s =~m/color/i;

@@ -531,7 +531,7 @@ sub disablecache  {
 
 # --- Functions to process the 'time' data type
 
-sub new { my @t = @( mytime, times, (nelems @_) == 2 ? @_[1] : 0);
+sub new { my @t = @( mytime, times, (nelems @_) == 2 ?? @_[1] !! 0);
 	  print STDERR "new=$(join ' ',@t)\n" if $Debug;
 	  bless \@t; }
 
@@ -594,9 +594,9 @@ sub timestr {
     # format a time in the required style, other formats may be added here
     $style ||= $Default_Style;
     return '' if $style eq 'none';
-    $style = ($ct+>0) ? 'all' : 'noc' if $style eq 'auto';
+    $style = ($ct+>0) ?? 'all' !! 'noc' if $style eq 'auto';
     my $s = "$(join ' ',@t) $style"; # default for unknown style
-    my $w = $hirestime ? "\%2g" : "\%2d";
+    my $w = $hirestime ?? "\%2g" !! "\%2d";
     $s = sprintf("$w wallclock secs (\%$f usr \%$f sys + \%$f cusr \%$f csys = \%$f CPU)",
 			    $r,$pu,$ps,$cu,$cs,$tt) if $style eq 'all';
     $s = sprintf("$w wallclock secs (\%$f usr + \%$f sys = \%$f CPU)",
@@ -678,11 +678,11 @@ sub timeit {
                      (!ref $code or ref $code eq 'CODE');
 
     printf STDERR "timeit $n $code\n" if $Debug;
-    my $cache_key = $n . ( ref( $code ) ? 'c' : 's' );
+    my $cache_key = $n . ( ref( $code ) ?? 'c' !! 's' );
     if ($Do_Cache && exists %Cache{$cache_key} ) {
 	$wn = %Cache{$cache_key};
     } else {
-	$wn = &runloop($n, ref( $code ) ? sub { } : '' );
+	$wn = &runloop($n, ref( $code ) ?? sub { } !! '' );
 	# Can't let our baseline have any iterations, or they get subtracted
 	# out of the result.
 	$wn->[5] = 0;
@@ -754,7 +754,7 @@ sub countit {
 	my $td = timeit($n, $code);
 	my $new_tc = $td->[1] + $td->[2];
         # Make sure we are making progress.
-        $tc = $new_tc +> 1.2 * $tc ? $new_tc : 1.2 * $tc;
+        $tc = $new_tc +> 1.2 * $tc ?? $new_tc !! 1.2 * $tc;
     }
 
     # Now, do the 'for real' timing(s), repeating until we exceed
@@ -801,7 +801,7 @@ sub countit {
 
 sub n_to_for {
     my $n = shift;
-    return $n == 0 ? $default_for : $n +< 0 ? -$n : undef;
+    return $n == 0 ?? $default_for !! $n +< 0 ?? -$n !! undef;
 }
 
 %_Usage{timethis} = <<'USAGE';
@@ -924,14 +924,14 @@ sub cmpthese{
     @vals =sort { $a->[7] <+> $b->[7] } @vals;
 
     # If more than half of the rates are greater than one...
-    my $display_as_rate = (nelems @vals) ? (@vals[((nelems @vals)-1)>>1]->[7] +> 1) : 0;
+    my $display_as_rate = (nelems @vals) ?? (@vals[((nelems @vals)-1)>>1]->[7] +> 1) !! 0;
 
     my @rows;
     my @col_widths;
 
     my @top_row = @( 
         '', 
-	$display_as_rate ? 'Rate' : 's/iter', 
+	$display_as_rate ?? 'Rate' !! 's/iter', 
 	< map { $_->[0] } @vals 
     );
 
@@ -954,19 +954,19 @@ sub cmpthese{
 	my $row_rate = $row_val->[7];
 
 	# We assume that we'll never get a 0 rate.
-	my $rate = $display_as_rate ? $row_rate : 1 / $row_rate;
+	my $rate = $display_as_rate ?? $row_rate !! 1 / $row_rate;
 
 	# Only give a few decimal places before switching to sci. notation,
 	# since the results aren't usually that accurate anyway.
 	my $format = 
-	   $rate +>= 100 ? 
-	       "\%0.0f" : 
-	   $rate +>= 10 ?
-	       "\%0.1f" :
-	   $rate +>= 1 ?
-	       "\%0.2f" :
-	   $rate +>= 0.1 ?
-	       "\%0.3f" :
+	   $rate +>= 100 ?? 
+	       "\%0.0f" !! 
+	   $rate +>= 10 ??
+	       "\%0.1f" !!
+	   $rate +>= 1 ??
+	       "\%0.2f" !!
+	   $rate +>= 0.1 ??
+	       "\%0.3f" !!
 	       "\%0.2e";
 
 	$format .= "/s"

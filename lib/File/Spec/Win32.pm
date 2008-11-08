@@ -110,11 +110,11 @@ sub file_name_is_absolute {
 
     if ($file =~ m{^($VOL_RX)}o) {
       my $vol = $1;
-      return  $vol =~ m{^$UNC_RX}o ? 2
-	      : $file =~ m{^$DRIVE_RX(?:[\\/])}o ? 2
-	      : 0;
+      return  $vol =~ m{^$UNC_RX}o ?? 2
+	      !! $file =~ m{^$DRIVE_RX(?:[\\/])}o ?? 2
+	      !! 0;
     }
-    return $file =~  m{^[\\/]} ? 1 : 0;
+    return $file =~  m{^[\\/]} ?? 1 !! 0;
 }
 
 =item catfile
@@ -299,7 +299,7 @@ sub catpath {
          $file   =~ m@[^\\/]@
        ) {
         $volume =~ m@([\\/])@ ;
-        my $sep = $1 ? $1 : '\' ;
+        my $sep = $1 ?? $1 !! '\' ;
         $volume .= $sep ;
     }
 
@@ -378,14 +378,14 @@ sub _canon_cat(@)				# @path -> path
 {
     my $first  = shift;
     my $volume = $first =~ s{ \A ([A-Za-z]:) ([\\/]?) }{}x	# drive letter
-    	       ? ucfirst( $1 ).( $2 ? "\\" : "" )
-	       : $first =~ s{ \A (?:\\\\|//) ([^\\/]+)
+    	       ?? ucfirst( $1 ).( $2 ?? "\\" !! "" )
+	       !! $first =~ s{ \A (?:\\\\|//) ([^\\/]+)
 				 (?: [\\/] ([^\\/]+) )?
 	       			 [\\/]? }{}xs			# UNC volume
-	       ? "\\\\$1".( defined $2 ? "\\$2" : "" )."\\"
-	       : $first =~ s{ \A [\\/] }{}x			# root dir
-	       ? "\\"
-	       : "";
+	       ?? "\\\\$1".( defined $2 ?? "\\$2" !! "" )."\\"
+	       !! $first =~ s{ \A [\\/] }{}x			# root dir
+	       ?? "\\"
+	       !! "";
     my $path   = join "\\", @( $first, < @_);
 
     $path =~ s#[\\/]+#\\#g;		# xx/yy --> xx\yy & xx\\yy --> xx\yy
@@ -435,7 +435,7 @@ sub _canon_cat(@)				# @path -> path
 	    if    $path eq ""
 	      and $volume =~ m#\A(\\\\.*)\\\z#s;
     }
-    return $path ne "" || $volume ? $volume.$path : ".";
+    return $path ne "" || $volume ?? $volume.$path !! ".";
 }
 
 1;

@@ -2,8 +2,8 @@
 
 
 use bytes;
-require(%ENV{PERL_CORE} ? "./test.pl" : "./t/test.pl");
-plan(tests => ($^O =~ m/MSWin32/ ? 9 : 6));
+require(%ENV{PERL_CORE} ?? "./test.pl" !! "./t/test.pl");
+plan(tests => ($^O =~ m/MSWin32/ ?? 9 !! 6));
 
 my $Class       = 'IO::File';
 my $All_Chars   = join '', @( "\r\n", < map( chr, 1..255 ), "zzz\n\r");

@@ -110,7 +110,7 @@ sub _verify_att {
             next;
         }
 
-        my @sigs   = @( ref $sig ? < @$sig : $sig );
+        my @sigs   = @( ref $sig ?? < @$sig !! $sig );
         my $given  = ref $val;
         unless( grep { $given eq $_ || ($_ && try{$val->isa($_)}) } @sigs ) {
             my $takes = join " or ", map { _format_att($_) } @sigs;
@@ -126,9 +126,9 @@ sub _verify_att {
 sub _format_att {
     my $given = shift;
     
-    return $given eq ''        ? "string/number"
-         : uc $given eq $given ? "$given reference"
-         :                       "$given object"
+    return $given eq ''        ?? "string/number"
+         !! uc $given eq $given ?? "$given reference"
+         !!                       "$given object"
          ;
 }
 
@@ -140,8 +140,8 @@ sub prompt ($;$) {  ## no critic
 
     my $isa_tty = -t *STDIN && (-t *STDOUT || !(-f *STDOUT || -c *STDOUT)) ;
 
-    my $dispdef = defined $def ? "[$def] " : " ";
-    $def = defined $def ? $def : "";
+    my $dispdef = defined $def ?? "[$def] " !! " ";
+    $def = defined $def ?? $def !! "";
 
     local $|=1;
     local $\;
@@ -161,7 +161,7 @@ sub prompt ($;$) {  ## no critic
         }
     }
 
-    return (!defined $ans || $ans eq '') ? $def : $ans;
+    return (!defined $ans || $ans eq '') ?? $def !! $ans;
 }
 
 sub eval_in_subdirs {
@@ -410,8 +410,8 @@ sub new {
               $prereq, $self->{PREREQ_PM}->{$prereq}, 
                 ($pr_version || 'unknown version') 
                   unless $self->{PREREQ_FATAL};
-            %unsatisfied{$prereq} = $self->{PREREQ_PM}->{$prereq} ? 
-              $self->{PREREQ_PM}->{$prereq} : 'unknown version' ;
+            %unsatisfied{$prereq} = $self->{PREREQ_PM}->{$prereq} ?? 
+              $self->{PREREQ_PM}->{$prereq} !! 'unknown version' ;
         }
     }
     
@@ -685,8 +685,8 @@ sub parse_args{
         my($name, $value) = ($1, $2);
         if ($value =~ m/^~(\w+)?/) { # tilde with optional username
             $value =~ s [^~(\w*)]
-                [$($1 ?
-                   ((getpwnam($1))[[7]] || "~$1") :
+                [$($1 ??
+                   ((getpwnam($1))[[7]] || "~$1") !!
                    (getpwuid($>))[[7]]
                  )]x;
         }
@@ -884,7 +884,7 @@ sub flush {
     my $finalname = $self->{MAKEFILE};
     print STDOUT "Writing $finalname for $self->{NAME}\n";
 
-    unlink($finalname, "MakeMaker.tmp", $Is_VMS ? 'Descrip.MMS' : ());
+    unlink($finalname, "MakeMaker.tmp", $Is_VMS ?? 'Descrip.MMS' !! ());
     open(my $fh,">", "MakeMaker.tmp")
         or die "Unable to open MakeMaker.tmp: $!";
 

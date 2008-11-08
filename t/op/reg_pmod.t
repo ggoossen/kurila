@@ -18,21 +18,21 @@ plan tests => 4 * (nelems @tests) + 2;
 my $W = "";
 
 $^WARN_HOOK = sub { $W.=join("", @_); };
-sub _u($$) { "@_[0] is ".(defined @_[1] ? "'@_[1]'" : "undef") }
+sub _u($$) { "@_[0] is ".(defined @_[1] ?? "'@_[1]'" !! "undef") }
 
 $_ = '123-456-789';
 foreach my $test ( @tests) {
     my ($p, $pat,$l,$m,$r) = < @$test;
-    my $test_name = $p eq '/p'   ? "/$pat/p"
-                  : $p eq '(?p)' ? "/(?p)$pat/"
-                  :                "/$pat/";
+    my $test_name = $p eq '/p'   ?? "/$pat/p"
+                  !! $p eq '(?p)' ?? "/(?p)$pat/"
+                  !!                "/$pat/";
 
     #
     # Cannot use if/else due to the scope invalidating $^MATCH and friends.
     #
-    my $ok = ok $p eq '/p'   ? m/$pat/p
-              : $p eq '(?p)' ? m/(?p)$pat/
-              :                m/$pat/
+    my $ok = ok $p eq '/p'   ?? m/$pat/p
+              !! $p eq '(?p)' ?? m/(?p)$pat/
+              !!                m/$pat/
               => $test_name;
     SKIP: do {
         skip "/$pat/$p failed to match", 3

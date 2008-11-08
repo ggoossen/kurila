@@ -35,7 +35,7 @@ if (@G[0] =~ m#.*\](\w+\.t)#i) {
     # identical to that returned by readdir
     @G = grep(s#.*\](\w+\.t).*#op/$1#i, @(glob("op/*.t")));
 }
-while (@R && @G && @G[0] eq ($^O eq 'MacOS' ? ':op:' : 'op/').@R[0]) {
+while (@R && @G && @G[0] eq ($^O eq 'MacOS' ?? ':op:' !! 'op/').@R[0]) {
     shift(@R);
     shift(@G);
 }

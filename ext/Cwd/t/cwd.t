@@ -45,12 +45,12 @@ try { fastcwd };
 
 # Must find an external pwd (or equivalent) command.
 
-my $pwd = $^O eq 'MSWin32' ? "cmd" : "pwd";
+my $pwd = $^O eq 'MSWin32' ?? "cmd" !! "pwd";
 my $pwd_cmd =
-    ($^O eq "NetWare") ?
-        "cd" :
-    ($IsMacOS) ?
-        "pwd" :
+    ($^O eq "NetWare") ??
+        "cd" !!
+    ($IsMacOS) ??
+        "pwd" !!
         (grep { -x && -f } map { "$_/$pwd$(config_value('exe_ext'))" }
 	                   split m/$(config_value('path_sep'))/, %ENV{PATH})[0];
 
@@ -136,8 +136,8 @@ for (1..nelems @test_dirs) {
 rmtree(@test_dirs[0], 0, 0);
 
 do {
-  my $check = ($IsVMS   ? qr|\b((?i)t)\]$| :
-	       $IsMacOS ? qr|\bt:$| :
+  my $check = ($IsVMS   ?? qr|\b((?i)t)\]$| !!
+	       $IsMacOS ?? qr|\bt:$| !!
 			  qr|\bt$| );
   
   like(%ENV{PWD}, $check);
@@ -162,7 +162,7 @@ SKIP: do {
     my $fast_abs_path =  Cwd::fast_abs_path("linktest");
     my $want          =  quotemeta(
                              File::Spec->rel2abs(
-			         %ENV{PERL_CORE} ? $Test_Dir : < File::Spec->catdir('t', $Test_Dir)
+			         %ENV{PERL_CORE} ?? $Test_Dir !! < File::Spec->catdir('t', $Test_Dir)
                                                 )
                                   );
 
@@ -224,7 +224,7 @@ sub bracketed_form_dir {
 sub dir_ends_with {
   my ($dir, $expect) = (shift, shift);
   my $bracketed_expect = quotemeta bracketed_form_dir($expect);
-  like( bracketed_form_dir($dir), qr|$bracketed_expect$|i, ((nelems @_) ? shift : ()) );
+  like( bracketed_form_dir($dir), qr|$bracketed_expect$|i, ((nelems @_) ?? shift !! ()) );
 }
 
 sub bracketed_form_path {
@@ -234,5 +234,5 @@ sub bracketed_form_path {
 sub path_ends_with {
   my ($dir, $expect) = (shift, shift);
   my $bracketed_expect = quotemeta bracketed_form_path($expect);
-  like( bracketed_form_path($dir), qr|$bracketed_expect$|i, ((nelems @_) ? shift : ()) );
+  like( bracketed_form_path($dir), qr|$bracketed_expect$|i, ((nelems @_) ?? shift !! ()) );
 }

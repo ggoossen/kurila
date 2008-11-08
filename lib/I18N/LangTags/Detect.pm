@@ -70,7 +70,7 @@ sub http_accept_langs {
   # Hm.  Should I just move this into I18N::LangTags at some point?
   no integer;
 
-  my $in = ((nelems @_) +> 1) ? @_[1] : %ENV{'HTTP_ACCEPT_LANGUAGE'};
+  my $in = ((nelems @_) +> 1) ?? @_[1] !! %ENV{'HTTP_ACCEPT_LANGUAGE'};
   # (always ends up untainting)
 
   return() unless defined $in and length $in;
@@ -107,7 +107,7 @@ sub http_accept_langs {
        $
       /sx
     ;
-    $q = (defined $2 and length $2) ? $2 : 1;
+    $q = (defined $2 and length $2) ?? $2 !! 1;
     #print "$1 with q=$q\n";
     push @{ %pref{$q} }, lc $1;
   }

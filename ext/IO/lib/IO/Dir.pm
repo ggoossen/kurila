@@ -123,7 +123,7 @@ sub FETCH {
 
 sub STORE {
     my($dh,$key,$data) = < @_;
-    my($atime,$mtime) = ref($data) ? < @$data : ($data,$data);
+    my($atime,$mtime) = ref($data) ?? < @$data !! ($data,$data);
     my $file = File::Spec->catfile(%{*$dh}{io_dir_path}, $key);
     unless(-e $file) {
 	my $io = IO::File->new($file,O_CREAT ^|^ O_RDWR);
@@ -142,8 +142,8 @@ sub DELETE {
     my $file = File::Spec->catfile(%{*$dh}{io_dir_path}, $key);
 
     -d $file
-	? rmdir($file)
-	: unlink($file);
+	?? rmdir($file)
+	!! unlink($file);
 }
 
 1;
