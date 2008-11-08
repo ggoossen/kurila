@@ -14,11 +14,11 @@ do {
 
 do {
     package MRO_A;
-    our @ISA = @( qw// );
+    our @ISA = qw//;
     package MRO_B;
-    our @ISA = @( qw// );
+    our @ISA = qw//;
     package MRO_C;
-    our @ISA = @( qw// );
+    our @ISA = qw//;
     package MRO_D;
     our @ISA = qw/MRO_A MRO_B MRO_C/;
     package MRO_E;

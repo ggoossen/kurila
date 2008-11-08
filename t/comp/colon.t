@@ -53,7 +53,7 @@ ok 6, (eval "package qq; sub zyx \{1\}; 1;" and
 
 ok 7, (eval "package qw; sub zyx \{1\}; 1;" and
 	not eval "qw::zyx" and
-	eval "qw:: eq qw||" and
+	eval "nelems(qw::) == nelems(qw||)" and
 	not eval "qw::: +>= 0");
 
 ok 8, (eval "package qx; sub zyx \{1\}; 1;" and
