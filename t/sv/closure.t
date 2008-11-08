@@ -262,7 +262,7 @@ do \{
     my \$test = $test;
     sub test (&) \{
       my \$ok = &\{\@_[0]\};
-      print \$ok ? "ok \$test\n" : "not ok \$test\n";
+      print \$ok ?? "ok \$test\n" !! "not ok \$test\n";
       printf "# Failed at line \\\%d\n", @(caller)[2] unless \$ok;
       \$test++;
     \}
@@ -643,8 +643,8 @@ do {
             sub {@_[0]->(<@_)} -> (
                 sub {
                     @_[1]
-                        ?  @_[0]->(@_[0], @_[1] - 1) .  sub {"x"}->()
-                        : "y"
+                        ??  @_[0]->(@_[0], @_[1] - 1) .  sub {"x"}->()
+                        !! "y"
                 },   
                 2
             )

@@ -63,11 +63,12 @@ do {
     our $x;
     sub func1 { $x++; return "func1 called. args: $(join ' ', @_)" };
 
-    BEGIN { compsub::define( compfunc1 => sub { my $op = shift;
-                                                my $cvop = B::SVOP->new('const', 0, \&func1, @('myop', 1, 1));
-                                                $op = B::LISTOP->new('list', 0, ($op ? ($op, $cvop) : ($cvop, undef)), @());
-                                                return B::UNOP->new('entersub', B::OPf_STACKED^|^B::OPf_SPECIAL, $op, @('compfunc1'));
-                                            } ); }
+    BEGIN { compsub::define( compfunc1 => 
+                               sub { my $op = shift;
+                                     my $cvop = B::SVOP->new('const', 0, \&func1, @('myop', 1, 1));
+                                     $op = B::LISTOP->new('list', 0, ($op ?? ($op, $cvop) !! ($cvop, undef)), @());
+                                     return B::UNOP->new('entersub', B::OPf_STACKED^|^B::OPf_SPECIAL, $op, @('compfunc1'));
+                                 } ); }
 
     is( (compfunc1), "func1 called. args: ");
     is( (compfunc1 1, 2, 3), "func1 called. args: 1 2 3");
@@ -115,7 +116,8 @@ do {
             $kid = $kid->sibling;
         }
         my $cvop = B::SVOP->new('const', 0, \&parseparams, undef);
-        $op = B::LISTOP->new('list', 0, ($op ? ($op, $cvop) : ($cvop, undef)), undef);
+        $op = B::LISTOP->new('list', 0,
+                             ($op ?? ($op, $cvop) !! ($cvop, undef)), undef);
         my $entersubop = B::UNOP->new('entersub', B::OPf_STACKED^|^B::OPf_SPECIAL, $op, undef);
         return $entersubop;
     }

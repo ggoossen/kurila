@@ -52,14 +52,11 @@ our @TESTS =
  'country2code("Zimbabwe")       eq "zw"',    # last in DATA segment
 );
 
-print "1..", int(nelems @TESTS), "\n";
+require "./test.pl";
 
-my $testid = 1;
+plan(int(nelems @TESTS));
+
 foreach my $test ( @TESTS)
 {
-    eval "print (($test) ? \"ok $testid\\n\" : \"not ok $testid\\n\" )";
-    print "not ok $testid\n" if $@;
-    ++$testid;
+    lives_ok( sub { eval "$test" } );
 }
-
-exit 0;

@@ -113,7 +113,7 @@ do {
 
 # Bug #24762
 do {
-    eval q{ *foo{CODE} ? 1 : 0 };
+    eval q{ *foo{CODE} ?? 1 !! 0 };
     is( $@, '', "glob subscript in conditional" );
 };
 
@@ -140,7 +140,7 @@ eval q{ foo::$bar };
 like( $@->{description}, qr/Bad name after foo::/, 'Bad name after foo::' );
 
 # test for ?: context error
-eval q{($a ? $x : ($y)) = 5};
+eval q{($a ?? $x !! ($y)) = 5};
 like( $@->{description}, qr/Assignment to both a list and a scalar/, 'Assignment to both a list and a scalar' );
 
 eval q{ s/x/#/ };

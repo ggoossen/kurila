@@ -40,7 +40,7 @@ is( $exit, 0, '  exited 0' );
 
 # On VMS and Win32 you need the quotes around the program or it won't work.
 # On Unix its the opposite.
-my $quote = $Is_VMS || $Is_Win32 ? '"' : '';
+my $quote = $Is_VMS || $Is_Win32 ?? '"' !! '';
 $tnum = curr_test();
 $exit = system $Perl, '-le', 
                "$($quote)print q<ok $tnum - system(PROG, LIST)>$($quote)";
@@ -85,7 +85,7 @@ do {
 
 is( system(qq{$Perl -e "exit 0"}), 0,     'Explicit exit of 0' );
 
-my $exit_one = $Is_VMS ? 4 << 8 : 1 << 8;
+my $exit_one = $Is_VMS ?? 4 << 8 !! 1 << 8;
 is( system(qq{$Perl "-I../lib" -e "use vmsish qw(hushed); exit 1"}), $exit_one,
     'Explicit exit of 1' );
 

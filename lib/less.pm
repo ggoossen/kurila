@@ -23,7 +23,7 @@ sub of {
  <    %tags{[_unpack_tags( $hinthash->{$class} ) ]} = ();
 
     if ((nelems @_)) {
-        exists %tags{$_} and return !!1 for  @_;
+        exists %tags{$_} and return ! ! 1 for  @_;
         return;
     }
     else {

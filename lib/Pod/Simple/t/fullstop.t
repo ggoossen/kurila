@@ -22,7 +22,7 @@ sub e ($$) { Pod::Simple::DumpAsXML->_duo(< @_) }
 &ok( < e "", "" );
 &ok( < e "\n", "", );
 
-die unless ok !! Pod::Simple::XMLOutStream->can('fullstop_space_harden');
+die unless ok( ! ! Pod::Simple::XMLOutStream->can('fullstop_space_harden'));
 sub harden { @_[0]->fullstop_space_harden(1) }
 
 print "# Test that \".  \" always compacts without the hardening on...\n";

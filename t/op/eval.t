@@ -31,7 +31,7 @@ $ans = eval $fact;
 if ($ans == 120) {print "ok 8\n";} else {print "not ok 8\n";}
 
 $foo = 5;
-$fact = 'local($foo)=$foo; $foo +<= 1 ? 1 : $foo-- * (eval $fact);';
+$fact = 'local($foo)=$foo; $foo +<= 1 ?? 1 !! $foo-- * (eval $fact);';
 $ans = eval $fact;
 if ($ans == 120) {print "ok 9\n";} else {print "not ok 9 $ans\n";}
 
@@ -223,7 +223,7 @@ my $zzz = 1;
 
 eval q{
     sub fred1 {
-	eval q{ print eval '$zzz' == 1 ? 'ok' : 'not ok', " @_[0]\n"}
+	eval q{ print eval '$zzz' == 1 ?? 'ok' !! 'not ok', " @_[0]\n"}
     }
     fred1(47);
     do { my $zzz = 2; fred1(48) };
@@ -231,9 +231,9 @@ eval q{
 
 eval q{
     sub fred2 {
-	print eval('$zzz') == 1 ? 'ok' : 'not ok', " @_[0]\n";
+	print eval('$zzz') == 1 ?? 'ok' !! 'not ok', " @_[0]\n";
     }
-};
+}; die if $@;
 fred2(49);
 do { my $zzz = 2; fred2(50) };
 
@@ -264,15 +264,15 @@ eval q{
 	return $l * fred3($l-1);
     }
     my $r = fred3(5);
-    print $r == 120 ? 'ok' : 'not ok', " 52\n";
+    print $r == 120 ?? 'ok' !! 'not ok', " 52\n";
     $r = eval'fred3(5)';
-    print $r == 120 ? 'ok' : 'not ok', " 53\n";
+    print $r == 120 ?? 'ok' !! 'not ok', " 53\n";
     $r = 0;
     eval '$r = fred3(5)';
-    print $r == 120 ? 'ok' : 'not ok', " 54\n";
+    print $r == 120 ?? 'ok' !! 'not ok', " 54\n";
     $r = 0;
     do { my $yyy = 4; my $zzz = 5; my $l = 6; $r = eval 'fred3(5)' };
-    print $r == 120 ? 'ok' : 'not ok', " 55\n";
+    print $r == 120 ?? 'ok' !! 'not ok', " 55\n";
 };
 my $r = fred3(5);
 print $r == 120 ?? 'ok' !! 'not ok', " 56\n";
@@ -302,9 +302,9 @@ eval q{
     fred4();
     sub fred5 {
 	my $zzz = 4;
-	print( ($zzz == 4  && eval '$zzz' == 4) ? 'ok' : 'not ok', " $test\n" );
+	print( ($zzz == 4  && eval '$zzz' == 4) ?? 'ok' !! 'not ok', " $test\n" );
 	$test++;
-	print eval '$yyy' == 2 ? 'ok' : 'not ok', " $test\n";
+	print eval '$yyy' == 2 ?? 'ok' !! 'not ok', " $test\n";
 	$test++;
 	goto &fred4;
     }

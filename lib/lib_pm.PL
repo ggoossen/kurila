@@ -86,8 +86,8 @@ sub import {
 	foreach my $incver (< @inc_version_list)
 	{
 	    my $dir = $Is_MacOS
-		? File::Spec->catdir( $path, $incver )
-		: "$path/$incver";
+		?? File::Spec->catdir( $path, $incver )
+		!! "$path/$incver";
 	    unshift(@INC, $dir) if -d $dir;
 	}
 	# Put a corresponding archlib directory in front of $path if it

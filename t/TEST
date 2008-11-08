@@ -148,7 +148,7 @@ unless (nelems @ARGV) {
     }
     my $mani = File::Spec->catfile($updir, "MANIFEST");
     if (open(my $mani, "<", $mani)) {
-	my $ext_pat = $^O eq 'MSWin32' ? '(?:win32/)?ext' : 'ext';
+	my $ext_pat = $^O eq 'MSWin32' ?? '(?:win32/)?ext' !! 'ext';
 	while ( ~< *$mani) { # similar code in t/harness
 	    if (m!^($ext_pat/(\S+)/+(?:[^/\s]+\.t|test\.pl)|lib/\S+?(?:\.t|test\.pl))\s!) {
 		my $t = $1;
@@ -185,8 +185,8 @@ elsif ($::with_utf16) {
 	    print STDERR "# ENDIAN $e BOM $b\n";
 	    my @UARGV;
 	    for my $a ( @ARGV) {
-		my $u = $a . "." . ($e ? "l" : "b") . "e" . ($b ? "b" : "");
-		my $f = $e ? "v" : "n";
+		my $u = $a . "." . ($e ?? "l" !! "b") . "e" . ($b ?? "b" !! "");
+		my $f = $e ?? "v" !! "n";
 		push @UARGV, $u;
 		unlink($u);
 		if (open(my $afh, "<", $a)) {
@@ -253,7 +253,7 @@ EOT
     };
 
     while (my $test = shift @tests) {
-        my $test_start_time = $show_elapsed_time ? Time::HiRes::time() : 0;
+        my $test_start_time = $show_elapsed_time ?? Time::HiRes::time() !! 0;
 
 	if ($test =~ m/^$/) {
 	    next;
@@ -309,7 +309,7 @@ EOT
 	    close($script);
 	}
 
-	my $utf8 = $::with_utf8 ? '-I../lib -Mutf8' : '';
+	my $utf8 = $::with_utf8 ?? '-I../lib -Mutf8' !! '';
 	my $testswitch = '-I. -MTestInit'; # -T will strict . from @INC
 	if ($type eq 'deparse') {
 	    my $deparse_cmd =
@@ -322,7 +322,7 @@ EOT
 	}
 	elsif ($type eq 'perl') {
 	    my $perl = %ENV{PERL} || './perl';
-	    my $redir = $^O eq 'VMS' ? '2>&1' : '';
+	    my $redir = $^O eq 'VMS' ?? '2>&1' !! '';
 	    if (%ENV{PERL_VALGRIND}) {
 		my $valgrind = %ENV{VALGRIND} // 'valgrind';
 		my $vg_opts = %ENV{VG_OPTS}
@@ -408,7 +408,7 @@ EOT
 			}
 		    }
 		    elsif (m/^Bail out!\s*(.*)/i) { # magic words
-			die "FAILED--Further testing stopped" . ($1 ? ": $1\n" : ".\n");
+			die "FAILED--Further testing stopped" . ($1 ?? ": $1\n" !! ".\n");
 		    }
 		    else {
 			# module tests are allowed extra output,
@@ -532,8 +532,8 @@ EOT
 	}
     }
     else {
-	my $pct = $tested_files ? sprintf("%.2f", ($tested_files - $::bad_files) / $tested_files * 100) : "0.00";
-	my $s = $::bad_files == 1 ? "" : "s";
+	my $pct = $tested_files ?? sprintf("%.2f", ($tested_files - $::bad_files) / $tested_files * 100) !! "0.00";
+	my $s = $::bad_files == 1 ?? "" !! "s";
 	print STDERR "Failed $::bad_files test$s out of $tested_files, $pct% okay.\n";
 	for my $test (sort grep { %failed_tests{$_} } keys %failed_tests) {
 	    print "\t$test\n";
@@ -586,7 +586,7 @@ SHRDLU_5
     print sprintf('u=%.2f  s=%.2f  cu=%.2f  cs=%.2f  scripts=%d  tests=%d' . "\n",
 	$user,$sys,$cuser,$csys,$tested_files,$totmax);
     if (%ENV{PERL_VALGRIND}) {
-	my $s = $valgrind == 1 ? '' : 's';
+	my $s = $valgrind == 1 ?? '' !! 's';
 	print "$valgrind valgrind report$s created.\n", ;
     }
 }

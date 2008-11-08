@@ -580,7 +580,7 @@ sub is_tainted_pp {
     my $nada = substr($arg, 0, 0); # zero-length
     local $@;
     try { eval "# $nada" };
-    return $@ ? 1 : 0;
+    return $@ ?? 1 !! 0;
 }
 
 sub _find_opt {
@@ -597,7 +597,7 @@ sub _find_opt {
     local($dir, $name, $fullname, $prune);
     local *_ = \my $a;
 
-    my $cwd            = $wanted->{bydepth} ? Cwd::fastcwd() : Cwd::getcwd();
+    my $cwd            = $wanted->{bydepth} ?? Cwd::fastcwd() !! Cwd::getcwd();
     if ($Is_VMS) {
 	# VMS returns this by default in VMS format which just doesn't
 	# work for the rest of this module.
@@ -619,8 +619,8 @@ sub _find_opt {
     $pre_process       = $wanted->{preprocess};
     $post_process      = $wanted->{postprocess};
     $no_chdir          = $wanted->{no_chdir};
-    $full_check        = $^O eq 'MSWin32' ? 0 : $wanted->{follow};
-    $follow            = $^O eq 'MSWin32' ? 0 :
+    $full_check        = $^O eq 'MSWin32' ?? 0 !! $wanted->{follow};
+    $follow            = $^O eq 'MSWin32' ?? 0 !!
                              $full_check || $wanted->{follow_fast};
     $follow_skip       = $wanted->{follow_skip};
     $untaint           = $wanted->{untaint};
@@ -640,7 +640,7 @@ sub _find_opt {
     foreach my $TOP ( @_) {
 	my $top_item = $TOP;
 
-	($topdev,$topino,$topmode,$topnlink) = $follow ? stat $top_item : lstat $top_item;
+	($topdev,$topino,$topmode,$topnlink) = $follow ?? stat $top_item !! lstat $top_item;
 
 	if ($Is_MacOS) {
 	    $top_item = ":$top_item"
@@ -788,9 +788,9 @@ sub _find_dir($$$) {
     my $no_nlink;
 
     if ($Is_MacOS) {
-	$dir_pref= ($p_dir =~ m/:$/) ? $p_dir : "$p_dir:"; # preface
+	$dir_pref= ($p_dir =~ m/:$/) ?? $p_dir !! "$p_dir:"; # preface
     } elsif ($^O eq 'MSWin32') {
-	$dir_pref = ($p_dir =~ m|\w:/$| ? $p_dir : "$p_dir/" );
+	$dir_pref = ($p_dir =~ m|\w:/$| ?? $p_dir !! "$p_dir/" );
     } elsif ($^O eq 'VMS') {
 
 	#	VMS is returning trailing .dir on directories
@@ -800,10 +800,10 @@ sub _find_dir($$$) {
 
 	$p_dir =~ s/\.(dir)?$//i unless $p_dir eq '.';
 
-	$dir_pref = ($p_dir =~ m/[\]>]+$/ ? $p_dir : "$p_dir/" );
+	$dir_pref = ($p_dir =~ m/[\]>]+$/ ?? $p_dir !! "$p_dir/" );
     }
     else {
-	$dir_pref= ( $p_dir eq '/' ? '/' : "$p_dir/" );
+	$dir_pref= ( $p_dir eq '/' ?? '/' !! "$p_dir/" );
     }
 
     local ($dir, $name, $prune, *DIR);
@@ -821,7 +821,7 @@ sub _find_dir($$$) {
 		}
 	    }
 	}
-	unless (chdir ($Is_VMS && $udir !~ m/[\/\[<]+/ ? "./$udir" : $udir)) {
+	unless (chdir ($Is_VMS && $udir !~ m/[\/\[<]+/ ?? "./$udir" !! $udir)) {
 	    warnings::warnif "Can't cd to $udir: $!\n";
 	    return;
 	}
@@ -838,7 +838,7 @@ sub _find_dir($$$) {
 	unless ($bydepth) {
 	    $dir= $p_dir; # $File::Find::dir
 	    $name= $dir_name; # $File::Find::name
-	    $_= ($no_chdir ? $dir_name : $dir_rel ); # $_
+	    $_= ($no_chdir ?? $dir_name !! $dir_rel ); # $_
 	    # prune may happen here
 	    $prune= 0;
 	    do { $wanted_callback->() };;	# protect against wild "next"
@@ -856,20 +856,20 @@ sub _find_dir($$$) {
 			    die "directory ($p_dir) $dir_rel is still tainted";
 			}
 			else {
-			    die "directory (" . ($p_dir ne '/' ? $p_dir : '') . "/) $dir_rel is still tainted";
+			    die "directory (" . ($p_dir ne '/' ?? $p_dir !! '') . "/) $dir_rel is still tainted";
 			}
 		    } else { # $untaint_skip == 1
 			next;
 		    }
 		}
 	    }
-	    unless (chdir ($Is_VMS && $udir !~ m/[\/\[<]+/ ? "./$udir" : $udir)) {
+	    unless (chdir ($Is_VMS && $udir !~ m/[\/\[<]+/ ?? "./$udir" !! $udir)) {
 		if ($Is_MacOS) {
 		    warnings::warnif "Can't cd to ($p_dir) $udir: $!\n";
 		}
 		else {
 		    warnings::warnif "Can't cd to (" .
-			($p_dir ne '/' ? $p_dir : '') . "/) $udir: $!\n";
+			($p_dir ne '/' ?? $p_dir !! '') . "/) $udir: $!\n";
 		}
 		next;
 	    }
@@ -883,7 +883,7 @@ sub _find_dir($$$) {
 	$dir= $dir_name; # $File::Find::dir
 
 	# Get the list of files in the current directory.
-	unless (opendir DIR, ($no_chdir ? $dir_name : $File::Find::current_dir)) {
+	unless (opendir DIR, ($no_chdir ?? $dir_name !! $File::Find::current_dir)) {
 	    warnings::warnif "Can't opendir($dir_name): $!\n";
 	    next;
 	}
@@ -912,7 +912,7 @@ sub _find_dir($$$) {
 		next if $FN =~ $File::Find::skip_pattern;
 		
 		$name = $dir_pref . $FN; # $File::Find::name
-		$_ = ($no_chdir ? $name : $FN); # $_
+		$_ = ($no_chdir ?? $name !! $FN); # $_
 		do { $wanted_callback->() };; # protect against wild "next"
 	    }
 
@@ -932,7 +932,7 @@ sub _find_dir($$$) {
 		    # Seen all the subdirs?
 		    # check for directoriness.
 		    # stat is faster for a file in the current directory
-		    $sub_nlink = @(lstat ($no_chdir ? $dir_pref . $FN : $FN))[3];
+		    $sub_nlink = @(lstat ($no_chdir ?? $dir_pref . $FN !! $FN))[3];
 
 		    if (-d _) {
 			--$subcount;
@@ -944,13 +944,13 @@ sub _find_dir($$$) {
 		    }
 		    else {
 			$name = $dir_pref . $FN; # $File::Find::name
-			$_= ($no_chdir ? $name : $FN); # $_
+			$_= ($no_chdir ?? $name !! $FN); # $_
 			do { $wanted_callback->() };; # protect against wild "next"
 		    }
 		}
 		else {
 		    $name = $dir_pref . $FN; # $File::Find::name
-		    $_= ($no_chdir ? $name : $FN); # $_
+		    $_= ($no_chdir ?? $name !! $FN); # $_
 		    do { $wanted_callback->() };; # protect against wild "next"
 		}
 	    }
@@ -982,7 +982,7 @@ sub _find_dir($$$) {
 		$dir_pref = "$dir_name:";
 	    }
 	    elsif ($^O eq 'MSWin32') {
-		$dir_name = ($p_dir =~ m|\w:/$| ? "$p_dir$dir_rel" : "$p_dir/$dir_rel");
+		$dir_name = ($p_dir =~ m|\w:/$| ?? "$p_dir$dir_rel" !! "$p_dir/$dir_rel");
 		$dir_pref = "$dir_name/";
 	    }
 	    elsif ($^O eq 'VMS') {
@@ -997,7 +997,7 @@ sub _find_dir($$$) {
                 }
 	    }
 	    else {
-		$dir_name = ($p_dir eq '/' ? "/$dir_rel" : "$p_dir/$dir_rel");
+		$dir_name = ($p_dir eq '/' ?? "/$dir_rel" !! "$p_dir/$dir_rel");
 		$dir_pref = "$dir_name/";
 	    }
 
@@ -1014,16 +1014,16 @@ sub _find_dir($$$) {
 			$p_dir = "$p_dir:" unless ($p_dir =~ m/:$/);
 		    }
 		    $dir = $p_dir; # $File::Find::dir
-		    $_ = ($no_chdir ? $name : $dir_rel); # $_
+		    $_ = ($no_chdir ?? $name !! $dir_rel); # $_
 		}
 		else {
 		    if ( substr($name,-2) eq '/.' ) {
-			substr($name, (length($name) == 2 ? -1 : -2), undef, '');
+			substr($name, (length($name) == 2 ?? -1 !! -2), undef, '');
 		    }
 		    $dir = $p_dir;
-		    $_ = ($no_chdir ? $dir_name : $dir_rel );
+		    $_ = ($no_chdir ?? $dir_name !! $dir_rel );
 		    if ( substr($_,-2) eq '/.' ) {
-			substr($_, (length($_) == 2 ? -1 : -2), undef, '');
+			substr($_, (length($_) == 2 ?? -1 !! -2), undef, '');
 		    }
 		}
 		do { $wanted_callback->() };; # protect against wild "next"
@@ -1060,11 +1060,11 @@ sub _find_dir_symlnk($$$) {
     my $ok = 1;
 
     if ($Is_MacOS) {
-	$dir_pref = ($p_dir =~ m/:$/) ? "$p_dir" : "$p_dir:";
-	$loc_pref = ($dir_loc =~ m/:$/) ? "$dir_loc" : "$dir_loc:";
+	$dir_pref = ($p_dir =~ m/:$/) ?? "$p_dir" !! "$p_dir:";
+	$loc_pref = ($dir_loc =~ m/:$/) ?? "$dir_loc" !! "$dir_loc:";
     } else {
-	$dir_pref = ( $p_dir   eq '/' ? '/' : "$p_dir/" );
-	$loc_pref = ( $dir_loc eq '/' ? '/' : "$dir_loc/" );
+	$dir_pref = ( $p_dir   eq '/' ?? '/' !! "$p_dir/" );
+	$loc_pref = ( $dir_loc eq '/' ?? '/' !! "$dir_loc/" );
     }
 
     local ($dir, $name, $fullname, $prune, *DIR);
@@ -1110,7 +1110,7 @@ sub _find_dir_symlnk($$$) {
 	    }
 	    $dir= $p_dir; # $File::Find::dir
 	    $name= $dir_name; # $File::Find::name
-	    $_= ($no_chdir ? $dir_name : $dir_rel ); # $_
+	    $_= ($no_chdir ?? $dir_name !! $dir_rel ); # $_
 	    $fullname= $dir_loc; # $File::Find::fullname
 	    # prune may happen here
 	    $prune= 0;
@@ -1147,7 +1147,7 @@ sub _find_dir_symlnk($$$) {
 	$dir = $dir_name; # $File::Find::dir
 
 	# Get the list of files in the current directory.
-	unless (opendir DIR, ($no_chdir ? $dir_loc : $File::Find::current_dir)) {
+	unless (opendir DIR, ($no_chdir ?? $dir_loc !! $File::Find::current_dir)) {
 	    warnings::warnif "Can't opendir($dir_loc): $!\n";
 	    next;
 	}
@@ -1180,7 +1180,7 @@ sub _find_dir_symlnk($$$) {
 
 	        $fullname = undef;
 	        $name = $dir_pref . $FN;
-	        $_ = ($no_chdir ? $name : $FN);
+	        $_ = ($no_chdir ?? $name !! $FN);
 	        do { $wanted_callback->() };;
 	        next;
 	    }
@@ -1197,7 +1197,7 @@ sub _find_dir_symlnk($$$) {
 	    else {
 		$fullname = $new_loc; # $File::Find::fullname
 		$name = $dir_pref . $FN; # $File::Find::name
-		$_ = ($no_chdir ? $name : $FN); # $_
+		$_ = ($no_chdir ?? $name !! $FN); # $_
 		do { $wanted_callback->() };; # protect against wild "next"
 	    }
 	}
@@ -1211,10 +1211,10 @@ sub _find_dir_symlnk($$$) {
 		# where $dir_rel eq ':'
 		$dir_name = "$p_dir$dir_rel";
 		$dir_pref = "$dir_name:";
-		$loc_pref = ($dir_loc =~ m/:$/) ? $dir_loc : "$dir_loc:";
+		$loc_pref = ($dir_loc =~ m/:$/) ?? $dir_loc !! "$dir_loc:";
 	    }
 	    else {
-		$dir_name = ($p_dir eq '/' ? "/$dir_rel" : "$p_dir/$dir_rel");
+		$dir_name = ($p_dir eq '/' ?? "/$dir_rel" !! "$p_dir/$dir_rel");
 		$dir_pref = "$dir_name/";
 		$loc_pref = "$dir_loc/";
 	    }
@@ -1233,16 +1233,16 @@ sub _find_dir_symlnk($$$) {
 			$p_dir = "$p_dir:" unless ($p_dir =~ m/:$/);
 		    }
 		    $dir = $p_dir; # $File::Find::dir
-		     $_ = ($no_chdir ? $name : $dir_rel); # $_
+		     $_ = ($no_chdir ?? $name !! $dir_rel); # $_
 		}
 		else {
 		    if ( substr($name,-2) eq '/.' ) {
-			substr($name, (length($name) == 2 ? -1 : -2), undef, ''); # $File::Find::name
+			substr($name, (length($name) == 2 ?? -1 !! -2), undef, ''); # $File::Find::name
 		    }
 		    $dir = $p_dir; # $File::Find::dir
-		    $_ = ($no_chdir ? $dir_name : $dir_rel); # $_
+		    $_ = ($no_chdir ?? $dir_name !! $dir_rel); # $_
 		    if ( substr($_,-2) eq '/.' ) {
-			substr($_, (length($_) == 2 ? -1 : -2), undef, '');
+			substr($_, (length($_) == 2 ?? -1 !! -2), undef, '');
 		    }
 		}
 
@@ -1327,7 +1327,7 @@ unless ($File::Find::dont_use_nlink) {
 do {
     local $@;
     try { require Scalar::Util };
-    *is_tainted = $@ ? \&is_tainted_pp : \&Scalar::Util::tainted;
+    *is_tainted = $@ ?? \&is_tainted_pp !! \&Scalar::Util::tainted;
 };
 
 1;

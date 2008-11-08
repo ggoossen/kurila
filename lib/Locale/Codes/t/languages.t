@@ -3,11 +3,6 @@
 # language.t - tests for Locale::Language
 #
 
-BEGIN {
-	chdir 't' if -d 't';
-	@INC = @( '../lib' );
-}
-
 use Locale::Language;
 
 no utf8; # we contain Latin-1
@@ -97,14 +92,13 @@ our @TESTS =
  'language2code("Zulu")      eq "zu"',       # last in DATA segment
 );
 
-print "1..", int(nelems @TESTS), "\n";
+require "./test.pl";
 
-my $testid = 1;
+plan(nelems @TESTS);
+
 foreach my $test ( @TESTS)
 {
-    eval "print (($test) ? \"ok $testid\\n\" : \"not ok $testid\\n\" )";
-    print "not ok $testid\n" if $@;
-    ++$testid;
+    dies_not( sub { eval "$test" } );
 }
 
 exit 0;

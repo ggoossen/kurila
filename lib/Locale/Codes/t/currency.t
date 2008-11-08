@@ -67,14 +67,11 @@ our @TESTS =
  'currency2code("Canadian Dollar") eq "cad"',       # last in DATA segment
 );
 
-print "1..", int(nelems @TESTS), "\n";
+require "./test.pl";
 
-my $testid = 1;
+plan(nelems @TESTS);
+
 foreach my $test ( @TESTS)
 {
-    eval "print (($test) ? \"ok $testid\\n\" : \"not ok $testid\\n\" )";
-    print "not ok $testid\n" if $@;
-    ++$testid;
+    dies_not( sub { eval "$test" } );
 }
-
-exit 0;
