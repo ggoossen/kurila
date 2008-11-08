@@ -81,7 +81,7 @@ our $str;
 chop ($str .= ~< *DATA);
 ########
 our ($x, $y);
-$x=2;$y=3;$x+<$y ? $x : $y += 23;print $x;
+$x=2;$y=3;$x+<$y ?? $x !! $y += 23;print $x;
 EXPECT
 25
 ########
@@ -148,7 +148,7 @@ print "ok\n" if ("\0" cmp "\x[FF]") +< 0;
 EXPECT
 ok
 ########
-open(H,"<",$^O eq 'MacOS' ? ':run:fresh_perl.t' : 'run/fresh_perl.t'); # must be in the 't' directory
+open(H,"<",$^O eq 'MacOS' ?? ':run:fresh_perl.t' !! 'run/fresh_perl.t'); # must be in the 't' directory
 stat(H);
 print "ok\n" if (-e _ and -f _ and -r _);
 EXPECT

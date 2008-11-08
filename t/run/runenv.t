@@ -81,7 +81,7 @@ sub it_didnt_work {
 
 sub tryrun {
   my ($success, $reason) = < runperl(< @_);
-  ok( !!$success, 1, $reason );
+  ok( $success, $reason );
 }
 
 #  PERL5OPT    Command-line options (switches).  Switches in

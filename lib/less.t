@@ -1,13 +1,8 @@
 #!./perl -w
 
-BEGIN {
-    chdir 't' if -d 't';
-    push @INC, '../lib';
-}
+use Test::More tests => 5;
 
-use Test::More tests => 6;
-
-BEGIN { use_ok( 'less' ) }
+use less ();
 
 is_deeply(\less->of, \@(), 'more please');
 use less;

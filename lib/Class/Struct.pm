@@ -104,7 +104,7 @@ sub struct {
             %refs{$name}++;
             $type = $1;
         }
-        my $init = "defined(\%init\{'$name'\}) ? \%init\{'$name'\} :";
+        my $init = "defined(\%init\{'$name'\}) ?? \%init\{'$name'\} !! ";
         if( $type eq '@' ){
             $out .= "    die 'Initializer for $name must be array reference'\n"; 
             $out .= "        if defined(\%init\{'$name'\}) && ref(\%init\{'$name'\}) ne 'ARRAY';\n";
@@ -163,13 +163,13 @@ sub struct {
             }
             if( defined %arrays{$name} ){
                 $out .= "    my \$i;\n";
-                $out .= "    \@_ ? (\$i = shift) : return \$r->$elem;\n"; 
+                $out .= "    \@_ ?? (\$i = shift) !! return \$r->$elem;\n"; 
                 $out .= "    if (ref(\$i) eq 'ARRAY' && !\@_) \{ \$r->$elem = \$i; return \$r \}\n";
                 $sel = "->[\$i]";
             }
             elsif( defined %hashes{$name} ){
                 $out .= "    my \$i;\n";
-                $out .= "    \@_ ? (\$i = shift) : return \$r->$elem;\n";
+                $out .= "    \@_ ?? (\$i = shift) !! return \$r->$elem;\n";
                 $out .= "    if (ref(\$i) eq 'HASH' && !\@_) \{ \$r->$elem = \$i; return \$r \}\n";
                 $sel = "->\{\$i\}";
             }
@@ -177,7 +177,7 @@ sub struct {
                 $out .= "    die '$name argument is wrong class' if \@_ && ! UNIVERSAL::isa(\@_[0], '%classes{$name}');\n";
             }
             $out .= "    die 'Too many args to $name' if nelems(\@_) +> 1;\n";
-            $out .= "    \@_ ? ($pre\$r->$elem$sel = shift$pst) : $pre\$r->$elem$sel$pst;\n";
+            $out .= "    \@_ ?? ($pre\$r->$elem$sel = shift$pst) !! $pre\$r->$elem$sel$pst;\n";
             $out .= "  \}\n";
         }
     }

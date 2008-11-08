@@ -29,7 +29,7 @@ sub try_cmp_ok {
 
     local $Test::Builder::Level = $Test::Builder::Level + 1;
     my $ok = cmp_ok($left, $cmp, $right);
-    $TB->is_num(!!$ok, !!%expect{ok});
+    $TB->is_num( ! ! $ok, ! ! %expect{ok});
     
     my $diag = $$err;
     $$err = "";

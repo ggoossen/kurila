@@ -829,9 +829,9 @@ package abc ;
 use warnings "io" ;
 use warnings::register ;
 sub check { 
-  print "abc self" . (warnings::enabled() ? "" : " not") . " enabled\n" ;
-  print "abc def"  . (warnings::enabled('def') ? "" : " not") . " enabled\n" ;
-  print "abc all"  . (warnings::enabled('all') ? "" : " not") . " enabled\n" ;
+  print "abc self" . (warnings::enabled() ?? "" !! " not") . " enabled\n" ;
+  print "abc def"  . (warnings::enabled('def') ?? "" !! " not") . " enabled\n" ;
+  print "abc all"  . (warnings::enabled('all') ?? "" !! " not") . " enabled\n" ;
 }
 1;
 --FILE-- def.pm
@@ -839,9 +839,9 @@ package def ;
 use warnings "io" ;
 use warnings::register ;
 sub check { 
-  print "def self" . (warnings::enabled() ? "" : " not") . " enabled\n" ;
-  print "def abc"  . (warnings::enabled('abc') ? "" : " not") . " enabled\n" ;
-  print "def all"  . (warnings::enabled('all') ? "" : " not") . " enabled\n" ;
+  print "def self" . (warnings::enabled() ?? "" !! " not") . " enabled\n" ;
+  print "def abc"  . (warnings::enabled('abc') ?? "" !! " not") . " enabled\n" ;
+  print "def all"  . (warnings::enabled('all') ?? "" !! " not") . " enabled\n" ;
 }
 1;
 --FILE-- 

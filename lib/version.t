@@ -487,7 +487,7 @@ SKIP: do {
     };
 
     eval 'my $v = $CLASS->new("1._1");';
-    unlike($@, qr/^Invalid version format \(alpha with zero width\)/,
+    unlike($@->{description}, qr/^Invalid version format \(alpha with zero width\)/,
     	"Invalid version format 1._1");
 
     do {

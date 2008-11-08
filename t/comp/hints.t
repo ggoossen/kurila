@@ -97,7 +97,7 @@ do {
     BEGIN{%^H{x}=1};
     for(1..2) {
         eval q(
-            print %^H{x}==1 && !%^H{y} ? "ok\n" : "not ok\n";
+            print %^H{x}==1 && !%^H{y} ?? "ok\n" !! "not ok\n";
             %^H{y} = 1;
         );
         if ($@) {

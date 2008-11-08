@@ -337,7 +337,7 @@ sub bootstrap {
 	
 	# check for common cases to avoid autoload of dl_findfile
 	my $try = <<$^O-eq-MacOS>> "$dir:$modfname.$dl_dlext" <<|$^O-eq-MacOS>> "$dir/$modfname.$dl_dlext"<</$^O-eq-MacOS>>;
-	last if $file = <<$^O-eq-VMS>>($do_expand) ? dl_expandspec($try) : ((-f $try) && $try);
+	last if $file = <<$^O-eq-VMS>>($do_expand) ?? dl_expandspec($try) !! ((-f $try) && $try);
 	<<|$^O-eq-VMS>>(-f $try) && $try;
 	<</$^O-eq-VMS>>
 	
@@ -521,7 +521,7 @@ sub dl_findfile {
             foreach my $name (@names) {
 		my($file) = "$dir$dirsep$name";
                 print STDERR " checking in $dir for $name\n" if $dl_debug;
-		$file = ($do_expand) ? dl_expandspec($file) : (-f $file && $file);
+		$file = ($do_expand) ?? dl_expandspec($file) !! (-f $file && $file);
 		#$file = _check_file($file);
 		if ($file) {
                     push(@found, $file);
