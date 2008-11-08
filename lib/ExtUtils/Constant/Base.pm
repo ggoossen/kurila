@@ -641,8 +641,8 @@ sub normalise_items
             $item = \%(name=>$name, type=>$default_type);
             $what->{$default_type} = 1;
         }
-        warn (ref ($self) || $self)
-          . "doesn't know how to handle values of type $_ used in macro $name"
+        warn( (ref ($self) || $self)
+          . "doesn't know how to handle values of type $_ used in macro $name")
             unless $self->valid_type ($item->{type});
 
         $item->{name} = $name;

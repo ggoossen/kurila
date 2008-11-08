@@ -687,17 +687,17 @@ sub mkCheckRex {
     # In which case, we can continue to match for the eval in the rexexp built
     # from the golden result.
 
-    $str =~ s!(?:next|db)state
+    $str =~ s{(?:next|db)state
 	      \\\(			# opening literal ( (backslash escaped)
 	      [^()]*?			# not ()
 	      (\\\(eval\ \d+\\\)	# maybe /eval \d+/ in ()
 	       [^()]*?			# which might be followed by something
 	      )?
 	      \\\)			# closing literal )
-	     !$( '(?:next|db)state\([^()]*?' .
+	     }{$( '(?:next|db)state\([^()]*?' .
 	      ($1 ?? '\(eval \d+\)[^()]*' !! '')	# Match the eval if present
 	      . '\)'
-)!msgx;
+)}msgx;
     # widened for -terse mode
     $str =~ s/(?:next|db)state/(?:next|db)state/msg;
 

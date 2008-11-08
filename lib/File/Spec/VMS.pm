@@ -93,7 +93,7 @@ sub catdir {
 
     my $rslt;
     if (@dirs) {
-	my $path = ((nelems @dirs) == 1) ? @dirs[0] : $self->catdir(< @dirs);
+	my $path = ((nelems @dirs) == 1) ?? @dirs[0] !! $self->catdir(< @dirs);
 	my ($spath,$sdir) = ($path,$dir);
 	$spath =~ s/\.dir\Z(?!\n)//; $sdir =~ s/\.dir\Z(?!\n)//; 
 	$sdir = $self->eliminate_macros($sdir) unless $sdir =~ m/^[\w\-]+\Z(?!\n)/s;
@@ -127,7 +127,7 @@ sub catfile {
 
     my $rslt;
     if (@files) {
-	my $path = ((nelems @files) == 1) ? @files[0] : $self->catdir(<@files);
+	my $path = ((nelems @files) == 1) ?? @files[0] !! $self->catdir(<@files);
 	my $spath = $path;
 	$spath =~ s/\.dir\Z(?!\n)//;
 	if ($spath =~ m/^[^\)\]\/:>]+\)\Z(?!\n)/s && basename($file) eq $file) {
@@ -135,10 +135,10 @@ sub catfile {
 	}
 	else {
 	    $rslt = $self->eliminate_macros($spath);
-	    $rslt = vmsify($rslt.((defined $rslt) && ($rslt ne '') ? '/' : '').unixify($file));
+	    $rslt = vmsify($rslt.((defined $rslt) && ($rslt ne '') ?? '/' !! '').unixify($file));
 	}
     }
-    else { $rslt = (defined($file) && length($file)) ? vmsify($file) : ''; }
+    else { $rslt = (defined($file) && length($file)) ?? vmsify($file) !! ''; }
     return $self->canonpath($rslt);
 }
 
@@ -298,7 +298,7 @@ sub catpath {
     # We look for a volume in $dev, then in $dir, but not both
     my ($dir_volume, $dir_dir, $dir_file) = $self->splitpath($dir);
     $dev = $dir_volume unless length $dev;
-    $dir = length $dir_file ? $self->catfile($dir_dir, $dir_file) : $dir_dir;
+    $dir = length $dir_file ?? $self->catfile($dir_dir, $dir_file) !! $dir_dir;
     
     if ($dev =~ m|^/+([^/]+)|) { $dev = "$1:"; }
     else { $dev .= ':' unless $dev eq '' or $dev =~ m/:\Z(?!\n)/; }
@@ -382,8 +382,8 @@ sub rel2abs {
     return undef unless defined $path;
     if ($path =~ m/\//) {
 	$path = ( -d $path || $path =~ m/\/\z/  # educated guessing about
-		   ? vmspath($path)             # whether it's a directory
-		   : vmsify($path) );
+		   ?? vmspath($path)             # whether it's a directory
+		   !! vmsify($path) );
     }
     $base = vmspath($base) if defined $base && $base =~ m/\//;
     # Clean up and split up $path
@@ -491,8 +491,8 @@ sub fixpath {
     elsif ((($prefix,$name) = ($path =~ m#^\$\(([^\)]+)\)(.+)#s)) && $self->{$prefix}) {
         my($vmspre) = $self->eliminate_macros("\$($prefix)");
         # is it a dir or just a name?
-        $vmspre = ($vmspre =~ m|/| or $prefix =~ m/DIR\Z(?!\n)/) ? vmspath($vmspre) : '';
-        $fixedpath = ($vmspre ? $vmspre : $self->{$prefix}) . $name;
+        $vmspre = ($vmspre =~ m|/| or $prefix =~ m/DIR\Z(?!\n)/) ?? vmspath($vmspre) !! '';
+        $fixedpath = ($vmspre ?? $vmspre !! $self->{$prefix}) . $name;
         $fixedpath = vmspath($fixedpath) if $force_path;
     }
     else {

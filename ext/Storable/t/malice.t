@@ -66,10 +66,10 @@ sub test_hash {
 
 sub test_header {
   my ($header, $isfile, $isnetorder) = < @_;
-  is (!!$header->{file}, !!$isfile, "is file");
+  is ( ! ! $header->{file}, ! ! $isfile, "is file");
   is ($header->{major}, $major, "major number");
   is ($header->{minor}, $minor_write, "minor number");
-  is (!!$header->{netorder}, !!$isnetorder, "is network order");
+  is ( ! ! $header->{netorder}, ! ! $isnetorder, "is network order");
   if ($isnetorder) {
     # Network order header has no sizes
   } else {

@@ -216,7 +216,7 @@ flop		1..2
 and		$x && $y
 or		$x || $y
 xor		$x xor $y
-cond_expr	$x ? 1 : 0
+cond_expr	$x ?? 1 !! 0
 andassign	$x &&= $y
 orassign	$x ||= $y
 method		Foo->?$x()
