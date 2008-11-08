@@ -1120,6 +1120,15 @@ sub add_call_parens {
     }
 }
 
+sub rename_ternary_op {
+    my $xml = shift;
+    for my $madprop ($xml->findnodes(qq|//mad_conditional_op[\@val="?"]|)) {
+        my $op = $madprop->parent->parent;
+        set_madprop($op, "conditional_op", "??");
+        set_madprop($op, "attribute", "!!");
+    }
+}
+
 my $from; # floating point number with starting version of kurila.
 GetOptions("from=s" => \$from);
 $from =~ m/(\w+)[-]([\d.]+)$/ or die "invalid from: '$from'";
@@ -1216,6 +1225,7 @@ if ($from->{branch} ne "kurila" or $from->{v} < qv '1.15') {
 }
 
 #add_call_parens($twig);
+rename_ternary_op($twig);
 
 # print
 $twig->print( pretty_print => 'indented' );
