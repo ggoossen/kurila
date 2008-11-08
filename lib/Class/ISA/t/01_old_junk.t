@@ -15,7 +15,7 @@ print "ok 1\n";
   @Life::Fungus::ISA = qw(Life);
   @Chemicals::ISA = qw(Matter);
   @Life::ISA = qw(Matter);
-  @Matter::ISA = @( qw() );
+  @Matter::ISA = qw();
 
   use Class::ISA;
   my @path = Class::ISA::super_path('Food::Fishstick');

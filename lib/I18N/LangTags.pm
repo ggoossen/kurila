@@ -7,7 +7,7 @@ package I18N::LangTags;
 use vars < qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $VERSION %Panic);
 require Exporter;
 @ISA = qw(Exporter);
-@EXPORT = @( qw() );
+@EXPORT = qw();
 @EXPORT_OK = qw(is_language_tag same_language_tag
                 extract_language_tags super_languages
                 similarity_language_tag is_dialect_of

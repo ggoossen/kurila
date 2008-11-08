@@ -7,7 +7,7 @@ require q(./test.pl); plan(tests => 4);
 
 do {
     package Foo;
-    our @ISA = @( qw// );
+    our @ISA = qw//;
 };
 
 ok(!mro::get_pkg_gen('ReallyDoesNotExist'),

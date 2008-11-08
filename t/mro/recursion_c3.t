@@ -45,13 +45,13 @@ do {
     our @ISA = qw/A B C/;
     package C;
     use mro 'c3';
-    our @ISA = @( qw// );
+    our @ISA = qw//;
     package B;
     use mro 'c3';
-    our @ISA = @( qw// );
+    our @ISA = qw//;
     package A;
     use mro 'c3';
-    our @ISA = @( qw// );
+    our @ISA = qw//;
 };
 
 # A series of 8 abberations that would cause infinite loops,
@@ -59,11 +59,11 @@ do {
 my @loopies = @(
     sub { @E::ISA = qw/F/ },
     sub { @E::ISA = qw/D/; @C::ISA = qw/F/ },
-    sub { @C::ISA = @( qw// ); @A::ISA = qw/K/ },
-    sub { @A::ISA = @( qw// ); @J::ISA = qw/F K/ },
+    sub { @C::ISA = qw//; @A::ISA = qw/K/ },
+    sub { @A::ISA = qw//; @J::ISA = qw/F K/ },
     sub { @J::ISA = qw/F/; @H::ISA = qw/K G/ },
     sub { @H::ISA = qw/G/; @B::ISA = qw/B/ },
-    sub { @B::ISA = @( qw// ); @K::ISA = qw/K J I/ },
+    sub { @B::ISA = qw//; @K::ISA = qw/K J I/ },
     sub { @K::ISA = qw/J I/; @D::ISA = qw/A H B C/ },
 );
 
