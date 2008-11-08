@@ -629,7 +629,7 @@ my $no = No;
 if (defined $no and !$no) {
   print "ok $test\n";
 } else {
-  print "not ok $test # \$no=" . defined ($no) ? "'$no'\n" : "undef\n";
+  print "not ok $test # \$no=" . defined ($no) ?? "'$no'\n" !! "undef\n";
 }
 $test++;
 

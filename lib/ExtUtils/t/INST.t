@@ -68,7 +68,7 @@ my $config_prefix = config_value("installprefixexp") || config_value("installpre
                     config_value("prefixexp")        || config_value("prefix");
 is( $mm->{PERLPREFIX}, $config_prefix,   'PERLPREFIX' );
 
-is( !!$mm->{PERL_CORE}, !!%ENV{PERL_CORE}, 'PERL_CORE' );
+is( $mm->{PERL_CORE}, %ENV{PERL_CORE}, 'PERL_CORE' );
 
 my($perl_src, $mm_perl_src);
 if( %ENV{PERL_CORE} ) {

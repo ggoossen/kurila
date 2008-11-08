@@ -13,7 +13,7 @@ shift @tests
 
 plan( (nelems @tests) + 2 + ( (nelems @strs) - nelems(grep { !$_ or m/^---/ } @strs )));
 
-is( scalar nelems @tests, $NUM_SECTS,
+is( nelems @tests, $NUM_SECTS,
     "Expecting output for $NUM_SECTS patterns" );
 ok( defined $out, 'regop.pl returned something defined' );
 

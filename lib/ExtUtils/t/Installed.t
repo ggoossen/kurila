@@ -13,7 +13,7 @@ use Test::More tests => 51;
 
 BEGIN { use_ok( 'ExtUtils::Installed' ) }
 
-my $mandirs =  !!config_value("man1direxp") + !!config_value("man3direxp");
+my $mandirs = ! ! config_value("man1direxp") + ! ! config_value("man3direxp");
 
 # saves having to qualify package name for class methods
 my $ei = bless( \%(), 'ExtUtils::Installed' );

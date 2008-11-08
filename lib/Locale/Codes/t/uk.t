@@ -58,5 +58,5 @@ plan(int(nelems @TESTS));
 
 foreach my $test ( @TESTS)
 {
-    lives_ok( sub { eval "$test" } );
+    dies_not( sub { eval "$test" } );
 }

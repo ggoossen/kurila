@@ -98,7 +98,7 @@ foreach my $prefix (qw(PERLPREFIX SITEPREFIX VENDORPREFIX)) {
     is( $mm->{$prefix}, '$(PREFIX)', "\$(PREFIX) overrides $prefix" );
 }
 
-is( !!$mm->{PERL_CORE}, !!%ENV{PERL_CORE}, 'PERL_CORE' );
+is( ! ! $mm->{PERL_CORE}, ! ! %ENV{PERL_CORE}, 'PERL_CORE' );
 
 my($perl_src, $mm_perl_src);
 if( %ENV{PERL_CORE} ) {
