@@ -325,6 +325,8 @@ static struct debug_tokens {
     { UNTIL,		TOKENTYPE_IVAL,		"UNTIL" },
     { USE,		TOKENTYPE_IVAL,		"USE" },
     { WHILE,		TOKENTYPE_IVAL,		"WHILE" },
+    { TERNARY_IF,	TOKENTYPE_IVAL,		"TERNARY_IF" },
+    { TERNARY_ELSE,	TOKENTYPE_IVAL,		"TERNARY_ELSE" },
     { WORD,		TOKENTYPE_OPVAL,	"WORD" },
     { 0,		TOKENTYPE_NONE,		NULL }
 };
@@ -3916,6 +3918,9 @@ Perl_yylex(pTHX)
 	    }
 	    if (tmp == '~')
 		PMop(OP_NOT);
+
+	    if (tmp == '!')
+		OPERATOR(TERNARY_ELSE);
 	}
 	s--;
 	OPERATOR('!');
@@ -4095,6 +4100,10 @@ Perl_yylex(pTHX)
 
     case '?':			/* conditional */
 	 s++;
+	 if (*s == '?') {
+	     s++;
+	     OPERATOR(TERNARY_IF);
+	 }
 	 OPERATOR('?');
 
     case '.':

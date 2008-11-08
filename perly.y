@@ -111,7 +111,7 @@
 %nonassoc LSTOP LSTOPSUB
 %left <i_tkval> ','
 %right <i_tkval> ASSIGNOP
-%right <i_tkval> '?' ':'
+%right <i_tkval> TERNARY_IF TERNARY_ELSE
 %right <i_tkval> '<'
 %right ANONHSHL ANONARYL ANONSCALARL
 %nonassoc DOTDOT
@@ -980,7 +980,7 @@ term	:	termbinop
 	|	termunop
 	|	anonymous
 	|	termdo
-	|	term '?' term ':' term
+	|	term TERNARY_IF term TERNARY_ELSE term
                         { 
                             $$ = newCONDOP(0, $1, $3, $5, LOCATION($2));
                             TOKEN_GETMAD($2,$$,'?');
