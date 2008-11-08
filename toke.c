@@ -5265,9 +5265,9 @@ Perl_yylex(pTHX)
 		missingterminator(NULL);
 	    PL_expect = XOPERATOR;
 	    force_next(')');
-	    if (SvCUR(PL_lex_stuff.str_sv)) {
-		int warned = 0;
+	    {
 		AV *av = newAV();
+		int warned = 0;
 		d = SvPV_force(PL_lex_stuff.str_sv, len);
 		while (len) {
 		    for (; isSPACE(*d) && len; --len, ++d)
@@ -5301,10 +5301,7 @@ Perl_yylex(pTHX)
 		NEXTVAL_NEXTTOKE.opval = newSVOP(OP_CONST, 0, AvSv(av), S_curlocation());
 		force_next(THING);
 	    }
-	    if (PL_lex_stuff.str_sv) {
-		SvREFCNT_dec(PL_lex_stuff.str_sv);
-		PL_lex_stuff.str_sv = NULL;
-	    }
+	    SVcpNULL(PL_lex_stuff.str_sv);
 	    PL_expect = XTERM;
 	    TOKEN('(');
 
