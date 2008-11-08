@@ -93,29 +93,31 @@
      ANDOP = 308,
      NOTOP = 309,
      ASSIGNOP = 310,
-     DORDOR = 311,
-     OROR = 312,
-     ANDAND = 313,
-     BITOROP = 314,
-     BITANDOP = 315,
-     SHIFTOP = 316,
-     MATCHOP = 317,
-     SREFGEN = 318,
-     UMINUS = 319,
-     POWOP = 320,
-     POSTDEC = 321,
-     POSTINC = 322,
-     PREDEC = 323,
-     PREINC = 324,
-     ASLICE = 325,
-     HSLICE = 326,
-     DEREFAMP = 327,
-     DEREFSTAR = 328,
-     DEREFHSH = 329,
-     DEREFARY = 330,
-     DEREFSCL = 331,
-     ARROW = 332,
-     PEG = 333
+     TERNARY_ELSE = 311,
+     TERNARY_IF = 312,
+     DORDOR = 313,
+     OROR = 314,
+     ANDAND = 315,
+     BITOROP = 316,
+     BITANDOP = 317,
+     SHIFTOP = 318,
+     MATCHOP = 319,
+     SREFGEN = 320,
+     UMINUS = 321,
+     POWOP = 322,
+     POSTDEC = 323,
+     POSTINC = 324,
+     PREDEC = 325,
+     PREINC = 326,
+     ASLICE = 327,
+     HSLICE = 328,
+     DEREFAMP = 329,
+     DEREFSTAR = 330,
+     DEREFHSH = 331,
+     DEREFARY = 332,
+     DEREFSCL = 333,
+     ARROW = 334,
+     PEG = 335
    };
 #endif
 /* Tokens.  */
@@ -172,29 +174,31 @@
 #define ANDOP 308
 #define NOTOP 309
 #define ASSIGNOP 310
-#define DORDOR 311
-#define OROR 312
-#define ANDAND 313
-#define BITOROP 314
-#define BITANDOP 315
-#define SHIFTOP 316
-#define MATCHOP 317
-#define SREFGEN 318
-#define UMINUS 319
-#define POWOP 320
-#define POSTDEC 321
-#define POSTINC 322
-#define PREDEC 323
-#define PREINC 324
-#define ASLICE 325
-#define HSLICE 326
-#define DEREFAMP 327
-#define DEREFSTAR 328
-#define DEREFHSH 329
-#define DEREFARY 330
-#define DEREFSCL 331
-#define ARROW 332
-#define PEG 333
+#define TERNARY_ELSE 311
+#define TERNARY_IF 312
+#define DORDOR 313
+#define OROR 314
+#define ANDAND 315
+#define BITOROP 316
+#define BITANDOP 317
+#define SHIFTOP 318
+#define MATCHOP 319
+#define SREFGEN 320
+#define UMINUS 321
+#define POWOP 322
+#define POSTDEC 323
+#define POSTINC 324
+#define PREDEC 325
+#define PREINC 326
+#define ASLICE 327
+#define HSLICE 328
+#define DEREFAMP 329
+#define DEREFSTAR 330
+#define DEREFHSH 331
+#define DEREFARY 332
+#define DEREFSCL 333
+#define ARROW 334
+#define PEG 335
 
 
 

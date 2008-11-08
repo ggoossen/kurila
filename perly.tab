@@ -13,7 +13,7 @@
 
 /* YYTRANSLATE(YYLEX) -- Bison symbol number corresponding to YYLEX.  */
 #define YYUNDEFTOK  2
-#define YYMAXUTOK   333
+#define YYMAXUTOK   335
 
 #define YYTRANSLATE(YYX)						\
   ((unsigned int) (YYX) <= YYMAXUTOK ? yytranslate[YYX] : YYUNDEFTOK)
@@ -26,8 +26,8 @@ static const yytype_uint8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,    79,     2,     2,     9,    11,    13,     2,
       97,    96,    12,     8,    67,     7,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,    70,    14,
-      71,     2,     2,    69,    10,     2,     2,     2,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,     2,     2,    14,
+      71,     2,     2,     2,    10,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     5,     2,     6,     2,     2,     2,     2,     2,     2,
@@ -52,9 +52,9 @@ static const yytype_uint8 yytranslate[] =
       37,    38,    39,    40,    41,    42,    43,    44,    45,    46,
       47,    48,    49,    50,    51,    52,    53,    54,    55,    56,
       57,    58,    59,    60,    61,    62,    63,    64,    65,    66,
-      68,    72,    73,    74,    75,    76,    77,    78,    81,    82,
-      83,    84,    85,    86,    87,    88,    89,    90,    91,    92,
-      93,    94,    95,    98
+      68,    69,    70,    72,    73,    74,    75,    76,    77,    78,
+      81,    82,    83,    84,    85,    86,    87,    88,    89,    90,
+      91,    92,    93,    94,    95,    98
 };
 
 #if YYDEBUG
@@ -133,8 +133,8 @@ static const yytype_int16 yyrhs[] =
       -1,   141,    85,    -1,   141,    84,    -1,    87,   141,    -1,
       86,   141,    -1,    26,   125,   127,   101,    -1,    48,   141,
       -1,    48,   101,   111,    -1,    24,    48,   101,   111,    -1,
-     137,    -1,   138,    -1,   139,    -1,   140,    -1,   141,    69,
-     141,    70,   141,    -1,    81,   141,    -1,   142,    -1,    56,
+     137,    -1,   138,    -1,   139,    -1,   140,    -1,   141,    70,
+     141,    69,   141,    -1,    81,   141,    -1,   142,    -1,    56,
      141,    -1,    97,   131,    96,    -1,    97,    96,    -1,   149,
       -1,   152,    -1,   151,    -1,   150,    -1,   136,    -1,    17,
       -1,   148,    -1,   148,    97,    96,    -1,   148,    97,   131,
@@ -193,19 +193,19 @@ static const char *const yytname[] =
   "ADDOP", "DO", "NOAMP", "ANONARY", "ANONARYL", "ANONHSH", "ANONHSHL",
   "ANONSCALAR", "ANONSCALARL", "LOCAL", "MY", "MYSUB", "REQUIRE",
   "COLONATTR", "SPECIALBLOCK", "PREC_LOW", "DOROP", "OROP", "ANDOP",
-  "NOTOP", "','", "ASSIGNOP", "'?'", "':'", "'<'", "DORDOR", "OROR",
-  "ANDAND", "BITOROP", "BITANDOP", "SHIFTOP", "MATCHOP", "'!'", "'~'",
-  "SREFGEN", "UMINUS", "POWOP", "POSTDEC", "POSTINC", "PREDEC", "PREINC",
-  "ASLICE", "HSLICE", "DEREFAMP", "DEREFSTAR", "DEREFHSH", "DEREFARY",
-  "DEREFSCL", "ARROW", "')'", "'('", "PEG", "$accept", "prog", "block",
-  "remember", "progstart", "mblock", "mremember", "lineseq", "line",
-  "sideff", "else", "cond", "cont", "loop", "@1", "mintro", "texpr",
-  "iexpr", "mexpr", "miexpr", "label", "decl", "peg", "mysubrout",
-  "subrout", "startsub", "startanonsub", "subname", "proto", "subbody",
-  "package", "use", "expr", "argexpr", "listop", "@2", "method",
-  "subscripted", "termbinop", "termunop", "anonymous", "termdo", "term",
-  "myattrterm", "myterm", "mydef", "listexpr", "listexprcom", "my_scalar",
-  "amper", "scalar", "ary", "hsh", "star", "indirob", 0
+  "NOTOP", "','", "ASSIGNOP", "TERNARY_ELSE", "TERNARY_IF", "'<'",
+  "DORDOR", "OROR", "ANDAND", "BITOROP", "BITANDOP", "SHIFTOP", "MATCHOP",
+  "'!'", "'~'", "SREFGEN", "UMINUS", "POWOP", "POSTDEC", "POSTINC",
+  "PREDEC", "PREINC", "ASLICE", "HSLICE", "DEREFAMP", "DEREFSTAR",
+  "DEREFHSH", "DEREFARY", "DEREFSCL", "ARROW", "')'", "'('", "PEG",
+  "$accept", "prog", "block", "remember", "progstart", "mblock",
+  "mremember", "lineseq", "line", "sideff", "else", "cond", "cont", "loop",
+  "@1", "mintro", "texpr", "iexpr", "mexpr", "miexpr", "label", "decl",
+  "peg", "mysubrout", "subrout", "startsub", "startanonsub", "subname",
+  "proto", "subbody", "package", "use", "expr", "argexpr", "listop", "@2",
+  "method", "subscripted", "termbinop", "termunop", "anonymous", "termdo",
+  "term", "myattrterm", "myterm", "mydef", "listexpr", "listexprcom",
+  "my_scalar", "amper", "scalar", "ary", "hsh", "star", "indirob", 0
 };
 #endif
 
@@ -220,10 +220,10 @@ static const yytype_uint16 yytoknum[] =
      273,   274,   275,   276,   277,   278,   279,   280,   281,   282,
      283,   284,   285,   286,   287,   288,   289,   290,   291,   292,
      293,   294,   295,   296,   297,   298,   299,   300,   301,   302,
-     303,   304,   305,   306,   307,   308,   309,    44,   310,    63,
-      58,    60,   311,   312,   313,   314,   315,   316,   317,    33,
-     126,   318,   319,   320,   321,   322,   323,   324,   325,   326,
-     327,   328,   329,   330,   331,   332,    41,    40,   333
+     303,   304,   305,   306,   307,   308,   309,    44,   310,   311,
+     312,    60,   313,   314,   315,   316,   317,   318,   319,    33,
+     126,   320,   321,   322,   323,   324,   325,   326,   327,   328,
+     329,   330,   331,   332,   333,   334,    41,    40,   335
 };
 # endif
 
@@ -497,18 +497,18 @@ static const yytype_int16 yytable[] =
        0,     0,     0,     0,     0,   166,   167,   168,   169,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
        0,     0,   163,     0,   164,     0,     0,     0,     0,   170,
-     171,   294,     0,   172,   173,   174,   175,   176,   177,   178,
+     294,   171,     0,   172,   173,   174,   175,   176,   177,   178,
        0,     0,     0,     0,   179,   180,   181,     0,     0,   182,
      183,   184,   185,   186,   187,   188,   189,   165,     0,     0,
        0,     0,   178,   166,   167,   168,   169,   179,   180,   181,
        0,     0,   182,   183,   184,   185,   186,   187,   188,   189,
-     163,     0,   164,     0,     0,     0,     0,   170,   171,     0,
+     163,     0,   164,     0,     0,     0,     0,   170,     0,   171,
        0,   172,   173,   174,   175,   176,   177,   178,     0,     0,
        0,     0,   179,   180,   181,     0,     0,   182,   183,   184,
      185,   186,   187,   188,   189,   165,     0,     0,     0,     0,
        0,   166,   167,   168,   169,     0,     0,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,   163,     0,
-     164,     0,     0,     0,     0,     0,   171,     0,     0,   172,
+     164,     0,     0,     0,     0,     0,     0,   171,     0,   172,
      173,   174,   175,   176,   177,   178,     0,     0,     0,     0,
      179,   180,   181,     0,     0,   182,   183,   184,   185,   186,
      187,   188,   189,   165,     0,     0,     0,     0,     0,   166,
@@ -730,13 +730,13 @@ static const yytype_int16 yycheck[] =
       89,    90,    91,    92,    93,    94,    95,    38,    -1,    -1,
       -1,    -1,    78,    44,    45,    46,    47,    83,    84,    85,
       -1,    -1,    88,    89,    90,    91,    92,    93,    94,    95,
-       3,    -1,     5,    -1,    -1,    -1,    -1,    68,    69,    -1,
+       3,    -1,     5,    -1,    -1,    -1,    -1,    68,    -1,    70,
       -1,    72,    73,    74,    75,    76,    77,    78,    -1,    -1,
       -1,    -1,    83,    84,    85,    -1,    -1,    88,    89,    90,
       91,    92,    93,    94,    95,    38,    -1,    -1,    -1,    -1,
       -1,    44,    45,    46,    47,    -1,    -1,    -1,    -1,    -1,
       -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1,     3,    -1,
-       5,    -1,    -1,    -1,    -1,    -1,    69,    -1,    -1,    72,
+       5,    -1,    -1,    -1,    -1,    -1,    -1,    70,    -1,    72,
       73,    74,    75,    76,    77,    78,    -1,    -1,    -1,    -1,
       83,    84,    85,    -1,    -1,    88,    89,    90,    91,    92,
       93,    94,    95,    38,    -1,    -1,    -1,    -1,    -1,    44,
@@ -871,7 +871,7 @@ static const yytype_uint8 yystos[] =
      141,   141,   141,   141,   141,   141,    96,   131,    29,    30,
       14,    29,    30,    36,    29,    30,    31,    32,    36,    63,
       64,    65,    67,     3,     5,    38,    44,    45,    46,    47,
-      68,    69,    72,    73,    74,    75,    76,    77,    78,    83,
+      68,    70,    72,    73,    74,    75,    76,    77,    78,    83,
       84,    85,    88,    89,    90,    91,    92,    93,    94,    95,
       97,     3,   106,   132,   101,   101,    15,   126,    17,   127,
       14,    17,   102,   102,    96,    96,   131,   131,   146,   153,
@@ -883,7 +883,7 @@ static const yytype_uint8 yystos[] =
        5,    16,    88,    89,    97,   135,   149,    96,   131,   131,
        4,    96,   134,   111,   127,   101,    15,   117,   131,   116,
      118,    96,    67,    96,   131,   101,    96,   127,    97,   102,
-     102,   144,    14,     6,    70,     6,     6,   131,   131,   131,
+     102,   144,    14,     6,    69,     6,     6,   131,   131,   131,
      131,    96,   131,    97,    96,    14,   145,   128,   145,    96,
       96,    96,   128,   115,   131,   116,   147,   149,    97,     4,
      141,     6,    14,    14,     6,     6,     6,    96,   146,     4,
@@ -910,17 +910,17 @@ static const toketypes yy_type_tab[] =
   toketype_i_tkval, toketype_i_tkval, toketype_i_tkval, toketype_i_tkval, toketype_i_tkval, toketype_i_tkval, toketype_i_tkval,
   toketype_i_tkval, toketype_i_tkval, toketype_i_tkval, toketype_i_tkval, toketype_i_tkval, toketype_i_tkval,
   toketype_i_tkval, toketype_i_tkval, toketype_pval, toketype_pval, toketype_pval, toketype_pval,
-  toketype_pval, toketype_pval, toketype_pval, toketype_pval, toketype_pval, toketype_pval, toketype_pval, toketype_pval,
+  toketype_pval, toketype_pval, toketype_pval, toketype_pval, toketype_pval, toketype_pval,
   toketype_pval, toketype_pval, toketype_pval, toketype_pval, toketype_pval, toketype_pval, toketype_pval,
   toketype_pval, toketype_pval, toketype_pval, toketype_pval, toketype_pval, toketype_pval, toketype_pval,
   toketype_pval, toketype_pval, toketype_pval, toketype_pval, toketype_pval, toketype_pval,
-  toketype_pval, toketype_pval, toketype_pval, toketype_pval, toketype_i_tkval, toketype_pval, toketype_ionlyval, toketype_opval,
-  toketype_ionlyval, toketype_ionlyval, toketype_opval, toketype_ionlyval, toketype_opval, toketype_opval,
-  toketype_opval, toketype_opval, toketype_opval, toketype_opval, toketype_opval, toketype_pval, toketype_ionlyval, toketype_opval,
-  toketype_opval, toketype_opval, toketype_opval, toketype_p_tkval, toketype_opval, toketype_opval, toketype_opval,
-  toketype_opval, toketype_ionlyval, toketype_ionlyval, toketype_opval, toketype_opval, toketype_opval,
-  toketype_opval, toketype_opval, toketype_opval, toketype_opval, toketype_opval, toketype_pval, toketype_opval,
+  toketype_pval, toketype_pval, toketype_pval, toketype_pval, toketype_pval, toketype_pval, toketype_i_tkval,
+  toketype_pval, toketype_ionlyval, toketype_opval, toketype_ionlyval, toketype_ionlyval, toketype_opval,
+  toketype_ionlyval, toketype_opval, toketype_opval, toketype_opval, toketype_opval, toketype_opval, toketype_opval, toketype_opval,
+  toketype_pval, toketype_ionlyval, toketype_opval, toketype_opval, toketype_opval, toketype_opval, toketype_p_tkval, toketype_opval,
+  toketype_opval, toketype_opval, toketype_opval, toketype_ionlyval, toketype_ionlyval, toketype_opval,
+  toketype_opval, toketype_opval, toketype_opval, toketype_opval, toketype_opval, toketype_opval, toketype_opval, toketype_pval,
   toketype_opval, toketype_opval, toketype_opval, toketype_opval, toketype_opval, toketype_opval,
   toketype_opval, toketype_opval, toketype_opval, toketype_opval, toketype_opval, toketype_opval,
-  toketype_opval, toketype_opval, toketype_opval, toketype_opval, toketype_opval, toketype_opval
+  toketype_opval, toketype_opval, toketype_opval, toketype_opval, toketype_opval, toketype_opval, toketype_opval
 };
