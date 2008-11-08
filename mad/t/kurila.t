@@ -36,9 +36,10 @@ sub p5convert {
     is($output, $expected) or $TODO or die;
 }
 
+t_rename_ternary_op();
+die;
 t_call_parens();
 t_remove_strict();
-die;
 t_lval_vec();
 t_block();
 t_ampcall();
@@ -1431,3 +1432,12 @@ sub BAR() { 3 }
 BAR();
 END
 }
+
+sub t_rename_ternary_op {
+    p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
+$a ? 1 : 2;
+----
+$a ?? 1 !! 2;
+END
+}
+
