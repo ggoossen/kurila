@@ -235,7 +235,7 @@ sub findConsole {
     $consoleOUT = $console unless defined $consoleOUT;
     $console = "&STDIN" unless defined $console;
     if (!defined $consoleOUT) {
-      $consoleOUT = defined fileno(STDERR) && $^O ne 'MSWin32' ? "&STDERR" : "&STDOUT";
+      $consoleOUT = defined fileno(STDERR) && $^O ne 'MSWin32' ?? "&STDERR" !! "&STDOUT";
     }
     return @($console,$consoleOUT);
 }
@@ -251,7 +251,7 @@ sub new {
 
     # the Windows CONIN$ needs GENERIC_WRITE mode to allow
     # a SetConsoleMode() if we end up using Term::ReadKey
-    open FIN, ((  $^O eq 'MSWin32' && $console eq 'CONIN$' ) ? "+<" : "<"), "$console";
+    open FIN, ((  $^O eq 'MSWin32' && $console eq 'CONIN$' ) ?? "+<" !! "<"), "$console";
     open FOUT, ">","$consoleOUT";
 
     #OUT->autoflush(1);		# Conflicts with debugger?
@@ -303,7 +303,7 @@ package Term::ReadLine;		# So late to allow the above code be defined?
 
 our $VERSION = '1.03';
 
-my ($which) = exists %ENV{PERL_RL} ? < split m/\s+/, %ENV{PERL_RL} : undef;
+my ($which) = exists %ENV{PERL_RL} ?? < split m/\s+/, %ENV{PERL_RL} !! undef;
 if ($which) {
   if ($which =~ m/\bgnu\b/i){
     eval "use Term::ReadLine::Gnu;";
@@ -362,7 +362,7 @@ sub ornaments {
     $rl_term_set = ',,,';
     return;
   }
-  @rl_term_set = map {$_ ? $terminal->Tputs($_,1) || '' : ''} @ts;
+  @rl_term_set = map {$_ ?? $terminal->Tputs($_,1) || '' !! ''} @ts;
   return $rl_term_set;
 }
 

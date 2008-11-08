@@ -14,8 +14,8 @@ WriteMakefile(
 
     (
       %ENV{SKIP_FOR_CORE}
-        ? (MAN3PODS    => \%())
-        : (PREREQ_PM   => \%( 'Scalar::Util'  => 0, )
+        ?? (MAN3PODS    => \%())
+        !! (PREREQ_PM   => \%( 'Scalar::Util'  => 0, )
 	      )
     ),
        

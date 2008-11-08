@@ -52,7 +52,7 @@ SKIP: do {
     my $ivsize = config_value("ivsize");
     skip "ivsize == $ivsize", 4 unless $ivsize == 4 || $ivsize == 8;
 
-    my $iv_min = $ivsize == 4 ? -2147483648 : -9223372036854775808;
+    my $iv_min = $ivsize == 4 ?? -2147483648 !! -9223372036854775808;
     my $biff;
     try { $biff = $iv_min / -1 };
     is($@, '', 'IV_MIN / -1 succeeds');

@@ -303,7 +303,7 @@ sub curr_headings {
     my $self = shift;
     $self->_init_headings()  unless (defined $self->{_SECTION_HEADINGS});
     my @headings = @{ $self->{_SECTION_HEADINGS} };
-    return ((nelems @_) +> 0  and  @_[0] =~ m/^\d+$/) ? @headings[@_[0] - 1] : @headings;
+    return ((nelems @_) +> 0  and  @_[0] =~ m/^\d+$/) ?? @headings[@_[0] - 1] !! @headings;
 }
 
 ##---------------------------------------------------------------------------
@@ -352,7 +352,7 @@ sub select {
     ## it seems incredibly unlikely that "+" would ever correspond to
     ## a legitimate section heading
     ##---------------------------------------------------------------------
-    my $add = (@sections[0] eq "+") ? shift(@sections) : "";
+    my $add = (@sections[0] eq "+") ?? shift(@sections) !! "";
 
     ## Reset the set of sections to use
     unless ((nelems @sections) +> 0) {
@@ -442,7 +442,7 @@ sub match_section {
 
     ## Return true if no restrictions were explicitly specified
     my $selections = (exists %myData{_SELECTED_SECTIONS})
-                       ?  %myData{_SELECTED_SECTIONS}  :  undef;
+                       ??  %myData{_SELECTED_SECTIONS}  !!  undef;
     return  1  unless ((defined $selections) && ((nelems @{$selections}) +> 0));
 
     ## Default any unspecified sections to the current one
@@ -464,8 +464,8 @@ sub match_section {
         for my $i (0..$MAX_HEADING_LEVEL-1) {
             $regex   = $section_spec->[$i];
             $negated = ($regex =~ s/^\!//);
-            $match  ^&^= ($negated ? (@headings[$i] !~ m/$regex/)
-                                 : (@headings[$i] =~ m/$regex/));
+            $match  ^&^= ($negated ?? (@headings[$i] !~ m/$regex/)
+                                 !! (@headings[$i] =~ m/$regex/));
             last unless ($match);
         }
         return  1  if ($match);
@@ -697,7 +697,7 @@ sub _compile_section_spec {
             $_ = '!' . $_  if ($negated);
         }
     }
-    return  (! $bad_regexs) ? \ @regexs : undef;
+    return  (! $bad_regexs) ?? \ @regexs !! undef;
 }
 
 ##---------------------------------------------------------------------------

@@ -196,7 +196,7 @@ sub dynamic_lib {
 
     return '' unless $self->has_link_code;
 
-    my($otherldflags) = %attribs{OTHERLDFLAGS} || ($BORLAND ? 'c0d32.obj': '');
+    my($otherldflags) = %attribs{OTHERLDFLAGS} || ($BORLAND ?? 'c0d32.obj'!! '');
     my($inst_dynamic_dep) = %attribs{INST_DYNAMIC_DEP} || "";
     my($ldfrom) = '$(LDFROM)';
 

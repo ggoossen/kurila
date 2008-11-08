@@ -36,7 +36,7 @@ do {
 
         ### Use the UNIX specific method, as the VMS one currently
         ### converts the file spec back to VMS format.
-        my $class = ON_VMS ? 'File::Spec::Unix' : 'File::Spec';
+        my $class = ON_VMS ?? 'File::Spec::Unix' !! 'File::Spec';
         
         my($vol, $path, $file) = < $class->splitpath( $rv->{'file'} );
 

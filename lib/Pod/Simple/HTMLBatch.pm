@@ -155,9 +155,9 @@ sub _batch_convert_main {
   if(!$progress and $self->verbose +> 0 and $self->verbose() +<= 5) {
     require Pod::Simple::Progress;
     $progress = Pod::Simple::Progress->new(
-        ($self->verbose  +< 2) ? () # Default omission-delay
-      : ($self->verbose == 2) ? 1  # Reduce the omission-delay
-                              : 0  # Eliminate the omission-delay
+        ($self->verbose  +< 2) ?? () # Default omission-delay
+      !! ($self->verbose == 2) ?? 1  # Reduce the omission-delay
+                              !! 0  # Eliminate the omission-delay
     );
     $self->progress($progress);
   }
@@ -167,7 +167,7 @@ sub _batch_convert_main {
   } else {
     $self->muse("Scanning \@INC.  This could take a minute or two.");
   }
-  my $mod2path = $self->find_all_pods($dirs ? $dirs : ());
+  my $mod2path = $self->find_all_pods($dirs ?? $dirs !! ());
   $self->muse("Done scanning.");
 
   my $total = nkeys %$mod2path;
@@ -178,7 +178,7 @@ sub _batch_convert_main {
 
   $progress and $progress->goal($total);
   $self->muse("Now converting pod files to HTML.",
-    ($total +> 25) ? "  This will take a while more." : ()
+    ($total +> 25) ?? "  This will take a while more." !! ()
   );
 
   $self->_spray_css(        $outdir );
@@ -401,9 +401,9 @@ sub _prep_contents_breakdown {
   
   foreach my $entry ( @$contents) {
     my $toplevel = 
-      $entry->[0] =~ m/^perl\w*$/ ? 'perl_core_docs'
+      $entry->[0] =~ m/^perl\w*$/ ?? 'perl_core_docs'
           # group all the perlwhatever docs together
-      : $entry->[3]->[0] # normal case
+      !! $entry->[3]->[0] # normal case
     ;
     ++%toplevel_form_freq{ lc $toplevel }->{ $toplevel };
     push @{ %toplevel{ lc $toplevel } }, $entry;
@@ -535,8 +535,8 @@ sub modnames2paths { # return a hashref mapping modulenames => paths
     $search->verbose(1) if DEBUG +> 10;
     $search->progress( < $self->progress->copy->goal(0) ) if $self->progress;
     $search->shadows(0);  # don't bother noting shadowed files
-    $search->inc(     $dirs ? 0      :  1 );
-    $search->survey(  $dirs ? < @$dirs : () );
+    $search->inc(     $dirs ?? 0      !!  1 );
+    $search->survey(  $dirs ?? < @$dirs !! () );
     $m2p = $search->name2path;
     die "What, no name2path?!" unless $m2p;
   };
@@ -636,7 +636,7 @@ sub _css_wad_to_markup {
   my $out = '';
 
   --$depth;
-  my $uplink = $depth ? ('../' x $depth) : '';
+  my $uplink = $depth ?? ('../' x $depth) !! '';
 
   foreach my $chunk ( @css) {
     next unless $chunk and nelems @$chunk;
@@ -659,8 +659,8 @@ sub _maybe_uplink {
   # otherwise return emptystring
   my($self, $url, $uplink) = < @_;
   ($url =~ m{^\./} or $url !~ m{[/\:]} )
-    ? $uplink
-    : ''
+    ?? $uplink
+    !! ''
     # qualify it, if/as needed
 }
 
@@ -805,7 +805,7 @@ sub _javascript_wad_to_markup {
   my $out = '';
 
   --$depth;
-  my $uplink = $depth ? ('../' x $depth) : '';
+  my $uplink = $depth ?? ('../' x $depth) !! '';
 
   foreach my $s ( @scripts) {
     next unless $s and nelems @$s;

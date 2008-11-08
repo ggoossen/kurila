@@ -7,7 +7,7 @@ my $Class   = 'IPC::Cmd';
 my @Funcs   = qw[run can_run];
 my @Meths   = qw[can_use_ipc_run can_use_ipc_open3 can_capture_buffer];
 my $IsWin32 = $^O eq 'MSWin32';
-my $Verbose = (nelems @ARGV) ? 1 : 0;
+my $Verbose = (nelems @ARGV) ?? 1 !! 0;
 
 use_ok( $Class,         $_ ) for  @Funcs;
 can_ok( $Class,         $_ ) for  @(< @Funcs, < @Meths);
@@ -53,8 +53,8 @@ do {   ### list of commands and regexes matching output ###
             my $cmd                 = $aref->[0];
             my $regex               = $aref->[1];
 
-            my $pp_cmd = ref $cmd ? "$(join ' ',@$cmd)" : "$cmd";
-            diag( "Running '$pp_cmd' as " . (ref $cmd ? "ARRAY" : "SCALAR") ) 
+            my $pp_cmd = ref $cmd ?? "$(join ' ',@$cmd)" !! "$cmd";
+            diag( "Running '$pp_cmd' as " . (ref $cmd ?? "ARRAY" !! "SCALAR") ) 
                 if $Verbose;
 
             ### in scalar mode
@@ -79,7 +79,7 @@ do {   ### list of commands and regexes matching output ###
                 ok( @list[0],   "Command ran successfully" );
                 ok( !@list[1],  "   No error code set" );
 
-                my $list_length = $Class->can_capture_buffer ? 5 : 2;
+                my $list_length = $Class->can_capture_buffer ?? 5 !! 2;
                 is( scalar(nelems @list), $list_length,
                                 "   Output list has $list_length entries" );
 
@@ -127,8 +127,8 @@ do {   ### list of commands and regexes matching output ###
             my $cmd                 = $aref->[0];
             my $regex               = $aref->[1];
 
-            my $pp_cmd = ref $cmd ? "$(join ' ',@$cmd)" : "$cmd";
-            diag( "Running '$pp_cmd' as " . (ref $cmd ? "ARRAY" : "SCALAR") )
+            my $pp_cmd = ref $cmd ?? "$(join ' ',@$cmd)" !! "$cmd";
+            diag( "Running '$pp_cmd' as " . (ref $cmd ?? "ARRAY" !! "SCALAR") )
                 if $Verbose;
 
             ### in scalar mode
@@ -154,7 +154,7 @@ do {   ### list of commands and regexes matching output ###
                 ok( @list[0],   "Ran stderr command successfully in list mode." );
                 ok( !@list[1],  "   No error code set" );
 
-                my $list_length = $Class->can_capture_buffer ? 5 : 2;
+                my $list_length = $Class->can_capture_buffer ?? 5 !! 2;
                 is( scalar(nelems @list), $list_length,
                                 "   Output list has $list_length entries" );
 

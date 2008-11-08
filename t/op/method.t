@@ -105,7 +105,7 @@ do {
     our @ISA = @( 'A1' );
     package main;
     is(A2->foo(), "foo");
-    is(do { eval 'A2::foo()'; $@ ? 1 : 0}, 1);
+    is(do { eval 'A2::foo()'; $@ ?? 1 !! 0}, 1);
     is(A2->foo(), "foo");
 };
 
@@ -123,22 +123,22 @@ do {
 
 # test error messages if method loading fails
 is(do { eval 'my $e = bless \%(), "E::A"; E::A->foo()';
-	  $@->message =~ m/^\QCan't locate object method "foo" via package "E::A"/ ? 1 : $@->message}, 1);
+	  $@->message =~ m/^\QCan't locate object method "foo" via package "E::A"/ ?? 1 !! $@->message}, 1);
 is(do { eval 'my $e = bless \%(), "E::B"; $e->foo()';  
-	  $@->message =~ m/^\QCan't locate object method "foo" via package "E::B"/ ? 1 : $@}, 1);
+	  $@->message =~ m/^\QCan't locate object method "foo" via package "E::B"/ ?? 1 !! $@}, 1);
 is(do { eval 'E::C->foo()';
-	  $@->message =~ m/^\QCan't locate object method "foo" via package "E::C" (perhaps / ? 1 : $@}, 1);
+	  $@->message =~ m/^\QCan't locate object method "foo" via package "E::C" (perhaps / ?? 1 !! $@}, 1);
 
 is(do { eval 'UNIVERSAL->E::D::foo()';
-	  $@->message =~ m/^\QCan't locate object method "foo" via package "E::D" (perhaps / ? 1 : $@}, 1);
+	  $@->message =~ m/^\QCan't locate object method "foo" via package "E::D" (perhaps / ?? 1 !! $@}, 1);
 is(do { eval 'my $e = bless \%(), "UNIVERSAL"; $e->E::E::foo()';
-	  $@->message =~ m/^\QCan't locate object method "foo" via package "E::E" (perhaps / ? 1 : $@}, 1);
+	  $@->message =~ m/^\QCan't locate object method "foo" via package "E::E" (perhaps / ?? 1 !! $@}, 1);
 
 my $e = bless \%(), "E::F";  # force package to exist
 is(do { eval 'UNIVERSAL->E::F::foo()';
-	  $@->message =~ m/^\QCan't locate object method "foo" via package "E::F"/ ? 1 : $@}, 1);
+	  $@->message =~ m/^\QCan't locate object method "foo" via package "E::F"/ ?? 1 !! $@}, 1);
 is(do { eval '$e = bless \%(), "UNIVERSAL"; $e->E::F::foo()';
-	  $@->message =~ m/^\QCan't locate object method "foo" via package "E::F"/ ? 1 : $@}, 1);
+	  $@->message =~ m/^\QCan't locate object method "foo" via package "E::F"/ ?? 1 !! $@}, 1);
 
 # TODO: we need some tests for the SUPER:: pseudoclass
 
@@ -146,23 +146,23 @@ is(do { eval '$e = bless \%(), "UNIVERSAL"; $e->E::F::foo()';
 is( %main::{"Foo::"} || "none", "none");  # sanity check 1
 is( %main::{"Foo::"} || "none", "none");  # sanity check 2
 
-is( UNIVERSAL::can("main::Foo", "boogie") ? "yes":"no", "no" );
+is( UNIVERSAL::can("main::Foo", "boogie") ?? "yes"!!"no", "no" );
 is( %main::{"Foo::"} || "none", "none");  # still missing?
 
-is( main::Foo->UNIVERSAL::can("boogie")   ? "yes":"no", "no" );
+is( main::Foo->UNIVERSAL::can("boogie")   ?? "yes"!!"no", "no" );
 is( %main::{"Foo::"} || "none", "none");  # still missing?
 
-is( main::Foo->can("boogie")              ? "yes":"no", "no" );
+is( main::Foo->can("boogie")              ?? "yes"!!"no", "no" );
 is( %main::{"Foo::"} || "none", "none");  # still missing?
 
-is( eval 'main::Foo->boogie(); 1'         ? "yes":"no", "no" );
+is( eval 'main::Foo->boogie(); 1'         ?? "yes"!!"no", "no" );
 is( %main::{"Foo::"} || "none", "none");  # still missing?
 
 is(do { eval 'main::Foo->boogie()';
-	  $@->message =~ m/^\QCan't locate object method "boogie" via package "main::Foo" (perhaps / ? 1 : $@}, 1);
+	  $@->message =~ m/^\QCan't locate object method "boogie" via package "main::Foo" (perhaps / ?? 1 !! $@}, 1);
 
 eval 'sub main::Foo::boogie { "yes, sir!" }';
-is( %main::{"Foo::"} ? "ok" : "none", "ok");  # should exist now
+is( %main::{"Foo::"} ?? "ok" !! "none", "ok");  # should exist now
 is( main::Foo->boogie(), "yes, sir!");
 
 # TODO: universal.t should test NoSuchPackage->isa()/can()

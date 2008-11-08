@@ -94,7 +94,7 @@ sub is_decent {
   my @supers = @( () );
   foreach my $bit (split('-', $tag)) {
     push @supers, 
-      scalar(nelems @supers) ? (@supers[-1] . '-' . $bit) : $bit;
+      scalar(nelems @supers) ?? (@supers[-1] . '-' . $bit) !! $bit;
   }
   return 0 unless (nelems @supers);
   shift @supers if @supers[0] =~ m<^(i|x|sgn)$>s;

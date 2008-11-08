@@ -88,7 +88,7 @@ sub find_ext
     for my $xxx ( @items) {
         if ($xxx ne "DynaLoader") {
             if (-f "$xxx/$xxx.xs" || -f "$xxx/$xxx.c" ) {
-                %ext{"@_[0]$xxx"} = %static{"@_[0]$xxx"} ? 'static' : 'dynamic';
+                %ext{"@_[0]$xxx"} = %static{"@_[0]$xxx"} ?? 'static' !! 'dynamic';
             } elsif (-f "$xxx/Makefile.PL") {
                 %ext{"@_[0]$xxx"} = 'nonxs';
             } else {

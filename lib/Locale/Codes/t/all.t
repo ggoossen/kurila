@@ -47,7 +47,7 @@ foreach my $code (  all_country_codes())
         last;
     }
 }
-print ($ok ? "ok 1\n" : "not ok 1\n");
+print ($ok ?? "ok 1\n" !! "not ok 1\n");
 
 #-----------------------------------------------------------------------
 # code to country, back to code, for ALPHA2
@@ -73,7 +73,7 @@ foreach my $code ( all_country_codes(LOCALE_CODE_ALPHA_2))
         last;
     }
 }
-print ($ok ? "ok 2\n" : "not ok 2\n");
+print ($ok ?? "ok 2\n" !! "not ok 2\n");
 
 #-----------------------------------------------------------------------
 # code to country, back to code, for ALPHA3
@@ -99,7 +99,7 @@ foreach my $code ( all_country_codes(LOCALE_CODE_ALPHA_3))
         last;
     }
 }
-print ($ok ? "ok 3\n" : "not ok 3\n");
+print ($ok ?? "ok 3\n" !! "not ok 3\n");
 
 #-----------------------------------------------------------------------
 # code to country, back to code, for NUMERIC
@@ -125,7 +125,7 @@ foreach my $code ( all_country_codes(LOCALE_CODE_NUMERIC))
         last;
     }
 }
-print ($ok ? "ok 4\n" : "not ok 4\n");
+print ($ok ?? "ok 4\n" !! "not ok 4\n");
 
 
 #-----------------------------------------------------------------------
@@ -152,7 +152,7 @@ foreach my $country ( all_country_names())
         last;
     }
 }
-print ($ok ? "ok 5\n" : "not ok 5\n");
+print ($ok ?? "ok 5\n" !! "not ok 5\n");
 
 #-----------------------------------------------------------------------
 # country to code, back to country, using LOCALE_CODE_ALPHA_2
@@ -178,7 +178,7 @@ foreach my $country ( all_country_names())
         last;
     }
 }
-print ($ok ? "ok 6\n" : "not ok 6\n");
+print ($ok ?? "ok 6\n" !! "not ok 6\n");
 
 #-----------------------------------------------------------------------
 # country to code, back to country, using LOCALE_CODE_ALPHA_3
@@ -216,7 +216,7 @@ foreach my $country ( all_country_names())
         last;
     }
 }
-print ($ok ? "ok 7\n" : "not ok 7\n");
+print ($ok ?? "ok 7\n" !! "not ok 7\n");
 
 #-----------------------------------------------------------------------
 # country to code, back to country, using LOCALE_CODE_NUMERIC
@@ -254,7 +254,7 @@ foreach my $country ( all_country_names())
         last;
     }
 }
-print ($ok ? "ok 8\n" : "not ok 8\n");
+print ($ok ?? "ok 8\n" !! "not ok 8\n");
 
 
 $ok = 1;
@@ -278,7 +278,7 @@ foreach my $code ( all_language_codes())
         last;
     }
 }
-print ($ok ? "ok 9\n" : "not ok 9\n");
+print ($ok ?? "ok 9\n" !! "not ok 9\n");
 
 
 $ok = 1;
@@ -302,7 +302,7 @@ foreach my $language ( all_language_names())
         last;
     }
 }
-print ($ok ? "ok 10\n" : "not ok 10\n");
+print ($ok ?? "ok 10\n" !! "not ok 10\n");
 
 $ok = 1;
 foreach my $code ( all_currency_codes())
@@ -333,7 +333,7 @@ foreach my $code ( all_currency_codes())
         last;
     }
 }
-print ($ok ? "ok 11\n" : "not ok 11\n");
+print ($ok ?? "ok 11\n" !! "not ok 11\n");
 
 $ok = 1;
 foreach my $currency ( all_currency_names())
@@ -356,7 +356,7 @@ foreach my $currency ( all_currency_names())
         last;
     }
 }
-print ($ok ? "ok 12\n" : "not ok 12\n");
+print ($ok ?? "ok 12\n" !! "not ok 12\n");
 
 #=======================================================================
 #
@@ -388,7 +388,7 @@ foreach my $code ( all_script_codes())
         last;
     }
 }
-print ($ok ? "ok 13\n" : "not ok 13\n");
+print ($ok ?? "ok 13\n" !! "not ok 13\n");
 
 #-----------------------------------------------------------------------
 # code to script, back to code, for ALPHA2
@@ -414,7 +414,7 @@ foreach my $code ( all_script_codes(LOCALE_CODE_ALPHA_2))
         last;
     }
 }
-print ($ok ? "ok 14\n" : "not ok 14\n");
+print ($ok ?? "ok 14\n" !! "not ok 14\n");
 
 #-----------------------------------------------------------------------
 # code to script, back to code, for ALPHA3
@@ -440,7 +440,7 @@ foreach my $code ( all_script_codes(LOCALE_CODE_ALPHA_3))
         last;
     }
 }
-print ($ok ? "ok 15\n" : "not ok 15\n");
+print ($ok ?? "ok 15\n" !! "not ok 15\n");
 
 #-----------------------------------------------------------------------
 # code to script, back to code, for NUMERIC
@@ -466,7 +466,7 @@ foreach my $code ( all_script_codes(LOCALE_CODE_NUMERIC))
         last;
     }
 }
-print ($ok ? "ok 16\n" : "not ok 16\n");
+print ($ok ?? "ok 16\n" !! "not ok 16\n");
 
 
 #-----------------------------------------------------------------------
@@ -493,7 +493,7 @@ foreach my $script ( all_script_names())
         last;
     }
 }
-print ($ok ? "ok 17\n" : "not ok 17\n");
+print ($ok ?? "ok 17\n" !! "not ok 17\n");
 
 #-----------------------------------------------------------------------
 # script to code, back to script, using LOCALE_CODE_ALPHA_2
@@ -519,7 +519,7 @@ foreach my $script ( all_script_names())
         last;
     }
 }
-print ($ok ? "ok 18\n" : "not ok 18\n");
+print ($ok ?? "ok 18\n" !! "not ok 18\n");
 
 #-----------------------------------------------------------------------
 # script to code, back to script, using LOCALE_CODE_ALPHA_3
@@ -545,7 +545,7 @@ foreach my $script ( all_script_names())
         last;
     }
 }
-print ($ok ? "ok 19\n" : "not ok 19\n");
+print ($ok ?? "ok 19\n" !! "not ok 19\n");
 
 #-----------------------------------------------------------------------
 # script to code, back to script, using LOCALE_CODE_NUMERIC
@@ -571,5 +571,5 @@ foreach my $script ( all_script_names())
         last;
     }
 }
-print ($ok ? "ok 20\n" : "not ok 20\n");
+print ($ok ?? "ok 20\n" !! "not ok 20\n");
 

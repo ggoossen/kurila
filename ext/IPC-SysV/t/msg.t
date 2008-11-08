@@ -30,7 +30,7 @@ print "ok 1\n";
 #Putting a message on the queue
 my $msgtype = 1;
 my $msg = "hello";
-print $msq->snd($msgtype,$msg,IPC_NOWAIT) ? "ok 2\n" : "not ok 2 # $!\n";
+print $msq->snd($msgtype,$msg,IPC_NOWAIT) ?? "ok 2\n" !! "not ok 2 # $!\n";
 
 #Check if there are messages on the queue
 my $ds = $msq->stat() or print "not ";

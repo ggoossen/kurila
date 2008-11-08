@@ -483,7 +483,7 @@ sub pod2usage {
         %opts{"-verbose"} = 0;
     }
     elsif (! defined %opts{"-exitval"}) {
-        %opts{"-exitval"} = (%opts{"-verbose"} +> 0) ? 1 : 2;
+        %opts{"-exitval"} = (%opts{"-verbose"} +> 0) ?? 1 !! 2;
     }
     elsif (! defined %opts{"-verbose"}) {
         %opts{"-verbose"} = (lc(%opts{"-exitval"}) eq "noexit" ||
@@ -492,7 +492,7 @@ sub pod2usage {
 
     ## Default the output file
     %opts{"-output"} = (lc(%opts{"-exitval"}) eq "noexit" ||
-                        %opts{"-exitval"} +< 2) ? \*STDOUT : \*STDERR
+                        %opts{"-exitval"} +< 2) ?? \*STDOUT !! \*STDERR
             unless (defined %opts{"-output"});
     ## Default the input file
     %opts{"-input"} = $0  unless (defined %opts{"-input"});
@@ -500,11 +500,11 @@ sub pod2usage {
     ## Look up input file in path if it doesnt exist.
     unless ((ref %opts{"-input"}) || (-e %opts{"-input"})) {
         my ($basename) = (%opts{"-input"});
-        my $pathsep = ($^O =~ m/^(?:dos|os2|MSWin32)$/) ? ";"
-                            : (($^O eq 'MacOS' || $^O eq 'VMS') ? ',' :  ":");
+        my $pathsep = ($^O =~ m/^(?:dos|os2|MSWin32)$/) ?? ";"
+                            !! (($^O eq 'MacOS' || $^O eq 'VMS') ?? ',' !!  ":");
         my $pathspec = %opts{"-pathlist"} || %ENV{PATH} || %ENV{PERL5LIB};
 
-        my @paths = @( (ref $pathspec) ? < @$pathspec : < split($pathsep, $pathspec) );
+        my @paths = @( (ref $pathspec) ?? < @$pathspec !! < split($pathsep, $pathspec) );
         for my $dirname ( @paths) {
             local $_ = File::Spec->catfile($dirname, $basename) if length $dirname;
             last if (-e $_) && (%opts{"-input"} = $_);
@@ -616,7 +616,7 @@ sub _handle_element_end {
         # a colon to end all headings.
         if($self->{USAGE_OPTIONS}->{-verbose} +< 2) {
             local $_ = %$self{PENDING}->[-1]->[1];
-            s{([A-Z])([A-Z]+)}{$(((length($2) +> 2) ? $1 : lc($1)) . lc($2))}g;
+            s{([A-Z])([A-Z]+)}{$(((length($2) +> 2) ?? $1 !! lc($1)) . lc($2))}g;
             s/\s*$/:/  unless (m/:\s*$/);
             $_ .= "\n";
             %$self{PENDING}->[-1]->[1] = $_;
@@ -654,7 +654,7 @@ sub preprocess_paragraph {
         ## Change the title of the SYNOPSIS section to USAGE
         s/^=head1\s+SYNOPSIS\s*$/=head1 USAGE/;
         ## Try to do some lowercasing instead of all-caps in headings
-        s{([A-Z])([A-Z]+)}{$(((length($2) +> 2) ? $1 : lc($1)) . lc($2))}g;
+        s{([A-Z])([A-Z]+)}{$(((length($2) +> 2) ?? $1 !! lc($1)) . lc($2))}g;
         ## Use a colon to end all headings
         s/\s*$/:/  unless (m/:\s*$/);
         $_ .= "\n";

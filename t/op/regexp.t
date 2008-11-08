@@ -80,7 +80,7 @@ BEGIN {
 $bang = sprintf "\\\%03o", ord "!"; # \41 would not be portable.
 $ffff  = "\x[FF]\x[FF]";
 $nulnul = "\0" x 2;
-$OP = $qr ? 'qr' : 'm';
+$OP = $qr ?? 'qr' !! 'm';
 
 $| = 1;
 printf "1..\%d\n# $iters iterations\n", scalar nelems @tests;
@@ -106,11 +106,11 @@ foreach ( @tests) {
     $pat = "'$pat'" unless $pat =~ m/^[:'\/]/;
     $pat =~ s/\$\{(\w+)\}/$(eval '$'.$1)/g;
     $pat =~ s/\\n/\n/g;
-    my $keep = ($repl =~ m/\$\^MATCH/) ? 'p' : '';
+    my $keep = ($repl =~ m/\$\^MATCH/) ?? 'p' !! '';
     $subject = eval qq("$subject"); die "error in '$subject': $($@->message)" if $@;
     $expect  = eval qq("$expect"); die "error in '$expect': $($@->message)" if $@;
     my $todo = $qr_embed_thr && ($result =~ s/t//);
-    my $skip = ($skip_amp ? ($result =~ s/B//i) : ($result =~ s/B//));
+    my $skip = ($skip_amp ?? ($result =~ s/B//i) !! ($result =~ s/B//));
     $reason = 'skipping $&' if $reason eq  '' && $skip_amp;
     $result =~ s/B//i unless $skip;
 
@@ -172,11 +172,11 @@ EOFCODE
 	    last;  # no need to study a syntax error
 	}
 	elsif ( $skip ) {
-	    print "ok $test # skipped", length($reason) ? " $reason" : '', "\n";
+	    print "ok $test # skipped", length($reason) ?? " $reason" !! '', "\n";
 	    next TEST;
 	}
 	elsif ( $todo ) {
-	    print "not ok $test # todo", length($reason) ? " - $reason" : '', "\n";
+	    print "not ok $test # todo", length($reason) ?? " - $reason" !! '', "\n";
 	    next TEST;
 	}
 	elsif ($err) {

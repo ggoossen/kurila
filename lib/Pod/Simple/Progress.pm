@@ -19,7 +19,7 @@ sub new {
   my($class,$delay) = < @_;
   my $self = bless \%('quiet_until' => 1),  ref($class) || $class;
   $self->to(*STDOUT{IO});
-  $self->delay(defined($delay) ? $delay : 5);
+  $self->delay(defined($delay) ?? $delay !! 5);
   return $self;
 }
 
@@ -35,15 +35,15 @@ sub reach {
     my $goal;
     my    $to = $self->{'to'};
     print $to join('', @(
-      ($self->{'quiet_until'} == 1) ? () : '... ',
-      (defined $point) ? (
+      ($self->{'quiet_until'} == 1) ?? () !! '... ',
+      (defined $point) ?? (
         '#',
-        ($goal = $self->{'goal'}) ? (
+        ($goal = $self->{'goal'}) ?? (
           ' ' x (length($goal) - length($point)),
           $point, '/', $goal,
-        ) : $point,
-        $note ? ': ' : (),
-      ) : (),
+        ) !! $point,
+        $note ?? ': ' !! (),
+      ) !! (),
       $note || '',
       "\n")
     );

@@ -63,8 +63,8 @@ sub checkorder {
 	# Equality shouldn't happen, but catch it in the contents check
 	next if ($aref->[$i] cmp $aref->[$i+1]) +<= 0;
 	$disorder = (substr($aref->[$i],   0, $RootWidth) eq
-		     substr($aref->[$i+1], 0, $RootWidth)) ?
-		     "Instability" : "Disorder";
+		     substr($aref->[$i+1], 0, $RootWidth)) ??
+		     "Instability" !! "Disorder";
 	# Keep checking if merely unstable... disorder is much worse.
 	$status =
 	    "$disorder at element $i between $aref->[$i] and $aref->[$i+1]";

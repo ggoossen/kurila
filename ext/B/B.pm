@@ -79,7 +79,7 @@ sub B::GV::SAFENAME {
 
 sub B::IV::int_value {
   my ($self) = < @_;
-  return  ($self->FLAGS() ^&^ SVf_IVisUV()) ? $self->UVX : $self->IV;
+  return  ($self->FLAGS() ^&^ SVf_IVisUV()) ?? $self->UVX !! $self->IV;
 }
 
 sub B::NULL::as_string() {""}
@@ -297,7 +297,7 @@ do {
 	    s/^(.*?)\t//;
 	    if ($1 eq $name) {
 		s{(s\\_[0-9a-f]+)} {$(
-		    exists($sym->{$1}) ? $sym->{$1} : $default
+		    exists($sym->{$1}) ?? $sym->{$1} !! $default
 		)}g;
 		printf $fh $format, $_;
 	    }

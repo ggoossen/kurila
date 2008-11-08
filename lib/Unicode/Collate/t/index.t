@@ -7,7 +7,7 @@ BEGIN {
     }
     if (%ENV{PERL_CORE}) {
 	chdir('t') if -d 't';
-	@INC = @( $^O eq 'MacOS' ? < qw(::lib) : < qw(../lib) );
+	@INC = @( $^O eq 'MacOS' ?? < qw(::lib) !! < qw(../lib) );
     }
 }
 
@@ -123,14 +123,14 @@ ok($match, $ret);
 $Collator->change(level => 1);
 
 $str = $IsEBCDIC
-    ? "Ich mu\x{0059} studieren Perl."
-    : "Ich mu\x{00DF} studieren Perl.";
+    ?? "Ich mu\x{0059} studieren Perl."
+    !! "Ich mu\x{00DF} studieren Perl.";
 $sub = $IsEBCDIC
-    ? "m\x{00DC}ss"
-    : "m\x{00FC}ss";
+    ?? "m\x{00DC}ss"
+    !! "m\x{00FC}ss";
 $ret = $IsEBCDIC
-    ? "mu\x{0059}"
-    : "mu\x{00DF}";
+    ?? "mu\x{0059}"
+    !! "mu\x{00DF}";
 $match = undef;
 if (my($pos, $len) = < $Collator->index($str, $sub)) {
     $match = substr($str, $pos, $len);
@@ -251,14 +251,14 @@ ok($ret eq "P\cBe\x{300}\cB");
 $ret = $Collator->match("P\cBe\x{300}\cBrl and PERL", "pe");
 ok($ret, "P\cBe\x{300}\cB");
 
-$str = $IsEBCDIC ? "mu\x{0059}" : "mu\x{00DF}";
-$sub = $IsEBCDIC ? "m\x{00DC}ss" : "m\x{00FC}ss";
+$str = $IsEBCDIC ?? "mu\x{0059}" !! "mu\x{00DF}";
+$sub = $IsEBCDIC ?? "m\x{00DC}ss" !! "m\x{00FC}ss";
 
 ($ret) = $Collator->match($str, $sub);
 ok($ret, $str);
 
-$str = $IsEBCDIC ? "mu\x{0059}" : "mu\x{00DF}";
-$sub = $IsEBCDIC ? "m\x{00DC}s" : "m\x{00FC}s";
+$str = $IsEBCDIC ?? "mu\x{0059}" !! "mu\x{00DF}";
+$sub = $IsEBCDIC ?? "m\x{00DC}s" !! "m\x{00FC}s";
 
 ($ret) = $Collator->match($str, $sub);
 ok($ret, undef);
@@ -302,8 +302,8 @@ ok($ret eq "pe");
 $ret = $Collator->gmatch("P\cBe\x{300}\cBrl, perl, and PERL", "pe");
 ok(nelems($ret) == 1);
 
-$str = $IsEBCDIC ? "mu\x{0059}" : "mu\x{00DF}";
-$sub = $IsEBCDIC ? "m\x{00DC}ss" : "m\x{00FC}ss";
+$str = $IsEBCDIC ?? "mu\x{0059}" !! "mu\x{00DF}";
+$sub = $IsEBCDIC ?? "m\x{00DC}ss" !! "m\x{00FC}ss";
 
 ($ret) = $Collator->match($str, $sub);
 ok($ret, undef);

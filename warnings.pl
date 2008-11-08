@@ -195,7 +195,7 @@ sub printTree
 	my ($ver, $rest) = @{ $v } ;
 	if (ref $rest)
 	{
-	    my $bar = @keys ? "|" : " ";
+	    my $bar = @keys ?? "|" !! " ";
 	    print " -" . "-" x ($max - length $k ) . "+\n" ;
 	    printTree ($rest, $prefix . $bar . $offset )
 	}

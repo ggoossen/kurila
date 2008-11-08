@@ -224,16 +224,16 @@ die $@ if $@ and $@->{description} !~ m/^IO layers \(like ':utf8'\) unavailable/
 
 $a = "\x[FF]";
 
-print $a ne "\x[FF]" ? "not ok 40\n" : "ok 40\n";
+print $a ne "\x[FF]" ?? "not ok 40\n" !! "ok 40\n";
 
 syswrite I, $a;
 
 # Should not be changed as a side effect of syswrite.
-print $a ne "\x[FF]" ? "not ok 41\n" : "ok 41\n";
+print $a ne "\x[FF]" ?? "not ok 41\n" !! "ok 41\n";
 
 # This should work
 try {syswrite I, 2;};
-print $@ eq "" ? "ok 42\n" : "not ok 42 # $@";
+print $@ eq "" ?? "ok 42\n" !! "not ok 42 # $@";
 
 close(I);
 unlink $outfile;

@@ -13,8 +13,8 @@ sub ok ($;$) {
     my($ok, $name) = < @_;
 
     # You have to do it this way or VMS will get confused.
-    printf "\%sok \%d\%s\n", ($ok ? '' : 'not '), $test,
-      (defined $name ? " - $name" : '');
+    printf "\%sok \%d\%s\n", ($ok ?? '' !! 'not '), $test,
+      (defined $name ?? " - $name" !! '');
 
     printf "# Failed test at line \%d\n", (caller)[[2]] unless $ok;
     
@@ -105,7 +105,7 @@ main::ok ( $@ eq "", 'check we can call the imported subroutine')
   or print STDERR "# \$\@ is $@\n";
 main::ok ( $got eq 'lifejacket', 'and that it gave the correct result')
   or print STDERR "# expected 'lifejacket', got " .
-  (defined $got ? "'$got'" : "undef") . "\n";
+  (defined $got ?? "'$got'" !! "undef") . "\n";
 
 # The string eval is important. It stops $Foo::{is} existing when
 # Testing->import is called.
@@ -116,14 +116,14 @@ main::ok ( $@ eq "", 'check we can call the imported autoloaded subroutine')
   or chomp ($@), print STDERR "# \$\@ is $@\n";
 main::ok ( $got eq 'Is', 'and that it gave the correct result')
   or print STDERR "# expected 'Is', got " .
-  (defined $got ? "'$got'" : "undef") . "\n";
+  (defined $got ?? "'$got'" !! "undef") . "\n";
 
 };
 package Bar;
 my @imports = qw($seatbelt &Above stuff @wailing %left);
 Testing->import(< @imports);
 
-main::ok( (!grep { eval "!defined $_" } map({ m/^\w/ ? "&$_" : $_ } @imports)),
+main::ok( (!grep { eval "!defined $_" } map({ m/^\w/ ?? "&$_" !! $_ } @imports)),
       'import by symbols' );
 
 
@@ -131,7 +131,7 @@ package Yar;
 my @tags = qw(:This :tray);
 Testing->import(< @tags);
 
-main::ok( (!grep { eval "!defined $_" } map { m/^\w/ ? "&$_" : $_ }
+main::ok( (!grep { eval "!defined $_" } map { m/^\w/ ?? "&$_" !! $_ }
  map { < @$_ } %Testing::EXPORT_TAGS{[ map { s/^://; $_ }@tags ]}),
       'import by tags' );
 
@@ -145,7 +145,7 @@ main::ok( !defined &lifejacket,     'deny import by !' );
 package Mars;
 Testing->import('/e/');
 
-main::ok( (!grep { eval "!defined $_" } map { m/^\w/ ? "&$_" : $_ }
+main::ok( (!grep { eval "!defined $_" } map { m/^\w/ ?? "&$_" !! $_ }
  grep { m/e/ } @( < @Testing::EXPORT, < @Testing::EXPORT_OK)),
       'import by regex');
 
@@ -153,7 +153,7 @@ main::ok( (!grep { eval "!defined $_" } map { m/^\w/ ? "&$_" : $_ }
 package Venus;
 Testing->import('!/e/');
 
-main::ok( (!grep { eval "defined $_" } map { m/^\w/ ? "&$_" : $_ }
+main::ok( (!grep { eval "defined $_" } map { m/^\w/ ?? "&$_" !! $_ }
  grep { m/e/ } @( < @Testing::EXPORT, < @Testing::EXPORT_OK)),
       'deny import by regex');
 main::ok( !defined &lifejacket, 'further denial' );

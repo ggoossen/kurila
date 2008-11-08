@@ -29,8 +29,8 @@ sub populate (@) {
     return $tmob;
 } 
 
-sub gmtime (;$)    { populate CORE::gmtime((nelems @_) ? shift : time)}
-sub gmctime (;$)   { scalar   CORE::gmtime((nelems @_) ? shift : time)} 
+sub gmtime (;$)    { populate CORE::gmtime((nelems @_) ?? shift !! time)}
+sub gmctime (;$)   { scalar   CORE::gmtime((nelems @_) ?? shift !! time)} 
 
 1;
 __END__

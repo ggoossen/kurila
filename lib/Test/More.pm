@@ -442,8 +442,8 @@ sub can_ok ($@) {
     }
 
     my $name;
-    $name = (nelems @methods) == 1 ? "$class->can('@methods[0]')" 
-                          : "$class->can(...)";
+    $name = (nelems @methods) == 1 ?? "$class->can('@methods[0]')" 
+                          !! "$class->can(...)";
 
     my $ok = $tb->ok( !nelems @nok, $name );
 
@@ -850,7 +850,7 @@ sub _format_stack {
 
     my $out = "Structures begin differing at:\n";
     foreach my $val ( @vals) {
-        $val = _dne($val)    ? "Does not exist" : dump::view($val);
+        $val = _dne($val)    ?? "Does not exist" !! dump::view($val);
     }
 
     $out .= "@vars[0] = @vals[0]\n";
@@ -1179,10 +1179,10 @@ sub _eq_array  {
     return 1 if $a1 \== $a2;
 
     my $ok = 1;
-    my $max = (nelems @$a1) +> nelems @$a2 ? (nelems @$a1) : nelems @$a2;
+    my $max = (nelems @$a1) +> nelems @$a2 ?? (nelems @$a1) !! nelems @$a2;
     for (0..$max-1) {
-        my $e1 = $_ +> (nelems @$a1)-1 ? $DNE : $a1->[$_];
-        my $e2 = $_ +> (nelems @$a2)-1 ? $DNE : $a2->[$_];
+        my $e1 = $_ +> (nelems @$a1)-1 ?? $DNE !! $a1->[$_];
+        my $e2 = $_ +> (nelems @$a2)-1 ?? $DNE !! $a2->[$_];
 
         push @Data_Stack, \%( type => 'ARRAY', idx => $_, vals => \@($e1, $e2) );
         $ok = _deep_check($e1,$e2);
@@ -1298,10 +1298,10 @@ sub _eq_hash {
     return 1 if $a1 \== $a2;
 
     my $ok = 1;
-    my $bigger = (nelems keys %$a1) +> (nelems keys %$a2) ? $a1 : $a2;
+    my $bigger = (nelems keys %$a1) +> (nelems keys %$a2) ?? $a1 !! $a2;
     foreach my $k (keys %$bigger) {
-        my $e1 = exists $a1->{$k} ? $a1->{$k} : $DNE;
-        my $e2 = exists $a2->{$k} ? $a2->{$k} : $DNE;
+        my $e1 = exists $a1->{$k} ?? $a1->{$k} !! $DNE;
+        my $e2 = exists $a2->{$k} ?? $a2->{$k} !! $DNE;
 
         push @Data_Stack, \%( type => 'HASH', idx => $k, vals => \@($e1, $e2) );
         $ok = _deep_check($e1, $e2);

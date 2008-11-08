@@ -182,8 +182,8 @@ unlink "command";
 ###############################################################################
 # perl_script (on unix any ordinary, readable file)
 
-my $self_name = %ENV{PERL_CORE} ? '../lib/ExtUtils/t/MM_Unix.t' 
-                                 : 'MM_Unix.t';
+my $self_name = %ENV{PERL_CORE} ?? '../lib/ExtUtils/t/MM_Unix.t' 
+                                 !! 'MM_Unix.t';
 is ($t->perl_script($self_name),$self_name, 'we pass as a perl_script()');
 
 ###############################################################################

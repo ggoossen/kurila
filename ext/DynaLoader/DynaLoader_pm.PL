@@ -193,7 +193,7 @@ my $pthsep;
 
 if (%ENV{PERL_BUILD_EXPAND_CONFIG_VARS}) {
     $ldlibpthname         = to_string(config_value("ldlibpthname"));
-    $ldlibpthname_defined = to_string(defined config_value("ldlibpthname") ? 1 : 0);
+    $ldlibpthname_defined = to_string(defined config_value("ldlibpthname") ?? 1 !! 0);
     $pthsep               = to_string(config_value("path_sep"));
 }
 else {

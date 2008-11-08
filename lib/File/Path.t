@@ -9,7 +9,7 @@ BEGIN {
 }
 
 eval "use Test::Output";
-my $has_Test_Output = $@ ? 0 : 1;
+my $has_Test_Output = $@ ?? 0 !! 1;
 
 my $Is_VMS   = $^O eq 'VMS';
 

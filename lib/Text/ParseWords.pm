@@ -86,7 +86,7 @@ sub parse_line {
                             (?!^)(?=["'])               # a quote
                         )
 		    )//xs or return @();		# extended layout
-        my ($quote, $quoted, $unquoted, $delim) = (($1 ? ($1,$2) : ($3,$4)), $5, $6);
+        my ($quote, $quoted, $unquoted, $delim) = (($1 ?? ($1,$2) !! ($3,$4)), $5, $6);
 
 
 	return @() unless( defined($quote) || length($unquoted) || length($delim));
@@ -101,7 +101,7 @@ sub parse_line {
             }
 	}
         $word .= substr($line, 0, 0);	# leave results tainted
-        $word .= defined $quote ? $quoted : $unquoted;
+        $word .= defined $quote ?? $quoted !! $unquoted;
 
         if (length($delim)) {
             push(@pieces, $word);

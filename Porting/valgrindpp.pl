@@ -33,7 +33,7 @@ if (exists %opt{dir}) {
 }
 else {
   # Check if we're in 't'
-  %opt{dir} = cwd =~ m/\/t$/ ? '..' : '.';
+  %opt{dir} = cwd =~ m/\/t$/ ?? '..' !! '.';
 
   # Check if we're in the right directory
   -d "%opt{dir}/$_" or die "$0: must be run from the perl source directory"
@@ -43,7 +43,7 @@ else {
 
 # Assemble regex for functions whose leaks should be hidden
 # (no, a hash won't be significantly faster)
-my $hidden = do { local $"='|'; %opt{hide} ? qr/^(?:{join ' ', <@{%opt{hide}}})$/o : '' };
+my $hidden = do { local $"='|'; %opt{hide} ?? qr/^(?:{join ' ', <@{%opt{hide}}})$/o !! '' };
 
 # Setup our output file handle
 # (do it early, as it may fail)
@@ -93,7 +93,7 @@ sub summary {
   for my $e (keys %$error) {
     for my $f (keys %{$error->{$e}}) {
       my($func, $file, $line) = < split m/:/, $f;
-      my $nf = %opt{lines} ? "$func ($file:$line)" : "$func ($file)";
+      my $nf = %opt{lines} ?? "$func ($file:$line)" !! "$func ($file)";
       %ne{$e}->{$nf}->{count}++;
       while (my($k,$v) = each %{$error->{$e}->{$f}}) {
         %ne{$e}->{$nf}->{tests}->{$k} += $v;
@@ -106,9 +106,9 @@ sub summary {
     for my $s (keys %{$leak->{$l}}) {
       my $ns = join '<', map {
                  my($func, $file, $line) = < split m/:/;
-                 m/:/ ? %opt{lines}
-                       ? "$func ($file:$line)" : "$func ($file)"
-                     : $_
+                 m/:/ ?? %opt{lines}
+                       ?? "$func ($file:$line)" !! "$func ($file)"
+                     !! $_
                } split m/</, $s;
       %nl{$l}->{$ns}->{count}++;
       while (my($k,$v) = each %{$leak->{$l}->{$s}}) {
@@ -126,14 +126,14 @@ sub summary {
  grep %top{$_}->{$what}, keys %top;
       (nelems @t) +> %opt{top} and splice @t, %opt{top};
       my $n = (nelems @t);
-      my $s = $n +> 1 ? 's' : '';
+      my $s = $n +> 1 ?? 's' !! '';
       my $prev = 0;
       print $fh "Top $n test scripts for $($what)s:\n\n";
       for my $i (1 .. $n) {
         $n = %top{@t[$i-1]}->{$what};
-        $s = $n +> 1 ? 's' : '';
+        $s = $n +> 1 ?? 's' !! '';
         printf $fh "    \%3s \%-40s \%3d $what$s\n",
-                   $n != $prev ? "$i." : '', @t[$i-1], $n;
+                   $n != $prev ?? "$i." !! '', @t[$i-1], $n;
         $prev = $n;
       }
       print $fh "\n";
@@ -148,7 +148,7 @@ sub summary {
     print $fh qq("$e"\n);
     for my $frame (sort keys %{%ne{$e}}) {
       my $data = %ne{$e}->{$frame};
-      my $count = $data->{count} +> 1 ? " [$data->{count} paths]" : '';
+      my $count = $data->{count} +> 1 ?? " [$data->{count} paths]" !! '';
       print $fh ' 'x4, "$frame$count\n", <
                 format_tests($data->{tests}), "\n";
     }
@@ -178,7 +178,7 @@ sub format_tests {
   }
   else {
     my $count = keys %$tests;
-    my $s = $count +> 1 ? 's' : '';
+    my $s = $count +> 1 ?? 's' !! '';
     return $indent . "triggered by $count test$s";
   }
 }
@@ -238,7 +238,7 @@ sub filter {
 
         # Add stack frame if it's within our threshold
         if ($inperl +<= %opt{frames}) {
-          push @stack, $inperl ? "$func:$file:$lineno" : $func;
+          push @stack, $inperl ?? "$func:$file:$lineno" !! $func;
         }
       }
 

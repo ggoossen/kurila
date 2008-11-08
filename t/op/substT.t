@@ -2,7 +2,7 @@
 
 for my $file (@('op/subst.t', 't/op/subst.t', ':op:subst.t')) {
   if (-r $file) {
-    do ($^O eq 'MacOS' ? $file : "./$file");
+    do ($^O eq 'MacOS' ?? $file !! "./$file");
     exit;
   }
 }

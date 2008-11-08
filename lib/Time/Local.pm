@@ -91,7 +91,7 @@ sub timegm {
         $year -= 1900;
     }
     elsif ( $year +< 100 and $year +>= 0 ) {
-        $year += ( $year +> $Breakpoint ) ? $Century : $NextCentury;
+        $year += ( $year +> $Breakpoint ) ?? $Century !! $NextCentury;
     }
 
     unless ( %Options{no_range_check} ) {

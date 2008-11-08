@@ -324,7 +324,7 @@ sub fdopen {
     }
 
     open($io, _open_mode_string($mode) . $fdmode, $fd)
-	? $io : undef;
+	?? $io !! undef;
 }
 
 sub close {
@@ -430,7 +430,7 @@ sub stat {
 sub autoflush {
     my $old = SelectSaver->new( qualify(@_[0], caller));
     my $prev = $|;
-    $| = (nelems @_) +> 1 ? @_[1] : 1;
+    $| = (nelems @_) +> 1 ?? @_[1] !! 1;
     $prev;
 }
 
@@ -489,7 +489,7 @@ sub ioctl {
 sub constant {
     my $name = shift;
     (($name =~ m/^(SEEK_(SET|CUR|END)|_IO[FLN]BF)$/) && defined &{*{Symbol::fetch_glob($name)}})
-	? &{*{Symbol::fetch_glob($name)}}() : undef;
+	?? &{*{Symbol::fetch_glob($name)}}() !! undef;
 }
 
 

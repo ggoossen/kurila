@@ -166,7 +166,7 @@ sub find_perl {
         @sdirs = sort { my($absa) = < $self->file_name_is_absolute($a);
                         my($absb) = < $self->file_name_is_absolute($b);
                         if ($absa && $absb) { return $a cmp $b }
-                        else { return $absa ? 1 :  @($absb ? -1 :  @($a cmp $b)); }
+                        else { return $absa ?? 1 !!  @($absb ?? -1 !!  @($a cmp $b)); }
                       } @$dirs;
         # Check miniperl before perl, and check names likely to contain
         # version numbers before "generic" names, so we pick up an
@@ -208,8 +208,8 @@ sub find_perl {
             $inabs++; # Should happen above in next $dir, but just in case...
         }
         foreach my $name ( @snames){
-            push @cand, ($name !~ m![/:>\]]!) ? < $self->catfile($dir,$name)
-                                              : < $self->fixpath($name,0);
+            push @cand, ($name !~ m![/:>\]]!) ?? < $self->catfile($dir,$name)
+                                              !! < $self->fixpath($name,0);
         }
     }
     foreach my $name ( @cand) {
@@ -683,7 +683,7 @@ sub cflags {
 	    my($type,$lvl) = ($1,$2);
 	    $quals =~ s/ -$type$lvl\b\s*//;
 	    if ($type eq 'g') { $flagoptstr = '/NoOptimize'; }
-	    else { $flagoptstr = '/Optimize' . (defined($lvl) ? "=$lvl" : ''); }
+	    else { $flagoptstr = '/Optimize' . (defined($lvl) ?? "=$lvl" !! ''); }
 	}
 	while ($quals =~ m/ -([DIU])(\S+)/) {
 	    my($type,$def) = ($1,$2);
@@ -742,7 +742,7 @@ sub cflags {
     if ($self->{OPTIMIZE} !~ m!/!) {
 	if    ($self->{OPTIMIZE} =~ m!-g!) { $self->{OPTIMIZE} = '/Debug/NoOptimize' }
 	elsif ($self->{OPTIMIZE} =~ m/-O(\d*)/) {
-	    $self->{OPTIMIZE} = '/Optimize' . (defined($1) ? "=$1" : '');
+	    $self->{OPTIMIZE} = '/Optimize' . (defined($1) ?? "=$1" !! '');
 	}
 	else {
 	    warn "MM_VMS: Can't parse OPTIMIZE \"$self->{OPTIMIZE}\"; using default\n" if length $self->{OPTIMIZE};
@@ -786,7 +786,7 @@ sub const_cccmd {
         push @m,'
 .FIRST
 	',$self->{NOECHO},'If F$TrnLnm("Sys").eqs."" .and. F$TrnLnm("DECC$System_Include").eqs."" Then Define/NoLog SYS ',
-		(%Config{'archname'} eq 'VMS_AXP' ? 'Sys$Library' : 'DECC$Library_Include'),'
+		(%Config{'archname'} eq 'VMS_AXP' ?? 'Sys$Library' !! 'DECC$Library_Include'),'
 	',$self->{NOECHO},'If F$TrnLnm("Sys").eqs."" .and. F$TrnLnm("DECC$System_Include").nes."" Then Define/NoLog SYS DECC$System_Include';
     }
 
@@ -955,7 +955,7 @@ $(BASEEXT).opt : Makefile.PL
     if ($self->{OBJECT} =~ m/\bBASEEXT\b/ or
         $self->{OBJECT} =~ m/\b$self->{BASEEXT}\b/i) { 
         push @m, (%Config{d_vms_case_sensitive_symbols}
-	           ? uc($self->{BASEEXT}) :'$(BASEEXT)');
+	           ?? uc($self->{BASEEXT}) !!'$(BASEEXT)');
     }
     else {  # We don't have a "main" object file, so pull 'em all in
         # Upcase module names if linker is being case-sensitive
@@ -1508,7 +1508,7 @@ $(MAP_TARGET) :: $(MAKE_APERL_FILE)
 MAP_TARGET    = |, <$self->fixpath($target,0),'
 MAP_SHRTARGET = ', <$self->fixpath($shrtarget,0),"
 MAP_LINKCMD   = $linkcmd
-MAP_PERLINC   = ", $perlinc ? < map('"$_" ', @{$perlinc}) : '',"
+MAP_PERLINC   = ", $perlinc ?? < map('"$_" ', @{$perlinc}) !! '',"
 MAP_EXTRA     = $extralist
 MAP_LIBPERL = ", <$self->fixpath($libperl,0),'
 ';
@@ -1747,7 +1747,7 @@ sub echo {
     my($self, $text, $file, $appending) = < @_;
     $appending ||= 0;
 
-    my $opencmd = $appending ? 'Open/Append' : 'Open/Write';
+    my $opencmd = $appending ?? 'Open/Append' !! 'Open/Write';
 
     my @cmds = @("\$(NOECHO) $opencmd MMECHOFILE $file ");
     push @cmds, < map { '$(NOECHO) Write MMECHOFILE '.$self->quote_literal($_) } 
@@ -1809,7 +1809,7 @@ sub init_linker {
     }
     else {
         $self->{PERL_ARCHIVE} ||=
-          %ENV{$shr} ? %ENV{$shr} : "Sys\$Share:$shr.%Config{'dlext'}";
+          %ENV{$shr} ?? %ENV{$shr} !! "Sys\$Share:$shr.%Config{'dlext'}";
     }
 
     $self->{PERL_ARCHIVE_AFTER} ||= '';
@@ -1909,8 +1909,8 @@ sub fixpath {
     elsif ((($prefix,$name) = ($path =~ m#^\$\(([^\)]+)\)(.+)#s)) && $self->{$prefix}) {
         my($vmspre) = < $self->eliminate_macros("\$($prefix)");
         # is it a dir or just a name?
-        $vmspre = ($vmspre =~ m|/| or $prefix =~ m/DIR\Z(?!\n)/) ? vmspath($vmspre) : '';
-        $fixedpath = ($vmspre ? $vmspre : $self->{$prefix}) . $name;
+        $vmspre = ($vmspre =~ m|/| or $prefix =~ m/DIR\Z(?!\n)/) ?? vmspath($vmspre) !! '';
+        $fixedpath = ($vmspre ?? $vmspre !! $self->{$prefix}) . $name;
         $fixedpath = vmspath($fixedpath) if $force_path;
     }
     else {

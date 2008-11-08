@@ -3,9 +3,9 @@ package IPC::Cmd;
 
 BEGIN {
 
-    use constant IS_VMS   => $^O eq 'VMS'                       ? 1 : 0;    
-    use constant IS_WIN32 => $^O eq 'MSWin32'                   ? 1 : 0;
-    use constant IS_WIN98 => (IS_WIN32 and !Win32::IsWinNT())   ? 1 : 0;
+    use constant IS_VMS   => $^O eq 'VMS'                       ?? 1 !! 0;    
+    use constant IS_WIN32 => $^O eq 'MSWin32'                   ?? 1 !! 0;
+    use constant IS_WIN98 => (IS_WIN32 and !Win32::IsWinNT())   ?? 1 !! 0;
 
     use Exporter    ();
     use vars <        qw[ @ISA $VERSION @EXPORT_OK $VERBOSE $DEBUG
@@ -307,7 +307,7 @@ sub run {
         return;
     };        
 
-    print < loc("Running [\%1]...\n", (ref $cmd ? "$(join ' ',@$cmd)" : $cmd)) if $verbose;
+    print < loc("Running [\%1]...\n", (ref $cmd ?? "$(join ' ',@$cmd)" !! $cmd)) if $verbose;
 
     ### did the user pass us a buffer to fill or not? if so, set this
     ### flag so we know what is expected of us
@@ -340,7 +340,7 @@ sub run {
     
 
     ### flag to indicate we have a buffer captured
-    my $have_buffer = __PACKAGE__->can_capture_buffer ? 1 : 0;
+    my $have_buffer = __PACKAGE__->can_capture_buffer ?? 1 !! 0;
     
     ### flag indicating if the subcall went ok
     my $ok;
@@ -364,7 +364,7 @@ sub run {
         ### in case there are pipes in there;
         ### IPC::Open3 will call exec and exec will do the right thing 
         $ok = __PACKAGE__->_open3_run( 
-                                ( ref $cmd ? "$(join ' ',@$cmd)" : $cmd ),
+                                ( ref $cmd ?? "$(join ' ',@$cmd)" !! $cmd ),
                                 $_out_handler, $_err_handler, $verbose 
                             );
         
@@ -372,7 +372,7 @@ sub run {
     } else {
         __PACKAGE__->_debug( "# Using system(). Have buffer: $have_buffer" )
             if $DEBUG;
-        $ok = __PACKAGE__->_system_run( (ref $cmd ? "$(join ' ',@$cmd)" : $cmd), $verbose );
+        $ok = __PACKAGE__->_system_run( (ref $cmd ?? "$(join ' ',@$cmd)" !! $cmd), $verbose );
     }
     
     ### fill the buffer;
@@ -381,8 +381,8 @@ sub run {
     ### return a list of flags and buffers (if available) in list
     ### context, or just a simple 'ok' in scalar
     return $have_buffer
-                    ?  @($ok, $?, \@buffer, \@buff_out, \@buff_err)
-                    :  @($ok, $? );
+                    ??  @($ok, $?, \@buffer, \@buff_out, \@buff_err)
+                    !!  @($ok, $? );
 }
 
 sub _open3_run { 
@@ -410,16 +410,16 @@ sub _open3_run {
     ### We'll do the same for STDOUT and STDERR. It works without
     ### duping them on non-unix derivatives, but not on win32.
     my @fds_to_dup = @( IS_WIN32 && !$verbose 
-                            ? < qw[STDIN STDOUT STDERR] 
-                            : < qw[STDIN]
+                            ?? < qw[STDIN STDOUT STDERR] 
+                            !! < qw[STDIN]
                         );
     __PACKAGE__->__dup_fds( < @fds_to_dup );
     
 
     my $pid = IPC::Open3::open3(
                     '<&STDIN',
-                    (IS_WIN32 ? '>&STDOUT' : $kidout),
-                    (IS_WIN32 ? '>&STDERR' : $kiderror),
+                    (IS_WIN32 ?? '>&STDOUT' !! $kidout),
+                    (IS_WIN32 ?? '>&STDERR' !! $kiderror),
                     $cmd
                 );
 
@@ -427,9 +427,9 @@ sub _open3_run {
     ### we never get the input.. so jump through
     ### some hoops to do it :(
     my $selector = IO::Select->new(
-                        (IS_WIN32 ? \*STDERR : $kiderror), 
+                        (IS_WIN32 ?? \*STDERR !! $kiderror), 
                         \*STDIN,   
-                        (IS_WIN32 ? \*STDOUT : $kidout)     
+                        (IS_WIN32 ?? \*STDOUT !! $kidout)     
                     );              
 
     (\*STDOUT)->autoflush(1);   (\*STDERR)->autoflush(1);   (\*STDIN)->autoflush(1);
@@ -562,7 +562,7 @@ sub _system_run {
     my $cmd     = shift;
     my $verbose = shift || 0;
 
-    my @fds_to_dup = @( $verbose ? () : < qw[STDOUT STDERR] );
+    my @fds_to_dup = @( $verbose ?? () !! < qw[STDOUT STDERR] );
     __PACKAGE__->__dup_fds( < @fds_to_dup );
     
     ### system returns 'true' on failure -- the exit code of the cmd

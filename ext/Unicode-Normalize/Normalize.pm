@@ -60,7 +60,7 @@ sub unpack_U {
 
 sub FCD ($) {
     my $str = shift;
-    return checkFCD($str) ? $str : NFD($str);
+    return checkFCD($str) ?? $str !! NFD($str);
 }
 
 our %formNorm = %(

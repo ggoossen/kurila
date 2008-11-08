@@ -177,9 +177,9 @@ sub load_loc {
                         ([1-9]\d*|\*)           # 4 - variable
                     )
             }{$(
-                $1 ? $1
-                   : $2 ? "\[$2,"._unescape($3)."]"
-                        : "[_$4]"
+                $1 ?? $1
+                   !! $2 ?? "\[$2,"._unescape($3)."]"
+                        !! "[_$4]"
             )}gx;
 	    return $lh->maketext($str, < @_);
 	};
@@ -242,11 +242,11 @@ sub _default_gettext {
     }{$( do {
 	my $digit = $2 || shift;
 	$digit . (
-	    $1 ? (
-		($1 eq 'tense') ? (($3 eq 'present') ? 'ing' : 'ed') :
-		($1 eq 'quant') ? ' ' . (($digit +> 1) ? ($4 || "$3s") : $3) :
+	    $1 ?? (
+		($1 eq 'tense') ?? (($3 eq 'present') ?? 'ing' !! 'ed') !!
+		($1 eq 'quant') ?? ' ' . (($digit +> 1) ?? ($4 || "$3s") !! $3) !!
 		''
-	    ) : ''
+	    ) !! ''
 	);
     })}gx;
     return $str;
@@ -260,7 +260,7 @@ sub _escape {
 
 sub _unescape {
     join(',', map {
-        m/\A(\s*)%([1-9]\d*|\*)(\s*)\z/ ? "$1_$2$3" : $_
+        m/\A(\s*)%([1-9]\d*|\*)(\s*)\z/ ?? "$1_$2$3" !! $_
     } split(m/,/, @_[0]));
 }
 

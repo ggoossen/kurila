@@ -33,7 +33,7 @@ sub FILL {
 # Decode if there is something decode and return result or signal eof
 
     my $line = readline( @_[1] );
-    (defined $line) ? MIME::QuotedPrint::decode_qp( $line ) : undef;
+    (defined $line) ?? MIME::QuotedPrint::decode_qp( $line ) !! undef;
 } #FILL
 
 #-----------------------------------------------------------------------
@@ -46,7 +46,7 @@ sub WRITE {
 
 # Encode whatever needs to be encoded and write to handle: indicate result
 
-    (print {@_[2]} MIME::QuotedPrint::encode_qp(@_[1])) ? length(@_[1]) : -1;
+    (print {@_[2]} MIME::QuotedPrint::encode_qp(@_[1])) ?? length(@_[1]) !! -1;
 } #WRITE
 
 __END__

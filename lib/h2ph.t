@@ -21,17 +21,17 @@ print "1..2\n";
 sub txt_compare {
     local ($/);
     my $files = @_;
-    for ($files) { open(_, "<","$_") ? $_ = ~< *_ : die "$_ : $!"; close _ }
+    for ($files) { open(_, "<","$_") ?? $_ = ~< *_ !! die "$_ : $!"; close _ }
     $files[0] cmp $files[1];
 }
 
 # does it run?
 my $ok = system("$^X \"-I../lib\" $extracted_program -d. \"-Q\" lib/h2ph.h");
-print(($ok == 0 ? "" : "not "), "ok 1\n");
+print(($ok == 0 ?? "" !! "not "), "ok 1\n");
     
 # does it work? well, does it do what we expect? :-)
 $ok = txt_compare("lib/h2ph.ph", "lib/h2ph.pht");
-print(($ok == 0 ? "" : "not "), "ok 2\n");
+print(($ok == 0 ?? "" !! "not "), "ok 2\n");
     
 # cleanup - should this be in an END block?
 unlink("lib/h2ph.ph");

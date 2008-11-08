@@ -186,7 +186,7 @@ push @EXPORT, < qw(getdcwd) if $^O eq 'MSWin32';
 if ($^O eq 'os2') {
     local $^W = 0;
 
-    *cwd                = defined &sys_cwd ? \&sys_cwd : \&_os2_cwd;
+    *cwd                = defined &sys_cwd ?? \&sys_cwd !! \&_os2_cwd;
     *getcwd             = \&cwd;
     *fastgetcwd         = \&cwd;
     *fastcwd            = \&cwd;
@@ -447,7 +447,7 @@ sub chdir_init {
 }
 
 sub chdir {
-    my $newdir = (nelems @_) ? shift : '';	# allow for no arg (chdir to HOME dir)
+    my $newdir = (nelems @_) ?? shift !! '';	# allow for no arg (chdir to HOME dir)
     $newdir =~ s|///*|/|g unless $^O eq 'MSWin32';
     chdir_init() unless $chdir_init;
     my $newpwd;
@@ -489,7 +489,7 @@ sub chdir {
 
 sub _perl_abs_path
 {
-    my $start = (nelems @_) ? shift : '.';
+    my $start = (nelems @_) ?? shift !! '.';
     my($dotdots, $cwd, @pst, @cst, $dir, @tst);
 
     unless (@cst = @( stat( $start ) ))
@@ -517,7 +517,7 @@ sub _perl_abs_path
 	    return abs_path($link_target);
 	}
 	
-	return $dir ? abs_path($dir) . "/$file" : "/$file";
+	return $dir ?? abs_path($dir) . "/$file" !! "/$file";
     }
 
     $cwd = '';
@@ -554,7 +554,7 @@ sub _perl_abs_path
 	    } while ( $dir eq '.' || $dir eq '..' || @tst[0] != @pst[0] ||
                         @tst[1] != @pst[1] )
 	}
-	$cwd = (defined $dir ? "$dir" : "" ) . "/$cwd" ;
+	$cwd = (defined $dir ?? "$dir" !! "" ) . "/$cwd" ;
 	closedir($parent);
     } while (defined $dir);
     chop($cwd) unless $cwd eq '/'; # drop the trailing /
@@ -567,7 +567,7 @@ sub fast_abs_path {
     local %ENV{PWD} = %ENV{PWD} || ''; # Guard against clobberage
     my $cwd = getcwd();
     require File::Spec;
-    my $path = (nelems @_) ? shift : ($Curdir ||= File::Spec->curdir);
+    my $path = (nelems @_) ?? shift !! ($Curdir ||= File::Spec->curdir);
 
     # Detaint else we'll explode in taint mode.  This is safe because
     # we're not doing anything dangerous with it.
@@ -595,8 +595,8 @@ sub fast_abs_path {
 	}
 	
 	return $dir eq File::Spec->rootdir
-	  ? File::Spec->catpath($vol, $dir, $file)
-	  : fast_abs_path(File::Spec->catpath($vol, $dir, '')) . '/' . $file;
+	  ?? File::Spec->catpath($vol, $dir, $file)
+	  !! fast_abs_path(File::Spec->catpath($vol, $dir, '')) . '/' . $file;
     }
 
     if (!CORE::chdir($path)) {
@@ -683,7 +683,7 @@ sub _win32_cwd {
     return %ENV{'PWD'};
 }
 
-*_NT_cwd = defined &Win32::GetCwd ? \&_win32_cwd : \&_os2_cwd;
+*_NT_cwd = defined &Win32::GetCwd ?? \&_win32_cwd !! \&_os2_cwd;
 
 sub _dos_cwd {
     if (!defined &Dos::GetCwd) {
@@ -709,7 +709,7 @@ sub _qnx_abs_path {
     local %ENV{PATH} = '';
     local %ENV{CDPATH} = '';
     local %ENV{ENV} = '';
-    my $path = (nelems @_) ? shift : '.';
+    my $path = (nelems @_) ?? shift !! '.';
 
     my $rpfh;
     defined( open($rpfh, "-|", '-') || exec '/usr/bin/fullpath', '-t', $path ) or

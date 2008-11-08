@@ -260,7 +260,7 @@ while (defined (my $file = next_file())) {
 		my ($enum_name, $enum_value) = $enum =~ m/^([a-zA-Z_]\w*)(=.+)?$/;
 		$enum_name or next;
 		$enum_value =~ s/^=//;
-		$enum_val = (length($enum_value) ? $enum_value : $enum_val + 1);
+		$enum_val = (length($enum_value) ?? $enum_value !! $enum_val + 1);
 		if ($opt_h) {
 		    print OUT ($t,
 			       "eval(\"\\n#line $eval_index $outfile\\n",
@@ -309,10 +309,10 @@ while (defined (my $file = next_file())) {
 	    }
 	    $args = (
 		(nelems @args)
-		? "my(" . (join ',', map "\$$_", @args) . ") = \@_;\n$t    "
-		: ""
+		?? "my(" . (join ',', map "\$$_", @args) . ") = \@_;\n$t    "
+		!! ""
 	    );
-	    my $proto = (nelems @args) ? '' : '() ';
+	    my $proto = (nelems @args) ?? '' !! '() ';
 	    $new = '';
 	    s/\breturn\b//g; # "return" doesn't occur in macros usually...
 	    expr();
@@ -713,7 +713,7 @@ sub inc_dirs
            $from_gcc = '';
        };
     };
-    length($from_gcc) ? @($from_gcc, config_value("usrinc")) : @(config_value("usrinc"));
+    length($from_gcc) ?? @($from_gcc, config_value("usrinc")) !! @(config_value("usrinc"));
 }
 
 

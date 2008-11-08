@@ -42,8 +42,8 @@ sub new {
     my $id = msgget(@_[0],@_[1]);
 
     defined($id)
-	? bless \$id, $class
-	: undef;
+	?? bless \$id, $class
+	!! undef;
 }
 
 sub id {

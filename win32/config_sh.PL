@@ -92,11 +92,11 @@ if (exists %opt{cc}) {
     # cl and bcc32 version detection borrowed from Test::Smoke's configsmoke.pl
     if (%opt{cc} eq 'cl') {
         my $output = `cl --version 2>&1`;
-        %opt{ccversion} = $output =~ m/^.*Version\s+([\d.]+)/ ? $1 : '?';
+        %opt{ccversion} = $output =~ m/^.*Version\s+([\d.]+)/ ?? $1 !! '?';
     }
     elsif (%opt{cc} eq 'bcc32') {
         my $output = `bcc32 --version 2>&1`;
-        %opt{ccversion} = $output =~ m/([\d.]+)/ ? $1 : '?';
+        %opt{ccversion} = $output =~ m/([\d.]+)/ ?? $1 !! '?';
     }
     elsif (%opt{cc} eq 'gcc') {
         chomp(%opt{gccversion} = `gcc -dumpversion`);

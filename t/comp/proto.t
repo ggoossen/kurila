@@ -18,7 +18,7 @@ plan tests => 60;
 sub testing (&$) {
     my $p = prototype(shift);
     my $c = shift;
-    my $what = defined $c ? '(' . $p . ')' : 'no prototype';   
+    my $what = defined $c ?? '(' . $p . ')' !! 'no prototype';   
     print '#' x 25,"\n";
     print '# Testing ',$what,"\n";
     print '#' x 25,"\n";

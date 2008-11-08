@@ -16,11 +16,11 @@ sub gcd {
 }
 
 sub factorial {
-    @_[0] +< 2 ? 1 : @_[0] * factorial(@_[0] - 1);
+    @_[0] +< 2 ?? 1 !! @_[0] * factorial(@_[0] - 1);
 }
 
 sub fibonacci {
-    @_[0] +< 2 ? 1 : fibonacci(@_[0] - 2) + fibonacci(@_[0] - 1);
+    @_[0] +< 2 ?? 1 !! fibonacci(@_[0] - 2) + fibonacci(@_[0] - 1);
 }
 
 # Highly recursive, highly aggressive.
@@ -38,11 +38,11 @@ sub ackermann {
 # Highly recursive, highly boring.
 
 sub takeuchi {
-    @_[1] +< @_[0] ?
+    @_[1] +< @_[0] ??
 	takeuchi(takeuchi(@_[0] - 1, @_[1], @_[2]),
 		 takeuchi(@_[1] - 1, @_[2], @_[0]),
 		 takeuchi(@_[2] - 1, @_[0], @_[1]))
-	    : @_[2];
+	    !! @_[2];
 }
 
 is(gcd(1147, 1271), 31, "gcd(1147, 1271) == 31");
@@ -102,7 +102,7 @@ do {
     local $^W = 0; # We do not need recursion depth warning.
 
     sub sillysum {
-	return @_[0] + (@_[0] +> 0 ? sillysum(@_[0] - 1) : 0);
+	return @_[0] + (@_[0] +> 0 ?? sillysum(@_[0] - 1) !! 0);
     }
 
     is(sillysum(1000), 1000*1001/2, "recursive sum of 1..1000");

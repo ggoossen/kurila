@@ -22,5 +22,5 @@ print "ok 1\n";
   my $flat_path = join ' ', @path;
   print "#Food::Fishstick path is:\n# $flat_path\n";
   print
-   "Food::Fish Food Matter Life::Fungus Life Chemicals" eq $flat_path ?
-     "ok 2\n" : "fail 2!\n";
+   "Food::Fish Food Matter Life::Fungus Life Chemicals" eq $flat_path ??
+     "ok 2\n" !! "fail 2!\n";

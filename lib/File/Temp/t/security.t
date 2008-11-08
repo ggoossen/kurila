@@ -23,7 +23,7 @@ ok(1);
 my $skipplat = ( (
 		  # No sticky bits.
 		  $^O eq 'MSWin32' || $^O eq 'NetWare' || $^O eq 'os2' || $^O eq 'dos' || $^O eq 'mpeix' || $^O eq 'MacOS'
-		  ) ? 1 : 0 );
+		  ) ?? 1 !! 0 );
 
 # Determine whether we need to skip things and why
 my $skip = 0;

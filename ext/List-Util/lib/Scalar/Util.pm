@@ -36,7 +36,7 @@ sub openhandle ($) {
   my $fh = shift;
   my $rt = reftype($fh) || '';
 
-  return defined(fileno($fh)) ? $fh : undef
+  return defined(fileno($fh)) ?? $fh !! undef
     if $rt eq 'IO';
 
   if (reftype(\$fh) eq 'GLOB') { # handle  openhandle(*DATA)
@@ -47,7 +47,7 @@ sub openhandle ($) {
   }
 
   (tied(*$fh) or defined(fileno($fh)))
-    ? $fh : undef;
+    ?? $fh !! undef;
 }
 
 eval <<'ESQ' unless defined &dualvar;

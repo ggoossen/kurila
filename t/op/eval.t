@@ -69,7 +69,7 @@ do {
 my $b = 'wrong';
 my $X = sub {
    my $b = "right";
-   print eval('"$b"') eq $b ? "ok 24\n" : "not ok 24\n";
+   print eval('"$b"') eq $b ?? "ok 24\n" !! "not ok 24\n";
 };
 &$X();
 
@@ -164,7 +164,7 @@ $x++;
 # does scalar eval"" pop stack correctly?
 do {
     my $c = eval "(1,2)x10";
-    print $c eq '2222222222' ? "ok $x\n" : "# $c\nnot ok $x\n";
+    print $c eq '2222222222' ?? "ok $x\n" !! "# $c\nnot ok $x\n";
     $x++;
 };
 
@@ -199,20 +199,20 @@ print "ok 41\n";
 # 20011224 MJD
 do {
   eval q{my $$x};
-  print $@ ? "ok 42\n" : "not ok 42\n";
+  print $@ ?? "ok 42\n" !! "not ok 42\n";
   eval q{my @$x};
-  print $@ ? "ok 43\n" : "not ok 43\n";
+  print $@ ?? "ok 43\n" !! "not ok 43\n";
   eval q{my %$x};
-  print $@ ? "ok 44\n" : "not ok 44\n";
+  print $@ ?? "ok 44\n" !! "not ok 44\n";
   eval q{my $$$x};
-  print $@ ? "ok 45\n" : "not ok 45\n";
+  print $@ ?? "ok 45\n" !! "not ok 45\n";
 };
 
 # [ID 20020623.002] eval "" doesn't clear $@
 do {
     $@ = 5;
     eval q{};
-    print length($@) ? "not ok 46\t# \$\@ = '$@'\n" : "ok 46\n";
+    print length($@) ?? "not ok 46\t# \$\@ = '$@'\n" !! "ok 46\n";
 };
 
 # DAPM Nov-2002. Perl should now capture the full lexical context during
@@ -243,7 +243,7 @@ do { my $zzz = 2; fred2(50) };
 sub do_sort {
     my $zzz = 2;
     my @a = sort
-               { print eval('$zzz') == 2 ? 'ok' : 'not ok', " 51\n"; $a <+> $b }
+               { print eval('$zzz') == 2 ?? 'ok' !! 'not ok', " 51\n"; $a <+> $b }
  @(               2, 1);
 }
 do_sort();
@@ -275,15 +275,15 @@ eval q{
     print $r == 120 ? 'ok' : 'not ok', " 55\n";
 };
 my $r = fred3(5);
-print $r == 120 ? 'ok' : 'not ok', " 56\n";
+print $r == 120 ?? 'ok' !! 'not ok', " 56\n";
 $r = eval'fred3(5)';
-print $r == 120 ? 'ok' : 'not ok', " 57\n";
+print $r == 120 ?? 'ok' !! 'not ok', " 57\n";
 $r = 0;
 eval'$r = fred3(5)';
-print $r == 120 ? 'ok' : 'not ok', " 58\n";
+print $r == 120 ?? 'ok' !! 'not ok', " 58\n";
 $r = 0;
 do { my $yyy = 4; my $zzz = 5; my $l = 6; $r = eval 'fred3(5)' };;
-print $r == 120 ? 'ok' : 'not ok', " 59\n";
+print $r == 120 ?? 'ok' !! 'not ok', " 59\n";
 
 # check that goto &sub within evals doesn't leak lexical scope
 
@@ -292,9 +292,9 @@ my $yyy = 2;
 my $test = 60;
 sub fred4 { 
     my $zzz = 3;
-    print( ($zzz == 3  && eval '$zzz' == 3) ? 'ok' : 'not ok', " $test\n");
+    print( ($zzz == 3  && eval '$zzz' == 3) ?? 'ok' !! 'not ok', " $test\n");
     $test++;
-    print eval '$yyy' == 2 ? 'ok' : 'not ok', " $test\n";
+    print eval '$yyy' == 2 ?? 'ok' !! 'not ok', " $test\n";
     $test++;
 }
 
@@ -341,12 +341,12 @@ do {
 };
 do {
     my $x = 3;
-    print db1()     == 2 ? 'ok' : 'not ok', " $test\n"; $test++;
-    print DB::db2() == 2 ? 'ok' : 'not ok', " $test\n"; $test++;
-    print DB::db3() == 3 ? 'ok' : 'not ok', " $test # TODO\n"; $test++;
-    print DB::db4() == 3 ? 'ok' : 'not ok', " $test # TODO\n"; $test++;
-    print DB::db5() == 3 ? 'ok' : 'not ok', " $test # TODO\n"; $test++;
-    print db6()     == 4 ? 'ok' : 'not ok', " $test\n"; $test++;
+    print db1()     == 2 ?? 'ok' !! 'not ok', " $test\n"; $test++;
+    print DB::db2() == 2 ?? 'ok' !! 'not ok', " $test\n"; $test++;
+    print DB::db3() == 3 ?? 'ok' !! 'not ok', " $test # TODO\n"; $test++;
+    print DB::db4() == 3 ?? 'ok' !! 'not ok', " $test # TODO\n"; $test++;
+    print DB::db5() == 3 ?? 'ok' !! 'not ok', " $test # TODO\n"; $test++;
+    print db6()     == 4 ?? 'ok' !! 'not ok', " $test\n"; $test++;
 };
 require './test.pl';
 our $NO_ENDING = 1;

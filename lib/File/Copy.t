@@ -111,7 +111,7 @@ for my $cross_partition_test (0..1) {
     my $dest_mtime = @(stat("file-$$"))[9];
     is $dest_mtime, $mtime,
       "mtime preserved by copy()". 
-      ($cross_partition_test ? " while testing cross-partition" : "");
+      ($cross_partition_test ?? " while testing cross-partition" !! "");
   };
 
   # trick: create lib/ if not exists - not needed in Perl core

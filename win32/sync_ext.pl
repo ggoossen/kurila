@@ -34,7 +34,7 @@ my %opts = %(
     'say-subdir' => 0,
   #options itself
     (< map {m/^--([\-_\w]+)=(.*)$/} @ARGV),                            # --opt=smth
-    (< map {m/^no-?(.*)$/i?($1=>0):($_=>1)} map {m/^--([\-_\w]+)$/} @ARGV),  # --opt --no-opt --noopt
+    (< map {m/^no-?(.*)$/i??($1=>0)!!($_=>1)} map {m/^--([\-_\w]+)$/} @ARGV),  # --opt --no-opt --noopt
   );
 
 my $sp = '';

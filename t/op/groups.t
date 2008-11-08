@@ -1,7 +1,7 @@
 #!./perl
 
 %ENV{PATH} ="/bin:/usr/bin:/usr/xpg4/bin:/usr/ucb" .
-    exists %ENV{PATH} ? ":%ENV{PATH}" : "";
+    exists %ENV{PATH} ?? ":%ENV{PATH}" !! "";
 %ENV{LC_ALL} = "C"; # so that external utilities speak English
 %ENV{LANGUAGE} = 'C'; # GNU locale extension
 

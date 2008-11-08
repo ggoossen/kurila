@@ -10,7 +10,7 @@ use Symbol < qw(gensym);
 
 my $i = 1;
 foreach my $v (@: undef, 10, 'string') {
-  is(refaddr($v), undef, "not " . (defined($v) ? "'$v'" : "undef"));
+  is(refaddr($v), undef, "not " . (defined($v) ?? "'$v'" !! "undef"));
 }
 
 foreach my $r (@: \%(), \$t, \@(), sub {}) {

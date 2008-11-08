@@ -28,8 +28,8 @@ my $bad = \@('foo', \*GLOB,  'bar');
 my $result;
 
 try {$result = store ($bad , 'store')};
-print ((!defined $result)?"ok $test\n":"not ok $test\n"); $test++;
-print ($@?"ok $test\n":"not ok $test\n"); $test++;
+print ((!defined $result)??"ok $test\n"!!"not ok $test\n"); $test++;
+print ($@??"ok $test\n"!!"not ok $test\n"); $test++;
 
 $Storable::forgive_me=1;
 
@@ -43,14 +43,14 @@ try {$result = store ($bad , 'store')};
 
 open(STDERR, ">&", \*SAVEERR);
 
-print ((defined $result)?"ok $test\n":"not ok $test\n"); $test++;
-print (($@ eq '')?"ok $test\n":"not ok $test\n"); $test++;
+print ((defined $result)??"ok $test\n"!!"not ok $test\n"); $test++;
+print (($@ eq '')??"ok $test\n"!!"not ok $test\n"); $test++;
 
 my $ret = retrieve('store');
-print ((defined $ret)?"ok $test\n":"not ok $test\n"); $test++;
-print (($ret->[0] eq 'foo')?"ok $test\n":"not ok $test\n"); $test++;
-print (($ret->[2] eq 'bar')?"ok $test\n":"not ok $test\n"); $test++;
-print ((ref $ret->[1] eq 'SCALAR')?"ok $test\n":"not ok $test\n"); $test++;
+print ((defined $ret)??"ok $test\n"!!"not ok $test\n"); $test++;
+print (($ret->[0] eq 'foo')??"ok $test\n"!!"not ok $test\n"); $test++;
+print (($ret->[2] eq 'bar')??"ok $test\n"!!"not ok $test\n"); $test++;
+print ((ref $ret->[1] eq 'SCALAR')??"ok $test\n"!!"not ok $test\n"); $test++;
 
 
 END { 1 while unlink 'store' }

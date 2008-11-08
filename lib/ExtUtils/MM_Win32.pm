@@ -30,8 +30,8 @@ our $VERSION = '6.44';
 
 %ENV{EMXSHELL} = 'sh'; # to run `commands`
 
-my $BORLAND = %Config{'cc'} =~ m/^bcc/i ? 1 : 0;
-my $GCC     = %Config{'cc'} =~ m/^gcc/i ? 1 : 0;
+my $BORLAND = %Config{'cc'} =~ m/^bcc/i ?? 1 !! 0;
+my $GCC     = %Config{'cc'} =~ m/^gcc/i ?? 1 !! 0;
 
 
 =head2 Overridden methods
@@ -98,8 +98,8 @@ used by default.
 sub maybe_command {
     my($self,$file) = < @_;
     my @e = @( exists(%ENV{'PATHEXT'})
-          ? < split(m/;/, %ENV{PATHEXT})
-	  : < qw(.com .exe .bat .cmd) );
+          ?? < split(m/;/, %ENV{PATHEXT})
+	  !! < qw(.com .exe .bat .cmd) );
     my $e = '';
     for ( @e) { $e .= "\Q$_\E|" }
     chop $e;
@@ -128,9 +128,9 @@ sub init_DIRFILESEP {
     my $make = $self->make;
 
     # The ^ makes sure its not interpreted as an escape in nmake
-    $self->{DIRFILESEP} = $make eq 'nmake' ? '^\' :
-                          $make eq 'dmake' ? '\\'
-                                           : '\';
+    $self->{DIRFILESEP} = $make eq 'nmake' ?? '^\' !!
+                          $make eq 'dmake' ?? '\\'
+                                           !! '\';
 }
 
 =item B<init_others>
@@ -164,8 +164,8 @@ sub init_others {
     $self->{TEST_F}   ||= '$(ABSPERLRUN) -MExtUtils::Command -e test_f';
     $self->{DEV_NULL} ||= '> NUL';
 
-    $self->{FIXIN}    ||= $self->{PERL_CORE} ? 
-      "\$(PERLRUN) $self->{PERL_SRC}/win32/bin/pl2bat.pl" : 
+    $self->{FIXIN}    ||= $self->{PERL_CORE} ?? 
+      "\$(PERLRUN) $self->{PERL_SRC}/win32/bin/pl2bat.pl" !! 
       'pl2bat.bat';
 
     $self->{LD}     ||= %Config{ld} || 'link';
@@ -267,9 +267,9 @@ END
 MAKE_FRAG
 
     push @m,
-q{	$(AR) }.($BORLAND ? '$@ $(OBJECT:^"+")'
-			  : ($GCC ? '-ru $@ $(OBJECT)'
-			          : '-out:$@ $(OBJECT)')).q{
+q{	$(AR) }.($BORLAND ?? '$@ $(OBJECT:^"+")'
+			  !! ($GCC ?? '-ru $@ $(OBJECT)'
+			          !! '-out:$@ $(OBJECT)')).q{
 	$(CHMOD) $(PERM_RWX) $@
 	$(NOECHO) $(ECHO) "$(EXTRALIBS)" > $(INST_ARCHAUTODIR)\extralibs.ld
 };
@@ -295,7 +295,7 @@ sub dynamic_lib {
 
     return '' unless $self->has_link_code;
 
-    my($otherldflags) = %attribs{OTHERLDFLAGS} || ($BORLAND ? 'c0d32.obj': '');
+    my($otherldflags) = %attribs{OTHERLDFLAGS} || ($BORLAND ?? 'c0d32.obj'!! '');
     my($inst_dynamic_dep) = %attribs{INST_DYNAMIC_DEP} || "";
     my($ldfrom) = '$(LDFROM)';
     my(@m);
@@ -329,9 +329,9 @@ $(INST_DYNAMIC): $(OBJECT) $(MYEXTLIB) $(BOOTSTRAP) $(INST_ARCHAUTODIR)$(DFSEP).
       push(@m,
        q{	$(LD) $(LDDLFLAGS) $(OTHERLDFLAGS) }.$ldfrom.q{,$@,,}
        .($self->make eq 'dmake' 
-                ? q{$(PERL_ARCHIVE:s,/,\,) $(LDLOADLIBS:s,/,\,) }
+                ?? q{$(PERL_ARCHIVE:s,/,\,) $(LDLOADLIBS:s,/,\,) }
 		 .q{$(MYEXTLIB:s,/,\,),$(EXPORT_LIST:s,/,\,)}
-		: q{$(subst /,\,$(PERL_ARCHIVE)) $(subst /,\,$(LDLOADLIBS)) }
+		!! q{$(subst /,\,$(PERL_ARCHIVE)) $(subst /,\,$(LDLOADLIBS)) }
 		 .q{$(subst /,\,$(MYEXTLIB)),$(subst /,\,$(EXPORT_LIST))})
        .q{,$(RESFILES)});
     } else {	# VC
@@ -364,7 +364,7 @@ gcc.  Otherwise, take out all *.pdb files.
 sub extra_clean_files {
     my $self = shift;
 
-    return $GCC ?  @(qw(dll.base dll.exp)) :  @('*.pdb');
+    return $GCC ??  @(qw(dll.base dll.exp)) !!  @('*.pdb');
 }
 
 =item init_linker
@@ -416,7 +416,7 @@ banner.
 
 sub pasthru {
     my($self) = shift;
-    return "PASTHRU = " . ($self->make eq 'nmake' ? "-nologo" : "");
+    return "PASTHRU = " . ($self->make eq 'nmake' ?? "-nologo" !! "");
 }
 
 

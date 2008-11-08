@@ -20,8 +20,8 @@ package Pod::Perldoc::GetOptsOO;
 
 BEGIN { # Make a DEBUG constant ASAP
   *DEBUG = defined( &Pod::Perldoc::DEBUG )
-   ? \&Pod::Perldoc::DEBUG
-   : sub(){10};
+   ?? \&Pod::Perldoc::DEBUG
+   !! sub(){10};
 }
 
 

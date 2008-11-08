@@ -6,7 +6,7 @@ BEGIN {
 use File::Glob < qw(:glob csh_glob);
 print "ok 1\n";
 
-my $pat = $^O eq "MacOS" ? ":op:G*.t" : "op/G*.t";
+my $pat = $^O eq "MacOS" ?? ":op:G*.t" !! "op/G*.t";
 
 # Test the actual use of the case sensitivity tags, via csh_glob()
 File::Glob->import(':nocase');

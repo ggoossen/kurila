@@ -21,12 +21,12 @@ sub defined_or_space {
 }
 
 sub boolean {
-	return @_[0] ? 1 : 0;
+	return @_[0] ?? 1 !! 0;
 }
 
 sub pattern {
 	return @_[0] if ref @_[0] eq 'Regexp';
-	return @_[0] ? qr/(?=)/ : qr/(?!)/;
+	return @_[0] ?? qr/(?=)/ !! qr/(?!)/;
 }
 
 sub code {
@@ -199,7 +199,7 @@ sub user_def {
         while ($i+<nelems @$spec) {
 		my ($pat, $fld) = < @{$spec}[[@($i,$i+1)]];
 		push @from, "$pat(?\{$count\})";
-		push @to,   (ref $fld eq 'CODE' ? $fld : sub{$fld});
+		push @to,   (ref $fld eq 'CODE' ?? $fld !! sub{$fld});
                 $i+=2;
                 $count++;
 	}
@@ -234,9 +234,9 @@ my %def_opts = %( < map {$_=>%std_opt{$_}->{def}}  keys %std_opt );
 sub get_locale_vals {   # args: $dec_mark, $thou_sep, $thou_group
     use POSIX;
     my $lconv = POSIX::localeconv();
-    @_[0] = exists $lconv->{decimal_point} ? $lconv->{decimal_point} : "?";
-    @_[1] = exists $lconv->{thousands_sep} ? $lconv->{thousands_sep} : "";
-    @_[2] = exists $lconv->{grouping} ? \@(unpack "c*", $lconv->{grouping}) : \@(0);
+    @_[0] = exists $lconv->{decimal_point} ?? $lconv->{decimal_point} !! "?";
+    @_[1] = exists $lconv->{thousands_sep} ?? $lconv->{thousands_sep} !! "";
+    @_[2] = exists $lconv->{grouping} ?? \@(unpack "c*", $lconv->{grouping}) !! \@(0);
 }
 
 my %std_literal = %(
@@ -304,7 +304,7 @@ sub jleft {
 	unless (%val{last}) {
 		my $rem = %val{width}-length($str);
 		$str = join '', reverse split m//, $str;
-		1 while $rem+>0 && $str =~ s/( +)/$(($rem--+>0?" ":"").$1)/g;
+		1 while $rem+>0 && $str =~ s/( +)/$(($rem--+>0??" "!!"").$1)/g;
 		@_[0] = join '', reverse split m//, $str;
 	}
 	&jleft( < @_ );
@@ -312,7 +312,7 @@ sub jleft {
 
  sub jsingle {
 	my (undef, < %val) = < @_;
-	@_[0] = length @_[0] ? substr(@_[0],0,1) : fillpat(%val{pos}, %val{pre},1);
+	@_[0] = length @_[0] ?? substr(@_[0],0,1) !! fillpat(%val{pos}, %val{pre},1);
  }
 
  sub jfatal {
@@ -341,12 +341,12 @@ sub jleft {
 				($fld =~ m/^([]{>,.' 0]*)([.,]|\Q$incurr\E)([[}<0]*)/g);
 	$opts->{lfill} = '0' if $whole  =~ m/^0+/; 
 	$opts->{rfill} = '0' if $places =~ m/0+$/; 
-	my $comma = $whole =~ m/([,.' ])/ ? $1 : '';
+	my $comma = $whole =~ m/([,.' ])/ ?? $1 !! '';
 	my $grouping;
 	if ($comma) {
-		$grouping = $whole =~ m/,(?:\]{2},\]{3}|>{2},>{3})\z/ ? \@(3,2) # Subcont
-				  : $whole =~ m/[,.' ](\]+|>+)\z/             ? \@(length($1))
-				  : 										   undef;
+		$grouping = $whole =~ m/,(?:\]{2},\]{3}|>{2},>{3})\z/ ?? \@(3,2) # Subcont
+				  !! $whole =~ m/[,.' ](\]+|>+)\z/             ?? \@(length($1))
+				  !! 										   undef;
 	}
 	if (defined $setplaces) {
 		$places = $setplaces;
@@ -375,7 +375,7 @@ sub jleft {
 			$post =~ s/^[)-]|[)-]$/ /g;
 		}
 		else {
-			$pre = $pre =~ m/[(-]/ || $post =~ m/[)-]/ ? "-$pre" : " $pre"
+			$pre = $pre =~ m/[(-]/ || $post =~ m/[)-]/ ?? "-$pre" !! " $pre"
 				unless $orig = -$orig;
 		}
 		my ($fail, $str);
@@ -398,7 +398,7 @@ sub jleft {
 					} while $group && $w =~ s/(?<!,)(\d)(\d\{$group\})(?!\d)/$1$comma$2/;
 				}
 			}
-			if (!%val{stretch} && ($w ? length($w) : 0)+length($pre) +> $whole) {
+			if (!%val{stretch} && ($w ?? length($w) !! 0)+length($pre) +> $whole) {
 				@_[0] = $duh;
 			}
 			else {
@@ -487,7 +487,7 @@ $nestedbraces = qr/ \{ (?: (?> ((?!\{|\}).)+ ) | (??{ $nestedbraces }) )* \} /sx
 sub segment ($\@\%$\%) {
 	my ($format, $args, $opts, $fldcnt, $argcache) = < @_;
 	my $width =
-		defined $opts->{page}->{width} ? $opts->{page}->{width} : length($format);
+		defined $opts->{page}->{width} ?? $opts->{page}->{width} !! length($format);
 	my $userdef = join("|", @{$opts->{field}->{from}}) || qr/(?!)/;
 	my $bullet  = join("|", map quotemeta, @{$opts->{bullet}}) || qr/(?!)/;
 	use re 'eval';
@@ -544,9 +544,9 @@ sub segment ($\@\%$\%) {
                         if $fld =~ m/["']/ && $fld !~ m/[][><]/;
                     # was: if $fld =~ /["']/ && $fld !~ /[][]/;
                     %form{trackpos} = $fld =~ s/(\{):|:(\})/$2/g;
-                    %form{vjust} = $fld =~ s/=//g ? \&jmiddle
-                      : $fld =~ s/_//g ? \&jbottom
-                        :                  \&jtop
+                    %form{vjust} = $fld =~ s/=//g ?? \&jmiddle
+                      !! $fld =~ s/_//g ?? \&jbottom
+                        !!                  \&jtop
                           ;
 
                     $DB::single=1;
@@ -579,7 +579,7 @@ sub segment ($\@\%$\%) {
                     }
 
                     for (@(\@($checkwidth, $checkplaces), \@($setwidth, $setplaces))) {
-                        die "Can't fit $_->[1] decimal place",($_->[1]!=1?'s':''),
+                        die "Can't fit $_->[1] decimal place",($_->[1]!=1??'s'!!''),
                           " in a $_->[0]-character field" 
                             if defined($_->[0]) && defined($_->[1])
                               && $_->[0] ne '*'
@@ -587,11 +587,11 @@ sub segment ($\@\%$\%) {
                     }
 
                     $precurr =
-                      $fld =~ s/$precurrpat/$($1.($3 x length $2).$3)/  ? "$2" : "";
+                      $fld =~ s/$precurrpat/$($1.($3 x length $2).$3)/  ?? "$2" !! "";
                     $incurr =
-                      $fld =~ m/$incurrpat/                           ? "$2" : "";
+                      $fld =~ m/$incurrpat/                           ?? "$2" !! "";
                     $postcurr =
-                      $fld =~ s/$postcurrpat/$($1.($1 x length $2).$3)/ ? "$2" : "";
+                      $fld =~ s/$postcurrpat/$($1.($1 x length $2).$3)/ ?? "$2" !! "";
 
                     if (%form{width} == 2) {
                         $fld = '[[';
@@ -633,7 +633,7 @@ sub segment ($\@\%$\%) {
                 }
 
                 if ($setwidth && $setwidth eq '*')	{
-                    push @{%form{verbatim} ? \@vstarred : \@starred}, \%form;
+                    push @{%form{verbatim} ?? \@vstarred !! \@starred}, \%form;
                 }
                 else {
                     $width -= %form{width}
@@ -641,26 +641,26 @@ sub segment ($\@\%$\%) {
 
                 %form{line} = 1 unless %form{isbullet} || $fld =~ m/[][IV"]/;
 
-                %form{hjust} ||= %form{width} == 1					 ? \&jsingle
-                  : ($fld =~ m/^(?:<+|\[+)$/)			 ? \&jleft
-                    : ($fld =~ m/^(?:>+|\]+)$/)			 ? \&jright
-                      : ($fld =~ m/^(?:I+|\|+|>+<+|\]+\[+)$/)? \&jcentre
-                        : ($fld =~ m/^(?:<+>+|\[+\]+)$/)		 ? \&jfull
-                          : ($fld =~ m/^(?:V+)$/)				 ?
+                %form{hjust} ||= %form{width} == 1					 ?? \&jsingle
+                  !! ($fld =~ m/^(?:<+|\[+)$/)			 ?? \&jleft
+                    !! ($fld =~ m/^(?:>+|\]+)$/)			 ?? \&jright
+                      !! ($fld =~ m/^(?:I+|\|+|>+<+|\]+\[+)$/)?? \&jcentre
+                        !! ($fld =~ m/^(?:<+>+|\[+\]+)$/)		 ?? \&jfull
+                          !! ($fld =~ m/^(?:V+)$/)				 ??
                             joverflow(%form, %fldopts)
-                              : ($fld =~ m/^(?: [>,' 0]*  \.          [<0]*
+                              !! ($fld =~ m/^(?: [>,' 0]*  \.          [<0]*
                                            | [],' 0]*  \.          [[0]*
                                            | [>.' 0]*  \,          [<0]*
                                            | [].' 0]*  \,          [[0]*
                                            | [>.,' 0]* \Q$incurr\E [<0]*
                                            | [].,' 0]* \Q$incurr\E [[0]*
-                                           )$/x)                     	? do {
+                                           )$/x)                     	?? do {
                                                %form{break}=\&break_nl;
                                                jnum($fld,$precurr,$incurr,$postcurr,
                                                     %form{width},\%fldopts,
                                                     $setplaces, $checkplaces)
                                            }
-                                             : die "Field $fldcnt is of unknown type: $field"
+                                             !! die "Field $fldcnt is of unknown type: $field"
                                                ;
 
 			%form{break}=\&break_nl if %form{stretch};
@@ -684,15 +684,15 @@ sub segment ($\@\%$\%) {
 			for (@($args->[$i])) {
 				next if %form{isbullet};
 				%form{src} ||=
-					ref eq 'ARRAY' ? do {
+					ref eq 'ARRAY' ?? do {
 							my $s = join "", map { s/\n(?!\z)/\r/g; $_ }
- map {!defined() ? "\n"
-												 : m/\n\z/    ? $_
-												 :             "$_\n"} @$_;
-							%form{trackpos} ? ($argcache->{$_} ||= \$s) : \$s;
+ map {!defined() ?? "\n"
+												 !! m/\n\z/    ?? $_
+												 !!             "$_\n"} @$_;
+							%form{trackpos} ?? ($argcache->{$_} ||= \$s) !! \$s;
 							}
-				  : (readonly $_ || !%form{trackpos}) ? \(my$s=$_)
-				  : \$_;
+				  !! (readonly $_ || !%form{trackpos}) ?? \(my$s=$_)
+				  !! \$_;
 			}
 
 			%form{break} ||= %fldopts{break} || $opts->{break};
@@ -709,8 +709,8 @@ sub segment ($\@\%$\%) {
 	if ((nelems @starred)||nelems @vstarred) {
 		my $fldwidth = int($width/((nelems @starred)+nelems @vstarred));
 		for my $f ( @vstarred) {
-			$f->{width} = (nelems @starred) ? $f->{maxwidth} 
-								   : min @($fldwidth, $f->{maxwidth});
+			$f->{width} = (nelems @starred) ?? $f->{maxwidth} 
+								   !! min @($fldwidth, $f->{maxwidth});
 			$width += $fldwidth - $f->{width};
 		}
 		$fldwidth = int($width/((nelems @starred)+nelems @vstarred)) if (nelems @starred);
@@ -789,7 +789,7 @@ sub make_col {
 		if ($f->{opts}{ws}) {
                     $text =~ s{($f->{opts}{ws})}
                               {$( do { my @caps = @(); #@( < grep { defined $$_ } @( < 2..((nelems @+) -1)) );
-				 @caps = @( length($1) ? " " : "" ) unless (nelems @caps);
+				 @caps = @( length($1) ?? " " !! "" ) unless (nelems @caps);
 				 join "", @caps;
                                })}g;
 		}
@@ -797,8 +797,8 @@ sub make_col {
 		push @col, $text;
 		if ($bullet && $text =~ m/\S/) {
 			push @{$bullet->{bullets}}, ($bullet->{bullethole}) x $skipped;
-			push @{$bullet->{bullets}}, $bulleted ? ${$bullet->{isbullet}}
-												  : $bullet->{bullethole};
+			push @{$bullet->{bullets}}, $bulleted ?? ${$bullet->{isbullet}}
+												  !! $bullet->{bullethole};
 		}
 		$f->{done} = 1
 			if defined $f->{opts}{height}{max} && (nelems @col)==$f->{opts}{height}{max};
@@ -836,7 +836,7 @@ sub balance_cols {
 			}
 			return;
 		}
-		(substr($$src,pos$$src) =~ m/\S/) ? $minheight : $maxheight = $medheight;
+		(substr($$src,pos$$src) =~ m/\S/) ?? $minheight !! $maxheight = $medheight;
 	}
 }
 
@@ -927,7 +927,7 @@ sub make_cols($$\@\%$) {
 			$parts->[$col] = make_col($f,$opts, $maxheight);
 		}
 		$maxheight = min @($maxheight,
-						 max map { defined() ? scalar nelems @$_ : 0 } @$parts)
+						 max map { defined() ?? scalar nelems @$_ !! 0 } @$parts)
 			if $has_nonminimal;
 		for my $col (0..(nelems @$formatters)-1) {
 			my $f = $formatters->[$col];
@@ -997,7 +997,7 @@ sub make_cols($$\@\%$) {
 				$finished &&= !$tabular_more;
 			}
 			my $minimaxheight = min @($maxheight,
-							 max map { defined() ? scalar nelems @$_ : 0 } @$parts)
+							 max map { defined() ?? scalar nelems @$_ !! 0 } @$parts)
 				if $has_nonminimal;
 			for my $col (0..(nelems @$formatters)-1) {
 				my $tabular = 1;
@@ -1049,8 +1049,8 @@ sub make_underline {
 	$under =~ s/(\n*)\z//;
 	my $trail = "$1"^|^"\n";
 	for my $l (@($nextline, $prevline)) {
-		$l = join "", map {$_->{literal} ? ${$_->{src}} : '*'x$_->{width} } @$l;
-		$l =~ s{(.)}{$($1 =~ m/\s/ ? "\0" : "\1")}gs;
+		$l = join "", map {$_->{literal} ?? ${$_->{src}} !! '*'x$_->{width} } @$l;
+		$l =~ s{(.)}{$($1 =~ m/\s/ ?? "\0" !! "\1")}gs;
 	}
 	$nextline ^|^= $prevline;
 	$nextline =~ s{\0}{ }g;
@@ -1061,7 +1061,7 @@ sub make_underline {
 }
 
 sub linecount($) {
-	return (nelems @(m/(\n)/g)) + (m/[^\n]\z/?1:0) for  @_;
+	return (nelems @(m/(\n)/g)) + (m/[^\n]\z/??1!!0) for  @_;
 }
 
 use warnings::register;
@@ -1122,22 +1122,22 @@ sub form {
 		$page->{number} = $pagenum unless defined $page->{number};
 		my $pagelen = $page->{length};
 		while (1) {
-			my $parity = $page->{number}%2 ? 'odd' : 'even';
+			my $parity = $page->{number}%2 ?? 'odd' !! 'even';
 			my $header =
-			 $page->{header}->{$pagetype} ? $page->{header}->{$pagetype}->($sect_opts)
-			 : $page->{header}->{$parity} ? $page->{header}->{$parity}->($sect_opts)
-		     : $page->{header}->{other}   ? $page->{header}->{other}->($sect_opts)
-			 : "";
+			 $page->{header}->{$pagetype} ?? $page->{header}->{$pagetype}->($sect_opts)
+			 !! $page->{header}->{$parity} ?? $page->{header}->{$parity}->($sect_opts)
+		     !! $page->{header}->{other}   ?? $page->{header}->{other}->($sect_opts)
+			 !! "";
 			my $footer = 
-			 $page->{footer}->{$pagetype} ? $page->{footer}->{$pagetype}->($sect_opts)
-			 : $page->{footer}->{$parity} ? $page->{footer}->{$parity}->($sect_opts)
-			 : $page->{footer}->{other}   ? $page->{footer}->{other}->($sect_opts)
-			 : "";
+			 $page->{footer}->{$pagetype} ?? $page->{footer}->{$pagetype}->($sect_opts)
+			 !! $page->{footer}->{$parity} ?? $page->{footer}->{$parity}->($sect_opts)
+			 !! $page->{footer}->{other}   ?? $page->{footer}->{other}->($sect_opts)
+			 !! "";
 			my $feed = 
-			 $page->{feed}->{$pagetype} ? $page->{feed}->{$pagetype}->($sect_opts)
-			 : $page->{feed}->{$parity} ? $page->{feed}->{$parity}->($sect_opts)
-			 : $page->{feed}->{other}   ? $page->{feed}->{other}->($sect_opts)
-			 : "";
+			 $page->{feed}->{$pagetype} ?? $page->{feed}->{$pagetype}->($sect_opts)
+			 !! $page->{feed}->{$parity} ?? $page->{feed}->{$parity}->($sect_opts)
+			 !! $page->{feed}->{other}   ?? $page->{feed}->{other}->($sect_opts)
+			 !! "";
 			length and s/\n?\z/\n/ for @( $header, $footer);  # NOT for $feed 
 			my $bodyfn = $page->{body}->{$pagetype}
 					  || $page->{body}->{$parity}
@@ -1147,11 +1147,11 @@ sub form {
 			my ($pagetext, $more) = < make_page($section, $sect_opts, $bodylen);
 			if (!$more && $section == @section[-1]) {
 				my $lastheader =
-					$page->{header}->{last} ? $page->{header}->{last}->($sect_opts)
-							              : $header;
+					$page->{header}->{last} ?? $page->{header}->{last}->($sect_opts)
+							              !! $header;
 				my $lastfooter =
-					$page->{footer}->{last} ? $page->{footer}->{last}->($sect_opts)
-							              : $footer;
+					$page->{footer}->{last} ?? $page->{footer}->{last}->($sect_opts)
+							              !! $footer;
 				length and s/\n?\z/\n/ for @( $lastheader, $lastfooter);
 				my $lastlen =
 						$pagelen-linecount($lastheader)-linecount($lastfooter);
@@ -1165,8 +1165,8 @@ sub form {
 						if $page->{body}->{last};
 				}
 			}
-			my $fill = $pagelen +< $unlimited ? \@(("\n") x ($bodylen-nelems @$pagetext))
-											 : \@();
+			my $fill = $pagelen +< $unlimited ?? \@(("\n") x ($bodylen-nelems @$pagetext))
+											 !! \@();
 
 			my $body = $bodyfn->($pagetext, $fill, \%opts);
 
@@ -1175,7 +1175,7 @@ sub form {
 					   
 			# Handle special case of empty last page...
 			last unless $more || $section == @section[-1] && $pagetype ne 'last';
-			$pagetype = $page->{number}%2 ? 'odd' : 'even';
+			$pagetype = $page->{number}%2 ?? 'odd' !! 'even';
 		}
 		$pagenum = $page->{number};
 	}
@@ -1246,7 +1246,7 @@ sub section {
         }
         else {
 			my $what = ref $structure;
-            die "Can't drill ", ($what ? lc $what : $structure) , " of $type";
+            die "Can't drill ", ($what ?? lc $what !! $structure) , " of $type";
         }
     }
     return < @section;
@@ -1254,16 +1254,16 @@ sub section {
 
 sub slice {
     my ($structure, < @indices) = < @_;
-	return ref eq 'HASH' ? < $_->{[ @indices]} : < $_->[[@(@indices)]] for @( $structure);
+	return ref eq 'HASH' ?? < $_->{[ @indices]} !! < $_->[[@(@indices)]] for @( $structure);
 }
 
-sub vals { return ref eq 'HASH' ? values %$_ : < @$_ for @( @_[0]) }
+sub vals { return ref eq 'HASH' ?? values %$_ !! < @$_ for @( @_[0]) }
 
 sub drill (\[@%];@) {
     my ($structure, < @indices) = < @_;
     return $structure unless (nelems @indices);
     my $index = shift @indices;
-    my @section = (nelems @$index) ? slice($structure,< @$index) : vals($structure);
+    my @section = (nelems @$index) ?? slice($structure,< @$index) !! vals($structure);
     return @section unless (nelems @indices);
     for my $index ( @indices) {
       @section = map {section $_, < @$index} @section;
@@ -1284,13 +1284,13 @@ sub break_bullet {
 sub break_verbatim {
     my ($str,$rem) = < @_;
     $$str =~ m/ \G ([^\n\r]*) (?:\r|\n|\z) /gcx or return  @("",0);
-    return  @(substr("$1",0,$rem), $$str =~ m/ \G (?=.) /sgcx ? 1 : 0,0);
+    return  @(substr("$1",0,$rem), $$str =~ m/ \G (?=.) /sgcx ?? 1 !! 0,0);
 }
 
 sub break_nl {
 	my ($str) = < @_;
     if ($$str =~ m/\G [^\S\n\r]* ([^\n\r]*?) [^\S\r\n]* (?:\r|$)/gcxm)  {
-        return  @("$1", $$str =~ m/\G(?=.*\S)/sgc?1:0, 1);
+        return  @("$1", $$str =~ m/\G(?=.*\S)/sgc??1!!0, 1);
     }
     else {
         return  @("",0,0);
@@ -1356,7 +1356,7 @@ sub break_at {
 				}
 			}
 			my $rem = substr($$str, pos $$str);
-			return  @($res, $rem=~m/\S/?1:0, $rem =~ m/^\s*(?:\z|\n|\r)/);
+			return  @($res, $rem=~m/\S/??1!!0, $rem =~ m/^\s*(?:\z|\n|\r)/);
 		}
 	};
 }

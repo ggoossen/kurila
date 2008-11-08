@@ -58,7 +58,7 @@ sub _fileno
  return unless defined $f;
  $f = $f->[0] if ref($f) eq 'ARRAY';
  return fileno($f) if ref $f;
- ($f =~ m/^\d+$/) ? $f : fileno($f);
+ ($f =~ m/^\d+$/) ?? $f !! fileno($f);
 }
 
 sub _update
@@ -91,7 +91,7 @@ sub _update
    }
    $count++;
   }
- $vec->[VEC_BITS] = $vec->[FD_COUNT] ? $bits : undef;
+ $vec->[VEC_BITS] = $vec->[FD_COUNT] ?? $bits !! undef;
  $count;
 }
 
@@ -102,8 +102,8 @@ sub can_read
  my $r = $vec->[VEC_BITS];
 
  defined($r) && ((nelems @(select($r,undef,undef,$timeout))) +> 0)
-    ? handles($vec, $r)
-    : ();
+    ?? handles($vec, $r)
+    !! ();
 }
 
 sub can_write
@@ -113,8 +113,8 @@ sub can_write
  my $w = $vec->[VEC_BITS];
 
  defined($w) && (select(undef,$w,undef,$timeout) +> 0)
-    ? handles($vec, $w)
-    : ();
+    ?? handles($vec, $w)
+    !! ();
 }
 
 sub has_exception
@@ -124,8 +124,8 @@ sub has_exception
  my $e = $vec->[VEC_BITS];
 
  defined($e) && (select(undef,undef,$e,$timeout) +> 0)
-    ? handles($vec, $e)
-    : ();
+    ?? handles($vec, $e)
+    !! ();
 }
 
 sub has_error
@@ -153,12 +153,12 @@ sub as_string  # for debugging
  my $str = ref($vec) . ": ";
  my $bits = $vec->bits;
  my $count = $vec->count;
- $str .= defined($bits) ? unpack("b*", $bits) : "undef";
+ $str .= defined($bits) ?? unpack("b*", $bits) !! "undef";
  $str .= " $count";
  my @handles = @$vec;
  splice(@handles, 0, FIRST_FD);
  for ( @handles) {
-     $str .= " " . (defined($_) ? "$_" : "-");
+     $str .= " " . (defined($_) ?? "$_" !! "-");
  }
  $str;
 }
@@ -167,12 +167,12 @@ sub _max
 {
  my($a,$b,$c) = < @_;
  $a +> $b
-    ? $a +> $c
-        ? $a
-        : $c
-    : $b +> $c
-        ? $b
-        : $c;
+    ?? $a +> $c
+        ?? $a
+        !! $c
+    !! $b +> $c
+        ?? $b
+        !! $c;
 }
 
 sub select
@@ -183,18 +183,18 @@ sub select
  my($r,$w,$e,$t) = < @_;
  my @result = @( () );
 
- my $rb = defined $r ? $r->[VEC_BITS] : undef;
- my $wb = defined $w ? $w->[VEC_BITS] : undef;
- my $eb = defined $e ? $e->[VEC_BITS] : undef;
+ my $rb = defined $r ?? $r->[VEC_BITS] !! undef;
+ my $wb = defined $w ?? $w->[VEC_BITS] !! undef;
+ my $eb = defined $e ?? $e->[VEC_BITS] !! undef;
 
  if(select($rb,$wb,$eb,$t) +> 0)
   {
    my @r = @( () );
    my @w = @( () );
    my @e = @( () );
-   my $i = _max(defined $r ? scalar(nelems @$r)-1 : 0,
-                defined $w ? scalar(nelems @$w)-1 : 0,
-                defined $e ? scalar(nelems @$e)-1 : 0);
+   my $i = _max(defined $r ?? scalar(nelems @$r)-1 !! 0,
+                defined $w ?? scalar(nelems @$w)-1 !! 0,
+                defined $e ?? scalar(nelems @$e)-1 !! 0);
 
    while($i +>= FIRST_FD)
     {

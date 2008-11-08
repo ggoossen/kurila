@@ -73,7 +73,7 @@ sub obj { @_[0]->{obj} }
 
 package main;
 
-my $is_EBCDIC = (ord('A') == 193) ? 1 : 0;
+my $is_EBCDIC = (ord('A') == 193) ?? 1 !! 0;
  
 my $r = ROOT->make;
 
@@ -93,7 +93,7 @@ if (!$is_EBCDIC) {			# ASCII machine
 	}
 }
 
-my $expected_length = $is_EBCDIC ? 217 : 278;
+my $expected_length = $is_EBCDIC ?? 217 !! 278;
 ok 1, length $data == $expected_length;
   
 my $y = thaw($data);

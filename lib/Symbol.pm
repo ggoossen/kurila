@@ -136,7 +136,7 @@ sub qualify ($;$) {
 	    $pkg = "";
 	}
 	else {
-	    $pkg = ((nelems @_) +> 1) ? @_[1] : caller;
+	    $pkg = ((nelems @_) +> 1) ?? @_[1] !! caller;
 	}
 	$name = $pkg . "::" . $name;
     }
@@ -144,7 +144,7 @@ sub qualify ($;$) {
 }
 
 sub qualify_to_ref ($) {
-    return \*{ Symbol::fetch_glob( qualify @_[0], (nelems @_) +> 1 ? @_[1] : caller ) };
+    return \*{ Symbol::fetch_glob( qualify @_[0], (nelems @_) +> 1 ?? @_[1] !! caller ) };
 }
 
 #

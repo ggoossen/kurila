@@ -58,7 +58,7 @@ my @years =
 # Use 3 days before the start of the epoch because with Borland on
 # Win32 it will work for -3600 _if_ your time zone is +01:00 (or
 # greater).
-my $neg_epoch_ok = defined (@(localtime(-259200))[0]) ? 1 : 0;
+my $neg_epoch_ok = defined (@(localtime(-259200))[0]) ?? 1 !! 0;
 
 # use vmsish 'time' makes for oddness around the Unix epoch
 if ($^O eq 'VMS') {
@@ -87,7 +87,7 @@ for ( @( < @time, < @neg_time) ) {
             if $year +< 70 && ! $neg_epoch_ok;
 
         do {
-            my $year_in = $year +< 70 ? $year + 1900 : $year;
+            my $year_in = $year +< 70 ?? $year + 1900 !! $year;
             my $time = timelocal($sec,$min,$hour,$mday,$mon,$year_in);
 
             my($s,$m,$h,$D,$M,$Y) = localtime($time);
@@ -101,7 +101,7 @@ for ( @( < @time, < @neg_time) ) {
         };
 
         do {
-            my $year_in = $year +< 70 ? $year + 1900 : $year;
+            my $year_in = $year +< 70 ?? $year + 1900 !! $year;
             my $time = timegm($sec,$min,$hour,$mday,$mon,$year_in);
 
             my($s,$m,$h,$D,$M,$Y) = gmtime($time);
@@ -153,7 +153,7 @@ do {
 for my $p ( @years) {
     my ( $year, $is_leap_year ) = < @$p;
 
-    my $string = $is_leap_year ? 'is' : 'is not';
+    my $string = $is_leap_year ?? 'is' !! 'is not';
     is( Time::Local::_is_leap_year($year), $is_leap_year,
         "$year $string a leap year" );
 }

@@ -95,7 +95,7 @@ sub smartRead
     $self->{InputLengthRemaining} -= length($$out) #- $offset 
         if defined $self->{InputLength};
         
-    $self->saveStatus(length $$out +< 0 ? STATUS_ERROR : STATUS_OK) ;
+    $self->saveStatus(length $$out +< 0 ?? STATUS_ERROR !! STATUS_OK) ;
 
     return length $$out;
 }
@@ -387,8 +387,8 @@ sub _create
 
 
     $obj->{InputLength}       = $got->parsed('InputLength') 
-                                    ? $got->value('InputLength')
-                                    : undef ;
+                                    ?? $got->value('InputLength')
+                                    !! undef ;
     $obj->{InputLengthRemaining} = $got->value('InputLength');
     $obj->{BufferOffset}      = 0 ;
     $obj->{AutoClose}         = $got->value('AutoClose');
@@ -541,9 +541,9 @@ sub _inf
         my $inFile = ($x->{inType} eq 'filenames' 
                         || $x->{inType} eq 'filename');
 
-        $x->{inType} = $inFile ? 'filename' : 'buffer';
+        $x->{inType} = $inFile ?? 'filename' !! 'buffer';
         
-        foreach my $in (@($x->{oneInput} ? $input : < @$input))
+        foreach my $in (@($x->{oneInput} ?? $input !! < @$input))
         {
             my $out ;
             $x->{oneInput} = 1 ;
@@ -616,7 +616,7 @@ sub _singleTarget
     }
     else
     {
-        for my $element (@( ($x->{inType} eq 'hash') ? < keys %$input : < @$input))
+        for my $element (@( ($x->{inType} eq 'hash') ?? < keys %$input !! < @$input))
         {
             defined $self->_rd2($x, $element, $output) 
                 or return undef ;
@@ -795,7 +795,7 @@ sub _raw_read
     my $buf_len = 0;
     if ($status == STATUS_OK) {
         my $beforeC_len = length $temp_buf;
-        my $before_len = defined $$buffer ? length $$buffer : 0 ;
+        my $before_len = defined $$buffer ?? length $$buffer !! 0 ;
         $status = $self->{Uncomp}->uncompr(\$temp_buf, $buffer,
                                     defined $self->{CompressedInputLengthDone} ||
                                                 $self->smartEof(), $outSize);
@@ -1268,15 +1268,15 @@ sub seek
         last if $offset == 0 ;
     }
 
-    return $offset == 0 ? 1 : 0 ;
+    return $offset == 0 ?? 1 !! 0 ;
 }
 
 sub fileno
 {
     my $self = shift ;
     return defined $self->{FH} 
-           ? fileno $self->{FH} 
-           : undef ;
+           ?? fileno $self->{FH} 
+           !! undef ;
 }
 
 sub binmode
@@ -1298,8 +1298,8 @@ sub autoflush
 {
     my $self     = shift ;
     return defined $self->{FH} 
-            ? $self->{FH}->autoflush(< @_) 
-            : undef ;
+            ?? $self->{FH}->autoflush(< @_) 
+            !! undef ;
 }
 
 sub input_line_number

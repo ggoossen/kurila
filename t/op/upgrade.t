@@ -41,6 +41,6 @@ foreach my $source_type ( @keys) {
 	# useful to have the diagnostics about what was attempted printed first
 	print "# Assigning $source_type to $dest_type\n";
 	$vars->{dest} = $vars->{source};
-	cmp_ok($vars->{dest}, ((ref $vars->{source}) ? '\==' : 'eq'), $vars->{source});
+	cmp_ok($vars->{dest}, ((ref $vars->{source}) ?? '\==' !! 'eq'), $vars->{source});
     }
 }

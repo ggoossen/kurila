@@ -77,8 +77,8 @@ sub _feature_init {
                  )
     {
         my $short = $feep =~ m/^pw(.*)/
-                  ? $1
-                  : do {
+                  ?? $1
+                  !! do {
                         # not cluck, as we know we called ourselves,
                         # and a confession is probably imminent anyway
                         warn("$IE $feep is a funny struct pwd field");
@@ -109,8 +109,8 @@ sub pw_has {
     our %Groks;         # whether build system knew how to do this feature
     my $cando = 1;
     my $sploder = caller() ne __PACKAGE__
-                    ? \&die
-                    : sub { die("$IE $(join ' ',@_)") };
+                    ?? \&die
+                    !! sub { die("$IE $(join ' ',@_)") };
     if ((nelems @_) == 0) {
         my @valid = sort grep { %Groks{$_} } keys %Groks;
         return @valid;
@@ -167,7 +167,7 @@ sub _populate (@) {
 sub getpwent ( ) { _populate(CORE::getpwent()) }
 sub getpwnam ($) { _populate(CORE::getpwnam(shift)) }
 sub getpwuid ($) { _populate(CORE::getpwuid(shift)) }
-sub getpw    ($) { (@_[0] =~ m/^\d+\z/s) ? &getpwuid( < @_ ) : &getpwnam( < @_ ) }
+sub getpw    ($) { (@_[0] =~ m/^\d+\z/s) ?? &getpwuid( < @_ ) !! &getpwnam( < @_ ) }
 
 _feature_init();
 

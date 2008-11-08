@@ -30,7 +30,7 @@ $perl = File::Spec->rel2abs ($perl);
 # whereas we will run the child with the full path in $perl. So make $^X for
 # us the same as our child will see.
 $^X = $perl;
-my $lib = %ENV{PERL_CORE} ? '../../../lib' : '../../blib/lib';
+my $lib = %ENV{PERL_CORE} ?? '../../../lib' !! '../../blib/lib';
 my $runperl = "$perl \"-I$lib\"";
 print "# perl=$perl\n";
 
@@ -45,9 +45,9 @@ if ($^O eq 'VMS') {
 }
 
 # Renamed by make clean
-my $makefile = ($mms_or_mmk ? 'descrip' : 'Makefile');
-my $makefile_ext = ($mms_or_mmk ? '.mms' : '');
-my $makefile_rename = $makefile . ($mms_or_mmk ? '.mms_old' : '.old');
+my $makefile = ($mms_or_mmk ?? 'descrip' !! 'Makefile');
+my $makefile_ext = ($mms_or_mmk ?? '.mms' !! '');
+my $makefile_rename = $makefile . ($mms_or_mmk ?? '.mms_old' !! '.old');
 
 my $output = "output";
 my $package = "ExtTest";
@@ -82,7 +82,7 @@ package main;
 
 sub check_for_bonus_files {
   my $dir = shift;
-  my %expect = %( < map {($^O eq 'VMS' ? lc($_) : $_), 1} @_ );
+  my %expect = %( < map {($^O eq 'VMS' ?? lc($_) !! $_), 1} @_ );
 
   my $fail;
   opendir DIR, $dir or die "opendir '$dir': $!";
@@ -104,7 +104,7 @@ sub check_for_bonus_files {
 
 sub build_and_run {
   my ($tests, $expect, $files) = < @_;
-  my $core = %ENV{PERL_CORE} ? ' PERL_CORE=1' : '';
+  my $core = %ENV{PERL_CORE} ?? ' PERL_CORE=1' !! '';
   my @perlout = @( `$runperl Makefile.PL $core` );
   if ($?) {
     print "not ok $realtest # $runperl Makefile.PL failed: $?\n";
@@ -517,7 +517,7 @@ EOT
 
   # Automatically compile the list of all the macro names, and make them
   # exported constants.
-  my @export_names = map {(ref $_) ? $_->{name} : $_} @items;
+  my @export_names = map {(ref $_) ?? $_->{name} !! $_} @items;
 
   # Exporter::Heavy (currently) isn't able to export the last 3 of these:
   push @items, < @common_items;
@@ -792,7 +792,7 @@ EOT
       substr ($copyname, $i, 1, 'z');
       $test_body .= explict_call_constant ($copyname,
                                            $copyname eq $thisname
-                                             ? $thisname : undef);
+                                             ?? $thisname !! undef);
     }
   }
   # Ho. This seems to be buggy in 5.005_03:

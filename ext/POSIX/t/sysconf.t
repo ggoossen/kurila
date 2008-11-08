@@ -36,8 +36,8 @@ my $tests = 2 * 3 * (nelems @path_consts) +
             2 * 3 * (nelems @path_consts_fifo) +
                 3 * (nelems @sys_consts);
 plan $tests 
-     ? (tests => $tests) 
-     : (skip_all => "No tests to run on this OS")
+     ?? (tests => $tests) 
+     !! (skip_all => "No tests to run on this OS")
 ;
 
 # Don't test on "." as it can be networked storage which returns EINVAL
@@ -58,9 +58,9 @@ sub _check_and_report {
 	skip "terminal constants set errno on QNX", 1
 	    if $^O eq 'nto' and $description =~ $TTY;
         ok( $success, "\tchecking that the returned value is defined (" 
-                        . (defined($return_val) ? "yes, it's $return_val)" : "it isn't)"
+                        . (defined($return_val) ?? "yes, it's $return_val)" !! "it isn't)"
                         . " or that errno is clear ("
-                        . (!($!+0) ? "it is)" : "it isn't, it's $!)"))
+                        . (!($!+0) ?? "it is)" !! "it isn't, it's $!)"))
                         );
     };
     SKIP: do {

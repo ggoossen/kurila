@@ -315,7 +315,7 @@ unless (   defined &Time::HiRes::gettimeofday
 	alarm(0); # can't cancel usig %SIG
     }
 
-    print $not ? "not ok 17 # $not\n" : "ok 17 # $ok\n";
+    print $not ?? "not ok 17 # $not\n" !! "ok 17 # $ok\n";
 }
 
 unless (   defined &Time::HiRes::setitimer
@@ -333,7 +333,7 @@ unless (   defined &Time::HiRes::setitimer
     my $r = \@( <Time::HiRes::gettimeofday());
 
     %SIG{VTALRM} = sub {
-	$i ? $i-- : setitimer(&ITIMER_VIRTUAL( < @_ ), 0);
+	$i ?? $i-- !! setitimer(&ITIMER_VIRTUAL( < @_ ), 0);
 	print "# Tick! $i ", Time::HiRes::tv_interval($r), "\n";
     };	
 
@@ -375,7 +375,7 @@ if ($have_gettimeofday &&
     $msg = "$td went by while sleeping $sleep, ratio $ratio.\n";
 
     if ($td +< $sleep * (1 + $limit)) {
-	print $a +< $limit ? "ok 20 # $msg" : "not ok 20 # $msg";
+	print $a +< $limit ?? "ok 20 # $msg" !! "not ok 20 # $msg";
     } else {
 	print "ok 20 # Skip: $msg";
     }
@@ -388,7 +388,7 @@ if ($have_gettimeofday &&
     $msg = "$td went by while sleeping $sleep, ratio $ratio.\n";
 
     if ($td +< $sleep * (1 + $limit)) {
-	print $a +< $limit ? "ok 21 # $msg" : "not ok 21 # $msg";
+	print $a +< $limit ?? "ok 21 # $msg" !! "not ok 21 # $msg";
     } else {
 	print "ok 21 # Skip: $msg";
     }
@@ -423,21 +423,21 @@ else {
 }
 
 try { sleep(-1) };
-print $@->{description} =~ m/::sleep\(-1\): negative time not invented yet/ ?
-    "ok 24\n" : "not ok 24\n";
+print $@->{description} =~ m/::sleep\(-1\): negative time not invented yet/ ??
+    "ok 24\n" !! "not ok 24\n";
 
 try { usleep(-2) };
-print $@->{description} =~ m/::usleep\(-2\): negative time not invented yet/ ?
-    "ok 25\n" : "not ok 25\n";
+print $@->{description} =~ m/::usleep\(-2\): negative time not invented yet/ ??
+    "ok 25\n" !! "not ok 25\n";
 
 if ($have_ualarm) {
     try { alarm(-3) };
-    print $@->{description} =~ m/::alarm\(-3, 0\): negative time not invented yet/ ?
-	"ok 26\n" : "not ok 26\n";
+    print $@->{description} =~ m/::alarm\(-3, 0\): negative time not invented yet/ ??
+	"ok 26\n" !! "not ok 26\n";
 
     try { ualarm(-4) };
-    print $@->{description} =~ m/::ualarm\(-4, 0\): negative time not invented yet/ ?
-    "ok 27\n" : "not ok 27\n";
+    print $@->{description} =~ m/::ualarm\(-4, 0\): negative time not invented yet/ ??
+    "ok 27\n" !! "not ok 27\n";
 } else {
     skip 26;
     skip 27;
@@ -445,8 +445,8 @@ if ($have_ualarm) {
 
 if ($have_nanosleep) {
     try { nanosleep(-5) };
-    print $@->{description} =~ m/::nanosleep\(-5\): negative time not invented yet/ ?
-	"ok 28\n" : "not ok 28\n";
+    print $@->{description} =~ m/::nanosleep\(-5\): negative time not invented yet/ ??
+	"ok 28\n" !! "not ok 28\n";
 } else {
     skip 28;
 }
@@ -479,7 +479,7 @@ if ($have_ualarm) {
 
     # The time-burner which takes at least T (default 1) seconds.
     my $Delay = sub {
-	my $c = (nelems @_) ? shift : 1;
+	my $c = (nelems @_) ?? shift !! 1;
 	my $n = $c * $DelayN;
 	my $i = 0;
 	while ($i +< $n) { $i++ }

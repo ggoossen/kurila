@@ -55,10 +55,10 @@ sub get_keys {
     # if the hash has already been populated with a significant amount
     # of entries the number of mask bits can be higher
     my $keys = nelems( keys %$hr);
-    my $bits = $keys ? log($keys)/log(2) : 0;
+    my $bits = $keys ?? log($keys)/log(2) !! 0;
     $bits = $min_bits if $min_bits +> $bits;
 
-    $bits = int($bits) +< $bits ? int($bits) + 1 : int($bits);
+    $bits = int($bits) +< $bits ?? int($bits) + 1 !! int($bits);
     # need to add 2 bits to cover the internal split cases
     $bits += 2;
     my $mask = 2**$bits-1;

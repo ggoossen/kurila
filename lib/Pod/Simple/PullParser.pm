@@ -103,7 +103,7 @@ sub get_token {
    ") :\n", < map(
      "    " . $_->dump . "\n", @{ $self->{'token_buffer'} }
    ),
-   (nelems @{ $self->{'token_buffer'} }) ? '' : '       (no tokens)',
+   (nelems @{ $self->{'token_buffer'} }) ?? '' !! '       (no tokens)',
    "\n"
   ;
 
@@ -125,7 +125,7 @@ sub get_token {
         local $/ = $Pod::Simple::NL;
         push @lines, scalar( ~< $fh); # readline
         DEBUG +> 3 and print "  Line is: ",
-          defined(@lines[-1]) ? @lines[-1] : "<undef>\n";
+          defined(@lines[-1]) ?? @lines[-1] !! "<undef>\n";
         unless( defined @lines[-1] ) {
           DEBUG and print "That's it for that source fh!  Killing.\n";
           delete $self->{'source_fh'}; # so it can be GC'd
@@ -201,7 +201,7 @@ sub get_token {
   }
   DEBUG and print "get_token about to return ", <
    Pod::Simple::pretty( (nelems @{$self->{'token_buffer'}}
-)     ? $self->{'token_buffer'}->[-1] : undef
+)     ?? $self->{'token_buffer'}->[-1] !! undef
    ), "\n";
   return shift @{$self->{'token_buffer'}}; # that's an undef if empty
 }
@@ -210,7 +210,7 @@ use UNIVERSAL ();
 sub unget_token {
   my $self = shift;
   DEBUG and print "Ungetting ", scalar(nelems @_), " tokens: ",
-   (nelems @_) ? "$(join ' ',@_)\n" : "().\n";
+   (nelems @_) ?? "$(join ' ',@_)\n" !! "().\n";
   foreach my $t ( @_) {
     Carp::croak "Can't unget that, because it's not a token -- it's undef!"
      unless defined $t;
@@ -322,7 +322,7 @@ sub _get_titled_section {
   my $max_content_length   = delete %options{'max_content_length'};
   $max_content_length = 120 unless defined $max_content_length;
 
-  die( "Unknown " . ((2 == nelems(%options)) ? "option: " : "options: ")
+  die( "Unknown " . ((2 == nelems(%options)) ?? "option: " !! "options: ")
     . (join " ", map "[$_]", sort keys %options)
   )
    if %options;
@@ -387,8 +387,8 @@ sub _get_titled_section {
             )\)/sx
             # avoid accepting things like =head1 Thingy Thongy (DESCRIPTION)
           and ($max_content_length
-            ? (length($head1_text_content) +<= $max_content_length) # sanity
-            : 1)
+            ?? (length($head1_text_content) +<= $max_content_length) # sanity
+            !! 1)
         ) {
           DEBUG and print "  It looks titular: \"$head1_text_content\".\n",
             "\n  Using that.\n";
@@ -428,8 +428,8 @@ sub _get_titled_section {
 
         if( $para_text_content =~ m/\S/
           and ($max_content_length
-           ? (length($para_text_content) +<= $max_content_length)
-           : 1)
+           ?? (length($para_text_content) +<= $max_content_length)
+           !! 1)
         ) {
           # Some minimal sanity constraints, I think.
           DEBUG and print "  It looks contentworthy, I guess.  Using it.\n";

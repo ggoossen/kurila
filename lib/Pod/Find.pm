@@ -197,7 +197,7 @@ sub pod_find
             }
             next;
         }
-        my $root_rx = $^O eq 'MacOS' ? qq!^\Q$try\E! : qq!^\Q$try\E/!;
+        my $root_rx = $^O eq 'MacOS' ?? qq!^\Q$try\E! !! qq!^\Q$try\E/!;
         File::Find::find( sub {
             my $item = $File::Find::name;
             if(-d) {

@@ -70,8 +70,8 @@ sub casetest {
 	foreach my $func ( @funcs) {
 	    my $d = $func->($c);
 	    my $e = unidump($d);
-	    print $d eq pack("U0U", hex %simple{$i}) ?
-		"ok $test # $i -> $w\n" : "not ok $test # $i -> $e ($w)" . sprintf('%x', ord($d)) . "\n";
+	    print $d eq pack("U0U", hex %simple{$i}) ??
+		"ok $test # $i -> $w\n" !! "not ok $test # $i -> $e ($w)" . sprintf('%x', ord($d)) . "\n";
 		$test++;
 	}
     }
@@ -131,8 +131,8 @@ sub casetest {
 		# pack/unpack U has been EBCDICified, too, it would
 		# just undo our remapping.
 	    }
-	    print $w eq $e ?
-		"ok $test # $i -> $w\n" : "not ok $test # $h -> $e ($w)\n";
+	    print $w eq $e ??
+		"ok $test # $i -> $w\n" !! "not ok $test # $h -> $e ($w)\n";
 		$test++;
 	}
     }
@@ -143,8 +143,8 @@ sub casetest {
 	foreach my $func ( @funcs) {
 	    my $d = $func->($c);
 	    my $e = unidump($d);
-	    print $d eq $c ?
-		"ok $test # $i -> $w\n" : "not ok $test # $i -> $e ($w)\n";
+	    print $d eq $c ??
+		"ok $test # $i -> $w\n" !! "not ok $test # $i -> $e ($w)\n";
 		$test++;
 	}
     }

@@ -76,7 +76,7 @@ sub decomposeHangul {
     my @ret = @(
        LBase + $LIndex,
        VBase + $VIndex,
-      $TIndex ? (TBase + $TIndex) : (),
+      $TIndex ?? (TBase + $TIndex) !! (),
     );
     return @ret;
 }
@@ -124,7 +124,7 @@ while ($Decomp =~ m/(.+)/g) {
     my $ini = hex(@tab[0]); # initial decomposable character
 
     my $listname =
-	(nelems @$dec) == 2 ? sprintf("$($structname)_\%06x", $dec->[0]) : 'USELESS';
+	(nelems @$dec) == 2 ?? sprintf("$($structname)_\%06x", $dec->[0]) !! 'USELESS';
 		# %04x is bad since it'd place _3046 after _1d157.
 
     if (@tab[1] eq '') {
@@ -180,20 +180,20 @@ foreach my $j ( @(<0x1161..0x1175, < 0x11A8..0x11C2)) {
 sub getCanonList {
     my @src = @_;
     my @dec = map {
-	(SBase +<= $_ && $_ +<= SFinal) ? < decomposeHangul($_)
-	    : %Canon{$_} ? < @{ %Canon{$_} } : $_
+	(SBase +<= $_ && $_ +<= SFinal) ?? < decomposeHangul($_)
+	    !! %Canon{$_} ?? < @{ %Canon{$_} } !! $_
 		} @src;
-    return join(" ", @src) eq join(" ", @dec) ? @dec : getCanonList(< @dec);
+    return join(" ", @src) eq join(" ", @dec) ?? @dec !! getCanonList(< @dec);
     # condition @src == @dec is not ok.
 }
 
 sub getCompatList {
     my @src = @_;
     my @dec = map {
-	(SBase +<= $_ && $_ +<= SFinal) ? < decomposeHangul($_)
-	    : %Compat{$_} ? < @{ %Compat{$_} } : $_
+	(SBase +<= $_ && $_ +<= SFinal) ?? < decomposeHangul($_)
+	    !! %Compat{$_} ?? < @{ %Compat{$_} } !! $_
 		} @src;
-    return join(" ", @src) eq join(" ", @dec) ? @dec : getCompatList(< @dec);
+    return join(" ", @src) eq join(" ", @dec) ?? @dec !! getCompatList(< @dec);
     # condition @src == @dec is not ok.
 }
 
@@ -372,8 +372,8 @@ EOF
 	    printf "static $type $($head)_\%02x_\%02x [256] = \{\n", $p, $r;
 	    for my $c (0..255) {
 		print "\t", defined %val{$p}->{$r}->{$c}
-		    ? "($type)".%val{$p}->{$r}->{$c}
-		    : $null;
+		    ?? "($type)".%val{$p}->{$r}->{$c}
+		    !! $null;
 		print ','  if $c != 255;
 		print "\n" if $c % 8 == 7;
 	    }
@@ -385,8 +385,8 @@ EOF
 	printf "static $type* $($head)_\%02x [256] = \{\n", $p;
 	for my $r (0..255) {
 	    print %val{ $p }->{ $r }
-		? sprintf("$($head)_\%02x_\%02x", $p, $r)
-		: "NULL";
+		?? sprintf("$($head)_\%02x_\%02x", $p, $r)
+		!! "NULL";
 	    print ','  if $r != 255;
 	    print "\n" if %val{ $p }->{ $r } || ($r+1) % 8 == 0;
 	}
@@ -394,7 +394,7 @@ EOF
     }
     print "static $type** $head [] = \{\n";
     for my $p (0..0x10) {
-	print %val{ $p } ? sprintf("$($head)_\%02x", $p) : "NULL";
+	print %val{ $p } ?? sprintf("$($head)_\%02x", $p) !! "NULL";
 	print ','  if $p != 0x10;
 	print "\n";
     }

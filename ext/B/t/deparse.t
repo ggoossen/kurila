@@ -77,7 +77,7 @@ my $Is_MacOS = $^O eq 'MacOS';
 
 my $path = join " ", map { qq["-I$_"] } @INC;
 $path .= " -MMac::err=unix" if $Is_MacOS;
-my $redir = $Is_MacOS ? "" : "2>&1";
+my $redir = $Is_MacOS ?? "" !! "2>&1";
 
 $a = `$^X $path "-MO=Deparse" -anlwi.bak -e 1 $redir`;
 $a =~ s/-e syntax OK\n//g;

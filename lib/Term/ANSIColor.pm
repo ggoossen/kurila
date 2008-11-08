@@ -90,7 +90,7 @@ for my $attr (keys %attributes) {
     my $enable_colors = !defined %ENV{ANSI_COLORS_DISABLED};
     Symbol::fetch_glob(uc $attr)->* =
         sub {
-            my $xattr = $enable_colors ? "\e[" . $attr . 'm' : '';
+            my $xattr = $enable_colors ?? "\e[" . $attr . 'm' !! '';
             if (\$AUTORESET && \@_) {
                 '$xattr' . "\@_" . "\e[0m";
             } else {
@@ -117,7 +117,7 @@ sub color {
         $attribute .= %attributes{$_} . ';';
     }
     chop $attribute;
-    ($attribute ne '') ? "\e[$($attribute)m" : undef;
+    ($attribute ne '') ?? "\e[$($attribute)m" !! undef;
 }
 
 # Return a list of named color attributes for a given set of escape codes.
@@ -167,7 +167,7 @@ sub colored {
     return $string if defined %ENV{ANSI_COLORS_DISABLED};
     if (defined $EACHLINE) {
         my $attr = color (< @codes);
-        join '', map { $_ ne $EACHLINE ? $attr . $_ . "\e[0m" : $_ }
+        join '', map { $_ ne $EACHLINE ?? $attr . $_ . "\e[0m" !! $_ }
  grep { length ($_) +> 0 }
                     split (m/(\Q$EACHLINE\E)/, $string);
     } else {

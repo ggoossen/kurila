@@ -89,17 +89,17 @@ sub deg2deg($)     { _remt(@_[0], 360) }
 
 sub grad2grad($)   { _remt(@_[0], 400) }
 
-sub rad2deg ($;$)  { my $d = _RD * @_[0]; @_[1] ? $d : deg2deg($d) }
+sub rad2deg ($;$)  { my $d = _RD * @_[0]; @_[1] ?? $d !! deg2deg($d) }
 
-sub deg2rad ($;$)  { my $d = _DR * @_[0]; @_[1] ? $d : rad2rad($d) }
+sub deg2rad ($;$)  { my $d = _DR * @_[0]; @_[1] ?? $d !! rad2rad($d) }
 
-sub grad2deg ($;$) { my $d = _GD * @_[0]; @_[1] ? $d : deg2deg($d) }
+sub grad2deg ($;$) { my $d = _GD * @_[0]; @_[1] ?? $d !! deg2deg($d) }
 
-sub deg2grad ($;$) { my $d = _DG * @_[0]; @_[1] ? $d : grad2grad($d) }
+sub deg2grad ($;$) { my $d = _DG * @_[0]; @_[1] ?? $d !! grad2grad($d) }
 
-sub rad2grad ($;$) { my $d = _RG * @_[0]; @_[1] ? $d : grad2grad($d) }
+sub rad2grad ($;$) { my $d = _RG * @_[0]; @_[1] ?? $d !! grad2grad($d) }
 
-sub grad2rad ($;$) { my $d = _GR * @_[0]; @_[1] ? $d : rad2rad($d) }
+sub grad2rad ($;$) { my $d = _GR * @_[0]; @_[1] ?? $d !! rad2rad($d) }
 
 #
 # acos and asin functions which always return a real number
@@ -126,7 +126,7 @@ sub cartesian_to_spherical {
 
     return  @( $rho,
              atan2( $y, $x ),
-             $rho ? acos_real( $z / $rho ) : 0 );
+             $rho ?? acos_real( $z / $rho ) !! 0 );
 }
 
 sub spherical_to_cartesian {

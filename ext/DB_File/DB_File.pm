@@ -262,7 +262,7 @@ sub tie_hash_or_array
 	@arg[1] and ! -e @arg[1]) {
 	open(FH, ">", "@arg[1]") or return undef ;
 	close FH ;
-	chmod @arg[3] ? @arg[3] : 0666 , @arg[1] ;
+	chmod @arg[3] ?? @arg[3] !! 0666 , @arg[1] ;
     }
 
     DoTie_($tieHASH, < @arg) ;
@@ -369,7 +369,7 @@ sub get_dup
         $status = $db->seq($key, $value, R_NEXT());
     }
  
-    return  $flag ? %values : @values;
+    return  $flag ?? %values !! @values;
 }
 
 

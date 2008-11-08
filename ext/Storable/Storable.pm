@@ -263,7 +263,7 @@ sub _store {
 	unlink($file) or warn "Can't unlink $file: $!\n" if $@ || !defined $ret;
 	logcroak $@ if $@;
 	$@ = $da;
-	return $ret ? $ret : undef;
+	return $ret ?? $ret !! undef;
 }
 
 #
@@ -302,7 +302,7 @@ sub _store_fd {
 	logcroak $@ if $@;
 	local $\; $file->print('');	# Autoflush the file if wanted
 	$@ = $da;
-	return $ret ? $ret : undef;
+	return $ret ?? $ret !! undef;
 }
 
 #
@@ -336,7 +336,7 @@ sub _freeze {
 	try { $ret = &$xsptr($self) };
 	logcroak $@ if $@;
 	$@ = $da;
-	return $ret ? $ret : undef;
+	return $ret ?? $ret !! undef;
 }
 
 #

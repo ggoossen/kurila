@@ -730,7 +730,7 @@ sub parse_text {
     local $_ = '';
 
     ## Get options and set any defaults
-    my %opts = %( (ref @_[0]) ? < %{ shift() } : () );
+    my %opts = %( (ref @_[0]) ?? < %{ shift() } !! () );
     my $expand_seq   = %opts{'-expand_seq'}   || undef;
     my $expand_text  = %opts{'-expand_text'}  || undef;
     my $expand_ptree = %opts{'-expand_ptree'} || undef;
@@ -809,7 +809,7 @@ sub parse_text {
             if (length) {
                 ## In the middle of a sequence, append this text to it, and
                 ## dont forget to "expand" it if that's what the caller wanted
-                $seq->append($expand_text ? &$xtext_sub($self,$_,$seq) : $_);
+                $seq->append($expand_text ?? &$xtext_sub($self,$_,$seq) !! $_);
                 $_ .= $seq_end;
             }
             if (length $seq_end) {
@@ -818,8 +818,8 @@ sub parse_text {
                 ## Pop it off the stack of "in progress" sequences
                 pop @seq_stack;
                 ## Append result to its parent in current parse tree
-                @seq_stack[-1]->append($expand_seq ? &$xseq_sub($self,$seq)
-                                                   : $seq);
+                @seq_stack[-1]->append($expand_seq ?? &$xseq_sub($self,$seq)
+                                                   !! $seq);
                 ## Remember the current cmd-name and left-delimiter
                 if((nelems @seq_stack) +> 1) {
                     $cmd = @seq_stack[-1]->name;
@@ -833,7 +833,7 @@ sub parse_text {
         elsif (length) {
             ## In the middle of a sequence, append this text to it, and
             ## dont forget to "expand" it if that's what the caller wanted
-            $seq->append($expand_text ? &$xtext_sub($self,$_,$seq) : $_);
+            $seq->append($expand_text ?? &$xtext_sub($self,$_,$seq) !! $_);
         }
         ## Keep track of line count
         $line += s/\r*\n//;
@@ -842,7 +842,7 @@ sub parse_text {
     }
 
     ## Handle unterminated sequences
-    my $errorsub = ((nelems @seq_stack) +> 1) ? $self->errorsub() : undef;
+    my $errorsub = ((nelems @seq_stack) +> 1) ?? $self->errorsub() !! undef;
     while ((nelems @seq_stack) +> 1) {
        ($cmd, $file, $line) = ( $seq->name, < $seq->file_line);
        $ldelim  = $seq->ldelim;
@@ -854,13 +854,13 @@ sub parse_text {
        (ref $errorsub) and &{$errorsub}($errmsg)
            or (defined $errorsub) and $self->?$errorsub($errmsg)
                or  warn($errmsg);
-       @seq_stack[-1]->append($expand_seq ? < &$xseq_sub($self,$seq) : $seq);
+       @seq_stack[-1]->append($expand_seq ?? < &$xseq_sub($self,$seq) !! $seq);
        $seq = @seq_stack[-1];
     }
 
     ## Return the resulting parse-tree
     my $ptree = (pop @seq_stack)->parse_tree;
-    return  $expand_ptree ? &$xptree_sub($self, $ptree) : $ptree;
+    return  $expand_ptree ?? &$xptree_sub($self, $ptree) !! $ptree;
 }
 
 ##---------------------------------------------------------------------------
@@ -1033,7 +1033,7 @@ This method does I<not> usually need to be overridden by subclasses.
 
 sub parse_from_filehandle {
     my $self = shift;
-    my %opts = %( (ref @_[0] eq 'HASH') ? < %{ shift() } : () );
+    my %opts = %( (ref @_[0] eq 'HASH') ?? < %{ shift() } !! () );
     my ($in_fh, $out_fh) = < @_;
     $in_fh = \*STDIN  unless ($in_fh);
     local *myData = $self;  ## alias to avoid deref-ing overhead
@@ -1054,7 +1054,7 @@ sub parse_from_filehandle {
     my $tied_fh = (m/^(?:GLOB|FileHandle|IO::\w+)$/  or  tied $in_fh);
 
     ## Read paragraphs line-by-line
-    while (defined ($textline = $tied_fh ? ~< $in_fh : $in_fh->getline)) {
+    while (defined ($textline = $tied_fh ?? ~< $in_fh !! $in_fh->getline)) {
         $textline = $self->preprocess_line($textline, ++$nlines);
         next  unless ((defined $textline)  &&  (length $textline));
 
@@ -1145,7 +1145,7 @@ This method does I<not> usually need to be overridden by subclasses.
 
 sub parse_from_file {
     my $self = shift;
-    my %opts = %( (ref @_[0] eq 'HASH') ? < %{ shift() } : () );
+    my %opts = %( (ref @_[0] eq 'HASH') ?? < %{ shift() } !! () );
     my ($infile, $outfile) = < @_;
     my ($in_fh,  $out_fh);
     my ($close_input, $close_output) = (0, 0);
@@ -1278,7 +1278,7 @@ is used to issue error messages (this is the default behavior).
 =cut
 
 sub errorsub {
-   return ((nelems @_) +> 1) ?  @(@_[0]->{_ERRORSUB} = @_[1]) : @_[0]->{_ERRORSUB};
+   return ((nelems @_) +> 1) ??  @(@_[0]->{_ERRORSUB} = @_[1]) !! @_[0]->{_ERRORSUB};
 }
 
 ##---------------------------------------------------------------------------
@@ -1299,7 +1299,7 @@ result.
 =cut
 
 sub cutting {
-   return ((nelems @_) +> 1) ?  @(@_[0]->{_CUTTING} = @_[1]) : @_[0]->{_CUTTING};
+   return ((nelems @_) +> 1) ??  @(@_[0]->{_CUTTING} = @_[1]) !! @_[0]->{_CUTTING};
 }
 
 ##---------------------------------------------------------------------------
@@ -1348,7 +1348,7 @@ sub parseopts {
    return %myOpts  if ((nelems @_) == 0);
    if ((nelems @_) == 1) {
       local $_ = shift;
-      return  ref($_)  ?  %myData{_PARSEOPTS} = $_  :  %myOpts{$_};
+      return  ref($_)  ??  %myData{_PARSEOPTS} = $_  !!  %myOpts{$_};
    }
    my @newOpts = @(< %myOpts, < @_);
    %myData{_PARSEOPTS} = \%( < @newOpts );

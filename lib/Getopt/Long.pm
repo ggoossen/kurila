@@ -444,14 +444,14 @@ sub GetOptionsFromArray($@) {
     $error = 0;
 
     # Supply --version and --help support, if needed and allowed.
-    if ( defined($auto_version) ? $auto_version : ($requested_version +>= 2.3203) ) {
+    if ( defined($auto_version) ?? $auto_version !! ($requested_version +>= 2.3203) ) {
 	if ( !defined(%opctl{version}) ) {
 	    %opctl{version} = \@('','version',0, <CTL_DEST_CODE,undef);
 	    %linkage{version} = \&VersionMessage;
 	}
 	$auto_version = 1;
     }
-    if ( defined($auto_help) ? $auto_help : ($requested_version +>= 2.3203) ) {
+    if ( defined($auto_help) ?? $auto_help !! ($requested_version +>= 2.3203) ) {
 	if ( !defined(%opctl{help}) && !defined(%opctl{'?'}) ) {
 	    %opctl{help} = %opctl{'?'} = \@('','help',0, <CTL_DEST_CODE,undef);
 	    %linkage{help} = \&HelpMessage;
@@ -561,7 +561,7 @@ sub GetOptionsFromArray($@) {
 		    }
 		    elsif ( ref(%linkage{$opt}) eq 'CODE' ) {
 			print STDERR ("=> &L\{$opt\}(\"$opt\"",
-				      $ctl->[CTL_DEST] == CTL_DEST_HASH ? ", \"$key\"" : "",
+				      $ctl->[CTL_DEST] == CTL_DEST_HASH ?? ", \"$key\"" !! "",
 				      ", \"$arg\")\n")
 			    if $debug;
 			my $eval_error = do {
@@ -575,7 +575,7 @@ sub GetOptionsFromArray($@) {
 				    linkage => \%linkage,
 				    prefix  => $prefix,
 				   ),
-				   $ctl->[CTL_DEST] == CTL_DEST_HASH ? ($key) : (),
+				   $ctl->[CTL_DEST] == CTL_DEST_HASH ?? ($key) !! (),
 				   $arg);
 			    };
 			    $@;
@@ -731,7 +731,7 @@ sub GetOptionsFromArray($@) {
 # A readable representation of what's in an optbl.
 sub OptCtl ($) {
     my ($v) = < @_;
-    my @v = map { defined($_) ? ($_) : ("<undef>") } @$v;
+    my @v = map { defined($_) ?? ($_) !! ("<undef>") } @$v;
     "[".
       join(",", @(
 	   "\"@v[CTL_TYPE]\"",
@@ -801,12 +801,12 @@ sub ParseOptionSpec ($$) {
     elsif ( $spec =~ m/^:(-?\d+|\+)([@%])?$/ ) {
 	my $def = $1;
 	my $dest = $2;
-	my $type = $def eq '+' ? 'I' : 'i';
+	my $type = $def eq '+' ?? 'I' !! 'i';
 	$dest ||= '$';
-	$dest = $dest eq '@' ? CTL_DEST_ARRAY
-	  : $dest eq '%' ? CTL_DEST_HASH : CTL_DEST_SCALAR;
+	$dest = $dest eq '@' ?? CTL_DEST_ARRAY
+	  !! $dest eq '%' ?? CTL_DEST_HASH !! CTL_DEST_SCALAR;
 	# Fields are hard-wired here.
-	$entry = \@($type,$orig,$def eq '+' ? undef : $def,
+	$entry = \@($type,$orig,$def eq '+' ?? undef !! $def,
                     $dest,0,1);
     }
     else {
@@ -820,14 +820,14 @@ sub ParseOptionSpec ($$) {
 
 	$type = 'i' if $type eq 'n';
 	$dest ||= '$';
-	$dest = $dest eq '@' ? CTL_DEST_ARRAY
-	  : $dest eq '%' ? CTL_DEST_HASH : CTL_DEST_SCALAR;
+	$dest = $dest eq '@' ?? CTL_DEST_ARRAY
+	  !! $dest eq '%' ?? CTL_DEST_HASH !! CTL_DEST_SCALAR;
 	# Default minargs to 1/0 depending on mand status.
-	$mi = $mand eq '=' ? 1 : 0 unless defined $mi;
+	$mi = $mand eq '=' ?? 1 !! 0 unless defined $mi;
 	# Adjust mand status according to minargs.
-	$mand = $mi ? '=' : ':';
+	$mand = $mi ?? '=' !! ':';
 	# Adjust maxargs.
-	$ma = $mi ? $mi : 1 unless defined $ma || defined $cm;
+	$ma = $mi ?? $mi !! 1 unless defined $ma || defined $cm;
 	return  @(undef, "Max must be greater than zero in option spec: \"$opt\"\n")
 	  if defined($ma) && !$ma;
 	return  @(undef, "Max less than min in option spec: \"$opt\"\n")
@@ -842,7 +842,7 @@ sub ParseOptionSpec ($$) {
     foreach (  @names ) {
 
 	$_ = lc ($_)
-	  if $ignorecase +> (($bundling && length($_) == 1) ? 1 : 0);
+	  if $ignorecase +> (($bundling && length($_) == 1) ?? 1 !! 0);
 
 	if ( exists $opctl->{$_} ) {
 	    $dups .= "Duplicate specification \"$opt\" for option \"$_\"\n";
@@ -907,7 +907,7 @@ sub FindOption ($$$$$) {
     if ( $bundling && $starter eq '-' ) {
 
 	# To try overrides, obey case ignore.
-	$tryopt = $ignorecase ? lc($opt) : $opt;
+	$tryopt = $ignorecase ?? lc($opt) !! $opt;
 
 	# If bundling == 2, long options can override bundles.
 	if ( $bundling == 2 && length($tryopt) +> 1
@@ -918,7 +918,7 @@ sub FindOption ($$$$$) {
 	else {
 	    $tryopt = $opt;
 	    # Unbundle single letter option.
-	    $rest = length ($tryopt) +> 0 ? substr ($tryopt, 1) : '';
+	    $rest = length ($tryopt) +> 0 ?? substr ($tryopt, 1) !! '';
 	    $tryopt = substr ($tryopt, 0, 1);
 	    $tryopt = lc ($tryopt) if $ignorecase +> 1;
 	    print STDERR ("=> $starter$tryopt unbundled from ",
@@ -1033,14 +1033,14 @@ sub FindOption ($$$$$) {
 
     # Check if there is an option argument available.
     if ( $gnu_compat && defined $optarg && $optarg eq '' ) {
-	return  @(1, $opt, $ctl, $type eq 's' ? '' : 0) ;#unless $mand;
+	return  @(1, $opt, $ctl, $type eq 's' ?? '' !! 0) ;#unless $mand;
 	$optarg = 0 unless $type eq 's';
     }
 
     # Check if there is an option argument available.
     if ( defined $optarg
-	 ? ($optarg eq '')
-	 : !(defined $rest || (nelems @$argv) +> 0) ) {
+	 ?? ($optarg eq '')
+	 !! !(defined $rest || (nelems @$argv) +> 0) ) {
 	# Complain if this option needs an argument.
 #	if ( $mand && !($type eq 's' ? defined($optarg) : 0) ) {
 	if ( $mand ) {
@@ -1056,20 +1056,20 @@ sub FindOption ($$$$$) {
 	    return  @(1, $opt, \@c, 1);
 	}
 	return  @(1, $opt, $ctl,
-		defined($ctl->[CTL_DEFAULT]) ? $ctl->[CTL_DEFAULT] :
-		$type eq 's' ? '' : 0);
+		defined($ctl->[CTL_DEFAULT]) ?? $ctl->[CTL_DEFAULT] !!
+		$type eq 's' ?? '' !! 0);
     }
 
     # Get (possibly optional) argument.
-    $arg = (defined $rest ? $rest
-	    : (defined $optarg ? $optarg : shift (@$argv)));
+    $arg = (defined $rest ?? $rest
+	    !! (defined $optarg ?? $optarg !! shift (@$argv)));
 
     # Get key if this is a "name=value" pair for a hash option.
     my $key;
     if ($ctl->[CTL_DEST] == CTL_DEST_HASH && defined $arg) {
-	($key, $arg) = ($arg =~ m/^([^=]*)=(.*)$/s) ? ($1, $2)
-	  : ($arg, defined($ctl->[CTL_DEFAULT]) ? $ctl->[CTL_DEFAULT] :
-	     ($mand ? undef : ($type eq 's' ? "" : 1)));
+	($key, $arg) = ($arg =~ m/^([^=]*)=(.*)$/s) ?? ($1, $2)
+	  !! ($arg, defined($ctl->[CTL_DEFAULT]) ?? $ctl->[CTL_DEFAULT] !!
+	     ($mand ?? undef !! ($type eq 's' ?? "" !! 1)));
 	if (! defined $arg) {
 	    warn ("Option $opt, key \"$key\", requires a value\n");
 	    $error++;
@@ -1081,7 +1081,7 @@ sub FindOption ($$$$$) {
 
     #### Check if the argument is valid for this option ####
 
-    my $key_valid = $ctl->[CTL_DEST] == CTL_DEST_HASH ? "[^=]+=" : "";
+    my $key_valid = $ctl->[CTL_DEST] == CTL_DEST_HASH ?? "[^=]+=" !! "";
 
     if ( $type eq 's' ) {	# string
 	# A mandatory string takes anything.
@@ -1110,29 +1110,29 @@ sub FindOption ($$$$$) {
             || $type eq 'I'	# numeric/integer w/ incr default
 	    || $type eq 'o' ) { # dec/oct/hex/bin value
 
-	my $o_valid = $type eq 'o' ? PAT_XINT : PAT_INT;
+	my $o_valid = $type eq 'o' ?? PAT_XINT !! PAT_INT;
 
 	if ( $bundling && defined $rest
 	     && $rest =~ m/^($key_valid)($o_valid)(.*)$/si ) {
 	    ($key, $arg, $rest) = ($1, $2, $3);
 	    chop($key) if $key;
-	    $arg = ($type eq 'o' && $arg =~ m/^0/) ? oct($arg) : 0+$arg;
+	    $arg = ($type eq 'o' && $arg =~ m/^0/) ?? oct($arg) !! 0+$arg;
 	    unshift (@$argv, $starter.$rest) if defined $rest && $rest ne '';
 	}
 	elsif ( $arg =~ m/^$o_valid$/si ) {
 	    $arg =~ s/_//g;
-	    $arg = ($type eq 'o' && $arg =~ m/^0/) ? oct($arg) : 0+$arg;
+	    $arg = ($type eq 'o' && $arg =~ m/^0/) ?? oct($arg) !! 0+$arg;
 	}
 	else {
 	    if ( defined $optarg || $mand ) {
 		if ( $passthrough ) {
-		    unshift (@$argv, defined $rest ? $starter.$rest : $arg)
+		    unshift (@$argv, defined $rest ?? $starter.$rest !! $arg)
 		      unless defined $optarg;
 		    return  @(0);
 		}
 		warn ("Value \"", $arg, "\" invalid for option ",
 		      $opt, " (",
-		      $type eq 'o' ? "extended " : '',
+		      $type eq 'o' ?? "extended " !! '',
 		      "number expected)\n");
 		$error++;
 		# Push back.
@@ -1141,7 +1141,7 @@ sub FindOption ($$$$$) {
 	    }
 	    else {
 		# Push back.
-		unshift (@$argv, defined $rest ? $starter.$rest : $arg);
+		unshift (@$argv, defined $rest ?? $starter.$rest !! $arg);
 		if ( $type eq 'I' ) {
 		    # Fake incremental type.
 		    my @c = @$ctl;
@@ -1149,7 +1149,7 @@ sub FindOption ($$$$$) {
 		    return  @(1, $opt, \@c, 1);
 		}
 		# Supply default value.
-		$arg = defined($ctl->[CTL_DEFAULT]) ? $ctl->[CTL_DEFAULT] : 0;
+		$arg = defined($ctl->[CTL_DEFAULT]) ?? $ctl->[CTL_DEFAULT] !! 0;
 	    }
 	}
     }
@@ -1172,7 +1172,7 @@ sub FindOption ($$$$$) {
 	else {
 	    if ( defined $optarg || $mand ) {
 		if ( $passthrough ) {
-		    unshift (@$argv, defined $rest ? $starter.$rest : $arg)
+		    unshift (@$argv, defined $rest ?? $starter.$rest !! $arg)
 		      unless defined $optarg;
 		    return  @(0);
 		}
@@ -1185,7 +1185,7 @@ sub FindOption ($$$$$) {
 	    }
 	    else {
 		# Push back.
-		unshift (@$argv, defined $rest ? $starter.$rest : $arg);
+		unshift (@$argv, defined $rest ?? $starter.$rest !! $arg);
 		# Supply default value.
 		$arg = 0.0;
 	    }
@@ -1222,7 +1222,7 @@ sub ValidValue ($$$$$) {
             || $type eq 'I'	# numeric/integer w/ incr default
 	    || $type eq 'o' ) { # dec/oct/hex/bin value
 
-	my $o_valid = $type eq 'o' ? PAT_XINT : PAT_INT;
+	my $o_valid = $type eq 'o' ?? PAT_XINT !! PAT_INT;
 	return $arg =~ m/^$o_valid$/si;
     }
 
@@ -1273,7 +1273,7 @@ sub Configure (@) {
 	}
 	elsif ( $try eq 'getopt_compat' ) {
 	    $getopt_compat = $action;
-            $genprefix = $action ? "(--|-|\\+)" : "(--|-)";
+            $genprefix = $action ?? "(--|-|\\+)" !! "(--|-)";
 	}
 	elsif ( $try eq 'gnu_getopt' ) {
 	    if ( $action ) {
@@ -1297,19 +1297,19 @@ sub Configure (@) {
 	    $ignorecase = $action;
 	}
 	elsif ( $try eq 'ignorecase_always' or $try eq 'ignore_case_always' ) {
-	    $ignorecase = $action ? 2 : 0;
+	    $ignorecase = $action ?? 2 !! 0;
 	}
 	elsif ( $try eq 'bundling' ) {
 	    $bundling = $action;
 	}
 	elsif ( $try eq 'bundling_override' ) {
-	    $bundling = $action ? 2 : 0;
+	    $bundling = $action ?? 2 !! 0;
 	}
 	elsif ( $try eq 'require_order' ) {
-	    $order = $action ? $REQUIRE_ORDER : $PERMUTE;
+	    $order = $action ?? $REQUIRE_ORDER !! $PERMUTE;
 	}
 	elsif ( $try eq 'permute' ) {
-	    $order = $action ? $PERMUTE : $REQUIRE_ORDER;
+	    $order = $action ?? $PERMUTE !! $REQUIRE_ORDER;
 	}
 	elsif ( $try eq 'pass_through' or $try eq 'passthrough' ) {
 	    $passthrough = $action;
@@ -1366,15 +1366,15 @@ sub VersionMessage(@) {
 
     my $v = $main::VERSION;
     my $fh = $pa->{-output} ||
-      ($pa->{-exitval} eq "NOEXIT" || $pa->{-exitval} +< 2) ? \*STDOUT : \*STDERR;
+      ($pa->{-exitval} eq "NOEXIT" || $pa->{-exitval} +< 2) ?? \*STDOUT !! \*STDERR;
 
-    print $fh (defined($pa->{-message}) ? $pa->{-message} : (),
-	       $0, defined $v ? " version $v" : (),
+    print $fh (defined($pa->{-message}) ?? $pa->{-message} !! (),
+	       $0, defined $v ?? " version $v" !! (),
 	       "\n",
 	       "(", __PACKAGE__, "::", "GetOptions",
 	       " version ",
 	       defined($Getopt::Long::VERSION_STRING)
-	         ? $Getopt::Long::VERSION_STRING : $VERSION, ";",
+	         ?? $Getopt::Long::VERSION_STRING !! $VERSION, ";",
 	       " Perl version $^V",
 	       ")\n");
     exit($pa->{-exitval}) unless $pa->{-exitval} eq "NOEXIT";

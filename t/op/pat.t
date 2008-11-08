@@ -247,7 +247,7 @@ our @out = @( m/(?<!foo)bar./g );
 ok("$(join ' ',@out)" eq 'bar2 barf');
 
 # Tests which depend on REG_INFTY
-our $reg_infty = defined %Config{reg_infty} ? %Config{reg_infty} : 32767;
+our $reg_infty = defined %Config{reg_infty} ?? %Config{reg_infty} !! 32767;
 our $reg_infty_m = $reg_infty - 1;
 our $reg_infty_p = $reg_infty + 1;
 
@@ -589,13 +589,13 @@ our @res = @( () );
 # List context:
 $_ = 'abcde|abcde';
 our @dummy = @( m/([ace]).(?{push @res, $1,$2})([ce])(?{push @res, $1,$2})/g );
-@res = map {defined $_ ? "'$_'" : 'undef'} @res;
+@res = map {defined $_ ?? "'$_'" !! 'undef'} @res;
 $res = "$(join ' ',@res)";
 ok(  "$(join ' ',@res)" eq "'a' undef 'a' 'c' 'e' undef 'a' undef 'a' 'c'" );
 
 @res = @( () );
 @dummy = @( m/([ace]).(?{push @res, $^PREMATCH,$^MATCH,$^POSTMATCH})([ce])(?{push @res, $^PREMATCH,$^MATCH,$^POSTMATCH})/gp );
-@res = map {defined $_ ? "'$_'" : 'undef'} @res;
+@res = map {defined $_ ?? "'$_'" !! 'undef'} @res;
 $res = "$(join ' ',@res)";
 ok(  "$(join ' ',@res)" eq
   "'' 'ab' 'cde|abcde' " .
@@ -1803,8 +1803,8 @@ do {
     my $w = substr($u,1,1);
     my %u = %( $u => $u, $v => $v, $w => $w );
     for (keys %u) {
-	my $m1 = m/^\w*$/ ? 1 : 0;
-	my $m2 = %u{$_}=~m/^\w*$/ ? 1 : 0;
+	my $m1 = m/^\w*$/ ?? 1 !! 0;
+	my $m2 = %u{$_}=~m/^\w*$/ ?? 1 !! 0;
 	ok( $m1 == $m2 );
     }
 };
@@ -2823,7 +2823,7 @@ do {
     for my $name (@('',':foo')) 
     {
         for my $pat (@("(*PRUNE$name)",
-                     ($name? "(*MARK$name)" : "")
+                     ($name?? "(*MARK$name)" !! "")
                      . "(*SKIP$name)",
                      "(*COMMIT$name)"))
         {                         
@@ -2832,7 +2832,7 @@ do {
                 'aaaab'=~m/a+b$pat$suffix/;
                 is(
                     $REGERROR,
-                    ($suffix ? ($name ? 'foo' : "1") : ""),
+                    ($suffix ?? ($name ?? 'foo' !! "1") !! ""),
                     "Test $pat and \$REGERROR $suffix"
                 );
             }
@@ -2846,7 +2846,7 @@ do {
     for my $name (@('',':foo')) 
     {
         for my $pat (@("(*PRUNE$name)",
-                     ($name? "(*MARK$name)" : "")
+                     ($name?? "(*MARK$name)" !! "")
                      . "(*SKIP$name)",
                      "(*COMMIT$name)"))
         {                         
@@ -2855,7 +2855,7 @@ do {
                 'aaaab'=~m/a+b$pat$suffix/;
                 main::is(
                     $REGERROR,
-                    ($suffix ? ($name ? 'foo' : "1") : ""),
+                    ($suffix ?? ($name ?? 'foo' !! "1") !! ""),
                     "Test $pat and \$REGERROR $suffix"
                 );
             }

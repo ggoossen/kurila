@@ -4,8 +4,8 @@ use Config;
 
 use Scalar::Util ();
 use Test::More  (grep { m/weaken/ } < @Scalar::Util::EXPORT_FAIL)
-			? (skip_all => 'weaken requires XS version')
-			: (tests => 22);
+			?? (skip_all => 'weaken requires XS version')
+			!! (tests => 22);
 
 if (0) {
   require Devel::Peek;

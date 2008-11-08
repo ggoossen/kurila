@@ -80,7 +80,7 @@ try { ExtUtils::Packlist::write(\%()) };
 like( $@->{description}, qr/No packlist filename/, 'write() should croak without packfile' );
 
 try { ExtUtils::Packlist::write(\%(), 'eplist') };
-my $file_is_ready = $@ ? 0 : 1;
+my $file_is_ready = $@ ?? 0 !! 1;
 ok( $file_is_ready, 'write() can write a file' );
 
 local *IN;

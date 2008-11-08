@@ -26,9 +26,9 @@ sub _compiler_type {
   my $self = shift;
   my $cc = $self->{config}->{cc};
 
-  return  @(  $cc =~ m/cl(\.exe)?$/ ? 'MSVC'
-	  : $cc =~ m/bcc32(\.exe)?$/ ? 'BCC'
-	  : 'GCC');
+  return  @(  $cc =~ m/cl(\.exe)?$/ ?? 'MSVC'
+	  !! $cc =~ m/bcc32(\.exe)?$/ ?? 'BCC'
+	  !! 'GCC');
 }
 
 sub split_like_shell {
@@ -106,7 +106,7 @@ sub link {
   my ($self, < %args) = < @_;
   my $cf = $self->{config};
 
-  my @objects = @( ref %args{objects} eq 'ARRAY' ? < @{%args{objects}} : %args{objects} );
+  my @objects = @( ref %args{objects} eq 'ARRAY' ?? < @{%args{objects}} !! %args{objects} );
   my $to = join '', File::Spec->splitpath(@objects[0])[[0..1]];
   $to ||= File::Spec->curdir();
 
@@ -281,7 +281,7 @@ sub write_compiler_script {
   open( SCRIPT, ">$script" )
     or die( "Could not create script '$script': $!" );
 
-  print SCRIPT join( "\n", map { ref $_ ? < @{$_} : $_ }
+  print SCRIPT join( "\n", map { ref $_ ?? < @{$_} !! $_ }
  grep defined, @(
     delete(
       %spec{[ <qw(includes cflags optimize defines perlinc) ]} ))
@@ -353,7 +353,7 @@ sub write_linker_script {
   open( SCRIPT, ">$script" )
     or die( "Could not create script '$script': $!" );
 
-  print SCRIPT join( "\n", map { ref $_ ? < @{$_} : $_ }
+  print SCRIPT join( "\n", map { ref $_ ?? < @{$_} !! $_ }
  grep defined, @(
     delete(
       %spec{[ <qw(lddlflags libpath other_ldflags
@@ -414,7 +414,7 @@ sub write_compiler_script {
   # backslash doesn't work, and any level of quotes are stripped. The
   # result is is a floating point number in the source file where a
   # string is expected. So we leave the macros on the command line.
-  print SCRIPT join( "\n", map { ref $_ ? < @{$_} : $_ }
+  print SCRIPT join( "\n", map { ref $_ ?? < @{$_} !! $_ }
  grep defined, @(
     delete(
       %spec{[ <qw(includes cflags optimize perlinc) ]} ))
@@ -577,7 +577,7 @@ sub format_linker_cmd {
     %spec{libperl}            ,
     < @{%spec{perllibs}}        ,
     %spec{explib}             ,
-    %spec{map_file} ? ('-Map', %spec{map_file}) : ''
+    %spec{map_file} ?? ('-Map', %spec{map_file}) !! ''
   ));
 
   push @cmds, \@(
@@ -598,7 +598,7 @@ sub format_linker_cmd {
     %spec{libperl}            ,
     < @{%spec{perllibs}}        ,
     %spec{explib}             ,
-    %spec{map_file} ? ('-Map', %spec{map_file}) : ''
+    %spec{map_file} ?? ('-Map', %spec{map_file}) !! ''
   ));
 
   return @cmds;

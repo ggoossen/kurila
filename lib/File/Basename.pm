@@ -159,7 +159,7 @@ sub fileparse {
   my $tail   = '';
   if ((nelems @suffices)) {
     foreach my $suffix ( @suffices) {
-      my $pat = ($igncase ? '(?i)' : '') . "($suffix)\$";
+      my $pat = ($igncase ?? '(?i)' !! '') . "($suffix)\$";
       if ($basename =~ s/$pat//s) {
         $taint .= substr($suffix,0,0);
         $tail = $1 . $tail;
@@ -382,7 +382,7 @@ sub fileparse_set_fstype {
         }
 
         $Fileparse_igncase = 
-          (grep $Fileparse_fstype eq $_, @Ignore_Case) ? 1 : 0;
+          (grep $Fileparse_fstype eq $_, @Ignore_Case) ?? 1 !! 0;
     }
 
     return $old;

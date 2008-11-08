@@ -4,7 +4,7 @@ use Config;
 WriteMakefile(
     NAME	 => 'Socket',
     VERSION_FROM => 'Socket.pm',
-   (config_value("libs") =~ m/(-lsocks\S*)/ ? (LIBS => \@( "$1" ) ) : ()),
+   (config_value("libs") =~ m/(-lsocks\S*)/ ?? (LIBS => \@( "$1" ) ) !! ()),
     XSPROTOARG   => '-noprototypes', 		# XXX remove later?
     realclean => \%( FILES=> 'const-c.inc const-xs.inc' ),
 );

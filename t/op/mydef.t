@@ -6,7 +6,7 @@ my $test = 0;
 sub ok ($$) {
     my ($ok, $name) = < @_;
     ++$test;
-    print $ok ? "ok $test - $name\n" : "not ok $test - $name\n";
+    print $ok ?? "ok $test - $name\n" !! "not ok $test - $name\n";
 }
 
 $_ = 'global';

@@ -91,18 +91,18 @@ sub mysprintf_int_flags {
     die "wrong format $fmt" if $fmt !~ m/^%([-+ 0]+)([1-9][0-9]*)d\z/;
     my $flag  = $1;
     my $width = $2;
-    my $sign  = $num +< 0 ? '-' :
-		$flag =~ m/\+/ ? '+' :
-		$flag =~ m/\ / ? ' ' :
+    my $sign  = $num +< 0 ?? '-' !!
+		$flag =~ m/\+/ ?? '+' !!
+		$flag =~ m/\ / ?? ' ' !!
 		'';
     my $abs   = abs($num);
     my $padlen = $width - length($sign.$abs);
     return
 	$flag =~ m/0/ && $flag !~ m/-/ # do zero padding
-	    ? $sign . '0' x $padlen . $abs
-	    : $flag =~ m/-/ # left or right
-		? $sign . $abs . ' ' x $padlen
-		: ' ' x $padlen . $sign . $abs;
+	    ?? $sign . '0' x $padlen . $abs
+	    !! $flag =~ m/-/ # left or right
+		?? $sign . $abs . ' ' x $padlen
+		!! ' ' x $padlen . $sign . $abs;
 }
 
 # Whole tests for "%4d" with 2 to 4 flags;

@@ -121,8 +121,8 @@ sub termcap_path
         ( exists %ENV{TERMCAP} )
         && (
             ( $^O eq 'os2' || $^O eq 'MSWin32' || $^O eq 'dos' )
-            ? %ENV{TERMCAP} =~ m/^[a-z]:[\\\/]/is
-            : %ENV{TERMCAP} =~ m/^\//s
+            ?? %ENV{TERMCAP} =~ m/^[a-z]:[\\\/]/is
+            !! %ENV{TERMCAP} =~ m/^\//s
         )
       );
     if ( ( exists %ENV{TERMPATH} ) && ( %ENV{TERMPATH} ) )
@@ -136,7 +136,7 @@ sub termcap_path
 
         # Defaults
         push( @termcap_path,
-            exists %ENV{'HOME'} ? %ENV{'HOME'} . '/.termcap' : undef,
+            exists %ENV{'HOME'} ?? %ENV{'HOME'} . '/.termcap' !! undef,
             '/etc/termcap', '/usr/share/misc/termcap', );
     }
 
@@ -262,7 +262,7 @@ sub Tgetent
     $termpat = $tmp_term;
     $termpat =~ s/(\W)/\\$1/g;
 
-    my $foo = ( exists %ENV{TERMCAP} ? %ENV{TERMCAP} : '' );
+    my $foo = ( exists %ENV{TERMCAP} ?? %ENV{TERMCAP} !! '' );
 
     # $entry is the extracted termcap entry
     if ( ( $foo !~ m:^/:s ) && ( $foo =~ m/(^|\|)$termpat(?:)[:|]/s ) )
@@ -539,8 +539,8 @@ sub Tputs
     } else {
 	# cache result because Tpad can be slow
 	unless (exists $self->{$cap}) {
-	    $self->{$cap} = exists $self->{"_$cap"} ?
-		Tpad($self, $self->{"_$cap"}, 1) : undef;
+	    $self->{$cap} = exists $self->{"_$cap"} ??
+		Tpad($self, $self->{"_$cap"}, 1) !! undef;
 	}
 	$string = $self->{$cap};
     }

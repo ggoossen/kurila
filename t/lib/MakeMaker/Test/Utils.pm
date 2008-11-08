@@ -105,9 +105,9 @@ my $old5lib = %ENV{PERL5LIB};
 my $had5lib = exists %ENV{PERL5LIB};
 sub perl_lib {
                                # perl-src/t/
-    my $lib =  %ENV{PERL_CORE} ? qq{../lib}
+    my $lib =  %ENV{PERL_CORE} ?? qq{../lib}
                                # ExtUtils-MakeMaker/t/
-                               : qq{../blib/lib};
+                               !! qq{../blib/lib};
     $lib = 'File::Spec'->rel2abs($lib);
     my @libs = @($lib);
     push @libs, %ENV{PERL5LIB} if exists %ENV{PERL5LIB};
@@ -135,7 +135,7 @@ should generate.
 =cut
 
 sub makefile_name {
-    return $Is_VMS ? 'Descrip.MMS' : 'Makefile';
+    return $Is_VMS ?? 'Descrip.MMS' !! 'Makefile';
 }   
 
 =item B<makefile_backup>
@@ -149,7 +149,7 @@ Makefile.
 
 sub makefile_backup {
     my $makefile = makefile_name;
-    return $Is_VMS ? "$makefile".'_old' : "$makefile.old";
+    return $Is_VMS ?? "$makefile".'_old' !! "$makefile.old";
 }
 
 =item B<make>
@@ -215,7 +215,7 @@ sub make_macro {
         }
     }
 
-    return $is_mms ? "$make$macros $target" : "$make $target $macros";
+    return $is_mms ?? "$make$macros $target" !! "$make $target $macros";
 }
 
 =item B<calibrate_mtime>

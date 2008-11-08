@@ -47,7 +47,7 @@ sub _is_doc {
     return ($man1dir && $self->_is_prefix($path, $man1dir))
            ||
            ($man3dir && $self->_is_prefix($path, $man3dir))
-           ? 1 : 0;
+           ?? 1 !! 0;
 }
 
 sub _is_type {
@@ -60,7 +60,7 @@ sub _is_type {
         return ($self->_is_prefix($path, $self->{':private:'}->{Config}->{prefix} || $self->{':private:'}->{Config}->{prefixexp})
                &&
                !($self->_is_doc($path))
-               ? 1 : 0);
+               ?? 1 !! 0);
     }
     return 0;
 }
@@ -115,7 +115,7 @@ sub new {
         @{$self->{':private:'}->{INC}} = grep { -e $_ && !%dupe{$_}++ }
           @: < @{$self->{':private:'}->{INC}}, < @{$self->{':private:'}->{EXTRA}};
     };
-    my $perl5lib = defined %ENV{PERL5LIB} ? %ENV{PERL5LIB} : "";
+    my $perl5lib = defined %ENV{PERL5LIB} ?? %ENV{PERL5LIB} !! "";
 
     my @dirs = @( $self->{':private:'}->{Config}->{archlibexp},
                  $self->{':private:'}->{Config}->{sitearchexp},

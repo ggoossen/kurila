@@ -55,7 +55,7 @@ do {
 
 sub nok ($$$$$$$) {
   my ($left, $threeway, $right, $result, $i, $j, $boolean) = < @_;
-  $result = defined $result ? "'$result'" : 'undef';
+  $result = defined $result ?? "'$result'" !! 'undef';
   fail("($left <=> $right) gives: $result \$i=$i \$j=$j, $boolean disagrees");
 }
 
@@ -74,8 +74,8 @@ for my $i (0..((nelems @FOO)-1)) {
 	   @FOO[$j], @FOO[$j], @FOO[$j], @FOO[$j], @FOO[$j], @FOO[$j],
 	   @FOO[$j], @FOO[$j], @FOO[$j], @FOO[$j], @FOO[$j]);
 	my $cmp = $i1 <+> $j1;
-	if (!defined($cmp) ? !($i2 +< $j2)
-	    : ($cmp == -1 && $i2 +< $j2 ||
+	if (!defined($cmp) ?? !($i2 +< $j2)
+	    !! ($cmp == -1 && $i2 +< $j2 ||
 	       $cmp == 0  && !($i2 +< $j2) ||
 	       $cmp == 1  && !($i2 +< $j2)))
 	{
@@ -84,8 +84,8 @@ for my $i (0..((nelems @FOO)-1)) {
 	else {
 	    nok($i3, '<=>', $j3, $cmp, $i, $j, '<');
 	}
-	if (!defined($cmp) ? !($i4 == $j4)
-	    : ($cmp == -1 && !($i4 == $j4) ||
+	if (!defined($cmp) ?? !($i4 == $j4)
+	    !! ($cmp == -1 && !($i4 == $j4) ||
 	       $cmp == 0  && $i4 == $j4 ||
 	       $cmp == 1  && !($i4 == $j4)))
 	{
@@ -94,8 +94,8 @@ for my $i (0..((nelems @FOO)-1)) {
 	else {
 	    nok($i3, '<=>', $j3, $cmp, $i, $j, '==');
 	}
-	if (!defined($cmp) ? !($i5 +> $j5)
-	    : ($cmp == -1 && !($i5 +> $j5) ||
+	if (!defined($cmp) ?? !($i5 +> $j5)
+	    !! ($cmp == -1 && !($i5 +> $j5) ||
 	       $cmp == 0  && !($i5 +> $j5) ||
 	       $cmp == 1  && ($i5 +> $j5)))
 	{
@@ -104,8 +104,8 @@ for my $i (0..((nelems @FOO)-1)) {
 	else {
 	    nok ($i3, '<=>', $j3, $cmp, $i, $j, '>');
 	}
-	if (!defined($cmp) ? !($i6 +>= $j6)
-	    : ($cmp == -1 && !($i6 +>= $j6) ||
+	if (!defined($cmp) ?? !($i6 +>= $j6)
+	    !! ($cmp == -1 && !($i6 +>= $j6) ||
 	       $cmp == 0  && $i6 +>= $j6 ||
 	       $cmp == 1  && $i6 +>= $j6))
 	{
@@ -115,8 +115,8 @@ for my $i (0..((nelems @FOO)-1)) {
 	    nok($i3, '<=>', $j3, $cmp, $i, $j, '>=');
 	}
 	# OK, so the docs are wrong it seems. NaN != NaN
-	if (!defined($cmp) ? ($i7 != $j7)
-	    : ($cmp == -1 && $i7 != $j7 ||
+	if (!defined($cmp) ?? ($i7 != $j7)
+	    !! ($cmp == -1 && $i7 != $j7 ||
 	       $cmp == 0  && !($i7 != $j7) ||
 	       $cmp == 1  && $i7 != $j7))
 	{
@@ -125,8 +125,8 @@ for my $i (0..((nelems @FOO)-1)) {
 	else {
 	    nok ($i3, '<=>', $j3, $cmp, $i, $j, '!=');
 	}
-	if (!defined($cmp) ? !($i8 +<= $j8)
-	    : ($cmp == -1 && $i8 +<= $j8 ||
+	if (!defined($cmp) ?? !($i8 +<= $j8)
+	    !! ($cmp == -1 && $i8 +<= $j8 ||
 	       $cmp == 0  && $i8 +<= $j8 ||
 	       $cmp == 1  && !($i8 +<= $j8)))
 	{
@@ -138,7 +138,7 @@ for my $i (0..((nelems @FOO)-1)) {
         my $pmc =  $j16 <+> $i16; # cmp it in reverse
         # Should give -ve of other answer, or undef for NaNs
         # a + -a should be zero. not zero is truth. which avoids using ==
-	if (defined($cmp) ? !($cmp + $pmc) : !defined $pmc)
+	if (defined($cmp) ?? !($cmp + $pmc) !! !defined $pmc)
 	{
 	    pass();
 	}

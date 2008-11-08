@@ -29,8 +29,8 @@ sub populate (@) {
     return $tmob;
 } 
 
-sub localtime (;$) { populate CORE::localtime((nelems @_) ? shift : time)}
-sub ctime (;$)     { scalar   CORE::localtime((nelems @_) ? shift : time) } 
+sub localtime (;$) { populate CORE::localtime((nelems @_) ?? shift !! time)}
+sub ctime (;$)     { scalar   CORE::localtime((nelems @_) ?? shift !! time) } 
 
 1;
 

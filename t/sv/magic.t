@@ -27,9 +27,9 @@ my $Is_miniperl = %ENV{PERL_CORE_MINITEST};
 my $Is_BeOS     = $^O eq 'beos';
 
 my $PERL = %ENV{PERL}
-    || ($Is_NetWare           ? 'perl'   :
-       ($Is_MacOS || $Is_VMS) ? $^X      :
-       $Is_MSWin32            ? '.\perl' :
+    || ($Is_NetWare           ?? 'perl'   !!
+       ($Is_MacOS || $Is_VMS) ?? $^X      !!
+       $Is_MSWin32            ?? '.\perl' !!
        './perl');
 
 eval '%ENV{"FOO"} = "hi there";';	# check that ENV is inited inside eval
@@ -106,7 +106,7 @@ END
     close CMDPIPE;
     $? >>= 8 if $^O eq 'VMS'; # POSIX status hiding in 2nd byte
     next_test for 1..3;
-    local our $TODO = ($^O eq 'os2' ? ' # TODO: EMX v0.9d_fix4 bug: wrong nibble? ' : '');
+    local our $TODO = ($^O eq 'os2' ?? ' # TODO: EMX v0.9d_fix4 bug: wrong nibble? ' !! '');
     ok($? ^&^ 0xFF);
 }
 
@@ -171,7 +171,7 @@ do {
     else {
 	$wd = '.';
     }
-    my $perl = ($Is_MacOS || $Is_VMS) ? $^X : "$wd/perl";
+    my $perl = ($Is_MacOS || $Is_VMS) ?? $^X !! "$wd/perl";
     my $headmaybe = '';
     my $middlemaybe = '';
     my $tailmaybe = '';
@@ -224,18 +224,18 @@ print "\$^X is $^X, \$0 is $0\n";
 EOF
     ok close(SCRIPT), '$!';
     ok chmod(0755, $script), '$!';
-    $_ = ($Is_MacOS || $Is_VMS) ? `$perl $script` : `$script`;
+    $_ = ($Is_MacOS || $Is_VMS) ?? `$perl $script` !! `$script`;
     s/\.exe//i if $Is_Dos or $Is_Cygwin or $Is_os2;
     s{./$script}{$script} if $Is_BeOS; # revert BeOS execvp() side-effect
     s{\bminiperl\b}{perl}; # so that test doesn't fail with miniperl
     s{is perl}{is $perl}; # for systems where $^X is only a basename
     s{\\}{/}g;
-    ok((($Is_MSWin32 || $Is_os2) ? uc($_) eq uc($s1) : $_ eq $s1), ' :$_:!=:$s1:');
+    ok((($Is_MSWin32 || $Is_os2) ?? uc($_) eq uc($s1) !! $_ eq $s1), ' :$_:!=:$s1:');
     $_ = `$perl $script`;
     s/\.exe//i if $Is_Dos or $Is_os2 or $Is_Cygwin;
     s{./$perl}{$perl} if $Is_BeOS; # revert BeOS execvp() side-effect
     s{\\}{/}g;
-    ok(($Is_MSWin32 || $Is_os2) ? uc($_) eq uc($s1) : $_ eq $s1) or diag " :$_:!=:$s1: after `$perl $script`";
+    ok(($Is_MSWin32 || $Is_os2) ?? uc($_) eq uc($s1) !! $_ eq $s1) or diag " :$_:!=:$s1: after `$perl $script`";
     ok unlink($script) or diag $!;
 };
 
@@ -264,16 +264,16 @@ else {
 	    %ENV = %( () );
 	    %ENV{PATH} = $PATH;
 	    %ENV{PERL_DESTRUCT_LEVEL} = $PDL || 0;
-	    ok ($Is_MSWin32 ? (`set foo 2>NUL` eq "")
-			    : (`echo \$foo` eq "\n") );
+	    ok ($Is_MSWin32 ?? (`set foo 2>NUL` eq "")
+			    !! (`echo \$foo` eq "\n") );
 	}
 
 	%ENV{__NoNeSuCh} = "foo";
 	$0 = "bar";
 # cmd.exe will echo 'variable=value' but 4nt will echo just the value
 # -- Nikola Knezevic
-       ok ($Is_MSWin32 ? (`set __NoNeSuCh` =~ m/^(?:__NoNeSuCh=)?foo$/)
-			    : (`echo \$__NoNeSuCh` eq "foo\n") );
+       ok ($Is_MSWin32 ?? (`set __NoNeSuCh` =~ m/^(?:__NoNeSuCh=)?foo$/)
+			    !! (`echo \$__NoNeSuCh` eq "foo\n") );
 	if ($^O =~ m/^(linux|freebsd)$/ &&
 	    open CMDLINE, '<', "/proc/$$/cmdline") {
 	    chomp(my $line = scalar ~< *CMDLINE);
@@ -316,7 +316,7 @@ do {
     my $warn = '';
     local $^WARN_HOOK = sub { $ok = 0; $warn = join '', @_; };
     $! = undef;
-    ok($ok, $warn, $Is_VMS ? "'\$!=undef' does throw a warning" : '');
+    ok($ok, $warn, $Is_VMS ?? "'\$!=undef' does throw a warning" !! '');
 };
 
 SKIP: do {

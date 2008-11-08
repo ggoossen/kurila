@@ -503,7 +503,7 @@ sub expect
     my @checks = @_;
     foreach my $check ( @checks) {
         $check = $self->_translate_Failed_check($check);
-        push @{$self->{wanted}}, ref $check ? $check : "$check\n";
+        push @{$self->{wanted}}, ref $check ?? $check !! "$check\n";
     }
 }
 

@@ -27,10 +27,10 @@ if ($^O eq 'unicos') { # See lib/Math/Complex.pm and t/lib/complex.t.
 }
 
 sub near ($$;$) {
-    my $e = defined @_[2] ? @_[2] : $eps;
-    my $d = @_[1] ? abs(@_[0]/@_[1] - 1) : abs(@_[0]);
+    my $e = defined @_[2] ?? @_[2] !! $eps;
+    my $d = @_[1] ?? abs(@_[0]/@_[1] - 1) !! abs(@_[0]);
     print "# near? @_[0] @_[1] : $d : $e\n";
-    @_[1] ? ($d +< $e) : abs(@_[0]) +< $e;
+    @_[1] ?? ($d +< $e) !! abs(@_[0]) +< $e;
 }
 
 print "# Sanity checks\n";

@@ -201,7 +201,7 @@ for ( @prgs){
     }
     print $out_file $src, "\n########\n" if $got_files;
  
-    our $TODO = $todo ? $todo_reason : 0;
+    our $TODO = $todo ?? $todo_reason !! 0;
 
     print_err_line( $switch, $prog, $expected, $results, $todo, $file ) unless $ok or $TODO;
 

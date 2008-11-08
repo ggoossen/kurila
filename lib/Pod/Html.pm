@@ -396,13 +396,13 @@ sub pod2html {
 	if (m/\r/) {
 	    if (m/\r\n/) {
 		@poddata = map { s/\r\n/\n/g;
-				 m/\n\n/ ?
-				     < map { "$_\n\n" } split m/\n\n/ :
+				 m/\n\n/ ??
+				     < map { "$_\n\n" } split m/\n\n/ !!
 				     $_ } @poddata;
 	    } else {
 		@poddata = map { s/\r/\n/g;
-				 m/\n\n/ ?
-				     < map { "$_\n\n" } split m/\n\n/ :
+				 m/\n\n/ ??
+				     < map { "$_\n\n" } split m/\n\n/ !!
 				     $_ } @poddata;
 	    }
 	    last;
@@ -449,7 +449,7 @@ sub pod2html {
     } else {
 	warn "$0: no title for $Podfile.\n" unless $Quiet;
 	$Podfile =~ m/^(.*)(\.[^.\/]+)?\z/s;
-	$Title = ($Podfile eq "-" ? 'No Title' : $1);
+	$Title = ($Podfile eq "-" ?? 'No Title' !! $1);
 	warn "using $Title" if $Verbose;
     }
     $Title = html_escape($Title);
@@ -466,7 +466,7 @@ sub pod2html {
       $tdstyle = '';
     }
 
-      my $block = $Header ? <<END_OF_BLOCK : '';
+      my $block = $Header ?? <<END_OF_BLOCK !! '';
 <table border="0" width="100\%" cellspacing="0" cellpadding="3">
 <tr><td class="block"$tdstyle valign="middle">
 <big><strong><span class="block">&nbsp;$Title</span></strong></big>
@@ -499,7 +499,7 @@ END_OF_HEAD
     # that way some other program can extract it if desired.
     $index =~ s/--+/-/g;
 
-    my $hr = ($Doindex and $index) ? qq(<hr name="index" />) : "";
+    my $hr = ($Doindex and $index) ?? qq(<hr name="index" />) !! "";
 
     unless ($Doindex)
     {
@@ -1163,7 +1163,7 @@ sub new_listitem {
 	    print HTML "</li>\n";
 	}
     }
-    my $opentag = $tag eq 'dl' ? 'dt' : 'li';
+    my $opentag = $tag eq 'dl' ?? 'dt' !! 'li';
     print HTML "<$opentag>";
 }
 
@@ -1447,8 +1447,8 @@ sub process_puretext {
     my(@words, $lead, $trail);
 
     # keep track of leading and trailing white-space
-    $lead  = ($text =~ s/\A(\s+)//s ? $1 : "");
-    $trail = ($text =~ s/(\s+)\Z//s ? $1 : "");
+    $lead  = ($text =~ s/\A(\s+)//s ?? $1 !! "");
+    $trail = ($text =~ s/(\s+)\Z//s ?? $1 !! "");
 
     # split at space/non-space boundaries
     @words = split( m/(?<=\s)(?=\S)|(?<=\S)(?=\s)/, $text );
@@ -1519,8 +1519,8 @@ sub process_puretext {
 # converted to html commands.
 #
 
-sub pattern ($) { @_[0] ? '\s+'.('>' x (@_[0] + 1)) : '>' }
-sub closing ($) { local($_) = shift; (defined && s/\s+\z//) ? length : 0 }
+sub pattern ($) { @_[0] ?? '\s+'.('>' x (@_[0] + 1)) !! '>' }
+sub closing ($) { local($_) = shift; (defined && s/\s+\z//) ?? length !! 0 }
 
 sub process_text {
     return if $Ignore;
@@ -1727,7 +1727,7 @@ sub process_text1($$;$$){
 	    # terminate at closing angle bracket(s)
 	    my $pt = $1;
             $pt .= $2 if !$3 &&  $lev == 1;
-	    $res .= $lev == 1 ? pure_text( $pt ) : inIS_text( $pt );
+	    $res .= $lev == 1 ?? pure_text( $pt ) !! inIS_text( $pt );
 	    return $res if !$3 && $lev +> 1;
             if( $3 ){
 		$res .= &process_text1( $lev, $rstr, $3, closing $4 );
@@ -2173,8 +2173,8 @@ sub fragment_id_obfuscated {  # This was the old "_2d_2d__"
     $text =~ s/\s+/_/sg;
 
     $text =~ s{(\W)}{$(
-        defined( @HC[ord($1)] ) ? @HC[ord($1)]
-        : ( @HC[ord($1)] = sprintf( "\%\%\%02X", ord($1) ) ) )}gx;
+        defined( @HC[ord($1)] ) ?? @HC[ord($1)]
+        !! ( @HC[ord($1)] = sprintf( "\%\%\%02X", ord($1) ) ) )}gx;
     $text = substr( $text, 0, 50 );
 
     $text;

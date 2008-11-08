@@ -44,7 +44,7 @@ otherwise.
 ##--------------------------------------------------------------------------
 
 sub testcmp( $ $ ; $) {
-   my %opts = %( ref(@_[0]) eq 'HASH' ? < %{shift()} : () );
+   my %opts = %( ref(@_[0]) eq 'HASH' ?? < %{shift()} !! () );
    my ($file1, $file2) = < @_;
    my ($fh1, $fh2) = ($file1, $file2);
    unless (ref $fh1) {
@@ -66,8 +66,8 @@ sub testcmp( $ $ ; $) {
       # kill any extra line endings
       $f1text =~ s/[\r\n]+$//s;
       $f2text =~ s/[\r\n]+$//s;
-      $diffs = (ref $cmplines) ? &$cmplines($f1text, $f2text)
-                               : ($f1text ne $f2text);
+      $diffs = (ref $cmplines) ?? &$cmplines($f1text, $f2text)
+                               !! ($f1text ne $f2text);
       last if $diffs;
    }
    close($fh1) unless (ref $file1);

@@ -87,7 +87,7 @@ If no arguments are given to pod2man it will read from @ARGV.
 =cut
 
 sub pod2man {
-    local @ARGV = @( (nelems @_) ? < @_ : < @ARGV );
+    local @ARGV = @( (nelems @_) ?? < @_ !! < @ARGV );
 
     require Pod::Man;
     require Getopt::Long;
@@ -191,8 +191,8 @@ sub perllocal_install {
 
     # VMS feeds args as a piped file on STDIN since it usually can't
     # fit all the args on a single command line.
-    my @mod_info = @( $Is_VMS ? < split m/\|/, ~< *STDIN
-                           : < @ARGV );
+    my @mod_info = @( $Is_VMS ?? < split m/\|/, ~< *STDIN
+                           !! < @ARGV );
 
     my $pod;
     $pod = sprintf <<POD, scalar localtime;

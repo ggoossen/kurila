@@ -122,7 +122,7 @@ sub catpath {
          $file   =~ m@[^\\/]@
        ) {
         $volume =~ m@([\\/])@ ;
-        my $sep = $1 ? $1 : '/' ;
+        my $sep = $1 ?? $1 !! '/' ;
         $volume .= $sep ;
     }
 

@@ -12,8 +12,8 @@ use vars < qw( @ISA $VERSION );
 $VERSION = '2.02';
 @ISA = @('Pod::Simple::Methody');
 BEGIN { *DEBUG = defined(&Pod::Simple::DEBUG)
-          ? \&Pod::Simple::DEBUG
-          : sub() {0}
+          ?? \&Pod::Simple::DEBUG
+          !! sub() {0}
       }
 
 use Text::Wrap v98.112902 (); # was 2001.0131, but I don't think we need that
@@ -49,8 +49,8 @@ sub start_head1 {
   } else {
     if(@_[1]->{'errata'}) { # start of errata!
       @_[0]->{'Errata_seen'} = 1;
-      @_[0]->{'Thispara'} = @_[0]->{'source_filename'} ?
-        "@_[0]->{'source_filename'} -- " : ''
+      @_[0]->{'Thispara'} = @_[0]->{'source_filename'} ??
+        "@_[0]->{'source_filename'} -- " !! ''
     }
   }
 }

@@ -13,4 +13,4 @@ $| = 1;
 print "1..1\n";
 
 # Carp not loaded yet;
-print defined $Carp::VERSION ? "not ok 1\n" : "ok 1\n";
+print defined $Carp::VERSION ?? "not ok 1\n" !! "ok 1\n";

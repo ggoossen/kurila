@@ -230,13 +230,13 @@ SKIP: do {
     skip "ls command not available to Perl in OpenVMS right now.", 6
       if $Is_VMS;
 
-    my $LS  = config_value('d_readlink') ? "ls -lL" : "ls -l";
+    my $LS  = config_value('d_readlink') ?? "ls -lL" !! "ls -l";
     my $CMD = "$LS /dev 2>/dev/null";
     my $DEV = qx($CMD);
 
     skip "$CMD failed", 6 if $DEV eq '';
 
-    my @DEV = @( do { my $dev; opendir($dev, "/dev") ? readdir($dev) : () } );
+    my @DEV = @( do { my $dev; opendir($dev, "/dev") ?? readdir($dev) !! () } );
 
     skip "opendir failed: $!", 6 if (nelems @DEV) == 0;
 
@@ -322,7 +322,7 @@ SKIP: do {
 SKIP: do {
     skip "These tests require a TTY", 4 if %ENV{PERL_SKIP_TTY_TEST};
 
-    my $TTY = $Is_Rhapsody ? "/dev/ttyp0" : "/dev/tty";
+    my $TTY = $Is_Rhapsody ?? "/dev/ttyp0" !! "/dev/tty";
 
     SKIP: do {
         skip "Test uses unixisms", 2 if $Is_MSWin32 || $Is_NetWare;

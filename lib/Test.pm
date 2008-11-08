@@ -208,7 +208,7 @@ values through this.
 
 sub _to_value {
     my ($v) = < @_;
-    return ref $v eq 'CODE' ? $v->() : $v;
+    return ref $v eq 'CODE' ?? $v->() !! $v;
 }
 
 sub _quote {
@@ -357,7 +357,7 @@ sub ok ($;$$) {
     my ($pkg,$file,$line) = caller($TestLevel);
     my $repetition = ++%history{"$file:$line"};
     my $context = ("$file at line $line".
-		   ($repetition +> 1 ? " fail \#$repetition" : ''));
+		   ($repetition +> 1 ?? " fail \#$repetition" !! ''));
 
     # Are we comparing two values?
     my $compare = 0;
@@ -403,7 +403,7 @@ sub ok ($;$$) {
            'result' => $result, 'todo' => $todo,
            'file' => $file, 'line' => $line,
            'context' => $context, 'compare' => $compare,
-           (nelems @_) ? ('diagnostic' => _to_value(shift)) : (),
+           (nelems @_) ?? ('diagnostic' => _to_value(shift)) !! (),
         ));
 
     }
@@ -435,10 +435,10 @@ sub _complain {
                        " (%$detail{context})\n";
         $prefix = ' ' x (length($prefix) - 5);
         my $expected_quoted = (defined %$detail{regex})
-         ?  'qr{'.(%$detail{regex}).'}'  :  _quote($expected);
+         ??  'qr{'.(%$detail{regex}).'}'  !!  _quote($expected);
 
         print $TESTERR "# $prefix Expected: $expected_quoted",
-           $diag ? " ($diag)" : (), "\n";
+           $diag ?? " ($diag)" !! (), "\n";
 
         _diff_complain( $result, $expected, $detail, $prefix )
           if defined($expected) and 2 +< ($expected =~ m/(\n)/g);
@@ -527,7 +527,7 @@ sub _diff_complain_algdiff {
         return unless $diff_kind;
 
         my $count_lines = (nelems @diff_lines);
-        my $s = $count_lines == 1 ? "" : "s";
+        my $s = $count_lines == 1 ?? "" !! "s";
         my $first_line = @diff_lines[0]->[0] + 1;
 
         print $TESTERR "# $prefix ";

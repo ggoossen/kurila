@@ -35,7 +35,7 @@ sub getprotobyname   ($)  { populate(CORE::getprotobyname(shift)) }
 sub getprotobynumber ($)  { populate(CORE::getprotobynumber(shift)) } 
 
 sub getproto ($;$) {
-    return &{'getprotoby' . (@_[0]=~m/^\d+$/ ? 'number' : 'name')}(< @_);
+    return &{'getprotoby' . (@_[0]=~m/^\d+$/ ?? 'number' !! 'name')}(< @_);
 }
 
 1;

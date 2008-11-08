@@ -123,7 +123,7 @@ plan tests => 2 + nelems(@tests);
 
 use Text::Wrap;
 
-my $rerun = %ENV{'PERL_DL_NONLAZY'} ? 0 : 1;
+my $rerun = %ENV{'PERL_DL_NONLAZY'} ?? 0 !! 1;
 
 my @st = @tests;
 while (@st) {

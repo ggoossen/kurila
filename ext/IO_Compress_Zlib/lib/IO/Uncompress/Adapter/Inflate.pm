@@ -119,8 +119,8 @@ sub sync
 {
     my $self = shift ;
     ( $self->{Inf}->inflateSync(< @_) == Z_OK) 
-            ? STATUS_OK 
-            : STATUS_ERROR ;
+            ?? STATUS_OK 
+            !! STATUS_ERROR ;
 }
 
 

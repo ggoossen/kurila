@@ -7,9 +7,9 @@ sub ok {
     my($ok, $name) = < @_;
 
     # You have to do it this way or VMS will get confused.
-    printf "\%s \%d\%s\n", $ok ? "ok" : "not ok", 
+    printf "\%s \%d\%s\n", $ok ?? "ok" !! "not ok", 
                         $test,
-                        defined $name ? " - $name" : '';
+                        defined $name ?? " - $name" !! '';
 
     printf "# Failed test at line \%d\n", (caller)[[2]] unless $ok;
 

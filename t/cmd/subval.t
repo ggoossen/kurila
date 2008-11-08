@@ -85,7 +85,7 @@ sub ary1 {
 }
 
 print "ok 23\n";
-print join(':',&ary1( < @_ )) eq '1:2:3' ? "ok 24\n" : "not ok 24\n";
+print join(':',&ary1( < @_ )) eq '1:2:3' ?? "ok 24\n" !! "not ok 24\n";
 
 sub ary2 {
     do {
@@ -98,12 +98,12 @@ sub ary2 {
 print "ok 25\n";
 
 our $x = join(':',&ary2( < @_ ));
-print $x eq '1:2:3' ? "ok 26\n" : "not ok 26 $x\n";
+print $x eq '1:2:3' ?? "ok 26\n" !! "not ok 26 $x\n";
 
 sub somesub {
     local our ($num,$P,$F,$L) = < @_;
     our ($p,$f,$l) = caller;
-    print "$p:$f:$l" eq "$P:$F:$L" ? "ok $num\n" : "not ok $num $p:$f:$l ne $P:$F:$L\n";
+    print "$p:$f:$l" eq "$P:$F:$L" ?? "ok $num\n" !! "not ok $num $p:$f:$l ne $P:$F:$L\n";
 }
 
 &somesub(27, 'main', __FILE__, __LINE__);
@@ -115,6 +115,6 @@ package foo;
 sub autov { @_[0] = 23 };
 
 my $href = \%();
-print nkeys %$href ? 'not ' : '', "ok 29\n";
+print nkeys %$href ?? 'not ' !! '', "ok 29\n";
 autov($href->{b});
-print join(':', @:< %$href) eq 'b:23' ? '' : 'not ', "ok 30\n";
+print join(':', @:< %$href) eq 'b:23' ?? '' !! 'not ', "ok 30\n";

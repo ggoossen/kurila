@@ -23,12 +23,12 @@ sub import {
 	    }
 	    $sym = "$($callpack)::$sym" unless $sym =~ m/::/;
 	    *{Symbol::fetch_glob($sym)} =
-		(  $ch eq "\$" ? \${*{Symbol::fetch_glob($sym)}}
-		 : $ch eq "\@" ? \@{*{Symbol::fetch_glob($sym)}}
-		 : $ch eq "\%" ? \%{*{Symbol::fetch_glob($sym)}}
-		 : $ch eq "\*" ? \*{Symbol::fetch_glob($sym)}
-		 : $ch eq "\&" ? \&{*{Symbol::fetch_glob($sym)}}
-		 : die("'$_' is not a valid variable name")
+		(  $ch eq "\$" ?? \${*{Symbol::fetch_glob($sym)}}
+		 !! $ch eq "\@" ?? \@{*{Symbol::fetch_glob($sym)}}
+		 !! $ch eq "\%" ?? \%{*{Symbol::fetch_glob($sym)}}
+		 !! $ch eq "\*" ?? \*{Symbol::fetch_glob($sym)}
+		 !! $ch eq "\&" ?? \&{*{Symbol::fetch_glob($sym)}}
+		 !! die("'$_' is not a valid variable name")
 		 );
 	} else {
 	    die("'$_' is not a valid variable name");

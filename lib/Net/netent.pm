@@ -41,7 +41,7 @@ sub getnetbyaddr ($;$) {
     my ($net, $addrtype);
     $net = shift;
     require Socket if (nelems @_);
-    $addrtype = (nelems @_) ? shift : Socket::AF_INET();
+    $addrtype = (nelems @_) ?? shift !! Socket::AF_INET();
     populate(CORE::getnetbyaddr($net, $addrtype)) 
 } 
 

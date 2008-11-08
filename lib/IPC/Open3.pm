@@ -218,7 +218,7 @@ sub _open3 {
     xpipe $dad_rdr, $kid_wtr if !$dup_rdr;
     xpipe $dad_err, $kid_err if !$dup_err && Symbol::glob_name(*$dad_err) ne Symbol::glob_name(*$dad_rdr);
 
-    $kidpid = $do_spawn ? -1 : xfork;
+    $kidpid = $do_spawn ?? -1 !! xfork;
     if ($kidpid == 0) {		# Kid
 	# A tie in the parent should not be allowed to cause problems.
 	untie *STDIN;

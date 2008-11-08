@@ -28,7 +28,7 @@ ok( !(nkeys(%files)),'leftover op/* files' ) or diag(join(' ',sort keys %files))
 
 cmp_ok($/,'eq',"\n",'sane input record separator');
 
-$_ = $^O eq 'MacOS' ? ":op:*" : "op/*";
+$_ = $^O eq 'MacOS' ?? ":op:*" !! "op/*";
 @glops = glob $_;
 cmp_ok("$(join ' ',@glops)",'eq',"$(join ' ',@oops)",'glob operator 1');
 

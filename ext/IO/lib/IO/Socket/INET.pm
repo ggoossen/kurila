@@ -16,7 +16,7 @@ use Errno;
 @ISA = qw(IO::Socket);
 $VERSION = "1.31";
 
-my $EINVAL = exists(&Errno::EINVAL) ? Errno::EINVAL() : 1;
+my $EINVAL = exists(&Errno::EINVAL) ?? Errno::EINVAL() !! 1;
 
 IO::Socket::INET->register_domain( AF_INET );
 
@@ -86,7 +86,7 @@ sub _sock_info {
   }
 
   if(defined $port) {
-    my $defport = ($port =~ s,\((\d+)\)$,,) ? $1 : undef;
+    my $defport = ($port =~ s,\((\d+)\)$,,) ?? $1 !! undef;
     my $pnum = @($port =~ m,^(\d+)$,)[0];
 
     @serv = @( getservbyname($port, _get_proto_name($proto) || "") )
@@ -113,7 +113,7 @@ sub _error {
     do {
       local($!);
       my $title = ref($sock).": ";
-      $@ = join("", @( @_[0] =~ m/^$title/ ? "" : $title, < @_));
+      $@ = join("", @( @_[0] =~ m/^$title/ ?? "" !! $title, < @_));
       $sock->close()
 	if(defined fileno($sock));
     };
@@ -146,8 +146,8 @@ sub configure {
 					$arg->{Proto})
 			or return _error($sock, $!, $@);
 
-    $laddr = defined $laddr ? inet_aton($laddr)
-			    : INADDR_ANY;
+    $laddr = defined $laddr ?? inet_aton($laddr)
+			    !! INADDR_ANY;
 
     return _error($sock, $EINVAL, "Bad hostname '",$arg->{LocalAddr},"'")
 	unless(defined $laddr);
@@ -253,56 +253,56 @@ sub connect {
     (nelems @_) == 2 || (nelems @_) == 3 or
        croak 'usage: $sock->connect(NAME) or $sock->connect(PORT, ADDR)';
     my $sock = shift;
-    return $sock->SUPER::connect((nelems @_) == 1 ? shift : pack_sockaddr_in(< @_));
+    return $sock->SUPER::connect((nelems @_) == 1 ?? shift !! pack_sockaddr_in(< @_));
 }
 
 sub bind {
     (nelems @_) == 2 || (nelems @_) == 3 or
        croak 'usage: $sock->bind(NAME) or $sock->bind(PORT, ADDR)';
     my $sock = shift;
-    return $sock->SUPER::bind((nelems @_) == 1 ? shift : pack_sockaddr_in(< @_))
+    return $sock->SUPER::bind((nelems @_) == 1 ?? shift !! pack_sockaddr_in(< @_))
 }
 
 sub sockaddr {
     (nelems @_) == 1 or croak 'usage: $sock->sockaddr()';
     my($sock) = < @_;
     my $name = $sock->sockname;
-    $name ? sockaddr_in($name)[1] : undef;
+    $name ?? sockaddr_in($name)[1] !! undef;
 }
 
 sub sockport {
     (nelems @_) == 1 or croak 'usage: $sock->sockport()';
     my($sock) = < @_;
     my $name = $sock->sockname;
-    $name ? sockaddr_in($name)[0] : undef;
+    $name ?? sockaddr_in($name)[0] !! undef;
 }
 
 sub sockhost {
     (nelems @_) == 1 or croak 'usage: $sock->sockhost()';
     my($sock) = < @_;
     my $addr = $sock->sockaddr;
-    $addr ? inet_ntoa($addr) : undef;
+    $addr ?? inet_ntoa($addr) !! undef;
 }
 
 sub peeraddr {
     (nelems @_) == 1 or croak 'usage: $sock->peeraddr()';
     my($sock) = < @_;
     my $name = $sock->peername;
-    $name ? sockaddr_in($name)[1] : undef;
+    $name ?? sockaddr_in($name)[1] !! undef;
 }
 
 sub peerport {
     (nelems @_) == 1 or croak 'usage: $sock->peerport()';
     my($sock) = < @_;
     my $name = $sock->peername;
-    $name ? sockaddr_in($name)[0] : undef;
+    $name ?? sockaddr_in($name)[0] !! undef;
 }
 
 sub peerhost {
     (nelems @_) == 1 or croak 'usage: $sock->peerhost()';
     my($sock) = < @_;
     my $addr = $sock->peeraddr;
-    $addr ? inet_ntoa($addr) : undef;
+    $addr ?? inet_ntoa($addr) !! undef;
 }
 
 1;

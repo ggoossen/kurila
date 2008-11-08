@@ -1,7 +1,7 @@
 #!./perl
 require './test.pl';
 
-$^I = $^O eq 'VMS' ? '_bak' : '.bak';
+$^I = $^O eq 'VMS' ?? '_bak' !! '.bak';
 
 plan( tests => 2 );
 

@@ -268,7 +268,7 @@ if( $server_pid) {
          || IO::Socket::INET->new("127.0.0.1:$serverport");
 
     if ($has_perlio) {
-	print binmode($sock, ":utf8") ? "ok 19\n" : "not ok 19\n";
+	print binmode($sock, ":utf8") ?? "ok 19\n" !! "not ok 19\n";
     } else {
 	print "ok 19 - Skip: no perlio\n";
     }
@@ -278,18 +278,18 @@ if( $server_pid) {
 	if ($has_perlio) {
 	    $sock->print("ping \x{100}\n");
 	    chomp(my $pong = scalar ~< $sock);
-	    print $pong =~ m/^pong (.+)$/ && $1 eq "\x{100}" ?
-		"ok 20\n" : "not ok 20\n";
+	    print $pong =~ m/^pong (.+)$/ && $1 eq "\x{100}" ??
+		"ok 20\n" !! "not ok 20\n";
 
 	    $sock->print("ord \x{100}\n");
 	    chomp(my $ord = scalar ~< $sock);
-	    print $ord == 0x100 ?
-		"ok 21\n" : "not ok 21\n";
+	    print $ord == 0x100 ??
+		"ok 21\n" !! "not ok 21\n";
 
 	    $sock->print("chr 0x100\n");
 	    chomp(my $chr = scalar ~< $sock);
-	    print $chr eq "\x{100}" ?
-		"ok 22\n" : "not ok 22\n";
+	    print $chr eq "\x{100}" ??
+		"ok 22\n" !! "not ok 22\n";
 	} else {
 	    print "ok $_ - Skip: no perlio\n" for 20..22;
 	}

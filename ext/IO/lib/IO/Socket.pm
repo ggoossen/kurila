@@ -41,8 +41,8 @@ sub new {
 
     %{*$sock}{'io_socket_timeout'} = delete %arg{Timeout};
 
-    return scalar(%arg) ? $sock->configure(\%arg)
-			: $sock;
+    return scalar(%arg) ?? $sock->configure(\%arg)
+			!! $sock;
 }
 
 my @domain2pkg;
@@ -115,7 +115,7 @@ sub connect {
 
 	    undef $!;
 	    if (!$sel->can_write($timeout)) {
-		$err = $! || (exists &Errno::ETIMEDOUT ? &Errno::ETIMEDOUT( < @_ ) : 1);
+		$err = $! || (exists &Errno::ETIMEDOUT ?? &Errno::ETIMEDOUT( < @_ ) !! 1);
 		$@ = "connect: timeout";
 	    }
 	    elsif (!connect($sock,$addr) &&
@@ -138,7 +138,7 @@ sub connect {
 
     $! = $err if $err;
 
-    $err ? undef : $sock;
+    $err ?? undef !! $sock;
 }
 
 # Enable/disable blocking IO on sockets.
@@ -175,7 +175,7 @@ sub blocking {
     my $block = shift;
     
     if ( !$block != !$orig ) {
-        %{*$sock}{io_sock_nonblocking} = $block ? 0 : 1;
+        %{*$sock}{io_sock_nonblocking} = $block ?? 0 !! 1;
         ioctl($sock, 0x8004667e, pack("L!",%{*$sock}{io_sock_nonblocking}))
             or return undef;
     }
@@ -196,8 +196,8 @@ sub bind {
     my $sock = shift;
     my $addr = shift;
 
-    return bind($sock, $addr) ? $sock
-			      : undef;
+    return bind($sock, $addr) ?? $sock
+			      !! undef;
 }
 
 sub listen {
@@ -206,8 +206,8 @@ sub listen {
     $queue = 5
 	unless $queue && $queue +> 0;
 
-    return listen($sock, $queue) ? $sock
-				 : undef;
+    return listen($sock, $queue) ?? $sock
+				 !! undef;
 }
 
 sub accept {
@@ -225,7 +225,7 @@ sub accept {
 
 	unless ( @( $sel->can_read($timeout) ) ) {
 	    $@ = 'accept: timeout';
-	    $! = (exists &Errno::ETIMEDOUT ? &Errno::ETIMEDOUT( < @_ ) : 1);
+	    $! = (exists &Errno::ETIMEDOUT ?? &Errno::ETIMEDOUT( < @_ ) !! 1);
 	    return;
 	}
     }
@@ -263,8 +263,8 @@ sub send {
 	 unless(defined $peer);
 
     my $r = defined(getpeername($sock))
-	? send($sock, @_[1], $flags)
-	: send($sock, @_[1], $flags, $peer);
+	?? send($sock, @_[1], $flags)
+	!! send($sock, @_[1], $flags, $peer);
 
     # remember who we send to, if it was successful
     %{*$sock}{'io_socket_peername'} = $peer
@@ -308,8 +308,8 @@ sub getsockopt {
 
 sub sockopt {
     my $sock = shift;
-    (nelems @_) == 1 ? $sock->getsockopt(SOL_SOCKET,< @_)
-	    : $sock->setsockopt(SOL_SOCKET,< @_);
+    (nelems @_) == 1 ?? $sock->getsockopt(SOL_SOCKET,< @_)
+	    !! $sock->setsockopt(SOL_SOCKET,< @_);
 }
 
 sub atmark {
@@ -323,7 +323,7 @@ sub timeout {
     my($sock,$val) = < @_;
     my $r = %{*$sock}{'io_socket_timeout'};
 
-    %{*$sock}{'io_socket_timeout'} = defined $val ? 0 + $val : $val
+    %{*$sock}{'io_socket_timeout'} = defined $val ?? 0 + $val !! $val
 	if((nelems @_) == 2);
 
     $r;

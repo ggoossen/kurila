@@ -86,7 +86,7 @@ sub import {
 	    my $full_name = "$($pkg)::$name";
 	    %declared{$full_name}++;
 	    if ($multiple || (nelems @_) == 1) {
-		my $scalar = $multiple ? $constants->{$name} : @_[0];
+		my $scalar = $multiple ?? $constants->{$name} !! @_[0];
                 *{Symbol::fetch_glob($full_name)} = sub () { $scalar };
 	    } elsif ((nelems @_)) {
 		my @list = @_;

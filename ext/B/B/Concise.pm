@@ -312,24 +312,24 @@ sub compile {
 
 	    if (!ref $objname && $objname eq "BEGIN") {
 		concise_specials("BEGIN", $order,
-				 B::begin_av->isa("B::AV") ? <
-				 B::begin_av->ARRAY : ());
+				 B::begin_av->isa("B::AV") ?? <
+				 B::begin_av->ARRAY !! ());
 	    } elsif (!ref $objname && $objname eq "INIT") {
 		concise_specials("INIT", $order,
-				 B::init_av->isa("B::AV") ? <
-				 B::init_av->ARRAY : ());
+				 B::init_av->isa("B::AV") ?? <
+				 B::init_av->ARRAY !! ());
 	    } elsif (!ref $objname && $objname eq "CHECK") {
 		concise_specials("CHECK", $order,
-				 B::check_av->isa("B::AV") ? <
-				 B::check_av->ARRAY : ());
+				 B::check_av->isa("B::AV") ?? <
+				 B::check_av->ARRAY !! ());
 	    } elsif (!ref $objname && $objname eq "UNITCHECK") {
 		concise_specials("UNITCHECK", $order,
-				 B::unitcheck_av->isa("B::AV") ? <
-				 B::unitcheck_av->ARRAY : ());
+				 B::unitcheck_av->isa("B::AV") ?? <
+				 B::unitcheck_av->ARRAY !! ());
 	    } elsif (!ref $objname && $objname eq "END") {
 		concise_specials("END", $order,
-				 B::end_av->isa("B::AV") ? <
-				 B::end_av->ARRAY : ());
+				 B::end_av->isa("B::AV") ?? <
+				 B::end_av->ARRAY !! ());
 	    }
 	    else {
 		# convert function names to subrefs
@@ -539,10 +539,10 @@ sub fmt_line {    # generate text-line for op.
 
     # spec: (?(text1#varText2)?)
     $text =~ s/\(\?\(([^\#]*?)\#(\w+)([^\#]*?)\)\?\)/$(
-	$hr->{$2} ? $1.$hr->{$2}.$3 : "" )/g;
+	$hr->{$2} ?? $1.$hr->{$2}.$3 !! "" )/g;
 
     # spec: (x(exec_text;basic_text)x)
-    $text =~ s/\(x\((.*?);(.*?)\)x\)/$( $order eq "exec" ? $1 : $2 )/gs;
+    $text =~ s/\(x\((.*?);(.*?)\)x\)/$( $order eq "exec" ?? $1 !! $2 )/gs;
 
     # spec: (*(text)*)
     $text =~ s/\(\*\(([^;]*?)\)\*\)/$( $1 x $level )/gs;
@@ -743,7 +743,7 @@ sub concise_op {
     } elsif ($op->name =~ m/^leave(sub(lv)?|write)?$/) {
 	# targ potentially holds a reference count
 	if ($op->private ^&^ 64) {
-	    my $refs = "ref" . (%h{targ} != 1 ? "s" : "");
+	    my $refs = "ref" . (%h{targ} != 1 ?? "s" !! "");
 	    %h{targarglife} = %h{targarg} = "%h{targ} $refs";
 	}
     } elsif (%h{targ}) {
@@ -807,11 +807,11 @@ sub concise_op {
     } elsif (%h{class} eq "COP") {
 	my $label = $op->label;
 	%h{coplabel} = $label;
-	$label = $label ? "$label: " : "";
-	my $loc = $op->location ? $op->location[0] : '<unknown>';
+	$label = $label ?? "$label: " !! "";
+	my $loc = $op->location ?? $op->location[0] !! '<unknown>';
 	my $pathnm = $loc;
 	$loc =~ s[.*/][];
-	my $ln = $op->location ? $op->location[1] : '-1';
+	my $ln = $op->location ?? $op->location[1] !! '-1';
 	$loc .= ":$ln";
 	my($stash, $cseq) = ($op->stash->NAME, $op->cop_seq - $cop_seq_base);
 	%h{arg} = "($label$stash $cseq $loc)";
@@ -829,7 +829,7 @@ sub concise_op {
     }
     elsif (%h{class} eq "SVOP" or %h{class} eq "PADOP") {
 	unless (%h{name} eq 'aelemfast' and $op->flags ^&^ OPf_SPECIAL) {
-	    my $idx = (%h{class} eq "SVOP") ? $op->targ : $op->padix;
+	    my $idx = (%h{class} eq "SVOP") ?? $op->targ !! $op->padix;
 	    my $preferpv = %h{name} eq "method_named";
 	    if (%h{class} eq "PADOP" or !${$op->sv}) {
 		my $sv = $curcv->PADLIST->ARRAY[1]->ARRAY[$idx];
@@ -845,7 +845,7 @@ sub concise_op {
     %h{opt} = $op->opt;
     %h{label} = %labels{$$op};
     %h{next} = $op->next;
-    %h{next} = (class(%h{next}) eq "NULL") ? "(end)" : seq(%h{next});
+    %h{next} = (class(%h{next}) eq "NULL") ?? "(end)" !! seq(%h{next});
     %h{nextaddr} = sprintf("\%#x", $ {$op->next});
     %h{sibaddr} = sprintf("\%#x", $ {$op->sibling});
     %h{firstaddr} = sprintf("\%#x", $ {$op->first}) if $op->can("first");
@@ -984,7 +984,7 @@ sub tree {
 # Remember, this needs to stay the last things in the module.
 
 # Why is this different for MacOS?  Does it matter?
-my $cop_seq_mnum = $^O eq 'MacOS' ? 14 : 13;
+my $cop_seq_mnum = $^O eq 'MacOS' ?? 14 !! 13;
 $cop_seq_base = svref_2object(eval 'sub{0;}')->START->cop_seq + $cop_seq_mnum;
 
 1;

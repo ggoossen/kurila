@@ -37,7 +37,7 @@ if (%args{v}) {
 %args{filename} = shift @ARGV;
 
 process_file(< %args);
-exit( ExtUtils::ParseXS::errors() ? 1 : 0 );
+exit( ExtUtils::ParseXS::errors() ?? 1 !! 0 );
 
 __END__
 

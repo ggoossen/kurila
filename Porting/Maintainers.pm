@@ -41,9 +41,9 @@ sub get_module_files {
     my $m = shift;
     sort { lc $a cmp lc $b }
  map {
-	-f $_ ? # Files as-is.
-	    $_ :
-	    -d _ ? # Recurse into directories.
+	-f $_ ?? # Files as-is.
+	    $_ !!
+	    -d _ ?? # Recurse into directories.
 	    do {
 		my @files;
 		find(
@@ -53,7 +53,7 @@ sub get_module_files {
 		     }, $_);
 		@files;
 	    }
-	: glob( <$_) # The rest are globbable patterns.
+	!! glob( <$_) # The rest are globbable patterns.
 	} get_module_pat($m);
 }
 

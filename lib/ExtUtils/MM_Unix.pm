@@ -205,7 +205,7 @@ sub cflags {
     } else {
 	$uc = ""; # avoid warning
     }
-    $perltype = %map{$uc} ? %map{$uc} : "";
+    $perltype = %map{$uc} ?? %map{$uc} !! "";
 
     if ($uc =~ m/^D/) {
 	$optdebug = "-g";
@@ -856,7 +856,7 @@ sub dynamic_bs {
 BOOTSTRAP =
 ' unless $self->has_link_code();
 
-    my $target = %Is{VMS} ? '$(MMS$TARGET)' : '$@';
+    my $target = %Is{VMS} ?? '$(MMS$TARGET)' !! '$@';
 
     return sprintf <<'MAKE_FRAG', ($target) x 5;
 BOOTSTRAP = $(BASEEXT).bs
@@ -897,8 +897,8 @@ sub dynamic_lib {
     my($ldfrom) = '$(LDFROM)';
     $armaybe = 'ar' if (%Is{OSF} and $armaybe eq ':');
     my(@m);
-    my $ld_opt = %Is{OS2} ? '$(OPTIMIZE) ' : '';	# Useful on other systems too?
-    my $ld_fix = %Is{OS2} ? '|| ( $(RM_F) $@ && sh -c false )' : '';
+    my $ld_opt = %Is{OS2} ?? '$(OPTIMIZE) ' !! '';	# Useful on other systems too?
+    my $ld_fix = %Is{OS2} ?? '|| ( $(RM_F) $@ && sh -c false )' !! '';
     push(@m,'
 # This section creates the dynamically loadable $(INST_DYNAMIC)
 # from $(OBJECT) and possibly $(MYEXTLIB).
@@ -917,8 +917,8 @@ $(INST_DYNAMIC): $(OBJECT) $(MYEXTLIB) $(BOOTSTRAP) $(INST_ARCHAUTODIR)$(DFSEP).
     $ldfrom = "-all $ldfrom -none" if %Is{OSF};
 
     # The IRIX linker doesn't use LD_RUN_PATH
-    my $ldrun = %Is{IRIX} && $self->{LD_RUN_PATH} ?         
-                       qq{-rpath "$self->{LD_RUN_PATH}"} : '';
+    my $ldrun = %Is{IRIX} && $self->{LD_RUN_PATH} ??         
+                       qq{-rpath "$self->{LD_RUN_PATH}"} !! '';
 
     # For example in AIX the shared objects/libraries from previous builds
     # linger quite a while in the shared dynalinker cache even when nobody
@@ -1254,8 +1254,8 @@ sub init_dirscan {	# --- File and Directory Lists (.xs .pm .pod etc)
     my %ignore = %( < map {( $_ => 1 )} qw(Makefile.PL Build.PL test.pl t) );
 
     # ignore the distdir
-    %Is{VMS} ? %ignore{"$self->{DISTVNAME}.dir"} = 1
-            : %ignore{$self->{DISTVNAME}} = 1;
+    %Is{VMS} ?? %ignore{"$self->{DISTVNAME}.dir"} = 1
+            !! %ignore{$self->{DISTVNAME}} = 1;
  <
     %ignore{[ map lc, keys %ignore]} = < values %ignore if %Is{VMS};
 
@@ -1608,12 +1608,12 @@ sub init_main {
               $self->catdir("$self->{PERL_SRC}","xlib",$Cross::platform);
             $self->{PERL_INC}     = 
               $self->catdir("$self->{PERL_SRC}","xlib",$Cross::platform, 
-                                 %Is{Win32}?("CORE"):());
+                                 %Is{Win32}??("CORE")!!());
         }
         else {
             $self->{PERL_ARCHLIB} = $self->{PERL_LIB};
-            $self->{PERL_INC}     = (%Is{Win32}) ? 
-              $self->catdir($self->{PERL_LIB},"CORE") : $self->{PERL_SRC};
+            $self->{PERL_INC}     = (%Is{Win32}) ?? 
+              $self->catdir($self->{PERL_LIB},"CORE") !! $self->{PERL_SRC};
         }
 
 	# catch a situation that has occurred a few times in the past:
@@ -1659,8 +1659,8 @@ from the perl source tree.
 	    if ($lib) {
               # Win32 puts its header files in /perl/src/lib/CORE.
               # Unix leaves them in /perl/src.
-	      my $inc = %Is{Win32} ? $self->catdir($lib, "CORE" )
-                                  : dirname $lib;
+	      my $inc = %Is{Win32} ?? $self->catdir($lib, "CORE" )
+                                  !! dirname $lib;
 	      if (-e $self->catdir($inc, "perl.h")) {
 		$self->{PERL_LIB}	   = $lib;
 		$self->{PERL_ARCHLIB}	   = $lib;
@@ -1766,7 +1766,7 @@ sub init_others {	# --- Initialize Other Attributes
 	$self->{OBJECT} = '$(BASEEXT)$(OBJ_EXT)' if @{$self->{C}};
     }
     $self->{OBJECT} =~ s/\n+/ \\\n\t/g;
-    $self->{BOOTDEP}  = (-f "$self->{BASEEXT}_BS") ? "$self->{BASEEXT}_BS" : "";
+    $self->{BOOTDEP}  = (-f "$self->{BASEEXT}_BS") ?? "$self->{BASEEXT}_BS" !! "";
     $self->{PERLMAINCC} ||= '$(CC)';
     $self->{LDFROM} = '$(OBJECT)' unless $self->{LDFROM};
 
@@ -1776,8 +1776,8 @@ sub init_others {	# --- Initialize Other Attributes
     # use dynamic loading) or the caller asked for it explicitly.
     if (!$self->{LINKTYPE}) {
        $self->{LINKTYPE} = $self->{SKIPHASH}->{'dynamic'}
-                        ? 'static'
-                        : (%Config{usedl} ? 'dynamic' : 'static');
+                        ?? 'static'
+                        !! (%Config{usedl} ?? 'dynamic' !! 'static');
     };
 
     $self->{NOOP}               ||= '$(SHELL) -c true';
@@ -1924,8 +1924,8 @@ sub init_PERL {
     my $thisperl = $self->canonpath($^X);
     $thisperl .= %Config{exe_ext} unless 
                 # VMS might have a file version # at the end
-      %Is{VMS} ? $thisperl =~ m/%Config{exe_ext}(;\d+)?$/i
-              : $thisperl =~ m/%Config{exe_ext}$/i;
+      %Is{VMS} ?? $thisperl =~ m/%Config{exe_ext}(;\d+)?$/i
+              !! $thisperl =~ m/%Config{exe_ext}$/i;
 
     # We need a relative path to perl when in the core.
     $thisperl = $self->abs2rel($thisperl) if $self->{PERL_CORE};
@@ -2269,8 +2269,8 @@ Defines the linkext target which in turn defines the LINKTYPE.
 sub linkext {
     my($self, < %attribs) = < @_;
     # LINKTYPE => static or dynamic or ''
-    my($linktype) = defined %attribs{LINKTYPE} ?
-      %attribs{LINKTYPE} : '$(LINKTYPE)';
+    my($linktype) = defined %attribs{LINKTYPE} ??
+      %attribs{LINKTYPE} !! '$(LINKTYPE)';
     "
 linkext :: $linktype
 	\$(NOECHO) \$(NOOP)
@@ -2487,7 +2487,7 @@ MAP_PRELIBS   = %Config{perllibs} %Config{cryptlib}
     }
 
     # SUNOS ld does not take the full path to a shared library
-    my $llibperl = $libperl ? '$(MAP_LIBPERL)' : '-lperl';
+    my $llibperl = $libperl ?? '$(MAP_LIBPERL)' !! '-lperl';
 
     push @m, "
 MAP_LIBPERL = $libperl
@@ -2572,7 +2572,7 @@ $(OBJECT) : $(FIRST_MAKEFILE)
 
 ' if $self->{OBJECT};
 
-    my $newer_than_target = %Is{VMS} ? '$(MMS$SOURCE_LIST)' : '$?';
+    my $newer_than_target = %Is{VMS} ?? '$(MMS$SOURCE_LIST)' !! '$?';
     my $mpl_args = join " ", map qq["$_"], @ARGV;
 
     $m .= sprintf <<'MAKE_FRAG', $newer_than_target, $mpl_args;
@@ -2652,7 +2652,7 @@ sub parse_abstract {
     my $package = $self->{DISTNAME};
     $package =~ s/-/::/g;
     while (~< $fh) {
-        $inpod = m/^=(?!cut)/ ? 1 : m/^=cut/ ? 0 : $inpod;
+        $inpod = m/^=(?!cut)/ ?? 1 !! m/^=cut/ ?? 0 !! $inpod;
         next if !$inpod;
         chop;
         next unless m/^($package\s-\s)(.*)/;
@@ -2688,7 +2688,7 @@ sub parse_version {
     open(my $fh, '<', $parsefile) or die "Could not open '$parsefile': $!";
     my $inpod = 0;
     while (~< $fh) {
-        $inpod = m/^=(?!cut)/ ? 1 : m/^=cut/ ? 0 : $inpod;
+        $inpod = m/^=(?!cut)/ ?? 1 !! m/^=cut/ ?? 0 !! $inpod;
         next if $inpod || m/^\s*#/;
         chop;
         next unless m/(?<!\\)([\$*])(([\w\:\']*)\bVERSION)\b.*\=/;
@@ -2738,7 +2738,7 @@ sub pasthru {
     my(@m);
 
     my(@pasthru);
-    my($sep) = %Is{VMS} ? ',' : '';
+    my($sep) = %Is{VMS} ?? ',' !! '';
     $sep .= "\\\n\t";
 
     foreach my $key (qw(LIB LIBPERL_A LINKTYPE OPTIMIZE
@@ -3087,8 +3087,8 @@ sub processPL {
     my $m = '';
     foreach my $plfile (sort keys %$pl_files) {
         my $list = ref($pl_files->{$plfile})
-                     ?  $pl_files->{$plfile}
-		     : \@($pl_files->{$plfile});
+                     ??  $pl_files->{$plfile}
+		     !! \@($pl_files->{$plfile});
 
 	foreach my $target ( @$list) {
             if( %Is{VMS} ) {

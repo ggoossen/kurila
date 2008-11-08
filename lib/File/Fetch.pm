@@ -19,7 +19,7 @@ use vars <    qw[ $VERBOSE $PREFER_BIN $FROM_EMAIL $USER_AGENT
                 $FTP_PASSIVE $TIMEOUT $DEBUG $WARN
             ];
 
-use constant QUOTE  => do { $^O eq 'MSWin32' ? q["] : q['] };            
+use constant QUOTE  => do { $^O eq 'MSWin32' ?? q["] !! q['] };            
             
 
 $VERSION        = '0.14';
@@ -423,8 +423,8 @@ sub fetch {
 
     ### we dont use catfile on win32 because if we are using a cygwin tool
     ### under cmd.exe they wont understand windows style separators.
-    my $out_to = ON_WIN ? $to.'/'.$self->output_file 
-                        : File::Spec->catfile( $to, < $self->output_file );
+    my $out_to = ON_WIN ?? $to.'/'.$self->output_file 
+                        !! File::Spec->catfile( $to, < $self->output_file );
     
     for my $method (  @{ $METHODS->{$self->scheme} } ) {
         my $sub =  '_'.$method.'_fetch';
@@ -510,7 +510,7 @@ sub _lwp_fetch {
 
         ### special rules apply for file:// uris ###
         $uri->scheme( < $self->scheme );
-        $uri->host( $self->scheme eq 'file' ? '' : < $self->host );
+        $uri->host( $self->scheme eq 'file' ?? '' !! < $self->host );
         $uri->userinfo("anonymous:$FROM_EMAIL") if $self->scheme ne 'file';
 
         ### set up the useragent object
@@ -619,8 +619,8 @@ sub _wget_fetch {
         push @$cmd, '--output-document', 
                     ### DO NOT quote things for IPC::Run, it breaks stuff.
                     $IPC::Cmd::USE_IPC_RUN
-                        ? ($to, < $self->uri)
-                        : (QUOTE. $to .QUOTE, QUOTE. $self->uri .QUOTE);
+                        ?? ($to, < $self->uri)
+                        !! (QUOTE. $to .QUOTE, QUOTE. $self->uri .QUOTE);
 
         ### shell out ###
         my $captured;
@@ -723,8 +723,8 @@ sub _lynx_fetch {
 
         ### DO NOT quote things for IPC::Run, it breaks stuff.
         push @$cmd, $IPC::Cmd::USE_IPC_RUN
-                        ? < $self->uri
-                        : QUOTE. $self->uri .QUOTE;
+                        ?? < $self->uri
+                        !! QUOTE. $self->uri .QUOTE;
 
 
         ### shell out ###
@@ -782,8 +782,8 @@ sub _ncftp_fetch {
                                     # remote path to the file
             ### DO NOT quote things for IPC::Run, it breaks stuff.
             $IPC::Cmd::USE_IPC_RUN
-                        ? < File::Spec::Unix->catdir( < $self->path, < $self->file )
-                        : QUOTE. File::Spec::Unix->catdir( < 
+                        ?? < File::Spec::Unix->catdir( < $self->path, < $self->file )
+                        !! QUOTE. File::Spec::Unix->catdir( < 
                                         $self->path, < $self->file ) .QUOTE
             
         );
@@ -835,8 +835,8 @@ sub _curl_fetch {
         push @$cmd, '--fail', '--location', '--output', 
                     ### DO NOT quote things for IPC::Run, it breaks stuff.
                     $IPC::Cmd::USE_IPC_RUN
-                        ? ($to, < $self->uri)
-                        : (QUOTE. $to .QUOTE, QUOTE. $self->uri .QUOTE);
+                        ?? ($to, < $self->uri)
+                        !! (QUOTE. $to .QUOTE, QUOTE. $self->uri .QUOTE);
 
         my $captured;
         unless(run( command => $cmd,
@@ -946,8 +946,8 @@ sub _rsync_fetch {
 
         ### DO NOT quote things for IPC::Run, it breaks stuff.
         push @$cmd, $IPC::Cmd::USE_IPC_RUN
-                        ? ( <$self->uri, $to)
-                        : (QUOTE. $self->uri .QUOTE, QUOTE. $to .QUOTE);
+                        ?? ( <$self->uri, $to)
+                        !! (QUOTE. $self->uri .QUOTE, QUOTE. $to .QUOTE);
 
         my $captured;
         unless(run( command => $cmd,
@@ -991,7 +991,7 @@ sub _error {
     $self->_error_msg_long( < Carp::longmess($error) );
     
     if( $WARN ) {
-        carp $DEBUG ? < $self->_error_msg_long : < $self->_error_msg;
+        carp $DEBUG ?? < $self->_error_msg_long !! < $self->_error_msg;
     }
 
     return;
@@ -999,7 +999,7 @@ sub _error {
 
 sub error {
     my $self = shift;
-    return shift() ? $self->_error_msg_long : $self->_error_msg;
+    return shift() ?? $self->_error_msg_long !! $self->_error_msg;
 }
 
 

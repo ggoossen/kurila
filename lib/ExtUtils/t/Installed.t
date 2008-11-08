@@ -153,11 +153,11 @@ is( (nelems $ei->modules), 3,    'modules() in scalar context' );
 # files
 $ei->{goodmod} = \%(
         packlist => \%(
-                (config_value("man1direxp") ?
-                    (File::Spec->catdir(config_value("man1direxp"), 'foo') => 1) :
+                (config_value("man1direxp") ??
+                    (File::Spec->catdir(config_value("man1direxp"), 'foo') => 1) !!
                         ()),
-                (config_value("man3direxp") ?
-                    (File::Spec->catdir(config_value("man3direxp"), 'bar') => 1) :
+                (config_value("man3direxp") ??
+                    (File::Spec->catdir(config_value("man3direxp"), 'bar') => 1) !!
                         ()),
                 File::Spec->catdir($prefix, 'foobar') => 1,
                 foobaz  => 1,
@@ -203,19 +203,19 @@ SKIP: do {
 };
 @dirs = $ei->directories('goodmod');
 is( scalar nelems @dirs, 2 + $mandirs, '... should find all files files() would, again' );
-@files = sort map { exists %dirnames{lc($_)} ? %dirnames{lc($_)} : '' } @files;
+@files = sort map { exists %dirnames{lc($_)} ?? %dirnames{lc($_)} !! '' } @files;
 is( join(' ', @files), join(' ', @dirs), '... should sort output' );
 
 # directory_tree
 my $expectdirs =
        ($mandirs == 2) &&
        (dirname(config_value("man1direxp")) eq dirname(config_value("man3direxp")))
-       ? 3 : 2;
+       ?? 3 !! 2;
 
 SKIP: do {
     skip('no man directories on this system', 1) unless $mandirs;
-    @dirs = $ei->directory_tree('goodmod', 'doc', config_value("man1direxp") ?
-       dirname(config_value("man1direxp")) : dirname(config_value("man3direxp")));
+    @dirs = $ei->directory_tree('goodmod', 'doc', config_value("man1direxp") ??
+       dirname(config_value("man1direxp")) !! dirname(config_value("man3direxp")));
     is( scalar nelems @dirs, $expectdirs,
         'directory_tree() should report intermediate dirs to those requested' );
 };

@@ -24,8 +24,8 @@ $Is_VMS   = $^O eq 'VMS';
 require VMS::Filespec if $Is_VMS;
 
 $Debug   = %ENV{PERL_MM_MANIFEST_DEBUG} || 0;
-$Verbose = defined %ENV{PERL_MM_MANIFEST_VERBOSE} ?
-                   %ENV{PERL_MM_MANIFEST_VERBOSE} : 1;
+$Verbose = defined %ENV{PERL_MM_MANIFEST_VERBOSE} ??
+                   %ENV{PERL_MM_MANIFEST_VERBOSE} !! 1;
 $Quiet = 0;
 $MANIFEST = 'MANIFEST';
 
@@ -100,7 +100,7 @@ sub mkmanifest {
     my $found = manifind();
     my($key,$val,%all);
     %all = %(< %$found, < %$read);
-    %all{$MANIFEST} = ($Is_VMS ? "$MANIFEST\t\t" : '') . 'This list of files'
+    %all{$MANIFEST} = ($Is_VMS ?? "$MANIFEST\t\t" !! '') . 'This list of files'
         if $manimiss; # add new MANIFEST to known file list
     foreach my $file ( _sort < keys %all) {
 	if ($skip->($file)) {
@@ -162,7 +162,7 @@ sub manifind {
     # Also, it's okay to use / here, because MANIFEST files use Unix-style 
     # paths.
     find(\%(wanted => $wanted),
-	 $Is_MacOS ? ":" : ".");
+	 $Is_MacOS ?? ":" !! ".");
 
     return $found;
 }
@@ -280,7 +280,7 @@ sub _check_manifest {
         next if $skip->($file);
         warn "Debug: manicheck checking from disk $file\n" if $Debug;
         unless ( exists $read->{$file} ) {
-            my $canon = $Is_MacOS ? "\t" . _unmacify($file) : '';
+            my $canon = $Is_MacOS ?? "\t" . _unmacify($file) !! '';
             warn "Not in $MANIFEST: $file$canon\n" unless $Quiet;
             push @missentry, $file;
         }
@@ -359,7 +359,7 @@ sub _maniskip {
     close M;
     return sub {0} unless (scalar nelems @skip +> 0);
 
-    my $opts = $Is_VMS ? '(?i)' : '';
+    my $opts = $Is_VMS ?? '(?i)' !! '';
 
     # Make sure each entry is isolated in its own parentheses, in case
     # any of them contain alternations
@@ -468,7 +468,7 @@ sub manicopy {
     require File::Basename;
 
     $target = VMS::Filespec::unixify($target) if $Is_VMS;
-    File::Path::mkpath(\@( $target ),! $Quiet,$Is_VMS ? undef : 0755);
+    File::Path::mkpath(\@( $target ),! $Quiet,$Is_VMS ?? undef !! 0755);
     foreach my $file (keys %$read){
     	if ($Is_MacOS) {
 	    if ($file =~ m!:!) { 
@@ -482,7 +482,7 @@ sub manicopy {
 	    if ($file =~ m!/!) { # Ilya, that hurts, I fear, or maybe not?
 		my $dir = File::Basename::dirname($file);
 		$dir = VMS::Filespec::unixify($dir) if $Is_VMS;
-		File::Path::mkpath(\@("$target/$dir"),! $Quiet,$Is_VMS ? undef : 0755);
+		File::Path::mkpath(\@("$target/$dir"),! $Quiet,$Is_VMS ?? undef !! 0755);
 	    }
 	    cp_if_diff($file, "$target/$file", $how);
 	}
@@ -523,7 +523,7 @@ sub cp {
     my ($access,$mod) = < @(stat $srcFile)[[8..9]];
 
     copy($srcFile,$dstFile);
-    utime $access, $mod + ($Is_VMS ? 1 : 0), $dstFile;
+    utime $access, $mod + ($Is_VMS ?? 1 !! 0), $dstFile;
     _manicopy_chmod($srcFile, $dstFile);
 }
 
@@ -547,7 +547,7 @@ sub _manicopy_chmod {
     my($srcFile, $dstFile) = < @_;
 
     my $perm = 0444 ^|^ @(stat $srcFile)[2] ^&^ 0700;
-    chmod( $perm ^|^ ( $perm ^&^ 0100 ? 0111 : 0 ), $dstFile );
+    chmod( $perm ^|^ ( $perm ^&^ 0100 ?? 0111 !! 0 ), $dstFile );
 }
 
 # Files that are often modified in the distdir.  Don't hard link them.

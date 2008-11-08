@@ -227,8 +227,8 @@ sub check_install {
             ### files need to be in unix format under vms,
             ### or they might be loaded twice
             $href->{file} = ON_VMS
-                ? VMS::Filespec::unixify( $filename )
-                : $filename;
+                ?? VMS::Filespec::unixify( $filename )
+                !! $filename;
     
             ### user wants us to find the version from files
             if( $FIND_VERSION ) {
@@ -241,7 +241,7 @@ sub check_install {
                     ### versions after installing Text::NSP 1.03" where a 
                     ### VERSION mentioned in the POD was found before
                     ### the real $VERSION declaration.
-                    $in_pod = m/^=(?!cut)/ ? 1 : m/^=cut/ ? 0 : $in_pod;
+                    $in_pod = m/^=(?!cut)/ ?? 1 !! m/^=cut/ ?? 0 !! $in_pod;
                     next if $in_pod;
                     
                     ### try to find a version declaration in this string.
@@ -330,9 +330,9 @@ sub _parse_version {
         };
         
         
-        my $rv = defined $result ? $result : '0.0';
+        my $rv = defined $result ?? $result !! '0.0';
 
-        print( $@ ? "Error: $@\n" : "Result: $rv\n" ) if $verbose;
+        print( $@ ?? "Error: $@\n" !! "Result: $rv\n" ) if $verbose;
 
         return version->new($rv);
     }

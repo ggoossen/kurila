@@ -36,7 +36,7 @@ sub saveErrorString
 {
     my $self   = shift ;
     my $retval = shift ;
-    ${ $self->{Error} } = shift() . (${$self->{Error}} ? "\nprevious: ${$self->{Error}}" : "") ;
+    ${ $self->{Error} } = shift() . (${$self->{Error}} ?? "\nprevious: ${$self->{Error}}" !! "") ;
     ${ $self->{ErrorNo} } = shift() + 0 if (nelems @_) ;
 
     return $retval;
@@ -154,7 +154,7 @@ sub checkParams
             'FilterEnvelope' => \@(1, 1, Parse_any,   undef),
 
             < $self->getExtraParams(),
-            $self->{OneShot} ? < $self->getOneShotParams() : (),
+            $self->{OneShot} ?? < $self->getOneShotParams() !! (),
         ), 
         < @_) or die("$(dump::view($class)): $(dump::view($got->{Error}))")  ;
 
@@ -344,9 +344,9 @@ sub _def
         my $inFile = ($x->{inType} eq 'filenames' 
                         || $x->{inType} eq 'filename');
 
-        $x->{inType} = $inFile ? 'filename' : 'buffer';
+        $x->{inType} = $inFile ?? 'filename' !! 'buffer';
         
-        foreach my $in (@($x->{oneInput} ? $input : < @$input))
+        foreach my $in (@($x->{oneInput} ?? $input !! < @$input))
         {
             my $out ;
             $x->{oneInput} = 1 ;
@@ -552,7 +552,7 @@ sub syswrite
 
 
     if ((nelems @_) +> 1) {
-        my $slen = defined $$buffer ? length($$buffer) : 0;
+        my $slen = defined $$buffer ?? length($$buffer) !! 0;
         my $len = $slen;
         my $offset = 0;
         $len = @_[1] if @_[1] +< $len;
@@ -580,7 +580,7 @@ sub syswrite
 
     $self->filterUncompressed($buffer);
 
-    my $buffer_length = defined $$buffer ? length($$buffer) : 0 ;
+    my $buffer_length = defined $$buffer ?? length($$buffer) !! 0 ;
     $self->{UnCompSize}->add($buffer_length) ;
 
     my $outBuffer='';
@@ -854,8 +854,8 @@ sub fileno
 {
     my $self     = shift ;
     return defined $self->{FH} 
-            ? fileno($self->{FH}) 
-            : undef ;
+            ?? fileno($self->{FH}) 
+            !! undef ;
 }
 
 sub opened
@@ -868,8 +868,8 @@ sub autoflush
 {
     my $self     = shift ;
     return defined $self->{FH} 
-            ? $self->{FH}->autoflush(< @_) 
-            : undef ;
+            ?? $self->{FH}->autoflush(< @_) 
+            !! undef ;
 }
 
 sub input_line_number

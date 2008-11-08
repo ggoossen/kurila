@@ -326,7 +326,7 @@ sub ok {
 
     # $test might contain an object which we don't want to accidentally
     # store, so we turn it into a boolean.
-    $test = $test ? 1 : 0;
+    $test = $test ?? 1 !! 0;
 
     $self->_plan_check;
 
@@ -349,7 +349,7 @@ ERR
 
     unless( $test ) {
         $out .= "not ";
- <        %$result{[@('ok', 'actual_ok') ]} = ( ( $todo ? 1 : 0 ), 0 );
+ <        %$result{[@('ok', 'actual_ok') ]} = ( ( $todo ?? 1 !! 0 ), 0 );
     }
     else { <
         %$result{[@('ok', 'actual_ok') ]} = ( 1, $test );
@@ -383,7 +383,7 @@ ERR
     $self->_print($out);
 
     unless( $test ) {
-        my $msg = $todo ? "Failed (TODO)" : "Failed";
+        my $msg = $todo ?? "Failed (TODO)" !! "Failed";
         $self->_print_diag("\n") if %ENV{HARNESS_ACTIVE};
 
     my(undef, $file, $line) = < $self->caller;
@@ -396,13 +396,13 @@ ERR
         }
     } 
 
-    return $test ? 1 : 0;
+    return $test ?? 1 !! 0;
 }
 
 sub _is_object {
     my($self, $thing) = < @_;
 
-    return $self->_try(sub { ref $thing && $thing->isa('UNIVERSAL') }) ? 1 : 0;
+    return $self->_try(sub { ref $thing && $thing->isa('UNIVERSAL') }) ?? 1 !! 0;
 }
 
 
@@ -829,7 +829,7 @@ sub maybe_regex {
            (undef, $re, $opts) = $regex =~ m,^ m([^\w\s]) (.+) \1 (\w*) $,sx
          )
     {
-        $usable_regex = length $opts ? "(?$opts)$re" : $re;
+        $usable_regex = length $opts ?? "(?$opts)$re" !! $re;
     }
 
     return $usable_regex;
@@ -877,7 +877,7 @@ $code" . q{$test = $this =~ m/$usable_regex/ ? 1 : 0};
 
     unless( $ok ) {
         $this = dump::view($this);
-        my $match = $cmp eq '=~' ? "doesn't match" : "matches";
+        my $match = $cmp eq '=~' ?? "doesn't match" !! "matches";
 
         local $Level = $Level + 1;
         $self->diag(sprintf <<DIAGNOSTIC, $this, $match, $regex);
@@ -1103,7 +1103,7 @@ sub diag {
 
     # Smash args together like print does.
     # Convert undef to 'undef' so its readable.
-    my $msg = join '', map { defined($_) ? $_ : 'undef' } @msgs;
+    my $msg = join '', map { defined($_) ?? $_ !! 'undef' } @msgs;
 
     # Escape each line with a #.
     $msg =~ s/^/# /gm;
@@ -1167,7 +1167,7 @@ sub _print_diag {
     my $self = shift;
 
     local($\, $", $,) = (undef, ' ', '');
-    my $fh = $self->todo ? $self->todo_output : $self->failure_output;
+    my $fh = $self->todo ?? $self->todo_output !! $self->failure_output;
     print $fh < @_;
 }    
 
@@ -1343,7 +1343,7 @@ sub current_test {
         # If the test counter is being pushed forward fill in the details.
         my $test_results = $self->{Test_Results};
         if( $num +> nelems @$test_results ) {
-            my $start = (nelems @$test_results) ? (nelems @$test_results) : 0;
+            my $start = (nelems @$test_results) ?? (nelems @$test_results) !! 0;
             for ($start..$num-1) {
                 $test_results->[$_] = &share(\%(
                     'ok'      => 1, 
@@ -1463,8 +1463,8 @@ sub todo {
     $pack = $pack || $self->caller(1)[0] || $self->exported_to;
     return 0 unless $pack;
 
-    return defined ${*{Symbol::fetch_glob($pack.'::TODO')}} ? ${*{Symbol::fetch_glob($pack.'::TODO')}}
-                                     : 0;
+    return defined ${*{Symbol::fetch_glob($pack.'::TODO')}} ?? ${*{Symbol::fetch_glob($pack.'::TODO')}}
+                                     !! 0;
 }
 
 =item B<caller>
@@ -1608,13 +1608,13 @@ sub _ending {
         my $num_extra = $self->{Curr_Test} - $self->{Expected_Tests};
 
         if( $num_extra +< 0 ) {
-            my $s = $self->{Expected_Tests} == 1 ? '' : 's';
+            my $s = $self->{Expected_Tests} == 1 ?? '' !! 's';
             $self->diag(<<"FAIL");
 Looks like you planned $self->{Expected_Tests} test$s but only ran $self->{Curr_Test}.
 FAIL
         }
         elsif( $num_extra +> 0 ) {
-            my $s = $self->{Expected_Tests} == 1 ? '' : 's';
+            my $s = $self->{Expected_Tests} == 1 ?? '' !! 's';
             $self->diag(<<"FAIL");
 Looks like you planned $self->{Expected_Tests} test$s but ran $num_extra extra.
 FAIL
@@ -1622,9 +1622,9 @@ FAIL
 
         if ( $num_failed ) {
             my $num_tests = $self->{Curr_Test};
-            my $s = $num_failed == 1 ? '' : 's';
+            my $s = $num_failed == 1 ?? '' !! 's';
 
-            my $qualifier = $num_extra == 0 ? '' : ' run';
+            my $qualifier = $num_extra == 0 ?? '' !! ' run';
 
             $self->diag(<<"FAIL");
 Looks like you failed $num_failed test$s of $num_tests$qualifier.
@@ -1641,7 +1641,7 @@ FAIL
 
         my $exit_code;
         if( $num_failed ) {
-            $exit_code = $num_failed +<= 254 ? $num_failed : 254;
+            $exit_code = $num_failed +<= 254 ?? $num_failed !! 254;
         }
         elsif( $num_extra != 0 ) {
             $exit_code = 255;

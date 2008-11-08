@@ -68,7 +68,7 @@ sub SWASHNEW_real {
 	    ## It could be a user-defined property.
 	    ##
 
-	    my $caller1 = $type =~ s/(.+)::// ? $1 : caller(1);
+	    my $caller1 = $type =~ s/(.+)::// ?? $1 !! caller(1);
 
 	    if (defined $caller1 && $type =~ m/^(?:\w+)$/) {
 		my $prop = Symbol::fetch_glob("$($caller1)::$type");
@@ -98,8 +98,8 @@ sub SWASHNEW_real {
 		$enum =~ s/[ _-]//g;
 		$val =~ s/[ _-]//g;
 
-		my $pa = %PropertyAlias{$enum} ? $enum : %PA_reverse{$enum};
-		my $f = %PropValueAlias{$pa}->{$val} ? $val : %PVA_reverse{$pa}->{lc $val};
+		my $pa = %PropertyAlias{$enum} ?? $enum !! %PA_reverse{$enum};
+		my $f = %PropValueAlias{$pa}->{$val} ?? $val !! %PVA_reverse{$pa}->{lc $val};
 
 		if ($pa and $f) {
 		    $pa = "gc_sc" if $pa eq "gc" or $pa eq "sc";
@@ -223,14 +223,14 @@ sub SWASHNEW_real {
 	my $top = 0;
 	while ($list =~ m/^([0-9a-fA-F]+)(?:[\t]([0-9a-fA-F]+)?)(?:[ \t]([0-9a-fA-F]+))?/mg) {
 	    my $min = CORE::hex $1;
-	    my $max = defined $2 ? CORE::hex $2 : $min;
-	    my $val = defined $3 ? CORE::hex $3 : 0;
+	    my $max = defined $2 ?? CORE::hex $2 !! $min;
+	    my $val = defined $3 ?? CORE::hex $3 !! 0;
 	    $val += $max - $min if defined $3;
 	    $top = $val if $val +> $top;
 	}
 	my $topbits =
-	    $top +> 0xffff ? 32 :
-	    $top +> 0xff ? 16 : 8;
+	    $top +> 0xffff ?? 32 !!
+	    $top +> 0xff ?? 16 !! 8;
 	$bits = $topbits if $bits +< $topbits;
     }
 

@@ -123,7 +123,7 @@ sub Compress::Raw::Zlib::Parameters::setError
 {
     my $self = shift ;
     my $error = shift ;
-    my $retval = (nelems @_) ? shift : undef ;
+    my $retval = (nelems @_) ?? shift !! undef ;
 
     $self->{Error} = $error ;
     return $retval;
@@ -261,7 +261,7 @@ sub Compress::Raw::Zlib::Parameters::_checkType
         return $self->setError("Parameter '$key' must be an unsigned int, got '$value'")
             if $validate && $value !~ m/^\d+$/;
 
-        $$output = defined $value ? $value : 0 ;    
+        $$output = defined $value ?? $value !! 0 ;    
         return 1;
     }
     elsif ($type ^&^ Parse_signed)
@@ -271,19 +271,19 @@ sub Compress::Raw::Zlib::Parameters::_checkType
         return $self->setError("Parameter '$key' must be a signed int, got '$value'")
             if $validate && $value !~ m/^-?\d+$/;
 
-        $$output = defined $value ? $value : 0 ;    
+        $$output = defined $value ?? $value !! 0 ;    
         return 1 ;
     }
     elsif ($type ^&^ Parse_boolean)
     {
         return $self->setError("Parameter '$key' must be an int, got '$value'")
             if $validate && defined $value && $value !~ m/^\d*$/;
-        $$output =  defined $value ? $value != 0 : 0 ;    
+        $$output =  defined $value ?? $value != 0 !! 0 ;    
         return 1;
     }
     elsif ($type ^&^ Parse_string)
     {
-        $$output = defined $value ? $value : "" ;    
+        $$output = defined $value ?? $value !! "" ;    
         return 1;
     }
 

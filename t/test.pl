@@ -69,9 +69,9 @@ END {
 # messages
 sub _diag {
     return unless (nelems @_);
-    my @mess = map { m/^#/ ? "$_\n" : "# $_\n" }
+    my @mess = map { m/^#/ ?? "$_\n" !! "# $_\n" }
  map { < split m/\n/ } @_;
-    my $func = $TODO ? \&_print : \&_print_stderr;
+    my $func = $TODO ?? \&_print !! \&_print_stderr;
     $func->(< @mess);
 }
 
@@ -96,9 +96,9 @@ sub _ok {
     if ($name) {
         # escape out '#' or it will interfere with '# skip' and such
         $name =~ s/#/\\#/g;
-	$out = $pass ? "ok $test - $name" : "not ok $test - $name";
+	$out = $pass ?? "ok $test - $name" !! "not ok $test - $name";
     } else {
-	$out = $pass ? "ok $test" : "not ok $test";
+	$out = $pass ?? "ok $test" !! "not ok $test";
     }
 
     $out .= " # TODO $TODO" if $TODO;
@@ -271,7 +271,7 @@ sub like_yn ($$$@) {
     unless ($pass) {
 	unshift(@mess, "#      got '$got'\n",
 		$flip
-		? "# expected !~ m/$expected/\n" : "# expected m/$expected/\n");
+		?? "# expected !~ m/$expected/\n" !! "# expected m/$expected/\n");
     }
     local $Level = $Level + 1;
     _ok($pass, _where(), $name, < @mess);
@@ -300,7 +300,7 @@ sub next_test {
 # be compatible with Test::More::skip().
 sub skip {
     my $why = shift;
-    my $n    = (nelems @_) ? shift : 1;
+    my $n    = (nelems @_) ?? shift !! 1;
     for (1..$n) {
         _print "ok $test # skip: $why\n";
         $test = $test + 1;
@@ -311,7 +311,7 @@ sub skip {
 
 sub todo_skip {
     my $why = shift;
-    my $n   = (nelems @_) ? shift : 1;
+    my $n   = (nelems @_) ?? shift !! 1;
 
     for (1..$n) {
         _print "not ok $test # TODO & SKIP: $why\n";
@@ -408,7 +408,7 @@ sub _quote_args {
 
 sub _create_runperl { # Create the string to qx in runperl().
     my %args = %( < @_ );
-    my $runperl = $^X =~ m/\s/ ? qq{"$^X"} : $^X;
+    my $runperl = $^X =~ m/\s/ ?? qq{"$^X"} !! $^X;
     #- this allows, for example, to set PERL_RUNPERL_DEBUG=/usr/bin/valgrind
     if (%ENV{PERL_RUNPERL_DEBUG}) {
 	$runperl = "%ENV{PERL_RUNPERL_DEBUG} $runperl";
@@ -688,7 +688,7 @@ sub fresh_perl_is {
     local $Level = 2;
     $expected =~ s/\n+$//; # is also removed from program output
     _fresh_perl($prog,
-		sub { (nelems @_) ? @_[0] eq $expected : $expected },
+		sub { (nelems @_) ?? @_[0] eq $expected !! $expected },
 		$runperl_args, $name);
 }
 
@@ -702,8 +702,8 @@ sub fresh_perl_like {
     my($prog, $expected, $runperl_args, $name) = < @_;
     local $Level = 2;
     _fresh_perl($prog,
-		sub { (nelems @_) ?
-			  @_[0] =~ (ref $expected ? $expected : m/$expected/) :
+		sub { (nelems @_) ??
+			  @_[0] =~ (ref $expected ?? $expected !! m/$expected/) !!
 		          $expected },
 		$runperl_args, $name);
 }
@@ -724,8 +724,8 @@ sub can_ok ($@) {
     }
 
     my $name;
-    $name = (nelems @methods) == 1 ? "$class->can('@methods[0]')"
-                          : "$class->can(...)";
+    $name = (nelems @methods) == 1 ?? "$class->can('@methods[0]')"
+                          !! "$class->can(...)";
 
     _ok( !nelems @nok, _where(), $name );
 }

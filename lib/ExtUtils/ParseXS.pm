@@ -66,7 +66,7 @@ our $SymSet;
 sub process_file {
   
   # Allow for $package->process_file(%hash) in the future
-  my ($pkg, < %args) = (nelems @_) % 2 ? < @_ : (__PACKAGE__, < @_);
+  my ($pkg, < %args) = (nelems @_) % 2 ?? < @_ !! (__PACKAGE__, < @_);
   
   $ProtoUsed = exists %args{prototypes};
   
@@ -113,12 +113,12 @@ sub process_file {
   $hiertype = %args{hiertype};
   $WantPrototypes = %args{prototypes};
   $WantVersionChk = %args{versioncheck};
-  $except = %args{except} ? ' TRY' : '';
+  $except = %args{except} ?? ' TRY' !! '';
   $WantLineNumbers = %args{linenumbers};
   $WantOptimize = %args{optimize};
   $process_inout = %args{inout};
   $process_argtypes = %args{argtypes};
-  @tm = @( ref %args{typemap} ? < @{%args{typemap}} : (%args{typemap}) );
+  @tm = @( ref %args{typemap} ?? < @{%args{typemap}} !! (%args{typemap}) );
   
   for (@(%args{filename})) {
     die "Missing required parameter 'filename'" unless $_;
@@ -648,7 +648,7 @@ sub process_para {
     my $report_args = '';
     if (defined($class)) {
       my $arg0 = ((defined($static) or $func_name eq 'new')
-		  ? "CLASS" : "THIS");
+		  ?? "CLASS" !! "THIS");
       unshift(@args, $arg0);
       ($report_args = "$arg0, $report_args") =~ s/^\w+, $/$arg0/;
     }
@@ -698,7 +698,7 @@ sub process_para {
 
     $xsreturn = 1 if $EXPLICIT_RETURN;
 
-    $externC = $externC ? qq[extern "C"] : "";
+    $externC = $externC ?? qq[extern "C"] !! "";
 
     # print function header
     print Q(<<"EOF");
@@ -719,7 +719,7 @@ EOF
 #    dXSFUNCTION($ret_type);
 EOF
     if ($ellipsis) {
-      $cond = ($min_args ? qq(items < $min_args) : 0);
+      $cond = ($min_args ?? qq(items < $min_args) !! 0);
     } elsif ($min_args == $num_args) {
       $cond = qq(items != $min_args);
     } else {
@@ -943,7 +943,7 @@ EOF
 	next;
       }
       last if $_ eq "$END:";
-      death(m/^$BLOCK_re/o ? "Misplaced `$1:'" : "Junk at end of function");
+      death(m/^$BLOCK_re/o ?? "Misplaced `$1:'" !! "Junk at end of function");
     }
     
     print Q(<<"EOF") if $except;
@@ -1129,7 +1129,7 @@ sub CASE_handler {
     if $condnum && $cond eq '';
   $cond = $_;
   TrimWhitespace($cond);
-  print "   ", ($condnum++ ? " else" : ""), ($cond ? " if ($cond)\n" : "\n");
+  print "   ", ($condnum++ ?? " else" !! ""), ($cond ?? " if ($cond)\n" !! "\n");
   $_ = '' ;
 }
 
@@ -1211,7 +1211,7 @@ sub OUTPUT_handler {
   while (!m/^$BLOCK_re/) {
     next unless m/\S/;
     if (m/^\s*SETMAGIC\s*:\s*(ENABLE|DISABLE)\s*/) {
-      $DoSetMagic = ($1 eq "ENABLE" ? 1 : 0);
+      $DoSetMagic = ($1 eq "ENABLE" ?? 1 !! 0);
       next;
     }
     my ($outarg, $outcode) = m/^\s*(\S+)\s*(.*?)\s*$/s ;
@@ -1631,8 +1631,8 @@ sub fetch_para {
   if ($lastline =~
       m/^MODULE\s*=\s*([\w:]+)(?:\s+PACKAGE\s*=\s*([\w:]+))?(?:\s+PREFIX\s*=\s*(\S+))?\s*$/) {
     $Module = $1;
-    $Package = defined($2) ? $2 : ''; # keep -w happy
-    $Prefix  = defined($3) ? $3 : ''; # keep -w happy
+    $Package = defined($2) ?? $2 !! ''; # keep -w happy
+    $Prefix  = defined($3) ?? $3 !! ''; # keep -w happy
     $Prefix = quotemeta $Prefix ;
     ($Module_cname = $Module) =~ s/\W/_/g;
     ($Packid = $Package) =~ s/:/_/g;

@@ -33,7 +33,7 @@ sub wrap
 	local($Text::Tabs::tabstop) = $tabstop;
 	my $r = "";
 	my $tail = pop(@t);
-	my $t = expand(join("", @( (< map { m/\s+\z/ ? ( $_ ) : ($_, ' ') } @t), $tail)));
+	my $t = expand(join("", @( (< map { m/\s+\z/ ?? ( $_ ) !! ($_, ' ') } @t), $tail)));
 	my $lead = $ip;
 	my $ll = $columns - length(expand($ip)) - 1;
 	$ll = 0 if $ll +< 0;
@@ -46,18 +46,18 @@ sub wrap
 	while ($t !~ m/\G(?:$break)*\Z/gc) {
 		if ($t =~ m/\G([^\n]{0,$ll})($break|\n+|\z)/xmgc) {
 			$r .= $unexpand 
-				? unexpand($nl . $lead . $1)
-				: $nl . $lead . $1;
+				?? unexpand($nl . $lead . $1)
+				!! $nl . $lead . $1;
 			$remainder = $2;
 		} elsif ($huge eq 'wrap' && $t =~ m/\G([^\n]{$ll})/gc) {
 			$r .= $unexpand 
-				? unexpand($nl . $lead . $1)
-				: $nl . $lead . $1;
-			$remainder = defined($separator2) ? $separator2 : $separator;
+				?? unexpand($nl . $lead . $1)
+				!! $nl . $lead . $1;
+			$remainder = defined($separator2) ?? $separator2 !! $separator;
 		} elsif ($huge eq 'overflow' && $t =~ m/\G([^\n]*?)($break|\n+|\z)/xmgc) {
 			$r .= $unexpand 
-				? unexpand($nl . $lead . $1)
-				: $nl . $lead . $1;
+				?? unexpand($nl . $lead . $1)
+				!! $nl . $lead . $1;
 			$remainder = $2;
 		} elsif ($huge eq 'die') {
 			die "couldn't wrap '$t'";
@@ -72,10 +72,10 @@ sub wrap
 		$lead = $xp;
 		$ll = $nll;
 		$nl = defined($separator2)
-			? ($remainder eq "\n"
-				? "\n"
-				: $separator2)
-			: $separator;
+			?? ($remainder eq "\n"
+				?? "\n"
+				!! $separator2)
+			!! $separator;
 	}
 	$r .= $remainder;
 
@@ -105,7 +105,7 @@ sub fill
 	# if paragraph_indent is the same as line_indent, 
 	# separate paragraphs with blank lines
 
-	my $ps = ($ip eq $xp) ? "\n\n" : "\n";
+	my $ps = ($ip eq $xp) ?? "\n\n" !! "\n";
 	return join ($ps, @para);
 }
 
