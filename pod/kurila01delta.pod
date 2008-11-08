@@ -40,9 +40,18 @@ chomp, chop, chr, index, lc, lcfirst, length, oct, ord, reverse, rindex, substr,
 all depend on the lexical scope to determine whether to use bytes or codepoints.
 The default lexical scope is bytes.
 
+=head3 Rationale
+
+Semantics of a function is fixed at compile time.
+
 =head2 Internal encoding using UTF-8
 
 Strings are always internally represented using UTF-8
+
+=head3 Rationale
+
+No need to worry about what encoding a string is. There is
+no need to distinguish byte and codepoint strings.
 
 =head2 \x...
 
@@ -50,19 +59,35 @@ C<\x{NUMBER}> creates a codepoint with the numeric value NUMBER.
 C<\x[NUMBER]> creates a byte with numeric value NUMBER modulo 256.
 C<\x1b> creates a codepoint or byte depending on the lexical scope.
 
+=head3 Rationale
+
+Makes it possible to distinguish between a bytes and codepoints.
+
 =head2 /u pattern option
 
 Regex unicode matching is enabled when C</u> option is enabled on a pattern, or when C<use utf8>
 is in effect.
 
+=head3 Rationale
+
+Unicode vs bytecode matching no longer depends on the input string, but is determined by the pattern, thus a pattern option is needed to distinguish the two.
+
 =head2 Indirect object syntax removed
 
 Indirect object syntax has been removed.
+
+=head3 Rationale
+
+Indirect object syntax is ambiguous. And this frees the syntax for other uses.
 
 =head2 formats removed
 
 The C<format> and C<formline> keywords have been removed. As well as the
 special vars $^A, $^, $~, $=, $-, $% and $:.
+
+=head3 Rationale
+
+Formats have many problems. Perl6::Form is a much better alternative.
 
 =head1 Modules and Pragmata
 
