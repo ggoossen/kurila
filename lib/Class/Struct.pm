@@ -93,7 +93,7 @@ sub struct {
         $type = @decls[$idx+1];
         push( @methods, $name );
         if( $base_type eq 'HASH' ){
-            $elem = "\{'$($class)::$name'\}";
+            $elem = "\{+'$($class)::$name'\}";
         }
         elsif( $base_type eq 'ARRAY' ){
             $elem = "[$cnt]";
@@ -104,16 +104,16 @@ sub struct {
             %refs{+$name}++;
             $type = $1;
         }
-        my $init = "defined(\%init\{'$name'\}) ?? \%init\{'$name'\} !! ";
+        my $init = "defined(\%init\{?'$name'\}) ?? \%init\{'$name'\} !! ";
         if( $type eq '@' ){
             $out .= "    die 'Initializer for $name must be array reference'\n"; 
-            $out .= "        if defined(\%init\{'$name'\}) && ref(\%init\{'$name'\}) ne 'ARRAY';\n";
+            $out .= "        if defined(\%init\{?'$name'\}) && ref(\%init\{'$name'\}) ne 'ARRAY';\n";
             $out .= "    \$r->$elem = $init \\\@();$cmt\n";
             %arrays{+$name}++;
         }
         elsif( $type eq '%' ){
             $out .= "    die 'Initializer for $name must be hash reference'\n";
-            $out .= "        if defined(\%init\{'$name'\}) && ref(\%init\{'$name'\}) ne 'HASH';\n";
+            $out .= "        if defined(\%init\{?'$name'\}) && ref(\%init\{'$name'\}) ne 'HASH';\n";
             $out .= "    \$r->$elem = $init \\\%();$cmt\n";
             %hashes{+$name}++;
         }
@@ -121,7 +121,7 @@ sub struct {
             $out .= "    \$r->$elem = $init undef;$cmt\n";
         }
         elsif( $type =~ m/^\w+(?:::\w+)*$/ ){
-            $out .= "    if (defined(\%init\{'$name'\})) \{\n";
+            $out .= "    if (defined(\%init\{?'$name'\})) \{\n";
            $out .= "       if (ref \%init\{'$name'\} eq 'HASH')\n";
             $out .= "            \{ \$r->$elem = $type->new(\%\{\%init\{'$name'\}\}) \} $cmt\n";
            $out .= "       elsif (UNIVERSAL::isa(\%init\{'$name'\}, '$type'))\n";

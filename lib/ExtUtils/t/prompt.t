@@ -30,7 +30,7 @@ open my $stdout_fh, '>>', $stdout or die;
 *STDOUT = *$stdout_fh{IO};
 
 
-%ENV{PERL_MM_USE_DEFAULT} = 1;
+%ENV{+PERL_MM_USE_DEFAULT} = 1;
 is( prompt("Foo?"), '',     'no default' );
 like( $$stdout,  qr/^Foo\?\s*\n$/,      '  question' );
 $$stdout = '';

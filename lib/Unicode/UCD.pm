@@ -315,7 +315,7 @@ sub _charblocks {
 		    my ($lo, $hi) = (hex($1), hex($2));
 		    my $subrange = \@( $lo, $hi, $3 );
 		    push @BLOCKS, $subrange;
-		    push @{%BLOCKS{$3}}, $subrange;
+		    push @{%BLOCKS{+$3}}, $subrange;
 		}
 	    }
 	    close($BLOCKSFH);
@@ -379,7 +379,7 @@ sub _charscripts {
 		    $script =~ s/\b(\w)/$(uc($1))/g;
 		    my $subrange = \@( $lo, $hi, $script );
 		    push @SCRIPTS, $subrange;
-		    push @{%SCRIPTS{$script}}, $subrange;
+		    push @{%SCRIPTS{+$script}}, $subrange;
 		}
 	    }
 	    close($SCRIPTSFH);
@@ -791,7 +791,7 @@ sub _casespec {
 				my ($oldlocale) =
 				($oldcondition =~ m/^([a-z][a-z](?:_\S+)?)/);
 				delete %CASESPEC{$code};
-				%CASESPEC{$code}->{+$oldlocale} =
+				%CASESPEC{+$code}->{+$oldlocale} =
 				\%( code      => $hexcode,
                                     lower     => $oldlower,
                                     title     => $oldtitle,

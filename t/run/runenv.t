@@ -20,7 +20,7 @@ plan tests => 12;
 
 my $STDOUT = './results-0';
 my $STDERR = './results-1';
-my $PERL = %ENV{PERL} || './perl';
+my $PERL = %ENV{?PERL} || './perl';
 my $FAILURE_CODE = 119;
 
 delete %ENV{PERLLIB};
@@ -64,7 +64,7 @@ sub runperl {
     }
   } else {                      # child
     for my $k (keys %$env) {
-      %ENV{$k} = $env->{$k};
+      %ENV{+$k} = $env->{$k};
     }
     open STDOUT, ">", $STDOUT or exit $FAILURE_CODE;
     open STDERR, ">", $STDERR or it_didnt_work();

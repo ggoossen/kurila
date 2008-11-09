@@ -3722,12 +3722,8 @@ Perl_yylex(pTHX)
 	    }
 	    while (s < PL_bufend && SPACE_OR_TAB(*s))
 		s++;
-	    if (*s == '+') {
-		pl_yylval.i_tkval.ival = OPpHELEM_ADD;
-		s++;
-	    }
-	    else if (*s == '?') {
-		pl_yylval.i_tkval.ival = OPpHELEM_OPTIONAL;
+	    if ( *s == '+' || *s == '?' ) {
+		pl_yylval.i_tkval.ival = *s == '+' ? OPpHELEM_ADD : OPpHELEM_OPTIONAL;
 		s++;
 	    }
 	    else
@@ -3742,10 +3738,7 @@ Perl_yylex(pTHX)
 		while (d < PL_bufend && SPACE_OR_TAB(*d))
 		    d++;
 		if (*d == '}') {
-		    const char minus = (PL_tokenbuf[0] == '-');
-		    s = force_word(s + minus, WORD, FALSE, TRUE, FALSE);
-		    if (minus)
-			force_next('-');
+		    s = force_word(s, WORD, FALSE, TRUE, FALSE);
 		}
 	    }
 	    /* FALL THROUGH */

@@ -1,11 +1,10 @@
 #!./perl -w
 
+use Config;
 BEGIN {
-    our %Config;
-    require Config; Config->import;
-    if (!%Config{'d_fork'}
+    if (!config_value('d_fork')
        # open2/3 supported on win32 (but not Borland due to CRT bugs)
-       && (($^O ne 'MSWin32' && $^O ne 'NetWare') || %Config{'cc'} =~ m/^bcc/i))
+       && (($^O ne 'MSWin32' && $^O ne 'NetWare') || config_value('cc') =~ m/^bcc/i))
     {
 	print "1..0\n";
 	exit 0;
@@ -135,7 +134,7 @@ waitpid $pid, 0;
 # command line in single parameter variant of open3
 # for understanding of Config{'sh'} test see exec description in camel book
 my $cmd = 'print(scalar(~< *STDIN))';
-$cmd = %Config{'sh'} =~ m/sh/ ? "'$cmd'" : cmd_line($cmd);
+$cmd = config_value('sh') =~ m/sh/ ?? "'$cmd'" !! cmd_line($cmd);
 try{$pid = open3 'WRITE', '>&STDOUT', 'ERROR', "$perl -e " . $cmd; };
 if ($@) {
 	print "error $($@->message)\n";

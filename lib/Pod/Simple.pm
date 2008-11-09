@@ -485,7 +485,7 @@ sub _complain_errata {
     DEBUG +> 9 and print "Discarding erratum (at line $line) $complaint\n because no_errata_section is on.\n";
   } else {
     DEBUG +> 9 and print "Queuing erratum (at line $line) $complaint\n";
-    push @{$self->{'errata'}->{$line}}, $complaint
+    push @{$self->{+'errata'}->{+$line}}, $complaint
       # for a report to be generated later!
   }
   return 1;

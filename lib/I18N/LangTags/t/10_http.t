@@ -64,7 +64,7 @@ foreach my $in ( @in) {
 
   if($in eq 'NIX') { $in = ''; @should = @( () ); }
 
-  local %ENV{'HTTP_ACCEPT_LANGUAGE'};
+  local %ENV{?'HTTP_ACCEPT_LANGUAGE'};
   
   foreach my $modus (@(
     sub {

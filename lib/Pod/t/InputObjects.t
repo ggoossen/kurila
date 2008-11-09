@@ -9,7 +9,7 @@ use_ok( 'Pod::InputObjects' );
 
 do { # test package Pod::InputSource
     local *FH;
-    my $p_is = Pod::InputSource->new( -handle => \*FH );
+    my $p_is = Pod::InputSource->new( handle => \*FH );
 
     isa_ok( $p_is, 'Pod::InputSource', 'Pod::InputSource constructor' );
 
@@ -24,7 +24,7 @@ do { # test package Pod::InputSource
 };
 
 do { # test package Pod::Paragraph
-    my $p_p1 = Pod::Paragraph->new( -text => 'NAME', -name => 'head2' );
+    my $p_p1 = Pod::Paragraph->new( text => 'NAME', name => 'head2' );
     my $p_p2 = Pod::Paragraph->new( 'test - This is the test suite' );
     isa_ok( $p_p1, 'Pod::Paragraph', 'Pod::Paragraph constuctor' );
     isa_ok( $p_p2, 'Pod::Paragraph', 'Pod::Paragraph constructor revisited' );
@@ -56,7 +56,7 @@ do { # test package Pod::Paragraph
     
     is( (join ':',$p_p1->file_line()), '<unknown-file>:0', 
         'Pod::Paragraph->file_line()' );
-    $p_p2->{+'-file' } = 'test'; $p_p2->{+'-line' } = 3;
+    $p_p2->{+'file' } = 'test'; $p_p2->{+'line' } = 3;
     is( (join ':',$p_p2->file_line()), 'test:3', 
         'Pod::Paragraph->file_line()' );
 };
@@ -70,8 +70,8 @@ do { # test package Pod::InteriorSequence
 	$p_pt->append( $cmd_txt );
 
     my $p_is = Pod::InteriorSequence->new( 
-        -name => 'I', -ldelim => '<', -rdelim => '>',
-        -ptree => $p_pt
+        name => 'I', ldelim => '<', rdelim => '>',
+        ptree => $p_pt
     );
     isa_ok( $p_is, 'Pod::InteriorSequence', 'P::InteriorSequence constructor' );
 	

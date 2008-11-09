@@ -18,6 +18,6 @@ BEGIN { use_ok 'ExtUtils::MakeMaker::Config'; }
 is %Config{path_sep}, Config::config_value("path_sep");
 
 try {
-    %Config{wibble} = 42;
+    %Config{+wibble} = 42;
 };
 is %Config{wibble}, 42;

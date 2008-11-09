@@ -2151,23 +2151,9 @@ PP(pp_negate)
 	else if (SvPOKp(sv)) {
 	    STRLEN len;
 	    const char * const s = SvPV_const(sv, len);
-	    if (isIDFIRST(*s)) {
-		sv_setpvn(TARG, "-", 1);
-		sv_catsv(TARG, sv);
-	    }
-	    else if (*s == '+' || *s == '-') {
+	    if (*s == '+' || *s == '-') {
 		sv_setsv(TARG, sv);
 		*SvPV_force(TARG, len) = *s == '-' ? '+' : '-';
-	    }
-	    else if (DO_UTF8(sv)) {
-		if (SvIOK(sv))
-		    goto oops_its_an_int;
-		if (SvNOK(sv))
-		    sv_setnv(TARG, -SvNV(sv));
-		else {
-		    sv_setpvn(TARG, "-", 1);
-		    sv_catsv(TARG, sv);
-		}
 	    }
 	    else {
 		if (SvIOK(sv))

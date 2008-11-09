@@ -1,11 +1,11 @@
 #!./perl -w
 
+use Config;
+
 BEGIN {
-    our %Config;
-    require Config; Config->import;
-    if (!%Config{'d_fork'}
+    if (!config_value('d_fork')
        # open2/3 supported on win32 (but not Borland due to CRT bugs)
-       && (($^O ne 'MSWin32' && $^O ne 'NetWare') || %Config{'cc'} =~ m/^bcc/i))
+       && (($^O ne 'MSWin32' && $^O ne 'NetWare') || config_value('cc') =~ m/^bcc/i))
     {
 	print "1..0\n";
 	exit 0;

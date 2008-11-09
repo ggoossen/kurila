@@ -1106,7 +1106,7 @@ sub form {
 				make_underline(%opts{?under}, $prevformat, $currformat);
 			%opts{+under} = undef;
 		}
-		push @{@section[-1]->{formatters}}, $currformat;
+		push @{@section[-1]->{+formatters}}, $currformat;
 		push @allformats, $currformat;
 	}
 	die scalar(nelems @_), " too many data values after last format" if (nelems @_);

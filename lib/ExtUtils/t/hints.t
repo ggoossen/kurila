@@ -26,7 +26,7 @@ my $hint_file = File::Spec->catfile('hints', "$os.pl");
 open(HINT, ">", "$hint_file") || die "Can't write dummy hints file $hint_file: $!";
 print HINT <<'CLOO';
 our $self;
-$self->{CCFLAGS} = 'basset hounds got long ears';
+$self->{+CCFLAGS} = 'basset hounds got long ears';
 CLOO
 close HINT;
 
@@ -37,7 +37,7 @@ close STDERR;
 open STDERR, '>>', \$out or die;
 my $mm = bless \%(), 'ExtUtils::MakeMaker';
 $mm->check_hints;
-is( $mm->{CCFLAGS}, 'basset hounds got long ears' );
+is( $mm->{+CCFLAGS}, 'basset hounds got long ears' );
 is( $out, "Processing hints file $hint_file\n" );
 
 open(HINT, ">", "$hint_file") || die "Can't write dummy hints file $hint_file: $!";

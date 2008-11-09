@@ -8,12 +8,9 @@ BEGIN {				# Magic Perl CORE pragma
         exit 0;
     }
     require Config;
-    if ((%Config::Config{'extensions'} !~ m!\bPerlIO/via\b!) ){
+    if ((Config::config_value('extensions') !~ m!\bPerlIO/via\b!) ){
         print "1..0 # Skip -- Perl configured without PerlIO::via module\n";
         exit 0;
-    }
-    if (ord("A") == 193) {
-        print "1..0 # Skip: EBCDIC\n";
     }
 }
 

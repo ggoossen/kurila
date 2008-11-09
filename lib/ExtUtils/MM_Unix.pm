@@ -1364,7 +1364,7 @@ sub init_MAN1PODS {
 	foreach my $name ( @{$self->{EXE_FILES}}) {
 	    next unless $self->_has_pod($name);
 
-	    $self->{MAN1PODS}->{+$name} =
+	    $self->{+MAN1PODS}->{+$name} =
 		$self->catfile("\$(INST_MAN1DIR)", 
 			       basename($name).".\$(MAN1EXT)");
 	}
@@ -1413,7 +1413,7 @@ sub init_MAN3PODS {
 	    );
 	}
 	$manpagename = $self->replace_manpage_separator($manpagename);
-	$self->{MAN3PODS}->{+$name} =
+	$self->{+MAN3PODS}->{+$name} =
 	    $self->catfile("\$(INST_MAN3DIR)", "$manpagename.\$(MAN3EXT)");
     }
 }
@@ -3057,7 +3057,7 @@ sub prefixify {
     print STDERR "  prefixify $var => $path\n" if $Verbose +>= 2;
     print STDERR "    from $sprefix to $rprefix\n" if $Verbose +>= 2;
 
-    if( $self->{ARGS}->{?PREFIX} && $self->file_name_is_absolute($path) && 
+    if( $self->{+ARGS}->{?PREFIX} && $self->file_name_is_absolute($path) && 
         $path !~ s{^\Q$sprefix\E\b}{$rprefix}s ) 
     {
 

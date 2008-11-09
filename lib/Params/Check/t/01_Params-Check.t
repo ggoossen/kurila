@@ -67,7 +67,7 @@ do {
 
     ### now see if we can strip leading dashes ###
     do {   local $Params::Check::STRIP_LEADING_DASHES = 1;
-        my $try  = \%( -foo => 2 );
+        my $try  = \%( "-foo" => 2 );
         my $get  = \%( foo  => 2 );
         
         my $args = check( $tmpl, $try );

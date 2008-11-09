@@ -32,7 +32,7 @@ $mm->prefixify('installbin', 'wibble', 'something', $default);
 is( $mm->{INSTALLBIN}, %Config{installbin},
                                             'prefixify w/defaults');
 
-$mm->{ARGS}->{PREFIX} = 'foo';
+$mm->{ARGS}->{+PREFIX} = 'foo';
 $mm->prefixify('installbin', 'wibble', 'something', $default);
 is( $mm->{INSTALLBIN}, File::Spec->catdir('something', $default),
                                             'prefixify w/defaults and PREFIX');

@@ -421,19 +421,19 @@ sub GetOptionsFromArray($@) {
 	    if ( %opctl{$name}->[CTL_DEST] == CTL_DEST_ARRAY ) {
 		print STDERR ("=> link \"$orig\" to \@$pkg","::opt_$ov\n")
 		    if $debug;
-		eval ("\%linkage\{\$orig\} = \\\@".$pkg."::opt_$ov;");
+		eval ("\%linkage\{+\$orig\} = \\\@".$pkg."::opt_$ov;");
                 die if $@;
 	    }
 	    elsif ( %opctl{$name}->[CTL_DEST] == CTL_DEST_HASH ) {
 		print STDERR ("=> link \"$orig\" to \%$pkg","::opt_$ov\n")
 		    if $debug;
-		eval ("\%linkage\{\$orig\} = \\\%".$pkg."::opt_$ov;");
+		eval ("\%linkage\{+\$orig\} = \\\%".$pkg."::opt_$ov;");
                 die if $@;
 	    }
 	    else {
 		print STDERR ("=> link \"$orig\" to \$$pkg","::opt_$ov\n")
 		    if $debug;
-		eval ("\%linkage\{\$orig\} = \\\$".$pkg."::opt_$ov;");
+		eval ("\%linkage\{+\$orig\} = \\\$".$pkg."::opt_$ov;");
                 die if $@;
 	    }
 	}

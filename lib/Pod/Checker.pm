@@ -570,7 +570,7 @@ sub initialize {
     # print warnings?
     $self->{+warnings} = 1 unless(defined $self->{?warnings});
     $self->{+_current_head1} = ''; # the current =head1 block
-    $self->parseopts(-process_cut_cmd => 1, -warnings => $self->{-warnings});
+    $self->parseopts(-process_cut_cmd => 1, -warnings => $self->{?"-warnings"});
 }
 
 ##################################
@@ -685,7 +685,7 @@ sub node {
         # add node, order important!
         push(@{$self->{_nodes}}, $text);
         # keep also a uniqueness counter
-        $self->{_unique_nodes}->{+$text}++ if($text !~ m/^\s*$/s);
+        $self->{+_unique_nodes}->{+$text}++ if($text !~ m/^\s*$/s);
         return $text;
     }
     return @{$self->{?_nodes}};

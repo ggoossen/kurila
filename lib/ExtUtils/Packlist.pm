@@ -61,6 +61,7 @@ sub TIEHASH
     my ($class, $packfile) = < @_;
     my $self = \%( packfile => $packfile );
     bless($self, $class);
+    $self->{+data} = \%();
     $self->read($packfile) if (defined($packfile) && -f $packfile);
     return ($self);
 }
