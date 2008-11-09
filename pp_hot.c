@@ -1471,7 +1471,7 @@ PP(pp_helem)
 		)
 	    ) ? hv_exists_ent(hv, keysv, 0) : 1;
     }
-    he = hv_fetch_ent(hv, keysv, add && !defer, hash);
+    he = hv_fetch_ent(hv, keysv, lval && !defer, hash);
     svp = he ? &HeVAL(he) : NULL;
     if ( ! svp || *svp == &PL_sv_undef ) {
 	if ( optional ) {
@@ -1488,22 +1488,22 @@ PP(pp_helem)
 	hv_store_ent(hv, keysv, sv, hash);
 	svp = &sv;
     }
-    if (add) {
-	if (PL_op->op_private & OPpLVAL_INTRO) {
-	    if (HvNAME_get(hv) && isGV(*svp))
-		save_gp((GV*)*svp, !(PL_op->op_flags & OPf_SPECIAL));
-	    else {
-		if (!preeminent) {
-		    STRLEN keylen;
-		    const char * const key = SvPV_const(keysv, keylen);
-		    SAVEDELETE(hv, savepvn(key,keylen), (I32)keylen);
-		} else
-		    save_helem(hv, keysv, svp);
-            }
+
+    if (PL_op->op_private & OPpLVAL_INTRO) {
+	if (HvNAME_get(hv) && isGV(*svp))
+	    save_gp((GV*)*svp, !(PL_op->op_flags & OPf_SPECIAL));
+	else {
+	    if (!preeminent) {
+		STRLEN keylen;
+		const char * const key = SvPV_const(keysv, keylen);
+		SAVEDELETE(hv, savepvn(key,keylen), (I32)keylen);
+	    } else
+		save_helem(hv, keysv, svp);
 	}
-	else if (PL_op->op_private & OPpDEREF)
-	    vivify_ref(*svp, PL_op->op_private & OPpDEREF);
     }
+    else if (PL_op->op_private & OPpDEREF)
+	vivify_ref(*svp, PL_op->op_private & OPpDEREF);
+
     sv = (svp ? *svp : &PL_sv_undef);
     /* This makes C<local $tied{foo} = $tied{foo}> possible.
      * Pushing the magical RHS on to the stack is useless, since
@@ -1511,7 +1511,7 @@ PP(pp_helem)
      * and thus the later pp_sassign() will fail to mg_get() the
      * old value.  This should also cure problems with delayed
      * mg_get()s.  GSAR 98-07-03 */
-    if (!add && SvGMAGICAL(sv))
+    if (!lval && SvGMAGICAL(sv))
 	sv = sv_mortalcopy(sv);
     PUSHs(sv);
     RETURN;
