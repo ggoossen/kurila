@@ -40,7 +40,7 @@ is( $FOO, 'Eymascalar', 'leaves scalar alone' );
 do {
     local $^W=1;		# 5.005 compat.
     my $warn;
-    local $^WARN_HOOK = sub { $warn .= @_[0]->{description} };
+    local $^WARN_HOOK = sub { $warn .= @_[0]->{?description} };
     readline *FOO;
     like( $warn, qr/unopened filehandle/, 'warns like an unopened filehandle' );
 };
@@ -89,7 +89,7 @@ package main;
 TODO: do {
     todo_skip("fix delete_package", 2);
     $Transient::variable = 42;
-    ok( defined %Transient::{variable}, 'transient variable in stash' );
+    ok( defined %Transient::{?variable}, 'transient variable in stash' );
     Symbol::delete_package('Transient');
     ok( !exists %Transient::{variable}, 'transient variable no longer in stash' );
     is( nelems(@(keys %Transient::)), 0, 'transient stash is empty' );

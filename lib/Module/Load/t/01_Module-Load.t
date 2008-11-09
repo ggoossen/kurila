@@ -14,7 +14,7 @@ do {
     try { load $mod };
 
     is( $@, '', qq[Loading module '$mod'] );
-    ok( defined(%INC{$file}), q[... found in %INC] );
+    ok( defined(%INC{?$file}), q[... found in %INC] );
 };
 
 do {
@@ -24,7 +24,7 @@ do {
     try { load $mod };
 
     is( $@, '', qq[Loading File '$mod'] );
-    ok( defined(%INC{$file}), q[... found in %INC] );
+    ok( defined(%INC{?$file}), q[... found in %INC] );
 };
 
 do {
@@ -34,7 +34,7 @@ do {
     try { load $mod };
 
     is( $@, '', qq[Loading Ambigious Module '$mod'] );
-    ok( defined(%INC{$file}), q[... found in %INC] );
+    ok( defined(%INC{?$file}), q[... found in %INC] );
 };
 
 do {
@@ -44,7 +44,7 @@ do {
     try { load $mod };
 
     is( $@ && $@->message, '', qq[Loading Ambigious File '$mod'] );
-    ok( defined(%INC{$file}), q[... found in %INC] );
+    ok( defined(%INC{?$file}), q[... found in %INC] );
 };
 
 ### Test importing functions ###

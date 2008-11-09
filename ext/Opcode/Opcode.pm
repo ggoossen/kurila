@@ -62,8 +62,8 @@ sub _init_optags {
 	my @ops   = map  { < split ' ' } @lines; # get op words
 
 	foreach( @ops) {
-	    warn "$tag - $_ already tagged in %seen{$_}\n" if %seen{$_};
-	    %seen{$_} = $tag;
+	    warn "$tag - $_ already tagged in %seen{?$_}\n" if %seen{?$_};
+	    %seen{+$_} = $tag;
 	    delete %all{$_};
 	}
 	# opset will croak on invalid names

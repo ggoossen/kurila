@@ -8,7 +8,7 @@ BEGIN {
 	@INC = @( '../lib' );
 	require './test.pl';
     }
-    $^WARN_HOOK = sub { push @WARN, @_[0]->{description} };
+    $^WARN_HOOK = sub { push @WARN, @_[0]->{?description} };
 }
 
 require File::Spec;

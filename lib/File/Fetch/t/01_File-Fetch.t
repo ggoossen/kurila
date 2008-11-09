@@ -11,7 +11,7 @@ use_ok('File::Fetch');
 $File::Fetch::DEBUG = $File::Fetch::DEBUG   = 1 if @ARGV[0];
 $IPC::Cmd::DEBUG    = $IPC::Cmd::DEBUG      = 1 if @ARGV[0];
 
-unless( %ENV{PERL_CORE} ) {
+unless( %ENV{?PERL_CORE} ) {
     warn qq[
 
 ####################### NOTE ##############################
@@ -113,14 +113,14 @@ push @map, (
 
 ### parse uri tests ###
 for my $entry (@map ) {
-    my $uri = $entry->{'uri'};
+    my $uri = $entry->{?'uri'};
 
     my $href = File::Fetch->_parse_uri( $uri );
     ok( $href,  "Able to parse uri '$uri'" );
 
     for my $key ( sort keys %$entry ) {
-        is( $href->{$key}, $entry->{$key},
-                "   '$key' ok ($entry->{$key}) for $uri");
+        is( $href->{?$key}, $entry->{?$key},
+                "   '$key' ok ($entry->{?$key}) for $uri");
     }
 }
 
@@ -128,12 +128,12 @@ for my $entry (@map ) {
 for my $entry (@map) {
     my $ff = File::Fetch->new( uri => $entry->{uri} );
 
-    ok( $ff,                    "Object for uri '$entry->{uri}'" );
+    ok( $ff,                    "Object for uri '$entry->{?uri}'" );
     isa_ok( $ff, "File::Fetch", "   Object" );
 
     for my $acc ( keys %$entry ) {
-        is( $ff->?$acc(), $entry->{$acc},
-                                "   Accessor '$acc' ok ($entry->{$acc})" );
+        is( $ff->?$acc(), $entry->{?$acc},
+                                "   Accessor '$acc' ok ($entry->{?$acc})" );
     }
 }
 
@@ -186,7 +186,7 @@ sub _fetch_uri {
 
     SKIP: do {
         skip "'$method' fetching tests disabled under perl core", 4
-                if %ENV{PERL_CORE};
+                if %ENV{?PERL_CORE};
     
         ### stupid warnings ###
         $File::Fetch::METHODS =
@@ -200,8 +200,8 @@ sub _fetch_uri {
     
         SKIP: do {
             skip "You do not have '$method' installed/available", 3
-                if $File::Fetch::METHOD_FAIL->{$method} &&
-                   $File::Fetch::METHOD_FAIL->{$method};
+                if $File::Fetch::METHOD_FAIL->{?$method} &&
+                   $File::Fetch::METHOD_FAIL->{?$method};
             ok( $file,          "   File ($file) fetched with $method ($uri)" );
             ok( $file && -s $file,   
                                 "   File has size" );

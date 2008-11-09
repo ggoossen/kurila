@@ -27,7 +27,7 @@ do {   ok( mark_as_unloaded($Mod), "$Mod now marked as unloaded" );
     my $rv = eval "require $Mod; 1";
     ok( !$rv,                   "$Mod require failed" );
     ok( $@,                     "   require died" );
-    like( $@->{description}, qr/locate/,       "       with expected error" );
+    like( $@->{?description}, qr/locate/,       "       with expected error" );
 };
 
 ### check for an already loaded module

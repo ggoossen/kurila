@@ -11,7 +11,7 @@ sub dooot {
 	is(hint_fetch('dooot', 1), 54);
     }
     BEGIN {
-	%^H{dooot} = 42;
+	%^H{+dooot} = 42;
     }
     is(hint_fetch('dooot'), 6 * 7);
     if ($::testing_caller) {
@@ -19,7 +19,7 @@ sub dooot {
     }
 
     BEGIN {
-	%^H{dooot} = undef;
+	%^H{+dooot} = undef;
     }
     is(hint_fetch('dooot'), undef);
     ok(hint_exists('dooot'));
@@ -37,8 +37,8 @@ do {
     is(hint_fetch('dooot'), undef);
     is(hint_fetch('thikoosh'), undef);
     BEGIN {
-	%^H{dooot} = 1;
-	%^H{thikoosh} = "SKREECH";
+	%^H{+dooot} = 1;
+	%^H{+thikoosh} = "SKREECH";
     }
     if ($::testing_caller) {
 	is(hint_fetch('dooot'), 1);
@@ -46,12 +46,12 @@ do {
     is(hint_fetch('thikoosh'), "SKREECH");
 
     BEGIN {
-	%^H{dooot} = 42;
+	%^H{+dooot} = 42;
     }
     do {
 	do {
 	    BEGIN {
-		%^H{dooot} = 6 * 9;
+		%^H{+dooot} = 6 * 9;
 	    }
 	    is(hint_fetch('dooot'), 54);
 	    is(hint_fetch('thikoosh'), "SKREECH");
@@ -76,7 +76,7 @@ print "# which now works inside evals\n";
 
 do {
     BEGIN {
-	%^H{dooot} = 42;
+	%^H{+dooot} = 42;
     }
     is(hint_fetch('dooot'), 6 * 7);
 
@@ -98,17 +98,17 @@ EOE
 
 do {
     BEGIN {
-	%^H{dooot} = "FIP\0FOP\0FIDDIT\0FAP";
+	%^H{+dooot} = "FIP\0FOP\0FIDDIT\0FAP";
     }
     is(hint_fetch('dooot'), "FIP\0FOP\0FIDDIT\0FAP", "Can do embedded 0 bytes");
 
     BEGIN {
-	%^H{dooot} = -42;
+	%^H{+dooot} = -42;
     }
     is(hint_fetch('dooot'), -42, "Can do IVs");
 
     BEGIN {
-	%^H{dooot} = ^~^0;
+	%^H{+dooot} = ^~^0;
     }
     cmp_ok(hint_fetch('dooot'), '+>', 42, "Can do UVs");
 };
@@ -124,10 +124,10 @@ do {
 	utf8::encode $k2;
 	utf8::encode $k4;
 
-	%^H{$k1} = 1;
-	%^H{$k2} = 2;
-	%^H{$k3} = 3;
-	%^H{$k4} = 4;
+	%^H{+$k1} = 1;
+	%^H{+$k2} = 2;
+	%^H{+$k3} = 3;
+	%^H{+$k4} = 4;
     }
 
 	
@@ -147,9 +147,9 @@ do {
     my ($k1, $k2, $k3);
     BEGIN {
 	($k1, $k2, $k3) = ("\0", "\0\0", "\0\0\0");
-	%^H{$k1} = 1;
-	%^H{$k2} = 2;
-	%^H{$k3} = 3;
+	%^H{+$k1} = 1;
+	%^H{+$k2} = 2;
+	%^H{+$k3} = 3;
     }
 
     is(hint_fetch($k1), 1, "Keys with the same hash value don't clash");
@@ -157,9 +157,9 @@ do {
     is(hint_fetch($k3), 3, "Keys with the same hash value don't clash");
 
     BEGIN {
-	%^H{$k1} = "a";
-	%^H{$k2} = "b";
-	%^H{$k3} = "c";
+	%^H{+$k1} = "a";
+	%^H{+$k2} = "b";
+	%^H{+$k3} = "c";
     }
 
     is(hint_fetch($k1), "a", "Keys with the same hash value don't clash");

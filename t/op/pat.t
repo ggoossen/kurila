@@ -247,7 +247,7 @@ our @out = @( m/(?<!foo)bar./g );
 ok("$(join ' ',@out)" eq 'bar2 barf');
 
 # Tests which depend on REG_INFTY
-our $reg_infty = defined %Config{reg_infty} ?? %Config{reg_infty} !! 32767;
+our $reg_infty = defined %Config{?reg_infty} ?? %Config{?reg_infty} !! 32767;
 our $reg_infty_m = $reg_infty - 1;
 our $reg_infty_p = $reg_infty + 1;
 
@@ -302,8 +302,8 @@ my %ans = %( 'ax13876y25677lbc' => 1,
        );
 
 for ( keys %ans ) {
-  ok( not ( %ans{$_} xor m/a(?=([yx]($long_constant_len)){2,4}[k-o]).*b./o ));
-  ok( not ( %ans{$_} xor m/a(?=([yx]($long_var_len)){2,4}[k-o]).*b./o ));
+  ok( not ( %ans{?$_} xor m/a(?=([yx]($long_constant_len)){2,4}[k-o]).*b./o ));
+  ok( not ( %ans{?$_} xor m/a(?=([yx]($long_var_len)){2,4}[k-o]).*b./o ));
 }
 
 $_ = " a (bla()) and x(y b((l)u((e))) and b(l(e)e)e";
@@ -652,7 +652,7 @@ ok( ('123||x|123|' eq join '|', @res) );
 
 # see if matching against temporaries (created via pp_helem()) is safe
 my $x = "abc";
-%( foo => "ok $x\n".$^X ){foo} =~ m/^(.*)\n/g;
+%( foo => "ok $x\n".$^X ){?foo} =~ m/^(.*)\n/g;
 ok( $1 eq "ok abc" );
 
 # See if $i work inside (?{}) in the presense of saved substrings and
@@ -783,9 +783,9 @@ my %space = %( spc   => " ",
 	      vt    => chr(11),
 	      false => "space" );
 
-my @space0 = sort grep { %space{$_} =~ m/\s/ }          keys %space;
-my @space1 = sort grep { %space{$_} =~ m/[[:space:]]/ } keys %space;
-my @space2 = sort grep { %space{$_} =~ m/[[:blank:]]/ } keys %space;
+my @space0 = sort grep { %space{?$_} =~ m/\s/ }          keys %space;
+my @space1 = sort grep { %space{?$_} =~ m/[[:space:]]/ } keys %space;
+my @space2 = sort grep { %space{?$_} =~ m/[[:blank:]]/ } keys %space;
 
 ok( "$(join ' ',@space0)" eq "cr ff lf spc tab" );
 
@@ -907,7 +907,7 @@ SKIP: do {
 	
     for my $char ( map { s/^\S+ //; $_ }
                     sort map { sprintf("\%06x", ord($_))." $_" } keys %s) {
-	my $class = %s{$char};
+	my $class = %s{?$char};
 	my $code  = sprintf("\%06x", ord($char));
 	printf "#\n# 0x$code  $char\n#\n";
 	print "# IsAlpha\n";
@@ -1126,7 +1126,7 @@ do {
     # from japhy
     my $w;
     use warnings;    
-    local $^WARN_HOOK = sub { $w .= shift->{description} . "\n" };
+    local $^WARN_HOOK = sub { $w .= shift->{?description} . "\n" };
 
     $w = "";
     eval 'qr/(?c)/'; die if $@;
@@ -1804,7 +1804,7 @@ do {
     my %u = %( $u => $u, $v => $v, $w => $w );
     for (keys %u) {
 	my $m1 = m/^\w*$/ ?? 1 !! 0;
-	my $m2 = %u{$_}=~m/^\w*$/ ?? 1 !! 0;
+	my $m2 = %u{?$_}=~m/^\w*$/ ?? 1 !! 0;
 	ok( $m1 == $m2 );
     }
 };
@@ -1951,7 +1951,7 @@ EOF
 ok( "d" =~ m/\p{InConsonant}/ );
 ok( "e" =~ m/\P{InConsonant}/ );
 
-if (!%ENV{PERL_SKIP_PSYCHO_TEST}){
+if (!%ENV{?PERL_SKIP_PSYCHO_TEST}){
     print "# [ID 20020630.002] utf8 regex only matches 32k\n";
     for (@(\@( 'byte', "\x{ff}" ), \@( 'utf8', "\x{1ff}" ))) {
 	my($type, $char) = < @$_;
@@ -2326,10 +2326,10 @@ do { # TRIE related
     push @got,$1 while m/$re/g;
 
     my %count;
-    %count{$_}++ for  @got;
+    %count{+$_}++ for  @got;
     my $ok=1;
     for ( @nums) {
-        $ok=0 if --%count{$_}+<0;
+        $ok=0 if --%count{+$_}+<0;
     }
     ok($ok,"Trie min count matches");
 };
@@ -2384,7 +2384,7 @@ ok(("foba  ba$($s)pxySS$s$s" =~ qr/(b(?:a${\$s}t|a${\$s}f|a${\$s}p)[xy]+$s*)/i)
 
 
 print "# set PERL_SKIP_PSYCHO_TEST to skip this test\n";
-if (!%ENV{PERL_SKIP_PSYCHO_TEST}){
+if (!%ENV{?PERL_SKIP_PSYCHO_TEST}){
     my @normal=qw(these are some normal words);
     use utf8;
     my $psycho=join "|", @(< @normal,< map chr $_,255..20000);
@@ -2627,7 +2627,7 @@ SKIP:do {
 # CURLYX and WHILEM blocks, except those related to LONGJMP, the
 # super-linear cache and warnings. It executes about 0.5M regexes
 
-if (%ENV{PERL_SKIP_PSYCHO_TEST}){
+if (%ENV{?PERL_SKIP_PSYCHO_TEST}){
   ok( 1, "Skip: No psycho tests");
 } else {    
   print "# set PERL_SKIP_PSYCHO_TEST to skip this test\n";

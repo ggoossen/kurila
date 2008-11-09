@@ -48,7 +48,7 @@ sub open {
     # a dir name should always have a ":" in it; assume dirname is
     # in current directory
     $dirname = ':' .  $dirname if ( ($^O eq 'MacOS') && ($dirname !~ m/:/) );
-    %{*$dh}{io_dir_path} = $dirname;
+    %{*$dh}{+io_dir_path} = $dirname;
     1;
 }
 
@@ -96,7 +96,7 @@ sub TIEHASH {
 
     $options ||= 0;
 
-    %{*$dh}{io_dir_unlink} = $options ^&^ DIR_UNLINK;
+    %{*$dh}{+io_dir_unlink} = $options ^&^ DIR_UNLINK;
     $dh;
 }
 
@@ -113,18 +113,18 @@ sub NEXTKEY {
 
 sub EXISTS {
     my($dh,$key) = < @_;
-    -e File::Spec->catfile(%{*$dh}{io_dir_path}, $key);
+    -e File::Spec->catfile(%{*$dh}{?io_dir_path}, $key);
 }
 
 sub FETCH {
     my($dh,$key) = < @_;
-    &lstat(File::Spec->catfile(%{*$dh}{io_dir_path}, $key));
+    &lstat(File::Spec->catfile(%{*$dh}{?io_dir_path}, $key));
 }
 
 sub STORE {
     my($dh,$key,$data) = < @_;
     my($atime,$mtime) = ref($data) ?? < @$data !! ($data,$data);
-    my $file = File::Spec->catfile(%{*$dh}{io_dir_path}, $key);
+    my $file = File::Spec->catfile(%{*$dh}{?io_dir_path}, $key);
     unless(-e $file) {
 	my $io = IO::File->new($file,O_CREAT ^|^ O_RDWR);
 	$io->close if $io;
@@ -137,9 +137,9 @@ sub DELETE {
 
     # Only unlink if unlink-ing is enabled
     return 0
-	unless %{*$dh}{io_dir_unlink};
+	unless %{*$dh}{?io_dir_unlink};
 
-    my $file = File::Spec->catfile(%{*$dh}{io_dir_path}, $key);
+    my $file = File::Spec->catfile(%{*$dh}{?io_dir_path}, $key);
 
     -d $file
 	?? rmdir($file)

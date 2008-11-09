@@ -37,23 +37,23 @@ sub parse_from_file {
   my $self = shift;
   my($file, $outfh) = < @_;
 
-  my $render = $self->{'__nroffer'} || die "no nroffer set!?";
+  my $render = $self->{?'__nroffer'} || die "no nroffer set!?";
   
   # turn the switches into CLIs
-  my $switches = join ' ', map qq{"--$_=$self->{$_}"}, grep !m/^_/s,
+  my $switches = join ' ', map qq{"--$_=$self->{?$_}"}, grep !m/^_/s,
         keys %$self
   ;
 
   my $pod2man =
     catfile(
-      ($self->{'__bindir'}  || die "no bindir set?!"  ),
-      ($self->{'__pod2man'} || die "no pod2man set?!" ),
+      ($self->{?'__bindir'}  || die "no bindir set?!"  ),
+      ($self->{?'__pod2man'} || die "no pod2man set?!" ),
     )
   ;
   unless(-e $pod2man) {
     # This is rarely needed, I think.
-    $pod2man = $self->{'__pod2man'} || die "no pod2man set?!";
-    die "Can't find a pod2man?! (". $self->{'__pod2man'} .")\nAborting"
+    $pod2man = $self->{?'__pod2man'} || die "no pod2man set?!";
+    die "Can't find a pod2man?! (". $self->{?'__pod2man'} .")\nAborting"
       unless -e $pod2man;
   }
 
@@ -89,7 +89,7 @@ sub parse_from_file {
 
   my $err;
 
-  if( $self->{'__filter_nroff'} ) {
+  if( $self->{?'__filter_nroff'} ) {
     defined(&Pod::Perldoc::DEBUG)
      and &Pod::Perldoc::DEBUG()
      and print "filter_nroff is set, so filtering...\n";
@@ -112,7 +112,7 @@ sub parse_from_file {
     
   } else {
     print $outfh $rslt
-     or die "Can't print to %$self{__output_file}: $!";
+     or die "Can't print to %$self{?__output_file}: $!";
   }
   
   return;

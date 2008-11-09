@@ -71,7 +71,7 @@ package Test1;
 sub new { bless(\%(name => @_[1]), @_[0]) }
 sub freeze {
     my $self = shift;
-    $self->{frozed} = 1;
+    $self->{+frozed} = 1;
 }
 
 # a package without a freeze()

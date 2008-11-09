@@ -7,47 +7,47 @@ BEGIN { require "./test.pl"; }
 plan( tests => 81 );
 
 eval '%@x=0;';
-like( $@->{description}, qr/^Can't coerce HASH to string in repeat/, '%@x=0' );
+like( $@->{?description}, qr/^Can't coerce HASH to string in repeat/, '%@x=0' );
 
 # Bug 20010528.007
 eval q/"\x{"/;
-like( $@->{description}, qr/^Missing right brace on \\x/,
+like( $@->{?description}, qr/^Missing right brace on \\x/,
     'syntax error in string, used to dump core' );
 
 eval q/"\N{"/;
-like( $@->{description}, qr/^Missing right brace on \\N/,
+like( $@->{?description}, qr/^Missing right brace on \\N/,
     'syntax error in string with incomplete \N' );
 eval q/"\Nfoo"/;
-like( $@->{description}, qr/^Missing braces on \\N/,
+like( $@->{?description}, qr/^Missing braces on \\N/,
     'syntax error in string with incomplete \N' );
 
 # Bug 20010831.001
 eval '($a, b) = (1, 2);';
-like( $@->{description}, qr/^Can't modify constant item in list assignment/,
+like( $@->{?description}, qr/^Can't modify constant item in list assignment/,
     'bareword in list assignment' );
 
 eval 'tie FOO, "Foo";';
-like( $@->{description}, qr/^Can't modify constant item in tie/,
+like( $@->{?description}, qr/^Can't modify constant item in tie/,
     'tying a bareword causes a segfault in 5.6.1' );
 
 eval 'undef foo';
-like( $@->{description}, qr/^Can't modify constant item in undef operator/,
+like( $@->{?description}, qr/^Can't modify constant item in undef operator/,
     'undefing constant causes a segfault in 5.6.1 [ID 20010906.019]' );
 
 eval 'read(our $bla, FILE, 1);';
-like( $@->{description}, qr/^Can't modify constant item in read/,
+like( $@->{?description}, qr/^Can't modify constant item in read/,
     'read($var, FILE, 1) segfaults on 5.6.1 [ID 20011025.054]' );
 
 # This used to dump core (bug #17920)
 eval q{ sub { sub { f1(f2();); my($a,$b,$c) } } };
-like( $@->{description}, qr/error/, 'lexical block discarded by yacc' );
+like( $@->{?description}, qr/error/, 'lexical block discarded by yacc' );
 
 # bug #18573, used to corrupt memory
 eval q{ "\c" };
-like( $@->{description}, qr/^Missing control char name in \\c/, q("\c" string) );
+like( $@->{?description}, qr/^Missing control char name in \\c/, q("\c" string) );
 
 eval q{ qq(foo$) };
-like( $@->{description}, qr/Final \$ should be \\\$ or \$name/, q($ at end of "" string) );
+like( $@->{?description}, qr/Final \$ should be \\\$ or \$name/, q($ at end of "" string) );
 
 # two tests for memory corruption problems in the said variables
 # (used to dump core or produce strange results)
@@ -96,14 +96,14 @@ is($@, '', "';&' sub prototype confuses the lexer");
 my %data = %( foo => "\n" );
 print "#";
 print(
-%data{foo});
+%data{?foo});
 pass();
 
 # Bug #24212
 do {
     local $^WARN_HOOK = sub { }; # silence mandatory warning
     eval q{ my $x = -F 1; };
-    like( $@->{description}, qr/(?i:syntax|parse) error .* near "F 1"/, "unknown filetest operators" );
+    like( $@->{?description}, qr/(?i:syntax|parse) error .* near "F 1"/, "unknown filetest operators" );
     is(
         eval q{ sub F { 42 } -F 1 },
 	'-42',
@@ -120,28 +120,28 @@ do {
 # Bug #25824
 do {
     eval q{ sub f { @a=@b=@c;  {use} } };
-    like( $@->{description}, qr/syntax error/, "use without body" );
+    like( $@->{?description}, qr/syntax error/, "use without body" );
 };
 
 # [perl #2738] perl segfautls on input
 do {
     eval q{ sub _ <> {} };
-    like($@->{description}, qr/Illegal declaration of subroutine main::_/, "readline operator as prototype");
+    like($@->{?description}, qr/Illegal declaration of subroutine main::_/, "readline operator as prototype");
 
     eval q{ $s = sub <> {} };
-    like($@->{description}, qr/Illegal declaration of anonymous subroutine/, "readline operator as prototype");
+    like($@->{?description}, qr/Illegal declaration of anonymous subroutine/, "readline operator as prototype");
 
     eval q{ sub _ __FILE__ {} };
-    like($@->{description}, qr/Illegal declaration of subroutine main::_/, "__FILE__ as prototype");
+    like($@->{?description}, qr/Illegal declaration of subroutine main::_/, "__FILE__ as prototype");
 };
 
 # tests for "Bad name"
 eval q{ foo::$bar };
-like( $@->{description}, qr/Bad name after foo::/, 'Bad name after foo::' );
+like( $@->{?description}, qr/Bad name after foo::/, 'Bad name after foo::' );
 
 # test for ?: context error
 eval q{($a ?? $x !! ($y)) = 5};
-like( $@->{description}, qr/Assignment to both a list and a scalar/, 'Assignment to both a list and a scalar' );
+like( $@->{?description}, qr/Assignment to both a list and a scalar/, 'Assignment to both a list and a scalar' );
 
 eval q{ s/x/#/ };
 is( $@, '', 'comments in s///e' );
@@ -154,27 +154,27 @@ eval q[
 	    sub { my $z
 ];
 
-like($@->{description}, qr/Missing right curly/, 'nested sub syntax error' );
+like($@->{?description}, qr/Missing right curly/, 'nested sub syntax error' );
 
 eval q[
     sub { my ($a,$b,$c,$d,$e,$f,$g,$h,$i,$j,$k,$l,$m,$n,$o,$p,$q,$r,$s,$r);
 	    sub { my $z
 ];
-like($@->{description}, qr/Missing right curly/, 'nested sub syntax error 2' );
+like($@->{?description}, qr/Missing right curly/, 'nested sub syntax error 2' );
 
 eval q[
     sub { our $a= 1;$a;$a;$a;$a;$a;$a;$a;$a;$a;$a;$a;$a;$a;$a;$a;$a;$a;$a;$a;
 	    use DieDieDie;
 ];
 
-like($@->{description}, qr/Can't locate DieDieDie.pm/, 'croak cleanup' );
+like($@->{?description}, qr/Can't locate DieDieDie.pm/, 'croak cleanup' );
 
 eval q[
     sub { my ($a,$b,$c,$d,$e,$f,$g,$h,$i,$j,$k,$l,$m,$n,$o,$p,$q,$r,$s,$r);
 	    use DieDieDie;
 ];
 
-like($@->{description}, qr/Can't locate DieDieDie.pm/, 'croak cleanup 2' );
+like($@->{?description}, qr/Can't locate DieDieDie.pm/, 'croak cleanup 2' );
 
 
 # these might leak, or have duplicate frees, depending on the bugginess of

@@ -31,14 +31,14 @@ sub copy {
 
 sub reach {
   my($self, $point, $note) = < @_;
-  if( (my $now = time) +>= $self->{'quiet_until'}) {
+  if( (my $now = time) +>= $self->{?'quiet_until'}) {
     my $goal;
-    my    $to = $self->{'to'};
+    my    $to = $self->{?'to'};
     print $to join('', @(
-      ($self->{'quiet_until'} == 1) ?? () !! '... ',
+      ($self->{?'quiet_until'} == 1) ?? () !! '... ',
       (defined $point) ?? (
         '#',
-        ($goal = $self->{'goal'}) ?? (
+        ($goal = $self->{?'goal'}) ?? (
           ' ' x (length($goal) - length($point)),
           $point, '/', $goal,
         ) !! $point,
@@ -47,7 +47,7 @@ sub reach {
       $note || '',
       "\n")
     );
-    $self->{'quiet_until'} = $now + $self->{'delay'};
+    $self->{+'quiet_until'} = $now + $self->{?'delay'};
   }
   return $self;
 }
@@ -56,7 +56,7 @@ sub reach {
 
 sub done {
   my($self, $note) = < @_;
-  $self->{'quiet_until'} = 1;
+  $self->{+'quiet_until'} = 1;
   return $self->reach( undef, $note );
 }
 
@@ -64,11 +64,11 @@ sub done {
 # Simple accessors:
 
 sub delay {
-  return @_[0]->{'delay'} if (nelems @_) == 1; @_[0]->{'delay'} = @_[1]; return @_[0] }
+  return @_[0]->{?'delay'} if (nelems @_) == 1; @_[0]->{+'delay'} = @_[1]; return @_[0] }
 sub goal {
-  return @_[0]->{'goal' } if (nelems @_) == 1; @_[0]->{'goal' } = @_[1]; return @_[0] }
+  return @_[0]->{?'goal' } if (nelems @_) == 1; @_[0]->{+'goal' } = @_[1]; return @_[0] }
 sub to   {
-  return @_[0]->{'to'   } if (nelems @_) == 1; @_[0]->{'to'   } = @_[1]; return @_[0] }
+  return @_[0]->{?'to'   } if (nelems @_) == 1; @_[0]->{+'to'   } = @_[1]; return @_[0] }
 
 #--------------------------------------------------------------------------
 

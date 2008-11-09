@@ -72,27 +72,27 @@ my (@info) = @( unpack("NNNNNNC", $buff) ) ;
 my (@info1) = @( unpack("VVVVVVC", $buff) ) ;
 my ($magic, $version, $endian, $encrypt) ;
 
-if (%Data{@info[0]}) # first try DB 1.x format, big endian
+if (%Data{?@info[0]}) # first try DB 1.x format, big endian
 {
     $magic = @info[0] ;
     $version = @info[1] ;
     $endian  = "Big Endian" ;
     $encrypt = "Not Supported";
 }
-elsif (%Data{@info1[0]}) # first try DB 1.x format, little endian
+elsif (%Data{?@info1[0]}) # first try DB 1.x format, little endian
 {
     $magic = @info1[0] ;
     $version = @info1[1] ;
     $endian  = "Little Endian" ;
     $encrypt = "Not Supported";
 }
-elsif (%Data{@info[3]}) # next DB 2.x big endian
+elsif (%Data{?@info[3]}) # next DB 2.x big endian
 {
     $magic = @info[3] ;
     $version = @info[4] ;
     $endian  = "Big Endian" ;
 }
-elsif (%Data{@info1[3]}) # next DB 2.x little endian
+elsif (%Data{?@info1[3]}) # next DB 2.x little endian
 {
     $magic = @info1[3] ;
     $version = @info1[4] ;
@@ -101,12 +101,12 @@ elsif (%Data{@info1[3]}) # next DB 2.x little endian
 else
   { die "not a Berkeley DB database file.\n" }
 
-my $type = %Data{$magic} ;
+my $type = %Data{?$magic} ;
 $magic = sprintf "\%06X", $magic ;
 
 my $ver_string = "Unknown" ;
 
-if ( defined $type->{Versions}->{$version} )
+if ( defined $type->{Versions}->{?$version} )
 {
      $ver_string = $type->{Versions}->{$version}->[1];
      if ($type->{Versions}->{$version}->[0] )
@@ -116,7 +116,7 @@ if ( defined $type->{Versions}->{$version} )
 }
 
 print <<EOM ;
-File Type:		Berkeley DB $type->{Type} file.
+File Type:		Berkeley DB $type->{?Type} file.
 File Version ID:	$version
 Built with Berkeley DB:	$ver_string
 Byte Order:		$endian

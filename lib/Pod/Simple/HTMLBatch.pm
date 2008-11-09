@@ -108,7 +108,7 @@ sub new {
 sub muse {
   my $self = shift;
   if($self->verbose) {
-    print 'T+', int(time() - $self->{'_batch_start_time'}), "s: ", < @_, "\n";
+    print 'T+', int(time() - $self->{?'_batch_start_time'}), "s: ", < @_, "\n";
   }
   return 1;
 }
@@ -146,7 +146,7 @@ sub _batch_convert_main {
   # $dirs is either false, or an arrayref.    
   # $outdir is a pathspec.
   
-  $self->{'_batch_start_time'} ||= time();
+  $self->{+'_batch_start_time'} ||= time();
 
   $self->muse( "= ", scalar(localtime) );
   $self->muse( "Starting batch conversion to \"$outdir\"" );
@@ -196,7 +196,7 @@ sub _batch_convert_main {
 
 sub _do_all_batch_conversions {
   my($self, $mod2path, $outdir) = < @_;
-  $self->{"__batch_conv_page_count"} = 0;
+  $self->{+"__batch_conv_page_count"} = 0;
 
   foreach my $module (sort {lc($a) cmp lc($b)} keys %$mod2path) {
     $self->_do_one_batch_conversion($module, $mod2path, $outdir);
@@ -209,7 +209,7 @@ sub _do_all_batch_conversions {
 sub _batch_convert_finish {
   my($self, $outdir) = < @_;
   $self->write_contents_file($outdir);
-  $self->muse("Done with batch conversion.  %$self{'__batch_conv_page_count'} files done.");
+  $self->muse("Done with batch conversion.  %$self{?'__batch_conv_page_count'} files done.");
   $self->muse( "= ", scalar(localtime) );
   $self->progress and $self->progress->done("All done!");
   return;
@@ -222,7 +222,7 @@ sub _do_one_batch_conversion {
 
   my $retval;
   my $total    = nkeys %$mod2path;
-  my $infile   = $mod2path->{$module};
+  my $infile   = $mod2path->{?$module};
   my @namelets = grep m/\S/, split "::", $module;
         # this can stick around in the contents LoL
   my $depth    = scalar nelems @namelets;
@@ -238,10 +238,10 @@ sub _do_one_batch_conversion {
 
   my $page = $self->html_render_class->new;
   if(DEBUG +> 5) {
-    $self->muse($self->{"__batch_conv_page_count"} + 1, "/$total: ",
+    $self->muse($self->{?"__batch_conv_page_count"} + 1, "/$total: ",
       ref($page), " render ($depth) $module => $outfile");
   } elsif(DEBUG +> 2) {
-    $self->muse($self->{"__batch_conv_page_count"} + 1, "/$total: $module => $outfile")
+    $self->muse($self->{?"__batch_conv_page_count"} + 1, "/$total: $module => $outfile")
   }
 
   # Give each class a chance to init the converter:
@@ -254,10 +254,10 @@ sub _do_one_batch_conversion {
   # Now get busy...
   $self->makepath($outdir => \@namelets);
 
-  $progress and $progress->reach($self->{"__batch_conv_page_count"}, "Rendering $module");
+  $progress and $progress->reach($self->{?"__batch_conv_page_count"}, "Rendering $module");
 
   if( $retval = $page->parse_from_file($infile, $outfile) ) {
-    ++ $self->{"__batch_conv_page_count"} ;
+    ++ $self->{+"__batch_conv_page_count"} ;
     $self->note_for_contents_file( \@namelets, $infile, $outfile );
   } else {
     $self->muse("Odd, parse_from_file(\"$infile\", \"$outfile\") returned false.");
@@ -278,7 +278,7 @@ sub _do_one_batch_conversion {
 }
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-sub filespecsys { @_[0]->{'_filespecsys'} || 'File::Spec' }
+sub filespecsys { @_[0]->{?'_filespecsys'} || 'File::Spec' }
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -358,10 +358,10 @@ sub _write_contents_middle {
 
   foreach my $t (sort keys %$toplevel2submodules) {
     my @downlines = sort {$a->[-1] cmp $b->[-1]}
- @{ $toplevel2submodules->{$t} };
+ @{ $toplevel2submodules->{?$t} };
     
     printf $Contents qq[<dt><a name="\%s">\%s</a></dt>\n<dd>\n],
-      esc( $t ), esc( $toplevel_form_freq->{$t} )
+      esc( $t ), esc( $toplevel_form_freq->{?$t} )
     ;
     
     my($path, $name);
@@ -405,16 +405,16 @@ sub _prep_contents_breakdown {
           # group all the perlwhatever docs together
       !! $entry->[3]->[0] # normal case
     ;
-    ++%toplevel_form_freq{ lc $toplevel }->{ $toplevel };
+    ++%toplevel_form_freq{ lc $toplevel }->{+$toplevel };
     push @{ %toplevel{ lc $toplevel } }, $entry;
     push @$entry, lc($entry->[0]); # add a sort-order key to the end
   }
 
   foreach my $toplevel (sort keys %toplevel) {
-    my $fgroup = %toplevel_form_freq{$toplevel};
-    %toplevel_form_freq{$toplevel} =
+    my $fgroup = %toplevel_form_freq{?$toplevel};
+    %toplevel_form_freq{+$toplevel} =
     (
-      sort { $fgroup->{$b} <+> $fgroup->{$a}  or  $a cmp $b }
+      sort { $fgroup->{?$b} <+> $fgroup->{?$a}  or  $a cmp $b }
         keys %$fgroup
       # This hash is extremely unlikely to have more than 4 members, so this
       # sort isn't so very wasteful
@@ -545,7 +545,7 @@ sub modnames2paths { # return a hashref mapping modulenames => paths
   if( DEBUG +> 4 ) {
     print "Modules found (name => path):\n";
     foreach my $m (sort {lc($a) cmp lc($b)} keys %$m2p) {
-      print "  $m  %$m2p{$m}\n";
+      print "  $m  %$m2p{?$m}\n";
     }
     print "(total ",     nkeys %$m2p, ")\n\n";
   } elsif( DEBUG ) {
@@ -744,7 +744,7 @@ sub _gen_css_wad {
 sub _color_negate {
   my $x = lc @_[0];
   $x =~ s/([0123456789abcdef])/$( 
-     %( < qw| 0 f 1 e 2 d 3 c 4 b 5 a 6 9 7 8 8 7 9 6 a 5 b 4 c 3 d 2 e 1 f 0 | ){$1} )/g;
+     %( < qw| 0 f 1 e 2 d 3 c 4 b 5 a 6 9 7 8 8 7 9 6 a 5 b 4 c 3 d 2 e 1 f 0 | ){?$1} )/g;
   return $x;
 }
 

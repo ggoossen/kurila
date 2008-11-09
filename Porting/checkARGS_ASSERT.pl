@@ -8,7 +8,7 @@ my %used;
 
 open my $fh, '<', 'proto.h' or die "Can't open proto.h: $!";
 while (~< $fh) {
-    %declared{$1}++ if m/^#define\s+(PERL_ARGS_ASSERT[A-Za-z_]+)\s+/;
+    %declared{+$1}++ if m/^#define\s+(PERL_ARGS_ASSERT[A-Za-z_]+)\s+/;
 }
 
 if (!nelems @ARGV) {
@@ -20,13 +20,13 @@ if (!nelems @ARGV) {
 }
 
 while (~< *ARGV) {
-    %used{$1}++ if m/^\s+(PERL_ARGS_ASSERT_[A-Za-z_]+);$/;
+    %used{+$1}++ if m/^\s+(PERL_ARGS_ASSERT_[A-Za-z_]+);$/;
 }
 
 my %unused;
 
 foreach (keys %declared) {
-    %unused{$_}++ unless %used{$_};
+    %unused{+$_}++ unless %used{?$_};
 }
 
 print $_, "\n" foreach sort keys %unused;

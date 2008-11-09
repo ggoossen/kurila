@@ -84,7 +84,7 @@ if (join ('|', @names) eq 'bold|on_green|clear') {
 }
 
 # Test ANSI_COLORS_DISABLED.
-%ENV{ANSI_COLORS_DISABLED} = 1;
+%ENV{+ANSI_COLORS_DISABLED} = 1;
 if (color ('blue') eq '') {
     print "ok 10\n";
 } else {

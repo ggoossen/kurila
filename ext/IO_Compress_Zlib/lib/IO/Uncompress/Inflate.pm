@@ -59,7 +59,7 @@ sub ckMagic
     my $magic ;
     $self->smartReadExact(\$magic, ZLIB_HEADER_SIZE);
 
-    *$self->{HeaderPending} = $magic ;
+    *$self->{+HeaderPending} = $magic ;
 
     return $self->HeaderError("Header size is " . 
                                         ZLIB_HEADER_SIZE . " bytes") 
@@ -69,7 +69,7 @@ sub ckMagic
     return undef
         if ! $self->isZlibMagic($magic) ;
                       
-    *$self->{Type} = 'rfc1950';
+    *$self->{+Type} = 'rfc1950';
     return $magic;
 }
 
@@ -87,9 +87,9 @@ sub chkTrailer
     my $trailer = shift;
 
     my $ADLER32 = unpack("N", $trailer) ;
-    *$self->{Info}->{ADLER32} = $ADLER32;    
+    *$self->{Info}->{+ADLER32} = $ADLER32;    
     return $self->TrailerError("CRC mismatch")
-        if *$self->{Strict} && $ADLER32 != *$self->{Uncomp}->adler32() ;
+        if *$self->{?Strict} && $ADLER32 != *$self->{Uncomp}->adler32() ;
 
     return STATUS_OK;
 }
@@ -167,7 +167,7 @@ sub _readDeflateHeader
         $DICTID = unpack("N", $buffer) ;
     }
 
-    *$self->{Type} = 'rfc1950';
+    *$self->{+Type} = 'rfc1950';
 
     return \%(
         'Type'          => 'rfc1950',

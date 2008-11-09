@@ -136,16 +136,16 @@ sub lock_ref_keys {
         my %original_keys = %( < map { ($_ => 1) } keys %$hash );
         foreach my $k (keys %original_keys) {
             die "Hash has key '$k' which is not in the new key set"
-              unless %keys{$k};
+              unless %keys{?$k};
         }
 
         foreach my $k ( @keys) {
-            $hash->{$k} = undef unless exists $hash->{$k};
+            $hash->{+$k} = undef unless exists $hash->{$k};
         }
         Internals::SvREADONLY %$hash, 1;
 
         foreach my $k ( @keys) {
-            delete $hash->{$k} unless %original_keys{$k};
+            delete $hash->{$k} unless %original_keys{?$k};
         }
     }
     else {
@@ -186,7 +186,7 @@ sub lock_ref_keys_plus {
     Internals::hv_clear_placeholders(%$hash);
     foreach my $key ( @keys) {
         unless (exists($hash->{$key})) {
-            $hash->{$key}=undef;
+            $hash->{+$key}=undef;
             push @delete,$key;
         }
     }
@@ -222,13 +222,13 @@ sub lock_ref_value {
     # of the status of the hash itself.
     warn "Cannot usefully lock values in an unlocked hash"
       if !Internals::SvREADONLY(%$hash) && warnings::enabled;
-    Internals::SvREADONLY $hash->{$key}, 1;
+    Internals::SvREADONLY $hash->{?$key}, 1;
     return $hash
 }
 
 sub unlock_ref_value {
     my($hash, $key) = < @_;
-    Internals::SvREADONLY $hash->{$key}, 0;
+    Internals::SvREADONLY $hash->{?$key}, 0;
     return $hash
 }
 

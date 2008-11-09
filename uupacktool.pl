@@ -30,7 +30,7 @@ sub handle_file {
 
     ### unpack?
     my $outstr;
-    if( $opts->{u} ) {
+    if( $opts->{?u} ) {
         if( !$outfile ) {
             $outfile = $file;
             $outfile =~ s/\.packed\z//;
@@ -65,11 +65,11 @@ EOFBLURB
     }
 
     ### output the file
-    if( $opts->{'s'} ) {
+    if( $opts->{?'s'} ) {
         print STDOUT $outstr;
     } else {
         $outfile = VMS::Filespec::vmsify($outfile) if $^O eq 'VMS';
-        print "Writing $file into $outfile\n" if $opts->{'v'};
+        print "Writing $file into $outfile\n" if $opts->{?'v'};
         open my $outfh, ">", $outfile
             or do { warn "Could not open $outfile for writing: $!"; exit 0 };
         binmode $outfh;
@@ -81,19 +81,19 @@ EOFBLURB
     }
 
     ### delete source file?
-    if( $opts->{'D'} and $file ne $outfile ) {
+    if( $opts->{?'D'} and $file ne $outfile ) {
         1 while unlink $file;
     }
 }
 
 sub bulk_process {
     my $opts = shift;
-    my $Manifest = $opts->{'m'};
+    my $Manifest = $opts->{?'m'};
 
     open my $fh, "<", $Manifest or die "Could not open '$Manifest':$!";
 
     print "Reading $Manifest\n"
-            if $opts->{'v'};
+            if $opts->{?'v'};
 
     my $count = 0;
     my $lines = 0;
@@ -112,19 +112,19 @@ sub bulk_process {
         $out = vms_check_name($out) if $^O eq 'VMS';
 
         ### unpack
-        if( !$opts->{'c'} ) {
-            ( $out, $file ) = ( $file, $out ) if $opts->{'p'};
+        if( !$opts->{?'c'} ) {
+            ( $out, $file ) = ( $file, $out ) if $opts->{?'p'};
             if (-e $out) {
                 my $changed = -M _;
                 if ($changed +< $LastUpdate and $changed +< -M $file) {
                     print "Skipping '$file' as '$out' is up-to-date.\n"
-                        if $opts->{'v'};
+                        if $opts->{?'v'};
                     next;
                 }
             }
             handle_file($opts, $file, $out);
             print "Converted '$file' to '$out'\n"
-                if $opts->{'v'};
+                if $opts->{?'v'};
 
         ### clean up
         } else {
@@ -141,7 +141,7 @@ sub bulk_process {
         }
     }
     print "Found $count files to process out of $lines in '$Manifest'\n"
-            if $opts->{'v'};
+            if $opts->{?'v'};
 }
 
 sub usage {
@@ -199,17 +199,17 @@ my $opts = \%();
 GetOptions($opts,'u','p','c', 'D', 'm:s','s','d=s','v','h');
 
 die "Can't pack and unpack at the same time!\n", < usage()
-    if $opts->{'u'} && $opts->{'p'};
-die < usage() if $opts->{'h'};
+    if $opts->{?'u'} && $opts->{?'p'};
+die < usage() if $opts->{?'h'};
 
-if ( $opts->{'d'} ) {
-    chdir $opts->{'d'}
-        or die "Failed to chdir to '$opts->{'d'}':$!";
+if ( $opts->{?'d'} ) {
+    chdir $opts->{?'d'}
+        or die "Failed to chdir to '$opts->{?'d'}':$!";
 }
-$opts->{'u'} = 1 if !$opts->{'p'};
-binmode STDOUT if $opts->{'s'};
+$opts->{+'u'} = 1 if !$opts->{?'p'};
+binmode STDOUT if $opts->{?'s'};
 if ( exists $opts->{'m'} or exists $opts->{'c'} ) {
-    $opts->{'m'} ||= "MANIFEST";
+    $opts->{+'m'} ||= "MANIFEST";
     bulk_process($opts);
     exit(0);
 } else {

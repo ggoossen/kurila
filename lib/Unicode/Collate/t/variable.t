@@ -54,7 +54,7 @@ is($Collator->cmp("deLuge", "de Luge"), -1);
 
 $Collator->change(< %origVar);
 
-ok($Collator->{variable}, 'shifted');
+ok($Collator->{?variable}, 'shifted');
 
 ##############
 

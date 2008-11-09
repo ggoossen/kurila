@@ -369,18 +369,18 @@ sub glob {
  
     # assume global context if not provided one
     $cxix = '_G_' unless defined $cxix;
-    %iter{$cxix} = 0 unless exists %iter{$cxix};
+    %iter{+$cxix} = 0 unless exists %iter{$cxix};
 
     # if we're just beginning, do it all first
-    if (%iter{$cxix} == 0) {
+    if (%iter{?$cxix} == 0) {
 	if ($^O eq 'MacOS') {
 		# first, take care of updirs and trailing colons
 		@pat = _preprocess_pattern(< @pat);
 		# expand volume names
 		@pat = _expand_volume(< @pat);
-		%entries{$cxix} = (nelems @pat) ?? \_un_escape( < doglob_Mac(1,< @pat) ) !! \@();
+		%entries{+$cxix} = (nelems @pat) ?? \_un_escape( < doglob_Mac(1,< @pat) ) !! \@();
 	} else {
-		%entries{$cxix} = \doglob(1,< @pat);
+		%entries{+$cxix} = \doglob(1,< @pat);
     }
 	}
 

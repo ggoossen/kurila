@@ -51,7 +51,7 @@ sub method {
 
 sub trymethod {
     try { method('foo', 'bar'); };
-    print "# $@->{description}" if $@;
+    print "# $@->{?description}" if $@;
 }
 
 for (1..5) { trymethod() }

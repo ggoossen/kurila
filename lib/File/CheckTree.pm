@@ -218,7 +218,7 @@ sub valmess {
     if ($test =~ m/ ^ (!?) -(\w) \s* $ /x) {
         my ($neg, $ftype) = ($1, $2);
 
-        $ferror = "$file %Val_Message{$ftype}";
+        $ferror = "$file %Val_Message{?$ftype}";
 
         if ($neg eq '!') {
             $ferror =~ s/ is not / should not be / ||

@@ -232,7 +232,7 @@ EOT
 
 sub B::GV::debug {
     my ($gv) = < @_;
-    if (%done_gv{$$gv}++) {
+    if (%done_gv{+$$gv}++) {
 	printf "GV \%s::\%s\n", < $gv->STASH->NAME, < $gv->SAFENAME;
 	return;
     }

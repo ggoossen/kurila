@@ -33,8 +33,8 @@ sub has_attr {
 }
 
 sub get_attr {
-    $Fattr->{@_[0]} = \@(1) unless $Fattr->{@_[0]};
-    return $Fattr->{@_[0]};
+    $Fattr->{+@_[0]} = \@(1) unless $Fattr->{?@_[0]};
+    return $Fattr->{?@_[0]};
 }
 
 sub get_fields {
@@ -65,7 +65,7 @@ sub import {
             eval "require $base";
             # Only ignore "Can't locate" errors from our eval require.
             # Other fatal errors (syntax etc) must be reported.
-            die if $@ && $@->{description} !~ m/^Can't locate .*?/;
+            die if $@ && $@->{?description} !~ m/^Can't locate .*?/;
             unless (%{*{Symbol::fetch_glob("$base\::")}}) {
                 die(<<ERROR);
 Base class package "$base" is empty.
@@ -120,7 +120,7 @@ END
     # This is all too complicated to do efficiently with add_fields().
     while (my($k,$v) = each %$bfields) {
         my $fno;
-        if ($fno = $dfields->{$k} and $fno != $v) {
+        if ($fno = $dfields->{?$k} and $fno != $v) {
             die("Inherited fields can't override existing fields");
         }
 
@@ -129,7 +129,7 @@ END
         }
         else {
             $dattr->[$v] = INHERITED ^|^ $battr->[$v];
-            $dfields->{$k} = $v;
+            $dfields->{+$k} = $v;
         }
     }
 

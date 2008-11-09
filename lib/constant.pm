@@ -36,7 +36,7 @@ sub import {
 	}
 	$constants = shift;
     } else {
-	$constants->{shift(@_)} = undef;
+	$constants->{+shift(@_)} = undef;
     }
 
     foreach my $name ( keys %$constants ) {
@@ -45,11 +45,11 @@ sub import {
 	}
 
 	# Normal constant name
-	if ($name =~ m/^_?[^\W_0-9]\w*\z/ and !%forbidden{$name}) {
+	if ($name =~ m/^_?[^\W_0-9]\w*\z/ and !%forbidden{?$name}) {
 	    # Everything is okay
 
 	# Name forced into main, but we're not in main. Fatal.
-	} elsif (%forced_into_main{$name} and $pkg ne 'main') {
+	} elsif (%forced_into_main{?$name} and $pkg ne 'main') {
 	    die("Constant name '$name' is forced into main::");
 
 	# Starts with double underscore. Fatal.
@@ -60,9 +60,9 @@ sub import {
 	} elsif ($name =~ m/^[A-Za-z_]\w*\z/) {
 	    # Then we'll warn only if you've asked for warnings
 	    if (warnings::enabled()) {
-		if (%keywords{$name}) {
+		if (%keywords{?$name}) {
 		    warnings::warn("Constant name '$name' is a Perl keyword");
-		} elsif (%forced_into_main{$name}) {
+		} elsif (%forced_into_main{?$name}) {
 		    warnings::warn("Constant name '$name' is " .
 			"forced into package main::");
 		}
@@ -84,9 +84,9 @@ sub import {
 
 	do {
 	    my $full_name = "$($pkg)::$name";
-	    %declared{$full_name}++;
+	    %declared{+$full_name}++;
 	    if ($multiple || (nelems @_) == 1) {
-		my $scalar = $multiple ?? $constants->{$name} !! @_[0];
+		my $scalar = $multiple ?? $constants->{?$name} !! @_[0];
                 *{Symbol::fetch_glob($full_name)} = sub () { $scalar };
 	    } elsif ((nelems @_)) {
 		my @list = @_;

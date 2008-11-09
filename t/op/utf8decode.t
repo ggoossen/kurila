@@ -135,8 +135,8 @@ do {
 
     my $x_warn;
     local $^WARN_HOOK = sub {
-	print "# $id: " . @_[0]->{description} . "\n";
-	$x_warn = @_[0]->{description};
+	print "# $id: " . @_[0]->{?description} . "\n";
+	$x_warn = @_[0]->{?description};
     };
 
     sub moan {

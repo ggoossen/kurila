@@ -7,7 +7,7 @@
 #
 
 BEGIN {
-    if (%ENV{PERL_CORE}){
+    if (%ENV{?PERL_CORE}){
 	push @INC, '../ext/Storable/t';
     }
     require 'st-dump.pl';
@@ -28,13 +28,13 @@ sub FETCH {
 	my $self = shift;
 	my ($key) = <@_;
 	$main::hash_fetch++;
-	return $self->{$key};
+	return $self->{?$key};
 }
 
 sub STORE {
 	my $self = shift;
 	my ($key, $val) = <@_;
-	$self->{$key} = $val;
+	$self->{+$key} = $val;
 }
 
 package SIMPLE;
@@ -51,25 +51,25 @@ package ROOT;
 sub make {
 	my $self = bless \%(), shift;
 	my $h = tie our %hash, 'TIED_HASH';
-	$self->{h} = $h;
-	$self->{ref} = \%hash;
+	$self->{+h} = $h;
+	$self->{+ref} = \%hash;
 	my @pool;
 	for my $i (0..4) {
 		push(@pool, SIMPLE->make($i));
 	}
-	$self->{obj} = \@pool;
+	$self->{+obj} = \@pool;
 	my @a = @('string', $h, $self);
-	$self->{a} = \@a;
-	$self->{num} = \@(1, 0, -3, -3.14159, 456, 4.5);
-	$h->{key1} = 'val1';
-	$h->{key2} = 'val2';
+	$self->{+a} = \@a;
+	$self->{+num} = \@(1, 0, -3, -3.14159, 456, 4.5);
+	$h->{+key1} = 'val1';
+	$h->{+key2} = 'val2';
 	return $self;
 };
 
-sub num { @_[0]->{num} }
-sub h   { @_[0]->{h} }
-sub ref { @_[0]->{ref} }
-sub obj { @_[0]->{obj} }
+sub num { @_[0]->{?num} }
+sub h   { @_[0]->{?h} }
+sub ref { @_[0]->{?ref} }
+sub obj { @_[0]->{?obj} }
 
 package main;
 
@@ -107,8 +107,8 @@ $y->{num}->[3] += 0;
 $r->{num}->[3] += 0;
 ok 4, nfreeze($y) eq nfreeze($r);
 
-ok 5, $y->ref->{key1} eq 'val1';
-ok 6, $y->ref->{key2} eq 'val2';
+ok 5, $y->ref->{?key1} eq 'val1';
+ok 6, $y->ref->{?key2} eq 'val2';
 ok 7, our $hash_fetch == 2;
 
 my $num = $r->num;

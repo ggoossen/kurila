@@ -13,7 +13,7 @@ $VERSION = '2.02';
 sub new {
   my $self = shift;
   my $new = $self->SUPER::new(< @_);
-  $new->{'output_fh'} ||= *STDOUT{IO};
+  $new->{+'output_fh'} ||= *STDOUT{IO};
   $new->nix_X_codes(1);
   return $new;
 }
@@ -21,19 +21,19 @@ sub new {
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 sub _handle_element_start {
-  print {@_[0]->{'output_fh'}} "\n"  unless @_[1] =~ m/^[A-Z]$/s;
+  print {@_[0]->{?'output_fh'}} "\n"  unless @_[1] =~ m/^[A-Z]$/s;
   return;
 }
 
 sub _handle_text {
     @_[1] =~ s/\x{AD}//g;
     @_[1] =~ s/\x{A0}/ /g;
-    print {@_[0]->{'output_fh'}} @_[1];
+    print {@_[0]->{?'output_fh'}} @_[1];
     return;
 }
 
 sub _handle_element_end {
-  print {@_[0]->{'output_fh'}} "\n"  unless @_[1] =~ m/^[A-Z]$/s;
+  print {@_[0]->{?'output_fh'}} "\n"  unless @_[1] =~ m/^[A-Z]$/s;
   return;
 }
 

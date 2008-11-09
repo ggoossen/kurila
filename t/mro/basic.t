@@ -168,7 +168,7 @@ do {
     );
     foreach my $code ( @recurse_codes) {
         eval $code;
-        ok($@->{description} =~ m/Recursive inheritance detected/);
+        ok($@->{?description} =~ m/Recursive inheritance detected/);
     }
 };
 

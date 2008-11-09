@@ -86,27 +86,27 @@ my %Opts;
 
 GetOptions(\%Opts, < qw[ help|?! man! v|version:f a! d ] );
 
-pod2usage(1) if %Opts{help};
-pod2usage(-verbose=>2) if %Opts{man};
+pod2usage(1) if %Opts{?help};
+pod2usage(-verbose=>2) if %Opts{?man};
 
 if(exists %Opts{v} ){
-    if( !%Opts{v} ) {
+    if( !%Opts{?v} ) {
         print "\nModule::CoreList has info on the following perl versions:\n";
         print "$_\n" for sort keys %Module::CoreList::version;
         print "\n";
         exit 0;
     }
 
-    %Opts{v} = numify_version( %Opts{v} );
+    %Opts{+v} = numify_version( %Opts{?v} );
     my $version_hash = Module::CoreList->find_version(%Opts{v});
     if( !$version_hash ) {
-        print "\nModule::CoreList has no info on perl v%Opts{v}\n\n";
+        print "\nModule::CoreList has no info on perl v%Opts{?v}\n\n";
         exit 1;
     }
 
     if ( !nelems @ARGV ) {
-	print "\nThe following modules were in perl v%Opts{v} CORE\n";
-	print "$_ ", $version_hash->{$_} || " ","\n"
+	print "\nThe following modules were in perl v%Opts{?v} CORE\n";
+	print "$_ ", $version_hash->{?$_} || " ","\n"
 	for sort keys %$version_hash;
 	print "\n";
 	exit 0;
@@ -134,7 +134,7 @@ while ((nelems @ARGV)) {
 	    if ($@) {
 		# regex errors are usually like 'Quantifier follow nothing in regex; marked by ...'
 		# then we drop text after ';' to shorten message
-		my $errmsg = $@->{description} =~ m/(.*);/ ?? $1 !! $@;
+		my $errmsg = $@->{?description} =~ m/(.*);/ ?? $1 !! $@;
 		warn "\n$mod  is a bad regex: $errmsg\n";
 		next;
 	    }
@@ -154,16 +154,16 @@ exit();
 sub module_version {
     my($mod,$ver) = < @_;
 
-    if ( %Opts{v} ) {
+    if ( %Opts{?v} ) {
 	my $version_hash = Module::CoreList->find_version(%Opts{v});
 	if ($version_hash) {
-	    print $mod, " ", $version_hash->{$mod} || 'undef', "\n";
+	    print $mod, " ", $version_hash->{?$mod} || 'undef', "\n";
 	    return;
 	}
 	else { die "Shouldn't happen" }
     }
 
-    my $ret = %Opts{d}
+    my $ret = %Opts{?d}
 	?? Module::CoreList->first_release_by_date(< @_)
 	!! Module::CoreList->first_release(< @_);
     my $msg = $mod;
@@ -179,13 +179,13 @@ sub module_version {
 
     print "\n",$msg,"\n";
 
-    if(defined $ret and exists %Opts{a} and %Opts{a}){
+    if(defined $ret and exists %Opts{a} and %Opts{?a}){
         for my $v(
             sort keys %Module::CoreList::version ){
 
             printf "  \%-10s \%-10s\n",
                 $v,
-                %Module::CoreList::version{$v}->{$mod}
+                %Module::CoreList::version{$v}->{?$mod}
                     || 'undef'
                     if exists %Module::CoreList::version{$v}->{$mod};
         }

@@ -56,16 +56,16 @@ can_ok( 'DynaLoader' => 'dl_find_symbol_anywhere' ); # defined in AutoLoaded sec
 # Check error messages
 # .. for bootstrap()
 try { DynaLoader::bootstrap() };
-like( $@->{description}, q{/^Usage: DynaLoader::bootstrap\(module\)/},
+like( $@->{?description}, q{/^Usage: DynaLoader::bootstrap\(module\)/},
         "calling DynaLoader::bootstrap() with no argument" );
 
 try { package egg_bacon_sausage_and_spam; DynaLoader::bootstrap("egg_bacon_sausage_and_spam") };
-like( $@->{description}, q{/^Can't locate loadable object for module egg_bacon_sausage_and_spam/},
+like( $@->{?description}, q{/^Can't locate loadable object for module egg_bacon_sausage_and_spam/},
         "calling DynaLoader::bootstrap() with a package without binary object" );
 
 # .. for dl_load_file()
 try { DynaLoader::dl_load_file() };
-like( $@->{description}, q{/^Usage: DynaLoader::dl_load_file\(filename, flags=0\)/},
+like( $@->{?description}, q{/^Usage: DynaLoader::dl_load_file\(filename, flags=0\)/},
         "calling DynaLoader::dl_load_file() with no argument" );
 
 try { no warnings 'uninitialized'; DynaLoader::dl_load_file(undef) };

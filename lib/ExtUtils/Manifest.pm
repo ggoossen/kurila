@@ -23,9 +23,9 @@ $Is_MacOS = $^O eq 'MacOS';
 $Is_VMS   = $^O eq 'VMS';
 require VMS::Filespec if $Is_VMS;
 
-$Debug   = %ENV{PERL_MM_MANIFEST_DEBUG} || 0;
-$Verbose = defined %ENV{PERL_MM_MANIFEST_VERBOSE} ??
-                   %ENV{PERL_MM_MANIFEST_VERBOSE} !! 1;
+$Debug   = %ENV{?PERL_MM_MANIFEST_DEBUG} || 0;
+$Verbose = defined %ENV{?PERL_MM_MANIFEST_VERBOSE} ??
+                   %ENV{?PERL_MM_MANIFEST_VERBOSE} !! 1;
 $Quiet = 0;
 $MANIFEST = 'MANIFEST';
 
@@ -100,7 +100,7 @@ sub mkmanifest {
     my $found = manifind();
     my($key,$val,%all);
     %all = %(< %$found, < %$read);
-    %all{$MANIFEST} = ($Is_VMS ?? "$MANIFEST\t\t" !! '') . 'This list of files'
+    %all{+$MANIFEST} = ($Is_VMS ?? "$MANIFEST\t\t" !! '') . 'This list of files'
         if $manimiss; # add new MANIFEST to known file list
     foreach my $file ( _sort < keys %all) {
 	if ($skip->($file)) {
@@ -112,7 +112,7 @@ sub mkmanifest {
 	if ($Verbose){
 	    warn "Added to $MANIFEST: $file\n" unless exists $read->{$file};
 	}
-	my $text = %all{$file};
+	my $text = %all{?$file};
 	$file = _unmacify($file);
 	my $tabs = (5 - (length($file)+1)/8);
 	$tabs = 1 if $tabs +< 1;
@@ -154,7 +154,7 @@ sub manifind {
             $name =~ s#(.*)\.$#$( lc($1) )#;
             $name = uc($name) if $name =~ m/^MANIFEST(\.SKIP)?$/i;
         }
-	$found->{$name} = "";
+	$found->{+$name} = "";
     };
 
     # We have to use "$File::Find::dir/$_" in preprocess, because 
@@ -336,7 +336,7 @@ sub maniread {
             $file = lc($file) unless $file =~ m/^MANIFEST(\.SKIP)?$/;
         }
 
-        $read->{$file} = $comment;
+        $read->{+$file} = $comment;
     }
     close $m;
     $read;
@@ -624,7 +624,7 @@ sub maniadd {
       die "maniadd() could not open $MANIFEST: $!";
 
     foreach my $file ( _sort < @needed) {
-        my $comment = $additions->{$file} || '';
+        my $comment = $additions->{?$file} || '';
         printf MANIFEST "\%-40s \%s\n", $file, $comment;
     }
     close MANIFEST or die "Error closing $MANIFEST: $!";

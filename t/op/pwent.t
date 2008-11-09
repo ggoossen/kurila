@@ -4,13 +4,13 @@ our (%Config, $where);
 
 BEGIN {
     try {my @n = @( getpwuid 0 ); setpwent()};
-    if ($@ && $@->{description} =~ m/(The \w+ function is unimplemented)/) {
+    if ($@ && $@->{?description} =~ m/(The \w+ function is unimplemented)/) {
 	print "1..0 # Skip: $1\n";
 	exit 0;
     }
     try { require Config; Config->import; };
     my $reason;
-    if (%Config{'i_pwd'} ne 'define') {
+    if (%Config{?'i_pwd'} ne 'define') {
 	$reason = '%Config{i_pwd} undefined';
     }
     elsif (not -f "/etc/passwd" ) { # Play safe.
@@ -89,7 +89,7 @@ while ( ~< *PW) {
     # LIMIT -1 so that users with empty shells don't fall off
     my @s = split m/:/, $_, -1;
     my ($name_s, $passwd_s, $uid_s, $gid_s, $gcos_s, $home_s, $shell_s);
-    (my $v) = %Config{osvers} =~ m/^(\d+)/;
+    (my $v) = %Config{?osvers} =~ m/^(\d+)/;
     if ($^O eq 'darwin' && $v +< 9) {
        ($name_s, $passwd_s, $uid_s, $gid_s, $gcos_s, $home_s, $shell_s) = < @s[[@(0,1,2,3,7,8,9)]];
     } else {
@@ -120,7 +120,7 @@ while ( ~< *PW) {
 	    ($name,$passwd,$uid,$gid,$quota,$comment,$gcos,$home,$shell) = < @n;
 	    next if $name_s ne $name;
 	}
-	%perfect{$name_s}++
+	%perfect{+$name_s}++
 	    if $name    eq $name_s    and
                $uid     eq $uid_s     and
 # Do not compare passwords: think shadow passwords.

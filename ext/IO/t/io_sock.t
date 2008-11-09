@@ -22,7 +22,7 @@ $| = 1;
 print "1..26\n";
 
 try {
-    %SIG{ALRM} = sub { die; };
+    %SIG{+ALRM} = sub { die; };
     alarm 120;
 };
 

@@ -61,7 +61,7 @@ sub code2country
 
     if (exists $CODES->[$codeset]->{$code})
     {
-        return $CODES->[$codeset]->{$code};
+        return $CODES->[$codeset]->{?$code};
     }
     else
     {
@@ -88,7 +88,7 @@ sub country2code
     $country = lc($country);
     if (exists $COUNTRIES->[$codeset]->{$country})
     {
-        return $COUNTRIES->[$codeset]->{$country};
+        return $COUNTRIES->[$codeset]->{?$country};
     }
     else
     {
@@ -174,9 +174,9 @@ sub alias_code
         carp "attempt to alias \"$alias\" to unknown country code \"$real\"\n";
         return undef;
     }
-    $country = $CODES->[$codeset]->{$real};
-    $CODES->[$codeset]->{$alias} = $country;
-    $COUNTRIES->[$codeset]->{lc "$country"} = $alias;
+    $country = $CODES->[$codeset]->{?$real};
+    $CODES->[$codeset]->{+$alias} = $country;
+    $COUNTRIES->[$codeset]->{+lc "$country"} = $alias;
 
     return $alias;
 }
@@ -208,7 +208,7 @@ sub rename_country
         return 0;
     }
 
-    $country = $CODES->[$codeset]->{$code};
+    $country = $CODES->[$codeset]->{?$code};
 
     foreach my $cset (@(LOCALE_CODE_ALPHA_2,
 			LOCALE_CODE_ALPHA_3,
@@ -223,8 +223,8 @@ sub rename_country
 	    $c = country_code2code($code, $codeset, $cset);
 	}
 
-	$CODES->[$cset]->{$c} = $new_name;
-	$COUNTRIES->[$cset]->{lc "$new_name"} = $c;
+	$CODES->[$cset]->{+$c} = $new_name;
+	$COUNTRIES->[$cset]->{+lc "$new_name"} = $c;
     }
 
     return 1;
@@ -271,27 +271,27 @@ do {
         chop;
         ($alpha2, $alpha3, $numeric, < @countries) = < split(m/:/, $_);
 
-        $CODES->[LOCALE_CODE_ALPHA_2]->{$alpha2} = @countries[0];
+        $CODES->[LOCALE_CODE_ALPHA_2]->{+$alpha2} = @countries[0];
 	foreach my $country ( @countries)
 	{
-	    $COUNTRIES->[LOCALE_CODE_ALPHA_2]->{lc "$country"} = $alpha2;
+	    $COUNTRIES->[LOCALE_CODE_ALPHA_2]->{+lc "$country"} = $alpha2;
 	}
 
 	if ($alpha3)
 	{
-            $CODES->[LOCALE_CODE_ALPHA_3]->{$alpha3} = @countries[0];
+            $CODES->[LOCALE_CODE_ALPHA_3]->{+$alpha3} = @countries[0];
 	    foreach my $country ( @countries)
 	    {
-		$COUNTRIES->[LOCALE_CODE_ALPHA_3]->{lc "$country"} = $alpha3;
+		$COUNTRIES->[LOCALE_CODE_ALPHA_3]->{+lc "$country"} = $alpha3;
 	    }
 	}
 
 	if ($numeric)
 	{
-            $CODES->[LOCALE_CODE_NUMERIC]->{$numeric} = @countries[0];
+            $CODES->[LOCALE_CODE_NUMERIC]->{+$numeric} = @countries[0];
 	    foreach my $country ( @countries)
 	    {
-		$COUNTRIES->[LOCALE_CODE_NUMERIC]->{lc "$country"} = $numeric;
+		$COUNTRIES->[LOCALE_CODE_NUMERIC]->{+lc "$country"} = $numeric;
 	    }
 	}
 

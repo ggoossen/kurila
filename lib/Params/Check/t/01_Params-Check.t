@@ -47,7 +47,7 @@ do {
     do {   my $args = check( $tmpl, \%() );
 
         ok( $args,              "check() call with empty args" );
-        is( $args->{'foo'}, 1,  "   got default value" );
+        is( $args->{?'foo'}, 1,  "   got default value" );
     };
     
     ### now provide an alternate value ###
@@ -62,7 +62,7 @@ do {
     do {   my $try  = \%( FOO => 2 );
         my $args = check( $tmpl, $try );
         ok( $args,              "check() call with alternate case" );
-        is( $args->{foo}, 2,    "   found provided value in rv" );
+        is( $args->{?foo}, 2,    "   found provided value in rv" );
     };
 
     ### now see if we can strip leading dashes ###
@@ -127,7 +127,7 @@ do {   my $foo;
         my $rv = check( $tmpl, \%( foo => 42 ) );
         ok( $rv,                    "check() call with store key, no_dup: $_" );
         is( $foo, 42,               "   found provided value in variable" );
-        is( $rv->{foo}, $expect,    "   found provided value in variable" );
+        is( $rv->{?foo}, $expect,    "   found provided value in variable" );
     }
 };    
 
@@ -138,7 +138,7 @@ do {   my $tmpl = \%(
     
     my $rv = check( $tmpl, \%( foo => 13 ) );        
     ok( $rv,                    "check() call with no_override key" );
-    is( $rv->{'foo'}, 42,       "   found default value in rv" );
+    is( $rv->{?'foo'}, 42,       "   found default value in rv" );
 
     like( last_error(), qr/^You are not allowed to override key/, 
                                 "   warning recorded ok" );
@@ -159,7 +159,7 @@ do {   my @list = @(
         ### proper value ###    
         do {   my $rv = check( $tmpl, \%( foo => \@() ) );
             ok( $rv,                "check() call with strict_type enabled" );
-            is( ref $rv->{foo}, 'ARRAY',
+            is( ref $rv->{?foo}, 'ARRAY',
                                     "   found provided value in rv" );
         };
         
@@ -180,7 +180,7 @@ do {   my $tmpl = \%(
     ### required value provided ###
     do {   my $rv = check( $tmpl, \%( foo => 42 ) );
         ok( $rv,                    "check() call with required key" );
-        is( $rv->{foo}, 42,         "   found provided value in rv" );
+        is( $rv->{?foo}, 42,         "   found provided value in rv" );
     };
     
     ### required value omitted ###
@@ -206,7 +206,7 @@ do {   my @list = @(
         ### value provided defined ###
         do {   my $rv = check( $tmpl, \%( foo => 42 ) );
             ok( $rv,                "check() call with defined key" );
-            is( $rv->{foo}, 42,     "   found provided value in rv" );
+            is( $rv->{?foo}, 42,     "   found provided value in rv" );
         };
         
         ### value provided undefined ###
@@ -254,7 +254,7 @@ do {   my $tmpl = \%( foo => \%( allow => sub { 0 } ) );
     try { check( $tmpl, \%( foo => 1 ) ) };      
 
     ok( $@,             "Call dies with fatal toggled" );
-    like( $@->{description},           qr/invalid type/,
+    like( $@->{?description},           qr/invalid type/,
                             "   error stored ok" );
 };
 
@@ -277,9 +277,9 @@ do {   ### if key is not provided, and value is '', will P::C treat
     
     ok( $rv,                    "check() call with default = ''" );
     ok( exists $rv->{foo},      "   rv exists" );
-    ok( defined $rv->{foo},     "   rv defined" );
-    ok( !$rv->{foo},            "   rv false" );
-    is( $rv->{foo}, '',         "   rv = '' " );
+    ok( defined $rv->{?foo},     "   rv defined" );
+    ok( !$rv->{?foo},            "   rv false" );
+    is( $rv->{?foo}, '',         "   rv = '' " );
 };
 
 ### big template test ###
@@ -324,7 +324,7 @@ do {
     
     ok( $rv,                "elaborate check() call" );
     is_deeply( $rv, $get,   "   found provided values in rv" );
-    is( $rv->{lastname}, $lastname, 
+    is( $rv->{?lastname}, $lastname, 
                             "   found provided values in rv" );
 };
 

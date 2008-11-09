@@ -42,7 +42,7 @@ print "1..$max\n";
 open(STDERR, ">", "die_exit.err") or die "Can't open temp error file:  $!";
 
 foreach my $test (1 .. $max) {
-    my($bang, $query, $code) = < @{%tests{$test}};
+    my($bang, $query, $code) = < @{%tests{?$test}};
     $code ||= 'die;';
     if ($^O eq 'MSWin32' || $^O eq 'NetWare' || $^O eq 'VMS') {
         system(qq{$^X -e "\$! = $bang; \$? = $query; $code"});

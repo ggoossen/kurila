@@ -47,7 +47,7 @@ sub plan {
 	}
     } else {
 	my %plan = %( < @_ );
-	$n = %plan{tests};
+	$n = %plan{?tests};
     }
     _print "1..$n\n" unless $noplan;
     $planned = $n;
@@ -140,7 +140,7 @@ sub _qq {
 # keys are the codes \n etc map to, values are 2 char strings such as \n
 my %backslash_escape;
 foreach my $x (split m//, q|nrtfa\'"|) {
-    %backslash_escape{ord eval "\"\\$x\""} = "\\$x";
+    %backslash_escape{+ord eval "\"\\$x\""} = "\\$x";
 }
 # A way to display scalars containing control characters and Unicode.
 # Trying to avoid setting $_, or relying on local $_ to work.
@@ -340,8 +340,8 @@ sub eq_hash {
     # Force a hash recompute if this perl's internals can cache the hash key.
     $key = "" . $key;
     if (exists $orig->{$key}) {
-      if ($orig->{$key} ne $value) {
-        _print "# key ", _qq($key), " was ", _qq($orig->{$key}),
+      if ($orig->{?$key} ne $value) {
+        _print "# key ", _qq($key), " was ", _qq($orig->{?$key}),
                      " now ", _qq($value), "\n";
         $fail = 1;
       }
@@ -355,7 +355,7 @@ sub eq_hash {
     # Force a hash recompute if this perl's internals can cache the hash key.
     $_ = "" . $_;
     next if (exists $suspect->{$_});
-    _print "# key ", < _qq($_), " was ", < _qq($orig->{$_}), " now missing.\n";
+    _print "# key ", < _qq($_), " was ", < _qq($orig->{?$_}), " now missing.\n";
     $fail = 1;
   }
   !$fail;
@@ -410,33 +410,33 @@ sub _create_runperl { # Create the string to qx in runperl().
     my %args = %( < @_ );
     my $runperl = $^X =~ m/\s/ ?? qq{"$^X"} !! $^X;
     #- this allows, for example, to set PERL_RUNPERL_DEBUG=/usr/bin/valgrind
-    if (%ENV{PERL_RUNPERL_DEBUG}) {
-	$runperl = "%ENV{PERL_RUNPERL_DEBUG} $runperl";
+    if (%ENV{?PERL_RUNPERL_DEBUG}) {
+	$runperl = "%ENV{?PERL_RUNPERL_DEBUG} $runperl";
     }
-    unless (%args{nolib}) {
+    unless (%args{?nolib}) {
 	if ($is_macos) {
 	    $runperl .= ' -I::lib';
 	    # Use UNIX style error messages instead of MPW style.
-	    $runperl .= ' -MMac::err=unix' if %args{stderr};
+	    $runperl .= ' -MMac::err=unix' if %args{?stderr};
 	}
 	else {
 	    $runperl .= ' "-I../lib"'; # doublequotes because of VMS
 	}
     }
-    if (%args{switches}) {
+    if (%args{?switches}) {
 	local $Level = 2;
 	die "test.pl:runperl(): 'switches' must be an ARRAYREF " . _where()
-	    unless ref %args{switches} eq "ARRAY";
-	_quote_args(\$runperl, %args{switches});
+	    unless ref %args{?switches} eq "ARRAY";
+	_quote_args(\$runperl, %args{?switches});
     }
-    if (defined %args{prog}) {
+    if (defined %args{?prog}) {
 	die "test.pl:runperl(): both 'prog' and 'progs' cannot be used " . _where()
-	    if defined %args{progs};
-        %args{progs} = \@(%args{prog})
+	    if defined %args{?progs};
+        %args{+progs} = \@(%args{?prog})
     }
-    if (defined %args{progs}) {
+    if (defined %args{?progs}) {
 	die "test.pl:runperl(): 'progs' must be an ARRAYREF " . _where()
-	    unless ref %args{progs} eq "ARRAY";
+	    unless ref %args{?progs} eq "ARRAY";
         foreach my $prog ( @{%args{progs}}) {
             if ($is_mswin || $is_netware || $is_vms) {
                 $runperl .= qq ( -e "$prog" );
@@ -445,31 +445,31 @@ sub _create_runperl { # Create the string to qx in runperl().
                 $runperl .= qq ( -e '$prog' );
             }
         }
-    } elsif (defined %args{progfile}) {
-	$runperl .= qq( "%args{progfile}");
+    } elsif (defined %args{?progfile}) {
+	$runperl .= qq( "%args{?progfile}");
     } else {
 	# You probaby didn't want to be sucking in from the upstream stdin
 	die "test.pl:runperl(): none of prog, progs, progfile, args, "
 	    . " switches or stdin specified"
-	    unless defined %args{args} or defined %args{switches}
-		or defined %args{stdin};
+	    unless defined %args{?args} or defined %args{?switches}
+		or defined %args{?stdin};
     }
-    if (defined %args{stdin}) {
+    if (defined %args{?stdin}) {
 	# so we don't try to put literal newlines and crs onto the
 	# command line.
-	%args{stdin} =~ s/\n/\\n/g;
-	%args{stdin} =~ s/\r/\\r/g;
+	%args{+stdin} =~ s/\n/\\n/g;
+	%args{+stdin} =~ s/\r/\\r/g;
 
 	if ($is_mswin || $is_netware || $is_vms) {
 	    $runperl = qq{$^X -e "print qq(} .
-		%args{stdin} . q{)" | } . $runperl;
+		%args{?stdin} . q{)" | } . $runperl;
 	}
 	elsif ($is_macos) {
 	    # MacOS can only do two processes under MPW at once;
 	    # the test itself is one; we can't do two more, so
 	    # write to temp file
-	    my $stdin = qq{$^X -e 'print qq(} . %args{stdin} . qq{)' > teststdin; };
-	    if (%args{verbose}) {
+	    my $stdin = qq{$^X -e 'print qq(} . %args{?stdin} . qq{)' > teststdin; };
+	    if (%args{?verbose}) {
 		my $stdindisplay = $stdin;
 		$stdindisplay =~ s/\n/\n\#/g;
 		_print_stderr "# $stdindisplay\n";
@@ -479,15 +479,15 @@ sub _create_runperl { # Create the string to qx in runperl().
 	}
 	else {
 	    $runperl = qq{$^X -e 'print qq(} .
-		%args{stdin} . q{)' | } . $runperl;
+		%args{?stdin} . q{)' | } . $runperl;
 	}
     }
-    if (defined %args{args}) {
-	_quote_args(\$runperl, %args{args});
+    if (defined %args{?args}) {
+	_quote_args(\$runperl, %args{?args});
     }
-    $runperl .= ' 2>&1'          if  %args{stderr} && !$is_macos;
-    $runperl .= " \x[B3] Dev:Null" if !%args{stderr} &&  $is_macos;
-    if (%args{verbose}) {
+    $runperl .= ' 2>&1'          if  %args{?stderr} && !$is_macos;
+    $runperl .= " \x[B3] Dev:Null" if !%args{?stderr} &&  $is_macos;
+    if (%args{?verbose}) {
 	my $runperldisplay = $runperl;
 	$runperldisplay =~ s/\n/\n\#/g;
 	_print_stderr "# $runperldisplay\n";
@@ -516,19 +516,19 @@ sub runperl {
 	    warn "test.pl had problems loading Config: $@";
 	    $sep = ':';
 	} else {
-	    $sep = %Config{path_sep};
+	    $sep = %Config{?path_sep};
 	}
 
 	my @keys = grep {exists %ENV{$_}} qw(CDPATH IFS ENV BASH_ENV);
 	local %ENV{[ @keys]} = @();
 	# Untaint, plus take out . and empty string:
-	local %ENV{'DCL$PATH'} = $1 if $is_vms && (%ENV{'DCL$PATH'} =~ m/(.*)/s);
-	%ENV{PATH} =~ m/(.*)/s;
-	local %ENV{PATH} =
+	local %ENV{+'DCL$PATH'} = $1 if $is_vms && (%ENV{?'DCL$PATH'} =~ m/(.*)/s);
+	%ENV{?PATH} =~ m/(.*)/s;
+	local %ENV{+PATH} =
 	    join $sep, grep { $_ ne "" and $_ ne "." and -d $_ and
 		($is_mswin or $is_vms or !(stat && @(stat '_')[2]^&^0022)) }
 		    split quotemeta ($sep), $1;
-	%ENV{PATH} .= "$sep/bin" if $is_cygwin;  # Must have /bin under Cygwin
+	%ENV{+PATH} .= "$sep/bin" if $is_cygwin;  # Must have /bin under Cygwin
 
 	$runperl =~ m/(.*)/s;
 	$runperl = $1;
@@ -564,7 +564,7 @@ sub which_perl {
 	    warn "test.pl had problems loading Config: $@";
 	    $exe = '';
 	} else {
-	    $exe = %Config{_exe};
+	    $exe = %Config{?_exe};
 	}
        $exe = '' unless defined $exe;
 
@@ -593,7 +593,7 @@ sub which_perl {
 	warn "which_perl: cannot find $Perl from $^X" unless -f $Perl;
 
 	# For subcommands to use.
-	%ENV{PERLEXE} = $Perl;
+	%ENV{+PERLEXE} = $Perl;
     }
     return $Perl;
 }
@@ -622,8 +622,8 @@ sub _fresh_perl {
     my($prog, $resolve, $runperl_args, $name) = < @_;
 
     $runperl_args ||= \%();
-    $runperl_args->{progfile} = $tmpfile;
-    $runperl_args->{stderr} = 1;
+    $runperl_args->{+progfile} = $tmpfile;
+    $runperl_args->{+stderr} = 1;
 
     open TEST, ">", "$tmpfile" or die "Cannot open $tmpfile: $!";
 
@@ -747,7 +747,7 @@ sub isa_ok ($$;$) {
         local($@, $!);  # eval sometimes resets $!
         my $rslt = try { $object->isa($class) };
         if( $@ ) {
-            if( $@->{description} =~ m/^Can't call method "isa" on unblessed reference/ ) {
+            if( $@->{?description} =~ m/^Can't call method "isa" on unblessed reference/ ) {
                 if( !UNIVERSAL::isa($object, $class) ) {
                     my $ref = ref $object;
                     $diag = "$obj_name isn't a '$class' it's a '$ref'";
@@ -787,7 +787,7 @@ sub dies_like(&$;$) {
         diag "didn't die";
         return ok(0, $name);
     }
-    my $err = $@->{description};
+    my $err = $@->{?description};
     return like_yn(0, $err, $qr );
 }
 
@@ -795,7 +795,7 @@ sub eval_dies_like($$;$) {
     my ($e, $qr, $name) = < @_;
   TODO:
     do {
-        todo_skip("Compile time abortion are known to leak memory", 1) if %ENV{PERL_VALGRIND};
+        todo_skip("Compile time abortion are known to leak memory", 1) if %ENV{?PERL_VALGRIND};
         
         eval "$e";
         my $err = $@;
@@ -804,7 +804,7 @@ sub eval_dies_like($$;$) {
             diag "didn't die";
             return ok(0, $name);
         }
-        return like_yn(0, $err->{description}, $qr );
+        return like_yn(0, $err->{?description}, $qr );
     };
 }
 

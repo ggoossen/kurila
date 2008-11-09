@@ -69,17 +69,17 @@ my @loopies = @(
 
 foreach my $loopy ( @loopies) {
     try {
-        local %SIG{ALRM} = sub { die "ALRMTimeout" };
+        local %SIG{+ALRM} = sub { die "ALRMTimeout" };
         alarm(3);
         $loopy->();
         mro::get_linear_isa('K', 'c3');
     };
 
     if(my $err = $@) {
-        if($err->{description} =~ m/ALRMTimeout/) {
+        if($err->{?description} =~ m/ALRMTimeout/) {
             ok(0, "Loop terminated by SIGALRM");
         }
-        elsif($err->{description} =~ m/Recursive inheritance detected/) {
+        elsif($err->{?description} =~ m/Recursive inheritance detected/) {
             ok(1, "Graceful exception thrown");
         }
         else {

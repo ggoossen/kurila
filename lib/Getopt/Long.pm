@@ -69,7 +69,7 @@ my $requested_version = 0;
 
 sub ConfigDefaults() {
     # Handle POSIX compliancy.
-    if ( defined %ENV{"POSIXLY_CORRECT"} ) {
+    if ( defined %ENV{?"POSIXLY_CORRECT"} ) {
 	$genprefix = "(--|-)";
 	$autoabbrev = 0;		# no automatic abbrev of options
 	$bundling = 0;			# no bundling of single letter switches
@@ -141,14 +141,14 @@ sub new {
     bless ($self, $class);
 
     # Process config attributes.
-    if ( defined %atts{config} ) {
+    if ( defined %atts{?config} ) {
 	my $save = Getopt::Long::Configure ($default_config, < @{%atts{config}});
-	$self->{settings} = Getopt::Long::Configure ($save);
+	$self->{+settings} = Getopt::Long::Configure ($save);
 	delete (%atts{config});
     }
     # Else use default config.
     else {
-	$self->{settings} = $default_config;
+	$self->{+settings} = $default_config;
     }
 
     if ( %atts ) {		# Oops
@@ -163,21 +163,21 @@ sub configure {
     my ($self) = shift;
 
     # Restore settings, merge new settings in.
-    my $save = Getopt::Long::Configure ($self->{settings}, < @_);
+    my $save = Getopt::Long::Configure ($self->{?settings}, < @_);
 
     # Restore orig config and save the new config.
-    $self->{settings} = Getopt::Long::Configure ($save);
+    $self->{+settings} = Getopt::Long::Configure ($save);
 }
 
 sub getoptions {
     my ($self) = shift;
 
     # Restore config settings.
-    my $save = Getopt::Long::Configure ($self->{settings});
+    my $save = Getopt::Long::Configure ($self->{?settings});
 
     # Call main routine.
     my $ret = 0;
-    $Getopt::Long::caller = $self->{caller_pkg};
+    $Getopt::Long::caller = $self->{?caller_pkg};
 
     try {
 	# Locally set exception handler to default, otherwise it will
@@ -339,8 +339,8 @@ sub GetOptionsFromArray($@) {
 	    if ( (defined $userlinkage)
 		&& !((nelems @optionlist) +> 0 && ref(@optionlist[0]))
 		&& (exists $userlinkage->{$opt})
-		&& ref($userlinkage->{$opt}) ) {
-		unshift (@optionlist, $userlinkage->{$opt});
+		&& ref($userlinkage->{?$opt}) ) {
+		unshift (@optionlist, $userlinkage->{?$opt});
 	    }
 	    unless ( (nelems @optionlist) +> 0
 		    && ref(@optionlist[0]) && ref(@optionlist[0]) eq 'CODE' ) {
@@ -350,7 +350,7 @@ sub GetOptionsFromArray($@) {
 		  if (nelems @optionlist) && ref(@optionlist[0]);
 		next;
 	    }
-	    %linkage{'<>'} = shift (@optionlist);
+	    %linkage{+'<>'} = shift (@optionlist);
 	    next;
 	}
 
@@ -370,11 +370,11 @@ sub GetOptionsFromArray($@) {
 	if ( defined $userlinkage ) {
 	    unless ( (nelems @optionlist) +> 0 && ref(@optionlist[0]) ) {
 		if ( exists $userlinkage->{$orig} &&
-		     ref($userlinkage->{$orig}) ) {
+		     ref($userlinkage->{?$orig}) ) {
 		    print STDERR ("=> found userlinkage for \"$orig\": ",
-				  "$userlinkage->{$orig}\n")
+				  "$userlinkage->{?$orig}\n")
 			if $debug;
-		    unshift (@optionlist, $userlinkage->{$orig});
+		    unshift (@optionlist, $userlinkage->{?$orig});
 		}
 		else {
 		    # Do nothing. Being undefined will be handled later.
@@ -387,7 +387,7 @@ sub GetOptionsFromArray($@) {
 	if ( (nelems @optionlist) +> 0 && ref(@optionlist[0]) ) {
 	    print STDERR ("=> link \"$orig\" to $(dump::view(@optionlist[0]))\n")
 		if $debug;
-	    my $rl = ref(%linkage{$orig} = shift (@optionlist));
+	    my $rl = ref(%linkage{+$orig} = shift (@optionlist));
 
 	    if ( $rl eq "ARRAY" ) {
 		%opctl{$name}->[CTL_DEST] = CTL_DEST_ARRAY;
@@ -445,16 +445,16 @@ sub GetOptionsFromArray($@) {
 
     # Supply --version and --help support, if needed and allowed.
     if ( defined($auto_version) ?? $auto_version !! ($requested_version +>= 2.3203) ) {
-	if ( !defined(%opctl{version}) ) {
-	    %opctl{version} = \@('','version',0, <CTL_DEST_CODE,undef);
-	    %linkage{version} = \&VersionMessage;
+	if ( !defined(%opctl{?version}) ) {
+	    %opctl{+version} = \@('','version',0, <CTL_DEST_CODE,undef);
+	    %linkage{+version} = \&VersionMessage;
 	}
 	$auto_version = 1;
     }
     if ( defined($auto_help) ?? $auto_help !! ($requested_version +>= 2.3203) ) {
-	if ( !defined(%opctl{help}) && !defined(%opctl{'?'}) ) {
-	    %opctl{help} = %opctl{'?'} = \@('','help',0, <CTL_DEST_CODE,undef);
-	    %linkage{help} = \&HelpMessage;
+	if ( !defined(%opctl{?help}) && !defined(%opctl{?'?'}) ) {
+	    %opctl{+help} = %opctl{+'?'} = \@('','help',0, <CTL_DEST_CODE,undef);
+	    %linkage{+help} = \&HelpMessage;
 	}
 	$auto_help = 1;
     }
@@ -507,12 +507,12 @@ sub GetOptionsFromArray($@) {
 		$opt = $ctl->[CTL_CNAME];
 		print STDERR ("\"$ctl->[CTL_CNAME]\"\n") if $debug;
 
-		if ( defined %linkage{$opt} ) {
+		if ( defined %linkage{?$opt} ) {
 		    print STDERR ("=> ref(\$L\{$opt\}) -> ",
-				  ref(%linkage{$opt}), "\n") if $debug;
+				  ref(%linkage{?$opt}), "\n") if $debug;
 
-		    if ( ref(%linkage{$opt}) eq 'SCALAR'
-			 || ref(%linkage{$opt}) eq 'REF' ) {
+		    if ( ref(%linkage{?$opt}) eq 'SCALAR'
+			 || ref(%linkage{?$opt}) eq 'REF' ) {
 			if ( $ctl->[CTL_TYPE] eq '+' ) {
 			    print STDERR ("=> \$\$L\{$opt\} += \"$arg\"\n")
 			      if $debug;
@@ -527,8 +527,8 @@ sub GetOptionsFromArray($@) {
 			    print STDERR ("=> ref(\$L\{$opt\}) auto-vivified",
 					  " to ARRAY\n")
 			      if $debug;
-			    my $t = %linkage{$opt};
-			    $$t = %linkage{$opt} = \@();
+			    my $t = %linkage{?$opt};
+			    $$t = %linkage{+$opt} = \@();
 			    print STDERR ("=> push(\@\{\$L\{$opt\}, \"$arg\")\n")
 			      if $debug;
 			    push (@{%linkage{$opt}}, $arg);
@@ -537,11 +537,11 @@ sub GetOptionsFromArray($@) {
 			    print STDERR ("=> ref(\$L\{$opt\}) auto-vivified",
 					  " to HASH\n")
 			      if $debug;
-			    my $t = %linkage{$opt};
-			    $$t = %linkage{$opt} = \%();
+			    my $t = %linkage{?$opt};
+			    $$t = %linkage{+$opt} = \%();
 			    print STDERR ("=> \$\$L\{$opt\}->\{$key\} = \"$arg\"\n")
 			      if $debug;
-			    %linkage{$opt}->{$key} = $arg;
+			    %linkage{$opt}->{+$key} = $arg;
 			}
 			else {
 			    print STDERR ("=> \$\$L\{$opt\} = \"$arg\"\n")
@@ -549,17 +549,17 @@ sub GetOptionsFromArray($@) {
 			    ${%linkage{$opt}} = $arg;
 		        }
 		    }
-		    elsif ( ref(%linkage{$opt}) eq 'ARRAY' ) {
+		    elsif ( ref(%linkage{?$opt}) eq 'ARRAY' ) {
 			print STDERR ("=> push(\@\{\$L\{$opt\}, \"$arg\")\n")
 			    if $debug;
 			push (@{%linkage{$opt}}, $arg);
 		    }
-		    elsif ( ref(%linkage{$opt}) eq 'HASH' ) {
+		    elsif ( ref(%linkage{?$opt}) eq 'HASH' ) {
 			print STDERR ("=> \$\$L\{$opt\}->\{$key\} = \"$arg\"\n")
 			    if $debug;
-			%linkage{$opt}->{$key} = $arg;
+			%linkage{$opt}->{+$key} = $arg;
 		    }
-		    elsif ( ref(%linkage{$opt}) eq 'CODE' ) {
+		    elsif ( ref(%linkage{?$opt}) eq 'CODE' ) {
 			print STDERR ("=> &L\{$opt\}(\"$opt\"",
 				      $ctl->[CTL_DEST] == CTL_DEST_HASH ?? ", \"$key\"" !! "",
 				      ", \"$arg\")\n")
@@ -567,7 +567,7 @@ sub GetOptionsFromArray($@) {
 			my $eval_error = do {
 			    local $@;
 			    try {
-				&{%linkage{$opt}}
+				&{%linkage{?$opt}}
 				  (Getopt::Long::CallBack->new
 				   (name    => $opt,
 				    ctl     => $ctl,
@@ -595,14 +595,14 @@ sub GetOptionsFromArray($@) {
 			}
 		    }
 		    else {
-			print STDERR ("Invalid REF type \"", ref(%linkage{$opt}),
+			print STDERR ("Invalid REF type \"", ref(%linkage{?$opt}),
 				      "\" in linkage\n");
 			die("Getopt::Long -- internal error!\n");
 		    }
 		}
 		# No entry in linkage means entry in userlinkage.
 		elsif ( $ctl->[CTL_DEST] == CTL_DEST_ARRAY ) {
-		    if ( defined $userlinkage->{$opt} ) {
+		    if ( defined $userlinkage->{?$opt} ) {
 			print STDERR ("=> push(\@\{\$L\{$opt\}\}, \"$arg\")\n")
 			    if $debug;
 			push (@{$userlinkage->{$opt}}, $arg);
@@ -610,35 +610,35 @@ sub GetOptionsFromArray($@) {
 		    else {
 			print STDERR ("=>\$L\{$opt\} = [\"$arg\"]\n")
 			    if $debug;
-			$userlinkage->{$opt} = \@($arg);
+			$userlinkage->{+$opt} = \@($arg);
 		    }
 		}
 		elsif ( $ctl->[CTL_DEST] == CTL_DEST_HASH ) {
-		    if ( defined $userlinkage->{$opt} ) {
+		    if ( defined $userlinkage->{?$opt} ) {
 			print STDERR ("=> \$L\{$opt\}->\{$key\} = \"$arg\"\n")
 			    if $debug;
-			$userlinkage->{$opt}->{$key} = $arg;
+			$userlinkage->{$opt}->{+$key} = $arg;
 		    }
 		    else {
 			print STDERR ("=>\$L\{$opt\} = \{$key => \"$arg\"\}\n")
 			    if $debug;
-			$userlinkage->{$opt} = \%($key => $arg);
+			$userlinkage->{+$opt} = \%($key => $arg);
 		    }
 		}
 		else {
 		    if ( $ctl->[CTL_TYPE] eq '+' ) {
 			print STDERR ("=> \$L\{$opt\} += \"$arg\"\n")
 			  if $debug;
-			if ( defined $userlinkage->{$opt} ) {
-			    $userlinkage->{$opt} += $arg;
+			if ( defined $userlinkage->{?$opt} ) {
+			    $userlinkage->{+$opt} += $arg;
 			}
 			else {
-			    $userlinkage->{$opt} = $arg;
+			    $userlinkage->{+$opt} = $arg;
 			}
 		    }
 		    else {
 			print STDERR ("=>\$L\{$opt\} = \"$arg\"\n") if $debug;
-			$userlinkage->{$opt} = $arg;
+			$userlinkage->{+$opt} = $arg;
 		    }
 		}
 
@@ -680,7 +680,7 @@ sub GetOptionsFromArray($@) {
 	elsif ( $order == $PERMUTE ) {
 	    # Try non-options call-back.
 	    my $cb;
-	    if ( (defined ($cb = %linkage{'<>'})) ) {
+	    if ( (defined ($cb = %linkage{?'<>'})) ) {
 		print STDERR ("=> &L\{$tryopt\}(\"$tryopt\")\n")
 		  if $debug;
 		my $eval_error = do {
@@ -849,13 +849,13 @@ sub ParseOptionSpec ($$) {
 	}
 
 	if ( $spec eq '!' ) {
-	    $opctl->{"no$_"} = $entry;
-	    $opctl->{"no-$_"} = $entry;
-	    $opctl->{$_} = \$: @$entry;
+	    $opctl->{+"no$_"} = $entry;
+	    $opctl->{+"no-$_"} = $entry;
+	    $opctl->{+$_} = \$: @$entry;
 	    $opctl->{$_}->[CTL_TYPE] = '';
 	}
 	else {
-	    $opctl->{$_} = $entry;
+	    $opctl->{+$_} = $entry;
 	}
     }
 
@@ -879,7 +879,7 @@ sub FindOption ($$$$$) {
     print STDERR ("=> find \"$opt\"\n") if $debug;
 
     return  @(0) unless $opt =~ m/^$prefix(.*)$/s;
-    return  @(0) if $opt eq "-" && !defined $opctl->{''};
+    return  @(0) if $opt eq "-" && !defined $opctl->{?''};
 
     $opt = $2;
     my $starter = $1;
@@ -911,7 +911,7 @@ sub FindOption ($$$$$) {
 
 	# If bundling == 2, long options can override bundles.
 	if ( $bundling == 2 && length($tryopt) +> 1
-	     && defined ($opctl->{$tryopt}) ) {
+	     && defined ($opctl->{?$tryopt}) ) {
 	    print STDERR ("=> $starter$tryopt overrides unbundling\n")
 	      if $debug;
 	}
@@ -949,7 +949,7 @@ sub FindOption ($$$$$) {
 		my $hit = $_;
 		$hit = $opctl->{$hit}->[CTL_CNAME]
 		  if defined $opctl->{$hit}->[CTL_CNAME];
-		%hit{$hit} = 1;
+		%hit{+$hit} = 1;
 	    }
 	    # Remove auto-supplied options (version, help).
 	    if ( keys(%hit) == 2 ) {
@@ -986,7 +986,7 @@ sub FindOption ($$$$$) {
     }
 
     # Check validity by fetching the info.
-    my $ctl = $opctl->{$tryopt};
+    my $ctl = $opctl->{?$tryopt};
     unless  ( defined $ctl ) {
 	return  @(0) if $passthrough;
 	# Pretend one char when bundling.
@@ -1265,7 +1265,7 @@ sub Configure (@) {
 	}
 	elsif ( ($try eq 'posix_default' or $try eq 'posix_defaults') ) {
 	    local %ENV{POSIXLY_CORRECT};
-	    %ENV{POSIXLY_CORRECT} = 1 if $action;
+	    %ENV{+POSIXLY_CORRECT} = 1 if $action;
 	    ConfigDefaults ();
 	}
 	elsif ( $try eq 'auto_abbrev' or $try eq 'autoabbrev' ) {
@@ -1365,10 +1365,10 @@ sub VersionMessage(@) {
     my $pa = setup_pa_args("version", < @_);
 
     my $v = $main::VERSION;
-    my $fh = $pa->{-output} ||
-      ($pa->{-exitval} eq "NOEXIT" || $pa->{-exitval} +< 2) ?? \*STDOUT !! \*STDERR;
+    my $fh = $pa->{?output} ||
+      ($pa->{?exitval} eq "NOEXIT" || $pa->{?exitval} +< 2) ?? \*STDOUT !! \*STDERR;
 
-    print $fh (defined($pa->{-message}) ?? $pa->{-message} !! (),
+    print $fh (defined($pa->{?message}) ?? $pa->{?message} !! (),
 	       $0, defined $v ?? " version $v" !! (),
 	       "\n",
 	       "(", __PACKAGE__, "::", "GetOptions",
@@ -1377,7 +1377,7 @@ sub VersionMessage(@) {
 	         ?? $Getopt::Long::VERSION_STRING !! $VERSION, ";",
 	       " Perl version $^V",
 	       ")\n");
-    exit($pa->{-exitval}) unless $pa->{-exitval} eq "NOEXIT";
+    exit($pa->{?exitval}) unless $pa->{?exitval} eq "NOEXIT";
 }
 
 # Issue a standard message for --help.
@@ -1422,7 +1422,7 @@ sub setup_pa_args($@) {
 
     if ( UNIVERSAL::isa($pa, 'HASH') ) {
 	# Get rid of -msg vs. -message ambiguity.
-	$pa->{-message} = $pa->{-msg};
+	$pa->{+message} = $pa->{?msg};
 	delete($pa->{-msg});
     }
     elsif ( $pa =~ m/^-?\d+$/ ) {
@@ -1433,8 +1433,8 @@ sub setup_pa_args($@) {
     }
 
     # These are _our_ defaults.
-    $pa->{-verbose} = 0 unless exists($pa->{-verbose});
-    $pa->{-exitval} = 0 unless exists($pa->{-exitval});
+    $pa->{+verbose} = 0 unless exists($pa->{-verbose});
+    $pa->{+exitval} = 0 unless exists($pa->{-exitval});
     $pa;
 }
 
@@ -1453,7 +1453,7 @@ sub new {
 
 sub name {
     my $self = shift;
-    ''.$self->{name};
+    ''.$self->{?name};
 }
 
 1;

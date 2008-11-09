@@ -9,11 +9,11 @@ try {
     die $err;
 };
 
-print "not " unless $@->{description} eq $err;
+print "not " unless $@->{?description} eq $err;
 print "ok 1\n";
 
 try {
-    local $^DIE_HOOK = sub { print "ok ", @_[0]->{description}, "\n" } ;
+    local $^DIE_HOOK = sub { print "ok ", @_[0]->{?description}, "\n" } ;
 
     die 2;
 

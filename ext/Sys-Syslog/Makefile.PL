@@ -23,8 +23,8 @@ if ($use_eventlog) {
 
     push @extra_prereqs, "Win32::TieRegistry" => 0, "Win32::EventLog" => 0;
 
-    %virtual_path{'win32/Win32.pm'   } = '$(INST_LIBDIR)/Syslog/Win32.pm';
-    %virtual_path{'win32/PerlLog.dll'} = '$(INST_ARCHAUTODIR)/PerlLog.dll';
+    %virtual_path{+'win32/Win32.pm'   } = '$(INST_LIBDIR)/Syslog/Win32.pm';
+    %virtual_path{+'win32/PerlLog.dll'} = '$(INST_ARCHAUTODIR)/PerlLog.dll';
 
     # recreate the DLL from its uuencoded form if it's not here
     if (! -f File::Spec->catfile("win32", "$name.dll")) {
@@ -153,7 +153,7 @@ if(try {require ExtUtils::Constant; 1}) {
         NAMES => \@( < @levels, < @facilities, < @options, < @others_macros ),
     );
 
-    my @names = map { ref $_ ?? $_->{name} !! $_ } @( < @levels, < @facilities, < @options);
+    my @names = map { ref $_ ?? $_->{?name} !! $_ } @( < @levels, < @facilities, < @options);
     open(MACROS, ">", 'macros.all') or warn "warning: Can't write 'macros.all': $!\n";
     print MACROS join $/, @names;
     close(MACROS);

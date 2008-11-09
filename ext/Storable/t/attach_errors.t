@@ -63,7 +63,7 @@ do {
 	};
 	ok( $@, 'Storable dies correctly when STORABLE_freeze returns a referece' );
 	# Check for a unique substring of the error message
-	ok( $@->{description} =~ m/cannot return references/, 'Storable dies with the expected error' );
+	ok( $@->{?description} =~ m/cannot return references/, 'Storable dies with the expected error' );
 
 	package My::BadFreeze;
 
@@ -104,7 +104,7 @@ do {
 		Storable::thaw( $frozen );
 	};
 	isa_ok( $thawed, 'My::GoodThaw' );
-	is( $thawed->{foo}, 'bar', 'My::GoodThaw thawed correctly as expected' );
+	is( $thawed->{?foo}, 'bar', 'My::GoodThaw thawed correctly as expected' );
 
 	package My::GoodThaw;
 
@@ -145,7 +145,7 @@ do {
 	};
 	ok( $@, 'My::BadThaw object dies when thawing as expected' );
 	# Check for a snippet from the error message
-	ok( $@->{description} =~ m/unexpected references/, 'Dies with the expected error message' );
+	ok( $@->{?description} =~ m/unexpected references/, 'Dies with the expected error message' );
 
 	package My::BadThaw;
 
@@ -235,7 +235,7 @@ do {
 			$thawed = Storable::thaw( $frozen );
 		};
 		ok( $@, 'BadAttach dies on thaw' );
-		ok( $@->{description} =~ m/STORABLE_attach did not return a My::BadAttach object/,
+		ok( $@->{?description} =~ m/STORABLE_attach did not return a My::BadAttach object/,
 			'BadAttach dies on thaw with the expected error message' );
 		is( $thawed, undef, 'Double checking $thawed was not set' );
 	}

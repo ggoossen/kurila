@@ -486,13 +486,13 @@ sub debug { $Debug = (@_[1] != 0); }
 sub usage { 
     my $calling_sub = @(caller(1))[3];
     $calling_sub =~ s/^Benchmark:://;
-    return %_Usage{$calling_sub} || '';
+    return %_Usage{?$calling_sub} || '';
 }
 
 # The cache needs two branches: 's' for strings and 'c' for code.  The
 # empty loop is different in these two cases.
 
-%_Usage{clearcache} = <<'USAGE';
+%_Usage{+clearcache} = <<'USAGE';
 usage: clearcache($count);
 USAGE
 
@@ -501,7 +501,7 @@ sub clearcache    {
     delete %Cache{"@_[0]c"}; delete %Cache{"@_[0]s"}; 
 }
 
-%_Usage{clearallcache} = <<'USAGE';
+%_Usage{+clearallcache} = <<'USAGE';
 usage: clearallcache();
 USAGE
 
@@ -510,7 +510,7 @@ sub clearallcache {
     %Cache = %( () ); 
 }
 
-%_Usage{enablecache} = <<'USAGE';
+%_Usage{+enablecache} = <<'USAGE';
 usage: enablecache();
 USAGE
 
@@ -519,7 +519,7 @@ sub enablecache   {
     $Do_Cache = 1; 
 }
 
-%_Usage{disablecache} = <<'USAGE';
+%_Usage{+disablecache} = <<'USAGE';
 usage: disablecache();
 USAGE
 
@@ -542,7 +542,7 @@ sub real  { my($r,$pu,$ps,$cu,$cs) = < @{@_[0]}; $r              ; }
 sub iters { @_[0]->[5] ; }
 
 
-%_Usage{timediff} = <<'USAGE';
+%_Usage{+timediff} = <<'USAGE';
 usage: $result_diff = timediff($result1, $result2);
 USAGE
 
@@ -560,7 +560,7 @@ sub timediff {
     bless \@r;
 }
 
-%_Usage{timesum} = <<'USAGE';
+%_Usage{+timesum} = <<'USAGE';
 usage: $sum = timesum($result1, $result2);
 USAGE
 
@@ -577,7 +577,7 @@ sub timesum {
 }
 
 
-%_Usage{timestr} = <<'USAGE';
+%_Usage{+timestr} = <<'USAGE';
 usage: $formatted_result = timestr($result1);
 USAGE
 
@@ -619,7 +619,7 @@ sub timedebug {
 
 # --- Functions implementing low-level support for timing loops
 
-%_Usage{runloop} = <<'USAGE';
+%_Usage{+runloop} = <<'USAGE';
 usage: runloop($number, [$string | $coderef])
 USAGE
 
@@ -665,7 +665,7 @@ sub runloop {
     $td;
 }
 
-%_Usage{timeit} = <<'USAGE';
+%_Usage{+timeit} = <<'USAGE';
 usage: $result = timeit($count, 'code' );        or
        $result = timeit($count, sub { code } );
 USAGE
@@ -680,13 +680,13 @@ sub timeit {
     printf STDERR "timeit $n $code\n" if $Debug;
     my $cache_key = $n . ( ref( $code ) ?? 'c' !! 's' );
     if ($Do_Cache && exists %Cache{$cache_key} ) {
-	$wn = %Cache{$cache_key};
+	$wn = %Cache{?$cache_key};
     } else {
 	$wn = &runloop($n, ref( $code ) ?? sub { } !! '' );
 	# Can't let our baseline have any iterations, or they get subtracted
 	# out of the result.
 	$wn->[5] = 0;
-	%Cache{$cache_key} = $wn;
+	%Cache{+$cache_key} = $wn;
     }
 
     $wc = &runloop($n, $code);
@@ -704,7 +704,7 @@ my $default_for = 3;
 my $min_for     = 0.1;
 
 
-%_Usage{countit} = <<'USAGE';
+%_Usage{+countit} = <<'USAGE';
 usage: $result = countit($time, 'code' );        or
        $result = countit($time, sub { code } );
 USAGE
@@ -804,7 +804,7 @@ sub n_to_for {
     return $n == 0 ?? $default_for !! $n +< 0 ?? -$n !! undef;
 }
 
-%_Usage{timethis} = <<'USAGE';
+%_Usage{+timethis} = <<'USAGE';
 usage: $result = timethis($time, 'code' );        or
        $result = timethis($time, sub { code } );
 USAGE
@@ -844,7 +844,7 @@ sub timethis{
 }
 
 
-%_Usage{timethese} = <<'USAGE';
+%_Usage{+timethese} = <<'USAGE';
 usage: timethese($count, { Name1 => 'code1', ... });        or
        timethese($count, { Name1 => sub { code1 }, ... });
 USAGE
@@ -874,14 +874,14 @@ sub timethese{
     # sum, min, max, avg etc etc
     my %results;
     foreach my $name ( @names) {
-        %results{$name} = timethis ($n, $alt -> {$name}, $name, $style);
+        %results{+$name} = timethis ($n, $alt -> {?$name}, $name, $style);
     }
 
     return \%results;
 }
 
 
-%_Usage{cmpthese} = <<'USAGE';
+%_Usage{+cmpthese} = <<'USAGE';
 usage: cmpthese($count, { Name1 => 'code1', ... });        or
        cmpthese($count, { Name1 => sub { code1 }, ... });  or
        cmpthese($result, $style);
@@ -906,7 +906,7 @@ sub cmpthese{
     $style = "" unless defined $style;
 
     # Flatten in to an array of arrays with the name as the first field
-    my @vals = map{ \@( $_, < @{$results->{$_}} ) } keys %$results;
+    my @vals = map{ \@( $_, < @{$results->{?$_}} ) } keys %$results;
 
     for ( @vals) {
 	# The epsilon fudge here is to prevent div by 0.  Since clock

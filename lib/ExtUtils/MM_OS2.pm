@@ -39,7 +39,7 @@ Define TO_UNIX to convert OS2 linefeeds to Unix style.
 sub init_dist {
     my($self) = < @_;
 
-    $self->{TO_UNIX} ||= <<'MAKE_TEXT';
+    $self->{+TO_UNIX} ||= <<'MAKE_TEXT';
 $(NOECHO) $(TEST_F) tmp.zip && $(RM_F) tmp.zip; $(ZIP) -ll -mr tmp.zip $(DISTVNAME) && unzip -o tmp.zip && $(RM_F) tmp.zip
 MAKE_TEXT
 
@@ -49,16 +49,16 @@ MAKE_TEXT
 sub dlsyms {
     my($self,< %attribs) = < @_;
 
-    my($funcs) = %attribs{DL_FUNCS} || $self->{DL_FUNCS} || \%();
-    my($vars)  = %attribs{DL_VARS} || $self->{DL_VARS} || \@();
-    my($funclist) = %attribs{FUNCLIST} || $self->{FUNCLIST} || \@();
-    my($imports)  = %attribs{IMPORTS} || $self->{IMPORTS} || \%();
+    my($funcs) = %attribs{?DL_FUNCS} || $self->{?DL_FUNCS} || \%();
+    my($vars)  = %attribs{?DL_VARS} || $self->{?DL_VARS} || \@();
+    my($funclist) = %attribs{?FUNCLIST} || $self->{?FUNCLIST} || \@();
+    my($imports)  = %attribs{?IMPORTS} || $self->{?IMPORTS} || \%();
     my(@m);
-    (my $boot = $self->{NAME}) =~ s/:/_/g;
+    (my $boot = $self->{?NAME}) =~ s/:/_/g;
 
-    if (not $self->{SKIPHASH}->{'dynamic'}) {
+    if (not $self->{SKIPHASH}->{?'dynamic'}) {
 	push(@m,"
-$self->{BASEEXT}.def: Makefile.PL
+$self->{?BASEEXT}.def: Makefile.PL
 ",
      q|	$(PERL) "-I$(PERL_ARCHLIB)" "-I$(PERL_LIB)" -e 'use ExtUtils::Mksymlists; \
      Mksymlists("NAME" => "$(NAME)", "DLBASE" => "$(DLBASE)", |,
@@ -70,7 +70,7 @@ $self->{BASEEXT}.def: Makefile.PL
      ', "DL_VARS" => ', < neatvalue($vars), q|);'
 |);
     }
-    if ($self->{IMPORTS} && %{$self->{IMPORTS}}) {
+    if ($self->{?IMPORTS} && %{$self->{?IMPORTS}}) {
 	# Make import files (needed for static build)
 	-d 'tmp_imp' or mkdir 'tmp_imp', 0777 or die "Can't mkdir tmp_imp";
 	open my $imp, '>', 'tmpimp.imp' or die "Can't open tmpimp.imp";
@@ -80,10 +80,10 @@ $self->{BASEEXT}.def: Makefile.PL
 	}
 	close $imp or die "Can't close tmpimp.imp";
 	# print "emximp -o tmpimp$Config::Config{lib_ext} tmpimp.imp\n";
-	system "emximp -o tmpimp%Config::Config{lib_ext} tmpimp.imp" 
+	system "emximp -o tmpimp%Config::Config{?lib_ext} tmpimp.imp" 
 	    and die "Cannot make import library: $!, \$?=$?";
 	unlink glob( <"tmp_imp/*");
-	system "cd tmp_imp; %Config::Config{ar} x ../tmpimp%Config::Config{lib_ext}" 
+	system "cd tmp_imp; %Config::Config{?ar} x ../tmpimp%Config::Config{?lib_ext}" 
 	    and die "Cannot extract import objects: $!, \$?=$?";      
     }
     join('', @m);
@@ -92,7 +92,7 @@ $self->{BASEEXT}.def: Makefile.PL
 sub static_lib {
     my($self) = < @_;
     my $old = $self->ExtUtils::MM_Unix::static_lib();
-    return $old unless $self->{IMPORTS} && %{$self->{IMPORTS}};
+    return $old unless $self->{?IMPORTS} && %{$self->{?IMPORTS}};
     
     my @chunks = split m/\n{2,}/, $old;
     shift @chunks unless length @chunks[0]; # Empty lines at the start
@@ -125,12 +125,12 @@ sub maybe_command {
 sub init_linker {
     my $self = shift;
 
-    $self->{PERL_ARCHIVE} = "\$(PERL_INC)/libperl\$(LIB_EXT)";
+    $self->{+PERL_ARCHIVE} = "\$(PERL_INC)/libperl\$(LIB_EXT)";
 
-    $self->{PERL_ARCHIVE_AFTER} = $OS2::is_aout
+    $self->{+PERL_ARCHIVE_AFTER} = $OS2::is_aout
       ?? ''
       !! '$(PERL_INC)/libperl_override$(LIB_EXT)';
-    $self->{EXPORT_LIST} = '$(BASEEXT).def';
+    $self->{+EXPORT_LIST} = '$(BASEEXT).def';
 }
 
 =item os_flavor

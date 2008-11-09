@@ -30,7 +30,7 @@ is( prototype(\&g),	undef,	'remove prototype');
 
 try { &set_prototype( 'f', '' ); };
 print "not " unless 
-ok($@->{description} =~ m/^set_prototype: not a reference/,	'not a reference');
+ok($@->{?description} =~ m/^set_prototype: not a reference/,	'not a reference');
 
 try { &set_prototype( \'f', '' ); };
-ok($@->{description} =~ m/^set_prototype: not a subroutine reference/,	'not a sub reference');
+ok($@->{?description} =~ m/^set_prototype: not a subroutine reference/,	'not a sub reference');

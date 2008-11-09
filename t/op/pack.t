@@ -230,7 +230,7 @@ do {
     SKIP: do {
 	# Avoid void context warnings.
 	my $a = try {pack "$base$mod"};
-	skip "pack can't $base", 1 if $@ and $@->{description} =~ m/^Invalid type '\w'/;
+	skip "pack can't $base", 1 if $@ and $@->{?description} =~ m/^Invalid type '\w'/;
 	# Which error you get when 2 would be possible seems to be emergent
 	# behaviour of pack's format parser.
 
@@ -252,13 +252,13 @@ do {
 	if ($fails_endian) {
 	  if ($no_endianness) {
 	    # < and > are seen as pattern letters, not modifiers
-	    like ($@->{description}, qr/^Invalid type '[<>]'/, "pack can't $base$mod");
+	    like ($@->{?description}, qr/^Invalid type '[<>]'/, "pack can't $base$mod");
 	  } else {
-	    like ($@->{description}, qr/^'[<>]' allowed only after types/,
+	    like ($@->{?description}, qr/^'[<>]' allowed only after types/,
 		  "pack can't $base$mod");
 	  }
 	} elsif ($fails_shriek) {
-	  like ($@->{description}, qr/^'!' allowed only after types/,
+	  like ($@->{?description}, qr/^'!' allowed only after types/,
 		"pack can't $base$mod");
 	} else {
 	  is ($@, '', "pack can $base$mod");
@@ -814,10 +814,10 @@ do {
 
   my ($x, $y, $z);
   try { ($x) = unpack '/a*','hello' };
-  like($@->{description}, qr!'/' must follow a numeric type!);
+  like($@->{?description}, qr!'/' must follow a numeric type!);
   undef $x;
   try { $x = unpack '/a*','hello' };
-  like($@->{description}, qr!'/' must follow a numeric type!);
+  like($@->{?description}, qr!'/' must follow a numeric type!);
 
   undef $x;
   try { ($z,$x,$y) = unpack 'a3/A C/a* C/Z', "003ok \003yes\004z\000abc" };
@@ -833,10 +833,10 @@ do {
 
   undef $x;
   try { ($x) = pack '/a*','hello' };
-  like($@->{description},  qr!Invalid type '/'!);
+  like($@->{?description},  qr!Invalid type '/'!);
   undef $x;
   try { $x = pack '/a*','hello' };
-  like($@->{description},  qr!Invalid type '/'!);
+  like($@->{?description},  qr!Invalid type '/'!);
 
   $z = pack 'n/a* N/Z* w/A*','string','hi there ','etc';
   my $expect = "\000\006string\0\0\0\012hi there \000\003etc";
@@ -947,7 +947,7 @@ SKIP: do {
         my $bad = pack("U0C", 255);
         local $^WARN_HOOK = sub { $@ = @_[0]; };
         my @null = @( unpack('U0U', $bad) );
-        like($@->{description}, qr/^Malformed UTF-8 character /);
+        like($@->{?description}, qr/^Malformed UTF-8 character /);
     };
 };
 
@@ -1072,9 +1072,9 @@ SKIP: do {
   for my $t (qw{ (s<)> (sl>s)< (s(l(sl)<l)s)> }) {
     print "# testing pattern '$t'\n";
     try { ($_) = unpack($t, 'x'x18); };
-    like($@->{description}, qr/Can't use '[<>]' in a group with different byte-order in unpack/);
+    like($@->{?description}, qr/Can't use '[<>]' in a group with different byte-order in unpack/);
     try { $_ = pack($t, (0)x6); };
-    like($@->{description}, qr/Can't use '[<>]' in a group with different byte-order in pack/);
+    like($@->{?description}, qr/Can't use '[<>]' in a group with different byte-order in pack/);
   }
 
   is(pack('L<L>', (0x12345678)x2),
@@ -1107,7 +1107,7 @@ do {
   );
 
   for my $tle (sort keys %templates) {
-    my @d = @{%templates{$tle}};
+    my @d = @{%templates{?$tle}};
     my $tbe = $tle;
     $tbe =~ s/</>/g;
     for my $t (@($tbe, $tle)) {
@@ -1152,7 +1152,7 @@ do {
     # from Wolfgang Laun: fix in change #13288
 
     try { my $t=unpack("P*", "abc") };
-    like($@->{description}, qr/'P' must have an explicit size/);
+    like($@->{?description}, qr/'P' must have an explicit size/);
 };
 
 do {   # Grouping constructs
@@ -1178,13 +1178,13 @@ do {   # Grouping constructs
     @a = @( unpack '(SL)*SL',   pack 'SLSLSLSL', < 67..90 );
     is("$(join ' ',@a)", "$(join ' ',@b)");
     try { @a = @( unpack '(*SL)',   '' ) };
-    like($@->{description}, qr/\(\)-group starts with a count/);
+    like($@->{?description}, qr/\(\)-group starts with a count/);
     try { @a = @( unpack '(3SL)',   '' ) };
-    like($@->{description}, qr/\(\)-group starts with a count/);
+    like($@->{?description}, qr/\(\)-group starts with a count/);
     try { @a = @( unpack '([3]SL)',   '' ) };
-    like($@->{description}, qr/\(\)-group starts with a count/);
+    like($@->{?description}, qr/\(\)-group starts with a count/);
     try { @a = @( pack '(*SL)' ) };
-    like($@->{description}, qr/\(\)-group starts with a count/);
+    like($@->{?description}, qr/\(\)-group starts with a count/);
     @a = @( unpack '(SL)3 SL',   pack '(SL)4', < 67..74 );
     is("$(join ' ',@a)", "$(join ' ',@b)");
     @a = @( unpack '(SL)3 SL',   pack '(SL)[4]', < 67..74 );
@@ -1215,7 +1215,7 @@ do {  # more on grouping (W.Laun)
   # \0002 \0001 a \0003 AAA \0001 b \0003 BBB
   #     2     4 5     7  10    1213
   try { @pup = @( unpack( 'S/(S/A* S/A*)', substr( $env, 0, 13 ) ) ) };
-  like( $@->{description}, qr{length/code after end of string} );
+  like( $@->{?description}, qr{length/code after end of string} );
 
   # postfix repeat count
   $env = pack( '(S/A* S/A*)' . (nelems @Env)/2, < @Env );
@@ -1224,30 +1224,30 @@ do {  # more on grouping (W.Laun)
   # \0001 a \0003 AAA \0001  b \0003 BBB
   #     2 3c    5   8    10 11    13  16
   try { @pup = @( unpack( '(S/A* S/A*)' . (nelems @Env)/2, substr( $env, 0, 11 ) ) ) };
-  like( $@->{description}, qr{length/code after end of string} );
+  like( $@->{?description}, qr{length/code after end of string} );
 
   # catch stack overflow/segfault
   try { $_ = pack( ('(' x 105) . 'A' . (')' x 105) ); };
-  like( $@->{description}, qr{Too deeply nested \(\)-groups} );
+  like( $@->{?description}, qr{Too deeply nested \(\)-groups} );
 };
 
 do { # syntax checks (W.Laun)
   use warnings < qw(NONFATAL all);;
   my @warning;
   local $^WARN_HOOK = sub {
-      push( @warning, @_[0]->{description} );
+      push( @warning, @_[0]->{?description} );
   };
   try { my $s = pack( 'Ax![4c]A', < 1..5 ); };
-  like( $@->{description}, qr{Malformed integer in \[\]} );
+  like( $@->{?description}, qr{Malformed integer in \[\]} );
 
   try { my $buf = pack( '(c/*a*)', 'AAA', 'BB' ); };
-  like( $@->{description}, qr{'/' does not take a repeat count} );
+  like( $@->{?description}, qr{'/' does not take a repeat count} );
 
   try { my @inf = @( unpack( 'c/1a', "\x[03]AAA\x[02]BB" ) ); };
-  like( $@->{description}, qr{'/' does not take a repeat count} );
+  like( $@->{?description}, qr{'/' does not take a repeat count} );
 
   try { my @inf = @( unpack( 'c/*a', "\x[03]AAA\x[02]BB" ) ); };
-  like( $@->{description}, qr{'/' does not take a repeat count} );
+  like( $@->{?description}, qr{'/' does not take a repeat count} );
 
   # white space where possible
   my @Env = @( a => 'AAA', b => 'BBB' );
@@ -1258,7 +1258,7 @@ do { # syntax checks (W.Laun)
   # white space in 4 wrong places
   for my $temp (@(  'A ![4]', 'A [4]', 'A *', 'A 4') ){
       try { my $s = pack( $temp, 'B' ); };
-      like( $@->{description}, qr{Invalid type } );
+      like( $@->{?description}, qr{Invalid type } );
   }
 
   # warning for commas
@@ -1273,7 +1273,7 @@ do { # syntax checks (W.Laun)
 
   # forbidden code in []
   try { my $x = pack( 'A[@4]', 'XXXX' ); };
-  like( $@->{description}, qr{Within \[\]-length '\@' not allowed} );
+  like( $@->{?description}, qr{Within \[\]-length '\@' not allowed} );
 
   # @ repeat default 1
   my $s = pack( 'AA@A', 'A', 'B', 'C' );
@@ -1283,7 +1283,7 @@ do { # syntax checks (W.Laun)
 
   # no unpack code after /
   try { my @a = @( unpack( "C/", "\3" ) ); };
-  like( $@->{description}, qr{Code missing after '/'} );
+  like( $@->{?description}, qr{Code missing after '/'} );
 
  SKIP: do {
     skip $no_endianness, 6 if $no_endianness;
@@ -1334,7 +1334,7 @@ do {  # Repeat count [SUBEXPR]
    my $end = "N4";
 
    for my $type ( @codes) {
-     my @list = @( %val{$type} );
+     my @list = @( %val{?$type} );
      @list = @( () ) unless defined @list[0];
      for my $count (@('', '3', '[11]')) {
        my $c = 1;
@@ -1428,7 +1428,7 @@ numbers ('F', -(2**34), -1, 0, 1, 2**34);
 SKIP: do {
     my $t = try { unpack("D*", pack("D", 12.34)) };
 
-    skip "Long doubles not in use", 166 if $@->{description} =~ m/Invalid type/;
+    skip "Long doubles not in use", 166 if $@->{?description} =~ m/Invalid type/;
 
     is(length(pack("D", 0)), config_value("longdblsize"));
     numbers ('D', -(2**34), -1, 0, 1, 2**34);
@@ -1442,9 +1442,9 @@ foreach my $template (qw(A Z c C s S i I l L n N v V q Q j J f d F D u U w)) {
   SKIP: do {
     my $packed = try {pack "$($template)4", 1, 4, 9, 16};
     if ($@) {
-      die unless $@->{description} =~ m/Invalid type '$template'/;
+      die unless $@->{?description} =~ m/Invalid type '$template'/;
       skip ("$template not supported on this perl",
-            %cant_checksum{$template} ?? 4 !! 8);
+            %cant_checksum{?$template} ?? 4 !! 8);
     }
     my @unpack4 = @( unpack "$($template)4", $packed );
     my @unpack = @( unpack "$($template)*", $packed );
@@ -1459,7 +1459,7 @@ foreach my $template (qw(A Z c C s S i I l L n N v V q Q j J f d F D u U w)) {
                   \@("scalar $($template)* vs $($template)", \@unpacks, \@unpack1),
                 );
 
-    unless (%cant_checksum{$template}) {
+    unless (%cant_checksum{?$template}) {
       my @unpack4_c = @( unpack "\%$($template)4", $packed );
       my @unpack_c = @( unpack "\%$($template)*", $packed );
       my @unpack1_c = @( unpack "\%$($template)", $packed );
@@ -1587,7 +1587,7 @@ do {
     for my $string (@($down, $up)) {
         for my $format (sort {lc($a) cmp lc($b) || $a cmp $b } keys %expect) {
           SKIP: do {
-              my $expect = %expect{$format};
+              my $expect = %expect{?$format};
               # unpack upgraded and downgraded string
               my @result = @( try { unpack("$format C0 W", $string) } );
               skip "cannot pack/unpack '$format C0 W' on this perl", 5 if
@@ -1831,7 +1831,7 @@ do {
     # Testing pack . and .!
     is(pack("(a)5 .", < 1..5, 3), "123", ". relative to string start, shorten");
     try { () = pack("(a)5 .", < 1..5, -3) };
-    like($@->{description}, qr{'\.' outside of string in pack}, "Proper error message");
+    like($@->{?description}, qr{'\.' outside of string in pack}, "Proper error message");
     is(pack("(a)5 .", < 1..5, 8), "12345\0\0\0",
        ". relative to string start, extend");
     is(pack("(a)5 .", < 1..5, 5), "12345", ". relative to string start, keep");

@@ -70,14 +70,14 @@ do {
     
   } elsif (exists %OSTYPES{$^O} and
 	   grep {-e File::Spec->catfile($_, < @package, 'Platform', %OSTYPES{$^O}) . '.pm'} @INC) {
-    $load->(__PACKAGE__ . "::Platform::%OSTYPES{$^O}");
+    $load->(__PACKAGE__ . "::Platform::%OSTYPES{?$^O}");
     
   } else {
     $load->(__PACKAGE__ . "::Base");
   }
 };
 
-sub os_type { %OSTYPES{$^O} }
+sub os_type { %OSTYPES{?$^O} }
 
 1;
 __END__

@@ -234,13 +234,13 @@ sub charinfo {
 		    )]} = < split(m/;/, $line, -1);
 	    $hexk =~ s/^0+//;
 	    $hexk =  sprintf("\%04X", hex($hexk));
-	    if (%prop{code} eq $hexk) {
-		%prop{block}  = charblock($code);
-		%prop{script} = charscript($code);
+	    if (%prop{?code} eq $hexk) {
+		%prop{+block}  = charblock($code);
+		%prop{+script} = charscript($code);
 		if(defined $rname){
-                    %prop{code} = $rcode;
-                    %prop{name} = $rname;
-                    %prop{decomposition} = $rdec;
+                    %prop{+code} = $rcode;
+                    %prop{+name} = $rname;
+                    %prop{+decomposition} = $rdec;
                 }
 		return \%prop;
 	    }
@@ -334,7 +334,7 @@ sub charblock {
 	_search(\@BLOCKS, 0, ((nelems @BLOCKS)-1), $code);
     } else {
 	if (exists %BLOCKS{$arg}) {
-	    return dclone %BLOCKS{$arg};
+	    return dclone %BLOCKS{?$arg};
 	} else {
 	    return;
 	}
@@ -399,7 +399,7 @@ sub charscript {
 	_search(\@SCRIPTS, 0, ((nelems @SCRIPTS)-1), $code);
     } else {
 	if (exists %SCRIPTS{$arg}) {
-	    return dclone %SCRIPTS{$arg};
+	    return dclone %SCRIPTS{?$arg};
 	} else {
 	    return;
 	}
@@ -623,7 +623,7 @@ sub _compexcl {
 	    while ( ~< $COMPEXCLFH) {
 		if (m/^([0-9A-F]+)\s+\#\s+/) {
 		    my $code = hex($1);
-		    %COMPEXCL{$code} = undef;
+		    %COMPEXCL{+$code} = undef;
 		}
 	    }
 	    close($COMPEXCLFH);
@@ -694,7 +694,7 @@ sub _casefold {
 	    while ( ~< $CASEFOLDFH) {
 		if (m/^([0-9A-F]+); ([CFSI]); ([0-9A-F]+(?: [0-9A-F]+)*);/) {
 		    my $code = hex($1);
-		    %CASEFOLD{$code} = \%( code    => $1,
+		    %CASEFOLD{+$code} = \%( code    => $1,
                                            status  => $2,
                                            mapping => $3 );
 		}
@@ -712,7 +712,7 @@ sub casefold {
 
     _casefold() unless %CASEFOLD;
 
-    return %CASEFOLD{$code};
+    return %CASEFOLD{?$code};
 }
 
 =head2 casespec
@@ -791,7 +791,7 @@ sub _casespec {
 				my ($oldlocale) =
 				($oldcondition =~ m/^([a-z][a-z](?:_\S+)?)/);
 				delete %CASESPEC{$code};
-				%CASESPEC{$code}->{$oldlocale} =
+				%CASESPEC{$code}->{+$oldlocale} =
 				\%( code      => $hexcode,
                                     lower     => $oldlower,
                                     title     => $oldtitle,
@@ -801,14 +801,14 @@ sub _casespec {
 			}
 			my ($locale) =
 			    ($condition =~ m/^([a-z][a-z](?:_\S+)?)/);
-			%CASESPEC{$code}->{$locale} =
+			%CASESPEC{$code}->{+$locale} =
 			\%( code      => $hexcode,
                             lower     => $lower,
                             title     => $title,
                             upper     => $upper,
                             condition => $condition );
 		    } else {
-			%CASESPEC{$code} =
+			%CASESPEC{+$code} =
 			\%( code      => $hexcode,
                             lower     => $lower,
                             title     => $title,
@@ -830,7 +830,7 @@ sub casespec {
 
     _casespec() unless %CASESPEC;
 
-    return ref %CASESPEC{$code} ?? dclone %CASESPEC{$code} !! %CASESPEC{$code};
+    return ref %CASESPEC{?$code} ?? dclone %CASESPEC{?$code} !! %CASESPEC{?$code};
 }
 
 =head2 namedseq()
@@ -864,7 +864,7 @@ sub _namedseq {
 		if (m/^(.+)\s*;\s*([0-9A-F]+(?: [0-9A-F]+)*)$/) {
 		    my ($n, $s) = ($1, $2);
 		    my @s = map { chr(hex($_)) } split(' ', $s);
-		    %NAMEDSEQ{$n} = join("", @s);
+		    %NAMEDSEQ{+$n} = join("", @s);
 		}
 	    }
 	    close($NAMEDSEQFH);
@@ -877,7 +877,7 @@ sub namedseq {
     if ((nelems @_) == 0) {
         return %NAMEDSEQ;
     } elsif ((nelems @_) == 1) {
-        my $s = %NAMEDSEQ{ @_[0] };
+        my $s = %NAMEDSEQ{?@_[0] };
         return map { ord($_) } split('', $s);
     }
     return;

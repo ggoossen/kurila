@@ -32,12 +32,12 @@ sub import {
                          \@{*{Symbol::fetch_glob("$pkg\::EXPORT_FAIL")}});
   return export $pkg, $callpkg, < @_
     if $Verbose or $Debug or (nelems @$fail) +> 1;
-  my $export_cache = (%Cache{$pkg} ||= \%());
+  my $export_cache = (%Cache{+$pkg} ||= \%());
   my $args = (nelems @_) or @_ = @$exports;
 
   local $_;
   if ($args and not %$export_cache) {
-    s/^&//, $export_cache->{$_} = 1
+    s/^&//, $export_cache->{+$_} = 1
       foreach @( (< @$exports, < @{*{Symbol::fetch_glob("$pkg\::EXPORT_OK")}}));
   }
   my $heavy;

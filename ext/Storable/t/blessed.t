@@ -7,7 +7,7 @@
 #
 
 BEGIN {
-    if (%ENV{PERL_CORE}){
+    if (%ENV{?PERL_CORE}){
 	push @INC, '../ext/Storable/t';
     }
     require 'st-dump.pl';
@@ -113,7 +113,7 @@ sub STORABLE_freeze {
   # Some reference some number of times.
   my $self = shift;
   my ($what, $times) = < @$self;
-  return @("$what$times", (%::immortals{$what}) x $times);
+  return @("$what$times", (%::immortals{?$what}) x $times);
 }
 
 sub STORABLE_thaw {
@@ -123,7 +123,7 @@ sub STORABLE_thaw {
 	my ($what, $times) = $x =~ m/(.)(\d+)/;
 	die "'$x' didn't match" unless defined $times;
 	main::ok ++$test, nelems(@refs) == $times;
-	my $expect = %::immortals{$what};
+	my $expect = %::immortals{?$what};
 	die "'$x' did not give a reference" unless ref $expect;
 	my $fail;
 	foreach ( @refs) {

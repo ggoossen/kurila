@@ -37,7 +37,7 @@
 
 BEGIN { require './test.pl' }
 
-my $max_chain = %ENV{PERL_TEST_NUMCONVERTS} || 2;
+my $max_chain = %ENV{?PERL_TEST_NUMCONVERTS} || 2;
 
 # Bulk out if unsigned type is hopelessly wrong:
 my $max_uv1 = ^~^0;
@@ -51,7 +51,7 @@ if ($max_uv1 ne $max_uv2 or $big_iv +> $max_uv1 or $max_uv1 == $max_uv_less3) {
   print "1..0 # skipped: unsigned perl arithmetic is not sane";
   try { require Config; Config->import };
   use vars < qw(%Config);
-  if (%Config{d_quad} eq 'define') {
+  if (%Config{?d_quad} eq 'define') {
       print " (common in 64-bit platforms)";
   }
   print "\n";

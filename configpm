@@ -48,7 +48,7 @@ while ($how_many_common--) {
     my $_ = ~< *DATA;
     chomp;
     m/^(\S+):\s*(\d+)$/ or die "Malformed line '$_'";
-    %Common{$1} = $1;
+    %Common{+$1} = $1;
 }
 
 # names of things which may need to have slashes changed to double-colons
@@ -88,13 +88,13 @@ my %Opts = %( < opts() );
 my ($Config_SH, $Config_PM, $Config_heavy, $Config_POD);
 my $Glossary = 'Porting/Glossary';
 
-if (%Opts{cross}) {
+if (%Opts{?cross}) {
   # creating cross-platform config file
   mkdir "xlib";
-  mkdir "xlib/%Opts{cross}";
-  $Config_PM = "xlib/%Opts{cross}/Config.pm";
-  $Config_POD = "xlib/%Opts{cross}/Config.pod";
-  $Config_SH = "Cross/config-%Opts{cross}.sh";
+  mkdir "xlib/%Opts{?cross}";
+  $Config_PM = "xlib/%Opts{?cross}/Config.pm";
+  $Config_POD = "xlib/%Opts{?cross}/Config.pod";
+  $Config_SH = "Cross/config-%Opts{?cross}.sh";
 }
 else {
   $Config_PM = "lib/Config.pm";
@@ -211,13 +211,13 @@ do {
     $in_v = $val !~ m/$quote\n/;
     next if $in_v;
 
-    s,/,::,g if %Extensions{$name};
+    s,/,::,g if %Extensions{?$name};
 
     $val =~ s/$quote\n?\z//;
 
     my $line = "$name=$quote$val$quote\n";
     push(@v_others, $line);
-    %seen_quotes{$quote}++;
+    %seen_quotes{+$quote}++;
   }
   close *CONFIG_SH;
 };
@@ -233,7 +233,7 @@ sub fetch_string {
 
 EOT
 
-if (%seen_quotes{'"'}) {
+if (%seen_quotes{?'"'}) {
     # We need the full ' and " code
     $fetch_string .= <<'EOT';
     my $quote_type = "'";
@@ -261,7 +261,7 @@ $fetch_string .= <<'EOT';
     $start += length($key) + 3;
 
 EOT
-if (!%seen_quotes{'"'}) {
+if (!%seen_quotes{?'"'}) {
     # Don't need the full ' and " code, or the eval expansion.
     $fetch_string .= <<'EOT';
     my $value = substr($Config_SH_expanded, $start,
@@ -392,7 +392,7 @@ my %need_relocation;
 
 # This can have .../ anywhere:
 if (fetch_string(\%(), 'otherlibdirs') =~ m!\.\.\./!) {
-    %need_relocation{otherlibdirs} = 'otherlibdirs';
+    %need_relocation{+otherlibdirs} = 'otherlibdirs';
 }
 
 my $relocation_code = <<'EOT';
@@ -427,7 +427,7 @@ if (%need_relocation) {
   my $relocations_in_common;
   # otherlibdirs only features in the hash
   foreach (keys %need_relocation) {
-    $relocations_in_common++ if %Common{$_};
+    $relocations_in_common++ if %Common{?$_};
   }
   if ($relocations_in_common) {
     $config_txt .= $relocation_code;
@@ -463,7 +463,7 @@ $heavy_txt .= join('', sort @v_others) . "!END!\n";
 
 # Only need the dynamic byteorder code in Config.pm if 'byteorder' is one of
 # the precached keys
-if (%Common{byteorder}) {
+if (%Common{?byteorder}) {
     $config_txt .= $byteorder_code;
 } else {
     $heavy_txt .= $byteorder_code;
@@ -478,7 +478,7 @@ EOT
 # Currently it only makes sense to do the ... relocation on Unix, so there's
 # no need to emulate the "which separator for this platform" logic in perl.c -
 # ':' will always be applicable
-if (%need_relocation{otherlibdirs}) {
+if (%need_relocation{?otherlibdirs}) {
 $heavy_txt .= << 'EOT';
 s\{^(otherlibdirs=)(['"])(.*?)\2\}
  \{$1 . $2 . join ':', < map \{relocate_inc($_)\} split ':', $3 . $2 )\}me;
@@ -553,7 +553,7 @@ sub FIRSTKEY {
 
 sub NEXTKEY {
 ENDOFEND
-if (%seen_quotes{'"'}) {
+if (%seen_quotes{?'"'}) {
 $heavy_txt .= <<'ENDOFEND';
     # Find out how the current key's quoted so we can skip to its end.
     my $quote = substr($Config_SH_expanded,
@@ -650,17 +650,17 @@ foreach my $key (keys %Common) {
 	$value = "'$value'";
 	if ($key eq 'otherlibdirs') {
 	    $value = "join (':', map \{relocate_inc(\$_)\} split (':', $value) )";
-	} elsif (%need_relocation{$key}) {
+	} elsif (%need_relocation{?$key}) {
 	    $value = "relocate_inc($value)";
 	}
     } else {
 	$value = "undef";
     }
-    %Common{$key} = "$qkey => $value";
+    %Common{+$key} = "$qkey => $value";
 }
 
-if (%Common{byteorder}) {
-    %Common{byteorder} = 'byteorder => $byteorder';
+if (%Common{?byteorder}) {
+    %Common{+byteorder} = 'byteorder => $byteorder';
 }
 my $fast_config = join '', map { "    $_,\n" } sort values %Common;
 
@@ -824,7 +824,7 @@ in such cases.
 
 ENDOFTAIL
 
-if (%Opts{glossary}) {
+if (%Opts{?glossary}) {
   open(*GLOS, "<", "$Glossary") or die "Can't open $Glossary: $!";
 }
 my %seen = %( () );
@@ -835,7 +835,7 @@ sub process {
   my $_ = shift;
   if (s/\A(\w*)\s+\(([\w.]+)\):\s*\n(\t?)/=item C<$1>\n\nFrom F<$2>:\n\n/m) {
     my $c = substr $1, 0, 1;
-    unless (%seen{$c}++) {
+    unless (%seen{+$c}++) {
       print CONFIG_POD <<EOF if $text;
 =back
 
@@ -885,7 +885,7 @@ EOF
   s/n[\0]t/n't/g;		# undo can't, won't damage
 }
 
-if (%Opts{glossary}) {
+if (%Opts{?glossary}) {
     ~< *GLOS;				# Skip the "DO NOT EDIT"
     ~< *GLOS;				# Skip the preamble
   while ( ~< *GLOS) {
@@ -908,7 +908,7 @@ outside of it.
 
 ENDOFTAIL
 
-close(*GLOS) if %Opts{glossary};
+close(*GLOS) if %Opts{?glossary};
 close(*CONFIG_POD);
 print "written $Config_POD\n";
 
@@ -934,7 +934,7 @@ if ($orig_config_txt ne $config_txt or $orig_heavy_txt ne $heavy_txt) {
 
 
 # Now create Cross.pm if needed
-if (%Opts{cross}) {
+if (%Opts{?cross}) {
   open *CROSS, ">", "lib/Cross.pm" or die "Can not open >lib/Cross.pm: $!";
   my $cross = <<'EOS';
 # typical invocation:
@@ -955,16 +955,16 @@ sub import {
 
 1;
 EOS
-  $cross =~ s/\*\*\*replace-marker\*\*\*/%Opts{cross}/g;
+  $cross =~ s/\*\*\*replace-marker\*\*\*/%Opts{?cross}/g;
   print CROSS $cross;
   close *CROSS;
   print "written lib/Cross.pm\n";
-  unshift(@INC,"xlib/%Opts{cross}");
+  unshift(@INC,"xlib/%Opts{?cross}");
 }
 
 # Now do some simple tests on the Config.pm file we have created
 unshift(@INC,'lib');
-unshift(@INC,'xlib/symbian') if %Opts{cross};
+unshift(@INC,'xlib/symbian') if %Opts{?cross};
 require $Config_PM;
 require $Config_heavy;
 Config->import();

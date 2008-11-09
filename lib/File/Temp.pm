@@ -360,14 +360,14 @@ sub _gettemp {
   ${%options{ErrStr}} = undef;
 
   # Can not open the file and make a directory in a single call
-  if (%options{"open"} && %options{"mkdir"}) {
+  if (%options{?"open"} && %options{?"mkdir"}) {
     ${%options{ErrStr}} = "doopen and domkdir can not both be true\n";
     return ();
   }
 
   # Find the start of the end of the  Xs (position of last X)
   # Substr starts from 0
-  my $start = length($template) - 1 - %options{"suffixlen"};
+  my $start = length($template) - 1 - %options{?"suffixlen"};
 
   # Check that we have at least MINX x X (e.g. 'XXXX") at the end of the string
   # (taking suffixlen into account). Any fewer is insecure.
@@ -387,7 +387,7 @@ sub _gettemp {
   # and suffixlen=0 returns nothing if used in the substr directly
   # and generate a full path from the template
 
-  my $path = _replace_XX($template, %options{"suffixlen"});
+  my $path = _replace_XX($template, %options{?"suffixlen"});
 
 
   # Split the path into constituent parts - eventually we need to check
@@ -397,7 +397,7 @@ sub _gettemp {
 
   my ($volume, $directories, $file);
   my $parent; # parent directory
-  if (%options{"mkdir"}) {
+  if (%options{?"mkdir"}) {
     # There is no filename at the end
     ($volume, $directories, $file) = < File::Spec->splitpath( $path, 1);
 
@@ -487,7 +487,7 @@ sub _gettemp {
   for my $i ( 0 .. MAX_TRIES -1) {
 
     # Try to open the file if requested
-    if (%options{"open"}) {
+    if (%options{?"open"}) {
       my $fh;
 
       # Try to make sure this will be marked close-on-exec
@@ -497,15 +497,15 @@ sub _gettemp {
 
       # Attempt to open the file
       my $open_success = undef;
-      if ( $^O eq 'VMS' and %options{"unlink_on_close"} && !$KEEP_ALL) {
+      if ( $^O eq 'VMS' and %options{?"unlink_on_close"} && !$KEEP_ALL) {
         # make it auto delete on close by setting FAB$V_DLT bit
 	$fh = VMS::Stdio::vmssysopen($path, $OPENFLAGS, 0600, 'fop=dlt');
 	$open_success = $fh;
       } else {
-	my $flags = ( (%options{"unlink_on_close"} && !$KEEP_ALL) ??
+	my $flags = ( (%options{?"unlink_on_close"} && !$KEEP_ALL) ??
 		      $OPENTEMPFLAGS !!
 		      $OPENFLAGS );
-	$flags ^|^= $LOCKFLAG if (defined $LOCKFLAG && %options{use_exlock});
+	$flags ^|^= $LOCKFLAG if (defined $LOCKFLAG && %options{?use_exlock});
 	$open_success = sysopen($fh, $path, $flags, 0600);
       }
       if ( $open_success ) {
@@ -520,7 +520,7 @@ sub _gettemp {
 
 	# Error opening file - abort with error
 	# if the reason was anything but EEXIST
-	unless (%!{EEXIST}) {
+	unless (%!{?EEXIST}) {
 	  ${%options{ErrStr}} = "Could not create temp file $path: $!";
 	  return ();
 	}
@@ -528,7 +528,7 @@ sub _gettemp {
 	# Loop round for another try
 
       }
-    } elsif (%options{"mkdir"}) {
+    } elsif (%options{?"mkdir"}) {
 
       # Open the temp directory
       if (mkdir( $path, 0700)) {
@@ -540,7 +540,7 @@ sub _gettemp {
 
 	# Abort with error if the reason for failure was anything
 	# except EEXIST
-	unless (%!{EEXIST}) {
+	unless (%!{?EEXIST}) {
 	  ${%options{ErrStr}} = "Could not create directory $path: $!";
 	  return ();
 	}
@@ -578,7 +578,7 @@ sub _gettemp {
     do {
 
       # Generate new name from original template
-      $path = _replace_XX($template, %options{"suffixlen"});
+      $path = _replace_XX($template, %options{?"suffixlen"});
 
       $counter++;
 
@@ -870,7 +870,7 @@ do {
     if (!$KEEP_ALL) {
       # Files
       my @files = @(exists %files_to_unlink{$$} ??
-		   < @{ %files_to_unlink{$$} } !! () );
+		   < @{ %files_to_unlink{?$$} } !! () );
       foreach my $file ( @files) {
 	# close the filehandle without checking its state
 	# in order to make real sure that this is closed
@@ -885,7 +885,7 @@ do {
       }
       # Dirs
       my @dirs = @(exists %dirs_to_unlink{$$} ??
-		  < @{ %dirs_to_unlink{$$} } !! () );
+		  < @{ %dirs_to_unlink{?$$} } !! () );
       foreach my $dir ( @dirs) {
 	if (-d $dir) {
 	  rmtree($dir, $DEBUG, 0);
@@ -924,7 +924,7 @@ do {
 	# Directory exists so store it
 	# first on VMS turn []foo into [.foo] for rmtree
 	$fname = VMS::Filespec::vmspath($fname) if $^O eq 'VMS';
-	%dirs_to_unlink{$$} = \@() 
+	%dirs_to_unlink{+$$} = \@() 
 	  unless exists %dirs_to_unlink{$$};
 	push (@{ %dirs_to_unlink{$$} }, $fname);
 
@@ -937,7 +937,7 @@ do {
       if (-f $fname) {
 
 	# file exists so store handle and name for later removal
-	%files_to_unlink{$$} = \@()
+	%files_to_unlink{+$$} = \@()
 	  unless exists %files_to_unlink{$$};
 	push(@{ %files_to_unlink{$$} }, \@($fh, $fname));
 
@@ -1000,15 +1000,15 @@ sub new {
 
   # read arguments and convert keys to upper case
   my %args = %( < @_ );
-  %args = %( < map { uc($_), %args{$_} } keys %args );
+  %args = %( < map { uc($_), %args{?$_} } keys %args );
 
   # see if they are unlinking (defaulting to yes)
-  my $unlink = (exists %args{UNLINK} ?? %args{UNLINK} !! 1 );
+  my $unlink = (exists %args{UNLINK} ?? %args{?UNLINK} !! 1 );
   delete %args{UNLINK};
 
   # template (store it in an error so that it will
   # disappear from the arg list of tempfile
-  my @template = @( exists %args{TEMPLATE} ?? %args{TEMPLATE} !! () );
+  my @template = @( exists %args{TEMPLATE} ?? %args{?TEMPLATE} !! () );
   delete %args{TEMPLATE};
 
   # Protect OPEN
@@ -1023,7 +1023,7 @@ sub new {
   ${*$fh} = $path;
 
   # Cache the filename by pid so that the destructor can decide whether to remove it
-  %FILES_CREATED_BY_OBJECT{$$}->{$path} = 1;
+  %FILES_CREATED_BY_OBJECT{$$}->{+$path} = 1;
 
   # Store unlink information in hash slot (plus other constructor info)
   %{*$fh} = %( < %args );
@@ -1059,7 +1059,7 @@ sub newdir {
   # default without passing CLEANUP to tempdir
   my $template = (scalar(nelems @_) % 2 == 1 ?? shift(@_) !! undef );
   my %options = %( < @_ );
-  my $cleanup = (exists %options{CLEANUP} ?? %options{CLEANUP} !! 1 );
+  my $cleanup = (exists %options{CLEANUP} ?? %options{?CLEANUP} !! 1 );
 
   delete %options{CLEANUP};
 
@@ -1120,9 +1120,9 @@ Default is for the file to be removed.
 sub unlink_on_destroy {
   my $self = shift;
   if ((nelems @_)) {
-    %{*$self}{UNLINK} = shift;
+    %{*$self}{+UNLINK} = shift;
   }
-  return %{*$self}{UNLINK};
+  return %{*$self}{?UNLINK};
 }
 
 =item B<DESTROY>
@@ -1148,7 +1148,7 @@ will not be removed.
 
 sub DESTROY {
   my $self = shift;
-  if (%{*$self}{UNLINK} && !$KEEP_ALL) {
+  if (%{*$self}{?UNLINK} && !$KEEP_ALL) {
     print "# --------->   Unlinking $self\n" if $DEBUG;
 
     # only delete if this process created it
@@ -1290,17 +1290,17 @@ sub tempfile {
   %options = %(< %options, < @_)  if (nelems @_);
 
   # First decision is whether or not to open the file
-  if (! %options{"OPEN"}) {
+  if (! %options{?"OPEN"}) {
 
     warn "tempfile(): temporary filename requested but not opened.\nPossibly unsafe, consider using tempfile() with OPEN set to true\n"
       if $^W;
 
   }
 
-  if (%options{"DIR"} and $^O eq 'VMS') {
+  if (%options{?"DIR"} and $^O eq 'VMS') {
 
       # on VMS turn []foo into [.foo] for concatenation
-      %options{"DIR"} = VMS::Filespec::vmspath(%options{"DIR"});
+      %options{+"DIR"} = VMS::Filespec::vmspath(%options{?"DIR"});
   }
 
   # Construct the template
@@ -1313,11 +1313,11 @@ sub tempfile {
   # If no template must prefix the temp directory
   if (defined $template) {
     # End up with current directory if neither DIR not TMPDIR are set
-    if (%options{"DIR"}) {
+    if (%options{?"DIR"}) {
 
-      $template = File::Spec->catfile(%options{"DIR"}, $template);
+      $template = File::Spec->catfile(%options{?"DIR"}, $template);
 
-    } elsif (%options{TMPDIR}) {
+    } elsif (%options{?TMPDIR}) {
 
       $template = File::Spec->catfile( <File::Spec->tmpdir, $template );
 
@@ -1325,9 +1325,9 @@ sub tempfile {
 
   } else {
 
-    if (%options{"DIR"}) {
+    if (%options{?"DIR"}) {
 
-      $template = File::Spec->catfile(%options{"DIR"}, TEMPXXX);
+      $template = File::Spec->catfile(%options{?"DIR"}, TEMPXXX);
 
     } else {
 
@@ -1338,7 +1338,7 @@ sub tempfile {
   }
 
   # Now add a suffix
-  $template .= %options{"SUFFIX"};
+  $template .= %options{?"SUFFIX"};
 
   # Determine whether we should tell _gettemp to unlink the file
   # On unix this is irrelevant and can be worked out after the file is
@@ -1356,12 +1356,12 @@ sub tempfile {
   my ($fh, $path, $errstr);
   croak "Error in tempfile() using $template: $errstr"
     unless (($fh, $path) = < _gettemp($template,
-				    "open" => %options{'OPEN'},
+				    "open" => %options{?'OPEN'},
 				    "mkdir"=> 0 ,
                                     "unlink_on_close" => $unlink_on_close,
-				    "suffixlen" => length(%options{'SUFFIX'}),
+				    "suffixlen" => length(%options{?'SUFFIX'}),
 				    "ErrStr" => \$errstr,
-				    "use_exlock" => %options{EXLOCK},
+				    "use_exlock" => %options{?EXLOCK},
 				   ) );
 
   # Set up an exit handler that can do whatever is right for the
@@ -1370,10 +1370,10 @@ sub tempfile {
   # of OS limitations.
   # The latter should be achieved by using a tied filehandle.
   # Do not check return status since this is all done with END blocks.
-  _deferred_unlink($fh, $path, 0) if %options{"UNLINK"};
+  _deferred_unlink($fh, $path, 0) if %options{?"UNLINK"};
 
   # Return
-  if (%options{'OPEN'}) {
+  if (%options{?'OPEN'}) {
       return  @($fh, $path);
   } else {
       return  @(undef, $path);
@@ -1469,7 +1469,7 @@ sub tempdir  {
   if (defined $template) {
 
     # Need to strip directory path if using DIR or TMPDIR
-    if (%options{'TMPDIR'} || %options{'DIR'}) {
+    if (%options{?'TMPDIR'} || %options{?'DIR'}) {
 
       # Strip parent directory from the filename
       #
@@ -1481,11 +1481,11 @@ sub tempdir  {
       $template = File::Spec->splitdir($directories)[-1];
 
       # Prepend the supplied directory or temp dir
-      if (%options{"DIR"}) {
+      if (%options{?"DIR"}) {
 
-        $template = File::Spec->catdir(%options{"DIR"}, $template);
+        $template = File::Spec->catdir(%options{?"DIR"}, $template);
 
-      } elsif (%options{TMPDIR}) {
+      } elsif (%options{?TMPDIR}) {
 
 	# Prepend tmpdir
 	$template = File::Spec->catdir(File::Spec->tmpdir, $template);
@@ -1496,9 +1496,9 @@ sub tempdir  {
 
   } else {
 
-    if (%options{"DIR"}) {
+    if (%options{?"DIR"}) {
 
-      $template = File::Spec->catdir(%options{"DIR"}, TEMPXXX);
+      $template = File::Spec->catdir(%options{?"DIR"}, TEMPXXX);
 
     } else {
 
@@ -1530,7 +1530,7 @@ sub tempdir  {
 				   ) );
 
   # Install exit handler; must be dynamic to get lexical
-  if ( %options{'CLEANUP'} && -d $tempdir) {
+  if ( %options{?'CLEANUP'} && -d $tempdir) {
     _deferred_unlink(undef, $tempdir, 1);
   }
 
@@ -2351,7 +2351,7 @@ use File::Path < qw/ rmtree /;
 
 sub dirname {
   my $self = shift;
-  return $self->{DIRNAME};
+  return $self->{?DIRNAME};
 }
 
 sub STRINGIFY {
@@ -2362,17 +2362,17 @@ sub STRINGIFY {
 sub unlink_on_destroy {
   my $self = shift;
   if ((nelems @_)) {
-    $self->{CLEANUP} = shift;
+    $self->{+CLEANUP} = shift;
   }
-  return $self->{CLEANUP};
+  return $self->{?CLEANUP};
 }
 
 sub DESTROY {
   my $self = shift;
   if ($self->unlink_on_destroy && 
-      $$ == $self->{LAUNCHPID} && !$File::Temp::KEEP_ALL) {
-    rmtree($self->{DIRNAME}, $File::Temp::DEBUG, 0)
-      if -d $self->{DIRNAME};
+      $$ == $self->{?LAUNCHPID} && !$File::Temp::KEEP_ALL) {
+    rmtree($self->{?DIRNAME}, $File::Temp::DEBUG, 0)
+      if -d $self->{?DIRNAME};
   }
 }
 

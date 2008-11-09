@@ -10,7 +10,7 @@ use Fatal < qw(open close);
 
 my $i = 1;
 try { open *FOO, '<', 'lkjqweriuapofukndajsdlfjnvcvn' };
-print "not " unless $@->{description} =~ m/^Can't open/;
+print "not " unless $@->{?description} =~ m/^Can't open/;
 print "ok $i\n"; ++$i;
 
 my $foo = 'FOO';

@@ -101,7 +101,7 @@ sub ParseParameters
     #local $Carp::CarpLevel = 1 ;
     my $p = Compress::Raw::Zlib::Parameters->new() ;
     $p->parse(< @_)
-        or croak "$sub: $p->{Error}" ;
+        or croak "$sub: $p->{?Error}" ;
 
     return $p;
 }
@@ -125,7 +125,7 @@ sub Compress::Raw::Zlib::Parameters::setError
     my $error = shift ;
     my $retval = (nelems @_) ?? shift !! undef ;
 
-    $self->{Error} = $error ;
+    $self->{+Error} = $error ;
     return $retval;
 }
           
@@ -141,7 +141,7 @@ sub Compress::Raw::Zlib::Parameters::parse
 
     my $default = shift ;
 
-    my $got = $self->{Got} ;
+    my $got = $self->{?Got} ;
     my $firstTime = nkeys %{ $got } == 0 ;
 
     my (@Bad) ;
@@ -159,7 +159,7 @@ sub Compress::Raw::Zlib::Parameters::parse
  
         foreach my $key (keys %$href) {
             push @entered, $key ;
-            push @entered, \$href->{$key} ;
+            push @entered, \$href->{+$key} ;
         }
     }
     else {
@@ -187,7 +187,7 @@ sub Compress::Raw::Zlib::Parameters::parse
         $key = lc $key;
 
         if ($firstTime || ! $sticky) {
-            $got->{$key} = \@(0, $type, $value, $x, $first_only, $sticky) ;
+            $got->{+$key} = \@(0, $type, $value, $x, $first_only, $sticky) ;
         }
 
         $got->{$key}->[OFF_PARSED] = 0 ;
@@ -203,7 +203,7 @@ sub Compress::Raw::Zlib::Parameters::parse
         $key =~ s/^-// ;
         my $canonkey = lc $key;
  
-        if ($got->{$canonkey} && ($firstTime ||
+        if ($got->{?$canonkey} && ($firstTime ||
                                   ! $got->{$canonkey}->[OFF_FIRST_ONLY]  ))
         {
             my $type = $got->{$canonkey}->[OFF_TYPE] ;
@@ -212,7 +212,7 @@ sub Compress::Raw::Zlib::Parameters::parse
                 or return undef ;
             #$value = $$value unless $type & Parse_store_ref ;
             $value = $$value ;
-            $got->{$canonkey} = \@(1, $type, $value, $s) ;
+            $got->{+$canonkey} = \@(1, $type, $value, $s) ;
         }
         else
           { push (@Bad, $key) }

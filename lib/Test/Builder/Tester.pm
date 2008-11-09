@@ -120,8 +120,8 @@ sub _start_testing
 {
     # even if we're running under Test::Harness pretend we're not
     # for now.  This needed so Test::Builder doesn't add extra spaces
-    $original_harness_env = %ENV{HARNESS_ACTIVE} || 0;
-    %ENV{HARNESS_ACTIVE} = 0;
+    $original_harness_env = %ENV{?HARNESS_ACTIVE} || 0;
+    %ENV{+HARNESS_ACTIVE} = 0;
 
     # remember what the handles were set to
     $original_output_handle  = $t->output();
@@ -324,9 +324,9 @@ sub test_test
    else
    {
      %args = %( < @_ );
-     $mess = %args{name} if exists(%args{name});
-     $mess = %args{title} if exists(%args{title});
-     $mess = %args{label} if exists(%args{label});
+     $mess = %args{?name} if exists(%args{name});
+     $mess = %args{?title} if exists(%args{title});
+     $mess = %args{?label} if exists(%args{label});
    }
 
     # er, are we testing?
@@ -343,11 +343,11 @@ sub test_test
     $testing = 0;
 
     # re-enable the original setting of the harness
-    %ENV{HARNESS_ACTIVE} = $original_harness_env;
+    %ENV{+HARNESS_ACTIVE} = $original_harness_env;
 
     # check the output we've stashed
-    unless ($t->ok(    (%args{skip_out} || $out->check)
-                    && (%args{skip_err} || $err->check),
+    unless ($t->ok(    (%args{?skip_out} || $out->check)
+                    && (%args{?skip_err} || $err->check),
                    $mess))
     {
       # print out the diagnostic information about why this
@@ -356,10 +356,10 @@ sub test_test
       local $_;
 
       $t->diag(< map {"$_\n"} @( $out->complaint))
-	unless %args{skip_out} || $out->check;
+	unless %args{?skip_out} || $out->check;
 
       $t->diag(< map {"$_\n"} @( $err->complaint))
-	unless %args{skip_err} || $err->check;
+	unless %args{?skip_err} || $err->check;
     }
 }
 
@@ -486,14 +486,14 @@ sub new {
     my ($class, $type) = < @_;
 
     my $self = bless \%( got => '', type => $type ), $class;
-    open my $fh, '>', \$self->{'got'} or die "$!";
-    $self->{'filehandle'} = $fh;
+    open my $fh, '>', \$self->{+'got'} or die "$!";
+    $self->{+'filehandle'} = $fh;
     return $self;
 }
 
 sub handle {
     my $self = shift;
-    return $self->{'filehandle'};
+    return $self->{?'filehandle'};
 }
 
 sub expect
@@ -530,8 +530,8 @@ sub check
     # turn off warnings as these might be undef
     local $^W = 0;
 
-    my @checks = @{$self->{wanted}};
-    my $got = $self->{got};
+    my @checks = @{$self->{?wanted}};
+    my $got = $self->{?got};
     foreach my $check ( @checks) {
         $check = "\Q$check\E" unless ($check =~ s,^/(.*)/$,$1, or ref $check);
         return 0 unless $got =~ s/^$check//;
@@ -598,28 +598,28 @@ sub complaint
 sub reset
 {
     my $self = shift;
-    seek $self->{'filehandle'}, 0, 0;
-    $self->{'got'} = '';
-    $self->{'wanted'} = \@();
+    seek $self->{?'filehandle'}, 0, 0;
+    $self->{+'got'} = '';
+    $self->{+'wanted'} = \@();
 }
 
 
 sub got
 {
     my $self = shift;
-    return $self->{got};
+    return $self->{?got};
 }
 
 sub wanted
 {
     my $self = shift;
-    return $self->{wanted};
+    return $self->{?wanted};
 }
 
 sub type
 {
     my $self = shift;
-    return $self->{type};
+    return $self->{?type};
 }
 
 1;

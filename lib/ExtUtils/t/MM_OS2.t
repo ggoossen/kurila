@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 BEGIN {
-    if( %ENV{PERL_CORE} ) {
+    if( %ENV{?PERL_CORE} ) {
         chdir 't' if -d 't';
         @INC = @( '../lib' );
     }
@@ -41,7 +41,7 @@ my $mm = bless(\%(
 is( $mm->dlsyms(), '', 
 	'dlsyms() should return nothing with dynamic flag set' );
 
-$mm->{BASEEXT} = 'baseext';
+$mm->{+BASEEXT} = 'baseext';
 delete $mm->{SKIPHASH};
 my $res = $mm->dlsyms();
 like( $res, qr/baseext\.def: Makefile/,
@@ -50,7 +50,7 @@ like( $res, qr/"DL_FUNCS" => {  }/,
 	'... should provide empty hash refs where necessary' );
 like( $res, qr/"DL_VARS" => \[]/, '... and empty array refs too' );
 
-$mm->{FUNCLIST} = 'funclist';
+$mm->{+FUNCLIST} = 'funclist';
 $res = $mm->dlsyms( IMPORTS => 'imports' );
 like( $res, qr/"FUNCLIST" => .+funclist/, 
 	'... should pick up values from object' );
@@ -65,18 +65,18 @@ do {
 SKIP: do {
 	skip("Cannot write test files: $!", 7) unless $can_write;
 
-	$mm->{IMPORTS} = \%( foo => 'bar' );
+	$mm->{+IMPORTS} = \%( foo => 'bar' );
 
 	local $@->{description};
 	try { $mm->dlsyms() };
-	like( $@->{description}, qr/Can.t mkdir tmp_imp/, 
+	like( $@->{?description}, qr/Can.t mkdir tmp_imp/, 
 		'... should die if directory cannot be made' );
 
 	unlink('tmp_imp') or skip("Cannot remove test file: $!", 9);
 	try { $mm->dlsyms() };
-	like( $@->{description}, qr/Malformed IMPORT/, 'should die from malformed import symbols');
+	like( $@->{?description}, qr/Malformed IMPORT/, 'should die from malformed import symbols');
 
-	$mm->{IMPORTS} = \%( foo => 'bar.baz' );
+	$mm->{+IMPORTS} = \%( foo => 'bar.baz' );
 
 	my @sysfail = @( 1, 0, 1 );
 	my ($sysargs, $unlinked);
@@ -95,13 +95,13 @@ SKIP: do {
 	try { $mm->dlsyms() };
 
 	like( $sysargs, qr/^emximp/, '... should try to call system() though' );
-	like( $@->{description}, qr/Cannot make import library/, 
+	like( $@->{?description}, qr/Cannot make import library/, 
 		'... should die if emximp syscall fails' );
 
 	# sysfail is 0 now, call emximp call should succeed
 	try { $mm->dlsyms() };
 	is( $unlinked, 1, '... should attempt to unlink temp files' );
-	like( $@->{description}, qr/Cannot extract import/, 
+	like( $@->{?description}, qr/Cannot extract import/, 
 		'... should die if other syscall fails' );
 	
 	# make both syscalls succeed
@@ -130,7 +130,7 @@ do {
     like( $ret, qr/^called static_lib/m,
           '... should return parent data unless IMPORTS exists' );
 
-    $args->{IMPORTS} = \%( foo => 1);
+    $args->{+IMPORTS} = \%( foo => 1);
     $ret = ExtUtils::MM_OS2::static_lib( $args );
     is( $called, 2, '... should call parent method if extra imports passed' );
     like( $ret, qr/^called static_lib\n\t\$\(AR\) \$\(AR_STATIC_ARGS\)/m, 
@@ -162,7 +162,7 @@ do {
 	# in addition, we need them to be unique enough they do not trip
 	# an earlier file test in maybe_command().  Portability.
 
-	foreach my $path (split(m/:/, %ENV{PATH})) {
+	foreach my $path (split(m/:/, %ENV{?PATH})) {
 		opendir(DIR, $path) or next;
 		while (defined(my $file = readdir(DIR))) {
 			next if $file eq $curdir or $file eq $updir;
@@ -252,7 +252,7 @@ ok( ! ExtUtils::MM_OS2->file_name_is_absolute( 'arduk' ),
 $mm->init_linker;
 
 # PERL_ARCHIVE
-is( $mm->{PERL_ARCHIVE}, '$(PERL_INC)/libperl$(LIB_EXT)', 'PERL_ARCHIVE' );
+is( $mm->{?PERL_ARCHIVE}, '$(PERL_INC)/libperl$(LIB_EXT)', 'PERL_ARCHIVE' );
 
 # PERL_ARCHIVE_AFTER
 do {
@@ -261,16 +261,16 @@ do {
 	*OS2::is_aout = \$aout;
 	
         $mm->init_linker;
-	isnt( $mm->{PERL_ARCHIVE_AFTER}, '',
+	isnt( $mm->{?PERL_ARCHIVE_AFTER}, '',
 		'PERL_ARCHIVE_AFTER should be empty without $is_aout set' );
 	$aout = 1;
-	is( $mm->{PERL_ARCHIVE_AFTER}, 
+	is( $mm->{?PERL_ARCHIVE_AFTER}, 
             '$(PERL_INC)/libperl_override$(LIB_EXT)', 
 		'... and has libperl_override if it is set' );
 };
 
 # EXPORT_LIST
-is( $mm->{EXPORT_LIST}, '$(BASEEXT).def', 
+is( $mm->{?EXPORT_LIST}, '$(BASEEXT).def', 
 	'EXPORT_LIST should add .def to BASEEXT member' );
 
 END {

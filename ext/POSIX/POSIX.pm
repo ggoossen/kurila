@@ -427,7 +427,7 @@ sub free {
 
 sub getenv {
     usage "getenv(name)" if (nelems @_) != 1;
-    %ENV{@_[0]};
+    %ENV{?@_[0]};
 }
 
 sub labs {
@@ -662,7 +662,7 @@ sub getgid {
 sub getgroups {
     usage "getgroups()" if (nelems @_) != 0;
     my %seen;
-    grep(!%seen{$_}++, split(' ', $^EGID ));
+    grep(!%seen{+$_}++, split(' ', $^EGID ));
 }
 
 sub getlogin {
@@ -953,10 +953,10 @@ require Exporter;
 package POSIX::SigAction;
 
 sub new { bless \%(HANDLER => @_[1], MASK => @_[2], FLAGS => @_[3] || 0, SAFE => 0), @_[0] }
-sub handler { @_[0]->{HANDLER} = @_[1] if (nelems @_) +> 1; @_[0]->{HANDLER} };
-sub mask    { @_[0]->{MASK}    = @_[1] if (nelems @_) +> 1; @_[0]->{MASK} };
-sub flags   { @_[0]->{FLAGS}   = @_[1] if (nelems @_) +> 1; @_[0]->{FLAGS} };
-sub safe    { @_[0]->{SAFE}    = @_[1] if (nelems @_) +> 1; @_[0]->{SAFE} };
+sub handler { @_[0]->{+HANDLER} = @_[1] if (nelems @_) +> 1; @_[0]->{?HANDLER} };
+sub mask    { @_[0]->{+MASK}    = @_[1] if (nelems @_) +> 1; @_[0]->{?MASK} };
+sub flags   { @_[0]->{+FLAGS}   = @_[1] if (nelems @_) +> 1; @_[0]->{?FLAGS} };
+sub safe    { @_[0]->{+SAFE}    = @_[1] if (nelems @_) +> 1; @_[0]->{?SAFE} };
 
 package POSIX::SigRt;
 
@@ -1007,7 +1007,7 @@ sub EXISTS { &_exist( < @_ ) }
 sub FETCH  { my $rtsig = &_check( < @_ );
 	     my $oa = POSIX::SigAction->new();
 	     POSIX::sigaction($rtsig, undef, $oa);
-	     return $oa->{HANDLER} }
+	     return $oa->{?HANDLER} }
 sub STORE  { my $rtsig = &_check( < @_ ); new($rtsig, @_[2], $SIGACTION_FLAGS) }
 sub DELETE { delete %SIG{ &_check( < @_ ) } }
 sub CLEAR  { &_exist( < @_ ); delete %SIG{[ <&POSIX::SIGRTMIN( < @_ ) .. &POSIX::SIGRTMAX( < @_ ) ]} }

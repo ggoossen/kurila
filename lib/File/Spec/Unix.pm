@@ -158,7 +158,7 @@ sub _tmpdir {
 
 sub tmpdir {
     return $tmpdir if defined $tmpdir;
-    $tmpdir = @_[0]->_tmpdir( %ENV{TMPDIR}, "/tmp" );
+    $tmpdir = @_[0]->_tmpdir( %ENV{?TMPDIR}, "/tmp" );
 }
 
 =item updir
@@ -213,7 +213,7 @@ Takes no argument, returns the environment variable PATH as an array.
 
 sub path {
     return () unless exists %ENV{PATH};
-    my @path = split(':', %ENV{PATH});
+    my @path = split(':', %ENV{?PATH});
     foreach ( @path) { $_ = '.' if $_ eq '' }
     return @path;
 }

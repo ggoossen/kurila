@@ -67,7 +67,7 @@ BEGIN {
     if ($^O eq 'MacOS') {
 	$path = $Lib_Dir . 'Yup.pm';
     }
-    is( %INC{'Yup.pm'}, $path,    '%INC set properly' );
+    is( %INC{?'Yup.pm'}, $path,    '%INC set properly' );
 
     is( try { do 'Yup.pm'  }, 42,  'do() works' );
     ok( try { require Yup; },      '   require()' );

@@ -92,8 +92,8 @@ sub valueWalk
     my @list = @() ;
 
     foreach my $k (sort keys %$tre) {
-	my $v = $tre->{$k};
-	die "duplicate key $k\n" if defined %list{$k} ;
+	my $v = $tre->{?$k};
+	die "duplicate key $k\n" if defined %list{?$k} ;
 	die "Value associated with key '$k' is not an ARRAY reference"
 	    if !ref $v || ref $v ne 'ARRAY' ;
 
@@ -112,8 +112,8 @@ sub orderValues
     my $index = 0;
     foreach my $ver ( sort { $a <+> $b } keys %v_list ) {
         foreach my $name (  @{ %v_list{$ver} } ) {
-	    %ValueToName{ $index } = \@( uc $name, $ver ) ;
-	    %NameToValue{ uc $name } = $index ++ ;
+	    %ValueToName{+$index } = \@( uc $name, $ver ) ;
+	    %NameToValue{+uc $name } = $index ++ ;
         }
     }
 
@@ -128,12 +128,12 @@ sub walk
     my @list = @() ;
 
     foreach my $k (sort keys %$tre) {
-	my $v = $tre->{$k};
-	die "duplicate key $k\n" if defined %list{$k} ;
+	my $v = $tre->{?$k};
+	die "duplicate key $k\n" if defined %list{?$k} ;
 	#$Value{$index} = uc $k ;
 	die "Can't find key '$k'"
-	    if ! defined %NameToValue{uc $k} ;
-        push @{ %list{$k} }, %NameToValue{uc $k} ;
+	    if ! defined %NameToValue{?uc $k} ;
+        push @{ %list{$k} }, %NameToValue{?uc $k} ;
 	die "Value associated with key '$k' is not an ARRAY reference"
 	    if !ref $v || ref $v ne 'ARRAY' ;
 	
@@ -142,7 +142,7 @@ sub walk
             push (@{ %list{$k} }, < walk ($rest));
         }
 
-	push @list, < @{ %list{$k} } ;
+	push @list, < @{ %list{?$k} } ;
     }
 
    return @list ;
@@ -177,7 +177,7 @@ sub printTree
     my @keys = sort keys %$tre ;
 
     while ($k = shift @keys) {
-	$v = $tre->{$k};
+	$v = $tre->{?$k};
 	die "Value associated with key '$k' is not an ARRAY reference"
 	    if !ref $v || ref $v ne 'ARRAY' ;
 	
@@ -287,7 +287,7 @@ my $warn_size = int($index / 8) + ($index % 8 != 0) ;
 
 my $last_ver = 0;
 foreach my $k (sort { $a <+> $b } keys %ValueToName) {
-    my ($name, $version) = < @{ %ValueToName{$k} };
+    my ($name, $version) = < @{ %ValueToName{?$k} };
     print $warn "\n/* Warnings Categories added in Perl $version */\n\n"
         if $last_ver != $version ;
     print $warn tab(5, "#define WARN_$name"), "$k\n" ;
@@ -358,7 +358,7 @@ while ( ~< *DATA) {
 $last_ver = 0;
 print $pm "our \%Offsets = \%(\n" ;
 foreach my $k (sort { $a <+> $b } keys %ValueToName) {
-    my ($name, $version) = < @{ %ValueToName{$k} };
+    my ($name, $version) = < @{ %ValueToName{?$k} };
     $name = lc $name;
     $k *= 2 ;
     if ( $last_ver != $version ) {
@@ -375,7 +375,7 @@ print $pm "  );\n\n" ;
 print $pm "our \%Bits = %(\n" ;
 foreach my $k (sort keys  %list) {
 
-    my $v = %list{$k} ;
+    my $v = %list{?$k} ;
     my @list = sort { $a <+> $b } @$v;
 
     print $pm tab(4, "    '$k'"), '=> "',
@@ -389,7 +389,7 @@ print $pm "  );\n\n" ;
 print $pm "our \%DeadBits = %(\n" ;
 foreach my $k (sort keys  %list) {
 
-    my $v = %list{$k} ;
+    my $v = %list{?$k} ;
     my @list = sort { $a <+> $b } @$v;
 
     print $pm tab(4, "    '$k'"), '=> "',

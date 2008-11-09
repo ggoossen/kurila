@@ -33,7 +33,7 @@ do {
     $path_to_README = File::Spec->rel2abs('README');
 
     my @warnings;
-    local $^WARN_HOOK = sub { push @warnings, @_[0]->{description} };
+    local $^WARN_HOOK = sub { push @warnings, @_[0]->{?description} };
 
     try {
         $num_warnings = validate qq{
@@ -62,7 +62,7 @@ do {
 do {
     my ($num_warnings, @warnings);
 
-    local $^WARN_HOOK = sub { push @warnings, @_[0]->{description} };
+    local $^WARN_HOOK = sub { push @warnings, @_[0]->{?description} };
 
     try {
         $num_warnings = validate qq{
@@ -91,7 +91,7 @@ do {
 do {
     my ($num_warnings, @warnings);
 
-    local $^WARN_HOOK = sub { push @warnings, @_[0]->{description} };
+    local $^WARN_HOOK = sub { push @warnings, @_[0]->{?description} };
 
     try {
         $num_warnings = validate q{
@@ -124,7 +124,7 @@ do {
     $path_to_libFile = File::Spec->rel2abs(File::Spec->catdir('lib','File'));
     $path_to_dist    = File::Spec->rel2abs(File::Spec->curdir);
 
-    local $^WARN_HOOK = sub { push @warnings, @_[0]->{description} };
+    local $^WARN_HOOK = sub { push @warnings, @_[0]->{?description} };
 
     try {
         $num_warnings = validate qq{
@@ -165,7 +165,7 @@ do {
         };
     };
 
-    if ( $@ && $@->{description} =~ m/lib is not a plain file/
+    if ( $@ && $@->{?description} =~ m/lib is not a plain file/
             && not defined $num_warnings )
     {
         ok(1);
@@ -188,7 +188,7 @@ do {
         };
     };
 
-    if ( $@ && $@->{description} =~ m/yadda lib yadda/
+    if ( $@ && $@->{?description} =~ m/yadda lib yadda/
             && not defined $num_warnings )
     {
         ok(1);

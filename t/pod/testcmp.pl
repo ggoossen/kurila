@@ -54,7 +54,7 @@ sub testcmp( $ $ ; $) {
       $fh2 = FileHandle->new($file2, "r") or die "Can't open $file2: $!";
    }
   
-   my $cmplines = %opts{'-cmplines'} || undef;
+   my $cmplines = %opts{?'-cmplines'} || undef;
    my ($f1text, $f2text) = ("", "");
    my ($line, $diffs)    = (0, 0);
   

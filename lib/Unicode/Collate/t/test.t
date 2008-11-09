@@ -5,7 +5,7 @@ BEGIN {
 	    "cannot stringify a Unicode code point\n";
 	exit 0;
     }
-    if (%ENV{PERL_CORE}) {
+    if (%ENV{?PERL_CORE}) {
 	chdir('t') if -d 't';
 	@INC = @( $^O eq 'MacOS' ?? < qw(::lib) !! < qw(../lib) );
     }
@@ -76,7 +76,7 @@ is($Collator->cmp($a_acute, $A_acute), -1);
 
 $Collator->change(level => 2);
 
-is($Collator->{level}, 2);
+is($Collator->{?level}, 2);
 
 is( $Collator->cmp("ABC","abc"), 0);
 ok( $Collator->eq("ABC","abc") );
@@ -97,7 +97,7 @@ is( $Collator->cmp("a\x{C544}b", "a\x{30A2}b"), -1 ); # hangul < hiragana
 
 $Collator->change(< %old_level, katakana_before_hiragana => 1);
 
-is($Collator->{level}, 4);
+is($Collator->{?level}, 4);
 
 is( $Collator->cmp("abc", "ABC"), -1);
 ok( $Collator->ne("abc", "ABC") );

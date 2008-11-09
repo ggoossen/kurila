@@ -23,7 +23,7 @@ my $msg;
 my $sem;
 
 # FreeBSD is known to throw this if there's no SysV IPC in the kernel.
-%SIG{SYS} = sub {
+%SIG{+SYS} = sub {
     diag(<<EOM);
 SIGSYS caught.
 It may be that your kernel does not have SysV IPC configured.

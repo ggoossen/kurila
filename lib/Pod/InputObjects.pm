@@ -165,8 +165,8 @@ contents of the given argument.
 =cut
 
 sub name {
-   ((nelems @_) +> 1)  and  @_[0]->{'-name'} = @_[1];
-   return @_[0]->{'-name'};
+   ((nelems @_) +> 1)  and  @_[0]->{+'-name'} = @_[1];
+   return @_[0]->{?'-name'};
 }
 
 ## allow 'filename' as an alias for 'name'
@@ -188,7 +188,7 @@ one used to contructed this input source object).
 =cut
 
 sub handle {
-   return @_[0]->{'-handle'};
+   return @_[0]->{?'-handle'};
 }
 
 ##---------------------------------------------------------------------------
@@ -209,8 +209,8 @@ state is restored to this value.
 =cut
 
 sub was_cutting {
-   ((nelems @_) +> 1)  and  @_[0]->{-was_cutting} = @_[1];
-   return @_[0]->{-was_cutting};
+   ((nelems @_) +> 1)  and  @_[0]->{+was_cutting} = @_[1];
+   return @_[0]->{?was_cutting};
 }
 
 ##---------------------------------------------------------------------------
@@ -292,8 +292,8 @@ the name of the command (I<without> any leading C<=> prefix).
 =cut
 
 sub cmd_name {
-   ((nelems @_) +> 1)  and  @_[0]->{'-name'} = @_[1];
-   return @_[0]->{'-name'};
+   ((nelems @_) +> 1)  and  @_[0]->{+'-name'} = @_[1];
+   return @_[0]->{?'-name'};
 }
 
 ## let name() be an alias for cmd_name()
@@ -310,8 +310,8 @@ This method will return the corresponding text of the paragraph.
 =cut
 
 sub text {
-   ((nelems @_) +> 1)  and  @_[0]->{'-text'} = @_[1];
-   return @_[0]->{'-text'};
+   ((nelems @_) +> 1)  and  @_[0]->{+'-text'} = @_[1];
+   return @_[0]->{?'-text'};
 }       
 
 ##---------------------------------------------------------------------------
@@ -326,9 +326,9 @@ as it appeared in the input.
 =cut
 
 sub raw_text {
-   return @_[0]->{'-text'}  unless (defined @_[0]->{'-name'});
-   return @_[0]->{'-prefix'} . @_[0]->{'-name'} . 
-          @_[0]->{'-separator'} . @_[0]->{'-text'};
+   return @_[0]->{?'-text'}  unless (defined @_[0]->{?'-name'});
+   return @_[0]->{?'-prefix'} . @_[0]->{?'-name'} . 
+          @_[0]->{?'-separator'} . @_[0]->{?'-text'};
 }
 
 ##---------------------------------------------------------------------------
@@ -344,7 +344,7 @@ or "==").
 =cut
 
 sub cmd_prefix {
-   return @_[0]->{'-prefix'};
+   return @_[0]->{?'-prefix'};
 }
 
 ##---------------------------------------------------------------------------
@@ -360,7 +360,7 @@ paragraph (if any).
 =cut
 
 sub cmd_separator {
-   return @_[0]->{'-separator'};
+   return @_[0]->{?'-separator'};
 }
 
 ##---------------------------------------------------------------------------
@@ -376,8 +376,8 @@ This method will get/set the corresponding parse-tree of the paragraph's text.
 =cut
 
 sub parse_tree {
-   ((nelems @_) +> 1)  and  @_[0]->{'-ptree'} = @_[1];
-   return @_[0]->{'-ptree'};
+   ((nelems @_) +> 1)  and  @_[0]->{+'-ptree'} = @_[1];
+   return @_[0]->{?'-ptree'};
 }       
 
 ## let ptree() be an alias for parse_tree()
@@ -399,8 +399,8 @@ by a colon (':'), followed by the line number.
 =cut
 
 sub file_line {
-   my @loc = @(@_[0]->{'-file'} || '<unknown-file>',
-              @_[0]->{'-line'} || 0);
+   my @loc = @(@_[0]->{?'-file'} || '<unknown-file>',
+              @_[0]->{?'-line'} || 0);
    return @loc;
 }
 
@@ -480,13 +480,13 @@ sub new {
     );
 
     ## Initialize contents if they havent been already
-    my $ptree = $self->{'-ptree'} || Pod::ParseTree->new();
+    my $ptree = $self->{?'-ptree'} || Pod::ParseTree->new();
     if ( (ref $ptree) =~ m/^(ARRAY)?$/ ) {
         ## We have an array-ref, or a normal scalar. Pass it as an
         ## an argument to the ptree-constructor
         $ptree = Pod::ParseTree->new($1 ?? \@($ptree) !! $ptree);
     }
-    $self->{'-ptree'} = $ptree;
+    $self->{+'-ptree'} = $ptree;
 
     ## Bless ourselves into the desired class and perform any initialization
     bless $self, $class;
@@ -504,8 +504,8 @@ The name of the interior sequence command.
 =cut
 
 sub cmd_name {
-   ((nelems @_) +> 1)  and  @_[0]->{'-name'} = @_[1];
-   return @_[0]->{'-name'};
+   ((nelems @_) +> 1)  and  @_[0]->{+'-name'} = @_[1];
+   return @_[0]->{?'-name'};
 }
 
 ## let name() be an alias for cmd_name()
@@ -533,8 +533,8 @@ sub _set_child2parent_links {
 
 sub _unset_child2parent_links {
    my $self = shift;
-   $self->{'-parent_sequence'} = undef;
-   my $ptree = $self->{'-ptree'};
+   $self->{+'-parent_sequence'} = undef;
+   my $ptree = $self->{?'-ptree'};
    for ( @$ptree) {
       next  unless (ref  and  ref ne 'SCALAR');
       $_->_unset_child2parent_links()
@@ -556,7 +556,7 @@ of this interior sequence.
 
 sub prepend {
    my $self  = shift;
-   $self->{'-ptree'}->prepend(< @_);
+   $self->{?'-ptree'}->prepend(< @_);
    _set_child2parent_links($self, < @_);
    return $self;
 }       
@@ -575,7 +575,7 @@ of this interior sequence.
 
 sub append {
    my $self = shift;
-   $self->{'-ptree'}->append(< @_);
+   $self->{?'-ptree'}->append(< @_);
    _set_child2parent_links($self, < @_);
    return $self;
 }       
@@ -594,8 +594,8 @@ returned. Otherwise C<undef> is returned.
 
 sub nested {
    my $self = shift;
-  ((nelems @_) == 1)  and  $self->{'-parent_sequence'} = shift;
-   return  $self->{'-parent_sequence'} || undef;
+  ((nelems @_) == 1)  and  $self->{+'-parent_sequence'} = shift;
+   return  $self->{?'-parent_sequence'} || undef;
 }
 
 ##---------------------------------------------------------------------------
@@ -611,11 +611,11 @@ exactly as it appeared in the input.
 
 sub raw_text {
    my $self = shift;
-   my $text = $self->{'-name'} . $self->{'-ldelim'};
+   my $text = $self->{?'-name'} . $self->{?'-ldelim'};
    for (  $self->{'-ptree'}->children ) {
       $text .= (ref $_) ?? $_->raw_text !! $_;
    }
-   $text .= $self->{'-rdelim'};
+   $text .= $self->{?'-rdelim'};
    return $text;
 }
 
@@ -631,8 +631,8 @@ sequence (should be "<").
 =cut
 
 sub left_delimiter {
-   ((nelems @_) +> 1)  and  @_[0]->{'-ldelim'} = @_[1];
-   return @_[0]->{'-ldelim'};
+   ((nelems @_) +> 1)  and  @_[0]->{+'-ldelim'} = @_[1];
+   return @_[0]->{?'-ldelim'};
 }
 
 ## let ldelim() be an alias for left_delimiter()
@@ -648,8 +648,8 @@ sequence (should be ">").
 =cut
 
 sub right_delimiter {
-   ((nelems @_) +> 1)  and  @_[0]->{'-rdelim'} = @_[1];
-   return @_[0]->{'-rdelim'};
+   ((nelems @_) +> 1)  and  @_[0]->{+'-rdelim'} = @_[1];
+   return @_[0]->{?'-rdelim'};
 }
 
 ## let rdelim() be an alias for right_delimiter()
@@ -669,8 +669,8 @@ sequence's text.
 =cut
 
 sub parse_tree {
-   ((nelems @_) +> 1)  and  @_[0]->{'-ptree'} = @_[1];
-   return @_[0]->{'-ptree'};
+   ((nelems @_) +> 1)  and  @_[0]->{+'-ptree'} = @_[1];
+   return @_[0]->{?'-ptree'};
 }       
 
 ## let ptree() be an alias for parse_tree()
@@ -692,8 +692,8 @@ by a colon (':'), followed by the line number.
 =cut
 
 sub file_line {
-   my @loc = @(@_[0]->{'-file'}  || '<unknown-file>',
-              @_[0]->{'-line'}  || 0);
+   my @loc = @(@_[0]->{?'-file'}  || '<unknown-file>',
+              @_[0]->{?'-line'}  || 0);
    return @loc;
 }
 

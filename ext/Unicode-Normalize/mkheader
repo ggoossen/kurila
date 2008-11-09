@@ -97,7 +97,7 @@ do {
     while ( ~< $fh) {
 	next if m/^#/ or m/^$/;
 	s/#.*//;
-	%Exclus{ hex($1) } = 1 if m/([0-9A-Fa-f]+)/;
+	%Exclus{+hex($1) } = 1 if m/([0-9A-Fa-f]+)/;
     }
     close $fh;
 };
@@ -111,9 +111,9 @@ while ($Combin =~ m/(.+)/g) {
     my @tab = split m/\t/, $1;
     my $ini = hex @tab[0];
     if (@tab[1] eq '') {
-	%Combin{ $ini } = @tab[2];
+	%Combin{+$ini } = @tab[2];
     } else {
-	%Combin{ $_ } = @tab[2] foreach $ini .. hex(@tab[1]);
+	%Combin{+$_ } = @tab[2] foreach $ini .. hex(@tab[1]);
     }
 }
 
@@ -128,42 +128,42 @@ while ($Decomp =~ m/(.+)/g) {
 		# %04x is bad since it'd place _3046 after _1d157.
 
     if (@tab[1] eq '') {
-	%Compat{ $ini } = $dec;
+	%Compat{+$ini } = $dec;
 
 	if (! $compat) {
-	    %Canon{ $ini } = $dec;
+	    %Canon{+$ini } = $dec;
 
 	    if ((nelems @$dec) == 2) {
-		if (%Combin{ $dec->[0] }) {
-		    %NonStD{ $ini } = 1;
+		if (%Combin{?$dec->[0] }) {
+		    %NonStD{+$ini } = 1;
 		} else {
-		    %CompList{ $listname }->{ $dec->[1] } = $ini;
-		    %Comp1st{ $dec->[0] } = $listname;
-		    %Comp2nd{ $dec->[1] } = 1 if ! %Exclus{$ini};
+		    %CompList{ $listname }->{+$dec->[1] } = $ini;
+		    %Comp1st{+$dec->[0] } = $listname;
+		    %Comp2nd{+$dec->[1] } = 1 if ! %Exclus{?$ini};
 		}
 	    } elsif ((nelems @$dec) == 1) {
-		%Single{ $ini } = 1;
+		%Single{+$ini } = 1;
 	    } else {
 		die("Weird Canonical Decomposition of U+@tab[0]");
 	    }
 	}
     } else {
 	foreach my $u ($ini .. hex(@tab[1])) {
-	    %Compat{ $u } = $dec;
+	    %Compat{+$u } = $dec;
 
 	    if (! $compat) {
-		%Canon{ $u } = $dec;
+		%Canon{+$u } = $dec;
 
 		if ((nelems @$dec) == 2) {
-		    if (%Combin{ $dec->[0] }) {
-			%NonStD{ $u } = 1;
+		    if (%Combin{?$dec->[0] }) {
+			%NonStD{+$u } = 1;
 		    } else {
-			%CompList{ $listname }->{ $dec->[1] } = $u;
-			%Comp1st{ $dec->[0] } = $listname;
-			%Comp2nd{ $dec->[1] } = 1 if ! %Exclus{$u};
+			%CompList{ $listname }->{+$dec->[1] } = $u;
+			%Comp1st{+$dec->[0] } = $listname;
+			%Comp2nd{+$dec->[1] } = 1 if ! %Exclus{?$u};
 		    }
 		} elsif ((nelems @$dec) == 1) {
-		    %Single{ $u } = 1;
+		    %Single{+$u } = 1;
 		} else {
 		    die("Weird Canonical Decomposition of U+@tab[0]");
 		}
@@ -174,14 +174,14 @@ while ($Decomp =~ m/(.+)/g) {
 
 # modern HANGUL JUNGSEONG and HANGUL JONGSEONG jamo
 foreach my $j ( @(<0x1161..0x1175, < 0x11A8..0x11C2)) {
-    %Comp2nd{$j} = 1;
+    %Comp2nd{+$j} = 1;
 }
 
 sub getCanonList {
     my @src = @_;
     my @dec = map {
 	(SBase +<= $_ && $_ +<= SFinal) ?? < decomposeHangul($_)
-	    !! %Canon{$_} ?? < @{ %Canon{$_} } !! $_
+	    !! %Canon{?$_} ?? < @{ %Canon{?$_} } !! $_
 		} @src;
     return join(" ", @src) eq join(" ", @dec) ?? @dec !! getCanonList(< @dec);
     # condition @src == @dec is not ok.
@@ -191,7 +191,7 @@ sub getCompatList {
     my @src = @_;
     my @dec = map {
 	(SBase +<= $_ && $_ +<= SFinal) ?? < decomposeHangul($_)
-	    !! %Compat{$_} ?? < @{ %Compat{$_} } !! $_
+	    !! %Compat{?$_} ?? < @{ %Compat{?$_} } !! $_
 		} @src;
     return join(" ", @src) eq join(" ", @dec) ?? @dec !! getCompatList(< @dec);
     # condition @src == @dec is not ok.
@@ -199,12 +199,12 @@ sub getCompatList {
 
 # exhaustive decomposition
 foreach my $key (keys %Canon) {
-    %Canon{$key}  = \ getCanonList($key);
+    %Canon{+$key}  = \ getCanonList($key);
 }
 
 # exhaustive decomposition
 foreach my $key (keys %Compat) {
-    %Compat{$key} = \ getCompatList($key);
+    %Compat{+$key} = \ getCompatList($key);
 }
 
 sub _pack_U {
@@ -228,7 +228,7 @@ sub _U_stringify {
 
 foreach my $hash (@(\%Canon, \%Compat)) {
     foreach my $key (keys %$hash) {
-	$hash->{$key} = _U_stringify( < @{ $hash->{$key} } );
+	$hash->{+$key} = _U_stringify( < @{ $hash->{$key} } );
     }
 }
 
@@ -269,9 +269,9 @@ binmode FH; select FH;
 EOF
 
 foreach my $tbl ( @boolfunc) {
-    my @temp = sort {$a <+> $b} keys %{$tbl->{hash}};
-    my $type = $tbl->{type};
-    my $name = $tbl->{name};
+    my @temp = sort {$a <+> $b} keys %{$tbl->{?hash}};
+    my $type = $tbl->{?type};
+    my $name = $tbl->{?name};
     print "$type is$name (UV uv)\n\{\nreturn\n\t";
 
     while ((nelems @temp)) {
@@ -300,8 +300,8 @@ my $compinit =
 
 foreach my $i (sort keys %CompList) {
     $compinit .= "$structname $i [] = \{\n";
-    $compinit .= join ",\n", map sprintf("\t\{ \%d, \%d \}", $_, %CompList{$i}->{$_}),
-	    sort { $a <+> $b } keys %{ %CompList{$i} };
+    $compinit .= join ",\n", map sprintf("\t\{ \%d, \%d \}", $_, %CompList{$i}->{?$_}),
+	    sort { $a <+> $b } keys %{ %CompList{?$i} };
     $compinit .= ",\n\{0,0\}\n\};\n\n"; # with sentinel
 }
 
@@ -338,12 +338,12 @@ my @tripletable = @(
 );
 
 foreach my $tbl ( @tripletable) {
-    my $file = "$tbl->{file}.h";
-    my $head = "$($prefix)$tbl->{name}";
-    my $type = $tbl->{type};
-    my $hash = $tbl->{hash};
-    my $null = $tbl->{null};
-    my $init = $tbl->{init};
+    my $file = "$tbl->{?file}.h";
+    my $head = "$($prefix)$tbl->{?name}";
+    my $type = $tbl->{?type};
+    my $hash = $tbl->{?hash};
+    my $null = $tbl->{?null};
+    my $init = $tbl->{?init};
 
     open FH, ">", "$file" or die "$PACKAGE: $file can't be made";
     binmode FH; select FH;
@@ -362,17 +362,17 @@ EOF
 	die sprintf("a Unicode code point 0x\%04X over 0x10FFFF.", $uv)
 	    unless $uv +<= 0x10FFFF;
 	my @c = @( unpack 'CCCC', pack 'N', $uv );
-	%val{ @c[1] }->{ @c[2] }->{ @c[3] } = $hash->{$uv};
+	%val{ @c[1] }->{ @c[2] }->{+@c[3] } = $hash->{?$uv};
     }
 
     foreach my $p (sort { $a <+> $b } keys %val) {
-	next if ! %val{ $p };
+	next if ! %val{?$p };
 	for my $r (0..255) {
-	    next if ! %val{ $p }->{ $r };
+	    next if ! %val{ $p }->{?$r };
 	    printf "static $type $($head)_\%02x_\%02x [256] = \{\n", $p, $r;
 	    for my $c (0..255) {
-		print "\t", defined %val{$p}->{$r}->{$c}
-		    ?? "($type)".%val{$p}->{$r}->{$c}
+		print "\t", defined %val{$p}->{$r}->{?$c}
+		    ?? "($type)".%val{$p}->{$r}->{?$c}
 		    !! $null;
 		print ','  if $c != 255;
 		print "\n" if $c % 8 == 7;
@@ -381,20 +381,20 @@ EOF
 	}
     }
     foreach my $p (sort { $a <+> $b } keys %val) {
-	next if ! %val{ $p };
+	next if ! %val{?$p };
 	printf "static $type* $($head)_\%02x [256] = \{\n", $p;
 	for my $r (0..255) {
-	    print %val{ $p }->{ $r }
+	    print %val{ $p }->{?$r }
 		?? sprintf("$($head)_\%02x_\%02x", $p, $r)
 		!! "NULL";
 	    print ','  if $r != 255;
-	    print "\n" if %val{ $p }->{ $r } || ($r+1) % 8 == 0;
+	    print "\n" if %val{ $p }->{?$r } || ($r+1) % 8 == 0;
 	}
 	print "\};\n\n";
     }
     print "static $type** $head [] = \{\n";
     for my $p (0..0x10) {
-	print %val{ $p } ?? sprintf("$($head)_\%02x", $p) !! "NULL";
+	print %val{?$p } ?? sprintf("$($head)_\%02x", $p) !! "NULL";
 	print ','  if $p != 0x10;
 	print "\n";
     }

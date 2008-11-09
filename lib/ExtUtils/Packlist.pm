@@ -39,7 +39,7 @@ sub __find_relocations
 	my $exp_key = $raw_key . "exp";
 	next unless defined config_value($exp_key);
 	next unless $raw_val =~ m!\.\.\./!;
-	%paths{config_value($exp_key)}++;
+	%paths{+config_value($exp_key)}++;
     }
     # Longest prefixes go first in the alternatives
     my $alternations = join "|", map {quotemeta $_}
@@ -67,17 +67,17 @@ sub TIEHASH
 
 sub STORE
 {
-    @_[0]->{data}->{@_[1]} = @_[2];
+    @_[0]->{data}->{+@_[1]} = @_[2];
 }
 
 sub FETCH
 {
-    return @_[0]->{data}->{@_[1]};
+    return @_[0]->{data}->{?@_[1]};
 }
 
 sub FIRSTKEY
 {
-    keys(%{@_[0]->{data}});
+    keys(%{@_[0]->{?data}});
     return each(%{@_[0]->{data}});
 }
 
@@ -110,12 +110,12 @@ sub read($;$)
 my ($self, $packfile) = < @_;
 $self = tied(%$self) || $self;
 
-if (defined($packfile)) { $self->{packfile} = $packfile; }
-else { $packfile = $self->{packfile}; }
+if (defined($packfile)) { $self->{+packfile} = $packfile; }
+else { $packfile = $self->{?packfile}; }
 die("No packlist filename specified") if (! defined($packfile));
 my $fh = mkfh();
 open($fh, "<", "$packfile") || die("Can't open file $packfile: $!");
-$self->{data} = \%();
+$self->{+data} = \%();
 my ($line);
 while (defined($line = ~< $fh))
    {
@@ -126,7 +126,7 @@ while (defined($line = ~< $fh))
       $key = $1;
       $data = \%( < map { < split('=', $_) } split(' ', $2));
 
-      if (config_value("userelocatableinc") && $data->{relocate_as})
+      if (config_value("userelocatableinc") && $data->{?relocate_as})
       {
 	  require File::Spec;
 	  require Cwd;
@@ -136,7 +136,7 @@ while (defined($line = ~< $fh))
       }
          }
    $key =~ s!/\./!/!g;   # Some .packlists have spurious '/./' bits in the paths
-      $self->{data}->{$key} = $data;
+      $self->{data}->{+$key} = $data;
       }
 close($fh);
 }
@@ -145,14 +145,14 @@ sub write($;$)
 {
 my ($self, $packfile) = < @_;
 $self = tied(%$self) || $self;
-if (defined($packfile)) { $self->{packfile} = $packfile; }
-else { $packfile = $self->{packfile}; }
+if (defined($packfile)) { $self->{+packfile} = $packfile; }
+else { $packfile = $self->{?packfile}; }
 die("No packlist filename specified") if (! defined($packfile));
 my $fh = mkfh();
 open($fh, ">", "$packfile") || die("Can't open file $packfile: $!");
-foreach my $key (sort(keys(%{$self->{data} || \%()})))
+foreach my $key (sort(keys(%{$self->{?data} || \%()})))
    {
-       my $data = $self->{data}->{$key};
+       my $data = $self->{data}->{?$key};
        if (config_value("userelocatableinc")) {
 	   $Relocations ||= __find_relocations();
 	   if ($packfile =~ $Relocations) {
@@ -172,7 +172,7 @@ foreach my $key (sort(keys(%{$self->{data} || \%()})))
 		   if (!ref $data) {
 		       $data = \%();
 		   }
-		   $data->{relocate_as} = $relocate_as;
+		   $data->{+relocate_as} = $relocate_as;
 	       }
 	   }
        }
@@ -181,7 +181,7 @@ foreach my $key (sort(keys(%{$self->{data} || \%()})))
       {
       foreach my $k (sort(keys(%$data)))
          {
-         print $fh (" $k=$data->{$k}");
+         print $fh (" $k=$data->{?$k}");
          }
       }
    print $fh ("\n");
@@ -194,7 +194,7 @@ sub validate($;$)
 my ($self, $remove) = < @_;
 $self = tied(%$self) || $self;
 my @missing;
-foreach my $key (sort(keys(%{$self->{data}})))
+foreach my $key (sort(keys(%{$self->{?data}})))
    {
    if (! -e $key)
       {
@@ -209,7 +209,7 @@ sub packlist_file($)
 {
 my ($self) = < @_;
 $self = tied(%$self) || $self;
-return @($self->{packfile});
+return @($self->{?packfile});
 }
 
 1;

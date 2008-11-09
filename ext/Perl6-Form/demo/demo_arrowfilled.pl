@@ -2,8 +2,8 @@ use Perl6::Form;
 
 sub hashes {
 	my ($match,$opts) = < @_;
-	$opts->{lfill}='>> ';
-	$opts->{rfill}='<< ';
+	$opts->{+lfill}='>> ';
+	$opts->{+rfill}='<< ';
 	return '{I{'.length($match).'}I}';
 }
 

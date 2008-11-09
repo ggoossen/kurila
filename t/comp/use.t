@@ -1,7 +1,7 @@
 #!./perl
 
 BEGIN {
-    %INC{"feature.pm"} = 1; # so we don't attempt to load feature.pm
+    %INC{+"feature.pm"} = 1; # so we don't attempt to load feature.pm
 }
 
 print "1..26\n";
@@ -72,14 +72,14 @@ like ($@->message, qr/use VERSION is not valid in Perl Kurila/);
 # fake package 'testuse'
 our $testimport;
 our $version_check;
-%INC{'testuse.pm'} = 1;
+%INC{+'testuse.pm'} = 1;
 *testuse::import = sub { $testimport = \ @_ };
 *testuse::VERSION = sub { $version_check = @_[1] };
 
 # test calling of 'VERSION' and 'import' with correct arguments
 eval "use testuse v0.9";
 is ($@, '');
-is $version_check->{'original'}, "v0.9";
+is $version_check->{?'original'}, "v0.9";
 is( (nelems @{$testimport}), 1, "import called with only packagename");
 
 # test the default VERSION check.
@@ -120,7 +120,7 @@ do {
 
     local $testuse::VERSION = '35.36';
     eval "use testuse v33.55";
-    like ($@ && $@->{description}, '');
+    like ($@ && $@->{?description}, '');
 
     eval "use testuse v100.105";
     like ($@->message, qr/testuse version v100.105.0 required--this is only version v35\.360\.0/);

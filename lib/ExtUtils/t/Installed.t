@@ -19,9 +19,9 @@ my $mandirs = ! ! config_value("man1direxp") + ! ! config_value("man3direxp");
 my $ei = bless( \%(), 'ExtUtils::Installed' );
 
 # Make sure meta info is available
-$ei->{':private:'}->{Config} = \%:<
+$ei->{':private:'}->{+Config} = \%:<
   map { ($_ => config_value($_)) } config_keys();
-$ei->{':private:'}->{INC} = \@INC;
+$ei->{':private:'}->{+INC} = \@INC;
 
 # _is_prefix
 ok( $ei->_is_prefix('foo/bar', 'foo'),
@@ -101,9 +101,9 @@ do {
     my $config_override = \%:<
       map { $_ => Config::config_value($_) }
       Config::config_keys();
-    $config_override->{archlibexp} = cwd();
-    $config_override->{sitearchexp} = $fake_mod_dir;
-    $config_override->{version} = 'fake_test_version';
+    $config_override->{+archlibexp} = cwd();
+    $config_override->{+sitearchexp} = $fake_mod_dir;
+    $config_override->{+version} = 'fake_test_version';
 
     my @inc_override = @(< @INC, $fake_mod_dir);
 
@@ -112,13 +112,13 @@ do {
         'inc_override' => \@inc_override,
     );
     isa_ok( $realei, 'ExtUtils::Installed' );
-    isa_ok( $realei->{Perl}->{packlist}, 'ExtUtils::Packlist' );
-    is( $realei->{Perl}->{version}, 'fake_test_version',
+    isa_ok( $realei->{Perl}->{?packlist}, 'ExtUtils::Packlist' );
+    is( $realei->{Perl}->{?version}, 'fake_test_version',
         'new(config_override => HASH) overrides %Config' );
 
     ok( exists $realei->{FakeMod}, 'new() with overrides should find modules with .packlists');
-    isa_ok( $realei->{FakeMod}->{packlist}, 'ExtUtils::Packlist' );
-    is( $realei->{FakeMod}->{version}, '1.1.1',
+    isa_ok( $realei->{FakeMod}->{?packlist}, 'ExtUtils::Packlist' );
+    is( $realei->{FakeMod}->{?version}, '1.1.1',
 	'... should find version in modules' );
 };
 
@@ -130,20 +130,20 @@ do {
         'extra_libs' => \@( cwd() ),
     );
     isa_ok( $realei, 'ExtUtils::Installed' );
-    isa_ok( $realei->{Perl}->{packlist}, 'ExtUtils::Packlist' );
+    isa_ok( $realei->{Perl}->{?packlist}, 'ExtUtils::Packlist' );
     ok( exists $realei->{FakeMod}, 
         'new() with extra_libs should find modules with .packlists');
     
     #{ use Data::Dumper; local $realei->{':private:'}{Config};
     #  warn Dumper($realei); }
     
-    isa_ok( $realei->{FakeMod}->{packlist}, 'ExtUtils::Packlist' );
-    is( $realei->{FakeMod}->{version}, '1.1.1',
+    isa_ok( $realei->{FakeMod}->{?packlist}, 'ExtUtils::Packlist' );
+    is( $realei->{FakeMod}->{?version}, '1.1.1',
 	'... should find version in modules' );
 };
 
 # modules
-$ei->{$_} = 1 for qw( abc def ghi );
+$ei->{+$_} = 1 for qw( abc def ghi );
 is( join(' ', $ei->modules()), 'abc def ghi',
     'modules() should return sorted keys' );
 
@@ -151,7 +151,7 @@ is( join(' ', $ei->modules()), 'abc def ghi',
 is( (nelems $ei->modules), 3,    'modules() in scalar context' );
 
 # files
-$ei->{goodmod} = \%(
+$ei->{+goodmod} = \%(
         packlist => \%(
                 (config_value("man1direxp") ??
                     (File::Spec->catdir(config_value("man1direxp"), 'foo') => 1) !!
@@ -203,7 +203,7 @@ SKIP: do {
 };
 @dirs = $ei->directories('goodmod');
 is( scalar nelems @dirs, 2 + $mandirs, '... should find all files files() would, again' );
-@files = sort map { exists %dirnames{lc($_)} ?? %dirnames{lc($_)} !! '' } @files;
+@files = sort map { exists %dirnames{lc($_)} ?? %dirnames{?lc($_)} !! '' } @files;
 is( join(' ', @files), join(' ', @dirs), '... should sort output' );
 
 # directory_tree
@@ -222,7 +222,7 @@ SKIP: do {
 
 my $fakepak = Fakepak->new(102);
 
-$ei->{yesmod} = \%(
+$ei->{+yesmod} = \%(
         version         => 101,
         packlist        => $fakepak,
 );

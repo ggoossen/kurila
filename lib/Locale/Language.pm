@@ -39,7 +39,7 @@ sub code2language
     $code = lc($code);
     if (exists %CODES{$code})
     {
-        return %CODES{$code};
+        return %CODES{?$code};
     }
     else
     {
@@ -65,7 +65,7 @@ sub language2code
     $lang = lc($lang);
     if (exists %LANGUAGES{$lang})
     {
-        return %LANGUAGES{$lang};
+        return %LANGUAGES{?$lang};
     }
     else
     {
@@ -113,8 +113,8 @@ do {
         next unless m/\S/;
         chop;
         ($code, $language) = < split(m/:/, $_, 2);
-        %CODES{$code} = $language;
-        %LANGUAGES{lc "$language"} = $code;
+        %CODES{+$code} = $language;
+        %LANGUAGES{+lc "$language"} = $code;
     }
 
     close(DATA);

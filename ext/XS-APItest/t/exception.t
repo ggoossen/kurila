@@ -21,10 +21,10 @@ is($XS::APItest::exception_caught, 0);
 $XS::APItest::exception_caught = undef;
 
 $rv = try { apitest_exception(1) };
-is($@->{description}, "boo\n");
+is($@->{?description}, "boo\n");
 ok(not defined $rv);
 is($XS::APItest::exception_caught, 1);
 
 $rv = try { mycroak("foobar\n"); 1 };
-is($@->{description}, "foobar\n", 'croak');
+is($@->{?description}, "foobar\n", 'croak');
 ok(not defined $rv);

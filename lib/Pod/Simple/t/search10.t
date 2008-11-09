@@ -1,5 +1,5 @@
 BEGIN {
-    if(%ENV{PERL_CORE}) {
+    if(%ENV{?PERL_CORE}) {
         chdir 't';
         @INC = @( '../lib' );
     }
@@ -31,7 +31,7 @@ print "# CWD: $cwd\n";
 
 sub source_path {
     my $file = shift;
-    if (%ENV{PERL_CORE}) {
+    if (%ENV{?PERL_CORE}) {
         require File::Spec;
         my $updir = File::Spec->updir;
         my $dir = File::Spec->catdir($updir, 'lib', 'Pod', 'Simple', 't');
@@ -75,7 +75,7 @@ my $names = join "|", sort keys %$name2where;
 ok $names, "Blorm|Zonk::Pronk|hinkhonk::Glunk|hinkhonk::Vliff|perlflif|perlthng|squaa|squaa::Glunk|squaa::Vliff|zikzik";
 };
 
-ok( ($name2where->{'squaa'} || 'huh???'), '/squaa\.pm$/');
+ok( ($name2where->{?'squaa'} || 'huh???'), '/squaa\.pm$/');
 
 ok nelems(grep( m/squaa\.pm/, keys %$where2name)), 1;
 

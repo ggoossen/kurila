@@ -28,7 +28,7 @@ $args = "-Foo -baR blech --foo bar";
 undef $opt_baR;
 undef $opt_bar;
 do { my $msg = "";
-  local $^WARN_HOOK = sub { $msg .= @_[0]->{description} };
+  local $^WARN_HOOK = sub { $msg .= @_[0]->{?description} };
   my $ret = GetOptionsFromString($args, "foo", "Foo=s");
   print ($ret ?? "not " !! "ok 9\n");
   print ($msg =~ m/^GetOptionsFromString: Excess data / ?? "" !! "$msg\nnot ", "ok 10\n");

@@ -209,9 +209,9 @@ $got = timethese($iterations, \%( Foo => sub {++$foo}, Bar => '++$bar',
                                 Baz => sub {++$baz} ));
 select(STDOUT);
 is(ref ($got), 'HASH', "timethese should return a hashref");
-isa_ok($got->{Foo}, 'Benchmark', "Foo value");
-isa_ok($got->{Bar}, 'Benchmark', "Bar value");
-isa_ok($got->{Baz}, 'Benchmark', "Baz value");
+isa_ok($got->{?Foo}, 'Benchmark', "Foo value");
+isa_ok($got->{?Bar}, 'Benchmark', "Bar value");
+isa_ok($got->{?Baz}, 'Benchmark', "Baz value");
 eq_set(\keys %$got, \qw(Foo Bar Baz), 'should be exactly three objects');
 is ($foo, $iterations, "Foo code was run $iterations times");
 is ($bar, $iterations, "Bar code was run $iterations times");
@@ -243,8 +243,8 @@ do {
     select(STDOUT);
 
     is(ref ($results), 'HASH', "timethese should return a hashref");
-    isa_ok($results->{Foo}, 'Benchmark', "Foo value");
-    isa_ok($results->{Bar}, 'Benchmark', "Bar value");
+    isa_ok($results->{?Foo}, 'Benchmark', "Foo value");
+    isa_ok($results->{?Bar}, 'Benchmark', "Bar value");
     eq_set(\keys %$results, \qw(Foo Bar), 'should be exactly two objects');
     ok ($foo +> 0, "Foo code was run");
     ok ($bar +> 0, "Bar code was run");
@@ -546,7 +546,7 @@ do {   # Check usage error messages
                     );
     while( my($name, $code) = each %cmpthese ) {
         eval $code;
-        is( $@->{description}, %usage{cmpthese}, "cmpthese usage: $name" );
+        is( $@->{?description}, %usage{?cmpthese}, "cmpthese usage: $name" );
     }
 
     my %timethese = %('forgot {}'  => 'timethese( 42, foo => sub { 1 } )',
@@ -556,18 +556,18 @@ do {   # Check usage error messages
 
     while( my($name, $code) = each %timethese ) {
         eval $code;
-        is( $@->{description}, %usage{timethese}, "timethese usage: $name" );
+        is( $@->{?description}, %usage{?timethese}, "timethese usage: $name" );
     }
 
 
     while( my($func, $usage) = each %usage ) {
         next if grep $func eq $_, @takes_no_args;
         eval "$func()";
-        is( $@->{description}, $usage, "$func usage: no args" );
+        is( $@->{?description}, $usage, "$func usage: no args" );
     }
 
     foreach my $func ( @takes_no_args) {
         eval "$func(42)";
-        is( $@->{description}, %usage{$func}, "$func usage: with args" );
+        is( $@->{?description}, %usage{?$func}, "$func usage: with args" );
     }
 };

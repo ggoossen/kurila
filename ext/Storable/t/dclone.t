@@ -7,7 +7,7 @@
 #
 
 BEGIN {
-    if (%ENV{PERL_CORE}){
+    if (%ENV{?PERL_CORE}){
 	push @INC, '../ext/Storable/t';
     }
     require 'st-dump.pl';
@@ -21,7 +21,7 @@ print "1..12\n";
 $a = 'toto';
 $b = \$a;
 our $c = bless \%(), 'CLASS';
-$c->{attribute} = 'attrval';
+$c->{+attribute} = 'attrval';
 our %a = %('key', 'value', 1, 0, $a, $b, 'cvar', \$c);
 our @a = @('first', undef, 3, -4, -3.14159, 456, 4.5,
 	$b, \$a, $a, $c, \$c, \%a);
@@ -42,7 +42,7 @@ package FOO; our @ISA = qw(Storable);
 
 sub make {
 	my $self = bless \%();
-	$self->{key} = \%main::a;
+	$self->{+key} = \%main::a;
 	return $self;
 };
 
@@ -57,16 +57,16 @@ print "ok 6\n";
 
 # Ensure refs to "undef" values are properly shared during cloning
 my $hash;
-push @{%$hash{''}}, \%$hash{a};
-print "not " unless %$hash{''}->[0] \== \%$hash{a};
+push @{%$hash{''}}, \%$hash{+a};
+print "not " unless %$hash{''}->[0] \== \%$hash{+a};
 print "ok 7\n";
 
 my $cloned = dclone(dclone($hash));
-print "not " unless %$cloned{''}->[0] \== \%$cloned{a};
+print "not " unless %$cloned{''}->[0] \== \%$cloned{+a};
 print "ok 8\n";
 
-%$cloned{a} = "blah";
-print "not " unless %$cloned{''}->[0] \== \%$cloned{a};
+%$cloned{+a} = "blah";
+print "not " unless %$cloned{''}->[0] \== \%$cloned{+a};
 print "ok 9\n";
 
 # [ID 20020221.007] SEGV in Storable with empty string scalar object
@@ -87,13 +87,13 @@ print ref $clone eq ref $empty_string_obj &&
 # Do not fail if Tie::Hash and/or Tie::StdHash is not available
 if (try { require Tie::Hash; scalar keys %{Symbol::stash("Tie::StdHash")} }) {
     tie my %tie, "Tie::StdHash" or die $!;
-    %tie{array} = \@(1,2,3,4);
-    %tie{hash} = \%(1,2,3,4);
-    my $clone_array = dclone %tie{array};
-    print "not " unless join(' ',@$clone_array) eq join(' ',@{%tie{array}});
+    %tie{+array} = \@(1,2,3,4);
+    %tie{+hash} = \%(1,2,3,4);
+    my $clone_array = dclone %tie{?array};
+    print "not " unless join(' ',@$clone_array) eq join(' ',@{%tie{?array}});
     print "ok 11\n";
-    my $clone_hash = dclone %tie{hash};
-    print "not " unless $clone_hash->{1} eq %tie{hash}->{1};
+    my $clone_hash = dclone %tie{?hash};
+    print "not " unless $clone_hash->{?1} eq %tie{hash}->{?1};
     print "ok 12\n";
 } else {
     print <<EOF;

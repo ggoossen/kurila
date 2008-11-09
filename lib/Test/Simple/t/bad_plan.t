@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 BEGIN {
-    if( %ENV{PERL_CORE} ) {
+    if( %ENV{?PERL_CORE} ) {
         chdir 't';
         @INC = @( '../lib' );
     }
@@ -29,10 +29,10 @@ my $Test = Test::Builder->new;
 print "1..2\n";
 
 try { $Test->plan(7); };
-ok( $@->{description} =~ m/^plan\(\) doesn't understand 7/, 'bad plan()' ) ||
+ok( $@->{?description} =~ m/^plan\(\) doesn't understand 7/, 'bad plan()' ) ||
     print STDERR "# $@";
 
 try { $Test->plan(wibble => 7); };
-ok( $@->{description} =~ m/^plan\(\) doesn't understand wibble 7/, 'bad plan()' ) ||
+ok( $@->{?description} =~ m/^plan\(\) doesn't understand wibble 7/, 'bad plan()' ) ||
     print STDERR "# $@";
 

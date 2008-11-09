@@ -71,8 +71,8 @@ ok(prototype($thawed->[4]), prototype(@obj[0]->[4]));
 $freezed = freeze @obj[1];
 $thawed  = thaw $freezed;
 
-ok($thawed->{"a"}->(), "srt");
-ok($thawed->{"b"}->(), "JAPH");
+ok($thawed->{?"a"}->(), "srt");
+ok($thawed->{?"b"}->(), "JAPH");
 
 ######################################################################
 

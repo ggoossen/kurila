@@ -95,16 +95,16 @@ sub new {
   $new->nbsp_for_S(1);
   $new->accept_targets( 'rtf', 'RTF' );
 
-  $new->{'Tagmap'} = \%(< %Tagmap);
+  $new->{+'Tagmap'} = \%(< %Tagmap);
 
   $new->accept_codes(< @_to_accept);
   $new->accept_codes('VerbatimFormatted');
   DEBUG +> 2 and print "To accept: ", join(' ', @_to_accept), "\n";
   $new->doc_lang(
-    (  %ENV{'RTFDEFLANG'} || '') =~ m/^(\d{1,10})$/s ?? $1
-    !! (%ENV{'RTFDEFLANG'} || '') =~ m/^0?x([a-fA-F0-9]{1,10})$/s ?? hex($1)
+    (  %ENV{?'RTFDEFLANG'} || '') =~ m/^(\d{1,10})$/s ?? $1
+    !! (%ENV{?'RTFDEFLANG'} || '') =~ m/^0?x([a-fA-F0-9]{1,10})$/s ?? hex($1)
                                       # yes, tolerate hex!
-    !! (%ENV{'RTFDEFLANG'} || '') =~ m/^([a-fA-F0-9]{4})$/s ?? hex($1)
+    !! (%ENV{?'RTFDEFLANG'} || '') =~ m/^([a-fA-F0-9]{4})$/s ?? hex($1)
                                       # yes, tolerate even more hex!
     !! '1033'
   );
@@ -148,17 +148,17 @@ sub run {
 
 sub do_middle {      # the main work
   my $self = @_[0];
-  my $fh = $self->{'output_fh'};
+  my $fh = $self->{?'output_fh'};
   
   my($token, $type, $tagname, $scratch);
   my @stack;
   my @indent_stack;
-  $self->{'rtfindent'} = 0 unless defined $self->{'rtfindent'};
+  $self->{+'rtfindent'} = 0 unless defined $self->{?'rtfindent'};
   
   while($token = $self->get_token) {
   
     if( ($type = $token->type) eq 'text' ) {
-      if( $self->{'rtfverbatim'} ) {
+      if( $self->{?'rtfverbatim'} ) {
         DEBUG +> 1 and print "  $type " , < $token->text, " in verbatim!\n";
         $scratch = rtf_esc_codely($token->text);
         print $fh $scratch;
@@ -171,7 +171,7 @@ sub do_middle {      # the main work
       $scratch =~ s/\t/ /g;
       $scratch =~ s/[\cb\cc]//g;
       
-      $self->{'no_proofing_exemptions'} or $scratch =~
+      $self->{?'no_proofing_exemptions'} or $scratch =~
        s/(?:
            ^
            |
@@ -210,7 +210,7 @@ sub do_middle {      # the main work
       if( ($tagname = $token->tagname) eq 'Verbatim'
           or $tagname eq 'VerbatimFormatted'
       ) {
-        ++$self->{'rtfverbatim'};
+        ++$self->{+'rtfverbatim'};
         my $next = $self->get_token;
         next unless defined $next;
         my $line_count = 1;
@@ -222,12 +222,12 @@ sub do_middle {      # the main work
           DEBUG +> 3 and print "    verbatim line count: $line_count\n";
         }
         $self->unget_token($next);
-        $self->{'rtfkeep'} = ($line_count +> 15) ?? '' !! '\keepn' ;     
+        $self->{+'rtfkeep'} = ($line_count +> 15) ?? '' !! '\keepn' ;     
 
       } elsif( $tagname =~ m/^item-/s ) {
         my @to_unget;
         my $text_count_here = 0;
-        $self->{'rtfitemkeepn'} = '';
+        $self->{+'rtfitemkeepn'} = '';
         # Some heuristics to stop item-*'s functioning as subheadings
         #  from getting split from the things they're subheadings for.
         #
@@ -249,14 +249,14 @@ sub do_middle {      # the main work
             @to_unget[-2]->tagname =~ m/^item-/s
           ) {
             # Bail out here, after setting rtfitemkeepn yea or nay.
-            $self->{'rtfitemkeepn'} = '\keepn' if 
+            $self->{+'rtfitemkeepn'} = '\keepn' if 
               @to_unget[-1]->type eq 'start' and
               @to_unget[-1]->tagname eq 'Para';
 
             DEBUG +> 1 and printf "    item-* before \%s(\%s) \%s keepn'd.\n", <
               @to_unget[-1]->type,
               @to_unget[-1]->can('tagname') ?? < @to_unget[-1]->tagname !! '',
-              $self->{'rtfitemkeepn'} ?? "gets" !! "doesn't get";
+              $self->{?'rtfitemkeepn'} ?? "gets" !! "doesn't get";
             last;
           } elsif ((nelems @to_unget) +> 40) {
             DEBUG +> 1 and print "    item-* now has too many tokens (",
@@ -275,7 +275,7 @@ sub do_middle {      # the main work
         push @indent_stack,
          int($token->attr('indent') * 4 * $self->normal_halfpoint_size);
         DEBUG and print "Indenting over @indent_stack[-1] twips.\n";
-        $self->{'rtfindent'} += @indent_stack[-1];
+        $self->{+'rtfindent'} += @indent_stack[-1];
         
       } elsif ($tagname eq 'L') {
         $tagname .= '=' . ($token->attr('type') || 'pod');
@@ -292,8 +292,8 @@ sub do_middle {      # the main work
         next;
       }
 
-      defined($scratch = $self->{'Tagmap'}->{$tagname}) or next;
-      $scratch =~ s/\#([^\#]+)\#/%{$self}{$1}/g; # interpolate
+      defined($scratch = $self->{'Tagmap'}->{?$tagname}) or next;
+      $scratch =~ s/\#([^\#]+)\#/%{$self}{?$1}/g; # interpolate
       print $fh $scratch;
       
       if ($tagname eq 'item-number') {
@@ -307,13 +307,13 @@ sub do_middle {      # the main work
       DEBUG +> 1 and print "  -$type ", <$token->tagname,"\n";
       if( ($tagname = $token->tagname) =~ m/^over-/s ) {
         DEBUG and print "Indenting back @indent_stack[-1] twips.\n";
-        $self->{'rtfindent'} -= pop @indent_stack;
+        $self->{+'rtfindent'} -= pop @indent_stack;
         pop @stack;
       } elsif( $tagname eq 'Verbatim' or $tagname eq 'VerbatimFormatted') {
-        --$self->{'rtfverbatim'};
+        --$self->{+'rtfverbatim'};
       }
-      defined($scratch = $self->{'Tagmap'}->{"/$tagname"}) or next;
-      $scratch =~ s/\#([^\#]+)\#/%{$self}{$1}/g; # interpolate
+      defined($scratch = $self->{'Tagmap'}->{?"/$tagname"}) or next;
+      $scratch =~ s/\#([^\#]+)\#/%{$self}{?$1}/g; # interpolate
       print $fh $scratch;
     }
   }
@@ -323,7 +323,7 @@ sub do_middle {      # the main work
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 sub do_beginning {
   my $self = @_[0];
-  my $fh = $self->{'output_fh'};
+  my $fh = $self->{?'output_fh'};
   return print $fh join '', @( <
     $self->doc_init, <
     $self->font_table, <
@@ -337,7 +337,7 @@ sub do_beginning {
 
 sub do_end {
   my $self = @_[0];
-  my $fh = $self->{'output_fh'};
+  my $fh = $self->{?'output_fh'};
   return print $fh '}'; # that should do it
 }
 
@@ -481,7 +481,7 @@ use integer;
 sub rtf_esc {
   my $x; # scratch
   ($x = (((nelems @_) == 1) ?? @_[0] !! join '', @_)
-  ) =~ s/([F\x00-\x1F\-\\\{\}\x7F-\xFF])/%Escape{$1}/g;  # ESCAPER
+  ) =~ s/([F\x00-\x1F\-\\\{\}\x7F-\xFF])/%Escape{?$1}/g;  # ESCAPER
   # Escape \, {, }, -, control chars, and 7f-ff.
   $x =~ s/([^\x[00]-\x[FF]])/$('\\uc1\\u'.((ord($1)+<32768)??ord($1)!!(ord($1)-65536)).'?')/g;
   return $x;
@@ -496,7 +496,7 @@ sub rtf_esc_codely {
   
   my $x; # scratch
   ($x = (((nelems @_) == 1) ?? @_[0] !! join '', @_)
-  ) =~ s/([F\x00-\x1F\\\{\}\x7F-\xFF])/%Escape{$1}/g;  # ESCAPER
+  ) =~ s/([F\x00-\x1F\\\{\}\x7F-\xFF])/%Escape{?$1}/g;  # ESCAPER
   # Escape \, {, }, -, control chars, and 7f-ff.
   $x =~ s/([^\x00-\xFF])/$('\\uc1\\u'.((ord($1)+<32768)??ord($1)!!(ord($1)-65536)).'?')/g;
   return $x;

@@ -89,8 +89,8 @@ do {
     }
 
     my %h;
-    %h{foo} = bless \@(), 'X';
-    delete %h{foo} for @( %h{foo}, 1);
+    %h{+foo} = bless \@(), 'X';
+    delete %h{foo} for @( %h{?foo}, 1);
     print $x == 1 ?? "ok" !! "not ok", " 15 - double destroy, x=$x\n";
 };
 

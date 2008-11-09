@@ -5,7 +5,7 @@ my $W;
 BEGIN {
     $W = 0;
     $^WARN_HOOK = sub {
-        if (@_[0]->{description} =~ m/^Hides field '.*?' in base class/) {
+        if (@_[0]->{?description} =~ m/^Hides field '.*?' in base class/) {
             $W++;
         }
         else {
@@ -57,7 +57,7 @@ use base < qw(M B2);
 # Test that multiple inheritance fails.
 package D6;
 try { 'base'->import( <qw(B2 M B3)); };
-main::like($@->{description}, qr/can't multiply inherit fields/i, 
+main::like($@->{?description}, qr/can't multiply inherit fields/i, 
     'No multiple field inheritance');
 
 package Foo::Bar;
@@ -132,7 +132,7 @@ while(my($class, $efields) = each %EXPECT) {
     foreach my $idx (1..nelems @$efields) {
         my $key = $efields->[$idx-1];
         next unless $key;
-        %expected_fields{$key} = $idx;
+        %expected_fields{+$key} = $idx;
     }
 
     main::is_deeply(\%fields, \%expected_fields, "\%FIELDS check:  $class");
@@ -144,19 +144,19 @@ is( $W, 1, 'right warnings' );
 
 # A simple object creation and attribute access test
 my $obj1 = D3->new;
-$obj1->{b1} = "B2";
+$obj1->{+b1} = "B2";
 my $obj2 = $obj1;
-$obj2->{b1} = "D3";
+$obj2->{+b1} = "D3";
  <
 # Slices
 
 %$obj1{[@("_b1", "b1")]} = (17, 29);
-is( $obj1->{_b1}, 17 );
-is( $obj1->{b1},  29 );
+is( $obj1->{?_b1}, 17 );
+is( $obj1->{?b1},  29 );
  <
 %$obj1{[@('_b1', 'b1')]} = (44,28);
-is( $obj1->{_b1}, 44 );
-is( $obj1->{b1},  28 );
+is( $obj1->{?_b1}, 44 );
+is( $obj1->{?b1},  28 );
 
 
 
@@ -174,7 +174,7 @@ try {
     require base;
     'base'->import( <qw(E1 E2));
 };
-main::like( $@->{description}, qr/Can't multiply inherit fields/i, 'Again, no multi inherit' );
+main::like( $@->{?description}, qr/Can't multiply inherit fields/i, 'Again, no multi inherit' );
 
 
 # Test that a package with no fields can inherit from a package with
@@ -183,7 +183,7 @@ main::like( $@->{description}, qr/Can't multiply inherit fields/i, 'Again, no mu
 package B9;
 use fields < qw(b1);
 
-sub _mk_obj { fields::new(@_[0])->{'b1'} };
+sub _mk_obj { fields::new(@_[0])->{?'b1'} };
 
 package D9;
 use base < qw(B9);
@@ -211,11 +211,11 @@ do {
     sub new {
 	my $self = shift;
 	$self = fields::new($self) unless ref $self;
-	$self->{X1} = "x1";
-	$self->{_X2} = "_x2";
+	$self->{+X1} = "x1";
+	$self->{+_X2} = "_x2";
 	return $self;
     }
-    sub get_X2 { my $self = shift; $self->{_X2} }
+    sub get_X2 { my $self = shift; $self->{?_X2} }
 
     package Y;
     use base < qw(X);
@@ -236,7 +236,7 @@ do {
 	my $self = shift;
 	$self = fields::new($self) unless ref $self;
 	$self->SUPER::new();
-	$self->{Z1} = 'z1';
+	$self->{+Z1} = 'z1';
 	return $self;
     }
 

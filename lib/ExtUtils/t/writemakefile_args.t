@@ -4,7 +4,7 @@
 # WriteMakefile.
 
 BEGIN {
-    if( %ENV{PERL_CORE} ) {
+    if( %ENV{?PERL_CORE} ) {
         push @INC, 'lib';
     }
     else {
@@ -36,7 +36,7 @@ do {
     *STDOUT = *{$stdout_fh}{IO};
     my $warnings = '';
     local $^WARN_HOOK = sub {
-        $warnings .= @_[0]->{description};
+        $warnings .= @_[0]->{?description};
     };
 
     my $mm;
@@ -66,7 +66,7 @@ VERIFY
 
     # We'll get warnings about the bogus libs, that's ok.
     unlike( $warnings, qr/WARNING: .* takes/ );
-    is_deeply( $mm->{LIBS}, \@('-lwibble -lwobble') );
+    is_deeply( $mm->{?LIBS}, \@('-lwibble -lwobble') );
 
     $warnings = '';
     $mm = WriteMakefile(
@@ -77,7 +77,7 @@ VERIFY
 
     # We'll get warnings about the bogus libs, that's ok.
     unlike( $warnings, qr/WARNING: .* takes/ );
-    is_deeply( $mm->{LIBS}, \@('-lwibble', '-lwobble') );
+    is_deeply( $mm->{?LIBS}, \@('-lwibble', '-lwobble') );
 
     $warnings = '';
     try {
@@ -102,8 +102,8 @@ VERIFY
     like( $warnings, qr{^WARNING: WIBBLE is not a known parameter.\n}m );
     like( $warnings, qr{^WARNING: wump is not a known parameter.\n}m );
 
-    is( $mm->{WIBBLE}, 'something' );
-    is_deeply( $mm->{wump}, \%( foo => 42 ) );
+    is( $mm->{?WIBBLE}, 'something' );
+    is_deeply( $mm->{?wump}, \%( foo => 42 ) );
 
 
     # Test VERSION
@@ -124,7 +124,7 @@ VERIFY
         );
     };
     is( $warnings, '' );
-    is( $mm->{VERSION}, '1.002003' );
+    is( $mm->{?VERSION}, '1.002003' );
 
     $warnings = '';
     try {
@@ -134,7 +134,7 @@ VERIFY
         );
     };
     is( $warnings, '' );
-    is( $mm->{VERSION}, '1.002_003' );
+    is( $mm->{?VERSION}, '1.002_003' );
 
 
     $warnings = '';
@@ -158,7 +158,7 @@ VERIFY
             VERSION    => $version,
         );
         is( $warnings, '' );
-        is( $mm->{VERSION}, $version->stringify );
+        is( $mm->{?VERSION}, $version->stringify );
 
         $warnings = '';
         $version = qv('1.2.3');
@@ -167,6 +167,6 @@ VERIFY
             VERSION    => $version,
         );
         is( $warnings, '' );
-        is( $mm->{VERSION}, $version->stringify, 'correct version' );
+        is( $mm->{?VERSION}, $version->stringify, 'correct version' );
     };
 };

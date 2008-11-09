@@ -36,7 +36,7 @@ sub loadopts {
 my %opt;
 my $optref = loadopts();
 while ((nelems @{$optref}) && $optref->[0] =~ m/^([\w_]+)=(.*)$/) {
-    %opt{$1}=$2;
+    %opt{+$1}=$2;
     shift(@{$optref});
 }
 
@@ -46,7 +46,7 @@ if (-e $pl_h) {
     open PL, "<", "$pl_h" or die "Can't open $pl_h: $!";
     while ( ~< *PL) {
 	if (m/^#\s*define\s+(PERL_\w+)\s+([\d.]+)/) {
-	    %opt{$1} = $2;
+	    %opt{+$1} = $2;
 	}
     }
     close PL;
@@ -54,19 +54,19 @@ if (-e $pl_h) {
 else {
     die "Can't find $pl_h: $!";
 }
-%opt{VERSION} = "%opt{PERL_REVISION}.%opt{PERL_VERSION}.%opt{PERL_SUBVERSION}";
-%opt{INST_VER} =~ s|~VERSION~|%opt{VERSION}|g;
+%opt{+VERSION} = "%opt{?PERL_REVISION}.%opt{?PERL_VERSION}.%opt{?PERL_SUBVERSION}";
+%opt{+INST_VER} =~ s|~VERSION~|%opt{?VERSION}|g;
 
-%opt{'cf_by'} = %ENV{USERNAME} unless %opt{'cf_by'};
-%opt{'cf_email'} = %opt{'cf_by'} . '@' . (gethostbyname('localhost'))[[0]]
-	unless %opt{'cf_email'};
-%opt{'usemymalloc'} = 'y' if %opt{'d_mymalloc'} eq 'define';
+%opt{+'cf_by'} = %ENV{?USERNAME} unless %opt{?'cf_by'};
+%opt{+'cf_email'} = %opt{?'cf_by'} . '@' . (gethostbyname('localhost'))[[0]]
+	unless %opt{?'cf_email'};
+%opt{+'usemymalloc'} = 'y' if %opt{?'d_mymalloc'} eq 'define';
 
-%opt{libpth} = mungepath(%opt{libpth}) if exists %opt{libpth};
-%opt{incpath} = mungepath(%opt{incpath}) if exists %opt{incpath};
+%opt{+libpth} = mungepath(%opt{?libpth}) if exists %opt{libpth};
+%opt{+incpath} = mungepath(%opt{?incpath}) if exists %opt{incpath};
 
 while ( ~< *ARGV) {
-    s/~([\w_]+)~/%opt{$1}/g;
+    s/~([\w_]+)~/%opt{?$1}/g;
     if (m/^([\w_]+)=(.*)$/) {
 	my($k,$v) = ($1,$2);
 	# this depends on cf_time being empty in the template (or we'll
@@ -75,7 +75,7 @@ while ( ~< *ARGV) {
 	    $_ = "$k='" . localtime(time) . "'\n" if $v =~ m/^\s*'\s*'/;
 	}
 	elsif (exists %opt{$k}) {
-	    $_ = "$k='%opt{$k}'\n";
+	    $_ = "$k='%opt{?$k}'\n";
 	}
     }
     print;

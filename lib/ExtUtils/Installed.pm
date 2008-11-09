@@ -42,8 +42,8 @@ sub _is_prefix {
 sub _is_doc {
     my ($self, $path) = < @_;
 
-    my $man1dir = $self->{':private:'}->{Config}->{man1direxp};
-    my $man3dir = $self->{':private:'}->{Config}->{man3direxp};
+    my $man1dir = $self->{':private:'}->{Config}->{?man1direxp};
+    my $man3dir = $self->{':private:'}->{Config}->{?man3direxp};
     return ($man1dir && $self->_is_prefix($path, $man1dir))
            ||
            ($man3dir && $self->_is_prefix($path, $man3dir))
@@ -57,7 +57,7 @@ sub _is_type {
     return $self->_is_doc($path) if $type eq "doc";
 
     if ($type eq "prog") {
-        return ($self->_is_prefix($path, $self->{':private:'}->{Config}->{prefix} || $self->{':private:'}->{Config}->{prefixexp})
+        return ($self->_is_prefix($path, $self->{':private:'}->{Config}->{?prefix} || $self->{':private:'}->{Config}->{prefixexp})
                &&
                !($self->_is_doc($path))
                ?? 1 !! 0);
@@ -83,15 +83,15 @@ sub new {
 
     my $self = \%();
 
-    if (%args{config_override}) {
+    if (%args{?config_override}) {
         try {
-            $self->{':private:'}->{Config} = \%( < %{%args{config_override}} );
+            $self->{':private:'}->{+Config} = \%( < %{%args{?config_override}} );
         } or die(
             "The 'config_override' parameter must be a hash reference."
         );
     }
     else {
-        $self->{':private:'}->{Config} = \%:<
+        $self->{':private:'}->{+Config} = \%:<
           map { ($_ => config_value($_)) } config_keys();
     }
     
@@ -99,28 +99,28 @@ sub new {
                    \@( extra_libs => EXTRA => \@() ))) 
     {
         my ($arg,$key,$val)=< @$tuple;
-        if ( %args{$arg} ) {
+        if ( %args{?$arg} ) {
             try {
-                $self->{':private:'}->{$key} = \ @{%args{$arg}};
+                $self->{':private:'}->{+$key} = \ @{%args{$arg}};
             } or die(
                 "The '$arg' parameter must be an array reference."
             );
         }
         elsif ($val) {
-            $self->{':private:'}->{$key} = $val;
+            $self->{':private:'}->{+$key} = $val;
         }
     }
     do {
         my %dupe;
-        @{$self->{':private:'}->{INC}} = grep { -e $_ && !%dupe{$_}++ }
-          @: < @{$self->{':private:'}->{INC}}, < @{$self->{':private:'}->{EXTRA}};
+        @{$self->{':private:'}->{INC}} = grep { -e $_ && !%dupe{+$_}++ }
+          @: < @{$self->{':private:'}->{?INC}}, < @{$self->{':private:'}->{?EXTRA}};
     };
-    my $perl5lib = defined %ENV{PERL5LIB} ?? %ENV{PERL5LIB} !! "";
+    my $perl5lib = defined %ENV{?PERL5LIB} ?? %ENV{?PERL5LIB} !! "";
 
-    my @dirs = @( $self->{':private:'}->{Config}->{archlibexp},
-                 $self->{':private:'}->{Config}->{sitearchexp},
+    my @dirs = @( $self->{':private:'}->{Config}->{?archlibexp},
+                 $self->{':private:'}->{Config}->{?sitearchexp},
                  < split(m/\Q$(config_value("path_sep"))\E/, $perl5lib),
-                 < @{$self->{':private:'}->{EXTRA}},
+                 < @{$self->{':private:'}->{?EXTRA}},
                );
     
     # File::Find does not know how to deal with VMS filepaths.
@@ -135,9 +135,9 @@ sub new {
     my $archlib = @dirs[0];
     
     # Read the core packlist
-    $self->{Perl}->{packlist} =
+    $self->{Perl}->{+packlist} =
       ExtUtils::Packlist->new( File::Spec->catfile($archlib, '.packlist') );
-    $self->{Perl}->{version} = $self->{':private:'}->{Config}->{version};
+    $self->{Perl}->{+version} = $self->{':private:'}->{Config}->{?version};
 
     # Read the module packlists
     my $sub = sub {
@@ -160,24 +160,24 @@ sub new {
         $module =~ s!/!::!g;
 
         # Find the top-level module file in @INC
-        $self->{$module}->{version} = '';
+        $self->{$module}->{+version} = '';
         foreach my $dir ( @{$self->{':private:'}->{INC}} ) {
             my $p = File::Spec->catfile($dir, $modfile);
             if (-r $p) {
                 $module = _module_name($p, $module) if $Is_VMS;
 
-                $self->{$module}->{version} = MM->parse_version($p);
+                $self->{$module}->{+version} = MM->parse_version($p);
                 last;
             }
         }
 
         # Read the .packlist
-        $self->{$module}->{packlist} =
+        $self->{$module}->{+packlist} =
           ExtUtils::Packlist->new($File::Find::name);
     };
     my %dupe;
-    @dirs= grep { -e $_ && !%dupe{$_}++ } @dirs;
-    $self->{':private:'}->{LIBDIRS} = \@dirs;    
+    @dirs= grep { -e $_ && !%dupe{+$_}++ } @dirs;
+    $self->{':private:'}->{+LIBDIRS} = \@dirs;    
     find($sub, < @dirs) if (nelems @dirs);
 
     return bless($self, $class);
@@ -230,7 +230,7 @@ sub files {
         if ($type ne "all" && $type ne "prog" && $type ne "doc");
 
     my (@files);
-    foreach my $file (keys(%{$self->{$module}->{packlist}})) {
+    foreach my $file (keys(%{$self->{$module}->{?packlist}})) {
         push(@files, $file)
           if ($self->_is_type($file, $type) &&
               $self->_is_under($file, < @under));
@@ -242,7 +242,7 @@ sub directories {
     my ($self, $module, $type, < @under) = < @_;
     my (%dirs);
     foreach my $file ( $self->files($module, $type, < @under)) {
-        %dirs{dirname($file)}++;
+        %dirs{+dirname($file)}++;
     }
     return sort keys %dirs;
 }
@@ -251,13 +251,13 @@ sub directory_tree {
     my ($self, $module, $type, < @under) = < @_;
     my (%dirs);
     foreach my $dir ( $self->directories($module, $type, < @under)) {
-        %dirs{$dir}++;
+        %dirs{+$dir}++;
         my ($last) = ("");
         while ($last ne $dir) {
             $last = $dir;
             $dir = dirname($dir);
             last if !$self->_is_under($dir, < @under);
-            %dirs{$dir}++;
+            %dirs{+$dir}++;
         }
     }
     return sort(keys(%dirs));
@@ -266,19 +266,19 @@ sub directory_tree {
 sub validate {
     my ($self, $module, $remove) = < @_;
     die("$module is not installed") if (! exists($self->{$module}));
-    return $self->{$module}->{packlist}->validate($remove);
+    return $self->{$module}->{?packlist}->validate($remove);
 }
 
 sub packlist {
     my ($self, $module) = < @_;
     die("$module is not installed") if (! exists($self->{$module}));
-    return $self->{$module}->{packlist};
+    return $self->{$module}->{?packlist};
 }
 
 sub version {
     my ($self, $module) = < @_;
     die("$module is not installed") if (! exists($self->{$module}));
-    return $self->{$module}->{version};
+    return $self->{$module}->{?version};
 }
 
 

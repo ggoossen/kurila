@@ -244,7 +244,7 @@ do {
 };
 
 # E.g. netbsd-alpha core dumps on Inf arith without this.
-local %SIG{FPE} = undef;
+local %SIG{+FPE} = undef;
 
 print "# great_circle_distance with small angles\n";
 

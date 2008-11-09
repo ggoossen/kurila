@@ -133,15 +133,15 @@ test {
 
 my %foo;
 for my $n ('A'..'E') {
-    %foo{$n} = sub { $n eq @_[0] };
+    %foo{+$n} = sub { $n eq @_[0] };
 }
 
 test {
-  &{%foo{A}}('A') and
-  &{%foo{B}}('B') and
-  &{%foo{C}}('C') and
-  &{%foo{D}}('D') and
-  &{%foo{E}}('E')
+  &{%foo{?A}}('A') and
+  &{%foo{?B}}('B') and
+  &{%foo{?C}}('C') and
+  &{%foo{?D}}('D') and
+  &{%foo{?E}}('E')
 };
 
 for my $n (0..4) {
@@ -383,7 +383,7 @@ END
 
 	  # Now, we can actually prep to run the tests.
 	  for my $inner_sub_test ( @inners) {
-	    $expected = %expected{$inner_sub_test} or
+	    $expected = %expected{?$inner_sub_test} or
 	      die "expected $inner_sub_test missing";
 
 	    # Named closures won't access the expected vars
@@ -627,9 +627,9 @@ f16302();
 do {
     my %a;
     for my $x (@(7,11)) {
-	%a{$x} = sub { $x=$x; sub { eval '$x' } };
+	%a{+$x} = sub { $x=$x; sub { eval '$x' } };
     }
-    test { %a{7}->()->() + %a{11}->()->() == 18 };
+    test { %a{?7}->()->() + %a{?11}->()->() == 18 };
 };
 
 do {

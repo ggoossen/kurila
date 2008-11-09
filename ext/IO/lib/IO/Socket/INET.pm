@@ -25,9 +25,9 @@ my %socket_type = %( tcp  => SOCK_STREAM,
 		    icmp => SOCK_RAW
 		  );
 my %proto_number;
-%proto_number{tcp}  = Socket::IPPROTO_TCP()  if defined &Socket::IPPROTO_TCP;
-%proto_number{upd}  = Socket::IPPROTO_UDP()  if defined &Socket::IPPROTO_UDP;
-%proto_number{icmp} = Socket::IPPROTO_ICMP() if defined &Socket::IPPROTO_ICMP;
+%proto_number{+tcp}  = Socket::IPPROTO_TCP()  if defined &Socket::IPPROTO_TCP;
+%proto_number{+upd}  = Socket::IPPROTO_UDP()  if defined &Socket::IPPROTO_UDP;
+%proto_number{+icmp} = Socket::IPPROTO_ICMP() if defined &Socket::IPPROTO_ICMP;
 my %proto_name = %( < reverse @: < %proto_number );
 
 sub new {
@@ -39,15 +39,15 @@ sub new {
 sub _cache_proto {
     my @proto = @_;
     for ( map lc($_), @( @proto[0], < split(' ', @proto[1]))) {
-	%proto_number{$_} = @proto[2];
+	%proto_number{+$_} = @proto[2];
     }
-    %proto_name{@proto[2]} = @proto[0];
+    %proto_name{+@proto[2]} = @proto[0];
 }
 
 sub _get_proto_number {
     my $name = lc(shift);
     return undef unless defined $name;
-    return %proto_number{$name} if exists %proto_number{$name};
+    return %proto_number{?$name} if exists %proto_number{$name};
 
     my @proto = @( getprotobyname($name) );
     return undef unless (nelems @proto);
@@ -59,7 +59,7 @@ sub _get_proto_number {
 sub _get_proto_name {
     my $num = shift;
     return undef unless defined $num;
-    return %proto_name{$num} if exists %proto_name{$num};
+    return %proto_name{?$num} if exists %proto_name{$num};
 
     my @proto = @( getprotobynumber($num) );
     return undef unless (nelems @proto);
@@ -138,39 +138,39 @@ sub configure {
     my($lport,$rport,$laddr,$raddr,$proto,$type);
 
 
-    $arg->{LocalAddr} = $arg->{LocalHost}
+    $arg->{+LocalAddr} = $arg->{?LocalHost}
 	if exists $arg->{LocalHost} && !exists $arg->{LocalAddr};
 
-    ($laddr,$lport,$proto) = < _sock_info($arg->{LocalAddr},
-					$arg->{LocalPort},
-					$arg->{Proto})
+    ($laddr,$lport,$proto) = < _sock_info($arg->{?LocalAddr},
+					$arg->{?LocalPort},
+					$arg->{?Proto})
 			or return _error($sock, $!, $@);
 
     $laddr = defined $laddr ?? inet_aton($laddr)
 			    !! INADDR_ANY;
 
-    return _error($sock, $EINVAL, "Bad hostname '",$arg->{LocalAddr},"'")
+    return _error($sock, $EINVAL, "Bad hostname '",$arg->{?LocalAddr},"'")
 	unless(defined $laddr);
 
-    $arg->{PeerAddr} = $arg->{PeerHost}
+    $arg->{+PeerAddr} = $arg->{?PeerHost}
 	if exists $arg->{PeerHost} && !exists $arg->{PeerAddr};
 
     unless(exists $arg->{Listen}) {
-	($raddr,$rport,$proto) = < _sock_info($arg->{PeerAddr},
-					    $arg->{PeerPort},
+	($raddr,$rport,$proto) = < _sock_info($arg->{?PeerAddr},
+					    $arg->{?PeerPort},
 					    $proto)
 			or return _error($sock, $!, $@);
     }
 
     $proto ||= _get_proto_number('tcp');
 
-    $type = $arg->{Type} || %socket_type{lc _get_proto_name($proto)};
+    $type = $arg->{?Type} || %socket_type{?lc _get_proto_name($proto)};
 
     my @raddr = @( () );
 
     if(defined $raddr) {
 	@raddr = $sock->_get_addr($raddr, $arg->{MultiHomed});
-	return _error($sock, $EINVAL, "Bad hostname '",$arg->{PeerAddr},"'")
+	return _error($sock, $EINVAL, "Bad hostname '",$arg->{?PeerAddr},"'")
 	    unless (nelems @raddr);
     }
 
@@ -179,22 +179,22 @@ sub configure {
 	$sock->socket(AF_INET, $type, $proto) or
 	    return _error($sock, $!, "$!");
 
-        if (defined $arg->{Blocking}) {
+        if (defined $arg->{?Blocking}) {
 	    defined $sock->blocking($arg->{Blocking})
 		or return _error($sock, $!, "$!");
 	}
 
-	if ($arg->{Reuse} || $arg->{ReuseAddr}) {
+	if ($arg->{?Reuse} || $arg->{?ReuseAddr}) {
 	    $sock->sockopt(SO_REUSEADDR,1) or
 		    return _error($sock, $!, "$!");
 	}
 
-	if ($arg->{ReusePort}) {
+	if ($arg->{?ReusePort}) {
 	    $sock->sockopt( <SO_REUSEPORT,1) or
 		    return _error($sock, $!, "$!");
 	}
 
-	if ($arg->{Broadcast}) {
+	if ($arg->{?Broadcast}) {
 		$sock->sockopt(SO_BROADCAST,1) or
 		    return _error($sock, $!, "$!");
 	}
@@ -205,7 +205,7 @@ sub configure {
 	}
 
 	if(exists $arg->{Listen}) {
-	    $sock->listen($arg->{Listen} || 5) or
+	    $sock->listen($arg->{?Listen} || 5) or
 		return _error($sock, $!, "$!");
 	    last;
 	}
@@ -221,7 +221,7 @@ sub configure {
 	last
 	    unless($type == SOCK_STREAM || defined $raddr);
 
-	return _error($sock, $EINVAL, "Bad hostname '",$arg->{PeerAddr},"'")
+	return _error($sock, $EINVAL, "Bad hostname '",$arg->{?PeerAddr},"'")
 	    unless defined $raddr;
 
 #        my $timeout = ${*$sock}{'io_socket_timeout'};

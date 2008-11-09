@@ -16,9 +16,9 @@ BEGIN {
 }
 
 # Hard-code a few values to try to get reproducible results.
-%ENV{COLUMNS} = 80;
-%ENV{TERM} = 'xterm';
-%ENV{TERMCAP} = 'xterm:co=80:do=^J:md=\E[1m:us=\E[4m:me=\E[m';
+%ENV{+COLUMNS} = 80;
+%ENV{+TERM} = 'xterm';
+%ENV{+TERMCAP} = 'xterm:co=80:do=^J:md=\E[1m:us=\E[4m:me=\E[m';
 
 use Pod::Text::Termcap;
 

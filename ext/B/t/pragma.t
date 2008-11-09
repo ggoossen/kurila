@@ -1,7 +1,7 @@
 #!./perl -w
 
 BEGIN {    ## no critic strict
-    if ( %ENV{PERL_CORE} ) {
+    if ( %ENV{?PERL_CORE} ) {
 	push @INC, < qw(lib);
     }
     else {
@@ -51,7 +51,7 @@ do {
     my $hints_hash = $cop->hints_hash;
     is( ref($hints_hash), 'HASH', 'Got hash reference' );
 
-    is( $hints_hash->{mypragma}, 42, q[mypragma => 42] );
+    is( $hints_hash->{?mypragma}, 42, q[mypragma => 42] );
 };
 
 do {
@@ -63,7 +63,7 @@ do {
     my $hints_hash = $cop->hints_hash;
     is( ref($hints_hash), 'HASH', 'Got hash reference' );
 
-    is( $hints_hash->{mypragma}, 0, q[mypragma => 0] );
+    is( $hints_hash->{?mypragma}, 0, q[mypragma => 0] );
 };
 exit;
 

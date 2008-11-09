@@ -47,17 +47,17 @@ sub foo2 {
     local($a, @b) = (shift, @_);
     local(@c, %d);
     @c = @( "c 3" );
-    %d{''} = "d 4";
+    %d{+''} = "d 4";
     do { local($a, @c) = ("a 19", @("c 20")); ($x, $y) = ($a, < @c); };
     is($a, "a 1");
     is("$(join ' ',@b)", "b 2");
-    return @(@c[0], %d{''});
+    return @(@c[0], %d{?''});
 }
 
 $a = "a 5";
 @b = @( "b 6" );
 @c = @( "c 7" );
-%d{''} = "d 8";
+%d{+''} = "d 8";
 
 @res = &foo2("a 1","b 2");
 is(@res[0], "c 3");
@@ -66,7 +66,7 @@ is(@res[1], "d 4");
 is($a, "a 5");
 is("$(join ' ',@b)", "b 6");
 is(@c[0], "c 7");
-is(%d{''}, "d 8");
+is(%d{?''}, "d 8");
 is($x, "a 19");
 is($y, "c 20");
 
@@ -74,13 +74,13 @@ is($y, "c 20");
 do {
 local our $TODO = "fix localization through reference";
 eval 'local($$e)';
-like($@ && $@->{description}, qr/Can't localize through a reference/);
+like($@ && $@->{?description}, qr/Can't localize through a reference/);
 
 eval '$e = \@(); local(@$e)';
-like($@ && $@->{description}, qr/Can't localize through a reference/);
+like($@ && $@->{?description}, qr/Can't localize through a reference/);
 
 eval '$e = \%(); local(%$e)';
-like($@ && $@->{description}, qr/Can't localize through a reference/);
+like($@ && $@->{?description}, qr/Can't localize through a reference/);
 };
 
 # Array and hash elements
@@ -111,21 +111,21 @@ do {
 
 %h = %('a' => 1, 'b' => 2, 'c' => 3);
 do {
-    local(%h{'a'}) = 'foo';
-    local(%h{'b'}) = %h{'b'};
-    is(%h{'a'}, 'foo');
-    is(%h{'b'}, 2);
+    local(%h{+'a'}) = 'foo';
+    local(%h{+'b'}) = %h{?'b'};
+    is(%h{?'a'}, 'foo');
+    is(%h{?'b'}, 2);
     local(%h{'c'});
     delete %h{'c'};
 };
-is(%h{'a'}, 1);
-is(%h{'b'}, 2);
+is(%h{?'a'}, 1);
+is(%h{?'b'}, 2);
 do {
-    my $d = join("\n", map { "$_=>%h{$_}" } sort keys %h);
+    my $d = join("\n", map { "$_=>%h{?$_}" } sort keys %h);
     local %h = %( < %h );
-    is(join("\n", map { "$_=>%h{$_}" } sort keys %h), $d);
+    is(join("\n", map { "$_=>%h{?$_}" } sort keys %h), $d);
 };
-is(%h{'c'}, 3);
+is(%h{?'c'}, 3);
 
 # check for scope leakage
 $a = 'outer';
@@ -135,8 +135,8 @@ is($a, 'outer');
 do {
     package TH;
     sub TIEHASH { bless \%(), @_[0] }
-    sub STORE { print "# STORE [$(dump::view(\@_))]\n"; @_[0]->{@_[1]} = @_[2] }
-    sub FETCH { my $v = @_[0]->{@_[1]}; print "# FETCH [$(dump::view(\@_))=$v]\n"; $v }
+    sub STORE { print "# STORE [$(dump::view(\@_))]\n"; @_[0]->{+@_[1]} = @_[2] }
+    sub FETCH { my $v = @_[0]->{?@_[1]}; print "# FETCH [$(dump::view(\@_))=$v]\n"; $v }
     sub EXISTS { print "# EXISTS [$(dump::view(\@_))]\n"; exists @_[0]->{@_[1]}; }
     sub DELETE { print "# DELETE [$(dump::view(\@_))]\n"; delete @_[0]->{@_[1]}; }
     sub CLEAR { print "# CLEAR [$(dump::view(< @_))]\n"; %{@_[0]} = %( () ); }
@@ -149,26 +149,26 @@ tie %h, 'TH';
 %h = %('a' => 1, 'b' => 2, 'c' => 3);
 
 do {
-    local(%h{'a'}) = 'foo';
-    local(%h{'b'}) = %h{'b'};
+    local(%h{+'a'}) = 'foo';
+    local(%h{+'b'}) = %h{?'b'};
     local(%h{'y'});
-    local(%h{'z'}) = 33;
-    is(%h{'a'}, 'foo');
-    is(%h{'b'}, 2, " # TODO ");
+    local(%h{+'z'}) = 33;
+    is(%h{?'a'}, 'foo');
+    is(%h{?'b'}, 2, " # TODO ");
     local(%h{'c'});
     delete %h{'c'};
 };
-is(%h{'a'}, 1, " # TODO ");
-is(%h{'b'}, 2, " # TODO ");
-is(%h{'c'}, 3, " # TODO ");
+is(%h{?'a'}, 1, " # TODO ");
+is(%h{?'b'}, 2, " # TODO ");
+is(%h{?'c'}, 3, " # TODO ");
 # local() should preserve the existenceness of tied hash elements
 ok(! exists %h{'y'});
 ok(! exists %h{'z'});
 TODO: do {
     todo_skip("Localize entire tied hash");
-    my $d = join("\n", map { "$_=>%h{$_}" } sort keys %h);
+    my $d = join("\n", map { "$_=>%h{?$_}" } sort keys %h);
     local %h = %( < %h );
-    is(join("\n", map { "$_=>%h{$_}" } sort keys %h), $d);
+    is(join("\n", map { "$_=>%h{?$_}" } sort keys %h), $d);
 };
 
 @a = @('a', 'b', 'c');
@@ -180,45 +180,45 @@ is(@a[0].@a[1], "Xb");
 
 # now try the same for %SIG
 
-%SIG{INT} = \&foo;
-$^WARN_HOOK = %SIG{INT};
+%SIG{+INT} = \&foo;
+$^WARN_HOOK = %SIG{?INT};
 do {
-    local(%SIG{TERM}) = %SIG{TERM};
-    local(%SIG{INT}) = %SIG{INT};
+    local(%SIG{+TERM}) = %SIG{?TERM};
+    local(%SIG{+INT}) = %SIG{?INT};
     local($^WARN_HOOK) = $^WARN_HOOK;
-    is(%SIG{TERM}, undef);
-    cmp_ok(%SIG{INT}, '\==', \&foo);
+    is(%SIG{?TERM}, undef);
+    cmp_ok(%SIG{?INT}, '\==', \&foo);
     cmp_ok($^WARN_HOOK, '\==', \&foo);
     local(%SIG{INT});
     $^WARN_HOOK = undef;
 };
-is(%SIG{TERM}, undef);
-cmp_ok(%SIG{INT}, '\==', \&foo);
+is(%SIG{?TERM}, undef);
+cmp_ok(%SIG{?INT}, '\==', \&foo);
 cmp_ok($^WARN_HOOK, '\==', \&foo);
 do {
-    my $d = join("\n", map { "$_=>$(dump::view(%SIG{$_}))" } sort keys %SIG);
+    my $d = join("\n", map { "$_=>$(dump::view(%SIG{?$_}))" } sort keys %SIG);
     local %SIG = %( < %SIG );
-    is(join("\n", map { "$_=>$(dump::view(%SIG{$_}))" } sort keys %SIG), $d);
+    is(join("\n", map { "$_=>$(dump::view(%SIG{?$_}))" } sort keys %SIG), $d);
 };
 
 # and for %ENV
 
-%ENV{_X_} = 'a';
-%ENV{_Y_} = 'b';
-%ENV{_Z_} = 'c';
+%ENV{+_X_} = 'a';
+%ENV{+_Y_} = 'b';
+%ENV{+_Z_} = 'c';
 do {
     local(%ENV{_A_});
-    local(%ENV{_B_}) = 'foo';
-    local(%ENV{_X_}) = 'foo';
-    local(%ENV{_Y_}) = %ENV{_Y_};
-    is(%ENV{_X_}, 'foo');
-    is(%ENV{_Y_}, 'b');
+    local(%ENV{+_B_}) = 'foo';
+    local(%ENV{+_X_}) = 'foo';
+    local(%ENV{+_Y_}) = %ENV{?_Y_};
+    is(%ENV{?_X_}, 'foo');
+    is(%ENV{?_Y_}, 'b');
     local(%ENV{_Z_});
     delete %ENV{_Z_};
 };
-is(%ENV{_X_}, 'a');
-is(%ENV{_Y_}, 'b');
-is(%ENV{_Z_}, 'c');
+is(%ENV{?_X_}, 'a');
+is(%ENV{?_Y_}, 'b');
+is(%ENV{?_Z_}, 'c');
 # local() should preserve the existenceness of %ENV elements
 ok(! exists %ENV{_A_});
 ok(! exists %ENV{_B_});
@@ -226,9 +226,9 @@ ok(! exists %ENV{_B_});
 SKIP: do {
     skip("Can't make list assignment to \%ENV on this system")
 	unless $list_assignment_supported;
-    my $d = join("\n", map { "$_=>%ENV{$_}" } sort keys %ENV);
+    my $d = join("\n", map { "$_=>%ENV{?$_}" } sort keys %ENV);
     local %ENV = %( < %ENV );
-    is(join("\n", map { "$_=>%ENV{$_}" } sort keys %ENV), $d);
+    is(join("\n", map { "$_=>%ENV{?$_}" } sort keys %ENV), $d);
 };
 
 # does implicit localization in foreach skip magic?
@@ -244,8 +244,8 @@ while (m/(o.+?),/gc) {
 do {
     # BUG 20001205.22
     my %x;
-    %x{a} = 1;
-    do { local %x{b} = 1; };
+    %x{+a} = 1;
+    do { local %x{+b} = 1; };
     ok(! exists %x{b});
     do { local %x{[@('c','d','e')]} = @(); };
     ok(! exists %x{c});
@@ -254,7 +254,7 @@ do {
 # local() and readonly magic variables
 
 try { local $1 = 1 };
-like($@->{description}, qr/Modification of a read-only value attempted/);
+like($@->{?description}, qr/Modification of a read-only value attempted/);
 
 # sub localisation
 do {
@@ -270,7 +270,7 @@ do {
 	};
 	main::ok(f1() eq "f1", "localised sub restored");
 	do {
-		local %Other::{"f1"} = sub { "h1" };
+		local %Other::{+"f1"} = sub { "h1" };
 		main::ok(f1() eq "h1", "localised sub via stash");
 	};
 	main::ok(f1() eq "f1", "localised sub restored");
@@ -287,33 +287,33 @@ do {
 # Localising unicode keys (bug #38815)
 do {
     my %h;
-    %h{"\243"} = "pound";
-    %h{"\302\240"} = "octects";
+    %h{+"\243"} = "pound";
+    %h{+"\302\240"} = "octects";
     is(nelems( keys %h), 2);
     do {
         use utf8;
 	my $unicode = chr 256;
 	my $ambigous = "\240" . $unicode;
 	chop $ambigous;
-	local %h{$unicode} = 256;
-	local %h{$ambigous} = 160;
+	local %h{+$unicode} = 256;
+	local %h{+$ambigous} = 160;
 
 	is(nelems(keys %h), 4);
-	is(%h{"\243"}, "pound");
-	is(%h{$unicode}, 256);
-	is(%h{$ambigous}, 160);
-	is(%h{"\302\240"}, "octects");
+	is(%h{?"\243"}, "pound");
+	is(%h{?$unicode}, 256);
+	is(%h{?$ambigous}, 160);
+	is(%h{?"\302\240"}, "octects");
     };
     is(nelems(keys %h), 2);
-    is(%h{"\243"}, "pound");
-    is(%h{"\302\240"}, "octects");
+    is(%h{?"\243"}, "pound");
+    is(%h{?"\302\240"}, "octects");
 };
 
 # And with slices
 do {
     my %h;
-    %h{"\243"} = "pound";
-    %h{"\302\240"} = "octects";
+    %h{+"\243"} = "pound";
+    %h{+"\302\240"} = "octects";
     is(nelems(keys %h), 2);
     do {
         use utf8;
@@ -324,14 +324,14 @@ do {
         local our $TODO = "localized hash alues";
 
 	is(nkeys %h, 4);
-	is(%h{"\243"}, "pound");
-	is(%h{$unicode}, 256);
-	is(%h{$ambigous}, 160);
-	is(%h{"\302\240"}, "octects");
+	is(%h{?"\243"}, "pound");
+	is(%h{?$unicode}, 256);
+	is(%h{?$ambigous}, 160);
+	is(%h{?"\302\240"}, "octects");
     };
     is(nkeys %h, 2);
-    is(%h{"\243"}, "pound");
-    is(%h{"\302\240"}, "octects");
+    is(%h{?"\243"}, "pound");
+    is(%h{?"\302\240"}, "octects");
 };
 
 # [perl #39012] localizing @_ element then shifting frees element too # soon
@@ -351,24 +351,24 @@ do {
     my %h=%('k1' => 111);
     my $k='k1';
     do {
-	local %h{$k}=222;
+	local %h{+$k}=222;
 
-	is(%h{'k1'},222);
+	is(%h{?'k1'},222);
 	$k='k2';
     };
     ok(! exists(%h{'k2'}));
-    is(%h{'k1'},111);
+    is(%h{?'k1'},111);
 };
 do {
     my %h=%('k1' => 111);
     our $k = 'k1';  # try dynamic too
     do {
-	local %h{$k}=222;
-	is(%h{'k1'},222);
+	local %h{+$k}=222;
+	is(%h{?'k1'},222);
 	$k='k2';
     };
     ok(! exists(%h{'k2'}));
-    is(%h{'k1'},111);
+    is(%h{?'k1'},111);
 };
 
 # Keep this test last, as it can SEGV

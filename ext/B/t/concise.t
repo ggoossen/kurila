@@ -89,7 +89,7 @@ SKIP: do {
 my @stylespec;
 $@='';
 try { add_style ('junk_B' => < @stylespec) };
-like ($@->{description}, 'expecting 3 style-format args',
+like ($@->{?description}, 'expecting 3 style-format args',
     "add_style rejects insufficient args");
 
 @stylespec = @(0,0,0); # right length, invalid values
@@ -99,7 +99,7 @@ is ($@, '', "add_style accepts: stylename => 3-arg-array");
 
 $@='';
 try { add_style (junk => < @stylespec) };
-like ($@->{description}, qr/style 'junk' already exists, choose a new name/,
+like ($@->{?description}, qr/style 'junk' already exists, choose a new name/,
     "add_style correctly disallows re-adding same style-name" );
 
 # test new arg-checks on set_style
@@ -110,7 +110,7 @@ is ($@, '', "set_style accepts 3 style-format args");
 @stylespec = @( () ); # bad style
 
 try { set_style (< @stylespec) };
-like ($@->{description}, qr/expecting 3 style-format args/,
+like ($@->{?description}, qr/expecting 3 style-format args/,
       "set_style rejects bad style-format args");
 
 #### for content with doc'd options
@@ -168,7 +168,7 @@ SKIP: do {
 	    my $typ = ref $ref;
 	    walk_output(\my $out);
 	    try { B::Concise::compile('-basic', $ref)->() };
-	    like ($@->{description}, qr/^err: not a coderef: $typ/,
+	    like ($@->{?description}, qr/^err: not a coderef: $typ/,
 		  "compile detects $typ-ref where expecting subref");
 	    is($out,'', "no output when errd"); # announcement prints
 	}
@@ -238,14 +238,14 @@ SKIP: do {
 	    walk_output(\$sample);
 	    reset_sequence();
 	    $walker->($style, $mode);
-	    %combos{"$style$mode"} = $sample;
+	    %combos{+"$style$mode"} = $sample;
 	}
     }
     # crosscheck that samples are all text-different
     my @list = sort keys %combos;
     for my $i (0..((nelems @list)-1)) {
 	for my $j ($i+1..((nelems @list)-1)) {
-	    isnt (%combos{@list[$i]}, %combos{@list[$j]},
+	    isnt (%combos{?@list[$i]}, %combos{?@list[$j]},
 		  "combos for @list[$i] and @list[$j] are different, as expected");
 	}
     }
@@ -256,14 +256,14 @@ SKIP: do {
 	    reset_sequence();
 	    walk_output(\$sample);
 	    $walker->($mode, $style);
-	    %combos{"$mode$style"} = $sample;
+	    %combos{+"$mode$style"} = $sample;
 	}
     }
     # test commutativity of flags, ie that AB == BA
     for my $mode ( @modes) {
 	for my $style ( @styles) {
-	    is ( %combos{"$style$mode"},
-		 %combos{"$mode$style"},
+	    is ( %combos{?"$style$mode"},
+		 %combos{?"$mode$style"},
 		 "results for $style$mode vs $mode$style are the same" );
 	}
     }
@@ -280,14 +280,14 @@ SKIP: do {
 	    walk_output(\$sample);
 	    reset_sequence();
 	    $walker->($mode);
-	    %combos{"$style/$mode"} = $sample;
+	    %combos{+"$style/$mode"} = $sample;
 	}
     }
     # crosscheck that samples are all text-different
     my @nm = sort keys %combos;
     for my $i (0..((nelems @nm)-1)) {
 	for my $j ($i+1..((nelems @nm)-1)) {
-	    isnt (%combos{@nm[$i]}, %combos{@nm[$j]},
+	    isnt (%combos{?@nm[$i]}, %combos{?@nm[$j]},
 		  "results for @nm[$i] and @nm[$j] are different, as expected");
 	}
     }
@@ -301,14 +301,14 @@ SKIP: do {
 	    walk_output(\$sample);
 	    reset_sequence();
 	    $walker->($style);
-	    %combos{"$mode/$style"} = $sample;
+	    %combos{+"$mode/$style"} = $sample;
 	}
     }
     # test commutativity of flags, ie that AB == BA
     for my $mode ( @modes) {
 	for my $style ( @styles) {
-	    is ( %combos{"$style/$mode"},
-		 %combos{"$mode/$style"},
+	    is ( %combos{?"$style/$mode"},
+		 %combos{?"$mode/$style"},
 		 "results for $style/$mode vs $mode/$style are the same" );
 	}
     }
@@ -321,20 +321,20 @@ SKIP: do {
     for my $mode ( @modes) {
 	for my $style ( @styles) {
 
-	    is ( %combos{"$style$mode"},
-		 %combos{"$style/$mode"},
+	    is ( %combos{?"$style$mode"},
+		 %combos{?"$style/$mode"},
 		 "$style$mode VS $style/$mode are the same" );
 
-	    is ( %combos{"$mode$style"},
-		 %combos{"$mode/$style"},
+	    is ( %combos{?"$mode$style"},
+		 %combos{?"$mode/$style"},
 		 "$mode$style VS $mode/$style are the same" );
 
-	    is ( %combos{"$style$mode"},
-		 %combos{"$mode/$style"},
+	    is ( %combos{?"$style$mode"},
+		 %combos{?"$mode/$style"},
 		 "$style$mode VS $mode/$style are the same" );
 
-	    is ( %combos{"$mode$style"},
-		 %combos{"$style/$mode"},
+	    is ( %combos{?"$mode$style"},
+		 %combos{?"$style/$mode"},
 		 "$mode$style VS $style/$mode are the same" );
 	}
     }

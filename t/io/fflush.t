@@ -117,7 +117,7 @@ my %subs = %(
             );
 my $t = 2;
 for (qw(system qx popen)) {
-    my $code    = %subs{$_};
+    my $code    = %subs{?$_};
     my $f       = "ff-$_-$$";
     my $command = qq{$runperl "ff-prog" "$f" "rl"};
     open OUT, ">", "$f" or die "open $f: $!";

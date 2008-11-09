@@ -38,7 +38,7 @@ sub heavy_export {
     my($pkg, $callpkg, < @imports) = < @_;
     my($type, $cache_is_current, $oops);
     my($exports, $export_cache) = (\@{*{Symbol::fetch_glob("$($pkg)::EXPORT")}},
-                                   %Exporter::Cache{$pkg} ||= \%());
+                                   %Exporter::Cache{+$pkg} ||= \%());
 
     if ((nelems @imports)) {
 	if (!%$export_cache) {
@@ -60,7 +60,7 @@ sub heavy_export {
 		    if ($spec eq 'DEFAULT'){
 			@names = @$exports;
 		    }
-		    elsif ($tagdata = $tagsref->{$spec}) {
+		    elsif ($tagdata = $tagsref->{?$spec}) {
 			@names = @$tagdata;
 		    }
 		    else {
@@ -93,7 +93,7 @@ sub heavy_export {
 
         my @carp;
 	foreach my $sym ( @imports) {
-	    if (!$export_cache->{$sym}) {
+	    if (!$export_cache->{?$sym}) {
 		if ($sym =~ m/^\d/) {
 		    $pkg->VERSION($sym); # inherit from UNIVERSAL
 		    # If the version number was the only thing specified
@@ -108,7 +108,7 @@ sub heavy_export {
 			@imports = @( () );
 			last;
 		    }
-		} elsif ($sym !~ s/^&// || !$export_cache->{$sym}) {
+		} elsif ($sym !~ s/^&// || !$export_cache->{?$sym}) {
 		    # Last chance - see if they've updated EXPORT_OK since we
 		    # cached it.
 
@@ -118,7 +118,7 @@ sub heavy_export {
 			$cache_is_current = 1;
 		    }
 
-		    if (!$export_cache->{$sym}) {
+		    if (!$export_cache->{?$sym}) {
 			# accumulate the non-exports
 			push @carp,
 			  qq["$sym" is not exported by the $pkg module\n];
@@ -136,7 +136,7 @@ sub heavy_export {
     }
 
     my($fail, $fail_cache) = (\@{*{Symbol::fetch_glob("$($pkg)::EXPORT_FAIL")}},
-                              %Exporter::FailCache{$pkg} ||= \%());
+                              %Exporter::FailCache{+$pkg} ||= \%());
 
     if ((nelems @$fail)) {
 	if (!%$fail_cache) {
@@ -148,7 +148,7 @@ sub heavy_export {
  <	    %{$fail_cache}{[ @expanded]} = (1) x nelems @expanded;
 	}
 	my @failed;
-	foreach my $sym ( @imports) { push(@failed, $sym) if $fail_cache->{$sym} }
+	foreach my $sym ( @imports) { push(@failed, $sym) if $fail_cache->{?$sym} }
 	if ((nelems @failed)) {
 	    @failed = $pkg->export_fail(< @failed);
 	    foreach my $sym ( @failed) {
@@ -195,7 +195,7 @@ sub _push_tags {
     my @nontag = @( () );
     my $export_tags = \%{*{Symbol::fetch_glob("$($pkg)::EXPORT_TAGS")}};
     push(@{*{Symbol::fetch_glob("$($pkg)::$var")}},
-	< map { $export_tags->{$_} ?? < @{$export_tags->{$_}} 
+	< map { $export_tags->{?$_} ?? < @{$export_tags->{?$_}} 
                                  !! do { push(@nontag,$_); $_ } }
  @(		(nelems @$syms) ?? < @$syms !! < keys %$export_tags));
     if ((nelems @nontag) and $^W) {

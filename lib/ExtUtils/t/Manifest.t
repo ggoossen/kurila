@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 BEGIN {
-    if( %ENV{PERL_CORE} ) {
+    if( %ENV{?PERL_CORE} ) {
         chdir 't' if -d 't';
         unshift @INC, '../lib';
     }
@@ -34,7 +34,7 @@ sub add_file {
     1 while unlink $file;  # or else we'll get multiple versions on VMS
     open( T, ">", ''.$file) or return;
     print T $data;
-    ++%Files{$file};
+    ++%Files{+$file};
     close T;
 }
 
@@ -47,7 +47,7 @@ sub read_manifest {
 
 sub catch_warning {
     my $warn = '';
-    local $^WARN_HOOK = sub { $warn .= @_[0]->{description} };
+    local $^WARN_HOOK = sub { $warn .= @_[0]->{?description} };
     return @( @_[0]->(), $warn );
 }
 
@@ -164,7 +164,7 @@ rmtree('copy');
 
 # poison the manifest, and add a comment that should be reported
 add_file( 'MANIFEST', 'none #none' );
-is( ExtUtils::Manifest::maniread()->{none}, '#none', 
+is( ExtUtils::Manifest::maniread()->{?none}, '#none', 
                                         'maniread found comment' );
 
 ok( mkdir( 'copy', 0777 ), 'made copy directory' );
@@ -172,7 +172,7 @@ $files = maniread();
 try { (undef, $warn) = < catch_warning( sub {
  		manicopy( $files, 'copy', 'cp' ) })
 };
-like( $@->{description}, qr/^Can't read none: /, 'croaked about none' );
+like( $@->{?description}, qr/^Can't read none: /, 'croaked about none' );
 
 # a newline comes through, so get rid of it
 chomp($warn);
@@ -187,7 +187,7 @@ do {
 	like( $warn, qr/Added to albatross: /, 'using a new manifest file' );
 
 	# add the new file to the list of files to be deleted
-	%Files{'albatross'}++;
+	%Files{+'albatross'}++;
 };
 
 
@@ -209,13 +209,13 @@ is_deeply( $res,  @(),      'MANIFEST overrides MANIFEST.SKIP' );
 is( $warn, '',   'MANIFEST overrides MANIFEST.SKIP, no warnings' );
 
 $files = maniread;
-ok( !$files->{wibble},     'MANIFEST in good state' );
+ok( !$files->{?wibble},     'MANIFEST in good state' );
 maniadd(\%( wibble => undef ));
 maniadd(\%( yarrow => "hock" ));
 $files = maniread;
-is( $files->{wibble}, '',    'maniadd() with undef comment' );
-is( $files->{yarrow}, 'hock','          with comment' );
-is( $files->{foobar}, '',    '          preserved old entries' );
+is( $files->{?wibble}, '',    'maniadd() with undef comment' );
+is( $files->{?yarrow}, 'hock','          with comment' );
+is( $files->{?foobar}, '',    '          preserved old entries' );
 
 # test including an external manifest.skip file in MANIFEST.SKIP
 do {
@@ -249,14 +249,14 @@ do {
     ok( ! exists $files->{'mydefault.skip'},
         'mydefault.skip excluded via mydefault.skip' );
     my $extsep = $Is_VMS ?? '_' !! '.';
-    %Files{"$_.bak"}++ for @( ('MANIFEST', "MANIFEST$($extsep)SKIP"));
+    %Files{+"$_.bak"}++ for @( ('MANIFEST', "MANIFEST$($extsep)SKIP"));
 };
 
 add_file('MANIFEST'   => 'Makefile.PL');
 maniadd(\%( foo  => 'bar' ));
 $files = maniread;
 # VMS downcases the MANIFEST.  We normalize it here to match.
-%$files = %( < map { (lc $_ => $files->{$_}) } keys %$files );
+%$files = %( < map { (lc $_ => $files->{?$_}) } keys %$files );
 my %expect = %( 'makefile.pl' => '',
                'foo'    => 'bar'
              );
@@ -277,7 +277,7 @@ SKIP: do {
     try {
         maniadd(\%( 'grrrwoof' => 'yippie' ));
     };
-    like( $@->{description}, qr/^\Qmaniadd() could not open MANIFEST:\E/,  
+    like( $@->{?description}, qr/^\Qmaniadd() could not open MANIFEST:\E/,  
                  "maniadd() dies if it can't open the MANIFEST" );
 
     chmod( 0600, 'MANIFEST' );

@@ -104,13 +104,13 @@ sub char_range {
 
 # non-General Category and non-Script
 while (my ($abbrev, $files) = each %utf8::PVA_abbr_map) {
-  my $prop_name = %utf8::PropertyAlias{$abbrev};
+  my $prop_name = %utf8::PropertyAlias{?$abbrev};
   next unless $prop_name;
   next if $abbrev eq "gc_sc";
 
   for (sort keys %$files) {
     my $filename = 'File::Spec'->catfile(
-      $updir => lib => unicore => lib => $abbrev => "$files->{$_}.pl"
+      $updir => lib => unicore => lib => $abbrev => "$files->{?$_}.pl"
     );
 
     next unless -e $filename;
@@ -119,7 +119,7 @@ while (my ($abbrev, $files) = each %utf8::PVA_abbr_map) {
     my $str = char_range($h1, $h2);
 
     for my $p (@($prop_name, $abbrev)) {
-      for my $c (@($files->{$_}, $_)) {
+      for my $c (@($files->{?$_}, $_)) {
         is($str =~ m/(\p{$p: $c}+)/ && $1, substr($str, 0, -1), "$filename - $p - $c");
         is($str =~ m/(\P{$p= $c}+)/ && $1, substr($str, -1));
       }
@@ -131,7 +131,7 @@ while (my ($abbrev, $files) = each %utf8::PVA_abbr_map) {
 for my $p (@('gc', 'sc')) {
   while (my ($abbr) = each %{ %utf8::PropValueAlias{$p} }) {
     my $filename = 'File::Spec'->catfile(
-      $updir => lib => unicore => lib => gc_sc => "%utf8::PVA_abbr_map{gc_sc}->{$abbr}.pl"
+      $updir => lib => unicore => lib => gc_sc => "%utf8::PVA_abbr_map{gc_sc}->{?$abbr}.pl"
     );
 
     next unless -e $filename;
@@ -139,8 +139,8 @@ for my $p (@('gc', 'sc')) {
 
     my $str = char_range($h1, $h2);
 
-    for my $x (@($p, %( gc => 'General Category', sc => 'Script' ){$p})) {
-      for my $y (@($abbr, %utf8::PropValueAlias{$p}->{$abbr}, %utf8::PVA_abbr_map{gc_sc}->{$abbr})) {
+    for my $x (@($p, %( gc => 'General Category', sc => 'Script' ){?$p})) {
+      for my $y (@($abbr, %utf8::PropValueAlias{$p}->{?$abbr}, %utf8::PVA_abbr_map{gc_sc}->{?$abbr})) {
         is($str =~ m/(\p{$x: $y}+)/ && $1, substr($str, 0, -1));
         is($str =~ m/(\P{$x= $y}+)/ && $1, substr($str, -1));
         SKIP: do {
@@ -172,7 +172,7 @@ do {
   closedir D;
 
   for (keys %utf8::PA_reverse) {
-    my $leafname = "%utf8::PA_reverse{$_}.pl";
+    my $leafname = "%utf8::PA_reverse{?$_}.pl";
     next unless exists %files{$leafname};
 
     my $filename = 'File::Spec'->catfile($dirname, $leafname);
@@ -182,8 +182,8 @@ do {
     my $str = char_range($h1, $h2);
 
     for my $x (@('gc', 'General Category')) {
-      print "# $filename $x $_, %utf8::PA_reverse{$_}\n";
-      for my $y (@($_, %utf8::PA_reverse{$_})) {
+      print "# $filename $x $_, %utf8::PA_reverse{?$_}\n";
+      for my $y (@($_, %utf8::PA_reverse{?$_})) {
 	is($str =~ m/(\p{$x: $y}+)/ && $1, substr($str, 0, -1));
 	is($str =~ m/(\P{$x= $y}+)/ && $1, substr($str, -1));
 	test_regexp ($str, $y);
@@ -193,9 +193,9 @@ do {
 };
 
 # test the blocks (InFoobar)
-for ( grep %utf8::Canonical{$_} =~ m/^In/, keys %utf8::Canonical) {
+for ( grep %utf8::Canonical{?$_} =~ m/^In/, keys %utf8::Canonical) {
   my $filename = 'File::Spec'->catfile(
-    $updir => lib => unicore => lib => gc_sc => "%utf8::Canonical{$_}.pl"
+    $updir => lib => unicore => lib => gc_sc => "%utf8::Canonical{?$_}.pl"
   );
 
   next unless -e $filename;

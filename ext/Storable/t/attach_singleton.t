@@ -40,7 +40,7 @@ is_deeply( $struct, $thawed, 'Struct superficially looks like the original' );
 is( $struct->[1], $thawed->[1], 'Singleton thaws correctly' );
 
 # We can also test this empirically
-$struct->[1]->{value} = 'Goodbye cruel world!';
+$struct->[1]->{+value} = 'Goodbye cruel world!';
 is_deeply( $struct, $thawed, 'Empiric testing corfirms correct behaviour' );
 
 # End Tests

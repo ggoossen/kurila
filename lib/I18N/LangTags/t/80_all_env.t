@@ -10,8 +10,8 @@ print "# Using I18N::LangTags::Detect v$I18N::LangTags::Detect::VERSION\n";
 
 print "# Make sure we can assign to ENV entries\n",
       "# (Otherwise we can't run the subsequent tests)...\n";
-%ENV{'MYORP'}   = 'Zing';          ok %ENV{'MYORP'}, 'Zing';
-%ENV{'SWUZ'}   = 'KLORTHO HOOBOY'; ok %ENV{'SWUZ'}, 'KLORTHO HOOBOY';
+%ENV{+'MYORP'}   = 'Zing';          ok %ENV{?'MYORP'}, 'Zing';
+%ENV{+'SWUZ'}   = 'KLORTHO HOOBOY'; ok %ENV{?'SWUZ'}, 'KLORTHO HOOBOY';
 
 delete %ENV{'MYORP'};
 delete %ENV{'SWUZ'};
@@ -26,59 +26,59 @@ sub show {
 sub printenv {
   print "# ENV:\n";
   foreach my $k (sort keys %ENV) {
-    my $p = %ENV{$k};  $p =~ s/\n/\n#/g;
+    my $p = %ENV{?$k};  $p =~ s/\n/\n#/g;
     print "#   [$k] = [$p]\n"; }
   print "# [end of ENV]\n#\n";
 }
 
-%ENV{'IGNORE_WIN32_LOCALE'} = 1; # a hack, just for testing's sake.
+%ENV{+'IGNORE_WIN32_LOCALE'} = 1; # a hack, just for testing's sake.
 
 
 print "# Test LANGUAGE...\n";
-%ENV{'REQUEST_METHOD'} = '';
-%ENV{'LANGUAGE'}       = 'Eu-MT';
-%ENV{'LC_ALL'}         = '';
-%ENV{'LC_MESSAGES'}    = '';
-%ENV{'LANG'}           = '';
+%ENV{+'REQUEST_METHOD'} = '';
+%ENV{+'LANGUAGE'}       = 'Eu-MT';
+%ENV{+'LC_ALL'}         = '';
+%ENV{+'LC_MESSAGES'}    = '';
+%ENV{+'LANG'}           = '';
 ok show( j <      I18N::LangTags::Detect::detect()), q{["eu-mt"]};
 
 
 print "# Test LC_ALL...\n";
-%ENV{'REQUEST_METHOD'} = '';
-%ENV{'LANGUAGE'}       = '';
-%ENV{'LC_ALL'}         = 'Eu-MT';
-%ENV{'LC_MESSAGES'}    = '';
-%ENV{'LANG'}           = '';
+%ENV{+'REQUEST_METHOD'} = '';
+%ENV{+'LANGUAGE'}       = '';
+%ENV{+'LC_ALL'}         = 'Eu-MT';
+%ENV{+'LC_MESSAGES'}    = '';
+%ENV{+'LANG'}           = '';
 
 ok show( j <      I18N::LangTags::Detect::detect()), q{["eu-mt"]};
 
 print "# Test LC_MESSAGES...\n";
-%ENV{'REQUEST_METHOD'} = '';
-%ENV{'LANGUAGE'}       = '';
-%ENV{'LC_ALL'}         = '';
-%ENV{'LC_MESSAGES'}    = 'Eu-MT';
-%ENV{'LANG'}           = '';
+%ENV{+'REQUEST_METHOD'} = '';
+%ENV{+'LANGUAGE'}       = '';
+%ENV{+'LC_ALL'}         = '';
+%ENV{+'LC_MESSAGES'}    = 'Eu-MT';
+%ENV{+'LANG'}           = '';
 
 ok show( j <      I18N::LangTags::Detect::detect()), q{["eu-mt"]};
 
 
 print "# Test LANG...\n";
-%ENV{'REQUEST_METHOD'} = '';
-%ENV{'LANGUAGE'}       = '';
-%ENV{'LC_ALL'}         = '';
-%ENV{'LC_MESSAGES'}    = '';
-%ENV{'LANG'}           = 'Eu_MT';
+%ENV{+'REQUEST_METHOD'} = '';
+%ENV{+'LANGUAGE'}       = '';
+%ENV{+'LC_ALL'}         = '';
+%ENV{+'LC_MESSAGES'}    = '';
+%ENV{+'LANG'}           = 'Eu_MT';
 
 ok show( j <      I18N::LangTags::Detect::detect()), q{["eu-mt"]};
 
 
 
 print "# Test LANG...\n";
-%ENV{'LANGUAGE'} = '';
-%ENV{'REQUEST_METHOD'} = '';
-%ENV{'LC_ALL'} = '';
-%ENV{'LC_MESSAGES'} = '';
-%ENV{'LANG'}     = 'Eu_MT';
+%ENV{+'LANGUAGE'} = '';
+%ENV{+'REQUEST_METHOD'} = '';
+%ENV{+'LC_ALL'} = '';
+%ENV{+'LC_MESSAGES'} = '';
+%ENV{+'LANG'}     = 'Eu_MT';
 
 ok show( j <      I18N::LangTags::Detect::detect()), q{["eu-mt"]};
 
@@ -86,15 +86,15 @@ ok show( j <      I18N::LangTags::Detect::detect()), q{["eu-mt"]};
 
 
 print "# Test HTTP_ACCEPT_LANGUAGE...\n";
-%ENV{'REQUEST_METHOD'}       = 'GET';
-%ENV{'HTTP_ACCEPT_LANGUAGE'} = 'eu-MT';
+%ENV{+'REQUEST_METHOD'}       = 'GET';
+%ENV{+'HTTP_ACCEPT_LANGUAGE'} = 'eu-MT';
 ok show( j <      I18N::LangTags::Detect::detect()), q{["eu-mt"]};
 
 
-%ENV{'HTTP_ACCEPT_LANGUAGE'} = 'x-plorp, zaz, eu-MT, i-klung';
+%ENV{+'HTTP_ACCEPT_LANGUAGE'} = 'x-plorp, zaz, eu-MT, i-klung';
 ok show( j <      I18N::LangTags::Detect::detect()), qq{["x-plorp" "i-plorp" "zaz" "eu-mt" "i-klung" "x-klung"]};
 
-%ENV{'HTTP_ACCEPT_LANGUAGE'} = 'x-plorp, zaz, eU-Mt, i-klung';
+%ENV{+'HTTP_ACCEPT_LANGUAGE'} = 'x-plorp, zaz, eU-Mt, i-klung';
 ok show( j <      I18N::LangTags::Detect::detect()), qq{["x-plorp" "i-plorp" "zaz" "eu-mt" "i-klung" "x-klung"]};
 
 

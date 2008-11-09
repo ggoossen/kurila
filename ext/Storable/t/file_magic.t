@@ -385,7 +385,7 @@ plan tests => 31 + 2 * nelems @tests;
 my $file = "xx-$$.pst";
 
 is(try { Storable::file_magic($file) }, undef, "empty file give undef");
-like($@->{description}, qq{/^Can't open '\Q$file\E':/}, "...and croaks");
+like($@->{?description}, qq{/^Can't open '\Q$file\E':/}, "...and croaks");
 is(Storable::file_magic(__FILE__), undef, "not an image");
 
 store(\%(), $file);
@@ -393,15 +393,15 @@ do {
     my $info = Storable::file_magic($file);
     unlink($file);
     ok($info, "got info");
-    is($info->{file}, $file, "file set");
-    is($info->{hdrsize}, 11 + length(config_value('byteorder')), "hdrsize");
-    like($info->{version}, q{/^2\.\d+$/}, "sane version");
-    is($info->{version_nv}, Storable::BIN_WRITE_VERSION_NV, "version_nv match");
-    is($info->{major}, 2, "sane major");
-    ok($info->{minor}, "have minor");
-    ok($info->{minor} +>= Storable::BIN_WRITE_MINOR, "large enough minor");
+    is($info->{?file}, $file, "file set");
+    is($info->{?hdrsize}, 11 + length(config_value('byteorder')), "hdrsize");
+    like($info->{?version}, q{/^2\.\d+$/}, "sane version");
+    is($info->{?version_nv}, Storable::BIN_WRITE_VERSION_NV, "version_nv match");
+    is($info->{?major}, 2, "sane major");
+    ok($info->{?minor}, "have minor");
+    ok($info->{?minor} +>= Storable::BIN_WRITE_MINOR, "large enough minor");
 
-    ok(!$info->{netorder}, "no netorder");
+    ok(!$info->{?netorder}, "no netorder");
 
     my %attrs = %(
         nvsize  => 5.006, 
@@ -409,7 +409,7 @@ do {
         < map {$_ => 5.004} qw(byteorder intsize longsize)
     );
     for my $attr (keys %attrs) {
-        is($info->{$attr}, config_value($attr), "$attr match Config");
+        is($info->{?$attr}, config_value($attr), "$attr match Config");
     }
 };
 
@@ -418,15 +418,15 @@ do {
     my $info = Storable::file_magic($file);
     unlink($file);
     ok($info, "got info");
-    is($info->{file}, $file, "file set");
-    is($info->{hdrsize}, 6, "hdrsize");
-    like($info->{version}, q{/^2\.\d+$/}, "sane version");
-    is($info->{version_nv}, Storable::BIN_WRITE_VERSION_NV, "version_nv match");
-    is($info->{major}, 2, "sane major");
-    ok($info->{minor}, "have minor");
-    ok($info->{minor} +>= Storable::BIN_WRITE_MINOR, "large enough minor");
+    is($info->{?file}, $file, "file set");
+    is($info->{?hdrsize}, 6, "hdrsize");
+    like($info->{?version}, q{/^2\.\d+$/}, "sane version");
+    is($info->{?version_nv}, Storable::BIN_WRITE_VERSION_NV, "version_nv match");
+    is($info->{?major}, 2, "sane major");
+    ok($info->{?minor}, "have minor");
+    ok($info->{?minor} +>= Storable::BIN_WRITE_MINOR, "large enough minor");
 
-    ok($info->{netorder}, "no netorder");
+    ok($info->{?netorder}, "no netorder");
     for (qw(byteorder intsize longsize ptrsize nvsize)) {
 	ok(!exists $info->{$_}, "no $_");
     }
@@ -439,14 +439,14 @@ for my $test ( @tests) {
     print FH $data;
     close(FH) || die "Can't write $file: $!";
 
-    my $name = $expected->{file};
-    $expected->{file} = $file;
+    my $name = $expected->{?file};
+    $expected->{+file} = $file;
 
     my $info = Storable::file_magic($file);
     unlink($file);
 
     is_deeply($info, $expected, "file_magic $name");
 
-    $expected->{file} = 1;
+    $expected->{+file} = 1;
     is_deeply(Storable::read_magic($data), $expected, "read magic $name");
 }

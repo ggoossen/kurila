@@ -129,7 +129,7 @@ for my $cross_partition_test (0..1) {
 
   do { 
     my $warnings = '';
-    local $^WARN_HOOK = sub { $warnings .= @_[0]->{description} };
+    local $^WARN_HOOK = sub { $warnings .= @_[0]->{?description} };
     ok copy("file-$$", "file-$$"), 'copy(fn, fn) succeeds';
 
     like $warnings, qr/are identical/, 'but warns';
@@ -151,7 +151,7 @@ for my $cross_partition_test (0..1) {
     symlink("file-$$", "symlink-$$") or die $!;
 
     my $warnings = '';
-    local $^WARN_HOOK = sub { $warnings .= @_[0]->{description} };
+    local $^WARN_HOOK = sub { $warnings .= @_[0]->{?description} };
     ok !copy("file-$$", "symlink-$$"), 'copy to itself (via symlink) fails';
 
     like $warnings, qr/are identical/, 'emits a warning';
@@ -172,7 +172,7 @@ for my $cross_partition_test (0..1) {
     link("file-$$", "hardlink-$$") or die $!;
 
     my $warnings = '';
-    local $^WARN_HOOK = sub { $warnings .= @_[0]->{description} };
+    local $^WARN_HOOK = sub { $warnings .= @_[0]->{?description} };
     ok !copy("file-$$", "hardlink-$$"), 'copy to itself (via hardlink) fails';
 
     like $warnings, qr/are identical/, 'emits a warning';

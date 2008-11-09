@@ -8,7 +8,7 @@ try {
     print "ok 1\n";
     die "ok 3\n";
     1;
-} || print "ok 2\n$@->{description}";
+} || print "ok 2\n$@->{?description}";
 
 my $test = 4;
 

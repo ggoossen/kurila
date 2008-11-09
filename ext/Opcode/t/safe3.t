@@ -16,7 +16,7 @@ $safe->reval( qq{\@_[1] = qq/\0/ x } . $masksize );
 
 # Check that it didn't work
 $safe->reval( q{$x + $y} );
-like( $@->{description}, qr/^'?addition \(\+\)'? trapped by operation mask/,
+like( $@->{?description}, qr/^'?addition \(\+\)'? trapped by operation mask/,
 	    'opmask still in place with reval' );
 
 my $safe2 = Safe->new();
@@ -32,7 +32,7 @@ EOF
     close $fh;
     $safe2->rdo('nasty.pl');
     $safe2->reval( q{$x + $y} );
-    like( $@->{description}, qr/^'?addition \(\+\)'? trapped by operation mask/,
+    like( $@->{?description}, qr/^'?addition \(\+\)'? trapped by operation mask/,
           'opmask still in place with rdo' );
 };
 

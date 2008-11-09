@@ -3,7 +3,7 @@
 # Test is_deeply and friends with circular data structures [rt.cpan.org 7289]
 
 BEGIN {
-    if( %ENV{PERL_CORE} ) {
+    if( %ENV{?PERL_CORE} ) {
         chdir 't';
         @INC = @('../lib', 'lib');
     }
@@ -24,9 +24,9 @@ ok( eq_array ($a1, $a2) );
 ok( eq_set   ($a1, $a2) );
 
 my $h1 = \%( 1=>1, 2=>2, 3=>3 );
-$h1->{4} = $h1;
+$h1->{+4} = $h1;
 my $h2 = \%( 1=>1, 2=>2, 3=>3 );
-$h2->{4} = $h2;
+$h2->{+4} = $h2;
 
 is_deeply $h1, $h2;
 ok( eq_hash  ($h1, $h2) );

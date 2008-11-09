@@ -88,18 +88,18 @@ sub check_same {
   my $fail;
   while (my ($key, $value) = each %$suspect) {
     if (exists $orig->{$key}) {
-      if ($orig->{$key} ne $value) {
-        print "# key '$key' was '$orig->{$key}' now '$value'\n";
+      if ($orig->{?$key} ne $value) {
+        print "# key '$key' was '$orig->{?$key}' now '$value'\n";
         $fail = 1;
       }
     } else {
-      print "# key '$key' is '$orig->{$key}', unexpect.\n";
+      print "# key '$key' is '$orig->{?$key}', unexpect.\n";
       $fail = 1;
     }
   }
   foreach (keys %$orig) {
     next if (exists $suspect->{$_});
-    print "# key '$_' was '$orig->{$_}' now missing\n";
+    print "# key '$_' was '$orig->{?$_}' now missing\n";
     $fail = 1;
   }
   ok (!$fail);
@@ -111,7 +111,7 @@ my %up = %(1=>2, ab => 'ac');
 my %down = %(1=>0, ab => -1);
 
 foreach (keys %inc) {
-  my $ans = %up{$_};
+  my $ans = %up{?$_};
   my $up;
   try {$up = ++$_};
   ok ((defined $up and $up eq $ans), $up, $@);
@@ -120,7 +120,7 @@ foreach (keys %inc) {
 check_same (\%orig, \%inc);
 
 foreach (keys %dec) {
-  my $ans = %down{$_};
+  my $ans = %down{?$_};
   my $down;
   try {$down = --$_};
   ok ((defined $down and $down eq $ans), $down, $@);
@@ -129,7 +129,7 @@ foreach (keys %dec) {
 check_same (\%orig, \%dec);
 
 foreach (keys %postinc) {
-  my $ans = %postinc{$_};
+  my $ans = %postinc{?$_};
   my $up;
   try {$up = $_++};
   ok ((defined $up and $up eq $ans), $up, $@);
@@ -138,7 +138,7 @@ foreach (keys %postinc) {
 check_same (\%orig, \%postinc);
 
 foreach (keys %postdec) {
-  my $ans = %postdec{$_};
+  my $ans = %postdec{?$_};
   my $down;
   try {$down = $_--};
   ok ((defined $down and $down eq $ans), $down, $@);

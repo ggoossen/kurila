@@ -9,7 +9,7 @@
 use Config;
 
 BEGIN {
-    if (%ENV{PERL_CORE}){
+    if (%ENV{?PERL_CORE}){
 	push @INC, '../ext/Storable/t';
     } else {
 	unshift @INC, 't';
@@ -67,7 +67,7 @@ sub STORABLE_thaw {
 	my ($cloning, $undef, $a, $obj) = <@_;
 	die "STORABLE_thaw #1" unless $obj \== $self;
 	die "STORABLE_thaw #2" unless ref $a eq 'ARRAY' || @$a != 2;
-	$self->{ok} = $self;
+	$self->{+ok} = $self;
 }
 
 package OBJ_SYNC2;
@@ -77,8 +77,8 @@ use Storable < qw(dclone);
 sub make {
 	my $self = bless \%(), shift;
 	my ($ext) = <@_;
-	$self->{sync} = OBJ_SYNC->make;
-	$self->{ext} = $ext;
+	$self->{+sync} = OBJ_SYNC->make;
+	$self->{+ext} = $ext;
 	return $self;
 }
 
@@ -86,8 +86,8 @@ sub STORABLE_freeze {
 	my $self = shift;
 	my %copy = %$self;
 	my $r = \%copy;
-	my $t = dclone($r->{sync});
-	return @("", \@($t, $self->{ext}), $r, $self, $r->{ext});
+	my $t = dclone($r->{?sync});
+	return @("", \@($t, $self->{?ext}), $r, $self, $r->{?ext});
 }
 
 sub STORABLE_thaw {
@@ -96,9 +96,9 @@ sub STORABLE_thaw {
 	die "STORABLE_thaw #1" unless $obj \== $self;
 	die "STORABLE_thaw #2" unless ref $a eq 'ARRAY';
 	die "STORABLE_thaw #3" unless ref $r eq 'HASH';
-	die "STORABLE_thaw #4" unless $a->[1] \== $r->{ext};
-	$self->{ok} = $self;
-	($self->{sync}, $self->{ext}) = <@$a;
+	die "STORABLE_thaw #4" unless $a->[1] \== $r->{?ext};
+	$self->{+ok} = $self;
+	($self->{+sync}, $self->{+ext}) = <@$a;
 }
 
 package OBJ_REAL2;
@@ -144,7 +144,7 @@ ok 5, 1;
 
 $y = thaw $x;
 ok 6, 1;
-ok 7, $y->{ok} \== $y;
+ok 7, $y->{?ok} \== $y;
 
 my $ext = \@(1, 2);
 $sync = OBJ_SYNC2->make($ext);
@@ -154,9 +154,9 @@ ok 8, 1;
 my $z = thaw $x;
 $y = $z->[0];
 ok 9, 1;
-ok 10, $y->{ok} \== $y;
-ok 11, ref $y->{sync} eq 'OBJ_SYNC';
-ok 12, $y->{ext} \== $z->[1];
+ok 10, $y->{?ok} \== $y;
+ok 11, ref $y->{?sync} eq 'OBJ_SYNC';
+ok 12, $y->{?ext} \== $z->[1];
 
 $real = OBJ_REAL2->make;
 $x = freeze $real;
@@ -204,13 +204,13 @@ sub new {
 
 sub STORABLE_freeze {
 	my($self,$clonning) = <@_;
-	return @( "$self->{a}", $self->{b} );
+	return @( "$self->{?a}", $self->{?b} );
 }
 
 sub STORABLE_thaw {
 	my($self,$clonning,$dummy,$o) = <@_;
-	$self->{a} = $dummy;
-	$self->{b} = $o;
+	$self->{+a} = $dummy;
+	$self->{+b} = $o;
 }
 
 package main;
@@ -241,16 +241,16 @@ package CLASS_2;
 sub make {
 	my $self = bless \%(), shift;
 	my ($o) = <@_;
-	$self->{c1} = CLASS_1->make();
-	$self->{o} = $o;
-	$self->{c3} = bless CLASS_1->make(), "CLASS_3";
+	$self->{+c1} = CLASS_1->make();
+	$self->{+o} = $o;
+	$self->{+c3} = bless CLASS_1->make(), "CLASS_3";
 	$o->set_c2($self);
 	return $self;
 }
 
 sub STORABLE_freeze {
 	my($self, $clonning) = <@_;
-	return @( "", $self->{c1}, $self->{c3}, $self->{o} );
+	return @( "", $self->{?c1}, $self->{?c3}, $self->{?o} );
 }
 
 sub STORABLE_thaw {
@@ -259,8 +259,8 @@ sub STORABLE_thaw {
 	main::ok 30, ref $c1 eq "CLASS_1";
 	main::ok 31, ref $c3 eq "CLASS_3";
 	main::ok 32, ref $o eq "CLASS_OTHER";
-	$self->{c1} = $c1;
-	$self->{c3} = $c3;
+	$self->{+c1} = $c1;
+	$self->{+c3} = $c3;
 }
 
 package CLASS_OTHER;
@@ -270,7 +270,7 @@ sub make {
 	return $self;
 }
 
-sub set_c2 { @_[0]->{c2} = @_[1] }
+sub set_c2 { @_[0]->{+c2} = @_[1] }
 
 #
 # Is the reference count of the extra references returned from a
@@ -280,13 +280,13 @@ package Foo2;
 
 sub new {
 	my $self = bless \%(), @_[0];
-	$self->{freezed} = dump::view($self);
+	$self->{+freezed} = dump::view($self);
 	return $self;
 }
 
 sub DESTROY {
 	my $self = shift;
-	$main::refcount_ok = 1 unless dump::view($self) eq $self->{freezed};
+	$main::refcount_ok = 1 unless dump::view($self) eq $self->{?freezed};
 }
 
 package Foo3;

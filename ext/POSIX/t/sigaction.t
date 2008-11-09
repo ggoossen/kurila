@@ -41,20 +41,20 @@ do {
 	ok(!$bad, "no warnings");
 };
 
-ok($oldaction->{HANDLER} eq 'DEFAULT' ||
-   $oldaction->{HANDLER} eq 'IGNORE', $oldaction->{HANDLER});
+ok($oldaction->{?HANDLER} eq 'DEFAULT' ||
+   $oldaction->{?HANDLER} eq 'IGNORE', $oldaction->{?HANDLER});
 
-is(%SIG{HUP}, \&foo);
+is(%SIG{?HUP}, \&foo);
 
 sigaction(SIGHUP, $newaction, $oldaction);
-is($oldaction->{HANDLER}, \&foo);
+is($oldaction->{?HANDLER}, \&foo);
 
-ok($oldaction->{MASK}->ismember(SIGUSR1), "SIGUSR1 ismember MASK");
+ok($oldaction->{?MASK}->ismember(SIGUSR1), "SIGUSR1 ismember MASK");
 
 SKIP: do {
     skip("sigaction() thinks different in $^O", 1)
 	if $^O eq 'linux' || $^O eq 'unicos';
-    is($oldaction->{FLAGS}, 0);
+    is($oldaction->{?FLAGS}, 0);
 };
 
 $newaction=POSIX::SigAction->new('IGNORE');
@@ -62,9 +62,9 @@ sigaction(SIGHUP, $newaction);
 kill 'HUP', $$;
 ok(!$bad, "SIGHUP ignored");
 
-is(%SIG{HUP}, 'IGNORE');
+is(%SIG{?HUP}, 'IGNORE');
 sigaction(SIGHUP, POSIX::SigAction->new('DEFAULT'));
-is(%SIG{HUP}, undef);
+is(%SIG{?HUP}, undef);
 
 $newaction=POSIX::SigAction->new(sub { $ok10=1; });
 sigaction(SIGHUP, $newaction);
@@ -74,7 +74,7 @@ do {
 };
 ok($ok10, "SIGHUP handler called");
 
-is(ref(%SIG{HUP}), 'CODE');
+is(ref(%SIG{?HUP}), 'CODE');
 
 sigaction(SIGHUP, POSIX::SigAction->new(\&main::foo));
 # Make sure the signal mask gets restored after sigaction croak()s.
@@ -92,9 +92,9 @@ my $x=defined sigaction(SIGKILL, $newaction, $oldaction);
 kill 'HUP', $$;
 ok(!$x && $ok, "signal mask gets restored after early return");
 
-%SIG{HUP}=sub {};
+%SIG{+HUP}=sub {};
 sigaction(SIGHUP, $newaction, $oldaction);
-is(ref($oldaction->{HANDLER}), 'CODE');
+is(ref($oldaction->{?HANDLER}), 'CODE');
 
 try {
 	sigaction(SIGHUP, undef, $oldaction);
@@ -152,7 +152,7 @@ do {
 # for this one, use the accessor instead of the attribute
 
 # standard signal handling via %SIG is safe
-%SIG{HUP} = \&foo;
+%SIG{+HUP} = \&foo;
 $oldaction = POSIX::SigAction->new;
 sigaction(SIGHUP, undef, $oldaction);
 ok($oldaction->safe, "SIGHUP is safe");
@@ -184,8 +184,8 @@ SKIP: do {
     is(scalar %SIGRT, SIGRTMAX() - SIGRTMIN() + 1, "scalar SIGRT");
     my $sigrtmin;
     my $h = sub { $sigrtmin = 1 };
-    %SIGRT{SIGRTMIN} = $h;
-    is(%SIGRT{SIGRTMIN}, $h, "handler set & get");
+    %SIGRT{+SIGRTMIN} = $h;
+    is(%SIGRT{?SIGRTMIN}, $h, "handler set & get");
     kill 'SIGRTMIN', $$;
     is($sigrtmin, 1, "SIGRTMIN handler works");
 };
@@ -194,7 +194,7 @@ SKIP: do {
     eval 'use POSIX qw(SA_SIGINFO); SA_SIGINFO';
     skip("no SA_SIGINFO", 1) if $@;
     sub hiphup {
-	is(@_[1]->{signo}, SIGHUP, "SA_SIGINFO got right signal");
+	is(@_[1]->{?signo}, SIGHUP, "SA_SIGINFO got right signal");
     }
     my $act = POSIX::SigAction->new(\&hiphup, 0, SA_SIGINFO);
     sigaction(SIGHUP, $act);
@@ -202,5 +202,5 @@ SKIP: do {
 };
 
 try { sigaction(-999, "foo"); };
-like($@->{description}, qr/Negative signals/,
+like($@->{?description}, qr/Negative signals/,
     "Prevent negative signals instead of core dumping");

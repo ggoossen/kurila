@@ -28,15 +28,15 @@ GetOptions (\%options, 'section|s=s', 'release|r:s', 'center|c=s',
             'date|d=s', 'fixed=s', 'fixedbold=s', 'fixeditalic=s',
             'fixedbolditalic=s', 'name|n=s', 'official|o', 'quotes|q=s',
             'lax|l', 'help|h', 'verbose|v') or exit 1;
-pod2usage (0) if %options{help};
+pod2usage (0) if %options{?help};
 
 # Official sets --center, but don't override things explicitly set.
-if (%options{official} && !defined %options{center}) {
-    %options{center} = 'Perl Programmers Reference Guide';
+if (%options{?official} && !defined %options{?center}) {
+    %options{+center} = 'Perl Programmers Reference Guide';
 }
 
 # Verbose is only our flag, not a Pod::Man flag.
-my $verbose = %options{verbose};
+my $verbose = %options{?verbose};
 delete %options{verbose};
 
 # This isn't a valid Pod::Man option and is only accepted for backwards

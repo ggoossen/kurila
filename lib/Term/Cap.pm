@@ -116,27 +116,27 @@ sub termcap_path
     my @termcap_path;
 
     # $TERMCAP, if it's a filespec
-    push( @termcap_path, %ENV{TERMCAP} )
+    push( @termcap_path, %ENV{?TERMCAP} )
       if (
         ( exists %ENV{TERMCAP} )
         && (
             ( $^O eq 'os2' || $^O eq 'MSWin32' || $^O eq 'dos' )
-            ?? %ENV{TERMCAP} =~ m/^[a-z]:[\\\/]/is
-            !! %ENV{TERMCAP} =~ m/^\//s
+            ?? %ENV{?TERMCAP} =~ m/^[a-z]:[\\\/]/is
+            !! %ENV{?TERMCAP} =~ m/^\//s
         )
       );
-    if ( ( exists %ENV{TERMPATH} ) && ( %ENV{TERMPATH} ) )
+    if ( ( exists %ENV{TERMPATH} ) && ( %ENV{?TERMPATH} ) )
     {
 
         # Add the users $TERMPATH
-        push( @termcap_path, < split( m/(:|\s+)/, %ENV{TERMPATH} ) );
+        push( @termcap_path, < split( m/(:|\s+)/, %ENV{?TERMPATH} ) );
     }
     else
     {
 
         # Defaults
         push( @termcap_path,
-            exists %ENV{'HOME'} ?? %ENV{'HOME'} . '/.termcap' !! undef,
+            exists %ENV{'HOME'} ?? %ENV{?'HOME'} . '/.termcap' !! undef,
             '/etc/termcap', '/usr/share/misc/termcap', );
     }
 
@@ -211,15 +211,15 @@ sub Tgetent
     local $_;
 
     # Compute PADDING factor from OSPEED (to be used by Tpad)
-    if ( !$self->{OSPEED} )
+    if ( !$self->{?OSPEED} )
     {
         if ($^W)
         {
             carp "OSPEED was not set, defaulting to 9600";
         }
-        $self->{OSPEED} = 9600;
+        $self->{+OSPEED} = 9600;
     }
-    if ( $self->{OSPEED} +< 16 )
+    if ( $self->{?OSPEED} +< 16 )
     {
 
         # delays for old style speeds
@@ -227,24 +227,24 @@ sub Tgetent
             0,    200, 133.3, 90.9, 74.3, 66.7, 50, 33.3,
             16.7, 8.3, 5.5,   4.1,  2,    1,    .5, .2
         );
-        $self->{PADDING} = @pad[ $self->{OSPEED} ];
+        $self->{+PADDING} = @pad[ $self->{?OSPEED} ];
     }
     else
     {
-        $self->{PADDING} = 10000 / $self->{OSPEED};
+        $self->{+PADDING} = 10000 / $self->{?OSPEED};
     }
 
-    unless ( $self->{TERM} )
+    unless ( $self->{?TERM} )
     {
-       if ( %ENV{TERM} )
+       if ( %ENV{?TERM} )
        {
-         $self->{TERM} =  %ENV{TERM} ;
+         $self->{+TERM} =  %ENV{?TERM} ;
        }
        else
        {
           if ( $^O eq 'Win32' )
           {
-             $self->{TERM} =  'dumb';
+             $self->{+TERM} =  'dumb';
           }
           else
           {
@@ -253,16 +253,16 @@ sub Tgetent
        }
     }
 
-    $term = $self->{TERM};    # $term is the term type we are looking for
+    $term = $self->{?TERM};    # $term is the term type we are looking for
 
     # $tmp_term is always the next term (possibly :tc=...:) we are looking for
-    $tmp_term = $self->{TERM};
+    $tmp_term = $self->{?TERM};
 
     # protect any pattern metacharacters in $tmp_term
     $termpat = $tmp_term;
     $termpat =~ s/(\W)/\\$1/g;
 
-    my $foo = ( exists %ENV{TERMCAP} ?? %ENV{TERMCAP} !! '' );
+    my $foo = ( exists %ENV{TERMCAP} ?? %ENV{?TERMCAP} !! '' );
 
     # $entry is the extracted termcap entry
     if ( ( $foo !~ m:^/:s ) && ( $foo =~ m/(^|\|)$termpat(?:)[:|]/s ) )
@@ -276,7 +276,7 @@ sub Tgetent
     {
 
         # last resort--fake up a termcap from terminfo
-        local %ENV{TERM} = $term;
+        local %ENV{+TERM} = $term;
 
         if ( $^O eq 'VMS' )
         {
@@ -284,7 +284,7 @@ sub Tgetent
         }
         else
         {
-            if ( grep { -x "$_/infocmp" } split m/:/, %ENV{PATH} )
+            if ( grep { -x "$_/infocmp" } split m/:/, %ENV{?PATH} )
             {
                 try {
                     my $tmp = `infocmp -C 2>/dev/null`;
@@ -299,7 +299,7 @@ sub Tgetent
             else
             {
                # this is getting desperate now
-               if ( $self->{TERM} eq 'dumb' )
+               if ( $self->{?TERM} eq 'dumb' )
                {
                   $entry = 'dumb|80-column dumb tty::am::co#80::bl=^G:cr=^M:do=^J:sf=^J:';
                }
@@ -390,7 +390,7 @@ sub Tgetent
     croak "Can't find $term" if $entry eq '';
     $entry =~ s/:+\s*:+/:/g;    # cleanup $entry
     $entry =~ s/:+/:/g;         # cleanup $entry
-    $self->{TERMCAP} = $entry;  # save it
+    $self->{+TERMCAP} = $entry;  # save it
                                 # print STDERR "DEBUG: $entry = ", $entry, "\n";
 
     # Precompile $entry into the object
@@ -399,19 +399,19 @@ sub Tgetent
     {
         if ( defined $field && $field =~ m/^(\w\w)$/ )
         {
-            $self->{ '_' . $field } = 1 unless defined $self->{ '_' . $1 };
+            $self->{+'_' . $field } = 1 unless defined $self->{?'_' . $1 };
 
             # print STDERR "DEBUG: flag $1\n";
         }
         elsif ( defined $field && $field =~ m/^(\w\w)\@/ )
         {
-            $self->{ '_' . $1 } = "";
+            $self->{+'_' . $1 } = "";
 
             # print STDERR "DEBUG: unset $1\n";
         }
         elsif ( defined $field && $field =~ m/^(\w\w)#(.*)/ )
         {
-            $self->{ '_' . $1 } = $2 unless defined $self->{ '_' . $1 };
+            $self->{+'_' . $1 } = $2 unless defined $self->{?'_' . $1 };
 
             # print STDERR "DEBUG: numeric $1 = $2\n";
         }
@@ -419,7 +419,7 @@ sub Tgetent
         {
 
             # print STDERR "DEBUG: string $1 = $2\n";
-            next if defined $self->{ '_' . ( $cap = $1 ) };
+            next if defined $self->{?'_' . ( $cap = $1 ) };
             $_ = $2;
             s/\\E/\033/g;
             s/\\(\d\d\d)/$(pack('c',oct($1) ^&^ 0177))/g;
@@ -433,13 +433,13 @@ sub Tgetent
             s/\^(.)/$(pack('c',ord($1) ^&^ 31))/g;
             s/\\(.)/$1/g;
             s/\377/^/g;
-            $self->{ '_' . $cap } = $_;
+            $self->{+'_' . $cap } = $_;
         }
 
         # else { carp "junk in $term ignored: $field"; }
     }
-    $self->{'_pc'} = "\0" unless defined $self->{'_pc'};
-    $self->{'_bc'} = "\b" unless defined $self->{'_bc'};
+    $self->{+'_pc'} = "\0" unless defined $self->{?'_pc'};
+    $self->{+'_bc'} = "\b" unless defined $self->{?'_bc'};
     $self;
 }
 
@@ -485,11 +485,11 @@ sub Tpad
         $ms = $1;
         $ms *= $cnt if $2;
         $string = $3;
-        $decr   = $self->{PADDING};
+        $decr   = $self->{?PADDING};
         if ( $decr +> .1 )
         {
             $ms += $decr / 2;
-            $string .= $self->{'_pc'} x ( $ms / $decr );
+            $string .= $self->{?'_pc'} x ( $ms / $decr );
         }
     }
     print $FH $string if $FH;
@@ -535,14 +535,14 @@ sub Tputs
     $cnt = 0 unless $cnt;
 
     if ($cnt +> 1) {
-	$string = Tpad($self, $self->{'_' . $cap}, $cnt);
+	$string = Tpad($self, $self->{?'_' . $cap}, $cnt);
     } else {
 	# cache result because Tpad can be slow
 	unless (exists $self->{$cap}) {
-	    $self->{$cap} = exists $self->{"_$cap"} ??
-		Tpad($self, $self->{"_$cap"}, 1) !! undef;
+	    $self->{+$cap} = exists $self->{"_$cap"} ??
+		Tpad($self, $self->{?"_$cap"}, 1) !! undef;
 	}
-	$string = $self->{$cap};
+	$string = $self->{?$cap};
     }
     print $FH $string if $FH;
     $string;
@@ -605,7 +605,7 @@ sub Tgoto
 {    ## public
     my $self = shift;
     my ( $cap, $code, $tmp, $FH ) = < @_;
-    my $string = $self->{ '_' . $cap };
+    my $string = $self->{?'_' . $cap };
     my $result = '';
     my $after  = '';
     my $online = 0;
@@ -623,10 +623,10 @@ sub Tgoto
 	    $tmp = shift(@tmp);
 	    if ($tmp == 0 || $tmp == 4 || $tmp == 10) {
 		if ($online) {
-		    ++$tmp, $after .= $self->{'_up'} if $self->{'_up'};
+		    ++$tmp, $after .= $self->{?'_up'} if $self->{?'_up'};
 		}
 		else {
-		    ++$tmp, $after .= $self->{'_bc'};
+		    ++$tmp, $after .= $self->{?'_bc'};
 		}
 	    }
 	    $result .= sprintf("\%c",$tmp);
@@ -685,7 +685,7 @@ sub Trequire
     foreach my $cap ( @_)
     {
         push( @undefined, $cap )
-          unless defined $self->{ '_' . $cap } && $self->{ '_' . $cap };
+          unless defined $self->{?'_' . $cap } && $self->{?'_' . $cap };
     }
     croak "Terminal does not support: ($(join ' ',@undefined))" if (nelems @undefined);
 }

@@ -8,7 +8,7 @@ my %err = %( () );
 my %wsa = %( () );
 
 # Symbian cross-compiling environment.
-my $IsSymbian = exists %ENV{SDK} && -d "%ENV{SDK}\\epoc32";
+my $IsSymbian = exists %ENV{SDK} && -d "%ENV{?SDK}\\epoc32";
 
 my $IsMSWin32 = $^O eq 'MSWin32' && !$IsSymbian;
 
@@ -78,15 +78,15 @@ sub process_file {
     
     if ($^O eq 'MacOS') {
 	while( ~< *FH) {
-	    %err{$1} = $2
+	    %err{+$1} = $2
 		if m/^\s*#\s*define\s+(E\w+)\s+(\d+)/;
 	}
     } else {
 	while( ~< *FH) {
-	    %err{$1} = 1
+	    %err{+$1} = 1
 		if m/^\s*#\s*define\s+(E\w+)\s+/;
             if ($IsMSWin32) {
-	        %wsa{$1} = 1
+	        %wsa{+$1} = 1
 	    	    if m/^\s*#\s*define\s+WSA(E\w+)\s+/;
             }
 	}
@@ -118,26 +118,26 @@ sub get_files {
     # VMS keeps its include files in system libraries (well, except for Gcc)
     if ($^O eq 'VMS') {
 	if ($(config_value('vms_cc_type')) eq 'decc') {
-	    %file{'Sys$Library:DECC$RTLDEF.TLB'} = 1;
+	    %file{+'Sys$Library:DECC$RTLDEF.TLB'} = 1;
 	} elsif ($(config_value('vms_cc_type')) eq 'vaxc') {
-	    %file{'Sys$Library:vaxcdef.tlb'} = 1;
+	    %file{+'Sys$Library:vaxcdef.tlb'} = 1;
 	} elsif ($(config_value('vms_cc_type')) eq 'gcc') {
-	    %file{'gnu_cc_include:[000000]errno.h'} = 1;
+	    %file{+'gnu_cc_include:[000000]errno.h'} = 1;
 	}
     } elsif ($^O eq 'os390') {
 	# OS/390 C compiler doesn't generate #file or #line directives
-	%file{'/usr/include/errno.h'} = 1;
+	%file{+'/usr/include/errno.h'} = 1;
     } elsif ($^O eq 'vmesa') {
 	# OS/390 C compiler doesn't generate #file or #line directives
-	%file{'../../vmesa/errno.h'} = 1;
+	%file{+'../../vmesa/errno.h'} = 1;
     } elsif ($(config_value('archname')) eq 'epoc') {
 	# Watch out for cross compiling for EPOC (usually done on linux)
-	%file{'/usr/local/epocemx/epocsdk/include/libc/sys/errno.h'} = 1;
+	%file{+'/usr/local/epocemx/epocsdk/include/libc/sys/errno.h'} = 1;
     } elsif ($(config_value('archname')) eq 'arm-riscos') {
 	# Watch out for cross compiling for RISC OS
 	my $dep = `echo "#include <errno.h>" | gcc -E -M -`;
 	if ($dep =~ m/(\S+errno\.h)/) {
-	     %file{$1} = 1;
+	     %file{+$1} = 1;
 	}
     } elsif ($^O eq 'linux' &&
 	      $(config_value('gccversion')) ne '' && 
@@ -148,23 +148,23 @@ sub get_files {
 	# no #file or #line directives
 	my $linux_errno_h = -e '/usr/include/errno.h' ??
 	    '/usr/include/errno.h' !! '/usr/local/include/errno.h';
-	%file{$linux_errno_h} = 1;
+	%file{+$linux_errno_h} = 1;
     } elsif ($^O eq 'MacOS') {
 	# note that we are only getting the GUSI errno's here ...
 	# we might miss out on compiler-specific ones
-	%file{"%ENV{GUSI}include:sys:errno.h"} = 1;
+	%file{+"%ENV{?GUSI}include:sys:errno.h"} = 1;
 
     } elsif ($^O eq 'beos') {
 	# hidden in a special place
-	%file{'/boot/develop/headers/posix/errno.h'} = 1;
+	%file{+'/boot/develop/headers/posix/errno.h'} = 1;
 
     } elsif ($^O eq 'vos') {
 	# avoid problem where cpp returns non-POSIX pathnames
-	%file{'/system/include_library/errno.h'} = 1;
+	%file{+'/system/include_library/errno.h'} = 1;
     } elsif ($IsSymbian) {
-        my $SDK = %ENV{SDK};
+        my $SDK = %ENV{?SDK};
         $SDK =~ s!\\!/!g;
-	%file{"$SDK/epoc32/include/libc/sys/errno.h"} = 1;
+	%file{+"$SDK/epoc32/include/libc/sys/errno.h"} = 1;
     } else {
 	open(CPPI, ">","errno.c") or
 	    die "Cannot open errno.c";
@@ -203,11 +203,11 @@ sub get_files {
 		if (m/$pat/o) {
 		   my $f = $1;
 		   $f =~ s,\\\\,/,g;
-		   %file{$f} = 1;
+		   %file{+$f} = 1;
 		}
 	    }
 	    else {
-		%file{$1} = 1 if m/$pat/o;
+		%file{+$1} = 1 if m/$pat/o;
 	    }
 	}
 	close(CPPO);
@@ -238,7 +238,7 @@ sub write_errno_pm {
 	    print CPPI "#ifndef $err\n";
 	    print CPPI "#define $err WSA$err\n";
 	    print CPPI "#endif\n";
-	    %err{$err} = 1;
+	    %err{+$err} = 1;
 	}
     }
  
@@ -260,7 +260,7 @@ sub write_errno_pm {
 	    open(CPPO,"-|", "$(config_value('cpprun')) $(config_value('cppflags')) errno.c") or
 		die "Cannot run '$(config_value('cpprun')) $(config_value('cppflags')) errno.c'";
 	} elsif ($IsSymbian) {
-            my $cpp = "gcc -E -I%ENV{SDK}\\epoc32\\include\\libc -";
+            my $cpp = "gcc -E -I%ENV{?SDK}\\epoc32\\include\\libc -";
 	    open(CPPO,"-|", "$cpp < errno.c")
 		or die "Cannot exec $cpp";
         } else {
@@ -279,12 +279,12 @@ sub write_errno_pm {
 	    $expr =~ s/((?:0x)?[0-9a-fA-F]+)[LU]+\b/$1/g; # 2147483647L et alia
 	    next if $expr =~ m/^[a-zA-Z]+$/; # skip some Win32 functions
 	    if($expr =~ m/^0[xX]/) {
-		%err{$name} = hex $expr;
+		%err{+$name} = hex $expr;
 	    }
 	    else {
-	    %err{$name} = eval $expr;
+	    %err{+$name} = eval $expr;
 	}
-	    delete %err{$name} unless defined %err{$name};
+	    delete %err{$name} unless defined %err{?$name};
 	}
 	close(CPPO);
     }
@@ -313,7 +313,7 @@ EOF
             unlink("errno.c");
             if (open(C, "-|", "./errno")) {
 		while ( ~< *C) {
-		    if (m/^(\w+) (-?\d+)$/) { %err{$1} = $2 }
+		    if (m/^(\w+) (-?\d+)$/) { %err{+$1} = $2 }
 		}
 		close(C);
 	    } else {
@@ -348,7 +348,7 @@ use Config;
 EDQ
    
     my $len = 0;
-    my @err = sort { %err{$a} <+> %err{$b} } keys %err;
+    my @err = sort { %err{?$a} <+> %err{?$b} } keys %err;
     map { $len = length if length +> $len } @err;
 
     my $j = "\@EXPORT_OK = qw(" . join(" ",keys %err) . ");\n";
@@ -379,7 +379,7 @@ ESQ
     print "\t",$k,"\n    )\n);\n\n";
 
     foreach my $err ( @err) {
-	printf "sub \%s () \{ \%d \}\n",$err,%err{$err};
+	printf "sub \%s () \{ \%d \}\n",$err,%err{?$err};
     }
 
     print <<'ESQ';
@@ -387,7 +387,7 @@ my %name2no = %(
 ESQ
 
     foreach my $err ( @err) {
-	printf "    \%s => \%d,\n",$err,%err{$err};
+	printf "    \%s => \%d,\n",$err,%err{?$err};
     }
 
     print <<'ESQ';

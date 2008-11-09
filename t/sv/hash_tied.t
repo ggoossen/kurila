@@ -9,13 +9,13 @@ plan tests => 2;
 my $h=%();
 tie $h, 'TIED_HASH';
 
-$h{aap} = 'noot';
-is($h{aap}, 'noot');
+$h{+aap} = 'noot';
+is($h{?aap}, 'noot');
 
 TODO: do {
     todo_skip("hash to key assignment", 1);
-    $h{aap} = %( teun => 'vuur' );
-    is($h{aap}{teun}, 'vuur');
+    $h{+aap} = %( teun => 'vuur' );
+    is($h{?aap}{?teun}, 'vuur');
 };
 
 
@@ -30,13 +30,13 @@ sub FETCH {
 	my $self = shift;
 	my ($key) = < @_;
 	$main::hash_fetch++;
-	return $self->{$key};
+	return $self->{?$key};
 }
 
 sub STORE {
 	my $self = shift;
 	my ($key, $value) = < @_;
-	$self->{$key} = $value;
+	$self->{+$key} = $value;
 }
 
 sub FIRSTKEY {

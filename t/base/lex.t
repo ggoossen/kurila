@@ -95,14 +95,14 @@ E1
 do {
     $foo = 'FOO';
     $bar = 'BAR';
-    %foo{$bar} = 'BAZ';
+    %foo{+$bar} = 'BAZ';
     @ary[0] = 'ABC';
 };
 
-print "%foo{$bar}" eq "BAZ" ?? "ok 21\n" !! "not ok 21\n";
+print "%foo{?$bar}" eq "BAZ" ?? "ok 21\n" !! "not ok 21\n";
 
 print "$($foo)\{$bar\}" eq "FOO\{BAR\}" ?? "ok 22\n" !! "not ok 22\n";
-print "$(%foo{$bar})" eq "BAZ" ?? "ok 23\n" !! "not ok 23\n";
+print "$(%foo{?$bar})" eq "BAZ" ?? "ok 23\n" !! "not ok 23\n";
 
 #print "FOO:" =~ m/$foo[:]/ ? "ok 24\n" : "not ok 24\n";
 print "ok 24\n";
@@ -163,12 +163,12 @@ do {
   # 
 
   eval 'my $^X;';
-  print "not " unless index ($@->{description}, q|Can't use global $^X in "my"|) +> -1;
+  print "not " unless index ($@->{?description}, q|Can't use global $^X in "my"|) +> -1;
   print "ok 37\n";
 #  print "($@)\n" if $@;
 
   eval 'my $^XYZ;';
-  print "not " unless index ($@->{description}, q|Can't use global $^XYZ in "my"|) +> -1;
+  print "not " unless index ($@->{?description}, q|Can't use global $^XYZ in "my"|) +> -1;
   print "ok 38\n";
 #  print "($@)\n" if $@;
 
@@ -271,5 +271,5 @@ sub foo::::::bar { print "ok $test\n"; $test++ }
 foo::::::bar;
 
 eval "\$x =\x[E2]foo";
-if ($@->{description} =~ m/Unrecognized character \\xE2 in column 5/) { print "ok $test\n"; } else { print "not ok $test\n"; }
+if ($@->{?description} =~ m/Unrecognized character \\xE2 in column 5/) { print "ok $test\n"; } else { print "not ok $test\n"; }
 $test++;

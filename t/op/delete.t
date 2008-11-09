@@ -7,20 +7,20 @@ my (@foo, %foo, $foo, @bar, @refary, %refhash, @list);
 
 # delete() on hash elements
 
-%foo{1} = 'a';
-%foo{2} = 'b';
-%foo{3} = 'c';
-%foo{4} = 'd';
-%foo{5} = 'e';
+%foo{+1} = 'a';
+%foo{+2} = 'b';
+%foo{+3} = 'c';
+%foo{+4} = 'd';
+%foo{+5} = 'e';
 
 $foo = delete %foo{2};
 
 cmp_ok($foo,'eq','b','delete 2');
 ok(!(exists %foo{2}),'b absent');
-cmp_ok(%foo{1},'eq','a','a exists');
-cmp_ok(%foo{3},'eq','c','c exists');
-cmp_ok(%foo{4},'eq','d','d exists');
-cmp_ok(%foo{5},'eq','e','e exists');
+cmp_ok(%foo{?1},'eq','a','a exists');
+cmp_ok(%foo{?3},'eq','c','c exists');
+cmp_ok(%foo{?4},'eq','d','d exists');
+cmp_ok(%foo{?5},'eq','e','e exists');
 
 @foo = delete %foo{[@(4, 5)]};
 
@@ -29,8 +29,8 @@ cmp_ok(@foo[0],'eq','d','slice 1');
 cmp_ok(@foo[1],'eq','e','slice 2');
 ok(!(exists %foo{4}),'d absent');
 ok(!(exists %foo{5}),'e absent');
-cmp_ok(%foo{1},'eq','a','a still exists');
-cmp_ok(%foo{3},'eq','c','c still exists');
+cmp_ok(%foo{?1},'eq','a','a still exists');
+cmp_ok(%foo{?3},'eq','c','c still exists');
 
 $foo = join('',values(%foo));
 ok($foo eq 'ac' || $foo eq 'ca','remaining keys');
@@ -39,23 +39,23 @@ foreach my $key (keys %foo) {
     delete %foo{$key};
 }
 
-%foo{'foo'} = 'x';
-%foo{'bar'} = 'y';
+%foo{+'foo'} = 'x';
+%foo{+'bar'} = 'y';
 
 $foo = join('',values(%foo));
 ok($foo eq 'xy' || $foo eq 'yx','fresh keys');
 
-%refhash{"top"}->{"foo"} = "FOO";
-%refhash{"top"}->{"bar"} = "BAR";
+%refhash{"top"}->{+"foo"} = "FOO";
+%refhash{"top"}->{+"bar"} = "BAR";
 
 delete %refhash{"top"}->{"bar"};
-@list = keys %{%refhash{"top"}};
+@list = keys %{%refhash{?"top"}};
 
 cmp_ok("$(join ' ',@list)",'eq',"foo", 'autoviv and delete hashref');
 
 do {
     my %a = %('bar', 33);
-    my $b = \%a{bar};
+    my $b = \%a{+bar};
     my $c = \delete %a{bar};
 
     ok($b \== $c,'a b c equivalent');

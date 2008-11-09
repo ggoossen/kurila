@@ -13,7 +13,7 @@ BEGIN {
 use warnings;
 
 my $warn = "";
-$^WARN_HOOK = sub { print $warn; $warn .= @_[0]->{description} . "\n" };
+$^WARN_HOOK = sub { print $warn; $warn .= @_[0]->{?description} . "\n" };
 
 sub uninitialized { $warn =~ s/Use of uninitialized value[^\n]+\n//s; }
 sub tiex { }

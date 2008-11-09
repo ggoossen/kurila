@@ -87,14 +87,14 @@ my $flag = 0;
 do {
 	my $y = bless \%(), 'Dest';
 	Dump($y);
-	$y->{Self} = $y;
+	$y->{+Self} = $y;
 	Dump($y);
-	$y->{Flag} = \$flag;
-	weaken($y->{Self});
+	$y->{+Flag} = \$flag;
+	weaken($y->{?Self});
 	print "# WKED\n";
 	ok( ref($y) );
-	print "# VALS: HASH ", dump::view($y),"   SELF ", dump::view(\$y->{Self}),"  Y ", dump::view(\$y), 
-		"    FLAG: ", dump::view(\$y->{Flag}),"\n";
+	print "# VALS: HASH ", dump::view($y),"   SELF ", dump::view(\$y->{+Self}),"  Y ", dump::view(\$y), 
+		"    FLAG: ", dump::view(\$y->{+Flag}),"\n";
 	print "# VPRINT\n";
 };
 print "# OUT $flag\n";
@@ -114,11 +114,11 @@ $flag = 0;
 do {
 	my $y = bless \%(), 'Dest';
 	my $x = bless \%(), 'Dest';
-	$x->{Ref} = $y;
-	$y->{Ref} = $x;
-	$x->{Flag} = \$flag;
-	$y->{Flag} = \$flag;
-	weaken($x->{Ref});
+	$x->{+Ref} = $y;
+	$y->{+Ref} = $x;
+	$x->{+Flag} = \$flag;
+	$y->{+Flag} = \$flag;
+	weaken($x->{?Ref});
 };
 ok( $flag == 2 );
 
@@ -158,9 +158,9 @@ $b = \$a;
 ok(!isweak($b));
 
 our $x = \%();
-weaken($x->{Y} = \$a);
-ok(isweak($x->{Y}));
-ok(!isweak($x->{Z}));
+weaken($x->{+Y} = \$a);
+ok(isweak($x->{?Y}));
+ok(!isweak($x->{?Z}));
 
 #
 # Case 7: test weaken on a read only ref

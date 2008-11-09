@@ -57,14 +57,14 @@ do {
     }
     next unless oct $1 == ord 'A'; # Skip ASCII on EBCDIC, and vice versa
     my $data = unpack 'u', $3;
-    %tests{$2} = $data;
+    %tests{+$2} = $data;
   }
 };
 
 # use Data::Dumper; $Data::Dumper::Useqq = 1; print Dumper \%tests;
 sub thaw_hash {
   my ($name, $expected) = < @_;
-  my $hash = try {thaw %tests{$name}};
+  my $hash = try {thaw %tests{?$name}};
   is ($@, '', "Thawed $name without error?");
   isa_ok ($hash, 'HASH');
   ok (defined $hash && eq_hash($hash, $expected),
@@ -75,7 +75,7 @@ sub thaw_hash {
 
 sub thaw_scalar {
   my ($name, $expected, $bug) = < @_;
-  my $scalar = try {thaw %tests{$name}};
+  my $scalar = try {thaw %tests{?$name}};
   is ($@, '', "Thawed $name without error?");
   isa_ok ($scalar, 'SCALAR', "Thawed $name?");
   is ($$scalar, $expected, "And it is the data we expected?");
@@ -84,21 +84,21 @@ sub thaw_scalar {
 
 sub thaw_fail {
   my ($name, $expected) = < @_;
-  my $thing = try {thaw %tests{$name}};
+  my $thing = try {thaw %tests{?$name}};
   is ($thing, undef, "Thawed $name failed as expected?");
-  like ($@->{description}, $expected, "Error as predicted?");
+  like ($@->{?description}, $expected, "Error as predicted?");
 }
 
 sub test_locked_hash {
   my $hash = shift;
   my @keys = keys %$hash;
   my ($key, $value) = each %$hash;
-  try {$hash->{$key} = 'x' . $value};
-  like( $@->{description}, "/^Modification of a read-only value attempted/",
+  try {$hash->{+$key} = 'x' . $value};
+  like( $@->{?description}, "/^Modification of a read-only value attempted/",
         'trying to change a locked key' );
-  is ($hash->{$key}, $value, "hash should not change?");
-  try {$hash->{use} = 'perl'};
-  like( $@->{description}, "/^Attempt to access disallowed key 'use' in a restricted hash/",
+  is ($hash->{?$key}, $value, "hash should not change?");
+  try {$hash->{+use} = 'perl'};
+  like( $@->{?description}, "/^Attempt to access disallowed key 'use' in a restricted hash/",
         'trying to add another key' );
   ok (eq_array(\keys %$hash, \@keys), "Still the same keys?");
 }
@@ -107,28 +107,28 @@ sub test_restricted_hash {
   my $hash = shift;
   my @keys = keys %$hash;
   my ($key, $value) = each %$hash;
-  try {$hash->{$key} = 'x' . $value};
+  try {$hash->{+$key} = 'x' . $value};
   is( $@, '',
         'trying to change a restricted key' );
-  is ($hash->{$key}, 'x' . $value, "hash should change");
-  try {$hash->{use} = 'perl'};
-  like( $@->{description}, "/^Attempt to access disallowed key 'use' in a restricted hash/",
+  is ($hash->{?$key}, 'x' . $value, "hash should change");
+  try {$hash->{+use} = 'perl'};
+  like( $@->{?description}, "/^Attempt to access disallowed key 'use' in a restricted hash/",
         'trying to add another key' );
   ok (eq_array(\keys %$hash, \@keys), "Still the same keys?");
 }
 
 sub test_placeholder {
   my $hash = shift;
-  try {$hash->{rules} = 42};
+  try {$hash->{+rules} = 42};
   is ($@, '', 'No errors');
-  is ($hash->{rules}, 42, "New value added");
+  is ($hash->{?rules}, 42, "New value added");
 }
 
 sub test_newkey {
   my $hash = shift;
-  try {$hash->{nms} = "http://nms-cgi.sourceforge.net/"};
+  try {$hash->{+nms} = "http://nms-cgi.sourceforge.net/"};
   is ($@, '', 'No errors');
-  is ($hash->{nms}, "http://nms-cgi.sourceforge.net/", "New value added");
+  is ($hash->{?nms}, "http://nms-cgi.sourceforge.net/", "New value added");
 }
 
 # $Storable::DEBUGME = 1;

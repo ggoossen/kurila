@@ -24,7 +24,7 @@ my %types = %(
 
 # This is somewhat cheating but I can't think of anything built in that I can
 # copy that already has type PVIV
-%types{pviv} = "Perl rules!";
+%types{+pviv} = "Perl rules!";
 
 # use Devel::Peek; Dump $pvmg;
 
@@ -35,12 +35,12 @@ foreach my $source_type ( @keys) {
     foreach my $dest_type ( @keys) {
 	# Pads re-using variables might contaminate this
 	my $vars = \%();
-	$vars->{dest} = %types{$dest_type};
-	$vars->{source} = %types{$source_type};
+	$vars->{+dest} = %types{?$dest_type};
+	$vars->{+source} = %types{?$source_type};
 	# The assignment can potentially trigger assertion failures, so it's
 	# useful to have the diagnostics about what was attempted printed first
 	print "# Assigning $source_type to $dest_type\n";
-	$vars->{dest} = $vars->{source};
-	cmp_ok($vars->{dest}, ((ref $vars->{source}) ?? '\==' !! 'eq'), $vars->{source});
+	$vars->{+dest} = $vars->{?source};
+	cmp_ok($vars->{?dest}, ((ref $vars->{?source}) ?? '\==' !! 'eq'), $vars->{?source});
     }
 }

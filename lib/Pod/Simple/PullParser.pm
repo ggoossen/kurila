@@ -83,10 +83,10 @@ sub new {
   my $self = $class->SUPER::new(< @_);
   die "Couldn't construct for $class" unless $self;
 
-  $self->{'token_buffer'} ||= \@();
-  $self->{'start_token_class'} ||= 'Pod::Simple::PullParserStartToken';
-  $self->{'text_token_class'}  ||= 'Pod::Simple::PullParserTextToken';
-  $self->{'end_token_class'}   ||= 'Pod::Simple::PullParserEndToken';
+  $self->{+'token_buffer'} ||= \@();
+  $self->{+'start_token_class'} ||= 'Pod::Simple::PullParserStartToken';
+  $self->{+'text_token_class'}  ||= 'Pod::Simple::PullParserTextToken';
+  $self->{+'end_token_class'}   ||= 'Pod::Simple::PullParserEndToken';
 
   DEBUG +> 1 and print "New pullparser object: $self\n";
 
@@ -99,22 +99,22 @@ sub get_token {
   my $self = shift;
   DEBUG +> 1 and print "\nget_token starting up on $self.\n";
   DEBUG +> 2 and print " Items in token-buffer (",
-   scalar( nelems @{ $self->{'token_buffer'} } ) ,
+   scalar( nelems @{ $self->{?'token_buffer'} } ) ,
    ") :\n", < map(
      "    " . $_->dump . "\n", @{ $self->{'token_buffer'} }
    ),
-   (nelems @{ $self->{'token_buffer'} }) ?? '' !! '       (no tokens)',
+   (nelems @{ $self->{?'token_buffer'} }) ?? '' !! '       (no tokens)',
    "\n"
   ;
 
-  until( nelems @{ $self->{'token_buffer'} } ) {
+  until( nelems @{ $self->{?'token_buffer'} } ) {
     DEBUG +> 3 and print "I need to get something into my empty token buffer...\n";
-    if($self->{'source_dead'}) {
+    if($self->{?'source_dead'}) {
       DEBUG and print "$self 's source is dead.\n";
       push @{ $self->{'token_buffer'} }, undef;
     } elsif(exists $self->{'source_fh'}) {
       my @lines;
-      my $fh = $self->{'source_fh'}
+      my $fh = $self->{?'source_fh'}
        || Carp::croak('You have to call set_source before you can call get_token');
        
       DEBUG and print "$self 's source is filehandle $fh.\n";
@@ -154,8 +154,8 @@ sub get_token {
       $self->SUPER::parse_lines(< @lines);
       
     } elsif(exists $self->{'source_arrayref'}) {
-      DEBUG and print "$self 's source is arrayref $self->{'source_arrayref'}, with ",
-       scalar(nelems @{$self->{'source_arrayref'}}), " items left in it.\n";
+      DEBUG and print "$self 's source is arrayref $self->{?'source_arrayref'}, with ",
+       scalar(nelems @{$self->{?'source_arrayref'}}), " items left in it.\n";
 
       DEBUG +> 3 and print "  Fetching ", Pod::Simple::MANY_LINES, " lines.\n";
       $self->SUPER::parse_lines(
@@ -163,7 +163,7 @@ sub get_token {
         0,
         Pod::Simple::MANY_LINES
       );
-      unless( nelems @{ $self->{'source_arrayref'} } ) {
+      unless( nelems @{ $self->{?'source_arrayref'} } ) {
         DEBUG and print "That's it for that source arrayref!  Killing.\n";
         $self->SUPER::parse_lines(undef);
         delete $self->{'source_arrayref'}; # so it can be GC'd
@@ -172,20 +172,20 @@ sub get_token {
 
     } elsif(exists $self->{'source_scalar_ref'}) {
 
-      DEBUG and print "$self 's source is scalarref $self->{'source_scalar_ref'}, with ",
-        length(${ $self->{'source_scalar_ref'} }) -
-        (pos(${ $self->{'source_scalar_ref'} }) || 0),
+      DEBUG and print "$self 's source is scalarref $self->{?'source_scalar_ref'}, with ",
+        length(${ $self->{?'source_scalar_ref'} }) -
+        (pos(${ $self->{?'source_scalar_ref'} }) || 0),
         " characters left to parse.\n";
 
       DEBUG +> 3 and print " Fetching a line from source-string...\n";
-      if( ${ $self->{'source_scalar_ref'} } =~
+      if( ${ $self->{?'source_scalar_ref'} } =~
         m/([^\n\r]*)((?:\r?\n)?)/g
       ) {
         #print(">> $1\n"),
         $self->SUPER::parse_lines($1)
          if length($1) or length($2)
-          or pos(     ${ $self->{'source_scalar_ref'} })
-           != length( ${ $self->{'source_scalar_ref'} });
+          or pos(     ${ $self->{?'source_scalar_ref'} })
+           != length( ${ $self->{?'source_scalar_ref'} });
          # I.e., unless it's a zero-length "empty line" at the very
          #  end of "foo\nbar\n" (i.e., between the \n and the EOS).
       } else { # that's the end.  Byebye
@@ -200,7 +200,7 @@ sub get_token {
     }
   }
   DEBUG and print "get_token about to return ", <
-   Pod::Simple::pretty( (nelems @{$self->{'token_buffer'}}
+   Pod::Simple::pretty( (nelems @{$self->{?'token_buffer'}}
 )     ?? $self->{'token_buffer'}->[-1] !! undef
    ), "\n";
   return shift @{$self->{'token_buffer'}}; # that's an undef if empty
@@ -222,7 +222,7 @@ sub unget_token {
   
   unshift @{$self->{'token_buffer'}}, < @_;
   DEBUG +> 1 and print "Token buffer now has ",
-   scalar(nelems @{$self->{'token_buffer'}}), " items in it.\n";
+   scalar(nelems @{$self->{?'token_buffer'}}), " items in it.\n";
   return;
 }
 
@@ -232,24 +232,24 @@ sub unget_token {
 
 sub set_source {
   my $self = shift @_;
-  return $self->{'source_fh'} unless (nelems @_);
+  return $self->{?'source_fh'} unless (nelems @_);
   my $handle;
   if(!defined @_[0]) {
     Carp::croak("Can't use empty-string as a source for set_source");
   } elsif(ref(\( @_[0] )) eq 'GLOB') {
-    $self->{'source_filename'} = '*' . Symbol::glob_name($handle = @_[0]);
+    $self->{+'source_filename'} = '*' . Symbol::glob_name($handle = @_[0]);
     DEBUG and print "$self 's source is glob " . Symbol::glob_name(@_[0]) . "\n";
     # and fall thru   
   } elsif(ref( @_[0] ) eq 'SCALAR') {
-    $self->{'source_scalar_ref'} = @_[0];
+    $self->{+'source_scalar_ref'} = @_[0];
     DEBUG and print "$self 's source is scalar ref @_[0]\n";
     return;
   } elsif(ref( @_[0] ) eq 'ARRAY') {
-    $self->{'source_arrayref'} = @_[0];
+    $self->{+'source_arrayref'} = @_[0];
     DEBUG and print "$self 's source is array ref @_[0]\n";
     return;
   } elsif(ref @_[0]) {
-    $self->{'source_filename'} = dump::view($handle = @_[0]);
+    $self->{+'source_filename'} = dump::view($handle = @_[0]);
     DEBUG and print "$self 's source is fh-obj @_[0]\n";
   } elsif(!length @_[0]) {
     Carp::croak("Can't use empty-string as a source for set_source");
@@ -260,13 +260,13 @@ sub set_source {
       open(PODSOURCE, "<", "@_[0]") || Carp::croak "Can't open @_[0]: $!";
       $handle = *PODSOURCE{IO};
     };
-    $self->{'source_filename'} = @_[0];
+    $self->{+'source_filename'} = @_[0];
     DEBUG and print "  Its name is @_[0].\n";
 
     # TODO: file-discipline things here!
   }
 
-  $self->{'source_fh'} = $handle;
+  $self->{+'source_fh'} = $handle;
   DEBUG and print "  Its handle is $handle\n";
   return 1;
 }
@@ -328,10 +328,10 @@ sub _get_titled_section {
    if %options;
 
   my %content_containers;
-  %content_containers{'Para'} = 1;
+  %content_containers{+'Para'} = 1;
   if($accept_verbatim) {
-    %content_containers{'Verbatim'} = 1;
-    %content_containers{'VerbatimFormatted'} = 1;
+    %content_containers{+'Verbatim'} = 1;
+    %content_containers{+'VerbatimFormatted'} = 1;
   }
 
   my $token_count = 0;
@@ -404,7 +404,7 @@ sub _get_titled_section {
     
     elsif($state == 2) {
       # seeking start of para (which must immediately follow)
-      if($token->is_start and %content_containers{ $token->tagname }) {
+      if($token->is_start and %content_containers{?$token->tagname }) {
         DEBUG and print "  Found start of Para.  Accumulating content...\n";
         $para_text_content = '';
         ++$state;
@@ -422,7 +422,7 @@ sub _get_titled_section {
         $para_text_content .= $token->text;
         # and keep looking
         
-      } elsif( $token->is_end and %content_containers{ $token->tagname } ) {
+      } elsif( $token->is_end and %content_containers{?$token->tagname } ) {
         DEBUG and print "  Found end of Para.  Considering content: ",
           $para_text_content, "\n";
 
@@ -471,7 +471,7 @@ sub _handle_element_start {
   DEBUG +> 2 and print "++ @_[0] (", < map("<$_> ", %{@_[1]}), ")\n";
   
   push @{ $self->{'token_buffer'} }, 
-       $self->{'start_token_class'}->new(< @_);
+       $self->{?'start_token_class'}->new(< @_);
   return;
 }
 
@@ -479,7 +479,7 @@ sub _handle_text {
   my $self = shift;   # leaving ($text)
   DEBUG +> 2 and print "== @_[0]\n";
   push @{ $self->{'token_buffer'} },
-       $self->{'text_token_class'}->new(< @_);
+       $self->{?'text_token_class'}->new(< @_);
   return;
 }
 
@@ -487,7 +487,7 @@ sub _handle_element_end {
   my $self = shift;   # leaving ($element_name);
   DEBUG +> 2 and print "-- @_[0]\n";
   push @{ $self->{'token_buffer'} },
-       $self->{'end_token_class'}->new(< @_);
+       $self->{?'end_token_class'}->new(< @_);
   return;
 }
 

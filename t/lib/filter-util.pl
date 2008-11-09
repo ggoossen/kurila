@@ -47,7 +47,7 @@ foreach ( @INC)
 $Inc = "-I::lib" if $^O eq 'MacOS';
 
 $Perl = '' ;
-$Perl = (%ENV{'FULLPERL'} or $^X or 'perl') ;
+$Perl = (%ENV{?'FULLPERL'} or $^X or 'perl') ;
 
 $Perl = "$Perl -MMac::err=unix" if $^O eq 'MacOS';
 $Perl = "$Perl -w" ;

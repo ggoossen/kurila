@@ -40,7 +40,7 @@ sub code2currency
     $code = lc($code);
     if (exists %CODES{$code})
     {
-        return %CODES{$code};
+        return %CODES{?$code};
     }
     else
     {
@@ -66,7 +66,7 @@ sub currency2code
     $curr = lc($curr);
     if (exists %CURRENCIES{$curr})
     {
-        return %CURRENCIES{$curr};
+        return %CURRENCIES{?$curr};
     }
     else
     {
@@ -114,8 +114,8 @@ do {
         next unless m/\S/;
         chop;
         ($code, $currency) = < split(m/:/, $_, 2);
-        %CODES{$code} = $currency;
-        %CURRENCIES{lc "$currency"} = $code;
+        %CODES{+$code} = $currency;
+        %CURRENCIES{+lc "$currency"} = $code;
     }
 
     close(DATA);

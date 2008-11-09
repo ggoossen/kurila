@@ -35,7 +35,7 @@ sub do_cksum {
 	local *FH;
 	if (open(FH, "<", $f)) {
 	    local $/;
-	    %cksum{$f} = unpack("\%32C*", ~< *FH);
+	    %cksum{+$f} = unpack("\%32C*", ~< *FH);
 	    close FH;
 	} else {
 	    warn "$0: $f: $!\n";
@@ -55,9 +55,9 @@ foreach my $pl (qw (keywords.pl opcode.pl embed.pl
   my @chg;
   for my $f ( @{ %gen{$pl} }) {
       push(@chg, $f)
-	  if !defined(%cksum0{$f}) ||
-	     !defined(%cksum1{$f}) ||
-	     %cksum0{$f} ne %cksum1{$f};
+	  if !defined(%cksum0{?$f}) ||
+	     !defined(%cksum1{?$f}) ||
+	     %cksum0{?$f} ne %cksum1{?$f};
   }
   print "Changed: $(join ' ',@chg)\n" if (nelems @chg);
 }

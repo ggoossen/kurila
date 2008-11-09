@@ -28,10 +28,10 @@ our @ISA = qw(ExtUtils::MM_Win32);
 
 use ExtUtils::MakeMaker < qw( &neatvalue );
 
-%ENV{EMXSHELL} = 'sh'; # to run `commands`
+%ENV{+EMXSHELL} = 'sh'; # to run `commands`
 
-my $BORLAND  = %Config{'cc'} =~ m/^bcc/i;
-my $GCC      = %Config{'cc'} =~ m/^gcc/i;
+my $BORLAND  = %Config{?'cc'} =~ m/^bcc/i;
+my $GCC      = %Config{?'cc'} =~ m/^gcc/i;
 
 
 =item os_flavor
@@ -67,39 +67,39 @@ sub init_platform {
 
     # incpath is copied to makefile var INCLUDE in constants sub, here just 
     # make it empty
-    my $libpth = %Config{'libpth'};
+    my $libpth = %Config{?'libpth'};
     $libpth =~ s( )(;);
-    $self->{'LIBPTH'} = $libpth;
+    $self->{+'LIBPTH'} = $libpth;
 
-    $self->{'BASE_IMPORT'} = %Config{'base_import'};
+    $self->{+'BASE_IMPORT'} = %Config{?'base_import'};
 
     # Additional import file specified from Makefile.pl
-    if($self->{'base_import'}) {
-        $self->{'BASE_IMPORT'} .= ', ' . $self->{'base_import'};
+    if($self->{?'base_import'}) {
+        $self->{+'BASE_IMPORT'} .= ', ' . $self->{?'base_import'};
     }
  
-    $self->{'NLM_VERSION'} = %Config{'nlm_version'};
-    $self->{'MPKTOOL'}	= %Config{'mpktool'};
-    $self->{'TOOLPATH'}	= %Config{'toolpath'};
+    $self->{+'NLM_VERSION'} = %Config{?'nlm_version'};
+    $self->{+'MPKTOOL'}	= %Config{?'mpktool'};
+    $self->{+'TOOLPATH'}	= %Config{?'toolpath'};
 
-    (my $boot = $self->{'NAME'}) =~ s/:/_/g;
-    $self->{'BOOT_SYMBOL'}=$boot;
+    (my $boot = $self->{?'NAME'}) =~ s/:/_/g;
+    $self->{+'BOOT_SYMBOL'}=$boot;
 
     # If the final binary name is greater than 8 chars,
     # truncate it here.
-    if(length($self->{'BASEEXT'}) +> 8) {
-        $self->{'NLM_SHORT_NAME'} = substr($self->{'BASEEXT'},0,8);
+    if(length($self->{?'BASEEXT'}) +> 8) {
+        $self->{+'NLM_SHORT_NAME'} = substr($self->{?'BASEEXT'},0,8);
     }
 
     # Get the include path and replace the spaces with ;
     # Copy this to makefile as INCLUDE = d:\...;d:\;
-    ($self->{INCLUDE} = %Config{'incpath'}) =~ s/([ ]*)-I/;/g;
+    ($self->{+INCLUDE} = %Config{?'incpath'}) =~ s/([ ]*)-I/;/g;
 
     # Set the path to CodeWarrior binaries which might not have been set in
     # any other place
-    $self->{PATH} = '$(PATH);$(TOOLPATH)';
+    $self->{+PATH} = '$(PATH);$(TOOLPATH)';
 
-    $self->{MM_NW5_VERSION} = $VERSION;
+    $self->{+MM_NW5_VERSION} = $VERSION;
 }
 
 sub platform_constants {
@@ -114,8 +114,8 @@ sub platform_constants {
                           MM_NW5_VERSION
                       ))
     {
-        next unless defined $self->{$macro};
-        $make_frag .= "$macro = $self->{$macro}\n";
+        next unless defined $self->{?$macro};
+        $make_frag .= "$macro = $self->{?$macro}\n";
     }
 
     return $make_frag;
@@ -128,9 +128,9 @@ sub platform_constants {
 
 sub const_cccmd {
     my($self,$libperl)=< @_;
-    return $self->{CONST_CCCMD} if $self->{CONST_CCCMD};
+    return $self->{?CONST_CCCMD} if $self->{?CONST_CCCMD};
     return '' unless $self->needs_linking();
-    return $self->{CONST_CCCMD} = <<'MAKE_FRAG';
+    return $self->{+CONST_CCCMD} = <<'MAKE_FRAG';
 CCCMD = $(CC) $(CCFLAGS) $(INC) $(OPTIMIZE) \
 	$(PERLTYPE) $(MPOLLUTE) -o $@ \
 	-DVERSION=\"$(VERSION)\" -DXS_VERSION=\"$(XS_VERSION)\"
@@ -155,7 +155,7 @@ END
 
     # If this extension has it's own library (eg SDBM_File)
     # then copy that to $(INST_STATIC) and add $(OBJECT) into it.
-    $m .= <<'END'  if $self->{MYEXTLIB};
+    $m .= <<'END'  if $self->{?MYEXTLIB};
 	$self->{CP} $(MYEXTLIB) $@
 END
 
@@ -176,7 +176,7 @@ END
 	$(CHMOD) 755 $@
 END
 
-    $m .= <<'END' if $self->{PERL_SRC};
+    $m .= <<'END' if $self->{?PERL_SRC};
 	$(NOECHO) $(ECHO) "$(EXTRALIBS)" >> $(PERL_SRC)\ext.libs
 
 
@@ -196,11 +196,11 @@ sub dynamic_lib {
 
     return '' unless $self->has_link_code;
 
-    my($otherldflags) = %attribs{OTHERLDFLAGS} || ($BORLAND ?? 'c0d32.obj'!! '');
-    my($inst_dynamic_dep) = %attribs{INST_DYNAMIC_DEP} || "";
+    my($otherldflags) = %attribs{?OTHERLDFLAGS} || ($BORLAND ?? 'c0d32.obj'!! '');
+    my($inst_dynamic_dep) = %attribs{?INST_DYNAMIC_DEP} || "";
     my($ldfrom) = '$(LDFROM)';
 
-    (my $boot = $self->{NAME}) =~ s/:/_/g;
+    (my $boot = $self->{?NAME}) =~ s/:/_/g;
 
     my $m = <<'MAKE_FRAG';
 # This section creates the dynamically loadable $(INST_DYNAMIC)
@@ -216,7 +216,7 @@ $(INST_DYNAMIC): $(OBJECT) $(MYEXTLIB) $(BOOTSTRAP) $(INST_ARCHAUTODIR)$(DFSEP).
 MAKE_FRAG
 
 
-    if ( $self->{CCFLAGS} =~ m/ -DMPK_ON /) {
+    if ( $self->{?CCFLAGS} =~ m/ -DMPK_ON /) {
         $m .= <<'MAKE_FRAG';
 	$(MPKTOOL) $(XDCFLAGS) $(BASEEXT).xdc
 	$(NOECHO) $(ECHO) xdcdata $(BASEEXT).xdc >> $(BASEEXT).def
@@ -228,7 +228,7 @@ MAKE_FRAG
     $m .= sprintf '	$(LD) $(LDFLAGS) $(OBJECT:.obj=.obj) -desc "Perl %s Extension ($(BASEEXT))  XS_VERSION: $(XS_VERSION)" -nlmversion $(NLM_VERSION)', $version;
 
     # Taking care of long names like FileHandle, ByteLoader, SDBM_File etc
-    if($self->{NLM_SHORT_NAME}) {
+    if($self->{?NLM_SHORT_NAME}) {
         # In case of nlms with names exceeding 8 chars, build nlm in the 
         # current dir, rename and move to auto\lib.
         $m .= q{ -o $(NLM_SHORT_NAME).$(DLEXT)}
@@ -237,11 +237,11 @@ MAKE_FRAG
     }
 
     # Add additional lib files if any (SDBM_File)
-    $m .= q{ $(MYEXTLIB) } if $self->{MYEXTLIB};
+    $m .= q{ $(MYEXTLIB) } if $self->{?MYEXTLIB};
 
     $m .= q{ $(PERL_INC)\Main.lib -commandfile $(BASEEXT).def}."\n";
 
-    if($self->{NLM_SHORT_NAME}) {
+    if($self->{?NLM_SHORT_NAME}) {
         $m .= <<'MAKE_FRAG';
 	if exist $(INST_AUTODIR)\$(NLM_SHORT_NAME).$(DLEXT) del $(INST_AUTODIR)\$(NLM_SHORT_NAME).$(DLEXT) 
 	move $(NLM_SHORT_NAME).$(DLEXT) $(INST_AUTODIR)

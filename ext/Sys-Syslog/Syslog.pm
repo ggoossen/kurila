@@ -48,11 +48,11 @@ do {
         ),
     );
 
-    our @EXPORT = @{%EXPORT_TAGS{standard}};
+    our @EXPORT = @{%EXPORT_TAGS{?standard}};
 
     our @EXPORT_OK = @(
-        < @{%EXPORT_TAGS{extended}}, 
-        < @{%EXPORT_TAGS{macros}}, 
+        < @{%EXPORT_TAGS{?extended}}, 
+        < @{%EXPORT_TAGS{?macros}}, 
     );
 
     try {
@@ -117,7 +117,7 @@ my @fallbackMethods = @( () );
 $sock_timeout = 0.25 if $^O =~ m/darwin/;
 
 # coderef for a nicer handling of errors
-my $err_sub = %options{nofatal} ?? \&warnings::warnif !! sub { die shift; };
+my $err_sub = %options{?nofatal} ?? \&warnings::warnif !! sub { die shift; };
 
 
 sub openlog {
@@ -129,11 +129,11 @@ sub openlog {
     $facility ||= LOG_USER();
 
     for my $opt (split m/\b/, $logopt) {
-        %options{$opt} = 1 if exists %options{$opt}
+        %options{+$opt} = 1 if exists %options{$opt}
     }
 
-    $err_sub = %options{nofatal} ?? \&warnings::warnif !! sub { die shift; };
-    return 1 unless %options{ndelay};
+    $err_sub = %options{?nofatal} ?? \&warnings::warnif !! sub { die shift; };
+    return 1 unless %options{?ndelay};
     connect_log();
 }
 
@@ -321,7 +321,7 @@ sub syslog {
     }
     else {
         my $whoami = $ident;
-        $whoami .= "[$$]" if %options{pid};
+        $whoami .= "[$$]" if %options{?pid};
 
         $sum = $numpri + $numfac;
         my $oldlocale = setlocale(LC_TIME);
@@ -378,7 +378,7 @@ sub _syslog_send_console {
     # to the caller.
     if (my $pid = fork) {
 
-	if (%options{nowait}) {
+	if (%options{?nowait}) {
 	    return 1;
 	} else {
 	    if (waitpid($pid, 0) +>= 0) {
@@ -658,7 +658,7 @@ sub connect_native {
 
     # reconstruct the numeric equivalent of the options
     for my $opt (keys %options) {
-        $logopt += xlate($opt) if %options{$opt}
+        $logopt += xlate($opt) if %options{?$opt}
     }
 
     try { openlog_xs($ident, $logopt, xlate($facility)) };

@@ -146,7 +146,7 @@ foreach (keys %chomp) {
     $err =~ s/\n$//s;
     fail ("\$\@ = \"$err\"");
   } else {
-    is ($_, %chomp{$key}, "chomp hash key");
+    is ($_, %chomp{?$key}, "chomp hash key");
   }
 }
 
@@ -158,19 +158,19 @@ foreach (keys %chop) {
     $err =~ s/\n$//s;
     fail ("\$\@ = \"$err\"");
   } else {
-    is ($_, %chop{$key}, "chop hash key");
+    is ($_, %chop{?$key}, "chop hash key");
   }
 }
 
 # chop and chomp can't be lvalues
 eval 'chop($x) = 1;';
-ok($@->{description} =~ m/Can\'t modify.*chop.*in.*assignment/);
+ok($@->{?description} =~ m/Can\'t modify.*chop.*in.*assignment/);
 eval 'chomp($x) = 1;';
-ok($@->{description} =~ m/Can\'t modify.*chom?p.*in.*assignment/);
+ok($@->{?description} =~ m/Can\'t modify.*chom?p.*in.*assignment/);
 eval 'chop($x, $y) = (1, 2);';
-ok($@->{description} =~ m/Can\'t modify.*chop.*in.*assignment/);
+ok($@->{?description} =~ m/Can\'t modify.*chop.*in.*assignment/);
 eval 'chomp($x, $y) = (1, 2);';
-ok($@->{description} =~ m/Can\'t modify.*chom?p.*in.*assignment/);
+ok($@->{?description} =~ m/Can\'t modify.*chom?p.*in.*assignment/);
 
 do {
     use utf8;

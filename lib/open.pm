@@ -74,7 +74,7 @@ sub import {
             }
 	    push(@val,":$layer");
 	    if ($layer =~ m/^(crlf|raw)$/) {
-		%^H{"open_$type"} = $layer;
+		%^H{+"open_$type"} = $layer;
 	    }
 	}
 	if ($type eq 'IN') {

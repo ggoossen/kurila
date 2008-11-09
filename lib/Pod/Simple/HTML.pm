@@ -194,7 +194,7 @@ sub new {
   );
   $new->html_footer( qq[\n<!-- end doc -->\n\n</body></html>\n] );
 
-  $new->{'Tagmap'} = \%(< %Tagmap);
+  $new->{+'Tagmap'} = \%(< %Tagmap);
   return $new;
 }
 
@@ -231,7 +231,7 @@ sub do_beginning {
       DEBUG and print "No content seen in search for title.\n";
       return;
     }
-    $self->{'Title'} = $title;
+    $self->{+'Title'} = $title;
 
     if(defined $title and $title =~ m/\S/) {
       $title = $self->title_prefix . esc($title) . $self->title_postfix;
@@ -267,7 +267,7 @@ sub do_beginning {
     $after =~ s{(</head>)}{$link\n$1}i;  # otherwise nevermind
   }
 
-  print {$self->{'output_fh'}}
+  print {$self->{?'output_fh'}}
     $self->html_header_before_title || '',
     $title, # already escaped
     $after,
@@ -313,7 +313,7 @@ See 'perldoc $class' for more info.
 
 sub do_end {
   my $self = @_[0];
-  print {$self->{'output_fh'}}  $self->html_footer || '';
+  print {$self->{?'output_fh'}}  $self->html_footer || '';
   return 1;
 }
 
@@ -372,7 +372,7 @@ sub index_as_html {
   my $self = @_[0];
   # This is meant to be called AFTER the input document has been parsed!
 
-  my $points = $self->{'PSHTML_index_points'} || \@();
+  my $points = $self->{?'PSHTML_index_points'} || \@();
   
   (nelems @$points) +> 1 or return qq[<div class='indexgroupEmpty'></div>\n];
    # There's no point in having a 0-item or 1-item index, I dare say.
@@ -418,8 +418,8 @@ sub index_as_html {
 
 sub _do_middle_main_loop {
   my $self = @_[0];
-  my $fh = $self->{'output_fh'};
-  my $tagmap = $self->{'Tagmap'};
+  my $fh = $self->{?'output_fh'};
+  my $tagmap = $self->{?'Tagmap'};
   
   my($token, $type, $tagname, $linkto, $linktype);
   my @stack;
@@ -444,7 +444,7 @@ sub _do_middle_main_loop {
         }
 
       } elsif ($tagname eq 'item-text' or $tagname =~ m/^head\d$/s) {
-        print $fh $tagmap->{$tagname} || next;
+        print $fh $tagmap->{?$tagname} || next;
 
         my @to_unget;
         while(1) {
@@ -467,7 +467,7 @@ sub _do_middle_main_loop {
           DEBUG and print "Linearized ", scalar(nelems @to_unget),
            " tokens as \"$name\".\n";
           push @{ $self->{'PSHTML_index_points'} }, \@($tagname, $name)
-           if %ToIndex{ $tagname };
+           if %ToIndex{?$tagname };
             # Obviously, this discards all formatting codes (saving
             #  just their content), but ahwell.
            
@@ -496,7 +496,7 @@ sub _do_middle_main_loop {
           print $fh @stack[-1];
           @stack[-1] = '';
         }
-        print $fh $tagmap->{$tagname} || next;
+        print $fh $tagmap->{?$tagname} || next;
         ++$dont_wrap if $tagname eq 'Verbatim' or $tagname eq "VerbatimFormatted"
           or $tagname eq 'X';
       }
@@ -508,17 +508,17 @@ sub _do_middle_main_loop {
           print $fh $end;
         }
       } elsif( $tagname =~ m/^item-/s and nelems @stack) {
-        @stack[-1] = $tagmap->{"/$tagname"};
+        @stack[-1] = $tagmap->{?"/$tagname"};
         if( $tagname eq 'item-text' and defined(my $next = $self->get_token) ) {
           $self->unget_token($next);
           if( $next->type eq 'start' and $next->tagname !~ m/^item-/s ) {
-            print $fh $tagmap->{"/item-text"},$tagmap->{"item-body"};
-            @stack[-1] = $tagmap->{"/item-body"};
+            print $fh $tagmap->{?"/item-text"},$tagmap->{?"item-body"};
+            @stack[-1] = $tagmap->{?"/item-body"};
           }
         }
         next;
       }
-      print $fh $tagmap->{"/$tagname"} || next;
+      print $fh $tagmap->{?"/$tagname"} || next;
       --$dont_wrap if $tagname eq 'Verbatim' or $tagname eq 'X';
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -725,7 +725,7 @@ sub batch_mode_rectify_path {
 sub resolve_pod_link_by_table {
   # A crazy hack to allow specifying custom L<foo> => URL mappings
 
-  return unless @_[0]->{'podhtml_LOT'};  # An optimizy shortcut
+  return unless @_[0]->{?'podhtml_LOT'};  # An optimizy shortcut
 
   my($self, $to, $section) = < @_;
 
@@ -733,9 +733,9 @@ sub resolve_pod_link_by_table {
 
   if(defined $section) {
     $to = '' unless defined $to and length $to;
-    return $self->{'podhtml_LOT'}->{"$to#$section"}; # quite possibly undef!
+    return $self->{'podhtml_LOT'}->{?"$to#$section"}; # quite possibly undef!
   } else {
-    return $self->{'podhtml_LOT'}->{$to};            # quite possibly undef!
+    return $self->{'podhtml_LOT'}->{?$to};            # quite possibly undef!
   }
   return;
 }

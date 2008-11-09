@@ -532,7 +532,7 @@ sub _error {
     my $message = shift;
     my $object  = shift;
 
-    if ($arg->{error}) {
+    if ($arg->{?error}) {
         $object = '' unless defined $object;
         push @{${$arg->{error}}}, \%($object => "$message: $!");
     }
@@ -558,14 +558,14 @@ sub mkpath {
         my ($verbose, $mode);
         ($paths, $verbose, $mode) = < @_;
         $paths = \@($paths) unless UNIVERSAL::isa($paths,'ARRAY');
-        $arg->{verbose} = defined $verbose ?? $verbose !! 0;
-        $arg->{mode}    = defined $mode    ?? $mode    !! 0777;
+        $arg->{+verbose} = defined $verbose ?? $verbose !! 0;
+        $arg->{+mode}    = defined $mode    ?? $mode    !! 0777;
     }
     else {
         if ((nelems @_) +> 0 and UNIVERSAL::isa(@_[-1], 'HASH')) {
             $arg = pop @_;
-            exists $arg->{mask} and $arg->{mode} = delete $arg->{mask};
-            $arg->{mode} = 0777 unless exists $arg->{mode};
+            exists $arg->{mask} and $arg->{+mode} = delete $arg->{mask};
+            $arg->{+mode} = 0777 unless exists $arg->{mode};
             ${$arg->{error}} = \@() if exists $arg->{error};
         }
         else { <
@@ -595,8 +595,8 @@ sub _mkpath {
 	unless (-d $parent or $path eq $parent) {
             push(@created, <_mkpath($arg, \@($parent)));
         }
-        print "mkdir $path\n" if $arg->{verbose};
-        if (mkdir($path,$arg->{mode})) {
+        print "mkdir $path\n" if $arg->{?verbose};
+        if (mkdir($path,$arg->{?mode})) {
             push(@created, $path);
 	}
         else {
@@ -606,7 +606,7 @@ sub _mkpath {
 	    # allow for another process to have created it meanwhile
             if (!-d $path) {
                 $! = $save_bang;
-                if ($arg->{error}) {
+                if ($arg->{?error}) {
                     push @{${$arg->{error}}}, \%($path => $e);
                 }
                 else {
@@ -639,16 +639,16 @@ sub rmtree {
         $paths = \ @_;
     }
 
-    $arg->{prefix} = '';
-    $arg->{depth}  = 0;
+    $arg->{+prefix} = '';
+    $arg->{+depth}  = 0;
 
-    $arg->{cwd} = getcwd() or do {
+    $arg->{+cwd} = getcwd() or do {
         _error($arg, "cannot fetch initial working directory");
         return 0;
     };
-    for (@($arg->{cwd})) { m/\A(.*)\Z/; $_ = $1 } # untaint
-    < %{$arg}{[qw(device inode)]} = < @(stat $arg->{cwd})[[0..1]] or do {
-        _error($arg, "cannot stat initial working directory", $arg->{cwd});
+    for (@($arg->{?cwd})) { m/\A(.*)\Z/; $_ = $1 } # untaint
+    < %{$arg}{[qw(device inode)]} = < @(stat $arg->{?cwd})[[0..1]] or do {
+        _error($arg, "cannot stat initial working directory", $arg->{?cwd});
         return 0;
     };
 
@@ -680,8 +680,8 @@ sub _rmtree {
         # filename, anchored from the directory being unlinked (as
         # opposed to being truly canonical, anchored from the root (/).
 
-        my $canon = $arg->{prefix}
-            ?? File::Spec->catfile($arg->{prefix}, $root)
+        my $canon = $arg->{?prefix}
+            ?? File::Spec->catfile($arg->{?prefix}, $root)
             !! $root
         ;
 
@@ -695,7 +695,7 @@ sub _rmtree {
                 # (e.g. funny protection mask such as -w- instead of rwx)
                 $perm ^&^= 07777;
                 my $nperm = $perm ^|^ 0700;
-                if (!($arg->{safe} or $nperm == $perm or chmod($nperm, $root))) {
+                if (!($arg->{?safe} or $nperm == $perm or chmod($nperm, $root))) {
                     _error($arg, "cannot make child directory read-write-exec", $canon);
                     next ROOT_DIR;
                 }
@@ -721,7 +721,7 @@ sub _rmtree {
 	    # to recurse in which case we are better than rm -rf for 
 	    # subtrees with strange permissions
 
-            if (!($arg->{safe} or $nperm == $perm or chmod($nperm, $curdir))) {
+            if (!($arg->{?safe} or $nperm == $perm or chmod($nperm, $curdir))) {
                 _error($arg, "cannot make directory read+writeable", $canon);
                 $nperm = $perm;
             }
@@ -756,7 +756,7 @@ sub _rmtree {
                 # remove the contained files before the directory itself
                 my $narg = \%(< %$arg);
  <                %{$narg}{[qw(device inode cwd prefix depth)]}
-                    = ($device, $inode, $updir, $canon, $arg->{depth}+1);
+                    = ($device, $inode, $updir, $canon, $arg->{?depth}+1);
                 $count += _rmtree($narg, \@files);
             }
 
@@ -768,21 +768,21 @@ sub _rmtree {
             }
 
             # don't leave the client code in an unexpected directory
-            chdir($arg->{cwd})
-                or die("cannot chdir to $arg->{cwd} from $canon: $!, aborting.");
+            chdir($arg->{?cwd})
+                or die("cannot chdir to $arg->{?cwd} from $canon: $!, aborting.");
 
             # ensure that a chdir upwards didn't take us somewhere other
             # than we expected (see CVE-2002-0435)
             ($device, $inode) = < @(stat $curdir)[[@(0,1)]]
-                or die("cannot stat prior working directory $arg->{cwd}: $!, aborting.");
+                or die("cannot stat prior working directory $arg->{?cwd}: $!, aborting.");
 
-            ($arg->{device} eq $device and $arg->{inode} eq $inode)
-                or die("previous directory $arg->{cwd} changed before entering $canon, expected dev=$ldev inode=$lino, actual dev=$device ino=$inode, aborting.");
+            ($arg->{?device} eq $device and $arg->{?inode} eq $inode)
+                or die("previous directory $arg->{?cwd} changed before entering $canon, expected dev=$ldev inode=$lino, actual dev=$device ino=$inode, aborting.");
 
-            if ($arg->{depth} or !$arg->{keep_root}) {
-                if ($arg->{safe} &&
+            if ($arg->{?depth} or !$arg->{?keep_root}) {
+                if ($arg->{?safe} &&
 		($Is_VMS ?? !&VMS::Filespec::candelete($root) !! !-w $root)) {
-                    print "skipped $root\n" if $arg->{verbose};
+                    print "skipped $root\n" if $arg->{?verbose};
                     next ROOT_DIR;
 	    }
                 if (!chmod $perm ^|^ 0700, $root) {
@@ -790,9 +790,9 @@ sub _rmtree {
                         _error($arg, "cannot make directory writeable", $canon);
                     }
                 }
-                print "rmdir $root\n" if $arg->{verbose};
+                print "rmdir $root\n" if $arg->{?verbose};
 	    if (rmdir $root) {
-                    push @{${$arg->{result}}}, $root if $arg->{result};
+                    push @{${$arg->{result}}}, $root if $arg->{?result};
 		++$count;
 	    }
 	    else {
@@ -810,11 +810,11 @@ sub _rmtree {
             $root = VMS::Filespec::vmsify("./$root")
                 if $Is_VMS && !File::Spec->file_name_is_absolute($root);
 
-            if ($arg->{safe} &&
+            if ($arg->{?safe} &&
 		($Is_VMS ?? !&VMS::Filespec::candelete($root)
 		         !! !(-l $root || -w $root)))
 	    {
-                print "skipped $root\n" if $arg->{verbose};
+                print "skipped $root\n" if $arg->{?verbose};
                 next ROOT_DIR;
 	    }
 
@@ -824,11 +824,11 @@ sub _rmtree {
                     _error($arg, "cannot make file writeable", $canon);
                     }
                 }
-            print "unlink $canon\n" if $arg->{verbose};
+            print "unlink $canon\n" if $arg->{?verbose};
 	    # delete all versions under VMS
 	    while (1) {
                 if (unlink $root) {
-                    push @{${$arg->{result}}}, $root if $arg->{result};
+                    push @{${$arg->{result}}}, $root if $arg->{?result};
                 }
                 else {
                     _error($arg, "cannot unlink file", $canon);

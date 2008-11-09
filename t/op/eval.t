@@ -19,7 +19,7 @@ $foo =;';		# this tests for a call through yyerror()
 if ($@->message =~ m/line 2/) {print "ok 5\n";} else {print "not ok 5\n";}
 
 print eval '$foo = m/';	# this tests for a call through fatal()
-if ($@->{description} =~ m/Search/) {print "ok 6\n";} else {print "not ok 6\n";}
+if ($@->{?description} =~ m/Search/) {print "ok 6\n";} else {print "not ok 6\n";}
 
 print eval '"ok 7\n";';
 
@@ -52,7 +52,7 @@ try {
     print "ok 14\n";
     die "ok 16\n";
     1;
-} || print "ok 15\n$@->{description}";
+} || print "ok 15\n$@->{?description}";
 
 # check whether eval EXPR determines value of EXPR correctly
 
@@ -367,7 +367,7 @@ $test++;
 # eval for a build with copy on write
 do {
   my %h;
-  %h{a}=1;
+  %h{+a}=1;
   foreach my $k (keys %h) {
     if (defined $k and $k eq 'a') {
       print "ok $test\n";

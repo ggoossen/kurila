@@ -18,33 +18,33 @@ my %a;
 
 tie %a, 'Tie::SubstrHash', 3, 3, 3;
 
-%a{abc} = 123;
-%a{bcd} = 234;
+%a{+abc} = 123;
+%a{+bcd} = 234;
 
-is(%a{abc}, 123);
+is(%a{?abc}, 123);
 
 is(nkeys %a, 2);
 
 delete %a{abc};
 
-is(%a{bcd}, 234);
+is(%a{?bcd}, 234);
 
 is((values %a)[0], 234);
 
-dies_like(sub { %a{abcd} = 123 },
+dies_like(sub { %a{+abcd} = 123 },
           qr/Key "abcd" is not 3 characters long/);
 
-dies_like(sub { %a{abc} = 1234 },
+dies_like(sub { %a{+abc} = 1234 },
           qr/Value "1234" is not 3 characters long/);
 
-dies_like(sub { $a = %a{abcd}; $a++  },
+dies_like(sub { $a = %a{?abcd}; $a++  },
           qr/Key "abcd" is not 3 characters long/);
 
 do {
     local $TODO = "hash list assignment";
     < %a{[@( <qw(abc cde))]} = < qw(123 345); 
-    is(%a{cde}, 345);
-    dies_like(sub { %a{def} = 456 },
+    is(%a{?cde}, 345);
+    dies_like(sub { %a{+def} = 456 },
               qr/Table is full \(3 elements\)/);
 };
 
@@ -61,13 +61,13 @@ tie %test, "Tie::SubstrHash", 13, 86, $hashsize;
 for my $i (1..$hashsize) {
         my $key1 = $i + 100_000;           # fix to uniform 6-digit numbers
         my $key2 = "abcdefg$key1";
-        %test{$key2} = ("abcdefgh" x 10) . "$key1";
+        %test{+$key2} = ("abcdefgh" x 10) . "$key1";
 }
 
 for my $i (1..$hashsize) {
         my $key1 = $i + 100_000;
         my $key2 = "abcdefg$key1";
-	unless (%test{$key2}) {
+	unless (%test{?$key2}) {
             fail;
             last;
 	}

@@ -10,7 +10,7 @@ is( B::Terse::indent(), '', 'indent with no argument' );
 
 # this should fail without a reference
 try { B::Terse::terse('scalar') };
-like( $@->{description}, qr/not a reference/, 'terse() fed bad parameters' );
+like( $@->{?description}, qr/not a reference/, 'terse() fed bad parameters' );
 
 # now point it at a sub and see what happens
 sub foo {}
@@ -41,8 +41,8 @@ foreach ( @lines) {
 	if (m/^([A-Z]+)\s+/) {
 		my $op = $1;
 		next unless exists %ops{$op};
-		like( $_, %ops{$op}, "$op " );
-		s/%ops{$op}//;
+		like( $_, %ops{?$op}, "$op " );
+		s/%ops{?$op}//;
 		delete %ops{$op};
 		redo if $_;
 	}

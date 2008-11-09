@@ -17,11 +17,11 @@ sub trimsym {
   my($self,$name,$maxlen,$silent) = < @_;
 
   unless (defined $maxlen) {
-    if (ref $self) { $maxlen ||= $self->{'__M@xLen'}; }
+    if (ref $self) { $maxlen ||= $self->{?'__M@xLen'}; }
     $maxlen ||= 31;
   }
   unless (defined $silent) {
-    if (ref $self) { $silent ||= $self->{'__S!lent'}; }
+    if (ref $self) { $silent ||= $self->{?'__S!lent'}; }
     $silent ||= 0;
   }
   return $name if (length $name +<= $maxlen);
@@ -77,8 +77,8 @@ sub addsym {
 
   return $trimmed if defined $trimmed;
 
-  $maxlen ||= $self->{'__M@xLen'} || 31;
-  $silent ||= $self->{'__S!lent'} || 0;    
+  $maxlen ||= $self->{?'__M@xLen'} || 31;
+  $silent ||= $self->{?'__S!lent'} || 0;    
   $trimmed = $self->trimsym($sym,$maxlen,1);
   if (exists $self->{$trimmed}) {
     my($i) = "00";
@@ -91,15 +91,15 @@ sub addsym {
   elsif (not $silent and $trimmed ne $sym) {
     warn "Warning: long symbol $sym\n\ttrimmed to $trimmed\n\t";
   }
-  $self->{$trimmed} = $sym;
-  $self->{'__N+Map'}->{$sym} = $trimmed;
+  $self->{+$trimmed} = $sym;
+  $self->{'__N+Map'}->{+$sym} = $trimmed;
   $trimmed;
 }
 
 
 sub delsym {
   my($self,$sym) = < @_;
-  my $trimmed = $self->{'__N+Map'}->{$sym};
+  my $trimmed = $self->{'__N+Map'}->{?$sym};
   if (defined $trimmed) {
     delete $self->{'__N+Map'}->{$sym};
     delete $self->{$trimmed};
@@ -110,17 +110,17 @@ sub delsym {
 
 sub get_trimmed {
   my($self,$sym) = < @_;
-  $self->{'__N+Map'}->{$sym};
+  $self->{'__N+Map'}->{?$sym};
 }
 
 
 sub get_orig {
   my($self,$trimmed) = < @_;
-  $self->{$trimmed};
+  $self->{?$trimmed};
 }
 
 
-sub all_orig { (keys %{@_[0]->{'__N+Map'}}); }
+sub all_orig { (keys %{@_[0]->{?'__N+Map'}}); }
 sub all_trimmed { (grep { m/^\w+$/ } keys %{@_[0]}); }
 
 __END__

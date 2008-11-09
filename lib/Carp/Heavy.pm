@@ -28,10 +28,10 @@ use Carp;  our $VERSION = $Carp::VERSION;
 our (%CarpInternal, %Internal);
 
 # disable these by default, so they can live w/o require Carp
-%CarpInternal{Carp}++;
-%CarpInternal{warnings}++;
-%Internal{Exporter}++;
-%Internal{'Exporter::Heavy'}++;
+%CarpInternal{+Carp}++;
+%CarpInternal{+warnings}++;
+%Internal{+Exporter}++;
+%Internal{+'Exporter::Heavy'}++;
 
 
 our ($CarpLevel, $MaxArgNums, $MaxEvalLen, $MaxArgLen, $Verbose);
@@ -47,7 +47,7 @@ sub  longmess_real {
     # by one.  Other code began calling longmess and expecting this
     # behaviour, so the replacement has to emulate that behaviour.
     my $call_pack = caller();
-    if (%Internal{$call_pack} or %CarpInternal{$call_pack}) {
+    if (%Internal{?$call_pack} or %CarpInternal{?$call_pack}) {
       return longmess_heavy(< @_);
     }
     else {
@@ -72,12 +72,12 @@ sub caller_info {
     qw(pack file line sub has_args wantarray evaltext is_require)
   ]} = caller($i);
   
-  unless (defined %call_info{pack}) {
+  unless (defined %call_info{?pack}) {
     return ();
   }
 
   my $sub_name = Carp::get_subname(\%call_info);
-  if (%call_info{has_args}) {
+  if (%call_info{?has_args}) {
     my @args = map { Carp::format_arg($_)} @DB::args;
     if ($MaxArgNums and (nelems @args) +> $MaxArgNums) { # More than we want to show?
       splice @args, $MaxArgNums;
@@ -86,7 +86,7 @@ sub caller_info {
     # Push the args onto the subroutine
     $sub_name .= '(' . join (', ', @args) . ')';
   }
-  %call_info{sub_name} = $sub_name;
+  %call_info{+sub_name} = $sub_name;
   return %call_info;
 }
 
@@ -107,17 +107,17 @@ sub format_arg {
 sub get_status {
     my $cache = shift;
     my $pkg = shift;
-    $cache->{$pkg} ||= \@(\%($pkg => $pkg), \trusts_directly($pkg));
-    return @{$cache->{$pkg}};
+    $cache->{+$pkg} ||= \@(\%($pkg => $pkg), \trusts_directly($pkg));
+    return @{$cache->{?$pkg}};
 }
 
 # Takes the info from caller() and figures out the name of
 # the sub/require/eval
 sub get_subname {
   my $info = shift;
-  if (defined($info->{evaltext})) {
-    my $eval = $info->{evaltext};
-    if ($info->{is_require}) {
+  if (defined($info->{?evaltext})) {
+    my $eval = $info->{?evaltext};
+    if ($info->{?is_require}) {
       return "require $eval";
     }
     else {
@@ -126,7 +126,7 @@ sub get_subname {
     }
   }
 
-  return (($info->{sub}||'') eq '(eval)') ?? 'try {...}' !! $info->{sub};
+  return (($info->{?sub}||'') eq '(eval)') ?? 'try {...}' !! $info->{?sub};
 }
 
 # Figures out what call (from the point of view of the caller)
@@ -148,9 +148,9 @@ sub long_error_loc {
         return 2;
       }
     }
-    redo if %CarpInternal{$pkg};
+    redo if %CarpInternal{?$pkg};
     redo unless 0 +> --$lvl;
-    redo if %Internal{$pkg};
+    redo if %Internal{?$pkg};
   };
   return $i - 1;
 }
@@ -177,10 +177,10 @@ sub ret_backtrace {
   }
 
   my %i = %( < caller_info($i) );
-  $mess = "$err at %i{file} line %i{line}$tid_msg\n";
+  $mess = "$err at %i{?file} line %i{?line}$tid_msg\n";
 
   while (my %i = %( < caller_info(++$i) )) {
-      $mess .= "\t%i{sub_name} called at %i{file} line %i{line}$tid_msg\n";
+      $mess .= "\t%i{?sub_name} called at %i{?file} line %i{?line}$tid_msg\n";
   }
   
   return $mess;
@@ -198,7 +198,7 @@ sub ret_summary {
   }
 
   my %i = %( < caller_info($i) );
-  return "$err at %i{file} line %i{line}$tid_msg\n";
+  return "$err at %i{?file} line %i{?line}$tid_msg\n";
 }
 
 
@@ -214,9 +214,9 @@ sub short_error_loc {
     my $caller = caller($i);
 
     return 0 unless defined($caller); # What happened?
-    redo if %Internal{$caller};
-    redo if %CarpInternal{$caller};
-    redo if %CarpInternal{$called};
+    redo if %Internal{?$caller};
+    redo if %CarpInternal{?$caller};
+    redo if %CarpInternal{?$called};
     redo if trusts($called, $caller, $cache);
     redo if trusts($caller, $called, $cache);
     redo unless 0 +> --$lvl;
@@ -262,7 +262,7 @@ sub trusts {
     while ((nelems @$partial) and not exists $known->{$parent}) {
         my $anc = shift @$partial;
         next if exists $known->{$anc};
-        $known->{$anc}++;
+        $known->{+$anc}++;
         my ($anc_knows, $anc_partial) = < get_status($cache, $anc);
         my @found = keys %$anc_knows;
  <        %$known{[ @found]} = ();

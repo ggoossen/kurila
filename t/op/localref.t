@@ -34,22 +34,22 @@ do { local @{*{$x}};     @aa = qw/m n/; is("$(join ' ',@aa)","m n"); undef $x; i
 is("$(join ' ',@aa)","a b");
 
 %aa = %( < qw/a b/ );
-do { local %aa;     %aa = %( < qw/c d/ ); is(%aa{c},"d"); };
-is(%aa{a},"b");
-do { local %aa;   %aa = %( < qw/e f/ ); is(%aa{e},"f"); };
-is(%aa{a},"b");
-do { local %{*{Symbol::fetch_glob("aa")}}; %aa = %( < qw/g h/ ); is(%aa{g},"h"); };
-is(%aa{a},"b");
+do { local %aa;     %aa = %( < qw/c d/ ); is(%aa{?c},"d"); };
+is(%aa{?a},"b");
+do { local %aa;   %aa = %( < qw/e f/ ); is(%aa{?e},"f"); };
+is(%aa{?a},"b");
+do { local %{*{Symbol::fetch_glob("aa")}}; %aa = %( < qw/g h/ ); is(%aa{?g},"h"); };
+is(%aa{?a},"b");
 $x = \*aa;
-do { local %{*{$x}};   %aa = %( < qw/i j/ ); is(%aa{i},"j"); undef $x; is(%aa{i},"j"); };
-is(%aa{a},"b");
+do { local %{*{$x}};   %aa = %( < qw/i j/ ); is(%aa{?i},"j"); undef $x; is(%aa{?i},"j"); };
+is(%aa{?a},"b");
 $x = \*aa;
-do { local %{*{$x}};     %aa = %( < qw/m n/ ); is(%aa{m},"n"); undef $x; is(%aa{m},"n"); };
-is(%aa{a},"b");
+do { local %{*{$x}};     %aa = %( < qw/m n/ ); is(%aa{?m},"n"); undef $x; is(%aa{?m},"n"); };
+is(%aa{?a},"b");
 
 sub test_err_localref () {
     local our $TODO = 1;
-    like($@ && $@->{description},qr/Can't localize through a reference/,'error');
+    like($@ && $@->{?description},qr/Can't localize through a reference/,'error');
 }
 $x = \$aa;
 my $y = \$aa;

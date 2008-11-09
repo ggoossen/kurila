@@ -4,7 +4,7 @@
 package My::Test;
 
 BEGIN {
-    if( %ENV{PERL_CORE} ) {
+    if( %ENV{?PERL_CORE} ) {
         chdir 't';
         @INC = @( '../lib' );
     }

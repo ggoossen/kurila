@@ -87,7 +87,7 @@ EOE
     is($a, $b, $comment);
 EOE
     if ($@) {
-      if ($@->{description} =~ m/is unimplemented/) {
+      if ($@->{?description} =~ m/is unimplemented/) {
         skip("$comment: unimplemented", 1);
       } else {
         fail("error: $($@->message)");
@@ -113,9 +113,9 @@ for ( @simple_input) {
      "\\\$$variable = $operator \\\$$variable");
 EOE
   if ($@) {
-    if ($@->{description} =~ m/is unimplemented/) {
+    if ($@->{?description} =~ m/is unimplemented/) {
       skip("skipping $comment: unimplemented", 1);
-    } elsif ($@->{description} =~ m/Can't (modify|take log of 0)/) {
+    } elsif ($@->{?description} =~ m/Can't (modify|take log of 0)/) {
       skip("skipping $comment: syntax not good for selfassign", 1);
     } else {
       fail("error: $($@->message)");

@@ -12,13 +12,13 @@ ok( require 'open.pm', 'requiring open' );
 
 # this should fail
 try { import() };
-like( $@->{description}, qr/needs explicit list of PerlIO layers/,
+like( $@->{?description}, qr/needs explicit list of PerlIO layers/,
 	'import should fail without args' );
 
 # prevent it from loading I18N::Langinfo, so we can test encoding failures
 my $warn;
 local $^WARN_HOOK = sub {
-	$warn .= shift->{description};
+	$warn .= shift->{?description};
 };
 
 # and it shouldn't be able to find this layer
@@ -37,21 +37,21 @@ like( $warn, qr/Unknown PerlIO layer/,
 
 # see if it sets the magic variables appropriately
 import( 'IN', ':crlf' );
-is( %^H{'open_IN'}, 'crlf', 'should have set crlf layer' );
+is( %^H{?'open_IN'}, 'crlf', 'should have set crlf layer' );
 
 # it should reset them appropriately, too
 import( 'IN', ':raw' );
-is( %^H{'open_IN'}, 'raw', 'should have reset to raw layer' );
+is( %^H{?'open_IN'}, 'raw', 'should have reset to raw layer' );
 
 # it dies if you don't set IN, OUT, or IO
 try { import( 'sideways', ':raw' ) };
-like( $@->{description}, qr/Unknown PerlIO layer class/, 'should croak with unknown class' );
+like( $@->{?description}, qr/Unknown PerlIO layer class/, 'should croak with unknown class' );
 
 # but it handles them all so well together
 import( 'IO', ':raw :crlf' );
 is( $^OPEN, ":raw :crlf\0:raw :crlf",
 	'should set multi types, multi layer' );
-is( %^H{'open_IO'}, 'crlf', 'should record last layer set in %^H' );
+is( %^H{?'open_IO'}, 'crlf', 'should record last layer set in %^H' );
 
 SKIP: do {
     skip("no perlio, no :utf8", 12) unless (PerlIO::Layer->find( 'perlio'));
@@ -139,7 +139,7 @@ EOE
 	$ok = $a = 0;
 	for (@a) {
 	    unless (
-		    ($c = %actions{$key}->($_)) == 1 &&
+		    ($c = %actions{?$key}->($_)) == 1 &&
 		    systell(*G)                == ($a += bytes::length($_))
 		   ) {
 		diagnostics();
@@ -183,7 +183,7 @@ SKIP: do {
     try {
 	require Symbol; # Anything that exists but we havn't loaded
     };
-    like($@->{description}, qr/Can't locate Symbol|Recursive call/i,
+    like($@->{?description}, qr/Can't locate Symbol|Recursive call/i,
 	 "test for an endless loop in PerlIO_find_layer");
 };
 

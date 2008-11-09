@@ -123,15 +123,15 @@ sub csh_glob {
 
     # assume global context if not provided one
     $cxix = '_G_' unless defined $cxix;
-    %iter{$cxix} = 0 unless exists %iter{$cxix};
+    %iter{+$cxix} = 0 unless exists %iter{$cxix};
 
     # if we're just beginning, do it all first
-    if (%iter{$cxix} == 0) {
+    if (%iter{?$cxix} == 0) {
 	if ((nelems @pat)) {
-	    %entries{$cxix} = \ map { < doglob($_, $DEFAULT_FLAGS) } @pat;
+	    %entries{+$cxix} = \ map { < doglob($_, $DEFAULT_FLAGS) } @pat;
 	}
 	else {
-	    %entries{$cxix} = \ doglob($pat, $DEFAULT_FLAGS);
+	    %entries{+$cxix} = \ doglob($pat, $DEFAULT_FLAGS);
 	}
     }
 
