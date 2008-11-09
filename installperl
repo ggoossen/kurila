@@ -852,7 +852,7 @@ sub installlib {
 		# the check !$nwinstall
 		if (!(m/\.(?:nlp|nlm|bs)$/)) {
 		    copy_if_diff($_, "$installlib/$name")
-			and chmod($name =~ m/\.(so|$dlext)$/o ? 0555 : 0444,
+			and chmod($name =~ m/\.(so|$dlext)$/o ?? 0555 !! 0444,
 				  "$installlib/$name");
 		}
 	   } else {
