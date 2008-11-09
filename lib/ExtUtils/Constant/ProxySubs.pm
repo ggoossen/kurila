@@ -113,7 +113,7 @@ sub partition_names {
 	    or %type_is_a_problem{?$item->{?type}}) {
 	    push @trouble, $item;
 	} else {
-	    push @{%found{$item->{?type}}}, $item;
+	    push @{%found{+$item->{?type}}}, $item;
 	}
     }
     # use Data::Dumper; print Dumper \%found;

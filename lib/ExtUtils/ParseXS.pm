@@ -472,7 +472,7 @@ sub process_para {
 	my @fns = keys %{@XSStack[-1]->{?functions} || \%()};
 	if ($statement ne 'endif') { <
 	  # Hide the functions defined in other #if branches, and reset.
-	  %{@XSStack[-1]->{other_functions}}{[ @fns]} = (1) x nelems @fns;
+	  %{@XSStack[-1]->{+other_functions}}{[ @fns]} = (1) x nelems @fns;
  <	  %{@XSStack[-1]}{[qw(varname functions)]} = ('', \%());
 	} else {
 	  my($tmp) = pop(@XSStack);
@@ -480,7 +480,7 @@ sub process_para {
 		   && @XSStack[$XSS_work_idx]->{?type} ne 'if');
 	  # Keep all new defined functions
 	  push(@fns, < keys %{$tmp->{?other_functions} || \%()});
- <	  %{@XSStack[$XSS_work_idx]->{functions}}{[ @fns]} = (1) x nelems @fns;
+ <	  %{@XSStack[$XSS_work_idx]->{+functions}}{[ @fns]} = (1) x nelems @fns;
 	}
       }
     }
@@ -572,11 +572,11 @@ sub process_para {
 
     # Check for duplicate function definition
     for my $tmp ( @XSStack) {
-      next unless defined $tmp->{functions}->{?$Full_func_name};
+      next unless defined $tmp->{?functions}->{?$Full_func_name};
       Warn("Warning: duplicate function definition '$clean_func_name' detected");
       last;
     }
-    @XSStack[$XSS_work_idx]->{functions}->{+$Full_func_name} ++ ;
+    @XSStack[$XSS_work_idx]->{?functions}->{+$Full_func_name} ++ ;
     %XsubAliases = %XsubAliasValues =  %Interfaces = %( < ( @Attributes = @() ) );
     $DoSetMagic = 1;
 

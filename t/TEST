@@ -13,7 +13,7 @@ $| = 1;
 
 # remove empty elements due to insertion of empty symbols via "''p1'" syntax
 @ARGV = grep($_, @ARGV) if $^O eq 'VMS';
-our $show_elapsed_time = %ENV{HARNESS_TIMER} || 0;
+our $show_elapsed_time = %ENV{?HARNESS_TIMER} || 0;
 
 # Cheesy version of Getopt::Std.  Maybe we should replace it with that.
 do {
@@ -42,7 +42,7 @@ chdir 't' if -f 't/TEST';
 die "You need to run \"make test\" first to set things up.\n"
   unless -e 'perl' or -e 'perl.exe' or -e 'perl.pm';
 
-if (%ENV{PERL_3LOG}) { # Tru64 third(1) tool, see perlhack
+if (%ENV{?PERL_3LOG}) { # Tru64 third(1) tool, see perlhack
     unless (-x 'perl.third') {
 	unless (-x '../perl.third') {
 	    die "You need to run \"make perl.third first.\n";
@@ -58,9 +58,9 @@ if (%ENV{PERL_3LOG}) { # Tru64 third(1) tool, see perlhack
 }
 
 # check leakage for embedders
-%ENV{PERL_DESTRUCT_LEVEL} = 2 unless exists %ENV{PERL_DESTRUCT_LEVEL};
+%ENV{+PERL_DESTRUCT_LEVEL} = 2 unless exists %ENV{PERL_DESTRUCT_LEVEL};
 
-%ENV{EMXSHELL} = 'sh';        # For OS/2
+%ENV{+EMXSHELL} = 'sh';        # For OS/2
 
 # Roll your own File::Find!
 use TestInit;
@@ -137,7 +137,7 @@ unless (nelems @ARGV) {
 	if (%extensions) {
 	    if (%known_extensions) {
 		foreach (keys %known_extensions) {
-		    %skip{$_}++ unless %extensions{$_};
+		    %skip{+$_}++ unless %extensions{?$_};
 		}
 	    } else {
 		warn "No known_extensions line found in $configsh";
@@ -158,11 +158,11 @@ unless (nelems @ARGV) {
 		    if (defined $extension) {
 			$extension =~ s!/t$!!;
 			# XXX Do I want to warn that I'm skipping these?
-			next if %skip{$extension};
+			next if %skip{?$extension};
 		    }
 		    my $path = File::Spec->catfile($updir, $t);
 		    push @ARGV, $path;
-		    %::path_to_name{$path} = $t;
+		    %::path_to_name{+$path} = $t;
 		}
 	    }
 	}
@@ -224,7 +224,7 @@ EOT
       unless (exists %::path_to_name{$t}) {
 	my $tname = File::Spec->catfile('t',$t);
 	$tname = VMS::Filespec::unixify($tname) if $^O eq 'VMS';
-	%::path_to_name{$t} = $tname;
+	%::path_to_name{+$t} = $tname;
       }
     }
     my $maxlen = 0;
@@ -321,9 +321,9 @@ EOT
 		or print "can't deparse '$deparse_cmd': $!.\n";
 	}
 	elsif ($type eq 'perl') {
-	    my $perl = %ENV{PERL} || './perl';
+	    my $perl = %ENV{?PERL} || './perl';
 	    my $redir = $^O eq 'VMS' ?? '2>&1' !! '';
-	    if (%ENV{PERL_VALGRIND}) {
+	    if (%ENV{?PERL_VALGRIND}) {
 		my $valgrind = %ENV{VALGRIND} // 'valgrind';
 		my $vg_opts = %ENV{VG_OPTS}
 		    //  "--suppressions=perl.supp --leak-check=yes "
@@ -397,7 +397,7 @@ EOT
 			    # this still conforms to TAP:
 			    # http://search.cpan.org/dist/TAP/TAP.pod
 			    $extra and $istodo = $extra =~ m/#\s*(?:TODO|SKIP)\b/;
-			    $istodo = 1 if %todo{$num};
+			    $istodo = 1 if %todo{?$num};
 
 			    if( $not && !$istodo ) {
 				$failure ||= "FAILED at test $num";
@@ -425,7 +425,7 @@ EOT
 	    $failure = 'FAILED--no leader found' unless $seen_leader;
 	}
 
-	if (%ENV{PERL_VALGRIND}) {
+	if (%ENV{?PERL_VALGRIND}) {
 	    my @valgrind;
 	    if (-e $valgrind_log) {
 		if (open(my $v, "<", $valgrind_log)) {
@@ -476,7 +476,7 @@ EOT
 	if ($type eq 'deparse') {
 	    unlink "./$test.dp";
 	}
-	if (%ENV{PERL_3LOG}) {
+	if (%ENV{?PERL_3LOG}) {
 	    my $tpp = $test;
 	    $tpp =~ s:^\.\./::;
 	    $tpp =~ s:/:_:g;
@@ -500,7 +500,7 @@ EOT
 	    if ($test =~ m/^base/) {
 		die "Failed a basic test ($test) -- cannot continue.\n";
 	    }
-	    ++%failed_tests{$test};
+	    ++%failed_tests{+$test};
 	}
 	else {
             delete %failed_tests{$test};

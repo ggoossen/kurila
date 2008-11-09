@@ -1476,7 +1476,7 @@ sub init_PM {
     }
 
     unless( $self->{?PMLIBPARENTDIRS} ) {
-	@{$self->{PMLIBPARENTDIRS}} = @('lib');
+	@{$self->{+PMLIBPARENTDIRS}} = @('lib');
     }
 
     return if $self->{?PM} and $self->{ARGS}->{?PM};
@@ -1775,7 +1775,7 @@ sub init_others {	# --- Initialize Other Attributes
     # 'static', since we either must use it (%Config says we can't
     # use dynamic loading) or the caller asked for it explicitly.
     if (!$self->{?LINKTYPE}) {
-       $self->{+LINKTYPE} = $self->{SKIPHASH}->{?'dynamic'}
+       $self->{+LINKTYPE} = $self->{?SKIPHASH}->{?'dynamic'}
                         ?? 'static'
                         !! (%Config{?usedl} ?? 'dynamic' !! 'static');
     };
@@ -3626,7 +3626,7 @@ sub top_targets {
     my($self) = shift;
     my(@m);
 
-    push @m, $self->all_target, "\n" unless $self->{SKIPHASH}->{?'all'};
+    push @m, $self->all_target, "\n" unless $self->{+SKIPHASH}->{?'all'};
 
     push @m, '
 pure_all :: config pm_to_blib subdirs linkext

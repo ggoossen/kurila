@@ -359,7 +359,7 @@ sub new {
 
     # Store the original args passed to WriteMakefile()
     foreach my $k (keys %$self) {
-        $self->{ARGS}->{+$k} = $self->{?$k};
+        $self->{+ARGS}->{+$k} = $self->{?$k};
     }
 
     if ("$(join ' ',@ARGV)" =~ m/\bPREREQ_PRINT\b/) {
@@ -542,7 +542,7 @@ END
     $argv =~ s/^\[/(/;
     $argv =~ s/\]$/)/;
 
-    push @{$self->{RESULT}}, <<END;
+    push @{$self->{+RESULT}}, <<END;
 # This Makefile is for the $self->{?NAME} extension to perl.
 #
 # It was generated automatically by MakeMaker version
@@ -589,7 +589,7 @@ END
 
     # turn the SKIP array into a SKIPHASH hash
     for my $skip ( @{$self->{?SKIP} || \@()}) {
-        $self->{SKIPHASH}->{+$skip} = 1;
+        $self->{+SKIPHASH}->{+$skip} = 1;
     }
     delete $self->{SKIP}; # free memory
 
@@ -874,7 +874,7 @@ sub skipcheck {
         "in skipped section 'static_lib'\n"
             if $self->{SKIPHASH}->{?static_lib} && $Verbose;
     }
-    return 'skipped' if $self->{SKIPHASH}->{?$section};
+    return 'skipped' if $self->{?SKIPHASH}->{?$section};
     return '';
 }
 

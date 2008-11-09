@@ -137,7 +137,7 @@ while ($Decomp =~ m/(.+)/g) {
 		if (%Combin{?$dec->[0] }) {
 		    %NonStD{+$ini } = 1;
 		} else {
-		    %CompList{ $listname }->{+$dec->[1] } = $ini;
+		    %CompList{ + $listname }->{+$dec->[1] } = $ini;
 		    %Comp1st{+$dec->[0] } = $listname;
 		    %Comp2nd{+$dec->[1] } = 1 if ! %Exclus{?$ini};
 		}
@@ -362,7 +362,7 @@ EOF
 	die sprintf("a Unicode code point 0x\%04X over 0x10FFFF.", $uv)
 	    unless $uv +<= 0x10FFFF;
 	my @c = @( unpack 'CCCC', pack 'N', $uv );
-	%val{ @c[1] }->{ @c[2] }->{+@c[3] } = $hash->{?$uv};
+	%val{ + @c[1] }->{ + @c[2] }->{+@c[3] } = $hash->{?$uv};
     }
 
     foreach my $p (sort { $a <+> $b } keys %val) {
