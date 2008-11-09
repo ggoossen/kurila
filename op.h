@@ -188,6 +188,10 @@ Deprecated.  Use C<GIMME_V> instead.
 #define OPpEARLY_CV		32	/* foo() called before sub foo was parsed */
   /* OP_?ELEM only */
 #define OPpLVAL_DEFER		16	/* Defer creation of array/hash elem */
+/* Private for OP_HELEM */
+#define OPpHELEM_ADD            8       /* Add key if it doesn't exist */
+#define OPpHELEM_OPTIONAL       4       /* Ignore if the key does not exist */
+
   /* OP_RV2?V, OP_GVSV, OP_ENTERITER only */
 #define OPpOUR_INTRO		16	/* Variable was in an our() */
   /* OP_PADSV only */
@@ -249,7 +253,7 @@ Deprecated.  Use C<GIMME_V> instead.
     
 /* Private for OP_ENTEREVAL */
 #define OPpEVAL_HAS_HH		2	/* Does it have a copy of %^H */
-    
+
 struct op {
     BASEOP
 };
