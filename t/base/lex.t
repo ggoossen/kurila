@@ -28,7 +28,7 @@ m/^/ && (print "ok 5\n");
 
 our ($foo, %foo, $bar, $bar, @ary, $A, $X, @X, $N);
 
-eval '%foo{1} / 1;';
+eval '%foo{+1} / 1;';
 if (!$@) {print "ok 6\n";} else {print "not ok 6 $@\n";}
 
 eval '$foo = 123+123.4+123e4+123.4E5+123.4e+5+.12;';

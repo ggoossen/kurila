@@ -288,7 +288,7 @@ EOT
 $fetch_string .= <<'EOT';
     # So we can say "if %Config{'foo'}".
     $value = undef if $value eq 'undef';
-    $self->{$key} = $value; # cache it
+    $self->{+$key} = $value; # cache it
 }
 EOT
 

@@ -212,7 +212,7 @@ $VERSION = eval $VERSION;
 my %METHOD_MAP =
   %(
    VMS =>
-   \%(
+   %(
     cwd			=> '_vms_cwd',
     getcwd		=> '_vms_cwd',
     fastcwd		=> '_vms_cwd',
@@ -222,7 +222,7 @@ my %METHOD_MAP =
    ),
 
    MSWin32 =>
-   \%(
+   %(
     # We assume that &_NT_cwd is defined as an XSUB or in the core.
     cwd			=> '_NT_cwd',
     getcwd		=> '_NT_cwd',
@@ -233,7 +233,7 @@ my %METHOD_MAP =
    ),
 
    dos => 
-   \%(
+   %(
     cwd			=> '_dos_cwd',
     getcwd		=> '_dos_cwd',
     fastgetcwd		=> '_dos_cwd',
@@ -242,7 +242,7 @@ my %METHOD_MAP =
    ),
 
    qnx =>
-   \%(
+   %(
     cwd			=> '_qnx_cwd',
     getcwd		=> '_qnx_cwd',
     fastgetcwd		=> '_qnx_cwd',
@@ -252,7 +252,7 @@ my %METHOD_MAP =
    ),
 
    cygwin =>
-   \%(
+   %(
     getcwd		=> 'cwd',
     fastgetcwd		=> 'cwd',
     fastcwd		=> 'cwd',
@@ -261,7 +261,7 @@ my %METHOD_MAP =
    ),
 
    epoc =>
-   \%(
+   %(
     cwd			=> '_epoc_cwd',
     getcwd	        => '_epoc_cwd',
     fastgetcwd		=> '_epoc_cwd',
@@ -270,7 +270,7 @@ my %METHOD_MAP =
    ),
 
    MacOS =>
-   \%(
+   %(
     getcwd		=> 'cwd',
     fastgetcwd		=> 'cwd',
     fastcwd		=> 'cwd',
@@ -321,7 +321,7 @@ sub _backtick_pwd {
 # Since some ports may predefine cwd internally (e.g., NT)
 # we take care not to override an existing definition for cwd().
 
-unless (%METHOD_MAP{$^O}->{?cwd} or defined &cwd) {
+unless (%METHOD_MAP{?$^O}{?cwd} or defined &cwd) {
     # The pwd command is not available in some chroot(2)'ed environments
     require Config;
     my $sep = Config::config_value("path_sep") || ':';
@@ -730,10 +730,10 @@ sub _epoc_cwd {
 # user-level functions to the right places
 
 if (exists %METHOD_MAP{$^O}) {
-  my $map = %METHOD_MAP{?$^O};
-  foreach my $name (keys %$map) {
+  my %map = %METHOD_MAP{?$^O};
+  foreach my $name (keys %map) {
     local $^W = 0;  # assignments trigger 'subroutine redefined' warning
-    *{Symbol::fetch_glob($name)} = \&{$map->{?$name}};
+    *{Symbol::fetch_glob($name)} = \&{%map{?$name}};
   }
 }
 

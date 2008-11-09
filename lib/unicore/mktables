@@ -290,24 +290,24 @@ sub Build_Aliases()
 	my ($prop, < @data) = < split m/\s*;\s*/;
 
 	if ($prop eq 'ccc') {
-	    %PropValueAlias{$prop}->{+@data[1]} = \ @data[[@(0,2)]];
-	    %PVA_reverse{$prop}->{+@data[2]} = \ @data[[@(0,1)]];
+	    %PropValueAlias{+$prop}->{+@data[1]} = \ @data[[@(0,2)]];
+	    %PVA_reverse{+$prop}->{+@data[2]} = \ @data[[@(0,1)]];
 	}
 	else {
             next if @data[0] eq "n/a";
-	    %PropValueAlias{$prop}->{+@data[0]} = @data[1];
-            %PVA_reverse{$prop}->{+@data[1]} = @data[0];
+	    %PropValueAlias{+$prop}->{+@data[0]} = @data[1];
+            %PVA_reverse{+$prop}->{+@data[1]} = @data[0];
 	}
 
 	shift @data if $prop eq 'ccc';
 	next if @data[0] eq "n/a";
 
 	@data[1] =~ s/[ _-]//g;
-	%utf8::PropValueAlias{$prop}->{+lc @data[0]} = @data[1];
-	%utf8::PVA_reverse{$prop}->{+lc @data[1]} = @data[0];
+	%utf8::PropValueAlias{+$prop}->{+lc @data[0]} = @data[1];
+	%utf8::PVA_reverse{+$prop}->{+lc @data[1]} = @data[0];
 
 	my $abbr_class = ($prop eq 'gc' or $prop eq 'sc') ?? 'gc_sc' !! $prop;
-	%utf8::PVA_abbr_map{$abbr_class}->{+lc @data[0]} = @data[0];
+	%utf8::PVA_abbr_map{+$abbr_class}->{+lc @data[0]} = @data[0];
     }
     close PVA;
 
@@ -347,12 +347,12 @@ sub New_Prop($$$<)
         die "$0: bad args to New_Prop"
     }
 
-    if (not %TableInfo{$Type}->{?$Name})
+    if (not %TableInfo{?$Type}->{?$Name})
     {
-        %TableInfo{$Type}->{+$Name} = $Table;
-        %TableDesc{$Type}->{+$Name} = $Desc;
+        %TableInfo{+$Type}->{+$Name} = $Table;
+        %TableDesc{+$Type}->{+$Name} = $Desc;
         if ($Fuzzy) {
-            %FuzzyNames{$Type}->{+$Name} = $Name;
+            %FuzzyNames{+$Type}->{+$Name} = $Name;
         }
     }
 }
@@ -727,9 +727,9 @@ sub New_Alias($$$<)
     if (%TableInfo{?$Alias}) {
         die "$0: already have original $Type => $Alias; can't make alias";
     }
-    %AliasInfo{$Type}->{+$Name} = $Alias;
+    %AliasInfo{+$Type}->{+$Name} = $Alias;
     if ($Fuzzy) {
-        %FuzzyNames{$Type}->{+$Alias} = $Name;
+        %FuzzyNames{+$Type}->{+$Alias} = $Name;
     }
 
 }
@@ -1990,11 +1990,11 @@ sub SpecialCasing_txt()
         # Wait until all the special cases have been read since
         # they are not listed in numeric order.
         my $ix = hex($code);
-        push @{%CaseInfo{Lower}}, \@( $ix, $code, $lower )
+        push @{%CaseInfo{+Lower}}, \@( $ix, $code, $lower )
 	    unless $code eq $lower;
-        push @{%CaseInfo{Title}}, \@( $ix, $code, $title )
+        push @{%CaseInfo{+Title}}, \@( $ix, $code, $title )
 	    unless $code eq $title;
-        push @{%CaseInfo{Upper}}, \@( $ix, $code, $upper )
+        push @{%CaseInfo{+Upper}}, \@( $ix, $code, $upper )
 	    unless $code eq $upper;
     }
     close IN;

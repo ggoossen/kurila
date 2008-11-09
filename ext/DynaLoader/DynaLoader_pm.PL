@@ -96,7 +96,7 @@ use Config;
 
 # enable debug/trace messages from DynaLoader perl code
 our $dl_debug;
-$dl_debug = %ENV{PERL_DL_DEBUG} || 0 unless defined $dl_debug;
+$dl_debug = %ENV{?PERL_DL_DEBUG} || 0 unless defined $dl_debug;
 
 #
 # Flags to alter dl_load_file behaviour.  Assigned bits:

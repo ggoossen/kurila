@@ -45,7 +45,7 @@ foreach my $key (keys %foo) {
 $foo = join('',values(%foo));
 ok($foo eq 'xy' || $foo eq 'yx','fresh keys');
 
-%refhash{"top"}->{+"foo"} = "FOO";
+%refhash{+"top"}->{+"foo"} = "FOO";
 %refhash{"top"}->{+"bar"} = "BAR";
 
 delete %refhash{"top"}->{"bar"};

@@ -597,7 +597,7 @@ sub _find_opt {
     local($dir, $name, $fullname, $prune);
     local *_ = \my $a;
 
-    my $cwd            = $wanted->{bydepth} ?? Cwd::fastcwd() !! Cwd::getcwd();
+    my $cwd            = $wanted->{?bydepth} ?? Cwd::fastcwd() !! Cwd::getcwd();
     if ($Is_VMS) {
 	# VMS returns this by default in VMS format which just doesn't
 	# work for the rest of this module.
@@ -615,18 +615,18 @@ sub _find_opt {
     my $cwd_untainted  = $cwd;
     my $check_t_cwd    = 1;
     $wanted_callback   = $wanted->{wanted};
-    $bydepth           = $wanted->{bydepth};
-    $pre_process       = $wanted->{preprocess};
-    $post_process      = $wanted->{postprocess};
-    $no_chdir          = $wanted->{no_chdir};
-    $full_check        = $^O eq 'MSWin32' ?? 0 !! $wanted->{follow};
+    $bydepth           = $wanted->{?bydepth};
+    $pre_process       = $wanted->{?preprocess};
+    $post_process      = $wanted->{?postprocess};
+    $no_chdir          = $wanted->{?no_chdir};
+    $full_check        = $^O eq 'MSWin32' ?? 0 !! $wanted->{?follow};
     $follow            = $^O eq 'MSWin32' ?? 0 !!
-                             $full_check || $wanted->{follow_fast};
-    $follow_skip       = $wanted->{follow_skip};
-    $untaint           = $wanted->{untaint};
-    $untaint_pat       = $wanted->{untaint_pattern};
-    $untaint_skip      = $wanted->{untaint_skip};
-    $dangling_symlinks = $wanted->{dangling_symlinks};
+                             $full_check || $wanted->{?follow_fast};
+    $follow_skip       = $wanted->{?follow_skip};
+    $untaint           = $wanted->{?untaint};
+    $untaint_pat       = $wanted->{?untaint_pattern};
+    $untaint_skip      = $wanted->{?untaint_skip};
+    $dangling_symlinks = $wanted->{?dangling_symlinks};
 
     # for compatibility reasons (find.pl, find2perl)
     local our ($topdir, $topdev, $topino, $topmode, $topnlink);
@@ -1261,13 +1261,13 @@ sub _find_dir_symlnk($$$) {
 sub wrap_wanted {
     my $wanted = shift;
     if ( ref($wanted) eq 'HASH' ) {
-	if ( $wanted->{follow} || $wanted->{follow_fast}) {
-	    $wanted->{follow_skip} = 1 unless defined $wanted->{follow_skip};
+	if ( $wanted->{?follow} || $wanted->{?follow_fast}) {
+	    $wanted->{+follow_skip} = 1 unless defined $wanted->{follow_skip};
 	}
-	if ( $wanted->{untaint} ) {
-	    $wanted->{untaint_pattern} = $File::Find::untaint_pattern
-		unless defined $wanted->{untaint_pattern};
-	    $wanted->{untaint_skip} = 0 unless defined $wanted->{untaint_skip};
+	if ( $wanted->{?untaint} ) {
+	    $wanted->{+untaint_pattern} = $File::Find::untaint_pattern
+		unless defined $wanted->{?untaint_pattern};
+	    $wanted->{+untaint_skip} = 0 unless defined $wanted->{?untaint_skip};
 	}
 	return $wanted;
     }
