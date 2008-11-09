@@ -247,8 +247,8 @@ sub Compress::Zlib::gzFile::gzsetparams
     return _set_gzerr(Z_STREAM_ERROR())
         if $self->[1] ne 'deflate';
  
-    my $status = *$gz->{?Compress}->deflateParams(-Level   => $level, 
-                                                -Strategy => $strategy);
+    my $status = *$gz->{?Compress}->deflateParams(Level   => $level, 
+                                                Strategy => $strategy);
     _save_gzerr($gz);
     return $status ;
 }
@@ -276,7 +276,7 @@ sub compress($;$)
 
     my $level = ((nelems @_) == 2 ?? @_[1] !! Z_DEFAULT_COMPRESSION() );
 
-    ($x) = < Compress::Raw::Zlib::Deflate->new( -AppendOutput => 1, -Level => $level);
+    ($x) = < Compress::Raw::Zlib::Deflate->new( AppendOutput => 1, Level => $level);
     $x or return undef ;
 
     $err = $x->deflate($in, $output) ;
@@ -301,7 +301,7 @@ sub uncompress($)
         $in = \@_[0] ;
     }
 
-    ($x) = < Compress::Raw::Zlib::Inflate->new( -ConsumeInput => 0);
+    ($x) = < Compress::Raw::Zlib::Inflate->new( ConsumeInput => 0);
     $x or return undef ;
  
     $err = $x->inflate($in, $output) ;
@@ -495,8 +495,8 @@ sub memGunzip($)
         or return undef;
      
     my $bufsize = length $$string +> 4096 ?? length $$string !! 4096 ;
-    my ($x) = < Compress::Raw::Zlib::Inflate->new(\%(-WindowBits => - MAX_WBITS(),
-                         -Bufsize => $bufsize));
+    my ($x) = < Compress::Raw::Zlib::Inflate->new(\%(WindowBits => - MAX_WBITS(),
+                         Bufsize => $bufsize));
     $x or return undef;
 
     my $output = "" ;
@@ -1033,37 +1033,37 @@ C<Z_DEFAULT_COMPRESSION>.
 
 The default is Z_DEFAULT_COMPRESSION.
 
-=item B<-Method>
+=item B<Method>
 
 Defines the compression method. The only valid value at present (and
 the default) is Z_DEFLATED.
 
-=item B<-WindowBits>
+=item B<WindowBits>
 
 To create an RFC 1950 data stream, set C<WindowBits> to a positive number.
 
-To create an RFC 1951 data stream, set C<WindowBits> to C<-MAX_WBITS>.
+To create an RFC 1951 data stream, set C<WindowBits> to C<MAX_WBITS>.
 
 For a full definition of the meaning and valid values for C<WindowBits> refer
 to the I<zlib> documentation for I<deflateInit2>.
 
 Defaults to MAX_WBITS.
 
-=item B<-MemLevel>
+=item B<MemLevel>
 
 For a definition of the meaning and valid values for C<MemLevel>
 refer to the I<zlib> documentation for I<deflateInit2>.
 
 Defaults to MAX_MEM_LEVEL.
 
-=item B<-Strategy>
+=item B<Strategy>
 
 Defines the strategy used to tune the compression. The valid values are
 C<Z_DEFAULT_STRATEGY>, C<Z_FILTERED> and C<Z_HUFFMAN_ONLY>. 
 
 The default is Z_DEFAULT_STRATEGY.
 
-=item B<-Dictionary>
+=item B<Dictionary>
 
 When a dictionary is specified I<Compress::Zlib> will automatically
 call C<deflateSetDictionary> directly after calling C<deflateInit>. The
@@ -1072,7 +1072,7 @@ C<$d->dict_adler()>.
 
 The default is no dictionary.
 
-=item B<-Bufsize>
+=item B<Bufsize>
 
 Sets the initial size for the deflation buffer. If the buffer has to be
 reallocated to increase the size, it will grow in increments of
@@ -1086,8 +1086,8 @@ Here is an example of using the C<deflateInit> optional parameter list
 to override the default buffer size and compression level. All other
 options will take their default values.
 
-    deflateInit( -Bufsize => 300, 
-                 -Level => Z_BEST_SPEED  ) ;
+    deflateInit( Bufsize => 300, 
+                 Level => Z_BEST_SPEED  ) ;
 
 
 =head2 B<($out, $status) = $d-E<gt>deflate($buffer)>
@@ -1136,13 +1136,13 @@ will remain unchanged.
 
 =over 5
 
-=item B<-Level>
+=item B<Level>
 
 Defines the compression level. Valid values are 0 through 9,
 C<Z_NO_COMPRESSION>, C<Z_BEST_SPEED>, C<Z_BEST_COMPRESSION>, and
 C<Z_DEFAULT_COMPRESSION>.
 
-=item B<-Strategy>
+=item B<Strategy>
 
 Defines the strategy used to tune the compression. The valid values are
 C<Z_DEFAULT_STRATEGY>, C<Z_FILTERED> and C<Z_HUFFMAN_ONLY>. 
@@ -1234,7 +1234,7 @@ Here is a list of the valid options:
 
 =over 5
 
-=item B<-WindowBits>
+=item B<WindowBits>
 
 To uncompress an RFC 1950 data stream, set C<WindowBits> to a positive number.
 
@@ -1245,7 +1245,7 @@ to the I<zlib> documentation for I<inflateInit2>.
 
 Defaults to MAX_WBITS.
 
-=item B<-Bufsize>
+=item B<Bufsize>
 
 Sets the initial size for the inflation buffer. If the buffer has to be
 reallocated to increase the size, it will grow in increments of
@@ -1253,7 +1253,7 @@ C<Bufsize>.
 
 Default is 4096.
 
-=item B<-Dictionary>
+=item B<Dictionary>
 
 The default is no dictionary.
 
@@ -1262,7 +1262,7 @@ The default is no dictionary.
 Here is an example of using the C<inflateInit> optional parameter to
 override the default buffer size.
 
-    inflateInit( -Bufsize => 300 ) ;
+    inflateInit( Bufsize => 300 ) ;
 
 =head2 B<($out, $status) = $i-E<gt>inflate($buffer)>
 

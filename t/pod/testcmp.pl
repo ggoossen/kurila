@@ -23,7 +23,7 @@ testcmp -- compare two files line-by-line
 
 or
 
-    $is_diff = testcmp({-cmplines => \&mycmp}, $file1, $file2);
+    $is_diff = testcmp({cmplines => \&mycmp}, $file1, $file2);
 
 =head2 DESCRIPTION
 
@@ -31,7 +31,7 @@ Compare two text files line-by-line and return 0 if they are the
 same, 1 if they differ. Each of $file1 and $file2 may be a filenames,
 or a filehandles (in which case it must already be open for reading).
 
-If the first argument is a hashref, then the B<-cmplines> key in the
+If the first argument is a hashref, then the B<cmplines> key in the
 hash may have a subroutine reference as its corresponding value.
 The referenced user-defined subroutine should be a line-comparator
 function that takes two pre-chomped text-lines as its arguments
@@ -54,7 +54,7 @@ sub testcmp( $ $ ; $) {
       $fh2 = FileHandle->new($file2, "r") or die "Can't open $file2: $!";
    }
   
-   my $cmplines = %opts{?'-cmplines'} || undef;
+   my $cmplines = %opts{?'cmplines'} || undef;
    my ($f1text, $f2text) = ("", "");
    my ($line, $diffs)    = (0, 0);
   

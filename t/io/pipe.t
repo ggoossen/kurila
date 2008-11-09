@@ -1,11 +1,10 @@
 #!./perl
 
+use Config;
 BEGIN {
-    our %Config;
-    require Config; Config->import;
     require './test.pl';
 
-    if (!%Config{'d_fork'}) {
+    if (!config_value('d_fork')) {
         skip_all("fork required to pipe");
     }
     else {
@@ -93,7 +92,7 @@ SKIP: do {
     next_test();
 
     SKIP: do {
-        skip "fork required", 2 unless %Config{d_fork};
+        skip "fork required", 2 unless config_value('d_fork');
 
         pipe(READER,'WRITER') || die "Can't open pipe";
 
@@ -156,7 +155,7 @@ SKIP: do {
         # BeOS will not write to broken pipes, either.
         # Nor does POSIX-BC.
         skip "Won't report failure on broken pipe", 1
-          if %Config{d_sfio} || $^O eq 'machten' || $^O eq 'beos' || 
+          if config_value('d_sfio') || $^O eq 'machten' || $^O eq 'beos' || 
              $^O eq 'posix-bc';
 
         local %SIG{PIPE} = 'IGNORE';

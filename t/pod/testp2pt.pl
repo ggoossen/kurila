@@ -89,7 +89,7 @@ sub command {
     my $incfile  = $self->findinclude(shift @incargs)  or  return;
     my $incbase  = basename $incfile;
     print $out_fh "###### begin =include $incbase #####\n"  if ($incdebug);
-    $self->parse_from_file( \%(-cutting => 1), $incfile );
+    $self->parse_from_file( \%(cutting => 1), $incfile );
     print $out_fh "###### end =include $incbase #####\n"    if ($incdebug);
 }
 
@@ -106,9 +106,9 @@ sub podinc2plaintext( $ $ ) {
 
 sub testpodinc2plaintext( @ ) {
    my %args = %( < @_ );
-   my $infile  = %args{?'-In'}  || die "No input file given!";
-   my $outfile = %args{?'-Out'} || die "No output file given!";
-   my $cmpfile = %args{?'-Cmp'} || die "No compare-result file given!";
+   my $infile  = %args{?'In'}  || die "No input file given!";
+   my $outfile = %args{?'Out'} || die "No output file given!";
+   my $cmpfile = %args{?'Cmp'} || die "No compare-result file given!";
 
    my $different = '';
    my $testname = basename $cmpfile, '.t', '.xr';
@@ -141,7 +141,7 @@ sub testpodplaintext( @ ) {
    my $failed = 0;
    local $_;
 
-   print "1..", scalar nelems @testpods, "\n"  unless (%opts{?'-xrgen'});
+   print "1..", scalar nelems @testpods, "\n"  unless (%opts{?'xrgen'});
 
    for my $podfile ( @testpods) {
       ($testname, $_) = < fileparse($podfile);
@@ -150,8 +150,8 @@ sub testpodplaintext( @ ) {
       $cmpfile   =  $testdir . $testname . '.xr';
       $outfile   =  $testdir . $testname . '.OUT';
 
-      if (%opts{?'-xrgen'}) {
-          if (%opts{?'-force'} or ! -e $cmpfile) {
+      if (%opts{?'xrgen'}) {
+          if (%opts{?'force'} or ! -e $cmpfile) {
              ## Create the comparison file
              print "# Creating expected result for \"$testname\"" .
                    " pod2plaintext test ...\n";
@@ -159,15 +159,15 @@ sub testpodplaintext( @ ) {
           }
           else {
              print "# File $cmpfile already exists" .
-                   " (use '-force' to regenerate it).\n";
+                   " (use 'force' to regenerate it).\n";
           }
           next;
       }
 
       my $failmsg = testpodinc2plaintext
-                        -In  => $podfile,
-                        -Out => $outfile,
-                        -Cmp => $cmpfile;
+                        In  => $podfile,
+                        Out => $outfile,
+                        Cmp => $cmpfile;
       if ($failmsg) {
           ++$failed;
           print "#\tFAILED. ($failmsg)\n";

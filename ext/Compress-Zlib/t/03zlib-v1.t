@@ -135,7 +135,7 @@ $hello = "I am a HAL 9000 computer" ;
 my @hello = @( split('', $hello) );
 my ($err, $X, $status);
  
-ok($x = deflateInit( \%(-Bufsize => 1) ) );
+ok($x = deflateInit( \%(Bufsize => 1) ) );
 ok $x ;
  
 my $Answer = '';
@@ -156,7 +156,7 @@ $Answer .= $X ;
 my @Answer = @( split('', $Answer) );
  
 my $k;
-ok ($k = inflateInit( \%(-Bufsize => 1)) ) ;
+ok ($k = inflateInit( \%(Bufsize => 1)) ) ;
 ok $k ;
  
 my $GOT = '';
@@ -178,7 +178,7 @@ title 'deflate/inflate - small buffer with a number';
 
 $hello = 6529 ;
  
-ok ($x = deflateInit( \%(-Bufsize => 1) ) ) ;
+ok ($x = deflateInit( \%(Bufsize => 1) ) ) ;
 ok $x ;
  
 ok !defined $x->msg() ;
@@ -203,7 +203,7 @@ ok $x->total_out() == length $Answer ;
  
 @Answer = @( split('', $Answer) );
  
-ok ($k = inflateInit( \%(-Bufsize => 1)) ) ;
+ok ($k = inflateInit( \%(Bufsize => 1)) ) ;
 ok $k ;
 
 ok !defined $k->msg() ;
@@ -255,8 +255,8 @@ title 'deflate/inflate - preset dictionary';
 # ===================================
 
 my $dictionary = "hello" ;
-ok $x = deflateInit(\%(-Level => Z_BEST_COMPRESSION,
-			 -Dictionary => $dictionary)) ;
+ok $x = deflateInit(\%(Level => Z_BEST_COMPRESSION,
+			 Dictionary => $dictionary)) ;
  
 my $dictID = $x->dict_adler() ;
 
@@ -267,7 +267,7 @@ ok $status == Z_OK ;
 $X .= $Y ;
 $x = 0 ;
  
-ok $k = inflateInit(-Dictionary => $dictionary) ;
+ok $k = inflateInit(Dictionary => $dictionary) ;
  
 ($Z, $status) = < $k->inflate($X);
 ok $status == Z_STREAM_END ;
@@ -293,7 +293,7 @@ title 'inflate - check remaining buffer after Z_STREAM_END';
 # ===================================================
  
 do {
-    ok $x = deflateInit(-Level => Z_BEST_COMPRESSION ) ;
+    ok $x = deflateInit(Level => Z_BEST_COMPRESSION ) ;
  
     ($X, $status) = < $x->deflate($hello) ;
     ok $status == Z_OK ;
@@ -538,7 +538,7 @@ do {
     $hello = "Test test test test test";
     @hello = @( split('', $hello) );
      
-    ok ($x = deflateInit( -Bufsize => 1, -WindowBits => -MAX_WBITS() ) ) ;
+    ok ($x = deflateInit( Bufsize => 1, WindowBits => -MAX_WBITS() ) ) ;
     ok $x ;
      
     $Answer = '';
@@ -561,7 +561,7 @@ do {
     # Z_STREAM_END when done.  
     push @Answer, " " ; 
      
-    ok ($k = inflateInit(-Bufsize => 1, -WindowBits => -MAX_WBITS()) ) ;
+    ok ($k = inflateInit(Bufsize => 1, WindowBits => -MAX_WBITS()) ) ;
     ok $k ;
      
     $GOT = '';
@@ -581,35 +581,35 @@ do {
 do {
     # error cases
 
-    try { deflateInit(-Level) };
+    try { deflateInit("Level") };
     like $@->{?description}, '/^Compress::Zlib::deflateInit: Expected even number of parameters, got 1/';
 
-    try { inflateInit(-Level) };
+    try { inflateInit("Level") };
     like $@->{?description}, '/^Compress::Zlib::inflateInit: Expected even number of parameters, got 1/';
 
-    try { deflateInit(-Joe => 1) };
+    try { deflateInit(Joe => 1) };
     ok $@->{?description} =~ m/^Compress::Zlib::deflateInit: unknown key value\(s\) Joe at/;
 
-    try { inflateInit(-Joe => 1) };
+    try { inflateInit(Joe => 1) };
     ok $@->{?description} =~ m/^Compress::Zlib::inflateInit: unknown key value\(s\) Joe at/;
 
-    try { deflateInit(-Bufsize => 0) };
+    try { deflateInit(Bufsize => 0) };
     ok $@->{?description} =~ m/^.*?: Bufsize must be >= 1, you specified 0 at/;
 
-    try { inflateInit(-Bufsize => 0) };
+    try { inflateInit(Bufsize => 0) };
     ok $@->{?description} =~ m/^.*?: Bufsize must be >= 1, you specified 0 at/;
 
-    try { deflateInit(-Bufsize => -1) };
+    try { deflateInit(Bufsize => -1) };
     #ok $@ =~ /^.*?: Bufsize must be >= 1, you specified -1 at/;
     ok $@->{?description} =~ m/^Compress::Zlib::deflateInit: Parameter 'Bufsize' must be an unsigned int, got '-1'/;
 
-    try { inflateInit(-Bufsize => -1) };
+    try { inflateInit(Bufsize => -1) };
     ok $@->{?description} =~ m/^Compress::Zlib::inflateInit: Parameter 'Bufsize' must be an unsigned int, got '-1'/;
 
-    try { deflateInit(-Bufsize => "xxx") };
+    try { deflateInit(Bufsize => "xxx") };
     ok $@->{?description} =~ m/^Compress::Zlib::deflateInit: Parameter 'Bufsize' must be an unsigned int, got 'xxx'/;
 
-    try { inflateInit(-Bufsize => "xxx") };
+    try { inflateInit(Bufsize => "xxx") };
     ok $@->{?description} =~ m/^Compress::Zlib::inflateInit: Parameter 'Bufsize' must be an unsigned int, got 'xxx'/;
 
     try { gzopen(\@(), 0) ; }  ;
@@ -675,7 +675,7 @@ some text
 EOM
 
     my $good ;
-    ok my $x = IO::Compress::Gzip->new( \$good, Append => 1, -HeaderCRC => 1) ;
+    ok my $x = IO::Compress::Gzip->new( \$good, Append => 1, HeaderCRC => 1) ;
     ok $x->write($string) ;
     ok  $x->close ;
 
@@ -721,8 +721,8 @@ some text
 EOM
 
     my $truncated ;
-    ok  my $x = IO::Compress::Gzip->new( \$truncated, Append => 1, -HeaderCRC => 1, Strict => 0,
-				-ExtraField => "hello" x 10)  ;
+    ok  my $x = IO::Compress::Gzip->new( \$truncated, Append => 1, HeaderCRC => 1, Strict => 0,
+				ExtraField => "hello" x 10)  ;
     ok  $x->write($string) ;
     ok  $x->close ;
 
@@ -742,7 +742,7 @@ some text
 EOM
 
     my $truncated ;
-    ok  my $x = IO::Compress::Gzip->new( \$truncated, Append => 1, -Name => $Name);
+    ok  my $x = IO::Compress::Gzip->new( \$truncated, Append => 1, Name => $Name);
     ok  $x->write($string) ;
     ok  $x->close ;
 
@@ -760,7 +760,7 @@ some text
 EOM
 
     my $truncated ;
-    ok  my $x = IO::Compress::Gzip->new( \$truncated, -Comment => $Comment);
+    ok  my $x = IO::Compress::Gzip->new( \$truncated, Comment => $Comment);
     ok  $x->write($string) ;
     ok  $x->close ;
 
@@ -776,7 +776,7 @@ some text
 EOM
 
     my $truncated ;
-    ok  my $x = IO::Compress::Gzip->new( \$truncated, -HeaderCRC => 1);
+    ok  my $x = IO::Compress::Gzip->new( \$truncated, HeaderCRC => 1);
     ok  $x->write($string) ;
     ok  $x->close ;
 
@@ -793,12 +793,12 @@ EOM
 
     my $buffer ;
     ok  my $x = IO::Compress::Gzip->new( \$buffer, 
-                             -Append     => 1,
-                             -Strict     => 0,
-                             -HeaderCRC  => 1,
-                             -Name       => "Fred",
-                             -ExtraField => "Extra",
-                             -Comment    => 'Comment');
+                             Append     => 1,
+                             Strict     => 0,
+                             HeaderCRC  => 1,
+                             Name       => "Fred",
+                             ExtraField => "Extra",
+                             Comment    => 'Comment');
     ok  $x->write($string) ;
     ok  $x->close ;
 

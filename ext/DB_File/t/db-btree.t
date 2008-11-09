@@ -144,10 +144,10 @@ $dbh->{+maxkeypage} = 1234 ;
 ok( $dbh->{?maxkeypage} == 1234 );
 
 # Check that an invalid entry is caught both for store & fetch
-eval '$dbh->{fred} = 1234' ;
-ok( $@->{?description} =~ m/^DB_File::BTREEINFO::STORE - Unknown element 'fred' at/ ) ;
-eval 'my $q = $dbh->{fred}' ;
-ok( $@->{?description} =~ m/^DB_File::BTREEINFO::FETCH - Unknown element 'fred' at/ ) ;
+try { $dbh->{+fred} = 1234 };
+ok( $@->{?description} =~ m/^DB_File::BTREEINFO::STORE - Unknown element 'fred'/ ) ;
+try { my $q = $dbh->{+fred} };
+ok( $@->{?description} =~ m/^DB_File::BTREEINFO::FETCH - Unknown element 'fred'/ ) ;
 
 # Now check the interface to BTREE
 
@@ -1339,10 +1339,12 @@ do {
     my $dbh = DB_File::BTREEINFO->new() ;
 
     try { $dbh->{+compare} = 2 };
-    ok( $@->{?description} =~ m/^Key 'compare' not associated with a code reference at/);
+    like( $@->{?description},
+          qr/^Key 'compare' not associated with a code reference/);
 
     try { $dbh->{+prefix} = 2 };
-    ok( $@->{?description} =~ m/^Key 'prefix' not associated with a code reference at/);
+    like( $@->{?description},
+          qr/^Key 'prefix' not associated with a code reference/);
 
 };
 

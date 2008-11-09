@@ -24,14 +24,14 @@ Pod::Find - find POD documents in directory trees
 =head1 SYNOPSIS
 
   use Pod::Find qw(pod_find simplify_name);
-  my %pods = pod_find({ -verbose => 1, -inc => 1 });
+  my %pods = pod_find({ verbose => 1, inc => 1 });
   foreach(keys %pods) {
      print "found library POD `$pods{$_}' in $_\n";
   }
 
   print "podname=",simplify_name('a/b/c/mymodule.pod'),"\n";
 
-  $location = pod_where( { -inc => 1 }, "Pod::Find" );
+  $location = pod_where( { inc => 1 }, "Pod::Find" );
 
 =head1 DESCRIPTION
 
@@ -89,19 +89,19 @@ with any Perl-like extension (.pm, .pl, .pod) stripped.
 
 Print progress information while scanning.
 
-=item C<-perl =E<gt> 1>
+=item C<perl =E<gt> 1>
 
 Apply Perl-specific heuristics to find the correct PODs. This includes
 stripping Perl-like extensions, omitting subdirectories that are numeric
 but do I<not> match the current Perl interpreter's version id, suppressing
 F<site_perl> as a module hierarchy name etc.
 
-=item C<-script =E<gt> 1>
+=item C<script =E<gt> 1>
 
 Search for PODs in the current Perl interpreter's installation 
 B<scriptdir>. This is taken from the local L<Config|Config> module.
 
-=item C<-inc =E<gt> 1>
+=item C<inc =E<gt> 1>
 
 Search for PODs in the current Perl interpreter's I<@INC> paths. This
 automatically considers paths specified in the C<PERL5LIB> environment
@@ -321,18 +321,18 @@ Options:
 
 =over 4
 
-=item C<-inc =E<gt> 1>
+=item C<inc =E<gt> 1>
 
 Search @INC for the pod and also the C<scriptdir> defined in the
 L<Config|Config> module.
 
-=item C<-dirs =E<gt> [ $dir1, $dir2, ... ]>
+=item C<dirs =E<gt> [ $dir1, $dir2, ... ]>
 
 Reference to an array of search directories. These are searched in order
 before looking in C<@INC> (if B<-inc>). Current directory is used if
 none are specified.
 
-=item C<-verbose =E<gt> 1>
+=item C<verbose =E<gt> 1>
 
 List directories as they are searched
 
@@ -361,9 +361,9 @@ sub pod_where {
 
   # default options
   my %options = %(
-         '-inc' => 0,
-         '-verbose' => 0,
-         '-dirs' => \@( File::Spec->curdir ),
+         'inc' => 0,
+         'verbose' => 0,
+         'dirs' => \@( File::Spec->curdir ),
         );
 
   # Check for an options hash as first argument
@@ -384,14 +384,14 @@ sub pod_where {
   my @parts = split (m/::/, $pod);
 
   # Get full directory list
-  my @search_dirs = @{ %options{?'-dirs'} };
+  my @search_dirs = @{ %options{?'dirs'} };
 
-  if (%options{?'-inc'}) {
+  if (%options{?'inc'}) {
 
     require Config;
 
     # Add @INC
-    if ($^O eq 'MacOS' && %options{?'-inc'}) {
+    if ($^O eq 'MacOS' && %options{?'inc'}) {
         # tolerate '.', './some_dir' and '(../)+some_dir' on Mac OS
         my @new_INC = @INC;
         for ( @new_INC) {
@@ -404,7 +404,7 @@ sub pod_where {
             }
         }
         push (@search_dirs, < @new_INC);
-    } elsif (%options{?'-inc'}) {
+    } elsif (%options{?'inc'}) {
         push (@search_dirs, < @INC);
     }
 
@@ -421,7 +421,7 @@ sub pod_where {
   }
 
   warn "Search path is: ".join(' ', @search_dirs)."\n"
-        if %options{?'-verbose'};
+        if %options{?'verbose'};
 
   # Loop over directories
   Dir: foreach my $dir (  @search_dirs ) {
@@ -429,25 +429,25 @@ sub pod_where {
     # Don't bother if can't find the directory
     if (-d $dir) {
       warn "Looking in directory $dir\n" 
-        if %options{?'-verbose'};
+        if %options{'verbose'};
 
       # Now concatenate this directory with the pod we are searching for
       my $fullname = File::Spec->catfile($dir, < @parts);
       warn "Filename is now $fullname\n"
-        if %options{?'-verbose'};
+        if %options{'verbose'};
 
       # Loop over possible extensions
       foreach my $ext (@('', '.pod', '.pm', '.pl')) {
         my $fullext = $fullname . $ext;
         if (-f $fullext && 
-         contains_pod($fullext, %options{?'-verbose'}) ) {
-          warn "FOUND: $fullext\n" if %options{?'-verbose'};
+         contains_pod($fullext, %options{'verbose'}) ) {
+          warn "FOUND: $fullext\n" if %options{'verbose'};
           return $fullext;
         }
       }
     } else {
       warn "Directory $dir does not exist\n"
-        if %options{?'-verbose'};
+        if %options{'verbose'};
       next Dir;
     }
     # for some strange reason the path on MacOS/darwin/cygwin is

@@ -2,11 +2,11 @@
 # sysopen(), sysseek(), syswrite(), sysread() are tested in t/lib/syslfs.t.
 # If you modify/add tests here, remember to update also ext/Fcntl/t/syslfs.t.
 
+use Config;
+
 BEGIN {
 	# Don't bother if there are no quad offsets.
-        our %Config;
-	require Config; Config->import;
-	if (%Config{lseeksize} +< 8) {
+	if (config_value('lseeksize') +< 8) {
 		print "1..0 # Skip: no 64-bit file offsets\n";
 		exit(0);
 	}
@@ -135,7 +135,7 @@ EOF
 open(BIG, ">", "big") or do { warn "open failed: $!\n"; bye };
 binmode BIG;
 if ($r or not seek(BIG, 5_000_000_000, $SEEK_SET)) {
-    my $err = $r ? 'signal '.($r ^&^ 0x7f) : $!;
+    my $err = $r ?? 'signal '.($r ^&^ 0x7f) !! $!;
     explain("seeking past 2GB failed: $err");
     bye();
 }
