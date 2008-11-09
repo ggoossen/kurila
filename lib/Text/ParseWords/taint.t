@@ -3,7 +3,7 @@
 
 BEGIN {
     require Config;
-    if (%Config::Config{extensions} !~ m/\bList\/Util\b/) {
+    if (Config::config_value('extensions') !~ m/\bList\/Util\b/) {
 	print "1..0 # Skip: Scalar::Util was not built\n";
 	exit 0;
     }

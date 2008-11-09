@@ -358,10 +358,9 @@ SKIP: do {
     # don't untaint at all, should die
     undef $@;
 
-    try {File::Find::find( \%(wanted => \&simple_wanted, follow => 1),
-			    topdir('fa') );};
-
-    like( $@->{?description}, qr|Insecure dependency|, 'Not untainting causes death (good)' );
+    dies_like( sub { File::Find::find( \%(wanted => \&simple_wanted, follow => 1),
+                                       topdir('fa') );},
+               qr|Insecure dependency|, 'Not untainting causes death (good)' );
     chdir($cwd_untainted);
 
     # untaint pattern doesn't match, should die

@@ -1473,23 +1473,22 @@ PP(pp_helem)
     }
     he = hv_fetch_ent(hv, keysv, add && !defer, hash);
     svp = he ? &HeVAL(he) : NULL;
-    if (add) {
-	if (!svp || *svp == &PL_sv_undef) {
-	    SV* lv;
-	    SV* key2;
-	    if (!defer) {
-		DIE(aTHX_ PL_no_helem_sv, SVfARG(keysv));
+    if ( ! svp || *svp == &PL_sv_undef ) {
+	if ( optional ) {
+	    if (PL_op->op_private & OPpDEREF) {
+		mPUSHs(newRV(newSV(0)));
+		RETURN;
 	    }
-	    lv = sv_newmortal();
-	    sv_upgrade(lv, SVt_PVLV);
-	    LvTYPE(lv) = 'y';
-	    sv_magic(lv, key2 = newSVsv(keysv), PERL_MAGIC_defelem, NULL, 0);
-	    SvREFCNT_dec(key2);	/* sv_magic() increments refcount */
-	    LvTARG(lv) = SvREFCNT_inc_simple(hv);
-	    LvTARGLEN(lv) = 1;
-	    PUSHs(lv);
-	    RETURN;
+	    else
+		RETPUSHUNDEF;
 	}
+	if ( ! add )
+	    Perl_croak(aTHX_ "Missing hash key '%s'", SvPVX_const(keysv));
+	sv = newSV(0);
+	hv_store_ent(hv, keysv, sv, hash);
+	svp = &sv;
+    }
+    if (add) {
 	if (PL_op->op_private & OPpLVAL_INTRO) {
 	    if (HvNAME_get(hv) && isGV(*svp))
 		save_gp((GV*)*svp, !(PL_op->op_flags & OPf_SPECIAL));
@@ -1504,20 +1503,6 @@ PP(pp_helem)
 	}
 	else if (PL_op->op_private & OPpDEREF)
 	    vivify_ref(*svp, PL_op->op_private & OPpDEREF);
-    }
-    else {
-	if ( ! svp || *svp == &PL_sv_undef ) {
-	    if ( optional ) {
-		if (PL_op->op_private & OPpDEREF) {
-		    mPUSHs(newRV(newSV(0)));
-		    RETURN;
-		}
-		else
-		    RETPUSHUNDEF;
-	    }
-	    if ( ! add )
-		Perl_croak(aTHX_ "Missing hash key '%s'", SvPVX_const(keysv));
-	}
     }
     sv = (svp ? *svp : &PL_sv_undef);
     /* This makes C<local $tied{foo} = $tied{foo}> possible.

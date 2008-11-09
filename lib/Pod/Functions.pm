@@ -132,7 +132,7 @@ while ( ~< *DATA) {
     %Type{+$name} = $type;
     %Flavor{+$name} = $text;
     for my $t ( split m/[,\s]+/, $type ) {
-        push @{%Kinds{$t}}, $name;
+        push @{%Kinds{+$t}}, $name;
     }
 }
 

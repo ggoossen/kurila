@@ -32,7 +32,7 @@ my $PERL = %ENV{?PERL}
        $Is_MSWin32            ?? '.\perl' !!
        './perl');
 
-eval '%ENV{"FOO"} = "hi there";';	# check that ENV is inited inside eval
+eval '%ENV{+"FOO"} = "hi there";';	# check that ENV is inited inside eval
 # cmd.exe will echo 'variable=value' but 4nt will echo just the value
 # -- Nikola Knezevic
 if ($Is_MSWin32)  { ok `set FOO` =~ m/^(?:FOO=)?hi there$/; }

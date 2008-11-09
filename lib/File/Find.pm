@@ -535,7 +535,7 @@ sub Follow_SymLink($) {
     ($DEV, $INO)= lstat $AbsName;
 
     while (-l _) {
-	if (%SLnkSeen{$DEV . "," . $INO}++) {
+	if (%SLnkSeen{+ $DEV . "," . $INO}++) {
 	    if ($follow_skip +< 2) {
 		die "$AbsName is encountered a second time";
 	    }
@@ -559,7 +559,7 @@ sub Follow_SymLink($) {
 	return undef unless defined $DEV;  #  dangling symbolic link
     }
 
-    if ($full_check && defined $DEV && %SLnkSeen{$DEV . "," . $INO}++) {
+    if ($full_check && defined $DEV && %SLnkSeen{+ $DEV . "," . $INO}++) {
 	if ( ($follow_skip +< 1) || ((-d _) && ($follow_skip +< 2)) ) {
 	    die "$AbsName encountered a second time";
 	}
@@ -1262,7 +1262,7 @@ sub wrap_wanted {
     my $wanted = shift;
     if ( ref($wanted) eq 'HASH' ) {
 	if ( $wanted->{?follow} || $wanted->{?follow_fast}) {
-	    $wanted->{+follow_skip} = 1 unless defined $wanted->{follow_skip};
+	    $wanted->{+follow_skip} = 1 unless defined $wanted->{?follow_skip};
 	}
 	if ( $wanted->{?untaint} ) {
 	    $wanted->{+untaint_pattern} = $File::Find::untaint_pattern
@@ -1283,7 +1283,7 @@ sub find {
 
 sub finddepth {
     my $wanted = wrap_wanted(shift);
-    $wanted->{bydepth} = 1;
+    $wanted->{+bydepth} = 1;
     _find_opt($wanted, < @_);
 }
 

@@ -25,7 +25,7 @@ open (TMP, ">", 'tmp.pod') or die "Cannot create tmp.pod: $!\n";
 print TMP "Some random B<text>.\n";
 close TMP;
 open (OUT, ">", 'out.tmp') or die "Cannot create out.tmp: $!\n";
-$parser->parse_from_file (\%( -cutting => 0 ), 'tmp.pod', \*OUT);
+$parser->parse_from_file (\%( cutting => 0 ), 'tmp.pod', \*OUT);
 close OUT;
 open (OUT, "<", 'out.tmp') or die "Cannot open out.tmp: $!\n";
 while ( ~< *OUT) { last if m/^\.nh/ }
@@ -45,7 +45,7 @@ if ($output eq "Some random \\fBtext\\fR.\n") {
 
 $parser = Pod::Text->new or die "Cannot create parser\n";
 open (OUT, ">", 'out.tmp') or die "Cannot create out.tmp: $!\n";
-$parser->parse_from_file (\%( -cutting => 0 ), 'tmp.pod', \*OUT);
+$parser->parse_from_file (\%( cutting => 0 ), 'tmp.pod', \*OUT);
 close OUT;
 open (OUT, "<", 'out.tmp') or die "Cannot open out.tmp: $!\n";
 do {

@@ -414,7 +414,7 @@ sub can_load {
         my @load;
         for my $mod ( keys %$href ) {
 
-            next if $CACHE->{$mod}->{?usable} && !$args->{?nocache};
+            next if $CACHE->{?$mod}->{?usable} && !$args->{?nocache};
 
             ### else, check if the hash key is defined already,
             ### meaning $mod => 0,
@@ -424,7 +424,7 @@ sub can_load {
             ### ie ones containing _ as well. This addresses bug report
             ### #29348: Version compare logic doesn't handle alphas?
             if (    !$args->{?nocache}
-                    && defined $CACHE->{$mod}->{?usable}
+                    && defined $CACHE->{?$mod}->{?usable}
                     && (qv($CACHE->{$mod}->{?version}||0)->vcmp(qv($href->{?$mod})) +>= 0)
             ) {
                 $error = loc( q[Already tried to use '%1', which was unsuccessful], $mod);
@@ -438,12 +438,12 @@ sub can_load {
 
             if( !$mod_data or !defined $mod_data->{?file} ) {
                 $error = loc(q[Could not find or check module '%1'], $mod);
-                $CACHE->{$mod}->{+usable} = 0;
+                $CACHE->{+$mod}->{+usable} = 0;
                 last BLOCK;
             }
 
             map {
-                $CACHE->{$mod}->{+$_} = $mod_data->{?$_}
+                $CACHE->{+$mod}->{+$_} = $mod_data->{?$_}
             } qw[version file uptodate];
 
             push @load, $mod;

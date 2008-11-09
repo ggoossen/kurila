@@ -168,11 +168,15 @@ progstart:
 	;
 
 
-mblock	:	'{' mremember lineseq '}'
+mblock	:	
+                        {
+                            PL_parser->expect = XBLOCK;
+                        }
+               '{' mremember lineseq '}'
 			{
-                            $$ = block_end($2, $3);
-                            TOKEN_GETMAD($1,$$,'{');
-                            TOKEN_GETMAD($4,$$,'}');
+                            $$ = block_end($3, $4);
+                            TOKEN_GETMAD($2,$$,'{');
+                            TOKEN_GETMAD($5,$$,'}');
 			}
 	;
 

@@ -207,7 +207,7 @@ sub find_version {
 
 for my $version ( sort { $a <+> $b } keys %released ) {
     my $family = int ($version * 1000) / 1000;
-    push @{ %families{ $family }} , $version;
+    push @{ %families{ + $family }} , $version;
 }
 
 

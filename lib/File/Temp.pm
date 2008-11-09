@@ -1023,7 +1023,7 @@ sub new {
   ${*$fh} = $path;
 
   # Cache the filename by pid so that the destructor can decide whether to remove it
-  %FILES_CREATED_BY_OBJECT{$$}->{+$path} = 1;
+  %FILES_CREATED_BY_OBJECT{+$$}->{+$path} = 1;
 
   # Store unlink information in hash slot (plus other constructor info)
   %{*$fh} = %( < %args );
@@ -1152,7 +1152,7 @@ sub DESTROY {
     print "# --------->   Unlinking $self\n" if $DEBUG;
 
     # only delete if this process created it
-    return unless exists %FILES_CREATED_BY_OBJECT{$$}->{$self->filename};
+    return unless exists %FILES_CREATED_BY_OBJECT{+$$}->{$self->filename};
 
     # The unlink1 may fail if the file has been closed
     # by the caller. This leaves us with the decision

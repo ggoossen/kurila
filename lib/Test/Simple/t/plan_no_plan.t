@@ -8,7 +8,7 @@ BEGIN {
 use Test::More;
 
 BEGIN {
-    if( !%ENV{HARNESS_ACTIVE} && %ENV{PERL_CORE} ) {
+    if( !%ENV{?HARNESS_ACTIVE} && %ENV{?PERL_CORE} ) {
         plan skip_all => "Won't work with t/TEST";
     }
 }

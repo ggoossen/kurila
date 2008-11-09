@@ -3,15 +3,14 @@
 use Test::More;
 
 BEGIN {
-    our %Config;
-    require Config; Config->import;
-    if (%Config{'extensions'} !~ m/\bSocket\b/ && 
-        !(($^O eq 'VMS') && %Config{d_socket})) 
+    require Config;
+    if (Config::config_value('extensions') !~ m/\bSocket\b/ && 
+        !(($^O eq 'VMS') && Config::config_value('d_socket'))) 
     {
 	plan skip_all => "Test uses Socket, Socket not built";
     }
-    if ($^O eq 'MacOS' || ($^O eq 'irix' && %Config{osvers} == 5)) {
-	plan skip_all => "Test relies on resolution of localhost, fails on $^O (%Config{osvers})";
+    if ($^O eq 'MacOS' || ($^O eq 'irix' && Config::config_value('osvers') == 5)) {
+	plan skip_all => "Test relies on resolution of localhost, fails on $^O ($(Config::config_value('osvers')))";
     }
 }
 

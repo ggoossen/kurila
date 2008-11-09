@@ -19,7 +19,7 @@ my $mandirs = ! ! config_value("man1direxp") + ! ! config_value("man3direxp");
 my $ei = bless( \%(), 'ExtUtils::Installed' );
 
 # Make sure meta info is available
-$ei->{':private:'}->{+Config} = \%:<
+$ei->{+':private:'}->{+Config} = \%:<
   map { ($_ => config_value($_)) } config_keys();
 $ei->{':private:'}->{+INC} = \@INC;
 

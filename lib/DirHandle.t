@@ -1,9 +1,9 @@
 #!./perl
 
+use Config;
+
 BEGIN {
-    our %Config;
-    require Config; Config->import;
-    if (not %Config{'d_readdir'}) {
+    if (not config_value('d_readdir')) {
 	print "1..0\n";
 	exit 0;
     }
@@ -14,21 +14,21 @@ require './test.pl';
 
 plan(5);
 
-my $dot = DirHandle->new($^O eq 'MacOS' ? ':' : '.');
+my $dot = DirHandle->new($^O eq 'MacOS' ?? ':' !! '.');
 
 ok(defined($dot));
 
 my @a = sort glob("*");
 my $first;
 { $first = $dot->readdir } while defined($first) && $first =~ m/^\./;
-ok(+(< grep { $_ eq $first } @a));
+ok(grep { $_ eq $first } @a);
 
 my @b = sort( @($first, (< grep {m/^[^.]/} $dot->readdirs)));
-ok(+(join("\0", @a) eq join("\0", @b)));
+is(join("\0", @a), join("\0", @b));
 
 $dot->rewind;
 my @c = sort grep {m/^[^.]/} $dot->readdirs;
-cmp_ok(+(join("\0", @b), 'eq', join("\0", @c)));
+is(join("\0", @b), join("\0", @c));
 
 $dot->close;
 $dot->rewind;

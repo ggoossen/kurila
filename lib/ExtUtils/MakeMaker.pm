@@ -473,7 +473,7 @@ END
             }
         }
         if ($self->{?PARENT}) {
-            $self->{PARENT}->{CHILDREN}->{+$newclass} = $self;
+            $self->{PARENT}->{+CHILDREN}->{+$newclass} = $self;
             foreach my $opt (qw(POLLUTE PERL_CORE LINKTYPE)) {
                 if (exists $self->{PARENT}->{$opt}
                     and not exists $self->{$opt})
@@ -595,7 +595,7 @@ END
 
     if ($self->{?PARENT}) {
         for (qw/install dist dist_basics dist_core distdir dist_test dist_ci/) {
-            $self->{SKIPHASH}->{+$_} = 1;
+            $self->{+SKIPHASH}->{+$_} = 1;
         }
     }
 

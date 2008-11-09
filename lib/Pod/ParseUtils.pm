@@ -86,7 +86,7 @@ method or by calling the B<file()> method with a scalar argument.
 
 # The POD file name the list appears in
 sub file {
-   return ((nelems @_) +> 1) ??  @(@_[0]->{+file} = @_[1]) !! @_[0]->{?file};
+   return ((nelems @_) +> 1) ??  @(@_[0]->{file} = @_[1]) !! @_[0]->{file};
 }
 
 =item $list-E<gt>start()
@@ -100,7 +100,7 @@ argument.
 
 # The line in the file the node appears
 sub start {
-   return ((nelems @_) +> 1) ??  @(@_[0]->{+start} = @_[1]) !! @_[0]->{?start};
+   return ((nelems @_) +> 1) ??  @(@_[0]->{start} = @_[1]) !! @_[0]->{start};
 }
 
 =item $list-E<gt>indent()
@@ -114,7 +114,7 @@ with a scalar argument.
 
 # indent level
 sub indent {
-   return ((nelems @_) +> 1) ??  @(@_[0]->{+indent} = @_[1]) !! @_[0]->{?indent};
+   return ((nelems @_) +> 1) ??  @(@_[0]->{indent} = @_[1]) !! @_[0]->{indent};
 }
 
 =item $list-E<gt>type()
@@ -129,7 +129,7 @@ with a scalar argument.
 
 # The type of the list (UL, OL, ...)
 sub type {
-   return ((nelems @_) +> 1) ??  @(@_[0]->{+type} = @_[1]) !! @_[0]->{?type};
+   return ((nelems @_) +> 1) ??  @(@_[0]->{type} = @_[1]) !! @_[0]->{type};
 }
 
 =item $list-E<gt>rx()
@@ -146,7 +146,7 @@ with a scalar argument.
 
 # The regular expression to simplify the items
 sub rx {
-   return ((nelems @_) +> 1) ??  @(@_[0]->{+rx} = @_[1]) !! @_[0]->{?rx};
+   return ((nelems @_) +> 1) ??  @(@_[0]->{rx} = @_[1]) !! @_[0]->{rx};
 }
 
 =item $list-E<gt>item()
@@ -165,7 +165,7 @@ sub item {
         return $item;
     }
     else {
-        return @{$self->{?_items}};
+        return @{$self->{_items}};
     }
 }
 
@@ -182,7 +182,7 @@ with a scalar argument.
 # possibility for parsers/translators to store information about the
 # lists's parent object
 sub parent {
-   return ((nelems @_) +> 1) ??  @(@_[0]->{+parent} = @_[1]) !! @_[0]->{?parent};
+   return ((nelems @_) +> 1) ??  @(@_[0]->{parent} = @_[1]) !! @_[0]->{parent};
 }
 
 =item $list-E<gt>tag()
@@ -200,7 +200,7 @@ with a scalar argument.
 # possibility for parsers/translators to store information about the
 # list's object
 sub tag {
-   return ((nelems @_) +> 1) ??  @(@_[0]->{+tag} = @_[1]) !! @_[0]->{?tag};
+   return ((nelems @_) +> 1) ??  @(@_[0]->{tag} = @_[1]) !! @_[0]->{tag};
 }
 
 #-----------------------------------------------------------------------------

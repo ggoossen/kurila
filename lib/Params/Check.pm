@@ -365,7 +365,7 @@ sub check {
     ### can't do it before, because something may go wrong later,
     ### leaving the user with a few set variables
     for my $key (keys %defs) {
-        if( my $ref = %utmpl{$key}->{?'store'} ) {
+        if( my $ref = %utmpl{?$key}->{?'store'} ) {
             $$ref = $NO_DUPLICATES ?? delete %defs{$key} !! %defs{?$key};
         }
     }

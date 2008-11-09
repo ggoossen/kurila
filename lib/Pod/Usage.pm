@@ -458,11 +458,11 @@ sub pod2usage {
     }
     elsif (m/^[-+]?\d+$/) {
         ## User passed in the exit value to use
-        %opts{+"-exitval"} =  $_;
+        %opts{+"exitval"} =  $_;
     }
     else {
         ## User passed in a message to print before issuing usage.
-        $_  and  %opts{+"-message"} = $_;
+        $_  and  %opts{+"message"} = $_;
     }
 
     ## Need this for backward compatibility since we formerly used
@@ -478,77 +478,77 @@ sub pod2usage {
     } @( ( <keys %opts)) );
 
     ## Now determine default -exitval and -verbose values to use
-    if ((! defined %opts{?"-exitval"}) && (! defined %opts{?"-verbose"})) {
-        %opts{+"-exitval"} = 2;
-        %opts{+"-verbose"} = 0;
+    if ((! defined %opts{?"exitval"}) && (! defined %opts{?"verbose"})) {
+        %opts{+"exitval"} = 2;
+        %opts{+"verbose"} = 0;
     }
-    elsif (! defined %opts{?"-exitval"}) {
-        %opts{+"-exitval"} = (%opts{?"-verbose"} +> 0) ?? 1 !! 2;
+    elsif (! defined %opts{?"exitval"}) {
+        %opts{+"exitval"} = (%opts{?"verbose"} +> 0) ?? 1 !! 2;
     }
-    elsif (! defined %opts{?"-verbose"}) {
-        %opts{+"-verbose"} = (lc(%opts{?"-exitval"}) eq "noexit" ||
-                             %opts{?"-exitval"} +< 2);
+    elsif (! defined %opts{?"verbose"}) {
+        %opts{+"verbose"} = (lc(%opts{?"exitval"}) eq "noexit" ||
+                             %opts{?"exitval"} +< 2);
     }
 
     ## Default the output file
-    %opts{+"-output"} = (lc(%opts{?"-exitval"}) eq "noexit" ||
-                        %opts{?"-exitval"} +< 2) ?? \*STDOUT !! \*STDERR
-            unless (defined %opts{?"-output"});
+    %opts{+"output"} = (lc(%opts{?"exitval"}) eq "noexit" ||
+                        %opts{?"exitval"} +< 2) ?? \*STDOUT !! \*STDERR
+            unless (defined %opts{?"output"});
     ## Default the input file
-    %opts{+"-input"} = $0  unless (defined %opts{?"-input"});
+    %opts{+"input"} = $0  unless (defined %opts{?"input"});
 
     ## Look up input file in path if it doesnt exist.
-    unless ((ref %opts{?"-input"}) || (-e %opts{?"-input"})) {
-        my ($basename) = (%opts{?"-input"});
+    unless ((ref %opts{?"input"}) || (-e %opts{?"input"})) {
+        my ($basename) = (%opts{?"input"});
         my $pathsep = ($^O =~ m/^(?:dos|os2|MSWin32)$/) ?? ";"
                             !! (($^O eq 'MacOS' || $^O eq 'VMS') ?? ',' !!  ":");
-        my $pathspec = %opts{?"-pathlist"} || %ENV{?PATH} || %ENV{?PERL5LIB};
+        my $pathspec = %opts{?"pathlist"} || %ENV{?PATH} || %ENV{?PERL5LIB};
 
         my @paths = @( (ref $pathspec) ?? < @$pathspec !! < split($pathsep, $pathspec) );
         for my $dirname ( @paths) {
             local $_ = File::Spec->catfile($dirname, $basename) if length $dirname;
-            last if (-e $_) && (%opts{+"-input"} = $_);
+            last if (-e $_) && (%opts{+"input"} = $_);
         }
     }
 
     ## Now create a pod reader and constrain it to the desired sections.
     my $parser = Pod::Usage->new(USAGE_OPTIONS => \%opts);
-    if (%opts{?"-verbose"} == 0) {
+    if (%opts{?"verbose"} == 0) {
         $parser->select('SYNOPSIS\s*');
     }
-    elsif (%opts{?"-verbose"} == 1) {
+    elsif (%opts{?"verbose"} == 1) {
         my $opt_re = '(?i)' .
                      '(?:OPTIONS|ARGUMENTS)' .
                      '(?:\s*(?:AND|\/)\s*(?:OPTIONS|ARGUMENTS))?';
         $parser->select( 'SYNOPSIS', $opt_re, "DESCRIPTION/$opt_re" );
     }
-    elsif (%opts{?"-verbose"} +>= 2 && %opts{?"-verbose"} != 99) {
+    elsif (%opts{?"verbose"} +>= 2 && %opts{?"verbose"} != 99) {
         $parser->select('.*');
     }
-    elsif (%opts{?"-verbose"} == 99) {
-        $parser->select( %opts{"-sections"} );
-        %opts{+"-verbose"} = 1;
+    elsif (%opts{?"verbose"} == 99) {
+        $parser->select( %opts{"sections"} );
+        %opts{+"verbose"} = 1;
     }
 
     ## Now translate the pod document and then exit with the desired status
-    if ( !%opts{?"-noperldoc"}
-             and  %opts{?"-verbose"} +>= 2 
-             and  !ref(%opts{?"-input"})
-             and  %opts{?"-output"} \== \*STDOUT )
+    if ( !%opts{?"noperldoc"}
+             and  %opts{?"verbose"} +>= 2 
+             and  !ref(%opts{?"input"})
+             and  %opts{?"output"} \== \*STDOUT )
     {
        ## spit out the entire PODs. Might as well invoke perldoc
        my $progpath = File::Spec->catfile(config_value('scriptdir'), "perldoc");
-       system($progpath, %opts{?"-input"});
+       system($progpath, %opts{?"input"});
        if($?) {
          # RT16091: fall back to more if perldoc failed
-         system(%ENV{?PAGER} || 'more', %opts{?"-input"});
+         system(%ENV{?PAGER} || 'more', %opts{?"input"});
        }
     }
     else {
-       $parser->parse_from_file(%opts{?"-input"}, %opts{"-output"});
+       $parser->parse_from_file(%opts{?"input"}, %opts{"output"});
     }
 
-    exit(%opts{?"-exitval"})  unless (lc(%opts{?"-exitval"}) eq 'noexit');
+    exit(%opts{?"exitval"})  unless (lc(%opts{?"exitval"}) eq 'noexit');
 }
 
 ##---------------------------------------------------------------------------

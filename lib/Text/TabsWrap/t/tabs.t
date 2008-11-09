@@ -91,7 +91,7 @@ plan tests => $numtests;
 
 use Text::Tabs;
 
-my $rerun = %ENV{'PERL_DL_NONLAZY'} ?? 0 !! 1;
+my $rerun = %ENV{?'PERL_DL_NONLAZY'} ?? 0 !! 1;
 
 while (@tests) {
 	my $in = shift(@tests);

@@ -266,7 +266,7 @@ sub _handle_encoding_line {
 
   my $e    = $1;
   my $orig = $e;
-  push @{ $self->{'encoding_command_reqs'} }, "=encoding $orig";
+  push @{ $self->{+'encoding_command_reqs'} }, "=encoding $orig";
 
   my $enc_error;
 
@@ -326,7 +326,7 @@ sub _handle_encoding_line {
 
     $self->scream( $self->{?'line_count'}, $enc_error );
   }
-  push @{ $self->{'encoding_command_statuses'} }, $enc_error;
+  push @{ $self->{+'encoding_command_statuses'} }, $enc_error;
 
   return '=encoding ALREADYDONE';
 }

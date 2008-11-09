@@ -81,7 +81,9 @@ sub new {
 
     my %args = %( < @_ );
 
-    my $self = \%();
+    my $self = \%( ':private:' => \%(),
+                   'Perl' => \%(),
+               );
 
     if (%args{?config_override}) {
         try {
@@ -160,7 +162,7 @@ sub new {
         $module =~ s!/!::!g;
 
         # Find the top-level module file in @INC
-        $self->{$module}->{+version} = '';
+        $self->{+$module}->{+version} = '';
         foreach my $dir ( @{$self->{':private:'}->{INC}} ) {
             my $p = File::Spec->catfile($dir, $modfile);
             if (-r $p) {

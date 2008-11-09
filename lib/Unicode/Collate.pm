@@ -226,7 +226,7 @@ sub checkCollator {
 	or croak "$PACKAGE: list for rearrangement must be store in ARRAYREF";
 
     # keys of $self->{rearrangeHash} are $self->{rearrange}.
-    $self->{+rearrangeHash} = undef;
+    $self->{+rearrangeHash} = \%();
 
     if ((nelems @{ $self->{?rearrange} })) { <
 	%{ $self->{rearrangeHash} }{[ @{ $self->{?rearrange} } ]} = ();
@@ -391,11 +391,11 @@ sub parseEntry
 	# if and only if "all" CEs are [.0000.0000.0000].
     }
 
-    $self->{mapping}->{+$entry} = $is_L3_ignorable ?? \@() !! \@key;
+    $self->{+mapping}->{+$entry} = $is_L3_ignorable ?? \@() !! \@key;
 
     if ((nelems @uv) +> 1) {
-	(!$self->{maxlength}->{?@uv[0]} || $self->{maxlength}->{?@uv[0]} +< nelems @uv)
-	    and $self->{maxlength}->{+@uv[0]} = (nelems @uv);
+	(!$self->{?maxlength}->{?@uv[0]} || $self->{maxlength}->{?@uv[0]} +< nelems @uv)
+	    and $self->{+maxlength}->{+@uv[0]} = (nelems @uv);
     }
 }
 

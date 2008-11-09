@@ -466,7 +466,7 @@ sub _do_middle_main_loop {
           print $fh qq[name="$esc"];
           DEBUG and print "Linearized ", scalar(nelems @to_unget),
            " tokens as \"$name\".\n";
-          push @{ $self->{'PSHTML_index_points'} }, \@($tagname, $name)
+          push @{ $self->{+'PSHTML_index_points'} }, \@($tagname, $name)
            if %ToIndex{?$tagname };
             # Obviously, this discards all formatting codes (saving
             #  just their content), but ahwell.

@@ -109,12 +109,12 @@ methods/attributes:
 
 =head2 B<new()>
 
-        my $pod_input1 = Pod::InputSource->new(-handle => $filehandle);
-        my $pod_input2 = new Pod::InputSource(-handle => $filehandle,
-                                              -name   => $name);
-        my $pod_input3 = new Pod::InputSource(-handle => \*STDIN);
-        my $pod_input4 = Pod::InputSource->new(-handle => \*STDIN,
-                                               -name => "(STDIN)");
+        my $pod_input1 = Pod::InputSource->new(handle => $filehandle);
+        my $pod_input2 = new Pod::InputSource(handle => $filehandle,
+                                              name   => $name);
+        my $pod_input3 = new Pod::InputSource(handle => \*STDIN);
+        my $pod_input4 = Pod::InputSource->new(handle => \*STDIN,
+                                               name => "(STDIN)");
 
 This is a class method that constructs a C<Pod::InputSource> object and
 returns a reference to the new input source object. It takes one or more
@@ -136,9 +136,9 @@ sub new {
     ## hash that is used to represent this object. Note that we default
     ## certain values by specifying them *before* the arguments passed.
     ## If they are in the argument list, they will override the defaults.
-    my $self = \%( -name        => '(unknown)',
-                 -handle      => undef,
-                 -was_cutting => 0,
+    my $self = \%( name        => '(unknown)',
+                 handle      => undef,
+                 was_cutting => 0,
                  < @_ );
 
     ## Bless ourselves into the desired class and perform any initialization
@@ -165,8 +165,8 @@ contents of the given argument.
 =cut
 
 sub name {
-   ((nelems @_) +> 1)  and  @_[0]->{+'-name'} = @_[1];
-   return @_[0]->{?'-name'};
+   ((nelems @_) +> 1)  and  @_[0]->{+'name'} = @_[1];
+   return @_[0]->{?'name'};
 }
 
 ## allow 'filename' as an alias for 'name'
@@ -188,7 +188,7 @@ one used to contructed this input source object).
 =cut
 
 sub handle {
-   return @_[0]->{?'-handle'};
+   return @_[0]->{?'handle'};
 }
 
 ##---------------------------------------------------------------------------
@@ -232,24 +232,24 @@ It has the following methods/attributes:
 
 =head2 Pod::Paragraph-E<gt>B<new()>
 
-        my $pod_para1 = Pod::Paragraph->new(-text => $text);
-        my $pod_para2 = Pod::Paragraph->new(-name => $cmd,
-                                            -text => $text);
-        my $pod_para3 = new Pod::Paragraph(-text => $text);
-        my $pod_para4 = new Pod::Paragraph(-name => $cmd,
-                                           -text => $text);
-        my $pod_para5 = Pod::Paragraph->new(-name => $cmd,
-                                            -text => $text,
-                                            -file => $filename,
-                                            -line => $line_number);
+        my $pod_para1 = Pod::Paragraph->new(text => $text);
+        my $pod_para2 = Pod::Paragraph->new(name => $cmd,
+                                            text => $text);
+        my $pod_para3 = new Pod::Paragraph(text => $text);
+        my $pod_para4 = new Pod::Paragraph(name => $cmd,
+                                           text => $text);
+        my $pod_para5 = Pod::Paragraph->new(name => $cmd,
+                                            text => $text,
+                                            file => $filename,
+                                            line => $line_number);
 
 This is a class method that constructs a C<Pod::Paragraph> object and
 returns a reference to the new paragraph object. It may be given one or
-two keyword arguments. The C<-text> keyword indicates the corresponding
-text of the POD paragraph. The C<-name> keyword indicates the name of
+two keyword arguments. The C<text> keyword indicates the corresponding
+text of the POD paragraph. The C<name> keyword indicates the name of
 the corresponding POD command, such as C<head1> or C<item> (it should
 I<not> contain the C<=> prefix); this is needed only if the POD
-paragraph corresponds to a command paragraph. The C<-file> and C<-line>
+paragraph corresponds to a command paragraph. The C<file> and C<line>
 keywords indicate the filename and line number corresponding to the
 beginning of the paragraph 
 
@@ -265,13 +265,13 @@ sub new {
     ## certain values by specifying them *before* the arguments passed.
     ## If they are in the argument list, they will override the defaults.
     my $self = \%(
-          -name       => undef,
-          -text       => ((nelems @_) == 1) ?? shift !! undef,
-          -file       => '<unknown-file>',
-          -line       => 0,
-          -prefix     => '=',
-          -separator  => ' ',
-          -ptree => \@(),
+          name       => undef,
+          text       => ((nelems @_) == 1) ?? shift !! undef,
+          file       => '<unknown-file>',
+          line       => 0,
+          prefix     => '=',
+          separator  => ' ',
+          ptree => \@(),
           < @_
     );
 
@@ -292,8 +292,8 @@ the name of the command (I<without> any leading C<=> prefix).
 =cut
 
 sub cmd_name {
-   ((nelems @_) +> 1)  and  @_[0]->{+'-name'} = @_[1];
-   return @_[0]->{?'-name'};
+   ((nelems @_) +> 1)  and  @_[0]->{+'name'} = @_[1];
+   return @_[0]->{?'name'};
 }
 
 ## let name() be an alias for cmd_name()
@@ -310,8 +310,8 @@ This method will return the corresponding text of the paragraph.
 =cut
 
 sub text {
-   ((nelems @_) +> 1)  and  @_[0]->{+'-text'} = @_[1];
-   return @_[0]->{?'-text'};
+   ((nelems @_) +> 1)  and  @_[0]->{+'text'} = @_[1];
+   return @_[0]->{?'text'};
 }       
 
 ##---------------------------------------------------------------------------
@@ -326,9 +326,9 @@ as it appeared in the input.
 =cut
 
 sub raw_text {
-   return @_[0]->{?'-text'}  unless (defined @_[0]->{?'-name'});
-   return @_[0]->{?'-prefix'} . @_[0]->{?'-name'} . 
-          @_[0]->{?'-separator'} . @_[0]->{?'-text'};
+   return @_[0]->{?'text'}  unless (defined @_[0]->{?'name'});
+   return @_[0]->{?'prefix'} . @_[0]->{?'name'} . 
+          @_[0]->{?'separator'} . @_[0]->{?'text'};
 }
 
 ##---------------------------------------------------------------------------
@@ -344,7 +344,7 @@ or "==").
 =cut
 
 sub cmd_prefix {
-   return @_[0]->{?'-prefix'};
+   return @_[0]->{?'prefix'};
 }
 
 ##---------------------------------------------------------------------------
@@ -360,7 +360,7 @@ paragraph (if any).
 =cut
 
 sub cmd_separator {
-   return @_[0]->{?'-separator'};
+   return @_[0]->{?'separator'};
 }
 
 ##---------------------------------------------------------------------------
@@ -376,8 +376,8 @@ This method will get/set the corresponding parse-tree of the paragraph's text.
 =cut
 
 sub parse_tree {
-   ((nelems @_) +> 1)  and  @_[0]->{+'-ptree'} = @_[1];
-   return @_[0]->{?'-ptree'};
+   ((nelems @_) +> 1)  and  @_[0]->{+'ptree'} = @_[1];
+   return @_[0]->{?'ptree'};
 }       
 
 ## let ptree() be an alias for parse_tree()
@@ -399,8 +399,8 @@ by a colon (':'), followed by the line number.
 =cut
 
 sub file_line {
-   my @loc = @(@_[0]->{?'-file'} || '<unknown-file>',
-              @_[0]->{?'-line'} || 0);
+   my @loc = @(@_[0]->{?'file'} || '<unknown-file>',
+              @_[0]->{?'line'} || 0);
    return @loc;
 }
 
@@ -423,25 +423,25 @@ It has the following methods/attributes:
 
 =head2 Pod::InteriorSequence-E<gt>B<new()>
 
-        my $pod_seq1 = Pod::InteriorSequence->new(-name => $cmd
-                                                  -ldelim => $delimiter);
-        my $pod_seq2 = new Pod::InteriorSequence(-name => $cmd,
-                                                 -ldelim => $delimiter);
-        my $pod_seq3 = new Pod::InteriorSequence(-name => $cmd,
-                                                 -ldelim => $delimiter,
-                                                 -file => $filename,
-                                                 -line => $line_number);
+        my $pod_seq1 = Pod::InteriorSequence->new(name => $cmd
+                                                  ldelim => $delimiter);
+        my $pod_seq2 = new Pod::InteriorSequence(name => $cmd,
+                                                 ldelim => $delimiter);
+        my $pod_seq3 = new Pod::InteriorSequence(name => $cmd,
+                                                 ldelim => $delimiter,
+                                                 file => $filename,
+                                                 line => $line_number);
 
-        my $pod_seq4 = new Pod::InteriorSequence(-name => $cmd, $ptree);
+        my $pod_seq4 = new Pod::InteriorSequence(name => $cmd, $ptree);
         my $pod_seq5 = new Pod::InteriorSequence($cmd, $ptree);
 
 This is a class method that constructs a C<Pod::InteriorSequence> object
 and returns a reference to the new interior sequence object. It should
-be given two keyword arguments.  The C<-ldelim> keyword indicates the
+be given two keyword arguments.  The C<ldelim> keyword indicates the
 corresponding left-delimiter of the interior sequence (e.g. 'E<lt>').
-The C<-name> keyword indicates the name of the corresponding interior
-sequence command, such as C<I> or C<B> or C<C>. The C<-file> and
-C<-line> keywords indicate the filename and line number corresponding
+The C<name> keyword indicates the name of the corresponding interior
+sequence command, such as C<I> or C<B> or C<C>. The C<file> and
+C<line> keywords indicate the filename and line number corresponding
 to the beginning of the interior sequence. If the C<$ptree> argument is
 given, it must be the last argument, and it must be either string, or
 else an array-ref suitable for passing to B<Pod::ParseTree::new> (or
@@ -456,14 +456,14 @@ sub new {
 
     ## See if first argument has no keyword
     if ((((nelems @_) +<= 2) or ((nelems @_) % 2)) and @_[0] !~ m/^-\w/) {
-       ## Yup - need an implicit '-name' before first parameter
-       unshift @_, '-name';
+       ## Yup - need an implicit 'name' before first parameter
+       unshift @_, 'name';
     }
 
     ## See if odd number of args
     if (((nelems @_) % 2) != 0) {
-       ## Yup - need an implicit '-ptree' before the last parameter
-       splice @_, ((nelems @_)-1), 0, '-ptree';
+       ## Yup - need an implicit 'ptree' before the last parameter
+       splice @_, ((nelems @_)-1), 0, 'ptree';
     }
 
     ## Any remaining arguments are treated as initial values for the
@@ -471,22 +471,22 @@ sub new {
     ## certain values by specifying them *before* the arguments passed.
     ## If they are in the argument list, they will override the defaults.
     my $self = \%(
-          -name       => ((nelems @_) == 1) ?? @_[0] !! undef,
-          -file       => '<unknown-file>',
-          -line       => 0,
-          -ldelim     => '<',
-          -rdelim     => '>',
+          name       => ((nelems @_) == 1) ?? @_[0] !! undef,
+          file       => '<unknown-file>',
+          line       => 0,
+          ldelim     => '<',
+          rdelim     => '>',
           < @_
     );
 
     ## Initialize contents if they havent been already
-    my $ptree = $self->{?'-ptree'} || Pod::ParseTree->new();
+    my $ptree = $self->{?'ptree'} || Pod::ParseTree->new();
     if ( (ref $ptree) =~ m/^(ARRAY)?$/ ) {
         ## We have an array-ref, or a normal scalar. Pass it as an
         ## an argument to the ptree-constructor
         $ptree = Pod::ParseTree->new($1 ?? \@($ptree) !! $ptree);
     }
-    $self->{+'-ptree'} = $ptree;
+    $self->{+'ptree'} = $ptree;
 
     ## Bless ourselves into the desired class and perform any initialization
     bless $self, $class;
@@ -504,8 +504,8 @@ The name of the interior sequence command.
 =cut
 
 sub cmd_name {
-   ((nelems @_) +> 1)  and  @_[0]->{+'-name'} = @_[1];
-   return @_[0]->{?'-name'};
+   ((nelems @_) +> 1)  and  @_[0]->{+'name'} = @_[1];
+   return @_[0]->{?'name'};
 }
 
 ## let name() be an alias for cmd_name()
@@ -533,8 +533,8 @@ sub _set_child2parent_links {
 
 sub _unset_child2parent_links {
    my $self = shift;
-   $self->{+'-parent_sequence'} = undef;
-   my $ptree = $self->{?'-ptree'};
+   $self->{+'parent_sequence'} = undef;
+   my $ptree = $self->{?'ptree'};
    for ( @$ptree) {
       next  unless (ref  and  ref ne 'SCALAR');
       $_->_unset_child2parent_links()
@@ -556,7 +556,7 @@ of this interior sequence.
 
 sub prepend {
    my $self  = shift;
-   $self->{?'-ptree'}->prepend(< @_);
+   $self->{?'ptree'}->prepend(< @_);
    _set_child2parent_links($self, < @_);
    return $self;
 }       
@@ -575,7 +575,7 @@ of this interior sequence.
 
 sub append {
    my $self = shift;
-   $self->{?'-ptree'}->append(< @_);
+   $self->{?'ptree'}->append(< @_);
    _set_child2parent_links($self, < @_);
    return $self;
 }       
@@ -594,8 +594,8 @@ returned. Otherwise C<undef> is returned.
 
 sub nested {
    my $self = shift;
-  ((nelems @_) == 1)  and  $self->{+'-parent_sequence'} = shift;
-   return  $self->{?'-parent_sequence'} || undef;
+  ((nelems @_) == 1)  and  $self->{+'parent_sequence'} = shift;
+   return  $self->{?'parent_sequence'} || undef;
 }
 
 ##---------------------------------------------------------------------------
@@ -611,11 +611,11 @@ exactly as it appeared in the input.
 
 sub raw_text {
    my $self = shift;
-   my $text = $self->{?'-name'} . $self->{?'-ldelim'};
-   for (  $self->{'-ptree'}->children ) {
+   my $text = $self->{?'name'} . $self->{?'ldelim'};
+   for (  $self->{'ptree'}->children ) {
       $text .= (ref $_) ?? $_->raw_text !! $_;
    }
-   $text .= $self->{?'-rdelim'};
+   $text .= $self->{?'rdelim'};
    return $text;
 }
 
@@ -631,8 +631,8 @@ sequence (should be "<").
 =cut
 
 sub left_delimiter {
-   ((nelems @_) +> 1)  and  @_[0]->{+'-ldelim'} = @_[1];
-   return @_[0]->{?'-ldelim'};
+   ((nelems @_) +> 1)  and  @_[0]->{+'ldelim'} = @_[1];
+   return @_[0]->{?'ldelim'};
 }
 
 ## let ldelim() be an alias for left_delimiter()
@@ -648,8 +648,8 @@ sequence (should be ">").
 =cut
 
 sub right_delimiter {
-   ((nelems @_) +> 1)  and  @_[0]->{+'-rdelim'} = @_[1];
-   return @_[0]->{?'-rdelim'};
+   ((nelems @_) +> 1)  and  @_[0]->{+'rdelim'} = @_[1];
+   return @_[0]->{?'rdelim'};
 }
 
 ## let rdelim() be an alias for right_delimiter()
@@ -669,8 +669,8 @@ sequence's text.
 =cut
 
 sub parse_tree {
-   ((nelems @_) +> 1)  and  @_[0]->{+'-ptree'} = @_[1];
-   return @_[0]->{?'-ptree'};
+   ((nelems @_) +> 1)  and  @_[0]->{+'ptree'} = @_[1];
+   return @_[0]->{?'ptree'};
 }       
 
 ## let ptree() be an alias for parse_tree()
@@ -692,8 +692,8 @@ by a colon (':'), followed by the line number.
 =cut
 
 sub file_line {
-   my @loc = @(@_[0]->{?'-file'}  || '<unknown-file>',
-              @_[0]->{?'-line'}  || 0);
+   my @loc = @(@_[0]->{?'file'}  || '<unknown-file>',
+              @_[0]->{?'line'}  || 0);
    return @loc;
 }
 

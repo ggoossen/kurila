@@ -30,10 +30,10 @@ my $class = 'ExtUtils::MM_Unix';
 
 # only one of the following can be true
 # test should be removed if MM_Unix ever stops handling other OS than Unix
-my $os =  (%ExtUtils::MM_Unix::Is{OS2}   || 0)
-        + (%ExtUtils::MM_Unix::Is{Win32} || 0) 
-        + (%ExtUtils::MM_Unix::Is{Dos}   || 0)
-        + (%ExtUtils::MM_Unix::Is{VMS}   || 0); 
+my $os =  (%ExtUtils::MM_Unix::Is{?OS2}   || 0)
+        + (%ExtUtils::MM_Unix::Is{?Win32} || 0) 
+        + (%ExtUtils::MM_Unix::Is{?Dos}   || 0)
+        + (%ExtUtils::MM_Unix::Is{?VMS}   || 0); 
 ok ( $os +<= 1,  'There can be only one (or none)');
 
 cmp_ok ($ExtUtils::MM_Unix::VERSION, '+>=', '1.12606', 'Should be at least version 1.12606');
@@ -135,22 +135,22 @@ ok ( $class->dist_basics(), 'distclean :: realclean distcheck');
 # has_link_code tests
 
 my $t = bless \%( NAME => "Foo" ), $class;
-$t->{HAS_LINK_CODE} = 1; 
+$t->{+HAS_LINK_CODE} = 1; 
 is ($t->has_link_code(),1,'has_link_code'); is ($t->{HAS_LINK_CODE},1);
 
-$t->{HAS_LINK_CODE} = 0;
+$t->{+HAS_LINK_CODE} = 0;
 is ($t->has_link_code(),0); is ($t->{HAS_LINK_CODE},0);
 
 delete $t->{HAS_LINK_CODE}; delete $t->{OBJECT};
 is ($t->has_link_code(),0); is ($t->{HAS_LINK_CODE},0);
 
-delete $t->{HAS_LINK_CODE}; $t->{OBJECT} = 1;
+delete $t->{HAS_LINK_CODE}; $t->{+OBJECT} = 1;
 is ($t->has_link_code(),1); is ($t->{HAS_LINK_CODE},1);
 
-delete $t->{HAS_LINK_CODE}; delete $t->{OBJECT}; $t->{MYEXTLIB} = 1;
+delete $t->{HAS_LINK_CODE}; delete $t->{OBJECT}; $t->{+MYEXTLIB} = 1;
 is ($t->has_link_code(),1); is ($t->{HAS_LINK_CODE},1);
 
-delete $t->{HAS_LINK_CODE}; delete $t->{MYEXTLIB}; $t->{C} = \@( 'Gloin' );
+delete $t->{HAS_LINK_CODE}; delete $t->{MYEXTLIB}; $t->{+C} = \@( 'Gloin' );
 is ($t->has_link_code(),1); is ($t->{HAS_LINK_CODE},1);
 
 ###############################################################################
@@ -217,10 +217,10 @@ foreach (qw/ EXPORT_LIST PERL_ARCHIVE PERL_ARCHIVE_AFTER /)
 
 
 do {
-    $t->{CCFLAGS} = '-DMY_THING';
-    $t->{LIBPERL_A} = 'libperl.a';
-    $t->{LIB_EXT}   = '.a';
-    local $t->{NEEDS_LINKING} = 1;
+    $t->{+CCFLAGS} = '-DMY_THING';
+    $t->{+LIBPERL_A} = 'libperl.a';
+    $t->{+LIB_EXT}   = '.a';
+    local $t->{+NEEDS_LINKING} = 1;
     $t->cflags();
 
     # Brief bug where CCFLAGS was being blown away

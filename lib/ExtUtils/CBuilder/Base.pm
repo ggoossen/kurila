@@ -12,9 +12,10 @@ sub new {
   my $class = shift;
   my $self = bless \%(< @_), $class;
 
-  $self->{properties}->{+perl} = $class->find_perl_interpreter
+  $self->{+properties}->{+perl} = $class->find_perl_interpreter
     or warn "Warning: Can't locate your perl binary";
 
+  $self->{+config} = \%();
   for my $k (config_keys) {
       my $v = config_value($k);
       $self->{config}->{+$k} = $v unless exists $self->{config}->{$k};
@@ -93,7 +94,7 @@ sub compile {
   
   my @defines = $self->arg_defines( < %{%args{?defines} || \%()} );
   
-  my @extra_compiler_flags = $self->split_like_shell(%args{extra_compiler_flags});
+  my @extra_compiler_flags = $self->split_like_shell(%args{?extra_compiler_flags});
   my @cccdlflags = $self->split_like_shell($cf->{cccdlflags});
   my @ccflags = $self->split_like_shell($cf->{ccflags});
   my @optimize = $self->split_like_shell($cf->{optimize});
@@ -201,7 +202,7 @@ sub _do_link {
     $self->prelink(< %args,
 		   dl_name => %args{module_name}) if %args{?lddl} && $self->need_prelink;
   
-  my @linker_flags = @( <$self->split_like_shell(%args{extra_linker_flags}), <
+  my @linker_flags = @( <$self->split_like_shell(%args{?extra_linker_flags}), <
 		      $self->extra_link_args_after_prelink(< %args, dl_name => %args{?module_name},
 							   prelink_res => \@temp_files));
 

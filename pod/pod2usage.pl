@@ -128,11 +128,11 @@ if (@ARGV > 1) {
 }
 
 my %usage = ();
-$usage{-input}    = shift(@ARGV);
-$usage{-exitval}  = $options{"exit"}      if (defined $options{"exit"});
-$usage{-output}   = $options{"output"}    if (defined $options{"output"});
-$usage{-verbose}  = $options{"verbose"}   if (defined $options{"verbose"});
-$usage{-pathlist} = $options{"pathlist"}  if (defined $options{"pathlist"});
+$usage{input}    = shift(@ARGV);
+$usage{exitval}  = $options{"exit"}      if (defined $options{"exit"});
+$usage{output}   = $options{"output"}    if (defined $options{"output"});
+$usage{verbose}  = $options{"verbose"}   if (defined $options{"verbose"});
+$usage{pathlist} = $options{"pathlist"}  if (defined $options{"pathlist"});
 
 pod2usage(\%usage);
 
