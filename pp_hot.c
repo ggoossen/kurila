@@ -1426,21 +1426,29 @@ PP(pp_helem)
     HV * const hv = (HV*)POPs;
     const U32 lval = PL_op->op_flags & OPf_MOD;
     const U32 defer = PL_op->op_private & OPpLVAL_DEFER;
+    const U32 optional = PL_op->op_private & OPpHELEM_OPTIONAL;
+    const U32 add = PL_op->op_private & OPpHELEM_ADD;
     SV *sv;
     U32 hash;
     I32 preeminent = 0;
 
-    if ( SvOK(hv) && ! SvHVOK(hv) )
-	Perl_croak(aTHX_ "Not a HASH");
+    if ( ! SvHVOK(hv) ) {
+	if ( SvOK(hv) ) {
+	    Perl_croak(aTHX_ "Not a HASH");
+	}
 
-    hash = (SvIsCOW_shared_hash(keysv)) ? SvSHARED_HASH(keysv) : 0;
-
-    if (SvTYPE(hv) != SVt_PVHV) {
-	if ( ! lval )
-	    RETPUSHUNDEF;
 	/* hv must be "undef" */
+
+	if ( optional )
+	    RETPUSHUNDEF;
+
+	if ( ! add )
+	    Perl_croak(aTHX_ "Can not use UNDEF as a HASH");
+
 	sv_upgrade((SV*)hv, SVt_PVHV);
     }
+
+    hash = (SvIsCOW_shared_hash(keysv)) ? SvSHARED_HASH(keysv) : 0;
 
     if (PL_op->op_private & OPpLVAL_INTRO) {
 	MAGIC *mg;
@@ -1459,9 +1467,9 @@ PP(pp_helem)
 		)
 	    ) ? hv_exists_ent(hv, keysv, 0) : 1;
     }
-    he = hv_fetch_ent(hv, keysv, lval && !defer, hash);
+    he = hv_fetch_ent(hv, keysv, add && !defer, hash);
     svp = he ? &HeVAL(he) : NULL;
-    if (lval) {
+    if (add) {
 	if (!svp || *svp == &PL_sv_undef) {
 	    SV* lv;
 	    SV* key2;
@@ -1493,6 +1501,12 @@ PP(pp_helem)
 	else if (PL_op->op_private & OPpDEREF)
 	    vivify_ref(*svp, PL_op->op_private & OPpDEREF);
     }
+    else {
+	if ( ! ( optional || add ) ) {
+	    if ( ! svp || *svp == &PL_sv_undef ) 
+		Perl_croak(aTHX_ "Missing hash key '%s'", SvPVX_const(keysv));
+	}
+    }
     sv = (svp ? *svp : &PL_sv_undef);
     /* This makes C<local $tied{foo} = $tied{foo}> possible.
      * Pushing the magical RHS on to the stack is useless, since
@@ -1500,7 +1514,7 @@ PP(pp_helem)
      * and thus the later pp_sassign() will fail to mg_get() the
      * old value.  This should also cure problems with delayed
      * mg_get()s.  GSAR 98-07-03 */
-    if (!lval && SvGMAGICAL(sv))
+    if (!add && SvGMAGICAL(sv))
 	sv = sv_mortalcopy(sv);
     PUSHs(sv);
     RETURN;

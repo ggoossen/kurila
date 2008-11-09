@@ -88,6 +88,7 @@
 %type <ionlyval>  startsub startanonsub
 /* FIXME for MAD - are these two ival? */
 %type <ionlyval> mintro
+%type <ionlyval> regulator
 
 %type <opval> decl subrout mysubrout package use peg
 
@@ -680,6 +681,20 @@ method :       METHOD
        |       scalar
        ;
 
+regulator:      '+'
+			{
+                            $$ = OPpHELEM_ADD;
+                        }
+       |        '?'
+			{
+                            $$ = OPpHELEM_OPTIONAL;
+                        }
+       |
+			{
+                            $$ = 0;
+                        }
+       ;
+    
 /* Some kind of subscripted expression */
 subscripted:    star '{' expr ';' '}'        /* *main::{something} like *STDOUT{IO} */
                         /* In this and all the hash accessors, ';' is
@@ -768,22 +783,23 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} like *STDOUT{
 			  TOKEN_GETMAD($4,$$,'j');
 			  TOKEN_GETMAD($5,$$,']');
 			}
-	|	term '{' expr ';' '}'    /* %foo{bar} or %foo{bar();} */
-                        { $$ = newBINOP(OP_HELEM, 0, $1, scalar($3), LOCATION($2));
+	|	term '{' regulator expr ';' '}'    /* %foo{bar} or %foo{bar();} */
+                        { 
+                            $$ = newBINOP(OP_HELEM, $3, $1, scalar($4), LOCATION($2));
 			    PL_parser->expect = XOPERATOR;
-			  TOKEN_GETMAD($2,$$,'{');
-			  TOKEN_GETMAD($4,$$,';');
-			  TOKEN_GETMAD($5,$$,'}');
+                            TOKEN_GETMAD($2,$$,'{');
+                            TOKEN_GETMAD($5,$$,';');
+                            TOKEN_GETMAD($6,$$,'}');
 			}
-	|	term ARROW '{' expr ';' '}' /* somehref->{bar();} */
-			{ $$ = newBINOP(OP_HELEM, 0,
+	|	term ARROW '{' regulator expr ';' '}' /* somehref->{bar();} */
+			{ $$ = newBINOP(OP_HELEM, $4,
                                 ref(newHVREF($1, LOCATION($2)),OP_RV2HV),
-                                scalar($4), LOCATION($3));
+                                scalar($5), LOCATION($3));
 			    PL_parser->expect = XOPERATOR;
 			  TOKEN_GETMAD($2,$$,'a');
 			  TOKEN_GETMAD($3,$$,'{');
-			  TOKEN_GETMAD($5,$$,';');
-			  TOKEN_GETMAD($6,$$,'}');
+			  TOKEN_GETMAD($6,$$,';');
+			  TOKEN_GETMAD($7,$$,'}');
 			}
 	|	term ARROW '(' ')'          /* $subref->() */
 			{ $$ = newUNOP(OP_ENTERSUB, OPf_STACKED,
@@ -895,12 +911,6 @@ termbinop:	term ASSIGNOP term                     /* $x = $y */
 termunop : '-' term %prec UMINUS                       /* -$x */
 			{ $$ = newUNOP(OP_NEGATE, 0, scalar($2), LOCATION($1));
 			  TOKEN_GETMAD($1,$$,'o');
-			}
-	|	'+' term %prec UMINUS                  /* +$x */
-			{
-                            Perl_croak_at(aTHX_ LOCATION($1),
-                                "unary plus (+) reserved");
-                            $$ = $2;
 			}
 	|	'!' term                               /* !$x */
 			{ $$ = newUNOP(OP_NOT, 0, scalar($2), LOCATION($1));
