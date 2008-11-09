@@ -1439,8 +1439,12 @@ PP(pp_helem)
 
 	/* hv must be "undef" */
 
-	if ( optional )
-	    RETPUSHUNDEF;
+	if ( optional ) {
+	    if (PL_op->op_private & OPpDEREF)
+		mPUSHs(newRV(newSV(0)));
+	    else
+		RETPUSHUNDEF;
+	}
 
 	if ( ! add )
 	    Perl_croak(aTHX_ "Can not use UNDEF as a HASH");
@@ -1502,8 +1506,16 @@ PP(pp_helem)
 	    vivify_ref(*svp, PL_op->op_private & OPpDEREF);
     }
     else {
-	if ( ! ( optional || add ) ) {
-	    if ( ! svp || *svp == &PL_sv_undef ) 
+	if ( ! svp || *svp == &PL_sv_undef ) {
+	    if ( optional ) {
+		if (PL_op->op_private & OPpDEREF) {
+		    mPUSHs(newRV(newSV(0)));
+		    RETURN;
+		}
+		else
+		    RETPUSHUNDEF;
+	    }
+	    if ( ! add )
 		Perl_croak(aTHX_ "Missing hash key '%s'", SvPVX_const(keysv));
 	}
     }
