@@ -49,7 +49,7 @@ sub mask {
     if ((nelems @_)) {
 	my $mask = shift;
 	if($mask) {
-	  $self->[0]->{$fd}->{+$io} = $mask; # the error events are always returned
+	  $self->[0]->{+$fd}->{+$io} = $mask; # the error events are always returned
 	  $self->[1]->{+$fd}      = 0;     # output mask
 	  $self->[2]->{+$io}      = $io;   # remember handle
 	} else {

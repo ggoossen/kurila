@@ -159,7 +159,7 @@ sub struct {
                 ++$cnt;
             }
             elsif( $base_type eq 'HASH' ){
-                $elem = "\{'$($class)::$name'\}";
+                $elem = "\{+'$($class)::$name'\}";
             }
             if( defined %arrays{?$name} ){
                 $out .= "    my \$i;\n";
@@ -171,7 +171,7 @@ sub struct {
                 $out .= "    my \$i;\n";
                 $out .= "    \@_ ?? (\$i = shift) !! return \$r->$elem;\n";
                 $out .= "    if (ref(\$i) eq 'HASH' && !\@_) \{ \$r->$elem = \$i; return \$r \}\n";
-                $sel = "->\{\$i\}";
+                $sel = "->\{+\$i\}";
             }
             elsif( defined %classes{?$name} ){
                 $out .= "    die '$name argument is wrong class' if \@_ && ! UNIVERSAL::isa(\@_[0], '%classes{?$name}');\n";
