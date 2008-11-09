@@ -267,6 +267,7 @@ static struct debug_tokens {
     const char *name;
 } const debug_tokens[] =
 {
+    { '{',		TOKENTYPE_IVAL,		"'{'" },
     { ADDOP,		TOKENTYPE_OPNUM,	"ADDOP" },
     { ANDAND,		TOKENTYPE_NONE,		"ANDAND" },
     { ANDOP,		TOKENTYPE_NONE,		"ANDOP" },
@@ -3721,14 +3722,20 @@ Perl_yylex(pTHX)
 	    }
 	    while (s < PL_bufend && SPACE_OR_TAB(*s))
 		s++;
+	    if (*s == '+') {
+		pl_yylval.i_tkval.ival = OPpHELEM_ADD;
+		s++;
+	    }
+	    else if (*s == '?') {
+		pl_yylval.i_tkval.ival = OPpHELEM_OPTIONAL;
+		s++;
+	    }
+	    else
+		pl_yylval.i_tkval.ival = 0;
 	    d = s;
 	    PL_tokenbuf[0] = '\0';
-	    if (d < PL_bufend && *d == '-') {
-		PL_tokenbuf[0] = '-';
+	    while (d < PL_bufend && SPACE_OR_TAB(*d))
 		d++;
-		while (d < PL_bufend && SPACE_OR_TAB(*d))
-		    d++;
-	    }
 	    if (d < PL_bufend && isIDFIRST_lazy_if(d,UTF)) {
 		d = scan_word(d, PL_tokenbuf + 1, sizeof PL_tokenbuf - 1,
 			      FALSE, &len);
@@ -3770,7 +3777,6 @@ Perl_yylex(pTHX)
 	    }
 	    break;
 	}
-	pl_yylval.i_tkval.ival = PL_parser->lex_line_number;
 	TOKEN('{');
     case '}':
 	s++;
