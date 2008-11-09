@@ -67,7 +67,7 @@ ok($ctx->digest, "a0301");
 try {
     $ctx->add_bits("1010");
 };
-ok($@->{description} =~ m/^Number of bits must be multiple of 8/);
+ok($@->{?description} =~ m/^Number of bits must be multiple of 8/);
 
 $ctx->add_bits($EBCDIC ?? "11100100" !! "01010101");
 ok($ctx->digest, "U0001");
@@ -75,7 +75,7 @@ ok($ctx->digest, "U0001");
 try {
     $ctx->add_bits("abc", 12);
 };
-ok($@->{description} =~ m/^Number of bits must be multiple of 8/);
+ok($@->{?description} =~ m/^Number of bits must be multiple of 8/);
 
 $ctx->add_bits("abc", 16);
 ok($ctx->digest, "a0002");

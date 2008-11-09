@@ -105,7 +105,7 @@ sub first_release_raw {
 
     my @perls = @( $version
         ?? < grep { exists %version{$_}->{ $module } &&
-                        %version{$_}->{ $module } +>= $version } keys %version
+                        %version{$_}->{?$module } +>= $version } keys %version
         !! < grep { exists %version{$_}->{ $module }             } keys %version );
 
     return @perls;
@@ -114,7 +114,7 @@ sub first_release_raw {
 sub first_release_by_date {
     my @perls = &first_release_raw( < @_ );
     return unless (nelems @perls);
-    return (sort { %released{$a} cmp %released{$b} } @perls)[0];
+    return (sort { %released{?$a} cmp %released{?$b} } @perls)[0];
 }
 
 sub first_release {
@@ -132,7 +132,7 @@ sub find_modules {
     my %mods;
     foreach ( @perls) {
         while (my ($k, $v) = each %{%version{$_}}) {
-            %mods{$k}++ if $k =~ $regex;
+            %mods{+$k}++ if $k =~ $regex;
         }
     }
     return sort keys %mods
@@ -140,7 +140,7 @@ sub find_modules {
 
 sub find_version {
     my ($class, $v) = < @_;
-    return %version{$v} if defined %version{$v};
+    return %version{?$v} if defined %version{?$v};
     return undef;
 }
 

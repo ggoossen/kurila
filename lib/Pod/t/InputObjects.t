@@ -56,7 +56,7 @@ do { # test package Pod::Paragraph
     
     is( (join ':',$p_p1->file_line()), '<unknown-file>:0', 
         'Pod::Paragraph->file_line()' );
-    $p_p2->{ '-file' } = 'test'; $p_p2->{ '-line' } = 3;
+    $p_p2->{+'-file' } = 'test'; $p_p2->{+'-line' } = 3;
     is( (join ':',$p_p2->file_line()), 'test:3', 
         'Pod::Paragraph->file_line()' );
 };

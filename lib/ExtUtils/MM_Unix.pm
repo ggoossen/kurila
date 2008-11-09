@@ -22,24 +22,24 @@ our @ISA = qw(ExtUtils::MM_Any);
 
 my %Is;
 BEGIN { 
-    %Is{OS2}     = $^O eq 'os2';
-    %Is{Win32}   = $^O eq 'MSWin32' || %Config{osname} eq 'NetWare';
-    %Is{Dos}     = $^O eq 'dos';
-    %Is{VMS}     = $^O eq 'VMS';
-    %Is{OSF}     = $^O eq 'dec_osf';
-    %Is{IRIX}    = $^O eq 'irix';
-    %Is{NetBSD}  = $^O eq 'netbsd';
-    %Is{Interix} = $^O eq 'interix';
-    %Is{SunOS4}  = $^O eq 'sunos';
-    %Is{Solaris} = $^O eq 'solaris';
-    %Is{SunOS}   = %Is{SunOS4} || %Is{Solaris};
-    %Is{BSD}     = ($^O =~ m/^(?:free|net|open)bsd$/ or
+    %Is{+OS2}     = $^O eq 'os2';
+    %Is{+Win32}   = $^O eq 'MSWin32' || %Config{?osname} eq 'NetWare';
+    %Is{+Dos}     = $^O eq 'dos';
+    %Is{+VMS}     = $^O eq 'VMS';
+    %Is{+OSF}     = $^O eq 'dec_osf';
+    %Is{+IRIX}    = $^O eq 'irix';
+    %Is{+NetBSD}  = $^O eq 'netbsd';
+    %Is{+Interix} = $^O eq 'interix';
+    %Is{+SunOS4}  = $^O eq 'sunos';
+    %Is{+Solaris} = $^O eq 'solaris';
+    %Is{+SunOS}   = %Is{?SunOS4} || %Is{?Solaris};
+    %Is{+BSD}     = ($^O =~ m/^(?:free|net|open)bsd$/ or
                    grep( $^O eq $_, qw(bsdos interix dragonfly) )
                   );
 }
 
 BEGIN {
-    if( %Is{VMS} ) {
+    if( %Is{?VMS} ) {
         # For things like vmsify()
         require VMS::Filespec;
         VMS::Filespec->import;
@@ -132,7 +132,7 @@ sub c_o {
     my $command = '$(CCCMD)';
     my $flags   = '$(CCCDLFLAGS) "-I$(PERL_INC)" $(PASTHRU_DEFINE) $(DEFINE)';
     
-    if (my $cpp = %Config{cpprun}) {
+    if (my $cpp = %Config{?cpprun}) {
         my $cpp_cmd = $self->const_cccmd;
         $cpp_cmd =~ s/^CCCMD\s*=\s*\$\(CC\)/$cpp/;
         push @m, qq{
@@ -161,7 +161,7 @@ sub c_o {
     push @m, qq{
 .C\$(OBJ_EXT):
 	$command \$*.C
-} if !%Is{OS2} and !%Is{Win32} and !%Is{Dos}; #Case-specific
+} if !%Is{?OS2} and !%Is{?Win32} and !%Is{?Dos}; #Case-specific
 
     return join "", @m;
 }
@@ -179,18 +179,18 @@ returns the definition of the CCCMD macro which uses these parts.
 
 sub cflags {
     my($self,$libperl) = < @_;
-    return $self->{CFLAGS} if $self->{CFLAGS};
+    return $self->{?CFLAGS} if $self->{?CFLAGS};
     return '' unless $self->needs_linking();
 
     my($prog, $uc, $perltype, %cflags);
-    $libperl ||= $self->{LIBPERL_A} || "libperl$self->{LIB_EXT}" ;
-    $libperl =~ s/\.\$\(A\)$/$self->{LIB_EXT}/;
+    $libperl ||= $self->{?LIBPERL_A} || "libperl$self->{?LIB_EXT}" ;
+    $libperl =~ s/\.\$\(A\)$/$self->{?LIB_EXT}/;
  <
     %cflags{[qw(cc ccflags optimize shellflags)]}
 	= < %Config{[qw(cc ccflags optimize shellflags)]};
     my($optdebug) = "";
 
-    %cflags{shellflags} ||= '';
+    %cflags{+shellflags} ||= '';
 
     my(%map) =  %(
 		D =>   '-DDEBUGGING',
@@ -200,12 +200,12 @@ sub cflags {
 		DM =>  '-DDEBUGGING -DEMBED -DMULTIPLICITY',
 		);
 
-    if ($libperl =~ m/libperl(\w*)\Q$self->{LIB_EXT}/){
+    if ($libperl =~ m/libperl(\w*)\Q$self->{?LIB_EXT}/){
 	$uc = uc($1);
     } else {
 	$uc = ""; # avoid warning
     }
-    $perltype = %map{$uc} ?? %map{$uc} !! "";
+    $perltype = %map{?$uc} ?? %map{?$uc} !! "";
 
     if ($uc =~ m/^D/) {
 	$optdebug = "-g";
@@ -213,8 +213,8 @@ sub cflags {
 
 
     my($name);
-    ( $name = $self->{NAME} . "_cflags" ) =~ s/:/_/g ;
-    if ($prog = %Config{$name}) {
+    ( $name = $self->{?NAME} . "_cflags" ) =~ s/:/_/g ;
+    if ($prog = %Config{?$name}) {
 	# Expand hints for this extension via the shell
 	print STDOUT "Processing $name hint:\n" if $Verbose;
 	my(@o)= @(`cc=\"%cflags{cc}\"
@@ -232,7 +232,7 @@ sub cflags {
 	foreach my $line ( @o){
 	    chomp $line;
 	    if ($line =~ m/(.*?)=\s*(.*)\s*$/){
-		%cflags{$1} = $2;
+		%cflags{+$1} = $2;
 		print STDOUT "	$1 = $2\n" if $Verbose;
 	    } else {
 		print STDOUT "Unrecognised result from hint: '$line'\n";
@@ -241,35 +241,35 @@ sub cflags {
     }
 
     if ($optdebug) {
-	%cflags{optimize} = $optdebug;
+	%cflags{+optimize} = $optdebug;
     }
 
     for (qw(ccflags optimize perltype)) {
-        %cflags{$_} ||= '';
-	%cflags{$_} =~ s/^\s+//;
-	%cflags{$_} =~ s/\s+/ /g;
-	%cflags{$_} =~ s/\s+$//;
-	$self->{uc $_} ||= %cflags{$_};
+        %cflags{+$_} ||= '';
+	%cflags{+$_} =~ s/^\s+//;
+	%cflags{+$_} =~ s/\s+/ /g;
+	%cflags{+$_} =~ s/\s+$//;
+	$self->{+uc $_} ||= %cflags{?$_};
     }
 
-    if ($self->{POLLUTE}) {
-	$self->{CCFLAGS} .= ' -DPERL_POLLUTE ';
+    if ($self->{?POLLUTE}) {
+	$self->{+CCFLAGS} .= ' -DPERL_POLLUTE ';
     }
 
     my $pollute = '';
-    if (%Config{usemymalloc} and not %Config{bincompat5005}
-	and not %Config{ccflags} =~ m/-DPERL_POLLUTE_MALLOC\b/
-	and $self->{PERL_MALLOC_OK}) {
+    if (%Config{?usemymalloc} and not %Config{?bincompat5005}
+	and not %Config{?ccflags} =~ m/-DPERL_POLLUTE_MALLOC\b/
+	and $self->{?PERL_MALLOC_OK}) {
 	$pollute = '$(PERL_MALLOC_DEF)';
     }
 
-    $self->{CCFLAGS}  = quote_paren($self->{CCFLAGS});
-    $self->{OPTIMIZE} = quote_paren($self->{OPTIMIZE});
+    $self->{+CCFLAGS}  = quote_paren($self->{?CCFLAGS});
+    $self->{+OPTIMIZE} = quote_paren($self->{?OPTIMIZE});
 
-    return $self->{CFLAGS} = qq{
-CCFLAGS = $self->{CCFLAGS}
-OPTIMIZE = $self->{OPTIMIZE}
-PERLTYPE = $self->{PERLTYPE}
+    return $self->{+CFLAGS} = qq{
+CCFLAGS = $self->{?CCFLAGS}
+OPTIMIZE = $self->{?OPTIMIZE}
+PERLTYPE = $self->{?PERLTYPE}
 MPOLLUTE = $pollute
 };
 
@@ -284,9 +284,9 @@ definition in CONST_CCCMD.
 
 sub const_cccmd {
     my($self,$libperl)= < @_;
-    return $self->{CONST_CCCMD} if $self->{CONST_CCCMD};
+    return $self->{?CONST_CCCMD} if $self->{?CONST_CCCMD};
     return '' unless $self->needs_linking();
-    return $self->{CONST_CCCMD} =
+    return $self->{+CONST_CCCMD} =
 	q{CCCMD = $(CC) -c $(PASTHRU_INC) $(INC) \
 	$(CCFLAGS) $(OPTIMIZE) \
 	$(PERLTYPE) $(MPOLLUTE) $(DEFINE_VERSION) \
@@ -306,17 +306,17 @@ sub const_config {
     my($self) = shift;
     my @m = @( <<"END" );
 
-# These definitions are from config.sh (via %INC{'Config.pm'}).
+# These definitions are from config.sh (via %INC{?'Config.pm'}).
 # They may have been overridden via Makefile.PL or on the command line.
 END
 
     my(%once_only);
     foreach my $key ( @{$self->{CONFIG}}){
         # SITE*EXP macros are defined in &constants; avoid duplicates here
-        next if %once_only{$key};
-        $self->{uc $key} = quote_paren($self->{uc $key});
-        push @m, uc($key) , ' = ' , $self->{uc $key}, "\n";
-        %once_only{$key} = 1;
+        next if %once_only{?$key};
+        $self->{+uc $key} = quote_paren($self->{?uc $key});
+        push @m, uc($key) , ' = ' , $self->{?uc $key}, "\n";
+        %once_only{+$key} = 1;
     }
     join('', @m);
 }
@@ -333,22 +333,22 @@ sub const_loadlibs {
     return "" unless $self->needs_linking;
     my @m;
     push @m, qq{
-# $self->{NAME} might depend on some other libraries:
+# $self->{?NAME} might depend on some other libraries:
 # See ExtUtils::Liblist for details
 #
 };
     for my $tmp (qw/
          EXTRALIBS LDLOADLIBS BSLOADLIBS
          /) {
-        next unless defined $self->{$tmp};
-        push @m, "$tmp = $self->{$tmp}\n";
+        next unless defined $self->{?$tmp};
+        push @m, "$tmp = $self->{?$tmp}\n";
     }
     # don't set LD_RUN_PATH if empty
     for my $tmp (qw/
          LD_RUN_PATH
          /) {
-        next unless $self->{$tmp};
-        push @m, "$tmp = $self->{$tmp}\n";
+        next unless $self->{?$tmp};
+        push @m, "$tmp = $self->{?$tmp}\n";
     }
     return join "", @m;
 }
@@ -365,7 +365,7 @@ sub constants {
     my($self) = < @_;
     my @m = @( () );
 
-    $self->{DFSEP} = '$(DIRFILESEP)';  # alias for internal use
+    $self->{+DFSEP} = '$(DIRFILESEP)';  # alias for internal use
 
     for my $macro (@( <qw(
 
@@ -396,18 +396,18 @@ sub constants {
 
 	      )) ) 
     {
-	next unless defined $self->{$macro};
+	next unless defined $self->{?$macro};
 
         # pathnames can have sharp signs in them; escape them so
         # make doesn't think it is a comment-start character.
-        $self->{$macro} =~ s/#/\\#/g;
-	push @m, "$macro = $self->{$macro}\n";
+        $self->{+$macro} =~ s/#/\\#/g;
+	push @m, "$macro = $self->{?$macro}\n";
     }
 
     push @m, qq{
-MAKEMAKER   = $self->{MAKEMAKER}
-MM_VERSION  = $self->{MM_VERSION}
-MM_REVISION = $self->{MM_REVISION}
+MAKEMAKER   = $self->{?MAKEMAKER}
+MM_VERSION  = $self->{?MM_VERSION}
+MM_REVISION = $self->{?MM_REVISION}
 };
 
     push @m, q{
@@ -423,18 +423,18 @@ MM_REVISION = $self->{MM_REVISION}
 	      LDFROM LINKTYPE BOOTDEP
 	      /	) 
     {
-	next unless defined $self->{$macro};
-	push @m, "$macro = $self->{$macro}\n";
+	next unless defined $self->{?$macro};
+	push @m, "$macro = $self->{?$macro}\n";
     }
 
     push @m, "
 # Handy lists of source code files:
-XS_FILES = ".$self->wraplist( <sort keys %{$self->{XS} || \%()})."
+XS_FILES = ".$self->wraplist( <sort keys %{$self->{?XS} || \%()})."
 C_FILES  = ".$self->wraplist(< @{$self->{C}})."
 O_FILES  = ".$self->wraplist(< @{$self->{O_FILES}})."
 H_FILES  = ".$self->wraplist(< @{$self->{H}})."
-MAN1PODS = ".$self->wraplist( <sort keys %{$self->{MAN1PODS} || \%()})."
-MAN3PODS = ".$self->wraplist( <sort keys %{$self->{MAN3PODS} || \%()})."
+MAN1PODS = ".$self->wraplist( <sort keys %{$self->{?MAN1PODS} || \%()})."
+MAN3PODS = ".$self->wraplist( <sort keys %{$self->{?MAN3PODS} || \%()})."
 ";
 
 
@@ -446,23 +446,23 @@ CONFIGDEP = $(PERL_ARCHLIB)$(DFSEP)Config.pm $(PERL_INC)$(DFSEP)config.h
 
     push @m, qq{
 # Where to build things
-INST_LIBDIR      = $self->{INST_LIBDIR}
-INST_ARCHLIBDIR  = $self->{INST_ARCHLIBDIR}
+INST_LIBDIR      = $self->{?INST_LIBDIR}
+INST_ARCHLIBDIR  = $self->{?INST_ARCHLIBDIR}
 
-INST_AUTODIR     = $self->{INST_AUTODIR}
-INST_ARCHAUTODIR = $self->{INST_ARCHAUTODIR}
+INST_AUTODIR     = $self->{?INST_AUTODIR}
+INST_ARCHAUTODIR = $self->{?INST_ARCHAUTODIR}
 
-INST_STATIC      = $self->{INST_STATIC}
-INST_DYNAMIC     = $self->{INST_DYNAMIC}
-INST_BOOT        = $self->{INST_BOOT}
+INST_STATIC      = $self->{?INST_STATIC}
+INST_DYNAMIC     = $self->{?INST_DYNAMIC}
+INST_BOOT        = $self->{?INST_BOOT}
 };
 
 
     push @m, qq{
 # Extra linker info
-EXPORT_LIST        = $self->{EXPORT_LIST}
-PERL_ARCHIVE       = $self->{PERL_ARCHIVE}
-PERL_ARCHIVE_AFTER = $self->{PERL_ARCHIVE_AFTER}
+EXPORT_LIST        = $self->{?EXPORT_LIST}
+PERL_ARCHIVE       = $self->{?PERL_ARCHIVE}
+PERL_ARCHIVE_AFTER = $self->{?PERL_ARCHIVE_AFTER}
 };
 
     push @m, "
@@ -505,12 +505,12 @@ sub init_DEST {
     my $self = shift;
 
     # Initialize DESTDIR
-    $self->{DESTDIR} ||= '';
+    $self->{+DESTDIR} ||= '';
 
     # Make DEST variables.
     foreach my $var ( $self->installvars) {
         my $destvar = 'DESTINSTALL'.$var;
-        $self->{$destvar} ||= '$(DESTDIR)$(INSTALL'.$var.')';
+        $self->{+$destvar} ||= '$(DESTDIR)$(INSTALL'.$var.')';
     }
 }
 
@@ -563,24 +563,24 @@ Defines a lot of macros for distribution support.
 sub init_dist {
     my $self = shift;
 
-    $self->{TAR}      ||= 'tar';
-    $self->{TARFLAGS} ||= 'cvf';
-    $self->{ZIP}      ||= 'zip';
-    $self->{ZIPFLAGS} ||= '-r';
-    $self->{COMPRESS} ||= 'gzip --best';
-    $self->{SUFFIX}   ||= '.gz';
-    $self->{SHAR}     ||= 'shar';
-    $self->{PREOP}    ||= '$(NOECHO) $(NOOP)'; # eg update MANIFEST
-    $self->{POSTOP}   ||= '$(NOECHO) $(NOOP)'; # eg remove the distdir
-    $self->{TO_UNIX}  ||= '$(NOECHO) $(NOOP)';
+    $self->{+TAR}      ||= 'tar';
+    $self->{+TARFLAGS} ||= 'cvf';
+    $self->{+ZIP}      ||= 'zip';
+    $self->{+ZIPFLAGS} ||= '-r';
+    $self->{+COMPRESS} ||= 'gzip --best';
+    $self->{+SUFFIX}   ||= '.gz';
+    $self->{+SHAR}     ||= 'shar';
+    $self->{+PREOP}    ||= '$(NOECHO) $(NOOP)'; # eg update MANIFEST
+    $self->{+POSTOP}   ||= '$(NOECHO) $(NOOP)'; # eg remove the distdir
+    $self->{+TO_UNIX}  ||= '$(NOECHO) $(NOOP)';
 
-    $self->{CI}       ||= 'ci -u';
-    $self->{RCS_LABEL}||= 'rcs -Nv$(VERSION_SYM): -q';
-    $self->{DIST_CP}  ||= 'best';
-    $self->{DIST_DEFAULT} ||= 'tardist';
+    $self->{+CI}       ||= 'ci -u';
+    $self->{+RCS_LABEL}||= 'rcs -Nv$(VERSION_SYM): -q';
+    $self->{+DIST_CP}  ||= 'best';
+    $self->{+DIST_DEFAULT} ||= 'tardist';
 
-    ($self->{DISTNAME} = $self->{NAME}) =~ s{::}{-}g unless $self->{DISTNAME};
-    $self->{DISTVNAME} ||= $self->{DISTNAME}.'-'.$self->{VERSION};
+    ($self->{+DISTNAME} = $self->{?NAME}) =~ s{::}{-}g unless $self->{?DISTNAME};
+    $self->{+DISTVNAME} ||= $self->{?DISTNAME}.'-'.$self->{?VERSION};
 
 }
 
@@ -606,7 +606,7 @@ sub dist {
             DISTNAME DISTVNAME
            ))
     {
-        my $value = %attribs{$key} || $self->{$key};
+        my $value = %attribs{?$key} || $self->{?$key};
         $make .= "$key = $value\n";
     }
 
@@ -856,7 +856,7 @@ sub dynamic_bs {
 BOOTSTRAP =
 ' unless $self->has_link_code();
 
-    my $target = %Is{VMS} ?? '$(MMS$TARGET)' !! '$@';
+    my $target = %Is{?VMS} ?? '$(MMS$TARGET)' !! '$@';
 
     return sprintf <<'MAKE_FRAG', ($target) x 5;
 BOOTSTRAP = $(BASEEXT).bs
@@ -891,14 +891,14 @@ sub dynamic_lib {
 
     return '' unless $self->has_link_code;
 
-    my($otherldflags) = %attribs{OTHERLDFLAGS} || "";
-    my($inst_dynamic_dep) = %attribs{INST_DYNAMIC_DEP} || "";
-    my($armaybe) = %attribs{ARMAYBE} || $self->{ARMAYBE} || ":";
+    my($otherldflags) = %attribs{?OTHERLDFLAGS} || "";
+    my($inst_dynamic_dep) = %attribs{?INST_DYNAMIC_DEP} || "";
+    my($armaybe) = %attribs{?ARMAYBE} || $self->{?ARMAYBE} || ":";
     my($ldfrom) = '$(LDFROM)';
-    $armaybe = 'ar' if (%Is{OSF} and $armaybe eq ':');
+    $armaybe = 'ar' if (%Is{?OSF} and $armaybe eq ':');
     my(@m);
-    my $ld_opt = %Is{OS2} ?? '$(OPTIMIZE) ' !! '';	# Useful on other systems too?
-    my $ld_fix = %Is{OS2} ?? '|| ( $(RM_F) $@ && sh -c false )' !! '';
+    my $ld_opt = %Is{?OS2} ?? '$(OPTIMIZE) ' !! '';	# Useful on other systems too?
+    my $ld_fix = %Is{?OS2} ?? '|| ( $(RM_F) $@ && sh -c false )' !! '';
     push(@m,'
 # This section creates the dynamically loadable $(INST_DYNAMIC)
 # from $(OBJECT) and possibly $(MYEXTLIB).
@@ -914,11 +914,11 @@ $(INST_DYNAMIC): $(OBJECT) $(MYEXTLIB) $(BOOTSTRAP) $(INST_ARCHAUTODIR)$(DFSEP).
 	push(@m,'	$(ARMAYBE) cr '.$ldfrom.' $(OBJECT)'."\n");
 	push(@m,'	$(RANLIB) '."$ldfrom\n");
     }
-    $ldfrom = "-all $ldfrom -none" if %Is{OSF};
+    $ldfrom = "-all $ldfrom -none" if %Is{?OSF};
 
     # The IRIX linker doesn't use LD_RUN_PATH
-    my $ldrun = %Is{IRIX} && $self->{LD_RUN_PATH} ??         
-                       qq{-rpath "$self->{LD_RUN_PATH}"} !! '';
+    my $ldrun = %Is{?IRIX} && $self->{?LD_RUN_PATH} ??         
+                       qq{-rpath "$self->{?LD_RUN_PATH}"} !! '';
 
     # For example in AIX the shared objects/libraries from previous builds
     # linger quite a while in the shared dynalinker cache even when nobody
@@ -930,20 +930,20 @@ $(INST_DYNAMIC): $(OBJECT) $(MYEXTLIB) $(BOOTSTRAP) $(INST_ARCHAUTODIR)$(DFSEP).
 
     my $libs = '$(LDLOADLIBS)';
 
-    if ((%Is{NetBSD} || %Is{Interix}) && %Config{'useshrplib'} eq 'true') {
+    if ((%Is{?NetBSD} || %Is{?Interix}) && %Config{?'useshrplib'} eq 'true') {
 	# Use nothing on static perl platforms, and to the flags needed
 	# to link against the shared libperl library on shared perl
 	# platforms.  We peek at lddlflags to see if we need -Wl,-R
 	# or -R to add paths to the run-time library search path.
-        if (%Config{'lddlflags'} =~ m/-Wl,-R/) {
+        if (%Config{?'lddlflags'} =~ m/-Wl,-R/) {
             $libs .= ' -L$(PERL_INC) -Wl,-R$(INSTALLARCHLIB)/CORE -Wl,-R$(PERL_ARCHLIB)/CORE -lperl';
-        } elsif (%Config{'lddlflags'} =~ m/-R/) {
+        } elsif (%Config{?'lddlflags'} =~ m/-R/) {
             $libs .= ' -L$(PERL_INC) -R$(INSTALLARCHLIB)/CORE -R$(PERL_ARCHLIB)/CORE -lperl';
         }
     }
 
     my $ld_run_path_shell = "";
-    if ($self->{LD_RUN_PATH} ne "") {
+    if ($self->{?LD_RUN_PATH} ne "") {
 	$ld_run_path_shell = 'LD_RUN_PATH="$(LD_RUN_PATH)" ';
     }
 
@@ -1003,7 +1003,7 @@ $(join ' ',@$dirs)
 
     my $stderr_duped = 0;
     my $stderr_copy;
-    unless (%Is{BSD}) {
+    unless (%Is{?BSD}) {
         if( open($stderr_copy, '>&', \*STDERR) ) {
             $stderr_duped = 1;
         }
@@ -1032,8 +1032,8 @@ WARNING
             print "Executing $abs\n" if ($trace +>= 2);
 
             my $version_check = qq{$abs -le "\$^V =~ m/^\Q$ver\E/; print qq\{VER_OK\}"};
-            $version_check = "%Config{run} $version_check"
-                if defined %Config{run} and length %Config{run};
+            $version_check = "%Config{?run} $version_check"
+                if defined %Config{?run} and length %Config{?run};
 
             # To avoid using the unportable 2>&1 to suppress STDERR,
             # we close it before running the command.
@@ -1041,7 +1041,7 @@ WARNING
             # ( http://www.freebsd.org/cgi/query-pr.cgi?pr=51535 )
             # we cannot use the fancier more portable way in here
             # but instead need to use the traditional 2>&1 construct.
-            if (%Is{BSD}) {
+            if (%Is{?BSD}) {
                 $val = `$version_check 2>&1`;
             } else {
                 close STDERR if $stderr_duped;
@@ -1073,7 +1073,7 @@ Inserts the sharpbang or equivalent magic number to a set of @files.
 sub fixin {    # stolen from the pink Camel book, more or less
     my ( $self, < @files ) = < @_;
 
-    my ($does_shbang) = %Config{'sharpbang'} =~ m/^\s*\#\!/;
+    my ($does_shbang) = %Config{?'sharpbang'} =~ m/^\s*\#\!/;
     for my $file ( @files) {
         my $file_new = "$file.new";
         my $file_bak = "$file.bak";
@@ -1089,12 +1089,12 @@ sub fixin {    # stolen from the pink Camel book, more or less
         # Now look (in reverse) for interpreter in absolute PATH (unless perl).
         my $interpreter;
         if ( $cmd eq "perl" ) {
-            if ( %Config{startperl} =~ m,^\#!.*/perl, ) {
-                $interpreter = %Config{startperl};
+            if ( %Config{?startperl} =~ m,^\#!.*/perl, ) {
+                $interpreter = %Config{?startperl};
                 $interpreter =~ s,^\#!,,;
             }
             else {
-                $interpreter = %Config{perlpath};
+                $interpreter = %Config{?perlpath};
             }
         }
         else {
@@ -1120,14 +1120,14 @@ sub fixin {    # stolen from the pink Camel book, more or less
 
             # this is probably value-free on DOSISH platforms
             if ($does_shbang) {
-                $shb .= "%Config{'sharpbang'}$interpreter";
+                $shb .= "%Config{?'sharpbang'}$interpreter";
                 $shb .= ' ' . $arg if defined $arg;
                 $shb .= "\n";
             }
             $shb .= qq{
 eval 'exec $interpreter $arg -S \$0 \$\{1+"\$\@"\}'
     if 0; # not running under some shell
-} unless %Is{Win32};    # this won't work on win32, so don't
+} unless %Is{?Win32};    # this won't work on win32, so don't
         }
         else {
             warn "Can't find $cmd in PATH, $file unchanged"
@@ -1164,7 +1164,7 @@ eval 'exec $interpreter $arg -S \$0 \$\{1+"\$\@"\}'
         unlink $file_bak;
     }
     continue {
-        system("%Config{'eunicefix'} $file") if %Config{'eunicefix'} ne ':';
+        system("%Config{?'eunicefix'} $file") if %Config{?'eunicefix'} ne ':';
     }
 }
 
@@ -1173,7 +1173,7 @@ sub _rename {
     my($old, $new) = < @_;
 
     foreach my $file (@($old, $new)) {
-        if( %Is{VMS} and basename($file) !~ m/\./ ) {
+        if( %Is{?VMS} and basename($file) !~ m/\./ ) {
             # rename() in 5.8.0 on VMS will not rename a file if it
             # does not contain a dot yet it returns success.
             $file = "$file.";
@@ -1229,12 +1229,12 @@ needs_linking() does.
 
 sub has_link_code {
     my($self) = shift;
-    return $self->{HAS_LINK_CODE} if defined $self->{HAS_LINK_CODE};
-    if ($self->{OBJECT} or nelems @{$self->{C} || \@()} or $self->{MYEXTLIB}){
-	$self->{HAS_LINK_CODE} = 1;
+    return $self->{?HAS_LINK_CODE} if defined $self->{?HAS_LINK_CODE};
+    if ($self->{?OBJECT} or nelems @{$self->{?C} || \@()} or $self->{?MYEXTLIB}){
+	$self->{+HAS_LINK_CODE} = 1;
 	return 1;
     }
-    return $self->{HAS_LINK_CODE} = 0;
+    return $self->{+HAS_LINK_CODE} = 0;
 }
 
 
@@ -1254,54 +1254,54 @@ sub init_dirscan {	# --- File and Directory Lists (.xs .pm .pod etc)
     my %ignore = %( < map {( $_ => 1 )} qw(Makefile.PL Build.PL test.pl t) );
 
     # ignore the distdir
-    %Is{VMS} ?? %ignore{"$self->{DISTVNAME}.dir"} = 1
-            !! %ignore{$self->{DISTVNAME}} = 1;
+    %Is{?VMS} ?? %ignore{+"$self->{?DISTVNAME}.dir"} = 1
+            !! %ignore{+$self->{?DISTVNAME}} = 1;
  <
-    %ignore{[ map lc, keys %ignore]} = < values %ignore if %Is{VMS};
+    %ignore{[ map lc, keys %ignore]} = < values %ignore if %Is{?VMS};
 
     foreach my $name ( $self->lsdir($Curdir)){
 	next if $name =~ m/\#/;
-	next if $name eq $Curdir or $name eq $Updir or %ignore{$name};
+	next if $name eq $Curdir or $name eq $Updir or %ignore{?$name};
 	next unless $self->libscan($name);
 	if (-d $name){
 	    next if -l $name; # We do not support symlinks at all
-            next if $self->{NORECURS};
-	    %dir{$name} = $name if (-f $self->catfile($name,"Makefile.PL"));
+            next if $self->{?NORECURS};
+	    %dir{+$name} = $name if (-f $self->catfile($name,"Makefile.PL"));
 	} elsif ($name =~ m/\.xs\z/){
 	    my($c); ($c = $name) =~ s/\.xs\z/.c/;
-	    %xs{$name} = $c;
-	    %c{$c} = 1;
+	    %xs{+$name} = $c;
+	    %c{+$c} = 1;
 	} elsif ($name =~ m/\.c(pp|xx|c)?\z/i){  # .c .C .cpp .cxx .cc
-	    %c{$name} = 1
+	    %c{+$name} = 1
 		unless $name =~ m/perlmain\.c/; # See MAP_TARGET
 	} elsif ($name =~ m/\.h\z/i){
-	    %h{$name} = 1;
+	    %h{+$name} = 1;
 	} elsif ($name =~ m/\.PL\z/) {
-	    (%pl_files{$name} = $name) =~ s/\.PL\z// ;
-	} elsif ((%Is{VMS} || %Is{Dos}) && $name =~ m/[._]pl$/i) {
+	    (%pl_files{+$name} = $name) =~ s/\.PL\z// ;
+	} elsif ((%Is{?VMS} || %Is{?Dos}) && $name =~ m/[._]pl$/i) {
 	    # case-insensitive filesystem, one dot per name, so foo.h.PL
 	    # under Unix appears as foo.h_pl under VMS or fooh.pl on Dos
 	    local($/); open(my $pl, '<', $name); my $txt = ~< $pl; close $pl;
 	    if ($txt =~ m/Extracting \S+ \(with variable substitutions/) {
-		(%pl_files{$name} = $name) =~ s/[._]pl\z//i ;
+		(%pl_files{+$name} = $name) =~ s/[._]pl\z//i ;
 	    }
 	    else { 
-                %pm{$name} = $self->catfile($self->{INST_LIBDIR},$name); 
+                %pm{+$name} = $self->catfile($self->{?INST_LIBDIR},$name); 
             }
 	} elsif ($name =~ m/\.(p[ml]|pod)\z/){
-	    %pm{$name} = $self->catfile($self->{INST_LIBDIR},$name);
+	    %pm{+$name} = $self->catfile($self->{?INST_LIBDIR},$name);
 	}
     }
 
-    $self->{PL_FILES}   ||= \%pl_files;
-    $self->{DIR}        ||= \sort keys %dir;
-    $self->{XS}         ||= \%xs;
-    $self->{C}          ||= \sort keys %c;
-    $self->{H}          ||= \sort keys %h;
-    $self->{PM}         ||= \%pm;
+    $self->{+PL_FILES}   ||= \%pl_files;
+    $self->{+DIR}        ||= \sort keys %dir;
+    $self->{+XS}         ||= \%xs;
+    $self->{+C}          ||= \sort keys %c;
+    $self->{+H}          ||= \sort keys %h;
+    $self->{+PM}         ||= \%pm;
 
-    my @o_files = @{$self->{C}};
-    $self->{O_FILES} = \ grep s/\.c(pp|xx|c)?\z/$self->{OBJ_EXT}/i, @o_files;
+    my @o_files = @{$self->{?C}};
+    $self->{+O_FILES} = \ grep s/\.c(pp|xx|c)?\z/$self->{?OBJ_EXT}/i, @o_files;
 }
 
 
@@ -1317,10 +1317,10 @@ sub init_MANPODS {
 
     # Set up names of manual pages to generate from pods
     foreach my $man (qw(MAN1 MAN3)) {
-	if ( $self->{"$($man)PODS"}
-             or $self->{"INSTALL$($man)DIR"} =~ m/^(none|\s*)$/
+	if ( $self->{?"$($man)PODS"}
+             or $self->{?"INSTALL$($man)DIR"} =~ m/^(none|\s*)$/
         ) {
-            $self->{"$($man)PODS"} ||= \%();
+            $self->{+"$($man)PODS"} ||= \%();
         }
         else {
             my $init_method = "init_$($man)PODS";
@@ -1364,7 +1364,7 @@ sub init_MAN1PODS {
 	foreach my $name ( @{$self->{EXE_FILES}}) {
 	    next unless $self->_has_pod($name);
 
-	    $self->{MAN1PODS}->{$name} =
+	    $self->{MAN1PODS}->{+$name} =
 		$self->catfile("\$(INST_MAN1DIR)", 
 			       basename($name).".\$(MAN1EXT)");
 	}
@@ -1384,23 +1384,23 @@ sub init_MAN3PODS {
     my %manifypods = %( () ); # we collect the keys first, i.e. the files
                          # we have to convert to pod
 
-    foreach my $name (keys %{$self->{PM}}) {
+    foreach my $name (keys %{$self->{?PM}}) {
 	if ($name =~ m/\.pod\z/ ) {
-	    %manifypods{$name} = $self->{PM}->{$name};
+	    %manifypods{+$name} = $self->{PM}->{?$name};
 	} elsif ($name =~ m/\.p[ml]\z/ ) {
 	    if( $self->_has_pod($name) ) {
-		%manifypods{$name} = $self->{PM}->{$name};
+		%manifypods{+$name} = $self->{PM}->{?$name};
 	    }
 	}
     }
 
-    my $parentlibs_re = join '|', @{$self->{PMLIBPARENTDIRS}};
+    my $parentlibs_re = join '|', @{$self->{?PMLIBPARENTDIRS}};
 
     # Remove "Configure.pm" and similar, if it's not the only pod listed
     # To force inclusion, just name it "Configure.pod", or override 
     # MAN3PODS
     foreach my $name (keys %manifypods) {
-	if ($self->{PERL_CORE} and $name =~ m/(config|setup).*\.pm/is) {
+	if ($self->{?PERL_CORE} and $name =~ m/(config|setup).*\.pm/is) {
 	    delete %manifypods{$name};
 	    next;
 	}
@@ -1409,11 +1409,11 @@ sub init_MAN3PODS {
 	# everything below lib is ok
 	unless($manpagename =~ s!^\W*($parentlibs_re)\W+!!s) {
 	    $manpagename = $self->catfile( <
-	        split(m/::/,$self->{PARENT_NAME}),$manpagename
+	        split(m/::/,$self->{?PARENT_NAME}),$manpagename
 	    );
 	}
 	$manpagename = $self->replace_manpage_separator($manpagename);
-	$self->{MAN3PODS}->{$name} =
+	$self->{MAN3PODS}->{+$name} =
 	    $self->catfile("\$(INST_MAN3DIR)", "$manpagename.\$(MAN3EXT)");
     }
 }
@@ -1454,13 +1454,13 @@ sub init_PM {
     # (which includes PARENT_NAME). This is a subtle distinction but one
     # that's important for nested modules.
 
-    unless( $self->{PMLIBDIRS} ) {
-        if( %Is{VMS} ) {
+    unless( $self->{?PMLIBDIRS} ) {
+        if( %Is{?VMS} ) {
             # Avoid logical name vs directory collisions
-            $self->{PMLIBDIRS} = \@('./lib', "./$self->{BASEEXT}");
+            $self->{+PMLIBDIRS} = \@('./lib', "./$self->{?BASEEXT}");
         }
         else {
-            $self->{PMLIBDIRS} = \@('lib', $self->{BASEEXT});
+            $self->{+PMLIBDIRS} = \@('lib', $self->{?BASEEXT});
         }
     }
 
@@ -1468,21 +1468,21 @@ sub init_PM {
 
     # Avoid $_ wherever possible:
     # @{$self->{PMLIBDIRS}} = grep -d && !$dir{$_}, @{$self->{PMLIBDIRS}};
-    my (@pmlibdirs) = @{$self->{PMLIBDIRS}};
+    my (@pmlibdirs) = @{$self->{?PMLIBDIRS}};
     @{$self->{PMLIBDIRS}} = @( () );
     my %dir = %( < map { ($_ => $_) } @{$self->{DIR}} );
     foreach my $pmlibdir ( @pmlibdirs) {
-	-d $pmlibdir && !%dir{$pmlibdir} && push @{$self->{PMLIBDIRS}}, $pmlibdir;
+	-d $pmlibdir && !%dir{?$pmlibdir} && push @{$self->{PMLIBDIRS}}, $pmlibdir;
     }
 
-    unless( $self->{PMLIBPARENTDIRS} ) {
+    unless( $self->{?PMLIBPARENTDIRS} ) {
 	@{$self->{PMLIBPARENTDIRS}} = @('lib');
     }
 
-    return if $self->{PM} and $self->{ARGS}->{PM};
+    return if $self->{?PM} and $self->{ARGS}->{?PM};
 
-    if ((nelems @{$self->{PMLIBDIRS}})){
-	print "Searching PMLIBDIRS: $(join ' ',@{$self->{PMLIBDIRS}})\n"
+    if ((nelems @{$self->{?PMLIBDIRS}})){
+	print "Searching PMLIBDIRS: $(join ' ',@{$self->{?PMLIBDIRS}})\n"
 	    if ($Verbose +>= 2);
 	require File::Find;
         File::Find::find(sub {
@@ -1497,11 +1497,11 @@ sub init_PM {
             return if m/,v$/;   # RCS files
 
 	    my $path   = $File::Find::name;
-            my $prefix = $self->{INST_LIBDIR};
+            my $prefix = $self->{?INST_LIBDIR};
             my $striplibpath;
 
-	    my $parentlibs_re = join '|', @{$self->{PMLIBPARENTDIRS}};
-	    $prefix =  $self->{INST_LIB} 
+	    my $parentlibs_re = join '|', @{$self->{?PMLIBPARENTDIRS}};
+	    $prefix =  $self->{?INST_LIB} 
                 if ($striplibpath = $path) =~ s{^(\W*)($parentlibs_re)\W}
 	                                       {$1}i;
 
@@ -1510,7 +1510,7 @@ sub init_PM {
 	    $inst = $self->libscan($inst);
 	    print "libscan($path) => '$inst'\n" if ($Verbose +>= 2);
 	    return unless $inst;
-	    $self->{PM}->{$path} = $inst;
+	    $self->{PM}->{+$path} = $inst;
 	}, < @{$self->{PMLIBDIRS}});
     }
 }
@@ -1525,7 +1525,7 @@ Using / for Unix.  Called by init_main.
 sub init_DIRFILESEP {
     my($self) = shift;
 
-    $self->{DIRFILESEP} = '/';
+    $self->{+DIRFILESEP} = '/';
 }
 
 
@@ -1552,12 +1552,12 @@ sub init_main {
 ### Only UNIX:
 ###    ($self->{FULLEXT} =
 ###     $self->{NAME}) =~ s!::!/!g ; #eg. BSD/Foo/Socket
-    $self->{FULLEXT} = $self->catdir( <split m/::/, $self->{NAME});
+    $self->{+FULLEXT} = $self->catdir( <split m/::/, $self->{?NAME});
 
 
     # Copied from DynaLoader:
 
-    my(@modparts) = split(m/::/,$self->{NAME});
+    my(@modparts) = split(m/::/,$self->{?NAME});
     my($modfname) = @modparts[-1];
 
     # Some systems have restrictions on files names for DLL's etc.
@@ -1567,23 +1567,23 @@ sub init_main {
         $modfname = &DynaLoader::mod2fname(\@modparts);
     }
 
-    ($self->{PARENT_NAME}, $self->{BASEEXT}) = $self->{NAME} =~ m!(?:([\w:]+)::)?(\w+)\z! ;
-    $self->{PARENT_NAME} ||= '';
+    ($self->{+PARENT_NAME}, $self->{+BASEEXT}) = $self->{?NAME} =~ m!(?:([\w:]+)::)?(\w+)\z! ;
+    $self->{+PARENT_NAME} ||= '';
 
     if (defined &DynaLoader::mod2fname) {
 	# As of 5.001m, dl_os2 appends '_'
-	$self->{DLBASE} = $modfname;
+	$self->{+DLBASE} = $modfname;
     } else {
-	$self->{DLBASE} = '$(BASEEXT)';
+	$self->{+DLBASE} = '$(BASEEXT)';
     }
 
 
     # --- Initialize PERL_LIB, PERL_SRC
 
     # *Real* information: where did we get these two from? ...
-    my $inc_config_dir = dirname(%INC{'Config.pm'});
+    my $inc_config_dir = dirname(%INC{?'Config.pm'});
 
-    unless ($self->{PERL_SRC}){
+    unless ($self->{?PERL_SRC}){
         foreach my $dir_count (1..8) { # 8 is the VMS limit for nesting
             my $dir = $self->catdir(($Updir) x $dir_count);
 
@@ -1591,40 +1591,40 @@ sub init_main {
                 -f $self->catfile($dir,"perl.h")        &&
                 -f $self->catfile($dir,"lib","error.pm")
             ) {
-                $self->{PERL_SRC}=$dir ;
+                $self->{+PERL_SRC}=$dir ;
                 last;
             }
         }
     }
 
     warn "PERL_CORE is set but I can't find your PERL_SRC!\n" if
-      $self->{PERL_CORE} and !$self->{PERL_SRC};
+      $self->{?PERL_CORE} and !$self->{?PERL_SRC};
 
-    if ($self->{PERL_SRC}){
-	$self->{PERL_LIB}     ||= $self->catdir("$self->{PERL_SRC}","lib");
+    if ($self->{?PERL_SRC}){
+	$self->{+PERL_LIB}     ||= $self->catdir("$self->{?PERL_SRC}","lib");
 
         if (defined $Cross::platform) {
-            $self->{PERL_ARCHLIB} = 
-              $self->catdir("$self->{PERL_SRC}","xlib",$Cross::platform);
-            $self->{PERL_INC}     = 
-              $self->catdir("$self->{PERL_SRC}","xlib",$Cross::platform, 
-                                 %Is{Win32}??("CORE")!!());
+            $self->{+PERL_ARCHLIB} = 
+              $self->catdir("$self->{?PERL_SRC}","xlib",$Cross::platform);
+            $self->{+PERL_INC}     = 
+              $self->catdir("$self->{?PERL_SRC}","xlib",$Cross::platform, 
+                                 %Is{?Win32}??("CORE")!!());
         }
         else {
-            $self->{PERL_ARCHLIB} = $self->{PERL_LIB};
-            $self->{PERL_INC}     = (%Is{Win32}) ?? 
-              $self->catdir($self->{PERL_LIB},"CORE") !! $self->{PERL_SRC};
+            $self->{+PERL_ARCHLIB} = $self->{?PERL_LIB};
+            $self->{+PERL_INC}     = (%Is{?Win32}) ?? 
+              $self->catdir($self->{?PERL_LIB},"CORE") !! $self->{?PERL_SRC};
         }
 
 	# catch a situation that has occurred a few times in the past:
 	unless (
-		-s $self->catfile($self->{PERL_SRC},'cflags')
+		-s $self->catfile($self->{?PERL_SRC},'cflags')
 		or
-		%Is{VMS}
+		%Is{?VMS}
 		&&
-		-s $self->catfile($self->{PERL_SRC},'perlshr_attr.opt')
+		-s $self->catfile($self->{?PERL_SRC},'perlshr_attr.opt')
 		or
-		%Is{Win32}
+		%Is{?Win32}
 	       ){
 	    warn qq{
 You cannot build extensions below the perl source tree after executing
@@ -1642,13 +1642,13 @@ from the perl source tree.
 	}
     } else {
 	# we should also consider $ENV{PERL5LIB} here
-        my $old = $self->{PERL_LIB} || $self->{PERL_ARCHLIB} || $self->{PERL_INC};
-	$self->{PERL_LIB}     ||= %Config{privlibexp};
-	$self->{PERL_ARCHLIB} ||= %Config{archlibexp};
-	$self->{PERL_INC}     = $self->catdir("$self->{PERL_ARCHLIB}","CORE"); # wild guess for now
+        my $old = $self->{?PERL_LIB} || $self->{?PERL_ARCHLIB} || $self->{?PERL_INC};
+	$self->{+PERL_LIB}     ||= %Config{?privlibexp};
+	$self->{+PERL_ARCHLIB} ||= %Config{?archlibexp};
+	$self->{+PERL_INC}     = $self->catdir("$self->{?PERL_ARCHLIB}","CORE"); # wild guess for now
 	my $perl_h;
 
-	if (not -f ($perl_h = $self->catfile($self->{PERL_INC},"perl.h"))
+	if (not -f ($perl_h = $self->catfile($self->{?PERL_INC},"perl.h"))
 	    and not $old){
 	    # Maybe somebody tries to build an extension with an
 	    # uninstalled Perl outside of Perl build tree
@@ -1659,13 +1659,13 @@ from the perl source tree.
 	    if ($lib) {
               # Win32 puts its header files in /perl/src/lib/CORE.
               # Unix leaves them in /perl/src.
-	      my $inc = %Is{Win32} ?? $self->catdir($lib, "CORE" )
+	      my $inc = %Is{?Win32} ?? $self->catdir($lib, "CORE" )
                                   !! dirname $lib;
 	      if (-e $self->catdir($inc, "perl.h")) {
-		$self->{PERL_LIB}	   = $lib;
-		$self->{PERL_ARCHLIB}	   = $lib;
-		$self->{PERL_INC}	   = $inc;
-		$self->{UNINSTALLED_PERL}  = 1;
+		$self->{+PERL_LIB}	   = $lib;
+		$self->{+PERL_ARCHLIB}	   = $lib;
+		$self->{+PERL_INC}	   = $inc;
+		$self->{+UNINSTALLED_PERL}  = 1;
 		print STDOUT <<EOP;
 ... Detected uninstalled Perl.  Trying to continue.
 EOP
@@ -1679,24 +1679,24 @@ EOP
     # won't matter, we will set INSTALLDIRS to "perl". Otherwise we
     # set it to "site". I prefer that INSTALLDIRS be set from outside
     # MakeMaker.
-    $self->{INSTALLDIRS} ||= "site";
+    $self->{+INSTALLDIRS} ||= "site";
 
-    $self->{MAN1EXT} ||= %Config{man1ext};
-    $self->{MAN3EXT} ||= %Config{man3ext};
+    $self->{+MAN1EXT} ||= %Config{?man1ext};
+    $self->{+MAN3EXT} ||= %Config{?man3ext};
 
     # Get some stuff out of %Config if we haven't yet done so
     print STDOUT "CONFIG must be an array ref\n"
-        if ($self->{CONFIG} and ref $self->{CONFIG} ne 'ARRAY');
-    $self->{CONFIG} = \@() unless (ref $self->{CONFIG});
+        if ($self->{?CONFIG} and ref $self->{?CONFIG} ne 'ARRAY');
+    $self->{+CONFIG} = \@() unless (ref $self->{?CONFIG});
     push(@{$self->{CONFIG}}, < @ExtUtils::MakeMaker::Get_from_Config);
-    push(@{$self->{CONFIG}}, 'shellflags') if %Config{shellflags};
+    push(@{$self->{CONFIG}}, 'shellflags') if %Config{?shellflags};
     my(%once_only);
     foreach my $m ( @{$self->{CONFIG}}){
-        next if %once_only{$m};
+        next if %once_only{?$m};
         print STDOUT "CONFIG key '$m' does not exist in Config.pm\n"
                 unless exists %Config{$m};
-        $self->{uc $m} ||= %Config{$m};
-        %once_only{$m} = 1;
+        $self->{+uc $m} ||= %Config{?$m};
+        %once_only{+$m} = 1;
     }
 
 # This is too dangerous:
@@ -1706,21 +1706,21 @@ EOP
 #    }
 # But I leave it as a placeholder
 
-    $self->{AR_STATIC_ARGS} ||= "cr";
+    $self->{+AR_STATIC_ARGS} ||= "cr";
 
     # These should never be needed
-    $self->{OBJ_EXT} ||= '.o';
-    $self->{LIB_EXT} ||= '.a';
+    $self->{+OBJ_EXT} ||= '.o';
+    $self->{+LIB_EXT} ||= '.a';
 
-    $self->{MAP_TARGET} ||= "perl";
+    $self->{+MAP_TARGET} ||= "perl";
 
-    $self->{LIBPERL_A} ||= "libperl$self->{LIB_EXT}";
+    $self->{+LIBPERL_A} ||= "libperl$self->{?LIB_EXT}";
 
     # make a simple check if we find error.pm
-    warn "Warning: PERL_LIB ($self->{PERL_LIB}) seems not to be a perl library directory
+    warn "Warning: PERL_LIB ($self->{?PERL_LIB}) seems not to be a perl library directory
         (error.pm not found)"
-        unless -f $self->catfile("$self->{PERL_LIB}","error.pm") ||
-               $self->{NAME} eq "ExtUtils::MakeMaker";
+        unless -f $self->catfile("$self->{?PERL_LIB}","error.pm") ||
+               $self->{?NAME} eq "ExtUtils::MakeMaker";
 }
 
 =item init_others
@@ -1735,99 +1735,99 @@ TOUCH, CP, MV, CHMOD, UMASK_NULL, ECHO, ECHO_N
 sub init_others {	# --- Initialize Other Attributes
     my($self) = shift;
 
-    $self->{LD} ||= 'ld';
+    $self->{+LD} ||= 'ld';
 
     # Compute EXTRALIBS, BSLOADLIBS and LDLOADLIBS from $self->{LIBS}
     # Lets look at $self->{LIBS} carefully: It may be an anon array, a string or
     # undefined. In any case we turn it into an anon array:
 
     # May check $Config{libs} too, thus not empty.
-    $self->{LIBS} = \@($self->{LIBS}) unless ref $self->{LIBS};
+    $self->{+LIBS} = \@($self->{?LIBS}) unless ref $self->{?LIBS};
 
-    $self->{LIBS} = \@('') unless (nelems @{$self->{LIBS}}) && defined $self->{LIBS}->[0];
-    $self->{LD_RUN_PATH} = "";
+    $self->{+LIBS} = \@('') unless (nelems @{$self->{?LIBS}}) && defined $self->{LIBS}->[0];
+    $self->{+LD_RUN_PATH} = "";
 
     foreach my $libs (  @{$self->{LIBS}} ){
 	$libs =~ s/^\s*(.*\S)\s*$/$1/; # remove leading and trailing whitespace
 	my(@libs) = $self->extliblist($libs);
 	if (@libs[0] or @libs[1] or @libs[2]){
 	    # LD_RUN_PATH now computed by ExtUtils::Liblist
-	    ($self->{EXTRALIBS},  $self->{BSLOADLIBS}, 
-             $self->{LDLOADLIBS}, $self->{LD_RUN_PATH}) = < @libs;
+	    ($self->{+EXTRALIBS},  $self->{+BSLOADLIBS}, 
+             $self->{+LDLOADLIBS}, $self->{+LD_RUN_PATH}) = < @libs;
 	    last;
 	}
     }
 
-    if ( $self->{OBJECT} ) {
-	$self->{OBJECT} =~ s!\.o(bj)?\b!\$(OBJ_EXT)!g;
+    if ( $self->{?OBJECT} ) {
+	$self->{+OBJECT} =~ s!\.o(bj)?\b!\$(OBJ_EXT)!g;
     } else {
 	# init_dirscan should have found out, if we have C files
-	$self->{OBJECT} = "";
-	$self->{OBJECT} = '$(BASEEXT)$(OBJ_EXT)' if @{$self->{C}};
+	$self->{+OBJECT} = "";
+	$self->{+OBJECT} = '$(BASEEXT)$(OBJ_EXT)' if @{$self->{?C}};
     }
-    $self->{OBJECT} =~ s/\n+/ \\\n\t/g;
-    $self->{BOOTDEP}  = (-f "$self->{BASEEXT}_BS") ?? "$self->{BASEEXT}_BS" !! "";
-    $self->{PERLMAINCC} ||= '$(CC)';
-    $self->{LDFROM} = '$(OBJECT)' unless $self->{LDFROM};
+    $self->{+OBJECT} =~ s/\n+/ \\\n\t/g;
+    $self->{+BOOTDEP}  = (-f "$self->{?BASEEXT}_BS") ?? "$self->{?BASEEXT}_BS" !! "";
+    $self->{+PERLMAINCC} ||= '$(CC)';
+    $self->{+LDFROM} = '$(OBJECT)' unless $self->{?LDFROM};
 
     # Sanity check: don't define LINKTYPE = dynamic if we're skipping
     # the 'dynamic' section of MM.  We don't have this problem with
     # 'static', since we either must use it (%Config says we can't
     # use dynamic loading) or the caller asked for it explicitly.
-    if (!$self->{LINKTYPE}) {
-       $self->{LINKTYPE} = $self->{SKIPHASH}->{'dynamic'}
+    if (!$self->{?LINKTYPE}) {
+       $self->{+LINKTYPE} = $self->{SKIPHASH}->{?'dynamic'}
                         ?? 'static'
-                        !! (%Config{usedl} ?? 'dynamic' !! 'static');
+                        !! (%Config{?usedl} ?? 'dynamic' !! 'static');
     };
 
-    $self->{NOOP}               ||= '$(SHELL) -c true';
-    $self->{NOECHO}             = '@' unless defined $self->{NOECHO};
+    $self->{+NOOP}               ||= '$(SHELL) -c true';
+    $self->{+NOECHO}             = '@' unless defined $self->{?NOECHO};
 
-    $self->{FIRST_MAKEFILE}     ||= $self->{MAKEFILE} || 'Makefile';
-    $self->{MAKEFILE}           ||= $self->{FIRST_MAKEFILE};
-    $self->{MAKEFILE_OLD}       ||= $self->{MAKEFILE}.'.old';
-    $self->{MAKE_APERL_FILE}    ||= $self->{MAKEFILE}.'.aperl';
+    $self->{+FIRST_MAKEFILE}     ||= $self->{?MAKEFILE} || 'Makefile';
+    $self->{+MAKEFILE}           ||= $self->{?FIRST_MAKEFILE};
+    $self->{+MAKEFILE_OLD}       ||= $self->{?MAKEFILE}.'.old';
+    $self->{+MAKE_APERL_FILE}    ||= $self->{?MAKEFILE}.'.aperl';
 
     # Some makes require a wrapper around macros passed in on the command 
     # line.
-    $self->{MACROSTART}         ||= '';
-    $self->{MACROEND}           ||= '';
+    $self->{+MACROSTART}         ||= '';
+    $self->{+MACROEND}           ||= '';
 
     # Not everybody uses -f to indicate "use this Makefile instead"
-    $self->{USEMAKEFILE}        ||= '-f';
+    $self->{+USEMAKEFILE}        ||= '-f';
 
-    $self->{SHELL}              ||= %Config{sh} || '/bin/sh';
+    $self->{+SHELL}              ||= %Config{?sh} || '/bin/sh';
 
-    $self->{ECHO}       ||= 'echo';
-    $self->{ECHO_N}     ||= 'echo -n';
-    $self->{RM_F}       ||= "rm -f";
-    $self->{RM_RF}      ||= "rm -rf";
-    $self->{TOUCH}      ||= "touch";
-    $self->{TEST_F}     ||= "test -f";
-    $self->{CP}         ||= "cp";
-    $self->{MV}         ||= "mv";
-    $self->{CHMOD}      ||= "chmod";
-    $self->{MKPATH}     ||= '$(ABSPERLRUN) "-MExtUtils::Command" -e mkpath';
-    $self->{EQUALIZE_TIMESTAMP} ||= 
+    $self->{+ECHO}       ||= 'echo';
+    $self->{+ECHO_N}     ||= 'echo -n';
+    $self->{+RM_F}       ||= "rm -f";
+    $self->{+RM_RF}      ||= "rm -rf";
+    $self->{+TOUCH}      ||= "touch";
+    $self->{+TEST_F}     ||= "test -f";
+    $self->{+CP}         ||= "cp";
+    $self->{+MV}         ||= "mv";
+    $self->{+CHMOD}      ||= "chmod";
+    $self->{+MKPATH}     ||= '$(ABSPERLRUN) "-MExtUtils::Command" -e mkpath';
+    $self->{+EQUALIZE_TIMESTAMP} ||= 
       '$(ABSPERLRUN) "-MExtUtils::Command" -e eqtime';
 
-    $self->{UNINST}     ||= 0;
-    $self->{VERBINST}   ||= 0;
-    $self->{MOD_INSTALL} ||= 
+    $self->{+UNINST}     ||= 0;
+    $self->{+VERBINST}   ||= 0;
+    $self->{+MOD_INSTALL} ||= 
       $self->oneliner(<<'CODE', \@('-MExtUtils::Install'));
 install(\%(<@ARGV), '$(VERBINST)', 0, '$(UNINST)');
 CODE
-    $self->{DOC_INSTALL}        ||= 
+    $self->{+DOC_INSTALL}        ||= 
       '$(ABSPERLRUN) "-MExtUtils::Command::MM" -e perllocal_install';
-    $self->{UNINSTALL}          ||= 
+    $self->{+UNINSTALL}          ||= 
       '$(ABSPERLRUN) "-MExtUtils::Command::MM" -e uninstall';
-    $self->{WARN_IF_OLD_PACKLIST} ||= 
+    $self->{+WARN_IF_OLD_PACKLIST} ||= 
       '$(ABSPERLRUN) "-MExtUtils::Command::MM" -e warn_if_old_packlist';
-    $self->{FIXIN}              ||= 
+    $self->{+FIXIN}              ||= 
       q{$(PERLRUN) "-MExtUtils::MY" -e "MY->fixin(shift @ARGV)"};
 
-    $self->{UMASK_NULL}         ||= "umask 0";
-    $self->{DEV_NULL}           ||= "> /dev/null 2>&1";
+    $self->{+UMASK_NULL}         ||= "umask 0";
+    $self->{+DEV_NULL}           ||= "> /dev/null 2>&1";
 
     return 1;
 }
@@ -1841,9 +1841,9 @@ Unix has no need of special linker flags.
 
 sub init_linker {
     my($self) = shift;
-    $self->{PERL_ARCHIVE} ||= '';
-    $self->{PERL_ARCHIVE_AFTER} ||= '';
-    $self->{EXPORT_LIST}  ||= '';
+    $self->{+PERL_ARCHIVE} ||= '';
+    $self->{+PERL_ARCHIVE_AFTER} ||= '';
+    $self->{+EXPORT_LIST}  ||= '';
 }
 
 
@@ -1871,20 +1871,20 @@ sub init_lib2arch {
                      \%(l=>"vendorlib", a=>"vendorarch"),)
                     )
     {
-        my $lib = "install$libpair->{l}";
+        my $lib = "install$libpair->{?l}";
         my $Lib = uc $lib;
-        my $Arch = uc "install$libpair->{a}";
-        if( $self->{$Lib} && ! $self->{$Arch} ){
-            my($ilib) = %Config{$lib};
+        my $Arch = uc "install$libpair->{?a}";
+        if( $self->{?$Lib} && ! $self->{?$Arch} ){
+            my($ilib) = %Config{?$lib};
 
             $self->prefixify($Arch,$ilib,$self->{$Lib});
 
-            unless (-d $self->{$Arch}) {
-                print STDOUT "Directory $self->{$Arch} not found\n" 
+            unless (-d $self->{?$Arch}) {
+                print STDOUT "Directory $self->{?$Arch} not found\n" 
                   if $Verbose;
-                $self->{$Arch} = $self->{$Lib};
+                $self->{+$Arch} = $self->{?$Lib};
             }
-            print STDOUT "Defaulting $Arch to $self->{$Arch}\n" if $Verbose;
+            print STDOUT "Defaulting $Arch to $self->{?$Arch}\n" if $Verbose;
         }
     }
 }
@@ -1914,82 +1914,82 @@ sub init_PERL {
     my($self) = shift;
 
     my @defpath = @( () );
-    foreach my $component (@($self->{PERL_SRC}, < $self->path(), 
-                           %Config{binexp})) 
+    foreach my $component (@($self->{?PERL_SRC}, < $self->path(), 
+                           %Config{?binexp})) 
     {
 	push @defpath, $component if defined $component;
     }
 
     # Build up a set of file names (not command names).
     my $thisperl = $self->canonpath($^X);
-    $thisperl .= %Config{exe_ext} unless 
+    $thisperl .= %Config{?exe_ext} unless 
                 # VMS might have a file version # at the end
-      %Is{VMS} ?? $thisperl =~ m/%Config{exe_ext}(;\d+)?$/i
-              !! $thisperl =~ m/%Config{exe_ext}$/i;
+      %Is{?VMS} ?? $thisperl =~ m/%Config{?exe_ext}(;\d+)?$/i
+              !! $thisperl =~ m/%Config{?exe_ext}$/i;
 
     # We need a relative path to perl when in the core.
-    $thisperl = $self->abs2rel($thisperl) if $self->{PERL_CORE};
+    $thisperl = $self->abs2rel($thisperl) if $self->{?PERL_CORE};
 
     my @perls = @($thisperl);
-    push @perls, < map { "$_%Config{exe_ext}" }
- @(                     ('perl', 'perl5', "perl%Config{version}"));
+    push @perls, < map { "$_%Config{?exe_ext}" }
+ @(                     ('perl', 'perl5', "perl%Config{?version}"));
 
     # miniperl has priority over all but the cannonical perl when in the
     # core.  Otherwise its a last resort.
-    my $miniperl = "miniperl%Config{exe_ext}";
-    if( $self->{PERL_CORE} ) {
+    my $miniperl = "miniperl%Config{?exe_ext}";
+    if( $self->{?PERL_CORE} ) {
         splice @perls, 1, 0, $miniperl;
     }
     else {
         push @perls, $miniperl;
     }
 
-    $self->{PERL} ||=
+    $self->{+PERL} ||=
         $self->find_perl('kurila', \@perls, \@defpath, $Verbose );
     # don't check if perl is executable, maybe they have decided to
     # supply switches with perl
 
     # When built for debugging, VMS doesn't create perl.exe but ndbgperl.exe.
     my $perl_name = 'perl';
-    $perl_name = 'ndbgperl' if %Is{VMS} && 
-      defined %Config{usevmsdebug} && %Config{usevmsdebug} eq 'define';
+    $perl_name = 'ndbgperl' if %Is{?VMS} && 
+      defined %Config{?usevmsdebug} && %Config{?usevmsdebug} eq 'define';
 
     # XXX This logic is flawed.  If "miniperl" is anywhere in the path
     # it will get confused.  It should be fixed to work only on the filename.
     # Define 'FULLPERL' to be a non-miniperl (used in test: target)
-    ($self->{FULLPERL} = $self->{PERL}) =~ s/miniperl/$perl_name/i
-	unless $self->{FULLPERL};
+    ($self->{+FULLPERL} = $self->{?PERL}) =~ s/miniperl/$perl_name/i
+	unless $self->{?FULLPERL};
 
     # Little hack to get around VMS's find_perl putting "MCR" in front
     # sometimes.
-    $self->{ABSPERL} = $self->{PERL};
-    my $has_mcr = $self->{ABSPERL} =~ s/^MCR\s*//;
+    $self->{+ABSPERL} = $self->{?PERL};
+    my $has_mcr = $self->{+ABSPERL} =~ s/^MCR\s*//;
     if( $self->file_name_is_absolute($self->{ABSPERL}) ) {
-        $self->{ABSPERL} = '$(PERL)';
+        $self->{+ABSPERL} = '$(PERL)';
     }
     else {
-        $self->{ABSPERL} = $self->rel2abs($self->{ABSPERL});
-        $self->{ABSPERL} = 'MCR '.$self->{ABSPERL} if $has_mcr;
+        $self->{+ABSPERL} = $self->rel2abs($self->{ABSPERL});
+        $self->{+ABSPERL} = 'MCR '.$self->{?ABSPERL} if $has_mcr;
     }
 
-    $self->{ABSPERL} = qq{"$self->{ABSPERL}"}
-        if ($self->{ABSPERL} =~ m/\s/) && ! $has_mcr;
+    $self->{+ABSPERL} = qq{"$self->{?ABSPERL}"}
+        if ($self->{?ABSPERL} =~ m/\s/) && ! $has_mcr;
 
     # Are we building the core?
-    $self->{PERL_CORE} = %ENV{PERL_CORE} unless exists $self->{PERL_CORE};
-    $self->{PERL_CORE} = 0               unless defined $self->{PERL_CORE};
+    $self->{+PERL_CORE} = %ENV{?PERL_CORE} unless exists $self->{PERL_CORE};
+    $self->{+PERL_CORE} = 0               unless defined $self->{?PERL_CORE};
 
     # How do we run perl?
     foreach my $perl (qw(PERL FULLPERL ABSPERL)) {
         my $run  = $perl.'RUN';
 
-        $self->{$run}  = "\$($perl)";
+        $self->{+$run}  = "\$($perl)";
 
         # Make sure perl can find itself before it's installed.
-        $self->{$run} .= q{ "-I$(PERL_LIB)" "-I$(PERL_ARCHLIB)"} 
-          if $self->{UNINSTALLED_PERL} || $self->{PERL_CORE};
+        $self->{+$run} .= q{ "-I$(PERL_LIB)" "-I$(PERL_ARCHLIB)"} 
+          if $self->{?UNINSTALLED_PERL} || $self->{?PERL_CORE};
 
-        $self->{$perl.'RUNINST'} = 
+        $self->{+$perl.'RUNINST'} = 
           sprintf q{$(%sRUN) "-I$(INST_ARCHLIB)" "-I$(INST_LIB)"}, $perl;
     }
 
@@ -2008,8 +2008,8 @@ Add MM_Unix_VERSION.
 sub init_platform {
     my($self) = shift;
 
-    $self->{MM_Unix_VERSION} = $VERSION;
-    $self->{PERL_MALLOC_DEF} = '-DPERL_EXTMALLOC_DEF -Dmalloc=Perl_malloc '.
+    $self->{+MM_Unix_VERSION} = $VERSION;
+    $self->{+PERL_MALLOC_DEF} = '-DPERL_EXTMALLOC_DEF -Dmalloc=Perl_malloc '.
                                '-Dfree=Perl_mfree -Drealloc=Perl_realloc '.
                                '-Dcalloc=Perl_calloc';
 
@@ -2021,8 +2021,8 @@ sub platform_constants {
 
     foreach my $macro (qw(MM_Unix_VERSION PERL_MALLOC_DEF))
     {
-        next unless defined $self->{$macro};
-        $make_frag .= "$macro = $self->{$macro}\n";
+        next unless defined $self->{?$macro};
+        $make_frag .= "$macro = $self->{?$macro}\n";
     }
 
     return $make_frag;
@@ -2040,8 +2040,8 @@ Called by init_main.  Initializes PERL_*
 sub init_PERM {
     my($self) = shift;
 
-    $self->{PERM_RW}  = 644  unless defined $self->{PERM_RW};
-    $self->{PERM_RWX} = 755  unless defined $self->{PERM_RWX};
+    $self->{+PERM_RW}  = 644  unless defined $self->{?PERM_RW};
+    $self->{+PERM_RWX} = 755  unless defined $self->{?PERM_RWX};
 
     return 1;
 }
@@ -2060,16 +2060,16 @@ sub init_xs {
     my $self = shift;
 
     if ($self->has_link_code()) {
-        $self->{INST_STATIC}  = 
+        $self->{+INST_STATIC}  = 
           $self->catfile('$(INST_ARCHAUTODIR)', '$(BASEEXT)$(LIB_EXT)');
-        $self->{INST_DYNAMIC} = 
+        $self->{+INST_DYNAMIC} = 
           $self->catfile('$(INST_ARCHAUTODIR)', '$(DLBASE).$(DLEXT)');
-        $self->{INST_BOOT}    = 
+        $self->{+INST_BOOT}    = 
           $self->catfile('$(INST_ARCHAUTODIR)', '$(BASEEXT).bs');
     } else {
-        $self->{INST_STATIC}  = '';
-        $self->{INST_DYNAMIC} = '';
-        $self->{INST_BOOT}    = '';
+        $self->{+INST_STATIC}  = '';
+        $self->{+INST_DYNAMIC} = '';
+        $self->{+INST_BOOT}    = '';
     }
 }    
 
@@ -2207,11 +2207,11 @@ Defines targets to make and to install EXE_FILES.
 sub installbin {
     my($self) = shift;
 
-    return "" unless $self->{EXE_FILES} && ref $self->{EXE_FILES} eq "ARRAY";
-    my @exefiles = @{$self->{EXE_FILES}};
+    return "" unless $self->{?EXE_FILES} && ref $self->{?EXE_FILES} eq "ARRAY";
+    my @exefiles = @{$self->{?EXE_FILES}};
     return "" unless (nelems @exefiles);
 
-    @exefiles = map < vmsify($_), @exefiles if %Is{VMS};
+    @exefiles = map < vmsify($_), @exefiles if %Is{?VMS};
 
     my %fromto;
     for my $from ( @exefiles) {
@@ -2221,8 +2221,8 @@ sub installbin {
 	my $to = $self->libscan($path);
 	print "libscan($from) => '$to'\n" if ($Verbose +>=2);
 
-        $to = vmsify($to) if %Is{VMS};
-	%fromto{$from} = $to;
+        $to = vmsify($to) if %Is{?VMS};
+	%fromto{+$from} = $to;
     }
     my @to   = values %fromto;
 
@@ -2269,8 +2269,8 @@ Defines the linkext target which in turn defines the LINKTYPE.
 sub linkext {
     my($self, < %attribs) = < @_;
     # LINKTYPE => static or dynamic or ''
-    my($linktype) = defined %attribs{LINKTYPE} ??
-      %attribs{LINKTYPE} !! '$(LINKTYPE)';
+    my($linktype) = defined %attribs{?LINKTYPE} ??
+      %attribs{?LINKTYPE} !! '$(LINKTYPE)';
     "
 linkext :: $linktype
 	\$(NOECHO) \$(NOOP)
@@ -2332,13 +2332,13 @@ sub makeaperl {
     push @m, "
 # --- MakeMaker makeaperl section ---
 MAP_TARGET    = $target
-FULLPERL      = $self->{FULLPERL}
+FULLPERL      = $self->{?FULLPERL}
 ";
-    return join '', @m if $self->{PARENT};
+    return join '', @m if $self->{?PARENT};
 
-    my($dir) = join ":", @{$self->{DIR}};
+    my($dir) = join ":", @{$self->{?DIR}};
 
-    unless ($self->{MAKEAPERL}) {
+    unless ($self->{?MAKEAPERL}) {
 	push @m, q{
 $(MAP_TARGET) :: static $(MAKE_APERL_FILE)
 	$(MAKE) $(USEMAKEFILE) $(MAKE_APERL_FILE) $@
@@ -2369,9 +2369,9 @@ $(MAKE_APERL_FILE) : $(FIRST_MAKEFILE) pm_to_blib
 
     $cccmd = $self->const_cccmd($libperl);
     $cccmd =~ s/^CCCMD\s*=\s*//;
-    $cccmd =~ s/\$\(INC\)/ "-I$self->{PERL_INC}" /;
-    $cccmd .= " %Config{cccdlflags}"
-	if (%Config{useshrplib} eq 'true');
+    $cccmd =~ s/\$\(INC\)/ "-I$self->{?PERL_INC}" /;
+    $cccmd .= " %Config{?cccdlflags}"
+	if (%Config{?useshrplib} eq 'true');
     $cccmd =~ s/\(CC\)/\(PERLMAINCC\)/;
 
     # The front matter of the linkcommand...
@@ -2384,10 +2384,10 @@ $(MAKE_APERL_FILE) : $(FIRST_MAKEFILE) pm_to_blib
     my %static;
     require File::Find;
     File::Find::find(sub {
-	return unless m/\Q$self->{LIB_EXT}\E$/;
+	return unless m/\Q$self->{?LIB_EXT}\E$/;
 
         # Skip perl's libraries.
-        return if m/^libperl/ or m/^perl\Q$self->{LIB_EXT}\E$/;
+        return if m/^libperl/ or m/^perl\Q$self->{?LIB_EXT}\E$/;
 
 	# Skip purified versions of libraries 
         # (e.g., DynaLoader_pure_p1_c0_032.a)
@@ -2402,7 +2402,7 @@ $(MAKE_APERL_FILE) : $(FIRST_MAKEFILE) pm_to_blib
 
 		# Throw away anything not explicitly marked for inclusion.
 		# DynaLoader is implied.
-		foreach my $incl (@((< @{$self->{INCLUDE_EXT}},'DynaLoader'))){
+		foreach my $incl (@((< @{$self->{?INCLUDE_EXT}},'DynaLoader'))){
 			if( $xx eq $incl ){
 				$found++;
 				last;
@@ -2428,8 +2428,8 @@ $(MAKE_APERL_FILE) : $(FIRST_MAKEFILE) pm_to_blib
 
 	# Once the patch to minimod.PL is in the distribution, I can
 	# drop it
-	return if $File::Find::name =~ m:auto/$self->{FULLEXT}/$self->{BASEEXT}$self->{LIB_EXT}\z:;
-	%static{cwd() . "/" . $_}++;
+	return if $File::Find::name =~ m:auto/$self->{?FULLEXT}/$self->{?BASEEXT}$self->{?LIB_EXT}\z:;
+	%static{+cwd() . "/" . $_}++;
     }, < grep( -d $_, @{$searchdirs || \@()}) );
 
     # We trust that what has been handed in as argument, will be buildable
@@ -2438,7 +2438,7 @@ $(MAKE_APERL_FILE) : $(FIRST_MAKEFILE) pm_to_blib
 
     $extra = \@() unless $extra && ref $extra eq 'ARRAY';
     for (sort keys %static) {
-	next unless m/\Q$self->{LIB_EXT}\E\z/;
+	next unless m/\Q$self->{?LIB_EXT}\E\z/;
 	$_ = dirname($_) . "/extralibs.ld";
 	push @$extra, $_;
     }
@@ -2457,33 +2457,33 @@ MAP_PERLINC   = $(join ' ',@{$perlinc || \@()}
 )MAP_STATIC    = ",
 join(" \\\n\t", reverse sort keys %static), "
 
-MAP_PRELIBS   = %Config{perllibs} %Config{cryptlib}
+MAP_PRELIBS   = %Config{?perllibs} %Config{?cryptlib}
 ";
 
     if (defined $libperl) {
-	($lperl = $libperl) =~ s/\$\(A\)/$self->{LIB_EXT}/;
+	($lperl = $libperl) =~ s/\$\(A\)/$self->{?LIB_EXT}/;
     }
     unless ($libperl && -f $lperl) { # Ilya's code...
-	my $dir = $self->{PERL_SRC} || "$self->{PERL_ARCHLIB}/CORE";
-	$dir = "$self->{PERL_ARCHLIB}/.." if $self->{UNINSTALLED_PERL};
-	$libperl ||= "libperl$self->{LIB_EXT}";
+	my $dir = $self->{?PERL_SRC} || "$self->{?PERL_ARCHLIB}/CORE";
+	$dir = "$self->{?PERL_ARCHLIB}/.." if $self->{?UNINSTALLED_PERL};
+	$libperl ||= "libperl$self->{?LIB_EXT}";
 	$libperl   = "$dir/$libperl";
-	$lperl   ||= "libperl$self->{LIB_EXT}";
+	$lperl   ||= "libperl$self->{?LIB_EXT}";
 	$lperl     = "$dir/$lperl";
 
         if (! -f $libperl and ! -f $lperl) {
           # We did not find a static libperl. Maybe there is a shared one?
-          if (%Is{SunOS}) {
-            $lperl  = $libperl = "$dir/%Config{libperl}";
+          if (%Is{?SunOS}) {
+            $lperl  = $libperl = "$dir/%Config{?libperl}";
             # SUNOS ld does not take the full path to a shared library
-            $libperl = '' if %Is{SunOS4};
+            $libperl = '' if %Is{?SunOS4};
           }
         }
 
 	print STDOUT "Warning: $libperl not found
     If you're going to build a static perl binary, make sure perl is installed
     otherwise ignore this warning\n"
-		unless (-f $lperl || defined($self->{PERL_SRC}));
+		unless (-f $lperl || defined($self->{?PERL_SRC}));
     }
 
     # SUNOS ld does not take the full path to a shared library
@@ -2544,12 +2544,12 @@ doc_inst_perl :
 inst_perl : pure_inst_perl doc_inst_perl
 
 pure_inst_perl : $(MAP_TARGET)
-	}.$self->{CP}.q{ $(MAP_TARGET) }.$self->catfile('$(DESTINSTALLBIN)','$(MAP_TARGET)').q{
+	}.$self->{?CP}.q{ $(MAP_TARGET) }.$self->catfile('$(DESTINSTALLBIN)','$(MAP_TARGET)').q{
 
 clean :: map_clean
 
 map_clean :
-	}.$self->{RM_F}.qq{ $tmp/perlmain\$(OBJ_EXT) $tmp/perlmain.c \$(MAP_TARGET) $makefilename \$(INST_ARCHAUTODIR)/extralibs.all
+	}.$self->{?RM_F}.qq{ $tmp/perlmain\$(OBJ_EXT) $tmp/perlmain.c \$(MAP_TARGET) $makefilename \$(INST_ARCHAUTODIR)/extralibs.all
 };
 
     join '', @m;
@@ -2570,9 +2570,9 @@ sub makefile {
     $m = '
 $(OBJECT) : $(FIRST_MAKEFILE)
 
-' if $self->{OBJECT};
+' if $self->{?OBJECT};
 
-    my $newer_than_target = %Is{VMS} ?? '$(MMS$SOURCE_LIST)' !! '$?';
+    my $newer_than_target = %Is{?VMS} ?? '$(MMS$SOURCE_LIST)' !! '$?';
     my $mpl_args = join " ", map qq["$_"], @ARGV;
 
     $m .= sprintf <<'MAKE_FRAG', $newer_than_target, $mpl_args;
@@ -2621,18 +2621,18 @@ sub needs_linking {
     my $caller = @(caller(0))[3];
     confess("needs_linking called too early") if 
       $caller =~ m/^ExtUtils::MakeMaker::/;
-    return $self->{NEEDS_LINKING} if defined $self->{NEEDS_LINKING};
-    if ($self->has_link_code or $self->{MAKEAPERL}){
-	$self->{NEEDS_LINKING} = 1;
+    return $self->{?NEEDS_LINKING} if defined $self->{?NEEDS_LINKING};
+    if ($self->has_link_code or $self->{?MAKEAPERL}){
+	$self->{+NEEDS_LINKING} = 1;
 	return 1;
     }
-    foreach my $child (keys %{$self->{CHILDREN} || \%()}) {
+    foreach my $child (keys %{$self->{?CHILDREN} || \%()}) {
 	if ($self->{CHILDREN}->{$child}->needs_linking) {
-	    $self->{NEEDS_LINKING} = 1;
+	    $self->{+NEEDS_LINKING} = 1;
 	    return 1;
 	}
     }
-    return $self->{NEEDS_LINKING} = 0;
+    return $self->{+NEEDS_LINKING} = 0;
 }
 
 
@@ -2649,7 +2649,7 @@ sub parse_abstract {
     local $/ = "\n";
     open(my $fh, '<', $parsefile) or die "Could not open '$parsefile': $!";
     my $inpod = 0;
-    my $package = $self->{DISTNAME};
+    my $package = $self->{?DISTNAME};
     $package =~ s/-/::/g;
     while (~< $fh) {
         $inpod = m/^=(?!cut)/ ?? 1 !! m/^=cut/ ?? 0 !! $inpod;
@@ -2738,19 +2738,19 @@ sub pasthru {
     my(@m);
 
     my(@pasthru);
-    my($sep) = %Is{VMS} ?? ',' !! '';
+    my($sep) = %Is{?VMS} ?? ',' !! '';
     $sep .= "\\\n\t";
 
     foreach my $key (qw(LIB LIBPERL_A LINKTYPE OPTIMIZE
                      PREFIX INSTALL_BASE)
                  ) 
     {
-        next unless defined $self->{$key};
+        next unless defined $self->{?$key};
 	push @pasthru, "$key=\"\$($key)\"";
     }
 
     foreach my $key (qw(DEFINE INC)) {
-        next unless defined $self->{$key};
+        next unless defined $self->{?$key};
 	push @pasthru, "PASTHRU_$key=\"\$(PASTHRU_$key)\"";
     }
 
@@ -2785,7 +2785,7 @@ sub perldepend {
 
     my $make_config = $self->cd('$(PERL_SRC)', '$(MAKE) lib/Config.pm');
 
-    push @m, sprintf <<'MAKE_FRAG', $make_config if $self->{PERL_SRC};
+    push @m, sprintf <<'MAKE_FRAG', $make_config if $self->{?PERL_SRC};
 # Check for unpropogated config.sh changes. Should never happen.
 # We do NOT just update config.h because that is not sufficient.
 # An out of date config.h is not fatal but complains loudly!
@@ -2844,9 +2844,9 @@ PERL_HDRS = \
 	$(PERL_INC)/util.h
 
 $(OBJECT) : $(PERL_HDRS)
-} if $self->{OBJECT};
+} if $self->{?OBJECT};
 
-    push @m, join(" ", values %{$self->{XS}})." : \$(XSUBPPDEPS)\n"  if %{$self->{XS}};
+    push @m, join(" ", values %{$self->{XS}})." : \$(XSUBPPDEPS)\n"  if %{$self->{?XS}};
 
     join "\n", @m;
 }
@@ -2865,7 +2865,7 @@ interpreted as an octal value.
 =cut
 
 sub perm_rw {
-    return shift->{PERM_RW};
+    return shift->{?PERM_RW};
 }
 
 =item perm_rwx (o)
@@ -2878,7 +2878,7 @@ See also perl_rw.
 =cut
 
 sub perm_rwx {
-    return shift->{PERM_RWX};
+    return shift->{?PERM_RWX};
 }
 
 =item pm_to_blib
@@ -2950,14 +2950,14 @@ for a binary distribution.
 sub ppd {
     my($self) = < @_;
 
-    my $pack_ver = join ",", @( < split(m/\./, $self->{VERSION}), (0)x4)[[0..3]];
+    my $pack_ver = join ",", @( < split(m/\./, $self->{?VERSION}), (0)x4)[[0..3]];
 
-    my $abstract = $self->{ABSTRACT} || '';
+    my $abstract = $self->{?ABSTRACT} || '';
     $abstract =~ s/\n/\\n/sg;
     $abstract =~ s/</&lt;/g;
     $abstract =~ s/>/&gt;/g;
 
-    my $author = $self->{AUTHOR} || '';
+    my $author = $self->{?AUTHOR} || '';
     $author =~ s/</&lt;/g;
     $author =~ s/>/&gt;/g;
 
@@ -2969,10 +2969,10 @@ sub ppd {
 PPD_HTML
 
     $ppd_xml .= "    <IMPLEMENTATION>\n";
-    foreach my $prereq (sort keys %{$self->{PREREQ_PM} || \%()}) {
+    foreach my $prereq (sort keys %{$self->{?PREREQ_PM} || \%()}) {
         my $pre_req = $prereq;
         $pre_req =~ s/::/-/g;
-        my $dep_ver = join ",", @( <split (m/\./, $self->{PREREQ_PM}->{$prereq}), 
+        my $dep_ver = join ",", @( <split (m/\./, $self->{PREREQ_PM}->{?$prereq}), 
                                    (0) x 4)[[0 .. 3]];
         $ppd_xml .= sprintf <<'PPD_OUT', $pre_req, $dep_ver;
         <DEPENDENCY NAME="%s" VERSION="%s" />
@@ -2980,28 +2980,28 @@ PPD_OUT
 
     }
 
-    my $archname = %Config{archname};
+    my $archname = %Config{?archname};
         # archname did not change from 5.6 to 5.8, but those versions may
         # not be not binary compatible so now we append the part of the
         # version that changes when binary compatibility may change
-        $archname .= "-". substr(%Config{version},0,3);
+        $archname .= "-". substr(%Config{?version},0,3);
     $ppd_xml .= sprintf <<'PPD_OUT', $archname;
         <OS NAME="$(OSNAME)" />
         <ARCHITECTURE NAME="%s" />
 PPD_OUT
 
-    if ($self->{PPM_INSTALL_SCRIPT}) {
-        if ($self->{PPM_INSTALL_EXEC}) {
+    if ($self->{?PPM_INSTALL_SCRIPT}) {
+        if ($self->{?PPM_INSTALL_EXEC}) {
             $ppd_xml .= sprintf qq{        <INSTALL EXEC="\%s">\%s</INSTALL>\n},
-                  $self->{PPM_INSTALL_EXEC}, $self->{PPM_INSTALL_SCRIPT};
+                  $self->{?PPM_INSTALL_EXEC}, $self->{?PPM_INSTALL_SCRIPT};
         }
         else {
             $ppd_xml .= sprintf qq{        <INSTALL>\%s</INSTALL>\n}, 
-                  $self->{PPM_INSTALL_SCRIPT};
+                  $self->{?PPM_INSTALL_SCRIPT};
         }
     }
 
-    my ($bin_location) = $self->{BINARY_LOCATION} || '';
+    my ($bin_location) = $self->{?BINARY_LOCATION} || '';
     $bin_location =~ s/\\/\\\\/g;
 
     $ppd_xml .= sprintf <<'PPD_XML', $bin_location;
@@ -3049,15 +3049,15 @@ simply use '/home/foo/man/man1'.
 sub prefixify {
     my($self,$var,$sprefix,$rprefix,$default) = < @_;
 
-    my $path = $self->{uc $var} || 
-               %Config_Override{lc $var} || %Config{lc $var} || '';
+    my $path = $self->{?uc $var} || 
+               %Config_Override{?lc $var} || %Config{?lc $var} || '';
 
     $rprefix .= '/' if $sprefix =~ m|/$|;
 
     print STDERR "  prefixify $var => $path\n" if $Verbose +>= 2;
     print STDERR "    from $sprefix to $rprefix\n" if $Verbose +>= 2;
 
-    if( $self->{ARGS}->{PREFIX} && $self->file_name_is_absolute($path) && 
+    if( $self->{ARGS}->{?PREFIX} && $self->file_name_is_absolute($path) && 
         $path !~ s{^\Q$sprefix\E\b}{$rprefix}s ) 
     {
 
@@ -3068,7 +3068,7 @@ sub prefixify {
     }
 
     print "    now $path\n" if $Verbose +>= 2;
-    return $self->{uc $var} = $path;
+    return $self->{+uc $var} = $path;
 }
 
 
@@ -3080,18 +3080,18 @@ Defines targets to run *.PL files.
 
 sub processPL {
     my $self = shift;
-    my $pl_files = $self->{PL_FILES};
+    my $pl_files = $self->{?PL_FILES};
 
     return "" unless $pl_files;
 
     my $m = '';
     foreach my $plfile (sort keys %$pl_files) {
-        my $list = ref($pl_files->{$plfile})
-                     ??  $pl_files->{$plfile}
-		     !! \@($pl_files->{$plfile});
+        my $list = ref($pl_files->{?$plfile})
+                     ??  $pl_files->{?$plfile}
+		     !! \@($pl_files->{?$plfile});
 
 	foreach my $target ( @$list) {
-            if( %Is{VMS} ) {
+            if( %Is{?VMS} ) {
                 $plfile = vmsify( <$self->eliminate_macros($plfile));
                 $target = vmsify( <$self->eliminate_macros($target));
             }
@@ -3103,7 +3103,7 @@ sub processPL {
 	    # else we have a dependency loop.
 	    my $pm_dep;
 	    my $perlrun;
-	    if( defined $self->{PM}->{$target} ) {
+	    if( defined $self->{PM}->{?$target} ) {
 		$pm_dep  = '';
 		$perlrun = 'PERLRUN';
 	    }
@@ -3233,16 +3233,16 @@ Using POSIX::ARG_MAX.  Otherwise falling back to 4096.
 sub max_exec_len {
     my $self = shift;
 
-    if (!defined $self->{_MAX_EXEC_LEN}) {
+    if (!defined $self->{?_MAX_EXEC_LEN}) {
         if (my $arg_max = try { require POSIX;  &POSIX::ARG_MAX( < @_ ) }) {
-            $self->{_MAX_EXEC_LEN} = $arg_max;
+            $self->{+_MAX_EXEC_LEN} = $arg_max;
         }
         else {      # POSIX minimum exec size
-            $self->{_MAX_EXEC_LEN} = 4096;
+            $self->{+_MAX_EXEC_LEN} = 4096;
         }
     }
 
-    return $self->{_MAX_EXEC_LEN};
+    return $self->{?_MAX_EXEC_LEN};
 }
 
 
@@ -3283,12 +3283,12 @@ END
 
     # If this extension has its own library (eg SDBM_File)
     # then copy that to $(INST_STATIC) and add $(OBJECT) into it.
-    push(@m, <<'MAKE_FRAG') if $self->{MYEXTLIB};
+    push(@m, <<'MAKE_FRAG') if $self->{?MYEXTLIB};
 	$(CP) $(MYEXTLIB) $@
 MAKE_FRAG
 
     my $ar; 
-    if (exists $self->{FULL_AR} && -x $self->{FULL_AR}) {
+    if (exists $self->{FULL_AR} && -x $self->{?FULL_AR}) {
         # Prefer the absolute pathed ar if available so that PATH
         # doesn't confuse us.  Perl itself is built with the full_ar.  
         $ar = 'FULL_AR';
@@ -3302,7 +3302,7 @@ MAKE_FRAG
 MAKE_FRAG
 
     # Old mechanism - still available:
-    push @m, <<'MAKE_FRAG' if $self->{PERL_SRC} && $self->{EXTRALIBS};
+    push @m, <<'MAKE_FRAG' if $self->{?PERL_SRC} && $self->{?EXTRALIBS};
 	$(NOECHO) $(ECHO) "$(EXTRALIBS)" >> $(PERL_SRC)/ext.libs
 MAKE_FRAG
 
@@ -3319,15 +3319,15 @@ sub staticmake {
     my($self, < %attribs) = < @_;
     my(@static);
 
-    my(@searchdirs)=@($self->{PERL_ARCHLIB}, $self->{SITEARCHEXP},  $self->{INST_ARCHLIB});
+    my(@searchdirs)=@($self->{?PERL_ARCHLIB}, $self->{?SITEARCHEXP},  $self->{?INST_ARCHLIB});
 
     # And as it's not yet built, we add the current extension
     # but only if it has some C code (or XS code, which implies C code)
-    if ((nelems @{$self->{C}})) {
-	@static = @( $self->catfile($self->{INST_ARCHLIB},
+    if ((nelems @{$self->{?C}})) {
+	@static = @( $self->catfile($self->{?INST_ARCHLIB},
 				 "auto",
-				 $self->{FULLEXT},
-				 "$self->{BASEEXT}$self->{LIB_EXT}"
+				 $self->{?FULLEXT},
+				 "$self->{?BASEEXT}$self->{LIB_EXT}"
 				) );
     }
 
@@ -3339,13 +3339,13 @@ sub staticmake {
 
     # Instead we determine all libraries for the new perl at
     # runtime.
-    my(@perlinc) = @($self->{INST_ARCHLIB}, $self->{INST_LIB}, $self->{PERL_ARCHLIB}, $self->{PERL_LIB});
+    my(@perlinc) = @($self->{?INST_ARCHLIB}, $self->{?INST_LIB}, $self->{?PERL_ARCHLIB}, $self->{?PERL_LIB});
 
-    $self->makeaperl(MAKE	=> $self->{MAKEFILE},
+    $self->makeaperl(MAKE	=> $self->{?MAKEFILE},
 		     DIRS	=> \@searchdirs,
 		     STAT	=> \@static,
 		     INCL	=> \@perlinc,
-		     TARGET	=> $self->{MAP_TARGET},
+		     TARGET	=> $self->{?MAP_TARGET},
 		     TMP	=> "",
 		     LIBPERL	=> $self->{LIBPERL_A}
 		    );
@@ -3410,7 +3410,7 @@ sub test {
 # --- Test and Installation Sections ---
 
     my($self, < %attribs) = < @_;
-    my $tests = %attribs{TESTS} || '';
+    my $tests = %attribs{?TESTS} || '';
     if (!$tests && -d 't') {
         $tests = $self->find_tests;
     }
@@ -3443,7 +3443,7 @@ END
     }
 
     push(@m, "\t\$(NOECHO) \$(ECHO) 'No tests defined for \$(NAME) extension.'\n")
-	unless $tests or -f "test.pl" or nelems @{$self->{DIR}};
+	unless $tests or -f "test.pl" or nelems @{$self->{?DIR}};
     push(@m, "\n");
 
     push(@m, "test_dynamic :: pure_all\n");
@@ -3527,8 +3527,8 @@ sub tools_other {
                       FIXIN
                     } ) 
     {
-        next unless defined $self->{$tool};
-        push @m, "$tool = $self->{$tool}\n";
+        next unless defined $self->{?$tool};
+        push @m, "$tool = $self->{?$tool}\n";
     }
 
     return join "", @m;
@@ -3548,7 +3548,7 @@ sub tool_xsubpp {
     my @xsubpp_dirs = @INC;
 
     # Make sure we pick up the new xsubpp if we're building perl.
-    unshift @xsubpp_dirs, $self->{PERL_LIB} if $self->{PERL_CORE};
+    unshift @xsubpp_dirs, $self->{?PERL_LIB} if $self->{?PERL_CORE};
 
     foreach my $dir ( @xsubpp_dirs) {
         $xsdir = $self->catdir($dir, 'ExtUtils');
@@ -3557,9 +3557,9 @@ sub tool_xsubpp {
         }
     }
 
-    my $tmdir   = File::Spec->catdir($self->{PERL_LIB},"ExtUtils");
+    my $tmdir   = File::Spec->catdir($self->{?PERL_LIB},"ExtUtils");
     my(@tmdeps) = @( $self->catfile($tmdir,'typemap') );
-    if( $self->{TYPEMAPS} ){
+    if( $self->{?TYPEMAPS} ){
         foreach my $typemap ( @{$self->{TYPEMAPS}}){
             if( ! -f  $typemap ) {
                 warn "Typemap $typemap not found.\n";
@@ -3572,26 +3572,26 @@ sub tool_xsubpp {
     push(@tmdeps, "typemap") if -f "typemap";
     my(@tmargs) = map("-typemap $_", @tmdeps);
     if( exists $self->{XSOPT} ){
-        unshift( @tmargs, $self->{XSOPT} );
+        unshift( @tmargs, $self->{?XSOPT} );
     }
 
-    if (%Is{VMS}                          &&
-        %Config{'ldflags'}               && 
-        %Config{'ldflags'} =~ m!/Debug!i &&
-        (!exists($self->{XSOPT}) || $self->{XSOPT} !~ m/linenumbers/)
+    if (%Is{?VMS}                          &&
+        %Config{?'ldflags'}               && 
+        %Config{?'ldflags'} =~ m!/Debug!i &&
+        (!exists($self->{XSOPT}) || $self->{?XSOPT} !~ m/linenumbers/)
        ) 
     {
         unshift(@tmargs,'-nolinenumbers');
     }
 
 
-    $self->{XSPROTOARG} = "" unless defined $self->{XSPROTOARG};
+    $self->{+XSPROTOARG} = "" unless defined $self->{?XSPROTOARG};
 
     return qq{
 XSUBPPDIR = $xsdir
 XSUBPP = \$(XSUBPPDIR)\$(DFSEP)xsubpp
 XSUBPPRUN = \$(PERLRUN) \$(XSUBPP)
-XSPROTOARG = $self->{XSPROTOARG}
+XSPROTOARG = $self->{?XSPROTOARG}
 XSUBPPDEPS = $(join ' ',@tmdeps) \$(XSUBPP)
 XSUBPPARGS = $(join ' ',@tmargs)
 XSUBPP_EXTRA_ARGS = 
@@ -3626,7 +3626,7 @@ sub top_targets {
     my($self) = shift;
     my(@m);
 
-    push @m, $self->all_target, "\n" unless $self->{SKIPHASH}->{'all'};
+    push @m, $self->all_target, "\n" unless $self->{SKIPHASH}->{?'all'};
 
     push @m, '
 pure_all :: config pm_to_blib subdirs linkext
@@ -3641,7 +3641,7 @@ config :: $(FIRST_MAKEFILE) blibdirs
 
     push @m, '
 $(O_FILES): $(H_FILES)
-' if (nelems @{$self->{O_FILES} || \@()}) && nelems @{$self->{H} || \@()};
+' if (nelems @{$self->{?O_FILES} || \@()}) && nelems @{$self->{?H} || \@()};
 
     push @m, q{
 help :

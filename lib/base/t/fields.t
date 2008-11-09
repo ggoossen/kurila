@@ -23,7 +23,7 @@ is_deeply( \(sort keys %Foo::FIELDS),
 sub show_fields {
     my($base, $mask) = < @_;
     my $fields = \%{*{Symbol::fetch_glob($base.'::FIELDS')}};
-    return grep { (%fields::attr{$base}->[$fields->{$_}] ^&^ $mask) == $mask} 
+    return grep { (%fields::attr{$base}->[$fields->{?$_}] ^&^ $mask) == $mask} 
                 keys %$fields;
 }
 
@@ -38,12 +38,12 @@ foreach (@(Foo->new)) {
                  what  => 'Ahh',      who => 'Moo',
                  _up_yours => 'Yip' );
 
-    $obj->{Pants} = 'Whatever';
-    $obj->{_no}   = 'Yeah';
+    $obj->{+Pants} = 'Whatever';
+    $obj->{+_no}   = 'Yeah';
  <    %{$obj}{[qw(what who _up_yours)]} = ('Ahh', 'Moo', 'Yip');
 
     while(my($k,$v) = each %test) {
-        is($obj->{$k}, $v);
+        is($obj->{?$k}, $v);
     }
 }
 
@@ -53,7 +53,7 @@ do {
     };
     my $phash;
     try { $phash = fields::phash(name => "Joe", rank => "Captain") };
-    like $@->{description}, qr/^Pseudo-hashes have been removed from Perl/;
+    like $@->{?description}, qr/^Pseudo-hashes have been removed from Perl/;
 };
 
 
@@ -65,10 +65,10 @@ do {
 
     package main;
     my $a = Foo::Autoviv->new();
-    $a->{foo} = \@('a', 'ok', 'c');
-    $a->{bar} = \%( A => 'ok' );
+    $a->{+foo} = \@('a', 'ok', 'c');
+    $a->{+bar} = \%( A => 'ok' );
     is( $a->{foo}->[1],    'ok' );
-    is( $a->{bar}->{A},, 'ok' );
+    is( $a->{bar}->{?A},, 'ok' );
 };
 
 package Test::FooBar;

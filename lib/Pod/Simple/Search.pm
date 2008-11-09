@@ -51,11 +51,11 @@ sub survey {
   $self->_expand_inc( \@search_dirs );
 
 
-  $self->{'_scan_count'} = 0;
-  $self->{'_dirs_visited'} = \%();
+  $self->{+'_scan_count'} = 0;
+  $self->{+'_dirs_visited'} = \%();
   $self->path2name( \%() );
   $self->name2path( \%() );
-  $self->limit_re( $self->_limit_glob_to_limit_re ) if $self->{'limit_glob'};
+  $self->limit_re( $self->_limit_glob_to_limit_re ) if $self->{?'limit_glob'};
   my $cwd = cwd();
   my $verbose  = $self->verbose;
   local $_; # don't clobber the caller's $_ !
@@ -70,23 +70,23 @@ sub survey {
 
     my $start_in;
     my $modname_prefix;
-    if($self->{'dir_prefix'}) {
+    if($self->{?'dir_prefix'}) {
       $start_in = File::Spec->catdir(
         $try,
-        < grep length($_), split '[\/:]+', $self->{'dir_prefix'}
+        < grep length($_), split '[\/:]+', $self->{?'dir_prefix'}
       );
-      $modname_prefix = \ grep length($_), split m{[:/\\]}, $self->{'dir_prefix'};
-      $verbose and print "Appending \"$self->{'dir_prefix'}\" to $try, ",
+      $modname_prefix = \ grep length($_), split m{[:/\\]}, $self->{?'dir_prefix'};
+      $verbose and print "Appending \"$self->{?'dir_prefix'}\" to $try, ",
         "giving $start_in (= $(join ' ',@$modname_prefix))\n";
     } else {
       $start_in = $try;
     }
 
-    if( $self->{'_dirs_visited'}->{$start_in} ) {
+    if( $self->{'_dirs_visited'}->{?$start_in} ) {
       $verbose and print "Directory '$start_in' already seen, skipping.\n";
       next;
     } else {
-      $self->{'_dirs_visited'}->{$start_in} = 1;
+      $self->{'_dirs_visited'}->{+$start_in} = 1;
     }
   
     unless(-e $start_in) {
@@ -113,7 +113,7 @@ sub survey {
     }
   }
   $self->progress and $self->progress->done(
-   "Noted %$self{'_scan_count'} Pod files total");
+   "Noted %$self{?'_scan_count'} Pod files total");
 
   return $self->name2path;
 }
@@ -134,7 +134,7 @@ sub _make_search_callback {
 
     if($isdir) { # this never gets called on the startdir itself, just subdirs
 
-      if( $self->{'_dirs_visited'}->{$file} ) {
+      if( $self->{'_dirs_visited'}->{?$file} ) {
         $verbose and print "Directory '$file' already seen, skipping.\n";
         return 'PRUNE';
       }
@@ -150,7 +150,7 @@ sub _make_search_callback {
         }
       } # end unless $laborious
 
-      $self->{'_dirs_visited'}->{$file} = 1;
+      $self->{'_dirs_visited'}->{+$file} = 1;
       return; # (not pruning);
     }
 
@@ -180,10 +180,10 @@ sub _make_search_callback {
       return;
     }
 
-    if( !$shadows and $name2path->{$name} ) {
+    if( !$shadows and $name2path->{?$name} ) {
       $verbose and print "Not worth considering $file ",
         "-- already saw $name as ",
-        join(' ', grep($path2name->{$_} eq $name, keys %$path2name)), "\n";
+        join(' ', grep($path2name->{?$_} eq $name, keys %$path2name)), "\n";
       return;
     }
         
@@ -192,26 +192,26 @@ sub _make_search_callback {
     if( m/\.pod\z/is ) {
       # just assume it has pod, okay?
     } else {
-      $progress and $progress->reach($self->{'_scan_count'}, "Scanning $file");
+      $progress and $progress->reach($self->{?'_scan_count'}, "Scanning $file");
       return unless $self->contains_pod( $file );
     }
-    ++ $self->{'_scan_count'};
+    ++ $self->{+'_scan_count'};
 
     # Or finally take note of it:
-    if( $name2path->{$name} ) {
+    if( $name2path->{?$name} ) {
       $verbose and print
        "Duplicate POD found (shadowing?): $name ($file)\n",
        "    Already seen in ",
-       join(' ', grep($path2name->{$_} eq $name, keys %$path2name)), "\n";
+       join(' ', grep($path2name->{?$_} eq $name, keys %$path2name)), "\n";
     } else {
-      $name2path->{$name} = $file; # Noting just the first occurrence
+      $name2path->{+$name} = $file; # Noting just the first occurrence
     }
     $verbose and print "  Noting $name = $file\n";
     if( $callback ) {
       local $_ = $_; # insulate from changes, just in case
       $callback->($file, $name);
     }
-    $path2name->{$file} = $name;
+    $path2name->{+$file} = $name;
     return;
   }
 }
@@ -285,7 +285,7 @@ sub _path2modname {
 sub _recurse_dir {
   my($self, $startdir, $callback, $modname_bits) = < @_;
 
-  my $maxdepth = $self->{'fs_recursion_maxdepth'} || 10;
+  my $maxdepth = $self->{?'fs_recursion_maxdepth'} || 10;
   my $verbose = $self->verbose;
 
   my $here_string = File::Spec->curdir;
@@ -451,7 +451,7 @@ sub _simplify_base {   # Internal method only
 sub _expand_inc {
   my($self, $search_dirs) = < @_;
   
-  return unless $self->{'inc'};
+  return unless $self->{?'inc'};
 
   if ($^O eq 'MacOS') {
     push @$search_dirs,
@@ -461,7 +461,7 @@ sub _expand_inc {
     push @$search_dirs, < grep $_ ne File::Spec->curdir, @INC;
   }
 
-  $self->{'laborious'} = 0;   # Since inc said to use INC
+  $self->{+'laborious'} = 0;   # Since inc said to use INC
   return;
 }
 
@@ -486,22 +486,22 @@ sub _mac_whammy { # Tolerate '.', './some_dir' and '(../)+some_dir' on Mac OS
 
 sub _limit_glob_to_limit_re {
   my $self = @_[0];
-  my $limit_glob = $self->{'limit_glob'} || return;
+  my $limit_glob = $self->{?'limit_glob'} || return;
 
   my $limit_re = '^' . quotemeta($limit_glob) . '$';
   $limit_re =~ s/\\\?/./g;    # glob "?" => "."
   $limit_re =~ s/\\\*/.*?/g;  # glob "*" => ".*?"
   $limit_re =~ s/\.\*\?\$$//s; # final glob "*" => ".*?$" => ""
 
-  $self->{'verbose'} and print "Turning limit_glob $limit_glob into re $limit_re\n";
+  $self->{?'verbose'} and print "Turning limit_glob $limit_glob into re $limit_re\n";
 
   # A common optimization:
   if(!exists($self->{'dir_prefix'})
     and $limit_glob =~ m/^(?:\w+\:\:)+/s  # like "File::*" or "File::Thing*"
     # Optimize for sane and common cases (but not things like "*::File")
   ) {
-    $self->{'dir_prefix'} = join "::", @( $limit_glob =~ m/^(?:\w+::)+/sg);
-    $self->{'verbose'} and print " and setting dir_prefix to $self->{'dir_prefix'}\n";
+    $self->{+'dir_prefix'} = join "::", @( $limit_glob =~ m/^(?:\w+::)+/sg);
+    $self->{?'verbose'} and print " and setting dir_prefix to $self->{?'dir_prefix'}\n";
   }
 
   return $limit_re;
@@ -550,8 +550,8 @@ sub find {
  Dir:
   foreach my $dir (  @search_dirs ) {
     next unless defined $dir and length $dir;
-    next if %seen_dir{$dir};
-    %seen_dir{$dir} = 1;
+    next if %seen_dir{?$dir};
+    %seen_dir{+$dir} = 1;
     unless(-d $dir) {
       print "Directory $dir does not exist\n" if $verbose;
       next Dir;
@@ -583,7 +583,7 @@ sub find {
 
 sub contains_pod {
   my($self, $file) = < @_;
-  my $verbose = $self->{'verbose'};
+  my $verbose = $self->{?'verbose'};
 
   # check for one line of POD
   $verbose +> 1 and print " Scanning $file for pod...\n";
@@ -621,10 +621,10 @@ sub _accessorize {  # A simple-minded method-maker
       ) unless ((nelems @_) == 1 or (nelems @_) == 2) and ref @_[0];
 
       # Read access:
-      return @_[0]->{$attrname} if (nelems @_) == 1;
+      return @_[0]->{?$attrname} if (nelems @_) == 1;
 
       # Write access:
-      @_[0]->{$attrname} = @_[1];
+      @_[0]->{+$attrname} = @_[1];
       return @_[0]; # RETURNS MYSELF!
     };
   }
@@ -638,7 +638,7 @@ sub _state_as_string {
   return '' unless ref $self;
   my @out = @( "\{\n  # State of $(dump::view($self)) ...\n" );
   foreach my $k (sort keys %$self) {
-    push @out, "  $(dump::view($k)) => $(dump::view($self->{$k}))\n";
+    push @out, "  $(dump::view($k)) => $(dump::view($self->{?$k}))\n";
   }
   push @out, "\}\n";
   my $x = join '', @out;

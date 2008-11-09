@@ -267,8 +267,8 @@ sub new {
     select($sel);
     $ret = bless \@($FIN, $FOUT);
   }
-  if ($ret->Features->{ornaments} 
-      and not (%ENV{PERL_RL} and %ENV{PERL_RL} =~ m/\bo\w*=0/)) {
+  if ($ret->Features->{?ornaments} 
+      and not (%ENV{?PERL_RL} and %ENV{?PERL_RL} =~ m/\bo\w*=0/)) {
     local $Term::ReadLine::termcap_nowarn = 1;
     $ret->ornaments(1);
   }
@@ -303,7 +303,7 @@ package Term::ReadLine;		# So late to allow the above code be defined?
 
 our $VERSION = '1.03';
 
-my ($which) = exists %ENV{PERL_RL} ?? < split m/\s+/, %ENV{PERL_RL} !! undef;
+my ($which) = exists %ENV{PERL_RL} ?? < split m/\s+/, %ENV{?PERL_RL} !! undef;
 if ($which) {
   if ($which =~ m/\bgnu\b/i){
     eval "use Term::ReadLine::Gnu;";

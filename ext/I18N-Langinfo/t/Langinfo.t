@@ -60,10 +60,10 @@ for my $i (1..nelems @want) {
     try { I18N::Langinfo->import($try) };
     unless ($@) {
 	my $got = langinfo( <&$try);
-	if (ref %want{$try} && $got =~ %want{$try} || $got eq %want{$try}) {
+	if (ref %want{?$try} && $got =~ %want{?$try} || $got eq %want{?$try}) {
 	    print qq[ok $i - $try is "$got"\n];
 	} else {
-	    print qq[not ok $i - $try is "$got" not "%want{$try}"\n];
+	    print qq[not ok $i - $try is "$got" not "%want{?$try}"\n];
 	}
     } else {
 	print qq[ok $i - Skip: $try not defined\n];

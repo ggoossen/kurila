@@ -9,7 +9,7 @@
 
 BEGIN { $| = 1; }
 BEGIN {
-    %ENV{PERL5LIB} = "../lib";
+    %ENV{+PERL5LIB} = "../lib";
 
 # turn warnings into fatal errors
     $^WARN_HOOK = sub { die "WARNING: $(join ' ',@_)" } ;
@@ -95,7 +95,7 @@ do {
     my $e;
     for (1..4) {
 	try { goto_croak("boo$_\n") };
-	$e .= $@->{description};
+	$e .= $@->{?description};
     }
     print $e eq "boo1\nboo2\nboo3\nboo4\n" ?? "ok 11\n" !! "not ok 11\n";
 };

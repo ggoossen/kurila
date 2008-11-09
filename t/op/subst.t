@@ -176,7 +176,7 @@ my %MK = %(
 sub var { 
     my($var,$level) = < @_;
     return "\$($var)" unless exists %MK{$var};
-    return exp_vars(%MK{$var}, $level+1); # can recurse
+    return exp_vars(%MK{?$var}, $level+1); # can recurse
 }
 sub exp_vars { 
     my($str,$level) = < @_;

@@ -158,7 +158,7 @@ sub hint_fetch {
     my $key = shift;
     my $level = shift;
     my @results = @( caller($level||0) );
-    @results[10]->{$key};
+    @results[10]->{?$key};
 }
 
 $::testing_caller = 1;

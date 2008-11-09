@@ -51,10 +51,10 @@ sub look {
     if ((nelems @_) == 3 && ref $dict eq 'HASH') {
 	my $params = $dict;
 	$dict = 0;
-	$dict = $params->{dict} if exists $params->{dict};
-	$fold = $params->{fold} if exists $params->{fold};
-	$comp = $params->{comp} if exists $params->{comp};
-	$xfrm = $params->{xfrm} if exists $params->{xfrm};
+	$dict = $params->{?dict} if exists $params->{dict};
+	$fold = $params->{?fold} if exists $params->{fold};
+	$comp = $params->{?comp} if exists $params->{comp};
+	$xfrm = $params->{?xfrm} if exists $params->{xfrm};
     }
     $comp = sub { @_[0] cmp @_[1] } unless defined $comp;
     local($_);

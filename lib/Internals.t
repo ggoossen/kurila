@@ -104,7 +104,7 @@ my %foo;
 ok( !Internals::SvREADONLY %foo );
 %foo = %('foo' => 1, 2 => 'bar');
 is((nkeys(%foo)), 2);
-is(%foo{'foo'}, 1);
+is(%foo{?'foo'}, 1);
 
 ok(  Internals::SvREADONLY %foo, 1 );
 ok(  Internals::SvREADONLY %foo );
@@ -115,39 +115,39 @@ TODO: do {
     try { %foo = %('ping' => 'pong'); };
     like($@->message, $ro_err, q/Can't modify read-only hash/);
 };
-try { %foo{'baz'} = 123; };
+try { %foo{+'baz'} = 123; };
 like($@->message, qr/Attempt to access disallowed key/, q/Can't add to a read-only hash/);
 
 # These ops are allow for Hash::Util functionality
-%foo{2} = 'qux';
-is(%foo{2}, 'qux', 'Can modify elements in a read-only hash');
+%foo{+2} = 'qux';
+is(%foo{?2}, 'qux', 'Can modify elements in a read-only hash');
 my $qux = delete(%foo{2});
 ok(! exists(%foo{2}), 'Can delete keys from a read-only hash');
 is($qux, 'qux');
-%foo{2} = 2;
-is(%foo{2}, 2, 'Can add back deleted keys in a read-only hash');
+%foo{+2} = 2;
+is(%foo{?2}, 2, 'Can add back deleted keys in a read-only hash');
 
 ok( !Internals::SvREADONLY %foo, 0 );
 ok( !Internals::SvREADONLY %foo );
 
 ### Read-only hash values
 
-ok( !Internals::SvREADONLY %foo{foo} );
-%foo{'foo'} = 'bar';
-is(%foo{'foo'}, 'bar');
+ok( !Internals::SvREADONLY %foo{?foo} );
+%foo{+'foo'} = 'bar';
+is(%foo{?'foo'}, 'bar');
 
-ok(  Internals::SvREADONLY %foo{foo}, 1 );
-ok(  Internals::SvREADONLY %foo{foo} );
-try { %foo{'foo'} = 88; };
+ok(  Internals::SvREADONLY %foo{?foo}, 1 );
+ok(  Internals::SvREADONLY %foo{?foo} );
+try { %foo{+'foo'} = 88; };
 like($@->message, $ro_err, q/Can't modify a read-only hash value/);
-try { undef(%foo{'foo'}); };
+try { undef(%foo{+'foo'}); };
 like($@->message, $ro_err, q/Can't undef a read-only hash value/);
 my $bar = delete(%foo{'foo'});
 ok(! exists(%foo{'foo'}), 'Can delete a read-only hash value');
 is($bar, 'bar');
 
-ok( !Internals::SvREADONLY %foo{foo}, 0 );
-ok( !Internals::SvREADONLY %foo{foo} );
+ok( !Internals::SvREADONLY %foo{?foo}, 0 );
+ok( !Internals::SvREADONLY %foo{?foo} );
 
 is(  Internals::SvREFCNT(\$foo), 2 );
 do {
@@ -160,4 +160,4 @@ is(  Internals::SvREFCNT(\$foo), 2 );
 is(  Internals::SvREFCNT(\@foo), 2 );
 is(  Internals::SvREFCNT(\@foo[2]), 2 );
 is(  Internals::SvREFCNT(\%foo), 2 );
-is(  Internals::SvREFCNT(\%foo{foo}), 2 );
+is(  Internals::SvREFCNT(\%foo{+foo}), 2 );

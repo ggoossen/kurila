@@ -44,39 +44,39 @@ sub _is_win95 {
     # miniperl might not have the Win32 functions available and we need
     # to run in miniperl.
     return defined &Win32::IsWin95 ?? Win32::IsWin95() 
-                                   !! ! defined %ENV{SYSTEMROOT}; 
+                                   !! ! defined %ENV{?SYSTEMROOT}; 
 }
 
 my %Is = %( () );
-%Is{VMS}    = $^O eq 'VMS';
-%Is{OS2}    = $^O eq 'os2';
-%Is{MacOS}  = $^O eq 'MacOS';
+%Is{+VMS}    = $^O eq 'VMS';
+%Is{+OS2}    = $^O eq 'os2';
+%Is{+MacOS}  = $^O eq 'MacOS';
 if( $^O eq 'MSWin32' ) {
-    _is_win95() ?? %Is{Win95} = 1 !! %Is{Win32} = 1;
+    _is_win95() ?? %Is{+Win95} = 1 !! %Is{+Win32} = 1;
 }
-%Is{UWIN}   = $^O =~ m/^uwin(-nt)?$/;
-%Is{Cygwin} = $^O eq 'cygwin';
-%Is{NW5}    = %Config{osname} eq 'NetWare';  # intentional
-%Is{BeOS}   = $^O =~ m/beos/i;    # XXX should this be that loose?
-%Is{DOS}    = $^O eq 'dos';
-if( %Is{NW5} ) {
+%Is{+UWIN}   = $^O =~ m/^uwin(-nt)?$/;
+%Is{+Cygwin} = $^O eq 'cygwin';
+%Is{+NW5}    = %Config{?osname} eq 'NetWare';  # intentional
+%Is{+BeOS}   = $^O =~ m/beos/i;    # XXX should this be that loose?
+%Is{+DOS}    = $^O eq 'dos';
+if( %Is{?NW5} ) {
     $^O = 'NetWare';
     delete %Is{Win32};
 }
-%Is{VOS}    = $^O eq 'vos';
-%Is{QNX}    = $^O eq 'qnx';
-%Is{AIX}    = $^O eq 'aix';
-%Is{Darwin} = $^O eq 'darwin';
+%Is{+VOS}    = $^O eq 'vos';
+%Is{+QNX}    = $^O eq 'qnx';
+%Is{+AIX}    = $^O eq 'aix';
+%Is{+Darwin} = $^O eq 'darwin';
 
-%Is{Unix}   = !grep { $_ } values %Is;
+%Is{+Unix}   = !grep { $_ } values %Is;
 
-map { delete %Is{$_} unless %Is{$_} } keys %Is;
+map { delete %Is{$_} unless %Is{?$_} } keys %Is;
 _assert( nelems(%Is) == 2 );
 my($OS) = < keys %Is;
 
 
 my $class = "ExtUtils::MM_$OS";
-eval "require $class" unless %INC{"ExtUtils/MM_$OS.pm"}; ## no critic
+eval "require $class" unless %INC{?"ExtUtils/MM_$OS.pm"}; ## no critic
 die $@ if $@;
 unshift @ISA, $class;
 

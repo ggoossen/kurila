@@ -36,7 +36,7 @@ sub FETCH
 	my $self = shift;
 	my $key = shift;
 	my ($underlying) = < @$self;
-	return $underlying->{refaddr($key)};
+	return $underlying->{?refaddr($key)};
 }
 sub STORE
 {
@@ -44,5 +44,5 @@ sub STORE
 	my $key = shift;
 	my $value = shift;
 	my ($underlying) = < @$self;
-	return  @($underlying->{refaddr($key)} = $key);
+	return  @($underlying->{+refaddr($key)} = $key);
 }

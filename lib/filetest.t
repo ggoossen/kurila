@@ -13,7 +13,7 @@ ok( require filetest, 'required pragma successfully' );
 
 # and here's one culprit, right here
 try { filetest->import('bad subpragma') };
-is( $@->{description}, $error, 'filetest dies with bad subpragma on import' );
+is( $@->{?description}, $error, 'filetest dies with bad subpragma on import' );
 
 is( $^H ^&^ $hint_bits, 0, 'hint bits not set without pragma in place' );
 
@@ -31,20 +31,20 @@ filetest->unimport('access');
 is( $^H ^&^ $hint_bits, 0, 'hint bits not set with pragma unimported' );
 
 try { filetest->unimport() };
-is( $@->{description}, $error, 'filetest dies without subpragma on unimport' );
+is( $@->{?description}, $error, 'filetest dies without subpragma on unimport' );
 
 # there'll be a compilation aborted failure here, with the eval string
 eval "no filetest 'fake pragma'";
-like( $@->{description}, qr/^$error/, 'filetest dies with bad subpragma on unuse' );
+like( $@->{?description}, qr/^$error/, 'filetest dies with bad subpragma on unuse' );
 
 eval "use filetest 'bad subpragma'";
-like( $@->{description}, qr/^$error/, 'filetest dies with bad subpragma on use' );
+like( $@->{?description}, qr/^$error/, 'filetest dies with bad subpragma on use' );
 
 eval "use filetest";
-like( $@->{description}, qr/^$error/, 'filetest dies with missing subpragma on use' );
+like( $@->{?description}, qr/^$error/, 'filetest dies with missing subpragma on use' );
 
 eval "no filetest";
-like( $@->{description}, qr/^$error/, 'filetest dies with missing subpragma on unuse' );
+like( $@->{?description}, qr/^$error/, 'filetest dies with missing subpragma on unuse' );
 
 SKIP: do {
     # A real test for filetest.

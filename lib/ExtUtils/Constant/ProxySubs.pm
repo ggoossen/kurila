@@ -60,7 +60,7 @@ $VERSION = '0.06';
 
 sub type_to_C_value {
     my ($self, $type) = < @_;
-    return %type_to_C_value{$type} || sub {return map {ref $_ ?? < @$_ !! $_} @_ };
+    return %type_to_C_value{?$type} || sub {return map {ref $_ ?? < @$_ !! $_} @_ };
 }
 
 # TODO - figure out if there is a clean way for the type_to_sv code to
@@ -78,13 +78,13 @@ sub type_to_C_value {
      PV => \@('const char *'),
      PVN => \@('const char *', 'STRLEN'),
      );
-%type_temporary{$_} = \@($_) foreach qw(IV UV NV);
+%type_temporary{+$_} = \@($_) foreach qw(IV UV NV);
      
 while (my ($type, $value) = each %XS_TypeSet) {
-    %type_num_args{$type}
+    %type_num_args{+$type}
 	= defined $value ?? ref $value ?? scalar nelems @$value !! 1 !! 0;
 }
-%type_num_args{''} = 0;
+%type_num_args{+''} = 0;
 
 sub partition_names {
     my ($self, $default_type, < @items) = < @_;
@@ -96,24 +96,24 @@ sub partition_names {
 	    # If we find a default value, convert it into a regular item and
 	    # append it to the queue of items to process
 	    my $default_item = \%(< %$item);
-	    $default_item->{invert_macro} = 1;
-	    $default_item->{pre} = delete $item->{def_pre};
-	    $default_item->{post} = delete $item->{def_post};
-	    $default_item->{type} = shift @$default;
-	    $default_item->{value} = $default;
+	    $default_item->{+invert_macro} = 1;
+	    $default_item->{+pre} = delete $item->{def_pre};
+	    $default_item->{+post} = delete $item->{def_post};
+	    $default_item->{+type} = shift @$default;
+	    $default_item->{+value} = $default;
 	    push @items, $default_item;
 	} else {
 	    # It can be "not found" unless it's the default (invert the macro)
 	    # or the "macro" is an empty string (ie no macro)
-	    push @notfound, $item unless $item->{invert_macro}
+	    push @notfound, $item unless $item->{?invert_macro}
 		or !$self->macro_to_ifdef( $self->macro_from_item($item));
 	}
 
-	if ($item->{pre} or $item->{post} or $item->{not_constant}
-	    or %type_is_a_problem{$item->{type}}) {
+	if ($item->{?pre} or $item->{?post} or $item->{?not_constant}
+	    or %type_is_a_problem{?$item->{?type}}) {
 	    push @trouble, $item;
 	} else {
-	    push @{%found{$item->{type}}}, $item;
+	    push @{%found{$item->{?type}}}, $item;
 	}
     }
     # use Data::Dumper; print Dumper \%found;
@@ -122,10 +122,10 @@ sub partition_names {
 
 sub boottime_iterator {
     my ($self, $type, $iterator, $hash, $subname) = < @_;
-    my $extractor = %type_from_struct{$type};
+    my $extractor = %type_from_struct{?$type};
     die "Can't find extractor code for type $type"
 	unless defined $extractor;
-    my $generator = %type_to_sv{$type};
+    my $generator = %type_to_sv{?$type};
     die "Can't find generator code for type $type"
 	unless defined $generator;
 
@@ -142,9 +142,9 @@ EOBOOT
 
 sub name_len_value_macro {
     my ($self, $item) = < @_;
-    my $name = $item->{name};
-    my $value = $item->{value};
-    $value = $item->{name} unless defined $value;
+    my $name = $item->{?name};
+    my $value = $item->{?value};
+    $value = $item->{?name} unless defined $value;
 
     my $namelen = length $name;
     $name = C_stringify($name);
@@ -160,9 +160,9 @@ sub WriteConstants {
     my ($c_fh, $xs_fh, $c_subname, $xs_subname, $default_type, $package)
 	= < %{$ARGS}{[qw(C_FH XS_FH C_SUBNAME XS_SUBNAME DEFAULT_TYPE NAME)]};
 
-    my $options = $ARGS->{PROXYSUBS};
+    my $options = $ARGS->{?PROXYSUBS};
     $options = \%() unless ref $options;
-    my $explosives = $options->{croak_on_read};
+    my $explosives = $options->{?croak_on_read};
 
     $xs_subname ||= 'constant';
 
@@ -286,13 +286,13 @@ EOBOOT
 
     my %iterator;
 
-    $found->{''}
+    $found->{+''}
         = \ map {\%(< %$_, type=>'', invert_macro => 1)} @$notfound;
 
     foreach my $type (sort keys %$found) {
-	my $struct = %type_to_struct{$type};
+	my $struct = %type_to_struct{?$type};
 	my $type_to_value = $self->type_to_C_value($type);
-	my $number_of_args = %type_num_args{$type};
+	my $number_of_args = %type_num_args{?$type};
 	die "Can't find structure definition for type $type"
 	    unless defined $struct;
 
@@ -312,12 +312,12 @@ EOBOOT
                  = < $self->name_len_value_macro($item);
 
 	    my $ifdef = $self->macro_to_ifdef($macro);
-	    if (!$ifdef && $item->{invert_macro}) {
+	    if (!$ifdef && $item->{?invert_macro}) {
 		carp("Attempting to supply a default for '$name' which has no conditional macro");
 		next;
 	    }
 	    print $xs_fh $ifdef;
-	    if ($item->{invert_macro}) {
+	    if ($item->{?invert_macro}) {
 		print $xs_fh
 		    "        /* This is the default value: */\n" if $type;
 		print $xs_fh "#else\n";
@@ -331,10 +331,10 @@ EOBOOT
     # Terminate the list with a NULL
 	print $xs_fh "        \{ NULL, 0", (", 0" x $number_of_args), " \} \};\n";
 
-	%iterator{$type} = "value_for_" . ($type ?? lc $type !! 'notfound');
+	%iterator{+$type} = "value_for_" . ($type ?? lc $type !! 'notfound');
 
 	print $xs_fh <<"EOBOOT";
-	const struct $struct_type *%iterator{$type} = $array_name;
+	const struct $struct_type *%iterator{?$type} = $array_name;
 EOBOOT
     }
 
@@ -348,7 +348,7 @@ EOBOOT
 
     my $add_symbol_subname = $c_subname . '_add_symbol';
     foreach my $type (sort keys %$found) {
-	print $xs_fh $self->boottime_iterator($type, %iterator{$type}, 
+	print $xs_fh $self->boottime_iterator($type, %iterator{?$type}, 
 					      'symbol_table',
 					      $add_symbol_subname);
     }
@@ -405,16 +405,16 @@ EOBOOT
         my ($name, $namelen, $value, $macro)
 	    = < $self->name_len_value_macro($item);
         my $ifdef = $self->macro_to_ifdef($macro);
-        my $type = $item->{type};
+        my $type = $item->{?type};
 	my $type_to_value = $self->type_to_C_value($type);
 
         print $xs_fh $ifdef;
-	if ($item->{invert_macro}) {
+	if ($item->{?invert_macro}) {
 	    print $xs_fh
 		 "        /* This is the default value: */\n" if $type;
 	    print $xs_fh "#else\n";
 	}
-	my $generator = %type_to_sv{$type};
+	my $generator = %type_to_sv{?$type};
 	die "Can't find generator code for type $type"
 	    unless defined $generator;
 
@@ -426,7 +426,7 @@ EOBOOT
 	printf $xs_fh "            \%s temp\%d;\n", $_, $counter++
 	    foreach  @{%type_temporary{$type}};
 
-	print $xs_fh "            $item->{pre}\n" if $item->{pre};
+	print $xs_fh "            $item->{?pre}\n" if $item->{?pre};
 
 	# And because the code in pre might be both declarations and
 	# statements, we can't declare and assign to the temporaries in one.
@@ -439,7 +439,7 @@ EOBOOT
 	    $($c_subname)_add_symbol($athx symbol_table, "\%s",
 				    $namelen, \%s);
 EOBOOT
-	print $xs_fh "        $item->{post}\n" if $item->{post};
+	print $xs_fh "        $item->{?post}\n" if $item->{?post};
 	print $xs_fh "        \}\n";
 
         print $xs_fh $self->macro_to_endif($macro);

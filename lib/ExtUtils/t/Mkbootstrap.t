@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 BEGIN {
-    if( %ENV{PERL_CORE} ) {
+    if( %ENV{?PERL_CORE} ) {
         chdir 't';
         @INC = @('../lib', 'lib/');
     }
@@ -86,7 +86,7 @@ SKIP: do {
 	    skip("cannot write readonly files", 1) if -w 'dasboot.bs'; 
 
 	    try{ Mkbootstrap('dasboot', 1) };
-	    like( $@->{description}, qr/Unable to open dasboot\.bs/, 'should die given bad filename' );
+	    like( $@->{?description}, qr/Unable to open dasboot\.bs/, 'should die given bad filename' );
 	};
 
 	# now put it back like it was

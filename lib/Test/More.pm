@@ -813,8 +813,8 @@ sub _format_stack {
     my $var = '$FOO';
     my $prev_ref = 0;
     foreach my $entry ( @Stack) {
-        my $type = $entry->{type} || '';
-        my $idx  = $entry->{'idx'};
+        my $type = $entry->{?type} || '';
+        my $idx  = $entry->{?'idx'};
         if( $type eq 'HASH' ) {
             $var .= "->" if $prev_ref;
             $var .= "\{$idx\}";
@@ -1209,10 +1209,10 @@ sub _deep_check {
         # Quiet uninitialized value warnings when comparing undefs.
         local $^W = 0; 
 
-        if( %Refs_Seen{ref::address($e1)} ) {
-            return %Refs_Seen{ref::address($e1)} eq ref::address($e2);
+        if( %Refs_Seen{?ref::address($e1)} ) {
+            return %Refs_Seen{?ref::address($e1)} eq ref::address($e2);
         }
-        %Refs_Seen{ref::address $e1} = ref::address $e2;
+        %Refs_Seen{+ref::address $e1} = ref::address $e2;
 
         if (_dne($e1) or _dne($e2)) {
             $ok = _dne($e1) && _dne($e2);
@@ -1300,8 +1300,8 @@ sub _eq_hash {
     my $ok = 1;
     my $bigger = (nelems keys %$a1) +> (nelems keys %$a2) ?? $a1 !! $a2;
     foreach my $k (keys %$bigger) {
-        my $e1 = exists $a1->{$k} ?? $a1->{$k} !! $DNE;
-        my $e2 = exists $a2->{$k} ?? $a2->{$k} !! $DNE;
+        my $e1 = exists $a1->{$k} ?? $a1->{?$k} !! $DNE;
+        my $e2 = exists $a2->{$k} ?? $a2->{?$k} !! $DNE;
 
         push @Data_Stack, \%( type => 'HASH', idx => $k, vals => \@($e1, $e2) );
         $ok = _deep_check($e1, $e2);

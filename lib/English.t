@@ -97,7 +97,7 @@ is( 0+$OS_ERROR, Errno::ENOENT(), "\$OS_ERROR" );
 do { my $f = 'asdasdasd'; ++$f while -e $f; open(my $fh, "<", $f); };
 is( 0+$ERRNO, Errno::ENOENT(), '$OS_ERROR' );
 do { my $f = 'asdasdasd'; ++$f while -e $f; open(my $fh, "<", $f); };
-ok( %OS_ERROR_FLAGS{ENOENT}, '%OS_ERROR_FLAGS(ENOENT should be set)' );
+ok( %OS_ERROR_FLAGS{?ENOENT}, '%OS_ERROR_FLAGS(ENOENT should be set)' );
 
 package C;
 

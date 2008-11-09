@@ -23,10 +23,10 @@ my $Is_os2      = $^O eq 'os2';
 my $Is_Cygwin   = $^O eq 'cygwin';
 my $Is_MacOS    = $^O eq 'MacOS';
 my $Is_MPE      = $^O eq 'mpeix';		
-my $Is_miniperl = %ENV{PERL_CORE_MINITEST};
+my $Is_miniperl = %ENV{?PERL_CORE_MINITEST};
 my $Is_BeOS     = $^O eq 'beos';
 
-my $PERL = %ENV{PERL}
+my $PERL = %ENV{?PERL}
     || ($Is_NetWare           ?? 'perl'   !!
        ($Is_MacOS || $Is_VMS) ?? $^X      !!
        $Is_MSWin32            ?? '.\perl' !!
@@ -110,7 +110,7 @@ END
     ok($? ^&^ 0xFF);
 }
 
-dies_like( sub { %SIG{TERM} = 'foo' },
+dies_like( sub { %SIG{+TERM} = 'foo' },
     qr/signal handler should be a code reference or .../ );
 
 # can we slice ENV?
@@ -141,11 +141,11 @@ else {
 }
 
 try { die "foo\n" };
-ok $@->{description} eq "foo\n", '$@';
+ok $@->{?description} eq "foo\n", '$@';
 
 ok $$ +> 0, $$;
 try { $$++ };
-ok $@->{description} =~ m/^Modification of a read-only value attempted/;
+ok $@->{?description} =~ m/^Modification of a read-only value attempted/;
 
 our ($wd, $script);
 
@@ -255,20 +255,20 @@ if ($Is_VMS || $Is_Dos || $Is_MacOS) {
     skip("\%ENV manipulations fail or aren't safe on $^O") for 1..4;
 }
 else {
-	if (%ENV{PERL_VALGRIND}) {
+	if (%ENV{?PERL_VALGRIND}) {
 	    skip("clearing \%ENV is not safe when running under valgrind");
 	} else {
-	    my $PATH = %ENV{PATH};
-	    my $PDL = %ENV{PERL_DESTRUCT_LEVEL} || 0;
-	    %ENV{foo} = "bar";
+	    my $PATH = %ENV{?PATH};
+	    my $PDL = %ENV{?PERL_DESTRUCT_LEVEL} || 0;
+	    %ENV{+foo} = "bar";
 	    %ENV = %( () );
-	    %ENV{PATH} = $PATH;
-	    %ENV{PERL_DESTRUCT_LEVEL} = $PDL || 0;
+	    %ENV{+PATH} = $PATH;
+	    %ENV{+PERL_DESTRUCT_LEVEL} = $PDL || 0;
 	    ok ($Is_MSWin32 ?? (`set foo 2>NUL` eq "")
 			    !! (`echo \$foo` eq "\n") );
 	}
 
-	%ENV{__NoNeSuCh} = "foo";
+	%ENV{+__NoNeSuCh} = "foo";
 	$0 = "bar";
 # cmd.exe will echo 'variable=value' but 4nt will echo just the value
 # -- Nikola Knezevic
@@ -324,8 +324,8 @@ SKIP: do {
     # when perl is compiled with -DENV_IS_CASELESS)
     skip('no caseless %ENV support', 4) unless $Is_MSWin32 || $Is_NetWare;
     %ENV = %( () );
-    %ENV{'Foo'} = 'bar';
-    %ENV{'fOo'} = 'baz';
+    %ENV{+'Foo'} = 'bar';
+    %ENV{+'fOo'} = 'baz';
     ok (scalar(keys(%ENV)) == 1);
     ok exists(%ENV{'FOo'});
     ok (delete(%ENV{'foO'}) eq 'baz');
@@ -358,7 +358,7 @@ if ($Is_miniperl) {
     delete %INC{"Errno.pm"};
 
     open(FOO, "<", "nonesuch"); # Generate ENOENT
-    ok %{*{Symbol::fetch_glob("!")}}{ENOENT};
+    ok %{*{Symbol::fetch_glob("!")}}{?ENOENT};
 }
 
 ok $^S == 0 && defined $^S;

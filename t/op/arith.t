@@ -288,7 +288,7 @@ my $vms_no_ieee;
 if ($^O eq 'VMS') {
   use vars '%Config';
   try {require Config; Config->import() };
-  $vms_no_ieee = 1 unless defined(%Config{useieee});
+  $vms_no_ieee = 1 unless defined(%Config{?useieee});
 }
 
 if ($^O eq 'vos') {

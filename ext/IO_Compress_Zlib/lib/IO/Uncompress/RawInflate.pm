@@ -69,12 +69,12 @@ sub mkUncomp
     return $self->saveErrorString(undef, $errstr, $errno)
         if ! defined $obj;
 
-    $self->{Uncomp} = $obj;
+    $self->{+Uncomp} = $obj;
 
      my $magic = $self->ckMagic()
         or return 0;
 
-    $self->{Info} = $self->readHeader($magic)
+    $self->{+Info} = $self->readHeader($magic)
         or return undef ;
 
     return 1;
@@ -115,13 +115,13 @@ sub _isRaw
     my $got = $self->_isRawx(< @_);
 
     if ($got) {
-        *$self->{Pending} = *$self->{HeaderPending} ;
+        *$self->{+Pending} = *$self->{?HeaderPending} ;
     }
     else {
         $self->pushBack(*$self->{HeaderPending});
         *$self->{Uncomp}->reset();
     }
-    *$self->{HeaderPending} = '';
+    *$self->{+HeaderPending} = '';
 
     return $got ;
 }
@@ -139,31 +139,31 @@ sub _isRawx
         or return $self->saveErrorString(undef, "No data to read");
 
     my $temp_buf = $magic . $buffer ;
-    *$self->{HeaderPending} = $temp_buf ;    
+    *$self->{+HeaderPending} = $temp_buf ;    
     $buffer = '';
-    my $status = *$self->{Uncomp}->uncompr(\$temp_buf, \$buffer, < $self->smartEof()) ;
-    return $self->saveErrorString(undef, *$self->{Uncomp}->{Error}, STATUS_ERROR)
+    my $status = *$self->{?Uncomp}->uncompr(\$temp_buf, \$buffer, < $self->smartEof()) ;
+    return $self->saveErrorString(undef, *$self->{Uncomp}->{?Error}, STATUS_ERROR)
         if $status == STATUS_ERROR;
 
     #my $buf_len = *$self->{Uncomp}->uncompressedBytes();
     my $buf_len = length $buffer;
 
     if ($status == STATUS_ENDSTREAM) {
-        if (*$self->{MultiStream} 
+        if (*$self->{?MultiStream} 
                     && (length $temp_buf || ! $self->smartEof())){
-            *$self->{NewStream} = 1 ;
-            *$self->{EndStream} = 0 ;
+            *$self->{+NewStream} = 1 ;
+            *$self->{+EndStream} = 0 ;
             $self->pushBack($temp_buf);
         }
         else {
-            *$self->{EndStream} = 1 ;
+            *$self->{+EndStream} = 1 ;
             $self->pushBack($temp_buf);
         }
     }
-    *$self->{HeaderPending} = $buffer ;    
-    *$self->{InflatedBytesRead} = $buf_len ;    
-    *$self->{TotalInflatedBytesRead} += $buf_len ;    
-    *$self->{Type} = 'rfc1951';
+    *$self->{+HeaderPending} = $buffer ;    
+    *$self->{+InflatedBytesRead} = $buf_len ;    
+    *$self->{+TotalInflatedBytesRead} += $buf_len ;    
+    *$self->{+Type} = 'rfc1951';
 
     $self->saveStatus(STATUS_OK);
 
@@ -182,24 +182,24 @@ sub inflateSync
 
     # inflateSync is a no-op in Plain mode
     return 1
-        if *$self->{Plain} ;
+        if *$self->{?Plain} ;
 
-    return 0 if *$self->{Closed} ;
+    return 0 if *$self->{?Closed} ;
     #return G_EOF if !length *$self->{Pending} && *$self->{EndStream} ;
-    return 0 if ! length *$self->{Pending} && *$self->{EndStream} ;
+    return 0 if ! length *$self->{?Pending} && *$self->{?EndStream} ;
 
     # Disable CRC check
-    *$self->{Strict} = 0 ;
+    *$self->{+Strict} = 0 ;
 
     my $status ;
     while (1)
     {
         my $temp_buf ;
 
-        if (length *$self->{Pending} )
+        if (length *$self->{?Pending} )
         {
-            $temp_buf = *$self->{Pending} ;
-            *$self->{Pending} = '';
+            $temp_buf = *$self->{?Pending} ;
+            *$self->{+Pending} = '';
         }
         else
         {
@@ -208,16 +208,16 @@ sub inflateSync
                 if $status +< 0  ;
 
             if ($status == 0 ) {
-                *$self->{EndStream} = 1 ;
+                *$self->{+EndStream} = 1 ;
                 return $self->saveErrorString(0, "unexpected end of file", STATUS_ERROR);
             }
         }
         
-        $status = *$self->{Uncomp}->sync($temp_buf) ;
+        $status = *$self->{?Uncomp}->sync($temp_buf) ;
 
         if ($status == STATUS_OK)
         {
-            *$self->{Pending} .= $temp_buf ;
+            *$self->{+Pending} .= $temp_buf ;
             return 1 ;
         }
 
@@ -269,14 +269,14 @@ sub scan
 {
     my $self = shift ;
 
-    return 1 if *$self->{Closed} ;
-    return 1 if !length *$self->{Pending} && *$self->{EndStream} ;
+    return 1 if *$self->{?Closed} ;
+    return 1 if !length *$self->{?Pending} && *$self->{?EndStream} ;
 
     my $buffer = '' ;
     my $len = 0;
 
     $len = $self->_raw_read(\$buffer, 1) 
-        while ! *$self->{EndStream} && $len +>= 0 ;
+        while ! *$self->{?EndStream} && $len +>= 0 ;
 
     #return $len if $len < 0 ? $len : 0 ;
     return $len +< 0 ?? 0 !! 1 ;
@@ -286,7 +286,7 @@ sub zap
 {
     my $self  = shift ;
 
-    my $headerLength = *$self->{Info}->{HeaderLength};
+    my $headerLength = *$self->{Info}->{?HeaderLength};
     my $block_offset =  $headerLength + *$self->{Uncomp}->getLastBlockOffset();
     @_[0] = $headerLength + *$self->{Uncomp}->getEndOffset();
     #printf "# End $_[0], headerlen $headerLength \n";;
@@ -297,7 +297,7 @@ sub zap
         or return $self->saveErrorString(0, $!, $!); 
 
     #printf "#byte is %x\n", unpack('C*',$byte);
-    *$self->{Uncomp}->resetLastBlockByte($byte);
+    *$self->{?Uncomp}->resetLastBlockByte($byte);
     #printf "#to byte is %x\n", unpack('C*',$byte);
 
     ( $self->smartSeek($block_offset) && 

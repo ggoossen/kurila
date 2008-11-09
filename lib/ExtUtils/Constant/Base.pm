@@ -212,22 +212,22 @@ sub dump_names {
   foreach ( @items) {
     my $type;
     if (ref $_) {
-      $type = $_->{type} || $default_type;
-      die "No more utf8 flag" if ($_->{utf8});
+      $type = $_->{?type} || $default_type;
+      die "No more utf8 flag" if ($_->{?utf8});
     } else {
       $_ = \%(name=>$_);
       $type = $default_type;
     }
-    %used_types{$type}++;
+    %used_types{+$type}++;
     if ($type eq $default_type
-        and length $_->{name}
-        and ($_->{name} =~ m/^\w+$/)
-        and !defined ($_->{macro}) and !defined ($_->{value})
-        and !defined ($_->{default}) and !defined ($_->{pre})
-        and !defined ($_->{post}) and !defined ($_->{def_pre})
-        and !defined ($_->{def_post}) and !defined ($_->{weight})) {
+        and length $_->{?name}
+        and ($_->{?name} =~ m/^\w+$/)
+        and !defined ($_->{?macro}) and !defined ($_->{?value})
+        and !defined ($_->{?default}) and !defined ($_->{?pre})
+        and !defined ($_->{?post}) and !defined ($_->{?def_pre})
+        and !defined ($_->{?def_post}) and !defined ($_->{?weight})) {
       # It's the default type, and the name consists only of A-Za-z0-9_
-      push @simple, $_->{name};
+      push @simple, $_->{?name};
     } else {
       push @complex, $_;
     }
@@ -236,7 +236,7 @@ sub dump_names {
   if (!defined $declare_types) {
     # Do they pass in any types we weren't already using?
     foreach (keys %$what) {
-      next if %used_types{$_};
+      next if %used_types{?$_};
       $declare_types++; # Found one in $what that wasn't used.
       last; # And one is enough to terminate this loop
     }
@@ -250,12 +250,12 @@ sub dump_names {
   $result .= wrap ($indent . "my \@names = (qw(",
 		   $indent . "               ", join (" ", sort @simple) . ")");
   if ((nelems @complex)) {
-    foreach my $item (sort {$a->{name} cmp $b->{name}} @complex) {
-      my $name = perl_stringify $item->{name};
+    foreach my $item (sort {$a->{?name} cmp $b->{?name}} @complex) {
+      my $name = perl_stringify $item->{?name};
       my $line = ",\n$indent            \{name=>\"$name\"";
-      $line .= ", type=>\"$item->{type}\"" if defined $item->{type};
+      $line .= ", type=>\"$item->{?type}\"" if defined $item->{?type};
       foreach my $thing (qw (macro value default pre post def_pre def_post)) {
-        my $value = $item->{$thing};
+        my $value = $item->{?$thing};
         if (defined $value) {
           if (ref $value) {
             $line .= ", $thing=>[\""
@@ -342,7 +342,7 @@ sub return_clause {
 #      return PERL_constant_NOTDEF;
 ##endif
   my ($self, $args, $item) = < @_;
-  my $indent = $args->{indent};
+  my $indent = $args->{?indent};
 
   my ($name, $value, $default, $pre, $post, $def_pre, $def_post, $type)
     = < %$item{[qw (name value default pre post def_pre def_post type)]};
@@ -392,9 +392,9 @@ sub match_clause {
   my $body = '';
   my ($no, $yes, $either, $name, $inner_indent);
   if (ref $item eq 'ARRAY') {
-      die("utf8 removed '$item->[0]->{name}' - '$item->[1]->{name}'");
+      die("utf8 removed '$item->[0]->{?name}' - '$item->[1]->{?name}'");
   } else {
-    $name = $item->{name};
+    $name = $item->{?name};
     $inner_indent = $indent;
   }
 
@@ -438,7 +438,7 @@ sub switch_clause {
   local $Text::Wrap::huge = 'overflow';
   local $Text::Wrap::columns = 80;
 
-  my @names = sort map {$_->{name}} @items;
+  my @names = sort map {$_->{?name}} @items;
   my $leader = $indent . '/* ';
   my $follower = ' ' x length $leader;
   my $body = $indent . "/* Names all of length $namelen.  */\n";
@@ -520,12 +520,12 @@ sub switch_clause {
 	my $l = ref $a eq 'ARRAY' ?? ($a->[0]) !! $a;
 	my $r = ref $b eq 'ARRAY' ?? ($b->[0]) !! $b;
 	# Sort by weight first
-	($r->{weight} || 0) <+> ($l->{weight} || 0)
+	($r->{?weight} || 0) <+> ($l->{?weight} || 0)
 	    # Sort equal weights by name
-	    or $l->{name} cmp $r->{name}}
+	    or $l->{?name} cmp $r->{?name}}
 			 # If this looks evil, maybe it is.  $items is a
 			 # hashref, and we're doing a hash slice on it
-			 %{$items}{[ @{$best->{$char}}]}) {
+			 %{$items}{[ @{$best->{?$char}}]}) {
       # warn "You are here";
       if ($do_front_chop) {
         $body .= $self->match_clause (\%(indent => 2 + length $indent,
@@ -623,32 +623,32 @@ sub normalise_items
 	my ($name, $item);
         if (ref $orig) {
             # Make a copy which is a normalised version of the ref passed in.
-            $name = $orig->{name};
+            $name = $orig->{?name};
             my ($type, $macro, $value) = < %$orig{[qw (type macro value)]};
             $type ||= $default_type;
-            $what->{$type} = 1;
+            $what->{+$type} = 1;
             $item = \%(name=>$name, type=>$type);
-            $item->{macro} = $macro if defined $macro and (ref $macro or $macro ne $name);
-            $item->{value} = $value if defined $value and (ref $value or $value ne $name);
+            $item->{+macro} = $macro if defined $macro and (ref $macro or $macro ne $name);
+            $item->{+value} = $value if defined $value and (ref $value or $value ne $name);
             foreach my $key (qw(default pre post def_pre def_post weight
                                 not_constant)) {
-                my $value = $orig->{$key};
-                $item->{$key} = $value if defined $value;
+                my $value = $orig->{?$key};
+                $item->{+$key} = $value if defined $value;
                 # warn "$key $value";
             }
         } else {
             $name = $orig;
             $item = \%(name=>$name, type=>$default_type);
-            $what->{$default_type} = 1;
+            $what->{+$default_type} = 1;
         }
         warn( (ref ($self) || $self)
           . "doesn't know how to handle values of type $_ used in macro $name")
             unless $self->valid_type ($item->{type});
 
-        $item->{name} = $name;
-        $items->{$name} = $item;
+        $item->{+name} = $name;
+        $items->{+$name} = $item;
         # We have need for the utf8 flag.
-        $what->{''} = 1;
+        $what->{+''} = 1;
 
       push @new_items, $item;
     }
@@ -826,15 +826,15 @@ sub C_constant {
     # Need to group names of the same length
     my @by_length;
     foreach ( @items) {
-      push @{@by_length[length $_->{name}]}, $_;
+      push @{@by_length[length $_->{?name}]}, $_;
     }
     foreach my $i (0 .. ((nelems @by_length)-1)) {
       next unless @by_length[$i];	# None of this length
       $body .= "  case $i:\n";
       if ((nelems @{@by_length[$i]}) == 1) {
         my $only_thing = @by_length[$i]->[0];
-        if ($only_thing->{utf8}) {
-          if ($only_thing->{utf8} eq 'yes') {
+        if ($only_thing->{?utf8}) {
+          if ($only_thing->{?utf8} eq 'yes') {
             # With utf8 on flag item is passed in element 0
             $body .= $self->match_clause (undef, \@($only_thing));
           } else {
@@ -852,8 +852,8 @@ sub C_constant {
         # of the names of this length.
         my $what = \%();
         foreach ( @{@by_length[$i]}) {
-          $what->{$_->{type}} = 1;
-          $what->{''} = 1 if $_->{utf8};
+          $what->{+$_->{?type}} = 1;
+          $what->{+''} = 1 if $_->{?utf8};
         }
         $params = $self->params ($what);
         push @subs, < $self->C_constant (\%(package=>$package,

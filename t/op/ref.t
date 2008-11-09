@@ -80,7 +80,7 @@ is ($ref->[2]->[0], 3);
 # Test references to hashes of references.
 
 $refref = \%whatever;
-$refref->{"key"} = $ref;
+$refref->{+"key"} = $ref;
 is ($refref->{"key"}->[2]->[0], 3);
 
 # Test to see if anonymous subarrays spring into existence.
@@ -94,7 +94,7 @@ is (join(':', @{@spring[5]}), "123:456:789");
 
 @{%spring2{"foo"}} = @(1,2,3);
 %spring2{"foo"}->[3] = 4;
-is (join(':', @{%spring2{"foo"}}), "1:2:3:4");
+is (join(':', @{%spring2{?"foo"}}), "1:2:3:4");
 
 # Test references to subroutines.
 
@@ -143,7 +143,7 @@ package MYHASH;
 
 $object = bless $main::anonhash2;
 main::is (ref $object, 'MYHASH');
-main::is ($object->{ABC}, 'XYZ');
+main::is ($object->{?ABC}, 'XYZ');
 
 $object2 = bless \%();
 main::is (ref $object2,	'MYHASH');
@@ -158,7 +158,7 @@ sub mymethod {
     die 'Got a "' . ref($THIS). '" instead of a MYHASH'
 	unless ref $THIS eq 'MYHASH';
     main::is (@ARGS[0], "argument");
-    main::is ($THIS->{FOO}, 'BAR');
+    main::is ($THIS->{?FOO}, 'BAR');
 }
 
 # Test automatic destructor call.
@@ -194,7 +194,7 @@ is ($object->doit("BAR"), 'bar');
 sub BASEOBJ::doit {
     local $ref = shift;
     die "Not an OBJ" unless ref $ref eq 'OBJ';
-    $ref->{shift()};
+    $ref->{?shift()};
 }
 
 package main;
@@ -238,7 +238,7 @@ do {
 	    print "# infinite recursion, bailing\nnot ok $test\n";
 	    exit 1;
         }
-	like ($m->{description}, qr/^Modification of a read-only/);
+	like ($m->{?description}, qr/^Modification of a read-only/);
     };
     package C;
     sub new { bless \%(), shift }
@@ -351,14 +351,14 @@ TODO: do {
     ok (!defined $two,
 	'defined via a different NUL-containing name gives nothing');
 
-    is (*{Symbol::fetch_glob($name1)}->{PWOF}, undef, 'Nothing before we start (hashes)');
-    is (*{Symbol::fetch_glob($name2)}->{PWOF}, undef, 'Nothing before we start');
-    *{Symbol::fetch_glob($name1)}->{PWOF} = "Yummy";
-    is (*{Symbol::fetch_glob($name1)}->{PWOF}, "Yummy", 'Accessing via the correct name works');
-    is (*{Symbol::fetch_glob($name2)}->{PWOF}, undef,
+    is (*{Symbol::fetch_glob($name1)}->{?PWOF}, undef, 'Nothing before we start (hashes)');
+    is (*{Symbol::fetch_glob($name2)}->{?PWOF}, undef, 'Nothing before we start');
+    *{Symbol::fetch_glob($name1)}->{+PWOF} = "Yummy";
+    is (*{Symbol::fetch_glob($name1)}->{?PWOF}, "Yummy", 'Accessing via the correct name works');
+    is (*{Symbol::fetch_glob($name2)}->{?PWOF}, undef,
 	'Accessing via a different NUL-containing name gives nothing');
-    ok (defined *{Symbol::fetch_glob($name1)}->{PWOF}, 'defined via the correct name works');
-    ok (!defined *{Symbol::fetch_glob($name2)}->{PWOF},
+    ok (defined *{Symbol::fetch_glob($name1)}->{?PWOF}, 'defined via the correct name works');
+    ok (!defined *{Symbol::fetch_glob($name2)}->{?PWOF},
 	'defined via a different NUL-containing name gives nothing');
 
     my (undef, $one) = < %{*{Symbol::fetch_glob($name1)}}{[@('SNIF', 'BEEYOOP')]};

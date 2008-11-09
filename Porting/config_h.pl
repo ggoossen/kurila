@@ -23,7 +23,7 @@ sub ch_index ()
     %ch = %( () );
     foreach my $ch (0 .. ((nelems @ch)-1)) {
 	while (@ch[$ch] =~ m{^/\* ([A-Z]\w+)}gm) {
-	    %ch{$1} = $ch;
+	    %ch{+$1} = $ch;
 	    }
 	}
     } # ch_index
@@ -45,10 +45,10 @@ do {
     foreach my $sym (keys %dep) {
 	ch_index;
 	foreach my $dep ( @{%dep{$sym}}) {
-	    print STDERR "Check if $sym\t(%ch{$sym}) precedes $dep\t(%ch{$dep})\n";
-	    %ch{$sym} +< %ch{$dep} and next;
-	    my $ch = splice @ch, %ch{$sym}, 1;
-	    splice @ch, %ch{$dep}, 0, $ch;
+	    print STDERR "Check if $sym\t(%ch{?$sym}) precedes $dep\t(%ch{?$dep})\n";
+	    %ch{?$sym} +< %ch{?$dep} and next;
+	    my $ch = splice @ch, %ch{?$sym}, 1;
+	    splice @ch, %ch{?$dep}, 0, $ch;
 	    $changed++;
 	    ch_index;
 	    }

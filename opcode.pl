@@ -25,18 +25,18 @@ while ( ~< *DATA) {
     my ($key, $desc, $check, $flags, $args) = < split(m/\t+/, $_, 5);
     $args = '' unless defined $args;
 
-    warn qq[Description "$desc" duplicates %seen{$desc}\n] if %seen{$desc};
-    die qq[Opcode "$key" duplicates %seen{$key}\n] if %seen{$key};
-    %seen{$desc} = qq[description of opcode "$key"];
-    %seen{$key} = qq[opcode "$key"];
+    warn qq[Description "$desc" duplicates %seen{?$desc}\n] if %seen{?$desc};
+    die qq[Opcode "$key" duplicates %seen{?$key}\n] if %seen{?$key};
+    %seen{+$desc} = qq[description of opcode "$key"];
+    %seen{+$key} = qq[opcode "$key"];
 
     push(@ops, $key);
-    %opnum{$key} =( (nelems @ops)-1);
-    %desc{$key} = $desc;
-    %check{$key} = $check;
-    %ckname{$check}++;
-    %flags{$key} = $flags;
-    %args{$key} = $args;
+    %opnum{+$key} =( (nelems @ops)-1);
+    %desc{+$key} = $desc;
+    %check{+$key} = $check;
+    %ckname{+$check}++;
+    %flags{+$key} = $flags;
+    %args{+$key} = $args;
 }
 
 # Set up aliases
@@ -92,7 +92,7 @@ my @raw_alias = @(
 		);
 
 while (my ($func, $names) = splice @raw_alias, 0, 2) {
-    %alias{$_} = $func for  @$names;
+    %alias{+$_} = $func for  @$names;
 }
 
 # Emit defines.
@@ -191,7 +191,7 @@ EXTCONST char* const PL_op_desc[] = \{
 END
 
 for ( @ops) {
-    my($safe_desc) = %desc{$_};
+    my($safe_desc) = %desc{?$_};
 
     # Have to escape double quotes and escape characters.
     $safe_desc =~ s/(^|[^\\])([\\"])/$1\\$2/g;
@@ -241,7 +241,7 @@ EXT Perl_ppaddr_t PL_ppaddr[] /* or perlvars.h */
 END
 
 for ( @ops) {
-    if (my $name = %alias{$_}) {
+    if (my $name = %alias{?$_}) {
 	print "\tMEMBER_TO_FPTR($name),\t/* Perl_pp_$_ */\n";
     }
     else {
@@ -276,7 +276,7 @@ EXT Perl_check_t PL_check[] /* or perlvars.h */
 END
 
 for ( @ops) {
-    print "\t", tab(3, "MEMBER_TO_FPTR(Perl_%check{$_}),"), "\t/* $_ */\n";
+    print "\t", tab(3, "MEMBER_TO_FPTR(Perl_%check{?$_}),"), "\t/* $_ */\n";
 }
 
 print <<END;
@@ -347,29 +347,29 @@ my $OASHIFT = 13;
 
 for my $op ( @ops) {
     my $argsum = 0;
-    my $flags = %flags{$op};
+    my $flags = %flags{?$op};
     for my $flag (keys %opflags) {
 	if ($flags =~ s/$flag//) {
-	    die "Flag collision for '$op' (%flags{$op}, $flag)"
-		if $argsum ^&^ %opflags{$flag};
-	    $argsum ^|^= %opflags{$flag};
+	    die "Flag collision for '$op' (%flags{?$op}, $flag)"
+		if $argsum ^&^ %opflags{?$flag};
+	    $argsum ^|^= %opflags{?$flag};
 	}
     }
-    die qq[Opcode '$op' has no class indicator (%flags{$op} => $flags)\n]
+    die qq[Opcode '$op' has no class indicator (%flags{?$op} => $flags)\n]
 	unless exists %opclass{$flags};
-    $argsum ^|^= %opclass{$flags} << $OCSHIFT;
+    $argsum ^|^= %opclass{?$flags} << $OCSHIFT;
     my $argshift = $OASHIFT;
-    for my $arg (split(' ',%args{$op})) {
+    for my $arg (split(' ',%args{?$op})) {
 	if ($arg =~ m/^F/) {
 	    # record opnums of these opnames
-	    %OP_IS_SOCKET{$op}   = %opnum{$op} if $arg =~ s/s//;
-	    %OP_IS_FILETEST{$op} = %opnum{$op} if $arg =~ s/-//;
-	    %OP_IS_FT_ACCESS{$op} = %opnum{$op} if $arg =~ s/\+//;
+	    %OP_IS_SOCKET{+$op}   = %opnum{?$op} if $arg =~ s/s//;
+	    %OP_IS_FILETEST{+$op} = %opnum{?$op} if $arg =~ s/-//;
+	    %OP_IS_FT_ACCESS{+$op} = %opnum{?$op} if $arg =~ s/\+//;
         }
 	my $argnum = ($arg =~ s/\?//) ?? 8 !! 0;
         die "op = $op, arg = $arg\n"
 	    unless exists %argnum{$arg};
-	$argnum += %argnum{$arg};
+	$argnum += %argnum{?$arg};
 	die "Argument overflow for '$op'\n"
 	    if $argshift +>= $ARGBITS ||
 	       $argnum +> ((1 << ($ARGBITS - $argshift)) - 1);
@@ -410,7 +410,7 @@ sub gen_op_is_macro {
 	
 	# get opnames whose numbers are lowest and highest
 	my ($first, < @rest) = < sort {
-	    $op_is->{$a} <+> $op_is->{$b}
+	    $op_is->{?$a} <+> $op_is->{?$b}
 	} keys %$op_is;
 	
 	my $last = pop @rest;	# @rest slurped, get its last
@@ -420,7 +420,7 @@ sub gen_op_is_macro {
 
 	# verify that op-ct matches 1st..last range (and fencepost)
 	# (we know there are no dups)
-	if ( $op_is->{$last} - $op_is->{$first} == scalar (nelems @rest) + 1) {
+	if ( $op_is->{?$last} - $op_is->{?$first} == scalar (nelems @rest) + 1) {
 	    
 	    # contiguous ops -> optimized version
 	    print $on "(op) >= OP_" . uc($first) . " && (op) <= OP_" . uc($last);

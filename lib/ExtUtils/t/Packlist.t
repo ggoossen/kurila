@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 BEGIN {
-    if( %ENV{PERL_CORE} ) {
+    if( %ENV{?PERL_CORE} ) {
         chdir 't' if -d 't';
         @INC = @( '../lib' );
     }
@@ -25,29 +25,29 @@ is( (ref tied %$pl), 'ExtUtils::Packlist', 'obj should be tied underneath' );
 
 $pl = ExtUtils::Packlist::TIEHASH( 'tieclass', 'packfile' );
 is( ref($pl), 'tieclass', 'TIEHASH() should bless into class' );
-is( $pl->{packfile}, 'packfile', 'TIEHASH() should store packfile name' );
+is( $pl->{?packfile}, 'packfile', 'TIEHASH() should store packfile name' );
 
 
 ExtUtils::Packlist::STORE($pl, 'key', 'value');
-is( $pl->{data}->{key}, 'value', 'STORE() should stuff stuff in data member' );
+is( $pl->{data}->{?key}, 'value', 'STORE() should stuff stuff in data member' );
 
 
-$pl->{data}->{foo} = 'bar';
+$pl->{data}->{+foo} = 'bar';
 is( ExtUtils::Packlist::FETCH($pl, 'foo'), 'bar', 'check FETCH()' );
 
 
 # test FIRSTKEY and NEXTKEY
 SKIP: do {
-	$pl->{data}->{bar} = 'baz';
+	$pl->{data}->{+bar} = 'baz';
 	skip('not enough keys to test FIRSTKEY', 2)
-      unless nkeys %{ $pl->{data} } +> 2;
+      unless nkeys %{ $pl->{?data} } +> 2;
 
 	# get the first and second key
-	my ($first, $second) = < keys %{ $pl->{data} };
+	my ($first, $second) = < keys %{ $pl->{?data} };
 
 	# now get a couple of extra keys, to mess with the hash iterator
 	my $i = 0;
-	for (keys %{ $pl->{data} } ) {
+	for (keys %{ $pl->{?data} } ) {
 		last if $i++;
 	}
 
@@ -68,7 +68,7 @@ ok( !(exists $pl->{data}->{bar}), 'DELETE() should delete cleanly' );
 
 
 ExtUtils::Packlist::CLEAR($pl);
-is( nkeys %{ $pl->{data} }, 0, 'CLEAR() should wipe out data' );
+is( nkeys %{ $pl->{?data} }, 0, 'CLEAR() should wipe out data' );
 
 
 # DESTROY does nothing...
@@ -77,7 +77,7 @@ can_ok( 'ExtUtils::Packlist', 'DESTROY' );
 
 # write is a little more complicated
 try { ExtUtils::Packlist::write(\%()) };
-like( $@->{description}, qr/No packlist filename/, 'write() should croak without packfile' );
+like( $@->{?description}, qr/No packlist filename/, 'write() should croak without packfile' );
 
 try { ExtUtils::Packlist::write(\%(), 'eplist') };
 my $file_is_ready = $@ ?? 0 !! 1;
@@ -95,14 +95,14 @@ SKIP: do {
 	    skip("cannot write readonly files", 1) if -w 'eplist';
 
 	    try { ExtUtils::Packlist::write(\%(), 'eplist') };
-	    like( $@->{description}, qr/Can't open file/, 'write() should croak on open failure' );
+	    like( $@->{?description}, qr/Can't open file/, 'write() should croak on open failure' );
 	};
 
 	#'now set it back (tick here fixes vim syntax highlighting ;)
 	chmod 0777, 'eplist';
 
 	# and some test data to be read
-	$pl->{data} = \%(
+	$pl->{+data} = \%(
 		single => 1,
 		hash => \%(
 			foo => 'bar',
@@ -112,18 +112,18 @@ SKIP: do {
 	);
 	try { ExtUtils::Packlist::write($pl, 'eplist') };
 	is( $@, '', 'write() should normally succeed' );
-	is( $pl->{packfile}, 'eplist', 'write() should set packfile name' );
+	is( $pl->{?packfile}, 'eplist', 'write() should set packfile name' );
 
 	$file_is_ready = open(IN, "<", 'eplist');
 };
 
 
 try { ExtUtils::Packlist::read(\%()) };
-like( $@->{description}, qr/^No packlist filename/, 'read() should croak without packfile' );
+like( $@->{?description}, qr/^No packlist filename/, 'read() should croak without packfile' );
 
 
 try { ExtUtils::Packlist::read(\%(), 'abadfilename') };
-like( $@->{description}, qr/^Can't open file/, 'read() should croak with bad packfile name' );
+like( $@->{?description}, qr/^Can't open file/, 'read() should croak with bad packfile name' );
 #'open packfile for reading
 
 
@@ -140,14 +140,14 @@ SKIP: do {
 
 	try{ ExtUtils::Packlist::read($pl, 'eplist') };
 	is( $@, '', 'read() should normally succeed' );
-	is( $pl->{data}->{single}, undef, 'single keys should have undef value' );
-	is( ref($pl->{data}->{hash}), 'HASH', 'multivalue keys should become hashes');
+	is( $pl->{data}->{?single}, undef, 'single keys should have undef value' );
+	is( ref($pl->{data}->{?hash}), 'HASH', 'multivalue keys should become hashes');
 
-	is( $pl->{data}->{hash}->{foo}, 'bar', 'hash values should be set' );
+	is( $pl->{data}->{hash}->{?foo}, 'bar', 'hash values should be set' );
 	ok( exists $pl->{data}->{'/abc'}, 'read() should resolve /./ to / in keys' );
 
 	# give validate a valid and an invalid file to find
-	$pl->{data} = \%(
+	$pl->{+data} = \%(
 		eplist => 1,
 		fake => undef,
 	);

@@ -27,7 +27,7 @@ do {
                         version => $Module::Load::Conditional::VERSION,
                 );
 
-    ok( $rv->{uptodate},    q[Verify self] );
+    ok( $rv->{?uptodate},    q[Verify self] );
     is( $rv->{version}->stringify, $Module::Load::Conditional::VERSION,  
                             q[  Found proper version] );
 
@@ -49,7 +49,7 @@ do {
         @path;
     };
     
-    is( %INC{'Module/Load/Conditional.pm'},            
+    is( %INC{?'Module/Load/Conditional.pm'},            
             File::Spec::Unix->catfile(< @rv_path),
                             q[  Found proper file]
     );
@@ -64,7 +64,7 @@ do {   local $^W;
                         version => $Module::Load::Conditional::VERSION + 1,
                 );
 
-    ok( !$rv->{uptodate} && $rv->{version} && $rv->{file},
+    ok( !$rv->{?uptodate} && $rv->{?version} && $rv->{?file},
         q[Verify out of date module]
     );
 };
@@ -72,7 +72,7 @@ do {   local $^W;
 do {
     my $rv = check_install( module  => 'Module::Load::Conditional' );
 
-    ok( $rv->{uptodate} && $rv->{version} && $rv->{file},
+    ok( $rv->{?uptodate} && $rv->{?version} && $rv->{?file},
         q[Verify any module]
     );
 };
@@ -80,7 +80,7 @@ do {
 do {
     my $rv = check_install( module  => 'Module::Does::Not::Exist' );
 
-    ok( !$rv->{uptodate} && !$rv->{version} && !$rv->{file},
+    ok( !$rv->{?uptodate} && !$rv->{?version} && !$rv->{?file},
         q[Verify non-existant module]
     );
 
@@ -89,7 +89,7 @@ do {
 ### test finding a version of a module that mentions $VERSION in pod
 do {   my $rv = check_install( module => 'InPod' );
     ok( $rv,                        'Testing $VERSION in POD' );
-    ok( $rv->{version},             "   Version found" );
+    ok( $rv->{?version},             "   Version found" );
     is( $rv->{version}->stringify, 2,          "   Version is correct" );
 };
 
@@ -106,7 +106,7 @@ do {   my $test_ver = $Module::Load::Conditional::VERSION;
                 );
 
     ok( $rv,                "Checking beta versions" );
-    ok( !$rv->{'uptodate'}, "   Beta version is higher" );
+    ok( !$rv->{?'uptodate'}, "   Beta version is higher" );
     
 };    
 
@@ -117,8 +117,8 @@ do {   local $Module::Load::Conditional::FIND_VERSION = 0;
     my $rv = check_install( module  => 'Module::Load::Conditional' );
 
     ok( $rv,                        'Testing $FIND_VERSION' );
-    is( $rv->{version}, undef,      "   No version info returned" );
-    ok( $rv->{uptodate},            "   Module marked as uptodate" );
+    is( $rv->{?version}, undef,      "   No version info returned" );
+    ok( $rv->{?uptodate},            "   Module marked as uptodate" );
 };    
 
 ### test 'can_load' ###
@@ -151,7 +151,7 @@ do {
     my $use_list = \%( 'LoadIt' => 1, 'MustBe::Loaded' => 1 );
     my $bool = can_load( modules => $use_list );
 
-    ok( !%INC{'LoadIt.pm'} && !%INC{'MustBe/Loaded.pm'},
+    ok( !%INC{?'LoadIt.pm'} && !%INC{?'MustBe/Loaded.pm'},
         q[Do not load if one prerequisite fails]
     );
 };
@@ -160,7 +160,7 @@ do {
 ### test 'requires' ###
 SKIP:do {
     skip "Depends on \$^X, which doesn't work well when testing the Perl core", 
-        1 if %ENV{PERL_CORE};
+        1 if %ENV{?PERL_CORE};
 
     my %list = %( < map { $_ => 1 } requires('Carp') );
     
@@ -176,7 +176,7 @@ do {   local $Module::Load::Conditional::CHECK_INC_HASH = 1;
     
     do {   package A::B::C::D; 
         $A::B::C::D::VERSION = $$; 
-        %INC{'A/B/C/D.pm'}   = $$.$$;
+        %INC{+'A/B/C/D.pm'}   = $$.$$;
         
         ### XXX this is no longer needed with M::Load 0.11_01
         #$INC{'[.A.B.C]D.pm'} = $$.$$ if $^O eq 'VMS';
@@ -185,9 +185,9 @@ do {   local $Module::Load::Conditional::CHECK_INC_HASH = 1;
     my $href = check_install( module => 'A::B::C::D', version => 0 );
 
     ok( $href,                  'Found package in %INC' );
-    is( $href->{'file'}, $$.$$, '   Found correct file' );
-    is( $href->{'version'}, $$, '   Found correct version' );
-    ok( $href->{'uptodate'},    '   Marked as uptodate' );
+    is( $href->{?'file'}, $$.$$, '   Found correct file' );
+    is( $href->{?'version'}, $$, '   Found correct version' );
+    ok( $href->{?'uptodate'},    '   Marked as uptodate' );
     ok( can_load( modules => \%( 'A::B::C::D' => 0 ) ),
                                 '   can_load successful' );
 };

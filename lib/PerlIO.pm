@@ -13,7 +13,7 @@ sub import
    my $layer = shift;
    if (exists %alias{$layer})
     {
-     $layer = %alias{$layer}
+     $layer = %alias{?$layer}
     }
    else
     {

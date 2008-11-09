@@ -85,12 +85,12 @@ sub _feature_init {
                         $feep;
                     };
 
-        %Groks{$short} = defined config_value("d_" . $feep);
+        %Groks{+$short} = defined config_value("d_" . $feep);
     }
     # assume that any that are left are always there
     for my $feep ( grep m/^\$pw_/s, @EXPORT_OK) {
         $feep =~ m/^\$pw_(.*)/;
-        %Groks{$1} = 1 unless defined %Groks{$1};
+        %Groks{+$1} = 1 unless defined %Groks{?$1};
     }
 }
 
@@ -112,13 +112,13 @@ sub pw_has {
                     ?? \&die
                     !! sub { die("$IE $(join ' ',@_)") };
     if ((nelems @_) == 0) {
-        my @valid = sort grep { %Groks{$_} } keys %Groks;
+        my @valid = sort grep { %Groks{?$_} } keys %Groks;
         return @valid;
     }
     for my $feep ( map { < split } @_) {
-        defined %Groks{$feep}
+        defined %Groks{?$feep}
             || $sploder->("$feep is never a valid struct pwd field");
-        $cando &&= %Groks{$feep};
+        $cando &&= %Groks{?$feep};
     }
     return $cando;
 }

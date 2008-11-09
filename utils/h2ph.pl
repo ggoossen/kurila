@@ -123,7 +123,7 @@ while (defined (my $file = next_file())) {
 			$proto = '';
 			foreach my $arg (split(m/,\s*/,$args)) {
 			    $arg =~ s/^\s*([^\s].*[^\s])\s*$/$1/;
-			    %curargs{$arg} = 1;
+			    %curargs{+$arg} = 1;
 			}
 			$args =~ s/\b(\w)/\$$1/g;
 			$args = "my($args) = \@_;\n$t    ";
@@ -302,7 +302,7 @@ while (defined (my $file = next_file())) {
 	    if (s/^\(([^()]*)\)\s*(\w+\s*)*//) {
 		for my $arg (split m/,/, $1) {
 		    if ($arg =~ m/(\w+)\s*$/) {
-			%curargs{$1} = 1;
+			%curargs{+$1} = 1;
 			push @args, $1;
 		    }
 		}
@@ -346,7 +346,7 @@ while (defined (my $file = next_file())) {
             $emit->();
 	}
     }
-    %Is_converted{$file} = 1;
+    %Is_converted{+$file} = 1;
     if ($opt_e && exists(%bad_file{$file})) {
         unlink($Dest_dir . '/' . $outfile);
         $next = '';
@@ -391,7 +391,7 @@ sub expr {
 	s/^(\d+)\s*[LU]*//i	&& do {$new .= $1; next;};
 	s/^("(\\"|[^"])*")//	&& do {$new .= $1; next;};
 	s/^'((\\"|[^"])*)'//	&& do {
-	    if (%curargs{$1}) {
+	    if (%curargs{?$1}) {
 		$new .= "ord('\$$1')";
 	    } else {
 		$new .= "ord('$1')";
@@ -427,7 +427,7 @@ sub expr {
 	m/\(([\w\s]+)[\*\s]*\)\s*[\w\(]/ && do {
 	    my $doit = 1;
 	    foreach (split m/\s+/, $1) {  # Make sure all the words are types,
-	        unless(%isatype{$_} or $_ eq 'struct' or $_ eq 'union'){
+	        unless(%isatype{?$_} or $_ eq 'struct' or $_ eq 'union'){
 		    $doit = 0;
 		    last;
 		}
@@ -458,12 +458,12 @@ sub expr {
 	    if ($id eq 'struct' || $id eq 'union') {
 		s/^\s+(\w+)//;
 		$id .= ' ' . $1;
-		%isatype{$id} = 1;
+		%isatype{+$id} = 1;
 	    } elsif ($id =~ m/^((un)?signed)|(long)|(short)$/) {
 		while (s/^\s+(\w+)//) { $id .= ' ' . $1; }
-		%isatype{$id} = 1;
+		%isatype{+$id} = 1;
 	    }
-	    if (%curargs{$id}) {
+	    if (%curargs{?$id}) {
 		$new .= "\$$id";
 		$new .= '->' if m/^[\[\{]/;
 	    } elsif ($id eq 'defined') {
@@ -471,7 +471,7 @@ sub expr {
 	    } elsif (m/^\s*\(/) {
 		s/^\s*\((\w),/("$1",/ if $id =~ m/^_IO[WR]*$/i;	# cheat
 		$new .= " &$id";
-	    } elsif (%isatype{$id}) {
+	    } elsif (%isatype{?$id}) {
 		if ($new =~ m/{\s*$/) {
 		    $new .= "'$id'";
 		} elsif ($new =~ m/\(\s*$/ && m/^[\s*]*\)/) {
@@ -576,7 +576,7 @@ sub next_line
             } else {
                 if ($opt_e) {
                     warn "Cannot parse $file:\n$in\n";
-                    %bad_file{$file} = 1;
+                    %bad_file{+$file} = 1;
                     $in = '';
                     $out = undef;
                     last READ;
@@ -693,7 +693,7 @@ sub queue_includes_from
             }
 
             if ($line =~ m/^#\s*include\s+<(.*?)>/) {
-                push(@ARGV, $1) unless %Is_converted{$1};
+                push(@ARGV, $1) unless %Is_converted{?$1};
             }
         }
     close HEADER;
@@ -744,27 +744,27 @@ sub build_preamble_if_necessary
 
 	foreach (sort keys %define) {
 	    if ($opt_D) {
-		print PREAMBLE "# $_=%define{$_}\n";
+		print PREAMBLE "# $_=%define{?$_}\n";
 	    }
-	    if (%define{$_} =~ m/^\((.*)\)$/) {
+	    if (%define{?$_} =~ m/^\((.*)\)$/) {
 		# parenthesized value:  d=(v)
-		%define{$_} = $1;
+		%define{+$_} = $1;
 	    }
-	    if (%define{$_} =~ m/^([+-]?(\d+)?\.\d+([eE][+-]?\d+)?)[FL]?$/) {
+	    if (%define{?$_} =~ m/^([+-]?(\d+)?\.\d+([eE][+-]?\d+)?)[FL]?$/) {
 		# float:
 		print PREAMBLE
 		    "unless (defined &$_) \{ sub $_() \{ $1 \} \}\n\n";
-	    } elsif (%define{$_} =~ m/^([+-]?\d+)U?L{0,2}$/i) {
+	    } elsif (%define{?$_} =~ m/^([+-]?\d+)U?L{0,2}$/i) {
 		# integer:
 		print PREAMBLE
 		    "unless (defined &$_) \{ sub $_() \{ $1 \} \}\n\n";
-	    } elsif (%define{$_} =~ m/^\w+$/) {
+	    } elsif (%define{?$_} =~ m/^\w+$/) {
 		print PREAMBLE
-		    "unless (defined &$_) \{ sub $_() \{ &%define{$_} \} \}\n\n";
+		    "unless (defined &$_) \{ sub $_() \{ &%define{?$_} \} \}\n\n";
 	    } else {
 		print PREAMBLE
 		    "unless (defined &$_) \{ sub $_() \{ \"",
-		    quotemeta(%define{$_}), "\" \} \}\n\n";
+		    quotemeta(%define{?$_}), "\" \} \}\n\n";
 	    }
 	}
     close PREAMBLE               or die "Cannot close $preamble:  $!";
@@ -782,7 +782,7 @@ sub _extract_cc_defines
 
     # Split compiler pre-definitions into `key=value' pairs:
     while ($allsymbols =~ m/([^\s]+)=((\\\s|[^\s])+)/g) {
-	%define{$1} = $2;
+	%define{+$1} = $2;
 	if ($opt_D) {
 	    print STDERR "$_:  $1 -> $2\n";
 	}

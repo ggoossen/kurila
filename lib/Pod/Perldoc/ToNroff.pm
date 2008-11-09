@@ -29,7 +29,7 @@ sub parse_from_file {
   my $self = shift;
   my $file = @_[0];
   
-  my @options = map {; $_, $self->{$_} }
+  my @options = map {; $_, $self->{?$_} }
  grep !m/^_/s,
         keys %$self
   ;

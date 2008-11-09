@@ -85,22 +85,22 @@ sub recursive_dump {
 	# We don't want to duplicate data. Retrieval will know how to
 	# relink from the previously seen object.
 
-	if ($link && %dumped{$addr}++) {
-		my $num = %object{$addr};
+	if ($link && %dumped{+$addr}++) {
+		my $num = %object{?$addr};
 		$dumped .= "OBJECT #$num seen\n";
 		return;
 	}
 
 	my $objcount = $count++;
-	%object{$addr} = $objcount;
+	%object{+$addr} = $objcount;
 
 	# Call the appropriate dumping routine based on the reference type.
 	# If the referenced was blessed, we bless it once the object is dumped.
 	# The retrieval code will perform the same on the last object retrieved.
 
-	croak "Unknown simple type '$ref'" unless defined %dump{$ref};
+	croak "Unknown simple type '$ref'" unless defined %dump{?$ref};
 
-	&{*{Symbol::fetch_glob(%dump{$ref})}}($object);	# Dump object
+	&{*{Symbol::fetch_glob(%dump{?$ref})}}($object);	# Dump object
 	&bless($bless) if $bless;	# Mark it as blessed, if necessary
 
 	$dumped .= "OBJECT $objcount\n";
@@ -147,12 +147,12 @@ sub dump_hash {
 	foreach my $key (sort keys %{$href}) {
 		$dumped .= 'KEY ';
 		&recursive_dump(\$key, undef);
-		unless (defined $href->{$key}) {
+		unless (defined $href->{?$key}) {
 			$dumped .= 'VALUE_UNDEF' . "\n";
 			next;
 		}
 		$dumped .= 'VALUE ';
-		&recursive_dump(\$href->{$key}, 1);
+		&recursive_dump(\$href->{+$key}, 1);
 	}
 }
 

@@ -1,5 +1,5 @@
 BEGIN {
-    if( %ENV{PERL_CORE} ) {
+    if( %ENV{?PERL_CORE} ) {
         chdir 't';
         use File::Spec;
         @INC = @(File::Spec->rel2abs('../lib') );
@@ -40,9 +40,9 @@ ok $found;
 print "# Found $found items in $t seconds!\n# See...\n";
 
 print "# OK, making sure warnings and warnings.pm were in there...\n";
-ok( ($name2where->{'warnings'} || 'huh???'), '/warnings\.(pod|pm)$/');
+ok( ($name2where->{?'warnings'} || 'huh???'), '/warnings\.(pod|pm)$/');
 
-my  $warningspath = $name2where->{'warnings'};
+my  $warningspath = $name2where->{?'warnings'};
 if( $warningspath ) {
   my @x = @($x->find('warnings')||'(nil)', $warningspath);
   print "# Comparing \"@x[0]\" to \"@x[1]\"\n";

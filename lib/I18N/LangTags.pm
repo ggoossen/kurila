@@ -20,7 +20,7 @@ require Exporter;
 
 $VERSION = "0.35";
 
-sub uniq { my %seen; return grep(!(%seen{$_}++), @_); } # a util function
+sub uniq { my %seen; return grep(!(%seen{+$_}++), @_); } # a util function
 
 
 =head1 NAME
@@ -629,7 +629,7 @@ sub alternate_language_tags {
   } elsif($tag =~ m/^no-nyn\b(.*)/i) { push @em, "nn$1";
   }
 
-  push @em, %alt{$1} . $2 if $tag =~ m/^([XIxi])(-.+)/;
+  push @em, %alt{?$1} . $2 if $tag =~ m/^([XIxi])(-.+)/;
   return @em;
 }
 
@@ -692,7 +692,7 @@ do {
     ($k,$v) = splice(@panic,0,2);
     foreach my $k (@(ref($k) ?? < @$k !! $k)) {
       foreach my $v (@(ref($v) ?? < @$v !! $v)) {
-        push @{%Panic{$k} ||= \@()}, $v unless $k eq $v;
+        push @{%Panic{+$k} ||= \@()}, $v unless $k eq $v;
       }
     }
   }
@@ -734,11 +734,11 @@ sub panic_languages {
   my(@out, %seen);
   foreach my $t ( @_) {
     next unless $t;
-    next if %seen{$t}++; # so we don't return it or hit it again
+    next if %seen{+$t}++; # so we don't return it or hit it again
     # push @out, super_languages($t); # nah, keep that separate
-    push @out, < @{ %Panic{lc $t} || next };
+    push @out, < @{ %Panic{?lc $t} || next };
   }
-  return grep !%seen{$_}++, @(  < @out, 'en');
+  return grep !%seen{+$_}++, @(  < @out, 'en');
 }
 
 #---------------------------------------------------------------------------
@@ -796,7 +796,7 @@ sub implicate_supers {
   my @languages = grep is_language_tag($_), @_;
   my %seen_encoded;
   foreach my $lang ( @languages) {
-    %seen_encoded{ I18N::LangTags::encode_language_tag($lang) } = 1
+    %seen_encoded{+I18N::LangTags::encode_language_tag($lang) } = 1
   }
 
   my(@output_languages);
@@ -804,7 +804,7 @@ sub implicate_supers {
     push @output_languages, $lang;
     foreach my $s (  I18N::LangTags::super_languages($lang) ) {
       # Note that super_languages returns the longest first.
-      last if %seen_encoded{ I18N::LangTags::encode_language_tag($s) };
+      last if %seen_encoded{?I18N::LangTags::encode_language_tag($s) };
       push @output_languages, $s;
     }
   }

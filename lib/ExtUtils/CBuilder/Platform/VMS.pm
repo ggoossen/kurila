@@ -20,7 +20,7 @@ sub arg_defines {
   my @config_defines;
 
   # VMS can only have one define qualifier; add the one from config, if any.
-  if ($self->{config}->{ccflags} =~ s{/  def[^=]+  =+  \(?  ([^\/\)]*)  } {}ix) {
+  if ($self->{config}->{+ccflags} =~ s{/  def[^=]+  =+  \(?  ([^\/\)]*)  } {}ix) {
     push @config_defines, $1;
   }
 
@@ -29,7 +29,7 @@ sub arg_defines {
   return  @('/define=(' 
           . join(',', @( 
 		 < @config_defines,
-                 < map "\"$_" . ( length(%args{$_}) ?? "=%args{$_}" !! '') . "\"", 
+                 < map "\"$_" . ( length(%args{?$_}) ?? "=%args{?$_}" !! '') . "\"", 
                      keys %args)) 
           . ')');
 }
@@ -38,7 +38,7 @@ sub arg_include_dirs {
   my ($self, < @dirs) = < @_;
 
   # VMS can only have one include list, add the one from config.
-  if ($self->{config}->{ccflags} =~ s{/inc[^=]+(?:=)+(?:\()?([^\/\)]*)} {}i) {
+  if ($self->{config}->{+ccflags} =~ s{/inc[^=]+(?:=)+(?:\()?([^\/\)]*)} {}i) {
     unshift @dirs, $1;
   }
   return unless (nelems @dirs);
@@ -52,7 +52,7 @@ sub _do_link {
   my $objects = delete %args{objects};
   $objects = \@($objects) unless ref $objects;
   
-  if (%args{lddl}) {
+  if (%args{?lddl}) {
 
     # prelink will call Mksymlists, which creates the extension-specific
     # linker options file and populates it with the boot symbol.
@@ -99,7 +99,7 @@ sub arg_exec_file {
 
 sub arg_share_object_file {
   my ($self, $file) = < @_;
-  return  @("$self->{config}->{lddlflags}=$file");
+  return  @("$self->{config}->{?lddlflags}=$file");
 }
 
 
@@ -107,7 +107,7 @@ sub lib_file {
   my ($self, $dl_file) = < @_;
   $dl_file =~ s/\.[^.]+$//;
   $dl_file =~ s/"//g;
-  $dl_file = $dl_file .= '.' . $self->{config}->{dlext};
+  $dl_file = $dl_file .= '.' . $self->{config}->{?dlext};
 
   # Need to create with the same name as DynaLoader will load with.
   if (defined &DynaLoader::mod2fname) {
@@ -126,10 +126,10 @@ sub _liblist_ext {
   $verbose ||= 0;
 
   my(@crtls,$crtlstr);
-  @crtls = @( ($self->{'config'}->{'ldflags'} =~ m-/Debug-i ?? $self->{'config'}->{'dbgprefix'} !! '')
+  @crtls = @( ($self->{'config'}->{?'ldflags'} =~ m-/Debug-i ?? $self->{'config'}->{?'dbgprefix'} !! '')
               . 'PerlShr/Share' );
-  push(@crtls, < grep { not m/\(/ } split m/\s+/, $self->{'config'}->{'perllibs'});
-  push(@crtls, < grep { not m/\(/ } split m/\s+/, $self->{'config'}->{'libc'});
+  push(@crtls, < grep { not m/\(/ } split m/\s+/, $self->{'config'}->{?'perllibs'});
+  push(@crtls, < grep { not m/\(/ } split m/\s+/, $self->{'config'}->{?'libc'});
   # In general, we pass through the basic libraries from %Config unchanged.
   # The one exception is that if we're building in the Perl source tree, and
   # a library spec could be resolved via a logical name, we go to some trouble
@@ -139,9 +139,9 @@ sub _liblist_ext {
     my($locspec,$type);
     foreach my $lib ( @crtls) { 
       if (($locspec,$type) = $lib =~ m{^([\w\$-]+)(/\w+)?} and $locspec =~ m/perl/i) {
-        if    (lc $type eq '/share')   { $locspec .= $self->{'config'}->{'exe_ext'}; }
-        elsif (lc $type eq '/library') { $locspec .= $self->{'config'}->{'lib_ext'}; }
-        else                           { $locspec .= $self->{'config'}->{'obj_ext'}; }
+        if    (lc $type eq '/share')   { $locspec .= $self->{'config'}->{?'exe_ext'}; }
+        elsif (lc $type eq '/library') { $locspec .= $self->{'config'}->{?'lib_ext'}; }
+        else                           { $locspec .= $self->{'config'}->{?'obj_ext'}; }
         $locspec = catfile( <$self->perl_src, $locspec);
         $lib = "$locspec$type" if -e $locspec;
       }
@@ -166,7 +166,7 @@ sub _liblist_ext {
                  'socket' => '', 'X11' => 'DECW$XLIBSHR',
                  'Xt' => 'DECW$XTSHR', 'Xm' => 'DECW$XMLIBSHR',
                  'Xmu' => 'DECW$XMULIBSHR');
-  if ($self->{'config'}->{'vms_cc_type'} ne 'decc') { %libmap{'curses'} = 'VAXCCURSE'; }
+  if ($self->{'config'}->{?'vms_cc_type'} ne 'decc') { %libmap{+'curses'} = 'VAXCCURSE'; }
 
   warn "Potential libraries are '$potential_libs'\n" if $verbose;
 
@@ -178,7 +178,7 @@ sub _liblist_ext {
     push(@libs,$1),   next if $lib =~ m/^-l(.*)/;
     push(@libs,$lib);
   }
-  push(@dirs, <split(' ',$self->{'config'}->{'libpth'}));
+  push(@dirs, <split(' ',$self->{'config'}->{?'libpth'}));
 
   # Now make sure we've got VMS-syntax absolute directory specs
   # (We don't, however, check whether someone's hidden a relative
@@ -199,8 +199,8 @@ sub _liblist_ext {
 
   LIB: foreach my $lib ( @libs) {
     if (exists %libmap{$lib}) {
-      next unless length %libmap{$lib};
-      $lib = %libmap{$lib};
+      next unless length %libmap{?$lib};
+      $lib = %libmap{?$lib};
     }
 
     my(@variants,$cand);
@@ -272,7 +272,7 @@ sub _liblist_ext {
         else                      { push    @{%found{$ctype}}, $cand; }
         warn "\tFound as $cand (really $fullname), type $ctype\n" 
           if $verbose +> 1;
-	push @flibs, $name unless %libs_seen{$fullname}++;
+	push @flibs, $name unless %libs_seen{+$fullname}++;
         next LIB;
       }
     }
@@ -280,7 +280,7 @@ sub _liblist_ext {
 		 ."No library found for $lib\n";
   }
 
-  push @fndlibs, < @{%found{OBJ}}                      if exists %found{OBJ};
+  push @fndlibs, < @{%found{?OBJ}}                      if exists %found{OBJ};
   push @fndlibs, < map { "$_/Library" } @{%found{OLB}} if exists %found{OLB};
   push @fndlibs, < map { "$_/Share"   } @{%found{SHR}} if exists %found{SHR};
   my $lib = join(' ', @fndlibs);

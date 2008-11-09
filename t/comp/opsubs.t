@@ -60,7 +60,7 @@ SKIP: do {
     skip("external command not portable on VMS", 1) if $^O eq 'VMS';
     TODO: do {
 	local our $TODO = $^O eq 'MSWin32' ?? "Tainting of PATH not working of Windows" !! $TODO;
-	like( $@->{description}, qr/^Insecure/, "qx('unqualified') doesn't work" );
+	like( $@->{?description}, qr/^Insecure/, "qx('unqualified') doesn't work" );
     };
 };
 is( main::qx('main'), "qx-main", "main::qx() is func" );
@@ -69,7 +69,7 @@ is( &qx('amper'), "qx-amper", "&qx() is func" );
 # s operator
 can_ok( 'main', "s" );
 eval "s('unqualified')";
-like( $@->{description}, qr/^Substitution replacement not terminated/, "s('unqualified') doesn't work" );
+like( $@->{?description}, qr/^Substitution replacement not terminated/, "s('unqualified') doesn't work" );
 is( main::s('main'), "s-main", "main::s() is func" );
 is( &s('amper'), "s-amper", "&s() is func" );
 

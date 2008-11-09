@@ -31,18 +31,18 @@ sub casetest {
     my %simple;
     for my $i (split(m/\n/, $simple)) {
 	my ($k, $v) = < split(' ', $i);
-	%simple{$k} = $v;
+	%simple{+$k} = $v;
     }
     my %seen;
 
     for my $i (sort keys %simple) {
-	%seen{$i}++;
+	%seen{+$i}++;
     }
 
     my $both;
 
     for my $i (sort keys %$spec) {
-	if (++%seen{$i} == 2) {
+	if (++%seen{+$i} == 2) {
 	    warn sprintf "$base: $i seen twice\n";
 	    $both++;
 	}
@@ -53,7 +53,7 @@ sub casetest {
     for my $i ( map { ord } split m//,
 	       "\e !\"#\$\%&'()+,-./0123456789:;<=>?\@[\\]^_\{|\}~\b") {
 	next if pack("U0U", $i) =~ m/\w/;
-	%none{$i}++ unless %seen{$i};
+	%none{+$i}++ unless %seen{?$i};
     }
 
     my $tests = 
@@ -65,19 +65,19 @@ sub casetest {
     my $test = 1;
 
     for my $i (sort keys %simple) {
-	my $w = %simple{$i};
+	my $w = %simple{?$i};
 	my $c = pack "U0U", hex $i;
 	foreach my $func ( @funcs) {
 	    my $d = $func->($c);
 	    my $e = unidump($d);
-	    print $d eq pack("U0U", hex %simple{$i}) ??
+	    print $d eq pack("U0U", hex %simple{?$i}) ??
 		"ok $test # $i -> $w\n" !! "not ok $test # $i -> $e ($w)" . sprintf('%x', ord($d)) . "\n";
 		$test++;
 	}
     }
 
     for my $i (sort keys %$spec) {
-	my $w = unidump($spec->{$i});
+	my $w = unidump($spec->{?$i});
         #my $c = substr $i, 0, 1;
 	my $h = unidump($i);
 	foreach my $func ( @funcs) {

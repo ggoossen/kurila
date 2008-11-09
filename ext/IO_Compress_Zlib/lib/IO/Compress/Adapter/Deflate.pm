@@ -37,14 +37,14 @@ sub compr
 {
     my $self = shift ;
 
-    my $def   = $self->{Def};
+    my $def   = $self->{?Def};
 
     my $status = $def->deflate(@_[0], @_[1]) ;
-    $self->{ErrorNo} = $status;
+    $self->{+ErrorNo} = $status;
 
     if ($status != Z_OK)
     {
-        $self->{Error} = "Deflate Error: $status"; 
+        $self->{+Error} = "Deflate Error: $status"; 
         return STATUS_ERROR;
     }
 
@@ -55,15 +55,15 @@ sub flush
 {
     my $self = shift ;
 
-    my $def   = $self->{Def};
+    my $def   = $self->{?Def};
 
     my $opt = @_[1] || Z_FINISH;
     my $status = $def->flush(@_[0], $opt);
-    $self->{ErrorNo} = $status;
+    $self->{+ErrorNo} = $status;
 
     if ($status != Z_OK)
     {
-        $self->{Error} = "Deflate Error: $status"; 
+        $self->{+Error} = "Deflate Error: $status"; 
         return STATUS_ERROR;
     }
 
@@ -75,7 +75,7 @@ sub close
 {
     my $self = shift ;
 
-    my $def   = $self->{Def};
+    my $def   = $self->{?Def};
 
     $def->flush(@_[0], Z_FINISH)
         if defined $def ;
@@ -85,13 +85,13 @@ sub reset
 {
     my $self = shift ;
 
-    my $def   = $self->{Def};
+    my $def   = $self->{?Def};
 
     my $status = $def->deflateReset() ;
-    $self->{ErrorNo} = $status;
+    $self->{+ErrorNo} = $status;
     if ($status != Z_OK)
     {
-        $self->{Error} = "Deflate Error: $status"; 
+        $self->{+Error} = "Deflate Error: $status"; 
         return STATUS_ERROR;
     }
 

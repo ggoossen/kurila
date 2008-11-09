@@ -20,12 +20,12 @@ __PACKAGE__->_accessorize(
 sub _handle_element_start { # self, tagname, attrhash
   DEBUG +> 2 and print "Handling @_[1] start-event\n";
   my $x = \@(@_[1], @_[2]);
-  if(@_[0]->{'_currpos'}) {
+  if(@_[0]->{?'_currpos'}) {
     push    @{ @_[0]->{'_currpos'}->[0] }, $x; # insert in parent's child-list
     unshift @{ @_[0]->{'_currpos'} },    $x; # prefix to stack
   } else {
     DEBUG and print " And oo, it gets to be root!\n";
-    @_[0]->{'_currpos'} = \@(   @_[0]->{'root'} = $x   );
+    @_[0]->{+'_currpos'} = \@(   @_[0]->{+'root'} = $x   );
       # first event!  set to stack, and set as root.
   }
   DEBUG +> 3 and print "Stack is now: ",

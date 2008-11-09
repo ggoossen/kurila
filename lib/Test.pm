@@ -31,7 +31,7 @@ $TESTERR = *STDERR{IO};
 
 # Use of this variable is strongly discouraged.  It is set mainly to
 # help test coverage analyzers know which test is running.
-%ENV{REGRESSION_TEST} = $0;
+%ENV{+REGRESSION_TEST} = $0;
 
 
 =head1 NAME
@@ -160,7 +160,7 @@ sub plan {
 	my ($k,$v) = splice(@_, 0, 2);
 	if ($k =~ m/^test(s)?$/) { $max = $v; }
 	elsif ($k eq 'todo' or
-	       $k eq 'failok') { for ( @$v) { %todo{$_}=1; }; }
+	       $k eq 'failok') { for ( @$v) { %todo{+$_}=1; }; }
 	elsif ($k eq 'onfail') {
 	    ref $v eq 'CODE' or die "Test::plan(onfail => $v): must be CODE";
 	    $ONFAIL = $v;
@@ -184,7 +184,7 @@ sub _read_program {
   return unless defined $file and length $file
     and -e $file and -f _ and -r _;
   open(SOURCEFILE, "<", "$file") || return;
-  %Program_Lines{$file} = \@( ~< *SOURCEFILE);
+  %Program_Lines{+$file} = \@( ~< *SOURCEFILE);
   close(SOURCEFILE);
 
   foreach my $x ( @{%Program_Lines{$file}})
@@ -355,7 +355,7 @@ sub ok ($;$$) {
                     # print
 
     my ($pkg,$file,$line) = caller($TestLevel);
-    my $repetition = ++%history{"$file:$line"};
+    my $repetition = ++%history{+"$file:$line"};
     my $context = ("$file at line $line".
 		   ($repetition +> 1 ?? " fail \#$repetition" !! ''));
 
@@ -384,7 +384,7 @@ sub ok ($;$$) {
 	    $ok = $result eq $expected;
 	}
     }
-    my $todo = %todo{$ntest};
+    my $todo = %todo{?$ntest};
     if ($todo and $ok) {
 	$context .= ' TODO?!' if $todo;
 	print $TESTOUT "ok $ntest # ($context)\n";
@@ -414,28 +414,28 @@ sub ok ($;$$) {
 
 sub _complain {
     my($result, $expected, $detail) = < @_;
-    %$detail{expected} = $expected if defined $expected;
+    %$detail{+expected} = $expected if defined $expected;
 
     # Get the user's diagnostic, protecting against multi-line
     # diagnostics.
-    my $diag = %$detail{diagnostic};
+    my $diag = %$detail{?diagnostic};
     $diag =~ s/\n/\n#/g if defined $diag;
 
-    %$detail{context} .= ' *TODO*' if %$detail{todo};
-    if (!%$detail{compare}) {
+    %$detail{+context} .= ' *TODO*' if %$detail{?todo};
+    if (!%$detail{?compare}) {
         if (!$diag) {
-            print $TESTERR "# Failed test $ntest in %$detail{context}\n";
+            print $TESTERR "# Failed test $ntest in %$detail{?context}\n";
         } else {
-            print $TESTERR "# Failed test $ntest in %$detail{context}: $diag\n";
+            print $TESTERR "# Failed test $ntest in %$detail{?context}: $diag\n";
         }
     } else {
         my $prefix = "Test $ntest";
 
         print $TESTERR "# $prefix got: " . _quote($result) .
-                       " (%$detail{context})\n";
+                       " (%$detail{?context})\n";
         $prefix = ' ' x (length($prefix) - 5);
-        my $expected_quoted = (defined %$detail{regex})
-         ??  'qr{'.(%$detail{regex}).'}'  !!  _quote($expected);
+        my $expected_quoted = (defined %$detail{?regex})
+         ??  'qr{'.(%$detail{?regex}).'}'  !!  _quote($expected);
 
         print $TESTERR "# $prefix Expected: $expected_quoted",
            $diag ?? " ($diag)" !! (), "\n";
@@ -444,13 +444,13 @@ sub _complain {
           if defined($expected) and 2 +< ($expected =~ m/(\n)/g);
     }
 
-    if(defined %Program_Lines{ %$detail{file} }->[ %$detail{line} ]) {
+    if(defined %Program_Lines{ %$detail{?file} }->[ %$detail{?line} ]) {
         print $TESTERR
-          "#  %$detail{file} line %$detail{line} is: %Program_Lines{ %$detail{file} }->[ %$detail{line} ]\n"
-         if %Program_Lines{ %$detail{file} }->[ %$detail{line} ]
+          "#  %$detail{?file} line %$detail{?line} is: %Program_Lines{ %$detail{?file} }->[ %$detail{?line} ]\n"
+         if %Program_Lines{ %$detail{?file} }->[ %$detail{?line} ]
           =~ m/[^\s\#\(\)\{\}\[\]\;]/;  # Otherwise it's uninformative
 
-        undef %Program_Lines{ %$detail{file} }->[ %$detail{line} ];
+        undef %Program_Lines{ %$detail{?file} }->[ %$detail{?line} ];
          # So we won't repeat it.
     }
 
@@ -462,7 +462,7 @@ sub _complain {
 
 sub _diff_complain {
     my($result, $expected, $detail, $prefix) = < @_;
-    return _diff_complain_external(< @_) if %ENV{PERL_TEST_DIFF};
+    return _diff_complain_external(< @_) if %ENV{?PERL_TEST_DIFF};
     return _diff_complain_algdiff(< @_)
      if try { require Algorithm::Diff; Algorithm::Diff->VERSION(1.15); 1; };
 
@@ -479,7 +479,7 @@ EOT
 
 sub _diff_complain_external {
     my($result, $expected, $detail, $prefix) = < @_;
-    my $diff = %ENV{PERL_TEST_DIFF} || die "WHAAAA?";
+    my $diff = %ENV{?PERL_TEST_DIFF} || die "WHAAAA?";
 
     require File::Temp;
     my($got_fh, $got_filename) = < File::Temp::tempfile("test-got-XXXXX");

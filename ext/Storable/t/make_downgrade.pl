@@ -96,9 +96,9 @@ while (my ($key, $val) = each %uhash) {
   # to say "promote back to utf8"
   # Whereas scalars are stored as is.
   utf8::encode ($key) if ord $key +> 256;
-  %pre58{$key} = $val;
+  %pre58{+$key} = $val;
   utf8::encode ($val) unless $val eq "ch\xe5teau";
-  %pre56{$key} = $val;
+  %pre56{+$key} = $val;
 
 }
 uuencode_it (\%pre56, "Hash with utf8 keys for pre 5.6");

@@ -8,7 +8,7 @@ print "1..27\n";
 
 # catch "used once" warnings
 my @warns;
-BEGIN { $^WARN_HOOK = sub { push @warns, @_[0]->{description} }; $^W = 1 };
+BEGIN { $^WARN_HOOK = sub { push @warns, @_[0]->{?description} }; $^W = 1 };
 
 %main::x = %( () );
 $main::y = 3;
@@ -49,16 +49,16 @@ print "$($e)ok 13\n";
 
 eval q{use vars q(!abc);};
 print "ok 14\n";
-$e = $@->{description} !~ m/^'!abc' is not a valid variable name/ && 'not ';
+$e = $@->{?description} !~ m/^'!abc' is not a valid variable name/ && 'not ';
 print "$($e)ok 15\n";
 
 eval 'use vars q($x[3])';
-$e = $@->{description} !~ m/^Can't declare individual elements of hash or array/ && 'not ';
+$e = $@->{?description} !~ m/^Can't declare individual elements of hash or array/ && 'not ';
 print "$($e)ok 16\n";
 
 do { local $^W;
   eval 'use vars q($!)';
-  $e = $@->{description} !~ m/^'\$!' is not a valid variable name/ && 'not ';
+  $e = $@->{?description} !~ m/^'\$!' is not a valid variable name/ && 'not ';
   print "$($e)ok 17\n";
 };;
 
@@ -74,7 +74,7 @@ print "ok 21\n";
 print "ok 22\n";
 print "ok 23\n";
 eval '$u = 3; @v = (); %w = ()';
-my @errs = split m/\n/, $@->{description};
+my @errs = split m/\n/, $@->{?description};
 $e = (nelems @errs) != 3 && 'not ';
 print "$($e)ok 24\n";
 $e = !(grep(m/^Global symbol "\$u" requires explicit package name/, @errs))

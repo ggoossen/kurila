@@ -82,7 +82,7 @@ sub which_perl {
         # When building in the core, *don't* go off and find
         # another perl
         die "Can't find a perl to use (\$^X=$^X), (\$perlpath=$perlpath)" 
-          if %ENV{PERL_CORE};
+          if %ENV{?PERL_CORE};
 
         foreach my $path ( 'File::Spec'->path) {
             $perlpath = 'File::Spec'->catfile($path, $perl);
@@ -101,23 +101,23 @@ Sets up environment variables so perl can find its libraries.
 
 =cut
 
-my $old5lib = %ENV{PERL5LIB};
+my $old5lib = %ENV{?PERL5LIB};
 my $had5lib = exists %ENV{PERL5LIB};
 sub perl_lib {
                                # perl-src/t/
-    my $lib =  %ENV{PERL_CORE} ?? qq{../lib}
+    my $lib =  %ENV{?PERL_CORE} ?? qq{../lib}
                                # ExtUtils-MakeMaker/t/
                                !! qq{../blib/lib};
     $lib = 'File::Spec'->rel2abs($lib);
     my @libs = @($lib);
-    push @libs, %ENV{PERL5LIB} if exists %ENV{PERL5LIB};
-    %ENV{PERL5LIB} = join(config_value("path_sep"), @libs);
+    push @libs, %ENV{?PERL5LIB} if exists %ENV{PERL5LIB};
+    %ENV{+PERL5LIB} = join(config_value("path_sep"), @libs);
     unshift @INC, $lib;
 }
 
 END { 
     if( $had5lib ) {
-        %ENV{PERL5LIB} = $old5lib;
+        %ENV{+PERL5LIB} = $old5lib;
     }
     else {
         delete %ENV{PERL5LIB};
@@ -162,7 +162,7 @@ Returns a good guess at the make to run.
 
 sub make {
     my $make = config_value("make");
-    $make = %ENV{MAKE} if exists %ENV{MAKE};
+    $make = %ENV{?MAKE} if exists %ENV{MAKE};
 
     return $make;
 }

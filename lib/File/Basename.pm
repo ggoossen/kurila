@@ -290,7 +290,7 @@ sub dirname {
     my($basename, $dirname) = < fileparse($path);
 
     if ($type eq 'VMS') { 
-        $dirname ||= %ENV{DEFAULT};
+        $dirname ||= %ENV{?DEFAULT};
     }
     elsif ($type eq 'MacOS') {
 	if( !length($basename) && $dirname !~ m/^[^:]+:\z/) {

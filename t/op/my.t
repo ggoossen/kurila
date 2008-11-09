@@ -31,16 +31,16 @@ sub foo2 {
     my($a, < @b) = < @_;
     my(@c, %d);
     @c = @( "ok 13\n" );
-    %d{''} = "ok 14\n";
+    %d{+''} = "ok 14\n";
     do { my($a,< @c) = ("ok 19\n", "ok 20\n"); ($x, $y) = ($a, < @c); };
     print $a, < @b;
-    @c[0] . %d{''};
+    @c[0] . %d{?''};
 }
 
 $a = "ok 15\n";
 @b = @( "ok 16\n" );
 @c = @( "ok 17\n" );
-%d{''} = "ok 18\n";
+%d{+''} = "ok 18\n";
 
 print &foo2("ok 11\n","ok 12\n");
 
@@ -87,7 +87,7 @@ my %fonts = %( < qw(nok 31) );
 for my $full (keys %fonts) {
     $full =~ s/^n//;
     # Supposed to be copy-on-write via force_normal after a THINKFIRST check.
-    print "$full %fonts{nok}\n";
+    print "$full %fonts{?nok}\n";
 }
 
 #  [perl #29340] optimising away the = () left the padav returning the
@@ -104,9 +104,9 @@ print "ok 33\n";
 
 
 sub foo3 {
-    ++my $x->{foo};
-    print "not " if defined $x->{bar};
-    ++$x->{bar};
+    ++my $x->{+foo};
+    print "not " if defined $x->{?bar};
+    ++$x->{+bar};
 }
 try { foo3(); foo3(); };
 print "not " if $@;

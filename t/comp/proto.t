@@ -226,13 +226,13 @@ testing \&a_hash_ref, '\%';
 
 sub a_hash_ref (\%) {
     print "# \@_ = (",join(",", map {dump::view($_)} @_),")\n";
-    ok( ref(@_[0]) && @_[0]->{'a'} );
-    @_[0]->{'b'} = 2;
+    ok( ref(@_[0]) && @_[0]->{?'a'} );
+    @_[0]->{+'b'} = 2;
 }
 
 %hash = %( a => 1);
 a_hash_ref %hash;
-ok( %hash{'b'} == 2 );
+ok( %hash{?'b'} == 2 );
 
 ##
 ##

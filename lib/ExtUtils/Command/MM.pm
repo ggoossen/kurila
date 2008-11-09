@@ -107,8 +107,8 @@ sub pod2man {
     return 0 unless (nelems @ARGV);
 
     # Official sets --center, but don't override things explicitly set.
-    if (%options{official} && !defined %options{center}) {
-        %options{center} = q[Perl Programmer's Reference Guide];
+    if (%options{?official} && !defined %options{?center}) {
+        %options{+center} = q[Perl Programmer's Reference Guide];
     }
 
     # This isn't a valid Pod::Man option and is only accepted for backwards
@@ -128,9 +128,9 @@ sub pod2man {
         $parser->parse_from_file($pod, $man)
           or do { warn("Could not install $man\n");  next };
 
-        if (length %options{perm_rw}) {
-            chmod(oct(%options{perm_rw}), $man)
-              or do { warn("chmod %options{perm_rw} $man: $!\n"); next };
+        if (length %options{?perm_rw}) {
+            chmod(oct(%options{?perm_rw}), $man)
+              or do { warn("chmod %options{?perm_rw} $man: $!\n"); next };
         }
     } while (nelems @ARGV);
 

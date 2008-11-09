@@ -98,12 +98,12 @@ sub SWASHNEW_real {
 		$enum =~ s/[ _-]//g;
 		$val =~ s/[ _-]//g;
 
-		my $pa = %PropertyAlias{$enum} ?? $enum !! %PA_reverse{$enum};
-		my $f = %PropValueAlias{$pa}->{$val} ?? $val !! %PVA_reverse{$pa}->{lc $val};
+		my $pa = %PropertyAlias{?$enum} ?? $enum !! %PA_reverse{?$enum};
+		my $f = %PropValueAlias{$pa}->{?$val} ?? $val !! %PVA_reverse{$pa}->{?lc $val};
 
 		if ($pa and $f) {
 		    $pa = "gc_sc" if $pa eq "gc" or $pa eq "sc";
-		    $file = "unicore/lib/$pa/%PVA_abbr_map{$pa}->{lc $f}.pl";
+		    $file = "unicore/lib/$pa/%PVA_abbr_map{$pa}->{?lc $f}.pl";
 		    last GETFILE;
 		}
 	    }
@@ -111,8 +111,8 @@ sub SWASHNEW_real {
 		my $t = lc $type;
 		$t =~ s/[ _-]//g;
 
-		if (%PropValueAlias{gc}->{$t} or %PropValueAlias{sc}->{$t}) {
-		    $file = "unicore/lib/gc_sc/%PVA_abbr_map{gc_sc}->{$t}.pl";
+		if (%PropValueAlias{gc}->{?$t} or %PropValueAlias{sc}->{?$t}) {
+		    $file = "unicore/lib/gc_sc/%PVA_abbr_map{gc_sc}->{?$t}.pl";
 		    last GETFILE;
 		}
 	    }
@@ -121,7 +121,7 @@ sub SWASHNEW_real {
             ## See if it's in the direct mapping table.
             ##
             require "unicore/Exact.pl";
-            if (my $base = %utf8::Exact{$type}) {
+            if (my $base = %utf8::Exact{?$type}) {
                 $file = "unicore/lib/gc_sc/$base.pl";
                 last GETFILE;
             }
@@ -136,7 +136,7 @@ sub SWASHNEW_real {
 
             require "unicore/Canonical.pl";
 	    do { no warnings "uninitialized";
-            if (my $base = (%utf8::Canonical{$canonical} || %utf8::Canonical{ lc %utf8::PropertyAlias{$canonical} })) {
+            if (my $base = (%utf8::Canonical{?$canonical} || %utf8::Canonical{?lc %utf8::PropertyAlias{?$canonical} })) {
                 $file = "unicore/lib/gc_sc/$base.pl";
                 last GETFILE;
             }
@@ -187,7 +187,7 @@ sub SWASHNEW_real {
 	    ## If we have, return the cached results. The cache key is the
 	    ## class and file to load.
 	    ##
-	    my $found = %Cache{$class . "," . $file};
+	    my $found = %Cache{?$class . "," . $file};
 	    if ($found and ref($found) eq $class) {
 		print STDERR "Returning cached '$file' for \\p\{$type\}\n" if DEBUG;
 		return $found;
@@ -211,7 +211,7 @@ sub SWASHNEW_real {
 	$list = join '', map  { $_->[1] }
 	    sort { $a->[0] <+> $b->[0] }
  map  { m/^([0-9a-fA-F]+)/; \@( CORE::hex($1), $_ ) }
- grep { m/^([0-9a-fA-F]+)/ and not %seen{$1}++ } @tmp; # XXX doesn't do ranges right
+ grep { m/^([0-9a-fA-F]+)/ and not %seen{+$1}++ } @tmp; # XXX doesn't do ranges right
     }
 
     if ($none) {
@@ -255,7 +255,7 @@ sub SWASHNEW_real {
 		}
 		return $subobj unless ref $subobj;
 		push @extras, $name => $subobj;
-		$bits = $subobj->{BITS} if $bits +< $subobj->{BITS};
+		$bits = $subobj->{?BITS} if $bits +< $subobj->{?BITS};
 	    }
 	}
     };
@@ -272,7 +272,7 @@ sub SWASHNEW_real {
     ) => $class;
 
     if ($file) {
-        %Cache{$class . "," . $file} = $SWASH;
+        %Cache{+$class . "," . $file} = $SWASH;
     }
 
     return $SWASH;

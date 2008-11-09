@@ -21,22 +21,22 @@ BEGIN {
 }
 do {
     # simulate a pragma -- don't forget HINT_LOCALIZE_HH
-    BEGIN { $^H ^|^= 0x04020000; %^H{foo} = "a"; }
+    BEGIN { $^H ^|^= 0x04020000; %^H{+foo} = "a"; }
     BEGIN {
-	print "not " if %^H{foo} ne "a";
+	print "not " if %^H{?foo} ne "a";
 	print "ok 3 - \$^H\{foo\} is now 'a'\n";
 	print "not " unless $^H ^&^ 0x00020000;
 	print "ok 4 - \$^H contains HINT_LOCALIZE_HH while compiling\n";
     }
     do {
-	BEGIN { $^H ^|^= 0x00020000; %^H{foo} = "b"; }
+	BEGIN { $^H ^|^= 0x00020000; %^H{+foo} = "b"; }
 	BEGIN {
-	    print "not " if %^H{foo} ne "b";
+	    print "not " if %^H{?foo} ne "b";
 	    print "ok 5 - \$^H\{foo\} is now 'b'\n";
 	}
     };
     BEGIN {
-	print "not " if %^H{foo} ne "a";
+	print "not " if %^H{?foo} ne "a";
 	print "ok 6 - \$H^\{foo\} restored to 'a'\n";
     }
     # The pragma settings disappear after compilation
@@ -94,7 +94,7 @@ print "ok 15 - double-freeing hints hash\n";
 print "# got: $result\n" if length $result;
 
 do {
-    BEGIN{%^H{x}=1};
+    BEGIN{%^H{+x}=1};
     for(1..2) {
         eval q(
             print %^H{x}==1 && !%^H{y} ?? "ok\n" !! "not ok\n";

@@ -157,8 +157,8 @@ do {
     for my $method ( keys %$Tmpl ) {
         *{Symbol::fetch_glob($method)} = sub {
                         my $self = shift;
-                        $self->{$method} = @_[0] if (nelems @_);
-                        return $self->{$method};
+                        $self->{+$method} = @_[0] if (nelems @_);
+                        return $self->{?$method};
                     }
     }
     
@@ -325,20 +325,20 @@ sub _parse_uri {
 
     ### find the scheme ###
     $uri            =~ s|^(\w+)://||;
-    $href->{scheme} = $1;
+    $href->{+scheme} = $1;
 
     ### See rfc 1738 section 3.10
     ### http://www.faqs.org/rfcs/rfc1738.html
     ### And wikipedia for more on windows file:// urls
     ### http://en.wikipedia.org/wiki/File://
-    if( $href->{scheme} eq 'file' ) {
+    if( $href->{?scheme} eq 'file' ) {
         
         my @parts = split '/',$uri;
 
         ### file://hostname/...
         ### file://hostname/...
         ### normalize file://localhost with file:///
-        $href->{host} = @parts[0] || '';
+        $href->{+host} = @parts[0] || '';
 
         ### index in @parts where the path components begin;
         my $index = 1;  
@@ -346,8 +346,8 @@ sub _parse_uri {
         ### file:////hostname/sharename/blah.txt        
         if ( HAS_SHARE and not length @parts[0] and not length @parts[1] ) {
             
-            $href->{host}   = @parts[2] || '';  # avoid warnings
-            $href->{share}  = @parts[3] || '';  # avoid warnings        
+            $href->{+host}   = @parts[2] || '';  # avoid warnings
+            $href->{+share}  = @parts[3] || '';  # avoid warnings        
 
             $index          = 4         # index after the share
 
@@ -359,16 +359,16 @@ sub _parse_uri {
             ### this code comes from dmq's patch, but:
             ### XXX if volume is empty, wouldn't that be an error? --kane
             ### if so, our file://localhost test needs to be fixed as wel            
-            $href->{vol}    = @parts[1] || '';
+            $href->{+vol}    = @parts[1] || '';
 
             ### correct D| style colume descriptors
-            $href->{vol}    =~ s/\A([A-Z])\|\z/$1:/i if ON_WIN;
+            $href->{+vol}    =~ s/\A([A-Z])\|\z/$1:/i if ON_WIN;
 
             $index          = 2;        # index after the volume
         } 
 
         ### rebuild the path from the leftover parts;
-        $href->{path} = join '/', @( '', splice( @parts, $index, ((nelems @parts)-1) ));
+        $href->{+path} = join '/', @( '', splice( @parts, $index, ((nelems @parts)-1) ));
 
     } else { <
         ### using anything but qw() in hash slices may produce warnings 
@@ -378,14 +378,14 @@ sub _parse_uri {
 
     ### split the path into file + dir ###
     do {   my @parts = File::Spec::Unix->splitpath( delete $href->{path} );
-        $href->{path} = @parts[1];
-        $href->{file} = @parts[2];
+        $href->{+path} = @parts[1];
+        $href->{+file} = @parts[2];
     };
 
     ### host will be empty if the target was 'localhost' and the 
     ### scheme was 'file'
-    $href->{host} = '' if   ($href->{host}      eq 'localhost') and
-                            ($href->{scheme}    eq 'file');
+    $href->{+host} = '' if   ($href->{?host}      eq 'localhost') and
+                            ($href->{?scheme}    eq 'file');
 
     return $href;
 }
@@ -419,7 +419,7 @@ sub fetch {
     }
 
     ### set passive ftp if required ###
-    local %ENV{FTP_PASSIVE} = $FTP_PASSIVE;
+    local %ENV{+FTP_PASSIVE} = $FTP_PASSIVE;
 
     ### we dont use catfile on win32 because if we are using a cygwin tool
     ### under cmd.exe they wont understand windows style separators.
@@ -439,7 +439,7 @@ sub fetch {
         next if grep { lc $_ eq $method } @$BLACKLIST;
 
         ### method is known to fail ###
-        next if $METHOD_FAIL->{$method};
+        next if $METHOD_FAIL->{?$method};
 
         ### there's serious issues with IPC::Run and quoting of command
         ### line arguments. using quotes in the wrong place breaks things,
@@ -458,7 +458,7 @@ sub fetch {
                      "but it was not created",$method,$file));
 
                 ### mark the failure ###
-                $METHOD_FAIL->{$method} = 1;
+                $METHOD_FAIL->{+$method} = 1;
 
                 next;
 
@@ -533,7 +533,7 @@ sub _lwp_fetch {
         }
 
     } else {
-        $METHOD_FAIL->{'lwp'} = 1;
+        $METHOD_FAIL->{+'lwp'} = 1;
         return;
     }
 }
@@ -587,7 +587,7 @@ sub _netftp_fetch {
         return $target;
 
     } else {
-        $METHOD_FAIL->{'netftp'} = 1;
+        $METHOD_FAIL->{+'netftp'} = 1;
         return;
     }
 }
@@ -638,7 +638,7 @@ sub _wget_fetch {
         return $to;
 
     } else {
-        $METHOD_FAIL->{'wget'} = 1;
+        $METHOD_FAIL->{+'wget'} = 1;
         return;
     }
 }
@@ -660,7 +660,7 @@ sub _ftp_fetch {
 
         my $fh = FileHandle->new;
 
-        local %SIG{CHLD} = 'IGNORE';
+        local %SIG{+CHLD} = 'IGNORE';
 
         unless ($fh->open("|$ftp -n")) {
             return $self->_error( <loc("\%1 creation failed: \%2", $ftp, $!));
@@ -700,7 +700,7 @@ sub _lynx_fetch {
     if( my $lynx = can_run('lynx') ) {
 
         unless( IPC::Cmd->can_capture_buffer ) {
-            $METHOD_FAIL->{'lynx'} = 1;
+            $METHOD_FAIL->{+'lynx'} = 1;
 
             return $self->_error( <loc( 
                 "Can not capture buffers. Can not use '\%1' to fetch files",
@@ -750,7 +750,7 @@ sub _lynx_fetch {
         return $to;
 
     } else {
-        $METHOD_FAIL->{'lynx'} = 1;
+        $METHOD_FAIL->{+'lynx'} = 1;
         return;
     }
 }
@@ -800,7 +800,7 @@ sub _ncftp_fetch {
         return $to;
 
     } else {
-        $METHOD_FAIL->{'ncftp'} = 1;
+        $METHOD_FAIL->{+'ncftp'} = 1;
         return;
     }
 }
@@ -850,7 +850,7 @@ sub _curl_fetch {
         return $to;
 
     } else {
-        $METHOD_FAIL->{'curl'} = 1;
+        $METHOD_FAIL->{+'curl'} = 1;
         return;
     }
 }
@@ -962,7 +962,7 @@ sub _rsync_fetch {
         return $to;
 
     } else {
-        $METHOD_FAIL->{'rsync'} = 1;
+        $METHOD_FAIL->{+'rsync'} = 1;
         return;
     }
 }

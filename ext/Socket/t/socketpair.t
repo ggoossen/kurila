@@ -22,7 +22,7 @@ do {
       $child = fork;
       die "Fork failed" unless defined $child;
       if (!$child) {
-        %SIG{INT} = sub {exit 0}; # You have 60 seconds. Your time starts now.
+        %SIG{+INT} = sub {exit 0}; # You have 60 seconds. Your time starts now.
         my $must_finish_by = time + 60;
         my $remaining;
         while (($remaining = $must_finish_by - time) +> 0) {
@@ -55,12 +55,12 @@ if( ! config_value('d_alarm') ) {
 } else {
   # This should fail but not die if there is real socketpair
   try {socketpair LEFT, 'RIGHT', -1, -1, -1};
-  if ($@ && $@->{description} =~ m/^Unsupported socket function "socketpair" called/ ||
+  if ($@ && $@->{?description} =~ m/^Unsupported socket function "socketpair" called/ ||
       $! =~ m/^The operation requested is not supported./) { # Stratus VOS
     plan skip_all => 'No socketpair (real or emulated)';
   } else {
     try {AF_UNIX};
-    if ($@ && $@->{description} =~ m/^Your vendor has not defined Socket macro AF_UNIX/) {
+    if ($@ && $@->{?description} =~ m/^Your vendor has not defined Socket macro AF_UNIX/) {
       plan skip_all => 'No AF_UNIX';
     } else {
       plan tests => 45;
@@ -69,7 +69,7 @@ if( ! config_value('d_alarm') ) {
 }
 
 # But we'll install an alarm handler in case any of the races below fail.
-%SIG{ALRM} = sub {die "Unexpected alarm during testing"};
+%SIG{+ALRM} = sub {die "Unexpected alarm during testing"};
 
 ok (socketpair (LEFT, 'RIGHT', AF_UNIX, SOCK_STREAM, PF_UNSPEC),
     "socketpair (LEFT, RIGHT, AF_UNIX, SOCK_STREAM, PF_UNSPEC)")
@@ -108,7 +108,7 @@ ok (shutdown(LEFT, SHUT_WR), "shutdown left for writing");
 # Calls. Hence the child process minder.
 SKIP: do {
   skip "SCO Unixware / OSR have a bug with shutdown",2 if $^O =~ m/^(?:svr|sco)/;
-  local %SIG{ALRM} = sub { warn "EOF on right took over 3 seconds" };
+  local %SIG{+ALRM} = sub { warn "EOF on right took over 3 seconds" };
   local $TODO = "Known problems with unix sockets on $^O"
       if $^O eq 'hpux'   || $^O eq 'super-ux';
   alarm 3;
@@ -121,9 +121,9 @@ SKIP: do {
 };
 
 my $err = $!;
-%SIG{PIPE} = 'IGNORE';
+%SIG{+PIPE} = 'IGNORE';
 do {
-  local %SIG{ALRM}
+  local %SIG{+ALRM}
     = sub { warn "syswrite to left didn't fail within 3 seconds" };
   alarm 3;
   # Split the system call from the is() - is() does IO so
@@ -137,7 +137,7 @@ do {
   # This may need skipping on some OSes - restoring value saved above
   # should help
   $! = $err;
-  ok ((%!{EPIPE} or %!{ESHUTDOWN}), '$! should be EPIPE or ESHUTDOWN')
+  ok ((%!{?EPIPE} or %!{?ESHUTDOWN}), '$! should be EPIPE or ESHUTDOWN')
     or printf "\$\!=\%d(\%s)\n", $err, $err;
 };
 
@@ -207,7 +207,7 @@ SKIP: do {
   skip "$^O does length 0 udp reads", 2 if ($^O eq 'os390');
 
   my $alarmed = 0;
-  local %SIG{ALRM} = sub { $alarmed = 1; };
+  local %SIG{+ALRM} = sub { $alarmed = 1; };
   print "# Approximate forever as 3 seconds. Wait 'forever'...\n";
   alarm 3;
   undef $buffer;

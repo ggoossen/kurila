@@ -23,10 +23,10 @@ my $TAINT = substr($^X, 0, 0);
 my $file = 'TEST';
 
 try { mkfifo($TAINT. $file, 0) };
-like($@->{description}, qr/^Insecure dependency/,              'mkfifo with tainted data');
+like($@->{?description}, qr/^Insecure dependency/,              'mkfifo with tainted data');
 
 try { $testfd = open($TAINT. $file, O_WRONLY, 0) };
-like($@->{description}, qr/^Insecure dependency/,              'open with tainted data');
+like($@->{?description}, qr/^Insecure dependency/,              'open with tainted data');
 
 try { $testfd = open($file, O_RDONLY, 0) };
 is($@, "",                                  'open with untainted data');

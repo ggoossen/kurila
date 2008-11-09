@@ -19,7 +19,7 @@ BEGIN {
 # these tests are run as part of Perl core.
 sub source_path {
     my $file = shift;
-    if (%ENV{PERL_CORE}) {
+    if (%ENV{?PERL_CORE}) {
         require File::Spec;
         my $updir = File::Spec->updir;
         my $dir = File::Spec->catdir ($updir, 'lib', 'Pod', 'Simple', 't', 'corpus');

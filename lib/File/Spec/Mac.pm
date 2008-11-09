@@ -432,7 +432,7 @@ sub path {
 #  Under MPW, it has a meaning.
 #
     return unless exists %ENV{Commands};
-    returnsplit(m/,/, %ENV{Commands});
+    returnsplit(m/,/, %ENV{?Commands});
 }
 
 =item splitpath

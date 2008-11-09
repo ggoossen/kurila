@@ -13,17 +13,17 @@ sub Mksymlists {
     my($osname) = $^O;
 
     croak("Insufficient information specified to Mksymlists")
-        unless ( %spec{NAME} or
-                 (%spec{FILE} and (%spec{DL_FUNCS} or %spec{FUNCLIST})) );
+        unless ( %spec{?NAME} or
+                 (%spec{?FILE} and (%spec{?DL_FUNCS} or %spec{?FUNCLIST})) );
 
-    %spec{DL_VARS} = \@() unless %spec{DL_VARS};
-    (%spec{FILE} = %spec{NAME}) =~ s/.*::// unless %spec{FILE};
-    %spec{FUNCLIST} = \@() unless %spec{FUNCLIST};
-    %spec{DL_FUNCS} = \%( %spec{NAME} => \@() )
-        unless ( (%spec{DL_FUNCS} and keys %{%spec{DL_FUNCS}}) or
-                 nelems @{%spec{FUNCLIST}});
-    if (defined %spec{DL_FUNCS}) {
-        foreach my $package (keys %{%spec{DL_FUNCS}}) {
+    %spec{+DL_VARS} = \@() unless %spec{?DL_VARS};
+    (%spec{+FILE} = %spec{?NAME}) =~ s/.*::// unless %spec{?FILE};
+    %spec{+FUNCLIST} = \@() unless %spec{?FUNCLIST};
+    %spec{+DL_FUNCS} = \%( %spec{?NAME} => \@() )
+        unless ( (%spec{?DL_FUNCS} and keys %{%spec{?DL_FUNCS}}) or
+                 nelems @{%spec{?FUNCLIST}});
+    if (defined %spec{?DL_FUNCS}) {
+        foreach my $package (keys %{%spec{?DL_FUNCS}}) {
             my($packprefix,$bootseen);
             ($packprefix = $package) =~ s/\W/_/g;
             foreach my $sym ( @{%spec{DL_FUNCS}->{$package}}) {
@@ -42,8 +42,8 @@ sub Mksymlists {
 #    We'll need this if we ever add any OS which uses mod2fname
 #    not as pseudo-builtin.
 #    require DynaLoader;
-    if (defined &DynaLoader::mod2fname and not %spec{DLBASE}) {
-        %spec{DLBASE} = DynaLoader::mod2fname(\ split(m/::/,%spec{NAME}));
+    if (defined &DynaLoader::mod2fname and not %spec{?DLBASE}) {
+        %spec{+DLBASE} = DynaLoader::mod2fname(\ split(m/::/,%spec{?NAME}));
     }
 
     if    ($osname eq 'aix') { _write_aix(\%spec); }
@@ -60,12 +60,12 @@ sub Mksymlists {
 sub _write_aix {
     my($data) = < @_;
 
-    rename "$data->{FILE}.exp", "$data->{FILE}.exp_old";
+    rename "$data->{?FILE}.exp", "$data->{?FILE}.exp_old";
 
-    open( my $exp, ">", "$data->{FILE}.exp")
-        or croak("Can't create $data->{FILE}.exp: $!\n");
-    print $exp join("\n", @(< @{$data->{DL_VARS}}, "\n")) if (nelems @{$data->{DL_VARS}});
-    print $exp join("\n", @(< @{$data->{FUNCLIST}}, "\n")) if (nelems @{$data->{FUNCLIST}});
+    open( my $exp, ">", "$data->{?FILE}.exp")
+        or croak("Can't create $data->{?FILE}.exp: $!\n");
+    print $exp join("\n", @(< @{$data->{?DL_VARS}}, "\n")) if (nelems @{$data->{?DL_VARS}});
+    print $exp join("\n", @(< @{$data->{?FUNCLIST}}, "\n")) if (nelems @{$data->{?FUNCLIST}});
     close $exp;
 }
 
@@ -75,34 +75,34 @@ sub _write_os2 {
     require Config;
     my $threaded = "";
 
-    if (not $data->{DLBASE}) {
-        ($data->{DLBASE} = $data->{NAME}) =~ s/.*:://;
-        $data->{DLBASE} = substr($data->{DLBASE},0,7) . '_';
+    if (not $data->{?DLBASE}) {
+        ($data->{+DLBASE} = $data->{?NAME}) =~ s/.*:://;
+        $data->{+DLBASE} = substr($data->{?DLBASE},0,7) . '_';
     }
-    my $distname = $data->{DISTNAME} || $data->{NAME};
+    my $distname = $data->{?DISTNAME} || $data->{?NAME};
     $distname = "Distribution $distname";
     my $patchlevel = " pl$(config_value('perl_patchlevel'))" || '';
     my $comment = sprintf "Perl (v\%s\%s\%s) module \%s", 
-      Config::config_value("version"), $threaded, $patchlevel, $data->{NAME};
+      Config::config_value("version"), $threaded, $patchlevel, $data->{?NAME};
     chomp $comment;
-    if ($data->{INSTALLDIRS} and $data->{INSTALLDIRS} eq 'perl') {
+    if ($data->{?INSTALLDIRS} and $data->{?INSTALLDIRS} eq 'perl') {
         $distname = 'perl5-porters@perl.org';
         $comment = "Core $comment";
     }
     $comment = "$comment (Perl-config: $(config_value('config_args')))";
     $comment = substr($comment, 0, 200) . "...)" if length $comment +> 203;
-    rename "$data->{FILE}.def", "$data->{FILE}_def.old";
+    rename "$data->{?FILE}.def", "$data->{?FILE}_def.old";
 
-    open(my $def, ">", "$data->{FILE}.def")
-        or croak("Can't create $data->{FILE}.def: $!\n");
-    print $def "LIBRARY '$data->{DLBASE}' INITINSTANCE TERMINSTANCE\n";
-    print $def "DESCRIPTION '\@#$distname:$data->{VERSION}#\@ $comment'\n";
+    open(my $def, ">", "$data->{?FILE}.def")
+        or croak("Can't create $data->{?FILE}.def: $!\n");
+    print $def "LIBRARY '$data->{?DLBASE}' INITINSTANCE TERMINSTANCE\n";
+    print $def "DESCRIPTION '\@#$distname:$data->{?VERSION}#\@ $comment'\n";
     print $def "CODE LOADONCALL\n";
     print $def "DATA LOADONCALL NONSHARED MULTIPLE\n";
     print $def "EXPORTS\n  ";
-    print $def join("\n  ", @(< @{$data->{DL_VARS}}, "\n")) if (nelems @{$data->{DL_VARS}});
-    print $def join("\n  ", @(< @{$data->{FUNCLIST}}, "\n")) if (nelems @{$data->{FUNCLIST}});
-    if (%{$data->{IMPORTS}}) {
+    print $def join("\n  ", @(< @{$data->{?DL_VARS}}, "\n")) if (nelems @{$data->{?DL_VARS}});
+    print $def join("\n  ", @(< @{$data->{?FUNCLIST}}, "\n")) if (nelems @{$data->{?FUNCLIST}});
+    if (%{$data->{?IMPORTS}}) {
         print $def "IMPORTS\n";
         my ($name, $exp);
         while (($name, $exp)= each %{$data->{IMPORTS}}) {
@@ -116,17 +116,17 @@ sub _write_win32 {
     my($data) = < @_;
 
     require Config;
-    if (not $data->{DLBASE}) {
-        ($data->{DLBASE} = $data->{NAME}) =~ s/.*:://;
-        $data->{DLBASE} = substr($data->{DLBASE},0,7) . '_';
+    if (not $data->{?DLBASE}) {
+        ($data->{+DLBASE} = $data->{?NAME}) =~ s/.*:://;
+        $data->{+DLBASE} = substr($data->{?DLBASE},0,7) . '_';
     }
-    rename "$data->{FILE}.def", "$data->{FILE}_def.old";
+    rename "$data->{?FILE}.def", "$data->{?FILE}_def.old";
 
-    open( my $def, ">", "$data->{FILE}.def" )
-        or croak("Can't create $data->{FILE}.def: $!\n");
+    open( my $def, ">", "$data->{?FILE}.def" )
+        or croak("Can't create $data->{?FILE}.def: $!\n");
     # put library name in quotes (it could be a keyword, like 'Alias')
     if (Config::config_value('cc') !~ m/^gcc/i) {
-        print $def "LIBRARY \"$data->{DLBASE}\"\n";
+        print $def "LIBRARY \"$data->{?DLBASE}\"\n";
     }
     print $def "EXPORTS\n  ";
     my @syms;
@@ -146,7 +146,7 @@ sub _write_win32 {
         }
     }
     print $def join("\n  ", @(< @syms, "\n")) if (nelems @syms);
-    if (%{$data->{IMPORTS}}) {
+    if (%{$data->{?IMPORTS}}) {
         print $def "IMPORTS\n";
         my ($name, $exp);
         while (($name, $exp)= each %{$data->{IMPORTS}}) {
@@ -166,10 +166,10 @@ sub _write_vms {
     my($isvax) = Config::config_value('archname') =~ m/VAX/i;
     my($set) = < ExtUtils::XSSymSet->new;
 
-    rename "$data->{FILE}.opt", "$data->{FILE}.opt_old";
+    rename "$data->{?FILE}.opt", "$data->{?FILE}.opt_old";
 
-    open(my $opt,">", "$data->{FILE}.opt")
-        or croak("Can't create $data->{FILE}.opt: $!\n");
+    open(my $opt,">", "$data->{?FILE}.opt")
+        or croak("Can't create $data->{?FILE}.opt: $!\n");
 
     # Options file declaring universal symbols
     # Used when linking shareable image for dynamic extension,

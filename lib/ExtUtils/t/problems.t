@@ -28,12 +28,12 @@ do {
     open *STDOUT, '>>', \$stdout or die "$!";
 
     my $warning = '';
-    local $^WARN_HOOK = sub { $warning = @_[0]->{description} };
+    local $^WARN_HOOK = sub { $warning = @_[0]->{?description} };
     try { $MM->eval_in_subdirs; };
 
     is( $stdout, qq{\@INC has .\n}, 'cwd in @INC' );
     $stdout = '';
-    like( $@->{description}, 
+    like( $@->{?description}, 
           qr{^ERROR from evaluation of .*subdir.*Makefile.PL: YYYAaaaakkk},
           'Makefile.PL death in subdir warns' );
 };

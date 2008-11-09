@@ -131,41 +131,41 @@ umask(0);
 # Check the interface to RECNOINFO
 
 $dbh = DB_File::RECNOINFO->new() ;
-ok(1, ! defined $dbh->{bval}) ;
-ok(2, ! defined $dbh->{cachesize}) ;
-ok(3, ! defined $dbh->{psize}) ;
-ok(4, ! defined $dbh->{flags}) ;
-ok(5, ! defined $dbh->{lorder}) ;
-ok(6, ! defined $dbh->{reclen}) ;
-ok(7, ! defined $dbh->{bfname}) ;
+ok(1, ! defined $dbh->{?bval}) ;
+ok(2, ! defined $dbh->{?cachesize}) ;
+ok(3, ! defined $dbh->{?psize}) ;
+ok(4, ! defined $dbh->{?flags}) ;
+ok(5, ! defined $dbh->{?lorder}) ;
+ok(6, ! defined $dbh->{?reclen}) ;
+ok(7, ! defined $dbh->{?bfname}) ;
 
-$dbh->{bval} = 3000 ;
-ok(8, $dbh->{bval} == 3000 );
+$dbh->{+bval} = 3000 ;
+ok(8, $dbh->{?bval} == 3000 );
 
-$dbh->{cachesize} = 9000 ;
-ok(9, $dbh->{cachesize} == 9000 );
+$dbh->{+cachesize} = 9000 ;
+ok(9, $dbh->{?cachesize} == 9000 );
 
-$dbh->{psize} = 400 ;
-ok(10, $dbh->{psize} == 400 );
+$dbh->{+psize} = 400 ;
+ok(10, $dbh->{?psize} == 400 );
 
-$dbh->{flags} = 65 ;
-ok(11, $dbh->{flags} == 65 );
+$dbh->{+flags} = 65 ;
+ok(11, $dbh->{?flags} == 65 );
 
-$dbh->{lorder} = 123 ;
-ok(12, $dbh->{lorder} == 123 );
+$dbh->{+lorder} = 123 ;
+ok(12, $dbh->{?lorder} == 123 );
 
-$dbh->{reclen} = 1234 ;
-ok(13, $dbh->{reclen} == 1234 );
+$dbh->{+reclen} = 1234 ;
+ok(13, $dbh->{?reclen} == 1234 );
 
-$dbh->{bfname} = 1234 ;
-ok(14, $dbh->{bfname} == 1234 );
+$dbh->{+bfname} = 1234 ;
+ok(14, $dbh->{?bfname} == 1234 );
 
 
 # Check that an invalid entry is caught both for store & fetch
 eval '$dbh->{fred} = 1234' ;
-ok(15, $@->{description} =~ m/^DB_File::RECNOINFO::STORE - Unknown element 'fred' at/ );
+ok(15, $@->{?description} =~ m/^DB_File::RECNOINFO::STORE - Unknown element 'fred' at/ );
 eval 'my $q = $dbh->{fred}' ;
-ok(16, $@->{description} =~ m/^DB_File::RECNOINFO::FETCH - Unknown element 'fred' at/ );
+ok(16, $@->{?description} =~ m/^DB_File::RECNOINFO::FETCH - Unknown element 'fred' at/ );
 
 # Now check the interface to RECNOINFO
 

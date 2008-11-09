@@ -40,8 +40,8 @@ do {
     is(dirname('arma:virumque.cano'), 'arma:');
 
     do {
-        local %ENV{DEFAULT} = '' unless exists %ENV{DEFAULT};
-        is(dirname('virumque.cano'), %ENV{DEFAULT});
+        local %ENV{+DEFAULT} = '' unless exists %ENV{DEFAULT};
+        is(dirname('virumque.cano'), %ENV{?DEFAULT});
         is(dirname('arma/'), '.');
     };
 };

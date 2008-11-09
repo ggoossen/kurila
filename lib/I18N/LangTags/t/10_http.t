@@ -69,12 +69,12 @@ foreach my $in ( @in) {
   foreach my $modus (@(
     sub {
       print "# Testing with arg...\n";
-      %ENV{'HTTP_ACCEPT_LANGUAGE'} = 'PLORK';
+      %ENV{+'HTTP_ACCEPT_LANGUAGE'} = 'PLORK';
       return @(@_[0]);
     },
     sub {
       print "# Testing wath HTTP_ACCEPT_LANGUAGE...\n";
-      %ENV{'HTTP_ACCEPT_LANGUAGE'} = @_[0];
+      %ENV{+'HTTP_ACCEPT_LANGUAGE'} = @_[0];
      return();
     },)
   ) {

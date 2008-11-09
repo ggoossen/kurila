@@ -2,7 +2,7 @@
 
 use File::Path;
 use File::Spec;
-require(%ENV{PERL_CORE} ?? "./test.pl" !! "./t/test.pl");
+require(%ENV{?PERL_CORE} ?? "./test.pl" !! "./t/test.pl");
 plan(tests => 17);
 
 do {
@@ -25,7 +25,7 @@ my @default = map { "IO/$_.pm" } qw( Handle Seekable File Socket Dir );
 delete %INC{[@default ]};
 
 my $warn = '' ;
-local $^WARN_HOOK = sub { $warn = @_[0]->{description} } ;
+local $^WARN_HOOK = sub { $warn = @_[0]->{?description} } ;
 
 do {
     no warnings ;
@@ -71,7 +71,7 @@ foreach my $default ( @default)
 }
 
 try { IO->import( 'nothere' ) };
-like( $@->{description}, qr/Can.t locate IO.nothere\.pm/, '... croaking on any error' );
+like( $@->{?description}, qr/Can.t locate IO.nothere\.pm/, '... croaking on any error' );
 
 my $fakedir = File::Spec->catdir( 'lib', 'IO' );
 my $fakemod = File::Spec->catfile( $fakedir, 'fakemod.pm' );

@@ -1,5 +1,5 @@
 BEGIN {
-    if(%ENV{PERL_CORE}) {
+    if(%ENV{?PERL_CORE}) {
         chdir 't';
         @INC = @( '../lib' );
     }
@@ -29,7 +29,7 @@ print "# CWD: $cwd\n";
 
 sub source_path {
     my $file = shift;
-    if (%ENV{PERL_CORE}) {
+    if (%ENV{?PERL_CORE}) {
         my $updir = File::Spec->updir;
         my $dir = File::Spec->catdir($updir, 'lib', 'Pod', 'Simple', 't');
         return File::Spec->catdir ($dir, $file);
@@ -80,7 +80,7 @@ skip $^O eq 'VMS' ?? '-- case may or may not be preserved' !! 0,
      "Blorm|Suzzle|Zonk::Pronk|hinkhonk::Glunk|hinkhonk::Vliff|perlflif|perlthng|perlzuk|squaa|squaa::Glunk|squaa::Vliff|squaa::Wowo|zikzik";
 };
 
-ok( ($name2where->{'squaa'} || 'huh???'), '/squaa\.pm$/');
+ok( ($name2where->{?'squaa'} || 'huh???'), '/squaa\.pm$/');
 
 ok nelems(grep( m/squaa\.pm/, keys %$where2name) ), 1;
 

@@ -68,7 +68,7 @@ sub xsinit {
     }
 
     push(@mods, < static_ext()) if defined $std;
-    @mods = grep(!%seen{$_}++, @mods);
+    @mods = grep(!%seen{+$_}++, @mods);
 
     print $fh < &xsi_header();
     print $fh "EXTERN_C void xs_init ($xsinit_proto);\n\n";     
@@ -98,7 +98,7 @@ sub xsi_protos {
         ($mname = $pname) =~ s!/!::!g;
         ($cname = $pname) =~ s!/!__!g;
 	my($ccode) = "EXTERN_C void boot_$($cname) ($boot_proto);\n";
-	next if %seen{$ccode}++;
+	next if %seen{+$ccode}++;
         push(@retval, $ccode);
     }
     return join '', @retval;
@@ -121,10 +121,10 @@ sub xsi_body {
             # Must NOT install 'DynaLoader::boot_DynaLoader' as 'bootstrap'!
             # boot_DynaLoader is called directly in DynaLoader.pm
             $ccode = "\t/* DynaLoader is a special case */\n\tnewXS(\"$($mname)::boot_$($cname)\", boot_$($cname), file);\n";
-            push(@retval, $ccode) unless %seen{$ccode}++;
+            push(@retval, $ccode) unless %seen{+$ccode}++;
         } else {
             $ccode = "\tnewXS(\"$($mname)::bootstrap\", boot_$($cname), file);\n";
-            push(@retval, $ccode) unless %seen{$ccode}++;
+            push(@retval, $ccode) unless %seen{+$ccode}++;
         }
     }
     return join '', @retval;

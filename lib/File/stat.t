@@ -8,7 +8,7 @@ our @stat;
 BEGIN {
     our $hasst;
     try { my @n = @(stat "TEST") };
-    $hasst = 1 unless $@ && $@->{description} =~ m/unimplemented/;
+    $hasst = 1 unless $@ && $@->{?description} =~ m/unimplemented/;
     unless ($hasst) { plan skip_all => "no stat"; exit 0 }
     use Config;
     $hasst = 0 unless config_value('i_sysstat') eq 'define';

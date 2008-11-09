@@ -44,7 +44,7 @@ sub headerpath {
 sub MY::postamble {
     my $headerpath = headerpath();
     my @headers = map { File::Spec->catfile($headerpath, $_) } qw(op.h cop.h);
-    my $noecho = shift->{NOECHO};
+    my $noecho = shift->{?NOECHO};
 
 "
 B\$(OBJ_EXT) : defsubs.h

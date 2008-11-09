@@ -15,11 +15,11 @@ BEGIN {
 
 $Pod::Simple::Text::FREAKYMODE = 1;
 
-chdir 't' unless %ENV{PERL_CORE};
+chdir 't' unless %ENV{?PERL_CORE};
 
 sub source_path {
     my $file = shift;
-    if (%ENV{PERL_CORE}) {
+    if (%ENV{?PERL_CORE}) {
         require File::Spec;
         my $updir = File::Spec->updir;
         my $dir = File::Spec->catdir ($updir, 'lib', 'Pod', 'Simple', 't');

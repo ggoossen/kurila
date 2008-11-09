@@ -57,7 +57,7 @@ for (@(int(^~^0/2+1), ^~^0, "9999999999999999999")) {
 do {
     my ($warn, $bad) = (0,0);
     local $^WARN_HOOK = sub {
-	if (@_[0]->{description} =~ m/uninitialized/) {
+	if (@_[0]->{?description} =~ m/uninitialized/) {
 	    $warn++
 	}
 	else {
@@ -76,7 +76,7 @@ do {
     foreach my $ord (0 .. 255) {
 	my $bad = 0;
 	local $^WARN_HOOK = sub {
-	    if (@_[0]->{description} !~ m/^Invalid conversion in sprintf/) {
+	    if (@_[0]->{?description} !~ m/^Invalid conversion in sprintf/) {
 		warn @_[0];
 		$bad++;
 	    }

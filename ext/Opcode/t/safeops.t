@@ -2,7 +2,7 @@
 # Tests that all ops can be trapped by a Safe compartment
 
 BEGIN {
-    if (not %ENV{PERL_CORE}) {
+    if (not %ENV{?PERL_CORE}) {
 	# this won't work outside of the core, so exit
         print "1..0\n"; exit 0;
     }
@@ -19,7 +19,7 @@ my %code;
 while ( ~< *DATA) {
     chomp;
     die "Can't match $_" unless m/^([a-z_0-9]+)\t+(.*)/;
-    %code{$1} = $2;
+    %code{+$1} = $2;
 }
 
 open my $fh, '<', '../opcode.pl' or die "Can't open opcode.pl: $!";
@@ -30,7 +30,7 @@ while ( ~< $fh) {
     chomp;
     next if !$_ or m/^#/;
     my ($op, $opname) = < split m/\t+/;
-    push @op, \@($op, $opname, %code{$op});
+    push @op, \@($op, $opname, %code{?$op});
 }
 close $fh;
 

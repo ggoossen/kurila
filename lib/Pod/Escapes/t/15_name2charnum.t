@@ -1,5 +1,5 @@
 BEGIN {
-    if(%ENV{PERL_CORE}) {
+    if(%ENV{?PERL_CORE}) {
         chdir 't' if -d 't';
         @INC = @( '../lib' );
     }
@@ -79,7 +79,7 @@ ok e2charnum('pi'), e2charnum('x0003C0');
 print "# \%Name2character_number test...\n";
 
 ok nkeys %Name2character_number;
-ok defined %Name2character_number{'eacute'};
-ok %Name2character_number{'lt'} eq '60';
+ok defined %Name2character_number{?'eacute'};
+ok %Name2character_number{?'lt'} eq '60';
 
 # End

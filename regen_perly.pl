@@ -239,11 +239,11 @@ sub make_type_tab {
 	next unless m/^%(token|type)/;
 	s/^%(token|type)\s+<(\w+)>\s+//
 	    or die "$y_file: unparseable token/type line: $_";
-	%tokens{$_} = $2 for @( ( <split ' ', $_));
-	%types{$2} = 1;
+	%tokens{+$_} = $2 for @( ( <split ' ', $_));
+	%types{+$2} = 1;
     }
     die "$y_file: no __DEFAULT__ token defined\n" unless $default_token;
-    %types{$default_token} = 1;
+    %types{+$default_token} = 1;
 
     $tablines =~ m/^\Qstatic const char *const yytname[] =\E\n
 	    {\n
@@ -254,7 +254,7 @@ sub make_type_tab {
     my $fields = $1;
     $fields =~ s{"([^"]+)"}
 		{$( "toketype_" .
-		    (defined %tokens{$1} ?? %tokens{$1} !! $default_token)
+		    (defined %tokens{?$1} ?? %tokens{?$1} !! $default_token)
 		)}g;
     $fields =~ s/, \s* 0 \s* $//x
 	or die "make_type_tab: couldn't delete trailing ',0'\n";

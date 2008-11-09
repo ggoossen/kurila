@@ -51,7 +51,7 @@ our (%a1, %a2);
 for my $i (0 .. $hashsize -1) {
 	my($k) = int(rand(1_000_000));
 	$k = MD5->hexhash($k) if $gotmd5 and int(rand(2));
-	%a1{$k} = \%( key => "$k", "value" => $i );
+	%a1{+$k} = \%( key => "$k", "value" => $i );
 
 	# A third of the elements are references to further hashes
 
@@ -60,9 +60,9 @@ for my $i (0 .. $hashsize -1) {
 		my($hash2size) = int(rand($maxhash2size));
 		while ($hash2size--) {
 			my($k2) = $k . $i . int(rand(100));
-			$hash2->{$k2} = @fixed_strings[rand(int(nelems @fixed_strings))];
+			$hash2->{+$k2} = @fixed_strings[rand(int(nelems @fixed_strings))];
 		}
-		%a1{$k}->{value} = $hash2;
+		%a1{$k}->{+value} = $hash2;
 	}
 
 	# A further third are references to arrays
@@ -73,7 +73,7 @@ for my $i (0 .. $hashsize -1) {
 		while ($arraysize--) {
 			push(@$arr_ref, @fixed_strings[rand(int(nelems @fixed_strings))]);
 		}
-		%a1{$k}->{value} = $arr_ref;
+		%a1{$k}->{+value} = $arr_ref;
 	}	
 }
 
@@ -84,7 +84,7 @@ print STDERR < Data::Dumper::Dumper(\%a1) if ($verbose and $gotdd);
 # Copy the hash, element by element in order of the keys
 
 foreach my $k (sort keys %a1) {
-    %a2{$k} = \%( key => "$k", "value" => %a1{$k}->{value} );
+    %a2{+$k} = \%( key => "$k", "value" => %a1{$k}->{?value} );
 }
 
 # Deep clone the hash
@@ -128,11 +128,11 @@ ok 5, ($x1 ne $x2) || ($x1 ne $x3);
 # Same test as in t/dclone.t to ensure the "canonical" code is also correct
 
 my $hash;
-push @{%$hash{''}}, \%$hash{a};
-ok 6, %$hash{''}->[0] \== \%$hash{a};
+push @{%$hash{''}}, \%$hash{+a};
+ok 6, %$hash{''}->[0] \== \%$hash{+a};
 
 my $cloned = dclone(dclone($hash));
-ok 7, %$cloned{''}->[0] \== \%$cloned{a};
+ok 7, %$cloned{''}->[0] \== \%$cloned{+a};
 
-%$cloned{a} = "blah";
-ok 8, %$cloned{''}->[0] \== \%$cloned{a};
+%$cloned{+a} = "blah";
+ok 8, %$cloned{''}->[0] \== \%$cloned{+a};

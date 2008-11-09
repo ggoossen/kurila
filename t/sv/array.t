@@ -74,15 +74,15 @@ ok(!($cnt = (($F1,$F2,$Etc) = ($foo =~ m/^(\S+)\s+(\S+)\s*(.*)/))))
 
 %foo = %('blurfl','dyick','foo','bar','etc.','etc.');
 %bar = %( < %foo );
-is(%bar{'foo'}, 'bar');
+is(%bar{?'foo'}, 'bar');
 %bar = %( () );
-is(%bar{'foo'}, undef);
+is(%bar{?'foo'}, undef);
 (< %bar ) = (< %foo,'how','now');
-is(%bar{'foo'}, 'bar');
-is(%bar{'how'}, 'now');
+is(%bar{?'foo'}, 'bar');
+is(%bar{?'how'}, 'now');
  <%bar{[keys %foo]} = < values %foo;
-is(%bar{'foo'}, 'bar');
-is(%bar{'how'}, 'now');
+is(%bar{?'foo'}, 'bar');
+is(%bar{?'how'}, 'now');
 
 @foo = grep(m/e/,split(' ','now is the time for all good men to come to'));
 is(join(' ', @foo), 'the time men come');

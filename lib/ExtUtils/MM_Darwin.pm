@@ -35,7 +35,7 @@ sub init_dist {
     # 10.4 wants COPY_EXTENDED_ATTRIBUTES_DISABLE while 10.5 wants
     # COPYFILE_DISABLE.  I'm not going to push my luck and instead just
     # set both.
-    $self->{TAR} ||= 
+    $self->{+TAR} ||= 
         'COPY_EXTENDED_ATTRIBUTES_DISABLE=1 COPYFILE_DISABLE=1 tar';
     
     $self->SUPER::init_dist(< @_);

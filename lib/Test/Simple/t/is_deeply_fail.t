@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 BEGIN {
-    if( %ENV{PERL_CORE} ) {
+    if( %ENV{?PERL_CORE} ) {
         chdir 't';
         @INC = @('../lib', 'lib');
     }
@@ -16,7 +16,7 @@ require Test::Simple::Catch;
 my($out, $err) = < Test::Simple::Catch::caught();
 Test::Builder->new->no_header(1);
 Test::Builder->new->no_ending(1);
-local %ENV{HARNESS_ACTIVE} = 0;
+local %ENV{+HARNESS_ACTIVE} = 0;
 
 
 # Can't use Test.pm, that's a 5.005 thing.

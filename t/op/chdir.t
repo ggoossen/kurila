@@ -51,7 +51,7 @@ SKIP: do {
     }
     else {
        try { chdir($dh); };
-       like($@->{description}, qr/^The dirfd function is unimplemented at/, "dirfd is unimplemented");
+       like($@->{?description}, qr/^The dirfd function is unimplemented at/, "dirfd is unimplemented");
        chdir ".." or die $!;
     }
 
@@ -66,7 +66,7 @@ SKIP: do {
     }
     else {
        try { chdir(*DH); };
-       like($@->{description}, qr/^The dirfd function is unimplemented at/, "dirfd is unimplemented");
+       like($@->{?description}, qr/^The dirfd function is unimplemented at/, "dirfd is unimplemented");
        chdir ".." or die $!;
     }
     ok(-d "op", "verify that we are back");
@@ -84,7 +84,7 @@ SKIP: do {
     }
     else {
 	try { chdir(*H); };
-	like($@->{description}, qr/^The dirfd function is unimplemented at/,
+	like($@->{?description}, qr/^The dirfd function is unimplemented at/,
 	     "dirfd is unimplemented");
 	SKIP: do {
 	    skip("dirfd is unimplemented");
@@ -100,7 +100,7 @@ SKIP: do {
     skip("has fchdir", 1) if $has_fchdir;
     opendir(my $dh, "op");
     try { chdir($dh); };
-    like($@->{description}, qr/^The fchdir function is unimplemented at/, "fchdir is unimplemented");
+    like($@->{?description}, qr/^The fchdir function is unimplemented at/, "fchdir is unimplemented");
 };
 
 # The environment variables chdir() pays attention to.
@@ -117,17 +117,17 @@ sub check_env {
     }
     else {
         ok( chdir(),              "chdir() w/ only \$ENV\{$key\} set" );
-        is( abs_path, %ENV{$key}, '  abs_path() agrees' );
+        is( abs_path, %ENV{?$key}, '  abs_path() agrees' );
         chdir($Cwd);
         is( abs_path, $Cwd,       '  and back again' );
 
         my $warning = '';
-        local $^WARN_HOOK = sub { $warning .= @_[0]->{description} . "\n" };
+        local $^WARN_HOOK = sub { $warning .= @_[0]->{?description} . "\n" };
 
 
         # Check the deprecated chdir(undef) feature.
         ok( chdir(undef),           "chdir(undef) w/ only \$ENV\{$key\} set" );
-        is( abs_path, %ENV{$key},   '  abs_path() agrees' );
+        is( abs_path, %ENV{?$key},   '  abs_path() agrees' );
         is( $warning,  <<WARNING,   '  got uninit & deprecation warning' );
 Use of uninitialized value in chdir
 Use of chdir('') or chdir(undef) as chdir() is deprecated
@@ -138,7 +138,7 @@ WARNING
         # Ditto chdir('').
         $warning = '';
         ok( chdir(''),              "chdir('') w/ only \$ENV\{$key\} set" );
-        is( abs_path, %ENV{$key},   '  abs_path() agrees' );
+        is( abs_path, %ENV{?$key},   '  abs_path() agrees' );
         is( $warning,  <<WARNING,   '  got deprecation warning' );
 Use of chdir('') or chdir(undef) as chdir() is deprecated
 WARNING
@@ -150,7 +150,7 @@ WARNING
 my %Saved_Env = %( () );
 sub clean_env {
     foreach my $env ( @magic_envs) {
-        %Saved_Env{$env} = %ENV{$env};
+        %Saved_Env{+$env} = %ENV{?$env};
 
         # Can't actually delete SYS$ stuff on VMS.
         next if $IsVMS && $env eq 'SYS$LOGIN';
@@ -165,7 +165,7 @@ sub clean_env {
     # The following means we won't really be testing for non-existence,
     # but in Perl we can only delete from the process table, not the job 
     # table.
-    %ENV{'SYS$LOGIN'} = '' if $IsVMS;
+    %ENV{+'SYS$LOGIN'} = '' if $IsVMS;
 }
 
 END {
@@ -185,7 +185,7 @@ foreach my $key ( @magic_envs) {
     no warnings 'uninitialized';
 
     clean_env;
-    %ENV{$key} = catdir $Cwd, ($IsVMS ?? 'OP' !! 'op');
+    %ENV{+$key} = catdir $Cwd, ($IsVMS ?? 'OP' !! 'op');
 
     check_env($key);
 }

@@ -1,7 +1,7 @@
 #!perl
 
 BEGIN {
-    if (%ENV{PERL_CORE}){
+    if (%ENV{?PERL_CORE}){
 	push @INC, '../ext/B/t';
     } else {
 	unshift @INC, 't';
@@ -24,7 +24,7 @@ cmdline args in 'standard' way across all clients of OptreeCheck.
 
 our %gOpts;
 
-my $tests = 15 + 16 * %gOpts{selftest};	# pass()s + $#tests
+my $tests = 15 + 16 * %gOpts{?selftest};	# pass()s + $#tests
 plan tests => $tests;
 
 SKIP: do {
@@ -88,7 +88,7 @@ if (1) {
 		      expect	=> '',
 		      expect_nt	=> '');
     };
-    like($@->{description}, m/no '\w+' golden-sample found/, "empty expectations prevented");
+    like($@->{?description}, m/no '\w+' golden-sample found/, "empty expectations prevented");
     
     $@='';
     try {
@@ -99,7 +99,7 @@ if (1) {
 		      expect_nt	=> "\n",
 		      expect	=> "\n");
     };
-    like($@->{description}, m/no '\w+' golden-sample found/,
+    like($@->{?description}, m/no '\w+' golden-sample found/,
 	 "just whitespace expectations prevented");
 }
     

@@ -147,7 +147,7 @@ sub _unix_os2_ext {
 		next;
 	    }
 	    warn "'-l$thislib' found at $fullname\n" if $verbose;
-	    push @libs, $fullname unless %libs_seen{$fullname}++;
+	    push @libs, $fullname unless %libs_seen{+$fullname}++;
 	    $found++;
 	    $found_lib++;
 
@@ -162,7 +162,7 @@ sub _unix_os2_ext {
             my $fullnamedir = dirname($fullname);
             push @ld_run_path, $fullnamedir
                  if $is_dyna && !$in_perl &&
-                    !%ld_run_path_seen{$fullnamedir}++;
+                    !%ld_run_path_seen{+$fullnamedir}++;
 
 	    # Do not add it into the list if it is already linked in
 	    # with the main perl executable.
@@ -262,8 +262,8 @@ sub _win32_ext {
     # add "$Config{installarchlib}/CORE" to default search path
     push @libpath, config_value("installarchlib") . "/CORE";
 
-    if ($VC and exists %ENV{LIB} and %ENV{LIB}) {
-        push @libpath, < split m/;/, %ENV{LIB};
+    if ($VC and exists %ENV{LIB} and %ENV{?LIB}) {
+        push @libpath, < split m/;/, %ENV{?LIB};
     }
 
     foreach ( Text::ParseWords::quotewords('\s+', 0, $potential_libs)){
@@ -331,7 +331,7 @@ sub _win32_ext {
 	    $found++;
 	    $found_lib++;
 	    push(@extralibs, $fullname);
-	    push @libs, $fullname unless %libs_seen{$fullname}++;
+	    push @libs, $fullname unless %libs_seen{+$fullname}++;
 	    last;
 	}
 
@@ -384,14 +384,14 @@ sub _vms_ext {
   # a library spec could be resolved via a logical name, we go to some trouble
   # to insure that the copy in the local tree is used, rather than one to
   # which a system-wide logical may point.
-  if ($self->{PERL_SRC}) {
+  if ($self->{?PERL_SRC}) {
     my($locspec,$type);
     foreach my $lib ( @crtls) { 
       if (($locspec,$type) = $lib =~ m{^([\w\$-]+)(/\w+)?} and $locspec =~ m/perl/i) {
         if    (lc $type eq '/share')   { $locspec .= config_value('exe_ext'); }
         elsif (lc $type eq '/library') { $locspec .= config_value('lib_ext'); }
         else                           { $locspec .= config_value('obj_ext'); }
-        $locspec = $self->catfile($self->{PERL_SRC},$locspec);
+        $locspec = $self->catfile($self->{?PERL_SRC},$locspec);
         $lib = "$locspec$type" if -e $locspec;
       }
     }
@@ -415,7 +415,7 @@ sub _vms_ext {
                  'socket' => '', 'X11' => 'DECW$XLIBSHR',
                  'Xt' => 'DECW$XTSHR', 'Xm' => 'DECW$XMLIBSHR',
                  'Xmu' => 'DECW$XMULIBSHR');
-  if (config_value('vms_cc_type') ne 'decc') { %libmap{'curses'} = 'VAXCCURSE'; }
+  if (config_value('vms_cc_type') ne 'decc') { %libmap{+'curses'} = 'VAXCCURSE'; }
 
   warn "Potential libraries are '$potential_libs'\n" if $verbose;
 
@@ -452,8 +452,8 @@ sub _vms_ext {
 
   LIB: foreach my $lib ( @libs) {
     if (exists %libmap{$lib}) {
-      next unless length %libmap{$lib};
-      $lib = %libmap{$lib};
+      next unless length %libmap{?$lib};
+      $lib = %libmap{?$lib};
     }
 
     my(@variants,$cand);
@@ -525,7 +525,7 @@ sub _vms_ext {
         else                      { push    @{%found{$ctype}}, $cand; }
         warn "\tFound as $cand (really $fullname), type $ctype\n" 
           if $verbose +> 1;
-	push @flibs, $name unless %libs_seen{$fullname}++;
+	push @flibs, $name unless %libs_seen{+$fullname}++;
         next LIB;
       }
     }
@@ -533,7 +533,7 @@ sub _vms_ext {
 		 ."No library found for $lib\n";
   }
 
-  push @fndlibs, < @{%found{OBJ}}                      if exists %found{OBJ};
+  push @fndlibs, < @{%found{?OBJ}}                      if exists %found{OBJ};
   push @fndlibs, < map { "$_/Library" } @{%found{OLB}} if exists %found{OLB};
   push @fndlibs, < map { "$_/Share"   } @{%found{SHR}} if exists %found{SHR};
   my $lib = join(' ', @fndlibs);

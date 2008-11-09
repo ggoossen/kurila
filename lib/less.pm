@@ -20,7 +20,7 @@ sub of {
     # If no one wants the result, don't bother computing it.
     my $hinthash = @( caller 0 )[10];
     my %tags;
- <    %tags{[_unpack_tags( $hinthash->{$class} ) ]} = ();
+ <    %tags{[_unpack_tags( $hinthash->{?$class} ) ]} = ();
 
     if ((nelems @_)) {
         exists %tags{$_} and return ! ! 1 for  @_;
@@ -36,9 +36,9 @@ sub import {
 
     @_ = @( 'please' ) if not nelems @_;
     my %tags;
- <    %tags{[_unpack_tags( < @_, %^H{$class} ) ]} = ();
+ <    %tags{[_unpack_tags( < @_, %^H{?$class} ) ]} = ();
 
-    %^H{$class} = _pack_tags( < keys %tags );
+    %^H{+$class} = _pack_tags( < keys %tags );
     return;
 }
 
@@ -47,7 +47,7 @@ sub unimport {
 
     if ((nelems @_)) {
         my %tags;
- <        %tags{[_unpack_tags( %^H{$class} ) ]} = ();
+ <        %tags{[_unpack_tags( %^H{?$class} ) ]} = ();
         delete %tags{[ <_unpack_tags(< @_) ]};
         my $new = _pack_tags( < keys %tags );
 
@@ -55,7 +55,7 @@ sub unimport {
             delete %^H{$class};
         }
         else {
-            %^H{$class} = $new;
+            %^H{+$class} = $new;
         }
     }
     else {

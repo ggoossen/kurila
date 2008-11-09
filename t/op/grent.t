@@ -5,14 +5,14 @@ BEGIN {
 }
 
 try {my @n = @( getgrgid 0 )};
-if ($@ and $@->{description} =~ m/(The \w+ function is unimplemented)/) {
+if ($@ and $@->{?description} =~ m/(The \w+ function is unimplemented)/) {
     skip_all "getgrgid unimplemented";
 }
 
 our (%Config, $where);
 try { require Config; Config->import; };
 my $reason;
-if (%Config{'i_grp'} ne 'define') {
+if (%Config{?'i_grp'} ne 'define') {
 	$reason = '%Config{i_grp} not defined';
 }
 elsif (not -f "/etc/group" ) { # Play safe.
@@ -123,7 +123,7 @@ while ( ~< *GR) {
 	# NOTE: group names *CAN* contain whitespace.
 	$members =~ s/\s+/,/g;
 	# what about different orders of members?
-	%perfect{$name_s}++
+	%perfect{+$name_s}++
 	    if $name    eq $name_s    and
 # Do not compare passwords: think shadow passwords.
 # Not that group passwords are used much but better not assume anything.

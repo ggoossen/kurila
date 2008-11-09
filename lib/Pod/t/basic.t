@@ -26,7 +26,7 @@ use Pod::Text::Termcap;
 # these tests are run as part of Perl core.
 sub source_path {
     my $file = shift;
-    if (%ENV{PERL_CORE}) {
+    if (%ENV{?PERL_CORE}) {
         require File::Spec;
         my $updir = File::Spec->updir;
         my $dir = File::Spec->catdir ($updir, 'lib', 'Pod', 't');
@@ -39,9 +39,9 @@ sub source_path {
 print "ok 1\n";
 
 # Hard-code a few values to try to get reproducible results.
-%ENV{COLUMNS} = 80;
-%ENV{TERM} = 'xterm';
-%ENV{TERMCAP} = 'xterm:co=80:do=^J:md=\E[1m:us=\E[4m:me=\E[m';
+%ENV{+COLUMNS} = 80;
+%ENV{+TERM} = 'xterm';
+%ENV{+TERMCAP} = 'xterm:co=80:do=^J:md=\E[1m:us=\E[4m:me=\E[m';
 
 # Map of translators to file extensions to find the formatted output to
 # compare against.
@@ -79,8 +79,8 @@ for my $translator (sort keys %translators) {
     close OUT;
     if ($translator eq 'Pod::Man') {
         open (TMP, "<", 'out.tmp') or die "Cannot open out.tmp: $!\n";
-        open (OUTPUT, ">", "out.%translators{$translator}")
-            or die "Cannot create out.%translators{$translator}: $!\n";
+        open (OUTPUT, ">", "out.%translators{?$translator}")
+            or die "Cannot create out.%translators{?$translator}: $!\n";
         local $_;
         while ( ~< *TMP) { last if m/^\.nh/ }
         print OUTPUT while ~< *TMP;
@@ -88,15 +88,15 @@ for my $translator (sort keys %translators) {
         close TMP;
         unlink 'out.tmp';
     } else {
-        rename ('out.tmp', "out.%translators{$translator}")
+        rename ('out.tmp', "out.%translators{?$translator}")
             or die "Cannot rename out.tmp: $!\n";
     }
     do {
         local $/;
-        open (MASTER, "<", source_path ("basic.%translators{$translator}"))
-            or die "Cannot open basic.%translators{$translator}: $!\n";
-        open (OUTPUT, "<", "out.%translators{$translator}")
-            or die "Cannot open out.%translators{$translator}: $!\n";
+        open (MASTER, "<", source_path ("basic.%translators{?$translator}"))
+            or die "Cannot open basic.%translators{?$translator}: $!\n";
+        open (OUTPUT, "<", "out.%translators{?$translator}")
+            or die "Cannot open out.%translators{?$translator}: $!\n";
         my $master = ~< *MASTER;
         my $output = ~< *OUTPUT;
         close MASTER;
@@ -110,10 +110,10 @@ for my $translator (sort keys %translators) {
 
         if ($master eq $output) {
             print "ok $n\n";
-            unlink "out.%translators{$translator}";
+            unlink "out.%translators{?$translator}";
         } else {
             print "not ok $n\n";
-            print "# Non-matching output left in out.%translators{$translator}\n";
+            print "# Non-matching output left in out.%translators{?$translator}\n";
         }
     };
     $n++;

@@ -1,7 +1,7 @@
 #!perl
 
 BEGIN {
-    if (%ENV{PERL_CORE}){
+    if (%ENV{?PERL_CORE}){
 	push @INC, '../ext/B/t';
     } else {
 	unshift @INC, 't';
@@ -162,17 +162,17 @@ sub set_up_relative_test {
 	    my ($h, $op, $format, $level, $style) = < @_;
 
 	    # callback marks up const ops
-	    $h->{arg} .= ' CALLBACK' if $h->{name} eq 'const';
-	    $h->{extra} = '';
+	    $h->{+arg} .= ' CALLBACK' if $h->{?name} eq 'const';
+	    $h->{+extra} = '';
 
 	    # 2 style specific behaviors
 	    if ($style eq 'relative') {
-		$h->{extra} = 'RELATIVE';
-		$h->{arg} .= ' RELATIVE' if $h->{name} eq 'leavesub';
+		$h->{+extra} = 'RELATIVE';
+		$h->{+arg} .= ' RELATIVE' if $h->{?name} eq 'leavesub';
 	    }
 	    elsif ($style eq 'scope') {
 		# supress printout entirely
-		$$format="" unless grep { $h->{name} eq $_ } @scopeops;
+		$$format="" unless grep { $h->{?name} eq $_ } @scopeops;
 	    }
 	});
 }

@@ -18,11 +18,11 @@ BEGIN
 require VMS::Filespec if $^O eq 'VMS';
 
 
-unless(%ENV{PERL_CORE}) {
-    %ENV{PERL_CORE} = 1 if grep { $_ eq 'PERL_CORE=1' } @ARGV;
+unless(%ENV{?PERL_CORE}) {
+    %ENV{+PERL_CORE} = 1 if grep { $_ eq 'PERL_CORE=1' } @ARGV;
 }
 
-%ENV{SKIP_FOR_CORE} = 1 if %ENV{PERL_CORE} || %ENV{MY_PERL_CORE} ;
+%ENV{+SKIP_FOR_CORE} = 1 if %ENV{?PERL_CORE} || %ENV{?MY_PERL_CORE} ;
 
 
 
@@ -42,7 +42,7 @@ sub MY::libscan
 sub MY::postamble 
 {
     return ''
-        if %ENV{PERL_CORE} ;
+        if %ENV{?PERL_CORE} ;
 
     my @files = getPerlFiles('MANIFEST');
 
@@ -106,7 +106,7 @@ sub getPerlFiles
 
 sub UpDowngrade
 {
-    return if defined %ENV{TipTop};
+    return if defined %ENV{?TipTop};
 
     my @files = @_ ;
 

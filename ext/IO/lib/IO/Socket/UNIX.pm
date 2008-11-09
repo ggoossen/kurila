@@ -26,22 +26,22 @@ sub configure {
     my($sock,$arg) = < @_;
     my($bport,$cport);
 
-    my $type = $arg->{Type} || SOCK_STREAM;
+    my $type = $arg->{?Type} || SOCK_STREAM;
 
     $sock->socket(AF_UNIX, $type, 0) or
 	return undef;
 
     if(exists $arg->{Local}) {
-	my $addr = pack_sockaddr_un($arg->{Local});
+	my $addr = pack_sockaddr_un($arg->{?Local});
 	$sock->bind($addr) or
 	    return undef;
     }
     if(exists $arg->{Listen} && $type != SOCK_DGRAM) {
-	$sock->listen($arg->{Listen} || 5) or
+	$sock->listen($arg->{?Listen} || 5) or
 	    return undef;
     }
     elsif(exists $arg->{Peer}) {
-	my $addr = pack_sockaddr_un($arg->{Peer});
+	my $addr = pack_sockaddr_un($arg->{?Peer});
 	$sock->connect($addr) or
 	    return undef;
     }

@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 BEGIN {
-   if( %ENV{PERL_CORE} ) {
+   if( %ENV{?PERL_CORE} ) {
         chdir 't' if -d 't';
         @INC = qw(../lib ../t/lib);
     }
@@ -21,6 +21,6 @@ do {
       'base'->import( <qw(Huh::Boo));
     };
 
-    main::like($@->{description}, qr/^Base class package "Huh::Boo" is empty/, 
+    main::like($@->{?description}, qr/^Base class package "Huh::Boo" is empty/, 
          'Base class empty error message');
 };

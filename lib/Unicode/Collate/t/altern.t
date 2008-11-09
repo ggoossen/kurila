@@ -54,7 +54,7 @@ is($Collator->cmp("deLuge", "de Luge"), -1);
 
 $Collator->change(< %origAlt);
 
-is($Collator->{alternate}, 'shifted');
+is($Collator->{?alternate}, 'shifted');
 
 ##############
 

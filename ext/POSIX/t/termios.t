@@ -9,7 +9,7 @@ use POSIX;
 BEGIN {
     plan skip_all => "POSIX::Termios not implemented" 
         if  !eval "POSIX::Termios->new;1"
-        and $@->{description}=~m/not implemented/;
+        and $@->{?description}=~m/not implemented/;
 }
 
 

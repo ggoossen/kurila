@@ -85,8 +85,8 @@ sub valid_type {
 sub assignment_clause_for_type {
   my $self = shift;
   my $args = shift;
-  my $type = $args->{type};
-  my $typeset = %XS_TypeSet{$type};
+  my $type = $args->{?type};
+  my $typeset = %XS_TypeSet{?$type};
   if (ref $typeset) {
     die "Type $type is aggregate, but only single value given"
       if (nelems @_) == 1;
@@ -102,7 +102,7 @@ sub assignment_clause_for_type {
 sub return_statement_for_type {
   my ($self, $type) = < @_;
   # In the future may pass in an options hash
-  $type = $type->{type} if ref $type;
+  $type = $type->{?type} if ref $type;
   "return PERL_constant_IS$type;";
 }
 
@@ -122,14 +122,14 @@ sub default_type {
 
 sub macro_from_name {
   my ($self, $item) = < @_;
-  my $macro = $item->{name};
-  $macro = $item->{value} unless defined $macro;
+  my $macro = $item->{?name};
+  $macro = $item->{?value} unless defined $macro;
   $macro;
 }
 
 sub macro_from_item {
   my ($self, $item) = < @_;
-  my $macro = $item->{macro};
+  my $macro = $item->{?macro};
   $macro = $self->macro_from_name($item) unless defined $macro;
   $macro;
 }
@@ -142,14 +142,14 @@ sub memEQ {
 sub params {
   my ($self, $what) = < @_;
   foreach (sort keys %$what) {
-    warn "ExtUtils::Constant doesn't know how to handle values of type $_" unless defined %XS_Constant{$_};
+    warn "ExtUtils::Constant doesn't know how to handle values of type $_" unless defined %XS_Constant{?$_};
   }
   my $params = \%();
-  $params->{''} = 1 if $what->{''};
-  $params->{IV} = 1 if $what->{IV} || $what->{UV} || $what->{PVN};
-  $params->{NV} = 1 if $what->{NV};
-  $params->{PV} = 1 if $what->{PV} || $what->{PVN};
-  $params->{SV} = 1 if $what->{SV};
+  $params->{+''} = 1 if $what->{?''};
+  $params->{+IV} = 1 if $what->{?IV} || $what->{?UV} || $what->{?PVN};
+  $params->{+NV} = 1 if $what->{?NV};
+  $params->{+PV} = 1 if $what->{?PV} || $what->{?PVN};
+  $params->{+SV} = 1 if $what->{?SV};
   return $params;
 }
 
@@ -169,20 +169,20 @@ sub namelen_param_definition {
 sub C_constant_other_params_defintion {
   my ($self, $params) = < @_;
   my $body = '';
-  $body .= ", IV *iv_return" if $params->{IV};
-  $body .= ", NV *nv_return" if $params->{NV};
-  $body .= ", const char **pv_return" if $params->{PV};
-  $body .= ", SV **sv_return" if $params->{SV};
+  $body .= ", IV *iv_return" if $params->{?IV};
+  $body .= ", NV *nv_return" if $params->{?NV};
+  $body .= ", const char **pv_return" if $params->{?PV};
+  $body .= ", SV **sv_return" if $params->{?SV};
   $body;
 }
 
 sub C_constant_other_params {
   my ($self, $params) = < @_;
   my $body = '';
-  $body .= ", iv_return" if $params->{IV};
-  $body .= ", nv_return" if $params->{NV};
-  $body .= ", pv_return" if $params->{PV};
-  $body .= ", sv_return" if $params->{SV};
+  $body .= ", iv_return" if $params->{?IV};
+  $body .= ", nv_return" if $params->{?NV};
+  $body .= ", pv_return" if $params->{?PV};
+  $body .= ", sv_return" if $params->{?SV};
   $body;
 }
 

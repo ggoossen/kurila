@@ -110,10 +110,10 @@ sub gzopen($$)
     $writing = ! ($mode =~ m/r/i) ;
     $writing = ($mode =~ m/[wa]/i) ;
 
-    %defOpts{Level}    = $1               if $mode =~ m/(\d)/;
-    %defOpts{Strategy} = Z_FILTERED()     if $mode =~ m/f/i;
-    %defOpts{Strategy} = Z_HUFFMAN_ONLY() if $mode =~ m/h/i;
-    %defOpts{Append}   = 1                if $mode =~ m/a/i;
+    %defOpts{+Level}    = $1               if $mode =~ m/(\d)/;
+    %defOpts{+Strategy} = Z_FILTERED()     if $mode =~ m/f/i;
+    %defOpts{+Strategy} = Z_HUFFMAN_ONLY() if $mode =~ m/h/i;
+    %defOpts{+Append}   = 1                if $mode =~ m/a/i;
 
     my $infDef = $writing ?? 'deflate' !! 'inflate';
     my @params = @( () ) ;
@@ -247,7 +247,7 @@ sub Compress::Zlib::gzFile::gzsetparams
     return _set_gzerr(Z_STREAM_ERROR())
         if $self->[1] ne 'deflate';
  
-    my $status = *$gz->{Compress}->deflateParams(-Level   => $level, 
+    my $status = *$gz->{?Compress}->deflateParams(-Level   => $level, 
                                                 -Strategy => $strategy);
     _save_gzerr($gz);
     return $status ;

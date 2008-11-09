@@ -21,7 +21,7 @@ sub new
 {
     shift;  # class ignored
     my $algorithm = shift;
-    my $impl = %MMAP{$algorithm} || do {
+    my $impl = %MMAP{?$algorithm} || do {
 	$algorithm =~ s/\W+//;
 	"Digest::$algorithm";
     };

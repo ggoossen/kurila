@@ -78,7 +78,7 @@ sleep 2;
 SKIP: do {
     unlink $tmpfile_link;
     my $lnk_result = try { link $tmpfile, $tmpfile_link };
-    skip "link() unimplemented", 6 if $@ and $@->{description} =~ m/unimplemented/;
+    skip "link() unimplemented", 6 if $@ and $@->{?description} =~ m/unimplemented/;
 
     is( $@, '',         'link() implemented' );
     ok( $lnk_result,    'linked tmp testfile' );
@@ -198,7 +198,7 @@ ok(! -f $Curdir,          '!-f cwd' );
 SKIP: do {
     unlink($tmpfile_link);
     my $symlink_rslt = try { symlink $tmpfile, $tmpfile_link };
-    skip "symlink not implemented", 3 if $@ and $@->{description} =~ m/unimplemented/;
+    skip "symlink not implemented", 3 if $@ and $@->{?description} =~ m/unimplemented/;
 
     is( $@, '',     'symlink() implemented' );
     ok( $symlink_rslt,      'symlink() ok' );
@@ -320,7 +320,7 @@ SKIP: do {
 # may not be available (at, cron  rsh etc), the PERL_SKIP_TTY_TEST env var
 # can be set to skip the tests that need a tty.
 SKIP: do {
-    skip "These tests require a TTY", 4 if %ENV{PERL_SKIP_TTY_TEST};
+    skip "These tests require a TTY", 4 if %ENV{?PERL_SKIP_TTY_TEST};
 
     my $TTY = $Is_Rhapsody ?? "/dev/ttyp0" !! "/dev/tty";
 
@@ -368,7 +368,7 @@ ok(! -T $Perl,    '!-T');
 open(FOO, "<",$statfile);
 SKIP: do {
     try { -T *FOO; };
-    skip "-T/B on filehandle not implemented", 15 if $@ and $@->{description} =~ m/not implemented/;
+    skip "-T/B on filehandle not implemented", 15 if $@ and $@->{?description} =~ m/not implemented/;
 
     is( $@, '',     '-T on filehandle causes no errors' );
 

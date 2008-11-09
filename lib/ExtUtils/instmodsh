@@ -58,8 +58,8 @@ sub do_module($) {
 
         last if $cmd eq 'q';
 
-        if( %Module_Commands{$cmd} ) {
-            %Module_Commands{$cmd}->($reply, $module);
+        if( %Module_Commands{?$cmd} ) {
+            %Module_Commands{?$cmd}->($reply, $module);
         }
         elsif( $cmd eq 'q' ) {
             last MODULE_CMD;

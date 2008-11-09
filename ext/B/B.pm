@@ -158,12 +158,12 @@ sub clearsym {
 sub savesym {
     my ($obj, $value) = < @_;
 #    warn(sprintf("savesym: sym_%x => %s\n", $$obj, $value)); # debug
-    %symtable{sprintf("sym_\%x", $$obj)} = $value;
+    %symtable{+sprintf("sym_\%x", $$obj)} = $value;
 }
 
 sub objsym {
     my $obj = shift;
-    return %symtable{sprintf("sym_\%x", $$obj)};
+    return %symtable{?sprintf("sym_\%x", $$obj)};
 }
 
 sub walkoptree_exec {
@@ -226,7 +226,7 @@ sub walksymtable {
     my $fullname;
     $prefix = '' unless defined $prefix;
     for my $sym (keys %$symref) {
-        my $ref = $symref->{$_};
+        my $ref = $symref->{?$_};
         $fullname = "*".$prefix.$sym;
 	if ($sym =~ m/::$/) {
 	    $sym = $prefix . $sym;
@@ -248,13 +248,13 @@ do {
 	my ($class, $section, $symtable, $default) = < @_;
 	$output_fh ||= FileHandle->new_tmpfile;
 	my $obj = bless \@(-1, $section, $symtable, $default), $class;
-	%sections{$section} = $obj;
+	%sections{+$section} = $obj;
 	return $obj;
     }
 
     sub get {
 	my ($class, $section) = < @_;
-	return %sections{$section};
+	return %sections{?$section};
     }
 
     sub add {
@@ -297,7 +297,7 @@ do {
 	    s/^(.*?)\t//;
 	    if ($1 eq $name) {
 		s{(s\\_[0-9a-f]+)} {$(
-		    exists($sym->{$1}) ?? $sym->{$1} !! $default
+		    exists($sym->{$1}) ?? $sym->{?$1} !! $default
 		)}g;
 		printf $fh $format, $_;
 	    }

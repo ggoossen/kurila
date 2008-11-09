@@ -51,10 +51,10 @@ sub abbrev {
     WORD: foreach my $word ( @_) {
         for my $len ( reverse( 1 .. (length $word) - 1 ) ) {
 	    my $abbrev = substr($word,0,$len);
-	    my $seen = ++%table{$abbrev};
+	    my $seen = ++%table{+$abbrev};
 	    if ($seen == 1) {	    # We're the first word so far to have
 	    			    # this abbreviation.
-	        $hashref->{$abbrev} = $word;
+	        $hashref->{+$abbrev} = $word;
 	    } elsif ($seen == 2) {  # We're the second word to have this
 	    			    # abbreviation, so we can't use it.
 	        delete $hashref->{$abbrev};
@@ -66,7 +66,7 @@ sub abbrev {
     }
     # Non-abbreviations always get entered, even if they aren't unique
     foreach my $word ( @_) {
-        $hashref->{$word} = $word;
+        $hashref->{+$word} = $word;
     }
     return if $returnvoid;
     %{$hashref};

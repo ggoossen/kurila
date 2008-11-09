@@ -12,7 +12,7 @@ while ( ~< *DATA) {
     }
     elsif ($proto eq 'unknown') {
 	try { prototype "CORE::".$keyword };
-	like( $@->{description}, qr/Can't find an opnumber for/, $keyword );
+	like( $@->{?description}, qr/Can't find an opnumber for/, $keyword );
     }
     else {
 	is( "(".prototype("CORE::".$keyword).")", $proto, $keyword );

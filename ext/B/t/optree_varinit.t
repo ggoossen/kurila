@@ -1,7 +1,7 @@
 #!perl
 
 BEGIN {
-    if (%ENV{PERL_CORE}){
+    if (%ENV{?PERL_CORE}){
 	push @INC, '../ext/B/t';
     } else {
 	unshift @INC, 't';

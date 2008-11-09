@@ -9,7 +9,7 @@ do {
     my $err = error::create("my message", @("filetest.t", 33, 11));
     ok $err, "error object created";
     is ref $err, "error";
-    is $err->{description}, "my message";
+    is $err->{?description}, "my message";
     is $err->message, "my message", "message function";
     is $err->stacktrace, " at filetest.t line 33 character 11.\n",
       "stacktrace function";
@@ -21,9 +21,9 @@ do {
     sub new_error { return error::create("my message"); } $line1 = __LINE__;
     sub new_error2 { return new_error(); } $line2 = __LINE__;
     my $err = new_error2(); $line3 = __LINE__;
-    is( (nelems $err->{stack}), 2);
-    is((join '**', $err->{stack}[0]), "../lib/error.t**$line2**29**main::new_error**");
-    is((join '**', $err->{stack}[1]), "../lib/error.t**$line3**15**main::new_error2**");
+    is( (nelems $err->{?stack}), 2);
+    is((join '**', $err->{?stack}[0]), "../lib/error.t**$line2**29**main::new_error**");
+    is((join '**', $err->{?stack}[1]), "../lib/error.t**$line3**15**main::new_error2**");
     is $err->message, "my message";
     is $err->stacktrace, <<MSG;
 
@@ -40,7 +40,7 @@ do {
        };
     is defined $@, 1, '$@ is set';
     is ref $@, "error", '$@ is an error object';
-    is $@->{description}, "foobar";
+    is $@->{?description}, "foobar";
     is $@->message, "foobar";
     is $@->stacktrace, <<MSG;
  at ../lib/error.t line $line2 character 31.

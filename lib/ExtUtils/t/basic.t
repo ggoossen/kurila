@@ -25,7 +25,7 @@ my $perl = which_perl();
 my $Is_VMS = $^O eq 'VMS';
 
 # GNV logical interferes with testing
-%ENV{'bin'} = '[.bin]' if $Is_VMS;
+%ENV{+'bin'} = '[.bin]' if $Is_VMS;
 
 chdir 't';
 
@@ -69,7 +69,7 @@ my $make = make_run();
 
 do {
     # Supress 'make manifest' noise
-    local %ENV{PERL_MM_MANIFEST_VERBOSE} = 0;
+    local %ENV{+PERL_MM_MANIFEST_VERBOSE} = 0;
     my $manifest_out = run("$make manifest");
     ok( -e 'MANIFEST',      'make manifest created a MANIFEST' );
     ok( -s 'MANIFEST',      '  its not empty' ) or diag $manifest_out;
@@ -139,13 +139,13 @@ find( sub {
     # VMS likes to put dots on the end of things that don't have them.
     $file =~ s/\.$// if $Is_VMS;
 
-    %files{$file} = $File::Find::name; 
+    %files{+$file} = $File::Find::name; 
 }, '../dummy-install' );
-ok( %files{'dummy.pm'},     '  Dummy.pm installed' );
-ok( %files{'liar.pm'},      '  Liar.pm installed'  );
-ok( %files{'program'},      '  program installed'  );
-ok( %files{'.packlist'},    '  packlist created'   );
-ok( %files{'perllocal.pod'},'  perllocal.pod created' );
+ok( %files{?'dummy.pm'},     '  Dummy.pm installed' );
+ok( %files{?'liar.pm'},      '  Liar.pm installed'  );
+ok( %files{?'program'},      '  program installed'  );
+ok( %files{?'.packlist'},    '  packlist created'   );
+ok( %files{?'perllocal.pod'},'  perllocal.pod created' );
 
 
 SKIP: do {
@@ -158,12 +158,12 @@ SKIP: do {
 
     ok( -r 'elsewhere',     '  install dir created' );
     %files = %( () );
-    find( sub { %files{$_} = $File::Find::name; }, 'elsewhere' );
-    ok( %files{'Dummy.pm'},     '  Dummy.pm installed' );
-    ok( %files{'Liar.pm'},      '  Liar.pm installed'  );
-    ok( %files{'program'},      '  program installed'  );
-    ok( %files{'.packlist'},    '  packlist created'   );
-    ok( %files{'perllocal.pod'},'  perllocal.pod created' );
+    find( sub { %files{+$_} = $File::Find::name; }, 'elsewhere' );
+    ok( %files{?'Dummy.pm'},     '  Dummy.pm installed' );
+    ok( %files{?'Liar.pm'},      '  Liar.pm installed'  );
+    ok( %files{?'program'},      '  program installed'  );
+    ok( %files{?'.packlist'},    '  packlist created'   );
+    ok( %files{?'perllocal.pod'},'  perllocal.pod created' );
     rmtree('elsewhere');
 };
 
@@ -181,16 +181,16 @@ SKIP: do {
     %files = %( () );
     my $perllocal;
     find( sub { 
-        %files{$_} = $File::Find::name;
+        %files{+$_} = $File::Find::name;
     }, 'other' );
-    ok( %files{'Dummy.pm'},     '  Dummy.pm installed' );
-    ok( %files{'Liar.pm'},      '  Liar.pm installed'  );
-    ok( %files{'program'},      '  program installed'  );
-    ok( %files{'.packlist'},    '  packlist created'   );
-    ok( %files{'perllocal.pod'},'  perllocal.pod created' );
+    ok( %files{?'Dummy.pm'},     '  Dummy.pm installed' );
+    ok( %files{?'Liar.pm'},      '  Liar.pm installed'  );
+    ok( %files{?'program'},      '  program installed'  );
+    ok( %files{?'.packlist'},    '  packlist created'   );
+    ok( %files{?'perllocal.pod'},'  perllocal.pod created' );
 
-    ok( open(PERLLOCAL, "<", %files{'perllocal.pod'} ) ) || 
-        diag("Can't open %files{'perllocal.pod'}: $!");
+    ok( open(PERLLOCAL, "<", %files{?'perllocal.pod'} ) ) || 
+        diag("Can't open %files{?'perllocal.pod'}: $!");
     do { local $/;
       unlike( ~< *PERLLOCAL, qr/other/, 'DESTDIR should not appear in perllocal');
     };
@@ -221,12 +221,12 @@ SKIP: do {
     ok( !-d 'elsewhere',       '  install dir not created' );
     ok( -d 'other/elsewhere',  '  destdir created' );
     %files = %( () );
-    find( sub { %files{$_} = $File::Find::name; }, 'other/elsewhere' );
-    ok( %files{'Dummy.pm'},     '  Dummy.pm installed' );
-    ok( %files{'Liar.pm'},      '  Liar.pm installed'  );
-    ok( %files{'program'},      '  program installed'  );
-    ok( %files{'.packlist'},    '  packlist created'   );
-    ok( %files{'perllocal.pod'},'  perllocal.pod created' );
+    find( sub { %files{+$_} = $File::Find::name; }, 'other/elsewhere' );
+    ok( %files{?'Dummy.pm'},     '  Dummy.pm installed' );
+    ok( %files{?'Liar.pm'},      '  Liar.pm installed'  );
+    ok( %files{?'program'},      '  program installed'  );
+    ok( %files{?'.packlist'},    '  packlist created'   );
+    ok( %files{?'perllocal.pod'},'  perllocal.pod created' );
     rmtree('other');
 };
 
@@ -279,7 +279,7 @@ my $manifest = maniread("$distdir/MANIFEST");
 # VMS is non-case preserving, so we can't know what the MANIFEST will
 # look like. :(
 _normalize($manifest);
-is( $manifest->{'meta.yml'}, 'Module meta-data (added by MakeMaker)' );
+is( $manifest->{?'meta.yml'}, 'Module meta-data (added by MakeMaker)' );
 
 
 # Test NO_META META.yml suppression
@@ -318,6 +318,6 @@ sub _normalize {
 
     while(my($k,$v) = each %$hash) {
         delete $hash->{$k};
-        $hash->{lc $k} = $v;
+        $hash->{+lc $k} = $v;
     }
 }

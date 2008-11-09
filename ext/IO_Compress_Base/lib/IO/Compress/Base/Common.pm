@@ -198,11 +198,11 @@ sub Validator::new
 
     local $Carp::CarpLevel = 1;
 
-    my $inType    = %data{inType}    = whatIsInput(@_[0], WANT_EXT^|^WANT_HASH);
-    my $outType   = %data{outType}   = whatIsOutput(@_[1], WANT_EXT^|^WANT_HASH);
+    my $inType    = %data{+inType}    = whatIsInput(@_[0], WANT_EXT^|^WANT_HASH);
+    my $outType   = %data{+outType}   = whatIsOutput(@_[1], WANT_EXT^|^WANT_HASH);
 
-    my $oneInput  = %data{oneInput}  = oneTarget($inType);
-    my $oneOutput = %data{oneOutput} = oneTarget($outType);
+    my $oneInput  = %data{+oneInput}  = oneTarget($inType);
+    my $oneOutput = %data{+oneOutput} = oneTarget($outType);
 
     if (! $inType)
     {
@@ -236,14 +236,14 @@ sub Validator::new
 
     if ($inType eq 'fileglob' && $outType eq 'fileglob')
     {
-        %data{GlobMap} = 1 ;
-        %data{inType} = %data{outType} = 'filename';
+        %data{+GlobMap} = 1 ;
+        %data{+inType} = %data{+outType} = 'filename';
         my $mapper = File::GlobMapper->new(@_[0], @_[1]);
         if ( ! $mapper )
         {
             return $obj->saveErrorString($File::GlobMapper::Error) ;
         }
-        %data{Pairs} = $mapper->getFileMap();
+        %data{+Pairs} = $mapper->getFileMap();
 
         return $obj;
     }
@@ -266,15 +266,15 @@ sub Validator::new
             $obj->validateInputFilenames(@inputs[0])
                 or return undef;
             @_[0] = @inputs[0]  ;
-            %data{inType} = 'filename' ;
-            %data{oneInput} = 1;
+            %data{+inType} = 'filename' ;
+            %data{+oneInput} = 1;
         }
         else
         {
             $obj->validateInputFilenames(< @inputs)
                 or return undef;
             @_[0] = \ @inputs ;
-            %data{inType} = 'filenames' ;
+            %data{+inType} = 'filenames' ;
         }
     }
     elsif ($inType eq 'filename')
@@ -284,7 +284,7 @@ sub Validator::new
     }
     elsif ($inType eq 'array')
     {
-        %data{inType} = 'filenames' ;
+        %data{+inType} = 'filenames' ;
         $obj->validateInputArray(@_[0])
             or return undef ;
     }
@@ -332,7 +332,7 @@ sub Validator::validateInputFilenames
 
     foreach my $filename ( @_)
     {
-        $self->croakError("$self->{reportClass}: input filename is undef or null string")
+        $self->croakError("$self->{?reportClass}: input filename is undef or null string")
             if ! defined $filename || $filename eq ''  ;
 
         next if $filename eq '-';
@@ -418,11 +418,11 @@ sub createSelfTiedObject
     my $error_ref = shift ;
 
     my $obj = bless \%(), ref($class) || $class;
-    $obj->{Closed} = 1 ;
+    $obj->{+Closed} = 1 ;
     $$error_ref = '';
-    $obj->{Error} = $error_ref ;
+    $obj->{+Error} = $error_ref ;
     my $errno = 0 ;
-    $obj->{ErrorNo} = \$errno ;
+    $obj->{+ErrorNo} = \$errno ;
 
     return $obj;
 }
@@ -437,13 +437,13 @@ sub createSelfTiedObject
 #$VERSION = '2.000_08';
 #@ISA = qw(Exporter);
 
-%EXPORT_TAGS{Parse} = \qw( ParseParameters 
+%EXPORT_TAGS{+Parse} = \qw( ParseParameters 
                            Parse_any Parse_unsigned Parse_signed 
                            Parse_boolean Parse_custom Parse_string
                            Parse_multiple Parse_writable_scalar
                          );              
 
-push @EXPORT, < @{ %EXPORT_TAGS{Parse} } ;
+push @EXPORT, < @{ %EXPORT_TAGS{?Parse} } ;
 
 use constant Parse_any      => 0x01;
 use constant Parse_unsigned => 0x02;
@@ -474,7 +474,7 @@ sub ParseParameters
     local $Carp::CarpLevel = 1 ;
     my $p = IO::Compress::Base::Parameters->new() ;
     $p->parse(< @_)
-        or croak "$sub: $p->{Error}" ;
+        or croak "$sub: $p->{?Error}" ;
 
     return $p;
 }
@@ -502,7 +502,7 @@ sub IO::Compress::Base::Parameters::setError
     my $error = shift ;
     my $retval = (nelems @_) ?? shift !! undef ;
 
-    $self->{Error} = $error ;
+    $self->{+Error} = $error ;
     return $retval;
 }
           
@@ -518,7 +518,7 @@ sub IO::Compress::Base::Parameters::parse
 
     my $default = shift ;
 
-    my $got = $self->{Got} ;
+    my $got = $self->{?Got} ;
     my $firstTime = nkeys %{ $got } == 0 ;
 
     my (@Bad) ;
@@ -536,7 +536,7 @@ sub IO::Compress::Base::Parameters::parse
  
         foreach my $key (keys %$href) {
             push @entered, $key ;
-            push @entered, \$href->{$key} ;
+            push @entered, \$href->{+$key} ;
         }
     }
     else {
@@ -567,7 +567,7 @@ sub IO::Compress::Base::Parameters::parse
             $x = \@( $x )
                 if $type ^&^ Parse_multiple;
 
-            $got->{$key} = \@(0, $type, $value, $x, $first_only, $sticky) ;
+            $got->{+$key} = \@(0, $type, $value, $x, $first_only, $sticky) ;
         }
 
         $got->{$key}->[OFF_PARSED] = 0 ;
@@ -584,12 +584,12 @@ sub IO::Compress::Base::Parameters::parse
         $key =~ s/^-// ;
         my $canonkey = lc $key;
  
-        if ($got->{$canonkey} && ($firstTime ||
+        if ($got->{?$canonkey} && ($firstTime ||
                                   ! $got->{$canonkey}->[OFF_FIRST_ONLY]  ))
         {
             my $type = $got->{$canonkey}->[OFF_TYPE] ;
-            my $parsed = %parsed{$canonkey};
-            ++ %parsed{$canonkey};
+            my $parsed = %parsed{?$canonkey};
+            ++ %parsed{+$canonkey};
 
             return $self->setError("Muliple instances of '$key' found") 
                 if $parsed && ($type ^&^ Parse_multiple) == 0 ;
@@ -604,7 +604,7 @@ sub IO::Compress::Base::Parameters::parse
                 push @{ $got->{$canonkey}->[OFF_FIXED] }, $s ;
             }
             else {
-                $got->{$canonkey} = \@(1, $type, $value, $s) ;
+                $got->{+$canonkey} = \@(1, $type, $value, $s) ;
             }
         }
         else
@@ -761,11 +761,11 @@ sub IO::Compress::Base::Parameters::clone
     my %got ;
 
     while (my ($k, $v) = each %{ $self->{Got} }) {
-        %got{$k} = \ @$v;
+        %got{+$k} = \ @$v;
     }
 
-    $obj->{Error} = $self->{Error};
-    $obj->{Got} = \%got ;
+    $obj->{+Error} = $self->{?Error};
+    $obj->{+Got} = \%got ;
 
     return bless $obj, 'IO::Compress::Base::Parameters' ;
 }

@@ -106,7 +106,7 @@ my $Inc_uninstall_warn_handler;
 
 # install relative to here
 
-my $INSTALL_ROOT = %ENV{PERL_INSTALL_ROOT};
+my $INSTALL_ROOT = %ENV{?PERL_INSTALL_ROOT};
 
 my $Curdir = File::Spec->curdir;
 my $Updir  = File::Spec->updir;
@@ -119,7 +119,7 @@ do {my %warned;
 sub _warnonce(@) {
     my $first=shift;
     my $msg=_estr "WARNING: $first",< @_;
-    warn $msg unless %warned{$msg}++;
+    warn $msg unless %warned{+$msg}++;
 }};
 
 sub _choke(@) {
@@ -296,7 +296,7 @@ Handles loading the INSTALL.SKIP file. Returns an array of patterns to use.
 
 sub _get_install_skip {
     my ( $skip, $verbose )= < @_;
-    if (%ENV{EU_INSTALL_IGNORE_SKIP}) {
+    if (%ENV{?EU_INSTALL_IGNORE_SKIP}) {
         print "EU_INSTALL_IGNORE_SKIP is set, ignore skipfile settings\n"
             if $verbose+>2;
         return \@();
@@ -304,7 +304,7 @@ sub _get_install_skip {
     if ( ! defined $skip ) {
         print "Looking for install skip list\n"
             if $verbose+>2;
-        for my $file (@( 'INSTALL.SKIP', %ENV{EU_INSTALL_SITE_SKIPFILE}) ) {
+        for my $file (@( 'INSTALL.SKIP', %ENV{?EU_INSTALL_SITE_SKIPFILE}) ) {
             next unless $file;
             print "\tChecking for $file\n"
                 if $verbose+>2;
@@ -664,14 +664,14 @@ sub install { #XXX OS-SPECIFIC
     my($from_to,$verbose,$dry_run,$uninstall_shadows,$skip,$always_copy,$result) = < @_;
     if ((nelems @_)==1 and try { 1+nelems @$from_to }) {
         my %opts        = %( < @$from_to );
-        $from_to        = %opts{from_to} 
+        $from_to        = %opts{?from_to} 
                             or Carp::confess("from_to is a mandatory parameter");
-        $verbose        = %opts{verbose};
-        $dry_run        = %opts{dry_run};
-        $uninstall_shadows  = %opts{uninstall_shadows};
-        $skip           = %opts{skip};
-        $always_copy    = %opts{always_copy};
-        $result         = %opts{result};
+        $verbose        = %opts{?verbose};
+        $dry_run        = %opts{?dry_run};
+        $uninstall_shadows  = %opts{?uninstall_shadows};
+        $skip           = %opts{?skip};
+        $always_copy    = %opts{?always_copy};
+        $result         = %opts{?result};
     }
     
     $result ||= \%();
@@ -679,8 +679,8 @@ sub install { #XXX OS-SPECIFIC
     $dry_run  ||= 0;
 
     $skip= _get_install_skip($skip,$verbose);
-    $always_copy =  %ENV{EU_INSTALL_ALWAYS_COPY}
-                 || %ENV{EU_ALWAYS_COPY} 
+    $always_copy =  %ENV{?EU_INSTALL_ALWAYS_COPY}
+                 || %ENV{?EU_ALWAYS_COPY} 
                  || 0
         unless defined $always_copy;
 
@@ -690,10 +690,10 @@ sub install { #XXX OS-SPECIFIC
 
     local(*DIR);
     for (qw/read write/) {
-        %pack{$_}=%from_to{$_};
+        %pack{+$_}=%from_to{?$_};
         delete %from_to{$_};
     }
-    my $tmpfile = install_rooted_file(%pack{"read"});
+    my $tmpfile = install_rooted_file(%pack{?"read"});
     $packlist->read($tmpfile) if (-f $tmpfile);
     my $cwd = cwd();
     my @found_files;
@@ -710,7 +710,7 @@ sub install { #XXX OS-SPECIFIC
         #there are any files in arch. So we depend on having ./blib/arch
         #hardcoded here.
 
-        my $targetroot = install_rooted_dir(%from_to{$source});
+        my $targetroot = install_rooted_dir(%from_to{?$source});
 
         my $blib_lib  = File::Spec->catdir('blib', 'lib');
         my $blib_arch = File::Spec->catdir('blib', 'arch');
@@ -718,7 +718,7 @@ sub install { #XXX OS-SPECIFIC
             exists %from_to{$blib_arch} and
             directory_not_empty($blib_arch)
         ){
-            $targetroot = install_rooted_dir(%from_to{$blib_arch});
+            $targetroot = install_rooted_dir(%from_to{?$blib_arch});
             print "Files found in $blib_arch: installing files in $blib_lib into architecture dependent library tree\n";
         }
 
@@ -744,7 +744,7 @@ sub install { #XXX OS-SPECIFIC
                 if ( $sourcefile=~m/$pat/ ) {
                     print "Skipping $targetfile (filtered)\n"
                         if $verbose+>1;
-                    $result->{install_filtered}->{$sourcefile} = $pat;
+                    $result->{install_filtered}->{+$sourcefile} = $pat;
                     return;
                 }
             }
@@ -759,7 +759,7 @@ sub install { #XXX OS-SPECIFIC
                 # we might not need to copy this file
                 $diff = compare($sourcefile, $targetfile);
             }
-            %check_dirs{$targetdir}++ 
+            %check_dirs{+$targetdir}++ 
                 unless -w $targetfile;
             
             push @found_files,
@@ -802,14 +802,14 @@ sub install { #XXX OS-SPECIFIC
                 $mode = $mode ^|^ 0222
                   if $realtarget ne $targetfile;
                 _chmod( $mode, $targetfile, $verbose );
-                $result->{install}->{$targetfile} = $sourcefile;
+                $result->{install}->{+$targetfile} = $sourcefile;
                 1
             } or do {
-                $result->{install_fail}->{$targetfile} = $sourcefile;
+                $result->{install_fail}->{+$targetfile} = $sourcefile;
                 die $@;
             };
         } else {
-            $result->{install_unchanged}->{$targetfile} = $sourcefile;
+            $result->{install_unchanged}->{+$targetfile} = $sourcefile;
             print "Skipping $targetfile (unchanged)\n" if $verbose;
         }
 
@@ -821,14 +821,14 @@ sub install { #XXX OS-SPECIFIC
         }
 
         # Record the full pathname.
-        $packlist->{$targetfile}++;
+        $packlist->{+$targetfile}++;
     }
 
-    if (%pack{'write'}) {
-        $dir = install_rooted_dir(dirname(%pack{'write'}));
+    if (%pack{?'write'}) {
+        $dir = install_rooted_dir(dirname(%pack{?'write'}));
         _mkpath( $dir, 0, 0755, $verbose, $dry_run );
-        print "Writing %pack{'write'}\n";
-        $packlist->write(install_rooted_file(%pack{'write'})) unless $dry_run;
+        print "Writing %pack{?'write'}\n";
+        $packlist->write(install_rooted_file(%pack{?'write'})) unless $dry_run;
     }
 
     _do_cleanup($verbose);
@@ -1043,8 +1043,8 @@ sub inc_uninstall {
     my $file = (File::Spec->splitpath($filepath))[2];
     my %seen_dir = %( () );
     
-    my @PERL_ENV_LIB = split config_value("path_sep"), defined %ENV{'PERL5LIB'}
-      ?? %ENV{'PERL5LIB'} !! %ENV{'PERLLIB'} || '';
+    my @PERL_ENV_LIB = split config_value("path_sep"), defined %ENV{?'PERL5LIB'}
+      ?? %ENV{?'PERL5LIB'} !! %ENV{?'PERLLIB'} || '';
         
     my @dirs=@( < @PERL_ENV_LIB, 
                < @INC,
@@ -1058,7 +1058,7 @@ sub inc_uninstall {
     foreach my $dir (  @dirs ) {
         my $canonpath = File::Spec->canonpath($dir);
         next if $canonpath eq $Curdir;
-        next if %seen_dir{$canonpath}++;
+        next if %seen_dir{+$canonpath}++;
         my $targetfile = File::Spec->catfile($canonpath,$libdir,$file);
         next unless -f $targetfile;
 
@@ -1079,7 +1079,7 @@ sub inc_uninstall {
             next;
         }
         if ($dry_run) {
-            $results->{uninstall}->{$targetfile} = $filepath;
+            $results->{uninstall}->{+$targetfile} = $filepath;
             if ($verbose) {
                 $Inc_uninstall_warn_handler ||= ExtUtils::Install::Warn->new();
                 $libdir =~ s|^\./||s ; # That's just cosmetics, no need to port. It looks prettier.
@@ -1096,10 +1096,10 @@ sub inc_uninstall {
                     if $ExtUtils::Install::Testing and
                        File::Spec->canonpath($ExtUtils::Install::Testing) eq $targetfile;
                 forceunlink($targetfile,'tryhard');
-                $results->{uninstall}->{$targetfile} = $filepath;
+                $results->{uninstall}->{+$targetfile} = $filepath;
                 1;
             } or do {
-                $results->{fail_uninstall}->{$targetfile} = $filepath;
+                $results->{fail_uninstall}->{+$targetfile} = $filepath;
                 if ($seen_ours) { 
                     warn "Failed to remove probably harmless shadow file '$targetfile'\n";
                 } else {
@@ -1209,9 +1209,9 @@ sub DESTROY {
         my $self = shift;
         my($i,$plural);
         foreach my $file (sort keys %$self) {
-            $plural = (nelems @{$self->{$file}}) +> 1 ?? "s" !! "";
+            $plural = (nelems @{$self->{?$file}}) +> 1 ?? "s" !! "";
             print "## Differing version$plural of $file found. You might like to\n";
-            for (0..(nelems @{$self->{$file}})-1) {
+            for (0..(nelems @{$self->{?$file}})-1) {
                 print "rm ", $self->{$file}->[$_], "\n";
                 $i++;
             }

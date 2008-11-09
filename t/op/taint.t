@@ -19,12 +19,12 @@ use vars < qw($ipcsysv); # did we manage to load IPC::SysV?
 
 my ($old_env_path, $old_env_dcl_path, $old_env_term);
 BEGIN {
-   $old_env_path = %ENV{'PATH'};
-   $old_env_dcl_path = %ENV{'DCL$PATH'};
-   $old_env_term = %ENV{'TERM'};
+   $old_env_path = %ENV{?'PATH'};
+   $old_env_dcl_path = %ENV{?'DCL$PATH'};
+   $old_env_term = %ENV{?'TERM'};
   if ($^O eq 'VMS' && !defined(config_value('d_setenv'))) {
-      %ENV{PATH} = %ENV{PATH};
-      %ENV{TERM} = %ENV{TERM} ne ''?? %ENV{TERM} !! 'dummy';
+      %ENV{+PATH} = %ENV{?PATH};
+      %ENV{+TERM} = %ENV{?TERM} ne ''?? %ENV{?TERM} !! 'dummy';
   }
   if (config_value('extensions') =~ m/\bIPC\/SysV\b/
       && (config_value('d_shm') || config_value('d_msg'))) {
@@ -53,7 +53,7 @@ my @MoreEnv = qw/IFS CDPATH ENV BASH_ENV/;
 if ($Is_VMS) {
     my (%old);
     for my $x (@('DCL$PATH', < @MoreEnv)) {
-	(%old{$x}) = %ENV{$x} =~ m/^(.*)$/ if exists %ENV{$x};
+	(%old{+$x}) = %ENV{?$x} =~ m/^(.*)$/ if exists %ENV{$x};
     }
     # VMS note:  PATH and TERM are automatically created by the C
     # library in VMS on reference to the their keys in %ENV.
@@ -143,11 +143,11 @@ my $TEST = catfile(curdir(), 'TEST');
 # environment variables. Maybe they aren't set yet, so we'll
 # taint them ourselves.
 do {
-    %ENV{'DCL$PATH'} = '' if $Is_VMS;
+    %ENV{+'DCL$PATH'} = '' if $Is_VMS;
 
     if ($Is_MSWin32 && config_value('ccname') =~ m/bcc32/ && ! -f 'cc3250mt.dll') {
 	my $bcc_dir;
-	foreach my $dir (split m/$(config_value('path_sep'))/, %ENV{PATH}) {
+	foreach my $dir (split m/$(config_value('path_sep'))/, %ENV{?PATH}) {
 	    if (-f "$dir/cc3250mt.dll") {
 		$bcc_dir = $dir and last;
 	    }
@@ -161,9 +161,9 @@ do {
 	    }; die if $@;
 	}
     }
-    %ENV{PATH} = ($Is_Cygwin) ?? '/usr/bin' !! '';
+    %ENV{+PATH} = ($Is_Cygwin) ?? '/usr/bin' !! '';
     delete %ENV{[@MoreEnv]};
-    %ENV{TERM} = 'dumb';
+    %ENV{+TERM} = 'dumb';
 
     test try { `$echo 1` } eq "1\n";
 
@@ -173,20 +173,20 @@ do {
 
 	my @vars = @('PATH', < @MoreEnv);
 	while (my $v = @vars[0]) {
-	    local %ENV{$v} = $TAINT;
+	    local %ENV{+$v} = $TAINT;
 	    last if try { `$echo 1` };
-	    last unless $@->{description} =~ m/^Insecure \$ENV{$v}/;
+	    last unless $@->{?description} =~ m/^Insecure \$ENV{$v}/;
 	    shift @vars;
 	}
 	test !nelems @vars, "$(join ' ',@vars)";
 
 	# tainted $TERM is unsafe only if it contains metachars
 	local %ENV{TERM};
-	%ENV{TERM} = 'e=mc2';
+	%ENV{+TERM} = 'e=mc2';
 	test try { `$echo 1` } eq "1\n";
-	%ENV{TERM} = 'e=mc2' . $TAINT;
+	%ENV{+TERM} = 'e=mc2' . $TAINT;
 	test !try { `$echo 1` };
-	like( $@->{description}, qr/^Insecure \$ENV{TERM}/ );
+	like( $@->{?description}, qr/^Insecure \$ENV{TERM}/ );
     };
 
     my $tmp;
@@ -203,26 +203,26 @@ do {
     SKIP: do {
         skip "all directories are writeable", 2 unless $tmp;
 
-	local %ENV{PATH} = $tmp;
+	local %ENV{+PATH} = $tmp;
 	test !try { `$echo 1` };
-	test $@->{description} =~ m/^Insecure directory in \$ENV{PATH}/, $@;
+	test $@->{?description} =~ m/^Insecure directory in \$ENV{PATH}/, $@;
     };
 
     SKIP: do {
         skip "This is not VMS", 4 unless $Is_VMS;
 
-	%ENV{'DCL$PATH'} = $TAINT;
+	%ENV{+'DCL$PATH'} = $TAINT;
 	test  try { `$echo 1` } eq '';
-	test $@->{description} =~ m/^Insecure \$ENV{DCL\$PATH}/, $@;
+	test $@->{?description} =~ m/^Insecure \$ENV{DCL\$PATH}/, $@;
 	SKIP: do {
             skip q[can't find world-writeable directory to test DCL$PATH], 2
               unless $tmp;
 
-	    %ENV{'DCL$PATH'} = $tmp;
+	    %ENV{+'DCL$PATH'} = $tmp;
 	    test try { `$echo 1` } eq '';
-	    test $@->{description} =~ m/^Insecure directory in \$ENV{DCL\$PATH}/, $@;
+	    test $@->{?description} =~ m/^Insecure directory in \$ENV{DCL\$PATH}/, $@;
 	};
-	%ENV{'DCL$PATH'} = '';
+	%ENV{+'DCL$PATH'} = '';
     };
 };
 
@@ -312,10 +312,10 @@ SKIP: do {
     skip "globs should be forbidden", 2 if 1 or $Is_VMS;
 
     my @globs = @( try { glob( <"*") } );
-    test (nelems @globs) == 0 && $@->{description} =~ m/^Insecure dependency/;
+    test (nelems @globs) == 0 && $@->{?description} =~ m/^Insecure dependency/;
 
     @globs = @( try { glob < '*' } );
-    test (nelems @globs) == 0 && $@->{description} =~ m/^Insecure dependency/;
+    test (nelems @globs) == 0 && $@->{?description} =~ m/^Insecure dependency/;
 };
 
 # Output of commands should be tainted
@@ -747,20 +747,20 @@ do {
     my $c = \%( a => 42,
                 b => $a );
 
-    ok !tainted($c->{a}) && tainted($c->{b});
+    ok !tainted($c->{?a}) && tainted($c->{?b});
 
 
     my $d = \%( a => $a,
                 b => 42 );
-    ok tainted($d->{a}) && !tainted($d->{b});
+    ok tainted($d->{?a}) && !tainted($d->{?b});
 
 
     my $e = \%( a => 42,
                 b => \%( c => $a, d => 42 ) );
-    ok !tainted($e->{a}) &&
-       !tainted($e->{b}) &&
-	tainted($e->{b}->{c}) &&
-       !tainted($e->{b}->{d});
+    ok !tainted($e->{?a}) &&
+       !tainted($e->{?b}) &&
+	tainted($e->{b}->{?c}) &&
+       !tainted($e->{b}->{?d});
 
     close IN;
 };
@@ -875,7 +875,7 @@ ok( $^TAINT == 1, '$^TAINT is on' );
 
 try { $^TAINT = 0 };
 ok( $^TAINT,  '$^TAINT is not assignable' );
-ok( $@->{description} =~ m/^Modification of a read-only value attempted/,
+ok( $@->{?description} =~ m/^Modification of a read-only value attempted/,
     'Assigning to $^TAINT fails' );
 
 do {
@@ -895,7 +895,7 @@ SKIP: do {
     skip "system \{\} has different semantics on Win32", 1 if $Is_MSWin32;
 
     # bug 20010221.005
-    local %ENV{PATH} .= $TAINT;
+    local %ENV{+PATH} .= $TAINT;
     dies_like(sub { system { "echo" } "/arg0", "arg1" },
               qr/^Insecure \$ENV/);
 };
@@ -1114,8 +1114,8 @@ do {
     SKIP: do {
 	skip "fork() is not available", 3 unless config_value('d_fork');
 
-	%ENV{'PATH'} = $TAINT;
-	local %SIG{'PIPE'} = 'IGNORE';
+	%ENV{+'PATH'} = $TAINT;
+	local %SIG{+'PIPE'} = 'IGNORE';
 	try {
 	    my $pid = open my $pipe, "|-", '-';
 	    if (!defined $pid) {
@@ -1126,13 +1126,13 @@ do {
 	    }
 	    close $pipe;
 	};
-	test( ($@ && $@->{description}) !~ m/Insecure \$ENV/, 'fork triggers %ENV check');
+	test( ($@ && $@->{?description}) !~ m/Insecure \$ENV/, 'fork triggers %ENV check');
 	is $@, '',               'pipe/fork/open/close failed';
 	try {
 	    open my $pipe, "|-", "$Invoke_Perl -e 1";
 	    close $pipe;
 	};
-	test $@->{description} =~ m/Insecure \$ENV/, 'popen neglects %ENV check';
+	test $@->{?description} =~ m/Insecure \$ENV/, 'popen neglects %ENV check';
     };
 };
 

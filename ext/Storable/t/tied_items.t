@@ -13,7 +13,7 @@
 use Config;
 
 BEGIN {
-    if (%ENV{PERL_CORE}){
+    if (%ENV{?PERL_CORE}){
 	push @INC, '../ext/Storable/t';
     } else {
 	unshift @INC, 't';
@@ -34,7 +34,7 @@ sub H::FETCH { $h_fetches++; @_[1] - 70 }
 
 tie my %h, "H";
 
-my $ref = \%h{77};
+my $ref = \%h{+77};
 my $ref2 = dclone $ref;
 
 ok 1, $h_fetches == 0;

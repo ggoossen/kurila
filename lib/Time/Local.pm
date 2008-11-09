@@ -62,7 +62,7 @@ sub _daygm {
     # This is written in such a byzantine way in order to avoid
     # lexical variables and sub calls, for speed
     return @_[3] + (
-        %Cheat{ pack( 'ss', < @_[[@( 4, 5) ]] ) } ||= do {
+        %Cheat{+pack( 'ss', < @_[[@( 4, 5) ]] ) } ||= do {
             my $month = ( @_[4] + 10 ) % 12;
             my $year  = @_[5] + 1900 - $month / 10;
 
@@ -94,7 +94,7 @@ sub timegm {
         $year += ( $year +> $Breakpoint ) ?? $Century !! $NextCentury;
     }
 
-    unless ( %Options{no_range_check} ) {
+    unless ( %Options{?no_range_check} ) {
         if ( abs($year) +>= 0x7fff ) {
             $year += 1900;
             die
@@ -117,7 +117,7 @@ sub timegm {
 
     my $days = _daygm( undef, undef, undef, $mday, $month, $year );
 
-    unless (%Options{no_range_check} or abs($days) +< $MaxDay) {
+    unless (%Options{?no_range_check} or abs($days) +< $MaxDay) {
         my $msg = '';
         $msg .= "Day too big - $days > $MaxDay\n" if $days +> $MaxDay;
 
@@ -143,7 +143,7 @@ sub _is_leap_year {
 }
 
 sub timegm_nocheck {
-    local %Options{no_range_check} = 1;
+    local %Options{+no_range_check} = 1;
     return &timegm( < @_ );
 }
 
@@ -183,7 +183,7 @@ sub timelocal {
 }
 
 sub timelocal_nocheck {
-    local %Options{no_range_check} = 1;
+    local %Options{+no_range_check} = 1;
     return &timelocal( < @_ );
 }
 

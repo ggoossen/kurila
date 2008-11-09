@@ -32,21 +32,21 @@ sub import {
     # avoid possible typo warnings
     %{*{Symbol::fetch_glob("$package\::FIELDS")}} = %( () ) unless %{*{Symbol::fetch_glob("$package\::FIELDS")}};
     my $fields = \%{*{Symbol::fetch_glob("$package\::FIELDS")}};
-    my $fattr = (%attr{$package} ||= \@(1));
+    my $fattr = (%attr{+$package} ||= \@(1));
     my $next = (nelems @$fattr);
 
     # Quiet pseudo-hash deprecation warning for uses of fields::new.
     bless \%{*{Symbol::fetch_glob("$package\::FIELDS")}}, 'pseudohash';
 
     if ($next +> $fattr->[0]
-        and ($fields->{@_[0]} || 0) +>= $fattr->[0])
+        and ($fields->{?@_[0]} || 0) +>= $fattr->[0])
     {
         # There are already fields not belonging to base classes.
         # Looks like a possible module reload...
         $next = $fattr->[0];
     }
     foreach my $f ( @_) {
-        my $fno = $fields->{$f};
+        my $fno = $fields->{?$f};
 
         # Allow the module to be reloaded so long as field positions
         # have not changed.
@@ -57,7 +57,7 @@ sub import {
                 die("Field name '$f' already in use");
             }
         }
-        $fields->{$f} = $next;
+        $fields->{+$f} = $next;
         $fattr->[$next] = ($f =~ m/^_/) ?? PRIVATE !! PUBLIC;
         $next += 1;
     }
@@ -86,8 +86,8 @@ sub _dump  # sometimes useful for debugging
         }
         print "\n";
         my $fields = \%{*{Symbol::fetch_glob("$pkg\::FIELDS")}};
-        for my $f (sort {$fields->{$a} <+> $fields->{$b}} keys %$fields) {
-            my $no = $fields->{$f};
+        for my $f (sort {$fields->{?$a} <+> $fields->{?$b}} keys %$fields) {
+            my $no = $fields->{?$f};
             print "   $no: $f";
             my $fattr = %attr{$pkg}->[$no];
             if (defined $fattr) {

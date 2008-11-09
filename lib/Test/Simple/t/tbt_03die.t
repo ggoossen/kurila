@@ -6,7 +6,7 @@ use Test::More;
 try {
     test_test("foo");
 };
-like($@->{description},
+like($@->{?description},
      "/Not testing\.  You must declare output with a test function first\./",
      "dies correctly on error");
 

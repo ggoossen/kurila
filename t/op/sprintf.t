@@ -53,12 +53,12 @@ while ( ~< *DATA) {
 print '1..', scalar nelems @tests, "\n";
 
 $^WARN_HOOK = sub {
-    if (@_[0]->{description} =~ m/^Invalid conversion/) {
+    if (@_[0]->{?description} =~ m/^Invalid conversion/) {
 	$w = ' INVALID';
-    } elsif (@_[0]->{description}=~ m/^Use of uninitialized value/) {
+    } elsif (@_[0]->{?description}=~ m/^Use of uninitialized value/) {
 	$w = ' UNINIT';
     } else {
-	warn @_[0]->{description};
+	warn @_[0]->{?description};
     }
 };
 

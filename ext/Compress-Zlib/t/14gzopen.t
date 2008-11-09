@@ -1,5 +1,5 @@
 BEGIN {
-    if (%ENV{PERL_CORE}) {
+    if (%ENV{?PERL_CORE}) {
 	push @INC, "lib/compress";
     }
 }
@@ -305,7 +305,7 @@ do {
 
     # missing parameters
     eval ' $fil = gzopen()  ' ;
-    like $@->{description}, mkEvalErr('Not enough arguments for Compress::Zlib::gzopen'),
+    like $@->{?description}, mkEvalErr('Not enough arguments for Compress::Zlib::gzopen'),
         '  gzopen with missing mode fails' ;
 
     # unknown parameters
@@ -446,10 +446,10 @@ do {
     ok ! $a->gzerror() 
         or print "# gzerrno is $Compress::Zlib::gzerrno \n" ;
     try { $a->gzseek(-1, 10) ; };
-    like $@->{description}, mkErr("seek: unknown value, 10, for whence parameter");
+    like $@->{?description}, mkErr("seek: unknown value, 10, for whence parameter");
 
     try { $a->gzseek(-1, SEEK_END) ; };
-    like $@->{description}, mkErr("seek: cannot seek backwards");
+    like $@->{?description}, mkErr("seek: cannot seek backwards");
 
     $a->gzwrite("fred");
     $a->gzclose ;
@@ -458,13 +458,13 @@ do {
     my $u = gzopen($name, "r");
 
     try { $u->gzseek(-1, 10) ; };
-    like $@->{description}, mkErr("seek: unknown value, 10, for whence parameter");
+    like $@->{?description}, mkErr("seek: unknown value, 10, for whence parameter");
 
     try { $u->gzseek(-1, SEEK_END) ; };
-    like $@->{description}, mkErr("seek: SEEK_END not allowed");
+    like $@->{?description}, mkErr("seek: SEEK_END not allowed");
 
     try { $u->gzseek(-1, SEEK_CUR) ; };
-    like $@->{description}, mkErr("seek: cannot seek backwards");
+    like $@->{?description}, mkErr("seek: cannot seek backwards");
 };
 
 do {

@@ -7,7 +7,7 @@
 use Test::More < qw(no_plan);
 use POSIX;
 
-diag "Tests with base class" unless %ENV{PERL_CORE};
+diag "Tests with base class" unless %ENV{?PERL_CORE};
 
 BEGIN {
     use_ok("version", 0.50); # If we made it this far, we are ok.
@@ -17,7 +17,7 @@ our $Verbose;
 
 BaseTests("version");
 
-diag "Tests with empty derived class" unless %ENV{PERL_CORE};
+diag "Tests with empty derived class" unless %ENV{?PERL_CORE};
 
 package version::Empty;
 use base 'version';
@@ -40,20 +40,20 @@ my $verobj = version->new("1.2.4");
 is( $verobj->vcmp($testobj), 1, "Comparison vs parent class" );
 BaseTests("version::Empty");
 
-diag "tests with bad subclass" unless %ENV{PERL_CORE};
+diag "tests with bad subclass" unless %ENV{?PERL_CORE};
 $testobj = version::Bad->new(1.002_003);
 isa_ok( $testobj, "version::Bad" );
 try { my $string = $testobj->numify };
-like($@->{description}, qr/Invalid version object/,
+like($@->{?description}, qr/Invalid version object/,
     "Bad subclass numify");
 try { my $string = $testobj->normal };
-like($@->{description}, qr/Invalid version object/,
+like($@->{?description}, qr/Invalid version object/,
     "Bad subclass normal");
 try { my $string = $testobj->stringify };
-like($@->{description}, qr/Invalid version object/,
+like($@->{?description}, qr/Invalid version object/,
     "Bad subclass stringify");
 try { my $test = $testobj->vcmp(1.0) };
-like($@->{description}, qr/Invalid version object/,
+like($@->{?description}, qr/Invalid version object/,
     "Bad subclass vcmp");
 
 # dummy up a redundant call to satify David Wheeler
@@ -95,32 +95,32 @@ sub BaseTests {
     # test illegal formats
     diag "test illegal formats" if $Verbose;
     try {my $version = $CLASS->new("1.2_3_4")};
-    like($@->{description}, qr/multiple underscores/,
+    like($@->{?description}, qr/multiple underscores/,
 	"Invalid version format (multiple underscores)");
     
     try {my $version = $CLASS->new("1.2_3.4")};
-    like($@->{description}, qr/underscores before decimal/,
+    like($@->{?description}, qr/underscores before decimal/,
 	"Invalid version format (underscores before decimal)");
     
     try {my $version = $CLASS->new("1_2")};
-    like($@->{description}, qr/alpha without decimal/,
+    like($@->{?description}, qr/alpha without decimal/,
 	"Invalid version format (alpha without decimal)");
     
     # for this first test, just upgrade the warn() to die()
     try {
-	local $^WARN_HOOK = sub { die @_[0]->{description} };
+	local $^WARN_HOOK = sub { die @_[0]->{?description} };
 	$version = $CLASS->new("1.2b3");
     };
     my $warnregex = "Version string '.+' contains invalid data; ".
 	    "ignoring: '.+'";
 
-    like($@->{description}, qr/$warnregex/,
+    like($@->{?description}, qr/$warnregex/,
 	"Version string contains invalid data; ignoring");
 
     # from here on out capture the warning and test independently
     do {
     my $warning;
-    local $^WARN_HOOK = sub { $warning = @_[0]->{description} };
+    local $^WARN_HOOK = sub { $warning = @_[0]->{?description} };
     $version = $CLASS->new("99 and 44/100 pure");
 
     like($warning, qr/$warnregex/,
@@ -291,7 +291,7 @@ SKIP: do {
 	# this should fail even with old UNIVERSAL::VERSION
 	$version = "v0.590";
 	eval "use lib '.'; use aaa $version";
-	like($@->{description}, qr/aaa version $version/,
+	like($@->{?description}, qr/aaa version $version/,
 		'Replacement eval works with incremented version');
 	
 	$version =~ s/0+$//; #convert to string and remove trailing 0's
@@ -309,7 +309,7 @@ SKIP: do {
 	close F;
 
 	eval "use lib '.'; use xxx v3;";
-        like($@->{description}, qr/xxx defines neither package nor VERSION/,
+        like($@->{?description}, qr/xxx defines neither package nor VERSION/,
              'Replacement handles modules without package or VERSION'); 
 	eval "use lib '.'; use xxx; \$version = xxx->VERSION";
 	unlike ($@, qr/$error_regex/,
@@ -323,7 +323,7 @@ SKIP: do {
 	print F "package yyy;\n#look ma no VERSION\n1;\n";
 	close F;
 	eval "use lib '.'; use yyy v3;";
-	like ($@->{description}, qr/$error_regex/,
+	like ($@->{?description}, qr/$error_regex/,
 	    'Replacement handles modules without VERSION'); 
 	eval "use lib '.'; use yyy; print yyy->VERSION";
 	unlike ($@, qr/$error_regex/,
@@ -336,7 +336,7 @@ SKIP: do {
 	print F "package zzz;\nour \@VERSION = ();\n1;\n";
 	close F;
 	eval "use lib '.'; use zzz v3;";
-	like ($@->{description}, qr/$error_regex/,
+	like ($@->{?description}, qr/$error_regex/,
 	    'Replacement handles modules without VERSION'); 
 	eval "use lib '.'; use zzz; print zzz->VERSION";
 	unlike ($@, qr/$error_regex/,
@@ -410,18 +410,18 @@ EOF
 	close F;
 
 	eval "use lib '.'; use www v0.000008;";
-	like ($@->{description}, qr/^www version v0.8.0 required/,
+	like ($@->{?description}, qr/^www version v0.8.0 required/,
 	    "Make sure very small versions don't freak"); 
 	eval "use lib '.'; use www v1;";
-	like ($@->{description}, qr/^www version v1.0.0 required/,
+	like ($@->{?description}, qr/^www version v1.0.0 required/,
 	    "Comparing vs. version with no decimal"); 
 	eval "use lib '.'; use www v1.;";
-	like ($@->{description}, qr/^www version v1.0.0 required/,
+	like ($@->{?description}, qr/^www version v1.0.0 required/,
 	    "Comparing vs. version with decimal only"); 
 
 	eval "use lib '.'; use www v0.0.8;";
 	my $regex = "^www version v0.0.8 required";
-	like ($@->{description}, qr/$regex/, "Make sure very small versions don't freak"); 
+	like ($@->{?description}, qr/$regex/, "Make sure very small versions don't freak"); 
 
 	$regex =~ s/8/4/; # set for second test
 	eval "use lib '.'; use www v0.0.4;";
@@ -455,10 +455,10 @@ our \$VERSION = 1.0;
 EOF
 	close F;
 	eval "use lib '.'; use uuu v1.001;";
-	like ($@->{description}, qr/^uuu version v1.1.0 required/,
+	like ($@->{?description}, qr/^uuu version v1.1.0 required/,
 	    "User typed numeric so we error with numeric"); 
 	eval "use lib '.'; use uuu v1.1.0;";
-	like ($@->{description}, qr/^uuu version v1.1.0 required/,
+	like ($@->{?description}, qr/^uuu version v1.1.0 required/,
 	    "User typed extended so we error with extended"); 
 	unlink 'uuu.pm';
     };
@@ -472,7 +472,7 @@ SKIP: do {
 	while ( ~< *DATA) {
 	    chomp;
 	    $loc = POSIX::setlocale(&POSIX::LC_ALL( < @_ ), $_);
-	    last if POSIX::localeconv()->{decimal_point} eq ',';
+	    last if POSIX::localeconv()->{?decimal_point} eq ',';
 	}
 	skip 'Cannot test locale handling without a comma locale', 4
 	    unless ( $loc and ($ver eq '1,23') );
@@ -487,7 +487,7 @@ SKIP: do {
     };
 
     eval 'my $v = $CLASS->new("1._1");';
-    unlike($@->{description}, qr/^Invalid version format \(alpha with zero width\)/,
+    unlike($@->{?description}, qr/^Invalid version format \(alpha with zero width\)/,
     	"Invalid version format 1._1");
 
     do {
@@ -495,7 +495,7 @@ SKIP: do {
 	local $^WARN_HOOK = sub { $warning = @_[0] };
 	try { my $v = $CLASS->new(^~^0); };
 	unlike($@, qr/Integer overflow in version/, "Too large version");
-	like($warning->{description}, qr/Integer overflow in version/, "Too large version");
+	like($warning->{?description}, qr/Integer overflow in version/, "Too large version");
     };
 
 }

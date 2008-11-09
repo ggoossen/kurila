@@ -25,7 +25,7 @@ if ( $@ ) {
       sub File::Spec::VMS::unixify \{ die "$skip_exception" \}
       sub File::Spec::VMS::vmspath \{ die "$skip_exception" \}
    - ;
-   %INC{"VMS/Filespec.pm"} = 1 ;
+   %INC{+"VMS/Filespec.pm"} = 1 ;
 }
 require File::Spec::VMS ;
 
@@ -758,7 +758,7 @@ sub tryfunc {
     $got = join ',',$got if (ref \$got) eq "ARRAY";
 
     if ( $@ ) {
-      if ( $@->{description} =~ m/^\Q$skip_exception/ ) {
+      if ( $@->{?description} =~ m/^\Q$skip_exception/ ) {
 	skip "skip $function: $skip_exception", 1;
       }
       else {

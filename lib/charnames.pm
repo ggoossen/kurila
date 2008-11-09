@@ -81,15 +81,15 @@ sub charnames
   my $name = shift;
 
   if (exists %alias1{$name}) {
-    $name = %alias1{$name};
+    $name = %alias1{?$name};
   }
   elsif (exists %alias2{$name}) {
     require warnings;
-    warnings::warnif('deprecated', qq{Unicode character name "$name" is deprecated, use "%alias2{$name}" instead});
-    $name = %alias2{$name};
+    warnings::warnif('deprecated', qq{Unicode character name "$name" is deprecated, use "%alias2{?$name}" instead});
+    $name = %alias2{?$name};
   }
   elsif (exists %alias3{$name}) {
-    $name = %alias3{$name};
+    $name = %alias3{?$name};
   }
 
   my $ord;
@@ -107,14 +107,14 @@ sub charnames
 
     my $hexre = "[0-9A-Fa-f]+";
     ## If :full, look for the name exactly
-    if (%^H{charnames_full} and $txt =~ m/($hexre)\t\t\Q$name\E$/m) {
+    if (%^H{?charnames_full} and $txt =~ m/($hexre)\t\t\Q$name\E$/m) {
         $hexstr = $1;
     }
 
     ## If we didn't get above, and :short allowed, look for the short name.
     ## The short name is like "greek:Sigma"
     unless (defined $hexstr) {
-      if (%^H{charnames_short} and $name =~ m/^(.+?):(.+)/s) {
+      if (%^H{?charnames_short} and $name =~ m/^(.+?):(.+)/s) {
 	my ($script, $cname) = ($1, $2);
 	my $case = $cname =~ m/[[:upper:]]/ ?? "CAPITAL" !! "SMALL";
         my $uc_cname = uc($cname);
@@ -160,7 +160,7 @@ sub import
   if (not nelems @_) {
     warn("`use charnames' needs explicit imports list");
   }
-  %^H{charnames} = \&charnames ;
+  %^H{+charnames} = \&charnames ;
 
   ##
   ## fill %h keys with our @_ args.
@@ -195,15 +195,15 @@ sub import
   (nelems @args) == 0 && $promote and @args = @(":full");
  <  %h{[ @args]} = (1) x nelems @args;
 
-  %^H{charnames_full} = delete %h{':full'};
-  %^H{charnames_short} = delete %h{':short'};
-  %^H{charnames_scripts} = \ map uc, keys %h;
+  %^H{+charnames_full} = delete %h{':full'};
+  %^H{+charnames_short} = delete %h{':short'};
+  %^H{+charnames_scripts} = \ map uc, keys %h;
 
   ##
   ## If utf8? warnings are enabled, and some scripts were given,
   ## see if at least we can find one letter of each script.
   ##
-  if (warnings::enabled('utf8') && nelems @{%^H{charnames_scripts}}) {
+  if (warnings::enabled('utf8') && nelems @{%^H{?charnames_scripts}}) {
     $txt = do "unicore/Name.pl" unless $txt;
 
     for my $script ( @{%^H{charnames_scripts}}) {
@@ -243,13 +243,13 @@ sub viacode
     return;
   }
 
-  return %viacode{$hex} if exists %viacode{$hex};
+  return %viacode{?$hex} if exists %viacode{$hex};
 
   $txt = do "unicore/Name.pl" unless $txt;
 
   return unless $txt =~ m/^$hex\t\t(.+)/m;
 
-  %viacode{$hex} = $1;
+  %viacode{+$hex} = $1;
 } # viacode
 
 my %vianame;
@@ -265,7 +265,7 @@ sub vianame
 
   return chr CORE::hex $1 if $arg =~ m/^U\+([0-9a-fA-F]+)$/;
 
-  return %vianame{$arg} if exists %vianame{$arg};
+  return %vianame{?$arg} if exists %vianame{$arg};
 
   $txt = do "unicore/Name.pl" unless $txt;
 
@@ -273,7 +273,7 @@ sub vianame
   if ($pos +>= 0) {
     my $posLF = rindex $txt, "\n", $pos;
     (my $code = substr $txt, $posLF + 1, 6) =~ s/\t//g;
-    return %vianame{$arg} = CORE::hex $code;
+    return %vianame{+$arg} = CORE::hex $code;
 
     # If $pos is at the 1st line, $posLF must be $[ - 1 (not found);
     # then $posLF + 1 equals to $[ (at the beginning of $txt).

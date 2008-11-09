@@ -556,20 +556,20 @@ sub initialize {
     my $self = shift;
     ## Initialize number of errors, and setup an error function to
     ## increment this number and then print to the designated output.
-    $self->{_NUM_ERRORS} = 0;
-    $self->{_NUM_WARNINGS} = 0;
-    $self->{-quiet} ||= 0;
+    $self->{+_NUM_ERRORS} = 0;
+    $self->{+_NUM_WARNINGS} = 0;
+    $self->{+quiet} ||= 0;
     # set the error handling subroutine
-    $self->errorsub($self->{-quiet} ?? sub { 1; } !! 'poderror');
-    $self->{_commands} = 0; # total number of POD commands encountered
-    $self->{_list_stack} = \@(); # stack for nested lists
-    $self->{_have_begin} = ''; # stores =begin
-    $self->{_links} = \@(); # stack for internal hyperlinks
-    $self->{_nodes} = \@(); # stack for =head/=item nodes
-    $self->{_index} = \@(); # text in X<>
+    $self->errorsub($self->{?quiet} ?? sub { 1; } !! 'poderror');
+    $self->{+_commands} = 0; # total number of POD commands encountered
+    $self->{+_list_stack} = \@(); # stack for nested lists
+    $self->{+_have_begin} = ''; # stores =begin
+    $self->{+_links} = \@(); # stack for internal hyperlinks
+    $self->{+_nodes} = \@(); # stack for =head/=item nodes
+    $self->{+_index} = \@(); # text in X<>
     # print warnings?
-    $self->{-warnings} = 1 unless(defined $self->{-warnings});
-    $self->{_current_head1} = ''; # the current =head1 block
+    $self->{+warnings} = 1 unless(defined $self->{?warnings});
+    $self->{+_current_head1} = ''; # the current =head1 block
     $self->parseopts(-process_cut_cmd => 1, -warnings => $self->{-warnings});
 }
 
@@ -607,24 +607,24 @@ sub poderror {
     my %opts = %( (ref @_[0]) ?? < %{shift()} !! () );
 
     ## Retrieve options
-    chomp( my $msg  = (%opts{-msg} || "")."$(join ' ',@_)" );
-    my $line = (exists %opts{-line}) ?? " at line %opts{-line}" !! "";
-    my $file = (exists %opts{-file}) ?? " in file %opts{-file}" !! "";
+    chomp( my $msg  = (%opts{?msg} || "")."$(join ' ',@_)" );
+    my $line = (exists %opts{-line}) ?? " at line %opts{?line}" !! "";
+    my $file = (exists %opts{-file}) ?? " in file %opts{?file}" !! "";
     unless (exists %opts{-severity}) {
        ## See if can find severity in message prefix
-       %opts{-severity} = $1  if ( $msg =~ s/^\**\s*([A-Z]{3,}):\s+// );
+       %opts{+severity} = $1  if ( $msg =~ s/^\**\s*([A-Z]{3,}):\s+// );
     }
-    my $severity = (exists %opts{-severity}) ?? "*** %opts{-severity}: " !! "";
+    my $severity = (exists %opts{-severity}) ?? "*** %opts{?severity}: " !! "";
 
     ## Increment error count and print message "
-    ++($self->{_NUM_ERRORS}) 
-        if(!%opts || (%opts{-severity} && %opts{-severity} eq 'ERROR'));
-    ++($self->{_NUM_WARNINGS})
-        if(!%opts || (%opts{-severity} && %opts{-severity} eq 'WARNING'));
-    unless($self->{-quiet}) {
+    ++($self->{+_NUM_ERRORS}) 
+        if(!%opts || (%opts{?severity} && %opts{?severity} eq 'ERROR'));
+    ++($self->{+_NUM_WARNINGS})
+        if(!%opts || (%opts{?severity} && %opts{?severity} eq 'WARNING'));
+    unless($self->{?quiet}) {
       my $out_fh = $self->output_handle() || \*STDERR;
       print $out_fh ($severity, $msg, $line, $file, "\n")
-        if($self->{-warnings} || !%opts || %opts{-severity} ne 'WARNING');
+        if($self->{?warnings} || !%opts || %opts{?severity} ne 'WARNING');
     }
 }
 
@@ -637,7 +637,7 @@ Set (if argument specified) and retrieve the number of errors found.
 =cut
 
 sub num_errors {
-   return ((nelems @_) +> 1) ??  @(@_[0]->{_NUM_ERRORS} = @_[1]) !! @_[0]->{_NUM_ERRORS};
+   return ((nelems @_) +> 1) ??  @(@_[0]->{+_NUM_ERRORS} = @_[1]) !! @_[0]->{?_NUM_ERRORS};
 }
 
 ##################################
@@ -649,7 +649,7 @@ Set (if argument specified) and retrieve the number of warnings found.
 =cut
 
 sub num_warnings {
-   return ((nelems @_) +> 1) ??  @(@_[0]->{_NUM_WARNINGS} = @_[1]) !! @_[0]->{_NUM_WARNINGS};
+   return ((nelems @_) +> 1) ??  @(@_[0]->{+_NUM_WARNINGS} = @_[1]) !! @_[0]->{?_NUM_WARNINGS};
 }
 
 ##################################
@@ -663,7 +663,7 @@ found in the C<=head1 NAME> section.
 
 sub name {
     return ((nelems @_) +> 1 && @_[1]) ??
-         @(@_[0]->{-name} = @_[1]) !! @_[0]->{-name};  
+         @(@_[0]->{+name} = @_[1]) !! @_[0]->{?name};  
 }
 
 ##################################
@@ -685,10 +685,10 @@ sub node {
         # add node, order important!
         push(@{$self->{_nodes}}, $text);
         # keep also a uniqueness counter
-        $self->{_unique_nodes}->{$text}++ if($text !~ m/^\s*$/s);
+        $self->{_unique_nodes}->{+$text}++ if($text !~ m/^\s*$/s);
         return $text;
     }
-    return @{$self->{_nodes}};
+    return @{$self->{?_nodes}};
 }
 
 ##################################
@@ -710,10 +710,10 @@ sub idx {
         # add node, order important!
         push(@{$self->{_index}}, $text);
         # keep also a uniqueness counter
-        $self->{_unique_nodes}->{$text}++ if($text !~ m/^\s*$/s);
+        $self->{_unique_nodes}->{+$text}++ if($text !~ m/^\s*$/s);
         return $text;
     }
-    return @{$self->{_index}};
+    return @{$self->{?_index}};
 }
 
 ##################################
@@ -735,7 +735,7 @@ sub hyperlink {
         push(@{$self->{_links}}, @_[0]);
         return @_[0];
     }
-    return @{$self->{_links}};
+    return @{$self->{?_links}};
 }
 
 ## overrides for Pod::Parser
@@ -746,7 +746,7 @@ sub end_pod {
     my $self   = shift;
     my $infile = $self->input_file();
 
-    if((nelems @{$self->{_list_stack}})) {
+    if((nelems @{$self->{?_list_stack}})) {
         my $list;
         while(($list = $self->_close_list('EOF',$infile)) &&
           $list->indent() ne 'auto') {
@@ -760,15 +760,15 @@ sub end_pod {
     # first build the node names from the paragraph text
     my %nodes;
     foreach( $self->node()) {
-        %nodes{$_} = 1;
+        %nodes{+$_} = 1;
         if(m/^(\S+)\s+\S/) {
             # we have more than one word. Use the first as a node, too.
             # This is used heavily in perlfunc.pod
-            %nodes{$1} ||= 2; # derived node
+            %nodes{+$1} ||= 2; # derived node
         }
     }
     foreach( $self->idx()) {
-        %nodes{$_} = 3; # index node
+        %nodes{+$_} = 3; # index node
     }
     foreach( $self->hyperlink()) {
         my ($line,$link) = < @$_;
@@ -777,7 +777,7 @@ sub end_pod {
         if($link->node() && !$link->page() && $link->type() ne 'hyperlink') {
             my $node = $self->_check_ptree( $self->parse_text( $link->node(),
                 $line), $line, $infile, 'L');
-            if($node && !%nodes{$node}) {
+            if($node && !%nodes{?$node}) {
                 $self->poderror(\%( -line => $line || '', -file => $infile,
                     -severity => 'ERROR',
                     -msg => "unresolved internal link '$node'"));
@@ -787,9 +787,9 @@ sub end_pod {
 
     # check the internal nodes for uniqueness. This pertains to
     # =headX, =item and X<...>
-    if($self->{-warnings} && $self->{-warnings}+>1) {
-      foreach( grep($self->{_unique_nodes}->{$_} +> 1,
-        keys %{$self->{_unique_nodes}})) {
+    if($self->{?warnings} && $self->{?warnings}+>1) {
+      foreach( grep($self->{_unique_nodes}->{?$_} +> 1,
+        keys %{$self->{?_unique_nodes}})) {
           $self->poderror(\%( -line => '-', -file => $infile,
             -severity => 'WARNING',
             -msg => "multiple occurrence of link target '$_'"));
@@ -797,7 +797,7 @@ sub end_pod {
     }
 
     # no POD found here
-    $self->num_errors(-1) if($self->{_commands} == 0);
+    $self->num_errors(-1) if($self->{?_commands} == 0);
 }
 
 # check a POD command directive
@@ -806,12 +806,12 @@ sub command {
     my ($file, $line) = < $pod_para->file_line;
     ## Check the command syntax
     my $arg; # this will hold the command argument
-    if (! %VALID_COMMANDS{$cmd}) {
+    if (! %VALID_COMMANDS{?$cmd}) {
        $self->poderror(\%( -line => $line, -file => $file, -severity => 'ERROR',
                          -msg => "Unknown command '$cmd'" ));
     }
     else { # found a valid command
-        $self->{_commands}++; # delete this line if below is enabled again
+        $self->{+_commands}++; # delete this line if below is enabled again
 
         ##### following check disabled due to strong request
         #if(!$self->{_commands}++ && $cmd !~ /^head/) {
@@ -833,7 +833,7 @@ sub command {
         }
         elsif($cmd eq 'item') {
             # are we in a list?
-            unless(nelems @{$self->{_list_stack}}) {
+            unless(nelems @{$self->{?_list_stack}}) {
                 $self->poderror(\%( -line => $line, -file => $file,
                      -severity => 'ERROR', 
                      -msg => "=item without previous =over" ));
@@ -842,13 +842,13 @@ sub command {
             }
             my $list = $self->{_list_stack}->[0];
             # check whether the previous item had some contents
-            if(defined $self->{_list_item_contents} &&
-              $self->{_list_item_contents} == 0) {
+            if(defined $self->{?_list_item_contents} &&
+              $self->{?_list_item_contents} == 0) {
                 $self->poderror(\%( -line => $line, -file => $file,
                      -severity => 'WARNING', 
                      -msg => "previous =item has no contents" ));
             }
-            if($list->{_has_par}) {
+            if($list->{?_has_par}) {
                 $self->poderror(\%( -line => $line, -file => $file,
                      -severity => 'WARNING', 
                      -msg => "preceding non-item paragraph(s)" ));
@@ -861,17 +861,17 @@ sub command {
                 my $type;
                 if($arg =~ m/^[*]\s*(\S*.*)/) {
                   $type = 'bullet';
-                  $self->{_list_item_contents} = $1 ?? 1 !! 0;
+                  $self->{+_list_item_contents} = $1 ?? 1 !! 0;
                   $arg = $1;
                 }
                 elsif($arg =~ m/^\d+\.?\s*(\S*)/) {
                   $type = 'number';
-                  $self->{_list_item_contents} = $1 ?? 1 !! 0;
+                  $self->{+_list_item_contents} = $1 ?? 1 !! 0;
                   $arg = $1;
                 }
                 else {
                   $type = 'definition';
-                  $self->{_list_item_contents} = 1;
+                  $self->{+_list_item_contents} = 1;
                 }
                 my $first = $list->type();
                 if($first && $first ne $type) {
@@ -888,7 +888,7 @@ sub command {
                      -severity => 'WARNING', 
                      -msg => "No argument for =item" ));
 		$arg = ' '; # empty
-                $self->{_list_item_contents} = 0;
+                $self->{+_list_item_contents} = 0;
             }
             # add this item
             $list->item($arg);
@@ -897,7 +897,7 @@ sub command {
         }
         elsif($cmd eq 'back') {
             # check if we have an open list
-            unless(nelems @{$self->{_list_stack}}) {
+            unless(nelems @{$self->{?_list_stack}}) {
                 $self->poderror(\%( -line => $line, -file => $file,
                          -severity => 'ERROR', 
                          -msg => "=back without previous =over" ));
@@ -913,7 +913,7 @@ sub command {
                 # close list
                 my $list = $self->_close_list($line,$file);
                 # check for empty lists
-                if(!$list->item() && $self->{-warnings}) {
+                if(!$list->item() && $self->{?warnings}) {
                     $self->poderror(\%( -line => $line, -file => $file,
                          -severity => 'WARNING', 
                          -msg => "No items in =over (at line " .
@@ -923,25 +923,25 @@ sub command {
         }
         elsif($cmd =~ m/^head(\d+)/) {
             my $hnum = $1;
-            $self->{"_have_head_$hnum"}++; # count head types
-            if($hnum +> 1 && !$self->{"_have_head_".($hnum -1)}) {
+            $self->{+"_have_head_$hnum"}++; # count head types
+            if($hnum +> 1 && !$self->{?"_have_head_".($hnum -1)}) {
               $self->poderror(\%( -line => $line, -file => $file,
                    -severity => 'WARNING', 
                    -msg => "=head$hnum without preceding higher level"));
             }
             # check whether the previous =head section had some contents
-            if(defined $self->{_commands_in_head} &&
-              $self->{_commands_in_head} == 0 &&
-              defined $self->{_last_head} &&
-              $self->{_last_head} +>= $hnum) {
+            if(defined $self->{?_commands_in_head} &&
+              $self->{?_commands_in_head} == 0 &&
+              defined $self->{?_last_head} &&
+              $self->{?_last_head} +>= $hnum) {
                 $self->poderror(\%( -line => $line, -file => $file,
                      -severity => 'WARNING', 
                      -msg => "empty section in previous paragraph"));
             }
-            $self->{_commands_in_head} = -1;
-            $self->{_last_head} = $hnum;
+            $self->{+_commands_in_head} = -1;
+            $self->{+_last_head} = $hnum;
             # check if there is an open list
-            if((nelems @{$self->{_list_stack}})) {
+            if((nelems @{$self->{?_list_stack}})) {
                 my $list;
                 while(($list = $self->_close_list($line,$file)) &&
                   $list->indent() ne 'auto') {
@@ -961,18 +961,18 @@ sub command {
                      -msg => "empty =$cmd"));
             }
             if($cmd eq 'head1') {
-                $self->{_current_head1} = $arg;
+                $self->{+_current_head1} = $arg;
             } else {
-                $self->{_current_head1} = '';
+                $self->{+_current_head1} = '';
             }
         }
         elsif($cmd eq 'begin') {
-            if($self->{_have_begin}) {
+            if($self->{?_have_begin}) {
                 # already have a begin
                 $self->poderror(\%( -line => $line, -file => $file,
                      -severity => 'ERROR', 
                      -msg => "Nested =begin's (first at line " .
-                     $self->{_have_begin} . ")"));
+                     $self->{?_have_begin} . ")"));
             }
             else {
                 # check for argument
@@ -983,13 +983,13 @@ sub command {
                          -msg => "No argument for =begin"));
                 }
                 # remember the =begin
-                $self->{_have_begin} = "$line:$1";
+                $self->{+_have_begin} = "$line:$1";
             }
         }
         elsif($cmd eq 'end') {
-            if($self->{_have_begin}) {
+            if($self->{?_have_begin}) {
                 # close the existing =begin
-                $self->{_have_begin} = '';
+                $self->{+_have_begin} = '';
                 # check for spurious characters
                 $arg = $self->interpolate_and_check($paragraph, $line,$file);
                 # the closing argument is optional
@@ -1023,7 +1023,7 @@ sub command {
                       -msg => "Spurious text after =$cmd"));
             }
         }
-    $self->{_commands_in_head}++;
+    $self->{+_commands_in_head}++;
     ## Check the interior sequences in the command-text
     $self->interpolate_and_check($paragraph, $line,$file)
         unless(defined $arg);
@@ -1038,7 +1038,7 @@ sub _open_list
            -start => $line,
            -file => $file);
     unshift(@{$self->{_list_stack}}, $list);
-    undef $self->{_list_item_contents};
+    undef $self->{+_list_item_contents};
     $list;
 }
 
@@ -1046,13 +1046,13 @@ sub _close_list
 {
     my ($self,$line,$file) = < @_;
     my $list = shift(@{$self->{_list_stack}});
-    if(defined $self->{_list_item_contents} &&
-      $self->{_list_item_contents} == 0) {
+    if(defined $self->{?_list_item_contents} &&
+      $self->{?_list_item_contents} == 0) {
         $self->poderror(\%( -line => $line, -file => $file,
             -severity => 'WARNING', 
             -msg => "previous =item has no contents" ));
     }
-    undef $self->{_list_item_contents};
+    undef $self->{+_list_item_contents};
     $list;
 }
 
@@ -1075,7 +1075,7 @@ sub _check_ptree {
         unless(ref) {
             # count the unescaped angle brackets
             # complain only when warning level is greater than 1
-            if($self->{-warnings} && $self->{-warnings}+>1) {
+            if($self->{?warnings} && $self->{?warnings}+>1) {
               my $count;
               if($count = m/([<>])/g) {
                 $self->poderror(\%( -line => $line, -file => $file,
@@ -1091,7 +1091,7 @@ sub _check_ptree {
         my $contents = $_->parse_tree();
         ($file,$line) = < $_->file_line();
         # check for valid tag
-        if (! %VALID_SEQUENCES{$cmd}) {
+        if (! %VALID_SEQUENCES{?$cmd}) {
             $self->poderror(\%( -line => $line, -file => $file,
                  -severity => 'ERROR', 
                  -msg => qq(Unknown interior-sequence '$cmd')));
@@ -1138,9 +1138,9 @@ sub _check_ptree {
                         -msg => "Entity number out of range " . $_->raw_text()));
                 }
             }
-            elsif(%ENTITIES{$ent}) {
+            elsif(%ENTITIES{?$ent}) {
                 # known ISO entity
-                $text .= %ENTITIES{$ent};
+                $text .= %ENTITIES{?$ent};
             }
             else {
                 $self->poderror(\%( -line => $line, -file => $file,
@@ -1159,7 +1159,7 @@ sub _check_ptree {
                 next;
             }
             $link->line($line); # remember line
-            if($self->{-warnings}) {
+            if($self->{?warnings}) {
                 foreach my $w ( $link->warning()) {
                     $self->poderror(\%( -line => $line, -file => $file,
                         -severity => 'WARNING', 
@@ -1210,7 +1210,7 @@ sub verbatim {
 
     $self->_preproc_par($paragraph);
 
-    if($self->{_current_head1} eq 'NAME') {
+    if($self->{?_current_head1} eq 'NAME') {
         my ($file, $line) = < $pod_para->file_line;
         $self->poderror(\%( -line => $line, -file => $file,
             -severity => 'WARNING',
@@ -1226,12 +1226,12 @@ sub textblock {
     $self->_preproc_par($paragraph);
 
     # skip this paragraph if in a =begin block
-    unless($self->{_have_begin}) {
+    unless($self->{?_have_begin}) {
         my $block = $self->interpolate_and_check($paragraph, $line,$file);
-        if($self->{_current_head1} eq 'NAME') {
+        if($self->{?_current_head1} eq 'NAME') {
             if($block =~ m/^\s*(\S+?)\s*[,-]/) {
                 # this is the canonical name
-                $self->{-name} = $1 unless(defined $self->{-name});
+                $self->{+name} = $1 unless(defined $self->{?name});
             }
         }
     }
@@ -1242,10 +1242,10 @@ sub _preproc_par
     my $self = shift;
     @_[0] =~ s/[\s\n]+$//;
     if(@_[0]) {
-        $self->{_commands_in_head}++;
-        $self->{_list_item_contents}++ if(defined $self->{_list_item_contents});
-        if((nelems @{$self->{_list_stack}}) && !$self->{_list_stack}->[0]->item()) {
-            $self->{_list_stack}->[0]->{_has_par} = 1;
+        $self->{+_commands_in_head}++;
+        $self->{+_list_item_contents}++ if(defined $self->{?_list_item_contents});
+        if((nelems @{$self->{?_list_stack}}) && !$self->{_list_stack}->[0]->item()) {
+            $self->{_list_stack}->[0]->{+_has_par} = 1;
         }
     }
 }

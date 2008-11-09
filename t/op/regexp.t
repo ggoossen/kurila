@@ -97,7 +97,7 @@ foreach ( @tests) {
     chomp;
     s/\\n/\n/g;
     my ($pat, $subject, $result, $repl, $expect, $reason) = < split(m/\t/,$_,6);
-    if ($result =~ m/c/ and %ENV{PERL_VALGRIND}) {
+    if ($result =~ m/c/ and %ENV{?PERL_VALGRIND}) {
         print "ok $test # TODO fix memory leak with compilation error\n";
         next;
     }
@@ -168,7 +168,7 @@ EOFCODE
 	};
 	my $err = $@;
 	if ($result eq 'c') {
-	    if ($err->{description} !~ m!^\Q$expect!) { print "not ok $test (compile) $input => `$err'\n"; next TEST }
+	    if ($err->{?description} !~ m!^\Q$expect!) { print "not ok $test (compile) $input => `$err'\n"; next TEST }
 	    last;  # no need to study a syntax error
 	}
 	elsif ( $skip ) {

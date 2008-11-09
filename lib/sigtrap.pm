@@ -21,9 +21,9 @@ sub import {
             $_ = shift;
             if (m/^[A-Z][A-Z0-9]*$/) {
                 $saw_sig++;
-                unless ($untrapped and %SIG{$_} and %SIG{$_} ne 'DEFAULT') {
+                unless ($untrapped and %SIG{?$_} and %SIG{?$_} ne 'DEFAULT') {
                     print "Installing handler $(dump::view($handler)) for $_\n" if $Verbose;
-                    %SIG{$_} = $handler;
+                    %SIG{+$_} = $handler;
                 }
             } elsif ($_ eq 'normal-signals') {
                 unshift @_, < grep(exists %SIG{$_}, qw(HUP INT PIPE TERM));
@@ -67,7 +67,7 @@ sub handler_die {
 
 sub handler_traceback {
     our $panic;
-    %SIG{'ABRT'} = 'DEFAULT';
+    %SIG{+'ABRT'} = 'DEFAULT';
     kill 'ABRT', $$ if $panic++;
     syswrite(STDERR, 'Caught a SIG', 12);
     syswrite(STDERR, @_[0], length(@_[0]));

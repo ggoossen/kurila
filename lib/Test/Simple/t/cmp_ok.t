@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 BEGIN {
-    if( %ENV{PERL_CORE} ) {
+    if( %ENV{?PERL_CORE} ) {
         chdir 't';
         @INC = @('../lib', 'lib');
     }
@@ -13,7 +13,7 @@ BEGIN {
 
 require Test::Simple::Catch;
 my($out, $err) = < Test::Simple::Catch::caught();
-local %ENV{HARNESS_ACTIVE} = 0;
+local %ENV{+HARNESS_ACTIVE} = 0;
 
 require Test::Builder;
 my $TB = Test::Builder->create;
@@ -23,9 +23,9 @@ sub try_cmp_ok {
     my($left, $cmp, $right) = < @_;
     
     my %expect;
-    %expect{ok}    = eval "\$left $cmp \$right";
-    %expect{error} = $@;
-    %expect{error} =~ s/ at .*\n?//;
+    %expect{+ok}    = eval "\$left $cmp \$right";
+    %expect{+error} = $@;
+    %expect{+error} =~ s/ at .*\n?//;
 
     local $Test::Builder::Level = $Test::Builder::Level + 1;
     my $ok = cmp_ok($left, $cmp, $right);
@@ -33,9 +33,9 @@ sub try_cmp_ok {
     
     my $diag = $$err;
     $$err = "";
-    if( !$ok and %expect{error} ) {
+    if( !$ok and %expect{?error} ) {
         $diag =~ s/^# //mg;
-        $TB->like( $diag, "/\Q%expect{error}\E/" );
+        $TB->like( $diag, "/\Q%expect{?error}\E/" );
     }
     elsif( $ok ) {
         $TB->is_eq( $diag, '' );

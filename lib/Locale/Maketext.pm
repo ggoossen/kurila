@@ -73,7 +73,7 @@ sub numf {
    #  backtrack so it un-eats the rightmost three, and then we
    #  insert the comma there.
 
-  $num =~ s<(.,)><$($1 eq ',' ?? '.' !! ',')>g if ref($handle) and $handle->{'numf_comma'};
+  $num =~ s<(.,)><$($1 eq ',' ?? '.' !! ',')>g if ref($handle) and $handle->{?'numf_comma'};
    # This is just a lame hack instead of using Number::Format
   return $num;
 }
@@ -100,7 +100,7 @@ sub language_tag {
 sub encoding {
   my $it = @_[0];
   return @(
-   (ref($it) && $it->{'encoding'})
+   (ref($it) && $it->{?'encoding'})
    || "iso-8859-1"   # Latin-1
   );
 } 
@@ -116,8 +116,8 @@ sub fallback_language_classes { return () }
 sub fail_with { # an actual attribute method!
   my($handle, < @params) = < @_;
   return unless ref($handle);
-  $handle->{'fail'} = @params[0] if (nelems @params);
-  return $handle->{'fail'};
+  $handle->{+'fail'} = @params[0] if (nelems @params);
+  return $handle->{?'fail'};
 }
 
 #--------------------------------------------------------------------------
@@ -127,11 +127,11 @@ sub failure_handler_auto {
   #  $handle->fail_with('failure_handler_auto')
 
   my($handle, $phrase, < @params) = < @_;
-  $handle->{'failure_lex'} ||= \%();
-  my $lex = $handle->{'failure_lex'};
+  $handle->{+'failure_lex'} ||= \%();
+  my $lex = $handle->{?'failure_lex'};
 
   my $value;
-  $lex->{$phrase} ||= ($value = $handle->_compile($phrase));
+  $lex->{+$phrase} ||= ($value = $handle->_compile($phrase));
 
   # Dumbly copied from sub maketext:
   do {
@@ -180,21 +180,21 @@ sub maketext {
 
   my $value;
   foreach my $h_r (
-     @{  %isa_scan{ref($handle) || $handle} || $handle->_lex_refs  }
+     @{  %isa_scan{?ref($handle) || $handle} || $handle->_lex_refs  }
   ) {
     print "* Looking up \"$phrase\" in $h_r\n" if DEBUG;
     if(exists $h_r->{$phrase}) {
       print "  Found \"$phrase\" in $h_r\n" if DEBUG;
-      unless(ref($value = $h_r->{$phrase})) {
+      unless(ref($value = $h_r->{?$phrase})) {
         # Nonref means it's not yet compiled.  Compile and replace.
-        $value = $h_r->{$phrase} = $handle->_compile($value);
+        $value = $h_r->{+$phrase} = $handle->_compile($value);
       }
       last;
-    } elsif($phrase !~ m/^_/s and $h_r->{'_AUTO'}) {
+    } elsif($phrase !~ m/^_/s and $h_r->{?'_AUTO'}) {
       # it's an auto lex, and this is an autoable key!
       print "  Automaking \"$phrase\" into $h_r\n" if DEBUG;
       
-      $value = $h_r->{$phrase} = $handle->_compile($phrase);
+      $value = $h_r->{+$phrase} = $handle->_compile($phrase);
       last;
     }
     print "  Not found in $h_r, nor automakable\n" if DEBUG +> 1;
@@ -204,10 +204,10 @@ sub maketext {
   unless(defined($value)) {
     print "! Lookup of \"$phrase\" in/under ", ref($handle) || $handle,
       " fails.\n" if DEBUG;
-    if(ref($handle) and $handle->{'fail'}) {
+    if(ref($handle) and $handle->{?'fail'}) {
       print "WARNING0: maketext fails looking for <$phrase>\n" if DEBUG;
       my $fail;
-      if(ref($fail = $handle->{'fail'}) eq 'CODE') { # it's a sub reference
+      if(ref($fail = $handle->{?'fail'}) eq 'CODE') { # it's a sub reference
         return &{$fail}($handle, $phrase, < @_);
          # If it ever returns, it should return a good value.
       } else { # It's a method name
@@ -268,7 +268,7 @@ sub get_handle {  # This is a constructor and, yes, it CAN FAIL.
   my %seen;
   foreach my $module_name ( map { $base_class . "::" . $_ } @languages ) {
     next unless length $module_name; # sanity
-    next if %seen{$module_name}++        # Already been here, and it was no-go
+    next if %seen{+$module_name}++        # Already been here, and it was no-go
             || ! _try_use($module_name); # Try to use() it, but can't it.
     return $module_name->new; # Make it!
   }
@@ -375,11 +375,11 @@ my %tried = %( () );
 
 sub _try_use {   # Basically a wrapper around "require Modulename"
   # "Many men have tried..."  "They tried and failed?"  "They tried and died."
-  return %tried{@_[0]} if exists %tried{@_[0]};  # memoization
+  return %tried{?@_[0]} if exists %tried{@_[0]};  # memoization
 
   my $module = @_[0];   # ASSUME sane module name!
   do {
-    return (%tried{$module} = 1)
+    return (%tried{+$module} = 1)
      if %{*{Symbol::fetch_glob($module . "::Lexicon")}} or @{*{Symbol::fetch_glob($module . "::ISA")}};
     # weird case: we never use'd it, but there it is!
   };
@@ -390,10 +390,10 @@ sub _try_use {   # Basically a wrapper around "require Modulename"
   };
   if($@) {
     print "Error using $module \: $@\n" if DEBUG +> 1;
-    return %tried{$module} = 0;
+    return %tried{+$module} = 0;
   } else {
     print " OK, $module is used\n" if DEBUG;
-    return %tried{$module} = 1;
+    return %tried{+$module} = 1;
   }
 }
 
@@ -403,7 +403,7 @@ sub _lex_refs {  # report the lexicon references for this handle's class
   # returns an arrayREF!
   my $class = ref(@_[0]) || @_[0];
   print "Lex refs lookup on $class\n" if DEBUG +> 1;
-  return %isa_scan{$class} if exists %isa_scan{$class};  # memoization!
+  return %isa_scan{?$class} if exists %isa_scan{$class};  # memoization!
 
   my @lex_refs;
   my $seen_r = ref(@_[1]) ?? @_[1] !! \%();
@@ -418,11 +418,11 @@ sub _lex_refs {  # report the lexicon references for this handle's class
   # In hindsight, I suppose I could have just used Class::ISA!
   foreach my $superclass ( @{*{Symbol::fetch_glob($class . "::ISA")}}) {
     print " Super-class search into $superclass\n" if DEBUG;
-    next if $seen_r->{$superclass}++;
+    next if $seen_r->{+$superclass}++;
     push @lex_refs, < @{&_lex_refs($superclass, $seen_r)};  # call myself
   }
 
-  %isa_scan{$class} = \@lex_refs; # save for next time
+  %isa_scan{+$class} = \@lex_refs; # save for next time
   return \@lex_refs;
 }
 

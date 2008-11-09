@@ -123,7 +123,7 @@ sub munge_c_files () {
     }
     walk_table {
 	if ((nelems @_) +> 1) {
-	    $functions->{@_[2]} = \@_ if @_[(nelems @_)-1] =~ m/\.\.\./;
+	    $functions->{+@_[2]} = \@_ if @_[(nelems @_)-1] =~ m/\.\.\./;
 	}
     } '/dev/null', '', '';
     local $^I = '.bak';
@@ -282,7 +282,7 @@ do {
 	  my ($flags,$retval,$func,< @args) = < @_;
 	  # If a function is defined twice, for example before and after an
 	  # #else, only process the flags on the first instance for global.sym
-	  return $ret if %seen{$func}++;
+	  return $ret if %seen{+$func}++;
 	  if ($flags =~ m/[AX]/ && $flags !~ m/[xm]/
 	      || $flags =~ m/b/) { # public API, so export
 	      $func = "Perl_$func" if $flags =~ m/[pbX]/;
@@ -330,7 +330,7 @@ sub readsyms (\%$) {
 	    my $sym = $1;
 	    warn "duplicate symbol $sym while processing $file line $(iohandle::input_line_number(\*FILE)).\n"
 		if exists %$syms{$sym};
-	    %$syms{$sym} = 1;
+	    %$syms{+$sym} = 1;
 	}
     }
     close(FILE);
@@ -351,7 +351,7 @@ sub readvars(\%$$@) {
 	    $sym = $pre . $sym if $keep_pre;
 	    warn "duplicate symbol $sym while processing $file line $(iohandle::input_line_number(\*FILE))\n"
 		if exists %$syms{$sym};
-	    %$syms{$sym} = $pre || 1;
+	    %$syms{+$sym} = $pre || 1;
 	}
     }
     close(FILE);

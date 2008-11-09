@@ -49,7 +49,7 @@ sub FETCH
     my $self  = shift ;
     my $key   = shift ;
 
-    return $self->{GOT}->{$key} if exists $self->{VALID}->{$key}  ;
+    return $self->{GOT}->{?$key} if exists $self->{VALID}->{$key}  ;
 
     my $pkg = ref $self ;
     croak "$($pkg)::FETCH - Unknown element '$key'" ;
@@ -62,13 +62,13 @@ sub STORE
     my $key   = shift ;
     my $value = shift ;
 
-    my $type = $self->{VALID}->{$key};
+    my $type = $self->{VALID}->{?$key};
 
     if ( $type )
     {
     	croak "Key '$key' not associated with a code reference" 
 	    if $type == 2 && !ref $value && ref $value ne 'CODE';
-        $self->{GOT}->{$key} = $value ;
+        $self->{GOT}->{+$key} = $value ;
         return ;
     }
     
@@ -362,7 +362,7 @@ sub get_dup
  
         # save the value or count number of matches
         if ($flag)
-          { ++ %values{$value} }
+          { ++ %values{+$value} }
         else
           { push (@values, $value) }
 

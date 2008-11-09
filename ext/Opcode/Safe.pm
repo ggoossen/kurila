@@ -94,12 +94,12 @@ sub new {
     if (defined($root)) {
 	croak "Can't use \"$root\" as root name"
 	    if $root =~ m/^main\b/ or $root !~ m/^\w+::\w[:\w]*$/;
-	$obj->{Root}  = $root;
-	$obj->{Erase} = 0;
+	$obj->{+Root}  = $root;
+	$obj->{+Erase} = 0;
     }
     else {
-	$obj->{Root}  = "Safe::Root".$default_root++;
-	$obj->{Erase} = 1;
+	$obj->{+Root}  = "Safe::Root".$default_root++;
+	$obj->{+Erase} = 1;
     }
 
     # use permit/deny methods instead till interface issues resolved
@@ -114,13 +114,13 @@ sub new {
     # the whole glob *_ rather than $_ and @_ separately, otherwise
     # @_ in non default packages within the compartment don't work.
     $obj->share_from('', $default_share);
-    Opcode::_safe_pkg_prep($obj->{Root}) if($Opcode::VERSION +> 1.04);
+    Opcode::_safe_pkg_prep($obj->{?Root}) if($Opcode::VERSION +> 1.04);
     return $obj;
 }
 
 sub DESTROY {
     my $obj = shift;
-    $obj->erase('DESTROY') if $obj->{Erase};
+    $obj->erase('DESTROY') if $obj->{?Erase};
 }
 
 sub erase {
@@ -144,7 +144,7 @@ sub erase {
     delete $stem_symtab->{$leaf};
     return;
 
-    my $leaf_globref   = \($stem_symtab->{$leaf});
+    my $leaf_globref   = \($stem_symtab->{+$leaf});
     my $leaf_symtab = *{$leaf_globref}{HASH};
 #    warn " leaf_symtab ", join(', ', %$leaf_symtab),"\n";
     # FIXME this does not clear properly yet: %$leaf_symtab = %( () );
@@ -175,13 +175,13 @@ sub reinit {
 sub root {
     my $obj = shift;
     croak("Safe root method now read-only") if (nelems @_);
-    return $obj->{Root};
+    return $obj->{?Root};
 }
 
 
 sub mask {
     my $obj = shift;
-    return $obj->{Mask} unless (nelems @_);
+    return $obj->{?Mask} unless (nelems @_);
     $obj->deny_only(< @_);
 }
 
@@ -191,27 +191,27 @@ sub untrap { shift->permit(< @_) }
 
 sub deny {
     my $obj = shift;
-    $obj->{Mask} ^|^= opset(< @_);
+    $obj->{+Mask} ^|^= opset(< @_);
 }
 sub deny_only {
     my $obj = shift;
-    $obj->{Mask} = opset(< @_);
+    $obj->{+Mask} = opset(< @_);
 }
 
 sub permit {
     my $obj = shift;
     # XXX needs testing
-    $obj->{Mask} ^&^= invert_opset opset(< @_);
+    $obj->{+Mask} ^&^= invert_opset opset(< @_);
 }
 sub permit_only {
     my $obj = shift;
-    $obj->{Mask} = invert_opset opset(< @_);
+    $obj->{+Mask} = invert_opset opset(< @_);
 }
 
 
 sub dump_mask {
     my $obj = shift;
-    print < opset_to_hex($obj->{Mask}),"\n";
+    print < opset_to_hex($obj->{?Mask}),"\n";
 }
 
 
@@ -251,13 +251,13 @@ sub share_record {
     my $obj = shift;
     my $pkg = shift;
     my $vars = shift;
-    my $shares = \%{$obj->{Shares} ||= \%()};
+    my $shares = \%{$obj->{+Shares} ||= \%()};
  <    # Record shares using keys of $obj->{Shares}. See reinit.
     %{$shares}{[ @$vars]} = ($pkg) x nelems @$vars if (nelems @$vars);
 }
 sub share_redo {
     my $obj = shift;
-    my $shares = \%{$obj->{Shares} ||= \%()};
+    my $shares = \%{$obj->{+Shares} ||= \%()};
     my($var, $pkg);
     while(($var, $pkg) = each %$shares) {
 	# warn "share_redo $pkg\:: $var";
@@ -276,19 +276,19 @@ sub varglob {
 
 sub reval {
     my ($obj, $expr, $strict) = < @_;
-    my $root = $obj->{Root};
+    my $root = $obj->{?Root};
 
     my $evalsub = lexless_anon_sub($root,$strict, $expr);
-    return Opcode::_safe_call_sv($root, $obj->{Mask}, $evalsub);
+    return Opcode::_safe_call_sv($root, $obj->{?Mask}, $evalsub);
 }
 
 sub rdo {
     my ($obj, $file) = < @_;
-    my $root = $obj->{Root};
+    my $root = $obj->{?Root};
 
     my $evalsub = eval
 	    sprintf('package %s; sub { @_ = (); do $file }', $root);
-    return Opcode::_safe_call_sv($root, $obj->{Mask}, $evalsub);
+    return Opcode::_safe_call_sv($root, $obj->{?Mask}, $evalsub);
 }
 
 

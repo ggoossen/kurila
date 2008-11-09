@@ -67,7 +67,7 @@ SKIP: do {
 	my $mask   = POSIX::SigSet->new( &SIGINT( < @_ ));
 	my $action = POSIX::SigAction->new( \&main::SigHUP, $mask, 0);
 	sigaction(&SIGHUP( < @_ ), $action);
-	%SIG{'INT'} = \&SigINT;
+	%SIG{+'INT'} = \&SigINT;
 
 	# At least OpenBSD/i386 3.3 is okay, as is NetBSD 1.5.
 	# But not NetBSD 1.6 & 1.6.1: the test makes perl crash.
@@ -222,18 +222,18 @@ POSIX->import ('kill');
 my $result = eval "kill 0";
 is ($result, undef, "we should now have POSIX::kill");
 # Check usage.
-like ($@->{description}, qr/^Usage: POSIX::kill\(pid, sig\)/, "check its usage message");
+like ($@->{?description}, qr/^Usage: POSIX::kill\(pid, sig\)/, "check its usage message");
 
 # Check unimplemented.
 $result = try {POSIX::offsetof};
 is ($result, undef, "offsetof should fail");
-like ($@->{description}, qr/^Unimplemented: POSIX::offsetof\(\) is C-specific/,
+like ($@->{?description}, qr/^Unimplemented: POSIX::offsetof\(\) is C-specific/,
       "check its unimplemented message");
 
 # Check reimplemented.
 $result = try {POSIX::fgets};
 is ($result, undef, "fgets should fail");
-like ($@->{description}, qr/^Use method IO::Handle::gets\(\) instead/,
+like ($@->{?description}, qr/^Use method IO::Handle::gets\(\) instead/,
       "check its redef message");
 
 # Simplistic tests for the isXXX() functions (bug #16799)
@@ -279,8 +279,8 @@ if ($^O eq 'vos') {
  # The following line assumes buffered output, which may be not true:
  print '@#!*$@(!@#$' unless ($Is_MacOS || $Is_OS2 || $Is_UWin || $Is_OS390 ||
                             $Is_VMS ||
-			    (defined %ENV{PERLIO} &&
-			     %ENV{PERLIO} eq 'unix' &&
+			    (defined %ENV{?PERLIO} &&
+			     %ENV{?PERLIO} eq 'unix' &&
 			     Config::config_value("useperlio")));
  _exit(0);
 }

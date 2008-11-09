@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 BEGIN {
-    if( %ENV{PERL_CORE} ) {
+    if( %ENV{?PERL_CORE} ) {
         chdir 't';
         @INC = @('../lib', 'lib/');
     }
@@ -208,7 +208,7 @@ do {
     @ARGV = @( ( $Testfile ) x 3 );
     try { cp() };
 
-    like( $@->{description}, qr/Too many arguments/, 'cp croaks on error' );
+    like( $@->{?description}, qr/Too many arguments/, 'cp croaks on error' );
 
     # move a file to a subdirectory
     @ARGV = @( $Testfile, 'ecmddir' );
@@ -223,7 +223,7 @@ do {
     @ARGV = @( ( $Testfile ) x 3 );
 
     try { mv() };
-    like( $@->{description}, qr/Too many arguments/, 'mv croaks on error' );
+    like( $@->{?description}, qr/Too many arguments/, 'mv croaks on error' );
 
     # Test expand_wildcards()
     do {

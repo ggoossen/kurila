@@ -121,19 +121,19 @@ sub pod_find
         %opts = %( < %{shift()} );
     }
 
-    %opts{-verbose} ||= 0;
-    %opts{-perl}    ||= 0;
+    %opts{+verbose} ||= 0;
+    %opts{+perl}    ||= 0;
 
     my (@search) = @_;
 
-    if(%opts{-script}) {
+    if(%opts{?script}) {
         require Config;
         push(@search, Config::config_value('scriptdir'))
             if -d Config::config_value('scriptdir');
-        %opts{-perl} = 1;
+        %opts{+perl} = 1;
     }
 
-    if(%opts{-inc}) {
+    if(%opts{?inc}) {
         if ($^O eq 'MacOS') {
             # tolerate '.', './some_dir' and '(../)+some_dir' on Mac OS
             my @new_INC = @INC;
@@ -151,10 +151,10 @@ sub pod_find
             push(@search, < grep($_ ne File::Spec->curdir, @INC));
         }
 
-        %opts{-perl} = 1;
+        %opts{+perl} = 1;
     }
 
-    if(%opts{-perl}) {
+    if(%opts{?perl}) {
         require Config;
         # this code simplifies the POD name for Perl modules:
         # * remove "site_perl"
@@ -192,7 +192,7 @@ sub pod_find
         $try = VMS::Filespec::unixify($try) if ($^O eq 'VMS');
         my $name;
         if(-f $try) {
-            if($name = _check_and_extract_name($try, %opts{-verbose})) {
+            if($name = _check_and_extract_name($try, %opts{?verbose})) {
                 _check_for_duplicates($try, $name, \%names, \%pods);
             }
             next;
@@ -205,23 +205,23 @@ sub pod_find
                     $File::Find::prune = 1;
                     return;
                 }
-                elsif(%dirs_visited{$item}) {
+                elsif(%dirs_visited{?$item}) {
                     warn "Directory '$item' already seen, skipping.\n"
-                        if(%opts{-verbose});
+                        if(%opts{?verbose});
                     $File::Find::prune = 1;
                     return;
                 }
                 else {
-                    %dirs_visited{$item} = 1;
+                    %dirs_visited{+$item} = 1;
                 }
-                if(%opts{-perl} && m/^(\d+\.[\d_]+)\z/s && eval "$1" != $^V) {
+                if(%opts{?perl} && m/^(\d+\.[\d_]+)\z/s && eval "$1" != $^V) {
                     $File::Find::prune = 1;
                     warn "Perl $^V version mismatch on $_, skipping.\n"
-                        if(%opts{-verbose});
+                        if(%opts{?verbose});
                 }
                 return;
             }
-            if($name = _check_and_extract_name($item, %opts{-verbose}, $root_rx)) {
+            if($name = _check_and_extract_name($item, %opts{?verbose}, $root_rx)) {
                 _check_for_duplicates($item, $name, \%names, \%pods);
             }
         }, $try); # end of File::Find::find
@@ -232,15 +232,15 @@ sub pod_find
 
 sub _check_for_duplicates {
     my ($file, $name, $names_ref, $pods_ref) = < @_;
-    if(%$names_ref{$name}) {
+    if(%$names_ref{?$name}) {
         warn "Duplicate POD found (shadowing?): $name ($file)\n";
         warn "    Already seen in ",
-            join(' ', grep(%$pods_ref{$_} eq $name, keys %$pods_ref)),"\n";
+            join(' ', grep(%$pods_ref{?$_} eq $name, keys %$pods_ref)),"\n";
     }
     else {
-        %$names_ref{$name} = 1;
+        %$names_ref{+$name} = 1;
     }
-    %$pods_ref{$file} = $name;
+    %$pods_ref{+$file} = $name;
 }
 
 sub _check_and_extract_name {
@@ -384,14 +384,14 @@ sub pod_where {
   my @parts = split (m/::/, $pod);
 
   # Get full directory list
-  my @search_dirs = @{ %options{'-dirs'} };
+  my @search_dirs = @{ %options{?'-dirs'} };
 
-  if (%options{'-inc'}) {
+  if (%options{?'-inc'}) {
 
     require Config;
 
     # Add @INC
-    if ($^O eq 'MacOS' && %options{'-inc'}) {
+    if ($^O eq 'MacOS' && %options{?'-inc'}) {
         # tolerate '.', './some_dir' and '(../)+some_dir' on Mac OS
         my @new_INC = @INC;
         for ( @new_INC) {
@@ -404,7 +404,7 @@ sub pod_where {
             }
         }
         push (@search_dirs, < @new_INC);
-    } elsif (%options{'-inc'}) {
+    } elsif (%options{?'-inc'}) {
         push (@search_dirs, < @INC);
     }
 
@@ -421,7 +421,7 @@ sub pod_where {
   }
 
   warn "Search path is: ".join(' ', @search_dirs)."\n"
-        if %options{'-verbose'};
+        if %options{?'-verbose'};
 
   # Loop over directories
   Dir: foreach my $dir (  @search_dirs ) {
@@ -429,25 +429,25 @@ sub pod_where {
     # Don't bother if can't find the directory
     if (-d $dir) {
       warn "Looking in directory $dir\n" 
-        if %options{'-verbose'};
+        if %options{?'-verbose'};
 
       # Now concatenate this directory with the pod we are searching for
       my $fullname = File::Spec->catfile($dir, < @parts);
       warn "Filename is now $fullname\n"
-        if %options{'-verbose'};
+        if %options{?'-verbose'};
 
       # Loop over possible extensions
       foreach my $ext (@('', '.pod', '.pm', '.pl')) {
         my $fullext = $fullname . $ext;
         if (-f $fullext && 
-         contains_pod($fullext, %options{'-verbose'}) ) {
-          warn "FOUND: $fullext\n" if %options{'-verbose'};
+         contains_pod($fullext, %options{?'-verbose'}) ) {
+          warn "FOUND: $fullext\n" if %options{?'-verbose'};
           return $fullext;
         }
       }
     } else {
       warn "Directory $dir does not exist\n"
-        if %options{'-verbose'};
+        if %options{?'-verbose'};
       next Dir;
     }
     # for some strange reason the path on MacOS/darwin/cygwin is

@@ -273,8 +273,8 @@ sub _init_headings {
     local *myData = $self;
 
     ## Initialize current section heading titles if necessary
-    unless (defined %myData{_SECTION_HEADINGS}) {
-        local *section_headings = %myData{_SECTION_HEADINGS} = \@();
+    unless (defined %myData{?_SECTION_HEADINGS}) {
+        local *section_headings = %myData{+_SECTION_HEADINGS} = \@();
         for my $i (0..$MAX_HEADING_LEVEL-1) {
             @section_headings[$i] = '';
         }
@@ -301,8 +301,8 @@ level, then C<undef> is returned.
 
 sub curr_headings {
     my $self = shift;
-    $self->_init_headings()  unless (defined $self->{_SECTION_HEADINGS});
-    my @headings = @{ $self->{_SECTION_HEADINGS} };
+    $self->_init_headings()  unless (defined $self->{?_SECTION_HEADINGS});
+    my @headings = @{ $self->{?_SECTION_HEADINGS} };
     return ((nelems @_) +> 0  and  @_[0] =~ m/^\d+$/) ?? @headings[@_[0] - 1] !! @headings;
 }
 
@@ -359,9 +359,9 @@ sub select {
         delete %myData{_SELECTED_SECTIONS}  unless ($add);
         return;
     }
-    %myData{_SELECTED_SECTIONS} = \@()
+    %myData{+_SELECTED_SECTIONS} = \@()
         unless ($add  &&  exists %myData{_SELECTED_SECTIONS});
-    local *selected_sections = %myData{_SELECTED_SECTIONS};
+    local *selected_sections = %myData{?_SELECTED_SECTIONS};
 
     ## Compile each spec
     for my $spec ( @sections) {
@@ -442,7 +442,7 @@ sub match_section {
 
     ## Return true if no restrictions were explicitly specified
     my $selections = (exists %myData{_SELECTED_SECTIONS})
-                       ??  %myData{_SELECTED_SECTIONS}  !!  undef;
+                       ??  %myData{?_SELECTED_SECTIONS}  !!  undef;
     return  1  unless ((defined $selections) && ((nelems @{$selections}) +> 0));
 
     ## Default any unspecified sections to the current one
@@ -497,7 +497,7 @@ sub is_selected {
     local $_;
     local *myData = $self;
 
-    $self->_init_headings()  unless (defined %myData{_SECTION_HEADINGS});
+    $self->_init_headings()  unless (defined %myData{?_SECTION_HEADINGS});
 
     ## Keep track of current sections levels and headings
     $_ = $paragraph;
@@ -596,7 +596,7 @@ sub podselect {
             ## to be uppercase keywords)
             ##-------------------------------------------------------------
             %opts = %( < map {
-                my ($key, $val) = (lc $_, %opts{$_});
+                my ($key, $val) = (lc $_, %opts{?$_});
                 $key =~ s/^(?=\w)/-/;
                 $key =~ m/^-se[cl]/  and  $key  = '-sections';
                 #! $key eq '-range'    and  $key .= 's';
@@ -604,12 +604,12 @@ sub podselect {
             } @( ( <keys %opts)) );
 
             ## Process the options
-            (exists %opts{'-output'})  and  $output = %opts{'-output'};
+            (exists %opts{'-output'})  and  $output = %opts{?'-output'};
 
             ## Select the desired sections
             $pod_parser->select(< @{ %opts{'-sections'} })
-                if ( (defined %opts{'-sections'})
-                     && ((ref %opts{'-sections'}) eq 'ARRAY') );
+                if ( (defined %opts{?'-sections'})
+                     && ((ref %opts{?'-sections'}) eq 'ARRAY') );
 
             #! ## Select the desired paragraph ranges
             #! $pod_parser->select(@{ $opts{'-ranges'} })

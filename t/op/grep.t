@@ -37,7 +37,7 @@ do {
 
     @res = @( (map(
        \%(a =>$_), @(
-     ("chobb"))))[0]->{a} );
+     ("chobb"))))[0]->{?a} );
     cmp_ok( scalar(nelems @res), '==', 1, 'deref map nr');
     cmp_ok( @res[0], 'eq', 'chobb', 'deref map is');
 
@@ -52,7 +52,7 @@ do {
 
     @res = @( (map
            \%(a =>$_), @(
-       ("chobb")))[0]->{a} );
+       ("chobb")))[0]->{?a} );
     cmp_ok( scalar(nelems @res), '==', 1, 'no paren deref map nr');
     cmp_ok( @res[0], 'eq', 'chobb', 'no paren deref map is');
 
@@ -86,7 +86,7 @@ do {
     cmp_ok( @res[0], 'eq', 'yoyodyne', 'linefeed grep is');
 
     @res = grep
-        (%(a=>$_){a}, @(
+        (%(a=>$_){?a}, @(
         ("chobb")));
     cmp_ok( scalar(nelems @res), '==', 1, 'deref grep nr');
     cmp_ok( @res[0], 'eq', 'chobb', 'deref grep is');
@@ -100,12 +100,12 @@ do {
     cmp_ok( scalar(nelems @res), '==', 1, 'no paren linefeed grep nr');
     cmp_ok( @res[0], 'eq', 'yoyodyne', 'no paren linefeed grep is');
 
-    @res = grep %(a=>$_){a}, @( ("chobb"));
+    @res = grep %(a=>$_){?a}, @( ("chobb"));
     cmp_ok( scalar(nelems @res), '==', 1, 'no paren deref grep nr');
     cmp_ok( @res[0], 'eq', 'chobb', 'no paren deref grep is');
 
     @res = grep
-         %(a=>$_){a}, @( ("chobb"));
+         %(a=>$_){?a}, @( ("chobb"));
     cmp_ok( scalar(nelems @res), '==', 1, 'no paren deref linefeed  nr');
     cmp_ok( @res[0], 'eq', 'chobb', 'no paren deref linefeed  is');
 

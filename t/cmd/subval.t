@@ -116,5 +116,5 @@ sub autov { @_[0] = 23 };
 
 my $href = \%();
 print nkeys %$href ?? 'not ' !! '', "ok 29\n";
-autov($href->{b});
+autov($href->{?b});
 print join(':', @:< %$href) eq 'b:23' ?? '' !! 'not ', "ok 30\n";

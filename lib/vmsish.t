@@ -111,9 +111,9 @@ do {
      $vmstime, @vmslocal, @vmsgmtime, $vmsmtime,
      $utcval,  $vmaval, $offset);
   # Make sure apparent local time isn't GMT
-  if (not %ENV{'SYS$TIMEZONE_DIFFERENTIAL'}) {
-    my $oldtz = %ENV{'SYS$TIMEZONE_DIFFERENTIAL'};
-    %ENV{'SYS$TIMEZONE_DIFFERENTIAL'} = 3600;
+  if (not %ENV{?'SYS$TIMEZONE_DIFFERENTIAL'}) {
+    my $oldtz = %ENV{?'SYS$TIMEZONE_DIFFERENTIAL'};
+    %ENV{+'SYS$TIMEZONE_DIFFERENTIAL'} = 3600;
     eval "END \{ \$ENV\{'SYS\$TIMEZONE_DIFFERENTIAL'\} = $oldtz; \}";
     gmtime(0); # Force reset of tz offset
   }
@@ -144,7 +144,7 @@ do {
   @utcgmtime = @( gmtime($vmstime) );
   $utcmtime  = (stat $file)[[9]];
   
-  $offset = %ENV{'SYS$TIMEZONE_DIFFERENTIAL'};
+  $offset = %ENV{?'SYS$TIMEZONE_DIFFERENTIAL'};
 
   # We allow lots of leeway (10 sec) difference for these tests,
   # since it's unlikely local time will differ from UTC by so small

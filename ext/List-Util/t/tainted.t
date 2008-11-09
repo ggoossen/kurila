@@ -14,7 +14,7 @@ ok( !tainted($var), 'known variable');
 
 my $key = (keys %ENV)[0];
 
-ok( tainted(%ENV{$key}),	'environment variable');
+ok( tainted(%ENV{?$key}),	'environment variable');
 
-$var = %ENV{$key};
+$var = %ENV{?$key};
 ok( tainted($var),	'copy of environment variable');

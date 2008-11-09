@@ -132,7 +132,7 @@ sub qualify ($;$) {
     if (!ref($name) && index($name, '::') == -1 && index($name, "'") == -1) {
 	my $pkg;
 	# Global names: special character, "^xyz", or other. 
-	if ($name =~ m/^(([^a-z])|(\^[a-z_]+))\z/i || %global{$name}) {
+	if ($name =~ m/^(([^a-z])|(\^[a-z_]+))\z/i || %global{?$name}) {
 	    $pkg = "";
 	}
 	else {
@@ -167,7 +167,7 @@ sub delete_package ($) {
 
     # free all the symbols in the package
 
-    my $leaf_symtab = *{$stem_symtab->{$leaf}}{HASH};
+    my $leaf_symtab = *{$stem_symtab->{?$leaf}}{HASH};
     foreach my $name (keys %$leaf_symtab) {
         undef *{Symbol::qualify_to_ref($pkg . $name)};
     }

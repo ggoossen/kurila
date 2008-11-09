@@ -22,16 +22,16 @@ print "not " if exists %x{'l'}   ||
                 exists %x{'lis'};
 print "ok 2\n";
 
-print "not " unless %x{'list'}   eq 'list' &&
-                    %x{'liste'}  eq 'listen' &&
-                    %x{'listen'} eq 'listen';
+print "not " unless %x{?'list'}   eq 'list' &&
+                    %x{?'liste'}  eq 'listen' &&
+                    %x{?'listen'} eq 'listen';
 print "ok 3\n";
 
-print "not " unless %x{'a'}     eq 'abort' &&
-                    %x{'ab'}    eq 'abort' &&
-                    %x{'abo'}   eq 'abort' &&
-                    %x{'abor'}  eq 'abort' &&
-                    %x{'abort'} eq 'abort';
+print "not " unless %x{?'a'}     eq 'abort' &&
+                    %x{?'ab'}    eq 'abort' &&
+                    %x{?'abo'}   eq 'abort' &&
+                    %x{?'abor'}  eq 'abort' &&
+                    %x{?'abort'} eq 'abort';
 print "ok 4\n";
 
 my $test = 5;

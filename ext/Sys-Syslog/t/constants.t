@@ -4,7 +4,7 @@ use File::Spec;
 use Test::More;
 
 # NB. For PERL_CORE to be set, taint mode must not be enabled
-my $macrosall = %ENV{PERL_CORE} ?? File::Spec->catfile( <qw(.. ext Sys Syslog macros.all))
+my $macrosall = %ENV{?PERL_CORE} ?? File::Spec->catfile( <qw(.. ext Sys Syslog macros.all))
                                 !! 'macros.all';
 open(MACROS, "<", $macrosall) or plan skip_all => "can't read '$macrosall': $!";
 my @names = map {chomp;$_} @( ~< *MACROS);
@@ -15,10 +15,10 @@ my $callpack = my $testpack = 'Sys::Syslog';
 eval "use $callpack";
 
 eval "$($callpack)::This()";
-like( $@->{description}, "/^Undefined subroutine/", "trying a non-existing macro");
+like( $@->{?description}, "/^Undefined subroutine/", "trying a non-existing macro");
 
 eval "$($callpack)::NOSUCHNAME()";
-like( $@->{description}, "/^Undefined subroutine/", "trying a non-existing macro");
+like( $@->{?description}, "/^Undefined subroutine/", "trying a non-existing macro");
 
 # Testing all macros
 if((nelems @names)) {
@@ -33,7 +33,7 @@ if((nelems @names)) {
                 like( $v, '/^\d+$/', "checking that $name is a number ($v)" );
 
             } else {
-                like( $@->{description}, "/^Your vendor has not defined $testpack macro $name/", 
+                like( $@->{?description}, "/^Your vendor has not defined $testpack macro $name/", 
                     "calling the constant via its name" );
                 skip "irrelevant test in this case", 1
             }

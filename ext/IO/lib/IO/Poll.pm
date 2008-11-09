@@ -49,12 +49,12 @@ sub mask {
     if ((nelems @_)) {
 	my $mask = shift;
 	if($mask) {
-	  $self->[0]->{$fd}->{$io} = $mask; # the error events are always returned
-	  $self->[1]->{$fd}      = 0;     # output mask
-	  $self->[2]->{$io}      = $io;   # remember handle
+	  $self->[0]->{$fd}->{+$io} = $mask; # the error events are always returned
+	  $self->[1]->{+$fd}      = 0;     # output mask
+	  $self->[2]->{+$io}      = $io;   # remember handle
 	} else {
           delete $self->[0]->{$fd}->{$io};
-          unless(%{$self->[0]->{$fd}}) {
+          unless(%{$self->[0]->{?$fd}}) {
             # We no longer have any handles for this FD
             delete $self->[1]->{$fd};
             delete $self->[0]->{$fd};
@@ -64,7 +64,7 @@ sub mask {
     }
     
     return unless exists $self->[0]->{$fd} and exists $self->[0]->{$fd}->{$io};
-	return $self->[0]->{$fd}->{$io};
+	return $self->[0]->{$fd}->{?$io};
 }
 
 
@@ -89,7 +89,7 @@ sub poll {
 
     while((nelems @poll)) {
 	my($fd,$got) = splice(@poll,0,2);
-	$self->[1]->{$fd} = $got if $got;
+	$self->[1]->{+$fd} = $got if $got;
     }
 
     return $ret;  
@@ -101,7 +101,7 @@ sub events {
     my $fd = fileno($io);
     $io = dump::view($io);
     exists $self->[1]->{$fd} and exists $self->[0]->{$fd}->{$io} 
-                ?? $self->[1]->{$fd} ^&^ ($self->[0]->{$fd}->{$io}^|^POLLHUP^|^POLLERR^|^POLLNVAL)
+                ?? $self->[1]->{?$fd} ^&^ ($self->[0]->{$fd}->{?$io}^|^POLLHUP^|^POLLERR^|^POLLNVAL)
 	!! 0;
 }
 
@@ -122,7 +122,7 @@ sub handles {
     while(($fd,$ev) = each %{$self->[1]}) {
 	while (($io,$mask) = each %{$self->[0]->{$fd}}) {
 	    $mask ^|^= POLLHUP^|^POLLERR^|^POLLNVAL;  # must allow these
-	    push @handles,$self->[2]->{$io} if ($ev ^&^ $mask) ^&^ $events;
+	    push @handles,$self->[2]->{?$io} if ($ev ^&^ $mask) ^&^ $events;
 	}
     }
     return @handles;

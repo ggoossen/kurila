@@ -35,21 +35,21 @@ BEGIN { $tests += 1 }
 # check the diagnostics
 # setlogsock()
 try { setlogsock() };
-like( $@->{description}, qr/^Invalid argument passed to setlogsock/, 
+like( $@->{?description}, qr/^Invalid argument passed to setlogsock/, 
     "calling setlogsock() with no argument" );
 
 BEGIN { $tests += 3 }
 # syslog()
 try { syslog() };
-like( $@->{description}, qr/^syslog: expecting argument \$priority/, 
+like( $@->{?description}, qr/^syslog: expecting argument \$priority/, 
     "calling syslog() with no argument" );
 
 try { syslog(undef) };
-like( $@->{description}, qr/^syslog: expecting argument \$priority/, 
+like( $@->{?description}, qr/^syslog: expecting argument \$priority/, 
     "calling syslog() with one undef argument" );
 
 try { syslog('') };
-like( $@->{description}, qr/^syslog: expecting argument \$format/, 
+like( $@->{?description}, qr/^syslog: expecting argument \$format/, 
     "calling syslog() with one empty argument" );
 
 
@@ -77,7 +77,7 @@ SKIP: do {
     SKIP: do {
         # openlog()
         $r = try { openlog('perl', 'ndelay', 'local0') } || 0;
-        skip "can't connect to syslog", 6 if $@ and $@->{description} =~ m/^no connection to syslog available/;
+        skip "can't connect to syslog", 6 if $@ and $@->{?description} =~ m/^no connection to syslog available/;
         is( $@, '', "openlog() called with facility 'local0'" );
         ok( $r, "openlog() should return true" );
 
@@ -117,29 +117,29 @@ for my $sock_type (qw(native eventlog unix pipe stream inet tcp udp)) {
         # openlog() without option NDELAY
         $r = try { openlog('perl', '', 'local0') } || 0;
         diag $@->message if $@;
-        skip "can't connect to syslog", 16 if $@ and $@->{description} =~ m/^no connection to syslog available/;
+        skip "can't connect to syslog", 16 if $@ and $@->{?description} =~ m/^no connection to syslog available/;
         is( $@, '', "[$sock_type] openlog() called with facility 'local0' and without option 'ndelay'" );
         ok( $r, "[$sock_type] openlog() should return true: $(dump::view($r))" );
 
         # openlog() with the option NDELAY
         $r = try { openlog('perl', 'ndelay', 'local0') } || 0;
-        skip "can't connect to syslog", 14 if $@ and $@->{description} =~ m/^no connection to syslog available/;
+        skip "can't connect to syslog", 14 if $@ and $@->{?description} =~ m/^no connection to syslog available/;
         is( $@, '', "[$sock_type] openlog() called with facility 'local0' with option 'ndelay'" );
         ok( $r, "[$sock_type] openlog() should return true: $(dump::view($r))" );
 
         # syslog() with negative level, should fail
         $r = try { syslog(-1, "$test_string by connecting to a $sock_type socket") } || 0;
-        like( $@->{description}, '/^syslog: invalid level\/facility: /', "[$sock_type] syslog() called with level -1" );
+        like( $@->{?description}, '/^syslog: invalid level\/facility: /', "[$sock_type] syslog() called with level -1" );
         ok( !$r, "[$sock_type] syslog() should return false: $(dump::view($r))" );
 
         # syslog() with levels "info" and "notice" (as a strings), should fail
         $r = try { syslog('info,notice', "$test_string by connecting to a $sock_type socket") } || 0;
-        like( $@->{description}, '/^syslog: too many levels given: notice/', "[$sock_type] syslog() called with level 'info,notice'" );
+        like( $@->{?description}, '/^syslog: too many levels given: notice/', "[$sock_type] syslog() called with level 'info,notice'" );
         ok( !$r, "[$sock_type] syslog() should return false: $(dump::view($r))" );
 
         # syslog() with facilities "local0" and "local1" (as a strings), should fail
         $r = try { syslog('local0,local1', "$test_string by connecting to a $sock_type socket") } || 0;
-        like( $@->{description}, '/^syslog: too many facilities given: local1/', "[$sock_type] syslog() called with level 'local0,local1'" );
+        like( $@->{?description}, '/^syslog: too many facilities given: local1/', "[$sock_type] syslog() called with level 'local0,local1'" );
         ok( !$r, "[$sock_type] syslog() should return false: $(dump::view($r))" );
 
         # syslog() with level "info" (as a string), should pass

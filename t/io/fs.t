@@ -47,7 +47,7 @@ my $needs_fh_reopen =
 $needs_fh_reopen = 1 if (defined &Win32::IsWin95 && Win32::IsWin95());
 
 my $skip_mode_checks =
-    $^O eq 'cygwin' && %ENV{CYGWIN} !~ m/ntsec/;
+    $^O eq 'cygwin' && %ENV{?CYGWIN} !~ m/ntsec/;
 
 plan tests => 51;
 
@@ -200,14 +200,14 @@ SKIP: do {
     skip "has fchmod", 1 if (config_value('d_fchmod') || "") eq "define";
     open(my $fh, "<", "a");
     try { chmod(0777, $fh); };
-    like($@->{description}, qr/^The fchmod function is unimplemented at/, "fchmod is unimplemented");
+    like($@->{?description}, qr/^The fchmod function is unimplemented at/, "fchmod is unimplemented");
 };
 
 SKIP: do {
     skip "has fchown", 1 if (config_value('d_fchown') || "") eq "define";
     open(my $fh, "<", "a");
     try { chown(0, 0, $fh); };
-    like($@->{description}, qr/^The f?chown function is unimplemented at/, "fchown is unimplemented");
+    like($@->{?description}, qr/^The f?chown function is unimplemented at/, "fchown is unimplemented");
 };
 
 is(rename('a','b'), 1, "rename a b");
@@ -297,7 +297,7 @@ SKIP: do {
     skip "has futimes", 1 if (config_value('d_futimes') || "") eq "define";
     open(my $fh, "<", "b") || die;
     try { utime(undef, undef, $fh); };
-    like($@->{description}, qr/^The futimes function is unimplemented at/, "futimes is unimplemented");
+    like($@->{?description}, qr/^The futimes function is unimplemented at/, "futimes is unimplemented");
 };
 
 is(unlink('b'), 1, "unlink b");
@@ -415,7 +415,7 @@ SKIP: do {
 # check if rename() can be used to just change case of filename
 SKIP: do {
     skip "Works in Cygwin only if check_case is set to relaxed", 1
-      if (%ENV{'CYGWIN'} && (%ENV{'CYGWIN'} =~ m/check_case:(?:adjust|strict)/));
+      if (%ENV{?'CYGWIN'} && (%ENV{?'CYGWIN'} =~ m/check_case:(?:adjust|strict)/));
 
     chdir './tmp';
     open(FH, ">",'x') || die "Can't create x";

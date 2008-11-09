@@ -37,14 +37,14 @@ while ( ~< *DATA) {
     $_ = lc;
     if (my ($correct, $alias) = m/^\s*([^#\s]\S*)\s+(.*\S)/) {
         if ($correct eq '+') {$correct = $prev} else {$prev = $correct}
-        %map {$alias} = $correct;
+        %map {+$alias} = $correct;
     }
 }
 
 #
 # Email addresses for we do not have names.
 #
-%map {$_} = "?" for @( 
+%map {+$_} = "?" for @( 
     "agrow\100thegotonerd.com",
     "alexander_bluhm\100genua.de",
     "alexander_gernler\100genua.de",
@@ -90,7 +90,7 @@ while ( ~< *DATA) {
 # Presumably deliberately?
 # 
 
-%map {$_} = '!' for @(
+%map {+$_} = '!' for @(
      # Nick Ing-Simmons has passed away (2006-09-25).
      "nick\100ing-simmons.net",
      "nik\100tiuk.ti.com",
@@ -127,10 +127,10 @@ if ((nelems @authors)) {
       next if m/^-- /;
       if (m/<([^>]+)>/) {
 	# Easy line.
-	%raw{$1}++;
+	%raw{+$1}++;
       } elsif (m/^([-A-Za-z0-9 .\'À-ÖØöø-ÿ]+)[\t\n]/) {
 	# Name only
-	%untraced{$1}++;
+	%untraced{+$1}++;
       } else {
 	chomp;
 	warn "Can't parse line '$_'";
@@ -138,12 +138,12 @@ if ((nelems @authors)) {
     }
   }
   foreach (keys %raw) {
-    print "E-mail $_ occurs %raw{$_} times\n" if %raw{$_} +> 1;
+    print "E-mail $_ occurs %raw{?$_} times\n" if %raw{?$_} +> 1;
     $_ = lc $_;
-    %authors{%map{$_} || $_}++;
+    %authors{+%map{?$_} || $_}++;
   }
-  ++%authors{'!'};
-  ++%authors{'?'};
+  ++%authors{+'!'};
+  ++%authors{+'?'};
 }
 
 while ( ~< *ARGV) {
@@ -182,13 +182,13 @@ if ($rank) {
 } elsif (%authors) {
   my %missing;
   foreach (sort keys %patchers) {
-    next if %authors{$_};
+    next if %authors{?$_};
     # Sort by number of patches, then name.
-    %missing{%patchers{$_}}->{$_}++;
+    %missing{%patchers{?$_}}->{+$_}++;
   }
   foreach my $patches (sort {$b <+> $a} keys %missing) {
     print "$patches patch(es)\n";
-    foreach my $author (sort keys %{%missing{$patches}}) {
+    foreach my $author (sort keys %{%missing{?$patches}}) {
       print "  $author\n";
     }
   }
@@ -231,15 +231,15 @@ sub process {
       s/^<//;
       s/>$//;
       $_ = lc $_;
-      %patchers{%map{$_} || $_}++;
+      %patchers{+%map{?$_} || $_}++;
     }
     # print "$patch: @authors\n";
-    ++%committers{$committer};
+    ++%committers{+$committer};
   } else {
     # print "$patch: $committer\n";
     # Not entirely fair as this means that the maint pumpking scores for
     # everything intergrated that wasn't a third party patch in blead
-    %patchers{$committer}++;
+    %patchers{+$committer}++;
   }
 }
 

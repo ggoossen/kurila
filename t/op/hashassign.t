@@ -21,12 +21,12 @@ ok (nelems(keys %comma) == 1, 'keys on comma hash');
 ok (nelems(values %comma) == 1, 'values on comma hash');
 # defeat any tokeniser or optimiser cunning
 my $key = 'ey';
-is (%comma{"k" . $key}, "value", 'is key present? (unoptimised)');
+is (%comma{?"k" . $key}, "value", 'is key present? (unoptimised)');
 # now with cunning:
-is (%comma{key}, "value", 'is key present? (maybe optimised)');
+is (%comma{?key}, "value", 'is key present? (maybe optimised)');
 #tokeniser may treat => differently.
 my @temp = @(key=>undef);
-is (%comma{@temp[0]}, "value", 'is key present? (using LHS of =>)');
+is (%comma{?@temp[0]}, "value", 'is key present? (using LHS of =>)');
 
 @temp = @( < %comma );
 ok (eq_array(\@comma, \@temp), 'list from comma hash');
@@ -40,11 +40,11 @@ my %temp = %( < %comma );
 
 ok (nelems(keys %temp) == 1, 'keys on copy of comma hash');
 ok (nelems(values %temp) == 1, 'values on copy of comma hash');
-is (%temp{'k' . $key}, "value", 'is key present? (unoptimised)');
+is (%temp{?'k' . $key}, "value", 'is key present? (unoptimised)');
 # now with cunning:
-is (%temp{key}, "value", 'is key present? (maybe optimised)');
+is (%temp{?key}, "value", 'is key present? (maybe optimised)');
 @temp = @(key=>undef);
-is (%comma{@temp[0]}, "value", 'is key present? (using LHS of =>)');
+is (%comma{?@temp[0]}, "value", 'is key present? (using LHS of =>)');
 
 @temp = @( < %temp );
 ok (eq_array (\@temp, \@temp), 'list from copy of comma hash');
@@ -61,12 +61,12 @@ ok (nelems(keys %arrow) == 1, 'keys on arrow hash');
 ok (nelems(values %arrow) == 1, 'values on arrow hash');
 # defeat any tokeniser or optimiser cunning
 $key = 'ey';
-is (%arrow{"K" . $key}, "Value", 'is key present? (unoptimised)');
+is (%arrow{?"K" . $key}, "Value", 'is key present? (unoptimised)');
 # now with cunning:
-is (%arrow{Key}, "Value", 'is key present? (maybe optimised)');
+is (%arrow{?Key}, "Value", 'is key present? (maybe optimised)');
 #tokeniser may treat => differently.
 @temp = @('Key', undef);
-is (%arrow{@temp[0]}, "Value", 'is key present? (using LHS of =>)');
+is (%arrow{?@temp[0]}, "Value", 'is key present? (using LHS of =>)');
 
 @temp = @( < %arrow );
 ok (eq_array (\@arrow, \@temp), 'list from arrow hash');
@@ -80,11 +80,11 @@ ok (eq_array (\@(), \@temp), 'last each from arrow hash');
 
 ok (nelems(keys %temp) == 1, 'keys on copy of arrow hash');
 ok (nelems(values %temp) == 1, 'values on copy of arrow hash');
-is (%temp{'K' . $key}, "Value", 'is key present? (unoptimised)');
+is (%temp{?'K' . $key}, "Value", 'is key present? (unoptimised)');
 # now with cunning:
-is (%temp{Key}, "Value", 'is key present? (maybe optimised)');
+is (%temp{?Key}, "Value", 'is key present? (maybe optimised)');
 @temp = @('Key', undef);
-is (%arrow{@temp[0]}, "Value", 'is key present? (using LHS of =>)');
+is (%arrow{?@temp[0]}, "Value", 'is key present? (using LHS of =>)');
 
 @temp = @:< %temp;
 ok (eq_array (\@temp, \@temp), 'list from copy of arrow hash');
@@ -96,14 +96,14 @@ ok (eq_array (\@(), \@temp), 'last each from copy of arrow hash');
 
 my %direct = %('Camel', 2, 'Dromedary', 1);
 my %slow;
-%slow{Dromedary} = 1;
-%slow{Camel} = 2;
+%slow{+Dromedary} = 1;
+%slow{+Camel} = 2;
 
 ok (eq_hash (\%slow, \%direct), "direct list assignment to hash");
 %direct = %(Camel => 2, 'Dromedary' => 1);
 ok (eq_hash (\%slow, \%direct), "direct list assignment to hash using =>");
 
-%slow{Llama} = 0; # A llama is not a camel :-)
+%slow{+Llama} = 0; # A llama is not a camel :-)
 ok (!eq_hash (\%direct, \%slow), "different hashes should not be equal!");
 
 my (%names, %names_copy);
@@ -170,7 +170,7 @@ ok (eq_hash (\%names, \%names_copy), "duplicates at the start of a list");
 # This should not
 %names_copy = %('*', 'Typeglob', < %names);
 
-%names_copy2{'*'} = 'Typeglob';
+%names_copy2{+'*'} = 'Typeglob';
 ok (eq_hash (\%names_copy, \%names_copy2), "duplicates at the end of a list");
 
 %names_copy = %('%', 'Associative Array', '*', 'Endangered species', < %names,
@@ -192,12 +192,12 @@ do {
     my @refs =    @( \ do { my $x }, \@(),   \%(),  sub {}, \ *x);
     our %h;
     for my $ref ( @refs) {
-        dies_like( sub { %h{$ref} }, qr/reference as string/ );
+        dies_like( sub { %h{?$ref} }, qr/reference as string/ );
     }
 
     bless $_ for  @refs;
     %h = %( () );
     for my $ref ( @refs) {
-        dies_like( sub { %h{$ref} }, qr/reference as string/ );
+        dies_like( sub { %h{?$ref} }, qr/reference as string/ );
     }
 };

@@ -3,7 +3,7 @@
 use warnings;
 use vars < qw{ @warnings $fagwoosh $putt $kloong};
 BEGIN {				# ...and save 'em for later
-    $^WARN_HOOK = sub { push @warnings, @_[0]->{description} }
+    $^WARN_HOOK = sub { push @warnings, @_[0]->{?description} }
 }
 END { print STDERR < @warnings }
 
@@ -118,14 +118,14 @@ use constant CCODE	=> sub { "ok @_[0]\n" };
 
 my $output = $TB->output ;
 print $output ${$: CSCALAR};
-print $output CHASH->{foo};
+print $output CHASH->{?foo};
 print $output CARRAY->[1];
 print $output CCODE->($curr_test+4);
 
 $TB->current_test($curr_test+4);
 
 eval q{ CCODE->{foo} };
-like($@->{description}, qr/^Expected a HASH ref but got a CODE ref/);
+like($@->{?description}, qr/^Expected a HASH ref but got a CODE ref/);
 
 
 # Allow leading underscore
@@ -136,7 +136,7 @@ is _PRIVATE, 47;
 eval q{
     use constant __DISALLOWED => "Oops";
 };
-like $@->{description}, qr/begins with '__'/;
+like $@->{?description}, qr/begins with '__'/;
 
 # Check on declared() and %declared. This sub should be EXACTLY the
 # same as the one quoted in the docs!
@@ -146,26 +146,26 @@ sub declared ($) {
     $name =~ s/^::/main::/;
     my $pkg = caller;
     my $full_name = $name =~ m/::/ ?? $name !! "$($pkg)::$name";
-    %constant::declared{$full_name};
+    %constant::declared{?$full_name};
 }
 
 ok declared 'PI';
-ok %constant::declared{'main::PI'};
+ok %constant::declared{?'main::PI'};
 
 ok !declared 'PIE';
-ok !%constant::declared{'main::PIE'};
+ok !%constant::declared{?'main::PIE'};
 
 do {
     package Other;
     use constant IN_OTHER_PACK => 42;
     main::ok main::declared 'IN_OTHER_PACK';
-    main::ok %constant::declared{'Other::IN_OTHER_PACK'};
+    main::ok %constant::declared{?'Other::IN_OTHER_PACK'};
     main::ok main::declared 'main::PI';
-    main::ok %constant::declared{'main::PI'};
+    main::ok %constant::declared{?'main::PI'};
 };
 
 ok declared 'Other::IN_OTHER_PACK';
-ok %constant::declared{'Other::IN_OTHER_PACK'};
+ok %constant::declared{?'Other::IN_OTHER_PACK'};
 
 @warnings = @( () );
 eval q{
@@ -243,7 +243,7 @@ use constant \%(
 is nelems(@{$:FAMILY}), THREE;
 is nelems(@{$:FAMILY}), nelems @{RFAM->[0]};
 is FAMILY->[2], RFAM->[0]->[2];
-is AGES->{FAMILY->[1]}, 28;
+is AGES->{?FAMILY->[1]}, 28;
 is THREE**3, SPIT->((nelems @{$:FAMILY})**3);
 
 # Allow name of digits/underscores only if it begins with underscore

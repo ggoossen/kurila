@@ -44,7 +44,7 @@ do { package Foo;
 # Can we undefine a first sub while it's running?
 sub self_immolate {undef &self_immolate; 1}
 try { $v = first \&self_immolate, 1,2; };
-like($@->{description}, qr/^Can't undef active subroutine/, "undef active sub");
+like($@->{?description}, qr/^Can't undef active subroutine/, "undef active sub");
 
 # Redefining an active sub should not fail, but whether the
 # redefinition takes effect immediately depends on whether we're
@@ -88,6 +88,6 @@ if (!$::PERL_ONLY) { SKIP: do {
 
     # Can we goto a subroutine?
     try {()= <first{goto sub{}} 1,2;};
-    like($@->{description}, qr/^Can't goto subroutine from a sort sub/, "goto sub");
+    like($@->{?description}, qr/^Can't goto subroutine from a sort sub/, "goto sub");
 
 }; }

@@ -30,11 +30,11 @@ print defined($a) ?? "ok 8\n" !! "not ok 8\n";
 $a = shift(@ary);
 print defined($a) ?? "not ok 9\n" !! "ok 9\n";
 
-%ary{'foo'} = 'hi';
-print defined(%ary{'foo'}) ?? "ok 10\n" !! "not ok 10\n";
-print defined(%ary{'bar'}) ?? "not ok 11\n" !! "ok 11\n";
-undef %ary{'foo'};
-print defined(%ary{'foo'}) ?? "not ok 12\n" !! "ok 12\n";
+%ary{+'foo'} = 'hi';
+print defined(%ary{?'foo'}) ?? "ok 10\n" !! "not ok 10\n";
+print defined(%ary{?'bar'}) ?? "not ok 11\n" !! "ok 11\n";
+undef %ary{+'foo'};
+print defined(%ary{?'foo'}) ?? "not ok 12\n" !! "ok 12\n";
 
 print defined(@ary) ?? "ok 13\n" !! "not ok 13\n";
 print defined(%ary) ?? "ok 14\n" !! "not ok 14\n";
@@ -56,10 +56,10 @@ undef &foo;
 print defined(&foo) ?? "not ok 21\n" !! "ok 21\n";
 
 try { undef $1 };
-print $@->{description} =~ m/^Modification of a read/ ?? "ok 22\n" !! "not ok 22\n";
+print $@->{?description} =~ m/^Modification of a read/ ?? "ok 22\n" !! "not ok 22\n";
 
 try { $1 = undef };
-print $@->{description} =~ m/^Modification of a read/ ?? "ok 23\n" !! "not ok 23\n";
+print $@->{?description} =~ m/^Modification of a read/ ?? "ok 23\n" !! "not ok 23\n";
 
 do {
     require Tie::Hash;
@@ -72,7 +72,7 @@ do {
 do {
     # [perl #17753] segfault when undef'ing unquoted string constant
     eval 'undef tcp';
-    print $@->{description} =~ m/^Can't modify constant item/ ?? "ok 26\n" !! "not ok 26\n";
+    print $@->{?description} =~ m/^Can't modify constant item/ ?? "ok 26\n" !! "not ok 26\n";
 };
 
 # bugid 3096

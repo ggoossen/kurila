@@ -15,7 +15,7 @@ my %feature_bundle = %(
 );
 
 # special case
-%feature_bundle{"5.9.5"} = %feature_bundle{"5.10"};
+%feature_bundle{+"5.9.5"} = %feature_bundle{?"5.10"};
 
 # TODO:
 # - think about versioned features (use feature switch => 2)
@@ -141,13 +141,13 @@ sub import {
 		    unknown_feature_bundle(substr($name, 1));
 		}
 	    }
-	    unshift @_, < @{%feature_bundle{$v}};
+	    unshift @_, < @{%feature_bundle{?$v}};
 	    next;
 	}
 	if (!exists %feature{$name}) {
 	    unknown_feature($name);
 	}
-	%^H{%feature{$name}} = 1;
+	%^H{+%feature{?$name}} = 1;
     }
 }
 
@@ -170,14 +170,14 @@ sub unimport {
 		    unknown_feature_bundle(substr($name, 1));
 		}
 	    }
-	    unshift @_, < @{%feature_bundle{$v}};
+	    unshift @_, < @{%feature_bundle{?$v}};
 	    next;
 	}
 	if (!exists(%feature{$name})) {
 	    unknown_feature($name);
 	}
 	else {
-	    delete %^H{%feature{$name}};
+	    delete %^H{%feature{?$name}};
 	}
     }
 }

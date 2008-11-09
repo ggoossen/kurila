@@ -12,14 +12,14 @@ use Carp::Heavy ();
 BEGIN {
     if ($^O ne 'VMS') {
 	for (keys %ENV) { # untaint ENV
-	    (%ENV{$_}) = %ENV{$_} =~ m/(.*)/;
+	    (%ENV{+$_}) = %ENV{?$_} =~ m/(.*)/;
 	}
     }
 
     # Remove insecure directories from PATH
     my @path;
     my $sep = config_value("path_sep");
-    foreach my $dir (split(m/\Q$sep/,%ENV{'PATH'}))
+    foreach my $dir (split(m/\Q$sep/,%ENV{?'PATH'}))
     {
 	##
 	## Match the directory taint tests in mg.c::Perl_magic_setenv()
@@ -30,7 +30,7 @@ BEGIN {
 				 or
 				 @(stat $dir)[2] ^&^ 002);
     }
-    %ENV{'PATH'} = join($sep, @path);
+    %ENV{+'PATH'} = join($sep, @path);
 }
 
 use Test::More tests => 45;
@@ -100,13 +100,13 @@ sub wanted_File_Dir {
     print "# \$_ => '$_'\n";
     s#\.$## if ($^O eq 'VMS' && $_ ne '.');
     s/(.dir)?$//i if ($^O eq 'VMS' && -d _);
-	ok( %Expect_File{$_}, "Expected and found $File::Find::name" );
+	ok( %Expect_File{?$_}, "Expected and found $File::Find::name" );
     if ( $FastFileTests_OK ) {
         delete %Expect_File{ $_}
-          unless ( %Expect_Dir{$_} && ! -d _ );
+          unless ( %Expect_Dir{?$_} && ! -d _ );
     } else {
         delete %Expect_File{$_}
-          unless ( %Expect_Dir{$_} && ! -d $_ );
+          unless ( %Expect_Dir{?$_} && ! -d $_ );
     }
 }
 
@@ -286,7 +286,7 @@ is(nkeys %Expect_File, 0, 'Found all expected files');
 %Expect_Dir  = %( () );
 undef $@;
 try {File::Find::find( \%(wanted => \&simple_wanted), topdir('fa') );};
-like( $@->{description}, qr|Insecure dependency|, 'Tainted directory causes death (good)' );
+like( $@->{?description}, qr|Insecure dependency|, 'Tainted directory causes death (good)' );
 chdir($cwd_untainted);
 
 
@@ -297,7 +297,7 @@ try {File::Find::find( \%(wanted => \&simple_wanted, untaint => 1,
                          untaint_pattern => qr|^(NO_MATCH)$|),
                          topdir('fa') );};
 
-like( $@->{description}, qr|is still tainted|, 'Bad untaint pattern causes death (good)' );
+like( $@->{?description}, qr|is still tainted|, 'Bad untaint pattern causes death (good)' );
 chdir($cwd_untainted);
 
 
@@ -309,9 +309,9 @@ try {File::Find::find( \%(wanted => \&simple_wanted, untaint => 1,
                          untaint_skip => 1, untaint_pattern =>
                          qr|^(NO_MATCH)$|), topdir('fa') );};
 
-print "# $@->{description}\n" if $@;
+print "# $@->{?description}\n" if $@;
 #$^D = 8;
-like( $@->{description}, qr|insecure cwd|, 'Bad untaint pattern causes death in cwd (good)' );
+like( $@->{?description}, qr|insecure cwd|, 'Bad untaint pattern causes death in cwd (good)' );
 
 chdir($cwd_untainted);
 
@@ -361,7 +361,7 @@ SKIP: do {
     try {File::Find::find( \%(wanted => \&simple_wanted, follow => 1),
 			    topdir('fa') );};
 
-    like( $@->{description}, qr|Insecure dependency|, 'Not untainting causes death (good)' );
+    like( $@->{?description}, qr|Insecure dependency|, 'Not untainting causes death (good)' );
     chdir($cwd_untainted);
 
     # untaint pattern doesn't match, should die
@@ -371,7 +371,7 @@ SKIP: do {
                              untaint => 1, untaint_pattern =>
                              qr|^(NO_MATCH)$|), topdir('fa') );};
 
-    like( $@->{description}, qr|is still tainted|, 'Bat untaint pattern causes death (good)' );
+    like( $@->{?description}, qr|is still tainted|, 'Bat untaint pattern causes death (good)' );
     chdir($cwd_untainted);
 
     # untaint pattern doesn't match, should die when we chdir to cwd
@@ -381,7 +381,7 @@ SKIP: do {
     try {File::Find::find( \%(wanted => \&simple_wanted, untaint => 1,
                              untaint_skip => 1, untaint_pattern =>
                              qr|^(NO_MATCH)$|), topdir('fa') );};
-    like( $@->{description}, qr|insecure cwd|, 'Cwd not untainted with bad pattern (good)' );
+    like( $@->{?description}, qr|insecure cwd|, 'Cwd not untainted with bad pattern (good)' );
 
     chdir($cwd_untainted);
 };
