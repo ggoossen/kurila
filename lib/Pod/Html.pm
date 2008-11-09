@@ -1125,7 +1125,7 @@ my $EmittedItem;
 
 sub emit_item_tag($$$){
     my( $otext, $text, $compact ) = < @_;
-    my $item = fragment_id( depod($text) , -generate);
+    my $item = fragment_id( depod($text) , "generate");
     Carp::confess("Undefined fragment '$text' (".depod($text).") from fragment_id() in emit_item_tag() in $Podfile")
         if !defined $item;
     $EmittedItem = $item;

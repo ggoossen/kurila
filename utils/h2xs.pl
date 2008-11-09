@@ -209,10 +209,6 @@ Do not use C<Exporter> and/or export any symbol.
 
 Do not use C<Devel::PPPort>: no portability to older version.
 
-=item B<--skip-strict>
-
-Do not use the pragma C<strict>.
-
 =item B<--skip-warnings>
 
 Do not use the pragma C<warnings>.
@@ -449,10 +445,6 @@ See L<perlxs> and L<perlxstut> for additional details.
 
 =cut
 
-# ' # Grr
-use strict;
-
-
 my( $H2XS_VERSION ) = ' $Revision: 1.23 $ ' =~ m/\$Revision:\s+([^\s]+)/;
 my $TEMPLATE_VERSION = '0.01';
 my @ARGS = @ARGV;
@@ -510,7 +502,6 @@ OPTIONS:
         --use-old-tests   Use the module Test rather than Test::More.
         --skip-exporter   Do not export symbols.
         --skip-ppport     Do not use portability layer.
-        --skip-strict     Do not use the pragma C<strict>.
         --skip-warnings   Do not use the pragma C<warnings>.
     -v, --version         Specify a version number for this extension.
     -x, --autogen-xsubs   Autogenerate XSUBs using C::Scan.
@@ -552,7 +543,6 @@ my ($opt_A,
     $old_test,
     $skip_exporter,
     $skip_ppport,
-    $skip_strict,
     $skip_warnings,
     $use_xsloader
    );
@@ -590,7 +580,6 @@ my %options = (
                 'skip-exporter'      => \$skip_exporter,
                 'skip-ppport'        => \$skip_ppport,
                 'skip-warnings'      => \$skip_warnings,
-                'skip-strict'        => \$skip_strict,
                 'use-xsloader'       => \$use_xsloader,
               );
 
@@ -1012,10 +1001,6 @@ print PM <<"END";
 package $module;
 
 use kurila v$compat_version;
-END
-
-print PM <<"END" unless $skip_strict;
-use strict;
 END
 
 print PM "use warnings;\n" unless $skip_warnings;

@@ -162,10 +162,10 @@ ok(14, $dbh->{?bfname} == 1234 );
 
 
 # Check that an invalid entry is caught both for store & fetch
-eval '$dbh->{fred} = 1234' ;
-ok(15, $@->{?description} =~ m/^DB_File::RECNOINFO::STORE - Unknown element 'fred' at/ );
-eval 'my $q = $dbh->{fred}' ;
-ok(16, $@->{?description} =~ m/^DB_File::RECNOINFO::FETCH - Unknown element 'fred' at/ );
+try { $dbh->{+fred} = 1234 };
+ok(15, $@->{?description} =~ m/^DB_File::RECNOINFO::STORE - Unknown element 'fred'/ );
+try { my $q = $dbh->{+fred} };
+ok(16, $@->{?description} =~ m/^DB_File::RECNOINFO::FETCH - Unknown element 'fred'/ );
 
 # Now check the interface to RECNOINFO
 

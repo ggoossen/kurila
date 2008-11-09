@@ -42,9 +42,9 @@ sub msgcmp( $ $ ) {
 
 sub testpodcheck( @ ) {
    my %args = %( < @_ );
-   my $infile  = %args{?'-In'}  || die "No input file given!";
-   my $outfile = %args{?'-Out'} || die "No output file given!";
-   my $cmpfile = %args{?'-Cmp'} || die "No compare-result file given!";
+   my $infile  = %args{'In'}  || die "No input file given!";
+   my $outfile = %args{'Out'} || die "No output file given!";
+   my $cmpfile = %args{'Cmp'} || die "No compare-result file given!";
 
    my $different = '';
    my $testname = basename $cmpfile, '.t', '.xr';
@@ -63,7 +63,7 @@ sub testpodcheck( @ ) {
       }
    }
    podchecker($infile, $outfile);
-   if ( testcmp(\%('-cmplines' => \&msgcmp), $outfile, $cmpfile) ) {
+   if ( testcmp(\%('cmplines' => \&msgcmp), $outfile, $cmpfile) ) {
        $different = "$outfile is different from $cmpfile";
    }
    else {
@@ -82,7 +82,7 @@ sub testpodchecker( @ ) {
    my $failed = 0;
    local $_;
 
-   print "1..", nelems @testpods, "\n"  unless (%opts{?'-xrgen'});
+   print "1..", nelems @testpods, "\n"  unless (%opts{?'xrgen'});
 
    for my $podfile ( @testpods) {
       ($testname, $_) = < fileparse($podfile);
@@ -91,8 +91,8 @@ sub testpodchecker( @ ) {
       $cmpfile   =  $testdir . $testname . '.xr';
       $outfile   =  $testdir . $testname . '.OUT';
 
-      if (%opts{?'-xrgen'}) {
-          if (%opts{?'-force'} or ! -e $cmpfile) {
+      if (%opts{?'xrgen'}) {
+          if (%opts{?'force'} or ! -e $cmpfile) {
              ## Create the comparison file
              print "# Creating expected result for \"$testname\"" .
                    " podchecker test ...\n";
@@ -100,15 +100,15 @@ sub testpodchecker( @ ) {
           }
           else {
              print "# File $cmpfile already exists" .
-                   " (use '-force' to regenerate it).\n";
+                   " (use 'force' to regenerate it).\n";
           }
           next;
       }
 
       my $failmsg = testpodcheck
-                        -In  => $podfile,
-                        -Out => $outfile,
-                        -Cmp => $cmpfile;
+                        In  => $podfile,
+                        Out => $outfile,
+                        Cmp => $cmpfile;
       if ($failmsg) {
           ++$failed;
           print "#\tFAILED. ($failmsg)\n";

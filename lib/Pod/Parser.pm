@@ -156,7 +156,7 @@ The set of currently accepted parse-options is as follows:
 
 =over 3
 
-=item B<-want_nonPODs> (default: unset)
+=item B<want_nonPODs> (default: unset)
 
 Normally (by default) B<Pod::Parser> will only provide access to
 the POD sections of the input. Input paragraphs that are not part
@@ -167,7 +167,7 @@ non-POD sections of the input as well as POD sections. The B<cutting()>
 method can be used to determine if the corresponding paragraph is a POD
 paragraph, or some other input paragraph.
 
-=item B<-process_cut_cmd> (default: unset)
+=item B<process_cut_cmd> (default: unset)
 
 Normally (by default) B<Pod::Parser> handles the C<=cut> POD directive
 by itself and does not pass it on to the caller for processing. Setting
@@ -180,7 +180,7 @@ B<Pod::Parser> will still interpret the C<=cut> directive to mean that
 to capture the actual C<=cut> paragraph itself for whatever purpose
 it desires.
 
-=item B<-warnings> (default: unset)
+=item B<warnings> (default: unset)
 
 Normally (by default) B<Pod::Parser> recognizes a bare minimum of
 pod syntax errors and warnings and issues diagnostic messages
@@ -425,7 +425,7 @@ associative array (or hash-table) my be passed to the B<new()>
 constructor, as in:
 
     my $parser1 = MyParser->new( MYDATA => $value1, MOREDATA => $value2 );
-    my $parser2 = new MyParser( -myflag => 1 );
+    my $parser2 = new MyParser( myflag => 1 );
 
 All arguments passed to the B<new()> constructor will be treated as
 key/value pairs in a hash-table. The newly constructed object will be
@@ -606,7 +606,7 @@ Please note that the B<preprocess_line()> method is invoked I<before>
 the B<preprocess_paragraph()> method. After all (possibly preprocessed)
 lines in a paragraph have been assembled together and either it has been
 determined that the paragraph is part of the POD documentation from one
-of the selected sections or the C<-want_nonPODs> option is true,
+of the selected sections or the C<want_nonPODs> option is true,
 then B<preprocess_paragraph()> is invoked.
 
 The base class implementation of this method returns the given text.
@@ -657,11 +657,11 @@ returned. The set of recognized option keywords are:
 
 =over 3
 
-=item B<-expand_seq> =E<gt> I<code-ref>|I<method-name>
+=item B<expand_seq> =E<gt> I<code-ref>|I<method-name>
 
 Normally, the parse-tree returned by B<parse_text()> will contain an
 unexpanded C<Pod::InteriorSequence> object for each interior-sequence
-encountered. Specifying B<-expand_seq> tells B<parse_text()> to "expand"
+encountered. Specifying B<expand_seq> tells B<parse_text()> to "expand"
 every interior-sequence it sees by invoking the referenced function
 (or named method of the parser object) and using the return value as the
 expanded result.
@@ -679,11 +679,11 @@ is a reference to the interior-sequence object.
 [I<NOTE>: If the B<interior_sequence()> method is specified, then it is
 invoked according to the interface specified in L<"interior_sequence()">].
 
-=item B<-expand_text> =E<gt> I<code-ref>|I<method-name>
+=item B<expand_text> =E<gt> I<code-ref>|I<method-name>
 
 Normally, the parse-tree returned by B<parse_text()> will contain a
 text-string for each contiguous sequence of characters outside of an
-interior-sequence. Specifying B<-expand_text> tells B<parse_text()> to
+interior-sequence. Specifying B<expand_text> tells B<parse_text()> to
 "preprocess" every such text-string it sees by invoking the referenced
 function (or named method of the parser object) and using the return value
 as the preprocessed (or "expanded") result. [Note that if the result is
@@ -704,7 +704,7 @@ text-string encountered, and C<$ptree_node> is a reference to the current
 node in the parse-tree (usually an interior-sequence object or else the
 top-level node of the parse-tree).
 
-=item B<-expand_ptree> =E<gt> I<code-ref>|I<method-name>
+=item B<expand_ptree> =E<gt> I<code-ref>|I<method-name>
 
 Rather than returning a C<Pod::ParseTree>, pass the parse-tree as an
 argument to the referenced subroutine (or named method of the parser
@@ -731,9 +731,9 @@ sub parse_text {
 
     ## Get options and set any defaults
     my %opts = %( (ref @_[0]) ?? < %{ shift() } !! () );
-    my $expand_seq   = %opts{?'-expand_seq'}   || undef;
-    my $expand_text  = %opts{?'-expand_text'}  || undef;
-    my $expand_ptree = %opts{?'-expand_ptree'} || undef;
+    my $expand_seq   = %opts{?'expand_seq'}   || undef;
+    my $expand_text  = %opts{?'expand_text'}  || undef;
+    my $expand_ptree = %opts{?'expand_ptree'} || undef;
 
     my $text = shift;
     my $line = shift;
@@ -785,9 +785,9 @@ sub parse_text {
             ($ldelim = $ldelim_orig) =~ s/\s+$//;
             ($rdelim = $ldelim) =~ s/</>/g;
             $seq = Pod::InteriorSequence->new(
-                       -name   => $cmd,
-                       -ldelim => $ldelim_orig,  -rdelim => $rdelim,
-                       -file   => $file,    -line   => $line
+                       name   => $cmd,
+                       ldelim => $ldelim_orig,  rdelim => $rdelim,
+                       file   => $file,    line   => $line
                    );
             ((nelems @seq_stack) +> 1)  and  $seq->nested(@seq_stack[-1]);
             push @seq_stack, $seq;
@@ -883,7 +883,7 @@ some alternate order, use B<parse_text> instead.
 
 sub interpolate {
     my($self, $text, $line_num) = < @_;
-    my %parse_opts = %( -expand_seq => 'interior_sequence' );
+    my %parse_opts = %( expand_seq => 'interior_sequence' );
     my $ptree = $self->parse_text( \%parse_opts, $text, $line_num );
     return  join "", $ptree->children();
 }
@@ -914,7 +914,7 @@ sub parse_paragraph {
     local $_;
 
     ## See if we want to preprocess nonPOD paragraphs as well as POD ones.
-    my $wantNonPods = %myOpts{?'-want_nonPODs'};
+    my $wantNonPods = %myOpts{?'want_nonPODs'};
 
     ## Update cutting status
     %myData{+_CUTTING} = 0 if $text =~ m/^={1,2}\S/;
@@ -963,17 +963,17 @@ sub parse_paragraph {
         ## except return to "cutting" mode.
         if ($cmd eq 'cut') {
            %myData{+_CUTTING} = 1;
-           return  unless %myOpts{?'-process_cut_cmd'};
+           return  unless %myOpts{?'process_cut_cmd'};
         }
     }
     ## Save the attributes indicating how the command was specified.
     $pod_para = Pod::Paragraph->new(
-          -name      => $cmd,
-          -text      => $text,
-          -prefix    => $pfx,
-          -separator => $sep,
-          -file      => %myData{?_INFILE},
-          -line      => $line_num);
+          name      => $cmd,
+          text      => $text,
+          prefix    => $pfx,
+          separator => $sep,
+          file      => %myData{?_INFILE},
+          line      => $line_num);
     # ## Invoke appropriate callbacks
     # if (exists $myData{_CALLBACKS}) {
     #    ## Look through the callback list, invoke callbacks,
@@ -1043,7 +1043,7 @@ sub parse_from_filehandle {
     ## Put this stream at the top of the stack and do beginning-of-input
     ## processing. NOTE that $in_fh might be reset during this process.
     my $topstream = $self->_push_input_stream($in_fh, $out_fh);
-    (exists %opts{-cutting})  and  $self->cutting( %opts{-cutting} );
+    (exists %opts{cutting})  and  $self->cutting( %opts{cutting} );
 
     ## Initialize line/paragraph
     my ($textline, $paragraph) = ('', '');
@@ -1075,7 +1075,7 @@ sub parse_from_filehandle {
                                      && (length $paragraph));
 
         ## Issue a warning about any non-empty blank lines
-        if (length($1) +> 0 and %myOpts{?'-warnings'} and ! %myData{?_CUTTING}) {
+        if (length($1) +> 0 and %myOpts{?'warnings'} and ! %myData{?_CUTTING}) {
             my $errorsub = $self->errorsub();
             my $file = $self->input_file();
             my $errmsg = "*** WARNING: line containing nothing but whitespace".
@@ -1313,22 +1313,22 @@ of all the current parsing options.
 
             ## See if we are parsing non-POD sections as well as POD ones
             my %opts = $parser->parseopts();
-            $opts{'-want_nonPODs}' and print "-want_nonPODs\n";
+            $opts{'want_nonPODs}' and print "want_nonPODs\n";
 
 When invoked using a single string, B<parseopts> treats the string as the
 name of a parse-option and returns its corresponding value if it exists
 (returns C<undef> if it doesn't).
 
             ## Did we ask to see '=cut' paragraphs?
-            my $want_cut = $parser->parseopts('-process_cut_cmd');
-            $want_cut and print "-process_cut_cmd\n";
+            my $want_cut = $parser->parseopts('process_cut_cmd');
+            $want_cut and print "process_cut_cmd\n";
 
 When invoked with multiple arguments, B<parseopts> treats them as
 key/value pairs and the specified parse-option names are set to the
 given values. Any unspecified parse-options are unaffected.
 
             ## Set them back to the default
-            $parser->parseopts(-warnings => 0);
+            $parser->parseopts(warnings => 0);
 
 When passed a single hash-ref, B<parseopts> uses that hash to completely
 reset the existing parse-options, all previous parse-option values
@@ -1536,9 +1536,9 @@ sub _push_input_stream {
     %myData{+_INPUT}   = $in_fh;
     my $input_top     = %myData{+_TOP_STREAM}
                       = Pod::InputSource->new(
-                            -name        => %myData{?_INFILE},
-                            -handle      => $in_fh,
-                            -was_cutting => %myData{_CUTTING}
+                            name        => %myData{?_INFILE},
+                            handle      => $in_fh,
+                            was_cutting => %myData{_CUTTING}
 );
     local *input_stack = %myData{?_INPUT_STREAMS};
     push(@input_stack, $input_top);
@@ -1658,26 +1658,26 @@ following:
 
     sub begin_pod {
         my $self = shift;
-        $self->{'-paragraphs'} = [];  ## initialize paragraph list
+        $self->{'paragraphs'} = [];  ## initialize paragraph list
     }
 
     sub command { 
         my ($parser, $command, $paragraph, $line_num, $pod_para) = @_;
         my $ptree = $parser->parse_text({%options}, $paragraph, ...);
         $pod_para->parse_tree( $ptree );
-        push @{ $self->{'-paragraphs'} }, $pod_para;
+        push @{ $self->{'paragraphs'} }, $pod_para;
     }
 
     sub verbatim { 
         my ($parser, $paragraph, $line_num, $pod_para) = @_;
-        push @{ $self->{'-paragraphs'} }, $pod_para;
+        push @{ $self->{'paragraphs'} }, $pod_para;
     }
 
     sub textblock { 
         my ($parser, $paragraph, $line_num, $pod_para) = @_;
         my $ptree = $parser->parse_text({%options}, $paragraph, ...);
         $pod_para->parse_tree( $ptree );
-        push @{ $self->{'-paragraphs'} }, $pod_para;
+        push @{ $self->{'paragraphs'} }, $pod_para;
     }
 
     ...
@@ -1686,7 +1686,7 @@ following:
     ...
     my $parser = new MyPodParserTree(...);
     $parser->parse_from_file(...);
-    my $paragraphs_ref = $parser->{'-paragraphs'};
+    my $paragraphs_ref = $parser->{'paragraphs'};
 
 Of course, in this module-author's humble opinion, I'd be more inclined to
 use the existing B<Pod::ParseTree> object than a simple array. That way
@@ -1699,13 +1699,13 @@ interface for all parse-tree nodes. The result would look something like:
 
     sub begin_pod {
         my $self = shift;
-        $self->{'-ptree'} = new Pod::ParseTree;  ## initialize parse-tree
+        $self->{'ptree'} = new Pod::ParseTree;  ## initialize parse-tree
     }
 
     sub parse_tree {
         ## convenience method to get/set the parse-tree for the entire POD
-        (@_ > 1)  and  $_[0]->{'-ptree'} = $_[1];
-        return $_[0]->{'-ptree'};
+        (@_ > 1)  and  $_[0]->{'ptree'} = $_[1];
+        return $_[0]->{'ptree'};
     }
 
     sub command { 

@@ -2,10 +2,10 @@
 
 # tests for both real and emulated fork()
 
+use Config;
+
 BEGIN {
-    our %Config;
-    require Config; Config->import;
-    unless (%Config{'d_fork'} or %Config{'d_pseudofork'}) {
+    unless (config_value('d_fork') or config_value('d_pseudofork')) {
 	print "1..0 # Skip: no fork\n";
 	exit 0;
     }
@@ -29,7 +29,11 @@ $tmpfile = "forktmp000";
 1 while -f ++$tmpfile;
 END { close TEST; unlink $tmpfile if $tmpfile; }
 
-$CAT = (($^O eq 'MSWin32') ? '.\perl -e "print ~< *ARGV"' : (($^O eq 'NetWare') ? 'perl -e "print ~< *ARGV"' : 'cat'));
+$CAT = (($^O eq 'MSWin32') 
+          ?? '.\perl -e "print ~< *ARGV"'
+          !! (($^O eq 'NetWare')
+          ?? 'perl -e "print ~< *ARGV"'
+          !! 'cat'));
 
 for ( @prgs){
     my $switch;
@@ -153,16 +157,16 @@ iteration 3 child
 ########
 $| = 1;
 fork()
- ? (print("parent\n"),sleep(1))
- : (print("child\n"),exit) ;
+ ?? (print("parent\n"),sleep(1))
+ !! (print("child\n"),exit) ;
 EXPECT
 parent
 child
 ########
 $| = 1;
 fork()
- ? (print("parent\n"),exit)
- : (print("child\n"),sleep(1)) ;
+ ?? (print("parent\n"),exit)
+ !! (print("child\n"),sleep(1)) ;
 EXPECT
 parent
 child
@@ -230,8 +234,8 @@ use Config;
 $| = 1;
 $\ = "\n";
 fork()
- ? print(%Config{osname} eq $^O)
- : print(%Config{osname} eq $^O) ;
+ ?? print(config_value('osname') eq $^O)
+ !! print(config_value('osname') eq $^O) ;
 EXPECT
 1
 1
@@ -239,8 +243,8 @@ EXPECT
 $| = 1;
 $\ = "\n";
 fork()
- ? do { require Config; print(Config::config_value("osname") eq $^O); }
- : do { require Config; print(Config::config_value("osname") eq $^O); }
+ ?? do { require Config; print(Config::config_value("osname") eq $^O); }
+ !! do { require Config; print(Config::config_value("osname") eq $^O); }
 EXPECT
 1
 1
@@ -254,7 +258,7 @@ if (fork) {
     $dir = "f$$.tst";
     mkdir $dir, 0755;
     chdir $dir;
-    print cwd() =~ m/\Q$dir/i ? "ok 1 parent" : "not ok 1 parent";
+    print cwd() =~ m/\Q$dir/i ?? "ok 1 parent" !! "not ok 1 parent";
     chdir "..";
     rmdir $dir;
 }
@@ -263,7 +267,7 @@ else {
     $dir = "f$$.tst";
     mkdir $dir, 0755;
     chdir $dir;
-    print cwd() =~ m/\Q$dir/i ? "ok 1 child" : "not ok 1 child";
+    print cwd() =~ m/\Q$dir/i ?? "ok 1 child" !! "not ok 1 child";
     chdir "..";
     rmdir $dir;
 }
@@ -382,7 +386,7 @@ sub pipe_to_fork ($$) {
     pipe($child, $parent) or die;
     my $pid = fork();
     die "fork() failed: $!" unless defined $pid;
-    close($pid ? $child : $parent);
+    close($pid ?? $child !! $parent);
     $pid;
 }
 
@@ -408,7 +412,7 @@ sub pipe_from_fork ($$) {
     pipe($parent, $child) or die;
     my $pid = fork();
     die "fork() failed: $!" unless defined $pid;
-    close($pid ? $child : $parent);
+    close($pid ?? $child !! $parent);
     $pid;
 }
 
@@ -471,9 +475,9 @@ EXPECT
 1
 ########
 # [perl #39145] Perl_dounwind() crashing with Win32's fork() emulation
-sub { @_ = @(3); fork ? die "1" : die "1" }->(2);
+sub { @_ = @(3); fork ?? die "1" !! die "1" }->(2);
 EXPECT
-1 at - line 2 character 35.
-    main::__ANON__ called at - line 2 character 44.
-1 at - line 2 character 25.
-    main::__ANON__ called at - line 2 character 44.
+1 at - line 2 character 37.
+    main::__ANON__ called at - line 2 character 46.
+1 at - line 2 character 26.
+    main::__ANON__ called at - line 2 character 46.

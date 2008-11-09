@@ -1,6 +1,7 @@
 #!/usr/bin/perl -w
 
 use Test::More;
+use warnings;
 
 BEGIN {
   if ($^O eq 'MSWin32' || $^O eq 'VMS') {
@@ -54,10 +55,10 @@ ok (compare ($text, <<'EOT'), "Output test pod2usage ()");
 EOT
 
 ($exit, $text) = < getoutput( sub { pod2usage(
-  -message => 'You naughty person, what did you say?',
-  -verbose => 1 ) });
-is ($exit, 1,                 "Exit status pod2usage (-message => '...', -verbose => 1)");
-ok (compare ($text, <<'EOT'), "Output test pod2usage (-message => '...', -verbose => 1)");
+  message => 'You naughty person, what did you say?',
+  verbose => 1 ) });
+is ($exit, 1,                 "Exit status pod2usage (message => '...', verbose => 1)");
+ok (compare ($text, <<'EOT'), "Output test pod2usage (message => '...', verbose => 1)");
 #You naughty person, what did you say?
 # Usage:
 #     frobnicate [ -r | --recursive ] [ -f | --force ] file ...
@@ -75,9 +76,9 @@ ok (compare ($text, <<'EOT'), "Output test pod2usage (-message => '...', -verbos
 EOT
 
 ($exit, $text) = < getoutput( sub { pod2usage(
-  -verbose => 2, -exit => 42 ) } );
-is ($exit, 42,                "Exit status pod2usage (-verbose => 2, -exit => 42)");
-ok (compare ($text, <<'EOT'), "Output test pod2usage (-verbose => 2, -exit => 42)");
+  "-verbose" => 2, "-exit" => 42 ) } );
+is ($exit, 42,                "Exit status pod2usage (verbose => 2, exit => 42)");
+ok (compare ($text, <<'EOT'), "Output test pod2usage (verbose => 2, exit => 42)");
 #NAME
 #     frobnicate - do what I mean
 #
@@ -125,18 +126,18 @@ ok (compare ($text, <<'EOT'), "Output test pod2usage (42)");
 #
 EOT
 
-($exit, $text) = < getoutput( sub { pod2usage(-verbose => 0, -exit => 'NOEXIT') } );
-is ($exit, 0,                 "Exit status pod2usage (-verbose => 0, -exit => 'NOEXIT')");
-ok (compare ($text, <<'EOT'), "Output test pod2usage (-verbose => 0, -exit => 'NOEXIT')");
+($exit, $text) = < getoutput( sub { pod2usage(verbose => 0, exit => 'NOEXIT') } );
+is ($exit, 0,                 "Exit status pod2usage (verbose => 0, exit => 'NOEXIT')");
+ok (compare ($text, <<'EOT'), "Output test pod2usage (verbose => 0, exit => 'NOEXIT')");
 #Usage:
 #     frobnicate [ -r | --recursive ] [ -f | --force ] file ...
 #
 # --NORMAL-RETURN--
 EOT
 
-($exit, $text) = < getoutput( sub { pod2usage(-verbose => 99, -sections => 'DESCRIPTION') } );
-is ($exit, 1,                 "Exit status pod2usage (-verbose => 99, -sections => 'DESCRIPTION')");
-ok (compare ($text, <<'EOT'), "Output test pod2usage (-verbose => 99, -sections => 'DESCRIPTION')");
+($exit, $text) = < getoutput( sub { pod2usage(verbose => 99, sections => 'DESCRIPTION') } );
+is ($exit, 1,                 "Exit status pod2usage (verbose => 99, sections => 'DESCRIPTION')");
+ok (compare ($text, <<'EOT'), "Output test pod2usage (verbose => 99, sections => 'DESCRIPTION')");
 #Description:
 #     frobnicate does foo and bar and what not.
 #

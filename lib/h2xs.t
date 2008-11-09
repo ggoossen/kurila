@@ -9,16 +9,6 @@
 # We are now checking that the correct use $version; is present in
 # Makefile.PL and $module.pm
 
-BEGIN {
-    # FIXME (or rather FIXh2xs)
-    require Config;
-    if ((%Config::Config{'extensions'} !~ m!\bDevel/PPPort\b!) ){
-	print "1..0 # Skip -- Perl configured without Devel::PPPort module\n";
-	exit 0;
-    }
-}
-
-# use strict; # we are not really testing this
 use File::Path;  # for cleaning up with rmtree()
 use Test::More;
 use File::Spec;
@@ -54,12 +44,12 @@ if ($^O eq 'MacOS') {
 my $name = 'h2xst';
 my $header = "$name.h";
 require kurila;
-my $thisversion = $kurila::VERSION;
+my $thisversion = $kurila::VERSION->stringify;
 
 # If this test has failed previously a copy may be left.
 rmtree($name);
 
-my @tests = (
+my @tests = @(
 "-f -n $name", $^V, <<"EOXSFILES",
 Writing $name/ppport.h
 Writing $name/lib/$name.pm
@@ -97,12 +87,14 @@ EOXSFILES
 );
 
 my $total_tests = 3; # opening, closing and deleting the header file.
-for (my $i = $#tests; $i +> 0; $i-=3) {
+my $i = nelems(@tests) - 1;
+while ( $i +> 0 ) {
   # 1 test for running it, 1 test for the expected result, and 1 for each file
   # plus 1 to open and 1 to check for the use in lib/$name.pm and Makefile.PL
   # And 1 more for our check for "bonus" files, 2 more for ExtUtil::Manifest.
   # use the () to force list context and hence count the number of matches.
-  $total_tests += 9 + (() = $tests[$i] =~ m/(Writing)/sg);
+  $total_tests += 9 + (() = @tests[$i] =~ m/(Writing)/sg);
+  $i -= 3;
 }
 
 plan tests => $total_tests;
@@ -119,9 +111,8 @@ while (my ($args, $version, $expectation) = splice @tests, 0, 3) {
   # 2>&1 dupe:
   # does it run?
   my $prog = "$^X $lib $extracted_program $args $dupe";
-  @result = `$prog`;
+  my $result = `$prog`;
   cmp_ok ($?, "==", 0, "running $prog ");
-  $result = join("",@result);
 
   # accomodate MPW # comment character prependage
   if ($^O eq 'MacOS') {
@@ -134,7 +125,7 @@ while (my ($args, $version, $expectation) = splice @tests, 0, 3) {
   is ($result, $expectation, "running $prog");
 
   my (%got);
-  find (sub {$got{$File::Find::name}++ unless -d $_}, $name);
+  find (sub {%got{$File::Find::name}++ unless -d $_}, $name);
 
   foreach ($expectation =~ m/Writing\s+(\S+)/gm) {
     if ($^O eq 'MacOS') {
@@ -143,9 +134,9 @@ while (my ($args, $version, $expectation) = splice @tests, 0, 3) {
     }
     if ($^O eq 'VMS') {
       $_ .= '.' unless $_ =~ m/\./;
-      $_ = lc($_) unless exists $got{$_};
+      $_ = lc($_) unless exists %got{$_};
     }
-    ok (-e $_, "check for $_") and delete $got{$_};
+    ok (-e $_, "check for $_") and delete %got{$_};
   }
   my @extra = keys %got;
   unless (ok (!@extra, "Are any extra files present?")) {
@@ -159,8 +150,8 @@ while (my ($args, $version, $expectation) = splice @tests, 0, 3) {
   # seems the least evil thing to do:
   push @INC, "../../lib";
   my ($missing, $extra) = ExtUtils::Manifest::fullcheck();
-  is_deeply ($missing, [], "No files in the MANIFEST should be missing");
-  is_deeply ($extra, [],   "and all files present should be in the MANIFEST");
+  is_deeply ($missing, \@(), "No files in the MANIFEST should be missing");
+  is_deeply ($extra, \@(),   "and all files present should be in the MANIFEST");
   pop @INC;
   chdir ($up) or die "chdir $up failed: $!";
  
