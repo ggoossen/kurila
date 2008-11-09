@@ -74,11 +74,9 @@ sub testit {
   ok ++$test, !Internals::SvREADONLY($copy->{answer}),
     "key 'answer' not locked in copy?";
 
-  try { $copy->{extra} = 15 } ;
+  try { $copy->{+extra} = 15 } ;
   unless (ok ++$test, !$@, "Can assign to reserved key 'extra'?") {
-    my $diag = $@;
-    $diag =~ s/\n.*\z//s;
-    print "# \$\@: $diag\n";
+      die $@;
   }
 
   try { $copy->{nono} = 7 } ;
@@ -100,7 +98,7 @@ for my $canonical  (@(0, 1)) {
     # bless {}, "Restrict_Test";
 
     my %hash2;
-    %hash2{"k$_"} = "v$_" for 0..16;
+    %hash2{+"k$_"} = "v$_" for 0..16;
     lock_hash %hash2;
     for (0..16) {
       unlock_value %hash2, "k$_";
@@ -110,11 +108,9 @@ for my $canonical  (@(0, 1)) {
 
     for (0..16) {
       my $k = "k$_";
-      try { $copy->{$k} = undef } ;
+      try { $copy->{+$k} = undef } ;
       unless (ok ++$test, !$@, "Can assign to reserved key '$k'?") {
-	my $diag = $@;
-	$diag =~ s/\n.*\z//s;
-	print "# \$\@: $diag\n";
+          die $@;
       }
     }
   }

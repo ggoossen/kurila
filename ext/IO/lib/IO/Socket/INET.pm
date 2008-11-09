@@ -169,7 +169,7 @@ sub configure {
     my @raddr = @( () );
 
     if(defined $raddr) {
-	@raddr = $sock->_get_addr($raddr, $arg->{MultiHomed});
+	@raddr = $sock->_get_addr($raddr, $arg->{?MultiHomed});
 	return _error($sock, $EINVAL, "Bad hostname '",$arg->{?PeerAddr},"'")
 	    unless (nelems @raddr);
     }

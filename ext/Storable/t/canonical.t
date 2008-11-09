@@ -128,7 +128,7 @@ ok 5, ($x1 ne $x2) || ($x1 ne $x3);
 # Same test as in t/dclone.t to ensure the "canonical" code is also correct
 
 my $hash;
-push @{%$hash{''}}, \%$hash{+a};
+push @{%$hash{+''}}, \%$hash{+a};
 ok 6, %$hash{''}->[0] \== \%$hash{+a};
 
 my $cloned = dclone(dclone($hash));

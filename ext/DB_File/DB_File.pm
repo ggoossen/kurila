@@ -14,7 +14,6 @@ package DB_File::HASHINFO ;
 
 use warnings;
 
-use Carp;
 require Tie::Hash;
 @DB_File::HASHINFO::ISA = qw(Tie::Hash);
 
@@ -52,7 +51,7 @@ sub FETCH
     return $self->{GOT}->{?$key} if exists $self->{VALID}->{$key}  ;
 
     my $pkg = ref $self ;
-    croak "$($pkg)::FETCH - Unknown element '$key'" ;
+    die "$($pkg)::FETCH - Unknown element '$key'" ;
 }
 
 
@@ -66,14 +65,14 @@ sub STORE
 
     if ( $type )
     {
-    	croak "Key '$key' not associated with a code reference" 
+    	die "Key '$key' not associated with a code reference" 
 	    if $type == 2 && !ref $value && ref $value ne 'CODE';
         $self->{GOT}->{+$key} = $value ;
         return ;
     }
     
     my $pkg = ref $self ;
-    croak "$($pkg)::STORE - Unknown element '$key'" ;
+    die "$($pkg)::STORE - Unknown element '$key'" ;
 }
 
 sub DELETE 
@@ -88,7 +87,7 @@ sub DELETE
     }
     
     my $pkg = ref $self ;
-    croak "DB_File::HASHINFO::DELETE - Unknown element '$key'" ;
+    die "DB_File::HASHINFO::DELETE - Unknown element '$key'" ;
 }
 
 sub EXISTS
@@ -104,7 +103,7 @@ sub NotHere
     my $self = shift ;
     my $method = shift ;
 
-    croak ref($self) . " does not define the method $($method)" ;
+    die ref($self) . " does not define the method $($method)" ;
 }
 
 sub FIRSTKEY { my $self = shift ; $self->NotHere("FIRSTKEY") }
@@ -161,7 +160,6 @@ use warnings;
 
 our ($VERSION, @ISA, @EXPORT, $DB_BTREE, $DB_HASH, $DB_RECNO);
 our ($db_version, $use_XSLoader, $splice_end_array, $Error);
-use Carp;
 
 
 $VERSION = "1.816_2" ;
@@ -178,13 +176,7 @@ require Tie::Hash;
 require Exporter;
 BEGIN {
     $use_XSLoader = 1 ;
-    do { try { require XSLoader } ; };
-
-    if ($@) {
-        $use_XSLoader = 0 ;
-        require DynaLoader;
-        @ISA = qw(DynaLoader);
-    }
+    require XSLoader;
 }
 
 push @ISA, < qw(Tie::Hash Exporter);
@@ -310,7 +302,7 @@ sub STORESIZE
 
 sub find_dup
 {
-    croak "Usage: \$db->find_dup(key,value)\n"
+    die "Usage: \$db->find_dup(key,value)\n"
         unless (nelems @_) == 3 ;
  
     my $db        = shift ;
@@ -329,7 +321,7 @@ sub find_dup
 
 sub del_dup
 {
-    croak "Usage: \$db->del_dup(key,value)\n"
+    die "Usage: \$db->del_dup(key,value)\n"
         unless (nelems @_) == 3 ;
  
     my $db        = shift ;
@@ -343,7 +335,7 @@ sub del_dup
 
 sub get_dup
 {
-    croak "Usage: \$db->get_dup(key [,flag])\n"
+    die "Usage: \$db->get_dup(key [,flag])\n"
         unless (nelems @_) == 2 or (nelems @_) == 3 ;
  
     my $db        = shift ;

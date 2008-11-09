@@ -23,10 +23,10 @@ print "1..20\n";
 $a = 'toto';
 $b = \$a;
 our $c = bless \%(), 'CLASS';
-$c->{attribute} = $b;
+$c->{+attribute} = $b;
 our $d = \%();
 our $e = \@();
-$d->{'a'} = $e;
+$d->{+'a'} = $e;
 $e->[0] = $d;
 our %a = %('key', 'value', 1, 0, $a, $b, 'cvar', \$c);
 our @a = @('first', undef, 3, -4, -3.14159, 456, 4.5, $d, \$d, \$e, $e,
@@ -52,7 +52,7 @@ package FOO; our @ISA = qw(Storable);
 
 sub make {
 	my $self = bless \%();
-	$self->{key} = \%main::a;
+	$self->{+key} = \%main::a;
 	return $self;
 };
 

@@ -5,7 +5,7 @@ require_ok( 're' );
 
 # setcolor
 %INC{+'Term/Cap.pm' } = 1;
-local %ENV{PERL_RE_TC};
+local %ENV{?PERL_RE_TC};
 re::setcolor();
 is( %ENV{?PERL_RE_COLORS}, "md\tme\tso\tse\tus\tue", 
 	'setcolor() should provide default colors' );

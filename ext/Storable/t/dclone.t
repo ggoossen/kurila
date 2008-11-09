@@ -57,7 +57,7 @@ print "ok 6\n";
 
 # Ensure refs to "undef" values are properly shared during cloning
 my $hash;
-push @{%$hash{''}}, \%$hash{+a};
+push @{%$hash{+''}}, \%$hash{+a};
 print "not " unless %$hash{''}->[0] \== \%$hash{+a};
 print "ok 7\n";
 
