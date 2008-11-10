@@ -52,12 +52,21 @@ There is new dereference syntax "->." where . can be any of the sigils $,@,%,& o
 Which will dereference to the type indicated by the sigil. The precedence of the
 operator is the same as that of "->".
 
+=head3 Rationale
+
+Makes it possible to post-derefence.
+
 =head2 Method calls using $obj->?$name instead of $obj->$name
 
 The call methods with run-time name lookup, C,$obj->?$name> has to be
 used instead of old C<$obj->$name>. The old $obj->$name will be parsed 
 using the above mentioned new dereference syntax as C<$obj ->$ name>, and
 normally give a syntax error.
+
+=head3 Rationale
+
+Because C<< ->$ >> means dereference to an scalar. Thus something else is needed
+to indicate calling a method with a dynamic name.
 
 =head2 Improved Perl 5 to Kurila conversion script.
 
@@ -70,6 +79,12 @@ The bit operators &, |, ^ and ~ have been renamed to ^&^, ^|^, ^^^ and ^~^ respe
 A '^' which does not start one of these operators will give a compile error.
 Use of a single '&', '|' and '~' where an operator is expected will give a compile error.
 
+=head3 Rationale
+
+Bit operators are rarely used, this makes it more explicit that 
+they are bit operators. And it allows to old bit operators to be 
+used for something else.
+
 =head2 C<use kurila 1.5> should be used to indicate kurila is required.
 
 C<use kurila> should be used to indicate that kurila is required.
@@ -80,6 +95,10 @@ isn't Perl Kurila.
 
 In regexes instead of guessing whether in $term[...] the [...] is a subscripts
 or a character class, the [] are always interpreted as a subscript.
+
+=head3 Rationale
+
+Removes guessing whethere [...] is a subscript or a character class.
 
 =head2 Removal of the match once ?PATTERN? operator
 
