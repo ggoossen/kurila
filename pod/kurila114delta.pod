@@ -19,17 +19,33 @@ C<map>, C<join>, C<grep>, C<for>, C<sort>, C<reverse>, C<split>,
 C<keys>, C<values>, C<..>, C<qw>, C<[[ ]]>, C<{[ ]}> all return arrays
 and/or expect arrays as arguments instead of lists.
 
+=head3 Rationale
+
+These functions work natural on arrays.
+
 =head2 Circular dependencies are not allowed
 
 Requires a module which is still being compiled will produce an error.
+
+=head3 Rationale
+
+Prevents difficult problems with circular references
 
 =head2 Error reporting reports error to the exact position, including character offset
 
 All operations have specific location information, including the character position
 
+=head3 Rationale
+
+Makes debugging easier.
+
 =head2 Removal overloading
 
 Overloading has been removed.
+
+=head3 Rationale
+
+Prevents many difficulties associated wit overloading.
 
 =head1 KNOWN BUGS
 
