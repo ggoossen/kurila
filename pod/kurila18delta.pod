@@ -35,14 +35,27 @@ Minor language changes
 Die and warn now create C<error> objects. These include a full stack dump.
 Use $@->message to get the error message.
 
+=head3 Rationale
+
+Having a complete stack trace makes debugging easier.
+
 =head2 C<$SIG{__DIE__}> and C<$SIG{__WARN__}> renamed to C<${^DIE_HOOK}> and C<${^WARN_HOOK}>
 
 The die and warn handlers have been renamed to ${^DIE_HOOK} and ${^WARN_HOOK}.
 When called these functions hould receive as first argument an C<error> object.
 
+=head3 Rationale
+
+C<${^DIE_HOOK}> and C<${^WARN_HOOK}> are no signal handlers.
+ 
 =head2 Implicit C<local ${^DIE_HOOK} = undef> around an C<eval>
 
 Implicit C<local ${^DIE_HOOK} = undef> around an C<eval>
+
+=head3 Rationale
+
+Makes ${^DIE_HOOK} suitable for error reporting without interfering
+with C<eval>.
 
 =head2 Minor language changes
 
