@@ -56,24 +56,44 @@ Inside double quoted strings C<{...}> are interpolated in double quoted strings.
 They can also be used to evaluate code inside a replacement part of the substitute, for example
 C< s/<<=(.*)>/{ eval $1 }/g >.
 
+=head3 Rationale
+
+Makes interpolating code inside a double quoted string easy.
+
 =head2 Numeric comparison operators renamed.
 
 The numeric comparison operators < <= > >=, and <=> are renamed to +<, +<=,
 +>, +>= and <+> respectively.
+
+=head3 Rationale
+
+Makes the old comparison operators free for other uses.
 
 =head2 Interpolation independent of the delimiter
 
 Single quotes don't have any special meaning when used as delimiters for other constructors, i.e. 
 m'$a' is the same as m/$a/.
 
+=head3 Rationale
+
+Simplifies the currently complex interpolation rules.
+
 =head2 No-escaping within single quotes
 
 Single quotes do not do any escaping. This includes not escaping C<\\> and C<\'>.
 
+=head3 Rationale
+
+Makes single quotes consistent in not doing escaping.
+
 =head2 Substitute modifier s///e is removed
 
-The subsitute modifieders s///e and s///ee to evaluate the replacement are no longer supported.
+The substitute modifieders s///e and s///ee to evaluate the replacement are no longer supported.
 The new interpolating C<{...}> can be used instead.
+
+=head3 Rationale
+
+Removed in favor of using C<{...}> 
 
 =head2 Obligatory C<m> in front of matches.
 
@@ -81,22 +101,37 @@ The new interpolating C<{...}> can be used instead.
 Depending on the context a C</> will be interpreted as a divide operator or an error
 will be raised.
 
+=head3 Rationale
+
+Simplifies the interpretation of C</>
+
 =head2 Renamed readline C<< <> >> operator to C<< ~< >>
 
 The readline operator C<< <FH> >> has been renamed to C<< ~< *FH >>.
 There is no special syntax for ~<.
 There is no default *ARGV, and *ARGV must be explictly given to ~<
 
+=head3 Rationale
+
+Makes the syntax more consistent
+
 =head2 open must have a separate mode and filename
 
 open should always be used with separate mode and filename. Using open with 2-arguments
-with a concatened mode and filename no longer works and gives an error.
+with a concatenate mode and filename no longer works and gives an error.
+
+=head3 Rationale
+
+Makes the distinction between mode and filename explicit. 
 
 =head2 Removal of C<$]>
 
 The version variable $] has been removed. $^V (eq "kurila-1.7") or $kurila::VERSION (eq "1.7")
 can be used instead
 
+=head3 Rationale
+
+Removed because it does not indicate the difference between Perl 5 and Kurila.
 
 =head1 KNOWN BUGS
 
