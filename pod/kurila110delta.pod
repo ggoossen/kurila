@@ -41,11 +41,19 @@ The sigil refers the the data type of the variable, instead of the data type of 
 value. For example: @array[28] should be used instead of $array[28], and
 %hash{'key'} instead of $hash{'key'}.
 
+=head3 Rationale
+
+Makes the sigil really part of the variable name.
+
 =head2 Changed slice syntax
 
 Slices are taken using C<[[...]]> and C<{[....]}> instead of using the sigil to indicate a slice.
 i.e. %hash{["foo", "bar"]} instead of @hash{"foo", "bar"}, and
 @array[[1,2]] instead of @array[1,2].
+
+=head3 Rationale
+
+Because the sigil can not be used for indicating a slice new syntax was needed.
 
 =head2 No curly braces allowed around variables
 
@@ -54,10 +62,19 @@ should be used instead of ${varname}. Also names are allowed to start
 with an C<^>, which refer to special variables, for example $^TAINT
 instead of ${^TAINT}.
 
+=head3 Rationale
+
+Consistent with the no sigil change in making the sigil part of the
+variable name.
+
 =head2 Error on C<$#array>
 
 An error is raised for C<$#array>. To get the length of an array
 C<scalar @array> should be used.
+
+=head3 Rationale
+
+Removed in favor of C<scalar @array>
 
 =head1 KNOWN BUGS
 
