@@ -32,11 +32,19 @@ When a reference is used as a string an error is raised.
 dump::view can be used to view the variable.
 ref::address can be used to get the address of the variable.
 
+=head3 Rationale
+
+Makes finding errors where a reference is used as a string easier.
+
 =head2 New reference comparison operators \== and \!=
 
 There are two new operators \== and \!= which can be used to compare reference.
 Both arguments to the operators must be references otherwise an error is raised.
 \== returns true if both references refer to the same referent, false otherwise.
+
+=head3 Rationale
+
+Because refernces can no longer be compared using C<eq> new operator where needed.
 
 =head2 Integrate bleadperl changes upto Change 33541
 
