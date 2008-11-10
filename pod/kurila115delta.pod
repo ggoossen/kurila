@@ -17,15 +17,27 @@ Lots of bug fixes and minor changes.
 A block by itself is no longer allowed, C<do> can be used to make a block
 by itself.
 
+=head3 Rationale
+
+For the next release C<{}> is reserved to always make a coderef.
+ 
 =head2 Lexical scoped $_ in C<for> and C<while(~<$fh)> blocks
 
 A C<for> loop without a loop variable or a C<while(~<$fh)>,
 introduces a lexical C<$_>, which is used as the loop variable.
 
+=head3 Rationale
+
+Less global C<$_> problems.
+
 =head2 C<pos> and C<vec> use have an additional argument instead of use of lvalue.
 
 C<pos> and C<vec> can not be used a lvalue, instead they accept an
 additional parameter.
+
+=head3 Rationale
+
+As part of changing the assignment logic, all magic lvalues are to be removed.
 
 =head2 Minor changes
 
