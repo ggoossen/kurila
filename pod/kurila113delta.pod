@@ -21,26 +21,55 @@ A value can be a plain-value, array or hash. There are no distinctions
 between. The sigils are meaningless, and don't indicate anything
 containing the type
 
+=head3 Rationale
+
+Removes many unnecessary needs for references.
+
 =head2 expand operator C<< < >>
 
 Arrays are no longer automaticly expanded to a list. The expand
 operator C<< < >> should be used to expand an array to a list.
+
+=head3 Rationale
+
+Because types are no longer indicated by their sigil, they can't
+be automaticly expanded, so a special operator to expand a array
+is needed.
 
 =head2 Subroutines always return a scalar; C<wantarray> keyword removed
 
 Subroutines always return a scalar, and behave as if called in scalar
 context. As a consequence the C<wantarray> keyword has been removed.
 
+=head3 Rationale
+
+Because a subroutine can return an array, returning a list is not really
+needed and would only be confusing.
+
 =head2 New operators C<nelems> and C<nkeys>
 
 C<nelems> returns the number of elements of an array. C<nkeys> returns
 the number of keys in a hash.
 
+=head3 Rationale
+
+Because a array of hash in scalar context would just be the array of hash
+new operators are needed to return the number of elements in an array or hash.
+
 =head2 Only Hashes can be tied
 
 Scalars, arrays and handles can no longer be tied.
 
+=head3 Rationale
+
+Tied hashes are currently too much used to be easily be removed, so they
+are still allowed.
+ 
 =head2 Forward subroutine declarations are no longer supported.
+
+=head3 Rationale
+
+The don't really do anything.
 
 =head1 KNOWN BUGS
 
