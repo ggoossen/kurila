@@ -23,12 +23,22 @@ arrays and hashes, replacing the old anonymous array and hash ref
 constructors C<[...]> and C<{...}>. C<@(...)> creates an anonymous
 array, and C<%(...)> creates an anonymous hash.
 
+=head3 Rationale
+
+Removes the ambiguity of C<{...}> being a hash or a block.
+Allows the creation of a anonymous array or hash without
+dealing with references.
+
 =head2 Removal C<[...]> and C<{...}>
 
 The anonymous array and hash ref constructors C<[...]> and C<{...}>
 have been removed.  They can be replaced with the new array/hash
 constructors: C<[...]> becomes C<\ @(...)> and C<{...}> becomes
 C<\ %(...)>
+
+=head3 Rationale
+
+Replaced by C<@()> and C<%()>
 
 =head1 KNOWN BUGS
 
