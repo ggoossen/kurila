@@ -24,7 +24,7 @@ v-syntax must be used to do version checks
 
 =item *
 
-If a globs is attempted to be stringied or numified an error is given.
+If a globs is attempted to be stringified or numified an error is given.
 
 =back
 
@@ -38,16 +38,28 @@ If you call a undefined subroutine and it isn't defined you get an error.
 B<No> attempt to use AUTOLOAD is made. The same applies of course to method
 calls: if the method isn't found an error is raised.
 
+=head3 Rationale
+
+Prevents all the problems associated with C<AUTOLOAD> 
+
 =head2 v-strings create 'version' objects.
 
 Use of v-string create version objects, i.e. C<v1.2.3> would be similar 
 to C<version->new("v1.2.3")>. Use of numbers with multiple decimal dots (like
 C<1.2.3>, thus without a 'v'), will give a compile error. There is no VSTRING type.
 
+=head3 Rationale
+
+Promotes the use of version object for versions.
+
 =head2 v-syntax must be used to do version checks
 
 The C<VERSION> in C< use Module VERSION LIST > and C< use Module VERSION > should be v-syntax,
 i.e. a 'v' followed by a digit, anything else will not be seen as a version.
+
+=head3 Rationale
+
+Makes it more explicit that a version check is done.
 
 =head2 Globs throw an error when stringified or numified.
 
@@ -55,7 +67,9 @@ There is a new function C<Symbol::glob_name($glob)> which returns the name
 of the glob. Symbol::glob_name returns the name fully qualified, but without a leading '*'.
 For example: C< Symbol::glob_name(*STDERR) eq "main::STDERR" >
 
+=head3 Rationale
 
+Makes finding glob stringification errors easier.
 
 =head1 Modules and Pragmas
 
