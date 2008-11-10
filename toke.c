@@ -3683,9 +3683,7 @@ Perl_yylex(pTHX)
     case ')':
 	{
 	    const char tmp = *s++;
-/* 	    s = SKIPSPACE1(s); */
-	    if (*s == '{' && PL_expect != XOPERATOR)
-		PREBLOCK(tmp);
+	    PL_expect = XOPERATOR;
 	    TERM(tmp);
 	}
     case ']':
