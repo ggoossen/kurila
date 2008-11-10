@@ -22,25 +22,46 @@ If a list is used in scalar context an error will be raised. This can
 happen both at compile and run-time. Using an array in scalar context
 will still returns the number of elements of the array.
 
+=head3 Rationale
+
+Makes the change of non-automaticly expanding arrays easier.
+
 =head2 All variables must be declared or fully qualifyed as with use
 strict vars
 
 Variables must be declared or fully qualified, like with C<use strict
 'vars'>.
 
+=head3 Rationale
+
+Simplies things by always requiring C<use strict 'vars'> semantics
+
 =head2 eval BOCK has been renamed to try BLOCK
 
 The expression C<eval BLOCK> has changed to C<try BLOCK>.
 C<eval EXPR> remains the same.
 
+=head3 Rationale
+
+Makes the distinction between the old C<eval BLOCK> and C<eval EXPR>
+explicit.
+
 =head2 Removal of the transliteration operator
 
 The transliteration operator (C<tr///> or C<y///> has been removed.
+
+=head3 Rationale
+
+Barely used, and in almost all cases C<s///> can be used instead.
 
 =head2 The magic variables C<$&>, C<$`> and C<$'> are removed.
 
 The C<$^MATCH>, C<$^PREMATCH>, C<$^POSTMATCH> in combination with the
 C</p> still work, and can be used instead
+
+=head3 Rationale
+
+Using them has serious performance penalties.
 
 =head1 KNOWN BUGS
 
