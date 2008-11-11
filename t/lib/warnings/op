@@ -398,7 +398,7 @@ no warnings 'redefine' ;
 sub fred () { 1 }
 *fred = sub () { 2 };
 EXPECT
-Constant subroutine main::fred redefined at - line 4 character 6.
+Constant subroutine main::fred redefined at - line 4 character 1.
 ########
 # op.c
 BEGIN {

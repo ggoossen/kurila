@@ -122,7 +122,7 @@ do {
 END
     my (@i, $s);
 
-    @i = @( () );
+    @i = @();
     push @i, $s = index($a, '6');     # 60
     push @i, $s = index($a, '.', $s); # next . after 60 is 62
     push @i, $s = index($a, '5');     # 50

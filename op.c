@@ -1406,15 +1406,13 @@ Perl_mod(pTHX_ OP *o, I32 type)
 	break;
 
     case OP_PADSV:
+    case OP_ANONLIST:
+    case OP_ANONHASH:
 	PL_modcount++;
 	if (!type) /* local() */
 	    Perl_croak(aTHX_ "Can't localize lexical variable %s",
 		 PAD_COMPNAME_PV(o->op_targ));
 	break;
-
-    case OP_ANONLIST:
-    case OP_ANONHASH:
-	goto nomod;
 
     case OP_PUSHMARK:
 	localize = 0;
@@ -2139,7 +2137,7 @@ Perl_assign(pTHX_ OP *o)
 	    assign(kid);
 	break;
     default:
-	Perl_croak_at(aTHX_ o->op_location, "Can not assign to %s", OP_DESC(o));
+	Perl_croak_at(aTHX_ o->op_location, "Can't assign to %s", OP_DESC(o));
     }
     return o;
 }
@@ -3252,11 +3250,8 @@ Perl_newASSIGNOP(pTHX_ I32 flags, OP *left, I32 optype, OP *right, SV *location)
 
     if (optype) {
 	if (optype == OP_ANDASSIGN || optype == OP_ORASSIGN || optype == OP_DORASSIGN) {
-	    OP* const pushop = newOP(OP_PUSHMARK, 0, location);
 	    o = newBINOP(OP_SASSIGN, 0, scalar(right),
 		newOP(OP_XASSIGN, 0, location), location);
-	    pushop->op_sibling = cBINOPo->op_first;
-	    cBINOPo->op_first = pushop;
 	    return newLOGOP(optype, 0, mod(scalar(left), optype), o, location);
 	}
 	else {
@@ -3426,11 +3421,8 @@ Perl_newASSIGNOP(pTHX_ I32 flags, OP *left, I32 optype, OP *right, SV *location)
 	    location);
     }
     else {
-	OP* const pushop = newOP(OP_PUSHMARK, 0, location);
 	o = newBINOP(OP_SASSIGN, flags,
 	    scalar(right), assign(mod(scalar(left), OP_SASSIGN)), location );
-	pushop->op_sibling = cBINOPo->op_first;
-	cBINOPo->op_first = pushop;
     }
     return o;
 }
@@ -3590,13 +3582,13 @@ S_new_logop(pTHX_ I32 type, I32 flags, OP** firstp, OP** otherp, SV *location)
 	    break;
 
 	case OP_SASSIGN:
-	    if (k2->op_type == OP_READDIR
-		  || k2->op_type == OP_GLOB
-		  || (k2->op_type == OP_NULL && k2->op_targ == OP_GLOB)
-		  || k2->op_type == OP_EACH)
+	    if (k1->op_type == OP_READDIR
+		  || k1->op_type == OP_GLOB
+		  || (k1->op_type == OP_NULL && k1->op_targ == OP_GLOB)
+		  || k1->op_type == OP_EACH)
 	    {
-		warnop = ((k2->op_type == OP_NULL)
-			  ? (OPCODE)k2->op_targ : k2->op_type);
+		warnop = ((k1->op_type == OP_NULL)
+			  ? (OPCODE)k1->op_targ : k1->op_type);
 	    }
 	    break;
 	}
@@ -3780,10 +3772,10 @@ OP *
 		break;
 
 	      case OP_SASSIGN:
-		if (k2 && (k2->op_type == OP_READDIR
-		      || k2->op_type == OP_GLOB
-		      || (k2->op_type == OP_NULL && k2->op_targ == OP_GLOB)
-		      || k2->op_type == OP_EACH))
+		if (k1 && (k1->op_type == OP_READDIR
+		      || k1->op_type == OP_GLOB
+		      || (k1->op_type == OP_NULL && k1->op_targ == OP_GLOB)
+		      || k1->op_type == OP_EACH))
 		    expr = newUNOP(OP_DEFINED, 0, expr, location);
 		break;
 	    }
@@ -3843,10 +3835,10 @@ Perl_newWHILEOP(pTHX_ I32 flags, I32 debuggable, LOOP *loop, SV* location,
 		break;
 
 	      case OP_SASSIGN:
-		if (k2 && (k2->op_type == OP_READDIR
-		      || k2->op_type == OP_GLOB
-		      || (k2->op_type == OP_NULL && k2->op_targ == OP_GLOB)
-		      || k2->op_type == OP_EACH))
+		if (k1 && (k1->op_type == OP_READDIR
+		      || k1->op_type == OP_GLOB
+		      || (k1->op_type == OP_NULL && k1->op_targ == OP_GLOB)
+		      || k1->op_type == OP_EACH))
 		    expr = newUNOP(OP_DEFINED, 0, expr, expr->op_location);
 		break;
 	    }
@@ -5842,9 +5834,10 @@ Perl_ck_sassign(pTHX_ OP *o)
 	{
 	    kid->op_targ = kkid->op_targ;
 	    kkid->op_targ = 0;
-	    /* Now we do not need PADSV and SASSIGN. */
+	    /* Now we do not need PADSV and SASSIGN and PUSHMARK. */
 	    kid->op_sibling = o->op_sibling;	/* NULL */
 	    cLISTOPo->op_first = NULL;
+/* 	    op_free(o->op_sibling); */
 	    op_free(o);
 	    op_free(kkid);
 	    kid->op_private |= OPpTARGET_MY;	/* Used for context settings */

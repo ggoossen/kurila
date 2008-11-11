@@ -208,7 +208,7 @@ no warnings 'redefine' ;
 sub jim {} 
 *jim = \&joe ;
 EXPECT
-Subroutine main::fred redefined at - line 5 character 6.
+Subroutine main::fred redefined at - line 5 character 1.
 ########
 # sv.c
 use warnings 'printf' ;
@@ -240,7 +240,7 @@ use warnings 'misc' ;
 no warnings 'misc' ;
 *b = undef ;
 EXPECT
-Undefined value assigned to typeglob at - line 3 character 3.
+Undefined value assigned to typeglob at - line 3 character 1.
 ########
 # sv.c
 use warnings 'numeric' ;

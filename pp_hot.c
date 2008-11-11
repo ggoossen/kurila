@@ -63,8 +63,7 @@ PP(pp_gvsv)
     else
 	sv = GvSVn(cGVOP_gv);
     if (PL_op->op_flags & OPf_ASSIGN) {
-	dMARK;
-	sv_setsv_mg(sv, MARK[1]);
+	sv_setsv_mg(sv, POPs);
     }
     XPUSHs(sv);
     RETURN;
@@ -113,10 +112,6 @@ PP(pp_and)
 PP(pp_sassign)
 {
     dVAR; dSP;
-    /* source and destination SVs should be on the stack.
-       Keep only the destination on the stack */
-    TOPm1s = TOPs;
-    SP--;
     RETURN;
 }
 
@@ -189,8 +184,7 @@ PP(pp_padsv)
 {
     dVAR; dSP; dTARGET;
     if (PL_op->op_flags & OPf_ASSIGN) {
-	dMARK;
-	sv_setsv_mg(TARG, MARK[1]);
+	sv_setsv_mg(TARG, POPs);
     }
     XPUSHs(TARG);
     if (PL_op->op_flags & OPf_MOD) {
@@ -552,8 +546,7 @@ PP(pp_aelemfast)
 	if (!lval && SvGMAGICAL(sv))	/* see note in pp_helem() */
 	    sv = sv_mortalcopy(sv);
 	if (PL_op->op_flags & OPf_ASSIGN) {
-	    dMARK;
-	    sv_setsv_mg(sv, MARK[1]);
+	    sv_setsv_mg(sv, POPs);
 	}
 	PUSHs(sv);
     }
@@ -1520,8 +1513,7 @@ PP(pp_helem)
     if (!lval && SvGMAGICAL(sv))
 	sv = sv_mortalcopy(sv);
     if (PL_op->op_flags & OPf_ASSIGN) {
-	dMARK;
-	sv_setsv_mg(sv, MARK[1]);
+	sv_setsv_mg(sv, POPs);
     }
     PUSHs(sv);
     RETURN;
@@ -2424,8 +2416,7 @@ PP(pp_aelem)
     if (!lval && SvGMAGICAL(sv))	/* see note in pp_helem() */
 	sv = sv_mortalcopy(sv);
     if (PL_op->op_flags & OPf_ASSIGN) {
-	dMARK;
-	sv_setsv_mg(sv, MARK[1]);
+	sv_setsv_mg(sv, POPs);
     }
     PUSHs(sv);
     RETURN;
