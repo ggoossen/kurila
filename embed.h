@@ -481,6 +481,7 @@
 #define mod			Perl_mod
 #endif
 #ifdef PERL_CORE
+#define assign			Perl_assign
 #define mode_from_discipline	Perl_mode_from_discipline
 #endif
 #define moreswitches		Perl_moreswitches
@@ -2198,6 +2199,7 @@
 #define pp_waitpid		Perl_pp_waitpid
 #define pp_wantarray		Perl_pp_wantarray
 #define pp_warn			Perl_pp_warn
+#define pp_xassign		Perl_pp_xassign
 #define pp_xor			Perl_pp_xor
 
 #else	/* PERL_IMPLICIT_CONTEXT */
@@ -2641,6 +2643,7 @@
 #define mod(a,b)		Perl_mod(aTHX_ a,b)
 #endif
 #ifdef PERL_CORE
+#define assign(a)		Perl_assign(aTHX_ a)
 #define mode_from_discipline(a)	Perl_mode_from_discipline(aTHX_ a)
 #endif
 #define moreswitches(a)		Perl_moreswitches(aTHX_ a)
@@ -4364,6 +4367,7 @@
 #define pp_waitpid()		Perl_pp_waitpid(aTHX)
 #define pp_wantarray()		Perl_pp_wantarray(aTHX)
 #define pp_warn()		Perl_pp_warn(aTHX)
+#define pp_xassign()		Perl_pp_xassign(aTHX)
 #define pp_xor()		Perl_pp_xor(aTHX)
 
 #endif	/* PERL_IMPLICIT_CONTEXT */

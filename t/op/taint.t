@@ -105,17 +105,21 @@ sub all_tainted (@) {
     1;
 }
 
+our $TODO;
 
 sub test ($;$) {
     my($ok, $diag) = < @_;
 
     my $curr_test = curr_test();
+    if ($TODO) {
+        $curr_test .= " # TODO ";
+    }
 
     if ($ok) {
 	print "ok $curr_test\n";
     } else {
 	print "not ok $curr_test\n";
-        printf "# Failed test at line \%d\n", (caller)[[2]];
+        printf "# Failed test at line \%d\n", @(caller)[2];
 	for (split m/^/m, $diag) {
 	    print "# $_";
 	}
@@ -1032,6 +1036,7 @@ TERNARY_CONDITIONALS: do {
 
     $result = $tainted_false ?? $tainted_whatever !! $untainted_whatever;
     test $result eq "The Fabulous Johnny Cash";
+    local $TODO = 1;
     test !tainted( $result );
 };
 

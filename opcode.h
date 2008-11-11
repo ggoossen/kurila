@@ -39,6 +39,7 @@ EXTCONST char* const PL_op_name[] = {
 	"scalar",
 	"pushmark",
 	"wantarray",
+	"xassign",
 	"const",
 	"gvsv",
 	"gv",
@@ -394,6 +395,7 @@ EXTCONST char* const PL_op_desc[] = {
 	"scalar",
 	"pushmark",
 	"wantarray",
+	"conditioned assignment",
 	"constant item",
 	"scalar variable",
 	"glob value",
@@ -761,6 +763,7 @@ EXT Perl_ppaddr_t PL_ppaddr[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_pp_null),	/* Perl_pp_scalar */
 	MEMBER_TO_FPTR(Perl_pp_pushmark),
 	MEMBER_TO_FPTR(Perl_pp_wantarray),
+	MEMBER_TO_FPTR(Perl_pp_xassign),
 	MEMBER_TO_FPTR(Perl_pp_const),
 	MEMBER_TO_FPTR(Perl_pp_gvsv),
 	MEMBER_TO_FPTR(Perl_pp_gv),
@@ -1125,6 +1128,7 @@ EXT Perl_check_t PL_check[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* scalar */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* pushmark */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* wantarray */
+	MEMBER_TO_FPTR(Perl_ck_null),	/* xassign */
 	MEMBER_TO_FPTR(Perl_ck_svconst),	/* const */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* gvsv */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* gv */
@@ -1483,6 +1487,7 @@ EXTCONST U32 PL_opargs[] = {
 	0x00003604,	/* scalar */
 	0x00000004,	/* pushmark */
 	0x00000014,	/* wantarray */
+	0x00000000,	/* xassign */
 	0x00000c04,	/* const */
 	0x00000c44,	/* gvsv */
 	0x00000c44,	/* gv */

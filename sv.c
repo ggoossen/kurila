@@ -2611,8 +2611,10 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV* sstr, const I32 flags)
 
     PERL_ARGS_ASSERT_SV_SETSV_FLAGS;
 
-    if (sstr == dstr)
+    if (sstr == dstr) {
+	TAINT_IF(SvTAINTED(sstr));
 	return;
+    }
 
     if (SvIS_FREED(dstr)) {
 	Perl_croak(aTHX_ "panic: attempt to copy value %" SVf
