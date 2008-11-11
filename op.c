@@ -959,7 +959,6 @@ Perl_scalarvoid(pTHX_ OP *o)
     case OP_AELEM:
     case OP_AELEMFAST:
     case OP_ASLICE:
-    case OP_HELEM:
     case OP_HSLICE:
     case OP_UNPACK:
     case OP_PACK:
@@ -1005,6 +1004,11 @@ Perl_scalarvoid(pTHX_ OP *o)
     case OP_PROTOTYPE:
       func_ops:
 	if (!(o->op_private & (OPpLVAL_INTRO|OPpOUR_INTRO)))
+	    /* Otherwise it's "Useless use of grep iterator" */
+	    useless = OP_DESC(o);
+	break;
+    case OP_HELEM:
+	if (!(o->op_private & (OPpLVAL_INTRO|OPpOUR_INTRO|OPpHELEM_ADD)))
 	    /* Otherwise it's "Useless use of grep iterator" */
 	    useless = OP_DESC(o);
 	break;

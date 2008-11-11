@@ -2,7 +2,7 @@
 
 BEGIN { require "./test.pl" }
 
-plan tests => 12;
+plan tests => 14;
 
 my %a = %('aap', 'noot', 'mies', 'teun');
 
@@ -19,14 +19,23 @@ is( %a{+"monkey"}, undef, "undef returned with '?'");
 is( exists %a{"monkey"}, 1, "key created with '+'");
 
 do {
+    my %b = %( aap => "muis" );
     # localization
     do {
-        local %a{"aap"} = "vis";
-        is( %a{"aap"}, "vis" );
+        local %b{"aap"} = "vis";
+        is( %b{"aap"}, "vis" );
     };
-    is( %a{"aap"}, "noot" );
+    is( %b{"aap"}, "muis" );
 };
 
 do {
     is( %( 'aap', 'noot' ){+"aap"}, "noot", "direct helem from \%(..)");
 };
+
+do {
+    use warnings;
+    my %c = %( "aap" => "rat" );
+    %c{+"roodborstje"};
+    ok( exists %c{"roodborstje"} );
+    is( %c{"roodborstje"}, undef );
+}
