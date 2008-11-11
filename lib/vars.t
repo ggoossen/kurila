@@ -40,10 +40,11 @@ print "$($e)ok 8\n";
 $e = ! %main::{s} && 'not ';
 print "$($e)ok 9\n";
 print "ok 10\n";
-$e = defined %X::{q} && 'not ';
+$e = defined %X::{?q} && 'not ';
 print "$($e)ok 11\n";
 print "ok 12\n";
 EOE
+die if $@;
 $e = $@ && 'not ';
 print "$($e)ok 13\n";
 

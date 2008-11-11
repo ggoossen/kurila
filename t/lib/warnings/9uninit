@@ -131,7 +131,7 @@ $v = @gau[$i1] + @gau[$i2];
 $v = @gau[$i1] + @gau[$i3];
 $v = %mhu{$k1} + %mhu{$k2};
 $v = %ghu{$k1} + %ghu{$k2};
-$v = %ghu{$k1} + %ghu{$k3};
+$v = %ghu{$k1} + %ghu{?$k3};
 EXPECT
 Use of uninitialized value @mau[20] in addition (+) at - line 14 character 15.
 Use of uninitialized value @mau[10] in addition (+) at - line 14 character 15.
@@ -155,10 +155,10 @@ $v = @ma[$g1];
 $v = @ga[$m2];
 $v = @ga[$g2];
 
-$v = %mh{$m1};
-$v = %mh{$g1};
-$v = %gh{$m2};
-$v = %gh{$g2};
+$v = %mh{?$m1};
+$v = %mh{?$g1};
+$v = %gh{?$m2};
+$v = %gh{?$g2};
 
 $v = $m1+($m2-$g1);
 $v = @ma[@ga[3]];
@@ -184,13 +184,13 @@ our (@ga, %gh);
 
 $v = sin @ga[1000];
 $v = sin @ma[1000];
-$v = sin %gh{foo};
-$v = sin %mh{bar};
+$v = sin %gh{?foo};
+$v = sin %mh{?bar};
 
 $v = sin @ga[$$];
 $v = sin @ma[$$];
-$v = sin %gh{$$};
-$v = sin %mh{$$};
+$v = sin %gh{?$$};
+$v = sin %mh{?$$};
 EXPECT
 Use of uninitialized value @main::ga[1000] in sin at - line 5 character 6.
 Use of uninitialized value @ma[1000] in sin at - line 6 character 6.

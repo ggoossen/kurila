@@ -92,7 +92,7 @@ for (@{\@(0)}) { "$_" }		# check warning isn't duplicated
 no warnings 'void' ;
 for (@{\@(0)}) { "$_" }		# check warning isn't duplicated
 EXPECT
-Useless use of string in void context at - line 3 character 18.
+Useless use of string in void context at - line 3 character 17.
 ########
 # op.c
 use warnings 'void' ;

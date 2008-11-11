@@ -19,11 +19,14 @@ is(-"10foo", -10, "Negation of a numeric-lead string returns negation of numeric
 is(-"-10", "+10", 'Negation of string starting with "-" returns a string starting with "+" - numeric');
 is(-"-10.0", "+10.0", 'Negation of string starting with "-" returns a string starting with "+" - decimal');
 is(-"-10foo", "+10foo", 'Negation of string starting with "-" returns a string starting with "+" - non-numeric');
-is(-"xyz", "-xyz", 'Negation of a negative string adds "-" to the front');
+is(-"xyz", "-0", 'Negation of a string converts string to number');
 is(-"-xyz", "+xyz", "Negation of a negative string to positive");
 is(-"+xyz", "-xyz", "Negation of a positive string to negative");
-is(-bareword, "-bareword", "Negation of bareword treated like a string");
-is(- -bareword, "+bareword", "Negation of -bareword returns string +bareword");
+do {
+    no warnings;
+    is(-bareword, "-0", "Negation of bareword converted to number");
+    is(- -bareword, "0", "Negation of -bareword converted to number");
+};
 is(-" -10", 10, "Negation of a whitespace-lead numeric string");
 is(-" -10.0", 10, "Negation of a whitespace-lead decimal string");
 is(-" -10foo", 10, "Negation of a whitespace-lead sting starting with a numeric")
