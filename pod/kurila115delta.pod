@@ -19,11 +19,11 @@ by itself.
 
 =head3 Rationale
 
-For the next release C<{}> is reserved to always make a coderef.
- 
-=head2 Lexical scoped $_ in C<for> and C<while(~<$fh)> blocks
+For the next release C<{...}> is reserved to always make a coderef.
 
-A C<for> loop without a loop variable or a C<while(~<$fh)>,
+=head2 Lexical scoped C<$_> in C<for> and C<< while(~<$fh) >> blocks
+
+A C<for> loop without a loop variable or a C<< while(~<$fh) >>,
 introduces a lexical C<$_>, which is used as the loop variable.
 
 =head3 Rationale
