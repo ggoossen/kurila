@@ -15,7 +15,7 @@ __END__
 use warnings 'signal' ;
 %SIG{FRED} = sub {};
 EXPECT
-No such signal: SIGFRED at - line 3 character 11.
+No such signal: SIGFRED at - line 3 character 5.
 ########
 # mg.c
 no warnings 'signal' ;

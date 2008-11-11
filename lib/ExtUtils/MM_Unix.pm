@@ -1254,8 +1254,8 @@ sub init_dirscan {	# --- File and Directory Lists (.xs .pm .pod etc)
     my %ignore = %( < map {( $_ => 1 )} qw(Makefile.PL Build.PL test.pl t) );
 
     # ignore the distdir
-    %Is{?VMS} ?? %ignore{+"$self->{?DISTVNAME}.dir"} = 1
-            !! %ignore{+$self->{?DISTVNAME}} = 1;
+    ( %Is{?VMS} ?? %ignore{+"$self->{?DISTVNAME}.dir"}
+        !! %ignore{+$self->{?DISTVNAME}} ) = 1;
  <
     %ignore{[ map lc, keys %ignore]} = < values %ignore if %Is{?VMS};
 

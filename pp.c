@@ -58,9 +58,8 @@ PP(pp_xassign)
 {
     dVAR;
     dSP;
-    dMARK;
-    sv_setsv_mg(MARK[0], MARK[1]);
-    XPUSHs(MARK[0]);
+    SV* src = POPs;
+    sv_setsv_mg(TOPs, src);
     RETURN;
 }
 
@@ -68,7 +67,8 @@ PP(pp_xassign)
 
 PP(pp_rv2gv)
 {
-    dVAR; dSP; dTOPss;
+    dVAR; dSP;
+    SV* sv = POPs;
 
     if (SvROK(sv)) {
       wasref:
@@ -123,10 +123,9 @@ PP(pp_rv2gv)
     if (PL_op->op_private & OPpLVAL_INTRO)
 	save_gp((GV*)sv, !(PL_op->op_flags & OPf_SPECIAL));
     if (PL_op->op_flags & OPf_ASSIGN) {
-	dMARK;
-	sv_setsv_mg(sv, MARK[1]);
+	sv_setsv_mg(sv, POPs);
     }
-    SETs(sv);
+    PUSHs(sv);
     RETURN;
 }
 
@@ -183,8 +182,7 @@ PP(pp_rv2sv)
 	    vivify_ref(sv, PL_op->op_private & OPpDEREF);
     }
     if (PL_op->op_flags & OPf_ASSIGN) {
-	dMARK;
-	sv_setsv_mg(sv, MARK[1]);
+	sv_setsv_mg(sv, POPs);
     }
     PUSHs(sv);
     RETURN;

@@ -128,8 +128,7 @@ Illegal division by zero at - line 1 character 10.
 ########
 BEGIN { undef = 0 }
 EXPECT
-Modification of a read-only value attempted at - line 1 character 14.
-    BEGIN called at - line 1 character 1.
+Can't assign to undef operator at - line 1 character 9.
 ########
 my @a; @a[2] = 1; for (@a) { $_ = 2 } print join(' ', @a) . "\n"
 EXPECT
@@ -295,7 +294,7 @@ sub M { @_[0] = 2; }
 eval "C";
 M(C);
 EXPECT
-Modification of a read-only value attempted at - line 2 character 14.
+Modification of a read-only value attempted at - line 2 character 11.
     main::M called at - line 4 character 1.
 ########
 print < qw(ab a\b a\\b);
