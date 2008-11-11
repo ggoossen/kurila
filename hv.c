@@ -781,7 +781,7 @@ S_hv_magic_check(HV *hv, bool *needs_copy, bool *needs_store)
     const MAGIC *mg = SvMAGIC(hv);
 
     PERL_ARGS_ASSERT_HV_MAGIC_CHECK;
-
+    
     *needs_copy = FALSE;
     *needs_store = TRUE;
     while (mg) {

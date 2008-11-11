@@ -456,7 +456,7 @@ use Config;
 use Text::Wrap;
 $Text::Wrap::huge = 'overflow';
 $Text::Wrap::columns = 80;
-use ExtUtils::Constant qw (WriteConstants WriteMakefileSnippet);
+use ExtUtils::Constant < qw (WriteConstants WriteMakefileSnippet);
 use File::Compare;
 use File::Path;
 
@@ -550,7 +550,7 @@ my ($opt_A,
 Getopt::Long::Configure('bundling');
 Getopt::Long::Configure('pass_through');
 
-my %options = (
+my %options = %(
                 'beta-version|B'     => \$opt_B,
                 'omit-changes|C'     => \$opt_C,
                 'cpp-flags|F=s'      => \$opt_F,
@@ -598,11 +598,11 @@ if( $opt_v ){
     my $temp_version = $TEMPLATE_VERSION;
     my $beta_version = $temp_version =~ s/(\d)_(\d\d)/$1$2/;
     my $notnum;
-    {
+    do {
         local $^WARN_HOOK = sub { $notnum = 1 };
         use warnings 'numeric';
         $temp_version = 0+$temp_version;
-    }
+    };
 
     if ($notnum) {
         my $module = $opt_n || 'Your::Module';
@@ -697,27 +697,27 @@ if( @path_h ){
       #		it was looking at $hadsys header-file per header-file...
       my($hadsys) = grep s!^sys/!!i , @path_h;
       @paths = qw( Sys$Library VAXC$Include );
-      push @paths, ($hadsys ? 'GNU_CC_Include[vms]' : 'GNU_CC_Include[000000]');
+      push @paths, ($hadsys ?? 'GNU_CC_Include[vms]' !! 'GNU_CC_Include[000000]');
       push @paths, qw( DECC$Library_Include DECC$System_Include );
     }
     else {
-      @paths = (File::Spec->curdir(), %Config{usrinc},
-		(split ' ', %Config{locincpth}), '/usr/include');
+      @paths = @(File::Spec->curdir(), config_value('usrinc'),
+		( < split ' ', config_value('locincpth')), '/usr/include');
     }
     foreach my $path_h (@path_h) {
         $name ||= $path_h;
-    $module ||= do {
-      $name =~ s/\.h$//;
-      if ( $name !~ m/::/ ) {
-	$name =~ s#^.*/##;
-	$name = "\u$name";
-      }
-      $name;
-    };
+        $module ||= do {
+            $name =~ s/\.h$//;
+            if ( $name !~ m/::/ ) {
+                $name =~ s#^.*/##;
+                $name = "\u$name";
+            }
+            $name;
+        };
 
-    if( $path_h =~ s#::#/#g && $opt_n ){
-	warn "Nesting of headerfile ignored with -n\n";
-    }
+        if( $path_h =~ s#::#/#g && $opt_n ){
+            warn "Nesting of headerfile ignored with -n\n";
+        }
     $path_h .= ".h" unless $path_h =~ m/\.h$/;
     my $fullpath = $path_h;
     $path_h =~ s/,.*$// if $opt_x;
@@ -823,7 +823,7 @@ if( @path_h ){
             for my $item (split m/,/, $enum_body) {
                 next if $item =~ m/\A\s*\Z/;
                 my ($key, $declared_val) = $item =~ m/(\w+)\s*(?:=\s*(.*))?/;
-                $val = defined($declared_val) && length($declared_val) ? $declared_val : 1 + $val;
+                $val = defined($declared_val) && length($declared_val) ?? $declared_val !! 1 + $val;
                 %seen_define{$key} = $val;
                 %const_names{$key}++;
             }
@@ -843,7 +843,7 @@ my $constscfname = 'const-c.inc';
 my $constsxsfname = 'const-xs.inc';
 my $fallbackdirname = 'fallback';
 
-my $ext = chdir 'ext' ? 'ext/' : '';
+my $ext = chdir 'ext' ?? 'ext/' !! '';
 
 my @modparts  = split(m/::/,$module);
 my $modpname  = join('-', @modparts);
@@ -857,13 +857,13 @@ if ($opt_O) {
 else {
 	die "Won't overwrite existing $ext$modpname\n" if -e $modpname;
 }
--d "$modpname"   || mkpath([$modpname], 0, 0775);
+-d "$modpname"   || mkpath(\@($modpname), 0, 0775);
 chdir($modpname) || die "Can't chdir $ext$modpname: $!\n";
 
 my %types_seen;
 my %std_types;
-my $fdecls = [];
-my $fdecls_parsed = [];
+my $fdecls = \@();
+my $fdecls_parsed = \@();
 my $typedef_rex;
 my %typedefs_pre;
 my %known_fnames;
@@ -874,124 +874,125 @@ my @fnames_no_prefix;
 my %vdecl_hash;
 my @vdecls;
 
-if( ! $opt_X ){  # use XS, unless it was disabled
-  unless ($skip_ppport) {
-    require Devel::PPPort;
-    warn "Writing $ext$modpname/ppport.h\n";
-    Devel::PPPort::WriteFile('ppport.h')
-        || die "Can't create $ext$modpname/ppport.h: $!\n";
-  }
-  open(XS, ">", "$modfname.xs") || die "Can't create $ext$modpname/$modfname.xs: $!\n";
-  if ($opt_x) {
-    warn "Scanning typemaps...\n";
-    get_typemap();
-    my @td;
-    my @good_td;
-    my $addflags = $opt_F || '';
-
-    foreach my $filename (@path_h) {
-      my $c;
-      my $filter;
-
-      if (%fullpath{$filename} =~ m/,/) {
-	$filename = $`;
-	$filter = $';
-      }
-      warn "Scanning $filename for functions...\n";
-      my @styles = %Config{gccversion} ? qw(C++ C9X GNU) : qw(C++ C9X);
-      $c = C::Scan->new('filename' => $filename, 'filename_filter' => $filter,
-	'add_cppflags' => $addflags, 'c_styles' => \@styles);
-      $c->set('includeDirs' => ["%Config::Config{archlib}/CORE", $cwd]);
-
-      $c->get('keywords')->{'__restrict'} = 1;
-
-      push @$fdecls_parsed, @{ $c->get('parsed_fdecls') };
-      push(@$fdecls, @{$c->get('fdecls')});
-
-      push @td, @{$c->get('typedefs_maybe')};
-      if ($opt_a) {
-	my $structs = $c->get('typedef_structs');
-	%structs{[keys %$structs]} = values %$structs;
-      }
-
-      if ($opt_m) {
-	%vdecl_hash = %{ $c->get('vdecl_hash') };
-	@vdecls = sort keys %vdecl_hash;
-	for (local $_ = 0; $_ +< @vdecls; ++$_) {
-	  my $var = @vdecls[$_];
-	  my($type, $post) = @{ %vdecl_hash{$var} };
-	  if (defined $post) {
-	    warn "Can't handle variable '$type $var $post', skipping.\n";
-	    splice @vdecls, $_, 1;
-	    redo;
-	  }
-	  $type = normalize_type($type);
-	  %vdecl_hash{$var} = $type;
-	}
-      }
-
-      unless ($tmask_all) {
-	warn "Scanning $filename for typedefs...\n";
-	my $td = $c->get('typedef_hash');
-	# try {require 'dumpvar.pl'; ::dumpValue($td)} or warn $@ if $opt_d;
-	my @f_good_td = grep $td->{$_}[1] eq '', keys %$td;
-	push @good_td, @f_good_td;
-	%typedefs_pre{[@f_good_td]}  = map $_->[0], %$td{[@f_good_td]};
-      }
+if ( ! $opt_X ) {               # use XS, unless it was disabled
+    unless ($skip_ppport) {
+        require Devel::PPPort;
+        warn "Writing $ext$modpname/ppport.h\n";
+        Devel::PPPort::WriteFile('ppport.h')
+            || die "Can't create $ext$modpname/ppport.h: $!\n";
     }
-    { local $" = '|';
-      $typedef_rex = qr(\b(?<!struct )(?:@good_td)\b) if @good_td;
+    open(XS, ">", "$modfname.xs") || die "Can't create $ext$modpname/$modfname.xs: $!\n";
+    if ($opt_x) {
+        warn "Scanning typemaps...\n";
+        get_typemap();
+        my @td;
+        my @good_td;
+        my $addflags = $opt_F || '';
+
+        foreach my $filename (@path_h) {
+            my $c;
+            my $filter;
+
+            if (%fullpath{$filename} =~ m/(.*?),(.*)/) {
+                $filename = $1;
+                $filter = $2;
+            }
+            warn "Scanning $filename for functions...\n";
+            my @styles = config_value('gccversion') ?? qw(C++ C9X GNU) !! qw(C++ C9X);
+            $c = C::Scan->new('filename' => $filename, 'filename_filter' => $filter,
+                              'add_cppflags' => $addflags, 'c_styles' => \@styles);
+            $c->set('includeDirs' => @("$(config_value('archlib'))/CORE", $cwd));
+
+            $c->get('keywords')->{'__restrict'} = 1;
+
+            push @$fdecls_parsed, @{ $c->get('parsed_fdecls') };
+            push(@$fdecls, @{$c->get('fdecls')});
+
+            push @td, @{$c->get('typedefs_maybe')};
+            if ($opt_a) {
+                my $structs = $c->get('typedef_structs');
+                %structs{\(keys %$structs)} = values %$structs;
+            }
+
+            if ($opt_m) {
+                %vdecl_hash = %{ $c->get('vdecl_hash') };
+                @vdecls = sort keys %vdecl_hash;
+                for (0 .. nelems(@vdecls) -1 ) {
+                    my $var = @vdecls[$_];
+                    my($type, $post) = @{ %vdecl_hash{$var} };
+                    if (defined $post) {
+                        warn "Can't handle variable '$type $var $post', skipping.\n";
+                        splice @vdecls, $_, 1;
+                        redo;
+                    }
+                    $type = normalize_type($type);
+                    %vdecl_hash{$var} = $type;
+                }
+            }
+
+            unless ($tmask_all) {
+                warn "Scanning $filename for typedefs...\n";
+                my $td = $c->get('typedef_hash');
+                # try {require 'dumpvar.pl'; ::dumpValue($td)} or warn $@ if $opt_d;
+                my @f_good_td = grep $td->{$_}[1] eq '', keys %$td;
+                push @good_td, @f_good_td;
+                %typedefs_pre{[@f_good_td]}  = map $_->[0], %$td{[@f_good_td]};
+            }
+        }
+        do {
+            local $" = '|';
+            $typedef_rex = qr(\b(?<!struct )(?:@good_td)\b) if @good_td;
+        };
+        %known_fnames = map { @$_[[@: 1,3]] } @$fdecls_parsed; # [1,3] is NAME, FULLTEXT
+        if ($fmask) {
+            my @good;
+            for my $i (0..(@$fdecls_parsed-1)) {
+                next unless $fdecls_parsed->[$i][1] =~ m/$fmask/; # [1] is NAME
+                push @good, $i;
+                print "... Function $fdecls_parsed->[$i][1] passes -M mask.\n"
+                  if $opt_d;
+            }
+            $fdecls = \$: @$fdecls[[@good]] ;
+            $fdecls_parsed = \$: @$fdecls_parsed[[@good]];
+        }
+        @fnames = sort map $_->[1], @$fdecls_parsed; # 1 is NAME
+        # Sort declarations:
+        do {
+            my %h = map( ($_->[1], $_), @$fdecls_parsed);
+            $fdecls_parsed = \$: %h{[@fnames]} ;
+        };
+        @fnames_no_prefix = @fnames;
+        @fnames_no_prefix
+          = sort map { ++%prefix{$_} if s/^$opt_p(?!\d)//; $_ } @fnames_no_prefix
+            if defined $opt_p;
+        # Remove macros which expand to typedefs
+        print "Typedefs are @td.\n" if $opt_d;
+        my %td = map {($_, $_)} @td;
+        # Add some other possible but meaningless values for macros
+        for my $k (qw(char double float int long short unsigned signed void)) {
+            %td{"$_$k"} = "$_$k" for ('', 'signed ', 'unsigned ');
+        }
+        # try {require 'dumpvar.pl'; ::dumpValue( [\@td, \%td] ); 1} or warn $@;
+        my $n = 0;
+        my %bad_macs;
+        while (keys %td +> $n) {
+            $n = keys %td;
+            my ($k, $v);
+            while (($k, $v) = each %seen_define) {
+                # print("found '$k'=>'$v'\n"),
+                %bad_macs{$k} = %td{$k} = %td{$v} if exists %td{$v};
+            }
+        }
+        # Now %bad_macs contains names of bad macros
+        for my $k (keys %bad_macs) {
+            delete %const_names{%prefixless{$k}};
+            print "Ignoring macro $k which expands to a typedef name '%bad_macs{$k}'\n" if $opt_d;
+        }
     }
-    %known_fnames = map @$_[[1,3]], @$fdecls_parsed; # [1,3] is NAME, FULLTEXT
-    if ($fmask) {
-      my @good;
-      for my $i (0..(@$fdecls_parsed-1)) {
-	next unless $fdecls_parsed->[$i][1] =~ m/$fmask/; # [1] is NAME
-	push @good, $i;
-	print "... Function $fdecls_parsed->[$i][1] passes -M mask.\n"
-	  if $opt_d;
-      }
-      $fdecls = [@$fdecls[[@good]]];
-      $fdecls_parsed = [@$fdecls_parsed[[@good]]];
-    }
-    @fnames = sort map $_->[1], @$fdecls_parsed; # 1 is NAME
-    # Sort declarations:
-    {
-      my %h = map( ($_->[1], $_), @$fdecls_parsed);
-      $fdecls_parsed = [ %h{[@fnames]} ];
-    }
-    @fnames_no_prefix = @fnames;
-    @fnames_no_prefix
-      = sort map { ++%prefix{$_} if s/^$opt_p(?!\d)//; $_ } @fnames_no_prefix
-         if defined $opt_p;
-    # Remove macros which expand to typedefs
-    print "Typedefs are @td.\n" if $opt_d;
-    my %td = map {($_, $_)} @td;
-    # Add some other possible but meaningless values for macros
-    for my $k (qw(char double float int long short unsigned signed void)) {
-      %td{"$_$k"} = "$_$k" for ('', 'signed ', 'unsigned ');
-    }
-    # try {require 'dumpvar.pl'; ::dumpValue( [\@td, \%td] ); 1} or warn $@;
-    my $n = 0;
-    my %bad_macs;
-    while (keys %td +> $n) {
-      $n = keys %td;
-      my ($k, $v);
-      while (($k, $v) = each %seen_define) {
-	# print("found '$k'=>'$v'\n"),
-	%bad_macs{$k} = %td{$k} = %td{$v} if exists %td{$v};
-      }
-    }
-    # Now %bad_macs contains names of bad macros
-    for my $k (keys %bad_macs) {
-      delete %const_names{%prefixless{$k}};
-      print "Ignoring macro $k which expands to a typedef name '%bad_macs{$k}'\n" if $opt_d;
-    }
-  }
 }
 my @const_names = sort keys %const_names;
 
--d $modpmdir || mkpath([$modpmdir], 0, 0775);
+-d $modpmdir || mkpath(\@($modpmdir), 0, 0775);
 open(PM, ">", "$modpmname") || die "Can't create $ext$modpname/$modpmname: $!\n";
 
 $" = "\n\t";
@@ -1117,7 +1118,7 @@ try {
        ($username,$author) = (getpwuid($>))[[0,6]];
        if (defined $username && defined $author) {
 	   $author =~ s/,.*$//; # in case of sub fields
-	   my $domain = %Config{'mydomain'};
+	   my $domain = config_value('mydomain');
 	   $domain =~ s/^\.//;
 	   $email = "$username\@$domain";
        }
@@ -1152,7 +1153,7 @@ $revhist = <<EOT if $opt_C;
 #
 EOT
 
-my $exp_doc = $skip_exporter ? '' : <<EOD;
+my $exp_doc = $skip_exporter ?? '' !! <<EOD;
 #
 #=head2 EXPORT
 #
@@ -1351,7 +1352,7 @@ if( ! $opt_c ) {
 }
 
 
-my $prefix = defined $opt_p ? "PREFIX = $opt_p" : '';
+my $prefix = defined $opt_p ?? "PREFIX = $opt_p" !! '';
 
 # Now switch from C to XS by issuing the first MODULE declaration:
 print XS <<"END";
@@ -1540,7 +1541,7 @@ EOF
       }
     } else {
       my $type = normalize_type($item->[0]);
-      my $ttype = %structs{$type} ? normalize_type("$type *") : $type;
+      my $ttype = %structs{$type} ?? normalize_type("$type *") !! $type;
       print $fh <<"EOF";
 $ttype
 $item->[2](THIS, __value = NO_INIT)
@@ -1551,7 +1552,7 @@ $item->[2](THIS, __value = NO_INIT)
 	if (items > 1)
 	    THIS->$item->[-1] = __value;
 	RETVAL = @{[
-	    $type eq $ttype ? "THIS->$item->[-1]" : "&(THIS->$item->[-1])"
+	    $type eq $ttype ?? "THIS->$item->[-1]" !! "&(THIS->$item->[-1])"
 	]};
     OUTPUT:
 	RETVAL
@@ -1631,7 +1632,7 @@ EOF
 sub get_typemap {
   # We do not want to read ./typemap by obvios reasons.
   my @tm =  qw(../../../typemap ../../typemap ../typemap);
-  my $stdtypemap =  "%Config::Config{privlib}/ExtUtils/typemap";
+  my $stdtypemap =  "$(config_value('privlib'))/ExtUtils/typemap";
   unshift @tm, $stdtypemap;
   my $proto_re = "[" . quotemeta('\$%&*@;') . "]" ;
 
@@ -1674,7 +1675,7 @@ sub normalize_type {		# Second arg: do not strip const's before \*
   my $type = shift;
   my $do_keep_deep_const = shift;
   # If $do_keep_deep_const this is heuristical only
-  my $keep_deep_const = ($do_keep_deep_const ? '\b(?![^(,)]*\*)' : '');
+  my $keep_deep_const = ($do_keep_deep_const ?? '\b(?![^(,)]*\*)' !! '');
   my $ignore_mods
     = "(?:\\b(?:(?:__const__|const)$keep_deep_const|static|inline|__inline__)\\b\\s*)*";
   if ($do_keep_deep_const) {	# Keep different compiled /RExen/o separately!
@@ -1703,7 +1704,7 @@ sub assign_typemap_entry {
   my $entry;
   if ($tmask and $type =~ m/$tmask/) {
     print "Type $type matches -o mask\n" if $opt_d;
-    $entry = (td_is_struct($type) ? "T_OPAQUE_STRUCT" : "T_PTROBJ");
+    $entry = (td_is_struct($type) ?? "T_OPAQUE_STRUCT" !! "T_PTROBJ");
   }
   elsif ($typedef_rex and $type =~ s/($typedef_rex)/%typedefs_pre{$1}/go) {
     $type = normalize_type $type;
@@ -1713,7 +1714,7 @@ sub assign_typemap_entry {
   # XXX good do better if our UV happens to be long long
   return "T_NV" if $type =~ m/^(unsigned\s+)?long\s+(long|double)\z/;
   $entry ||= %typemap{$otype}
-    || (td_is_struct($type) ? "T_OPAQUE_STRUCT" : "T_PTROBJ");
+    || (td_is_struct($type) ?? "T_OPAQUE_STRUCT" !! "T_PTROBJ");
   %typemap{$otype} = $entry;
   $need_opaque = 1 if $entry eq "T_OPAQUE_STRUCT";
   return $entry;
@@ -1789,9 +1790,9 @@ WriteMakefile(
 END
 if (!$opt_X) { # print C stuff, unless XS is disabled
   $opt_F = '' unless defined $opt_F;
-  my $I = (((glob '*.h') || (glob '*.hh')) ? '-I.' : '');
-  my $Ihelp = ($I ? '-I. ' : '');
-  my $Icomment = ($I ? '' : <<EOC);
+  my $I = (((glob '*.h') || (glob '*.hh')) ?? '-I.' !! '');
+  my $Ihelp = ($I ?? '-I. ' !! '');
+  my $Icomment = ($I ?? '' !! <<EOC);
 	# Insert -I. if you add *.h files later:
 EOC
 
@@ -1803,8 +1804,8 @@ END
 
   my $C = grep {$_ ne "$modfname.c"}
     (glob '*.c'), (glob '*.cc'), (glob '*.C');
-  my $Cpre = ($C ? '' : '# ');
-  my $Ccomment = ($C ? '' : <<EOC);
+  my $Cpre = ($C ?? '' !! '# ');
+  my $Ccomment = ($C ?? '' !! <<EOC);
 	# Un-comment this if you add C files to link with later:
 EOC
 
@@ -1936,7 +1937,7 @@ unless (-d "$testdir") {
   mkdir "$testdir" or die "Cannot mkdir $testdir: $!\n";
 }
 warn "Writing $ext$modpname/$testfile\n";
-my $tests = @const_names ? 2 : 1;
+my $tests = @const_names ?? 2 !! 1;
 
 open EX, ">", "$testfile" or die "Can't create $ext$modpname/$testfile: $!\n";
 
@@ -2042,7 +2043,7 @@ unless ($opt_C) {
   warn "Writing $ext$modpname/Changes\n";
   $" = ' ';
   open(EX, ">", "Changes") || die "Can't create $ext$modpname/Changes: $!\n";
-  @ARGS = map {m/[\s\"\'\`\$*?^|&<>\[\]\{\}\(\)]/ ? "'$_'" : $_} @ARGS;
+  @ARGS = map {m/[\s\"\'\`\$*?^|&<>\[\]\{\}\(\)]/ ?? "'$_'" !! $_} @ARGS;
   print EX <<EOP;
 Revision history for Perl extension $module.
 
