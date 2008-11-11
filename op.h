@@ -63,7 +63,7 @@ typedef PERL_BITFIELD16 optype;
     PERL_BITFIELD16 op_latefreed:1;	\
     PERL_BITFIELD16 op_attached:1;	\
     PERL_BITFIELD16 op_spare:3;		\
-    U8		op_flags;		\
+    U16		op_flags;		\
     U8		op_private;
 #endif
 
@@ -138,6 +138,7 @@ Deprecated.  Use C<GIMME_V> instead.
 				/*  On OP_ANONHASH and OP_ANONLIST, create a
 				    reference to the new anon hash or array */
 				/*  On OP_AASIGN last element of the assignment is an expanded array/hash */
+#define OPf_ASSIGN      0x100   /*  op should do an assignment */
 
 /* old names; don't use in new code, but don't break them, either */
 #define OPf_LIST	OPf_WANT_LIST

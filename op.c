@@ -1406,13 +1406,15 @@ Perl_mod(pTHX_ OP *o, I32 type)
 	break;
 
     case OP_PADSV:
-    case OP_ANONLIST:
-    case OP_ANONHASH:
 	PL_modcount++;
 	if (!type) /* local() */
 	    Perl_croak(aTHX_ "Can't localize lexical variable %s",
 		 PAD_COMPNAME_PV(o->op_targ));
 	break;
+
+    case OP_ANONLIST:
+    case OP_ANONHASH:
+	goto nomod;
 
     case OP_PUSHMARK:
 	localize = 0;
@@ -1429,9 +1431,7 @@ Perl_mod(pTHX_ OP *o, I32 type)
 
     case OP_AELEM:
     case OP_HELEM:
-	mod(cBINOPo->op_first,
-	    (type == OP_NULL ? o->op_type : type)
-	    );
+	mod(cBINOPo->op_first, type == OP_NULL ? o->op_type : type);
 	if (type == OP_ENTERSUB &&
 	     !(o->op_private & (OPpLVAL_INTRO | OPpDEREF)))
 	    o->op_private |= OPpLVAL_DEFER;
@@ -2114,6 +2114,34 @@ Perl_convert(pTHX_ I32 type, I32 flags, OP *o, SV *location)
 	return o;
 
     return fold_constants(o);
+}
+
+OP *
+Perl_assign(pTHX_ OP *o)
+{
+    OP* kid;
+
+    switch (o->op_type) {
+    case OP_RV2SV:
+    case OP_RV2AV:
+    case OP_RV2HV:
+    case OP_RV2GV:
+    case OP_PADSV:
+    case OP_HELEM:
+    case OP_AELEM:
+	o->op_flags |= OPf_ASSIGN;
+	break;
+    case OP_NULL:
+	assign(cBINOPo->op_first);
+	break;
+    case OP_COND_EXPR:
+	for (kid = cUNOPo->op_first->op_sibling; kid; kid = kid->op_sibling)
+	    assign(kid);
+	break;
+    default:
+	Perl_croak_at(aTHX_ o->op_location, "Can not assign to %s", OP_DESC(o));
+    }
+    return o;
 }
 
 /* List constructors */
@@ -3224,9 +3252,12 @@ Perl_newASSIGNOP(pTHX_ I32 flags, OP *left, I32 optype, OP *right, SV *location)
 
     if (optype) {
 	if (optype == OP_ANDASSIGN || optype == OP_ORASSIGN || optype == OP_DORASSIGN) {
-	    return newLOGOP(optype, 0,
-			    mod(scalar(left), optype),
-			    newUNOP(OP_SASSIGN, 0, scalar(right), location), location);
+	    OP* const pushop = newOP(OP_PUSHMARK, 0, location);
+	    o = newBINOP(OP_SASSIGN, 0, scalar(right),
+		newOP(OP_XASSIGN, 0, location), location);
+	    pushop->op_sibling = cBINOPo->op_first;
+	    cBINOPo->op_first = pushop;
+	    return newLOGOP(optype, 0, mod(scalar(left), optype), o, location);
 	}
 	else {
 	    return newBINOP(optype, OPf_STACKED,
@@ -3390,11 +3421,16 @@ Perl_newASSIGNOP(pTHX_ I32 flags, OP *left, I32 optype, OP *right, SV *location)
 	right = newOP(OP_UNDEF, 0, location);
     if (right->op_type == OP_READLINE) {
 	right->op_flags |= OPf_STACKED;
-	return newBINOP(OP_NULL, flags, mod(scalar(left), OP_SASSIGN), scalar(right), location);
+	return newBINOP(OP_NULL, flags, 
+	    mod(scalar(left), OP_SASSIGN), scalar(right),
+	    location);
     }
     else {
+	OP* const pushop = newOP(OP_PUSHMARK, 0, location);
 	o = newBINOP(OP_SASSIGN, flags,
-		     scalar(right), mod(scalar(left), OP_SASSIGN), location );
+	    scalar(right), assign(mod(scalar(left), OP_SASSIGN)), location );
+	pushop->op_sibling = cBINOPo->op_first;
+	cBINOPo->op_first = pushop;
     }
     return o;
 }
@@ -3554,13 +3590,13 @@ S_new_logop(pTHX_ I32 type, I32 flags, OP** firstp, OP** otherp, SV *location)
 	    break;
 
 	case OP_SASSIGN:
-	    if (k1->op_type == OP_READDIR
-		  || k1->op_type == OP_GLOB
-		  || (k1->op_type == OP_NULL && k1->op_targ == OP_GLOB)
-		  || k1->op_type == OP_EACH)
+	    if (k2->op_type == OP_READDIR
+		  || k2->op_type == OP_GLOB
+		  || (k2->op_type == OP_NULL && k2->op_targ == OP_GLOB)
+		  || k2->op_type == OP_EACH)
 	    {
-		warnop = ((k1->op_type == OP_NULL)
-			  ? (OPCODE)k1->op_targ : k1->op_type);
+		warnop = ((k2->op_type == OP_NULL)
+			  ? (OPCODE)k2->op_targ : k2->op_type);
 	    }
 	    break;
 	}
@@ -3744,10 +3780,10 @@ OP *
 		break;
 
 	      case OP_SASSIGN:
-		if (k1 && (k1->op_type == OP_READDIR
-		      || k1->op_type == OP_GLOB
-		      || (k1->op_type == OP_NULL && k1->op_targ == OP_GLOB)
-		      || k1->op_type == OP_EACH))
+		if (k2 && (k2->op_type == OP_READDIR
+		      || k2->op_type == OP_GLOB
+		      || (k2->op_type == OP_NULL && k2->op_targ == OP_GLOB)
+		      || k2->op_type == OP_EACH))
 		    expr = newUNOP(OP_DEFINED, 0, expr, location);
 		break;
 	    }
@@ -3807,10 +3843,10 @@ Perl_newWHILEOP(pTHX_ I32 flags, I32 debuggable, LOOP *loop, SV* location,
 		break;
 
 	      case OP_SASSIGN:
-		if (k1 && (k1->op_type == OP_READDIR
-		      || k1->op_type == OP_GLOB
-		      || (k1->op_type == OP_NULL && k1->op_targ == OP_GLOB)
-		      || k1->op_type == OP_EACH))
+		if (k2 && (k2->op_type == OP_READDIR
+		      || k2->op_type == OP_GLOB
+		      || (k2->op_type == OP_NULL && k2->op_targ == OP_GLOB)
+		      || k2->op_type == OP_EACH))
 		    expr = newUNOP(OP_DEFINED, 0, expr, expr->op_location);
 		break;
 	    }
@@ -5169,15 +5205,7 @@ Perl_ck_rvconst(pTHX_ register OP *o)
 	if (gv) {
 	    kid->op_type = OP_GV;
 	    SvREFCNT_dec(kid->op_sv);
-#ifdef USE_ITHREADS
-	    /* XXX hack: dependence on sizeof(PADOP) <= sizeof(SVOP) */
-	    kPADOP->op_padix = pad_alloc(OP_GV, SVs_PADTMP);
-	    SvREFCNT_dec(PAD_SVl(kPADOP->op_padix));
-	    GvIN_PAD_on(gv);
-	    PAD_SETSV(kPADOP->op_padix, (SV*) SvREFCNT_inc_simple_NN(gv));
-#else
 	    kid->op_sv = SvREFCNT_inc_simple_NN(gv);
-#endif
 	    kid->op_private = 0;
 	    kid->op_ppaddr = PL_ppaddr[OP_GV];
 	}
@@ -6789,7 +6817,7 @@ Perl_peep(pTHX_ register OP *o)
 			op_null(o->op_next);
 		    op_null(pop->op_next);
 		    op_null(pop);
-		    o->op_flags |= pop->op_next->op_flags & OPf_MOD;
+		    o->op_flags |= pop->op_next->op_flags & (OPf_MOD|OPf_ASSIGN);
 		    o->op_next = pop->op_next->op_next;
 		    o->op_ppaddr = PL_ppaddr[OP_AELEMFAST];
 		    o->op_private = (U8)i;
@@ -6809,6 +6837,7 @@ Perl_peep(pTHX_ register OP *o)
 		    op_null(o->op_next);
 		    o->op_private |= o->op_next->op_private & (OPpLVAL_INTRO
 							       | OPpOUR_INTRO);
+		    o->op_flags |= o->op_next->op_flags & (OPf_ASSIGN);
 		    o->op_next = o->op_next->op_next;
 		    o->op_type = OP_GVSV;
 		    o->op_ppaddr = PL_ppaddr[OP_GVSV];
