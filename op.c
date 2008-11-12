@@ -5252,6 +5252,17 @@ Perl_ck_ftst(pTHX_ OP *o)
 }
 
 OP *
+Perl_ck_anonlist(pTHX_ OP*o)
+{
+    dVAR;
+    register OP *kid;
+    for( kid = cLISTOPo->op_first ; kid ; kid = kid->op_sibling ) {
+	list(kid);
+    }
+    return o;
+}
+
+OP *
 Perl_ck_fun(pTHX_ OP *o)
 {
     dVAR;

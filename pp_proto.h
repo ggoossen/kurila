@@ -5,6 +5,7 @@
 */
 
 PERL_CKDEF(Perl_ck_anoncode)
+PERL_CKDEF(Perl_ck_anonlist)
 PERL_CKDEF(Perl_ck_bitop)
 PERL_CKDEF(Perl_ck_chdir)
 PERL_CKDEF(Perl_ck_compsub)

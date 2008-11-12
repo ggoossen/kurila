@@ -1096,6 +1096,7 @@
 #if defined(PERL_IN_OP_C) || defined(PERL_DECL_PROT)
 #ifdef PERL_CORE
 #define ck_anoncode		Perl_ck_anoncode
+#define ck_anonlist		Perl_ck_anonlist
 #define ck_bitop		Perl_ck_bitop
 #define ck_concat		Perl_ck_concat
 #define ck_defined		Perl_ck_defined
@@ -1817,6 +1818,7 @@
 #endif
 #endif
 #define ck_anoncode		Perl_ck_anoncode
+#define ck_anonlist		Perl_ck_anonlist
 #define ck_bitop		Perl_ck_bitop
 #define ck_chdir		Perl_ck_chdir
 #define ck_compsub		Perl_ck_compsub
@@ -3249,6 +3251,7 @@
 #if defined(PERL_IN_OP_C) || defined(PERL_DECL_PROT)
 #ifdef PERL_CORE
 #define ck_anoncode(a)		Perl_ck_anoncode(aTHX_ a)
+#define ck_anonlist(a)		Perl_ck_anonlist(aTHX_ a)
 #define ck_bitop(a)		Perl_ck_bitop(aTHX_ a)
 #define ck_concat(a)		Perl_ck_concat(aTHX_ a)
 #define ck_defined(a)		Perl_ck_defined(aTHX_ a)
@@ -3985,6 +3988,7 @@
 #endif
 #endif
 #define ck_anoncode(a)		Perl_ck_anoncode(aTHX_ a)
+#define ck_anonlist(a)		Perl_ck_anonlist(aTHX_ a)
 #define ck_bitop(a)		Perl_ck_bitop(aTHX_ a)
 #define ck_chdir(a)		Perl_ck_chdir(aTHX_ a)
 #define ck_compsub(a)		Perl_ck_compsub(aTHX_ a)

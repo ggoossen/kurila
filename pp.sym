@@ -6,6 +6,7 @@
 #
 
 Perl_ck_anoncode
+Perl_ck_anonlist
 Perl_ck_bitop
 Perl_ck_chdir
 Perl_ck_compsub
