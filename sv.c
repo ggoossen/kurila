@@ -2608,6 +2608,7 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV* sstr, const I32 flags)
     U32 sflags;
     svtype dtype;
     svtype stype;
+    bool sstr_ref_incremented = FALSE;
 
     PERL_ARGS_ASSERT_SV_SETSV_FLAGS;
 
@@ -2634,7 +2635,11 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV* sstr, const I32 flags)
     if ( ( dtype == SVt_PVHV || dtype == SVt_PVAV  || dtype == SVt_PVCV
 	    || stype == SVt_PVAV || stype == SVt_PVHV || stype == SVt_PVCV )
         && dtype != stype ) {
-	/* FIXME the assignment should be done before old values ore DESTROYed */
+
+	/* Make sure the sstr stays alive during the assignment */
+	SvREFCNT_inc(sstr);
+	sstr_ref_incremented = TRUE;
+
 	if (SvOBJECT(dstr)) {
 	    HV* package = SvSTASH(dstr);
 	    Perl_sv_clear_body(aTHX_ dstr);
@@ -3048,6 +3053,8 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV* sstr, const I32 flags)
     }
     if (SvTAINTED(sstr))
 	SvTAINT(dstr);
+    if (sstr_ref_incremented)
+	SvREFCNT_dec(sstr);
 }
 
 /*
