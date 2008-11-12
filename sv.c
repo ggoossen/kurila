@@ -2801,6 +2801,10 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV* sstr, const I32 flags)
 	int i;
 	int len = av_len( (AV*)sstr);
 	bool magic = SvMAGICAL( dstr ) != 0;
+	if ( ! sstr_ref_incremented ) {
+	    SvREFCNT_inc(sstr);
+	    sstr_ref_incremented = TRUE;
+	}
 	av_clear( (AV*)dstr );
 	av_extend( (AV*)dstr, len );
 	for (i=0; i<=len; i++) {
@@ -2820,6 +2824,10 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV* sstr, const I32 flags)
 	
     }
     else if (dtype == SVt_PVHV) {
+	if ( ! sstr_ref_incremented ) {
+	    SvREFCNT_inc(sstr);
+	    sstr_ref_incremented = TRUE;
+	}
 	hv_sethv( (HV*)dstr, (HV*)sstr);
     }
     else if (dtype == SVt_PVCV) {
