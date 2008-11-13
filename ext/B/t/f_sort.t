@@ -516,7 +516,7 @@ checkOptree(name   => q{Compound sort/map Expression },
 # f      </> match(/"=(\\d+)"/) l/RTIME
 # g      <#> gvsv[*_] s
 # h      <1> uc[t17] sK/1
-# i      <@> anonlist lKRM/1
+# i      <@> anonarray lKRM/1
 # j      <1> refgen lK/1
 # k      <@> leave lKP
 #            goto 9
@@ -553,7 +553,7 @@ EOT_EOT
 # f      </> match(/"=(\\d+)"/) l/RTIME
 # g      <$> gvsv(*_) s
 # h      <1> uc[t9] sK/1
-# i      <@> anonlist lKRM/1
+# i      <@> anonarray lKRM/1
 # j      <1> refgen lK/1
 # k      <@> leave lKP
 #            goto 9

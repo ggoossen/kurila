@@ -4,8 +4,8 @@
    will be lost!
 */
 
+PERL_CKDEF(Perl_ck_anonarray)
 PERL_CKDEF(Perl_ck_anoncode)
-PERL_CKDEF(Perl_ck_anonlist)
 PERL_CKDEF(Perl_ck_bitop)
 PERL_CKDEF(Perl_ck_chdir)
 PERL_CKDEF(Perl_ck_compsub)
@@ -185,7 +185,7 @@ PERL_PPDEF(Perl_pp_split)
 PERL_PPDEF(Perl_pp_join)
 PERL_PPDEF(Perl_pp_list)
 PERL_PPDEF(Perl_pp_lslice)
-PERL_PPDEF(Perl_pp_anonlist)
+PERL_PPDEF(Perl_pp_anonarray)
 PERL_PPDEF(Perl_pp_anonhash)
 PERL_PPDEF(Perl_pp_listlast)
 PERL_PPDEF(Perl_pp_expand)

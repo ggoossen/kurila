@@ -1746,7 +1746,7 @@ sub anon_hash_or_list {
     my $self = shift;
     my($op, $cx) = < @_;
 
-    my($pre, $post) = < @{%("anonlist" => \@('@(',')'),
+    my($pre, $post) = < @{%("anonarray" => \@('@(',')'),
                           "anonhash" => \@('%(',')')){?$op->name}};
     my($expr, @exprs);
     $op = $op->first->sibling; # skip pushmark
@@ -1759,7 +1759,7 @@ sub anon_hash_or_list {
     return $pre . join(", ", @exprs) . $post;
 }
 
-sub pp_anonlist {
+sub pp_anonarray {
     my $self = shift;
     my ($op, $cx) = < @_;
     return $self->anon_hash_or_list($op, $cx);
@@ -1771,7 +1771,7 @@ sub pp_anonscalar {
     return "\$( " . $self->deparse($op->first, 6) . " )";
 }
 
-*pp_anonhash = \&pp_anonlist;
+*pp_anonhash = \&pp_anonarray;
 
 sub pp_srefgen {
     my $self = shift;

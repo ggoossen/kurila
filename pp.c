@@ -3714,7 +3714,7 @@ PP(pp_anonscalar)
     RETURN;
 }
 
-PP(pp_anonlist)
+PP(pp_anonarray)
 {
     dVAR; dSP; dMARK;
     const I32 items = SP - MARK;

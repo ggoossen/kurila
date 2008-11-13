@@ -516,7 +516,7 @@ ApPa	|long	|my_htonl	|long l
 ApPa	|long	|my_ntohl	|long l
 #endif
 p	|void	|my_unexec
-Apa	|OP*	|newANONLIST	|NULLOK OP* o|NULLOK SV* location
+Apa	|OP*	|newANONARRAY	|NULLOK OP* o|NULLOK SV* location
 Apa	|OP*	|newANONHASH	|NULLOK OP* o|NULLOK SV* location
 Ap	|OP*	|newANONSUB	|I32 floor|NULLOK OP* proto|NULLOK OP* block
 Apa	|OP*	|newASSIGNOP	|I32 flags|NULLOK OP* left|I32 optype|NULLOK OP* right|NULLOK SV* location
@@ -1100,7 +1100,7 @@ s	|void	|unwind_handler_stack|NN const void *p
 
 #if defined(PERL_IN_OP_C) || defined(PERL_DECL_PROT)
 pR	|OP*	|ck_anoncode	|NN OP *o
-pR	|OP*	|ck_anonlist	|NN OP *o
+pR	|OP*	|ck_anonarray	|NN OP *o
 pR	|OP*	|ck_bitop	|NN OP *o
 pR	|OP*	|ck_concat	|NN OP *o
 pR	|OP*	|ck_defined	|NN OP *o

@@ -522,7 +522,7 @@
 #ifdef PERL_CORE
 #define my_unexec		Perl_my_unexec
 #endif
-#define newANONLIST		Perl_newANONLIST
+#define newANONARRAY		Perl_newANONARRAY
 #define newANONHASH		Perl_newANONHASH
 #define newANONSUB		Perl_newANONSUB
 #define newASSIGNOP		Perl_newASSIGNOP
@@ -1096,7 +1096,7 @@
 #if defined(PERL_IN_OP_C) || defined(PERL_DECL_PROT)
 #ifdef PERL_CORE
 #define ck_anoncode		Perl_ck_anoncode
-#define ck_anonlist		Perl_ck_anonlist
+#define ck_anonarray		Perl_ck_anonarray
 #define ck_bitop		Perl_ck_bitop
 #define ck_concat		Perl_ck_concat
 #define ck_defined		Perl_ck_defined
@@ -1817,8 +1817,8 @@
 #define dump_op_rest		S_dump_op_rest
 #endif
 #endif
+#define ck_anonarray		Perl_ck_anonarray
 #define ck_anoncode		Perl_ck_anoncode
-#define ck_anonlist		Perl_ck_anonlist
 #define ck_bitop		Perl_ck_bitop
 #define ck_chdir		Perl_ck_chdir
 #define ck_compsub		Perl_ck_compsub
@@ -1870,9 +1870,9 @@
 #define pp_alarm		Perl_pp_alarm
 #define pp_and			Perl_pp_and
 #define pp_andassign		Perl_pp_andassign
+#define pp_anonarray		Perl_pp_anonarray
 #define pp_anoncode		Perl_pp_anoncode
 #define pp_anonhash		Perl_pp_anonhash
-#define pp_anonlist		Perl_pp_anonlist
 #define pp_anonscalar		Perl_pp_anonscalar
 #define pp_aslice		Perl_pp_aslice
 #define pp_atan2		Perl_pp_atan2
@@ -2686,7 +2686,7 @@
 #ifdef PERL_CORE
 #define my_unexec()		Perl_my_unexec(aTHX)
 #endif
-#define newANONLIST(a,b)	Perl_newANONLIST(aTHX_ a,b)
+#define newANONARRAY(a,b)	Perl_newANONARRAY(aTHX_ a,b)
 #define newANONHASH(a,b)	Perl_newANONHASH(aTHX_ a,b)
 #define newANONSUB(a,b,c)	Perl_newANONSUB(aTHX_ a,b,c)
 #define newASSIGNOP(a,b,c,d,e)	Perl_newASSIGNOP(aTHX_ a,b,c,d,e)
@@ -3251,7 +3251,7 @@
 #if defined(PERL_IN_OP_C) || defined(PERL_DECL_PROT)
 #ifdef PERL_CORE
 #define ck_anoncode(a)		Perl_ck_anoncode(aTHX_ a)
-#define ck_anonlist(a)		Perl_ck_anonlist(aTHX_ a)
+#define ck_anonarray(a)		Perl_ck_anonarray(aTHX_ a)
 #define ck_bitop(a)		Perl_ck_bitop(aTHX_ a)
 #define ck_concat(a)		Perl_ck_concat(aTHX_ a)
 #define ck_defined(a)		Perl_ck_defined(aTHX_ a)
@@ -3987,8 +3987,8 @@
 #define dump_op_rest(a,b,c)	S_dump_op_rest(aTHX_ a,b,c)
 #endif
 #endif
+#define ck_anonarray(a)		Perl_ck_anonarray(aTHX_ a)
 #define ck_anoncode(a)		Perl_ck_anoncode(aTHX_ a)
-#define ck_anonlist(a)		Perl_ck_anonlist(aTHX_ a)
 #define ck_bitop(a)		Perl_ck_bitop(aTHX_ a)
 #define ck_chdir(a)		Perl_ck_chdir(aTHX_ a)
 #define ck_compsub(a)		Perl_ck_compsub(aTHX_ a)
@@ -4040,9 +4040,9 @@
 #define pp_alarm()		Perl_pp_alarm(aTHX)
 #define pp_and()		Perl_pp_and(aTHX)
 #define pp_andassign()		Perl_pp_andassign(aTHX)
+#define pp_anonarray()		Perl_pp_anonarray(aTHX)
 #define pp_anoncode()		Perl_pp_anoncode(aTHX)
 #define pp_anonhash()		Perl_pp_anonhash(aTHX)
-#define pp_anonlist()		Perl_pp_anonlist(aTHX)
 #define pp_anonscalar()		Perl_pp_anonscalar(aTHX)
 #define pp_aslice()		Perl_pp_aslice(aTHX)
 #define pp_atan2()		Perl_pp_atan2(aTHX)

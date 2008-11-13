@@ -1889,7 +1889,7 @@ PERL_CALLCONV long	Perl_my_ntohl(pTHX_ long l)
 
 #endif
 PERL_CALLCONV void	Perl_my_unexec(pTHX);
-PERL_CALLCONV OP*	Perl_newANONLIST(pTHX_ OP* o, SV* location)
+PERL_CALLCONV OP*	Perl_newANONARRAY(pTHX_ OP* o, SV* location)
 			__attribute__malloc__
 			__attribute__warn_unused_result__;
 
@@ -3992,10 +3992,10 @@ PERL_CALLCONV OP*	Perl_ck_anoncode(pTHX_ OP *o)
 #define PERL_ARGS_ASSERT_CK_ANONCODE	\
 	assert(o)
 
-PERL_CALLCONV OP*	Perl_ck_anonlist(pTHX_ OP *o)
+PERL_CALLCONV OP*	Perl_ck_anonarray(pTHX_ OP *o)
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_CK_ANONLIST	\
+#define PERL_ARGS_ASSERT_CK_ANONARRAY	\
 	assert(o)
 
 PERL_CALLCONV OP*	Perl_ck_bitop(pTHX_ OP *o)

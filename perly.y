@@ -651,7 +651,7 @@ listop	:	LSTOP indirob argexpr /* map {...} @args or print $fh @args */
 			}
         |       ANONARYL listexpr  /* @: ... */
                         {
-                            $$ = newANONLIST($2, LOCATION($1));
+                            $$ = newANONARRAY($2, LOCATION($1));
                             TOKEN_GETMAD($1,$$,'[');
 			}
         |       ANONSCALARL listexpr  /* $: ... */
@@ -1254,13 +1254,13 @@ ary	:	'@' indirob
 			}
         |       ANONARY expr ')'  /* @( ... ) */
                         {
-                            $$ = newANONLIST($2, LOCATION($1));
+                            $$ = newANONARRAY($2, LOCATION($1));
                             TOKEN_GETMAD($1,$$,'[');
                             TOKEN_GETMAD($3,$$,']');
 			}
         |	ANONARY ')'  /* @() */
 			{
-                            $$ = newANONLIST((OP*)NULL, LOCATION($1));
+                            $$ = newANONARRAY((OP*)NULL, LOCATION($1));
                             TOKEN_GETMAD($1,$$,'[');
                             TOKEN_GETMAD($2,$$,']');
 			}
