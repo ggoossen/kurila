@@ -135,7 +135,7 @@ Deprecated.  Use C<GIMME_V> instead.
 				/*  On OP_REQUIRE, was seen as CORE::require */
 				/*  On OP_BREAK, an implicit break */
 				/*  On OP_SMARTMATCH, an implicit smartmatch */
-				/*  On OP_ANONHASH and OP_ANONLIST, create a
+				/*  On OP_ANONHASH and OP_ANONARRAY, create a
 				    reference to the new anon hash or array */
 				/*  On OP_AASIGN last element of the assignment is an expanded array/hash */
 #define OPf_ASSIGN      0x100   /*  op should do an assignment */

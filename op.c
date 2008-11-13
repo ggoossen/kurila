@@ -872,7 +872,7 @@ Perl_scalar(pTHX_ OP *o)
     case OP_LIST:
 	yyerror(Perl_form(aTHX_ "%s may not be used in scalar context", PL_op_desc[o->op_type]));
 	break;
-    case OP_ANONLIST:
+    case OP_ANONARRAY:
 	break;
     }
     return o;
@@ -1013,7 +1013,7 @@ Perl_scalarvoid(pTHX_ OP *o)
 	    useless = OP_DESC(o);
 	break;
 
-    case OP_ANONLIST:
+    case OP_ANONARRAY:
     case OP_ANONHASH:
 	useless = OP_DESC(o);
 	break;
@@ -1406,7 +1406,7 @@ Perl_mod(pTHX_ OP *o, I32 type)
 	break;
 
     case OP_PADSV:
-    case OP_ANONLIST:
+    case OP_ANONARRAY:
     case OP_ANONHASH:
 	PL_modcount++;
 	if (!type) /* local() */
@@ -1592,7 +1592,7 @@ Perl_doref(pTHX_ OP *o, I32 type, bool set_op_ref)
 	doref(cUNOPo->op_first, o->op_type, set_op_ref);
 	break;
 
-    case OP_ANONLIST:
+    case OP_ANONARRAY:
     case OP_ANONHASH:
 	if (set_op_ref)
 	    o->op_flags |= OPf_REF;
@@ -2071,7 +2071,7 @@ Perl_gen_constant_list(pTHX_ register OP *o)
     assert (!(curop->op_flags & OPf_SPECIAL));
     assert(curop->op_type == OP_RANGE);
     PL_op->op_flags &= ~OPf_REF;
-    pp_anonlist();
+    pp_anonarray();
     PL_tmps_floor = oldtmps_floor;
 
     o->op_type = OP_EXPAND;
@@ -4692,9 +4692,9 @@ Perl_newXS(pTHX_ const char *name, XSUBADDR_t subaddr, const char *filename)
 }
 
 OP *
-Perl_newANONLIST(pTHX_ OP *o, SV* location)
+Perl_newANONARRAY(pTHX_ OP *o, SV* location)
 {
-    return convert(OP_ANONLIST, 0, o, location);
+    return convert(OP_ANONARRAY, 0, o, location);
 }
 
 OP *
@@ -4736,7 +4736,7 @@ Perl_newAVREF(pTHX_ OP *o, SV* location)
 	SVcpREPLACE(o->op_location, location);
 	return o;
     }
-    else if ((o->op_type == OP_RV2AV || o->op_type == OP_ANONLIST )) {
+    else if ((o->op_type == OP_RV2AV || o->op_type == OP_ANONARRAY )) {
 	yyerror(Perl_form(aTHX_ "Array may not be used as a reference"));
     }
     return newUNOP(OP_RV2AV, 0, scalar(o), location);
@@ -5252,7 +5252,7 @@ Perl_ck_ftst(pTHX_ OP *o)
 }
 
 OP *
-Perl_ck_anonlist(pTHX_ OP*o)
+Perl_ck_anonarray(pTHX_ OP*o)
 {
     dVAR;
     register OP *kid;
@@ -5330,7 +5330,7 @@ Perl_ck_fun(pTHX_ OP *o)
 			"Useless use of %s with no values",
 			PL_op_desc[type]);
 
-		if (kid->op_type != OP_RV2AV && kid->op_type != OP_PADSV && kid->op_type != OP_ANONLIST
+		if (kid->op_type != OP_RV2AV && kid->op_type != OP_PADSV && kid->op_type != OP_ANONARRAY
 		    && kid->op_type != OP_RV2SV)
 		    bad_type(numargs, "array", PL_op_desc[type], kid);
 		mod(kid, type);

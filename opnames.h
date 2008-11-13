@@ -154,7 +154,7 @@ typedef enum opcode {
 	OP_JOIN		 = 136,
 	OP_LIST		 = 137,
 	OP_LSLICE	 = 138,
-	OP_ANONLIST	 = 139,
+	OP_ANONARRAY	 = 139,
 	OP_ANONHASH	 = 140,
 	OP_LISTLAST	 = 141,
 	OP_EXPAND	 = 142,
