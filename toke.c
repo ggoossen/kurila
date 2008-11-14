@@ -4101,7 +4101,7 @@ Perl_yylex(pTHX)
 	     s++;
 	     OPERATOR(TERNARY_IF);
 	 }
-	 OPERATOR('?');
+	 TOKEN('?');
 
     case '.':
 	if (PL_expect == XOPERATOR || !isDIGIT(s[1])) {

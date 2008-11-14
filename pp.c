@@ -127,7 +127,7 @@ PP(pp_rv2gv)
 	if (op_flags & OPf_ASSIGN_PART) {
 	    SV* src;
 	    if (PL_stack_base + TOPMARK >= SP) {
-		if ( ! (op_flags & OPf_ASSIGN_PART_OPTIONAL) )
+		if ( ! (op_flags & OPf_OPTIONAL) )
 		    Perl_croak(aTHX_ "Missing required assignment value");
 		src = &PL_sv_undef;
 	    } 
@@ -199,7 +199,7 @@ PP(pp_rv2sv)
 	if (op_flags & OPf_ASSIGN_PART) {
 	    SV* src;
 	    if (PL_stack_base + TOPMARK >= SP) {
-		if ( ! (op_flags & OPf_ASSIGN_PART_OPTIONAL) )
+		if ( ! (op_flags & OPf_OPTIONAL) )
 		    Perl_croak(aTHX_ "Missing required assignment value");
 		src = &PL_sv_undef;
 	    } 
