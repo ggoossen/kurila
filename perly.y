@@ -94,7 +94,7 @@
 %type <opval> mydef
 
 %type <opval> block mblock lineseq line loop cond else
-%type <opval> expr term subscripted scalar ary hsh star amper sideff
+%type <opval> expr term subscripted scalar star amper sideff
 %type <opval> argexpr texpr iexpr mexpr miexpr
 %type <opval> listexpr listexprcom indirob listop method
 %type <opval> subname proto subbody cont my_scalar
@@ -1017,10 +1017,6 @@ term	:	termbinop
 			{ $$ = $1; }
 	|	star	%prec '('
 			{ $$ = $1; }
-	|	hsh 	%prec '('
-			{ $$ = $1; }
-	|	ary 	%prec '('
-			{ $$ = $1; }
 	|       subscripted
 			{ $$ = $1; }
 	|	THING	%prec '('
@@ -1173,10 +1169,6 @@ myterm	:	'(' expr ')'
 			}
 	|	scalar	%prec '('
 			{ $$ = $1; }
-	|	hsh 	%prec '('
-			{ $$ = $1; }
-	|	ary 	%prec '('
-			{ $$ = $1; }
 	;
 
 mydef :   /* NULL */
@@ -1244,10 +1236,7 @@ scalar	:	'$' indirob
                                     PL_parser->lex_state = LEX_INTERPEND;
                             }
 			}
-
-	;
-
-ary	:	'@' indirob
+	|       '@' indirob
 			{ 
                             $$ = newAVREF($2, LOCATION($1));
                             TOKEN_GETMAD($1,$$,'@');
@@ -1264,9 +1253,7 @@ ary	:	'@' indirob
                             TOKEN_GETMAD($1,$$,'[');
                             TOKEN_GETMAD($2,$$,']');
 			}
-	;
-
-hsh	:	'%' indirob
+	|	'%' indirob
                         {
                             $$ = newHVREF($2, LOCATION($1));
                             TOKEN_GETMAD($1,$$,'%');
