@@ -411,6 +411,7 @@ miexpr	:	iexpr
 			{ $$ = $1; intro_my(); }
 	;
 
+
 /* Optional "MAIN:"-style loop labels */
 label	:	/* empty */
 			{
@@ -979,7 +980,12 @@ termdo	:       DO term	%prec UNIOP                     /* do $filename */
 			}
         ;
 
-term	:	termbinop
+term	:	'?' term
+                        { 
+                            $$ = $2;
+                            $$->op_flags |= OPf_OPTIONAL;
+                        }
+        |       termbinop
 	|	termunop
 	|	anonymous
 	|	termdo
@@ -1214,6 +1220,7 @@ amper	:	'&' indirob
                             TOKEN_GETMAD($1,$$,'&');
 			}
 	;
+
 
 scalar	:	'$' indirob
 			{ 

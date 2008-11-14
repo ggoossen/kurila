@@ -143,7 +143,7 @@ Deprecated.  Use C<GIMME_V> instead.
 #define OPf_ASSIGN_PART 0x200   /* op should do an assignment using
                                    "pop_assing_part" and without pusing
                                    onto the stack */
-#define OPf_ASSIGN_PART_OPTIONAL      0x400   /*  assignment is optional, flags
+#define OPf_OPTIONAL      0x400   /*  assignment is optional, flags
 						  should be passed to "pop_assign_part"
 					       */
 
