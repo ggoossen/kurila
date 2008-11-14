@@ -2115,7 +2115,7 @@ Perl_convert(pTHX_ I32 type, I32 flags, OP *o, SV *location)
 }
 
 OP *
-Perl_assign(pTHX_ OP *o)
+Perl_assign(pTHX_ OP *o, bool partial)
 {
     OP* kid;
 
@@ -2128,14 +2128,34 @@ Perl_assign(pTHX_ OP *o)
     case OP_HELEM:
     case OP_AELEM:
 	o->op_flags |= OPf_ASSIGN;
+	if (partial)
+	    o->op_flags |= OPf_ASSIGN_PART;
 	break;
+
     case OP_NULL:
-	assign(cBINOPo->op_first);
+	assign(cBINOPo->op_first, partial);
 	break;
+
     case OP_COND_EXPR:
 	for (kid = cUNOPo->op_first->op_sibling; kid; kid = kid->op_sibling)
-	    assign(kid);
+	    assign(kid, partial);
 	break;
+
+    case OP_ANONARRAY:
+	o->op_flags |= OPf_ASSIGN;
+	if (partial)
+	    o->op_flags |= OPf_ASSIGN_PART;
+
+	{
+	    OP* pushmark = cBINOPo->op_first;
+	    OP* enter = newOP(OP_ENTER_ANONARRAY_ASSIGN, 0, o->op_location);
+	    enter->op_sibling = pushmark->op_sibling;
+	    cBINOPo->op_first = enter;
+	    for (kid = enter->op_sibling; kid; kid = kid->op_sibling)
+		assign(kid, TRUE);
+	}
+	break;
+
     default:
 	Perl_croak_at(aTHX_ o->op_location, "Can't assign to %s", OP_DESC(o));
     }
@@ -3421,8 +3441,11 @@ Perl_newASSIGNOP(pTHX_ I32 flags, OP *left, I32 optype, OP *right, SV *location)
 	    location);
     }
     else {
-	o = newBINOP(OP_SASSIGN, flags,
-	    scalar(right), assign(mod(scalar(left), OP_SASSIGN)), location );
+	o = newBINOP(OP_SASSIGN,
+	    flags,
+	    scalar(right), 
+	    assign(mod(scalar(left), OP_SASSIGN), FALSE),
+	    location );
     }
     return o;
 }

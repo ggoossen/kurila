@@ -1788,7 +1788,7 @@ PERL_CALLCONV void	Perl_mini_mktime(pTHX_ struct tm *ptm)
 	assert(ptm)
 
 PERL_CALLCONV OP*	Perl_mod(pTHX_ OP* o, I32 type);
-PERL_CALLCONV OP*	Perl_assign(pTHX_ OP* o)
+PERL_CALLCONV OP*	Perl_assign(pTHX_ OP* o, bool partial)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_ASSIGN	\
 	assert(o)

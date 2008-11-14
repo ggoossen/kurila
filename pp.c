@@ -69,6 +69,7 @@ PP(pp_rv2gv)
 {
     dVAR; dSP;
     SV* sv = POPs;
+    const OPFLAGS op_flags = PL_op->op_flags;
 
     if (SvROK(sv)) {
       wasref:
@@ -122,7 +123,19 @@ PP(pp_rv2gv)
     }
     if (PL_op->op_private & OPpLVAL_INTRO)
 	save_gp((GV*)sv, !(PL_op->op_flags & OPf_SPECIAL));
-    if (PL_op->op_flags & OPf_ASSIGN) {
+    if (op_flags & OPf_ASSIGN) {
+	if (op_flags & OPf_ASSIGN_PART) {
+	    SV* src;
+	    if (PL_stack_base + TOPMARK >= SP) {
+		if ( ! (op_flags & OPf_ASSIGN_PART_OPTIONAL) )
+		    Perl_croak(aTHX_ "Missing required assignment item");
+		src = &PL_sv_undef;
+	    } 
+	    else
+		src = POPs;
+	    sv_setsv_mg(sv, src);
+	    RETURN;
+	}
 	sv_setsv_mg(sv, POPs);
     }
     PUSHs(sv);
@@ -136,6 +149,7 @@ PP(pp_rv2sv)
     GV *gv = NULL;
     const bool is_pp_rv2sv = PL_op->op_type == OP_RV2SV;
     const bool is_pp_rv2av = PL_op->op_type == OP_RV2AV;
+    const OPFLAGS op_flags = PL_op->op_flags;
     static const char an_array[] = "an ARRAY";
     static const char a_hash[] = "a HASH";
     static const char a_scalar[] = "a SCALAR";
@@ -177,11 +191,23 @@ PP(pp_rv2sv)
 /* 	    Perl_croak(aTHX_ PL_no_localize_ref); */
 	}
     }
-    else if (PL_op->op_flags & OPf_MOD) {
+    else if (op_flags & OPf_MOD) {
 	if (PL_op->op_private & OPpDEREF)
 	    vivify_ref(sv, PL_op->op_private & OPpDEREF);
     }
-    if (PL_op->op_flags & OPf_ASSIGN) {
+    if (op_flags & OPf_ASSIGN) {
+	if (op_flags & OPf_ASSIGN_PART) {
+	    SV* src;
+	    if (PL_stack_base + TOPMARK >= SP) {
+		if ( ! (op_flags & OPf_ASSIGN_PART_OPTIONAL) )
+		    Perl_croak(aTHX_ "Missing required assignment item");
+		src = &PL_sv_undef;
+	    } 
+	    else
+		src = POPs;
+	    sv_setsv_mg(sv, src);
+	    RETURN;
+	}
 	sv_setsv_mg(sv, POPs);
     }
     PUSHs(sv);
@@ -3714,11 +3740,33 @@ PP(pp_anonscalar)
     RETURN;
 }
 
+PP(pp_enter_anonarray_assign)
+{
+    dSP;
+    SV* sv = POPs;
+    AV* av;
+    I32 len, i;
+    if ( ! SvAVOK(sv) )
+	Perl_croak(aTHX_ "Expected ARRAY but got %s", Ddesc(sv));
+    av = SvAv(sv);
+    len = av_len(av);
+    PUSHMARK(SP);
+    for (i = len; i >= 0; i--) {
+	XPUSHs(*av_fetch(av, i, FALSE));
+    }
+    RETURN;
+}
+
 PP(pp_anonarray)
 {
     dVAR; dSP; dMARK;
     const I32 items = SP - MARK;
 
+    if (PL_op->op_flags & OPf_ASSIGN) {
+	if (items)
+	    Perl_croak(aTHX_ "In array assignment %d extra items", items);
+	RETURN;
+    }
     dORIGMARK;
     SV * const av = (SV *) av_make(items, MARK+1);
     SP = ORIGMARK;		/* av_make() might realloc stack_sp */
