@@ -38,6 +38,7 @@
  */
 
 #define OPCODE U16
+#define OPFLAGS U16
 
 #ifdef PERL_MAD
 #  define MADPROP_IN_BASEOP	MADPROP*	op_madprop;
@@ -63,7 +64,7 @@ typedef PERL_BITFIELD16 optype;
     PERL_BITFIELD16 op_latefreed:1;	\
     PERL_BITFIELD16 op_attached:1;	\
     PERL_BITFIELD16 op_spare:3;		\
-    U16		op_flags;		\
+    OPFLAGS		op_flags;		\
     U8		op_private;
 #endif
 
@@ -139,6 +140,12 @@ Deprecated.  Use C<GIMME_V> instead.
 				    reference to the new anon hash or array */
 				/*  On OP_AASIGN last element of the assignment is an expanded array/hash */
 #define OPf_ASSIGN      0x100   /*  op should do an assignment */
+#define OPf_ASSIGN_PART 0x200   /* op should do an assignment using
+                                   "pop_assing_part" and without pusing
+                                   onto the stack */
+#define OPf_ASSIGN_PART_OPTIONAL      0x400   /*  assignment is optional, flags
+						  should be passed to "pop_assign_part"
+					       */
 
 /* old names; don't use in new code, but don't break them, either */
 #define OPf_LIST	OPf_WANT_LIST

@@ -184,6 +184,7 @@ Perl_pp_split
 Perl_pp_join
 Perl_pp_list
 Perl_pp_lslice
+Perl_pp_enter_anonarray_assign
 Perl_pp_anonarray
 Perl_pp_anonhash
 Perl_pp_listlast

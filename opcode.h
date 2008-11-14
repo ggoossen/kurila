@@ -173,6 +173,7 @@ EXTCONST char* const PL_op_name[] = {
 	"join",
 	"list",
 	"lslice",
+	"enter_anonarray_assign",
 	"anonarray",
 	"anonhash",
 	"listlast",
@@ -529,6 +530,7 @@ EXTCONST char* const PL_op_desc[] = {
 	"join or string",
 	"list",
 	"list slice",
+	"anonymous array assignment (@())",
 	"anonymous array (@())",
 	"anonymous hash (%())",
 	"listlast",
@@ -897,6 +899,7 @@ EXT Perl_ppaddr_t PL_ppaddr[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_pp_join),
 	MEMBER_TO_FPTR(Perl_pp_list),
 	MEMBER_TO_FPTR(Perl_pp_lslice),
+	MEMBER_TO_FPTR(Perl_pp_enter_anonarray_assign),
 	MEMBER_TO_FPTR(Perl_pp_anonarray),
 	MEMBER_TO_FPTR(Perl_pp_anonhash),
 	MEMBER_TO_FPTR(Perl_pp_listlast),
@@ -1262,6 +1265,7 @@ EXT Perl_check_t PL_check[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* join */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* list */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* lslice */
+	MEMBER_TO_FPTR(Perl_ck_null),	/* enter_anonarray_assign */
 	MEMBER_TO_FPTR(Perl_ck_anonarray),	/* anonarray */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* anonhash */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* listlast */
@@ -1621,6 +1625,7 @@ EXTCONST U32 PL_opargs[] = {
 	0x0004280d,	/* join */
 	0x00004801,	/* list */
 	0x00448400,	/* lslice */
+	0x00000000,	/* enter_anonarray_assign */
 	0x00004801,	/* anonarray */
 	0x00004801,	/* anonhash */
 	0x00004805,	/* listlast */

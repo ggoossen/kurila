@@ -58,11 +58,24 @@ PP(pp_gvsv)
     dVAR;
     dSP;
     SV* sv;
+    OPFLAGS op_flags = PL_op->op_flags;
     if (PL_op->op_private & OPpLVAL_INTRO)
 	sv = save_scalar(cGVOP_gv);
     else
 	sv = GvSVn(cGVOP_gv);
-    if (PL_op->op_flags & OPf_ASSIGN) {
+    if (op_flags & OPf_ASSIGN) {
+	if (op_flags & OPf_ASSIGN_PART) {
+	    SV* src;
+	    if (PL_stack_base + TOPMARK >= SP) {
+		if ( ! (op_flags & OPf_ASSIGN_PART_OPTIONAL) )
+		    Perl_croak(aTHX_ "Missing required assignment item");
+		src = &PL_sv_undef;
+	    } 
+	    else
+		src = POPs;
+	    sv_setsv_mg(sv, src);
+	    RETURN;
+	}
 	sv_setsv_mg(sv, POPs);
     }
     XPUSHs(sv);
@@ -183,7 +196,20 @@ PP(pp_concat)
 PP(pp_padsv)
 {
     dVAR; dSP; dTARGET;
-    if (PL_op->op_flags & OPf_ASSIGN) {
+    OPFLAGS op_flags = PL_op->op_flags;
+    if (op_flags & OPf_ASSIGN) {
+	if (op_flags & OPf_ASSIGN_PART) {
+	    SV* src;
+	    if (PL_stack_base + TOPMARK >= SP) {
+		if ( ! (op_flags & OPf_ASSIGN_PART_OPTIONAL) )
+		    Perl_croak(aTHX_ "Missing required assignment item");
+		src = &PL_sv_undef;
+	    } 
+	    else
+		src = POPs;
+	    sv_setsv_mg(TARG, src);
+	    RETURN;
+	}
 	sv_setsv_mg(TARG, POPs);
     }
     XPUSHs(TARG);
@@ -542,10 +568,23 @@ PP(pp_aelemfast)
     {
 	SV** const svp = av_fetch(av, PL_op->op_private, lval);
 	SV *sv = (svp ? *svp : &PL_sv_undef);
+	OPFLAGS op_flags = PL_op->op_flags;
 	EXTEND(SP, 1);
 	if (!lval && SvGMAGICAL(sv))	/* see note in pp_helem() */
 	    sv = sv_mortalcopy(sv);
-	if (PL_op->op_flags & OPf_ASSIGN) {
+	if (op_flags & OPf_ASSIGN) {
+	    if (op_flags & OPf_ASSIGN_PART) {
+		SV* src;
+		if (PL_stack_base + TOPMARK >= SP) {
+		    if ( ! (op_flags & OPf_ASSIGN_PART_OPTIONAL) )
+			Perl_croak(aTHX_ "Missing required assignment item");
+		    src = &PL_sv_undef;
+		} 
+		else
+		    src = POPs;
+		sv_setsv_mg(sv, src);
+		RETURN;
+	    }
 	    sv_setsv_mg(sv, POPs);
 	}
 	PUSHs(sv);
@@ -1423,7 +1462,8 @@ PP(pp_helem)
     SV **svp;
     SV * const keysv = POPs;
     HV * const hv = (HV*)POPs;
-    const U32 lval = PL_op->op_flags & OPf_MOD;
+    const OPFLAGS op_flags = PL_op->op_flags;
+    const U32 lval = op_flags & OPf_MOD;
     const U32 defer = PL_op->op_private & OPpLVAL_DEFER;
     const U32 optional = PL_op->op_private & OPpHELEM_OPTIONAL;
     const U32 add = PL_op->op_private & OPpHELEM_ADD;
@@ -1512,7 +1552,19 @@ PP(pp_helem)
      * mg_get()s.  GSAR 98-07-03 */
     if (!lval && SvGMAGICAL(sv))
 	sv = sv_mortalcopy(sv);
-    if (PL_op->op_flags & OPf_ASSIGN) {
+    if (op_flags & OPf_ASSIGN) {
+	if (op_flags & OPf_ASSIGN_PART) {
+	    SV* src;
+	    if (PL_stack_base + TOPMARK >= SP) {
+		if ( ! (op_flags & OPf_ASSIGN_PART_OPTIONAL) )
+		    Perl_croak(aTHX_ "Missing required assignment item");
+		src = &PL_sv_undef;
+	    } 
+	    else
+		src = POPs;
+	    sv_setsv_mg(sv, src);
+	    RETURN;
+	}
 	sv_setsv_mg(sv, POPs);
     }
     PUSHs(sv);
@@ -2369,7 +2421,8 @@ PP(pp_aelem)
     SV* const elemsv = POPs;
     IV elem = SvIV(elemsv);
     AV* const av = (AV*)POPs;
-    const U32 lval = PL_op->op_flags & OPf_MOD;
+    const OPFLAGS op_flags = PL_op->op_flags;
+    const U32 lval = op_flags & OPf_MOD;
     U32 defer;
     SV *sv;
 
@@ -2415,7 +2468,19 @@ PP(pp_aelem)
     sv = (svp ? *svp : &PL_sv_undef);
     if (!lval && SvGMAGICAL(sv))	/* see note in pp_helem() */
 	sv = sv_mortalcopy(sv);
-    if (PL_op->op_flags & OPf_ASSIGN) {
+    if (op_flags & OPf_ASSIGN) {
+	if (op_flags & OPf_ASSIGN_PART) {
+	    SV* src;
+	    if (PL_stack_base + TOPMARK >= SP) {
+		if ( ! (op_flags & OPf_ASSIGN_PART_OPTIONAL) )
+		    Perl_croak(aTHX_ "Missing required assignment item");
+		src = &PL_sv_undef;
+	    } 
+	    else
+		src = POPs;
+	    sv_setsv_mg(sv, src);
+	    RETURN;
+	}
 	sv_setsv_mg(sv, POPs);
     }
     PUSHs(sv);
