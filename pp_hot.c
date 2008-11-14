@@ -68,7 +68,7 @@ PP(pp_gvsv)
 	    SV* src;
 	    if (PL_stack_base + TOPMARK >= SP) {
 		if ( ! (op_flags & OPf_ASSIGN_PART_OPTIONAL) )
-		    Perl_croak(aTHX_ "Missing required assignment item");
+		    Perl_croak(aTHX_ "Missing required assignment value");
 		src = &PL_sv_undef;
 	    } 
 	    else
@@ -202,7 +202,7 @@ PP(pp_padsv)
 	    SV* src;
 	    if (PL_stack_base + TOPMARK >= SP) {
 		if ( ! (op_flags & OPf_ASSIGN_PART_OPTIONAL) )
-		    Perl_croak(aTHX_ "Missing required assignment item");
+		    Perl_croak(aTHX_ "Missing required assignment value");
 		src = &PL_sv_undef;
 	    } 
 	    else
@@ -577,7 +577,7 @@ PP(pp_aelemfast)
 		SV* src;
 		if (PL_stack_base + TOPMARK >= SP) {
 		    if ( ! (op_flags & OPf_ASSIGN_PART_OPTIONAL) )
-			Perl_croak(aTHX_ "Missing required assignment item");
+			Perl_croak(aTHX_ "Missing required assignment value");
 		    src = &PL_sv_undef;
 		} 
 		else
@@ -1557,7 +1557,7 @@ PP(pp_helem)
 	    SV* src;
 	    if (PL_stack_base + TOPMARK >= SP) {
 		if ( ! (op_flags & OPf_ASSIGN_PART_OPTIONAL) )
-		    Perl_croak(aTHX_ "Missing required assignment item");
+		    Perl_croak(aTHX_ "Missing required assignment value");
 		src = &PL_sv_undef;
 	    } 
 	    else
@@ -2473,7 +2473,7 @@ PP(pp_aelem)
 	    SV* src;
 	    if (PL_stack_base + TOPMARK >= SP) {
 		if ( ! (op_flags & OPf_ASSIGN_PART_OPTIONAL) )
-		    Perl_croak(aTHX_ "Missing required assignment item");
+		    Perl_croak(aTHX_ "Missing required assignment value");
 		src = &PL_sv_undef;
 	    } 
 	    else
