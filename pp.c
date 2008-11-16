@@ -3823,6 +3823,32 @@ PP(pp_enter_arrayexpand_assign)
     RETURN;
 }
 
+PP(pp_enter_hashexpand_assign)
+{
+    dSP;
+    const I32 gimme = GIMME_V;
+    SV** base = PL_stack_base + TOPMARK;
+    HV* hv = SvHv(sv_2mortal(HvSv(newHV())));
+    IV duplicates = 0;
+    
+    while (SP > base) {	/* gobble up all the rest */
+	HE *didstore;
+	SV* sv = POPs;
+	SV* tmpstr = newSV(0);
+	if (SP > base)
+	    sv_setsv(tmpstr, POPs);	/* value */
+	if (gimme != G_VOID && hv_exists_ent(hv, sv, 0))
+	    /* key overwrites an existing entry */
+	    duplicates += 2;
+	didstore = hv_store_ent(hv,sv,tmpstr,0);
+    }
+
+    PUSHMARK(SP);
+    XPUSHs(HvSv(hv));
+
+    RETURN;
+}
+
 PP(pp_arrayexpand)
 {
     dVAR; dSP;
@@ -3905,6 +3931,13 @@ PP(pp_arrayexpand)
 PP(pp_hashexpand)
 {
     dVAR; dSP;
+    OPFLAGS op_flags = PL_op->op_flags;
+    if (op_flags & OPf_ASSIGN) {
+	dMARK;
+	if ( MARK != SP )
+	    Perl_croak(aTHX_ "Array expansion assignment failed");
+	RETURN;
+    }
     dTOPss;
     const I32 gimme = GIMME_V;
 
