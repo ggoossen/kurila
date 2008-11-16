@@ -22,4 +22,3 @@ do {
     dies_like( sub { @($x, $y) = qw|zus|; },
                qr/Missing required assignment value/, "assignment with one missing item" );
 };
-

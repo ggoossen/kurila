@@ -2132,6 +2132,12 @@ Perl_assign(pTHX_ OP *o, bool partial)
 	    o->op_flags |= OPf_ASSIGN_PART;
 	break;
 
+    case OP_DOTDOTDOT:
+	if ( ! partial )
+	    goto no_assign;
+	o->op_flags |= OPf_ASSIGN | OPf_ASSIGN_PART;
+	break;
+
     case OP_NULL:
 	assign(cBINOPo->op_first, partial);
 	break;
@@ -2157,6 +2163,7 @@ Perl_assign(pTHX_ OP *o, bool partial)
 	break;
 
     default:
+    no_assign:
 	Perl_croak_at(aTHX_ o->op_location, "Can't assign to %s", OP_DESC(o));
     }
     return o;
@@ -5927,6 +5934,14 @@ Perl_ck_method(pTHX_ OP *o)
 	    return cmop;
 	}
     }
+    return o;
+}
+
+OP *
+Perl_ck_dotdotdot(pTHX_ OP *o)
+{
+/*     Perl_croak_at(aTHX_ o->op_location, */
+/* 	"%s can only be used inside a pattern assignment", OP_DESC(o)); */
     return o;
 }
 

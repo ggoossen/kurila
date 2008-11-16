@@ -14,6 +14,7 @@ Perl_ck_concat
 Perl_ck_defined
 Perl_ck_delete
 Perl_ck_die
+Perl_ck_dotdotdot
 Perl_ck_eof
 Perl_ck_eval
 Perl_ck_exec
@@ -84,6 +85,7 @@ Perl_pp_subst
 Perl_pp_substcont
 Perl_pp_sassign
 Perl_pp_aassign
+Perl_pp_dotdotdot
 Perl_pp_chop
 Perl_pp_schop
 Perl_pp_chomp
