@@ -2147,6 +2147,20 @@ Perl_assign(pTHX_ OP *o, bool partial)
 	    assign(kid, partial);
 	break;
 
+    case OP_ARRAYEXPAND:
+	if ( ! partial )
+	    goto no_assign;
+	o->op_flags |= OPf_ASSIGN | OPf_ASSIGN_PART;
+	{
+	    OP* enter = newOP(OP_ENTER_ARRAYEXPAND_ASSIGN, 0, o->op_location);
+	    enter->op_sibling = cBINOPo->op_first;
+	    cBINOPo->op_first = enter;
+	    for (kid = enter->op_sibling; kid; kid = kid->op_sibling)
+		assign(kid, TRUE);
+	}
+	break;
+	break;
+
     case OP_ANONARRAY:
 	o->op_flags |= OPf_ASSIGN;
 	if (partial)

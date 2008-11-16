@@ -3798,7 +3798,42 @@ PP(pp_anonhash)
 
 PP(pp_expand)
 {
+    dSP;
+    if (SvHVOK(TOPs))
+	return Perl_pp_hashexpand();
+    else
+	return Perl_pp_arrayexpand();
+}
+
+PP(pp_enter_arrayexpand_assign)
+{
+    dSP;
+    SV** base = PL_stack_base + TOPMARK;
+    IV items = SP - base;
+    AV* av = av_2mortal(newAV());
+    IV i;
+    
+    for (i = 0; i < items ; i++) {
+	av_push(av, SvREFCNT_inc(POPs));
+    }
+
+    PUSHMARK(SP);
+    XPUSHs(AvSv(av));
+
+    RETURN;
+}
+
+PP(pp_arrayexpand)
+{
     dVAR; dSP;
+    OPFLAGS op_flags = PL_op->op_flags;
+    if (op_flags & OPf_ASSIGN) {
+	dMARK;
+	if ( MARK != SP )
+	    Perl_croak(aTHX_ "Array expansion assignment failed");
+	RETURN;
+    }
+
     dTOPss;
     const I32 gimme = GIMME_V;
 
@@ -3861,6 +3896,56 @@ PP(pp_expand)
 		XPUSHs(tmpstr);
 		PUTBACK;
 	    }
+	}
+    }
+
+    RETURN;
+}
+
+PP(pp_hashexpand)
+{
+    dVAR; dSP;
+    dTOPss;
+    const I32 gimme = GIMME_V;
+
+    do_arg_check(SP);
+
+    if (gimme == G_SCALAR)
+	Perl_croak(aTHX_ "expand operator may not be used in scalar context");
+
+    if ( ! SvHVOK(sv) ) {
+	if ( SvOK(sv) )
+	    Perl_croak(aTHX_ "%s operator may not be used upon a %s",
+		OP_DESC(PL_op), Ddesc(sv));
+	(void)POPs;
+	RETURN;
+    }
+
+    if (PL_op->op_flags & OPf_MOD && PL_op->op_flags & OPf_SPECIAL) {
+	/* lhs of an assignment is handled by pp_aassign */
+	RETURN;
+    }
+
+    if (gimme == G_ARRAY) {
+	HV* const hv = (HV*)sv;
+	register HE *entry;
+
+	(void)POPs;			/* XXXX May be optimized away? */
+
+	(void)hv_iterinit(hv);	/* reset iterator */
+
+	EXTEND(SP, HvKEYS(hv) * 2);
+
+	PUTBACK;	/* hv_iternext and hv_iterval might clobber stack_sp */
+	while ((entry = hv_iternext(hv))) {
+	    SV *tmpstr;
+	    SPAGAIN;
+	    XPUSHs(hv_iterkeysv(entry)); /* won't extend stack */
+	    PUTBACK;
+	    tmpstr = hv_iterval(hv,entry);
+	    SPAGAIN;
+	    XPUSHs(tmpstr);
+	    PUTBACK;
 	}
     }
 

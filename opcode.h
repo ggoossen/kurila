@@ -179,6 +179,9 @@ EXTCONST char* const PL_op_name[] = {
 	"anonhash",
 	"listlast",
 	"expand",
+	"arrayexpand",
+	"enter_arrayexpand_assign",
+	"hashexpand",
 	"nelems",
 	"splice",
 	"push",
@@ -537,6 +540,9 @@ EXTCONST char* const PL_op_desc[] = {
 	"anonymous hash (%())",
 	"listlast",
 	"expand",
+	"array expand",
+	"array expand assignment",
+	"hash expand",
 	"numer of elements",
 	"splice",
 	"push",
@@ -907,6 +913,9 @@ EXT Perl_ppaddr_t PL_ppaddr[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_pp_anonhash),
 	MEMBER_TO_FPTR(Perl_pp_listlast),
 	MEMBER_TO_FPTR(Perl_pp_expand),
+	MEMBER_TO_FPTR(Perl_pp_arrayexpand),
+	MEMBER_TO_FPTR(Perl_pp_enter_arrayexpand_assign),
+	MEMBER_TO_FPTR(Perl_pp_hashexpand),
 	MEMBER_TO_FPTR(Perl_pp_nelems),
 	MEMBER_TO_FPTR(Perl_pp_splice),
 	MEMBER_TO_FPTR(Perl_pp_push),
@@ -1274,6 +1283,9 @@ EXT Perl_check_t PL_check[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* anonhash */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* listlast */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* expand */
+	MEMBER_TO_FPTR(Perl_ck_fun),	/* arrayexpand */
+	MEMBER_TO_FPTR(Perl_ck_null),	/* enter_arrayexpand_assign */
+	MEMBER_TO_FPTR(Perl_ck_fun),	/* hashexpand */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* nelems */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* splice */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* push */
@@ -1635,6 +1647,9 @@ EXTCONST U32 PL_opargs[] = {
 	0x00004801,	/* anonhash */
 	0x00004805,	/* listlast */
 	0x00002200,	/* expand */
+	0x00002200,	/* arrayexpand */
+	0x00000000,	/* enter_arrayexpand_assign */
+	0x00002200,	/* hashexpand */
 	0x00002208,	/* nelems */
 	0x05326801,	/* splice */
 	0x0004691d,	/* push */
