@@ -4065,6 +4065,11 @@ Perl_yylex(pTHX)
 	    s += 2;
 	    OPERATOR(ANONARYL);
 	}
+	if (s[1] == '<') {
+	    /* array expand */
+	    s += 2;
+	    OPERATOR(ARRAYEXPAND);
+	}
 
 	PL_tokenbuf[0] = '@';
 	s = scan_ident(s, PL_bufend, PL_tokenbuf + 1, sizeof PL_tokenbuf - 1, FALSE);

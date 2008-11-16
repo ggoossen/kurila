@@ -112,7 +112,7 @@
 %left <i_tkval> ','
 %right <i_tkval> ASSIGNOP
 %right <i_tkval> TERNARY_IF TERNARY_ELSE
-%right <i_tkval> '<'
+%right <i_tkval> '<' ARRAYEXPAND
 %right ANONHSHL ANONARYL ANONSCALARL
 %nonassoc DOTDOT
 %left <i_tkval> OROR DORDOR
@@ -916,6 +916,10 @@ termunop : '-' term %prec UMINUS                       /* -$x */
 			}
 	|	'<' term                               /* <$x */
 			{ $$ = newUNOP(OP_EXPAND, 0, scalar($2), LOCATION($1));
+			  TOKEN_GETMAD($1,$$,'o');
+			}
+	|	ARRAYEXPAND term                               /* @< $x */
+			{ $$ = newUNOP(OP_ARRAYEXPAND, 0, scalar($2), LOCATION($1));
 			  TOKEN_GETMAD($1,$$,'o');
 			}
 	|	term POSTINC                           /* $x++ */
