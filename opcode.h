@@ -182,6 +182,7 @@ EXTCONST char* const PL_op_name[] = {
 	"arrayexpand",
 	"enter_arrayexpand_assign",
 	"hashexpand",
+	"enter_hashexpand_assign",
 	"nelems",
 	"splice",
 	"push",
@@ -543,6 +544,7 @@ EXTCONST char* const PL_op_desc[] = {
 	"array expand",
 	"array expand assignment",
 	"hash expand",
+	"hash expand assignment",
 	"numer of elements",
 	"splice",
 	"push",
@@ -916,6 +918,7 @@ EXT Perl_ppaddr_t PL_ppaddr[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_pp_arrayexpand),
 	MEMBER_TO_FPTR(Perl_pp_enter_arrayexpand_assign),
 	MEMBER_TO_FPTR(Perl_pp_hashexpand),
+	MEMBER_TO_FPTR(Perl_pp_enter_hashexpand_assign),
 	MEMBER_TO_FPTR(Perl_pp_nelems),
 	MEMBER_TO_FPTR(Perl_pp_splice),
 	MEMBER_TO_FPTR(Perl_pp_push),
@@ -1286,6 +1289,7 @@ EXT Perl_check_t PL_check[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* arrayexpand */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* enter_arrayexpand_assign */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* hashexpand */
+	MEMBER_TO_FPTR(Perl_ck_null),	/* enter_hashexpand_assign */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* nelems */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* splice */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* push */
@@ -1650,6 +1654,7 @@ EXTCONST U32 PL_opargs[] = {
 	0x00002200,	/* arrayexpand */
 	0x00000000,	/* enter_arrayexpand_assign */
 	0x00002200,	/* hashexpand */
+	0x00000000,	/* enter_hashexpand_assign */
 	0x00002208,	/* nelems */
 	0x05326801,	/* splice */
 	0x0004691d,	/* push */

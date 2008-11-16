@@ -95,30 +95,31 @@
      ASSIGNOP = 310,
      TERNARY_ELSE = 311,
      TERNARY_IF = 312,
-     ARRAYEXPAND = 313,
-     DORDOR = 314,
-     OROR = 315,
-     ANDAND = 316,
-     BITOROP = 317,
-     BITANDOP = 318,
-     SHIFTOP = 319,
-     MATCHOP = 320,
-     SREFGEN = 321,
-     UMINUS = 322,
-     POWOP = 323,
-     POSTDEC = 324,
-     POSTINC = 325,
-     PREDEC = 326,
-     PREINC = 327,
-     ASLICE = 328,
-     HSLICE = 329,
-     DEREFAMP = 330,
-     DEREFSTAR = 331,
-     DEREFHSH = 332,
-     DEREFARY = 333,
-     DEREFSCL = 334,
-     ARROW = 335,
-     PEG = 336
+     HASHEXPAND = 313,
+     ARRAYEXPAND = 314,
+     DORDOR = 315,
+     OROR = 316,
+     ANDAND = 317,
+     BITOROP = 318,
+     BITANDOP = 319,
+     SHIFTOP = 320,
+     MATCHOP = 321,
+     SREFGEN = 322,
+     UMINUS = 323,
+     POWOP = 324,
+     POSTDEC = 325,
+     POSTINC = 326,
+     PREDEC = 327,
+     PREINC = 328,
+     ASLICE = 329,
+     HSLICE = 330,
+     DEREFAMP = 331,
+     DEREFSTAR = 332,
+     DEREFHSH = 333,
+     DEREFARY = 334,
+     DEREFSCL = 335,
+     ARROW = 336,
+     PEG = 337
    };
 #endif
 /* Tokens.  */
@@ -177,30 +178,31 @@
 #define ASSIGNOP 310
 #define TERNARY_ELSE 311
 #define TERNARY_IF 312
-#define ARRAYEXPAND 313
-#define DORDOR 314
-#define OROR 315
-#define ANDAND 316
-#define BITOROP 317
-#define BITANDOP 318
-#define SHIFTOP 319
-#define MATCHOP 320
-#define SREFGEN 321
-#define UMINUS 322
-#define POWOP 323
-#define POSTDEC 324
-#define POSTINC 325
-#define PREDEC 326
-#define PREINC 327
-#define ASLICE 328
-#define HSLICE 329
-#define DEREFAMP 330
-#define DEREFSTAR 331
-#define DEREFHSH 332
-#define DEREFARY 333
-#define DEREFSCL 334
-#define ARROW 335
-#define PEG 336
+#define HASHEXPAND 313
+#define ARRAYEXPAND 314
+#define DORDOR 315
+#define OROR 316
+#define ANDAND 317
+#define BITOROP 318
+#define BITANDOP 319
+#define SHIFTOP 320
+#define MATCHOP 321
+#define SREFGEN 322
+#define UMINUS 323
+#define POWOP 324
+#define POSTDEC 325
+#define POSTINC 326
+#define PREDEC 327
+#define PREINC 328
+#define ASLICE 329
+#define HSLICE 330
+#define DEREFAMP 331
+#define DEREFSTAR 332
+#define DEREFHSH 333
+#define DEREFARY 334
+#define DEREFSCL 335
+#define ARROW 336
+#define PEG 337
 
 
 

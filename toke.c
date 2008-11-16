@@ -3452,9 +3452,14 @@ Perl_yylex(pTHX)
 	    OPERATOR(ANONHSH);
 	}
 	if (s[1] == ':' && s[2] != ':') {
-	    /* array constructor */
+	    /* hash constructor */
 	    s += 2;
 	    OPERATOR(ANONHSHL);
+	}
+	if (s[1] == '<') {
+	    /* hash expand */
+	    s += 2;
+	    OPERATOR(HASHEXPAND);
 	}
 
 	PL_tokenbuf[0] = '%';

@@ -807,6 +807,7 @@ expand		expand			ck_fun		1	S
 arrayexpand	array expand			ck_fun		1	S
 enter_arrayexpand_assign	array expand assignment			ck_null		0	
 hashexpand	hash expand			ck_fun		1	S
+enter_hashexpand_assign	hash expand assignment			ck_null		0	
 nelems		numer of elements	ck_fun		t1	S
 
 splice		splice			ck_fun		m@	A S? S? L
