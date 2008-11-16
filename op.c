@@ -1660,8 +1660,16 @@ S_my_kid(pTHX_ OP *o, OP **imopsp)
 #endif
 	       ) {
 	return o;
-    } else if (type == OP_EXPAND) {
+    }
+    else if (type == OP_EXPAND 
+	|| type == OP_HASHEXPAND
+	|| type == OP_ARRAYEXPAND) {
 	my_kid(cUNOPo->op_first, imopsp);
+    }
+    else if (type == OP_ANONARRAY) {
+        OP *kid;
+	for (kid = cLISTOPo->op_first; kid; kid = kid->op_sibling)
+	    my_kid(kid, imopsp);
     }
     else if (type == OP_RV2SV ||	/* "our" declaration */
 	       type == OP_RV2AV ||
