@@ -1136,7 +1136,6 @@
 #define ck_trunc		Perl_ck_trunc
 #define ck_unpack		Perl_ck_unpack
 #define is_handle_constructor	S_is_handle_constructor
-#define is_list_assignment	S_is_list_assignment
 #define cop_free		S_cop_free
 #define modkids			S_modkids
 #define scalarboolean		S_scalarboolean
@@ -1826,6 +1825,7 @@
 #define ck_defined		Perl_ck_defined
 #define ck_delete		Perl_ck_delete
 #define ck_die			Perl_ck_die
+#define ck_dotdotdot		Perl_ck_dotdotdot
 #define ck_eof			Perl_ck_eof
 #define ck_eval			Perl_ck_eval
 #define ck_exec			Perl_ck_exec
@@ -1874,6 +1874,7 @@
 #define pp_anoncode		Perl_pp_anoncode
 #define pp_anonhash		Perl_pp_anonhash
 #define pp_anonscalar		Perl_pp_anonscalar
+#define pp_arrayexpand		Perl_pp_arrayexpand
 #define pp_aslice		Perl_pp_aslice
 #define pp_atan2		Perl_pp_atan2
 #define pp_backtick		Perl_pp_backtick
@@ -1909,12 +1910,16 @@
 #define pp_dofile		Perl_pp_dofile
 #define pp_dor			Perl_pp_dor
 #define pp_dorassign		Perl_pp_dorassign
+#define pp_dotdotdot		Perl_pp_dotdotdot
 #define pp_dump			Perl_pp_dump
 #define pp_each			Perl_pp_each
 #define pp_egrent		Perl_pp_egrent
 #define pp_ehostent		Perl_pp_ehostent
 #define pp_enetent		Perl_pp_enetent
 #define pp_enter		Perl_pp_enter
+#define pp_enter_anonarray_assign	Perl_pp_enter_anonarray_assign
+#define pp_enter_arrayexpand_assign	Perl_pp_enter_arrayexpand_assign
+#define pp_enter_hashexpand_assign	Perl_pp_enter_hashexpand_assign
 #define pp_entereval		Perl_pp_entereval
 #define pp_enteriter		Perl_pp_enteriter
 #define pp_enterloop		Perl_pp_enterloop
@@ -1999,6 +2004,7 @@
 #define pp_gt			Perl_pp_gt
 #define pp_gv			Perl_pp_gv
 #define pp_gvsv			Perl_pp_gvsv
+#define pp_hashexpand		Perl_pp_hashexpand
 #define pp_helem		Perl_pp_helem
 #define pp_hex			Perl_pp_hex
 #define pp_hintseval		Perl_pp_hintseval
@@ -3291,7 +3297,6 @@
 #define ck_trunc(a)		Perl_ck_trunc(aTHX_ a)
 #define ck_unpack(a)		Perl_ck_unpack(aTHX_ a)
 #define is_handle_constructor	S_is_handle_constructor
-#define is_list_assignment(a)	S_is_list_assignment(aTHX_ a)
 #define cop_free(a)		S_cop_free(aTHX_ a)
 #define modkids(a,b)		S_modkids(aTHX_ a,b)
 #define scalarboolean(a)	S_scalarboolean(aTHX_ a)
@@ -3996,6 +4001,7 @@
 #define ck_defined(a)		Perl_ck_defined(aTHX_ a)
 #define ck_delete(a)		Perl_ck_delete(aTHX_ a)
 #define ck_die(a)		Perl_ck_die(aTHX_ a)
+#define ck_dotdotdot(a)		Perl_ck_dotdotdot(aTHX_ a)
 #define ck_eof(a)		Perl_ck_eof(aTHX_ a)
 #define ck_eval(a)		Perl_ck_eval(aTHX_ a)
 #define ck_exec(a)		Perl_ck_exec(aTHX_ a)
@@ -4044,6 +4050,7 @@
 #define pp_anoncode()		Perl_pp_anoncode(aTHX)
 #define pp_anonhash()		Perl_pp_anonhash(aTHX)
 #define pp_anonscalar()		Perl_pp_anonscalar(aTHX)
+#define pp_arrayexpand()	Perl_pp_arrayexpand(aTHX)
 #define pp_aslice()		Perl_pp_aslice(aTHX)
 #define pp_atan2()		Perl_pp_atan2(aTHX)
 #define pp_backtick()		Perl_pp_backtick(aTHX)
@@ -4079,12 +4086,16 @@
 #define pp_dofile()		Perl_pp_dofile(aTHX)
 #define pp_dor()		Perl_pp_dor(aTHX)
 #define pp_dorassign()		Perl_pp_dorassign(aTHX)
+#define pp_dotdotdot()		Perl_pp_dotdotdot(aTHX)
 #define pp_dump()		Perl_pp_dump(aTHX)
 #define pp_each()		Perl_pp_each(aTHX)
 #define pp_egrent()		Perl_pp_egrent(aTHX)
 #define pp_ehostent()		Perl_pp_ehostent(aTHX)
 #define pp_enetent()		Perl_pp_enetent(aTHX)
 #define pp_enter()		Perl_pp_enter(aTHX)
+#define pp_enter_anonarray_assign()	Perl_pp_enter_anonarray_assign(aTHX)
+#define pp_enter_arrayexpand_assign()	Perl_pp_enter_arrayexpand_assign(aTHX)
+#define pp_enter_hashexpand_assign()	Perl_pp_enter_hashexpand_assign(aTHX)
 #define pp_entereval()		Perl_pp_entereval(aTHX)
 #define pp_enteriter()		Perl_pp_enteriter(aTHX)
 #define pp_enterloop()		Perl_pp_enterloop(aTHX)
@@ -4169,6 +4180,7 @@
 #define pp_gt()			Perl_pp_gt(aTHX)
 #define pp_gv()			Perl_pp_gv(aTHX)
 #define pp_gvsv()		Perl_pp_gvsv(aTHX)
+#define pp_hashexpand()		Perl_pp_hashexpand(aTHX)
 #define pp_helem()		Perl_pp_helem(aTHX)
 #define pp_hex()		Perl_pp_hex(aTHX)
 #define pp_hintseval()		Perl_pp_hintseval(aTHX)

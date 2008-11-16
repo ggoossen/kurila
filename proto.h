@@ -4232,9 +4232,6 @@ STATIC bool	S_is_handle_constructor(const OP *o, I32 numargs)
 #define PERL_ARGS_ASSERT_IS_HANDLE_CONSTRUCTOR	\
 	assert(o)
 
-STATIC I32	S_is_list_assignment(pTHX_ const OP *o)
-			__attribute__warn_unused_result__;
-
 STATIC void	S_cop_free(pTHX_ COP *cop)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_COP_FREE	\
