@@ -656,6 +656,7 @@ substcont	substitution iterator	ck_null		dis|
 
 sassign		scalar assignment	ck_sassign	s0
 aassign		list assignment		ck_null		t2	L L
+dotdotdot		dotdotdot (...)	ck_dotdotdot	0
 
 chop		chop			ck_spair	mts%	L
 schop		scalar chop		ck_null		stu%	S?

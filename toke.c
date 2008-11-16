@@ -4110,10 +4110,10 @@ Perl_yylex(pTHX)
 		s++;
 		if (*s == tmp) {
 		    s++;
-		    pl_yylval.i_tkval.ival = OPf_SPECIAL;
+		    pl_yylval.opval = newOP(OP_DOTDOTDOT, 0, S_curlocation());
+		    TOKEN(THING);
 		}
-		else
-		    pl_yylval.i_tkval.ival = 0;
+		pl_yylval.i_tkval.ival = 0;
 		OPERATOR(DOTDOT);
 	    }
 	    if (PL_expect != XOPERATOR)

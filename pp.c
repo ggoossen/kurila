@@ -4506,6 +4506,18 @@ PP(unimplemented_op)
 	PL_op->op_type);
 }
 
+PP(pp_dotdotdot)
+{
+    OPFLAGS op_flags = PL_op->op_flags;
+    if ( ! ( op_flags & OPf_ASSIGN ) )
+	DIE(aTHX_ "%s must be part of an assignment", OP_DESC(PL_op));
+    {
+	dSP;
+	SP = PL_stack_base + TOPMARK;
+	RETURN;
+    }
+}
+
 /*
  * Local variables:
  * c-indentation-style: bsd
