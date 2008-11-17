@@ -199,7 +199,7 @@ overwritten.
 =cut
 
 sub echo {
-    my@($self, $text, $file, $appending) =  @_;
+    my@($self, $text, $file, ?$appending) =  @_;
     $appending ||= 0;
 
     my @cmds = map { '$(NOECHO) $(ECHO) '.$self->quote_literal($_) } 

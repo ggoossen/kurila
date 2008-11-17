@@ -178,7 +178,7 @@ returns the definition of the CCCMD macro which uses these parts.
 #'
 
 sub cflags {
-    my@($self,$libperl) =  @_;
+    my@($self, ?$libperl) =  @_;
     return $self->{?CFLAGS} if $self->{?CFLAGS};
     return '' unless $self->needs_linking();
 
@@ -188,17 +188,17 @@ sub cflags {
  
     %cflags{[qw(cc ccflags optimize shellflags)]}
 	=  %Config{[qw(cc ccflags optimize shellflags)]};
-    my@($optdebug) = "";
+    my $optdebug = "";
 
     %cflags{+shellflags} ||= '';
 
-    my@(%map) =@(  %(
+    my %map = %(
 		D =>   '-DDEBUGGING',
 		E =>   '-DEMBED',
 		DE =>  '-DDEBUGGING -DEMBED',
 		M =>   '-DEMBED -DMULTIPLICITY',
 		DM =>  '-DDEBUGGING -DEMBED -DMULTIPLICITY',
-		));
+		);
 
     if ($libperl =~ m/libperl(\w*)\Q$self->{?LIB_EXT}/){
 	$uc = uc($1);
@@ -283,7 +283,7 @@ definition in CONST_CCCMD.
 =cut
 
 sub const_cccmd {
-    my@($self,$libperl)=  @_;
+    my @($self,?$libperl)=  @_;
     return $self->{?CONST_CCCMD} if $self->{?CONST_CCCMD};
     return '' unless $self->needs_linking();
     return $self->{+CONST_CCCMD} =
@@ -485,7 +485,7 @@ Same as macro for the depend attribute.
 sub depend {
     my@($self,%< %attribs) =  @_;
     my(@m,$key,$val);
-    while (@($key,$val) =@( each %attribs)){
+    while (@(?$key,?$val) =@( each %attribs)){
 	last unless defined $key;
 	push @m, "$key : $val\n";
     }
@@ -2269,7 +2269,7 @@ Defines the linkext target which in turn defines the LINKTYPE.
 sub linkext {
     my@($self, %< %attribs) =  @_;
     # LINKTYPE => static or dynamic or ''
-    my@($linktype) = defined %attribs{?LINKTYPE} ??
+    my $linktype = defined %attribs{?LINKTYPE} ??
       %attribs{?LINKTYPE} !! '$(LINKTYPE)';
     "
 linkext :: $linktype
@@ -2306,7 +2306,7 @@ into the Makefile.
 sub macro {
     my@($self,%< %attribs) =  @_;
     my(@m,$key,$val);
-    while (@($key,$val) =@( each %attribs)){
+    while (@(?$key,?$val) =@( each %attribs)){
 	last unless defined $key;
 	push @m, "$key = $val\n";
     }
@@ -2737,8 +2737,8 @@ sub pasthru {
     my@($self) =@( shift);
     my(@m);
 
-    my(@pasthru);
-    my@($sep) = %Is{?VMS} ?? ',' !! '';
+    my @pasthru;
+    my $sep = %Is{?VMS} ?? ',' !! '';
     $sep .= "\\\n\t";
 
     foreach my $key (qw(LIB LIBPERL_A LINKTYPE OPTIMIZE
@@ -3001,7 +3001,7 @@ PPD_OUT
         }
     }
 
-    my @($bin_location) = $self->{?BINARY_LOCATION} || '';
+    my $bin_location = $self->{?BINARY_LOCATION} || '';
     $bin_location =~ s/\\/\\\\/g;
 
     $ppd_xml .= sprintf <<'PPD_XML', $bin_location;

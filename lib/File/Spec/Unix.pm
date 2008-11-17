@@ -364,8 +364,8 @@ sub abs2rel {
 	@($path, $base) =  map { $self->catdir('/', $_) } @( $path, $base);
     }
 
-    my @($path_volume) =  $self->splitpath($path, 1);
-    my @($base_volume) =  $self->splitpath($base, 1);
+    my @($path_volume, ...) =  $self->splitpath($path, 1);
+    my @($base_volume, ...) =  $self->splitpath($base, 1);
 
     # Can't relativize across volumes
     return $path unless $path_volume eq $base_volume;
@@ -432,7 +432,7 @@ Based on code written by Shigio Yamaguchi.
 =cut
 
 sub rel2abs {
-    my @($self,$path,$base ) =  @_;
+    my @($self,$path,?$base ) =  @_;
 
     # Clean up $path
     if ( ! $self->file_name_is_absolute( $path ) ) {

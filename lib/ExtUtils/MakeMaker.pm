@@ -964,7 +964,7 @@ sub neatvalue {
     }
     return dump::view($v) unless $t eq 'HASH';
     my(@m, $key, $val);
-    while (@($key,$val) =@( each %$v)){
+    while (@(?$key,?$val) =@( each %$v)){
         last unless defined $key; # cautious programming in case (undef,undef) is true
         push(@m,"$key=>".neatvalue($val)) ;
     }

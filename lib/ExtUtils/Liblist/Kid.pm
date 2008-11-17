@@ -21,7 +21,7 @@ sub ext {
 }
 
 sub _unix_os2_ext {
-    my@($self,$potential_libs, $verbose, $give_libs) =  @_;
+    my @($self,$potential_libs, $verbose, ?$give_libs) =  @_;
     $verbose ||= 0;
 
     if ($^O =~ 'os2' and config_value("perllibs")) { 
