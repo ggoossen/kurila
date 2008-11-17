@@ -157,7 +157,7 @@ sub plan {
 
     my $max=0;
     while ((nelems @_)) {
-	my @($k,$v) = splice@(@_, 0, 2);
+	my @($k,$v) = @: splice(@_, 0, 2);
 	if ($k =~ m/^test(s)?$/) { $max = $v; }
 	elsif ($k eq 'todo' or
 	       $k eq 'failok') { for ( @$v) { %todo{+$_}=1; }; }
@@ -354,7 +354,7 @@ sub ok ($;$$) {
     local($\,$,);   # guard against -l and other things that screw with
                     # print
 
-    my @($pkg,$file,$line) = caller@($TestLevel);
+    my @($pkg,$file,$line, ...) = @: caller($TestLevel);
     my $repetition = ++%history{+"$file:$line"};
     my $context = ("$file at line $line".
 		   ($repetition +> 1 ?? " fail \#$repetition" !! ''));
@@ -378,7 +378,7 @@ sub ok ($;$$) {
 	    $ok = $result =~ m/$expected/;
             $regex = $expected;
 	} elsif (($regex) = ($expected =~ m,^ / (.+) / $,sx) or
-	    @(undef, $regex) = @($expected =~ m,^ m([^\w\s]) (.+) \1 $,sx)) {
+                   @(?_, ?$regex) = @($expected =~ m,^ m([^\w\s]) (.+) \1 $,sx)) {
 	    $ok = $result =~ m/$regex/;
 	} else {
 	    $ok = $result eq $expected;

@@ -882,7 +882,7 @@ some alternate order, use B<parse_text> instead.
 =cut
 
 sub interpolate {
-    my@($self, $text, $line_num) =  @_;
+    my@($self, $text, ?$line_num) =  @_;
     my %parse_opts = %( expand_seq => 'interior_sequence' );
     my $ptree = $self->parse_text( \%parse_opts, $text, $line_num );
     return  join "", $ptree->children();
@@ -1146,7 +1146,7 @@ This method does I<not> usually need to be overridden by subclasses.
 sub parse_from_file {
     my $self = shift;
     my %opts = %( (ref @_[0] eq 'HASH') ?? < %{ shift() } !! () );
-    my @($infile, $outfile) =  @_;
+    my @($infile, ?$outfile) =  @_;
     my ($in_fh,  $out_fh);
     my @($close_input, $close_output) = @(0, 0);
     local *myData = $self;

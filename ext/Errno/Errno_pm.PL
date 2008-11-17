@@ -273,7 +273,7 @@ sub write_errno_pm {
 
 	while( ~< *CPPO) {
 	    my($name,$expr);
-	    next unless @($name, $expr) = m/"(.*?)"\s*\[\s*\[\s*(.*?)\s*\]\s*\]/;
+	    next unless @(?$name, ?$expr) = @: m/"(.*?)"\s*\[\s*\[\s*(.*?)\s*\]\s*\]/;
 	    next if $name eq $expr;
 	    $expr =~ s/\(?\([a-z_]\w*\)([^\)]*)\)?/$1/i; # ((type)0xcafebabe) at alia
 	    $expr =~ s/((?:0x)?[0-9a-fA-F]+)[LU]+\b/$1/g; # 2147483647L et alia
@@ -399,7 +399,7 @@ ESQ
 sub TIEHASH { bless \@() }
 
 sub FETCH {
-    my ($self, $errname) = < @_;
+    my @($self, $errname) = @_;
     my $errno = "";
     if ( exists %name2no{$errname}) {
         $errno = %name2no{$errname};
@@ -426,7 +426,7 @@ sub FIRSTKEY {
 }
 
 sub EXISTS {
-    my ($self, $errname) = < @_;
+    my @($self, $errname) = @_;
     return exists %name2no{$errname};
 }
 

@@ -968,7 +968,7 @@ sub _find_dir($$$) {
 		    $tmp = '[' . ('-' x ($CdLvl-$Level)) . ']';
 		}
 		else {
-		    $tmp = join('/', @(('..') x ($CdLvl-$Level)));
+		    $tmp = join('/', @('..') x ($CdLvl-$Level));
 		}
 		die "Can't cd to $tmp from $dir_name"
 		    unless chdir ($tmp);

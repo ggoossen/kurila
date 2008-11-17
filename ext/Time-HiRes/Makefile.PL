@@ -41,8 +41,8 @@ use File::Spec;
 sub try_compile_and_link {
     my @($c, %< %args) =  @_;
 
-    my @($ok) = 0;
-    my @($tmp) = "tmp$$";
+    my $ok = 0;
+    my $tmp = "tmp$$";
     local(*TMPC);
 
     my $obj_ext = config_value("obj_ext") || ".o";
@@ -60,7 +60,7 @@ sub try_compile_and_link {
 
 	if (%ENV{?PERL_CORE}) {
 	    my $updir = File::Spec->updir;
-	    $COREincdir = File::Spec->catdir(($updir) x 2);
+	    $COREincdir = File::Spec->catdir(< $: @($updir) x 2);
 	} else {
 	    $COREincdir = File::Spec->catdir(config_value('archlibexp'), 'CORE');
 	}
@@ -321,7 +321,7 @@ EOM
 }
 
 sub DEFINE {
-    my @($def, $val) =  @_;
+    my @($def, ?$val) =  @_;
     my $define = defined $val ?? "$def=$val" !! $def ;
     unless ($DEFINE =~ m/(?:^| )-D\Q$define\E(?: |$)/) {
 	$DEFINE .= " -D$define";

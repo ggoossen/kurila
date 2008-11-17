@@ -124,7 +124,7 @@ sub pod_find
     %opts{+verbose} ||= 0;
     %opts{+perl}    ||= 0;
 
-    my @(@search) = @_;
+    my @search = @_;
 
     if(%opts{?script}) {
         require Config;
@@ -180,7 +180,7 @@ sub pod_find
     my %names;
     my $pwd = cwd();
 
-    foreach my $try ( @search) {
+    foreach my $try (@search) {
         unless(File::Spec->file_name_is_absolute($try)) {
             # make path absolute
             $try = File::Spec->catfile($pwd,$try);

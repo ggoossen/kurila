@@ -160,9 +160,7 @@ If you call plan(), don't call any of the other methods below.
 =cut
 
 sub plan {
-    my@($self, $cmd, $arg) =  @_;
-
-    return unless $cmd;
+    my @($self, $cmd, ?$arg) =  @_;
 
     local $Level = $Level + 1;
 
@@ -386,7 +384,7 @@ ERR
         my $msg = $todo ?? "Failed (TODO)" !! "Failed";
         $self->_print_diag("\n") if %ENV{?HARNESS_ACTIVE};
 
-    my@(undef, $file, $line) =  $self->caller;
+    my@(_, $file, $line) =  $self->caller;
         if( defined $name ) {
             $self->diag(qq[  $msg test '$name'\n]);
             $self->diag(qq[  at $file line $line.\n]);
@@ -637,7 +635,7 @@ DIAGNOSTIC
 sub _caller_context {
     my $self = shift;
 
-    my@($pack, $file, $line) =  $self->caller(1);
+    my @($pack, $file, $line, ...) =  $self->caller(1);
 
     my $code = '';
     $code .= "#line $line $file\n" if defined $file and defined $line;
@@ -826,7 +824,7 @@ sub maybe_regex {
     }
     # Check for '/foo/' or 'm,foo,'
     elsif( @($re, $opts)        = $regex =~ m{^ /(.*)/ (\w*) $ }sx           or
-           @(undef, $re, $opts) = $regex =~ m,^ m([^\w\s]) (.+) \1 (\w*) $,sx
+           @(_, $re, $opts) = @: $regex =~ m,^ m([^\w\s]) (.+) \1 (\w*) $,sx
          )
     {
         $usable_regex = length $opts ?? "(?$opts)$re" !! $re;
@@ -964,7 +962,7 @@ To be polite to other functions wrapping your own you usually want to increment 
 =cut
 
 sub level {
-    my@($self, $level) =  @_;
+    my@($self, ?$level) =  @_;
 
     if( defined $level ) {
         $Level = $level;
@@ -997,7 +995,7 @@ Defaults to on.
 =cut
 
 sub use_numbers {
-    my@($self, $use_nums) =  @_;
+    my@($self, ?$use_nums) =  @_;
 
     if( defined $use_nums ) {
         $self->{+Use_Nums} = $use_nums;
@@ -1034,7 +1032,7 @@ foreach my $attribute (qw(No_Header No_Ending No_Diag)) {
     my $method = lc $attribute;
 
     my $code = sub {
-        my@($self, $no) =  @_;
+        my@($self, ?$no) =  @_;
 
         if( defined $no ) {
             $self->{+$attribute} = $no;
@@ -1192,7 +1190,7 @@ Defaults to STDOUT.
 =cut
 
 sub output {
-    my@($self, $fh) =  @_;
+    my@($self, ?$fh) =  @_;
 
     if( defined $fh ) {
         $self->{+Out_FH} = $self->_new_fh($fh);
@@ -1447,14 +1445,14 @@ what $pack to use.
 =cut
 
 sub todo {
-    my@($self, $pack) =  @_;
+    my @($self, ?$package) =  @_;
 
     return $self->{?TODO} if defined $self->{?TODO};
 
-    $pack = $pack || $self->caller(1)[0] || $self->exported_to;
-    return 0 unless $pack;
+    $package = $package || $self->caller(1)[0] || $self->exported_to;
+    return 0 unless $package;
 
-    return defined ${*{Symbol::fetch_glob($pack.'::TODO')}} ?? ${*{Symbol::fetch_glob($pack.'::TODO')}}
+    return defined ${*{Symbol::fetch_glob($package.'::TODO')}} ?? ${*{Symbol::fetch_glob($package.'::TODO')}}
                                      !! 0;
 }
 
@@ -1501,7 +1499,7 @@ sub _sanity_check {
     my $self = shift;
 
     $self->_whoa($self->{?Curr_Test} +< 0,  'Says here you ran a negative number of tests!');
-    $self->_whoa(!$self->{?Have_Plan} and $self->{?Curr_Test}, 
+    $self->_whoa((!$self->{?Have_Plan} and $self->{?Curr_Test}),
           'Somehow your tests ran without a plan!');
     $self->_whoa($self->{?Curr_Test} != nelems @{ $self->{?Test_Results} },
           'Somehow you got a different number of results than tests ran!');
@@ -1518,7 +1516,7 @@ a note to contact the author.
 =cut
 
 sub _whoa {
-    my@($self, $check, $desc) =  @_;
+    my @($self, $check, $desc) =  @_;
     if( $check ) {
         local $Level = $Level + 1;
         die(<<"WHOA");

@@ -159,7 +159,7 @@ If an argument has been given, it is pushed on the list of items.
 
 # The individual =items of this list
 sub item {
-    my @($self,$item) =  @_;
+    my @($self, ?$item) =  @_;
     if(defined $item) {
         push(@{$self->{_items}}, $item);
         return $item;

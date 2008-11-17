@@ -678,7 +678,7 @@ collapsed to a single blank.
 =cut
 
 sub node {
-    my @($self,$text) =  @_;
+    my @($self, ?$text) =  @_;
     if(defined $text) {
         $text =~ s/\s+$//s; # strip trailing whitespace
         $text =~ s/\s+/ /gs; # collapse whitespace
@@ -703,7 +703,7 @@ of whitespace is collapsed to a single blank.
 
 # set/return index entries of current POD
 sub idx {
-    my @($self,$text) =  @_;
+    my @($self,?$text) =  @_;
     if(defined $text) {
         $text =~ s/\s+$//s; # strip trailing whitespace
         $text =~ s/\s+/ /gs; # collapse whitespace

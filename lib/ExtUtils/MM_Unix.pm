@@ -1752,8 +1752,8 @@ sub init_others {	# --- Initialize Other Attributes
 	my @libs = $self->extliblist($libs);
 	if (@libs[0] or @libs[1] or @libs[2]){
 	    # LD_RUN_PATH now computed by ExtUtils::Liblist
-	    @($self->{+EXTRALIBS},  $self->{+BSLOADLIBS}, 
-             $self->{+LDLOADLIBS}, $self->{+LD_RUN_PATH}) =  @libs;
+	    @($self->{+EXTRALIBS},  $self->{+BSLOADLIBS},
+             $self->{+LDLOADLIBS}, $self->{+LD_RUN_PATH}, ...) =  @libs;
 	    last;
 	}
     }

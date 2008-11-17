@@ -99,7 +99,7 @@ sub bulk_process {
     my $lines = 0;
     while( my $line = ~< $fh ) {
         chomp $line;
-        my @($file) =  split m/\s+/, $line;
+        my @($file, ...) =  split m/\s+/, $line;
 
         $lines++;
 

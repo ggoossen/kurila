@@ -303,7 +303,7 @@ start with C<#> in the C<MANIFEST> file are discarded.
 =cut
 
 sub maniread {
-    my @($mfile) =  @_;
+    my @(?$mfile) =  @_;
     $mfile ||= $MANIFEST;
     my $read = \%();
     my $m;
@@ -316,7 +316,7 @@ sub maniread {
         chomp;
         next if m/^\s*#/;
 
-        my@($file, $comment) = m/^(\S+)\s*(.*)/;
+        my @($file, $comment) = @: m/^(\S+)\s*(.*)/;
         next unless $file;
 
         if ($Is_MacOS) {
