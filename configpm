@@ -127,7 +127,7 @@ ENDOFBEG
 
 my $myver = $^V;
 
-$config_txt .= sprintf <<'ENDOFBEG', ($myver) x 3;
+$config_txt .= sprintf <<'ENDOFBEG', < @($myver) x 3;
 # This file was created by configpm when Perl was built. Any changes
 # made to this file will be lost the next time perl is built.
 

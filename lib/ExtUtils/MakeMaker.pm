@@ -16,7 +16,7 @@ my @Prepend_parent;
 my %Recognized_Att_Keys;
 
 our $VERSION = '6.44';
-our @($Revision) = q$Revision: 54639 $ =~ m/Revision:\s+(\S+)/;
+our @($Revision, ...) = @: q$Revision: 54639 $ =~ m/Revision:\s+(\S+)/;
 our $Filename = __FILE__;   # referenced outside MakeMaker
 
 our @ISA = qw(Exporter);
@@ -96,14 +96,14 @@ my %Special_Sigs = %(
  test       => 'HASH',
 );
 
- %Att_Sigs{[keys %Recognized_Att_Keys]} = ('') x (nelems(%Recognized_Att_Keys)/2);
- %Att_Sigs{[keys %Special_Sigs]} =  values %Special_Sigs;
+ %Att_Sigs{[keys %Recognized_Att_Keys]} = @('') x (nelems(%Recognized_Att_Keys)/2);
+ %Att_Sigs{[keys %Special_Sigs]} = values %Special_Sigs;
 
 
 sub _verify_att {
     my@($att) =  @_;
 
-    while( my@($key, $val) =@( each %$att) ) {
+    while( my @(?$key, ?$val) = @( each %$att) ) {
         my $sig = %Att_Sigs{?$key};
         unless( defined $sig ) {
             warn "WARNING: $key is not a known parameter.\n";
@@ -173,7 +173,7 @@ sub eval_in_subdirs {
     push @INC, '.';     # '.' has to always be at the end of @INC
 
     foreach my $dir ( @{$self->{DIR}}){
-        my@($abs) = $self->catdir@($pwd,$dir);
+        my $abs = $self->catdir($pwd,$dir);
         try { $self->eval_in_x($abs); };
         last if $@;
     }
@@ -299,7 +299,7 @@ sub full_setup {
     push @Overridable, "postamble";
  
     # All sections are valid keys.
-    %Recognized_Att_Keys{[ @MM_Sections]} = (1) x nelems @MM_Sections;
+    %Recognized_Att_Keys{[ @MM_Sections]} = @(1) x nelems @MM_Sections;
 
     # we will use all these variables in the Makefile
     @Get_from_Config = 
@@ -664,7 +664,7 @@ sub check_manifest {
     require ExtUtils::Manifest;
     # avoid warning
     $ExtUtils::Manifest::Quiet = $ExtUtils::Manifest::Quiet = 1;
-    my@(@missed) = ExtUtils::Manifest::manicheck@();
+    my @missed = ExtUtils::Manifest::manicheck();
     if ((nelems @missed)) {
         print STDOUT "Warning: the following files are missing in your kit:\n";
         print "\t", join "\n\t", @missed;
@@ -756,7 +756,7 @@ sub check_hints {
     return unless -d $hint_dir;
 
     # First we look for the best hintsfile we have
-    my@($hint)="$($^O)_%Config{?osvers}";
+    my $hint="$($^O)_%Config{?osvers}";
     $hint =~ s/\./_/g;
     $hint =~ s/_$//;
     return unless $hint;

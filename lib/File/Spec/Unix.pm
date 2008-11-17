@@ -250,7 +250,7 @@ The results can be passed to L</catpath()> to get back a path equivalent to
 =cut
 
 sub splitpath {
-    my @($self,$path, $nofile) =  @_;
+    my @($self,$path, ?$nofile) =  @_;
 
     my @($volume,$directory,$file) = @('','','');
 
@@ -351,7 +351,7 @@ Based on code written by Shigio Yamaguchi.
 =cut
 
 sub abs2rel {
-    my@($self,$path,$base) =  @_;
+    my @($self,$path,?$base) =  @_;
     $base = $self->_cwd() unless defined $base and length $base;
 
     @($path, $base) =  map { $self->canonpath($_) } @( $path, $base);
