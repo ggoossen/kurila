@@ -127,16 +127,15 @@ sub geniosym () {
 sub ungensym ($) {}
 
 sub qualify ($;$) {
-    my @($name) =  @_;
+    my @($name, ? $pkg) =  @_;
     ref \$name eq "GLOB" and Carp::confess("glob..." . ref $name);
     if (!ref($name) && index($name, '::') == -1 && index($name, "'") == -1) {
-	my $pkg;
 	# Global names: special character, "^xyz", or other. 
 	if ($name =~ m/^(([^a-z])|(\^[a-z_]+))\z/i || %global{?$name}) {
 	    $pkg = "";
 	}
 	else {
-	    $pkg = ((nelems @_) +> 1) ?? @_[1] !! caller;
+	    $pkg //= caller;
 	}
 	$name = $pkg . "::" . $name;
     }

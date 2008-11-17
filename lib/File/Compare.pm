@@ -21,7 +21,7 @@ sub compare {
     croak("Usage: compare( file1, file2 [, buffersize]) ")
       unless((nelems @_) == 2 || (nelems @_) == 3);
 
-    my @($from,$to,$size) =  @_;
+    my @($from,$to,?$size) =  @_;
     my $text_mode = defined($size) && (ref($size) eq 'CODE' || $size +< 0);
 
     my ($fromsize,$closefrom,$closeto);
