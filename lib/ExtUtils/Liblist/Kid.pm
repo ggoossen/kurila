@@ -34,8 +34,8 @@ sub _unix_os2_ext {
     return  @("", "", "", "",  @($give_libs ?? \@() !! ())) unless $potential_libs;
     warn "Potential libraries are '$potential_libs':\n" if $verbose;
 
-    my@($so)   = config_value@("so");
-    my@($libs) = defined config_value("perllibs") 
+    my $so   = config_value("so");
+    my $libs = defined config_value("perllibs") 
       ?? config_value("perllibs") !! config_value("libs");
     my $Config_libext = config_value("lib_ext") || ".a";
 
@@ -50,19 +50,19 @@ sub _unix_os2_ext {
     my(@libs, %libs_seen);
     my($fullname, @fullname);
     my $pwd = cwd(); # from Cwd.pm
-    my@($found) = 0;
+    my $found = 0;
 
     foreach my $thislib (split ' ', $potential_libs) {
 
 	# Handle possible linker path arguments.
 	if ($thislib =~ s/^(-[LR]|-Wl,-R)//){	# save path flag type
-	    my@($ptype) = $1;
+	    my $ptype = $1;
 	    unless (-d $thislib){
 		warn "$ptype$thislib ignored, directory does not exist\n"
 			if $verbose;
 		next;
 	    }
-	    my@($rtype) = $ptype;
+	    my $rtype = $ptype;
 	    if (($ptype eq '-R') or ($ptype eq '-Wl,-R')) {
 		if (config_value('lddlflags') =~ m/-Wl,-R/) {
 		    $rtype = '-Wl,-R';
@@ -86,7 +86,7 @@ sub _unix_os2_ext {
 	  next;
 	}
 
-	my@($found_lib)=0;
+	my $found_lib=0;
 	foreach my $thispth ( @( <@searchpath, < @libpath)) {
 
 		# Try to find the full name of the library.  We need this to

@@ -80,7 +80,7 @@ sub type_to_C_value {
      );
 %type_temporary{+$_} = \@($_) foreach qw(IV UV NV);
      
-while (my @($type, $value) =@( each %XS_TypeSet)) {
+while (my @(?$type, ?$value) =@( each %XS_TypeSet)) {
     %type_num_args{+$type}
 	= defined $value ?? ref $value ?? scalar nelems @$value !! 1 !! 0;
 }

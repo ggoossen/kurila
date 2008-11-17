@@ -814,6 +814,8 @@ STATIC SV* S_dump_op_flags(pTHX_ const OP* o)
 	sv_catpv(tmpsv, ",MOD");
     if (o->op_flags & OPf_ASSIGN)
 	sv_catpv(tmpsv, ",ASSIGN");
+    if (o->op_flags & OPf_ASSIGN_PART)
+	sv_catpv(tmpsv, ",ASSIGN_PART");
     if (o->op_flags & OPf_SPECIAL)
 	sv_catpv(tmpsv, ",SPECIAL");
     if (o->op_latefree)

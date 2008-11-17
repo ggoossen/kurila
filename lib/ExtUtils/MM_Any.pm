@@ -560,7 +560,7 @@ sub dir_target {
 
     my $make = '';
     foreach my $dir ( @dirs) {
-        $make .= sprintf <<'MAKE', ($dir) x 7;
+        $make .= sprintf <<'MAKE', < (@($dir) x 7);
 %s$(DFSEP).exists :: Makefile.PL
 	$(NOECHO) $(MKPATH) %s
 	$(NOECHO) $(CHMOD) 755 %s
@@ -883,7 +883,7 @@ NOOP_FRAG
 
     foreach my $dir ( @{$self->{DIR}}) {
         foreach my $makefile (@('$(MAKEFILE_OLD)', '$(FIRST_MAKEFILE)') ) {
-            my $subrclean .= $self->oneliner(sprintf <<'CODE', $dir, ($makefile) x 2);
+            my $subrclean .= $self->oneliner(sprintf <<'CODE', $dir, < (@($makefile) x 2));
 chdir '%s';  system '$(MAKE) $(USEMAKEFILE) %s realclean' if -f '%s';
 CODE
 
@@ -1144,7 +1144,7 @@ sub init_INSTALL_from_PREFIX {
 
     if( $self->{?PREFIX} ) { 
         %{$self}{[qw(PERLPREFIX SITEPREFIX VENDORPREFIX)]} =
-          ('$(PREFIX)') x 3;
+          @('$(PREFIX)') x 3;
     }
     else {
         $self->{+PERLPREFIX}   ||= $iprefix;

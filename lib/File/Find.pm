@@ -429,7 +429,7 @@ our ($wanted_callback, $avoid_nlink, $bydepth, $no_chdir, $follow,
     $pre_process, $post_process, $dangling_symlinks);
 
 sub contract_name {
-    my ($cdir,$fn) = < @_;
+    my @($cdir,$fn) = @_;
 
     return substr($cdir,0,rindex($cdir,'/')) if $fn eq $File::Find::current_dir;
 
@@ -448,7 +448,7 @@ sub contract_name {
 
 # return the absolute name of a directory or file
 sub contract_name_Mac {
-    my ($cdir,$fn) = < @_;
+    my @($cdir,$fn) = @_;
     my $abs_name;
 
     if ($fn =~ m/^(:+)(.*)$/) { # valid pathname starting with a ':'
@@ -494,7 +494,7 @@ sub contract_name_Mac {
 }
 
 sub PathCombine($$) {
-    my ($Base,$Name) = < @_;
+    my @($Base,$Name) = @_;
     my $AbsName;
 
     if ($Is_MacOS) {
@@ -529,10 +529,10 @@ sub PathCombine($$) {
 }
 
 sub Follow_SymLink($) {
-    my ($AbsName) = < @_;
+    my @($AbsName) = @_;
 
     my ($NewName,$DEV, $INO);
-    ($DEV, $INO)= lstat $AbsName;
+    @($DEV, $INO, ...) = lstat $AbsName;
 
     while (-l _) {
 	if (%SLnkSeen{+ $DEV . "," . $INO}++) {
@@ -555,7 +555,7 @@ sub Follow_SymLink($) {
 	else {
 	    $AbsName= $NewName;
 	}
-	($DEV, $INO) = lstat($AbsName);
+	@($DEV, $INO, ...) = lstat($AbsName);
 	return undef unless defined $DEV;  #  dangling symbolic link
     }
 
@@ -640,7 +640,7 @@ sub _find_opt {
     foreach my $TOP ( @_) {
 	my $top_item = $TOP;
 
-	($topdev,$topino,$topmode,$topnlink) = $follow ?? stat $top_item !! lstat $top_item;
+	@($topdev,$topino,$topmode,$topnlink, ...) = @: $follow ?? stat $top_item !! lstat $top_item;
 
 	if ($Is_MacOS) {
 	    $top_item = ":$top_item"
@@ -718,12 +718,12 @@ sub _find_opt {
 	}
 
 	unless ($Is_Dir) {
-	    unless (($_,$dir) = < File::Basename::fileparse($abs_dir)) {
+	    unless (@(?$_,?$dir) = File::Basename::fileparse($abs_dir)) {
 		if ($Is_MacOS) {
-		    ($dir,$_) = (':', $top_item); # $File::Find::dir, $_
+		    @($dir,$_) = @(':', $top_item); # $File::Find::dir, $_
 		}
 		else {
-		    ($dir,$_) = ('./', $top_item);
+		    @($dir,$_) = @('./', $top_item);
 		}
 	    }
 
@@ -775,8 +775,8 @@ sub _find_opt {
 #  chdir (if not no_chdir) to dir
 
 sub _find_dir($$$) {
-    my ($wanted, $p_dir, $nlink) = < @_;
-    my ($CdLvl,$Level) = (0,0);
+    my @($wanted, $p_dir, $nlink) = @_;
+    my @($CdLvl,$Level) = @(0,0);
     my @Stack;
     my @filenames;
     my ($subcount,$sub_nlink);
@@ -958,7 +958,7 @@ sub _find_dir($$$) {
     }
     continue {
 	while ( defined ($SE = pop @Stack) ) {
-	    ($Level, $p_dir, $dir_rel, $nlink) = < @$SE;
+	    @($Level, $p_dir, $dir_rel, $nlink) = @$SE;
 	    if ($CdLvl +> $Level && !$no_chdir) {
 		my $tmp;
 		if ($Is_MacOS) {
@@ -1045,7 +1045,7 @@ sub _find_dir($$$) {
 #  chdir (if not no_chdir) to dir
 
 sub _find_dir_symlnk($$$) {
-    my ($wanted, $dir_loc, $p_dir) = < @_; # $dir_loc is the absolute directory
+    my @($wanted, $dir_loc, $p_dir) = @_; # $dir_loc is the absolute directory
     my @Stack;
     my @filenames;
     my $new_loc;
@@ -1205,7 +1205,7 @@ sub _find_dir_symlnk($$$) {
     }
     continue {
 	while (defined($SE = pop @Stack)) {
-	    ($dir_loc, $updir_loc, $p_dir, $dir_rel, $byd_flag) = < @$SE;
+	    @($dir_loc, $updir_loc, $p_dir, $dir_rel, $byd_flag) = @$SE;
 	    if ($Is_MacOS) {
 		# $p_dir always has a trailing ':', except for the starting dir,
 		# where $dir_rel eq ':'

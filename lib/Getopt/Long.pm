@@ -116,9 +116,9 @@ sub import {
 ################ Initialization ################
 
 # Values for $order. See GNU getopt.c for details.
-@($REQUIRE_ORDER, $PERMUTE, $RETURN_IN_ORDER) = @( <0..2);
+@($REQUIRE_ORDER, $PERMUTE, $RETURN_IN_ORDER) = 0..2;
 # Version major/minor numbers.
-@($major_version, $minor_version) = $VERSION =~ m/^(\d+)\.(\d+)/;
+@($major_version, $minor_version) = @: $VERSION =~ m/^(\d+)\.(\d+)/;
 
 ConfigDefaults();
 
@@ -463,7 +463,7 @@ sub GetOptionsFromArray($@) {
     if ( $debug ) {
 	my ($arrow, $k, $v);
 	$arrow = "=> ";
-	while ( @($k,$v) = each@(%opctl) ) {
+	while ( @($k,$v) = @: each(%opctl) ) {
 	    print STDERR ($arrow, "\%opctl\{$k\} = $(dump::view($v)) ",
                           dump::view(OptCtl($v)), "\n");
 	    $arrow = "   ";
@@ -491,7 +491,7 @@ sub GetOptionsFromArray($@) {
 	my $arg;		# option argument
 	my $ctl;		# the opctl entry
 
-	@($found, $opt, $ctl, $arg, $key) = 
+	@(?$found, ?$opt, ?$ctl, ?$arg, ?$key) =
 	  FindOption ($argv, $prefix, $argend, $opt, \%opctl);
 
 	if ( $found ) {
@@ -810,8 +810,8 @@ sub ParseOptionSpec ($$) {
                     $dest,0,1);
     }
     else {
-	my @($mand, $type, $dest) =
-	  $spec =~ m/^([=:])([ionfs])([@%])?(\{(\d+)?(,)?(\d+)?\})?$/;
+	my @($mand, $type, $dest, ...) =
+	  @: $spec =~ m/^([=:])([ionfs])([@%])?(\{(\d+)?(,)?(\d+)?\})?$/;
 	return  @(undef, "Cannot repeat while bundling: \"$opt\"\n")
 	  if $bundling && defined($4);
 	my @($mi, $cm, $ma) = @($5, $6, $7);
@@ -1067,9 +1067,10 @@ sub FindOption ($$$$$) {
     # Get key if this is a "name=value" pair for a hash option.
     my $key;
     if ($ctl->[CTL_DEST] == CTL_DEST_HASH && defined $arg) {
-	@($key, $arg) = ($arg =~ m/^([^=]*)=(.*)$/s) ?? ($1, $2)
-	  !! ($arg, defined($ctl->[CTL_DEFAULT]) ?? $ctl->[CTL_DEFAULT] !!
-	     ($mand ?? undef !! ($type eq 's' ?? "" !! 1)));
+	@($key, $arg) = ($arg =~ m/^([^=]*)=(.*)$/s)
+          ?? @($1, $2)
+	  !! @($arg, defined($ctl->[CTL_DEFAULT]) ?? $ctl->[CTL_DEFAULT] !!
+                 ($mand ?? undef !! ($type eq 's' ?? "" !! 1)));
 	if (! defined $arg) {
 	    warn ("Option $opt, key \"$key\", requires a value\n");
 	    $error++;
@@ -1238,7 +1239,7 @@ sub ValidValue ($$$$$) {
 
 # Getopt::Long Configuration.
 sub Configure (@) {
-    my @(@options) = @_;
+    my @options = @_;
 
     my $prevconfig =
       \@( $error, $debug, $major_version, $minor_version,

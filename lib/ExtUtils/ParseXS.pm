@@ -66,7 +66,7 @@ our $SymSet;
 sub process_file {
   
   # Allow for $package->process_file(%hash) in the future
-  my @($pkg, %< %args) = (nelems @_) % 2 ?? < @_ !! (__PACKAGE__, < @_);
+  my @($pkg, %< %args) = (nelems @_) % 2 ?? @_ !! @(__PACKAGE__, < @_);
   
   $ProtoUsed = exists %args{prototypes};
   
@@ -196,7 +196,7 @@ sub process_file {
 	TrimWhitespace($_) ;
 	# skip blank lines and comment lines
 	next if m/^$/ or m/^#/ ;
-	my@($type,$kind, $proto) = m/^\s*(.*?\S)\s+(\S+)\s*($proto_re*)\s*$/ or
+	my @($type,$kind, $proto) = @: m/^\s*(.*?\S)\s+(\S+)\s*($proto_re*)\s*$/ or
 	  warn("Warning: File '$typemap' Line $($line_no-1) '$line' TYPEMAP entry needs 2 or 3 columns\n"), next;
 	$type = TidyType($type) ;
 	%type_kind{+$type} = $kind ;
@@ -240,7 +240,7 @@ sub process_file {
   foreach my $key (keys %output_expr) {
     BEGIN { $^H ^|^= 0x00200000 }; # Equivalent to: use re 'eval', but hardcoded so we can compile re.xs
 
-    my @($t, $with_size, $arg, $sarg) =
+    my @(?$t, ?$with_size, ?$arg, ?$sarg) =
       @(%output_expr{?$key} =~
        m[^ \s+ sv_set ( [iunp] ) v (n)?	# Type, is_setpvn
 	 \s* \( \s* $cast \$arg \s* ,
@@ -310,8 +310,8 @@ firstmodule:
       die ("Error: Unterminated pod in $filename, line $podstartline\n")
 	unless $lastline;
     }
-    last if @($Package, $Prefix) =
-      m/^MODULE\s*=\s*[\w:]+(?:\s+PACKAGE\s*=\s*([\w:]+))?(?:\s+PREFIX\s*=\s*(\S+))?\s*$/;
+    last if @(?$Package, ?$Prefix) =
+      @: m/^MODULE\s*=\s*[\w:]+(?:\s+PACKAGE\s*=\s*([\w:]+))?(?:\s+PREFIX\s*=\s*(\S+))?\s*$/;
     
     print $_;
   }
@@ -472,15 +472,15 @@ sub process_para {
 	my @fns = keys %{@XSStack[-1]->{?functions} || \%()};
 	if ($statement ne 'endif') { 
 	  # Hide the functions defined in other #if branches, and reset.
-	  %{@XSStack[-1]->{+other_functions}}{[ @fns]} = (1) x nelems @fns;
+	  %{@XSStack[-1]->{+other_functions}}{[ @fns]} = @(1) x nelems @fns;
  	  %{@XSStack[-1]}{[qw(varname functions)]} = @('', \%());
 	} else {
-	  my@($tmp) = pop@(@XSStack);
+	  my $tmp = pop(@XSStack);
 	  0 while (--$XSS_work_idx
 		   && @XSStack[$XSS_work_idx]->{?type} ne 'if');
 	  # Keep all new defined functions
 	  push(@fns, < keys %{$tmp->{?other_functions} || \%()});
- 	  %{@XSStack[$XSS_work_idx]->{+functions}}{[ @fns]} = (1) x nelems @fns;
+ 	  %{@XSStack[$XSS_work_idx]->{+functions}}{[ @fns]} = @(1) x nelems @fns;
 	}
       }
     }
@@ -591,8 +591,8 @@ sub process_para {
 	for ( @args ) {
 	  s/^\s+//;
 	  s/\s+$//;
-	  my @($arg, $default) = m/ ( [^=]* ) ( (?: = .* )? ) /x;
-	  my @($pre, $name) = @($arg =~ m/(.*?) \s*
+	  my @($arg, $default) = @: m/ ( [^=]* ) ( (?: = .* )? ) /x;
+	  my @(?$pre, ?$name) = @($arg =~ m/(.*?) \s*
 					     \b ( \w+ | length\( \s*\w+\s* \) )
 					     \s* $ /x);
 	  next unless defined($pre) && length($pre);
@@ -997,7 +997,7 @@ EOF
     if (%XsubAliases) {
       %XsubAliases{+$pname} = 0
 	unless defined %XsubAliases{?$pname} ;
-      while ( @($name, $value) =@( each %XsubAliases)) {
+      while ( @(?$name, ?$value) =@( each %XsubAliases)) {
 	push(@InitFileCode, Q(<<"EOF"));
 #        cv = newXS(\"$name\", XS_$Full_func_name, file);
 #        XSANY.any_i32 = $value ;
@@ -1045,8 +1045,10 @@ sub standard_typemap_locations {
   my @tm = qw(typemap);
   
   my $updir = File::Spec->updir;
-  foreach my $dir (@(File::Spec->catdir(($updir) x 1), File::Spec->catdir(($updir) x 2),
-		   File::Spec->catdir(($updir) x 3), File::Spec->catdir(($updir) x 4))) {
+  foreach my $dir (@(File::Spec->catdir(< $: @($updir) x 1),
+                     File::Spec->catdir(< $: @($updir) x 2),
+                     File::Spec->catdir(< $: @($updir) x 3),
+                     File::Spec->catdir(< $: @($updir) x 4))) {
     
     unshift @tm, File::Spec->catfile($dir, 'typemap');
     unshift @tm, File::Spec->catfile($dir, lib => ExtUtils => 'typemap');
@@ -1158,7 +1160,7 @@ sub INPUT_handler {
     $var_init =~ s/"/\\"/g;
 
     s/\s+/ /g;
-    my @($var_type, $var_addr, $var_name) = m/^(.*?[^&\s])\s*(\&?)\s*\b(\w+)$/s
+    my @($var_type, $var_addr, $var_name) = @: m/^(.*?[^&\s])\s*(\&?)\s*\b(\w+)$/s
       or blurt("Error: invalid argument declaration '$line'"), next;
 
     # Check for duplicate definitions
@@ -1214,7 +1216,7 @@ sub OUTPUT_handler {
       $DoSetMagic = ($1 eq "ENABLE" ?? 1 !! 0);
       next;
     }
-    my @($outarg, $outcode) = m/^\s*(\S+)\s*(.*?)\s*$/s ;
+    my @($outarg, $outcode) = @: m/^\s*(\S+)\s*(.*?)\s*$/s ;
     blurt ("Error: duplicate OUTPUT argument '$outarg' ignored"), next
       if %outargs{+$outarg} ++ ;
     if (!$gotRETVAL and $outarg eq 'RETVAL') {
@@ -1288,7 +1290,7 @@ sub INIT_handler()    { print_section() }
 sub GetAliases
   {
     my @($line) =  @_ ;
-    my @($orig) = $line ;
+    my $orig = $line ;
     my ($alias) ;
     my ($value) ;
 
@@ -1366,7 +1368,7 @@ sub FALLBACK_handler()
 sub REQUIRE_handler ()
   {
     # the rest of the current line should contain a version number
-    my @($Ver) = $_ ;
+    my $Ver = $_ ;
 
     TrimWhitespace($Ver) ;
 
@@ -1680,8 +1682,9 @@ sub fetch_para {
 }
 
 sub output_init {
-  local@($type, $num, $var, $init, $name_printed) =  @_;
-  local($arg) = "ST(" . ($num - 1) . ")";
+  local ($type, $num, $var, $init, $name_printed);
+  @($type, $num, $var, $init, $name_printed) =  @_;
+  local ($arg) = "ST(" . ($num - 1) . ")";
 
   if (  $init =~ m/^=/  ) {
       my $x_init = evalqq($init);
@@ -1735,7 +1738,7 @@ sub evalqq {
 }
 
 sub generate_init {
-  local@($type, $num, $var) =  @_;
+  local@($type, $num, $var, ...) = @_;
   local($arg) = "ST(" . ($num - 1) . ")";
   local($argoff) = $num - 1;
   local($ntype);
@@ -1811,7 +1814,7 @@ sub generate_init {
 }
 
 sub generate_output {
-  local@($type, $num, $var, $do_setmagic, $do_push) =  @_;
+  local@($type, $num, $var, $do_setmagic, ?$do_push) =  @_;
   local($arg) = "ST(" . ($num - ($num != 0)) . ")";
   local($argoff) = $num - 1;
   local($ntype);
@@ -1884,7 +1887,7 @@ sub generate_output {
 }
 
 sub map_type {
-  my@($type, $varname) =  @_;
+  my @($type, ?$varname) =  @_;
   
   # C++ has :: in types too so skip this
   $type =~ s/:/_/g unless $hiertype;
