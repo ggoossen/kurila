@@ -3583,7 +3583,8 @@ PP(pp_hslice)
     dVAR; dSP;
     register HV * const hv = (HV*)POPs;
     AV * slice = (AV*)POPs;
-    register const I32 lval = (PL_op->op_flags & OPf_MOD);
+    const OPFLAGS op_flags = PL_op->op_flags;
+    register const I32 lval = (op_flags & OPf_MOD);
     const bool localizing = PL_op->op_private & OPpLVAL_INTRO;
     bool other_magic = FALSE;
     SV ** sliceitem;
@@ -3608,6 +3609,46 @@ PP(pp_hslice)
 
     if ( ! SvAVOK(slice) )
 	Perl_croak(aTHX_ "%s expected an ARRAY but got %s", OP_DESC(PL_op), Ddesc(AvSv(slice)));
+
+    if (op_flags & OPf_ASSIGN) {
+	SV* newv;
+	AV* ret;
+	IV i;
+	bool partial = (op_flags & OPf_ASSIGN_PART) ? 1 : 0;
+	if (partial) {
+	    if (PL_stack_base + TOPMARK >= SP) {
+		if ( ! (op_flags & OPf_OPTIONAL) )
+		    Perl_croak(aTHX_ "Missing required assignment value");
+		newv = &PL_sv_undef;
+	    } 
+	    else
+		newv = POPs;
+	}
+	else {
+	    newv = POPs;
+	}
+
+	if (partial) {
+	    ret = av_2mortal(newAV());
+	}
+	sliceitem = AvARRAY(slice);
+	if (!sliceitem)
+	    RETURN;
+	slicemax = sliceitem + av_len(slice);
+
+	i = 0;
+	while (sliceitem <= slicemax) {
+	    SV** newitem = av_fetch(newv, i, 0);
+	    HE* he = hv_store_ent(hv, *sliceitem, *newitem, 0);
+	    if (partial) {
+		av_push(ret, he ? HeVAL(he) : &PL_sv_undef);
+	    }
+	    i++;
+	    sliceitem++;
+	}
+	XPUSHs(ret);
+	RETURN;
+    }
 
     slice = av_mortalcopy(slice);
     XPUSHs(AvSv(slice));
