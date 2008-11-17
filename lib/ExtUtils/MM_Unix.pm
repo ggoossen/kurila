@@ -1468,7 +1468,7 @@ sub init_PM {
 
     # Avoid $_ wherever possible:
     # @{$self->{PMLIBDIRS}} = grep -d && !$dir{$_}, @{$self->{PMLIBDIRS}};
-    my @(@pmlibdirs) = @{$self->{?PMLIBDIRS}};
+    my @pmlibdirs = @{$self->{?PMLIBDIRS}};
     @{$self->{PMLIBDIRS}} = @( () );
     my %dir = %( < map { ($_ => $_) } @{$self->{DIR}} );
     foreach my $pmlibdir ( @pmlibdirs) {
@@ -1557,8 +1557,8 @@ sub init_main {
 
     # Copied from DynaLoader:
 
-    my@(@modparts) = split@(m/::/,$self->{?NAME});
-    my@($modfname) = @modparts[-1];
+    my @modparts = split(m/::/,$self->{?NAME});
+    my $modfname = @modparts[-1];
 
     # Some systems have restrictions on files names for DLL's etc.
     # mod2fname returns appropriate file base name (typically truncated)
@@ -1567,7 +1567,7 @@ sub init_main {
         $modfname = &DynaLoader::mod2fname(\@modparts);
     }
 
-    @($self->{+PARENT_NAME}, $self->{+BASEEXT}) = $self->{?NAME} =~ m!(?:([\w:]+)::)?(\w+)\z! ;
+    @($self->{+PARENT_NAME}, $self->{+BASEEXT}) = @: $self->{?NAME} =~ m!(?:([\w:]+)::)?(\w+)\z! ;
     $self->{+PARENT_NAME} ||= '';
 
     if (defined &DynaLoader::mod2fname) {
@@ -1749,7 +1749,7 @@ sub init_others {	# --- Initialize Other Attributes
 
     foreach my $libs (  @{$self->{LIBS}} ){
 	$libs =~ s/^\s*(.*\S)\s*$/$1/; # remove leading and trailing whitespace
-	my@(@libs) = $self->extliblist@($libs);
+	my @libs = $self->extliblist($libs);
 	if (@libs[0] or @libs[1] or @libs[2]){
 	    # LD_RUN_PATH now computed by ExtUtils::Liblist
 	    @($self->{+EXTRALIBS},  $self->{+BSLOADLIBS}, 
@@ -2215,7 +2215,7 @@ sub installbin {
 
     my %fromto;
     for my $from ( @exefiles) {
-	my@($path)= $self->catfile@('$(INST_SCRIPT)', basename($from));
+	my $path= $self->catfile('$(INST_SCRIPT)', basename($from));
 
 	local($_) = $path; # for backwards compatibility
 	my $to = $self->libscan($path);
@@ -2285,8 +2285,8 @@ all entries in the directory that match the regular expression.
 =cut
 
 sub lsdir {
-    my@($self) =@( shift);
-    my@($dir, $regex) =  @_;
+    my $self = shift;
+    my @($dir, ?$regex) =  @_;
     my(@ls);
     my $dh = DirHandle->new();
     $dh->open($dir || ".") or return ();
@@ -3570,7 +3570,7 @@ sub tool_xsubpp {
         }
     }
     push(@tmdeps, "typemap") if -f "typemap";
-    my@(@tmargs) = map@("-typemap $_", @tmdeps);
+    my @tmargs = map("-typemap $_", @tmdeps);
     if( exists $self->{XSOPT} ){
         unshift( @tmargs, $self->{?XSOPT} );
     }

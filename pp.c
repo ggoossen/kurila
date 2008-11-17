@@ -1383,55 +1383,17 @@ PP(pp_repeat)
     }
     else
 	 count = SvIV(sv);
-    if (GIMME == G_ARRAY && PL_op->op_private & OPpREPEAT_DOLIST) {
-	dMARK;
-	static const char oom_list_extend[] = "Out of memory during list extend";
-	const I32 items = SP - MARK;
-	const I32 max = items * count;
-
-	MEM_WRAP_CHECK_1(max, SV*, oom_list_extend);
-	/* Did the max computation overflow? */
-	if (items > 0 && max > 0 && (max < items || max < count))
-	   Perl_croak(aTHX_ oom_list_extend);
-	MEXTEND(MARK, max);
-	if (count > 1) {
-	    while (SP > MARK) {
-#if 0
-	      /* This code was intended to fix 20010809.028:
-
-	         $x = 'abcd';
-		 for (($x =~ /./g) x 2) {
-		     print chop; # "abcdabcd" expected as output.
-		 }
-
-	       * but that change (#11635) broke this code:
-
-	       $x = [("foo")x2]; # only one "foo" ended up in the anonlist.
-
-	       * I can't think of a better fix that doesn't introduce
-	       * an efficiency hit by copying the SVs. The stack isn't
-	       * refcounted, and mortalisation obviously doesn't
-	       * Do The Right Thing when the stack has more than
-	       * one pointer to the same mortal value.
-	       * .robin.
-	       */
-		if (*SP) {
-		    *SP = sv_2mortal(newSVsv(*SP));
-		    SvREADONLY_on(*SP);
-		}
-#else
-               if (*SP)
-		   SvTEMP_off((*SP));
-#endif
-		SP--;
+    if (SvAVOK(TOPs)) {
+	AV* src = SvAv(POPs);
+	AV* dst = av_2mortal(newAV());
+	const IV len = av_len(src);
+	IV i;
+	for ( ; count > 0 ; count--) {
+	    for (i=0; i<=len; i++) {
+		av_push(dst, newSVsv(*av_fetch(src, i, 0)));
 	    }
-	    MARK++;
-	    repeatcpy((char*)(MARK + items), (char*)MARK,
-		items * sizeof(SV*), count - 1);
-	    SP += max;
 	}
-	else if (count <= 0)
-	    SP -= items;
+	PUSHs(AvSv(dst));
     }
     else {	/* Note: mark already snarfed by pp_list */
 	SV * const tmpstr = POPs;
@@ -3612,6 +3574,7 @@ PP(pp_hslice)
 
     if (op_flags & OPf_ASSIGN) {
 	SV* newv;
+	AV* newav;
 	AV* ret;
 	IV i;
 	bool partial = (op_flags & OPf_ASSIGN_PART) ? 1 : 0;
@@ -3627,6 +3590,10 @@ PP(pp_hslice)
 	else {
 	    newv = POPs;
 	}
+	if ( ! SvAVOK(newv))
+	    Perl_croak(aTHX_ "Value of hash slice must be ARRAY not %s",
+		Ddesc(newv));
+	newav = SvAv(newv);
 
 	if (partial) {
 	    ret = av_2mortal(newAV());
@@ -3638,9 +3605,9 @@ PP(pp_hslice)
 
 	i = 0;
 	while (sliceitem <= slicemax) {
-	    SV** newitem = av_fetch(newv, i, 0);
+	    SV** newitem = av_fetch(newav, i, 0);
 	    HE* he = hv_store_ent(hv, *sliceitem,
-		newitem ? *newitem : &PL_sv_undef,
+		newitem ? newSVsv(*newitem) : &PL_sv_undef,
 		0);
 	    if (partial) {
 		av_push(ret, he ? HeVAL(he) : &PL_sv_undef);
@@ -3648,7 +3615,7 @@ PP(pp_hslice)
 	    i++;
 	    sliceitem++;
 	}
-	XPUSHs(ret);
+	XPUSHs(AvSv(ret));
 	RETURN;
     }
 
@@ -3812,11 +3779,14 @@ PP(pp_anonarray)
 	    Perl_croak(aTHX_ "Got extra value(s) in %s assignment", OP_DESC(PL_op));
 	RETURN;
     }
-    dORIGMARK;
-    SV * const av = (SV *) av_make(items, MARK+1);
-    SP = ORIGMARK;		/* av_make() might realloc stack_sp */
 
-    mXPUSHs( av );
+    {
+	dORIGMARK;
+	SV * const av = (SV *) av_make(items, MARK+1);
+	SP = ORIGMARK;		/* av_make() might realloc stack_sp */
+
+	mXPUSHs( av );
+    }
     RETURN;
 }
 
@@ -3898,6 +3868,7 @@ PP(pp_arrayexpand)
 {
     dVAR; dSP;
     OPFLAGS op_flags = PL_op->op_flags;
+
     if (op_flags & OPf_ASSIGN) {
 	dMARK;
 	if ( MARK != SP )
@@ -3905,28 +3876,28 @@ PP(pp_arrayexpand)
 	RETURN;
     }
 
-    dTOPss;
-    const I32 gimme = GIMME_V;
+    {
+	dTOPss;
+	const I32 gimme = GIMME_V;
 
-    do_arg_check(SP);
+	do_arg_check(SP);
 
-    if (gimme == G_SCALAR)
-	Perl_croak(aTHX_ "expand operator may not be used in scalar context");
+	if (gimme == G_SCALAR)
+	    Perl_croak(aTHX_ "expand operator may not be used in scalar context");
 
-    if ( ! (SvAVOK(sv) || SvHVOK(sv)) ) {
-	if ( SvOK(sv) )
-	    Perl_croak(aTHX_ "expand operator may not be used upon a %s", Ddesc(sv));
-	(void)POPs;
-	RETURN;
-    }
+	if ( ! (SvAVOK(sv) ) ) {
+	    if ( SvOK(sv) )
+		Perl_croak(aTHX_ "expand operator may not be used upon a %s", Ddesc(sv));
+	    (void)POPs;
+	    RETURN;
+	}
 
-    if (PL_op->op_flags & OPf_MOD && PL_op->op_flags & OPf_SPECIAL) {
-	/* lhs of an assignment is handled by pp_aassign */
-	RETURN;
-    }
+	if (PL_op->op_flags & OPf_MOD && PL_op->op_flags & OPf_SPECIAL) {
+	    /* lhs of an assignment is handled by pp_aassign */
+	    RETURN;
+	}
 
-    if (gimme == G_ARRAY) {
-	if (SvTYPE(sv) == SVt_PVAV) {
+	if (gimme == G_ARRAY) {
 	    AV *const av = (AV*)sv;
 	    const I32 maxarg = AvFILL(av) + 1;
 	    (void)POPs;			/* XXXX May be optimized away? */
@@ -3946,7 +3917,45 @@ PP(pp_arrayexpand)
 	    }
 	    SP += maxarg;
 	}
-	else if (SvTYPE(sv) == SVt_PVHV) {
+    }
+
+    RETURN;
+}
+
+PP(pp_hashexpand)
+{
+    dVAR; dSP;
+    OPFLAGS op_flags = PL_op->op_flags;
+    if (op_flags & OPf_ASSIGN) {
+	dMARK;
+	if ( MARK != SP )
+	    Perl_croak(aTHX_ "Array expansion assignment failed");
+	RETURN;
+    }
+
+    {
+	dTOPss;
+	const I32 gimme = GIMME_V;
+
+	do_arg_check(SP);
+
+	if (gimme == G_SCALAR)
+	    Perl_croak(aTHX_ "expand operator may not be used in scalar context");
+
+	if ( ! SvHVOK(sv) ) {
+	    if ( SvOK(sv) )
+		Perl_croak(aTHX_ "%s operator may not be used upon a %s",
+		    OP_DESC(PL_op), Ddesc(sv));
+	    (void)POPs;
+	    RETURN;
+	}
+
+	if (PL_op->op_flags & OPf_MOD && PL_op->op_flags & OPf_SPECIAL) {
+	    /* lhs of an assignment is handled by pp_aassign */
+	    RETURN;
+	}
+
+	if (gimme == G_ARRAY) {
 	    HV* const hv = (HV*)sv;
 	    register HE *entry;
 
@@ -3967,63 +3976,6 @@ PP(pp_arrayexpand)
 		XPUSHs(tmpstr);
 		PUTBACK;
 	    }
-	}
-    }
-
-    RETURN;
-}
-
-PP(pp_hashexpand)
-{
-    dVAR; dSP;
-    OPFLAGS op_flags = PL_op->op_flags;
-    if (op_flags & OPf_ASSIGN) {
-	dMARK;
-	if ( MARK != SP )
-	    Perl_croak(aTHX_ "Array expansion assignment failed");
-	RETURN;
-    }
-    dTOPss;
-    const I32 gimme = GIMME_V;
-
-    do_arg_check(SP);
-
-    if (gimme == G_SCALAR)
-	Perl_croak(aTHX_ "expand operator may not be used in scalar context");
-
-    if ( ! SvHVOK(sv) ) {
-	if ( SvOK(sv) )
-	    Perl_croak(aTHX_ "%s operator may not be used upon a %s",
-		OP_DESC(PL_op), Ddesc(sv));
-	(void)POPs;
-	RETURN;
-    }
-
-    if (PL_op->op_flags & OPf_MOD && PL_op->op_flags & OPf_SPECIAL) {
-	/* lhs of an assignment is handled by pp_aassign */
-	RETURN;
-    }
-
-    if (gimme == G_ARRAY) {
-	HV* const hv = (HV*)sv;
-	register HE *entry;
-
-	(void)POPs;			/* XXXX May be optimized away? */
-
-	(void)hv_iterinit(hv);	/* reset iterator */
-
-	EXTEND(SP, HvKEYS(hv) * 2);
-
-	PUTBACK;	/* hv_iternext and hv_iterval might clobber stack_sp */
-	while ((entry = hv_iternext(hv))) {
-	    SV *tmpstr;
-	    SPAGAIN;
-	    XPUSHs(hv_iterkeysv(entry)); /* won't extend stack */
-	    PUTBACK;
-	    tmpstr = hv_iterval(hv,entry);
-	    SPAGAIN;
-	    XPUSHs(tmpstr);
-	    PUTBACK;
 	}
     }
 
@@ -4688,7 +4640,6 @@ PP(pp_placeholder)
     if ( ! ( op_flags & OPf_ASSIGN ) )
 	DIE(aTHX_ "%s must be part of an assignment", OP_DESC(PL_op));
     if (op_flags & OPf_ASSIGN_PART) {
-	SV* src;
 	if (PL_stack_base + TOPMARK >= SP) {
 	    if ( ! (op_flags & OPf_OPTIONAL) )
 		Perl_croak(aTHX_ "Missing required assignment value");

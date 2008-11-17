@@ -1277,7 +1277,7 @@ sub init_INSTALL_from_PREFIX {
                       );
 
     my %layouts = %(< %bin_layouts, < %man_layouts, < %lib_layouts);
-    while( my@($var, $layout) = each@(%layouts) ) {
+    while( my @(?$var, ?$layout) = @: each(%layouts) ) {
         my@($s, $t, $d, $style) =  %{$layout}{[qw(s t d style)]};
         my $r = '$('.%type2prefix{?$t}.')';
 

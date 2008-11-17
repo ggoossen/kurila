@@ -1655,6 +1655,8 @@ S_my_kid(pTHX_ OP *o, OP **imopsp)
 	for (kid = cLISTOPo->op_first; kid; kid = kid->op_sibling)
 	    my_kid(kid, imopsp);
     } else if (type == OP_UNDEF
+	|| type == OP_DOTDOTDOT
+	|| type == OP_PLACEHOLDER
 #ifdef PERL_MAD
 	       || type == OP_STUB
 #endif

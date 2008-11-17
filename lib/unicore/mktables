@@ -267,7 +267,7 @@ sub Build_Aliases()
 	s/\s+$//;
 	next if m/^$/;
 
-	my @($abbrev, $name) =  split m/\s*;\s*/;
+	my @($abbrev, $name, ...) = split m/\s*;\s*/;
         next if $abbrev eq "n/a";
 	%PropertyAlias{+$abbrev} = $name;
         %PA_reverse{+$name} = $abbrev;
@@ -938,11 +938,11 @@ sub UnicodeData_Txt()
             $digit,     ## digit value
             $number,    ## numeric value
             $mirrored,  ## mirrored
-            $unicode10, ## name in Unicode 1.0
-            $comment,   ## comment field
-            $upper,     ## uppercase mapping
-            $lower,     ## lowercase mapping
-            $title,     ## titlecase mapping
+            ?$unicode10, ## name in Unicode 1.0
+            ?$comment,   ## comment field
+            ?$upper,     ## uppercase mapping
+            ?$lower,     ## lowercase mapping
+            ?$title,     ## titlecase mapping
               ) =  split(m/\s*;\s*/);
 
 	# Note that in Unicode 3.2 there will be names like
@@ -1266,7 +1266,7 @@ sub EastAsianWidth_txt()
 
 	my @($hexcodes, $pv) =  split(m/\s*;\s*/);
         %EAW{+$pv} ||= Table->New(Is => "EastAsianWidth$pv");
-      my @($start, $end) =  split(m/\.\./, $hexcodes);
+      my @($start, ?$end) =  split(m/\.\./, $hexcodes);
       if (defined $end) {
         %EAW{?$pv}->AppendRange(hex($start), hex($end));
       } else {
@@ -1816,7 +1816,7 @@ sub WriteAllMappings()
                 my $Desc = %TableDesc{$Type}->{?$Name} || "";
                 ## get list of names this table is reference by
                 my @Supported = @( $Name );
-                while (my @($Orig, $Alias) =@( each %{ %AliasInfo{?$Type} || \%() }))
+                while (my @(?$Orig, ?$Alias) = @( each %{ %AliasInfo{?$Type} || \%() }))
                 {
                     if ($Orig eq $Name) {
                         push @Supported, $Alias;
@@ -1980,7 +1980,7 @@ sub SpecialCasing_txt()
         s/\#.*//;
         s/\s+$//;
 
-        my @($code, $lower, $title, $upper, $condition) =  split(m/\s*;\s*/);
+        my @($code, $lower, $title, $upper, ? $condition) =  split(m/\s*;\s*/);
 
         if ($condition) { # not implemented yet
             print "# SKIPPING $_\n" if $Verbose;
