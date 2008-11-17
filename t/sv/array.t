@@ -69,7 +69,7 @@ is($F2, 'is');
 is($Etc, 'the time');
 
 $foo = 'lskjdf';
-ok(!($cnt = (@($F1,$F2,$Etc) = @($foo =~ m/^(\S+)\s+(\S+)\s*(.*)/))))
+ok(!($cnt = (@(?$F1,?$F2,?$Etc) = @($foo =~ m/^(\S+)\s+(\S+)\s*(.*)/))))
    or diag("$cnt $F1:$F2:$Etc");
 
 %foo = %('blurfl','dyick','foo','bar','etc.','etc.');
@@ -113,7 +113,7 @@ is($foo, 'acebdf');
 @foo = @foo;
 is((join ' ', @foo), "foo bar burbl blah");				# 38
 
-@(undef,@<@foo) =  @foo;
+@(_,@<@foo) =  @foo;
 is((join ' ', @foo), "bar burbl blah");					# 39
 
 @foo = @('XXX',< @foo, 'YYY');
@@ -159,7 +159,7 @@ do {
     my @bee = @bee;
     is((join ' ',@bee), "foo bar burbl blah");				# 54
     do {
-	my @(undef,@<@bee) =  @bee;
+	my @(_,@<@bee) =  @bee;
 	is((join ' ',@bee), "bar burbl blah");				# 55
 	do {
 	    my @bee = @('XXX',< @bee,'YYY');
@@ -186,7 +186,7 @@ do {
     our @bee = @bee;
     is((join ' ',@bee), "foo bar burbl blah");
     do {
-	our @(undef,@<@bee) =  @bee;
+	our @(_,@<@bee) =  @bee;
 	is((join ' ',@bee), "bar burbl blah");
 	do {
 	    our @bee = @('XXX',< @bee,'YYY');

@@ -27,8 +27,8 @@ sub has_version {
 }
 
 sub has_attr {
-    my@($proto) =@( shift);
-    my@($class) = ref $proto || $proto;
+    my $proto = shift;
+    my $class = ref $proto || $proto;
     return exists $Fattr->{$class};
 }
 

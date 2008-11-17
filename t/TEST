@@ -70,7 +70,7 @@ my $curdir = File::Spec->curdir;
 my $updir  = File::Spec->updir;
 
 sub _find_tests {
-    my($dir) = < @_;
+    my @($dir) = @_;
     opendir my $dirh, $dir or die "Trouble opening $dir: $!";
     foreach my $f (sort { $a cmp $b } @( readdir $dirh)) {
 	next if $f eq $curdir or $f eq $updir or
@@ -85,7 +85,7 @@ sub _find_tests {
 }
 
 sub _quote_args {
-    my ($args) = < @_;
+    my @($args) = @_;
     my $argstring = '';
 
     foreach (split(m/\s+/,$args)) {
@@ -210,7 +210,7 @@ else {
 }
 
 sub _testprogs {
-    my ($type, $args, < @tests) = < @_;
+    my @($type, $args, @< @tests) = @_;
 
     print <<'EOT' if ($type eq 'deparse');
 ------------------------------------------------------------------------------
@@ -388,7 +388,7 @@ EOT
 			}
 			$seen_ok = 1;
 			$next++;
-			my($not, $num, $extra, $istodo) = ($1, $2, $3, 0);
+			my @($not, $num, $extra, $istodo) = @($1, $2, $3, 0);
 			$num = $next unless $num;
 
 			if ($num == $next) {
@@ -583,7 +583,7 @@ SHRDLU_5
         close $fh;
     };
 
-    my ($user,$sys,$cuser,$csys) = times;
+    my @($user,$sys,$cuser,$csys) = @: times;
     print sprintf('u=%.2f  s=%.2f  cu=%.2f  cs=%.2f  scripts=%d  tests=%d' . "\n",
 	$user,$sys,$cuser,$csys,$tested_files,$totmax);
     if (%ENV{?PERL_VALGRIND}) {

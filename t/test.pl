@@ -89,7 +89,7 @@ sub skip_all {
 }
 
 sub _ok {
-    my @($pass, $where, $name, @< @mess) =  @_;
+    my @($pass, $where, ?$name, @< @mess) =  @_;
     # Do not try to microoptimize by factoring out the "not ".
     # VMS will avenge.
     my $out;
@@ -123,7 +123,7 @@ sub _where {
 
 # DON'T use this for matches. Use like() instead.
 sub ok ($@) {
-    my @($pass, $name, @< @mess) =  @_;
+    my @($pass, ?$name, @< @mess) =  @_;
     _ok($pass, _where(), $name, < @mess);
 }
 
@@ -149,7 +149,7 @@ sub display {
 }
 
 sub is ($$@) {
-    my @($got, $expected, $name, @< @mess) =  @_;
+    my @($got, $expected, ?$name, @< @mess) =  @_;
 
     my $pass;
     if( !defined $got || !defined $expected ) {
@@ -194,7 +194,7 @@ sub isnt ($$@) {
 }
 
 sub cmp_ok ($$$@) {
-    my@($got, $type, $expected, $name, @< @mess) =  @_;
+    my@($got, $type, $expected, ?$name, @< @mess) =  @_;
 
     my $pass;
     do {
@@ -264,7 +264,7 @@ sub like   ($$@) { like_yn (0,< @_) }; # 0 for -
 sub unlike ($$@) { like_yn (1,< @_) }; # 1 for un-
 
 sub like_yn ($$$@) {
-    my @($flip, $got, $expected, $name, @< @mess) =  @_;
+    my @($flip, $got, $expected, ?$name, @< @mess) =  @_;
     my $pass;
     $pass = $got =~ m/$expected/ if !$flip;
     $pass = $got !~ m/$expected/ if $flip;
@@ -670,7 +670,7 @@ sub _fresh_perl {
     # Use the first line of the program as a name if none was given
     unless( $name ) {
         my $first_line;
-        @($first_line, $name) = $prog =~ m/^((.{1,50}).*)/;
+        @($first_line, $name) = @: $prog =~ m/^((.{1,50}).*)/;
         $name .= '...' if length $first_line +> length $name;
     }
 
@@ -684,7 +684,7 @@ sub _fresh_perl {
 #
 
 sub fresh_perl_is {
-    my@($prog, $expected, $runperl_args, $name) =  @_;
+    my@($prog, $expected, ?$runperl_args, ?$name) =  @_;
     local $Level = 2;
     $expected =~ s/\n+$//; # is also removed from program output
     _fresh_perl($prog,
@@ -771,7 +771,7 @@ WHOA
 }
 
 sub dies_not(&;$) {
-    my @($e, $qr, $name) =  @_;
+    my @($e, ?$name) =  @_;
     local $Level = 2;
     if (try { $e->(); 1; }) {
         return ok(1, $name);
@@ -781,7 +781,7 @@ sub dies_not(&;$) {
 }
 
 sub dies_like(&$;$) {
-    my @($e, $qr, $name) =  @_;
+    my @($e, $qr, ?$name) =  @_;
     if (try { $e->(); 1; }) {
         local $Level = 2;
         diag "didn't die";
@@ -792,7 +792,7 @@ sub dies_like(&$;$) {
 }
 
 sub eval_dies_like($$;$) {
-    my @($e, $qr, $name) =  @_;
+    my @($e, $qr, ?$name) =  @_;
   TODO:
     do {
         todo_skip("Compile time abortion are known to leak memory", 1) if %ENV{?PERL_VALGRIND};

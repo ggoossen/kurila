@@ -108,7 +108,7 @@ sub all_tainted (@) {
 our $TODO;
 
 sub test ($;$) {
-    my@($ok, $diag) =  @_;
+    my @($ok, ?$diag) =  @_;
 
     my $curr_test = curr_test();
     if ($TODO) {
@@ -864,7 +864,7 @@ do {
 do {
     # Check that all environment variables are tainted.
     my @untainted;
-    while (my @($k, $v) =@( each %ENV)) {
+    while (my @(?$k, ?$v) =@( each %ENV)) {
 	if (!tainted($v) &&
 	    # These we have explicitly untainted or set earlier.
 	    $k !~ m/^(BASH_ENV|CDPATH|ENV|IFS|PATH|PERL_CORE|TEMP|TERM|TMP)$/) {

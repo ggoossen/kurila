@@ -83,9 +83,11 @@ sub import {
     $test->exported_to($caller);
 
     $class->import_extra(\@_);
-    my@(@imports) = $class->_strip_imports@(\@_);
+    my @imports = $class->_strip_imports(\@_);
 
-    $test->plan(< @_);
+    if (@_) {
+        $test->plan(< @_);
+    }
 
     $class->export_to_level(1, $class, < @imports);
 }

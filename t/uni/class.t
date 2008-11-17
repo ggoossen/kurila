@@ -103,7 +103,7 @@ sub char_range {
 }
 
 # non-General Category and non-Script
-while (my @($abbrev, $files) =@( each %utf8::PVA_abbr_map)) {
+while (my @(?$abbrev, ?$files) =@( each %utf8::PVA_abbr_map)) {
   my $prop_name = %utf8::PropertyAlias{?$abbrev};
   next unless $prop_name;
   next if $abbrev eq "gc_sc";
@@ -129,7 +129,7 @@ while (my @($abbrev, $files) =@( each %utf8::PVA_abbr_map)) {
 
 # General Category and Script
 for my $p (@('gc', 'sc')) {
-  while (my @($abbr) =@( each %{ %utf8::PropValueAlias{$p} })) {
+  while (my @(?$abbr, ?_) =@( each %{ %utf8::PropValueAlias{$p} })) {
     my $filename = 'File::Spec'->catfile(
       $updir => lib => unicore => lib => gc_sc => "%utf8::PVA_abbr_map{gc_sc}->{?$abbr}.pl"
     );

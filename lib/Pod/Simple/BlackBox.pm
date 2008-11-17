@@ -1599,7 +1599,7 @@ sub _treelet_from_formatting_codes {
   #            "!"
   #       ]
   
-  my@($self, $para, $start_line, $preserve_space) =  @_;
+  my@($self, $para, $start_line, ?$preserve_space) =  @_;
   
   my $treelet = \@('~Top', \%('start_line' => $start_line),);
   

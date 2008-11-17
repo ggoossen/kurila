@@ -3764,7 +3764,8 @@ PP(pp_enter_anonarray_assign)
     len = av_len(av);
     PUSHMARK(SP);
     for (i = len; i >= 0; i--) {
-	XPUSHs(*av_fetch(av, i, FALSE));
+	SV** isv = av_fetch(av, i, FALSE);
+	XPUSHs( isv ? *isv : &PL_sv_undef );
     }
     RETURN;
 }
