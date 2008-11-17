@@ -5086,9 +5086,10 @@ Perl_ck_ftst(pTHX_ OP *o)
 	SVOP * const kid = (SVOP*)cUNOPo->op_first;
 	const OPCODE kidtype = kid->op_type;
 
-	if (kidtype == OP_CONST && (kid->op_private & OPpCONST_BARE)) {
+	if (kidtype == OP_PLACEHOLDER) {
 	    OP * const newop = newGVOP(type, OPf_REF,
-				       gv_fetchsv(kid->op_sv, GV_ADD, SVt_PVIO), kid->op_location);
+		gv_fetchpv("_", GV_ADD, SVt_PVIO),
+		kid->op_location);
 #ifdef PERL_MAD
 	    op_getmad(o,newop,'O');
 #else
