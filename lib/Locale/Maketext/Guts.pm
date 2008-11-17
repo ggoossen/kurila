@@ -22,7 +22,7 @@ sub _compile {
   my $target = ref(@_[0]) || @_[0];
   
   my(@code);
-  my(@c) = @(''); # "chunks" -- scratch.
+  my@(@c) =@( @('')); # "chunks" -- scratch.
   my $call_count = 0;
   my $big_pile = '';
   do {
@@ -101,7 +101,7 @@ sub _compile {
           
            #$c[-1] =~ s/^\s+//s;
            #$c[-1] =~ s/\s+$//s;
-          ($m,< @params) = < split(",", @c[-1], -1);  # was /\s*,\s*/
+          @($m,@< @params) =  split(",", @c[-1], -1);  # was /\s*,\s*/
           
           # A bit of a hack -- we've turned "~,"'s into DELs, so turn
           #  'em into real commas here.

@@ -26,7 +26,7 @@ $TB->plan(tests => 2);
 
 
 require Test::Simple::Catch;
-my($out, $err) = < Test::Simple::Catch::caught();
+my@($out, $err) =  Test::Simple::Catch::caught();
 local %ENV{+HARNESS_ACTIVE} = 0;
 
 

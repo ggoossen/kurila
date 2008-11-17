@@ -187,7 +187,7 @@ sub PERL_UNICODE_STDIN () { 0x0001 }
 sub ReadLine {'Term::ReadLine::Stub'}
 sub readline {
   my $self = shift;
-  my ($in,$out,$str) = < @$self;
+  my @($in,$out,$str) =  @$self;
   my $prompt = shift;
   print $out @rl_term_set[0], $prompt, @rl_term_set[1], @rl_term_set[2]; 
   $self->register_Tk 
@@ -246,7 +246,7 @@ sub new {
   #local (*FIN, *FOUT);
   my ($FIN, $FOUT, $ret);
   if ((nelems @_)==2) {
-    my($console, $consoleOUT) = < @_[0]->findConsole;
+    my@($console, $consoleOUT) =  @_[0]->findConsole;
 
 
     # the Windows CONIN$ needs GENERIC_WRITE mode to allow
@@ -276,7 +276,7 @@ sub new {
 }
 
 sub newTTY {
-  my ($self, $in, $out) = < @_;
+  my @($self, $in, $out) =  @_;
   $self->[0] = $in;
   $self->[1] = $out;
   my $sel = select($out);
@@ -303,7 +303,7 @@ package Term::ReadLine;		# So late to allow the above code be defined?
 
 our $VERSION = '1.03';
 
-my ($which) = exists %ENV{PERL_RL} ?? < split m/\s+/, %ENV{?PERL_RL} !! undef;
+my @($which) = exists %ENV{PERL_RL} ?? < split m/\s+/, %ENV{?PERL_RL} !! undef;
 if ($which) {
   if ($which =~ m/\bgnu\b/i){
     eval "use Term::ReadLine::Gnu;";

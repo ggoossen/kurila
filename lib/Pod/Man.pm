@@ -118,7 +118,7 @@ sub toescape { (length (@_[0]) +> 1 ?? '\f(' !! '\f') . @_[0] }
 # fonts may be set by the user.  Sets the internal hash key FONTS which is
 # used to map our internal font escapes to actual *roff sequences later.
 sub init_fonts {
-    my ($self) = < @_;
+    my @($self) =  @_;
 
     # Figure out the fixed-width font.  If user-supplied, make sure that they
     # are the right length.
@@ -152,7 +152,7 @@ sub init_fonts {
 # that the quotes will be safe against *roff.  Sets the internal hash keys
 # LQUOTE and RQUOTE.
 sub init_quotes {
-    my ($self) = (< @_);
+    my @($self) = @(< @_);
 
     %$self{+quotes} ||= '"';
     if (%$self{?quotes} eq 'none') {
@@ -176,7 +176,7 @@ sub init_quotes {
 
 # Initialize the page title information and indentation from our arguments.
 sub init_page {
-    my ($self) = < @_;
+    my @($self) =  @_;
 
     # We used to try first to get the version number from a local binary, but
     # we shouldn't need that any more.  Get the version from the running Perl.
@@ -218,7 +218,7 @@ sub init_page {
 # Add a block of text to the contents of the current node, formatting it
 # according to the current formatting instructions as we do.
 sub _handle_text {
-    my ($self, $text) = < @_;
+    my @($self, $text) =  @_;
     DEBUG +> 3 and print "== $text\n";
     my $tag = %$self{PENDING}->[-1];
     @$tag[2] .= $self->format_text (@$tag[1], $text);
@@ -226,7 +226,7 @@ sub _handle_text {
 
 # Given an element name, get the corresponding method name.
 sub method_for_element {
-    my ($self, $element) = < @_;
+    my @($self, $element) =  @_;
     $element =~ s/-/_/g;
     $element =~ s/([A-Z])/$(lc($1))/g;
     $element =~ s/[^_a-z0-9]//g;
@@ -238,7 +238,7 @@ sub method_for_element {
 # element method, and create a new tree into which we'll collect blocks of
 # text and nested elements.  Otherwise, if start_element is defined, call it.
 sub _handle_element_start {
-    my ($self, $element, $attrs) = < @_;
+    my @($self, $element, $attrs) =  @_;
     DEBUG +> 3 and print "++ $element (<", join ('> <', %$attrs), ">)\n";
     my $method = $self->method_for_element ($element);
 
@@ -270,7 +270,7 @@ sub _handle_element_start {
 # this is where we pass along the tree that we built.  Otherwise, if we have
 # an end_ method for the element, call that.
 sub _handle_element_end {
-    my ($self, $element) = < @_;
+    my @($self, $element) =  @_;
     DEBUG +> 3 and print "-- $element\n";
     my $method = $self->method_for_element ($element);
 
@@ -309,7 +309,7 @@ sub _handle_element_end {
 # instructions but possibly with more things turned off depending on the
 # element.
 sub formatting {
-    my ($self, $current, $element) = < @_;
+    my @($self, $current, $element) =  @_;
     my %options;
     if ($current) {
         %options = %( < %$current );
@@ -334,7 +334,7 @@ sub formatting {
 # format.  Currently, the only formatting options are guesswork, cleanup, and
 # convert, all of which are boolean.
 sub format_text {
-    my ($self, $options, $text) = < @_;
+    my @($self, $options, $text) =  @_;
     my $guesswork = %$options{?guesswork} && !%$self{?IN_NAME};
     my $cleanup = %$options{?cleanup};
     my $convert = %$options{?convert};
@@ -437,7 +437,7 @@ sub guesswork {
         ( [a-zA-Z\']+ ) (?= [\)\".?!,;:]* (?:\s|\Z|\\\ ) )
         \b
     } {$( do {
-        my ($prefix, $hyphen, $main, $suffix) = ($1, $2, $3, $4);
+        my @($prefix, $hyphen, $main, $suffix) = @($1, $2, $3, $4);
         $hyphen ||= '';
         $main =~ s/\\-/-/g;
         $prefix . $hyphen . $main . $suffix;
@@ -555,8 +555,8 @@ sub guesswork {
 # outside font is always the "previous" font and end with \fP instead of \fR.
 # Idea from Zack Weinberg.
 sub mapfonts {
-    my ($self, $text) = < @_;
-    my ($fixed, $bold, $italic) = (0, 0, 0);
+    my @($self, $text) =  @_;
+    my @($fixed, $bold, $italic) = @(0, 0, 0);
     my %magic = %(F => \$fixed, B => \$bold, I => \$italic);
     my $last = '\fR';
     $text =~ s#
@@ -584,8 +584,8 @@ sub mapfonts {
 # around this, use a separate textmapfonts for text blocks where the default
 # font is always R and only use the smart mapfonts for headings.
 sub textmapfonts {
-    my ($self, $text) = < @_;
-    my ($fixed, $bold, $italic) = (0, 0, 0);
+    my @($self, $text) =  @_;
+    my @($fixed, $bold, $italic) = @(0, 0, 0);
     my %magic = %(F => \$fixed, B => \$bold, I => \$italic);
     $text =~ s#
         \\f\((.)(.)
@@ -604,7 +604,7 @@ sub textmapfonts {
 # embedded double quotes doubled.  For other formatters, remap paired double
 # quotes to LQUOTE and RQUOTE.
 sub switchquotes {
-    my ($self, $command, $text, $extra) = < @_;
+    my @($self, $command, $text, $extra) =  @_;
     $text =~ s/\\\*\([LR]\"/\"/g;
 
     # We also have to deal with \*C` and \*C', which are used to add the
@@ -656,7 +656,7 @@ sub switchquotes {
 # something that *roff would interpret as a command.  This is overkill, but
 # it's much simpler than trying to parse *roff here.
 sub protect {
-    my ($self, $text) = < @_;
+    my @($self, $text) =  @_;
     $text =~ s/^([.\'\\])/\\&$1/mg;
     return $text;
 }
@@ -668,7 +668,7 @@ sub protect {
 # repeated =items, since calling makespace means we're about to begin the item
 # body.
 sub makespace {
-    my ($self) = < @_;
+    my @($self) =  @_;
     $self->output (".PD\n") if %$self{?ITEMS} +> 1;
     %$self{+ITEMS} = 0;
     $self->output (%$self{?INDENT} +> 0 ?? ".Sp\n" !! ".PP\n")
@@ -679,7 +679,7 @@ sub makespace {
 # argument.  Support multiple index entries in X<> separated by slashes, and
 # strip special escapes from index entries.
 sub outindex {
-    my ($self, $section, $index) = < @_;
+    my @($self, $section, $index) =  @_;
     my @entries = map { < split m%\s*/\s*% } @{ %$self{INDEX} };
     return unless ($section || nelems @entries);
 
@@ -700,7 +700,7 @@ sub outindex {
 
     # Print out the .IX commands.
     for ( @output) {
-        my ($type, $entry) = < @$_;
+        my @($type, $entry) =  @$_;
         $entry =~ s/\"/\"\"/g;
         $self->output (".IX $type " . '"' . $entry . '"' . "\n");
     }
@@ -708,7 +708,7 @@ sub outindex {
 
 # Output some text, without any additional changes.
 sub output {
-    my ($self, < @text) = < @_;
+    my @($self, @< @text) =  @_;
     print { %$self{?output_fh} } < @text;
 }
 
@@ -719,7 +719,7 @@ sub output {
 # Handle the start of the document.  Here we handle empty documents, as well
 # as setting up our basic macros in a preamble and building the page title.
 sub start_document {
-    my ($self, $attrs) = < @_;
+    my @($self, $attrs) =  @_;
     if (%$attrs{?contentless} && !%$self{?ALWAYS_EMIT_SOMETHING}) {
         DEBUG and print "Document is contentless\n";
         %$self{+CONTENTLESS} = 1;
@@ -732,7 +732,7 @@ sub start_document {
         $name = %$self{?name};
         $section = %$self{?section} || 1;
     } else {
-        ($name, $section) = < $self->devise_title;
+        @($name, $section) =  $self->devise_title;
     }
     my $date = %$self{?date} || $self->devise_date;
     $self->preamble ($name, $section, $date)
@@ -753,7 +753,7 @@ sub start_document {
 # Handle the end of the document.  This does nothing but print out a final
 # comment at the end of the document under debugging.
 sub end_document {
-    my ($self) = < @_;
+    my @($self) =  @_;
     return if $self->bare_output;
     return if (%$self{?CONTENTLESS} && !%$self{?ALWAYS_EMIT_SOMETHING});
     $self->output (q(.\" [End document]) . "\n") if DEBUG;
@@ -763,7 +763,7 @@ sub end_document {
 # a list, returning an empty name and section 1 if we can't find any better
 # information.  Uses File::Basename and File::Spec as necessary.
 sub devise_title {
-    my ($self) = < @_;
+    my @($self) =  @_;
     my $name = $self->source_filename || '';
     my $section = %$self{?section} || 1;
     $section = 3 if (!%$self{?section} && $name =~ m/\.pm\z/i);
@@ -789,7 +789,7 @@ sub devise_title {
         $name = uc File::Basename::basename ($name);
     } else {
         require File::Spec;
-        my ($volume, $dirs, $file) = < File::Spec->splitpath ($name);
+        my @($volume, $dirs, $file) =  File::Spec->splitpath ($name);
         my @dirs = File::Spec->splitdir ($dirs);
         my $cut = 0;
         for my $i (0 .. nelems(@dirs) -1) {
@@ -821,7 +821,7 @@ sub devise_title {
 # handle as the source_filename for input from a file handle, so we have to
 # deal with that as well.
 sub devise_date {
-    my ($self) = < @_;
+    my @($self) =  @_;
     my $input = $self->source_filename;
     my $time;
     if ($input) {
@@ -841,7 +841,7 @@ sub devise_date {
 # The order of date and release used to be reversed in older versions of this
 # module, but this order is correct for both Solaris and Linux.
 sub preamble {
-    my ($self, $name, $section, $date) = < @_;
+    my @($self, $name, $section, $date) =  @_;
     my $preamble = $self->preamble_template;
 
     # Build the index line and make sure that it will be syntactically valid.
@@ -896,7 +896,7 @@ $preamble
 # the first paragraph of text after an =over, in which case we have to change
 # indentations for *roff.
 sub cmd_para {
-    my ($self, $attrs, $text) = < @_;
+    my @($self, $attrs, $text) =  @_;
     my $line = %$attrs{?start_line};
 
     # Output the paragraph.  We also have to handle =over without =item.  If
@@ -930,7 +930,7 @@ sub cmd_para {
 # to protect against commands and wrap in .Vb/.Ve (which we define in our
 # prelude).
 sub cmd_verbatim {
-    my ($self, $attrs, $text) = < @_;
+    my @($self, $attrs, $text) =  @_;
 
     # Ignore an empty verbatim paragraph.
     return unless $text =~ m/\S/;
@@ -964,7 +964,7 @@ sub cmd_verbatim {
 # Handle literal text (produced by =for and similar constructs).  Just output
 # it with the minimum of changes.
 sub cmd_data {
-    my ($self, $attrs, $text) = < @_;
+    my @($self, $attrs, $text) =  @_;
     $text =~ s/^\n+//;
     $text =~ s/\n{0,2}$/\n/;
     $self->output ($text);
@@ -979,7 +979,7 @@ sub cmd_data {
 # output.  It returns the cleaned up heading text (putting the heading all on
 # one line) and may do other things, like closing bad =item blocks.
 sub heading_common {
-    my ($self, $text, $line) = < @_;
+    my @($self, $text, $line) =  @_;
     $text =~ s/\s+$//;
     $text =~ s/\s*\n\s*/ /g;
 
@@ -1001,7 +1001,7 @@ sub heading_common {
 # already uses small caps, so remove \s0 and \s-1.  Maintain IN_NAME as
 # appropriate.
 sub cmd_head1 {
-    my ($self, $attrs, $text) = < @_;
+    my @($self, $attrs, $text) =  @_;
     $text =~ s/\\s-?\d//g;
     $text = $self->heading_common ($text, %$attrs{start_line});
     my $isname = ($text eq 'NAME' || $text =~ m/\(NAME\)/);
@@ -1014,7 +1014,7 @@ sub cmd_head1 {
 
 # Second level heading.
 sub cmd_head2 {
-    my ($self, $attrs, $text) = < @_;
+    my @($self, $attrs, $text) =  @_;
     $text = $self->heading_common ($text, %$attrs{start_line});
     $self->output ( $self->switchquotes ('.Sh', $self->mapfonts ($text)));
     $self->outindex ('Subsection', $text);
@@ -1025,7 +1025,7 @@ sub cmd_head2 {
 # Third level heading.  *roff doesn't have this concept, so just put the
 # heading in italics as a normal paragraph.
 sub cmd_head3 {
-    my ($self, $attrs, $text) = < @_;
+    my @($self, $attrs, $text) =  @_;
     $text = $self->heading_common ($text, %$attrs{start_line});
     $self->makespace;
     $self->output ($self->textmapfonts ('\f(IS' . $text . '\f(IE') . "\n");
@@ -1037,7 +1037,7 @@ sub cmd_head3 {
 # Fourth level heading.  *roff doesn't have this concept, so just put the
 # heading as a normal paragraph.
 sub cmd_head4 {
-    my ($self, $attrs, $text) = < @_;
+    my @($self, $attrs, $text) =  @_;
     $text = $self->heading_common ($text, %$attrs{start_line});
     $self->makespace;
     $self->output ($self->textmapfonts ($text) . "\n");
@@ -1059,7 +1059,7 @@ sub cmd_c { return @_[0]->quote_literal (@_[2]) }
 
 # Index entries are just added to the pending entries.
 sub cmd_x {
-    my ($self, $attrs, $text) = < @_;
+    my @($self, $attrs, $text) =  @_;
     push (@{ %$self{INDEX} }, $text);
     return '';
 }
@@ -1067,7 +1067,7 @@ sub cmd_x {
 # Links reduce to the text that we're given, wrapped in angle brackets if it's
 # a URL.
 sub cmd_l {
-    my ($self, $attrs, $text) = < @_;
+    my @($self, $attrs, $text) =  @_;
     return %$attrs{?type} eq 'url' ?? "<$text>" !! $text;
 }
 
@@ -1079,7 +1079,7 @@ sub cmd_l {
 # first argument, and then the attr hash.  This is called by the handlers for
 # the four different types of lists (bullet, number, text, and block).
 sub over_common_start {
-    my ($self, $type, $attrs) = < @_;
+    my @($self, $type, $attrs) =  @_;
     my $line = %$attrs{?start_line};
     my $indent = %$attrs{?indent};
     DEBUG +> 3 and print " Starting =over $type (line $line, indent ",
@@ -1115,7 +1115,7 @@ sub over_common_start {
 # circumstance.  If we're still inside an indentation, we need to emit another
 # .RE and then a new .RS to unconfuse *roff.
 sub over_common_end {
-    my ($self) = < @_;
+    my @($self) =  @_;
     DEBUG +> 3 and print " Ending =over\n";
     %$self{+INDENT} = pop @{ %$self{INDENTS} };
     pop @{ %$self{ITEMTYPES} };
@@ -1153,7 +1153,7 @@ sub end_over_block  { @_[0]->over_common_end }
 # entries for things like bullets and numbers.  Newlines in an item title are
 # turned into spaces since *roff can't handle them embedded.
 sub item_common {
-    my ($self, $type, $attrs, $text) = < @_;
+    my @($self, $type, $attrs, $text) =  @_;
     my $line = %$attrs{?start_line};
     DEBUG +> 3 and print "  $type item (line $line): $text\n";
 
@@ -1252,7 +1252,7 @@ sub parse_from_filehandle {
     my $self = shift;
     $self->parse_from_file (< @_);
 }
- <
+ 
 ##############################################################################
 # Translation tables
 ##############################################################################
@@ -1265,7 +1265,7 @@ sub parse_from_filehandle {
 #
 # This only works in an ASCII world.  What to do in a non-ASCII world is very
 # unclear.
-%ESCAPES{[0xA0 .. 0xFF]} = (
+%ESCAPES{[0xA0 .. 0xFF]} = @(
     "\\ ", undef, undef, undef,            undef, undef, undef, undef,
     undef, undef, undef, undef,            undef, "\\\%", undef, undef,
 

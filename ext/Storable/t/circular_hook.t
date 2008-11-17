@@ -48,7 +48,7 @@ package Foo;
 our @order = @( () );
 
 sub STORABLE_freeze {
-	my ($self, $clone) = < @_;
+	my @($self, $clone) =  @_;
 	my $class = ref $self;
 	
 	# print "# Freezing $class\n";
@@ -57,7 +57,7 @@ sub STORABLE_freeze {
 }
 
 sub STORABLE_thaw {
-	my ($self, $clone, $string, < @refs) = < @_;
+	my @($self, $clone, $string, @< @refs) =  @_;
 	my $class = ref $self;
 
 	# print "# Thawing $class\n";

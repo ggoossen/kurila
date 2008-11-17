@@ -58,7 +58,7 @@ use Pod::Simple;
 *pretty = \&Pod::Simple::BlackBox::pretty;
 
 print "# OK, starting run...\n# [[\n";
-my($name2where, $where2name) = ($x->survey($here1, $here2), $x->path2name);
+my@($name2where, $where2name) = @($x->survey($here1, $here2), $x->path2name);
 print "# ]]\n#OK, run done.\n";
 
 my $p = pretty( $where2name, $name2where )."\n";

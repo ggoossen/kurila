@@ -157,7 +157,7 @@ sub plan {
 
     my $max=0;
     while ((nelems @_)) {
-	my ($k,$v) = splice(@_, 0, 2);
+	my @($k,$v) = splice@(@_, 0, 2);
 	if ($k =~ m/^test(s)?$/) { $max = $v; }
 	elsif ($k eq 'todo' or
 	       $k eq 'failok') { for ( @$v) { %todo{+$_}=1; }; }
@@ -180,7 +180,7 @@ sub plan {
 }
 
 sub _read_program {
-  my($file) = shift;
+  my@($file) =@( shift);
   return unless defined $file and length $file
     and -e $file and -f _ and -r _;
   open(SOURCEFILE, "<", "$file") || return;
@@ -207,7 +207,7 @@ values through this.
 =cut
 
 sub _to_value {
-    my ($v) = < @_;
+    my @($v) =  @_;
     return ref $v eq 'CODE' ?? $v->() !! $v;
 }
 
@@ -354,7 +354,7 @@ sub ok ($;$$) {
     local($\,$,);   # guard against -l and other things that screw with
                     # print
 
-    my ($pkg,$file,$line) = caller($TestLevel);
+    my @($pkg,$file,$line) = caller@($TestLevel);
     my $repetition = ++%history{+"$file:$line"};
     my $context = ("$file at line $line".
 		   ($repetition +> 1 ?? " fail \#$repetition" !! ''));
@@ -378,7 +378,7 @@ sub ok ($;$$) {
 	    $ok = $result =~ m/$expected/;
             $regex = $expected;
 	} elsif (($regex) = ($expected =~ m,^ / (.+) / $,sx) or
-	    (undef, $regex) = ($expected =~ m,^ m([^\w\s]) (.+) \1 $,sx)) {
+	    @(undef, $regex) = @($expected =~ m,^ m([^\w\s]) (.+) \1 $,sx)) {
 	    $ok = $result =~ m/$regex/;
 	} else {
 	    $ok = $result eq $expected;
@@ -413,7 +413,7 @@ sub ok ($;$$) {
 
 
 sub _complain {
-    my($result, $expected, $detail) = < @_;
+    my@($result, $expected, $detail) =  @_;
     %$detail{+expected} = $expected if defined $expected;
 
     # Get the user's diagnostic, protecting against multi-line
@@ -461,7 +461,7 @@ sub _complain {
 
 
 sub _diff_complain {
-    my($result, $expected, $detail, $prefix) = < @_;
+    my@($result, $expected, $detail, $prefix) =  @_;
     return _diff_complain_external(< @_) if %ENV{?PERL_TEST_DIFF};
     return _diff_complain_algdiff(< @_)
      if try { require Algorithm::Diff; Algorithm::Diff->VERSION(1.15); 1; };
@@ -478,12 +478,12 @@ EOT
 
 
 sub _diff_complain_external {
-    my($result, $expected, $detail, $prefix) = < @_;
+    my@($result, $expected, $detail, $prefix) =  @_;
     my $diff = %ENV{?PERL_TEST_DIFF} || die "WHAAAA?";
 
     require File::Temp;
-    my($got_fh, $got_filename) = < File::Temp::tempfile("test-got-XXXXX");
-    my($exp_fh, $exp_filename) = < File::Temp::tempfile("test-exp-XXXXX");
+    my@($got_fh, $got_filename) =  File::Temp::tempfile("test-got-XXXXX");
+    my@($exp_fh, $exp_filename) =  File::Temp::tempfile("test-exp-XXXXX");
     unless ($got_fh && $exp_fh) {
       warn "Can't get tempfiles";
       return;
@@ -515,7 +515,7 @@ sub _diff_complain_external {
 
 
 sub _diff_complain_algdiff {
-    my($result, $expected, $detail, $prefix) = < @_;
+    my@($result, $expected, $detail, $prefix) =  @_;
 
     my @got = split(m/^/, $result);
     my @exp = split(m/^/, $expected);

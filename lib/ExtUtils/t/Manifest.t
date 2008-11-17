@@ -29,7 +29,7 @@ my $Is_VMS = $^O eq 'VMS';
 # keep track of everything added so it can all be deleted
 my %Files;
 sub add_file {
-    my ($file, $data) = < @_;
+    my @($file, $data) =  @_;
     $data ||= 'foo';
     1 while unlink $file;  # or else we'll get multiple versions on VMS
     open( T, ">", ''.$file) or return;
@@ -78,7 +78,7 @@ ok( add_file('foo'), 'add a temporary file' );
 chmod( 0744, 'foo') if config_value('chmod');
 
 # there shouldn't be a MANIFEST there
-my ($res, $warn) = < catch_warning( \&mkmanifest );
+my @($res, $warn) =  catch_warning( \&mkmanifest );
 # Canonize the order.
 $warn = join("", map { "$_|" } 
                  sort { lc($a) cmp lc($b) } split m/\r?\n/, $warn);
@@ -97,13 +97,13 @@ ok( add_file( 'bar' ), 'add another file' );
 ok( ! manicheck(), 'MANIFEST now out of sync' );
 
 # it reports that bar has been added and throws a warning
-($res, $warn) = < catch_warning( \&filecheck );
+@($res, $warn) =  catch_warning( \&filecheck );
 
 like( $warn, qr/^Not in MANIFEST: bar/, 'warning that bar has been added' );
 is_deeply( $res, @('bar'), 'bar reported as new' );
 
 # now quiet the warning that bar was added and test again
-($res, $warn) = do { local $ExtUtils::Manifest::Quiet = 1;
+@($res, $warn) = do { local $ExtUtils::Manifest::Quiet = 1;
  <                     catch_warning( \&skipcheck )
                 };
 is( $warn, '', 'disabled warnings' );
@@ -112,7 +112,7 @@ is( $warn, '', 'disabled warnings' );
 add_file( 'MANIFEST.SKIP', "baz\n.SKIP" );
 
 # this'll skip the new file
-($res, $warn) = < catch_warning( \&skipcheck );
+@($res, $warn) =  catch_warning( \&skipcheck );
 like( $warn, qr/^Skipping MANIFEST\.SKIP/i, 'got skipping warning' );
 
 my @skipped;
@@ -169,7 +169,7 @@ is( ExtUtils::Manifest::maniread()->{?none}, '#none',
 
 ok( mkdir( 'copy', 0777 ), 'made copy directory' );
 $files = maniread();
-try { (undef, $warn) = < catch_warning( sub {
+try { @(undef, $warn) =  catch_warning( sub {
  		manicopy( $files, 'copy', 'cp' ) })
 };
 like( $@->{?description}, qr/^Can't read none: /, 'croaked about none' );
@@ -183,7 +183,7 @@ like($warn, qr/^Skipping MANIFEST.SKIP/i, 'warned about MANIFEST.SKIP' );
 # tell ExtUtils::Manifest to use a different file
 do {
 	local $ExtUtils::Manifest::MANIFEST = 'albatross'; 
-	($res, $warn) = < catch_warning( \&mkmanifest );
+	@($res, $warn) =  catch_warning( \&mkmanifest );
 	like( $warn, qr/Added to albatross: /, 'using a new manifest file' );
 
 	# add the new file to the list of files to be deleted
@@ -195,7 +195,7 @@ do {
 add_file( 'MANIFEST.SKIP' => "^moretest/q\n" );
 
 # This'll skip moretest/quux
-($res, $warn) = < catch_warning( \&skipcheck );
+@($res, $warn) =  catch_warning( \&skipcheck );
 like( $warn, qr{^Skipping moretest/quux$}i, 'got skipping warning again' );
 
 
@@ -204,7 +204,7 @@ like( $warn, qr{^Skipping moretest/quux$}i, 'got skipping warning again' );
 add_file( 'MANIFEST.SKIP' => 'foo' );
 add_file( 'MANIFEST'      => "foobar\n"   );
 add_file( 'foobar'        => '123' );
-($res, $warn) = < catch_warning( \&manicheck );
+@($res, $warn) =  catch_warning( \&manicheck );
 is_deeply( $res,  @(),      'MANIFEST overrides MANIFEST.SKIP' );
 is( $warn, '',   'MANIFEST overrides MANIFEST.SKIP, no warnings' );
 
@@ -228,12 +228,12 @@ do {
     my $skip = File::Spec->catfile($cwd, < qw(mantest mymanifest.skip));
     add_file('MANIFEST.SKIP' =>
              "albatross\n#!include $skip\n#!include_default");
-    my ($res, $warn) = < catch_warning( \&skipcheck );
+    my @($res, $warn) =  catch_warning( \&skipcheck );
     for (qw(albatross foo foobar mymanifest.skip mydefault.skip)) {
         like( $warn, qr/Skipping \b$_\b/,
               "Skipping $_" );
     }
-    ($res, $warn) = < catch_warning( \&mkmanifest );
+    @($res, $warn) =  catch_warning( \&mkmanifest );
     for (qw(albatross foo foobar mymanifest.skip mydefault.skip)) {
         like( $warn, qr/Removed from MANIFEST: \b$_\b/,
               "Removed $_ from MANIFEST" );

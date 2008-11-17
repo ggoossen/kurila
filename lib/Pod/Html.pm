@@ -327,7 +327,7 @@ sub init_globals {
 # clean_data: global clean-up of pod data
 #
 sub clean_data($){
-    my( $dataref ) = < @_;
+    my@( $dataref ) =  @_;
     for my $i ( 0..(nelems @{$dataref})-1 ) {
 	@{$dataref}[$i] =~ s/\s+\Z//;
 
@@ -737,7 +737,7 @@ sub parse_command_line {
 my $Saved_Cache_Key;
 
 sub get_cache {
-    my($dircache, $itemcache, $podpath, $podroot, $recurse) = < @_;
+    my@($dircache, $itemcache, $podpath, $podroot, $recurse) =  @_;
     my @cache_key_args = @_;
 
     # A first-level cache:
@@ -766,7 +766,7 @@ sub get_cache {
 }
 
 sub cache_key {
-    my($dircache, $itemcache, $podpath, $podroot, $recurse) = < @_;
+    my@($dircache, $itemcache, $podpath, $podroot, $recurse) =  @_;
     return join('!', @( $dircache, $itemcache, $recurse,
 	< @$podpath, $podroot, stat($dircache), stat($itemcache)));
 }
@@ -777,7 +777,7 @@ sub cache_key {
 #  them and returns a non-zero value.
 #
 sub load_cache {
-    my($dircache, $itemcache, $podpath, $podroot) = < @_;
+    my@($dircache, $itemcache, $podpath, $podroot) =  @_;
     my($tests);
     local $_;
 
@@ -849,7 +849,7 @@ sub load_cache {
 #  @Libpods for =item directives.
 #
 sub scan_podpath {
-    my($podroot, $recurse, $append) = < @_;
+    my@($podroot, $recurse, $append) =  @_;
     my($pwd);
     my($dirname, @files, @poddata);
 
@@ -952,7 +952,7 @@ sub scan_podpath {
 #  links are on the filesystem.
 #
 sub scan_dir {
-    my($dir, $recurse) = < @_;
+    my@($dir, $recurse) =  @_;
     my($t, @subdirs, @pods, $pod, $dirname, @dirs);
     local $_;
 
@@ -1012,7 +1012,7 @@ sub scan_dir {
 #  build an index.
 #
 sub scan_headings {
-    my($sections, < @data) = < @_;
+    my@($sections, @< @data) =  @_;
     my($tag, $which_head, $otitle, $listdepth, $index);
 
     local $Ignore = 0;
@@ -1024,7 +1024,7 @@ sub scan_headings {
     #  pointing to each of them.
     foreach my $line ( @data) {
       if ($line =~ m/^=(head)([1-6])\s+(.*)/) {
-        ($tag, $which_head, $otitle) = ($1,$2,$3);
+        @($tag, $which_head, $otitle) = @($1,$2,$3);
 
         my $title = depod( $otitle );
         my $name = anchorify( $title );
@@ -1063,7 +1063,7 @@ sub scan_headings {
 #  will use this information later on in resolving C<> links.
 #
 sub scan_items {
-    my( $itemref, $pod, < @poddata ) = < @_;
+    my@( $itemref, $pod, @< @poddata ) =  @_;
     my( $item);
     local $_;
 
@@ -1094,7 +1094,7 @@ sub scan_items {
 # process_head - convert a pod head[1-6] tag and convert it to HTML format.
 #
 sub process_head {
-    my($tag, $heading, $hasindex) = < @_;
+    my@($tag, $heading, $hasindex) =  @_;
 
     # figure out the level of the =head
     $tag =~ m/head([1-6])/;
@@ -1124,7 +1124,7 @@ sub process_head {
 my $EmittedItem;
 
 sub emit_item_tag($$$){
-    my( $otext, $text, $compact ) = < @_;
+    my@( $otext, $text, $compact ) =  @_;
     my $item = fragment_id( depod($text) , "generate");
     Carp::confess("Undefined fragment '$text' (".depod($text).") from fragment_id() in emit_item_tag() in $Podfile")
         if !defined $item;
@@ -1144,7 +1144,7 @@ sub emit_item_tag($$$){
 }
 
 sub new_listitem {
-    my( $tag ) = < @_;
+    my@( $tag ) =  @_;
     # Open tag for definition list as we have something to put in it
     if( ($tag ne 'dl') && ($ListNewTerm) ){
 	print HTML "<dd>\n";
@@ -1171,7 +1171,7 @@ sub new_listitem {
 # process_item - convert a pod item tag and convert it to HTML format.
 #
 sub process_item {
-    my( $otext ) = < @_;
+    my@( $otext ) =  @_;
 
     # lots of documents start a list without doing an =over.  this is
     # bad!  but, the proper thing to do seems to be to just assume
@@ -1275,7 +1275,7 @@ sub process_pod {
 # it out verbatim, if illustration, center it, otherwise ignore it.
 #
 sub process_for {
-    my($whom, $text) = < @_;
+    my@($whom, $text) =  @_;
     if ( $whom =~ m/^(pod2)?html$/i) {
 	print HTML $text;
     } elsif ($whom =~ m/^illustration$/i) {
@@ -1293,7 +1293,7 @@ sub process_for {
 # begin stack, we only print if it us.
 #
 sub process_begin {
-    my($whom, $text) = < @_;
+    my@($whom, $text) =  @_;
     $whom = lc($whom);
     push (@Begin_Stack, $whom);
     if ( $whom =~ m/^(pod2)?html$/) {
@@ -1306,7 +1306,7 @@ sub process_begin {
 # begin stack.  die if we're mismatched.
 #
 sub process_end {
-    my($whom, $text) = < @_;
+    my@($whom, $text) =  @_;
     $whom = lc($whom);
     if (!defined @Begin_Stack[-1] or @Begin_Stack[-1] ne $whom ) {
 	Carp::confess("Unmatched begin/end at chunk $Paragraph in pod $Podfile\n")
@@ -1318,7 +1318,7 @@ sub process_end {
 # process_pre - indented paragraph, made into <pre></pre>
 #
 sub process_pre {
-    my( $text ) = < @_;
+    my@( $text ) =  @_;
     my( $rest );
     return if $Ignore;
 
@@ -1438,7 +1438,7 @@ sub inIS_text($){
 #  double-quotes and handling implicit C<> links.
 #
 sub process_puretext {
-    my($text, $notinIS) = < @_;
+    my@($text, $notinIS) =  @_;
 
     ## Guessing at func() or [\$\@%&]*var references in plain text is destined
     ## to produce some strange looking ref's. uncomment to disable:
@@ -1477,7 +1477,7 @@ sub process_puretext {
 	) {
 	    # has parenthesis so should have been a C<> ref
             ## try for a pagename (perlXXX(1))?
-            my( $func, $args, $rest ) = ( $1, $2, $3 || '' );
+            my@( $func, $args, $rest ) = @( $1, $2, $3 || '' );
             if( $args =~ m/^\d+$/ ){
                 my $url = page_sect( $word, '' );
                 if( defined $url ){
@@ -1499,9 +1499,9 @@ sub process_puretext {
 	    $word = qq(<a href="$word">$word</a>);
 	} elsif ($word =~ m/[\w.-]+\@[\w-]+\.\w/) {
 	    # looks like an e-mail address
-	    my ($w1, $w2, $w3) = ("", $word, "");
-	    ($w1, $w2, $w3) = ("(", $1, ")$2") if $word =~ m/^\((.*?)\)(,?)/;
-	    ($w1, $w2, $w3) = ("&lt;", $1, "&gt;$2") if $word =~ m/^<(.*?)>(,?)/;
+	    my @($w1, $w2, $w3) = @("", $word, "");
+	    @($w1, $w2, $w3) = @("(", $1, ")$2") if $word =~ m/^\((.*?)\)(,?)/;
+	    @($w1, $w2, $w3) = @("&lt;", $1, "&gt;$2") if $word =~ m/^<(.*?)>(,?)/;
 	    $word = qq($w1<a href="mailto:$w2">$w2</a>$w3);
 	} else {
 	    $word = html_escape($word) if $word =~ m/["&<>]/;
@@ -1524,7 +1524,7 @@ sub closing ($) { local($_) = shift; (defined && s/\s+\z//) ?? length !! 0 }
 
 sub process_text {
     return if $Ignore;
-    my( $tref ) = < @_;
+    my@( $tref ) =  @_;
     my $res = process_text1( 0, $tref );
     $res =~ s/\s+$//s;
     $$tref = $res;
@@ -1547,7 +1547,7 @@ sub process_text_rfc_links {
 }
 
 sub process_text1($$;$$){
-    my( $lev, $rstr, $func, $closing ) = < @_;
+    my@( $lev, $rstr, $func, $closing ) =  @_;
     my $res = '';
 
     unless (defined $func) {
@@ -1622,23 +1622,23 @@ sub process_text1($$;$$){
 	if( $par =~ m{^([^/]+?)/(?!")(.*?)$} ){     # name/ident
             # we've got a name/ident (no quotes)
             if (length $2) {
-                ( $page, $ident ) = ( $1, $2 );
+                @( $page, $ident ) = @( $1, $2 );
             } else {
-                ( $page, $section ) = ( $1, $2 );
+                @( $page, $section ) = @( $1, $2 );
             }
             ### print STDERR "--> L<$par> to page $page, ident $ident\n";
 
 	} elsif( $par =~ m{^(.*?)/"?(.*?)"?$} ){ # [name]/"section"
             # even though this should be a "section", we go for ident first
-	    ( $page, $ident ) = ( $1, $2 );
+	    @( $page, $ident ) = @( $1, $2 );
             ### print STDERR "--> L<$par> to page $page, section $section\n";
 
 	} elsif( $par =~ m/\s/ ){  # this must be a section with missing quotes
-	    ( $page, $section ) = ( '', $par );
+	    @( $page, $section ) = @( '', $par );
             ### print STDERR "--> L<$par> to void page, section $section\n";
 
         } else {
-	    ( $page, $section ) = ( $par, '' );
+	    @( $page, $section ) = @( $par, '' );
             ### print STDERR "--> L<$par> to page $par, void section\n";
 	}
 
@@ -1650,7 +1650,7 @@ sub process_text1($$;$$){
         RESOLVE: do {
             if( defined $ident ){
                 ## try to resolve $ident as an item
-	        ( $url, $fid ) = < coderef( $page, $ident );
+	        @( $url, $fid ) =  coderef( $page, $ident );
                 if( $url ){
                     if( ! defined( $linktext ) ){
                         $linktext = $ident;
@@ -1682,7 +1682,7 @@ sub process_text1($$;$$){
                 $ident = $page;
                 $page  = undef();
             }
-            ( $url, $fid ) = < coderef( $page, $ident );
+            @( $url, $fid ) =  coderef( $page, $ident );
             if( $url ){
                 if( ! defined( $linktext ) ){
                     $linktext = $ident;
@@ -1749,7 +1749,7 @@ sub process_text1($$;$$){
 # go_ahead: extract text of an IS (can be nested)
 #
 sub go_ahead($$$){
-    my( $rstr, $func, $closing ) = < @_;
+    my@( $rstr, $func, $closing ) =  @_;
     my $res = '';
     my @closing = @($closing);
     while( $$rstr =~
@@ -1775,10 +1775,10 @@ sub go_ahead($$$){
 #    $text is the depod-ed text
 #
 sub emit_C($;$$){
-    my( $text, $nocode, $args ) = < @_;
+    my@( $text, $nocode, $args ) =  @_;
     $args = '' unless defined $args;
     my $res;
-    my( $url, $fid ) = < coderef( undef(), $text );
+    my@( $url, $fid ) =  coderef( undef(), $text );
 
     # need HTML-safe text
     my $linktext = html_escape( "$text$args" );
@@ -1813,7 +1813,7 @@ sub html_escape {
 # dosify - convert filenames to 8.3
 #
 sub dosify {
-    my($str) = < @_;
+    my@($str) =  @_;
     return lc($str) if $^O eq 'VMS';     # VMS just needs casing
     if ($Is83) {
         $str = lc $str;
@@ -1827,7 +1827,7 @@ sub dosify {
 # page_sect - make a URL from the text of a L<>
 #
 sub page_sect($$) {
-    my( $page, $section ) = < @_;
+    my@( $page, $section ) =  @_;
     my( $linktext, $page83, $link);	# work strings
 
     # check if we know that this is a section in this page
@@ -1925,13 +1925,13 @@ sub page_sect($$) {
 # Assumes both end in a filename.
 #
 sub relativize_url {
-    my ($dest,$source) = < @_ ;
+    my @($dest,$source) =  @_ ;
 
-    my ($dest_volume,$dest_directory,$dest_file) = <
+    my @($dest_volume,$dest_directory,$dest_file) = 
         File::Spec::Unix->splitpath( $dest ) ;
     $dest = File::Spec::Unix->catpath( $dest_volume, $dest_directory, '' ) ;
 
-    my ($source_volume,$source_directory,$source_file) = <
+    my @($source_volume,$source_directory,$source_file) = 
         File::Spec::Unix->splitpath( $source ) ;
     $source = File::Spec::Unix->catpath( $source_volume, $source_directory, '' ) ;
 
@@ -1958,7 +1958,7 @@ sub relativize_url {
 # coderef - make URL from the text of a C<>
 #
 sub coderef($$){
-    my( $page, $item ) = < @_;
+    my@( $page, $item ) =  @_;
     my( $url );
 
     my $fid = fragment_id( $item );
@@ -2047,7 +2047,7 @@ sub finish_list {
 # except ", ? (Netscape problem) and the hyphen (writer's problem...).
 #
 sub htmlify {
-    my( $heading) = < @_;
+    my@( $heading) =  @_;
     $heading =~ s/(\s+)/ /g;
     $heading =~ s/\s+\Z//;
     $heading =~ s/\A\s+//;
@@ -2062,7 +2062,7 @@ sub htmlify {
 # similar to htmlify, but turns non-alphanumerics into underscores
 #
 sub anchorify {
-    my ($anchor) = < @_;
+    my @($anchor) =  @_;
     $anchor = htmlify($anchor);
     $anchor =~ s/\W/_/g;
     return $anchor;
@@ -2091,7 +2091,7 @@ sub depod($){
 }
 
 sub depod1($;$$){
-  my( $rstr, $func, $closing ) = < @_;
+  my@( $rstr, $func, $closing ) =  @_;
   my $res = '';
   return $res unless defined $$rstr;
   if( ! defined( $func ) ){
@@ -2221,7 +2221,7 @@ sub fragment_id {
 # Special treatment for CGI queries.
 #
 sub make_URL_href($){
-    my( $url ) = < @_;
+    my@( $url ) =  @_;
     if( $url !~
         s{^(http:[-\w/#~:.+=&%@!]+)(\?.*)$}{<a href="$1$2">$1</a>}i ){
         $url = "<a href=\"$url\">$url</a>";

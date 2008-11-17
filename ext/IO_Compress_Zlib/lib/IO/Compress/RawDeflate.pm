@@ -94,7 +94,7 @@ sub mkComp
     my $class = shift ;
     my $got = shift ;
 
-    my ($obj, $errstr, $errno) = < IO::Compress::Adapter::Deflate::mkCompObject(
+    my @($obj, $errstr, $errno) =  IO::Compress::Adapter::Deflate::mkCompObject(
                                                  $got->value('CRC32'),
                                                  $got->value('Adler32'),
                                                  $got->value('Level'),

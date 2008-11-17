@@ -517,7 +517,7 @@ sub cmd_name {
 ## children that are interior-sequences to be $self
 
 sub _set_child2parent_links {
-   my ($self, < @children) = < @_;
+   my @($self, @< @children) =  @_;
    ## Make sure any sequences know who their parent is
    for ( @children) {
       next  unless (ref  and  ref ne 'SCALAR');

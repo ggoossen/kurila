@@ -31,7 +31,7 @@ my ($na,$nb,$nc);	# holds regex-strs
 my ($out);	# output, option-flag
 
 sub padrep {
-    my ($varname,$newlex) = < @_;
+    my @($varname,$newlex) =  @_;
     return ($newlex)
 	?? 'PVNV \(0x[0-9a-fA-F]+\) "\'.$varname.'" = '
 	!! "PVNV \\\(0x[0-9a-fA-F]+\\\) \\$varname\n";
@@ -82,10 +82,10 @@ SKIP: do {
 
     # fibonacci function under test
     my $asub = sub {
-	my ($self,< %props)=< @_;
+	my @($self,%< %props)= @_;
 	my $total;
 	do { # inner block vars
-	    my (@fib)=@(1,2);
+	    my @(@fib)=@(@(1,2));
 	    for my $i (2..9) {
 		@fib[$i] = @fib[$i-2] + @fib[$i-1];
 	    }

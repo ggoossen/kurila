@@ -36,7 +36,7 @@ sub get_temp_fh {
 END { 1 while unlink < @tempfiles }
 
 sub fooinc {
-    my ($self, $filename) = < @_;
+    my @($self, $filename) =  @_;
     if (substr($filename,0,3) eq 'Foo') {
 	return get_temp_fh($filename);
     }
@@ -75,7 +75,7 @@ pop @INC;
 
 
 sub fooinc2 {
-    my ($self, $filename) = < @_;
+    my @($self, $filename) =  @_;
     if (substr($filename, 0, length($self->[1])) eq $self->[1]) {
 	return get_temp_fh($filename);
     }
@@ -113,7 +113,7 @@ cmp_ok( %INC{?'Bar2.pl'}, '\==', $arrayref,   '  val Bar2.pl is correct in %INC'
 pop @INC;
 
 sub FooLoader::INC {
-    my ($self, $filename) = < @_;
+    my @($self, $filename) =  @_;
     if (substr($filename,0,4) eq 'Quux') {
 	return get_temp_fh($filename);
     }
@@ -162,7 +162,7 @@ cmp_ok( %INC{?'Quux2.pm'}, '\==', $sref,       '  val Quux2.pm is correct in %IN
 pop @INC;
 
 push @INC, sub {
-    my ($self, $filename) = < @_;
+    my @($self, $filename) =  @_;
     if (substr($filename,0,4) eq 'Toto') {
 	%INC{+$filename} = 'xyz';
 	return get_temp_fh($filename);
@@ -182,7 +182,7 @@ is( %INC{?'Toto.pm'}, 'xyz',	   '  val Toto.pm is correct in %INC' );
 pop @INC;
 
 push @INC, sub {
-    my ($self, $filename) = < @_;
+    my @($self, $filename) =  @_;
     if ($filename eq 'abc.pl') {
 	return get_temp_fh($filename, qq(return "abc";\n));
     }
@@ -212,7 +212,7 @@ SKIP: do {
     pop @INC;
 
     push @INC, sub {
-        my ($cr, $filename) = < @_;
+        my @($cr, $filename) =  @_;
         my $module = $filename; $module =~ s,/,::,g; $module =~ s/\.pm$//;
         open my $fh, '<',
              \"package $module; sub complain \{ warn q(barf) \}; \$main::file = __FILE__;"

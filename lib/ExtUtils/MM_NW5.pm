@@ -60,7 +60,7 @@ Add Netware macros initialized above to the Makefile.
 =cut
 
 sub init_platform {
-    my($self) = shift;
+    my@($self) =@( shift);
 
     # To get Win32's setup.
     $self->SUPER::init_platform;
@@ -103,7 +103,7 @@ sub init_platform {
 }
 
 sub platform_constants {
-    my($self) = shift;
+    my@($self) =@( shift);
     my $make_frag = '';
 
     # Setup Win32's constants.
@@ -127,7 +127,7 @@ sub platform_constants {
 =cut
 
 sub const_cccmd {
-    my($self,$libperl)=< @_;
+    my@($self,$libperl)= @_;
     return $self->{?CONST_CCCMD} if $self->{?CONST_CCCMD};
     return '' unless $self->needs_linking();
     return $self->{+CONST_CCCMD} = <<'MAKE_FRAG';
@@ -144,7 +144,7 @@ MAKE_FRAG
 =cut
 
 sub static_lib {
-    my($self) = < @_;
+    my@($self) =  @_;
 
     return '' unless $self->has_link_code;
 
@@ -191,14 +191,14 @@ Defines how to produce the *.so (or equivalent) files.
 =cut
 
 sub dynamic_lib {
-    my($self, < %attribs) = < @_;
+    my@($self, %< %attribs) =  @_;
     return '' unless $self->needs_linking(); #might be because of a subdir
 
     return '' unless $self->has_link_code;
 
-    my($otherldflags) = %attribs{?OTHERLDFLAGS} || ($BORLAND ?? 'c0d32.obj'!! '');
-    my($inst_dynamic_dep) = %attribs{?INST_DYNAMIC_DEP} || "";
-    my($ldfrom) = '$(LDFROM)';
+    my@($otherldflags) = %attribs{?OTHERLDFLAGS} || ($BORLAND ?? 'c0d32.obj'!! '');
+    my@($inst_dynamic_dep) = %attribs{?INST_DYNAMIC_DEP} || "";
+    my@($ldfrom) = '$(LDFROM)';
 
     (my $boot = $self->{?NAME}) =~ s/:/_/g;
 

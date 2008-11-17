@@ -73,7 +73,7 @@ sub set {
 		or return undef;
 	my($key,$val);
 	$ds->?$key($val)
-	    while(($key,$val) = each %arg);
+	    while(@($key,$val) =@( each %arg));
     }
 
     msgctl($$self,IPC_SET,$ds->pack);
@@ -91,7 +91,7 @@ sub rcv {
     msgrcv($$self,$buf,@_[1],@_[2] || 0, @_[3] || 0) or
 	return;
     my $type;
-    ($type,@_[0]) = unpack("l! a*",$buf);
+    @($type,@_[0]) = unpack@("l! a*",$buf);
     $type;
 }
 

@@ -13,7 +13,7 @@ use vars < qw($debugging $verbose);
 print "1..8\n";
 
 sub ok {
-    my($testno, $ok) = < @_;
+    my@($testno, $ok) =  @_;
     print "not " unless $ok;
     print "ok $testno\n";
 }
@@ -49,17 +49,17 @@ our @fixed_strings = @("January", "February", "March", "April", "May", "June",
 
 our (%a1, %a2);
 for my $i (0 .. $hashsize -1) {
-	my($k) = int(rand(1_000_000));
+	my@($k) = int@(rand(1_000_000));
 	$k = MD5->hexhash($k) if $gotmd5 and int(rand(2));
 	%a1{+$k} = \%( key => "$k", "value" => $i );
 
 	# A third of the elements are references to further hashes
 
 	if (int(rand(1.5))) {
-		my($hash2) = \%();
-		my($hash2size) = int(rand($maxhash2size));
+		my@($hash2) = \%();
+		my@($hash2size) = int@(rand($maxhash2size));
 		while ($hash2size--) {
-			my($k2) = $k . $i . int(rand(100));
+			my@($k2) = $k . $i . int(rand(100));
 			$hash2->{+$k2} = @fixed_strings[rand(int(nelems @fixed_strings))];
 		}
 		%a1{$k}->{+value} = $hash2;
@@ -68,8 +68,8 @@ for my $i (0 .. $hashsize -1) {
 	# A further third are references to arrays
 
 	elsif (int(rand(2))) {
-		my($arr_ref) = \@();
-		my($arraysize) = int(rand($maxarraysize));
+		my@($arr_ref) = \@();
+		my@($arraysize) = int@(rand($maxarraysize));
 		while ($arraysize--) {
 			push(@$arr_ref, @fixed_strings[rand(int(nelems @fixed_strings))]);
 		}

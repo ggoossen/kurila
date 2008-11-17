@@ -127,7 +127,7 @@ sub process_options {
 }
 
 sub show_results {
-    my ($Maintainer, $Module, $Files, < @Files) = < @_;
+    my @($Maintainer, $Module, $Files, @< @Files) =  @_;
 
     if ($Maintainer) {
 	for my $m (sort keys %Maintainers) {
@@ -173,8 +173,8 @@ sub show_results {
 	my %ModuleByFile;
 
 	for ( @Files) { s:^\./:: }
- <
-	%ModuleByFile{[ @Files]} = ();
+ 
+	%ModuleByFile{[ @Files]} = @();
 
 	# First try fast match.
 
@@ -214,7 +214,7 @@ sub show_results {
 		for ( @ToDo) { s|/$|| }
 
 		my %ToDo;
- <		%ToDo{[ @ToDo]} = ();
+ 		%ToDo{[ @ToDo]} = @();
 
 		for my $pat (keys %ModuleByPat) {
 		    last unless keys %ToDo;
@@ -273,7 +273,7 @@ sub warn_maintainer {
 }
 
 sub missing_maintainers {
-    my($check, < @path) = < @_;
+    my@($check, @< @path) =  @_;
     maintainers_files();
     my @dir;
     for my $d ( @path) {

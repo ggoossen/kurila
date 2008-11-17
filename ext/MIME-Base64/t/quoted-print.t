@@ -92,7 +92,7 @@ print "1..$notests\n";
 my $testno = 0;
 for ( @tests) {
     $testno++;
-    my ($plain, $encoded) = < @$_;
+    my @($plain, $encoded) =  @$_;
     if (ord('A') == 193) {  # EBCDIC 8 bit chars are different
         if ($testno == 2) { $plain =~ s/\xe5/\x47/; $plain =~ s/\xe6/\x9c/g; $plain =~ s/\xf8/\x70/; }
         if ($testno == 7) { $plain =~ s/\xff/\xdf/; }

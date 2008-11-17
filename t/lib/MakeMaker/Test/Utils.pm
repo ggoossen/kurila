@@ -200,13 +200,13 @@ different calling convention than Unix or Windows.
 =cut
 
 sub make_macro {
-    my($make, $target) = (shift, shift);
+    my@($make, $target) = @(shift, shift);
 
     my $is_mms = $make =~ m/^MM(K|S)/i;
 
     my $cmd = $make;
     my $macros = '';
-    while( my($key,$val) = splice(@_, 0, 2) ) {
+    while( my@($key,$val) = splice@(@_, 0, 2) ) {
         if( $is_mms ) {
             $macros .= qq{/macro="$key=$val"};
         }
@@ -232,7 +232,7 @@ sub calibrate_mtime {
     open(FILE, ">", "calibrate_mtime.tmp") || die $!;
     print FILE "foo";
     close FILE;
-    my($mtime) = @(stat('calibrate_mtime.tmp'))[9];
+    my@($mtime) = @(stat('calibrate_mtime.tmp'))[9];
     unlink 'calibrate_mtime.tmp';
     return $mtime;
 }

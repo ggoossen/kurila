@@ -28,10 +28,10 @@ my $Is_Rhapsody= $^O eq 'rhapsody';
 
 my $Is_Dosish  = $Is_Dos || $Is_OS2 || $Is_MSWin32 || $Is_NetWare || $Is_Cygwin;
 
-my $Is_UFS     = $Is_Darwin && (() = `df -t ufs . 2>/dev/null`) == 2;
+my $Is_UFS     = $Is_Darwin && (@() = `df -t ufs . 2>/dev/null`) == 2;
 
-my($DEV, $INO, $MODE, $NLINK, $UID, $GID, $RDEV, $SIZE,
-   $ATIME, $MTIME, $CTIME, $BLKSIZE, $BLOCKS) = ( <0..12);
+my@($DEV, $INO, $MODE, $NLINK, $UID, $GID, $RDEV, $SIZE,
+   $ATIME, $MTIME, $CTIME, $BLKSIZE, $BLOCKS) = @( <0..12);
 
 my $Curdir = File::Spec->curdir;
 
@@ -46,7 +46,7 @@ close FOO;
 
 open(FOO, ">", "$tmpfile") || DIE("Can't open temp test file: $!");
 
-my($nlink, $mtime, $ctime) = < @(stat(*FOO))[[@($NLINK, $MTIME, $CTIME)]];
+my@($nlink, $mtime, $ctime) =  @(stat(*FOO))[[@($NLINK, $MTIME, $CTIME)]];
 
 #nlink should if link support configured in Perl.
 SKIP: do {
@@ -84,7 +84,7 @@ SKIP: do {
     ok( $lnk_result,    'linked tmp testfile' );
     ok( chmod(0644, $tmpfile),             'chmoded tmp testfile' );
 
-    my($nlink, $mtime, $ctime) = < @(stat($tmpfile))[[@($NLINK, $MTIME, $CTIME)]];
+    my@($nlink, $mtime, $ctime) =  @(stat($tmpfile))[[@($NLINK, $MTIME, $CTIME)]];
 
     SKIP: do {
         skip "No link count", 1 if config_value('dont_use_nlink');
@@ -392,7 +392,7 @@ SKIP: do {
     ok(! -B *FOO,        '   still !-B');
 
     # It's documented this way in perlfunc *shrug*
-    () = ~< *FOO;
+    @() = ~< *FOO;
     ok(eof FOO,         'at EOF');
     ok(-T *FOO,          '   still -T');
     ok(-B *FOO,          '   now -B');

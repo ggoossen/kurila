@@ -28,7 +28,7 @@ my $Cwd = abs_path;
 
 # Let's get to a known position
 SKIP: do {
-    my ($vol,$dir) = < splitpath(abs_path,1);
+    my @($vol,$dir) =  splitpath(abs_path,1);
     my $test_dir = $IsVMS ?? 'T' !! 't';
     skip("Already in t/", 2) if (splitdir($dir))[-1] eq $test_dir;
 
@@ -107,7 +107,7 @@ SKIP: do {
 my @magic_envs = qw(HOME LOGDIR SYS$LOGIN);
 
 sub check_env {
-    my($key) = < @_;
+    my@($key) =  @_;
 
     # Make sure $ENV{'SYS$LOGIN'} is only honored on VMS.
     if( $key eq 'SYS$LOGIN' && !$IsVMS && !$IsMacOS ) {
@@ -170,9 +170,9 @@ sub clean_env {
 
 END {
     no warnings 'uninitialized';
- <
+ 
     # Restore the environment for VMS (and doesn't hurt for anyone else)
-    %ENV{[ @magic_envs]} = < %Saved_Env{[ @magic_envs]};
+    %ENV{[ @magic_envs]} =  %Saved_Env{[ @magic_envs]};
 
     # On VMS this must be deleted or process table is wrong on exit
     # when this script is run interactively.

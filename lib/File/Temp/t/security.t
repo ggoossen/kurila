@@ -86,7 +86,7 @@ sub test_security {
 
   # Create the tempfile
   my $template = "tmpXXXXX";
-  my ($fh1, $fname1) = < try { tempfile ( $template,
+  my @($fh1, $fname1) =  try { tempfile ( $template,
                                           DIR => File::Spec->tmpdir,
                                           UNLINK => 1,
                                       );
@@ -112,7 +112,7 @@ sub test_security {
       eval q{ END { skip($skip,1); } 1; } || die;
       return;
   }
-  my ($fh2, $fname2) = < try { tempfile ($template,  UNLINK => 1 ); };
+  my @($fh2, $fname2) =  try { tempfile ($template,  UNLINK => 1 ); };
   if (defined $fname2) {
       print "# fname2 = $fname2\n";
       ok( (-e $fname2) );

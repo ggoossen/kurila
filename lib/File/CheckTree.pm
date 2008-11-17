@@ -92,7 +92,7 @@ sub validate {
             $check =~ m/^\s*'([^']+)'\s+(.*?)\s*$/ or
             $check =~ m/^\s*(\S+?)\s+(\S.*?)\s*$/)
         {
-            ($file, $test) = ($1,$2);
+            @($file, $test) = @($1,$2);
         }
         else {
             die "Malformed line: '$check'";
@@ -212,11 +212,11 @@ my %Val_Message = %(
 );
 
 sub valmess {
-    my ($disposition, $test, $file) = < @_;
+    my @($disposition, $test, $file) =  @_;
     my $ferror;
 
     if ($test =~ m/ ^ (!?) -(\w) \s* $ /x) {
-        my ($neg, $ftype) = ($1, $2);
+        my @($neg, $ftype) = @($1, $2);
 
         $ferror = "$file %Val_Message{?$ftype}";
 

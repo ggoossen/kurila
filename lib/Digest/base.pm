@@ -15,7 +15,7 @@ sub reset {
 }
 
 sub addfile {
-    my ($self, $handle) = < @_;
+    my @($self, $handle) =  @_;
 
     my $n;
     my $buf = "";
@@ -41,7 +41,7 @@ sub add_bits {
 	$nbits = length($arg);
     }
     else {
-	($bits, $nbits) = < @_;
+	@($bits, $nbits) =  @_;
     }
     if (($nbits % 8) != 0) {
 	require Carp;

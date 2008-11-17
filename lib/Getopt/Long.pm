@@ -116,9 +116,9 @@ sub import {
 ################ Initialization ################
 
 # Values for $order. See GNU getopt.c for details.
-($REQUIRE_ORDER, $PERMUTE, $RETURN_IN_ORDER) = ( <0..2);
+@($REQUIRE_ORDER, $PERMUTE, $RETURN_IN_ORDER) = @( <0..2);
 # Version major/minor numbers.
-($major_version, $minor_version) = $VERSION =~ m/^(\d+)\.(\d+)/;
+@($major_version, $minor_version) = $VERSION =~ m/^(\d+)\.(\d+)/;
 
 ConfigDefaults();
 
@@ -160,7 +160,7 @@ sub new {
 }
 
 sub configure {
-    my ($self) = shift;
+    my @($self) =@( shift);
 
     # Restore settings, merge new settings in.
     my $save = Getopt::Long::Configure ($self->{?settings}, < @_);
@@ -170,7 +170,7 @@ sub configure {
 }
 
 sub getoptions {
-    my ($self) = shift;
+    my @($self) =@( shift);
 
     # Restore config settings.
     my $save = Getopt::Long::Configure ($self->{?settings});
@@ -247,7 +247,7 @@ sub GetOptions(@) {
 }
 
 sub GetOptionsFromString($@) {
-    my ($string) = shift;
+    my @($string) =@( shift);
     require Text::ParseWords;
     my $args = \ Text::ParseWords::shellwords($string);
     $caller ||= @(caller)[0];	# current context
@@ -261,7 +261,7 @@ sub GetOptionsFromString($@) {
 
 sub GetOptionsFromArray($@) {
 
-    my ($argv, < @optionlist) = < @_;	# local copy of the option descriptions
+    my @($argv, @< @optionlist) =  @_;	# local copy of the option descriptions
     my $argend = '--';		# option list terminator
     my %opctl = %( () );		# table of option specs
     my $pkg = $caller || @(caller)[0];	# current context
@@ -355,7 +355,7 @@ sub GetOptionsFromArray($@) {
 	}
 
 	# Parse option spec.
-	my ($name, $orig) = < ParseOptionSpec ($opt, \%opctl);
+	my @($name, $orig) =  ParseOptionSpec ($opt, \%opctl);
 	unless ( defined $name ) {
 	    # Failed. $orig contains the error message. Sorry for the abuse.
 	    $error .= $orig;
@@ -463,7 +463,7 @@ sub GetOptionsFromArray($@) {
     if ( $debug ) {
 	my ($arrow, $k, $v);
 	$arrow = "=> ";
-	while ( ($k,$v) = each(%opctl) ) {
+	while ( @($k,$v) = each@(%opctl) ) {
 	    print STDERR ($arrow, "\%opctl\{$k\} = $(dump::view($v)) ",
                           dump::view(OptCtl($v)), "\n");
 	    $arrow = "   ";
@@ -491,7 +491,7 @@ sub GetOptionsFromArray($@) {
 	my $arg;		# option argument
 	my $ctl;		# the opctl entry
 
-	($found, $opt, $ctl, $arg, $key) = <
+	@($found, $opt, $ctl, $arg, $key) = 
 	  FindOption ($argv, $prefix, $argend, $opt, \%opctl);
 
 	if ( $found ) {
@@ -652,7 +652,7 @@ sub GetOptionsFromArray($@) {
 			if ( ValidValue($ctl, $argv->[0], 1, $argend, $prefix) ) {
 			    $arg = shift(@$argv);
 			    $arg =~ s/_//g if $ctl->[CTL_TYPE] =~ m/^[iIo]$/;
-			    ($key,$arg) = $arg =~ m/^([^=]+)=(.*)/
+			    @($key,$arg) = $arg =~ m/^([^=]+)=(.*)/
 			      if $ctl->[CTL_DEST] == CTL_DEST_HASH;
 			    next;
 			}
@@ -669,7 +669,7 @@ sub GetOptionsFromArray($@) {
 		if ( (nelems @$argv) && ValidValue($ctl, $argv->[0], 0, $argend, $prefix) ) {
 		    $arg = shift(@$argv);
 		    $arg =~ s/_//g if $ctl->[CTL_TYPE] =~ m/^[iIo]$/;
-		    ($key,$arg) = $arg =~ m/^([^=]+)=(.*)/
+		    @($key,$arg) = $arg =~ m/^([^=]+)=(.*)/
 		      if $ctl->[CTL_DEST] == CTL_DEST_HASH;
 		    next;
 		}
@@ -730,7 +730,7 @@ sub GetOptionsFromArray($@) {
 
 # A readable representation of what's in an optbl.
 sub OptCtl ($) {
-    my ($v) = < @_;
+    my @($v) =  @_;
     my @v = map { defined($_) ?? ($_) !! ("<undef>") } @$v;
     "[".
       join(",", @(
@@ -747,7 +747,7 @@ sub OptCtl ($) {
 
 # Parse an option specification and fill the tables.
 sub ParseOptionSpec ($$) {
-    my ($opt, $opctl) = < @_;
+    my @($opt, $opctl) =  @_;
 
     # Match option spec.
     if ( $opt !~ m;^
@@ -771,7 +771,7 @@ sub ParseOptionSpec ($$) {
 	return  @(undef, "Error in option spec: \"$opt\"\n");
     }
 
-    my ($names, $spec) = ($1, $2);
+    my @($names, $spec) = @($1, $2);
     $spec = '' unless defined $spec;
 
     # $orig keeps track of the primary name the user specified.
@@ -810,11 +810,11 @@ sub ParseOptionSpec ($$) {
                     $dest,0,1);
     }
     else {
-	my ($mand, $type, $dest) =
+	my @($mand, $type, $dest) =
 	  $spec =~ m/^([=:])([ionfs])([@%])?(\{(\d+)?(,)?(\d+)?\})?$/;
 	return  @(undef, "Cannot repeat while bundling: \"$opt\"\n")
 	  if $bundling && defined($4);
-	my ($mi, $cm, $ma) = ($5, $6, $7);
+	my @($mi, $cm, $ma) = @($5, $6, $7);
 	return  @(undef, "\{0\} is useless in option spec: \"$opt\"\n")
 	  if defined($mi) && !$mi && !defined($ma) && !defined($cm);
 
@@ -874,7 +874,7 @@ sub FindOption ($$$$$) {
     # returns (1, undef) if option in error,
     # returns (0) otherwise.
 
-    my ($argv, $prefix, $argend, $opt, $opctl) = < @_;
+    my @($argv, $prefix, $argend, $opt, $opctl) =  @_;
 
     print STDERR ("=> find \"$opt\"\n") if $debug;
 
@@ -1067,7 +1067,7 @@ sub FindOption ($$$$$) {
     # Get key if this is a "name=value" pair for a hash option.
     my $key;
     if ($ctl->[CTL_DEST] == CTL_DEST_HASH && defined $arg) {
-	($key, $arg) = ($arg =~ m/^([^=]*)=(.*)$/s) ?? ($1, $2)
+	@($key, $arg) = ($arg =~ m/^([^=]*)=(.*)$/s) ?? ($1, $2)
 	  !! ($arg, defined($ctl->[CTL_DEFAULT]) ?? $ctl->[CTL_DEFAULT] !!
 	     ($mand ?? undef !! ($type eq 's' ?? "" !! 1)));
 	if (! defined $arg) {
@@ -1114,7 +1114,7 @@ sub FindOption ($$$$$) {
 
 	if ( $bundling && defined $rest
 	     && $rest =~ m/^($key_valid)($o_valid)(.*)$/si ) {
-	    ($key, $arg, $rest) = ($1, $2, $3);
+	    @($key, $arg, $rest) = @($1, $2, $3);
 	    chop($key) if $key;
 	    $arg = ($type eq 'o' && $arg =~ m/^0/) ?? oct($arg) !! 0+$arg;
 	    unshift (@$argv, $starter.$rest) if defined $rest && $rest ne '';
@@ -1162,7 +1162,7 @@ sub FindOption ($$$$$) {
 	if ( $bundling && defined $rest &&
 	     $rest =~ m/^($key_valid)($o_valid)(.*)$/s ) {
 	    $arg =~ s/_//g;
-	    ($key, $arg, $rest) = ($1, $2, $3);
+	    @($key, $arg, $rest) = @($1, $2, $3);
 	    chop($key) if $key;
 	    unshift (@$argv, $starter.$rest) if defined $rest && $rest ne '';
 	}
@@ -1198,7 +1198,7 @@ sub FindOption ($$$$$) {
 }
 
 sub ValidValue ($$$$$) {
-    my ($ctl, $arg, $mand, $argend, $prefix) = < @_;
+    my @($ctl, $arg, $mand, $argend, $prefix) =  @_;
 
     if ( $ctl->[CTL_DEST] == CTL_DEST_HASH ) {
 	return 0 unless $arg =~ m/[^=]+=(.*)/;
@@ -1238,7 +1238,7 @@ sub ValidValue ($$$$$) {
 
 # Getopt::Long Configuration.
 sub Configure (@) {
-    my (@options) = @_;
+    my @(@options) = @_;
 
     my $prevconfig =
       \@( $error, $debug, $major_version, $minor_version,
@@ -1247,10 +1247,10 @@ sub Configure (@) {
           $longprefix );
 
     if ( ref(@options[0]) eq 'ARRAY' ) {
-	( $error, $debug, $major_version, $minor_version,
+	@( $error, $debug, $major_version, $minor_version,
 	  $autoabbrev, $getopt_compat, $ignorecase, $bundling, $order,
 	  $gnu_compat, $passthrough, $genprefix, $auto_version, $auto_help,
-	  $longprefix ) = < @{shift(@options)};
+	  $longprefix ) =  @{shift(@options)};
     }
 
     foreach my $opt (  @options ) {
@@ -1447,7 +1447,7 @@ sub VERSION {
 package Getopt::Long::CallBack;
 
 sub new {
-    my ($pkg, < %atts) = < @_;
+    my @($pkg, %< %atts) =  @_;
     bless \%( < %atts ), $pkg;
 }
 

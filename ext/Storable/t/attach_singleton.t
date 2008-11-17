@@ -64,7 +64,7 @@ sub STORABLE_freeze {
 }
 
 sub STORABLE_attach {
-	my ($class, $clone, $string) = < @_;
+	my @($class, $clone, $string) =  @_;
 	Test::More::ok( ! ref $class, 'STORABLE_attach passed class, and not an object' );
 	Test::More::is( $class, 'My::Singleton', 'STORABLE_attach is passed the correct class name' );
 	Test::More::is( $clone, 0, 'We are not in a dclone' );

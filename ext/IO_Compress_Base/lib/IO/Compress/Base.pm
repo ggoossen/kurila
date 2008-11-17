@@ -331,7 +331,7 @@ sub _def
         $x->{+oneInput} = 1 ;
         foreach my $pair ( @{ $x->{Pairs} })
         {
-            my ($from, $to) = < @$pair ;
+            my @($from, $to) =  @$pair ;
             $obj->_singleTarget($x, 1, $from, $to, < @_)
                 or return undef ;
         }

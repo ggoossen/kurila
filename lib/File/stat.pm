@@ -31,10 +31,10 @@ struct 'File::stat' => \ map { $_ => '$' } qw{
 sub populate (@) {
     return unless (nelems @_);
     my $stob = new();
-    @$stob = @( (
+    @$stob = @( @(
 	$st_dev, $st_ino, $st_mode, $st_nlink, $st_uid, $st_gid, $st_rdev,
         $st_size, $st_atime, $st_mtime, $st_ctime, $st_blksize, $st_blocks ) 
-	    = < @_ );
+	    =  @_ );
     return $stob;
 } 
 
@@ -48,7 +48,7 @@ sub stat ($) {
     do {
 		local $!;
 		require Symbol;
-                my ($pkg) = caller();
+                my @($pkg) = caller@();
 		$fh = \*{ Symbol::fetch_glob( $pkg . "::" . $arg) };
 		return unless defined fileno $fh;
 	};

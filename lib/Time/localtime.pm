@@ -21,11 +21,11 @@ use vars      < @EXPORT_OK;
 sub populate (@) {
     return unless (nelems @_);
     my $tmob = Time::tm->new();
-    @$tmob = @( (
+    @$tmob = @( @(
 		$tm_sec, $tm_min, $tm_hour, $tm_mday, 
 		$tm_mon, $tm_year, $tm_wday, $tm_yday, 
 		$tm_isdst )
-	    = < @_ );
+	    =  @_ );
     return $tmob;
 } 
 

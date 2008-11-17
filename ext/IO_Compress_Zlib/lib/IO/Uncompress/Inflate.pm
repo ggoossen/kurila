@@ -109,7 +109,7 @@ sub isZlibMagic
     return $self->HeaderError("CRC mismatch.")
         if $hdr % 31 != 0 ;
 
-    my ($CMF, $FLG) = unpack "C C", $buffer;
+    my @($CMF, $FLG) =@( unpack "C C", $buffer);
     my $cm =    bits($CMF, ZLIB_CMF_CM_OFFSET,    ZLIB_CMF_CM_BITS) ;
 
     # Only Deflate supported
@@ -137,7 +137,7 @@ sub bits
 
 sub _readDeflateHeader
 {
-    my ($self, $buffer) = < @_ ;
+    my @($self, $buffer) =  @_ ;
 
 #    if (! $buffer) {
 #        $self->smartReadExact(\$buffer, ZLIB_HEADER_SIZE);
@@ -152,7 +152,7 @@ sub _readDeflateHeader
 #            if ! isZlibMagic($buffer) ;
 #    }
                                         
-    my ($CMF, $FLG) = unpack "C C", $buffer;
+    my @($CMF, $FLG) =@( unpack "C C", $buffer);
     my $FDICT = bits($FLG, ZLIB_FLG_FDICT_OFFSET,  ZLIB_FLG_FDICT_BITS ),
 
     my $cm = bits($CMF, ZLIB_CMF_CM_OFFSET, ZLIB_CMF_CM_BITS) ;

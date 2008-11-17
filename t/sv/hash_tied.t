@@ -28,14 +28,14 @@ sub TIEHASH {
 
 sub FETCH {
 	my $self = shift;
-	my ($key) = < @_;
+	my @($key) =  @_;
 	$main::hash_fetch++;
 	return $self->{?$key};
 }
 
 sub STORE {
 	my $self = shift;
-	my ($key, $value) = < @_;
+	my @($key, $value) =  @_;
 	$self->{+$key} = $value;
 }
 

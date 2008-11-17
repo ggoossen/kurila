@@ -30,14 +30,14 @@ my @tests = map \@(chomp and < split m/\t+/, $_, 3), grep !m/^#/ && m/\S/, @( ~<
 plan tests => 2 * nelems @tests;
 
 for my $test ( @tests) {
-    my ($yn, $left, $right) = < @$test;
+    my @($yn, $left, $right) =  @$test;
 
     match_test($yn, $left, $right);
     match_test($yn, $right, $left);
 }
 
 sub match_test {
-    my ($yn, $left, $right) = < @_;
+    my @($yn, $left, $right) =  @_;
 
     die "Bad test spec: ($yn, $left, $right)"
 	unless $yn eq "" || $yn eq "!";

@@ -128,7 +128,7 @@ Both routines return a reference to the hash operated on.
 =cut
 
 sub lock_ref_keys {
-    my($hash, < @keys) = < @_;
+    my@($hash, @< @keys) =  @_;
 
     Internals::hv_clear_placeholders %$hash;
     if( (nelems @keys) ) {
@@ -181,7 +181,7 @@ Returns a reference to %hash
 
 
 sub lock_ref_keys_plus {
-    my ($hash,< @keys)=< @_;
+    my @($hash,@< @keys)= @_;
     my @delete;
     Internals::hv_clear_placeholders(%$hash);
     foreach my $key ( @keys) {
@@ -216,7 +216,7 @@ Returns a reference to the %hash.
 =cut
 
 sub lock_ref_value {
-    my($hash, $key) = < @_;
+    my@($hash, $key) =  @_;
     # I'm doubtful about this warning, as it seems not to be true.
     # Marking a value in the hash as RO is useful, regardless
     # of the status of the hash itself.
@@ -227,7 +227,7 @@ sub lock_ref_value {
 }
 
 sub unlock_ref_value {
-    my($hash, $key) = < @_;
+    my@($hash, $key) =  @_;
     Internals::SvREADONLY $hash->{?$key}, 0;
     return $hash
 }

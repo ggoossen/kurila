@@ -95,7 +95,7 @@ sub chkTrailer
     my $trailer = shift;
 
     # Check CRC & ISIZE 
-    my ($CRC32, $ISIZE) = unpack("V V", $trailer) ;
+    my @($CRC32, $ISIZE) = unpack@("V V", $trailer) ;
     $self->{Info}->{+CRC32} = $CRC32;    
     $self->{Info}->{+ISIZE} = $ISIZE;    
 
@@ -116,13 +116,13 @@ sub isGzipMagic
 {
     my $buffer = shift ;
     return 0 if length $buffer +< GZIP_ID_SIZE ;
-    my ($id1, $id2) = unpack("C C", $buffer) ;
+    my @($id1, $id2) = unpack@("C C", $buffer) ;
     return $id1 == GZIP_ID1 && $id2 == GZIP_ID2 ;
 }
 
 sub _readFullGzipHeader($)
 {
-    my ($self) = < @_ ;
+    my @($self) =  @_ ;
     my $magic = '' ;
 
     $self->smartReadExact(\$magic, GZIP_ID_SIZE);
@@ -144,9 +144,9 @@ sub _readFullGzipHeader($)
 
 sub _readGzipHeader($)
 {
-    my ($self, $magic) = < @_ ;
+    my @($self, $magic) =  @_ ;
     my ($HeaderCRC) ;
-    my ($buffer) = '' ;
+    my @($buffer) = '' ;
 
     $self->smartReadExact(\$buffer, GZIP_MIN_HEADER_SIZE - GZIP_ID_SIZE)
         or return $self->HeaderError("Minimum header size is " . 
@@ -156,7 +156,7 @@ sub _readGzipHeader($)
     $self->{+HeaderPending} = $keep ;
 
     # now split out the various parts
-    my ($cm, $flag, $mtime, $xfl, $os) = unpack("C C V C C", $buffer) ;
+    my @($cm, $flag, $mtime, $xfl, $os) = unpack@("C C V C C", $buffer) ;
 
     $cm == GZIP_CM_DEFLATED 
         or return $self->HeaderError("Not Deflate (CM is $cm)") ;
@@ -172,7 +172,7 @@ sub _readGzipHeader($)
         $self->smartReadExact(\$buffer, GZIP_FEXTRA_HEADER_SIZE) 
             or return $self->TruncatedHeader("FEXTRA Length") ;
 
-        my ($XLEN) = unpack("v", $buffer) ;
+        my @($XLEN) = unpack@("v", $buffer) ;
         $self->smartReadExact(\$EXTRA, $XLEN) 
             or return $self->TruncatedHeader("FEXTRA Body");
         $keep .= $buffer . $EXTRA ;

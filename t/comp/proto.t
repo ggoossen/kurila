@@ -200,7 +200,7 @@ testing \&sub_aref, '&\@';
 
 sub sub_aref (&\@) {
     print "# \@_ = (",join(",", map {dump::view($_)} @_),")\n";
-    my($sub,$array) = < @_;
+    my@($sub,$array) =  @_;
     ok( (nelems @_) == 2 && (nelems @{$array}) == 4 );
     print < map { &{$sub}($_) } @{$array}
 }

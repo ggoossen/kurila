@@ -19,10 +19,10 @@ plan(tests => scalar nelems @prgs);
 my $i;
 for ( @prgs){
     ++$i;
-    my($prog,$expected) = < split(m/\nEXPECT\n/, $_, 2);
+    my@($prog,$expected) =  split(m/\nEXPECT\n/, $_, 2);
     print("not ok $i # bad test format\n"), next
         unless defined $expected;
-    my ($testname) = $prog =~ m/^# (.*)\n/m;
+    my @($testname) = $prog =~ m/^# (.*)\n/m;
     $testname ||= '';
     local our $TODO = $testname =~ s/^TODO //;
     $expected =~ s/\n+$//;

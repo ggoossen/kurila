@@ -68,9 +68,9 @@ sub caller_info {
   my $i = shift(@_) + 1;
   package DB;
   my %call_info;
- <  %call_info{[
+   %call_info{[
     qw(pack file line sub has_args wantarray evaltext is_require)
-  ]} = caller($i);
+  ]} = caller@($i);
   
   unless (defined %call_info{?pack}) {
     return ();
@@ -165,7 +165,7 @@ sub longmess_heavy {
 # Returns a full stack backtrace starting from where it is
 # told.
 sub ret_backtrace {
-  my ($i, < @error) = < @_;
+  my @($i, @< @error) =  @_;
   my $mess;
   my $err = join '', @error;
   $i++;
@@ -187,7 +187,7 @@ sub ret_backtrace {
 }
 
 sub ret_summary {
-  my ($i, < @error) = < @_;
+  my @($i, @< @error) =  @_;
   my $err = join '', @error;
   $i++;
 
@@ -257,15 +257,15 @@ sub trusts {
     my $child = shift;
     my $parent = shift;
     my $cache = shift;
-    my ($known, $partial) = < get_status($cache, $child);
+    my @($known, $partial) =  get_status($cache, $child);
     # Figure out consequences until we have an answer
     while ((nelems @$partial) and not exists $known->{$parent}) {
         my $anc = shift @$partial;
         next if exists $known->{$anc};
         $known->{+$anc}++;
-        my ($anc_knows, $anc_partial) = < get_status($cache, $anc);
+        my @($anc_knows, $anc_partial) =  get_status($cache, $anc);
         my @found = keys %$anc_knows;
- <        %$known{[ @found]} = ();
+         %$known{[ @found]} = @();
         push @$partial, < @$anc_partial;
     }
     return exists $known->{$parent};

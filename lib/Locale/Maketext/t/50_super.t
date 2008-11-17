@@ -57,7 +57,7 @@ foreach my $in ( @in) {
     die "What kind of line is <$in>?!"
      unless $in =~ m/^(.+)=>(.+)$/s;
   
-    my($i,$s) = ($1, $2);
+    my@($i,$s) = @($1, $2);
     @in     = @($i =~ m/(\S+)/g);
     @should = @($s =~ m/(\S+)/g);
     #print "{@in}{@should}\n";

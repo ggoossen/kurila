@@ -43,12 +43,12 @@ my $GCC     = %Config{?'cc'} =~ m/^gcc/i ?? 1 !! 0;
 =cut
 
 sub dlsyms {
-    my($self,< %attribs) = < @_;
+    my@($self,%< %attribs) =  @_;
 
-    my($funcs) = %attribs{?DL_FUNCS} || $self->{?DL_FUNCS} || \%();
-    my($vars)  = %attribs{?DL_VARS} || $self->{?DL_VARS} || \@();
-    my($funclist) = %attribs{?FUNCLIST} || $self->{?FUNCLIST} || \@();
-    my($imports)  = %attribs{?IMPORTS} || $self->{?IMPORTS} || \%();
+    my@($funcs) = %attribs{?DL_FUNCS} || $self->{?DL_FUNCS} || \%();
+    my@($vars)  = %attribs{?DL_VARS} || $self->{?DL_VARS} || \@();
+    my@($funclist) = %attribs{?FUNCLIST} || $self->{?FUNCLIST} || \@();
+    my@($imports)  = %attribs{?IMPORTS} || $self->{?IMPORTS} || \%();
     my(@m);
 
     if (not $self->{SKIPHASH}->{?'dynamic'}) {
@@ -78,7 +78,7 @@ Changes the path separator with .
 =cut
 
 sub replace_manpage_separator {
-    my($self,$man) = < @_;
+    my@($self,$man) =  @_;
     $man =~ s,/+,.,g;
     $man;
 }
@@ -96,7 +96,7 @@ used by default.
 =cut
 
 sub maybe_command {
-    my($self,$file) = < @_;
+    my@($self,$file) =  @_;
     my @e = @( exists(%ENV{'PATHEXT'})
           ?? < split(m/;/, %ENV{?PATHEXT})
 	  !! < qw(.com .exe .bat .cmd) );
@@ -123,7 +123,7 @@ Using \ for Windows.
 =cut
 
 sub init_DIRFILESEP {
-    my($self) = shift;
+    my@($self) =@( shift);
 
     my $make = $self->make;
 
@@ -148,7 +148,7 @@ Adjustments are made for Borland's quirks needing -L to come first.
 =cut
 
 sub init_others {
-    my ($self) = < @_;
+    my @($self) =  @_;
 
     # Used in favor of echo because echo won't strip quotes. :(
     $self->{+ECHO}     ||= $self->oneliner('print qq{@ARGV}', \@('-l'));
@@ -203,13 +203,13 @@ Add MM_Win32_VERSION.
 =cut
 
 sub init_platform {
-    my($self) = shift;
+    my@($self) =@( shift);
 
     $self->{+MM_Win32_VERSION} = $VERSION;
 }
 
 sub platform_constants {
-    my($self) = shift;
+    my@($self) =@( shift);
     my $make_frag = '';
 
     foreach my $macro (qw(MM_Win32_VERSION))
@@ -229,7 +229,7 @@ Add .USESHELL target for dmake.
 =cut
 
 sub special_targets {
-    my($self) = < @_;
+    my@($self) =  @_;
 
     my $make_frag = $self->SUPER::special_targets;
 
@@ -251,7 +251,7 @@ to its own method.
 =cut
 
 sub static_lib {
-    my($self) = < @_;
+    my@($self) =  @_;
     return '' unless $self->has_link_code;
 
     my(@m);
@@ -290,14 +290,14 @@ Complicated stuff for Win32 that I don't understand. :(
 =cut
 
 sub dynamic_lib {
-    my($self, < %attribs) = < @_;
+    my@($self, %< %attribs) =  @_;
     return '' unless $self->needs_linking(); #might be because of a subdir
 
     return '' unless $self->has_link_code;
 
-    my($otherldflags) = %attribs{?OTHERLDFLAGS} || ($BORLAND ?? 'c0d32.obj'!! '');
-    my($inst_dynamic_dep) = %attribs{?INST_DYNAMIC_DEP} || "";
-    my($ldfrom) = '$(LDFROM)';
+    my@($otherldflags) = %attribs{?OTHERLDFLAGS} || ($BORLAND ?? 'c0d32.obj'!! '');
+    my@($inst_dynamic_dep) = %attribs{?INST_DYNAMIC_DEP} || "";
+    my@($ldfrom) = '$(LDFROM)';
     my(@m);
 
 # one thing for GCC/Mingw32:
@@ -387,7 +387,7 @@ Checks for the perl program under several common perl extensions.
 =cut
 
 sub perl_script {
-    my($self,$file) = < @_;
+    my@($self,$file) =  @_;
     return $file if -r $file && -f _;
     return "$file.pl"  if -r "$file.pl" && -f _;
     return "$file.plx" if -r "$file.plx" && -f _;
@@ -415,7 +415,7 @@ banner.
 =cut
 
 sub pasthru {
-    my($self) = shift;
+    my@($self) =@( shift);
     return "PASTHRU = " . ($self->make eq 'nmake' ?? "-nologo" !! "");
 }
 
@@ -428,7 +428,7 @@ for other Windows shells, I don't know.
 =cut
 
 sub oneliner {
-    my($self, $cmd, $switches) = < @_;
+    my@($self, $cmd, $switches) =  @_;
     $switches = \@() unless defined $switches;
 
     # Strip leading and trailing newlines
@@ -445,7 +445,7 @@ sub oneliner {
 
 
 sub quote_literal {
-    my($self, $text) = < @_;
+    my@($self, $text) =  @_;
 
     # I don't know if this is correct, but it seems to work on
     # Win98's command.com
@@ -465,7 +465,7 @@ sub quote_literal {
 
 
 sub escape_newlines {
-    my($self, $text) = < @_;
+    my@($self, $text) =  @_;
 
     # Escape newlines
     $text =~ s{\n}{\\\n}g;
@@ -489,7 +489,7 @@ NOTE: This only works with simple relative directories.  Throw it an absolute di
 =cut
 
 sub cd {
-    my($self, $dir, < @cmds) = < @_;
+    my@($self, $dir, @< @cmds) =  @_;
 
     return $self->SUPER::cd($dir, < @cmds) unless $self->make eq 'nmake';
 
@@ -543,7 +543,7 @@ defined.
 =cut
 
 sub cflags {
-    my($self,$libperl)=< @_;
+    my@($self,$libperl)= @_;
     return $self->{?CFLAGS} if $self->{?CFLAGS};
     return '' unless $self->needs_linking();
 

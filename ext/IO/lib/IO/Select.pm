@@ -54,7 +54,7 @@ sub exists
 
 sub _fileno
 {
- my($self, $f) = < @_;
+ my@($self, $f) =  @_;
  return unless defined $f;
  $f = $f->[0] if ref($f) eq 'ARRAY';
  return fileno($f) if ref $f;
@@ -165,7 +165,7 @@ sub as_string  # for debugging
 
 sub _max
 {
- my($a,$b,$c) = < @_;
+ my@($a,$b,$c) =  @_;
  $a +> $b
     ?? $a +> $c
         ?? $a
@@ -180,7 +180,7 @@ sub select
  shift
    if defined @_[0] && !ref(@_[0]);
 
- my($r,$w,$e,$t) = < @_;
+ my@($r,$w,$e,$t) =  @_;
  my @result = @( () );
 
  my $rb = defined $r ?? $r->[VEC_BITS] !! undef;

@@ -27,7 +27,7 @@ sub walk_output { # updates $walkHandle
 }
 
 sub shownamearray {
-    my ($name, $av) = < @_;
+    my @($name, $av) =  @_;
     my @els = $av->ARRAY;
     my $count = (nelems @els);
     print $walkHandle "$name has $count entries\n";
@@ -43,7 +43,7 @@ sub shownamearray {
 }
 
 sub showvaluearray {
-    my ($name, $av) = < @_;
+    my @($name, $av) =  @_;
     my @els = $av->ARRAY;
     my $count = (nelems @els);
     print $walkHandle "$name has $count entries\n";
@@ -54,7 +54,7 @@ sub showvaluearray {
 }
 
 sub showlex {
-    my ($objname, $namesav, $valsav) = < @_;
+    my @($objname, $namesav, $valsav) =  @_;
     shownamearray("Pad of lexical names for $objname", $namesav);
     showvaluearray("Pad of lexical values for $objname", $valsav);
 }
@@ -62,7 +62,7 @@ sub showlex {
 my ($newlex, $nosp1); # rendering state vars
 
 sub newlex { # drop-in for showlex
-    my ($objname, $names, $vals) = < @_;
+    my @($objname, $names, $vals) =  @_;
     my @names = $names->ARRAY;
     my @vals  = $vals->ARRAY;
     my $count = (nelems @names);
@@ -75,7 +75,7 @@ sub newlex { # drop-in for showlex
 }
 
 sub showlex_obj {
-    my ($objname, $obj) = < @_;
+    my @($objname, $obj) =  @_;
     $objname =~ s/^&main::/&/;
     showlex($objname, < svref_2object($obj)->PADLIST->ARRAY) if !$newlex;
     newlex ($objname, < svref_2object($obj)->PADLIST->ARRAY) if  $newlex;

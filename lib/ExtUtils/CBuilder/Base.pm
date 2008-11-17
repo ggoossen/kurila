@@ -46,7 +46,7 @@ sub cleanup {
 }
 
 sub object_file {
-  my ($self, $filename) = < @_;
+  my @($self, $filename) =  @_;
 
   # File name, minus the suffix
   (my $file_base = $filename) =~ s/\.[^.]+$//;
@@ -61,27 +61,27 @@ sub arg_include_dirs {
 sub arg_nolink { '-c' }
 
 sub arg_object_file {
-  my ($self, $file) = < @_;
+  my @($self, $file) =  @_;
   return  @('-o', $file);
 }
 
 sub arg_share_object_file {
-  my ($self, $file) = < @_;
+  my @($self, $file) =  @_;
   return  @(< $self->split_like_shell($self->{config}->{lddlflags}), '-o', $file);
 }
 
 sub arg_exec_file {
-  my ($self, $file) = < @_;
+  my @($self, $file) =  @_;
   return  @('-o', $file);
 }
 
 sub arg_defines {
-  my ($self, < %args) = < @_;
+  my @($self, %< %args) =  @_;
   return map "-D$_=%args{?$_}", keys %args;
 }
 
 sub compile {
-  my ($self, < %args) = < @_;
+  my @($self, %< %args) =  @_;
   die "Missing 'source' argument to compile()" unless defined %args{?source};
   
   my $cf = $self->{?config}; # For convenience
@@ -113,7 +113,7 @@ sub compile {
 }
 
 sub have_compiler {
-  my ($self) = < @_;
+  my @($self) =  @_;
   return $self->{?have_compiler} if defined $self->{?have_compiler};
   
   my $tmpfile = File::Spec->catfile(File::Spec->tmpdir, 'compilet.c');
@@ -139,7 +139,7 @@ sub have_compiler {
 }
 
 sub lib_file {
-  my ($self, $dl_file) = < @_;
+  my @($self, $dl_file) =  @_;
   $dl_file =~ s/\.[^.]+$//;
   $dl_file =~ s/"//g;
   return "$dl_file.$self->{config}->{?dlext}";
@@ -147,7 +147,7 @@ sub lib_file {
 
 
 sub exe_file {
-  my ($self, $dl_file) = < @_;
+  my @($self, $dl_file) =  @_;
   $dl_file =~ s/\.[^.]+$//;
   $dl_file =~ s/"//g;
   return "$dl_file$self->{config}->{?_exe}";
@@ -158,7 +158,7 @@ sub need_prelink { 0 }
 sub extra_link_args_after_prelink { return }
 
 sub prelink {
-  my ($self, < %args) = < @_;
+  my @($self, %< %args) =  @_;
   
   (%args{+dl_file} = %args{?dl_name}) =~ s/.*::// unless %args{?dl_file};
   
@@ -179,17 +179,17 @@ sub prelink {
 }
 
 sub link {
-  my ($self, < %args) = < @_;
+  my @($self, %< %args) =  @_;
   return $self->_do_link('lib_file', lddl => 1, < %args);
 }
 
 sub link_executable {
-  my ($self, < %args) = < @_;
+  my @($self, %< %args) =  @_;
   return $self->_do_link('exe_file', lddl => 0, < %args);
 }
 
 sub _do_link {
-  my ($self, $type, < %args) = < @_;
+  my @($self, $type, %< %args) =  @_;
 
   my $cf = $self->{?config}; # For convenience
   
@@ -218,13 +218,13 @@ sub _do_link {
 
 
 sub do_system {
-  my ($self, < @cmd) = < @_;
+  my @($self, @< @cmd) =  @_;
   print "$(join ' ',@cmd)\n" if !$self->{?quiet};
   return !system(< @cmd);
 }
 
 sub split_like_shell {
-  my ($self, $string) = < @_;
+  my @($self, $string) =  @_;
   
   return () unless defined($string);
   return @$string if UNIVERSAL::isa($string, 'ARRAY');

@@ -46,7 +46,7 @@ sub opdump (;$) {
 
 sub _init_optags {
     my(%all, %seen);
- <    %all{[opset_to_ops(full_opset())]} = (); # keys only
+     %all{[opset_to_ops(full_opset())]} = @(); # keys only
 
     local($_);
     local($/) = "\n=cut"; # skip to optags definition section

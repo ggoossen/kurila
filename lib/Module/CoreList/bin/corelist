@@ -120,7 +120,7 @@ if ( !nelems @ARGV ) {
 while ((nelems @ARGV)) {
 	my ($mod, $ver);
 	if (@ARGV[0] =~ m/=/) {
-	    ($mod, $ver) = < split m/=/, shift @ARGV;
+	    @($mod, $ver) =  split m/=/, shift @ARGV;
 	} else {
 	    $mod = shift @ARGV;
 	    $ver = ((nelems @ARGV) && @ARGV[0] =~ m/^\d/) ?? shift @ARGV !! "";
@@ -152,7 +152,7 @@ while ((nelems @ARGV)) {
 exit();
 
 sub module_version {
-    my($mod,$ver) = < @_;
+    my@($mod,$ver) =  @_;
 
     if ( %Opts{?v} ) {
 	my $version_hash = Module::CoreList->find_version(%Opts{v});

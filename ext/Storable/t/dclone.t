@@ -72,7 +72,7 @@ print "ok 9\n";
 # [ID 20020221.007] SEGV in Storable with empty string scalar object
 package TestString;
 sub new {
-    my ($type, $string) = < @_;
+    my @($type, $string) =  @_;
     return bless(\$string, $type);
 }
 package main;

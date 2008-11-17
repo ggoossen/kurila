@@ -25,7 +25,7 @@ Typically, it is invoked as:
 =cut
 
 
-my ($ext1, $ext2) = < map {quotemeta} grep {!m/^--/} @ARGV;
+my @($ext1, $ext2) =  map {quotemeta} grep {!m/^--/} @ARGV;
 my %opts = %(
   #defaults
     'verbose' => 0,

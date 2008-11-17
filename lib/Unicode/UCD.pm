@@ -76,7 +76,7 @@ my $CASESPECFH;
 my $NAMEDSEQFH;
 
 sub openunicode {
-    my ($rfh, < @path) = < @_;
+    my @($rfh, @< @path) =  @_;
     my $f;
     unless (defined $$rfh) {
 	for my $d ( @INC) {
@@ -225,13 +225,13 @@ sub charinfo {
 	    return unless defined $line;
 	    chomp $line;
 	    my %prop;
- <	    %prop{[qw(
+ 	    %prop{[qw(
 		     code name category
 		     combining bidi decomposition
 		     decimal digit numeric
 		     mirrored unicode10 comment
 		     upper lower title
-		    )]} = < split(m/;/, $line, -1);
+		    )]} =  split(m/;/, $line, -1);
 	    $hexk =~ s/^0+//;
 	    $hexk =  sprintf("\%04X", hex($hexk));
 	    if (%prop{?code} eq $hexk) {
@@ -250,7 +250,7 @@ sub charinfo {
 }
 
 sub _search { # Binary search in a [[lo,hi,prop],[...],...] table.
-    my ($table, $lo, $hi, $code) = < @_;
+    my @($table, $lo, $hi, $code) =  @_;
 
     return if $lo +> $hi;
 
@@ -270,7 +270,7 @@ sub _search { # Binary search in a [[lo,hi,prop],[...],...] table.
 }
 
 sub charinrange {
-    my ($range, $arg) = < @_;
+    my @($range, $arg) =  @_;
     my $code = _getcode($arg);
     croak __PACKAGE__, "::charinrange: unknown code '$arg'"
 	unless defined $code;
@@ -312,7 +312,7 @@ sub _charblocks {
 	    local $_;
 	    while ( ~< $BLOCKSFH) {
 		if (m/^([0-9A-F]+)\.\.([0-9A-F]+);\s+(.+)/) {
-		    my ($lo, $hi) = (hex($1), hex($2));
+		    my @($lo, $hi) = @(hex($1), hex($2));
 		    my $subrange = \@( $lo, $hi, $3 );
 		    push @BLOCKS, $subrange;
 		    push @{%BLOCKS{+$3}}, $subrange;
@@ -374,7 +374,7 @@ sub _charscripts {
 	    local $_;
 	    while ( ~< $SCRIPTSFH) {
 		if (m/^([0-9A-F]+)(?:\.\.([0-9A-F]+))?\s+;\s+(\w+)/) {
-		    my ($lo, $hi) = (hex($1), $2 ?? hex($2) !! hex($1));
+		    my @($lo, $hi) = @(hex($1), $2 ?? hex($2) !! hex($1));
 		    my $script = lc($3);
 		    $script =~ s/\b(\w)/$(uc($1))/g;
 		    my $subrange = \@( $lo, $hi, $script );
@@ -774,22 +774,22 @@ sub _casespec {
 	    local $_;
 	    while ( ~< $CASESPECFH) {
 		if (m/^([0-9A-F]+); ([0-9A-F]+(?: [0-9A-F]+)*)?; ([0-9A-F]+(?: [0-9A-F]+)*)?; ([0-9A-F]+(?: [0-9A-F]+)*)?; (\w+(?: \w+)*)?/) {
-		    my ($hexcode, $lower, $title, $upper, $condition) =
-			($1, $2, $3, $4, $5);
+		    my @($hexcode, $lower, $title, $upper, $condition) =
+			@($1, $2, $3, $4, $5);
 		    my $code = hex($hexcode);
 		    if (exists %CASESPEC{$code}) {
 			if (exists %CASESPEC{$code}->{code}) {
-			    my ($oldlower,
+			    my @($oldlower,
 				$oldtitle,
 				$oldupper,
-				$oldcondition) = <
+				$oldcondition) = 
 				    %{%CASESPEC{$code}}{[qw(lower
 							   title
 							   upper
 							   condition)]};
 			    if (defined $oldcondition) {
-				my ($oldlocale) =
-				($oldcondition =~ m/^([a-z][a-z](?:_\S+)?)/);
+				my @($oldlocale) =
+				@($oldcondition =~ m/^([a-z][a-z](?:_\S+)?)/);
 				delete %CASESPEC{$code};
 				%CASESPEC{+$code}->{+$oldlocale} =
 				\%( code      => $hexcode,
@@ -799,8 +799,8 @@ sub _casespec {
                                     condition => $oldcondition );
 			    }
 			}
-			my ($locale) =
-			    ($condition =~ m/^([a-z][a-z](?:_\S+)?)/);
+			my @($locale) =
+			    @($condition =~ m/^([a-z][a-z](?:_\S+)?)/);
 			%CASESPEC{$code}->{+$locale} =
 			\%( code      => $hexcode,
                             lower     => $lower,
@@ -862,7 +862,7 @@ sub _namedseq {
 	    local $_;
 	    while ( ~< $NAMEDSEQFH) {
 		if (m/^(.+)\s*;\s*([0-9A-F]+(?: [0-9A-F]+)*)$/) {
-		    my ($n, $s) = ($1, $2);
+		    my @($n, $s) = @($1, $2);
 		    my @s = map { chr(hex($_)) } split(' ', $s);
 		    %NAMEDSEQ{+$n} = join("", @s);
 		}

@@ -433,7 +433,7 @@ do {
 };
 
 for my $test ( @tests) {
-    my($data, $expected) = < @$test;
+    my@($data, $expected) =  @$test;
     open(FH, ">", "$file") || die "Can't create $file: $!";
     binmode(FH);
     print FH $data;

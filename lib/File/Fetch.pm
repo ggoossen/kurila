@@ -370,7 +370,7 @@ sub _parse_uri {
         ### rebuild the path from the leftover parts;
         $href->{+path} = join '/', @( '', splice( @parts, $index, ((nelems @parts)-1) ));
 
-    } else { <
+    } else { 
         ### using anything but qw() in hash slices may produce warnings 
         ### in older perls :-(
         %{$href}{[qw(host path) ]} = $uri =~ m|([^/]*)(/.*)$|s;

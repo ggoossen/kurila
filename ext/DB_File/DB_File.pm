@@ -231,7 +231,7 @@ else
 
 sub tie_hash_or_array
 {
-    my (@arg) = @_ ;
+    my @(@arg) = @_ ;
     my $tieHASH = ( @(caller(1))[3] =~ m/TIEHASH/ ) ;
 
     use File::Spec;
@@ -306,8 +306,8 @@ sub find_dup
         unless (nelems @_) == 3 ;
  
     my $db        = shift ;
-    my ($origkey, $value_wanted) = < @_ ;
-    my ($key, $value) = ($origkey, 0);
+    my @($origkey, $value_wanted) =  @_ ;
+    my @($key, $value) = @($origkey, 0);
 
     my $status = $db->seq($key, $value, R_CURSOR());
     while ($status == 0) {
@@ -325,7 +325,7 @@ sub del_dup
         unless (nelems @_) == 3 ;
  
     my $db        = shift ;
-    my ($key, $value) = < @_ ;
+    my @($key, $value) =  @_ ;
     my $status = $db->find_dup($key, $value) ;
     return $status if $status != 0 ;
 

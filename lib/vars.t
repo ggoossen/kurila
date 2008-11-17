@@ -25,7 +25,7 @@ $e = !(grep m/^Name "main::y" used only once: possible typo/, @warns) && 'not ';
 print "$($e)ok 3\n";
 $e = !(grep m/^Name "main::z" used only once: possible typo/, @warns) && 'not ';
 print "$($e)ok 4\n";
-($e, < @warns) = (nelems @warns) != 4 && 'not ';
+@($e, @< @warns) = (nelems @warns) != 4 && 'not ';
 print "$($e)ok 5\n";
 
 # this is inside eval() to avoid creation of symbol table entries and

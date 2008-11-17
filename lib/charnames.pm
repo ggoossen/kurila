@@ -48,12 +48,12 @@ sub alias (@)
 {
   (nelems @_) or return %alias3;
   my $alias = ref @_[0] ?? @_[0] !! \%( < @_ );
- <  %alias3{[keys %$alias]} = < values %$alias;
+   %alias3{[keys %$alias]} =  values %$alias;
 } # alias
 
 sub alias_file ($)
 {
-  my ($arg, $file) = < @_;
+  my @($arg, $file) =  @_;
   if (-f $arg && File::Spec->file_name_is_absolute ($arg)) {
     $file = $arg;
   }
@@ -115,7 +115,7 @@ sub charnames
     ## The short name is like "greek:Sigma"
     unless (defined $hexstr) {
       if (%^H{?charnames_short} and $name =~ m/^(.+?):(.+)/s) {
-	my ($script, $cname) = ($1, $2);
+	my @($script, $cname) = @($1, $2);
 	my $case = $cname =~ m/[[:upper:]]/ ?? "CAPITAL" !! "SMALL";
         my $uc_cname = uc($cname);
         my $uc_script = uc($script);
@@ -165,7 +165,7 @@ sub import
   ##
   ## fill %h keys with our @_ args.
   ##
-  my ($promote, %h, @args) = (0, %(), @());
+  my @($promote, %h, @args) = @(0, %(), @());
   while (my $arg = shift) {
     if ($arg eq ":alias") {
       (nelems @_) or
@@ -193,7 +193,7 @@ sub import
     push @args, $arg;
   }
   (nelems @args) == 0 && $promote and @args = @(":full");
- <  %h{[ @args]} = (1) x nelems @args;
+   %h{[ @args]} = (1) x nelems @args;
 
   %^H{+charnames_full} = delete %h{':full'};
   %^H{+charnames_short} = delete %h{':short'};

@@ -40,7 +40,7 @@ ok( !exists %hash{bar},'!exists $hash{bar}' );
 %hash{+bar} = 69;
 is( %hash{?bar}, 69 ,'$hash{bar} == 69');
 
-try { () = %hash{?i_dont_exist} };
+try { @() = %hash{?i_dont_exist} };
 like( $@->{?description}, qr/^Attempt to access disallowed key 'i_dont_exist' in a restricted hash/,
       'Disallowed 1' );
 
@@ -168,7 +168,7 @@ do {
 
 
 lock_keys(%ENV);
-try { () = %ENV{?I_DONT_EXIST} };
+try { @() = %ENV{?I_DONT_EXIST} };
 like( $@->{?description}, qr/^Attempt to access disallowed key 'I_DONT_EXIST' in a restricted hash/,   'locked %ENV');
 
 do {
@@ -248,7 +248,7 @@ do {
       my %target;
       lock_keys ( %target, < @keys ) if $lock;
 
-      while (my ($k, $v) = each %clean) {
+      while (my @($k, $v) =@( each %clean)) {
 	%target{+$k} = $v;
       }
 
@@ -272,10 +272,10 @@ do {
 		 "hash in list context for $message");
 
       my (@clean, @target);
-      while (my ($k, $v) = each %clean) {
+      while (my @($k, $v) =@( each %clean)) {
 	push @clean, $k, $v;
       }
-      while (my ($k, $v) = each %target) {
+      while (my @($k, $v) =@( each %target)) {
 	push @target, $k, $v;
       }
 
@@ -347,12 +347,12 @@ do {
     unlock_keys(%hash);
     is (nkeys %hash, 2,"Count of keys after unlock");
 
-    my ($first, $value) = each %hash;
+    my @($first, $value) =@( each %hash);
     is (%hash{?$first}, $value, "Key has the expected value before the lock");
     lock_keys(%hash);
     is (%hash{?$first}, $value, "Key has the expected value after the lock");
 
-    my ($second, $v2) = each %hash;
+    my @($second, $v2) =@( each %hash);
 
     is (%hash{?$first}, $value, "Still correct after iterator advances");
     is (%hash{?$second}, $v2, "Other key has the expected value");

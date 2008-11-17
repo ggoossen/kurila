@@ -20,7 +20,7 @@ do {
 };
 
 sub Backwards { ($a cmp $b) +< 0 ?? 1 !! ($a cmp $b) +> 0 ?? -1 !! 0 }
-sub Backwards_stacked($$) { my($x,$y) = < @_; ($x cmp $y) +< 0 ?? 1 !! ($x cmp $y) +> 0 ?? -1 !! 0 }
+sub Backwards_stacked($$) { my@($x,$y) =  @_; ($x cmp $y) +< 0 ?? 1 !! ($x cmp $y) +> 0 ?? -1 !! 0 }
 sub Backwards_other { ($a cmp $b) +< 0 ?? 1 !! ($a cmp $b) +> 0 ?? -1 !! 0 }
 
 my $upperfirst = ('A' cmp 'a') +< 0;
@@ -205,7 +205,7 @@ do {
     sub reenter { my @force = sort \&compare, qw/a b/ }
 };
 do {
-    my($def, $init) = (0, 0);
+    my@($def, $init) = @(0, 0);
     @b = sort {
 	$def = 1 if defined $Bar::a;
 	Bar::reenter() unless $init++;
@@ -290,7 +290,7 @@ do {
 	    return 1;
 	}
 	if ($n+<5) { rec($n+1); }
-	else { () = < sort \&rec, @(1,2); }
+	else { @() =  sort \&rec, @(1,2); }
 
 	$failed = 1 if !defined $n;
     }
@@ -304,7 +304,7 @@ do {
 # de facto behaviour that shouldn't be broken.
 package main;
 my $answer = "good";
-() = < sort \&OtherPack::foo, @(1,2,3,4);
+@() =  sort \&OtherPack::foo, @(1,2,3,4);
 
 do {
     package OtherPack;

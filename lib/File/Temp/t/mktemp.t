@@ -19,7 +19,7 @@ ok(1);
 # Create file in temp directory
 my $template = File::Spec->catfile(File::Spec->tmpdir, 'wowserXXXX');
 
-(my $fh, $template) = < mkstemp($template);
+@(my $fh, $template) =  mkstemp($template);
 
 print "# MKSTEMP: FH is $(dump::view($fh)) File is $template fileno=".fileno($fh)."\n";
 # Check if the file exists
@@ -65,7 +65,7 @@ if ($status) {
 $template = "suffixXXXXXX";
 my $suffix = ".dat";
 
-($fh, my $fname) = < mkstemps($template, $suffix);
+@($fh, my $fname) =  mkstemps($template, $suffix);
 
 print "# MKSTEMPS: File is $template -> $fname fileno=".fileno($fh)."\n";
 # Check if the file exists

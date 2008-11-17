@@ -174,7 +174,7 @@ test {
 do {
     my $w;
     $w = sub {
-	my ($i) = < @_;
+	my @($i) =  @_;
 	test { $i == 10 };
 	sub { $w };
     };

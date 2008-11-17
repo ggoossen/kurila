@@ -68,8 +68,8 @@ my $buff ;
 read F, $buff, 30 ;
 
 
-my (@info) = @( unpack("NNNNNNC", $buff) ) ;
-my (@info1) = @( unpack("VVVVVVC", $buff) ) ;
+my @(@info) =@( @( unpack("NNNNNNC", $buff) )) ;
+my @(@info1) =@( @( unpack("VVVVVVC", $buff) )) ;
 my ($magic, $version, $endian, $encrypt) ;
 
 if (%Data{?@info[0]}) # first try DB 1.x format, big endian

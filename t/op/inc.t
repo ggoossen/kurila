@@ -5,7 +5,7 @@ print "1..51\n";
 my $test = 1;
 
 sub ok {
-  my ($pass, $err) = < @_;
+  my @($pass, $err) =  @_;
   if ($pass) {
     print "ok $test\n";
     $test = $test + 1; # Would be doubleplusbad to use ++ in the ++ test.
@@ -84,9 +84,9 @@ ok (!defined($a--), "postdec undef returns undef");
 # Verify that shared hash keys become unshared.
 
 sub check_same {
-  my ($orig, $suspect) = < @_;
+  my @($orig, $suspect) =  @_;
   my $fail;
-  while (my ($key, $value) = each %$suspect) {
+  while (my @($key, $value) =@( each %$suspect)) {
     if (exists $orig->{$key}) {
       if ($orig->{?$key} ne $value) {
         print "# key '$key' was '$orig->{?$key}' now '$value'\n";
@@ -192,7 +192,7 @@ do {
 # sparcs have a 112 bit mantissa for their long doubles. Just to be awkward :-)
 
 sub check_some_code {
-    my ($start, $warn, $action, $description) = < @_;
+    my @($start, $warn, $action, $description) =  @_;
     my $warn_line = ($warn ?? 'use' !! 'no') . " warnings 'imprecision';";
     my @warnings;
     local $^WARN_HOOK = sub {push @warnings, @_[0]->message};

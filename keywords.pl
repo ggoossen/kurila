@@ -30,7 +30,7 @@ while ( ~< *DATA) {
     chop;
     next unless $_;
     next if m/^#/;
-    my ($keyword) = < split;
+    my @($keyword) =  split;
     print &tab(5, "#define KEY_$keyword"), $keynum++, "\n";
 }
 
@@ -42,7 +42,7 @@ rename_if_different("keywords.h-new", "keywords.h");
 
 ###########################################################################
 sub tab {
-    my ($l, $t) = < @_;
+    my @($l, $t) =  @_;
     $t .= "\t" x ($l - (length($t) + 1) / 8);
     $t;
 }

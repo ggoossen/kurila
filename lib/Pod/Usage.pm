@@ -499,7 +499,7 @@ sub pod2usage {
 
     ## Look up input file in path if it doesnt exist.
     unless ((ref %opts{?"input"}) || (-e %opts{?"input"})) {
-        my ($basename) = (%opts{?"input"});
+        my @($basename) = @(%opts{?"input"});
         my $pathsep = ($^O =~ m/^(?:dos|os2|MSWin32)$/) ?? ";"
                             !! (($^O eq 'MacOS' || $^O eq 'VMS') ?? ',' !!  ":");
         my $pathspec = %opts{?"pathlist"} || %ENV{?PATH} || %ENV{?PERL5LIB};
@@ -573,7 +573,7 @@ sub new {
 }
 
 sub select {
-    my ($self, < @res) = < @_;
+    my @($self, @< @res) =  @_;
     if (@ISA[0]->can('select')) {
         $self->SUPER::select(< @_);
     } else {
@@ -588,7 +588,7 @@ sub seq_i { return @_[1] }
 # Pod::Select did as well as the work done below by preprocess_paragraph.
 # Note that the below is very, very specific to Pod::Text.
 sub _handle_element_end {
-    my ($self, $element) = < @_;
+    my @($self, $element) =  @_;
     if ($element eq 'head1') {
         %$self{+USAGE_HEAD1} = %$self{PENDING}->[-1]->[1];
         if ($self->{USAGE_OPTIONS}->{?verbose} +< 2) {

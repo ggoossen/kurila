@@ -16,7 +16,7 @@ my @Prepend_parent;
 my %Recognized_Att_Keys;
 
 our $VERSION = '6.44';
-our ($Revision) = q$Revision: 54639 $ =~ m/Revision:\s+(\S+)/;
+our @($Revision) = q$Revision: 54639 $ =~ m/Revision:\s+(\S+)/;
 our $Filename = __FILE__;   # referenced outside MakeMaker
 
 our @ISA = qw(Exporter);
@@ -96,14 +96,14 @@ my %Special_Sigs = %(
  test       => 'HASH',
 );
 
-< %Att_Sigs{[keys %Recognized_Att_Keys]} = ('') x (nelems(%Recognized_Att_Keys)/2);
-< %Att_Sigs{[keys %Special_Sigs]} = < values %Special_Sigs;
+ %Att_Sigs{[keys %Recognized_Att_Keys]} = ('') x (nelems(%Recognized_Att_Keys)/2);
+ %Att_Sigs{[keys %Special_Sigs]} =  values %Special_Sigs;
 
 
 sub _verify_att {
-    my($att) = < @_;
+    my@($att) =  @_;
 
-    while( my($key, $val) = each %$att ) {
+    while( my@($key, $val) =@( each %$att) ) {
         my $sig = %Att_Sigs{?$key};
         unless( defined $sig ) {
             warn "WARNING: $key is not a known parameter.\n";
@@ -134,7 +134,7 @@ sub _format_att {
 
 
 sub prompt ($;$) {  ## no critic
-    my($mess, $def) = < @_;
+    my@($mess, $def) =  @_;
     die("prompt function called without an argument") 
         unless defined $mess;
 
@@ -165,7 +165,7 @@ sub prompt ($;$) {  ## no critic
 }
 
 sub eval_in_subdirs {
-    my($self) = < @_;
+    my@($self) =  @_;
     use Cwd < qw(cwd abs_path);
     my $pwd = cwd() || die "Can't figure out your cwd!";
 
@@ -173,7 +173,7 @@ sub eval_in_subdirs {
     push @INC, '.';     # '.' has to always be at the end of @INC
 
     foreach my $dir ( @{$self->{DIR}}){
-        my($abs) = $self->catdir($pwd,$dir);
+        my@($abs) = $self->catdir@($pwd,$dir);
         try { $self->eval_in_x($abs); };
         last if $@;
     }
@@ -182,7 +182,7 @@ sub eval_in_subdirs {
 }
 
 sub eval_in_x {
-    my($self,$dir) = < @_;
+    my@($self,$dir) =  @_;
     chdir $dir or warn("Couldn't change to directory $dir: $!");
 
     do {
@@ -297,7 +297,7 @@ sub full_setup {
     # Postamble needs to be the last that was always the case
     push @MM_Sections, "postamble";
     push @Overridable, "postamble";
- <
+ 
     # All sections are valid keys.
     %Recognized_Att_Keys{[ @MM_Sections]} = (1) x nelems @MM_Sections;
 
@@ -354,7 +354,7 @@ END
 }
 
 sub new {
-    my($class,$self) = < @_;
+    my@($class,$self) =  @_;
     my($key);
 
     # Store the original args passed to WriteMakefile()
@@ -664,7 +664,7 @@ sub check_manifest {
     require ExtUtils::Manifest;
     # avoid warning
     $ExtUtils::Manifest::Quiet = $ExtUtils::Manifest::Quiet = 1;
-    my(@missed) = ExtUtils::Manifest::manicheck();
+    my@(@missed) = ExtUtils::Manifest::manicheck@();
     if ((nelems @missed)) {
         print STDOUT "Warning: the following files are missing in your kit:\n";
         print "\t", join "\n\t", @missed;
@@ -676,13 +676,13 @@ sub check_manifest {
 }
 
 sub parse_args{
-    my($self, < @args) = < @_;
+    my@($self, @< @args) =  @_;
     foreach ( @args) {
         unless (m/(.*?)=(.*)/) {
             ++$Verbose if m/^verb/;
             next;
         }
-        my($name, $value) = ($1, $2);
+        my@($name, $value) = @($1, $2);
         if ($value =~ m/^~(\w+)?/) { # tilde with optional username
             $value =~ s [^~(\w*)]
                 [$($1 ??
@@ -697,7 +697,7 @@ sub parse_args{
 
     # catch old-style 'potential_libs' and inform user how to 'upgrade'
     if (defined $self->{?potential_libs}){
-        my($msg)="'potential_libs' => '$self->{?potential_libs}' should be";
+        my@($msg)="'potential_libs' => '$self->{?potential_libs}' should be";
         if ($self->{?potential_libs}){
             print STDOUT "$msg changed to:\n\t'LIBS' => ['$self->{?potential_libs}']\n";
         } else {
@@ -708,10 +708,10 @@ sub parse_args{
     }
     # catch old-style 'ARMAYBE' and inform user how to 'upgrade'
     if (defined $self->{?ARMAYBE}){
-        my($armaybe) = $self->{?ARMAYBE};
+        my@($armaybe) = $self->{?ARMAYBE};
         print STDOUT "ARMAYBE => '$armaybe' should be changed to:\n",
                         "\t'dynamic_lib' => \{ARMAYBE => '$armaybe'\}\n";
-        my(%dl) = %( < %{$self->{?dynamic_lib} || \%()} );
+        my@(%dl) =@( %( < %{$self->{?dynamic_lib} || \%()} ));
         $self->{+dynamic_lib} = \%( < %dl, ARMAYBE => $armaybe);
         delete $self->{ARMAYBE};
     }
@@ -746,7 +746,7 @@ sub parse_args{
 }
 
 sub check_hints {
-    my($self) = < @_;
+    my@($self) =  @_;
     # We allow extension-specific hints files.
 
     require File::Spec;
@@ -756,7 +756,7 @@ sub check_hints {
     return unless -d $hint_dir;
 
     # First we look for the best hintsfile we have
-    my($hint)="$($^O)_%Config{?osvers}";
+    my@($hint)="$($^O)_%Config{?osvers}";
     $hint =~ s/\./_/g;
     $hint =~ s/_$//;
     return unless $hint;
@@ -777,7 +777,7 @@ sub check_hints {
 sub _run_hintfile {
     our $self;
     local($self) = shift;       # make $self available to the hint file.
-    my($hint_file) = shift;
+    my@($hint_file) =@( shift);
 
     local($@, $!);
     print STDERR "Processing hints file $hint_file\n";
@@ -793,7 +793,7 @@ sub _run_hintfile {
 }
 
 sub mv_all_methods {
-    my($from,$to) = < @_;
+    my@($from,$to) =  @_;
 
     # Here you see the *current* list of methods that are overridable
     # from Makefile.PL via MY:: subroutines. As of VERSION 5.07 I'm
@@ -854,8 +854,8 @@ sub mv_all_methods {
 }
 
 sub skipcheck {
-    my($self) = shift;
-    my($section) = < @_;
+    my@($self) =@( shift);
+    my@($section) =  @_;
     if ($section eq 'dynamic') {
         print STDOUT "Warning (non-fatal): Target 'dynamic' depends on targets ",
         "in skipped section 'dynamic_bs'\n"
@@ -913,7 +913,7 @@ sub flush {
 
 # This is a rename for OS's where the target must be unlinked first.
 sub _rename {
-    my($src, $dest) = < @_;
+    my@($src, $dest) =  @_;
     chmod 0666, $dest;
     unlink $dest;
     return rename $src, $dest;
@@ -948,9 +948,9 @@ END
 }
 
 sub neatvalue {
-    my($v) = < @_;
+    my@($v) =  @_;
     return "undef" unless defined $v;
-    my($t) = ref $v;
+    my@($t) =@( ref $v);
     return "q[$v]" unless $t;
     if ($t eq 'ARRAY') {
         my(@m, @neat);
@@ -964,7 +964,7 @@ sub neatvalue {
     }
     return dump::view($v) unless $t eq 'HASH';
     my(@m, $key, $val);
-    while (($key,$val) = each %$v){
+    while (@($key,$val) =@( each %$v)){
         last unless defined $key; # cautious programming in case (undef,undef) is true
         push(@m,"$key=>".neatvalue($val)) ;
     }
@@ -972,13 +972,13 @@ sub neatvalue {
 }
 
 sub selfdocument {
-    my($self) = < @_;
+    my@($self) =  @_;
     my(@m);
     if ($Verbose){
         push @m, "\n# Full list of MakeMaker attribute values:";
         foreach my $key (sort keys %$self){
             next if $key eq 'RESULT' || $key =~ m/^[A-Z][a-z]/;
-            my($v) = < neatvalue($self->{?$key});
+            my@($v) =  neatvalue($self->{?$key});
             $v =~ s/(CODE|HASH|ARRAY|SCALAR)\([\dxa-f]+\)/$1\(...\)/;
             $v =~ s/\n+/ /g;
             push @m, "# $key => $v";

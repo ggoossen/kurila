@@ -127,7 +127,7 @@ sub geniosym () {
 sub ungensym ($) {}
 
 sub qualify ($;$) {
-    my ($name) = < @_;
+    my @($name) =  @_;
     ref \$name eq "GLOB" and Carp::confess("glob..." . ref $name);
     if (!ref($name) && index($name, '::') == -1 && index($name, "'") == -1) {
 	my $pkg;
@@ -160,7 +160,7 @@ sub delete_package ($) {
         $pkg .= '::'		unless	$pkg =~ m/::$/;
     }
 
-    my($stem, $leaf) = $pkg =~ m/(.*)::(\w+::)$/;
+    my@($stem, $leaf) = $pkg =~ m/(.*)::(\w+::)$/;
     my $stem_symtab = Symbol::stash($stem);
     return unless defined $stem_symtab and exists $stem_symtab->{$leaf};
 

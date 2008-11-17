@@ -17,7 +17,7 @@ $VERSION = '1.43';
 $VERSION = eval $VERSION;
 
 sub _is_prefix {
-    my ($self, $path, $prefix) = < @_;
+    my @($self, $path, $prefix) =  @_;
     return unless defined $prefix && defined $path;
 
     if( $Is_VMS ) {
@@ -40,7 +40,7 @@ sub _is_prefix {
 }
 
 sub _is_doc {
-    my ($self, $path) = < @_;
+    my @($self, $path) =  @_;
 
     my $man1dir = $self->{':private:'}->{Config}->{?man1direxp};
     my $man3dir = $self->{':private:'}->{Config}->{?man3direxp};
@@ -51,7 +51,7 @@ sub _is_doc {
 }
 
 sub _is_type {
-    my ($self, $path, $type) = < @_;
+    my @($self, $path, $type) =  @_;
     return 1 if $type eq "all";
 
     return $self->_is_doc($path) if $type eq "doc";
@@ -66,7 +66,7 @@ sub _is_type {
 }
 
 sub _is_under {
-    my ($self, $path, < @under) = < @_;
+    my @($self, $path, @< @under) =  @_;
     @under[0] = "" if (! nelems @under);
     foreach my $dir ( @under) {
         return 1 if ($self->_is_prefix($path, $dir));
@@ -76,7 +76,7 @@ sub _is_under {
 }
 
 sub new {
-    my ($class) = shift(@_);
+    my @($class) = shift@(@_);
     $class = ref($class) || $class;
 
     my %args = %( < @_ );
@@ -100,7 +100,7 @@ sub new {
     for my $tuple (@(\@(inc_override => INC => \ @INC ),
                    \@( extra_libs => EXTRA => \@() ))) 
     {
-        my ($arg,$key,$val)=< @$tuple;
+        my @($arg,$key,$val)= @$tuple;
         if ( %args{?$arg} ) {
             try {
                 $self->{':private:'}->{+$key} = \ @{%args{$arg}};
@@ -188,7 +188,7 @@ sub new {
 # VMS's non-case preserving file-system means the package name can't
 # be reconstructed from the filename.
 sub _module_name {
-    my($file, $orig_module) = < @_;
+    my@($file, $orig_module) =  @_;
 
     my $module = '';
     if (open PACKFH, "<", $file) {
@@ -216,14 +216,14 @@ sub _module_name {
 
 
 sub modules {
-    my ($self) = < @_;
+    my @($self) =  @_;
 
     # Bug/feature of sort in scalar context requires this.
     return sort grep { not m/^:private:$/ } keys %$self;
 }
 
 sub files {
-    my ($self, $module, $type, < @under) = < @_;
+    my @($self, $module, $type, @< @under) =  @_;
 
     # Validate arguments
     die("$module is not installed") if (! exists($self->{$module}));
@@ -241,7 +241,7 @@ sub files {
 }
 
 sub directories {
-    my ($self, $module, $type, < @under) = < @_;
+    my @($self, $module, $type, @< @under) =  @_;
     my (%dirs);
     foreach my $file ( $self->files($module, $type, < @under)) {
         %dirs{+dirname($file)}++;
@@ -250,11 +250,11 @@ sub directories {
 }
 
 sub directory_tree {
-    my ($self, $module, $type, < @under) = < @_;
+    my @($self, $module, $type, @< @under) =  @_;
     my (%dirs);
     foreach my $dir ( $self->directories($module, $type, < @under)) {
         %dirs{+$dir}++;
-        my ($last) = ("");
+        my @($last) = @("");
         while ($last ne $dir) {
             $last = $dir;
             $dir = dirname($dir);
@@ -266,19 +266,19 @@ sub directory_tree {
 }
 
 sub validate {
-    my ($self, $module, $remove) = < @_;
+    my @($self, $module, $remove) =  @_;
     die("$module is not installed") if (! exists($self->{$module}));
     return $self->{$module}->{?packlist}->validate($remove);
 }
 
 sub packlist {
-    my ($self, $module) = < @_;
+    my @($self, $module) =  @_;
     die("$module is not installed") if (! exists($self->{$module}));
     return $self->{$module}->{?packlist};
 }
 
 sub version {
-    my ($self, $module) = < @_;
+    my @($self, $module) =  @_;
     die("$module is not installed") if (! exists($self->{$module}));
     return $self->{$module}->{?version};
 }

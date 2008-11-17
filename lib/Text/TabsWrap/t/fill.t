@@ -95,7 +95,7 @@ while ((nelems @tests)) {
 
 sub write_file
 {
-	my ($f, < @data) = < @_;
+	my @($f, @< @data) =  @_;
 
 	local(*F);
 

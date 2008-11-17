@@ -24,7 +24,7 @@ __PACKAGE__->_accessorize(
 #  And here is how we implement a pull-parser on top of a push-parser...
 
 sub filter {
-  my($self, $source) = < @_;
+  my@($self, $source) =  @_;
   $self = $self->new unless ref $self;
 
   $source = *STDIN{IO} unless defined $source;
@@ -44,7 +44,7 @@ sub parse_string_document {
 }
 
 sub parse_file {
-  my($this, $filename) = < @_;
+  my@($this, $filename) =  @_;
   $this->set_source($filename);
   $this->run;
 }
@@ -314,7 +314,7 @@ sub get_author      {
 
 sub _get_titled_section {
   # Based on a get_title originally contributed by Graham Barr
-  my($self, $titlename, < %options) = (< @_);
+  my@($self, $titlename, %< %options) = @(< @_);
   
   my $max_token            = delete %options{'max_token'};
   my $desperate_for_title  = delete %options{'desperate'};

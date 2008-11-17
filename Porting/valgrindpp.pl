@@ -85,17 +85,17 @@ summary($fh, \%error, \%leak);
 exit 0;
 
 sub summary {
-  my($fh, $error, $leak) = < @_;
+  my@($fh, $error, $leak) =  @_;
   my(%ne, %nl, %top);
 
   # Prepare the data
 
   for my $e (keys %$error) {
     for my $f (keys %{$error->{?$e}}) {
-      my($func, $file, $line) = < split m/:/, $f;
+      my@($func, $file, $line) =  split m/:/, $f;
       my $nf = %opt{?lines} ?? "$func ($file:$line)" !! "$func ($file)";
       %ne{$e}->{$nf}->{+count}++;
-      while (my($k,$v) = each %{$error->{$e}->{$f}}) {
+      while (my@($k,$v) =@( each %{$error->{$e}->{$f}})) {
         %ne{$e}->{$nf}->{tests}->{+$k} += $v;
         %top{$k}->{+error}++;
       }
@@ -105,13 +105,13 @@ sub summary {
   for my $l (keys %$leak) {
     for my $s (keys %{$leak->{?$l}}) {
       my $ns = join '<', map {
-                 my($func, $file, $line) = < split m/:/;
+                 my@($func, $file, $line) =  split m/:/;
                  m/:/ ?? %opt{?lines}
                        ?? "$func ($file:$line)" !! "$func ($file)"
                      !! $_
                } split m/</, $s;
       %nl{$l}->{$ns}->{+count}++;
-      while (my($k,$v) = each %{$leak->{$l}->{$s}}) {
+      while (my@($k,$v) =@( each %{$leak->{$l}->{$s}})) {
         %nl{$l}->{$ns}->{tests}->{+$k} += $v;
         %top{$k}->{+leak}++;
       }
@@ -227,7 +227,7 @@ sub filter {
       my @stack;           # Call stack
 
       while (@l[$j++] =~ m/^\s+(?:at|by) $hexaddr:\s+(\w+)\s+\((?:([^:]+):(\d+)|[^)]+)\)/o) {
-        my($func, $file, $lineno) = ($1, $2, $3);
+        my@($func, $file, $lineno) = @($1, $2, $3);
 
         # If the stack frame is inside perl => increment $inperl
         # If we've already been inside perl, but are no longer => leave

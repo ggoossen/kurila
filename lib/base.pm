@@ -15,20 +15,20 @@ sub PROTECTED  () { 2**3  }
 my $Fattr = \%fields::attr;
 
 sub has_fields {
-    my($base) = shift;
+    my@($base) =@( shift);
     my $fglob = Symbol::fetch_glob("$base\::FIELDS");
     return ($fglob && 'GLOB' eq ref($fglob) && *$fglob{HASH}) ?? 1 !! 0;
 }
 
 sub has_version {
-    my($base) = shift;
+    my@($base) =@( shift);
     my $vglob = Symbol::fetch_glob($base.'::VERSION');
     return ($vglob && *$vglob{SCALAR}) ?? 1 !! 0;
 }
 
 sub has_attr {
-    my($proto) = shift;
-    my($class) = ref $proto || $proto;
+    my@($proto) =@( shift);
+    my@($class) = ref $proto || $proto;
     return exists $Fattr->{$class};
 }
 
@@ -39,7 +39,7 @@ sub get_attr {
 
 sub get_fields {
     # Shut up a possible typo warning.
-    () = \%{*{Symbol::fetch_glob(@_[0].'::FIELDS')}};
+    @() = \%{*{Symbol::fetch_glob(@_[0].'::FIELDS')}};
     return \%{*{Symbol::fetch_glob(@_[0].'::FIELDS')}};
 }
 
@@ -95,7 +95,7 @@ ERROR
 
 
 sub inherit_fields {
-    my($derived, $base) = < @_;
+    my@($derived, $base) =  @_;
 
     return SUCCESS unless $base;
 
@@ -118,7 +118,7 @@ END
     # ones to the derived class.  Hang on to the original attribute
     # (Public, Private, etc...) and add Inherited.
     # This is all too complicated to do efficiently with add_fields().
-    while (my($k,$v) = each %$bfields) {
+    while (my@($k,$v) =@( each %$bfields)) {
         my $fno;
         if ($fno = $dfields->{?$k} and $fno != $v) {
             die("Inherited fields can't override existing fields");

@@ -140,10 +140,10 @@ sub init
 
    if ($^O eq 'VMS')
     {
-     ($Bin,$Script) = VMS::Filespec::rmsexpand($0) =~ m/(.*[\]>\/]+)(.*)/s;
+     @($Bin,$Script) = VMS::Filespec::rmsexpand($0) =~ m/(.*[\]>\/]+)(.*)/s;
      # C<use disk:[dev]/lib> isn't going to work, so unixify first
      ($Bin = VMS::Filespec::unixify($Bin)) =~ s/\/\z//;
-     ($RealBin,$RealScript) = ($Bin,$Script);
+     @($RealBin,$RealScript) = @($Bin,$Script);
     }
    else
     {
@@ -177,14 +177,14 @@ sub init
      $script = File::Spec->catfile(cwd2(), $script)
        unless File::Spec->file_name_is_absolute($script);
 
-     ($Script,$Bin) = < fileparse($script);
+     @($Script,$Bin) =  fileparse($script);
 
      # Resolve $script if it is a link
      while(1)
       {
        my $linktext = readlink($script);
 
-       ($RealScript,$RealBin) = < fileparse($script);
+       @($RealScript,$RealBin) =  fileparse($script);
        last unless defined $linktext;
 
        $script = (File::Spec->file_name_is_absolute($linktext))

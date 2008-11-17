@@ -168,7 +168,7 @@ sub smartReadExact
 
 sub smartEof
 {
-    my ($self) = @_[0];
+    my @($self) = @_[0];
 
     return 0 if length $self->{?Prime} || $self->{?PushMode};
 
@@ -254,25 +254,25 @@ sub errorNo
 
 sub HeaderError
 {
-    my ($self) = shift;
+    my @($self) =@( shift);
     return $self->saveErrorString(undef, "Header Error: @_[0]", STATUS_ERROR);
 }
 
 sub TrailerError
 {
-    my ($self) = shift;
+    my @($self) =@( shift);
     return $self->saveErrorString( <G_ERR, "Trailer Error: @_[0]", STATUS_ERROR);
 }
 
 sub TruncatedHeader
 {
-    my ($self) = shift;
+    my @($self) =@( shift);
     return $self->HeaderError("Truncated in @_[0] Section");
 }
 
 sub TruncatedTrailer
 {
-    my ($self) = shift;
+    my @($self) =@( shift);
     return $self->TrailerError("Truncated in @_[0] Section");
 }
 
@@ -528,7 +528,7 @@ sub _inf
         $x->{+oneInput} = 1 ;
         foreach my $pair ( @{ $x->{Pairs} })
         {
-            my ($from, $to) = < @$pair ;
+            my @($from, $to) =  @$pair ;
             $obj->_singleTarget($x, $from, $to, < @_)
                 or return undef ;
         }

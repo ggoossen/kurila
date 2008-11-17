@@ -37,7 +37,7 @@ and then File::Spec::Unix canonpath() is called on the result.
 =cut
 
 sub canonpath {
-    my($self,$path) = < @_;
+    my@($self,$path) =  @_;
     return unless defined $path;
 
     $path =~ s|\\|/|g;
@@ -74,7 +74,7 @@ and if not, File::Spec::Unix file_name_is_absolute() is called.
 
 
 sub file_name_is_absolute {
-    my ($self,$file) = < @_;
+    my @($self,$file) =  @_;
     return 1 if $file =~ m{^([a-z]:)?[\\/]}is; # C:/test
     return $self->SUPER::file_name_is_absolute($file);
 }

@@ -20,8 +20,8 @@ $out = runperl(switches => \@("-MO=Concise"), prog => '$a', stderr => 1);
 
 is($op_base, 1, "Smallest OP sequence number");
 
-($op_base_p1, $cop_base)
-  = ($out =~ m/^(\d+)\s*<;>\s*nextstate\(main (-?\d+) /m);
+@($op_base_p1, $cop_base)
+  = @($out =~ m/^(\d+)\s*<;>\s*nextstate\(main (-?\d+) /m);
 
 is($op_base_p1, 2, "Second-smallest OP sequence number");
 
@@ -137,7 +137,7 @@ SKIP: do {
 		  -base10 -bigendian -littleendian
 		  );
     foreach my $opt ( @options) {
-	my ($out) = < render($opt, $func);
+	my @($out) =  render($opt, $func);
 	isnt($out, '', "got output with option $opt");
     }
     
@@ -184,7 +184,7 @@ SKIP: do {
 	#local $TODO = "\tdoes this handling make sense ?";
 
 	sub defd_empty {};
-	($res,$err) = < render('-basic', \&defd_empty);
+	@($res,$err) =  render('-basic', \&defd_empty);
 	my @lines = split(m/\n/, $res);
 	is(scalar nelems @lines, 3,
 	   "'sub defd_empty \{\}' seen as 3 liner");
@@ -197,16 +197,16 @@ SKIP: do {
 	    our $AUTOLOAD = 'garbage';
 	    sub AUTOLOAD { print "# in AUTOLOAD body: $AUTOLOAD\n" }
 	};
-	($res,$err) = < render('-basic', 'Bar::auto_func');
+	@($res,$err) =  render('-basic', 'Bar::auto_func');
 	like ($res, qr/unknown function \(Bar::auto_func\)/,
 	      "Bar::auto_func seen as unknown function");
 
-	($res,$err) = < render('-basic', \&Bar::AUTOLOAD);
+	@($res,$err) =  render('-basic', \&Bar::AUTOLOAD);
 	like ($res, qr/in AUTOLOAD body: /, "found body of Bar::AUTOLOAD");
 
     };
     do {
-        ($res,$err) = < render('-basic', 'Foo::bar');
+        @($res,$err) =  render('-basic', 'Foo::bar');
         like ($res, qr/unknown function \(Foo::bar\)/,
               "BC::compile detects fn-name as unknown function");
     };

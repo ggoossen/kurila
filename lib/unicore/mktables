@@ -81,7 +81,7 @@ if ($FileList) {
             s/^ \s+ | \s+ $//xg;
             next if m/^ \s* (?: \# .* )? $/x;
             last if m/^ =+ $/x;
-            my ( $file ) = < split m/\t/, $_;
+            my @( $file ) =  split m/\t/, $_;
             push @$list, $file;
         }
         my %dupe;
@@ -267,7 +267,7 @@ sub Build_Aliases()
 	s/\s+$//;
 	next if m/^$/;
 
-	my ($abbrev, $name) = < split m/\s*;\s*/;
+	my @($abbrev, $name) =  split m/\s*;\s*/;
         next if $abbrev eq "n/a";
 	%PropertyAlias{+$abbrev} = $name;
         %PA_reverse{+$name} = $abbrev;
@@ -287,7 +287,7 @@ sub Build_Aliases()
 	s/\s+$//;
 	next if m/^$/;
 
-	my ($prop, < @data) = < split m/\s*;\s*/;
+	my @($prop, @< @data) =  split m/\s*;\s*/;
 
 	if ($prop eq 'ccc') {
 	    %PropValueAlias{+$prop}->{+@data[1]} = \ @data[[@(0,2)]];
@@ -569,7 +569,7 @@ sub Table::Merge
     }
 
     ## sort by range start, with longer ranges coming first.
-    my ($first, < @Rest) = < sort {
+    my @($first, @< @Rest) =  sort {
         ($a->[RANGE_START] <+> $b->[RANGE_START])
           or
         ($b->[RANGE_END]   <+> $b->[RANGE_END])
@@ -833,10 +833,10 @@ sub UnicodeData_Txt()
 
     sub gencat($$$$)
     {
-        my ($name, ## Name ("LATIN CAPITAL LETTER A")
+        my @($name, ## Name ("LATIN CAPITAL LETTER A")
             $cat,  ## Category ("Lu", "Zp", "Nd", etc.)
             $code, ## Code point (as an integer)
-            $op) = < @_;
+            $op) =  @_;
 
         my $MajorCat = substr($cat, 0, 1); ## L, M, Z, S, etc
 
@@ -928,7 +928,7 @@ sub UnicodeData_Txt()
         next unless m/^[0-9A-Fa-f]+;/;
         s/\s+$//;
 
-        my ($hexcode,   ## code point in hex (e.g. "0041")
+        my @($hexcode,   ## code point in hex (e.g. "0041")
             $name,      ## character name (e.g. "LATIN CAPITAL LETTER A")
             $cat,       ## category (e.g. "Lu")
             $comb,      ## Canonical combining class (e.t. "230")
@@ -943,7 +943,7 @@ sub UnicodeData_Txt()
             $upper,     ## uppercase mapping
             $lower,     ## lowercase mapping
             $title,     ## titlecase mapping
-              ) = < split(m/\s*;\s*/);
+              ) =  split(m/\s*;\s*/);
 
 	# Note that in Unicode 3.2 there will be names like
 	# LINE FEED (LF), which probably means that \N{} needs
@@ -1130,7 +1130,7 @@ sub UnicodeData_Txt()
 
     $Comb->Write("CombiningClass.pl");
     for (keys %{ %PropValueAlias{?ccc} }) {
-	my ($code, $name) = < @{ %PropValueAlias{ccc}->{?$_} };
+	my @($code, $name) =  @{ %PropValueAlias{ccc}->{?$_} };
 	(my $c = Table->New())->Append($code);
 	$c->Write(
 	    \@("lib","ccc","$_.pl"),
@@ -1181,7 +1181,7 @@ sub LineBreak_Txt()
     {
         next unless m/^([0-9A-Fa-f]+)(?:\.\.([0-9A-Fa-f]+))?\s*;\s*(\w+)/;
 
-	my ($first, $last, $lbrk) = (hex($1), hex($2||""), $3);
+	my @($first, $last, $lbrk) = @(hex($1), hex($2||""), $3);
 
 	$Lbrk->Append($first, $lbrk);
 
@@ -1225,7 +1225,7 @@ sub ArabicShaping_txt()
 	next unless m/^[0-9A-Fa-f]+;/;
 	s/\s+$//;
 
-	my ($hexcode, $name, $link, $linkgroup) = < split(m/\s*;\s*/);
+	my @($hexcode, $name, $link, $linkgroup) =  split(m/\s*;\s*/);
         my $code = hex($hexcode);
 	$ArabLink->Append($code, $link);
 	$ArabLinkGroup->Append($code, $linkgroup);
@@ -1264,9 +1264,9 @@ sub EastAsianWidth_txt()
 	s/#.*//;
 	s/\s+$//;
 
-	my ($hexcodes, $pv) = < split(m/\s*;\s*/);
+	my @($hexcodes, $pv) =  split(m/\s*;\s*/);
         %EAW{+$pv} ||= Table->New(Is => "EastAsianWidth$pv");
-      my ($start, $end) = < split(m/\.\./, $hexcodes);
+      my @($start, $end) =  split(m/\.\./, $hexcodes);
       if (defined $end) {
         %EAW{?$pv}->AppendRange(hex($start), hex($end));
       } else {
@@ -1298,7 +1298,7 @@ sub HangulSyllableType_txt()
     while ( ~< *IN)
     {
         next unless m/^([0-9A-Fa-f]+)(?:\.\.([0-9A-Fa-f]+))?\s*;\s*(\w+)/;
-	my ($first, $last, $pv) = (hex($1), hex($2||""), $3);
+	my @($first, $last, $pv) = @(hex($1), hex($2||""), $3);
 
         %HST{+$pv} ||= Table->New(Is => "HangulSyllableType$pv");
         %HST{?$pv}->Append($first);
@@ -1328,7 +1328,7 @@ sub Jamo_txt()
     while ( ~< *IN)
     {
 	next unless m/^([0-9A-Fa-f]+)\s*;\s*(\w*)/;
-	my ($code, $short) = (hex($1), $2);
+	my @($code, $short) = @(hex($1), $2);
 
 	$Short->Append($code, $short);
     }
@@ -1362,7 +1362,7 @@ sub Scripts_txt()
 
     for my $script (sort { $a->[0] <+> $b->[0] } @ScriptInfo)
     {
-        my ($first, $last, $name) = < @$script;
+        my @($first, $last, $name) =  @$script;
         $Scripts->Append($first, $name);
 
         %Script{+$name} ||= Table->New(Is    => $name,
@@ -1421,7 +1421,7 @@ sub Blocks_txt()
         #next if not /Private Use$/;
 	next if not m/^([0-9A-Fa-f]+)\.\.([0-9A-Fa-f]+)\s*;\s*(.+?)\s*$/;
 
-	my ($first, $last, $name) = (hex($1), hex($2), $3);
+	my @($first, $last, $name) = @(hex($1), hex($2), $3);
 
 	$Blocks->Append($first, $name);
 
@@ -1471,7 +1471,7 @@ sub PropList_txt()
 
     for my $prop (sort { $a->[0] <+> $b->[0] } @PropInfo)
     {
-        my ($first, $last, $name) = < @$prop;
+        my @($first, $last, $name) =  @$prop;
         $Props->Append($first, $name);
 
         %Prop{+$name} ||= Table->New(Is    => $name,
@@ -1663,7 +1663,7 @@ sub MakePropTestScript()
     }
     print OUT ~< *DATA;
 
-    while (my ($Name, $Table) = each %ExactNameToTest)
+    while (my @($Name, $Table) =@( each %ExactNameToTest))
     {
         GenTests(*OUT, $Name, $Table->ValidCode, $Table->InvalidCode);
         ExpectError(*OUT, uc $Name) if uc $Name ne $Name;
@@ -1671,7 +1671,7 @@ sub MakePropTestScript()
     }
 
 
-    while (my ($Name, $Table) = each %FuzzyNameToTest)
+    while (my @($Name, $Table) =@( each %FuzzyNameToTest))
     {
         my $Orig  = %CanonicalToOrig{?$Name};
         my %Names = %(
@@ -1816,7 +1816,7 @@ sub WriteAllMappings()
                 my $Desc = %TableDesc{$Type}->{?$Name} || "";
                 ## get list of names this table is reference by
                 my @Supported = @( $Name );
-                while (my ($Orig, $Alias) = each %{ %AliasInfo{?$Type} || \%() })
+                while (my @($Orig, $Alias) =@( each %{ %AliasInfo{?$Type} || \%() }))
                 {
                     if ($Orig eq $Name) {
                         push @Supported, $Alias;
@@ -1980,7 +1980,7 @@ sub SpecialCasing_txt()
         s/\#.*//;
         s/\s+$//;
 
-        my ($code, $lower, $title, $upper, $condition) = < split(m/\s*;\s*/);
+        my @($code, $lower, $title, $upper, $condition) =  split(m/\s*;\s*/);
 
         if ($condition) { # not implemented yet
             print "# SKIPPING $_\n" if $Verbose;
@@ -2014,7 +2014,7 @@ sub SpecialCasing_txt()
 	    );
 
         for my $prop (sort { $a->[0] <+> $b->[0] } @{%CaseInfo{?$case}}) {
-            my ($ix, $code, $to) = < @$prop;
+            my @($ix, $code, $to) =  @$prop;
             my $tostr =
               join "", map { sprintf "\\x\{\%s\}", $_ } split ' ', $to;
             push @OUT, sprintf qq["\%s" => "$tostr",\n], join("", map { sprintf "\\x[\%02X]", $_ } @( unpack("U0C*", pack("U", $ix))));
@@ -2051,7 +2051,7 @@ sub CaseFolding_txt()
 	# Skip status 'S', simple case folding
 	next unless m/^([0-9A-Fa-f]+)\s*;\s*([CFI])\s*;\s*([0-9A-Fa-f]+(?: [0-9A-Fa-f]+)*)\s*;/;
 
-	my ($code, $status, $fold) = (hex($1), $2, $3);
+	my @($code, $status, $fold) = @(hex($1), $2, $3);
 
 	if ($status eq 'C') { # Common: one-to-one folding
 	    # No append() since several codes may fold into one.

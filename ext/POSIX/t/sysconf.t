@@ -51,7 +51,7 @@ my $r;
 my $TTY = "/dev/tty";
 
 sub _check_and_report {
-    my ($eval_status, $return_val, $description) = < @_;
+    my @($eval_status, $return_val, $description) =  @_;
     my $success = defined($return_val) || $! == 0;
     is( $eval_status, '', $description );
     SKIP: do {

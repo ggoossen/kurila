@@ -28,12 +28,12 @@ $NO_ENDING = 0;
 
 # Use this instead of print to avoid interference while testing globals.
 sub _print {
-    local($\, $", $,) = (undef, ' ', '');
+    local@($\, $", $,) = @(undef, ' ', '');
     print STDOUT < @_;
 }
 
 sub _print_stderr {
-    local($\, $", $,) = (undef, ' ', '');
+    local@($\, $", $,) = @(undef, ' ', '');
     print STDERR < @_;
 }
 
@@ -89,7 +89,7 @@ sub skip_all {
 }
 
 sub _ok {
-    my ($pass, $where, $name, < @mess) = < @_;
+    my @($pass, $where, $name, @< @mess) =  @_;
     # Do not try to microoptimize by factoring out the "not ".
     # VMS will avenge.
     my $out;
@@ -123,7 +123,7 @@ sub _where {
 
 # DON'T use this for matches. Use like() instead.
 sub ok ($@) {
-    my ($pass, $name, < @mess) = < @_;
+    my @($pass, $name, @< @mess) =  @_;
     _ok($pass, _where(), $name, < @mess);
 }
 
@@ -149,7 +149,7 @@ sub display {
 }
 
 sub is ($$@) {
-    my ($got, $expected, $name, < @mess) = < @_;
+    my @($got, $expected, $name, @< @mess) =  @_;
 
     my $pass;
     if( !defined $got || !defined $expected ) {
@@ -172,7 +172,7 @@ sub is ($$@) {
 }
 
 sub isnt ($$@) {
-    my ($got, $isnt, $name, < @mess) = < @_;
+    my @($got, $isnt, $name, @< @mess) =  @_;
 
     my $pass;
     if( !defined $got || !defined $isnt ) {
@@ -194,7 +194,7 @@ sub isnt ($$@) {
 }
 
 sub cmp_ok ($$$@) {
-    my($got, $type, $expected, $name, < @mess) = < @_;
+    my@($got, $type, $expected, $name, @< @mess) =  @_;
 
     my $pass;
     do {
@@ -228,7 +228,7 @@ sub cmp_ok ($$$@) {
 # Here $range must be numeric, >= 0
 # Non numeric ranges might be a useful future extension. (eg %)
 sub within ($$$@) {
-    my ($got, $expected, $range, $name, < @mess) = < @_;
+    my @($got, $expected, $range, $name, @< @mess) =  @_;
     my $pass;
     if (!defined $got or !defined $expected or !defined $range) {
         # This is a fail, but doesn't need extra diagnostics
@@ -264,7 +264,7 @@ sub like   ($$@) { like_yn (0,< @_) }; # 0 for -
 sub unlike ($$@) { like_yn (1,< @_) }; # 1 for un-
 
 sub like_yn ($$$@) {
-    my ($flip, $got, $expected, $name, < @mess) = < @_;
+    my @($flip, $got, $expected, $name, @< @mess) =  @_;
     my $pass;
     $pass = $got =~ m/$expected/ if !$flip;
     $pass = $got !~ m/$expected/ if $flip;
@@ -322,7 +322,7 @@ sub todo_skip {
 }
 
 sub eq_array {
-    my ($ra, $rb) = < @_;
+    my @($ra, $rb) =  @_;
     return 0 unless (nelems @$ra) == nelems(@$rb);
     for my $i (0..(nelems @$ra)-1) {
 	next     if !defined $ra->[$i] && !defined $rb->[$i];
@@ -334,9 +334,9 @@ sub eq_array {
 }
 
 sub eq_hash {
-  my ($orig, $suspect) = < @_;
+  my @($orig, $suspect) =  @_;
   my $fail;
-  while (my ($key, $value) = each %$suspect) {
+  while (my @($key, $value) =@( each %$suspect)) {
     # Force a hash recompute if this perl's internals can cache the hash key.
     $key = "" . $key;
     if (exists $orig->{$key}) {
@@ -362,7 +362,7 @@ sub eq_hash {
 }
 
 sub require_ok ($) {
-    my ($require) = < @_;
+    my @($require) =  @_;
     eval <<REQUIRE_OK;
 require $require;
 REQUIRE_OK
@@ -370,7 +370,7 @@ REQUIRE_OK
 }
 
 sub use_ok ($) {
-    my ($use) = < @_;
+    my @($use) =  @_;
     eval <<USE_OK;
 use $use;
 USE_OK
@@ -396,7 +396,7 @@ my $is_vms      = $^O eq 'VMS';
 my $is_cygwin   = $^O eq 'cygwin';
 
 sub _quote_args {
-    my ($runperl, $args) = < @_;
+    my @($runperl, $args) =  @_;
 
     foreach ( @$args) {
 	# In VMS protect with doublequotes because otherwise
@@ -520,7 +520,7 @@ sub runperl {
 	}
 
 	my @keys = grep {exists %ENV{$_}} qw(CDPATH IFS ENV BASH_ENV);
-	local %ENV{[ @keys]} = @();
+	local %ENV{[ @keys]} =@( @());
 	# Untaint, plus take out . and empty string:
 	local %ENV{+'DCL$PATH'} = $1 if $is_vms && (%ENV{?'DCL$PATH'} =~ m/(.*)/s);
 	%ENV{?PATH} =~ m/(.*)/s;
@@ -619,7 +619,7 @@ END { unlink_all $tmpfile }
 #
 
 sub _fresh_perl {
-    my($prog, $resolve, $runperl_args, $name) = < @_;
+    my@($prog, $resolve, $runperl_args, $name) =  @_;
 
     $runperl_args ||= \%();
     $runperl_args->{+progfile} = $tmpfile;
@@ -670,7 +670,7 @@ sub _fresh_perl {
     # Use the first line of the program as a name if none was given
     unless( $name ) {
         my $first_line;
-        ($first_line, $name) = $prog =~ m/^((.{1,50}).*)/;
+        @($first_line, $name) = $prog =~ m/^((.{1,50}).*)/;
         $name .= '...' if length $first_line +> length $name;
     }
 
@@ -684,7 +684,7 @@ sub _fresh_perl {
 #
 
 sub fresh_perl_is {
-    my($prog, $expected, $runperl_args, $name) = < @_;
+    my@($prog, $expected, $runperl_args, $name) =  @_;
     local $Level = 2;
     $expected =~ s/\n+$//; # is also removed from program output
     _fresh_perl($prog,
@@ -699,7 +699,7 @@ sub fresh_perl_is {
 #
 
 sub fresh_perl_like {
-    my($prog, $expected, $runperl_args, $name) = < @_;
+    my@($prog, $expected, $runperl_args, $name) =  @_;
     local $Level = 2;
     _fresh_perl($prog,
 		sub { (nelems @_) ??
@@ -709,7 +709,7 @@ sub fresh_perl_like {
 }
 
 sub can_ok ($@) {
-    my($proto, < @methods) = < @_;
+    my@($proto, @< @methods) =  @_;
     my $class = ref $proto || $proto;
 
     unless( nelems @methods ) {
@@ -731,7 +731,7 @@ sub can_ok ($@) {
 }
 
 sub isa_ok ($$;$) {
-    my($object, $class, $obj_name) = < @_;
+    my@($object, $class, $obj_name) =  @_;
 
     my $diag;
     $obj_name = 'The object' unless defined $obj_name;
@@ -771,7 +771,7 @@ WHOA
 }
 
 sub dies_not(&;$) {
-    my ($e, $qr, $name) = < @_;
+    my @($e, $qr, $name) =  @_;
     local $Level = 2;
     if (try { $e->(); 1; }) {
         return ok(1, $name);
@@ -781,7 +781,7 @@ sub dies_not(&;$) {
 }
 
 sub dies_like(&$;$) {
-    my ($e, $qr, $name) = < @_;
+    my @($e, $qr, $name) =  @_;
     if (try { $e->(); 1; }) {
         local $Level = 2;
         diag "didn't die";
@@ -792,7 +792,7 @@ sub dies_like(&$;$) {
 }
 
 sub eval_dies_like($$;$) {
-    my ($e, $qr, $name) = < @_;
+    my @($e, $qr, $name) =  @_;
   TODO:
     do {
         todo_skip("Compile time abortion are known to leak memory", 1) if %ENV{?PERL_VALGRIND};

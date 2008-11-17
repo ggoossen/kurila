@@ -13,7 +13,7 @@ use File::Spec::Functions < qw(catfile catdir);
 sub need_prelink { 0 }
 
 sub arg_defines {
-  my ($self, < %args) = < @_;
+  my @($self, %< %args) =  @_;
 
   s/"/""/g foreach values %args;
 
@@ -35,7 +35,7 @@ sub arg_defines {
 }
 
 sub arg_include_dirs {
-  my ($self, < @dirs) = < @_;
+  my @($self, @< @dirs) =  @_;
 
   # VMS can only have one include list, add the one from config.
   if ($self->{config}->{+ccflags} =~ s{/inc[^=]+(?:=)+(?:\()?([^\/\)]*)} {}i) {
@@ -47,7 +47,7 @@ sub arg_include_dirs {
 }
 
 sub _do_link {
-  my ($self, $type, < %args) = < @_;
+  my @($self, $type, %< %args) =  @_;
   
   my $objects = delete %args{objects};
   $objects = \@($objects) unless ref $objects;
@@ -88,30 +88,30 @@ sub _do_link {
 sub arg_nolink { return; }
 
 sub arg_object_file {
-  my ($self, $file) = < @_;
+  my @($self, $file) =  @_;
   return "/obj=$file";
 }
 
 sub arg_exec_file {
-  my ($self, $file) = < @_;
+  my @($self, $file) =  @_;
   return  @("/exe=$file");
 }
 
 sub arg_share_object_file {
-  my ($self, $file) = < @_;
+  my @($self, $file) =  @_;
   return  @("$self->{config}->{?lddlflags}=$file");
 }
 
 
 sub lib_file {
-  my ($self, $dl_file) = < @_;
+  my @($self, $dl_file) =  @_;
   $dl_file =~ s/\.[^.]+$//;
   $dl_file =~ s/"//g;
   $dl_file = $dl_file .= '.' . $self->{config}->{?dlext};
 
   # Need to create with the same name as DynaLoader will load with.
   if (defined &DynaLoader::mod2fname) {
-    my ($dev,$dir,$file) = < File::Spec->splitpath($dl_file);
+    my @($dev,$dir,$file) =  File::Spec->splitpath($dl_file);
     $file = DynaLoader::mod2fname(\@($file));
     $dl_file = File::Spec->catpath($dev,$dir,$file);
   }
@@ -122,7 +122,7 @@ sub lib_file {
 # We can't just call that because it's tied up with the MakeMaker object hierarchy.
 
 sub _liblist_ext {
-  my($self, $potential_libs,$verbose,$give_libs) = < @_;
+  my@($self, $potential_libs,$verbose,$give_libs) =  @_;
   $verbose ||= 0;
 
   my(@crtls,$crtlstr);
@@ -138,7 +138,7 @@ sub _liblist_ext {
   if ($self->perl_src) {
     my($locspec,$type);
     foreach my $lib ( @crtls) { 
-      if (($locspec,$type) = $lib =~ m{^([\w\$-]+)(/\w+)?} and $locspec =~ m/perl/i) {
+      if (@($locspec,$type) = $lib =~ m{^([\w\$-]+)(/\w+)?} and $locspec =~ m/perl/i) {
         if    (lc $type eq '/share')   { $locspec .= $self->{'config'}->{?'exe_ext'}; }
         elsif (lc $type eq '/library') { $locspec .= $self->{'config'}->{?'lib_ext'}; }
         else                           { $locspec .= $self->{'config'}->{?'obj_ext'}; }
@@ -156,7 +156,7 @@ sub _liblist_ext {
 
   my(@dirs,@libs,%found,@fndlibs,$ldlib);
   my $cwd = cwd();
-  my($so,$lib_ext,$obj_ext) = < %{$self->{'config'}}{[@('so','lib_ext','obj_ext')]};
+  my@($so,$lib_ext,$obj_ext) =  %{$self->{'config'}}{[@('so','lib_ext','obj_ext')]};
   # List of common Unix library names and their VMS equivalents
   # (VMS equivalent of '' indicates that the library is automatically
   # searched by the linker, and should be skipped here.)
@@ -204,7 +204,7 @@ sub _liblist_ext {
     }
 
     my(@variants,$cand);
-    my($ctype) = '';
+    my@($ctype) = '';
 
     # If we don't have a file type, consider it a possibly abbreviated name and
     # check for common variants.  We try these first to grab libraries before

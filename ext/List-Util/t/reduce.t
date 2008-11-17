@@ -25,7 +25,7 @@ $v = reduce { $a . $b } < @a;
 is( $v,	join("", @a),	'concat');
 
 sub add {
-  my($aa, $bb) = < @_;
+  my@($aa, $bb) =  @_;
   return $aa + $bb;
 }
 
@@ -116,7 +116,7 @@ if (!$::PERL_ONLY) { SKIP: do {
       if !$List::Util::REAL_MULTICALL;
 
     # Can we goto a subroutine?
-    try {()= <reduce{goto sub{}} 1,2;};
+    try {@()= reduce{goto sub{}} 1,2;};
     like($@->{?description}, qr/^Can't goto subroutine from a sort sub/, "goto sub");
 
 }; }

@@ -667,7 +667,7 @@ use sort 'stable';
 
 =cut
 
-my ($expect, $expect_nt) = (<<'EOT_EOT', <<'EONT_EONT');
+my @($expect, $expect_nt) = @(<<'EOT_EOT', <<'EONT_EONT');
 # 1  <;> nextstate(main 656 (eval 40):1) v:%,{
 # 2  <0> pushmark s
 # 3  <0> pushmark s

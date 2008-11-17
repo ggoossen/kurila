@@ -118,7 +118,7 @@ ok(_canon($result),_canon($compare));
 # make the path as generic as possible
 sub _canon
 {
-  my ($path) = < @_;
+  my @($path) =  @_;
   $path = 'File::Spec'->canonpath($path);
   my @comp = 'File::Spec'->splitpath($path);
   my @dir = 'File::Spec'->splitdir(@comp[1]);

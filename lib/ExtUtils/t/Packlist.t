@@ -43,7 +43,7 @@ SKIP: do {
       unless nkeys %{ $pl->{?data} } +> 2;
 
 	# get the first and second key
-	my ($first, $second) = < keys %{ $pl->{?data} };
+	my @($first, $second) =  keys %{ $pl->{?data} };
 
 	# now get a couple of extra keys, to mess with the hash iterator
 	my $i = 0;

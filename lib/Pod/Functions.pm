@@ -128,7 +128,7 @@ while ( ~< *DATA) {
     chomp;
     s/#.*//;
     next unless $_;
-    my($name, $type, $text) = < split " ", $_, 3;
+    my@($name, $type, $text) =  split " ", $_, 3;
     %Type{+$name} = $type;
     %Flavor{+$name} = $text;
     for my $t ( split m/[,\s]+/, $type ) {

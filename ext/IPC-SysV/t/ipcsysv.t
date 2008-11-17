@@ -118,7 +118,7 @@ EOM
 
     my $test_name = 'message get data';
     my($rmsgtype,$rmsgtext);
-    ($rmsgtype,$rmsgtext) = unpack("L! a*",$msgbuf);
+    @($rmsgtype,$rmsgtext) = unpack@("L! a*",$msgbuf);
     if ($rmsgtype == $msgtype && $rmsgtext eq $msgtext) {
         pass($test_name);
     }

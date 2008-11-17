@@ -32,7 +32,7 @@ sub fill_protos {
 }
 
 sub write_invocation {
-  my ($core, $call, $name, < @argvs) = < @_;
+  my @($core, $call, $name, @< @argvs) =  @_;
   if ((nelems @argvs) == 1) {		# No optional arguments
     my @argv = @{@argvs[0]};
     shift @argv;
@@ -57,13 +57,13 @@ EOC
 }
 
 sub one_invocation {
-  my ($core, $call, $name, < @argv) = < @_;
+  my @($core, $call, $name, @< @argv) =  @_;
   return qq{$call($(join ', ', @argv)) || die "Can't $name(\$(join ', ', map \{ dump::view(\$_) \} \@_))} . 
     ($core ?? ': $!' !! ', \$! is \"$!\"') . '"';
 }
 
 sub _make_fatal {
-    my($sub, $pkg) = < @_;
+    my@($sub, $pkg) =  @_;
     my($name, $code, $sref, $real_proto, $proto, $core, $call);
     my $ini = $sub;
 
