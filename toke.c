@@ -4230,6 +4230,12 @@ Perl_yylex(pTHX)
 	goto keylookup;
 
     case '_':
+	if ( ! isIDFIRST_lazy_if(s+1,UTF)) {
+	    s++;
+	    pl_yylval.opval = newOP(OP_PLACEHOLDER, 0, S_curlocation());
+	    TOKEN(THING);
+	}
+	/* FALLTHROUGH */
     case 'a': case 'A':
     case 'b': case 'B':
     case 'c': case 'C':

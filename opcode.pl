@@ -22,7 +22,7 @@ while ( ~< *DATA) {
     chop;
     next unless $_;
     next if m/^#/;
-    my @($key, $desc, $check, $flags, $args) =  split(m/\t+/, $_, 5);
+    my @($key, $desc, $check, $flags, ? $args) =  split(m/\t+/, $_, 5);
     $args = '' unless defined $args;
 
     warn qq[Description "$desc" duplicates %seen{?$desc}\n] if %seen{?$desc};
@@ -91,7 +91,8 @@ my @raw_alias = @(
 		 Perl_pp_rv2sv => \@('rv2av rv2hv'),
 		);
 
-while (my @($func, $names) =@( splice @raw_alias, 0, 2)) {
+while (@raw_alias) {
+    my @($func, $names) = @: splice @raw_alias, 0, 2;
     %alias{+$_} = $func for  @$names;
 }
 
@@ -191,7 +192,7 @@ EXTCONST char* const PL_op_desc[] = \{
 END
 
 for ( @ops) {
-    my@($safe_desc) = %desc{?$_};
+    my $safe_desc = %desc{?$_};
 
     # Have to escape double quotes and escape characters.
     $safe_desc =~ s/(^|[^\\])([\\"])/$1\\$2/g;
@@ -657,6 +658,7 @@ substcont	substitution iterator	ck_null		dis|
 sassign		scalar assignment	ck_sassign	s0
 aassign		list assignment		ck_null		t2	L L
 dotdotdot		dotdotdot (...)	ck_dotdotdot	0
+placeholder		placeholder (_)	ck_null	0
 
 chop		chop			ck_spair	mts%	L
 schop		scalar chop		ck_null		stu%	S?

@@ -3639,7 +3639,9 @@ PP(pp_hslice)
 	i = 0;
 	while (sliceitem <= slicemax) {
 	    SV** newitem = av_fetch(newv, i, 0);
-	    HE* he = hv_store_ent(hv, *sliceitem, *newitem, 0);
+	    HE* he = hv_store_ent(hv, *sliceitem,
+		newitem ? *newitem : &PL_sv_undef,
+		0);
 	    if (partial) {
 		av_push(ret, he ? HeVAL(he) : &PL_sv_undef);
 	    }
@@ -3789,6 +3791,8 @@ PP(pp_enter_anonarray_assign)
     I32 len, i;
     if ( ! SvAVOK(sv) )
 	Perl_croak(aTHX_ "Expected ARRAY but got %s", Ddesc(sv));
+    if ( ! ( PL_op->op_flags & OPf_ASSIGN_PART ) )
+	XPUSHs(sv_mortalcopy(sv));
     av = SvAv(sv);
     len = av_len(av);
     PUSHMARK(SP);
@@ -4675,6 +4679,26 @@ PP(pp_dotdotdot)
 	SP = PL_stack_base + TOPMARK;
 	RETURN;
     }
+}
+
+PP(pp_placeholder)
+{
+    dSP;
+    OPFLAGS op_flags = PL_op->op_flags;
+    if ( ! ( op_flags & OPf_ASSIGN ) )
+	DIE(aTHX_ "%s must be part of an assignment", OP_DESC(PL_op));
+    if (op_flags & OPf_ASSIGN_PART) {
+	SV* src;
+	if (PL_stack_base + TOPMARK >= SP) {
+	    if ( ! (op_flags & OPf_OPTIONAL) )
+		Perl_croak(aTHX_ "Missing required assignment value");
+	} 
+	else
+	    SP--;
+	RETURN;
+    }
+    XPUSHs(sv_mortalcopy(POPs));
+    RETURN;
 }
 
 /*

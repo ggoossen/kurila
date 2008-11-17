@@ -110,7 +110,7 @@ sub fileparse {
   my $orig_type = '';
   my@($type,$igncase) = @($Fileparse_fstype, $Fileparse_igncase);
 
-  my@($taint) = substr@($fullname,0,0);  # Is $fullname tainted?
+  my $taint = substr($fullname,0,0);  # Is $fullname tainted?
 
   if ($type eq "VMS" and $fullname =~ m{/} ) {
     # We're doing Unix emulation
@@ -279,7 +279,7 @@ current default device and directory is used.
 sub dirname {
     my $path = shift;
 
-    my@($type) = $Fileparse_fstype;
+    my $type = $Fileparse_fstype;
 
     if( $type eq 'VMS' and $path =~ m{/} ) {
         # Parse as Unix
@@ -287,7 +287,7 @@ sub dirname {
         return dirname($path);
     }
 
-    my@($basename, $dirname) =  fileparse($path);
+    my @($basename, $dirname, ...) =  fileparse($path);
 
     if ($type eq 'VMS') { 
         $dirname ||= %ENV{?DEFAULT};

@@ -12,7 +12,7 @@ our $VERSION = '1.06';
 # see also strict.pm.
 my $pkg = __PACKAGE__;
 unless ( __FILE__ =~ m/(^|[\/\\])\Q$pkg\E\.pmc?$/ ) {
-    my @(undef, $f, $l) =@( caller);
+    my @($xxx, $f, $l) =@( caller);
     die("Incorrect use of pragma '$(__PACKAGE__)' at $f line $l.\n");
 }
 

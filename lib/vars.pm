@@ -10,7 +10,7 @@ sub import {
     my @($pack, @< @imports) =  @_;
     my ($sym, $ch);
     foreach ( @imports) {
-        if (@($ch, $sym) = m/^([\$\@\%\*\&])(.+)/) {
+        if (@($ch, $sym) = @: m/^([\$\@\%\*\&])(.+)/) {
 	    if ($sym =~ m/\W/) {
 		# time for a more-detailed check-up
 		if ($sym =~ m/^\w+[[{].*[]}]$/) {

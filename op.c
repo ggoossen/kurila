@@ -2136,6 +2136,7 @@ Perl_assign(pTHX_ OP *o, bool partial)
     case OP_HELEM:
     case OP_AELEM:
     case OP_HSLICE:
+    case OP_PLACEHOLDER:
 	o->op_flags |= OPf_ASSIGN;
 	if (partial)
 	    o->op_flags |= OPf_ASSIGN_PART;
@@ -2182,7 +2183,9 @@ Perl_assign(pTHX_ OP *o, bool partial)
 
 	{
 	    OP* pushmark = cBINOPo->op_first;
-	    OP* enter = newOP(OP_ENTER_ANONARRAY_ASSIGN, 0, o->op_location);
+	    OP* enter = newOP(OP_ENTER_ANONARRAY_ASSIGN,
+		partial ? (OPf_ASSIGN_PART | OPf_ASSIGN_PART) : OPf_ASSIGN_PART,
+		o->op_location);
 	    enter->op_sibling = pushmark->op_sibling;
 	    cBINOPo->op_first = enter;
 	    for (kid = enter->op_sibling; kid; kid = kid->op_sibling)

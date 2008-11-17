@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-use vars < qw($Is_W32 $Is_OS2 $Is_Cygwin $Is_NetWare $Needs_Write);
+our ($Is_W32, $Is_OS2, $Is_Cygwin, $Is_NetWare, $Needs_Write);
 use Config; # Remember, this is running using an existing perl
 use File::Compare;
 use Symbol;

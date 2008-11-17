@@ -86,6 +86,7 @@ Perl_pp_substcont
 Perl_pp_sassign
 Perl_pp_aassign
 Perl_pp_dotdotdot
+Perl_pp_placeholder
 Perl_pp_chop
 Perl_pp_schop
 Perl_pp_chomp
