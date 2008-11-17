@@ -389,15 +389,16 @@ sub abs2rel {
       return $self->canonpath( $self->catpath('', $self->catdir( < @pathchunks ), '') );
     }
 
-    while ((nelems @pathchunks) && nelems @basechunks && $self->_same(@pathchunks[0], @basechunks[0])) {
+    while (@pathchunks && @basechunks
+             && $self->_same(@pathchunks[0], @basechunks[0])) {
         shift @pathchunks ;
         shift @basechunks ;
     }
-    return $self->curdir unless (nelems @pathchunks) || nelems @basechunks;
+    return $self->curdir unless @pathchunks || @basechunks;
 
     # $base now contains the directories the resulting relative path 
     # must ascend out of before it can descend to $path_directory.
-    my $result_dirs = $self->catdir( ( $self->updir) x nelems @basechunks, < @pathchunks );
+    my $result_dirs = $self->catdir( < (@( $self->updir) x nelems @basechunks), < @pathchunks );
     return $self->canonpath( $self->catpath('', $result_dirs, '') );
 }
 

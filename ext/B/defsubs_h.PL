@@ -3,8 +3,8 @@
 # Extracting defsubs.h (with variable substitutions)
 #!perl -w
 use File::Spec;
-my @(undef, $headerpath) =  @ARGV;
-my @($out) = __FILE__ =~ m/(^.*)\.PL/i;
+my @(_, $headerpath) =  @ARGV;
+my @($out) = @: __FILE__ =~ m/(^.*)\.PL/i;
 $out =~ s/_h$/.h/;
 unlink $out if -l $out;
 open(OUT,">","$out") || die "Cannot open $out:$!";

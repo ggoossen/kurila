@@ -1405,9 +1405,13 @@ Perl_mod(pTHX_ OP *o, I32 type)
 	    goto nomod;
 	break;
 
+    case OP_DOTDOTDOT:
+    case OP_PLACEHOLDER:
+	PL_modcount++;
+	localize = 0;
+	break;
+
     case OP_PADSV:
-    case OP_ANONARRAY:
-    case OP_ANONHASH:
 	PL_modcount++;
 	if (!type) /* local() */
 	    Perl_croak(aTHX_ "Can't localize lexical variable %s",
@@ -1457,6 +1461,10 @@ Perl_mod(pTHX_ OP *o, I32 type)
 	    break;
 	}
 	/* FALL THROUGH */
+    case OP_HASHEXPAND:
+    case OP_ARRAYEXPAND:
+    case OP_ANONARRAY:
+    case OP_ANONHASH:
     case OP_LIST:
 	localize = 0;
 	for (kid = cLISTOPo->op_first; kid; kid = kid->op_sibling)
@@ -6696,7 +6704,7 @@ Perl_peep(pTHX_ register OP *o)
 			op_null(o->op_next);
 		    op_null(pop->op_next);
 		    op_null(pop);
-		    o->op_flags |= pop->op_next->op_flags & (OPf_MOD|OPf_ASSIGN);
+		    o->op_flags |= pop->op_next->op_flags & (OPf_MOD|OPf_ASSIGN|OPf_ASSIGN_PART|OPf_OPTIONAL);
 		    o->op_next = pop->op_next->op_next;
 		    o->op_ppaddr = PL_ppaddr[OP_AELEMFAST];
 		    o->op_private = (U8)i;
@@ -6716,7 +6724,7 @@ Perl_peep(pTHX_ register OP *o)
 		    op_null(o->op_next);
 		    o->op_private |= o->op_next->op_private & (OPpLVAL_INTRO
 							       | OPpOUR_INTRO);
-		    o->op_flags |= o->op_next->op_flags & (OPf_ASSIGN);
+		    o->op_flags |= o->op_next->op_flags & (OPf_ASSIGN|OPf_ASSIGN_PART|OPf_OPTIONAL);
 		    o->op_next = o->op_next->op_next;
 		    o->op_type = OP_GVSV;
 		    o->op_ppaddr = PL_ppaddr[OP_GVSV];

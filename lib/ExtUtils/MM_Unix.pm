@@ -858,7 +858,7 @@ BOOTSTRAP =
 
     my $target = %Is{?VMS} ?? '$(MMS$TARGET)' !! '$@';
 
-    return sprintf <<'MAKE_FRAG', ($target) x 5;
+    return sprintf <<'MAKE_FRAG', < ( @($target) x 5 );
 BOOTSTRAP = $(BASEEXT).bs
 
 # As Mkbootstrap might not write a file (if none is required)
@@ -891,10 +891,10 @@ sub dynamic_lib {
 
     return '' unless $self->has_link_code;
 
-    my@($otherldflags) = %attribs{?OTHERLDFLAGS} || "";
-    my@($inst_dynamic_dep) = %attribs{?INST_DYNAMIC_DEP} || "";
-    my@($armaybe) = %attribs{?ARMAYBE} || $self->{?ARMAYBE} || ":";
-    my@($ldfrom) = '$(LDFROM)';
+    my $otherldflags = %attribs{?OTHERLDFLAGS} || "";
+    my $inst_dynamic_dep = %attribs{?INST_DYNAMIC_DEP} || "";
+    my $armaybe = %attribs{?ARMAYBE} || $self->{?ARMAYBE} || ":";
+    my $ldfrom = '$(LDFROM)';
     $armaybe = 'ar' if (%Is{?OSF} and $armaybe eq ':');
     my(@m);
     my $ld_opt = %Is{?OS2} ?? '$(OPTIMIZE) ' !! '';	# Useful on other systems too?
@@ -1073,7 +1073,7 @@ Inserts the sharpbang or equivalent magic number to a set of @files.
 sub fixin {    # stolen from the pink Camel book, more or less
     my @( $self, @< @files ) =  @_;
 
-    my @($does_shbang) = %Config{?'sharpbang'} =~ m/^\s*\#\!/;
+    my @($does_shbang) = @: %Config{?'sharpbang'} =~ m/^\s*\#\!/;
     for my $file ( @files) {
         my $file_new = "$file.new";
         my $file_bak = "$file.bak";
@@ -1083,7 +1083,7 @@ sub fixin {    # stolen from the pink Camel book, more or less
         chomp( my $line = ~< $fixin );
         next unless $line =~ s/^\s*\#!\s*//;    # Not a shbang file.
         # Now figure out the interpreter name.
-        my @( $cmd, $arg ) =  split ' ', $line, 2;
+        my @( $cmd, ?$arg ) =  split ' ', $line, 2;
         $cmd =~ s!^.*/!!;
 
         # Now look (in reverse) for interpreter in absolute PATH (unless perl).
@@ -1098,8 +1098,8 @@ sub fixin {    # stolen from the pink Camel book, more or less
             }
         }
         else {
-            my @(@absdirs)
-                =@( reverse grep { $self->file_name_is_absolute } $self->path);
+            my @absdirs
+                = reverse grep { $self->file_name_is_absolute($_) } $self->path;
             $interpreter = '';
 
             foreach my $dir ( @absdirs) {
@@ -1113,7 +1113,7 @@ sub fixin {    # stolen from the pink Camel book, more or less
 
         # Figure out how to invoke interpreter on this machine.
 
-        my @($shb) = "";
+        my $shb = "";
         if ($interpreter) {
             print STDOUT "Changing sharpbang in $file to $interpreter"
                 if $Verbose;
@@ -1585,7 +1585,7 @@ sub init_main {
 
     unless ($self->{?PERL_SRC}){
         foreach my $dir_count (1..8) { # 8 is the VMS limit for nesting
-            my $dir = $self->catdir(($Updir) x $dir_count);
+            my $dir = $self->catdir( < ( @($Updir) x $dir_count) );
 
             if (-f $self->catfile($dir,"config_h.SH")   &&
                 -f $self->catfile($dir,"perl.h")        &&
@@ -2434,7 +2434,7 @@ $(MAKE_APERL_FILE) : $(FIRST_MAKEFILE) pm_to_blib
 
     # We trust that what has been handed in as argument, will be buildable
     $static = \@() unless $static;
-     %static{[ @{$static}]} = (1) x nelems @{$static};
+     %static{[ @{$static}]} = @(1) x nelems @{$static};
 
     $extra = \@() unless $extra && ref $extra eq 'ARRAY';
     for (sort keys %static) {
@@ -2973,7 +2973,7 @@ PPD_HTML
         my $pre_req = $prereq;
         $pre_req =~ s/::/-/g;
         my $dep_ver = join ",", @( <split (m/\./, $self->{PREREQ_PM}->{?$prereq}), 
-                                   (0) x 4)[[0 .. 3]];
+                                   <(@(0) x 4))[[0 .. 3]];
         $ppd_xml .= sprintf <<'PPD_OUT', $pre_req, $dep_ver;
         <DEPENDENCY NAME="%s" VERSION="%s" />
 PPD_OUT

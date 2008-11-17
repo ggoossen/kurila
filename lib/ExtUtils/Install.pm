@@ -439,7 +439,7 @@ writable.
 =cut
 
 sub _mkpath {
-    my @($dir,$show,$mode,$verbose,$dry_run)=  @_;
+    my @($dir,$show,$mode,?$verbose,?$dry_run)=  @_;
     if ( $verbose && $verbose +> 1 && ! -d $dir) {
         $show= 1;
         printf "mkpath(\%s,\%d,\%#o)\n", $dir, $show, $mode;
@@ -509,7 +509,7 @@ Dies if the copy fails.
 =cut
 
 sub _symlink {
-    my @( $old, $new, $verbose, $nonono)= @_;
+    my @( $old, $new, ?$verbose, ?$nonono)= @_;
     if ($verbose && $verbose+>1) {
         printf "symlink(\%s,\%s)\n", $old, $new;
     }
@@ -1158,7 +1158,7 @@ sub pm_to_blib {
     my@($fromto,$autodir,$pm_filter) =  @_;
 
     _mkpath($autodir,0,0755);
-    while(my@($from, $to) =@( each %$fromto)) {
+    while(my@(?$from, ?$to) =@( each %$fromto)) {
         if( -f $to && -s $from == -s $to && -M $to +< -M $from ) {
             print "Skip $to (unchanged)\n";
             next;

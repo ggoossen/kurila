@@ -164,7 +164,7 @@ foreach my $key (sort(keys(%{$self->{?data} || \%()})))
 	       {
 		   # The relocated path is within the found prefix
 		   my $packfile_prefix;
-		   @(undef, $packfile_prefix)
+		   @(_, $packfile_prefix)
 		       =  File::Spec->splitpath($packfile);
 
 		   my $relocate_as

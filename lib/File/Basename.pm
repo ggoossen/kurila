@@ -100,7 +100,7 @@ denote the same location as the original $path.
 
 
 sub fileparse {
-  my@($fullname,@< @suffices) =  @_;
+  my @($fullname, @< @suffices) =  @_;
 
   unless (defined $fullname) {
       require Carp;
