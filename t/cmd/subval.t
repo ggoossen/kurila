@@ -53,7 +53,7 @@ if (&foo6(1) eq '1') {print "ok 12\n";} else {print "not ok 12\n";}
 our $level;
 
 sub fib {
-    my($arg) = < @_;
+    my@($arg) =  @_;
     my($foo);
     $level++;
     if ($arg +<= 2) {
@@ -101,8 +101,8 @@ our $x = join(':',&ary2( < @_ ));
 print $x eq '1:2:3' ?? "ok 26\n" !! "not ok 26 $x\n";
 
 sub somesub {
-    local our ($num,$P,$F,$L) = < @_;
-    our ($p,$f,$l) = caller;
+    local our @($num,$P,$F,$L) =  @_;
+    our @($p,$f,$l) =@( caller);
     print "$p:$f:$l" eq "$P:$F:$L" ?? "ok $num\n" !! "not ok $num $p:$f:$l ne $P:$F:$L\n";
 }
 

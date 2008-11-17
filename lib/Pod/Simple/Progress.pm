@@ -16,7 +16,7 @@ our $VERSION = "1.01";
 #--------------------------------------------------------------------------
 
 sub new {
-  my($class,$delay) = < @_;
+  my@($class,$delay) =  @_;
   my $self = bless \%('quiet_until' => 1),  ref($class) || $class;
   $self->to(*STDOUT{IO});
   $self->delay(defined($delay) ?? $delay !! 5);
@@ -30,7 +30,7 @@ sub copy {
 #--------------------------------------------------------------------------
 
 sub reach {
-  my($self, $point, $note) = < @_;
+  my@($self, $point, $note) =  @_;
   if( (my $now = time) +>= $self->{?'quiet_until'}) {
     my $goal;
     my    $to = $self->{?'to'};
@@ -55,7 +55,7 @@ sub reach {
 #--------------------------------------------------------------------------
 
 sub done {
-  my($self, $note) = < @_;
+  my@($self, $note) =  @_;
   $self->{+'quiet_until'} = 1;
   return $self->reach( undef, $note );
 }

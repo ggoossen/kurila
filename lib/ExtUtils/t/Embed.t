@@ -37,7 +37,7 @@ my (@cmd2) if $^O eq 'VMS';
 # will be wrong.
 if ($^O eq 'VMS') {
     push(@cmd,$cc,"/Obj=$obj");
-    my (@incs) = @($inc);
+    my @(@incs) =@( @($inc));
     my $crazy = ccflags();
     if ($crazy =~ s#/inc[^=/]*=([\w\$\_\-\.\[\]\:]+)##i) {
         push(@incs,$1);
@@ -102,7 +102,7 @@ if ($^O eq 'VMS') {
    }
 
    if ($^O eq 'aix') { # AIX needs an explicit symbol export list.
-    my ($perl_exp) = < grep { -f } qw(perl.exp ../perl.exp);
+    my @($perl_exp) =  grep { -f } qw(perl.exp ../perl.exp);
     die "where is perl.exp?\n" unless defined $perl_exp;
     for ( @cmd) {
         s!-bE:(\S+)!-bE:$perl_exp!;

@@ -308,7 +308,7 @@ unless ($pwd_cmd) {
 sub _backtick_pwd {
     # Localize %ENV entries in a way that won't create new hash keys
     my @localize = grep exists %ENV{$_}, qw(PATH IFS CDPATH ENV BASH_ENV);
-    local %ENV{[ @localize]} = @();
+    local %ENV{[ @localize]} =@( @());
     
     my $cwd = `$pwd_cmd`;
     # Belt-and-suspenders in case someone said "undef $/".
@@ -379,13 +379,13 @@ sub fastcwd_ {
     my(@path, $path);
     local(*DIR);
 
-    my($orig_cdev, $orig_cino) = stat('.');
-    ($cdev, $cino) = ($orig_cdev, $orig_cino);
+    my@($orig_cdev, $orig_cino) = stat@('.');
+    @($cdev, $cino) = @($orig_cdev, $orig_cino);
     while (1) {
 	my $direntry;
-	($odev, $oino) = ($cdev, $cino);
+	@($odev, $oino) = @($cdev, $cino);
 	CORE::chdir('..') || return undef;
-	($cdev, $cino) = stat('.');
+	@($cdev, $cino) = stat@('.');
 	last if $odev == $cdev && $oino == $cino;
 	opendir(my $dir, '.') || return undef;
 	while (1) {
@@ -394,7 +394,7 @@ sub fastcwd_ {
 	    next if $direntry eq '.';
 	    next if $direntry eq '..';
 
-	    ($tdev, $tino) = lstat($direntry);
+	    @($tdev, $tino) = lstat@($direntry);
 	    last unless $tdev != $odev || $tino != $oino;
 	}
 	closedir($dir);
@@ -407,7 +407,7 @@ sub fastcwd_ {
     # Untaint it then check that we landed where we started.
     $path =~ m/^(.*)\z/s		# untaint
 	&& CORE::chdir($1) or return undef;
-    ($cdev, $cino) = stat('.');
+    @($cdev, $cino) = stat@('.');
     die "Unstable directory path, current directory changed unexpectedly"
 	if $cdev != $orig_cdev || $cino != $orig_cino;
     $path;
@@ -424,8 +424,8 @@ my $chdir_init = 0;
 
 sub chdir_init {
     if (%ENV{?'PWD'} and $^O ne 'os2' and $^O ne 'dos' and $^O ne 'MSWin32') {
-	my($dd,$di) = stat('.');
-	my($pd,$pi) = stat(%ENV{?'PWD'});
+	my@($dd,$di) = stat@('.');
+	my@($pd,$pi) = stat@(%ENV{?'PWD'});
 	if (!defined $dd or !defined $pd or $di != $pi or $dd != $pd) {
 	    %ENV{+'PWD'} = cwd();
 	}
@@ -437,8 +437,8 @@ sub chdir_init {
     }
     # Strip an automounter prefix (where /tmp_mnt/foo/bar == /foo/bar)
     if ($^O ne 'MSWin32' and %ENV{?'PWD'} =~ m|(/[^/]+(/[^/]+/[^/]+))(.*)|s) {
-	my($pd,$pi) = stat($2);
-	my($dd,$di) = stat($1);
+	my@($pd,$pi) = stat@($2);
+	my@($dd,$di) = stat@($1);
 	if (defined $pd and defined $dd and $di == $pi and $dd == $pd) {
 	    %ENV{+'PWD'}="$2$3";
 	}
@@ -502,7 +502,7 @@ sub _perl_abs_path
         # Make sure we can be invoked on plain files, not just directories.
         # NOTE that this routine assumes that '/' is the only directory separator.
 	
-        my ($dir, $file) = $start =~ m{^(.*)/(.+)$}
+        my @($dir, $file) = $start =~ m{^(.*)/(.+)$}
 	    or return cwd() . '/' . $start;
 	
 	# Can't use "-l _" here, because the previous stat was a stat(), not an lstat().
@@ -581,7 +581,7 @@ sub fast_abs_path {
     unless (-d _) {
         # Make sure we can be invoked on plain files, not just directories.
 	
-	my ($vol, $dir, $file) = < File::Spec->splitpath($path);
+	my @($vol, $dir, $file) =  File::Spec->splitpath($path);
 	return File::Spec->catfile($cwd, $path) unless length $dir;
 
 	if (-l $path) {

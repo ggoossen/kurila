@@ -37,7 +37,7 @@ Define TO_UNIX to convert OS2 linefeeds to Unix style.
 =cut
 
 sub init_dist {
-    my($self) = < @_;
+    my@($self) =  @_;
 
     $self->{+TO_UNIX} ||= <<'MAKE_TEXT';
 $(NOECHO) $(TEST_F) tmp.zip && $(RM_F) tmp.zip; $(ZIP) -ll -mr tmp.zip $(DISTVNAME) && unzip -o tmp.zip && $(RM_F) tmp.zip
@@ -47,12 +47,12 @@ MAKE_TEXT
 }
 
 sub dlsyms {
-    my($self,< %attribs) = < @_;
+    my@($self,%< %attribs) =  @_;
 
-    my($funcs) = %attribs{?DL_FUNCS} || $self->{?DL_FUNCS} || \%();
-    my($vars)  = %attribs{?DL_VARS} || $self->{?DL_VARS} || \@();
-    my($funclist) = %attribs{?FUNCLIST} || $self->{?FUNCLIST} || \@();
-    my($imports)  = %attribs{?IMPORTS} || $self->{?IMPORTS} || \%();
+    my@($funcs) = %attribs{?DL_FUNCS} || $self->{?DL_FUNCS} || \%();
+    my@($vars)  = %attribs{?DL_VARS} || $self->{?DL_VARS} || \@();
+    my@($funclist) = %attribs{?FUNCLIST} || $self->{?FUNCLIST} || \@();
+    my@($imports)  = %attribs{?IMPORTS} || $self->{?IMPORTS} || \%();
     my(@m);
     (my $boot = $self->{?NAME}) =~ s/:/_/g;
 
@@ -74,8 +74,8 @@ $self->{?BASEEXT}.def: Makefile.PL
 	# Make import files (needed for static build)
 	-d 'tmp_imp' or mkdir 'tmp_imp', 0777 or die "Can't mkdir tmp_imp";
 	open my $imp, '>', 'tmpimp.imp' or die "Can't open tmpimp.imp";
-	while (my($name, $exp) = each %{$self->{IMPORTS}}) {
-	    my ($lib, $id) = ($exp =~ m/(.*)\.(.*)/) or die "Malformed IMPORT `$exp'";
+	while (my@($name, $exp) =@( each %{$self->{IMPORTS}})) {
+	    my @($lib, $id) = @($exp =~ m/(.*)\.(.*)/) or die "Malformed IMPORT `$exp'";
 	    print $imp "$name $lib $id ?\n";
 	}
 	close $imp or die "Can't close tmpimp.imp";
@@ -90,7 +90,7 @@ $self->{?BASEEXT}.def: Makefile.PL
 }
 
 sub static_lib {
-    my($self) = < @_;
+    my@($self) =  @_;
     my $old = $self->ExtUtils::MM_Unix::static_lib();
     return $old unless $self->{?IMPORTS} && %{$self->{?IMPORTS}};
     
@@ -104,13 +104,13 @@ EOC
 }
 
 sub replace_manpage_separator {
-    my($self,$man) = < @_;
+    my@($self,$man) =  @_;
     $man =~ s,/+,.,g;
     $man;
 }
 
 sub maybe_command {
-    my($self,$file) = < @_;
+    my@($self,$file) =  @_;
     $file =~ s,[/\\]+,/,g;
     return $file if -x $file && ! -d _;
     return "$file.exe" if -x "$file.exe" && ! -d _;

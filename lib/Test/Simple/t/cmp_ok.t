@@ -12,7 +12,7 @@ BEGIN {
 
 
 require Test::Simple::Catch;
-my($out, $err) = < Test::Simple::Catch::caught();
+my@($out, $err) =  Test::Simple::Catch::caught();
 local %ENV{+HARNESS_ACTIVE} = 0;
 
 require Test::Builder;
@@ -20,7 +20,7 @@ my $TB = Test::Builder->create;
 $TB->level(0);
 
 sub try_cmp_ok {
-    my($left, $cmp, $right) = < @_;
+    my@($left, $cmp, $right) =  @_;
     
     my %expect;
     %expect{+ok}    = eval "\$left $cmp \$right";

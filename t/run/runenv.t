@@ -33,7 +33,7 @@ delete %ENV{PERL5OPT};
 # second element is an explanation of the failure
 sub runperl {
   local *F;
-  my ($env, $args, $stdout, $stderr) = < @_;
+  my @($env, $args, $stdout, $stderr) =  @_;
 
   unshift @$args, '-I../lib';
 
@@ -80,7 +80,7 @@ sub it_didnt_work {
 }
 
 sub tryrun {
-  my ($success, $reason) = < runperl(< @_);
+  my @($success, $reason) =  runperl(< @_);
   ok( $success, $reason );
 }
 

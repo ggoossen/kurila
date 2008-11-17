@@ -82,7 +82,7 @@ sub mkUncomp
     # try zlib first
     if (defined $IO::Uncompress::RawInflate::VERSION )
     {
-        my ($obj, $errstr, $errno) = < IO::Uncompress::Adapter::Inflate::mkUncompObject();
+        my @($obj, $errstr, $errno) =  IO::Uncompress::Adapter::Inflate::mkUncompObject();
 
         return $self->saveErrorString(undef, $errstr, $errno)
             if ! defined $obj;
@@ -108,7 +108,7 @@ sub mkUncomp
         *$self->{+Info} = $self->readHeader($magic)
             or return undef ;
 
-        my ($obj, $errstr, $errno) = < IO::Uncompress::Adapter::Bunzip2::mkUncompObject();
+        my @($obj, $errstr, $errno) =  IO::Uncompress::Adapter::Bunzip2::mkUncompObject();
 
         return $self->saveErrorString(undef, $errstr, $errno)
             if ! defined $obj;
@@ -124,7 +124,7 @@ sub mkUncomp
         *$self->{+Info} = $self->readHeader($magic)
             or return undef ;
 
-        my ($obj, $errstr, $errno) = < IO::Uncompress::Adapter::LZO::mkUncompObject();
+        my @($obj, $errstr, $errno) =  IO::Uncompress::Adapter::LZO::mkUncompObject();
 
         return $self->saveErrorString(undef, $errstr, $errno)
             if ! defined $obj;
@@ -140,7 +140,7 @@ sub mkUncomp
         *$self->{+Info} = $self->readHeader($magic)
             or return undef ;
 
-        my ($obj, $errstr, $errno) = < IO::Uncompress::Adapter::Lzf::mkUncompObject();
+        my @($obj, $errstr, $errno) =  IO::Uncompress::Adapter::Lzf::mkUncompObject();
 
         return $self->saveErrorString(undef, $errstr, $errno)
             if ! defined $obj;

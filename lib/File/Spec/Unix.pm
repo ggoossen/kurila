@@ -39,7 +39,7 @@ actually traverse the filesystem cleaning up paths like this.
 =cut
 
 sub canonpath {
-    my ($self,$path) = < @_;
+    my @($self,$path) =  @_;
     return unless defined $path;
     
     # Handle POSIX-style node names beginning with double slash (qnx, nto)
@@ -201,7 +201,7 @@ L<File::Spec::VMS/file_name_is_absolute>).
 =cut
 
 sub file_name_is_absolute {
-    my ($self,$file) = < @_;
+    my @($self,$file) =  @_;
     return scalar($file =~ m:^/:s);
 }
 
@@ -250,9 +250,9 @@ The results can be passed to L</catpath()> to get back a path equivalent to
 =cut
 
 sub splitpath {
-    my ($self,$path, $nofile) = < @_;
+    my @($self,$path, $nofile) =  @_;
 
-    my ($volume,$directory,$file) = ('','','');
+    my @($volume,$directory,$file) = @('','','');
 
     if ( $nofile ) {
         $directory = $path;
@@ -306,7 +306,7 @@ inserted if needed (though if the directory portion doesn't start with
 =cut
 
 sub catpath {
-    my ($self,$volume,$directory,$file) = < @_;
+    my @($self,$volume,$directory,$file) =  @_;
 
     if ( $directory ne ''                && 
          $file ne ''                     && 
@@ -351,21 +351,21 @@ Based on code written by Shigio Yamaguchi.
 =cut
 
 sub abs2rel {
-    my($self,$path,$base) = < @_;
+    my@($self,$path,$base) =  @_;
     $base = $self->_cwd() unless defined $base and length $base;
 
-    ($path, $base) = < map { $self->canonpath($_) } @( $path, $base);
+    @($path, $base) =  map { $self->canonpath($_) } @( $path, $base);
 
     if (grep $self->file_name_is_absolute($_), @( $path, $base)) {
-	($path, $base) = < map { $self->rel2abs($_) } @( $path, $base);
+	@($path, $base) =  map { $self->rel2abs($_) } @( $path, $base);
     }
     else {
 	# save a couple of cwd()s if both paths are relative
-	($path, $base) = < map { $self->catdir('/', $_) } @( $path, $base);
+	@($path, $base) =  map { $self->catdir('/', $_) } @( $path, $base);
     }
 
-    my ($path_volume) = < $self->splitpath($path, 1);
-    my ($base_volume) = < $self->splitpath($base, 1);
+    my @($path_volume) =  $self->splitpath($path, 1);
+    my @($base_volume) =  $self->splitpath($base, 1);
 
     # Can't relativize across volumes
     return $path unless $path_volume eq $base_volume;
@@ -432,7 +432,7 @@ Based on code written by Shigio Yamaguchi.
 =cut
 
 sub rel2abs {
-    my ($self,$path,$base ) = < @_;
+    my @($self,$path,$base ) =  @_;
 
     # Clean up $path
     if ( ! $self->file_name_is_absolute( $path ) ) {
@@ -480,12 +480,12 @@ sub _cwd {
 
 # Internal method to reduce xx\..\yy -> yy
 sub _collapse {
-    my($fs, $path) = < @_;
+    my@($fs, $path) =  @_;
 
     my $updir  = $fs->updir;
     my $curdir = $fs->curdir;
 
-    my($vol, $dirs, $file) = < $fs->splitpath($path);
+    my@($vol, $dirs, $file) =  $fs->splitpath($path);
     my @dirs = $fs->splitdir($dirs);
     pop @dirs if (nelems @dirs) && @dirs[-1] eq '';
 

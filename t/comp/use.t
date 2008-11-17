@@ -11,7 +11,7 @@ print "1..26\n";
 my $test = 1;
 
 sub _ok {
-    my ($type, $got, $expected, $name) = < @_;
+    my @($type, $got, $expected, $name) =  @_;
 
     my $result;
     if ($type eq 'is') {

@@ -122,7 +122,7 @@ do {
 
 do {
     my %h;
-    my ($x,$y) = (1, scalar delete %h{[@()]});
+    my @($x,$y) = @(1, scalar delete %h{[@()]});
     ok(!nelems($y),q([perl #29127] scalar delete of empty slice returned garbage));
 };
 

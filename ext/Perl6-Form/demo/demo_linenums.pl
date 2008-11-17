@@ -2,7 +2,7 @@ use Perl6::Form;
 
 my $linenum = 1;
 sub numerate {
-    my ($lines, $fill, $opts) = < @_;
+    my @($lines, $fill, $opts) =  @_;
 	my $body = form '{]]]]} {"""{*}"""}',
 					\$linenum..$linenum+nelems @$lines-1, $lines,
 					< @$fill;

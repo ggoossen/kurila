@@ -9,8 +9,8 @@ our @EXPORT = qw(&Mksymlists);
 our $VERSION = '6.44';
 
 sub Mksymlists {
-    my(%spec) = %( < @_ );
-    my($osname) = $^O;
+    my@(%spec) =@( %( < @_ ));
+    my@($osname) = $^O;
 
     croak("Insufficient information specified to Mksymlists")
         unless ( %spec{?NAME} or
@@ -58,7 +58,7 @@ sub Mksymlists {
 
 
 sub _write_aix {
-    my($data) = < @_;
+    my@($data) =  @_;
 
     rename "$data->{?FILE}.exp", "$data->{?FILE}.exp_old";
 
@@ -71,7 +71,7 @@ sub _write_aix {
 
 
 sub _write_os2 {
-    my($data) = < @_;
+    my@($data) =  @_;
     require Config;
     my $threaded = "";
 
@@ -105,7 +105,7 @@ sub _write_os2 {
     if (%{$data->{?IMPORTS}}) {
         print $def "IMPORTS\n";
         my ($name, $exp);
-        while (($name, $exp)= each %{$data->{IMPORTS}}) {
+        while (@($name, $exp)=@( each %{$data->{IMPORTS}})) {
             print $def "  $name=$exp\n";
         }
     }
@@ -113,7 +113,7 @@ sub _write_os2 {
 }
 
 sub _write_win32 {
-    my($data) = < @_;
+    my@($data) =  @_;
 
     require Config;
     if (not $data->{?DLBASE}) {
@@ -149,7 +149,7 @@ sub _write_win32 {
     if (%{$data->{?IMPORTS}}) {
         print $def "IMPORTS\n";
         my ($name, $exp);
-        while (($name, $exp)= each %{$data->{IMPORTS}}) {
+        while (@($name, $exp)=@( each %{$data->{IMPORTS}})) {
             print $def "  $name=$exp\n";
         }
     }
@@ -158,13 +158,13 @@ sub _write_win32 {
 
 
 sub _write_vms {
-    my($data) = < @_;
+    my@($data) =  @_;
 
     require Config; # a reminder for once we do $^O
     require ExtUtils::XSSymSet;
 
-    my($isvax) = Config::config_value('archname') =~ m/VAX/i;
-    my($set) = < ExtUtils::XSSymSet->new;
+    my@($isvax) = Config::config_value('archname') =~ m/VAX/i;
+    my@($set) =  ExtUtils::XSSymSet->new;
 
     rename "$data->{?FILE}.opt", "$data->{?FILE}.opt_old";
 

@@ -72,7 +72,7 @@ sub opt_d_with { shift->_elem('opt_d', < @_) }
 sub opt_L_with { shift->_elem('opt_L', < @_) }
 
 sub opt_w_with { # Specify an option for the formatter subclass
-  my($self, $value) = < @_;
+  my@($self, $value) =  @_;
   if($value =~ m/^([-_a-zA-Z][-_a-zA-Z0-9]*)(?:[=\:](.*?))?$/s) {
     my $option = $1;
     my $option_value = defined($2) ?? $2 !! "TRUE";
@@ -85,7 +85,7 @@ sub opt_w_with { # Specify an option for the formatter subclass
 }
 
 sub opt_M_with { # specify formatter class name(s)
-  my($self, $classes) = < @_;
+  my@($self, $classes) =  @_;
   return unless defined $classes and length $classes;
   DEBUG +> 4 and print "Considering new formatter classes -M$classes\n";
   my @classes_to_add;
@@ -143,7 +143,7 @@ sub opt_n_with {
 }
 
 sub opt_o_with { # "o" for output format
-  my($self, $rest) = < @_;
+  my@($self, $rest) =  @_;
   return unless defined $rest and length $rest;
   if($rest =~ m/^(\w+)$/s) {
     $rest = $1; #untaint
@@ -543,11 +543,11 @@ sub formatter_sanity_check {
 #..........................................................................
 
 sub render_and_page {
-    my($self, $found_list) = < @_;
+    my@($self, $found_list) =  @_;
     
     $self->maybe_generate_dynamic_pod($found_list);
 
-    my($out, $formatter) = < $self->render_findings($found_list);
+    my@($out, $formatter) =  $self->render_findings($found_list);
     
     if($self->opt_d) {
       printf "Perldoc (\%s) output saved to \%s\n",
@@ -682,7 +682,7 @@ sub options_sanity {
 #..........................................................................
 
 sub grand_search_init {
-    my($self, $pages, < @found) = < @_;
+    my@($self, $pages, @< @found) =  @_;
 
     foreach my $page ( @$pages) {
         if ($self->{?'podidx'} && open(PODIDX, $self->{?'podidx'})) {
@@ -764,7 +764,7 @@ sub grand_search_init {
 #..........................................................................
 
 sub maybe_generate_dynamic_pod {
-    my($self, $found_things) = < @_;
+    my@($self, $found_things) =  @_;
     my @dynamic_pod;
     
     $self->search_perlfunc($found_things, \@dynamic_pod)  if  $self->opt_f;
@@ -775,7 +775,7 @@ sub maybe_generate_dynamic_pod {
         DEBUG +> 4 and print "That's a non-dynamic pod search.\n";
     } elsif ( (nelems @dynamic_pod) ) {
         $self->aside("Hm, I found some Pod from that search!\n");
-        my ($buffd, $buffer) = < $self->new_tempfile('pod', 'dyn');
+        my @($buffd, $buffer) =  $self->new_tempfile('pod', 'dyn');
         
         push @{ $self->{'temp_file_list'} }, $buffer;
          # I.e., it MIGHT be deleted at the end.
@@ -850,7 +850,7 @@ sub add_translator { # $self->add_translator($lang);
 #..........................................................................
 
 sub search_perlfunc {
-    my($self, $found_things, $pod) = < @_;
+    my@($self, $found_things, $pod) =  @_;
 
     DEBUG +> 2 and print "Search: $(join ' ',@$found_things)\n";
 
@@ -911,7 +911,7 @@ sub search_perlfunc {
 #..........................................................................
 
 sub search_perlfaqs {
-    my( $self, $found_things, $pod) = < @_;
+    my@( $self, $found_things, $pod) =  @_;
 
     my $found = 0;
     my %found_in;
@@ -955,7 +955,7 @@ EOD
 sub render_findings {
   # Return the filename to open
 
-  my($self, $found_things) = < @_;
+  my@($self, $found_things) =  @_;
 
   my $formatter_class = $self->{?'formatter_class'}
    || die "No formatter class set!?";
@@ -983,7 +983,7 @@ sub render_findings {
   # Set formatter options:
   if( ref $formatter ) {
     foreach my $f ( @{ $self->{?'formatter_switches'} || \@() }) {
-      my($switch, $value, $silent_fail) = < @$f;
+      my@($switch, $value, $silent_fail) =  @$f;
       if( $formatter->can($switch) ) {
         try { $formatter->?$switch( defined($value) ?? $value !! () ) };
         warn "Got an error when setting $formatter_class\->$switch:\n$@\n"
@@ -1001,7 +1001,7 @@ sub render_findings {
   $self->{+'output_is_binary'} =
     $formatter->can('write_with_binmode') && $formatter->write_with_binmode;
 
-  my ($out_fh, $out) = < $self->new_output_file(
+  my @($out_fh, $out) =  $self->new_output_file(
     ( $formatter->can('output_extension') && $formatter->output_extension )
      || undef, <
     $self->useful_filename_bit,
@@ -1055,7 +1055,7 @@ sub unlink_if_temp_file {
   #  throw away the dynamically generated source pod file once
   #  we've formatted it.
   #
-  my($self, $file) = < @_;
+  my@($self, $file) =  @_;
   return unless defined $file and length $file;
   
   my $temp_file_list = $self->{?'temp_file_list'} || return;
@@ -1122,7 +1122,7 @@ sub MSWin_temp_cleanup {
 #  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
 
 sub MSWin_perldoc_tempfile {
-  my($self, $suffix, $infix) = < @_;
+  my@($self, $suffix, $infix) =  @_;
 
   my $tempdir = %ENV{?'TEMP'};
   return unless defined $tempdir and length $tempdir
@@ -1191,7 +1191,7 @@ sub after_rendering_MSWin32  {
 
 sub minus_f_nocase {   # i.e., do like -f, but without regard to case
 
-     my($self, $dir, $file) = < @_;
+     my@($self, $dir, $file) =  @_;
      my $path = catfile($dir,$file);
      return $path if -f $path and -r _;
 
@@ -1295,7 +1295,7 @@ sub pagers_guessing {
 #..........................................................................
 
 sub page_module_file {
-    my($self, < @found) = < @_;
+    my@($self, @< @found) =  @_;
 
     # Security note:
     # Don't ever just pass this off to anything like MSWin's "start.exe",
@@ -1363,7 +1363,7 @@ sub page_module_file {
 #..........................................................................
 
 sub check_file {
-    my($self, $dir, $file) = < @_;
+    my@($self, $dir, $file) =  @_;
     
     unless( ref $self ) {
       # Should never get called:
@@ -1401,7 +1401,7 @@ sub check_file {
 #..........................................................................
 
 sub containspod {
-    my($self, $file, $readit) = < @_;
+    my@($self, $file, $readit) =  @_;
     return 1 if !$readit && $file =~ m/\.pod\z/i;
 
 
@@ -1530,7 +1530,7 @@ sub new_tempfile {    # $self->new_tempfile( [$suffix, [$infix] ] )
 #..........................................................................
 
 sub page {  # apply a pager to the output file
-    my ($self, $output, $output_to_stdout, < @pagers) = < @_;
+    my @($self, $output, $output_to_stdout, @< @pagers) =  @_;
     if ($output_to_stdout) {
         $self->aside("Sending unpaged output to STDOUT.\n");
 	open(TMP, "<", $output)  or  die "Can't open $output: $!"; # XXX 5.6ism
@@ -1566,7 +1566,7 @@ sub page {  # apply a pager to the output file
 #..........................................................................
 
 sub searchfor {
-    my($self, $recurse,$s,< @dirs) = < @_;
+    my@($self, $recurse,$s,@< @dirs) =  @_;
     $s =~ s!::!/!g;
     $s = VMS::Filespec::unixify($s) if IS_VMS;
     return $s if -f $s && $self->containspod($s);
@@ -1634,7 +1634,7 @@ do {
 #..........................................................................
 
 sub tweak_found_pathnames {
-  my($self, $found) = < @_;
+  my@($self, $found) =  @_;
   if (IS_MSWin32) {
     foreach ( @$found) { s,/,\\,g }
   }
@@ -1648,7 +1648,7 @@ sub tweak_found_pathnames {
 sub am_taint_checking {
     my $self = shift;
     die "NO ENVIRONMENT?!?!" unless keys %ENV; # reset iterator along the way
-    my($k,$v) = each %ENV;
+    my@($k,$v) =@( each %ENV);
     return is_tainted($v);  
 }
 

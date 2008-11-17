@@ -259,7 +259,7 @@ method with the command paragraph).
 =cut
 
 sub command {
-    my ($self, $cmd, $text, $line_num, $pod_para)  = < @_;
+    my @($self, $cmd, $text, $line_num, $pod_para)  =  @_;
     ## Just treat this like a textblock
     $self->textblock( $pod_para->raw_text(), $line_num, $pod_para);
 }
@@ -298,7 +298,7 @@ The base class implementation of this method simply prints the textblock
 =cut
 
 sub verbatim {
-    my ($self, $text, $line_num, $pod_para) = < @_;
+    my @($self, $text, $line_num, $pod_para) =  @_;
     my $out_fh = $self->{?_OUTPUT};
     print $out_fh $text;
 }
@@ -344,7 +344,7 @@ as it occurred in the input stream).
 =cut
 
 sub textblock {
-    my ($self, $text, $line_num, $pod_para) = < @_;
+    my @($self, $text, $line_num, $pod_para) =  @_;
     my $out_fh = $self->{?_OUTPUT};
     print $out_fh $self->interpolate($text, $line_num);
 }
@@ -380,7 +380,7 @@ in the input) to the caller.
 =cut
 
 sub interior_sequence {
-    my ($self, $seq_cmd, $seq_arg, $pod_seq) = < @_;
+    my @($self, $seq_cmd, $seq_arg, $pod_seq) =  @_;
     ## Just return the raw text of the interior sequence
     return  $pod_seq->raw_text();
 }
@@ -574,7 +574,7 @@ The base class implementation of this method returns the given text.
 =cut
 
 sub preprocess_line {
-    my ($self, $text, $line_num) = < @_;
+    my @($self, $text, $line_num) =  @_;
     return  $text;
 }
 
@@ -614,7 +614,7 @@ The base class implementation of this method returns the given text.
 =cut
 
 sub preprocess_paragraph {
-    my ($self, $text, $line_num) = < @_;
+    my @($self, $text, $line_num) =  @_;
     return  $text;
 }
 
@@ -749,7 +749,7 @@ sub parse_text {
         ## more than just the sequence object, we also need to pass the
         ## sequence name and text.
         $xseq_sub = sub {
-            my ($self, $iseq) = < @_;
+            my @($self, $iseq) =  @_;
             my $args = join("", $iseq->parse_tree->children);
             return  $self->interior_sequence( $iseq->name, $args, $iseq);
         };
@@ -769,7 +769,7 @@ sub parse_text {
     ##
     my $seq       = Pod::ParseTree->new();
     my @seq_stack = @($seq);
-    my ($ldelim, $rdelim) = ('', '');
+    my @($ldelim, $rdelim) = @('', '');
 
     ## Iterate over all sequence starts text (NOTE: split with
     ## capturing parens keeps the delimiters)
@@ -781,7 +781,7 @@ sub parse_text {
         if ( m/^([A-Z])(<(?:<+\s)?)$/ ) {
             ## Push a new sequence onto the stack of those "in-progress"
             my $ldelim_orig;
-            ($cmd, $ldelim_orig) = ($1, $2);
+            @($cmd, $ldelim_orig) = @($1, $2);
             ($ldelim = $ldelim_orig) =~ s/\s+$//;
             ($rdelim = $ldelim) =~ s/</>/g;
             $seq = Pod::InteriorSequence->new(
@@ -795,7 +795,7 @@ sub parse_text {
         ## Look for sequence ending
         elsif ( (nelems @seq_stack) +> 1 ) {
             ## Make sure we match the right kind of closing delimiter
-            my ($seq_end, $post_seq) = ("", "");
+            my @($seq_end, $post_seq) = @("", "");
             if ( ($ldelim eq '<'   and  m/\A(.*?)(>)/s)
                  or  m/\A(.*?)(\s+$rdelim)/s )
             {
@@ -803,7 +803,7 @@ sub parse_text {
                 ## closing the delimiter, and put the rest back on the
                 ## token-list
                 $post_seq = substr($_, length($1) + length($2));
-                ($_, $seq_end) = ($1, $2);
+                @($_, $seq_end) = @($1, $2);
                 (length $post_seq)  and  unshift @tokens, $post_seq;
             }
             if (length) {
@@ -844,7 +844,7 @@ sub parse_text {
     ## Handle unterminated sequences
     my $errorsub = ((nelems @seq_stack) +> 1) ?? $self->errorsub() !! undef;
     while ((nelems @seq_stack) +> 1) {
-       ($cmd, $file, $line) = ( $seq->name, < $seq->file_line);
+       @($cmd, $file, $line) = @( $seq->name, < $seq->file_line);
        $ldelim  = $seq->ldelim;
        ($rdelim = $ldelim) =~ s/</>/g;
        $rdelim  =~ s/^(\S+)(\s*)$/$2$1/;
@@ -882,7 +882,7 @@ some alternate order, use B<parse_text> instead.
 =cut
 
 sub interpolate {
-    my($self, $text, $line_num) = < @_;
+    my@($self, $text, $line_num) =  @_;
     my %parse_opts = %( expand_seq => 'interior_sequence' );
     my $ptree = $self->parse_text( \%parse_opts, $text, $line_num );
     return  join "", $ptree->children();
@@ -908,7 +908,7 @@ dynamic lookup; Hence subclasses may I<not> override it!
 =cut
 
 sub parse_paragraph {
-    my ($self, $text, $line_num) = < @_;
+    my @($self, $text, $line_num) =  @_;
     local *myData = $self;  ## alias to avoid deref-ing overhead
     local *myOpts = (%myData{+_PARSEOPTS} ||= \%());  ## get parse-options
     local $_;
@@ -950,7 +950,7 @@ sub parse_paragraph {
     }
 
     ## Look for one of the three types of paragraphs
-    my ($pfx, $cmd, $arg, $sep) = ('', '', '', '');
+    my @($pfx, $cmd, $arg, $sep) = @('', '', '', '');
     my $pod_para = undef;
     if ($text =~ m/^(={1,2})(?=\S)/) {
         ## Looks like a command paragraph. Capture the command prefix used
@@ -958,7 +958,7 @@ sub parse_paragraph {
         ## and whatever sequence of characters was used to separate them
         $pfx = $1;
         $_ = substr($text, length $pfx);
-        ($cmd, $sep, $text) = < split m/(\s+)/, $_, 2; 
+        @($cmd, $sep, $text) =  split m/(\s+)/, $_, 2; 
         ## If this is a "cut" directive then we dont need to do anything
         ## except return to "cutting" mode.
         if ($cmd eq 'cut') {
@@ -1034,7 +1034,7 @@ This method does I<not> usually need to be overridden by subclasses.
 sub parse_from_filehandle {
     my $self = shift;
     my %opts = %( (ref @_[0] eq 'HASH') ?? < %{ shift() } !! () );
-    my ($in_fh, $out_fh) = < @_;
+    my @($in_fh, $out_fh) =  @_;
     $in_fh = \*STDIN  unless ($in_fh);
     local *myData = $self;  ## alias to avoid deref-ing overhead
     local *myOpts = (%myData{+_PARSEOPTS} ||= \%());  ## get parse-options
@@ -1046,8 +1046,8 @@ sub parse_from_filehandle {
     (exists %opts{cutting})  and  $self->cutting( %opts{cutting} );
 
     ## Initialize line/paragraph
-    my ($textline, $paragraph) = ('', '');
-    my ($nlines, $plines) = (0, 0);
+    my @($textline, $paragraph) = @('', '');
+    my @($nlines, $plines) = @(0, 0);
 
     ## Use <$fh> instead of $fh->getline where possible (for speed)
     $_ = ref $in_fh;
@@ -1146,9 +1146,9 @@ This method does I<not> usually need to be overridden by subclasses.
 sub parse_from_file {
     my $self = shift;
     my %opts = %( (ref @_[0] eq 'HASH') ?? < %{ shift() } !! () );
-    my ($infile, $outfile) = < @_;
+    my @($infile, $outfile) =  @_;
     my ($in_fh,  $out_fh);
-    my ($close_input, $close_output) = (0, 0);
+    my @($close_input, $close_output) = @(0, 0);
     local *myData = $self;
     local *_;
 
@@ -1512,7 +1512,7 @@ and C<OUTPUT> instance data members to determine their new values.
 =cut
 
 sub _push_input_stream {
-    my ($self, $in_fh, $out_fh) = < @_;
+    my @($self, $in_fh, $out_fh) =  @_;
     local *myData = $self;
 
     ## Initialize stuff for the entire document if this is *not*
@@ -1570,7 +1570,7 @@ the new top of the input stream stack.
 =cut
 
 sub _pop_input_stream {
-    my ($self) = < @_;
+    my @($self) =  @_;
     local *myData = $self;
     local *input_stack = %myData{?_INPUT_STREAMS};
 

@@ -92,7 +92,7 @@ if ($^O =~ m/^(?:MSWin32|VMS|os2|dos|riscos|MacOS)$/) {
 }
 
 sub bsd_glob {
-    my ($pat,$flags) = < @_;
+    my @($pat,$flags) =  @_;
     $flags = $DEFAULT_FLAGS if (nelems @_) +< 2;
     return doglob($pat,$flags);
 }

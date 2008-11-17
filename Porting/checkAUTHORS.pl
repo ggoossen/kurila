@@ -35,7 +35,7 @@ while ( ~< *DATA) {
     chomp;
     s/\\100/\@/g;
     $_ = lc;
-    if (my ($correct, $alias) = m/^\s*([^#\s]\S*)\s+(.*\S)/) {
+    if (my @($correct, $alias) = m/^\s*([^#\s]\S*)\s+(.*\S)/) {
         if ($correct eq '+') {$correct = $prev} else {$prev = $correct}
         %map {+$alias} = $correct;
     }
@@ -152,7 +152,7 @@ while ( ~< *ARGV) {
     # new patch
     my @new = @($1, $2);
     &process ($committer, $patch, $log);
-    ($patch, $committer) = < @new;
+    @($patch, $committer) =  @new;
     undef $log;
   } elsif (s/^(\s+Log: )//) {
     die "Duplicate Log:" if $log;
@@ -198,7 +198,7 @@ sub display_ordered {
   my $what = shift;
   my @sorted;
   my $total;
-  while (my ($name, $count) = each %$what) {
+  while (my @($name, $count) =@( each %$what)) {
     push @{@sorted[$count]}, $name;
     $total += $count;
   }
@@ -222,7 +222,7 @@ sub display_ordered {
 }
 
 sub process {
-  my ($committer, $patch, $log) = < @_;
+  my @($committer, $patch, $log) =  @_;
   return unless $committer;
   my @authors = @( $log =~ m/From:\s+.*?([^"\@ \t\n<>]+\@[^"\@ \t\n<>]+)/gm );
 

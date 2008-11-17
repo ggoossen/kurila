@@ -26,14 +26,14 @@ sub TIEHASH {
 
 sub FETCH {
 	my $self = shift;
-	my ($key) = <@_;
+	my @($key) = @_;
 	$main::hash_fetch++;
 	return $self->{?$key};
 }
 
 sub STORE {
 	my $self = shift;
-	my ($key, $val) = <@_;
+	my @($key, $val) = @_;
 	$self->{+$key} = $val;
 }
 
@@ -41,7 +41,7 @@ package SIMPLE;
 
 sub make {
 	my $self = bless \@(), shift;
-	my ($x) = <@_;
+	my @($x) = @_;
 	$self->[0] = $x;
 	return $self;
 }

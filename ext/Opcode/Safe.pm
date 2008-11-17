@@ -87,7 +87,7 @@ my $default_share = \qw[
 ];
 
 sub new {
-    my($class, $root, $mask) = < @_;
+    my@($class, $root, $mask) =  @_;
     my $obj = \%();
     bless $obj, $class;
 
@@ -124,12 +124,12 @@ sub DESTROY {
 }
 
 sub erase {
-    my ($obj, $action) = < @_;
+    my @($obj, $action) =  @_;
     my $pkg = $obj->root();
     my ($stem, $leaf);
 
     $pkg = "$($pkg)::";	# expand to full symbol table name
-    ($stem, $leaf) = $pkg =~ m/(.*)::(\w+::)$/;
+    @($stem, $leaf) = $pkg =~ m/(.*)::(\w+::)$/;
 
     # The 'my $foo' is needed! Without it you get an
     # 'Attempt to free unreferenced scalar' warning!
@@ -217,7 +217,7 @@ sub dump_mask {
 
 
 sub share {
-    my($obj, < @vars) = < @_;
+    my@($obj, @< @vars) =  @_;
     $obj->share_from(scalar(caller), \@vars);
 }
 
@@ -252,14 +252,14 @@ sub share_record {
     my $pkg = shift;
     my $vars = shift;
     my $shares = \%{$obj->{+Shares} ||= \%()};
- <    # Record shares using keys of $obj->{Shares}. See reinit.
+     # Record shares using keys of $obj->{Shares}. See reinit.
     %{$shares}{[ @$vars]} = ($pkg) x nelems @$vars if (nelems @$vars);
 }
 sub share_redo {
     my $obj = shift;
     my $shares = \%{$obj->{+Shares} ||= \%()};
     my($var, $pkg);
-    while(($var, $pkg) = each %$shares) {
+    while(@($var, $pkg) =@( each %$shares)) {
 	# warn "share_redo $pkg\:: $var";
 	$obj->share_from($pkg,  \@( $var ), 1);
     }
@@ -269,13 +269,13 @@ sub share_forget {
 }
 
 sub varglob {
-    my ($obj, $var) = < @_;
+    my @($obj, $var) =  @_;
     return Symbol::fetch_glob($obj->root()."::$var");
 }
 
 
 sub reval {
-    my ($obj, $expr, $strict) = < @_;
+    my @($obj, $expr, $strict) =  @_;
     my $root = $obj->{?Root};
 
     my $evalsub = lexless_anon_sub($root,$strict, $expr);
@@ -283,7 +283,7 @@ sub reval {
 }
 
 sub rdo {
-    my ($obj, $file) = < @_;
+    my @($obj, $file) =  @_;
     my $root = $obj->{?Root};
 
     my $evalsub = eval

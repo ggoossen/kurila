@@ -46,7 +46,7 @@ is (((nelems @values)-1), 27, "values");
 
 $i = 0;		# stop -w complaints
 
-while (($key,$value) = each(%h)) {
+while (@($key,$value) = each@(%h)) {
     if ($key eq @keys[$i] && $value eq @values[$i]
         && (($key cmp $value) +> 0)) {
 	$key =~ s/([a-z])/$(uc($1))/g;
@@ -86,7 +86,7 @@ $i = 0;
 %h = %(a => 'A', b => 'B', c=> 'C', d => 'D', abc => 'ABC');
 @keys = keys(%h);
 @values = values(%h);
-while (($key, $value) = each(%h)) {
+while (@($key, $value) = each@(%h)) {
 	if ($key eq @keys[$i] && $value eq @values[$i] && $key eq lc($value)) {
 		$i++;
 	}
@@ -99,7 +99,7 @@ do {
     sub DESTROY { print "ok @::tests[1] # DESTROY called\n"; }
     do {
 	my $h = \%( A => bless \@(), __PACKAGE__ );
-        while (my($k,$v) = each %$h) {
+        while (my@($k,$v) =@( each %$h)) {
 	    print "ok @::tests[0]\n" if $k eq 'A' and ref($v) eq 'Obj';
 	}
     };
@@ -110,7 +110,7 @@ do {
 use utf8;
 %u = %("\x{12}", "f", "\x{123}", "fo", "\x{1234}",  "foo");
 %u{+"\x{12345}"}  = "bar";
- <%u{[@("\x{10FFFD}")]} = "zap";
+ %u{[@("\x{10FFFD}")]} = "zap";
 
 my %u2;
 foreach (keys %u) {

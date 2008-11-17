@@ -268,8 +268,8 @@ do {   local $/ = undef;
 
 my $i = 46;
 for ( @prgs) {
-    my ($code, $exp) = (( <split m/\nEXPECT\n/), '$');
-    my ($prog, $fil) = (( <split m/\nFILE\n/, $code), "");
+    my @($code, $exp) = @(( <split m/\nEXPECT\n/), '$');
+    my @($prog, $fil) = @(( <split m/\nFILE\n/, $code), "");
     $prog = "use utf8; " . $prog;
     open my $tmp, ">", "$tmpfile" or die "Could not open $tmpfile: $!";
     print $tmp $prog, "\n";

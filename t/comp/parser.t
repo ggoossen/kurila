@@ -205,8 +205,8 @@ like($@->stacktrace, qr/BEGIN/, 'BEGIN 7' );
 # with sane line reporting for any other test failures
 
 sub check ($$$) {
-    my ($file, $line, $name) =  < @_;
-    my (undef, $got_file, $got_line) = caller;
+    my @($file, $line, $name) =   @_;
+    my @(undef, $got_file, $got_line) =@( caller);
     like ($got_file, $file, "file of $name");
     is ($got_line, $line, "line of $name");
 }

@@ -35,14 +35,14 @@ sub new {
 }
 
 sub DESTROY {
-    my ($dh) = < @_;
+    my @($dh) =  @_;
     no warnings 'io';
     closedir($dh);
 }
 
 sub open {
     (nelems @_) == 2 or croak 'usage: $dh->open(DIRNAME)';
-    my ($dh, $dirname) = < @_;
+    my @($dh, $dirname) =  @_;
     return undef
 	unless opendir($dh, $dirname);
     # a dir name should always have a ":" in it; assume dirname is
@@ -54,42 +54,42 @@ sub open {
 
 sub close {
     (nelems @_) == 1 or croak 'usage: $dh->close()';
-    my ($dh) = < @_;
+    my @($dh) =  @_;
     closedir($dh);
 }
 
 sub read {
     (nelems @_) == 1 or croak 'usage: $dh->read()';
-    my ($dh) = < @_;
+    my @($dh) =  @_;
     readdir($dh);
 }
 
 sub read_all {
     (nelems @_) == 1 or croak 'usage: $dh->read_all()';
-    my ($dh) = < @_;
+    my @($dh) =  @_;
     return @( readdir($dh) );
 }
 
 sub seek {
     (nelems @_) == 2 or croak 'usage: $dh->seek(POS)';
-    my ($dh,$pos) = < @_;
+    my @($dh,$pos) =  @_;
     seekdir($dh,$pos);
 }
 
 sub tell {
     (nelems @_) == 1 or croak 'usage: $dh->tell()';
-    my ($dh) = < @_;
+    my @($dh) =  @_;
     telldir($dh);
 }
 
 sub rewind {
     (nelems @_) == 1 or croak 'usage: $dh->rewind()';
-    my ($dh) = < @_;
+    my @($dh) =  @_;
     rewinddir($dh);
 }
 
 sub TIEHASH {
-    my($class,$dir,$options) = < @_;
+    my@($class,$dir,$options) =  @_;
 
     my $dh = $class->new($dir)
 	or return undef;
@@ -101,29 +101,29 @@ sub TIEHASH {
 }
 
 sub FIRSTKEY {
-    my($dh) = < @_;
+    my@($dh) =  @_;
     $dh->rewind;
     scalar $dh->read;
 }
 
 sub NEXTKEY {
-    my($dh) = < @_;
+    my@($dh) =  @_;
     scalar $dh->read;
 }
 
 sub EXISTS {
-    my($dh,$key) = < @_;
+    my@($dh,$key) =  @_;
     -e File::Spec->catfile(%{*$dh}{?io_dir_path}, $key);
 }
 
 sub FETCH {
-    my($dh,$key) = < @_;
+    my@($dh,$key) =  @_;
     &lstat(File::Spec->catfile(%{*$dh}{?io_dir_path}, $key));
 }
 
 sub STORE {
-    my($dh,$key,$data) = < @_;
-    my($atime,$mtime) = ref($data) ?? < @$data !! ($data,$data);
+    my@($dh,$key,$data) =  @_;
+    my@($atime,$mtime) = ref($data) ?? < @$data !! ($data,$data);
     my $file = File::Spec->catfile(%{*$dh}{?io_dir_path}, $key);
     unless(-e $file) {
 	my $io = IO::File->new($file,O_CREAT ^|^ O_RDWR);
@@ -133,7 +133,7 @@ sub STORE {
 }
 
 sub DELETE {
-    my($dh,$key) = < @_;
+    my@($dh,$key) =  @_;
 
     # Only unlink if unlink-ing is enabled
     return 0

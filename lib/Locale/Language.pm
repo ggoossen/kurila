@@ -112,7 +112,7 @@ do {
     {
         next unless m/\S/;
         chop;
-        ($code, $language) = < split(m/:/, $_, 2);
+        @($code, $language) =  split(m/:/, $_, 2);
         %CODES{+$code} = $language;
         %LANGUAGES{+lc "$language"} = $code;
     }

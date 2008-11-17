@@ -43,7 +43,7 @@ sub hostname {
     return $host if $host;
 
     # method 4 - does hostname happen to work?
-    my($rslt) = `hostname`;
+    my@($rslt) = `hostname`;
     if ($rslt !~ m/IVVERB/) { ($host) = $rslt =~ m/^(\S+)/; }
     return $host if $host;
 
@@ -104,7 +104,7 @@ sub hostname {
     # method 6 - Apollo pre-SR10
     || try {
         my($a,$b,$c,$d);
-	($host,$a,$b,$c,$d)= <split(m/[:\. ]/,`/com/host`,6);
+	@($host,$a,$b,$c,$d)= split(m/[:\. ]/,`/com/host`,6);
     }
 
     # bummer

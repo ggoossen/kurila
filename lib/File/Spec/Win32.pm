@@ -106,7 +106,7 @@ volume, 1 if it's absolute with no volume, 0 otherwise.
 
 sub file_name_is_absolute {
 
-    my ($self,$file) = < @_;
+    my @($self,$file) =  @_;
 
     if ($file =~ m{^($VOL_RX)}o) {
       my $vol = $1;
@@ -204,8 +204,8 @@ The results can be passed to L</catpath> to get back a path equivalent to
 =cut
 
 sub splitpath {
-    my ($self,$path, $nofile) = < @_;
-    my ($volume,$directory,$file) = ('','','');
+    my @($self,$path, $nofile) =  @_;
+    my @($volume,$directory,$file) = @('','','');
     if ( $nofile ) {
         $path =~ 
             m{^ ( $VOL_RX ? ) (.*) }sox;
@@ -250,7 +250,7 @@ Yields:
 =cut
 
 sub splitdir {
-    my ($self,$directories) = < @_ ;
+    my @($self,$directories) =  @_ ;
     #
     # split() likes to forget about trailing null fields, so here we
     # check to be sure that there will not be any before handling the
@@ -280,7 +280,7 @@ the $volume become significant.
 =cut
 
 sub catpath {
-    my ($self,$volume,$directory,$file) = < @_;
+    my @($self,$volume,$directory,$file) =  @_;
 
     # If it's UNC, make sure the glue separator is there, reusing
     # whatever separator is first in the $volume
@@ -313,7 +313,7 @@ sub _same {
 }
 
 sub rel2abs {
-    my ($self,$path,$base ) = < @_;
+    my @($self,$path,$base ) =  @_;
 
     my $is_abs = $self->file_name_is_absolute($path);
 
@@ -338,10 +338,10 @@ sub rel2abs {
       $base = $self->canonpath( $base ) ;
     }
 
-    my ( $path_directories, $path_file ) =
-      < ($self->splitpath( $path, 1 ))[[1..2]] ;
+    my @( $path_directories, $path_file ) =
+       ($self->splitpath( $path, 1 ))[[1..2]] ;
 
-    my ( $base_volume, $base_directories ) = <
+    my @( $base_volume, $base_directories ) = 
       $self->splitpath( $base, 1 ) ;
 
     $path = $self->catpath( 

@@ -551,12 +551,12 @@ sub IO::Compress::Base::Parameters::parse
     }
 
 
-    while (my ($key, $v) = each %$default)
+    while (my @($key, $v) =@( each %$default))
     {
         croak "need 4 params [$(join ' ',@$v)]"
             if (nelems @$v) != 4 ;
 
-        my ($first_only, $sticky, $type, $value) = < @$v ;
+        my @($first_only, $sticky, $type, $value) =  @$v ;
         my $x ;
         $self->_checkType($key, \$value, $type, 0, \$x) 
             or return undef ;
@@ -612,7 +612,7 @@ sub IO::Compress::Base::Parameters::parse
     }
  
     if ((nelems @Bad)) {
-        my ($bad) = join(", ", @Bad) ;
+        my @($bad) = join@(", ", @Bad) ;
         return $self->setError("unknown key value(s) $(join ' ',@Bad)") ;
     }
 
@@ -760,7 +760,7 @@ sub IO::Compress::Base::Parameters::clone
     my $obj = \%( );
     my %got ;
 
-    while (my ($k, $v) = each %{ $self->{Got} }) {
+    while (my @($k, $v) =@( each %{ $self->{Got} })) {
         %got{+$k} = \ @$v;
     }
 
@@ -798,7 +798,7 @@ sub newUnpack_V64
 {
     my $string = shift;
 
-    my ($low, $hi) = unpack "V V", $string ;
+    my @($low, $hi) =@( unpack "V V", $string) ;
     bless \@( $low, $hi ), "U64";
 }
 

@@ -67,7 +67,7 @@ my $glob = 'squaa::*';
 print "# Limiting to $glob\n";
 $x->limit_glob($glob);
 
-my($name2where, $where2name) = ($x->survey($here1, $here2, $here3), $x->path2name);
+my@($name2where, $where2name) = @($x->survey($here1, $here2, $here3), $x->path2name);
 
 my $p = pretty( $where2name, $name2where )."\n";
 $p =~ s/, +/,\n/g;

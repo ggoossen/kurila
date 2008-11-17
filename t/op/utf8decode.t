@@ -154,8 +154,8 @@ do {
 	    # print "# $_\n";
 	} elsif (m/^(\d+\.\d+\.\d+[bu]?)\s+([yn])\s+"(.+)"\s+([0-9a-f]{1,8}|-)\s+(\d+)\s+([0-9a-f]{2}(?::[0-9a-f]{2})*)(?:\s+((?:\d+|-)(?:\s+(.+))?))?$/) {
 	    $id = $1;
-	    my ($okay, $bytes, $Unicode, $byteslen, $hex, $charslen, $experr) =
-		($2, $3, $4, $5, $6, $7, $8);
+	    my @($okay, $bytes, $Unicode, $byteslen, $hex, $charslen, $experr) =
+		@($2, $3, $4, $5, $6, $7, $8);
 	    my @hex = split(m/:/, $hex);
 	    unless ((nelems @hex) == $byteslen) {
 		my $nhex = (nelems @hex);

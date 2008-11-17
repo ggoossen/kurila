@@ -181,7 +181,7 @@ do {
 
     # Catch PERL_CONFIG_SH=true and PERL_VERSION=n line from Configure.
     s/^(\w+)=(true|\d+)\s*$/$1='$2'\n/ or m/^(\w+)='(.*)'$/;
-    my($k, $v) = ($1, $2);
+    my@($k, $v) = @($1, $2);
 
     # grandfather PATCHLEVEL and SUBVERSION and CONFIG
     if ($k) {
@@ -206,7 +206,7 @@ do {
         $val .= $_;
     }
     else { 
-        ($name,$val) = ($1,$3); 
+        @($name,$val) = @($1,$3); 
     }
     $in_v = $val !~ m/$quote\n/;
     next if $in_v;
@@ -388,7 +388,7 @@ if (fetch_string(\%(),'userelocatableinc')) {
 }
 
 my %need_relocation;
- <%need_relocation{[ @need_relocation]} = < @need_relocation;
+ %need_relocation{[ @need_relocation]} =  @need_relocation;
 
 # This can have .../ anywhere:
 if (fetch_string(\%(), 'otherlibdirs') =~ m!\.\.\./!) {
@@ -511,7 +511,7 @@ foreach my $prefix (qw(libs libswanted)) {
        = split(' ', fetch_string (\%(), 'libswanted_uselargefiles'));
     if ((nelems @lflibswanted)) {
 	my %lflibswanted;
- <	%lflibswanted{[ @lflibswanted]} = ();
+ 	%lflibswanted{[ @lflibswanted]} = @();
 	if ($prefix eq 'libs') {
 	    my @libs = grep { m/^-l(.+)/ &&
                             not exists %lflibswanted{$1} }
@@ -621,7 +621,7 @@ if ($OS2::is_aout) {
 sub TIEHASH { bless {%preconfig} }
 ENDOFSET
     # Extract the name of the DLL from the makefile to avoid duplication
-    my ($f) = < grep -r, qw(GNUMakefile Makefile);
+    my @($f) =  grep -r, qw(GNUMakefile Makefile);
     my $dll;
     if (open my $fh, '<', $f) {
 	while ( ~< $fh) {

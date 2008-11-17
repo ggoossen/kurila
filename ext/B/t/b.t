@@ -29,7 +29,7 @@ B::walksymtable(\%Testing::Symtable::, 'find_syms', sub { @_[0] =~ m/Foo/ },
                 'Testing::Symtable::');
 
 sub B::GV::find_syms {
-    my($symbol) = < @_;
+    my@($symbol) =  @_;
 
     %main::Subs{+$symbol->STASH->NAME . '::' . $symbol->NAME}++;
 }

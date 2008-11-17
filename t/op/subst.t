@@ -174,12 +174,12 @@ my %MK = %(
     DIR => '$(UNDEFINEDNAME)/xxx',
 );
 sub var { 
-    my($var,$level) = < @_;
+    my@($var,$level) =  @_;
     return "\$($var)" unless exists %MK{$var};
     return exp_vars(%MK{?$var}, $level+1); # can recurse
 }
 sub exp_vars { 
-    my($str,$level) = < @_;
+    my@($str,$level) =  @_;
     $str =~ s/\$\((\w+)\)/$(var($1, $level+1))/g; # can recurse
     #warn "exp_vars $level = '$str'\n";
     $str;
@@ -407,8 +407,8 @@ do {
 
 do {
     # subst with mixed utf8/non-utf8 type
-    my($ua, $ub, $uc, $ud) = ("\x{101}", "\x{102}", "\x{103}", "\x{104}");
-    my($na, $nb) = ("\x{ff}", "\x{fe}");
+    my@($ua, $ub, $uc, $ud) = @("\x{101}", "\x{102}", "\x{103}", "\x{104}");
+    my@($na, $nb) = @("\x{ff}", "\x{fe}");
     my $a = "$ua--$ub";
     my $b;
     ($b = $a) =~ s/--/$na/;

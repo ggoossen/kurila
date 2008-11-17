@@ -86,7 +86,7 @@ die "failed to read $tmpc_file: length mismatch\n"
     unless length $clines == -s $tmpc_file;
 close CTMPFILE;
 
-my ($actlines, $tablines) = < extract($clines);
+my @($actlines, $tablines) =  extract($clines);
 
 $tablines .= make_type_tab($y_file, $tablines);
 
@@ -217,7 +217,7 @@ sub extract {
 # perly.y
 
 sub make_type_tab {
-    my ($y_file, $tablines) = < @_;
+    my @($y_file, $tablines) =  @_;
     my %tokens;
     my %types;
     my $default_token;

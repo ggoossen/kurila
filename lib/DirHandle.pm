@@ -54,7 +54,7 @@ sub new {
 }
 
 sub DESTROY {
-    my ($dh) = < @_;
+    my @($dh) =  @_;
     # Don't warn about already being closed as it may have been closed 
     # correctly, or maybe never opened at all.
     no warnings 'io';
@@ -63,31 +63,31 @@ sub DESTROY {
 
 sub open {
     (nelems @_) == 2 or die 'usage: $dh->open(DIRNAME)';
-    my ($dh, $dirname) = < @_;
+    my @($dh, $dirname) =  @_;
     opendir($dh, $dirname);
 }
 
 sub close {
     (nelems @_) == 1 or die 'usage: $dh->close()';
-    my ($dh) = < @_;
+    my @($dh) =  @_;
     closedir($dh);
 }
 
 sub readdir {
     (nelems @_) == 1 or die 'usage: $dh->read()';
-    my ($dh) = < @_;
+    my @($dh) =  @_;
     return $( CORE::readdir($dh) );
 }
 
 sub readdirs {
     (nelems @_) == 1 or die 'usage: $dh->read()';
-    my ($dh) = < @_;
+    my @($dh) =  @_;
     return @( CORE::readdir($dh) ); # Force list context.
 }
 
 sub rewind {
     (nelems @_) == 1 or die 'usage: $dh->rewind()';
-    my ($dh) = < @_;
+    my @($dh) =  @_;
     rewinddir($dh);
 }
 

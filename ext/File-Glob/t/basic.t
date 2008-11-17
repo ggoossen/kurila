@@ -29,7 +29,7 @@ SKIP: do {
     skip $^O, 1 if $^O eq 'MSWin32' || $^O eq 'NetWare' || $^O eq 'VMS'
 	|| $^O eq 'os2' || $^O eq 'beos';
     skip "Can't find user for $>: $@", 1 unless try {
-	($name, $home) = < @(getpwuid($>))[[@:0,7]];
+	@($name, $home) =  @(getpwuid($>))[[@:0,7]];
 	1;
     };
     skip "$> has no home directory", 1

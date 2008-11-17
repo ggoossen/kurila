@@ -985,7 +985,7 @@ Process basic pod commands.
 
 sub command {
   my $self = shift;
-  my ($command, $paragraph, $line_num, $parobj) = < @_;
+  my @($command, $paragraph, $line_num, $parobj) =  @_;
 
   # return if we dont care
   return if $command eq 'pod';
@@ -1071,7 +1071,7 @@ sub command {
 
     # The first line contains the format and the rest is the
     # raw code.
-    my ($format, $chunk) = < split(m/\n/, $rawpara, 2);
+    my @($format, $chunk) =  split(m/\n/, $rawpara, 2);
 
     # If we have got some latex code print it out immediately
     # unmodified. Else do nothing.
@@ -1105,7 +1105,7 @@ Verbatim text
 
 sub verbatim {
   my $self = shift;
-  my ($paragraph, $line_num, $parobj) = < @_;
+  my @($paragraph, $line_num, $parobj) =  @_;
 
   # Expand paragraph unless in =begin block
   if ($self->{?_dont_modify_any_para}) {
@@ -1147,7 +1147,7 @@ Plain text paragraph.
 
 sub textblock {
   my $self = shift;
-  my ($paragraph, $line_num, $parobj) = < @_;
+  my @($paragraph, $line_num, $parobj) =  @_;
 
   # print Dumper($self);
 
@@ -1182,7 +1182,7 @@ sub textblock {
     $paragraph =~ s/\s$//;
 
     # Split the string into 2 parts
-    my ($name, $purpose) = < split(m/\s+-\s+/, $expansion,2);
+    my @($name, $purpose) =  split(m/\s+-\s+/, $expansion,2);
 
     # Now prevent this from triggering until a new head1 NAME is set
     $self->{+_CURRENT_HEAD1} = '_NAME';
@@ -1221,7 +1221,7 @@ Interior sequence expansion
 sub interior_sequence {
   my $self = shift;
 
-  my ($seq_command, $seq_argument, $pod_seq) = < @_;
+  my @($seq_command, $seq_argument, $pod_seq) =  @_;
 
   if ($seq_command eq 'B') {
     return "\\textbf\{$seq_argument\}";
@@ -1239,7 +1239,7 @@ sub interior_sequence {
       return %HTML_Escapes{?$seq_argument};
 
     } else {
-      my ($file, $line) = < $pod_seq->file_line();
+      my @($file, $line) =  $pod_seq->file_line();
       warn "Escape sequence $seq_argument not recognised at line $line of file $file\n";
       return;
     }
@@ -1288,7 +1288,7 @@ sub interior_sequence {
       # Use default markup for external references
       # (although Starlink would use \xlabel)
       my $markup = $link->markup;
-      my ($file, $line) = < $pod_seq->file_line();
+      my @($file, $line) =  $pod_seq->file_line();
 
       return $self->interpolate( $link->markup, $line);
     }
@@ -1448,7 +1448,7 @@ sub add_item {
     # If the string is longer than 40 characters we split
     # it into a real item header and some bold text.
     my $maxlen = 40;
-    my ($hunk1, $hunk2) = < $self->_split_delimited( $paragraph, $maxlen );
+    my @($hunk1, $hunk2) =  $self->_split_delimited( $paragraph, $maxlen );
 
     # Print the first hunk
     $self->_output("\n\\item[\{$hunk1\}] ");

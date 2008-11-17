@@ -87,7 +87,7 @@ if (!$::PERL_ONLY) { SKIP: do {
       if !$List::Util::REAL_MULTICALL;
 
     # Can we goto a subroutine?
-    try {()= <first{goto sub{}} 1,2;};
+    try {@()= first{goto sub{}} 1,2;};
     like($@->{?description}, qr/^Can't goto subroutine from a sort sub/, "goto sub");
 
 }; }

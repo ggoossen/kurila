@@ -170,11 +170,11 @@ sub fail () {
 }
 
 sub offset ($$) {
-    my ($offset_will_be, $offset_want) = < @_;
+    my @($offset_will_be, $offset_want) =  @_;
     my $offset_is = eval $offset_will_be;
     unless ($offset_is == $offset_want) {
         print "# bad offset $offset_is, want $offset_want\n";
-	my ($offset_func) = ($offset_will_be =~ m/^(\w+)/);
+	my @($offset_func) = @($offset_will_be =~ m/^(\w+)/);
 	if (unpack("L", pack("L", $offset_want)) == $offset_is) {
 	    print "# 32-bit wraparound suspected in $offset_func() since\n";
 	    print "# $offset_want cast into 32 bits equals $offset_is.\n";

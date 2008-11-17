@@ -41,7 +41,7 @@ my $rep = "camel";
 my $ret = "This is a camel book.";
 
 $str = $orig;
-if (my($pos,$len) = < $Collator->index($str, $sub)) {
+if (my@($pos,$len) =  $Collator->index($str, $sub)) {
   substr($str, $pos, $len, $rep);
 }
 
@@ -50,7 +50,7 @@ ok($str, $ret);
 $Collator->change(< %old_level);
 
 $str = $orig;
-if (my($pos,$len) = < $Collator->index($str, $sub)) {
+if (my@($pos,$len) =  $Collator->index($str, $sub)) {
   substr($str, $pos, $len, $rep);
 }
 
@@ -66,7 +66,7 @@ $str = "Pe\x{300}rl";
 $sub = "pe";
 $ret = "Pe\x{300}";
 $match = undef;
-if (my($pos, $len) = < $Collator->index($str, $sub)) {
+if (my@($pos, $len) =  $Collator->index($str, $sub)) {
     $match = substr($str, $pos, $len);
 }
 ok($match, $ret);
@@ -75,7 +75,7 @@ $str = "P\x{300}e\x{300}\x{301}\x{303}rl";
 $sub = "pE";
 $ret = "P\x{300}e\x{300}\x{301}\x{303}";
 $match = undef;
-if (my($pos, $len) = < $Collator->index($str, $sub)) {
+if (my@($pos, $len) =  $Collator->index($str, $sub)) {
     $match = substr($str, $pos, $len);
 }
 ok($match, $ret);
@@ -86,7 +86,7 @@ $str = "Pe\x{300}rl";
 $sub = "pe";
 $ret = undef;
 $match = undef;
-if (my($pos, $len) = < $Collator->index($str, $sub)) {
+if (my@($pos, $len) =  $Collator->index($str, $sub)) {
     $match = substr($str, $pos, $len);
 }
 ok($match, $ret);
@@ -95,7 +95,7 @@ $str = "P\x{300}e\x{300}\x{301}\x{303}rl";
 $sub = "pE";
 $ret = undef;
 $match = undef;
-if (my($pos, $len) = < $Collator->index($str, $sub)) {
+if (my@($pos, $len) =  $Collator->index($str, $sub)) {
     $match = substr($str, $pos, $len);
 }
 ok($match, $ret);
@@ -104,7 +104,7 @@ $str = "Pe\x{300}rl";
 $sub = "pe\x{300}";
 $ret = "Pe\x{300}";
 $match = undef;
-if (my($pos, $len) = < $Collator->index($str, $sub)) {
+if (my@($pos, $len) =  $Collator->index($str, $sub)) {
     $match = substr($str, $pos, $len);
 }
 ok($match, $ret);
@@ -113,7 +113,7 @@ $str = "P\x{300}e\x{300}\x{301}\x{303}rl";
 $sub = "p\x{300}E\x{300}\x{301}\x{303}";
 $ret = "P\x{300}e\x{300}\x{301}\x{303}";
 $match = undef;
-if (my($pos, $len) = < $Collator->index($str, $sub)) {
+if (my@($pos, $len) =  $Collator->index($str, $sub)) {
     $match = substr($str, $pos, $len);
 }
 ok($match, $ret);
@@ -132,7 +132,7 @@ $ret = $IsEBCDIC
     ?? "mu\x{0059}"
     !! "mu\x{00DF}";
 $match = undef;
-if (my($pos, $len) = < $Collator->index($str, $sub)) {
+if (my@($pos, $len) =  $Collator->index($str, $sub)) {
     $match = substr($str, $pos, $len);
 }
 ok($match, $ret);
@@ -140,19 +140,19 @@ ok($match, $ret);
 $Collator->change(< %old_level);
 
 $match = undef;
-if (my($pos, $len) = < $Collator->index($str, $sub)) {
+if (my@($pos, $len) =  $Collator->index($str, $sub)) {
     $match = substr($str, $pos, $len);
 }
 ok($match, undef);
 
 $match = undef;
-if (my($pos,$len) = < $Collator->index("", "")) {
+if (my@($pos,$len) =  $Collator->index("", "")) {
     $match = substr("", $pos, $len);
 }
 ok($match, "");
 
 $match = undef;
-if (my($pos,$len) = < $Collator->index("", "abc")) {
+if (my@($pos,$len) =  $Collator->index("", "abc")) {
     $match = substr("", $pos, $len);
 }
 ok($match, undef);
@@ -165,7 +165,7 @@ $str = "\0\cA\0\cAe\0\x{300}\cA\x{301}\cB\x{302}\0 \0\cA";
 $sub = "e";
 $ret = "e\0\x{300}\cA\x{301}\cB\x{302}\0";
 $match = undef;
-if (my($pos, $len) = < $Collator->index($str, $sub)) {
+if (my@($pos, $len) =  $Collator->index($str, $sub)) {
     $match = substr($str, $pos, $len);
 }
 ok($match, $ret);
@@ -176,7 +176,7 @@ $str = "\0\cA\0\cAe\0\cA\x{300}\0\cAe";
 $sub = "e";
 $ret = "e\0\cA\x{300}\0\cA";
 $match = undef;
-if (my($pos, $len) = < $Collator->index($str, $sub)) {
+if (my@($pos, $len) =  $Collator->index($str, $sub)) {
     $match = substr($str, $pos, $len);
 }
 ok($match, $ret);
@@ -188,7 +188,7 @@ $str = "e\x{300}";
 $sub = "e";
 $ret = undef;
 $match = undef;
-if (my($pos, $len) = < $Collator->index($str, $sub)) {
+if (my@($pos, $len) =  $Collator->index($str, $sub)) {
     $match = substr($str, $pos, $len);
 }
 ok($match, $ret);
@@ -201,37 +201,37 @@ $str = "The Perl is a language, and the perl is an interpreter.";
 $sub = "PERL";
 
 $match = undef;
-if (my($pos, $len) = < $Collator->index($str, $sub, -40)) {
+if (my@($pos, $len) =  $Collator->index($str, $sub, -40)) {
     $match = substr($str, $pos, $len);
 }
 ok($match, "Perl");
 
 $match = undef;
-if (my($pos, $len) = < $Collator->index($str, $sub, 4)) {
+if (my@($pos, $len) =  $Collator->index($str, $sub, 4)) {
     $match = substr($str, $pos, $len);
 }
 ok($match, "Perl");
 
 $match = undef;
-if (my($pos, $len) = < $Collator->index($str, $sub, 5)) {
+if (my@($pos, $len) =  $Collator->index($str, $sub, 5)) {
     $match = substr($str, $pos, $len);
 }
 ok($match, "perl");
 
 $match = undef;
-if (my($pos, $len) = < $Collator->index($str, $sub, 32)) {
+if (my@($pos, $len) =  $Collator->index($str, $sub, 32)) {
     $match = substr($str, $pos, $len);
 }
 ok($match, "perl");
 
 $match = undef;
-if (my($pos, $len) = < $Collator->index($str, $sub, 33)) {
+if (my@($pos, $len) =  $Collator->index($str, $sub, 33)) {
     $match = substr($str, $pos, $len);
 }
 ok($match, undef);
 
 $match = undef;
-if (my($pos, $len) = < $Collator->index($str, $sub, 100)) {
+if (my@($pos, $len) =  $Collator->index($str, $sub, 100)) {
     $match = substr($str, $pos, $len);
 }
 ok($match, undef);

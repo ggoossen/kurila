@@ -11,7 +11,7 @@ ok($deparse);
 
 # Tell B::Deparse about our ambient pragmas
 do { my ($hint_bits, $warning_bits, $hinthash);
- BEGIN { ($hint_bits, $warning_bits, $hinthash) = ($^H, $^WARNING_BITS, \%^H); }
+ BEGIN { @($hint_bits, $warning_bits, $hinthash) = @($^H, $^WARNING_BITS, \%^H); }
  $deparse->ambient_pragmas (
      hint_bits    => $hint_bits,
      warning_bits => $warning_bits,
@@ -24,14 +24,14 @@ while ( ~< *DATA) {
     chomp;
     my ($num, $testname, $todo);
     if (s/#\s*(.*)$//mg) {
-        ($num, $todo, $testname) = $1 =~ m/(\d*)\s*(TODO)?\s*(.*)/;
+        @($num, $todo, $testname) = $1 =~ m/(\d*)\s*(TODO)?\s*(.*)/;
     }
     my ($input, $expected);
     if (m/(.*)\n>>>>\n(.*)/s) {
-	($input, $expected) = ($1, $2);
+	@($input, $expected) = @($1, $2);
     }
     else {
-	($input, $expected) = ($_, $_);
+	@($input, $expected) = @($_, $_);
     }
 
     local our $TODO = $todo;

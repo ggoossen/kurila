@@ -22,14 +22,14 @@ sub mkUncompObject
 
     if ($scan)
     {
-        ($inflate, $status) = < Compress::Raw::Zlib::InflateScan->new(
+        @($inflate, $status) =  Compress::Raw::Zlib::InflateScan->new(
                                     CRC32        => $crc32,
                                     ADLER32      => $adler32,
                                     WindowBits   => - MAX_WBITS) ;
     }
     else
     {
-        ($inflate, $status) = < Compress::Raw::Zlib::Inflate->new(
+        @($inflate, $status) =  Compress::Raw::Zlib::Inflate->new(
                                     AppendOutput => 1,
                                     CRC32        => $crc32,
                                     ADLER32      => $adler32,

@@ -19,7 +19,7 @@ sub write_with_binmode { 0 }
 sub output_extension   { 'txt' }
 
 sub if_zero_length {
-  my( $self, $file, $tmp, $tmpfd ) = < @_;
+  my@( $self, $file, $tmp, $tmpfd ) =  @_;
   print "No Pod errors in $file\n";
 }
 

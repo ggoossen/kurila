@@ -177,7 +177,7 @@ my $do_spawn = $^O eq 'os2' || $^O eq 'MSWin32';
 
 sub _open3 {
     local $Me = shift;
-    my($package, $dad_wtr, $dad_rdr, $dad_err, < @cmd) = < @_;
+    my@($package, $dad_wtr, $dad_rdr, $dad_err, @< @cmd) =  @_;
     my($dup_wtr, $dup_rdr, $dup_err, $kidpid);
 
     if ((nelems @cmd) +> 1 and @cmd[0] eq '-') {

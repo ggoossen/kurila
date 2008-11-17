@@ -42,7 +42,7 @@ dies_like(sub { $a = %a{?abcd}; $a++  },
 
 do {
     local $TODO = "hash list assignment";
-    < %a{[@( <qw(abc cde))]} = < qw(123 345); 
+     %a{[@( <qw(abc cde))]} =  qw(123 345); 
     is(%a{?cde}, 345);
     dies_like(sub { %a{+def} = 456 },
               qr/Table is full \(3 elements\)/);

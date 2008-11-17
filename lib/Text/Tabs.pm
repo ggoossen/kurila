@@ -33,7 +33,7 @@ sub expand {
 
 sub unexpand
 {
-	my (@l) = @_;
+	my @(@l) = @_;
 	my @e;
 	my $lastbit;
 	my $ts_as_space = " "x$tabstop;

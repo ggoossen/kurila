@@ -37,7 +37,7 @@ The && problem.
 =cut
 
 sub xs_c {
-    my($self) = shift;
+    my@($self) =@( shift);
     return '' unless $self->needs_linking();
     '
 .xs.c:
@@ -53,7 +53,7 @@ The && problem
 =cut
 
 sub xs_cpp {
-    my($self) = shift;
+    my@($self) =@( shift);
     return '' unless $self->needs_linking();
     '
 .xs.cpp:
@@ -68,7 +68,7 @@ The && problem.
 =cut
 
 sub xs_o {
-    my($self) = shift;
+    my@($self) =@( shift);
     return '' unless $self->needs_linking();
     '
 .xs$(OBJ_EXT):

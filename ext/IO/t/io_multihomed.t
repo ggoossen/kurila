@@ -31,7 +31,7 @@ use Socket < qw(inet_aton inet_ntoa unpack_sockaddr_in);
 
 sub _get_addr
 {
-    my($sock,$addr_str, $multi) = < @_;
+    my@($sock,$addr_str, $multi) =  @_;
     #print "_get_addr($sock, $addr_str, $multi)\n";
 
     print "not " unless $multi;
@@ -49,7 +49,7 @@ sub connect
 {
     my $self = shift;
     if ((nelems @_) == 1) {
-	my($port, $addr) = < unpack_sockaddr_in(@_[0]);
+	my@($port, $addr) =  unpack_sockaddr_in(@_[0]);
 	$addr = inet_ntoa($addr);
 	#print "connect($self, $port, $addr)\n";
 	if($addr eq "10.250.230.10") {

@@ -29,14 +29,14 @@ while( ~< *DATA) {
 plan tests => scalar nelems @prgs;
 
 foreach my $prog ( @prgs) {
-    my($raw_prog, $name) = < @$prog;
+    my@($raw_prog, $name) =  @$prog;
 
     my $switch;
     if ($raw_prog =~ s/^\s*(-\w.*)\n//){
 	$switch = $1;
     }
 
-    my($prog,$expected) = < split(m/\nEXPECT\n/, $raw_prog);
+    my@($prog,$expected) =  split(m/\nEXPECT\n/, $raw_prog);
     $prog .= "\n";
     $expected = '' unless defined $expected;
 

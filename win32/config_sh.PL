@@ -138,7 +138,7 @@ if (%opt{?useithreads} eq 'define' && %opt{?ccflags} =~ m/-DPERL_IMPLICIT_SYS\b/
 while ( ~< *ARGV) {
     s/~([\w_]+)~/%opt{?$1}/g;
     if (m/^([\w_]+)=(.*)$/) {
-	my($k,$v) = ($1,$2);
+	my@($k,$v) = @($1,$2);
 	# this depends on cf_time being empty in the template (or we'll
 	# get a loop)
 	if ($k eq 'cf_time') {

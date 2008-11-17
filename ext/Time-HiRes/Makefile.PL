@@ -39,10 +39,10 @@ use File::Spec;
 # release. Sorry, Edward :)
 
 sub try_compile_and_link {
-    my ($c, < %args) = < @_;
+    my @($c, %< %args) =  @_;
 
-    my ($ok) = 0;
-    my ($tmp) = "tmp$$";
+    my @($ok) = 0;
+    my @($tmp) = "tmp$$";
     local(*TMPC);
 
     my $obj_ext = config_value("obj_ext") || ".o";
@@ -177,7 +177,7 @@ EOM
 }
 
 sub has_x {
-    my ($x, < %args) = < @_;
+    my @($x, %< %args) =  @_;
 
     return 1 if
     try_compile_and_link(<<EOM, < %args);
@@ -232,7 +232,7 @@ EOM
 }
 
 sub has_include {
-    my ($inc) = < @_;
+    my @($inc) =  @_;
     return 1 if
     try_compile_and_link(<<EOM);
 #include "EXTERN.h"
@@ -321,7 +321,7 @@ EOM
 }
 
 sub DEFINE {
-    my ($def, $val) = < @_;
+    my @($def, $val) =  @_;
     my $define = defined $val ?? "$def=$val" !! $def ;
     unless ($DEFINE =~ m/(?:^| )-D\Q$define\E(?: |$)/) {
 	$DEFINE .= " -D$define";

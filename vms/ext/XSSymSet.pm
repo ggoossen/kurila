@@ -5,16 +5,16 @@ $VERSION = '1.1';
 
 
 sub new { 
-  my($pkg,$maxlen,$silent) = < @_;
+  my@($pkg,$maxlen,$silent) =  @_;
   $maxlen ||= 31;
   $silent ||= 0;
-  my($obj) = \%( '__M@xLen' => $maxlen, '__S!lent' => $silent );
+  my@($obj) = \%( '__M@xLen' => $maxlen, '__S!lent' => $silent );
   bless $obj, $pkg;
 }
 
 
 sub trimsym {
-  my($self,$name,$maxlen,$silent) = < @_;
+  my@($self,$name,$maxlen,$silent) =  @_;
 
   unless (defined $maxlen) {
     if (ref $self) { $maxlen ||= $self->{?'__M@xLen'}; }
@@ -34,7 +34,7 @@ sub trimsym {
     $trimmed =~ s/(.)\1+/$1/g;
     if (length $trimmed +> $maxlen) {
       my $squeezed = $trimmed;
-      my($xs,$prefix,$func) = $trimmed =~ m/^(XS_)?(.*)_([^_]*)$/;
+      my@($xs,$prefix,$func) = $trimmed =~ m/^(XS_)?(.*)_([^_]*)$/;
       $xs ||= '';
       my $frac = 3; # replaces broken length-based calculations but w/same result
       my $pat = '([^_])';
@@ -72,7 +72,7 @@ sub trimsym {
 
 
 sub addsym {
-  my($self,$sym,$maxlen,$silent) = < @_;
+  my@($self,$sym,$maxlen,$silent) =  @_;
   my $trimmed = $self->get_trimmed($sym);
 
   return $trimmed if defined $trimmed;
@@ -81,7 +81,7 @@ sub addsym {
   $silent ||= $self->{?'__S!lent'} || 0;    
   $trimmed = $self->trimsym($sym,$maxlen,1);
   if (exists $self->{$trimmed}) {
-    my($i) = "00";
+    my@($i) = "00";
     $trimmed = $self->trimsym($sym,$maxlen-3,$silent);
     while (exists $self->{"$($trimmed)_$i"}) { $i++; }
     warn "Warning: duplicate symbol $trimmed\n\tchanged to $($trimmed)_$i\n\t(original was $sym)\n\t"
@@ -98,7 +98,7 @@ sub addsym {
 
 
 sub delsym {
-  my($self,$sym) = < @_;
+  my@($self,$sym) =  @_;
   my $trimmed = $self->{'__N+Map'}->{?$sym};
   if (defined $trimmed) {
     delete $self->{'__N+Map'}->{$sym};
@@ -109,13 +109,13 @@ sub delsym {
 
 
 sub get_trimmed {
-  my($self,$sym) = < @_;
+  my@($self,$sym) =  @_;
   $self->{'__N+Map'}->{?$sym};
 }
 
 
 sub get_orig {
-  my($self,$trimmed) = < @_;
+  my@($self,$trimmed) =  @_;
   $self->{?$trimmed};
 }
 

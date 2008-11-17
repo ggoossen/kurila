@@ -29,7 +29,7 @@ if (not defined $where) {	# Try NIS.
 
             # Check to make sure we're really using NIS.
             if( open(NSSW, "<", "/etc/nsswitch.conf" ) ) {
-                my($group) = < grep m/^\s*group:/, @( ~< *NSSW);
+                my@($group) =  grep m/^\s*group:/, @( ~< *NSSW);
 
                 # If there's no group line, assume it default to compat.
                 if( !$group || $group !~ m/(nis|compat)/ ) {
@@ -92,7 +92,7 @@ while ( ~< *GR) {
     chomp;
     # LIMIT -1 so that groups with no users don't fall off
     my @s = split m/:/, $_, -1;
-    my ($name_s,$passwd_s,$gid_s,$members_s) = < @s;
+    my @($name_s,$passwd_s,$gid_s,$members_s) =  @s;
     if ((nelems @s)) {
 	push @{ %seen{$name_s} }, iohandle::input_line_number(\*GR);
     } else {
@@ -113,11 +113,11 @@ while ( ~< *GR) {
 	my @n = @( getgrgid($gid_s) );
 	# 'nogroup' et al.
 	next unless (nelems @n);
-	my ($name,$passwd,$gid,$members) = < @n;
+	my @($name,$passwd,$gid,$members) =  @n;
 	# Protect against one-to-many and many-to-one mappings.
 	if ($name_s ne $name) {
 	    @n = @( getgrnam($name_s) );
-	    ($name,$passwd,$gid,$members) = < @n;
+	    @($name,$passwd,$gid,$members) =  @n;
 	    next if $name_s ne $name;
 	}
 	# NOTE: group names *CAN* contain whitespace.
@@ -176,7 +176,7 @@ my @gr2;
 
 setgrent();
 for (1..$max) {
-    my ($gr) = (getgrent());
+    my @($gr) = @(getgrent());
     last unless defined $gr;
     push @gr2, $gr;
 }

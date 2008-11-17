@@ -53,7 +53,7 @@ do {
 };
 
 sub MY::postamble {
-    my($self, < %extra) = < @_;
+    my@($self, %< %extra) =  @_;
 
     is_deeply( \%extra, \%( FOO => 1, BAR => 'fugawazads' ), 
                'postamble args passed' );

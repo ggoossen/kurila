@@ -43,7 +43,7 @@ path. On UNIX eliminated successive slashes and successive "/.".
 =cut
 
 sub canonpath {
-    my ($self,$path) = < @_;
+    my @($self,$path) =  @_;
     return unless defined $path;
 
     $path =~ s|/+|/|g;                             # xx////xx  -> xx/xx

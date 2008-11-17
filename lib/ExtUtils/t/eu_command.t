@@ -43,7 +43,7 @@ do {
     open STDOUT, '>>', \$out or die;
     my $self = $0;
     unless (-f $self) {
-        my ($vol, $dirs, $file) = < File::Spec->splitpath($self);
+        my @($vol, $dirs, $file) =  File::Spec->splitpath($self);
         my @dirs = File::Spec->splitdir($dirs);
         unshift(@dirs, File::Spec->updir);
         $dirs = File::Spec->catdir(< @dirs);
@@ -73,7 +73,7 @@ do {
     @ARGV = @( $Testfile );
     ok( -e @ARGV[0], 'created!' );
 
-    my ($now) = time;
+    my @($now) = time;
     utime ($now, $now, @ARGV[0]);
     sleep 2;
 

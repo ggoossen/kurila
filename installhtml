@@ -301,7 +301,7 @@ sub parse_command_line {
 
 
 sub create_index {
-    my($html, $dir) = < @_;
+    my@($html, $dir) =  @_;
     (my $pod = $dir) =~ s,^.*/,,;
     my(@files, @filedata, @index);
     my($lcp1,$lcp2);
@@ -330,9 +330,9 @@ sub create_index {
 	# pull out the NAME section
 	my $name;
 	($name) = < grep(m/name="name"/i, @filedata);
-	($lcp1,$lcp2) = ($name =~ m,/H1>\s(\S+)\s[\s-]*(.*?)\s*$,smi);
+	@($lcp1,$lcp2) = @($name =~ m,/H1>\s(\S+)\s[\s-]*(.*?)\s*$,smi);
 	if (defined $lcp1 and $lcp1 =~ m,^<P>$,i) { # Uninteresting.  Try again.
-	    ($lcp1,$lcp2) = ($name =~ m,/H1>\s<P>\s*(\S+)\s[\s-]*(.*?)\s*$,smi);
+	    @($lcp1,$lcp2) = @($name =~ m,/H1>\s<P>\s*(\S+)\s[\s-]*(.*?)\s*$,smi);
 	}
 	my $url= "$pod/$file" ;
 	if ( ! defined %Options{?htmlroot} || %Options{?htmlroot} eq '' ) {
@@ -360,7 +360,7 @@ sub create_index {
 
 
 sub split_on_head {
-    my($podroot, $htmldir, $splitdirs, $ignore, < @splithead) = < @_;
+    my@($podroot, $htmldir, $splitdirs, $ignore, @< @splithead) =  @_;
     my($dirname, $filename);
 
     # split the files specified in @splithead on =head[1-6] pod directives
@@ -383,7 +383,7 @@ sub split_on_head {
 
 
 sub split_on_item {
-    my($podroot, $splitdirs, $ignore, < @splititem) = < @_;
+    my@($podroot, $splitdirs, $ignore, @< @splititem) =  @_;
     my($pwd, $dirname, $filename);
 
     print "splitting files by item.\n" if $verbose &&( (nelems @splititem)-1) +>= 0;
@@ -424,7 +424,7 @@ sub split_on_item {
 #  is encountered in the input file.
 #
 sub splitpod {
-    my($pod, $poddir, $htmldir, $splitdirs) = < @_;
+    my@($pod, $poddir, $htmldir, $splitdirs) =  @_;
     my(@poddata, @filedata, @heads);
     my($file, $i, $j, $prevsec, $section, $nextsec);
 
@@ -512,7 +512,7 @@ sub splitpod {
 #  current directory to .html files and then installing those.
 #
 sub installdir {
-    my($dir, $recurse, $podroot, $splitdirs, $ignore) = < @_;
+    my@($dir, $recurse, $podroot, $splitdirs, $ignore) =  @_;
     my(@dirlist, @podlist, @pmlist, $doindex);
 
     @dirlist = @( () );	# directories to recurse on
@@ -577,7 +577,7 @@ sub installdir {
 #  file.
 #
 sub runpod2html {
-    my($pod, $doindex) = < @_;
+    my@($pod, $doindex) =  @_;
     my($html, $i, $dir, @dirs);
 
     $html = $pod;

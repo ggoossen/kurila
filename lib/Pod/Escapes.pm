@@ -373,7 +373,7 @@ sub e2charnum {
 do {
   %Name2character = %( () );
   my($name, $number);
-  while( ($name, $number) = each %Name2character_number) {
+  while( @($name, $number) =@( each %Name2character_number)) {
       %Name2character{+$name} = chr $number;
       # normal case
   }
@@ -492,7 +492,7 @@ do {
 #--------------------------------------------------------------------------
 
 %Latin1Code_to_fallback = %( () );
- <%Latin1Code_to_fallback{[0xA0 .. 0xFF]} = (
+ %Latin1Code_to_fallback{[0xA0 .. 0xFF]} = @(
 # Copied from Text/Unidecode/x00.pm:
 
 ' ', qq{!}, qq{C/}, 'PS', qq{\$?}, qq{Y=}, qq{|}, 'SS', qq{"}, qq{(c)}, 'a', qq{<<}, qq{!}, "", qq{(r)}, qq{-},
@@ -508,7 +508,7 @@ do {
   # Now stuff %Latin1Char_to_fallback:
   %Latin1Char_to_fallback = %( () );
   my($k,$v);
-  while( ($k,$v) = each %Latin1Code_to_fallback) {
+  while( @($k,$v) =@( each %Latin1Code_to_fallback)) {
     %Latin1Char_to_fallback{+chr $k} = $v;
     #print chr($k), ' => ', $v, "\n";
   }

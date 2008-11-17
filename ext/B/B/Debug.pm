@@ -15,7 +15,7 @@ sub _printop {
 }
 
 sub B::OP::debug {
-    my ($op) = < @_;
+    my @($op) =  @_;
     printf <<'EOT', class($op), $$op, $op->ppaddr, _printop($op->next), _printop($op->sibling), $op->targ, $op->type;
 %s (0x%lx)
 	op_ppaddr	%s
@@ -34,19 +34,19 @@ EOT
 }
 
 sub B::UNOP::debug {
-    my ($op) = < @_;
+    my @($op) =  @_;
     $op->B::OP::debug();
     printf "\top_first\t\%s\n", _printop($op->first);
 }
 
 sub B::BINOP::debug {
-    my ($op) = < @_;
+    my @($op) =  @_;
     $op->B::UNOP::debug();
     printf "\top_last \t\%s\n", _printop($op->last);
 }
 
 sub B::LOOP::debug {
-    my ($op) = < @_;
+    my @($op) =  @_;
     $op->B::BINOP::debug();
     printf <<'EOT', < _printop($op->redoop), _printop($op->nextop), _printop($op->lastop);
 	op_redoop	%s
@@ -56,19 +56,19 @@ EOT
 }
 
 sub B::LOGOP::debug {
-    my ($op) = < @_;
+    my @($op) =  @_;
     $op->B::UNOP::debug();
     printf "\top_other\t\%s\n", _printop($op->other);
 }
 
 sub B::LISTOP::debug {
-    my ($op) = < @_;
+    my @($op) =  @_;
     $op->B::BINOP::debug();
     printf "\top_children\t\%d\n", $op->children;
 }
 
 sub B::PMOP::debug {
-    my ($op) = < @_;
+    my @($op) =  @_;
     $op->B::LISTOP::debug();
     printf "\top_pmreplroot\t0x\%x\n", ${$op->pmreplroot};
     printf "\top_pmreplstart\t0x\%x\n", ${$op->pmreplstart};
@@ -80,7 +80,7 @@ sub B::PMOP::debug {
 }
 
 sub B::COP::debug {
-    my ($op) = < @_;
+    my @($op) =  @_;
     $op->B::OP::debug();
     my $cop_io = class($op->io) eq 'SPECIAL' ?? '' !! $op->io->as_string;
     printf <<'EOT', $op->label, $op->stashpv, $op->cop_seq, ${$op->warnings}, cstring($cop_io);
@@ -93,26 +93,26 @@ EOT
 }
 
 sub B::SVOP::debug {
-    my ($op) = < @_;
+    my @($op) =  @_;
     $op->B::OP::debug();
     printf "\top_sv\t\t0x\%x\n", ${$op->sv};
     $op->sv->debug;
 }
 
 sub B::PVOP::debug {
-    my ($op) = < @_;
+    my @($op) =  @_;
     $op->B::OP::debug();
     printf "\top_pv\t\t\%s\n", < cstring( <$op->pv);
 }
 
 sub B::PADOP::debug {
-    my ($op) = < @_;
+    my @($op) =  @_;
     $op->B::OP::debug();
     printf "\top_padix\t\%ld\n", < $op->padix;
 }
 
 sub B::NULL::debug {
-    my ($sv) = < @_;
+    my @($sv) =  @_;
     if ($$sv == ${sv_undef()}) {
 	print "&sv_undef\n";
     } else {
@@ -121,7 +121,7 @@ sub B::NULL::debug {
 }
 
 sub B::SV::debug {
-    my ($sv) = < @_;
+    my @($sv) =  @_;
     if (!$$sv) {
 	print < class($sv), " = NULL\n";
 	return;
@@ -134,7 +134,7 @@ EOT
 }
 
 sub B::RV::debug {
-    my ($rv) = < @_;
+    my @($rv) =  @_;
     B::SV::debug($rv);
     printf <<'EOT', ${$rv->RV};
 	RV		0x%x
@@ -143,7 +143,7 @@ EOT
 }
 
 sub B::PV::debug {
-    my ($sv) = < @_;
+    my @($sv) =  @_;
     $sv->B::SV::debug();
     my $pv = $sv->PV();
     printf <<'EOT', < cstring($pv), length($pv);
@@ -153,31 +153,31 @@ EOT
 }
 
 sub B::IV::debug {
-    my ($sv) = < @_;
+    my @($sv) =  @_;
     $sv->B::SV::debug();
     printf "\txiv_iv\t\t\%d\n", < $sv->IV;
 }
 
 sub B::NV::debug {
-    my ($sv) = < @_;
+    my @($sv) =  @_;
     $sv->B::IV::debug();
     printf "\txnv_nv\t\t\%s\n", < $sv->NV;
 }
 
 sub B::PVIV::debug {
-    my ($sv) = < @_;
+    my @($sv) =  @_;
     $sv->B::PV::debug();
     printf "\txiv_iv\t\t\%d\n", < $sv->IV;
 }
 
 sub B::PVNV::debug {
-    my ($sv) = < @_;
+    my @($sv) =  @_;
     $sv->B::PVIV::debug();
     printf "\txnv_nv\t\t\%s\n", < $sv->NV;
 }
 
 sub B::PVLV::debug {
-    my ($sv) = < @_;
+    my @($sv) =  @_;
     $sv->B::PVNV::debug();
     printf "\txlv_targoff\t\%d\n", < $sv->TARGOFF;
     printf "\txlv_targlen\t\%u\n", < $sv->TARGLEN;
@@ -185,7 +185,7 @@ sub B::PVLV::debug {
 }
 
 sub B::BM::debug {
-    my ($sv) = < @_;
+    my @($sv) =  @_;
     $sv->B::PVNV::debug();
     printf "\txbm_useful\t\%d\n", < $sv->USEFUL;
     printf "\txbm_previous\t\%u\n", < $sv->PREVIOUS;
@@ -193,14 +193,14 @@ sub B::BM::debug {
 }
 
 sub B::CV::debug {
-    my ($sv) = < @_;
+    my @($sv) =  @_;
     $sv->B::PVNV::debug();
-    my ($stash) = < $sv->STASH;
-    my ($start) = < $sv->START;
-    my ($root) = < $sv->ROOT;
-    my ($padlist) = < $sv->PADLIST;
-    my ($file) = < $sv->FILE;
-    my ($gv) = < $sv->GV;
+    my @($stash) =  $sv->STASH;
+    my @($start) =  $sv->START;
+    my @($root) =  $sv->ROOT;
+    my @($padlist) =  $sv->PADLIST;
+    my @($file) =  $sv->FILE;
+    my @($gv) =  $sv->GV;
     printf <<'EOT', $$stash, $$start, $$root, $$gv, $file, < $sv->DEPTH, $padlist, ${$sv->OUTSIDE}, < $sv->OUTSIDE_SEQ;
 	STASH		0x%x
 	START		0x%x
@@ -219,9 +219,9 @@ EOT
 }
 
 sub B::AV::debug {
-    my ($av) = < @_;
+    my @($av) =  @_;
     $av->B::SV::debug;
-    my(@array) = $av->ARRAY;
+    my@(@array) =@( $av->ARRAY;
     print "\tARRAY\t\t(", join(", ", map("0x" . $$_, @array)), ")\n";
     printf <<'EOT', scalar(nelems @array), < $av->MAX, < $av->OFF;
 	FILL		%d
@@ -231,14 +231,14 @@ EOT
 }
 
 sub B::GV::debug {
-    my ($gv) = < @_;
+    my @($gv) =  @_;
     if (%done_gv{+$$gv}++) {
 	printf "GV \%s::\%s\n", < $gv->STASH->NAME, < $gv->SAFENAME;
 	return;
     }
-    my ($sv) = < $gv->SV;
-    my ($av) = < $gv->AV;
-    my ($cv) = < $gv->CV;
+    my @($sv) =  $gv->SV;
+    my @($av) =  $gv->AV;
+    my @($cv) =  $gv->CV;
     $gv->B::SV::debug;
     printf <<'EOT', < $gv->SAFENAME, < $gv->STASH->NAME, < $gv->STASH, $$sv, < $gv->GvREFCNT, < $gv->FORM, $$av, ${$gv->HV}, ${$gv->EGV}, $$cv, < $gv->CVGEN, < $gv->LINE, < $gv->FILE, < $gv->GvFLAGS;
 	NAME		%s

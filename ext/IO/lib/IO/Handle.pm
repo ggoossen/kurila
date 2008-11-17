@@ -304,7 +304,7 @@ sub new_from_fd {
 ##
 
 sub _open_mode_string {
-    my ($mode) = < @_;
+    my @($mode) =  @_;
     $mode =~ m/^\+?(<|>>?)$/
       or $mode =~ s/^r(\+?)$/$1</
       or $mode =~ s/^w(\+?)$/$1>/
@@ -315,7 +315,7 @@ sub _open_mode_string {
 
 sub fdopen {
     (nelems @_) == 3 or die 'usage: $io->fdopen(FD, MODE)';
-    my ($io, $fd, $mode) = < @_;
+    my @($io, $fd, $mode) =  @_;
 
     my $fdmode = '&';
     if (!ref($fd) && $fd =~ m#^\d+$#) {
@@ -329,7 +329,7 @@ sub fdopen {
 
 sub close {
     (nelems @_) == 1 or die 'usage: $io->close()';
-    my($io) = < @_;
+    my@($io) =  @_;
 
     close($io);
 }
@@ -469,14 +469,14 @@ sub input_line_number {
 # XXX undocumented
 sub fcntl {
     (nelems @_) == 3 || die 'usage: $io->fcntl( OP, VALUE );';
-    my ($io, $op) = < @_;
+    my @($io, $op) =  @_;
     return fcntl($io, $op, @_[2]);
 }
 
 # XXX undocumented
 sub ioctl {
     (nelems @_) == 3 || die 'usage: $io->ioctl( OP, VALUE );';
-    my ($io, $op) = < @_;
+    my @($io, $op) =  @_;
     return ioctl($io, $op, @_[2]);
 }
 

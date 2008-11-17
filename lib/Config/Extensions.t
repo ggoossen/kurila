@@ -14,11 +14,11 @@ use Config;
 
 my @types = qw(dynamic static nonxs);
 my %types;
- <%types{[ @types]} = < @types;
+ %types{[ @types]} =  @types;
 
 ok (nkeys %Extensions, "There are some extensions");
 # Check only the 3 valid keys have been used.
-while (my ($key, $val) = each %Extensions) {
+while (my @($key, $val) =@( each %Extensions)) {
     my $raw_ext = $key;
     # Back to the format in Config
     $raw_ext =~ s!::!/!g;

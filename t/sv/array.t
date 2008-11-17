@@ -63,13 +63,13 @@ $r = join(',', @( (nelems @bar)-1, < @bar));
 is($r, "2,0,,2");
 
 $foo = 'now is the time';
-ok(scalar (($F1,$F2,$Etc) = ($foo =~ m/^(\S+)\s+(\S+)\s*(.*)/)));
+ok(scalar (@($F1,$F2,$Etc) = @($foo =~ m/^(\S+)\s+(\S+)\s*(.*)/)));
 is($F1, 'now');
 is($F2, 'is');
 is($Etc, 'the time');
 
 $foo = 'lskjdf';
-ok(!($cnt = (($F1,$F2,$Etc) = ($foo =~ m/^(\S+)\s+(\S+)\s*(.*)/))))
+ok(!($cnt = (@($F1,$F2,$Etc) = @($foo =~ m/^(\S+)\s+(\S+)\s*(.*)/))))
    or diag("$cnt $F1:$F2:$Etc");
 
 %foo = %('blurfl','dyick','foo','bar','etc.','etc.');
@@ -77,10 +77,10 @@ ok(!($cnt = (($F1,$F2,$Etc) = ($foo =~ m/^(\S+)\s+(\S+)\s*(.*)/))))
 is(%bar{?'foo'}, 'bar');
 %bar = %( () );
 is(%bar{?'foo'}, undef);
-(< %bar ) = (< %foo,'how','now');
+@(%< %bar ) = @(< %foo,'how','now');
 is(%bar{?'foo'}, 'bar');
 is(%bar{?'how'}, 'now');
- <%bar{[keys %foo]} = < values %foo;
+ %bar{[keys %foo]} =  values %foo;
 is(%bar{?'foo'}, 'bar');
 is(%bar{?'how'}, 'now');
 
@@ -113,7 +113,7 @@ is($foo, 'acebdf');
 @foo = @foo;
 is((join ' ', @foo), "foo bar burbl blah");				# 38
 
-(undef,<@foo) = < @foo;
+@(undef,@<@foo) =  @foo;
 is((join ' ', @foo), "bar burbl blah");					# 39
 
 @foo = @('XXX',< @foo, 'YYY');
@@ -159,7 +159,7 @@ do {
     my @bee = @bee;
     is((join ' ',@bee), "foo bar burbl blah");				# 54
     do {
-	my (undef,<@bee) = < @bee;
+	my @(undef,@<@bee) =  @bee;
 	is((join ' ',@bee), "bar burbl blah");				# 55
 	do {
 	    my @bee = @('XXX',< @bee,'YYY');
@@ -168,7 +168,7 @@ do {
 		my @bee = @( my @bee = qw(foo bar burbl blah) );
 		is((join ' ',@bee), "foo bar burbl blah");		# 57
 		do {
-		    my (@bim) = my(@bee) = qw(foo bar);
+		    my @(@bim) = my@(@bee) =@( qw(foo bar));
 		    is((join ' ',@bee), "foo bar");			# 58
 		    is((join ' ',@bim), "foo bar");			# 59
 		};
@@ -186,7 +186,7 @@ do {
     our @bee = @bee;
     is((join ' ',@bee), "foo bar burbl blah");
     do {
-	our (undef,<@bee) = < @bee;
+	our @(undef,@<@bee) =  @bee;
 	is((join ' ',@bee), "bar burbl blah");
 	do {
 	    our @bee = @('XXX',< @bee,'YYY');
@@ -195,7 +195,7 @@ do {
 		our @bee = our @bee = qw(foo bar burbl blah);
 		is((join ' ',@bee), "foo bar burbl blah");
 		do {
-		    our (@bim) = our(@bee) = qw(foo bar);
+		    our @(@bim) = our@(@bee) =@( qw(foo bar));
 		    is((join ' ',@bee), "foo bar");
 		    is((join ' ',@bim), "foo bar");
 		};
@@ -283,13 +283,13 @@ do {
 # more tests for AASSIGN_COMMON
 
 do {
-    our($x,$y,$z) = ( <1..3);
-    our($y,$z) = ($x,$y);
+    our@($x,$y,$z) = @( <1..3);
+    our@($y,$z) = @($x,$y);
     is("$x $y $z", "1 1 2");
 };
 do {
-    our($x,$y,$z) = ( <1..3);
-    (our $y, our $z) = ($x,$y);
+    our@($x,$y,$z) = @( <1..3);
+    @(our $y, our $z) = @($x,$y);
     is("$x $y $z", "1 1 2");
 };
 

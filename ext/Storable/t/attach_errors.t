@@ -41,14 +41,14 @@ do {
 	package My::GoodFreeze;
 
 	sub STORABLE_freeze {
-		my ($self, $clone) = < @_;
+		my @($self, $clone) =  @_;
 		
 		# Illegally include a reference in this return
 		return  @('');
 	}
 
 	sub STORABLE_attach {
-		my ($class, $clone, $string) = < @_;
+		my @($class, $clone, $string) =  @_;
 		return bless \%( ), 'My::GoodFreeze';
 	}
 };
@@ -68,14 +68,14 @@ do {
 	package My::BadFreeze;
 
 	sub STORABLE_freeze {
-		my ($self, $clone) = < @_;
+		my @($self, $clone) =  @_;
 		
 		# Illegally include a reference in this return
 		return  @('', \@());
 	}
 
 	sub STORABLE_attach {
-		my ($class, $clone, $string) = < @_;
+		my @($class, $clone, $string) =  @_;
 		return bless \%( ), 'My::BadFreeze';
 	}
 };
@@ -109,13 +109,13 @@ do {
 	package My::GoodThaw;
 
 	sub STORABLE_freeze {
-		my ($self, $clone) = < @_;
+		my @($self, $clone) =  @_;
 
 		return  @('');
 	}
 
 	sub STORABLE_attach {
-		my ($class, $clone, $string) = < @_;
+		my @($class, $clone, $string) =  @_;
 		return bless \%( 'foo' => 'bar' ), 'My::GoodThaw';
 	}
 };
@@ -150,7 +150,7 @@ do {
 	package My::BadThaw;
 
 	sub STORABLE_freeze {
-		my ($self, $clone) = < @_;
+		my @($self, $clone) =  @_;
 
 		return  @('', \@());
 	}
@@ -158,7 +158,7 @@ do {
 	# Start with no STORABLE_attach method so we can get a
 	# frozen object-containing-a-reference into the freeze string.
 	sub STORABLE_thaw {
-		my ($class, $clone, $string) = < @_;
+		my @($class, $clone, $string) =  @_;
 		return bless \%( 'foo' => 'bar' ), 'My::BadThaw';
 	}
 };
@@ -188,12 +188,12 @@ do {
 	package My::GoodAttach;
 
 	sub STORABLE_freeze {
-		my ($self, $cloning) = < @_;
+		my @($self, $cloning) =  @_;
 		return  @('');
 	}
 
 	sub STORABLE_attach {
-		my ($class, $cloning, $string) = < @_;
+		my @($class, $cloning, $string) =  @_;
 
 		return bless \%( ), 'My::GoodAttach::Subclass';
 	}
@@ -243,12 +243,12 @@ do {
 	package My::BadAttach;
 
 	sub STORABLE_freeze {
-		my ($self, $cloning) = < @_;
+		my @($self, $cloning) =  @_;
 		return  @('');
 	}
 
 	sub STORABLE_attach {
-		my ($class, $cloning, $string) = < @_;
+		my @($class, $cloning, $string) =  @_;
 
 		return $returnvalue;
 	}

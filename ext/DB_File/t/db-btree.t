@@ -31,8 +31,8 @@ unlink < glob "__db.*";
 
 sub lexical
 {
-    my(@a) = @( unpack ("C*", $a) ) ;
-    my(@b) = @( unpack ("C*", $b) ) ;
+    my@(@a) =@( @( unpack ("C*", $a) )) ;
+    my@(@b) =@( @( unpack ("C*", $b) )) ;
 
     my $len = ((nelems @a) +> nelems @b ?? (nelems @b) !! nelems @a) ;
 
@@ -155,8 +155,8 @@ my ($X, %h) ;
 ok( $X = tie(%h, 'DB_File',$Dfile, O_RDWR^|^O_CREAT, 0640, $DB_BTREE )) ;
 die "Could not tie: $!" unless $X;
 
-my ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
-   $blksize,$blocks) = stat($Dfile);
+my @($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
+   $blksize,$blocks) = stat@($Dfile);
 
 my %noMode = %( < map { $_, 1} qw( amigaos MSWin32 NetWare cygwin ) ) ;
 
@@ -164,7 +164,7 @@ ok( ($mode ^&^ 0777) == (($^O eq 'os2' || $^O eq 'MacOS') ?? 0666 !! 0640)
    || %noMode{?$^O} );
 
 my ($key, $value, $i);
-while (($key,$value) = each(%h)) {
+while (@($key,$value) = each@(%h)) {
     $i++;
 }
 ok( !$i ) ;
@@ -240,7 +240,7 @@ my @values = values(%h);
 ok( ((nelems @keys)-1) == 29 && ((nelems @values)-1) == 29) ;
 
 $i = 0 ;
-while (($key,$value) = each(%h)) {
+while (@($key,$value) = each@(%h)) {
     if ($key eq @keys[$i] && $value eq @values[$i] && $key eq lc($value)) {
 	$key = uc($key);
 	$i++ if $key eq $value;
@@ -277,13 +277,13 @@ for my $i (1..199) { %h{+$i + 0} = $i + 0; }
 for my $i (1..199) { $ok = 0 unless %h{?$i} == $i; }
 ok( $ok);
 
-($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
-   $blksize,$blocks) = stat($Dfile);
+@($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
+   $blksize,$blocks) = stat@($Dfile);
 ok( $size +> 0 );
  
 do {
     local $TODO = "hash slice assignment";
-    < %h{[0..200]} = < 200..400;
+     %h{[0..200]} =  200..400;
     my @foo = %h{[0..200]};
     ok( join(':',200..400) eq join(':', @foo) );
 };
@@ -489,7 +489,7 @@ ok( "$(join ' ',@smith)" eq "John" );
 do {
 my @wall = $YY->get_dup('Wall') ;
 my %wall ;
- <%wall{[ @wall]} = < @wall ;
+ %wall{[ @wall]} =  @wall ;
 ok( ((nelems @wall) == 4 && %wall{?'Larry'} && %wall{?'Stone'} && %wall{?'Brick'}) );
 };
 
@@ -564,7 +564,7 @@ foreach (1 .. 10)
 
 # check that there are 10 elements in the hash
 $i = 0 ;
-while (($key,$value) = each(%h)) {
+while (@($key,$value) = each@(%h)) {
     $i++;
 }
 ok( $i == 10);
@@ -574,7 +574,7 @@ ok( $i == 10);
 
 # check it is empty
 $i = 0 ;
-while (($key,$value) = each(%h)) {
+while (@($key,$value) = each@(%h)) {
     $i++;
 }
 ok( $i == 0);
@@ -682,12 +682,12 @@ do {
    use warnings ;
     
    my (%h, $db) ;
-   my ($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
+   my @($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
    unlink $Dfile;
 
    sub checkOutput
    {
-       my($fk, $sk, $fv, $sv) = < @_ ;
+       my@($fk, $sk, $fv, $sv) =  @_ ;
        return
            $fetch_key eq $fk && $store_key eq $sk && 
 	   $fetch_value eq $fv && $store_value eq $sv &&
@@ -707,12 +707,12 @@ do {
    #                   fk   sk     fv   sv
    ok( checkOutput( "", "fred", "", "joe")) ;
 
-   ($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
+   @($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
    ok( %h{?"fred"} eq "joe");
    #                   fk    sk     fv    sv
    ok( checkOutput( "", "fred", "joe", "")) ;
 
-   ($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
+   @($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
    ok( $db->FIRSTKEY() eq "fred") ;
    #                    fk     sk  fv  sv
    ok( checkOutput( "fred", "", "", "")) ;
@@ -727,17 +727,17 @@ do {
    my $old_sv = $db->filter_store_value 
    			(sub { s/o/x/g; $store_value = $_ }) ;
    
-   ($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
+   @($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
    %h{+"Fred"} = "Joe" ;
    #                   fk   sk     fv    sv
    ok( checkOutput( "", "fred", "", "Jxe")) ;
 
-   ($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
+   @($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
    ok( %h{?"Fred"} eq "[Jxe]");
    #                   fk   sk     fv    sv
    ok( checkOutput( "", "fred", "[Jxe]", "")) ;
 
-   ($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
+   @($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
    ok( $db->FIRSTKEY() eq "FRED") ;
    #                   fk   sk     fv    sv
    ok( checkOutput( "FRED", "", "", "")) ;
@@ -748,15 +748,15 @@ do {
    $db->filter_fetch_value ($old_fv);
    $db->filter_store_value ($old_sv);
 
-   ($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
+   @($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
    %h{+"fred"} = "joe" ;
    ok( checkOutput( "", "fred", "", "joe")) ;
 
-   ($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
+   @($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
    ok( %h{?"fred"} eq "joe");
    ok( checkOutput( "", "fred", "joe", "")) ;
 
-   ($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
+   @($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
    ok( $db->FIRSTKEY() eq "fred") ;
    ok( checkOutput( "fred", "", "", "")) ;
 
@@ -766,15 +766,15 @@ do {
    $db->filter_fetch_value (undef);
    $db->filter_store_value (undef);
 
-   ($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
+   @($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
    %h{+"fred"} = "joe" ;
    ok( checkOutput( "", "", "", "")) ;
 
-   ($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
+   @($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
    ok( %h{?"fred"} eq "joe");
    ok( checkOutput( "", "", "", "")) ;
 
-   ($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
+   @($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
    ok( $db->FIRSTKEY() eq "fred") ;
    ok( checkOutput( "", "", "", "")) ;
 
@@ -797,7 +797,7 @@ do {
 
     sub Closure
     {
-        my ($name) = < @_ ;
+        my @($name) =  @_ ;
 	my $count = 0 ;
 	my @kept = @( () ) ;
 
@@ -886,7 +886,7 @@ do {
 
     sub Compare
     {
-        my ($key1, $key2) = < @_ ;
+        my @($key1, $key2) =  @_ ;
         (lc "$key1") cmp (lc "$key2") ;
     }
 
@@ -1317,8 +1317,8 @@ do {
     ok( %h{?'Alpha_ABC'} == 2);
     ok( %h{?'Alpha_DEF'} == 5);
 
-    my ($k, $v) = ("","");
-    while (($k, $v) = each %h) {}
+    my @($k, $v) = @("","");
+    while (@($k, $v) =@( each %h)) {}
     ok( $bad_key == 0);
 
     $bad_key = 0 ;
@@ -1594,8 +1594,8 @@ do {
     ok nkeys %bad == 0 ;
     ok nkeys %remember == 0 ;
 
-    print "# missing -- $key $value\n" while ($key, $value) = each %remember;
-    print "# bad     -- $key $value\n" while ($key, $value) = each %bad;
+    print "# missing -- $key $value\n" while @($key, $value) =@( each %remember);
+    print "# bad     -- $key $value\n" while @($key, $value) =@( each %bad);
 
     # Make sure this fix does not break code to handle an undef key
     # Berkeley DB undef key is bron between versions 2.3.16 and 

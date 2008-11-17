@@ -282,7 +282,7 @@ else {
 	    close CMDLINE;
             # perlbug #22811
             my $mydollarzero = sub {
-              my($arg) = shift;
+              my@($arg) =@( shift);
               $0 = $arg if defined $arg;
 	      # In FreeBSD the ps -o command= will cause
 	      # an empty header line, grab only the last line.

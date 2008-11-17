@@ -4,7 +4,7 @@ our (@x, @y, $result, $x, $y, @t, $u);
 
 my $test = 1;
 sub ok {
-    my($ok, $name) = < @_;
+    my@($ok, $name) =  @_;
 
     # You have to do it this way or VMS will get confused.
     printf "\%s \%d\%s\n", $ok ?? "ok" !! "not ok", 

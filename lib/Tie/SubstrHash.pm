@@ -45,7 +45,7 @@ our ($self, $key, $klen, $vlen, $tsize, $rlen, $offset, $hash,
 
 sub TIEHASH {
     my $pack = shift;
-    my ($klen, $vlen, $tsize) = < @_;
+    my @($klen, $vlen, $tsize) =  @_;
     my $rlen = 1 + $klen + $vlen;
     $tsize = \@($tsize, findgteprime($tsize * 1.1)); # Allow 10% empty.
     local $self = bless \@("\0", $klen, $vlen, $tsize, $rlen, 0, -1);
@@ -61,8 +61,8 @@ sub CLEAR {
 }
 
 sub FETCH {
-    local($self,$key) = < @_;
-    local($klen, $vlen, $tsize, $rlen) = < @$self[[1..4]];
+    local@($self,$key) =  @_;
+    local@($klen, $vlen, $tsize, $rlen) =  @$self[[1..4]];
     &hashkey( < @_ );
     while (1) {
 	$offset = $hash * $rlen;
@@ -80,8 +80,8 @@ sub FETCH {
 }
 
 sub STORE {
-    local($self,$key,$val) = < @_;
-    local($klen, $vlen, $tsize, $rlen) = < @$self[[1..4]];
+    local@($self,$key,$val) =  @_;
+    local@($klen, $vlen, $tsize, $rlen) =  @$self[[1..4]];
     die("Table is full ($tsize->[0] elements)") if @$self[5] +> $tsize->[0];
     die(qq/Value "$val" is not $vlen characters long/)
 	if length($val) != $vlen;
@@ -113,8 +113,8 @@ sub STORE {
 }
 
 sub DELETE {
-    local($self,$key) = < @_;
-    local($klen, $vlen, $tsize, $rlen) = < @$self[[1..4]];
+    local@($self,$key) =  @_;
+    local@($klen, $vlen, $tsize, $rlen) =  @$self[[1..4]];
     &hashkey( < @_ );
     while (1) {
 	$offset = $hash * $rlen;
@@ -141,7 +141,7 @@ sub FIRSTKEY {
 
 sub NEXTKEY {
     local($self) = < @_;
-    local($klen, $vlen, $tsize, $rlen, $entries, $iterix) = < @$self[[1..6]];
+    local@($klen, $vlen, $tsize, $rlen, $entries, $iterix) =  @$self[[1..6]];
     ++$iterix;
     while ($iterix +< $tsize->[1]) {
 	next unless substr(@$self[0], $iterix * $rlen, 1) eq "\2";

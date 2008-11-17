@@ -50,17 +50,17 @@ sub DESTROY {};
 package POSIX;
 
 sub usage {
-    my ($mess) = < @_;
+    my @($mess) =  @_;
     die "Usage: POSIX::$mess";
 }
 
 sub redef {
-    my ($mess) = < @_;
+    my @($mess) =  @_;
     die "Use method $mess instead";
 }
 
 sub unimpl {
-    my ($mess) = < @_;
+    my @($mess) =  @_;
     $mess =~ s/xxx//;
     die "Unimplemented: POSIX::$mess";
 }
@@ -882,7 +882,7 @@ sub load_imports {
 do {
   # De-duplicate the export list: 
   my %export;
- <  %export{[ map {< @$_} values %EXPORT_TAGS]} = ();
+   %export{[ map {< @$_} values %EXPORT_TAGS]} = @();
   # Doing the de-dup with a temporary hash has the advantage that the SVs in
   # @EXPORT are actually shared hash key sacalars, which will save some memory.
   push @EXPORT, < keys %export;
@@ -988,14 +988,14 @@ sub _exist {
 }
 
 sub _check {
-    my ($rtsig, $ok) = < &_exist( < @_ );
+    my @($rtsig, $ok) =  &_exist( < @_ );
     die "No POSIX::SigRt signal @_[1] (valid range SIGRTMIN..SIGRTMAX, or $_SIGRTMIN..$_SIGRTMAX)"
 	unless $ok;
     return $rtsig;
 }
 
 sub new {
-    my ($rtsig, $handler, $flags) = < @_;
+    my @($rtsig, $handler, $flags) =  @_;
     my $sigset = POSIX::SigSet->new($rtsig);
     my $sigact = POSIX::SigAction->new($handler,
 				       $sigset,

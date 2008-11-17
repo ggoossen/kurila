@@ -14,11 +14,11 @@ $list_assignment_supported = 0 if ($^O eq 'VMS');
 
 
 sub foo {
-    local($a, $b) = < @_;
+    local@($a, $b) =  @_;
     local($c, $d);
     $c = "c 3";
     $d = "d 4";
-    do { local($a,$c) = ("a 9", "c 10"); ($x, $y) = ($a, $c); };
+    do { local@($a,$c) = @("a 9", "c 10"); @($x, $y) = @($a, $c); };
     is($a, "a 1");
     is($b, "b 2");
     return @($c, $d);
@@ -44,11 +44,11 @@ is($y, "c 10");
 # same thing, only with arrays and associative arrays
 
 sub foo2 {
-    local($a, @b) = (shift, @_);
+    local@($a, @b) = @(shift, @_);
     local(@c, %d);
     @c = @( "c 3" );
     %d{+''} = "d 4";
-    do { local($a, @c) = ("a 19", @("c 20")); ($x, $y) = ($a, < @c); };
+    do { local@($a, @c) = @("a 19", @("c 20")); @($x, $y) = @($a, < @c); };
     is($a, "a 1");
     is("$(join ' ',@b)", "b 2");
     return @(@c[0], %d{?''});
@@ -247,7 +247,7 @@ do {
     %x{+a} = 1;
     do { local %x{+b} = 1; };
     ok(! exists %x{b});
-    do { local %x{[@('c','d','e')]} = @(); };
+    do { local %x{[@('c','d','e')]} =@( @()); };
     ok(! exists %x{c});
 };
 
@@ -275,7 +275,7 @@ do {
 	};
 	main::ok(f1() eq "f1", "localised sub restored");
 	do {
-		local %Other::{[qw/ f1 f2 /]} = @(sub { "j1" }, sub { "j2" });
+		local %Other::{[qw/ f1 f2 /]} =@( @(sub { "j1" }, sub { "j2" }));
                 local $main::TODO = 1;
 		main::ok(f1() eq "j1", "localised sub via stash slice");
 		main::ok(f2() eq "j2", "localised sub via stash slice");
@@ -320,7 +320,7 @@ do {
 	my $unicode = chr 256;
 	my $ambigous = "\240" . $unicode;
 	chop $ambigous;
-	local %h{[@($unicode, $ambigous)]} = @(256, 160);
+	local %h{[@($unicode, $ambigous)]} =@( @(256, 160));
         local our $TODO = "localized hash alues";
 
 	is(nkeys %h, 4);

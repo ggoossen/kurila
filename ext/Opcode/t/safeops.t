@@ -29,7 +29,7 @@ while ( ~< $fh) {
 while ( ~< $fh) {
     chomp;
     next if !$_ or m/^#/;
-    my ($op, $opname) = < split m/\t+/;
+    my @($op, $opname) =  split m/\t+/;
     push @op, \@($op, $opname, %code{?$op});
 }
 close $fh;
@@ -37,7 +37,7 @@ close $fh;
 plan(tests => nelems(@op));
 
 sub testop {
-    my ($op, $opname, $code) = < @_;
+    my @($op, $opname, $code) =  @_;
     pass("$op : skipped") and return if $code =~ m/^SKIP/;
     my $c = Safe->new();
     $c->deny_only($op);

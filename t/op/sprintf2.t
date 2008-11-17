@@ -55,7 +55,7 @@ for (@(int(^~^0/2+1), ^~^0, "9999999999999999999")) {
 
 # check %NNN$ for range bounds
 do {
-    my ($warn, $bad) = (0,0);
+    my @($warn, $bad) = @(0,0);
     local $^WARN_HOOK = sub {
 	if (@_[0]->{?description} =~ m/uninitialized/) {
 	    $warn++
@@ -87,7 +87,7 @@ do {
 };
 
 sub mysprintf_int_flags {
-    my ($fmt, $num) = < @_;
+    my @($fmt, $num) =  @_;
     die "wrong format $fmt" if $fmt !~ m/^%([-+ 0]+)([1-9][0-9]*)d\z/;
     my $flag  = $1;
     my $width = $2;

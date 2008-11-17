@@ -591,7 +591,7 @@ do {   use File::Spec;
         __PACKAGE__->_debug( "# Closing the following fds: $(join ' ',@fds)" ) if $DEBUG;
 
         for my $name (  @fds ) {
-            my($redir, $fh, $glob) = < @{%Map{?$name}} or (
+            my@($redir, $fh, $glob) =  @{%Map{?$name}} or (
                 Carp::carp( <loc("No such FD: '\%1'", $name)), next );
             
             ### MUST use the 2-arg version of open for dup'ing for 
@@ -623,7 +623,7 @@ do {   use File::Spec;
         __PACKAGE__->_debug( "# Reopening the following fds: $(join ' ',@fds)" ) if $DEBUG;
 
         for my $name (  @fds ) {
-            my($redir, $fh, $glob) = < @{%Map{?$name}} or (
+            my@($redir, $fh, $glob) =  @{%Map{?$name}} or (
                 Carp::carp( <loc("No such FD: '\%1'", $name)), next );
 
             open( $fh, $redir, fileno($glob) ) or (

@@ -150,7 +150,7 @@ cmp_ok(0, '||', 1,          '       ||');
 do {
     package Wibble;
     sub isa {
-        my($self, $class) = < @_;
+        my@($self, $class) =  @_;
         return 1 if $class eq 'Wibblemeister';
     }
     sub new { bless \%() }

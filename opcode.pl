@@ -22,7 +22,7 @@ while ( ~< *DATA) {
     chop;
     next unless $_;
     next if m/^#/;
-    my ($key, $desc, $check, $flags, $args) = < split(m/\t+/, $_, 5);
+    my @($key, $desc, $check, $flags, $args) =  split(m/\t+/, $_, 5);
     $args = '' unless defined $args;
 
     warn qq[Description "$desc" duplicates %seen{?$desc}\n] if %seen{?$desc};
@@ -91,7 +91,7 @@ my @raw_alias = @(
 		 Perl_pp_rv2sv => \@('rv2av rv2hv'),
 		);
 
-while (my ($func, $names) = splice @raw_alias, 0, 2) {
+while (my @($func, $names) =@( splice @raw_alias, 0, 2)) {
     %alias{+$_} = $func for  @$names;
 }
 
@@ -191,7 +191,7 @@ EXTCONST char* const PL_op_desc[] = \{
 END
 
 for ( @ops) {
-    my($safe_desc) = %desc{?$_};
+    my@($safe_desc) = %desc{?$_};
 
     # Have to escape double quotes and escape characters.
     $safe_desc =~ s/(^|[^\\])([\\"])/$1\\$2/g;
@@ -405,11 +405,11 @@ gen_op_is_macro( \%OP_IS_FILETEST, 'OP_IS_FILETEST');
 gen_op_is_macro( \%OP_IS_FT_ACCESS, 'OP_IS_FILETEST_ACCESS');
 
 sub gen_op_is_macro {
-    my ($op_is, $macname) = < @_;
+    my @($op_is, $macname) =  @_;
     if (%$op_is) {
 	
 	# get opnames whose numbers are lowest and highest
-	my ($first, < @rest) = < sort {
+	my @($first, @< @rest) =  sort {
 	    $op_is->{?$a} <+> $op_is->{?$b}
 	} keys %$op_is;
 	
@@ -499,7 +499,7 @@ END {
 
 ###########################################################################
 sub tab {
-    my ($l, $t) = < @_;
+    my @($l, $t) =  @_;
     $t .= "\t" x ($l - (length($t) + 1) / 8);
     $t;
 }

@@ -30,7 +30,7 @@ for ( @prgs){
     if (s/^\s*(-\w+)//){
        $switch = $1;
     }
-    my($prog,$expected) = < split(m/\nEXPECT\n/, $_);
+    my@($prog,$expected) =  split(m/\nEXPECT\n/, $_);
     open TEST, ">", "$tmpfile";
     print TEST "$prog\n";
     close TEST or die "Could not close: $!";
@@ -56,7 +56,7 @@ for ( @prgs){
 }
 
 sub test_invalid_decl {
-    my ($code,$todo) = < @_;
+    my @($code,$todo) =  @_;
     local our $TODO = $todo;
     eval_dies_like( $code,
                     qr/^Illegal declaration of anonymous subroutine/);

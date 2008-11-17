@@ -6,7 +6,7 @@ use vars < qw($mycnt);
 my $why = "zero != one";
 
 sub myfail {
-    my ($f) = < @_;
+    my @($f) =  @_;
     ok((nelems @$f), 1);
 
     my $t = @$f[0];

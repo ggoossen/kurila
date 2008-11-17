@@ -498,7 +498,7 @@ my %ENTITIES = %(
 ##---------------------------------
 
 sub podchecker( $ ; $ % ) {
-    my ($infile, $outfile, < %options) = < @_;
+    my @($infile, $outfile, %< %options) =  @_;
     local $_;
 
     ## Set defaults
@@ -678,7 +678,7 @@ collapsed to a single blank.
 =cut
 
 sub node {
-    my ($self,$text) = < @_;
+    my @($self,$text) =  @_;
     if(defined $text) {
         $text =~ s/\s+$//s; # strip trailing whitespace
         $text =~ s/\s+/ /gs; # collapse whitespace
@@ -703,7 +703,7 @@ of whitespace is collapsed to a single blank.
 
 # set/return index entries of current POD
 sub idx {
-    my ($self,$text) = < @_;
+    my @($self,$text) =  @_;
     if(defined $text) {
         $text =~ s/\s+$//s; # strip trailing whitespace
         $text =~ s/\s+/ /gs; # collapse whitespace
@@ -771,7 +771,7 @@ sub end_pod {
         %nodes{+$_} = 3; # index node
     }
     foreach( $self->hyperlink()) {
-        my ($line,$link) = < @$_;
+        my @($line,$link) =  @$_;
         # _TODO_ what if there is a link to the page itself by the name,
         # e.g. in Tk::Pod : L<Tk::Pod/"DESCRIPTION">
         if($link->node() && !$link->page() && $link->type() ne 'hyperlink') {
@@ -802,8 +802,8 @@ sub end_pod {
 
 # check a POD command directive
 sub command { 
-    my ($self, $cmd, $paragraph, $line_num, $pod_para) = < @_;
-    my ($file, $line) = < $pod_para->file_line;
+    my @($self, $cmd, $paragraph, $line_num, $pod_para) =  @_;
+    my @($file, $line) =  $pod_para->file_line;
     ## Check the command syntax
     my $arg; # this will hold the command argument
     if (! %VALID_COMMANDS{?$cmd}) {
@@ -1032,7 +1032,7 @@ sub command {
 
 sub _open_list
 {
-    my ($self,$indent,$line,$file) = < @_;
+    my @($self,$indent,$line,$file) =  @_;
     my $list = Pod::List->new(
            indent => $indent,
            start => $line,
@@ -1044,7 +1044,7 @@ sub _open_list
 
 sub _close_list
 {
-    my ($self,$line,$file) = < @_;
+    my @($self,$line,$file) =  @_;
     my $list = shift(@{$self->{_list_stack}});
     if(defined $self->{?_list_item_contents} &&
       $self->{?_list_item_contents} == 0) {
@@ -1058,7 +1058,7 @@ sub _close_list
 
 # process a block of some text
 sub interpolate_and_check {
-    my ($self, $paragraph, $line, $file) = < @_;
+    my @($self, $paragraph, $line, $file) =  @_;
     ## Check the interior sequences in the command-text
     # and return the text
     $self->_check_ptree( 
@@ -1066,7 +1066,7 @@ sub interpolate_and_check {
 }
 
 sub _check_ptree {
-    my ($self,$ptree,$line,$file,$nestlist) = < @_;
+    my @($self,$ptree,$line,$file,$nestlist) =  @_;
     local($_);
     my $text = '';
     # process each node in the parse tree
@@ -1089,7 +1089,7 @@ sub _check_ptree {
         # have an interior sequence
         my $cmd = $_->cmd_name();
         my $contents = $_->parse_tree();
-        ($file,$line) = < $_->file_line();
+        @($file,$line) =  $_->file_line();
         # check for valid tag
         if (! %VALID_SEQUENCES{?$cmd}) {
             $self->poderror(\%( line => $line, file => $file,
@@ -1206,12 +1206,12 @@ sub _check_ptree {
 # process a block of verbatim text
 sub verbatim { 
     ## Nothing particular to check
-    my ($self, $paragraph, $line_num, $pod_para) = < @_;
+    my @($self, $paragraph, $line_num, $pod_para) =  @_;
 
     $self->_preproc_par($paragraph);
 
     if($self->{?_current_head1} eq 'NAME') {
-        my ($file, $line) = < $pod_para->file_line;
+        my @($file, $line) =  $pod_para->file_line;
         $self->poderror(\%( line => $line, file => $file,
             severity => 'WARNING',
             msg => 'Verbatim paragraph in NAME section' ));
@@ -1220,8 +1220,8 @@ sub verbatim {
 
 # process a block of regular text
 sub textblock { 
-    my ($self, $paragraph, $line_num, $pod_para) = < @_;
-    my ($file, $line) = < $pod_para->file_line;
+    my @($self, $paragraph, $line_num, $pod_para) =  @_;
+    my @($file, $line) =  $pod_para->file_line;
 
     $self->_preproc_par($paragraph);
 

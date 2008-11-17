@@ -12,7 +12,7 @@ $FS = ':';
 
 $_ = 'a:b:c';
 
-($a,$b,$c) = < split($FS,$_);
+@($a,$b,$c) =  split($FS,$_);
 
 is(join(';', @($a,$b,$c)), 'a;b;c');
 
@@ -54,7 +54,7 @@ $foo = runperl( switches => \@('-Dt'), stderr => 1, prog => '($a,$b)=split;' );
 ok($foo =~ m/DEBUGGING/ || $foo =~ m/const\n?\Q(IV(3))\E/);
 
 # Can we say how many fields to split to when assigning to a list?
-($a,$b) = < split(' ','1 2 3 4 5 6', 2);
+@($a,$b) =  split(' ','1 2 3 4 5 6', 2);
 $_ = join(':', @($a,$b));
 is($_, '1:2 3 4 5 6');
 
@@ -67,12 +67,12 @@ $_ = join '|', split(m/,|(-)/, "1-10,20,,,", 10);
 is($_, "1|-|10||20||||||");
 
 # is the 'two undefs' bug fixed?
-(undef, $a, undef, $b) = < qw(1 2 3 4);
+@(undef, $a, undef, $b) =  qw(1 2 3 4);
 is("$a|$b", "2|4");
 
 # .. even for locals?
 do {
-  local(undef, $a, undef, $b) = < qw(1 2 3 4);
+  local@(undef, $a, undef, $b) =  qw(1 2 3 4);
   is("$a|$b", "2|4");
 };
 
@@ -180,27 +180,27 @@ do {
     } else {
 	# bug id 20000426.003
 
-	my ($a, $b, $c) = < split(m/\x40/, $s);
+	my @($a, $b, $c) =  split(m/\x40/, $s);
 	ok($a eq "\x20" && $b eq "\x{80}\x{100}\x{80}" && $c eq $a);
     }
   };
 
-    my ($a, $b) = < split(m/\x{100}/, $s);
+    my @($a, $b) =  split(m/\x{100}/, $s);
     ok($a eq "\x20\x40\x{80}" && $b eq "\x{80}\x40\x20");
 
-    my ($a, $b) = < split(m/\x{80}\x{100}\x{80}/, $s);
+    my @($a, $b) =  split(m/\x{80}\x{100}\x{80}/, $s);
     ok($a eq "\x20\x40" && $b eq "\x40\x20");
 
   SKIP: do {
     if (ord('A') == 193) {
 	skip("EBCDIC", 1);
     }  else {
-	my ($a, $b) = < split(m/\x40\x{80}/, $s);
+	my @($a, $b) =  split(m/\x40\x{80}/, $s);
 	ok($a eq "\x20" && $b eq "\x{100}\x{80}\x40\x20");
     }
   };
 
-    my ($a, $b, $c) = < split(m/[\x40\x{80}]+/, $s);
+    my @($a, $b, $c) =  split(m/[\x40\x{80}]+/, $s);
     ok($a eq "\x20" && $b eq "\x{100}" && $c eq "\x20");
 };
 

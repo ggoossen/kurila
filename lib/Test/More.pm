@@ -218,7 +218,7 @@ This is the same as Test::Simple's ok() routine.
 =cut
 
 sub ok ($;$) {
-    my($test, $name) = < @_;
+    my@($test, $name) =  @_;
     my $tb = Test::More->builder;
 
     $tb->ok($test, $name);
@@ -420,7 +420,7 @@ as one test.  If you desire otherwise, use:
 =cut
 
 sub can_ok ($@) {
-    my($proto, < @methods) = < @_;
+    my@($proto, @< @methods) =  @_;
     my $class = ref $proto || $proto;
     my $tb = Test::More->builder;
 
@@ -482,7 +482,7 @@ you'd like them to be more specific, you can supply an $object_name
 =cut
 
 sub isa_ok ($$;$) {
-    my($object, $class, $obj_name) = < @_;
+    my@($object, $class, $obj_name) =  @_;
     my $tb = Test::More->builder;
 
     my $diag;
@@ -613,11 +613,11 @@ because the notion of "compile-time" is relative.  Instead, you want:
 =cut
 
 sub use_ok ($;@) {
-    my($module, < @imports) = < @_;
+    my@($module, @< @imports) =  @_;
     @imports = @( () ) unless (nelems @imports);
     my $tb = Test::More->builder;
 
-    my($pack,$filename,$line) = caller;
+    my@($pack,$filename,$line) =@( caller);
 
     my $code;
     if( (nelems @imports) == 1 and ref @imports[0] and @imports[0]->isa('version') ) {
@@ -637,7 +637,7 @@ use $module < \@\{\@args[0]\};
 USE
     }
 
-    my($eval_result, $eval_error) = < _eval($code, \@imports);
+    my@($eval_result, $eval_error) =  _eval($code, \@imports);
     my $ok = $tb->ok( $eval_result, "use $module;" );
     
     unless( $ok ) {
@@ -653,7 +653,7 @@ DIAGNOSTIC
 
 
 sub _eval {
-    my($code) = shift;
+    my@($code) =@( shift);
     my @args = @_;
 
     # Work around oddities surrounding resetting of $@ by immediately
@@ -670,7 +670,7 @@ sub _eval {
 =cut
 
 sub dies_like {
-    my ($coderef, $like, $name) = < @_;
+    my @($coderef, $like, $name) =  @_;
 
     my $tb = Test::More->builder;
 
@@ -692,7 +692,7 @@ Like use_ok(), except it requires the $module or $file.
 =cut
 
 sub require_ok ($) {
-    my($module) = shift;
+    my@($module) =@( shift);
     my $tb = Test::More->builder;
 
     my $pack = caller;
@@ -707,7 +707,7 @@ require $module;
 1;
 REQUIRE
 
-    my($eval_result, $eval_error) = < _eval($code);
+    my@($eval_result, $eval_error) =  _eval($code);
     my $ok = $tb->ok( $eval_result, "require $module;" );
 
     unless( $ok ) {
@@ -791,7 +791,7 @@ WARNING
 	return $tb->ok(0);
     }
 
-    my($got, $expected, $name) = < @_;
+    my@($got, $expected, $name) =  @_;
 
     my $ok;
 
@@ -808,7 +808,7 @@ WARNING
 }
 
 sub _format_stack {
-    my(@Stack) = @_;
+    my@(@Stack) = @_;
 
     my $var = '$FOO';
     my $prev_ref = 0;
@@ -985,7 +985,7 @@ use TODO.  Read on.
 
 #'#
 sub skip {
-    my($why, $how_many) = < @_;
+    my@($why, $how_many) =  @_;
     my $tb = Test::More->builder;
 
     unless( defined $how_many ) {
@@ -1071,7 +1071,7 @@ interpret them as passing.
 =cut
 
 sub todo_skip {
-    my($why, $how_many) = < @_;
+    my@($why, $how_many) =  @_;
     my $tb = Test::More->builder;
 
     unless( defined $how_many ) {
@@ -1169,7 +1169,7 @@ sub eq_array {
 }
 
 sub _eq_array  {
-    my($a1, $a2) = < @_;
+    my@($a1, $a2) =  @_;
 
     if( grep !_type($_) eq 'ARRAY', @( $a1, $a2) ) {
         warn "eq_array passed a non-array ref";
@@ -1195,7 +1195,7 @@ sub _eq_array  {
 }
 
 sub _deep_check {
-    my($e1, $e2) = < @_;
+    my@($e1, $e2) =  @_;
     my $tb = Test::More->builder;
 
     my $ok = 0;
@@ -1263,7 +1263,7 @@ sub _deep_check {
 
 
 sub _whoa {
-    my($check, $desc) = < @_;
+    my@($check, $desc) =  @_;
     if( $check ) {
         die <<WHOA;
 WHOA!  $desc
@@ -1288,7 +1288,7 @@ sub eq_hash {
 }
 
 sub _eq_hash {
-    my($a1, $a2) = < @_;
+    my@($a1, $a2) =  @_;
 
     if( grep !_type($_) eq 'HASH', @( $a1, $a2) ) {
         warn "eq_hash passed a non-hash ref";
@@ -1340,7 +1340,7 @@ Test::Deep contains much better set comparison functions.
 =cut
 
 sub eq_set  {
-    my($a1, $a2) = < @_;
+    my@($a1, $a2) =  @_;
     return 0 unless (nelems @$a1) == nelems @$a2;
 
     # There's faster ways to do this, but this is easiest.

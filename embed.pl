@@ -156,7 +156,7 @@ sub write_protos {
 	$ret .= "$arg\n";
     }
     else {
-	my ($flags,$retval,$plain_func,< @args) = < @_;
+	my @($flags,$retval,$plain_func,@< @args) =  @_;
 	my @nonnull;
 	my $has_context = ( $flags !~ m/n/ );
 	my $never_returns = ( $flags =~ m/r/ );
@@ -279,7 +279,7 @@ do {
   sub write_global_sym {
       my $ret = "";
       if ((nelems @_) +> 1) {
-	  my ($flags,$retval,$func,< @args) = < @_;
+	  my @($flags,$retval,$func,@< @args) =  @_;
 	  # If a function is defined twice, for example before and after an
 	  # #else, only process the flags on the first instance for global.sym
 	  return $ret if %seen{+$func}++;
@@ -320,7 +320,7 @@ my @extvars = qw(sv_undef sv_yes sv_no na dowarn
                 );
 
 sub readsyms (\%$) {
-    my ($syms, $file) = < @_;
+    my @($syms, $file) =  @_;
     local (*FILE, $_);
     open(FILE, "<", "$file")
 	or die "embed.pl: Can't open $file: $!\n";
@@ -340,7 +340,7 @@ sub readsyms (\%$) {
 readsyms my %ppsym, 'pp.sym';
 
 sub readvars(\%$$@) {
-    my ($syms, $file,$pre,$keep_pre) = < @_;
+    my @($syms, $file,$pre,$keep_pre) =  @_;
     local (*FILE, $_);
     open(FILE, "<", "$file")
 	or die "embed.pl: Can't open $file: $!\n";
@@ -364,29 +364,29 @@ readvars %intrp,  'intrpvar.h','I';
 readvars %globvar, 'perlvars.h','G';
 
 sub undefine ($) {
-    my ($sym) = < @_;
+    my @($sym) =  @_;
     "#undef  $sym\n";
 }
 
 sub hide ($$) {
-    my ($from, $to) = < @_;
+    my @($from, $to) =  @_;
     my $t = int(length($from) / 8);
     "#define $from" . "\t" x ($t +< 3 ?? 3 - $t !! 1) . "$to\n";
 }
 
 sub bincompat_var ($$) {
-    my ($pfx, $sym) = < @_;
+    my @($pfx, $sym) =  @_;
     my $arg = ($pfx eq 'G' ?? 'NULL' !! 'aTHX');
     undefine("PL_$sym") . hide("PL_$sym", "(*Perl_$($pfx)$($sym)_ptr($arg))");
 }
 
 sub multon ($$$) {
-    my ($sym,$pre,$ptr) = < @_;
+    my @($sym,$pre,$ptr) =  @_;
     hide("PL_$sym", "($ptr$pre$sym)");
 }
 
 sub multoff ($$) {
-    my ($sym,$pre) = < @_;
+    my @($sym,$pre) =  @_;
     return hide("PL_$pre$sym", "PL_$sym");
 }
 
@@ -426,7 +426,7 @@ walk_table {
 	$ret .= "$arg\n" if $arg =~ m/^#\s*(if|ifn?def|else|endif)\b/;
     }
     else {
-	my ($flags,$retval,$func,< @args) = < @_;
+	my @($flags,$retval,$func,@< @args) =  @_;
 	unless ($flags =~ m/[om]/) {
 	    if ($flags =~ m/s/) {
 		$ret .= hide($func,"S_$func");
@@ -492,7 +492,7 @@ walk_table {
 	$ret .= "$arg\n" if $arg =~ m/^#\s*(if|ifn?def|else|endif)\b/;
     }
     else {
-	my ($flags,$retval,$func,< @args) = < @_;
+	my @($flags,$retval,$func,@< @args) =  @_;
 	unless ($flags =~ m/[om]/) {
 	    my $args = scalar nelems @args;
 	    if ($args and @args[$args-1] =~ m/\.\.\./) {

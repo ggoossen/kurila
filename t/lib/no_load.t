@@ -21,7 +21,7 @@ $count += (nelems @$_) - 1 for  @TESTS;
 print "1..$count\n";
 
 foreach my $test ( @TESTS) {
-    my ($exclude, < @modules) = < @$test;
+    my @($exclude, @< @modules) =  @$test;
 
     foreach my $module ( @modules) {
         my $prog = <<"        --";

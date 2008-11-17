@@ -64,7 +64,7 @@ singleton, use C<create>.
 
 my $Test = Test::Builder->new;
 sub new {
-    my($class) = shift;
+    my@($class) =@( shift);
     $Test ||= $class->create;
     return $Test;
 }
@@ -106,7 +106,7 @@ test might be run multiple times in the same process.
 use vars < qw($Level);
 
 sub reset {
-    my ($self) = < @_;
+    my @($self) =  @_;
 
     # We leave this a global because it has to be localized and localizing
     # hash keys is just asking for pain.  Also, it was documented.
@@ -160,7 +160,7 @@ If you call plan(), don't call any of the other methods below.
 =cut
 
 sub plan {
-    my($self, $cmd, $arg) = < @_;
+    my@($self, $cmd, $arg) =  @_;
 
     return unless $cmd;
 
@@ -208,7 +208,7 @@ the appropriate headers.
 
 sub expected_tests {
     my $self = shift;
-    my($max) = < @_;
+    my@($max) =  @_;
 
     if( (nelems @_) ) {
         die("Number of tests must be a positive integer.  You gave it '$max'")
@@ -265,7 +265,7 @@ Skips all the tests, using the given $reason.  Exits immediately with 0.
 =cut
 
 sub skip_all {
-    my($self, $reason) = < @_;
+    my@($self, $reason) =  @_;
 
     my $out = "1..0";
     $out .= " # Skip $reason" if $reason;
@@ -292,7 +292,7 @@ the last one will be honored.
 =cut
 
 sub exported_to {
-    my($self, $pack) = < @_;
+    my@($self, $pack) =  @_;
 
     if( defined $pack ) {
         $self->{+Exported_To} = $pack;
@@ -322,7 +322,7 @@ like Test::Simple's ok().
 =cut
 
 sub ok {
-    my($self, $test, $name) = < @_;
+    my@($self, $test, $name) =  @_;
 
     # $test might contain an object which we don't want to accidentally
     # store, so we turn it into a boolean.
@@ -349,10 +349,10 @@ ERR
 
     unless( $test ) {
         $out .= "not ";
- <        %$result{[@('ok', 'actual_ok') ]} = ( ( $todo ?? 1 !! 0 ), 0 );
+         %$result{[@('ok', 'actual_ok') ]} = @( ( $todo ?? 1 !! 0 ), 0 );
     }
-    else { <
-        %$result{[@('ok', 'actual_ok') ]} = ( 1, $test );
+    else { 
+        %$result{[@('ok', 'actual_ok') ]} = @( 1, $test );
     }
 
     $out .= "ok";
@@ -386,7 +386,7 @@ ERR
         my $msg = $todo ?? "Failed (TODO)" !! "Failed";
         $self->_print_diag("\n") if %ENV{?HARNESS_ACTIVE};
 
-    my(undef, $file, $line) = < $self->caller;
+    my@(undef, $file, $line) =  $self->caller;
         if( defined $name ) {
             $self->diag(qq[  $msg test '$name'\n]);
             $self->diag(qq[  at $file line $line.\n]);
@@ -400,7 +400,7 @@ ERR
 }
 
 sub _is_object {
-    my($self, $thing) = < @_;
+    my@($self, $thing) =  @_;
 
     return $self->_try(sub { ref $thing && $thing->isa('UNIVERSAL') }) ?? 1 !! 0;
 }
@@ -408,7 +408,7 @@ sub _is_object {
 
 # This is a hack to detect a dualvar such as $!
 sub _is_dualvar {
-    my($self, $val) = < @_;
+    my@($self, $val) =  @_;
 
     local $^W = 0;
     my $numval = $val+0;
@@ -434,7 +434,7 @@ numeric version.
 =cut
 
 sub is_eq {
-    my($self, $got, $expect, $name) = < @_;
+    my@($self, $got, $expect, $name) =  @_;
     local $Level = $Level + 1;
 
     if( !defined $got || !defined $expect ) {
@@ -458,7 +458,7 @@ sub is_eq {
 }
 
 sub is_num {
-    my($self, $got, $expect, $name) = < @_;
+    my@($self, $got, $expect, $name) =  @_;
     local $Level = $Level + 1;
 
     if( !defined $got || !defined $expect ) {
@@ -474,7 +474,7 @@ sub is_num {
 }
 
 sub _is_diag {
-    my($self, $got, $type, $expect) = < @_;
+    my@($self, $got, $type, $expect) =  @_;
 
     local $Level = $Level + 1;
     return $self->diag(sprintf <<DIAGNOSTIC, dump::view($got), dump::view($expect));
@@ -501,7 +501,7 @@ the numeric version.
 =cut
 
 sub isnt_eq {
-    my($self, $got, $dont_expect, $name) = < @_;
+    my@($self, $got, $dont_expect, $name) =  @_;
     local $Level = $Level + 1;
 
     if( !defined $got || !defined $dont_expect ) {
@@ -525,7 +525,7 @@ sub isnt_eq {
 }
 
 sub isnt_num {
-    my($self, $got, $dont_expect, $name) = < @_;
+    my@($self, $got, $dont_expect, $name) =  @_;
     local $Level = $Level + 1;
 
     if( !defined $got || !defined $dont_expect ) {
@@ -561,14 +561,14 @@ given $regex.
 =cut
 
 sub like {
-    my($self, $this, $regex, $name) = < @_;
+    my@($self, $this, $regex, $name) =  @_;
 
     local $Level = $Level + 1;
     $self->_regex_ok($this, $regex, '=~', $name);
 }
 
 sub unlike {
-    my($self, $this, $regex, $name) = < @_;
+    my@($self, $this, $regex, $name) =  @_;
 
     local $Level = $Level + 1;
     $self->_regex_ok($this, $regex, '!~', $name);
@@ -590,7 +590,7 @@ my %numeric_cmps = %( < map { ($_, 1) }
  @(                       ("<",  "<=", ">",  ">=", "==", "!=", "<=>")) );
 
 sub cmp_ok {
-    my($self, $got, $type, $expect, $name) = < @_;
+    my@($self, $got, $type, $expect, $name) =  @_;
 
     my $test;
     do {
@@ -620,7 +620,7 @@ $code" . "\$got $type \$expect;";
 }
 
 sub _cmp_diag {
-    my($self, $got, $type, $expect) = < @_;
+    my@($self, $got, $type, $expect) =  @_;
     
     $got    = dump::view($got);
     $expect = dump::view($expect);
@@ -637,7 +637,7 @@ DIAGNOSTIC
 sub _caller_context {
     my $self = shift;
 
-    my($pack, $file, $line) = < $self->caller(1);
+    my@($pack, $file, $line) =  $self->caller(1);
 
     my $code = '';
     $code .= "#line $line $file\n" if defined $file and defined $line;
@@ -667,7 +667,7 @@ It will exit with 255.
 =cut
 
 sub BAIL_OUT {
-    my($self, $reason) = < @_;
+    my@($self, $reason) =  @_;
 
     $self->{+Bailed_Out} = 1;
     $self->_print("Bail out!  $reason");
@@ -692,7 +692,7 @@ Skips the current test, reporting $why.
 =cut
 
 sub skip {
-    my($self, $why) = < @_;
+    my@($self, $why) =  @_;
     $why ||= '';
 
     $self->_plan_check;
@@ -733,7 +733,7 @@ to
 =cut
 
 sub todo_skip {
-    my($self, $why) = < @_;
+    my@($self, $why) =  @_;
     $why ||= '';
 
     $self->_plan_check;
@@ -812,7 +812,7 @@ could be written as:
 
 
 sub maybe_regex {
-    my ($self, $regex) = < @_;
+    my @($self, $regex) =  @_;
     my $usable_regex = undef;
 
     return $usable_regex unless defined $regex;
@@ -825,8 +825,8 @@ sub maybe_regex {
         $usable_regex = $regex;
     }
     # Check for '/foo/' or 'm,foo,'
-    elsif( ($re, $opts)        = $regex =~ m{^ /(.*)/ (\w*) $ }sx           or
-           (undef, $re, $opts) = $regex =~ m,^ m([^\w\s]) (.+) \1 (\w*) $,sx
+    elsif( @($re, $opts)        = $regex =~ m{^ /(.*)/ (\w*) $ }sx           or
+           @(undef, $re, $opts) = $regex =~ m,^ m([^\w\s]) (.+) \1 (\w*) $,sx
          )
     {
         $usable_regex = length $opts ?? "(?$opts)$re" !! $re;
@@ -847,7 +847,7 @@ sub _is_qr {
 
 
 sub _regex_ok {
-    my($self, $this, $regex, $cmp, $name) = < @_;
+    my@($self, $this, $regex, $cmp, $name) =  @_;
 
     my $ok = 0;
     my $usable_regex = $self->maybe_regex($regex);
@@ -898,7 +898,7 @@ It is suggested you use this in place of eval BLOCK.
 =cut
 
 sub _try {
-    my($self, $code) = < @_;
+    my@($self, $code) =  @_;
     
     local $!;               # eval can mess up $!
     local $@;               # don't set $@ in the test
@@ -964,7 +964,7 @@ To be polite to other functions wrapping your own you usually want to increment 
 =cut
 
 sub level {
-    my($self, $level) = < @_;
+    my@($self, $level) =  @_;
 
     if( defined $level ) {
         $Level = $level;
@@ -997,7 +997,7 @@ Defaults to on.
 =cut
 
 sub use_numbers {
-    my($self, $use_nums) = < @_;
+    my@($self, $use_nums) =  @_;
 
     if( defined $use_nums ) {
         $self->{+Use_Nums} = $use_nums;
@@ -1034,7 +1034,7 @@ foreach my $attribute (qw(No_Header No_Ending No_Diag)) {
     my $method = lc $attribute;
 
     my $code = sub {
-        my($self, $no) = < @_;
+        my@($self, $no) =  @_;
 
         if( defined $no ) {
             $self->{+$attribute} = $no;
@@ -1084,7 +1084,7 @@ Mark Fowler <mark@twoshortplanks.com>
 =cut
 
 sub diag {
-    my($self, < @msgs) = < @_;
+    my@($self, @< @msgs) =  @_;
 
     return if $self->no_diag;
     return unless (nelems @msgs);
@@ -1121,7 +1121,7 @@ Prints to the output() filehandle.
 =cut
 
 sub _print {
-    my($self, < @msgs) = < @_;
+    my@($self, @< @msgs) =  @_;
 
     # Prevent printing headers when only compiling.  Mostly for when
     # tests are deparsed with B::Deparse
@@ -1129,7 +1129,7 @@ sub _print {
 
     my $msg = join '', @msgs;
 
-    local($\, $", $,) = (undef, ' ', '');
+    local@($\, $", $,) = @(undef, ' ', '');
     my $fh = $self->output;
 
     # Escape each line after the first with a # so we don't
@@ -1157,7 +1157,7 @@ Like _print, but prints to the current diagnostic filehandle.
 sub _print_diag {
     my $self = shift;
 
-    local($\, $", $,) = (undef, ' ', '');
+    local@($\, $", $,) = @(undef, ' ', '');
     my $fh = $self->todo ?? $self->todo_output !! $self->failure_output;
     print $fh < @_;
 }    
@@ -1192,7 +1192,7 @@ Defaults to STDOUT.
 =cut
 
 sub output {
-    my($self, $fh) = < @_;
+    my@($self, $fh) =  @_;
 
     if( defined $fh ) {
         $self->{+Out_FH} = $self->_new_fh($fh);
@@ -1201,7 +1201,7 @@ sub output {
 }
 
 sub failure_output {
-    my($self, $fh) = < @_;
+    my@($self, $fh) =  @_;
 
     if( defined $fh ) {
         $self->{+Fail_FH} = $self->_new_fh($fh);
@@ -1210,7 +1210,7 @@ sub failure_output {
 }
 
 sub todo_output {
-    my($self, $fh) = < @_;
+    my@($self, $fh) =  @_;
 
     if( defined $fh ) {
         $self->{+Todo_FH} = $self->_new_fh($fh);
@@ -1221,7 +1221,7 @@ sub todo_output {
 
 sub _new_fh {
     my $self = shift;
-    my($file_or_fh) = shift;
+    my@($file_or_fh) =@( shift);
 
     my $fh;
     if( $self->is_fh($file_or_fh) ) {
@@ -1238,7 +1238,7 @@ sub _new_fh {
 
 
 sub _autoflush {
-    my($fh) = shift;
+    my@($fh) =@( shift);
     my $old_fh = select $fh;
     $| = 1;
     select $old_fh;
@@ -1280,7 +1280,7 @@ sub _open_testhandles {
 
 
 sub _copy_io_layers {
-    my($self, $src, $dest) = < @_;
+    my@($self, $src, $dest) =  @_;
     
     $self->_try(sub {
         require PerlIO;
@@ -1321,7 +1321,7 @@ can erase history if you really want to.
 =cut
 
 sub current_test {
-    my($self, $num) = < @_;
+    my@($self, $num) =  @_;
 
     lock($self->{?Curr_Test});
     if( defined $num ) {
@@ -1366,7 +1366,7 @@ Of course, test #1 is $tests[0], etc...
 =cut
 
 sub summary {
-    my($self) = shift;
+    my@($self) =@( shift);
 
     return map { $_->{?'ok'} } @{ $self->{Test_Results} };
 }
@@ -1447,7 +1447,7 @@ what $pack to use.
 =cut
 
 sub todo {
-    my($self, $pack) = < @_;
+    my@($self, $pack) =  @_;
 
     return $self->{?TODO} if defined $self->{?TODO};
 
@@ -1471,7 +1471,7 @@ C<$height> will be added to the level().
 =cut
 
 sub caller {
-    my($self, $height) = < @_;
+    my@($self, $height) =  @_;
     $height ||= 0;
 
     my @caller = @( CORE::caller($self->level + $height + 1) );
@@ -1518,7 +1518,7 @@ a note to contact the author.
 =cut
 
 sub _whoa {
-    my($self, $check, $desc) = < @_;
+    my@($self, $check, $desc) =  @_;
     if( $check ) {
         local $Level = $Level + 1;
         die(<<"WHOA");

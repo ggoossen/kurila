@@ -32,7 +32,7 @@ my @from = @(
 
 # Might as well test all the classes...
 while((nelems @from)) {
-  my($x => $expected) = splice(@from, 0,2);
+  my@($x => $expected) = splice@(@from, 0,2);
   my $more = '';
   print "#Testing via class $x, version ", $x->VERSION(), "\n";
   my $p = $x->new;

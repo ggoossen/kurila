@@ -111,7 +111,7 @@ print "ABC" =~ m/^@ary[$A]$/ ?? "ok 25\n" !! "not ok 25\n";
 print "ok 26\n";
 
 # MJD 19980425
-($X, < @X) = < qw(a b c d); 
+@($X, @< @X) =  qw(a b c d); 
 print "d" =~ m/^@X[-1]$/ ?? "ok 27\n" !! "not ok 27\n";
 print "a1" !~ m/^@X[-1]$/ ?? "ok 28\n" !! "not ok 28\n";
 
@@ -191,8 +191,8 @@ do {
 # see if eval '', s///e, and heredocs mix
 
 sub T {
-    my ($where, $num) = < @_;
-    my ($p,$f,$l) = caller;
+    my @($where, $num) =  @_;
+    my @($p,$f,$l) =@( caller);
     print "# $p:$f:$l vs /$where/\nnot " unless "$p:$f:$l" =~ m/$where/;
     print "ok $num\n";
 }

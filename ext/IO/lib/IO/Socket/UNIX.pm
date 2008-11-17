@@ -23,7 +23,7 @@ sub new {
 }
 
 sub configure {
-    my($sock,$arg) = < @_;
+    my@($sock,$arg) =  @_;
     my($bport,$cport);
 
     my $type = $arg->{?Type} || SOCK_STREAM;

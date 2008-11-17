@@ -32,7 +32,7 @@ my %isa_scan = %( () );
 ###########################################################################
 
 sub quant {
-  my($handle, $num, < @forms) = < @_;
+  my@($handle, $num, @< @forms) =  @_;
 
   return $num if (nelems @forms) == 0; # what should this mean?
   return @forms[2] if (nelems @forms) +> 2 and $num == 0; # special zeroth case
@@ -46,7 +46,7 @@ sub quant {
 
 sub numerate {
  # return this lexical item in a form appropriate to this number
-  my($handle, $num, < @forms) = < @_;
+  my@($handle, $num, @< @forms) =  @_;
   my $s = ($num == 1);
 
   return '' unless (nelems @forms);
@@ -60,7 +60,7 @@ sub numerate {
 #--------------------------------------------------------------------------
 
 sub numf {
-  my($handle, $num) = < @_[[@(0,1)]];
+  my@($handle, $num) =  @_[[@(0,1)]];
   if($num +< 10_000_000_000 and $num +> -10_000_000_000 and $num == int($num)) {
     $num += 0;  # Just use normal integer stringification.
          # Specifically, don't let %G turn ten million into 1E+007
@@ -80,7 +80,7 @@ sub numf {
 
 sub sprintf {
   no integer;
-  my($handle, $format, < @params) = < @_;
+  my@($handle, $format, @< @params) =  @_;
   return CORE::sprintf($format, < @params);
     # "CORE::" is there to avoid confusion with myself!
 }
@@ -114,7 +114,7 @@ sub fallback_language_classes { return () }
 #--------------------------------------------------------------------------
 
 sub fail_with { # an actual attribute method!
-  my($handle, < @params) = < @_;
+  my@($handle, @< @params) =  @_;
   return unless ref($handle);
   $handle->{+'fail'} = @params[0] if (nelems @params);
   return $handle->{?'fail'};
@@ -126,7 +126,7 @@ sub failure_handler_auto {
   # Meant to be used like:
   #  $handle->fail_with('failure_handler_auto')
 
-  my($handle, $phrase, < @params) = < @_;
+  my@($handle, $phrase, @< @params) =  @_;
   $handle->{+'failure_lex'} ||= \%();
   my $lex = $handle->{?'failure_lex'};
 
@@ -171,7 +171,7 @@ sub maketext {
   # Remember, this can fail.  Failure is controllable many ways.
   Carp::croak "maketext requires at least one parameter" unless (nelems @_) +> 1;
 
-  my($handle, $phrase) = splice(@_,0,2);
+  my@($handle, $phrase) = splice@(@_,0,2);
 
   # Don't interefere with $@ in case that's being interpolated into the msg.
   local $@;
@@ -248,7 +248,7 @@ sub get_handle {  # This is a constructor and, yes, it CAN FAIL.
   # Its class argument has to be the base class for the current
   # application's l10n files.
 
-  my($base_class, < @languages) = < @_;
+  my@($base_class, @< @languages) =  @_;
   $base_class = ref($base_class) || $base_class;
    # Complain if they use __PACKAGE__ as a project base class?
   
@@ -279,7 +279,7 @@ sub get_handle {  # This is a constructor and, yes, it CAN FAIL.
 ###########################################################################
 
 sub _langtag_munging {
-  my($base_class, < @languages) = < @_;
+  my@($base_class, @< @languages) =  @_;
 
   # We have all these DEBUG statements because otherwise it's hard as hell
   # to diagnose ifwhen something goes wrong.
@@ -335,7 +335,7 @@ sub _ambient_langprefs {
 ###########################################################################
 
 sub _add_supers {
-  my($base_class, < @languages) = < @_;
+  my@($base_class, @< @languages) =  @_;
 
   if(!$MATCH_SUPERS) {
     # Nothing

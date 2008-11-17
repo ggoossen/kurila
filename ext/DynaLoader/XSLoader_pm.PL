@@ -2,7 +2,7 @@
 use Config;
 
 sub to_string {
-    my ($value) = < @_;
+    my @($value) =  @_;
     $value =~ s/\\/\\\\/g;
     $value =~ s/'/\\'/g;
     return "'$value'";

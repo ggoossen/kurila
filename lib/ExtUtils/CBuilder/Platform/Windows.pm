@@ -35,7 +35,7 @@ sub split_like_shell {
   # Since Windows will pass the whole command string (not an argument
   # array) to the target program and make the program parse it itself,
   # we don't actually need to do any processing here.
-  (my $self, local $_) = < @_;
+  @(my $self, local $_) =  @_;
   
   return @$_ if defined() && UNIVERSAL::isa($_, 'ARRAY');
   return unless defined() && length();
@@ -43,19 +43,19 @@ sub split_like_shell {
 }
 
 sub arg_defines {
-  my ($self, < %args) = < @_;
+  my @($self, %< %args) =  @_;
   s/"/\\"/g foreach values %args;
   return map qq{"-D$_=%args{?$_}"}, keys %args;
 }
 
 sub compile {
-  my ($self, < %args) = < @_;
+  my @($self, %< %args) =  @_;
   my $cf = $self->{?config};
 
   die "Missing 'source' argument to compile()" unless defined %args{?source};
 
-  my ($basename, $srcdir) =
-    < (File::Basename::fileparse(%args{?source}, '\.[^.]+$') )[[0..1]];
+  my @($basename, $srcdir) =
+     (File::Basename::fileparse(%args{?source}, '\.[^.]+$') )[[0..1]];
 
   $srcdir ||= File::Spec->curdir();
 
@@ -103,7 +103,7 @@ sub compile {
 sub need_prelink { 1 }
 
 sub link {
-  my ($self, < %args) = < @_;
+  my @($self, %< %args) =  @_;
   my $cf = $self->{?config};
 
   my @objects = @( ref %args{?objects} eq 'ARRAY' ?? < @{%args{?objects}} !! %args{?objects} );
@@ -192,7 +192,7 @@ sub link {
 
 # canonize & quote paths
 sub normalize_filespecs {
-  my ($self, < @specs) = < @_;
+  my @($self, @< @specs) =  @_;
   foreach my $spec ( grep defined, @specs ) {
     if ( ref $spec eq 'ARRAY') {
       $self->normalize_filespecs( < map {\$_} grep defined, @$spec )
@@ -247,7 +247,7 @@ commandlines under some shells.
 package ExtUtils::CBuilder::Platform::Windows::MSVC;
 
 sub format_compiler_cmd {
-  my ($self, < %spec) = < @_;
+  my @($self, %< %spec) =  @_;
 
   foreach my $path (  @{ %spec{?includes} || \@() },
                      < @{ %spec{?perlinc}  || \@() } ) {
@@ -270,7 +270,7 @@ sub format_compiler_cmd {
 }
 
 sub write_compiler_script {
-  my ($self, < %spec) = < @_;
+  my @($self, %< %spec) =  @_;
 
   my $script = File::Spec->catfile( %spec{?srcdir},
                                     %spec{?basename} . '.ccs' );
@@ -295,7 +295,7 @@ sub write_compiler_script {
 }
 
 sub format_linker_cmd {
-  my ($self, < %spec) = < @_;
+  my @($self, %< %spec) =  @_;
   my $cf = $self->{?config};
 
   foreach my $path (  @{%spec{libpath}} ) {
@@ -341,7 +341,7 @@ sub format_linker_cmd {
 }
 
 sub write_linker_script {
-  my ($self, < %spec) = < @_;
+  my @($self, %< %spec) =  @_;
 
   my $script = File::Spec->catfile( %spec{?srcdir},
                                     %spec{?basename} . '.lds' );
@@ -374,7 +374,7 @@ sub write_linker_script {
 package ExtUtils::CBuilder::Platform::Windows::BCC;
 
 sub format_compiler_cmd {
-  my ($self, < %spec) = < @_;
+  my @($self, %< %spec) =  @_;
 
   foreach my $path (  @{ %spec{?includes} || \@() },
                      < @{ %spec{?perlinc}  || \@() } ) {
@@ -397,7 +397,7 @@ sub format_compiler_cmd {
 }
 
 sub write_compiler_script {
-  my ($self, < %spec) = < @_;
+  my @($self, %< %spec) =  @_;
 
   my $script = File::Spec->catfile( %spec{?srcdir},
                                     %spec{?basename} . '.ccs' );
@@ -428,7 +428,7 @@ sub write_compiler_script {
 }
 
 sub format_linker_cmd {
-  my ($self, < %spec) = < @_;
+  my @($self, %< %spec) =  @_;
 
   foreach my $path (  @{%spec{libpath}} ) {
     $path = "-L$path";
@@ -456,7 +456,7 @@ sub format_linker_cmd {
 }
 
 sub write_linker_script {
-  my ($self, < %spec) = < @_;
+  my @($self, %< %spec) =  @_;
 
   # To work around Borlands "unique" commandline syntax,
   # two scripts are used:
@@ -505,7 +505,7 @@ sub write_linker_script {
 package ExtUtils::CBuilder::Platform::Windows::GCC;
 
 sub format_compiler_cmd {
-  my ($self, < %spec) = < @_;
+  my @($self, %< %spec) =  @_;
 
   foreach my $path (  @{ %spec{?includes} || \@() },
                      < @{ %spec{?perlinc}  || \@() } ) {
@@ -528,7 +528,7 @@ sub format_compiler_cmd {
 }
 
 sub format_linker_cmd {
-  my ($self, < %spec) = < @_;
+  my @($self, %< %spec) =  @_;
 
   # The Config.pm variable 'libperl' is hardcoded to the full name
   # of the perl import library (i.e. 'libperl56.a'). GCC will not
@@ -605,7 +605,7 @@ sub format_linker_cmd {
 }
 
 sub write_linker_script {
-  my ($self, < %spec) = < @_;
+  my @($self, %< %spec) =  @_;
 
   my $script = File::Spec->catfile( %spec{?srcdir},
                                     %spec{?basename} . '.lds' );

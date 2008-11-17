@@ -52,7 +52,7 @@ $tb->reset;
 my $test_num = 2;   # since we already printed 1
 # Utility testing functions.
 sub ok ($;$) {
-    my($test, $name) = < @_;
+    my@($test, $name) =  @_;
     my $ok = '';
     $ok .= "not " unless $test;
     $ok .= "ok $test_num";

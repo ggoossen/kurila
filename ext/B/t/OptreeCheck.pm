@@ -471,7 +471,7 @@ sub newTestCases {
 	}
 	elsif (ref $tc->{?errs} eq 'ARRAY') {
 	    my %errs;
- <	    %errs{[ @{$tc->{?errs}}]} = (1) x nelems @{$tc->{?errs}};
+ 	    %errs{[ @{$tc->{?errs}}]} = (1) x nelems @{$tc->{?errs}};
 	    $tc->{+errs} = \%errs;
 	}
 	elsif (ref $tc->{?errs} eq 'Regexp') {
@@ -483,7 +483,7 @@ sub newTestCases {
 
 sub label {
     # may help get/keep test output consistent
-    my ($tc) = < @_;
+    my @($tc) =  @_;
     return $tc->{?name} if $tc->{?name};
 
     my $buf = (ref $tc->{?bcopts}) 
@@ -565,7 +565,7 @@ sub getRendering {
 
 sub get_bcopts {
     # collect concise passthru-options if any
-    my ($tc) = shift;
+    my @($tc) =@( shift);
     my @opts = @( () );
     if ($tc->{?bcopts}) {
 	@opts = @( (ref $tc->{?bcopts} eq 'ARRAY')
@@ -581,7 +581,7 @@ sub checkErrs {
     # check for agreement, by hash (order less important)
     my (%goterrs, @got);
     $tc->{+goterrs} ||= \@();
- <    %goterrs{[ @{$tc->{?goterrs}}]} = (1) x scalar nelems @{$tc->{?goterrs}};
+     %goterrs{[ @{$tc->{?goterrs}}]} = (1) x scalar nelems @{$tc->{?goterrs}};
     
     foreach my $k (keys %{$tc->{+errs} ||= \%()}) {
 	if (@got = grep m/^$k$/, keys %goterrs) {
@@ -661,7 +661,7 @@ my $announce = 'B::Concise::compile\(CODE\(0x[0-9a-f]+\)\)';;
 sub mkCheckRex {
     # converts expected text into Regexp which should match against
     # unaltered version.  also adjusts threaded => non-threaded
-    my ($tc, $want) = < @_;
+    my @($tc, $want) =  @_;
     eval "no re 'debug'";
 
     my $str = $tc->{?expect} || $tc->{?expect_nt};	# standard bias
@@ -968,7 +968,7 @@ EONT_EONT
 }
 
 sub OptreeCheck::gentest {
-    my ($code,$opts) = < @_;
+    my @($code,$opts) =  @_;
     my $rendering = getRendering(\%(code => $code));
     my $testcode = OptreeCheck::wrap($code);
     return unless $testcode;

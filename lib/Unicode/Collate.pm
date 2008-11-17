@@ -114,9 +114,9 @@ sub unpack_U {
 ######
 
 my (%VariableOK);
- <%VariableOK{[qw/
+ %VariableOK{[qw/
     blanked  non-ignorable  shifted  shift-trimmed
-  / ]} = (); # keys lowercased
+  / ]} = @(); # keys lowercased
 
 our @ChangeOK = qw/
     alternate backwards level normalization rearrange
@@ -144,8 +144,8 @@ sub version {
 }
 
 my (%ChangeOK, %ChangeNG);
- <%ChangeOK{[ @ChangeOK ]} = ();
- <%ChangeNG{[ @ChangeNG ]} = ();
+ %ChangeOK{[ @ChangeOK ]} = @();
+ %ChangeNG{[ @ChangeNG ]} = @();
 
 sub change {
     my $self = shift;
@@ -228,8 +228,8 @@ sub checkCollator {
     # keys of $self->{rearrangeHash} are $self->{rearrange}.
     $self->{+rearrangeHash} = \%();
 
-    if ((nelems @{ $self->{?rearrange} })) { <
-	%{ $self->{rearrangeHash} }{[ @{ $self->{?rearrange} } ]} = ();
+    if ((nelems @{ $self->{?rearrange} })) { 
+	%{ $self->{rearrangeHash} }{[ @{ $self->{?rearrange} } ]} = @();
     }
 
     $self->{+normCode} = undef;
@@ -352,7 +352,7 @@ sub parseEntry
     return if defined $self->{?undefName} && $name =~ m/$self->{?undefName}/;
 
     # gets element
-    my($e, $k) = < split m/;/, $line;
+    my@($e, $k) =  split m/;/, $line;
     croak "Wrong Entry: <charList> must be separated by ';' from <collElement>"
 	if ! $k;
 
@@ -410,7 +410,7 @@ sub _varCE
     if ($vbl eq 'non-ignorable') {
 	return $vce;
     }
-    my ($var, < @wt) = unpack VCE_TEMPLATE, $vce;
+    my @($var, @< @wt) =@( unpack VCE_TEMPLATE, $vce);
 
     if ($var) {
 	return pack(VCE_TEMPLATE, $var, 0, 0, 0,
@@ -486,7 +486,7 @@ sub splitEnt
 	my $i = 0;
         while ($i +< nelems @src) {
 	    if (exists $reH->{ @src[$i] } && $i + 1 +< nelems @src) {
-		(@src[$i], @src[$i+1]) = (@src[$i+1], @src[$i]);
+		@(@src[$i], @src[$i+1]) = @(@src[$i+1], @src[$i]);
 		$i++;
 	    }
             $i++;
@@ -693,7 +693,7 @@ sub getSortKey
     my $last_is_variable;
 
     foreach my $vwt ( @buf) {
-	my($var, < @wt) = unpack(VCE_TEMPLATE, $vwt);
+	my@($var, @< @wt) = unpack@(VCE_TEMPLATE, $vwt);
 
 	# "Ignorable (L1, L2) after Variable" since track. v. 9
 	if ($v2i) {
@@ -807,7 +807,7 @@ sub _uideoCE_8 {
 }
 
 sub _isUIdeo {
-    my ($u, $uca_vers) = < @_;
+    my @($u, $uca_vers) =  @_;
     return (
 	(CJK_UidIni +<= $u &&
 	    ($uca_vers +>= 14 ?? ( $u +<= CJK_UidF41) !! ($u +<= CJK_UidFin)))
@@ -945,7 +945,7 @@ sub index
 
     my $last_is_variable;
     for my $vwt ( map < $self->getWt($_), @$subE) {
-	my($var, < @wt) = unpack(VCE_TEMPLATE, $vwt);
+	my@($var, @< @wt) = unpack@(VCE_TEMPLATE, $vwt);
 	my $to_be_pushed = _nonIgnorAtLevel(\@wt,$lev);
 
 	# "Ignorable (L1, L2) after Variable" since track. v. 9
@@ -979,7 +979,7 @@ sub index
 	# fetch a grapheme
 	while ($i +<= $end && $found_base == 0) {
 	    for my $vwt ( $self->getWt($strE->[$i]->[0])) {
-		my($var, < @wt) = unpack(VCE_TEMPLATE, $vwt);
+		my@($var, @< @wt) = unpack@(VCE_TEMPLATE, $vwt);
 		my $to_be_pushed = _nonIgnorAtLevel(\@wt,$lev);
 
 		# "Ignorable (L1, L2) after Variable" since track. v. 9
@@ -1044,7 +1044,7 @@ sub index
 sub match
 {
     my $self = shift;
-    if (my($pos,$len) = < $self->index(@_[0], @_[1])) {
+    if (my@($pos,$len) =  $self->index(@_[0], @_[1])) {
 	my $temp = substr(@_[0], $pos, $len);
 	return $temp;
 	# An lvalue ref \substr should be avoided,
@@ -1075,7 +1075,7 @@ sub subst
     my $self = shift;
     my $code = ref @_[2] eq 'CODE' ?? @_[2] !! FALSE;
 
-    if (my($pos,$len) = < $self->index(@_[0], @_[1])) {
+    if (my@($pos,$len) =  $self->index(@_[0], @_[1])) {
 	if ($code) {
 	    my $mat = substr(@_[0], $pos, $len);
 	    substr(@_[0], $pos, $len, $code->($mat));

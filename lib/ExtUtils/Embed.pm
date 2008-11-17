@@ -44,7 +44,7 @@ sub my_return {
 }
 
 sub xsinit { 
-    my($file, $std, $mods) = < @_;
+    my@($file, $std, $mods) =  @_;
     my($fh,@mods,%seen);
     $file ||= "perlxsi.c";
     my $xsinit_proto = "pTHX";
@@ -89,15 +89,15 @@ EOF
 }    
 
 sub xsi_protos {
-    my(@exts) = @_;
+    my@(@exts) = @_;
     my(@retval,%seen);
     my $boot_proto = "pTHX_ CV* cv";
     foreach my $_ ( @exts){
-        my($pname) = < canon('/', $_);
+        my@($pname) =  canon('/', $_);
         my($mname, $cname);
         ($mname = $pname) =~ s!/!::!g;
         ($cname = $pname) =~ s!/!__!g;
-	my($ccode) = "EXTERN_C void boot_$($cname) ($boot_proto);\n";
+	my@($ccode) = "EXTERN_C void boot_$($cname) ($boot_proto);\n";
 	next if %seen{+$ccode}++;
         push(@retval, $ccode);
     }
@@ -105,15 +105,15 @@ sub xsi_protos {
 }
 
 sub xsi_body {
-    my(@exts) = @_;
+    my@(@exts) = @_;
     my($pname,@retval,%seen);
-    my($dl) = < canon('/','DynaLoader');
+    my@($dl) =  canon('/','DynaLoader');
     push(@retval, "\tchar *file = __FILE__;\n");
     push(@retval, "\tdXSUB_SYS;\n");
     push(@retval, "\n");
 
     foreach my $_ ( @exts){
-        my($pname) = < canon('/', $_);
+        my@($pname) =  canon('/', $_);
         my($mname, $cname, $ccode);
         ($mname = $pname) =~ s!/!::!g;
         ($cname = $pname) =~ s!/!__!g;
@@ -166,7 +166,7 @@ sub _ccdlflags {
 sub ldopts {
     require ExtUtils::MakeMaker;
     require ExtUtils::Liblist;
-    my($std,$mods,$link_args,$path) = < @_;
+    my@($std,$mods,$link_args,$path) =  @_;
     my(@mods,@link_args,@argv);
     my($dllib,$config_libs,@potential_libs,@path);
     local($") = ' ' unless $" eq ' ';
@@ -210,7 +210,7 @@ sub ldopts {
 	    if(-e ($extra = File::Spec->catdir($_,"auto",$root,"extralibs.ld"))) {
 		local(*FH); 
 		if(open(FH, "<", $extra)) {
-		    my($libs) = ~< *FH; chomp $libs;
+		    my@($libs) = ~< *FH; chomp $libs;
 		    push @potential_libs, < split m/\s+/, $libs;
 		}
 		else {  
@@ -237,7 +237,7 @@ sub ldopts {
 
     my $lpath = File::Spec->catdir(config_value("archlibexp"), 'CORE');
     $lpath = qq["$lpath"] if $^O eq 'MSWin32';
-    my($extralibs, $bsloadlibs, $ldloadlibs, $ld_run_path) = <
+    my@($extralibs, $bsloadlibs, $ldloadlibs, $ld_run_path) = 
 	MM->ext(join ' ', @( "-L$lpath", $libperl, < @potential_libs));
 
     my $ld_or_bs = $bsloadlibs || $ldloadlibs;
@@ -272,7 +272,7 @@ sub ccopts {
 }
 
 sub canon {
-    my($as, < @ext) = < @_;
+    my@($as, @< @ext) =  @_;
     foreach( @ext) {
        # might be X::Y or lib/auto/X/Y/Y.a
        next if s!::!/!g;

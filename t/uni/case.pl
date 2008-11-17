@@ -11,7 +11,7 @@ sub unidump {
 }
 
 sub casetest {
-    my ($base, $spec, < @funcs) = < @_;
+    my @($base, $spec, @< @funcs) =  @_;
     # For each provided function run it, and run a version with some extra
     # characters afterwards. Use a recycling symbol, as it doesn't change case.
     my $ballast = chr (0x2672) x 3;
@@ -30,7 +30,7 @@ sub casetest {
     my $simple = do $file or die $@;
     my %simple;
     for my $i (split(m/\n/, $simple)) {
-	my ($k, $v) = < split(' ', $i);
+	my @($k, $v) =  split(' ', $i);
 	%simple{+$k} = $v;
     }
     my %seen;

@@ -97,7 +97,7 @@ sub is_language_tag {
 
   ## Changes in the language tagging standards may have to be reflected here.
 
-  my($tag) = lc(@_[0]);
+  my@($tag) = lc@(@_[0]);
 
   return 0 if $tag eq "i" or $tag eq "x";
   # Bad degenerate cases that the following
@@ -138,7 +138,7 @@ sub extract_language_tags {
 
   ## Changes in the language tagging standards may have to be reflected here.
 
-  my($text) =
+  my@($text) =
     @_[0] =~ m/(.+)/  # to make for an untainted result
     ?? $1 !! ''
   ;
@@ -526,7 +526,7 @@ sub encode_language_tag {
 
   ## Changes in the language tagging standards may have to be reflected here.
 
-  my($tag) = @_[0] || return undef;
+  my@($tag) = @_[0] || return undef;
   return undef unless &is_language_tag($tag);
 
   # For the moment, these legacy variances are few enough that
@@ -689,7 +689,7 @@ do {
   );
   my($k,$v);
   while((nelems @panic)) {
-    ($k,$v) = splice(@panic,0,2);
+    @($k,$v) = splice@(@panic,0,2);
     foreach my $k (@(ref($k) ?? < @$k !! $k)) {
       foreach my $v (@(ref($v) ?? < @$v !! $v)) {
         push @{%Panic{+$k} ||= \@()}, $v unless $k eq $v;

@@ -243,7 +243,7 @@ on this.
 =cut
 
 sub check {
-    my ($utmpl, $href, $verbose) = < @_;
+    my @($utmpl, $href, $verbose) =  @_;
 
     ### did we get the arguments we need? ###
     return if !$utmpl or !$href;
@@ -553,7 +553,7 @@ It is exported upon request.
 do {   $_ERROR_STRING = '';
 
     sub _store_error {
-        my($err, $verbose, $offset) = < @_[[0..2]];
+        my@($err, $verbose, $offset) =  @_[[0..2]];
         $verbose ||= 0;
         $offset  ||= 0;
         my $level   = 1 + $offset;

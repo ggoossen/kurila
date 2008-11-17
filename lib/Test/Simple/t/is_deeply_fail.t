@@ -13,7 +13,7 @@ BEGIN {
 
 use Test::Builder;
 require Test::Simple::Catch;
-my($out, $err) = < Test::Simple::Catch::caught();
+my@($out, $err) =  Test::Simple::Catch::caught();
 Test::Builder->new->no_header(1);
 Test::Builder->new->no_ending(1);
 local %ENV{+HARNESS_ACTIVE} = 0;
@@ -32,7 +32,7 @@ sub ok ($;$) {
 }
 
 sub is ($$;$) {
-    my($this, $that, $name) = < @_;
+    my@($this, $that, $name) =  @_;
 
     my $ok = $TB->is_eq($$this, $that, $name);
 
@@ -42,7 +42,7 @@ sub is ($$;$) {
 }
 
 sub like ($$;$) {
-    my($this, $regex, $name) = < @_;
+    my@($this, $regex, $name) =  @_;
     $regex = "/$regex/" if !ref $regex and $regex !~ m{^/.*/$}s;
 
     my $ok = $TB->like($$this, $regex, $name);
