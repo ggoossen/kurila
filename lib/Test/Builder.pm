@@ -206,7 +206,7 @@ the appropriate headers.
 
 sub expected_tests {
     my $self = shift;
-    my@($max) =  @_;
+    my @(?$max) =  @_;
 
     if( (nelems @_) ) {
         die("Number of tests must be a positive integer.  You gave it '$max'")
@@ -290,7 +290,7 @@ the last one will be honored.
 =cut
 
 sub exported_to {
-    my@($self, $pack) =  @_;
+    my @($self, ?$pack) =  @_;
 
     if( defined $pack ) {
         $self->{+Exported_To} = $pack;
@@ -320,7 +320,7 @@ like Test::Simple's ok().
 =cut
 
 sub ok {
-    my@($self, $test, $name) =  @_;
+    my @($self, $test, ?$name) =  @_;
 
     # $test might contain an object which we don't want to accidentally
     # store, so we turn it into a boolean.
@@ -384,7 +384,7 @@ ERR
         my $msg = $todo ?? "Failed (TODO)" !! "Failed";
         $self->_print_diag("\n") if %ENV{?HARNESS_ACTIVE};
 
-    my@(_, $file, $line) =  $self->caller;
+    my@(_, $file, $line, ...) =  $self->caller;
         if( defined $name ) {
             $self->diag(qq[  $msg test '$name'\n]);
             $self->diag(qq[  at $file line $line.\n]);
@@ -432,7 +432,7 @@ numeric version.
 =cut
 
 sub is_eq {
-    my@($self, $got, $expect, $name) =  @_;
+    my@($self, $got, $expect, ?$name) =  @_;
     local $Level = $Level + 1;
 
     if( !defined $got || !defined $expect ) {
@@ -456,7 +456,7 @@ sub is_eq {
 }
 
 sub is_num {
-    my@($self, $got, $expect, $name) =  @_;
+    my@($self, $got, $expect, ?$name) =  @_;
     local $Level = $Level + 1;
 
     if( !defined $got || !defined $expect ) {
@@ -499,7 +499,7 @@ the numeric version.
 =cut
 
 sub isnt_eq {
-    my@($self, $got, $dont_expect, $name) =  @_;
+    my@($self, $got, $dont_expect, ?$name) =  @_;
     local $Level = $Level + 1;
 
     if( !defined $got || !defined $dont_expect ) {
@@ -559,14 +559,14 @@ given $regex.
 =cut
 
 sub like {
-    my@($self, $this, $regex, $name) =  @_;
+    my@($self, $this, $regex, ?$name) =  @_;
 
     local $Level = $Level + 1;
     $self->_regex_ok($this, $regex, '=~', $name);
 }
 
 sub unlike {
-    my@($self, $this, $regex, $name) =  @_;
+    my@($self, $this, $regex, ?$name) =  @_;
 
     local $Level = $Level + 1;
     $self->_regex_ok($this, $regex, '!~', $name);
@@ -588,7 +588,7 @@ my %numeric_cmps = %( < map { ($_, 1) }
  @(                       ("<",  "<=", ">",  ">=", "==", "!=", "<=>")) );
 
 sub cmp_ok {
-    my@($self, $got, $type, $expect, $name) =  @_;
+    my@($self, $got, $type, $expect, ?$name) =  @_;
 
     my $test;
     do {
@@ -635,7 +635,7 @@ DIAGNOSTIC
 sub _caller_context {
     my $self = shift;
 
-    my @($pack, $file, $line, ...) =  $self->caller(1);
+    my @(?$pack, ?$file, ?$line, ...) =  $self->caller(1);
 
     my $code = '';
     $code .= "#line $line $file\n" if defined $file and defined $line;
@@ -731,7 +731,7 @@ to
 =cut
 
 sub todo_skip {
-    my@($self, $why) =  @_;
+    my @($self, $why) =  @_;
     $why ||= '';
 
     $self->_plan_check;
@@ -823,8 +823,8 @@ sub maybe_regex {
         $usable_regex = $regex;
     }
     # Check for '/foo/' or 'm,foo,'
-    elsif( @($re, $opts)        = $regex =~ m{^ /(.*)/ (\w*) $ }sx           or
-           @(_, $re, $opts) = @: $regex =~ m,^ m([^\w\s]) (.+) \1 (\w*) $,sx
+    elsif( @(?$re, ?$opts)        = @($regex =~ m{^ /(.*)/ (\w*) $ }sx)           or
+           @(?_, ?$re, ?$opts) = @: $regex =~ m,^ m([^\w\s]) (.+) \1 (\w*) $,sx
          )
     {
         $usable_regex = length $opts ?? "(?$opts)$re" !! $re;
@@ -896,7 +896,7 @@ It is suggested you use this in place of eval BLOCK.
 =cut
 
 sub _try {
-    my@($self, $code) =  @_;
+    my @($self, $code) =  @_;
     
     local $!;               # eval can mess up $!
     local $@;               # don't set $@ in the test
@@ -1199,7 +1199,7 @@ sub output {
 }
 
 sub failure_output {
-    my@($self, $fh) =  @_;
+    my@($self, ?$fh) =  @_;
 
     if( defined $fh ) {
         $self->{+Fail_FH} = $self->_new_fh($fh);
@@ -1208,7 +1208,7 @@ sub failure_output {
 }
 
 sub todo_output {
-    my@($self, $fh) =  @_;
+    my@($self, ?$fh) =  @_;
 
     if( defined $fh ) {
         $self->{+Todo_FH} = $self->_new_fh($fh);
@@ -1319,7 +1319,7 @@ can erase history if you really want to.
 =cut
 
 sub current_test {
-    my@($self, $num) =  @_;
+    my@($self, ?$num) =  @_;
 
     lock($self->{?Curr_Test});
     if( defined $num ) {
@@ -1469,7 +1469,7 @@ C<$height> will be added to the level().
 =cut
 
 sub caller {
-    my@($self, $height) =  @_;
+    my@($self, ?$height) =  @_;
     $height ||= 0;
 
     my @caller = @( CORE::caller($self->level + $height + 1) );

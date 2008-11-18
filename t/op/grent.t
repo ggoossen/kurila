@@ -176,7 +176,7 @@ my @gr2;
 
 setgrent();
 for (1..$max) {
-    my @($gr) = @(getgrent());
+    my @($gr, ...) = @(getgrent());
     last unless defined $gr;
     push @gr2, $gr;
 }

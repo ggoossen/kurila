@@ -849,7 +849,7 @@ if (m/(\C)/g) {
 
 do {
   # japhy -- added 03/03/2001
-  @() = (my $str = "abc") =~ m/(...)/;
+  @(_) = @: (my $str = "abc") =~ m/(...)/;
   $str = "def";
   ok($1 eq "abc");
 };
@@ -874,7 +874,7 @@ do {
     my @x = @("stra\x{DF}e 138","stra\x{DF}e 138");
     for ( @x) {
 	s/(\d+)\s*([\w\-]+)/$($1 . uc $2)/;
-	my@($latin) = m/^(.+)(?:\s+\d)/;
+	my @($latin) = @: m/^(.+)(?:\s+\d)/;
 	ok($latin eq "stra\x{DF}e");
 	$latin =~ s/stra\x{DF}e/straße/; # \303\237 after the 2nd a
 	use utf8; # needed for the raw UTF-8
@@ -2284,7 +2284,7 @@ for (120 .. 130) {
 
 # perl #25269: panic: pp_match start/end pointers
 ok("a-bc" eq try {
-	my@($x, $y) = "bca" =~ m/^(?=.*(a)).*(bc)/;
+	my @($x, $y) = @: "bca" =~ m/^(?=.*(a)).*(bc)/;
 	"$x-$y";
 }, 'captures can move backwards in string'); die if $@;
 
@@ -2994,7 +2994,7 @@ do {
 do {
     # From Message-ID: <877ixs6oa6.fsf@k75.linux.bogus>
     my $dow_name= "nada";
-    my $parser = "use utf8; (\$dow_name) = \$time_string =~ m/(D\x{e9}\\ C\x{e9}adaoin|D\x{e9}\\ Sathairn|\\w+|\x{100})/;";
+    my $parser = "use utf8; \@(\$dow_name) = \@: \$time_string =~ m/(D\x{e9}\\ C\x{e9}adaoin|D\x{e9}\\ Sathairn|\\w+|\x{100})/;";
     my $time_string = "D\x{e9} C\x{e9}adaoin";
     eval $parser; die if $@;
     ok(!$@,"Test Eval worked");

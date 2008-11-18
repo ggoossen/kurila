@@ -532,7 +532,7 @@ sub Follow_SymLink($) {
     my @($AbsName) = @_;
 
     my ($NewName,$DEV, $INO);
-    @($DEV, $INO, ...) = lstat $AbsName;
+    @($DEV, $INO, ...) = @: lstat $AbsName;
 
     while (-l _) {
 	if (%SLnkSeen{+ $DEV . "," . $INO}++) {
@@ -555,7 +555,7 @@ sub Follow_SymLink($) {
 	else {
 	    $AbsName= $NewName;
 	}
-	@($DEV, $INO, ...) = lstat($AbsName);
+	@($DEV, $INO, ...) = @: lstat($AbsName);
 	return undef unless defined $DEV;  #  dangling symbolic link
     }
 
@@ -718,7 +718,7 @@ sub _find_opt {
 	}
 
 	unless ($Is_Dir) {
-	    unless (@(?$_,?$dir) = File::Basename::fileparse($abs_dir)) {
+	    unless (@(?$_,?$dir, _) = File::Basename::fileparse($abs_dir)) {
 		if ($Is_MacOS) {
 		    @($dir,$_) = @(':', $top_item); # $File::Find::dir, $_
 		}

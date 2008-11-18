@@ -373,7 +373,7 @@ sub _parse_uri {
     } else { 
         ### using anything but qw() in hash slices may produce warnings 
         ### in older perls :-(
-        %{$href}{[qw(host path) ]} = $uri =~ m|([^/]*)(/.*)$|s;
+        %{$href}{[qw(host path) ]} = @: $uri =~ m|([^/]*)(/.*)$|s;
     }
 
     ### split the path into file + dir ###

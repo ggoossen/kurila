@@ -53,7 +53,8 @@ sub alias (@)
 
 sub alias_file ($)
 {
-  my @($arg, $file) =  @_;
+  my @($arg) =  @_;
+  my $file;
   if (-f $arg && File::Spec->file_name_is_absolute ($arg)) {
     $file = $arg;
   }
@@ -193,7 +194,7 @@ sub import
     push @args, $arg;
   }
   (nelems @args) == 0 && $promote and @args = @(":full");
-   %h{[ @args]} = (1) x nelems @args;
+   %h{[ @args]} = @(1) x nelems @args;
 
   %^H{+charnames_full} = delete %h{':full'};
   %^H{+charnames_short} = delete %h{':short'};

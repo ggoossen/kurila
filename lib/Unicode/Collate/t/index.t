@@ -50,7 +50,7 @@ ok($str, $ret);
 $Collator->change(< %old_level);
 
 $str = $orig;
-if (my@($pos,$len) =  $Collator->index($str, $sub)) {
+if (my @($pos,$len) =  $Collator->index($str, $sub)) {
   substr($str, $pos, $len, $rep);
 }
 

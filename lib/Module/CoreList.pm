@@ -101,7 +101,7 @@ END {
 
 
 sub first_release_raw {
-    my @($discard, $module, $version) =  @_;
+    my @($discard, $module, ?$version) =  @_;
 
     my @perls = @( $version
         ?? < grep { exists %version{$_}->{ $module } &&
@@ -131,7 +131,7 @@ sub find_modules {
 
     my %mods;
     foreach ( @perls) {
-        while (my @($k, $v) =@( each %{%version{$_}})) {
+        while (my @(?$k, ?$v) =@( each %{%version{$_}})) {
             %mods{+$k}++ if $k =~ $regex;
         }
     }

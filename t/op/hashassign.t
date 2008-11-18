@@ -182,7 +182,7 @@ ok (eq_hash (\%names_copy, \%names_copy2), "duplicates at both ends");
 # duplicate keys [perl #24380]
 do {
     my %h; my $x; my $ar;
-    is( (join ':', @( (@(%<%h) = (1) x 8 ))), '1:1',
+    is( (join ':', (@(%<%h) = @(1) x 8 )), '1:1',
 	'hash assignment in list context removes duplicates' );
 };
 

@@ -337,8 +337,8 @@ TODO: do {
     ok (!defined*{Symbol::fetch_glob($name2)}->[0],
 	'defined via a different NUL-containing name gives nothing');
 
-    my @(undef, $one) =  @{*{Symbol::fetch_glob($name1)}}[[@(2,3)]];
-    my @(undef, $two) =  @{*{Symbol::fetch_glob($name2)}}[[@(2,3)]];
+    my @(_, $one) =  @{*{Symbol::fetch_glob($name1)}}[[@(2,3)]];
+    my @(_, $two) =  @{*{Symbol::fetch_glob($name2)}}[[@(2,3)]];
     is ($one, undef, 'Nothing before we start (array slices)');
     is ($two, undef, 'Nothing before we start');
      @{*{Symbol::fetch_glob($name1)}}[[@(2,3)]] = @("Very", "Yummy");

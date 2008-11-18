@@ -103,7 +103,7 @@ foreach my $platform ( @platforms) {
 
 sub volumes_differ {
   my @($module, $one, $two) =  @_;
-  my @($one_v) =  $module->splitpath( $module->rel2abs($one) );
-  my @($two_v) =  $module->splitpath( $module->rel2abs($two) );
+  my @($one_v, ...) =  $module->splitpath( $module->rel2abs($one) );
+  my @($two_v, ...) =  $module->splitpath( $module->rel2abs($two) );
   return $one_v ne $two_v;
 }

@@ -50,7 +50,7 @@ sub new {
     unless (defined($v) && (ref($v) eq 'ARRAY'));
   $n = \@() unless (defined($n) && (ref($v) eq 'ARRAY'));
 
-  my@($s) = \%( 
+  my $s = \%( 
              level      => 0,           # current recursive depth
 	     indent     => $Indent,     # various styles of indenting
 	     pad	=> $Pad,        # all lines prefixed by this string
@@ -164,9 +164,9 @@ sub Dump {
 #
 our @post;
 sub Dumpperl {
-  my@($s) =@( shift);
+  my $s = shift;
   my(@out, $name);
-  my@($i) = 0;
+  my $i = 0;
   local(@post);
   init_refaddr_format();
 
@@ -436,7 +436,7 @@ sub _dump {
         $pair = $s->{?pair};
         $mname = $name . '->';
         $mname .= '->' if $mname =~ m/^\*.+\{[A-Z]+\}$/;
-        my @($sortkeys, $keys, $key) = @($s->{?sortkeys});
+        my @($sortkeys, ?$keys, ?$key) = @($s->{?sortkeys});
         if ($sortkeys) {
             if (ref($s->{?sortkeys}) eq 'CODE') {
                 $keys = $s->{?sortkeys}->($rval);
@@ -448,9 +448,9 @@ sub _dump {
                 $keys = \ sort keys %$rval;
             }
         }
-        while (@($k, $v) = ! $sortkeys ?? (each %$rval) !!
-               (nelems @$keys) ?? ($key = shift(@$keys), $rval->{?$key}) !!
-               () ) {
+        while (@(?$k, ?$v) = ! $sortkeys ?? @(each %$rval) !!
+               (nelems @$keys) ?? @($key = shift(@$keys), $rval->{?$key}) !!
+               @() ) {
             my $nk = $s->_dump($k, "");
             $nk = $1 if !$s->{?quotekeys} and $nk =~ m/^[\"\']([A-Za-z_]\w*)[\"\']$/;
             $sname = $mname . '{' . $nk . '}';

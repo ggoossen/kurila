@@ -105,7 +105,7 @@ sub skip {
 }
 
 sub ok {
-    my ($n, $result, < @info) = < @_;
+    my @($n, $result, @< @info) = < @_;
     if ($result) {
     	print "ok $n\n";
     }

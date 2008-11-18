@@ -257,7 +257,7 @@ while (defined (my $file = next_file())) {
 	    my @enum_subs = split(m/,/, $enum_subs);
 	    my $enum_val = -1;
 	    foreach my $enum ( @enum_subs) {
-		my @($enum_name, $enum_value) = $enum =~ m/^([a-zA-Z_]\w*)(=.+)?$/;
+		my @($enum_name, $enum_value) = @: $enum =~ m/^([a-zA-Z_]\w*)(=.+)?$/;
 		$enum_name or next;
 		$enum_value =~ s/^=//;
 		$enum_val = (length($enum_value) ?? $enum_value !! $enum_val + 1);

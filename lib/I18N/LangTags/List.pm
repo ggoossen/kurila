@@ -15,8 +15,8 @@ do {
   while( ~< *I18N::LangTags::List::DATA) {
     if($seeking) {
       $seeking = 0 if m/=for woohah/;
-    } elsif( @($disrec, $tag, $name) =
-          m/(\[?)\{([-0-9a-zA-Z]+)\}(?:\s*:)?\s*([^\[\]]+)/
+    } elsif( @(?$disrec, ?$tag, ?$name) =
+          @: m/(\[?)\{([-0-9a-zA-Z]+)\}(?:\s*:)?\s*([^\[\]]+)/
     ) {
       $name =~ s/\s*[;\.]*\s*$//g;
       next unless $name;

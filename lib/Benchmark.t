@@ -3,7 +3,7 @@
 use warnings;
 
 use vars < qw($foo $bar $baz $ballast);
-use Test::More tests => 192;
+use Test::More tests => 182;
 
 use Benchmark < qw(:all);
 
@@ -107,7 +107,7 @@ do {
     like ($all, $All_Pattern, 'timestr ($diff, "all")');
     print "# $all\n";
 
-    my @($wallclock, $usr, $sys, $cusr, $csys, $cpu) = $all =~ $All_Pattern;
+    my @($wallclock, $usr, $sys, $cusr, $csys, $cpu) = @: $all =~ $All_Pattern;
 
     is (timestr ($diff, 'none'), '', "none supresses output");
 
@@ -330,7 +330,7 @@ sub check_graph_vs_output {
     my @(	$ratetext, $slowc, $fastc,
         $slowr, $slowratet, $slowslow, $slowfastt,
         $fastr, $fastratet, $fastslowt, $fastfast)
-        = $got =~ $graph_dissassembly;
+        = @: $got =~ $graph_dissassembly;
     my $all_passed
       = check_graph_consistency (        $ratetext, $slowc, $fastc,
                                  $slowr, $slowratet, $slowslow, $slowfastt,
@@ -544,27 +544,20 @@ do {   # Check usage error messages
                      'not result' => 'cmpthese(42)',
                      'array ref'  => 'cmpthese( 42, \@( foo => sub { 1 } ) )',
                     );
-    while( my@($name, $code) =@( each %cmpthese) ) {
+    while( my@(?$name, ?$code) =@( each %cmpthese) ) {
         eval $code;
         is( $@->{?description}, %usage{?cmpthese}, "cmpthese usage: $name" );
     }
 
     my %timethese = %('forgot {}'  => 'timethese( 42, foo => sub { 1 } )',
-                       'no code'    => 'timethese(42)',
                        'array ref'  => 'timethese( 42, \@( foo => sub { 1 } ) )',
                       );
 
-    while( my@($name, $code) =@( each %timethese) ) {
+    while( my@(?$name, ?$code) =@( each %timethese) ) {
         eval $code;
         is( $@->{?description}, %usage{?timethese}, "timethese usage: $name" );
     }
 
-
-    while( my@($func, $usage) =@( each %usage) ) {
-        next if grep $func eq $_, @takes_no_args;
-        eval "$func()";
-        is( $@->{?description}, $usage, "$func usage: no args" );
-    }
 
     foreach my $func ( @takes_no_args) {
         eval "$func(42)";

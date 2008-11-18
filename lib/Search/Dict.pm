@@ -46,7 +46,7 @@ transform the lines read from the filehandle before their comparison.
 =cut
 
 sub look {
-    my@($fh,$key,$dict,$fold) =  @_;
+    my@($fh,$key,?$dict,?$fold) =  @_;
     my ($comp, $xfrm);
     if ((nelems @_) == 3 && ref $dict eq 'HASH') {
 	my $params = $dict;

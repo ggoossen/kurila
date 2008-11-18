@@ -16,12 +16,12 @@ sub new      { bless \%() }
 
 package main;
 
-use Test::More tests => 15;
+use Test::More tests => 14;
 
 BEGIN {
     %ENV{+PERL_RL} = 'Mock'; # test against our instrumented class
-    use_ok('Term::ReadLine');
 }
+use Term::ReadLine;
 
 my $t = Term::ReadLine->new( 'test term::readline');
 

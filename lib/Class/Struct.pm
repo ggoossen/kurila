@@ -74,7 +74,7 @@ sub struct {
     my $out = '';
 
     $out = "do \{\n  package $class;\n  sub new \{\n";
-    $out .= "    my (\$class, < \%init) = < \@_;\n";
+    $out .= "    my \@(?\$class, \%< \%init) = \@_;\n";
     $out .= "    \$class = __PACKAGE__ unless \@_;\n";
 
     my $cnt = 0;

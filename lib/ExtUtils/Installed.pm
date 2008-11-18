@@ -76,7 +76,7 @@ sub _is_under {
 }
 
 sub new {
-    my @($class) = shift@(@_);
+    my $class = shift(@_);
     $class = ref($class) || $class;
 
     my %args = %( < @_ );
@@ -223,7 +223,7 @@ sub modules {
 }
 
 sub files {
-    my @($self, $module, $type, @< @under) =  @_;
+    my @($self, $module, ?$type, @< @under) =  @_;
 
     # Validate arguments
     die("$module is not installed") if (! exists($self->{$module}));
@@ -241,7 +241,7 @@ sub files {
 }
 
 sub directories {
-    my @($self, $module, $type, @< @under) =  @_;
+    my @($self, $module, ?$type, @< @under) =  @_;
     my (%dirs);
     foreach my $file ( $self->files($module, $type, < @under)) {
         %dirs{+dirname($file)}++;
@@ -266,7 +266,7 @@ sub directory_tree {
 }
 
 sub validate {
-    my @($self, $module, $remove) =  @_;
+    my @($self, $module, ?$remove) =  @_;
     die("$module is not installed") if (! exists($self->{$module}));
     return $self->{$module}->{?packlist}->validate($remove);
 }

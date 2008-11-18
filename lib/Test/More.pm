@@ -218,7 +218,7 @@ This is the same as Test::Simple's ok() routine.
 =cut
 
 sub ok ($;$) {
-    my@($test, $name) =  @_;
+    my@($test, ?$name) =  @_;
     my $tb = Test::More->builder;
 
     $tb->ok($test, $name);
@@ -482,7 +482,7 @@ you'd like them to be more specific, you can supply an $object_name
 =cut
 
 sub isa_ok ($$;$) {
-    my@($object, $class, $obj_name) =  @_;
+    my@($object, $class, ?$obj_name) =  @_;
     my $tb = Test::More->builder;
 
     my $diag;
@@ -643,7 +643,7 @@ USE
     unless( $ok ) {
         $tb->diag(<<DIAGNOSTIC);
     Tried to use '$module'.
-    Error:  $($eval_error->message)
+    Error:  $($eval_error->message . $eval_error->stacktrace)
 DIAGNOSTIC
 
     }
@@ -670,7 +670,7 @@ sub _eval {
 =cut
 
 sub dies_like {
-    my @($coderef, $like, $name) =  @_;
+    my @($coderef, $like, ?$name) =  @_;
 
     my $tb = Test::More->builder;
 
@@ -679,7 +679,7 @@ sub dies_like {
         return $tb->ok(0, $name);
     }
     my $err = $@->message;
-    return $tb->like($err, $like, $name);
+    return $tb->like($err, $like, $name) or diag($@->stacktrace);
 }
 
 =item B<require_ok>
@@ -791,7 +791,7 @@ WARNING
 	return $tb->ok(0);
     }
 
-    my@($got, $expected, $name) =  @_;
+    my @($got, $expected, ?$name) =  @_;
 
     my $ok;
 
@@ -808,7 +808,7 @@ WARNING
 }
 
 sub _format_stack {
-    my@(@Stack) = @_;
+    my @Stack = @_;
 
     my $var = '$FOO';
     my $prev_ref = 0;
@@ -985,7 +985,7 @@ use TODO.  Read on.
 
 #'#
 sub skip {
-    my@($why, $how_many) =  @_;
+    my@($why, ?$how_many) =  @_;
     my $tb = Test::More->builder;
 
     unless( defined $how_many ) {
@@ -1071,7 +1071,7 @@ interpret them as passing.
 =cut
 
 sub todo_skip {
-    my@($why, $how_many) =  @_;
+    my@($why, ?$how_many) =  @_;
     my $tb = Test::More->builder;
 
     unless( defined $how_many ) {
@@ -1340,7 +1340,7 @@ Test::Deep contains much better set comparison functions.
 =cut
 
 sub eq_set  {
-    my@($a1, $a2) =  @_;
+    my @($a1, $a2, ?$name) =  @_;
     return 0 unless (nelems @$a1) == nelems @$a2;
 
     # There's faster ways to do this, but this is easiest.

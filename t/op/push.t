@@ -26,7 +26,7 @@ if (join(':', @x) eq '1:2:3:1:2:3:4') {print "ok 2\n";} else {print "not ok 2\n"
 our $test = 3;
 foreach my $line ( @tests) {
     my @($list,$get,$leave) =  split(m/,\t*/,$line);
-    my @($pos, $len, @< @list) =  split(' ',$list);
+    my @($pos, ?$len, @< @list) =  split(' ',$list);
     my @get = split(' ',$get);
     my @leave = split(' ',$leave);
     @x = @(0,1,2,3,4,5,6,7);

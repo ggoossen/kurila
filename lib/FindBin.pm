@@ -177,14 +177,14 @@ sub init
      $script = File::Spec->catfile(cwd2(), $script)
        unless File::Spec->file_name_is_absolute($script);
 
-     @($Script,$Bin) =  fileparse($script);
+     @($Script,$Bin, _) =  fileparse($script);
 
      # Resolve $script if it is a link
      while(1)
       {
        my $linktext = readlink($script);
 
-       @($RealScript,$RealBin) =  fileparse($script);
+       @($RealScript,$RealBin, _) =  fileparse($script);
        last unless defined $linktext;
 
        $script = (File::Spec->file_name_is_absolute($linktext))

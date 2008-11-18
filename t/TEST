@@ -523,7 +523,7 @@ EOT
     } # while tests
 
     if ($::bad_files == 0) {
-	if ($good_files) {
+	if ($good_files || $::failed) {
 	    print "All tests successful.\n";
 	    # XXX add mention of 'perlbug -ok' ?
 	}

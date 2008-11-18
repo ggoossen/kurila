@@ -10,8 +10,8 @@ my $file="../lib/unicore/CaseFolding.txt";
 open my $fh,"<",$file or die "Failed to read '$file': $!";
 while (~< $fh) {
     chomp;
-    my @($line,$comment)=  split m/\s+#\s+/, $_;
-    my @($cp,$type,@< @fc)= split m/[\s;]+/,$line||'';
+    my @(?$line, ?$comment)=  split m/\s+#\s+/, $_;
+    my @(?$cp, ?$type, @< @fc)= split m/[\s;]+/,$line||'';
     next unless $type and ($type eq 'F' or $type eq 'C');
     $_="\\x\{$_\}" for  @fc;
     my $chr="chr(0x$cp)";

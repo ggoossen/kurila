@@ -429,7 +429,7 @@ sub pod2html {
 		if (@poddata[$i] =~ m/^=head1\s*NAME\b/m) {
  		    for my $para ( @poddata[[@($i, $i+1)]] ) {
 			last TITLE_SEARCH
-			    if ($Title) = $para =~ m/(\S+\s+-+.*\S)/s;
+			    if @(?$Title) = @: $para =~ m/(\S+\s+-+.*\S)/s;
 		    }
 		}
 
@@ -439,7 +439,7 @@ sub pod2html {
     if (!$Title and $Podfile =~ m/\.pod\z/) {
 	# probably a split pod so take first =head[12] as title
  	for my $i (0 .. nelems(@poddata) -1) {
-	    last if ($Title) = @poddata[$i] =~ m/^=head[12]\s*(.*)/;
+	    last if @($Title) = @: @poddata[$i] =~ m/^=head[12]\s*(.*)/;
 	}
 	warn "adopted '$Title' as title for $Podfile\n"
 	    if $Verbose and $Title;
@@ -1547,7 +1547,7 @@ sub process_text_rfc_links {
 }
 
 sub process_text1($$;$$){
-    my@( $lev, $rstr, $func, $closing ) =  @_;
+    my@( $lev, $rstr, ?$func, ?$closing ) =  @_;
     my $res = '';
 
     unless (defined $func) {
@@ -1775,7 +1775,7 @@ sub go_ahead($$$){
 #    $text is the depod-ed text
 #
 sub emit_C($;$$){
-    my@( $text, $nocode, $args ) =  @_;
+    my@( $text, ?$nocode, ?$args ) =  @_;
     $args = '' unless defined $args;
     my $res;
     my@( $url, $fid ) =  coderef( undef(), $text );
@@ -2091,7 +2091,7 @@ sub depod($){
 }
 
 sub depod1($;$$){
-  my@( $rstr, $func, $closing ) =  @_;
+  my@( $rstr, ?$func, ?$closing ) =  @_;
   my $res = '';
   return $res unless defined $$rstr;
   if( ! defined( $func ) ){

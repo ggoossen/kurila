@@ -42,7 +42,7 @@ sub is ($$;$) {
 }
 
 sub like ($$;$) {
-    my@($this, $regex, $name) =  @_;
+    my@($this, $regex, ?$name) =  @_;
     $regex = "/$regex/" if !ref $regex and $regex !~ m{^/.*/$}s;
 
     my $ok = $TB->like($$this, $regex, $name);
@@ -329,7 +329,7 @@ ERR
 # rt.cpan.org 14746
 do {
   TODO: do {
-        $TB->todo_skip("different subs", 2);
+        $TB->todo_skip("different subs");
         last TODO;
 
 # line 349
@@ -348,7 +348,7 @@ ERR
     my $glob2 = gensym;
 
   TODO: do {
-        $TB->todo_skip("different subs", 2);
+        $TB->todo_skip("different subs");
         last TODO;
 #line 357
         ok !is_deeply( $glob1, $glob2 ), 'typeglobs';

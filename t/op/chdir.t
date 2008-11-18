@@ -28,7 +28,7 @@ my $Cwd = abs_path;
 
 # Let's get to a known position
 SKIP: do {
-    my @($vol,$dir) =  splitpath(abs_path,1);
+    my @($vol,$dir, ...) =  splitpath(abs_path,1);
     my $test_dir = $IsVMS ?? 'T' !! 't';
     skip("Already in t/", 2) if (splitdir($dir))[-1] eq $test_dir;
 

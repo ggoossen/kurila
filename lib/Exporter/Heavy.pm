@@ -23,13 +23,13 @@ No user-serviceable parts inside.
 #
 
 sub _rebuild_cache {
-    my @($pkg, $exports, $cache) = < @_;
+    my @($pkg, $exports, $cache) = @_;
     s/^&// foreach  @$exports;
-    %{$cache}{[ @$exports]} = (1) x nelems @$exports;
+    %{$cache}{[ @$exports]} = @(1) x nelems @$exports;
     my $ok = \@{*{Symbol::fetch_glob("$($pkg)::EXPORT_OK")}};
     if ((nelems @$ok)) {
 	s/^&// foreach  @$ok;
- 	%{$cache}{[ @$ok]} = (1) x nelems @$ok;
+ 	%{$cache}{[ @$ok]} = @(1) x nelems @$ok;
     }
 }
 
@@ -85,7 +85,7 @@ sub heavy_export {
 		   foreach my $sym ( @names) { delete %imports{$sym} } 
 		}
 		else {
-		    %imports{[ @names]} = (1) x nelems @names;
+		    %imports{[ @names]} = @(1) x nelems @names;
 		}
 	    }
 	    @imports = keys %imports;

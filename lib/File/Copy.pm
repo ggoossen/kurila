@@ -229,7 +229,7 @@ sub move {
     }
 
     my $rename_to = $to;
-    if (-$^O eq 'VMS' && -e $from) {
+    if ($^O eq 'VMS' && -e $from) {
 
         if (! -d $to && ! -d $from) {
             # VMS has sticky defaults on extensions, which means that
@@ -271,7 +271,7 @@ sub move {
     };
     @($sts,$ossts) = @($! + 0, $^E + 0);
 
-    @($tosz2,$tomt2) = @(< @(stat($to))[[@:7,9]],0,0) if defined $tomt1;
+    @($tosz2,$tomt2, ...) = @(< @(stat($to))[[@:7,9]],0,0) if defined $tomt1;
     unlink($to) if !defined($tomt1) or $tomt1 != $tomt2 or $tosz1 != $tosz2;
     @($!,$^E) = @($sts,$ossts);
     return 0;

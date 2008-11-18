@@ -397,7 +397,7 @@ my @lengths = @( <
   'l!'  => config_value("longsize"),  'L!'  => config_value("longsize"),
 );
 
-while (my @($base, $expect) =@( splice @lengths, 0, 2)) {
+while (my @(?$base, ?$expect) =@( splice @lengths, 0, 2)) {
   my @formats = @($base);
   $base =~ m/^[nv]/i or push @formats, "$base>", "$base<";
   for my $format ( @formats) {
@@ -703,7 +703,8 @@ sub byteorder
   print "# byteorder test for $format\n";
   for my $value ( @_) {
     SKIP: do {
-      my@($nat,$be,$le) = try { < map { pack $format.$_, $value } @( '', '>', '<') };
+      my ($nat,$be,$le);
+      try { @($nat, $be, $le) = map { pack $format.$_, $value } @( '', '>', '<') };
       skip "cannot pack '$format' on this perl", 5
         if is_valid_error($@);
 
@@ -759,7 +760,8 @@ SKIP: do {
 
   for my $format (qw(s i l j s! i! l! q)) {
     SKIP: do {
-      my@($nat,$be,$le) = try { < map { pack $format.$_, -1 } @( '', '>', '<') };
+      my ($nat,$be,$le);
+      try { @($nat,$be,$le) = map { pack $format.$_, -1 } @( '', '>', '<') };
       skip "cannot pack '$format' on this perl", 15
         if is_valid_error($@);
 
@@ -792,7 +794,7 @@ SKIP: do {
       }
 
       for my $i (0 .. (nelems @val)-1) {
-        my@($nat,$be,$le) = try { < map { pack $format.$_, @val[$i] } @( '', '>', '<') };
+        my @($nat,$be,$le) = try { map { pack $format.$_, @val[$i] } @( '', '>', '<') };
         is($@, '');
 
         SKIP: do {
@@ -1071,7 +1073,7 @@ SKIP: do {
 
   for my $t (qw{ (s<)> (sl>s)< (s(l(sl)<l)s)> }) {
     print "# testing pattern '$t'\n";
-    try { ($_) = unpack($t, 'x'x18); };
+    try { @($_) = @: unpack($t, 'x'x18); };
     like($@->{?description}, qr/Can't use '[<>]' in a group with different byte-order in unpack/);
     try { $_ = pack($t, (0)x6); };
     like($@->{?description}, qr/Can't use '[<>]' in a group with different byte-order in pack/);
@@ -1141,7 +1143,7 @@ do {
 
     my $h = $buf;
     $h =~ s/[^[:print:]]/./g;
-    @( $s, $y ) = unpack@( "Z*/A* C", $buf );
+    @( $s, $y ) = @: unpack( "Z*/A* C", $buf );
     is($h, "30.ABCABCABCABCABCABCABCABCABCABC$t");
     is(length $buf, 34);
     is($s, "ABCABCABCABCABCABCABCABCABCABC");
@@ -1340,12 +1342,12 @@ do {  # Repeat count [SUBEXPR]
        my $c = 1;
        $c = $1 if $count =~ m/(\d+)/;
        my @list1 = @list;
-       @list1 = @( (< @list1) x $c ) unless $type =~ m/[XxAaZBbHhP]/;
+       @list1 = @list1 x $c unless $type =~ m/[XxAaZBbHhP]/;
        for my $groupend (@('', ')2', ')[8]')) {
 	   my $groupbegin = ($groupend ?? '(' !! '');
 	   $c = 1;
 	   $c = $1 if $groupend =~ m/(\d+)/;
-	   my @list2 = @( (< @list1) x $c );
+	   my @list2 = @list1 x $c ;
 
            SKIP: do {
 	     my $junk1 = "$groupbegin $type$count $groupend";
@@ -1353,7 +1355,7 @@ do {  # Repeat count [SUBEXPR]
 	     my $p = try { pack $junk1, < @list2 };
              skip "cannot pack '$type' on this perl", 12
                if is_valid_error($@);
-	     die "pack $junk1 failed: $@" if $@;
+	     die "pack $junk1 failed: $($@->message . $@->stacktrace)" if $@;
 
 	     my $half = int( (length $p)/2 );
 	     for my $move (@('', "X$half", "X!$half", 'x1', 'x!8', "x$half")) {
@@ -1830,7 +1832,7 @@ do {
 do {
     # Testing pack . and .!
     is(pack("(a)5 .", < 1..5, 3), "123", ". relative to string start, shorten");
-    try { @() = pack@("(a)5 .", < 1..5, -3) };
+    try { @(...) = @: pack("(a)5 .", < 1..5, -3) };
     like($@->{?description}, qr{'\.' outside of string in pack}, "Proper error message");
     is(pack("(a)5 .", < 1..5, 8), "12345\0\0\0",
        ". relative to string start, extend");

@@ -25,7 +25,7 @@ is $tb->_try(sub { return '' }), '';
 
 is $tb->_try(sub { die; }), undef;
 
-is_deeply \@($tb->_try(sub { die "Foo\n" }, undef)),
+is_deeply \@($tb->_try(sub { die "Foo\n" })),
           \@(undef);
 
 is $@, 42;

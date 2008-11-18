@@ -52,7 +52,7 @@ sub catdir {
 }
 
 sub canonpath {
-    my @($self,$path) =  @_;
+    my @($self,?$path) =  @_;
     return unless defined $path;
 
     $path =~ s/^([a-z]:)/$(lc($1))/s;
@@ -69,7 +69,7 @@ sub canonpath {
 
 
 sub splitpath {
-    my @($self,$path, $nofile) =  @_;
+    my @($self,$path, ?$nofile) =  @_;
     my @($volume,$directory,$file) = @('','','');
     if ( $nofile ) {
         $path =~ 
@@ -153,7 +153,7 @@ sub abs2rel {
 
     # Split up paths
     my @( $path_volume, $path_directories, $path_file ) =  $self->splitpath( $path, 1 ) ;
-    my @( $base_volume, $base_directories ) =  $self->splitpath( $base, 1 ) ;
+    my @( $base_volume, $base_directories, _ ) =  $self->splitpath( $base, 1 ) ;
     return $path unless $path_volume eq $base_volume;
 
     # Now, remove all leading components that are the same
@@ -196,7 +196,7 @@ sub abs2rel {
 
 
 sub rel2abs {
-    my @($self,$path,$base ) =  @_;
+    my @($self,$path,?$base ) =  @_;
 
     if ( ! $self->file_name_is_absolute( $path ) ) {
 

@@ -469,7 +469,7 @@ sub _expand_inc {
 
 sub _mac_whammy { # Tolerate '.', './some_dir' and '(../)+some_dir' on Mac OS
   my @them;
-  @(undef,@< @them) =  @_;
+  @(_,@< @them) =  @_;
   for my $_ ( @them) {
     if ( $_ eq '.' ) {
       $_ = ':';

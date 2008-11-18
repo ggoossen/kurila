@@ -1333,7 +1333,7 @@ sub init_MANPODS {
 sub _has_pod {
     my@($self, $file) =  @_;
 
-    my@($ispod)=0;
+    my $ispod=0;
     if (open( my $fh, '<', $file )) {
         while (~< $fh) {
             if (m/^=(?:head\d+|item|pod)\b/) {
@@ -1404,7 +1404,7 @@ sub init_MAN3PODS {
 	    delete %manifypods{$name};
 	    next;
 	}
-	my@($manpagename) = $name;
+	my $manpagename = $name;
 	$manpagename =~ s/\.p(od|m|l)\z//;
 	# everything below lib is ok
 	unless($manpagename =~ s!^\W*($parentlibs_re)\W+!!s) {
@@ -3179,7 +3179,7 @@ sub cd {
 =cut
 
 sub oneliner {
-    my@($self, $cmd, $switches) =  @_;
+    my@($self, $cmd, ?$switches) =  @_;
     $switches = \@() unless defined $switches;
 
     # Strip leading and trailing newlines

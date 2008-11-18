@@ -437,7 +437,7 @@ This method should I<not> normally be overridden by subclasses.
 
 sub match_section {
     my $self = shift;
-    my @(@headings) = @_;
+    my @headings = @_;
     local *myData = $self;
 
     ## Return true if no restrictions were explicitly specified

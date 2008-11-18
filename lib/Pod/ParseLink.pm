@@ -52,7 +52,7 @@ sub _parse_section {
     # Split into page and section on slash, and then clean up quoting in the
     # section.  If there is no section and the name contains spaces, also
     # guess that it's an old section link.
-    my @($page, $section) =  split (m/\s*\/\s*/, $link, 2);
+    my @($page, ?$section) =  split (m/\s*\/\s*/, $link, 2);
     $section =~ s/^"\s*(.*?)\s*"$/$1/ if $section;
     if ($page && $page =~ m/ / && !defined ($section)) {
         $section = $page;

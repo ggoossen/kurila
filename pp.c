@@ -3595,7 +3595,7 @@ PP(pp_hslice)
 		Ddesc(newv));
 	newav = SvAv(newv);
 
-	if (partial) {
+	if ( ! partial) {
 	    ret = av_2mortal(newAV());
 	}
 	sliceitem = AvARRAY(slice);
@@ -3609,13 +3609,14 @@ PP(pp_hslice)
 	    HE* he = hv_store_ent(hv, *sliceitem,
 		newitem ? newSVsv(*newitem) : &PL_sv_undef,
 		0);
-	    if (partial) {
-		av_push(ret, he ? HeVAL(he) : &PL_sv_undef);
+	    if ( ! partial) {
+		av_push(ret, newSVsv(he ? HeVAL(he) : &PL_sv_undef));
 	    }
 	    i++;
 	    sliceitem++;
 	}
-	XPUSHs(AvSv(ret));
+	if ( ! partial)
+	    XPUSHs(AvSv(ret));
 	RETURN;
     }
 

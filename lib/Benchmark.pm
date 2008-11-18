@@ -535,10 +535,10 @@ sub new { my @t = @( mytime, times, (nelems @_) == 2 ?? @_[1] !! 0);
 	  print STDERR "new=$(join ' ',@t)\n" if $Debug;
 	  bless \@t; }
 
-sub cpu_p { my@($r,$pu,$ps,$cu,$cs) =  @{@_[0]}; $pu+$ps         ; }
-sub cpu_c { my@($r,$pu,$ps,$cu,$cs) =  @{@_[0]};         $cu+$cs ; }
-sub cpu_a { my@($r,$pu,$ps,$cu,$cs) =  @{@_[0]}; $pu+$ps+$cu+$cs ; }
-sub real  { my@($r,$pu,$ps,$cu,$cs) =  @{@_[0]}; $r              ; }
+sub cpu_p { my@($r,$pu,$ps,$cu,$cs, ...) =  @{@_[0]}; $pu+$ps         ; }
+sub cpu_c { my@($r,$pu,$ps,$cu,$cs, ...) =  @{@_[0]};         $cu+$cs ; }
+sub cpu_a { my@($r,$pu,$ps,$cu,$cs, ...) =  @{@_[0]}; $pu+$ps+$cu+$cs ; }
+sub real  { my@($r,$pu,$ps,$cu,$cs, ...) =  @{@_[0]}; $r              ; }
 sub iters { @_[0]->[5] ; }
 
 
@@ -582,7 +582,7 @@ usage: $formatted_result = timestr($result1);
 USAGE
 
 sub timestr {
-    my@($tr, $style, $f) =  @_;
+    my@($tr, ?$style, ?$f) =  @_;
 
     die usage unless ref $tr;
 
@@ -632,8 +632,9 @@ sub runloop {
     my($t0, $t1, $td); # before, after, difference
 
     # find package of caller so we can execute code there
-    my@($curpack) = caller@(0);
-    my@($i, $pack)= 0;
+    my @($curpack, ...) = @: caller(0);
+    my $i = 0;
+    my $pack;
     while (($pack) = caller(++$i)) {
 	last if $pack ne $curpack;
     }
@@ -810,7 +811,7 @@ usage: $result = timethis($time, 'code' );        or
 USAGE
 
 sub timethis{
-    my@($n, $code, $title, $style) =  @_;
+    my@($n, $code, ?$title, ?$style) =  @_;
     my($t, $forn);
 
     die usage unless defined $code and
@@ -850,7 +851,7 @@ usage: timethese($count, { Name1 => 'code1', ... });        or
 USAGE
 
 sub timethese{
-    my@($n, $alt, $style) =  @_;
+    my@($n, $alt, ?$style) =  @_;
     die usage unless ref $alt eq 'HASH';
 
     my @names = sort keys %$alt;
@@ -892,7 +893,7 @@ sub cmpthese{
 
     # $count can be a blessed object.
     if ( ref @_[0] eq 'HASH' ) {
-        @($results, $style) =  @_;
+        @($results, ?$style) =  @_;
     }
     else {
         my@($count, $code) =  @_[[@(0,1)]];

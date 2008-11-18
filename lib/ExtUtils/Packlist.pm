@@ -49,7 +49,7 @@ sub __find_relocations
 
 sub new($$)
 {
-    my @($class, $packfile) =  @_;
+    my @($class, ?$packfile) =  @_;
     $class = ref($class) || $class;
     my %self;
     tie(%self, $class, $packfile);
@@ -108,7 +108,7 @@ sub DESTROY
 
 sub read($;$)
 {
-my @($self, $packfile) =  @_;
+my @($self, ?$packfile) =  @_;
 $self = tied(%$self) || $self;
 
 if (defined($packfile)) { $self->{+packfile} = $packfile; }
@@ -121,7 +121,8 @@ my ($line);
 while (defined($line = ~< $fh))
    {
    chomp $line;
-   my @($key, $data) = $line;
+   my $key = $line;
+   my $data;
    if ($key =~ m/^(.*?)( \w+=.*)$/)
       {
       $key = $1;
@@ -144,7 +145,7 @@ close($fh);
 
 sub write($;$)
 {
-my @($self, $packfile) =  @_;
+my @($self, ?$packfile) =  @_;
 $self = tied(%$self) || $self;
 if (defined($packfile)) { $self->{+packfile} = $packfile; }
 else { $packfile = $self->{?packfile}; }
@@ -192,7 +193,7 @@ close($fh);
 
 sub validate($;$)
 {
-my @($self, $remove) =  @_;
+my @($self, ?$remove) =  @_;
 $self = tied(%$self) || $self;
 my @missing;
 foreach my $key (sort(keys(%{$self->{?data}})))

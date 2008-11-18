@@ -171,7 +171,7 @@ sub maketext {
   # Remember, this can fail.  Failure is controllable many ways.
   Carp::croak "maketext requires at least one parameter" unless (nelems @_) +> 1;
 
-  my@($handle, $phrase) = splice@(@_,0,2);
+  my@($handle, $phrase) = @: splice(@_,0,2);
 
   # Don't interefere with $@ in case that's being interpolated into the msg.
   local $@;

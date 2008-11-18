@@ -26,7 +26,7 @@ pod2usage(\%( verbose => 0, exit => 'noexit', output => $fake_out_fh,
 is( $$fake_out, "$msg\n$vbl_0", 'message parameter' );
 
 SKIP: do {
-    my@( $file, $path ) =  fileparse( $0 );
+    my @( $file, $path, _ ) =  fileparse( $0 );
     skip( 'File in current directory', 2 ) if -e $file; 
     $$fake_out = '';
     try {

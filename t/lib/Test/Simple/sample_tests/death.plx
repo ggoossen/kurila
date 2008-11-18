@@ -2,7 +2,7 @@ require Test::Simple;
 
 push @INC, 't/lib';
 require Test::Simple::Catch;
-my($out, $err) = Test::Simple::Catch::caught();
+my @($out, $err) = Test::Simple::Catch::caught();
 
 require Dev::Null;
 

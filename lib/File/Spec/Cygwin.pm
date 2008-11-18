@@ -37,7 +37,7 @@ and then File::Spec::Unix canonpath() is called on the result.
 =cut
 
 sub canonpath {
-    my@($self,$path) =  @_;
+    my@($self,?$path) =  @_;
     return unless defined $path;
 
     $path =~ s|\\|/|g;

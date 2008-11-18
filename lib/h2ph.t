@@ -21,7 +21,7 @@ print "1..2\n";
 sub txt_compare {
     local ($/);
     my $files = @_;
-    for ($files) { open(_, "<","$_") ?? $_ = ~< *_ !! die "$_ : $!"; close _ }
+    for ($files) { open(\*_, "<","$_") ?? $_ = ~< *_ !! die "$_ : $!"; close \*_ }
     $files[0] cmp $files[1];
 }
 
