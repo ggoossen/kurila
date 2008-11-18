@@ -20,9 +20,10 @@ BEGIN {
 }
 
 BEGIN {
-    plan tests => 5;
-    use_ok('User::grent');
+    plan tests => 4;
 }
+
+use User::grent;
 
 can_ok(__PACKAGE__, 'getgrgid');
 

@@ -5,7 +5,7 @@ print "1..51\n";
 my $test = 1;
 
 sub ok {
-  my @($pass, $err) =  @_;
+  my @($pass, ?$err) =  @_;
   if ($pass) {
     print "ok $test\n";
     $test = $test + 1; # Would be doubleplusbad to use ++ in the ++ test.
@@ -86,7 +86,7 @@ ok (!defined($a--), "postdec undef returns undef");
 sub check_same {
   my @($orig, $suspect) =  @_;
   my $fail;
-  while (my @($key, $value) =@( each %$suspect)) {
+  while (my @(?$key, ?$value) =@( each %$suspect)) {
     if (exists $orig->{$key}) {
       if ($orig->{?$key} ne $value) {
         print "# key '$key' was '$orig->{?$key}' now '$value'\n";
@@ -114,7 +114,7 @@ foreach (keys %inc) {
   my $ans = %up{?$_};
   my $up;
   try {$up = ++$_};
-  ok ((defined $up and $up eq $ans), $up, $@);
+  ok((defined $up and $up eq $ans), $up);
 }
 
 check_same (\%orig, \%inc);
@@ -123,7 +123,7 @@ foreach (keys %dec) {
   my $ans = %down{?$_};
   my $down;
   try {$down = --$_};
-  ok ((defined $down and $down eq $ans), $down, $@);
+  ok ((defined $down and $down eq $ans), $down);
 }
 
 check_same (\%orig, \%dec);
@@ -132,7 +132,7 @@ foreach (keys %postinc) {
   my $ans = %postinc{?$_};
   my $up;
   try {$up = $_++};
-  ok ((defined $up and $up eq $ans), $up, $@);
+  ok ((defined $up and $up eq $ans), $up);
 }
 
 check_same (\%orig, \%postinc);
@@ -141,7 +141,7 @@ foreach (keys %postdec) {
   my $ans = %postdec{?$_};
   my $down;
   try {$down = $_--};
-  ok ((defined $down and $down eq $ans), $down, $@);
+  ok(defined $down and $down eq $ans);
 }
 
 check_same (\%orig, \%postdec);

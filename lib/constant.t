@@ -250,8 +250,9 @@ is THREE**3, SPIT->((nelems @{$:FAMILY})**3);
 do {
     use warnings FATAL => 'constant';
     eval q{
-        use constant _1_2_3 => 'allowed';
+        use constant '_1_2_3' => 'allowed';
     };
+    die if $@;
     ok( $@ eq '' );
 };
 

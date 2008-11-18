@@ -40,7 +40,7 @@ my @cat_keys = grep exists %Type_Description{ $_ }, @Type_Order;
 ok( eq_array( \@cat_keys, \@catagories ),
     'keys() %Type_Description' );
 
-my@( undef, $path ) =  fileparse( $0 );
+my@( _, $path, _ ) =  fileparse( $0 );
 my $pod_functions = File::Spec->catfile( 
     $path, File::Spec->updir, 'Functions.pm' );
 

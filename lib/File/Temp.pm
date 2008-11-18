@@ -754,7 +754,7 @@ sub _is_verysafe {
   }
 
   # Split directory into components - assume no file
-  my @($volume, $directories, undef) =  File::Spec->splitpath( $path, 1);
+  my @($volume, $directories, _) =  File::Spec->splitpath( $path, 1);
 
   # Slightly less efficient than having a function in File::Spec
   # to chop off the end of a directory or even a function that
@@ -1475,7 +1475,7 @@ sub tempdir  {
       #
       # There is no filename at the end
       $template = VMS::Filespec::vmspath($template) if $^O eq 'VMS';
-      my @($volume, $directories, undef) =  File::Spec->splitpath( $template, 1);
+      my @($volume, $directories, _) =  File::Spec->splitpath( $template, 1);
 
       # Last directory is then our template
       $template = File::Spec->splitdir($directories)[-1];
@@ -1522,7 +1522,7 @@ sub tempdir  {
 
   my $errstr;
   croak "Error in tempdir() using $template: $errstr"
-    unless (@(undef, $tempdir) =  _gettemp($template,
+    unless (@(_, $tempdir) =  _gettemp($template,
 				    "open" => 0,
 				    "mkdir"=> 1 ,
 				    "suffixlen" => $suffixlen,

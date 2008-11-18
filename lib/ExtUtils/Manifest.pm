@@ -228,7 +228,7 @@ file.
 =cut
 
 sub skipcheck {
-    my@($p) =  @_;
+    my @(?$p) =  @_;
     my $found = manifind();
     my $matches = _maniskip();
 
@@ -270,7 +270,7 @@ sub _check_files {
 
 
 sub _check_manifest {
-    my@($p) =  @_;
+    my @(?$p) =  @_;
     my $read = maniread() || \%();
     my $found = manifind($p);
     my $skip  = _maniskip();
@@ -492,7 +492,7 @@ sub manicopy {
 sub cp_if_diff {
     my@($from, $to, $how)= @_;
     -f $from or warn "$0: $from not found";
-    my@($diff) = 0;
+    my $diff = 0;
     local(*F,*T);
     open(F, "<","$from\0") or die "Can't read $from: $!\n";
     if (open(T, "<","$to\0")) {

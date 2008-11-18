@@ -18,7 +18,7 @@ is $@->{?description}, "Number of tests must be a positive integer.  You gave it
 
 my $foo = \@();
 my @foo = @($foo, 2, 3);
-ok !try { $tb->plan( tests => < @foo ) };
+ok !try { $tb->plan( tests => $foo ) };
 like $@->{?description}, qr/reference as string/;
 
 #line 25

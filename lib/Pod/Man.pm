@@ -604,7 +604,7 @@ sub textmapfonts {
 # embedded double quotes doubled.  For other formatters, remap paired double
 # quotes to LQUOTE and RQUOTE.
 sub switchquotes {
-    my @($self, $command, $text, $extra) =  @_;
+    my @($self, $command, $text, ?$extra) =  @_;
     $text =~ s/\\\*\([LR]\"/\"/g;
 
     # We also have to deal with \*C` and \*C', which are used to add the
@@ -679,7 +679,7 @@ sub makespace {
 # argument.  Support multiple index entries in X<> separated by slashes, and
 # strip special escapes from index entries.
 sub outindex {
-    my @($self, $section, $index) =  @_;
+    my @($self, ?$section, ?$index) =  @_;
     my @entries = map { < split m%\s*/\s*% } @{ %$self{INDEX} };
     return unless ($section || nelems @entries);
 
@@ -719,7 +719,7 @@ sub output {
 # Handle the start of the document.  Here we handle empty documents, as well
 # as setting up our basic macros in a preamble and building the page title.
 sub start_document {
-    my @($self, $attrs) =  @_;
+    my @($self, $attrs, _) =  @_;
     if (%$attrs{?contentless} && !%$self{?ALWAYS_EMIT_SOMETHING}) {
         DEBUG and print "Document is contentless\n";
         %$self{+CONTENTLESS} = 1;
@@ -1079,7 +1079,7 @@ sub cmd_l {
 # first argument, and then the attr hash.  This is called by the handlers for
 # the four different types of lists (bullet, number, text, and block).
 sub over_common_start {
-    my @($self, $type, $attrs) =  @_;
+    my @($self, $type, $attrs, _) =  @_;
     my $line = %$attrs{?start_line};
     my $indent = %$attrs{?indent};
     DEBUG +> 3 and print " Starting =over $type (line $line, indent ",

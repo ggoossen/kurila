@@ -39,7 +39,7 @@ actually traverse the filesystem cleaning up paths like this.
 =cut
 
 sub canonpath {
-    my @($self,$path) =  @_;
+    my @($self,?$path) =  @_;
     return unless defined $path;
     
     # Handle POSIX-style node names beginning with double slash (qnx, nto)
@@ -213,7 +213,7 @@ Takes no argument, returns the environment variable PATH as an array.
 
 sub path {
     return () unless exists %ENV{PATH};
-    my @path = split(':', %ENV{?PATH});
+    my @path = split(':', %ENV{PATH});
     foreach ( @path) { $_ = '.' if $_ eq '' }
     return @path;
 }

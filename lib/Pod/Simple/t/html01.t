@@ -1,7 +1,6 @@
 # t/html-para.t
 
-use Test;
-BEGIN { plan tests => 8 };
+use Test::More tests => 8;
 
 #use Pod::Simple::Debug (10);
 
@@ -12,7 +11,7 @@ sub x ($) { Pod::Simple::HTML->_out(
   "=pod\n\n@_[0]",
 ) }
 
-ok( x(
+is( x(
 q{
 =pod
  
@@ -25,41 +24,41 @@ This is a paragraph
 );
 
 
-ok( x(qq{=pod\n\nThis is a paragraph}),
+is( x(qq{=pod\n\nThis is a paragraph}),
  qq{\n<p>This is a paragraph</p>\n},
  "paragraph building"
 );
 
 
-ok( x(qq{This is a paragraph}),
+is( x(qq{This is a paragraph}),
  qq{\n<p>This is a paragraph</p>\n},
  "paragraph building"
 );
 
 
 
-ok(x(
+like(x(
 '=head1 This is a heading')
- => q{/\s*<h1><a[^<>]+>This\s+is\s+a\s+heading</a></h1>\s*$/},
+ => qr{\s*<h1><a[^<>]+>This\s+is\s+a\s+heading</a></h1>\s*$},
   "heading building"
 );
 
-ok(x(
+like(x(
 '=head2 This is a heading too')
- => q{/\s*<h2><a[^<>]+>This\s+is\s+a\s+heading\s+too</a></h2>\s*$/},
+ => qr{\s*<h2><a[^<>]+>This\s+is\s+a\s+heading\s+too</a></h2>\s*$},
   "heading building"
 );
 
-ok(x(
+like(x(
 '=head3 Also, this is a heading')
- => q{/\s*<h3><a[^<>]+>Also,\s+this\s+is\s+a\s+heading</a></h3>\s*$/},
+ => qr{\s*<h3><a[^<>]+>Also,\s+this\s+is\s+a\s+heading</a></h3>\s*$},
   "heading building"
 );
 
 
-ok(x(
+like(x(
 '=head4 This, too, is a heading')
- => q{/\s*<h4><a[^<>]+>This,\s+too,\s+is\s+a\s+heading</a></h4>\s*$/},
+ => qr{\s*<h4><a[^<>]+>This,\s+too,\s+is\s+a\s+heading</a></h4>\s*$},
   "heading building"
 );
 

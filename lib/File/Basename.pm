@@ -295,14 +295,14 @@ sub dirname {
     elsif ($type eq 'MacOS') {
 	if( !length($basename) && $dirname !~ m/^[^:]+:\z/) {
             _strip_trailing_sep($dirname);
-	    @($basename,$dirname) =  fileparse $dirname;
+	    @($basename,$dirname, _) =  fileparse $dirname;
 	}
 	$dirname .= ":" unless $dirname =~ m/:\z/;
     }
     elsif (grep { $type eq $_ } qw(MSDOS DOS MSWin32 OS2)) { 
         _strip_trailing_sep($dirname);
         unless( length($basename) ) {
-	    @($basename,$dirname) =  fileparse $dirname;
+	    @($basename,$dirname, _) =  fileparse $dirname;
 	    _strip_trailing_sep($dirname);
 	}
     }
@@ -314,7 +314,7 @@ sub dirname {
     else {
         _strip_trailing_sep($dirname);
         unless( length($basename) ) {
-	    @($basename,$dirname) =  fileparse $dirname;
+	    @($basename,$dirname, _) =  fileparse $dirname;
 	    _strip_trailing_sep($dirname);
 	}
     }

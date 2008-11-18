@@ -218,7 +218,7 @@ sub _batch_convert_finish {
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 sub _do_one_batch_conversion {
-  my@($self, $module, $mod2path, $outdir, $outfile) =  @_;
+  my@($self, $module, $mod2path, $outdir, ?$outfile) =  @_;
 
   my $retval;
   my $total    = nkeys %$mod2path;
@@ -810,7 +810,7 @@ sub _javascript_wad_to_markup {
   foreach my $s ( @scripts) {
     next unless $s and nelems @$s;
 
-    my@( $url1, $url2, $type, $media) = @(
+    my@( $url1, $url2, $type, ?$media) = @(
       $self->_maybe_uplink( $s->[0], $uplink ),
       < map { esc($_) } @( (< grep !ref($_), @$s))
     );

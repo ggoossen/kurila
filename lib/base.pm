@@ -39,7 +39,7 @@ sub get_attr {
 
 sub get_fields {
     # Shut up a possible typo warning.
-    @() = \%{*{Symbol::fetch_glob(@_[0].'::FIELDS')}};
+    my $x = \%{*{Symbol::fetch_glob(@_[0].'::FIELDS')}};
     return \%{*{Symbol::fetch_glob(@_[0].'::FIELDS')}};
 }
 
@@ -118,7 +118,7 @@ END
     # ones to the derived class.  Hang on to the original attribute
     # (Public, Private, etc...) and add Inherited.
     # This is all too complicated to do efficiently with add_fields().
-    while (my@($k,$v) =@( each %$bfields)) {
+    while (my@(?$k,?$v) =@( each %$bfields)) {
         my $fno;
         if ($fno = $dfields->{?$k} and $fno != $v) {
             die("Inherited fields can't override existing fields");

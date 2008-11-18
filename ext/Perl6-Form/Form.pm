@@ -43,7 +43,7 @@ my %std_one = %(
 );
 
 sub one_char {
-	my @($newval, undef, $opts ) =  @_;
+	my @($newval, _, $opts ) =  @_;
 	$newval = \@( $newval ) unless ref $newval eq 'ARRAY';
 	for ( @$newval) {
 		die "Value for 'single' option must be single character (not '$_')"
@@ -157,7 +157,7 @@ sub hashify {
 }
 
 sub page_hash {
-	my @($h, undef, $opts) =  @_;
+	my @($h, _, $opts) =  @_;
 	die "Value for 'page' option must be hash reference (not $_)"
 		for grep $_ ne 'HASH', @( ref $h);
 	$h = \%( < %{$opts->{?page}}, < %$h );
@@ -274,7 +274,7 @@ sub jverbatim {
 }
 
 sub jleft {
-	my @(undef, %< %val) =  @_;
+	my @(_, %< %val) =  @_;
 	@_[0] =~ s/^\s+// unless %val{?precropped};
 	my $len = length @_[0];
 	@_[0] .= fillpat(%val{?pos}+$len, %val{?post}, %val{?width}-$len);
@@ -282,14 +282,14 @@ sub jleft {
  }
 
  sub jright {
-	my @(undef, %< %val) =  @_;
+	my @(_, %< %val) =  @_;
 	@_[0] =~ s/\s+$// unless %val{?precropped};
 	@_[0] = fillpat(%val{?pos}, %val{?pre}, %val{?width}-length(@_[0])) . @_[0];
 	substr(@_[0],0,-%val{?width}, "") unless %val{?stretch};
  }
 
  sub jcentre {
-	my @(undef, %< %val) =  @_;
+	my @(_, %< %val) =  @_;
 	@_[0] =~ s/^\s+|\s+$//g;
 	%val{+precropped} = 1;
 	my $indent = int( (%val{?width}-length @_[0])/2 );
@@ -311,7 +311,7 @@ sub jleft {
  }
 
  sub jsingle {
-	my @(undef, %< %val) =  @_;
+	my @(_, %< %val) =  @_;
 	@_[0] = length @_[0] ?? substr(@_[0],0,1) !! fillpat(%val{?pos}, %val{?pre},1);
  }
 
@@ -528,7 +528,7 @@ sub segment ($\@\%$\%) {
                     }
                 }
                 my $fld = $field;
-                my @($precurr, $incurr, $postcurr) = ("")x3;
+                my @($precurr, $incurr, $postcurr) = @("")x3;
                 %form{+width} = length $field;
                 if (%form{?isbullet}) {
                     %form{+vjust} = \&jtop;
@@ -1301,7 +1301,7 @@ my $wsnzw = q{ (??{length($^N)?'(?=)':'(?!)'}) };
 
 sub break_at {
     my @($hyphen) =  @_;
-	my @($lit_hy) = qr/\Q$hyphen\E/;
+	my $lit_hy = qr/\Q$hyphen\E/;
     my $hylen = length($hyphen);         
     my @ret;
 	return sub {

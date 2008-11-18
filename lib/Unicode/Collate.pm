@@ -693,7 +693,7 @@ sub getSortKey
     my $last_is_variable;
 
     foreach my $vwt ( @buf) {
-	my@($var, @< @wt) = unpack@(VCE_TEMPLATE, $vwt);
+	my@($var, @< @wt) = @: unpack(VCE_TEMPLATE, $vwt);
 
 	# "Ignorable (L1, L2) after Variable" since track. v. 9
 	if ($v2i) {
@@ -945,7 +945,7 @@ sub index
 
     my $last_is_variable;
     for my $vwt ( map < $self->getWt($_), @$subE) {
-	my@($var, @< @wt) = unpack@(VCE_TEMPLATE, $vwt);
+	my@($var, @< @wt) = @: unpack(VCE_TEMPLATE, $vwt);
 	my $to_be_pushed = _nonIgnorAtLevel(\@wt,$lev);
 
 	# "Ignorable (L1, L2) after Variable" since track. v. 9
@@ -979,7 +979,7 @@ sub index
 	# fetch a grapheme
 	while ($i +<= $end && $found_base == 0) {
 	    for my $vwt ( $self->getWt($strE->[$i]->[0])) {
-		my@($var, @< @wt) = unpack@(VCE_TEMPLATE, $vwt);
+		my@($var, @< @wt) = @: unpack(VCE_TEMPLATE, $vwt);
 		my $to_be_pushed = _nonIgnorAtLevel(\@wt,$lev);
 
 		# "Ignorable (L1, L2) after Variable" since track. v. 9

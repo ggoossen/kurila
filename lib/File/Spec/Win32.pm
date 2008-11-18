@@ -204,7 +204,7 @@ The results can be passed to L</catpath> to get back a path equivalent to
 =cut
 
 sub splitpath {
-    my @($self,$path, $nofile) =  @_;
+    my @($self,$path, ?$nofile) =  @_;
     my @($volume,$directory,$file) = @('','','');
     if ( $nofile ) {
         $path =~ 
@@ -313,7 +313,7 @@ sub _same {
 }
 
 sub rel2abs {
-    my @($self,$path,$base ) =  @_;
+    my @($self,$path,?$base ) =  @_;
 
     my $is_abs = $self->file_name_is_absolute($path);
 
@@ -341,7 +341,7 @@ sub rel2abs {
     my @( $path_directories, $path_file ) =
        ($self->splitpath( $path, 1 ))[[1..2]] ;
 
-    my @( $base_volume, $base_directories ) = 
+    my @( $base_volume, $base_directories, _ ) = 
       $self->splitpath( $base, 1 ) ;
 
     $path = $self->catpath( 

@@ -172,7 +172,7 @@ sub is ($$@) {
 }
 
 sub isnt ($$@) {
-    my @($got, $isnt, $name, @< @mess) =  @_;
+    my @($got, $isnt, ?$name, @< @mess) =  @_;
 
     my $pass;
     if( !defined $got || !defined $isnt ) {
@@ -336,7 +336,7 @@ sub eq_array {
 sub eq_hash {
   my @($orig, $suspect) =  @_;
   my $fail;
-  while (my @($key, $value) =@( each %$suspect)) {
+  while (my @(?$key, ?$value) =@( each %$suspect)) {
     # Force a hash recompute if this perl's internals can cache the hash key.
     $key = "" . $key;
     if (exists $orig->{$key}) {

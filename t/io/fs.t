@@ -98,7 +98,7 @@ SKIP: do {
     $a_mode = @(stat('a'))[2];
 
     @($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
-     $blksize,$blocks) = stat@('c');
+     $blksize,$blocks) = @: stat('c');
 
     SKIP: do {
         skip "no nlink", 1 if config_value('dont_use_nlink');
@@ -128,7 +128,7 @@ SKIP: do {
     skip("no link", 7) unless $has_link;
 
     @($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
-     $blksize,$blocks) = stat@('c');
+     $blksize,$blocks) = @: stat('c');
 
     SKIP: do {
 	skip "no mode checks", 1 if $skip_mode_checks;
@@ -143,7 +143,7 @@ SKIP: do {
     is(chmod($newmode,'c','x'), 2, "chmod two files");
 
     @($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
-     $blksize,$blocks) = stat@('c');
+     $blksize,$blocks) = @: stat('c');
 
     SKIP: do {
 	skip "no mode checks", 1 if $skip_mode_checks;
@@ -152,7 +152,7 @@ SKIP: do {
     };
 
     @($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
-     $blksize,$blocks) = stat@('x');
+     $blksize,$blocks) = @: stat('x');
 
     SKIP: do {
 	skip "no mode checks", 1 if $skip_mode_checks;
@@ -162,13 +162,13 @@ SKIP: do {
 
     is(unlink('b','x'), 2, "unlink two files");
 
-    @($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
-     $blksize,$blocks) = stat@('b');
+    @(?$dev,?$ino,?$mode,?$nlink,?$uid,?$gid,?$rdev,?$size,?$atime,?$mtime,?$ctime,
+     ?$blksize,?$blocks) = @: stat('b');
 
     is($ino, undef, "ino of removed file b should be undef");
 
-    @($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
-     $blksize,$blocks) = stat@('x');
+    @(?$dev,?$ino,?$mode,?$nlink,?$uid,?$gid,?$rdev,?$size,?$atime,?$mtime,?$ctime,
+     ?$blksize,?$blocks) = @: stat('x');
 
     is($ino, undef, "ino of removed file x should be undef");
 };
@@ -212,8 +212,8 @@ SKIP: do {
 
 is(rename('a','b'), 1, "rename a b");
 
-@($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
- $blksize,$blocks) = stat@('a');
+@(?$dev,?$ino,?$mode,?$nlink,?$uid,?$gid,?$rdev,?$size,?$atime,?$mtime,?$ctime,
+ ?$blksize,?$blocks) = @: stat('a');
 
 is($ino, undef, "ino of renamed file a should be undef");
 
@@ -241,7 +241,7 @@ SKIP: do {
 
 sub check_utime_result {
     @($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
-     $blksize,$blocks) = stat@('b');
+     $blksize,$blocks) = @: stat('b');
 
  SKIP: do {
 	skip "bogus inode num", 1 if ($^O eq 'MSWin32') || ($^O eq 'NetWare');
@@ -302,8 +302,8 @@ SKIP: do {
 
 is(unlink('b'), 1, "unlink b");
 
-@($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
-    $blksize,$blocks) = stat@('b');
+@(?$dev,?$ino,?$mode,?$nlink,?$uid,?$gid,?$rdev,?$size,?$atime,?$mtime,?$ctime,
+    ?$blksize,?$blocks) = @: stat('b');
 is($ino, undef, "ino of unlinked file b should be undef");
 unlink 'c';
 

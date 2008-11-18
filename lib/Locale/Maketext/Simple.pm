@@ -110,7 +110,7 @@ sub import {
     %args{+Export}   ||= 'loc';
     %args{+Subclass} ||= 'I18N';
 
-    my @($loc, $loc_lang) =  $class->load_loc(< %args);
+    my @(?$loc, ?$loc_lang) =  $class->load_loc(< %args) || @();
     $loc ||= $class->default_loc(< %args);
 
     *{Symbol::fetch_glob(caller(0) . "::%args{?Export}")} = $loc if %args{?Export};

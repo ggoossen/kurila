@@ -130,7 +130,7 @@ sub _choke(@) {
 
 
 sub _chmod($$;$) {
-    my @( $mode, $item, $verbose )=  @_;
+    my @( $mode, $item, ?$verbose )=  @_;
     $verbose ||= 0;
     if (chmod $mode, $item) {
         print "chmod($mode, $item)\n" if $verbose +> 1;
@@ -661,7 +661,7 @@ provided then the returned hashref will be the passed in hashref.
 =cut
 
 sub install { #XXX OS-SPECIFIC
-    my@($from_to,$verbose,$dry_run,$uninstall_shadows,$skip,$always_copy,$result) =  @_;
+    my@($from_to,?$verbose,?$dry_run,?$uninstall_shadows,?$skip,?$always_copy,?$result) =  @_;
     if ((nelems @_)==1 and try { 1+nelems @$from_to }) {
         my %opts        = %( < @$from_to );
         $from_to        = %opts{?from_to} 
@@ -1155,7 +1155,7 @@ be prepended as a directory to each installed file (and directory).
 =cut
 
 sub pm_to_blib {
-    my@($fromto,$autodir,$pm_filter) =  @_;
+    my@($fromto,$autodir, ?$pm_filter) =  @_;
 
     _mkpath($autodir,0,0755);
     while(my@(?$from, ?$to) =@( each %$fromto)) {

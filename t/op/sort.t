@@ -290,7 +290,7 @@ do {
 	    return 1;
 	}
 	if ($n+<5) { rec($n+1); }
-	else { @() =  sort \&rec, @(1,2); }
+	else { @(...) =  sort \&rec, @(1,2); }
 
 	$failed = 1 if !defined $n;
     }
@@ -304,7 +304,7 @@ do {
 # de facto behaviour that shouldn't be broken.
 package main;
 my $answer = "good";
-@() =  sort \&OtherPack::foo, @(1,2,3,4);
+@(...) =  sort \&OtherPack::foo, @(1,2,3,4);
 
 do {
     package OtherPack;

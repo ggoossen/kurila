@@ -42,7 +42,7 @@ foreach (@(Foo->new)) {
     $obj->{+_no}   = 'Yeah';
      %{$obj}{[qw(what who _up_yours)]} = @('Ahh', 'Moo', 'Yip');
 
-    while(my@($k,$v) =@( each %test)) {
+    while(my@(?$k,?$v) =@( each %test)) {
         is($obj->{?$k}, $v);
     }
 }

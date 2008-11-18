@@ -247,7 +247,7 @@ do {
     %x{+a} = 1;
     do { local %x{+b} = 1; };
     ok(! exists %x{b});
-    do { local %x{[@('c','d','e')]} =@( @()); };
+    do { local %x{[@('c','d','e')]} =@(); };
     ok(! exists %x{c});
 };
 

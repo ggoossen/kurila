@@ -29,17 +29,17 @@ cmp_ok( %SIG{?AFAKE}, '\==', \&sigtrap::handler_die, 'install the die handler' )
 cmp_ok( %SIG{?FAKE2}, '\==',\&sigtrap::handler_traceback, 'install traceback handler' );
 
 my @normal =qw( HUP INT PIPE TERM );
- %SIG{[@normal]} =@( '' x (nelems @normal);
+ %SIG{[@normal]} = @('') x (nelems @normal);
 sigtrap->import('normal-signals');
 is( nelems(grep { ref $_ } %SIG{[@normal]}), nelems(@normal), 'check normal-signals set' );
 
 my @error =qw( ABRT BUS EMT FPE ILL QUIT SEGV SYS TRAP );
- %SIG{[@error]} =@( '' x (nelems @error);
+ %SIG{[@error]} =@( '') x (nelems @error);
 sigtrap->import('error-signals');
 is( nelems( grep { ref $_ } %SIG{[@error]}), nelems(@error), 'check error-signals set' );
 
 my @old =qw( ABRT BUS EMT FPE ILL PIPE QUIT SEGV SYS TERM TRAP );
- %SIG{[@old]} =@( '' x nelems(@old);
+ %SIG{[@old]} =@( '' ) x nelems(@old);
 sigtrap->import('old-interface-signals');
 is( nelems( grep { ref $_ } %SIG{[@old]}), nelems(@old), 'check old-interface-signals set' );
 

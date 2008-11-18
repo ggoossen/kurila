@@ -6,7 +6,7 @@ print q(1..41
 # This is() function is written to avoid ""
 my $test = 1;
 sub is {
-    my@($left, $right) =  @_;
+    my @($left, $right, ?$msg) =  @_;
 
     if ($left eq $right) {
       printf 'ok %d
@@ -80,7 +80,7 @@ do {
 
 # variable interpolation
 do {
-  our @($a, $b, $c, $dx) =  qw(foo bar);
+  our @($a, $b, ?$c, ?$dx) =  qw(foo bar);
 
   is("$a", "foo",    "verifying assign");
   is("$a$b", "foobar", "basic concatenation");

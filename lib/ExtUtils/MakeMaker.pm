@@ -134,7 +134,7 @@ sub _format_att {
 
 
 sub prompt ($;$) {  ## no critic
-    my@($mess, $def) =  @_;
+    my@($mess, ?$def) =  @_;
     die("prompt function called without an argument") 
         unless defined $mess;
 

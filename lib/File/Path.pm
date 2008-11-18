@@ -556,7 +556,7 @@ sub mkpath {
 
     if ($old_style) {
         my ($verbose, $mode);
-        @($paths, $verbose, $mode) =  @_;
+        @($paths, ?$verbose, ?$mode) =  @_;
         $paths = \@($paths) unless UNIVERSAL::isa($paths,'ARRAY');
         $arg->{+verbose} = defined $verbose ?? $verbose !! 0;
         $arg->{+mode}    = defined $mode    ?? $mode    !! 0777;
@@ -647,7 +647,7 @@ sub rmtree {
         return 0;
     };
     for (@($arg->{?cwd})) { m/\A(.*)\Z/; $_ = $1 } # untaint
-     %{$arg}{[qw(device inode)]} =  @(stat $arg->{?cwd})[[0..1]] or do {
+     %{$arg}{[qw(device inode)]} = @(stat $arg->{?cwd})[[0..1]] or do {
         _error($arg, "cannot stat initial working directory", $arg->{?cwd});
         return 0;
     };

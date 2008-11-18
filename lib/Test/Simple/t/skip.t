@@ -36,7 +36,7 @@ SKIP: do {
 SKIP: do {
     skip "Again, not skipping", 2 if 0;
 
-    my@($pack, $file, $line) =@( caller);
+    my @(?$pack, ?$file, ?$line) =@( caller);
     is( $pack || '', '',      'calling package not interfered with' );
     is( $file || '', '',      '  or file' );
     is( $line || '', '',      '  or line' );

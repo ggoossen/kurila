@@ -178,7 +178,7 @@ my @pw2;
 
 setpwent();
 for (1..$max) {
-    my @($pw) = @(getpwent());
+    my @($pw, ...) = @(getpwent());
     last unless defined $pw;
     push @pw2, $pw;
 }

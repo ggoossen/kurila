@@ -29,7 +29,7 @@ my $Is_VMS = $^O eq 'VMS';
 # keep track of everything added so it can all be deleted
 my %Files;
 sub add_file {
-    my @($file, $data) =  @_;
+    my @($file, ?$data) =  @_;
     $data ||= 'foo';
     1 while unlink $file;  # or else we'll get multiple versions on VMS
     open( T, ">", ''.$file) or return;
@@ -104,7 +104,7 @@ is_deeply( $res, @('bar'), 'bar reported as new' );
 
 # now quiet the warning that bar was added and test again
 @($res, $warn) = do { local $ExtUtils::Manifest::Quiet = 1;
- <                     catch_warning( \&skipcheck )
+                      catch_warning( \&skipcheck )
                 };
 is( $warn, '', 'disabled warnings' );
 
@@ -169,7 +169,7 @@ is( ExtUtils::Manifest::maniread()->{?none}, '#none',
 
 ok( mkdir( 'copy', 0777 ), 'made copy directory' );
 $files = maniread();
-try { @(undef, $warn) =  catch_warning( sub {
+try { @(_, $warn) =  catch_warning( sub {
  		manicopy( $files, 'copy', 'cp' ) })
 };
 like( $@->{?description}, qr/^Can't read none: /, 'croaked about none' );

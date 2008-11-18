@@ -90,7 +90,7 @@ for ( @( < @time, < @neg_time) ) {
             my $year_in = $year +< 70 ?? $year + 1900 !! $year;
             my $time = timelocal($sec,$min,$hour,$mday,$mon,$year_in);
 
-            my@($s,$m,$h,$D,$M,$Y) = localtime@($time);
+            my@($s,$m,$h,$D,$M,$Y, ...) = @: localtime($time);
 
             is($s, $sec, "timelocal second for $(join ' ',@$_)");
             is($m, $min, "timelocal minute for $(join ' ',@$_)");
@@ -104,7 +104,7 @@ for ( @( < @time, < @neg_time) ) {
             my $year_in = $year +< 70 ?? $year + 1900 !! $year;
             my $time = timegm($sec,$min,$hour,$mday,$mon,$year_in);
 
-            my@($s,$m,$h,$D,$M,$Y) = gmtime@($time);
+            my@($s,$m,$h,$D,$M,$Y, ...) = @: gmtime($time);
 
             is($s, $sec, "timegm second for $(join ' ',@$_)");
             is($m, $min, "timegm minute for $(join ' ',@$_)");

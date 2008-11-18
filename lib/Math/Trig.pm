@@ -160,7 +160,7 @@ sub cylindrical_to_spherical {
 }
 
 sub great_circle_distance {
-    my @( $theta0, $phi0, $theta1, $phi1, $rho ) =  @_;
+    my @( $theta0, $phi0, $theta1, $phi1, ?$rho ) =  @_;
 
     $rho = 1 unless defined $rho; # Default to the unit sphere.
 

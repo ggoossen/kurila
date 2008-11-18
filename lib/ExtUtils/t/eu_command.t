@@ -73,7 +73,7 @@ do {
     @ARGV = @( $Testfile );
     ok( -e @ARGV[0], 'created!' );
 
-    my @($now) = time;
+    my @($now) = @: time;
     utime ($now, $now, @ARGV[0]);
     sleep 2;
 
@@ -205,7 +205,7 @@ do {
     ok( -e File::Spec->join( 'ecmddir', 'temp2', $Testfile ), 'copied okay' );
 
     # cp should croak if destination isn't directory (not a great warning)
-    @ARGV = @( ( $Testfile ) x 3 );
+    @ARGV = @( $Testfile ) x 3 ;
     try { cp() };
 
     like( $@->{?description}, qr/Too many arguments/, 'cp croaks on error' );
@@ -220,7 +220,7 @@ do {
     ok( -e File::Spec->join( 'ecmddir', $Testfile ), 'file in new location' );
 
     # mv should also croak with the same wacky warning
-    @ARGV = @( ( $Testfile ) x 3 );
+    @ARGV = @( $Testfile ) x 3 ;
 
     try { mv() };
     like( $@->{?description}, qr/Too many arguments/, 'mv croaks on error' );

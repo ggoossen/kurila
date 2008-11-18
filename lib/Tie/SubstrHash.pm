@@ -54,7 +54,7 @@ sub TIEHASH {
 }
 
 sub CLEAR {
-    local($self) = < @_;
+    local @($self) = @_;
     @$self[0] = "\0" x (@$self[4] * @$self[3]->[1]);
     @$self[5] =  0;
     @$self[6] = -1;
@@ -134,13 +134,13 @@ sub DELETE {
 }
 
 sub FIRSTKEY {
-    local($self) = < @_;
+    local @($self) = @_;
     @$self[6] = -1;
     &NEXTKEY( < @_ );
 }
 
 sub NEXTKEY {
-    local($self) = < @_;
+    local @($self, ...) = @_;
     local@($klen, $vlen, $tsize, $rlen, $entries, $iterix) =  @$self[[1..6]];
     ++$iterix;
     while ($iterix +< $tsize->[1]) {

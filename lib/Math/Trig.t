@@ -217,7 +217,7 @@ do {
     my $dir1 = great_circle_direction(< @London, < @Tokyo);
     my $dst1 = great_circle_distance(< @London,  < @Tokyo);
 
-    @($lon, $lat) =  great_circle_destination(< @London, $dir1, $dst1);
+    @($lon, $lat, _) =  great_circle_destination(< @London, $dir1, $dst1);
 
     ok(near($lon, @Tokyo[0]));
 
@@ -226,7 +226,7 @@ do {
     my $dir2 = great_circle_direction(< @Tokyo, < @London);
     my $dst2 = great_circle_distance(< @Tokyo,  < @London);
 
-    @($lon, $lat) =  great_circle_destination(< @Tokyo, $dir2, $dst2);
+    @($lon, $lat, _) =  great_circle_destination(< @Tokyo, $dir2, $dst2);
 
     ok(near($lon, @London[0]));
 

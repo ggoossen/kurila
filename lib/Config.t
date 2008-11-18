@@ -13,13 +13,13 @@ BEGIN {
 
 ok(nelems(config_keys) +> 500, "Config has more than 500 entries");
 
-my @($first) = Config::config_sh() =~ m/^(\S+)=/m;
+my @($first) = @: Config::config_sh() =~ m/^(\S+)=/m;
 die "Can't find first entry in Config::config_sh()" unless defined $first;
 print "# First entry is '$first'\n";
 
 # It happens that the we know what the first key should be. This is somewhat
 # cheating, but there was briefly a bug where the key got a bonus newline.
-my @($first_each) =  config_keys;
+my @($first_each, ...) =  config_keys;
 is($first_each, $first, "First key from each is correct");
 
 is(config_value('PERL_REVISION'), undef, "No PERL_REVISION");

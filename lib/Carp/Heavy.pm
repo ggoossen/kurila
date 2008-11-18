@@ -70,7 +70,7 @@ sub caller_info {
   my %call_info;
    %call_info{[
     qw(pack file line sub has_args wantarray evaltext is_require)
-  ]} = caller@($i);
+  ]} = @: caller($i);
   
   unless (defined %call_info{?pack}) {
     return ();

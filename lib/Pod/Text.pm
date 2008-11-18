@@ -282,7 +282,7 @@ sub start_document {
 # enough room for us to output the item tag in the margin of the text or if we
 # have to put it on a separate line.
 sub item {
-    my @($self, $text) =  @_;
+    my @($self, ?$text) =  @_;
     my $tag = %$self{?ITEM};
     unless (defined $tag) {
         warn "Item called without tag";

@@ -114,14 +114,14 @@ sub dl_load_flags { 0x00 }
 EOT
 
 if (%ENV{?PERL_BUILD_EXPAND_CONFIG_VARS}) {
-    print OUT "our (\$dl_dlext, \$dl_so, \$dlsrc) = (", <
-              to_string(config_value('dlext')), ",", <
-              to_string(config_value('so')), ",", <
-              to_string(config_value('dlsrc')), ")\n;" ;
+    print OUT "our @(\$dl_dlext, \$dl_so, \$dlsrc) = @(",
+              < to_string(config_value('dlext')), ",",
+              < to_string(config_value('so')), ",",
+              < to_string(config_value('dlsrc')), ")\n;" ;
 }
 else {
     print OUT <<'EOT';
-our ($dl_dlext, $dl_so, $dlsrc) = < map { config_value($_) } qw(dlext so dlsrc);
+our @($dl_dlext, $dl_so, $dlsrc) = map { config_value($_) } qw(dlext so dlsrc);
 EOT
 }
 
@@ -345,7 +345,7 @@ sub bootstrap {
 	push @dirs, $dir;
     }
     # last resort, let dl_findfile have a go in all known locations
-    ($file) = < dl_findfile(< map("-L$_",@(<@dirs,<@INC)), $modfname) unless $file;
+    @($file) = dl_findfile(< map("-L$_",@(<@dirs,<@INC)), $modfname) unless $file;
 
     die("Can't locate loadable object for module $module in \@INC (\@INC contains: $(join ' ', @INC))")
 	unless $file;	# wording similar to error from 'require'
