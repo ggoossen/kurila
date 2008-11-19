@@ -200,7 +200,7 @@ SKIP: do {
     my $root = Cwd::abs_path(File::Spec->rootdir);	# Add drive letter?
     local *FH;
     opendir FH, $root or skip("Can't opendir($root): $!", 2+$EXTRA_ABSPATH_TESTS);
-    ($file) = < grep {-f $_ and not -l $_} map File::Spec->catfile($root, $_), @( readdir FH);
+    @(?$file) = grep {-f $_ and not -l $_} map File::Spec->catfile($root, $_), @( readdir FH);
     closedir FH;
   };
   skip "No plain file in root directory to test with", 2+$EXTRA_ABSPATH_TESTS unless $file;
