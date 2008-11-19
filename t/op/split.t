@@ -4,7 +4,7 @@ BEGIN {
     require './test.pl';
 }
 
-plan tests => 132;
+plan tests => 131;
 
 our ($FS, $c, @ary, $x, $foo, $res, @list1, @list2, @a, $p, $n);
 
@@ -48,10 +48,6 @@ is($_, '1:2:3:4 5 6');
 # Does the 999 suppress null field chopping?
 $_ = join(':', split(m/:/,'1:2:3:4:5:6:::', 999));
 is($_ , '1:2:3:4:5:6:::');
-
-# Does assignment to a list imply split to one more field than that?
-$foo = runperl( switches => \@('-Dt'), stderr => 1, prog => '@($a,$b)=split;' );
-ok($foo =~ m/DEBUGGING/ || $foo =~ m/const\n?\Q(IV(3))\E/);
 
 # Can we say how many fields to split to when assigning to a list?
 @($a,$b) =  split(' ','1 2 3 4 5 6', 2);
