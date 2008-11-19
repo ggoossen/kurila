@@ -37,7 +37,7 @@ do {
   # \xe5 is V in EBCDIC. That doesn't have the same properties w.r.t. \w as
   # an a circumflex, so we need to be explicit.
 
-  my $a_circumflex = "\xe5"; # a byte.
+  my $a_circumflex = "\x[e5]"; # a byte.
   %U_HASH = %(< map {$_, $_} @( 'castle', "ch$($a_circumflex)teau", $utf8, chr 0x57CE));
   plan tests => 162;
 };
@@ -74,7 +74,7 @@ sub thaw_hash {
 }
 
 sub thaw_scalar {
-  my @($name, $expected, $bug) =  @_;
+  my @($name, $expected, ?$bug) =  @_;
   my $scalar = try {thaw %tests{?$name}};
   is ($@, '', "Thawed $name without error?");
   isa_ok ($scalar, 'SCALAR', "Thawed $name?");

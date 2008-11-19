@@ -87,7 +87,7 @@ my $default_share = \qw[
 ];
 
 sub new {
-    my@($class, $root, $mask) =  @_;
+    my@($class, ?$root, ?$mask) =  @_;
     my $obj = \%();
     bless $obj, $class;
 
@@ -129,7 +129,7 @@ sub erase {
     my ($stem, $leaf);
 
     $pkg = "$($pkg)::";	# expand to full symbol table name
-    @($stem, $leaf) = $pkg =~ m/(.*)::(\w+::)$/;
+    @($stem, $leaf) = @: $pkg =~ m/(.*)::(\w+::)$/;
 
     # The 'my $foo' is needed! Without it you get an
     # 'Attempt to free unreferenced scalar' warning!
@@ -253,7 +253,7 @@ sub share_record {
     my $vars = shift;
     my $shares = \%{$obj->{+Shares} ||= \%()};
      # Record shares using keys of $obj->{Shares}. See reinit.
-    %{$shares}{[ @$vars]} = ($pkg) x nelems @$vars if (nelems @$vars);
+    %{$shares}{[ @$vars]} = @($pkg) x nelems @$vars if (nelems @$vars);
 }
 sub share_redo {
     my $obj = shift;
@@ -275,7 +275,7 @@ sub varglob {
 
 
 sub reval {
-    my @($obj, $expr, $strict) =  @_;
+    my @($obj, $expr, ?$strict) =  @_;
     my $root = $obj->{?Root};
 
     my $evalsub = lexless_anon_sub($root,$strict, $expr);

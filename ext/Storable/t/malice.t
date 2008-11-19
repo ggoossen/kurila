@@ -65,7 +65,7 @@ sub test_hash {
 }
 
 sub test_header {
-  my ($header, $isfile, $isnetorder) = < @_;
+  my @($header, $isfile, $isnetorder) = @_;
   is ( ! ! $header->{?file}, ! ! $isfile, "is file");
   is ($header->{major}, $major, "major number");
   is ($header->{minor}, $minor_write, "minor number");
@@ -87,7 +87,7 @@ sub test_header {
 }
 
 sub test_truncated {
-  my ($data, $sub, $magic_len, $what) = < @_;
+  my @($data, $sub, $magic_len, $what) = @_;
   for my $i (0 .. length ($data) - 1) {
     my $short = substr $data, 0, $i;
 
@@ -104,7 +104,7 @@ sub test_truncated {
 }
 
 sub test_corrupt {
-  my ($data, $sub, $what, $name) = < @_;
+  my @($data, $sub, $what, $name) = @_;
 
   my $clone = &$sub($data);
   is (defined ($clone), '', "$name $what should fail");
@@ -112,7 +112,7 @@ sub test_corrupt {
 }
 
 sub test_things {
-  my ($contents, $sub, $what, $isnetwork) = < @_;
+  my @($contents, $sub, $what, ?$isnetwork) = @_;
   my $isfile = $what eq 'file';
   my $file_magic = $isfile ?? length $file_magic_str !! 0;
 
@@ -191,7 +191,7 @@ sub test_things {
              \@('longsize', "Long integer"),
              \@('ptrsize', "Pointer"),
              \@('nvsize', "Double"))) {
-      my ($key, $name) = < @$_;
+      my @($key, $name) = @$_;
       $copy = $contents;
       substr ($copy, $where++, 1, chr 0);
       test_corrupt ($copy, $sub, "/^$name size is not compatible/",

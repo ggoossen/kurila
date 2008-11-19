@@ -25,7 +25,7 @@ our (@a, @c, $c, $d, $foo, %foo, @foo, @dogs, %kennel, $mutts, $e, $f, $i,
 
 
 sub TEST {
-  my @($string, $name) =  @_;
+  my @($string, ?$name) =  @_;
   my $t = eval $string;
   $t =~ s/([A-Z]+)\(0x[0-9a-f]+\)/$1(0xdeadbeef)/g
       if ($WANT =~ m/deadbeef/);

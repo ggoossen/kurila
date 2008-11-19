@@ -731,7 +731,7 @@ sub can_ok ($@) {
 }
 
 sub isa_ok ($$;$) {
-    my@($object, $class, $obj_name) =  @_;
+    my@($object, $class, ?$obj_name) =  @_;
 
     my $diag;
     $obj_name = 'The object' unless defined $obj_name;

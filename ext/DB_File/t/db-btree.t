@@ -156,7 +156,7 @@ ok( $X = tie(%h, 'DB_File',$Dfile, O_RDWR^|^O_CREAT, 0640, $DB_BTREE )) ;
 die "Could not tie: $!" unless $X;
 
 my @($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
-   $blksize,$blocks) = stat@($Dfile);
+   $blksize,$blocks) = @: stat($Dfile);
 
 my %noMode = %( < map { $_, 1} qw( amigaos MSWin32 NetWare cygwin ) ) ;
 
@@ -164,7 +164,7 @@ ok( ($mode ^&^ 0777) == (($^O eq 'os2' || $^O eq 'MacOS') ?? 0666 !! 0640)
    || %noMode{?$^O} );
 
 my ($key, $value, $i);
-while (@($key,$value) = each@(%h)) {
+while (@(?$key,?$value) = @: each(%h)) {
     $i++;
 }
 ok( !$i ) ;
@@ -240,7 +240,7 @@ my @values = values(%h);
 ok( ((nelems @keys)-1) == 29 && ((nelems @values)-1) == 29) ;
 
 $i = 0 ;
-while (@($key,$value) = each@(%h)) {
+while (@(?$key,?$value) = @: each(%h)) {
     if ($key eq @keys[$i] && $value eq @values[$i] && $key eq lc($value)) {
 	$key = uc($key);
 	$i++ if $key eq $value;
@@ -278,7 +278,7 @@ for my $i (1..199) { $ok = 0 unless %h{?$i} == $i; }
 ok( $ok);
 
 @($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
-   $blksize,$blocks) = stat@($Dfile);
+   $blksize,$blocks) = @: stat($Dfile);
 ok( $size +> 0 );
  
 do {
@@ -564,7 +564,7 @@ foreach (1 .. 10)
 
 # check that there are 10 elements in the hash
 $i = 0 ;
-while (@($key,$value) = each@(%h)) {
+while (@(?$key,?$value) = @: each(%h)) {
     $i++;
 }
 ok( $i == 10);
@@ -574,7 +574,7 @@ ok( $i == 10);
 
 # check it is empty
 $i = 0 ;
-while (@($key,$value) = each@(%h)) {
+while (@(?$key,?$value) = @: each(%h)) {
     $i++;
 }
 ok( $i == 0);

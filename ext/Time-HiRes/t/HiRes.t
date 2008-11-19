@@ -105,7 +105,7 @@ sub skip {
 }
 
 sub ok {
-    my @($n, $result, @< @info) = < @_;
+    my @($n, $result, @< @info) = @_;
     if ($result) {
     	print "ok $n\n";
     }
@@ -207,7 +207,8 @@ else {
 unless ($have_gettimeofday) {
     skip 14;
 } else {
- my ($s, $n) = (0);
+ my $s = 0;
+ my $n;
  for my $i (1 .. 100) {
      $s += Time::HiRes::time() - time();
      $n++;
@@ -613,7 +614,7 @@ if ($have_ualarm) {
                  \@(35, 1_100_000),
                  \@(36, 2_200_000),
                  \@(37, 4_300_000))) {
-	my ($i, $n) = < @$t;
+	my @($i, $n) = @$t;
 	my $alarmed = 0;
 	local %SIG{ ALRM } = sub { $alarmed++ };
 	my $t0 = Time::HiRes::time();
