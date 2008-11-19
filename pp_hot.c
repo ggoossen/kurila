@@ -1298,6 +1298,8 @@ Perl_do_readline(pTHX_ GV* gv)
 	    /* undef TARG, and push that undefined value */
 	    if (type != OP_RCATLINE) {
 		SV_CHECK_THINKFIRST_COW_DROP(TARG);
+		if ( ! SvPVOK(TARG) )
+		    sv_upgrade(TARG, SVt_PV);
 		SvOK_off(TARG);
 	    }
 	    PUSHTARG;
@@ -1307,8 +1309,14 @@ Perl_do_readline(pTHX_ GV* gv)
   have_fp:
     if (gimme == G_SCALAR) {
 	sv = TARG;
-	if (type == OP_RCATLINE && SvGMAGICAL(sv))
-	    mg_get(sv);
+	if (type == OP_RCATLINE) {
+	    if (SvGMAGICAL(sv))
+		mg_get(sv);
+	}
+	else {
+	    if ( SvOK(sv) && ! SvPVOK(sv) )
+		sv_clear_body(sv);
+	}
 	if (SvROK(sv)) {
 	    if (type == OP_RCATLINE)
 		SvPV_force_nolen(sv);

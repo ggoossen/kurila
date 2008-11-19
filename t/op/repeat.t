@@ -1,7 +1,7 @@
 #!./perl
 
 BEGIN { require './test.pl' };
-plan(tests => 40);
+plan(tests => 30);
 
 # compile time
 
@@ -47,15 +47,8 @@ is($a, '',              'x=0');
 
 my @x = @(1,2,3);
 
-is(join('', @((<@x) x 4)),      '123123123123',         '(@x) x Y');
-is(join('', @((<@x,()) x 4)),   '123123123123',         '(@x,()) x Y');
-is(join('', @((<@x,1) x 4)),    '1231123112311231',     '(@x,1) x Y');
-is(join(':', @(() x 4)),       '',                     '() x Y');
-is(join(':', @((9) x 4)),      '9:9:9:9',              '(X) x Y');
-is(join(':', @((9,9) x 4)),    '9:9:9:9:9:9:9:9',      '(X,X) x Y');
-is(join('', @((< split(m//,"123")) x 2)), '123123',       'split and x');
-
-is(join('', @((<@x) x -14)),    '',                     '(@x) x -14');
+is(join('', (@x x 4)),      '123123123123',         '(@x) x Y');
+is(join('', (@x x -14)),    '',                     '(@x) x -14');
 
 
 # This test is actually testing for Digital C compiler optimizer bug,
@@ -113,21 +106,6 @@ is(join('', @((<@x) x -14)),    '',                     '(@x) x -14');
 #
 is("\x[dd]" x 24, "\x[dddddddddddddddddddddddddddddddddddddddddddddddd]", 'Dec C bug');
 
-
-# When we use a list repeat in a scalar context, it behaves like
-# a scalar repeat. Make sure that works properly, and doesn't leave
-# extraneous values on the stack.
-#  -- robin@kitsite.com
-
-my ($x, $y) = scalar ((1,2)x2);
-is($x, "22",    'list repeat in scalar context');
-is($y, undef,   '  no extra values on stack');
-
-# Make sure the stack doesn't get truncated too much - the left
-# operand of the eq binop needs to remain!
-is(77, scalar ((1,7)x2),    'stack truncation');
-
-
 # perlbug 20011113.110 works in 5.6.1, broken in 5.7.2
 do {
     my $x= \@(("foo") x 2);
@@ -139,11 +117,8 @@ do {
     local our $TODO = "x operator not copying elements in 'for' list? [ID 20010809.028]";
     my $x = 'abcd';
     my $y = '';
-    for (@(($x =~ m/./g) x 2)) {
+    for (@($x =~ m/./g) x 2) {
 	$y .= chop;
     }
     is($y, 'abcdabcd');
 };
-
-# [perl #35885]
-is( (join ',', @((<qw(a b c)) x 3)), 'a,b,c,a,b,c,a,b,c', 'x on qw produces list' );

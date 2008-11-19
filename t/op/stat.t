@@ -391,8 +391,7 @@ SKIP: do {
     ok(-T *FOO,          '   still -T');
     ok(! -B *FOO,        '   still !-B');
 
-    # It's documented this way in perlfunc *shrug*
-    @() = ~< *FOO;
+    @: ~< *FOO;
     ok(eof FOO,         'at EOF');
     ok(-T *FOO,          '   still -T');
     ok(-B *FOO,          '   now -B');

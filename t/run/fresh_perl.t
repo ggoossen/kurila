@@ -93,7 +93,7 @@ our $file;
 chop($file = ~< *DATA);
 ########
 package N;
-sub new {my ($obj,$n)=@_; bless \$n}  
+sub new {my @($obj,$n)=@_; bless \$n}  
 our $aa=N->new(1);
 $aa=12345;
 print $aa;
@@ -147,8 +147,8 @@ print "ok\n" if ("\0" cmp "\x[FF]") +< 0;
 EXPECT
 ok
 ########
-open(H,"<",$^O eq 'MacOS' ?? ':run:fresh_perl.t' !! 'run/fresh_perl.t'); # must be in the 't' directory
-stat(H);
+open(my $h,"<",$^O eq 'MacOS' ?? ':run:fresh_perl.t' !! 'run/fresh_perl.t'); # must be in the 't' directory
+stat($h);
 print "ok\n" if (-e _ and -f _ and -r _);
 EXPECT
 ok

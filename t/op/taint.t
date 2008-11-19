@@ -261,7 +261,7 @@ do {
     do {
       use re 'taint';
 
-      ($foo) = ('bar' . $TAINT) =~ m/(.+)/;
+      @($foo) = @: ('bar' . $TAINT) =~ m/(.+)/;
       test tainted $foo;
       test $foo eq 'bar';
 
@@ -277,7 +277,7 @@ do {
     my $pi = 4 * atan2(1,1) + $TAINT0;
     test tainted $pi;
 
-    ($pi) = $pi =~ m/(\d+\.\d+)/;
+    @($pi) = @: $pi =~ m/(\d+\.\d+)/;
     test not tainted $pi;
     test sprintf("\%.5f", $pi) eq '3.14159';
 };
@@ -1097,7 +1097,7 @@ do {
     local $main::TODO = 1;
     @a[0] = $^X;
     my $i = 0;
-    while(@a[0]=~ m/(.)/g ) {
+    while(@a[0] =~ m/(.)/g ) {
 	last if $i++ +> 10000;
     }
     cmp_ok $i, '+<', 10000, "infinite m//g";

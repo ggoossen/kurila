@@ -416,7 +416,7 @@ sub STORE {
 *DELETE = \&STORE;
 
 sub NEXTKEY {
-    my($k,$v) = each %name2no;
+    my @($k,$v) = @: each %name2no;
     $k
 }
 
