@@ -194,8 +194,6 @@ Deprecated.  Use C<GIMME_V> instead.
 #define OPpENTERSUB_INARGS	4	/* Lval used as arg to a sub. */
   /* OP_GV only */
 #define OPpEARLY_CV		32	/* foo() called before sub foo was parsed */
-  /* OP_?ELEM only */
-#define OPpLVAL_DEFER		16	/* Defer creation of array/hash elem */
 /* Private for OP_HELEM */
 #define OPpHELEM_ADD            8       /* Add key if it doesn't exist */
 #define OPpHELEM_OPTIONAL       4       /* Ignore if the key does not exist */

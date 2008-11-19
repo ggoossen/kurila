@@ -892,8 +892,6 @@ STATIC SV* S_dump_op_flags_private(pTHX_ const OP* o)
 	    }
 	}
 	if (optype == OP_AELEM || optype == OP_HELEM) {
-	    if (o->op_private & OPpLVAL_DEFER)
-		sv_catpv(tmpsv, ",LVAL_DEFER");
 	}
 	else {
 	    if (o->op_private & OPpOUR_INTRO)
