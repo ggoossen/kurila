@@ -121,7 +121,7 @@ my $err_sub = %options{?nofatal} ?? \&warnings::warnif !! sub { die shift; };
 
 
 sub openlog {
-    @($ident, my $logopt, $facility) =  @_;
+    @(?$ident, ?my $logopt, ?$facility) =  @_;
 
     # default values
     $ident    ||= basename($0) || getlogin() || getpwuid($<) || 'syslog';
@@ -414,13 +414,13 @@ sub _syslog_send_pipe {
 }
 
 sub _syslog_send_socket {
-    my @($buf) =  @_;
+    my @($buf, ...) =  @_;
     return syswrite(SYSLOG, $buf, length($buf));
     #return send(SYSLOG, $buf, 0);
 }
 
 sub _syslog_send_native {
-    my @($buf, $numpri) =  @_;
+    my @($buf, $numpri, ...) =  @_;
     syslog_xs($numpri, $buf);
     return 1;
 }
@@ -469,7 +469,7 @@ sub connect_log {
     $transmit_ok = 0;
     if ($connected) {
 	$current_proto = $proto;
-        my @($old) = select@(SYSLOG); $| = 1; select($old);
+        my $old = select(SYSLOG); $| = 1; select($old);
     } else {
 	@fallbackMethods = @( () );
         $err_sub->(join "\n\t- ", @( "no connection to syslog available", < @errs));

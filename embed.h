@@ -2082,6 +2082,7 @@
 #define pp_padany		Perl_pp_padany
 #define pp_padsv		Perl_pp_padsv
 #define pp_pipe_op		Perl_pp_pipe_op
+#define pp_placeholder		Perl_pp_placeholder
 #define pp_pop			Perl_pp_pop
 #define pp_pos			Perl_pp_pos
 #define pp_postdec		Perl_pp_postdec
@@ -4258,6 +4259,7 @@
 #define pp_padany()		Perl_pp_padany(aTHX)
 #define pp_padsv()		Perl_pp_padsv(aTHX)
 #define pp_pipe_op()		Perl_pp_pipe_op(aTHX)
+#define pp_placeholder()	Perl_pp_placeholder(aTHX)
 #define pp_pop()		Perl_pp_pop(aTHX)
 #define pp_pos()		Perl_pp_pos(aTHX)
 #define pp_postdec()		Perl_pp_postdec(aTHX)

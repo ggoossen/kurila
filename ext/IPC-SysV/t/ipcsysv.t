@@ -118,7 +118,7 @@ EOM
 
     my $test_name = 'message get data';
     my($rmsgtype,$rmsgtext);
-    @($rmsgtype,$rmsgtext) = unpack@("L! a*",$msgbuf);
+    @($rmsgtype,$rmsgtext) = @: unpack("L! a*",$msgbuf);
     if ($rmsgtype == $msgtype && $rmsgtext eq $msgtext) {
         pass($test_name);
     }
@@ -163,12 +163,12 @@ SKIP: do {
 
     cmp_ok(length($data),'+>',0,'sem data len');
 
-    ok(semctl($sem,0,SETALL,pack("s!*",(0) x $nsem)), 'set all sems');
+    ok(semctl($sem,0,SETALL,pack("s!*",< $: @(0) x $nsem)), 'set all sems');
 
     $data = "";
     ok(semctl($sem,0,GETALL,$data), 'get all sems');
 
-    is(length($data),length(pack("s!*",(0) x $nsem)), 'right length');
+    is(length($data),length(pack("s!*", < $: @(0) x $nsem)), 'right length');
 
     my @data = @(unpack("s!*",$data));
 

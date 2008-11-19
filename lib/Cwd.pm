@@ -571,8 +571,8 @@ sub fast_abs_path {
 
     # Detaint else we'll explode in taint mode.  This is safe because
     # we're not doing anything dangerous with it.
-    ($path) = $path =~ m/(.*)/;
-    ($cwd)  = $cwd  =~ m/(.*)/;
+    @($path) = @: $path =~ m/(.*)/;
+    @($cwd)  = @: $cwd  =~ m/(.*)/;
 
     unless (-e $path) {
  	die("$path: No such file or directory");

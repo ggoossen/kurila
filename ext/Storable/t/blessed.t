@@ -113,14 +113,14 @@ sub STORABLE_freeze {
   # Some reference some number of times.
   my $self = shift;
   my @($what, $times) =  @$self;
-  return @("$what$times", (%::immortals{?$what}) x $times);
+  return @("$what$times", < (@(%::immortals{?$what}) x $times));
 }
 
 sub STORABLE_thaw {
 	my $self = shift;
 	my $cloning = shift;
 	my @($x, @< @refs) =  @_;
-	my @($what, $times) = $x =~ m/(.)(\d+)/;
+	my @($what, $times) = @: $x =~ m/(.)(\d+)/;
 	die "'$x' didn't match" unless defined $times;
 	main::ok ++$test, nelems(@refs) == $times;
 	my $expect = %::immortals{?$what};

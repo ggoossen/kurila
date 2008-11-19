@@ -125,7 +125,7 @@ sub _get_addr {
     my@($sock,$addr_str, $multi) =  @_;
     my @addr;
     if ($multi && $addr_str !~ m/^\d+(?:\.\d+){3}$/) {
-	@(undef, undef, undef, undef, @< @addr) = gethostbyname@($addr_str);
+	@(_, _, _, _, @< @addr) = @: gethostbyname($addr_str);
     } else {
 	my $h = inet_aton($addr_str);
 	push(@addr, $h) if defined $h;

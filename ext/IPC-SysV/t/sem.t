@@ -48,7 +48,7 @@ pass('acquired a semaphore');
 
 ok(my $st = $sem->stat,'stat it');
 
-ok($sem->setall( (0) x 10),'set all');
+ok($sem->setall( < $: @(0) x 10),'set all');
 
 my @sem =$sem->getall;
 cmp_ok(join("",@sem),'eq',"0000000000",'get all');

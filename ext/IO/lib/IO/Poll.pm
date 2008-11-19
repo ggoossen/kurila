@@ -76,7 +76,7 @@ sub poll {
     my($fd,$mask,$iom);
     my @poll = @( () );
 
-    while(@($fd,$iom) =@( each %{$self->[0]})) {
+    while(@(?$fd,?$iom) =@( each %{$self->[0]})) {
 	$mask   = 0;
 	$mask  ^|^= $_ for values(%$iom);
 	push(@poll,$fd => $mask);
@@ -88,7 +88,7 @@ sub poll {
 	unless $ret +> 0;
 
     while((nelems @poll)) {
-	my@($fd,$got) = splice@(@poll,0,2);
+	my @($fd,$got) = @: splice(@poll,0,2);
 	$self->[1]->{+$fd} = $got if $got;
     }
 

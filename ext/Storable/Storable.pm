@@ -126,7 +126,7 @@ sub file_magic {
 }
 
 sub read_magic {
-    my@($buf, $file) =  @_;
+    my@($buf, ?$file) =  @_;
     my %info;
 
     my $buflen = length($buf);

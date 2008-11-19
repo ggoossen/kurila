@@ -340,7 +340,7 @@ sub readsyms (\%$) {
 readsyms my %ppsym, 'pp.sym';
 
 sub readvars(\%$$@) {
-    my @($syms, $file,$pre,$keep_pre) =  @_;
+    my @($syms, $file,$pre,?$keep_pre) =  @_;
     local (*FILE, $_);
     open(FILE, "<", "$file")
 	or die "embed.pl: Can't open $file: $!\n";

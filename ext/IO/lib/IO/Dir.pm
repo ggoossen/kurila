@@ -89,7 +89,7 @@ sub rewind {
 }
 
 sub TIEHASH {
-    my@($class,$dir,$options) =  @_;
+    my@($class,$dir,?$options) =  @_;
 
     my $dh = $class->new($dir)
 	or return undef;
@@ -107,7 +107,7 @@ sub FIRSTKEY {
 }
 
 sub NEXTKEY {
-    my@($dh) =  @_;
+    my @($dh, ...) =  @_;
     scalar $dh->read;
 }
 
@@ -123,7 +123,7 @@ sub FETCH {
 
 sub STORE {
     my@($dh,$key,$data) =  @_;
-    my@($atime,$mtime) = ref($data) ?? < @$data !! ($data,$data);
+    my@($atime,$mtime) = ref($data) ?? < @$data !! @($data,$data);
     my $file = File::Spec->catfile(%{*$dh}{?io_dir_path}, $key);
     unless(-e $file) {
 	my $io = IO::File->new($file,O_CREAT ^|^ O_RDWR);

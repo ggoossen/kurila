@@ -1232,8 +1232,8 @@ sub populate_curcvlex {
             my $name = @ns[$i]->PVX_const;
 	    my @($seq_st, $seq_en) =
 		(@ns[$i]->FLAGS ^&^ SVf_FAKE)
-		    ?? (0, 999999)
-		    !! (@ns[$i]->COP_SEQ_RANGE_LOW, @ns[$i]->COP_SEQ_RANGE_HIGH);
+		    ?? @(0, 999999)
+		    !! @(@ns[$i]->COP_SEQ_RANGE_LOW, @ns[$i]->COP_SEQ_RANGE_HIGH);
 
 	    push @{$self->{'curcvlex'}->{$name}}, \@($seq_st, $seq_en);
 	}

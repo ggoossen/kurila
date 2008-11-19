@@ -11,7 +11,7 @@
 # ext/Storable into @INC.
 
 sub ok {
-	my @($num, $ok, $name) =  @_;
+	my @($num, $ok, ?$name) =  @_;
         $num .= " - $name" if defined $name and length $name;
 	print $ok ?? "ok $num\n" !! "not ok $num\n";
         $ok;
@@ -72,8 +72,8 @@ sub recursive_dump {
 	# Then extract the bless, ref and address parts of that string.
 
 	my $what = dump::view($object);		# Stringify
-	my @($bless, $ref, $addr) = $what =~ m/^(\w+)=(\w+)\((0x.*)\)$/;
-	@($ref, $addr) = $what =~ m/^(\w+)\((0x.*)\)$/ unless $bless;
+	my @(?$bless, ?$ref, ?$addr) = @: $what =~ m/^(\w+)=(\w+)\((0x.*)\)$/;
+	@($ref, $addr) = @: $what =~ m/^(\w+)\((0x.*)\)$/ unless $bless;
 
 	# Special case for references to references. When stringified,
 	# they appear as being scalars. However, ref() correctly pinpoints

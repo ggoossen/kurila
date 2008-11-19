@@ -44,7 +44,7 @@ our $Deparse    //= 0;
 # to cause output of arrays and hashes rather than refs.
 #
 sub new {
-  my@($c, $v, $n) =  @_;
+  my@($c, $v, ?$n) =  @_;
 
   die "Usage:  PACKAGE->new(ARRAYREF, [ARRAYREF])" 
     unless (defined($v) && (ref($v) eq 'ARRAY'));
@@ -414,7 +414,7 @@ sub _dump {
     }
     elsif ($realtype eq 'ARRAY') {
         my($pad, $mname);
-        my@($i) = 0;
+        my $i = 0;
         $out .= '@(';
         $pad = $s->{?sep} . $s->{?pad} . $s->{?apad};
         $mname = $name . '->';
@@ -548,7 +548,7 @@ sub Indent {
 }
 
 sub Pair {
-    my@($s, $v) =  @_;
+    my@($s, ?$v) =  @_;
     defined($v) ?? do { ($s->{+pair} = $v); return $s} !! $s->{?pair};
 }
 

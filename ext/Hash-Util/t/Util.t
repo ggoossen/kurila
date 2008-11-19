@@ -248,7 +248,7 @@ do {
       my %target;
       lock_keys ( %target, < @keys ) if $lock;
 
-      while (my @($k, $v) =@( each %clean)) {
+      while (my @(?$k, ?$v) =@( each %clean)) {
 	%target{+$k} = $v;
       }
 
@@ -272,10 +272,10 @@ do {
 		 "hash in list context for $message");
 
       my (@clean, @target);
-      while (my @($k, $v) =@( each %clean)) {
+      while (my @(?$k, ?$v) =@( each %clean)) {
 	push @clean, $k, $v;
       }
-      while (my @($k, $v) =@( each %target)) {
+      while (my @(?$k, ?$v) =@( each %target)) {
 	push @target, $k, $v;
       }
 

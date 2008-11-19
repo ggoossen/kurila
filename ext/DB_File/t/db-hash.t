@@ -15,7 +15,7 @@ unlink < glob "__db.*";
 
 sub myok
 {
-    my @($no, $result, $message) =  @_;
+    my @($no, $result, ?$message) =  @_;
  
     ok($result, $message);
 
@@ -126,7 +126,7 @@ myok(15, $X = tie(%h, 'DB_File',$Dfile, O_RDWR^|^O_CREAT, 0640, $DB_HASH ) );
 die "Could not tie: $!" unless $X;
 
 my @($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
-   $blksize,$blocks) = stat@($Dfile);
+   $blksize,$blocks) = @: stat($Dfile);
 
 my %noMode = %( < map { $_, 1} qw( amigaos MSWin32 NetWare cygwin ) ) ;
 
@@ -134,7 +134,7 @@ myok(16, ($mode ^&^ 0777) == (($^O eq 'os2' || $^O eq 'MacOS') ?? 0666 !! 0640) 
    %noMode{?$^O} );
 
 my ($key, $value, $i);
-while (@($key,$value) = each@(%h)) {
+while (@(?$key,?$value) = @: each(%h)) {
     $i++;
 }
 myok(17, !$i );
@@ -211,7 +211,7 @@ my @values = values(%h);
 myok(23, (nelems @keys) == 30 && (nelems @values) == 30) ;
 
 $i = 0 ;
-while (@($key,$value) = each@(%h)) {
+while (@(?$key,?$value) = @: each(%h)) {
     if ($key eq @keys[$i] && $value eq @values[$i] && $key eq lc($value)) {
 	$key = uc($key);
 	$i++ if $key eq $value;
@@ -244,7 +244,7 @@ for my $i (1..199) { $ok = 0 unless %h{?$i} == $i; }
 myok(28, $ok );
 
 @($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
-   $blksize,$blocks) = stat@($Dfile);
+   $blksize,$blocks) = @: stat($Dfile);
 myok(29, $size +> 0 );
  
     @(@< %h{[0..200]}) =  200..400;
@@ -340,7 +340,7 @@ foreach (1 .. 10)
 
 # check that there are 10 elements in the hash
 $i = 0 ;
-while (@($key,$value) = each@(%h)) {
+while (@(?$key,?$value) = @: each(%h)) {
     $i++;
 }
 myok(45, $i == 10);
@@ -350,7 +350,7 @@ myok(45, $i == 10);
 
 # check it is empty
 $i = 0 ;
-while (@($key,$value) = each@(%h)) {
+while (@(?$key,?$value) = @: each(%h)) {
     $i++;
 }
 myok(46, $i == 0);
@@ -487,7 +487,7 @@ do {
    use warnings ;
     
    my (%h, $db) ;
-   my @($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
+   my @($fetch_key, $store_key, $fetch_value, $store_value) = @("") x 4 ;
    unlink $Dfile;
 
    sub checkOutput
@@ -525,12 +525,12 @@ do {
    #                   fk   sk     fv   sv
    myok(64, checkOutput( "", "fred", "", "joe")) ;
 
-   @($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
+   @($fetch_key, $store_key, $fetch_value, $store_value) = @("") x 4 ;
    myok(65, %h{?"fred"} eq "joe");
    #                   fk    sk     fv    sv
    myok(66, checkOutput( "", "fred", "joe", "")) ;
 
-   @($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
+   @($fetch_key, $store_key, $fetch_value, $store_value) = @("") x 4 ;
    my ($k, $v) ;
    $k = 'fred';
    myok(67, ! $db->seq($k, $v, R_FIRST) ) ;
@@ -549,17 +549,17 @@ do {
    my $old_sv = $db->filter_store_value 
    			(sub { s/o/x/g; $store_value = $_ }) ;
    
-   @($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
+   @($fetch_key, $store_key, $fetch_value, $store_value) = @("") x 4 ;
    %h{+"Fred"} = "Joe" ;
    #                   fk   sk     fv    sv
    myok(71, checkOutput( "", "fred", "", "Jxe")) ;
 
-   @($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
+   @($fetch_key, $store_key, $fetch_value, $store_value) = @("") x 4 ;
    myok(72, %h{?"Fred"} eq "[Jxe]");
    #                   fk   sk     fv    sv
    myok(73, checkOutput( "", "fred", "[Jxe]", "")) ;
 
-   @($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
+   @($fetch_key, $store_key, $fetch_value, $store_value) = @("") x 4 ;
    $k = 'Fred'; $v ='';
    myok(74, ! $db->seq($k, $v, R_FIRST) ) ;
    myok(75, $k eq "FRED") or 
@@ -574,15 +574,15 @@ do {
    $db->filter_fetch_value ($old_fv);
    $db->filter_store_value ($old_sv);
 
-   @($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
+   @($fetch_key, $store_key, $fetch_value, $store_value) = @("") x 4 ;
    %h{+"fred"} = "joe" ;
    myok(78, checkOutput( "", "fred", "", "joe")) ;
 
-   @($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
+   @($fetch_key, $store_key, $fetch_value, $store_value) = @("") x 4 ;
    myok(79, %h{?"fred"} eq "joe");
    myok(80, checkOutput( "", "fred", "joe", "")) ;
 
-   @($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
+   @($fetch_key, $store_key, $fetch_value, $store_value) = @("") x 4 ;
    #myok(77, $db->FIRSTKEY() eq "fred") ;
    $k = 'fred';
    myok(81, ! $db->seq($k, $v, R_FIRST) ) ;
@@ -597,15 +597,15 @@ do {
    $db->filter_fetch_value (undef);
    $db->filter_store_value (undef);
 
-   @($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
+   @($fetch_key, $store_key, $fetch_value, $store_value) = @("") x 4 ;
    %h{+"fred"} = "joe" ;
    myok(85, checkOutput( "", "", "", "")) ;
 
-   @($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
+   @($fetch_key, $store_key, $fetch_value, $store_value) = @("") x 4 ;
    myok(86, %h{?"fred"} eq "joe");
    myok(87, checkOutput( "", "", "", "")) ;
 
-   @($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
+   @($fetch_key, $store_key, $fetch_value, $store_value) = @("") x 4 ;
    $k = 'fred';
    myok(88, ! $db->seq($k, $v, R_FIRST) ) ;
    myok(89, $k eq "fred") ;
@@ -730,7 +730,7 @@ do {
     delete %h{"apple"} ;
 
     # print the contents of the file
-    while (@($k, $v) =@( each %h))
+    while (@(?$k, ?$v) =@( each %h))
       { print "$k -> $v\n" }
 
     untie %h ;
@@ -814,7 +814,7 @@ do {
     myok(122, %h{?'Alpha_DEF'} == 5);
 
     my @($k, $v) = @("","");
-    while (@($k, $v) =@( each %h)) {}
+    while (@(?$k, ?$v) =@( each %h)) {}
     myok(123, $bad_key == 0);
 
     $bad_key = 0 ;
@@ -1111,8 +1111,8 @@ do {
     ok nkeys %bad == 0 ;
     ok nkeys %remember == 0 ;
 
-    print "# missing -- $key=>$value\n" while @($key, $value) =@( each %remember);
-    print "# bad     -- $key=>$value\n" while @($key, $value) =@( each %bad);
+    print "# missing -- $key=>$value\n" while @(?$key, ?$value) =@( each %remember);
+    print "# bad     -- $key=>$value\n" while @(?$key, ?$value) =@( each %bad);
 
     # Make sure this fix does not break code to handle an undef key
     # Berkeley DB undef key is broken between versions 2.3.16 and 3.1
@@ -1201,8 +1201,8 @@ do {
     ok nkeys %bad == 0 ;
     ok nkeys %remember == 0 ;
 
-    print "# missing -- $key $value\n" while @($key, $value) =@( each %remember);
-    print "# bad     -- $key $value\n" while @($key, $value) =@( each %bad);
+    print "# missing -- $key $value\n" while @(?$key, ?$value) =@( each %remember);
+    print "# bad     -- $key $value\n" while @(?$key, ?$value) =@( each %bad);
    undef $db ;
    untie %h;
    unlink $Dfile;

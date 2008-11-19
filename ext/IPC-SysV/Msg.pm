@@ -91,7 +91,7 @@ sub rcv {
     msgrcv($$self,$buf,@_[1],@_[2] || 0, @_[3] || 0) or
 	return;
     my $type;
-    @($type,@_[0]) = unpack@("l! a*",$buf);
+    @($type,@_[0]) = @: unpack("l! a*",$buf);
     $type;
 }
 
