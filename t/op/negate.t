@@ -4,7 +4,7 @@ BEGIN {
     require './test.pl';
 }
 
-plan tests => 16;
+plan tests => 14;
 
 # Some of these will cause warnings if left on.  Here we're checking the
 # functionality, not the warnings.
@@ -22,11 +22,6 @@ is(-"-10foo", "+10foo", 'Negation of string starting with "-" returns a string s
 is(-"xyz", "-0", 'Negation of a string converts string to number');
 is(-"-xyz", "+xyz", "Negation of a negative string to positive");
 is(-"+xyz", "-xyz", "Negation of a positive string to negative");
-do {
-    no warnings;
-    is(-bareword, "-0", "Negation of bareword converted to number");
-    is(- -bareword, "0", "Negation of -bareword converted to number");
-};
 is(-" -10", 10, "Negation of a whitespace-lead numeric string");
 is(-" -10.0", 10, "Negation of a whitespace-lead decimal string");
 is(-" -10foo", 10, "Negation of a whitespace-lead sting starting with a numeric")

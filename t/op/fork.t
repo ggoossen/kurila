@@ -9,7 +9,7 @@ BEGIN {
 	print "1..0 # Skip: no fork\n";
 	exit 0;
     }
-    %ENV{PERL5LIB} = "../lib";
+    %ENV{+PERL5LIB} = "../lib";
 }
 
 if ($^O eq 'mpeix') {
@@ -279,21 +279,21 @@ $| = 1;
 $\ = "\n";
 my $getenv;
 if ($^O eq 'MSWin32' || $^O eq 'NetWare') {
-    $getenv = qq[$^X -e "print \%ENV\{TST\}"];
+    $getenv = qq[$^X -e "print \%ENV\{?TST\}"];
 }
 else {
-    $getenv = qq[$^X -e 'print \%ENV\{TST\}'];
+    $getenv = qq[$^X -e 'print \%ENV\{?TST\}'];
 }
-%ENV{TST} = 'foo';
+%ENV{+TST} = 'foo';
 if (fork) {
     sleep 1;
     print "parent before: " . `$getenv`;
-    %ENV{TST} = 'bar';
+    %ENV{+TST} = 'bar';
     print "parent after: " . `$getenv`;
 }
 else {
     print "child before: " . `$getenv`;
-    %ENV{TST} = 'baz';
+    %ENV{+TST} = 'baz';
     print "child after: " . `$getenv`;
 }
 EXPECT

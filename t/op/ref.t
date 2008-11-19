@@ -92,7 +92,7 @@ is (join(':', @{@spring[5]}), "123:456:789");
 
 # Test to see if anonymous subhashes spring into existence.
 
-@{%spring2{"foo"}} = @(1,2,3);
+@{%spring2{+"foo"}} = @(1,2,3);
 %spring2{"foo"}->[3] = 4;
 is (join(':', @{%spring2{?"foo"}}), "1:2:3:4");
 
