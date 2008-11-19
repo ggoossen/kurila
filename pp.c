@@ -3650,7 +3650,7 @@ PP(pp_hslice)
             }
 
 	    HE* he = hv_store_ent(hv, keysv,
-		newitem ? newSVsv(*newitem) : &PL_sv_undef,
+		newSVsv(newitem ? *newitem : &PL_sv_undef),
 		0);
 	    if ( ! partial) {
 		av_push(ret, newSVsv(he ? HeVAL(he) : &PL_sv_undef));
@@ -3897,6 +3897,12 @@ PP(pp_enter_hashexpand_assign)
 	SV* tmpstr = newSV(0);
 	if (SP > base)
 	    sv_setsv(tmpstr, POPs);	/* value */
+	else
+	    if (ckWARN(WARN_MISC)) {
+		const char *err = "Odd number of elements in hash assignment";
+		Perl_warner(aTHX_ packWARN(WARN_MISC), err);
+	    }
+
 	if (gimme != G_VOID && hv_exists_ent(hv, sv, 0))
 	    /* key overwrites an existing entry */
 	    duplicates += 2;

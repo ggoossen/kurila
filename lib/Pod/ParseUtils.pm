@@ -775,7 +775,7 @@ unique id for the C<find_node> method to work correctly.
 sub nodes {
     my @($self,@< @nodes) =  @_;
     if((nelems @nodes)) {
-        push(@{$self->{-nodes}}, < @nodes);
+        push(@{$self->{nodes}}, < @nodes);
         return @nodes;
     }
     else {
@@ -821,7 +821,7 @@ unique id.
 sub idx {
     my @($self,@< @idx) =  @_;
     if((nelems @idx)) {
-        push(@{$self->{-idx}}, < @idx);
+        push(@{$self->{idx}}, < @idx);
         return @idx;
     }
     else {

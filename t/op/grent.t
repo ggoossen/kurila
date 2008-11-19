@@ -94,7 +94,7 @@ while ( ~< *GR) {
     my @s = split m/:/, $_, -1;
     my @($name_s,$passwd_s,$gid_s,$members_s) =  @s;
     if ((nelems @s)) {
-	push @{ %seen{$name_s} }, iohandle::input_line_number(\*GR);
+	push @{ %seen{+$name_s} }, iohandle::input_line_number(\*GR);
     } else {
 	warn "# Your $where line $(iohandle::input_line_number(\*GR)) is empty.\n";
 	next;

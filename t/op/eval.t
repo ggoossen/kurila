@@ -352,7 +352,7 @@ require './test.pl';
 our $NO_ENDING = 1;
 # [perl #19022] used to end up with shared hash warnings
 # The program should generate no output, so anything we see is on stderr
-my $got = runperl (prog => 'our %h; %h{a}=1; foreach my $k (keys %h) {eval qq{\$k}}',
+my $got = runperl (prog => 'our %h; %h{+a}=1; foreach my $k (keys %h) {eval qq{\$k}}',
 		   stderr => 1);
 
 if ($got eq '') {

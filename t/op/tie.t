@@ -22,7 +22,7 @@ for ( @prgs){
     my@($prog,$expected) =  split(m/\nEXPECT\n/, $_, 2);
     print("not ok $i # bad test format\n"), next
         unless defined $expected;
-    my @($testname) = @: $prog =~ m/^# (.*)\n/m;
+    my @(?$testname) = @: $prog =~ m/^# (.*)\n/m;
     $testname ||= '';
     local our $TODO = $testname =~ s/^TODO //;
     $expected =~ s/\n+$//;
@@ -175,9 +175,9 @@ Self-ties of arrays and hashes are not supported at - line 6 character 5.
 use Tie::Hash ;
 tie our %tied, 'Tie::StdHash';
 our %hash;
-do { local %hash{'foo'} }; warn "plain hash bad unlocalize" if exists %hash{'foo'};
-do { local %tied{'foo'} }; warn "tied hash bad unlocalize" if exists %tied{'foo'};
-do { local %ENV{'foo'}  }; warn "\%ENV bad unlocalize" if exists %ENV{'foo'};
+do { local %hash{?'foo'} }; warn "plain hash bad unlocalize" if exists %hash{'foo'};
+do { local %tied{?'foo'} }; warn "tied hash bad unlocalize" if exists %tied{'foo'};
+do { local %ENV{?'foo'}  }; warn "\%ENV bad unlocalize" if exists %ENV{'foo'};
 EXPECT
 ########
 
@@ -188,8 +188,8 @@ Can't modify constant item in tie at - line 3 character 5.
 ########
 
 # localizing tied hash slices
-%ENV{FooA} = 1;
-%ENV{FooB} = 2;
+%ENV{+FooA} = 1;
+%ENV{+FooB} = 2;
 print exists %ENV{FooA} ?? 1 !! 0, "\n";
 print exists %ENV{FooB} ?? 2 !! 0, "\n";
 print exists %ENV{FooC} ?? 3 !! 0, "\n";

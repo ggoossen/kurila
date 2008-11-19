@@ -282,7 +282,7 @@ sub test_pkg {
 	       ))) ));
 
     for my $type (keys %matchers) {
-	foreach my $fn ( @{$fntypes->{$type}}) {
+	foreach my $fn ( @{$fntypes->{?$type}}) {
 	    carp "$fn can only be one of $type, %stash{?$fn}\n"
 		if %stash{?$fn};
 	    %stash{+$fn} = $type;
@@ -293,7 +293,7 @@ sub test_pkg {
     for my $k (keys %stash) {
 	%stash{+$k} = $dflt unless %stash{?$k};
     }
-    %stash{+$_} = 'skip' foreach  @{$fntypes->{skip}};
+    %stash{+$_} = 'skip' foreach  @{$fntypes->{?skip}};
 
     if (%opts{?v}) {
 	diag("fntypes: " => < Dumper($fntypes));

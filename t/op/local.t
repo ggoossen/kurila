@@ -207,7 +207,7 @@ do {
 %ENV{+_Y_} = 'b';
 %ENV{+_Z_} = 'c';
 do {
-    local(%ENV{_A_});
+    local(%ENV{?_A_});
     local(%ENV{+_B_}) = 'foo';
     local(%ENV{+_X_}) = 'foo';
     local(%ENV{+_Y_}) = %ENV{?_Y_};

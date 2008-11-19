@@ -682,7 +682,7 @@ do {
    use warnings ;
     
    my (%h, $db) ;
-   my @($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
+   my @($fetch_key, $store_key, $fetch_value, $store_value) = @("") x 4 ;
    unlink $Dfile;
 
    sub checkOutput
@@ -707,12 +707,12 @@ do {
    #                   fk   sk     fv   sv
    ok( checkOutput( "", "fred", "", "joe")) ;
 
-   @($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
+   @($fetch_key, $store_key, $fetch_value, $store_value) = @("") x 4 ;
    ok( %h{?"fred"} eq "joe");
    #                   fk    sk     fv    sv
    ok( checkOutput( "", "fred", "joe", "")) ;
 
-   @($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
+   @($fetch_key, $store_key, $fetch_value, $store_value) = @("") x 4 ;
    ok( $db->FIRSTKEY() eq "fred") ;
    #                    fk     sk  fv  sv
    ok( checkOutput( "fred", "", "", "")) ;
@@ -727,17 +727,17 @@ do {
    my $old_sv = $db->filter_store_value 
    			(sub { s/o/x/g; $store_value = $_ }) ;
    
-   @($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
+   @($fetch_key, $store_key, $fetch_value, $store_value) = @("") x 4 ;
    %h{+"Fred"} = "Joe" ;
    #                   fk   sk     fv    sv
    ok( checkOutput( "", "fred", "", "Jxe")) ;
 
-   @($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
+   @($fetch_key, $store_key, $fetch_value, $store_value) = @("") x 4 ;
    ok( %h{?"Fred"} eq "[Jxe]");
    #                   fk   sk     fv    sv
    ok( checkOutput( "", "fred", "[Jxe]", "")) ;
 
-   @($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
+   @($fetch_key, $store_key, $fetch_value, $store_value) = @("") x 4 ;
    ok( $db->FIRSTKEY() eq "FRED") ;
    #                   fk   sk     fv    sv
    ok( checkOutput( "FRED", "", "", "")) ;
@@ -748,15 +748,15 @@ do {
    $db->filter_fetch_value ($old_fv);
    $db->filter_store_value ($old_sv);
 
-   @($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
+   @($fetch_key, $store_key, $fetch_value, $store_value) = @("") x 4 ;
    %h{+"fred"} = "joe" ;
    ok( checkOutput( "", "fred", "", "joe")) ;
 
-   @($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
+   @($fetch_key, $store_key, $fetch_value, $store_value) = @("") x 4 ;
    ok( %h{?"fred"} eq "joe");
    ok( checkOutput( "", "fred", "joe", "")) ;
 
-   @($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
+   @($fetch_key, $store_key, $fetch_value, $store_value) = @("") x 4 ;
    ok( $db->FIRSTKEY() eq "fred") ;
    ok( checkOutput( "fred", "", "", "")) ;
 
@@ -766,15 +766,15 @@ do {
    $db->filter_fetch_value (undef);
    $db->filter_store_value (undef);
 
-   @($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
+   @($fetch_key, $store_key, $fetch_value, $store_value) = @("") x 4 ;
    %h{+"fred"} = "joe" ;
    ok( checkOutput( "", "", "", "")) ;
 
-   @($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
+   @($fetch_key, $store_key, $fetch_value, $store_value) = @("") x 4 ;
    ok( %h{?"fred"} eq "joe");
    ok( checkOutput( "", "", "", "")) ;
 
-   @($fetch_key, $store_key, $fetch_value, $store_value) = ("") x 4 ;
+   @($fetch_key, $store_key, $fetch_value, $store_value) = @("") x 4 ;
    ok( $db->FIRSTKEY() eq "fred") ;
    ok( checkOutput( "", "", "", "")) ;
 
@@ -1318,7 +1318,7 @@ do {
     ok( %h{?'Alpha_DEF'} == 5);
 
     my @($k, $v) = @("","");
-    while (@($k, $v) =@( each %h)) {}
+    while (@(?$k, ?$v) =@( each %h)) {}
     ok( $bad_key == 0);
 
     $bad_key = 0 ;
@@ -1594,8 +1594,8 @@ do {
     ok nkeys %bad == 0 ;
     ok nkeys %remember == 0 ;
 
-    print "# missing -- $key $value\n" while @($key, $value) =@( each %remember);
-    print "# bad     -- $key $value\n" while @($key, $value) =@( each %bad);
+    print "# missing -- $key $value\n" while @(?$key, ?$value) =@( each %remember);
+    print "# bad     -- $key $value\n" while @(?$key, ?$value) =@( each %bad);
 
     # Make sure this fix does not break code to handle an undef key
     # Berkeley DB undef key is bron between versions 2.3.16 and 
