@@ -1464,7 +1464,6 @@ PP(pp_helem)
     HV * const hv = (HV*)POPs;
     const OPFLAGS op_flags = PL_op->op_flags;
     const U32 lval = op_flags & OPf_MOD;
-    const U32 defer = PL_op->op_private & OPpLVAL_DEFER;
     const U32 optional = PL_op->op_private & OPpHELEM_OPTIONAL;
     const U32 add = PL_op->op_private & OPpHELEM_ADD;
     SV *sv;
@@ -1510,7 +1509,7 @@ PP(pp_helem)
 		)
 	    ) ? hv_exists_ent(hv, keysv, 0) : 1;
     }
-    he = hv_fetch_ent(hv, keysv, lval && !defer, hash);
+    he = hv_fetch_ent(hv, keysv, lval, hash);
     svp = he ? &HeVAL(he) : NULL;
     if ( ! svp || *svp == &PL_sv_undef ) {
 	if ( optional ) {
@@ -2423,15 +2422,12 @@ PP(pp_aelem)
     AV* const av = (AV*)POPs;
     const OPFLAGS op_flags = PL_op->op_flags;
     const U32 lval = op_flags & OPf_MOD;
-    U32 defer;
     SV *sv;
 
     if ( ! SvAVOK(av) )
 	Perl_croak(aTHX_ "Can't take an element from a %s", Ddesc((SV*)av));
 
-    defer = (PL_op->op_private & OPpLVAL_DEFER) && (elem > av_len(av));
-
-    svp = av_fetch(av, elem, lval && !defer);
+    svp = av_fetch(av, elem, lval);
     if (lval) {
 #ifdef PERL_MALLOC_WRAP
 	 if (SvUOK(elemsv)) {
@@ -2448,8 +2444,7 @@ PP(pp_aelem)
 #endif
 	if (!svp || *svp == &PL_sv_undef) {
 	    SV* lv;
-	    if (!defer)
-		DIE(aTHX_ PL_no_aelem, elem);
+	    DIE(aTHX_ PL_no_aelem, elem);
 	    lv = sv_newmortal();
 	    sv_upgrade(lv, SVt_PVLV);
 	    LvTYPE(lv) = 'y';

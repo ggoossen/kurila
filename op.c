@@ -1434,9 +1434,6 @@ Perl_mod(pTHX_ OP *o, I32 type)
     case OP_AELEM:
     case OP_HELEM:
 	mod(cBINOPo->op_first, type == OP_NULL ? o->op_type : type);
-	if (type == OP_ENTERSUB &&
-	     !(o->op_private & (OPpLVAL_INTRO | OPpDEREF)))
-	    o->op_private |= OPpLVAL_DEFER;
 	localize = 1;
 	PL_modcount++;
 	break;
@@ -6692,7 +6689,7 @@ Perl_peep(pTHX_ register OP *o)
 		    ((PL_op = pop->op_next)) &&
 		    pop->op_next->op_type == OP_AELEM &&
 		    !(pop->op_next->op_private &
-		      (OPpLVAL_INTRO|OPpLVAL_DEFER|OPpDEREF)) &&
+		      (OPpLVAL_INTRO|OPpDEREF)) &&
 		    (i = SvIV(((SVOP*)pop)->op_sv))
 				<= 255 &&
 		    i >= 0)
