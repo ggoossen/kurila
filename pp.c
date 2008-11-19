@@ -3345,18 +3345,32 @@ PP(pp_aslice)
     dVAR; dSP;
     register AV* const av = (AV*)POPs;
     register AV* slice = (AV*)POPs;
-    register const I32 lval = (PL_op->op_flags & OPf_MOD);
+    const OPFLAGS op_flags = PL_op->op_flags;
+    register const I32 lval = (op_flags & OPf_MOD);
+    const bool assign = (op_flags & OPf_ASSIGN) ? 1 : 0;
     SV **sliceitem;
     SV **slicemax;
+    AV *src;
 
     if (SvTYPE(av) != SVt_PVAV)
 	Perl_croak(aTHX_ "can't take an array slice from an %s", Ddesc((SV*)av));
 
     if (SvTYPE(slice) != SVt_PVAV)
-	Perl_croak(aTHX_ "array slice indices must be an ARRAY not %s", Ddesc((SV*)slice));
+	Perl_croak(aTHX_ "array slice indices must be an ARRAY not %s",
+	    Ddesc((SV*)slice));
+
+    if (assign) {
+	SV* svsrc = POPs;
+	if ( ! SvAVOK(svsrc) )
+	    Perl_croak(aTHX_ "source must be the ARRAY not %s", Ddesc(svsrc));
+	src = SvAv(svsrc);
+    }
 
     slice = av_mortalcopy(slice);
-    XPUSHs(AvSv(slice));
+
+    if ( ! ( op_flags & OPf_ASSIGN_PART ) )
+	XPUSHs(AvSv(slice));
+
     sliceitem = AvARRAY(slice);
 
     if ( ! sliceitem )
@@ -3388,6 +3402,17 @@ PP(pp_aslice)
 	}
 	SVcpREPLACE(*sliceitem, svp ? *svp : &PL_sv_undef );
         sliceitem++;
+    }
+
+    if (assign) {
+	SV** srcitem = AvARRAY(src);
+	SV** srcitemmax = srcitem + av_len(src);
+	sliceitem = AvARRAY(slice);
+	while (sliceitem <= slicemax && srcitem <= srcitemmax) {
+	    sv_setsv(*sliceitem, *srcitem);
+	    srcitem++;
+	    sliceitem++;
+	}
     }
 
     RETURN;
@@ -3606,7 +3631,25 @@ PP(pp_hslice)
 	i = 0;
 	while (sliceitem <= slicemax) {
 	    SV** newitem = av_fetch(newav, i, 0);
-	    HE* he = hv_store_ent(hv, *sliceitem,
+	    SV* keysv = *sliceitem;
+
+            if (localizing) {
+		HE* he = hv_fetch_ent(hv, keysv, 0, 0);
+		SV** svp = he ? &HeVAL(he) : NULL;
+		if (HvNAME_get(hv) && isGV(*svp))
+		    save_gp((GV*)*svp, !(PL_op->op_flags & OPf_SPECIAL));
+		else {
+		    if (svp)
+			save_helem(hv, keysv, svp);
+		    else {
+			STRLEN keylen;
+			const char * const key = SvPV_const(keysv, keylen);
+			SAVEDELETE(hv, savepvn(key,keylen), (I32)keylen);
+		    }
+		}
+            }
+
+	    HE* he = hv_store_ent(hv, keysv,
 		newitem ? newSVsv(*newitem) : &PL_sv_undef,
 		0);
 	    if ( ! partial) {

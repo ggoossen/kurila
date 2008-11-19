@@ -1424,18 +1424,18 @@ sub setup_pa_args($@) {
     if ( UNIVERSAL::isa($pa, 'HASH') ) {
 	# Get rid of -msg vs. -message ambiguity.
 	$pa->{+message} = $pa->{?msg};
-	delete($pa->{-msg});
+	delete($pa->{"-msg"});
     }
     elsif ( $pa =~ m/^-?\d+$/ ) {
-	$pa = \%( -exitval => $pa );
+	$pa = \%( "-exitval" => $pa );
     }
     else {
-	$pa = \%( -message => $pa );
+	$pa = \%( "-message" => $pa );
     }
 
     # These are _our_ defaults.
-    $pa->{+verbose} = 0 unless exists($pa->{-verbose});
-    $pa->{+exitval} = 0 unless exists($pa->{-exitval});
+    $pa->{+verbose} = 0 unless exists($pa->{"-verbose"});
+    $pa->{+exitval} = 0 unless exists($pa->{"-exitval"});
     $pa;
 }
 

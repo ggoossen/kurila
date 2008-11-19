@@ -471,7 +471,7 @@ sub newTestCases {
 	}
 	elsif (ref $tc->{?errs} eq 'ARRAY') {
 	    my %errs;
- 	    %errs{[ @{$tc->{?errs}}]} = (1) x nelems @{$tc->{?errs}};
+ 	    %errs{[ @{$tc->{?errs}}]} = @(1) x nelems @{$tc->{?errs}};
 	    $tc->{+errs} = \%errs;
 	}
 	elsif (ref $tc->{?errs} eq 'Regexp') {
@@ -581,7 +581,7 @@ sub checkErrs {
     # check for agreement, by hash (order less important)
     my (%goterrs, @got);
     $tc->{+goterrs} ||= \@();
-     %goterrs{[ @{$tc->{?goterrs}}]} = (1) x scalar nelems @{$tc->{?goterrs}};
+     %goterrs{[ @{$tc->{?goterrs}}]} = @(1) x nelems @{$tc->{?goterrs}};
     
     foreach my $k (keys %{$tc->{+errs} ||= \%()}) {
 	if (@got = grep m/^$k$/, keys %goterrs) {

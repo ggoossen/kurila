@@ -77,7 +77,8 @@ use fields < qw(a b c);
 
 sub new {
     my $self = fields::new(shift);
-    @(%<%$self) =  @_ if (nelems @_);
+    my @(%<%h) =  @_ if (nelems @_);
+    $self->{+$_} = %h{$_} for keys %h;
     $self;
 }
 

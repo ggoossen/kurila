@@ -12,7 +12,7 @@ BEGIN {
 }
 use OptreeCheck;
 use Config;
-plan tests	=> 17;
+plan tests	=> 16;
 SKIP: do {
 skip "no perlio in this build", 22 unless Config::config_value("useperlio");
 
@@ -287,32 +287,7 @@ EOT_EOT
 # 6  <@> leave[1 ref] vKP/REFC
 EONT_EONT
 
-checkOptree ( name	=> 'my ($a,$b)=()',
-	      prog	=> 'my ($a,$b)=()',
-              #todo	=> 'probly not worth doing',
-	      bcopts	=> '-exec',
-	      strip_open_hints => 1,
-	      expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT');
-# 1  <0> enter 
-# 2  <;> nextstate(main 1 -e:1) v:{
-# 3  <0> pushmark s
-# 4  <0> pushmark sRM*/128
-# 5  <0> padsv[$a:1,2] lRM*/LVINTRO
-# 6  <0> padsv[$b:1,2] lRM*/LVINTRO
-# 7  <2> aassign[t3] vKS
-# 8  <@> leave[1 ref] vKP/REFC
-EOT_EOT
-# 1  <0> enter 
-# 2  <;> nextstate(main 1 -e:1) v:{
-# 3  <0> pushmark s
-# 4  <0> pushmark sRM*/128
-# 5  <0> padsv[$a:1,2] lRM*/LVINTRO
-# 6  <0> padsv[$b:1,2] lRM*/LVINTRO
-# 7  <2> aassign[t3] vKS
-# 8  <@> leave[1 ref] vKP/REFC
-EONT_EONT
-
-}; #skip
+};
 
 __END__
 

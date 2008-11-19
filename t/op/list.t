@@ -34,11 +34,11 @@ cmp_ok(%c{?2},'==',3,'assign helem in list');
 cmp_ok($d,'==',4,'assign last scalar in list');
 
 @foo = @(1,2,3,4,5,6,7,8);
-@($a, $b, $c, $d) =  @foo;
+@($a, $b, $c, $d, ...) =  @foo;
 cmp_ok("$a/$b/$c/$d",'eq','1/2/3/4','long list assign');
 
 @foo = @(1,2);
-@($a, $b, $c, $d) =  @foo;
+@($a, $b, ?$c, ?$d) =  @foo;
 cmp_ok($a,'==',1,'short list 1 defined');
 cmp_ok($b,'==',2,'short list 2 defined');
 ok(!defined($c),'short list 3 undef');
@@ -58,9 +58,9 @@ do {
     my ($a, $b, $c);
     for my $x (0..2) {
         @($a, $b, $c) = 
-              $x == 0 ??  ('a','b','c')
-            !! $x == 1 ??  ('d','e','f')
-            !!            ('g','h','i')
+              $x == 0 ??  @('a','b','c')
+            !! $x == 1 ??  @('d','e','f')
+            !!            @('g','h','i')
         ;
         if ($x == 0) {
             cmp_ok($a,'eq','a','ternary for a 1');
@@ -85,13 +85,13 @@ do {
     for my $x (0..2) {
         @($a, $b, $c) = do {
             if ($x == 0) {
-                ('a','b','c');
+                @('a','b','c');
             }
             elsif ($x == 1) {
-                ('d','e','f');
+                @('d','e','f');
             }
             else {
-                ('g','h','i');
+                @('g','h','i');
             }
         };
         if ($x == 0) {

@@ -293,7 +293,7 @@ EOT
 }
 
 sub MANIFEST {
-  my @(@files) = @_;
+  my @files = @_;
   ################ MANIFEST
   # We really need a MANIFEST because make distclean checks it.
   my $manifest = "MANIFEST";
@@ -442,7 +442,7 @@ sub start_tests {
   $here = $dummytest;
 }
 sub end_tests {
-  my @($name, $items, $export_names, $header, $testfile, $args) =  @_;
+  my @($name, $items, $export_names, $header, $testfile, ?$args) =  @_;
   push @tests, \@($name, $items, $export_names, $package, $header, $testfile,
                $dummytest - $here, $args);
   $dummytest += $after_tests;
@@ -488,7 +488,7 @@ foreach my $args ( @args)
 #define perl "rules"
 EOT
 
-  while (my @($point, $bearing) =@( each %compass)) {
+  while (my @(?$point, ?$bearing) =@( each %compass)) {
     $header .= "#define $point $bearing\n"
   }
 
@@ -667,7 +667,7 @@ $test++;
 my %compass = %(
 EOT
 
-while (my @($point, $bearing) =@( each %compass)) {
+while (my @(?$point, ?$bearing) =@( each %compass)) {
   $test_body .= "'$point' => $bearing, "
 }
 
@@ -676,7 +676,7 @@ $test_body .= <<'EOT';
 );
 
 my $fail;
-while (my ($point, $bearing) = each %compass) {
+while (my @(?$point, ?$bearing) = @: each %compass) {
   my $val = eval $point;
   if ($@) {
     print "# $point: \$@='$@'\n";
@@ -738,7 +738,7 @@ sub explict_call_constant {
   # This does assume simple strings suitable for ''
   my $test_body = <<"EOT";
 do \{
-  my (\$error, \$got) = $($package)::constant ('$string');\n;
+  my \@(?\$error, ?\$got) = \@: $($package)::constant ('$string');\n;
 EOT
 
   if (defined $expect) {

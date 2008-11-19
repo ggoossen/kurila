@@ -117,7 +117,7 @@ sub GZreadFile
 {
     my @($filename) =@( shift) ;
 
-    my @($uncomp) = "" ;
+    my $uncomp = "" ;
     my $line = "" ;
     my $fil = gzopen($filename, "rb") 
         or croak "Cannopt open '$filename': $Compress::Zlib::gzerrno" ;

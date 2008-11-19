@@ -92,7 +92,6 @@ qr		qr/foo/
 subst		s/foo/bar/
 substcont	SKIP (set by optimizer)
 sassign		$x = $y
-aassign		($x) = ($y)
 chop		chop @foo
 schop		chop
 chomp		chomp @foo

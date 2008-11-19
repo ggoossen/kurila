@@ -88,7 +88,7 @@ Use of uninitialized value in addition (+) at - line 10 character 14.
 ########
 use warnings 'uninitialized';
 my ($v);
-our @gau = @( (undef) x 258 );
+our @gau = @(undef) x 258 ;
 our %ghu = %('foo', undef, 'bar', undef);
 
 $v = @gau[8] + 46;
@@ -115,9 +115,9 @@ Use of uninitialized value %main::ghu{"foo"} in addition (+) at - line 13 charac
 ########
 use warnings 'uninitialized';
 my ($v);
-our @gau = @( (undef) x 258 );
+our @gau = @(undef) x 258 ;
 our %ghu = %('foo', undef, 'bar', undef);
-my @mau = @( (undef) x 258 );
+my @mau = @(undef) x 258 ;
 my %mhu = %('foo', undef, 'bar', undef);
 
 my $i1 = 10;

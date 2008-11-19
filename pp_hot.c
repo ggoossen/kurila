@@ -196,7 +196,7 @@ PP(pp_concat)
 PP(pp_padsv)
 {
     dVAR; dSP; dTARGET;
-    OPFLAGS op_flags = PL_op->op_flags;
+    const OPFLAGS op_flags = PL_op->op_flags;
     if (op_flags & OPf_ASSIGN) {
 	if (op_flags & OPf_ASSIGN_PART) {
 	    SV* src;
@@ -208,6 +208,8 @@ PP(pp_padsv)
 	    else
 		src = POPs;
 	    sv_setsv_mg(TARG, src);
+	    if (PL_op->op_private & OPpLVAL_INTRO)
+		SAVECLEARSV(PAD_SVl(PL_op->op_targ));
 	    RETURN;
 	}
 	sv_setsv_mg(TARG, POPs);
@@ -1517,7 +1519,7 @@ PP(pp_helem)
 		)
 	    ) ? hv_exists_ent(hv, keysv, 0) : 1;
     }
-    he = hv_fetch_ent(hv, keysv, lval, hash);
+    he = hv_fetch_ent(hv, keysv, 0, hash);
     svp = he ? &HeVAL(he) : NULL;
     if ( ! svp || *svp == &PL_sv_undef ) {
 	if ( optional ) {

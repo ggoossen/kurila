@@ -4,7 +4,7 @@
 # (including weird syntax errors)
 
 BEGIN { require "./test.pl"; }
-plan( tests => 81 );
+plan( tests => 80 );
 
 eval '%@x=0;';
 like( $@->{?description}, qr/^Can't coerce HASH to string in repeat/, '%@x=0' );
@@ -22,8 +22,8 @@ like( $@->{?description}, qr/^Missing braces on \\N/,
     'syntax error in string with incomplete \N' );
 
 # Bug 20010831.001
-eval '($a, b) = (1, 2);';
-like( $@->{?description}, qr/^Can't modify constant item in list assignment/,
+eval '@($a, b) = @(1, 2);';
+like( $@->{?description}, qr/^Can't modify constant item in assignment/,
     'bareword in list assignment' );
 
 eval 'tie FOO, "Foo";';
@@ -138,10 +138,6 @@ do {
 # tests for "Bad name"
 eval q{ foo::$bar };
 like( $@->{?description}, qr/Bad name after foo::/, 'Bad name after foo::' );
-
-# test for ?: context error
-eval q{($a ?? $x !! ($y)) = 5};
-like( $@->{?description}, qr/Assignment to both a list and a scalar/, 'Assignment to both a list and a scalar' );
 
 eval q{ s/x/#/ };
 is( $@, '', 'comments in s///e' );

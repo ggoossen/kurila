@@ -1320,7 +1320,7 @@ my %map = %(
 sub init_INSTALL_from_INSTALL_BASE {
     my $self = shift;
  
-    %{$self}{[qw(PREFIX VENDORPREFIX SITEPREFIX PERLPREFIX)]} = 
+    %{$self}{[qw(PREFIX VENDORPREFIX SITEPREFIX PERLPREFIX)]} = @:
                                                          '$(INSTALL_BASE)';
 
     my %install;

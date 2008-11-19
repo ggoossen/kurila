@@ -5,7 +5,7 @@ BEGIN {
 }
 
 
-plan tests => 151;
+plan tests => 150;
 
 require_ok("B::Concise");
 
@@ -109,10 +109,6 @@ is ($@, '', "set_style accepts 3 style-format args");
 
 @stylespec = @( () ); # bad style
 
-try { set_style (< @stylespec) };
-like ($@->{?description}, qr/expecting 3 style-format args/,
-      "set_style rejects bad style-format args");
-
 #### for content with doc'd options
 
 our($a, $b);
@@ -137,7 +133,7 @@ SKIP: do {
 		  -base10 -bigendian -littleendian
 		  );
     foreach my $opt ( @options) {
-	my @($out) =  render($opt, $func);
+	my @($out, ...) =  render($opt, $func);
 	isnt($out, '', "got output with option $opt");
     }
     

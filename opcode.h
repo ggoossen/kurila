@@ -430,7 +430,7 @@ EXTCONST char* const PL_op_desc[] = {
 	"pattern quote (qr//)",
 	"substitution (s///)",
 	"substitution iterator",
-	"scalar assignment",
+	"assignment",
 	"list assignment",
 	"dotdotdot (...)",
 	"placeholder (_)",

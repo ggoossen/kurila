@@ -49,7 +49,7 @@ do {
     my %seen;
     foreach (keys %EXPORT_TAGS )
     {
-        push @{%EXPORT_TAGS{constants}}, 
+        push @{%EXPORT_TAGS{+constants}}, 
                  < grep { !%seen{+$_}++ } 
  @{ %EXPORT_TAGS{$_} }
     }
@@ -94,7 +94,7 @@ sub mkComp
     my $class = shift ;
     my $got = shift ;
 
-    my @($obj, $errstr, $errno) =  IO::Compress::Adapter::Deflate::mkCompObject(
+    my @($obj, ?$errstr, ?$errno) =  IO::Compress::Adapter::Deflate::mkCompObject(
                                                  $got->value('CRC32'),
                                                  $got->value('Adler32'),
                                                  $got->value('Level'),

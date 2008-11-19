@@ -555,7 +555,7 @@ sub Follow_SymLink($) {
 	else {
 	    $AbsName= $NewName;
 	}
-	@($DEV, $INO, ...) = @: lstat($AbsName);
+	@(?$DEV, ?$INO, ...) = @: lstat($AbsName);
 	return undef unless defined $DEV;  #  dangling symbolic link
     }
 
@@ -640,7 +640,7 @@ sub _find_opt {
     foreach my $TOP ( @_) {
 	my $top_item = $TOP;
 
-	@($topdev,$topino,$topmode,$topnlink, ...) = @: $follow ?? stat $top_item !! lstat $top_item;
+	@(?$topdev,?$topino,?$topmode,?$topnlink, ...) = @: $follow ?? stat $top_item !! lstat $top_item;
 
 	if ($Is_MacOS) {
 	    $top_item = ":$top_item"
@@ -729,7 +729,7 @@ sub _find_opt {
 
 	    $abs_dir = $dir;
 	    if (( $untaint ) && (is_tainted($dir) )) {
-		( $abs_dir ) = $dir =~ m|$untaint_pat|;
+		@( $abs_dir ) = @: $dir =~ m|$untaint_pat|;
 		unless (defined $abs_dir) {
 		    if ($untaint_skip == 0) {
 			die "directory $dir is still tainted";
@@ -754,7 +754,7 @@ sub _find_opt {
 
 	unless ( $no_chdir ) {
 	    if ( ($check_t_cwd) && (($untaint) && (is_tainted($cwd) )) ) {
-		( $cwd_untainted ) = $cwd =~ m|$untaint_pat|;
+		@( ?$cwd_untainted ) = @: $cwd =~ m|$untaint_pat|;
 		unless (defined $cwd_untainted) {
 		    die "insecure cwd in find(depth)";
 		}
@@ -811,7 +811,7 @@ sub _find_dir($$$) {
     unless ( $no_chdir || ($p_dir eq $File::Find::current_dir)) {
 	my $udir = $p_dir;
 	if (( $untaint ) && (is_tainted($p_dir) )) {
-	    ( $udir ) = $p_dir =~ m|$untaint_pat|;
+	    @( $udir ) = @: $p_dir =~ m|$untaint_pat|;
 	    unless (defined $udir) {
 		if ($untaint_skip == 0) {
 		    die "directory $p_dir is still tainted";
@@ -849,7 +849,7 @@ sub _find_dir($$$) {
 	unless ($no_chdir || ($dir_rel eq $File::Find::current_dir)) {
 	    my $udir= $dir_rel;
 	    if ( ($untaint) && (($tainted) || ($tainted = is_tainted($dir_rel) )) ) {
-		( $udir ) = $dir_rel =~ m|$untaint_pat|;
+		@( ?$udir ) = @: $dir_rel =~ m|$untaint_pat|;
 		unless (defined $udir) {
 		    if ($untaint_skip == 0) {
 			if ($Is_MacOS) {
@@ -1072,7 +1072,8 @@ sub _find_dir_symlnk($$$) {
     unless ($no_chdir) {
 	# untaint the topdir
 	if (( $untaint ) && (is_tainted($dir_loc) )) {
-	    ( $updir_loc ) = $dir_loc =~ m|$untaint_pat|; # parent dir, now untainted
+	    @( ?$updir_loc ) =
+              @: $dir_loc =~ m|$untaint_pat|; # parent dir, now untainted
 	     # once untainted, $updir_loc is pushed on the stack (as parent directory);
 	    # hence, we don't need to untaint the parent directory every time we chdir
 	    # to it later
@@ -1124,7 +1125,7 @@ sub _find_dir_symlnk($$$) {
 	    $updir_loc = $dir_loc;
 	    if ( ($untaint) && (($tainted) || ($tainted = is_tainted($dir_loc) )) ) {
 		# untaint $dir_loc, what will be pushed on the stack as (untainted) parent dir
-		( $updir_loc ) = $dir_loc =~ m|$untaint_pat|;
+		@( $updir_loc ) = @: $dir_loc =~ m|$untaint_pat|;
 		unless (defined $updir_loc) {
 		    if ($untaint_skip == 0) {
 			die "directory $dir_loc is still tainted";

@@ -612,7 +612,7 @@ sub IO::Compress::Base::Parameters::parse
     }
  
     if ((nelems @Bad)) {
-        my @($bad) = join@(", ", @Bad) ;
+        my $bad = join(", ", @Bad) ;
         return $self->setError("unknown key value(s) $(join ' ',@Bad)") ;
     }
 
@@ -715,7 +715,7 @@ sub IO::Compress::Base::Parameters::parsed
     my $self = shift ;
     my $name = shift ;
 
-    return $self->{Got}->{lc $name}->[OFF_PARSED] ;
+    return $self->{Got}->{+ lc $name}->[OFF_PARSED] ;
 }
 
 sub IO::Compress::Base::Parameters::value
@@ -725,12 +725,12 @@ sub IO::Compress::Base::Parameters::value
 
     if ((nelems @_))
     {
-        $self->{Got}->{lc $name}->[OFF_PARSED]  = 1;
-        $self->{Got}->{lc $name}->[OFF_DEFAULT] = @_[0] ;
-        $self->{Got}->{lc $name}->[OFF_FIXED]   = @_[0] ;
+        $self->{Got}->{+ lc $name}->[OFF_PARSED]  = 1;
+        $self->{Got}->{+ lc $name}->[OFF_DEFAULT] = @_[0] ;
+        $self->{Got}->{+ lc $name}->[OFF_FIXED]   = @_[0] ;
     }
 
-    return $self->{Got}->{lc $name}->[OFF_FIXED] ;
+    return $self->{Got}->{+ lc $name}->[OFF_FIXED] ;
 }
 
 sub IO::Compress::Base::Parameters::valueOrDefault

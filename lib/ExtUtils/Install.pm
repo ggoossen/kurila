@@ -907,7 +907,7 @@ reboot. A wrapper for _unlink_or_rename().
 
 
 sub forceunlink {
-    my @( $file, $tryhard )=  @_; #XXX OS-SPECIFIC
+    my @( $file, ?$tryhard )=  @_; #XXX OS-SPECIFIC
     _unlink_or_rename( $file, $tryhard, not("installing") );
 }
 

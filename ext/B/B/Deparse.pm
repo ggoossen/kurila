@@ -451,7 +451,7 @@ sub begin_is_use {
 }
 
 sub stash_subs {
-    my @($self, $pack) =  @_;
+    my @($self, ?$pack) =  @_;
     my (@ret, $stash);
     if (!defined $pack) {
 	$pack = '';
@@ -482,7 +482,7 @@ sub stash_subs {
 sub print_protos {
     my $self = shift;
     my @ret;
-    foreach my $ar ( @{$self->{'protos_todo'}}) {
+    foreach my $ar ( @{$self->{+'protos_todo'}}) {
 	my $proto = (defined $ar->[1] ?? " (". $ar->[1] . ")" !! "");
 	push @ret, "sub " . $ar->[0] .  "$proto;\n";
     }
@@ -585,7 +585,7 @@ sub init {
 }
 
 sub compile {
-    my@(@args) = @_;
+    my @args = @_;
     return sub {
 	my $self = B::Deparse->new(< @args);
 	# First deparse command-line args
@@ -647,7 +647,7 @@ sub coderef2text {
 
 sub ambient_pragmas {
     my $self = shift;
-    my @($hint_bits, $warning_bits, $hinthash) = @(0, 0);
+    my @($hint_bits, $warning_bits, $hinthash) = @(0, 0, undef);
 
     while ((nelems @_) +> 1) {
 	my $name = shift();
@@ -804,7 +804,7 @@ sub deparse_sub {
     }
 
     local($self->{+'curcv'}) = $cv;
-    local($self->{'curcvlex'});
+    local($self->{?'curcvlex'});
     my @oldv = %$self{[qw'curstash warnings hints hinthash']};
     local(%$self{[qw'curstash warnings hints hinthash']});
      %$self{[qw'curstash warnings hints hinthash']}
@@ -956,7 +956,7 @@ sub maybe_local {
     my@($op, $cx, $text) =  @_;
     my $our_intro = ($op->name =~ m/^(gv|rv2)[ash]v$/) ?? OPpOUR_INTRO !! 0;
     if ($op->private ^&^ (OPpLVAL_INTRO^|^$our_intro)
-	and not $self->{'avoid_local'}->{?$$op}) {
+	and not $self->{?'avoid_local'}->{?$$op}) {
 	my $our_local = ($op->private ^&^ OPpLVAL_INTRO) ?? "local" !! "our";
 	if( $our_local eq 'our' ) {
 	    # XXX This assertion fails code with non-ASCII identifiers,
@@ -995,7 +995,7 @@ sub padname_sv {
 sub maybe_my {
     my $self = shift;
     my@($op, $cx, $text) =  @_;
-    if ($op->private ^&^ OPpLVAL_INTRO and not $self->{'avoid_local'}->{?$$op}) {
+    if ($op->private ^&^ OPpLVAL_INTRO and not $self->{?'avoid_local'}->{?$$op}) {
 	my $my = "my";
 	if (want_scalar($op)) {
 	    return "$my $text";
@@ -1235,7 +1235,7 @@ sub populate_curcvlex {
 		    ?? @(0, 999999)
 		    !! @(@ns[$i]->COP_SEQ_RANGE_LOW, @ns[$i]->COP_SEQ_RANGE_HIGH);
 
-	    push @{$self->{'curcvlex'}->{$name}}, \@($seq_st, $seq_en);
+	    push @{$self->{+'curcvlex'}->{+$name}}, \@($seq_st, $seq_en);
 	}
     } continue {
         $padlist = $parentpadlist;
@@ -1247,7 +1247,7 @@ sub find_scope_en { find_scope(< @_)[1]; }
 
 # Recurses down the tree, looking for pad variable introductions and COPs
 sub find_scope {
-    my @($self, $op, $scope_st, $scope_en) =  @_;
+    my @($self, $op, ?$scope_st, ?$scope_en) =  @_;
     carp("Undefined op in find_scope") if !defined $op;
     return  @($scope_st, $scope_en) unless $op->flags ^&^ OPf_KIDS;
 
@@ -1281,7 +1281,7 @@ sub find_scope {
 
 # Returns a list of subs which should be inserted before the COP
 sub cop_subs {
-    my @($self, $op, $out_seq) =  @_;
+    my @($self, $op, ?$out_seq) =  @_;
     my $seq = $op->cop_seq;
     # If we have nephews, then our sequence number indicates
     # the cop_seq of the end of some sort of scope.
@@ -1438,7 +1438,7 @@ sub baseop {
 
 sub pp_stub {
     my $self = shift;
-    my@($op, $cx, $name) =  @_;
+    my@($op, $cx, ?$name) =  @_;
     if ($cx +>= 1) {
 	return "()";
     }
@@ -1991,7 +1991,7 @@ sub deparse_binop_right {
 
 sub binop {
     my $self = shift;
-    my @($op, $cx, $opname, $prec, $flags) = @(< @_, 0);
+    my @($op, $cx, $opname, $prec, $flags, ...) = @(< @_, 0);
     my $left = $op->first;
     my $right = $op->last;
     my $eq = "";
@@ -2479,7 +2479,7 @@ sub pp_list {
 	    } else {
 		$lop = $kid;
 	    }
-	    $self->{'avoid_local'}->{+$$lop}++;
+	    $self->{+'avoid_local'}->{+$$lop}++;
 	    $expr = $self->deparse($kid, 6);
 	    delete $self->{'avoid_local'}->{$$lop};
 	} else {
@@ -3237,11 +3237,11 @@ sub pp_entersub {
     my $declared;
     do {
 	no warnings 'uninitialized';
-	$declared = exists $self->{'subs_declared'}->{$kid}
+	$declared = exists(($self->{?'subs_declared'} || \%())->{$kid})
 	    || (
 		 defined %{Symbol::stash($self->{?'curstash'})}{?$kid}
-		 && !exists
-		     $self->{'subs_deparsed'}->{$self->{?'curstash'}."::".$kid}
+		 && !exists(
+		     ($self->{?'subs_deparsed'}||\%())->{$self->{?'curstash'}."::".$kid})
 		 && defined prototype(
                      \&{*{Symbol::fetch_glob($self->{?'curstash'}."::".$kid)}})
 	       );

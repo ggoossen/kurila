@@ -166,7 +166,7 @@ sub _ccdlflags {
 sub ldopts {
     require ExtUtils::MakeMaker;
     require ExtUtils::Liblist;
-    my@($std,$mods,$link_args,$path) =  @_;
+    my @(?$std,?$mods,?$link_args,?$path) =  @_;
     my(@mods,@link_args,@argv);
     my($dllib,$config_libs,@potential_libs,@path);
     local($") = ' ' unless $" eq ' ';
@@ -237,7 +237,7 @@ sub ldopts {
 
     my $lpath = File::Spec->catdir(config_value("archlibexp"), 'CORE');
     $lpath = qq["$lpath"] if $^O eq 'MSWin32';
-    my@($extralibs, $bsloadlibs, $ldloadlibs, $ld_run_path) = 
+    my @($extralibs, $bsloadlibs, $ldloadlibs, $ld_run_path, ...) = 
 	MM->ext(join ' ', @( "-L$lpath", $libperl, < @potential_libs));
 
     my $ld_or_bs = $bsloadlibs || $ldloadlibs;

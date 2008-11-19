@@ -14,7 +14,7 @@ use File::Spec;
 # relative "blib/lib" onto @INC.
 my $cwd;
 BEGIN {
-    ($cwd) = getcwd() =~ m/(.*)/;
+    @($cwd) = @: getcwd() =~ m/(.*)/;
 }
 use lib < map { File::Spec->rel2abs($_, $cwd) } qw(blib/arch blib/lib);
 1;
