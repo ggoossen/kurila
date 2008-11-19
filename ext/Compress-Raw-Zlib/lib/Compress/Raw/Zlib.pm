@@ -174,7 +174,7 @@ sub Compress::Raw::Zlib::Parameters::parse
     }
 
 
-    while (my @($key, $v) =@( each %$default))
+    while (my @(?$key, ?$v) =@( each %$default))
     {
         croak "need 4 params [$(join ' ',@$v)]"
             if (nelems @$v) != 4 ;

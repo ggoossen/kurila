@@ -4230,7 +4230,7 @@ Perl_yylex(pTHX)
 	goto keylookup;
 
     case '_':
-	if ( ! isIDFIRST_lazy_if(s+1,UTF)) {
+	if ( ! ( isIDFIRST_lazy_if(s+1,UTF) || isDIGIT(s[1]) ) ) {
 	    s++;
 	    pl_yylval.opval = newOP(OP_PLACEHOLDER, 0, S_curlocation());
 	    TOKEN(THING);

@@ -23,8 +23,8 @@ use Scalar::Util < qw(readonly);
 use List::Util < qw(min);
 use Carp ;
 
-%EXPORT_TAGS = %( ( ) );
-push @{ %EXPORT_TAGS{all} }, < @EXPORT_OK ;
+%EXPORT_TAGS = %( );
+push @{ %EXPORT_TAGS{+all} }, < @EXPORT_OK ;
 #Exporter::export_ok_tags('all') ;
 
 
@@ -168,7 +168,7 @@ sub smartReadExact
 
 sub smartEof
 {
-    my @($self) = @_[0];
+    my $self = @_[0];
 
     return 0 if length $self->{?Prime} || $self->{?PushMode};
 
@@ -440,7 +440,7 @@ sub _create
         $obj->pushBack($obj->{HeaderPending})  ;
     }
 
-    push @{ $obj->{InfoList} }, $obj->{?Info} ;
+    push @{ $obj->{+InfoList} }, $obj->{?Info} ;
 
     $obj->saveStatus(STATUS_OK) ;
     $obj->{+InNew} = 0;

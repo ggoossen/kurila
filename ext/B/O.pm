@@ -48,7 +48,7 @@ sub import {
 
             our $savebackslash;
 	    local $savebackslash = $\;
-	    local ($\,$",$,) = (undef,' ','');
+	    local @($\,$",$,) = @(undef,' ','');
 	    &$compilesub();
 
 	    close STDERR if $veryquiet;

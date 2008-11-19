@@ -31,8 +31,8 @@ unlink < glob "__db.*";
 
 sub lexical
 {
-    my@(@a) =@( @( unpack ("C*", $a) )) ;
-    my@(@b) =@( @( unpack ("C*", $b) )) ;
+    my @a = @( unpack ("C*", $a) ) ;
+    my @b = @( unpack ("C*", $b) ) ;
 
     my $len = ((nelems @a) +> nelems @b ?? (nelems @b) !! nelems @a) ;
 

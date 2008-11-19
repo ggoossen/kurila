@@ -1,13 +1,6 @@
 package Unicode::Collate;
 
-BEGIN {
-    unless ("A" eq pack('U', 0x41)) {
-	die "Unicode::Collate cannot stringify a Unicode code point\n";
-    }
-}
-
 use warnings;
-use Carp;
 use File::Spec;
 use utf8;
 
@@ -163,7 +156,7 @@ sub change {
 	    $self->{+$k} = %hash{?$k};
 	}
 	elsif (exists %ChangeNG{$k}) {
-	    croak "change of $k via change() is not allowed!";
+	    die "change of $k via change() is not allowed!";
 	}
 	# else => ignored
     }
@@ -174,10 +167,10 @@ sub change {
 sub _checkLevel {
     my $level = shift;
     my $key   = shift; # 'level' or 'backwards'
-    MinLevel +<= $level or croak sprintf
+    MinLevel +<= $level or die sprintf
 	"Illegal level \%d (in value for key '\%s') lower than \%d.",
 	    $level, $key, < MinLevel;
-    $level +<= MaxLevel or croak sprintf
+    $level +<= MaxLevel or die sprintf
 	"Unsupported level \%d (in value for key '\%s') higher than \%d.",
 	    $level, $key, < MaxLevel;
 }
@@ -194,13 +187,13 @@ sub checkCollator {
     _checkLevel($self->{?level}, "level");
 
     $self->{+derivCode} = %DerivCode{?$self->{?UCA_Version} }
-	or croak "Illegal UCA version (passed $self->{?UCA_Version}).";
+	or die "Illegal UCA version (passed $self->{?UCA_Version}).";
 
     $self->{+variable} ||= $self->{?alternate} || $self->{?variableTable} ||
 				$self->{?alternateTable} || 'shifted';
     $self->{+variable} = $self->{+alternate} = lc($self->{?variable});
     exists %VariableOK{ $self->{?variable} }
-	or croak "$PACKAGE unknown variable parameter name: $self->{?variable}";
+	or die "$PACKAGE unknown variable parameter name: $self->{?variable}";
 
     if (! defined $self->{?backwards}) {
 	$self->{+backwardsFlag} = 0;
@@ -223,7 +216,7 @@ sub checkCollator {
 
     defined $self->{?rearrange} or $self->{+rearrange} = \@();
     ref $self->{?rearrange}
-	or croak "$PACKAGE: list for rearrangement must be store in ARRAYREF";
+	or die "$PACKAGE: list for rearrangement must be store in ARRAYREF";
 
     # keys of $self->{rearrangeHash} are $self->{rearrange}.
     $self->{+rearrangeHash} = \%();
@@ -236,7 +229,7 @@ sub checkCollator {
 
     if (defined $self->{?normalization}) {
 	try { require Unicode::Normalize };
-	$@ and croak "Unicode::Normalize is required to normalize strings";
+	$@ and die "Unicode::Normalize is required to normalize strings";
 
 	$CVgetCombinClass ||= \&Unicode::Normalize::getCombinClass;
 
@@ -249,7 +242,7 @@ sub checkCollator {
 		Unicode::Normalize::normalize($norm, shift);
 	    };
 	    try { $self->{?normCode}->("") }; # try
-	    $@ and croak "$PACKAGE unknown normalization form name: $norm";
+	    $@ and die "$PACKAGE unknown normalization form name: $norm";
 	}
     }
     return;
@@ -301,7 +294,7 @@ sub read_table {
     }
     if (!defined $f) {
 	$f = File::Spec->catfile(< @Path, $self->{table});
-	croak("$PACKAGE: Can't locate $f in \@INC (\@INC contains: $(join ' ',@INC))");
+	die("$PACKAGE: Can't locate $f in \@INC (\@INC contains: $(join ' ',@INC))");
     }
 
     while (my $line = ~< $fh) {
@@ -352,8 +345,8 @@ sub parseEntry
     return if defined $self->{?undefName} && $name =~ m/$self->{?undefName}/;
 
     # gets element
-    my@($e, $k) =  split m/;/, $line;
-    croak "Wrong Entry: <charList> must be separated by ';' from <collElement>"
+    my @($e, $k) =  split m/;/, $line;
+    die "Wrong Entry: <charList> must be separated by ';' from <collElement>"
 	if ! $k;
 
     @uv = _getHexArray($e);
@@ -936,16 +929,16 @@ sub index
 	    !! @($temp,0);
     }
     $len +< $pos
-	and return;
+	and return @();
     my $strE = $self->splitEnt($pos ?? substr($str, $pos) !! $str, TRUE);
     (nelems @$strE)
-	or return;
+	or return @();
 
     my(@strWt, @iniPos, @finPos, @subWt, @g_ret);
 
     my $last_is_variable;
     for my $vwt ( map < $self->getWt($_), @$subE) {
-	my@($var, @< @wt) = @: unpack(VCE_TEMPLATE, $vwt);
+	my @($var, @< @wt) = @: unpack(VCE_TEMPLATE, $vwt);
 	my $to_be_pushed = _nonIgnorAtLevel(\@wt,$lev);
 
 	# "Ignorable (L1, L2) after Variable" since track. v. 9
@@ -1011,7 +1004,9 @@ sub index
 	}
 
 	# try to match
-	while ( (nelems @strWt) +> nelems @subWt || ((nelems @strWt) == nelems @subWt && $i +> $end) ) {
+	while ( nelems(@strWt) +> nelems(@subWt)
+                  || (nelems(@strWt) == nelems(@subWt)
+                        && $i +> $end) ) {
 	    if (@iniPos[0] != NOMATCHPOS &&
 		    @finPos[((nelems @subWt)-1)] != NOMATCHPOS &&
 			_eqArray(\@strWt, \@subWt, $lev)) {
@@ -1035,7 +1030,7 @@ sub index
 
     return $grob
 	?? @g_ret
-	!! ();
+	!! @();
 }
 
 ##
@@ -1044,7 +1039,7 @@ sub index
 sub match
 {
     my $self = shift;
-    if (my@($pos,$len) =  $self->index(@_[0], @_[1])) {
+    if (my@(?$pos,?$len) =  $self->index(@_[0], @_[1])) {
 	my $temp = substr(@_[0], $pos, $len);
 	return $temp;
 	# An lvalue ref \substr should be avoided,
@@ -1075,7 +1070,7 @@ sub subst
     my $self = shift;
     my $code = ref @_[2] eq 'CODE' ?? @_[2] !! FALSE;
 
-    if (my@($pos,$len) =  $self->index(@_[0], @_[1])) {
+    if (my @(?$pos,?$len) =  $self->index(@_[0], @_[1]) || @()) {
 	if ($code) {
 	    my $mat = substr(@_[0], $pos, $len);
 	    substr(@_[0], $pos, $len, $code->($mat));

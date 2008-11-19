@@ -2,7 +2,7 @@
 
 BEGIN { require "./test.pl" }
 
-plan tests => 3;
+plan tests => 4;
 
 do {
     # OPf_ASSIGN
@@ -23,4 +23,14 @@ do {
     my $x = "aap";
     @( ? $x ) = @();
     is( $x, undef );
+};
+
+do {
+    # check initialization to new value
+    my @refs;
+    for (1..2) {
+        my @($x) = qw|aap|;
+        push @refs, \$x;
+    }
+    isnt( @refs[0], @refs[1] );
 };

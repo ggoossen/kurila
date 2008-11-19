@@ -126,7 +126,7 @@ my %EXPECT = %(
               'Foo::Bar::Baz'   => \qw(b1 b2 b3 foo bar baz),
              );
 
-while(my@($class, $efields) =@( each %EXPECT)) {
+while(my@(?$class, ?$efields) =@( each %EXPECT)) {
     my %fields = %( < %{*{Symbol::fetch_glob($class.'::FIELDS')}} );
     my %expected_fields;
     foreach my $idx (1..nelems @$efields) {

@@ -2242,7 +2242,7 @@ realclean ::
 
 
     # A target for each exe file.
-    while (my@($from,$to) =@( each %fromto)) {
+    while (my@(?$from,?$to) =@( each %fromto)) {
 	last unless defined $from;
 
 	push @m, sprintf <<'MAKE', $to, $from, $to, $from, $to, $to, $to;
@@ -2950,7 +2950,7 @@ for a binary distribution.
 sub ppd {
     my@($self) =  @_;
 
-    my $pack_ver = join ",", @( < split(m/\./, $self->{?VERSION}), (0)x4)[[0..3]];
+    my $pack_ver = join ",", @( < split(m/\./, $self->{?VERSION}), < $: @(0)x4)[[0..3]];
 
     my $abstract = $self->{?ABSTRACT} || '';
     $abstract =~ s/\n/\\n/sg;

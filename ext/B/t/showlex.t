@@ -94,7 +94,7 @@ SKIP: do {
 	    }
 	};
     };
-    $walker = B::Showlex::compile($asub, $newlex, -nosp);
+    $walker = B::Showlex::compile($asub, $newlex, "-nosp");
     $walker->();
     print $buf if $verbose;
 

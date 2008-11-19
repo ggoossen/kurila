@@ -10,8 +10,7 @@ BEGIN {
 #sub Pod::Simple::Search::DEBUG () {5};
 
 use Pod::Simple::Search;
-use Test;
-BEGIN { plan tests => 6 }
+use Test::More tests => 6;
 
 print "#  Test the scanning of the whole of \@INC ...\n";
 
@@ -40,7 +39,7 @@ ok $found;
 print "# Found $found items in $t seconds!\n# See...\n";
 
 print "# OK, making sure warnings and warnings.pm were in there...\n";
-ok( ($name2where->{?'warnings'} || 'huh???'), '/warnings\.(pod|pm)$/');
+like( ($name2where->{?'warnings'} || 'huh???'), qr/warnings\.(pod|pm)$/);
 
 my  $warningspath = $name2where->{?'warnings'};
 if( $warningspath ) {
@@ -48,7 +47,7 @@ if( $warningspath ) {
   print "# Comparing \"@x[0]\" to \"@x[1]\"\n";
   for( @x) { s{[/\\]}{/}g; }
   print "#        => \"@x[0]\" to \"@x[1]\"\n";
-  ok @x[0], @x[1], " find('warnings') should match survey's name2where\{warnings\}";
+  is @x[0], @x[1], " find('warnings') should match survey's name2where\{warnings\}";
 } else {
   ok 0;  # no 'thatpath/warnings.pm' means can't test find()
 }

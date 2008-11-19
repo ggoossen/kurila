@@ -39,8 +39,3 @@ do {
     ok( exists %c{"roodborstje"} );
     is( %c{"roodborstje"}, undef );
 };
-
-do {
-    my %c = %();
-    %c{"slak"} = "vlieg";
-};

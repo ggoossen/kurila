@@ -2133,6 +2133,7 @@ Perl_assign(pTHX_ OP *o, bool partial)
     case OP_HELEM:
     case OP_AELEM:
     case OP_HSLICE:
+    case OP_ASLICE:
     case OP_PLACEHOLDER:
 	o->op_flags |= OPf_ASSIGN;
 	if (partial)

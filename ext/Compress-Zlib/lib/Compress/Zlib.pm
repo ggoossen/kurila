@@ -276,7 +276,7 @@ sub compress($;$)
 
     my $level = ((nelems @_) == 2 ?? @_[1] !! Z_DEFAULT_COMPRESSION() );
 
-    ($x) = < Compress::Raw::Zlib::Deflate->new( AppendOutput => 1, Level => $level);
+    @($x, ...) = Compress::Raw::Zlib::Deflate->new( AppendOutput => 1, Level => $level);
     $x or return undef ;
 
     $err = $x->deflate($in, $output) ;
@@ -301,7 +301,7 @@ sub uncompress($)
         $in = \@_[0] ;
     }
 
-    ($x) = < Compress::Raw::Zlib::Inflate->new( ConsumeInput => 0);
+    @($x, ...) = Compress::Raw::Zlib::Inflate->new( ConsumeInput => 0);
     $x or return undef ;
  
     $err = $x->inflate($in, $output) ;
@@ -435,7 +435,7 @@ sub _removeGzipHeader($)
         if length($$string) +< GZIP_MIN_HEADER_SIZE ;
 
     my @($magic1, $magic2, $method, $flags, $time, $xflags, $oscode) = 
-        unpack @('CCCCVCC', $$string);
+        @: unpack ('CCCCVCC', $$string);
 
     return Z_DATA_ERROR()
         unless $magic1 == GZIP_ID1 and $magic2 == GZIP_ID2 and
@@ -448,7 +448,7 @@ sub _removeGzipHeader($)
         return Z_DATA_ERROR()
             if length($$string) +< GZIP_FEXTRA_HEADER_SIZE ;
 
-        my @($extra_len) = unpack @('v', $$string);
+        my @($extra_len) = @: unpack('v', $$string);
         $extra_len += GZIP_FEXTRA_HEADER_SIZE;
         return Z_DATA_ERROR()
             if length($$string) +< $extra_len ;
@@ -495,7 +495,7 @@ sub memGunzip($)
         or return undef;
      
     my $bufsize = length $$string +> 4096 ?? length $$string !! 4096 ;
-    my @($x) =  Compress::Raw::Zlib::Inflate->new(\%(WindowBits => - MAX_WBITS(),
+    my @($x, ...) =  Compress::Raw::Zlib::Inflate->new(\%(WindowBits => - MAX_WBITS(),
                          Bufsize => $bufsize));
     $x or return undef;
 
@@ -506,7 +506,7 @@ sub memGunzip($)
 
     if (length $$string +>= 8)
     {
-        my @($crc, $len) = unpack @("VV", substr($$string, 0, 8));
+        my @($crc, $len) = @: unpack("VV", substr($$string, 0, 8));
         substr($$string, 0, 8, '');
         return undef 
             unless $len == length($output) and

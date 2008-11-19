@@ -85,7 +85,6 @@ my $cop_seq_base;
 sub set_style {
     @($format, $gotofmt, $treefmt) =  @_;
     #warn "set_style: deprecated, use set_style_standard instead\n"; # someday
-    die "expecting 3 style-format args\n" unless (nelems @_) == 3;
 }
 
 sub add_style {
@@ -131,7 +130,7 @@ sub walk_output { # updates $walkHandle
 }
 
 sub concise_subref {
-    my@($order, $coderef, $name) =  @_;
+    my@($order, $coderef, ?$name) =  @_;
     my $codeobj = svref_2object($coderef);
 
     return concise_stashref(< @_)
@@ -462,7 +461,7 @@ sub walklines {
 }
 
 sub walk_exec {
-    my@($top, $level) =  @_;
+    my@($top, ?$level) =  @_;
     my %opsseen;
     my @lines;
     my @todo = @(\@($top, \@lines));
@@ -569,30 +568,30 @@ sub fmt_line {    # generate text-line for op.
 
 our %priv; # used to display each opcode's BASEOP.op_private values
 
-%priv{$_}->{+128} = "LVINTRO"
+%priv{+$_}->{+128} = "LVINTRO"
   for @( ("pos", "substr", "vec", "threadsv", "gvsv", "rv2sv", "rv2hv", "rv2gv",
        "rv2av", "aelem", "helem", "aslice", "hslice", "padsv",
        "padav", "padhv", "enteriter"));
-%priv{$_}->{+64} = "REFC" for @( ("leave", "leavesub", "leavesublv", "leavewrite"));
-%priv{"aassign"}->{+64} = "COMMON";
+%priv{+$_}->{+64} = "REFC" for @( ("leave", "leavesub", "leavesublv", "leavewrite"));
+%priv{+"aassign"}->{+64} = "COMMON";
 %priv{"aassign"}->{+32} = "STATE";
-%priv{"sassign"}->{+32} = "STATE";
-%priv{"sassign"}->{+64} = "BKWARD";
-%priv{$_}->{+64} = "RTIME" for @( ("match", "subst", "substcont", "qr"));
- %{%priv{"trans"}}{[@(1,2,4,8,16,64)]} = @("<UTF", ">UTF", "IDENT", "SQUASH", "DEL",
+%priv{+"sassign"}->{+32} = "STATE";
+%priv{+"sassign"}->{+64} = "BKWARD";
+%priv{+$_}->{+64} = "RTIME" for @( ("match", "subst", "substcont", "qr"));
+ %{%priv{+"trans"}}{[@(1,2,4,8,16,64)]} = @("<UTF", ">UTF", "IDENT", "SQUASH", "DEL",
 				    "COMPL", "GROWS");
-%priv{"repeat"}->{+64} = "DOLIST";
-%priv{"leaveloop"}->{+64} = "CONT";
- %{%priv{$_}}{[@(32,64,96)]} = @("DREFAV", "DREFHV", "DREFSV")
+%priv{+"repeat"}->{+64} = "DOLIST";
+%priv{+"leaveloop"}->{+64} = "CONT";
+ %{%priv{+$_}}{[@(32,64,96)]} = @("DREFAV", "DREFHV", "DREFSV")
   for @( ( <qw(rv2gv rv2sv padsv aelem helem)));
 %priv{$_}->{+16} = "STATE" for @( ("padav", "padhv", "padsv"));
- %{%priv{"entersub"}}{[@(16,32,64)]} = @("DBG","TARG","NOMOD");
- %{%priv{$_}}{[@(4,8,128)]} = @("INARGS","AMPER","NO()") for @( ("entersub", "rv2cv"));
-%priv{"gv"}->{+32} = "EARLYCV";
-%priv{"aelem"}->{+16} = %priv{"helem"}->{+16} = "LVDEFER";
-%priv{$_}->{+16} = "OURINTR" for @( ("gvsv", "rv2sv", "rv2av", "rv2hv", "r2gv",
+ %{%priv{+"entersub"}}{[@(16,32,64)]} = @("DBG","TARG","NOMOD");
+ %{%priv{+$_}}{[@(4,8,128)]} = @("INARGS","AMPER","NO()") for @( ("entersub", "rv2cv"));
+%priv{+"gv"}->{+32} = "EARLYCV";
+%priv{+"aelem"}->{+16} = %priv{"helem"}->{+16} = "LVDEFER";
+%priv{+$_}->{+16} = "OURINTR" for @( ("gvsv", "rv2sv", "rv2av", "rv2hv", "r2gv",
 	"enteriter"));
-%priv{$_}->{+16} = "TARGMY"
+%priv{+$_}->{+16} = "TARGMY"
   for @( (< map(($_,"s$_"), @("chop", "chomp")),
        < map(($_,"i_$_"), @( "postinc", "postdec", "multiply", "divide", "modulo",
 	   "add", "subtract", "negate")), "pow", "concat", "stringify",
@@ -604,30 +603,30 @@ our %priv; # used to display each opcode's BASEOP.op_private values
        "link", "symlink", "mkdir", "rmdir", "wait", "waitpid", "system",
        "exec", "kill", "getppid", "getpgrp", "setpgrp", "getpriority",
        "setpriority", "time", "sleep"));
-%priv{$_}->{+4} = "REVERSED" for @( ("enteriter", "iter"));
- %{%priv{"const"}}{[@(4,8,16,32,64,128)]} = @("SHORT","STRICT","ENTERED",'$[',"BARE","WARN");
-%priv{"flip"}->{+64} = %priv{"flop"}->{+64} = "LINENUM";
-%priv{"list"}->{+64} = "GUESSED";
-%priv{"delete"}->{+64} = "SLICE";
-%priv{"exists"}->{+64} = "SUB";
- %{%priv{"sort"}}{[@(1,2,4,8,16,32,64)]} = @("NUM", "INT", "REV", "INPLACE","DESC","QSORT","STABLE");
+%priv{+$_}->{+4} = "REVERSED" for @( ("enteriter", "iter"));
+ %{%priv{+"const"}}{[@(4,8,16,32,64,128)]} = @("SHORT","STRICT","ENTERED",'$[',"BARE","WARN");
+%priv{+"flip"}->{+64} = %priv{+"flop"}->{+64} = "LINENUM";
+%priv{+"list"}->{+64} = "GUESSED";
+%priv{+"delete"}->{+64} = "SLICE";
+%priv{+"exists"}->{+64} = "SUB";
+ %{%priv{+"sort"}}{[@(1,2,4,8,16,32,64)]} = @("NUM", "INT", "REV", "INPLACE","DESC","QSORT","STABLE");
 %priv{"threadsv"}->{+64} = "SVREFd";
- %{%priv{$_}}{[@(16,32,64,128)]} = @("INBIN","INCR","OUTBIN","OUTCR")
+ %{%priv{+$_}}{[@(16,32,64,128)]} = @("INBIN","INCR","OUTBIN","OUTCR")
   for @( ("open", "backtick"));
-%priv{"exit"}->{+128} = "VMS";
-%priv{$_}->{+2} = "FTACCESS"
+%priv{+"exit"}->{+128} = "VMS";
+%priv{+$_}->{+2} = "FTACCESS"
   for @( ("ftrread", "ftrwrite", "ftrexec", "fteread", "ftewrite", "fteexec"));
-%priv{"entereval"}->{+2} = "HAS_HH";
+%priv{+"entereval"}->{+2} = "HAS_HH";
 do {
   # Stacked filetests are post 5.8.x
-  %priv{$_}->{+4} = "FTSTACKED"
+  %priv{+$_}->{+4} = "FTSTACKED"
     for @( ("ftrread", "ftrwrite", "ftrexec", "fteread", "ftewrite", "fteexec",
          "ftis", "fteowned", "ftrowned", "ftzero", "ftsize", "ftmtime",
 	 "ftatime", "ftctime", "ftsock", "ftchr", "ftblk", "ftfile", "ftdir",
 	 "ftpipe", "ftlink", "ftsuid", "ftsgid", "ftsvtx", "fttty", "fttext",
 	 "ftbinary"));
   # Lexical $_ is post 5.8.x
-  %priv{$_}->{+2} = "GREPLEX"
+  %priv{+$_}->{+2} = "GREPLEX"
     for @( ("mapwhile", "mapstart", "grepwhile", "grepstart"));
 };
 
@@ -670,7 +669,7 @@ sub hints_flags {
 }
 
 sub concise_sv {
-    my@($sv, $hr, $preferpv) =  @_;
+    my@($sv, $hr, ?$preferpv) =  @_;
     $hr->{+svclass} = class($sv);
     $hr->{+svclass} = "UV"
       if $hr->{?svclass} eq "IV" and $sv->FLAGS ^&^ SVf_IVisUV;

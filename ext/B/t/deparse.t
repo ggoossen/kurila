@@ -24,7 +24,7 @@ while ( ~< *DATA) {
     chomp;
     my ($num, $testname, $todo);
     if (s/#\s*(.*)$//mg) {
-        @($num, $todo, $testname) = $1 =~ m/(\d*)\s*(TODO)?\s*(.*)/;
+        @($num, $todo, $testname) = @: $1 =~ m/(\d*)\s*(TODO)?\s*(.*)/;
     }
     my ($input, $expected);
     if (m/(.*)\n>>>>\n(.*)/s) {
@@ -39,7 +39,7 @@ while ( ~< *DATA) {
     my $coderef = eval "sub \{$input\}";
 
     if ($@ and $@->{?description}) {
-	diag("$num deparsed: $($@->message)");
+	diag("$num deparsed: $($@->message . $@->stacktrace)");
         diag("input: '$input'");
 	ok(0, $testname);
     }
@@ -173,7 +173,8 @@ print @main::x[1];
 my %x;
 %x{warn()};
 ####
-my($x, $y) = < @('xx', 'yy');
+# 0 TODO
+my @($x, $y) = @('xx', 'yy');
 ####
 # 0 TODO range
 my @x = @( 1..10 );

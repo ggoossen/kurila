@@ -24,7 +24,7 @@ do {
     cmp_ok(substr(@warnings[0],0,length($fail_odd)),'eq',$fail_odd,'odd msg');
 
     @warnings = @( () );
-    @(%<%hash) = 1;
+    @(%<%hash) = @: 1;
     cmp_ok(scalar(nelems @warnings),'==',1,'scalar count');
     cmp_ok(substr(@warnings[0],0,length($fail_odd)),'eq',$fail_odd,'scalar msg');
 

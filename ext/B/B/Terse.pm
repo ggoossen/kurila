@@ -7,7 +7,7 @@ use B::Concise < qw(concise_subref set_style_standard);
 use Carp;
 
 sub terse {
-    my @($order, $subref) =  @_;
+    my @($order, ?$subref) =  @_;
     set_style_standard("terse");
     if ($order eq "exec") {
 	concise_subref('exec', $subref);
@@ -25,7 +25,7 @@ sub compile {
 }
 
 sub indent {
-    my @($level) = (nelems @_) ?? shift !! 0;
+    my $level = (nelems @_) ?? shift !! 0;
     return "    " x $level;
 }
 

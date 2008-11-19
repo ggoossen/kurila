@@ -84,8 +84,8 @@ do {
 
 # Should use magical autoinc only when both are strings
 do {
-    my $scalar = (@() =  "0"..-1);
-    is ($scalar, 0);
+    my $scalar = "0"..-1;
+    is (nelems($scalar), 0);
 };
 do {
     my $fail = 0;

@@ -226,7 +226,7 @@ sub randomMatch
 }
 
 sub print_err_line {
-    my@($switch, $prog, $expected, $results, $todo) =  @_;
+    my @($switch, $prog, $expected, $results, $todo, $file) =  @_;
     my $err_line = "FILE: $file\n" .
                    "PROG: $switch\n$prog\n" .
 		   "EXPECTED:\n$expected\n" .
