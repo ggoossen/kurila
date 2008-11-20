@@ -299,7 +299,7 @@ invert_opset function.
 
     null stub scalar pushmark wantarray const defined undef
 
-    rv2sv sassign dotdotdot placeholder
+    rv2sv sassign logassign_assign dotdotdot placeholder
 
     rv2av aelem aelemfast aslice
 
@@ -322,7 +322,8 @@ invert_opset function.
     match split qr
 
     list listlast lslice splice push pop shift unshift reverse
-    arrayexpand enter_arrayexpand_assign hashexpand expand nelems
+    arrayexpand enter_arrayexpand_assign enter_hashexpand_assign
+    hashexpand expand nelems
 
     cond_expr flip flop andassign orassign dorassign and or dor xor
 
