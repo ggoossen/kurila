@@ -832,7 +832,7 @@ BINOP_new(class, type, flags, sv_first, sv_last, location)
 
         PL_curpad = AvARRAY(PL_comppad);
         
-        if (typenum == OP_SASSIGN || typenum == OP_AASSIGN) 
+        if (typenum == OP_SASSIGN) 
             o = newASSIGNOP(flags, first, 0, last, newSVsv(location));
         else {
             o = newBINOP(typenum, flags, first, last, newSVsv(location));
