@@ -68,7 +68,6 @@ EXTCONST char* const PL_op_name[] = {
 	"subst",
 	"substcont",
 	"sassign",
-	"aassign",
 	"dotdotdot",
 	"placeholder",
 	"chop",
@@ -431,7 +430,6 @@ EXTCONST char* const PL_op_desc[] = {
 	"substitution (s///)",
 	"substitution iterator",
 	"assignment",
-	"list assignment",
 	"dotdotdot (...)",
 	"placeholder (_)",
 	"chop",
@@ -806,7 +804,6 @@ EXT Perl_ppaddr_t PL_ppaddr[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_pp_subst),
 	MEMBER_TO_FPTR(Perl_pp_substcont),
 	MEMBER_TO_FPTR(Perl_pp_sassign),
-	MEMBER_TO_FPTR(Perl_pp_aassign),
 	MEMBER_TO_FPTR(Perl_pp_dotdotdot),
 	MEMBER_TO_FPTR(Perl_pp_placeholder),
 	MEMBER_TO_FPTR(Perl_pp_chop),
@@ -1178,7 +1175,6 @@ EXT Perl_check_t PL_check[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_ck_match),	/* subst */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* substcont */
 	MEMBER_TO_FPTR(Perl_ck_sassign),	/* sassign */
-	MEMBER_TO_FPTR(Perl_ck_null),	/* aassign */
 	MEMBER_TO_FPTR(Perl_ck_dotdotdot),	/* dotdotdot */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* placeholder */
 	MEMBER_TO_FPTR(Perl_ck_spair),	/* chop */
@@ -1544,7 +1540,6 @@ EXTCONST U32 PL_opargs[] = {
 	0x00002a54,	/* subst */
 	0x00000654,	/* substcont */
 	0x00000004,	/* sassign */
-	0x00044408,	/* aassign */
 	0x00000000,	/* dotdotdot */
 	0x00000000,	/* placeholder */
 	0x0000560d,	/* chop */

@@ -1373,7 +1373,6 @@ Perl_mod(pTHX_ OP *o, I32 type)
     case OP_HSLICE:
 	localize = 1;
 	/* FALL THROUGH */
-    case OP_AASSIGN:
     case OP_NEXTSTATE:
     case OP_DBSTATE:
 	PL_modcount = RETURN_UNLIMITED_NUMBER;
@@ -1401,8 +1400,6 @@ Perl_mod(pTHX_ OP *o, I32 type)
     case OP_EXPAND:
         PL_modcount = RETURN_UNLIMITED_NUMBER;
 	mod(cUNOPo->op_first, type);
-	if (type != OP_AASSIGN)
-	    goto nomod;
 	break;
 
     case OP_DOTDOTDOT:
@@ -1488,7 +1485,7 @@ Perl_mod(pTHX_ OP *o, I32 type)
 
     o->op_flags |= OPf_MOD;
 
-    if (type == OP_AASSIGN || type == OP_SASSIGN)
+    if (type == OP_SASSIGN)
 	o->op_flags |= OPf_SPECIAL|OPf_REF;
     else if (!type) { /* local() */
 	switch (localize) {
@@ -5542,12 +5539,6 @@ Perl_ck_defined(pTHX_ OP *o)		/* 19990527 MJD */
 	       to work.   Do not break Tk.
 	       */
 	    break;                      /* Globals via GV can be undef */
-	case OP_AASSIGN:		/* Is this a good idea? */
-	    Perl_warner(aTHX_ packWARN2(WARN_DEPRECATED, WARN_SYNTAX),
-			"defined(@array) is deprecated");
-	    Perl_warner(aTHX_ packWARN2(WARN_DEPRECATED, WARN_SYNTAX),
-			"\t(Maybe you should just omit the defined()?)\n");
-	break;
 	case OP_RV2HV:
 	    /* This is needed for
 	       if (defined %stash::)

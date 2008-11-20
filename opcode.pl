@@ -656,7 +656,6 @@ substcont	substitution iterator	ck_null		dis|
 # sassign is special-cased for op class
 
 sassign		assignment	ck_sassign	s0
-aassign		list assignment		ck_null		t2	L L
 dotdotdot		dotdotdot (...)	ck_dotdotdot	0
 placeholder		placeholder (_)	ck_null	0
 
