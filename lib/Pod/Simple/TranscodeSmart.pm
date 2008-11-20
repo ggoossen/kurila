@@ -23,7 +23,7 @@ sub encmodver {
 }
 
 sub make_transcoder {
-  my@($e) = @_[1];
+  my $e = @_[1];
   die "WHAT ENCODING!?!?" unless $e;
   return sub {
     foreach my $x ( @_) {
