@@ -20,7 +20,7 @@ typedef enum opcode {
 	OP_SCALAR	 = 2,
 	OP_PUSHMARK	 = 3,
 	OP_WANTARRAY	 = 4,
-	OP_XASSIGN	 = 5,
+	OP_LOGASSIGN_ASSIGN = 5,
 	OP_CONST	 = 6,
 	OP_GVSV		 = 7,
 	OP_GV		 = 8,

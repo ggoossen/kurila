@@ -3259,7 +3259,7 @@ Perl_newASSIGNOP(pTHX_ I32 flags, OP *left, I32 optype, OP *right, SV *location)
     if (optype) {
 	if (optype == OP_ANDASSIGN || optype == OP_ORASSIGN || optype == OP_DORASSIGN) {
 	    o = newBINOP(OP_SASSIGN, 0, scalar(right),
-		newOP(OP_XASSIGN, 0, location), location);
+		newOP(OP_LOGASSIGN_ASSIGN, 0, location), location);
 	    return newLOGOP(optype, 0, mod(scalar(left), optype), o, location);
 	}
 	else {
