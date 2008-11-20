@@ -54,7 +54,7 @@ PP(pp_stub)
     RETURN;
 }
 
-PP(pp_xassign)
+PP(pp_logassign_assign)
 {
     dVAR;
     dSP;

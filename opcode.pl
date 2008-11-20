@@ -610,7 +610,7 @@ scalar		scalar			ck_fun		s%	S
 pushmark	pushmark		ck_null		s0	
 wantarray	wantarray		ck_null		is0	
 
-xassign		conditioned assignment	ck_null		0	
+logassign_assign		assignment part of a logical assignment	ck_null		0	
 
 const		constant item		ck_svconst	s$	
 
