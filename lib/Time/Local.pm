@@ -85,7 +85,7 @@ sub _timegm {
 }
 
 sub timegm {
-    my @( $sec, $min, $hour, $mday, $month, $year ) =  @_;
+    my @( $sec, $min, $hour, $mday, $month, $year, ... ) =  @_;
 
     if ( $year +>= 1000 ) {
         $year -= 1900;
