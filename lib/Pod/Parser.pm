@@ -1034,7 +1034,7 @@ This method does I<not> usually need to be overridden by subclasses.
 sub parse_from_filehandle {
     my $self = shift;
     my %opts = %( (ref @_[0] eq 'HASH') ?? < %{ shift() } !! () );
-    my @($in_fh, $out_fh) =  @_;
+    my @($in_fh, ?$out_fh) =  @_;
     $in_fh = \*STDIN  unless ($in_fh);
     local *myData = $self;  ## alias to avoid deref-ing overhead
     local *myOpts = (%myData{+_PARSEOPTS} ||= \%());  ## get parse-options
