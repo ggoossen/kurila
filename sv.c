@@ -2935,9 +2935,9 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV* sstr, const I32 flags)
 	         (!(flags & SV_NOSTEAL)) &&
 					/* and we're allowed to steal temps */
                  SvREFCNT(sstr) == 1 &&   /* and no other references to it? */
-                 SvLEN(sstr) 	&&	  /* and really is a string */
+                 SvLEN(sstr)	  /* and really is a string */
 	    			/* and won't be needed again, potentially */
-	      !(PL_op && PL_op->op_type == OP_AASSIGN))
+	      )
 #ifdef PERL_OLD_COPY_ON_WRITE
             && ((flags & SV_COW_SHARED_HASH_KEYS)
 		? (!((sflags & CAN_COW_MASK) == CAN_COW_FLAGS
@@ -10865,10 +10865,6 @@ S_find_uninit_var(pTHX_ OP* obase, SV* uninit_sv, bool match)
 			   o->op_targ, NULL, 0, FUV_SUBSCRIPT_WITHIN);
 	}
 	break;
-
-    case OP_AASSIGN:
-	/* only examine RHS */
-	return find_uninit_var(cBINOPx(obase)->op_first, uninit_sv, match);
 
     case OP_OPEN:
 	o = cUNOPx(obase)->op_first;
