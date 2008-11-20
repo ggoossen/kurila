@@ -1488,8 +1488,12 @@ PP(pp_helem)
 	/* hv must be "undef" */
 
 	if ( optional ) {
-	    if (PL_op->op_private & OPpDEREF)
-		mPUSHs(newRV(newSV(0)));
+	    if (PL_op->op_private & OPpDEREF) {
+		SV* sv = newSV(0);
+		vivify_ref(sv, PL_op->op_private & OPpDEREF);
+		XPUSHs(sv);
+		RETURN;
+	    }
 	    else
 		RETPUSHUNDEF;
 	}
@@ -1524,7 +1528,9 @@ PP(pp_helem)
     if ( ! svp || *svp == &PL_sv_undef ) {
 	if ( optional ) {
 	    if (PL_op->op_private & OPpDEREF) {
-		mPUSHs(newRV(newSV(0)));
+		SV* sv = newSV(0);
+		vivify_ref(sv, PL_op->op_private & OPpDEREF);
+		XPUSHs(sv);
 		RETURN;
 	    }
 	    else
