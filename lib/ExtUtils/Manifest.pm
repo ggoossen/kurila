@@ -316,7 +316,7 @@ sub maniread {
         chomp;
         next if m/^\s*#/;
 
-        my @($file, $comment) = @: m/^(\S+)\s*(.*)/;
+        my @(?$file, ?$comment) = @: m/^(\S+)\s*(.*)/;
         next unless $file;
 
         if ($Is_MacOS) {
