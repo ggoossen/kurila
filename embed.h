@@ -1861,7 +1861,6 @@
 #define ck_trunc		Perl_ck_trunc
 #define ck_try			Perl_ck_try
 #define ck_unpack		Perl_ck_unpack
-#define pp_aassign		Perl_pp_aassign
 #define pp_abs			Perl_pp_abs
 #define pp_accept		Perl_pp_accept
 #define pp_add			Perl_pp_add
@@ -2048,6 +2047,7 @@
 #define pp_localtime		Perl_pp_localtime
 #define pp_lock			Perl_pp_lock
 #define pp_log			Perl_pp_log
+#define pp_logassign_assign	Perl_pp_logassign_assign
 #define pp_lslice		Perl_pp_lslice
 #define pp_lstat		Perl_pp_lstat
 #define pp_lt			Perl_pp_lt
@@ -2208,7 +2208,6 @@
 #define pp_waitpid		Perl_pp_waitpid
 #define pp_wantarray		Perl_pp_wantarray
 #define pp_warn			Perl_pp_warn
-#define pp_xassign		Perl_pp_xassign
 #define pp_xor			Perl_pp_xor
 
 #else	/* PERL_IMPLICIT_CONTEXT */
@@ -2703,7 +2702,7 @@
 #define newLOGOP(a,b,c,d,e)	Perl_newLOGOP(aTHX_ a,b,c,d,e)
 #define newLOOPEX(a,b)		Perl_newLOOPEX(aTHX_ a,b)
 #define newLOOPOP(a,b,c,d,e,f)	Perl_newLOOPOP(aTHX_ a,b,c,d,e,f)
-#define newNULLLIST()		Perl_newNULLLIST(aTHX)
+#define newNULLLIST(a)		Perl_newNULLLIST(aTHX_ a)
 #define newOP(a,b,c)		Perl_newOP(aTHX_ a,b,c)
 #define newPROG(a)		Perl_newPROG(aTHX_ a)
 #define newRANGE(a,b,c)		Perl_newRANGE(aTHX_ a,b,c)
@@ -4038,7 +4037,6 @@
 #define ck_trunc(a)		Perl_ck_trunc(aTHX_ a)
 #define ck_try(a)		Perl_ck_try(aTHX_ a)
 #define ck_unpack(a)		Perl_ck_unpack(aTHX_ a)
-#define pp_aassign()		Perl_pp_aassign(aTHX)
 #define pp_abs()		Perl_pp_abs(aTHX)
 #define pp_accept()		Perl_pp_accept(aTHX)
 #define pp_add()		Perl_pp_add(aTHX)
@@ -4225,6 +4223,7 @@
 #define pp_localtime()		Perl_pp_localtime(aTHX)
 #define pp_lock()		Perl_pp_lock(aTHX)
 #define pp_log()		Perl_pp_log(aTHX)
+#define pp_logassign_assign()	Perl_pp_logassign_assign(aTHX)
 #define pp_lslice()		Perl_pp_lslice(aTHX)
 #define pp_lstat()		Perl_pp_lstat(aTHX)
 #define pp_lt()			Perl_pp_lt(aTHX)
@@ -4385,7 +4384,6 @@
 #define pp_waitpid()		Perl_pp_waitpid(aTHX)
 #define pp_wantarray()		Perl_pp_wantarray(aTHX)
 #define pp_warn()		Perl_pp_warn(aTHX)
-#define pp_xassign()		Perl_pp_xassign(aTHX)
 #define pp_xor()		Perl_pp_xor(aTHX)
 
 #endif	/* PERL_IMPLICIT_CONTEXT */

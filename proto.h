@@ -1936,7 +1936,7 @@ PERL_CALLCONV OP*	Perl_newLOOPOP(pTHX_ I32 flags, I32 debuggable, OP* expr, OP* 
 			__attribute__malloc__
 			__attribute__warn_unused_result__;
 
-PERL_CALLCONV OP*	Perl_newNULLLIST(pTHX)
+PERL_CALLCONV OP*	Perl_newNULLLIST(pTHX_ SV *location)
 			__attribute__malloc__
 			__attribute__warn_unused_result__;
 
