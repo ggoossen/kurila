@@ -2544,9 +2544,9 @@ Perl_mad_free(pTHX_ MADPROP* mp)
 #endif
 
 OP *
-Perl_newNULLLIST(pTHX)
+Perl_newNULLLIST(pTHX_ SV *location)
 {
-    return newOP(OP_STUB, 0, NULL);
+    return newOP(OP_STUB, 0, location);
 }
 
 OP *
@@ -3184,7 +3184,7 @@ Perl_vload_module(pTHX_ U32 flags, SV *name, SV *ver, va_list *args)
     else
 	veop = NULL;
     if (flags & PERL_LOADMOD_NOIMPORT) {
-	imop = sawparens(newNULLLIST());
+	imop = sawparens(newNULLLIST(NULL));
     }
     else if (flags & PERL_LOADMOD_IMPORT_OPS) {
 	imop = va_arg(*args, OP*);
