@@ -643,7 +643,7 @@ USE
     unless( $ok ) {
         $tb->diag(<<DIAGNOSTIC);
     Tried to use '$module'.
-    Error:  $($eval_error->message . $eval_error->stacktrace)
+    Error:  $($eval_error->message)
 DIAGNOSTIC
 
     }
@@ -678,7 +678,7 @@ sub dies_like {
         $tb->diag("didn't die");
         return $tb->ok(0, $name);
     }
-    my $err = $@->message;
+    my $err = $@->description;
     return $tb->like($err, $like, $name) or diag($@->stacktrace);
 }
 

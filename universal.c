@@ -231,6 +231,7 @@ XS(XS_Symbol_glob_name);
 XS(XS_dump_view);
 XS(XS_error_create);
 XS(XS_error_message);
+XS(XS_error_description);
 XS(XS_error_stacktrace);
 XS(XS_error_write_to_stderr);
 XS(XS_ref_address);
@@ -299,6 +300,7 @@ Perl_boot_core_UNIVERSAL(pTHX)
     
     newXS("error::create", XS_error_create, file);
     newXS("error::message", XS_error_message, file);
+    newXS("error::description", XS_error_description, file);
     newXS("error::stacktrace", XS_error_stacktrace, file);
     newXS("error::write_to_stderr", XS_error_write_to_stderr, file);
 
@@ -855,7 +857,7 @@ XS(XS_error_create)
     }
 }
 
-XS(XS_error_message)
+XS(XS_error_description)
 {
     dVAR;
     dXSARGS;
@@ -886,6 +888,36 @@ XS(XS_error_message)
 	PUSHs(res);
 	XSRETURN(1);
     }
+}
+
+XS(XS_error_message)
+{
+    dVAR;
+    dXSARGS;
+    SV* error;
+    SV* msg;
+    PERL_UNUSED_ARG(cv);
+    if (items < 1)
+	Perl_croak(aTHX_ "Usage: $error->message()");
+    error = POPs;
+    ENTER;
+    PUSHMARK(SP);
+    PUSHs(error);
+    PUTBACK;
+    call_method("description", G_SCALAR);
+    SPAGAIN;
+    msg = POPs;
+    LEAVE;
+    ENTER;
+    PUSHMARK(SP);
+    XPUSHs(error);
+    PUTBACK;
+    call_method("stacktrace", G_SCALAR);
+    SPAGAIN;
+    sv_catsv(msg, POPs);
+    LEAVE;
+    XPUSHs(msg);
+    XSRETURN(1);
 }
 
 XS(XS_error_stacktrace)
@@ -974,20 +1006,6 @@ XS(XS_error_write_to_stderr) {
     PUTBACK;
 
     call_method("message", G_SCALAR);
-    SPAGAIN;
-    tmpsv = POPs;
-    message = SvPV_const(tmpsv, msglen);
-
-    LEAVE;
-
-    write_to_stderr(message, msglen);
-
-    ENTER;
-    PUSHMARK(SP);
-    PUSHs(ST(0));
-    PUTBACK;
-
-    call_method("stacktrace", G_SCALAR);
     SPAGAIN;
     tmpsv = POPs;
     message = SvPV_const(tmpsv, msglen);
