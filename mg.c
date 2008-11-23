@@ -857,6 +857,7 @@ Perl_magic_get(pTHX_ SV *sv, MAGIC *mg)
 		    }
 		    SvPOK_only(sv);
 		} else if (strEQ(remaining, "WARN_HOOK")) { /* $^WARN_HOOK */
+		    sv_setsv(sv, PL_warnhook);
 		    break;
 		}
 		break;
