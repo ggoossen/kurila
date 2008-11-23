@@ -201,8 +201,7 @@ sub bind {
 }
 
 sub listen {
-    (nelems @_) +>= 1 && (nelems @_) +<= 2 or croak 'usage: $sock->listen([QUEUE])';
-    my@($sock,$queue) =  @_;
+    my @($sock,?$queue) =  @_;
     $queue = 5
 	unless $queue && $queue +> 0;
 
