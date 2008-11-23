@@ -180,7 +180,7 @@ sub ret_backtrace {
   $mess = "$err at %i{?file} line %i{?line}$tid_msg\n";
 
   while (my %i = %( < caller_info(++$i) )) {
-      $mess .= "\t%i{?sub_name} called at %i{?file} line %i{?line}$tid_msg\n";
+      $mess .= "\t$(%i{?sub_name}//'(unnamed sub)') called at %i{?file} line %i{?line}$tid_msg\n";
   }
   
   return $mess;
