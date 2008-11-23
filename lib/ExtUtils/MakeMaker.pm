@@ -195,7 +195,7 @@ sub eval_in_x {
 #         } else {
 #             warn "WARNING from evaluation of $dir/Makefile.PL: $@";
 #         }
-        die "ERROR from evaluation of $dir/Makefile.PL: $($@->message . $@->stacktrace)";
+        die "ERROR from evaluation of $dir/Makefile.PL: $($@->message)";
     }
 }
 

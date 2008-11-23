@@ -39,7 +39,7 @@ while ( ~< *DATA) {
     my $coderef = eval "sub \{$input\}";
 
     if ($@ and $@->{?description}) {
-	diag("$num deparsed: $($@->message . $@->stacktrace)");
+	diag("$num deparsed: $($@->message)");
         diag("input: '$input'");
 	ok(0, $testname);
     }
