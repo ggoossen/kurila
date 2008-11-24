@@ -36,7 +36,7 @@ do {
     *STDOUT = *{$stdout_fh}{IO};
     my $warnings = '';
     local $^WARN_HOOK = sub {
-        $warnings .= @_[0]->message;
+        $warnings .= @_[0]->description;
     };
 
     my $mm;

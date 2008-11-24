@@ -335,11 +335,11 @@ use warnings ;
 try { 
     warnings::warn() 
   } ;
-print $@->message, "\n";
+print $@->description, "\n";
 try { 
   warnings::warn("fred", "joe") 
   } ;
-print $@->message, "\n";
+print $@->description, "\n";
 EXPECT
 Usage: warnings::warn([category,] 'message')
 Unknown warnings category 'fred'
@@ -350,11 +350,11 @@ use warnings ;
 try { 
   warnings::warnif() 
 } ;
-print $@->message, "\n";
+print $@->description, "\n";
 try { 
   warnings::warnif("fred", "joe") 
 } ;
-print $@->message, "\n";
+print $@->description, "\n";
 EXPECT
 Usage: warnings::warnif([category,] 'message')
 Unknown warnings category 'fred'
@@ -421,7 +421,7 @@ use abc;
 try { 
   abc::check() ; 
 } ;
-print "[[$($@->message)]]\n";
+print "[[$($@->description)]]\n";
 EXPECT
 [[hello]]
 ########
@@ -714,7 +714,7 @@ use warnings < qw( FATAL abc ) ;
 try { 
   abc::check() ; 
   } ;
-print "[[$($@->message)]]\n";
+print "[[$($@->description)]]\n";
 EXPECT
 [[hello]]
 ########
