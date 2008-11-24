@@ -56,8 +56,6 @@ PERLVAR(Itmps_stack,	SV **)		/* mortals we've made */
 PERLVARI(Itmps_ix,	I32,	-1)
 PERLVARI(Itmps_floor,	I32,	-1)
 PERLVAR(Itmps_max,	I32)
-PERLVAR(Imodcount,	I32)		/* how much mod()ification in
-					   assignment? */
 
 PERLVAR(Imarkstack,	I32 *)		/* stack_sp locations we're
 					   remembering */

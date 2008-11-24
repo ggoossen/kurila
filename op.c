@@ -1296,7 +1296,6 @@ Perl_mod(pTHX_ OP *o, I32 type)
     switch (o->op_type) {
     case OP_UNDEF:
 	localize = 0;
-	PL_modcount++;
 	return o;
     case OP_STUB:
 	if ((o->op_flags & OPf_PARENS) || PL_madskills)
@@ -1353,7 +1352,6 @@ Perl_mod(pTHX_ OP *o, I32 type)
     case OP_I_SUBTRACT:
 	if (!(o->op_flags & OPf_STACKED))
 	    goto nomod;
-	PL_modcount++;
 	break;
 
     case OP_COND_EXPR:
@@ -1367,7 +1365,6 @@ Perl_mod(pTHX_ OP *o, I32 type)
 /* 	    goto nomod; */
 	ref(cUNOPo->op_first, o->op_type);
 	localize = 1;
-	PL_modcount = RETURN_UNLIMITED_NUMBER;
 	break;
     case OP_ASLICE:
     case OP_HSLICE:
@@ -1375,7 +1372,6 @@ Perl_mod(pTHX_ OP *o, I32 type)
 	/* FALL THROUGH */
     case OP_NEXTSTATE:
     case OP_DBSTATE:
-	PL_modcount = RETURN_UNLIMITED_NUMBER;
 	break;
     case OP_RV2AV:
     case OP_RV2HV:
@@ -1389,27 +1385,22 @@ Perl_mod(pTHX_ OP *o, I32 type)
     case OP_ANDASSIGN:
     case OP_ORASSIGN:
     case OP_DORASSIGN:
-	PL_modcount++;
 	break;
 
     case OP_AELEMFAST:
 	localize = -1;
-	PL_modcount++;
 	break;
 
     case OP_EXPAND:
-        PL_modcount = RETURN_UNLIMITED_NUMBER;
 	mod(cUNOPo->op_first, type);
 	break;
 
     case OP_DOTDOTDOT:
     case OP_PLACEHOLDER:
-	PL_modcount++;
 	localize = 0;
 	break;
 
     case OP_PADSV:
-	PL_modcount++;
 	if (!type) /* local() */
 	    Perl_croak(aTHX_ "Can't localize lexical variable %s",
 		 PAD_COMPNAME_PV(o->op_targ));
@@ -1432,7 +1423,6 @@ Perl_mod(pTHX_ OP *o, I32 type)
     case OP_HELEM:
 	mod(cBINOPo->op_first, type == OP_NULL ? o->op_type : type);
 	localize = 1;
-	PL_modcount++;
 	break;
 
     case OP_SCOPE:

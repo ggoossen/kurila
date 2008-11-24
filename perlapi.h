@@ -390,8 +390,6 @@ END_EXTERN_C
 #define PL_minus_n		(*Perl_Iminus_n_ptr(aTHX))
 #undef  PL_minus_p
 #define PL_minus_p		(*Perl_Iminus_p_ptr(aTHX))
-#undef  PL_modcount
-#define PL_modcount		(*Perl_Imodcount_ptr(aTHX))
 #undef  PL_modglobal
 #define PL_modglobal		(*Perl_Imodglobal_ptr(aTHX))
 #undef  PL_my_cxt_keys
