@@ -280,7 +280,7 @@ cc_opclass(pTHX_ const OP *o)
 	return (o->op_flags & OPf_KIDS) ? OPc_UNOP : OPc_BASEOP;
 
     if (o->op_type == OP_SASSIGN)
-	return ((o->op_private & OPpASSIGN_BACKWARDS) ? OPc_UNOP : OPc_BINOP);
+	return (OPc_BINOP);
 
     if (o->op_type == OP_AELEMFAST) {
 	if (o->op_flags & OPf_SPECIAL)

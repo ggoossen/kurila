@@ -167,9 +167,6 @@ Deprecated.  Use C<GIMME_V> instead.
 /* Private for OP_LEAVE, OP_LEAVESUB, OP_LEAVESUBLV and OP_LEAVEWRITE */
 #define OPpREFCOUNTED		64	/* op_targ carries a refcount */
 
-/* Private for OP_SASSIGN */
-#define OPpASSIGN_BACKWARDS	64	/* Left & right switched. */
-
 /* Private for OP_MATCH and OP_SUBST{,CONST} */
 #define OPpRUNTIME		64	/* Pattern coming in on the stack */
 
