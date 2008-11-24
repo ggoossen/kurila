@@ -82,6 +82,8 @@ my $default_share = \qw[
     &re::regexp_pattern
     &error::create
     &error::message
+    &error::description
+    &error::stacktrace
     &error::write_to_stderr
     &Symbol::fetch_glob
 ];

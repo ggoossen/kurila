@@ -134,7 +134,7 @@ while ((nelems @death))
     }
     $result =~ s/{\#}/$marker1/;
     $result =~ s/{\#}/$marker2/;
-    if ($@->message !~ m/^\Q$result\E$/) {
+    if ($@->description !~ m/^\Q$result\E$/) {
 	print "# For $regex, expected:\n#  $result\n# Got:\n#  $($@ && $@->message)\n#\nnot ";
     }
     print "ok $count - $regex\n";
@@ -167,13 +167,13 @@ while ((nelems @warning))
     }
     $result =~ s/{\#}/$marker1/;
     $result =~ s/{\#}/$marker2/;
-    if ($warning->message !~ m/^\Q$result\E$/)
+    if ($warning->description !~ m/^\Q$result\E$/)
     {
 	print <<"EOM";
 # For $regex, expected:
 #   $result
 # Got:
-#   $($warning->message)
+#   $($warning->description)
 #
 not ok $count
 EOM

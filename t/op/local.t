@@ -181,7 +181,7 @@ is(@a[0].@a[1], "Xb");
 # now try the same for %SIG
 
 %SIG{+INT} = \&foo;
-$^WARN_HOOK = %SIG{?INT};
+$^WARN_HOOK = %SIG{INT};
 do {
     local(%SIG{+TERM}) = %SIG{?TERM};
     local(%SIG{+INT}) = %SIG{?INT};
