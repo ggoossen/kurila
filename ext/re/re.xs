@@ -36,9 +36,6 @@ extern SV*	my_reg_named_buff_iter(pTHX_ REGEXP * const rx,
                                    const SV * const lastkey, const U32 flags);
 
 extern SV*      my_reg_qr_package(pTHX_ REGEXP * const rx);
-#if defined(USE_ITHREADS)
-extern void*	my_regdupe (pTHX_ REGEXP * const r, CLONE_PARAMS *param);
-#endif
 
 EXTERN_C const struct regexp_engine my_reg_engine;
 
@@ -56,9 +53,6 @@ const struct regexp_engine my_reg_engine = {
         my_reg_named_buff,
         my_reg_named_buff_iter,
         my_reg_qr_package,
-#if defined(USE_ITHREADS)
-        my_regdupe 
-#endif
 };
 
 MODULE = re	PACKAGE = re

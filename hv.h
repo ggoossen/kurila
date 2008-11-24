@@ -389,21 +389,11 @@ C<SV*>.
     ((SV*) hv_common_key_len((urkk), (zamm), (clunk),			\
 			     (pam) | HV_DELETE, NULL, 0))
 
-#  ifdef USE_ITHREADS
-#    define HINTS_REFCNT_LOCK          MUTEX_LOCK(&PL_hints_mutex)
-#    define HINTS_REFCNT_UNLOCK                MUTEX_UNLOCK(&PL_hints_mutex)
-#  else
 #    define HINTS_REFCNT_LOCK          NOOP
 #    define HINTS_REFCNT_UNLOCK                NOOP
-#  endif
 
-#ifdef USE_ITHREADS
-#  define HINTS_REFCNT_INIT		MUTEX_INIT(&PL_hints_mutex)
-#  define HINTS_REFCNT_TERM		MUTEX_DESTROY(&PL_hints_mutex)
-#else
 #  define HINTS_REFCNT_INIT		NOOP
 #  define HINTS_REFCNT_TERM		NOOP
-#endif
 
 /* Hash actions
  * Passed in PERL_MAGIC_uvar calls

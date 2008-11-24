@@ -1321,10 +1321,6 @@ prime_env_iter(void)
 #if defined(PERL_IMPLICIT_CONTEXT)
   pTHX;
 #endif
-#if defined(USE_ITHREADS)
-  static perl_mutex primenv_mutex;
-  MUTEX_INIT(&primenv_mutex);
-#endif
 
 #if defined(PERL_IMPLICIT_CONTEXT)
     /* We jump through these hoops because we can be called at */
@@ -2881,9 +2877,6 @@ pipe_exit_routine(pTHX)
     while (info) {
         if (info->fp) {
            if (!info->useFILE
-#if defined(USE_ITHREADS)
-             && my_perl
-#endif
              && PL_perlio_fd_refcnt) 
                PerlIO_flush(info->fp);
            else 
@@ -4465,9 +4458,6 @@ I32 Perl_my_pclose(pTHX_ PerlIO *fp)
      */
      if (info->fp) {
         if (!info->useFILE
-#if defined(USE_ITHREADS)
-          && my_perl
-#endif
           && PL_perlio_fd_refcnt) 
             PerlIO_flush(info->fp);
         else 
@@ -4492,9 +4482,6 @@ I32 Perl_my_pclose(pTHX_ PerlIO *fp)
     _ckvmssts(sys$setast(1));
     if (info->fp) {
      if (!info->useFILE
-#if defined(USE_ITHREADS)
-         && my_perl
-#endif
          && PL_perlio_fd_refcnt) 
         PerlIO_close(info->fp);
      else 
@@ -9118,12 +9105,6 @@ vms_image_init(int *argcp, char ***argvp)
   if (tabidx) { tabvec[tabidx] = NULL; env_tables = tabvec; }
 
   getredirection(argcp,argvp);
-#if defined(USE_ITHREADS) && ( defined(__DECC) || defined(__DECCXX) )
-  {
-# include <reentrancy.h>
-  decc$set_reentrancy(C$C_MULTITHREAD);
-  }
-#endif
   return;
 }
 /*}}}*/
@@ -9449,12 +9430,7 @@ Perl_opendir(pTHX_ const char *name)
     dd->pat.dsc$w_length = strlen(dd->pattern);
     dd->pat.dsc$b_dtype = DSC$K_DTYPE_T;
     dd->pat.dsc$b_class = DSC$K_CLASS_S;
-#if defined(USE_ITHREADS)
-    Newx(dd->mutex,1,perl_mutex);
-    MUTEX_INIT( (perl_mutex *) dd->mutex );
-#else
     dd->mutex = NULL;
-#endif
 
     return dd;
 }  /* end of opendir() */
@@ -9485,10 +9461,6 @@ Perl_closedir(DIR *dd)
 
     sts = lib$find_file_end(&dd->context);
     Safefree(dd->pattern);
-#if defined(USE_ITHREADS)
-    MUTEX_DESTROY( (perl_mutex *) dd->mutex );
-    Safefree(dd->mutex);
-#endif
     Safefree(dd);
 }
 /*}}}*/
@@ -13004,19 +12976,6 @@ case_tolerant_process_fromperl(pTHX_ CV *cv)
   ST(0) = boolSV(do_vms_case_tolerant());
   XSRETURN(1);
 }
-
-#ifdef USE_ITHREADS
-
-void  
-Perl_sys_intern_dup(pTHX_ struct interp_intern *src, 
-                          struct interp_intern *dst)
-{
-    PERL_ARGS_ASSERT_SYS_INTERN_DUP;
-
-    memcpy(dst,src,sizeof(struct interp_intern));
-}
-
-#endif
 
 void  
 Perl_sys_intern_clear(pTHX)

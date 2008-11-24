@@ -264,9 +264,6 @@ BOOT:
 #define B_sv_undef()	&PL_sv_undef
 #define B_sv_yes()	&PL_sv_yes
 #define B_sv_no()	&PL_sv_no
-#ifdef USE_ITHREADS
-#define B_regex_padav()	PL_regex_padav
-#endif
 
 B::AV
 B_init_av()
@@ -282,13 +279,6 @@ B_end_av()
 
 B::GV
 B_inc_gv()
-
-#ifdef USE_ITHREADS
-
-B::AV
-B_regex_padav()
-
-#endif
 
 B::CV
 B_main_cv()
