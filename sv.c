@@ -10413,7 +10413,6 @@ perl_clone_using(PerlInterpreter *proto_perl, UV flags,
 
     PL_errors		= sv_dup_inc(proto_perl->Ierrors, param);
     PL_hv_fetch_ent_mh	= NULL;
-    PL_modcount		= proto_perl->Imodcount;
     PL_lastgotoprobe	= NULL;
     PL_dumpindent	= proto_perl->Idumpindent;
 

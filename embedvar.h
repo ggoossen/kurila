@@ -177,7 +177,6 @@
 #define PL_minus_l		(vTHX->Iminus_l)
 #define PL_minus_n		(vTHX->Iminus_n)
 #define PL_minus_p		(vTHX->Iminus_p)
-#define PL_modcount		(vTHX->Imodcount)
 #define PL_modglobal		(vTHX->Imodglobal)
 #define PL_my_cxt_keys		(vTHX->Imy_cxt_keys)
 #define PL_my_cxt_list		(vTHX->Imy_cxt_list)
@@ -460,7 +459,6 @@
 #define PL_Iminus_l		PL_minus_l
 #define PL_Iminus_n		PL_minus_n
 #define PL_Iminus_p		PL_minus_p
-#define PL_Imodcount		PL_modcount
 #define PL_Imodglobal		PL_modglobal
 #define PL_Imy_cxt_keys		PL_my_cxt_keys
 #define PL_Imy_cxt_list		PL_my_cxt_list
