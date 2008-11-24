@@ -288,45 +288,19 @@ struct pmop {
     BASEOP
     OP *	op_first;
     OP *	op_last;
-#ifdef USE_ITHREADS
-    IV          op_pmoffset;
-#else
     REGEXP *    op_pmregexp;            /* compiled expression */
-#endif
     U32         op_pmflags;
     union {
 	OP *	op_pmreplroot;		/* For OP_SUBST */
-#ifdef USE_ITHREADS
-	PADOFFSET  op_pmtargetoff;	/* For OP_PUSHRE */
-#else
 	GV *	op_pmtargetgv;
-#endif
     }	op_pmreplrootu;
     union {
 	OP *	op_pmreplstart;	/* Only used in OP_SUBST */
     }		op_pmstashstartu;
 };
 
-#ifdef USE_ITHREADS
-#define PM_GETRE(o)	(SvTYPE(PL_regex_pad[(o)->op_pmoffset]) == SVt_REGEXP \
-		 	 ? (REGEXP*)(PL_regex_pad[(o)->op_pmoffset]) : NULL)
-/* The assignment is just to enforce type safety (or at least get a warning).
- */
-/* With first class regexps not via a reference one needs to assign
-   &PL_sv_undef under ithreads. (This would probably work unthreaded, but NULL
-   is cheaper. I guess we could allow NULL, but the check above would get
-   more complex, and we'd have an AV with (SV*)NULL in it, which feels bad */
-/* BEWARE - something that calls this macro passes (r) which has a side
-   effect.  */
-#define PM_SETRE(o,r)	STMT_START {					\
-                            const REGEXP *const whap = (r);		\
-                            assert(whap);				\
-			    PL_regex_pad[(o)->op_pmoffset] = (SV*)whap;	\
-                        } STMT_END
-#else
 #define PM_GETRE(o)     ((o)->op_pmregexp)
 #define PM_SETRE(o,r)   ((o)->op_pmregexp = (r))
-#endif
 
 
 #define PMf_RETAINT	0x0001		/* taint $1 etc. if target tainted */
@@ -426,22 +400,11 @@ struct loop {
 #define kLOOP		cLOOPx(kid)
 
 
-#ifdef USE_ITHREADS
-#  define	cGVOPx_gv(o)	((GV*)PAD_SVl(cPADOPx(o)->op_padix))
-#  define	IS_PADGV(v)	(v && SvTYPE(v) == SVt_PVGV && isGV_with_GP(v) \
-				 && GvIN_PAD(v))
-#  define	IS_PADCONST(v)	(v && SvREADONLY(v))
-#  define	cSVOPx_sv(v)	(cSVOPx(v)->op_sv \
-				 ? cSVOPx(v)->op_sv : PAD_SVl((v)->op_targ))
-#  define	cSVOPx_svp(v)	(cSVOPx(v)->op_sv \
-				 ? &cSVOPx(v)->op_sv : &PAD_SVl((v)->op_targ))
-#else
 #  define	cGVOPx_gv(o)	((GV*)cSVOPx(o)->op_sv)
 #  define	IS_PADGV(v)	FALSE
 #  define	IS_PADCONST(v)	FALSE
 #  define	cSVOPx_sv(v)	(cSVOPx(v)->op_sv)
 #  define	cSVOPx_svp(v)	(&cSVOPx(v)->op_sv)
-#endif
 
 #define	cGVOP_gv		cGVOPx_gv(PL_op)
 #define	cGVOPo_gv		cGVOPx_gv(o)
@@ -505,22 +468,10 @@ struct loop {
  * regexes.
  */
 
-#ifdef USE_ITHREADS
-#  define OP_REFCNT_INIT		MUTEX_INIT(&PL_op_mutex)
-#  ifdef PERL_CORE
-#    define OP_REFCNT_LOCK		MUTEX_LOCK(&PL_op_mutex)
-#    define OP_REFCNT_UNLOCK		MUTEX_UNLOCK(&PL_op_mutex)
-#  else
-#    define OP_REFCNT_LOCK		op_refcnt_lock()
-#    define OP_REFCNT_UNLOCK		op_refcnt_unlock()
-#  endif
-#  define OP_REFCNT_TERM		MUTEX_DESTROY(&PL_op_mutex)
-#else
 #  define OP_REFCNT_INIT		NOOP
 #  define OP_REFCNT_LOCK		NOOP
 #  define OP_REFCNT_UNLOCK		NOOP
 #  define OP_REFCNT_TERM		NOOP
-#endif
 
 #define OpREFCNT_set(o,n)		((o)->op_targ = (n))
 #ifdef PERL_DEBUG_READONLY_OPS

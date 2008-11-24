@@ -1788,10 +1788,12 @@ PERL_CALLCONV void	Perl_mini_mktime(pTHX_ struct tm *ptm)
 	assert(ptm)
 
 PERL_CALLCONV OP*	Perl_mod(pTHX_ OP* o, I32 type);
-PERL_CALLCONV OP*	Perl_assign(pTHX_ OP* o, bool partial)
-			__attribute__nonnull__(pTHX_1);
+PERL_CALLCONV OP*	Perl_assign(pTHX_ OP* o, bool partial, I32 *min_modcount, I32 *max_modcount)
+			__attribute__nonnull__(pTHX_1)
+			__attribute__nonnull__(pTHX_3)
+			__attribute__nonnull__(pTHX_4);
 #define PERL_ARGS_ASSERT_ASSIGN	\
-	assert(o)
+	assert(o); assert(min_modcount); assert(max_modcount)
 
 PERL_CALLCONV int	Perl_mode_from_discipline(pTHX_ SV* discp);
 PERL_CALLCONV const char*	Perl_moreswitches(pTHX_ const char* s)

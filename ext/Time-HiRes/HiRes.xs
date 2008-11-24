@@ -766,15 +766,6 @@ BOOT:
 #endif
 }
 
-#if defined(USE_ITHREADS) && defined(MY_CXT_KEY)
-
-void
-CLONE(...)
-    CODE:
-    MY_CXT_CLONE;
-
-#endif
-
 INCLUDE: const-xs.inc
 
 #if defined(HAS_USLEEP) && defined(HAS_GETTIMEOFDAY)

@@ -615,34 +615,13 @@ Perl_op_clear(pTHX_ OP *o)
     case OP_AELEMFAST:
 	if (! (o->op_type == OP_AELEMFAST && o->op_flags & OPf_SPECIAL)) {
 	    /* not an OP_PADSV replacement */
-#ifdef USE_ITHREADS
-	    if (cPADOPo->op_padix > 0) {
-		/* No GvIN_PAD_off(cGVOPo_gv) here, because other references
-		 * may still exist on the pad */
-		pad_swipe(cPADOPo->op_padix, TRUE);
-		cPADOPo->op_padix = 0;
-	    }
-#else
 	    SVcpNULL(cSVOPo->op_sv);
-#endif
 	}
 	break;
     case OP_METHOD_NAMED:
     case OP_CONST:
     case OP_HINTSEVAL:
 	SVcpNULL(cSVOPo->op_sv);
-#ifdef USE_ITHREADS
-	/** Bug #15654
-	  Even if op_clear does a pad_free for the target of the op,
-	  pad_free doesn't actually remove the sv that exists in the pad;
-	  instead it lives on. This results in that it could be reused as 
-	  a target later on when the pad was reallocated.
-	**/
-        if(o->op_targ) {
-          pad_swipe(o->op_targ,1);
-          o->op_targ = 0;
-        }
-#endif
 	break;
     case OP_GOTO:
     case OP_NEXT:
@@ -657,15 +636,7 @@ Perl_op_clear(pTHX_ OP *o)
 	op_free(cPMOPo->op_pmreplrootu.op_pmreplroot);
 	goto clear_pmop;
     case OP_PUSHRE:
-#ifdef USE_ITHREADS
-        if (cPMOPo->op_pmreplrootu.op_pmtargetoff) {
-	    /* No GvIN_PAD_off here, because other references may still
-	     * exist on the pad */
-	    pad_swipe(cPMOPo->op_pmreplrootu.op_pmtargetoff, TRUE);
-	}
-#else
 	SvREFCNT_dec((SV*)cPMOPo->op_pmreplrootu.op_pmtargetgv);
-#endif
 	/* FALL THROUGH */
     case OP_MATCH:
     case OP_QR:
@@ -677,18 +648,8 @@ clear_pmop:
          * and the clearing of PL_regex_padav needs to
          * happen before sv_clean_all
          */
-#ifdef USE_ITHREADS
-	if(PL_regex_pad) {        /* We could be in destruction */
-	    const IV offset = (cPMOPo)->op_pmoffset;
-	    ReREFCNT_dec(PM_GETRE(cPMOPo));
-	    PL_regex_pad[offset] = &PL_sv_undef;
-            sv_catpvn_nomg(PL_regex_pad[0], (const char *)&offset,
-			   sizeof(offset));
-        }
-#else
 	ReREFCNT_dec(PM_GETRE(cPMOPo));
 	PM_SETRE(cPMOPo, NULL);
-#endif
 
 	break;
     }
@@ -2107,7 +2068,7 @@ Perl_convert(pTHX_ I32 type, I32 flags, OP *o, SV *location)
 }
 
 OP *
-Perl_assign(pTHX_ OP *o, bool partial)
+Perl_assign(pTHX_ OP *o, bool partial, I32 *min_modcount, I32 *max_modcount)
 {
     OP* kid;
 
@@ -2125,29 +2086,51 @@ Perl_assign(pTHX_ OP *o, bool partial)
 	o->op_flags |= OPf_ASSIGN;
 	if (partial)
 	    o->op_flags |= OPf_ASSIGN_PART;
+	(*max_modcount)++;
+	if ( ! (o->op_flags & OPf_OPTIONAL) )
+	    (*min_modcount)++;
 	break;
 
     case OP_DOTDOTDOT:
 	if ( ! partial )
 	    goto no_assign;
 	o->op_flags |= OPf_ASSIGN | OPf_ASSIGN_PART;
+	if (*max_modcount < *min_modcount)
+	    Perl_croak_at(aTHX_ o->op_location, 
+		"Multiple variable number of arguments patterns are not allowed");
+	(*max_modcount) = -1;
 	break;
 
     case OP_NULL:
-	assign(cBINOPo->op_first, partial);
+	assign(cBINOPo->op_first, partial, min_modcount, max_modcount);
 	break;
 
     case OP_COND_EXPR:
-	for (kid = cUNOPo->op_first->op_sibling; kid; kid = kid->op_sibling)
-	    assign(kid, partial);
+    {
+	I32 min_modcount2 = *min_modcount;
+	I32 max_modcount2 = *max_modcount;
+	assign(cUNOPo->op_first->op_sibling,
+	    partial, min_modcount, max_modcount);
+	assign(cUNOPo->op_first->op_sibling->op_sibling,
+	    partial, &min_modcount2, &max_modcount2);
+	if (min_modcount2 != *min_modcount || max_modcount2 != *max_modcount)
+	    Perl_croak_at(aTHX_ o->op_location,
+		"Conditional expression with different number of arguments not supported");
 	break;
+    }
 
     case OP_ARRAYEXPAND:
     case OP_HASHEXPAND:
 	if ( ! partial )
 	    goto no_assign;
+	if (*max_modcount < *min_modcount)
+	    Perl_croak_at(aTHX_ o->op_location, 
+		"Multiple variable number of arguments patterns are not allowed");
+	(*max_modcount) = -1;
 	o->op_flags |= OPf_ASSIGN | OPf_ASSIGN_PART;
 	{
+	    I32 sub_min_modcount = 0;
+	    I32 sub_max_modcount = 0;
 	    OP* enter = newOP(
 		o->op_type == OP_ARRAYEXPAND 
 		    ? OP_ENTER_ARRAYEXPAND_ASSIGN 
@@ -2155,18 +2138,24 @@ Perl_assign(pTHX_ OP *o, bool partial)
 		0, o->op_location);
 	    enter->op_sibling = cBINOPo->op_first;
 	    cBINOPo->op_first = enter;
-	    for (kid = enter->op_sibling; kid; kid = kid->op_sibling)
-		assign(kid, TRUE);
+	    assign(enter->op_sibling, TRUE, &sub_min_modcount, &sub_max_modcount);
+	    if (sub_min_modcount != 1 || sub_max_modcount != 1)
+		Perl_croak_at(aTHX_ o->op_location,
+		    "%s must have a single valued argument", OP_DESC(o));
 	}
-	break;
 	break;
 
     case OP_ANONARRAY:
 	o->op_flags |= OPf_ASSIGN;
 	if (partial)
 	    o->op_flags |= OPf_ASSIGN_PART;
+	(*max_modcount)++;
+	if ( ! (o->op_flags & OPf_OPTIONAL) )
+	    (*min_modcount)++;
 
 	{
+	    I32 sub_min_modcount = 0;
+	    I32 sub_max_modcount = 0;
 	    OP* pushmark = cBINOPo->op_first;
 	    OP* enter = newOP(OP_ENTER_ANONARRAY_ASSIGN,
 		partial ? (OPf_ASSIGN_PART | OPf_ASSIGN_PART) : OPf_ASSIGN_PART,
@@ -2174,7 +2163,7 @@ Perl_assign(pTHX_ OP *o, bool partial)
 	    enter->op_sibling = pushmark->op_sibling;
 	    cBINOPo->op_first = enter;
 	    for (kid = enter->op_sibling; kid; kid = kid->op_sibling)
-		assign(kid, TRUE);
+		assign(kid, TRUE, &sub_min_modcount, &sub_max_modcount);
 	}
 	break;
 
@@ -2682,29 +2671,6 @@ Perl_newPMOP(pTHX_ I32 type, I32 flags, SV *location)
     if (PL_hints & HINT_RE_TAINT)
 	pmop->op_pmflags |= PMf_RETAINT;
 
-#ifdef USE_ITHREADS
-    assert(SvPOK(PL_regex_pad[0]));
-    if (SvCUR(PL_regex_pad[0])) {
-	/* Pop off the "packed" IV from the end.  */
-	SV *const repointer_list = PL_regex_pad[0];
-	const char *p = SvEND(repointer_list) - sizeof(IV);
-	const IV offset = *((IV*)p);
-
-	assert(SvCUR(repointer_list) % sizeof(IV) == 0);
-
-	SvEND_set(repointer_list, p);
-
-	pmop->op_pmoffset = offset;
-	/* This slot should be free, so assert this:  */
-	assert(PL_regex_pad[offset] == &PL_sv_undef);
-    } else {
-	SV * const repointer = &PL_sv_undef;
-	av_push(PL_regex_padav, repointer);
-	pmop->op_pmoffset = av_len(PL_regex_padav);
-	PL_regex_pad = AvARRAY(PL_regex_padav);
-    }
-#endif
-
     return CHECKOP(type, pmop);
 }
 
@@ -2892,34 +2858,6 @@ Perl_newSVOP(pTHX_ I32 type, I32 flags, SV *sv, SV *location)
     return CHECKOP(type, svop);
 }
 
-#ifdef USE_ITHREADS
-OP *
-Perl_newPADOP(pTHX_ I32 type, I32 flags, SV *sv, SV *location)
-{
-    dVAR;
-    PADOP *padop;
-
-    PERL_ARGS_ASSERT_NEWPADOP;
-
-    NewOp(1101, padop, 1, PADOP);
-    padop->op_type = (OPCODE)type;
-    padop->op_ppaddr = PL_ppaddr[type];
-    padop->op_padix = pad_alloc(type, SVs_PADTMP);
-    padop->op_location = SvREFCNT_inc(location);
-    SvREFCNT_dec(PAD_SVl(padop->op_padix));
-    PAD_SETSV(padop->op_padix, sv);
-    assert(sv);
-    SvPADTMP_on(sv);
-    padop->op_next = (OP*)padop;
-    padop->op_flags = (U8)flags;
-    if (PL_opargs[type] & OA_RETSCALAR)
-	scalar((OP*)padop);
-    if (PL_opargs[type] & OA_TARGET)
-	padop->op_targ = pad_alloc(type, SVs_PADTMP);
-    return CHECKOP(type, padop);
-}
-#endif
-
 OP *
 Perl_newGVOP(pTHX_ I32 type, I32 flags, GV *gv, SV *location)
 {
@@ -2927,12 +2865,7 @@ Perl_newGVOP(pTHX_ I32 type, I32 flags, GV *gv, SV *location)
 
     PERL_ARGS_ASSERT_NEWGVOP;
 
-#ifdef USE_ITHREADS
-    GvIN_PAD_on(gv);
-    return newPADOP(type, flags, SvREFCNT_inc_simple_NN(gv), location);
-#else
     return newSVOP(type, flags, SvREFCNT_inc_simple_NN(gv), location);
-#endif
 }
 
 OP *
@@ -3267,10 +3200,12 @@ Perl_newASSIGNOP(pTHX_ I32 flags, OP *left, I32 optype, OP *right, SV *location)
 	    location);
     }
     else {
+	I32 min_modcount = 0;
+	I32 max_modcount = 0;
 	o = newBINOP(OP_SASSIGN,
 	    flags,
 	    scalar(right), 
-	    assign(mod(scalar(left), OP_SASSIGN), FALSE),
+	    assign(mod(scalar(left), OP_SASSIGN), FALSE, &min_modcount, &max_modcount),
 	    location );
     }
     return o;
@@ -6569,44 +6504,6 @@ Perl_peep(pTHX_ register OP *o)
 	case OP_CONST:
 	    if (cSVOPo->op_private & OPpCONST_STRICT)
 		no_bareword_allowed(o);
-#ifdef USE_ITHREADS
-	case OP_HINTSEVAL:
-	case OP_METHOD_NAMED:
-	    /* Relocate sv to the pad for thread safety.
-	     * Despite being a "constant", the SV is written to,
-	     * for reference counts, sv_upgrade() etc. */
-	    if (cSVOP->op_sv) {
-		const PADOFFSET ix = pad_alloc(OP_CONST, SVs_PADTMP);
-		if (o->op_type != OP_METHOD_NAMED && SvPADTMP(cSVOPo->op_sv)) {
-		    /* If op_sv is already a PADTMP then it is being used by
-		     * some pad, so make a copy. */
-		    sv_setsv(PAD_SVl(ix),cSVOPo->op_sv);
-		    SvREADONLY_on(PAD_SVl(ix));
-		    SvREFCNT_dec(cSVOPo->op_sv);
-		}
-		else if (o->op_type != OP_METHOD_NAMED
-			 && cSVOPo->op_sv == &PL_sv_undef) {
-		    /* PL_sv_undef is hack - it's unsafe to store it in the
-		       AV that is the pad, because av_fetch treats values of
-		       PL_sv_undef as a "free" AV entry and will merrily
-		       replace them with a new SV, causing pad_alloc to think
-		       that this pad slot is free. (When, clearly, it is not)
-		    */
-		    SvOK_off(PAD_SVl(ix));
-		    SvPADTMP_on(PAD_SVl(ix));
-		    SvREADONLY_on(PAD_SVl(ix));
-		}
-		else {
-		    SvREFCNT_dec(PAD_SVl(ix));
-		    SvPADTMP_on(cSVOPo->op_sv);
-		    PAD_SETSV(ix, cSVOPo->op_sv);
-		    /* XXX I don't know how this isn't readonly already. */
-		    SvREADONLY_on(PAD_SVl(ix));
-		}
-		cSVOPo->op_sv = NULL;
-		o->op_targ = ix;
-	    }
-#endif
 	    break;
 
 	case OP_CONCAT:
