@@ -843,10 +843,6 @@ STATIC SV* S_dump_op_flags_private(pTHX_ const OP* o)
 	if (o->op_private & OPpREFCOUNTED)
 	    sv_catpv(tmpsv, ",REFCOUNTED");
     }
-    else if (optype == OP_SASSIGN) {
-	if (o->op_private & OPpASSIGN_BACKWARDS)
-	    sv_catpv(tmpsv, ",BACKWARDS");
-    }
     else if (optype == OP_REPEAT) {
 	if (o->op_private & OPpREPEAT_DOLIST)
 	    sv_catpv(tmpsv, ",DOLIST");
