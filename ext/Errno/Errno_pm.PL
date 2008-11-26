@@ -396,42 +396,6 @@ ESQ
 
     print <<'ESQ';
 
-sub TIEHASH { bless \@() }
-
-sub FETCH {
-    my @($self, $errname) = @_;
-    my $errno = "";
-    if ( exists %name2no{$errname}) {
-        $errno = %name2no{$errname};
-        $errno = 0 unless $! == $errno;
-    }
-    return $errno;
-}
-
-sub STORE {
-    die("ERRNO hash is read only!");
-}
-
-*CLEAR = \&STORE;
-*DELETE = \&STORE;
-
-sub NEXTKEY {
-    my @(?$k,?$v) = @: each %name2no;
-    $k
-}
-
-sub FIRSTKEY {
-    keys %name2no;	# initialize iterator
-    goto &NEXTKEY;
-}
-
-sub EXISTS {
-    my @($self, $errname) = @_;
-    return exists %name2no{$errname};
-}
-
-tie %!, __PACKAGE__;
-
 1;
 __END__
 
