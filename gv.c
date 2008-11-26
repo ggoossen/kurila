@@ -1352,6 +1352,7 @@ Perl_gp_tmprefcnt(pTHX_ GV *gv)
 {
     dVAR;
     GP* gp;
+    PERL_ARGS_ASSERT_GP_TMPREFCNT;
 
     if (!gv || !isGV_with_GP(gv) || !(gp = GvGP(gv)))
 	return;

@@ -5040,6 +5040,7 @@ Perl_ck_anonarray(pTHX_ OP*o)
 {
     dVAR;
     register OP *kid;
+    PERL_ARGS_ASSERT_CK_ANONARRAY;
     for( kid = cLISTOPo->op_first ; kid ; kid = kid->op_sibling ) {
 	list(kid);
     }
