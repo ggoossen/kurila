@@ -115,8 +115,6 @@ sub import {
 	*CHILD_ERROR				= *?{SCALAR}	;
 	*OS_ERROR				= *!{SCALAR}	;
 	    *ERRNO				= *!{SCALAR}	;
-	*OS_ERROR_FLAGS				= *!{HASH}	;
-	    *ERRNO_FLAGS				= *!{HASH}	;
 	*EXTENDED_OS_ERROR			= *^E{SCALAR}	;
         *EVAL_ERROR                             = *@{SCALAR}    ;
 

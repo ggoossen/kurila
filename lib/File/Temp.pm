@@ -143,7 +143,7 @@ use File::Spec v0.8;
 use File::Path < qw/ rmtree /;
 use Fcntl v1.03;
 use IO::Seekable; # For SEEK_*
-use Errno;
+use Errno < qw|EEXIST|;
 require VMS::Stdio if $^O eq 'VMS';
 
 # pre-emptively load Carp::Heavy. If we don't when we run out of file
@@ -520,7 +520,7 @@ sub _gettemp {
 
 	# Error opening file - abort with error
 	# if the reason was anything but EEXIST
-	unless (%!{?EEXIST}) {
+	unless ($! == EEXIST) {
 	  ${%options{ErrStr}} = "Could not create temp file $path: $!";
 	  return ();
 	}
@@ -540,7 +540,7 @@ sub _gettemp {
 
 	# Abort with error if the reason for failure was anything
 	# except EEXIST
-	unless (%!{?EEXIST}) {
+	unless ($! == EEXIST) {
 	  ${%options{ErrStr}} = "Could not create directory $path: $!";
 	  return ();
 	}

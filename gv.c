@@ -903,9 +903,7 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 	    GvMULTI_on(gv);
 	    gv_init_sv(gv, sv_type);
 	    if (len == 1 && (sv_type == SVt_PVHV || sv_type == SVt_PVGV)) {
-	        if (*name == '!')
-		    require_tie_mod(gv, "!", newSVpvs("Errno"), "TIEHASH", 1);
-		else if (*name == '-' || *name == '+')
+		if (*name == '-' || *name == '+')
 		    require_tie_mod(gv, name, newSVpvs("Tie::Hash::NamedCapture"), "TIEHASH", 0);
 	    }
 	}
@@ -1114,17 +1112,6 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 #endif
 	    goto magicalize;
 
-	case '!':
-	    GvMULTI_on(gv);
-	    /* If %! has been used, automatically load Errno.pm. */
-
-	    sv_magic(GvSVn(gv), (SV*)gv, PERL_MAGIC_sv, name, len);
-
-            /* magicalization must be done before require_tie_mod is called */
-	    if (sv_type == SVt_PVHV || sv_type == SVt_PVGV)
-		require_tie_mod(gv, "!", newSVpvs("Errno"), "TIEHASH", 1);
-
-	    break;
 	case '|':
 	    sv_setiv(GvSVn(gv), (IV)(IoFLAGS(GvIOp(PL_defoutgv)) & IOf_FLUSH) != 0);
 	    goto magicalize;
@@ -1146,6 +1133,7 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 	case ',':
 	case '\\':
 	case '/':
+	case '!':
 	magicalize:
 	    sv_magic(GvSVn(gv), (SV*)gv, PERL_MAGIC_sv, name, len);
 

@@ -5,6 +5,7 @@ my $can_fork;
 my $has_perlio;
 
 use Config;
+use Errno < qw|EPIPE ESHUTDOWN|;
 
 BEGIN {
     $can_fork = config_value('d_fork') || config_value('d_pseudofork');
@@ -137,7 +138,7 @@ do {
   # This may need skipping on some OSes - restoring value saved above
   # should help
   $! = $err;
-  ok ((%!{?EPIPE} or %!{?ESHUTDOWN}), '$! should be EPIPE or ESHUTDOWN')
+  ok (($! == EPIPE or $! == ESHUTDOWN), '$! should be EPIPE or ESHUTDOWN')
     or printf "\$\!=\%d(\%s)\n", $err, $err;
 };
 
