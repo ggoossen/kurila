@@ -713,12 +713,11 @@ Set the actual length of the string which is in the SV.  See C<SvIV_set>.
 #define SvHVOK(sv)              (SvTYPE(sv) == SVt_PVHV)
 #define SvCVOK(sv)              (SvTYPE(sv) == SVt_PVCV)
 #define SvIOOK(sv)              (SvTYPE(sv) == SVt_PVIO)
+#define SvRVOK(sv)              (SvROK(sv))
 
-#define SvPVOK(sv)		((SvTYPE(sv) == SVt_BIND)		\
-				 ? (SvFLAGS(SvRV(sv)) & SVf_OK)		\
-				 : (SvFLAGS(sv) & SVf_OK))
+#define SvPVOK(sv)		( (SvFLAGS(sv) & SVf_OK) && ( ! SvRVOK(sv) ) )
 #define SvOK(sv)		(SvAVOK(sv) || SvHVOK(sv) || SvPVOK(sv) \
-	|| SvIOOK(sv) || SvCVOK(sv) )
+				 || SvIOOK(sv) || SvCVOK(sv) || SvRVOK(sv) )
 #define SvOK_off(sv)		( SvAVOK(sv) || SvHVOK(sv) ? sv_setsv(sv, NULL) : SvPVOK_off(sv) )
 #define SvPVOK_off(sv)		(assert_not_ROK(sv) assert_not_glob(sv)	\
 				 SvFLAGS(sv) &=	~(SVf_OK|		\
