@@ -13,7 +13,7 @@ use Carp;
 
 our(@ISA, $VERSION, @EXPORT_OK);
 use Exporter;
-use Errno;
+use Errno < qw|EINPROGRESS EWOULDBLOCK EISCONN|;
 
 # legacy
 
@@ -108,7 +108,7 @@ sub connect {
 
     $blocking = $sock->blocking(0) if $timeout;
     if (!connect($sock, $addr)) {
-	if (defined $timeout && (%!{?EINPROGRESS} || %!{?EWOULDBLOCK})) {
+	if (defined $timeout && ($! == EINPROGRESS || $! == EWOULDBLOCK)) {
 	    require IO::Select;
 
 	    my $sel = IO::Select->new( $sock);
@@ -119,7 +119,7 @@ sub connect {
 		$@ = "connect: timeout";
 	    }
 	    elsif (!connect($sock,$addr) &&
-                not (%!{?EISCONN} || ($! == 10022 && $^O eq 'MSWin32'))
+                not ($! == EISCONN || ($! == 10022 && $^O eq 'MSWin32'))
             ) {
 		# Some systems refuse to re-connect() to
 		# an already open socket and set errno to EISCONN.
@@ -128,7 +128,7 @@ sub connect {
 		$@ = "connect: $!";
 	    }
 	}
-        elsif ($blocking || !(%!{?EINPROGRESS} || %!{?EWOULDBLOCK}))  {
+        elsif ($blocking || !($! == EINPROGRESS || $! == EWOULDBLOCK))  {
 	    $err = $!;
 	    $@ = "connect: $!";
 	}
