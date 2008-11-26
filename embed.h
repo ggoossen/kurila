@@ -419,7 +419,6 @@
 #define magic_existspack	Perl_magic_existspack
 #define magic_get		Perl_magic_get
 #define magic_getdefelem	Perl_magic_getdefelem
-#define magic_getnkeys		Perl_magic_getnkeys
 #define magic_getpack		Perl_magic_getpack
 #define magic_getsig		Perl_magic_getsig
 #define magic_gettaint		Perl_magic_gettaint
@@ -443,7 +442,6 @@
 #endif
 #ifdef PERL_CORE
 #define magic_setmglob		Perl_magic_setmglob
-#define magic_setnkeys		Perl_magic_setnkeys
 #define magic_setpack		Perl_magic_setpack
 #define magic_setregexp		Perl_magic_setregexp
 #define magic_setsig		Perl_magic_setsig
@@ -2590,7 +2588,6 @@
 #define magic_existspack(a,b)	Perl_magic_existspack(aTHX_ a,b)
 #define magic_get(a,b)		Perl_magic_get(aTHX_ a,b)
 #define magic_getdefelem(a,b)	Perl_magic_getdefelem(aTHX_ a,b)
-#define magic_getnkeys(a,b)	Perl_magic_getnkeys(aTHX_ a,b)
 #define magic_getpack(a,b)	Perl_magic_getpack(aTHX_ a,b)
 #define magic_getsig(a,b)	Perl_magic_getsig(aTHX_ a,b)
 #define magic_gettaint(a,b)	Perl_magic_gettaint(aTHX_ a,b)
@@ -2614,7 +2611,6 @@
 #endif
 #ifdef PERL_CORE
 #define magic_setmglob(a,b)	Perl_magic_setmglob(aTHX_ a,b)
-#define magic_setnkeys(a,b)	Perl_magic_setnkeys(aTHX_ a,b)
 #define magic_setpack(a,b)	Perl_magic_setpack(aTHX_ a,b)
 #define magic_setregexp(a,b)	Perl_magic_setregexp(aTHX_ a,b)
 #define magic_setsig(a,b)	Perl_magic_setsig(aTHX_ a,b)
