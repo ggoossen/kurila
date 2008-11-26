@@ -881,7 +881,10 @@ XS(XS_error_description)
 
 	    sv = hv_fetchs(err, "description", 0);
 	    if (sv) {
-		sv_catsv(res, *sv);
+		if (SvPVOK(*sv))
+		    sv_catsv(res, *sv);
+		else
+		    sv_catpv(res, "(error description isn't a string)");
 	    }
 	}
 
