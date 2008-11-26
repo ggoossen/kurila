@@ -149,6 +149,11 @@ PERL_INLINE_CALLCONV NV	Perl_SvNV(pTHX_ SV *sv)
 #define PERL_ARGS_ASSERT_SVNV	\
 	assert(sv)
 
+PERL_INLINE_CALLCONV SV*	Perl_LocationFilename(pTHX_ SV *location)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_LOCATIONFILENAME	\
+	assert(location)
+
 #  include "pp_proto.h"
 PERL_CALLCONV OP*	Perl_append_elem(pTHX_ I32 optype, OP* first, OP* last);
 PERL_CALLCONV OP*	Perl_append_list(pTHX_ I32 optype, LISTOP* first, LISTOP* last);

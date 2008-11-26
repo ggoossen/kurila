@@ -497,7 +497,7 @@ PerlIO_debug(const char *fmt, ...)
     }
     if (PL_perlio_debug_fd > 0) {
 	dTHX;
-	const char *s = SvPV_nolen_const(loc_filename(PL_curcop->op_location));
+	const char *s = SvPV_nolen_const(LocationFilename(PL_curcop->op_location));
 	STRLEN len;
 	SV * const sv = Perl_newSVpvf(aTHX_ "%s:%" IVdf " ", s ? s : "(none)",
 	    (IV) 333);

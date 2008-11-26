@@ -60,6 +60,7 @@
 #define SvIV			Perl_SvIV
 #define SvUV			Perl_SvUV
 #define SvNV			Perl_SvNV
+#define LocationFilename	Perl_LocationFilename
 #ifdef PERL_CORE
 #define append_elem		Perl_append_elem
 #define append_list		Perl_append_list
@@ -2240,6 +2241,7 @@
 #define SvIV(a)			Perl_SvIV(aTHX_ a)
 #define SvUV(a)			Perl_SvUV(aTHX_ a)
 #define SvNV(a)			Perl_SvNV(aTHX_ a)
+#define LocationFilename(a)	Perl_LocationFilename(aTHX_ a)
 #ifdef PERL_CORE
 #define append_elem(a,b,c)	Perl_append_elem(aTHX_ a,b,c)
 #define append_list(a,b,c)	Perl_append_list(aTHX_ a,b,c)

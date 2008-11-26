@@ -904,7 +904,7 @@ PP(pp_caller)
     {
 	SV**linenr = NULL;
 	SV* location = cx->blk_oldop->op_location;
-	SV* filename = loc_filename(cx->blk_oldop->op_location);
+	SV* filename = LocationFilename(cx->blk_oldop->op_location);
 	if (location)
 	    linenr = av_fetch((AV*)location, 1, FALSE);
 	if (filename)
@@ -2003,7 +2003,7 @@ S_doeval(pTHX_ int gimme, OP** startop, CV* outside, U32 seq)
 	if (cv) {
 	    dSP;
 	    PUSHMARK(SP);
-	    XPUSHs(loc_filename(PL_compiling.op_location));
+	    XPUSHs(LocationFilename(PL_compiling.op_location));
 	    PUTBACK;
 	    call_sv((SV*)cv, G_DISCARD);
 	}
