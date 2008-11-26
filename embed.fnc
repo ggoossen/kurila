@@ -82,12 +82,12 @@ END_EXTERN_C
 
 /* functions with flag 'n' should come before here */
 START_EXTERN_C
-Aip	|SV*	|HvSv	|NN HV *hv
-Aip	|SV*	|AvSv	|NN AV *av
-Aip	|SV*	|CvSv	|NN CV *cv
-Aip	|SV*	|GvSv	|NN GV *cv
-Aip	|SV*	|IoSv	|NN struct io *cv
-Aip	|SV*	|ReSv	|NN REGEXP *cv
+Aip	|SV*	|HvSv	|NULLOK HV *hv
+Aip	|SV*	|AvSv	|NULLOK AV *av
+Aip	|SV*	|CvSv	|NULLOK CV *cv
+Aip	|SV*	|GvSv	|NULLOK GV *gv
+Aip	|SV*	|IoSv	|NULLOK struct io *io
+Aip	|SV*	|ReSv	|NULLOK REGEXP *re
 Aip	|AV*	|SvAv	|NN SV *sv
 Aip	|HV*	|SvHv	|NN SV *sv
 Aip	|CV*	|SvCv	|NN SV *sv
