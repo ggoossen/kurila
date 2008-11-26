@@ -4690,7 +4690,7 @@ END_EXTERN_C
 START_EXTERN_C
 
 #include "gv.h"
-#include "svx.h"
+#include "sv_i.h"
 
 /* PERL_GLOBAL_STRUCT_PRIVATE wants to keep global data like the
  * magic vtables const, but this is incompatible with SWIG which
