@@ -165,12 +165,11 @@ XVcpREPLACE(CV)
 
 
 /* Location retrieval */
-#define loc_filename(sv) inline_loc_filename(aTHX_ sv)
-static __inline__ SV* inline_loc_filename(pTHX_ SV *sv) {
+SV* LocationFilename(pTHX_ SV *location) {
     SV** fn;
-    if ( ! sv || ! SvAVOK(sv) )
+    if ( ! location || ! SvAVOK(location) )
         return NULL;
-    fn = av_fetch((AV*)sv, 0, 0);
+    fn = av_fetch(SvAv(location), 0, 0);
     if ( ! fn )
         return NULL;
     return *fn;

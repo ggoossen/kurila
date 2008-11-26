@@ -4342,7 +4342,7 @@ Perl_newCONSTSUB(pTHX_ const char *name, SV *sv)
 {
     dVAR;
     CV* cv;
-    SV *const temp_sv = loc_filename(PL_curcop->op_location);
+    SV *const temp_sv = LocationFilename(PL_curcop->op_location);
     STRLEN len;
     const char *const temp_p = temp_sv ? SvPV_const(temp_sv, len) : NULL;
     char *const file = savepvn(temp_p, temp_p ? len : 0);

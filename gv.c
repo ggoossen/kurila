@@ -156,7 +156,7 @@ Perl_newGP(pTHX_ GV *const gv)
 {
     GP *gp;
     U32 hash;
-    SV *const temp_sv = loc_filename(PL_curcop->op_location);
+    SV *const temp_sv = LocationFilename(PL_curcop->op_location);
     const char *file;
     STRLEN len;
 
