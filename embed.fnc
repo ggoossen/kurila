@@ -642,7 +642,6 @@ p	|void	|pidgone	|Pid_t pid|int status
 #endif
 Ap	|void	|pmflag		|NN U32* pmfl|int ch
 p	|OP*	|pmruntime	|NN OP *o|NN OP *expr|bool isreg
-p	|OP*	|pmtrans	|NN OP* o|NN OP* expr|NN OP* repl
 Ap	|void	|pop_scope
 p	|OP*	|prepend_elem	|I32 optype|NULLOK OP* head|NULLOK OP* tail
 Ap	|void	|push_scope

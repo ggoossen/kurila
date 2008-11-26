@@ -1180,6 +1180,7 @@ void
 Perl_hv_sethv(pTHX_ HV* dstr, HV* sstr)
 {
     STRLEN hv_max, hv_fill;
+    PERL_ARGS_ASSERT_HV_SETHV;
 
     hv_undef(dstr);
 
@@ -1728,6 +1729,7 @@ Perl_hv_tmprefcnt(pTHX_ HV *hv)
 {
     dVAR;
     register XPVHV* xhv;
+    PERL_ARGS_ASSERT_HV_TMPREFCNT;
 
     if (!hv)
 	return;

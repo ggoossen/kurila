@@ -1822,13 +1822,6 @@ Perl_parse_escape(pTHX_ const char *s, char *d, STRLEN *l, const char *send)
       case and quoting: \U \Q \E
     stops on @ and $, but not for $ as tail anchor
 
-  In transliterations:
-    characters are VERY literal, except for - not at the start or end
-    of the string, which indicates a range. If the range is in bytes,
-    scan_const expands the range to the full set of intermediate
-    characters. If the range is in utf8, the hyphen is replaced with
-    a certain range mark which will be handled by pmtrans() in op.c.
-
   In double-quoted strings:
     backslashes:
       double-quoted style: \r and \n
