@@ -2072,6 +2072,8 @@ Perl_assign(pTHX_ OP *o, bool partial, I32 *min_modcount, I32 *max_modcount)
 {
     OP* kid;
 
+    PERL_ARGS_ASSERT_ASSIGN;
+
     switch (o->op_type) {
     case OP_RV2SV:
     case OP_RV2AV:

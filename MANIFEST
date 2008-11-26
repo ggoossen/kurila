@@ -2034,7 +2034,7 @@ scope.c				Scope entry and exit code
 scope.h				Scope entry and exit header
 sv.c				Scalar value code
 sv.h				Scalar value header
-svx.h				Scalar value header
+sv_i.h				Scalar value inline functions
 symbian/bld.inf			Symbian sample app build config
 symbian/config.pl		Configuration script for Symbian
 symbian/config.sh		Configuration data for Symbian

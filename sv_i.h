@@ -98,24 +98,47 @@ static __inline__ AV* inline_av_mortalcopy(pTHX_ AV *av) {
     return (AV*)sv_mortalcopy((SV*)av);
 }
 
-SV* Perl_AvSv(pTHX_ AV *av) { return (SV*)av; }
-SV* Perl_HvSv(pTHX_ HV *hv) { return (SV*)hv; }
-SV* Perl_CvSv(pTHX_ CV *cv) { return (SV*)cv; }
-SV* Perl_GvSv(pTHX_ GV *gv) { return (SV*)gv; }
-SV* Perl_ReSv(pTHX_ REGEXP *re) { return (SV*)re; }
-SV* Perl_IoSv(pTHX_ struct io *io) { return (SV*)io; }
+/* XV to SV conversion "macros" */
+SV* Perl_AvSv(pTHX_ AV *av) {
+    PERL_ARGS_ASSERT_AVSV;
+    return (SV*)av;
+}
+SV* Perl_HvSv(pTHX_ HV *hv) {
+    PERL_ARGS_ASSERT_HVSV;
+    return (SV*)hv;
+}
+SV* Perl_CvSv(pTHX_ CV *cv) {
+    PERL_ARGS_ASSERT_CVSV;
+    return (SV*)cv;
+}
+SV* Perl_GvSv(pTHX_ GV *gv) {
+    PERL_ARGS_ASSERT_GVSV;
+    return (SV*)gv;
+}
+SV* Perl_ReSv(pTHX_ REGEXP *re) {
+    PERL_ARGS_ASSERT_RESV;
+    return (SV*)re;
+}
+SV* Perl_IoSv(pTHX_ struct io *io) {
+    PERL_ARGS_ASSERT_IOSV;
+    return (SV*)io;
+}
+
 
 AV* Perl_SvAv(pTHX_ SV *sv) {
+    PERL_ARGS_ASSERT_SVAV;
     assert(SvAVOK(sv));
     return (AV*)sv;
 }
 
 HV* Perl_SvHv(pTHX_ SV *sv) {
+    PERL_ARGS_ASSERT_SVHV;
     assert(SvHVOK(sv));
     return (HV*)sv;
 }
 
 CV* Perl_SvCv(pTHX_ SV *sv) {
+    PERL_ARGS_ASSERT_SVCV;
     assert(SvCVOK(sv));
     return (CV*)sv;
 }
