@@ -44,7 +44,6 @@ Perl_SvREFCNT_dec
 Perl_SvIV
 Perl_SvUV
 Perl_SvNV
-Perl_Gv_AMupdate
 Perl_av_clear
 Perl_av_delete
 Perl_av_exists
