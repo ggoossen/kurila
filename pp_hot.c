@@ -1034,6 +1034,7 @@ Perl_do_readline(pTHX_ GV* gv)
     register IO * const io = GvIO(gv);
     register const I32 type = PL_op->op_type;
     const I32 gimme = GIMME_V;
+    PERL_ARGS_ASSERT_DO_READLINE;
 
     fp = NULL;
     if (io) {

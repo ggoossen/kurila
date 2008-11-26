@@ -676,6 +676,7 @@ Perl_do_arg_check(pTHX_ SV** base)
     SV** arg = base;
     I32 numargs = 0;
 
+    PERL_ARGS_ASSERT_DO_ARG_CHECK;
 /*     if (opargs & OA_MARK) { */
 /* 	arg = PL_stack_base + TOPMARK; */
 /*     } else { */

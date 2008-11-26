@@ -419,6 +419,8 @@ Perl_av_undef(pTHX_ register AV *av)
 void
 Perl_av_tmprefcnt(pTHX_ AV *av)
 {
+    PERL_ARGS_ASSERT_AV_TMPREFCNT;
+
     if (AvREAL(av)) {
 	register I32 key = AvFILLp(av) + 1;
 	while (key)
