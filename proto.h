@@ -1499,12 +1499,6 @@ PERL_CALLCONV int	Perl_magic_getdefelem(pTHX_ SV* sv, MAGIC* mg)
 #define PERL_ARGS_ASSERT_MAGIC_GETDEFELEM	\
 	assert(sv); assert(mg)
 
-PERL_CALLCONV int	Perl_magic_getnkeys(pTHX_ SV* sv, MAGIC* mg)
-			__attribute__nonnull__(pTHX_1)
-			__attribute__nonnull__(pTHX_2);
-#define PERL_ARGS_ASSERT_MAGIC_GETNKEYS	\
-	assert(sv); assert(mg)
-
 PERL_CALLCONV int	Perl_magic_getpack(pTHX_ SV* sv, MAGIC* mg)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2);
@@ -1609,12 +1603,6 @@ PERL_CALLCONV int	Perl_magic_setmglob(pTHX_ SV* sv, MAGIC* mg)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2);
 #define PERL_ARGS_ASSERT_MAGIC_SETMGLOB	\
-	assert(sv); assert(mg)
-
-PERL_CALLCONV int	Perl_magic_setnkeys(pTHX_ SV* sv, MAGIC* mg)
-			__attribute__nonnull__(pTHX_1)
-			__attribute__nonnull__(pTHX_2);
-#define PERL_ARGS_ASSERT_MAGIC_SETNKEYS	\
 	assert(sv); assert(mg)
 
 PERL_CALLCONV int	Perl_magic_setpack(pTHX_ SV* sv, MAGIC* mg)
