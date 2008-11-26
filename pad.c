@@ -311,8 +311,7 @@ Perl_pad_tmprefcnt(pTHX_ CV* cv)
     dVAR;
     I32 ix;
     const PADLIST * const padlist = CvPADLIST(cv);
-
-    PERL_ARGS_ASSERT_PAD_UNDEF;
+    PERL_ARGS_ASSERT_PAD_TMPREFCNT;
 
     if (!padlist)
 	return;

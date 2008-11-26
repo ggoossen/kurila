@@ -654,7 +654,6 @@
 #define pmflag			Perl_pmflag
 #ifdef PERL_CORE
 #define pmruntime		Perl_pmruntime
-#define pmtrans			Perl_pmtrans
 #endif
 #define pop_scope		Perl_pop_scope
 #ifdef PERL_CORE
@@ -2819,7 +2818,6 @@
 #define pmflag(a,b)		Perl_pmflag(aTHX_ a,b)
 #ifdef PERL_CORE
 #define pmruntime(a,b,c)	Perl_pmruntime(aTHX_ a,b,c)
-#define pmtrans(a,b,c)		Perl_pmtrans(aTHX_ a,b,c)
 #endif
 #define pop_scope()		Perl_pop_scope(aTHX)
 #ifdef PERL_CORE
