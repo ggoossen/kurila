@@ -99,30 +99,12 @@ static __inline__ AV* inline_av_mortalcopy(pTHX_ AV *av) {
 }
 
 /* XV to SV conversion "macros" */
-SV* Perl_AvSv(pTHX_ AV *av) {
-    PERL_ARGS_ASSERT_AVSV;
-    return (SV*)av;
-}
-SV* Perl_HvSv(pTHX_ HV *hv) {
-    PERL_ARGS_ASSERT_HVSV;
-    return (SV*)hv;
-}
-SV* Perl_CvSv(pTHX_ CV *cv) {
-    PERL_ARGS_ASSERT_CVSV;
-    return (SV*)cv;
-}
-SV* Perl_GvSv(pTHX_ GV *gv) {
-    PERL_ARGS_ASSERT_GVSV;
-    return (SV*)gv;
-}
-SV* Perl_ReSv(pTHX_ REGEXP *re) {
-    PERL_ARGS_ASSERT_RESV;
-    return (SV*)re;
-}
-SV* Perl_IoSv(pTHX_ struct io *io) {
-    PERL_ARGS_ASSERT_IOSV;
-    return (SV*)io;
-}
+SV* Perl_AvSv(pTHX_ AV *av) { return (SV*)av; }
+SV* Perl_HvSv(pTHX_ HV *hv) { return (SV*)hv; }
+SV* Perl_CvSv(pTHX_ CV *cv) { return (SV*)cv; }
+SV* Perl_GvSv(pTHX_ GV *gv) { return (SV*)gv; }
+SV* Perl_ReSv(pTHX_ REGEXP *re) { return (SV*)re; }
+SV* Perl_IoSv(pTHX_ struct io *io) { return (SV*)io; }
 
 
 AV* Perl_SvAv(pTHX_ SV *sv) {
