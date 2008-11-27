@@ -1,7 +1,7 @@
 #!./perl
 
 BEGIN { require "./test.pl"; }
-plan( tests => 7 );
+plan( tests => 9 );
 
 my $x = \ %( aap => 'noot', Mies => 'Wim' );
 is $x->{?aap}, 'noot', "anon hash ref construction";
@@ -18,3 +18,12 @@ is Internals::SvREFCNT($x), 1, "there is only one reference";
 eval_dies_like( q| %( aap => 'noot', Mies => 'Wim' )->{aap}; |,
                 qr/Hash may not be used as a reference/,
                 "anon hash as reference" );
+
+do {
+    my $h = %( aap => "noot", Mies => "Wim" );
+    # OPf_ASSIGN
+    my ($aap, $mies);
+    %( aap => $aap, Mies => $mies ) = $h;
+    is( $aap, "noot" );
+    is( $mies, "Wim" );
+}

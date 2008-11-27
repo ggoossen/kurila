@@ -3817,6 +3817,57 @@ PP(pp_anonarray)
     RETURN;
 }
 
+PP(pp_enter_anonhash_assign)
+{
+    /* The stack: 
+       Before:
+	 keyX_is_optional
+	 keyX
+         ...            
+	 key2_is_optional
+	 key2
+	 key1_is_optional
+	 key1
+	 value  <- MARK
+	 XXX
+       
+       After:
+         subj1
+	 subj2
+	 ...
+	 subjX
+	 XXX   <- MARK
+    */
+    dSP;
+    dMARK;
+    SV* value_sv = *MARK;
+    HV* value;
+    SV **key;
+    AV *elem_values = newAV();
+    if ( ! SvHVOK(value_sv) )
+	Perl_croak(aTHX_ "%s expects a HASH but got %s", OP_DESC(PL_op), Ddesc(value_sv));
+    if ( ! ( PL_op->op_flags & OPf_ASSIGN_PART ) )
+	*MARK = sv_mortalcopy(value_sv);
+    value = SvHv(value_sv);
+    for (key = SP; key > MARK; key -= 2) {
+	HE *elem_value = hv_fetch_ent(value, *key, FALSE, 0);
+	bool is_optional = (key[-1] == &PL_sv_yes);
+	if ( ! ( elem_value || is_optional ) ) {
+	    DIE("required key '%s' is missing", SvPVX_const(*key));
+	}
+	av_push(elem_values, elem_value ? HeVAL(elem_value) : &PL_sv_undef);
+    }
+    SP = MARK + 1;
+    PUSHMARK(SP);
+    {
+	SV** ary = AvARRAY(elem_values);
+	SV** ary_last = ary + av_len(elem_values);
+	for ( ; ary <= ary_last; ary++ )
+	    PUSHs(*ary);
+    }
+    RETURN;
+}
+
 PP(pp_anonhash)
 {
     dVAR; dSP; dMARK; dORIGMARK;

@@ -2091,6 +2091,7 @@ Perl_assign(pTHX_ OP *o, bool partial, I32 *min_modcount, I32 *max_modcount)
 	(*max_modcount)++;
 	if ( ! (o->op_flags & OPf_OPTIONAL) )
 	    (*min_modcount)++;
+	mod(o, OP_SASSIGN);
 	break;
 
     case OP_DOTDOTDOT:
@@ -2166,6 +2167,50 @@ Perl_assign(pTHX_ OP *o, bool partial, I32 *min_modcount, I32 *max_modcount)
 	    cBINOPo->op_first = enter;
 	    for (kid = enter->op_sibling; kid; kid = kid->op_sibling)
 		assign(kid, TRUE, &sub_min_modcount, &sub_max_modcount);
+	}
+	break;
+
+    case OP_ANONHASH:
+	o->op_flags |= OPf_ASSIGN;
+	if (partial)
+	    o->op_flags |= OPf_ASSIGN_PART;
+	(*max_modcount)++;
+	if ( ! (o->op_flags & OPf_OPTIONAL) )
+	    (*min_modcount)++;
+
+	{
+	    /* split the ops into: OP_PUSHMARK, <key OP>*, OP_ENTER_ANONHASH_ASSIGN <subj OP>* */
+	    I32 sub_min_modcount = 0;
+	    I32 sub_max_modcount = 0;
+	    OP* key_kid = cBINOPo->op_first;
+	    OP* enter = newOP(OP_ENTER_ANONHASH_ASSIGN,
+		partial ? (OPf_ASSIGN_PART | OPf_ASSIGN_PART) : OPf_ASSIGN_PART,
+		o->op_location);
+	    OP* subj_kid = enter;
+	    OP* prev_kid = key_kid;
+	    for (kid = prev_kid->op_sibling; kid; kid = kid->op_sibling) {
+		OP* op_optional;
+		if (kid->op_type != OP_CONST)
+		    Perl_croak_at(aTHX_ kid->op_location, "hash keys must be constants in a %s assignment", OP_DESC(o));
+		assign(kid->op_sibling, TRUE, &sub_min_modcount, &sub_max_modcount);
+
+		/* remove kid->op_sibling from the list and add it the the list of subj_kid */
+		subj_kid->op_sibling = kid->op_sibling;
+		kid->op_sibling = kid->op_sibling->op_sibling;
+		subj_kid = subj_kid->op_sibling;
+		subj_kid->op_sibling = NULL;
+
+		/* Add optional op */
+		op_optional = newSVOP(OP_CONST, 0,
+		    (kid->op_flags & OPf_OPTIONAL) ? &PL_sv_yes : &PL_sv_no,
+		    o->op_location
+		    );
+		prev_kid->op_sibling = op_optional;
+		op_optional->op_sibling = kid;
+		
+		prev_kid = kid;
+	    }
+	    prev_kid->op_sibling = enter;
 	}
 	break;
 
@@ -3207,7 +3252,7 @@ Perl_newASSIGNOP(pTHX_ I32 flags, OP *left, I32 optype, OP *right, SV *location)
 	o = newBINOP(OP_SASSIGN,
 	    flags,
 	    scalar(right), 
-	    assign(mod(scalar(left), OP_SASSIGN), FALSE, &min_modcount, &max_modcount),
+	    assign(scalar(left), FALSE, &min_modcount, &max_modcount),
 	    location );
     }
     return o;
