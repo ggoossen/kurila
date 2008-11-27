@@ -265,7 +265,7 @@ is ($w, 0);
 
 # using 4 arg substr as lvalue is a compile time error
 eval_dies_like( 'substr($a,0,0,"") = "abc"',
-                qr/Can't modify substr/);
+                qr/Can't assign to substr/);
 is ($a, "foo");
 
 $a = "abcdefgh";

@@ -754,11 +754,8 @@ ok("\n\n" =~ m/\n* $ \n/x);
 
 ok("\n\n" =~ m/\n+ $ \n/x);
 
-do {
-  local $TODO = "stringy";
-  dies_like( sub { \@() =~ m/^ARRAY/ },
-             qr/Tried to stringify a reference/);
-};
+dies_like( sub { \@() =~ m/^ARRAY/ },
+           qr/Tried to use reference as string/);
 
 # test result of match used as match (!)
 ok( 'a1b' =~ ('xyz' =~ m/y/) );
@@ -2537,7 +2534,7 @@ do {
     do {
         my $code;
         my $w="";
-        local $^WARN_HOOK = sub { $w.=shift->message };
+        local $^WARN_HOOK = sub { $w.=shift->description };
         eval($code=<<'EOFTEST') or die "$@\n$code\n";
         do {
             use warnings;
@@ -3177,8 +3174,8 @@ do {
         my $ary=shift @$t;
         foreach my $pat ( @$t) {
             foreach my $str ( @$ary) {
-                ok($str=~m/($pat)/,$pat);
-                is($1,$str,$pat);
+                ok($str=~m/($pat)/,"$pat");
+                is($1,$str,"$pat");
             }
         }
     }

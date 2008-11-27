@@ -330,7 +330,7 @@ ok
 # reversed again as a result of [perl #17763]
 die qr(x)
 EXPECT
-(?-uxism:x) at - line 3 character 1.
+(error description isn't a string) at - line 3 character 1.
 ########
 # David Dyck
 # coredump in 5.7.1
