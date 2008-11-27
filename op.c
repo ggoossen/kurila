@@ -1626,6 +1626,17 @@ S_my_kid(pTHX_ OP *o, OP **imopsp)
 	for (kid = cLISTOPo->op_first; kid; kid = kid->op_sibling)
 	    my_kid(kid, imopsp);
     }
+    else if (type == OP_ANONHASH) {
+        OP *kid;
+	for (kid = cLISTOPo->op_first; kid; kid = kid->op_sibling) {
+	    if (kid->op_type == OP_CONST) {
+		kid = kid->op_sibling;
+		if ( ! kid )
+		    break;
+	    }
+	    my_kid(kid, imopsp);
+	}
+    }
     else if (type == OP_RV2SV ||	/* "our" declaration */
 	       type == OP_RV2AV ||
 	       type == OP_RV2HV) { /* XXX does this let anything illegal in? */
@@ -2043,7 +2054,7 @@ Perl_gen_constant_list(pTHX_ register OP *o)
 }
 
 OP *
-Perl_convert(pTHX_ I32 type, I32 flags, OP *o, SV *location)
+Perl_convert(pTHX_ I32 type, OPFLAGS flags, OP *o, SV *location)
 {
     dVAR;
     if (!o || o->op_type != OP_LIST)
@@ -2190,8 +2201,16 @@ Perl_assign(pTHX_ OP *o, bool partial, I32 *min_modcount, I32 *max_modcount)
 	    OP* prev_kid = key_kid;
 	    for (kid = prev_kid->op_sibling; kid; kid = kid->op_sibling) {
 		OP* op_optional;
-		if (kid->op_type != OP_CONST)
-		    Perl_croak_at(aTHX_ kid->op_location, "hash keys must be constants in a %s assignment", OP_DESC(o));
+		if (kid->op_type != OP_CONST) {
+		    if (kid->op_type != OP_ARRAYEXPAND && kid->op_type != OP_HASHEXPAND && kid->op_type != OP_DOTDOTDOT)
+			Perl_croak_at(aTHX_ kid->op_location, "hash keys must be constants in a %s assignment", OP_DESC(o));
+		    if (kid->op_sibling)
+			Perl_croak_at(aTHX_ kid->op_location, "%s must be the last item in %s assignment", OP_DESC(kid), OP_DESC(o));
+		    prev_kid->op_sibling = NULL;
+		    subj_kid->op_sibling = kid;
+		    assign(kid, TRUE, &sub_min_modcount, &sub_max_modcount);
+		    break;
+		}
 		assign(kid->op_sibling, TRUE, &sub_min_modcount, &sub_max_modcount);
 
 		/* remove kid->op_sibling from the list and add it the the list of subj_kid */
@@ -2585,7 +2604,7 @@ Perl_force_list(pTHX_ OP *o)
 }
 
 OP *
-Perl_newLISTOP(pTHX_ I32 type, I32 flags, OP *first, OP *last, SV *location)
+Perl_newLISTOP(pTHX_ I32 type, OPFLAGS flags, OP *first, OP *last, SV *location)
 {
     dVAR;
     LISTOP *listop;
@@ -2620,14 +2639,14 @@ Perl_newLISTOP(pTHX_ I32 type, I32 flags, OP *first, OP *last, SV *location)
 }
 
 OP *
-Perl_newOP(pTHX_ I32 type, I32 flags, SV* location)
+Perl_newOP(pTHX_ I32 type, OPFLAGS flags, SV* location)
 {
     dVAR;
     OP *o;
     NewOp(1101, o, 1, OP);
     o->op_type = (OPCODE)type;
     o->op_ppaddr = PL_ppaddr[type];
-    o->op_flags = (U8)flags;
+    o->op_flags = flags;
     o->op_latefree = 0;
     o->op_latefreed = 0;
     o->op_attached = 0;
@@ -2644,7 +2663,7 @@ Perl_newOP(pTHX_ I32 type, I32 flags, SV* location)
 }
 
 OP *
-Perl_newUNOP(pTHX_ I32 type, I32 flags, OP *first, SV* location)
+Perl_newUNOP(pTHX_ I32 type, OPFLAGS flags, OP *first, SV* location)
 {
     dVAR;
     UNOP *unop;
@@ -2669,7 +2688,7 @@ Perl_newUNOP(pTHX_ I32 type, I32 flags, OP *first, SV* location)
 }
 
 OP *
-Perl_newBINOP(pTHX_ I32 type, I32 flags, OP *first, OP *last, SV* location)
+Perl_newBINOP(pTHX_ I32 type, OPFLAGS flags, OP *first, OP *last, SV* location)
 {
     dVAR;
     BINOP *binop;
@@ -2703,7 +2722,7 @@ Perl_newBINOP(pTHX_ I32 type, I32 flags, OP *first, OP *last, SV* location)
 }
 
 OP *
-Perl_newPMOP(pTHX_ I32 type, I32 flags, SV *location)
+Perl_newPMOP(pTHX_ I32 type, OPFLAGS flags, SV *location)
 {
     dVAR;
     PMOP *pmop;
@@ -2884,7 +2903,7 @@ Perl_pmruntime(pTHX_ OP *o, OP *expr, bool isreg)
 }
 
 OP *
-Perl_newSVOP(pTHX_ I32 type, I32 flags, SV *sv, SV *location)
+Perl_newSVOP(pTHX_ I32 type, OPFLAGS flags, SV *sv, SV *location)
 {
     dVAR;
     SVOP *svop;
@@ -2906,7 +2925,7 @@ Perl_newSVOP(pTHX_ I32 type, I32 flags, SV *sv, SV *location)
 }
 
 OP *
-Perl_newGVOP(pTHX_ I32 type, I32 flags, GV *gv, SV *location)
+Perl_newGVOP(pTHX_ I32 type, OPFLAGS flags, GV *gv, SV *location)
 {
     dVAR;
 
@@ -2916,7 +2935,7 @@ Perl_newGVOP(pTHX_ I32 type, I32 flags, GV *gv, SV *location)
 }
 
 OP *
-Perl_newPVOP(pTHX_ I32 type, I32 flags, char *pv, SV *location)
+Perl_newPVOP(pTHX_ I32 type, OPFLAGS flags, char *pv, SV *location)
 {
     dVAR;
     PVOP *pvop;
@@ -3214,14 +3233,14 @@ Perl_dofile(pTHX_ OP *term, I32 force_builtin, SV* location)
 }
 
 OP *
-Perl_newSLICEOP(pTHX_ I32 flags, OP *subscript, OP *listval)
+Perl_newSLICEOP(pTHX_ OPFLAGS flags, OP *subscript, OP *listval)
 {
     return newBINOP(OP_LSLICE, flags, subscript,
 		    list(force_list(listval)), subscript->op_location );
 }
 
 OP *
-Perl_newASSIGNOP(pTHX_ I32 flags, OP *left, I32 optype, OP *right, SV *location)
+Perl_newASSIGNOP(pTHX_ OPFLAGS flags, OP *left, I32 optype, OP *right, SV *location)
 {
     dVAR;
     OP *o;
@@ -3259,7 +3278,7 @@ Perl_newASSIGNOP(pTHX_ I32 flags, OP *left, I32 optype, OP *right, SV *location)
 }
 
 OP *
-Perl_newSTATEOP(pTHX_ I32 flags, char *label, OP *o, SV *location)
+Perl_newSTATEOP(pTHX_ OPFLAGS flags, char *label, OP *o, SV *location)
 {
     dVAR;
     const U32 seq = intro_my();
@@ -3303,7 +3322,7 @@ Perl_newSTATEOP(pTHX_ I32 flags, char *label, OP *o, SV *location)
 
 
 OP *
-Perl_newLOGOP(pTHX_ I32 type, I32 flags, OP *first, OP *other, SV *location)
+Perl_newLOGOP(pTHX_ I32 type, OPFLAGS flags, OP *first, OP *other, SV *location)
 {
     dVAR;
 
@@ -3313,7 +3332,7 @@ Perl_newLOGOP(pTHX_ I32 type, I32 flags, OP *first, OP *other, SV *location)
 }
 
 STATIC OP *
-S_new_logop(pTHX_ I32 type, I32 flags, OP** firstp, OP** otherp, SV *location)
+S_new_logop(pTHX_ I32 type, OPFLAGS flags, OP** firstp, OP** otherp, SV *location)
 {
     dVAR;
     LOGOP *logop;
@@ -3459,7 +3478,7 @@ S_new_logop(pTHX_ I32 type, I32 flags, OP** firstp, OP** otherp, SV *location)
 }
 
 OP *
-Perl_newCONDOP(pTHX_ I32 flags, OP *first, OP *trueop, OP *falseop, SV *location)
+Perl_newCONDOP(pTHX_ OPFLAGS flags, OP *first, OP *trueop, OP *falseop, SV *location)
 {
     dVAR;
     LOGOP *logop;
@@ -3525,7 +3544,7 @@ Perl_newCONDOP(pTHX_ I32 flags, OP *first, OP *trueop, OP *falseop, SV *location
 }
 
 OP *
-Perl_newRANGE(pTHX_ I32 flags, OP *left, OP *right)
+Perl_newRANGE(pTHX_ OPFLAGS flags, OP *left, OP *right)
 {
     dVAR;
     LOGOP *range;
@@ -3573,7 +3592,7 @@ Perl_newRANGE(pTHX_ I32 flags, OP *left, OP *right)
 }
 
 OP *
-    Perl_newLOOPOP(pTHX_ I32 flags, I32 debuggable, OP *expr, OP *block, bool once, SV *location)
+    Perl_newLOOPOP(pTHX_ OPFLAGS flags, I32 debuggable, OP *expr, OP *block, bool once, SV *location)
 {
     dVAR;
     OP* listop;
@@ -3634,7 +3653,7 @@ OP *
 }
 
 OP *
-Perl_newWHILEOP(pTHX_ I32 flags, I32 debuggable, LOOP *loop, SV* location,
+Perl_newWHILEOP(pTHX_ OPFLAGS flags, I32 debuggable, LOOP *loop, SV* location,
 		OP *expr, OP *block, OP *cont, I32 has_my)
 {
     dVAR;
@@ -3735,7 +3754,7 @@ Perl_newWHILEOP(pTHX_ I32 flags, I32 debuggable, LOOP *loop, SV* location,
 }
 
 OP *
-Perl_newFOROP(pTHX_ I32 flags, char *label, OP *sv, OP *expr, OP *block, OP *cont, SV *location)
+Perl_newFOROP(pTHX_ OPFLAGS flags, char *label, OP *sv, OP *expr, OP *block, OP *cont, SV *location)
 {
     dVAR;
     LOOP *loop;
@@ -4598,7 +4617,7 @@ Perl_newHVREF(pTHX_ OP *o, SV* location)
 }
 
 OP *
-Perl_newCVREF(pTHX_ I32 flags, OP *o, SV* location)
+Perl_newCVREF(pTHX_ OPFLAGS flags, OP *o, SV* location)
 {
     return newUNOP(OP_RV2CV, flags, scalar(o), location);
 }
@@ -5210,7 +5229,7 @@ Perl_ck_fun(pTHX_ OP *o)
 			bad_type(numargs, "HANDLE", OP_DESC(o), kid);
 		    }
 		    else {
-			I32 flags = OPf_SPECIAL;
+			OPFLAGS flags = OPf_SPECIAL;
 			I32 priv = 0;
 			PADOFFSET targ = 0;
 

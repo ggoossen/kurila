@@ -3848,21 +3848,40 @@ PP(pp_enter_anonhash_assign)
 	Perl_croak(aTHX_ "%s expects a HASH but got %s", OP_DESC(PL_op), Ddesc(value_sv));
     if ( ! ( PL_op->op_flags & OPf_ASSIGN_PART ) )
 	*MARK = sv_mortalcopy(value_sv);
-    value = SvHv(value_sv);
+    value = SvHv(sv_mortalcopy(value_sv));
     for (key = SP; key > MARK; key -= 2) {
-	HE *elem_value = hv_fetch_ent(value, *key, FALSE, 0);
+	SV *elem_value = hv_delete_ent(value, *key, FALSE, 0);
 	bool is_optional = (key[-1] == &PL_sv_yes);
 	if ( ! ( elem_value || is_optional ) ) {
 	    DIE("required key '%s' is missing", SvPVX_const(*key));
 	}
-	av_push(elem_values, elem_value ? HeVAL(elem_value) : &PL_sv_undef);
+	av_push(elem_values, elem_value ? elem_value : &PL_sv_undef);
     }
-    SP = MARK + 1;
+    if ( ! ( PL_op->op_flags & OPf_ASSIGN_PART ) )
+	SP = MARK;
+    else
+	SP = MARK - 1;
     PUSHMARK(SP);
+
+    /* push remaining keys */
+    {
+	PUTBACK;
+	(void)hv_iterinit(value);
+	register HE *entry;
+	while ((entry = hv_iternext(value))) {
+	    SPAGAIN;
+	    SV* const sv = hv_iterkeysv(entry);
+	    XPUSHs(SvREFCNT_inc(hv_iterval(value,entry)));
+	    XPUSHs(SvREFCNT_inc(sv));
+	    PUTBACK;
+	}
+    }
+
+    /* push matching values */
     {
 	SV** ary = AvARRAY(elem_values);
 	SV** ary_last = ary + av_len(elem_values);
-	for ( ; ary <= ary_last; ary++ )
+	for ( ; ary && (ary <= ary_last); ary++ )
 	    PUSHs(*ary);
     }
     RETURN;
@@ -3870,23 +3889,34 @@ PP(pp_enter_anonhash_assign)
 
 PP(pp_anonhash)
 {
-    dVAR; dSP; dMARK; dORIGMARK;
-    HV* const hv = newHV();
+    dVAR; dSP; dMARK;
 
-    while (MARK < SP) {
-	SV * const key = *++MARK;
-	SV * const val = newSV(0);
-	if (MARK < SP)
-	    sv_setsv(val, *++MARK);
-	else if (ckWARN(WARN_MISC))
-	    Perl_warner(aTHX_ packWARN(WARN_MISC), "Odd number of elements in anonymous hash");
-	(void)hv_store_ent(hv,key,val,0);
+    if (PL_op->op_flags & OPf_ASSIGN) {
+	if (MARK != SP)
+	    Perl_croak(aTHX_ "Got extra value(s) in %s assignment", OP_DESC(PL_op));
+	RETURN;
     }
-    SP = ORIGMARK;
 
-    mXPUSHs( (SV*)hv );
+    {
+	dORIGMARK;
+	HV* hv;
+	hv = newHV();
 
-    RETURN;
+	while (MARK < SP) {
+	    SV * const key = *++MARK;
+	    SV * const val = newSV(0);
+	    if (MARK < SP)
+		sv_setsv(val, *++MARK);
+	    else if (ckWARN(WARN_MISC))
+		Perl_warner(aTHX_ packWARN(WARN_MISC), "Odd number of elements in anonymous hash");
+	    (void)hv_store_ent(hv,key,val,0);
+	}
+	SP = ORIGMARK;
+
+	mXPUSHs( (SV*)hv );
+
+	RETURN;
+    }
 }
 
 PP(pp_expand)
