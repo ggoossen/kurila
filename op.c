@@ -2172,7 +2172,7 @@ Perl_assign(pTHX_ OP *o, bool partial, I32 *min_modcount, I32 *max_modcount)
 	    I32 sub_max_modcount = 0;
 	    OP* pushmark = cBINOPo->op_first;
 	    OP* enter = newOP(OP_ENTER_ANONARRAY_ASSIGN,
-		partial ? (OPf_ASSIGN_PART | OPf_ASSIGN_PART) : OPf_ASSIGN_PART,
+		partial ? (OPf_ASSIGN_PART | OPf_ASSIGN_PART) : OPf_ASSIGN,
 		o->op_location);
 	    enter->op_sibling = pushmark->op_sibling;
 	    cBINOPo->op_first = enter;
@@ -2195,7 +2195,7 @@ Perl_assign(pTHX_ OP *o, bool partial, I32 *min_modcount, I32 *max_modcount)
 	    I32 sub_max_modcount = 0;
 	    OP* key_kid = cBINOPo->op_first;
 	    OP* enter = newOP(OP_ENTER_ANONHASH_ASSIGN,
-		partial ? (OPf_ASSIGN_PART | OPf_ASSIGN_PART) : OPf_ASSIGN_PART,
+		partial ? (OPf_ASSIGN_PART | OPf_ASSIGN_PART) : OPf_ASSIGN,
 		o->op_location);
 	    OP* subj_kid = enter;
 	    OP* prev_kid = key_kid;
