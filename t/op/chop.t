@@ -164,13 +164,13 @@ foreach (keys %chop) {
 
 # chop and chomp can't be lvalues
 eval 'chop($x) = 1;';
-ok($@->{?description} =~ m/Can\'t modify.*chop.*in.*assignment/);
+like($@->description, qr/Can\'t assign.*chop/);
 eval 'chomp($x) = 1;';
-ok($@->{?description} =~ m/Can\'t modify.*chom?p.*in.*assignment/);
+ok($@->{?description} =~ m/Can\'t assign.*chom?p/);
 eval 'chop($x, $y) = (1, 2);';
-ok($@->{?description} =~ m/Can\'t modify.*chop.*in.*assignment/);
+ok($@->{?description} =~ m/Can\'t assign.*chop/);
 eval 'chomp($x, $y) = (1, 2);';
-ok($@->{?description} =~ m/Can\'t modify.*chom?p.*in.*assignment/);
+ok($@->{?description} =~ m/Can\'t assign.*chom?p/);
 
 do {
     use utf8;

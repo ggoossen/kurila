@@ -23,7 +23,7 @@ like( $@->{?description}, qr/^Missing braces on \\N/,
 
 # Bug 20010831.001
 eval '@($a, b) = @(1, 2);';
-like( $@->{?description}, qr/^Can't modify constant item in assignment/,
+like( $@->{?description}, qr/^Can't assign to constant item/,
     'bareword in list assignment' );
 
 eval 'tie FOO, "Foo";';

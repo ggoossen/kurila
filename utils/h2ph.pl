@@ -32,7 +32,7 @@ my @isatype = qw(
 );
 
 my %isatype;
- %isatype{[ @isatype]} = (1) x nelems @isatype;
+ %isatype{[ @isatype]} = @(1) x nelems @isatype;
 my $inif = 0;
 my %Is_converted;
 my %bad_file = %( () );

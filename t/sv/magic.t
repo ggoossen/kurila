@@ -12,7 +12,7 @@ BEGIN {
 use warnings;
 use Config;
 
-plan tests => 49;
+plan tests => 48;
 
 
 my $Is_MSWin32  = $^O eq 'MSWin32';
@@ -347,18 +347,6 @@ if ($Is_miniperl) {
       %!;
       defined %Errno::;
    }, $@ && $@->message;
-}
-
-if ($Is_miniperl) {
-    skip ("miniperl can't rely on loading \%Errno");
-} else {
-    # Make sure that Errno loading doesn't clobber $!
-
-    undef %{Symbol::stash("Errno")};
-    delete %INC{"Errno.pm"};
-
-    open(FOO, "<", "nonesuch"); # Generate ENOENT
-    ok %{*{Symbol::fetch_glob("!")}}{?ENOENT};
 }
 
 ok $^S == 0 && defined $^S;
