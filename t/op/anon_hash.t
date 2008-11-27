@@ -1,7 +1,7 @@
 #!./perl
 
 BEGIN { require "./test.pl"; }
-plan( tests => 9 );
+plan( tests => 14 );
 
 my $x = \ %( aap => 'noot', Mies => 'Wim' );
 is $x->{?aap}, 'noot', "anon hash ref construction";
@@ -24,6 +24,22 @@ do {
     # OPf_ASSIGN
     my ($aap, $mies);
     %( aap => $aap, Mies => $mies ) = $h;
+    is( $aap, "noot" );
+    is( $mies, "Wim" );
+
+    # with an expansion
+    my $rest;
+    %( aap => $aap, @< $rest ) = $h;
+    is( join("*", $rest), "Mies*Wim");
+
+    eval_dies_like( q|my ($rest, $aap, $h); %( @< $rest, aap => $aap ) = $h|,
+                    qr/\Qarray expand must be the last item in anonymous hash (%()) assignment\E/ );
+
+    dies_like( sub { %( aap => $aap ) = $h; },
+               qr/\QGot extra value(s) in anonymous hash (%()) assignment\E/ );
+
+    # OPf_ASSIGN & OPf_ASSIGN_PART
+    my @(%( aap => $aap, Mies => $mies)) = @($h);
     is( $aap, "noot" );
     is( $mies, "Wim" );
 }

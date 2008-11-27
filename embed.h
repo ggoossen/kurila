@@ -1914,6 +1914,7 @@
 #define pp_enetent		Perl_pp_enetent
 #define pp_enter		Perl_pp_enter
 #define pp_enter_anonarray_assign	Perl_pp_enter_anonarray_assign
+#define pp_enter_anonhash_assign	Perl_pp_enter_anonhash_assign
 #define pp_enter_arrayexpand_assign	Perl_pp_enter_arrayexpand_assign
 #define pp_enter_hashexpand_assign	Perl_pp_enter_hashexpand_assign
 #define pp_entereval		Perl_pp_entereval
@@ -4087,6 +4088,7 @@
 #define pp_enetent()		Perl_pp_enetent(aTHX)
 #define pp_enter()		Perl_pp_enter(aTHX)
 #define pp_enter_anonarray_assign()	Perl_pp_enter_anonarray_assign(aTHX)
+#define pp_enter_anonhash_assign()	Perl_pp_enter_anonhash_assign(aTHX)
 #define pp_enter_arrayexpand_assign()	Perl_pp_enter_arrayexpand_assign(aTHX)
 #define pp_enter_hashexpand_assign()	Perl_pp_enter_hashexpand_assign(aTHX)
 #define pp_entereval()		Perl_pp_entereval(aTHX)
