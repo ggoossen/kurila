@@ -411,7 +411,7 @@ sub write {
 
 sub syswrite {
     (nelems @_) +>= 2 && (nelems @_) +<= 4 or die 'usage: $io->syswrite(BUF [, LEN [, OFFSET]])';
-    if (defined(@_[2])) {
+    if (defined(@_[?2])) {
 	syswrite(@_[0], @_[1], @_[2], @_[?3] || 0);
     } else {
 	syswrite(@_[0], @_[1]);
