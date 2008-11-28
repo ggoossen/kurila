@@ -1251,8 +1251,8 @@ PP(pp_helem)
     HV * const hv = (HV*)POPs;
     const OPFLAGS op_flags = PL_op->op_flags;
     const U32 lval = op_flags & OPf_MOD;
-    const U32 optional = PL_op->op_private & OPpHELEM_OPTIONAL;
-    const U32 add = PL_op->op_private & OPpHELEM_ADD;
+    const U32 optional = PL_op->op_private & OPpELEM_OPTIONAL;
+    const U32 add = PL_op->op_private & OPpELEM_ADD;
     SV *sv;
     U32 hash;
     I32 preeminent = 0;
@@ -2214,48 +2214,42 @@ PP(pp_aelem)
     IV elem = SvIV(elemsv);
     AV* const av = (AV*)POPs;
     const OPFLAGS op_flags = PL_op->op_flags;
-    const U32 lval = op_flags & OPf_MOD;
+    const OPFLAGS lval = op_flags & OPf_MOD;
+    const OPFLAGS add = PL_op->op_private & OPpELEM_ADD;
+    const OPFLAGS optional = PL_op->op_private & OPpELEM_OPTIONAL;
     SV *sv;
 
     if ( ! SvAVOK(av) )
 	Perl_croak(aTHX_ "Can't take an element from a %s", Ddesc((SV*)av));
 
-    svp = av_fetch(av, elem, lval);
-    if (lval) {
-#ifdef PERL_MALLOC_WRAP
-	 if (SvUOK(elemsv)) {
-	      const UV uv = SvUV(elemsv);
-	      elem = uv > IV_MAX ? IV_MAX : uv;
-	 }
-	 else if (SvNOK(elemsv))
-	      elem = (IV)SvNV(elemsv);
-	 if (elem > 0) {
-	      static const char oom_array_extend[] =
-		"Out of memory during array extend"; /* Duplicated in av.c */
-	      MEM_WRAP_CHECK_1(elem,SV*,oom_array_extend);
-	 }
-#endif
-	if (!svp || *svp == &PL_sv_undef) {
-	    SV* lv;
-	    DIE(aTHX_ PL_no_aelem, elem);
-	    lv = sv_newmortal();
-	    sv_upgrade(lv, SVt_PVLV);
-	    LvTYPE(lv) = 'y';
-	    sv_magic(lv, NULL, PERL_MAGIC_defelem, NULL, 0);
-	    LvTARG(lv) = SvREFCNT_inc_simple(av);
-	    LvTARGOFF(lv) = elem;
-	    LvTARGLEN(lv) = 1;
-	    PUSHs(lv);
-	    RETURN;
+    svp = av_fetch(av, elem, add);
+    if (PL_op->op_private & OPpLVAL_INTRO)
+	save_aelem(av, elem, svp);
+    if (!svp) {
+	if ( optional ) {
+	    if (PL_op->op_private & OPpDEREF) {
+		SV* sv = newSV(0);
+		vivify_ref(sv, PL_op->op_private & OPpDEREF);
+		XPUSHs(sv);
+		RETURN;
+	    }
+	    else
+		RETPUSHUNDEF;
 	}
-	if (PL_op->op_private & OPpLVAL_INTRO)
-	    save_aelem(av, elem, svp);
-	else if (PL_op->op_private & OPpDEREF)
+	if ( ! add )
+	    DIE(aTHX_ "Required array element %d does not exists", elem);
+	*svp = newSV(0);
+	if (PL_op->op_private & OPpDEREF)
 	    vivify_ref(*svp, PL_op->op_private & OPpDEREF);
     }
-    sv = (svp ? *svp : &PL_sv_undef);
-    if (!lval && SvGMAGICAL(sv))	/* see note in pp_helem() */
-	sv = sv_mortalcopy(sv);
+    if (lval && *svp == &PL_sv_undef)
+	SVcpREPLACE(*svp, newSV(0));
+    sv = *svp;
+    if (PL_op->op_private & OPpDEREF && ! SvOK(sv)) {
+	vivify_ref(sv, PL_op->op_private & OPpDEREF);
+	XPUSHs(sv);
+	RETURN;
+    }
     if (op_flags & OPf_ASSIGN) {
 	if (op_flags & OPf_ASSIGN_PART) {
 	    SV* src;

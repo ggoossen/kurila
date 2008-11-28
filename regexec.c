@@ -4872,7 +4872,8 @@ S_reginclass(pTHX_ const regexp *prog, register const regnode *n, register const
 		    match = TRUE;
 		else if (flags & ANYOF_FOLD) {
 		    AV** const unicode_alternate = (AV**) av_fetch(av, 2, FALSE);
-		    if (!match && lenp && unicode_alternate) {
+		    if (!match && lenp 
+			&& unicode_alternate && SvAVOK(*unicode_alternate)) {
 		        I32 i;
 			for (i = 0; i <= av_len(*unicode_alternate); i++) {
 			    SV* const sv = *av_fetch(*unicode_alternate, i, FALSE);

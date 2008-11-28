@@ -188,9 +188,9 @@ Deprecated.  Use C<GIMME_V> instead.
 #define OPpENTERSUB_INARGS	4	/* Lval used as arg to a sub. */
   /* OP_GV only */
 #define OPpEARLY_CV		32	/* foo() called before sub foo was parsed */
-/* Private for OP_HELEM */
-#define OPpHELEM_ADD            8       /* Add key if it doesn't exist */
-#define OPpHELEM_OPTIONAL       4       /* Ignore if the key does not exist */
+/* Private for OP_HELEM and OP_AELEM */
+#define OPpELEM_ADD            8       /* Add key if it doesn't exist */
+#define OPpELEM_OPTIONAL       4       /* Ignore if the key does not exist */
 
   /* OP_RV2?V, OP_GVSV, OP_ENTERITER only */
 #define OPpOUR_INTRO		16	/* Variable was in an our() */
