@@ -343,7 +343,7 @@ available memory).
 
     concat repeat join range
 
-    anonarray enter_anonarray_assign anonhash anonscalar
+    anonarray enter_anonarray_assign anonhash enter_anonhash_assign anonscalar
 
 Note that despite the existence of this optag a memory resource attack
 may still be possible using only :base_core ops.
