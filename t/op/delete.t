@@ -64,11 +64,11 @@ do {
 # delete() on array elements
 
 @foo = @( () );
-@foo[1] = 'a';
-@foo[2] = 'b';
-@foo[3] = 'c';
-@foo[4] = 'd';
-@foo[5] = 'e';
+@foo[+1] = 'a';
+@foo[+2] = 'b';
+@foo[+3] = 'c';
+@foo[+4] = 'd';
+@foo[+5] = 'e';
 
 $foo = delete @foo[2];
 
@@ -99,14 +99,14 @@ foreach my $key (0 .. ((nelems @foo)-1)) {
 
 cmp_ok(scalar(nelems @foo),'==',0,'and then there were none');
 
-@foo[0] = 'x';
-@foo[1] = 'y';
+@foo[+0] = 'x';
+@foo[+1] = 'y';
 
 $foo = "$(join ' ',@foo)";
 cmp_ok($foo,'eq','x y','two fresh');
 
-@refary[0]->[0] = "FOO";
-@refary[0]->[3] = "BAR";
+@refary[+0]->[+0] = "FOO";
+@refary[0]->[+3] = "BAR";
 
 delete @refary[0]->[3];
 
@@ -131,7 +131,7 @@ do {
     sub X::DESTROY { $x++ }
     do {
 	my @a;
-	@a[0] = bless \@(), 'X';
+	@a[+0] = bless \@(), 'X';
 	my $y = delete @a[0];
     };
     cmp_ok($x,'==',1,q([perl #30733] array delete didn't free returned element));

@@ -212,7 +212,7 @@ do {
 do {
     $@ = 5;
     eval q{};
-    print length($@) ?? "not ok 46\t# \$\@ = '$@'\n" !! "ok 46\n";
+    print length($@) ?? "not ok 46\t# \$\@ = '$@'\n" !! "ok 46 - eval clear $@\n";
 };
 
 # DAPM Nov-2002. Perl should now capture the full lexical context during
@@ -223,7 +223,7 @@ my $zzz = 1;
 
 eval q{
     sub fred1 {
-	eval q{ print eval '$zzz' == 1 ?? 'ok' !! 'not ok', " @_[0]\n"}
+	eval q{ print eval '$zzz' == 1 ?? 'ok' !! 'not ok', " @_[?0]\n"}
     }
     fred1(47);
     do { my $zzz = 2; fred1(48) };
@@ -231,7 +231,7 @@ eval q{
 
 eval q{
     sub fred2 {
-	print eval('$zzz') == 1 ?? 'ok' !! 'not ok', " @_[0]\n";
+	print eval('$zzz') == 1 ?? 'ok' !! 'not ok', " @_[?0]\n";
     }
 }; die if $@;
 fred2(49);

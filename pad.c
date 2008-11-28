@@ -707,7 +707,7 @@ S_pad_findlex(pTHX_ const char *name, PAD *padnames, PAD* pad, U32 seq)
 	SV* parent_pad;
 	SV* parent_seq;
 
-	if ( ! parent_padnames )
+	if ( ! parent_padnames || ! SvAVOK(*parent_padnames) )
 	    return NOT_IN_PAD;
 
         parent_pad = *av_fetch(padnames, PAD_PARENTPAD_INDEX, 0);
@@ -1476,7 +1476,7 @@ Perl_pad_savelex(pTHX_ PAD *padnames, PAD* pad, U32 seq)
 
     PERL_ARGS_ASSERT_PAD_SAVELEX;
 
-    while (parent_padnamesref) {
+    while (parent_padnamesref && SvAVOK(*parent_padnamesref)) {
 	I32 offset;
 	AV* parent_padnames = SvAv(*parent_padnamesref);
 	for (offset = av_len(parent_padnames);

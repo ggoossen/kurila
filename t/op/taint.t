@@ -176,7 +176,7 @@ do {
           if $Is_MSWin32 || $Is_NetWare || $Is_VMS || $Is_Dos || $Is_MacOS;
 
 	my @vars = @('PATH', < @MoreEnv);
-	while (my $v = @vars[0]) {
+	while (my $v = @vars[?0]) {
 	    local %ENV{+$v} = $TAINT;
 	    last if try { `$echo 1` };
 	    last unless $@->{?description} =~ m/^Insecure \$ENV{$v}/;
@@ -198,9 +198,9 @@ do {
 	print "# all directories are writeable\n";
     }
     else {
-	$tmp = (grep { defined and -d and @(stat '_')[2] ^&^ 2 }
+	$tmp = (grep { defined and -d and @(stat '_')[?2] ^&^ 2 }
  @( <		     qw(sys$scratch /tmp /var/tmp /usr/tmp), <
-		     %ENV{[qw(TMP TEMP)]}))[0]
+		     %ENV{[qw(TMP TEMP)]}))[?0]
 	    or print "# can't find world-writeable directory to test PATH\n";
     }
 

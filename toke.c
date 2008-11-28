@@ -3508,6 +3508,12 @@ Perl_yylex(pTHX)
 	    yyerror("'[...]' should be '\\@(...)'");
 	}
 	PL_lex_brackets++;
+	if ( *s == '+' || *s == '?' ) {
+	    pl_yylval.i_tkval.ival = *s == '+' ? OPpELEM_ADD : OPpELEM_OPTIONAL;
+	    s++;
+	}
+	else
+	    pl_yylval.i_tkval.ival = 0;
 	OPERATOR('[');
     case ',':
 	s++;
@@ -3719,7 +3725,7 @@ Perl_yylex(pTHX)
 	    while (s < PL_bufend && SPACE_OR_TAB(*s))
 		s++;
 	    if ( *s == '+' || *s == '?' ) {
-		pl_yylval.i_tkval.ival = *s == '+' ? OPpHELEM_ADD : OPpHELEM_OPTIONAL;
+		pl_yylval.i_tkval.ival = *s == '+' ? OPpELEM_ADD : OPpELEM_OPTIONAL;
 		s++;
 	    }
 	    else

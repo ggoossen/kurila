@@ -1601,14 +1601,14 @@ do {
               my $new = pack("$format C0 W", < @result);
               is(length($new), $expect->[1]+1,
                  "pack $format C0 W should give $expect->[1]+1 chars");
-              is($new, $expect->[2] || substr($string, 0, length $new),
+              is($new, $expect->[?2] || substr($string, 0, length $new),
                  "pack $format C0 W returns expected value");
 
               # pack to upgraded
               $new = pack("a0 $format C0 W", utf8::chr(256), < @result);
               is(length($new), $expect->[1]+1,
                  "pack a0 $format C0 W should give $expect->[1]+1 chars");
-              is($new, $expect->[2] || substr($string, 0, length $new),
+              is($new, $expect->[?2] || substr($string, 0, length $new),
                  "pack a0 $format C0 W returns expected value");
           };
         }

@@ -375,7 +375,7 @@ ERR
         $result->{+type}   = '';
     }
 
-    $self->{Test_Results}->[$self->{?Curr_Test}-1] = $result;
+    $self->{Test_Results}->[+$self->{?Curr_Test}-1] = $result;
     $out .= "\n";
 
     $self->_print($out);
