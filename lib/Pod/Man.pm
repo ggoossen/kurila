@@ -805,8 +805,8 @@ sub devise_title {
             shift @dirs if (@dirs[0] =~ m/^[\d.]+$/);
             shift @dirs if (@dirs[0] =~ m/^(.*-$^O|$^O-.*|$^O)$/);
         }
-        shift @dirs if @dirs[0] eq 'lib';
-        splice (@dirs, 0, 2) if (@dirs[0] eq 'blib' && @dirs[1] eq 'lib');
+        shift @dirs if @dirs[?0] eq 'lib';
+        splice (@dirs, 0, 2) if (@dirs[?0] eq 'blib' && @dirs[?1] eq 'lib');
 
         # Remove empty directories when building the module name; they
         # occur too easily on Unix by doubling slashes.
