@@ -394,12 +394,12 @@ sub truncate {
 
 sub read {
     (nelems @_) == 3 || (nelems @_) == 4 or die 'usage: $io->read(BUF, LEN [, OFFSET])';
-    read(@_[0], @_[1], @_[2], @_[3] || 0);
+    read(@_[0], @_[1], @_[2], @_[?3] || 0);
 }
 
 sub sysread {
     (nelems @_) == 3 || (nelems @_) == 4 or die 'usage: $io->sysread(BUF, LEN [, OFFSET])';
-    sysread(@_[0], @_[1], @_[2], @_[3] || 0);
+    sysread(@_[0], @_[1], @_[2], ?@_[3] || 0);
 }
 
 sub write {
@@ -412,7 +412,7 @@ sub write {
 sub syswrite {
     (nelems @_) +>= 2 && (nelems @_) +<= 4 or die 'usage: $io->syswrite(BUF [, LEN [, OFFSET]])';
     if (defined(@_[2])) {
-	syswrite(@_[0], @_[1], @_[2], @_[3] || 0);
+	syswrite(@_[0], @_[1], @_[2], @_[?3] || 0);
     } else {
 	syswrite(@_[0], @_[1]);
     }
