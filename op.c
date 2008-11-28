@@ -917,8 +917,6 @@ Perl_scalarvoid(pTHX_ OP *o)
     case OP_INDEX:
     case OP_RINDEX:
     case OP_SPRINTF:
-    case OP_AELEM:
-    case OP_AELEMFAST:
     case OP_ASLICE:
     case OP_HSLICE:
     case OP_UNPACK:
@@ -969,6 +967,8 @@ Perl_scalarvoid(pTHX_ OP *o)
 	    useless = OP_DESC(o);
 	break;
     case OP_HELEM:
+    case OP_AELEM:
+    case OP_AELEMFAST:
 	if (!(o->op_private & (OPpLVAL_INTRO|OPpOUR_INTRO|OPpELEM_ADD)))
 	    /* Otherwise it's "Useless use of grep iterator" */
 	    useless = OP_DESC(o);
