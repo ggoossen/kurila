@@ -325,7 +325,7 @@ do {
 use Unicode::UCD < qw(namedseq);
 
 is((join '*',namedseq("KATAKANA LETTER AINU P")), '12791*12442', "namedseq");
-is(namedseq("KATAKANA LETTER AINU Q")[0], undef);
+is(namedseq("KATAKANA LETTER AINU Q")[?0], undef);
 is(namedseq( <qw(foo bar)), undef);
 my @ns = namedseq("KATAKANA LETTER AINU P");
 is((nelems @ns), 2);

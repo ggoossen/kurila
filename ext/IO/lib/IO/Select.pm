@@ -48,7 +48,7 @@ sub exists
  my $vec = shift;
  my $fno = $vec->_fileno(shift);
  return undef unless defined $fno;
- $vec->[$fno + FIRST_FD];
+ $vec->[?$fno + FIRST_FD];
 }
 
 
@@ -76,15 +76,15 @@ sub _update
    next unless defined $fn;
    my $i = $fn + FIRST_FD;
    if ($add) {
-     if (defined $vec->[$i]) {
+     if (defined $vec->[?$i]) {
 	 $vec->[$i] = $f;  # if array rest might be different, so we update
 	 next;
      }
      $vec->[FD_COUNT]++;
      vec($bits, $fn, 1, 1);
-     $vec->[$i] = $f;
+     $vec->[+$i] = $f;
    } else {      # remove
-     next unless defined $vec->[$i];
+     next unless defined $vec->[?$i];
      $vec->[FD_COUNT]--;
      vec($bits, $fn, 1, 0);
      $vec->[$i] = undef;
@@ -121,7 +121,7 @@ sub has_exception
 {
  my $vec = shift;
  my $timeout = shift;
- my $e = $vec->[VEC_BITS];
+ my $e = $vec->[?VEC_BITS];
 
  defined($e) && (select(undef,undef,$e,$timeout) +> 0)
     ?? handles($vec, $e)

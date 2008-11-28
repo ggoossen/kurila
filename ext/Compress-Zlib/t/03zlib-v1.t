@@ -149,7 +149,7 @@ foreach (<@hello)
  
 ok $status == Z_OK ;
 
-ok    (@(@($X, $status) =  $x->flush())[1] == Z_OK ) ;
+ok    (@(@($X, $status) =  $x->flush())[?1] == Z_OK ) ;
 $Answer .= $X ;
  
  
@@ -193,7 +193,7 @@ do {
  
 ok $status == Z_OK ;
 
-ok   (@(@($X, $status) =  $x->flush())[1] == Z_OK ) ;
+ok   (@(@($X, $status) =  $x->flush())[?1] == Z_OK ) ;
 $Answer .= $X ;
  
 ok !defined $x->msg() ;
@@ -234,12 +234,12 @@ title 'deflate/inflate - larger buffer';
 
 ok $x = deflateInit() ;
  
-ok (@(@($X, $status) =  $x->deflate($contents))[1] == Z_OK) ;
+ok (@(@($X, $status) =  $x->deflate($contents))[?1] == Z_OK) ;
 
 my $Y = $X ;
  
  
-ok (@(@($X, $status) =  $x->flush() )[1] == Z_OK ) ;
+ok (@(@($X, $status) =  $x->flush() )[?1] == Z_OK ) ;
 $Y .= $X ;
  
  
@@ -552,7 +552,7 @@ do {
      
     ok $status == Z_OK ;
     
-    ok   (@(@($X, $status) =  $x->flush())[1] == Z_OK ) ;
+    ok   (@(@($X, $status) =  $x->flush())[?1] == Z_OK ) ;
     $Answer .= $X ;
      
      

@@ -46,7 +46,7 @@ sub genarray {
     elsif ($size +> $BigEnough) { $size = $BigEnough; }
     $items = int(sqrt($size));		# number of distinct items
     for my $i (0 .. $size -1) {
-	@a[$i] = sprintf($ItemFormat, int($items * rand()), $i);
+	@a[+$i] = sprintf($ItemFormat, int($items * rand()), $i);
     }
     return \@a;
 }

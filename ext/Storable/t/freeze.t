@@ -27,7 +27,7 @@ $c->{+attribute} = $b;
 our $d = \%();
 our $e = \@();
 $d->{+'a'} = $e;
-$e->[0] = $d;
+$e->[+0] = $d;
 our %a = %('key', 'value', 1, 0, $a, $b, 'cvar', \$c);
 our @a = @('first', undef, 3, -4, -3.14159, 456, 4.5, $d, \$d, \$e, $e,
 	$b, \$a, $a, $c, \$c, \%a);
@@ -103,7 +103,7 @@ print "ok 14\n";
 # Test the workaround for LVALUE bug in perl 5.004_04 -- from Gisle Aas
 sub foo { @_[0] = 1 }
 $foo = \@();
-foo($foo->[1]);
+foo($foo->[?1]);
 try { freeze($foo) };
 print "not " if $@;
 print "ok 15\n";

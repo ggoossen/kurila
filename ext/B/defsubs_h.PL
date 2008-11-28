@@ -58,7 +58,7 @@ doconst('CVf_ISXSUB');
 foreach my $tuple (@(\@('op.h'),\@('cop.h'),\@('regexp.h','RXf_')))
  {
   my $file = $tuple->[0];
-  my $pfx = $tuple->[1] || '';
+  my $pfx = $tuple->[?1] || '';
   my $path = File::Spec->catfile($headerpath, $file);
   open(OPH,"<","$path") || die "Cannot open $path:$!";
   while ( ~< *OPH)

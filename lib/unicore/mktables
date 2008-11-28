@@ -484,7 +484,7 @@ sub Table::Append
     ## If we've already got a range working, and this code point is the next
     ## one in line, and if the name is the same, just extend the current range.
     ##
-    my $last = $Table->[-1];
+    my $last = $Table->[?-1];
     if ($last
         and
         $last->[RANGE_END] == $codepoint - 1

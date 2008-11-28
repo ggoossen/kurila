@@ -155,10 +155,10 @@ sub whatIs ($;$)
 {
     return 'handle' if isaFilehandle(@_[0]);
 
-    my $wantCode = defined @_[1] && @_[1] ^&^ WANT_CODE ;
-    my $extended = defined @_[1] && @_[1] ^&^ WANT_EXT ;
-    my $undef    = defined @_[1] && @_[1] ^&^ WANT_UNDEF ;
-    my $hash     = defined @_[1] && @_[1] ^&^ WANT_HASH ;
+    my $wantCode = defined @_[?1] && @_[1] ^&^ WANT_CODE ;
+    my $extended = defined @_[?1] && @_[1] ^&^ WANT_EXT ;
+    my $undef    = defined @_[?1] && @_[1] ^&^ WANT_UNDEF ;
+    my $hash     = defined @_[?1] && @_[1] ^&^ WANT_HASH ;
 
     return 'undef'  if ! defined @_[0] && $undef ;
 
@@ -470,7 +470,7 @@ sub ParseParameters
 {
     my $level = shift || 0 ; 
 
-    my $sub = @(caller($level + 1))[3] ;
+    my $sub = @(caller($level + 1))[?3] ;
     local $Carp::CarpLevel = 1 ;
     my $p = IO::Compress::Base::Parameters->new() ;
     $p->parse(< @_)
@@ -715,7 +715,7 @@ sub IO::Compress::Base::Parameters::parsed
     my $self = shift ;
     my $name = shift ;
 
-    return $self->{Got}->{+ lc $name}->[OFF_PARSED] ;
+    return $self->{Got}->{+ lc $name}->[?OFF_PARSED] ;
 }
 
 sub IO::Compress::Base::Parameters::value
@@ -725,12 +725,12 @@ sub IO::Compress::Base::Parameters::value
 
     if ((nelems @_))
     {
-        $self->{Got}->{+ lc $name}->[OFF_PARSED]  = 1;
-        $self->{Got}->{+ lc $name}->[OFF_DEFAULT] = @_[0] ;
-        $self->{Got}->{+ lc $name}->[OFF_FIXED]   = @_[0] ;
+        $self->{Got}->{+ lc $name}->[+OFF_PARSED]  = 1;
+        $self->{Got}->{+ lc $name}->[+OFF_DEFAULT] = @_[0] ;
+        $self->{Got}->{+ lc $name}->[+OFF_FIXED]   = @_[0] ;
     }
 
-    return $self->{Got}->{+ lc $name}->[OFF_FIXED] ;
+    return $self->{Got}->{+ lc $name}->[?OFF_FIXED] ;
 }
 
 sub IO::Compress::Base::Parameters::valueOrDefault

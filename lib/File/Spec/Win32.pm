@@ -180,7 +180,7 @@ On Win32 makes
 sub canonpath {
     # Legacy / compatibility support
     #
-    return @_[1] if !defined(@_[1]) or @_[1] eq '';
+    return @_[?1] if !defined(@_[?1]) or @_[1] eq '';
     return _canon_cat( @_[1] );
 }
 

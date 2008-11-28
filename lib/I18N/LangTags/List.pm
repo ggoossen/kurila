@@ -34,7 +34,7 @@ do {
 #----------------------------------------------------------------------
 
 sub name {
-  my $tag = lc(@_[0] || return);
+  my $tag = lc(@_[?0] || return);
   $tag =~ s/^\s+//s;
   $tag =~ s/\s+$//s;
   
@@ -77,7 +77,7 @@ sub name {
 #--------------------------------------------------------------------------
 
 sub is_decent {
-  my $tag = lc(@_[0] || return 0);
+  my $tag = lc(@_[?0] || return 0);
   #require I18N::LangTags;
 
   return 0 unless

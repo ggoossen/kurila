@@ -445,7 +445,7 @@ sub visualizeSortKey
 sub splitEnt
 {
     my $self = shift;
-    my $wLen = @_[1];
+    my $wLen = @_[?1];
 
     my $code = $self->{?preprocess};
     my $norm = $self->{?normCode};

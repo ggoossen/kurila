@@ -155,7 +155,7 @@ sub Compress::Zlib::gzFile::gzread
     return _set_gzerr(Z_STREAM_ERROR())
         if $self->[1] ne 'inflate';
 
-    my $len = defined @_[1] ?? @_[1] !! 4096 ; 
+    my $len = defined @_[?1] ?? @_[1] !! 4096 ; 
 
     my $gz = $self->[0] ;
     my $status = $gz->read(@_[0], $len) ; 

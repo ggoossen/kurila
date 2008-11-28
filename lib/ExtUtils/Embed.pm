@@ -229,7 +229,7 @@ sub ldopts {
     elsif ($^O eq 'os390' && config_value("usedl")) {
 	# Nothing for OS/390 (z/OS) dynamic.
     } else {
-	$libperl = (grep(m/^-l\w*perl\w*$/, @link_args))[0]
+	$libperl = (grep(m/^-l\w*perl\w*$/, @link_args))[?0]
 	    || (config_value("libperl") =~ m/^lib(\w+)(\Q$lib_ext\E|\.\Q$(config_value("dlext"))\E)$/
 		?? "-l$1" !! '')
 		|| "-lperl";

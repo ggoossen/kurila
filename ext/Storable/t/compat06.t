@@ -42,7 +42,7 @@ package SIMPLE;
 sub make {
 	my $self = bless \@(), shift;
 	my @($x) = @_;
-	$self->[0] = $x;
+	$self->[+0] = $x;
 	return $self;
 }
 

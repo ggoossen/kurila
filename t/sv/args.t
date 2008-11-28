@@ -64,7 +64,7 @@ my $foo = 'foo'; local1($foo); local1($foo);
 print "got [$foo], expected [foo]\nnot " if $foo ne 'foo';
 pass();
 
-sub local2 { local @_[0]; last L }
+sub local2 { local @_[?0]; last L }
 L: do { local2 };
 pass();
 

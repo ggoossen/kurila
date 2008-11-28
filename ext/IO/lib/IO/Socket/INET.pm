@@ -92,7 +92,7 @@ sub _sock_info {
     @serv = @( getservbyname($port, _get_proto_name($proto) || "") )
 	if ($port =~ m,\D,);
 
-    $port = @serv[2] || $defport || $pnum;
+    $port = @serv[?2] || $defport || $pnum;
     unless (defined $port) {
 	$@ = "Bad service '$origport'";
 	return;

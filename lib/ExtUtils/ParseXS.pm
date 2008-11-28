@@ -673,7 +673,7 @@ sub process_para {
 	%defaults{+@args[$i]} = $2;
 	%defaults{+@args[$i]} =~ s/"/\\"/g;
       }
-      @proto_arg[$i+1] = '$' ;
+      @proto_arg[+$i+1] = '$' ;
     }
     my $min_args = $num_args - $extra_args;
     $report_args =~ s/"/\\"/g;

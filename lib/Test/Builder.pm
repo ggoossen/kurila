@@ -698,7 +698,7 @@ sub skip {
     lock($self->{?Curr_Test});
     $self->{+Curr_Test}++;
 
-    $self->{Test_Results}->[$self->{?Curr_Test}-1] = &share(\%(
+    $self->{Test_Results}->[+$self->{?Curr_Test}-1] = &share(\%(
         'ok'      => 1,
         actual_ok => 1,
         name      => '',
@@ -739,7 +739,7 @@ sub todo_skip {
     lock($self->{?Curr_Test});
     $self->{+Curr_Test}++;
 
-    $self->{Test_Results}->[$self->{?Curr_Test}-1] = &share(\%(
+    $self->{Test_Results}->[+$self->{?Curr_Test}-1] = &share(\%(
         'ok'      => 1,
         actual_ok => 0,
         name      => '',
@@ -1334,7 +1334,7 @@ sub current_test {
         if( $num +> nelems @$test_results ) {
             my $start = (nelems @$test_results) ?? (nelems @$test_results) !! 0;
             for ($start..$num-1) {
-                $test_results->[$_] = &share(\%(
+                $test_results->[+$_] = &share(\%(
                     'ok'      => 1, 
                     actual_ok => undef, 
                     reason    => 'incrementing test number', 
@@ -1449,7 +1449,7 @@ sub todo {
 
     return $self->{?TODO} if defined $self->{?TODO};
 
-    $package = $package || $self->caller(1)[0] || $self->exported_to;
+    $package = $package || $self->caller(1)[?0] || $self->exported_to;
     return 0 unless $package;
 
     return defined ${*{Symbol::fetch_glob($package.'::TODO')}} ?? ${*{Symbol::fetch_glob($package.'::TODO')}}
@@ -1587,8 +1587,8 @@ sub _ending {
         # ithreads.  So we have to fill them in by hand. :(
         my $empty_result = &share(\%());
         for my $idx ( 0..$self->{?Expected_Tests}-1 ) {
-            $test_results->[$idx] = $empty_result
-              unless defined $test_results->[$idx];
+            $test_results->[+$idx] = $empty_result
+              unless defined $test_results->[?$idx];
         }
 
         my $num_failed = nelems( grep !$_->{?'ok'},

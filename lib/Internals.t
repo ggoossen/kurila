@@ -55,9 +55,9 @@ is(@foo[1], 'bar');
 
 do {
     local our $TODO = 1;
-    ok( !Internals::SvREADONLY @foo[2] );
+    ok( !Internals::SvREADONLY @foo[?2] );
 };
-@foo[2] = 'baz';
+@foo[+2] = 'baz';
 is(@foo[2], 'baz');
 
 ok(  Internals::SvREADONLY @foo[2], 1 );
@@ -74,9 +74,9 @@ is(@foo[1], 'baz');
 
 do {
     local our $TODO = 1;
-    ok( !Internals::SvREADONLY @foo[2] );
+    ok( !Internals::SvREADONLY @foo[?2] );
 };
-@foo[2] = 'qux';
+@foo[+2] = 'qux';
 is(@foo[2], 'qux');
 
 unshift(@foo, 'foo');

@@ -276,7 +276,7 @@ sub _init_headings {
     unless (defined %myData{?_SECTION_HEADINGS}) {
         local *section_headings = %myData{+_SECTION_HEADINGS} = \@();
         for my $i (0..$MAX_HEADING_LEVEL-1) {
-            @section_headings[$i] = '';
+            @section_headings[+$i] = '';
         }
     }
 }
@@ -448,7 +448,7 @@ sub match_section {
     ## Default any unspecified sections to the current one
     my @current_headings = $self->curr_headings();
     for my $i (0..$MAX_HEADING_LEVEL-1) {
-        (defined @headings[$i])  or  @headings[$i] = @current_headings[$i];
+        (defined @headings[?$i])  or  @headings[+$i] = @current_headings[$i];
     }
 
     ## Look for a match against the specified section expressions
@@ -675,7 +675,7 @@ sub _compile_section_spec {
 
     ## Set default regex for ommitted levels
     for my $i (0 .. $MAX_HEADING_LEVEL -1) {
-        @regexs[$i]  = '.*'  unless ((defined @regexs[$i])
+        @regexs[+$i]  = '.*'  unless ((defined @regexs[?$i])
                                      && (length @regexs[$i]));
     }
     ## Modify the regexs as needed and validate their syntax

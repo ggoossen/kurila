@@ -1151,7 +1151,7 @@ sub new_listitem {
 	$ListNewTerm = 0;
     }
 
-    if( @Items_Seen[$Listlevel]++ == 0 ){
+    if( @Items_Seen[+$Listlevel]++ == 0 ){
 	# start of new list
 	push( @Listtype, "$tag" );
 	print HTML "<$tag>\n";
