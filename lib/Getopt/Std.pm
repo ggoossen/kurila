@@ -234,7 +234,7 @@ sub getopts ($;$) {
 	}
 	my $pos = index($argumentative,$first);
 	if ($pos +>= 0) {
-	    if (defined(@args[$pos+1]) and (@args[$pos+1] eq ':')) {
+	    if (defined(@args[?$pos+1]) and (@args[$pos+1] eq ':')) {
 		shift(@ARGV);
 		if ($rest eq '') {
 		    ++$errs unless (nelems @ARGV);
