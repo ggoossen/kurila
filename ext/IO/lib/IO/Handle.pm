@@ -399,7 +399,7 @@ sub read {
 
 sub sysread {
     (nelems @_) == 3 || (nelems @_) == 4 or die 'usage: $io->sysread(BUF, LEN [, OFFSET])';
-    sysread(@_[0], @_[1], @_[2], ?@_[3] || 0);
+    sysread(@_[0], @_[1], @_[2], @_[?3] || 0);
 }
 
 sub write {
