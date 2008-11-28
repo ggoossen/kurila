@@ -175,7 +175,7 @@ sub Dumpperl {
   for my $val ( @{$s->{todump}}) {
     my $out = "";
     @post = @();
-    $name = $s->{names}->[$i++];
+    $name = $s->{names}->[?$i++];
     if (defined $name) {
       if ($name =~ m/^[*](.*)$/) {
 	if (defined $val) {

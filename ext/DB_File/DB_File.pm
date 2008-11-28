@@ -250,7 +250,7 @@ sub tie_hash_or_array
         @arg[2] ^|^= O_CREAT();
     }
 
-    if ($db_version +> 1 and defined @arg[4] and (ref @arg[4]) =~ m/RECNO/ and 
+    if ($db_version +> 1 and defined @arg[?4] and (ref @arg[4]) =~ m/RECNO/ and 
 	@arg[1] and ! -e @arg[1]) {
 	open(FH, ">", "@arg[1]") or return undef ;
 	close FH ;

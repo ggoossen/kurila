@@ -989,8 +989,8 @@ sub read
         $buffer = \@_[0] ;
     }
 
-    my $length = @_[1] ;
-    my $offset = @_[2] || 0;
+    my $length = @_[?1] ;
+    my $offset = @_[?2] || 0;
 
     # the core read will return 0 if asked for 0 bytes
     return 0 if defined $length && $length == 0 ;

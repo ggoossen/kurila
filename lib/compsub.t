@@ -48,7 +48,7 @@ fst $a="newa", $b="notset";
 is("$a-$b", "newa-oldb");
 
 do {
-    BEGIN { compsub::define( nothing => sub { @_[0] and @_[0]->free; return B::OP->new('null', 0, @("myop", 33, 66)) } ); }
+    BEGIN { compsub::define( nothing => sub { @_[?0] and @_[0]->free; return B::OP->new('null', 0, @("myop", 33, 66)) } ); }
     nothing;
 
     eval "nothing";

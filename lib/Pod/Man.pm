@@ -254,7 +254,7 @@ sub _handle_element_start {
         # and also depends on our parent tags.  Thankfully, inside tags that
         # turn off guesswork and reformatting, nothing else can turn it back
         # on, so this can be strictly inherited.
-        my $formatting = %$self{PENDING}->[-1]->[1];
+        my $formatting = %$self{PENDING}->[-1]->[?1];
         $formatting = $self->formatting ($formatting, $element);
         push (@{ %$self{PENDING} }, \@( $attrs, $formatting, '' ));
         DEBUG +> 4 and print "Pending: [", < pretty (%$self{?PENDING}), "]\n";
@@ -825,7 +825,7 @@ sub devise_date {
     my $input = $self->source_filename;
     my $time;
     if ($input) {
-        $time = @(stat $input)[9] || time;
+        $time = @(stat $input)[?9] || time;
     } else {
         $time = time;
     }

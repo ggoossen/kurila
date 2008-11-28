@@ -31,7 +31,7 @@ my %NON_CONSTS = %(< map {($_,1)}
                      WIFEXITED WIFSIGNALED WIFSTOPPED WSTOPSIG WTERMSIG));
 
 for my $name (keys %NON_CONSTS) {
-    *{Symbol::fetch_glob($name)} = sub { int_macro_int($name, @_[0]) };
+    *{Symbol::fetch_glob($name)} = sub { int_macro_int($name, @_[?0]) };
 }
 
 package POSIX::SigRt;
@@ -952,7 +952,7 @@ require Exporter;
 
 package POSIX::SigAction;
 
-sub new { bless \%(HANDLER => @_[1], MASK => @_[2], FLAGS => @_[3] || 0, SAFE => 0), @_[0] }
+sub new { bless \%(HANDLER => @_[?1], MASK => @_[?2], FLAGS => @_[?3] || 0, SAFE => 0), @_[0] }
 sub handler { @_[0]->{+HANDLER} = @_[1] if (nelems @_) +> 1; @_[0]->{?HANDLER} };
 sub mask    { @_[0]->{+MASK}    = @_[1] if (nelems @_) +> 1; @_[0]->{?MASK} };
 sub flags   { @_[0]->{+FLAGS}   = @_[1] if (nelems @_) +> 1; @_[0]->{?FLAGS} };

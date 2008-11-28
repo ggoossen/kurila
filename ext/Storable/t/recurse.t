@@ -123,7 +123,7 @@ sub STORABLE_thaw {
 	my $cloning = shift;
 	my @($x, $obj) = @_;
 	die "STORABLE_thaw #1" unless $obj \== $self;
-	$self->[0] = thaw($x) if $x ne "no";
+	$self->[+0] = thaw($x) if $x ne "no";
 	$recursed--;
 }
 

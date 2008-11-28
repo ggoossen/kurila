@@ -67,7 +67,7 @@ sub _is_type {
 
 sub _is_under {
     my @($self, $path, @< @under) =  @_;
-    @under[0] = "" if (! nelems @under);
+    @under[+0] = "" if (! nelems @under);
     foreach my $dir ( @under) {
         return 1 if ($self->_is_prefix($path, $dir));
     }

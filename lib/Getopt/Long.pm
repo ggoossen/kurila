@@ -1247,7 +1247,7 @@ sub Configure (@) {
           $gnu_compat, $passthrough, $genprefix, $auto_version, $auto_help,
           $longprefix );
 
-    if ( ref(@options[0]) eq 'ARRAY' ) {
+    if ( ref(@options[?0]) eq 'ARRAY' ) {
 	@( $error, $debug, $major_version, $minor_version,
 	  $autoabbrev, $getopt_compat, $ignorecase, $bundling, $order,
 	  $gnu_compat, $passthrough, $genprefix, $auto_version, $auto_help,

@@ -198,7 +198,7 @@ ok $fil = gzopen($name, "rb") ;
 my $i = 0 ;
 my @got = @();
 while ($fil->gzreadline($line) +> 0) {
-    @got[$i] = $line ;
+    @got[+$i] = $line ;
     ++ $i ;
 }
 is $i, 2 ;
@@ -223,7 +223,7 @@ ok ! $fil->gzclose ;
 ok $fil = gzopen($name, "rb") ;
 @got = @() ; $i = 0 ;
 while ($fil->gzreadline($line) +> 0) {
-    @got[$i] = $line ;    
+    @got[+$i] = $line ;    
     ++ $i ;
 }
 is $i, 2 ;

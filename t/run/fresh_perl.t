@@ -130,7 +130,7 @@ BEGIN { undef = 0 }
 EXPECT
 Can't assign to undef operator at - line 1 character 9.
 ########
-my @a; @a[2] = 1; for (@a) { $_ = 2 } print join(' ', @a) . "\n"
+my @a; @a[+2] = 1; for (@a) { $_ = 2 } print join(' ', @a) . "\n"
 EXPECT
 2 2 2
 ########

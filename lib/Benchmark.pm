@@ -897,7 +897,7 @@ sub cmpthese{
     }
     else {
         my@($count, $code) =  @_[[@(0,1)]];
-        $style = @_[2] if defined @_[2];
+        $style = @_[2] if defined @_[?2];
 
         die usage unless ref $code eq 'HASH';
 
@@ -918,7 +918,7 @@ sub cmpthese{
 	    else {$_->[2]+$_->[3]+$_->[4]+$_->[5]}
 	};
 	my $rate = $_->[6]/(($elapsed)+0.000000000000001);
-	$_->[7] = $rate;
+	$_->[+7] = $rate;
     }
 
     # Sort by rate

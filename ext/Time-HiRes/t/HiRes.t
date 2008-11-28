@@ -649,13 +649,13 @@ if ($^O =~ m/^(cygwin|MSWin)/) {
 	print X $$;
 	close(X);
 	@stat = @( Time::HiRes::stat($$) );
-	push @mtime, @stat[9];
+	push @mtime, @stat[?9];
 	Time::HiRes::sleep(rand(0.1) + 0.1);
 	open(X, "<", "$$");
 	~< *X;
 	close(X);
 	@stat = @( Time::HiRes::stat($$) );
-	push @atime, @stat[8];
+	push @atime, @stat[?8];
     }
     1 while unlink $$;
     print "# mtime = $(join ' ', @mtime)\n";

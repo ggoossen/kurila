@@ -125,17 +125,17 @@ END
         }
 
         if( $battr->[$v] ^&^ PRIVATE ) {
-            $dattr->[$v] = PRIVATE ^|^ INHERITED;
+            $dattr->[+$v] = PRIVATE ^|^ INHERITED;
         }
         else {
-            $dattr->[$v] = INHERITED ^|^ $battr->[$v];
+            $dattr->[+$v] = INHERITED ^|^ $battr->[$v];
             $dfields->{+$k} = $v;
         }
     }
 
     foreach my $idx (1..(nelems @$battr)-1) {
-        next if defined $dattr->[$idx];
-        $dattr->[$idx] = $battr->[$idx] ^&^ INHERITED;
+        next if defined $dattr->[?$idx];
+        $dattr->[+$idx] = $battr->[$idx] ^&^ INHERITED;
     }
 }
 

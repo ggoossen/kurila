@@ -731,7 +731,7 @@ number and C<Pod::Hyperlink> object.
 # set/return hyperlinks of the current POD
 sub hyperlink {
     my $self = shift;
-    if(@_[0]) {
+    if(@_[?0]) {
         push(@{$self->{_links}}, @_[0]);
         return @_[0];
     }

@@ -34,31 +34,31 @@ is(join('', @ary), '1234');
 @foo = @( () );
 $r = join(',', @( (nelems @foo)-1, < @foo));
 is($r, "-1");
-@foo[0] = '0';
+@foo[+0] = '0';
 $r = join(',', @( (nelems @foo)-1, < @foo));
 is($r, "0,0");
-@foo[2] = '2';
+@foo[+2] = '2';
 $r = join(',', @( (nelems @foo)-1, < @foo));
 is($r, "2,0,,2");
 @bar = @( () );
-@bar[0] = '0';
-@bar[1] = '1';
+@bar[+0] = '0';
+@bar[+1] = '1';
 $r = join(',', @( (nelems @bar)-1, < @bar));
 is($r, "1,0,1");
 @bar = @( () );
 $r = join(',', @( (nelems @bar)-1, < @bar));
 is($r, "-1");
-@bar[0] = '0';
+@bar[+0] = '0';
 $r = join(',', @( (nelems @bar)-1, < @bar));
 is($r, "0,0");
-@bar[2] = '2';
+@bar[+2] = '2';
 $r = join(',', @( (nelems @bar)-1, < @bar));
 is($r, "2,0,,2");
 @bar = @( () );
-@bar[0] = '0';
+@bar[+0] = '0';
 $r = join(',', @( (nelems @bar)-1, < @bar));
 is($r, "0,0");
-@bar[2] = '2';
+@bar[+2] = '2';
 $r = join(',', @( (nelems @bar)-1, < @bar));
 is($r, "2,0,,2");
 
@@ -206,7 +206,7 @@ do {
 
 # make sure reification behaves
 my $t = curr_test();
-sub reify { @_[1] = $t++; print( (join ' ',@_), "\n"); }
+sub reify { @_[+1] = $t++; print( (join ' ',@_), "\n"); }
 reify('ok');
 reify('ok');
 
@@ -253,7 +253,7 @@ do {
     is(@a[-1], 4);
     is(@a[-2], 3);
     is(@a[-5], 0);
-    ok(!defined @a[-6]);
+    ok(!defined @a[?-6]);
 
     is(@a[2.1]  , 2);
     is(@a[2.9]  , 2);
@@ -264,9 +264,9 @@ do {
 
 do {
     my @a;
-    eval '@a[-1] = 0';
+    eval '@a[+-1] = 0';
     like $@->message,
-      qr/Modification of non-creatable array value attempted, subscript -1/, "\$a[-1] = 0";
+      qr/Required array element -1 could not be created/, "\$a[+-1] = 0";
 };
 
 do {

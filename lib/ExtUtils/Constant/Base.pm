@@ -826,7 +826,7 @@ sub C_constant {
     # Need to group names of the same length
     my @by_length;
     foreach ( @items) {
-      push @{@by_length[length $_->{?name}]}, $_;
+      push @{@by_length[+ length $_->{?name}]}, $_;
     }
     foreach my $i (0 .. ((nelems @by_length)-1)) {
       next unless @by_length[$i];	# None of this length

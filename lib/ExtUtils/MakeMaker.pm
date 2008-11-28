@@ -446,7 +446,7 @@ END
         @{*{Symbol::fetch_glob("$newclass\:\:ISA")}} = @( 'MM' );
     };
 
-    if (defined @Parent[-2]){
+    if (defined @Parent[?-2]){
         $self->{+PARENT} = @Parent[-2];
         for my $key ( @Prepend_parent) {
             next unless defined $self->{PARENT}->{?$key};

@@ -2223,8 +2223,6 @@ PP(pp_aelem)
 	Perl_croak(aTHX_ "Can't take an element from a %s", Ddesc((SV*)av));
 
     svp = av_fetch(av, elem, add);
-    if (PL_op->op_private & OPpLVAL_INTRO)
-	save_aelem(av, elem, svp);
     if (!svp) {
 	if ( optional ) {
 	    if (PL_op->op_private & OPpDEREF) {
@@ -2236,12 +2234,13 @@ PP(pp_aelem)
 	    else
 		RETPUSHUNDEF;
 	}
-	if ( ! add )
+	if ( add )
+	    DIE(aTHX_ "Required array element %d could not be created", elem);
+	else
 	    DIE(aTHX_ "Required array element %d does not exists", elem);
-	*svp = newSV(0);
-	if (PL_op->op_private & OPpDEREF)
-	    vivify_ref(*svp, PL_op->op_private & OPpDEREF);
     }
+    if (PL_op->op_private & OPpLVAL_INTRO)
+	save_aelem(av, elem, svp);
     if (lval && *svp == &PL_sv_undef)
 	SVcpREPLACE(*svp, newSV(0));
     sv = *svp;

@@ -49,7 +49,7 @@ my @domain2pkg;
 
 sub register_domain {
     my@($p,$d) =  @_;
-    @domain2pkg[$d] = $p;
+    @domain2pkg[+$d] = $p;
 }
 
 sub configure {
@@ -255,8 +255,8 @@ sub connected {
 sub send {
     (nelems @_) +>= 2 && (nelems @_) +<= 4 or croak 'usage: $sock->send(BUF, [FLAGS, [TO]])';
     my $sock  = @_[0];
-    my $flags = @_[2] || 0;
-    my $peer  = @_[3] || $sock->peername;
+    my $flags = @_[?2] || 0;
+    my $peer  = @_[?3] || $sock->peername;
 
     croak 'send: Cannot determine peer address'
 	 unless(defined $peer);
@@ -276,7 +276,7 @@ sub recv {
     (nelems @_) == 3 || (nelems @_) == 4 or croak 'usage: $sock->recv(BUF, LEN [, FLAGS])';
     my $sock  = @_[0];
     my $len   = @_[2];
-    my $flags = @_[3] || 0;
+    my $flags = @_[?3] || 0;
 
     # remember who we recv'd from
     %{*$sock}{+'io_socket_peername'} = recv($sock, @_[1]='', $len, $flags);

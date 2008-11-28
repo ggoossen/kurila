@@ -96,7 +96,7 @@ sub struct {
             $elem = "\{+'$($class)::$name'\}";
         }
         elsif( $base_type eq 'ARRAY' ){
-            $elem = "[$cnt]";
+            $elem = "[+$cnt]";
             ++$cnt;
             $cmt = " # $name";
         }
@@ -459,7 +459,7 @@ accessor accordingly.
     sub count {
         my $self = shift;
         if ( @_ ) {
-            die 'count must be nonnegative' if $_[0] < 0;
+            die 'count must be nonnegative' if @_[0] < 0;
             $self->{'MyObj::count'} = shift;
             warn "Too many args to count" if @_;
         }
