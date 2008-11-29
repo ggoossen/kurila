@@ -3843,7 +3843,7 @@ PP(pp_enter_anonhash_assign)
     SV* value_sv = *MARK;
     HV* value;
     SV **key;
-    AV *elem_values = newAV();
+    AV *elem_values = av_2mortal(newAV());
     if ( ! SvHVOK(value_sv) )
 	Perl_croak(aTHX_ "%s expects a HASH but got %s", OP_DESC(PL_op), Ddesc(value_sv));
     if ( ! ( PL_op->op_flags & OPf_ASSIGN_PART ) )
@@ -3871,8 +3871,8 @@ PP(pp_enter_anonhash_assign)
 	while ((entry = hv_iternext(value))) {
 	    SPAGAIN;
 	    SV* const sv = hv_iterkeysv(entry);
-	    XPUSHs(SvREFCNT_inc(hv_iterval(value,entry)));
-	    XPUSHs(SvREFCNT_inc(sv));
+	    XPUSHs(hv_iterval(value,entry));
+	    XPUSHs(sv);
 	    PUTBACK;
 	}
     }
@@ -3882,7 +3882,7 @@ PP(pp_enter_anonhash_assign)
 	SV** ary = AvARRAY(elem_values);
 	SV** ary_last = ary + av_len(elem_values);
 	for ( ; ary && (ary <= ary_last); ary++ )
-	    PUSHs(*ary);
+	    PUSHs(SvREFCNT_inc(*ary));
     }
     RETURN;
 }
