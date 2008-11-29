@@ -2176,6 +2176,7 @@ Perl_assign(pTHX_ OP *o, bool partial, I32 *min_modcount, I32 *max_modcount)
 		o->op_location);
 	    enter->op_sibling = pushmark->op_sibling;
 	    cBINOPo->op_first = enter;
+	    op_free(pushmark);
 	    for (kid = enter->op_sibling; kid; kid = kid->op_sibling)
 		assign(kid, TRUE, &sub_min_modcount, &sub_max_modcount);
 	}
