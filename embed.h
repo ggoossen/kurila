@@ -811,6 +811,12 @@
 #define sv_2cv			Perl_sv_2cv
 #define sv_2io			Perl_sv_2io
 #define sv_2iv_flags		Perl_sv_2iv_flags
+#define av_2mortal(a)		SvAv(Perl_sv_2mortal(aTHX_ AvSv(a)))
+#define hv_2mortal(a)		SvHv(Perl_sv_2mortal(aTHX_ HvSv(a)))
+#define cv_2mortal(a)		SvCv(Perl_sv_2mortal(aTHX_ CvSv(a)))
+#define gv_2mortal(a)		SvGv(Perl_sv_2mortal(aTHX_ GvSv(a)))
+#define io_2mortal(a)		SvIo(Perl_sv_2mortal(aTHX_ IoSv(a)))
+#define re_2mortal(a)		SvRe(Perl_sv_2mortal(aTHX_ ReSv(a)))
 #define sv_2mortal		Perl_sv_2mortal
 #define sv_2nv			Perl_sv_2nv
 #ifdef PERL_CORE
@@ -2977,6 +2983,12 @@
 #define sv_2cv(a,b,c)		Perl_sv_2cv(aTHX_ a,b,c)
 #define sv_2io(a)		Perl_sv_2io(aTHX_ a)
 #define sv_2iv_flags(a,b)	Perl_sv_2iv_flags(aTHX_ a,b)
+#define sv_2mortal(a)		SvAv(Perl_sv_2mortal(aTHX_ AvSv(a)))
+#define sv_2mortal(a)		SvHv(Perl_sv_2mortal(aTHX_ HvSv(a)))
+#define sv_2mortal(a)		SvCv(Perl_sv_2mortal(aTHX_ CvSv(a)))
+#define sv_2mortal(a)		SvGv(Perl_sv_2mortal(aTHX_ GvSv(a)))
+#define sv_2mortal(a)		SvIo(Perl_sv_2mortal(aTHX_ IoSv(a)))
+#define sv_2mortal(a)		SvRe(Perl_sv_2mortal(aTHX_ ReSv(a)))
 #define sv_2mortal(a)		Perl_sv_2mortal(aTHX_ a)
 #define sv_2nv(a)		Perl_sv_2nv(aTHX_ a)
 #ifdef PERL_CORE
