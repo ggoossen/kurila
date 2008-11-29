@@ -88,11 +88,6 @@ static __inline__ void iiSvIOKp_on(pTHX_ SV *sv) {
 #define SvIOKp_on(sv) iiSvIOKp_on(aTHX_ sv)
 
 
-#define av_2mortal(av) inline_av_2mortal(aTHX_ av)
-static __inline__ AV* inline_av_2mortal(pTHX_ AV *av) {
-    return (AV*)sv_2mortal((SV*)av);
-}
-
 #define av_mortalcopy(av) inline_av_mortalcopy(aTHX_ av)
 static __inline__ AV* inline_av_mortalcopy(pTHX_ AV *av) {
     return (AV*)sv_mortalcopy((SV*)av);

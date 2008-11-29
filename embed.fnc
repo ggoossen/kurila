@@ -776,7 +776,7 @@ Apd	|CV*	|sv_2cv		|NULLOK SV* sv|NN GV **const gvp|const I32 lref
 Apd	|IO*	|sv_2io		|NN SV *const sv
 Amb	|IV	|sv_2iv		|NULLOK SV *const sv
 Apd	|IV	|sv_2iv_flags	|NULLOK SV *const sv|const I32 flags
-Apd	|SV*	|sv_2mortal	|NULLOK SV *const sv
+ApdS	|SV*	|sv_2mortal	|NN SV *const sv
 Apd	|NV	|sv_2nv		|NULLOK SV *const sv
 pMd	|SV*	|sv_2num	|NN SV *const sv
 Amb	|char*	|sv_2pv		|NULLOK SV *sv|NULLOK STRLEN *lp

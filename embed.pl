@@ -438,7 +438,9 @@ walk_table {
                 for my $xv (qw|Av Hv Cv Gv Io Re|) {
                     my $alist = join(",", @: '', < @az[[1..nelems(@args)-1]]);
                     my $a1 = @az[0];
-                    (my $xvname = $func) =~ s/^Sv/$xv/;
+                    my $xvname = $func;
+                    $xvname =~ s/^Sv/$xv/;
+                    $xvname =~ s/^sv/$(lc $xv)/;
                     my $ret_convert = $retval =~ m/SV/;
                     my $call = "Perl_" . $func . "(aTHX_ " . $xv . "Sv" . "($a1)$alist)";
                     print $em "#define $xvname(" . $a1 . $alist . ")\t\t" . ($ret_convert ?? "Sv" . $xv . "($call)" !! $call ) . "\n";
