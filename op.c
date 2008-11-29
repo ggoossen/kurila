@@ -4361,7 +4361,7 @@ Perl_process_special_block(pTHX_ const I32 key, CV *const cv)
 
 	call_av = newAV();
 	av_2mortal(call_av);
-	av_push(call_av, SvREFCNT_inc(CvSv(cv)));
+	av_push(call_av, CvSv(cv));
 	call_list(oldscope, call_av);
 
 	PL_curcop = &PL_compiling;
