@@ -2105,13 +2105,7 @@ PP(pp_entersub)
 	    sv_upgrade(avsv, SVt_PVAV);
 	    av = SvAv(avsv);
 	    SAVECLEARSV(PAD_SVl(PAD_ARGS_INDEX));
-	    if (AvREAL(av)) {
-		/* @_ is normally not REAL--this should only ever
-		 * happen when DB::sub() calls things that modify @_ */
-		av_clear(av);
-		AvREAL_off(av);
-		AvREIFY_on(av);
-	    }
+	    AvREAL_on(av);
 	    CX_CURPAD_SAVE(cx->blk_sub);
 	    ++MARK;
 
@@ -2132,8 +2126,10 @@ PP(pp_entersub)
 	    AvFILLp(av) = items - 1;
 	
 	    while (items--) {
-		if (*MARK)
+		if (*MARK) {
 		    SvTEMP_off(*MARK);
+		    SvREFCNT_inc(*MARK);
+		}
 		MARK++;
 	    }
 	}
