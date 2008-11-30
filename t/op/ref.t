@@ -2,7 +2,7 @@
 
 require './test.pl';
 
-plan(101);
+plan(100);
 
 our ($bar, $foo, $baz, $FOO, $BAR, $BAZ, @ary, @ref,
      @a, @b, @c, @d, $ref, $object, @foo, @bar, @baz,
