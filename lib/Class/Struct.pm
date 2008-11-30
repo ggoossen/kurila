@@ -155,7 +155,7 @@ sub struct {
             }
             $out .= "  sub $name \{$cmt\n    my \$r = shift;\n";
             if( $base_type eq 'ARRAY' ){
-                $elem = "[$cnt]";
+                $elem = "[+$cnt]";
                 ++$cnt;
             }
             elsif( $base_type eq 'HASH' ){
@@ -165,7 +165,7 @@ sub struct {
                 $out .= "    my \$i;\n";
                 $out .= "    \@_ ?? (\$i = shift) !! return \$r->$elem;\n"; 
                 $out .= "    if (ref(\$i) eq 'ARRAY' && !\@_) \{ \$r->$elem = \$i; return \$r \}\n";
-                $sel = "->[\$i]";
+                $sel = "->[+\$i]";
             }
             elsif( defined %hashes{?$name} ){
                 $out .= "    my \$i;\n";

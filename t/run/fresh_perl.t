@@ -351,7 +351,7 @@ sub bad {
    print "K";
 }
 EXPECT
-OK
+O12345678910K
 ########
 # Bug 20010506.041
 use utf8;

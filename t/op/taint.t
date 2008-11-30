@@ -96,8 +96,8 @@ sub any_tainted (@) {
     return scalar grep { tainted($_) } @_;
 }
 sub tainted ($) {
-    my $tainted = not try { @_[0], kill 0; 1};
-    die if $@ and $@->message !~ m/^Insecure dependency in kill while running with -T switch/;
+    my $tainted = not try { kill 0, @_[0]; 1};
+    return 0 if $@ and $@->message !~ m/^Insecure dependency in kill while running with -T switch/;
     return $tainted;
 }
 sub all_tainted (@) {
@@ -1095,7 +1095,7 @@ do {
 do {
     my @a;
     local $main::TODO = 1;
-    @a[0] = $^X;
+    @a[+0] = $^X;
     my $i = 0;
     while(@a[0] =~ m/(.)/g ) {
 	last if $i++ +> 10000;
