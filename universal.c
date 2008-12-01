@@ -200,6 +200,7 @@ XS(XS_utf8_decode);
 XS(XS_utf8_unicode_to_native);
 XS(XS_utf8_native_to_unicode);
 XS(XS_Internals_SvREADONLY);
+XS(XS_Internals_SvTAINTED);
 XS(XS_Internals_peek);
 XS(XS_Internals_SvREFCNT);
 XS(XS_Internals_hv_clear_placehold);
@@ -266,6 +267,7 @@ Perl_boot_core_UNIVERSAL(pTHX)
     newXS("utf8::native_to_unicode", XS_utf8_native_to_unicode, file);
     newXS("utf8::unicode_to_native", XS_utf8_unicode_to_native, file);
     newXSproto("Internals::SvREADONLY",XS_Internals_SvREADONLY, file, "\\[$%@];$");
+    newXSproto("Internals::SvTAINTED",XS_Internals_SvTAINTED, file, "\\[$%@];$");
     newXS("Internals::SvREFCNT",XS_Internals_SvREFCNT, file);
     newXS("Internals::peek",XS_Internals_peek, file);
     newXSproto("Internals::hv_clear_placeholders",
@@ -1110,6 +1112,33 @@ XS(XS_Internals_SvREADONLY)	/* This is dangerous stuff. */
 	else {
 	    /* I hope you really know what you are doing. */
 	    SvREADONLY_off(sv);
+	    XSRETURN_NO;
+	}
+    }
+    XSRETURN_UNDEF; /* Can't happen. */
+}
+
+XS(XS_Internals_SvTAINTED)
+{
+    dVAR;
+    dXSARGS;
+    SV * const sv = SvRV(ST(0));
+    SvGETMAGIC(sv);
+    PERL_UNUSED_ARG(cv);
+
+    if (items == 1) {
+	 if (SvTAINTED(sv))
+	     XSRETURN_YES;
+	 else
+	     XSRETURN_NO;
+    }
+    else if (items == 2) {
+	if (SvTRUE(ST(1))) {
+	    SvTAINTED_on(sv);
+	    XSRETURN_YES;
+	}
+	else {
+	    SvTAINTED_off(sv);
 	    XSRETURN_NO;
 	}
     }

@@ -96,9 +96,7 @@ sub any_tainted (@) {
     return scalar grep { tainted($_) } @_;
 }
 sub tainted ($) {
-    my $tainted = not try { kill 0, @_[0]; 1};
-    return 0 if $@ and $@->message !~ m/^Insecure dependency in kill while running with -T switch/;
-    return $tainted;
+    return Internals::SvTAINTED(@_[0]);
 }
 sub all_tainted (@) {
     for ( @_) { return 0 unless tainted $_ }
