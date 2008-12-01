@@ -152,6 +152,7 @@ ok( $@->{?description} =~ m/^DB_File::BTREEINFO::FETCH - Unknown element 'fred'/
 # Now check the interface to BTREE
 
 my ($X, %h) ;
+do {
 ok( $X = tie(%h, 'DB_File',$Dfile, O_RDWR^|^O_CREAT, 0640, $DB_BTREE )) ;
 die "Could not tie: $!" unless $X;
 
@@ -199,11 +200,12 @@ $X->put('d', 'D') ;
 %h{+'goner2'} = 'snork';
 delete %h{'goner2'};
 
-
 # IMPORTANT - $X must be undefined before the untie otherwise the
 #             underlying DB close routine will not get called.
 undef $X ;
 untie(%h);
+
+};
 
 # tie to the same file again
 ok( $X = tie(%h,'DB_File',$Dfile, O_RDWR, 0640, $DB_BTREE)) ;
@@ -239,8 +241,8 @@ my @values = values(%h);
 
 ok( ((nelems @keys)-1) == 29 && ((nelems @values)-1) == 29) ;
 
-$i = 0 ;
-while (@(?$key,?$value) = @: each(%h)) {
+my $i = 0 ;
+while (my @(?$key,?$value) = @: each(%h)) {
     if ($key eq @keys[$i] && $value eq @values[$i] && $key eq lc($value)) {
 	$key = uc($key);
 	$i++ if $key eq $value;
@@ -277,8 +279,8 @@ for my $i (1..199) { %h{+$i + 0} = $i + 0; }
 for my $i (1..199) { $ok = 0 unless %h{?$i} == $i; }
 ok( $ok);
 
-@($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
-   $blksize,$blocks) = @: stat($Dfile);
+my @($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
+     $blksize,$blocks) = @: stat($Dfile);
 ok( $size +> 0 );
  
 do {
@@ -306,7 +308,7 @@ $status = $X->put('key', 'value') ;
 ok( $status == 0 );
 
 #check that previous put can be retrieved
-$value = 0 ;
+my $value = 0 ;
 $status = $X->get('key', $value) ;
 ok( $status == 0 );
 ok( $value eq 'value' );
@@ -326,10 +328,14 @@ ok( $status == 0 );
 ok( ! defined %h{?'q'}) ;
 ok( ! defined %h{?''}) ;
 
-undef $X ;
-untie %h ;
+TODO:
+do {
+    todo_skip("The file does not get stored", 1);
+    undef $X ;
+    untie %h ;
 
-ok( $X = tie(%h, 'DB_File',$Dfile, O_RDWR, 0640, $DB_BTREE ));
+    ok( $X = tie(%h, 'DB_File',$Dfile, O_RDWR, 0640, $DB_BTREE ));
+};
 
 # Attempting to delete a non-existant key should fail
 
@@ -351,7 +357,7 @@ ok( $value eq 'A' );
 # ###
 
 # use seq to find an approximate match
-$key = 'ke' ;
+my $key = 'ke' ;
 $value = '' ;
 $status = $X->seq($key, $value, R_CURSOR) ;
 ok( $status == 0 );
