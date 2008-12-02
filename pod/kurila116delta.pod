@@ -1,0 +1,120 @@
+=head1 NAME
+
+kurila116delta - what is new for Perl Kurila 1.16
+
+=head1 DESCRIPTION
+
+This document describes differences between Perl Kurila 1.15 and Perl Kurila 1.16
+
+=head1 Highlights In Perl Kurila 1.16
+
+Structured assignments. 
+
+=head1 Core Enhancements
+
+=head2 Structured assignments
+
+Structured assignments are a new way, to extract values from complex
+structures.
+
+For example:
+
+    %( aap => $aap, ?noot => $noot ) = $h;
+
+C<$h> must be an hash with a key C<aap> and possible a key C<noot>, the
+corresponding values are assigned to C<$aap> and C<$noot>.  Assigns
+C<$aap> to the key C<$noot>.
+
+As a more basic example:
+
+    @( $a, $b ) = @list;
+
+Assigns C<$a> to the first element, and C<$b> the second element. If there
+are more elements in the list an error is raised. To allow for more
+element do
+
+    @($a, $b, ...) = @list;
+
+To allow assignment without two elements ad a C<?> in front of the
+variable:
+
+    @($a, ? $b, ...) = @list;
+
+If C<@list> only has only element C<$b> will be set to C<undef>.
+Similairly for hashes:
+
+    %( aap => $aap, ?noot => $noot, ... ) = $h;
+
+C<$h> must be a hash which must have the key C<aap>. C<$aap> is
+assigned the value of C<$h{aap}>, and C<$noot> is assigned the
+value of C<$h{?noot}>. 
+Extra values in a hash or array can be ignored using C<...> or
+assigned to hash or array using C<< @< >> or C<< %< >>. For example:
+
+    @($a, @< $remaining) = @list
+
+Assigns the first element of C<@list> to C<$a> and the remaining elements to
+C<$remaining>.
+
+    @( $a, %< $h ) = @( "arg1", "key1" => "value1" );
+
+After the assignment C<$a> is C<"arg1"> and C<$h> is C<< %( "key1" => "value1" ) >>
+
+=head3 Rationale
+
+Improve assignments.
+
+=head2 Controlled hash and array element access and creation
+
+Default when you access a hash key or array element which does not
+exists an error is raised. To automaticly create the hash key or array
+element if it does not exists, add the C<+> operator to the key,
+i.e. C<$h{+$key}>. To ignore accessing a non-existent key or element,
+add the C<?> to the key, i.e. C<@a[?$i]>.
+
+=head3 Rationale
+
+Direct control over the creation and access of hash and array
+elements.
+
+=head2 Removed list assigments
+
+List assignments are no longer possible
+
+=head3 Rationale
+
+List assignments have been removed in favour of structured assigments.
+
+=head1 KNOWN BUGS
+
+=head2 Documentation
+
+Documentation has not been updated for many of the changes for kurila.
+
+=head2 Self referential assignment problems
+
+Assigning some value to a part of itself behaves unexpected.
+
+=head2 Tied hashes with complex data
+
+Tied hashes do not work correctly with complex data
+structures. Assigning arrays or hashes to a value of tied hash might
+behave strange.
+
+=head2 Limited platform support
+
+Perl Kurila has only been tested/build for x86_64-linux-gnu-thread-multi platform.
+
+=head1 SEE ALSO
+
+The F<INSTALL> file for how to build Perl Kurila.
+
+The F<README> file for general stuff.
+
+The F<Artistic> and F<Copying> files for copyright information.
+
+=head1 HISTORY
+
+Written by Gerard Goossen <F<gerard@tty.nl>>.
+
+=cut
