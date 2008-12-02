@@ -1,4 +1,4 @@
-#!/usr/bin/perl -ws
+#!/usr/bin/perl -w
 
 #
 # manicheck - check files against the MANIFEST
@@ -12,14 +12,6 @@
 # With option -m prints out only the extra files (and without the "missing: ")
 #
 
-BEGIN {
-  $^WARN_HOOK = sub {
-    help() if @_[0] =~ m/"main::\w" used only once: possible typo at /;
-  };
-}
-
-use strict;
-
 sub help {
   die <<EOF;
 $0: Usage: $0 [-x|-m|-l|-h]
@@ -30,26 +22,30 @@ $0: Usage: $0 [-x|-m|-l|-h]
 EOF
 }
 
-use vars qw($x $m $l $h);
+use Getopt::Long;
+
+our ($x, $m, $l, $h);
+
+GetOptions("extra" => \$x, missing => \$m, lines => \$l, help => \$h);
 
 help() if $h;
 
 open(MANIFEST, "<", "MANIFEST") or die "MANIFEST: $!";
 
 my %mani;
-my %mand = %( qw(. 1) );
-use File::Basename qw(dirname);
+my %mand = %: ".", 1;
+use File::Basename < qw(dirname);
 
 while ( ~< *MANIFEST) {
   if (m/^(\S+)\s+(.+)$/) {
-    %mani{$1}++;
+    %mani{+$1}++;
     my $d = dirname($1);
     while($d ne '.') {
-	%mand{$d}++;
+	%mand{+$d}++;
 	$d = dirname($d);
     }
   } else {
-    warn "MANIFEST:$.:$_";
+    warn "MANIFEST:$(iohandle::input_line_number(\*MANIFEST)):$_";
   }
 }
 
@@ -60,14 +56,15 @@ use File::Find;
 find(sub {
        my $n = $File::Find::name;
        $n =~ s:^\./::;
-       %find{$n}++;
+       return if $n =~ m{^\.git/};
+       %find{+$n}++;
      }, '.' );
 
 my @xtra;
 my @miss;
 
 for (sort keys %find) {
-  push @xtra, $_ unless %mani{$_} || %mand{$_};
+  push @xtra, $_ unless %mani{?$_} || %mand{?$_};
 }
 
 for (sort keys %mani) {
@@ -79,8 +76,8 @@ $" = "\n" if $l;
 unshift @xtra, "extra:"   if (nelems @xtra) && !$x;
 unshift @miss, "missing:" if (nelems @miss) && !$m;
 
-print "{join ' ', <@xtra}\n", if (nelems @xtra) && !$m;
-print "{join ' ', <@miss}\n"  if (nelems @miss) && !$x;
+print join(' ', @xtra) . "\n", if (nelems @xtra) && !$m;
+print join(' ', @miss) . "\n"  if (nelems @miss) && !$x;
 
 exit 0;
 
