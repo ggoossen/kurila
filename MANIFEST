@@ -977,6 +977,7 @@ lib/File/Fetch/t/01_File-Fetch.t	File::Fetch tests
 lib/File/Find.pm		Routines to do a find
 lib/File/Find/t/find.t		See if File::Find works
 lib/File/Find/t/taint.t		See if File::Find works with taint
+lib/File/GlobPP.pm		Pure perl glob
 lib/FileHandle.pm		Backward-compatible front end to IO extension
 lib/FileHandle.t		See if FileHandle works
 lib/File/Path.pm		Do things like `mkdir -p' and `rm -r'
@@ -2150,6 +2151,7 @@ t/lex/ver.t			See if v-strings and the %v format flag work
 t/lex/location.t		See if locations are correctly saved
 t/op/anon_array.t		See if @( ... ) work
 t/op/anon_hash.t		See if %( ... ) work
+t/op/aslice.t		See if [[...]] work
 t/lib/Cname.pm			Test charnames in regexes (op/pat.t)
 t/lib/common.pl			Helper for lib/{warnings,feature}.t
 t/lib/commonsense.t		See if configuration meets basic needs
@@ -2259,6 +2261,8 @@ t/mro/vulcan_c3.t		mro tests
 Todo.micro			The Wishlist for microperl
 toke.c				The tokener
 t/op/arith.t			See if arithmetic works
+t/op/arrayexpand.t			See if the array expand operator works
+t/op/hashexpand.t			See if the hash expand operator works
 t/op/assignwarn.t		See if OP= operators warn correctly for undef targets
 t/op/auto.t			See if autoincrement et all work
 t/op/bless.t			See if bless works
@@ -2293,6 +2297,7 @@ t/op/goto_xs.t			See if "goto &sub" works on XSUBs
 t/op/grent.t			See if getgr*() functions work
 t/op/grep.t			See if grep() and map() work
 t/op/groups.t			See if $( works
+t/op/helem.t		See if hash element operator work
 t/op/hashassign.t		See if hash assignments work
 t/op/hashwarn.t			See if warnings for bad hash assignments work
 t/op/inccode.t			See if coderefs work in @INC
@@ -2321,11 +2326,14 @@ t/op/negate.t			See if unary minus works
 t/op/nelems.t			See if nelems works
 t/op/not.t			See if not works
 t/op/numconvert.t		See if accessing fields does not change numeric values
+t/op/sassign.t			See if assignment operator works
+t/op/try.t			See if try operator works
 t/op/oct.t			See if oct and hex work
 t/op/ord.t			See if ord works
 t/op/or.t			See if || works in weird situations
 t/op/override.t			See if operator overriding works
 t/op/pack.t			See if pack and unpack work
+t/op/padsv.t			See if my variables operators works
 t/op/pat.t			See if esoteric patterns work
 t/op/pos.t			See if pos works
 t/op/pow.t			See if ** works
@@ -2442,6 +2450,7 @@ t/run/switches.t		Tests for the other switches (-0, -l, -c, -s, -M, -m, -V, -v, 
 t/run/switchI.t			Test the -I switch
 t/run/switchn.t			Test the -n switch
 t/run/switchp.t			Test the -p switch
+t/run/switchp.aux			Test the -p switch
 t/run/switcht.t			Test the -t switch
 t/run/switchx2.aux		Data for switchx.t
 t/run/switchx.aux		Data for switchx.t
@@ -2454,6 +2463,7 @@ t/sv/object.t			See if objects work
 t/sv/closure.t			See if closures work
 t/sv/fh.t			See if filehandles work
 t/sv/hash.t			See if the complexity attackers are repelled
+t/sv/hash_tied.t			See if the tied hashes work
 t/sv/magic.t			See if magic variables work
 t/sv/sv_2pv.t			See if stringification (sv_2pv) works
 t/TEST				The regression tester
