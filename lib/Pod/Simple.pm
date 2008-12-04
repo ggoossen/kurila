@@ -419,7 +419,7 @@ sub parse_from_file {
   # An emulation of Pod::Parser's interface, for the sake of Perldoc.
   # Basically just a wrapper around parse_file.
 
-  my@($self, $source, $to) =  @_;
+  my @($self, ?$source, ?$to) =  @_;
   $self = $self->new unless ref($self); # so we tolerate being a class method
   
   if(!defined $source)             { $source = *STDIN{IO}

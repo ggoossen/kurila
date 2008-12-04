@@ -13,7 +13,7 @@ push @MANIFEST, 'lib/Config.pod', 'lib/Errno.pm', 'lib/lib.pm',
 for ( @MANIFEST) {
      my $filename;
      next unless s|^lib/|| or m|^ext/|;
-     my @($origfilename) = ($filename) = m|^(\S+)|;
+     my @($origfilename) = @($filename) = @: m|^(\S+)|;
      $filename =~ s|^[^/]+/|| if $filename =~ s|^ext/||;
      next unless $filename =~ m!\.p(m|od)$!;
      unless (open (MOD, "<", "../lib/$filename")) {
