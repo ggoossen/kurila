@@ -121,7 +121,7 @@ while (~< *UTILS) {
 	    $xold =~ s/^\Q%opts{'destdir'}\E// if %opts{'destdir'};
 	    my $xnew = $new;
 	    $xnew =~ s/^\Q%opts{'destdir'}\E// if %opts{'destdir'};
-	    $packlist->{$xnew} = \%( from => $xold, type => 'link' );
+	    $packlist->{data}{$xnew} = \%( from => $xold, type => 'link' );
 	}
     }
 }
@@ -219,7 +219,7 @@ sub pod2man {
 	if (!%opts{notify} && $parser->parse_from_file($pod, $tmp)) {
             if (-s $tmp) {
                 if (rename($tmp, $manpage)) {
-                    $packlist->{$xmanpage} = \%( type => 'file' );
+                    $packlist->{data}{$xmanpage} = \%( type => 'file' );
                     next;
                 }
             }
