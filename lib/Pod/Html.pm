@@ -1240,7 +1240,7 @@ sub process_back {
     # defined because an =item directive may have never appeared and thus
     # $Listtype[$Listlevel] may have never been initialized.
     $Listlevel--;
-    if( defined @Listtype[$Listlevel] ){
+    if( defined @Listtype[?$Listlevel] ){
         if ( @Listtype[$Listlevel] eq 'dl' ){
             print HTML "</dd>\n" unless $ListNewTerm;
         } else {
