@@ -132,7 +132,7 @@ sub write($;$)
         print $fh ("$key");
         if (ref($data)) {
             foreach my $k (sort(keys(%$data))) {
-                print $fh (" $k=$data{$k}");
+                print $fh (" $k=$data->{$k}");
             }
         }
         print $fh ("\n");
