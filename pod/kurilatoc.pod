@@ -4575,7 +4575,7 @@ tarball, Announce to the modules list, Announce to clpa, Fix bugs!
 
 L<perldoc|perldoc>, L<pod2man|pod2man> and L<pod2text|pod2text>,
 L<pod2html|pod2html> and L<pod2latex|pod2latex>, L<pod2usage|pod2usage>,
-L<podselect|podselect>, L<podchecker|podchecker>, L<splain|splain>,
+L<podselect|podselect>, L<podchecker|podchecker>,
 L<roffitall|roffitall>
 
 =item Convertors
@@ -24929,8 +24929,6 @@ don't all have manual pages yet:
 =item pod2man
 
 =item s2p
-
-=item splain
 
 =item xsubpp
 

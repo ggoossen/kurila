@@ -61,11 +61,6 @@ a given file.
 If you're writing your own documentation in POD, the F<podchecker>
 utility will look for errors in your markup.
 
-=item L<splain|splain>
-
-F<splain> is an interface to L<perldiag> - paste in your error message
-to it, and it'll explain it for you.
-
 =item L<roffitall|roffitall>
 
 The C<roffitall> utility is not installed on your system but lives in
@@ -268,7 +263,7 @@ validate your packlists and even create a tarball from an installed module.
 
 L<perldoc|perldoc>, L<pod2man|pod2man>, L<perlpod>,
 L<pod2html|pod2html>, L<pod2usage|pod2usage>, L<podselect|podselect>,
-L<podchecker|podchecker>, L<splain|splain>, L<perldiag>,
+L<podchecker|podchecker>, L<perldiag>,
 L<roffitall|roffitall>, L<a2p|a2p>, L<s2p|s2p>, L<find2perl|find2perl>,
 L<File::Find|File::Find>, L<pl2pm|pl2pm>, L<perlbug|perlbug>,
 L<h2ph|h2ph>, L<h2xs|h2xs>, L<dprofpp|dprofpp>,

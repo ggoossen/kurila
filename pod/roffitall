@@ -115,7 +115,6 @@ toroff=`
     $mandir/pod2html.1	\
     $mandir/pod2man.1	\
     $mandir/s2p.1	\
-    $mandir/splain.1	\
     $mandir/xsubpp.1	\
 			\
     $libdir/attrs.3	\
