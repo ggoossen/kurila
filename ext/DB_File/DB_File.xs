@@ -983,8 +983,8 @@ SV *   sv ;
         if (sv_isa(sv, "DB_File::HASHINFO"))
         {
 
-	    if (!isHASH)
-	        croak("DB_File can only tie an associative array to a DB_HASH database") ;
+/* 	    if (!isHASH) */
+/* 	        croak("DB_File can only tie an associative array to a DB_HASH database") ; */
 
             RETVAL->type = DB_HASH ;
             openinfo = (void*)info ;
@@ -1018,8 +1018,8 @@ SV *   sv ;
         }
         else if (sv_isa(sv, "DB_File::BTREEINFO"))
         {
-	    if (!isHASH)
-	        croak("DB_File can only tie an associative array to a DB_BTREE database");
+/* 	    if (!isHASH) */
+/* 	        croak("DB_File can only tie an associative array to a DB_BTREE database"); */
 
             RETVAL->type = DB_BTREE ;
             openinfo = (void*)info ;
@@ -1266,8 +1266,8 @@ SV *   sv ;
         if (sv_isa(sv, "DB_File::HASHINFO"))
         {
 
-	    if (!isHASH)
-	        croak("DB_File can only tie an associative array to a DB_HASH database") ;
+/* 	    if (!isHASH) */
+/* 	        croak("DB_File can only tie an associative array to a DB_HASH database") ; */
 
             RETVAL->type = DB_HASH ;
   

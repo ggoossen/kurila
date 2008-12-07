@@ -113,17 +113,10 @@ myok(11, $dbh->{?hash} \== $some_sub );
 $dbh->{+lorder} = 1234 ;
 myok(12, $dbh->{?lorder} == 1234 );
 
-# Check that an invalid entry is caught both for store & fetch
-eval '$dbh->{fred} = 1234' ;
-myok(13, $@->{?description} =~ m/^DB_File::HASHINFO::STORE - Unknown element 'fred'/ );
-eval 'my $q = $dbh->{fred}' ;
-myok(14, $@->{?description} =~ m/^DB_File::HASHINFO::FETCH - Unknown element 'fred'/ );
-
 
 # Now check the interface to HASH
-my ($X, %h);
-myok(15, $X = tie(%h, 'DB_File',$Dfile, O_RDWR^|^O_CREAT, 0640, $DB_HASH ) );
-die "Could not tie: $!" unless $X;
+my %h = DB_File->new($Dfile, O_RDWR^|^O_CREAT, 0640, $DB_HASH );
+myok(15, %h);
 
 my @($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
    $blksize,$blocks) = @: stat($Dfile);
@@ -134,77 +127,50 @@ myok(16, ($mode ^&^ 0777) == (($^O eq 'os2' || $^O eq 'MacOS') ?? 0666 !! 0640) 
    %noMode{?$^O} );
 
 my ($key, $value, $i);
-while (@(?$key,?$value) = @: each(%h)) {
-    $i++;
-}
+# while (@(?$key,?$value) = @: each(%h)) {
+#     $i++;
+# }
 myok(17, !$i );
 
-%h{+'goner1'} = 'snork';
+%h->put('goner1', 'snork');
 
-%h{+'abc'} = 'ABC';
-myok(18, %h{?'abc'} eq 'ABC' );
-myok(19, !defined %h{?'jimmy'} );
-myok(20, !exists %h{'jimmy'} );
-myok(21, exists %h{'abc'} );
+%h->put('abc', 'ABC');
+is( %h->FETCH("abc"), 'ABC' );
+is( %h->FETCH("jimmy"), undef );
 
-%h{+'def'} = 'DEF';
-%h{+'jkl' . "\034" . 'mno'} = "JKL\034MNO";
-%h{+join("\034", @( 'a',2,3,4,5))} = join("\034", @('A',2,3,4,5));
-%h{+'a'} = 'A';
+%h->put('def', 'DEF');
+%h->put('jkl' . "\034" . 'mno', "JKL\034MNO");
+%h->put(join("\034", @: 'a',2,3,4,5), join("\034", @:'A',2,3,4,5));
+%h->put('a', 'A');
+%h->put('b', 'B');
+%h->put('c', 'C');
+%h->put('d', 'D') ;
+for (qw|e f g h i|) {
+    %h->put($_, uc($_));
+}
 
-#$h{'b'} = 'B';
-$X->STORE('b', 'B') ;
-
-%h{+'c'} = 'C';
-
-#$h{'d'} = 'D';
-$X->put('d', 'D') ;
-
-%h{+'e'} = 'E';
-%h{+'f'} = 'F';
-%h{+'g'} = 'X';
-%h{+'h'} = 'H';
-%h{+'i'} = 'I';
-
-%h{+'goner2'} = 'snork';
-delete %h{'goner2'};
-
+%h->put('goner2', 'snork');
+%h->DELETE('goner2');
 
 # IMPORTANT - $X must be undefined before the untie otherwise the
 #             underlying DB close routine will not get called.
-undef $X ;
-untie(%h);
+%h = undef;
 
 
 # tie to the same file again, do not supply a type - should default to HASH
-myok(22, $X = tie(%h,'DB_File',$Dfile, O_RDWR, 0640) );
+%h = DB_File->new($Dfile, O_RDWR, 0640);
+ok(%h);
 
 # Modify an entry from the previous tie
-%h{+'g'} = 'G';
+for (qw(g j k l m n o p q r s t u v w x y z)) {
+    %h->put($_, uc($_));
+}
 
-%h{+'j'} = 'J';
-%h{+'k'} = 'K';
-%h{+'l'} = 'L';
-%h{+'m'} = 'M';
-%h{+'n'} = 'N';
-%h{+'o'} = 'O';
-%h{+'p'} = 'P';
-%h{+'q'} = 'Q';
-%h{+'r'} = 'R';
-%h{+'s'} = 'S';
-%h{+'t'} = 'T';
-%h{+'u'} = 'U';
-%h{+'v'} = 'V';
-%h{+'w'} = 'W';
-%h{+'x'} = 'X';
-%h{+'y'} = 'Y';
-%h{+'z'} = 'Z';
+%h->put('goner3', 'snork');
 
-%h{+'goner3'} = 'snork';
+%h->del('goner1');
 
-delete %h{'goner1'};
-$X->DELETE('goner3');
-
+__END__
 my @keys = keys(%h);
 my @values = values(%h);
 
@@ -371,19 +337,20 @@ untie %h ;
 
 do {
     # check ability to override the default hashing
-    my %x ;
     my $filename = "xyz" ;
     my $hi = DB_File::HASHINFO->new() ;
     $::count = 0 ;
     $hi->{+hash} = sub { ++$::count ; length @_[0] } ;
-    myok(49, tie %x, 'DB_File', $filename, O_RDWR^|^O_CREAT, 0640, $hi ) ;
-    %h{+"abc"} = 123 ;
-    myok(50, %h{?"abc"} == 123) ;
-    untie %x ;
+    my %h = DB_File->open( $filename, O_RDWR^|^O_CREAT, 0640, $hi ) ;
+    %h->put("abc", 123 );
+    my $value;
+    %h->get("abc", $value);
+    myok(50, $value == 123) ;
     unlink $filename ;
     myok(51, $::count +>0) ;
 };
 
+__END__
 myok(52, 1);
 
 do {
