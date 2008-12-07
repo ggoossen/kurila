@@ -821,7 +821,7 @@ sub install { #XXX OS-SPECIFIC
         }
 
         # Record the full pathname.
-        $packlist->{+$targetfile}++;
+        $packlist->{data}{+$targetfile}++;
     }
 
     if (%pack{?'write'}) {
@@ -1008,7 +1008,7 @@ sub uninstall {
     # my $my_req = $self->catfile(qw(auto ExtUtils Install forceunlink.al));
     # require $my_req; # Hairy, but for the first
     my $packlist = ExtUtils::Packlist->new($fil);
-    foreach (sort(keys(%$packlist))) {
+    foreach (sort(keys($packlist->{data}))) {
         chomp;
         print "unlink $_\n" if $verbose;
         forceunlink($_,'tryhard') unless $dry_run;

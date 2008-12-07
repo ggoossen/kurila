@@ -20,17 +20,7 @@ require Tie::Hash;
 sub new
 {
     my $pkg = shift ;
-    my %x ;
-    tie %x, $pkg ;
-    bless \%x, $pkg ;
-}
-
-
-sub TIEHASH
-{
-    my $pkg = shift ;
-
-    bless \%( VALID => \%( 
+    return bless \%( VALID => \%( 
 		       	bsize	  => 1,
 			ffactor	  => 1,
 			nelem	  => 1,
@@ -42,62 +32,6 @@ sub TIEHASH
           ), $pkg ;
 }
 
-
-sub FETCH 
-{  
-    my $self  = shift ;
-    my $key   = shift ;
-
-    return $self->{GOT}->{?$key} if exists $self->{VALID}->{$key}  ;
-
-    my $pkg = ref $self ;
-    die "$($pkg)::FETCH - Unknown element '$key'" ;
-}
-
-
-sub STORE 
-{
-    my $self  = shift ;
-    my $key   = shift ;
-    my $value = shift ;
-
-    my $type = $self->{VALID}->{?$key};
-
-    if ( $type )
-    {
-    	die "Key '$key' not associated with a code reference" 
-	    if $type == 2 && !ref $value && ref $value ne 'CODE';
-        $self->{GOT}->{+$key} = $value ;
-        return ;
-    }
-    
-    my $pkg = ref $self ;
-    die "$($pkg)::STORE - Unknown element '$key'" ;
-}
-
-sub DELETE 
-{
-    my $self = shift ;
-    my $key  = shift ;
-
-    if ( exists $self->{VALID}->{$key} )
-    {
-        delete $self->{GOT}->{$key} ;
-        return ;
-    }
-    
-    my $pkg = ref $self ;
-    die "DB_File::HASHINFO::DELETE - Unknown element '$key'" ;
-}
-
-sub EXISTS
-{
-    my $self = shift ;
-    my $key  = shift ;
-
-    exists $self->{VALID}->{$key} ;
-}
-
 sub NotHere
 {
     my $self = shift ;
@@ -105,10 +39,6 @@ sub NotHere
 
     die ref($self) . " does not define the method $($method)" ;
 }
-
-sub FIRSTKEY { my $self = shift ; $self->NotHere("FIRSTKEY") }
-sub NEXTKEY  { my $self = shift ; $self->NotHere("NEXTKEY") }
-sub CLEAR    { my $self = shift ; $self->NotHere("CLEAR") }
 
 package DB_File::RECNOINFO ;
 

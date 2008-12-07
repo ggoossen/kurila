@@ -2,7 +2,7 @@ package POSIX;
 
 use warnings;
 
-our(@ISA, %EXPORT_TAGS, @EXPORT_OK, @EXPORT, %SIGRT);
+our(@ISA, %EXPORT_TAGS, @EXPORT_OK, @EXPORT);
 
 our $VERSION = "1.13";
 
@@ -33,21 +33,6 @@ my %NON_CONSTS = %(< map {($_,1)}
 for my $name (keys %NON_CONSTS) {
     *{Symbol::fetch_glob($name)} = sub { int_macro_int($name, @_[?0]) };
 }
-
-package POSIX::SigRt;
-
-use Tie::Hash;
-
-use vars < qw($SIGACTION_FLAGS $_SIGRTMIN $_SIGRTMAX $_sigrtn @ISA);
-@POSIX::SigRt::ISA = qw(Tie::StdHash);
-
-$SIGACTION_FLAGS = 0;
-
-tie %POSIX::SIGRT, 'POSIX::SigRt';
-
-sub DESTROY {};
-
-package POSIX;
 
 sub usage {
     my @($mess) =  @_;
@@ -800,7 +785,7 @@ sub load_imports {
     signal_h =>	\qw(SA_NOCLDSTOP SA_NOCLDWAIT SA_NODEFER SA_ONSTACK
 		SA_RESETHAND SA_RESTART SA_SIGINFO SIGABRT SIGALRM
 		SIGCHLD SIGCONT SIGFPE SIGHUP SIGILL SIGINT SIGKILL
-		SIGPIPE %SIGRT SIGRTMIN SIGRTMAX SIGQUIT SIGSEGV SIGSTOP
+		SIGPIPE SIGRTMIN SIGRTMAX SIGQUIT SIGSEGV SIGSTOP
 		SIGTERM SIGTSTP SIGTTIN	SIGTTOU SIGUSR1 SIGUSR2
 		SIG_BLOCK SIG_DFL SIG_ERR SIG_IGN SIG_SETMASK SIG_UNBLOCK
 		raise sigaction sigpending sigprocmask sigsuspend),
@@ -958,57 +943,4 @@ sub mask    { @_[0]->{+MASK}    = @_[1] if (nelems @_) +> 1; @_[0]->{?MASK} };
 sub flags   { @_[0]->{+FLAGS}   = @_[1] if (nelems @_) +> 1; @_[0]->{?FLAGS} };
 sub safe    { @_[0]->{+SAFE}    = @_[1] if (nelems @_) +> 1; @_[0]->{?SAFE} };
 
-package POSIX::SigRt;
-
-
-sub _init {
-    $_SIGRTMIN = &POSIX::SIGRTMIN( < @_ );
-    $_SIGRTMAX = &POSIX::SIGRTMAX( < @_ );
-    $_sigrtn   = $_SIGRTMAX - $_SIGRTMIN;
-}
-
-sub _croak {
-    &_init( < @_ ) unless defined $_sigrtn;
-    die "POSIX::SigRt not available" unless defined $_sigrtn && $_sigrtn +> 0;
-}
-
-sub _getsig {
-    &_croak( < @_ );
-    my $rtsig = @_[0];
-    # Allow (SIGRT)?MIN( + n)?, a common idiom when doing these things in C.
-    $rtsig = $_SIGRTMIN + ($1 || 0)
-	if $rtsig =~ m/^(?:(?:SIG)?RT)?MIN(\s*\+\s*(\d+))?$/;
-    return $rtsig;
-}
-
-sub _exist {
-    my $rtsig = _getsig(@_[1]);
-    my $ok    = $rtsig +>= $_SIGRTMIN && $rtsig +<= $_SIGRTMAX;
-    return @($rtsig, $ok);
-}
-
-sub _check {
-    my @($rtsig, $ok) =  &_exist( < @_ );
-    die "No POSIX::SigRt signal @_[1] (valid range SIGRTMIN..SIGRTMAX, or $_SIGRTMIN..$_SIGRTMAX)"
-	unless $ok;
-    return $rtsig;
-}
-
-sub new {
-    my @($rtsig, $handler, $flags) =  @_;
-    my $sigset = POSIX::SigSet->new($rtsig);
-    my $sigact = POSIX::SigAction->new($handler,
-				       $sigset,
-				       $flags);
-    POSIX::sigaction($rtsig, $sigact);
-}
-
-sub EXISTS { &_exist( < @_ ) }
-sub FETCH  { my $rtsig = &_check( < @_ );
-	     my $oa = POSIX::SigAction->new();
-	     POSIX::sigaction($rtsig, undef, $oa);
-	     return $oa->{?HANDLER} }
-sub STORE  { my $rtsig = &_check( < @_ ); new($rtsig, @_[2], $SIGACTION_FLAGS) }
-sub DELETE { delete %SIG{ &_check( < @_ ) } }
-sub CLEAR  { &_exist( < @_ ); delete %SIG{[ <&POSIX::SIGRTMIN( < @_ ) .. &POSIX::SIGRTMAX( < @_ ) ]} }
-sub SCALAR { &_croak( < @_ ); $_sigrtn + 1 }
+1;
