@@ -6347,11 +6347,11 @@ Perl_keyword (pTHX_ const char *name, I32 len)
           }
 
         case 't':
-          if (name[1] == 'i' &&
-              name[2] == 'e')
-          {                                       /* tie        */
-            return KEY_tie;
-          }
+/*           if (name[1] == 'i' && */
+/*               name[2] == 'e') */
+/*           {                                       /\* tie        *\/ */
+/*             return KEY_tie; */
+/*           } */
 	  if (name[1] == 'r' &&
 	      name[2] == 'y')
 	  {
