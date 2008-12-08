@@ -233,5 +233,4 @@ ao pl2pm
 ao pod2html
 ao pod2man
 ao s2p
-ao splain
 ao xsubpp

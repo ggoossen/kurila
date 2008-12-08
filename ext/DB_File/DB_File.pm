@@ -195,6 +195,18 @@ sub clear
     }
 }
 
+sub iterate {
+    my @($self, $callback) = @_;
+
+    my ($key, $value);
+    my $status = $self->seq($key, $value, R_FIRST());
+    while ($status == 0) {
+        $callback->($key, $value);
+        $status = $self->seq($key, $value, R_NEXT());
+    }
+    return;
+}
+
 sub EXTEND { }
 
 sub STORESIZE

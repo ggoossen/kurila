@@ -144,97 +144,88 @@ $dbh->{+maxkeypage} = 1234 ;
 ok( $dbh->{?maxkeypage} == 1234 );
 
 # Check that an invalid entry is caught both for store & fetch
-try { $dbh->{+fred} = 1234 };
-ok( $@->{?description} =~ m/^DB_File::BTREEINFO::STORE - Unknown element 'fred'/ ) ;
-try { my $q = $dbh->{+fred} };
-ok( $@->{?description} =~ m/^DB_File::BTREEINFO::FETCH - Unknown element 'fred'/ ) ;
+dies_like( sub { $dbh->{+fred} = 1234 },
+           qr/^DB_File::BTREEINFO::STORE - Unknown element 'fred'/ ) ;
+dies_like( sub { my $q = $dbh->{+fred} },
+           qr/^DB_File::BTREEINFO::FETCH - Unknown element 'fred'/ ) ;
 
 # Now check the interface to BTREE
 
-my ($X, %h) ;
+my (%h) ;
 do {
-ok( $X = tie(%h, 'DB_File',$Dfile, O_RDWR^|^O_CREAT, 0640, $DB_BTREE )) ;
-die "Could not tie: $!" unless $X;
+    ok( %h = DB_File->new( $Dfile, O_RDWR^|^O_CREAT, 0640, $DB_BTREE )) ;
 
-my @($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
-   $blksize,$blocks) = @: stat($Dfile);
+    my @($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
+         $blksize,$blocks) = @: stat($Dfile);
 
-my %noMode = %( < map { $_, 1} qw( amigaos MSWin32 NetWare cygwin ) ) ;
+    my %noMode = %( < map { $_, 1} qw( amigaos MSWin32 NetWare cygwin ) ) ;
 
-ok( ($mode ^&^ 0777) == (($^O eq 'os2' || $^O eq 'MacOS') ?? 0666 !! 0640)
-   || %noMode{?$^O} );
+    ok( ($mode ^&^ 0777) == (($^O eq 'os2' || $^O eq 'MacOS') ?? 0666 !! 0640)
+          || %noMode{?$^O} );
 
-my ($key, $value, $i);
-while (@(?$key,?$value) = @: each(%h)) {
-    $i++;
-}
-ok( !$i ) ;
+    my ($i);
+    %h->iterate( sub { $i++ } );
+    ok( !$i ) ;
 
-%h{+'goner1'} = 'snork';
+    %h->put('goner1' => 'snork');
 
-%h{+'abc'} = 'ABC';
-ok( %h{?'abc'} eq 'ABC' );
-ok( ! defined %h{?'jimmy'} ) ;
-ok( ! exists %h{'jimmy'} ) ;
-ok(  defined %h{?'abc'} ) ;
+    %h->put('abc' => 'ABC');
+    ok( %h->FETCH('abc') eq 'ABC' );
+    ok( ! defined %h->FETCH('jimmy') ) ;
+    ok(  defined %h->FETCH('abc') ) ;
 
-%h{+'def'} = 'DEF';
-%h{+'jkl'.";".'mno'} = "JKL;MNO";
-%h{+join(";", @( 'a',2,3,4,5))} = join(";", @('A',2,3,4,5));
-%h{+'a'} = 'A';
+    %h->put('def' => 'DEF');
+    %h->put('jkl'.";".'mno' => "JKL;MNO");
+    %h->put(join(";", @( 'a',2,3,4,5)) => join(";", @('A',2,3,4,5)));
+    %h->put('a' => 'A');
 
-#$h{'b'} = 'B';
-$X->STORE('b', 'B') ;
+    #$h{'b' => 'B';
+    %h->STORE('b', 'B');
 
-%h{+'c'} = 'C';
+    %h->put('c' => 'C');
 
-#$h{'d'} = 'D';
-$X->put('d', 'D') ;
+    %h->put('d', 'D') ;
 
-%h{+'e'} = 'E';
-%h{+'f'} = 'F';
-%h{+'g'} = 'X';
-%h{+'h'} = 'H';
-%h{+'i'} = 'I';
+    %h->put('e' => 'E');
+    %h->put('f' => 'F');
+    %h->put('g' => 'X');
+    %h->put('h' => 'H');
+    %h->put('i' => 'I');
 
-%h{+'goner2'} = 'snork';
-delete %h{'goner2'};
+    %h->put('goner2' => 'snork');
+    %h->del('goner2');
 
-# IMPORTANT - $X must be undefined before the untie otherwise the
-#             underlying DB close routine will not get called.
-undef $X ;
-untie(%h);
-
+    %h = undef;
 };
 
 # tie to the same file again
-ok( $X = tie(%h,'DB_File',$Dfile, O_RDWR, 0640, $DB_BTREE)) ;
+ok( %h = DB_File->new($Dfile, O_RDWR, 0640, $DB_BTREE)) ;
 
 # Modify an entry from the previous tie
-%h{+'g'} = 'G';
+%h->put('g' => 'G');
 
-%h{+'j'} = 'J';
-%h{+'k'} = 'K';
-%h{+'l'} = 'L';
-%h{+'m'} = 'M';
-%h{+'n'} = 'N';
-%h{+'o'} = 'O';
-%h{+'p'} = 'P';
-%h{+'q'} = 'Q';
-%h{+'r'} = 'R';
-%h{+'s'} = 'S';
-%h{+'t'} = 'T';
-%h{+'u'} = 'U';
-%h{+'v'} = 'V';
-%h{+'w'} = 'W';
-%h{+'x'} = 'X';
-%h{+'y'} = 'Y';
-%h{+'z'} = 'Z';
+%h->put('j' => 'J');
+%h->put('k' => 'K');
+%h->put('l' => 'L');
+%h->put('m' => 'M');
+%h->put('n' => 'N');
+%h->put('o' => 'O');
+%h->put('p' => 'P');
+%h->put('q' => 'Q');
+%h->put('r' => 'R');
+%h->put('s' => 'S');
+%h->put('t' => 'T');
+%h->put('u' => 'U');
+%h->put('v' => 'V');
+%h->put('w' => 'W');
+%h->put('x' => 'X');
+%h->put('y' => 'Y');
+%h->put('z' => 'Z');
 
-%h{+'goner3'} = 'snork';
+%h->put('goner3' => 'snork');
 
-delete %h{'goner1'};
-$X->DELETE('goner3');
+%h->del('goner1');
+%h->DELETE('goner3');
 
 my @keys = keys(%h);
 my @values = values(%h);
@@ -296,7 +287,7 @@ do {
 # Check R_NOOVERWRITE flag will make put fail when attempting to overwrite
 # an existing record.
  
-my $status = $X->put( 'x', 'newvalue', R_NOOVERWRITE) ;
+my $status = %h->put( 'x', 'newvalue', R_NOOVERWRITE) ;
 ok( $status == 1 );
  
 # check that the value of the key 'x' has not been changed by the 
@@ -304,21 +295,21 @@ ok( $status == 1 );
 ok( %h{?'x'} eq 'X' );
 
 # standard put
-$status = $X->put('key', 'value') ;
+$status = %h->put('key', 'value') ;
 ok( $status == 0 );
 
 #check that previous put can be retrieved
 my $value = 0 ;
-$status = $X->get('key', $value) ;
+$status = %h->get('key', $value) ;
 ok( $status == 0 );
 ok( $value eq 'value' );
 
 # Attempting to delete an existing key should work
 
-$status = $X->del('q') ;
+$status = %h->del('q') ;
 ok( $status == 0 );
 if ($null_keys_allowed) {
-    $status = $X->del('') ;
+    $status = %h->del('') ;
 } else {
     $status = 0 ;
 }
@@ -328,28 +319,25 @@ ok( $status == 0 );
 ok( ! defined %h{?'q'}) ;
 ok( ! defined %h{?''}) ;
 
-TODO:
 do {
-    todo_skip("The file does not get stored", 1);
-    undef $X ;
-    untie %h ;
+    %h->close;
 
-    ok( $X = tie(%h, 'DB_File',$Dfile, O_RDWR, 0640, $DB_BTREE ));
+    ok( %h = DB_File->new( $Dfile, O_RDWR, 0640, $DB_BTREE ));
 };
 
 # Attempting to delete a non-existant key should fail
 
-$status = $X->del('joe') ;
+$status = %h->del('joe') ;
 ok( $status == 1 );
 
 # Check the get interface
 
 # First a non-existing key
-$status = $X->get('aaaa', $value) ;
+$status = %h->get('aaaa', $value) ;
 ok( $status == 1 );
 
 # Next an existing key
-$status = $X->get('a', $value) ;
+$status = %h->get('a', $value) ;
 ok( $status == 0 );
 ok( $value eq 'A' );
 
@@ -359,7 +347,7 @@ ok( $value eq 'A' );
 # use seq to find an approximate match
 my $key = 'ke' ;
 $value = '' ;
-$status = $X->seq($key, $value, R_CURSOR) ;
+$status = %h->seq($key, $value, R_CURSOR) ;
 ok( $status == 0 );
 ok( $key eq 'key' );
 ok( $value eq 'value' );
@@ -367,7 +355,7 @@ ok( $value eq 'value' );
 # seq when the key does not match
 $key = 'zzz' ;
 $value = '' ;
-$status = $X->seq($key, $value, R_CURSOR) ;
+$status = %h->seq($key, $value, R_CURSOR) ;
 ok( $status == 1 );
 
 
@@ -375,41 +363,41 @@ ok( $status == 1 );
 
 $key = 'x' ;
 $value = '' ;
-$status = $X->seq($key, $value, R_CURSOR) ;
+$status = %h->seq($key, $value, R_CURSOR) ;
 ok( $status == 0 );
 ok( $key eq 'x' );
 ok( $value eq 'X' );
-$status = $X->del(0, R_CURSOR) ;
+$status = %h->del(0, R_CURSOR) ;
 ok( $status == 0 );
-$status = $X->get('x', $value) ;
+$status = %h->get('x', $value) ;
 ok( $status == 1 );
 
 # ditto, but use put to replace the key/value pair.
 $key = 'y' ;
 $value = '' ;
-$status = $X->seq($key, $value, R_CURSOR) ;
+$status = %h->seq($key, $value, R_CURSOR) ;
 ok( $status == 0 );
 ok( $key eq 'y' );
 ok( $value eq 'Y' );
 
 $key = "replace key" ;
 $value = "replace value" ;
-$status = $X->put($key, $value, R_CURSOR) ;
+$status = %h->put($key, $value, R_CURSOR) ;
 ok( $status == 0 );
 ok( $key eq 'replace key' );
 ok( $value eq 'replace value' );
-$status = $X->get('y', $value) ;
+$status = %h->get('y', $value) ;
 ok( 1) ; # hard-wire to always pass. the previous test ($status == 1)
 	    # only worked because of a bug in 1.85/6
 
 # use seq to walk forwards through a file 
 
-$status = $X->seq($key, $value, R_FIRST) ;
+$status = %h->seq($key, $value, R_FIRST) ;
 ok( $status == 0 );
 my $previous = $key ;
 
 $ok = 1 ;
-while (($status = $X->seq($key, $value, R_NEXT)) == 0)
+while (($status = %h->seq($key, $value, R_NEXT)) == 0)
 {
     ($ok = 0), last if ($previous cmp $key) == 1 ;
 }
@@ -418,12 +406,12 @@ ok( $status == 1 );
 ok( $ok == 1 );
 
 # use seq to walk backwards through a file 
-$status = $X->seq($key, $value, R_LAST) ;
+$status = %h->seq($key, $value, R_LAST) ;
 ok( $status == 0 );
 $previous = $key ;
 
 $ok = 1 ;
-while (($status = $X->seq($key, $value, R_PREV)) == 0)
+while (($status = %h->seq($key, $value, R_PREV)) == 0)
 {
     ($ok = 0), last if ($previous cmp $key) == -1 ;
     #print "key = [$key] value = [$value]\n" ;
@@ -438,20 +426,19 @@ ok( $ok == 1 );
 # sync
 # ####
 
-$status = $X->sync ;
+$status = %h->sync ;
 ok( $status == 0 );
 
 
 # fd
 # ##
 
-$status = $X->fd ;
+$status = %h->fd ;
 ok( 1 );
 #ok( $status != 0 );
 
 
-undef $X ;
-untie %h ;
+undef %h ;
 
 unlink $Dfile;
 
@@ -900,7 +887,7 @@ do {
     $DB_BTREE->{+'compare'} = \&Compare ;
 
     unlink "tree" ;
-    tie %h, "DB_File", "tree", O_RDWR^|^O_CREAT, 0640, $DB_BTREE 
+    %h = DB_File->new( "tree", O_RDWR^|^O_CREAT, 0640, $DB_BTREE )
         or die "Cannot open file 'tree': $!\n" ;
 
     # Add a key/value pair to the file
@@ -949,7 +936,7 @@ EOM
     # Enable duplicate records
     $DB_BTREE->{+'flags'} = R_DUP ;
  
-    tie %h, "DB_File", $filename, O_RDWR^|^O_CREAT, 0640, $DB_BTREE 
+    %h = DB_File->new( $filename, O_RDWR^|^O_CREAT, 0640, $DB_BTREE )
 	or die "Cannot open $filename: $!\n";
  
     # Add some key/value pairs to the file
@@ -1001,7 +988,7 @@ EOM
     # Enable duplicate records
     $DB_BTREE->{+'flags'} = R_DUP ;
  
-    $x = tie %h, "DB_File", $filename, O_RDWR^|^O_CREAT, 0640, $DB_BTREE 
+    %h = DB_File->new( $filename, O_RDWR^|^O_CREAT, 0640, $DB_BTREE )
 	or die "Cannot open $filename: $!\n";
  
     # Add some key/value pairs to the file
@@ -1057,7 +1044,7 @@ EOM
     # Enable duplicate records
     $DB_BTREE->{+'flags'} = R_DUP ;
  
-    $x = tie %h, "DB_File", $filename, O_RDWR^|^O_CREAT, 0640, $DB_BTREE 
+    %h = DB_File->new( $filename, O_RDWR^|^O_CREAT, 0640, $DB_BTREE )
 	or die "Cannot open $filename: $!\n";
  
     my $cnt  = nelems $x->get_dup("Wall") ;
@@ -1106,7 +1093,7 @@ EOM
     # Enable duplicate records
     $DB_BTREE->{+'flags'} = R_DUP ;
  
-    $x = tie %h, "DB_File", $filename, O_RDWR^|^O_CREAT, 0640, $DB_BTREE 
+    %h = DB_File->new( $filename, O_RDWR^|^O_CREAT, 0640, $DB_BTREE )
 	or die "Cannot open $filename: $!\n";
 
     $found = ( $x->find_dup("Wall", "Larry") == 0 ?? "" !! "not") ; 
@@ -1141,7 +1128,7 @@ EOM
     # Enable duplicate records
     $DB_BTREE->{+'flags'} = R_DUP ;
  
-    $x = tie %h, "DB_File", $filename, O_RDWR^|^O_CREAT, 0640, $DB_BTREE 
+    %h = DB_File->new( $filename, O_RDWR^|^O_CREAT, 0640, $DB_BTREE )
 	or die "Cannot open $filename: $!\n";
 
     $x->del_dup("Wall", "Larry") ;
@@ -1184,7 +1171,7 @@ EOM
     $filename = "tree" ;
     unlink $filename ;
 
-    $x = tie %h, "DB_File", $filename, O_RDWR^|^O_CREAT, 0640, $DB_BTREE
+    %h = DB_File->new( $filename, O_RDWR^|^O_CREAT, 0640, $DB_BTREE )
         or die "Cannot open $filename: $!\n";
  
     # Add some key/value pairs to the file
@@ -1270,7 +1257,7 @@ do {
     my $a = "";
     local $^WARN_HOOK = sub {$a = @_[0]} ;
     
-    tie %h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0664, $DB_BTREE
+    %h = DB_File->new( $Dfile, O_RDWR^|^O_CREAT, 0664, $DB_BTREE )
 	or die "Can't open file: $!\n" ;
     %h{+ABC} = undef;
     ok( $a eq "") ;
@@ -1290,7 +1277,7 @@ do {
     my $a = "";
     local $^WARN_HOOK = sub {$a = @_[0]} ;
     
-    tie %h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0664, $DB_BTREE
+    %h = DB_File->new( $Dfile, O_RDWR^|^O_CREAT, 0664, $DB_BTREE )
 	or die "Can't open file: $!\n" ;
     %h = %( () ); ;
     ok( $a eq "") ;

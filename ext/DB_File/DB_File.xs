@@ -364,19 +364,19 @@ typedef union INFO {
 #define db_get(db, key, value, flags)   ((db->dbp)->get)(db->dbp, TXN &key, &value, flags)
 
 #ifdef DB_VERSION_MAJOR
-#define db_DESTROY(db)                  (!db->aborted && ( db->cursor->c_close(db->cursor),\
-					  (db->dbp->close)(db->dbp, 0) ))
-#define db_close(db)			((db->dbp)->close)(db->dbp, 0)
-#define db_del(db, key, flags)          (flagSet(flags, R_CURSOR) 					\
+#    define db_DESTROY(db)                  (!db->aborted && ( db->cursor->c_close(db->cursor),\
+					      (db->dbp->close)(db->dbp, 0) ))
+#    define db_close(db)			((db->dbp)->close)(db->dbp, 0)
+#    define db_del(db, key, flags)          (flagSet(flags, R_CURSOR) 					\
 						? ((db->cursor)->c_del)(db->cursor, 0)		\
 						: ((db->dbp)->del)(db->dbp, NULL, &key, flags) )
 
 #else /* ! DB_VERSION_MAJOR */
 
-#define db_DESTROY(db)                  (!db->aborted && ((db->dbp)->close)(db->dbp))
-#define db_close(db)			((db->dbp)->close)(db->dbp)
-#define db_del(db, key, flags)          ((db->dbp)->del)(db->dbp, &key, flags)
-#define db_put(db, key, value, flags)   ((db->dbp)->put)(db->dbp, &key, &value, flags)
+#    define db_DESTROY(db)                  (!db->aborted && ((db->dbp)->close)(db->dbp))
+#    define db_close(db)			((db->dbp)->close)(db->dbp)
+#    define db_del(db, key, flags)          ((db->dbp)->del)(db->dbp, &key, flags)
+#    define db_put(db, key, value, flags)   ((db->dbp)->put)(db->dbp, &key, &value, flags)
 
 #endif /* ! DB_VERSION_MAJOR */
 
@@ -983,9 +983,6 @@ SV *   sv ;
         if (sv_isa(sv, "DB_File::HASHINFO"))
         {
 
-/* 	    if (!isHASH) */
-/* 	        croak("DB_File can only tie an associative array to a DB_HASH database") ; */
-
             RETVAL->type = DB_HASH ;
             openinfo = (void*)info ;
   
@@ -1018,9 +1015,6 @@ SV *   sv ;
         }
         else if (sv_isa(sv, "DB_File::BTREEINFO"))
         {
-/* 	    if (!isHASH) */
-/* 	        croak("DB_File can only tie an associative array to a DB_BTREE database"); */
-
             RETVAL->type = DB_BTREE ;
             openinfo = (void*)info ;
    
@@ -1266,9 +1260,6 @@ SV *   sv ;
         if (sv_isa(sv, "DB_File::HASHINFO"))
         {
 
-/* 	    if (!isHASH) */
-/* 	        croak("DB_File can only tie an associative array to a DB_HASH database") ; */
-
             RETVAL->type = DB_HASH ;
   
             svp = hv_fetch(action, "hash", 4, FALSE); 
@@ -1303,9 +1294,6 @@ SV *   sv ;
         }
         else if (sv_isa(sv, "DB_File::BTREEINFO"))
         {
-	    if (!isHASH)
-	        croak("DB_File can only tie an associative array to a DB_BTREE database");
-
             RETVAL->type = DB_BTREE ;
    
             svp = hv_fetch(action, "compare", 7, FALSE);
