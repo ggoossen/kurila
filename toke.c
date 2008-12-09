@@ -4648,8 +4648,10 @@ Perl_yylex(pTHX)
 		}
 
 		/* Call it a bare word */
-
 		pl_yylval.opval->op_private |= OPpCONST_STRICT;
+		if ( ! ( s[0] == '-' && s[1] == '>') ) {
+		    yyerror(Perl_form("Unknown bare word %s", PL_tokenbuf));
+		}
 		
 	    bareword:
 
