@@ -1343,23 +1343,9 @@ sub eq_set  {
     my @($a1, $a2, ?$name) =  @_;
     return 0 unless (nelems @$a1) == nelems @$a2;
 
-    # There's faster ways to do this, but this is easiest.
-    local $^W = 0;
-
-    # It really doesn't matter how we sort them, as long as both arrays are 
-    # sorted with the same algorithm.
-    #
-    # Ensure that references are not accidentally treated the same as a
-    # string containing the reference.
-    #
-    # Have to inline the sort routine due to a threading/sort bug.
-    # See [rt.cpan.org 6782]
-    #
-    # I don't know how references would be sorted so we just don't sort
-    # them.  This means eq_set doesn't really work with refs.
     return eq_array(
-           \@(< grep(ref, @$a1), < sort( grep(!ref, @$a1) )),
-           \@(< grep(ref, @$a2), < sort( grep(!ref, @$a2) )),
+           \ (sort { dump::view($a) cmp dump::view($b) } @$a1 ),
+           \ (sort { dump::view($a) cmp dump::view($b) } @$a2 ),
     );
 }
 
