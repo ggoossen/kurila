@@ -13,15 +13,6 @@ plan tests => 165;
 
 unlink < glob "__db.*";
 
-sub myok
-{
-    my @($no, $result, ?$message) =  @_;
- 
-    ok($result, $message);
-
-    return $result ;
-}
-
 do {
     package Redirect ;
     use Symbol ;
@@ -87,50 +78,50 @@ umask(0);
 
 my $dbh = DB_File::HASHINFO->new() ;
 
-myok(1, ! defined $dbh->{?bsize}) ;
-myok(2, ! defined $dbh->{?ffactor}) ;
-myok(3, ! defined $dbh->{?nelem}) ;
-myok(4, ! defined $dbh->{?cachesize}) ;
-myok(5, ! defined $dbh->{?hash}) ;
-myok(6, ! defined $dbh->{?lorder}) ;
+ok( ! defined $dbh->{?bsize}) ;
+ok( ! defined $dbh->{?ffactor}) ;
+ok( ! defined $dbh->{?nelem}) ;
+ok( ! defined $dbh->{?cachesize}) ;
+ok( ! defined $dbh->{?hash}) ;
+ok( ! defined $dbh->{?lorder}) ;
 
 $dbh->{+bsize} = 3000 ;
-myok(7, $dbh->{?bsize} == 3000 );
+ok( $dbh->{?bsize} == 3000 );
 
 $dbh->{+ffactor} = 9000 ;
-myok(8, $dbh->{?ffactor} == 9000 );
+ok( $dbh->{?ffactor} == 9000 );
 
 $dbh->{+nelem} = 400 ;
-myok(9, $dbh->{?nelem} == 400 );
+ok( $dbh->{?nelem} == 400 );
 
 $dbh->{+cachesize} = 65 ;
-myok(10, $dbh->{?cachesize} == 65 );
+ok( $dbh->{?cachesize} == 65 );
 
 my $some_sub = sub {} ;
 $dbh->{+hash} = $some_sub;
-myok(11, $dbh->{?hash} \== $some_sub );
+ok( $dbh->{?hash} \== $some_sub );
 
 $dbh->{+lorder} = 1234 ;
-myok(12, $dbh->{?lorder} == 1234 );
+ok( $dbh->{?lorder} == 1234 );
 
 
 # Now check the interface to HASH
 my %h = DB_File->new($Dfile, O_RDWR^|^O_CREAT, 0640, $DB_HASH );
-myok(15, %h);
+ok( %h);
 
 my @($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
    $blksize,$blocks) = @: stat($Dfile);
 
 my %noMode = %( < map { $_, 1} qw( amigaos MSWin32 NetWare cygwin ) ) ;
 
-myok(16, ($mode ^&^ 0777) == (($^O eq 'os2' || $^O eq 'MacOS') ?? 0666 !! 0640) ||
+ok( ($mode ^&^ 0777) == (($^O eq 'os2' || $^O eq 'MacOS') ?? 0666 !! 0640) ||
    %noMode{?$^O} );
 
 my ($key, $value, $i);
 # while (@(?$key,?$value) = @: each(%h)) {
 #     $i++;
 # }
-myok(17, !$i );
+ok( !$i );
 
 %h->put('goner1', 'snork');
 
@@ -166,108 +157,102 @@ for (qw(g j k l m n o p q r s t u v w x y z)) {
     %h->put($_, uc($_));
 }
 
-%h->put('goner3', 'snork');
-
 %h->del('goner1');
 
-__END__
-my @keys = keys(%h);
-my @values = values(%h);
+my @keys = %h->keys;
+my @values = %h->values;
 
-myok(23, (nelems @keys) == 30 && (nelems @values) == 30) ;
+is( nelems(@keys), 30 );
+is( nelems(@values), 30 );
 
 $i = 0 ;
-while (@(?$key,?$value) = @: each(%h)) {
-    if ($key eq @keys[$i] && $value eq @values[$i] && $key eq lc($value)) {
-	$key = uc($key);
-	$i++ if $key eq $value;
+%h->iterate(
+    sub {
+        my @($key,$value) = @_;
+        if ($key eq @keys[$i] && $value eq @values[$i] && $key eq lc($value)) {
+            $key = uc($key);
+            $i++ if $key eq $value;
+        }
     }
-}
+);
 
-myok(24, $i == 30) ;
+ok( $i == 30) ;
 
-@keys = @('blurfl', < keys(%h), 'dyick');
-myok(25, (nelems @keys) == 32) ;
+@keys = @('blurfl', < %h->keys, 'dyick');
+ok( (nelems @keys) == 32) ;
 
-%h{+'foo'} = '';
-myok(26, %h{?'foo'} eq '' );
+%h->STORE('foo' => '');
+ok( %h->FETCH('foo') eq '' );
 
 # Berkeley DB from version 2.4.10 to 3.0 does not allow null keys.
 # This feature was reenabled in version 3.1 of Berkeley DB.
 my $result = 0 ;
 if ($null_keys_allowed) {
-    %h{+''} = 'bar';
-    $result = ( %h{?''} eq 'bar' );
+    %h->STORE('' => 'bar');
+    $result = ( %h->FETCH('') eq 'bar' );
 }
 else
   { $result = 1 }
-myok(27, $result) ;
+ok( $result) ;
 
 # check cache overflow and numeric keys and contents
 my $ok = 1;
-for my $i (1..199) { %h{+$i + 0} = $i + 0; }
-for my $i (1..199) { $ok = 0 unless %h{?$i} == $i; }
-myok(28, $ok );
+for my $i (1..199) { %h->put( $i + 0 => $i + 0 ); }
+for my $i (1..199) { $ok = 0 unless %h->FETCH($i) == $i; }
+ok( $ok );
 
 @($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
    $blksize,$blocks) = @: stat($Dfile);
-myok(29, $size +> 0 );
- 
-    @(@< %h{[0..200]}) =  200..400;
-    my @foo = %h{[0..200]};
-    do {
-        local our $TODO = 1;
-        ok(join(':',200..400) eq join(':', @foo));
-    };
+ok( $size +> 0 );
 
 # Now check all the non-tie specific stuff
 
 # Check NOOVERWRITE will make put fail when attempting to overwrite
 # an existing record.
  
-my $status = $X->put( 'x', 'newvalue', R_NOOVERWRITE) ;
-myok(31, $status == 1 );
+my $status = %h->put( 'x', 'newvalue', R_NOOVERWRITE) ;
+ok( $status == 1 );
  
 # check that the value of the key 'x' has not been changed by the 
 # previous test
-myok(32, %h{?'x'} eq 'X' );
+ok( %h->FETCH('x') eq 'X' );
 
 # standard put
-$status = $X->put('key', 'value') ;
-myok(33, $status == 0 );
+$status = %h->put('key', 'value') ;
+ok( $status == 0 );
 
 #check that previous put can be retrieved
 $value = 0 ;
-$status = $X->get('key', $value) ;
-myok(34, $status == 0 );
-myok(35, $value eq 'value' );
+$status = %h->get('key', $value) ;
+ok( $status == 0 );
+ok( $value eq 'value' );
 
 # Attempting to delete an existing key should work
 
-$status = $X->del('q') ;
-myok(36, $status == 0 );
+$status = %h->del('q') ;
+ok( $status == 0 );
 
 # Make sure that the key deleted, cannot be retrieved
 do {
     no warnings 'uninitialized' ;
-    myok(37, %h{?'q'} eq undef );
+    ok( %h->FETCH('q') eq undef );
 };
 
 # Attempting to delete a non-existant key should fail
 
-$status = $X->del('joe') ;
-myok(38, $status == 1 );
+$status = %h->del('joe') ;
+ok( $status == 1 );
 
 # Check the get interface
 
 # First a non-existing key
-$status = $X->get('aaaa', $value) ;
-myok(39, $status == 1 );
+$status = %h->get('aaaa', $value) ;
+ok( $status == 1 );
 
 # Next an existing key
-$status = $X->get('a', $value) ;
-myok(40, $status == 0 );
-myok(41, $value eq 'A' );
+$status = %h->get('a', $value) ;
+ok( $status == 0 );
+ok( $value eq 'A' );
 
 # seq
 # ###
@@ -281,59 +266,21 @@ myok(41, $value eq 'A' );
 # sync
 # ####
 
-$status = $X->sync ;
-myok(42, $status == 0 );
+$status = %h->sync ;
+ok( $status == 0 );
 
 
 # fd
 # ##
 
-$status = $X->fd ;
-myok(43, 1 );
-#myok(43, $status != 0 );
+$status = %h->fd ;
+ok( 1 );
+#ok( $status != 0 );
 
-undef $X ;
+undef %h ;
 untie %h ;
 
 unlink $Dfile;
-
-# clear
-# #####
-
-myok(44, tie(%h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $DB_HASH ) );
-foreach (1 .. 10)
-  { %h{+$_} = $_ * 100 }
-
-# check that there are 10 elements in the hash
-$i = 0 ;
-while (@(?$key,?$value) = @: each(%h)) {
-    $i++;
-}
-myok(45, $i == 10);
-
-# now clear the hash
-%h = %( () ) ;
-
-# check it is empty
-$i = 0 ;
-while (@(?$key,?$value) = @: each(%h)) {
-    $i++;
-}
-myok(46, $i == 0);
-
-untie %h ;
-unlink $Dfile ;
-
-
-# Now try an in memory file
-myok(47, $X = tie(%h, 'DB_File',undef, O_RDWR^|^O_CREAT, 0640, $DB_HASH ) );
-
-# fd with an in memory file should return fail
-$status = $X->fd ;
-myok(48, $status == -1 );
-
-undef $X ;
-untie %h ;
 
 do {
     # check ability to override the default hashing
@@ -341,17 +288,16 @@ do {
     my $hi = DB_File::HASHINFO->new() ;
     $::count = 0 ;
     $hi->{+hash} = sub { ++$::count ; length @_[0] } ;
-    my %h = DB_File->open( $filename, O_RDWR^|^O_CREAT, 0640, $hi ) ;
+    my %h = DB_File->new( $filename, O_RDWR^|^O_CREAT, 0640, $hi ) ;
     %h->put("abc", 123 );
     my $value;
     %h->get("abc", $value);
-    myok(50, $value == 123) ;
+    ok( $value == 123) ;
     unlink $filename ;
-    myok(51, $::count +>0) ;
+    ok( $::count +>0) ;
 };
 
-__END__
-myok(52, 1);
+ok( 1);
 
 do {
    # sub-class test
@@ -416,34 +362,33 @@ EOM
     BEGIN { push @INC, '.'; }             
     eval 'use SubDB ; ';
     die if $@;
-    main::myok(53, $@ eq "") ;
+    main::ok( $@ eq "") ;
     my %h ;
-    my $X ;
     eval '
-	$X = tie(%h, "SubDB","dbhash.tmp", O_RDWR^|^O_CREAT, 0640, $DB_HASH );
+	%h = tie(%h, "SubDB","dbhash.tmp", O_RDWR^|^O_CREAT, 0640, $DB_HASH );
 	' ;
 
-    main::myok(54, $@ eq "") ;
+    main::ok( $@ eq "") ;
 
     my $ret = eval '%h{+"fred"} = 3 ; return %h{"fred"} ' ;
     die if $@;
-    main::myok(55, ! $@ ) ;
-    main::myok(56, $ret == 5) ;
+    main::ok( ! $@ ) ;
+    main::ok( $ret == 5) ;
 
     my $value = 0;
-    $ret = eval '$X->put("joe", 4) ; $X->get("joe", $value) ; return $value' ;
-    main::myok(57, ! $@ ) ;
-    main::myok(58, $ret == 10) ;
+    $ret = eval '%h->put("joe", 4) ; %h->get("joe", $value) ; return $value' ;
+    main::ok( ! $@ ) ;
+    main::ok( $ret == 10) ;
 
     $ret = eval ' R_NEXT eq main::R_NEXT ' ;
-    main::myok(59, $@ eq "" ) ;
-    main::myok(60, $ret == 1) ;
+    main::ok( $@ eq "" ) ;
+    main::ok( $ret == 1) ;
 
-    $ret = eval '$X->A_new_method("joe") ' ;
-    main::myok(61, $@ eq "") ;
-    main::myok(62, $ret eq "[[11]]") ;
+    $ret = eval '%h->A_new_method("joe") ' ;
+    main::ok( $@ eq "") ;
+    main::ok( $ret eq "[[11]]") ;
 
-    undef $X;
+    undef %h;
     untie(%h);
     unlink "SubDB.pm", "dbhash.tmp" ;
 
@@ -479,7 +424,7 @@ do {
 	   $_ eq 'original' ;
    }
    
-   myok(63, $db = tie(%h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $DB_HASH ) );
+   ok( $db = tie(%h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $DB_HASH ) );
 
    $db->filter_fetch_key   (sub { $fetch_key = $_ }) ;
    $db->filter_store_key   (sub { $store_key = $_ }) ;
@@ -490,21 +435,21 @@ do {
 
    %h{+"fred"} = "joe" ;
    #                   fk   sk     fv   sv
-   myok(64, checkOutput( "", "fred", "", "joe")) ;
+   ok( checkOutput( "", "fred", "", "joe")) ;
 
    @($fetch_key, $store_key, $fetch_value, $store_value) = @("") x 4 ;
-   myok(65, %h{?"fred"} eq "joe");
+   ok( %h{?"fred"} eq "joe");
    #                   fk    sk     fv    sv
-   myok(66, checkOutput( "", "fred", "joe", "")) ;
+   ok( checkOutput( "", "fred", "joe", "")) ;
 
    @($fetch_key, $store_key, $fetch_value, $store_value) = @("") x 4 ;
    my ($k, $v) ;
    $k = 'fred';
-   myok(67, ! $db->seq($k, $v, R_FIRST) ) ;
-   myok(68, $k eq "fred") ;
-   myok(69, $v eq "joe") ;
+   ok( ! $db->seq($k, $v, R_FIRST) ) ;
+   ok( $k eq "fred") ;
+   ok( $v eq "joe") ;
    #                    fk     sk  fv  sv
-   myok(70, checkOutput( "fred", "fred", "joe", "")) ;
+   ok( checkOutput( "fred", "fred", "joe", "")) ;
 
    # replace the filters, but remember the previous set
    my $old_fk = $db->filter_fetch_key   
@@ -519,21 +464,21 @@ do {
    @($fetch_key, $store_key, $fetch_value, $store_value) = @("") x 4 ;
    %h{+"Fred"} = "Joe" ;
    #                   fk   sk     fv    sv
-   myok(71, checkOutput( "", "fred", "", "Jxe")) ;
+   ok( checkOutput( "", "fred", "", "Jxe")) ;
 
    @($fetch_key, $store_key, $fetch_value, $store_value) = @("") x 4 ;
-   myok(72, %h{?"Fred"} eq "[Jxe]");
+   ok( %h{?"Fred"} eq "[Jxe]");
    #                   fk   sk     fv    sv
-   myok(73, checkOutput( "", "fred", "[Jxe]", "")) ;
+   ok( checkOutput( "", "fred", "[Jxe]", "")) ;
 
    @($fetch_key, $store_key, $fetch_value, $store_value) = @("") x 4 ;
    $k = 'Fred'; $v ='';
-   myok(74, ! $db->seq($k, $v, R_FIRST) ) ;
-   myok(75, $k eq "FRED") or 
+   ok( ! $db->seq($k, $v, R_FIRST) ) ;
+   ok( $k eq "FRED") or 
     print "# k [$k]\n" ;
-   myok(76, $v eq "[Jxe]") ;
+   ok( $v eq "[Jxe]") ;
    #                   fk   sk     fv    sv
-   myok(77, checkOutput( "FRED", "fred", "[Jxe]", "")) ;
+   ok( checkOutput( "FRED", "fred", "[Jxe]", "")) ;
 
    # put the original filters back
    $db->filter_fetch_key   ($old_fk);
@@ -543,20 +488,20 @@ do {
 
    @($fetch_key, $store_key, $fetch_value, $store_value) = @("") x 4 ;
    %h{+"fred"} = "joe" ;
-   myok(78, checkOutput( "", "fred", "", "joe")) ;
+   ok( checkOutput( "", "fred", "", "joe")) ;
 
    @($fetch_key, $store_key, $fetch_value, $store_value) = @("") x 4 ;
-   myok(79, %h{?"fred"} eq "joe");
-   myok(80, checkOutput( "", "fred", "joe", "")) ;
+   ok( %h{?"fred"} eq "joe");
+   ok( checkOutput( "", "fred", "joe", "")) ;
 
    @($fetch_key, $store_key, $fetch_value, $store_value) = @("") x 4 ;
-   #myok(77, $db->FIRSTKEY() eq "fred") ;
+   #ok( $db->FIRSTKEY() eq "fred") ;
    $k = 'fred';
-   myok(81, ! $db->seq($k, $v, R_FIRST) ) ;
-   myok(82, $k eq "fred") ;
-   myok(83, $v eq "joe") ;
+   ok( ! $db->seq($k, $v, R_FIRST) ) ;
+   ok( $k eq "fred") ;
+   ok( $v eq "joe") ;
    #                   fk   sk     fv    sv
-   myok(84, checkOutput( "fred", "fred", "joe", "")) ;
+   ok( checkOutput( "fred", "fred", "joe", "")) ;
 
    # delete the filters
    $db->filter_fetch_key   (undef);
@@ -566,18 +511,18 @@ do {
 
    @($fetch_key, $store_key, $fetch_value, $store_value) = @("") x 4 ;
    %h{+"fred"} = "joe" ;
-   myok(85, checkOutput( "", "", "", "")) ;
+   ok( checkOutput( "", "", "", "")) ;
 
    @($fetch_key, $store_key, $fetch_value, $store_value) = @("") x 4 ;
-   myok(86, %h{?"fred"} eq "joe");
-   myok(87, checkOutput( "", "", "", "")) ;
+   ok( %h{?"fred"} eq "joe");
+   ok( checkOutput( "", "", "", "")) ;
 
    @($fetch_key, $store_key, $fetch_value, $store_value) = @("") x 4 ;
    $k = 'fred';
-   myok(88, ! $db->seq($k, $v, R_FIRST) ) ;
-   myok(89, $k eq "fred") ;
-   myok(90, $v eq "joe") ;
-   myok(91, checkOutput( "", "", "", "")) ;
+   ok( ! $db->seq($k, $v, R_FIRST) ) ;
+   ok( $k eq "fred") ;
+   ok( $v eq "joe") ;
+   ok( checkOutput( "", "", "", "")) ;
 
    undef $db ;
    untie %h;
@@ -592,7 +537,7 @@ do {
     my (%h, $db) ;
 
     unlink $Dfile;
-    myok(92, $db = tie(%h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $DB_HASH ) );
+    ok( $db = tie(%h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $DB_HASH ) );
 
     my %result = %( () ) ;
 
@@ -616,32 +561,32 @@ do {
     $_ = "original" ;
 
     %h{+"fred"} = "joe" ;
-    myok(93, %result{?"store key"} eq "store key - 1: [fred]");
-    myok(94, %result{?"store value"} eq "store value - 1: [joe]");
-    myok(95, ! defined %result{?"fetch key"} );
-    myok(96, ! defined %result{?"fetch value"} );
-    myok(97, $_ eq "original") ;
+    ok( %result{?"store key"} eq "store key - 1: [fred]");
+    ok( %result{?"store value"} eq "store value - 1: [joe]");
+    ok( ! defined %result{?"fetch key"} );
+    ok( ! defined %result{?"fetch value"} );
+    ok( $_ eq "original") ;
 
-    myok(98, $db->FIRSTKEY() eq "fred") ;
-    myok(99, %result{?"store key"} eq "store key - 1: [fred]");
-    myok(100, %result{?"store value"} eq "store value - 1: [joe]");
-    myok(101, %result{?"fetch key"} eq "fetch key - 1: [fred]");
-    myok(102, ! defined %result{?"fetch value"} );
-    myok(103, $_ eq "original") ;
+    ok( $db->FIRSTKEY() eq "fred") ;
+    ok( %result{?"store key"} eq "store key - 1: [fred]");
+    ok( %result{?"store value"} eq "store value - 1: [joe]");
+    ok( %result{?"fetch key"} eq "fetch key - 1: [fred]");
+    ok( ! defined %result{?"fetch value"} );
+    ok( $_ eq "original") ;
 
     %h{+"jim"}  = "john" ;
-    myok(104, %result{?"store key"} eq "store key - 2: [fred jim]");
-    myok(105, %result{?"store value"} eq "store value - 2: [joe john]");
-    myok(106, %result{?"fetch key"} eq "fetch key - 1: [fred]");
-    myok(107, ! defined %result{?"fetch value"} );
-    myok(108, $_ eq "original") ;
+    ok( %result{?"store key"} eq "store key - 2: [fred jim]");
+    ok( %result{?"store value"} eq "store value - 2: [joe john]");
+    ok( %result{?"fetch key"} eq "fetch key - 1: [fred]");
+    ok( ! defined %result{?"fetch value"} );
+    ok( $_ eq "original") ;
 
-    myok(109, %h{?"fred"} eq "joe");
-    myok(110, %result{?"store key"} eq "store key - 3: [fred jim fred]");
-    myok(111, %result{?"store value"} eq "store value - 2: [joe john]");
-    myok(112, %result{?"fetch key"} eq "fetch key - 1: [fred]");
-    myok(113, %result{?"fetch value"} eq "fetch value - 1: [joe]");
-    myok(114, $_ eq "original") ;
+    ok( %h{?"fred"} eq "joe");
+    ok( %result{?"store key"} eq "store key - 3: [fred jim fred]");
+    ok( %result{?"store value"} eq "store value - 2: [joe john]");
+    ok( %result{?"fetch key"} eq "fetch key - 1: [fred]");
+    ok( %result{?"fetch value"} eq "fetch value - 1: [joe]");
+    ok( $_ eq "original") ;
 
     undef $db ;
     untie %h;
@@ -655,12 +600,12 @@ do {
    my (%h, $db) ;
    unlink $Dfile;
 
-   myok(115, $db = tie(%h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $DB_HASH ) );
+   ok( $db = tie(%h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $DB_HASH ) );
 
    $db->filter_store_key (sub { $_ = %h{?$_} }) ;
 
    eval '%h{1} = 1234' ;
-   myok(116, $@->{?description} =~ m/^recursion detected in filter_store_key/ );
+   ok( $@->{?description} =~ m/^recursion detected in filter_store_key/ );
    
    undef $db ;
    untie %h;
@@ -678,23 +623,23 @@ do {
     use warnings FATAL => < qw(all);
      
     use DB_File ;
-    our (%h, $k, $v);
+    our ($k, $v);
 
     unlink "fruit" ;
-    tie %h, "DB_File", "fruit", O_RDWR^|^O_CREAT, 0640, $DB_HASH 
+    my %h = DB_File->new( "fruit", O_RDWR^|^O_CREAT, 0640, $DB_HASH )
         or die "Cannot open file 'fruit': $!\n";
 
     # Add a few key/value pairs to the file
-    %h{+"apple"} = "red" ;
-    %h{+"orange"} = "orange" ;
-    %h{+"banana"} = "yellow" ;
-    %h{+"tomato"} = "red" ;
+    %h->put("apple" => "red");
+    %h->put("orange" => "orange");
+    %h->put("banana" => "yellow");
+    %h->put("tomato" => "red");
 
     # Check for existence of a key
-    print "Banana Exists\n\n" if %h{?"banana"} ;
+    print "Banana Exists\n\n" if %h->FETCH("banana") ;
 
     # Delete a key/value pair.
-    delete %h{"apple"} ;
+    %h->del("apple") ;
 
     # print the contents of the file
     while (@(?$k, ?$v) =@( each %h))
@@ -705,7 +650,7 @@ do {
     unlink "fruit" ;
   };  
 
-  myok(117, docat_del($file) eq <<'EOM') ;
+  ok( docat_del($file) eq <<'EOM') ;
 Banana Exists
 
 orange -> orange
@@ -725,14 +670,13 @@ do {
     use DB_File ;
 
     unlink $Dfile;
-    my %h ;
     my $a = "";
     local $^WARN_HOOK = sub {$a = @_[0]} ;
     
-    tie %h, 'DB_File', $Dfile or die "Can't open file: $!\n" ;
-    %h{+ABC} = undef;
-    myok(118, $a eq "") ;
-    untie %h ;
+    my %h = DB_File->new( $Dfile ) or die "Can't open file: $!\n" ;
+    %h->put("ABC" => undef);
+    ok( $a eq "") ;
+    undef %h;
     unlink $Dfile;
 };
 
@@ -744,14 +688,13 @@ do {
     use DB_File ;
 
     unlink $Dfile;
-    my %h ;
     my $a = "";
     local $^WARN_HOOK = sub {$a = @_[0]} ;
     
-    tie %h, 'DB_File', $Dfile or die "Can't open file: $!\n" ;
-    %h = %( () ); ;
-    myok(119, $a eq "") ;
-    untie %h ;
+    my %h = DB_File->new($Dfile) or die "Can't open file: $!\n" ;
+    %h->clear();
+    ok( $a eq "") ;
+    undef %h;
     unlink $Dfile;
 };
 
@@ -770,27 +713,27 @@ do {
     my $bad_key = 0 ;
     my %h = %( () ) ;
     my $db ;
-    myok(120, $db = tie(%h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $DB_HASH ) );
+    ok( $db = tie(%h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $DB_HASH ) );
     $db->filter_fetch_key (sub { $_ =~ s/^Beta_/Alpha_/ if defined $_}) ;
     $db->filter_store_key (sub { $bad_key = 1 if m/^Beta_/ ; $_ =~ s/^Alpha_/Beta_/}) ;
 
     %h{+'Alpha_ABC'} = 2 ;
     %h{+'Alpha_DEF'} = 5 ;
 
-    myok(121, %h{?'Alpha_ABC'} == 2);
-    myok(122, %h{?'Alpha_DEF'} == 5);
+    ok( %h{?'Alpha_ABC'} == 2);
+    ok( %h{?'Alpha_DEF'} == 5);
 
     my @($k, $v) = @("","");
     while (@(?$k, ?$v) =@( each %h)) {}
-    myok(123, $bad_key == 0);
+    ok( $bad_key == 0);
 
     $bad_key = 0 ;
     foreach my $k (keys %h) {}
-    myok(124, $bad_key == 0);
+    ok( $bad_key == 0);
 
     $bad_key = 0 ;
     foreach my $v (values %h) {}
-    myok(125, $bad_key == 0);
+    ok( $bad_key == 0);
 
     undef $db ;
     untie %h ;
@@ -816,13 +759,13 @@ do {
 #    $dbh->{hash} = sub { $hash{3} = 4 ; length $_[0] } ;
 # 
 # 
-#    myok(127, tie(%hash, 'DB_File',$Dfile, O_RDWR|O_CREAT, 0640, $dbh ) );
+#    ok( tie(%hash, 'DB_File',$Dfile, O_RDWR|O_CREAT, 0640, $dbh ) );
 #
 #    try {	$hash{1} = 2;
 #    		$hash{4} = 5;
 #	 };
 #
-#    myok(128, $@ =~ /^DB_File hash callback: recursion detected/);
+#    ok( $@ =~ /^DB_File hash callback: recursion detected/);
 #    {
 #        no warnings;
 #        untie %hash;
@@ -830,8 +773,8 @@ do {
 #    unlink $Dfile;
 #}
 
-#myok(127, 1);
-#myok(128, 1);
+#ok( 1);
+#ok( 1);
 
 do {
     # Check that two hash's don't interact
@@ -849,8 +792,8 @@ do {
  
  
     my (%h);
-    myok(127, tie(%hash1, 'DB_File',$Dfile, O_RDWR^|^O_CREAT, 0640, $dbh1 ) );
-    myok(128, tie(%hash2, 'DB_File',$Dfile2, O_RDWR^|^O_CREAT, 0640, $dbh2 ) );
+    ok( tie(%hash1, 'DB_File',$Dfile, O_RDWR^|^O_CREAT, 0640, $dbh1 ) );
+    ok( tie(%hash2, 'DB_File',$Dfile2, O_RDWR^|^O_CREAT, 0640, $dbh2 ) );
 
     %hash1{+DEFG} = 5;
     %hash1{+XYZ} = 2;
@@ -860,11 +803,11 @@ do {
     %hash2{+xyz} = 2;
     %hash2{+abcde} = 5;
 
-    myok(129, $h1_count +> 0);
-    myok(130, $h1_count == $h2_count);
+    ok( $h1_count +> 0);
+    ok( $h1_count == $h2_count);
 
-    myok(131, safeUntie \%hash1);
-    myok(132, safeUntie \%hash2);
+    ok( safeUntie \%hash1);
+    ok( safeUntie \%hash2);
     unlink $Dfile, $Dfile2;
 };
 
@@ -879,16 +822,16 @@ do {
     unlink $Dfile;
 
     tie %hash1, 'DB_File',$Dfile, undef;
-    myok(133, $warn_count == 0);
+    ok( $warn_count == 0);
     $warn_count = 0;
     untie %hash1;
     unlink $Dfile;
     tie %hash1, 'DB_File',$Dfile, O_RDWR^|^O_CREAT, undef;
-    myok(134, $warn_count == 0);
+    ok( $warn_count == 0);
     untie %hash1;
     unlink $Dfile;
     tie %hash1, 'DB_File',$Dfile, undef, undef;
-    myok(135, $warn_count == 0);
+    ok( $warn_count == 0);
     $warn_count = 0;
 
     untie %hash1;
@@ -904,7 +847,7 @@ do {
    my $Dfile = "xxy.db";
    unlink $Dfile;
 
-   myok(136, $db = tie(%h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $DB_HASH ) );
+   ok( $db = tie(%h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $DB_HASH ) );
 
    $db->filter_fetch_key   (sub { }) ;
    $db->filter_store_key   (sub { }) ;
@@ -914,7 +857,7 @@ do {
    $_ = "original" ;
 
    %h{+"fred"} = "joe" ;
-   myok(137, %h{?"fred"} eq "joe");
+   ok( %h{?"fred"} eq "joe");
 
    my @r= grep { %h{?$_} } @( (1, 2, 3));
 
@@ -926,9 +869,9 @@ do {
 
    %h{+"fred"} = "joe" ;
 
-   myok(139, %h{?"fred"} eq "joe");
+   ok( %h{?"fred"} eq "joe");
 
-   myok(140, $db->FIRSTKEY() eq "fred") ;
+   ok( $db->FIRSTKEY() eq "fred") ;
    
    try { my @r= grep { %h{?$_} } @( (1, 2, 3)) };
    ok (141, ! $@);
@@ -947,7 +890,7 @@ do {
    my $Dfile = "xxy.db";
    unlink $Dfile;
 
-   myok(142, $db = tie(%h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $DB_HASH ) );
+   ok( $db = tie(%h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $DB_HASH ) );
 
 
    $db->filter_fetch_key   (sub { $_ = unpack("i", $_) } );
@@ -999,7 +942,7 @@ do {
     my $Dfile = "xxy.db";
     unlink $Dfile;
 
-    myok(152, $db = tie(%h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $DB_HASH ) );
+    ok( $db = tie(%h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $DB_HASH ) );
 
     my $warned = '';
     local $^WARN_HOOK = sub {$warned = @_[0]} ;
@@ -1113,7 +1056,7 @@ do {
    my $Dfile = "xxy.db";
    unlink $Dfile;
 
-   myok(162, $db = tie(%h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $DB_HASH ) );
+   ok( $db = tie(%h, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $DB_HASH ) );
 
 
    do {

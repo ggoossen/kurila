@@ -207,23 +207,19 @@ sub iterate {
     return;
 }
 
-sub EXTEND { }
-
-sub STORESIZE
-{
-    my $self = shift;
-    my $length = shift ;
-    my $current_length = $self->length() ;
-
-    if ($length +< $current_length) {
-        for my $key ( reverse ( $length .. $current_length - 1 ) )
-	  { $self->del($key) }
-    }
-    elsif ($length +> $current_length) {
-        $self->put($length-1, "") ;
-    }
+sub keys {
+    my @($self) = @_;
+    my @keys = @();
+    $self->iterate( sub { my @($key, $value) = @_; push @keys, $key; } );
+    return @keys;
 }
- 
+
+sub values {
+    my @($self) = @_;
+    my @values = @();
+    $self->iterate( sub { my @($key, $value) = @_; push @values, $value; } );
+    return @values;
+}
 
 sub find_dup
 {
