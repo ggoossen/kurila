@@ -880,7 +880,6 @@ fileno		fileno			ck_fun		ist%	F
 umask		umask			ck_fun		ist%	S?
 binmode		binmode			ck_fun		s@	F S?
 
-untie		untie			ck_fun		is%	R
 tied		tied			ck_fun		s%	R
 
 sselect		select system call	ck_select	t@	S S S S

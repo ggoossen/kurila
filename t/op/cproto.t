@@ -231,7 +231,6 @@ unless undef
 unlink (@)
 unpack ($;$)
 unshift (\@@)
-untie undef
 until undef
 use undef
 utime (@)

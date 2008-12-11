@@ -5750,9 +5750,6 @@ Perl_yylex(pTHX)
 	case KEY_ucfirst:
 	    UNI(OP_UCFIRST);
 
-	case KEY_untie:
-	    UNI(OP_UNTIE);
-
 	case KEY_until:
 	    OPERATOR(UNTIL);
 
@@ -7248,11 +7245,6 @@ Perl_keyword (pTHX_ const char *name, I32 len)
                   {
                     switch (name[4])
                     {
-                      case 'e':
-                        {                         /* untie      */
-                          return KEY_untie;
-                        }
-
                       case 'l':
                         {                         /* until      */
                           return KEY_until;

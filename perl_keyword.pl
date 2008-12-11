@@ -9,7 +9,7 @@ my @pos = qw(__DATA__ __END__ BEGIN CHECK DESTROY default defined
 	    delete do END else eval elsif exists for foreach given grep
 	    goto glob INIT if last local m my map next no our pos print printf
 	    package prototype q qr qq qw qx redo return require s scalar sort
-	    split state study sub tr tie tied use undef UNITCHECK until untie
+	    split state study sub tr tie tied use undef UNITCHECK until
 	    unless when while y);
 
 my @neg = qw(__FILE__ __LINE__ __PACKAGE__ and abs alarm atan2 accept bless

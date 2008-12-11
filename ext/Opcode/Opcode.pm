@@ -398,8 +398,6 @@ These are a hotchpotch of opcodes still waiting to be considered
 
     crypt
 
-    tie untie
-
     sselect select
     pipe_op sockpair
 

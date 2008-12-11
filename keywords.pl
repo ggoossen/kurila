@@ -273,7 +273,6 @@ unless
 unlink
 unpack
 unshift
-untie
 until
 use
 utime

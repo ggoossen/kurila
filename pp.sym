@@ -250,7 +250,6 @@ Perl_pp_pipe_op
 Perl_pp_fileno
 Perl_pp_umask
 Perl_pp_binmode
-Perl_pp_untie
 Perl_pp_tied
 Perl_pp_sselect
 Perl_pp_select

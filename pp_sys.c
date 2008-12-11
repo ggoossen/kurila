@@ -716,42 +716,6 @@ PP(pp_binmode)
     }
 }
 
-PP(pp_untie)
-{
-    dVAR; dSP;
-    MAGIC *mg;
-    SV *sv = POPs;
-    const char how = PERL_MAGIC_tied;
-
-    if (SvTYPE(sv) == SVt_PVGV && !(sv = (SV *)GvIOp(sv)))
-	RETPUSHYES;
-
-    if ((mg = SvTIED_mg(sv, how))) {
-	SV * const obj = SvRV(SvTIED_obj(sv, mg));
-        if (obj) {
-	    GV * const gv = gv_fetchmethod(SvSTASH(obj), "UNTIE");
-	    CV *cv;
-	    if (gv && isGV(gv) && (cv = GvCV(gv))) {
-	       PUSHMARK(SP);
-	       XPUSHs(SvTIED_obj((SV*)gv, mg));
-	       mXPUSHi(SvREFCNT(obj) - 1);
-	       PUTBACK;
-	       ENTER;
-	       call_sv((SV *)cv, G_VOID);
-	       LEAVE;
-	       SPAGAIN;
-            }
-	    else if (mg && SvREFCNT(obj) > 1 && ckWARN(WARN_UNTIE)) {
-		  Perl_warner(aTHX_ packWARN(WARN_UNTIE),
-		      "untie attempted while %"UVuf" inner references still exist",
-		       (UV)SvREFCNT(obj) - 1 ) ;
-	    }
-        }
-    }
-    sv_unmagic(sv, how) ;
-    RETPUSHYES;
-}
-
 PP(pp_tied)
 {
     dVAR;
