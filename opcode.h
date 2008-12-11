@@ -238,7 +238,6 @@ EXTCONST char* const PL_op_name[] = {
 	"fileno",
 	"umask",
 	"binmode",
-	"tie",
 	"untie",
 	"tied",
 	"sselect",
@@ -601,7 +600,6 @@ EXTCONST char* const PL_op_desc[] = {
 	"fileno",
 	"umask",
 	"binmode",
-	"tie",
 	"untie",
 	"tied",
 	"select system call",
@@ -976,7 +974,6 @@ EXT Perl_ppaddr_t PL_ppaddr[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_pp_fileno),
 	MEMBER_TO_FPTR(Perl_pp_umask),
 	MEMBER_TO_FPTR(Perl_pp_binmode),
-	MEMBER_TO_FPTR(Perl_pp_tie),
 	MEMBER_TO_FPTR(Perl_pp_untie),
 	MEMBER_TO_FPTR(Perl_pp_tied),
 	MEMBER_TO_FPTR(Perl_pp_sselect),
@@ -1348,7 +1345,6 @@ EXT Perl_check_t PL_check[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* fileno */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* umask */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* binmode */
-	MEMBER_TO_FPTR(Perl_ck_fun),	/* tie */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* untie */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* tied */
 	MEMBER_TO_FPTR(Perl_ck_select),	/* sselect */
@@ -1714,7 +1710,6 @@ EXTCONST U32 PL_opargs[] = {
 	0x0000d61c,	/* fileno */
 	0x0001361c,	/* umask */
 	0x0012c804,	/* binmode */
-	0x0042e855,	/* tie */
 	0x0000f614,	/* untie */
 	0x0000f604,	/* tied */
 	0x02222808,	/* sselect */
