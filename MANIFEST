@@ -1825,7 +1825,6 @@ pod/perlclib.pod		Internal replacements for standard C library functions
 pod/perlcommunity.pod		Perl community information
 pod/perlcompile.pod		Perl compiler suite intro
 pod/perldata.pod		Perl data structures
-pod/perldbmfilter.pod		Perl DBM filters
 pod/perldebguts.pod		Perl debugging guts and tips
 pod/perldebtut.pod		Perl debugging tutorial
 pod/perldebug.pod		Perl debugging
