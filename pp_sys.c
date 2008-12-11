@@ -716,27 +716,6 @@ PP(pp_binmode)
     }
 }
 
-PP(pp_tied)
-{
-    dVAR;
-    dSP;
-    const MAGIC *mg;
-    SV *sv = POPs;
-    const char how = PERL_MAGIC_tied;
-
-    if (SvTYPE(sv) == SVt_PVGV && !(sv = (SV *)GvIOp(sv)))
-	RETPUSHUNDEF;
-
-    if ((mg = SvTIED_mg(sv, how))) {
-	SV *osv = SvTIED_obj(sv, mg);
-	if (osv == mg->mg_obj)
-	    osv = sv_mortalcopy(osv);
-	PUSHs(osv);
-	RETURN;
-    }
-    RETPUSHUNDEF;
-}
-
 PP(pp_sselect)
 {
 #ifdef HAS_SELECT

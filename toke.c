@@ -5728,9 +5728,6 @@ Perl_yylex(pTHX)
 	case KEY_telldir:
 	    UNI(OP_TELLDIR);
 
-	case KEY_tied:
-	    UNI(OP_TIED);
-
 	case KEY_time:
 	    FUN0(OP_TIME);
 
@@ -6787,14 +6784,6 @@ Perl_keyword (pTHX_ const char *name, I32 len)
             case 'i':
               switch (name[2])
               {
-                case 'e':
-                  if (name[3] == 'd')
-                  {                               /* tied       */
-                    return KEY_tied;
-                  }
-
-                  goto unknown;
-
                 case 'm':
                   if (name[3] == 'e')
                   {                               /* time       */

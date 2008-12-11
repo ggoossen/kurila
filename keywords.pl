@@ -259,7 +259,6 @@ system
 syswrite
 tell
 telldir
-tied
 time
 times
 tr
