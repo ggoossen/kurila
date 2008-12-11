@@ -1891,7 +1891,6 @@ pod/perlstyle.pod		Perl style guide
 pod/perlsub.pod			Perl subroutines
 pod/perlsyn.pod			Perl syntax
 pod/perlthrtut.pod		Perl threads tutorial
-pod/perltie.pod			Perl objects hidden behind simple variables
 pod/perltodo.pod		Perl things to do
 pod/perltooc.pod		Perl OO tutorial, part 2
 pod/perltoot.pod		Perl OO tutorial, part 1
