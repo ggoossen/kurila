@@ -2388,7 +2388,6 @@ t/op/sub.t			See if subroutines work
 t/op/symbolcache.t		See if undef/delete works on stashes with functions
 t/op/sysio.t			See if sysread and syswrite work
 t/op/taint.t			See if tainting works
-t/op/tie.t			See if tie/untie functions work
 t/op/time.t			See if time functions work
 t/op/undef.t			See if undef works
 t/op/universal.t		See if UNIVERSAL class works
@@ -2464,7 +2463,6 @@ t/sv/object.t			See if objects work
 t/sv/closure.t			See if closures work
 t/sv/fh.t			See if filehandles work
 t/sv/hash.t			See if the complexity attackers are repelled
-t/sv/hash_tied.t			See if the tied hashes work
 t/sv/magic.t			See if magic variables work
 t/sv/sv_2pv.t			See if stringification (sv_2pv) works
 t/TEST				The regression tester
