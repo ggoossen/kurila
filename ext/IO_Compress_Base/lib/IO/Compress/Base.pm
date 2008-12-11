@@ -724,8 +724,6 @@ sub close
     return 1 if $self->{?Closed} || ! $self->{?Compress} ;
     $self->{+Closed} = 1 ;
 
-    untie $self;
-
     $self->_writeTrailer()
         or return 0 ;
 

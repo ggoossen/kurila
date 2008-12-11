@@ -1200,8 +1200,6 @@ sub close
 
     return 1 if $self->{?Closed} ;
 
-    untie $self ;
-
     my $status = 1 ;
 
     if (defined $self->{?FH}) {
