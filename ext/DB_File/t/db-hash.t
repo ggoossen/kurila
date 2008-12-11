@@ -55,16 +55,6 @@ sub normalise
     return $data ;
 }
 
-sub safeUntie
-{
-    my $hashref = shift ;
-    my $no_inner = 1;
-    local $^WARN_HOOK = sub {-- $no_inner } ;
-    untie %$hashref;
-    return $no_inner;
-}
-
-
 my $Dfile = "dbhash.tmp";
 my $Dfile2 = "dbhash2.tmp";
 my $null_keys_allowed = ($DB_File::db_ver +< 2.004010 
@@ -278,7 +268,6 @@ ok( 1 );
 #ok( $status != 0 );
 
 undef %h ;
-untie %h ;
 
 unlink $Dfile;
 
@@ -525,7 +514,7 @@ do {
    ok( checkOutput( "", "", "", "")) ;
 
    undef $db ;
-   untie %h;
+   undef %h;
    unlink $Dfile;
 };
 
@@ -589,7 +578,7 @@ do {
     ok( $_ eq "original") ;
 
     undef $db ;
-    untie %h;
+    undef %h;
     unlink $Dfile;
 };		
 
@@ -608,7 +597,7 @@ do {
    ok( $@->{?description} =~ m/^recursion detected in filter_store_key/ );
    
    undef $db ;
-   untie %h;
+   undef %h;
    unlink $Dfile;
 };
 
@@ -645,7 +634,7 @@ do {
     while (@(?$k, ?$v) =@( each %h))
       { print "$k -> $v\n" }
 
-    untie %h ;
+    undef %h ;
 
     unlink "fruit" ;
   };  
@@ -736,7 +725,7 @@ do {
     ok( $bad_key == 0);
 
     undef $db ;
-    untie %h ;
+    undef %h ;
     unlink $Dfile;
 };
 
@@ -806,8 +795,6 @@ do {
     ok( $h1_count +> 0);
     ok( $h1_count == $h2_count);
 
-    ok( safeUntie \%hash1);
-    ok( safeUntie \%hash2);
     unlink $Dfile, $Dfile2;
 };
 

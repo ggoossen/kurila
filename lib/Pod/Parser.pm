@@ -1051,7 +1051,7 @@ sub parse_from_filehandle {
 
     ## Use <$fh> instead of $fh->getline where possible (for speed)
     $_ = ref $in_fh;
-    my $tied_fh = (m/^(?:GLOB|FileHandle|IO::\w+)$/  or  tied $in_fh);
+    my $tied_fh = (m/^(?:GLOB|FileHandle|IO::\w+)$/);
 
     ## Read paragraphs line-by-line
     while (defined ($textline = $tied_fh ?? ~< $in_fh !! $in_fh->getline)) {

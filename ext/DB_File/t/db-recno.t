@@ -60,15 +60,6 @@ sub docat_del
     return $result;
 }   
 
-sub safeUntie
-{
-    my $hashref = shift ;
-    my $no_inner = 1;
-    local $^WARN_HOOK = sub {-- $no_inner } ;
-    untie @$hashref;
-    return $no_inner;
-}
-
 sub bad_one
 {
     unless ($bad_ones++) {

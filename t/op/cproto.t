@@ -2,7 +2,7 @@
 # Tests to ensure that we don't unexpectedly change prototypes of builtins
 
 BEGIN { require './test.pl'; }
-plan tests => 223;
+plan tests => 221;
 
 while ( ~< *DATA) {
     chomp;
@@ -218,7 +218,6 @@ system undef
 syswrite (*$;$$)
 tell (;*)
 telldir (*)
-tied undef
 time ()
 times ()
 tr undef

@@ -443,7 +443,6 @@ EOF
 
   chdir($orig_cwd);
   select($orig_fh);
-  untie *PSEUDO_STDOUT if tied *PSEUDO_STDOUT;
   close $FH;
 
   return 1;

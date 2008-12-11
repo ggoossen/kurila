@@ -184,7 +184,7 @@ sub copy {
 	$size = shift(@_) + 0;
 	die("Bad buffer size for copy: $size\n") unless ($size +> 0);
     } else {
-	$size = tied(*$from_h) ?? 0 !! -s $from_h || 0;
+	$size = -s $from_h || 0;
 	$size = 1024 if ($size +< 512);
 	$size = $Too_Big if ($size +> $Too_Big);
     }
