@@ -456,19 +456,19 @@ forked second kid
 second child
 wait() returned ok
 ########
-pipe(RDR,WTR) or die $!;
+pipe(my $rdr, my $wtr) or die $!;
 my $pid = fork;
 die "fork: $!" if !defined $pid;
 if ($pid == 0) {
     my $rand_child = rand;
-    close RDR;
+    close $rdr;
     print WTR $rand_child, "\n";
-    close WTR;
+    close $wtr;
 } else {
     my $rand_parent = rand;
-    close WTR;
-    chomp(my $rand_child  = ~< *RDR);
-    close RDR;
+    close $wtr;
+    chomp(my $rand_child  = ~< $rdr);
+    close $rdr;
     print $rand_child ne $rand_parent, "\n";
 }
 EXPECT

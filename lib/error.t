@@ -114,12 +114,12 @@ MSG
 
 # yyerror
 do {
-    eval 'undef foo'; my $line = __LINE__;
+    eval 'undef "foo"'; my $line = __LINE__;
     is defined $@, 1, '$@ is set';
     is ref $@, 'error', '$@ is error object';
     is $@->description, "Can't modify constant item in undef operator";
     is $@->stacktrace, <<MSG ;
- at (eval 9) line 1 character 7.
+ at (eval 9) line 1 character 12.
     (eval) called at ../lib/error.t line $line character 5.
 MSG
 };

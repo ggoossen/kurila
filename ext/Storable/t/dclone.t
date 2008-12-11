@@ -16,7 +16,7 @@ BEGIN {
 
 use Storable < qw(dclone);
 
-print "1..12\n";
+print "1..10\n";
 
 $a = 'toto';
 $b = \$a;
@@ -83,21 +83,3 @@ print ref $clone eq ref $empty_string_obj &&
       $$clone eq $$empty_string_obj &&
       $$clone eq '' ?? "ok 10\n" !! "not ok 10\n";
 
-
-# Do not fail if Tie::Hash and/or Tie::StdHash is not available
-if (try { require Tie::Hash; scalar keys %{Symbol::stash("Tie::StdHash")} }) {
-    tie my %tie, "Tie::StdHash" or die $!;
-    %tie{+array} = \@(1,2,3,4);
-    %tie{+hash} = \%(1,2,3,4);
-    my $clone_array = dclone %tie{?array};
-    print "not " unless join(' ',@$clone_array) eq join(' ',@{%tie{?array}});
-    print "ok 11\n";
-    my $clone_hash = dclone %tie{?hash};
-    print "not " unless $clone_hash->{?1} eq %tie{hash}->{?1};
-    print "ok 12\n";
-} else {
-    print <<EOF;
-ok 11 # skip No Tie::StdHash available
-ok 12 # skip No Tie::StdHash available
-EOF
-}

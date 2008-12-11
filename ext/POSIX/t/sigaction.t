@@ -11,7 +11,7 @@ BEGIN{
 	}
 }
 
-use Test::More tests => 31;
+use Test::More tests => 27;
 
 use vars < qw/$bad $bad7 $ok10 $bad18 $ok/;
 
@@ -173,22 +173,6 @@ ok($oldaction->safe, "SigAction can be safe");
 $ok = 0;
 kill 'HUP', $$;
 ok($ok, "safe signal delivery must work");
-
-SKIP: do {
-    eval 'use POSIX qw(%SIGRT SIGRTMIN SIGRTMAX); scalar %SIGRT + SIGRTMIN() + SIGRTMAX()';
-    $@					# POSIX did not exort
-    || SIGRTMIN() +< 0 || SIGRTMAX() +< 0	# HP-UX 10.20 exports both as -1
-    || SIGRTMIN() +> config_value('sig_count')	# AIX 4.3.3 exports bogus 888 and 999
-	and skip("no SIGRT signals", 4);
-    ok(SIGRTMAX() +> SIGRTMIN(), "SIGRTMAX > SIGRTMIN");
-    is(scalar %SIGRT, SIGRTMAX() - SIGRTMIN() + 1, "scalar SIGRT");
-    my $sigrtmin;
-    my $h = sub { $sigrtmin = 1 };
-    %SIGRT{+SIGRTMIN} = $h;
-    is(%SIGRT{?SIGRTMIN}, $h, "handler set & get");
-    kill 'SIGRTMIN', $$;
-    is($sigrtmin, 1, "SIGRTMIN handler works");
-};
 
 SKIP: do {
     eval 'use POSIX qw(SA_SIGINFO); SA_SIGINFO';

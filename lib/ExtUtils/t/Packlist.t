@@ -13,7 +13,7 @@ isa_ok( $pl, 'ExtUtils::Packlist' );
 SKIP: do {
 
 	# and some test data to be read
-	$pl->{+data} = \%(
+	$pl->{+data} = %(
 		single => 1,
 		hash => \%(
 			foo => 'bar',
@@ -42,14 +42,14 @@ SKIP: do {
 
     try{ ExtUtils::Packlist::read($pl, 'eplist') };
     is( $@, '', 'read() should normally succeed' );
-    is( $pl->{data}->{?single}, undef, 'single keys should have undef value' );
-    is( ref($pl->{data}->{?hash}), 'HASH', 'multivalue keys should become hashes');
+    is( $pl->{data}{?single}, undef, 'single keys should have undef value' );
+    is( ref($pl->{data}{?hash}), 'HASH', 'multivalue keys should become hashes');
 
-    is( $pl->{data}->{hash}->{?foo}, 'bar', 'hash values should be set' );
-    ok( exists $pl->{data}->{'/abc'}, 'read() should resolve /./ to / in keys' );
+    is( $pl->{data}{hash}->{?foo}, 'bar', 'hash values should be set' );
+    ok( exists $pl->{data}{'/abc'}, 'read() should resolve /./ to / in keys' );
 
     # give validate a valid and an invalid file to find
-    $pl->{+data} = \%(
+    $pl->{+data} = %(
         eplist => 1,
         fake => undef,
     );
@@ -57,7 +57,7 @@ SKIP: do {
     is( nelems @(ExtUtils::Packlist::validate($pl)), 1,
         'validate() should find missing files' );
     ExtUtils::Packlist::validate($pl, 1);
-    ok( !exists $pl->{data}->{fake},
+    ok( !exists $pl->{data}{fake},
         'validate() should remove missing files when prompted' );
 
     # one more new() test, to see if it calls read() successfully

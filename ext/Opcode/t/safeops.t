@@ -249,7 +249,6 @@ pipe_op		pipe FOO,BAR
 fileno		fileno FOO
 umask		umask 0755, 'foo'
 binmode		binmode FOO
-tie		tie
 untie		untie
 tied		tied
 sselect		SKIP (set by optimizer)

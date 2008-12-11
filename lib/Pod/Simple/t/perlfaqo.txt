@@ -251,10 +251,7 @@ If you want to call C from Perl, start with perlxstut, moving on to perlxs, xsub
 I've read perlembed, perlguts, etc., but I can't embed perl in my C program; what am I doing wrong?
 Download the ExtUtils::Embed kit from CPAN and run `make test'. If the tests pass, read the pods again and again and again. If they fail, see perlbug and send a bug report with the output of make test TEST_VERBOSE=1 along with perl -V.
 When I tried to run my script, I got this message. What does it mean?
-A complete list of Perl's error messages and warnings with explanatory text can be found in perldiag. You can also use the splain program (distributed with Perl) to explain the error messages:
-    perl program 2>diag.out
-    splain [-v] [-p] diag.out
-or change your program to explain the messages for you:
+A complete list of Perl's error messages and warnings with explanatory text can be found in perldiag. You can also change your program to explain the messages for you:
     use diagnostics;
 or
     use diagnostics -verbose;

@@ -22,7 +22,7 @@ sub ok {
   print "$($not)ok $tcount\n";
 }
 
-print "1..10\n";
+print "1..5\n";
 
 my $DIR = $^O eq 'MacOS' ?? ":" !! ".";
 
@@ -49,24 +49,3 @@ open(FH,'>', 'X') || die "Can't create x";
 print FH "X";
 close(FH) or die "Can't close: $!";
 
-tie my %dir, 'IO::Dir', $DIR;
-my @files = keys %dir;
-
-# I hope we do not have an empty dir :-)
-ok(scalar nelems @files);
-
-my $stat = %dir{?'X'};
-ok(defined($stat) && UNIVERSAL::isa($stat,'File::stat') && $stat->size == 1);
-
-delete %dir{'X'};
-
-ok(-f 'X');
-
-tie my %dirx, 'IO::Dir', $DIR, DIR_UNLINK;
-
-my $statx = %dirx{?'X'};
-ok(defined($statx) && UNIVERSAL::isa($statx,'File::stat') && $statx->size == 1);
-
-delete %dirx{'X'};
-
-ok(!(-f 'X'));

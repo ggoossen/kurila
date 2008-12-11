@@ -202,42 +202,6 @@ Use of uninitialized value within %main::gh in sin at - line 12 character 6.
 Use of uninitialized value within %mh in sin at - line 13 character 6.
 ########
 use warnings 'uninitialized';
-my (@mat, %mht, $v);
-
-sub X::TIEHASH { bless \@(), 'X' }
-sub X::FETCH { undef }
-
-tie %mht, 'X';
-my $key1 = 'akey';
-my $key2 = 'bkey';
-my $index1 = 33;
-my $index2 = 55;
-
-
-
-
-
-
-
-
-
-$v = sin %mht{foo};
-$v = %mht{foo} + %mht{bar};
-
-$v = sin %mht{$key1};
-$v = %mht{$key1} + %mht{$key2};
-
-$v = $1+1;
-EXPECT
-Use of uninitialized value %mht{"foo"} in sin at - line 21 character 6.
-Use of uninitialized value in addition (+) at - line 22 character 15.
-Use of uninitialized value in addition (+) at - line 22 character 15.
-Use of uninitialized value within %mht in sin at - line 24 character 6.
-Use of uninitialized value in addition (+) at - line 25 character 17.
-Use of uninitialized value in addition (+) at - line 25 character 17.
-Use of uninitialized value $::1 in addition (+) at - line 27 character 8.
-########
-use warnings 'uninitialized';
 my ($m1, $m2);
 our ($g1, @ga);
 

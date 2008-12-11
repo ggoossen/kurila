@@ -4,7 +4,7 @@
 # (including weird syntax errors)
 
 BEGIN { require "./test.pl"; }
-plan( tests => 80 );
+plan( tests => 78 );
 
 eval '%@x=0;';
 like( $@->{?description}, qr/^Can't coerce HASH to string in repeat/, '%@x=0' );
@@ -26,15 +26,7 @@ eval '@($a, b) = @(1, 2);';
 like( $@->{?description}, qr/^Can't assign to constant item/,
     'bareword in list assignment' );
 
-eval 'tie FOO, "Foo";';
-like( $@->{?description}, qr/^Can't modify constant item in tie/,
-    'tying a bareword causes a segfault in 5.6.1' );
-
-eval 'undef foo';
-like( $@->{?description}, qr/^Can't modify constant item in undef operator/,
-    'undefing constant causes a segfault in 5.6.1 [ID 20010906.019]' );
-
-eval 'read(our $bla, FILE, 1);';
+eval 'read(our $bla, "FILE", 1);';
 like( $@->{?description}, qr/^Can't modify constant item in read/,
     'read($var, FILE, 1) segfaults on 5.6.1 [ID 20011025.054]' );
 

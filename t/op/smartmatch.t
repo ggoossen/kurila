@@ -22,8 +22,6 @@ do {my $const = "a constant"; sub a_const () {$const}};
 my @nums =1..10;
 
 my %hash = %(foo => 17, bar => 23);
-tie my %tied_hash, 'Tie::StdHash';
-%tied_hash = %( < %hash );
 
 # Load and run the tests
 my @tests = map \@(chomp and < split m/\t+/, $_, 3), grep !m/^#/ && m/\S/, @( ~< *DATA);
@@ -87,10 +85,6 @@ __DATA__
 	\%(1 => 2)	\%(1 => 2)
 	\%(1 => 2)	\%(1 => 3)
 !	\%(1 => 2)	\%(2 => 3)
-
-#  - tied hash ref
-	\%hash		\%tied_hash
-	\%tied_hash	\%tied_hash
 
 #  - an array ref
 	\%::		\@(keys %main::)

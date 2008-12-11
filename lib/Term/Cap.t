@@ -33,7 +33,7 @@ else {
 use_ok( 'Term::Cap' );
 
 local (*TCOUT, *OUT);
-my $out = tie *OUT, 'TieOut';
+open \*OUT, ">>", \(my $out);
 my $writable = 1;
 
 if (open(TCOUT, ">", "tcout")) {

@@ -3,7 +3,7 @@
 BEGIN {
     require './test.pl';
 }
-plan tests => 101;
+plan tests => 93;
 
 our (@c, @b, @a, $a, $b, $c, $d, $e, $x, $y, %d, %h, $m);
 
@@ -142,33 +142,6 @@ do {
     sub CLEAR { print "# CLEAR [$(dump::view(< @_))]\n"; %{@_[0]} = %( () ); }
     sub FIRSTKEY { print "# FIRSTKEY [$(join ' ',@_)]\n"; keys %{@_[0]}; each %{@_[0]} }
     sub NEXTKEY { print "# NEXTKEY [$(join ' ',@_)]\n"; each %{@_[0]} }
-};
-
-# see if localization works on tied hashes
-tie %h, 'TH';
-%h = %('a' => 1, 'b' => 2, 'c' => 3);
-
-do {
-    local(%h{+'a'}) = 'foo';
-    local(%h{+'b'}) = %h{?'b'};
-    local(%h{'y'});
-    local(%h{+'z'}) = 33;
-    is(%h{?'a'}, 'foo');
-    is(%h{?'b'}, 2, " # TODO ");
-    local(%h{'c'});
-    delete %h{'c'};
-};
-is(%h{?'a'}, 1, " # TODO ");
-is(%h{?'b'}, 2, " # TODO ");
-is(%h{?'c'}, 3, " # TODO ");
-# local() should preserve the existenceness of tied hash elements
-ok(! exists %h{'y'});
-ok(! exists %h{'z'});
-TODO: do {
-    todo_skip("Localize entire tied hash");
-    my $d = join("\n", map { "$_=>%h{?$_}" } sort keys %h);
-    local %h = %( < %h );
-    is(join("\n", map { "$_=>%h{?$_}" } sort keys %h), $d);
 };
 
 @a = @('a', 'b', 'c');
@@ -320,8 +293,7 @@ do {
 	my $unicode = chr 256;
 	my $ambigous = "\240" . $unicode;
 	chop $ambigous;
-	local %h{[@($unicode, $ambigous)]} =@( @(256, 160));
-        local our $TODO = "localized hash alues";
+	local %h{[@($unicode, $ambigous)]} = @(256, 160);
 
 	is(nkeys %h, 4);
 	is(%h{?"\243"}, "pound");

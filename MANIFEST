@@ -534,7 +534,6 @@ ext/Storable/t/canonical.t	See if Storable works
 ext/Storable/t/circular_hook.t	Test thaw hook called depth-first for circular refs
 ext/Storable/t/code.t		See if Storable works
 ext/Storable/t/compat01.t	See if Storable works
-ext/Storable/t/compat06.t	See if Storable works
 ext/Storable/t/croak.t		See if Storable works
 ext/Storable/t/dclone.t		See if Storable works
 ext/Storable/t/downgrade.t	See if Storable works
@@ -558,7 +557,6 @@ ext/Storable/t/sig_die.t	See if Storable works
 ext/Storable/t/st-dump.pl	See if Storable works
 ext/Storable/t/store.t		See if Storable works
 ext/Storable/t/testlib.pl	more helper routines for tests
-ext/Storable/t/tied_items.t	See if Storable works
 ext/Storable/t/utf8.t		See if Storable works
 ext/Storable/t/weak.t		Can Storable store weakrefs
 ext/Sys-Hostname/Hostname.pm	Sys::Hostname extension Perl module
@@ -1486,8 +1484,6 @@ lib/Text/TabsWrap/t/wrap.t	See if Text::Wrap::wrap works
 lib/Text/Wrap.pm		Paragraph formatter
 lib/Tie/Hash/NamedCapture.pm	Implements %- and %+ behaviour
 lib/Tie/Hash.pm			Base class for tied hashes
-lib/Tie/SubstrHash.pm		Compact hash for known key, value and table size
-lib/Tie/SubstrHash.t		Test for Tie::SubstrHash
 lib/Time/gmtime.pm		By-name interface to Perl's builtin gmtime
 lib/Time/gmtime.t		Test for Time::gmtime
 lib/Time/Local.pm		Reverse translation of localtime, gmtime
