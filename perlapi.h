@@ -256,6 +256,8 @@ END_EXTERN_C
 #define PL_dumper_fd		(*Perl_Idumper_fd_ptr(aTHX))
 #undef  PL_dumpindent
 #define PL_dumpindent		(*Perl_Idumpindent_ptr(aTHX))
+#undef  PL_dynamicscope
+#define PL_dynamicscope		(*Perl_Idynamicscope_ptr(aTHX))
 #undef  PL_e_script
 #define PL_e_script		(*Perl_Ie_script_ptr(aTHX))
 #undef  PL_efloatbuf

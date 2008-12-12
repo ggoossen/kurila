@@ -91,7 +91,8 @@ Perl_push_scope(pTHX)
 	Renew(PL_scopestack, PL_scopestack_max, I32);
     }
     PL_scopestack[PL_scopestack_ix++] = PL_savestack_ix;
-
+    SAVESPTR( PL_dynamicscope );
+    SVcpSTEAL( PL_dynamicscope, newHV() );
 }
 
 void
@@ -791,6 +792,7 @@ Perl_leave_scope(pTHX_ I32 base)
 	    ptr = SSPOPPTR;
 	    SvREFCNT_dec(*(SV**)ptr);
 	    *(SV**)ptr = (SV*)SSPOPPTR;
+	    DEBUG_l(PerlIO_printf(Perl_debug_log, "ptr %p", *(SV**)ptr));
 	    assert( ( ! *(SV**)(ptr) ) || (SvREFCNT(*(SV**)(ptr)) > 0) );
 	    break;
 	case SAVEt_VPTR:			/* random* reference */

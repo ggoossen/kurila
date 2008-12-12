@@ -2191,8 +2191,6 @@
 #define pp_syswrite		Perl_pp_syswrite
 #define pp_tell			Perl_pp_tell
 #define pp_telldir		Perl_pp_telldir
-#define pp_tie			Perl_pp_tie
-#define pp_tied			Perl_pp_tied
 #define pp_time			Perl_pp_time
 #define pp_tms			Perl_pp_tms
 #define pp_truncate		Perl_pp_truncate
@@ -2204,7 +2202,6 @@
 #define pp_unpack		Perl_pp_unpack
 #define pp_unshift		Perl_pp_unshift
 #define pp_unstack		Perl_pp_unstack
-#define pp_untie		Perl_pp_untie
 #define pp_utime		Perl_pp_utime
 #define pp_values		Perl_pp_values
 #define pp_vec			Perl_pp_vec
@@ -4371,8 +4368,6 @@
 #define pp_syswrite()		Perl_pp_syswrite(aTHX)
 #define pp_tell()		Perl_pp_tell(aTHX)
 #define pp_telldir()		Perl_pp_telldir(aTHX)
-#define pp_tie()		Perl_pp_tie(aTHX)
-#define pp_tied()		Perl_pp_tied(aTHX)
 #define pp_time()		Perl_pp_time(aTHX)
 #define pp_tms()		Perl_pp_tms(aTHX)
 #define pp_truncate()		Perl_pp_truncate(aTHX)
@@ -4384,7 +4379,6 @@
 #define pp_unpack()		Perl_pp_unpack(aTHX)
 #define pp_unshift()		Perl_pp_unshift(aTHX)
 #define pp_unstack()		Perl_pp_unstack(aTHX)
-#define pp_untie()		Perl_pp_untie(aTHX)
 #define pp_utime()		Perl_pp_utime(aTHX)
 #define pp_values()		Perl_pp_values(aTHX)
 #define pp_vec()		Perl_pp_vec(aTHX)

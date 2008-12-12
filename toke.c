@@ -4901,6 +4901,9 @@ Perl_yylex(pTHX)
 	    s = force_word(s,WORD,TRUE,FALSE,FALSE);
 	    LOOPX(OP_DUMP);
 
+	case KEY_dynascope:
+	    FUN0(OP_DYNASCOPE);
+
 	case KEY_else:
 	    PREBLOCK(ELSE);
 
@@ -7814,24 +7817,14 @@ Perl_keyword (pTHX_ const char *name, I32 len)
           switch (name[1])
           {
             case 'e':
-              if (name[2] == 'f')
-              {
-                switch (name[3])
-                {
-                  case 'i':
-                    if (name[4] == 'n' &&
-                        name[5] == 'e' &&
-                        name[6] == 'd')
-                    {                             /* defined    */
+              if (name[2] == 'f' &&
+                  name[3] == 'i' &&
+                  name[4] == 'n' &&
+                  name[5] == 'e' &&
+                  name[6] == 'd')
+		  {                             /* defined    */
                       return KEY_defined;
-                    }
-
-                    goto unknown;
-
-                  default:
-                    goto unknown;
-                }
-              }
+		  }
 
               goto unknown;
 
@@ -8539,6 +8532,21 @@ Perl_keyword (pTHX_ const char *name, I32 len)
               name[8] == 'K')
           {                                       /* UNITCHECK  */
             return KEY_UNITCHECK;
+          }
+
+          goto unknown;
+
+        case 'd':
+          if (name[1] == 'y' &&
+              name[2] == 'n' &&
+              name[3] == 'a' &&
+              name[4] == 's' &&
+              name[5] == 'c' &&
+              name[6] == 'o' &&
+              name[7] == 'p' &&
+              name[8] == 'e')
+          {                                       /* dynascope  */
+            return KEY_dynascope;
           }
 
           goto unknown;

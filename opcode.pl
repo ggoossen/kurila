@@ -849,6 +849,7 @@ leavesub	subroutine exit		ck_null		1
 caller		caller			ck_fun		t%	S?
 warn		warn			ck_fun		imst@	L
 die		die			ck_die		dimst@	L
+dynascope		dynamic scope			ck_null		s0	
 
 lineseq		line sequence		ck_null		@	
 nextstate	next statement		ck_null		s;	

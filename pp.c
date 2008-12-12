@@ -4766,6 +4766,13 @@ PP(pp_placeholder)
     RETURN;
 }
 
+PP(pp_dynascope)
+{
+    dSP;
+    mXPUSHs(newRV(PL_dynamicscope));
+    RETURN;
+}
+
 /*
  * Local variables:
  * c-indentation-style: bsd

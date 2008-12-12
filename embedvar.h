@@ -110,6 +110,7 @@
 #define PL_dowarn		(vTHX->Idowarn)
 #define PL_dumper_fd		(vTHX->Idumper_fd)
 #define PL_dumpindent		(vTHX->Idumpindent)
+#define PL_dynamicscope		(vTHX->Idynamicscope)
 #define PL_e_script		(vTHX->Ie_script)
 #define PL_efloatbuf		(vTHX->Iefloatbuf)
 #define PL_efloatsize		(vTHX->Iefloatsize)
@@ -392,6 +393,7 @@
 #define PL_Idowarn		PL_dowarn
 #define PL_Idumper_fd		PL_dumper_fd
 #define PL_Idumpindent		PL_dumpindent
+#define PL_Idynamicscope	PL_dynamicscope
 #define PL_Ie_script		PL_e_script
 #define PL_Iefloatbuf		PL_efloatbuf
 #define PL_Iefloatsize		PL_efloatsize

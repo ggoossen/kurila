@@ -47,6 +47,8 @@ PERLVAR(Iscopestack,	I32 *)		/* scopes we've ENTERed */
 PERLVAR(Iscopestack_ix,	I32)
 PERLVAR(Iscopestack_max,I32)
 
+PERLVAR(Idynamicscope,	SV *)		/* the current dynamic scope */
+
 PERLVAR(Isavestack,	ANY *)		/* items that need to be restored when
 					   LEAVEing scopes we've ENTERed */
 PERLVAR(Isavestack_ix,	I32)

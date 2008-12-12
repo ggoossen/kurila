@@ -90,6 +90,7 @@ delete
 die
 do
 dump
+dynascope
 each
 else
 elsif
