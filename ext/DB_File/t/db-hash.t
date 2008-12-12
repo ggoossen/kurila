@@ -9,7 +9,7 @@ use Fcntl;
 
 use Test::More;
 
-plan tests => 165;
+plan tests => 57;
 
 unlink < glob "__db.*";
 
@@ -363,75 +363,6 @@ do {
 };
 
 do {
-    # now an error to pass 'hash' a non-code reference
-    my $dbh = DB_File::HASHINFO->new() ;
-
-    dies_like( sub { $dbh->{+hash} = 2 },
-               qr/^Key 'hash' not associated with a code reference/ );
-
-};
-
-
-#{
-#    # recursion detection in hash
-#    my %hash ;
-#    my $Dfile = "xxx.db";
-#    unlink $Dfile;
-#    my $dbh = new DB_File::HASHINFO ;
-#    $dbh->{hash} = sub { $hash{3} = 4 ; length $_[0] } ;
-# 
-# 
-#    ok( tie(%hash, 'DB_File',$Dfile, O_RDWR|O_CREAT, 0640, $dbh ) );
-#
-#    try {	$hash{1} = 2;
-#    		$hash{4} = 5;
-#	 };
-#
-#    ok( $@ =~ /^DB_File hash callback: recursion detected/);
-#    {
-#        no warnings;
-#        untie %hash;
-#    }
-#    unlink $Dfile;
-#}
-
-#ok( 1);
-#ok( 1);
-
-do {
-    # Check that two hash's don't interact
-    my %hash1 ;
-    my %hash2 ;
-    my $h1_count = 0;
-    my $h2_count = 0;
-    unlink $Dfile, $Dfile2;
-    my $dbh1 = DB_File::HASHINFO->new() ;
-    $dbh1->{+hash} = sub { ++ $h1_count ; length @_[0] } ;
-
-    my $dbh2 = DB_File::HASHINFO->new() ;
-    $dbh2->{+hash} = sub { ++ $h2_count ; length @_[0] } ;
- 
- 
- 
-    my (%h);
-    ok( tie(%hash1, 'DB_File',$Dfile, O_RDWR^|^O_CREAT, 0640, $dbh1 ) );
-    ok( tie(%hash2, 'DB_File',$Dfile2, O_RDWR^|^O_CREAT, 0640, $dbh2 ) );
-
-    %hash1{+DEFG} = 5;
-    %hash1{+XYZ} = 2;
-    %hash1{+ABCDE} = 5;
-
-    %hash2{+defg} = 5;
-    %hash2{+xyz} = 2;
-    %hash2{+abcde} = 5;
-
-    ok( $h1_count +> 0);
-    ok( $h1_count == $h2_count);
-
-    unlink $Dfile, $Dfile2;
-};
-
-do {
     # Passing undef for flags and/or mode when calling tie could cause 
     #     Use of uninitialized value in subroutine entry
     
@@ -469,7 +400,7 @@ do {
 
     use warnings ;
      
-    my (%h, $db) ;
+    my (%h) ;
     my $Dfile = "xxy.db";
     unlink $Dfile;
 
@@ -485,7 +416,7 @@ do {
         my $key = $ix . "data" ;
         my $value = "value$ix" ;
         %remember{+$key} = $value ;
-        $db->put($key, $value) ;
+        %h->put($key, $value) ;
     }
 
     ok $warned eq '' 
@@ -498,7 +429,7 @@ do {
         my $key = $ix . "data" ;
         my $value = "value$ix" ;
         %remember{+$key} = $value ;
-        $db->put($key, $value) ;
+        %h->put($key, $value) ;
     }
 
     ok $warned eq '' 
@@ -512,7 +443,7 @@ do {
         my $key = $ix . "data" ;
         my $value = "value$ix" ;
         %remember{+$key} = $value ;
-        %h{+substr($key,0)} = $value ;
+        %h->put(substr($key,0) => $value);
     }
 
     ok $warned eq '' 
@@ -526,7 +457,7 @@ do {
         my $key = $ix . "data" ;
         my $value = "value$ix" ;
         %remember{+$key} = $value ;
-        %h{+$key} = substr($value,0) ;
+        %h->put($key => substr($value,0) );
     }
 
     ok $warned eq '' 
@@ -534,7 +465,7 @@ do {
 
     my %bad = %( () ) ;
     $key = '';
-    my $status = $db->seq($key, $value, R_FIRST );
+    my $status = %h->seq($key, $value, R_FIRST );
     while ( $status == 0 ) {
 
         #print "# key [$key] value [$value]\n" ;
@@ -546,7 +477,7 @@ do {
             %bad{+$key} = $value ;
         }
 
-        $status = $db->seq($key, $value, R_NEXT );
+        $status = %h->seq($key, $value, R_NEXT );
     }
     
     ok nkeys %bad == 0 ;
@@ -559,7 +490,7 @@ do {
     # Berkeley DB undef key is broken between versions 2.3.16 and 3.1
     my $value = 'fred';
     $warned = '';
-    $db->put(undef, $value) ;
+    %h->put(undef, $value) ;
     ok $warned eq '' 
       or print "# Caught warning [$warned]\n" ;
     $warned = '';
@@ -567,14 +498,12 @@ do {
     my $no_NULL = ($DB_File::db_ver +>= 2.003016 && $DB_File::db_ver +< 3.001) ;
     print "# db_ver $DB_File::db_ver\n";
     $value = '' ;
-    $db->get(undef, $value) ;
+    %h->get(undef, $value) ;
     ok $no_NULL || $value eq 'fred' or print "# got [$value]\n" ;
     ok $warned eq '' 
       or print "# Caught warning [$warned]\n" ;
     $warned = '';
 
-    undef $db ;
     undef %h;
     unlink $Dfile;
 };
-

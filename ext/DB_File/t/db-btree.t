@@ -93,17 +93,6 @@ sub normalise
     return $data ;
 }
 
-sub safeUntie
-{
-    my $hashref = shift ;
-    my $no_inner = 1;
-    local $^WARN_HOOK = sub {-- $no_inner } ;
-    untie %$hashref;
-    return $no_inner;
-}
-
-
-
 my $db185mode =  ($DB_File::db_version == 1 && ! $DB_File::db_185_compat) ;
 my $null_keys_allowed = ($DB_File::db_ver +< 2.004010 
 				|| $DB_File::db_ver +>= 3.1 );
@@ -227,38 +216,41 @@ ok( %h = DB_File->new($Dfile, O_RDWR, 0640, $DB_BTREE)) ;
 %h->del('goner1');
 %h->DELETE('goner3');
 
-my @keys = keys(%h);
-my @values = values(%h);
+my @keys = %h->keys;
+my @values = %h->values;
 
 ok( ((nelems @keys)-1) == 29 && ((nelems @values)-1) == 29) ;
 
 my $i = 0 ;
-while (my @(?$key,?$value) = @: each(%h)) {
-    if ($key eq @keys[$i] && $value eq @values[$i] && $key eq lc($value)) {
-	$key = uc($key);
-	$i++ if $key eq $value;
+%h->iterate(
+    sub {
+        my @($key, $value) = @_;
+        if ($key eq @keys[$i] && $value eq @values[$i] && $key eq lc($value)) {
+            $key = uc($key);
+            $i++ if $key eq $value;
+        }
     }
-}
+);
 
 ok( $i == 30) ;
 
-@keys = @('blurfl', < keys(%h), 'dyick');
+@keys = @('blurfl', < %h->keys(), 'dyick');
 ok( ((nelems @keys)-1) == 31) ;
 
 #Check that the keys can be retrieved in order
-my @b = keys %h ;
+my @b = %h->keys ;
 my @c = sort \&lexical, @b ;
 is_deeply(\@b, \@c);
 
-%h{+'foo'} = '';
-ok( %h{?'foo'} eq '' ) ;
+%h->put('foo' => '');
+ok( %h->FETCH('foo') eq '' ) ;
 
 # Berkeley DB from version 2.4.10 to 3.0 does not allow null keys.
 # This feature was reenabled in version 3.1 of Berkeley DB.
 my $result = 0 ;
 if ($null_keys_allowed) {
-    %h{+''} = 'bar';
-    $result = ( %h{?''} eq 'bar' );
+    %h->put('' => 'bar');
+    $result = ( %h->FETCH('') eq 'bar' );
 }
 else
   { $result = 1 }
@@ -266,21 +258,14 @@ ok( $result) ;
 
 # check cache overflow and numeric keys and contents
 my $ok = 1;
-for my $i (1..199) { %h{+$i + 0} = $i + 0; }
-for my $i (1..199) { $ok = 0 unless %h{?$i} == $i; }
+for my $i (1..199) { %h->put( $i + 0 => $i + 0 ); }
+for my $i (1..199) { $ok = 0 unless %h->FETCH($i) == $i; }
 ok( $ok);
 
 my @($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
      $blksize,$blocks) = @: stat($Dfile);
 ok( $size +> 0 );
  
-do {
-    local $TODO = "hash slice assignment";
-     %h{[0..200]} =  200..400;
-    my @foo = %h{[0..200]};
-    ok( join(':',200..400) eq join(':', @foo) );
-};
-
 # Now check all the non-tie specific stuff
 
 
@@ -292,7 +277,7 @@ ok( $status == 1 );
  
 # check that the value of the key 'x' has not been changed by the 
 # previous test
-ok( %h{?'x'} eq 'X' );
+ok( %h->FETCH('x') eq 'X' );
 
 # standard put
 $status = %h->put('key', 'value') ;
@@ -316,11 +301,11 @@ if ($null_keys_allowed) {
 ok( $status == 0 );
 
 # Make sure that the key deleted, cannot be retrieved
-ok( ! defined %h{?'q'}) ;
-ok( ! defined %h{?''}) ;
+ok( ! defined %h->FETCH('q'));
+ok( ! defined %h->FETCH(''));
 
 do {
-    %h->close;
+    undef %h;
 
     ok( %h = DB_File->new( $Dfile, O_RDWR, 0640, $DB_BTREE ));
 };
@@ -443,62 +428,58 @@ undef %h ;
 unlink $Dfile;
 
 # Now try an in memory file
-my $Y;
-ok( $Y = tie(%h, 'DB_File',undef, O_RDWR^|^O_CREAT, 0640, $DB_BTREE ));
+ok( %h = DB_File->new( undef, O_RDWR^|^O_CREAT, 0640, $DB_BTREE ));
 
 # fd with an in memory file should return failure
-$status = $Y->fd ;
+$status = %h->fd ;
 ok( $status == -1 );
 
 
-undef $Y ;
-untie %h ;
+undef %h ;
 
 # Duplicate keys
 my $bt = DB_File::BTREEINFO->new() ;
 $bt->{+flags} = R_DUP ;
-my ($YY, %hh);
-ok( $YY = tie(%hh, 'DB_File', $Dfile, O_RDWR^|^O_CREAT, 0640, $bt )) ;
+ok( my %hh = DB_File->new( $Dfile, O_RDWR^|^O_CREAT, 0640, $bt )) ;
 
-%hh{+'Wall'} = 'Larry' ;
-%hh{+'Wall'} = 'Stone' ; # Note the duplicate key
-%hh{+'Wall'} = 'Brick' ; # Note the duplicate key
-%hh{+'Wall'} = 'Brick' ; # Note the duplicate key and value
-%hh{+'Smith'} = 'John' ;
-%hh{+'mouse'} = 'mickey' ;
+%hh->STORE('Wall' => 'Larry' );
+%hh->STORE('Wall' => 'Stone' ); # Note the duplicate key
+%hh->STORE('Wall' => 'Brick' ); # Note the duplicate key
+%hh->STORE('Wall' => 'Brick' ); # Note the duplicate key and value
+%hh->STORE('Smith' => 'John' );
+%hh->STORE('mouse' => 'mickey' );
 
 # first work in scalar context
-ok( nelems( $YY->get_dup('Unknown') ) == 0 );
-ok( nelems( $YY->get_dup('Smith') ) == 1 );
-ok( nelems( $YY->get_dup('Wall') ) == 4 );
+ok( nelems( %hh->get_dup('Unknown') ) == 0 );
+ok( nelems( %hh->get_dup('Smith') ) == 1 );
+ok( nelems( %hh->get_dup('Wall') ) == 4 );
 
 # now in list context
-my @unknown = $YY->get_dup('Unknown') ;
+my @unknown = %hh->get_dup('Unknown') ;
 ok( "$(join ' ',@unknown)" eq "" );
 
-my @smith = $YY->get_dup('Smith') ;
+my @smith = %hh->get_dup('Smith') ;
 ok( "$(join ' ',@smith)" eq "John" );
 
 do {
-my @wall = $YY->get_dup('Wall') ;
+my @wall = %hh->get_dup('Wall') ;
 my %wall ;
  %wall{[ @wall]} =  @wall ;
 ok( ((nelems @wall) == 4 && %wall{?'Larry'} && %wall{?'Stone'} && %wall{?'Brick'}) );
 };
 
 # hash
-my %unknown = %( < $YY->get_dup('Unknown', 1) ) ;
+my %unknown = %( < %hh->get_dup('Unknown', 1) ) ;
 ok( ! %unknown );
 
-my %smith = %( < $YY->get_dup('Smith', 1) ) ;
+my %smith = %( < %hh->get_dup('Smith', 1) ) ;
 ok( nkeys %smith == 1 && %smith{?'John'}) ;
 
-my %wall = %( < $YY->get_dup('Wall', 1) ) ;
+my %wall = %( < %hh->get_dup('Wall', 1) ) ;
 ok( nkeys %wall == 3 && %wall{?'Larry'} == 1 && %wall{?'Stone'} == 1 
 		&& %wall{?'Brick'} == 2);
 
-undef $YY ;
-untie %hh ;
+undef %hh ;
 unlink $Dfile;
 
 
@@ -543,9 +524,9 @@ is_deeply(\@srt_1, \keys %h);
 is_deeply(\@srt_2, \keys %g);
 is_deeply(\@srt_3, \keys %k);
 
-untie %h ;
-untie %g ;
-untie %k ;
+undef %h ;
+undef %g ;
+undef %k ;
 unlink $Dfile1, $Dfile2, $Dfile3 ;
 
 # clear
@@ -572,7 +553,7 @@ while (@(?$key,?$value) = @: each(%h)) {
 }
 ok( $i == 0);
 
-untie %h ;
+undef %h ;
 unlink $Dfile1 ;
 
 do {
@@ -665,7 +646,7 @@ EOM
     main::ok( $ret eq "[[11]]") ;
 
     undef $X;
-    untie(%h);
+    undef(%h);
     unlink "SubDB.pm", "dbbtree.tmp" ;
 
 };
@@ -715,7 +696,7 @@ do {
     foreach (keys %h)
       { print "$_\n" }
 
-    untie %h ;
+    undef %h ;
 
     unlink "tree" ;
   };  
@@ -761,7 +742,7 @@ EOM
     foreach (keys %h)
       { print "$_	-> %h{?$_}\n" }
 
-    untie %h ;
+    undef %h ;
 
     unlink $filename ;
   };  
@@ -819,7 +800,7 @@ EOM
  
  
     undef $x ;
-    untie %h ;
+    undef %h ;
   };
 
   ok( docat_del($file) eq ($db185mode == 1 ?? <<'EOM' !! <<'EOM') ) ;
@@ -874,7 +855,7 @@ EOM
     print "Dog =>	[$(join ' ',@list)]\n" ; 
  
     undef $x ;
-    untie %h ;
+    undef %h ;
   };
 
   ok( docat_del($file) eq <<'EOM') ;
@@ -913,7 +894,7 @@ EOM
     print "Harry Wall is $found there\n" ;
     
     undef $x ;
-    untie %h ;
+    undef %h ;
   };
 
   ok( docat_del($file) eq <<'EOM') ;
@@ -947,7 +928,7 @@ EOM
     print "Larry Wall is $found there\n" ;
     
     undef $x ;
-    untie %h ;
+    undef %h ;
 
     unlink $filename ;
   };
@@ -1006,7 +987,7 @@ EOM
     match "a" ;
 
     undef $x ;
-    untie %h ;
+    undef %h ;
 
     unlink $filename ;
 
@@ -1049,7 +1030,7 @@ EOM
 #   ok( keys %h == 1) ;
 #   
 #   undef $db ;
-#   untie %h;
+#   undef %h;
 #   unlink $Dfile;
 #}
 
@@ -1071,7 +1052,7 @@ do {
 	or die "Can't open file: $!\n" ;
     %h{+ABC} = undef;
     ok( $a eq "") ;
-    untie %h ;
+    undef %h ;
     unlink $Dfile;
 };
 
@@ -1091,7 +1072,7 @@ do {
 	or die "Can't open file: $!\n" ;
     %h = %( () ); ;
     ok( $a eq "") ;
-    untie %h ;
+    undef %h ;
     unlink $Dfile;
 };
 
@@ -1128,47 +1109,12 @@ do {
 #    ok( $@ =~ /^DB_File btree_compare: recursion detected/);
 #    {
 #        no warnings;
-#        untie %hash;
+#        undef %hash;
 #    }
 #    unlink $Dfile;
 #}
 ok(1);
 ok(1);
-
-do {
-    # Check that two callbacks don't interact
-    my %hash1 ;
-    my %hash2 ;
-    my $h1_count = 0;
-    my $h2_count = 0;
-    unlink $Dfile, $Dfile2;
-    my $dbh1 = DB_File::BTREEINFO->new() ;
-    $dbh1->{+compare} = sub { ++ $h1_count ; @_[0] cmp @_[1] } ; 
-
-    my $dbh2 = DB_File::BTREEINFO->new() ;
-    $dbh2->{+compare} = sub { ;++ $h2_count ; @_[0] cmp @_[1] } ; 
- 
- 
- 
-    my (%h);
-    ok( tie(%hash1, 'DB_File',$Dfile, O_RDWR^|^O_CREAT, 0640, $dbh1 ) );
-    ok( tie(%hash2, 'DB_File',$Dfile2, O_RDWR^|^O_CREAT, 0640, $dbh2 ) );
-
-    %hash1{+DEFG} = 5;
-    %hash1{+XYZ} = 2;
-    %hash1{+ABCDE} = 5;
-
-    %hash2{+defg} = 5;
-    %hash2{+xyz} = 2;
-    %hash2{+abcde} = 5;
-
-    ok( $h1_count +> 0);
-    ok( $h1_count == $h2_count);
-
-    ok( safeUntie \%hash1);
-    ok( safeUntie \%hash2);
-    unlink $Dfile, $Dfile2;
-};
 
 do {
     # Regression Test for bug 30237
@@ -1285,7 +1231,6 @@ do {
     $warned = '';
 
     undef $db ;
-    untie %h;
+    undef %h;
     unlink $Dfile;
 };
-exit ;
