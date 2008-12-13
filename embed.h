@@ -98,6 +98,7 @@
 #define block_start		Perl_block_start
 #define boot_core_UNIVERSAL	Perl_boot_core_UNIVERSAL
 #define boot_core_error		Perl_boot_core_error
+#define boot_core_version	Perl_boot_core_version
 #define boot_core_PerlIO	Perl_boot_core_PerlIO
 #endif
 #define call_list		Perl_call_list
@@ -2287,6 +2288,7 @@
 #define block_start(a)		Perl_block_start(aTHX_ a)
 #define boot_core_UNIVERSAL()	Perl_boot_core_UNIVERSAL(aTHX)
 #define boot_core_error()	Perl_boot_core_error(aTHX)
+#define boot_core_version()	Perl_boot_core_version(aTHX)
 #define boot_core_PerlIO()	Perl_boot_core_PerlIO(aTHX)
 #endif
 #define call_list(a,b)		Perl_call_list(aTHX_ a,b)

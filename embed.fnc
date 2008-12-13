@@ -132,6 +132,7 @@ ApR	|I32	|block_gimme
 pR	|int	|block_start	|int full
 p	|void	|boot_core_UNIVERSAL
 p	|void	|boot_core_error
+p	|void	|boot_core_version
 p	|void	|boot_core_PerlIO
 Ap	|void	|call_list	|I32 oldscope|NN AV *paramList
 pR	|bool	|cando		|Mode_t mode|bool effective|NN const Stat_t* statbufp

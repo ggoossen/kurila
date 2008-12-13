@@ -293,6 +293,7 @@ PERL_CALLCONV int	Perl_block_start(pTHX_ int full)
 
 PERL_CALLCONV void	Perl_boot_core_UNIVERSAL(pTHX);
 PERL_CALLCONV void	Perl_boot_core_error(pTHX);
+PERL_CALLCONV void	Perl_boot_core_version(pTHX);
 PERL_CALLCONV void	Perl_boot_core_PerlIO(pTHX);
 PERL_CALLCONV void	Perl_call_list(pTHX_ I32 oldscope, AV *paramList)
 			__attribute__nonnull__(pTHX_2);
