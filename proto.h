@@ -154,6 +154,12 @@ PERL_INLINE_CALLCONV SV*	Perl_LocationFilename(pTHX_ SV *location)
 #define PERL_ARGS_ASSERT_LOCATIONFILENAME	\
 	assert(location)
 
+
+PERL_INLINE_CALLCONV PERL_CONTEXT*	Perl_PushBlock(pTHX_ U8 t, SV** sp, U8 gimme)
+			__attribute__nonnull__(pTHX_2);
+#define PERL_ARGS_ASSERT_PUSHBLOCK	\
+	assert(sp)
+
 #  include "pp_proto.h"
 PERL_CALLCONV OP*	Perl_append_elem(pTHX_ I32 optype, OP* first, OP* last);
 PERL_CALLCONV OP*	Perl_append_list(pTHX_ I32 optype, LISTOP* first, LISTOP* last);

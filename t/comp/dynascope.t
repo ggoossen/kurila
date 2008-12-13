@@ -3,7 +3,7 @@ BEGIN {
     require "./test.pl";
 }
 
-plan tests => 3;
+plan tests => 4;
 
 do {
     # test basic dynascope scope
@@ -11,7 +11,7 @@ do {
     is( $mainscope, dynascope );
     do {
         isnt( $mainscope, dynascope );
+        is( $mainscope, dynascope->{parent} );
     };
     is( $mainscope, dynascope );
 };
-

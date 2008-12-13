@@ -423,7 +423,7 @@ perl_construct(pTHXx)
     PL_hints = DEFAULT_HINTS;
 
     PL_compiling.cop_hints_hash = newHV();
-    PL_dynamicscope = newHV();
+    PL_dynamicscope = HvSv(newHV());
 
     ENTER;
 }

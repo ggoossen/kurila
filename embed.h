@@ -61,6 +61,7 @@
 #define SvUV			Perl_SvUV
 #define SvNV			Perl_SvNV
 #define LocationFilename	Perl_LocationFilename
+#define PushBlock		Perl_PushBlock
 #ifdef PERL_CORE
 #define append_elem		Perl_append_elem
 #define append_list		Perl_append_list
@@ -1914,6 +1915,7 @@
 #define pp_dorassign		Perl_pp_dorassign
 #define pp_dotdotdot		Perl_pp_dotdotdot
 #define pp_dump			Perl_pp_dump
+#define pp_dynascope		Perl_pp_dynascope
 #define pp_each			Perl_pp_each
 #define pp_egrent		Perl_pp_egrent
 #define pp_ehostent		Perl_pp_ehostent
@@ -2246,6 +2248,7 @@
 #define SvUV(a)			Perl_SvUV(aTHX_ a)
 #define SvNV(a)			Perl_SvNV(aTHX_ a)
 #define LocationFilename(a)	Perl_LocationFilename(aTHX_ a)
+#define PushBlock(a,b,c)	Perl_PushBlock(aTHX_ a,b,c)
 #ifdef PERL_CORE
 #define append_elem(a,b,c)	Perl_append_elem(aTHX_ a,b,c)
 #define append_list(a,b,c)	Perl_append_list(aTHX_ a,b,c)
@@ -4091,6 +4094,7 @@
 #define pp_dorassign()		Perl_pp_dorassign(aTHX)
 #define pp_dotdotdot()		Perl_pp_dotdotdot(aTHX)
 #define pp_dump()		Perl_pp_dump(aTHX)
+#define pp_dynascope()		Perl_pp_dynascope(aTHX)
 #define pp_each()		Perl_pp_each(aTHX)
 #define pp_egrent()		Perl_pp_egrent(aTHX)
 #define pp_ehostent()		Perl_pp_ehostent(aTHX)

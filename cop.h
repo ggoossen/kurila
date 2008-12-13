@@ -349,6 +349,7 @@ struct block {
     OP *	blku_oldop;	/* old op pointer */
     I32		blku_oldmarksp;	/* mark stack index */
     I32		blku_oldscopesp;	/* scope stack index */
+    SV *        blku_dynascope;  /* dynamic scope */
     PMOP *	blku_oldpm;	/* values of pattern match vars */
 
     union {
@@ -364,23 +365,13 @@ struct block {
 #define blk_oldscopesp	cx_u.cx_blk.blku_oldscopesp
 #define blk_oldpm	cx_u.cx_blk.blku_oldpm
 #define blk_gimme	cx_u.cx_blk.blku_gimme
+#define blk_dynascope	cx_u.cx_blk.blku_dynascope
 #define blk_u16		cx_u.cx_blk.blku_u16
 #define blk_sub		cx_u.cx_blk.blk_u.blku_sub
 #define blk_eval	cx_u.cx_blk.blk_u.blku_eval
 #define blk_loop	cx_u.cx_blk.blk_u.blku_loop
 
-/* Enter a block. */
-#define PUSHBLOCK(cx,t,sp) CXINC, cx = &cxstack[cxstack_ix],		\
-	cx->cx_type		= t,					\
-	cx->blk_oldsp		= sp - PL_stack_base,			\
-	cx->blk_oldcop		= PL_curcop,				\
-	cx->blk_oldop		= PL_op,				\
-	cx->blk_oldmarksp	= PL_markstack_ptr - PL_markstack,	\
-	cx->blk_oldscopesp	= PL_scopestack_ix,			\
-	cx->blk_oldpm		= PL_curpm,				\
-	cx->blk_gimme		= (U8)gimme;				\
-	DEBUG_l( PerlIO_printf(Perl_debug_log, "Entering block %ld, type %s\n",	\
-			       (long)cxstack_ix, PL_block_type[CxTYPE(cx)]); )
+#define PUSHBLOCK(cx,t,sp) cx = PushBlock(t,sp,gimme)
 
 /* Exit a block (RETURN and LAST). */
 #define POPBLOCK(cx,pm) cx = &cxstack[cxstack_ix--],			\
@@ -390,6 +381,7 @@ struct block {
 	PL_scopestack_ix = cx->blk_oldscopesp,				\
 	pm		 = cx->blk_oldpm,				\
 	gimme		 = cx->blk_gimme;				\
+        SVcpSTEAL(PL_dynamicscope, cx->blk_dynascope);				\
 	DEBUG_SCOPE("POPBLOCK");					\
 	DEBUG_l( PerlIO_printf(Perl_debug_log, "Leaving block %ld, type %s\n",		\
 			       (long)cxstack_ix+1,PL_block_type[CxTYPE(cx)]); )

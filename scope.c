@@ -91,8 +91,6 @@ Perl_push_scope(pTHX)
 	Renew(PL_scopestack, PL_scopestack_max, I32);
     }
     PL_scopestack[PL_scopestack_ix++] = PL_savestack_ix;
-    SAVESPTR( PL_dynamicscope );
-    SVcpSTEAL( PL_dynamicscope, newHV() );
 }
 
 void
