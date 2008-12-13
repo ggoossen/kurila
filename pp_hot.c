@@ -1369,7 +1369,7 @@ PP(pp_leave)
     register PERL_CONTEXT *cx;
     SV **newsp;
     PMOP *newpm;
-    I32 gimme;
+    U8 gimme;
 
     if (PL_op->op_flags & OPf_SPECIAL) {
 	cx = &cxstack[cxstack_ix];

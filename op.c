@@ -5180,9 +5180,6 @@ Perl_ck_fun(pTHX_ OP *o)
 			"Useless use of %s with no values",
 			PL_op_desc[type]);
 
-		if (kid->op_type != OP_RV2AV && kid->op_type != OP_PADSV && kid->op_type != OP_ANONARRAY
-		    && kid->op_type != OP_RV2SV)
-		    bad_type(numargs, "array", PL_op_desc[type], kid);
 		mod(kid, type);
 #ifdef PERL_MAD
 		addmad(newMADsv('c', newSVpvn("@", 1)), &kid->op_madprop, 0);

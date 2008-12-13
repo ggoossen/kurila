@@ -101,6 +101,8 @@ Aip	|NV	|SvNV	|NN SV *sv
 Aip	|SV*	|LocationFilename	|NN SV *location
 
 Aip     |PERL_CONTEXT* |PushBlock  |U8 t|NN SV** sp|U8 gimme
+Aip     |PERL_CONTEXT* |PopBlock
+
 #  include "pp_proto.h"
 p	|OP*	|append_elem	|I32 optype|NULLOK OP* first|NULLOK OP* last
 p	|OP*	|append_list	|I32 optype|NULLOK LISTOP* first|NULLOK LISTOP* last

@@ -103,8 +103,7 @@ sub fileparse {
   my @($fullname, @< @suffices) =  @_;
 
   unless (defined $fullname) {
-      require Carp;
-      Carp::croak("fileparse(): need a valid pathname");
+      die("fileparse(): need a valid pathname");
   }
 
   my $orig_type = '';

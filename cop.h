@@ -374,17 +374,11 @@ struct block {
 #define PUSHBLOCK(cx,t,sp) cx = PushBlock(t,sp,gimme)
 
 /* Exit a block (RETURN and LAST). */
-#define POPBLOCK(cx,pm) cx = &cxstack[cxstack_ix--],			\
-	newsp		 = PL_stack_base + cx->blk_oldsp,		\
-	PL_curcop	 = cx->blk_oldcop,				\
-	PL_markstack_ptr = PL_markstack + cx->blk_oldmarksp,		\
-	PL_scopestack_ix = cx->blk_oldscopesp,				\
-	pm		 = cx->blk_oldpm,				\
-	gimme		 = cx->blk_gimme;				\
-        SVcpSTEAL(PL_dynamicscope, cx->blk_dynascope);				\
-	DEBUG_SCOPE("POPBLOCK");					\
-	DEBUG_l( PerlIO_printf(Perl_debug_log, "Leaving block %ld, type %s\n",		\
-			       (long)cxstack_ix+1,PL_block_type[CxTYPE(cx)]); )
+#define POPBLOCK(cx,pm) cx = PopBlock();	\
+   newsp		 = PL_stack_base + cx->blk_oldsp; \
+   pm		         = cx->blk_oldpm; \
+   gimme		 = cx->blk_gimme; \
+   DEBUG_SCOPE("POPBLOCK");
 
 /* Continue a block elsewhere (NEXT and REDO). */
 #define TOPBLOCK(cx) cx  = &cxstack[cxstack_ix],			\

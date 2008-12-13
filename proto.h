@@ -160,6 +160,8 @@ PERL_INLINE_CALLCONV PERL_CONTEXT*	Perl_PushBlock(pTHX_ U8 t, SV** sp, U8 gimme)
 #define PERL_ARGS_ASSERT_PUSHBLOCK	\
 	assert(sp)
 
+PERL_INLINE_CALLCONV PERL_CONTEXT*	Perl_PopBlock(pTHX);
+
 #  include "pp_proto.h"
 PERL_CALLCONV OP*	Perl_append_elem(pTHX_ I32 optype, OP* first, OP* last);
 PERL_CALLCONV OP*	Perl_append_list(pTHX_ I32 optype, LISTOP* first, LISTOP* last);
