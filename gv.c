@@ -902,10 +902,6 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 	if (add) {
 	    GvMULTI_on(gv);
 	    gv_init_sv(gv, sv_type);
-	    if (len == 1 && (sv_type == SVt_PVHV || sv_type == SVt_PVGV)) {
-		if (*name == '-' || *name == '+')
-		    require_tie_mod(gv, name, newSVpvs("Tie::Hash::NamedCapture"), "TIEHASH", 0);
-	    }
 	}
 	return gv;
     } else if (no_init) {

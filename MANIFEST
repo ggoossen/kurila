@@ -1483,7 +1483,6 @@ lib/Text/TabsWrap/t/sep.t	See if Text::Tabs is working
 lib/Text/TabsWrap/t/tabs.t	See if Text::Tabs works
 lib/Text/TabsWrap/t/wrap.t	See if Text::Wrap::wrap works
 lib/Text/Wrap.pm		Paragraph formatter
-lib/Tie/Hash/NamedCapture.pm	Implements %- and %+ behaviour
 lib/Tie/Hash.pm			Base class for tied hashes
 lib/Time/gmtime.pm		By-name interface to Perl's builtin gmtime
 lib/Time/gmtime.t		Test for Time::gmtime

@@ -61,15 +61,6 @@ my $default_share = \qw[
     &re::regname
     &re::regnames
     &re::regnames_count
-    &Tie::Hash::NamedCapture::FETCH
-    &Tie::Hash::NamedCapture::STORE
-    &Tie::Hash::NamedCapture::DELETE
-    &Tie::Hash::NamedCapture::CLEAR
-    &Tie::Hash::NamedCapture::EXISTS
-    &Tie::Hash::NamedCapture::FIRSTKEY
-    &Tie::Hash::NamedCapture::NEXTKEY
-    &Tie::Hash::NamedCapture::SCALAR
-    &Tie::Hash::NamedCapture::flags
     &UNIVERSAL::DOES
     &version::new
     &version::stringify
