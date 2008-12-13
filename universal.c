@@ -186,11 +186,6 @@ PERL_XS_EXPORT_C void XS_UNIVERSAL_isa(pTHX_ CV *cv);
 PERL_XS_EXPORT_C void XS_UNIVERSAL_can(pTHX_ CV *cv);
 PERL_XS_EXPORT_C void XS_UNIVERSAL_DOES(pTHX_ CV *cv);
 PERL_XS_EXPORT_C void XS_UNIVERSAL_VERSION(pTHX_ CV *cv);
-XS(XS_utf8_valid);
-XS(XS_utf8_encode);
-XS(XS_utf8_decode);
-XS(XS_utf8_unicode_to_native);
-XS(XS_utf8_native_to_unicode);
 XS(XS_Internals_SvREADONLY);
 XS(XS_Internals_SvTAINTED);
 XS(XS_Internals_peek);
@@ -228,13 +223,6 @@ Perl_boot_core_UNIVERSAL(pTHX)
     newXS("UNIVERSAL::can",             XS_UNIVERSAL_can,         file);
     newXS("UNIVERSAL::DOES",            XS_UNIVERSAL_DOES,        file);
     newXS("UNIVERSAL::VERSION", 	XS_UNIVERSAL_VERSION, 	  file);
-    {
-    }
-    newXS("utf8::valid", XS_utf8_valid, file);
-    newXS("utf8::encode", XS_utf8_encode, file);
-    newXS("utf8::decode", XS_utf8_decode, file);
-    newXS("utf8::native_to_unicode", XS_utf8_native_to_unicode, file);
-    newXS("utf8::unicode_to_native", XS_utf8_unicode_to_native, file);
     newXSproto("Internals::SvREADONLY",XS_Internals_SvREADONLY, file, "\\[$%@];$");
     newXSproto("Internals::SvTAINTED",XS_Internals_SvTAINTED, file, "\\[$%@];$");
     newXS("Internals::SvREFCNT",XS_Internals_SvREFCNT, file);
@@ -439,77 +427,6 @@ XS(XS_UNIVERSAL_VERSION)
     }
 
     XSRETURN(1);
-}
-
-XS(XS_utf8_valid)
-{
-     dVAR;
-     dXSARGS;
-     PERL_UNUSED_ARG(cv);
-     if (items != 1)
-	  Perl_croak(aTHX_ "Usage: utf8::valid(sv)");
-    else {
-	SV * const sv = ST(0);
-	STRLEN len;
-	const char * const s = SvPV_const(sv,len);
-	if (is_utf8_string(s,len))
-	    XSRETURN_YES;
-	else
-	    XSRETURN_NO;
-    }
-     XSRETURN_EMPTY;
-}
-
-XS(XS_utf8_encode)
-{
-    dVAR;
-    dXSARGS;
-    PERL_UNUSED_ARG(cv);
-    if (items != 1)
-	Perl_croak(aTHX_ "Usage: utf8::encode(sv)");
-    XSRETURN_EMPTY;
-}
-
-XS(XS_utf8_decode)
-{
-    dVAR;
-    dXSARGS;
-    PERL_UNUSED_ARG(cv);
-    if (items != 1)
-	Perl_croak(aTHX_ "Usage: utf8::decode(sv)");
-    else {
-	ST(0) = boolSV(1);
-	sv_2mortal(ST(0));
-    }
-    XSRETURN(1);
-}
-
-XS(XS_utf8_native_to_unicode)
-{
- dVAR;
- dXSARGS;
- const UV uv = SvUV(ST(0));
- PERL_UNUSED_ARG(cv);
-
- if (items > 1)
-     Perl_croak(aTHX_ "Usage: utf8::native_to_unicode(sv)");
-
- ST(0) = sv_2mortal(newSViv(NATIVE_TO_UNI(uv)));
- XSRETURN(1);
-}
-
-XS(XS_utf8_unicode_to_native)
-{
- dVAR;
- dXSARGS;
- const UV uv = SvUV(ST(0));
- PERL_UNUSED_ARG(cv);
-
- if (items > 1)
-     Perl_croak(aTHX_ "Usage: utf8::unicode_to_native(sv)");
-
- ST(0) = sv_2mortal(newSViv(UNI_TO_NATIVE(uv)));
- XSRETURN(1);
 }
 
 XS(XS_Internals_SvREADONLY)	/* This is dangerous stuff. */

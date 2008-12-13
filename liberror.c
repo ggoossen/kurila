@@ -1,6 +1,5 @@
 
 #include "EXTERN.h"
-#define PERL_IN_LIBERROR_C
 #include "perl.h"
 
 #include "XSUB.h"
