@@ -236,6 +236,7 @@ Perl_boot_core_UNIVERSAL(pTHX)
     boot_core_version();
     boot_core_utf8();
     boot_core_Internals();
+    boot_core_signals();
 }
 
 

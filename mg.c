@@ -1225,33 +1225,6 @@ restore_sigmask(pTHX_ SV *save_sv)
 int
 Perl_magic_getsig(pTHX_ SV *sv, MAGIC *mg)
 {
-    dVAR;
-    /* Are we fetching a signal entry? */
-    const I32 i = whichsig(MgPV_nolen_const(mg));
-
-    PERL_ARGS_ASSERT_MAGIC_GETSIG;
-
-    if (i > 0) {
-    	if(PL_psig_ptr[i])
-    	    sv_setsv(sv,sv_2mortal(newRV_inc(PL_psig_ptr[i])));
-    	else {
-	    Sighandler_t sigstate = rsignal_state(i);
-#ifdef FAKE_PERSISTENT_SIGNAL_HANDLERS
-	    if (PL_sig_handlers_initted && PL_sig_ignoring[i])
-		sigstate = SIG_IGN;
-#endif
-#ifdef FAKE_DEFAULT_SIGNAL_HANDLERS
-	    if (PL_sig_handlers_initted && PL_sig_defaulting[i])
-		sigstate = SIG_DFL;
-#endif
-    	    /* cache state so we don't fetch it again */
-    	    if(sigstate == (Sighandler_t) SIG_IGN)
-    	    	sv_setpvs(sv,"IGNORE");
-    	    else
-    	    	sv_setsv(sv,&PL_sv_undef);
-    	}
-    }
-    return 0;
 }
 int
 Perl_magic_clearsig(pTHX_ SV *sv, MAGIC *mg)
