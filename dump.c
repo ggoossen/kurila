@@ -1154,7 +1154,6 @@ static const struct { const char type; const char *name; } magic_names[] = {
 	{ PERL_MAGIC_dbfile,         "dbfile(L)" },
 	{ PERL_MAGIC_shared,         "shared(N)" },
 	{ PERL_MAGIC_tied,           "tied(P)" },
-	{ PERL_MAGIC_sig,            "sig(S)" },
 	{ PERL_MAGIC_uvar,           "uvar(U)" },
 	{ PERL_MAGIC_envelem,        "envelem(e)" },
 	{ PERL_MAGIC_fm,             "fm(f)" },
@@ -1165,7 +1164,6 @@ static const struct { const char type; const char *name; } magic_names[] = {
 	{ PERL_MAGIC_shared_scalar,  "shared_scalar(n)" },
 	{ PERL_MAGIC_tiedelem,       "tiedelem(p)" },
 	{ PERL_MAGIC_qr,             "qr(r)" },
-	{ PERL_MAGIC_sigelem,        "sigelem(s)" },
 	{ PERL_MAGIC_taint,          "taint(t)" },
 	{ PERL_MAGIC_uvar_elem,      "uvar_elem(u)" },
 	{ PERL_MAGIC_vstring,        "vstring(V)" },
@@ -1190,8 +1188,6 @@ Perl_do_magic_dump(pTHX_ I32 level, PerlIO *file, const MAGIC *mg, I32 nest, I32
  	    if      (v == &PL_vtbl_sv)         s = "sv";
             else if (v == &PL_vtbl_env)        s = "env";
             else if (v == &PL_vtbl_envelem)    s = "envelem";
-            else if (v == &PL_vtbl_sig)        s = "sig";
-            else if (v == &PL_vtbl_sigelem)    s = "sigelem";
             else if (v == &PL_vtbl_pack)       s = "pack";
             else if (v == &PL_vtbl_packelem)   s = "packelem";
             else if (v == &PL_vtbl_dbline)     s = "dbline";

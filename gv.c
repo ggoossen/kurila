@@ -955,28 +955,6 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 		    /* NOTE: No support for tied ISA */
 		}
 		break;
-	    case 'S':
-		if (strEQ(name2, "IG")) {
-		    HV *hv;
-		    I32 i;
-		    if (!PL_psig_ptr) {
-			Newxz(PL_psig_ptr,  SIG_SIZE, SV*);
-			Newxz(PL_psig_name, SIG_SIZE, SV*);
-			Newxz(PL_psig_pend, SIG_SIZE, int);
-		    }
-		    GvMULTI_on(gv);
-		    hv = GvHVn(gv);
-		    hv_magic(hv, NULL, PERL_MAGIC_sig);
-		    for (i = 1; i < SIG_SIZE; i++) {
-			SV * const * const init = hv_fetch(hv, PL_sig_name[i], strlen(PL_sig_name[i]), 1);
-			if (init)
-			    sv_setsv(*init, &PL_sv_undef);
-			PL_psig_ptr[i] = 0;
-			PL_psig_name[i] = 0;
-			PL_psig_pend[i] = 0;
-		    }
-		}
-		break;
 	    case 'V':
 		if (strEQ(name2, "ERSION"))
 		    GvMULTI_on(gv);

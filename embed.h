@@ -422,12 +422,10 @@
 #define magic_clearhint		Perl_magic_clearhint
 #define magic_clearisa		Perl_magic_clearisa
 #define magic_clearpack		Perl_magic_clearpack
-#define magic_clearsig		Perl_magic_clearsig
 #define magic_existspack	Perl_magic_existspack
 #define magic_get		Perl_magic_get
 #define magic_getdefelem	Perl_magic_getdefelem
 #define magic_getpack		Perl_magic_getpack
-#define magic_getsig		Perl_magic_getsig
 #define magic_gettaint		Perl_magic_gettaint
 #define magic_getuvar		Perl_magic_getuvar
 #define magic_len		Perl_magic_len
@@ -451,7 +449,6 @@
 #define magic_setmglob		Perl_magic_setmglob
 #define magic_setpack		Perl_magic_setpack
 #define magic_setregexp		Perl_magic_setregexp
-#define magic_setsig		Perl_magic_setsig
 #define magic_settaint		Perl_magic_settaint
 #define magic_setuvar		Perl_magic_setuvar
 #define magic_setutf8		Perl_magic_setutf8
@@ -2602,12 +2599,10 @@
 #define magic_clearhint(a,b)	Perl_magic_clearhint(aTHX_ a,b)
 #define magic_clearisa(a,b)	Perl_magic_clearisa(aTHX_ a,b)
 #define magic_clearpack(a,b)	Perl_magic_clearpack(aTHX_ a,b)
-#define magic_clearsig(a,b)	Perl_magic_clearsig(aTHX_ a,b)
 #define magic_existspack(a,b)	Perl_magic_existspack(aTHX_ a,b)
 #define magic_get(a,b)		Perl_magic_get(aTHX_ a,b)
 #define magic_getdefelem(a,b)	Perl_magic_getdefelem(aTHX_ a,b)
 #define magic_getpack(a,b)	Perl_magic_getpack(aTHX_ a,b)
-#define magic_getsig(a,b)	Perl_magic_getsig(aTHX_ a,b)
 #define magic_gettaint(a,b)	Perl_magic_gettaint(aTHX_ a,b)
 #define magic_getuvar(a,b)	Perl_magic_getuvar(aTHX_ a,b)
 #define magic_len(a,b)		Perl_magic_len(aTHX_ a,b)
@@ -2631,7 +2626,6 @@
 #define magic_setmglob(a,b)	Perl_magic_setmglob(aTHX_ a,b)
 #define magic_setpack(a,b)	Perl_magic_setpack(aTHX_ a,b)
 #define magic_setregexp(a,b)	Perl_magic_setregexp(aTHX_ a,b)
-#define magic_setsig(a,b)	Perl_magic_setsig(aTHX_ a,b)
 #define magic_settaint(a,b)	Perl_magic_settaint(aTHX_ a,b)
 #define magic_setuvar(a,b)	Perl_magic_setuvar(aTHX_ a,b)
 #define magic_setutf8(a,b)	Perl_magic_setutf8(aTHX_ a,b)

@@ -52,8 +52,6 @@ vtbl_packelem
 vtbl_regdata
 vtbl_regdatum
 vtbl_regexp
-vtbl_sig
-vtbl_sigelem
 vtbl_substr
 vtbl_substr_utf8
 vtbl_sv
