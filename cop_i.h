@@ -30,7 +30,7 @@ PERL_CONTEXT * Perl_PopBlock() {
     SV** onleave_ref = hv_fetchs(SvHv(PL_dynamicscope), "onleave", 0);
     if (onleave_ref && SvAVOK(*onleave_ref)) {
         AV* onleave = SvAv(*onleave_ref);
-        call_list(PL_scopestack_ix, onleave);
+        call_list_onleave(PL_scopestack_ix, onleave);
     }
 
     PERL_CONTEXT * cx = &cxstack[cxstack_ix--];

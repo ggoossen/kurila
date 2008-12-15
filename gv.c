@@ -806,8 +806,7 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 		break;
 	    case 3:
 		if ((name[0] == 'I' && name[1] == 'N' && name[2] == 'C')
-		    || (name[0] == 'E' && name[1] == 'N' && name[2] == 'V')
-		    || (name[0] == 'S' && name[1] == 'I' && name[2] == 'G'))
+		    || (name[0] == 'E' && name[1] == 'N' && name[2] == 'V'))
 		    global = TRUE;
 		break;
 	    case 4:

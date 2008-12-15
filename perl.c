@@ -4630,6 +4630,66 @@ S_incpush(pTHX_ const char *dir, bool addsubdirs, bool addoldvers, bool usesep,
     }
 }
 
+void
+Perl_call_list_onleave(pTHX_ I32 oldscope, AV *paramList)
+{
+    dVAR;
+    SV *atsv;
+    CV *cv;
+    int ret;
+    dJMPENV;
+
+    PERL_ARGS_ASSERT_CALL_LIST_ONLEAVE;
+
+    while (av_len(paramList) >= 0) {
+	cv = (CV*)av_pop(paramList);
+	JMPENV_PUSH(ret);
+	switch (ret) {
+	case 0:
+	    {
+		SV *old_diehook = PL_diehook;
+		PL_diehook = PERL_DIEHOOK_IGNORE;
+		PUSHMARK(PL_stack_sp);
+		call_sv((SV*)(cv), G_EVAL|G_KEEPERR|G_DISCARD|G_VOID);
+		PL_diehook = old_diehook;
+	    }
+	    atsv = ERRSV;
+	    if (SvTRUE(atsv)) {
+		PL_curcop = &PL_compiling;
+		while (PL_scopestack_ix > oldscope)
+		    LEAVE;
+		JMPENV_POP;
+
+		vdie_common(atsv, FALSE);
+	    }
+	    break;
+	case 1:
+	    STATUS_ALL_FAILURE;
+	    /* FALL THROUGH */
+	case 2:
+	    /* my_exit() was called */
+	    while (PL_scopestack_ix > oldscope)
+		LEAVE;
+	    FREETMPS;
+	    PL_curcop = &PL_compiling;
+	    JMPENV_POP;
+	    if (PL_statusvalue && !(PL_exit_flags & PERL_EXIT_EXPECTED)) {
+		Perl_croak(aTHX_ "'onleave' failed");
+	    }
+	    my_exit_jump();
+	    /* NOTREACHED */
+	case 3:
+	    if (PL_restartop) {
+		PL_curcop = &PL_compiling;
+		JMPENV_JUMP(3);
+	    }
+	    PerlIO_printf(Perl_error_log, "panic: restartop\n");
+	    FREETMPS;
+	    break;
+	}
+	JMPENV_POP;
+    }
+}
 
 void
 Perl_call_list(pTHX_ I32 oldscope, AV *paramList)

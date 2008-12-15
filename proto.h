@@ -303,6 +303,11 @@ PERL_CALLCONV void	Perl_call_list(pTHX_ I32 oldscope, AV *paramList)
 #define PERL_ARGS_ASSERT_CALL_LIST	\
 	assert(paramList)
 
+PERL_CALLCONV void	Perl_call_list_onleave(pTHX_ I32 oldscope, AV *paramList)
+			__attribute__nonnull__(pTHX_2);
+#define PERL_ARGS_ASSERT_CALL_LIST_ONLEAVE	\
+	assert(paramList)
+
 PERL_CALLCONV bool	Perl_cando(pTHX_ Mode_t mode, bool effective, const Stat_t* statbufp)
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(pTHX_3);

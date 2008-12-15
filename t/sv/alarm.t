@@ -11,12 +11,14 @@ BEGIN {
     }
 }
 
+use signals;
+
 plan tests => 5;
 my $Perl = which_perl();
 
 my $start_time = time;
 try {
-    local %SIG{+ALRM} = sub { die "ALARM!\n" };
+    signals::temp_set_handler("ALRM", sub { die "ALARM!\n" });
     alarm 3;
 
     # perlfunc recommends against using sleep in combination with alarm.
@@ -32,7 +34,7 @@ ok( abs($diff - 3) +<= 1,   "   right time" );
 
 my $start_time = time;
 try {
-    local %SIG{+ALRM} = sub { die "ALARM!\n" };
+    signals::temp_set_handler("ALRM", sub { die "ALARM!\n" });
     alarm 3;
     system(qq{$Perl -e "sleep 6"});
 };
@@ -48,9 +50,8 @@ do {
     ok( abs($diff - 3) +<= 1,   "   right time (waited $diff secs for 3-sec alarm)" );
 };
 
-
 do {
-    local %SIG{+"ALRM"} = sub { die };
+    signals::temp_set_handler("ALRM", sub { die "ALARM!\n" });
     try { alarm(1); my $x = qx($Perl -e "sleep 3") };
     chomp (my $foo = "foo\n");
     ok($foo eq "foo", '[perl #33928] chomp() fails after alarm(), `sleep`');

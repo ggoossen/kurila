@@ -21,19 +21,18 @@ sub import {
             $_ = shift;
             if (m/^[A-Z][A-Z0-9]*$/) {
                 $saw_sig++;
-                unless ($untrapped and %SIG{?$_} and %SIG{?$_} ne 'DEFAULT') {
+                unless ($untrapped and signals::handler($_)
+                          and signals::handler($_) ne 'DEFAULT') {
                     print "Installing handler $(dump::view($handler)) for $_\n" if $Verbose;
-                    %SIG{+$_} = $handler;
+                    signals::set_handler($_, $handler);
                 }
             } elsif ($_ eq 'normal-signals') {
-                unshift @_, < grep(exists %SIG{$_}, qw(HUP INT PIPE TERM));
+                unshift @_, < qw(HUP INT PIPE TERM);
             } elsif ($_ eq 'error-signals') {
-                unshift @_, < grep(exists %SIG{$_},
-                                   qw(ABRT BUS EMT FPE ILL QUIT SEGV SYS TRAP));
+                unshift @_, < qw(ABRT BUS EMT FPE ILL QUIT SEGV SYS TRAP);
             } elsif ($_ eq 'old-interface-signals') {
                 unshift @_,
-                  < grep(exists %SIG{$_},
-                         qw(ABRT BUS EMT FPE ILL PIPE QUIT SEGV SYS TERM TRAP));
+                  < qw(ABRT BUS EMT FPE ILL PIPE QUIT SEGV SYS TERM TRAP);
             } elsif ($_ eq 'stack-trace') {
                 $handler = \&handler_traceback;
             } elsif ($_ eq 'die') {
@@ -67,7 +66,7 @@ sub handler_die {
 
 sub handler_traceback {
     our $panic;
-    %SIG{+'ABRT'} = 'DEFAULT';
+    signals::set_handler('ABRT', 'DEFAULT');
     kill 'ABRT', $$ if $panic++;
     syswrite(STDERR, 'Caught a SIG', 12);
     syswrite(STDERR, @_[0], length(@_[0]));

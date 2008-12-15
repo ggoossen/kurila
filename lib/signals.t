@@ -28,3 +28,8 @@ do {
     };
     is( signals::handler("INT"), "IGNORE" );
 };
+
+do {
+    dies_like( sub { signals::set_handler("TERM", 'foo') },
+               qr/signal handler should be a code reference or .../ );
+};

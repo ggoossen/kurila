@@ -8,7 +8,6 @@ use Test::More tests => 15;
 use_ok( 'sigtrap' );
 
 package main;
-local %SIG;
 
 # use a version of sigtrap.pm somewhat too high
 try{ sigtrap->import(99999) };
@@ -22,24 +21,34 @@ try{ sigtrap->import('handler') };
 like( $@->{?description}, qr/^No argument specified/, 'send handler without subref' );
 
 sigtrap->import('AFAKE');
-cmp_ok( %SIG{?AFAKE}, '\==', \&sigtrap::handler_traceback, 'install normal handler' );
+cmp_ok( signals::handler("AFAKE"), '\==', \&sigtrap::handler_traceback,
+        'install normal handler' );
 
 sigtrap->import('die', 'AFAKE', 'stack-trace', 'FAKE2');
-cmp_ok( %SIG{?AFAKE}, '\==', \&sigtrap::handler_die, 'install the die handler' );
-cmp_ok( %SIG{?FAKE2}, '\==',\&sigtrap::handler_traceback, 'install traceback handler' );
+cmp_ok( signals::handler("AFAKE"), '\==', \&sigtrap::handler_die,
+        'install the die handler' );
+cmp_ok( signal::handler("FAKE2"), '\==',\&sigtrap::handler_traceback,
+        'install traceback handler' );
 
 my @normal =qw( HUP INT PIPE TERM );
- %SIG{[@normal]} = @('') x (nelems @normal);
+for (@normal) {
+    signals::set_handler($_, '');
+}
 sigtrap->import('normal-signals');
-is( nelems(grep { ref $_ } %SIG{[@normal]}), nelems(@normal), 'check normal-signals set' );
+for (@normal) {
+    ok( ref signals::handler($_),
+        'check normal-signals set' );
+}
 
+1;
+__END__
 my @error =qw( ABRT BUS EMT FPE ILL QUIT SEGV SYS TRAP );
- %SIG{[@error]} =@( '') x (nelems @error);
+%SIG{[@error]} =@( '') x (nelems @error);
 sigtrap->import('error-signals');
 is( nelems( grep { ref $_ } %SIG{[@error]}), nelems(@error), 'check error-signals set' );
 
 my @old =qw( ABRT BUS EMT FPE ILL PIPE QUIT SEGV SYS TERM TRAP );
- %SIG{[@old]} =@( '' ) x nelems(@old);
+%SIG{[@old]} =@( '' ) x nelems(@old);
 sigtrap->import('old-interface-signals');
 is( nelems( grep { ref $_ } %SIG{[@old]}), nelems(@old), 'check old-interface-signals set' );
 
