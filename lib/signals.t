@@ -1,5 +1,5 @@
 
-use Test::More tests => 7;
+use Test::More tests => 10;
 
 use signals;
 
@@ -33,3 +33,8 @@ do {
     dies_like( sub { signals::set_handler("TERM", 'foo') },
                qr/signal handler should be a code reference or .../ );
 };
+
+do {
+    is( signals::supported("ALRM"), 1 );
+    is( signals::supported("NON-EXIST"), '' );
+}

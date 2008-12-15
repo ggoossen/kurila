@@ -1,6 +1,7 @@
 #!./perl
 
 use Config;
+use signals;
 BEGIN {
     require './test.pl';
 
@@ -128,10 +129,10 @@ wait;				# Collect from $pid
 pipe(READER,'WRITER') || die "Can't open pipe";
 close READER;
 
-%SIG{'PIPE'} = \&broken_pipe;
+signals::set_handler('PIPE' => \&broken_pipe);
 
 sub broken_pipe {
-    %SIG{'PIPE'} = 'IGNORE';       # loop preventer
+    signals::set_handler('PIPE' => 'IGNORE');       # loop preventer
     printf "ok \%d - SIGPIPE\n", curr_test;
 }
 
@@ -158,7 +159,7 @@ SKIP: do {
           if config_value('d_sfio') || $^O eq 'machten' || $^O eq 'beos' || 
              $^O eq 'posix-bc';
 
-        local %SIG{PIPE} = 'IGNORE';
+        signals::temp_set_handler(PIPE => 'IGNORE');
         open NIL, '|-', qq{$Perl -e "exit 0"} or die "open failed: $!";
         sleep 5;
         if (print NIL 'foo') {
@@ -190,7 +191,7 @@ SKIP: do {
                 exit 37;
             }
             my $pipe = open *FH, "-|", "sleep 2;exit 13" or die "Open: $!\n";
-            %SIG{ALRM} = sub { return };
+            signals::set_handler(ALRM => sub { return });
             alarm(1);
             is( close FH, '',   'close failure for... umm, something' );
             is( $?, 13*256,     '       status' );
@@ -230,7 +231,7 @@ SKIP: do {
 
   my $child = 0;
   try {
-    local %SIG{ALRM} = sub { die; };
+    signals::temp_set_handler(ALRM => sub { die; });
     alarm 2;
     $child = wait;
     alarm 0;

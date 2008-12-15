@@ -3,7 +3,7 @@
 BEGIN {
     require './test.pl';
 }
-plan tests => 93;
+plan tests => 86;
 
 our (@c, @b, @a, $a, $b, $c, $d, $e, $x, $y, %d, %h, $m);
 
@@ -150,29 +150,6 @@ do {
     shift @a;
 };
 is(@a[0].@a[1], "Xb");
-
-# now try the same for %SIG
-
-%SIG{+INT} = \&foo;
-$^WARN_HOOK = %SIG{INT};
-do {
-    local(%SIG{+TERM}) = %SIG{?TERM};
-    local(%SIG{+INT}) = %SIG{?INT};
-    local($^WARN_HOOK) = $^WARN_HOOK;
-    is(%SIG{?TERM}, undef);
-    cmp_ok(%SIG{?INT}, '\==', \&foo);
-    cmp_ok($^WARN_HOOK, '\==', \&foo, "# TODO");
-    local(%SIG{INT});
-    $^WARN_HOOK = undef;
-};
-is(%SIG{?TERM}, undef);
-cmp_ok(%SIG{?INT}, '\==', \&foo);
-cmp_ok($^WARN_HOOK, '\==', \&foo, "# TODO");
-do {
-    my $d = join("\n", map { "$_=>$(dump::view(%SIG{?$_}))" } sort keys %SIG);
-    local %SIG = %( < %SIG );
-    is(join("\n", map { "$_=>$(dump::view(%SIG{?$_}))" } sort keys %SIG), $d);
-};
 
 # and for %ENV
 

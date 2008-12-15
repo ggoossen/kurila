@@ -9,6 +9,7 @@
 
 use Config;
 use File::Spec::Functions;
+use signals;
 
 BEGIN { require './test.pl'; }
 plan tests => 229;
@@ -1118,7 +1119,7 @@ do {
 	skip "fork() is not available", 3 unless config_value('d_fork');
 
 	%ENV{+'PATH'} = $TAINT;
-	local %SIG{+'PIPE'} = 'IGNORE';
+	signals::temp_set_handler('PIPE', 'IGNORE');
 	try {
 	    my $pid = open my $pipe, "|-", '-';
 	    if (!defined $pid) {

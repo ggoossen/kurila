@@ -24,11 +24,13 @@ sub nok ($;$) {
 }
 
 use Config;
+use signals;
+
 my $have_alarm = config_value('d_alarm');
 sub alarm_ok (&) {
     my $test = shift;
 
-    local %SIG{+ALRM} = sub { die "timeout\n" };
+    signals::temp_set_handler("ALRM" => sub { die "timeout\n" });
     
     my $match;
     try { 

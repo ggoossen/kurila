@@ -105,7 +105,8 @@ if (my $cid = fork) {
 else {
     # XXX On Windows the default signal handler kills the
     # XXX whole process, not just the thread (pseudo-process)
-    %SIG{INT} = sub { exit };
+    use signals;
+    signals::set_handler(INT => sub { exit });
     print "ok 1\n";
     sleep 5;
     die;
