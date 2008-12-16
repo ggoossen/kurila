@@ -4428,6 +4428,7 @@ enum {		/* pass one of these to get_vtbl */
     want_vtbl_sv,
     want_vtbl_env,
     want_vtbl_envelem,
+    want_vtbl_hints,
     want_vtbl_pack,
     want_vtbl_packelem,
     want_vtbl_dbline,
@@ -4743,6 +4744,18 @@ MGVTBL_SET(
     MEMBER_TO_FPTR(Perl_magic_setenv),
     0,
     MEMBER_TO_FPTR(Perl_magic_clearenv),
+    0,
+    0,
+    0,
+    0
+);
+
+MGVTBL_SET(
+    PL_vtbl_hints,
+    0,
+    0,
+    0,
+    0,
     0,
     0,
     0,

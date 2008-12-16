@@ -3876,7 +3876,8 @@ Perl_sv_magic(pTHX_ register SV *const sv, SV *const obj, const int how,
 	vtable = &PL_vtbl_regexp;
 	break;
     case PERL_MAGIC_hints:
-	/* As this vtable is all NULL, we can reuse it.  */
+	vtable = &PL_vtbl_hints;
+	break;
     case PERL_MAGIC_taint:
 	vtable = &PL_vtbl_taint;
 	break;

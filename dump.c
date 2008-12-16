@@ -1154,6 +1154,7 @@ static const struct { const char type; const char *name; } magic_names[] = {
 	{ PERL_MAGIC_dbfile,         "dbfile(L)" },
 	{ PERL_MAGIC_shared,         "shared(N)" },
 	{ PERL_MAGIC_tied,           "tied(P)" },
+	{ PERL_MAGIC_hints,          "hints(H)" },
 	{ PERL_MAGIC_uvar,           "uvar(U)" },
 	{ PERL_MAGIC_envelem,        "envelem(e)" },
 	{ PERL_MAGIC_fm,             "fm(f)" },
@@ -1188,6 +1189,7 @@ Perl_do_magic_dump(pTHX_ I32 level, PerlIO *file, const MAGIC *mg, I32 nest, I32
  	    if      (v == &PL_vtbl_sv)         s = "sv";
             else if (v == &PL_vtbl_env)        s = "env";
             else if (v == &PL_vtbl_envelem)    s = "envelem";
+            else if (v == &PL_vtbl_hints)      s = "hints";
             else if (v == &PL_vtbl_pack)       s = "pack";
             else if (v == &PL_vtbl_packelem)   s = "packelem";
             else if (v == &PL_vtbl_dbline)     s = "dbline";
