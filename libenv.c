@@ -51,7 +51,10 @@ XS(XS_env_set_var)
         SV* value = POPs;
         SV* key = POPs;
 
-        my_setenv(SvPVX_const(key), SvPVX_const(value));
+        my_setenv(
+            SvPV_nolen_const(key),
+            SvOK(value) ? SvPV_nolen_const(value) : NULL
+            );
     }
     XSRETURN(0);
 }
