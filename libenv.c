@@ -2,8 +2,6 @@
 #include "EXTERN.h"
 #include "perl.h"
 
-#include "iperlsys.h"
-
 #include "XSUB.h"
 
 XS(XS_env_var);
@@ -47,10 +45,13 @@ XS(XS_env_set_var)
     dVAR;
     dXSARGS;
     PERL_UNUSED_ARG(cv);
-    if (items != 1)
-	Perl_croak(aTHX_ "Usage: env::var(name)");
+    if (items != 2)
+	Perl_croak(aTHX_ "Usage: env::set_var(key, value)");
     {
+        SV* value = POPs;
+        SV* key = POPs;
 
+        my_setenv(SvPVX_const(key), SvPVX_const(value));
     }
     XSRETURN(0);
 }
