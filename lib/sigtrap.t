@@ -3,7 +3,7 @@
 
 use Config;
 
-use Test::More tests => 15;
+use Test::More tests => 9;
 
 use_ok( 'sigtrap' );
 
@@ -20,54 +20,15 @@ like( $@->{?description}, qr/^Unrecognized argument abadsignal/, 'send bad signa
 try{ sigtrap->import('handler') };
 like( $@->{?description}, qr/^No argument specified/, 'send handler without subref' );
 
-sigtrap->import('AFAKE');
-cmp_ok( signals::handler("AFAKE"), '\==', \&sigtrap::handler_traceback,
-        'install normal handler' );
-
-sigtrap->import('die', 'AFAKE', 'stack-trace', 'FAKE2');
-cmp_ok( signals::handler("AFAKE"), '\==', \&sigtrap::handler_die,
-        'install the die handler' );
-cmp_ok( signal::handler("FAKE2"), '\==',\&sigtrap::handler_traceback,
-        'install traceback handler' );
-
 my @normal =qw( HUP INT PIPE TERM );
 for (@normal) {
-    signals::set_handler($_, '');
+    signals::set_handler($_, 'DEFAULT');
 }
 sigtrap->import('normal-signals');
 for (@normal) {
     ok( ref signals::handler($_),
         'check normal-signals set' );
 }
-
-1;
-__END__
-my @error =qw( ABRT BUS EMT FPE ILL QUIT SEGV SYS TRAP );
-%SIG{[@error]} =@( '') x (nelems @error);
-sigtrap->import('error-signals');
-is( nelems( grep { ref $_ } %SIG{[@error]}), nelems(@error), 'check error-signals set' );
-
-my @old =qw( ABRT BUS EMT FPE ILL PIPE QUIT SEGV SYS TERM TRAP );
-%SIG{[@old]} =@( '' ) x nelems(@old);
-sigtrap->import('old-interface-signals');
-is( nelems( grep { ref $_ } %SIG{[@old]}), nelems(@old), 'check old-interface-signals set' );
-
-my $handler = sub {};
-sigtrap->import(handler => $handler, 'FAKE3');
-cmp_ok( %SIG{?FAKE3}, '\==', $handler, 'install custom handler' );
-
-%SIG{+FAKE} = 'IGNORE';
-sigtrap->import('untrapped', 'FAKE');
-is( %SIG{?FAKE}, 'IGNORE', 'respect existing handler set to IGNORE' );
-
-my $out = "";
-open my $out_fh, '>>', \$out or die;
-*STDOUT = *$out_fh{IO};
-%SIG{+FAKE} = 'DEFAULT';
-$sigtrap::Verbose = 1;
-sigtrap->import('any', 'FAKE');
-cmp_ok( %SIG{?FAKE}, '\==', \&sigtrap::handler_traceback, 'should set default handler' );
-like( $out, qr/^Installing handler/, 'does it talk with $Verbose set?' );
 
 # handler_die croaks with first argument
 try { sigtrap::handler_die('FAKE') };

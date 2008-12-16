@@ -28,7 +28,6 @@ XS(XS_signals_handler)
     if (items != 1)
 	Perl_croak(aTHX_ "Usage: signals::handler(signalname)");
     {
-        dVAR;
         SV* namesv = POPs;
         SV* sv;
         /* Are we fetching a signal entry? */
@@ -36,30 +35,31 @@ XS(XS_signals_handler)
 
         sv = newSV(0);
         mXPUSHs(sv);
-        if (i > 0) {
-            if (!PL_psig_ptr) {
-                Newxz(PL_psig_ptr,  SIG_SIZE, SV*);
-                Newxz(PL_psig_name, SIG_SIZE, SV*);
-                Newxz(PL_psig_pend, SIG_SIZE, int);
-            }
-            if(PL_psig_ptr[i])
-                sv_setsv(sv,sv_2mortal(newRV_inc(PL_psig_ptr[i])));
-            else {
-                Sighandler_t sigstate = rsignal_state(i);
+        if (i <= 0) {
+            Perl_croak(aTHX_ "No such signal: SIG%s", SvPV_nolen_const(namesv));
+        }
+        if (!PL_psig_ptr) {
+            Newxz(PL_psig_ptr,  SIG_SIZE, SV*);
+            Newxz(PL_psig_name, SIG_SIZE, SV*);
+            Newxz(PL_psig_pend, SIG_SIZE, int);
+        }
+        if(PL_psig_ptr[i])
+            sv_setsv(sv,sv_2mortal(newRV_inc(PL_psig_ptr[i])));
+        else {
+            Sighandler_t sigstate = rsignal_state(i);
 #ifdef FAKE_PERSISTENT_SIGNAL_HANDLERS
-                if (PL_sig_handlers_initted && PL_sig_ignoring[i])
-                    sigstate = SIG_IGN;
+            if (PL_sig_handlers_initted && PL_sig_ignoring[i])
+                sigstate = SIG_IGN;
 #endif
 #ifdef FAKE_DEFAULT_SIGNAL_HANDLERS
-                if (PL_sig_handlers_initted && PL_sig_defaulting[i])
-                    sigstate = SIG_DFL;
+            if (PL_sig_handlers_initted && PL_sig_defaulting[i])
+                sigstate = SIG_DFL;
 #endif
-                /* cache state so we don't fetch it again */
-                if(sigstate == (Sighandler_t) SIG_IGN)
-                    sv_setpvs(sv,"IGNORE");
-                else
-                    sv_setsv(sv,&PL_sv_undef);
-            }
+            /* cache state so we don't fetch it again */
+            if(sigstate == (Sighandler_t) SIG_IGN)
+                sv_setpvs(sv,"IGNORE");
+            else
+                sv_setsv(sv,&PL_sv_undef);
         }
     }
     XSRETURN(1);
@@ -124,9 +124,7 @@ XS(XS_signals_set_handler)
     s = SvPV_const(namesv,len);
     i = whichsig(s);        /* ...no, a brick */
     if (i <= 0) {
-	if (ckWARN(WARN_SIGNAL))
-	    Perl_warner(aTHX_ packWARN(WARN_SIGNAL), "No such signal: SIG%s", s);
-        XSRETURN(0);
+        Perl_croak(aTHX_ "No such signal: SIG%s", s);
     }
 #ifdef HAS_SIGPROCMASK
     /* Avoid having the signal arrive at a bad time, if possible. */
