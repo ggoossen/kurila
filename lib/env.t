@@ -1,7 +1,7 @@
 BEGIN {
     require "./test.pl";
 }
-plan tests => 6;
+plan tests => 8;
 use env;
 
 is( env::var("PERL_CORE"), 1, "PERL_CORE is set to '1'" );
@@ -19,3 +19,8 @@ fresh_perl_is(qq{print env::var("PERL_TEST_ENV_VAR")},
 
 env::set_var("PERL_TEST_ENV_VAR", undef);
 is( env::var("PERL_TEST_ENV_VAR"), undef, "PERL_TEST_ENV_VAR is undef" );
+
+env::set_var("PERL_TEST_ENV_VAR", "test3");
+my %envhash = %:< map { $_ => env::var($_) } env::keys() ;
+is( %envhash{"PERL_CORE"}, 1 );
+is( %envhash{"PERL_TEST_ENV_VAR"}, "test3" );
