@@ -1261,7 +1261,6 @@ sigaction(sig, optaction, oldaction = 0)
 	{
 	    dVAR;
 	    POSIX__SigAction action;
-	    GV *siggv = gv_fetchpv("SIG", TRUE, SVt_PVHV);
 	    struct sigaction act;
 	    struct sigaction oact;
 	    sigset_t sset;
@@ -1269,7 +1268,7 @@ sigaction(sig, optaction, oldaction = 0)
 	    sigset_t osset;
 	    POSIX__SigSet sigset;
 	    SV** svp;
-	    SV** sigsvp;
+	    SV* sigsv;
 
             if (sig < 0) {
                 croak("Negative signals are not allowed");
@@ -1297,10 +1296,14 @@ sigaction(sig, optaction, oldaction = 0)
 	        XSRETURN_UNDEF;
 	    }
 #endif
-	    sigsvp = hv_fetch(GvHVn(siggv),
-			      PL_sig_name[sig],
-			      strlen(PL_sig_name[sig]),
-			      TRUE);
+            ENTER;
+            PUSHMARK(SP);
+            mXPUSHs(newSVpv(PL_sig_name[sig], 0));
+            PUTBACK;
+            call_pv("signals::handler", G_SCALAR);
+            SPAGAIN;
+            sigsv = POPs;
+            LEAVE;
 
 	    /* Check optaction and set action */
 	    if(SvTRUE(optaction)) {
@@ -1335,8 +1338,8 @@ sigaction(sig, optaction, oldaction = 0)
 		svp = hv_fetchs(oldaction, "HANDLER", TRUE);
 		if(!svp)
 		    croak("Can't supply an oldaction without a HANDLER");
-		if(SvTRUE(*sigsvp)) { /* TBD: what if "0"? */
-			sv_setsv(*svp, *sigsvp);
+		if(SvTRUE(sigsv)) { /* TBD: what if "0"? */
+			sv_setsv(*svp, sigsv);
 		}
 		else {
 			sv_setpv(*svp, "DEFAULT");
@@ -1384,13 +1387,14 @@ sigaction(sig, optaction, oldaction = 0)
 		svp = hv_fetchs(action, "HANDLER", FALSE);
 		if (!svp)
 		    croak("Can't supply an action without a HANDLER");
-		sv_setsv(*sigsvp, *svp);
 
-		/* This call actually calls sigaction() with almost the
-		   right settings, including appropriate interpretation
-		   of DEFAULT and IGNORE.  However, why are we doing
-		   this when we're about to do it again just below?  XXX */
-		mg_set(*sigsvp);
+                ENTER;
+                PUSHMARK(SP);
+                mXPUSHs(newSVpv(PL_sig_name[sig], 0));
+                XPUSHs(*svp);
+                PUTBACK;
+                call_pv("signals::set_handler", G_VOID|G_DISCARD);
+                LEAVE;
 
 		/* And here again we duplicate -- DEFAULT/IGNORE checking. */
 		if(SvPOK(*svp)) {

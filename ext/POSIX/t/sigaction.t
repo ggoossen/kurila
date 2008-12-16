@@ -44,7 +44,7 @@ do {
 ok($oldaction->{?HANDLER} eq 'DEFAULT' ||
    $oldaction->{?HANDLER} eq 'IGNORE', $oldaction->{?HANDLER});
 
-is(%SIG{?HUP}, \&foo);
+is(signals::handler("HUP"), \&foo);
 
 sigaction(SIGHUP, $newaction, $oldaction);
 is($oldaction->{?HANDLER}, \&foo);
@@ -62,9 +62,9 @@ sigaction(SIGHUP, $newaction);
 kill 'HUP', $$;
 ok(!$bad, "SIGHUP ignored");
 
-is(%SIG{?HUP}, 'IGNORE');
+is(signals::handler("HUP"), 'IGNORE');
 sigaction(SIGHUP, POSIX::SigAction->new('DEFAULT'));
-is(%SIG{?HUP}, undef);
+is(signals::handler("HUP"), undef);
 
 $newaction=POSIX::SigAction->new(sub { $ok10=1; });
 sigaction(SIGHUP, $newaction);
@@ -74,7 +74,7 @@ do {
 };
 ok($ok10, "SIGHUP handler called");
 
-is(ref(%SIG{?HUP}), 'CODE');
+is(ref(signals::handler("HUP")), 'CODE');
 
 sigaction(SIGHUP, POSIX::SigAction->new(\&main::foo));
 # Make sure the signal mask gets restored after sigaction croak()s.
@@ -92,7 +92,7 @@ my $x=defined sigaction(SIGKILL, $newaction, $oldaction);
 kill 'HUP', $$;
 ok(!$x && $ok, "signal mask gets restored after early return");
 
-%SIG{+HUP}=sub {};
+signals::set_handler( HUP => sub {} );
 sigaction(SIGHUP, $newaction, $oldaction);
 is(ref($oldaction->{?HANDLER}), 'CODE');
 
@@ -152,7 +152,7 @@ do {
 # for this one, use the accessor instead of the attribute
 
 # standard signal handling via %SIG is safe
-%SIG{+HUP} = \&foo;
+signals::set_handler( HUP => \&foo );
 $oldaction = POSIX::SigAction->new;
 sigaction(SIGHUP, undef, $oldaction);
 ok($oldaction->safe, "SIGHUP is safe");
