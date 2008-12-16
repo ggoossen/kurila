@@ -297,6 +297,7 @@ PERL_CALLCONV void	Perl_boot_core_version(pTHX);
 PERL_CALLCONV void	Perl_boot_core_utf8(pTHX);
 PERL_CALLCONV void	Perl_boot_core_Internals(pTHX);
 PERL_CALLCONV void	Perl_boot_core_signals(pTHX);
+PERL_CALLCONV void	Perl_boot_core_env(pTHX);
 PERL_CALLCONV void	Perl_boot_core_PerlIO(pTHX);
 PERL_CALLCONV void	Perl_call_list(pTHX_ I32 oldscope, AV *paramList)
 			__attribute__nonnull__(pTHX_2);

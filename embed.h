@@ -102,6 +102,7 @@
 #define boot_core_utf8		Perl_boot_core_utf8
 #define boot_core_Internals	Perl_boot_core_Internals
 #define boot_core_signals	Perl_boot_core_signals
+#define boot_core_env		Perl_boot_core_env
 #define boot_core_PerlIO	Perl_boot_core_PerlIO
 #endif
 #define call_list		Perl_call_list
@@ -2293,6 +2294,7 @@
 #define boot_core_utf8()	Perl_boot_core_utf8(aTHX)
 #define boot_core_Internals()	Perl_boot_core_Internals(aTHX)
 #define boot_core_signals()	Perl_boot_core_signals(aTHX)
+#define boot_core_env()		Perl_boot_core_env(aTHX)
 #define boot_core_PerlIO()	Perl_boot_core_PerlIO(aTHX)
 #endif
 #define call_list(a,b)		Perl_call_list(aTHX_ a,b)

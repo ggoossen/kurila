@@ -136,6 +136,7 @@ p	|void	|boot_core_version
 p	|void	|boot_core_utf8
 p	|void	|boot_core_Internals
 p	|void	|boot_core_signals
+p	|void	|boot_core_env
 p	|void	|boot_core_PerlIO
 Ap	|void	|call_list	|I32 oldscope|NN AV *paramList
 Ap	|void	|call_list_onleave	|I32 oldscope|NN AV *paramList
