@@ -2233,7 +2233,6 @@ t/lib/warnings/pp_pack		Tests for pp_pack.c for warnings.t
 t/lib/warnings/pp_sys		Tests for pp_sys.c for warnings.t
 t/lib/warnings/regcomp		Tests for regcomp.c for warnings.t
 t/lib/warnings/regexec		Tests for regexec.c for warnings.t
-t/lib/warnings/run		Tests for run.c for warnings.t
 t/lib/warnings/sv		Tests for sv.c for warnings.t
 t/lib/warnings/taint		Tests for taint.c for warnings.t
 t/lib/warnings/toke		Tests for toke.c for warnings.t

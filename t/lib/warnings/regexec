@@ -17,9 +17,6 @@ __END__
 # regexec.c
 print("SKIPPED\n# most systems run into stacksize limits\n"),exit;
 use warnings 'regexp' ;
-%SIG{__WARN__} = sub{local our ($m) = shift;
-                 $m =~ s/\(\d+\)/(*MASKED*)/;
-                 print STDERR $m};
 $_ = 'a' x (2**15+1); 
 m/^()(a\1)*$/ ;
 #
@@ -43,9 +40,6 @@ Complex regular subexpression recursion limit (*MASKED*) exceeded at - line 9.
 # regexec.c
 print("SKIPPED\n# most systems run into stacksize limits\n"),exit;
 no warnings 'regexp' ;
-%SIG{__WARN__} = sub{local our ($m) = shift;
-                 $m =~ s/\(\d+\)/(*MASKED*)/;
-                 print STDERR $m};
 $_ = 'a' x (2**15+1); 
 m/^()(a\1)*$/ ;
 #
@@ -69,9 +63,6 @@ EXPECT
 # regexec.c
 print("SKIPPED\n# most systems run into stacksize limits\n"),exit;
 use warnings 'regexp' ;
-%SIG{__WARN__} = sub{local our ($m) = shift;
-                 $m =~ s/\(\d+\)/(*MASKED*)/;
-                 print STDERR $m};
 $_ = 'a' x (2**15+1);
 m/^()(a\1)*?$/ ;
 #
@@ -95,9 +86,6 @@ Complex regular subexpression recursion limit (*MASKED*) exceeded at - line 9.
 # regexec.c
 print("SKIPPED\n# most systems run into stacksize limits\n"),exit;
 no warnings 'regexp' ;
-%SIG{__WARN__} = sub{local our ($m) = shift;
-                 $m =~ s/\(\d+\)/(*MASKED*)/;
-                 print STDERR $m};
 $_ = 'a' x (2**15+1);
 m/^()(a\1)*?$/ ;
 #

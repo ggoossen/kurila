@@ -9,6 +9,7 @@
 # -- Jarkko Hietaniemi, April 1997
 
 use Test::More;
+use signals;
 
 plan(tests => 69);
 
@@ -244,7 +245,7 @@ do {
 };
 
 # E.g. netbsd-alpha core dumps on Inf arith without this.
-local %SIG{+FPE} = undef;
+signals::temp_set_handler(FPE => undef);
 
 print "# great_circle_distance with small angles\n";
 

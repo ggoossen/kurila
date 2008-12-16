@@ -5,7 +5,7 @@ use Cwd <             qw[cwd];
 use File::Basename <  qw[basename];
 use Data::Dumper;
 
-use_ok('File::Fetch');
+use File::Fetch;
 
 ### optionally set debugging ###
 $File::Fetch::DEBUG = $File::Fetch::DEBUG   = 1 if @ARGV[0];

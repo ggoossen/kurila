@@ -85,7 +85,8 @@ sub hostname {
 
     # method 3 - trusty old hostname command
     || try {
-	local %SIG{CHLD};
+        require signals;
+	signals::temp_set_handler("CHLD");
 	$host = `(hostname) 2>/dev/null`; # bsdish
     }
 

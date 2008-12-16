@@ -10,6 +10,7 @@ BEGIN {
 }
 	
 use Socket < qw(:all);
+use signals;
 
 plan tests => 14;
 
@@ -17,7 +18,7 @@ my $has_echo = $^O ne 'MSWin32';
 my $alarmed = 0;
 sub arm      { $alarmed = 0; alarm(shift) if $has_alarm }
 sub alarmed  { $alarmed = 1 }
-%SIG{+ALRM} = \&alarmed                    if $has_alarm;
+signals::set_handler(ALRM => \&alarmed)                    if $has_alarm;
 
 if (socket(T, PF_INET, SOCK_STREAM, IPPROTO_TCP)) {
 

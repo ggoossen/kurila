@@ -5,6 +5,7 @@ use File::Copy;
 use File::Spec;
 use File::Spec::Unix;
 use File::Basename <              qw[dirname];
+use signals;
 
 use Cwd <                         qw[cwd];
 use Carp <                        qw[carp];
@@ -660,7 +661,7 @@ sub _ftp_fetch {
 
         my $fh = FileHandle->new;
 
-        local %SIG{+CHLD} = 'IGNORE';
+        signals::temp_set_handler(CHLD => 'IGNORE');
 
         unless ($fh->open("|$ftp -n")) {
             return $self->_error( <loc("\%1 creation failed: \%2", $ftp, $!));
