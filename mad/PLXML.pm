@@ -1819,6 +1819,10 @@ sub check { 'ck_fun' }
 sub flags { 'ms@' }
 sub args { 'L' }
 
+package PLXML::op_anonarray;
+
+our @ISA = ('PLXML::op_anonlist');
+
 package PLXML::op_anonhash;
 
 our @ISA = ('PLXML::listop');

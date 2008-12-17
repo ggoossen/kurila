@@ -826,6 +826,7 @@ sub sv_array_hash {
         my (undef, $right, $left) = $op->children;
 
         next if $left->att('flags') =~ m/PARENS/;
+
         my $svt;
         $svt = $1 eq 'av' ? '@' : '%' if $left->child(1)->tag =~ m/op_(?:pad|rv2)(av|hv)/;
         next unless $svt;
@@ -1129,6 +1130,60 @@ sub rename_ternary_op {
     }
 }
 
+sub hashkey_regulator {
+    my $xml = shift;
+    for my $op ($xml->findnodes(qq|//op_helem|)) {
+        if ($op->att("flags") =~ m/\bMOD\b/
+              and ($op->att("private")||'') !~ m/\bLVAL_DEFER\b/) {
+            if ( $op->att("flags") =~ m/(\bSPECIAL\b|\bREF\b)/ ) {
+                set_madprop($op, "curly_open", "{+");
+            }
+        }
+        else {
+            next if $op->following_elt()->tag eq "op_method_named";
+            set_madprop($op, "curly_open", "{?");
+        }
+    }
+}
+
+sub pattern_assignment {
+    my $xml = shift;
+
+    for my $op ($xml->findnodes("//op_aassign")) {
+        my (undef, $dst, $subj) = $op->children;
+
+        next if ($subj->child(1)->tag eq "op_padsv")
+          && ($dst->child(1)->tag =~ m/op_entersub|op_const|op_padsv/);
+
+        for my $side ($subj, $dst) {
+            if ( $side->tag eq "op_null"
+                   and get_madprop($side, "round_open")) {
+                set_madprop($side, "round_open", "\@(");
+            }
+            elsif ($side->child(1)->att("flags") =~ m/\bPARENS\b/
+                     and get_madprop($side->child(1), "round_open")) {
+                set_madprop($side->child(1), "round_open", "\@(");
+            }
+            elsif ( $side->child(1)->tag eq "op_expand") {
+                set_madprop($side->child(1), "operator", '');
+            }
+            else {
+                set_madprop($side->child(1), "wrap_open", "\@(");
+                set_madprop($side->child(1), "wrap_close", ")");
+            }
+        }
+
+        my ($exp) = $op->child(2)->findnodes(".//op_expand");
+        if ( $exp and get_madprop($exp, "operator") ) {
+            my $var = "\@";
+            if ((get_madprop($exp->child(1), "hsh") || '') =~ m/%/) {
+                $var = "%";
+            }
+            set_madprop($exp, "operator", $var . "&lt;");
+        }
+    }
+}
+
 my $from; # floating point number with starting version of kurila.
 GetOptions("from=s" => \$from);
 $from =~ m/(\w+)[-]([\d.]+)$/ or die "invalid from: '$from'";
@@ -1225,7 +1280,10 @@ if ($from->{branch} ne "kurila" or $from->{v} < qv '1.15') {
 }
 
 #add_call_parens($twig);
-rename_ternary_op($twig);
+
+#rename_ternary_op($twig);
+#hashkey_regulator($twig);
+pattern_assignment($twig);
 
 # print
 $twig->print( pretty_print => 'indented' );

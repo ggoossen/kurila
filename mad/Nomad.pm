@@ -2431,6 +2431,7 @@ sub ast {
 }
 
 package PLXML::op_anonlist;
+package PLXML::op_anonarray;
 package PLXML::op_anonhash;
 package PLXML::op_nkeys;
 package PLXML::op_nelems;

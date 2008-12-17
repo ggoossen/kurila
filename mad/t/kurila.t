@@ -33,11 +33,13 @@ sub p5convert {
                                   from => $from, to => $to,
                                   dumpcommand => "$ENV{madpath}/perl",
                                  );
-    is($output, $expected) or $TODO or die;
+    is($output, $expected) or $TODO or die "failed test";
 }
 
+t_pattern_assignment();
+die "END";
+t_hashkey_regulator();
 t_rename_ternary_op();
-die;
 t_call_parens();
 t_remove_strict();
 t_lval_vec();
@@ -1441,3 +1443,62 @@ $a ?? 1 !! 2;
 END
 }
 
+sub t_hashkey_regulator {
+    p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
+$a{ee} = 3;
+$b = $a{ee};
+$a{ff}->{gg} = 2;
+----
+$a{+ee} = 3;
+$b = $a{?ee};
+$a{ff}->{+gg} = 2;
+====
+sub foo { }
+foo($a{ee});
+----
+sub foo { }
+foo($a{?ee});
+====
+$a{ee} ||= 1;
+$a{ff}++;
+$a{gg}->foo();
+----
+$a{+ee} ||= 1;
+$a{+ff}++;
+$a{gg}->foo();
+END
+}
+
+sub t_pattern_assignment {
+    p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
+my ($x, $y) = (1, 2);
+($x, $y) = (1, 2);
+my ($u, $v) = < $x;
+----
+my @($x, $y) = @(1, 2);
+@($x, $y) = @(1, 2);
+my @($u, $v) =  $x;
+====
+< $a{[qw|aap noot|]} = < qw|Mies Wim|;
+----
+ $a{[qw|aap noot|]} =  qw|Mies Wim|;
+====
+my ($x, < @y) = (1, 2);
+my ($u, < %h) = (1, 2);
+----
+my @($x, @< @y) = @(1, 2);
+my @($u, %< %h) = @(1, 2);
+====
+my (@l) = $a->list();
+----
+my (@l) = $a->list();
+====
+my ($l) = "foo";
+----
+my ($l) = "foo";
+====
+my ($l) = m/(foo)/;
+----
+my @($l) = @(m/(foo)/);
+END
+}
