@@ -2695,8 +2695,9 @@ Perl_newBINOP(pTHX_ I32 type, OPFLAGS flags, OP *first, OP *last, SV* location)
     BINOP *binop;
     NewOp(1101, binop, 1, BINOP);
 
-    if (!first)
+    if (!first) {
 	first = newOP(OP_NULL, 0, location);
+    }
 
     binop->op_location = SvREFCNT_inc(location);
 

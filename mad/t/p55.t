@@ -114,12 +114,6 @@ for my $prog (@prgs) {
 use File::Find;
 
 our %failing = map { $_, 1 } qw|
-../t/op/switch.t
-
-../t/op/attrhand.t
-
-../t/op/exec.t
-
 ../t/arch/64bitint.t
 |;
 
@@ -136,7 +130,6 @@ for my $file (@files) {
 __DATA__
 33
 ########
-use strict;
 #ABC
 Foo->new;
 ########
@@ -159,24 +152,6 @@ BEGIN { PerlIO::Layer->find("encoding",1);}
 ########
 # from t/op/getppid.t
 pipe my ($r, $w)
-########
-# TODO switch
-use feature 'switch';
-given(my $x = "bar") { }
-########
-# TODO attribute t/op/attrhand.t
-sub something : TypeCheck(
-    QNET::Util::Object,
-    QNET::Util::Object,
-    QNET::Util::Object
-) { #           WrongAttr (perl tokenizer bug)
-    # keep this ^ lined up !
-    return 42;
-}
-########
-# symbol table t/op/symbolcache.t
-sub replaced2 { 'func' }
-BEGIN { undef $main::{replaced2} }
 ########
 # TODO exit in begin block. from t/op/threads.t without threads
 BEGIN {
@@ -266,13 +241,15 @@ $( 3 );
 ########
 sub () { 1 }
 ########
+# assignment to hash
 my %h;
-(<%h) = (1, 2);
+%h = %(1, 2);
 ########
-my (<%hash) = (1,2);
+my %hash = %(1,2);
 ########
+# hash expand assignment
 my %h;
-(<%h) = < (%h);
+%( %< %h ) = %h;
 ########
 do {
    # comment
@@ -313,3 +290,26 @@ print "arg";
 pos($a);
 ########
 LABEL: for (@: 1) { print "arg" }
+########
+# optional assignment
+my @( ? $x) = qw();
+########
+# dotdotdot operator
+my @($pw, ...) = qw(aap noot mies);
+########
+# or assignment.
+my $a;
+$a ||= 3;
+########
+# optional key
+$a{?key};
+########
+# optional assignment with our
+our $d;
+@( ? $d) = qw();
+########
+# dynascope
+dynascope;
+########
+# readpipe
+readpipe;

@@ -560,6 +560,9 @@ sub check { 'ck_sassign' }
 sub flags { 's0' }
 sub args { '' }
 
+package PLXML::op_logassign_assign;
+
+our @ISA = ('PLXML::baseop');
 
 package PLXML::op_aassign;
 
@@ -638,6 +641,17 @@ sub check { 'ck_lfun' }
 sub flags { 's%' }
 sub args { 'S?' }
 
+package PLXML::op_dotdotdot;
+
+our @ISA = ('PLXML::baseop');
+
+package PLXML::op_placeholder;
+
+our @ISA = ('PLXML::baseop');
+
+package PLXML::op_dynascope;
+
+our @ISA = ('PLXML::baseop_unop');
 
 package PLXML::op_study;
 
@@ -1641,6 +1655,14 @@ sub check { 'ck_fun' }
 sub flags { '%' }
 sub args { 'S' }
 
+package PLXML::op_hashexpand;
+
+our @ISA = ('PLXML::op_expand');
+
+package PLXML::op_arrayexpand;
+
+our @ISA = ('PLXML::op_expand');
+
 package PLXML::op_values;
 
 our @ISA = ('PLXML::baseop_unop');
@@ -1823,6 +1845,10 @@ package PLXML::op_anonarray;
 
 our @ISA = ('PLXML::op_anonlist');
 
+package PLXML::op_enter_anonarray_assign;
+
+our @ISA = ('PLXML::baseop');
+
 package PLXML::op_anonhash;
 
 our @ISA = ('PLXML::listop');
@@ -1833,7 +1859,17 @@ sub check { 'ck_fun' }
 sub flags { 'ms@' }
 sub args { 'L' }
 
+package PLXML::op_enter_anonhash_assign;
 
+our @ISA = ('PLXML::baseop');
+
+package PLXML::op_enter_hashexpand_assign;
+
+our @ISA = ('PLXML::baseop');
+
+package PLXML::op_enter_arrayexpand_assign;
+
+our @ISA = ('PLXML::baseop');
 
 package PLXML::op_splice;
 

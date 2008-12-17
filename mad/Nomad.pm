@@ -1474,7 +1474,7 @@ package PLXML::op_padsv;
 sub ast {
     my $self = shift;
     my @args;
-    push @args, $self->madness('dx d ( $ @ % )');
+    push @args, $self->madness('optional_assign dx d ( $ @ % )');
 
     return $self->newtype->new(Kids => [@args]);
 }
@@ -1542,7 +1542,7 @@ package PLXML::op_rv2sv;
 
 sub astnull {
     my $self = shift;
-    return P5AST::op_rv2sv->new(Kids => [$self->madness('O o dx d ( $ ) : a')]);
+    return P5AST::op_rv2sv->new(Kids => [$self->madness('O o optional_assign dx d ( $ ) : a')]);
 }
 
 sub ast {
@@ -1672,7 +1672,10 @@ package PLXML::op_backtick;
 sub ast {
     my $self = shift;
     my @args;
-    if (exists $self->{mp}{q}) {
+    if (exists $self->{mp}{o}) {
+        push @args, $self->madness('o');
+    }
+    elsif (exists $self->{mp}{q}) {
 	push @args, $self->madness('q');
 	if ($args[-1]->uni =~ /^<</) {
 	    my $opstub = bless { start => $args[-1] }, 'P5AST::heredoc';
@@ -1868,6 +1871,7 @@ sub ast {
 
     my $right = $$self{Kids}[1];
     eval { push @newkids, $right->ast($self, @_); };
+    die if $@;
 
     push @newkids, $self->madness('o');
 
@@ -1902,6 +1906,22 @@ package PLXML::op_chomp;
 package PLXML::op_schomp;
 package PLXML::op_defined;
 package PLXML::op_undef;
+package PLXML::op_dotdotdot;
+
+sub ast {
+    my $self = shift;
+    my @newkids = $self->madness('X');
+    return $self->newtype->new(Kids => [@newkids]);
+}
+
+package PLXML::op_placeholder;
+
+sub ast {
+    my $self = shift;
+    my @newkids = $self->madness('optional_assign X');
+    return $self->newtype->new(Kids => [@newkids]);
+}
+
 package PLXML::op_study;
 package PLXML::op_pos;
 package PLXML::op_preinc;
@@ -2252,8 +2272,7 @@ sub ast {
     my @newkids = $self->madness('wrap_open d ( o');
 
     if (exists $$self{Kids}) {
-	my $arg = $$self{Kids}[0];
-	push @newkids, $arg->ast($self, @_) if defined $arg;
+	push @newkids, map { $_->ast($self, @_) } @{ $self->{Kids} };
     }
     push @newkids, $self->madness(') wrap_close');
 
@@ -3006,6 +3025,7 @@ sub ast {
                 eval {
                     push @newkids, $$andor{Kids}[1]->blockast($self, @_);
                 };
+                die if $@;
             } else {
                 push @newkids, $nextthing->ast($self, @_);
             }
