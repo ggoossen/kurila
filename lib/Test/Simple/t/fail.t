@@ -12,7 +12,7 @@ BEGIN {
 
 
 require Test::Simple::Catch;
-my($out, $err) = < Test::Simple::Catch::caught();
+my@($out, $err) =  Test::Simple::Catch::caught();
 local %ENV{+HARNESS_ACTIVE} = 0;
 
 
@@ -24,7 +24,7 @@ print "1..2\n";
 my $test_num = 1;
 # Utility testing functions.
 sub ok ($;$) {
-    my($test, $name) = < @_;
+    my@($test, ?$name) =  @_;
     my $ok = '';
     $ok .= "not " unless $test;
     $ok .= "ok $test_num";

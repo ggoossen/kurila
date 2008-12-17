@@ -98,8 +98,8 @@ close STDIN ;
 tell(STDIN);
 $a = seek(STDIN,1,1);
 $a = sysseek(STDIN,1,1);
--x STDIN ;
-stat(STDIN) ;
+-x \*STDIN ;
+stat(\*STDIN) ;
 $a = \*fred;
 tell($a);
 seek($a,1,1);
@@ -111,8 +111,8 @@ close STDIN ;
 tell(STDIN);
 $a = seek(STDIN,1,1);
 $a = sysseek(STDIN,1,1);
--x STDIN ;
-stat(STDIN) ;
+-x \*STDIN ;
+stat(\*STDIN) ;
 $a = \*fred;
 tell($a);
 seek($a,1,1);
@@ -123,8 +123,8 @@ EXPECT
 tell() on closed filehandle STDIN at - line 4 character 1.
 seek() on closed filehandle STDIN at - line 5 character 6.
 sysseek() on closed filehandle STDIN at - line 6 character 6.
--x on closed filehandle STDIN at - line 7 character 4.
-stat() on closed filehandle STDIN at - line 8 character 6.
+-x on closed filehandle STDIN at - line 7 character 2.
+stat() on closed filehandle STDIN at - line 8 character 1.
 tell() on unopened filehandle fred at - line 10 character 1.
 seek() on unopened filehandle fred at - line 11 character 1.
 sysseek() on unopened filehandle fred at - line 12 character 1.

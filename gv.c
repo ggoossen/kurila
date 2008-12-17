@@ -156,7 +156,7 @@ Perl_newGP(pTHX_ GV *const gv)
 {
     GP *gp;
     U32 hash;
-    SV *const temp_sv = loc_filename(PL_curcop->op_location);
+    SV *const temp_sv = LocationFilename(PL_curcop->op_location);
     const char *file;
     STRLEN len;
 
@@ -497,12 +497,8 @@ S_gv_get_super_pkg(pTHX_ const char* name, I32 namelen)
     assert(SvTYPE(superisa) == SVt_PVAV);
     GvMULTI_on(gv);
     sv_magic((SV*)superisa, (SV*)gv, PERL_MAGIC_isa, NULL, 0);
-#ifdef USE_ITHREADS
-    av_push(superisa, newSVpv(CopSTASHPV(PL_curcop), 0));
-#else
     av_push(superisa, newSVhek(CopSTASH(PL_curcop)
 			       ? HvNAME_HEK(CopSTASH(PL_curcop)) : NULL));
-#endif
 
     return stash;
 }
@@ -810,8 +806,7 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 		break;
 	    case 3:
 		if ((name[0] == 'I' && name[1] == 'N' && name[2] == 'C')
-		    || (name[0] == 'E' && name[1] == 'N' && name[2] == 'V')
-		    || (name[0] == 'S' && name[1] == 'I' && name[2] == 'G'))
+		    || (name[0] == 'E' && name[1] == 'N' && name[2] == 'V'))
 		    global = TRUE;
 		break;
 	    case 4:
@@ -906,12 +901,6 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 	if (add) {
 	    GvMULTI_on(gv);
 	    gv_init_sv(gv, sv_type);
-	    if (len == 1 && (sv_type == SVt_PVHV || sv_type == SVt_PVGV)) {
-	        if (*name == '!')
-		    require_tie_mod(gv, "!", newSVpvs("Errno"), "TIEHASH", 1);
-		else if (*name == '-' || *name == '+')
-		    require_tie_mod(gv, name, newSVpvs("Tie::Hash::NamedCapture"), "TIEHASH", 0);
-	    }
 	}
 	return gv;
     } else if (no_init) {
@@ -963,28 +952,6 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 		    GvMULTI_on(gv);
 		    sv_magic((SV*)av, (SV*)gv, PERL_MAGIC_isa, NULL, 0);
 		    /* NOTE: No support for tied ISA */
-		}
-		break;
-	    case 'S':
-		if (strEQ(name2, "IG")) {
-		    HV *hv;
-		    I32 i;
-		    if (!PL_psig_ptr) {
-			Newxz(PL_psig_ptr,  SIG_SIZE, SV*);
-			Newxz(PL_psig_name, SIG_SIZE, SV*);
-			Newxz(PL_psig_pend, SIG_SIZE, int);
-		    }
-		    GvMULTI_on(gv);
-		    hv = GvHVn(gv);
-		    hv_magic(hv, NULL, PERL_MAGIC_sig);
-		    for (i = 1; i < SIG_SIZE; i++) {
-			SV * const * const init = hv_fetch(hv, PL_sig_name[i], strlen(PL_sig_name[i]), 1);
-			if (init)
-			    sv_setsv(*init, &PL_sv_undef);
-			PL_psig_ptr[i] = 0;
-			PL_psig_name[i] = 0;
-			PL_psig_pend[i] = 0;
-		    }
 		}
 		break;
 	    case 'V':
@@ -1118,17 +1085,6 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 #endif
 	    goto magicalize;
 
-	case '!':
-	    GvMULTI_on(gv);
-	    /* If %! has been used, automatically load Errno.pm. */
-
-	    sv_magic(GvSVn(gv), (SV*)gv, PERL_MAGIC_sv, name, len);
-
-            /* magicalization must be done before require_tie_mod is called */
-	    if (sv_type == SVt_PVHV || sv_type == SVt_PVGV)
-		require_tie_mod(gv, "!", newSVpvs("Errno"), "TIEHASH", 1);
-
-	    break;
 	case '|':
 	    sv_setiv(GvSVn(gv), (IV)(IoFLAGS(GvIOp(PL_defoutgv)) & IOf_FLUSH) != 0);
 	    goto magicalize;
@@ -1150,6 +1106,7 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 	case ',':
 	case '\\':
 	case '/':
+	case '!':
 	magicalize:
 	    sv_magic(GvSVn(gv), (SV*)gv, PERL_MAGIC_sv, name, len);
 
@@ -1356,6 +1313,7 @@ Perl_gp_tmprefcnt(pTHX_ GV *gv)
 {
     dVAR;
     GP* gp;
+    PERL_ARGS_ASSERT_GP_TMPREFCNT;
 
     if (!gv || !isGV_with_GP(gv) || !(gp = GvGP(gv)))
 	return;

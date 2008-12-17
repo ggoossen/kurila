@@ -46,8 +46,7 @@ sub openhandle ($) {
     return undef;
   }
 
-  (tied(*$fh) or defined(fileno($fh)))
-    ?? $fh !! undef;
+  defined(fileno($fh)) ?? $fh !! undef;
 }
 
 eval <<'ESQ' unless defined &dualvar;

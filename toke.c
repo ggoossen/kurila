@@ -1822,13 +1822,6 @@ Perl_parse_escape(pTHX_ const char *s, char *d, STRLEN *l, const char *send)
       case and quoting: \U \Q \E
     stops on @ and $, but not for $ as tail anchor
 
-  In transliterations:
-    characters are VERY literal, except for - not at the start or end
-    of the string, which indicates a range. If the range is in bytes,
-    scan_const expands the range to the full set of intermediate
-    characters. If the range is in utf8, the hyphen is replaced with
-    a certain range mark which will be handled by pmtrans() in op.c.
-
   In double-quoted strings:
     backslashes:
       double-quoted style: \r and \n
@@ -3515,6 +3508,14 @@ Perl_yylex(pTHX)
 	    yyerror("'[...]' should be '\\@(...)'");
 	}
 	PL_lex_brackets++;
+	while (s < PL_bufend && SPACE_OR_TAB(*s))
+	    s++;
+	if ( *s == '+' || *s == '?' ) {
+	    pl_yylval.i_tkval.ival = *s == '+' ? OPpELEM_ADD : OPpELEM_OPTIONAL;
+	    s++;
+	}
+	else
+	    pl_yylval.i_tkval.ival = 0;
 	OPERATOR('[');
     case ',':
 	s++;
@@ -3726,7 +3727,7 @@ Perl_yylex(pTHX)
 	    while (s < PL_bufend && SPACE_OR_TAB(*s))
 		s++;
 	    if ( *s == '+' || *s == '?' ) {
-		pl_yylval.i_tkval.ival = *s == '+' ? OPpHELEM_ADD : OPpHELEM_OPTIONAL;
+		pl_yylval.i_tkval.ival = *s == '+' ? OPpELEM_ADD : OPpELEM_OPTIONAL;
 		s++;
 	    }
 	    else
@@ -4230,6 +4231,12 @@ Perl_yylex(pTHX)
 	goto keylookup;
 
     case '_':
+	if ( ! ( isIDFIRST_lazy_if(s+1,UTF) || isDIGIT(s[1]) ) ) {
+	    s++;
+	    pl_yylval.opval = newOP(OP_PLACEHOLDER, 0, S_curlocation());
+	    TOKEN(THING);
+	}
+	/* FALLTHROUGH */
     case 'a': case 'A':
     case 'b': case 'B':
     case 'c': case 'C':
@@ -4641,8 +4648,10 @@ Perl_yylex(pTHX)
 		}
 
 		/* Call it a bare word */
-
 		pl_yylval.opval->op_private |= OPpCONST_STRICT;
+		if ( ! ( s[0] == '-' && s[1] == '>') ) {
+		    yyerror(Perl_form("Unknown bare word %s", PL_tokenbuf));
+		}
 		
 	    bareword:
 
@@ -4891,6 +4900,9 @@ Perl_yylex(pTHX)
 	case KEY_dump:
 	    s = force_word(s,WORD,TRUE,FALSE,FALSE);
 	    LOOPX(OP_DUMP);
+
+	case KEY_dynascope:
+	    FUN0(OP_DYNASCOPE);
 
 	case KEY_else:
 	    PREBLOCK(ELSE);
@@ -5719,12 +5731,6 @@ Perl_yylex(pTHX)
 	case KEY_telldir:
 	    UNI(OP_TELLDIR);
 
-	case KEY_tie:
-	    LOP(OP_TIE,XTERM);
-
-	case KEY_tied:
-	    UNI(OP_TIED);
-
 	case KEY_time:
 	    FUN0(OP_TIME);
 
@@ -5743,9 +5749,6 @@ Perl_yylex(pTHX)
 
 	case KEY_ucfirst:
 	    UNI(OP_UCFIRST);
-
-	case KEY_untie:
-	    UNI(OP_UNTIE);
 
 	case KEY_until:
 	    OPERATOR(UNTIL);
@@ -6340,11 +6343,6 @@ Perl_keyword (pTHX_ const char *name, I32 len)
           }
 
         case 't':
-          if (name[1] == 'i' &&
-              name[2] == 'e')
-          {                                       /* tie        */
-            return KEY_tie;
-          }
 	  if (name[1] == 'r' &&
 	      name[2] == 'y')
 	  {
@@ -6789,14 +6787,6 @@ Perl_keyword (pTHX_ const char *name, I32 len)
             case 'i':
               switch (name[2])
               {
-                case 'e':
-                  if (name[3] == 'd')
-                  {                               /* tied       */
-                    return KEY_tied;
-                  }
-
-                  goto unknown;
-
                 case 'm':
                   if (name[3] == 'e')
                   {                               /* time       */
@@ -7247,11 +7237,6 @@ Perl_keyword (pTHX_ const char *name, I32 len)
                   {
                     switch (name[4])
                     {
-                      case 'e':
-                        {                         /* untie      */
-                          return KEY_untie;
-                        }
-
                       case 'l':
                         {                         /* until      */
                           return KEY_until;
@@ -7832,24 +7817,14 @@ Perl_keyword (pTHX_ const char *name, I32 len)
           switch (name[1])
           {
             case 'e':
-              if (name[2] == 'f')
-              {
-                switch (name[3])
-                {
-                  case 'i':
-                    if (name[4] == 'n' &&
-                        name[5] == 'e' &&
-                        name[6] == 'd')
-                    {                             /* defined    */
+              if (name[2] == 'f' &&
+                  name[3] == 'i' &&
+                  name[4] == 'n' &&
+                  name[5] == 'e' &&
+                  name[6] == 'd')
+		  {                             /* defined    */
                       return KEY_defined;
-                    }
-
-                    goto unknown;
-
-                  default:
-                    goto unknown;
-                }
-              }
+		  }
 
               goto unknown;
 
@@ -8557,6 +8532,21 @@ Perl_keyword (pTHX_ const char *name, I32 len)
               name[8] == 'K')
           {                                       /* UNITCHECK  */
             return KEY_UNITCHECK;
+          }
+
+          goto unknown;
+
+        case 'd':
+          if (name[1] == 'y' &&
+              name[2] == 'n' &&
+              name[3] == 'a' &&
+              name[4] == 's' &&
+              name[5] == 'c' &&
+              name[6] == 'o' &&
+              name[7] == 'p' &&
+              name[8] == 'e')
+          {                                       /* dynascope  */
+            return KEY_dynascope;
           }
 
           goto unknown;

@@ -3,7 +3,7 @@
 # This ok() function is specially written to avoid any concatenation.
 my $test = 1;
 sub ok {
-    my($ok, $name) = < @_;
+    my @($ok, ?$name) =  @_;
 
     printf "\%sok \%d - \%s\n", ($ok ?? "" !! "not "), $test, $name;
 
@@ -48,8 +48,8 @@ do {
 
 # test that nul bytes get copied
 do {
-    my ($a, $ab)   = ("a", "a\0b");
-    my ($ua, $uab) = < map pack("U0a*", $_), @( $a, $ab);
+    my @($a, $ab)   = @("a", "a\0b");
+    my @($ua, $uab) =  map pack("U0a*", $_), @( $a, $ab);
 
     my $ub = pack("U0a*", 'b');
 
@@ -120,7 +120,7 @@ do {
     use utf8;
     my($l, $r, $c);
 
-    ($l, $r, $c) = ("\x{101}", "\x[fe]", "\x{101}\x[fe]");
+    @($l, $r, $c) = @("\x{101}", "\x[fe]", "\x{101}\x[fe]");
     ok($l.$r eq $c, "concat utf8 and byte");
     ok($l eq "\x{101}", "right not changed after concat");
     ok($r eq "\x[fe]", "left not changed after concat");

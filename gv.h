@@ -169,11 +169,7 @@ INLINE1(AV*, GvAVn, GV *gv) {
 #define GvUNIQUE_on(gv)         NOOP
 #define GvUNIQUE_off(gv)        NOOP
 
-#ifdef USE_ITHREADS
-#define GV_UNIQUE_CHECK
-#else
 #undef  GV_UNIQUE_CHECK
-#endif
 
 #ifndef PERL_CORE
 #  define Nullgv Null(GV*)

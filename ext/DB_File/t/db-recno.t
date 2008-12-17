@@ -60,15 +60,6 @@ sub docat_del
     return $result;
 }   
 
-sub safeUntie
-{
-    my $hashref = shift ;
-    my $no_inner = 1;
-    local $^WARN_HOOK = sub {-- $no_inner } ;
-    untie @$hashref;
-    return $no_inner;
-}
-
 sub bad_one
 {
     unless ($bad_ones++) {
@@ -120,7 +111,7 @@ BEGIN
     }          
 }
 
-my $total_tests = 16 ;
+my $total_tests = 14 ;
 print "1..$total_tests\n";   
 
 $Dfile = "recno.tmp";
@@ -160,12 +151,6 @@ ok(13, $dbh->{?reclen} == 1234 );
 $dbh->{+bfname} = 1234 ;
 ok(14, $dbh->{?bfname} == 1234 );
 
-
-# Check that an invalid entry is caught both for store & fetch
-try { $dbh->{+fred} = 1234 };
-ok(15, $@->{?description} =~ m/^DB_File::RECNOINFO::STORE - Unknown element 'fred'/ );
-try { my $q = $dbh->{+fred} };
-ok(16, $@->{?description} =~ m/^DB_File::RECNOINFO::FETCH - Unknown element 'fred'/ );
 
 # Now check the interface to RECNOINFO
 

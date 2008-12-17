@@ -41,7 +41,7 @@ sub STORABLE_freeze {
 sub STORABLE_thaw {
 	my $self = shift;
 	my $cloning = shift;
-	my ($x, $obj) = < @_;
+	my @($x, $obj) =  @_;
 	die "STORABLE_thaw" unless $obj \== $self;
 }
 
@@ -112,15 +112,15 @@ sub make { my $self = shift; bless \ @_, $self }
 sub STORABLE_freeze {
   # Some reference some number of times.
   my $self = shift;
-  my ($what, $times) = < @$self;
-  return @("$what$times", (%::immortals{?$what}) x $times);
+  my @($what, $times) =  @$self;
+  return @("$what$times", < (@(%::immortals{?$what}) x $times));
 }
 
 sub STORABLE_thaw {
 	my $self = shift;
 	my $cloning = shift;
-	my ($x, < @refs) = < @_;
-	my ($what, $times) = $x =~ m/(.)(\d+)/;
+	my @($x, @< @refs) =  @_;
+	my @($what, $times) = @: $x =~ m/(.)(\d+)/;
 	die "'$x' didn't match" unless defined $times;
 	main::ok ++$test, nelems(@refs) == $times;
 	my $expect = %::immortals{?$what};

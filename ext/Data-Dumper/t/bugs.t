@@ -8,7 +8,7 @@ use Data::Dumper;
 
 do {
     sub iterate_hash {
-	my ($h) = < @_;
+	my @($h) =  @_;
 	my $count = 0;
 	$count++ while each %$h;
 	return $count;

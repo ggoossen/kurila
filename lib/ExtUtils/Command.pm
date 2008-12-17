@@ -87,7 +87,7 @@ Sets modified time of destination to that of source.
 
 sub eqtime
 {
- my ($src,$dst) = < @ARGV;
+ my @($src,$dst) =  @ARGV;
  local @ARGV = @($dst);  touch();  # in case $dst doesn't exist
  utime(< @(stat($src))[[8..9]],$dst);
 }

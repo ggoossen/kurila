@@ -650,7 +650,7 @@ cmp_ok($ok,'==',1,'label on bare block last');
 
 TEST39: do {
     $ok = 0;
-    my ($x, $y, $z) = (1,1,1);
+    my @($x, $y, $z) = @(1,1,1);
     one39: while ($x--) {
       $ok = 0;
       two39: while ($y--) {

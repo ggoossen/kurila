@@ -11,7 +11,7 @@ BEGIN{
 	}
 }
 
-use Test::More tests => 31;
+use Test::More tests => 27;
 
 use vars < qw/$bad $bad7 $ok10 $bad18 $ok/;
 
@@ -44,7 +44,7 @@ do {
 ok($oldaction->{?HANDLER} eq 'DEFAULT' ||
    $oldaction->{?HANDLER} eq 'IGNORE', $oldaction->{?HANDLER});
 
-is(%SIG{?HUP}, \&foo);
+is(signals::handler("HUP"), \&foo);
 
 sigaction(SIGHUP, $newaction, $oldaction);
 is($oldaction->{?HANDLER}, \&foo);
@@ -62,9 +62,9 @@ sigaction(SIGHUP, $newaction);
 kill 'HUP', $$;
 ok(!$bad, "SIGHUP ignored");
 
-is(%SIG{?HUP}, 'IGNORE');
+is(signals::handler("HUP"), 'IGNORE');
 sigaction(SIGHUP, POSIX::SigAction->new('DEFAULT'));
-is(%SIG{?HUP}, undef);
+is(signals::handler("HUP"), undef);
 
 $newaction=POSIX::SigAction->new(sub { $ok10=1; });
 sigaction(SIGHUP, $newaction);
@@ -74,7 +74,7 @@ do {
 };
 ok($ok10, "SIGHUP handler called");
 
-is(ref(%SIG{?HUP}), 'CODE');
+is(ref(signals::handler("HUP")), 'CODE');
 
 sigaction(SIGHUP, POSIX::SigAction->new(\&main::foo));
 # Make sure the signal mask gets restored after sigaction croak()s.
@@ -92,7 +92,7 @@ my $x=defined sigaction(SIGKILL, $newaction, $oldaction);
 kill 'HUP', $$;
 ok(!$x && $ok, "signal mask gets restored after early return");
 
-%SIG{+HUP}=sub {};
+signals::set_handler( HUP => sub {} );
 sigaction(SIGHUP, $newaction, $oldaction);
 is(ref($oldaction->{?HANDLER}), 'CODE');
 
@@ -152,7 +152,7 @@ do {
 # for this one, use the accessor instead of the attribute
 
 # standard signal handling via %SIG is safe
-%SIG{+HUP} = \&foo;
+signals::set_handler( HUP => \&foo );
 $oldaction = POSIX::SigAction->new;
 sigaction(SIGHUP, undef, $oldaction);
 ok($oldaction->safe, "SIGHUP is safe");
@@ -173,22 +173,6 @@ ok($oldaction->safe, "SigAction can be safe");
 $ok = 0;
 kill 'HUP', $$;
 ok($ok, "safe signal delivery must work");
-
-SKIP: do {
-    eval 'use POSIX qw(%SIGRT SIGRTMIN SIGRTMAX); scalar %SIGRT + SIGRTMIN() + SIGRTMAX()';
-    $@					# POSIX did not exort
-    || SIGRTMIN() +< 0 || SIGRTMAX() +< 0	# HP-UX 10.20 exports both as -1
-    || SIGRTMIN() +> config_value('sig_count')	# AIX 4.3.3 exports bogus 888 and 999
-	and skip("no SIGRT signals", 4);
-    ok(SIGRTMAX() +> SIGRTMIN(), "SIGRTMAX > SIGRTMIN");
-    is(scalar %SIGRT, SIGRTMAX() - SIGRTMIN() + 1, "scalar SIGRT");
-    my $sigrtmin;
-    my $h = sub { $sigrtmin = 1 };
-    %SIGRT{+SIGRTMIN} = $h;
-    is(%SIGRT{?SIGRTMIN}, $h, "handler set & get");
-    kill 'SIGRTMIN', $$;
-    is($sigrtmin, 1, "SIGRTMIN handler works");
-};
 
 SKIP: do {
     eval 'use POSIX qw(SA_SIGINFO); SA_SIGINFO';

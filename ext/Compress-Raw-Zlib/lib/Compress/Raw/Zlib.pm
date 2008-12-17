@@ -174,12 +174,12 @@ sub Compress::Raw::Zlib::Parameters::parse
     }
 
 
-    while (my ($key, $v) = each %$default)
+    while (my @(?$key, ?$v) =@( each %$default))
     {
         croak "need 4 params [$(join ' ',@$v)]"
             if (nelems @$v) != 4 ;
 
-        my ($first_only, $sticky, $type, $value) = < @$v ;
+        my @($first_only, $sticky, $type, $value) =  @$v ;
         my $x ;
         $self->_checkType($key, \$value, $type, 0, \$x) 
             or return undef ;
@@ -219,7 +219,7 @@ sub Compress::Raw::Zlib::Parameters::parse
     }
  
     if ((nelems @Bad)) {
-        my ($bad) = join(", ", @Bad) ;
+        my @($bad) = join@(", ", @Bad) ;
         return $self->setError("unknown key value(s) $(join ' ',@Bad)") ;
     }
 
@@ -388,7 +388,7 @@ sub Compress::Raw::Zlib::Inflate::new
 sub Compress::Raw::Zlib::InflateScan::new
 {
     my $pkg = shift ;
-    my ($got) = < ParseParameters(0,
+    my @($got) =  ParseParameters(0,
                     \%(
                         'CRC32'         => \@(1, 1, < Parse_boolean,  0),
                         'ADLER32'       => \@(1, 1, < Parse_boolean,  0),
@@ -416,7 +416,7 @@ sub Compress::Raw::Zlib::InflateScan::new
 sub Compress::Raw::Zlib::inflateScanStream::createDeflateStream
 {
     my $pkg = shift ;
-    my ($got) = < ParseParameters(0,
+    my @($got) =  ParseParameters(0,
             \%(
                 'AppendOutput'  => \@(1, 1, < Parse_boolean,  0),
                 'CRC32'         => \@(1, 1, < Parse_boolean,  0),

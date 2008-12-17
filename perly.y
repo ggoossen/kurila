@@ -586,7 +586,7 @@ expr	:	expr ANDOP expr
 argexpr	:	argexpr ','
 			{
 #ifdef MAD
-			  OP* op = newNULLLIST();
+			  OP* op = newNULLLIST(NULL);
 			  TOKEN_GETMAD($2,op,',');
 			  $$ = append_elem(OP_LIST, $1, op);
                           APPEND_MADPROPS_PV(",", op, '>');
@@ -722,17 +722,21 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} like *STDOUT{
                             TOKEN_GETMAD($2,$$,'a');
                         }
 	|	term '[' expr ']'          /* $array[$element] */
-                        { $$ = newBINOP(OP_AELEM, 0, scalar($1), scalar($3), LOCATION($2));
-			  TOKEN_GETMAD($2,$$,'[');
-			  TOKEN_GETMAD($4,$$,']');
+                        { 
+                            $$ = newBINOP(OP_AELEM, 0, scalar($1), scalar($3), LOCATION($2));
+                            $$->op_private = IVAL($2);
+                            TOKEN_GETMAD($2,$$,'[');
+                            TOKEN_GETMAD($4,$$,']');
 			}
 	|	term ARROW '[' expr ']'      /* somearef->[$element] */
-			{ $$ = newBINOP(OP_AELEM, 0,
+			{
+                            $$ = newBINOP(OP_AELEM, 0,
                                 ref(newAVREF($1, LOCATION($2)),OP_RV2AV),
                                 scalar($4), LOCATION($3));
-			  TOKEN_GETMAD($2,$$,'a');
-			  TOKEN_GETMAD($3,$$,'[');
-			  TOKEN_GETMAD($5,$$,']');
+                            $$->op_private = IVAL($3);
+                            TOKEN_GETMAD($2,$$,'a');
+                            TOKEN_GETMAD($3,$$,'[');
+                            TOKEN_GETMAD($5,$$,']');
 			}
 	|	term ARROW HSLICE expr ']' ';' '}'    /* someref->{[bar();]} */
 			{ $$ = newLISTOP(OP_HSLICE, 0,
@@ -1023,9 +1027,10 @@ term	:	'?' term
                             TOKEN_GETMAD($3,$$,')');
 			}
 	|	'(' ')'
-			{ $$ = sawparens(newNULLLIST());
-			  TOKEN_GETMAD($1,$$,'(');
-			  TOKEN_GETMAD($2,$$,')');
+			{
+                            $$ = sawparens(newNULLLIST(LOCATION($1)));
+                            TOKEN_GETMAD($1,$$,'(');
+                            TOKEN_GETMAD($2,$$,')');
 			}
 	|	scalar	%prec '('
 			{ $$ = $1; }
@@ -1177,9 +1182,10 @@ myterm	:	'(' expr ')'
 			  TOKEN_GETMAD($3,$$,')');
 			}
 	|	'(' ')'
-			{ $$ = sawparens(newNULLLIST());
-			  TOKEN_GETMAD($1,$$,'(');
-			  TOKEN_GETMAD($2,$$,')');
+			{
+                            $$ = sawparens(newNULLLIST(LOCATION($1)));
+                            TOKEN_GETMAD($1,$$,'(');
+                            TOKEN_GETMAD($2,$$,')');
 			}
 	|	scalar	%prec '('
 			{ $$ = $1; }
@@ -1205,7 +1211,7 @@ listexprcom:	/* NULL */
 	|	expr ','
 			{
 #ifdef MAD
-			  OP* op = newNULLLIST();
+			  OP* op = newNULLLIST(NULL);
 			  TOKEN_GETMAD($2,op,',');
 			  $$ = append_elem(OP_LIST, $1, op);
                           APPEND_MADPROPS_PV(",", op, '>');

@@ -27,7 +27,7 @@ sub shellwords {
 
 
 sub quotewords {
-    my($delim, $keep, < @lines) = < @_;
+    my@($delim, $keep, @< @lines) =  @_;
     my(@words, @allwords);
 
     foreach my $line ( @lines) {
@@ -41,11 +41,11 @@ sub quotewords {
 
 
 sub nested_quotewords {
-    my($delim, $keep, < @lines) = < @_;
+    my@($delim, $keep, @< @lines) =  @_;
     my(@allwords);
 
     for my $i (0 .. nelems(@lines) -1) {
-	@{@allwords[$i]} = parse_line($delim, $keep, @lines[$i]);
+	@{@allwords[+$i]} = parse_line($delim, $keep, @lines[$i]);
 	return() unless ((nelems @{@allwords[$i]}) || !length(@lines[$i]));
     }
     return @allwords;
@@ -54,7 +54,7 @@ sub nested_quotewords {
 
 
 sub parse_line {
-    my($delimiter, $keep, $line) = < @_;
+    my@($delimiter, $keep, $line) =  @_;
     my($word, @pieces);
 
     no warnings 'uninitialized';	# we will be testing undef strings
@@ -86,7 +86,7 @@ sub parse_line {
                             (?!^)(?=["'])               # a quote
                         )
 		    )//xs or return @();		# extended layout
-        my ($quote, $quoted, $unquoted, $delim) = (($1 ?? ($1,$2) !! ($3,$4)), $5, $6);
+        my @($quote, $quoted, $unquoted, $delim) = @(($1 ?? ($1,$2) !! ($3,$4)), $5, $6);
 
 
 	return @() unless( defined($quote) || length($unquoted) || length($delim));

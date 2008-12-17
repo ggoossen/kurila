@@ -20,7 +20,7 @@ my $expect;
 while (~< $man) {
     ++$expect if m!^t/op/[^/]+\t!;
 }
-my ($min, $max) = ($expect - 10, $expect + 10);
+my @($min, $max) = @($expect - 10, $expect + 10);
 if ((nelems @D) +> $min && (nelems @D) +< $max) { print "ok 2\n"; }
 else {
     printf "not ok 2 # counting op/*.t, expect $min < \%d < $max files\n",

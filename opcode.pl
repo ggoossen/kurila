@@ -22,7 +22,7 @@ while ( ~< *DATA) {
     chop;
     next unless $_;
     next if m/^#/;
-    my ($key, $desc, $check, $flags, $args) = < split(m/\t+/, $_, 5);
+    my @($key, $desc, $check, $flags, ? $args) =  split(m/\t+/, $_, 5);
     $args = '' unless defined $args;
 
     warn qq[Description "$desc" duplicates %seen{?$desc}\n] if %seen{?$desc};
@@ -91,7 +91,8 @@ my @raw_alias = @(
 		 Perl_pp_rv2sv => \@('rv2av rv2hv'),
 		);
 
-while (my ($func, $names) = splice @raw_alias, 0, 2) {
+while (@raw_alias) {
+    my @($func, $names) = @: splice @raw_alias, 0, 2;
     %alias{+$_} = $func for  @$names;
 }
 
@@ -191,7 +192,7 @@ EXTCONST char* const PL_op_desc[] = \{
 END
 
 for ( @ops) {
-    my($safe_desc) = %desc{?$_};
+    my $safe_desc = %desc{?$_};
 
     # Have to escape double quotes and escape characters.
     $safe_desc =~ s/(^|[^\\])([\\"])/$1\\$2/g;
@@ -405,11 +406,11 @@ gen_op_is_macro( \%OP_IS_FILETEST, 'OP_IS_FILETEST');
 gen_op_is_macro( \%OP_IS_FT_ACCESS, 'OP_IS_FILETEST_ACCESS');
 
 sub gen_op_is_macro {
-    my ($op_is, $macname) = < @_;
+    my @($op_is, $macname) =  @_;
     if (%$op_is) {
 	
 	# get opnames whose numbers are lowest and highest
-	my ($first, < @rest) = < sort {
+	my @($first, @< @rest) =  sort {
 	    $op_is->{?$a} <+> $op_is->{?$b}
 	} keys %$op_is;
 	
@@ -499,7 +500,7 @@ END {
 
 ###########################################################################
 sub tab {
-    my ($l, $t) = < @_;
+    my @($l, $t) =  @_;
     $t .= "\t" x ($l - (length($t) + 1) / 8);
     $t;
 }
@@ -609,7 +610,7 @@ scalar		scalar			ck_fun		s%	S
 pushmark	pushmark		ck_null		s0	
 wantarray	wantarray		ck_null		is0	
 
-xassign		conditioned assignment	ck_null		0	
+logassign_assign		assignment part of a logical assignment	ck_null		0	
 
 const		constant item		ck_svconst	s$	
 
@@ -654,9 +655,9 @@ substcont	substitution iterator	ck_null		dis|
 # Lvalue operators.
 # sassign is special-cased for op class
 
-sassign		scalar assignment	ck_sassign	s0
-aassign		list assignment		ck_null		t2	L L
+sassign		assignment	ck_sassign	s0
 dotdotdot		dotdotdot (...)	ck_dotdotdot	0
+placeholder		placeholder (_)	ck_null	0
 
 chop		chop			ck_spair	mts%	L
 schop		scalar chop		ck_null		stu%	S?
@@ -799,6 +800,7 @@ join		join or string		ck_fun		mst@	S L
 list		list			ck_null		m@	L
 lslice		list slice		ck_null		2	H L L
 enter_anonarray_assign	anonymous array assignment (@())	ck_null	0	
+enter_anonhash_assign	anonymous hash assignment (%())	ck_null	0	
 anonarray	anonymous array (@())	ck_anonarray	m@	L
 anonhash	anonymous hash (%())	ck_fun		m@	L
 listlast	listlast		ck_null		ms@	L
@@ -847,6 +849,7 @@ leavesub	subroutine exit		ck_null		1
 caller		caller			ck_fun		t%	S?
 warn		warn			ck_fun		imst@	L
 die		die			ck_die		dimst@	L
+dynascope		dynamic scope			ck_null		s0	
 
 lineseq		line sequence		ck_null		@	
 nextstate	next statement		ck_null		s;	
@@ -877,10 +880,6 @@ pipe_op		pipe			ck_fun		is@	F F
 fileno		fileno			ck_fun		ist%	F
 umask		umask			ck_fun		ist%	S?
 binmode		binmode			ck_fun		s@	F S?
-
-tie		tie			ck_fun		idms@	R S L
-untie		untie			ck_fun		is%	R
-tied		tied			ck_fun		s%	R
 
 sselect		select system call	ck_select	t@	S S S S
 select		select			ck_select	st@	F?

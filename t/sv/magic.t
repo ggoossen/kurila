@@ -12,7 +12,7 @@ BEGIN {
 use warnings;
 use Config;
 
-plan tests => 49;
+plan tests => 43;
 
 
 my $Is_MSWin32  = $^O eq 'MSWin32';
@@ -45,73 +45,6 @@ $! = 0;
 open(FOO, "<",'ajslkdfpqjsjfk');
 ok $!, $!;
 close FOO; # just mention it, squelch used-only-once
-
-if ($Is_MSWin32 || $Is_NetWare || $Is_Dos || $Is_MPE || $Is_MacOS) {
-    skip('SIGINT not safe on this platform') for 1..4;
-}
-else {
-  # the next tests are done in a subprocess because sh spits out a
-  # newline onto stderr when a child process kills itself with SIGINT.
-  # We use a pipe rather than system() because the VMS command buffer
-  # would overflow with a command that long.
-
-    open( CMDPIPE, "|-", "$PERL");
-
-    print CMDPIPE <<'END';
-
-    $| = 1;		# command buffering
-
-    %SIG{"INT"} = \&ok3;     kill "INT",$$; sleep 1;
-    %SIG{"INT"} = "IGNORE";  kill "INT",$$; sleep 1; print "ok 4\n";
-    %SIG{"INT"} = "DEFAULT"; kill "INT",$$; sleep 1; print "not ok 4\n";
-
-    sub ok3 {
-	if ((my $x = pop(@_)) eq "INT") {
-	    print "ok 3\n";
-	}
-	else {
-	    print "not ok 3 ($x @_)\n";
-	}
-    }
-
-END
-
-    close CMDPIPE;
-
-    open( CMDPIPE, "|-", "$PERL");
-    print CMDPIPE <<'END';
-
-    do { package X;
-	sub DESTROY {
-	    kill "INT",$$;
-	}
-    };
-    sub x {
-	my $x=bless \@(), 'X';
-	return sub { $x };
-    }
-    $| = 1;		# command buffering
-    %SIG{"INT"} = \&ok5;
-    do {
-	local %SIG{"INT"}=x();
-	print ""; # Needed to expose failure in 5.8.0 (why?)
-    };
-    sleep 1;
-    delete %SIG{"INT"};
-    kill "INT",$$; sleep 1;
-    sub ok5 {
-	print "ok 5\n";
-    }
-END
-    close CMDPIPE;
-    $? >>= 8 if $^O eq 'VMS'; # POSIX status hiding in 2nd byte
-    next_test for 1..3;
-    local our $TODO = ($^O eq 'os2' ?? ' # TODO: EMX v0.9d_fix4 bug: wrong nibble? ' !! '');
-    ok($? ^&^ 0xFF);
-}
-
-dies_like( sub { %SIG{+TERM} = 'foo' },
-    qr/signal handler should be a code reference or .../ );
 
 # can we slice ENV?
 my @val1 = %ENV{[keys(%ENV)]};
@@ -282,7 +215,7 @@ else {
 	    close CMDLINE;
             # perlbug #22811
             my $mydollarzero = sub {
-              my($arg) = shift;
+              my@($arg) =@( shift);
               $0 = $arg if defined $arg;
 	      # In FreeBSD the ps -o command= will cause
 	      # an empty header line, grab only the last line.
@@ -347,18 +280,6 @@ if ($Is_miniperl) {
       %!;
       defined %Errno::;
    }, $@ && $@->message;
-}
-
-if ($Is_miniperl) {
-    skip ("miniperl can't rely on loading \%Errno");
-} else {
-    # Make sure that Errno loading doesn't clobber $!
-
-    undef %{Symbol::stash("Errno")};
-    delete %INC{"Errno.pm"};
-
-    open(FOO, "<", "nonesuch"); # Generate ENOENT
-    ok %{*{Symbol::fetch_glob("!")}}{?ENOENT};
 }
 
 ok $^S == 0 && defined $^S;

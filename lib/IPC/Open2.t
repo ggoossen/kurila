@@ -20,7 +20,7 @@ use IPC::Open2;
 my $perl = './perl';
 
 sub ok {
-    my ($n, $result, $info) = < @_;
+    my @($n, $result, ?$info) =  @_;
     if ($result) {
 	print "ok $n\n";
     }

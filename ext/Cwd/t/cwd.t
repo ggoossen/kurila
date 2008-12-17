@@ -66,8 +66,8 @@ SKIP: do {
 
     print "# native pwd = '$pwd_cmd'\n";
 
-    local %ENV{[qw(PATH IFS CDPATH ENV BASH_ENV)]} = ();
-    my ($pwd_cmd_untainted) = $pwd_cmd =~ m/^(.+)$/; # Untaint.
+    local %ENV{[qw(PATH IFS CDPATH ENV BASH_ENV)]} = @();
+    my @($pwd_cmd_untainted) = @: $pwd_cmd =~ m/^(.+)$/; # Untaint.
     chomp(my $start = `$pwd_cmd_untainted`);
 
     # Win32's cd returns native C:\ style
@@ -200,7 +200,7 @@ SKIP: do {
     my $root = Cwd::abs_path(File::Spec->rootdir);	# Add drive letter?
     local *FH;
     opendir FH, $root or skip("Can't opendir($root): $!", 2+$EXTRA_ABSPATH_TESTS);
-    ($file) = < grep {-f $_ and not -l $_} map File::Spec->catfile($root, $_), @( readdir FH);
+    @(?$file) = grep {-f $_ and not -l $_} map File::Spec->catfile($root, $_), @( readdir FH);
     closedir FH;
   };
   skip "No plain file in root directory to test with", 2+$EXTRA_ABSPATH_TESTS unless $file;
@@ -222,7 +222,7 @@ sub bracketed_form_dir {
 }
 
 sub dir_ends_with {
-  my ($dir, $expect) = (shift, shift);
+  my @($dir, $expect) = @(shift, shift);
   my $bracketed_expect = quotemeta bracketed_form_dir($expect);
   like( bracketed_form_dir($dir), qr|$bracketed_expect$|i, ((nelems @_) ?? shift !! ()) );
 }
@@ -232,7 +232,7 @@ sub bracketed_form_path {
 }
 
 sub path_ends_with {
-  my ($dir, $expect) = (shift, shift);
+  my @($dir, $expect) = @(shift, shift);
   my $bracketed_expect = quotemeta bracketed_form_path($expect);
   like( bracketed_form_path($dir), qr|$bracketed_expect$|i, ((nelems @_) ?? shift !! ()) );
 }

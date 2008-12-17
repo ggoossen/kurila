@@ -47,14 +47,14 @@ my %Module_Commands = %(
                       );
 
 sub do_module($) {
-    my ($module) = < @_;
+    my @($module) =  @_;
 
     print($Module_Help);
     MODULE_CMD: while (1) {
         print("$module cmd? ");
 
         my $reply = ~< *STDIN; chomp($reply);
-        my($cmd) = $reply =~ m/^(\w)\b/;
+        my@($cmd) = $reply =~ m/^(\w)\b/;
 
         last if $cmd eq 'q';
 
@@ -72,7 +72,7 @@ sub do_module($) {
 
 
 sub list_installed {
-    my($reply, $module) = < @_;
+    my@($reply, $module) =  @_;
 
     my $class = ( <split(' ', $reply))[[1]];
     $class = 'all' unless $class;
@@ -89,7 +89,7 @@ sub list_installed {
 
 
 sub list_directories {
-    my($reply, $module) = < @_;
+    my@($reply, $module) =  @_;
 
     my $class = ( <split(' ', $reply))[[1]];
     $class = 'all' unless $class;
@@ -106,7 +106,7 @@ sub list_directories {
 
 
 sub create_archive {
-    my($reply, $module) = < @_;
+    my@($reply, $module) =  @_;
 
     my $file = ( <split(' ', $reply))[[1]];
 
@@ -117,7 +117,7 @@ sub create_archive {
         Archive::Tar->create_archive($file, 0, < $Inst->files($module));
     }
     else {
-        my($first, < @rest) = < $Inst->files($module);
+        my@($first, @< @rest) =  $Inst->files($module);
         system('tar', 'cvf', $file, $first);
         for my $f ( @rest) {
             system('tar', 'rvf', $file, $f);
@@ -128,7 +128,7 @@ sub create_archive {
 
 
 sub validate_packlist {
-    my($reply, $module) = < @_;
+    my@($reply, $module) =  @_;
 
     if (my @missing = $Inst->validate($module)) {
         print("Files missing from $module are:\n   ",

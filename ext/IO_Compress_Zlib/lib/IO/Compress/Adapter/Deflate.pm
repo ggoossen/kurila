@@ -17,7 +17,7 @@ sub mkCompObject
     my $level    = shift ;
     my $strategy = shift ;
 
-    my ($def, $status) = < Compress::Raw::Zlib::Deflate->new(
+    my @($def, $status) =  Compress::Raw::Zlib::Deflate->new(
                                 AppendOutput   => 1,
                                 CRC32          => $crc32,
                                 ADLER32        => $adler32,

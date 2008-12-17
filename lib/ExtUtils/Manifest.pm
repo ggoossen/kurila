@@ -228,7 +228,7 @@ file.
 =cut
 
 sub skipcheck {
-    my($p) = < @_;
+    my @(?$p) =  @_;
     my $found = manifind();
     my $matches = _maniskip();
 
@@ -251,7 +251,7 @@ sub _check_files {
     my $read = maniread() || \%();
     my $found = manifind($p);
 
-    my(@missfile) = @( () );
+    my@(@missfile) =@( @( () ));
     foreach my $file ( _sort < keys %$read){
         warn "Debug: manicheck checking from $MANIFEST $file\n" if $Debug;
         if ($dosnames){
@@ -270,7 +270,7 @@ sub _check_files {
 
 
 sub _check_manifest {
-    my($p) = < @_;
+    my @(?$p) =  @_;
     my $read = maniread() || \%();
     my $found = manifind($p);
     my $skip  = _maniskip();
@@ -303,7 +303,7 @@ start with C<#> in the C<MANIFEST> file are discarded.
 =cut
 
 sub maniread {
-    my ($mfile) = < @_;
+    my @(?$mfile) =  @_;
     $mfile ||= $MANIFEST;
     my $read = \%();
     my $m;
@@ -316,7 +316,7 @@ sub maniread {
         chomp;
         next if m/^\s*#/;
 
-        my($file, $comment) = m/^(\S+)\s*(.*)/;
+        my @(?$file, ?$comment) = @: m/^(\S+)\s*(.*)/;
         next unless $file;
 
         if ($Is_MacOS) {
@@ -325,10 +325,10 @@ sub maniread {
         }
         elsif ($Is_VMS) {
             require File::Basename;
-            my($base,$dir) = < File::Basename::fileparse($file);
+            my@($base,$dir) =  File::Basename::fileparse($file);
             # Resolve illegal file specifications in the same way as tar
             $dir =~ s/./_/g;
-            my(@pieces) = split(m/\./,$base);
+            my@(@pieces) = split@(m/\./,$base);
             if ((nelems @pieces) +> 2) { $base = shift(@pieces) . '.' . join('_', @pieces); }
             my $okfile = "$dir$base";
             warn "Debug: Illegal name $file changed to $okfile\n" if $Debug;
@@ -461,7 +461,7 @@ default.
 =cut
 
 sub manicopy {
-    my($read,$target,$how)=< @_;
+    my@($read,$target,$how)= @_;
     die "manicopy() called without target argument" unless defined $target;
     $how ||= 'cp';
     require File::Path;
@@ -490,9 +490,9 @@ sub manicopy {
 }
 
 sub cp_if_diff {
-    my($from, $to, $how)=< @_;
+    my@($from, $to, $how)= @_;
     -f $from or warn "$0: $from not found";
-    my($diff) = 0;
+    my $diff = 0;
     local(*F,*T);
     open(F, "<","$from\0") or die "Can't read $from: $!\n";
     if (open(T, "<","$to\0")) {
@@ -519,8 +519,8 @@ sub cp_if_diff {
 }
 
 sub cp {
-    my ($srcFile, $dstFile) = < @_;
-    my ($access,$mod) = < @(stat $srcFile)[[8..9]];
+    my @($srcFile, $dstFile) =  @_;
+    my @($access,$mod) =  @(stat $srcFile)[[8..9]];
 
     copy($srcFile,$dstFile);
     utime $access, $mod + ($Is_VMS ?? 1 !! 0), $dstFile;
@@ -529,7 +529,7 @@ sub cp {
 
 
 sub ln {
-    my ($srcFile, $dstFile) = < @_;
+    my @($srcFile, $dstFile) =  @_;
     return &cp( < @_ ) if $Is_VMS or ($^O eq 'MSWin32' and Win32::IsWin95());
     link($srcFile, $dstFile);
 
@@ -544,7 +544,7 @@ sub ln {
 # 2) Let everyone read it.
 # 3) If the owner can execute it, everyone can.
 sub _manicopy_chmod {
-    my($srcFile, $dstFile) = < @_;
+    my@($srcFile, $dstFile) =  @_;
 
     my $perm = 0444 ^|^ @(stat $srcFile)[2] ^&^ 0700;
     chmod( $perm ^|^ ( $perm ^&^ 0100 ?? 0111 !! 0 ), $dstFile );
@@ -553,7 +553,7 @@ sub _manicopy_chmod {
 # Files that are often modified in the distdir.  Don't hard link them.
 my @Exceptions = qw(MANIFEST META.yml SIGNATURE);
 sub best {
-    my ($srcFile, $dstFile) = < @_;
+    my @($srcFile, $dstFile) =  @_;
 
     my $is_exception = grep $srcFile =~ m/$_/, @Exceptions;
     if ($is_exception or ! config_value("d_link") or -l $srcFile) {
@@ -564,7 +564,7 @@ sub best {
 }
 
 sub _macify {
-    my($file) = < @_;
+    my@($file) =  @_;
 
     return $file unless $Is_MacOS;
 
@@ -578,7 +578,7 @@ sub _macify {
 }
 
 sub _maccat {
-    my($f1, $f2) = < @_;
+    my@($f1, $f2) =  @_;
 
     return "$f1/$f2" unless $Is_MacOS;
 
@@ -588,7 +588,7 @@ sub _maccat {
 }
 
 sub _unmacify {
-    my($file) = < @_;
+    my@($file) =  @_;
 
     return $file unless $Is_MacOS;
 
@@ -611,7 +611,7 @@ $file will be normalized (ie. Unixified).  B<UNIMPLEMENTED>
 =cut
 
 sub maniadd {
-    my($additions) = shift;
+    my@($additions) =@( shift);
 
     _normalize($additions);
     _fix_manifest($MANIFEST);

@@ -196,7 +196,7 @@ PP(pp_concat)
 PP(pp_padsv)
 {
     dVAR; dSP; dTARGET;
-    OPFLAGS op_flags = PL_op->op_flags;
+    const OPFLAGS op_flags = PL_op->op_flags;
     if (op_flags & OPf_ASSIGN) {
 	if (op_flags & OPf_ASSIGN_PART) {
 	    SV* src;
@@ -208,6 +208,8 @@ PP(pp_padsv)
 	    else
 		src = POPs;
 	    sv_setsv_mg(TARG, src);
+	    if (PL_op->op_private & OPpLVAL_INTRO)
+		SAVECLEARSV(PAD_SVl(PL_op->op_targ));
 	    RETURN;
 	}
 	sv_setsv_mg(TARG, POPs);
@@ -719,230 +721,6 @@ S_do_oddball(pTHX_ HV *hash, SV **relem, SV **firstrelem)
     }
 }
 
-PP(pp_aassign)
-{
-    dVAR; dSP;
-    SV **lastlelem = PL_stack_sp;
-    SV **lastrelem = PL_stack_base + POPMARK;
-    SV **firstrelem = PL_stack_base + POPMARK + 1;
-    SV **firstlelem = lastrelem + 1;
-
-    register SV **relem;
-    register SV **lelem;
-
-    register SV *sv;
-    register AV *ary;
-
-    I32 gimme;
-    HV *hash;
-    I32 i;
-    int magic;
-    int duplicates = 0;
-    SV **firsthashrelem = NULL;	/* "= 0" keeps gcc 2.95 quiet  */
-
-    PL_delaymagic = DM_DELAY;		/* catch simultaneous items */
-    gimme = GIMME_V;
-
-    /* If there's a common identifier on both sides we have to take
-     * special care that assigning the identifier on the left doesn't
-     * clobber a value on the right that's used later in the list.
-     */
-    if (PL_op->op_private & (OPpASSIGN_COMMON)) {
-	EXTEND_MORTAL(lastrelem - firstrelem + 1);
-	for (relem = firstrelem; relem <= lastrelem; relem++) {
-	    if ((sv = *relem)) {
-		TAINT_NOT;	/* Each item is independent */
-		*relem = sv_mortalcopy(sv);
-	    }
-	}
-    }
-
-    relem = firstrelem;
-    lelem = firstlelem;
-    ary = NULL;
-    hash = NULL;
-
-    while (lelem <= lastlelem) {
-	TAINT_NOT;		/* Each item stands on its own, taintwise. */
-	sv = *lelem++;
-	
-	if ( lelem <= lastlelem || ! (PL_op->op_flags & OPf_SPECIAL)) {
-	    if (SvIMMORTAL(sv)) {
-		if (relem <= lastrelem)
-		    relem++;
-	    } else {
-		if (relem <= lastrelem) {
-		    sv_setsv(sv, *relem);
-		    *(relem++) = sv;
-		}
-		else
-		    sv_setsv(sv, &PL_sv_undef);
-		SvSETMAGIC(sv);
-	    }
-	}
-	else {    /* Special handling of last element if it is an array/hash expand */
-	    TAINT_NOT;		/* Each item stands on its own, taintwise. */
-	    sv = *lastlelem;
-	    switch (SvTYPE(sv)) {
-	    case SVt_PVAV:
-		ary = (AV*)sv;
-		magic = SvMAGICAL(ary) != 0;
-		av_fill(ary, lastrelem - relem);
-		i = 0;
-		while (relem <= lastrelem) {	/* gobble up all the rest */
-		    assert(*relem);
-		    sv = *av_fetch(ary,i++,1);
-		    sv_setsv(sv, *relem);
-		    *(relem++) = sv;
-		    if (magic) {
-			if (SvSMAGICAL(sv))
-			    mg_set(sv);
-		    }
-		    TAINT_NOT;
-		}
-		if (PL_delaymagic & DM_ARRAY)
-		    SvSETMAGIC((SV*)ary);
-		break;
-	    case SVt_PVHV: {				/* normal hash */
-		SV *tmpstr;
-
-		hash = (HV*)sv;
-		magic = SvMAGICAL(hash) != 0;
-		hv_clear(hash);
-		firsthashrelem = relem;
-
-		while (relem < lastrelem) {	/* gobble up all the rest */
-		    HE *didstore;
-		    sv = *relem ? *relem : &PL_sv_no;
-		    relem++;
-		    tmpstr = newSV(0);
-		    if (*relem)
-			sv_setsv(tmpstr,*relem);	/* value */
-		    *(relem++) = tmpstr;
-		    if (gimme != G_VOID && hv_exists_ent(hash, sv, 0))
-			/* key overwrites an existing entry */
-			duplicates += 2;
-		    didstore = hv_store_ent(hash,sv,tmpstr,0);
-		    if (magic) {
-			if (SvSMAGICAL(tmpstr))
-			    mg_set(tmpstr);
-			if (!didstore)
-			    sv_2mortal(tmpstr);
-		    }
-		    TAINT_NOT;
-		}
-		if (relem == lastrelem) {
-		    do_oddball(hash, relem, firstrelem);
-		    relem++;
-		}
-    	        }
-		break;
-	    default:
-		Perl_croak(aTHX_ "panic: expanded sv is not an array or hash");
-		break;
-	    }
-	}
-    }
-
-    if (PL_delaymagic & ~DM_DELAY) {
-	if (PL_delaymagic & DM_UID) {
-#ifdef HAS_SETRESUID
-	    (void)setresuid((PL_delaymagic & DM_RUID) ? PL_uid  : (Uid_t)-1,
-			    (PL_delaymagic & DM_EUID) ? PL_euid : (Uid_t)-1,
-			    (Uid_t)-1);
-#else
-#  ifdef HAS_SETREUID
-	    (void)setreuid((PL_delaymagic & DM_RUID) ? PL_uid  : (Uid_t)-1,
-			   (PL_delaymagic & DM_EUID) ? PL_euid : (Uid_t)-1);
-#  else
-#    ifdef HAS_SETRUID
-	    if ((PL_delaymagic & DM_UID) == DM_RUID) {
-		(void)setruid(PL_uid);
-		PL_delaymagic &= ~DM_RUID;
-	    }
-#    endif /* HAS_SETRUID */
-#    ifdef HAS_SETEUID
-	    if ((PL_delaymagic & DM_UID) == DM_EUID) {
-		(void)seteuid(PL_euid);
-		PL_delaymagic &= ~DM_EUID;
-	    }
-#    endif /* HAS_SETEUID */
-	    if (PL_delaymagic & DM_UID) {
-		if (PL_uid != PL_euid)
-		    DIE(aTHX_ "No setreuid available");
-		(void)PerlProc_setuid(PL_uid);
-	    }
-#  endif /* HAS_SETREUID */
-#endif /* HAS_SETRESUID */
-	    PL_uid = PerlProc_getuid();
-	    PL_euid = PerlProc_geteuid();
-	}
-	if (PL_delaymagic & DM_GID) {
-#ifdef HAS_SETRESGID
-	    (void)setresgid((PL_delaymagic & DM_RGID) ? PL_gid  : (Gid_t)-1,
-			    (PL_delaymagic & DM_EGID) ? PL_egid : (Gid_t)-1,
-			    (Gid_t)-1);
-#else
-#  ifdef HAS_SETREGID
-	    (void)setregid((PL_delaymagic & DM_RGID) ? PL_gid  : (Gid_t)-1,
-			   (PL_delaymagic & DM_EGID) ? PL_egid : (Gid_t)-1);
-#  else
-#    ifdef HAS_SETRGID
-	    if ((PL_delaymagic & DM_GID) == DM_RGID) {
-		(void)setrgid(PL_gid);
-		PL_delaymagic &= ~DM_RGID;
-	    }
-#    endif /* HAS_SETRGID */
-#    ifdef HAS_SETEGID
-	    if ((PL_delaymagic & DM_GID) == DM_EGID) {
-		(void)setegid(PL_egid);
-		PL_delaymagic &= ~DM_EGID;
-	    }
-#    endif /* HAS_SETEGID */
-	    if (PL_delaymagic & DM_GID) {
-		if (PL_gid != PL_egid)
-		    DIE(aTHX_ "No setregid available");
-		(void)PerlProc_setgid(PL_gid);
-	    }
-#  endif /* HAS_SETREGID */
-#endif /* HAS_SETRESGID */
-	    PL_gid = PerlProc_getgid();
-	    PL_egid = PerlProc_getegid();
-	}
-	PL_tainting |= (PL_uid && (PL_euid != PL_uid || PL_egid != PL_gid));
-    }
-    PL_delaymagic = 0;
-
-    if (gimme == G_VOID)
-	SP = firstrelem - 1;
-    else if (gimme == G_SCALAR) {
-	dTARGET;
-	SP = firstrelem;
-	SETi(lastrelem - firstrelem + 1 - duplicates);
-    }
-    else {
-	if (ary)
-	    SP = lastrelem;
-	else if (hash) {
-	    if (duplicates) {
-		/* Removes from the stack the entries which ended up as
-		 * duplicated keys in the hash (fix for [perl #24380]) */
-		Move(firsthashrelem + duplicates,
-			firsthashrelem, duplicates, SV**);
-		lastrelem -= duplicates;
-	    }
-	    SP = lastrelem;
-	}
-	else
-	    SP = firstrelem + (lastlelem - firstlelem);
-	lelem = firstlelem + (relem - firstrelem);
-	while (relem <= SP)
-	    *relem++ = (lelem <= lastlelem) ? *lelem++ : &PL_sv_undef;
-    }
-
-    RETURN;
-}
-
 PP(pp_qr)
 {
     dVAR; dSP;
@@ -1256,6 +1034,7 @@ Perl_do_readline(pTHX_ GV* gv)
     register IO * const io = GvIO(gv);
     register const I32 type = PL_op->op_type;
     const I32 gimme = GIMME_V;
+    PERL_ARGS_ASSERT_DO_READLINE;
 
     fp = NULL;
     if (io) {
@@ -1298,6 +1077,8 @@ Perl_do_readline(pTHX_ GV* gv)
 	    /* undef TARG, and push that undefined value */
 	    if (type != OP_RCATLINE) {
 		SV_CHECK_THINKFIRST_COW_DROP(TARG);
+		if ( ! SvPVOK(TARG) )
+		    sv_upgrade(TARG, SVt_PV);
 		SvOK_off(TARG);
 	    }
 	    PUSHTARG;
@@ -1307,8 +1088,14 @@ Perl_do_readline(pTHX_ GV* gv)
   have_fp:
     if (gimme == G_SCALAR) {
 	sv = TARG;
-	if (type == OP_RCATLINE && SvGMAGICAL(sv))
-	    mg_get(sv);
+	if (type == OP_RCATLINE) {
+	    if (SvGMAGICAL(sv))
+		mg_get(sv);
+	}
+	else {
+	    if ( SvOK(sv) && ! SvPVOK(sv) )
+		sv_clear_body(sv);
+	}
 	if (SvROK(sv)) {
 	    if (type == OP_RCATLINE)
 		SvPV_force_nolen(sv);
@@ -1464,9 +1251,8 @@ PP(pp_helem)
     HV * const hv = (HV*)POPs;
     const OPFLAGS op_flags = PL_op->op_flags;
     const U32 lval = op_flags & OPf_MOD;
-    const U32 defer = PL_op->op_private & OPpLVAL_DEFER;
-    const U32 optional = PL_op->op_private & OPpHELEM_OPTIONAL;
-    const U32 add = PL_op->op_private & OPpHELEM_ADD;
+    const U32 optional = PL_op->op_private & OPpELEM_OPTIONAL;
+    const U32 add = PL_op->op_private & OPpELEM_ADD;
     SV *sv;
     U32 hash;
     I32 preeminent = 0;
@@ -1479,8 +1265,12 @@ PP(pp_helem)
 	/* hv must be "undef" */
 
 	if ( optional ) {
-	    if (PL_op->op_private & OPpDEREF)
-		mPUSHs(newRV(newSV(0)));
+	    if (PL_op->op_private & OPpDEREF) {
+		SV* sv = newSV(0);
+		vivify_ref(sv, PL_op->op_private & OPpDEREF);
+		XPUSHs(sv);
+		RETURN;
+	    }
 	    else
 		RETPUSHUNDEF;
 	}
@@ -1510,12 +1300,14 @@ PP(pp_helem)
 		)
 	    ) ? hv_exists_ent(hv, keysv, 0) : 1;
     }
-    he = hv_fetch_ent(hv, keysv, lval && !defer, hash);
+    he = hv_fetch_ent(hv, keysv, 0, hash);
     svp = he ? &HeVAL(he) : NULL;
     if ( ! svp || *svp == &PL_sv_undef ) {
 	if ( optional ) {
 	    if (PL_op->op_private & OPpDEREF) {
-		mPUSHs(newRV(newSV(0)));
+		SV* sv = newSV(0);
+		vivify_ref(sv, PL_op->op_private & OPpDEREF);
+		XPUSHs(sv);
 		RETURN;
 	    }
 	    else
@@ -1577,7 +1369,7 @@ PP(pp_leave)
     register PERL_CONTEXT *cx;
     SV **newsp;
     PMOP *newpm;
-    I32 gimme;
+    U8 gimme;
 
     if (PL_op->op_flags & OPf_SPECIAL) {
 	cx = &cxstack[cxstack_ix];
@@ -2313,13 +2105,7 @@ PP(pp_entersub)
 	    sv_upgrade(avsv, SVt_PVAV);
 	    av = SvAv(avsv);
 	    SAVECLEARSV(PAD_SVl(PAD_ARGS_INDEX));
-	    if (AvREAL(av)) {
-		/* @_ is normally not REAL--this should only ever
-		 * happen when DB::sub() calls things that modify @_ */
-		av_clear(av);
-		AvREAL_off(av);
-		AvREIFY_on(av);
-	    }
+	    AvREAL_on(av);
 	    CX_CURPAD_SAVE(cx->blk_sub);
 	    ++MARK;
 
@@ -2340,8 +2126,10 @@ PP(pp_entersub)
 	    AvFILLp(av) = items - 1;
 	
 	    while (items--) {
-		if (*MARK)
+		if (*MARK) {
 		    SvTEMP_off(*MARK);
+		    SvREFCNT_inc(*MARK);
+		}
 		MARK++;
 	    }
 	}
@@ -2422,52 +2210,41 @@ PP(pp_aelem)
     IV elem = SvIV(elemsv);
     AV* const av = (AV*)POPs;
     const OPFLAGS op_flags = PL_op->op_flags;
-    const U32 lval = op_flags & OPf_MOD;
-    U32 defer;
+    const OPFLAGS lval = op_flags & OPf_MOD;
+    const OPFLAGS add = PL_op->op_private & OPpELEM_ADD;
+    const OPFLAGS optional = PL_op->op_private & OPpELEM_OPTIONAL;
     SV *sv;
 
     if ( ! SvAVOK(av) )
 	Perl_croak(aTHX_ "Can't take an element from a %s", Ddesc((SV*)av));
 
-    defer = (PL_op->op_private & OPpLVAL_DEFER) && (elem > av_len(av));
-
-    svp = av_fetch(av, elem, lval && !defer);
-    if (lval) {
-#ifdef PERL_MALLOC_WRAP
-	 if (SvUOK(elemsv)) {
-	      const UV uv = SvUV(elemsv);
-	      elem = uv > IV_MAX ? IV_MAX : uv;
-	 }
-	 else if (SvNOK(elemsv))
-	      elem = (IV)SvNV(elemsv);
-	 if (elem > 0) {
-	      static const char oom_array_extend[] =
-		"Out of memory during array extend"; /* Duplicated in av.c */
-	      MEM_WRAP_CHECK_1(elem,SV*,oom_array_extend);
-	 }
-#endif
-	if (!svp || *svp == &PL_sv_undef) {
-	    SV* lv;
-	    if (!defer)
-		DIE(aTHX_ PL_no_aelem, elem);
-	    lv = sv_newmortal();
-	    sv_upgrade(lv, SVt_PVLV);
-	    LvTYPE(lv) = 'y';
-	    sv_magic(lv, NULL, PERL_MAGIC_defelem, NULL, 0);
-	    LvTARG(lv) = SvREFCNT_inc_simple(av);
-	    LvTARGOFF(lv) = elem;
-	    LvTARGLEN(lv) = 1;
-	    PUSHs(lv);
-	    RETURN;
+    svp = av_fetch(av, elem, add);
+    if (!svp) {
+	if ( optional ) {
+	    if (PL_op->op_private & OPpDEREF) {
+		SV* sv = newSV(0);
+		vivify_ref(sv, PL_op->op_private & OPpDEREF);
+		XPUSHs(sv);
+		RETURN;
+	    }
+	    else
+		RETPUSHUNDEF;
 	}
-	if (PL_op->op_private & OPpLVAL_INTRO)
-	    save_aelem(av, elem, svp);
-	else if (PL_op->op_private & OPpDEREF)
-	    vivify_ref(*svp, PL_op->op_private & OPpDEREF);
+	if ( add )
+	    DIE(aTHX_ "Required array element %d could not be created", elem);
+	else
+	    DIE(aTHX_ "Required array element %d does not exists", elem);
     }
-    sv = (svp ? *svp : &PL_sv_undef);
-    if (!lval && SvGMAGICAL(sv))	/* see note in pp_helem() */
-	sv = sv_mortalcopy(sv);
+    if (PL_op->op_private & OPpLVAL_INTRO)
+	save_aelem(av, elem, svp);
+    if (lval && *svp == &PL_sv_undef)
+	SVcpREPLACE(*svp, newSV(0));
+    sv = *svp;
+    if (PL_op->op_private & OPpDEREF && ! SvOK(sv)) {
+	vivify_ref(sv, PL_op->op_private & OPpDEREF);
+	XPUSHs(sv);
+	RETURN;
+    }
     if (op_flags & OPf_ASSIGN) {
 	if (op_flags & OPf_ASSIGN_PART) {
 	    SV* src;

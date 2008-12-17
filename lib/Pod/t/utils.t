@@ -35,8 +35,8 @@ my @results = @(
 	      );
 
 for my $i( 0..nelems @links ) {
-  my $link = Pod::Hyperlink->new( @links[$i]);
-  is($link->markup, @results[$i]);
+  my $link = Pod::Hyperlink->new( @links[?$i]);
+  is($link->markup, @results[?$i]);
 }
 
 # Now test lists

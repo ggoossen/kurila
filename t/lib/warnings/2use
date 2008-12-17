@@ -50,7 +50,8 @@ Use of uninitialized value $b in scalar chop at - line 6 character 24.
 no warnings 'reserved' ;
 foo.bar;
 EXPECT
-Useless use of concatenation (.) or string in void context at - line 3 character 4.
+Unknown bare word foo at - line 3, at end of line
+Unknown bare word bar at - line 3, at end of line
 Bareword "foo" not allowed while "strict subs" in use at - line 3 character 1.
 ########
 

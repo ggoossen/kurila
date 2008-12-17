@@ -22,7 +22,7 @@ sub import {
 	require Exporter;
 	goto &Exporter::import;
     };
-    my (undef,$home_stash,$svref,< @attrs) = < @_;
+    my @(undef,$home_stash,$svref,@< @attrs) =  @_;
 
     my $svtype = uc reftype($svref);
     my $pkgmeth;

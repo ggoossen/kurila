@@ -143,10 +143,10 @@ if ($^O =~ m/^(?:uwin|cygwin|interix|solaris)$/) {
 	$gr1 = join(' ', sort grep defined $_ && !%did{+$_}++, @gr);
 }
 
-if (config_value("myuname") =~ m/^cygwin_nt/i) {  <# basegroup on CYGWIN_NT has id = 0.
-    %basegroup{[@($pwgid,$pwgnam)]} = (0,0);
-} else { <
-    %basegroup{[@($pwgid,$pwgnam)]} = (1,1);
+if (config_value("myuname") =~ m/^cygwin_nt/i) {  # basegroup on CYGWIN_NT has id = 0.
+    %basegroup{[@($pwgid,$pwgnam)]} = @(0,0);
+} else { 
+    %basegroup{[@($pwgid,$pwgnam)]} = @(1,1);
 }
 $gr2 = join(' ', grep(!%basegroup{+$_}++, sort split(' ',$groups)));
 

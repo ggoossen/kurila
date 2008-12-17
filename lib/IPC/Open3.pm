@@ -177,7 +177,7 @@ my $do_spawn = $^O eq 'os2' || $^O eq 'MSWin32';
 
 sub _open3 {
     local $Me = shift;
-    my($package, $dad_wtr, $dad_rdr, $dad_err, < @cmd) = < @_;
+    my@($package, $dad_wtr, $dad_rdr, $dad_err, @< @cmd) =  @_;
     my($dup_wtr, $dup_rdr, $dup_err, $kidpid);
 
     if ((nelems @cmd) +> 1 and @cmd[0] eq '-') {
@@ -220,9 +220,6 @@ sub _open3 {
 
     $kidpid = $do_spawn ?? -1 !! xfork;
     if ($kidpid == 0) {		# Kid
-	# A tie in the parent should not be allowed to cause problems.
-	untie *STDIN;
-	untie *STDOUT;
 	# If she wants to dup the kid's stderr onto her stdout I need to
 	# save a copy of her stdout before I put something else there.
 	if (Symbol::glob_name($dad_rdr->*) ne Symbol::glob_name($dad_err->*) && $dup_err
@@ -315,7 +312,7 @@ sub _open3 {
     # of it.
     xclose $dad_wtr if $dup_wtr;
 
-    select(@(select($dad_wtr), $| = 1)[0]); # unbuffer pipe
+    select(my $x = @(select($dad_wtr), $| = 1)[0]); # unbuffer pipe
     $kidpid;
 }
 

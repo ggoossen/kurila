@@ -74,7 +74,7 @@ sub struct {
     my $out = '';
 
     $out = "do \{\n  package $class;\n  sub new \{\n";
-    $out .= "    my (\$class, < \%init) = < \@_;\n";
+    $out .= "    my \@(?\$class, \%< \%init) = \@_;\n";
     $out .= "    \$class = __PACKAGE__ unless \@_;\n";
 
     my $cnt = 0;
@@ -96,7 +96,7 @@ sub struct {
             $elem = "\{+'$($class)::$name'\}";
         }
         elsif( $base_type eq 'ARRAY' ){
-            $elem = "[$cnt]";
+            $elem = "[+$cnt]";
             ++$cnt;
             $cmt = " # $name";
         }
@@ -155,7 +155,7 @@ sub struct {
             }
             $out .= "  sub $name \{$cmt\n    my \$r = shift;\n";
             if( $base_type eq 'ARRAY' ){
-                $elem = "[$cnt]";
+                $elem = "[+$cnt]";
                 ++$cnt;
             }
             elsif( $base_type eq 'HASH' ){
@@ -165,7 +165,7 @@ sub struct {
                 $out .= "    my \$i;\n";
                 $out .= "    \@_ ?? (\$i = shift) !! return \$r->$elem;\n"; 
                 $out .= "    if (ref(\$i) eq 'ARRAY' && !\@_) \{ \$r->$elem = \$i; return \$r \}\n";
-                $sel = "->[\$i]";
+                $sel = "->[+\$i]";
             }
             elsif( defined %hashes{?$name} ){
                 $out .= "    my \$i;\n";
@@ -459,7 +459,7 @@ accessor accordingly.
     sub count {
         my $self = shift;
         if ( @_ ) {
-            die 'count must be nonnegative' if $_[0] < 0;
+            die 'count must be nonnegative' if @_[0] < 0;
             $self->{'MyObj::count'} = shift;
             warn "Too many args to count" if @_;
         }

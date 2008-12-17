@@ -72,7 +72,7 @@ if ($^O eq 'unicos') {
 
 # Let's not depend on Fcntl or any other extension.
 
-my ($SEEK_SET, $SEEK_CUR, $SEEK_END) = (0, 1, 2);
+my @($SEEK_SET, $SEEK_CUR, $SEEK_END) = @(0, 1, 2);
 
 # We'll start off by creating a one megabyte file which has
 # only three "true" bytes.  If we have sparseness, we should
@@ -172,11 +172,11 @@ sub fail () {
 }
 
 sub offset ($$) {
-    my ($offset_will_be, $offset_want) = < @_;
+    my @($offset_will_be, $offset_want) =  @_;
     my $offset_is = eval $offset_will_be;
     unless ($offset_is == $offset_want) {
         print "# bad offset $offset_is, want $offset_want\n";
-	my ($offset_func) = ($offset_will_be =~ m/^(\w+)/);
+	my @($offset_func) = @($offset_will_be =~ m/^(\w+)/);
 	if (unpack("L", pack("L", $offset_want)) == $offset_is) {
 	    print "# 32-bit wraparound suspected in $offset_func() since\n";
 	    print "# $offset_want cast into 32 bits equals $offset_is.\n";

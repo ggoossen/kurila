@@ -1,7 +1,7 @@
 use Config;
 
 sub to_string {
-    my ($value) = < @_;
+    my @($value) =  @_;
     $value =~ s/\\/\\\\/g;
     $value =~ s/'/\\'/g;
     return "'$value'";
@@ -31,10 +31,10 @@ sub to_string {
 # The latter is better for some for cross-compilation setups.
 #
 sub _expansion {
-    my ($op, $os, $expr) = < @_;
+    my @($op, $os, $expr) =  @_;
     if ($op ne 'eq' and $op ne 'ne') {die "wrong eq-ne arg"};
     if ($expr =~ m[^(.*?)<<\|\$\^O-$op-$os>>(.*?)$]s) {
-        my ($if,$el) = ($1,$2);
+        my @($if,$el) = @($1,$2);
         if (($op eq 'eq' and ($^O eq $os || config_value("osname") eq $os))
               || ($op eq 'ne' and ($^O ne $os || config_value("osname") ne $os))) {
             return $if
@@ -114,14 +114,14 @@ sub dl_load_flags { 0x00 }
 EOT
 
 if (%ENV{?PERL_BUILD_EXPAND_CONFIG_VARS}) {
-    print OUT "our (\$dl_dlext, \$dl_so, \$dlsrc) = (", <
-              to_string(config_value('dlext')), ",", <
-              to_string(config_value('so')), ",", <
-              to_string(config_value('dlsrc')), ")\n;" ;
+    print OUT "our @(\$dl_dlext, \$dl_so, \$dlsrc) = @(",
+              < to_string(config_value('dlext')), ",",
+              < to_string(config_value('so')), ",",
+              < to_string(config_value('dlsrc')), ")\n;" ;
 }
 else {
     print OUT <<'EOT';
-our ($dl_dlext, $dl_so, $dlsrc) = < map { config_value($_) } qw(dlext so dlsrc);
+our @($dl_dlext, $dl_so, $dlsrc) = map { config_value($_) } qw(dlext so dlsrc);
 EOT
 }
 
@@ -345,7 +345,7 @@ sub bootstrap {
 	push @dirs, $dir;
     }
     # last resort, let dl_findfile have a go in all known locations
-    ($file) = < dl_findfile(< map("-L$_",@(<@dirs,<@INC)), $modfname) unless $file;
+    @(?$file) = dl_findfile(< map("-L$_",@(<@dirs,<@INC)), $modfname) unless $file;
 
     die("Can't locate loadable object for module $module in \@INC (\@INC contains: $(join ' ', @INC))")
 	unless $file;	# wording similar to error from 'require'

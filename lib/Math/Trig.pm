@@ -51,7 +51,7 @@ my @pi = qw(pi pi2 pi4 pip2 pip4);
 	        'pi'     => \ @pi);
 
 sub tan {
-    my ($z) = < @_;
+    my @($z) =  @_;
     my $cz = cos($z);
     die "Division by zero in tan($z)" if $cz == 0;
     return sin($z) / $cz;
@@ -89,17 +89,17 @@ sub deg2deg($)     { _remt(@_[0], 360) }
 
 sub grad2grad($)   { _remt(@_[0], 400) }
 
-sub rad2deg ($;$)  { my $d = _RD * @_[0]; @_[1] ?? $d !! deg2deg($d) }
+sub rad2deg ($;$)  { my $d = _RD * @_[0]; @_[?1] ?? $d !! deg2deg($d) }
 
-sub deg2rad ($;$)  { my $d = _DR * @_[0]; @_[1] ?? $d !! rad2rad($d) }
+sub deg2rad ($;$)  { my $d = _DR * @_[0]; @_[?1] ?? $d !! rad2rad($d) }
 
-sub grad2deg ($;$) { my $d = _GD * @_[0]; @_[1] ?? $d !! deg2deg($d) }
+sub grad2deg ($;$) { my $d = _GD * @_[0]; @_[?1] ?? $d !! deg2deg($d) }
 
-sub deg2grad ($;$) { my $d = _DG * @_[0]; @_[1] ?? $d !! grad2grad($d) }
+sub deg2grad ($;$) { my $d = _DG * @_[0]; @_[?1] ?? $d !! grad2grad($d) }
 
-sub rad2grad ($;$) { my $d = _RG * @_[0]; @_[1] ?? $d !! grad2grad($d) }
+sub rad2grad ($;$) { my $d = _RG * @_[0]; @_[?1] ?? $d !! grad2grad($d) }
 
-sub grad2rad ($;$) { my $d = _GR * @_[0]; @_[1] ?? $d !! rad2rad($d) }
+sub grad2rad ($;$) { my $d = _GR * @_[0]; @_[?1] ?? $d !! rad2rad($d) }
 
 #
 # acos and asin functions which always return a real number
@@ -120,7 +120,7 @@ sub asin_real {
 }
 
 sub cartesian_to_spherical {
-    my ( $x, $y, $z ) = < @_;
+    my @( $x, $y, $z ) =  @_;
 
     my $rho = sqrt( $x * $x + $y * $y + $z * $z );
 
@@ -130,7 +130,7 @@ sub cartesian_to_spherical {
 }
 
 sub spherical_to_cartesian {
-    my ( $rho, $theta, $phi ) = < @_;
+    my @( $rho, $theta, $phi ) =  @_;
 
     return  @( $rho * cos( $theta ) * sin( $phi ),
              $rho * sin( $theta ) * sin( $phi ),
@@ -138,19 +138,19 @@ sub spherical_to_cartesian {
 }
 
 sub spherical_to_cylindrical {
-    my ( $x, $y, $z ) = < spherical_to_cartesian( < @_ );
+    my @( $x, $y, $z ) =  spherical_to_cartesian( < @_ );
 
     return  @( sqrt( $x * $x + $y * $y ), @_[1], $z );
 }
 
 sub cartesian_to_cylindrical {
-    my ( $x, $y, $z ) = < @_;
+    my @( $x, $y, $z ) =  @_;
 
     return  @( sqrt( $x * $x + $y * $y ), atan2( $y, $x ), $z );
 }
 
 sub cylindrical_to_cartesian {
-    my ( $rho, $theta, $z ) = < @_;
+    my @( $rho, $theta, $z ) =  @_;
 
     return  @( $rho * cos( $theta ), $rho * sin( $theta ), $z );
 }
@@ -160,7 +160,7 @@ sub cylindrical_to_spherical {
 }
 
 sub great_circle_distance {
-    my ( $theta0, $phi0, $theta1, $phi1, $rho ) = < @_;
+    my @( $theta0, $phi0, $theta1, $phi1, ?$rho ) =  @_;
 
     $rho = 1 unless defined $rho; # Default to the unit sphere.
 
@@ -173,7 +173,7 @@ sub great_circle_distance {
 }
 
 sub great_circle_direction {
-    my ( $theta0, $phi0, $theta1, $phi1 ) = < @_;
+    my @( $theta0, $phi0, $theta1, $phi1 ) =  @_;
 
     my $distance = &great_circle_distance( < @_ );
 
@@ -193,7 +193,7 @@ sub great_circle_direction {
 *great_circle_bearing = \&great_circle_direction;
 
 sub great_circle_waypoint {
-    my ( $theta0, $phi0, $theta1, $phi1, $point ) = < @_;
+    my @( $theta0, $phi0, $theta1, $phi1, $point ) =  @_;
 
     $point = 0.5 unless defined $point;
 
@@ -226,7 +226,7 @@ sub great_circle_midpoint {
 }
 
 sub great_circle_destination {
-    my ( $theta0, $phi0, $dir0, $dst ) = < @_;
+    my @( $theta0, $phi0, $dir0, $dst ) =  @_;
 
     my $lat0 = pip2 - $phi0;
 

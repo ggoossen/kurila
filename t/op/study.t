@@ -3,7 +3,7 @@
 our $Ok_Level = 0;
 my $test = 1;
 sub ok ($;$) {
-    my($ok, $name) = < @_;
+    my@($ok, ?$name) =  @_;
 
     local $_;
 
@@ -18,17 +18,19 @@ sub ok ($;$) {
 }
 
 sub nok ($;$) {
-    my($nok, $name) = < @_;
+    my@($nok, ?$name) =  @_;
     local $Ok_Level = 1;
     ok( !$nok, $name );
 }
 
 use Config;
+use signals;
+
 my $have_alarm = config_value('d_alarm');
 sub alarm_ok (&) {
     my $test = shift;
 
-    local %SIG{+ALRM} = sub { die "timeout\n" };
+    signals::temp_set_handler("ALRM" => sub { die "timeout\n" });
     
     my $match;
     try { 

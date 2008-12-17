@@ -7,12 +7,11 @@ my %Expect_Dir  = %( () ); # what we expect for $File::Find::dir
 my ($cwd, $cwd_untainted);
 
 use Config;
-use Carp::Heavy ();
 
 BEGIN {
     if ($^O ne 'VMS') {
 	for (keys %ENV) { # untaint ENV
-	    (%ENV{+$_}) = %ENV{?$_} =~ m/(.*)/;
+	    @(%ENV{+$_}) = @: %ENV{?$_} =~ m/(.*)/;
 	}
     }
 
@@ -233,7 +232,7 @@ MkDir( dir_path('for_find'), 0770 );
 ok( chdir( dir_path('for_find')), 'successful chdir() to for_find' );
 
 $cwd = cwd(); # save cwd
-( $cwd_untainted ) = $cwd =~ m|^(.+)$|; # untaint it
+@( $cwd_untainted ) = @: $cwd =~ m|^(.+)$|; # untaint it
 
 MkDir( dir_path('fa'), 0770 );
 MkDir( dir_path('fb'), 0770  );

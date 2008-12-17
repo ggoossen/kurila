@@ -58,7 +58,7 @@ sub import {
             }
         }
         $fields->{+$f} = $next;
-        $fattr->[$next] = ($f =~ m/^_/) ?? PRIVATE !! PUBLIC;
+        $fattr->[+$next] = ($f =~ m/^_/) ?? PRIVATE !! PUBLIC;
         $next += 1;
     }
     if ((nelems @$fattr) +> $next) {
@@ -114,7 +114,7 @@ sub new {
 }
 
 sub _accessible_keys {
-    my ($class) = < @_;
+    my @($class) =  @_;
     return  @( <
         keys %{*{Symbol::fetch_glob($class.'::FIELDS')}},
         < map( <_accessible_keys($_), @{*{Symbol::fetch_glob($class.'::ISA')}}),

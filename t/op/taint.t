@@ -9,6 +9,7 @@
 
 use Config;
 use File::Spec::Functions;
+use signals;
 
 BEGIN { require './test.pl'; }
 plan tests => 229;
@@ -96,9 +97,7 @@ sub any_tainted (@) {
     return scalar grep { tainted($_) } @_;
 }
 sub tainted ($) {
-    my $tainted = not try { @_[0], kill 0; 1};
-    die if $@ and $@->message !~ m/^Insecure dependency in kill while running with -T switch/;
-    return $tainted;
+    return Internals::SvTAINTED(@_[0]);
 }
 sub all_tainted (@) {
     for ( @_) { return 0 unless tainted $_ }
@@ -108,7 +107,7 @@ sub all_tainted (@) {
 our $TODO;
 
 sub test ($;$) {
-    my($ok, $diag) = < @_;
+    my @($ok, ?$diag) =  @_;
 
     my $curr_test = curr_test();
     if ($TODO) {
@@ -176,7 +175,7 @@ do {
           if $Is_MSWin32 || $Is_NetWare || $Is_VMS || $Is_Dos || $Is_MacOS;
 
 	my @vars = @('PATH', < @MoreEnv);
-	while (my $v = @vars[0]) {
+	while (my $v = @vars[?0]) {
 	    local %ENV{+$v} = $TAINT;
 	    last if try { `$echo 1` };
 	    last unless $@->{?description} =~ m/^Insecure \$ENV{$v}/;
@@ -198,9 +197,9 @@ do {
 	print "# all directories are writeable\n";
     }
     else {
-	$tmp = (grep { defined and -d and @(stat '_')[2] ^&^ 2 }
+	$tmp = (grep { defined and -d and @(stat '_')[?2] ^&^ 2 }
  @( <		     qw(sys$scratch /tmp /var/tmp /usr/tmp), <
-		     %ENV{[qw(TMP TEMP)]}))[0]
+		     %ENV{[qw(TMP TEMP)]}))[?0]
 	    or print "# can't find world-writeable directory to test PATH\n";
     }
 
@@ -261,7 +260,7 @@ do {
     do {
       use re 'taint';
 
-      ($foo) = ('bar' . $TAINT) =~ m/(.+)/;
+      @($foo) = @: ('bar' . $TAINT) =~ m/(.+)/;
       test tainted $foo;
       test $foo eq 'bar';
 
@@ -277,7 +276,7 @@ do {
     my $pi = 4 * atan2(1,1) + $TAINT0;
     test tainted $pi;
 
-    ($pi) = $pi =~ m/(\d+\.\d+)/;
+    @($pi) = @: $pi =~ m/(\d+\.\d+)/;
     test not tainted $pi;
     test sprintf("\%.5f", $pi) eq '3.14159';
 };
@@ -708,7 +707,7 @@ SKIP: do {
 	if (defined $id) {
 	    if (msgsnd($id, pack("l! a*", $type_sent, $sent), IPC_NOWAIT())) {
 		if (msgrcv($id, $rcvd, 60, 0, IPC_NOWAIT())) {
-		    ($type_rcvd, $rcvd) = unpack("l! a*", $rcvd);
+		    @($type_rcvd, $rcvd) = unpack@("l! a*", $rcvd);
 		} else {
 		    warn "# msgrcv failed: $!\n";
 		}
@@ -864,7 +863,7 @@ do {
 do {
     # Check that all environment variables are tainted.
     my @untainted;
-    while (my ($k, $v) = each %ENV) {
+    while (my @(?$k, ?$v) =@( each %ENV)) {
 	if (!tainted($v) &&
 	    # These we have explicitly untainted or set earlier.
 	    $k !~ m/^(BASH_ENV|CDPATH|ENV|IFS|PATH|PERL_CORE|TEMP|TERM|TMP)$/) {
@@ -1095,9 +1094,9 @@ do {
 do {
     my @a;
     local $main::TODO = 1;
-    @a[0] = $^X;
+    @a[+0] = $^X;
     my $i = 0;
-    while(@a[0]=~ m/(.)/g ) {
+    while(@a[0] =~ m/(.)/g ) {
 	last if $i++ +> 10000;
     }
     cmp_ok $i, '+<', 10000, "infinite m//g";
@@ -1120,7 +1119,7 @@ do {
 	skip "fork() is not available", 3 unless config_value('d_fork');
 
 	%ENV{+'PATH'} = $TAINT;
-	local %SIG{+'PIPE'} = 'IGNORE';
+	signals::temp_set_handler('PIPE', 'IGNORE');
 	try {
 	    my $pid = open my $pipe, "|-", '-';
 	    if (!defined $pid) {

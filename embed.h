@@ -60,7 +60,9 @@
 #define SvIV			Perl_SvIV
 #define SvUV			Perl_SvUV
 #define SvNV			Perl_SvNV
-#define Gv_AMupdate		Perl_Gv_AMupdate
+#define LocationFilename	Perl_LocationFilename
+#define PushBlock		Perl_PushBlock
+#define PopBlock		Perl_PopBlock
 #ifdef PERL_CORE
 #define append_elem		Perl_append_elem
 #define append_list		Perl_append_list
@@ -95,9 +97,15 @@
 #ifdef PERL_CORE
 #define block_start		Perl_block_start
 #define boot_core_UNIVERSAL	Perl_boot_core_UNIVERSAL
+#define boot_core_error		Perl_boot_core_error
+#define boot_core_version	Perl_boot_core_version
+#define boot_core_utf8		Perl_boot_core_utf8
+#define boot_core_Internals	Perl_boot_core_Internals
+#define boot_core_signals	Perl_boot_core_signals
 #define boot_core_PerlIO	Perl_boot_core_PerlIO
 #endif
 #define call_list		Perl_call_list
+#define call_list_onleave	Perl_call_list_onleave
 #ifdef PERL_CORE
 #define cando			Perl_cando
 #endif
@@ -415,13 +423,10 @@
 #define magic_clearhint		Perl_magic_clearhint
 #define magic_clearisa		Perl_magic_clearisa
 #define magic_clearpack		Perl_magic_clearpack
-#define magic_clearsig		Perl_magic_clearsig
 #define magic_existspack	Perl_magic_existspack
 #define magic_get		Perl_magic_get
 #define magic_getdefelem	Perl_magic_getdefelem
-#define magic_getnkeys		Perl_magic_getnkeys
 #define magic_getpack		Perl_magic_getpack
-#define magic_getsig		Perl_magic_getsig
 #define magic_gettaint		Perl_magic_gettaint
 #define magic_getuvar		Perl_magic_getuvar
 #define magic_len		Perl_magic_len
@@ -443,10 +448,8 @@
 #endif
 #ifdef PERL_CORE
 #define magic_setmglob		Perl_magic_setmglob
-#define magic_setnkeys		Perl_magic_setnkeys
 #define magic_setpack		Perl_magic_setpack
 #define magic_setregexp		Perl_magic_setregexp
-#define magic_setsig		Perl_magic_setsig
 #define magic_settaint		Perl_magic_settaint
 #define magic_setuvar		Perl_magic_setuvar
 #define magic_setutf8		Perl_magic_setutf8
@@ -657,7 +660,6 @@
 #define pmflag			Perl_pmflag
 #ifdef PERL_CORE
 #define pmruntime		Perl_pmruntime
-#define pmtrans			Perl_pmtrans
 #endif
 #define pop_scope		Perl_pop_scope
 #ifdef PERL_CORE
@@ -814,6 +816,12 @@
 #define sv_2cv			Perl_sv_2cv
 #define sv_2io			Perl_sv_2io
 #define sv_2iv_flags		Perl_sv_2iv_flags
+#define av_2mortal(a)		SvAv(Perl_sv_2mortal(aTHX_ AvSv(a)))
+#define hv_2mortal(a)		SvHv(Perl_sv_2mortal(aTHX_ HvSv(a)))
+#define cv_2mortal(a)		SvCv(Perl_sv_2mortal(aTHX_ CvSv(a)))
+#define gv_2mortal(a)		SvGv(Perl_sv_2mortal(aTHX_ GvSv(a)))
+#define io_2mortal(a)		SvIo(Perl_sv_2mortal(aTHX_ IoSv(a)))
+#define re_2mortal(a)		SvRe(Perl_sv_2mortal(aTHX_ ReSv(a)))
 #define sv_2mortal		Perl_sv_2mortal
 #define sv_2nv			Perl_sv_2nv
 #ifdef PERL_CORE
@@ -1136,7 +1144,6 @@
 #define ck_trunc		Perl_ck_trunc
 #define ck_unpack		Perl_ck_unpack
 #define is_handle_constructor	S_is_handle_constructor
-#define is_list_assignment	S_is_list_assignment
 #define cop_free		S_cop_free
 #define modkids			S_modkids
 #define scalarboolean		S_scalarboolean
@@ -1826,6 +1833,7 @@
 #define ck_defined		Perl_ck_defined
 #define ck_delete		Perl_ck_delete
 #define ck_die			Perl_ck_die
+#define ck_dotdotdot		Perl_ck_dotdotdot
 #define ck_eof			Perl_ck_eof
 #define ck_eval			Perl_ck_eval
 #define ck_exec			Perl_ck_exec
@@ -1861,7 +1869,6 @@
 #define ck_trunc		Perl_ck_trunc
 #define ck_try			Perl_ck_try
 #define ck_unpack		Perl_ck_unpack
-#define pp_aassign		Perl_pp_aassign
 #define pp_abs			Perl_pp_abs
 #define pp_accept		Perl_pp_accept
 #define pp_add			Perl_pp_add
@@ -1874,6 +1881,7 @@
 #define pp_anoncode		Perl_pp_anoncode
 #define pp_anonhash		Perl_pp_anonhash
 #define pp_anonscalar		Perl_pp_anonscalar
+#define pp_arrayexpand		Perl_pp_arrayexpand
 #define pp_aslice		Perl_pp_aslice
 #define pp_atan2		Perl_pp_atan2
 #define pp_backtick		Perl_pp_backtick
@@ -1909,12 +1917,18 @@
 #define pp_dofile		Perl_pp_dofile
 #define pp_dor			Perl_pp_dor
 #define pp_dorassign		Perl_pp_dorassign
+#define pp_dotdotdot		Perl_pp_dotdotdot
 #define pp_dump			Perl_pp_dump
+#define pp_dynascope		Perl_pp_dynascope
 #define pp_each			Perl_pp_each
 #define pp_egrent		Perl_pp_egrent
 #define pp_ehostent		Perl_pp_ehostent
 #define pp_enetent		Perl_pp_enetent
 #define pp_enter		Perl_pp_enter
+#define pp_enter_anonarray_assign	Perl_pp_enter_anonarray_assign
+#define pp_enter_anonhash_assign	Perl_pp_enter_anonhash_assign
+#define pp_enter_arrayexpand_assign	Perl_pp_enter_arrayexpand_assign
+#define pp_enter_hashexpand_assign	Perl_pp_enter_hashexpand_assign
 #define pp_entereval		Perl_pp_entereval
 #define pp_enteriter		Perl_pp_enteriter
 #define pp_enterloop		Perl_pp_enterloop
@@ -1999,6 +2013,7 @@
 #define pp_gt			Perl_pp_gt
 #define pp_gv			Perl_pp_gv
 #define pp_gvsv			Perl_pp_gvsv
+#define pp_hashexpand		Perl_pp_hashexpand
 #define pp_helem		Perl_pp_helem
 #define pp_hex			Perl_pp_hex
 #define pp_hintseval		Perl_pp_hintseval
@@ -2042,6 +2057,7 @@
 #define pp_localtime		Perl_pp_localtime
 #define pp_lock			Perl_pp_lock
 #define pp_log			Perl_pp_log
+#define pp_logassign_assign	Perl_pp_logassign_assign
 #define pp_lslice		Perl_pp_lslice
 #define pp_lstat		Perl_pp_lstat
 #define pp_lt			Perl_pp_lt
@@ -2076,6 +2092,7 @@
 #define pp_padany		Perl_pp_padany
 #define pp_padsv		Perl_pp_padsv
 #define pp_pipe_op		Perl_pp_pipe_op
+#define pp_placeholder		Perl_pp_placeholder
 #define pp_pop			Perl_pp_pop
 #define pp_pos			Perl_pp_pos
 #define pp_postdec		Perl_pp_postdec
@@ -2180,8 +2197,6 @@
 #define pp_syswrite		Perl_pp_syswrite
 #define pp_tell			Perl_pp_tell
 #define pp_telldir		Perl_pp_telldir
-#define pp_tie			Perl_pp_tie
-#define pp_tied			Perl_pp_tied
 #define pp_time			Perl_pp_time
 #define pp_tms			Perl_pp_tms
 #define pp_truncate		Perl_pp_truncate
@@ -2193,7 +2208,6 @@
 #define pp_unpack		Perl_pp_unpack
 #define pp_unshift		Perl_pp_unshift
 #define pp_unstack		Perl_pp_unstack
-#define pp_untie		Perl_pp_untie
 #define pp_utime		Perl_pp_utime
 #define pp_values		Perl_pp_values
 #define pp_vec			Perl_pp_vec
@@ -2201,7 +2215,6 @@
 #define pp_waitpid		Perl_pp_waitpid
 #define pp_wantarray		Perl_pp_wantarray
 #define pp_warn			Perl_pp_warn
-#define pp_xassign		Perl_pp_xassign
 #define pp_xor			Perl_pp_xor
 
 #else	/* PERL_IMPLICIT_CONTEXT */
@@ -2238,7 +2251,9 @@
 #define SvIV(a)			Perl_SvIV(aTHX_ a)
 #define SvUV(a)			Perl_SvUV(aTHX_ a)
 #define SvNV(a)			Perl_SvNV(aTHX_ a)
-#define Gv_AMupdate(a)		Perl_Gv_AMupdate(aTHX_ a)
+#define LocationFilename(a)	Perl_LocationFilename(aTHX_ a)
+#define PushBlock(a,b,c)	Perl_PushBlock(aTHX_ a,b,c)
+#define PopBlock()		Perl_PopBlock(aTHX)
 #ifdef PERL_CORE
 #define append_elem(a,b,c)	Perl_append_elem(aTHX_ a,b,c)
 #define append_list(a,b,c)	Perl_append_list(aTHX_ a,b,c)
@@ -2273,9 +2288,15 @@
 #ifdef PERL_CORE
 #define block_start(a)		Perl_block_start(aTHX_ a)
 #define boot_core_UNIVERSAL()	Perl_boot_core_UNIVERSAL(aTHX)
+#define boot_core_error()	Perl_boot_core_error(aTHX)
+#define boot_core_version()	Perl_boot_core_version(aTHX)
+#define boot_core_utf8()	Perl_boot_core_utf8(aTHX)
+#define boot_core_Internals()	Perl_boot_core_Internals(aTHX)
+#define boot_core_signals()	Perl_boot_core_signals(aTHX)
 #define boot_core_PerlIO()	Perl_boot_core_PerlIO(aTHX)
 #endif
 #define call_list(a,b)		Perl_call_list(aTHX_ a,b)
+#define call_list_onleave(a,b)	Perl_call_list_onleave(aTHX_ a,b)
 #ifdef PERL_CORE
 #define cando(a,b,c)		Perl_cando(aTHX_ a,b,c)
 #endif
@@ -2580,13 +2601,10 @@
 #define magic_clearhint(a,b)	Perl_magic_clearhint(aTHX_ a,b)
 #define magic_clearisa(a,b)	Perl_magic_clearisa(aTHX_ a,b)
 #define magic_clearpack(a,b)	Perl_magic_clearpack(aTHX_ a,b)
-#define magic_clearsig(a,b)	Perl_magic_clearsig(aTHX_ a,b)
 #define magic_existspack(a,b)	Perl_magic_existspack(aTHX_ a,b)
 #define magic_get(a,b)		Perl_magic_get(aTHX_ a,b)
 #define magic_getdefelem(a,b)	Perl_magic_getdefelem(aTHX_ a,b)
-#define magic_getnkeys(a,b)	Perl_magic_getnkeys(aTHX_ a,b)
 #define magic_getpack(a,b)	Perl_magic_getpack(aTHX_ a,b)
-#define magic_getsig(a,b)	Perl_magic_getsig(aTHX_ a,b)
 #define magic_gettaint(a,b)	Perl_magic_gettaint(aTHX_ a,b)
 #define magic_getuvar(a,b)	Perl_magic_getuvar(aTHX_ a,b)
 #define magic_len(a,b)		Perl_magic_len(aTHX_ a,b)
@@ -2608,10 +2626,8 @@
 #endif
 #ifdef PERL_CORE
 #define magic_setmglob(a,b)	Perl_magic_setmglob(aTHX_ a,b)
-#define magic_setnkeys(a,b)	Perl_magic_setnkeys(aTHX_ a,b)
 #define magic_setpack(a,b)	Perl_magic_setpack(aTHX_ a,b)
 #define magic_setregexp(a,b)	Perl_magic_setregexp(aTHX_ a,b)
-#define magic_setsig(a,b)	Perl_magic_setsig(aTHX_ a,b)
 #define magic_settaint(a,b)	Perl_magic_settaint(aTHX_ a,b)
 #define magic_setuvar(a,b)	Perl_magic_setuvar(aTHX_ a,b)
 #define magic_setutf8(a,b)	Perl_magic_setutf8(aTHX_ a,b)
@@ -2645,7 +2661,7 @@
 #define mod(a,b)		Perl_mod(aTHX_ a,b)
 #endif
 #ifdef PERL_CORE
-#define assign(a,b)		Perl_assign(aTHX_ a,b)
+#define assign(a,b,c,d)		Perl_assign(aTHX_ a,b,c,d)
 #define mode_from_discipline(a)	Perl_mode_from_discipline(aTHX_ a)
 #endif
 #define moreswitches(a)		Perl_moreswitches(aTHX_ a)
@@ -2696,7 +2712,7 @@
 #define newLOGOP(a,b,c,d,e)	Perl_newLOGOP(aTHX_ a,b,c,d,e)
 #define newLOOPEX(a,b)		Perl_newLOOPEX(aTHX_ a,b)
 #define newLOOPOP(a,b,c,d,e,f)	Perl_newLOOPOP(aTHX_ a,b,c,d,e,f)
-#define newNULLLIST()		Perl_newNULLLIST(aTHX)
+#define newNULLLIST(a)		Perl_newNULLLIST(aTHX_ a)
 #define newOP(a,b,c)		Perl_newOP(aTHX_ a,b,c)
 #define newPROG(a)		Perl_newPROG(aTHX_ a)
 #define newRANGE(a,b,c)		Perl_newRANGE(aTHX_ a,b,c)
@@ -2819,7 +2835,6 @@
 #define pmflag(a,b)		Perl_pmflag(aTHX_ a,b)
 #ifdef PERL_CORE
 #define pmruntime(a,b,c)	Perl_pmruntime(aTHX_ a,b,c)
-#define pmtrans(a,b,c)		Perl_pmtrans(aTHX_ a,b,c)
 #endif
 #define pop_scope()		Perl_pop_scope(aTHX)
 #ifdef PERL_CORE
@@ -2976,6 +2991,12 @@
 #define sv_2cv(a,b,c)		Perl_sv_2cv(aTHX_ a,b,c)
 #define sv_2io(a)		Perl_sv_2io(aTHX_ a)
 #define sv_2iv_flags(a,b)	Perl_sv_2iv_flags(aTHX_ a,b)
+#define sv_2mortal(a)		SvAv(Perl_sv_2mortal(aTHX_ AvSv(a)))
+#define sv_2mortal(a)		SvHv(Perl_sv_2mortal(aTHX_ HvSv(a)))
+#define sv_2mortal(a)		SvCv(Perl_sv_2mortal(aTHX_ CvSv(a)))
+#define sv_2mortal(a)		SvGv(Perl_sv_2mortal(aTHX_ GvSv(a)))
+#define sv_2mortal(a)		SvIo(Perl_sv_2mortal(aTHX_ IoSv(a)))
+#define sv_2mortal(a)		SvRe(Perl_sv_2mortal(aTHX_ ReSv(a)))
 #define sv_2mortal(a)		Perl_sv_2mortal(aTHX_ a)
 #define sv_2nv(a)		Perl_sv_2nv(aTHX_ a)
 #ifdef PERL_CORE
@@ -3291,7 +3312,6 @@
 #define ck_trunc(a)		Perl_ck_trunc(aTHX_ a)
 #define ck_unpack(a)		Perl_ck_unpack(aTHX_ a)
 #define is_handle_constructor	S_is_handle_constructor
-#define is_list_assignment(a)	S_is_list_assignment(aTHX_ a)
 #define cop_free(a)		S_cop_free(aTHX_ a)
 #define modkids(a,b)		S_modkids(aTHX_ a,b)
 #define scalarboolean(a)	S_scalarboolean(aTHX_ a)
@@ -3996,6 +4016,7 @@
 #define ck_defined(a)		Perl_ck_defined(aTHX_ a)
 #define ck_delete(a)		Perl_ck_delete(aTHX_ a)
 #define ck_die(a)		Perl_ck_die(aTHX_ a)
+#define ck_dotdotdot(a)		Perl_ck_dotdotdot(aTHX_ a)
 #define ck_eof(a)		Perl_ck_eof(aTHX_ a)
 #define ck_eval(a)		Perl_ck_eval(aTHX_ a)
 #define ck_exec(a)		Perl_ck_exec(aTHX_ a)
@@ -4031,7 +4052,6 @@
 #define ck_trunc(a)		Perl_ck_trunc(aTHX_ a)
 #define ck_try(a)		Perl_ck_try(aTHX_ a)
 #define ck_unpack(a)		Perl_ck_unpack(aTHX_ a)
-#define pp_aassign()		Perl_pp_aassign(aTHX)
 #define pp_abs()		Perl_pp_abs(aTHX)
 #define pp_accept()		Perl_pp_accept(aTHX)
 #define pp_add()		Perl_pp_add(aTHX)
@@ -4044,6 +4064,7 @@
 #define pp_anoncode()		Perl_pp_anoncode(aTHX)
 #define pp_anonhash()		Perl_pp_anonhash(aTHX)
 #define pp_anonscalar()		Perl_pp_anonscalar(aTHX)
+#define pp_arrayexpand()	Perl_pp_arrayexpand(aTHX)
 #define pp_aslice()		Perl_pp_aslice(aTHX)
 #define pp_atan2()		Perl_pp_atan2(aTHX)
 #define pp_backtick()		Perl_pp_backtick(aTHX)
@@ -4079,12 +4100,18 @@
 #define pp_dofile()		Perl_pp_dofile(aTHX)
 #define pp_dor()		Perl_pp_dor(aTHX)
 #define pp_dorassign()		Perl_pp_dorassign(aTHX)
+#define pp_dotdotdot()		Perl_pp_dotdotdot(aTHX)
 #define pp_dump()		Perl_pp_dump(aTHX)
+#define pp_dynascope()		Perl_pp_dynascope(aTHX)
 #define pp_each()		Perl_pp_each(aTHX)
 #define pp_egrent()		Perl_pp_egrent(aTHX)
 #define pp_ehostent()		Perl_pp_ehostent(aTHX)
 #define pp_enetent()		Perl_pp_enetent(aTHX)
 #define pp_enter()		Perl_pp_enter(aTHX)
+#define pp_enter_anonarray_assign()	Perl_pp_enter_anonarray_assign(aTHX)
+#define pp_enter_anonhash_assign()	Perl_pp_enter_anonhash_assign(aTHX)
+#define pp_enter_arrayexpand_assign()	Perl_pp_enter_arrayexpand_assign(aTHX)
+#define pp_enter_hashexpand_assign()	Perl_pp_enter_hashexpand_assign(aTHX)
 #define pp_entereval()		Perl_pp_entereval(aTHX)
 #define pp_enteriter()		Perl_pp_enteriter(aTHX)
 #define pp_enterloop()		Perl_pp_enterloop(aTHX)
@@ -4169,6 +4196,7 @@
 #define pp_gt()			Perl_pp_gt(aTHX)
 #define pp_gv()			Perl_pp_gv(aTHX)
 #define pp_gvsv()		Perl_pp_gvsv(aTHX)
+#define pp_hashexpand()		Perl_pp_hashexpand(aTHX)
 #define pp_helem()		Perl_pp_helem(aTHX)
 #define pp_hex()		Perl_pp_hex(aTHX)
 #define pp_hintseval()		Perl_pp_hintseval(aTHX)
@@ -4212,6 +4240,7 @@
 #define pp_localtime()		Perl_pp_localtime(aTHX)
 #define pp_lock()		Perl_pp_lock(aTHX)
 #define pp_log()		Perl_pp_log(aTHX)
+#define pp_logassign_assign()	Perl_pp_logassign_assign(aTHX)
 #define pp_lslice()		Perl_pp_lslice(aTHX)
 #define pp_lstat()		Perl_pp_lstat(aTHX)
 #define pp_lt()			Perl_pp_lt(aTHX)
@@ -4246,6 +4275,7 @@
 #define pp_padany()		Perl_pp_padany(aTHX)
 #define pp_padsv()		Perl_pp_padsv(aTHX)
 #define pp_pipe_op()		Perl_pp_pipe_op(aTHX)
+#define pp_placeholder()	Perl_pp_placeholder(aTHX)
 #define pp_pop()		Perl_pp_pop(aTHX)
 #define pp_pos()		Perl_pp_pos(aTHX)
 #define pp_postdec()		Perl_pp_postdec(aTHX)
@@ -4350,8 +4380,6 @@
 #define pp_syswrite()		Perl_pp_syswrite(aTHX)
 #define pp_tell()		Perl_pp_tell(aTHX)
 #define pp_telldir()		Perl_pp_telldir(aTHX)
-#define pp_tie()		Perl_pp_tie(aTHX)
-#define pp_tied()		Perl_pp_tied(aTHX)
 #define pp_time()		Perl_pp_time(aTHX)
 #define pp_tms()		Perl_pp_tms(aTHX)
 #define pp_truncate()		Perl_pp_truncate(aTHX)
@@ -4363,7 +4391,6 @@
 #define pp_unpack()		Perl_pp_unpack(aTHX)
 #define pp_unshift()		Perl_pp_unshift(aTHX)
 #define pp_unstack()		Perl_pp_unstack(aTHX)
-#define pp_untie()		Perl_pp_untie(aTHX)
 #define pp_utime()		Perl_pp_utime(aTHX)
 #define pp_values()		Perl_pp_values(aTHX)
 #define pp_vec()		Perl_pp_vec(aTHX)
@@ -4371,7 +4398,6 @@
 #define pp_waitpid()		Perl_pp_waitpid(aTHX)
 #define pp_wantarray()		Perl_pp_wantarray(aTHX)
 #define pp_warn()		Perl_pp_warn(aTHX)
-#define pp_xassign()		Perl_pp_xassign(aTHX)
 #define pp_xor()		Perl_pp_xor(aTHX)
 
 #endif	/* PERL_IMPLICIT_CONTEXT */

@@ -89,14 +89,14 @@ our ($OUTPUT_HELP_VERSION, $STANDARD_HELP_VERSION);
 #	getopt('oDI');  # -o, -D & -I take arg.  Sets opt_* as a side effect.
 
 sub getopt (;$$) {
-    my ($argumentative, $hash) = < @_;
+    my @($argumentative, ?$hash) =  @_;
     $argumentative = '' if !defined $argumentative;
     my ($first,$rest);
     local $_;
     local @EXPORT;
 
     while ((nelems @ARGV) && ($_ = @ARGV[0]) =~ m/^-(.)(.*)/) {
-	($first,$rest) = ($1,$2);
+	@($first,$rest) = @($1,$2);
 	if (m/^--$/) {	# early exit if --
 	    shift @ARGV;
 	    last;
@@ -178,9 +178,9 @@ sub help_mess ($;$) {
     if ((nelems @_) and defined &main::HELP_MESSAGE) {
 	main::HELP_MESSAGE($h, __PACKAGE__, $VERSION, $args);
     } else {
-	my (@witharg) = @($args =~ m/(\S)\s*:/g);
-	my (@rest) = @($args =~ m/([^\s:])(?!\s*:)/g);
-	my ($help, $arg) = ('', '');
+	my @(@witharg) =@( @($args =~ m/(\S)\s*:/g));
+	my @(@rest) =@( @($args =~ m/([^\s:])(?!\s*:)/g));
+	my @($help, $arg) = @('', '');
 	if ((nelems @witharg)) {
 	    $help .= "\n\tWith arguments: -" . join " -", @witharg;
 	    $arg = "\nSpace is not required between options and their arguments.";
@@ -188,7 +188,7 @@ sub help_mess ($;$) {
 	if ((nelems @rest)) {
 	    $help .= "\n\tBoolean (without arguments): -" . join " -", @rest;
 	}
-	my ($scr) = ($0 =~ m,([^/\\]+)$,);
+	my @($scr) = @($0 =~ m,([^/\\]+)$,);
 	print $h <<EOH if (nelems @_);			# Let the script override this
 
 Usage: $scr [-OPTIONS [-MORE_OPTIONS]] [--] [PROGRAM_ARG1 ...]
@@ -219,7 +219,7 @@ EOH
 #			#  side effect.
 
 sub getopts ($;$) {
-    my ($argumentative, $hash) = < @_;
+    my @($argumentative, ?$hash) =  @_;
     my (@args,$first,$rest,$exit);
     my $errs = 0;
     local $_;
@@ -227,14 +227,14 @@ sub getopts ($;$) {
 
     @args = split( m/ */, $argumentative );
     while((nelems @ARGV) && ($_ = @ARGV[0]) =~ m/^-(.)(.*)/s) {
-	($first,$rest) = ($1,$2);
+	@($first,$rest) = @($1,$2);
 	if (m/^--$/) {	# early exit if --
 	    shift @ARGV;
 	    last;
 	}
 	my $pos = index($argumentative,$first);
 	if ($pos +>= 0) {
-	    if (defined(@args[$pos+1]) and (@args[$pos+1] eq ':')) {
+	    if (defined(@args[?$pos+1]) and (@args[$pos+1] eq ':')) {
 		shift(@ARGV);
 		if ($rest eq '') {
 		    ++$errs unless (nelems @ARGV);

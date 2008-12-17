@@ -331,7 +331,7 @@ sub _def
         $x->{+oneInput} = 1 ;
         foreach my $pair ( @{ $x->{Pairs} })
         {
-            my ($from, $to) = < @$pair ;
+            my @($from, $to) =  @$pair ;
             $obj->_singleTarget($x, 1, $from, $to, < @_)
                 or return undef ;
         }
@@ -723,8 +723,6 @@ sub close
 
     return 1 if $self->{?Closed} || ! $self->{?Compress} ;
     $self->{+Closed} = 1 ;
-
-    untie $self;
 
     $self->_writeTrailer()
         or return 0 ;

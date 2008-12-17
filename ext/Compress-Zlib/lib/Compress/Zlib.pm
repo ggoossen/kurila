@@ -99,7 +99,7 @@ sub _save_gzerr
 
 sub gzopen($$)
 {
-    my ($file, $mode) = < @_ ;
+    my @($file, $mode) =  @_ ;
 
     my $gz ;
     my %defOpts = %(Level    => Z_DEFAULT_COMPRESSION(),
@@ -155,7 +155,7 @@ sub Compress::Zlib::gzFile::gzread
     return _set_gzerr(Z_STREAM_ERROR())
         if $self->[1] ne 'inflate';
 
-    my $len = defined @_[1] ?? @_[1] !! 4096 ; 
+    my $len = defined @_[?1] ?? @_[1] !! 4096 ; 
 
     my $gz = $self->[0] ;
     my $status = $gz->read(@_[0], $len) ; 
@@ -264,7 +264,7 @@ sub Compress::Zlib::gzFile::gzerror
 
 sub compress($;$)
 {
-    my ($x, $output, $err, $in) =('', '', '', '') ;
+    my @($x, $output, $err, $in) =@('', '', '', '') ;
 
     if (ref @_[0] ) {
         $in = @_[0] ;
@@ -276,7 +276,7 @@ sub compress($;$)
 
     my $level = ((nelems @_) == 2 ?? @_[1] !! Z_DEFAULT_COMPRESSION() );
 
-    ($x) = < Compress::Raw::Zlib::Deflate->new( AppendOutput => 1, Level => $level);
+    @($x, ...) = Compress::Raw::Zlib::Deflate->new( AppendOutput => 1, Level => $level);
     $x or return undef ;
 
     $err = $x->deflate($in, $output) ;
@@ -291,7 +291,7 @@ sub compress($;$)
 
 sub uncompress($)
 {
-    my ($x, $output, $err, $in) =('', '', '', '') ;
+    my @($x, $output, $err, $in) =@('', '', '', '') ;
 
     if (ref @_[0] ) {
         $in = @_[0] ;
@@ -301,7 +301,7 @@ sub uncompress($)
         $in = \@_[0] ;
     }
 
-    ($x) = < Compress::Raw::Zlib::Inflate->new( ConsumeInput => 0);
+    @($x, ...) = Compress::Raw::Zlib::Inflate->new( ConsumeInput => 0);
     $x or return undef ;
  
     $err = $x->inflate($in, $output) ;
@@ -331,7 +331,7 @@ sub deflateInit(@)
     my $obj ;
 
     my $status = 0 ;
-    ($obj, $status) = < 
+    @($obj, $status) =  
       Compress::Raw::Zlib::_deflateInit(0,
                 $got->value('Level'), 
                 $got->value('Method'), 
@@ -361,7 +361,7 @@ sub inflateInit(@)
 
     my $status = 0 ;
     my $obj ;
-    ($obj, $status) = < Compress::Raw::Zlib::_inflateInit(FLAG_CONSUME_INPUT,
+    @($obj, $status) =  Compress::Raw::Zlib::_inflateInit(FLAG_CONSUME_INPUT,
                                 $got->value('WindowBits'), 
                                 $got->value('Bufsize'), 
                                 $got->value('Dictionary')) ;
@@ -434,8 +434,8 @@ sub _removeGzipHeader($)
     return Z_DATA_ERROR() 
         if length($$string) +< GZIP_MIN_HEADER_SIZE ;
 
-    my ($magic1, $magic2, $method, $flags, $time, $xflags, $oscode) = 
-        unpack ('CCCCVCC', $$string);
+    my @($magic1, $magic2, $method, $flags, $time, $xflags, $oscode) = 
+        @: unpack ('CCCCVCC', $$string);
 
     return Z_DATA_ERROR()
         unless $magic1 == GZIP_ID1 and $magic2 == GZIP_ID2 and
@@ -448,7 +448,7 @@ sub _removeGzipHeader($)
         return Z_DATA_ERROR()
             if length($$string) +< GZIP_FEXTRA_HEADER_SIZE ;
 
-        my ($extra_len) = unpack ('v', $$string);
+        my @($extra_len) = @: unpack('v', $$string);
         $extra_len += GZIP_FEXTRA_HEADER_SIZE;
         return Z_DATA_ERROR()
             if length($$string) +< $extra_len ;
@@ -495,7 +495,7 @@ sub memGunzip($)
         or return undef;
      
     my $bufsize = length $$string +> 4096 ?? length $$string !! 4096 ;
-    my ($x) = < Compress::Raw::Zlib::Inflate->new(\%(WindowBits => - MAX_WBITS(),
+    my @($x, ...) =  Compress::Raw::Zlib::Inflate->new(\%(WindowBits => - MAX_WBITS(),
                          Bufsize => $bufsize));
     $x or return undef;
 
@@ -506,7 +506,7 @@ sub memGunzip($)
 
     if (length $$string +>= 8)
     {
-        my ($crc, $len) = unpack ("VV", substr($$string, 0, 8));
+        my @($crc, $len) = @: unpack("VV", substr($$string, 0, 8));
         substr($$string, 0, 8, '');
         return undef 
             unless $len == length($output) and

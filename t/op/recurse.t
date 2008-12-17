@@ -66,7 +66,7 @@ for my $x (0..3) {
     }
 }
 
-my ($x, $y, $z) = (18, 12, 6);
+my @($x, $y, $z) = @(18, 12, 6);
 
 is(takeuchi($x, $y, $z), $z + 1, "takeuchi($x, $y, $z) == $z + 1");
 

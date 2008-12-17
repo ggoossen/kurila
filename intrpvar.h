@@ -47,6 +47,8 @@ PERLVAR(Iscopestack,	I32 *)		/* scopes we've ENTERed */
 PERLVAR(Iscopestack_ix,	I32)
 PERLVAR(Iscopestack_max,I32)
 
+PERLVAR(Idynamicscope,	SV *)		/* the current dynamic scope */
+
 PERLVAR(Isavestack,	ANY *)		/* items that need to be restored when
 					   LEAVEing scopes we've ENTERed */
 PERLVAR(Isavestack_ix,	I32)
@@ -56,8 +58,6 @@ PERLVAR(Itmps_stack,	SV **)		/* mortals we've made */
 PERLVARI(Itmps_ix,	I32,	-1)
 PERLVARI(Itmps_floor,	I32,	-1)
 PERLVAR(Itmps_max,	I32)
-PERLVAR(Imodcount,	I32)		/* how much mod()ification in
-					   assignment? */
 
 PERLVAR(Imarkstack,	I32 *)		/* stack_sp locations we're
 					   remembering */

@@ -10,6 +10,7 @@ BEGIN {
 }
 	
 use Socket < qw(:all);
+use signals;
 
 plan tests => 14;
 
@@ -17,7 +18,7 @@ my $has_echo = $^O ne 'MSWin32';
 my $alarmed = 0;
 sub arm      { $alarmed = 0; alarm(shift) if $has_alarm }
 sub alarmed  { $alarmed = 1 }
-%SIG{+ALRM} = \&alarmed                    if $has_alarm;
+signals::set_handler(ALRM => \&alarmed)                    if $has_alarm;
 
 if (socket(T, PF_INET, SOCK_STREAM, IPPROTO_TCP)) {
 
@@ -123,7 +124,7 @@ is(inet_ntoa("\x{a}\x{14}\x{1e}\x{28}"), "10.20.30.40");
 # the value thru the entire chain.
 is(inet_ntoa(unpack_sockaddr_in( pack_sockaddr_in(100, inet_aton("10.250.230.10")))[1]), '10.250.230.10');
 do {
-    my ($port,$addr) = < unpack_sockaddr_in(pack_sockaddr_in(100,"\x{a}\x{a}\x{a}\x{a}"));
+    my @($port,$addr) =  unpack_sockaddr_in(pack_sockaddr_in(100,"\x{a}\x{a}\x{a}\x{a}"));
     is($port, 100);
     is(inet_ntoa($addr), "10.10.10.10");
 };

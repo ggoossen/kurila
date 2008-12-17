@@ -30,7 +30,7 @@ sub new
     for  ( @$impl) {
 	my $class = $_;
 	my @args;
-	($class, < @args) = < @$class if ref($class);
+	@($class, @< @args) =  @$class if ref($class);
 	unless (exists %{*{Symbol::fetch_glob("$class\::")}}{"VERSION"}) {
 	    eval "require $class";
 	    if ($@) {

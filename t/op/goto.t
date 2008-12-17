@@ -32,7 +32,7 @@ is($r, "ok\n", 'avoid pad without an @_');
 # Test autoloading mechanism.
 
 sub two {
-    my ($pack, $file, $line) = caller;	# Should indicate original call stats.
+    my @($pack, $file, $line) =@( caller);	# Should indicate original call stats.
     is("$(join ' ',@_) $pack $file $line", "1 2 3 main $::FILE $::LINE",
 	'autoloading mechanism.');
 }

@@ -19,6 +19,7 @@ my @Functions = qw(getcwd cwd fastcwd fastgetcwd
 foreach my $func ( @Functions) {
     my $cwd;
     try { $cwd = &{*{Symbol::fetch_glob('Cwd::'.$func)}} };
+    die if $@;
     is( $@, '',		"$func() should not explode under taint mode" );
     ok( tainted($cwd),	"its return value should be tainted" );
 }

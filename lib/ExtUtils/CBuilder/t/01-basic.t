@@ -41,7 +41,7 @@ ok $object_file, $b->compile(source => $source_file);
 my $lib_file = $b->lib_file($object_file);
 ok 1;
 
-my ($lib, < @temps) = < $b->link(objects => $object_file,
+my @($lib, @< @temps) =  $b->link(objects => $object_file,
                              module_name => 'compilet');
 $lib =~ s/"|'//g;
 ok $lib_file, $lib;

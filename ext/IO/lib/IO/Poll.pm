@@ -69,14 +69,14 @@ sub mask {
 
 
 sub poll {
-    my($self,$timeout) = < @_;
+    my@($self,$timeout) =  @_;
 
     $self->[1] = \%();
 
     my($fd,$mask,$iom);
     my @poll = @( () );
 
-    while(($fd,$iom) = each %{$self->[0]}) {
+    while(@(?$fd,?$iom) =@( each %{$self->[0]})) {
 	$mask   = 0;
 	$mask  ^|^= $_ for values(%$iom);
 	push(@poll,$fd => $mask);
@@ -88,7 +88,7 @@ sub poll {
 	unless $ret +> 0;
 
     while((nelems @poll)) {
-	my($fd,$got) = splice(@poll,0,2);
+	my @($fd,$got) = @: splice(@poll,0,2);
 	$self->[1]->{+$fd} = $got if $got;
     }
 
@@ -119,8 +119,8 @@ sub handles {
     my($fd,$ev,$io,$mask);
     my @handles = @( () );
 
-    while(($fd,$ev) = each %{$self->[1]}) {
-	while (($io,$mask) = each %{$self->[0]->{$fd}}) {
+    while(@($fd,$ev) =@( each %{$self->[1]})) {
+	while (@($io,$mask) =@( each %{$self->[0]->{$fd}})) {
 	    $mask ^|^= POLLHUP^|^POLLERR^|^POLLNVAL;  # must allow these
 	    push @handles,$self->[2]->{?$io} if ($ev ^&^ $mask) ^&^ $events;
 	}

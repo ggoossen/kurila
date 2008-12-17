@@ -151,7 +151,7 @@ do {
 	my ($dir, $noext, $exe, $cmd);
 	my $found = 0;
 
-	my ($curdir, $updir) = ( <File::Spec->curdir, < File::Spec->updir);
+	my @($curdir, $updir) = @( <File::Spec->curdir, < File::Spec->updir);
 
 	# we need:
 	#	1) a directory

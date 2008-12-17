@@ -120,7 +120,7 @@ my %Install_Vars = %(
  VENDOR => \qw(vendorarch vendorlib vendorbin vendorman1dir vendorman3dir)
 );
 
-while( my($type, $vars) = each %Install_Vars) {
+while( my@(?$type, ?$vars) =@( each %Install_Vars)) {
     SKIP: do {
         skip "VMS must expand macros in INSTALL* vars", scalar nelems @$vars 
           if $Is_VMS;    
@@ -255,7 +255,7 @@ do {
 
 
 sub _set_config {
-    my($k,$v) = < @_;
+    my@($k,$v) =  @_;
     (my $k_no_install = $k) =~ s/^install//i;
     %Config{$k} = $v;
 

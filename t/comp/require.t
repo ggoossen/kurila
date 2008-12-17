@@ -116,7 +116,7 @@ if ($@->message =~ m/^This is an expected error/) {
 }
 
 sub write_file_not_thing {
-    my ($file, $thing, $test) = < @_;
+    my @($file, $thing, $test) =  @_;
     write_file($file, <<"EOT");
     print "not ok $test\n";
     die "The $thing file should not be loaded";

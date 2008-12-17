@@ -38,7 +38,7 @@ $VERSION = 2.03;
 # In the initialization method, grab our terminal characteristics as well as
 # do all the stuff we normally do.
 sub new {
-    my ($self, < @args) = < @_;
+    my @($self, @< @args) =  @_;
     my ($ospeed, $term, $termios);
     $self = $self->SUPER::new (< @args);
 
@@ -74,14 +74,14 @@ sub new {
 
 # Make level one headings bold.
 sub cmd_head1 {
-    my ($self, $attrs, $text) = < @_;
+    my @($self, $attrs, $text) =  @_;
     $text =~ s/\s+$//;
     $self->SUPER::cmd_head1 ($attrs, "%$self{?BOLD}$text%$self{?NORM}");
 }
 
 # Make level two headings bold.
 sub cmd_head2 {
-    my ($self, $attrs, $text) = < @_;
+    my @($self, $attrs, $text) =  @_;
     $text =~ s/\s+$//;
     $self->SUPER::cmd_head2 ($attrs, "%$self{?BOLD}$text%$self{?NORM}");
 }
@@ -92,7 +92,7 @@ sub cmd_i { my $self = shift; return "%$self{?UNDL}@_[1]%$self{?NORM}" }
 
 # Output any included code in bold.
 sub output_code {
-    my ($self, $code) = < @_;
+    my @($self, $code) =  @_;
     $self->output (%$self{?BOLD} . $code . %$self{NORM});
 }
 

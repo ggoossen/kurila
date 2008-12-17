@@ -65,7 +65,7 @@ sub _export_to_level
 {
       my $pkg = shift;
       my $level = shift;
-      (undef) = shift;                  # XXX redundant arg
+      shift;                  # XXX redundant arg
       my $callpkg = caller($level);
       $pkg->export($callpkg, < @_);
 }
@@ -77,7 +77,9 @@ sub import {
     my $caller = caller;
 
     $t->exported_to($caller);
-    $t->plan(< @plan);
+    if (@plan) {
+        $t->plan(< @plan);
+    }
 
     my @imports = @( () );
     foreach my $idx (0..((nelems @plan)-1)) {
@@ -228,7 +230,7 @@ sub test_fail
     _start_testing() unless $testing;
 
     # work out what line we should be on
-    my ($package, $filename, $line) = caller;
+    my @($package, $filename, $line, ...) = @: caller;
     $line = $line + (shift() || 0); # prevent warnings
 
     # expect that on stderr
@@ -377,7 +379,7 @@ C<line_num(+3)> idiom is arguably nicer.
 
 sub line_num
 {
-    my ($package, $filename, $line) = caller;
+    my @($package, $filename, $line, ...) = @: caller;
     return $line + (shift() || 0); # prevent warnings
 }
 
@@ -483,7 +485,7 @@ package Test::Builder::Tester::Tie;
 # add line(s) to be expected
 
 sub new {
-    my ($class, $type) = < @_;
+    my @($class, $type) = @_;
 
     my $self = bless \%( got => '', type => $type ), $class;
     open my $fh, '>', \$self->{+'got'} or die "$!";
@@ -510,7 +512,7 @@ sub expect
 
 sub _translate_Failed_check
 {
-    my($self, $check) = < @_;
+    my @($self, $check) = @_;
 
     if( $check =~ m/\A(.*)#     (Failed .*test) \((.*?) at line (\d+)\)\Z(?!\n)/ ) {
         $check = "/\Q$1\E#\\s+\Q$2\E.*?\\n?.*?\Qat $3\E line \Q$4\E.*\\n?/";

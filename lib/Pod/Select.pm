@@ -276,7 +276,7 @@ sub _init_headings {
     unless (defined %myData{?_SECTION_HEADINGS}) {
         local *section_headings = %myData{+_SECTION_HEADINGS} = \@();
         for my $i (0..$MAX_HEADING_LEVEL-1) {
-            @section_headings[$i] = '';
+            @section_headings[+$i] = '';
         }
     }
 }
@@ -437,7 +437,7 @@ This method should I<not> normally be overridden by subclasses.
 
 sub match_section {
     my $self = shift;
-    my (@headings) = @_;
+    my @headings = @_;
     local *myData = $self;
 
     ## Return true if no restrictions were explicitly specified
@@ -448,7 +448,7 @@ sub match_section {
     ## Default any unspecified sections to the current one
     my @current_headings = $self->curr_headings();
     for my $i (0..$MAX_HEADING_LEVEL-1) {
-        (defined @headings[$i])  or  @headings[$i] = @current_headings[$i];
+        (defined @headings[?$i])  or  @headings[+$i] = @current_headings[$i];
     }
 
     ## Look for a match against the specified section expressions
@@ -493,7 +493,7 @@ for processing; otherwise a false value is returned.
 =cut
 
 sub is_selected {
-    my ($self, $paragraph) = < @_;
+    my @($self, $paragraph) =  @_;
     local $_;
     local *myData = $self;
 
@@ -504,7 +504,7 @@ sub is_selected {
     if (m/^=((?:sub)*)(?:head(?:ing)?|sec(?:tion)?)(\d*)\s+(.*?)\s*$/)
     {
         ## This is a section heading command
-        my ($level, $heading) = ($2, $3);
+        my @($level, $heading) = @($2, $3);
         $level = 1 + (length($1) / 3)  if ((! length $level) || (length $1));
         ## Reset the current section heading at this level
         %myData{_SECTION_HEADINGS}->[$level - 1] = $heading;
@@ -577,7 +577,7 @@ filenames are given).
 =cut 
 
 sub podselect {
-    my(@argv) = @_;
+    my@(@argv) = @_;
     my %defaults = %( () );
     my $pod_parser = Pod::Select->new(< %defaults);
     my $num_inputs = 0;
@@ -596,7 +596,7 @@ sub podselect {
             ## to be uppercase keywords)
             ##-------------------------------------------------------------
             %opts = %( < map {
-                my ($key, $val) = (lc $_, %opts{?$_});
+                my @($key, $val) = @(lc $_, %opts{?$_});
                 $key =~ s/^(?=\w)/-/;
                 $key =~ m/^-se[cl]/  and  $key  = '-sections';
                 #! $key eq '-range'    and  $key .= 's';
@@ -662,7 +662,7 @@ each invalid regex.
 =cut
 
 sub _compile_section_spec {
-    my ($section_spec) = < @_;
+    my @($section_spec) =  @_;
     my (@regexs, $negated);
 
     ## Compile the spec into a list of regexs
@@ -675,7 +675,7 @@ sub _compile_section_spec {
 
     ## Set default regex for ommitted levels
     for my $i (0 .. $MAX_HEADING_LEVEL -1) {
-        @regexs[$i]  = '.*'  unless ((defined @regexs[$i])
+        @regexs[+$i]  = '.*'  unless ((defined @regexs[?$i])
                                      && (length @regexs[$i]));
     }
     ## Modify the regexs as needed and validate their syntax

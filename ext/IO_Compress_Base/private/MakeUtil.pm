@@ -86,7 +86,7 @@ sub getPerlFiles
 
             m/^(\S+)\s*(.*)$/;
 
-            my ($file, $rest) = ($1, $2);
+            my @($file, $rest) = @($1, $2);
 
             if ($file =~ m/\.(pm|pl|t)$/ and $file !~ m/MakeUtil.pm/)
             {

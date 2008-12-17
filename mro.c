@@ -40,31 +40,6 @@ Perl_mro_meta_init(pTHX_ HV* stash)
     return newmeta;
 }
 
-#if defined(USE_ITHREADS)
-
-/* for sv_dup on new threads */
-struct mro_meta*
-Perl_mro_meta_dup(pTHX_ struct mro_meta* smeta, CLONE_PARAMS* param)
-{
-    struct mro_meta* newmeta;
-
-    PERL_ARGS_ASSERT_MRO_META_DUP;
-
-    Newx(newmeta, 1, struct mro_meta);
-    Copy(smeta, newmeta, 1, struct mro_meta);
-
-    if (newmeta->mro_linear_c3)
-	newmeta->mro_linear_c3
-	    = (AV*) SvREFCNT_inc(sv_dup((SV*)newmeta->mro_linear_c3, param));
-    if (newmeta->mro_nextmethod)
-	newmeta->mro_nextmethod
-	    = (HV*) SvREFCNT_inc(sv_dup((SV*)newmeta->mro_nextmethod, param));
-
-    return newmeta;
-}
-
-#endif /* USE_ITHREADS */
-
 /*
 =for apidoc mro_get_linear_isa_c3
 

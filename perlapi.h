@@ -256,6 +256,8 @@ END_EXTERN_C
 #define PL_dumper_fd		(*Perl_Idumper_fd_ptr(aTHX))
 #undef  PL_dumpindent
 #define PL_dumpindent		(*Perl_Idumpindent_ptr(aTHX))
+#undef  PL_dynamicscope
+#define PL_dynamicscope		(*Perl_Idynamicscope_ptr(aTHX))
 #undef  PL_e_script
 #define PL_e_script		(*Perl_Ie_script_ptr(aTHX))
 #undef  PL_efloatbuf
@@ -390,8 +392,6 @@ END_EXTERN_C
 #define PL_minus_n		(*Perl_Iminus_n_ptr(aTHX))
 #undef  PL_minus_p
 #define PL_minus_p		(*Perl_Iminus_p_ptr(aTHX))
-#undef  PL_modcount
-#define PL_modcount		(*Perl_Imodcount_ptr(aTHX))
 #undef  PL_modglobal
 #define PL_modglobal		(*Perl_Imodglobal_ptr(aTHX))
 #undef  PL_my_cxt_keys

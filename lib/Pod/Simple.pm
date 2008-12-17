@@ -172,17 +172,17 @@ sub new {
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 sub _handle_element_start {     # OVERRIDE IN DERIVED CLASS
-  my($self, $element_name, $attr_hash_r) = < @_;
+  my@($self, $element_name, $attr_hash_r) =  @_;
   return;
 }
 
 sub _handle_element_end {       # OVERRIDE IN DERIVED CLASS
-  my($self, $element_name) = < @_;
+  my@($self, $element_name) =  @_;
   return;
 }
 
 sub _handle_text          {     # OVERRIDE IN DERIVED CLASS
-  my($self, $text) = < @_;
+  my@($self, $text) =  @_;
   return;
 }
 
@@ -195,7 +195,7 @@ sub accept_directive_as_data      { shift->_accept_directives('Data',     < @_) 
 sub accept_directive_as_processed { shift->_accept_directives('Plain',    < @_) }
 
 sub _accept_directives {
-  my($this, $type) = splice @_,0,2;
+  my@($this, $type) =@( splice @_,0,2);
   foreach my $d ( @_) {
     next unless defined $d and length $d;
     die "\"$d\" isn't a valid directive name"
@@ -244,7 +244,7 @@ sub accept_targets_as_text { shift->_accept_targets('force_resolve', < @_) }
  # forces them to be processed, even when there's no ":".
 
 sub _accept_targets {
-  my($this, $type) = splice @_,0,2;
+  my@($this, $type) =@( splice @_,0,2);
   foreach my $t ( @_) {
     next unless defined $t and length $t;
     # TODO: enforce some limitations on what a target name can be?
@@ -360,7 +360,7 @@ sub parse_string_document {
 }
 
 sub _init_fh_source {
-  my($self, $source) = < @_;
+  my@($self, $source) =  @_;
 
   #DEBUG > 1 and print "Declaring $source as :raw for starters\n";
   #$self->_apply_binmode($source, ':raw');
@@ -373,7 +373,7 @@ sub _init_fh_source {
 #
 
 sub parse_file {
-  my($self, $source) = (< @_);
+  my@($self, $source) = @(< @_);
 
   if(!defined $source) {
     die("Can't use empty-string as a source for parse_file");
@@ -419,7 +419,7 @@ sub parse_from_file {
   # An emulation of Pod::Parser's interface, for the sake of Perldoc.
   # Basically just a wrapper around parse_file.
 
-  my($self, $source, $to) = < @_;
+  my @($self, ?$source, ?$to) =  @_;
   $self = $self->new unless ref($self); # so we tolerate being a class method
   
   if(!defined $source)             { $source = *STDIN{IO}
@@ -474,13 +474,13 @@ sub scream {    # like whine, but not suppressable
 }
 
 sub _complain_warn {
-  my($self,$line,$complaint) = < @_;
+  my@($self,$line,$complaint) =  @_;
   return printf STDERR "\%s around line \%s: \%s\n",
     $self->{?'source_filename'} || 'Pod input', $line, $complaint;
 }
 
 sub _complain_errata {
-  my($self,$line,$complaint) = < @_;
+  my@($self,$line,$complaint) =  @_;
   if( $self->{?'no_errata_section'} ) {
     DEBUG +> 9 and print "Discarding erratum (at line $line) $complaint\n because no_errata_section is on.\n";
   } else {
@@ -495,7 +495,7 @@ sub _complain_errata {
 
 sub _get_initial_item_type {
   # A hack-wrapper here for when you have like "=over\n\n=item 456\n\n"
-  my($self, $para) = < @_;
+  my@($self, $para) =  @_;
   return $para->[1]->{?'~type'}  if $para->[1]->{?'~type'};
 
   return $para->[1]->{+'~type'} = 'text'
@@ -507,7 +507,7 @@ sub _get_initial_item_type {
 
 
 sub _get_item_type {       # mutates the item!!
-  my($self, $para) = < @_;
+  my@($self, $para) =  @_;
   return $para->[1]->{?'~type'} if $para->[1]->{?'~type'};
 
 
@@ -587,7 +587,7 @@ sub _make_treelet {
 #:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.
 
 sub _wrap_up {
-  my($self, < @stack) = < @_;
+  my@($self, @< @stack) =  @_;
   my $nixx  = $self->{?'nix_X_codes'};
   my $merge = $self->{?'merge_text' };
   return unless $nixx or $merge;
@@ -648,7 +648,7 @@ sub _wrap_up {
 #:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.
 
 sub _remap_sequences {
-  my($self,< @stack) = < @_;
+  my@($self,@< @stack) =  @_;
   
   if((nelems @stack) == 1 and (nelems @{ @stack[0] }) == 3 and !ref @stack[0]->[2]) {
     # VERY common case: abort it.
@@ -753,7 +753,7 @@ sub _ponder_extend {
   # "Go to an extreme, move back to a more comfortable place"
   #  -- /Oblique Strategies/,  Brian Eno and Peter Schmidt
   
-  my($self, $para) = < @_;
+  my@($self, $para) =  @_;
   my $content = join ' ', @( splice @$para, 2);
   $content =~ s/^\s+//s;
   $content =~ s/\s+$//s;
@@ -874,7 +874,7 @@ sub _ponder_extend {
 #:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.
 
 sub _treat_Zs {  # Nix Z<...>'s
-  my($self,< @stack) = < @_;
+  my@($self,@< @stack) =  @_;
 
   my($treelet);
   my $start_line = @stack[0]->[1]->{?'start_line'};
@@ -981,7 +981,7 @@ sub _treat_Ls {  # Process our dear dear friends, the L<...> sequences
   # L<text|/"sec"> or L<text|/sec> or L<text|"sec">
   # L<scheme:...>
 
-  my($self,< @stack) = < @_;
+  my@($self,@< @stack) =  @_;
 
   my($treelet);
   my $start_line = @stack[0]->[1]->{?'start_line'};
@@ -1251,7 +1251,7 @@ sub _treat_Ls {  # Process our dear dear friends, the L<...> sequences
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 sub _treat_Es {
-  my($self,< @stack) = < @_;
+  my@($self,@< @stack) =  @_;
 
   my($i, $treelet, $content, $replacer, $charnum);
   my $start_line = @stack[0]->[1]->{?'start_line'};
@@ -1340,7 +1340,7 @@ sub _treat_Es {
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 sub _treat_Ss {
-  my($self,$treelet) = < @_;
+  my@($self,$treelet) =  @_;
   
   _change_S_to_nbsp($treelet,0) if $self->{?'nbsp_for_S'};
 
@@ -1355,7 +1355,7 @@ sub _treat_Ss {
 
 sub _change_S_to_nbsp { #  a recursive function
   # Sanely assumes that the top node in the excursion won't be an S node.
-  my($treelet, $in_s) = < @_;
+  my@($treelet, $in_s) =  @_;
   
   my $is_s = ('S' eq $treelet->[0]);
   $in_s ||= $is_s; # So in_s is on either by this being an S element,
@@ -1410,7 +1410,7 @@ sub _accessorize {  # A simple-minded method-maker
 #=============================================================================
 
 sub filter {
-  my($class, $source) = < @_;
+  my@($class, $source) =  @_;
   my $new = $class->new;
   $new->output_fh(*STDOUT{IO});
   

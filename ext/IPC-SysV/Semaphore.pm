@@ -115,7 +115,7 @@ sub set {
 		or return undef;
 	my($key,$val);
 	$ds->?$key($val)
-	    while(($key,$val) = each %arg);
+	    while(@($key,$val) =@( each %arg));
     }
 
     my $v = semctl($$self,0,IPC_SET,$ds->pack);

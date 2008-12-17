@@ -44,13 +44,13 @@ our $Deparse    //= 0;
 # to cause output of arrays and hashes rather than refs.
 #
 sub new {
-  my($c, $v, $n) = < @_;
+  my@($c, $v, ?$n) =  @_;
 
   die "Usage:  PACKAGE->new(ARRAYREF, [ARRAYREF])" 
     unless (defined($v) && (ref($v) eq 'ARRAY'));
   $n = \@() unless (defined($n) && (ref($v) eq 'ARRAY'));
 
-  my($s) = \%( 
+  my $s = \%( 
              level      => 0,           # current recursive depth
 	     indent     => $Indent,     # various styles of indenting
 	     pad	=> $Pad,        # all lines prefixed by this string
@@ -97,11 +97,11 @@ do {
 # add-to or query the table of already seen references
 #
 sub Seen {
-  my($s, $g) = < @_;
+  my@($s, $g) =  @_;
   if (defined($g) && (ref($g) eq 'HASH'))  {
     init_refaddr_format();
     my($k, $v, $id);
-    while (($k, $v) = each %$g) {
+    while (@($k, $v) =@( each %$g)) {
       if (defined $v and ref $v) {
 	$id = format_refaddr($v);
 	if ($k =~ m/^[*](.*)$/) {
@@ -130,7 +130,7 @@ sub Seen {
 # set or query the values to be dumped
 #
 sub Values {
-  my($s, $v) = < @_;
+  my@($s, $v) =  @_;
   if (defined($v) && (ref($v) eq 'ARRAY'))  {
     $s->{+todump} = \ @$v;        # make a copy
     return $s;
@@ -144,7 +144,7 @@ sub Values {
 # set or query the names of the values to be dumped
 #
 sub Names {
-  my($s, $n) = < @_;
+  my@($s, $n) =  @_;
   if (defined($n) && (ref($n) eq 'ARRAY'))  {
     $s->{+names} = \ @$n;         # make a copy
     return $s;
@@ -164,9 +164,9 @@ sub Dump {
 #
 our @post;
 sub Dumpperl {
-  my($s) = shift;
+  my $s = shift;
   my(@out, $name);
-  my($i) = 0;
+  my $i = 0;
   local(@post);
   init_refaddr_format();
 
@@ -175,7 +175,7 @@ sub Dumpperl {
   for my $val ( @{$s->{todump}}) {
     my $out = "";
     @post = @();
-    $name = $s->{names}->[$i++];
+    $name = $s->{names}->[?$i++];
     if (defined $name) {
       if ($name =~ m/^[*](.*)$/) {
 	if (defined $val) {
@@ -414,7 +414,7 @@ sub _dump {
     }
     elsif ($realtype eq 'ARRAY') {
         my($pad, $mname);
-        my($i) = 0;
+        my $i = 0;
         $out .= '@(';
         $pad = $s->{?sep} . $s->{?pad} . $s->{?apad};
         $mname = $name . '->';
@@ -436,7 +436,7 @@ sub _dump {
         $pair = $s->{?pair};
         $mname = $name . '->';
         $mname .= '->' if $mname =~ m/^\*.+\{[A-Z]+\}$/;
-        my ($sortkeys, $keys, $key) = ($s->{?sortkeys});
+        my @($sortkeys, ?$keys, ?$key) = @($s->{?sortkeys});
         if ($sortkeys) {
             if (ref($s->{?sortkeys}) eq 'CODE') {
                 $keys = $s->{?sortkeys}->($rval);
@@ -448,9 +448,9 @@ sub _dump {
                 $keys = \ sort keys %$rval;
             }
         }
-        while (($k, $v) = ! $sortkeys ?? (each %$rval) !!
-               (nelems @$keys) ?? ($key = shift(@$keys), $rval->{?$key}) !!
-               () ) {
+        while (@(?$k, ?$v) = ! $sortkeys ?? @(each %$rval) !!
+               (nelems @$keys) ?? @($key = shift(@$keys), $rval->{?$key}) !!
+               @() ) {
             my $nk = $s->_dump($k, "");
             $nk = $1 if !$s->{?quotekeys} and $nk =~ m/^[\"\']([A-Za-z_]\w*)[\"\']$/;
             $sname = $mname . '{' . $nk . '}';
@@ -523,13 +523,13 @@ sub Dumpp { print < Data::Dumper->Dump(< @_) }
 # reset the "seen" cache 
 #
 sub Reset {
-  my($s) = shift;
+  my@($s) =@( shift);
   $s->{+seen} = \%();
   return $s;
 }
 
 sub Indent {
-  my($s, $v) = < @_;
+  my@($s, $v) =  @_;
   if (defined($v)) {
     if ($v == 0) {
       $s->{+xpad} = "";
@@ -548,72 +548,72 @@ sub Indent {
 }
 
 sub Pair {
-    my($s, $v) = < @_;
+    my@($s, ?$v) =  @_;
     defined($v) ?? do { ($s->{+pair} = $v); return $s} !! $s->{?pair};
 }
 
 sub Pad {
-  my($s, $v) = < @_;
+  my@($s, $v) =  @_;
   defined($v) ?? do { ($s->{+pad} = $v); return $s} !! $s->{?pad};
 }
 
 sub Varname {
-  my($s, $v) = < @_;
+  my@($s, $v) =  @_;
   defined($v) ?? do {($s->{+varname} = $v); return $s} !! $s->{?varname};
 }
 
 sub Purity {
-  my($s, $v) = < @_;
+  my@($s, $v) =  @_;
   defined($v) ?? do {($s->{+purity} = $v); return $s} !! $s->{?purity};
 }
 
 sub Useqq {
-  my($s, $v) = < @_;
+  my@($s, $v) =  @_;
   defined($v) ?? do {($s->{+useqq} = $v); return $s} !! $s->{?useqq};
 }
 
 sub Terse {
-  my($s, $v) = < @_;
+  my@($s, $v) =  @_;
   defined($v) ?? do {($s->{+terse} = $v); return $s} !! $s->{?terse};
 }
 
 sub Freezer {
-  my($s, $v) = < @_;
+  my@($s, $v) =  @_;
   defined($v) ?? do {($s->{+freezer} = $v); return $s} !! $s->{?freezer};
 }
 
 sub Toaster {
-  my($s, $v) = < @_;
+  my@($s, $v) =  @_;
   defined($v) ?? do {($s->{+toaster} = $v); return $s} !! $s->{?toaster};
 }
 
 sub Deepcopy {
-  my($s, $v) = < @_;
+  my@($s, $v) =  @_;
   defined($v) ?? do {($s->{+deepcopy} = $v); return $s} !! $s->{?deepcopy};
 }
 
 sub Quotekeys {
-  my($s, $v) = < @_;
+  my@($s, $v) =  @_;
   defined($v) ?? do {($s->{+quotekeys} = $v); return $s} !! $s->{?quotekeys};
 }
 
 sub Bless {
-  my($s, $v) = < @_;
+  my@($s, $v) =  @_;
   defined($v) ?? do {($s->{+'bless'} = $v); return $s} !! $s->{?'bless'};
 }
 
 sub Maxdepth {
-  my($s, $v) = < @_;
+  my@($s, $v) =  @_;
   defined($v) ?? do {($s->{+'maxdepth'} = $v); return $s} !! $s->{?'maxdepth'};
 }
 
 sub Sortkeys {
-  my($s, $v) = < @_;
+  my@($s, $v) =  @_;
   defined($v) ?? do {($s->{+'sortkeys'} = $v); return $s} !! $s->{?'sortkeys'};
 }
 
 sub Deparse {
-  my($s, $v) = < @_;
+  my@($s, $v) =  @_;
   defined($v) ?? do {($s->{+'deparse'} = $v); return $s} !! $s->{?'deparse'};
 }
 

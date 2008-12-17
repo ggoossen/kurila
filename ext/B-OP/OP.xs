@@ -280,25 +280,15 @@ cc_opclass(pTHX_ const OP *o)
 	return (o->op_flags & OPf_KIDS) ? OPc_UNOP : OPc_BASEOP;
 
     if (o->op_type == OP_SASSIGN)
-	return ((o->op_private & OPpASSIGN_BACKWARDS) ? OPc_UNOP : OPc_BINOP);
+	return (OPc_BINOP);
 
     if (o->op_type == OP_AELEMFAST) {
 	if (o->op_flags & OPf_SPECIAL)
 	    return OPc_BASEOP;
 	else
-#ifdef USE_ITHREADS
-	    return OPc_PADOP;
-#else
 	    return OPc_SVOP;
-#endif
     }
     
-#ifdef USE_ITHREADS
-    if (o->op_type == OP_GV || o->op_type == OP_GVSV ||
-	o->op_type == OP_RCATLINE)
-	return OPc_PADOP;
-#endif
-
     switch (PL_opargs[o->op_type] & OA_CLASS_MASK) {
     case OA_BASEOP:
 	return OPc_BASEOP;
@@ -832,7 +822,7 @@ BINOP_new(class, type, flags, sv_first, sv_last, location)
 
         PL_curpad = AvARRAY(PL_comppad);
         
-        if (typenum == OP_SASSIGN || typenum == OP_AASSIGN) 
+        if (typenum == OP_SASSIGN) 
             o = newASSIGNOP(flags, first, 0, last, newSVsv(location));
         else {
             o = newBINOP(typenum, flags, first, last, newSVsv(location));
@@ -1042,16 +1032,7 @@ SVOP_set_sv(o, ...)
         GEN_PAD;
         if (items > 1) {
             sv = newSVsv(ST(1));
-#ifdef USE_ITHREADS
-            if ( cSVOPx(o)->op_sv ) {
-                cSVOPx(o)->op_sv = sv;
-            }
-            else {
-                PAD_SVl(o->op_targ) = sv;
-            }
-#else
             cSVOPx(o)->op_sv = sv;
-#endif
         }
         OLD_PAD;
 
@@ -1344,14 +1325,10 @@ PMOP_pmreplroot(o)
     CODE:
 	ST(0) = sv_newmortal();
 	if (o->op_type == OP_PUSHRE) {
-#  ifdef USE_ITHREADS
-            sv_setiv(ST(0), o->op_pmreplrootu.op_pmtargetoff);
-#  else
 	    GV *const target = o->op_pmreplrootu.op_pmtargetgv;
 	    sv_setiv(newSVrv(ST(0), target ?
 			     svclassnames[SvTYPE((SV*)target)] : "B::SV"),
 		     PTR2IV(target));
-#  endif
 	}
 	else {
 	    OP *const root = o->op_pmreplrootu.op_pmreplroot; 

@@ -76,7 +76,7 @@ test {&$foo(11)-1 == &$bar()};
 my @foo;
 for (qw(0 1 2 3 4)) {
   my $i = $_;
-  @foo[$_] = sub {$i = shift if (nelems @_); $i };
+  @foo[+$_] = sub {$i = shift if (nelems @_); $i };
 }
 
 test {
@@ -103,7 +103,7 @@ sub barf {
   my @foo;
   for (qw(0 1 2 3 4)) {
     my $i = $_;
-    @foo[$_] = sub {$i = shift if (nelems @_); $i };
+    @foo[+$_] = sub {$i = shift if (nelems @_); $i };
   }
   @foo;
 }
@@ -174,7 +174,7 @@ test {
 do {
     my $w;
     $w = sub {
-	my ($i) = < @_;
+	my @($i) =  @_;
 	test { $i == 10 };
 	sub { $w };
     };

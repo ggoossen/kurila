@@ -19,7 +19,7 @@ use IPC::Open3;
 my $perl = $^X;
 
 sub ok {
-    my ($n, $result, $info) = < @_;
+    my @($n, $result, ?$info) =  @_;
     if ($result) {
 	print "ok $n\n";
     }

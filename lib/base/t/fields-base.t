@@ -126,7 +126,7 @@ my %EXPECT = %(
               'Foo::Bar::Baz'   => \qw(b1 b2 b3 foo bar baz),
              );
 
-while(my($class, $efields) = each %EXPECT) {
+while(my@(?$class, ?$efields) =@( each %EXPECT)) {
     my %fields = %( < %{*{Symbol::fetch_glob($class.'::FIELDS')}} );
     my %expected_fields;
     foreach my $idx (1..nelems @$efields) {
@@ -147,14 +147,14 @@ my $obj1 = D3->new;
 $obj1->{+b1} = "B2";
 my $obj2 = $obj1;
 $obj2->{+b1} = "D3";
- <
+ 
 # Slices
 
-%$obj1{[@("_b1", "b1")]} = (17, 29);
+%$obj1{[@("_b1", "b1")]} = @(17, 29);
 is( $obj1->{?_b1}, 17 );
 is( $obj1->{?b1},  29 );
- <
-%$obj1{[@('_b1', 'b1')]} = (44,28);
+ 
+%$obj1{[@('_b1', 'b1')]} = @(44,28);
 is( $obj1->{?_b1}, 44 );
 is( $obj1->{?b1},  28 );
 

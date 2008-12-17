@@ -110,6 +110,7 @@
 #define PL_dowarn		(vTHX->Idowarn)
 #define PL_dumper_fd		(vTHX->Idumper_fd)
 #define PL_dumpindent		(vTHX->Idumpindent)
+#define PL_dynamicscope		(vTHX->Idynamicscope)
 #define PL_e_script		(vTHX->Ie_script)
 #define PL_efloatbuf		(vTHX->Iefloatbuf)
 #define PL_efloatsize		(vTHX->Iefloatsize)
@@ -177,7 +178,6 @@
 #define PL_minus_l		(vTHX->Iminus_l)
 #define PL_minus_n		(vTHX->Iminus_n)
 #define PL_minus_p		(vTHX->Iminus_p)
-#define PL_modcount		(vTHX->Imodcount)
 #define PL_modglobal		(vTHX->Imodglobal)
 #define PL_my_cxt_keys		(vTHX->Imy_cxt_keys)
 #define PL_my_cxt_list		(vTHX->Imy_cxt_list)
@@ -393,6 +393,7 @@
 #define PL_Idowarn		PL_dowarn
 #define PL_Idumper_fd		PL_dumper_fd
 #define PL_Idumpindent		PL_dumpindent
+#define PL_Idynamicscope	PL_dynamicscope
 #define PL_Ie_script		PL_e_script
 #define PL_Iefloatbuf		PL_efloatbuf
 #define PL_Iefloatsize		PL_efloatsize
@@ -460,7 +461,6 @@
 #define PL_Iminus_l		PL_minus_l
 #define PL_Iminus_n		PL_minus_n
 #define PL_Iminus_p		PL_minus_p
-#define PL_Imodcount		PL_modcount
 #define PL_Imodglobal		PL_modglobal
 #define PL_Imy_cxt_keys		PL_my_cxt_keys
 #define PL_Imy_cxt_list		PL_my_cxt_list

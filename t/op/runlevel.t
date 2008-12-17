@@ -18,7 +18,7 @@ for ( @prgs){
     if (s/^\s*(-\w+)//){
        $switch = $1;
     }
-    my($prog,$expected) = < split(m/\nEXPECT\n/, $_);
+    my@($prog,$expected) =  split(m/\nEXPECT\n/, $_);
 
     fresh_perl_is( $prog, $expected, \%( switch => $switch, stderr => 1, ) );
 }
@@ -64,17 +64,3 @@ do {
 END { print "foobar\n" }
 EXPECT
 foobar
-########
-package TH;
-sub TIEHASH { bless \%(), 'TH' }
-sub STORE { try { print join(' ', @_[[1..2]]) . "\n" }; die "bar\n" }
-tie our %h, 'TH';
-try { %h{A} = 1; print "never\n"; };
-print $@->{description};
-try { %h{B} = 2; };
-print $@->{description};
-EXPECT
-A 1
-bar
-B 2
-bar

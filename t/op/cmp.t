@@ -54,7 +54,7 @@ do {
 };
 
 sub nok ($$$$$$$) {
-  my ($left, $threeway, $right, $result, $i, $j, $boolean) = < @_;
+  my @($left, $threeway, $right, $result, $i, $j, $boolean) =  @_;
   $result = defined $result ?? "'$result'" !! 'undef';
   fail("($left <=> $right) gives: $result \$i=$i \$j=$j, $boolean disagrees");
 }
@@ -63,14 +63,14 @@ for my $i (0..((nelems @FOO)-1)) {
     for my $j ($i..((nelems @FOO)-1)) {
 	# Comparison routines may convert these internally, which would change
 	# what is used to determine the comparison on later runs. Hence copy
-	my ($i1, $i2, $i3, $i4, $i5, $i6, $i7, $i8, $i9, $i10,
+	my @($i1, $i2, $i3, $i4, $i5, $i6, $i7, $i8, $i9, $i10,
 	    $i11, $i12, $i13, $i14, $i15, $i16, $i17) =
-	  (@FOO[$i], @FOO[$i], @FOO[$i], @FOO[$i], @FOO[$i], @FOO[$i],
+	  @(@FOO[$i], @FOO[$i], @FOO[$i], @FOO[$i], @FOO[$i], @FOO[$i],
 	   @FOO[$i], @FOO[$i], @FOO[$i], @FOO[$i], @FOO[$i], @FOO[$i],
 	   @FOO[$i], @FOO[$i], @FOO[$i], @FOO[$i], @FOO[$i]);
-	my ($j1, $j2, $j3, $j4, $j5, $j6, $j7, $j8, $j9, $j10,
+	my @($j1, $j2, $j3, $j4, $j5, $j6, $j7, $j8, $j9, $j10,
 	    $j11, $j12, $j13, $j14, $j15, $j16, $j17) =
-	  (@FOO[$j], @FOO[$j], @FOO[$j], @FOO[$j], @FOO[$j], @FOO[$j],
+	  @(@FOO[$j], @FOO[$j], @FOO[$j], @FOO[$j], @FOO[$j], @FOO[$j],
 	   @FOO[$j], @FOO[$j], @FOO[$j], @FOO[$j], @FOO[$j], @FOO[$j],
 	   @FOO[$j], @FOO[$j], @FOO[$j], @FOO[$j], @FOO[$j]);
 	my $cmp = $i1 <+> $j1;

@@ -199,7 +199,7 @@ sub new {
 }
 
 sub batch_mode_page_object_init {
-  my($self, $batchconvobj, $module, $infile, $outfile, $depth) = < @_;
+  my@($self, $batchconvobj, $module, $infile, $outfile, $depth) =  @_;
   DEBUG and print "Initting $self\n  for $module\n",
     "  in $infile\n  out $outfile\n  depth $depth\n";
   $self->batch_mode(1);
@@ -278,7 +278,7 @@ sub do_beginning {
 }
 
 sub _add_top_anchor {
-  my($self, $text_r) = < @_;
+  my@($self, $text_r) =  @_;
   unless($$text_r and $$text_r =~ m/name=['"]___top['"]/) { # a hack
     $$text_r .= "<a name='___top' class='dummyTopAnchor' ></a>\n";
   }
@@ -377,12 +377,12 @@ sub index_as_html {
   (nelems @$points) +> 1 or return qq[<div class='indexgroupEmpty'></div>\n];
    # There's no point in having a 0-item or 1-item index, I dare say.
   
-  my(@out) = @( qq{\n<div class='indexgroup'>} );
+  my@(@out) =@( @( qq{\n<div class='indexgroup'>} ));
   my $level = 0;
 
   my( $target_level, $previous_tagname, $tagname, $text, $anchorname, $indent);
   foreach my $p ( @( < @$points, \@('head0', '(end)') ) ) {
-    ($tagname, $text) = < @$p;
+    @($tagname, $text) =  @$p;
     $anchorname = $self->section_escape($text);
     if( $tagname =~ m{^head(\d+)$} ) {
       $target_level = 0 + $1;
@@ -536,7 +536,7 @@ sub _do_middle_main_loop {
 #
 
 sub do_link {
-  my($self, $token) = < @_;
+  my@($self, $token) =  @_;
   my $type = $token->attr('type');
   if(!defined $type) {
     $self->whine("Typeless L!?", < $token->attr('start_line'));
@@ -560,7 +560,7 @@ sub do_man_link { return undef }
 
 sub do_pod_link {
   # And now things get really messy...
-  my($self, $link) = < @_;
+  my@($self, $link) =  @_;
   my $to = $link->attr('to');
   my $section = $link->attr('section');
   return undef unless(  # should never happen
@@ -628,14 +628,14 @@ sub do_pod_link {
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 sub section_escape {
-  my($self, $section) = < @_;
+  my@($self, $section) =  @_;
   return $self->section_url_escape(
     $self->section_name_tidy($section)
   );
 }
 
 sub section_name_tidy {
-  my($self, $section) = < @_;
+  my@($self, $section) =  @_;
   $section =~ s/ /_/g;
   $section =~ s/\x[00]-\x[1F]\x[80]-\x[9F]//g; # drop crazy characters
   $section = $self->unicode_escape_url($section);
@@ -647,7 +647,7 @@ sub section_url_escape  { shift->general_url_escape(< @_) }
 sub pagepath_url_escape { shift->general_url_escape(< @_) }
 
 sub general_url_escape {
-  my($self, $string) = < @_;
+  my@($self, $string) =  @_;
  
   $string =~ s/([^\x[00]-\x[FF]])/$(
      join '', map sprintf('%%%02X',$_), @( unpack 'C*', $1)
@@ -682,7 +682,7 @@ sub resolve_pod_page_link {
 }
 
 sub resolve_pod_page_link_singleton_mode {
-  my($self, $it) = < @_;
+  my@($self, $it) =  @_;
   return undef unless defined $it and length $it;
   my $url = $self->pagepath_url_escape($it);
   
@@ -694,7 +694,7 @@ sub resolve_pod_page_link_singleton_mode {
 }
 
 sub resolve_pod_page_link_batch_mode {
-  my($self, $to) = < @_;
+  my@($self, $to) =  @_;
   DEBUG +> 1 and print " During batch mode, resolving $to ...\n";
   my @path = grep length($_), split m/::/s, $to, -1;
   unless( nelems @path ) { # sanity
@@ -709,7 +709,7 @@ sub resolve_pod_page_link_batch_mode {
 }
 
 sub batch_mode_rectify_path {
-  my($self, $pathbits) = < @_;
+  my@($self, $pathbits) =  @_;
   my $level = $self->batch_mode_current_level;
   $level--; # how many levels up to go to get to the root
   if($level +< 1) {
@@ -727,7 +727,7 @@ sub resolve_pod_link_by_table {
 
   return unless @_[0]->{?'podhtml_LOT'};  # An optimizy shortcut
 
-  my($self, $to, $section) = < @_;
+  my@($self, $to, $section) =  @_;
 
   # TODO: add a method that actually populates podhtml_LOT from a file?
 
@@ -769,7 +769,7 @@ sub linearize_tokens {  # self, tokens
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 sub unicode_escape_url {
-  my($self, $string) = < @_;
+  my@($self, $string) =  @_;
   $string =~ s/([^\x[00]-\x[FF]])/$('('.ord($1).')')/g;
     #  Turn char 1234 into "(1234)"
   return $string;

@@ -192,7 +192,7 @@ C<do>, C<import>, C<no>, C<package>, C<require>, C<use>
 X<object> X<class> X<package>
 
 C<bless>, C<package>, C<ref>, C<tie>, C<tied>,
-C<untie>, C<use>
+C<use>
 
 =item Low-level socket functions
 X<socket> X<sock>
@@ -235,7 +235,7 @@ C<abs>, C<bless>, C<break>, C<chomp>, C<chr>, C<continue>, C<default>,
 C<exists>, C<formline>, C<given>, C<glob>, C<import>, C<lc>, C<lcfirst>,
 C<lock>, C<map>, C<my>, C<no>, C<our>, C<prototype>, C<qr//>, C<qw//>, C<qx//>,
 C<readline>, C<readpipe>, C<ref>, C<sub>*, C<sysopen>, C<tie>, C<tied>, C<uc>,
-C<ucfirst>, C<untie>, C<use>, C<when>
+C<ucfirst>, C<use>, C<when>
 
 * - C<sub> was a keyword in perl4, but in perl5 it is an
 operator, which can be used in expressions.
@@ -6588,12 +6588,6 @@ error. If the input string is longer than one described by the TEMPLATE,
 the rest is ignored.
 
 See L</pack> for more examples and notes.
-
-=item untie VARIABLE
-X<untie>
-
-Breaks the binding between a variable and a package.  (See C<tie>.)
-Has no effect if the variable is not tied.
 
 =item unshift ARRAY,LIST
 X<unshift>

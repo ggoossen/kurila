@@ -72,7 +72,7 @@ if( %Is{?NW5} ) {
 
 map { delete %Is{$_} unless %Is{?$_} } keys %Is;
 _assert( nelems(%Is) == 2 );
-my($OS) = < keys %Is;
+my@($OS) =  keys %Is;
 
 
 my $class = "ExtUtils::MM_$OS";

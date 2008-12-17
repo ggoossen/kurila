@@ -159,7 +159,7 @@ sub set_up_relative_test {
 
     add_callback
 	( sub {
-	    my ($h, $op, $format, $level, $style) = < @_;
+	    my @($h, $op, $format, $level, $style) =  @_;
 
 	    # callback marks up const ops
 	    $h->{+arg} .= ' CALLBACK' if $h->{?name} eq 'const';

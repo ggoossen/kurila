@@ -1008,13 +1008,8 @@ C<make test TEST_VERBOSE=1> along with C<perl -V>.
 =head2 When I tried to run my script, I got this message. What does it mean?
 
 A complete list of Perl's error messages and warnings with explanatory
-text can be found in L<perldiag>. You can also use the splain program
-(distributed with Perl) to explain the error messages:
-
-    perl program 2>diag.out
-    splain [-v] [-p] diag.out
-
-or change your program to explain the messages for you:
+text can be found in L<perldiag>. You can also change your program to
+explain the messages for you:
 
     use diagnostics;
 

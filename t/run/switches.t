@@ -218,7 +218,7 @@ do {
 do {
     local $TODO = '';   # these ones should work on VMS
 
-    my (undef, $v) = < split m/-/, $^V;
+    my @(_, $v) =  split m/-/, $^V;
     my $archname = config_value('archname');
     like( runperl( switches => \@('-v') ),
 	  qr/This[ ]is[ ]kurila,[  ]v$v [ ] (?:DEVEL\w+[ ])? built[ ]for[ ]

@@ -271,18 +271,18 @@ unless (%opts{?a}) {
 ############
 
 sub test_pkg {
-    my ($pkg, $fntypes) = < @_;
+    my @($pkg, $fntypes) =  @_;
     require_ok($pkg);
 
     # build %stash: keys are func-names, vals filled in below
-    my (%stash) = %( < map
+    my @(%stash) =@( %( < map
 	( ($_ => 0), @(
 	   ( < grep exists &{*{Symbol::fetch_glob("$pkg\::$_")}}	# grab CODE symbols
 , grep !m/__ANON__/, keys %{*{Symbol::fetch_glob($pkg.'::')}}		# from symbol table
-	       ))) );
+	       ))) ));
 
     for my $type (keys %matchers) {
-	foreach my $fn ( @{$fntypes->{$type}}) {
+	foreach my $fn ( @{$fntypes->{?$type}}) {
 	    carp "$fn can only be one of $type, %stash{?$fn}\n"
 		if %stash{?$fn};
 	    %stash{+$fn} = $type;
@@ -293,7 +293,7 @@ sub test_pkg {
     for my $k (keys %stash) {
 	%stash{+$k} = $dflt unless %stash{?$k};
     }
-    %stash{+$_} = 'skip' foreach  @{$fntypes->{skip}};
+    %stash{+$_} = 'skip' foreach  @{$fntypes->{?skip}};
 
     if (%opts{?v}) {
 	diag("fntypes: " => < Dumper($fntypes));
@@ -309,12 +309,12 @@ sub test_pkg {
 }
 
 sub checkXS {
-    my ($func_name, $want) = < @_;
+    my @($func_name, $want) =  @_;
 
     croak "unknown type $want: $func_name\n"
 	unless defined %matchers{?$want};
 
-    my ($buf, $err) = < render($func_name);
+    my @($buf, $err) =  render($func_name);
     my $res = like($buf, %matchers{?$want}, "$want sub:\t $func_name");
 
     unless ($res) {
@@ -327,7 +327,7 @@ sub checkXS {
 }
 
 sub render {
-    my ($func_name) = < @_;
+    my @($func_name) =  @_;
 
     B::Concise::reset_sequence();
     B::Concise::walk_output(\my $buf);

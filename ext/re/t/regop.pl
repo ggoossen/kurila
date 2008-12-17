@@ -9,7 +9,7 @@ my @tests=@(
   'q'=>'[q]',
 );
 while ((nelems @tests)) {
-    my ($str,$pat)=splice @tests,0,2;
+    my @($str,$pat)=@(splice @tests,0,2);
     print STDERR "\n";
     $pat="m/$pat/" if substr($pat,0,2) ne 'm/';
     # string eval to get the free regex message in the right place.

@@ -29,7 +29,7 @@ while ( ~< $fh) {
 while ( ~< $fh) {
     chomp;
     next if !$_ or m/^#/;
-    my ($op, $opname) = < split m/\t+/;
+    my @($op, $opname, ...) =  split m/\t+/;
     push @op, \@($op, $opname, %code{?$op});
 }
 close $fh;
@@ -37,7 +37,7 @@ close $fh;
 plan(tests => nelems(@op));
 
 sub testop {
-    my ($op, $opname, $code) = < @_;
+    my @($op, $opname, $code) =  @_;
     pass("$op : skipped") and return if $code =~ m/^SKIP/;
     my $c = Safe->new();
     $c->deny_only($op);
@@ -92,7 +92,6 @@ qr		qr/foo/
 subst		s/foo/bar/
 substcont	SKIP (set by optimizer)
 sassign		$x = $y
-aassign		($x) = ($y)
 chop		chop @foo
 schop		chop
 chomp		chomp @foo
@@ -250,8 +249,6 @@ pipe_op		pipe FOO,BAR
 fileno		fileno FOO
 umask		umask 0755, 'foo'
 binmode		binmode FOO
-tie		tie
-untie		untie
 tied		tied
 sselect		SKIP (set by optimizer)
 select		select FOO

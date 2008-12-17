@@ -1,6 +1,5 @@
 package ExtUtils::MakeMaker::Config;
 
-
 our $VERSION = '6.44';
 
 use Config < qw(config_value config_keys);

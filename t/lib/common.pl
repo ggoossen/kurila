@@ -84,7 +84,7 @@ for ( @prgs){
     if (s/^(\s*-\w+)//){
         $switch = $1;
     }
-    my($prog,$expected) = < split(m/\nEXPECT(?:\n|$)/, $_, 2);
+    my@($prog,$expected) =  split(m/\nEXPECT(?:\n|$)/, $_, 2);
 
     my ($todo, $todo_reason);
     $todo = $prog =~ s/^#\s*TODO\s*(.*)\n//m and $todo_reason = $1;
@@ -226,7 +226,7 @@ sub randomMatch
 }
 
 sub print_err_line {
-    my($switch, $prog, $expected, $results, $todo) = < @_;
+    my @($switch, $prog, $expected, $results, $todo, $file) =  @_;
     my $err_line = "FILE: $file\n" .
                    "PROG: $switch\n$prog\n" .
 		   "EXPECTED:\n$expected\n" .

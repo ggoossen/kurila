@@ -28,7 +28,7 @@ use Text::Tabs < qw(expand unexpand);
 
 sub wrap
 {
-	my ($ip, $xp, < @t) = < @_;
+	my @($ip, $xp, @< @t) =  @_;
 
 	local($Text::Tabs::tabstop) = $tabstop;
 	my $r = "";
@@ -93,7 +93,7 @@ sub wrap
 
 sub fill 
 {
-	my ($ip, $xp, < @raw) = < @_;
+	my @($ip, $xp, @< @raw) =  @_;
 	my @para;
 
 	for my $pp (split(m/\n\s+/, join("\n", @raw))) {

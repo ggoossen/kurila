@@ -22,7 +22,7 @@ sub _u($$) { "@_[0] is ".(defined @_[1] ?? "'@_[1]'" !! "undef") }
 
 $_ = '123-456-789';
 foreach my $test ( @tests) {
-    my ($p, $pat,$l,$m,$r) = < @$test;
+    my @($p, $pat,$l,$m,$r) =  @$test;
     my $test_name = $p eq '/p'   ?? "/$pat/p"
                   !! $p eq '(?p)' ?? "/(?p)$pat/"
                   !!                "/$pat/";

@@ -22,22 +22,20 @@ do {my $const = "a constant"; sub a_const () {$const}};
 my @nums =1..10;
 
 my %hash = %(foo => 17, bar => 23);
-tie my %tied_hash, 'Tie::StdHash';
-%tied_hash = %( < %hash );
 
 # Load and run the tests
 my @tests = map \@(chomp and < split m/\t+/, $_, 3), grep !m/^#/ && m/\S/, @( ~< *DATA);
 plan tests => 2 * nelems @tests;
 
 for my $test ( @tests) {
-    my ($yn, $left, $right) = < @$test;
+    my @($yn, $left, $right) =  @$test;
 
     match_test($yn, $left, $right);
     match_test($yn, $right, $left);
 }
 
 sub match_test {
-    my ($yn, $left, $right) = < @_;
+    my @($yn, $left, $right) =  @_;
 
     die "Bad test spec: ($yn, $left, $right)"
 	unless $yn eq "" || $yn eq "!";
@@ -87,10 +85,6 @@ __DATA__
 	\%(1 => 2)	\%(1 => 2)
 	\%(1 => 2)	\%(1 => 3)
 !	\%(1 => 2)	\%(2 => 3)
-
-#  - tied hash ref
-	\%hash		\%tied_hash
-	\%tied_hash	\%tied_hash
 
 #  - an array ref
 	\%::		\@(keys %main::)

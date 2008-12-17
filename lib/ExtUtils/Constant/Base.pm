@@ -65,7 +65,7 @@ sub macro_from_item {
 }
 
 sub macro_to_ifdef {
-    my ($self, $macro) = < @_;
+    my @($self, $macro) =  @_;
     if (ref $macro) {
 	return $macro->[0];
     }
@@ -76,7 +76,7 @@ sub macro_to_ifdef {
 }
 
 sub macro_to_endif {
-    my ($self, $macro) = < @_;
+    my @($self, $macro) =  @_;
 
     if (ref $macro) {
 	return $macro->[1];
@@ -112,8 +112,8 @@ the front of I<name>).
 sub memEQ_clause {
 #    if (memEQ(name, "thingy", 6)) {
   # Which could actually be a character comparison or even ""
-  my ($self, $args) = < @_;
-  my ($name, $checked_at, $indent) = < %{$args}{[qw(name checked_at indent)]};
+  my @($self, $args) =  @_;
+  my @($name, $checked_at, $indent) =  %{$args}{[qw(name checked_at indent)]};
   $indent = ' ' x ($indent || 4);
   my $front_chop;
   if (ref $checked_at) {
@@ -202,9 +202,9 @@ I<default_types> and the I<ITEM>s.
 =cut
 
 sub dump_names {
-  my ($self, $args, < @items) = < @_;
-  my ($default_type, $what, $indent, $declare_types)
-    = < %{$args}{[qw(default_type what indent declare_types)]};
+  my @($self, $args, @< @items) =  @_;
+  my @($default_type, $what, $indent, $declare_types)
+    =  %{$args}{[qw(default_type what indent declare_types)]};
   $indent = ' ' x ($indent || 0);
 
   my $result;
@@ -293,8 +293,8 @@ of a block, so variables may be defined in it.
 sub assign {
   my $self = shift;
   my $args = shift;
-  my ($indent, $type, $pre, $post, $item)
-      = < %{$args}{[qw(indent type pre post item)]};
+  my @($indent, $type, $pre, $post, $item)
+      =  %{$args}{[qw(indent type pre post item)]};
   $post ||= '';
   my $clause;
   my $close;
@@ -341,11 +341,11 @@ sub return_clause {
 ##else
 #      return PERL_constant_NOTDEF;
 ##endif
-  my ($self, $args, $item) = < @_;
+  my @($self, $args, $item) =  @_;
   my $indent = $args->{?indent};
 
-  my ($name, $value, $default, $pre, $post, $def_pre, $def_post, $type)
-    = < %$item{[qw (name value default pre post def_pre def_post type)]};
+  my @($name, $value, $default, $pre, $post, $def_pre, $def_post, $type)
+    =  %$item{[qw (name value default pre post def_pre def_post type)]};
   $value = $name unless defined $value;
   my $macro = $self->macro_from_item($item);
   $indent = ' ' x ($indent || 6);
@@ -386,8 +386,8 @@ sub return_clause {
 
 sub match_clause {
   # $offset defined if we have checked an offset.
-  my ($self, $args, $item) = < @_;
-  my ($offset, $indent) = < %{$args}{[qw(checked_at indent)]};
+  my @($self, $args, $item) =  @_;
+  my @($offset, $indent) =  %{$args}{[qw(checked_at indent)]};
   $indent = ' ' x ($indent || 4);
   my $body = '';
   my ($no, $yes, $either, $name, $inner_indent);
@@ -431,8 +431,8 @@ each call).
 =cut
 
 sub switch_clause {
-  my ($self, $args, $namelen, $items, < @items) = < @_;
-  my ($indent, $comment) = < %{$args}{[qw(indent comment)]};
+  my @($self, $args, $namelen, $items, @< @items) =  @_;
+  my @($indent, $comment) =  %{$args}{[qw(indent comment)]};
   $indent = ' ' x ($indent || 2);
 
   local $Text::Wrap::huge = 'overflow';
@@ -465,7 +465,7 @@ sub switch_clause {
   # Prefer the last character over the others. (As it lets us shorten the
   # memEQ clause at no cost).
   foreach my $i (@($namelen - 1, < 0 .. ($namelen - 2))) {
-    my ($min, $max) = (^~^0, 0);
+    my @($min, $max) = @(^~^0, 0);
     my %spread;
     foreach ( @names) {
       my $char = substr $_, $i, 1;
@@ -500,7 +500,7 @@ sub switch_clause {
   die "Internal error. Failed to pick a switch point for $(join ' ',@names)"
     unless defined @best[2];
   # use Data::Dumper; print Dumper (@best);
-  my ($offset, $best) = < @best[[@(2,3)]];
+  my @($offset, $best) =  @best[[@(2,3)]];
   $body .= $indent . "/* Offset $offset gives the best switch position.  */\n";
 
   my $do_front_chop = $offset == 0 && $namelen +> 2;
@@ -624,7 +624,7 @@ sub normalise_items
         if (ref $orig) {
             # Make a copy which is a normalised version of the ref passed in.
             $name = $orig->{?name};
-            my ($type, $macro, $value) = < %$orig{[qw (type macro value)]};
+            my @($type, $macro, $value) =  %$orig{[qw (type macro value)]};
             $type ||= $default_type;
             $what->{+$type} = 1;
             $item = \%(name=>$name, type=>$type);
@@ -766,8 +766,8 @@ example C<constant_5> for names 5 characters long.  The default I<breakout> is
 # scalar reference.
 
 sub C_constant {
-  my ($self, $args, < @items) = < @_;
-  my ($package, $subname, $default_type, $what, $indent, $breakout) = <
+  my @($self, $args, @< @items) =  @_;
+  my @($package, $subname, $default_type, $what, $indent, $breakout) = 
     %{$args}{[qw(package subname default_type types indent breakout)]};
   $package ||= 'Foo';
   $subname ||= 'constant';
@@ -779,7 +779,7 @@ sub C_constant {
   if (ref $breakout) {
     # We are called recursively. We trust @items to be normalised, $what to
     # be a hashref, and pinch %$items from our parent to save recalculation.
-    ($namelen, $items) = < @$breakout;
+    @($namelen, $items) =  @$breakout;
   } else {
     $items = \%();
     $breakout ||= 3;
@@ -826,7 +826,7 @@ sub C_constant {
     # Need to group names of the same length
     my @by_length;
     foreach ( @items) {
-      push @{@by_length[length $_->{?name}]}, $_;
+      push @{@by_length[+ length $_->{?name}]}, $_;
     }
     foreach my $i (0 .. ((nelems @by_length)-1)) {
       next unless @by_length[$i];	# None of this length

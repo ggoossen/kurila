@@ -5,8 +5,8 @@ use vars < qw( $Perl $Inc);
 
 sub readFile
 {
-    my ($filename) = < @_ ;
-    my ($string) = '' ;
+    my @($filename) =  @_ ;
+    my @($string) = '' ;
 
     open (F, "<", "$filename") 
 	or die "Cannot open $filename: $!\n" ;
@@ -18,7 +18,7 @@ sub readFile
 
 sub writeFile
 {
-    my($filename, < @strings) = < @_ ;
+    my@($filename, @< @strings) =  @_ ;
     open (F, ">", "$filename") 
 	or die "Cannot open $filename: $!\n" ;
     binmode(F) if $filename =~ m/bin$/i;
@@ -29,7 +29,7 @@ sub writeFile
 
 sub ok
 {
-    my($number, $result, $note) = < @_ ;
+    my@($number, $result, $note) =  @_ ;
  
     $note = "" if ! defined $note ;
     if ($note) {

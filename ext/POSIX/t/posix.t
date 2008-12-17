@@ -67,7 +67,7 @@ SKIP: do {
 	my $mask   = POSIX::SigSet->new( &SIGINT( < @_ ));
 	my $action = POSIX::SigAction->new( \&main::SigHUP, $mask, 0);
 	sigaction(&SIGHUP( < @_ ), $action);
-	%SIG{+'INT'} = \&SigINT;
+	signals::set_handler('INT' => \&SigINT);
 
 	# At least OpenBSD/i386 3.3 is okay, as is NetBSD 1.5.
 	# But not NetBSD 1.6 & 1.6.1: the test makes perl crash.
@@ -137,7 +137,7 @@ SKIP: do {
     my $lc = &POSIX::setlocale(&POSIX::LC_NUMERIC( < @_ ), 'C') if config_value('d_setlocale');
 
     # we're just checking that strtod works, not how accurate it is
-    my ($n, $x) = < &POSIX::strtod('3.14159_OR_SO');
+    my @($n, $x) =  &POSIX::strtod('3.14159_OR_SO');
     ok((abs("3.14159" - $n) +< 1e-6) && ($x == 6), 'strtod works');
 
     &POSIX::setlocale(&POSIX::LC_NUMERIC( < @_ ), $lc) if config_value('d_setlocale');
@@ -146,7 +146,7 @@ SKIP: do {
 SKIP: do {
     skip("strtol() not present", 2) unless config_value('d_strtol');
 
-    my ($n, $x) = < &POSIX::strtol('21_PENGUINS');
+    my @($n, $x) =  &POSIX::strtol('21_PENGUINS');
     is($n, 21, 'strtol() number');
     is($x, 9,  '         unparsed chars');
 };
@@ -154,7 +154,7 @@ SKIP: do {
 SKIP: do {
     skip("strtoul() not present", 2) unless config_value('d_strtoul');
 
-    my ($n, $x) = < &POSIX::strtoul('88_TEARS');
+    my @($n, $x) =  &POSIX::strtoul('88_TEARS');
     is($n, 88, 'strtoul() number');
     is($x, 6,  '          unparsed chars');
 };

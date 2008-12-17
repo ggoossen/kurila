@@ -2,7 +2,7 @@
 
 BEGIN { require "./test.pl" }
 
-plan tests => 14;
+plan tests => 15;
 
 my %a = %('aap', 'noot', 'mies', 'teun');
 
@@ -33,7 +33,6 @@ do {
 };
 
 do {
-    use warnings;
     my %c = %( "aap" => "rat" );
     %c{+"roodborstje"};
     ok( exists %c{"roodborstje"} );
@@ -41,6 +40,7 @@ do {
 };
 
 do {
+    # OPpDEREF and OPpHELEM_OPTIONAL
     my %c = %();
-    %c{"slak"} = "vlieg";
-};
+    is( %c{?"aap"}->{?"noot"}, undef );
+}

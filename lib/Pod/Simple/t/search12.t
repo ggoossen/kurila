@@ -51,7 +51,7 @@ print $x->_state_as_string;
 use Pod::Simple;
 *pretty = \&Pod::Simple::BlackBox::pretty;
 
-my($name2where, $where2name) = ($x->survey('.'), $x->path2name);
+my@($name2where, $where2name) = @($x->survey('.'), $x->path2name);
 
 my $p = pretty( $where2name, $name2where )."\n";
 $p =~ s/, +/,\n/g;

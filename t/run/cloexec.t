@@ -54,7 +54,7 @@ skip_all("VMS")      if $Is_VMS;
 skip_all("Win32")    if $Is_Win32;
 
 sub make_tmp_file {
-    my ($fname, $fcontents) = < @_;
+    my @($fname, $fcontents) =  @_;
     local *FHTMP;
     open   FHTMP, ">", "$fname"  or die "open  '$fname': $!";
     print  FHTMP $fcontents  or die "print '$fname': $!";

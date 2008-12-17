@@ -75,9 +75,9 @@ sub testpodcheck( @ ) {
 sub testpodchecker( @ ) {
    my %opts = %( (ref @_[0] eq 'HASH') ?? < %{shift()} !! () );
    my @testpods = @_;
-   my ($testname, $testdir) = ("", "");
+   my @($testname, $testdir) = @("", "");
    my $cmpfile = "";
-   my ($outfile, $errfile) = ("", "");
+   my @($outfile, $errfile) = @("", "");
    my $passes = 0;
    my $failed = 0;
    local $_;
@@ -85,7 +85,7 @@ sub testpodchecker( @ ) {
    print "1..", nelems @testpods, "\n"  unless (%opts{?'xrgen'});
 
    for my $podfile ( @testpods) {
-      ($testname, $_) = < fileparse($podfile);
+      @($testname, $_, ...) =  fileparse($podfile);
       $testdir ||=  $_;
       $testname  =~ s/\.t$//;
       $cmpfile   =  $testdir . $testname . '.xr';

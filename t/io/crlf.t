@@ -74,7 +74,7 @@ else {
 }
 
 sub count_chars {
-    my($text, $chars) = < @_;
+    my@($text, $chars) =  @_;
     my $seen = 0;
     $seen++ while $text =~ m/$chars/g;
     return $seen;

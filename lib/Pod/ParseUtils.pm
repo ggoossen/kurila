@@ -159,7 +159,7 @@ If an argument has been given, it is pushed on the list of items.
 
 # The individual =items of this list
 sub item {
-    my ($self,$item) = < @_;
+    my @($self, ?$item) =  @_;
     if(defined $item) {
         push(@{$self->{_items}}, $item);
         return $item;
@@ -279,7 +279,7 @@ sub parse {
     my $self = shift;
     local($_) = @_[0];
     # syntax check the link and extract destination
-    my ($alttext,$page,$node,$type,$quoted) = (undef,'','','',0);
+    my @($alttext,$page,$node,$type,$quoted) = @(undef,'','','',0);
 
     $self->{+_warnings} = \@();
 
@@ -314,30 +314,30 @@ sub parse {
     }
     # alttext, page and "section"
     elsif(m!^(.*?)\s*[|]\s*($page_rx)\s*/\s*"(.+)"$!o) {
-        ($alttext, $page, $node) = ($1, $2, $3);
+        @($alttext, $page, $node) = @($1, $2, $3);
         $type = 'section';
         $quoted = 1; #... therefore | and / are allowed
     }
     # alttext and page
     elsif(m!^(.*?)\s*[|]\s*($page_rx)$!o) {
-        ($alttext, $page) = ($1, $2);
+        @($alttext, $page) = @($1, $2);
         $type = 'page';
     }
     # alttext and "section"
     elsif(m!^(.*?)\s*[|]\s*(?:/\s*|)"(.+)"$!) {
-        ($alttext, $node) = ($1,$2);
+        @($alttext, $node) = @($1,$2);
         $type = 'section';
         $quoted = 1;
     }
     # page and "section"
     elsif(m!^($page_rx)\s*/\s*"(.+)"$!o) {
-        ($page, $node) = ($1, $2);
+        @($page, $node) = @($1, $2);
         $type = 'section';
         $quoted = 1;
     }
     # page and item
     elsif(m!^($page_rx)\s*/\s*(.+)$!o) {
-        ($page, $node) = ($1, $2);
+        @($page, $node) = @($1, $2);
         $type = 'item';
     }
     # only "section"
@@ -354,7 +354,7 @@ sub parse {
 
     # non-standard: Hyperlink with alt-text - doesn't remove protocol prefix, maybe it should?
     elsif(m!^ \s* (.*?) \s* [|] \s* (\w+:[^:\s] [^\s|]*?) \s* $!ix) {
-      ($alttext,$node) = ($1,$2);
+      @($alttext,$node) = @($1,$2);
       $type = 'hyperlink';
     }
 
@@ -365,12 +365,12 @@ sub parse {
     }
     # alttext, page and item
     elsif(m!^(.*?)\s*[|]\s*($page_rx)\s*/\s*(.+)$!o) {
-        ($alttext, $page, $node) = ($1, $2, $3);
+        @($alttext, $page, $node) = @($1, $2, $3);
         $type = 'item';
     }
     # alttext and item
     elsif(m!^(.*?)\s*[|]\s*/(.+)$!) {
-        ($alttext, $node) = ($1,$2);
+        @($alttext, $node) = @($1,$2);
     }
     # must be an item or a "malformed" section (without "")
     else {
@@ -604,7 +604,7 @@ sub link {
 }
 
 sub _invalid_link {
-    my ($msg) = < @_;
+    my @($msg) =  @_;
     # this sets @_
     #try { die "$msg\n" };
     #chomp $@;
@@ -651,7 +651,7 @@ list of all cache elements.
 =cut
 
 sub item {
-    my ($self,< %param) = < @_;
+    my @($self,%< %param) =  @_;
     if(%param) {
         my $item = Pod::Cache::Item->new(< %param);
         push(@$self, $item);
@@ -673,7 +673,7 @@ not found.
 =cut
 
 sub find_page {
-    my ($self,$page) = < @_;
+    my @($self,$page) =  @_;
     foreach( @$self) {
         if($_->page() eq $page) {
             return $_;
@@ -773,9 +773,9 @@ unique id for the C<find_node> method to work correctly.
 
 # The POD nodes
 sub nodes {
-    my ($self,< @nodes) = < @_;
+    my @($self,@< @nodes) =  @_;
     if((nelems @nodes)) {
-        push(@{$self->{-nodes}}, < @nodes);
+        push(@{$self->{nodes}}, < @nodes);
         return @nodes;
     }
     else {
@@ -792,7 +792,7 @@ stored in the node array) or undef if not found.
 =cut
 
 sub find_node {
-    my ($self,$node) = < @_;
+    my @($self,$node) =  @_;
     my @search;
     push(@search, < @{$self->{?nodes}}) if($self->{?nodes});
     push(@search, < @{$self->{?idx}}) if($self->{?idx});
@@ -819,9 +819,9 @@ unique id.
 
 # The POD index entries
 sub idx {
-    my ($self,< @idx) = < @_;
+    my @($self,@< @idx) =  @_;
     if((nelems @idx)) {
-        push(@{$self->{-idx}}, < @idx);
+        push(@{$self->{idx}}, < @idx);
         return @idx;
     }
     else {

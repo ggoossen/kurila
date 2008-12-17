@@ -21,19 +21,18 @@ sub import {
             $_ = shift;
             if (m/^[A-Z][A-Z0-9]*$/) {
                 $saw_sig++;
-                unless ($untrapped and %SIG{?$_} and %SIG{?$_} ne 'DEFAULT') {
+                unless ($untrapped and signals::handler($_)
+                          and signals::handler($_) ne 'DEFAULT') {
                     print "Installing handler $(dump::view($handler)) for $_\n" if $Verbose;
-                    %SIG{+$_} = $handler;
+                    signals::set_handler($_, $handler);
                 }
             } elsif ($_ eq 'normal-signals') {
-                unshift @_, < grep(exists %SIG{$_}, qw(HUP INT PIPE TERM));
+                unshift @_, < grep { signals::supported($_) } qw(HUP INT PIPE TERM);
             } elsif ($_ eq 'error-signals') {
-                unshift @_, < grep(exists %SIG{$_},
-                                   qw(ABRT BUS EMT FPE ILL QUIT SEGV SYS TRAP));
+                unshift @_, < grep { signals::supported($_) } qw(ABRT BUS EMT FPE ILL QUIT SEGV SYS TRAP);
             } elsif ($_ eq 'old-interface-signals') {
                 unshift @_,
-                  < grep(exists %SIG{$_},
-                         qw(ABRT BUS EMT FPE ILL PIPE QUIT SEGV SYS TERM TRAP));
+                  < grep { signals::supported($_) } qw(ABRT BUS EMT FPE ILL PIPE QUIT SEGV SYS TERM TRAP);
             } elsif ($_ eq 'stack-trace') {
                 $handler = \&handler_traceback;
             } elsif ($_ eq 'die') {
@@ -67,12 +66,12 @@ sub handler_die {
 
 sub handler_traceback {
     our $panic;
-    %SIG{+'ABRT'} = 'DEFAULT';
+    signals::set_handler('ABRT', 'DEFAULT');
     kill 'ABRT', $$ if $panic++;
     syswrite(STDERR, 'Caught a SIG', 12);
     syswrite(STDERR, @_[0], length(@_[0]));
     syswrite(STDERR, ' at ', 4);
-    our ($pack,$file,$line) = caller;
+    our @($pack,$file,$line) =@( caller);
     syswrite(STDERR, $file, length($file));
     syswrite(STDERR, ' line ', 6);
     syswrite(STDERR, $line, length($line));
@@ -80,7 +79,7 @@ sub handler_traceback {
 
     # Now go for broke.
     my $i = 1;
-    while (my ($p,$f,$l,$s,$h,$w,$e,$r) = caller($i)) {
+    while (my @($p,$f,$l,$s,$h,$w,$e,$r) = caller@($i)) {
         my @a = @( () );
 	for ( @DB::args) {
 	    s/([\'\\])/\\$1/g;

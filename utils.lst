@@ -13,5 +13,4 @@ utils/perlbug	# link = utils/perlthanks
 utils/perldoc   # pod = pod/perldoc.pod
 utils/perlivp
 utils/pl2pm
-utils/splain
 utils/xsubpp

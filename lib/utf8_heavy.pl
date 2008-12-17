@@ -18,7 +18,7 @@ our (%PropertyAlias, %PA_reverse, %PropValueAlias, %PVA_reverse, %PVA_abbr_map);
 use bytes;
 
 sub SWASHNEW_real {
-    my ($class, $type, $list, $minbits, $none) = < @_;
+    my @($class, $type, $list, $minbits, $none) =  @_;
     local $^D = 0 if $^D;
 
     print STDERR "SWASHNEW $(join ' ',@_)\n" if DEBUG;
@@ -94,7 +94,7 @@ sub SWASHNEW_real {
 	    ##
 	    require "unicore/PVA.pl";
 	    if ($type =~ m/^([\w\s]+)[:=]\s*(.*)/) {
-		my ($enum, $val) = (lc $1, lc $2);
+		my @($enum, $val) = @(lc $1, lc $2);
 		$enum =~ s/[ _-]//g;
 		$val =~ s/[ _-]//g;
 
@@ -242,7 +242,7 @@ sub SWASHNEW_real {
 	    my $name = $2;
 	    print STDERR "$1 => $2\n" if DEBUG;
 	    if ($char =~ m/[-+!&]/) {
-		my ($c,$t) = < split(m/::/, $name, 2);	# bogus use of ::, really
+		my @($c,?$t) =  split(m/::/, $name, 2);	# bogus use of ::, really
 		my $subobj;
 		if ($c eq 'utf8') {
 		    $subobj = SWASHNEW_real('utf8', $t, "", $minbits, 0);

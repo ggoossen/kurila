@@ -101,7 +101,7 @@ sub touch
 
 sub writeFile
 {
-    my($filename, < @strings) = < @_ ;
+    my@($filename, @< @strings) =  @_ ;
     1 while unlink $filename ;
     open (F, ">", "$filename") 
         or croak "Cannot open $filename: $!\n" ;
@@ -115,9 +115,9 @@ sub writeFile
 
 sub GZreadFile
 {
-    my ($filename) = shift ;
+    my @($filename) =@( shift) ;
 
-    my ($uncomp) = "" ;
+    my $uncomp = "" ;
     my $line = "" ;
     my $fil = gzopen($filename, "rb") 
         or croak "Cannopt open '$filename': $Compress::Zlib::gzerrno" ;
@@ -199,7 +199,7 @@ EOM
 
 sub cmpFile
 {
-    my ($filename, $uue) = < @_ ;
+    my @($filename, $uue) =  @_ ;
     return readFile($filename) eq unpack("u", $uue) ;
 }
 
@@ -559,7 +559,7 @@ sub mkComplete
 sub mkErr
 {
     my $string = shift ;
-    my ($dummy, $file, $line) = caller ;
+    my @($dummy, $file, $line) =@( caller) ;
     -- $line ;
 
     $file = quotemeta($file);
@@ -578,7 +578,7 @@ sub dumpObj
 {
     my $obj = shift ;
 
-    my ($dummy, $file, $line) = caller ;
+    my @($dummy, $file, $line) =@( caller) ;
 
     if ((nelems @_))
     {

@@ -15,7 +15,7 @@ my (@enums, @names);
 while ( ~< *DATA) {
   next if m/^#/;
   next if m/^$/;
-  my ($enum, $name) = m/^(\S+)\s+(\S+)/ or die "Can't parse $_";
+  my @($enum, $name) = m/^(\S+)\s+(\S+)/ or die "Can't parse $_";
   push @enums, $enum;
   push @names, $name;
 }

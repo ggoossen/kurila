@@ -101,36 +101,12 @@ END_EXTERN_C
 
 /* functions with flag 'n' should come before here */
 START_EXTERN_C
-PERL_INLINE_CALLCONV SV*	Perl_HvSv(pTHX_ HV *hv)
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_HVSV	\
-	assert(hv)
-
-PERL_INLINE_CALLCONV SV*	Perl_AvSv(pTHX_ AV *av)
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_AVSV	\
-	assert(av)
-
-PERL_INLINE_CALLCONV SV*	Perl_CvSv(pTHX_ CV *cv)
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_CVSV	\
-	assert(cv)
-
-PERL_INLINE_CALLCONV SV*	Perl_GvSv(pTHX_ GV *cv)
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_GVSV	\
-	assert(cv)
-
-PERL_INLINE_CALLCONV SV*	Perl_IoSv(pTHX_ struct io *cv)
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_IOSV	\
-	assert(cv)
-
-PERL_INLINE_CALLCONV SV*	Perl_ReSv(pTHX_ REGEXP *cv)
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_RESV	\
-	assert(cv)
-
+PERL_INLINE_CALLCONV SV*	Perl_HvSv(pTHX_ HV *hv);
+PERL_INLINE_CALLCONV SV*	Perl_AvSv(pTHX_ AV *av);
+PERL_INLINE_CALLCONV SV*	Perl_CvSv(pTHX_ CV *cv);
+PERL_INLINE_CALLCONV SV*	Perl_GvSv(pTHX_ GV *gv);
+PERL_INLINE_CALLCONV SV*	Perl_IoSv(pTHX_ struct io *io);
+PERL_INLINE_CALLCONV SV*	Perl_ReSv(pTHX_ REGEXP *re);
 PERL_INLINE_CALLCONV AV*	Perl_SvAv(pTHX_ SV *sv)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_SVAV	\
@@ -173,12 +149,20 @@ PERL_INLINE_CALLCONV NV	Perl_SvNV(pTHX_ SV *sv)
 #define PERL_ARGS_ASSERT_SVNV	\
 	assert(sv)
 
-#  include "pp_proto.h"
-PERL_CALLCONV bool	Perl_Gv_AMupdate(pTHX_ HV* stash)
+PERL_INLINE_CALLCONV SV*	Perl_LocationFilename(pTHX_ SV *location)
 			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_GV_AMUPDATE	\
-	assert(stash)
+#define PERL_ARGS_ASSERT_LOCATIONFILENAME	\
+	assert(location)
 
+
+PERL_INLINE_CALLCONV PERL_CONTEXT*	Perl_PushBlock(pTHX_ U8 t, SV** sp, U8 gimme)
+			__attribute__nonnull__(pTHX_2);
+#define PERL_ARGS_ASSERT_PUSHBLOCK	\
+	assert(sp)
+
+PERL_INLINE_CALLCONV PERL_CONTEXT*	Perl_PopBlock(pTHX);
+
+#  include "pp_proto.h"
 PERL_CALLCONV OP*	Perl_append_elem(pTHX_ I32 optype, OP* first, OP* last);
 PERL_CALLCONV OP*	Perl_append_list(pTHX_ I32 optype, LISTOP* first, LISTOP* last);
 PERL_CALLCONV I32	Perl_apply(pTHX_ I32 type, SV** mark, SV** sp)
@@ -308,10 +292,20 @@ PERL_CALLCONV int	Perl_block_start(pTHX_ int full)
 			__attribute__warn_unused_result__;
 
 PERL_CALLCONV void	Perl_boot_core_UNIVERSAL(pTHX);
+PERL_CALLCONV void	Perl_boot_core_error(pTHX);
+PERL_CALLCONV void	Perl_boot_core_version(pTHX);
+PERL_CALLCONV void	Perl_boot_core_utf8(pTHX);
+PERL_CALLCONV void	Perl_boot_core_Internals(pTHX);
+PERL_CALLCONV void	Perl_boot_core_signals(pTHX);
 PERL_CALLCONV void	Perl_boot_core_PerlIO(pTHX);
 PERL_CALLCONV void	Perl_call_list(pTHX_ I32 oldscope, AV *paramList)
 			__attribute__nonnull__(pTHX_2);
 #define PERL_ARGS_ASSERT_CALL_LIST	\
+	assert(paramList)
+
+PERL_CALLCONV void	Perl_call_list_onleave(pTHX_ I32 oldscope, AV *paramList)
+			__attribute__nonnull__(pTHX_2);
+#define PERL_ARGS_ASSERT_CALL_LIST_ONLEAVE	\
 	assert(paramList)
 
 PERL_CALLCONV bool	Perl_cando(pTHX_ Mode_t mode, bool effective, const Stat_t* statbufp)
@@ -337,7 +331,7 @@ PERL_CALLCONV I32	Perl_my_chsize(pTHX_ int fd, Off_t length)
 			__attribute__warn_unused_result__;
 
 #endif
-PERL_CALLCONV OP*	Perl_convert(pTHX_ I32 optype, I32 flags, OP* o, SV* location)
+PERL_CALLCONV OP*	Perl_convert(pTHX_ I32 optype, OPFLAGS flags, OP* o, SV* location)
 			__attribute__warn_unused_result__;
 
 PERL_CALLCONV PERL_CONTEXT*	Perl_create_eval_scope(pTHX_ U32 flags);
@@ -1499,12 +1493,6 @@ PERL_CALLCONV int	Perl_magic_clearpack(pTHX_ SV* sv, MAGIC* mg)
 #define PERL_ARGS_ASSERT_MAGIC_CLEARPACK	\
 	assert(sv); assert(mg)
 
-PERL_CALLCONV int	Perl_magic_clearsig(pTHX_ SV* sv, MAGIC* mg)
-			__attribute__nonnull__(pTHX_1)
-			__attribute__nonnull__(pTHX_2);
-#define PERL_ARGS_ASSERT_MAGIC_CLEARSIG	\
-	assert(sv); assert(mg)
-
 PERL_CALLCONV int	Perl_magic_existspack(pTHX_ SV* sv, const MAGIC* mg)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2);
@@ -1523,22 +1511,10 @@ PERL_CALLCONV int	Perl_magic_getdefelem(pTHX_ SV* sv, MAGIC* mg)
 #define PERL_ARGS_ASSERT_MAGIC_GETDEFELEM	\
 	assert(sv); assert(mg)
 
-PERL_CALLCONV int	Perl_magic_getnkeys(pTHX_ SV* sv, MAGIC* mg)
-			__attribute__nonnull__(pTHX_1)
-			__attribute__nonnull__(pTHX_2);
-#define PERL_ARGS_ASSERT_MAGIC_GETNKEYS	\
-	assert(sv); assert(mg)
-
 PERL_CALLCONV int	Perl_magic_getpack(pTHX_ SV* sv, MAGIC* mg)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2);
 #define PERL_ARGS_ASSERT_MAGIC_GETPACK	\
-	assert(sv); assert(mg)
-
-PERL_CALLCONV int	Perl_magic_getsig(pTHX_ SV* sv, MAGIC* mg)
-			__attribute__nonnull__(pTHX_1)
-			__attribute__nonnull__(pTHX_2);
-#define PERL_ARGS_ASSERT_MAGIC_GETSIG	\
 	assert(sv); assert(mg)
 
 PERL_CALLCONV int	Perl_magic_gettaint(pTHX_ SV* sv, MAGIC* mg)
@@ -1635,12 +1611,6 @@ PERL_CALLCONV int	Perl_magic_setmglob(pTHX_ SV* sv, MAGIC* mg)
 #define PERL_ARGS_ASSERT_MAGIC_SETMGLOB	\
 	assert(sv); assert(mg)
 
-PERL_CALLCONV int	Perl_magic_setnkeys(pTHX_ SV* sv, MAGIC* mg)
-			__attribute__nonnull__(pTHX_1)
-			__attribute__nonnull__(pTHX_2);
-#define PERL_ARGS_ASSERT_MAGIC_SETNKEYS	\
-	assert(sv); assert(mg)
-
 PERL_CALLCONV int	Perl_magic_setpack(pTHX_ SV* sv, MAGIC* mg)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2);
@@ -1651,12 +1621,6 @@ PERL_CALLCONV int	Perl_magic_setregexp(pTHX_ SV* sv, MAGIC* mg)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2);
 #define PERL_ARGS_ASSERT_MAGIC_SETREGEXP	\
-	assert(sv); assert(mg)
-
-PERL_CALLCONV int	Perl_magic_setsig(pTHX_ SV* sv, MAGIC* mg)
-			__attribute__nonnull__(pTHX_1)
-			__attribute__nonnull__(pTHX_2);
-#define PERL_ARGS_ASSERT_MAGIC_SETSIG	\
 	assert(sv); assert(mg)
 
 PERL_CALLCONV int	Perl_magic_settaint(pTHX_ SV* sv, MAGIC* mg)
@@ -1788,10 +1752,12 @@ PERL_CALLCONV void	Perl_mini_mktime(pTHX_ struct tm *ptm)
 	assert(ptm)
 
 PERL_CALLCONV OP*	Perl_mod(pTHX_ OP* o, I32 type);
-PERL_CALLCONV OP*	Perl_assign(pTHX_ OP* o, bool partial)
-			__attribute__nonnull__(pTHX_1);
+PERL_CALLCONV OP*	Perl_assign(pTHX_ OP* o, bool partial, I32 *min_modcount, I32 *max_modcount)
+			__attribute__nonnull__(pTHX_1)
+			__attribute__nonnull__(pTHX_3)
+			__attribute__nonnull__(pTHX_4);
 #define PERL_ARGS_ASSERT_ASSIGN	\
-	assert(o)
+	assert(o); assert(min_modcount); assert(max_modcount)
 
 PERL_CALLCONV int	Perl_mode_from_discipline(pTHX_ SV* discp);
 PERL_CALLCONV const char*	Perl_moreswitches(pTHX_ const char* s)
@@ -1898,11 +1864,11 @@ PERL_CALLCONV OP*	Perl_newANONHASH(pTHX_ OP* o, SV* location)
 			__attribute__warn_unused_result__;
 
 PERL_CALLCONV OP*	Perl_newANONSUB(pTHX_ I32 floor, OP* proto, OP* block);
-PERL_CALLCONV OP*	Perl_newASSIGNOP(pTHX_ I32 flags, OP* left, I32 optype, OP* right, SV* location)
+PERL_CALLCONV OP*	Perl_newASSIGNOP(pTHX_ OPFLAGS flags, OP* left, I32 optype, OP* right, SV* location)
 			__attribute__malloc__
 			__attribute__warn_unused_result__;
 
-PERL_CALLCONV OP*	Perl_newCONDOP(pTHX_ I32 flags, OP* first, OP* trueop, OP* falseop, SV* location)
+PERL_CALLCONV OP*	Perl_newCONDOP(pTHX_ OPFLAGS flags, OP* first, OP* trueop, OP* falseop, SV* location)
 			__attribute__malloc__
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(pTHX_2);
@@ -1910,14 +1876,14 @@ PERL_CALLCONV OP*	Perl_newCONDOP(pTHX_ I32 flags, OP* first, OP* trueop, OP* fal
 	assert(first)
 
 PERL_CALLCONV CV*	Perl_newCONSTSUB(pTHX_ const char* name, SV* sv);
-PERL_CALLCONV OP*	Perl_newFOROP(pTHX_ I32 flags, char* label, OP* sv, OP* expr, OP* block, OP* cont, SV* location)
+PERL_CALLCONV OP*	Perl_newFOROP(pTHX_ OPFLAGS flags, char* label, OP* sv, OP* expr, OP* block, OP* cont, SV* location)
 			__attribute__malloc__
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(pTHX_4);
 #define PERL_ARGS_ASSERT_NEWFOROP	\
 	assert(expr)
 
-PERL_CALLCONV OP*	Perl_newLOGOP(pTHX_ I32 optype, I32 flags, OP *first, OP *other, SV* location)
+PERL_CALLCONV OP*	Perl_newLOGOP(pTHX_ I32 optype, OPFLAGS flags, OP *first, OP *other, SV* location)
 			__attribute__malloc__
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(pTHX_3)
@@ -1932,15 +1898,15 @@ PERL_CALLCONV OP*	Perl_newLOOPEX(pTHX_ I32 type, OP* label)
 #define PERL_ARGS_ASSERT_NEWLOOPEX	\
 	assert(label)
 
-PERL_CALLCONV OP*	Perl_newLOOPOP(pTHX_ I32 flags, I32 debuggable, OP* expr, OP* block, bool once, SV* location)
+PERL_CALLCONV OP*	Perl_newLOOPOP(pTHX_ OPFLAGS flags, I32 debuggable, OP* expr, OP* block, bool once, SV* location)
 			__attribute__malloc__
 			__attribute__warn_unused_result__;
 
-PERL_CALLCONV OP*	Perl_newNULLLIST(pTHX)
+PERL_CALLCONV OP*	Perl_newNULLLIST(pTHX_ SV *location)
 			__attribute__malloc__
 			__attribute__warn_unused_result__;
 
-PERL_CALLCONV OP*	Perl_newOP(pTHX_ I32 optype, I32 flags, SV* location)
+PERL_CALLCONV OP*	Perl_newOP(pTHX_ I32 optype, OPFLAGS flags, SV* location)
 			__attribute__malloc__
 			__attribute__warn_unused_result__;
 
@@ -1949,7 +1915,7 @@ PERL_CALLCONV void	Perl_newPROG(pTHX_ OP* o)
 #define PERL_ARGS_ASSERT_NEWPROG	\
 	assert(o)
 
-PERL_CALLCONV OP*	Perl_newRANGE(pTHX_ I32 flags, OP* left, OP* right)
+PERL_CALLCONV OP*	Perl_newRANGE(pTHX_ OPFLAGS flags, OP* left, OP* right)
 			__attribute__malloc__
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(pTHX_2)
@@ -1957,11 +1923,11 @@ PERL_CALLCONV OP*	Perl_newRANGE(pTHX_ I32 flags, OP* left, OP* right)
 #define PERL_ARGS_ASSERT_NEWRANGE	\
 	assert(left); assert(right)
 
-PERL_CALLCONV OP*	Perl_newSLICEOP(pTHX_ I32 flags, OP* subscript, OP* listop)
+PERL_CALLCONV OP*	Perl_newSLICEOP(pTHX_ OPFLAGS flags, OP* subscript, OP* listop)
 			__attribute__malloc__
 			__attribute__warn_unused_result__;
 
-PERL_CALLCONV OP*	Perl_newSTATEOP(pTHX_ I32 flags, char* label, OP* o, SV* location)
+PERL_CALLCONV OP*	Perl_newSTATEOP(pTHX_ OPFLAGS flags, char* label, OP* o, SV* location)
 			__attribute__malloc__
 			__attribute__warn_unused_result__;
 
@@ -1994,15 +1960,15 @@ PERL_CALLCONV OP*	Perl_newAVREF(pTHX_ OP* o, SV* location)
 #define PERL_ARGS_ASSERT_NEWAVREF	\
 	assert(o)
 
-PERL_CALLCONV OP*	Perl_newBINOP(pTHX_ I32 type, I32 flags, OP* first, OP* last, SV* location)
+PERL_CALLCONV OP*	Perl_newBINOP(pTHX_ I32 type, OPFLAGS flags, OP* first, OP* last, SV* location)
 			__attribute__malloc__
 			__attribute__warn_unused_result__;
 
-PERL_CALLCONV OP*	Perl_newCVREF(pTHX_ I32 flags, OP* o, SV* location)
+PERL_CALLCONV OP*	Perl_newCVREF(pTHX_ OPFLAGS flags, OP* o, SV* location)
 			__attribute__malloc__
 			__attribute__warn_unused_result__;
 
-PERL_CALLCONV OP*	Perl_newGVOP(pTHX_ I32 type, I32 flags, GV* gv, SV* location)
+PERL_CALLCONV OP*	Perl_newGVOP(pTHX_ I32 type, OPFLAGS flags, GV* gv, SV* location)
 			__attribute__malloc__
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(pTHX_3);
@@ -2044,15 +2010,15 @@ PERL_CALLCONV IO*	Perl_newIO(pTHX)
 			__attribute__malloc__
 			__attribute__warn_unused_result__;
 
-PERL_CALLCONV OP*	Perl_newLISTOP(pTHX_ I32 type, I32 flags, OP* first, OP* last, SV* location)
+PERL_CALLCONV OP*	Perl_newLISTOP(pTHX_ I32 type, OPFLAGS flags, OP* first, OP* last, SV* location)
 			__attribute__malloc__
 			__attribute__warn_unused_result__;
 
-PERL_CALLCONV OP*	Perl_newPMOP(pTHX_ I32 type, I32 flags, SV* location)
+PERL_CALLCONV OP*	Perl_newPMOP(pTHX_ I32 type, OPFLAGS flags, SV* location)
 			__attribute__malloc__
 			__attribute__warn_unused_result__;
 
-PERL_CALLCONV OP*	Perl_newPVOP(pTHX_ I32 type, I32 flags, char* pv, SV* location)
+PERL_CALLCONV OP*	Perl_newPVOP(pTHX_ I32 type, OPFLAGS flags, char* pv, SV* location)
 			__attribute__malloc__
 			__attribute__warn_unused_result__;
 
@@ -2081,7 +2047,7 @@ PERL_CALLCONV OP*	Perl_newSVREF(pTHX_ OP* o, SV* location)
 #define PERL_ARGS_ASSERT_NEWSVREF	\
 	assert(o)
 
-PERL_CALLCONV OP*	Perl_newSVOP(pTHX_ I32 type, I32 flags, SV* sv, SV* location)
+PERL_CALLCONV OP*	Perl_newSVOP(pTHX_ I32 type, OPFLAGS flags, SV* sv, SV* location)
 			__attribute__malloc__
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(pTHX_3);
@@ -2148,11 +2114,11 @@ PERL_CALLCONV SV*	Perl_newSV_type(pTHX_ const svtype type)
 			__attribute__malloc__
 			__attribute__warn_unused_result__;
 
-PERL_CALLCONV OP*	Perl_newUNOP(pTHX_ I32 type, I32 flags, OP* first, SV* location)
+PERL_CALLCONV OP*	Perl_newUNOP(pTHX_ I32 type, OPFLAGS flags, OP* first, SV* location)
 			__attribute__malloc__
 			__attribute__warn_unused_result__;
 
-PERL_CALLCONV OP*	Perl_newWHILEOP(pTHX_ I32 flags, I32 debuggable, LOOP* loop, SV* location, OP* expr, OP* block, OP* cont, I32 has_my)
+PERL_CALLCONV OP*	Perl_newWHILEOP(pTHX_ OPFLAGS flags, I32 debuggable, LOOP* loop, SV* location, OP* expr, OP* block, OP* cont, I32 has_my)
 			__attribute__malloc__
 			__attribute__warn_unused_result__;
 
@@ -2383,13 +2349,6 @@ PERL_CALLCONV OP*	Perl_pmruntime(pTHX_ OP *o, OP *expr, bool isreg)
 			__attribute__nonnull__(pTHX_2);
 #define PERL_ARGS_ASSERT_PMRUNTIME	\
 	assert(o); assert(expr)
-
-PERL_CALLCONV OP*	Perl_pmtrans(pTHX_ OP* o, OP* expr, OP* repl)
-			__attribute__nonnull__(pTHX_1)
-			__attribute__nonnull__(pTHX_2)
-			__attribute__nonnull__(pTHX_3);
-#define PERL_ARGS_ASSERT_PMTRANS	\
-	assert(o); assert(expr); assert(repl)
 
 PERL_CALLCONV void	Perl_pop_scope(pTHX);
 PERL_CALLCONV OP*	Perl_prepend_elem(pTHX_ I32 optype, OP* head, OP* tail);
@@ -2869,7 +2828,11 @@ PERL_CALLCONV IO*	Perl_sv_2io(pTHX_ SV *const sv)
 
 /* PERL_CALLCONV IV	Perl_sv_2iv(pTHX_ SV *const sv); */
 PERL_CALLCONV IV	Perl_sv_2iv_flags(pTHX_ SV *const sv, const I32 flags);
-PERL_CALLCONV SV*	Perl_sv_2mortal(pTHX_ SV *const sv);
+PERL_CALLCONV SV*	Perl_sv_2mortal(pTHX_ SV *const sv)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_SV_2MORTAL	\
+	assert(sv)
+
 PERL_CALLCONV NV	Perl_sv_2nv(pTHX_ SV *const sv);
 PERL_CALLCONV SV*	Perl_sv_2num(pTHX_ SV *const sv)
 			__attribute__nonnull__(pTHX_1);
@@ -4232,9 +4195,6 @@ STATIC bool	S_is_handle_constructor(const OP *o, I32 numargs)
 #define PERL_ARGS_ASSERT_IS_HANDLE_CONSTRUCTOR	\
 	assert(o)
 
-STATIC I32	S_is_list_assignment(pTHX_ const OP *o)
-			__attribute__warn_unused_result__;
-
 STATIC void	S_cop_free(pTHX_ COP *cop)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_COP_FREE	\
@@ -4249,7 +4209,7 @@ STATIC OP*	S_scalarboolean(pTHX_ OP *o)
 STATIC OP*	S_newDEFSVOP(pTHX_ SV* location)
 			__attribute__warn_unused_result__;
 
-STATIC OP*	S_new_logop(pTHX_ I32 type, I32 flags, OP **firstp, OP **otherp, SV *location)
+STATIC OP*	S_new_logop(pTHX_ I32 type, OPFLAGS flags, OP **firstp, OP **otherp, SV *location)
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(pTHX_3)
 			__attribute__nonnull__(pTHX_4);

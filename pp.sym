@@ -55,7 +55,7 @@ Perl_pp_stub
 Perl_pp_scalar
 Perl_pp_pushmark
 Perl_pp_wantarray
-Perl_pp_xassign
+Perl_pp_logassign_assign
 Perl_pp_const
 Perl_pp_gvsv
 Perl_pp_gv
@@ -84,8 +84,8 @@ Perl_pp_qr
 Perl_pp_subst
 Perl_pp_substcont
 Perl_pp_sassign
-Perl_pp_aassign
 Perl_pp_dotdotdot
+Perl_pp_placeholder
 Perl_pp_chop
 Perl_pp_schop
 Perl_pp_chomp
@@ -187,6 +187,7 @@ Perl_pp_join
 Perl_pp_list
 Perl_pp_lslice
 Perl_pp_enter_anonarray_assign
+Perl_pp_enter_anonhash_assign
 Perl_pp_anonarray
 Perl_pp_anonhash
 Perl_pp_listlast
@@ -224,6 +225,7 @@ Perl_pp_leavesub
 Perl_pp_caller
 Perl_pp_warn
 Perl_pp_die
+Perl_pp_dynascope
 Perl_pp_lineseq
 Perl_pp_nextstate
 Perl_pp_dbstate
@@ -249,9 +251,6 @@ Perl_pp_pipe_op
 Perl_pp_fileno
 Perl_pp_umask
 Perl_pp_binmode
-Perl_pp_tie
-Perl_pp_untie
-Perl_pp_tied
 Perl_pp_sselect
 Perl_pp_select
 Perl_pp_getc

@@ -66,11 +66,11 @@ ok( ($zzz1 == 13 and $zzz2 == 13 and $l1 == 13),
 
 for ( @INPUT) {
  SKIP: do {
-    ($op, undef, $comment) = m/^([^\#]+)(\#\s+(.*))?/;
+    @($op, _, $comment) = @: m/^([^\#]+)(\#\s+(.*))?/;
     $comment = $op unless defined $comment;
     chomp;
     $op = "$op==$op" unless $op =~ m/==/;
-    ($op, $expectop) = $op =~ m/(.*)==(.*)/;
+    @($op, $expectop) = @: $op =~ m/(.*)==(.*)/;
   
     if ($op =~ m/^'\?\?\?'/ or $comment =~ m/skip\(.*\Q$^O\E.*\)/i) {
       skip("$comment", 1);
@@ -99,10 +99,10 @@ EOE
 for ( @simple_input) {
  SKIP:
  do {
-  ($op, undef, $comment) = m/^([^\#]+)(\#\s+(.*))?/;
+  @($op, _, $comment) = @: m/^([^\#]+)(\#\s+(.*))?/;
   $comment = $op unless defined $comment;
   chomp;
-  ($operator, $variable) = m/^\s*(\w+)\s*\$(\w+)/ or warn "misprocessed '$_'\n";
+  @($operator, $variable) = @: m/^\s*(\w+)\s*\$(\w+)/ or warn "misprocessed '$_'\n";
   eval <<EOE;
   local \$^WARN_HOOK = \\&wrn;
   my \$$variable = "Ac# Ca\\nxxx";
@@ -145,7 +145,6 @@ ref $cstr			# ref nonref
 `$undefed`			# backtick undef skip(MSWin32)
 ~< *OP				# readline
 'faked'				# rcatline
-(<@z) = (1 .. 3)			# aassign
 chop $chopit			# chop
 (chop (@x=@chopar))		# schop
 chomp $chopit			# chomp

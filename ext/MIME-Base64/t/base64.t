@@ -315,7 +315,7 @@ sub encodeTest
     );
 
     for my $test ( @encode_tests) {
-	my($plain, $expected) = (@$test[0], @$test[1]);
+	my@($plain, $expected) = @(@$test[0], @$test[1]);
 
 	my $encoded = encode_base64($plain, '');
 	if ($encoded ne $expected) {
@@ -358,7 +358,7 @@ sub decodeTest
     );
 
     for my $test ( @decode_tests) {
-	my($encoded, $expected) = (@$test[0], @$test[1]);
+	my@($encoded, $expected) = @(@$test[0], @$test[1]);
 
 	my $decoded = decode_base64($encoded);
 	if ($decoded ne $expected) {

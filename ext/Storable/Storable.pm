@@ -126,7 +126,7 @@ sub file_magic {
 }
 
 sub read_magic {
-    my($buf, $file) = < @_;
+    my@($buf, ?$file) =  @_;
     my %info;
 
     my $buflen = length($buf);
@@ -237,7 +237,7 @@ sub lock_nstore {
 sub _store {
 	my $xsptr = shift;
 	my $self = shift;
-	my ($file, $use_locking) = < @_;
+	my @($file, $use_locking) =  @_;
 	logcroak "not a reference" unless ref($self);
 	logcroak "wrong argument number" unless (nelems @_) == 2;	# No @foo in arglist
 	local *FILE;
@@ -282,7 +282,7 @@ sub store_fd {
 # Same as store_fd, but in network order.
 #
 sub nstore_fd {
-	my ($self, $file) = < @_;
+	my @($self, $file) =  @_;
 	return _store_fd(\&net_pstore, < @_);
 }
 
@@ -290,7 +290,7 @@ sub nstore_fd {
 sub _store_fd {
 	my $xsptr = shift;
 	my $self = shift;
-	my ($file) = < @_;
+	my @($file) =  @_;
 	logcroak "not a reference" unless ref($self);
 	logcroak "too many arguments" unless (nelems @_) == 1;	# No @foo in arglist
 	my $fd = fileno($file);
@@ -360,7 +360,7 @@ sub lock_retrieve {
 
 # Internal retrieve routine
 sub _retrieve {
-	my ($file, $use_locking) = < @_;
+	my @($file, $use_locking) =  @_;
 	local *FILE;
 	open(FILE, "<", $file) || logcroak "can't open $file: $!";
 	binmode FILE;							# Archaic systems...
@@ -387,7 +387,7 @@ sub _retrieve {
 # Same as retrieve, but perform from an already opened file descriptor instead.
 #
 sub fd_retrieve {
-	my ($file) = < @_;
+	my @($file) =  @_;
 	my $fd = fileno($file);
 	logcroak "not a valid file descriptor" unless defined $fd;
 	my $self;
@@ -405,7 +405,7 @@ sub fd_retrieve {
 # by freeze.  If the frozen image passed is undef, return undef.
 #
 sub thaw {
-	my ($frozen) = < @_;
+	my @($frozen) =  @_;
 	return undef unless defined $frozen;
 	my $self;
 	my $da = $@;							# Could be from exception handler

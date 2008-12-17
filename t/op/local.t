@@ -3,7 +3,7 @@
 BEGIN {
     require './test.pl';
 }
-plan tests => 101;
+plan tests => 86;
 
 our (@c, @b, @a, $a, $b, $c, $d, $e, $x, $y, %d, %h, $m);
 
@@ -14,11 +14,11 @@ $list_assignment_supported = 0 if ($^O eq 'VMS');
 
 
 sub foo {
-    local($a, $b) = < @_;
+    local@($a, $b) =  @_;
     local($c, $d);
     $c = "c 3";
     $d = "d 4";
-    do { local($a,$c) = ("a 9", "c 10"); ($x, $y) = ($a, $c); };
+    do { local@($a,$c) = @("a 9", "c 10"); @($x, $y) = @($a, $c); };
     is($a, "a 1");
     is($b, "b 2");
     return @($c, $d);
@@ -44,11 +44,11 @@ is($y, "c 10");
 # same thing, only with arrays and associative arrays
 
 sub foo2 {
-    local($a, @b) = (shift, @_);
+    local@($a, @b) = @(shift, @_);
     local(@c, %d);
     @c = @( "c 3" );
     %d{+''} = "d 4";
-    do { local($a, @c) = ("a 19", @("c 20")); ($x, $y) = ($a, < @c); };
+    do { local@($a, @c) = @("a 19", @("c 20")); @($x, $y) = @($a, < @c); };
     is($a, "a 1");
     is("$(join ' ',@b)", "b 2");
     return @(@c[0], %d{?''});
@@ -144,33 +144,6 @@ do {
     sub NEXTKEY { print "# NEXTKEY [$(join ' ',@_)]\n"; each %{@_[0]} }
 };
 
-# see if localization works on tied hashes
-tie %h, 'TH';
-%h = %('a' => 1, 'b' => 2, 'c' => 3);
-
-do {
-    local(%h{+'a'}) = 'foo';
-    local(%h{+'b'}) = %h{?'b'};
-    local(%h{'y'});
-    local(%h{+'z'}) = 33;
-    is(%h{?'a'}, 'foo');
-    is(%h{?'b'}, 2, " # TODO ");
-    local(%h{'c'});
-    delete %h{'c'};
-};
-is(%h{?'a'}, 1, " # TODO ");
-is(%h{?'b'}, 2, " # TODO ");
-is(%h{?'c'}, 3, " # TODO ");
-# local() should preserve the existenceness of tied hash elements
-ok(! exists %h{'y'});
-ok(! exists %h{'z'});
-TODO: do {
-    todo_skip("Localize entire tied hash");
-    my $d = join("\n", map { "$_=>%h{?$_}" } sort keys %h);
-    local %h = %( < %h );
-    is(join("\n", map { "$_=>%h{?$_}" } sort keys %h), $d);
-};
-
 @a = @('a', 'b', 'c');
 do {
     local(@a[1]) = "X";
@@ -178,36 +151,13 @@ do {
 };
 is(@a[0].@a[1], "Xb");
 
-# now try the same for %SIG
-
-%SIG{+INT} = \&foo;
-$^WARN_HOOK = %SIG{?INT};
-do {
-    local(%SIG{+TERM}) = %SIG{?TERM};
-    local(%SIG{+INT}) = %SIG{?INT};
-    local($^WARN_HOOK) = $^WARN_HOOK;
-    is(%SIG{?TERM}, undef);
-    cmp_ok(%SIG{?INT}, '\==', \&foo);
-    cmp_ok($^WARN_HOOK, '\==', \&foo);
-    local(%SIG{INT});
-    $^WARN_HOOK = undef;
-};
-is(%SIG{?TERM}, undef);
-cmp_ok(%SIG{?INT}, '\==', \&foo);
-cmp_ok($^WARN_HOOK, '\==', \&foo);
-do {
-    my $d = join("\n", map { "$_=>$(dump::view(%SIG{?$_}))" } sort keys %SIG);
-    local %SIG = %( < %SIG );
-    is(join("\n", map { "$_=>$(dump::view(%SIG{?$_}))" } sort keys %SIG), $d);
-};
-
 # and for %ENV
 
 %ENV{+_X_} = 'a';
 %ENV{+_Y_} = 'b';
 %ENV{+_Z_} = 'c';
 do {
-    local(%ENV{_A_});
+    local(%ENV{?_A_});
     local(%ENV{+_B_}) = 'foo';
     local(%ENV{+_X_}) = 'foo';
     local(%ENV{+_Y_}) = %ENV{?_Y_};
@@ -247,7 +197,7 @@ do {
     %x{+a} = 1;
     do { local %x{+b} = 1; };
     ok(! exists %x{b});
-    do { local %x{[@('c','d','e')]} = @(); };
+    do { local %x{[@('c','d','e')]} =@(); };
     ok(! exists %x{c});
 };
 
@@ -275,7 +225,7 @@ do {
 	};
 	main::ok(f1() eq "f1", "localised sub restored");
 	do {
-		local %Other::{[qw/ f1 f2 /]} = @(sub { "j1" }, sub { "j2" });
+		local %Other::{[qw/ f1 f2 /]} =@( @(sub { "j1" }, sub { "j2" }));
                 local $main::TODO = 1;
 		main::ok(f1() eq "j1", "localised sub via stash slice");
 		main::ok(f2() eq "j2", "localised sub via stash slice");
@@ -321,7 +271,6 @@ do {
 	my $ambigous = "\240" . $unicode;
 	chop $ambigous;
 	local %h{[@($unicode, $ambigous)]} = @(256, 160);
-        local our $TODO = "localized hash alues";
 
 	is(nkeys %h, 4);
 	is(%h{?"\243"}, "pound");

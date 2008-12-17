@@ -32,7 +32,7 @@ my @isatype = qw(
 );
 
 my %isatype;
- <%isatype{[ @isatype]} = (1) x nelems @isatype;
+ %isatype{[ @isatype]} = @(1) x nelems @isatype;
 my $inif = 0;
 my %Is_converted;
 my %bad_file = %( () );
@@ -42,7 +42,7 @@ my %bad_file = %( () );
 build_preamble_if_necessary();
 
 sub reindent($) {
-    my($text) = shift;
+    my@($text) =@( shift);
     $text =~ s/\n/\n    /g;
     $text =~ s/        /\t/g;
     $text;
@@ -257,7 +257,7 @@ while (defined (my $file = next_file())) {
 	    my @enum_subs = split(m/,/, $enum_subs);
 	    my $enum_val = -1;
 	    foreach my $enum ( @enum_subs) {
-		my ($enum_name, $enum_value) = $enum =~ m/^([a-zA-Z_]\w*)(=.+)?$/;
+		my @($enum_name, $enum_value) = @: $enum =~ m/^([a-zA-Z_]\w*)(=.+)?$/;
 		$enum_name or next;
 		$enum_value =~ s/^=//;
 		$enum_val = (length($enum_value) ?? $enum_value !! $enum_val + 1);
@@ -442,7 +442,7 @@ sub expr {
 	    $id =~ s/(\.|(->))([^\.\-]*)/->\{$3\}/g;
 	    $id =~ s/\b([^\$])($joined_args)/$1\$$2/g if length($joined_args);
 	    while($id =~ m/\[\s*([^\$\&\d\]]+)\]/) {
-		my($index) = $1;
+		my@($index) = $1;
 		$index =~ s/\s//g;
 		if(exists(%curargs{$index})) {
 		    $index = "\$$index";
@@ -624,7 +624,7 @@ sub next_file
 # Put all the files in $directory into @ARGV for processing.
 sub expand_glob
 {
-    my ($directory)  = < @_;
+    my @($directory)  =  @_;
 
     $directory =~ s:/$::;
 
@@ -646,7 +646,7 @@ sub expand_glob
 # Otherwise, just duplicate the file or directory.
 sub link_if_possible
 {
-    my ($dirlink)  = < @_;
+    my @($dirlink)  =  @_;
     my $target  = eval 'readlink($dirlink)';
 
     if ($target =~ m:^\.\./: or $target =~ m:^/:) {
@@ -680,7 +680,7 @@ sub link_if_possible
 # and files we've already processed.
 sub queue_includes_from
 {
-    my ($file)    = < @_;
+    my @($file)    =  @_;
     my $line;
 
     return if ($file eq "-");
@@ -737,7 +737,7 @@ sub build_preamble_if_necessary
         return if $1 == $VERSION;
     }
 
-    my (%define) = %( < _extract_cc_defines() );
+    my @(%define) =@( %( < _extract_cc_defines() ));
 
     open  PREAMBLE, ">", "$preamble" or die "Cannot open $preamble:  $!";
 	print PREAMBLE "# This file was created by h2ph version $VERSION\n";

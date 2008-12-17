@@ -92,15 +92,15 @@ sub import {
 	}
 	# Put a corresponding archlib directory in front of $path if it
 	# looks like $path has an archlib directory below it.
-	my($arch_auto_dir, $arch_dir, $version_dir, $version_arch_dir)
-	    = < _get_dirs($path);
+	my @($arch_auto_dir, $arch_dir, $version_dir, $version_arch_dir)
+	    = _get_dirs($path);
 	unshift(@INC, $arch_dir)         if -d $arch_auto_dir;
 	unshift(@INC, $version_dir)      if -d $version_dir;
 	unshift(@INC, $version_arch_dir) if -d $version_arch_dir;
     }
 
     # remove trailing duplicates
-    @INC = grep { ++%names{$_} == 1 } @INC;
+    @INC = grep { ++%names{+$_} == 1 } @INC;
     return;
 }
 
@@ -112,12 +112,12 @@ sub unimport {
     foreach (@_) {
 	my $path = _nativize($_);
 
-	my($arch_auto_dir, $arch_dir, $version_dir, $version_arch_dir)
-	    = < _get_dirs($path);
-	++%names{$path};
-	++%names{$arch_dir}         if -d $arch_auto_dir;
-	++%names{$version_dir}      if -d $version_dir;
-	++%names{$version_arch_dir} if -d $version_arch_dir;
+	my @($arch_auto_dir, $arch_dir, $version_dir, $version_arch_dir)
+	    = _get_dirs($path);
+	++%names{+$path};
+	++%names{+$arch_dir}         if -d $arch_auto_dir;
+	++%names{+$version_dir}      if -d $version_dir;
+	++%names{+$version_arch_dir} if -d $version_arch_dir;
     }
 
     # Remove ALL instances of each named directory.
@@ -126,7 +126,7 @@ sub unimport {
 }
 
 sub _get_dirs {
-    my($dir) = < @_;
+    my @($dir) = @_;
     my($arch_auto_dir, $arch_dir, $version_dir, $version_arch_dir);
 
     # we could use this for all platforms in the future, but leave it
@@ -146,7 +146,7 @@ sub _get_dirs {
 }
 
 sub _nativize {
-    my($dir) = < @_;
+    my @($dir) = @_;
 
     if ($Is_MacOS && $Mac_FS && ! -d $dir) {
 	$dir = Mac::FileSpec::Unixish::nativize($dir);

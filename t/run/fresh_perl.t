@@ -29,14 +29,14 @@ while( ~< *DATA) {
 plan tests => scalar nelems @prgs;
 
 foreach my $prog ( @prgs) {
-    my($raw_prog, $name) = < @$prog;
+    my@($raw_prog, $name) =  @$prog;
 
     my $switch;
     if ($raw_prog =~ s/^\s*(-\w.*)\n//){
 	$switch = $1;
     }
 
-    my($prog,$expected) = < split(m/\nEXPECT\n/, $raw_prog);
+    my@($prog,?$expected) =  split(m/\nEXPECT\n/, $raw_prog);
     $prog .= "\n";
     $expected = '' unless defined $expected;
 
@@ -93,7 +93,7 @@ our $file;
 chop($file = ~< *DATA);
 ########
 package N;
-sub new {my ($obj,$n)=@_; bless \$n}  
+sub new {my @($obj,$n)=@_; bless \$n}  
 our $aa=N->new(1);
 $aa=12345;
 print $aa;
@@ -130,7 +130,7 @@ BEGIN { undef = 0 }
 EXPECT
 Can't assign to undef operator at - line 1 character 9.
 ########
-my @a; @a[2] = 1; for (@a) { $_ = 2 } print join(' ', @a) . "\n"
+my @a; @a[+2] = 1; for (@a) { $_ = 2 } print join(' ', @a) . "\n"
 EXPECT
 2 2 2
 ########
@@ -147,8 +147,8 @@ print "ok\n" if ("\0" cmp "\x[FF]") +< 0;
 EXPECT
 ok
 ########
-open(H,"<",$^O eq 'MacOS' ?? ':run:fresh_perl.t' !! 'run/fresh_perl.t'); # must be in the 't' directory
-stat(H);
+open(my $h,"<",$^O eq 'MacOS' ?? ':run:fresh_perl.t' !! 'run/fresh_perl.t'); # must be in the 't' directory
+stat($h);
 print "ok\n" if (-e _ and -f _ and -r _);
 EXPECT
 ok
@@ -330,7 +330,7 @@ ok
 # reversed again as a result of [perl #17763]
 die qr(x)
 EXPECT
-(?-uxism:x) at - line 3 character 1.
+(error description isn't a string) at - line 3 character 1.
 ########
 # David Dyck
 # coredump in 5.7.1
@@ -351,7 +351,7 @@ sub bad {
    print "K";
 }
 EXPECT
-OK
+O12345678910K
 ########
 # Bug 20010506.041
 use utf8;

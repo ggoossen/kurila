@@ -6,7 +6,7 @@ use Storable < qw(nfreeze);
 
 # If this looks like a hack, it's probably because it is :-)
 sub uuencode_it {
-  my ($data, $name) = < @_;
+  my @($data, $name) =  @_;
   my $frozen = nfreeze $data;
 
   my $uu = pack 'u', $frozen;
@@ -91,7 +91,7 @@ uuencode_it (\%uhash, "Locked hash with utf8 keys");
 
 my (%pre56, %pre58);
 
-while (my ($key, $val) = each %uhash) {
+while (my @($key, $val) =@( each %uhash)) {
   # hash keys are always stored downgraded to bytes if possible, with a flag
   # to say "promote back to utf8"
   # Whereas scalars are stored as is.

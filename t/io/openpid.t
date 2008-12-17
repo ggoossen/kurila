@@ -19,9 +19,10 @@ plan tests => 10;
 
 
 use Config;
+use signals;
 $| = 1;
-%SIG{+PIPE} = 'IGNORE';
-%SIG{+HUP} = 'IGNORE' if $^O eq 'interix';
+signals::set_handler(PIPE => 'IGNORE');
+signals::set_handler(HUP => 'IGNORE') if $^O eq 'interix';
 
 my $perl = which_perl();
 $perl .= qq[ "-I../lib"];

@@ -33,7 +33,7 @@ Removes redundant portions of file specifications according to VMS syntax.
 =cut
 
 sub canonpath {
-    my($self,$path) = <@_;
+    my @($self,?$path) = @_;
 
     return undef unless defined $path;
 
@@ -94,7 +94,7 @@ sub catdir {
     my $rslt;
     if (@dirs) {
 	my $path = ((nelems @dirs) == 1) ?? @dirs[0] !! $self->catdir(< @dirs);
-	my ($spath,$sdir) = ($path,$dir);
+	my @($spath,$sdir) = @($path,$dir);
 	$spath =~ s/\.dir\Z(?!\n)//; $sdir =~ s/\.dir\Z(?!\n)//; 
 	$sdir = $self->eliminate_macros($sdir) unless $sdir =~ m/^[\w\-]+\Z(?!\n)/s;
 	$rslt = $self->fixpath($self->eliminate_macros($spath)."/$sdir",1);
@@ -232,7 +232,7 @@ Checks for VMS directory spec as well as Unix separators.
 =cut
 
 sub file_name_is_absolute {
-    my ($self,$file) = <@_;
+    my @($self,$file) = @_;
     # If it's a logical name, expand it.
     $file = %ENV{$file} while $file =~ m/^[\w\$\-]+\Z(?!\n)/s && %ENV{$file};
     return scalar($file =~ m!^/!s             ||
@@ -247,8 +247,8 @@ Splits using VMS syntax.
 =cut
 
 sub splitpath {
-    my($self,$path) = <@_;
-    my($dev,$dir,$file) = ('','','');
+    my @($self,$path) = @_;
+    my @($dev,$dir,$file) = @('','','');
 
     vmsify($path) =~ m/(.+:)?([\[<].*[\]>])?(.*)/s;
     return @($1 || '',$2 || '',$3);
@@ -261,7 +261,7 @@ Split dirspec using VMS syntax.
 =cut
 
 sub splitdir {
-    my($self,$dirspec) = <@_;
+    my @($self,$dirspec) = @_;
     my @dirs = @();
     return @dirs if ( (!defined $dirspec) || ('' eq $dirspec) );
     $dirspec =~ s/</[/g;
@@ -293,10 +293,10 @@ Construct a complete filespec using VMS syntax
 =cut
 
 sub catpath {
-    my($self,$dev,$dir,$file) = <@_;
+    my @($self,$dev,$dir,$file) = @_;
     
     # We look for a volume in $dev, then in $dir, but not both
-    my ($dir_volume, $dir_dir, $dir_file) = $self->splitpath($dir);
+    my @($dir_volume, $dir_dir, $dir_file) = $self->splitpath($dir);
     $dev = $dir_volume unless length $dev;
     $dir = length $dir_file ?? $self->catfile($dir_dir, $dir_file) !! $dir_dir;
     
@@ -320,7 +320,7 @@ sub abs2rel {
     return vmspath(File::Spec::Unix::abs2rel( $self, < @_ ))
         if grep m{/}, @_;
 
-    my($path,$base) = < @_;
+    my @($path,$base) = @_;
     $base = $self->_cwd() unless defined $base and length $base;
 
     for (@(\$path, \$base)) { $$_ = $self->canonpath($$_) }
@@ -335,8 +335,8 @@ sub abs2rel {
     # and we do not even try to call $parse() or consult %ENV for $trnlnm()
     # (this module needs to run on non VMS platforms after all).
     
-    my ($path_volume, $path_directories, $path_file) = $self->splitpath($path);
-    my ($base_volume, $base_directories, $base_file) = $self->splitpath($base);
+    my @($path_volume, $path_directories, $path_file) = $self->splitpath($path);
+    my @($base_volume, $base_directories, $base_file) = $self->splitpath($base);
     return $path unless lc($path_volume) eq lc($base_volume);
 
     for ($path, $base) { $_ = $self->rel2abs($_) }
@@ -378,7 +378,7 @@ Use VMS syntax when converting filespecs.
 
 sub rel2abs {
     my $self = shift ;
-    my ($path,$base ) = < @_;
+    my @($path,$base ) = @_;
     return undef unless defined $path;
     if ($path =~ m/\//) {
 	$path = ( -d $path || $path =~ m/\/\z/  # educated guessing about
@@ -400,10 +400,10 @@ sub rel2abs {
         }
 
         # Split up paths
-        my ( $path_directories, $path_file ) =
-            < ($self->splitpath( $path ))[[1..2]] ;
+        my @( $path_directories, $path_file ) =
+            ($self->splitpath( $path ))[[1..2]] ;
 
-        my ( $base_volume, $base_directories ) =
+        my @( $base_volume, $base_directories ) =
             $self->splitpath( $base ) ;
 
         $path_directories = '' if $path_directories eq '[]' ||
@@ -432,7 +432,7 @@ sub rel2abs {
 # Please consider these two methods deprecated.  Do not patch them,
 # patch the ones in ExtUtils::MM_VMS instead.
 sub eliminate_macros {
-    my($self,$path) = <@_;
+    my @($self,$path) = @_;
     return '' unless (defined $path) && ($path ne '');
     $self = \%() unless ref $self;
 
@@ -447,7 +447,7 @@ sub eliminate_macros {
     # perform m##g in scalar context so it acts as an iterator
     while ($npath =~ m#(.*?)\$\((\S+?)\)(.*)#gs) { 
         if ($self->{$2}) {
-            ($head,$macro,$tail) = ($1,$2,$3);
+            @($head,$macro,$tail) = @($1,$2,$3);
             if (ref $self->{$macro}) {
                 if (ref $self->{$macro} eq 'ARRAY') {
                     $macro = join ' ', <@{$self->{$macro}};
@@ -469,7 +469,7 @@ sub eliminate_macros {
 
 # Deprecated.  See the note above for eliminate_macros().
 sub fixpath {
-    my($self,$path,$force_path) = @_;
+    my @($self,$path,$force_path) = @_;
     return '' unless $path;
     $self = bless \%() unless ref $self;
     my($fixedpath,$prefix,$name);
@@ -488,7 +488,7 @@ sub fixpath {
             $fixedpath = vmsify($self->eliminate_macros($path));
         }
     }
-    elsif ((($prefix,$name) = ($path =~ m#^\$\(([^\)]+)\)(.+)#s)) && $self->{$prefix}) {
+    elsif ((@($prefix,$name) = @($path =~ m#^\$\(([^\)]+)\)(.+)#s)) && $self->{$prefix}) {
         my($vmspre) = $self->eliminate_macros("\$($prefix)");
         # is it a dir or just a name?
         $vmspre = ($vmspre =~ m|/| or $prefix =~ m/DIR\Z(?!\n)/) ?? vmspath($vmspre) !! '';

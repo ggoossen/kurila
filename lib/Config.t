@@ -13,13 +13,13 @@ BEGIN {
 
 ok(nelems(config_keys) +> 500, "Config has more than 500 entries");
 
-my ($first) = Config::config_sh() =~ m/^(\S+)=/m;
+my @($first) = @: Config::config_sh() =~ m/^(\S+)=/m;
 die "Can't find first entry in Config::config_sh()" unless defined $first;
 print "# First entry is '$first'\n";
 
 # It happens that the we know what the first key should be. This is somewhat
 # cheating, but there was briefly a bug where the key got a bonus newline.
-my ($first_each) = < config_keys;
+my @($first_each, ...) =  config_keys;
 is($first_each, $first, "First key from each is correct");
 
 is(config_value('PERL_REVISION'), undef, "No PERL_REVISION");
@@ -131,8 +131,8 @@ foreach my $pain (@($first, < @virtual)) {
 # TestInit.pm has probably already messed with our @INC
 # This little bit of evil is to avoid a @ in the program, in case it confuses
 # shell 1 liners. Perl 1 rules.
-my ($path, $ver, < @orig_inc)
-  = < split m/\n/,
+my @($path, $ver, @< @orig_inc)
+  =  split m/\n/,
     runperl (nolib=>1,
 	     prog=>'print qq{$^X\n$^V\n}; print qq{$_\n} while $_ = shift @INC');
 
@@ -140,7 +140,7 @@ die "This perl is $^V at $^X; other perl is $ver (at $path) "
   . '- failed to find this perl' unless $^V eq $ver;
 
 my %orig_inc;
- <%orig_inc{[ @orig_inc]} = @();
+ %orig_inc{[ @orig_inc]} =@( @());
 
 my $failed;
 # This is the order that directories are pushed onto @INC in perl.c:

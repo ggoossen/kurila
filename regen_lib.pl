@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-use vars < qw($Is_W32 $Is_OS2 $Is_Cygwin $Is_NetWare $Needs_Write);
+our ($Is_W32, $Is_OS2, $Is_Cygwin, $Is_NetWare, $Needs_Write);
 use Config; # Remember, this is running using an existing perl
 use File::Compare;
 use Symbol;
@@ -31,7 +31,7 @@ sub safer_unlink {
 }
 
 sub safer_rename_silent {
-  my ($from, $to) = < @_;
+  my @($from, $to) =  @_;
 
   # Some dosish systems can't rename over an existing file:
   safer_unlink $to;
@@ -40,7 +40,7 @@ sub safer_rename_silent {
 }
 
 sub rename_if_different {
-  my ($from, $to) = < @_;
+  my @($from, $to) =  @_;
 
   if (compare($from, $to) == 0) {
       warn "no changes between '$from' & '$to'\n";

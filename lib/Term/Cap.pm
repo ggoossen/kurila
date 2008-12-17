@@ -201,7 +201,7 @@ It calls C<croak> on failure.
 sub Tgetent
 {    ## public -- static method
     my $class = shift;
-    my ($self) = < @_;
+    my @($self) =  @_;
 
     $self = \%() unless defined $self;
     bless $self, $class;
@@ -477,7 +477,7 @@ The padded $string is returned.
 sub Tpad
 {    ## public
     my $self = shift;
-    my ( $string, $cnt, $FH ) = < @_;
+    my @( $string, $cnt, $FH ) =  @_;
     my ( $decr, $ms );
 
     if ( defined $string && $string =~ m/(^[\d.]+)(\*?)(.*)$/ )
@@ -529,7 +529,7 @@ The appropriate string for the capability will be returned.
 sub Tputs
 {    ## public
     my $self = shift;
-    my ( $cap, $cnt, $FH ) = < @_;
+    my @( $cap, $cnt, $FH ) =  @_;
     my $string;
 
     $cnt = 0 unless $cnt;
@@ -604,7 +604,7 @@ The output string will be returned.
 sub Tgoto
 {    ## public
     my $self = shift;
-    my ( $cap, $code, $tmp, $FH ) = < @_;
+    my @( $cap, $code, $tmp, $FH ) =  @_;
     my $string = $self->{?'_' . $cap };
     my $result = '';
     my $after  = '';
@@ -638,12 +638,12 @@ sub Tgoto
 	    $online = !$online;
 	}
 	elsif ($code eq 'r') {
-	    ($code,$tmp) = < @tmp;
+	    @($code,$tmp) =  @tmp;
 	    @tmp = @($tmp,$code);
 	    $online = !$online;
 	}
 	elsif ($code eq '>') {
-	    ($code,$tmp,$string) = unpack("CCa99",$string);
+	    @($code,$tmp,$string) = unpack@("CCa99",$string);
 	    if (@tmp[0] +> $code) {
 		@tmp[0] += $tmp;
 	    }
@@ -657,7 +657,7 @@ sub Tgoto
 	    $online = !$online;
 	}
 	elsif ($code eq 'i') {
-	    ($code,$tmp) = < @tmp;
+	    @($code,$tmp) =  @tmp;
 	    @tmp = @($code+1,$tmp+1);
 	}
 	else {

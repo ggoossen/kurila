@@ -28,7 +28,7 @@ END
 sub test_regexp ($$) {
   # test that given string consists of N-1 chars matching $qr1, and 1
   # char matching $qr2
-  my ($str, $blk) = <@_;
+  my @($str, $blk) = @_;
 
   # constructing these objects here makes the last test loop go much faster
   my $qr1 = qr/(\p{$blk}+)/;
@@ -93,7 +93,7 @@ my $updir = 'File::Spec'->updir;
 no warnings 'utf8'; # we do not want warnings about surrogates etc
 
 sub char_range {
-    my ($h1, $h2) = <@_;
+    my @($h1, $h2) = @_;
 
     my $str;
 
@@ -103,7 +103,7 @@ sub char_range {
 }
 
 # non-General Category and non-Script
-while (my ($abbrev, $files) = each %utf8::PVA_abbr_map) {
+while (my @(?$abbrev, ?$files) =@( each %utf8::PVA_abbr_map)) {
   my $prop_name = %utf8::PropertyAlias{?$abbrev};
   next unless $prop_name;
   next if $abbrev eq "gc_sc";
@@ -114,7 +114,7 @@ while (my ($abbrev, $files) = each %utf8::PVA_abbr_map) {
     );
 
     next unless -e $filename;
-    my ($h1, $h2) = < map hex, (split(m/\t/, (do $filename), 3))[[0..1]];
+    my @($h1, $h2) =  map hex, (split(m/\t/, (do $filename), 3))[[0..1]];
 
     my $str = char_range($h1, $h2);
 
@@ -129,13 +129,13 @@ while (my ($abbrev, $files) = each %utf8::PVA_abbr_map) {
 
 # General Category and Script
 for my $p (@('gc', 'sc')) {
-  while (my ($abbr) = each %{ %utf8::PropValueAlias{$p} }) {
+  while (my @(?$abbr, ?_) =@( each %{ %utf8::PropValueAlias{$p} })) {
     my $filename = 'File::Spec'->catfile(
       $updir => lib => unicore => lib => gc_sc => "%utf8::PVA_abbr_map{gc_sc}->{?$abbr}.pl"
     );
 
     next unless -e $filename;
-    my ($h1, $h2) = < map hex, (split(m/\t/, (do $filename), 3))[[0..1]];
+    my @($h1, $h2) =  map hex, (split(m/\t/, (do $filename), 3))[[0..1]];
 
     my $str = char_range($h1, $h2);
 
@@ -168,7 +168,7 @@ do {
 
   my $dirname = 'File::Spec'->catdir($updir => lib => unicore => lib => 'gc_sc');
   opendir D, $dirname or die $!;
- <  %files{[@(readdir(D))]} = ();
+   %files{[@(readdir(D))]} = @();
   closedir D;
 
   for (keys %utf8::PA_reverse) {
@@ -177,7 +177,7 @@ do {
 
     my $filename = 'File::Spec'->catfile($dirname, $leafname);
 
-    my ($h1, $h2) = < map hex, split(m/\t/, (do $filename), 3)[[0..1]];
+    my @($h1, $h2) =  map hex, split(m/\t/, (do $filename), 3)[[0..1]];
 
     my $str = char_range($h1, $h2);
 
@@ -202,7 +202,7 @@ for ( grep %utf8::Canonical{?$_} =~ m/^In/, keys %utf8::Canonical) {
 
   print "# In$_ $filename\n";
 
-  my ($h1, $h2) = < map hex, split(m/\t/, (do $filename), 3)[[0..1]];
+  my @($h1, $h2) =  map hex, split(m/\t/, (do $filename), 3)[[0..1]];
 
   my $str = char_range($h1, $h2);
 

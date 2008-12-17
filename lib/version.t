@@ -10,7 +10,7 @@ use POSIX;
 diag "Tests with base class" unless %ENV{?PERL_CORE};
 
 BEGIN {
-    use_ok("version", 0.50); # If we made it this far, we are ok.
+    use_ok("version", v0.50); # If we made it this far, we are ok.
 }
 
 our $Verbose;
@@ -27,7 +27,7 @@ no warnings 'redefine';
 
 package version::Bad;
 use base 'version';
-sub new { my($self,$n)=< @_;  bless \$n, $self }
+sub new { my@($self,$n)= @_;  bless \$n, $self }
 
 package main;
 my $testobj = version::Empty->new(1.002_003);
@@ -64,7 +64,7 @@ unlike ($@, qr/^Subroutine main::qv redefined/,
 
 sub BaseTests {
 
-    my ($CLASS, $no_qv) = < @_;
+    my @($CLASS, ?$no_qv) =  @_;
     
     # Insert your test code below, the Test module is use()ed here so read
     # its man page ( perldoc Test ) for help writing this test script.

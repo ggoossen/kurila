@@ -65,7 +65,6 @@ h Reference Manual
   perlrecharclass	Perl regular expression character classes
   perlreref		Perl regular expressions quick reference
   perlref		Perl references, the rest of the story
-  perlform		Perl formats
   perlobj		Perl objects
   perltie		Perl objects hidden behind simple variables
 2 perldbmfilter		Perl DBM filters
@@ -129,6 +128,15 @@ h Miscellaneous
 
   perldoc		Look up Perl documentation in Pod format
 
+  kurila116delta        What is new for Perl Kurila 1.16
+  kurila115delta        What is new for Perl Kurila 1.15
+  kurila114delta        What is new for Perl Kurila 1.14
+  kurila113delta        What is new for Perl Kurila 1.13
+  kurila112delta        What is new for Perl Kurila 1.12
+  kurila111delta        What is new for Perl Kurila 1.11
+  kurila110delta        What is new for Perl Kurila 1.10
+  kurila19delta         What is new for Perl Kurila 1.9
+  kurila18delta         What is new for Perl Kurila 1.8
   kurila17delta         What is new for Perl Kurila 1.7
   kurila16delta         What is new for Perl Kurila 1.6
   kurila15delta         What is new for Perl Kurila 1.5
@@ -225,5 +233,4 @@ ao pl2pm
 ao pod2html
 ao pod2man
 ao s2p
-ao splain
 ao xsubpp

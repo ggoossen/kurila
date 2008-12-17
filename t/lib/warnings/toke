@@ -185,7 +185,7 @@ $a = 1_23; print "$a\n";
 $a = 12_3; print "$a\n";
 $a = 123_; print "$a\n";		# 11
 $a = eval "_-123"; print "$a\n";		#(12	string)
-$a = -_123; print "$a\n";		#(13	string)
+
 $a = -1_23; print "$a\n";
 $a = -12_3; print "$a\n";
 $a = -123_; print "$a\n";		# 16
@@ -226,7 +226,7 @@ $a = 1_23; print "$a\n";
 $a = 12_3; print "$a\n";
 $a = 123_; print "$a\n";
 $a = eval "_-123"; print "$a\n";
-$a = -_123; print "$a\n";
+
 $a = -1_23; print "$a\n";
 $a = -12_3; print "$a\n";
 $a = -123_; print "$a\n";
@@ -287,7 +287,6 @@ Misplaced _ in number at - line 42 character 5.
 123
 123
 
--0
 -123
 -123
 -123
@@ -327,7 +326,6 @@ Misplaced _ in number at - line 42 character 5.
 123
 123
 
--0
 -123
 -123
 -123

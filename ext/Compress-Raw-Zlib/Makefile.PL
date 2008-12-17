@@ -179,7 +179,7 @@ sub ParseCONFIG
 	next if m/^\s*$/ or m/^\s*#/ ;
 	s/\s*#\s*$// ;
 
-	($k, $v) = < split(m/\s+=\s+/, $_, 2) ;
+	@($k, $v) =  split(m/\s+=\s+/, $_, 2) ;
 	$k = uc $k ;
 	if (%ValidOption{?$k}) {
 	    delete %Parsed{$k} ;
@@ -355,7 +355,7 @@ sub getOSCode
 
     for my $h ( @GZIP_OS_Names)
     {
-        my ($pattern, $code, $name) = < @$h;
+        my @($pattern, $code, $name) =  @$h;
 
         return $code
             if $pattern && $uname eq $pattern ;

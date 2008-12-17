@@ -174,7 +174,7 @@ sub parseExtraField
         }
     }   
     elsif (ref $data eq 'HASH') {    
-        while (my ($id, $info) = each %$data) {
+        while (my @($id, $info) =@( each %$data)) {
             my $bad = validateExtraFieldPair(\@($id, $info), $strict, $gzipMode);
             return $bad if $bad ;
 

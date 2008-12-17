@@ -12,7 +12,7 @@ our $VERSION = '1.06';
 # see also strict.pm.
 my $pkg = __PACKAGE__;
 unless ( __FILE__ =~ m/(^|[\/\\])\Q$pkg\E\.pmc?$/ ) {
-    my (undef, $f, $l) = caller;
+    my @($xxx, $f, $l) =@( caller);
     die("Incorrect use of pragma '$(__PACKAGE__)' at $f line $l.\n");
 }
 
@@ -399,7 +399,7 @@ sub unimport
     $^WARNING_BITS = $mask ;
 }
 
-my %builtin_type; < %builtin_type{[qw(SCALAR ARRAY HASH CODE REF GLOB LVALUE Regexp)]} = ();
+my %builtin_type;  %builtin_type{[qw(SCALAR ARRAY HASH CODE REF GLOB LVALUE Regexp)]} = @();
 
 sub __chk
 {
@@ -450,7 +450,7 @@ sub enabled
     die("Usage: warnings::enabled([category])")
 	unless nelems(@_) == 1 || nelems(@_) == 0 ;
 
-    my ($callers_bitmask, $offset, $i) = < __chk(< @_) ;
+    my @($callers_bitmask, $offset, $i) =  __chk(< @_) ;
 
     return 0 unless defined $callers_bitmask ;
     return vec($callers_bitmask, $offset, 1) ||
@@ -464,7 +464,7 @@ sub warn
 	unless nelems(@_) == 2 || nelems(@_) == 1 ;
 
     my $message = pop ;
-    my ($callers_bitmask, $offset, $i) = < __chk(<@_) ;
+    my @($callers_bitmask, $offset, $i) =  __chk(<@_) ;
     die($message)
 	if vec($callers_bitmask, $offset+1, 1) ||
 	   vec($callers_bitmask, %Offsets{?'all'}+1, 1) ;
@@ -477,7 +477,7 @@ sub warnif
 	unless nelems(@_) == 2 || nelems(@_) == 1 ;
 
     my $message = pop ;
-    my ($callers_bitmask, $offset, $i) = <__chk(<@_) ;
+    my @($callers_bitmask, $offset, $i) = __chk(<@_) ;
 
     return
         unless defined $callers_bitmask &&

@@ -3,8 +3,8 @@
 # Extracting defsubs.h (with variable substitutions)
 #!perl -w
 use File::Spec;
-my (undef, $headerpath) = < @ARGV;
-my ($out) = __FILE__ =~ m/(^.*)\.PL/i;
+my @(_, $headerpath) =  @ARGV;
+my @($out) = @: __FILE__ =~ m/(^.*)\.PL/i;
 $out =~ s/_h$/.h/;
 unlink $out if -l $out;
 open(OUT,">","$out") || die "Cannot open $out:$!";
@@ -58,7 +58,7 @@ doconst('CVf_ISXSUB');
 foreach my $tuple (@(\@('op.h'),\@('cop.h'),\@('regexp.h','RXf_')))
  {
   my $file = $tuple->[0];
-  my $pfx = $tuple->[1] || '';
+  my $pfx = $tuple->[?1] || '';
   my $path = File::Spec->catfile($headerpath, $file);
   open(OPH,"<","$path") || die "Cannot open $path:$!";
   while ( ~< *OPH)

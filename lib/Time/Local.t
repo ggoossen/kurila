@@ -76,7 +76,7 @@ $tests += 8 if %ENV{?MAINTAINER};
 plan tests => $tests;
 
 for ( @( < @time, < @neg_time) ) {
-    my($year, $mon, $mday, $hour, $min, $sec) = < @$_;
+    my@($year, $mon, $mday, $hour, $min, $sec) =  @$_;
     $year -= 1900;
     $mon--;
 
@@ -90,7 +90,7 @@ for ( @( < @time, < @neg_time) ) {
             my $year_in = $year +< 70 ?? $year + 1900 !! $year;
             my $time = timelocal($sec,$min,$hour,$mday,$mon,$year_in);
 
-            my($s,$m,$h,$D,$M,$Y) = localtime($time);
+            my@($s,$m,$h,$D,$M,$Y, ...) = @: localtime($time);
 
             is($s, $sec, "timelocal second for $(join ' ',@$_)");
             is($m, $min, "timelocal minute for $(join ' ',@$_)");
@@ -104,7 +104,7 @@ for ( @( < @time, < @neg_time) ) {
             my $year_in = $year +< 70 ?? $year + 1900 !! $year;
             my $time = timegm($sec,$min,$hour,$mday,$mon,$year_in);
 
-            my($s,$m,$h,$D,$M,$Y) = gmtime($time);
+            my@($s,$m,$h,$D,$M,$Y, ...) = @: gmtime($time);
 
             is($s, $sec, "timegm second for $(join ' ',@$_)");
             is($m, $min, "timegm minute for $(join ' ',@$_)");
@@ -117,7 +117,7 @@ for ( @( < @time, < @neg_time) ) {
 }
 
 for ( @bad_time) {
-    my($year, $mon, $mday, $hour, $min, $sec) = < @$_;
+    my@($year, $mon, $mday, $hour, $min, $sec) =  @$_;
     $year -= 1900;
     $mon--;
 
@@ -151,7 +151,7 @@ do {
 };
 
 for my $p ( @years) {
-    my ( $year, $is_leap_year ) = < @$p;
+    my @( $year, $is_leap_year ) =  @$p;
 
     my $string = $is_leap_year ?? 'is' !! 'is not';
     is( Time::Local::_is_leap_year($year), $is_leap_year,

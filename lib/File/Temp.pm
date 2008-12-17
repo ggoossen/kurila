@@ -143,7 +143,7 @@ use File::Spec v0.8;
 use File::Path < qw/ rmtree /;
 use Fcntl v1.03;
 use IO::Seekable; # For SEEK_*
-use Errno;
+use Errno < qw|EEXIST|;
 require VMS::Stdio if $^O eq 'VMS';
 
 # pre-emptively load Carp::Heavy. If we don't when we run out of file
@@ -231,7 +231,7 @@ my $LOCKFLAG;
 
 unless ($^O eq 'MacOS') {
   for my $oflag (qw/ NOFOLLOW BINARY LARGEFILE NOINHERIT /) {
-    my ($bit, $func) = (0, "Fcntl::O_" . $oflag);
+    my @($bit, $func) = @(0, "Fcntl::O_" . $oflag);
     $OPENFLAGS ^|^= $bit if try {
       # Make sure that redefined die handlers do not cause problems
       # e.g. CGI::Carp
@@ -258,7 +258,7 @@ unless ($^O eq 'MacOS') {
 my $OPENTEMPFLAGS = $OPENFLAGS;
 unless ($^O eq 'MacOS') {
   for my $oflag (qw/ TEMPORARY /) {
-    my ($bit, $func) = (0, "Fcntl::O_" . $oflag);
+    my @($bit, $func) = @(0, "Fcntl::O_" . $oflag);
     local($@);
     $OPENTEMPFLAGS ^|^= $bit if try {
       # Make sure that redefined die handlers do not cause problems
@@ -399,7 +399,7 @@ sub _gettemp {
   my $parent; # parent directory
   if (%options{?"mkdir"}) {
     # There is no filename at the end
-    ($volume, $directories, $file) = < File::Spec->splitpath( $path, 1);
+    @($volume, $directories, $file) =  File::Spec->splitpath( $path, 1);
 
     # The parent is then $directories without the last directory
     # Split the directory and put it back together again
@@ -428,7 +428,7 @@ sub _gettemp {
   } else {
 
     # Get rid of the last filename (use File::Basename for this?)
-    ($volume, $directories, $file) = < File::Spec->splitpath( $path );
+    @($volume, $directories, $file) =  File::Spec->splitpath( $path );
 
     # Join up without the file part
     $parent = File::Spec->catpath($volume,$directories,'');
@@ -520,7 +520,7 @@ sub _gettemp {
 
 	# Error opening file - abort with error
 	# if the reason was anything but EEXIST
-	unless (%!{?EEXIST}) {
+	unless ($! == EEXIST) {
 	  ${%options{ErrStr}} = "Could not create temp file $path: $!";
 	  return ();
 	}
@@ -540,7 +540,7 @@ sub _gettemp {
 
 	# Abort with error if the reason for failure was anything
 	# except EEXIST
-	unless (%!{?EEXIST}) {
+	unless ($! == EEXIST) {
 	  ${%options{ErrStr}} = "Could not create directory $path: $!";
 	  return ();
 	}
@@ -614,7 +614,7 @@ sub _replace_XX {
   croak 'Usage: _replace_XX($template, $ignore)'
     unless scalar(nelems @_) == 2;
 
-  my ($path, $ignore) = < @_;
+  my @($path, $ignore) =  @_;
 
   # Do it as an if, since the suffix adjusts which section to replace
   # and suffixlen=0 returns nothing if used in the substr directly
@@ -754,7 +754,7 @@ sub _is_verysafe {
   }
 
   # Split directory into components - assume no file
-  my ($volume, $directories, undef) = < File::Spec->splitpath( $path, 1);
+  my @($volume, $directories, _) =  File::Spec->splitpath( $path, 1);
 
   # Slightly less efficient than having a function in File::Spec
   # to chop off the end of a directory or even a function that
@@ -911,7 +911,7 @@ do {
     croak 'Usage:  _deferred_unlink($fh, $fname, $isdir)'
       unless scalar(nelems @_) == 3;
 
-    my ($fh, $fname, $isdir) = < @_;
+    my @($fh, $fname, $isdir) =  @_;
 
     warn "Setting up deferred removal of $fname\n"
       if $DEBUG;
@@ -1015,7 +1015,7 @@ sub new {
   delete %args{OPEN};
 
   # Open the file and retain file handle and file name
-  my ($fh, $path) = < tempfile( < @template, < %args );
+  my @($fh, $path) =  tempfile( < @template, < %args );
 
   print "Tmp: $fh - $path\n" if $DEBUG;
 
@@ -1355,7 +1355,7 @@ sub tempfile {
   # Create the file
   my ($fh, $path, $errstr);
   croak "Error in tempfile() using $template: $errstr"
-    unless (($fh, $path) = < _gettemp($template,
+    unless (@($fh, $path) =  _gettemp($template,
 				    "open" => %options{?'OPEN'},
 				    "mkdir"=> 0 ,
                                     "unlink_on_close" => $unlink_on_close,
@@ -1475,7 +1475,7 @@ sub tempdir  {
       #
       # There is no filename at the end
       $template = VMS::Filespec::vmspath($template) if $^O eq 'VMS';
-      my ($volume, $directories, undef) = < File::Spec->splitpath( $template, 1);
+      my @($volume, $directories, _) =  File::Spec->splitpath( $template, 1);
 
       # Last directory is then our template
       $template = File::Spec->splitdir($directories)[-1];
@@ -1522,7 +1522,7 @@ sub tempdir  {
 
   my $errstr;
   croak "Error in tempdir() using $template: $errstr"
-    unless ((undef, $tempdir) = < _gettemp($template,
+    unless (@(_, $tempdir) =  _gettemp($template,
 				    "open" => 0,
 				    "mkdir"=> 1 ,
 				    "suffixlen" => $suffixlen,
@@ -1576,7 +1576,7 @@ sub mkstemp {
 
   my ($fh, $path, $errstr);
   croak "Error in mkstemp using $template: $errstr"
-    unless (($fh, $path) = < _gettemp($template,
+    unless (@($fh, $path) =  _gettemp($template,
 				    "open" => 1,
 				    "mkdir"=> 0 ,
 				    "suffixlen" => 0,
@@ -1616,7 +1616,7 @@ sub mkstemps {
 
   my ($fh, $path, $errstr);
   croak "Error in mkstemps using $template: $errstr"
-    unless (($fh, $path) = < _gettemp($template,
+    unless (@($fh, $path) =  _gettemp($template,
 				    "open" => 1,
 				    "mkdir"=> 0 ,
 				    "suffixlen" => length($suffix),
@@ -1660,7 +1660,7 @@ sub mkdtemp {
   }
   my ($junk, $tmpdir, $errstr);
   croak "Error creating temp directory from template $template\: $errstr"
-    unless (($junk, $tmpdir) = < _gettemp($template,
+    unless (@($junk, $tmpdir) =  _gettemp($template,
 					"open" => 0,
 					"mkdir"=> 1 ,
 					"suffixlen" => $suffixlen,
@@ -1693,7 +1693,7 @@ sub mktemp {
 
   my ($tmpname, $junk, $errstr);
   croak "Error getting name to temp file from template $template: $errstr"
-    unless (($junk, $tmpname) = < _gettemp($template,
+    unless (@($junk, $tmpname) =  _gettemp($template,
 					 "open" => 0,
 					 "mkdir"=> 0 ,
 					 "suffixlen" => 0,
@@ -1780,7 +1780,7 @@ Will croak() if there is an error.
 sub tmpfile {
 
   # Simply call tmpnam() in a list context
-  my ($fh, $file) = < tmpnam();
+  my @($fh, $file) =  tmpnam();
 
   # Make sure file is removed when filehandle is closed
   # This will fail on NFS
@@ -1826,7 +1826,7 @@ sub tempnam {
 
   croak 'Usage tempnam($dir, $prefix)' unless scalar(nelems @_) == 2;
 
-  my ($dir, $prefix) = < @_;
+  my @($dir, $prefix) =  @_;
 
   # Add a string to the prefix
   $prefix .= 'XXXXXXXX';
@@ -1900,7 +1900,7 @@ sub unlink0 {
     unless scalar(nelems @_) == 2;
 
   # Read args
-  my ($fh, $path) = < @_;
+  my @($fh, $path) =  @_;
 
   cmpstat($fh, $path) or return 0;
 
@@ -1965,7 +1965,7 @@ sub cmpstat {
     unless scalar(nelems @_) == 2;
 
   # Read args
-  my ($fh, $path) = < @_;
+  my @($fh, $path) =  @_;
 
   warn "Comparing stat\n"
     if $DEBUG;
@@ -2057,7 +2057,7 @@ sub unlink1 {
     unless scalar(nelems @_) == 2;
 
   # Read args
-  my ($fh, $path) = < @_;
+  my @($fh, $path) =  @_;
 
   cmpstat($fh, $path) or return 0;
 

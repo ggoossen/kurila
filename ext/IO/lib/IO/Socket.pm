@@ -13,7 +13,7 @@ use Carp;
 
 our(@ISA, $VERSION, @EXPORT_OK);
 use Exporter;
-use Errno;
+use Errno < qw|EINPROGRESS EWOULDBLOCK EISCONN|;
 
 # legacy
 
@@ -34,7 +34,7 @@ sub import {
 }
 
 sub new {
-    my($class,< %arg) = < @_;
+    my@($class,%< %arg) =  @_;
     my $sock = $class->SUPER::new();
 
     $sock->autoflush(1);
@@ -48,12 +48,12 @@ sub new {
 my @domain2pkg;
 
 sub register_domain {
-    my($p,$d) = < @_;
-    @domain2pkg[$d] = $p;
+    my@($p,$d) =  @_;
+    @domain2pkg[+$d] = $p;
 }
 
 sub configure {
-    my($sock,$arg) = < @_;
+    my@($sock,$arg) =  @_;
     my $domain = delete $arg->{Domain};
 
     croak 'IO::Socket: Cannot configure a generic socket'
@@ -71,7 +71,7 @@ sub configure {
 
 sub socket {
     (nelems @_) == 4 or croak 'usage: $sock->socket(DOMAIN, TYPE, PROTOCOL)';
-    my($sock,$domain,$type,$protocol) = < @_;
+    my@($sock,$domain,$type,$protocol) =  @_;
 
     socket($sock,$domain,$type,$protocol) or
     	return undef;
@@ -85,7 +85,7 @@ sub socket {
 
 sub socketpair {
     (nelems @_) == 4 || croak 'usage: IO::Socket->socketpair(DOMAIN, TYPE, PROTOCOL)';
-    my($class,$domain,$type,$protocol) = < @_;
+    my@($class,$domain,$type,$protocol) =  @_;
     my $sock1 = $class->new();
     my $sock2 = $class->new();
 
@@ -108,7 +108,7 @@ sub connect {
 
     $blocking = $sock->blocking(0) if $timeout;
     if (!connect($sock, $addr)) {
-	if (defined $timeout && (%!{?EINPROGRESS} || %!{?EWOULDBLOCK})) {
+	if (defined $timeout && ($! == EINPROGRESS || $! == EWOULDBLOCK)) {
 	    require IO::Select;
 
 	    my $sel = IO::Select->new( $sock);
@@ -119,7 +119,7 @@ sub connect {
 		$@ = "connect: timeout";
 	    }
 	    elsif (!connect($sock,$addr) &&
-                not (%!{?EISCONN} || ($! == 10022 && $^O eq 'MSWin32'))
+                not ($! == EISCONN || ($! == 10022 && $^O eq 'MSWin32'))
             ) {
 		# Some systems refuse to re-connect() to
 		# an already open socket and set errno to EISCONN.
@@ -128,7 +128,7 @@ sub connect {
 		$@ = "connect: $!";
 	    }
 	}
-        elsif ($blocking || !(%!{?EINPROGRESS} || %!{?EWOULDBLOCK}))  {
+        elsif ($blocking || !($! == EINPROGRESS || $! == EWOULDBLOCK))  {
 	    $err = $!;
 	    $@ = "connect: $!";
 	}
@@ -201,8 +201,7 @@ sub bind {
 }
 
 sub listen {
-    (nelems @_) +>= 1 && (nelems @_) +<= 2 or croak 'usage: $sock->listen([QUEUE])';
-    my($sock,$queue) = < @_;
+    my @($sock,?$queue) =  @_;
     $queue = 5
 	unless $queue && $queue +> 0;
 
@@ -243,21 +242,21 @@ sub sockname {
 
 sub peername {
     (nelems @_) == 1 or croak 'usage: $sock->peername()';
-    my($sock) = < @_;
+    my@($sock) =  @_;
     %{*$sock}{+'io_socket_peername'} ||= getpeername($sock);
 }
 
 sub connected {
     (nelems @_) == 1 or croak 'usage: $sock->connected()';
-    my($sock) = < @_;
+    my@($sock) =  @_;
     getpeername($sock);
 }
 
 sub send {
     (nelems @_) +>= 2 && (nelems @_) +<= 4 or croak 'usage: $sock->send(BUF, [FLAGS, [TO]])';
     my $sock  = @_[0];
-    my $flags = @_[2] || 0;
-    my $peer  = @_[3] || $sock->peername;
+    my $flags = @_[?2] || 0;
+    my $peer  = @_[?3] || $sock->peername;
 
     croak 'send: Cannot determine peer address'
 	 unless(defined $peer);
@@ -277,7 +276,7 @@ sub recv {
     (nelems @_) == 3 || (nelems @_) == 4 or croak 'usage: $sock->recv(BUF, LEN [, FLAGS])';
     my $sock  = @_[0];
     my $len   = @_[2];
-    my $flags = @_[3] || 0;
+    my $flags = @_[?3] || 0;
 
     # remember who we recv'd from
     %{*$sock}{+'io_socket_peername'} = recv($sock, @_[1]='', $len, $flags);
@@ -285,7 +284,7 @@ sub recv {
 
 sub shutdown {
     (nelems @_) == 2 or croak 'usage: $sock->shutdown(HOW)';
-    my($sock, $how) = < @_;
+    my@($sock, $how) =  @_;
     %{*$sock}{+'io_socket_peername'} = undef;
     shutdown($sock, $how);
 }
@@ -314,13 +313,13 @@ sub sockopt {
 
 sub atmark {
     (nelems @_) == 1 or croak 'usage: $sock->atmark()';
-    my($sock) = < @_;
+    my@($sock) =  @_;
     sockatmark($sock);
 }
 
 sub timeout {
     (nelems @_) == 1 || (nelems @_) == 2 or croak 'usage: $sock->timeout([VALUE])';
-    my($sock,$val) = < @_;
+    my@($sock,$val) =  @_;
     my $r = %{*$sock}{?'io_socket_timeout'};
 
     %{*$sock}{+'io_socket_timeout'} = defined $val ?? 0 + $val !! $val
@@ -343,7 +342,7 @@ sub socktype {
 
 sub protocol {
     (nelems @_) == 1 or croak 'usage: $sock->protocol()';
-    my($sock) = < @_;
+    my@($sock) =  @_;
     %{*$sock}{?'io_socket_proto'};
 }
 

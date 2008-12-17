@@ -124,7 +124,7 @@ sub pod_find
     %opts{+verbose} ||= 0;
     %opts{+perl}    ||= 0;
 
-    my (@search) = @_;
+    my @search = @_;
 
     if(%opts{?script}) {
         require Config;
@@ -180,7 +180,7 @@ sub pod_find
     my %names;
     my $pwd = cwd();
 
-    foreach my $try ( @search) {
+    foreach my $try (@search) {
         unless(File::Spec->file_name_is_absolute($try)) {
             # make path absolute
             $try = File::Spec->catfile($pwd,$try);
@@ -231,7 +231,7 @@ sub pod_find
 }
 
 sub _check_for_duplicates {
-    my ($file, $name, $names_ref, $pods_ref) = < @_;
+    my @($file, $name, $names_ref, $pods_ref) =  @_;
     if(%$names_ref{?$name}) {
         warn "Duplicate POD found (shadowing?): $name ($file)\n";
         warn "    Already seen in ",
@@ -244,7 +244,7 @@ sub _check_for_duplicates {
 }
 
 sub _check_and_extract_name {
-    my ($file, $verbose, $root_rx) = < @_;
+    my @($file, $verbose, $root_rx) =  @_;
 
     # check extension or executable flag
     # this involves testing the .bat extension on Win32!
@@ -289,7 +289,7 @@ F<.bat>, F<.cmd> on Win32 and OS/2, or F<.com> on VMS, respectively.
 # basic simplification of the POD name:
 # basename & strip extension
 sub simplify_name {
-    my ($str) = < @_;
+    my @($str) =  @_;
     # remove all path components
     if ($^O eq 'MacOS') {
         $str =~ s/^.*://s;

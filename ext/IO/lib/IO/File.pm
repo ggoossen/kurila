@@ -169,9 +169,9 @@ sub new {
 
 sub open {
     (nelems @_) +>= 2 && (nelems @_) +<= 4 or die 'usage: $fh->open(FILENAME [,MODE [,PERMS]])';
-    my ($fh, $file) = < @_;
+    my @($fh, $file, ...) =  @_;
     if ((nelems @_) +> 2) {
-	my ($mode, $perms) = < @_[[@(2, 3)]];
+	my @($mode, $perms) =  @_[[@(2, 3)]];
 	if ($mode =~ m/^\d+$/) {
 	    defined $perms or $perms = 0666;
 	    return sysopen($fh, $file, $mode, $perms);
@@ -193,7 +193,7 @@ sub open {
 sub binmode {
     ( (nelems @_) == 1 or (nelems @_) == 2 ) or die 'usage $fh->binmode([LAYER])';
 
-    my($fh, $layer) = < @_;
+    my @($fh, ?$layer) =  @_;
 
     return binmode $$fh unless $layer;
     return binmode $$fh, $layer;

@@ -814,6 +814,8 @@ STATIC SV* S_dump_op_flags(pTHX_ const OP* o)
 	sv_catpv(tmpsv, ",MOD");
     if (o->op_flags & OPf_ASSIGN)
 	sv_catpv(tmpsv, ",ASSIGN");
+    if (o->op_flags & OPf_ASSIGN_PART)
+	sv_catpv(tmpsv, ",ASSIGN_PART");
     if (o->op_flags & OPf_SPECIAL)
 	sv_catpv(tmpsv, ",SPECIAL");
     if (o->op_latefree)
@@ -840,14 +842,6 @@ STATIC SV* S_dump_op_flags_private(pTHX_ const OP* o)
 	     optype == OP_LEAVE) {
 	if (o->op_private & OPpREFCOUNTED)
 	    sv_catpv(tmpsv, ",REFCOUNTED");
-    }
-    else if (optype == OP_AASSIGN) {
-	if (o->op_private & OPpASSIGN_COMMON)
-	    sv_catpv(tmpsv, ",COMMON");
-    }
-    else if (optype == OP_SASSIGN) {
-	if (o->op_private & OPpASSIGN_BACKWARDS)
-	    sv_catpv(tmpsv, ",BACKWARDS");
     }
     else if (optype == OP_REPEAT) {
 	if (o->op_private & OPpREPEAT_DOLIST)
@@ -890,8 +884,10 @@ STATIC SV* S_dump_op_flags_private(pTHX_ const OP* o)
 	    }
 	}
 	if (optype == OP_AELEM || optype == OP_HELEM) {
-	    if (o->op_private & OPpLVAL_DEFER)
-		sv_catpv(tmpsv, ",LVAL_DEFER");
+	    if (o->op_private & OPpELEM_ADD)
+		sv_catpv(tmpsv, ",ELEM_ADD");
+	    if (o->op_private & OPpELEM_OPTIONAL)
+		sv_catpv(tmpsv, ",ELEM_OPTIONAL");
 	}
 	else {
 	    if (o->op_private & OPpOUR_INTRO)
@@ -1158,7 +1154,7 @@ static const struct { const char type; const char *name; } magic_names[] = {
 	{ PERL_MAGIC_dbfile,         "dbfile(L)" },
 	{ PERL_MAGIC_shared,         "shared(N)" },
 	{ PERL_MAGIC_tied,           "tied(P)" },
-	{ PERL_MAGIC_sig,            "sig(S)" },
+	{ PERL_MAGIC_hints,          "hints(H)" },
 	{ PERL_MAGIC_uvar,           "uvar(U)" },
 	{ PERL_MAGIC_envelem,        "envelem(e)" },
 	{ PERL_MAGIC_fm,             "fm(f)" },
@@ -1169,7 +1165,6 @@ static const struct { const char type; const char *name; } magic_names[] = {
 	{ PERL_MAGIC_shared_scalar,  "shared_scalar(n)" },
 	{ PERL_MAGIC_tiedelem,       "tiedelem(p)" },
 	{ PERL_MAGIC_qr,             "qr(r)" },
-	{ PERL_MAGIC_sigelem,        "sigelem(s)" },
 	{ PERL_MAGIC_taint,          "taint(t)" },
 	{ PERL_MAGIC_uvar_elem,      "uvar_elem(u)" },
 	{ PERL_MAGIC_vstring,        "vstring(V)" },
@@ -1194,8 +1189,7 @@ Perl_do_magic_dump(pTHX_ I32 level, PerlIO *file, const MAGIC *mg, I32 nest, I32
  	    if      (v == &PL_vtbl_sv)         s = "sv";
             else if (v == &PL_vtbl_env)        s = "env";
             else if (v == &PL_vtbl_envelem)    s = "envelem";
-            else if (v == &PL_vtbl_sig)        s = "sig";
-            else if (v == &PL_vtbl_sigelem)    s = "sigelem";
+            else if (v == &PL_vtbl_hints)      s = "hints";
             else if (v == &PL_vtbl_pack)       s = "pack";
             else if (v == &PL_vtbl_packelem)   s = "packelem";
             else if (v == &PL_vtbl_dbline)     s = "dbline";

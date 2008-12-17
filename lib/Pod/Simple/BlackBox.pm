@@ -257,7 +257,7 @@ sub parse_lines {             # Usage: $parser->parse_lines(@lines)
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 sub _handle_encoding_line {
-  my($self, $line) = < @_;
+  my@($self, $line) =  @_;
   
   # The point of this routine is to set $self->{'_transcoder'} as indicated.
 
@@ -336,7 +336,7 @@ sub _handle_encoding_line {
 sub _handle_encoding_second_level {
   # By time this is called, the encoding (if well formed) will already
   #  have been acted one.
-  my($self, $para) = < @_;
+  my@($self, $para) =  @_;
   my @x = @$para;
   my $content = join ' ', @( splice @x, 2);
   $content =~ s/^\s+//s;
@@ -834,7 +834,7 @@ sub _ponder_paragraph_buffer {
 
 
 sub _ponder_for {
-  my ($self,$para,$curr_open,$paras) = < @_;
+  my @($self,$para,$curr_open,$paras) =  @_;
 
   # Fake it out as a begin/end
   my $target;
@@ -878,7 +878,7 @@ sub _ponder_for {
 }
 
 sub _ponder_begin {
-  my ($self,$para,$curr_open,$paras) = < @_;
+  my @($self,$para,$curr_open,$paras) =  @_;
   my $content = join ' ', @( splice @$para, 2);
   $content =~ s/^\s+//s;
   $content =~ s/\s+$//s;
@@ -963,7 +963,7 @@ sub _ponder_begin {
 }
 
 sub _ponder_end {
-  my ($self,$para,$curr_open,$paras) = < @_;
+  my @($self,$para,$curr_open,$paras) =  @_;
   my $content = join ' ', @( splice @$para, 2);
   $content =~ s/^\s+//s;
   $content =~ s/\s+$//s;
@@ -1033,7 +1033,7 @@ sub _ponder_end {
 } 
 
 sub _ponder_doc_end {
-  my ($self,$para,$curr_open,$paras) = < @_;
+  my @($self,$para,$curr_open,$paras) =  @_;
   if((nelems @$curr_open)) { # Deal with things left open
     DEBUG and print "Stack is nonempty at end-document: (", <
       $self->_dump_curr_open(), ")\n";
@@ -1071,7 +1071,7 @@ sub _ponder_doc_end {
 }
 
 sub _ponder_pod {
-  my ($self,$para,$curr_open,$paras) = < @_;
+  my @($self,$para,$curr_open,$paras) =  @_;
   $self->whine(
     $para->[1]->{?'start_line'},
     "=pod directives shouldn't be over one line long!  Ignoring all "
@@ -1082,7 +1082,7 @@ sub _ponder_pod {
 }
 
 sub _ponder_over {
-  my ($self,$para,$curr_open,$paras) = < @_;
+  my @($self,$para,$curr_open,$paras) =  @_;
   return 1 unless (nelems @$paras);
   my $list_type;
 
@@ -1137,7 +1137,7 @@ sub _ponder_over {
 }
       
 sub _ponder_back {
-  my ($self,$para,$curr_open,$paras) = < @_;
+  my @($self,$para,$curr_open,$paras) =  @_;
   # TODO: fire off </item-number> or </item-bullet> or </item-text> ??
 
   my $content = join ' ', @( splice @$para, 2);
@@ -1168,7 +1168,7 @@ sub _ponder_back {
 }
 
 sub _ponder_item {
-  my ($self,$para,$curr_open,$paras) = < @_;
+  my @($self,$para,$curr_open,$paras) =  @_;
   my $over;
   unless((nelems @$curr_open) and ($over = $curr_open->[-1])->[0] eq '=over') {
     $self->whine(
@@ -1336,7 +1336,7 @@ sub _ponder_item {
 }
 
 sub _ponder_Plain {
-  my ($self,$para) = < @_;
+  my @($self,$para) =  @_;
   DEBUG and print " giving plain treatment...\n";
   unless( (nelems @$para) == 2 or ( (nelems @$para) == 3 and $para->[2] eq '' )
     or $para->[1]->{?'~cooked'}
@@ -1353,7 +1353,7 @@ sub _ponder_Plain {
 }
 
 sub _ponder_Verbatim {
-  my ($self,$para) = < @_;
+  my @($self,$para) =  @_;
   DEBUG and print " giving verbatim treatment...\n";
 
   $para->[1]->{+'xml:space'} = 'preserve';
@@ -1389,7 +1389,7 @@ sub _ponder_Verbatim {
 }
 
 sub _ponder_Data {
-  my ($self,$para) = < @_;
+  my @($self,$para) =  @_;
   DEBUG and print " giving data treatment...\n";
   $para->[1]->{+'xml:space'} = 'preserve';
   push @$para, join "\n", @( splice(@$para, 2)) if (nelems @$para) +> 3;
@@ -1402,7 +1402,7 @@ sub _ponder_Data {
 ###########################################################################
 
 sub _traverse_treelet_bit {  # for use only by the routine above
-  my($self, $name) = splice @_,0,2;
+  my@($self, $name) =@( splice @_,0,2);
 
   my $scratch;
   $self->_handle_element_start(($scratch=$name), shift @_);
@@ -1451,7 +1451,7 @@ sub _closers_for_all_curr_open {
 #--------------------------------------------------------------------------
 
 sub _verbatim_format {
-  my($it, $p) = < @_;
+  my@($it, $p) =  @_;
   
   my $formatting;
 
@@ -1599,7 +1599,7 @@ sub _treelet_from_formatting_codes {
   #            "!"
   #       ]
   
-  my($self, $para, $start_line, $preserve_space) = < @_;
+  my@($self, $para, $start_line, ?$preserve_space) =  @_;
   
   my $treelet = \@('~Top', \%('start_line' => $start_line),);
   
@@ -1788,7 +1788,7 @@ sub stringify_lol {  # function: stringify_lol($lol)
 }
 
 sub _stringify_lol {  # the real recursor
-  my($lol, $to) = < @_;
+  my@($lol, $to) =  @_;
   use UNIVERSAL ();
   for my $i (2 .. nelems(@$lol) -1) {
     if( ref($lol->[$i] || '') and UNIVERSAL::isa($lol->[$i], 'ARRAY') ) {

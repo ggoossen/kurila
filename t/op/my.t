@@ -5,13 +5,13 @@ print "1..34\n";
 our ($a, $b, $c, $d, $x, $y, @b, @c, %d, $k);
 
 sub foo {
-    my($a, $b) = < @_;
+    my@($a, $b) =  @_;
     my $c;
     my $d;
     $c = "ok 3\n";
     $d = "ok 4\n";
-    do { my($a, undef, $c) = ("ok 9\n", "not ok 10\n", "ok 10\n");
-      ($x, $y) = ($a, $c); };
+    do { my@($a, _, $c) = @("ok 9\n", "not ok 10\n", "ok 10\n");
+      @($x, $y) = @($a, $c); };
     print $a, $b;
     $c . $d;
 }
@@ -28,11 +28,11 @@ print $a,$b,$c,$d,$x,$y;
 # same thing, only with arrays and associative arrays
 
 sub foo2 {
-    my($a, < @b) = < @_;
+    my@($a, @< @b) =  @_;
     my(@c, %d);
     @c = @( "ok 13\n" );
     %d{+''} = "ok 14\n";
-    do { my($a,< @c) = ("ok 19\n", "ok 20\n"); ($x, $y) = ($a, < @c); };
+    do { my@($a,@< @c) = @("ok 19\n", "ok 20\n"); @($x, $y) = @($a, < @c); };
     print $a, < @b;
     @c[0] . %d{?''};
 }

@@ -9,7 +9,7 @@ BEGIN {
 	print "1..0 # Skip: no fork\n";
 	exit 0;
     }
-    %ENV{PERL5LIB} = "../lib";
+    %ENV{+PERL5LIB} = "../lib";
 }
 
 if ($^O eq 'mpeix') {
@@ -40,7 +40,7 @@ for ( @prgs){
     if (s/^\s*(-\w.*)//){
 	$switch = $1;
     }
-    my($prog,$expected) = < split(m/\nEXPECT\n/, $_);
+    my@($prog,$expected) =  split(m/\nEXPECT\n/, $_);
     $expected =~ s/\n+$//;
     # results can be in any order, so sort 'em
     my @expected = sort split m/\n/, $expected;
@@ -105,7 +105,8 @@ if (my $cid = fork) {
 else {
     # XXX On Windows the default signal handler kills the
     # XXX whole process, not just the thread (pseudo-process)
-    %SIG{INT} = sub { exit };
+    use signals;
+    signals::set_handler(INT => sub { exit });
     print "ok 1\n";
     sleep 5;
     die;
@@ -279,21 +280,21 @@ $| = 1;
 $\ = "\n";
 my $getenv;
 if ($^O eq 'MSWin32' || $^O eq 'NetWare') {
-    $getenv = qq[$^X -e "print \%ENV\{TST\}"];
+    $getenv = qq[$^X -e "print \%ENV\{?TST\}"];
 }
 else {
-    $getenv = qq[$^X -e 'print \%ENV\{TST\}'];
+    $getenv = qq[$^X -e 'print \%ENV\{?TST\}'];
 }
-%ENV{TST} = 'foo';
+%ENV{+TST} = 'foo';
 if (fork) {
     sleep 1;
     print "parent before: " . `$getenv`;
-    %ENV{TST} = 'bar';
+    %ENV{+TST} = 'bar';
     print "parent after: " . `$getenv`;
 }
 else {
     print "child before: " . `$getenv`;
-    %ENV{TST} = 'baz';
+    %ENV{+TST} = 'baz';
     print "child after: " . `$getenv`;
 }
 EXPECT
@@ -340,11 +341,11 @@ child died at - line 5 character 14.
 ########
 if (my $pid = fork) {
     try { die "parent died" };
-    print $@->message, $@->stacktrace;
+    print $@->message;
 }
 else {
     sleep 1; try { die "child died" };
-    print $@->message, $@->stacktrace;
+    print $@->message;
 }
 EXPECT
 parent died at - line 2 character 11.
@@ -355,11 +356,11 @@ child died at - line 6 character 20.
 my $pid;
 if (eval q{$pid = fork}) {
     eval q{ die "parent died" };
-    print $@->message, $@->stacktrace;
+    print $@->message;
 }
 else {
     sleep 1; eval q{ die "child died" };
-    print $@->message, $@->stacktrace;
+    print $@->message;
 }
 EXPECT
 parent died at (eval 2) line 1 character 2.
@@ -456,19 +457,19 @@ forked second kid
 second child
 wait() returned ok
 ########
-pipe(RDR,WTR) or die $!;
+pipe(my $rdr, my $wtr) or die $!;
 my $pid = fork;
 die "fork: $!" if !defined $pid;
 if ($pid == 0) {
     my $rand_child = rand;
-    close RDR;
+    close $rdr;
     print WTR $rand_child, "\n";
-    close WTR;
+    close $wtr;
 } else {
     my $rand_parent = rand;
-    close WTR;
-    chomp(my $rand_child  = ~< *RDR);
-    close RDR;
+    close $wtr;
+    chomp(my $rand_child  = ~< $rdr);
+    close $rdr;
     print $rand_child ne $rand_parent, "\n";
 }
 EXPECT

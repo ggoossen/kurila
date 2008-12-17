@@ -45,7 +45,7 @@ sub init {
 #--------------------------------------------------------------------------
 
 sub survey {
-  my($self, < @search_dirs) = < @_;
+  my@($self, @< @search_dirs) =  @_;
   $self = $self->new unless ref $self; # tolerate being a class method
 
   $self->_expand_inc( \@search_dirs );
@@ -124,13 +124,13 @@ sub _make_search_callback {
   my $self = @_[0];
 
   # Put the options in variables, for easy access
-  my(  $laborious, $verbose, $shadows, $limit_re, $callback, $progress,$path2name,$name2path) =
-    < map scalar($self->?$_()),
+  my@(  $laborious, $verbose, $shadows, $limit_re, $callback, $progress,$path2name,$name2path) =
+     map scalar($self->?$_()),
      qw(laborious   verbose   shadows   limit_re   callback   progress  path2name  name2path);
 
   my($file, $shortname, $isdir, $modname_bits);
   return sub {
-    ($file, $shortname, $isdir, $modname_bits) = < @_;
+    @($file, $shortname, $isdir, $modname_bits) =  @_;
 
     if($isdir) { # this never gets called on the startdir itself, just subdirs
 
@@ -219,7 +219,7 @@ sub _make_search_callback {
 #==========================================================================
 
 sub _path2modname {
-  my($self, $file, $shortname, $modname_bits) = < @_;
+  my@($self, $file, $shortname, $modname_bits) =  @_;
 
   # this code simplifies the POD name for Perl modules:
   # * remove "site_perl"
@@ -283,7 +283,7 @@ sub _path2modname {
 #==========================================================================
 
 sub _recurse_dir {
-  my($self, $startdir, $callback, $modname_bits) = < @_;
+  my@($self, $startdir, $callback, $modname_bits) =  @_;
 
   my $maxdepth = $self->{?'fs_recursion_maxdepth'} || 10;
   my $verbose = $self->verbose;
@@ -294,7 +294,7 @@ sub _recurse_dir {
 
   my $recursor;
   $recursor = sub {
-    my($dir_long, $dir_bare) = < @_;
+    my@($dir_long, $dir_bare) =  @_;
     if( (nelems @$modname_bits) +>= 10 ) {
       $verbose and print "Too deep! [$(join ' ',@$modname_bits)]\n";
       return;
@@ -362,7 +362,7 @@ sub run {
   my $self = __PACKAGE__->new;
   $self->limit_glob(@ARGV[0]) if (nelems @ARGV);
   $self->callback( sub {
-    my($file, $name) = < @_;
+    my@($file, $name) =  @_;
     my $version = '';
      
     # Yes, I know we won't catch the version in like a File/Thing.pm
@@ -418,7 +418,7 @@ sub run {
 #==========================================================================
 
 sub simplify_name {
-  my($self, $str) = < @_;
+  my@($self, $str) =  @_;
     
   # Remove all path components
   #                             XXX Why not just use basename()? -- SMB
@@ -449,7 +449,7 @@ sub _simplify_base {   # Internal method only
 #==========================================================================
 
 sub _expand_inc {
-  my($self, $search_dirs) = < @_;
+  my@($self, $search_dirs) =  @_;
   
   return unless $self->{?'inc'};
 
@@ -469,7 +469,7 @@ sub _expand_inc {
 
 sub _mac_whammy { # Tolerate '.', './some_dir' and '(../)+some_dir' on Mac OS
   my @them;
-  (undef,< @them) = < @_;
+  @(_,@< @them) =  @_;
   for my $_ ( @them) {
     if ( $_ eq '.' ) {
       $_ = ':';
@@ -512,7 +512,7 @@ sub _limit_glob_to_limit_re {
 # contribution mostly from Tim Jenness <t.jenness@jach.hawaii.edu>
 
 sub find {
-  my($self, $pod, < @search_dirs) = < @_;
+  my@($self, $pod, @< @search_dirs) =  @_;
   $self = $self->new unless ref $self; # tolerate being a class method
 
   # Check usage
@@ -582,7 +582,7 @@ sub find {
 #==========================================================================
 
 sub contains_pod {
-  my($self, $file) = < @_;
+  my@($self, $file) =  @_;
   my $verbose = $self->{?'verbose'};
 
   # check for one line of POD

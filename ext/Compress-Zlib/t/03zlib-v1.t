@@ -141,7 +141,7 @@ ok $x ;
 my $Answer = '';
 foreach (<@hello)
 {
-    ($X, $status) = < $x->deflate($_) ;
+    @($X, $status) =  $x->deflate($_) ;
     last unless $status == Z_OK ;
 
     $Answer .= $X ;
@@ -149,7 +149,7 @@ foreach (<@hello)
  
 ok $status == Z_OK ;
 
-ok    (@(($X, $status) = < $x->flush())[1] == Z_OK ) ;
+ok    (@(@($X, $status) =  $x->flush())[?1] == Z_OK ) ;
 $Answer .= $X ;
  
  
@@ -163,7 +163,7 @@ my $GOT = '';
 my $Z;
 foreach (< @Answer)
 {
-    ($Z, $status) = < $k->inflate($_) ;
+    @($Z, $status) =  $k->inflate($_) ;
     $GOT .= $Z ;
     last if $status == Z_STREAM_END or $status != Z_OK ;
  
@@ -186,14 +186,14 @@ ok $x->total_in() == 0 ;
 ok $x->total_out() == 0 ;
 $Answer = '';
 do {
-    ($X, $status) = < $x->deflate($hello) ;
+    @($X, $status) =  $x->deflate($hello) ;
 
     $Answer .= $X ;
 };
  
 ok $status == Z_OK ;
 
-ok   (@(($X, $status) = < $x->flush())[1] == Z_OK ) ;
+ok   (@(@($X, $status) =  $x->flush())[?1] == Z_OK ) ;
 $Answer .= $X ;
  
 ok !defined $x->msg() ;
@@ -213,7 +213,7 @@ ok $k->total_out() == 0 ;
 $GOT = '';
 foreach ( < @Answer)
 {
-    ($Z, $status) = < $k->inflate($_) ;
+    @($Z, $status) =  $k->inflate($_) ;
     $GOT .= $Z ;
     last if $status == Z_STREAM_END or $status != Z_OK ;
  
@@ -234,19 +234,19 @@ title 'deflate/inflate - larger buffer';
 
 ok $x = deflateInit() ;
  
-ok (@(($X, $status) = < $x->deflate($contents))[1] == Z_OK) ;
+ok (@(@($X, $status) =  $x->deflate($contents))[?1] == Z_OK) ;
 
 my $Y = $X ;
  
  
-ok (@(($X, $status) = < $x->flush() )[1] == Z_OK ) ;
+ok (@(@($X, $status) =  $x->flush() )[?1] == Z_OK ) ;
 $Y .= $X ;
  
  
  
 ok $k = inflateInit() ;
  
-($Z, $status) = < $k->inflate($Y) ;
+@($Z, $status) =  $k->inflate($Y) ;
  
 ok $status == Z_STREAM_END ;
 ok $contents eq $Z ;
@@ -260,16 +260,16 @@ ok $x = deflateInit(\%(Level => Z_BEST_COMPRESSION,
  
 my $dictID = $x->dict_adler() ;
 
-($X, $status) = < $x->deflate($hello) ;
+@($X, $status) =  $x->deflate($hello) ;
 ok $status == Z_OK ;
-($Y, $status) = < $x->flush() ;
+@($Y, $status) =  $x->flush() ;
 ok $status == Z_OK ;
 $X .= $Y ;
 $x = 0 ;
  
 ok $k = inflateInit(Dictionary => $dictionary) ;
  
-($Z, $status) = < $k->inflate($X);
+@($Z, $status) =  $k->inflate($X);
 ok $status == Z_STREAM_END ;
 ok $k->dict_adler() == $dictID;
 ok $hello eq $Z ;
@@ -295,9 +295,9 @@ title 'inflate - check remaining buffer after Z_STREAM_END';
 do {
     ok $x = deflateInit(Level => Z_BEST_COMPRESSION ) ;
  
-    ($X, $status) = < $x->deflate($hello) ;
+    @($X, $status) =  $x->deflate($hello) ;
     ok $status == Z_OK ;
-    ($Y, $status) = < $x->flush() ;
+    @($Y, $status) =  $x->flush() ;
     ok $status == Z_OK ;
     $X .= $Y ;
     $x = 0 ;
@@ -306,13 +306,13 @@ do {
  
     my $first = substr($X, 0, 2) ;
     my $last  = substr($X, 2) ;
-    ($Z, $status) = < $k->inflate($first);
+    @($Z, $status) =  $k->inflate($first);
     ok $status == Z_OK ;
     ok $first eq "" ;
 
     $last .= "appendage" ;
     my $T;
-    ($T, $status) = < $k->inflate($last);
+    @($T, $status) =  $k->inflate($last);
     ok $status == Z_STREAM_END ;
     ok $hello eq $Z . $T ;
     ok $last eq "appendage" ;
@@ -544,7 +544,7 @@ do {
     $Answer = '';
     foreach ( < @hello)
     {
-        ($X, $status) = < $x->deflate($_) ;
+        @($X, $status) =  $x->deflate($_) ;
         last unless $status == Z_OK ;
     
         $Answer .= $X ;
@@ -552,7 +552,7 @@ do {
      
     ok $status == Z_OK ;
     
-    ok   (@(($X, $status) = < $x->flush())[1] == Z_OK ) ;
+    ok   (@(@($X, $status) =  $x->flush())[?1] == Z_OK ) ;
     $Answer .= $X ;
      
      
@@ -567,7 +567,7 @@ do {
     $GOT = '';
     foreach ( @Answer)
     {
-        ($Z, $status) = < $k->inflate($_) ;
+        @($Z, $status) =  $k->inflate($_) ;
         $GOT .= $Z ;
         last if $status == Z_STREAM_END or $status != Z_OK ;
      

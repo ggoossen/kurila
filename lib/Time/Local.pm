@@ -85,7 +85,7 @@ sub _timegm {
 }
 
 sub timegm {
-    my ( $sec, $min, $hour, $mday, $month, $year ) = < @_;
+    my @( $sec, $min, $hour, $mday, $month, $year, ... ) =  @_;
 
     if ( $year +>= 1000 ) {
         $year -= 1900;
@@ -176,7 +176,7 @@ sub timelocal {
 
     # If the original date was a non-extent gap in a forward DST jump,
     # we should now have the wrong answer - undo the DST adjustment
-    my ( $s, $m, $h ) = localtime($loc_t);
+    my @( $s, $m, $h, ... ) = @: localtime($loc_t);
     $loc_t -= $dst_off if $s != @_[0] || $m != @_[1] || $h != @_[2];
 
     return $loc_t;

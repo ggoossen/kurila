@@ -83,13 +83,12 @@ my $curcv;
 my $cop_seq_base;
 
 sub set_style {
-    ($format, $gotofmt, $treefmt) = < @_;
+    @($format, $gotofmt, $treefmt) =  @_;
     #warn "set_style: deprecated, use set_style_standard instead\n"; # someday
-    die "expecting 3 style-format args\n" unless (nelems @_) == 3;
 }
 
 sub add_style {
-    my ($newstyle,< @args) = < @_;
+    my @($newstyle,@< @args) =  @_;
     die "style '$newstyle' already exists, choose a new name\n"
 	if exists %style{$newstyle};
     die "expecting 3 style-format args\n" unless (nelems @args) == 3;
@@ -131,7 +130,7 @@ sub walk_output { # updates $walkHandle
 }
 
 sub concise_subref {
-    my($order, $coderef, $name) = < @_;
+    my@($order, $coderef, ?$name) =  @_;
     my $codeobj = svref_2object($coderef);
 
     return concise_stashref(< @_)
@@ -140,7 +139,7 @@ sub concise_subref {
 }
 
 sub concise_stashref {
-    my($order, $h) = < @_;
+    my@($order, $h) =  @_;
     foreach my $k (sort keys %$h) {
 	next unless defined $h->{?$k};
 	my $s = \($h->{+$k});
@@ -159,7 +158,7 @@ sub concise_stashref {
 *concise_cv = \&concise_subref;
 
 sub concise_cv_obj {
-    my ($order, $cv, $name) = < @_;
+    my @($order, $cv, $name) =  @_;
     # name is either a string, or a CODE ref (copy of $cv arg??)
 
     $curcv = $cv;
@@ -194,7 +193,7 @@ sub concise_cv_obj {
 }
 
 sub concise_main {
-    my($order) = < @_;
+    my@($order) =  @_;
     sequence(main_start);
     $curcv = main_cv;
     if ($order eq "exec") {
@@ -211,7 +210,7 @@ sub concise_main {
 }
 
 sub concise_specials {
-    my($name, $order, < @cv_s) = < @_;
+    my@($name, $order, @< @cv_s) =  @_;
     my $i = 1;
     if ($name eq "BEGIN") {
 	splice(@cv_s, 0, 8); # skip 7 BEGIN blocks in this file. NOW 8 ??
@@ -391,7 +390,7 @@ my @linenoise =
 my $chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 sub op_flags { # common flags (see BASOP.op_flags in op.h)
-    my($x) = < @_;
+    my@($x) =  @_;
     my(@v);
     push @v, "v" if ($x ^&^ 3) == 1;
     push @v, "s" if ($x ^&^ 3) == 2;
@@ -425,13 +424,13 @@ sub reset_sequence {
 }
 
 sub seq {
-    my($op) = < @_;
+    my@($op) =  @_;
     return "-" if not exists %sequence_num{$$op};
     return base_n(%sequence_num{?$$op});
 }
 
 sub walk_topdown {
-    my($op, $sub, $level) = < @_;
+    my@($op, $sub, $level) =  @_;
     $sub->($op, $level);
     if ($op->flags ^&^ OPf_KIDS) {
 	my $kid = $op->first;
@@ -451,7 +450,7 @@ sub walk_topdown {
 }
 
 sub walklines {
-    my($ar, $level) = < @_;
+    my@($ar, $level) =  @_;
     for my $l ( @$ar) {
 	if (ref($l) eq "ARRAY") {
 	    walklines($l, $level + 1);
@@ -462,11 +461,11 @@ sub walklines {
 }
 
 sub walk_exec {
-    my($top, $level) = < @_;
+    my@($top, ?$level) =  @_;
     my %opsseen;
     my @lines;
     my @todo = @(\@($top, \@lines));
-    while ((nelems @todo) and my($op, $targ) = < @{shift @todo}) {
+    while ((nelems @todo) and my@($op, $targ) =  @{shift @todo}) {
 	while ($$op) {
 	    last if %opsseen{+$$op}++;
 	    push @$targ, $op;
@@ -493,7 +492,7 @@ sub walk_exec {
 
 # The structure of this routine is purposely modeled after op.c's peep()
 sub sequence {
-    my($op) = < @_;
+    my@($op) =  @_;
     my $oldop = 0;
     return if class($op) eq "NULL" or exists %sequence_num{$$op};
     while ($$op) {
@@ -530,7 +529,7 @@ sub sequence {
 }
 
 sub fmt_line {    # generate text-line for op.
-    my($hr, $op, $text, $level) = < @_;
+    my@($hr, $op, $text, $level) =  @_;
 
     $_->($hr, $op, \$text, \$level, $stylename) for  @callbacks;
 
@@ -569,30 +568,30 @@ sub fmt_line {    # generate text-line for op.
 
 our %priv; # used to display each opcode's BASEOP.op_private values
 
-%priv{$_}->{+128} = "LVINTRO"
+%priv{+$_}->{+128} = "LVINTRO"
   for @( ("pos", "substr", "vec", "threadsv", "gvsv", "rv2sv", "rv2hv", "rv2gv",
        "rv2av", "aelem", "helem", "aslice", "hslice", "padsv",
        "padav", "padhv", "enteriter"));
-%priv{$_}->{+64} = "REFC" for @( ("leave", "leavesub", "leavesublv", "leavewrite"));
-%priv{"aassign"}->{+64} = "COMMON";
+%priv{+$_}->{+64} = "REFC" for @( ("leave", "leavesub", "leavesublv", "leavewrite"));
+%priv{+"aassign"}->{+64} = "COMMON";
 %priv{"aassign"}->{+32} = "STATE";
-%priv{"sassign"}->{+32} = "STATE";
-%priv{"sassign"}->{+64} = "BKWARD";
-%priv{$_}->{+64} = "RTIME" for @( ("match", "subst", "substcont", "qr"));
- <%{%priv{"trans"}}{[@(1,2,4,8,16,64)]} = ("<UTF", ">UTF", "IDENT", "SQUASH", "DEL",
+%priv{+"sassign"}->{+32} = "STATE";
+%priv{+"sassign"}->{+64} = "BKWARD";
+%priv{+$_}->{+64} = "RTIME" for @( ("match", "subst", "substcont", "qr"));
+ %{%priv{+"trans"}}{[@(1,2,4,8,16,64)]} = @("<UTF", ">UTF", "IDENT", "SQUASH", "DEL",
 				    "COMPL", "GROWS");
-%priv{"repeat"}->{+64} = "DOLIST";
-%priv{"leaveloop"}->{+64} = "CONT";
- <%{%priv{$_}}{[@(32,64,96)]} = ("DREFAV", "DREFHV", "DREFSV")
+%priv{+"repeat"}->{+64} = "DOLIST";
+%priv{+"leaveloop"}->{+64} = "CONT";
+ %{%priv{+$_}}{[@(32,64,96)]} = @("DREFAV", "DREFHV", "DREFSV")
   for @( ( <qw(rv2gv rv2sv padsv aelem helem)));
 %priv{$_}->{+16} = "STATE" for @( ("padav", "padhv", "padsv"));
- <%{%priv{"entersub"}}{[@(16,32,64)]} = ("DBG","TARG","NOMOD");
- <%{%priv{$_}}{[@(4,8,128)]} = ("INARGS","AMPER","NO()") for @( ("entersub", "rv2cv"));
-%priv{"gv"}->{+32} = "EARLYCV";
-%priv{"aelem"}->{+16} = %priv{"helem"}->{+16} = "LVDEFER";
-%priv{$_}->{+16} = "OURINTR" for @( ("gvsv", "rv2sv", "rv2av", "rv2hv", "r2gv",
+ %{%priv{+"entersub"}}{[@(16,32,64)]} = @("DBG","TARG","NOMOD");
+ %{%priv{+$_}}{[@(4,8,128)]} = @("INARGS","AMPER","NO()") for @( ("entersub", "rv2cv"));
+%priv{+"gv"}->{+32} = "EARLYCV";
+%priv{+"aelem"}->{+16} = %priv{"helem"}->{+16} = "LVDEFER";
+%priv{+$_}->{+16} = "OURINTR" for @( ("gvsv", "rv2sv", "rv2av", "rv2hv", "r2gv",
 	"enteriter"));
-%priv{$_}->{+16} = "TARGMY"
+%priv{+$_}->{+16} = "TARGMY"
   for @( (< map(($_,"s$_"), @("chop", "chomp")),
        < map(($_,"i_$_"), @( "postinc", "postdec", "multiply", "divide", "modulo",
 	   "add", "subtract", "negate")), "pow", "concat", "stringify",
@@ -604,50 +603,50 @@ our %priv; # used to display each opcode's BASEOP.op_private values
        "link", "symlink", "mkdir", "rmdir", "wait", "waitpid", "system",
        "exec", "kill", "getppid", "getpgrp", "setpgrp", "getpriority",
        "setpriority", "time", "sleep"));
-%priv{$_}->{+4} = "REVERSED" for @( ("enteriter", "iter"));
- <%{%priv{"const"}}{[@(4,8,16,32,64,128)]} = ("SHORT","STRICT","ENTERED",'$[',"BARE","WARN");
-%priv{"flip"}->{+64} = %priv{"flop"}->{+64} = "LINENUM";
-%priv{"list"}->{+64} = "GUESSED";
-%priv{"delete"}->{+64} = "SLICE";
-%priv{"exists"}->{+64} = "SUB";
- <%{%priv{"sort"}}{[@(1,2,4,8,16,32,64)]} = ("NUM", "INT", "REV", "INPLACE","DESC","QSORT","STABLE");
+%priv{+$_}->{+4} = "REVERSED" for @( ("enteriter", "iter"));
+ %{%priv{+"const"}}{[@(4,8,16,32,64,128)]} = @("SHORT","STRICT","ENTERED",'$[',"BARE","WARN");
+%priv{+"flip"}->{+64} = %priv{+"flop"}->{+64} = "LINENUM";
+%priv{+"list"}->{+64} = "GUESSED";
+%priv{+"delete"}->{+64} = "SLICE";
+%priv{+"exists"}->{+64} = "SUB";
+ %{%priv{+"sort"}}{[@(1,2,4,8,16,32,64)]} = @("NUM", "INT", "REV", "INPLACE","DESC","QSORT","STABLE");
 %priv{"threadsv"}->{+64} = "SVREFd";
- <%{%priv{$_}}{[@(16,32,64,128)]} = ("INBIN","INCR","OUTBIN","OUTCR")
+ %{%priv{+$_}}{[@(16,32,64,128)]} = @("INBIN","INCR","OUTBIN","OUTCR")
   for @( ("open", "backtick"));
-%priv{"exit"}->{+128} = "VMS";
-%priv{$_}->{+2} = "FTACCESS"
+%priv{+"exit"}->{+128} = "VMS";
+%priv{+$_}->{+2} = "FTACCESS"
   for @( ("ftrread", "ftrwrite", "ftrexec", "fteread", "ftewrite", "fteexec"));
-%priv{"entereval"}->{+2} = "HAS_HH";
+%priv{+"entereval"}->{+2} = "HAS_HH";
 do {
   # Stacked filetests are post 5.8.x
-  %priv{$_}->{+4} = "FTSTACKED"
+  %priv{+$_}->{+4} = "FTSTACKED"
     for @( ("ftrread", "ftrwrite", "ftrexec", "fteread", "ftewrite", "fteexec",
          "ftis", "fteowned", "ftrowned", "ftzero", "ftsize", "ftmtime",
 	 "ftatime", "ftctime", "ftsock", "ftchr", "ftblk", "ftfile", "ftdir",
 	 "ftpipe", "ftlink", "ftsuid", "ftsgid", "ftsvtx", "fttty", "fttext",
 	 "ftbinary"));
   # Lexical $_ is post 5.8.x
-  %priv{$_}->{+2} = "GREPLEX"
+  %priv{+$_}->{+2} = "GREPLEX"
     for @( ("mapwhile", "mapstart", "grepwhile", "grepstart"));
 };
 
 our %hints; # used to display each COP's op_hints values
- <
+ 
 # strict refs, subs, vars
-%hints{[@(2,512,1024)]} = ('$', '&', '*');
- <# integers, locale, bytes
-%hints{[@(1,4,8,16)]} = ('i', 'l', 'b');
- <# block scope, localise %^H, $^OPEN (in), $^OPEN (out)
-%hints{[@(256,131072,262144,524288)]} = ('{','%','<','>');
- <# overload new integer, float, binary, string, re
-%hints{[@(4096,8192,16384,32768,65536)]} = ('I', 'F', 'B', 'S', 'R');
- <# taint and eval
-%hints{[@(1048576,2097152)]} = ('T', 'E');
- <# filetest access, UTF-8
-%hints{[@(4194304,8388608)]} = ('X', 'U');
+%hints{[@(2,512,1024)]} = @('$', '&', '*');
+ # integers, locale, bytes
+%hints{[@(1,4,8,16)]} = @('i', 'l', 'b');
+ # block scope, localise %^H, $^OPEN (in), $^OPEN (out)
+%hints{[@(256,131072,262144,524288)]} = @('{','%','<','>');
+ # overload new integer, float, binary, string, re
+%hints{[@(4096,8192,16384,32768,65536)]} = @('I', 'F', 'B', 'S', 'R');
+ # taint and eval
+%hints{[@(1048576,2097152)]} = @('T', 'E');
+ # filetest access, UTF-8
+%hints{[@(4194304,8388608)]} = @('X', 'U');
 
 sub _flags {
-    my($hash, $x) = < @_;
+    my@($hash, $x) =  @_;
     my @s;
     for my $flag (sort {$b <+> $a} keys %{$hash || \%()}) {
 	if ($hash->{?$flag} and $x ^&^ $flag and $x +>= $flag) {
@@ -660,17 +659,17 @@ sub _flags {
 }
 
 sub private_flags {
-    my($name, $x) = < @_;
+    my@($name, $x) =  @_;
     _flags(%priv{?$name}, $x);
 }
 
 sub hints_flags {
-    my($x) = < @_;
+    my@($x) =  @_;
     _flags(\%hints, $x);
 }
 
 sub concise_sv {
-    my($sv, $hr, $preferpv) = < @_;
+    my@($sv, $hr, ?$preferpv) =  @_;
     $hr->{+svclass} = class($sv);
     $hr->{+svclass} = "UV"
       if $hr->{?svclass} eq "IV" and $sv->FLAGS ^&^ SVf_IVisUV;
@@ -729,7 +728,7 @@ sub fill_srclines {
 }
 
 sub concise_op {
-    my ($op, $level, $format) = < @_;
+    my @($op, $level, $format) =  @_;
     my %h;
     %h{+exname} = %h{+name} = $op->name;
     %h{+NAME} = uc %h{?name};
@@ -813,7 +812,7 @@ sub concise_op {
 	$loc =~ s[.*/][];
 	my $ln = $op->location ?? $op->location[1] !! '-1';
 	$loc .= ":$ln";
-	my($stash, $cseq) = ($op->stash->NAME, $op->cop_seq - $cop_seq_base);
+	my@($stash, $cseq) = @($op->stash->NAME, $op->cop_seq - $cop_seq_base);
 	%h{+arg} = "($label$stash $cseq $loc)";
 	if ($show_src) {
 	    fill_srclines($pathnm) unless exists %srclines{$pathnm};
@@ -870,7 +869,7 @@ sub concise_op {
 }
 
 sub B::OP::concise {
-    my($op, $level) = < @_;
+    my@($op, $level) =  @_;
     if ($order eq "exec" and $lastnext and $$lastnext != $$op) {
 	# insert a 'goto' line
 	my $synth = \%("seq" => seq($lastnext), "class" => class($lastnext),
@@ -885,7 +884,7 @@ sub B::OP::concise {
 
 # B::OP::terse (see Terse.pm) now just calls this
 sub b_terse {
-    my($op, $level) = < @_;
+    my@($op, $level) =  @_;
 
     # This isn't necessarily right, but there's no easy way to get
     # from an OP to the right CV. This is a limitation of the
@@ -914,7 +913,7 @@ sub tree {
     my $op = shift;
     my $level = shift;
     my $style = @tree_decorations[$tree_style];
-    my($space, $single, $kids, $nokid, $last, $lead, $size) = < @$style;
+    my@($space, $single, $kids, $nokid, $last, $lead, $size) =  @$style;
     my $name = concise_op($op, $level, $treefmt);
     if (not $op->flags ^&^ OPf_KIDS) {
 	return $name . "\n";

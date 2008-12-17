@@ -118,8 +118,8 @@ sub constant_types {
 }
 
 sub C_constant {
-  my ($package, $subname, $default_type, $what, $indent, $breakout, < @items)
-    = < @_;
+  my @($package, $subname, $default_type, $what, $indent, $breakout, @< @items)
+    =  @_;
   ExtUtils::Constant::XS->C_constant(\%(package => $package, subname => $subname,
                                         default_type => $default_type,
                                         types => $what, indent => $indent,

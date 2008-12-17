@@ -42,7 +42,7 @@ if configured for dynamic loading, triggers #define EXT in EXTERN.h
 =cut
 
 sub cflags {
-    my($self,$libperl)=< @_;
+    my@($self,$libperl)= @_;
     return $self->{?CFLAGS} if $self->{?CFLAGS};
     return '' unless $self->needs_linking();
 
@@ -68,7 +68,7 @@ replaces strings '::' with '.' in MAN*POD man page names
 =cut
 
 sub replace_manpage_separator {
-    my($self, $man) = < @_;
+    my@($self, $man) =  @_;
     $man =~ s{/+}{.}g;
     return $man;
 }

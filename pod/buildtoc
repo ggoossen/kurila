@@ -43,21 +43,21 @@ __USAGE__
   unless (nelems @ARGV)
 	&& GetOptions (verbose => \$Verbose,
 		       showfiles => \$showfiles,
-		       < map {+"build-$_", \%Build{$_}} @( < @files, 'all'));
- <  # Set them all to true
-  %Build{[ @files]} = < @files if (%Build{all});
+		       < map { "build-$_", \%Build{+$_} } @( < @files, 'all'));
+  # Set them all to true
+  %Build{[@files]} = @files if (%Build{?all});
   if ($showfiles) {
       print
 	  join(" ",
 	       sort { lc $a cmp lc $b }
  map {
-		   my ($v, $d, $f) = < File::Spec->splitpath($_);
+		   my @($v, $d, $f) = File::Spec->splitpath($_);
 		   my @d;
-		   @d = @( defined $d ? < File::Spec->splitdir($d) : () );
+		   @d = defined $d ?? File::Spec->splitdir($d) !! @();
 		   shift @d if (nelems @d);
-		   File::Spec->catfile((nelems @d) ?
-				       ((nelems @d) == 1 && @d[0] eq '' ? () : < @d)
-				       : "pod", $f);
+		   File::Spec->catfile((nelems @d)
+				       ?? ((nelems @d) == 1 && @d[0] eq '' ?? () !! < @d)
+				       !! "pod", $f);
 	       } %Targets{[ grep { $_ ne 'all' && %Build{$_} } keys %Build]}),
           "\n";
       exit(0);
@@ -85,43 +85,42 @@ foreach (@( ~< *MASTER)) {
   next if m/^\#/;
 
   # At least one upper case letter somewhere in the first group
-  if (m/^(\S+)\s(.*)/ && $1 =~ m/h/) {
+  if (m/^(\S+)\s(.*)/ && (my $flags = $1) =~ m/h/) {
     # it's a heading
-    my $flags = $1;
     $flags =~ s/h//g;
     my %flags = %(header => 1);
-    %flags{toc_omit} = 1 if $flags =~ s/o//g;
-    %flags{aux} = 1 if $flags =~ s/a//g;
+    %flags{+toc_omit} = 1 if $flags =~ s/o//g;
+    %flags{+aux} = 1 if $flags =~ s/a//g;
     die "$0: Unknown flag found in heading line: $_" if length $flags;
     push @Master, \@(\%flags, $2);
 
   } elsif (m/^(\S*)\s+(\S+)\s+(.*)/) {
     # it's a section
-    my ($flags, $filename, $desc) = ($1, $2, $3);
+    my @($flags, $filename, $desc) = @($1, $2, $3);
 
     my %flags = %(indent => 0);
     %flags{indent} = $1 if $flags =~ s/(\d+)//;
-    %flags{toc_omit} = 1 if $flags =~ s/o//g; 
-    %flags{aux} = 1 if $flags =~ s/a//g;
+    %flags{+toc_omit} = 1 if $flags =~ s/o//g; 
+    %flags{+aux} = 1 if $flags =~ s/a//g;
 
     if ($flags =~ s/D//g) {
-      %flags{perlpod_omit} = 1;
+      %flags{+perlpod_omit} = 1;
       $delta_source = "$filename.pod";
     }
     if ($flags =~ s/d//g) {
-      %flags{manifest_omit} = 1;
+      %flags{+manifest_omit} = 1;
       $delta_target = "$filename.pod";
     }
 
     if ($flags =~ s/r//g) {
       my $readme = $filename;
       $readme =~ s/^perl//;
-      %Readmepods{$filename} = %Readmes{$readme} = $desc;
-      %flags{readme} = 1;
-    } elsif (%flags{aux}) {
-      %Aux{$filename} = $desc;
+      %Readmepods{+$filename} = %Readmes{+$readme} = $desc;
+      %flags{+readme} = 1;
+    } elsif (%flags{?aux}) {
+      %Aux{+$filename} = $desc;
     } else {
-      %Pods{$filename} = $desc;
+      %Pods{+$filename} = $desc;
     }
     die "$0: Unknown flag found in section line: $_" if length $flags;
     push @Master, \@(\%flags, $filename, $desc);
@@ -137,7 +136,7 @@ if (defined $delta_source) {
     # Targets will aways be in the pod directory. Currently we can only cope
     # with sources being in the same directory. Fix this and do perlvms.pod
     # with this?
-    %Copies{$delta_target} = $delta_source;
+    %Copies{+$delta_target} = $delta_source;
   } else {
     die "$0: delta source defined but not target";
   }
@@ -158,29 +157,29 @@ do {
 
   # Convert these to a list of filenames.
   foreach (@( <keys %Pods, < keys %Readmepods)) {
-    %our_pods{"$_.pod"}++;
+    %our_pods{+"$_.pod"}++;
   }
 
   # None of these filenames will be boolean false
   @disk_pods = glob("*.pod");
- <  %disk_pods{[ @disk_pods]} = < @disk_pods;
- <
+  %disk_pods{[ @disk_pods]} = @disk_pods;
+
   # Things we copy from won't be in perl.pod
   # Things we copy to won't be in MANIFEST
-  %sources{[values %Copies]} = ();
+  %sources{[values %Copies]} = @();
 
   open(MANI, "<", "../MANIFEST") || die "$0: opening ../MANIFEST failed: $!";
   while ( ~< *MANI) {
     if (m!^pod/([^.]+\.pod)\s+!i) {
       push @manipods, $1;
     } elsif (m!^README\.(\S+)\s+!i) {
-      next if %Ignore{$1};
+      next if %Ignore{?$1};
       push @manireadmes, "perl$1.pod";
     }
   }
   close(MANI);
- <  %manipods{[ @manipods]} = < @manipods;
- <  %manireadmes{[ @manireadmes]} = < @manireadmes;
+  %manipods{[ @manipods]} = @manipods;
+  %manireadmes{[ @manireadmes]} = @manireadmes;
 
   my $in_perlpod;
   open(PERLPOD, "<", "perl.pod") || die "$0: opening perl.pod failed: $!\n";
@@ -196,19 +195,19 @@ do {
   close(PERLPOD);
   die "$0: could not find the pod listing of perl.pod\n"
     unless (nelems @perlpods);
- <  %perlpods{[ @perlpods]} = < @perlpods;
+  %perlpods{[@perlpods]} = @perlpods;
 
   foreach my $i (sort keys %disk_pods) {
     warn "$0: $i exists but is unknown by buildtoc\n"
-      unless %our_pods{$i};
+      unless %our_pods{?$i};
     warn "$0: $i exists but is unknown by ../MANIFEST\n"
-      if !%manipods{$i} && !%manireadmes{$i} && !%Copies{$i};
+      if !%manipods{?$i} && !%manireadmes{?$i} && !%Copies{?$i};
     warn "$0: $i exists but is unknown by perl.pod\n"
-	if !%perlpods{$i} && !exists %sources{$i};
+	if !%perlpods{?$i} && !exists %sources{$i};
   }
   foreach my $i (sort keys %our_pods) {
     warn "$0: $i is known by buildtoc but does not exist\n"
-      unless %disk_pods{$i};
+      unless %disk_pods{?$i};
   }
   foreach my $i (sort keys %manipods) {
     warn "$0: $i is known by ../MANIFEST but does not exist\n"
@@ -216,7 +215,7 @@ do {
   }
   foreach my $i (sort keys %perlpods) {
     warn "$0: $i is known by perl.pod but does not exist\n"
-      unless %disk_pods{$i};
+      unless %disk_pods{?$i};
   }
 };
 
@@ -262,13 +261,13 @@ do {
     #($name) = /(\w+)\.p(m|od)$/;
     my $name = path2modname($_);
     if ($name =~ m/^[a-z]/) {
-      %Pragmata{$name} = $_;
+      %Pragmata{+$name} = $_;
     } else {
-      if (%done{$name}++) {
+      if (%done{+$name}++) {
 	# warn "already did $_\n";
 	next;
       }
-      %Modules{$name} = $_;
+      %Modules{+$name} = $_;
     }
   }
 };
@@ -312,7 +311,7 @@ EOPOD2B
 #' make emacs happy
 
   # All the things in the master list that happen to be pod filenames
-  podset(< map {"$_->[1].pod"} grep {defined $_ && (nelems @$_) == 3 && !$_->[0]->{toc_omit}} @Master);
+  podset(< map {"$_->[1].pod"} grep {defined $_ && (nelems @$_) == 3 && !$_->[0]->{?toc_omit}} @Master);
 
 
   ($_= <<"EOPOD2B") =~ s/^\t//gm && output($_);
@@ -505,7 +504,7 @@ sub generate_perlpod {
   $maxlength += 2;
   $maxlength = ($maxlength + 3) ^&^ ^~^3;
   # sprintf gives $1.....$2 where ... are spaces:
-  return unexpand (< map {ref $_ ? sprintf "\%-$($maxlength)s\%s\n", < @$_ : $_}
+  return unexpand (< map {ref $_ ?? sprintf "\%-$($maxlength)s\%s\n", < @$_ !! $_}
  @output);
 }
 
@@ -546,7 +545,7 @@ sub generate_descrip_mms_1 {
 }
 
 sub generate_descrip_mms_2 {
-  map {sprintf <<'SNIP', $_, $_ eq 'perlvms' ? 'vms' : 'pod', $_}
+  map {sprintf <<'SNIP', $_, $_ eq 'perlvms' ?? 'vms' !! 'pod', $_}
 [.lib.pods]%s.pod : [.%s]%s.pod
 	@ If F$Search("[.lib]pods.dir").eqs."" Then Create/Directory [.lib.pods]
 	Copy/NoConfirm/Log $(MMS$SOURCE) [.lib.pods]
@@ -597,7 +596,7 @@ sub do_nmake {
   my $makefile = join '', @_;
   die "$0: $name contains NUL bytes" if $makefile =~ m/\0/;
   $makefile =~ s/^\tcopy \.\.\\README.*\n/\0/gm;
-  my $sections = () = $makefile =~ m/\0+/g;
+  my $sections = @: $makefile =~ m/\0+/g;
   die "$0: $name contains no README copies" if $sections +< 1;
   die "$0: $name contains discontiguous README copies" if $sections +> 1;
   # Now remove the other copies that follow
@@ -644,7 +643,7 @@ sub do_vms {
   my $makefile = join '', @_;
   die "$0: $name contains NUL bytes" if $makefile =~ m/\0/;
   $makefile =~ s/\npod\d* =[^\n]*/\0/gs;
-  my $sections = () = $makefile =~ m/\0+/g;
+  my $sections = @: $makefile =~ m/\0+/g;
   die "$0: $name contains no pod assignments" if $sections +< 1;
   die "$0: $name contains $sections discontigous pod assignments"
     if $sections +> 1;
@@ -661,7 +660,7 @@ sub do_vms {
 		 [^\n]+\n	# Another line
 		 [^\n]+\Q[.lib.pods]\E\n		# ends [.lib.pods]
 		    /\0/gsx;
-  $sections = () = $makefile =~ m/\0+/g;
+  $sections = @: $makefile =~ m/\0+/g;
   die "$0: $name contains no copy rules" if $sections +< 1;
   die "$0: $name contains $sections discontigous copy rules"
     if $sections +> 1;
@@ -676,7 +675,7 @@ sub do_unix {
 
   $makefile_SH =~ s/\n\s+-\@test -f \S+ && cd pod && \$\(LNS\) \S+ \S+ && cd \.\. && echo "\S+" >> extra.pods \# See buildtoc\n/\0/gm;
 
-  my $sections = () = $makefile_SH =~ m/\0+/g;
+  my $sections = @: $makefile_SH =~ m/\0+/g;
 
   die "$0: $name contains no copy rules" if $sections +< 1;
   die "$0: $name contains $sections discontigous copy rules"
@@ -693,7 +692,7 @@ sub do_unix {
 # Do stuff
 
 my $built;
-while (my ($target, $name) = each %Targets) {
+while (my @(?$target, ?$name) = @: each %Targets) {
   next unless %Build{$target};
   $built++;
   if ($target eq "toc") {

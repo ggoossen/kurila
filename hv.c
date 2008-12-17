@@ -126,79 +126,6 @@ Perl_free_tied_hv_pool(pTHX)
     PL_hv_fetch_ent_mh = NULL;
 }
 
-#if defined(USE_ITHREADS)
-HEK *
-Perl_hek_dup(pTHX_ HEK *source, CLONE_PARAMS* param)
-{
-    HEK *shared = (HEK*)ptr_table_fetch(PL_ptr_table, source);
-
-    PERL_ARGS_ASSERT_HEK_DUP;
-    PERL_UNUSED_ARG(param);
-
-    if (shared) {
-	/* We already shared this hash key.  */
-	(void)share_hek_hek(shared);
-    }
-    else {
-	shared
-	    = share_hek_flags(HEK_KEY(source), HEK_LEN(source),
-			      HEK_HASH(source), HEK_FLAGS(source));
-	ptr_table_store(PL_ptr_table, source, shared);
-    }
-    return shared;
-}
-
-HE *
-Perl_he_dup(pTHX_ const HE *e, bool shared, CLONE_PARAMS* param)
-{
-    HE *ret;
-
-    PERL_ARGS_ASSERT_HE_DUP;
-
-    if (!e)
-	return NULL;
-    /* look for it in the table first */
-    ret = (HE*)ptr_table_fetch(PL_ptr_table, e);
-    if (ret)
-	return ret;
-
-    /* create anew and remember what it is */
-    ret = new_HE();
-    ptr_table_store(PL_ptr_table, e, ret);
-
-    HeNEXT(ret) = he_dup(HeNEXT(e),shared, param);
-    if (HeKLEN(e) == HEf_SVKEY) {
-	char *k;
-	Newx(k, HEK_BASESIZE + sizeof(SV*), char);
-	HeKEY_hek(ret) = (HEK*)k;
-	HeKEY_sv(ret) = SvREFCNT_inc(sv_dup(HeKEY_sv(e), param));
-    }
-    else if (shared) {
-	/* This is hek_dup inlined, which seems to be important for speed
-	   reasons.  */
-	HEK * const source = HeKEY_hek(e);
-	HEK *shared = (HEK*)ptr_table_fetch(PL_ptr_table, source);
-
-	if (shared) {
-	    /* We already shared this hash key.  */
-	    (void)share_hek_hek(shared);
-	}
-	else {
-	    shared
-		= share_hek_flags(HEK_KEY(source), HEK_LEN(source),
-				  HEK_HASH(source), HEK_FLAGS(source));
-	    ptr_table_store(PL_ptr_table, source, shared);
-	}
-	HeKEY_hek(ret) = shared;
-    }
-    else
-	HeKEY_hek(ret) = save_hek_flags(HeKEY(e), HeKLEN(e), HeHASH(e),
-                                        HeKFLAGS(e));
-    HeVAL(ret) = SvREFCNT_inc(sv_dup(HeVAL(e), param));
-    return ret;
-}
-#endif	/* USE_ITHREADS */
-
 static void
 S_hv_notallowed(pTHX_ int flags, const char *key, I32 klen,
 		const char *msg)
@@ -1253,6 +1180,7 @@ void
 Perl_hv_sethv(pTHX_ HV* dstr, HV* sstr)
 {
     STRLEN hv_max, hv_fill;
+    PERL_ARGS_ASSERT_HV_SETHV;
 
     hv_undef(dstr);
 
@@ -1801,6 +1729,7 @@ Perl_hv_tmprefcnt(pTHX_ HV *hv)
 {
     dVAR;
     register XPVHV* xhv;
+    PERL_ARGS_ASSERT_HV_TMPREFCNT;
 
     if (!hv)
 	return;

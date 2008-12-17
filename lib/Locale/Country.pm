@@ -269,29 +269,29 @@ do {
     {
         next unless m/\S/;
         chop;
-        ($alpha2, $alpha3, $numeric, < @countries) = < split(m/:/, $_);
+        @($alpha2, $alpha3, $numeric, @< @countries) =  split(m/:/, $_);
 
-        $CODES->[LOCALE_CODE_ALPHA_2]->{+$alpha2} = @countries[0];
+        $CODES->[+LOCALE_CODE_ALPHA_2]->{+$alpha2} = @countries[0];
 	foreach my $country ( @countries)
 	{
-	    $COUNTRIES->[LOCALE_CODE_ALPHA_2]->{+lc "$country"} = $alpha2;
+	    $COUNTRIES->[+LOCALE_CODE_ALPHA_2]->{+lc "$country"} = $alpha2;
 	}
 
 	if ($alpha3)
 	{
-            $CODES->[LOCALE_CODE_ALPHA_3]->{+$alpha3} = @countries[0];
+            $CODES->[+LOCALE_CODE_ALPHA_3]->{+$alpha3} = @countries[0];
 	    foreach my $country ( @countries)
 	    {
-		$COUNTRIES->[LOCALE_CODE_ALPHA_3]->{+lc "$country"} = $alpha3;
+		$COUNTRIES->[+LOCALE_CODE_ALPHA_3]->{+lc "$country"} = $alpha3;
 	    }
 	}
 
 	if ($numeric)
 	{
-            $CODES->[LOCALE_CODE_NUMERIC]->{+$numeric} = @countries[0];
+            $CODES->[+LOCALE_CODE_NUMERIC]->{+$numeric} = @countries[0];
 	    foreach my $country ( @countries)
 	    {
-		$COUNTRIES->[LOCALE_CODE_NUMERIC]->{+lc "$country"} = $numeric;
+		$COUNTRIES->[+LOCALE_CODE_NUMERIC]->{+lc "$country"} = $numeric;
 	    }
 	}
 

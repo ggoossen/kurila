@@ -14,7 +14,7 @@ our @dl_resolve_using;
 
 
 sub Mkbootstrap {
-    my($baseext, < @bsloadlibs)=< @_;
+    my@($baseext, @< @bsloadlibs)= @_;
     @bsloadlibs = grep($_, @bsloadlibs); # strip empty libs
 
     print STDOUT "	bsloadlibs=$(join ' ',@bsloadlibs)\n" if $Verbose;
@@ -31,8 +31,8 @@ sub Mkbootstrap {
     if (-f "$($baseext)_BS"){
 	$_ = "$($baseext)_BS";
 	package DynaLoader; # execute code as if in DynaLoader
-	local our ($osname, $dlsrc) = (); # avoid warnings
-	($osname, $dlsrc) = < map { config_value($_) } qw(osname dlsrc);
+	local our @($osname, $dlsrc) = @(undef, undef); # avoid warnings
+	@($osname, $dlsrc) =  map { config_value($_) } qw(osname dlsrc);
 	our $bscode = "";
 	unshift @INC, ".";
 	require $_;
@@ -44,9 +44,9 @@ sub Mkbootstrap {
 	push(@dl_resolve_using, < dl_findfile('-lc'));
     }
 
-    my(@all) = @(< @bsloadlibs, < @DynaLoader::dl_resolve_using);
-    my($method) = '';
-    if ((nelems @all)){
+    my @all = @(< @bsloadlibs, < @DynaLoader::dl_resolve_using);
+    my $method = '';
+    if (@all) {
 	open my $bs, ">", "$baseext.bs"
 		or die "Unable to open $baseext.bs: $!";
 	print STDOUT "Writing $baseext.bs\n";

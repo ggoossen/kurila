@@ -34,7 +34,7 @@ if ($^O eq 'MacOS') {
 }
 
 sub _catname {
-    my($from, $to) = < @_;
+    my@($from, $to) =  @_;
     if (not defined &basename) {
 	require File::Basename;
 	File::Basename->import('basename');
@@ -119,7 +119,7 @@ sub copy {
                 # So add a '.' for a null extension.
 
                 $copy_to = VMS::Filespec::vmsify($to);
-                my ($vol, $dirs, $file) = < File::Spec->splitpath($copy_to);
+                my @($vol, $dirs, $file) =  File::Spec->splitpath($copy_to);
                 $file = $file . '.' unless ($file =~ m/(?<!\^)\./);
                 $copy_to = File::Spec->catpath($vol, $dirs, $file);
 
@@ -184,7 +184,7 @@ sub copy {
 	$size = shift(@_) + 0;
 	die("Bad buffer size for copy: $size\n") unless ($size +> 0);
     } else {
-	$size = tied(*$from_h) ?? 0 !! -s $from_h || 0;
+	$size = -s $from_h || 0;
 	$size = 1024 if ($size +< 512);
 	$size = $Too_Big if ($size +> $Too_Big);
     }
@@ -213,7 +213,7 @@ sub copy {
 sub move {
     die("Usage: move(FROM, TO) ") unless (nelems @_) == 2;
 
-    my($from,$to) = < @_;
+    my@($from,$to) =  @_;
 
     my($fromsz,$tosz1,$tomt1,$tosz2,$tomt2,$sts,$ossts);
 
@@ -221,7 +221,7 @@ sub move {
 	$to = _catname($from, $to);
     }
 
-    ($tosz1,$tomt1) = < @(stat($to))[[@: 7,9]];
+    @($tosz1,$tomt1) =  @(stat($to))[[@: 7,9]];
     $fromsz = -s $from;
     if ($^O eq 'os2' and defined $tosz1 and defined $fromsz) {
       # will not rename with overwrite
@@ -229,7 +229,7 @@ sub move {
     }
 
     my $rename_to = $to;
-    if (-$^O eq 'VMS' && -e $from) {
+    if ($^O eq 'VMS' && -e $from) {
 
         if (! -d $to && ! -d $from) {
             # VMS has sticky defaults on extensions, which means that
@@ -238,7 +238,7 @@ sub move {
             # So add a '.' for a null extension.
 
             $rename_to = VMS::Filespec::vmsify($to);
-            my ($vol, $dirs, $file) = < File::Spec->splitpath($rename_to);
+            my @($vol, $dirs, $file) =  File::Spec->splitpath($rename_to);
             $file = $file . '.' unless ($file =~ m/(?<!\^)\./);
             $rename_to = File::Spec->catpath($vol, $dirs, $file);
 
@@ -252,28 +252,28 @@ sub move {
     # Did rename return an error even though it succeeded, because $to
     # is on a remote NFS file system, and NFS lost the server's ack?
     return 1 if defined($fromsz) && !-e $from &&           # $from disappeared
-                (($tosz2,$tomt2) = < @(stat($to))[[@:7,9]]) &&    # $to's there
+                (@($tosz2,$tomt2) =  @(stat($to))[[@:7,9]]) &&    # $to's there
                   ((!defined $tosz1) ||			   #  not before or
 		   ($tosz1 != $tosz2 or $tomt1 != $tomt2)) &&  #   was changed
                 $tosz2 == $fromsz;                         # it's all there
 
-    ($tosz1,$tomt1) = < @(stat($to))[[@:7,9]];  # just in case rename did something
+    @($tosz1,$tomt1) =  @(stat($to))[[@:7,9]];  # just in case rename did something
 
     do {
         local $@;
         try {
             copy($from,$to) or die;
-            my($atime, $mtime) = < @(stat($from))[[8..9]];
+            my@($atime, $mtime) =  @(stat($from))[[8..9]];
             utime($atime, $mtime, $to);
             unlink($from)   or die;
         };
         return 1 unless $@;
     };
-    ($sts,$ossts) = ($! + 0, $^E + 0);
+    @($sts,$ossts) = @($! + 0, $^E + 0);
 
-    ($tosz2,$tomt2) = (< @(stat($to))[[@:7,9]],0,0) if defined $tomt1;
+    @($tosz2,$tomt2, ...) = @(< @(stat($to))[[@:7,9]],0,0) if defined $tomt1;
     unlink($to) if !defined($tomt1) or $tomt1 != $tomt2 or $tosz1 != $tosz2;
-    ($!,$^E) = ($sts,$ossts);
+    @($!,$^E) = @($sts,$ossts);
     return 0;
 }
 
@@ -306,15 +306,15 @@ unless (defined &syscopy) {
 	};
     } elsif ($macfiles) {
 	*syscopy = sub {
-	    my($from, $to) = < @_;
+	    my@($from, $to) =  @_;
 	    my($dir, $toname);
 
 	    return 0 unless -e $from;
 
 	    if ($to =~ m/(.*:)([^:]+):?$/) {
-		($dir, $toname) = ($1, $2);
+		@($dir, $toname) = @($1, $2);
 	    } else {
-		($dir, $toname) = (":", $to);
+		@($dir, $toname) = @(":", $to);
 	    }
 
 	    unlink($to);

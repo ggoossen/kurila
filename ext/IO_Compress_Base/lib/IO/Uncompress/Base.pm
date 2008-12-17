@@ -23,8 +23,8 @@ use Scalar::Util < qw(readonly);
 use List::Util < qw(min);
 use Carp ;
 
-%EXPORT_TAGS = %( ( ) );
-push @{ %EXPORT_TAGS{all} }, < @EXPORT_OK ;
+%EXPORT_TAGS = %( );
+push @{ %EXPORT_TAGS{+all} }, < @EXPORT_OK ;
 #Exporter::export_ok_tags('all') ;
 
 
@@ -168,7 +168,7 @@ sub smartReadExact
 
 sub smartEof
 {
-    my ($self) = @_[0];
+    my $self = @_[0];
 
     return 0 if length $self->{?Prime} || $self->{?PushMode};
 
@@ -254,25 +254,25 @@ sub errorNo
 
 sub HeaderError
 {
-    my ($self) = shift;
+    my @($self) =@( shift);
     return $self->saveErrorString(undef, "Header Error: @_[0]", STATUS_ERROR);
 }
 
 sub TrailerError
 {
-    my ($self) = shift;
+    my @($self) =@( shift);
     return $self->saveErrorString( <G_ERR, "Trailer Error: @_[0]", STATUS_ERROR);
 }
 
 sub TruncatedHeader
 {
-    my ($self) = shift;
+    my @($self) =@( shift);
     return $self->HeaderError("Truncated in @_[0] Section");
 }
 
 sub TruncatedTrailer
 {
-    my ($self) = shift;
+    my @($self) =@( shift);
     return $self->TrailerError("Truncated in @_[0] Section");
 }
 
@@ -440,7 +440,7 @@ sub _create
         $obj->pushBack($obj->{HeaderPending})  ;
     }
 
-    push @{ $obj->{InfoList} }, $obj->{?Info} ;
+    push @{ $obj->{+InfoList} }, $obj->{?Info} ;
 
     $obj->saveStatus(STATUS_OK) ;
     $obj->{+InNew} = 0;
@@ -528,7 +528,7 @@ sub _inf
         $x->{+oneInput} = 1 ;
         foreach my $pair ( @{ $x->{Pairs} })
         {
-            my ($from, $to) = < @$pair ;
+            my @($from, $to) =  @$pair ;
             $obj->_singleTarget($x, $from, $to, < @_)
                 or return undef ;
         }
@@ -989,8 +989,8 @@ sub read
         $buffer = \@_[0] ;
     }
 
-    my $length = @_[1] ;
-    my $offset = @_[2] || 0;
+    my $length = @_[?1] ;
+    my $offset = @_[?2] || 0;
 
     # the core read will return 0 if asked for 0 bytes
     return 0 if defined $length && $length == 0 ;
@@ -1199,8 +1199,6 @@ sub close
     my $self = shift ;
 
     return 1 if $self->{?Closed} ;
-
-    untie $self ;
 
     my $status = 1 ;
 

@@ -21,7 +21,7 @@ sub ext {
 }
 
 sub _unix_os2_ext {
-    my($self,$potential_libs, $verbose, $give_libs) = < @_;
+    my @($self,$potential_libs, ?$verbose, ?$give_libs) =  @_;
     $verbose ||= 0;
 
     if ($^O =~ 'os2' and config_value("perllibs")) { 
@@ -34,8 +34,8 @@ sub _unix_os2_ext {
     return  @("", "", "", "",  @($give_libs ?? \@() !! ())) unless $potential_libs;
     warn "Potential libraries are '$potential_libs':\n" if $verbose;
 
-    my($so)   = config_value("so");
-    my($libs) = defined config_value("perllibs") 
+    my $so   = config_value("so");
+    my $libs = defined config_value("perllibs") 
       ?? config_value("perllibs") !! config_value("libs");
     my $Config_libext = config_value("lib_ext") || ".a";
 
@@ -50,19 +50,19 @@ sub _unix_os2_ext {
     my(@libs, %libs_seen);
     my($fullname, @fullname);
     my $pwd = cwd(); # from Cwd.pm
-    my($found) = 0;
+    my $found = 0;
 
     foreach my $thislib (split ' ', $potential_libs) {
 
 	# Handle possible linker path arguments.
 	if ($thislib =~ s/^(-[LR]|-Wl,-R)//){	# save path flag type
-	    my($ptype) = $1;
+	    my $ptype = $1;
 	    unless (-d $thislib){
 		warn "$ptype$thislib ignored, directory does not exist\n"
 			if $verbose;
 		next;
 	    }
-	    my($rtype) = $ptype;
+	    my $rtype = $ptype;
 	    if (($ptype eq '-R') or ($ptype eq '-Wl,-R')) {
 		if (config_value('lddlflags') =~ m/-Wl,-R/) {
 		    $rtype = '-Wl,-R';
@@ -86,7 +86,7 @@ sub _unix_os2_ext {
 	  next;
 	}
 
-	my($found_lib)=0;
+	my $found_lib=0;
 	foreach my $thispth ( @( <@searchpath, < @libpath)) {
 
 		# Try to find the full name of the library.  We need this to
@@ -112,8 +112,8 @@ sub _unix_os2_ext {
 
 		#TODO: iterate through the directory instead of sorting
 
-		$fullname = "$thispth/" . (sort { my($ma) = $a;
-			my($mb) = $b;
+		$fullname = "$thispth/" . (sort { my $ma = $a;
+			my $mb = $b;
 			$ma =~ s/[A-Za-z]+/0/g;
 			$ma =~ s/\b(\d)\b/0$1/g;
 			$mb =~ s/[A-Za-z]+/0/g;
@@ -217,7 +217,7 @@ sub _win32_ext {
 
     require Text::ParseWords;
 
-    my($self, $potential_libs, $verbose, $give_libs) = < @_;
+    my@($self, $potential_libs, $verbose, $give_libs) =  @_;
     $verbose ||= 0;
 
     # If user did not supply a list, we punt.
@@ -371,7 +371,7 @@ sub _win32_ext {
 
 
 sub _vms_ext {
-  my($self, $potential_libs, $verbose, $give_libs) = < @_;
+  my@($self, $potential_libs, $verbose, $give_libs) =  @_;
   $verbose ||= 0;
 
   my(@crtls,$crtlstr);
@@ -387,7 +387,7 @@ sub _vms_ext {
   if ($self->{?PERL_SRC}) {
     my($locspec,$type);
     foreach my $lib ( @crtls) { 
-      if (($locspec,$type) = $lib =~ m{^([\w\$-]+)(/\w+)?} and $locspec =~ m/perl/i) {
+      if (@($locspec,$type) = $lib =~ m{^([\w\$-]+)(/\w+)?} and $locspec =~ m/perl/i) {
         if    (lc $type eq '/share')   { $locspec .= config_value('exe_ext'); }
         elsif (lc $type eq '/library') { $locspec .= config_value('lib_ext'); }
         else                           { $locspec .= config_value('obj_ext'); }
@@ -405,7 +405,7 @@ sub _vms_ext {
 
   my(%found,@fndlibs,$ldlib);
   my $cwd = cwd();
-  my($so,$lib_ext,$obj_ext) = < map { config_value($_) } @: 'so','lib_ext','obj_ext';
+  my@($so,$lib_ext,$obj_ext) =  map { config_value($_) } @: 'so','lib_ext','obj_ext';
   # List of common Unix library names and their VMS equivalents
   # (VMS equivalent of '' indicates that the library is automatically
   # searched by the linker, and should be skipped here.)
@@ -457,7 +457,7 @@ sub _vms_ext {
     }
 
     my(@variants,$cand);
-    my($ctype) = '';
+    my@($ctype) = '';
 
     # If we don't have a file type, consider it a possibly abbreviated name and
     # check for common variants.  We try these first to grab libraries before

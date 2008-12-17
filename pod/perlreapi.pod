@@ -367,13 +367,6 @@ C<RXapif_ONE> or C<RXapif_ALL>.
     RXapif_REGNAMES
     RXapif_REGNAMES_COUNT
 
-Internally C<%+> and C<%-> are implemented with a real tied interface
-via L<Tie::Hash::NamedCapture>. The methods in that package will call
-back into these functions. However the usage of
-L<Tie::Hash::NamedCapture> for this purpose might change in future
-releases. For instance this might be implemented by magic instead
-(would need an extension to mgvtbl).
-
 =head3 named_buff
 
     SV*     (*named_buff) (pTHX_ REGEXP * const rx, SV * const key,

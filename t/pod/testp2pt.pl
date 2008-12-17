@@ -26,10 +26,10 @@ BEGIN {
     @ISA = qw( Pod::PlainText );
     require VMS::Filespec if $^O eq 'VMS';
 }
- <
+ 
 ## Hardcode settings for TERMCAP and COLUMNS so we can try to get
 ## reproducible results between environments
-%ENV{[qw(TERMCAP COLUMNS)]} = ('co=76:do=^J', 76);
+%ENV{[qw(TERMCAP COLUMNS)]} = @('co=76:do=^J', 76);
 
 sub catfile(@) { 'File::Spec'->catfile(< @_); }
 
@@ -71,7 +71,7 @@ sub findinclude {
 
 sub command {
     my $self = shift;
-    my ($cmd, $text, $line_num, $pod_para)  = < @_;
+    my @($cmd, $text, $line_num, $pod_para)  =  @_;
     $cmd     = ''  unless (defined $cmd);
     local $_ = $text || '';
     my $out_fh  = $self->output_handle;
@@ -98,7 +98,7 @@ sub begin_input {
 }
 
 sub podinc2plaintext( $ $ ) {
-    my ($infile, $outfile) = < @_;
+    my @($infile, $outfile) =  @_;
     local $_;
     my $text_parser = $MYPKG->new;
     $text_parser->parse_from_file($infile, $outfile);
@@ -134,9 +134,9 @@ sub testpodinc2plaintext( @ ) {
 sub testpodplaintext( @ ) {
    my %opts = %( (ref @_[0] eq 'HASH') ?? < %{shift()} !! () );
    my @testpods = @_;
-   my ($testname, $testdir) = ("", "");
+   my @($testname, $testdir) = @("", "");
    my $cmpfile = "";
-   my ($outfile, $errfile) = ("", "");
+   my @($outfile, $errfile) = @("", "");
    my $passes = 0;
    my $failed = 0;
    local $_;
@@ -144,7 +144,7 @@ sub testpodplaintext( @ ) {
    print "1..", scalar nelems @testpods, "\n"  unless (%opts{?'xrgen'});
 
    for my $podfile ( @testpods) {
-      ($testname, $_) = < fileparse($podfile);
+      @($testname, $_, ...) = fileparse($podfile);
       $testdir ||=  $_;
       $testname  =~ s/\.t$//;
       $cmpfile   =  $testdir . $testname . '.xr';

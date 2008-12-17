@@ -70,7 +70,7 @@ if ($^O eq 'dos')
     exit(0);
 }
 
-my ($rd,$wr) = < FileHandle::pipe;
+my @($rd,$wr) =  FileHandle::pipe;
 
 if ($^O eq 'VMS' || $^O eq 'os2' || $^O eq 'amigaos' || $^O eq 'MSWin32' || $^O eq 'NetWare' ||
     config_value('d_fork') ne 'define') {

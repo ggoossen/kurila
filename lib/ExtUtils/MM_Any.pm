@@ -133,7 +133,7 @@ pairs of arguments.  This makes things like this safe:
 =cut
 
 sub split_command {
-    my($self, $cmd, < @args) = < @_;
+    my@($self, $cmd, @< @args) =  @_;
 
     my @cmds = @( () );
     return @cmds unless (nelems @args);
@@ -174,7 +174,7 @@ sub split_command {
 
 
 sub _expand_macros {
-    my($self, $cmd) = < @_;
+    my@($self, $cmd) =  @_;
 
     $cmd =~ s{\$\((\w+)\)}{$(
         defined $self->{?$1} ?? $self->{?$1} !! "\$($1)"
@@ -199,7 +199,7 @@ overwritten.
 =cut
 
 sub echo {
-    my($self, $text, $file, $appending) = < @_;
+    my@($self, $text, $file, ?$appending) =  @_;
     $appending ||= 0;
 
     my @cmds = map { '$(NOECHO) $(ECHO) '.$self->quote_literal($_) } 
@@ -434,7 +434,7 @@ Defines the clean target.
 sub clean {
 # --- Cleanup and Distribution Sections ---
 
-    my($self, < %attribs) = < @_;
+    my@($self, %< %attribs) =  @_;
     my @m;
     push(@m, q|
 # Delete temporary files but do not touch installed files. We don't delete
@@ -488,8 +488,8 @@ clean :: clean_subdirs
     push @dirs, < $self->extra_clean_files;
 
     # Occasionally files are repeated several times from different sources
-    do { my(%f) = %( < map { ($_ => 1) } grep { defined $_ } @files ); @files = keys %f; };
-    do { my(%d) = %( < map { ($_ => 1) } grep { defined $_ } @dirs );  @dirs  = keys %d; };
+    do { my@(%f) =@( %( < map { ($_ => 1) } grep { defined $_ } @files )); @files = keys %f; };
+    do { my@(%d) =@( %( < map { ($_ => 1) } grep { defined $_ } @dirs ));  @dirs  = keys %d; };
 
     push @m, < map "\t$_\n", $self->split_command('- $(RM_F)',  < @files);
     push @m, < map "\t$_\n", $self->split_command('- $(RM_RF)', < @dirs);
@@ -515,7 +515,7 @@ call clean on any subdirectories which contain Makefiles.
 =cut
 
 sub clean_subdirs_target {
-    my($self) = shift;
+    my@($self) =@( shift);
 
     # No subdirectories, no cleaning.
     return <<'NOOP_FRAG' unless (nelems @{$self->{?DIR}});
@@ -556,11 +556,11 @@ than a '/' to seperate the directory from the file.
 =cut
 
 sub dir_target {
-    my($self, < @dirs) = < @_;
+    my@($self, @< @dirs) =  @_;
 
     my $make = '';
     foreach my $dir ( @dirs) {
-        $make .= sprintf <<'MAKE', ($dir) x 7;
+        $make .= sprintf <<'MAKE', < (@($dir) x 7);
 %s$(DFSEP).exists :: Makefile.PL
 	$(NOECHO) $(MKPATH) %s
 	$(NOECHO) $(CHMOD) 755 %s
@@ -582,7 +582,7 @@ before tar-ing (or shar-ing).
 =cut
 
 sub distdir {
-    my($self) = shift;
+    my@($self) =@( shift);
 
     my $meta_target = $self->{?NO_META} ?? '' !! 'distmeta';
     my $sign_target = !$self->{?SIGN}   ?? '' !! 'distsignature';
@@ -610,7 +610,7 @@ subdirectory.
 =cut
 
 sub dist_test {
-    my($self) = shift;
+    my@($self) =@( shift);
 
     my $mpl_args = join " ", map qq["$_"], @ARGV;
 
@@ -639,7 +639,7 @@ Defines the dynamic target.
 sub dynamic {
 # --- Dynamic Loading Sections ---
 
-    my($self) = shift;
+    my@($self) =@( shift);
     '
 dynamic :: $(FIRST_MAKEFILE) $(INST_DYNAMIC) $(INST_BOOT)
 	$(NOECHO) $(NOOP)
@@ -677,7 +677,7 @@ all POD files in MAN1PODS and MAN3PODS.
 =cut
 
 sub manifypods_target {
-    my($self) = shift;
+    my@($self) =@( shift);
 
     my $man1pods      = '';
     my $man3pods      = '';
@@ -752,7 +752,7 @@ MAKE_FRAG
     my $meta = "--- #YAML:1.0\n";
 
     while( (nelems @meta_to_mm) ) {
-        my($key, $val) = splice @meta_to_mm, 0, 2;
+        my@($key, $val) =@( splice @meta_to_mm, 0, 2);
 
         $val = '~' unless defined $val;
 
@@ -815,7 +815,7 @@ Defines the realclean target.
 =cut
 
 sub realclean {
-    my($self, < %attribs) = < @_;
+    my@($self, %< %attribs) =  @_;
 
     my @dirs  = qw($(DISTVNAME));
     my @files = qw($(FIRST_MAKEFILE) $(MAKEFILE_OLD));
@@ -841,8 +841,8 @@ sub realclean {
     }
 
     # Occasionally files are repeated several times from different sources
-    do { my(%f) = %( < map { ($_ => 1) } @files );  @files = keys %f; };
-    do { my(%d) = %( < map { ($_ => 1) } @dirs );   @dirs  = keys %d; };
+    do { my@(%f) =@( %( < map { ($_ => 1) } @files ));  @files = keys %f; };
+    do { my@(%d) =@( %( < map { ($_ => 1) } @dirs ));   @dirs  = keys %d; };
 
     my $rm_cmd  = join "\n\t", map { "$_" } 
                     $self->split_command('- $(RM_F)',  < @files);
@@ -883,7 +883,7 @@ NOOP_FRAG
 
     foreach my $dir ( @{$self->{DIR}}) {
         foreach my $makefile (@('$(MAKEFILE_OLD)', '$(FIRST_MAKEFILE)') ) {
-            my $subrclean .= $self->oneliner(sprintf <<'CODE', $dir, ($makefile) x 2);
+            my $subrclean .= $self->oneliner(sprintf <<'CODE', $dir, < (@($makefile) x 2));
 chdir '%s';  system '$(MAKE) $(USEMAKEFILE) %s realclean' if -f '%s';
 CODE
 
@@ -1019,7 +1019,7 @@ to XS code.  Those are handled in init_xs.
 =cut
 
 sub init_INST {
-    my($self) = shift;
+    my@($self) =@( shift);
 
     $self->{+INST_ARCHLIB} ||= $self->catdir($Curdir,"blib","arch");
     $self->{+INST_BIN}     ||= $self->catdir($Curdir,'blib','bin');
@@ -1069,7 +1069,7 @@ INSTALLDIRS) and *PREFIX.
 =cut
 
 sub init_INSTALL {
-    my($self) = shift;
+    my@($self) =@( shift);
 
     if( $self->{ARGS}->{?INSTALL_BASE} and $self->{ARGS}->{?PREFIX} ) {
         die "Only one of PREFIX or INSTALL_BASE can be given.  Not both.\n";
@@ -1142,9 +1142,9 @@ sub init_INSTALL_from_PREFIX {
 
     $self->{+PREFIX}       ||= '';
 
-    if( $self->{?PREFIX} ) { <
+    if( $self->{?PREFIX} ) { 
         %{$self}{[qw(PERLPREFIX SITEPREFIX VENDORPREFIX)]} =
-          ('$(PREFIX)') x 3;
+          @('$(PREFIX)') x 3;
     }
     else {
         $self->{+PERLPREFIX}   ||= $iprefix;
@@ -1277,8 +1277,8 @@ sub init_INSTALL_from_PREFIX {
                       );
 
     my %layouts = %(< %bin_layouts, < %man_layouts, < %lib_layouts);
-    while( my($var, $layout) = each(%layouts) ) {
-        my($s, $t, $d, $style) = < %{$layout}{[qw(s t d style)]};
+    while( my @(?$var, ?$layout) = @: each(%layouts) ) {
+        my@($s, $t, $d, $style) =  %{$layout}{[qw(s t d style)]};
         my $r = '$('.%type2prefix{?$t}.')';
 
         print STDERR "Prefixing $var\n" if $Verbose +>= 2;
@@ -1319,8 +1319,8 @@ my %map = %(
 
 sub init_INSTALL_from_INSTALL_BASE {
     my $self = shift;
- <
-    %{$self}{[qw(PREFIX VENDORPREFIX SITEPREFIX PERLPREFIX)]} = 
+ 
+    %{$self}{[qw(PREFIX VENDORPREFIX SITEPREFIX PERLPREFIX)]} = @:
                                                          '$(INSTALL_BASE)';
 
     my %install;
@@ -1378,7 +1378,7 @@ Called by init_main.
 =cut
 
 sub init_VERSION {
-    my($self) = shift;
+    my@($self) =@( shift);
 
     $self->{+MAKEMAKER}  = $ExtUtils::MakeMaker::Filename;
     $self->{+MM_VERSION} = $ExtUtils::MakeMaker::VERSION;
@@ -1601,7 +1601,7 @@ Used on the t/*.t files.
 =cut
 
 sub test_via_harness {
-    my($self, $perl, $tests) = < @_;
+    my@($self, $perl, $tests) =  @_;
 
     return qq{\t$perl "-MExtUtils::Command::MM" }.
            qq{"-e" "test_harness(\$(TEST_VERBOSE), '\$(INST_LIB)', '\$(INST_ARCHLIB)')" $tests\n};
@@ -1621,7 +1621,7 @@ formatting.
 =cut
 
 sub test_via_script {
-    my($self, $perl, $script) = < @_;
+    my@($self, $perl, $script) =  @_;
     return qq{\t$perl "-I\$(INST_LIB)" "-I\$(INST_ARCHLIB)" $script\n};
 }
 
@@ -1662,7 +1662,7 @@ tests in t/*.t.
 =cut
 
 sub find_tests {
-    my($self) = shift;
+    my@($self) =@( shift);
     return -d 't' ?? 't/*.t' !! '';
 }
 
@@ -1716,8 +1716,8 @@ installation.
 =cut
 
 sub libscan {
-    my($self,$path) = < @_;
-    my($dirs,$file) = < ($self->splitpath($path))[[1..2]];
+    my@($self,$path) =  @_;
+    my@($dirs,$file) =  ($self->splitpath($path))[[1..2]];
     return '' if grep m/^(?:RCS|CVS|SCCS|\.svn|_darcs)$/, @( < 
                      $self->splitdir($dirs), $file);
 

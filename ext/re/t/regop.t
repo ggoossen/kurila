@@ -20,7 +20,7 @@ ok( defined $out, 'regop.pl returned something defined' );
 $out ||= "";
 my $test= 1;
 foreach my $testout (  @tests ) {
-    my ( $pattern )= $testout=~m/Compiling REx "([^"]+)"/;
+    my @( $pattern )= @: $testout=~m/Compiling REx "([^"]+)"/;
     ok( $pattern, "Pattern for test " . ($test++) );
     my $diaged;
 

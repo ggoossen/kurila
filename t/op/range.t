@@ -12,11 +12,11 @@ our (@a, @foo, @bar, @bcd, $e, $x, @x, @b, @y);
 is(join(':',1..5), '1:2:3:4:5');
 
 @foo = @(1,2,3,4,5,6,7,8,9);
- <@foo[[2..4]] = ('c','d','e');
+ @foo[[2..4]] = @('c','d','e');
 
 is(join(':', @foo[[@foo[0]..5]]), '2:c:d:e:6');
- <
-@bar[[2..4]] = ('c','d','e');
+ 
+@bar[[2..4]] = @('c','d','e');
 is(join(':', @bar[[1..5]]), ':c:d:e:');
 
 TODO: do {
@@ -84,8 +84,8 @@ do {
 
 # Should use magical autoinc only when both are strings
 do {
-    my $scalar = (() = < "0"..-1);
-    is ($scalar, 0);
+    my $scalar = "0"..-1;
+    is (nelems($scalar), 0);
 };
 do {
     my $fail = 0;

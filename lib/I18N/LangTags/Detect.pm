@@ -16,7 +16,7 @@ use I18N::LangTags < qw(alternate_language_tags locale2language_tag);
 
 sub _uniq { my %seen; return grep(!(%seen{+$_}++), @_); }
 sub _normalize {
-  my(@languages) = map lc($_), grep $_, map {; $_, < alternate_language_tags($_) } @_;
+  my@(@languages) =@( map lc($_), grep $_, map {; $_, < alternate_language_tags($_) } @_);
   return _uniq(< @languages);
 }
 

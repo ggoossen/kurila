@@ -13,7 +13,7 @@ push @MANIFEST, 'lib/Config.pod', 'lib/Errno.pm', 'lib/lib.pm',
 for ( @MANIFEST) {
      my $filename;
      next unless s|^lib/|| or m|^ext/|;
-     my ($origfilename) = ($filename) = m|^(\S+)|;
+     my @($origfilename) = @($filename) = @: m|^(\S+)|;
      $filename =~ s|^[^/]+/|| if $filename =~ s|^ext/||;
      next unless $filename =~ m!\.p(m|od)$!;
      unless (open (MOD, "<", "../lib/$filename")) {
@@ -49,7 +49,7 @@ for ( @MANIFEST) {
      $perlname =~ s!\b(\w+)/\1\b!$1!;
      $perlname =~ s![/-]!::!g;
 
-     ($name, $thing) = < split m/ --? /, $title, 2;
+     @($name, $thing) =  split m/ --? /, $title, 2;
 
      unless ($name and $thing) {
 	 warn "$filename missing name\n"  unless $name;

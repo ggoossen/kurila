@@ -108,7 +108,7 @@ sub nstore_and_retrieve {
 }
 
 foreach ( @processes) {
-  my ($process, $sub) = < @$_;
+  my @($process, $sub) =  @$_;
   foreach my $number ( @numbers) {
     # as $number is an alias into @numbers, we don't want any side effects of
     # conversion macros affecting later runs, so pass a copy to Storable:

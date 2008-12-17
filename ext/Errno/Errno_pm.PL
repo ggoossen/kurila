@@ -40,7 +40,7 @@ write_errno_pm();
 unlink "errno.c" if -f "errno.c";
 
 sub process_file {
-    my($file) = < @_;
+    my@($file) =  @_;
 
     # for win32 perl under cygwin, we need to get a windows pathname
     if ($^O eq 'MSWin32' && config_value("cc") =~ m/\B-mno-cygwin\b/ &&
@@ -273,7 +273,7 @@ sub write_errno_pm {
 
 	while( ~< *CPPO) {
 	    my($name,$expr);
-	    next unless ($name, $expr) = m/"(.*?)"\s*\[\s*\[\s*(.*?)\s*\]\s*\]/;
+	    next unless @(?$name, ?$expr) = @: m/"(.*?)"\s*\[\s*\[\s*(.*?)\s*\]\s*\]/;
 	    next if $name eq $expr;
 	    $expr =~ s/\(?\([a-z_]\w*\)([^\)]*)\)?/$1/i; # ((type)0xcafebabe) at alia
 	    $expr =~ s/((?:0x)?[0-9a-fA-F]+)[LU]+\b/$1/g; # 2147483647L et alia
@@ -395,42 +395,6 @@ ESQ
 ESQ
 
     print <<'ESQ';
-
-sub TIEHASH { bless \@() }
-
-sub FETCH {
-    my ($self, $errname) = < @_;
-    my $errno = "";
-    if ( exists %name2no{$errname}) {
-        $errno = %name2no{$errname};
-        $errno = 0 unless $! == $errno;
-    }
-    return $errno;
-}
-
-sub STORE {
-    die("ERRNO hash is read only!");
-}
-
-*CLEAR = \&STORE;
-*DELETE = \&STORE;
-
-sub NEXTKEY {
-    my($k,$v) = each %name2no;
-    $k
-}
-
-sub FIRSTKEY {
-    keys %name2no;	# initialize iterator
-    goto &NEXTKEY;
-}
-
-sub EXISTS {
-    my ($self, $errname) = < @_;
-    return exists %name2no{$errname};
-}
-
-tie %!, __PACKAGE__;
 
 1;
 __END__

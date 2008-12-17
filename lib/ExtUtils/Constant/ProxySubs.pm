@@ -59,7 +59,7 @@ $VERSION = '0.06';
      );
 
 sub type_to_C_value {
-    my ($self, $type) = < @_;
+    my @($self, $type) =  @_;
     return %type_to_C_value{?$type} || sub {return map {ref $_ ?? < @$_ !! $_} @_ };
 }
 
@@ -80,14 +80,14 @@ sub type_to_C_value {
      );
 %type_temporary{+$_} = \@($_) foreach qw(IV UV NV);
      
-while (my ($type, $value) = each %XS_TypeSet) {
+while (my @(?$type, ?$value) =@( each %XS_TypeSet)) {
     %type_num_args{+$type}
 	= defined $value ?? ref $value ?? scalar nelems @$value !! 1 !! 0;
 }
 %type_num_args{+''} = 0;
 
 sub partition_names {
-    my ($self, $default_type, < @items) = < @_;
+    my @($self, $default_type, @< @items) =  @_;
     my (%found, @notfound, @trouble);
 
     while (my $item = shift @items) {
@@ -121,7 +121,7 @@ sub partition_names {
 }
 
 sub boottime_iterator {
-    my ($self, $type, $iterator, $hash, $subname) = < @_;
+    my @($self, $type, $iterator, $hash, $subname) =  @_;
     my $extractor = %type_from_struct{?$type};
     die "Can't find extractor code for type $type"
 	unless defined $extractor;
@@ -141,7 +141,7 @@ EOBOOT
 }
 
 sub name_len_value_macro {
-    my ($self, $item) = < @_;
+    my @($self, $item) =  @_;
     my $name = $item->{?name};
     my $value = $item->{?value};
     $value = $item->{?name} unless defined $value;
@@ -157,8 +157,8 @@ sub WriteConstants {
     my $self = shift;
     my $ARGS = \%(< @_);
 
-    my ($c_fh, $xs_fh, $c_subname, $xs_subname, $default_type, $package)
-	= < %{$ARGS}{[qw(C_FH XS_FH C_SUBNAME XS_SUBNAME DEFAULT_TYPE NAME)]};
+    my @($c_fh, $xs_fh, $c_subname, $xs_subname, $default_type, $package)
+	=  %{$ARGS}{[qw(C_FH XS_FH C_SUBNAME XS_SUBNAME DEFAULT_TYPE NAME)]};
 
     my $options = $ARGS->{?PROXYSUBS};
     $options = \%() unless ref $options;
@@ -183,8 +183,8 @@ sub WriteConstants {
     # Everything that doesn't have a default needs alternative code for
     # "I'm missing"
     # And everything that has pre or post code ends up in a private block
-    my ($found, $notfound, $trouble)
-	= < $self->partition_names($default_type, < @items);
+    my @($found, $notfound, $trouble)
+	=  $self->partition_names($default_type, < @items);
 
     my $pthx = $self->C_constant_prefix_param_defintion();
     my $athx = $self->C_constant_prefix_param();
@@ -308,8 +308,8 @@ EOBOOT
 
 
 	foreach my $item ( @{$found->{$type}}) {
-            my ($name, $namelen, $value, $macro)
-                 = < $self->name_len_value_macro($item);
+            my @($name, $namelen, $value, $macro)
+                 =  $self->name_len_value_macro($item);
 
 	    my $ifdef = $self->macro_to_ifdef($macro);
 	    if (!$ifdef && $item->{?invert_macro}) {
@@ -402,8 +402,8 @@ DONT
 EOBOOT
 
     foreach my $item ( @$trouble) {
-        my ($name, $namelen, $value, $macro)
-	    = < $self->name_len_value_macro($item);
+        my @($name, $namelen, $value, $macro)
+	    =  $self->name_len_value_macro($item);
         my $ifdef = $self->macro_to_ifdef($macro);
         my $type = $item->{?type};
 	my $type_to_value = $self->type_to_C_value($type);

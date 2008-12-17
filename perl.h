@@ -3688,8 +3688,6 @@ Gid_t getegid (void);
 #define PERL_MAGIC_tied		  'P' /* Tied array or hash */
 #define PERL_MAGIC_tiedelem	  'p' /* Tied array or hash element */
 #define PERL_MAGIC_qr		  'r' /* precompiled qr// regex */
-#define PERL_MAGIC_sig		  'S' /* %SIG hash */
-#define PERL_MAGIC_sigelem	  's' /* %SIG hash element */
 #define PERL_MAGIC_taint	  't' /* Taintedness */
 #define PERL_MAGIC_uvar		  'U' /* Available for use by extensions */
 #define PERL_MAGIC_uvar_elem	  'u' /* Reserved for use by extensions */
@@ -4430,8 +4428,7 @@ enum {		/* pass one of these to get_vtbl */
     want_vtbl_sv,
     want_vtbl_env,
     want_vtbl_envelem,
-    want_vtbl_sig,
-    want_vtbl_sigelem,
+    want_vtbl_hints,
     want_vtbl_pack,
     want_vtbl_packelem,
     want_vtbl_dbline,
@@ -4690,7 +4687,8 @@ END_EXTERN_C
 START_EXTERN_C
 
 #include "gv.h"
-#include "svx.h"
+#include "sv_i.h"
+#include "cop_i.h"
 
 /* PERL_GLOBAL_STRUCT_PRIVATE wants to keep global data like the
  * magic vtables const, but this is incompatible with SWIG which
@@ -4752,9 +4750,8 @@ MGVTBL_SET(
     0
 );
 
-/* For now, hints magic will also use vtbl_sig, because it is all 0  */
 MGVTBL_SET(
-    PL_vtbl_sig,
+    PL_vtbl_hints,
     0,
     0,
     0,
@@ -4764,33 +4761,6 @@ MGVTBL_SET(
     0,
     0
 );
-
-#ifdef PERL_MICRO
-MGVTBL_SET(
-    PL_vtbl_sigelem,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0
-);
-
-#else
-MGVTBL_SET(
-    PL_vtbl_sigelem,
-    MEMBER_TO_FPTR(Perl_magic_getsig),
-    MEMBER_TO_FPTR(Perl_magic_setsig),
-    0,
-    MEMBER_TO_FPTR(Perl_magic_clearsig),
-    0,
-    0,
-    0,
-    0
-);
-#endif
 
 MGVTBL_SET(
     PL_vtbl_pack,

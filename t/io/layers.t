@@ -58,7 +58,7 @@ SKIP: do {
     skip("miniperl does not have Encode", $NTEST) if %ENV{?PERL_CORE_MINITEST};
 
     sub check {
-	my ($result, $expected, $id) = < @_;
+	my @($result, $expected, $id) =  @_;
 	# An interesting dance follows where we try to make the following
 	# IO layer stack setups to compare equal:
 	#

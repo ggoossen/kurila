@@ -46,7 +46,7 @@ sub opdump (;$) {
 
 sub _init_optags {
     my(%all, %seen);
- <    %all{[opset_to_ops(full_opset())]} = (); # keys only
+     %all{[opset_to_ops(full_opset())]} = @(); # keys only
 
     local($_);
     local($/) = "\n=cut"; # skip to optags definition section
@@ -299,9 +299,9 @@ invert_opset function.
 
     null stub scalar pushmark wantarray const defined undef
 
-    rv2sv sassign
+    rv2sv sassign logassign_assign dotdotdot placeholder
 
-    rv2av aassign aelem aelemfast aslice
+    rv2av aelem aelemfast aslice
 
     rv2hv helem hslice each values keys exists delete nkeys
 
@@ -321,7 +321,9 @@ invert_opset function.
 
     match split qr
 
-    list listlast lslice splice push pop shift unshift reverse expand nelems
+    list listlast lslice splice push pop shift unshift reverse
+    arrayexpand enter_arrayexpand_assign enter_hashexpand_assign
+    hashexpand expand nelems
 
     cond_expr flip flop andassign orassign dorassign and or dor xor
 
@@ -341,7 +343,7 @@ available memory).
 
     concat repeat join range
 
-    anonarray anonhash anonscalar
+    anonarray enter_anonarray_assign anonhash enter_anonhash_assign anonscalar
 
 Note that despite the existence of this optag a memory resource attack
 may still be possible using only :base_core ops.
@@ -395,8 +397,6 @@ These are a hotchpotch of opcodes still waiting to be considered
     sprintf prtf -- can core dump
 
     crypt
-
-    tie untie
 
     sselect select
     pipe_op sockpair
@@ -539,7 +539,6 @@ about calling environment and args.
 
     sleep alarm -- changes global timer state and signal handling
     sort -- assorted problems including core dumps
-    tied -- can be used to access object implementing a tie
     pack unpack -- can be used to create/use memory pointers
 
     hintseval -- constant op holding eval hints

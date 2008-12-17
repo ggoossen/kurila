@@ -17,7 +17,6 @@ INPUT
 T_dbtkeydatum
     \{
 	SV * my_sv = $arg;
-	DBM_ckFilter(my_sv, filter_store_key, \"filter_store_key\");
 	DBT_clear($var) ;
 	SvGETMAGIC(my_sv) ;
         if (db->type == DB_RECNO) \{
@@ -36,7 +35,6 @@ T_dbtkeydatum
 T_dbtdatum
     \{
 	SV * my_sv = $arg;
-	DBM_ckFilter(my_sv, filter_store_value, \"filter_store_value\");
 	DBT_clear($var) ;
 	SvGETMAGIC(my_sv) ;
 	if (SvOK(my_sv)) \{

@@ -85,15 +85,15 @@ is ($refref->{"key"}->[2]->[0], 3);
 
 # Test to see if anonymous subarrays spring into existence.
 
-@spring[5]->[0] = 123;
-@spring[5]->[1] = 456;
+@spring[+5]->[+0] = 123;
+@spring[5]->[+1] = 456;
 push(@{@spring[5]}, 789);
 is (join(':', @{@spring[5]}), "123:456:789");
 
 # Test to see if anonymous subhashes spring into existence.
 
-@{%spring2{"foo"}} = @(1,2,3);
-%spring2{"foo"}->[3] = 4;
+@{%spring2{+"foo"}} = @(1,2,3);
+%spring2{"foo"}->[+3] = 4;
 is (join(':', @{%spring2{?"foo"}}), "1:2:3:4");
 
 # Test references to subroutines.
@@ -253,7 +253,7 @@ do {
 # test if refgen behaves with autoviv magic
 do {
     my @a;
-    @a[1] = "good";
+    @a[+1] = "good";
     my $got;
     for ( @a) {
 	$got .= ${\$_};
@@ -327,8 +327,8 @@ TODO: do {
     ok (!defined ${*{Symbol::fetch_glob($name2)}},
 	'defined via a different NUL-containing name gives nothing');
 
-    is (*{Symbol::fetch_glob($name1)}->[0], undef, 'Nothing before we start (arrays)');
-    is (*{Symbol::fetch_glob($name2)}->[0], undef, 'Nothing before we start');
+    is (*{Symbol::fetch_glob($name1)}->[+0], undef, 'Nothing before we start (arrays)');
+    is (*{Symbol::fetch_glob($name2)}->[+0], undef, 'Nothing before we start');
     *{Symbol::fetch_glob($name1)}->[0] = "Yummy";
     is (*{Symbol::fetch_glob($name1)}->[0], "Yummy", 'Accessing via the correct name works');
     is (*{Symbol::fetch_glob($name2)}->[0], undef,
@@ -337,13 +337,13 @@ TODO: do {
     ok (!defined*{Symbol::fetch_glob($name2)}->[0],
 	'defined via a different NUL-containing name gives nothing');
 
-    my (undef, $one) = < @{*{Symbol::fetch_glob($name1)}}[[@(2,3)]];
-    my (undef, $two) = < @{*{Symbol::fetch_glob($name2)}}[[@(2,3)]];
+    my @(_, $one) =  @{*{Symbol::fetch_glob($name1)}}[[@(2,3)]];
+    my @(_, $two) =  @{*{Symbol::fetch_glob($name2)}}[[@(2,3)]];
     is ($one, undef, 'Nothing before we start (array slices)');
     is ($two, undef, 'Nothing before we start');
- <    @{*{Symbol::fetch_glob($name1)}}[[@(2,3)]] = ("Very", "Yummy");
-    (undef, $one) = < @{*{Symbol::fetch_glob($name1)}}[[@(2,3)]];
-    (undef, $two) = < @{*{Symbol::fetch_glob($name2)}}[[@(2,3)]];
+     @{*{Symbol::fetch_glob($name1)}}[[@(2,3)]] = @("Very", "Yummy");
+    @(_, $one) =  @{*{Symbol::fetch_glob($name1)}}[[@(2,3)]];
+    @(_, $two) =  @{*{Symbol::fetch_glob($name2)}}[[@(2,3)]];
     is ($one, "Yummy", 'Accessing via the correct name works');
     is ($two, undef,
 	'Accessing via a different NUL-containing name gives nothing');
@@ -361,13 +361,13 @@ TODO: do {
     ok (!defined *{Symbol::fetch_glob($name2)}->{?PWOF},
 	'defined via a different NUL-containing name gives nothing');
 
-    my (undef, $one) = < %{*{Symbol::fetch_glob($name1)}}{[@('SNIF', 'BEEYOOP')]};
-    my (undef, $two) = < %{*{Symbol::fetch_glob($name2)}}{[@('SNIF', 'BEEYOOP')]};
+    my @(_, $one) =  %{*{Symbol::fetch_glob($name1)}}{[@('SNIF', 'BEEYOOP')]};
+    my @(_, $two) =  %{*{Symbol::fetch_glob($name2)}}{[@('SNIF', 'BEEYOOP')]};
     is ($one, undef, 'Nothing before we start (hash slices)');
     is ($two, undef, 'Nothing before we start');
- <    %{*{Symbol::fetch_glob($name1)}}{[@('SNIF', 'BEEYOOP')]} = ("Very", "Yummy");
-    (undef, $one) = < %{*{Symbol::fetch_glob($name1)}}{[@('SNIF', 'BEEYOOP')]};
-    (undef, $two) = < %{*{Symbol::fetch_glob($name2)}}{[@('SNIF', 'BEEYOOP')]};
+     %{*{Symbol::fetch_glob($name1)}}{[@('SNIF', 'BEEYOOP')]} = @("Very", "Yummy");
+    @(_, $one) =  %{*{Symbol::fetch_glob($name1)}}{[@('SNIF', 'BEEYOOP')]};
+    @(_, $two) =  %{*{Symbol::fetch_glob($name2)}}{[@('SNIF', 'BEEYOOP')]};
     is ($one, "Yummy", 'Accessing via the correct name works');
     is ($two, undef,
 	'Accessing via a different NUL-containing name gives nothing');

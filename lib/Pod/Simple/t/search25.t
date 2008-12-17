@@ -1,16 +1,8 @@
-BEGIN {
-    if(%ENV{?PERL_CORE}) {
-        chdir 't';
-        @INC = @( '../lib' );
-    }
-}
-
 
 #sub Pod::Simple::Search::DEBUG () {5};
 
 use Pod::Simple::Search;
-use Test;
-BEGIN { plan tests => 10 }
+use Test::More tests => 10;
 
 print "# ", __FILE__,
  ": Testing limit_glob ...\n";
@@ -67,7 +59,7 @@ my $glob = 'squaa::*';
 print "# Limiting to $glob\n";
 $x->limit_glob($glob);
 
-my($name2where, $where2name) = ($x->survey($here1, $here2, $here3), $x->path2name);
+my@($name2where, $where2name) = @($x->survey($here1, $here2, $here3), $x->path2name);
 
 my $p = pretty( $where2name, $name2where )."\n";
 $p =~ s/, +/,\n/g;
@@ -76,32 +68,32 @@ print $p;
 
 do {
 my $names = join "|", sort keys %$name2where;
-ok $names, "squaa::Glunk|squaa::Vliff|squaa::Wowo";
+is $names, "squaa::Glunk|squaa::Vliff|squaa::Wowo";
 };
 
 do {
 my $names = join "|", sort values %$where2name;
-ok $names, "squaa::Glunk|squaa::Vliff|squaa::Vliff|squaa::Vliff|squaa::Wowo";
+is $names, "squaa::Glunk|squaa::Vliff|squaa::Vliff|squaa::Vliff|squaa::Wowo";
 
 my %count;
 for(values %$where2name) { ++%count{+$_} };
 #print pretty(\%count), "\n\n";
 delete %count{[ grep %count{?$_} +< 2, keys %count ]};
 my $shadowed = join "|", sort keys %count;
-ok $shadowed, "squaa::Vliff";
+is $shadowed, "squaa::Vliff";
 
 sub thar { print "# Seen @_[0] :\n", < map "#  \{$_\}\n", sort grep $where2name->{?$_} eq @_[0],keys %$where2name; return; }
 
-ok %count{?'squaa::Vliff'}, 3;
+is %count{?'squaa::Vliff'}, 3;
 thar 'squaa::Vliff';
 };
 
 
 ok ! $name2where->{?'squaa'};  # because squaa.pm isn't squaa::*
 
-ok( ($name2where->{?'squaa::Vliff'} || 'huh???'), '/[^\^]testlib1/' );
+like( ($name2where->{?'squaa::Vliff'} || 'huh???'), qr/[^\^]testlib1/ );
 
-ok( ($name2where->{?'squaa::Wowo'}  || 'huh???'), '/testlib2/' );
+like( ($name2where->{?'squaa::Wowo'}  || 'huh???'), qr/testlib2/ );
 
 
 print "# OK, bye from ", __FILE__, "\n";

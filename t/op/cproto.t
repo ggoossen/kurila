@@ -2,11 +2,11 @@
 # Tests to ensure that we don't unexpectedly change prototypes of builtins
 
 BEGIN { require './test.pl'; }
-plan tests => 224;
+plan tests => 221;
 
 while ( ~< *DATA) {
     chomp;
-    (my $keyword, my $proto, local our $TODO) = < split " ", $_, 3;
+    @(my $keyword, my $proto, ?local our $TODO) =  split " ", $_, 3;
     if ($proto eq 'undef') {
 	ok( !defined prototype "CORE::".$keyword, $keyword );
     }
@@ -218,8 +218,6 @@ system undef
 syswrite (*$;$$)
 tell (;*)
 telldir (*)
-tie undef
-tied undef
 time ()
 times ()
 tr undef
@@ -232,7 +230,6 @@ unless undef
 unlink (@)
 unpack ($;$)
 unshift (\@@)
-untie undef
 until undef
 use undef
 utime (@)

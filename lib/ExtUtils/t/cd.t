@@ -29,7 +29,7 @@ do {
     do {
         local *make = sub { "nmake" };
 
-        my @dirs = @( (File::Spec->updir) x 2 );
+        my @dirs = @(File::Spec->updir) x 2 ;
         my $expected_updir = File::Spec->catdir(< @dirs);
         
         main::is $mm->cd(< @cd_args),

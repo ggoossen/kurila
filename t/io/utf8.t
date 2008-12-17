@@ -237,14 +237,14 @@ do {
     local $^WARN_HOOK = sub { $@ = shift };
     open F, ">", "a";
     binmode F;
-    my ($chrE4, $chrF6) = ("\x[E4]", "\x[F6]");
+    my @($chrE4, $chrF6) = @("\x[E4]", "\x[F6]");
     print F "foo", $chrE4, "\n";
     print F "foo", $chrF6, "\n";
     close F;
     open F, "<:utf8", "a";
     undef $@;
     my $line = ~< *F;
-    my ($chrE4, $chrF6) = ("E4", "F6");
+    my @($chrE4, $chrF6) = @("E4", "F6");
     like( $@->message, qr/utf8 "\\x$chrE4" does not map to Unicode/,
 	  "<:utf8 readline must warn about bad utf8");
     undef $@;

@@ -311,8 +311,7 @@ Perl_pad_tmprefcnt(pTHX_ CV* cv)
     dVAR;
     I32 ix;
     const PADLIST * const padlist = CvPADLIST(cv);
-
-    PERL_ARGS_ASSERT_PAD_UNDEF;
+    PERL_ARGS_ASSERT_PAD_TMPREFCNT;
 
     if (!padlist)
 	return;
@@ -708,7 +707,7 @@ S_pad_findlex(pTHX_ const char *name, PAD *padnames, PAD* pad, U32 seq)
 	SV* parent_pad;
 	SV* parent_seq;
 
-	if ( ! parent_padnames )
+	if ( ! parent_padnames || ! SvAVOK(*parent_padnames) )
 	    return NOT_IN_PAD;
 
         parent_pad = *av_fetch(padnames, PAD_PARENTPAD_INDEX, 0);
@@ -1156,17 +1155,6 @@ Perl_pad_free(pTHX_ PADOFFSET po)
 
     if (PL_curpad[po] && PL_curpad[po] != &PL_sv_undef) {
 	SvPADTMP_off(PL_curpad[po]);
-#ifdef USE_ITHREADS
-	/* SV could be a shared hash key (eg bugid #19022) */
-	if (
-#ifdef PERL_OLD_COPY_ON_WRITE
-	    !SvIsCOW(PL_curpad[po])
-#else
-	    !SvFAKE(PL_curpad[po])
-#endif
-	    )
-	    SvREADONLY_off(PL_curpad[po]);	/* could be a freed constant */
-#endif
     }
     if ((I32)po < PL_padix)
 	PL_padix = po - 1;
@@ -1488,7 +1476,7 @@ Perl_pad_savelex(pTHX_ PAD *padnames, PAD* pad, U32 seq)
 
     PERL_ARGS_ASSERT_PAD_SAVELEX;
 
-    while (parent_padnamesref) {
+    while (parent_padnamesref && SvAVOK(*parent_padnamesref)) {
 	I32 offset;
 	AV* parent_padnames = SvAv(*parent_padnamesref);
 	for (offset = av_len(parent_padnames);

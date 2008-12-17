@@ -23,22 +23,22 @@ No user-serviceable parts inside.
 #
 
 sub _rebuild_cache {
-    my ($pkg, $exports, $cache) = < @_;
+    my @($pkg, $exports, $cache) = @_;
     s/^&// foreach  @$exports;
- <    %{$cache}{[ @$exports]} = (1) x nelems @$exports;
+    %{$cache}{[ @$exports]} = @(1) x nelems @$exports;
     my $ok = \@{*{Symbol::fetch_glob("$($pkg)::EXPORT_OK")}};
     if ((nelems @$ok)) {
 	s/^&// foreach  @$ok;
- <	%{$cache}{[ @$ok]} = (1) x nelems @$ok;
+ 	%{$cache}{[ @$ok]} = @(1) x nelems @$ok;
     }
 }
 
 sub heavy_export {
 
-    my($pkg, $callpkg, < @imports) = < @_;
-    my($type, $cache_is_current, $oops);
-    my($exports, $export_cache) = (\@{*{Symbol::fetch_glob("$($pkg)::EXPORT")}},
-                                   %Exporter::Cache{+$pkg} ||= \%());
+    my @($pkg, $callpkg, @< @imports) = @_;
+    my ($type, $cache_is_current, $oops);
+    my @($exports, $export_cache) = @(\@{*{Symbol::fetch_glob("$($pkg)::EXPORT")}},
+                                      %Exporter::Cache{+$pkg} ||= \%());
 
     if ((nelems @imports)) {
 	if (!%$export_cache) {
@@ -84,8 +84,8 @@ sub heavy_export {
 		if ($remove) {
 		   foreach my $sym ( @names) { delete %imports{$sym} } 
 		}
-		else { <
-		    %imports{[ @names]} = (1) x nelems @names;
+		else {
+		    %imports{[ @names]} = @(1) x nelems @names;
 		}
 	    }
 	    @imports = keys %imports;
@@ -135,8 +135,8 @@ sub heavy_export {
 	@imports = @$exports;
     }
 
-    my($fail, $fail_cache) = (\@{*{Symbol::fetch_glob("$($pkg)::EXPORT_FAIL")}},
-                              %Exporter::FailCache{+$pkg} ||= \%());
+    my @($fail, $fail_cache) = @(\@{*{Symbol::fetch_glob("$($pkg)::EXPORT_FAIL")}},
+                                 %Exporter::FailCache{+$pkg} ||= \%());
 
     if ((nelems @$fail)) {
 	if (!%$fail_cache) {
@@ -145,7 +145,7 @@ sub heavy_export {
 	    # (Technique could be applied to $export_cache at cost of memory)
 	    my @expanded = map { m/^\w/ ?? ($_, '&'.$_) !! $_ } @$fail;
 	    warn "$($pkg)::EXPORT_FAIL cached: $(join ' ',@expanded)" if $Exporter::Verbose;
- <	    %{$fail_cache}{[ @expanded]} = (1) x nelems @expanded;
+ 	    %{$fail_cache}{[ @expanded]} = (1) x nelems @expanded;
 	}
 	my @failed;
 	foreach my $sym ( @imports) { push(@failed, $sym) if $fail_cache->{?$sym} }
@@ -183,7 +183,7 @@ sub heavy_export_to_level
 {
       my $pkg = shift;
       my $level = shift;
-      (undef) = shift;			# XXX redundant arg
+      shift;			# XXX redundant arg
       my $callpkg = caller($level);
       $pkg->export($callpkg, < @_);
 }
@@ -191,7 +191,7 @@ sub heavy_export_to_level
 # Utility functions
 
 sub _push_tags {
-    my($pkg, $var, $syms) = < @_;
+    my @($pkg, $var, $syms) = @_;
     my @nontag = @( () );
     my $export_tags = \%{*{Symbol::fetch_glob("$($pkg)::EXPORT_TAGS")}};
     push(@{*{Symbol::fetch_glob("$($pkg)::$var")}},
@@ -205,7 +205,7 @@ sub _push_tags {
 }
 
 sub heavy_require_version {
-    my($self, $wanted) = < @_;
+    my @($self, $wanted) = @_;
     my $pkg = ref $self || $self;
     return $pkg->VERSION($wanted);
 }

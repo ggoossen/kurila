@@ -304,7 +304,7 @@ sub new_from_fd {
 ##
 
 sub _open_mode_string {
-    my ($mode) = < @_;
+    my @($mode) =  @_;
     $mode =~ m/^\+?(<|>>?)$/
       or $mode =~ s/^r(\+?)$/$1</
       or $mode =~ s/^w(\+?)$/$1>/
@@ -315,7 +315,7 @@ sub _open_mode_string {
 
 sub fdopen {
     (nelems @_) == 3 or die 'usage: $io->fdopen(FD, MODE)';
-    my ($io, $fd, $mode) = < @_;
+    my @($io, $fd, $mode) =  @_;
 
     my $fdmode = '&';
     if (!ref($fd) && $fd =~ m#^\d+$#) {
@@ -329,7 +329,7 @@ sub fdopen {
 
 sub close {
     (nelems @_) == 1 or die 'usage: $io->close()';
-    my($io) = < @_;
+    my@($io) =  @_;
 
     close($io);
 }
@@ -394,25 +394,25 @@ sub truncate {
 
 sub read {
     (nelems @_) == 3 || (nelems @_) == 4 or die 'usage: $io->read(BUF, LEN [, OFFSET])';
-    read(@_[0], @_[1], @_[2], @_[3] || 0);
+    read(@_[0], @_[1], @_[2], @_[?3] || 0);
 }
 
 sub sysread {
     (nelems @_) == 3 || (nelems @_) == 4 or die 'usage: $io->sysread(BUF, LEN [, OFFSET])';
-    sysread(@_[0], @_[1], @_[2], @_[3] || 0);
+    sysread(@_[0], @_[1], @_[2], @_[?3] || 0);
 }
 
 sub write {
     (nelems @_) +>= 2 && (nelems @_) +<= 4 or die 'usage: $io->write(BUF [, LEN [, OFFSET]])';
     local($\) = "";
-    @_[2] = length(@_[1]) unless defined @_[2];
-    print { @_[0] } substr(@_[1], @_[3] || 0, @_[2]);
+    @_[+2] = length(@_[1]) unless defined @_[?2];
+    print { @_[0] } substr(@_[1], @_[?3] || 0, @_[2]);
 }
 
 sub syswrite {
     (nelems @_) +>= 2 && (nelems @_) +<= 4 or die 'usage: $io->syswrite(BUF [, LEN [, OFFSET]])';
-    if (defined(@_[2])) {
-	syswrite(@_[0], @_[1], @_[2], @_[3] || 0);
+    if (defined(@_[?2])) {
+	syswrite(@_[0], @_[1], @_[2], @_[?3] || 0);
     } else {
 	syswrite(@_[0], @_[1]);
     }
@@ -469,14 +469,14 @@ sub input_line_number {
 # XXX undocumented
 sub fcntl {
     (nelems @_) == 3 || die 'usage: $io->fcntl( OP, VALUE );';
-    my ($io, $op) = < @_;
+    my @($io, $op) =  @_;
     return fcntl($io, $op, @_[2]);
 }
 
 # XXX undocumented
 sub ioctl {
     (nelems @_) == 3 || die 'usage: $io->ioctl( OP, VALUE );';
-    my ($io, $op) = < @_;
+    my @($io, $op) =  @_;
     return ioctl($io, $op, @_[2]);
 }
 

@@ -61,7 +61,7 @@ $sel->add(\@(\*STDOUT, "ok 12\n"));
 print "not " unless (nelems @a) == 1;
 print "ok 11\n";
 
-my($fd, $msg) = < @{shift @a};
+my@($fd, $msg) =  @{shift @a};
 print $fd $msg;
 
 $sel->add(\*STDOUT);  # update
@@ -70,7 +70,7 @@ $sel->add(\*STDOUT);  # update
 print "not " unless (nelems @a) == 3;
 print "ok 13\n";
 
-my ($r, $w, $e) = < @a;
+my @($r, $w, $e) =  @a;
 
 print "not " unless (nelems @$r) == 0 && (nelems @$w) == 1 && (nelems @$e) == 0;
 print "ok 14\n";

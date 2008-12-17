@@ -3,7 +3,7 @@
 use warnings;
 
 use vars < qw($foo $bar $baz $ballast);
-use Test::More tests => 192;
+use Test::More tests => 182;
 
 use Benchmark < qw(:all);
 
@@ -40,7 +40,7 @@ is ($bar, 5, "benchmarked code was run 5 times");
 
 # is coderef called with spurious arguments?
 my $foo;
-timeit( 1, sub { $foo = @_[0] });
+timeit( 1, sub { $foo = @_[?0] });
 is ($foo, undef, "benchmarked code called without arguments");
 
 
@@ -107,7 +107,7 @@ do {
     like ($all, $All_Pattern, 'timestr ($diff, "all")');
     print "# $all\n";
 
-    my ($wallclock, $usr, $sys, $cusr, $csys, $cpu) = $all =~ $All_Pattern;
+    my @($wallclock, $usr, $sys, $cusr, $csys, $cpu) = @: $all =~ $All_Pattern;
 
     is (timestr ($diff, 'none'), '', "none supresses output");
 
@@ -262,10 +262,10 @@ my $graph_dissassembly =
     \n[ \t]*(\w+)[ \t]+([0-9.]+(?:/s)?)[ \t]+(-?\d+%)[ \t]+(-+)[ \t]*$!xm;
 
 sub check_graph_consistency {
-    my (	$ratetext, $slowc, $fastc,
+    my @(	$ratetext, $slowc, $fastc,
         $slowr, $slowratet, $slowslow, $slowfastt,
         $fastr, $fastratet, $fastslowt, $fastfast)
-        = < @_;
+        =  @_;
     my $all_passed = 1;
     $all_passed
       ^&^= is ($slowc, $slowr, "left col tag should be top row tag");
@@ -326,11 +326,11 @@ sub check_graph_consistency {
 }
 
 sub check_graph_vs_output {
-    my ($chart, $got) = < @_;
-    my (	$ratetext, $slowc, $fastc,
+    my @($chart, $got) =  @_;
+    my @(	$ratetext, $slowc, $fastc,
         $slowr, $slowratet, $slowslow, $slowfastt,
         $fastr, $fastratet, $fastslowt, $fastfast)
-        = $got =~ $graph_dissassembly;
+        = @: $got =~ $graph_dissassembly;
     my $all_passed
       = check_graph_consistency (        $ratetext, $slowc, $fastc,
                                  $slowr, $slowratet, $slowslow, $slowfastt,
@@ -347,7 +347,7 @@ sub check_graph_vs_output {
 }
 
 sub check_graph {
-    my ($title, $row1, $row2) = < @_;
+    my @($title, $row1, $row2) =  @_;
     is (nelems @$title, 4, "Four entries in title row");
     is (nelems @$row1, 4, "Four entries in first row");
     is (nelems @$row2, 4, "Four entries in second row");
@@ -544,27 +544,20 @@ do {   # Check usage error messages
                      'not result' => 'cmpthese(42)',
                      'array ref'  => 'cmpthese( 42, \@( foo => sub { 1 } ) )',
                     );
-    while( my($name, $code) = each %cmpthese ) {
+    while( my@(?$name, ?$code) =@( each %cmpthese) ) {
         eval $code;
         is( $@->{?description}, %usage{?cmpthese}, "cmpthese usage: $name" );
     }
 
     my %timethese = %('forgot {}'  => 'timethese( 42, foo => sub { 1 } )',
-                       'no code'    => 'timethese(42)',
                        'array ref'  => 'timethese( 42, \@( foo => sub { 1 } ) )',
                       );
 
-    while( my($name, $code) = each %timethese ) {
+    while( my@(?$name, ?$code) =@( each %timethese) ) {
         eval $code;
         is( $@->{?description}, %usage{?timethese}, "timethese usage: $name" );
     }
 
-
-    while( my($func, $usage) = each %usage ) {
-        next if grep $func eq $_, @takes_no_args;
-        eval "$func()";
-        is( $@->{?description}, $usage, "$func usage: no args" );
-    }
 
     foreach my $func ( @takes_no_args) {
         eval "$func(42)";

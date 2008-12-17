@@ -316,7 +316,7 @@ close SAVERR;
 sub _normalize {
     my $hash = shift;
 
-    while(my($k,$v) = each %$hash) {
+    while(my@(?$k,?$v) =@( each %$hash)) {
         delete $hash->{$k};
         $hash->{+lc $k} = $v;
     }

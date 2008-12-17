@@ -4,7 +4,7 @@
 # (including weird syntax errors)
 
 BEGIN { require "./test.pl"; }
-plan( tests => 81 );
+plan( tests => 78 );
 
 eval '%@x=0;';
 like( $@->{?description}, qr/^Can't coerce HASH to string in repeat/, '%@x=0' );
@@ -22,19 +22,11 @@ like( $@->{?description}, qr/^Missing braces on \\N/,
     'syntax error in string with incomplete \N' );
 
 # Bug 20010831.001
-eval '($a, b) = (1, 2);';
-like( $@->{?description}, qr/^Can't modify constant item in list assignment/,
+eval '@($a, b) = @(1, 2);';
+like( $@->{?description}, qr/^Can't assign to constant item/,
     'bareword in list assignment' );
 
-eval 'tie FOO, "Foo";';
-like( $@->{?description}, qr/^Can't modify constant item in tie/,
-    'tying a bareword causes a segfault in 5.6.1' );
-
-eval 'undef foo';
-like( $@->{?description}, qr/^Can't modify constant item in undef operator/,
-    'undefing constant causes a segfault in 5.6.1 [ID 20010906.019]' );
-
-eval 'read(our $bla, FILE, 1);';
+eval 'read(our $bla, "FILE", 1);';
 like( $@->{?description}, qr/^Can't modify constant item in read/,
     'read($var, FILE, 1) segfaults on 5.6.1 [ID 20011025.054]' );
 
@@ -139,10 +131,6 @@ do {
 eval q{ foo::$bar };
 like( $@->{?description}, qr/Bad name after foo::/, 'Bad name after foo::' );
 
-# test for ?: context error
-eval q{($a ?? $x !! ($y)) = 5};
-like( $@->{?description}, qr/Assignment to both a list and a scalar/, 'Assignment to both a list and a scalar' );
-
 eval q{ s/x/#/ };
 is( $@, '', 'comments in s///e' );
 
@@ -205,8 +193,8 @@ like($@->stacktrace, qr/BEGIN/, 'BEGIN 7' );
 # with sane line reporting for any other test failures
 
 sub check ($$$) {
-    my ($file, $line, $name) =  < @_;
-    my (undef, $got_file, $got_line) = caller;
+    my @($file, $line, $name) =   @_;
+    my @(_, $got_file, $got_line) =@( caller);
     like ($got_file, $file, "file of $name");
     is ($got_line, $line, "line of $name");
 }
