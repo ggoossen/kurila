@@ -3,7 +3,7 @@
 # regression tests for old bugs that don't fit other categories
 
 
-use Test::More tests => 3;
+use Test::More tests => 2;
 use Data::Dumper;
 
 do {
@@ -13,12 +13,6 @@ do {
 	$count++ while each %$h;
 	return $count;
     }
-
-    my $dumper = Data::Dumper->new( \@(\%ENV), \@('ENV') )->Sortkeys(1);
-    my $orig_count = iterate_hash(\%ENV);
-    $dumper->Dump;
-    my $new_count = iterate_hash(\%ENV);
-    is($new_count, $orig_count, 'correctly resets hash iterators');
 };
 
 # [perl #38612] Data::Dumper core dump in 5.8.6, fixed by 5.8.7

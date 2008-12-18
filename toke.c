@@ -4830,8 +4830,6 @@ Perl_yylex(pTHX)
 	    PREBLOCK(CONTINUE);
 
 	case KEY_chdir:
-	    /* may use HOME */
-	    (void)gv_fetchpvs("ENV", GV_ADD|GV_NOTQUAL, SVt_PVHV);
 	    UNI(OP_CHDIR);
 
 	case KEY_close:

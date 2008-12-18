@@ -36,7 +36,7 @@ sub _cwd {
 my $tmpdir;
 sub tmpdir {
     return $tmpdir if defined $tmpdir;
-    my @d = %ENV{[qw(TMPDIR TEMP TMP)]};	# function call could autovivivy
+    my @d = map { env::var($_) } qw(TMPDIR TEMP TMP);
     $tmpdir = @_[0]->_tmpdir( < @d, '/tmp', '/'  );
 }
 

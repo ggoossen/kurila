@@ -39,8 +39,8 @@ ok env::var('MYORP'), 'Zing';
 env::set_var('SWUZ'   => 'KLORTHO HOOBOY');
 ok env::var('SWUZ'), 'KLORTHO HOOBOY';
 
-delete %ENV{'MYORP'};
-delete %ENV{'SWUZ'};
+env::set_var('MYORP', undef);
+env::set_var('SWUZ', undef);
 
 
 print "# Test LANG...\n";

@@ -8,7 +8,7 @@ my %err = %( () );
 my %wsa = %( () );
 
 # Symbian cross-compiling environment.
-my $IsSymbian = exists %ENV{SDK} && -d "$(env::var('SDK'))\\epoc32";
+my $IsSymbian = defined env::var("SDK") && -d "$(env::var('SDK'))\\epoc32";
 
 my $IsMSWin32 = $^O eq 'MSWin32' && !$IsSymbian;
 

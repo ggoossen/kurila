@@ -521,8 +521,7 @@ sub runperl {
 	    $sep = %Config{?path_sep};
 	}
 
-	my @keys = grep {exists %ENV{$_}} qw(CDPATH IFS ENV BASH_ENV);
-	local %ENV{[ @keys]} =@( @());
+	env::temp_set_var($_, undef) for qw(CDPATH IFS ENV BASH_ENV);
 	# Untaint, plus take out . and empty string:
         env::temp_set_var('DCL$PATH' => $1) if $is_vms && (env::var('DCL$PATH') =~ m/(.*)/s);
 	env::var('PATH') =~ m/(.*)/s;

@@ -158,7 +158,7 @@ sub clean_env {
 
         unless ($IsMacOS) { # ENV on MacOS is "special" :-)
             # On VMS, %ENV is many layered.
-            delete %ENV{$env} while exists %ENV{$env};
+            env::set_var($env, undef) while defined env::var($env);
         }
     }
 
@@ -172,11 +172,13 @@ END {
     no warnings 'uninitialized';
  
     # Restore the environment for VMS (and doesn't hurt for anyone else)
-    %ENV{[ @magic_envs]} =  %Saved_Env{[ @magic_envs]};
+    for my $key (@magic_envs) {
+        env::set_var($key, %Saved_Env{$key});
+    }
 
     # On VMS this must be deleted or process table is wrong on exit
     # when this script is run interactively.
-    delete %ENV{'SYS$LOGIN'} if $IsVMS;
+    env::set_var('SYS$LOGIN', undef) if $IsVMS;
 }
 
 

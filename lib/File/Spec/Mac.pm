@@ -431,7 +431,7 @@ sub path {
 #  The concept is meaningless under the MacPerl application.
 #  Under MPW, it has a meaning.
 #
-    return unless exists %ENV{Commands};
+    return unless defined env::var('Commands');
     returnsplit(m/,/, env::var('Commands'));
 }
 

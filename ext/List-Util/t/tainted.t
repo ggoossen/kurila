@@ -12,7 +12,7 @@ my $var = 2;
 
 ok( !tainted($var), 'known variable');
 
-my $key = (keys %ENV)[0];
+my $key = (env::keys)[0];
 
 ok( tainted(env::var($key)),	'environment variable');
 

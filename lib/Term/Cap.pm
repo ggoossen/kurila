@@ -118,14 +118,14 @@ sub termcap_path
     # $TERMCAP, if it's a filespec
     push( @termcap_path, env::var('TERMCAP') )
       if (
-        ( exists %ENV{TERMCAP} )
+        ( defined env::var('TERMCAP') )
         && (
             ( $^O eq 'os2' || $^O eq 'MSWin32' || $^O eq 'dos' )
             ?? env::var('TERMCAP') =~ m/^[a-z]:[\\\/]/is
             !! env::var('TERMCAP') =~ m/^\//s
         )
       );
-    if ( ( exists %ENV{TERMPATH} ) && ( env::var('TERMPATH') ) )
+    if ( env::var('TERMPATH') )
     {
 
         # Add the users $TERMPATH
@@ -136,7 +136,7 @@ sub termcap_path
 
         # Defaults
         push( @termcap_path,
-            exists %ENV{'HOME'} ?? $(env::var('HOME')) . '/.termcap' !! undef,
+            defined env::var('HOME') ?? env::var('HOME') . '/.termcap' !! undef,
             '/etc/termcap', '/usr/share/misc/termcap', );
     }
 
@@ -262,7 +262,7 @@ sub Tgetent
     $termpat = $tmp_term;
     $termpat =~ s/(\W)/\\$1/g;
 
-    my $foo = ( exists %ENV{TERMCAP} ?? env::var('TERMCAP') !! '' );
+    my $foo = env::var('TERMCAP') // '' ;
 
     # $entry is the extracted termcap entry
     if ( ( $foo !~ m:^/:s ) && ( $foo =~ m/(^|\|)$termpat(?:)[:|]/s ) )

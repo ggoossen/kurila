@@ -166,7 +166,7 @@ do {
 
    local *^O;
    local *ENV;
-   delete %ENV{TERM};
+   env::set_var('TERM', undef);
    $^O = 'Win32';
 
    my $foo = Term::Cap->Tgetent();

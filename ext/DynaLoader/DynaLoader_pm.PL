@@ -96,7 +96,7 @@ use Config;
 
 # enable debug/trace messages from DynaLoader perl code
 our $dl_debug;
-$dl_debug = %ENV{?PERL_DL_DEBUG} || 0 unless defined $dl_debug;
+$dl_debug = env::var("PERL_DL_DEBUG") || 0 unless defined $dl_debug;
 
 #
 # Flags to alter dl_load_file behaviour.  Assigned bits:
@@ -210,16 +210,16 @@ EOT
 
 my $env_dl_library_path = <<'EOT';
 if ($ldlibpthname_defined &&
-    exists %ENV{$ldlibpthname}) {
-    push(@dl_library_path, < split(m/$pthsep/, %ENV{$ldlibpthname}));
+    defined env::var($ldlibpthname)) {
+    push(@dl_library_path, < split(m/$pthsep/, env::var($ldlibpthname)));
 }
 
 # E.g. HP-UX supports both its native SHLIB_PATH *and* LD_LIBRARY_PATH.
 
 if ($ldlibpthname_defined &&
     $ldlibpthname ne 'LD_LIBRARY_PATH' &&
-    exists %ENV{LD_LIBRARY_PATH}) {
-    push(@dl_library_path, < split(m/$pthsep/, %ENV{LD_LIBRARY_PATH}));
+    defined env::var('LD_LIBRARY_PATH')) {
+    push(@dl_library_path, < split(m/$pthsep/, env::var('LD_LIBRARY_PATH')));
 }
 EOT
 

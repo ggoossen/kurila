@@ -13,8 +13,8 @@ print "# Make sure we can assign to ENV entries\n",
 env::set_var('MYORP'   => 'Zing');          ok env::var('MYORP'), 'Zing';
 env::set_var('SWUZ'    => 'KLORTHO HOOBOY'); ok env::var('SWUZ'), 'KLORTHO HOOBOY';
 
-delete %ENV{'MYORP'};
-delete %ENV{'SWUZ'};
+env::set_var('MYORP', undef);
+env::set_var('SWUZ', undef);
 
 sub j { "[" . join(' ', map "\"$_\"", @_) . "]" ;}
 
@@ -25,7 +25,7 @@ sub show {
 }
 sub printenv {
   print "# ENV:\n";
-  foreach my $k (sort keys %ENV) {
+  foreach my $k (sort { $a cmp $b } env::keys()) {
     my $p = env::var($k);  $p =~ s/\n/\n#/g;
     print "#   [$k] = [$p]\n"; }
   print "# [end of ENV]\n#\n";

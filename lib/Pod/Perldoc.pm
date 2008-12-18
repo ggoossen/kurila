@@ -1647,9 +1647,9 @@ sub tweak_found_pathnames {
 
 sub am_taint_checking {
     my $self = shift;
-    die "NO ENVIRONMENT?!?!" unless keys %ENV; # reset iterator along the way
-    my@($k,$v) =@( each %ENV);
-    return is_tainted($v);  
+    die "NO ENVIRONMENT?!?!" unless env::keys(); # reset iterator along the way
+    my $v = env::var( env::keys()[0] );
+    return is_tainted($v);
 }
 
 #..........................................................................

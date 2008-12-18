@@ -54,7 +54,7 @@ my @MoreEnv = qw/IFS CDPATH ENV BASH_ENV/;
 if ($Is_VMS) {
     my (%old);
     for my $x (@('DCL$PATH', < @MoreEnv)) {
-	(%old{+$x}) = env::var($x) =~ m/^(.*)$/ if exists %ENV{$x};
+	(%old{+$x}) = env::var($x) =~ m/^(.*)$/ if defined env::var($x);
     }
     # VMS note:  PATH and TERM are automatically created by the C
     # library in VMS on reference to the their keys in %ENV.
@@ -165,7 +165,7 @@ do {
 	}
     }
     env::set_var('PATH' => ($Is_Cygwin) ?? '/usr/bin' !! '');
-    delete %ENV{[@MoreEnv]};
+    env::set_var($_, undef) for @MoreEnv;
     env::set_var('TERM' => 'dumb');
 
     test try { `$echo 1` } eq "1\n";
@@ -198,8 +198,8 @@ do {
     }
     else {
 	$tmp = (grep { defined and -d and @(stat '_')[?2] ^&^ 2 }
- @( <		     qw(sys$scratch /tmp /var/tmp /usr/tmp), <
-		     %ENV{[qw(TMP TEMP)]}))[?0]
+ 		     @: < qw(sys$scratch /tmp /var/tmp /usr/tmp),
+                        env::var('TMP'), env::var('TEMP') )[?0]
 	    or print "# can't find world-writeable directory to test PATH\n";
     }
 
@@ -863,7 +863,8 @@ do {
 do {
     # Check that all environment variables are tainted.
     my @untainted;
-    while (my @(?$k, ?$v) =@( each %ENV)) {
+    for my $k (env::keys) {
+        my $v = env::var($k);
 	if (!tainted($v) &&
 	    # These we have explicitly untainted or set earlier.
 	    $k !~ m/^(BASH_ENV|CDPATH|ENV|IFS|PATH|PERL_CORE|TEMP|TERM|TMP)$/) {

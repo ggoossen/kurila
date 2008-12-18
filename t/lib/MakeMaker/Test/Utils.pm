@@ -102,7 +102,7 @@ Sets up environment variables so perl can find its libraries.
 =cut
 
 my $old5lib = env::var('PERL5LIB');
-my $had5lib = exists %ENV{PERL5LIB};
+my $had5lib = defined $old5lib;
 sub perl_lib {
                                # perl-src/t/
     my $lib =  env::var('PERL_CORE') ?? qq{../lib}
@@ -110,18 +110,13 @@ sub perl_lib {
                                !! qq{../blib/lib};
     $lib = 'File::Spec'->rel2abs($lib);
     my @libs = @($lib);
-    push @libs, env::var('PERL5LIB') if exists %ENV{PERL5LIB};
+    push @libs, env::var('PERL5LIB') if defined env::var('PERL5LIB');
     env::set_var('PERL5LIB' => join(config_value("path_sep"), @libs));
     unshift @INC, $lib;
 }
 
-END { 
-    if( $had5lib ) {
-        env::set_var('PERL5LIB' => $old5lib);
-    }
-    else {
-        delete %ENV{PERL5LIB};
-    }
+END {
+    env::set_var('PERL5LIB' => $old5lib);
 }
 
 
@@ -161,8 +156,7 @@ Returns a good guess at the make to run.
 =cut
 
 sub make {
-    my $make = config_value("make");
-    $make = env::var('MAKE') if exists %ENV{MAKE};
+    my $make = env::var('MAKE') // config_value("make");
 
     return $make;
 }

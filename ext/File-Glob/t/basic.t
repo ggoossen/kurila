@@ -8,7 +8,7 @@ use Cwd ();
 
 # look for the contents of the current directory
 env::set_var('PATH' => "/bin");
-delete %ENV{[qw(BASH_ENV CDPATH ENV IFS)]};
+env::set_var($_, undef) for qw(BASH_ENV CDPATH ENV IFS);
 my @correct = @( () );
 if (opendir(D, $^O eq "MacOS" ?? ":" !! ".")) {
    @correct = grep { !m/^\./ } sort @( readdir(D));

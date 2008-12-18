@@ -189,7 +189,7 @@ is tainted, it is not used.
 my $tmpdir;
 sub tmpdir {
     return $tmpdir if defined $tmpdir;
-    $tmpdir = @_[0]->_tmpdir( 'sys$scratch:', %ENV{TMPDIR} );
+    $tmpdir = @_[0]->_tmpdir( 'sys$scratch:', env::var('TMPDIR') );
 }
 
 =item updir (override)
@@ -221,7 +221,7 @@ to C<split> string value of C<%ENV{'PATH'}>.
 
 sub path {
     my (@dirs,$dir,$i);
-    while ($dir = %ENV{'DCL$PATH;' . $i++}) { push(@dirs,$dir); }
+    while ($dir = env::var('DCL$PATH;' . $i++)) { push(@dirs,$dir); }
     return < @dirs;
 }
 
@@ -234,7 +234,7 @@ Checks for VMS directory spec as well as Unix separators.
 sub file_name_is_absolute {
     my @($self,$file) = @_;
     # If it's a logical name, expand it.
-    $file = %ENV{$file} while $file =~ m/^[\w\$\-]+\Z(?!\n)/s && %ENV{$file};
+    $file = env::var($file) while $file =~ m/^[\w\$\-]+\Z(?!\n)/s && env::var($file);
     return scalar($file =~ m!^/!s             ||
 		  $file =~ m![<\[][^.\-\]>]!  ||
 		  $file =~ m/:[^<\[]/);

@@ -303,7 +303,7 @@ package Term::ReadLine;		# So late to allow the above code be defined?
 
 our $VERSION = '1.03';
 
-my @($which) = exists %ENV{PERL_RL} ?? split m/\s+/, env::var('PERL_RL') !! @(undef);
+my @($which) = defined env::var('PERL_RL') ?? split m/\s+/, env::var('PERL_RL') !! @(undef);
 if ($which) {
   if ($which =~ m/\bgnu\b/i){
     eval "use Term::ReadLine::Gnu;";

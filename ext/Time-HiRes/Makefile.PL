@@ -792,13 +792,13 @@ sub main {
     doMakefile;
     doConstants;
     my $make = config_value('make') || "make";
-    unless (exists %ENV{PERL_CORE} && env::var('PERL_CORE')) {
+    unless (env::var('PERL_CORE')) {
 	print  <<EOM;
 Now you may issue '$make'.  Do not forget also '$make test'.
 EOM
-       if ((exists %ENV{LC_ALL}   && env::var('LC_ALL')   =~ m/utf-?8/i) ||
-           (exists %ENV{LC_CTYPE} && env::var('LC_CTYPE') =~ m/utf-?8/i) ||
-           (exists %ENV{LANG}     && env::var('LANG')     =~ m/utf-?8/i)) {
+       if ((defined env::var('LC_ALL')   && env::var('LC_ALL')   =~ m/utf-?8/i) ||
+           (defined env::var('LC_CTYPE') && env::var('LC_CTYPE') =~ m/utf-?8/i) ||
+           (defined env::var('LANG')     && env::var('LANG')     =~ m/utf-?8/i)) {
             print <<EOM;
 
 NOTE: if you get an error like this (the Makefile line number may vary):

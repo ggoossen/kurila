@@ -23,7 +23,7 @@ local $^WARN_HOOK = sub {
 #try { re::bits(1) };
 #like( $warn, qr/Useless use/, 'bits() should warn with no args' );
 
-delete %ENV{PERL_RE_COLORS};
+env::set_var('PERL_RE_COLORS', undef);
 re::bits(0, 'debug');
 is( env::var('PERL_RE_COLORS'), undef,
 	"... should not set regex colors given 'debug'" );

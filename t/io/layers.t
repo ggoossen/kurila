@@ -9,20 +9,20 @@ BEGIN {
 	exit 0;
     }
     # Makes testing easier.
-    env::set_var('PERLIO' => 'stdio') if exists %ENV{PERLIO} && env::var('PERLIO') eq '';
-    if (exists %ENV{PERLIO} && env::var('PERLIO') !~ m/^(stdio|perlio|mmap)$/) {
+    env::set_var('PERLIO' => 'stdio') if defined env::var('PERLIO') && env::var('PERLIO') eq '';
+    if (defined env::var('PERLIO') && env::var('PERLIO') !~ m/^(stdio|perlio|mmap)$/) {
 	# We are not prepared for anything else.
 	print "1..0 # PERLIO='$(env::var('PERLIO'))' unknown\n";
 	exit 0;
     }
-    $PERLIO = exists %ENV{PERLIO} ?? env::var('PERLIO') !! "(undef)";
+    $PERLIO = defined env::var('PERLIO') ?? env::var('PERLIO') !! "(undef)";
 }
 
 use Config;
 
 my $DOSISH    = $^O =~ m/^(?:MSWin32|os2|dos|NetWare|mint)$/ ?? 1 !! 0;
    $DOSISH    = 1 if !$DOSISH and $^O =~ m/^uwin/;
-my $NONSTDIO  = exists %ENV{PERLIO} && env::var('PERLIO') ne 'stdio'     ?? 1 !! 0;
+my $NONSTDIO  = defined env::var('PERLIO') && env::var('PERLIO') ne 'stdio'     ?? 1 !! 0;
 my $FASTSTDIO = config_value('d_faststdio') && config_value('usefaststdio') ?? 1 !! 0;
 my $UTF8_STDIN;
 if ($^UNICODE ^&^ 1) {

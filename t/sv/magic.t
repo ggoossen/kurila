@@ -32,7 +32,7 @@ my $PERL = env::var('PERL')
        $Is_MSWin32            ?? '.\perl' !!
        './perl');
 
-eval '%ENV{+"FOO"} = "hi there";';	# check that ENV is inited inside eval
+eval 'env::set_var("FOO" => "hi there");';	# check that ENV is inited inside eval
 # cmd.exe will echo 'variable=value' but 4nt will echo just the value
 # -- Nikola Knezevic
 if ($Is_MSWin32)  { ok `set FOO` =~ m/^(?:FOO=)?hi there$/; }
@@ -45,12 +45,6 @@ $! = 0;
 open(FOO, "<",'ajslkdfpqjsjfk');
 ok $!, $!;
 close FOO; # just mention it, squelch used-only-once
-
-# can we slice ENV?
-my @val1 = %ENV{[keys(%ENV)]};
-my @val2 = values(%ENV);
-ok join(':', @val1) eq join(':', @val2);
-ok( (nelems @val1) +> 1 );
 
 # regex vars
 
@@ -194,7 +188,9 @@ else {
 	    my $PATH = env::var('PATH');
 	    my $PDL = env::var('PERL_DESTRUCT_LEVEL') || 0;
 	    env::set_var('foo' => "bar");
-	    %ENV = %( () );
+            for (env::keys()) {
+                env::set_var($_, undef);
+            }
 	    env::set_var('PATH' => $PATH);
 	    env::set_var('PERL_DESTRUCT_LEVEL' => $PDL || 0);
 	    ok ($Is_MSWin32 ?? (`set foo 2>NUL` eq "")
@@ -256,13 +252,15 @@ SKIP: do {
     # test case-insignificance of %ENV (these tests must be enabled only
     # when perl is compiled with -DENV_IS_CASELESS)
     skip('no caseless %ENV support', 4) unless $Is_MSWin32 || $Is_NetWare;
-    %ENV = %( () );
+    for (env::keys()) {
+        env::set_var($_, undef);
+    }
     env::set_var('Foo' => 'bar');
     env::set_var('fOo' => 'baz');
-    ok (scalar(keys(%ENV)) == 1);
-    ok exists(%ENV{'FOo'});
-    ok (delete(%ENV{'foO'}) eq 'baz');
-    ok (scalar(keys(%ENV)) == 0);
+    ok (nelems(env::keys()) == 1);
+    ok defined(env::var('FOo'));
+    env::set_var('foO', undef);
+    ok (nelems(env::keys()) == 0);
 };
 
 if ($Is_miniperl) {

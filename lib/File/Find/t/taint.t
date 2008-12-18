@@ -10,7 +10,7 @@ use Config;
 
 BEGIN {
     if ($^O ne 'VMS') {
-	for (keys %ENV) { # untaint ENV
+	for (env::keys) { # untaint ENV
 	    env::set_var($_ => @( env::var($_) =~ m/(.*)/ )[0]);
 	}
     }

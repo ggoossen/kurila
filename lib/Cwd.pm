@@ -308,8 +308,18 @@ unless ($pwd_cmd) {
 # The 'natural and safe form' for UNIX (pwd may be setuid root)
 sub _backtick_pwd {
     # Localize %ENV entries in a way that won't create new hash keys
-    env::temp_set_var($_, undef) for qw(PATH IFS CDPATH ENV BASH_ENV);
-
+    my @localize = qw(PATH IFS CDPATH ENV BASH_ENV);
+    my $oldvalue = map { env::var($_) } @localize;
+    push dynascope->{onleave},
+      sub {
+          for (@localize) {
+              env::set_var($_, shift $oldvalue);
+          }
+      };
+    for (@localize) {
+        env::set_var($_, undef);
+    }
+    
     my $cwd = `$pwd_cmd`;
     # Belt-and-suspenders in case someone said "undef $/".
     local $/ = "\n";

@@ -280,21 +280,21 @@ $| = 1;
 $\ = "\n";
 my $getenv;
 if ($^O eq 'MSWin32' || $^O eq 'NetWare') {
-    $getenv = qq[$^X -e "print \%ENV\{?TST\}"];
+    $getenv = qq[$^X -e "print \$(env::var(q[TST]))"];
 }
 else {
-    $getenv = qq[$^X -e 'print \%ENV\{?TST\}'];
+    $getenv = qq[$^X -e 'print \$(env::var(q[TST]))'];
 }
-%ENV{+TST} = 'foo';
+env::set_var(TST => 'foo');
 if (fork) {
     sleep 1;
     print "parent before: " . `$getenv`;
-    %ENV{+TST} = 'bar';
+    env::set_var(TST => 'bar');
     print "parent after: " . `$getenv`;
 }
 else {
     print "child before: " . `$getenv`;
-    %ENV{+TST} = 'baz';
+    env::set_var(TST => 'baz');
     print "child after: " . `$getenv`;
 }
 EXPECT

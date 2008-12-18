@@ -33,9 +33,9 @@ ok( !defined(&fast_abs_path),   '  nor fast_abs_path()');
 
 do {
   my @fields = qw(PATH IFS CDPATH ENV BASH_ENV);
-  my $before = grep exists %ENV{$_}, @fields;
+  my $before = grep defined env::var($_), @fields;
   cwd();
-  my $after = grep exists %ENV{$_}, @fields;
+  my $after = grep defined env::var($_), @fields;
   is(nelems($before), nelems($after), "cwd() shouldn't create spurious entries in \%ENV");
 };
 
@@ -66,7 +66,11 @@ SKIP: do {
 
     print "# native pwd = '$pwd_cmd'\n";
 
-    local %ENV{[qw(PATH IFS CDPATH ENV BASH_ENV)]} = @();
+    my %local_env_keys = %:< map { $_, env::var($_) } qw[PATH IFS CDPATH ENV BASH_ENV];
+    push dynascope->{onleave}, sub {
+        env::set_var($_, %local_env_keys{$_}) for keys %local_env_keys;
+    };
+    env::set_var($_, undef) for keys %local_env_keys;
     my @($pwd_cmd_untainted) = @: $pwd_cmd =~ m/^(.+)$/; # Untaint.
     chomp(my $start = `$pwd_cmd_untainted`);
 
@@ -91,7 +95,7 @@ SKIP: do {
 	# Admittedly fixing this in the Cwd module would be better
 	# long-term solution but deleting $ENV{PWD} should not be
 	# done light-heartedly. --jhi
-	delete %ENV{PWD} if $^O eq 'darwin';
+	env::set_var('PWD') if $^O eq 'darwin';
 
 	my $cwd        = cwd;
 	my $getcwd     = getcwd;

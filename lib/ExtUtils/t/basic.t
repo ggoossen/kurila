@@ -20,7 +20,7 @@ use File::Path;
 
 # 'make disttest' sets a bunch of environment variables which interfere
 # with our testing.
-delete %ENV{[qw(PREFIX LIB MAKEFLAGS)]};
+env::set_var($_, undef) for qw(PREFIX LIB MAKEFLAGS);
 
 my $perl = which_perl();
 my $Is_VMS = $^O eq 'VMS';

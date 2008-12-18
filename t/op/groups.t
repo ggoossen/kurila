@@ -1,7 +1,7 @@
 #!./perl
 
 env::set_var('PATH' => "/bin:/usr/bin:/usr/xpg4/bin:/usr/ucb" .
-    exists %ENV{PATH} ?? ":$(env::var('PATH'))" !! "" );
+    defined env::var('PATH') ?? ":$(env::var('PATH'))" !! "" );
 env::set_var('LC_ALL' => "C"); # so that external utilities speak English
 env::set_var('LANGUAGE' => 'C'); # GNU locale extension
 

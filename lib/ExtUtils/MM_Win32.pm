@@ -97,9 +97,9 @@ used by default.
 
 sub maybe_command {
     my@($self,$file) =  @_;
-    my @e = @( exists(%ENV{'PATHEXT'})
-          ?? < split(m/;/, env::var('PATHEXT'))
-	  !! < qw(.com .exe .bat .cmd) );
+    my @e = defined(env::var('PATHEXT'))
+          ?? split(m/;/, env::var('PATHEXT'))
+	  !! qw(.com .exe .bat .cmd);
     my $e = '';
     for ( @e) { $e .= "\Q$_\E|" }
     chop $e;
