@@ -212,7 +212,7 @@ Takes no argument, returns the environment variable PATH as an array.
 =cut
 
 sub path {
-    return () unless exists %ENV{PATH};
+    return () unless defined env::var('PATH');
     my @path = split(':', env::var('PATH'));
     foreach ( @path) { $_ = '.' if $_ eq '' }
     return @path;

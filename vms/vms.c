@@ -1334,10 +1334,10 @@ prime_env_iter(void)
     }
 #endif
 
-  if (primed || !PL_envgv) return;
+  if (primed || !PL_envhv) return;
   MUTEX_LOCK(&primenv_mutex);
   if (primed) { MUTEX_UNLOCK(&primenv_mutex); return; }
-  envhv = GvHVn(PL_envgv);
+  envhv = PL_envhv;
   /* Perform a dummy fetch as an lval to insure that the hash table is
    * set up.  Otherwise, the hv_store() will turn into a nullop. */
   (void) hv_fetch(envhv,"DEFAULT",7,TRUE);

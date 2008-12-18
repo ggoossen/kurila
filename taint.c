@@ -92,24 +92,8 @@ Perl_taint_env(pTHX)
     };
 
     /* Don't bother if there's no *ENV glob */
-    if (!PL_envgv)
+    if (!PL_envhv)
 	return;
-    /* If there's no %ENV hash of if it's not magical, croak, because
-     * it probably doesn't reflect the actual environment */
-    if (!GvHV(PL_envgv) || !(SvRMAGICAL(GvHV(PL_envgv))
-	    && mg_find((SV*)GvHV(PL_envgv), PERL_MAGIC_env))) {
-	const bool was_tainted = PL_tainted;
-	const char * const name = GvENAME(PL_envgv);
-	PL_tainted = TRUE;
-	if (strEQ(name,"ENV"))
-	    /* hash alias */
-	    taint_proper("%%ENV is aliased to %s%s", "another variable");
-	else
-	    /* glob alias: report it in the error message */
-	    taint_proper("%%ENV is aliased to %%%s%s", name);
-	/* this statement is reached under -t or -U */
-	PL_tainted = was_tainted;
-    }
 
 #ifdef VMS
     {
@@ -120,7 +104,7 @@ Perl_taint_env(pTHX)
     while (1) {
 	if (i)
 	    len = my_sprintf(name,"DCL$PATH;%d", i);
-	svp = hv_fetch(GvHVn(PL_envgv), name, len, FALSE);
+	svp = hv_fetch(PL_envhv, name, len, FALSE);
 	if (!svp || *svp == &PL_sv_undef)
 	    break;
 	if (SvTAINTED(*svp)) {
@@ -136,7 +120,7 @@ Perl_taint_env(pTHX)
   }
 #endif /* VMS */
 
-    svp = hv_fetchs(GvHVn(PL_envgv),"PATH",FALSE);
+    svp = hv_fetchs(PL_envhv,"PATH",FALSE);
     if (svp && *svp) {
 	if (SvTAINTED(*svp)) {
 	    TAINT;
@@ -150,7 +134,7 @@ Perl_taint_env(pTHX)
 
 #ifndef VMS
     /* tainted $TERM is okay if it contains no metachars */
-    svp = hv_fetchs(GvHVn(PL_envgv),"TERM",FALSE);
+    svp = hv_fetchs(PL_envhv,"TERM",FALSE);
     if (svp && *svp && SvTAINTED(*svp)) {
 	STRLEN len;
 	const bool was_tainted = PL_tainted;
@@ -169,7 +153,7 @@ Perl_taint_env(pTHX)
 #endif /* !VMS */
 
     for (e = misc_env; *e; e++) {
-	SV * const * const svp = hv_fetch(GvHVn(PL_envgv), *e, strlen(*e), FALSE);
+	SV * const * const svp = hv_fetch(PL_envhv, *e, strlen(*e), FALSE);
 	if (svp && *svp != &PL_sv_undef && SvTAINTED(*svp)) {
 	    TAINT;
 	    taint_proper("Insecure $ENV{%s}%s", *e);

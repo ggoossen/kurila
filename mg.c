@@ -1094,7 +1094,7 @@ Perl_magic_setenv(pTHX_ SV *sv, MAGIC *mg)
      /* We just undefd an environment var.  Is a replacement */
      /* waiting in the wings? */
     if (!len) {
-	SV ** const valp = hv_fetch(GvHVn(PL_envgv), ptr, klen, FALSE);
+	SV ** const valp = hv_fetch(PL_envhv, ptr, klen, FALSE);
 	if (valp)
 	    s = SvOK(*valp) ? SvPV_const(*valp, len) : "";
     }

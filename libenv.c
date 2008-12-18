@@ -58,10 +58,10 @@ XS(XS_env_set_var)
             SvOK(value) ? SvPV_nolen_const(value) : NULL
             );
         if (SvOK(value)) {
-            hv_store_ent(GvHV(PL_envgv), key, newSVsv(value), 0);
+            hv_store_ent(PL_envhv, key, newSVsv(value), 0);
         }
         else {
-            hv_delete_ent(GvHV(PL_envgv), key, G_DISCARD, 0);
+            hv_delete_ent(PL_envhv, key, G_DISCARD, 0);
         }
     }
     XSRETURN(0);
@@ -75,7 +75,7 @@ XS(XS_env_keys)
     if (items != 0)
 	Perl_croak(aTHX_ "Usage: env::keys()");
     {
-        HV* hv = GvHV(PL_envgv);
+        HV* hv = PL_envhv;
         register HE *entry;
         AV* res = newAV();
         mXPUSHs(AvSv(res));

@@ -2736,7 +2736,7 @@ PP(pp_chdir)
     }
 
     if( !gv && (!tmps || !*tmps) ) {
-	HV * const table = GvHVn(PL_envgv);
+	HV * const table = PL_envhv;
 	SV **svp;
 
         if (    (svp = hv_fetchs(table, "HOME", FALSE))
@@ -2789,7 +2789,7 @@ PP(pp_chdir)
 #ifdef VMS
     /* Clear the DEFAULT element of ENV so we'll get the new value
      * in the future. */
-    hv_delete(GvHVn(PL_envgv),"DEFAULT",7,G_DISCARD);
+    hv_delete(PL_envhv,"DEFAULT",7,G_DISCARD);
 #endif
     RETURN;
 }

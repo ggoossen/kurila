@@ -262,7 +262,7 @@ sub _win32_ext {
     # add "$Config{installarchlib}/CORE" to default search path
     push @libpath, config_value("installarchlib") . "/CORE";
 
-    if ($VC and exists %ENV{LIB} and env::var('LIB')) {
+    if ($VC and env::var('LIB')) {
         push @libpath, < split m/;/, env::var('LIB');
     }
 
