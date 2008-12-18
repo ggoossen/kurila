@@ -2,7 +2,7 @@
 # Tests that all ops can be trapped by a Safe compartment
 
 BEGIN {
-    if (not %ENV{?PERL_CORE}) {
+    if (not env::var('PERL_CORE')) {
 	# this won't work outside of the core, so exit
         print "1..0\n"; exit 0;
     }

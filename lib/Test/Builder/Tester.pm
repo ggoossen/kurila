@@ -122,8 +122,8 @@ sub _start_testing
 {
     # even if we're running under Test::Harness pretend we're not
     # for now.  This needed so Test::Builder doesn't add extra spaces
-    $original_harness_env = %ENV{?HARNESS_ACTIVE} || 0;
-    %ENV{+HARNESS_ACTIVE} = 0;
+    $original_harness_env = env::var('HARNESS_ACTIVE') || 0;
+    env::set_var('HARNESS_ACTIVE') = 0;
 
     # remember what the handles were set to
     $original_output_handle  = $t->output();
@@ -345,7 +345,7 @@ sub test_test
     $testing = 0;
 
     # re-enable the original setting of the harness
-    %ENV{+HARNESS_ACTIVE} = $original_harness_env;
+    env::set_var('HARNESS_ACTIVE') = $original_harness_env;
 
     # check the output we've stashed
     unless ($t->ok(    (%args{?skip_out} || $out->check)

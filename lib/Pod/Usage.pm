@@ -502,7 +502,7 @@ sub pod2usage {
         my @($basename) = @(%opts{?"input"});
         my $pathsep = ($^O =~ m/^(?:dos|os2|MSWin32)$/) ?? ";"
                             !! (($^O eq 'MacOS' || $^O eq 'VMS') ?? ',' !!  ":");
-        my $pathspec = %opts{?"pathlist"} || %ENV{?PATH} || %ENV{?PERL5LIB};
+        my $pathspec = %opts{?"pathlist"} || env::var('PATH') || env::var('PERL5LIB');
 
         my @paths = @( (ref $pathspec) ?? < @$pathspec !! < split($pathsep, $pathspec) );
         for my $dirname ( @paths) {
@@ -541,7 +541,7 @@ sub pod2usage {
        system($progpath, %opts{?"input"});
        if($?) {
          # RT16091: fall back to more if perldoc failed
-         system(%ENV{?PAGER} || 'more', %opts{?"input"});
+         system(env::var('PAGER') || 'more', %opts{?"input"});
        }
     }
     else {

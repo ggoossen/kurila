@@ -3,7 +3,7 @@
 # Test ExtUtils::Install.
 
 BEGIN {
-    if( %ENV{PERL_CORE} ) {
+    if( env::var('PERL_CORE') ) {
         @INC = @('../../lib', '../lib', 'lib');
     }
     else {
@@ -32,8 +32,8 @@ END {
     ok( teardown_recurs(), 'teardown' );
 }
 # ensure the env doesnt pollute our tests
-local %ENV{?EU_INSTALL_ALWAYS_COPY};
-local %ENV{?EU_ALWAYS_COPY};    
+ env::temp_set_var('EU_INSTALL_ALWAYS_COPY');
+ env::temp_set_var('EU_ALWAYS_COPY');    
 
 chdir 'Big-Dummy';
 
@@ -113,7 +113,7 @@ do {
   ok( -r 'install-test/lib/perl/Big/Dummy.pm', 'different install exists' );
 
   local @INC = @('install-test/lib/perl');
-  local %ENV{+PERL5LIB} = '';
+   env::temp_set_var('PERL5LIB') = '';
   install(\@(from_to=> \%( 'blib/lib' => 'install-test/other_lib/perl',
            read   => 'install-test/packlist',
            write  => 'install-test/packlist'
@@ -130,7 +130,7 @@ do {
   my $tfile='install-test/lib/perl/Big/Dummy.pm';
   local $ExtUtils::Install::Testing = $tfile; 
   local @INC = @('install-test/other_lib/perl','install-test/lib/perl');
-  local %ENV{+PERL5LIB} = '';
+   env::temp_set_var('PERL5LIB') = '';
   ok( -r $tfile, 'different install exists' );
   my @warn;
   local $^WARN_HOOK=sub { push @warn, @_[0]->message; return };
@@ -152,7 +152,7 @@ do {
   my $tfile='install-test/lib/perl/Big/Dummy.pm';
   local $ExtUtils::Install::Testing = $tfile;
   local @INC = @('install-test/lib/perl','install-test/other_lib/perl');
-  local %ENV{+PERL5LIB} = '';
+   env::temp_set_var('PERL5LIB') = '';
   ok( -r $tfile, 'different install exists' );
   my @warn;
   local $^WARN_HOOK = sub { push @warn,< @_; return };
@@ -174,7 +174,7 @@ do {
 # Test UNINST=1 removing other versions in other dirs.
 do {
   local @INC = @('install-test/lib/perl');
-  local %ENV{+PERL5LIB} = '';
+   env::temp_set_var('PERL5LIB') = '';
   ok( -r 'install-test/lib/perl/Big/Dummy.pm','different install exists' );
   install(\@(from_to=>\%( 'blib/lib' => 'install-test/other_lib/perl',
            read   => 'install-test/packlist',
@@ -190,8 +190,8 @@ do {
 # Test EU_ALWAYS_COPY triggers copy.
 do {
   local @INC = @('install-test/lib/perl');
-  local %ENV{+PERL5LIB} = '';
-  local %ENV{+EU_INSTALL_ALWAYS_COPY}=1;
+   env::temp_set_var('PERL5LIB') = '';
+   env::temp_set_var('EU_INSTALL_ALWAYS_COPY')=1;
   my $tfile='install-test/other_lib/perl/Big/Dummy.pm';
   my $sfile='blib/lib/Big/Dummy.pm';
   ok(-r $tfile,"install file already exists");
@@ -211,8 +211,8 @@ do {
 # Test nothing is copied.
 do {
   local @INC = @('install-test/lib/perl');
-  local %ENV{+PERL5LIB} = '';
-  local %ENV{+EU_INSTALL_ALWAYS_COPY}=0;
+   env::temp_set_var('PERL5LIB') = '';
+   env::temp_set_var('EU_INSTALL_ALWAYS_COPY')=0;
   my $tfile='install-test/other_lib/perl/Big/Dummy.pm';
   my $sfile='blib/lib/Big/Dummy.pm';
   ok(-r $tfile,"install file already exists");

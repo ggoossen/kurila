@@ -5,7 +5,7 @@
 # A use_ok() inside a BEGIN block lacking a plan would be silently ignored.
 
 BEGIN {
-    if( %ENV{?PERL_CORE} ) {
+    if( env::var('PERL_CORE') ) {
         chdir 't';
         @INC = @('../lib', 'lib');
     }

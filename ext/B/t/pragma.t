@@ -1,7 +1,7 @@
 #!./perl -w
 
 BEGIN {    ## no critic strict
-    if ( %ENV{?PERL_CORE} ) {
+    if ( env::var('PERL_CORE') ) {
 	push @INC, < qw(lib);
     }
     else {

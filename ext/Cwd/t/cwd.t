@@ -18,7 +18,7 @@ $tests += 4 if $EXTRA_ABSPATH_TESTS;
 plan tests => $tests;
 
 SKIP: do {
-  skip "no need to check for blib/ in the core", 1 if %ENV{?PERL_CORE};
+  skip "no need to check for blib/ in the core", 1 if env::var('PERL_CORE');
   like %INC{?'Cwd.pm'}, qr{blib}i, "Cwd should be loaded from blib/ during testing";
 };
 
@@ -52,7 +52,7 @@ my $pwd_cmd =
     ($IsMacOS) ??
         "pwd" !!
         (grep { -x && -f } map { "$_/$pwd$(config_value('exe_ext'))" }
-	                   split m/$(config_value('path_sep'))/, %ENV{?PATH})[0];
+	                   split m/$(config_value('path_sep'))/, env::var('PATH'))[0];
 
 $pwd_cmd = 'SHOW DEFAULT' if $IsVMS;
 if ($^O eq 'MSWin32') {
@@ -125,12 +125,12 @@ do {
 };
 
 # Cwd::chdir should also update $ENV{PWD}
-dir_ends_with( %ENV{?PWD}, $Test_Dir, 'Cwd::chdir() updates $ENV{PWD}' );
+dir_ends_with( env::var('PWD'), $Test_Dir, 'Cwd::chdir() updates $ENV{PWD}' );
 my $updir = File::Spec->updir;
 
 for (1..nelems @test_dirs) {
   Cwd::chdir $updir;
-  print "#%ENV{?PWD}\n";
+  print "#$(env::var('PWD'))\n";
 }
 
 rmtree(@test_dirs[0], 0, 0);
@@ -140,15 +140,15 @@ do {
 	       $IsMacOS ?? qr|\bt:$| !!
 			  qr|\bt$| );
   
-  like(%ENV{?PWD}, $check);
+  like(env::var('PWD'), $check);
 };
 
 do {
   # Make sure abs_path() doesn't trample $ENV{PWD}
-  my $start_pwd = %ENV{?PWD};
+  my $start_pwd = env::var('PWD');
   mkpath(\@($Test_Dir), 0, 0777);
   Cwd::abs_path($Test_Dir);
-  is %ENV{?PWD}, $start_pwd;
+  is env::var('PWD'), $start_pwd;
   rmtree(@test_dirs[0], 0, 0);
 };
 
@@ -162,7 +162,7 @@ SKIP: do {
     my $fast_abs_path =  Cwd::fast_abs_path("linktest");
     my $want          =  quotemeta(
                              File::Spec->rel2abs(
-			         %ENV{?PERL_CORE} ?? $Test_Dir !! < File::Spec->catdir('t', $Test_Dir)
+			         env::var('PERL_CORE') ?? $Test_Dir !! < File::Spec->catdir('t', $Test_Dir)
                                                 )
                                   );
 
@@ -174,7 +174,7 @@ SKIP: do {
     1 while unlink "linktest";
 };
 
-if (%ENV{?PERL_CORE}) {
+if (env::var('PERL_CORE')) {
     chdir '../ext/Cwd/t';
     unshift @INC, '../../../lib';
 }

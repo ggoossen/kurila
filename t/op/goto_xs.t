@@ -9,7 +9,7 @@
 
 BEGIN { $| = 1; }
 BEGIN {
-    %ENV{+PERL5LIB} = "../lib";
+    env::set_var('PERL5LIB') = "../lib";
 
 # turn warnings into fatal errors
     $^WARN_HOOK = sub { die "WARNING: $(join ' ',@_)" } ;

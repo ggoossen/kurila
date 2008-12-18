@@ -372,7 +372,7 @@ directory on your startup volume.
 my $tmpdir;
 sub tmpdir {
     return $tmpdir if defined $tmpdir;
-    $tmpdir = @_[0]->_tmpdir( %ENV{TMPDIR} );
+    $tmpdir = @_[0]->_tmpdir( env::var('TMPDIR') );
 }
 
 =item updir
@@ -432,7 +432,7 @@ sub path {
 #  Under MPW, it has a meaning.
 #
     return unless exists %ENV{Commands};
-    returnsplit(m/,/, %ENV{?Commands});
+    returnsplit(m/,/, env::var('Commands'));
 }
 
 =item splitpath

@@ -10,8 +10,8 @@ use File::Path;
 rmtree('blurfl');
 
 # tests 3 and 7 rather naughtily expect English error messages
-%ENV{+'LC_ALL'} = 'C';
-%ENV{+LANGUAGE} = 'C'; # GNU locale extension
+env::set_var('LC_ALL') = 'C';
+env::set_var('LANGUAGE') = 'C'; # GNU locale extension
 
 ok(mkdir('blurfl',0777));
 ok(!mkdir('blurfl',0777));

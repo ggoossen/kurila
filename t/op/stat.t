@@ -320,7 +320,7 @@ SKIP: do {
 # may not be available (at, cron  rsh etc), the PERL_SKIP_TTY_TEST env var
 # can be set to skip the tests that need a tty.
 SKIP: do {
-    skip "These tests require a TTY", 4 if %ENV{?PERL_SKIP_TTY_TEST};
+    skip "These tests require a TTY", 4 if env::var('PERL_SKIP_TTY_TEST');
 
     my $TTY = $Is_Rhapsody ?? "/dev/ttyp0" !! "/dev/tty";
 

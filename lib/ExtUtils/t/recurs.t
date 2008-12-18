@@ -3,7 +3,7 @@
 # This tests MakeMaker against recursive builds
 
 BEGIN {
-    if( %ENV{?PERL_CORE} ) {
+    if( env::var('PERL_CORE') ) {
         unshift @INC, 'lib';
     }
     else {

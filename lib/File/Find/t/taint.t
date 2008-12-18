@@ -11,14 +11,14 @@ use Config;
 BEGIN {
     if ($^O ne 'VMS') {
 	for (keys %ENV) { # untaint ENV
-	    @(%ENV{+$_}) = @: %ENV{?$_} =~ m/(.*)/;
+	    @(env::set_var($_)) = @: env::var($_) =~ m/(.*)/;
 	}
     }
 
     # Remove insecure directories from PATH
     my @path;
     my $sep = config_value("path_sep");
-    foreach my $dir (split(m/\Q$sep/,%ENV{?'PATH'}))
+    foreach my $dir (split(m/\Q$sep/,env::var('PATH')))
     {
 	##
 	## Match the directory taint tests in mg.c::Perl_magic_setenv()
@@ -29,7 +29,7 @@ BEGIN {
 				 or
 				 @(stat $dir)[2] ^&^ 002);
     }
-    %ENV{+'PATH'} = join($sep, @path);
+    env::set_var('PATH') = join($sep, @path);
 }
 
 use Test::More tests => 45;

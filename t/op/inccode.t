@@ -5,7 +5,7 @@
 use Config;
 
 my $can_fork   = 0;
-my $minitest   = %ENV{?PERL_CORE_MINITEST};
+my $minitest   = env::var('PERL_CORE_MINITEST');
 my $has_perlio = config_value("useperlio");
 
 if (!$minitest) {

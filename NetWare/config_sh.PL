@@ -57,7 +57,7 @@ else {
 %opt{+VERSION} = "%opt{?PERL_REVISION}.%opt{?PERL_VERSION}.%opt{?PERL_SUBVERSION}";
 %opt{+INST_VER} =~ s|~VERSION~|%opt{?VERSION}|g;
 
-%opt{+'cf_by'} = %ENV{?USERNAME} unless %opt{?'cf_by'};
+%opt{+'cf_by'} = env::var('USERNAME') unless %opt{?'cf_by'};
 %opt{+'cf_email'} = %opt{?'cf_by'} . '@' . (gethostbyname('localhost'))[[0]]
 	unless %opt{?'cf_email'};
 %opt{+'usemymalloc'} = 'y' if %opt{?'d_mymalloc'} eq 'define';

@@ -31,15 +31,15 @@ sub ambient_langprefs { # always returns things untainted
   my $base_class = @_[0];
   
   return $base_class->http_accept_langs
-   if length( %ENV{?'REQUEST_METHOD'} || '' ); # I'm a CGI
+   if length( env::var('REQUEST_METHOD') || '' ); # I'm a CGI
        # it's off in its own routine because it's complicated
 
   # Not running as a CGI: try to puzzle out from the environment
   my @languages;
 
   foreach my $envname (qw( LANGUAGE LC_ALL LC_MESSAGES LANG )) {
-    next unless %ENV{?$envname};
-    DEBUG and print "Noting \$$envname: %ENV{?$envname}\n";
+    next unless env::var($envname);
+    DEBUG and print "Noting \$$envname: $(env::var($envname))\n";
     push @languages,
       < map locale2language_tag($_),
         # if it's a lg tag, fine, pass thru (untainted)
@@ -47,12 +47,12 @@ sub ambient_langprefs { # always returns things untainted
         # otherwise nix it.
 
       split m/[,:]/,
-      %ENV{?$envname}
+      env::var($envname)
     ;
     last; # first one wins
   }
   
-  if(%ENV{?'IGNORE_WIN32_LOCALE'}) {
+  if(env::var('IGNORE_WIN32_LOCALE')) {
     # no-op
   } elsif(&_try_use('Win32::Locale')) {
     # If we have that module installed...
@@ -70,7 +70,7 @@ sub http_accept_langs {
   # Hm.  Should I just move this into I18N::LangTags at some point?
   no integer;
 
-  my $in = ((nelems @_) +> 1) ?? @_[1] !! %ENV{?'HTTP_ACCEPT_LANGUAGE'};
+  my $in = ((nelems @_) +> 1) ?? @_[1] !! env::var('HTTP_ACCEPT_LANGUAGE');
   # (always ends up untainting)
 
   return() unless defined $in and length $in;

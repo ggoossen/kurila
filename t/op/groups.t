@@ -1,9 +1,9 @@
 #!./perl
 
-%ENV{+PATH} ="/bin:/usr/bin:/usr/xpg4/bin:/usr/ucb" .
-    exists %ENV{PATH} ?? ":%ENV{?PATH}" !! "";
-%ENV{+LC_ALL} = "C"; # so that external utilities speak English
-%ENV{+LANGUAGE} = 'C'; # GNU locale extension
+env::set_var('PATH') ="/bin:/usr/bin:/usr/xpg4/bin:/usr/ucb" .
+    exists %ENV{PATH} ?? ":$(env::var('PATH'))" !! "";
+env::set_var('LC_ALL') = "C"; # so that external utilities speak English
+env::set_var('LANGUAGE') = 'C'; # GNU locale extension
 
 BEGIN {
     require Config;
@@ -70,7 +70,7 @@ GROUPS: do {
 	    print <<EOM;
 # These test results *may* be bogus, as you appear to have AFS,
 # and I can't find a working 'id' in your PATH (which I have set
-# to '%ENV{?PATH}').
+# to '$(env::var('PATH'))').
 #
 # If these tests fail, report the particular incantation you use
 # on this platform to find *all* the groups that an arbitrary

@@ -287,7 +287,7 @@ sub _parseOutputGlob
             }{$(
               $1
                   ?? (getpwnam($1))[[7]]
-                  !! ( %ENV{?HOME} || %ENV{?LOGDIR} )
+                  !! ( $(env::var('HOME')) || $(env::var('LOGDIR')) )
             )}x;
 
     }

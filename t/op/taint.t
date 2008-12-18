@@ -20,12 +20,12 @@ use vars < qw($ipcsysv); # did we manage to load IPC::SysV?
 
 my ($old_env_path, $old_env_dcl_path, $old_env_term);
 BEGIN {
-   $old_env_path = %ENV{?'PATH'};
-   $old_env_dcl_path = %ENV{?'DCL$PATH'};
-   $old_env_term = %ENV{?'TERM'};
+   $old_env_path = env::var('PATH');
+   $old_env_dcl_path = env::var('DCL$PATH');
+   $old_env_term = env::var('TERM');
   if ($^O eq 'VMS' && !defined(config_value('d_setenv'))) {
-      %ENV{+PATH} = %ENV{?PATH};
-      %ENV{+TERM} = %ENV{?TERM} ne ''?? %ENV{?TERM} !! 'dummy';
+      env::set_var('PATH') = env::var('PATH');
+      env::set_var('TERM') = env::var('TERM') ne ''?? env::var('TERM') !! 'dummy';
   }
   if (config_value('extensions') =~ m/\bIPC\/SysV\b/
       && (config_value('d_shm') || config_value('d_msg'))) {
@@ -54,7 +54,7 @@ my @MoreEnv = qw/IFS CDPATH ENV BASH_ENV/;
 if ($Is_VMS) {
     my (%old);
     for my $x (@('DCL$PATH', < @MoreEnv)) {
-	(%old{+$x}) = %ENV{?$x} =~ m/^(.*)$/ if exists %ENV{$x};
+	(%old{+$x}) = env::var($x) =~ m/^(.*)$/ if exists %ENV{$x};
     }
     # VMS note:  PATH and TERM are automatically created by the C
     # library in VMS on reference to the their keys in %ENV.
@@ -146,11 +146,11 @@ my $TEST = catfile(curdir(), 'TEST');
 # environment variables. Maybe they aren't set yet, so we'll
 # taint them ourselves.
 do {
-    %ENV{+'DCL$PATH'} = '' if $Is_VMS;
+    env::set_var('DCL$PATH') = '' if $Is_VMS;
 
     if ($Is_MSWin32 && config_value('ccname') =~ m/bcc32/ && ! -f 'cc3250mt.dll') {
 	my $bcc_dir;
-	foreach my $dir (split m/$(config_value('path_sep'))/, %ENV{?PATH}) {
+	foreach my $dir (split m/$(config_value('path_sep'))/, env::var('PATH')) {
 	    if (-f "$dir/cc3250mt.dll") {
 		$bcc_dir = $dir and last;
 	    }
@@ -164,9 +164,9 @@ do {
 	    }; die if $@;
 	}
     }
-    %ENV{+PATH} = ($Is_Cygwin) ?? '/usr/bin' !! '';
+    env::set_var('PATH') = ($Is_Cygwin) ?? '/usr/bin' !! '';
     delete %ENV{[@MoreEnv]};
-    %ENV{+TERM} = 'dumb';
+    env::set_var('TERM') = 'dumb';
 
     test try { `$echo 1` } eq "1\n";
 
@@ -176,7 +176,7 @@ do {
 
 	my @vars = @('PATH', < @MoreEnv);
 	while (my $v = @vars[?0]) {
-	    local %ENV{+$v} = $TAINT;
+	     env::temp_set_var($v) = $TAINT;
 	    last if try { `$echo 1` };
 	    last unless $@->{?description} =~ m/^Insecure \$ENV{$v}/;
 	    shift @vars;
@@ -184,10 +184,10 @@ do {
 	test !nelems @vars, "$(join ' ',@vars)";
 
 	# tainted $TERM is unsafe only if it contains metachars
-	local %ENV{TERM};
-	%ENV{+TERM} = 'e=mc2';
+	 env::temp_set_var('TERM');
+	env::set_var('TERM') = 'e=mc2';
 	test try { `$echo 1` } eq "1\n";
-	%ENV{+TERM} = 'e=mc2' . $TAINT;
+	env::set_var('TERM') = 'e=mc2' . $TAINT;
 	test !try { `$echo 1` };
 	like( $@->{?description}, qr/^Insecure \$ENV{TERM}/ );
     };
@@ -206,7 +206,7 @@ do {
     SKIP: do {
         skip "all directories are writeable", 2 unless $tmp;
 
-	local %ENV{+PATH} = $tmp;
+	 env::temp_set_var('PATH') = $tmp;
 	test !try { `$echo 1` };
 	test $@->{?description} =~ m/^Insecure directory in \$ENV{PATH}/, $@;
     };
@@ -214,18 +214,18 @@ do {
     SKIP: do {
         skip "This is not VMS", 4 unless $Is_VMS;
 
-	%ENV{+'DCL$PATH'} = $TAINT;
+	env::set_var('DCL$PATH') = $TAINT;
 	test  try { `$echo 1` } eq '';
 	test $@->{?description} =~ m/^Insecure \$ENV{DCL\$PATH}/, $@;
 	SKIP: do {
             skip q[can't find world-writeable directory to test DCL$PATH], 2
               unless $tmp;
 
-	    %ENV{+'DCL$PATH'} = $tmp;
+	    env::set_var('DCL$PATH') = $tmp;
 	    test try { `$echo 1` } eq '';
 	    test $@->{?description} =~ m/^Insecure directory in \$ENV{DCL\$PATH}/, $@;
 	};
-	%ENV{+'DCL$PATH'} = '';
+	env::set_var('DCL$PATH') = '';
     };
 };
 
@@ -898,7 +898,7 @@ SKIP: do {
     skip "system \{\} has different semantics on Win32", 1 if $Is_MSWin32;
 
     # bug 20010221.005
-    local %ENV{+PATH} .= $TAINT;
+     env::temp_set_var('PATH')) .= $TAINT;
     dies_like(sub { system { "echo" } "/arg0", "arg1" },
               qr/^Insecure \$ENV/);
 };
@@ -1118,7 +1118,7 @@ do {
     SKIP: do {
 	skip "fork() is not available", 3 unless config_value('d_fork');
 
-	%ENV{+'PATH'} = $TAINT;
+	env::set_var('PATH') = $TAINT;
 	signals::temp_set_handler('PIPE', 'IGNORE');
 	try {
 	    my $pid = open my $pipe, "|-", '-';

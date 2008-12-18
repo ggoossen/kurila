@@ -37,7 +37,7 @@
 
 BEGIN { require './test.pl' }
 
-my $max_chain = %ENV{?PERL_TEST_NUMCONVERTS} || 2;
+my $max_chain = env::var('PERL_TEST_NUMCONVERTS') || 2;
 
 # Bulk out if unsigned type is hopelessly wrong:
 my $max_uv1 = ^~^0;

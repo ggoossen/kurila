@@ -31,7 +31,7 @@ $TESTERR = *STDERR{IO};
 
 # Use of this variable is strongly discouraged.  It is set mainly to
 # help test coverage analyzers know which test is running.
-%ENV{+REGRESSION_TEST} = $0;
+env::set_var('REGRESSION_TEST') = $0;
 
 
 =head1 NAME
@@ -462,7 +462,7 @@ sub _complain {
 
 sub _diff_complain {
     my@($result, $expected, $detail, $prefix) =  @_;
-    return _diff_complain_external(< @_) if %ENV{?PERL_TEST_DIFF};
+    return _diff_complain_external(< @_) if env::var('PERL_TEST_DIFF');
     return _diff_complain_algdiff(< @_)
      if try { require Algorithm::Diff; Algorithm::Diff->VERSION(1.15); 1; };
 
@@ -479,7 +479,7 @@ EOT
 
 sub _diff_complain_external {
     my@($result, $expected, $detail, $prefix) =  @_;
-    my $diff = %ENV{?PERL_TEST_DIFF} || die "WHAAAA?";
+    my $diff = env::var('PERL_TEST_DIFF') || die "WHAAAA?";
 
     require File::Temp;
     my@($got_fh, $got_filename) =  File::Temp::tempfile("test-got-XXXXX");

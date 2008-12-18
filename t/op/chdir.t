@@ -117,7 +117,7 @@ sub check_env {
     }
     else {
         ok( chdir(),              "chdir() w/ only \$ENV\{$key\} set" );
-        is( abs_path, %ENV{?$key}, '  abs_path() agrees' );
+        is( abs_path, env::var($key), '  abs_path() agrees' );
         chdir($Cwd);
         is( abs_path, $Cwd,       '  and back again' );
 
@@ -127,7 +127,7 @@ sub check_env {
 
         # Check the deprecated chdir(undef) feature.
         ok( chdir(undef),           "chdir(undef) w/ only \$ENV\{$key\} set" );
-        is( abs_path, %ENV{?$key},   '  abs_path() agrees' );
+        is( abs_path, env::var($key),   '  abs_path() agrees' );
         is( $warning,  <<WARNING,   '  got uninit & deprecation warning' );
 Use of uninitialized value in chdir
 Use of chdir('') or chdir(undef) as chdir() is deprecated
@@ -138,7 +138,7 @@ WARNING
         # Ditto chdir('').
         $warning = '';
         ok( chdir(''),              "chdir('') w/ only \$ENV\{$key\} set" );
-        is( abs_path, %ENV{?$key},   '  abs_path() agrees' );
+        is( abs_path, env::var($key),   '  abs_path() agrees' );
         is( $warning,  <<WARNING,   '  got deprecation warning' );
 Use of chdir('') or chdir(undef) as chdir() is deprecated
 WARNING
@@ -150,7 +150,7 @@ WARNING
 my %Saved_Env = %( () );
 sub clean_env {
     foreach my $env ( @magic_envs) {
-        %Saved_Env{+$env} = %ENV{?$env};
+        %Saved_Env{+$env} = env::var($env);
 
         # Can't actually delete SYS$ stuff on VMS.
         next if $IsVMS && $env eq 'SYS$LOGIN';
@@ -165,7 +165,7 @@ sub clean_env {
     # The following means we won't really be testing for non-existence,
     # but in Perl we can only delete from the process table, not the job 
     # table.
-    %ENV{+'SYS$LOGIN'} = '' if $IsVMS;
+    env::set_var('SYS$LOGIN') = '' if $IsVMS;
 }
 
 END {
@@ -185,7 +185,7 @@ foreach my $key ( @magic_envs) {
     no warnings 'uninitialized';
 
     clean_env;
-    %ENV{+$key} = catdir $Cwd, ($IsVMS ?? 'OP' !! 'op');
+    env::set_var($key) = catdir $Cwd, ($IsVMS ?? 'OP' !! 'op');
 
     check_env($key);
 }

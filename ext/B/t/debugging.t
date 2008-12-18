@@ -2,7 +2,7 @@
 # Test -DEBUGGING things (in dump.c)
 
 BEGIN {
-    if (%ENV{?PERL_CORE}){
+    if (env::var('PERL_CORE')){
         push @INC, '../ext/B/t';
     } else {
         unshift @INC, 't';

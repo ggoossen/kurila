@@ -153,22 +153,22 @@ is(@a[0].@a[1], "Xb");
 
 # and for %ENV
 
-%ENV{+_X_} = 'a';
-%ENV{+_Y_} = 'b';
-%ENV{+_Z_} = 'c';
+env::set_var('_X_') = 'a';
+env::set_var('_Y_') = 'b';
+env::set_var('_Z_') = 'c';
 do {
-    local(%ENV{?_A_});
-    local(%ENV{+_B_}) = 'foo';
-    local(%ENV{+_X_}) = 'foo';
-    local(%ENV{+_Y_}) = %ENV{?_Y_};
-    is(%ENV{?_X_}, 'foo');
-    is(%ENV{?_Y_}, 'b');
-    local(%ENV{_Z_});
+    local(env::var('_A_'));
+    local(env::set_var('_B_')) = 'foo';
+    local(env::set_var('_X_')) = 'foo';
+    local(env::set_var('_Y_')) = env::var('_Y_');
+    is(env::var('_X_'), 'foo');
+    is(env::var('_Y_'), 'b');
+    local(env::var('_Z_'));
     delete %ENV{_Z_};
 };
-is(%ENV{?_X_}, 'a');
-is(%ENV{?_Y_}, 'b');
-is(%ENV{?_Z_}, 'c');
+is(env::var('_X_'), 'a');
+is(env::var('_Y_'), 'b');
+is(env::var('_Z_'), 'c');
 # local() should preserve the existenceness of %ENV elements
 ok(! exists %ENV{_A_});
 ok(! exists %ENV{_B_});
@@ -176,9 +176,9 @@ ok(! exists %ENV{_B_});
 SKIP: do {
     skip("Can't make list assignment to \%ENV on this system")
 	unless $list_assignment_supported;
-    my $d = join("\n", map { "$_=>%ENV{?$_}" } sort keys %ENV);
+    my $d = join("\n", map { "$_=>$(env::var($_))" } sort keys %ENV);
     local %ENV = %( < %ENV );
-    is(join("\n", map { "$_=>%ENV{?$_}" } sort keys %ENV), $d);
+    is(join("\n", map { "$_=>$(env::var($_))" } sort keys %ENV), $d);
 };
 
 # does implicit localization in foreach skip magic?

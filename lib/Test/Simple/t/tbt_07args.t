@@ -31,14 +31,14 @@ sub start_testing
     $original_output_handle  = $t->output();
     $original_failure_handle = $t->failure_output();
     $original_todo_handle    = $t->todo_output();
-    $original_harness_env    = %ENV{?HARNESS_ACTIVE};
+    $original_harness_env    = env::var('HARNESS_ACTIVE');
 
     # switch out to our own handles
     $t->output($out->handle);
     $t->failure_output($err->handle);
     $t->todo_output($err->handle);
 
-    %ENV{+HARNESS_ACTIVE} = 0;
+    env::set_var('HARNESS_ACTIVE') = 0;
 
     # clear the expected list
     $out->reset();
@@ -62,7 +62,7 @@ sub my_test_test
   $t->output($original_output_handle);
   $t->failure_output($original_failure_handle);
   $t->todo_output($original_todo_handle);
-  %ENV{+HARNESS_ACTIVE} = $original_harness_env;
+  env::set_var('HARNESS_ACTIVE') = $original_harness_env;
 
   # reset the number of tests
   $t->current_test($testing_num);

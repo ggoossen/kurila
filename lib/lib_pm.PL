@@ -16,7 +16,7 @@ my $Config_inc_version_list;
 # Expand the variables only if explicitly requested because
 # otherwise relocating Perl becomes much harder.
 
-if (%ENV{?PERL_BUILD_EXPAND_CONFIG_VARS}) {
+if (env::var('PERL_BUILD_EXPAND_CONFIG_VARS')) {
     $useConfig = '';
     $Config_archname = qq('$(config_value("archname"))');
     $Config_version  = qq('$(config_value("version"))');

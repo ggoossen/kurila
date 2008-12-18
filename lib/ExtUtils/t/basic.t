@@ -25,7 +25,7 @@ my $perl = which_perl();
 my $Is_VMS = $^O eq 'VMS';
 
 # GNV logical interferes with testing
-%ENV{+'bin'} = '[.bin]' if $Is_VMS;
+env::set_var('bin') = '[.bin]' if $Is_VMS;
 
 chdir 't';
 
@@ -69,7 +69,7 @@ my $make = make_run();
 
 do {
     # Supress 'make manifest' noise
-    local %ENV{+PERL_MM_MANIFEST_VERBOSE} = 0;
+     env::temp_set_var('PERL_MM_MANIFEST_VERBOSE') = 0;
     my $manifest_out = run("$make manifest");
     ok( -e 'MANIFEST',      'make manifest created a MANIFEST' );
     ok( -s 'MANIFEST',      '  its not empty' ) or diag $manifest_out;

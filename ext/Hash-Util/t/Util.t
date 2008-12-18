@@ -168,7 +168,7 @@ do {
 
 
 lock_keys(%ENV);
-try { @() = %ENV{?I_DONT_EXIST} };
+try { @() = env::var('I_DONT_EXIST') };
 like( $@->{?description}, qr/^Attempt to access disallowed key 'I_DONT_EXIST' in a restricted hash/,   'locked %ENV');
 
 do {

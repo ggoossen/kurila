@@ -410,8 +410,8 @@ sub _create_runperl { # Create the string to qx in runperl().
     my %args = %( < @_ );
     my $runperl = $^X =~ m/\s/ ?? qq{"$^X"} !! $^X;
     #- this allows, for example, to set PERL_RUNPERL_DEBUG=/usr/bin/valgrind
-    if (%ENV{?PERL_RUNPERL_DEBUG}) {
-	$runperl = "%ENV{?PERL_RUNPERL_DEBUG} $runperl";
+    if (env::var('PERL_RUNPERL_DEBUG')) {
+	$runperl = "$(env::var('PERL_RUNPERL_DEBUG')) $runperl";
     }
     unless (%args{?nolib}) {
 	if ($is_macos) {
@@ -522,13 +522,13 @@ sub runperl {
 	my @keys = grep {exists %ENV{$_}} qw(CDPATH IFS ENV BASH_ENV);
 	local %ENV{[ @keys]} =@( @());
 	# Untaint, plus take out . and empty string:
-	local %ENV{+'DCL$PATH'} = $1 if $is_vms && (%ENV{?'DCL$PATH'} =~ m/(.*)/s);
-	%ENV{?PATH} =~ m/(.*)/s;
-	local %ENV{+PATH} =
+	 env::temp_set_var('DCL$PATH') = $1 if $is_vms && (env::var('DCL$PATH') =~ m/(.*)/s);
+	env::var('PATH') =~ m/(.*)/s;
+	 env::temp_set_var('PATH') =
 	    join $sep, grep { $_ ne "" and $_ ne "." and -d $_ and
 		($is_mswin or $is_vms or !(stat && @(stat '_')[?2]^&^0022)) }
 		    split quotemeta ($sep), $1;
-	%ENV{+PATH} .= "$sep/bin" if $is_cygwin;  # Must have /bin under Cygwin
+	$(env::var('PATH')) .= "$sep/bin" if $is_cygwin;  # Must have /bin under Cygwin
 
 	$runperl =~ m/(.*)/s;
 	$runperl = $1;
@@ -593,7 +593,7 @@ sub which_perl {
 	warn "which_perl: cannot find $Perl from $^X" unless -f $Perl;
 
 	# For subcommands to use.
-	%ENV{+PERLEXE} = $Perl;
+	env::set_var('PERLEXE') = $Perl;
     }
     return $Perl;
 }
@@ -795,7 +795,7 @@ sub eval_dies_like($$;$) {
     my @($e, $qr, ?$name) =  @_;
   TODO:
     do {
-        todo_skip("Compile time abortion are known to leak memory", 1) if %ENV{?PERL_VALGRIND};
+        todo_skip("Compile time abortion are known to leak memory", 1) if env::var('PERL_VALGRIND');
         
         eval "$e";
         my $err = $@;

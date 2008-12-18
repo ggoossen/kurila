@@ -10,7 +10,7 @@ use Config;
 use ExtUtils::MakeMaker;
 
 
-my $VERBOSE = %ENV{?VERBOSE};
+my $VERBOSE = env::var('VERBOSE');
 my $DEFINE;
 my $LIBS = \@();
 my $XSOPT = '';
@@ -24,8 +24,8 @@ my $ld_exeext = ($^O eq 'cygwin' ||
                  $^O eq 'os2' && config_value("ldflags") =~ m/-Zexe\b/) ?? '.exe' !!
                 (($^O eq 'vos') ?? config_value("exe_ext") !! '');
 
-unless(%ENV{?PERL_CORE}) {
-    %ENV{+PERL_CORE} = 1 if grep { $_ eq 'PERL_CORE=1' } @ARGV;
+unless(env::var('PERL_CORE')) {
+    env::set_var('PERL_CORE') = 1 if grep { $_ eq 'PERL_CORE=1' } @ARGV;
 }
 
 use File::Spec;
@@ -58,17 +58,17 @@ sub try_compile_and_link {
 
 	my $COREincdir;
 
-	if (%ENV{?PERL_CORE}) {
+	if (env::var('PERL_CORE')) {
 	    my $updir = File::Spec->updir;
 	    $COREincdir = File::Spec->catdir(< $: @($updir) x 2);
 	} else {
 	    $COREincdir = File::Spec->catdir(config_value('archlibexp'), 'CORE');
 	}
 
-	if (%ENV{?PERL_CORE}) {
+	if (env::var('PERL_CORE')) {
 	    unless (-f File::Spec->catfile($COREincdir, "EXTERN.h")) {
 		die <<__EOD__;
-Your environment variable PERL_CORE is '%ENV{?PERL_CORE}' but there
+Your environment variable PERL_CORE is '$(env::var('PERL_CORE'))' but there
 is no EXTERN.h in $COREincdir.
 Cannot continue, aborting.
 __EOD__
@@ -78,7 +78,7 @@ __EOD__
 	my $ccflags = config_value('ccflags') . ' ' . "-I$COREincdir";
 
 	if ($^O eq 'VMS') {
-	    if (%ENV{?PERL_CORE}) {
+	    if (env::var('PERL_CORE')) {
 		# Fragile if the extensions change hierarchy within
 		# the Perl core but this should do for now.
                 $cccmd = "$(config_value('cc')) /include=([---]) $tmp.c";
@@ -466,7 +466,7 @@ EOD
 
     print "Looking for nanosleep()... ";
     my $has_nanosleep;
-    if (%ENV{?FORCE_NANOSLEEP_SCAN}) {
+    if (env::var('FORCE_NANOSLEEP_SCAN')) {
 	print "forced scan... ";
 	if (has_nanosleep()) {
 	    $has_nanosleep++;
@@ -792,13 +792,13 @@ sub main {
     doMakefile;
     doConstants;
     my $make = config_value('make') || "make";
-    unless (exists %ENV{PERL_CORE} && %ENV{?PERL_CORE}) {
+    unless (exists %ENV{PERL_CORE} && env::var('PERL_CORE')) {
 	print  <<EOM;
 Now you may issue '$make'.  Do not forget also '$make test'.
 EOM
-       if ((exists %ENV{LC_ALL}   && %ENV{?LC_ALL}   =~ m/utf-?8/i) ||
-           (exists %ENV{LC_CTYPE} && %ENV{?LC_CTYPE} =~ m/utf-?8/i) ||
-           (exists %ENV{LANG}     && %ENV{?LANG}     =~ m/utf-?8/i)) {
+       if ((exists %ENV{LC_ALL}   && env::var('LC_ALL')   =~ m/utf-?8/i) ||
+           (exists %ENV{LC_CTYPE} && env::var('LC_CTYPE') =~ m/utf-?8/i) ||
+           (exists %ENV{LANG}     && env::var('LANG')     =~ m/utf-?8/i)) {
             print <<EOM;
 
 NOTE: if you get an error like this (the Makefile line number may vary):

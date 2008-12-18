@@ -107,7 +107,7 @@ plan tests => 1 +nelems @tests;
 use Text::Wrap;
 $Text::Wrap::separator2 = '=';
 
-my $rerun = %ENV{?'PERL_DL_NONLAZY'} ?? 0 !! 1;
+my $rerun = env::var('PERL_DL_NONLAZY') ?? 0 !! 1;
 
 my @st = @tests;
 while ((nelems @st)) {

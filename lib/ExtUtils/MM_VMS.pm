@@ -106,7 +106,7 @@ sub guess_name {
     my($defname,$defpm,@pm,%xs);
     local *PM;
 
-    $defname = basename( <fileify(%ENV{?'DEFAULT'}));
+    $defname = basename( <fileify(env::var('DEFAULT')));
     $defname =~ s![\d\-_]*\.dir.*$!!;  # Clip off .dir;1 suffix, and package version
     $defpm = $defname;
     # Fallback in case for some reason a user has copied the files for an
@@ -266,8 +266,8 @@ sub maybe_command {
 
     if ($file !~ m![/:>\]]!) {
         my $i = 0;
-        while (defined %ENV{?"DCL\$PATH;$i"}) {
-            my $dir = %ENV{?"DCL\$PATH;$i"};
+        while (defined env::var("DCL\$PATH;$i")) {
+            my $dir = env::var("DCL\$PATH;$i");
             $dir .= ':' unless $dir =~ m%[\]:]$%;
             push(@dirs,$dir);
             $i++;
@@ -1417,7 +1417,7 @@ $(MAP_TARGET) :: $(MAKE_APERL_FILE)
 		}
 	}
 
-	%olbs{+%ENV{?DEFAULT}} = $_;
+	%olbs{+env::var('DEFAULT')} = $_;
     }, < grep( -d $_, @{$searchdirs || \@()}));
 
     # We trust that what has been handed in as argument will be buildable
@@ -1809,7 +1809,7 @@ sub init_linker {
     }
     else {
         $self->{+PERL_ARCHIVE} ||=
-          %ENV{?$shr} ?? %ENV{?$shr} !! "Sys\$Share:$shr.%Config{?'dlext'}";
+          env::var($shr) ?? env::var($shr) !! "Sys\$Share:$shr.%Config{?'dlext'}";
     }
 
     $self->{+PERL_ARCHIVE_AFTER} ||= '';

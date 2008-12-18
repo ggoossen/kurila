@@ -412,7 +412,7 @@ sub free {
 
 sub getenv {
     usage "getenv(name)" if (nelems @_) != 1;
-    %ENV{?@_[0]};
+    env::var(@_[0]);
 }
 
 sub labs {

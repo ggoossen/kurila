@@ -8,7 +8,7 @@ my %err = %( () );
 my %wsa = %( () );
 
 # Symbian cross-compiling environment.
-my $IsSymbian = exists %ENV{SDK} && -d "%ENV{?SDK}\\epoc32";
+my $IsSymbian = exists %ENV{SDK} && -d "$(env::var('SDK'))\\epoc32";
 
 my $IsMSWin32 = $^O eq 'MSWin32' && !$IsSymbian;
 
@@ -152,7 +152,7 @@ sub get_files {
     } elsif ($^O eq 'MacOS') {
 	# note that we are only getting the GUSI errno's here ...
 	# we might miss out on compiler-specific ones
-	%file{+"%ENV{?GUSI}include:sys:errno.h"} = 1;
+	%file{+"$(env::var('GUSI'))include:sys:errno.h"} = 1;
 
     } elsif ($^O eq 'beos') {
 	# hidden in a special place
@@ -162,7 +162,7 @@ sub get_files {
 	# avoid problem where cpp returns non-POSIX pathnames
 	%file{+'/system/include_library/errno.h'} = 1;
     } elsif ($IsSymbian) {
-        my $SDK = %ENV{?SDK};
+        my $SDK = env::var('SDK');
         $SDK =~ s!\\!/!g;
 	%file{+"$SDK/epoc32/include/libc/sys/errno.h"} = 1;
     } else {
@@ -260,7 +260,7 @@ sub write_errno_pm {
 	    open(CPPO,"-|", "$(config_value('cpprun')) $(config_value('cppflags')) errno.c") or
 		die "Cannot run '$(config_value('cpprun')) $(config_value('cppflags')) errno.c'";
 	} elsif ($IsSymbian) {
-            my $cpp = "gcc -E -I%ENV{?SDK}\\epoc32\\include\\libc -";
+            my $cpp = "gcc -E -I$(env::var('SDK'))\\epoc32\\include\\libc -";
 	    open(CPPO,"-|", "$cpp < errno.c")
 		or die "Cannot exec $cpp";
         } else {

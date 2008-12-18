@@ -28,7 +28,7 @@ if ('PerlIO::Layer'->find( 'perlio')) {
     SKIP:
     do {
 	skip("miniperl can't rely on loading PerlIO::scalar")
-	if %ENV{?PERL_CORE_MINITEST};
+	if env::var('PERL_CORE_MINITEST');
 	skip("no PerlIO::scalar") unless config_value("extensions") =~ m!\bPerlIO/scalar\b!;
 	require PerlIO::scalar;
 	my $fcontents = join "", map {"$_\015\012"} "a".."zzz";

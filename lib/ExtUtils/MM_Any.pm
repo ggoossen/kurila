@@ -971,7 +971,7 @@ sub special_targets {
 
 MAKE_FRAG
 
-    $make_frag .= <<'MAKE_FRAG' if %ENV{?CLEARCASE_ROOT};
+    $make_frag .= <<'MAKE_FRAG' if env::var('CLEARCASE_ROOT');
 .NO_CONFIG_REC: Makefile
 
 MAKE_FRAG
@@ -1529,7 +1529,7 @@ Initialize MAKE from either a MAKE environment variable or $Config{make}.
 sub init_MAKE {
     my $self = shift;
 
-    $self->{+MAKE} ||= %ENV{?MAKE} || %Config{?make};
+    $self->{+MAKE} ||= env::var('MAKE') || %Config{?make};
 }
 
 

@@ -28,7 +28,7 @@ require ExtUtils::MM_Unix;
 our @ISA = qw( ExtUtils::MM_Unix );
 our $VERSION = '6.44';
 
-%ENV{+EMXSHELL} = 'sh'; # to run `commands`
+env::set_var('EMXSHELL') = 'sh'; # to run `commands`
 
 my $BORLAND = %Config{?'cc'} =~ m/^bcc/i ?? 1 !! 0;
 my $GCC     = %Config{?'cc'} =~ m/^gcc/i ?? 1 !! 0;
@@ -98,7 +98,7 @@ used by default.
 sub maybe_command {
     my@($self,$file) =  @_;
     my @e = @( exists(%ENV{'PATHEXT'})
-          ?? < split(m/;/, %ENV{?PATHEXT})
+          ?? < split(m/;/, env::var('PATHEXT'))
 	  !! < qw(.com .exe .bat .cmd) );
     my $e = '';
     for ( @e) { $e .= "\Q$_\E|" }
