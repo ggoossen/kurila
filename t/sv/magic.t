@@ -193,15 +193,15 @@ else {
 	} else {
 	    my $PATH = env::var('PATH');
 	    my $PDL = env::var('PERL_DESTRUCT_LEVEL') || 0;
-	    env::set_var('foo') = "bar";
+	    env::set_var('foo' => "bar");
 	    %ENV = %( () );
-	    env::set_var('PATH') = $PATH;
-	    env::set_var('PERL_DESTRUCT_LEVEL') = $PDL || 0;
+	    env::set_var('PATH' => $PATH);
+	    env::set_var('PERL_DESTRUCT_LEVEL' => $PDL || 0);
 	    ok ($Is_MSWin32 ?? (`set foo 2>NUL` eq "")
 			    !! (`echo \$foo` eq "\n") );
 	}
 
-	env::set_var('__NoNeSuCh') = "foo";
+	env::set_var('__NoNeSuCh' => "foo");
 	$0 = "bar";
 # cmd.exe will echo 'variable=value' but 4nt will echo just the value
 # -- Nikola Knezevic
@@ -257,8 +257,8 @@ SKIP: do {
     # when perl is compiled with -DENV_IS_CASELESS)
     skip('no caseless %ENV support', 4) unless $Is_MSWin32 || $Is_NetWare;
     %ENV = %( () );
-    env::set_var('Foo') = 'bar';
-    env::set_var('fOo') = 'baz';
+    env::set_var('Foo' => 'bar');
+    env::set_var('fOo' => 'baz');
     ok (scalar(keys(%ENV)) == 1);
     ok exists(%ENV{'FOo'});
     ok (delete(%ENV{'foO'}) eq 'baz');

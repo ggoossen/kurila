@@ -11,8 +11,8 @@ use vmsish qw(hushed);
 
 $| = 1;				# flush stdout
 
-env::set_var('LC_ALL')   = 'C';		# Forge English error messages.
-env::set_var('LANGUAGE') = 'C';		# Ditto in GNU.
+env::set_var('LC_ALL'   => 'C');		# Forge English error messages.
+env::set_var('LANGUAGE' => 'C');		# Ditto in GNU.
 
 my $Is_VMS   = $^O eq 'VMS';
 my $Is_Win32 = $^O eq 'MSWin32';

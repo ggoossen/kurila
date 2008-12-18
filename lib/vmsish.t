@@ -113,7 +113,7 @@ do {
   # Make sure apparent local time isn't GMT
   if (not env::var('SYS$TIMEZONE_DIFFERENTIAL')) {
     my $oldtz = env::var('SYS$TIMEZONE_DIFFERENTIAL');
-    env::set_var('SYS$TIMEZONE_DIFFERENTIAL') = 3600;
+    env::set_var('SYS$TIMEZONE_DIFFERENTIAL' => 3600);
     eval "END \{ \$ENV\{'SYS\$TIMEZONE_DIFFERENTIAL'\} = $oldtz; \}";
     gmtime(0); # Force reset of tz offset
   }

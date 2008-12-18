@@ -20,7 +20,7 @@ BEGIN {
                      hv_store
 
                     );
-    plan tests => 204 + nelems @Exported_Funcs;
+    plan tests => 203 + nelems @Exported_Funcs;
     use_ok 'Hash::Util', < @Exported_Funcs;
 }
 foreach my $func ( @Exported_Funcs) {
@@ -166,10 +166,6 @@ do {
     ok( !Internals::SvREADONLY(%hash{?bar}),'Was unlocked $hash{bar}' );
 };
 
-
-lock_keys(%ENV);
-try { @() = env::var('I_DONT_EXIST') };
-like( $@->{?description}, qr/^Attempt to access disallowed key 'I_DONT_EXIST' in a restricted hash/,   'locked %ENV');
 
 do {
     my %hash;

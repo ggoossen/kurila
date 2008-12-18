@@ -7,7 +7,7 @@ BEGIN {use_ok('File::Glob', ':glob')};
 use Cwd ();
 
 # look for the contents of the current directory
-env::set_var('PATH') = "/bin";
+env::set_var('PATH' => "/bin");
 delete %ENV{[qw(BASH_ENV CDPATH ENV IFS)]};
 my @correct = @( () );
 if (opendir(D, $^O eq "MacOS" ?? ":" !! ".")) {
@@ -99,7 +99,7 @@ print "# $(join ' ',@a)\n";
 is_deeply(\@a, \@(($^O eq 'VMS'?? 'test.' !! 'TEST'), 'a', 'b'));
 
 # "~" should expand to $ENV{HOME}
-env::set_var('HOME') = "sweet home";
+env::set_var('HOME' => "sweet home");
 @a = bsd_glob('~', GLOB_TILDE ^|^ GLOB_NOMAGIC);
 SKIP: do {
     skip $^O, 1 if $^O eq "MacOS";

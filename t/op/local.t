@@ -153,9 +153,9 @@ is(@a[0].@a[1], "Xb");
 
 # and for %ENV
 
-env::set_var('_X_') = 'a';
-env::set_var('_Y_') = 'b';
-env::set_var('_Z_') = 'c';
+env::set_var('_X_' => 'a');
+env::set_var('_Y_' => 'b');
+env::set_var('_Z_' => 'c');
 do {
     local(env::var('_A_'));
     local(env::set_var('_B_')) = 'foo';

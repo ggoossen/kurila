@@ -9,7 +9,7 @@ BEGIN {
 	print "1..0 # Skip: no fork\n";
 	exit 0;
     }
-    env::set_var('PERL5LIB') = "../lib";
+    env::set_var('PERL5LIB' => "../lib");
 }
 
 if ($^O eq 'mpeix') {

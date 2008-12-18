@@ -8,6 +8,8 @@ BEGIN {
     }
 }
 
+use env;
+
 # Can't use Test.pm, that's a 5.005 thing.
 package My::Test;
 
@@ -26,7 +28,7 @@ require Test::Simple;
 
 require Test::Simple::Catch;
 my@($out, $err) =  Test::Simple::Catch::caught();
- env::temp_set_var('HARNESS_ACTIVE') = 0;
+env::temp_set_var('HARNESS_ACTIVE' => 0);
 
 Test::Simple->import(tests => 5);
 

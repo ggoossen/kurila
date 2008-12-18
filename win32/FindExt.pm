@@ -16,7 +16,8 @@ sub getcwd {
     $_ = `cd`;
     chomp;
     s:\\:/:g ;
-    return env::set_var('PWD') = $_;
+    env::set_var('PWD' => $_);
+    return $_;
 }
 
 sub set_static_extensions {

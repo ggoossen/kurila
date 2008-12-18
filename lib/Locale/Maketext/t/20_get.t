@@ -34,9 +34,9 @@ ok $lh && $lh->maketext('d2', 7), "hum 14"      ;
 
 print "# Make sure we can assign to ENV entries\n",
       "# (Otherwise we can't run the subsequent tests)...\n";
-env::set_var('MYORP')   = 'Zing';
+env::set_var('MYORP'   => 'Zing');
 ok env::var('MYORP'), 'Zing';
-env::set_var('SWUZ')   = 'KLORTHO HOOBOY';
+env::set_var('SWUZ'   => 'KLORTHO HOOBOY');
 ok env::var('SWUZ'), 'KLORTHO HOOBOY';
 
 delete %ENV{'MYORP'};
@@ -44,25 +44,25 @@ delete %ENV{'SWUZ'};
 
 
 print "# Test LANG...\n";
-env::set_var('LC_ALL') = '';
-env::set_var('LC_MESSAGES') = '';
-env::set_var('REQUEST_METHOD') = '';
-env::set_var('LANG')     = 'Eu_MT';
-env::set_var('LANGUAGE') = '';
+env::set_var('LC_ALL' => '');
+env::set_var('LC_MESSAGES' => '');
+env::set_var('REQUEST_METHOD' => '');
+env::set_var('LANG'     => 'Eu_MT');
+env::set_var('LANGUAGE' => '');
 ok defined( $lh = Woozle->get_handle() ) && ref($lh);
 
 print "# Test LANGUAGE...\n";
-env::set_var('LANG')     = '';
-env::set_var('LANGUAGE') = 'Eu-MT';
+env::set_var('LANG'     => '');
+env::set_var('LANGUAGE' => 'Eu-MT');
 ok defined( $lh = Woozle->get_handle() ) && ref($lh);
 
 print "# Test HTTP_ACCEPT_LANGUAGE...\n";
-env::set_var('REQUEST_METHOD')       = 'GET';
-env::set_var('HTTP_ACCEPT_LANGUAGE') = 'eu-MT';
+env::set_var('REQUEST_METHOD'       => 'GET');
+env::set_var('HTTP_ACCEPT_LANGUAGE' => 'eu-MT');
 ok defined( $lh = Woozle->get_handle() ) && ref($lh);
-env::set_var('HTTP_ACCEPT_LANGUAGE') = 'x-plorp, zaz, eu-MT, i-klung';
+env::set_var('HTTP_ACCEPT_LANGUAGE' => 'x-plorp, zaz, eu-MT, i-klung');
 ok defined( $lh = Woozle->get_handle() ) && ref($lh);
-env::set_var('HTTP_ACCEPT_LANGUAGE') = 'x-plorp, zaz, eU-Mt, i-klung';
+env::set_var('HTTP_ACCEPT_LANGUAGE' => 'x-plorp, zaz, eU-Mt, i-klung');
 ok defined( $lh = Woozle->get_handle() ) && ref($lh);
 
 

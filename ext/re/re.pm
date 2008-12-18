@@ -41,11 +41,10 @@ sub setcolor {
   my $colors = join "\t", map {$terminal->Tputs($_,1)} @props;
 
   $colors =~ s/\0//g;
-  env::set_var('PERL_RE_COLORS') = $colors;
+  env::set_var('PERL_RE_COLORS' => $colors);
  };
  if ($@) {
      die $@;
-    env::var('PERL_RE_COLORS') ||= qq'\t\t> <\t> <\t\t';
  }
 
 }

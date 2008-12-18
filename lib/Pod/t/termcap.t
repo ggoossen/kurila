@@ -16,9 +16,9 @@ BEGIN {
 }
 
 # Hard-code a few values to try to get reproducible results.
-env::set_var('COLUMNS') = 80;
-env::set_var('TERM') = 'xterm';
-env::set_var('TERMCAP') = 'xterm:co=80:do=^J:md=\E[1m:us=\E[4m:me=\E[m';
+env::set_var('COLUMNS' => 80);
+env::set_var('TERM' => 'xterm');
+env::set_var('TERMCAP' => 'xterm:co=80:do=^J:md=\E[1m:us=\E[4m:me=\E[m');
 
 use Pod::Text::Termcap;
 

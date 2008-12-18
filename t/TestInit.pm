@@ -23,7 +23,7 @@ BEGIN {
 }
 
 # Don't interfere with the taintedness of %ENV, this could perturbate tests
-env::set_var('PERL_CORE') = 1 unless $^TAINT;
+env::set_var('PERL_CORE' => 1) unless $^TAINT;
 
 $0 =~ s/\.dp$//; # for the test.deparse make target
 1;

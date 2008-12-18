@@ -22,8 +22,8 @@ do {  package  Whunk::L10N::zh_tw;
    our %Lexicon = %("hello" => "NIHAU JOE!");
 };
 
-env::set_var('REQUEST_METHOD') = 'GET';
-env::set_var('HTTP_ACCEPT_LANGUAGE') = 'en-US, zh-TW';
+env::set_var('REQUEST_METHOD' => 'GET');
+env::set_var('HTTP_ACCEPT_LANGUAGE' => 'en-US, zh-TW');
 
 my $x = Whunk::L10N->get_handle;
 print "# LH object: $(dump::view($x))\n";

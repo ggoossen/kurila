@@ -11,7 +11,7 @@ use Config;
 BEGIN {
     if ($^O ne 'VMS') {
 	for (keys %ENV) { # untaint ENV
-	    @(env::set_var($_)) = @: env::var($_) =~ m/(.*)/;
+	    env::set_var($_ => @( env::var($_) =~ m/(.*)/ )[0]);
 	}
     }
 
@@ -29,7 +29,7 @@ BEGIN {
 				 or
 				 @(stat $dir)[2] ^&^ 002);
     }
-    env::set_var('PATH') = join($sep, @path);
+    env::set_var('PATH' => join($sep, @path));
 }
 
 use Test::More tests => 45;

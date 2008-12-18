@@ -45,8 +45,8 @@ sub new {
     # $ENV{HOME} is usually not set on Windows.  The default Term::Cap path
     # may not work on Solaris.
     my $home = exists %ENV{HOME} ?? "$(env::var('HOME'))/.termcap:" !! '';
-    env::set_var('TERMPATH') = $home . '/etc/termcap:/usr/share/misc/termcap'
-                           . ':/usr/share/lib/termcap';
+    env::set_var('TERMPATH' => $home . '/etc/termcap:/usr/share/misc/termcap'
+                           . ':/usr/share/lib/termcap');
 
     # Fall back on a hard-coded terminal speed if POSIX::Termios isn't
     # available (such as on VMS).

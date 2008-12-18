@@ -16,6 +16,8 @@
 # In this file, we use the latter "Baby Perl" approach, and increment
 # will be worked over by t/op/inc.t
 
+use env;
+
 our ($Level, $TODO, $NO_ENDING);
 
 $Level = 1;
@@ -522,13 +524,13 @@ sub runperl {
 	my @keys = grep {exists %ENV{$_}} qw(CDPATH IFS ENV BASH_ENV);
 	local %ENV{[ @keys]} =@( @());
 	# Untaint, plus take out . and empty string:
-	 env::temp_set_var('DCL$PATH') = $1 if $is_vms && (env::var('DCL$PATH') =~ m/(.*)/s);
+        env::temp_set_var('DCL$PATH' => $1) if $is_vms && (env::var('DCL$PATH') =~ m/(.*)/s);
 	env::var('PATH') =~ m/(.*)/s;
-	 env::temp_set_var('PATH') =
+        env::temp_set_var('PATH' =>
 	    join $sep, grep { $_ ne "" and $_ ne "." and -d $_ and
 		($is_mswin or $is_vms or !(stat && @(stat '_')[?2]^&^0022)) }
-		    split quotemeta ($sep), $1;
-	$(env::var('PATH')) .= "$sep/bin" if $is_cygwin;  # Must have /bin under Cygwin
+		    split quotemeta ($sep), $1);
+	env::set_var('PATH' => env::var('PATH') . "$sep/bin") if $is_cygwin;  # Must have /bin under Cygwin
 
 	$runperl =~ m/(.*)/s;
 	$runperl = $1;
@@ -593,7 +595,7 @@ sub which_perl {
 	warn "which_perl: cannot find $Perl from $^X" unless -f $Perl;
 
 	# For subcommands to use.
-	env::set_var('PERLEXE') = $Perl;
+	env::set_var('PERLEXE' => $Perl);
     }
     return $Perl;
 }

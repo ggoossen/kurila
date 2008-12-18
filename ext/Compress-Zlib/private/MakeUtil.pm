@@ -19,10 +19,10 @@ require VMS::Filespec if $^O eq 'VMS';
 
 
 unless(env::var('PERL_CORE')) {
-    env::set_var('PERL_CORE') = 1 if grep { $_ eq 'PERL_CORE=1' } @ARGV;
+    env::set_var('PERL_CORE' => 1) if grep { $_ eq 'PERL_CORE=1' } @ARGV;
 }
 
-env::set_var('SKIP_FOR_CORE') = 1 if env::var('PERL_CORE') || env::var('MY_PERL_CORE') ;
+env::set_var('SKIP_FOR_CORE' => 1) if env::var('PERL_CORE') || env::var('MY_PERL_CORE') ;
 
 
 

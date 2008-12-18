@@ -24,8 +24,8 @@ BEGIN {
    $old_env_dcl_path = env::var('DCL$PATH');
    $old_env_term = env::var('TERM');
   if ($^O eq 'VMS' && !defined(config_value('d_setenv'))) {
-      env::set_var('PATH') = env::var('PATH');
-      env::set_var('TERM') = env::var('TERM') ne ''?? env::var('TERM') !! 'dummy';
+      env::set_var('PATH' => env::var('PATH'));
+      env::set_var('TERM' => env::var('TERM') ne ''?? env::var('TERM') !! 'dummy');
   }
   if (config_value('extensions') =~ m/\bIPC\/SysV\b/
       && (config_value('d_shm') || config_value('d_msg'))) {
@@ -146,7 +146,7 @@ my $TEST = catfile(curdir(), 'TEST');
 # environment variables. Maybe they aren't set yet, so we'll
 # taint them ourselves.
 do {
-    env::set_var('DCL$PATH') = '' if $Is_VMS;
+    env::set_var('DCL$PATH' => '') if $Is_VMS;
 
     if ($Is_MSWin32 && config_value('ccname') =~ m/bcc32/ && ! -f 'cc3250mt.dll') {
 	my $bcc_dir;
@@ -164,9 +164,9 @@ do {
 	    }; die if $@;
 	}
     }
-    env::set_var('PATH') = ($Is_Cygwin) ?? '/usr/bin' !! '';
+    env::set_var('PATH' => ($Is_Cygwin) ?? '/usr/bin' !! '');
     delete %ENV{[@MoreEnv]};
-    env::set_var('TERM') = 'dumb';
+    env::set_var('TERM' => 'dumb');
 
     test try { `$echo 1` } eq "1\n";
 
@@ -176,7 +176,7 @@ do {
 
 	my @vars = @('PATH', < @MoreEnv);
 	while (my $v = @vars[?0]) {
-	     env::temp_set_var($v) = $TAINT;
+            env::temp_set_var($v => $TAINT);
 	    last if try { `$echo 1` };
 	    last unless $@->{?description} =~ m/^Insecure \$ENV{$v}/;
 	    shift @vars;
@@ -184,10 +184,10 @@ do {
 	test !nelems @vars, "$(join ' ',@vars)";
 
 	# tainted $TERM is unsafe only if it contains metachars
-	 env::temp_set_var('TERM');
-	env::set_var('TERM') = 'e=mc2';
+        env::temp_set_var('TERM', undef);
+	env::set_var('TERM' => 'e=mc2');
 	test try { `$echo 1` } eq "1\n";
-	env::set_var('TERM') = 'e=mc2' . $TAINT;
+	env::set_var('TERM' => 'e=mc2' . $TAINT);
 	test !try { `$echo 1` };
 	like( $@->{?description}, qr/^Insecure \$ENV{TERM}/ );
     };
@@ -206,7 +206,7 @@ do {
     SKIP: do {
         skip "all directories are writeable", 2 unless $tmp;
 
-	 env::temp_set_var('PATH') = $tmp;
+        env::temp_set_var('PATH' => $tmp);
 	test !try { `$echo 1` };
 	test $@->{?description} =~ m/^Insecure directory in \$ENV{PATH}/, $@;
     };
@@ -214,18 +214,18 @@ do {
     SKIP: do {
         skip "This is not VMS", 4 unless $Is_VMS;
 
-	env::set_var('DCL$PATH') = $TAINT;
+	env::set_var('DCL$PATH' => $TAINT);
 	test  try { `$echo 1` } eq '';
 	test $@->{?description} =~ m/^Insecure \$ENV{DCL\$PATH}/, $@;
 	SKIP: do {
             skip q[can't find world-writeable directory to test DCL$PATH], 2
               unless $tmp;
 
-	    env::set_var('DCL$PATH') = $tmp;
+	    env::set_var('DCL$PATH' => $tmp);
 	    test try { `$echo 1` } eq '';
 	    test $@->{?description} =~ m/^Insecure directory in \$ENV{DCL\$PATH}/, $@;
 	};
-	env::set_var('DCL$PATH') = '';
+	env::set_var('DCL$PATH' => '');
     };
 };
 
@@ -898,7 +898,7 @@ SKIP: do {
     skip "system \{\} has different semantics on Win32", 1 if $Is_MSWin32;
 
     # bug 20010221.005
-     env::temp_set_var('PATH')) .= $TAINT;
+    env::temp_set_var('PATH' => env::var('PATH') . $TAINT);
     dies_like(sub { system { "echo" } "/arg0", "arg1" },
               qr/^Insecure \$ENV/);
 };
@@ -1118,7 +1118,7 @@ do {
     SKIP: do {
 	skip "fork() is not available", 3 unless config_value('d_fork');
 
-	env::set_var('PATH') = $TAINT;
+	env::set_var('PATH' => $TAINT);
 	signals::temp_set_handler('PIPE', 'IGNORE');
 	try {
 	    my $pid = open my $pipe, "|-", '-';

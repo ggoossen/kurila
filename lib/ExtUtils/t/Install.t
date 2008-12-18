@@ -18,11 +18,12 @@ use File::Spec;
 use Test::More tests => 51;
 
 use MakeMaker::Test::Setup::BFD;
+use env;
 
 BEGIN { use_ok('ExtUtils::Install') }
 # ensure the env doesnt pollute our tests
- env::temp_set_var('EU_INSTALL_ALWAYS_COPY');
- env::temp_set_var('EU_ALWAYS_COPY');    
+env::temp_set_var('EU_INSTALL_ALWAYS_COPY', undef);
+env::temp_set_var('EU_ALWAYS_COPY', undef);
 
 # Check exports.
 foreach my $func (qw(install uninstall pm_to_blib install_default)) {
@@ -114,7 +115,7 @@ do {
   ok( -r 'install-test/lib/perl/Big/Dummy.pm', 'different install exists' );
 
   local @INC = @('install-test/lib/perl');
-   env::temp_set_var('PERL5LIB') = '';
+  env::temp_set_var('PERL5LIB' => '');
   install( \%( 'blib/lib' => 'install-test/other_lib/perl',
            read   => 'install-test/packlist',
            write  => 'install-test/packlist'
@@ -132,7 +133,7 @@ do {
   my $tfile='install-test/lib/perl/Big/Dummy.pm';
   local $ExtUtils::Install::Testing = $tfile; 
   local @INC = @('install-test/other_lib/perl','install-test/lib/perl');
-   env::temp_set_var('PERL5LIB') = '';
+  env::temp_set_var('PERL5LIB' => '');
   ok( -r $tfile, 'different install exists' );
   my @warn;
   local $^WARN_HOOK=sub { push @warn, @_[0]->message; return };
@@ -154,7 +155,7 @@ do {
   my $tfile='install-test/lib/perl/Big/Dummy.pm';
   local $ExtUtils::Install::Testing = $tfile;
   local @INC = @('install-test/lib/perl','install-test/other_lib/perl');
-   env::temp_set_var('PERL5LIB') = '';
+  env::temp_set_var('PERL5LIB' => '');
   ok( -r $tfile, 'different install exists' );
   my @warn;
   local $^WARN_HOOK=sub { push @warn, <@_[0]->message; return };
@@ -177,7 +178,7 @@ do {
 # Test UNINST=1 removing other versions in other dirs.
 do {
   local @INC = @('install-test/lib/perl');
-   env::temp_set_var('PERL5LIB') = '';
+  env::temp_set_var('PERL5LIB' => '');
   install( \%( 'blib/lib' => 'install-test/other_lib/perl',
            read   => 'install-test/packlist',
            write  => 'install-test/packlist'

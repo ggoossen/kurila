@@ -1,15 +1,16 @@
 #!./perl
 
 use Test::More tests => 13;
+use env;
 require_ok( 're' );
 
 # setcolor
 %INC{+'Term/Cap.pm' } = 1;
- env::temp_set_var('PERL_RE_TC');
+env::temp_set_var('PERL_RE_TC', undef);
 re::setcolor();
 is( env::var('PERL_RE_COLORS'), "md\tme\tso\tse\tus\tue", 
 	'setcolor() should provide default colors' );
-env::set_var('PERL_RE_TC') = 'su,n,ny';
+env::set_var('PERL_RE_TC' => 'su,n,ny');
 re::setcolor();
 is( env::var('PERL_RE_COLORS'), "su\tn\tny", '... or use %ENV{PERL_RE_COLORS}' );
 

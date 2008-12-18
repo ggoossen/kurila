@@ -64,7 +64,7 @@ sub runperl {
     }
   } else {                      # child
     for my $k (keys %$env) {
-      env::set_var($k) = $env->{$k};
+      env::set_var($k => $env->{$k});
     }
     open STDOUT, ">", $STDOUT or exit $FAILURE_CODE;
     open STDERR, ">", $STDERR or it_didnt_work();

@@ -1265,8 +1265,8 @@ sub Configure (@) {
 	    ConfigDefaults ();
 	}
 	elsif ( ($try eq 'posix_default' or $try eq 'posix_defaults') ) {
-	     env::temp_set_var('POSIXLY_CORRECT');
-	    env::set_var('POSIXLY_CORRECT') = 1 if $action;
+            env::temp_set_var('POSIXLY_CORRECT', undef);
+	    env::set_var('POSIXLY_CORRECT' => 1) if $action;
 	    ConfigDefaults ();
 	}
 	elsif ( $try eq 'auto_abbrev' or $try eq 'autoabbrev' ) {

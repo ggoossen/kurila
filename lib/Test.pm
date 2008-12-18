@@ -31,7 +31,7 @@ $TESTERR = *STDERR{IO};
 
 # Use of this variable is strongly discouraged.  It is set mainly to
 # help test coverage analyzers know which test is running.
-env::set_var('REGRESSION_TEST') = $0;
+env::set_var('REGRESSION_TEST' => $0);
 
 
 =head1 NAME

@@ -165,7 +165,7 @@ sub clean_env {
     # The following means we won't really be testing for non-existence,
     # but in Perl we can only delete from the process table, not the job 
     # table.
-    env::set_var('SYS$LOGIN') = '' if $IsVMS;
+    env::set_var('SYS$LOGIN' => '') if $IsVMS;
 }
 
 END {
@@ -185,7 +185,7 @@ foreach my $key ( @magic_envs) {
     no warnings 'uninitialized';
 
     clean_env;
-    env::set_var($key) = catdir $Cwd, ($IsVMS ?? 'OP' !! 'op');
+    env::set_var($key => catdir $Cwd, ($IsVMS ?? 'OP' !! 'op'));
 
     check_env($key);
 }

@@ -12,8 +12,9 @@ BEGIN {
 
 
 require Test::Simple::Catch;
+use env;
 my@($out, $err) =  Test::Simple::Catch::caught();
- env::temp_set_var('HARNESS_ACTIVE') = 0;
+env::temp_set_var('HARNESS_ACTIVE' => 0);
 
 
 # Can't use Test.pm, that's a 5.005 thing.

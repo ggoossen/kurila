@@ -12,37 +12,44 @@ if (env::var('PATH') =~ m!\\Symbian\\(.+?)\\(.+?)\\Epoc32\\gcc\\bin!i) {
     $SDK_NAME = $2;
     $WIN = ($SDK_NAME =~ m!_CW!i || $SDK_NAME eq '8.1a') ??
 	'winscw' !! 'wins';
-    env::set_var('WIN') = $WIN; 
+    env::set_var('WIN' => $WIN);
     if ($SDK_NAME =~ m!Series60_v20!) {
 	$SDK_VARIANT = 'S60';
-	$SDK_VERSION = env::set_var('S60SDK') = '2.0';
+	$SDK_VERSION = '2.0';
+        env::set_var('S60SDK' => '2.0');
     } elsif ($SDK_NAME =~ m!Series60_v21!) {
 	$SDK_VARIANT = 'S60';
-	$SDK_VERSION = env::set_var('S60SDK') = '2.1';
+	$SDK_VERSION = '2.1';
+        env::set_var('S60SDK' => '2.1');
     } elsif ($SDK_NAME =~ m!S60_2nd_FP2!) {
 	$SDK_VARIANT = 'S60';
-	$SDK_VERSION = env::set_var('S60SDK') = '2.6';
+	$SDK_VERSION = '2.6';
+        env::set_var('S60SDK' => '2.6');
     } elsif ($SDK_NAME =~ m!S60_2nd_FP3!) {
 	$SDK_VARIANT = 'S60';
-	$SDK_VERSION = env::set_var('S60SDK') = '2.8';
+	$SDK_VERSION = '2.8';
+        env::set_var('S60SDK' => '2.8');
     } elsif ($SDK_NAME =~ m!S80_DP2_0_SDK!) {
 	$SDK_VARIANT = 'S80';
-	$SDK_VERSION = env::set_var('S80SDK') = '2.0';
+	$SDK_VERSION = '2.0';
+        env::set_var('S80SDK' => '2.0');
     } elsif ($SDK_NAME =~ m!Nokia_7710_SDK!) {
 	$SDK_VARIANT = 'S90';
-	$SDK_VERSION = env::set_var('S90SDK') = '1.1';
+	$SDK_VERSION = '1.1';
+        env::set_var('S90SDK' => '1.1');
     }
 } elsif (env::var('PATH') =~ m!\\Symbian\\UIQ_(\d)(\d)\\Epoc32\\gcc\\bin!i) {
     $SDK_NAME    = 'UIQ';
     $SDK_VARIANT = 'UIQ';
-    $SDK_VERSION = env::set_var('UIQSDK') = "$1.$2";
+    $SDK_VERSION = "$1.$2";
+    env::set_var('UIQSDK' => "$1.$2");
     if ($SDK_VERSION =~ m/^2\./) {
 	$SYMBIAN_VERSION = '7.0s';
     } else {
 	die "$0: Unknown UIQ version '$SDK_VERSION'\n";
     }
     $WIN = 'winscw'; # This is CodeWarrior, how about Borland?
-    env::set_var('WIN') = $WIN; 
+    env::set_var('WIN' => $WIN);
 }
 
 if (open(GCC, "-|", "gcc -v 2>&1")) {
@@ -54,9 +61,11 @@ if (open(GCC, "-|", "gcc -v 2>&1")) {
        if (env::var('S60SDK')) {
 	   if ($SYMBIAN_ROOT eq 'C:\Symbian\6.1\Shared') { # Visual C. 
 	       $SYMBIAN_ROOT = 'C:\Symbian\6.1\Series60';
-	       $SDK_VERSION = env::set_var('S60SDK') = '1.2';
+	       $SDK_VERSION = '1.2';
+               env::set_var('S60SDK' => '1.2');
 	   } elsif ($SYMBIAN_ROOT eq 'C:\Symbian\Series60_1_2_CW') { # CodeWarrior.
-	       $SDK_VERSION = env::set_var('S60SDK') = '1.2';
+	       $SDK_VERSION = '1.2';
+               env::set_var('S60SDK' => '1.2');
 	   }
        }
        last;
@@ -74,8 +83,8 @@ my $UREL = "$SYMBIAN_ROOT\\epoc32\\release\\-ARM-\\$UARM";
 if ($SYMBIAN_ROOT eq 'C:\Symbian\6.1\Series60' && env::var('WIN') eq 'winscw') {
     $UREL = "C:\\Symbian\\Series60_1_2_CW\\epoc32\\release\\-ARM-\\urel";
 }
-env::set_var('UREL') = $UREL;
-env::set_var('UARM') = $UARM;
+env::set_var('UREL' => $UREL);
+env::set_var('UARM' => $UARM);
 
 \@( $SYMBIAN_ROOT, $SYMBIAN_VERSION, $SDK_NAME, $SDK_VARIANT, $SDK_VERSION );
 

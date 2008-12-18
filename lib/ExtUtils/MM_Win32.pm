@@ -28,7 +28,7 @@ require ExtUtils::MM_Unix;
 our @ISA = qw( ExtUtils::MM_Unix );
 our $VERSION = '6.44';
 
-env::set_var('EMXSHELL') = 'sh'; # to run `commands`
+env::set_var('EMXSHELL' => 'sh'); # to run `commands`
 
 my $BORLAND = %Config{?'cc'} =~ m/^bcc/i ?? 1 !! 0;
 my $GCC     = %Config{?'cc'} =~ m/^gcc/i ?? 1 !! 0;

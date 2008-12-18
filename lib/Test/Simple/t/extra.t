@@ -24,8 +24,9 @@ require Test::Simple;
 chdir 't';
 push @INC, '../t/lib/';
 require Test::Simple::Catch;
+use env;
 my@($out, $err) =  Test::Simple::Catch::caught();
- env::temp_set_var('HARNESS_ACTIVE') = 0;
+env::temp_set_var('HARNESS_ACTIVE' => 0);
 
 Test::Simple->import(tests => 3);
 

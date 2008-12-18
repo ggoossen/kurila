@@ -276,7 +276,7 @@ sub Tgetent
     {
 
         # last resort--fake up a termcap from terminfo
-         env::temp_set_var('TERM') = $term;
+        env::temp_set_var('TERM' => $term);
 
         if ( $^O eq 'VMS' )
         {
