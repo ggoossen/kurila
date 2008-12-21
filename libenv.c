@@ -30,13 +30,15 @@ XS(XS_env_var)
     {
         SV* sv;
         SV* key = POPs;
-	unsigned long len;
-	const char * const env = Perl_getenv_len(SvPV_nolen_const(key),&len);
-	if (env)
-	    sv = newSVpvn(env,len);
-        else
+
+        HE* he = hv_fetch_ent(PL_envhv, key, FALSE, 0);
+        if (he) { 
+	    sv = newSVsv(HeVAL(he));
+        }
+        else {
             sv = newSVsv(&PL_sv_undef);
-        SvTAINTED_on(sv);
+            SvTAINTED_on(sv);
+        }
         mXPUSHs(sv);
     }
     XSRETURN(1);
