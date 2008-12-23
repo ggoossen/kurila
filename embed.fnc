@@ -1064,8 +1064,6 @@ END_EXTERN_C
 #if defined(PERL_IN_GV_C) || defined(PERL_DECL_PROT)
 s	|void	|gv_init_sv	|NN GV *gv|const svtype sv_type
 s	|HV*	|gv_get_super_pkg|NN const char* name|I32 namelen
-s	|HV*	|require_tie_mod|NN GV *gv|NN const char *varpv|NN SV* namesv \
-				|NN const char *methpv|const U32 flags
 #endif
 
 : #if defined(PERL_IN_HV_C) || defined(PERL_IN_SV_C) || defined(PERL_DECL_PROT)

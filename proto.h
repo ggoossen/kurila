@@ -3820,14 +3820,6 @@ STATIC HV*	S_gv_get_super_pkg(pTHX_ const char* name, I32 namelen)
 #define PERL_ARGS_ASSERT_GV_GET_SUPER_PKG	\
 	assert(name)
 
-STATIC HV*	S_require_tie_mod(pTHX_ GV *gv, const char *varpv, SV* namesv, const char *methpv, const U32 flags)
-			__attribute__nonnull__(pTHX_1)
-			__attribute__nonnull__(pTHX_2)
-			__attribute__nonnull__(pTHX_3)
-			__attribute__nonnull__(pTHX_4);
-#define PERL_ARGS_ASSERT_REQUIRE_TIE_MOD	\
-	assert(gv); assert(varpv); assert(namesv); assert(methpv)
-
 #endif
 
 PERL_CALLCONV void*	Perl_get_arena(pTHX_ const size_t svtype, const U32 misc)

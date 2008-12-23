@@ -136,7 +136,6 @@ XS(XS_env_set_var)
 #endif
                         || (PerlLIO_stat(tmpbuf, &st) == 0 && (st.st_mode & 2)) ) {
                         MgTAINTEDDIR_on(mg);
-                        return 0;
                     }
                 }
             }
