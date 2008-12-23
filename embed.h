@@ -106,7 +106,6 @@
 #define boot_core_PerlIO	Perl_boot_core_PerlIO
 #endif
 #define call_list		Perl_call_list
-#define call_list_onleave	Perl_call_list_onleave
 #ifdef PERL_CORE
 #define cando			Perl_cando
 #endif
@@ -2298,7 +2297,6 @@
 #define boot_core_PerlIO()	Perl_boot_core_PerlIO(aTHX)
 #endif
 #define call_list(a,b)		Perl_call_list(aTHX_ a,b)
-#define call_list_onleave(a,b)	Perl_call_list_onleave(aTHX_ a,b)
 #ifdef PERL_CORE
 #define cando(a,b,c)		Perl_cando(aTHX_ a,b,c)
 #endif

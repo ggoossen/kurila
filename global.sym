@@ -65,7 +65,6 @@ Perl_av_tmprefcnt
 Perl_av_unshift
 Perl_block_gimme
 Perl_call_list
-Perl_call_list_onleave
 Perl_cast_ulong
 Perl_cast_i32
 Perl_cast_iv

@@ -139,7 +139,6 @@ p	|void	|boot_core_signals
 p	|void	|boot_core_env
 p	|void	|boot_core_PerlIO
 Ap	|void	|call_list	|I32 oldscope|NN AV *paramList
-Ap	|void	|call_list_onleave	|I32 oldscope|NN AV *paramList
 pR	|bool	|cando		|Mode_t mode|bool effective|NN const Stat_t* statbufp
 ApR	|U32	|cast_ulong	|NV f
 ApR	|I32	|cast_i32	|NV f
