@@ -3673,7 +3673,6 @@ Gid_t getegid (void);
 
 #define PERL_MAGIC_sv		  '\0' /* Special scalar variable */
 #define PERL_MAGIC_bm		  'B' /* Boyer-Moore (fast string search) */
-#define PERL_MAGIC_fm		  'f' /* Formline ('compiled' format) */
 #define PERL_MAGIC_regex_global	  'g' /* m//g target / study()ed string */
 #define PERL_MAGIC_hints	  'H' /* %^H hash */
 #define PERL_MAGIC_hintselem	  'h' /* %^H hash element */

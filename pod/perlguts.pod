@@ -1030,7 +1030,6 @@ The current kinds of Magic Virtual Tables are:
                                                  (@+ and @- vars)
     d  PERL_MAGIC_regdatum       vtbl_regdatum   Regex match position data
                                                  element
-    f  PERL_MAGIC_fm             vtbl_fm         Formline ('compiled' format)
     g  PERL_MAGIC_regex_global   vtbl_mglob      m//g target / study()ed string
     H  PERL_MAGIC_hints          vtbl_hints      %^H hash
     h  PERL_MAGIC_hintselem      vtbl_hintselem  %^H hash element
