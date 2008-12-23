@@ -1284,8 +1284,6 @@ PP(pp_helem)
     hash = (SvIsCOW_shared_hash(keysv)) ? SvSHARED_HASH(keysv) : 0;
 
     if (PL_op->op_private & OPpLVAL_INTRO) {
-	MAGIC *mg;
-	HV *stash;
 	/* does the element we're localizing already exist? */
 	preeminent = /* can we determine whether it exists? */
 	    (    !SvRMAGICAL(hv)

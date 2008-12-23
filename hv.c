@@ -424,8 +424,7 @@ Perl_hv_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
 	} /* ISEXISTS */
 	else if (action & HV_FETCH_ISSTORE) {
 	    bool needs_copy;
-	    bool needs_store;
-	    hv_magic_check (hv, &needs_copy, &needs_store);
+	    hv_magic_check (hv, &needs_copy);
 	    if (needs_copy) {
 		const bool save_taint = PL_tainted;
 		if (keysv) {
@@ -438,11 +437,6 @@ Perl_hv_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
 		}
 
 		TAINT_IF(save_taint);
-		if (!needs_store) {
-		    if (flags & HVhek_FREEKEY)
-			Safefree(key);
-		    return NULL;
-		}
 #ifdef ENV_IS_CASELESS
 		else if (mg_find((SV*)hv, PERL_MAGIC_env)) {
 		    /* XXX This code isn't UTF8 clean.  */
@@ -702,14 +696,13 @@ Perl_hv_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
 }
 
 STATIC void
-S_hv_magic_check(HV *hv, bool *needs_copy, bool *needs_store)
+S_hv_magic_check(HV *hv, bool *needs_copy)
 {
     const MAGIC *mg = SvMAGIC(hv);
 
     PERL_ARGS_ASSERT_HV_MAGIC_CHECK;
     
     *needs_copy = FALSE;
-    *needs_store = TRUE;
     while (mg) {
 	if (isUPPER(mg->mg_type)) {
 	    *needs_copy = TRUE;
@@ -774,8 +767,7 @@ S_hv_delete_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
 
     if (SvRMAGICAL(hv)) {
 	bool needs_copy;
-	bool needs_store;
-	hv_magic_check (hv, &needs_copy, &needs_store);
+	hv_magic_check (hv, &needs_copy);
 
 	if (needs_copy) {
 	    SV *sv;
@@ -788,11 +780,8 @@ S_hv_delete_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
 		if (SvMAGICAL(sv)) {
 		    mg_clear(sv);
 		}
-		if (!needs_store) {
-		    return NULL;		/* element cannot be deleted */
-		}
 #ifdef ENV_IS_CASELESS
-		else if (mg_find((SV*)hv, PERL_MAGIC_env)) {
+		if (mg_find((SV*)hv, PERL_MAGIC_env)) {
 		    /* XXX This code isn't UTF8 clean.  */
 		    keysv = newSVpvn_flags(key, klen, SVs_TEMP);
 		    if (k_flags & HVhek_FREEKEY) {
@@ -1998,7 +1987,6 @@ Perl_hv_iternext_flags(pTHX_ HV *hv, I32 flags)
     register XPVHV* xhv;
     register HE *entry;
     HE *oldentry;
-    MAGIC* mg;
     struct xpvhv_aux *iter;
 
     PERL_ARGS_ASSERT_HV_ITERNEXT_FLAGS;
