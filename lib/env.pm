@@ -24,7 +24,7 @@ sub make_restore {
         for my $key (env::keys()) {
             env::set_var($key, delete $old_copy{$key});
         }
-        for my $key (keys $old_copy) {
+        for my $key (CORE::keys $old_copy) {
             env::set_var($key, $old_copy{$key});
         }
         return;
