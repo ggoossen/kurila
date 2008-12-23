@@ -1044,7 +1044,6 @@ The current kinds of Magic Virtual Tables are:
     o  PERL_MAGIC_collxfrm       vtbl_collxfrm   Locale collate transformation
     P  PERL_MAGIC_tied           vtbl_pack       Tied array or hash
     p  PERL_MAGIC_tiedelem       vtbl_packelem   Tied array or hash element
-    q  PERL_MAGIC_tiedscalar     vtbl_packelem   Tied scalar or handle
     r  PERL_MAGIC_qr             vtbl_qr         precompiled qr// regex
     t  PERL_MAGIC_taint          vtbl_taint      Taintedness
     U  PERL_MAGIC_uvar           vtbl_uvar       Available for use by extensions

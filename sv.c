@@ -3866,12 +3866,6 @@ Perl_sv_magic(pTHX_ register SV *const sv, SV *const obj, const int how,
     case PERL_MAGIC_dbline:
 	vtable = &PL_vtbl_dbline;
 	break;
-    case PERL_MAGIC_tied:
-	vtable = &PL_vtbl_pack;
-	break;
-    case PERL_MAGIC_tiedelem:
-	vtable = &PL_vtbl_packelem;
-	break;
     case PERL_MAGIC_qr:
 	vtable = &PL_vtbl_regexp;
 	break;

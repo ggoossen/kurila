@@ -436,9 +436,7 @@ Perl_mg_copy(pTHX_ SV *sv, SV *nsv, const char *key, I32 klen)
 	    const char type = mg->mg_type;
 	    if (isUPPER(type) && type != PERL_MAGIC_uvar) {
 		sv_magic(nsv,
-		     (type == PERL_MAGIC_tied)
-			? SvTIED_obj(sv, mg)
-			: mg->mg_obj,
+		     mg->mg_obj,
 		     toLOWER(type), key, klen);
 		count++;
 	    }
@@ -1416,9 +1414,6 @@ S_magic_methcall(pTHX_ SV *sv, const MAGIC *mg, const char *meth, I32 flags, int
 		mPUSHp(mg->mg_ptr, mg->mg_len);
 	    else if (mg->mg_len == HEf_SVKEY)
 		PUSHs((SV*)mg->mg_ptr);
-	}
-	else if (mg->mg_type == PERL_MAGIC_tiedelem) {
-	    mPUSHi(mg->mg_len);
 	}
     }
     if (n > 2) {

@@ -3685,8 +3685,6 @@ Gid_t getegid (void);
 #define PERL_MAGIC_dbline	  'l' /* Debugger %_<filename element */
 #define PERL_MAGIC_shared	  'N' /* Shared between threads */
 #define PERL_MAGIC_shared_scalar  'n' /* Shared between threads */
-#define PERL_MAGIC_tied		  'P' /* Tied array or hash */
-#define PERL_MAGIC_tiedelem	  'p' /* Tied array or hash element */
 #define PERL_MAGIC_qr		  'r' /* precompiled qr// regex */
 #define PERL_MAGIC_taint	  't' /* Taintedness */
 #define PERL_MAGIC_uvar		  'U' /* Available for use by extensions */

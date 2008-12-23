@@ -1290,14 +1290,6 @@ PP(pp_helem)
 	preeminent = /* can we determine whether it exists? */
 	    (    !SvRMAGICAL(hv)
 		|| mg_find((SV*)hv, PERL_MAGIC_env)
-		|| (     (mg = mg_find((SV*)hv, PERL_MAGIC_tied))
-			/* Try to preserve the existenceness of a tied hash
-			* element by using EXISTS and DELETE if possible.
-			* Fallback to FETCH and STORE otherwise */
-		    && (stash = SvSTASH(SvRV(SvTIED_obj((SV*)hv, mg))))
-		    && gv_fetchmethod(stash, "EXISTS")
-		    && gv_fetchmethod(stash, "DELETE")
-		)
 	    ) ? hv_exists_ent(hv, keysv, 0) : 1;
     }
     he = hv_fetch_ent(hv, keysv, 0, hash);

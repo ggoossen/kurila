@@ -2167,8 +2167,6 @@ PP(pp_require)
 	    for (i = 0; i <= AvFILL(ar); i++) {
 		SV * const dirsv = *av_fetch(ar, i, TRUE);
 
-		if (SvTIED_mg((SV*)ar, PERL_MAGIC_tied))
-		    mg_get(dirsv);
 		if (SvROK(dirsv)) {
 		    int count;
 		    SV **svp;
@@ -2852,19 +2850,6 @@ S_do_smartmatch(pTHX_ HV *seen_this, HV *seen_other)
 	    bool other_tied = FALSE;
 	    U32 this_key_count  = 0,
 	        other_key_count = 0;
-	    
-	    /* Tied hashes don't know how many keys they have. */
-	    if (SvTIED_mg(This, PERL_MAGIC_tied)) {
-		tied = TRUE;
-	    }
-	    else if (SvTIED_mg((SV *) other_hv, PERL_MAGIC_tied)) {
-		HV * const temp = other_hv;
-		other_hv = (HV *) This;
-		This  = (SV *) temp;
-		tied = TRUE;
-	    }
-	    if (SvTIED_mg((SV *) other_hv, PERL_MAGIC_tied))
-		other_tied = TRUE;
 	    
 	    if (!tied && HvUSEDKEYS((HV *) This) != HvUSEDKEYS(other_hv))
 	    	RETPUSHNO;
