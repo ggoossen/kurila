@@ -12,7 +12,7 @@ use File::Spec::Functions;
 use signals;
 
 BEGIN { require './test.pl'; }
-plan tests => 229;
+plan tests => 228;
 
 $| = 1;
 
@@ -953,13 +953,6 @@ do {
     test tainted(my $foo = $1);
 };
 
-do {
-    # [perl #24291] this used to dump core
-    our %nonmagicalenv = %( PATH => "util" );
-    local *ENV = \%nonmagicalenv;
-    dies_like(sub { system("lskdfj") },
-              qr/^\%ENV is aliased to another variable while running with -T switch/);
-};
 do {
     # [perl #24248]
     $TAINT =~ m/(.*)/;
