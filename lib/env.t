@@ -1,7 +1,9 @@
+#! perl -T
+
 BEGIN {
     require "./test.pl";
 }
-plan tests => 9;
+plan tests => 11;
 use env;
 
 is( env::var("PERL_CORE"), 1, "PERL_CORE is set to '1'" );
@@ -29,4 +31,10 @@ do {
     # setting to something with a '\0'
     env::temp_set_var("PERL_TEST_ENV_VAR", "test\x[00]4");
     is env::var("PERL_TEST_ENV_VAR"), "test\x[00]4";
-}
+};
+
+my $v = env::var("PERL_CORE");
+ok Internals::SvTAINTED($v);
+env::set_var("PERL_CORE", 1);
+$v = env::var("PERL_CORE");
+ok ! Internals::SvTAINTED($v);

@@ -37,7 +37,6 @@ XS(XS_env_var)
         }
         else {
             sv = newSVsv(&PL_sv_undef);
-            SvTAINTED_on(sv);
         }
         mXPUSHs(sv);
     }
