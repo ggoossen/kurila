@@ -1524,14 +1524,14 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 #  endif
 #endif
 		    sv_catpvs(opts_prog, "; $\"=\"\\n    \"; "
-			      "our @env = map { \"$_=\\\"%ENV{$_}\\\"\" } "
-			      "sort grep {m/^PERL/} keys %ENV; ");
+			      "our @env = map { \"$_=\\\"$(env::var($_))\\\"\" } "
+			      "sort grep {m/^PERL/} env::keys; ");
 #ifdef __CYGWIN__
 		    sv_catpvs(opts_prog,
-			      "push @env, \"CYGWIN=\\\"%ENV{CYGWIN}\\\"\";");
+			      "push @env, \"CYGWIN=\\\"$(env::var('CYGWIN'))\\\"\";");
 #endif
 		    sv_catpvs(opts_prog, 
-			      "print \"  \\%ENV:\\n    $(join ' ', @env)\\n\" if @env;"
+			      "print \"  env:\\n    $(join ' ', @env)\\n\" if @env;"
 			      "print \"  \\@INC:\\n    $(join ' ', @INC)\\n\";");
 		}
 		else {
