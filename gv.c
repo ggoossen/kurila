@@ -568,52 +568,6 @@ Perl_gv_fetchmethod(pTHX_ HV *stash, const char *name)
     return gv;
 }
 
-/* require_tie_mod() internal routine for requiring a module
- * that implements the logic of automatical ties like %! and %-
- *
- * The "gv" parameter should be the glob.
- * "varpv" holds the name of the var, used for error messages.
- * "namesv" holds the module name. Its refcount will be decremented.
- * "methpv" holds the method name to test for to check that things
- *   are working reasonably close to as expected.
- * "flags": if flag & 1 then save the scalar before loading.
- * For the protection of $! to work (it is set by this routine)
- * the sv slot must already be magicalized.
- */
-STATIC HV*
-S_require_tie_mod(pTHX_ GV *gv, const char *varpv, SV* namesv, const char *methpv,const U32 flags)
-{
-    dVAR;
-    HV* stash = gv_stashsv(namesv, 0);
-
-    PERL_ARGS_ASSERT_REQUIRE_TIE_MOD;
-
-    if (!stash || !(gv_fetchmethod(stash, methpv))) {
-	SV *module = newSVsv(namesv);
-	char varname = *varpv; /* varpv might be clobbered by load_module,
-				  so save it. For the moment it's always
-				  a single char. */
-	dSP;
-	ENTER;
-	if ( flags & 1 )
-	    save_scalar(gv);
-	PUSHSTACKi(PERLSI_MAGIC);
-	Perl_load_module(aTHX_ PERL_LOADMOD_NOIMPORT, module, NULL);
-	POPSTACK;
-	LEAVE;
-	SPAGAIN;
-	stash = gv_stashsv(namesv, 0);
-	if (!stash)
-	    Perl_croak(aTHX_ "panic: Can't use %%%c because %"SVf" is not available",
-		    varname, SVfARG(namesv));
-	else if (!gv_fetchmethod(stash, methpv))
-	    Perl_croak(aTHX_ "panic: Can't use %%%c because %"SVf" does not support method %s",
-		    varname, SVfARG(namesv), methpv);
-    }
-    SvREFCNT_dec(namesv);
-    return stash;
-}
-
 /*
 =for apidoc gv_stashpv
 
