@@ -1154,7 +1154,6 @@ static const struct { const char type; const char *name; } magic_names[] = {
 	{ PERL_MAGIC_shared,         "shared(N)" },
 	{ PERL_MAGIC_hints,          "hints(H)" },
 	{ PERL_MAGIC_uvar,           "uvar(U)" },
-	{ PERL_MAGIC_fm,             "fm(f)" },
 	{ PERL_MAGIC_regex_global,   "regex_global(g)" },
 	{ PERL_MAGIC_hintselem,      "hintselem(h)" },
 	{ PERL_MAGIC_isaelem,        "isaelem(i)" },
@@ -1184,8 +1183,6 @@ Perl_do_magic_dump(pTHX_ I32 level, PerlIO *file, const MAGIC *mg, I32 nest, I32
  	    const char *s;
  	    if      (v == &PL_vtbl_sv)         s = "sv";
             else if (v == &PL_vtbl_hints)      s = "hints";
-            else if (v == &PL_vtbl_pack)       s = "pack";
-            else if (v == &PL_vtbl_packelem)   s = "packelem";
             else if (v == &PL_vtbl_dbline)     s = "dbline";
             else if (v == &PL_vtbl_isa)        s = "isa";
             else if (v == &PL_vtbl_mglob)      s = "mglob";

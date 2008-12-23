@@ -45,8 +45,6 @@ vtbl_isaelem
 vtbl_mglob
 vtbl_mutex
 vtbl_nkeys
-vtbl_pack
-vtbl_packelem
 vtbl_regdata
 vtbl_regdatum
 vtbl_regexp

@@ -4422,8 +4422,6 @@ typedef enum {
 enum {		/* pass one of these to get_vtbl */
     want_vtbl_sv,
     want_vtbl_hints,
-    want_vtbl_pack,
-    want_vtbl_packelem,
     want_vtbl_dbline,
     want_vtbl_isa,
     want_vtbl_isaelem,
@@ -4725,30 +4723,6 @@ MGVTBL_SET(
     0,
     0,
     0,
-    0,
-    0,
-    0,
-    0
-);
-
-MGVTBL_SET(
-    PL_vtbl_pack,
-    0,
-    0,
-    MEMBER_TO_FPTR(Perl_magic_sizepack),
-    MEMBER_TO_FPTR(Perl_magic_wipepack),
-    0,
-    0,
-    0,
-    0
-);
-
-MGVTBL_SET(
-    PL_vtbl_packelem,
-    MEMBER_TO_FPTR(Perl_magic_getpack),
-    MEMBER_TO_FPTR(Perl_magic_setpack),
-    0,
-    MEMBER_TO_FPTR(Perl_magic_clearpack),
     0,
     0,
     0,

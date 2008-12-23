@@ -420,15 +420,11 @@
 #ifdef PERL_CORE
 #define magic_clearhint		Perl_magic_clearhint
 #define magic_clearisa		Perl_magic_clearisa
-#define magic_clearpack		Perl_magic_clearpack
-#define magic_existspack	Perl_magic_existspack
 #define magic_get		Perl_magic_get
 #define magic_getdefelem	Perl_magic_getdefelem
-#define magic_getpack		Perl_magic_getpack
 #define magic_gettaint		Perl_magic_gettaint
 #define magic_getuvar		Perl_magic_getuvar
 #define magic_len		Perl_magic_len
-#define magic_nextpack		Perl_magic_nextpack
 #define magic_regdata_cnt	Perl_magic_regdata_cnt
 #define magic_regdatum_get	Perl_magic_regdatum_get
 #define magic_regdatum_set	Perl_magic_regdatum_set
@@ -445,13 +441,10 @@
 #endif
 #ifdef PERL_CORE
 #define magic_setmglob		Perl_magic_setmglob
-#define magic_setpack		Perl_magic_setpack
 #define magic_setregexp		Perl_magic_setregexp
 #define magic_settaint		Perl_magic_settaint
 #define magic_setuvar		Perl_magic_setuvar
 #define magic_setutf8		Perl_magic_setutf8
-#define magic_sizepack		Perl_magic_sizepack
-#define magic_wipepack		Perl_magic_wipepack
 #define magicname		Perl_magicname
 #endif
 #define markstack_grow		Perl_markstack_grow
@@ -1090,8 +1083,6 @@
 #if defined(PERL_IN_MG_C) || defined(PERL_DECL_PROT)
 #ifdef PERL_CORE
 #define save_magic		S_save_magic
-#define magic_methpack		S_magic_methpack
-#define magic_methcall		S_magic_methcall
 #define restore_magic		S_restore_magic
 #define unwind_handler_stack	S_unwind_handler_stack
 #endif
@@ -1574,9 +1565,6 @@
 #if defined(PERL_IN_DUMP_C) || defined(PERL_IN_HV_C) || defined(PERL_IN_SV_C) || defined(PERL_DECL_PROT)
 #endif
 #define hv_clear_placeholders	Perl_hv_clear_placeholders
-#ifdef PERL_CORE
-#define magic_scalarpack	Perl_magic_scalarpack
-#endif
 #if defined(PERL_IN_SV_C) || defined(PERL_DECL_PROT)
 #ifdef PERL_CORE
 #define find_hash_subscript	S_find_hash_subscript
@@ -2593,15 +2581,11 @@
 #ifdef PERL_CORE
 #define magic_clearhint(a,b)	Perl_magic_clearhint(aTHX_ a,b)
 #define magic_clearisa(a,b)	Perl_magic_clearisa(aTHX_ a,b)
-#define magic_clearpack(a,b)	Perl_magic_clearpack(aTHX_ a,b)
-#define magic_existspack(a,b)	Perl_magic_existspack(aTHX_ a,b)
 #define magic_get(a,b)		Perl_magic_get(aTHX_ a,b)
 #define magic_getdefelem(a,b)	Perl_magic_getdefelem(aTHX_ a,b)
-#define magic_getpack(a,b)	Perl_magic_getpack(aTHX_ a,b)
 #define magic_gettaint(a,b)	Perl_magic_gettaint(aTHX_ a,b)
 #define magic_getuvar(a,b)	Perl_magic_getuvar(aTHX_ a,b)
 #define magic_len(a,b)		Perl_magic_len(aTHX_ a,b)
-#define magic_nextpack(a,b,c)	Perl_magic_nextpack(aTHX_ a,b,c)
 #define magic_regdata_cnt(a,b)	Perl_magic_regdata_cnt(aTHX_ a,b)
 #define magic_regdatum_get(a,b)	Perl_magic_regdatum_get(aTHX_ a,b)
 #define magic_regdatum_set(a,b)	Perl_magic_regdatum_set(aTHX_ a,b)
@@ -2618,13 +2602,10 @@
 #endif
 #ifdef PERL_CORE
 #define magic_setmglob(a,b)	Perl_magic_setmglob(aTHX_ a,b)
-#define magic_setpack(a,b)	Perl_magic_setpack(aTHX_ a,b)
 #define magic_setregexp(a,b)	Perl_magic_setregexp(aTHX_ a,b)
 #define magic_settaint(a,b)	Perl_magic_settaint(aTHX_ a,b)
 #define magic_setuvar(a,b)	Perl_magic_setuvar(aTHX_ a,b)
 #define magic_setutf8(a,b)	Perl_magic_setutf8(aTHX_ a,b)
-#define magic_sizepack(a,b)	Perl_magic_sizepack(aTHX_ a,b)
-#define magic_wipepack(a,b)	Perl_magic_wipepack(aTHX_ a,b)
 #define magicname(a,b,c)	Perl_magicname(aTHX_ a,b,c)
 #endif
 #define markstack_grow()	Perl_markstack_grow(aTHX)
@@ -3253,8 +3234,6 @@
 #if defined(PERL_IN_MG_C) || defined(PERL_DECL_PROT)
 #ifdef PERL_CORE
 #define save_magic(a,b)		S_save_magic(aTHX_ a,b)
-#define magic_methpack(a,b,c)	S_magic_methpack(aTHX_ a,b,c)
-#define magic_methcall(a,b,c,d,e,f)	S_magic_methcall(aTHX_ a,b,c,d,e,f)
 #define restore_magic(a)	S_restore_magic(aTHX_ a)
 #define unwind_handler_stack(a)	S_unwind_handler_stack(aTHX_ a)
 #endif
@@ -3750,9 +3729,6 @@
 #endif
 #endif
 #define hv_clear_placeholders(a)	Perl_hv_clear_placeholders(aTHX_ a)
-#ifdef PERL_CORE
-#define magic_scalarpack(a,b)	Perl_magic_scalarpack(aTHX_ a,b)
-#endif
 #if defined(PERL_IN_SV_C) || defined(PERL_DECL_PROT)
 #ifdef PERL_CORE
 #define find_hash_subscript(a,b)	S_find_hash_subscript(aTHX_ a,b)
