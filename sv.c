@@ -3845,12 +3845,6 @@ Perl_sv_magic(pTHX_ register SV *const sv, SV *const obj, const int how,
     case PERL_MAGIC_bm:
 	vtable = &PL_vtbl_bm;
 	break;
-    case PERL_MAGIC_env:
-	vtable = &PL_vtbl_env;
-	break;
-    case PERL_MAGIC_envelem:
-	vtable = &PL_vtbl_envelem;
-	break;
     case PERL_MAGIC_regex_global:
 	vtable = &PL_vtbl_mglob;
 	break;

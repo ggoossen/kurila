@@ -383,8 +383,6 @@ Rethrows a previously caught exception.  See L<perlguts/"Exception Handling">.
 
 #if 1		/* for compatibility */
 #  define VTBL_sv		&PL_vtbl_sv
-#  define VTBL_env		&PL_vtbl_env
-#  define VTBL_envelem		&PL_vtbl_envelem
 #  define VTBL_hints		&PL_vtbl_hints
 #  define VTBL_pack		&PL_vtbl_pack
 #  define VTBL_packelem		&PL_vtbl_packelem

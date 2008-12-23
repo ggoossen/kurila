@@ -1459,18 +1459,6 @@ PERL_CALLCONV UV	Perl_grok_oct(pTHX_ const char* start, STRLEN* len_p, I32* flag
 #define PERL_ARGS_ASSERT_GROK_OCT	\
 	assert(start); assert(len_p); assert(flags)
 
-PERL_CALLCONV int	Perl_magic_clearenv(pTHX_ SV* sv, MAGIC* mg)
-			__attribute__nonnull__(pTHX_1)
-			__attribute__nonnull__(pTHX_2);
-#define PERL_ARGS_ASSERT_MAGIC_CLEARENV	\
-	assert(sv); assert(mg)
-
-PERL_CALLCONV int	Perl_magic_clear_all_env(pTHX_ SV* sv, MAGIC* mg)
-			__attribute__nonnull__(pTHX_1)
-			__attribute__nonnull__(pTHX_2);
-#define PERL_ARGS_ASSERT_MAGIC_CLEAR_ALL_ENV	\
-	assert(sv); assert(mg)
-
 PERL_CALLCONV int	Perl_magic_clearhint(pTHX_ SV* sv, MAGIC* mg)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2);
@@ -1575,12 +1563,6 @@ PERL_CALLCONV int	Perl_magic_setdefelem(pTHX_ SV* sv, MAGIC* mg)
 #define PERL_ARGS_ASSERT_MAGIC_SETDEFELEM	\
 	assert(sv); assert(mg)
 
-PERL_CALLCONV int	Perl_magic_setenv(pTHX_ SV* sv, MAGIC* mg)
-			__attribute__nonnull__(pTHX_1)
-			__attribute__nonnull__(pTHX_2);
-#define PERL_ARGS_ASSERT_MAGIC_SETENV	\
-	assert(sv); assert(mg)
-
 PERL_CALLCONV int	Perl_magic_sethint(pTHX_ SV* sv, MAGIC* mg)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2);
@@ -1635,12 +1617,6 @@ PERL_CALLCONV int	Perl_magic_setutf8(pTHX_ SV* sv, MAGIC* mg)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2);
 #define PERL_ARGS_ASSERT_MAGIC_SETUTF8	\
-	assert(sv); assert(mg)
-
-PERL_CALLCONV int	Perl_magic_set_all_env(pTHX_ SV* sv, MAGIC* mg)
-			__attribute__nonnull__(pTHX_1)
-			__attribute__nonnull__(pTHX_2);
-#define PERL_ARGS_ASSERT_MAGIC_SET_ALL_ENV	\
 	assert(sv); assert(mg)
 
 PERL_CALLCONV U32	Perl_magic_sizepack(pTHX_ SV* sv, MAGIC* mg)

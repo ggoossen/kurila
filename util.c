@@ -3364,12 +3364,6 @@ Perl_get_vtbl(pTHX_ int vtbl_id)
     case want_vtbl_sv:
 	result = &PL_vtbl_sv;
 	break;
-    case want_vtbl_env:
-	result = &PL_vtbl_env;
-	break;
-    case want_vtbl_envelem:
-	result = &PL_vtbl_envelem;
-	break;
     case want_vtbl_hints:
 	result = &PL_vtbl_hints;
 	break;

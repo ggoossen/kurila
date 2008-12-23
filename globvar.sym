@@ -39,8 +39,6 @@ vtbl_backref
 vtbl_bm
 vtbl_dbline
 vtbl_defelem
-vtbl_env
-vtbl_envelem
 vtbl_fm
 vtbl_isa
 vtbl_isaelem

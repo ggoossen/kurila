@@ -418,8 +418,6 @@
 #define grok_numeric_radix	Perl_grok_numeric_radix
 #define grok_oct		Perl_grok_oct
 #ifdef PERL_CORE
-#define magic_clearenv		Perl_magic_clearenv
-#define magic_clear_all_env	Perl_magic_clear_all_env
 #define magic_clearhint		Perl_magic_clearhint
 #define magic_clearisa		Perl_magic_clearisa
 #define magic_clearpack		Perl_magic_clearpack
@@ -437,7 +435,6 @@
 #define magic_set		Perl_magic_set
 #define magic_setdbline		Perl_magic_setdbline
 #define magic_setdefelem	Perl_magic_setdefelem
-#define magic_setenv		Perl_magic_setenv
 #define magic_sethint		Perl_magic_sethint
 #define magic_setisa		Perl_magic_setisa
 #endif
@@ -453,7 +450,6 @@
 #define magic_settaint		Perl_magic_settaint
 #define magic_setuvar		Perl_magic_setuvar
 #define magic_setutf8		Perl_magic_setutf8
-#define magic_set_all_env	Perl_magic_set_all_env
 #define magic_sizepack		Perl_magic_sizepack
 #define magic_wipepack		Perl_magic_wipepack
 #define magicname		Perl_magicname
@@ -2596,8 +2592,6 @@
 #define grok_numeric_radix(a,b)	Perl_grok_numeric_radix(aTHX_ a,b)
 #define grok_oct(a,b,c,d)	Perl_grok_oct(aTHX_ a,b,c,d)
 #ifdef PERL_CORE
-#define magic_clearenv(a,b)	Perl_magic_clearenv(aTHX_ a,b)
-#define magic_clear_all_env(a,b)	Perl_magic_clear_all_env(aTHX_ a,b)
 #define magic_clearhint(a,b)	Perl_magic_clearhint(aTHX_ a,b)
 #define magic_clearisa(a,b)	Perl_magic_clearisa(aTHX_ a,b)
 #define magic_clearpack(a,b)	Perl_magic_clearpack(aTHX_ a,b)
@@ -2615,7 +2609,6 @@
 #define magic_set(a,b)		Perl_magic_set(aTHX_ a,b)
 #define magic_setdbline(a,b)	Perl_magic_setdbline(aTHX_ a,b)
 #define magic_setdefelem(a,b)	Perl_magic_setdefelem(aTHX_ a,b)
-#define magic_setenv(a,b)	Perl_magic_setenv(aTHX_ a,b)
 #define magic_sethint(a,b)	Perl_magic_sethint(aTHX_ a,b)
 #define magic_setisa(a,b)	Perl_magic_setisa(aTHX_ a,b)
 #endif
@@ -2631,7 +2624,6 @@
 #define magic_settaint(a,b)	Perl_magic_settaint(aTHX_ a,b)
 #define magic_setuvar(a,b)	Perl_magic_setuvar(aTHX_ a,b)
 #define magic_setutf8(a,b)	Perl_magic_setutf8(aTHX_ a,b)
-#define magic_set_all_env(a,b)	Perl_magic_set_all_env(aTHX_ a,b)
 #define magic_sizepack(a,b)	Perl_magic_sizepack(aTHX_ a,b)
 #define magic_wipepack(a,b)	Perl_magic_wipepack(aTHX_ a,b)
 #define magicname(a,b,c)	Perl_magicname(aTHX_ a,b,c)

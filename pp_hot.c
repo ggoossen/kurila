@@ -1287,7 +1287,6 @@ PP(pp_helem)
 	/* does the element we're localizing already exist? */
 	preeminent = /* can we determine whether it exists? */
 	    (    !SvRMAGICAL(hv)
-		|| mg_find((SV*)hv, PERL_MAGIC_env)
 	    ) ? hv_exists_ent(hv, keysv, 0) : 1;
     }
     he = hv_fetch_ent(hv, keysv, 0, hash);

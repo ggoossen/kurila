@@ -3673,8 +3673,6 @@ Gid_t getegid (void);
 
 #define PERL_MAGIC_sv		  '\0' /* Special scalar variable */
 #define PERL_MAGIC_bm		  'B' /* Boyer-Moore (fast string search) */
-#define PERL_MAGIC_env		  'E' /* %ENV hash */
-#define PERL_MAGIC_envelem	  'e' /* %ENV hash element */
 #define PERL_MAGIC_fm		  'f' /* Formline ('compiled' format) */
 #define PERL_MAGIC_regex_global	  'g' /* m//g target / study()ed string */
 #define PERL_MAGIC_hints	  'H' /* %^H hash */
@@ -4424,8 +4422,6 @@ typedef enum {
 
 enum {		/* pass one of these to get_vtbl */
     want_vtbl_sv,
-    want_vtbl_env,
-    want_vtbl_envelem,
     want_vtbl_hints,
     want_vtbl_pack,
     want_vtbl_packelem,
@@ -4718,30 +4714,6 @@ MGVTBL_SET(
     MEMBER_TO_FPTR(Perl_magic_set),
     MEMBER_TO_FPTR(Perl_magic_len),
     0,
-    0,
-    0,
-    0,
-    0
-);
-
-MGVTBL_SET(
-    PL_vtbl_env,
-    0,
-    MEMBER_TO_FPTR(Perl_magic_set_all_env),
-    0,
-    MEMBER_TO_FPTR(Perl_magic_clear_all_env),
-    0,
-    0,
-    0,
-    0
-);
-
-MGVTBL_SET(
-    PL_vtbl_envelem,
-    0,
-    MEMBER_TO_FPTR(Perl_magic_setenv),
-    0,
-    MEMBER_TO_FPTR(Perl_magic_clearenv),
     0,
     0,
     0,

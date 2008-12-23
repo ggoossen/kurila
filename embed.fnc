@@ -430,8 +430,6 @@ Apd	|UV	|grok_hex	|NN const char* start|NN STRLEN* len_p|NN I32* flags|NULLOK NV
 Apd	|int	|grok_number	|NN const char *pv|STRLEN len|NULLOK UV *valuep
 ApdR	|bool	|grok_numeric_radix|NN const char **sp|NN const char *send
 Apd	|UV	|grok_oct	|NN const char* start|NN STRLEN* len_p|NN I32* flags|NULLOK NV *result
-p	|int	|magic_clearenv	|NN SV* sv|NN MAGIC* mg
-p	|int	|magic_clear_all_env|NN SV* sv|NN MAGIC* mg
 dp	|int	|magic_clearhint|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_clearisa	|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_clearpack|NN SV* sv|NN MAGIC* mg
@@ -449,7 +447,6 @@ pr	|int	|magic_regdatum_set|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_set	|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_setdbline|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_setdefelem|NN SV* sv|NN MAGIC* mg
-p	|int	|magic_setenv	|NN SV* sv|NN MAGIC* mg
 dp	|int	|magic_sethint	|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_setisa	|NN SV* sv|NN MAGIC* mg
 #ifndef NO_MATHOMS
@@ -461,7 +458,6 @@ p	|int	|magic_setregexp|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_settaint	|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_setuvar	|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_setutf8	|NN SV* sv|NN MAGIC* mg
-p	|int	|magic_set_all_env|NN SV* sv|NN MAGIC* mg
 p	|U32	|magic_sizepack	|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_wipepack	|NN SV* sv|NN MAGIC* mg
 p	|void	|magicname	|NN const char* sym|NULLOK const char* name|I32 namlen

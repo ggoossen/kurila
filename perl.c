@@ -4193,7 +4193,6 @@ S_init_postdump_symbols(pTHX_ register int argc, register char **argv, register 
     if ((PL_envhv = newHV())) {
 	HV *hv = PL_envhv;
 	bool env_is_not_environ;
-	hv_magic(hv, NULL, PERL_MAGIC_env);
 #ifndef PERL_MICRO
 #ifdef USE_ENVIRON_ARRAY
 	/* Note that if the supplied env parameter is actually a copy

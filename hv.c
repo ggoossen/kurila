@@ -350,40 +350,6 @@ Perl_hv_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
 		}
 		return (void *) entry;
 	    }
-#ifdef ENV_IS_CASELESS
-	    else if (mg_find((SV*)hv, PERL_MAGIC_env)) {
-		U32 i;
-		for (i = 0; i < klen; ++i)
-		    if (isLOWER(key[i])) {
-			/* Would be nice if we had a routine to do the
-			   copy and upercase in a single pass through.  */
-			const char * const nkey = strupr(savepvn(key,klen));
-			/* Note that this fetch is for nkey (the uppercased
-			   key) whereas the store is for key (the original)  */
-			void *result = hv_common(hv, NULL, nkey, klen,
-						 HVhek_FREEKEY, /* free nkey */
-						 0 /* non-LVAL fetch */
-						 | HV_DISABLE_UVAR_XKEY
-						 | return_svp,
-						 NULL /* no value */,
-						 0 /* compute hash */);
-			if (!result && (action & HV_FETCH_LVALUE)) {
-			    /* This call will free key if necessary.
-			       Do it this way to encourage compiler to tail
-			       call optimise.  */
-			    result = hv_common(hv, keysv, key, klen, flags,
-					       HV_FETCH_ISSTORE
-					       | HV_DISABLE_UVAR_XKEY
-					       | return_svp,
-					       newSV(0), hash);
-			} else {
-			    if (flags & HVhek_FREEKEY)
-				Safefree(key);
-			}
-			return result;
-		    }
-	    }
-#endif
 	} /* ISFETCH */
 	else if (SvRMAGICAL(hv) && (action & HV_FETCH_ISEXISTS)) {
 	    if (SvGMAGICAL((SV*)hv)) {
@@ -405,22 +371,6 @@ Perl_hv_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
 		   And I know hv is not NULL.  */
 		return SvTRUE(svret) ? (void *)hv : NULL;
 		}
-#ifdef ENV_IS_CASELESS
-	    else if (mg_find((SV*)hv, PERL_MAGIC_env)) {
-		/* XXX This code isn't UTF8 clean.  */
-		char * const keysave = (char * const)key;
-		/* Will need to free this, so set FREEKEY flag.  */
-		key = savepvn(key,klen);
-		key = (const char*)strupr((char*)key);
-		hash = 0;
-		keysv = 0;
-
-		if (flags & HVhek_FREEKEY) {
-		    Safefree(keysave);
-		}
-		flags |= HVhek_FREEKEY;
-	    }
-#endif
 	} /* ISEXISTS */
 	else if (action & HV_FETCH_ISSTORE) {
 	    bool needs_copy;
@@ -437,44 +387,18 @@ Perl_hv_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
 		}
 
 		TAINT_IF(save_taint);
-#ifdef ENV_IS_CASELESS
-		else if (mg_find((SV*)hv, PERL_MAGIC_env)) {
-		    /* XXX This code isn't UTF8 clean.  */
-		    const char *keysave = key;
-		    /* Will need to free this, so set FREEKEY flag.  */
-		    key = savepvn(key,klen);
-		    key = (const char*)strupr((char*)key);
-		    hash = 0;
-		    keysv = 0;
-
-		    if (flags & HVhek_FREEKEY) {
-			Safefree(keysave);
-		    }
-		    flags |= HVhek_FREEKEY;
-		}
-#endif
 	    }
 	} /* ISSTORE */
     } /* SvMAGICAL */
 
     if (!HvARRAY(hv)) {
-	if ((action & (HV_FETCH_LVALUE | HV_FETCH_ISSTORE))
-#ifdef DYNAMIC_ENV_FETCH  /* if it's an %ENV lookup, we may get it on the fly */
-		 || (SvRMAGICAL((SV*)hv) && mg_find((SV*)hv, PERL_MAGIC_env))
-#endif
-								  ) {
+	if ((action & (HV_FETCH_LVALUE | HV_FETCH_ISSTORE))) {
 	    char *array;
 	    Newxz(array,
 		 PERL_HV_ARRAY_ALLOC_BYTES(xhv->xhv_max+1 /* HvMAX(hv)+1 */),
 		 char);
 	    HvARRAY(hv) = (HE**)array;
 	}
-#ifdef DYNAMIC_ENV_FETCH
-	else if (action & HV_FETCH_ISEXISTS) {
-	    /* for an %ENV exists, if we do an insert it's by a recursive
-	       store call, so avoid creating HvARRAY(hv) right now.  */
-	}
-#endif
 	else {
 	    /* XXX remove at some point? */
             if (flags & HVhek_FREEKEY)
@@ -579,20 +503,6 @@ Perl_hv_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
 	}
 	return entry;
     }
-#ifdef DYNAMIC_ENV_FETCH  /* %ENV lookup?  If so, try to fetch the value now */
-    if (!(action & HV_FETCH_ISSTORE) 
-	&& SvRMAGICAL((SV*)hv) && mg_find((SV*)hv, PERL_MAGIC_env)) {
-	unsigned long len;
-	const char * const env = PerlEnv_ENVgetenv_len(key,&len);
-	if (env) {
-	    sv = newSVpvn(env,len);
-	    SvTAINTED_on(sv);
-	    return hv_common(hv, keysv, key, klen, flags,
-			     HV_FETCH_ISSTORE|HV_DISABLE_UVAR_XKEY|return_svp,
-			     sv, hash);
-	}
-    }
-#endif
 
     if (!entry && SvREADONLY(hv) && !(action & HV_FETCH_ISEXISTS)) {
 	hv_notallowed(flags, key, klen,
@@ -780,18 +690,6 @@ S_hv_delete_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
 		if (SvMAGICAL(sv)) {
 		    mg_clear(sv);
 		}
-#ifdef ENV_IS_CASELESS
-		if (mg_find((SV*)hv, PERL_MAGIC_env)) {
-		    /* XXX This code isn't UTF8 clean.  */
-		    keysv = newSVpvn_flags(key, klen, SVs_TEMP);
-		    if (k_flags & HVhek_FREEKEY) {
-			Safefree(key);
-		    }
-		    key = strupr(SvPVX(keysv));
-		    k_flags = 0;
-		    hash = 0;
-		}
-#endif
 	    }
 	}
     }
@@ -2005,19 +1903,6 @@ Perl_hv_iternext_flags(pTHX_ HV *hv, I32 flags)
     iter = HvAUX(hv);
 
     oldentry = entry = iter->xhv_eiter; /* HvEITER(hv) */
-#if defined(DYNAMIC_ENV_FETCH) && !defined(__riscos__)  /* set up %ENV for iteration */
-    if (!entry && SvRMAGICAL((SV*)hv) && mg_find((SV*)hv, PERL_MAGIC_env)) {
-	prime_env_iter();
-#ifdef VMS
-	/* The prime_env_iter() on VMS just loaded up new hash values
-	 * so the iteration count needs to be reset back to the beginning
-	 */
-	hv_iterinit(hv);
-	iter = HvAUX(hv);
-	oldentry = entry = iter->xhv_eiter; /* HvEITER(hv) */
-#endif
-    }
-#endif
 
     /* hv_iterint now ensures this.  */
     assert (HvARRAY(hv));
