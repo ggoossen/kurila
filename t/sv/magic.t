@@ -12,7 +12,7 @@ BEGIN {
 use warnings;
 use Config;
 
-plan tests => 43;
+plan tests => 39;
 
 
 my $Is_MSWin32  = $^O eq 'MSWin32';
@@ -308,26 +308,13 @@ do {
 };
 
 # Test for bug [perl #36434]
-if (!$Is_VMS) {
+do {
     our @ISA;
     local @ISA;
-    local %ENV;
     # This used to be __PACKAGE__, but that causes recursive
     #  inheritance, which is detected earlier now and broke
     #  this test
     try { push @ISA, __FILE__ };
     ok( $@ eq '', 'Push a constant on a magic array');
     $@ and print "# $@";
-    try { %ENV = %(PATH => __PACKAGE__) };
-    ok( $@ eq '', 'Assign a constant to a magic hash');
-    $@ and print "# $@";
-    try { my %h = %( < qw(A B) ); %ENV = %(PATH => (keys %h)[0]) };
-    ok( $@ eq '', 'Assign a shared key to a magic hash');
-    $@ and print "# $@";
-}
-else {
-# Can not do this test on VMS, EPOC, and SYMBIAN according to comments
-# in mg.c/Perl_magic_clear_all_env()
-#
-    skip(q|Can't make assignment to \%ENV on this system|) for 1..3;
-}
+};
