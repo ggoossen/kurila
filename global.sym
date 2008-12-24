@@ -595,7 +595,6 @@ Perl_uvchr_to_utf8_flags
 Perl_uvuni_to_utf8_flags
 Perl_pv_uni_display
 Perl_sv_uni_display
-Perl_vivify_defelem
 Perl_seed
 Perl_report_uninit
 Perl_warn

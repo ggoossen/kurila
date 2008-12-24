@@ -1044,7 +1044,6 @@ The current kinds of Magic Virtual Tables are:
     U  PERL_MAGIC_uvar           vtbl_uvar       Available for use by extensions
     V  PERL_MAGIC_vstring        (none)          v-string scalars
     w  PERL_MAGIC_utf8           vtbl_utf8       UTF-8 length+offset cache
-    y  PERL_MAGIC_defelem        vtbl_defelem    Shadow "foreach" iterator
                                                  variable / smart parameter
                                                  vivification
     .  PERL_MAGIC_pos            vtbl_pos        pos() lvalue

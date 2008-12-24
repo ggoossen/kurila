@@ -3388,9 +3388,6 @@ Perl_get_vtbl(pTHX_ int vtbl_id)
     case want_vtbl_uvar:
 	result = &PL_vtbl_uvar;
 	break;
-    case want_vtbl_defelem:
-	result = &PL_vtbl_defelem;
-	break;
     case want_vtbl_regexp:
 	result = &PL_vtbl_regexp;
 	break;

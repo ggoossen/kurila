@@ -1416,7 +1416,6 @@ PP(pp_iter)
     SV *sv, *oldsv;
     SV **itersvp;
     AV *av = NULL; /* used for LOOP_FOR on arrays and the stack */
-    bool av_is_stack = FALSE;
 
     EXTEND(SP, 1);
     cx = &cxstack[cxstack_ix];
@@ -1492,8 +1491,7 @@ PP(pp_iter)
 	RETPUSHNO;
     }
     if (PL_op->op_private & OPpITER_REVERSED) {
-	if (cx->blk_loop.state_u.ary.ix <= (av_is_stack
-				    ? cx->blk_loop.resetsp + 1 : 0))
+	if (cx->blk_loop.state_u.ary.ix <= 0)
 	    RETPUSHNO;
 
 	if (SvMAGICAL(av) || AvREIFY(av)) {
@@ -1505,8 +1503,7 @@ PP(pp_iter)
 	}
     }
     else {
-	if (cx->blk_loop.state_u.ary.ix >= (av_is_stack ? cx->blk_oldsp :
-				    AvFILL(av)))
+	if (cx->blk_loop.state_u.ary.ix >= AvFILL(av))
 	    RETPUSHNO;
 
 	if (SvMAGICAL(av) || AvREIFY(av)) {
@@ -1523,21 +1520,13 @@ PP(pp_iter)
 	Perl_croak(aTHX_ "Use of freed value in iteration");
     }
 
-    if (sv) {
-	SvTEMP_off(sv);
-	SvREFCNT_inc_simple_void_NN(sv);
+    if (sv == &PL_sv_undef) {
+	sv = newSV(0);
+	av_store(av, cx->blk_loop.state_u.ary.ix, sv);
     }
-    else
-	sv = &PL_sv_undef;
-    if (!av_is_stack && sv == &PL_sv_undef) {
-	SV *lv = newSV_type(SVt_PVLV);
-	LvTYPE(lv) = 'y';
-	sv_magic(lv, NULL, PERL_MAGIC_defelem, NULL, 0);
-	LvTARG(lv) = SvREFCNT_inc_simple(av);
-	LvTARGOFF(lv) = cx->blk_loop.state_u.ary.ix;
-	LvTARGLEN(lv) = (STRLEN)UV_MAX;
-	sv = lv;
-    }
+
+    SvTEMP_off(sv);
+    SvREFCNT_inc_simple_void_NN(sv);
 
     oldsv = *itersvp;
     *itersvp = sv;

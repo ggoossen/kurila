@@ -439,8 +439,6 @@ S_refto(pTHX_ SV *sv)
     PERL_ARGS_ASSERT_REFTO;
 
     if (SvTYPE(sv) == SVt_PVLV && LvTYPE(sv) == 'y') {
-	if (LvTARGLEN(sv))
-	    vivify_defelem(sv);
 	if (!(sv = LvTARG(sv)))
 	    sv = &PL_sv_undef;
 	else

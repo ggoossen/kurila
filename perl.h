@@ -3688,8 +3688,6 @@ Gid_t getegid (void);
 #define PERL_MAGIC_uvar_elem	  'u' /* Reserved for use by extensions */
 #define PERL_MAGIC_vstring	  'V' /* SV was vstring literal */
 #define PERL_MAGIC_utf8		  'w' /* Cached UTF-8 information */
-#define PERL_MAGIC_defelem	  'y' /* Shadow "foreach" iterator variable /
-					smart parameter vivification */
 #define PERL_MAGIC_backref	  '<' /* for weak ref data */
 #define PERL_MAGIC_symtab	  ':' /* extra data for symbol tables */
 #define PERL_MAGIC_rhash	  '%' /* extra data for restricted hashes */
@@ -4430,7 +4428,6 @@ enum {		/* pass one of these to get_vtbl */
     want_vtbl_taint,
     want_vtbl_bm,
     want_vtbl_uvar,
-    want_vtbl_defelem,
     want_vtbl_regexp,
     want_vtbl_backref,
     want_vtbl_utf8,
@@ -4817,18 +4814,6 @@ MGVTBL_SET(
     PL_vtbl_uvar,
     MEMBER_TO_FPTR(Perl_magic_getuvar),
     MEMBER_TO_FPTR(Perl_magic_setuvar),
-    0,
-    0,
-    0,
-    0,
-    0,
-    0
-);
-
-MGVTBL_SET(
-    PL_vtbl_defelem,
-    MEMBER_TO_FPTR(Perl_magic_getdefelem),
-    MEMBER_TO_FPTR(Perl_magic_setdefelem),
     0,
     0,
     0,

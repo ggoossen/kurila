@@ -155,7 +155,6 @@ S_is_container_magic(const MAGIC *mg)
     case PERL_MAGIC_taint:
     case PERL_MAGIC_vstring:
     case PERL_MAGIC_utf8:
-    case PERL_MAGIC_defelem:
     case PERL_MAGIC_backref:
     case PERL_MAGIC_rhash:
     case PERL_MAGIC_symtab:
@@ -1311,95 +1310,6 @@ Perl_magic_settaint(pTHX_ SV *sv, MAGIC *mg)
     else
         mg->mg_len &= ~1;
     return 0;
-}
-
-
-int
-Perl_magic_getdefelem(pTHX_ SV *sv, MAGIC *mg)
-{
-    dVAR;
-    SV *targ = NULL;
-
-    PERL_ARGS_ASSERT_MAGIC_GETDEFELEM;
-
-    if (LvTARGLEN(sv)) {
-        if (mg->mg_obj) {
-            SV * const ahv = LvTARG(sv);
-            HE * const he = hv_fetch_ent((HV*)ahv, mg->mg_obj, FALSE, 0);
-            if (he)
-                targ = HeVAL(he);
-        }
-        else {
-            AV* const av = (AV*)LvTARG(sv);
-            if ((I32)LvTARGOFF(sv) <= AvFILL(av))
-                targ = AvARRAY(av)[LvTARGOFF(sv)];
-        }
-        if (targ && (targ != &PL_sv_undef)) {
-            /* somebody else defined it for us */
-            SvREFCNT_dec(LvTARG(sv));
-            LvTARG(sv) = SvREFCNT_inc_simple_NN(targ);
-            LvTARGLEN(sv) = 0;
-            SvREFCNT_dec(mg->mg_obj);
-            mg->mg_obj = NULL;
-            mg->mg_flags &= ~MGf_REFCOUNTED;
-        }
-    }
-    else
-        targ = LvTARG(sv);
-    sv_setsv(sv, targ ? targ : &PL_sv_undef);
-    return 0;
-}
-
-int
-Perl_magic_setdefelem(pTHX_ SV *sv, MAGIC *mg)
-{
-    PERL_ARGS_ASSERT_MAGIC_SETDEFELEM;
-    PERL_UNUSED_ARG(mg);
-    if (LvTARGLEN(sv))
-        vivify_defelem(sv);
-    if (LvTARG(sv)) {
-        sv_setsv(LvTARG(sv), sv);
-        SvSETMAGIC(LvTARG(sv));
-    }
-    return 0;
-}
-
-void
-Perl_vivify_defelem(pTHX_ SV *sv)
-{
-    dVAR;
-    MAGIC *mg;
-    SV *value = NULL;
-
-    PERL_ARGS_ASSERT_VIVIFY_DEFELEM;
-
-    if (!LvTARGLEN(sv) || !(mg = mg_find(sv, PERL_MAGIC_defelem)))
-        return;
-    if (mg->mg_obj) {
-        SV * const ahv = LvTARG(sv);
-        HE * const he = hv_fetch_ent((HV*)ahv, mg->mg_obj, TRUE, 0);
-        if (he)
-            value = HeVAL(he);
-        if (!value || value == &PL_sv_undef)
-            Perl_croak(aTHX_ PL_no_helem_sv, SVfARG(mg->mg_obj));
-    }
-    else {
-        AV* const av = (AV*)LvTARG(sv);
-        if ((I32)LvTARGLEN(sv) < 0 && (I32)LvTARGOFF(sv) > AvFILL(av))
-            LvTARG(sv) = NULL;  /* array can't be extended */
-        else {
-            SV* const * const svp = av_fetch(av, LvTARGOFF(sv), TRUE);
-            if (!svp || (value = *svp) == &PL_sv_undef)
-                Perl_croak(aTHX_ PL_no_aelem, (I32)LvTARGOFF(sv));
-        }
-    }
-    SvREFCNT_inc_simple_void(value);
-    SvREFCNT_dec(LvTARG(sv));
-    LvTARG(sv) = value;
-    LvTARGLEN(sv) = 0;
-    SvREFCNT_dec(mg->mg_obj);
-    mg->mg_obj = NULL;
-    mg->mg_flags &= ~MGf_REFCOUNTED;
 }
 
 int
