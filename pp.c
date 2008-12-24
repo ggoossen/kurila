@@ -438,13 +438,7 @@ S_refto(pTHX_ SV *sv)
 
     PERL_ARGS_ASSERT_REFTO;
 
-    if (SvTYPE(sv) == SVt_PVLV && LvTYPE(sv) == 'y') {
-	if (!(sv = LvTARG(sv)))
-	    sv = &PL_sv_undef;
-	else
-	    SvREFCNT_inc_void_NN(sv);
-    }
-    else if (SvTYPE(sv) == SVt_PVAV) {
+    if (SvTYPE(sv) == SVt_PVAV) {
 	if (!AvREAL((AV*)sv) && AvREIFY((AV*)sv))
 	    av_reify((AV*)sv);
 	SvTEMP_off(sv);
