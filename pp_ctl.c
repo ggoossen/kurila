@@ -984,14 +984,12 @@ PP(pp_last)
     dVAR; dSP;
     I32 cxix;
     register PERL_CONTEXT *cx;
-    I32 pop2 = 0;
     I32 gimme;
     I32 optype;
     OP *nextop;
     SV **newsp;
     PMOP *newpm;
     SV **mark;
-    SV *sv = NULL;
 
 
     if (PL_op->op_flags & OPf_SPECIAL) {
@@ -1010,38 +1008,22 @@ PP(pp_last)
     POPBLOCK(cx,newpm);
     cxstack_ix++; /* temporarily protect top context */
     mark = newsp;
-    switch (CxTYPE(cx)) {
-    case CXt_LOOP_LAZYIV:
-    case CXt_LOOP_FOR:
-    case CXt_LOOP_PLAIN:
-	pop2 = CxTYPE(cx);
-	newsp = PL_stack_base + cx->blk_loop.resetsp;
-	nextop = cx->blk_loop.my_op->op_lastop->op_next;
-	break;
-    case CXt_SUB:
-	pop2 = CXt_SUB;
-	nextop = cx->blk_sub.retop;
-	break;
-    case CXt_EVAL:
-	POPEVAL(cx);
-	nextop = cx->blk_eval.retop;
-	break;
-    default:
-	DIE(aTHX_ "panic: last");
-    }
+    assert(CxTYPE(cx) == CXt_LOOP_LAZYIV
+	|| CxTYPE(cx) == CXt_LOOP_FOR
+	|| CxTYPE(cx) == CXt_LOOP_PLAIN);
+    newsp = PL_stack_base + cx->blk_loop.resetsp;
+    nextop = cx->blk_loop.my_op->op_lastop->op_next;
 
     TAINT_NOT;
     if (gimme == G_SCALAR) {
 	if (MARK < SP)
-	    *++newsp = ((pop2 == CXt_SUB) && SvTEMP(*SP))
-			? *SP : sv_mortalcopy(*SP);
+	    *++newsp = sv_mortalcopy(*SP);
 	else
 	    *++newsp = &PL_sv_undef;
     }
     else if (gimme == G_ARRAY) {
 	while (++MARK <= SP) {
-	    *++newsp = ((pop2 == CXt_SUB) && SvTEMP(*MARK))
-			? *MARK : sv_mortalcopy(*MARK);
+	    *++newsp = sv_mortalcopy(*MARK);
 	    TAINT_NOT;		/* Each item is independent */
 	}
     }
@@ -1051,20 +1033,10 @@ PP(pp_last)
     LEAVE;
     cxstack_ix--;
     /* Stack values are safe: */
-    switch (pop2) {
-    case CXt_LOOP_LAZYIV:
-    case CXt_LOOP_PLAIN:
-    case CXt_LOOP_FOR:
-	POPLOOP(cx);	/* release loop vars ... */
-	LEAVE;
-	break;
-    case CXt_SUB:
-	POPSUB(cx,sv);	/* release CV and @_ ... */
-	break;
-    }
+    POPLOOP(cx);	/* release loop vars ... */
+    LEAVE;
     PL_curpm = newpm;	/* ... and pop $1 et al */
 
-    LEAVESUB(sv);
     PERL_UNUSED_VAR(optype);
     PERL_UNUSED_VAR(gimme);
     return nextop;
