@@ -40,7 +40,6 @@ Perl_ck_rvconst
 Perl_ck_sassign
 Perl_ck_select
 Perl_ck_shift
-Perl_ck_smartmatch
 Perl_ck_sort
 Perl_ck_spair
 Perl_ck_split
@@ -139,7 +138,6 @@ Perl_pp_negate
 Perl_pp_i_negate
 Perl_pp_not
 Perl_pp_complement
-Perl_pp_smartmatch
 Perl_pp_atan2
 Perl_pp_sin
 Perl_pp_cos

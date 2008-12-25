@@ -3481,14 +3481,6 @@ Perl_yylex(pTHX)
 	    yyerror(Perl_form(aTHX_ "Expected ^,&,| or ~ after a ^, but found '%c'", *s));
 	}
     case '~':
-	if (s[1] == '~'
-	    && (PL_expect == XOPERATOR || PL_expect == XTERMORDORDOR))
-	{
-	    s += 2;
-	    Eop(OP_SMARTMATCH);
-	}
-
-
 	if (s[1] == '<') {
 	    s += 2;
 	    UNI(OP_READLINE);

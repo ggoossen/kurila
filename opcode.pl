@@ -729,8 +729,6 @@ i_negate	integer negation (-)	ck_null		ifsT1	S
 not		not			ck_null		ifs1	S
 complement	1's complement (^~^)	ck_bitop	fst1	S
 
-smartmatch	smart match		ck_smartmatch	s2
-
 # High falutin' math.
 
 atan2		atan2			ck_fun		fsT@	S S

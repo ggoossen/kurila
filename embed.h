@@ -1225,10 +1225,6 @@
 #ifdef PERL_CORE
 #define path_is_absolute	S_path_is_absolute
 #define run_user_filter		S_run_user_filter
-#define make_matcher		S_make_matcher
-#define matcher_matches_sv	S_matcher_matches_sv
-#define destroy_matcher		S_destroy_matcher
-#define do_smartmatch		S_do_smartmatch
 #endif
 #endif
 #if defined(PERL_IN_PP_HOT_C) || defined(PERL_DECL_PROT)
@@ -2191,7 +2187,6 @@
 #define pp_vec			Perl_pp_vec
 #define pp_wait			Perl_pp_wait
 #define pp_waitpid		Perl_pp_waitpid
-#define pp_wantarray		Perl_pp_wantarray
 #define pp_warn			Perl_pp_warn
 #define pp_xor			Perl_pp_xor
 
@@ -3379,10 +3374,6 @@
 #ifdef PERL_CORE
 #define path_is_absolute	S_path_is_absolute
 #define run_user_filter(a,b,c)	S_run_user_filter(aTHX_ a,b,c)
-#define make_matcher(a)		S_make_matcher(aTHX_ a)
-#define matcher_matches_sv(a,b)	S_matcher_matches_sv(aTHX_ a,b)
-#define destroy_matcher(a)	S_destroy_matcher(aTHX_ a)
-#define do_smartmatch(a,b)	S_do_smartmatch(aTHX_ a,b)
 #endif
 #endif
 #if defined(PERL_IN_PP_HOT_C) || defined(PERL_DECL_PROT)
@@ -4352,7 +4343,6 @@
 #define pp_vec()		Perl_pp_vec(aTHX)
 #define pp_wait()		Perl_pp_wait(aTHX)
 #define pp_waitpid()		Perl_pp_waitpid(aTHX)
-#define pp_wantarray()		Perl_pp_wantarray(aTHX)
 #define pp_warn()		Perl_pp_warn(aTHX)
 #define pp_xor()		Perl_pp_xor(aTHX)
 

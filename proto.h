@@ -4378,25 +4378,6 @@ STATIC I32	S_run_user_filter(pTHX_ int idx, SV *buf_sv, int maxlen)
 #define PERL_ARGS_ASSERT_RUN_USER_FILTER	\
 	assert(buf_sv)
 
-STATIC PMOP*	S_make_matcher(pTHX_ REGEXP* re)
-			__attribute__warn_unused_result__
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_MAKE_MATCHER	\
-	assert(re)
-
-STATIC bool	S_matcher_matches_sv(pTHX_ PMOP* matcher, SV* sv)
-			__attribute__warn_unused_result__
-			__attribute__nonnull__(pTHX_1)
-			__attribute__nonnull__(pTHX_2);
-#define PERL_ARGS_ASSERT_MATCHER_MATCHES_SV	\
-	assert(matcher); assert(sv)
-
-STATIC void	S_destroy_matcher(pTHX_ PMOP* matcher)
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_DESTROY_MATCHER	\
-	assert(matcher)
-
-STATIC OP*	S_do_smartmatch(pTHX_ HV* seen_this, HV* seen_other);
 #endif
 
 #if defined(PERL_IN_PP_HOT_C) || defined(PERL_DECL_PROT)

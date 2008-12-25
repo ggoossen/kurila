@@ -904,7 +904,6 @@ Perl_scalarvoid(pTHX_ OP *o)
 	/* FALL THROUGH */
     case OP_GVSV:
     case OP_GV:
-    case OP_SMARTMATCH:
     case OP_PADSV:
     case OP_PADANY:
     case OP_REF:
@@ -5591,33 +5590,6 @@ Perl_ck_listiob(pTHX_ OP *o)
 	append_elem(o->op_type, o, newDEFSVOP(o->op_location));
 
     return listkids(o);
-}
-
-OP *
-Perl_ck_smartmatch(pTHX_ OP *o)
-{
-    dVAR;
-    if (0 == (o->op_flags & OPf_SPECIAL)) {
-	OP *first  = cBINOPo->op_first;
-	OP *second = first->op_sibling;
-	
-	/* Implicitly take a reference to an array or hash */
-	first->op_sibling = NULL;
-	first = cBINOPo->op_first = ref_array_or_hash(first);
-	second = first->op_sibling = ref_array_or_hash(second);
-	
-	/* Implicitly take a reference to a regular expression */
-	if (first->op_type == OP_MATCH) {
-	    first->op_type = OP_QR;
-	    first->op_ppaddr = PL_ppaddr[OP_QR];
-	}
-	if (second->op_type == OP_MATCH) {
-	    second->op_type = OP_QR;
-	    second->op_ppaddr = PL_ppaddr[OP_QR];
-        }
-    }
-    
-    return o;
 }
 
 OP *
