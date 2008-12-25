@@ -1127,7 +1127,6 @@ Perl_cx_dump(pTHX_ PERL_CONTEXT *cx)
 	break;
 
     case CXt_LOOP_LAZYIV:
-    case CXt_LOOP_LAZYSV:
     case CXt_LOOP_FOR:
     case CXt_LOOP_PLAIN:
 	PerlIO_printf(Perl_debug_log, "BLK_LOOP.LABEL = %s\n", CxLABEL(cx));

@@ -215,7 +215,6 @@ static const char * const context_name[] = {
     "given",
     NULL, /* CXt_LOOP_FOR never actually needs "loop" */
     NULL, /* CXt_LOOP_PLAIN never actually needs "loop" */
-    NULL, /* CXt_LOOP_LAZYSV never actually needs "loop" */
     NULL, /* CXt_LOOP_LAZYIV never actually needs "loop" */
     "subroutine",
     "eval",
@@ -244,7 +243,6 @@ S_dopoptolabel(pTHX_ const char *label)
 		return -1;
 	    break;
 	case CXt_LOOP_LAZYIV:
-	case CXt_LOOP_LAZYSV:
 	case CXt_LOOP_FOR:
 	case CXt_LOOP_PLAIN:
 	    if ( !CxLABEL(cx) || strNE(label, CxLABEL(cx)) ) {
@@ -350,7 +348,6 @@ S_dopoptoloop(pTHX_ I32 startingblock)
 		return -1;
 	    break;
 	case CXt_LOOP_LAZYIV:
-	case CXt_LOOP_LAZYSV:
 	case CXt_LOOP_FOR:
 	case CXt_LOOP_PLAIN:
 	    DEBUG_l( Perl_deb(aTHX_ "(Found loop #%ld)\n", (long)i));
@@ -384,7 +381,6 @@ Perl_dounwind(pTHX_ I32 cxix)
 	    POPEVAL(cx);
 	    break;
 	case CXt_LOOP_LAZYIV:
-	case CXt_LOOP_LAZYSV:
 	case CXt_LOOP_FOR:
 	case CXt_LOOP_PLAIN:
 	    POPLOOP(cx);
@@ -1016,7 +1012,6 @@ PP(pp_last)
     mark = newsp;
     switch (CxTYPE(cx)) {
     case CXt_LOOP_LAZYIV:
-    case CXt_LOOP_LAZYSV:
     case CXt_LOOP_FOR:
     case CXt_LOOP_PLAIN:
 	pop2 = CxTYPE(cx);
@@ -1059,7 +1054,6 @@ PP(pp_last)
     switch (pop2) {
     case CXt_LOOP_LAZYIV:
     case CXt_LOOP_PLAIN:
-    case CXt_LOOP_LAZYSV:
     case CXt_LOOP_FOR:
 	POPLOOP(cx);	/* release loop vars ... */
 	LEAVE;

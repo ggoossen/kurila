@@ -1121,37 +1121,7 @@ PP(pp_iter)
 	DIE(aTHX_ "panic: pp_iter");
 
     itersvp = CxITERVAR(cx);
-    if (CxTYPE(cx) == CXt_LOOP_LAZYSV) {
-	    /* string increment */
-	    SV* cur = cx->blk_loop.state_u.lazysv.cur;
-	    SV *end = cx->blk_loop.state_u.lazysv.end;
-	    /* If the maximum is !SvOK(), pp_enteriter substitutes PL_sv_no.
-	       It has SvPVX of "" and SvCUR of 0, which is what we want.  */
-	    STRLEN maxlen = 0;
-	    const char *max = SvPV_const(end, maxlen);
-	    if (!SvNIOK(cur) && SvCUR(cur) <= maxlen) {
-		if (SvREFCNT(*itersvp) == 1 && !SvMAGICAL(*itersvp)) {
-		    /* safe to reuse old SV */
-		    sv_setsv(*itersvp, cur);
-		}
-		else
-		{
-		    /* we need a fresh SV every time so that loop body sees a
-		     * completely new SV for closures/references to work as
-		     * they used to */
-		    oldsv = *itersvp;
-		    *itersvp = newSVsv(cur);
-		    SvREFCNT_dec(oldsv);
-		}
-		if (strEQ(SvPVX_const(cur), max))
-		    sv_setiv(cur, 0); /* terminate next time */
-		else
-		    sv_inc(cur);
-		RETPUSHYES;
-	    }
-	    RETPUSHNO;
-    }
-    else if (CxTYPE(cx) == CXt_LOOP_LAZYIV) {
+    if (CxTYPE(cx) == CXt_LOOP_LAZYIV) {
 	/* integer increment */
 	if (cx->blk_loop.state_u.lazyiv.cur > cx->blk_loop.state_u.lazyiv.end)
 	    RETPUSHNO;
