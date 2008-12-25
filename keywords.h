@@ -243,12 +243,11 @@
 #define KEY_vec			228
 #define KEY_wait		229
 #define KEY_waitpid		230
-#define KEY_wantarray		231
-#define KEY_warn		232
-#define KEY_while		233
-#define KEY_write		234
-#define KEY_x			235
-#define KEY_xor			236
-#define KEY_y			237
+#define KEY_warn		231
+#define KEY_while		232
+#define KEY_write		233
+#define KEY_x			234
+#define KEY_xor			235
+#define KEY_y			236
 
 /* ex: set ro: */

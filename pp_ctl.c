@@ -40,27 +40,6 @@
 
 #define dopoptosub(plop)	dopoptosub_at(cxstack, (plop))
 
-PP(pp_wantarray)
-{
-    dVAR;
-    dSP;
-    I32 cxix;
-    EXTEND(SP, 1);
-
-    cxix = dopoptosub(cxstack_ix);
-    if (cxix < 0)
-	RETPUSHUNDEF;
-
-    switch (cxstack[cxix].blk_gimme) {
-    case G_ARRAY:
-	RETPUSHYES;
-    case G_SCALAR:
-	RETPUSHNO;
-    default:
-	RETPUSHUNDEF;
-    }
-}
-
 PP(pp_grepstart)
 {
     dVAR; dSP;

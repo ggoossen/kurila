@@ -5795,10 +5795,6 @@ Perl_yylex(pTHX)
 	case KEY_waitpid:
 	    LOP(OP_WAITPID,XTERM);
 
-	case KEY_wantarray:
-	    yyerror(Perl_form(aTHX_ "wantarray keyword is removed"));
-	    goto just_a_word;
-
 	case KEY_write:
 	    yyerror(Perl_form(aTHX_ "write keyword is removed"));
 	    goto just_a_word;
@@ -8650,21 +8646,6 @@ Perl_keyword (pTHX_ const char *name, I32 len)
               name[8] == 't')
           {                                       /* setnetent  */
             return -KEY_setnetent;
-          }
-
-          goto unknown;
-
-        case 'w':
-          if (name[1] == 'a' &&
-              name[2] == 'n' &&
-              name[3] == 't' &&
-              name[4] == 'a' &&
-              name[5] == 'r' &&
-              name[6] == 'r' &&
-              name[7] == 'a' &&
-              name[8] == 'y')
-          {                                       /* wantarray  */
-            return -KEY_wantarray;
           }
 
           goto unknown;

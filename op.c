@@ -903,7 +903,6 @@ Perl_scalarvoid(pTHX_ OP *o)
 	    break;
 	/* FALL THROUGH */
     case OP_GVSV:
-    case OP_WANTARRAY:
     case OP_GV:
     case OP_SMARTMATCH:
     case OP_PADSV:

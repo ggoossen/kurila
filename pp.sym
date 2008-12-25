@@ -54,7 +54,6 @@ Perl_pp_null
 Perl_pp_stub
 Perl_pp_scalar
 Perl_pp_pushmark
-Perl_pp_wantarray
 Perl_pp_logassign_assign
 Perl_pp_const
 Perl_pp_gvsv

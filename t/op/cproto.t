@@ -2,7 +2,7 @@
 # Tests to ensure that we don't unexpectedly change prototypes of builtins
 
 BEGIN { require './test.pl'; }
-plan tests => 221;
+plan tests => 220;
 
 while ( ~< *DATA) {
     chomp;
@@ -237,7 +237,6 @@ values (\%)
 vec ($$$;$)
 wait ()
 waitpid ($$)
-wantarray ()
 warn (@)
 while undef
 x unknown

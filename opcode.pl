@@ -608,7 +608,6 @@ scalar		scalar			ck_fun		s%	S
 # Pushy stuff.
 
 pushmark	pushmark		ck_null		s0	
-wantarray	wantarray		ck_null		is0	
 
 logassign_assign		assignment part of a logical assignment	ck_null		0	
 
