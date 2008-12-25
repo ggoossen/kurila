@@ -167,17 +167,6 @@ PP(pp_flip)
     RETURNOP(((LOGOP*)cUNOP->op_first)->op_other);
 }
 
-/* This code tries to decide if "$left .. $right" should use the
-   magical string increment, or if the range is numeric (we make
-   an exception for .."0" [#18165]). AMS 20021031. */
-
-#define RANGE_IS_NUMERIC(left,right) ( \
-	SvNIOKp(left)  || (SvOK(left)  && !SvPOKp(left))  || \
-	SvNIOKp(right) || (SvOK(right) && !SvPOKp(right)) || \
-	(((!SvOK(left) && SvOK(right)) || ((!SvOK(left) || \
-          looks_like_number(left)) && SvPOKp(left) && *SvPVX_const(left) != '0')) \
-         && (!SvOK(right) || looks_like_number(right))))
-
 PP(pp_flop)
 {
     dVAR; dSP;
@@ -188,7 +177,14 @@ PP(pp_flop)
     SvGETMAGIC(left);
     SvGETMAGIC(right);
 
-    if (RANGE_IS_NUMERIC(left,right)) {
+    if ( !SvNIOKp(left) && SvPOKp(left) && !looks_like_number(left)) {
+	Perl_croak(aTHX_ "Range must be numeric");
+    }
+    if ( !SvNIOKp(right) && SvPOKp(right) && !looks_like_number(right)) {
+	Perl_croak(aTHX_ "Range must be numeric");
+    }
+
+    {
 	register IV i, j;
 	IV max;
 	if ((SvOK(left) && SvNV(left) < IV_MIN) ||
@@ -203,20 +199,6 @@ PP(pp_flop)
 	    j = 0;
 	while (j--) {
 	    av_push(res, newSViv(i++));
-	}
-    }
-    else {
-	SV * const final = sv_mortalcopy(right);
-	STRLEN len;
-	const char * const tmps = SvPV_const(final, len);
-
-	SV *sv = sv_mortalcopy(left);
-	SvPV_force_nolen(sv);
-	while (!SvNIOKp(sv) && SvCUR(sv) <= len) {
-	    av_push(res, newSVsv(sv));
-	    if (strEQ(SvPVX_const(sv),tmps))
-		break;
-	    sv_inc(sv);
 	}
     }
 
@@ -775,59 +757,44 @@ PP(pp_enteriter)
 	dPOPss;
 	SvGETMAGIC(sv);
 	SvGETMAGIC(right);
-	if (RANGE_IS_NUMERIC(sv,right)) {
-	    cx->cx_type &= ~CXTYPEMASK;
-	    cx->cx_type |= CXt_LOOP_LAZYIV;
-	    /* Make sure that no-one re-orders cop.h and breaks our
-	       assumptions */
-	    assert(CxTYPE(cx) == CXt_LOOP_LAZYIV);
+
+	if ( !SvNIOKp(sv) && SvPOKp(sv) && !looks_like_number(sv)) {
+	    Perl_croak(aTHX_ "Range must be numeric");
+	}
+	if ( !SvNIOKp(right) && SvPOKp(right) && !looks_like_number(right)) {
+	    Perl_croak(aTHX_ "Range must be numeric");
+	}
+	cx->cx_type &= ~CXTYPEMASK;
+	cx->cx_type |= CXt_LOOP_LAZYIV;
+	/* Make sure that no-one re-orders cop.h and breaks our
+	   assumptions */
+	assert(CxTYPE(cx) == CXt_LOOP_LAZYIV);
 #ifdef NV_PRESERVES_UV
-	    if ((SvOK(sv) && ((SvNV(sv) < (NV)IV_MIN) ||
-			      (SvNV(sv) > (NV)IV_MAX)))
-		||
-		(SvOK(right) && ((SvNV(right) > (NV)IV_MAX) ||
-				 (SvNV(right) < (NV)IV_MIN))))
+	if ((SvOK(sv) && ((SvNV(sv) < (NV)IV_MIN) ||
+		    (SvNV(sv) > (NV)IV_MAX)))
+	    ||
+	    (SvOK(right) && ((SvNV(right) > (NV)IV_MAX) ||
+		(SvNV(right) < (NV)IV_MIN))))
 #else
-		if ((SvOK(sv) && ((SvNV(sv) <= (NV)IV_MIN)
-				  ||
-		                  ((SvNV(sv) > 0) &&
-				   ((SvUV(sv) > (UV)IV_MAX) ||
-				    (SvNV(sv) > (NV)UV_MAX)))))
+	    if ((SvOK(sv) && ((SvNV(sv) <= (NV)IV_MIN)
+			||
+			((SvNV(sv) > 0) &&
+			    ((SvUV(sv) > (UV)IV_MAX) ||
+				(SvNV(sv) > (NV)UV_MAX)))))
+		||
+		(SvOK(right) && ((SvNV(right) <= (NV)IV_MIN)
 		    ||
-		    (SvOK(right) && ((SvNV(right) <= (NV)IV_MIN)
-				     ||
-				     ((SvNV(right) > 0) &&
-				      ((SvUV(right) > (UV)IV_MAX) ||
-				       (SvNV(right) > (NV)UV_MAX))))))
+		    ((SvNV(right) > 0) &&
+			((SvUV(right) > (UV)IV_MAX) ||
+			    (SvNV(right) > (NV)UV_MAX))))))
 #endif
-		    DIE(aTHX_ "Range iterator outside integer range");
-	    cx->blk_loop.state_u.lazyiv.cur = SvIV(sv);
-	    cx->blk_loop.state_u.lazyiv.end = SvIV(right);
+		DIE(aTHX_ "Range iterator outside integer range");
+	cx->blk_loop.state_u.lazyiv.cur = SvIV(sv);
+	cx->blk_loop.state_u.lazyiv.end = SvIV(right);
 #ifdef DEBUGGING
-	    /* for correct -Dstv display */
-	    cx->blk_oldsp = sp - PL_stack_base;
+	/* for correct -Dstv display */
+	cx->blk_oldsp = sp - PL_stack_base;
 #endif
-	}
-	else {
-	    cx->cx_type &= ~CXTYPEMASK;
-	    cx->cx_type |= CXt_LOOP_LAZYSV;
-	    /* Make sure that no-one re-orders cop.h and breaks our
-	       assumptions */
-	    assert(CxTYPE(cx) == CXt_LOOP_LAZYSV);
-	    cx->blk_loop.state_u.lazysv.cur = newSVsv(sv);
-	    cx->blk_loop.state_u.lazysv.end = right;
-	    SvREFCNT_inc(right);
-	    (void) SvPV_force_nolen(cx->blk_loop.state_u.lazysv.cur);
-	    /* This will do the upgrade to SVt_PV, and warn if the value
-	       is uninitialised.  */
-	    (void) SvPV_nolen_const(right);
-	    /* Doing this avoids a check every time in pp_iter in pp_hot.c
-	       to replace !SvOK() with a pointer to "".  */
-	    if (!SvOK(right)) {
-		SvREFCNT_dec(right);
-		cx->blk_loop.state_u.lazysv.end = &PL_sv_no;
-	    }
-	}
     }
     else { /* iterating over (copy of) the array on the stack */
 	SV *maybe_ary = POPs;

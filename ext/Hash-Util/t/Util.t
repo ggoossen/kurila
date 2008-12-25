@@ -386,7 +386,7 @@ do {
 };
 do {
     my %hash=%( <0..9);
-    lock_keys(%hash, <keys(%hash), <'a'..'f');
+    lock_keys(%hash, <keys(%hash), < qw[a b c d e f]);
     ok(Internals::SvREADONLY(%hash),'lock_keys args DDS/t');
     my @hidden=sort(hidden_keys(%hash));
     my @legal=sort(legal_keys(%hash));
@@ -411,7 +411,7 @@ do {
 };
 do {
     my %hash=%( <0..9);
-    lock_ref_keys(\%hash, <keys %hash, <'a'..'f');
+    lock_ref_keys(\%hash, <keys %hash, < qw[a b c d e f]);
     ok(Internals::SvREADONLY(%hash),'lock_ref_keys args DDS/t');
     my @hidden=sort(hidden_keys(%hash));
     my @legal=sort(legal_keys(%hash));
@@ -422,7 +422,7 @@ do {
 };
 do {
     my %hash=%( <0..9);
-    lock_ref_keys_plus(\%hash, <'a'..'f');
+    lock_ref_keys_plus(\%hash, < qw[a b c d e f]);
     ok(Internals::SvREADONLY(%hash),'lock_ref_keys_plus args DDS/t');
     my @hidden=sort(hidden_keys(%hash));
     my @legal=sort(legal_keys(%hash));
@@ -433,7 +433,7 @@ do {
 };
 do {
     my %hash=%( <0..9);
-    lock_keys_plus(%hash, <'a'..'f');
+    lock_keys_plus(%hash, < qw[a b c d e f]);
     ok(Internals::SvREADONLY(%hash),'lock_keys_plus args DDS/t');
     my @hidden=sort(hidden_keys(%hash));
     my @legal=sort(legal_keys(%hash));
@@ -444,7 +444,7 @@ do {
 };
 
 do {
-    my %hash = %( <'a'..'f');
+    my %hash = %( < qw[a b c d e f]);
     my @keys = @( () );
     my @ph = @( () );
     my @lock = @('a', 'c', 'e', 'g');

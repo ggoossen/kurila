@@ -2470,7 +2470,7 @@ do {
     # https://rt.perl.org/rt3/Ticket/Display.html?id=39583
     
     # The printing characters
-    my @chars ="A".."Z";
+    my @chars = map { chr($_) } ord("A")..ord("Z");
     my $delim = ",";
     my $size = 32771 - 4;
     my $str = '';
