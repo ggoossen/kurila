@@ -2,7 +2,7 @@
 
 
 BEGIN {
-    if ( %ENV{?PERL_CORE} ) {
+    if ( env::var('PERL_CORE') ) {
         chdir 't' if -d 't';
         @INC = @( '../lib' );
     }
@@ -19,7 +19,7 @@ package main;
 use Test::More tests => 14;
 
 BEGIN {
-    %ENV{+PERL_RL} = 'Mock'; # test against our instrumented class
+    env::set_var('PERL_RL' => 'Mock'); # test against our instrumented class
 }
 use Term::ReadLine;
 

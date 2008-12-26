@@ -1,7 +1,7 @@
 # qr// was introduced in 5.004-devel.  Skip this test if we're not
 # of high enough version.
 BEGIN {
-    if( %ENV{?PERL_CORE} ) {
+    if( env::var('PERL_CORE') ) {
         chdir 't';
         @INC = @('../lib', 'lib');
     }
@@ -26,8 +26,9 @@ $TB->plan(tests => 2);
 
 
 require Test::Simple::Catch;
+use env;
 my@($out, $err) =  Test::Simple::Catch::caught();
-local %ENV{+HARNESS_ACTIVE} = 0;
+env::temp_set_var('HARNESS_ACTIVE' => 0);
 
 
 package main;

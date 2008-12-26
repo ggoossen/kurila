@@ -103,7 +103,7 @@ if (exists %opt{cc}) {
     }
 }
 
-%opt{+'cf_by'} = %ENV{?USERNAME} unless %opt{?'cf_by'};
+%opt{+'cf_by'} = env::var('USERNAME') unless %opt{?'cf_by'};
 %opt{+'cf_email'} = %opt{?'cf_by'} . '@' . (gethostbyname('localhost'))[[0]]
 	unless %opt{?'cf_email'};
 %opt{+'usemymalloc'} = 'y' if %opt{?'d_mymalloc'} eq 'define';
@@ -112,7 +112,7 @@ if (exists %opt{cc}) {
 %opt{+incpath} = mungepath(%opt{?incpath}) if exists %opt{incpath};
 
 # some functions are not available on Win9x
-unless (defined %ENV{?SYSTEMROOT}) { # SystemRoot has been introduced by WinNT
+unless (defined env::var('SYSTEMROOT')) { # SystemRoot has been introduced by WinNT
     %opt{+d_flock} = 'undef';
     %opt{+d_link} = 'undef';
 }

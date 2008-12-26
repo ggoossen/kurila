@@ -279,8 +279,8 @@ if ($^O eq 'vos') {
  # The following line assumes buffered output, which may be not true:
  print '@#!*$@(!@#$' unless ($Is_MacOS || $Is_OS2 || $Is_UWin || $Is_OS390 ||
                             $Is_VMS ||
-			    (defined %ENV{?PERLIO} &&
-			     %ENV{?PERLIO} eq 'unix' &&
+			    (defined env::var('PERLIO') &&
+			     env::var('PERLIO') eq 'unix' &&
 			     Config::config_value("useperlio")));
  _exit(0);
 }

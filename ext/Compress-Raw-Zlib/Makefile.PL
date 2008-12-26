@@ -12,7 +12,7 @@ my $BUILD_ZLIB = 0 ;
 my $OLD_ZLIB = '' ;
 my $WALL = '' ;
 my $GZIP_OS_CODE = -1 ;
-my $USE_PPPORT_H = (%ENV{?PERL_CORE}) ?? '' !! '-DUSE_PPPORT_H';
+my $USE_PPPORT_H = (env::var('PERL_CORE')) ?? '' !! '-DUSE_PPPORT_H';
 
 #$WALL = ' -pedantic ' if $Config{'cc'} =~ /gcc/ ;
 #$WALL = ' -Wall -Wno-comment ' if $Config{'cc'} =~ /gcc/ ;
@@ -23,7 +23,7 @@ my $USE_PPPORT_H = (%ENV{?PERL_CORE}) ?? '' !! '-DUSE_PPPORT_H';
 
 # Don't ask if MM_USE_DEFAULT is set -- enables perl core building on cygwin
 if ($^O =~ m/cygwin/i and $ExtUtils::Install::VERSION +< 1.39 
-        and not (%ENV{?PERL_MM_USE_DEFAULT} or %ENV{?PERL_CORE}))
+        and not (env::var('PERL_MM_USE_DEFAULT') or env::var('PERL_CORE')))
 {
     print <<EOM ;
 
@@ -59,7 +59,7 @@ EOM
 ParseCONFIG() ;
 
 UpDowngrade( <getPerlFiles('MANIFEST')) 
-    unless %ENV{?PERL_CORE};
+    unless env::var('PERL_CORE');
 
 WriteMakefile( 
     NAME         => 'Compress::Raw::Zlib',
@@ -199,18 +199,18 @@ sub ParseCONFIG
     die "The following keys are missing from $CONFIG  [$(join ' ',@missing)]\n" 
         if @missing = keys %Parsed ;
 
-    $ZLIB_INCLUDE = %ENV{?'ZLIB_INCLUDE'} || %Info{?'INCLUDE'} ;
-    $ZLIB_LIB = %ENV{?'ZLIB_LIB'} || %Info{?'LIB'} ;
+    $ZLIB_INCLUDE = env::var('ZLIB_INCLUDE') || %Info{?'INCLUDE'} ;
+    $ZLIB_LIB = env::var('ZLIB_LIB') || %Info{?'LIB'} ;
 
     if ($^O eq 'VMS') {
         $ZLIB_INCLUDE = VMS::Filespec::vmspath($ZLIB_INCLUDE);
         $ZLIB_LIB = VMS::Filespec::vmspath($ZLIB_LIB);
     }
 
-    my $y = %ENV{?'OLD_ZLIB'} || %Info{?'OLD_ZLIB'} ;
+    my $y = env::var('OLD_ZLIB') || %Info{?'OLD_ZLIB'} ;
     $OLD_ZLIB = '-DOLD_ZLIB' if $y and $y =~ m/^yes|on|true|1$/i;
 
-    my $x = %ENV{?'BUILD_ZLIB'} || %Info{?'BUILD_ZLIB'} ;
+    my $x = env::var('BUILD_ZLIB') || %Info{?'BUILD_ZLIB'} ;
 
     if ($x and $x =~ m/^yes|on|true|1$/i ) {
 
@@ -234,8 +234,8 @@ sub ParseCONFIG
 	print "Building Zlib enabled\n" ;
     }
 
-    $GZIP_OS_CODE = defined %ENV{?'GZIP_OS_CODE'} 
-                          ?? %ENV{?'GZIP_OS_CODE'} 
+    $GZIP_OS_CODE = defined env::var('GZIP_OS_CODE') 
+                          ?? env::var('GZIP_OS_CODE') 
                           !! %Info{?'GZIP_OS_CODE'} ;
 
 	die "GZIP_OS_CODE not 'AUTO_DETECT' or a number between 0 and 255\n"

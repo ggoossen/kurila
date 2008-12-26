@@ -3481,14 +3481,6 @@ Perl_yylex(pTHX)
 	    yyerror(Perl_form(aTHX_ "Expected ^,&,| or ~ after a ^, but found '%c'", *s));
 	}
     case '~':
-	if (s[1] == '~'
-	    && (PL_expect == XOPERATOR || PL_expect == XTERMORDORDOR))
-	{
-	    s += 2;
-	    Eop(OP_SMARTMATCH);
-	}
-
-
 	if (s[1] == '<') {
 	    s += 2;
 	    UNI(OP_READLINE);
@@ -4830,8 +4822,6 @@ Perl_yylex(pTHX)
 	    PREBLOCK(CONTINUE);
 
 	case KEY_chdir:
-	    /* may use HOME */
-	    (void)gv_fetchpvs("ENV", GV_ADD|GV_NOTQUAL, SVt_PVHV);
 	    UNI(OP_CHDIR);
 
 	case KEY_close:
@@ -5796,10 +5786,6 @@ Perl_yylex(pTHX)
 
 	case KEY_waitpid:
 	    LOP(OP_WAITPID,XTERM);
-
-	case KEY_wantarray:
-	    yyerror(Perl_form(aTHX_ "wantarray keyword is removed"));
-	    goto just_a_word;
 
 	case KEY_write:
 	    yyerror(Perl_form(aTHX_ "write keyword is removed"));
@@ -8652,21 +8638,6 @@ Perl_keyword (pTHX_ const char *name, I32 len)
               name[8] == 't')
           {                                       /* setnetent  */
             return -KEY_setnetent;
-          }
-
-          goto unknown;
-
-        case 'w':
-          if (name[1] == 'a' &&
-              name[2] == 'n' &&
-              name[3] == 't' &&
-              name[4] == 'a' &&
-              name[5] == 'r' &&
-              name[6] == 'r' &&
-              name[7] == 'a' &&
-              name[8] == 'y')
-          {                                       /* wantarray  */
-            return -KEY_wantarray;
           }
 
           goto unknown;

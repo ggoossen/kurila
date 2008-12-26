@@ -3,9 +3,9 @@
 
 
 die "$0: EPOCROOT unset\n" unless exists %ENV{EPOCROOT};
-die "$0: EPOCROOT directory does exists\n" unless -d %ENV{?EPOCROOT};
+die "$0: EPOCROOT directory does exists\n" unless -d env::var('EPOCROOT');
 
-my $EPOC32 = "%ENV{?EPOCROOT}epoc32";
+my $EPOC32 = "$(env::var('EPOCROOT'))epoc32";
 my $EXE = "$EPOC32\\release\\thumb\\urel\\perlapp.app";
 my $RSC = "$EPOC32\\data\\z\\system\\apps\\perlapp\\perlapp.rsc";
 

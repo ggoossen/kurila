@@ -9,7 +9,7 @@
 use Config;
 
 BEGIN {
-    if (%ENV{?PERL_CORE}){
+    if (env::var('PERL_CORE')){
 	push @INC, '../ext/Storable/t';
     } else {
 	unshift @INC, 't';

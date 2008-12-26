@@ -71,7 +71,7 @@ $tests += (nelems @neg_time) * 12;
 $tests += nelems @bad_time;
 $tests += nelems @years;
 $tests += 10;
-$tests += 8 if %ENV{?MAINTAINER};
+$tests += 8 if env::var('MAINTAINER');
 
 plan tests => $tests;
 
@@ -184,10 +184,10 @@ do {
     is($@, '', 'no error with leap day of 1996 (year passed as 96)');
 };
 
-if (%ENV{?MAINTAINER}) {
+if (env::var('MAINTAINER')) {
     require POSIX;
 
-    local %ENV{+TZ} = 'Europe/Vienna';
+    env::temp_set_var('TZ' => 'Europe/Vienna');
     POSIX::tzset();
 
     # 2001-10-28 02:30:00 - could be either summer or standard time,
@@ -196,7 +196,7 @@ if (%ENV{?MAINTAINER}) {
     is($time, 1004229000,
        'timelocal prefers earlier epoch in the presence of a DST change');
 
-    local %ENV{+TZ} = 'America/Chicago';
+    env::temp_set_var('TZ' => 'America/Chicago');
     POSIX::tzset();
 
     # Same local time in America/Chicago.  There is a transition here
@@ -209,7 +209,7 @@ if (%ENV{?MAINTAINER}) {
     is($time, 986113800,
        'timelocal for non-existent time gives you the time one hour later');
 
-    local %ENV{+TZ} = 'Australia/Sydney';
+    env::temp_set_var('TZ' => 'Australia/Sydney');
     POSIX::tzset();
     # 2001-03-25 02:30:00 in Australia/Sydney.  This is the transition
     # _to_ summer time.  The southern hemisphere transitions are
@@ -222,7 +222,7 @@ if (%ENV{?MAINTAINER}) {
     is($time, 1004200200,
        'timelocal for non-existent time gives you the time one hour later');
 
-    local %ENV{+TZ} = 'Europe/London';
+    env::temp_set_var('TZ' => 'Europe/London');
     POSIX::tzset();
     $time = timelocal( localtime(1111917720) );
     is($time, 1111917720,

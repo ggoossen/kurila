@@ -20,7 +20,7 @@ BEGIN {
                      hv_store
 
                     );
-    plan tests => 204 + nelems @Exported_Funcs;
+    plan tests => 203 + nelems @Exported_Funcs;
     use_ok 'Hash::Util', < @Exported_Funcs;
 }
 foreach my $func ( @Exported_Funcs) {
@@ -166,10 +166,6 @@ do {
     ok( !Internals::SvREADONLY(%hash{?bar}),'Was unlocked $hash{bar}' );
 };
 
-
-lock_keys(%ENV);
-try { @() = %ENV{?I_DONT_EXIST} };
-like( $@->{?description}, qr/^Attempt to access disallowed key 'I_DONT_EXIST' in a restricted hash/,   'locked %ENV');
 
 do {
     my %hash;
@@ -390,7 +386,7 @@ do {
 };
 do {
     my %hash=%( <0..9);
-    lock_keys(%hash, <keys(%hash), <'a'..'f');
+    lock_keys(%hash, <keys(%hash), < qw[a b c d e f]);
     ok(Internals::SvREADONLY(%hash),'lock_keys args DDS/t');
     my @hidden=sort(hidden_keys(%hash));
     my @legal=sort(legal_keys(%hash));
@@ -415,7 +411,7 @@ do {
 };
 do {
     my %hash=%( <0..9);
-    lock_ref_keys(\%hash, <keys %hash, <'a'..'f');
+    lock_ref_keys(\%hash, <keys %hash, < qw[a b c d e f]);
     ok(Internals::SvREADONLY(%hash),'lock_ref_keys args DDS/t');
     my @hidden=sort(hidden_keys(%hash));
     my @legal=sort(legal_keys(%hash));
@@ -426,7 +422,7 @@ do {
 };
 do {
     my %hash=%( <0..9);
-    lock_ref_keys_plus(\%hash, <'a'..'f');
+    lock_ref_keys_plus(\%hash, < qw[a b c d e f]);
     ok(Internals::SvREADONLY(%hash),'lock_ref_keys_plus args DDS/t');
     my @hidden=sort(hidden_keys(%hash));
     my @legal=sort(legal_keys(%hash));
@@ -437,7 +433,7 @@ do {
 };
 do {
     my %hash=%( <0..9);
-    lock_keys_plus(%hash, <'a'..'f');
+    lock_keys_plus(%hash, < qw[a b c d e f]);
     ok(Internals::SvREADONLY(%hash),'lock_keys_plus args DDS/t');
     my @hidden=sort(hidden_keys(%hash));
     my @legal=sort(legal_keys(%hash));
@@ -448,7 +444,7 @@ do {
 };
 
 do {
-    my %hash = %( <'a'..'f');
+    my %hash = %( < qw[a b c d e f]);
     my @keys = @( () );
     my @ph = @( () );
     my @lock = @('a', 'c', 'e', 'g');

@@ -191,7 +191,7 @@ PERLVAR(Iperldb,	U32)
 /* pseudo environmental stuff */
 PERLVAR(Iorigargc,	int)
 PERLVAR(Iorigargv,	char **)
-PERLVAR(Ienvgv,		GV *)
+PERLVAR(Ienvhv,		HV *)
 PERLVAR(Iincgv,		GV *)
 PERLVAR(Ihintgv,	GV *)
 PERLVAR(Iorigfilename,	char *)

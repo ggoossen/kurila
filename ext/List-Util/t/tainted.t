@@ -12,9 +12,9 @@ my $var = 2;
 
 ok( !tainted($var), 'known variable');
 
-my $key = (keys %ENV)[0];
+my $key = (env::keys)[0];
 
-ok( tainted(%ENV{?$key}),	'environment variable');
+ok( tainted(env::var($key)),	'environment variable');
 
-$var = %ENV{?$key};
+$var = env::var($key);
 ok( tainted($var),	'copy of environment variable');

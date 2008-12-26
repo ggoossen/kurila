@@ -38,7 +38,6 @@ EXTCONST char* const PL_op_name[] = {
 	"stub",
 	"scalar",
 	"pushmark",
-	"wantarray",
 	"logassign_assign",
 	"const",
 	"gvsv",
@@ -128,7 +127,6 @@ EXTCONST char* const PL_op_name[] = {
 	"i_negate",
 	"not",
 	"complement",
-	"smartmatch",
 	"atan2",
 	"sin",
 	"cos",
@@ -399,7 +397,6 @@ EXTCONST char* const PL_op_desc[] = {
 	"stub",
 	"scalar",
 	"pushmark",
-	"wantarray",
 	"assignment part of a logical assignment",
 	"constant item",
 	"scalar variable",
@@ -489,7 +486,6 @@ EXTCONST char* const PL_op_desc[] = {
 	"integer negation (-)",
 	"not",
 	"1's complement (^~^)",
-	"smart match",
 	"atan2",
 	"sin",
 	"cos",
@@ -772,7 +768,6 @@ EXT Perl_ppaddr_t PL_ppaddr[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_pp_stub),
 	MEMBER_TO_FPTR(Perl_pp_null),	/* Perl_pp_scalar */
 	MEMBER_TO_FPTR(Perl_pp_pushmark),
-	MEMBER_TO_FPTR(Perl_pp_wantarray),
 	MEMBER_TO_FPTR(Perl_pp_logassign_assign),
 	MEMBER_TO_FPTR(Perl_pp_const),
 	MEMBER_TO_FPTR(Perl_pp_gvsv),
@@ -862,7 +857,6 @@ EXT Perl_ppaddr_t PL_ppaddr[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_pp_i_negate),
 	MEMBER_TO_FPTR(Perl_pp_not),
 	MEMBER_TO_FPTR(Perl_pp_complement),
-	MEMBER_TO_FPTR(Perl_pp_smartmatch),
 	MEMBER_TO_FPTR(Perl_pp_atan2),
 	MEMBER_TO_FPTR(Perl_pp_sin),
 	MEMBER_TO_FPTR(Perl_pp_sin),	/* Perl_pp_cos */
@@ -1142,7 +1136,6 @@ EXT Perl_check_t PL_check[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* stub */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* scalar */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* pushmark */
-	MEMBER_TO_FPTR(Perl_ck_null),	/* wantarray */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* logassign_assign */
 	MEMBER_TO_FPTR(Perl_ck_svconst),	/* const */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* gvsv */
@@ -1232,7 +1225,6 @@ EXT Perl_check_t PL_check[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* i_negate */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* not */
 	MEMBER_TO_FPTR(Perl_ck_bitop),	/* complement */
-	MEMBER_TO_FPTR(Perl_ck_smartmatch),	/* smartmatch */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* atan2 */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* sin */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* cos */
@@ -1506,7 +1498,6 @@ EXTCONST U32 PL_opargs[] = {
 	0x00000000,	/* stub */
 	0x00003604,	/* scalar */
 	0x00000004,	/* pushmark */
-	0x00000014,	/* wantarray */
 	0x00000000,	/* logassign_assign */
 	0x00000c04,	/* const */
 	0x00000c44,	/* gvsv */
@@ -1596,7 +1587,6 @@ EXTCONST U32 PL_opargs[] = {
 	0x0000231e,	/* i_negate */
 	0x00002216,	/* not */
 	0x0000220e,	/* complement */
-	0x00000404,	/* smartmatch */
 	0x0002290e,	/* atan2 */
 	0x0001378e,	/* sin */
 	0x0001378e,	/* cos */

@@ -132,7 +132,7 @@ test {
 # test if closures get created in optimized for loops
 
 my %foo;
-for my $n ('A'..'E') {
+for my $n (qw[A B C D E]) {
     %foo{+$n} = sub { $n eq @_[0] };
 }
 

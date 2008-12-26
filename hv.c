@@ -311,7 +311,7 @@ Perl_hv_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
     xhv = (XPVHV*)SvANY(hv);
     if (SvMAGICAL(hv)) {
 	if (SvRMAGICAL(hv) && !(action & (HV_FETCH_ISSTORE|HV_FETCH_ISEXISTS))) {
-	    if ( mg_find((SV*)hv, PERL_MAGIC_tied) || SvGMAGICAL((SV*)hv))
+	    if (SvGMAGICAL((SV*)hv))
 	    {
 		/* FIXME should be able to skimp on the HE/HEK here when
 		   HV_FETCH_JUST_SV is true.  */
@@ -350,43 +350,9 @@ Perl_hv_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
 		}
 		return (void *) entry;
 	    }
-#ifdef ENV_IS_CASELESS
-	    else if (mg_find((SV*)hv, PERL_MAGIC_env)) {
-		U32 i;
-		for (i = 0; i < klen; ++i)
-		    if (isLOWER(key[i])) {
-			/* Would be nice if we had a routine to do the
-			   copy and upercase in a single pass through.  */
-			const char * const nkey = strupr(savepvn(key,klen));
-			/* Note that this fetch is for nkey (the uppercased
-			   key) whereas the store is for key (the original)  */
-			void *result = hv_common(hv, NULL, nkey, klen,
-						 HVhek_FREEKEY, /* free nkey */
-						 0 /* non-LVAL fetch */
-						 | HV_DISABLE_UVAR_XKEY
-						 | return_svp,
-						 NULL /* no value */,
-						 0 /* compute hash */);
-			if (!result && (action & HV_FETCH_LVALUE)) {
-			    /* This call will free key if necessary.
-			       Do it this way to encourage compiler to tail
-			       call optimise.  */
-			    result = hv_common(hv, keysv, key, klen, flags,
-					       HV_FETCH_ISSTORE
-					       | HV_DISABLE_UVAR_XKEY
-					       | return_svp,
-					       newSV(0), hash);
-			} else {
-			    if (flags & HVhek_FREEKEY)
-				Safefree(key);
-			}
-			return result;
-		    }
-	    }
-#endif
 	} /* ISFETCH */
 	else if (SvRMAGICAL(hv) && (action & HV_FETCH_ISEXISTS)) {
-	    if (mg_find((SV*)hv, PERL_MAGIC_tied) || SvGMAGICAL((SV*)hv)) {
+	    if (SvGMAGICAL((SV*)hv)) {
 		/* I don't understand why hv_exists_ent has svret and sv,
 		   whereas hv_exists only had one.  */
 		SV * const svret = sv_newmortal();
@@ -400,33 +366,15 @@ Perl_hv_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
 		}
 		if (flags & HVhek_FREEKEY)
 		    Safefree(key);
-		magic_existspack(svret, mg_find(sv, PERL_MAGIC_tiedelem));
 		/* This cast somewhat evil, but I'm merely using NULL/
 		   not NULL to return the boolean exists.
 		   And I know hv is not NULL.  */
 		return SvTRUE(svret) ? (void *)hv : NULL;
 		}
-#ifdef ENV_IS_CASELESS
-	    else if (mg_find((SV*)hv, PERL_MAGIC_env)) {
-		/* XXX This code isn't UTF8 clean.  */
-		char * const keysave = (char * const)key;
-		/* Will need to free this, so set FREEKEY flag.  */
-		key = savepvn(key,klen);
-		key = (const char*)strupr((char*)key);
-		hash = 0;
-		keysv = 0;
-
-		if (flags & HVhek_FREEKEY) {
-		    Safefree(keysave);
-		}
-		flags |= HVhek_FREEKEY;
-	    }
-#endif
 	} /* ISEXISTS */
 	else if (action & HV_FETCH_ISSTORE) {
 	    bool needs_copy;
-	    bool needs_store;
-	    hv_magic_check (hv, &needs_copy, &needs_store);
+	    hv_magic_check (hv, &needs_copy);
 	    if (needs_copy) {
 		const bool save_taint = PL_tainted;
 		if (keysv) {
@@ -439,49 +387,18 @@ Perl_hv_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
 		}
 
 		TAINT_IF(save_taint);
-		if (!needs_store) {
-		    if (flags & HVhek_FREEKEY)
-			Safefree(key);
-		    return NULL;
-		}
-#ifdef ENV_IS_CASELESS
-		else if (mg_find((SV*)hv, PERL_MAGIC_env)) {
-		    /* XXX This code isn't UTF8 clean.  */
-		    const char *keysave = key;
-		    /* Will need to free this, so set FREEKEY flag.  */
-		    key = savepvn(key,klen);
-		    key = (const char*)strupr((char*)key);
-		    hash = 0;
-		    keysv = 0;
-
-		    if (flags & HVhek_FREEKEY) {
-			Safefree(keysave);
-		    }
-		    flags |= HVhek_FREEKEY;
-		}
-#endif
 	    }
 	} /* ISSTORE */
     } /* SvMAGICAL */
 
     if (!HvARRAY(hv)) {
-	if ((action & (HV_FETCH_LVALUE | HV_FETCH_ISSTORE))
-#ifdef DYNAMIC_ENV_FETCH  /* if it's an %ENV lookup, we may get it on the fly */
-		 || (SvRMAGICAL((SV*)hv) && mg_find((SV*)hv, PERL_MAGIC_env))
-#endif
-								  ) {
+	if ((action & (HV_FETCH_LVALUE | HV_FETCH_ISSTORE))) {
 	    char *array;
 	    Newxz(array,
 		 PERL_HV_ARRAY_ALLOC_BYTES(xhv->xhv_max+1 /* HvMAX(hv)+1 */),
 		 char);
 	    HvARRAY(hv) = (HE**)array;
 	}
-#ifdef DYNAMIC_ENV_FETCH
-	else if (action & HV_FETCH_ISEXISTS) {
-	    /* for an %ENV exists, if we do an insert it's by a recursive
-	       store call, so avoid creating HvARRAY(hv) right now.  */
-	}
-#endif
 	else {
 	    /* XXX remove at some point? */
             if (flags & HVhek_FREEKEY)
@@ -586,20 +503,6 @@ Perl_hv_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
 	}
 	return entry;
     }
-#ifdef DYNAMIC_ENV_FETCH  /* %ENV lookup?  If so, try to fetch the value now */
-    if (!(action & HV_FETCH_ISSTORE) 
-	&& SvRMAGICAL((SV*)hv) && mg_find((SV*)hv, PERL_MAGIC_env)) {
-	unsigned long len;
-	const char * const env = PerlEnv_ENVgetenv_len(key,&len);
-	if (env) {
-	    sv = newSVpvn(env,len);
-	    SvTAINTED_on(sv);
-	    return hv_common(hv, keysv, key, klen, flags,
-			     HV_FETCH_ISSTORE|HV_DISABLE_UVAR_XKEY|return_svp,
-			     sv, hash);
-	}
-    }
-#endif
 
     if (!entry && SvREADONLY(hv) && !(action & HV_FETCH_ISEXISTS)) {
 	hv_notallowed(flags, key, klen,
@@ -703,21 +606,16 @@ Perl_hv_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
 }
 
 STATIC void
-S_hv_magic_check(HV *hv, bool *needs_copy, bool *needs_store)
+S_hv_magic_check(HV *hv, bool *needs_copy)
 {
     const MAGIC *mg = SvMAGIC(hv);
 
     PERL_ARGS_ASSERT_HV_MAGIC_CHECK;
     
     *needs_copy = FALSE;
-    *needs_store = TRUE;
     while (mg) {
 	if (isUPPER(mg->mg_type)) {
 	    *needs_copy = TRUE;
-	    if (mg->mg_type == PERL_MAGIC_tied) {
-		*needs_store = FALSE;
-		return; /* We've set all there is to set. */
-	    }
 	}
 	mg = mg->mg_moremagic;
     }
@@ -737,12 +635,6 @@ Perl_hv_scalar(pTHX_ HV *hv)
     SV *sv;
 
     PERL_ARGS_ASSERT_HV_SCALAR;
-
-    if (SvRMAGICAL(hv)) {
-	MAGIC * const mg = mg_find((SV*)hv, PERL_MAGIC_tied);
-	if (mg)
-	    return magic_scalarpack(hv, mg);
-    }
 
     sv = sv_newmortal();
     if (HvFILL((HV*)hv)) 
@@ -785,8 +677,7 @@ S_hv_delete_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
 
     if (SvRMAGICAL(hv)) {
 	bool needs_copy;
-	bool needs_store;
-	hv_magic_check (hv, &needs_copy, &needs_store);
+	hv_magic_check (hv, &needs_copy);
 
 	if (needs_copy) {
 	    SV *sv;
@@ -799,26 +690,6 @@ S_hv_delete_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
 		if (SvMAGICAL(sv)) {
 		    mg_clear(sv);
 		}
-		if (!needs_store) {
-		    if (mg_find(sv, PERL_MAGIC_tiedelem)) {
-			/* No longer an element */
-			sv_unmagic(sv, PERL_MAGIC_tiedelem);
-			return sv;
-		    }		
-		    return NULL;		/* element cannot be deleted */
-		}
-#ifdef ENV_IS_CASELESS
-		else if (mg_find((SV*)hv, PERL_MAGIC_env)) {
-		    /* XXX This code isn't UTF8 clean.  */
-		    keysv = newSVpvn_flags(key, klen, SVs_TEMP);
-		    if (k_flags & HVhek_FREEKEY) {
-			Safefree(key);
-		    }
-		    key = strupr(SvPVX(keysv));
-		    k_flags = 0;
-		    hash = 0;
-		}
-#endif
 	    }
 	}
     }
@@ -2014,7 +1885,6 @@ Perl_hv_iternext_flags(pTHX_ HV *hv, I32 flags)
     register XPVHV* xhv;
     register HE *entry;
     HE *oldentry;
-    MAGIC* mg;
     struct xpvhv_aux *iter;
 
     PERL_ARGS_ASSERT_HV_ITERNEXT_FLAGS;
@@ -2033,52 +1903,6 @@ Perl_hv_iternext_flags(pTHX_ HV *hv, I32 flags)
     iter = HvAUX(hv);
 
     oldentry = entry = iter->xhv_eiter; /* HvEITER(hv) */
-    if (SvMAGICAL(hv) && SvRMAGICAL(hv)) {
-	if ( ( mg = mg_find((SV*)hv, PERL_MAGIC_tied) ) ) {
-            SV * const key = sv_newmortal();
-            if (entry) {
-                sv_setsv(key, HeSVKEY_force(entry));
-                SvREFCNT_dec(HeSVKEY(entry));       /* get rid of previous key */
-            }
-            else {
-                char *k;
-                HEK *hek;
-
-                /* one HE per MAGICAL hash */
-                iter->xhv_eiter = entry = new_HE(); /* HvEITER(hv) = new_HE() */
-                Zero(entry, 1, HE);
-                Newxz(k, HEK_BASESIZE + sizeof(SV*), char);
-                hek = (HEK*)k;
-                HeKEY_hek(entry) = hek;
-                HeKLEN(entry) = HEf_SVKEY;
-            }
-            magic_nextpack((SV*) hv,mg,key);
-            if (SvOK(key)) {
-                /* force key to stay around until next time */
-                HeSVKEY_set(entry, SvREFCNT_inc_simple_NN(key));
-                return entry;               /* beware, hent_val is not set */
-            }
-            if (HeVAL(entry))
-                SvREFCNT_dec(HeVAL(entry));
-            Safefree(HeKEY_hek(entry));
-            del_HE(entry);
-            iter->xhv_eiter = NULL; /* HvEITER(hv) = NULL */
-            return NULL;
-        }
-    }
-#if defined(DYNAMIC_ENV_FETCH) && !defined(__riscos__)  /* set up %ENV for iteration */
-    if (!entry && SvRMAGICAL((SV*)hv) && mg_find((SV*)hv, PERL_MAGIC_env)) {
-	prime_env_iter();
-#ifdef VMS
-	/* The prime_env_iter() on VMS just loaded up new hash values
-	 * so the iteration count needs to be reset back to the beginning
-	 */
-	hv_iterinit(hv);
-	iter = HvAUX(hv);
-	oldentry = entry = iter->xhv_eiter; /* HvEITER(hv) */
-#endif
-    }
-#endif
 
     /* hv_iterint now ensures this.  */
     assert (HvARRAY(hv));
@@ -2190,16 +2014,6 @@ Perl_hv_iterval(pTHX_ HV *hv, register HE *entry)
 {
     PERL_ARGS_ASSERT_HV_ITERVAL;
 
-    if (SvRMAGICAL(hv)) {
-	if (mg_find((SV*)hv, PERL_MAGIC_tied)) {
-	    SV* const sv = sv_newmortal();
-	    if (HeKLEN(entry) == HEf_SVKEY)
-		mg_copy((SV*)hv, sv, (char*)HeKEY_sv(entry), HEf_SVKEY);
-	    else
-		mg_copy((SV*)hv, sv, HeKEY(entry), HeKLEN(entry));
-	    return sv;
-	}
-    }
     return HeVAL(entry);
 }
 
@@ -2525,20 +2339,6 @@ Perl_hv_assert(pTHX_ HV *hv)
 	if (HeSVKEY(entry)) {
 	    NOOP;   /* Don't know what to check on SV keys.  */
 	} 
-    }
-    if (!SvTIED_mg((SV*)hv, PERL_MAGIC_tied)) {
-	static const char bad_count[] = "Count %d %s(s), but hash reports %d\n";
-	const int nhashkeys = HvUSEDKEYS(hv);
-	const int nhashplaceholders = HvPLACEHOLDERS_get(hv);
-
-	if (nhashkeys != real) {
-	    PerlIO_printf(Perl_debug_log, bad_count, real, "keys", nhashkeys );
-	    bad = 1;
-	}
-	if (nhashplaceholders != placeholders) {
-	    PerlIO_printf(Perl_debug_log, bad_count, placeholders, "placeholder", nhashplaceholders );
-	    bad = 1;
-	}
     }
     if (bad) {
 	sv_dump((SV *)hv);

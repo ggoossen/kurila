@@ -6,7 +6,7 @@ BEGIN {
         $file = $0;
         chdir 't' if -d 't';
 
-        if ( %ENV{?PERL_CORE} ) {
+        if ( env::var('PERL_CORE') ) {
            @INC = @( '../lib' );
         }
 }
@@ -20,7 +20,7 @@ use Test::More;
 
 # these names are hardcoded in Term::Cap
 my $files = join '', grep { -f $_ }
- @(	( %ENV{?HOME} . '/.termcap', # we assume pretty UNIXy system anyway
+ @(	( $(env::var('HOME')) . '/.termcap', # we assume pretty UNIXy system anyway
 	  '/etc/termcap', 
 	  '/usr/share/misc/termcap' ));
 unless( $files || $^O eq 'VMS' ) {
@@ -44,7 +44,7 @@ if (open(TCOUT, ">", "tcout")) {
 }
 
 # termcap_path -- the names are hardcoded in Term::Cap
-%ENV{+TERMCAP} = '';
+env::set_var('TERMCAP' => '');
 my $path = join '', Term::Cap::termcap_path();
 is( $path, $files, 'termcap_path() should find default files' );
 
@@ -52,11 +52,12 @@ SKIP: do {
 	# this is ugly, but -f $0 really *ought* to work
 	skip("-f $file fails, some tests difficult now", 2) unless -f $file;
 
-	%ENV{+TERMCAP} = %ENV{+TERMPATH} = $file;
+	env::set_var('TERMCAP' => $file);
+        env::set_var('TERMPATH' => $file);
 	ok( grep($file, Term::Cap::termcap_path()), 
 		'termcap_path() should find file from $ENV{TERMCAP}' );
 
-	%ENV{+TERMCAP} = '/';
+	env::set_var('TERMCAP' => '/');
 	ok( grep($file, Term::Cap::termcap_path()), 
 		'termcap_path() should find file from $ENV{TERMPATH}' );
 };
@@ -95,7 +96,7 @@ local $^WARN_HOOK = sub {
 };
 
 # test the first few features by forcing Tgetent() to croak (line 156)
-undef %ENV{+TERM};
+env::set_var('TERM', undef);
 my $vals = \%();
 try { local $^W = 1; $t = Term::Cap->Tgetent($vals) };
 like( $@->{?description}, qr/TERM not set/, 'Tgetent() should croaks without TERM' );
@@ -119,9 +120,9 @@ SKIP: do {
         skip('Tgetent() bad termcap test, since using a fixed termcap',1)
               if $^O eq 'VMS';
         # now see if lines 177 or 180 will fail
-        %ENV{+TERM} = 'foo';
-        %ENV{+TERMPATH} = '!';
-        %ENV{+TERMCAP} = '';
+        env::set_var('TERM' => 'foo');
+        env::set_var('TERMPATH' => '!');
+        env::set_var('TERMCAP' => '');
         try { $t = Term::Cap->Tgetent($vals) };
         isnt( $@, '', 'Tgetent() should catch bad termcap file' );
 };
@@ -131,19 +132,19 @@ SKIP: do {
 
 	# it won't find the termtype in this fake file, so it should croak
 	$vals->{+TERM} = 'quux';
-	%ENV{+TERMPATH} = 'tcout';
+	env::set_var('TERMPATH' => 'tcout');
 	try { $t = Term::Cap->Tgetent($vals) };
 	like( $@->{?description}, qr/failed termcap/, 'Tgetent() should die with bad termcap' );
 
 	# it shouldn't try to read one file more than 32(!) times
 	# see __END__ for a really awful termcap example
-	%ENV{+TERMPATH} = join(' ', @( ('tcout') x 33));
+	env::set_var('TERMPATH' => join(' ', @( ('tcout') x 33)));
 	$vals->{+TERM} = 'bar';
 	try { $t = Term::Cap->Tgetent($vals) };
 	like( $@->{?description}, qr/failed termcap loop/, 'Tgetent() should catch deep recursion');
 
 	# now let it read a fake termcap file, and see if it sets properties 
-	%ENV{+TERMPATH} = 'tcout';
+	env::set_var('TERMPATH' => 'tcout');
 	$vals->{+TERM} = 'baz';
 	$t = Term::Cap->Tgetent($vals);
 	is( $t->{?_f1}, 1, 'Tgetent() should set a single field correctly' );
@@ -165,7 +166,7 @@ do {
 
    local *^O;
    local *ENV;
-   delete %ENV{TERM};
+   env::set_var('TERM', undef);
    $^O = 'Win32';
 
    my $foo = Term::Cap->Tgetent();

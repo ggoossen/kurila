@@ -438,15 +438,7 @@ S_refto(pTHX_ SV *sv)
 
     PERL_ARGS_ASSERT_REFTO;
 
-    if (SvTYPE(sv) == SVt_PVLV && LvTYPE(sv) == 'y') {
-	if (LvTARGLEN(sv))
-	    vivify_defelem(sv);
-	if (!(sv = LvTARG(sv)))
-	    sv = &PL_sv_undef;
-	else
-	    SvREFCNT_inc_void_NN(sv);
-    }
-    else if (SvTYPE(sv) == SVt_PVAV) {
+    if (SvTYPE(sv) == SVt_PVAV) {
 	if (!AvREAL((AV*)sv) && AvREIFY((AV*)sv))
 	    av_reify((AV*)sv);
 	SvTEMP_off(sv);
@@ -3559,20 +3551,6 @@ PP(pp_hslice)
     SV ** sliceitem;
     SV ** slicemax;
 
-    if (localizing) {
-        MAGIC *mg;
-        HV *stash;
-
-        other_magic = mg_find((SV*)hv, PERL_MAGIC_env) ||
-            ((mg = mg_find((SV*)hv, PERL_MAGIC_tied))
-             /* Try to preserve the existenceness of a tied hash
-              * element by using EXISTS and DELETE if possible.
-              * Fallback to FETCH and STORE otherwise */
-             && (stash = SvSTASH(SvRV(SvTIED_obj((SV*)hv, mg))))
-             && gv_fetchmethod(stash, "EXISTS")
-             && gv_fetchmethod(stash, "DELETE"));
-    }
-
     if ( ! SvHVOK(hv) )
 	Perl_croak(aTHX_ "Not a HASH");
 
@@ -4136,13 +4114,7 @@ PP(pp_nkeys)
 	int i;
 	HV* hv = (HV*)sv;
 	(void)hv_iterinit(hv);	/* always reset iterator regardless */
-	if (! SvTIED_mg(sv, PERL_MAGIC_tied) ) {
-	    i = HvKEYS(hv);
-	}
-	else {
-	    i = 0;
-	    while (hv_iternext(hv)) i++;
-	}
+	i = HvKEYS(hv);
 
 	SETi( i );
     }
@@ -4165,20 +4137,8 @@ PP(pp_splice)
     I32 newlen;
     I32 after;
     I32 diff;
-    const MAGIC * const mg = SvTIED_mg((SV*)ary, PERL_MAGIC_tied);
 
     do_arg_check(MARK);
-
-    if (mg) {
-	*MARK-- = SvTIED_obj((SV*)ary, mg);
-	PUSHMARK(MARK);
-	PUTBACK;
-	ENTER;
-	call_method("SPLICE",GIMME_V);
-	LEAVE;
-	SPAGAIN;
-	RETURN;
-    }
 
     SP++;
 
@@ -4411,20 +4371,10 @@ PP(pp_unshift)
 {
     dVAR; dSP; dMARK; dORIGMARK; dTARGET;
     register AV *ary = (AV*)*++MARK;
-    const MAGIC * const mg = SvTIED_mg((SV*)ary, PERL_MAGIC_tied);
 
     do_arg_check(MARK);
 
-    if (mg) {
-	*MARK-- = SvTIED_obj((SV*)ary, mg);
-	PUSHMARK(MARK);
-	PUTBACK;
-	ENTER;
-	call_method("UNSHIFT",G_SCALAR|G_DISCARD);
-	LEAVE;
-	SPAGAIN;
-    }
-    else {
+    {
 	register I32 i = 0;
 	av_unshift(ary, SP - MARK);
 	while (MARK < SP) {

@@ -382,7 +382,7 @@ ERR
 
     unless( $test ) {
         my $msg = $todo ?? "Failed (TODO)" !! "Failed";
-        $self->_print_diag("\n") if %ENV{?HARNESS_ACTIVE};
+        $self->_print_diag("\n") if env::var('HARNESS_ACTIVE');
 
     my@(_, $file, $line, ...) =  $self->caller;
         if( defined $name ) {

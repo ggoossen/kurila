@@ -101,10 +101,10 @@ sub new {
   $new->accept_codes('VerbatimFormatted');
   DEBUG +> 2 and print "To accept: ", join(' ', @_to_accept), "\n";
   $new->doc_lang(
-    (  %ENV{?'RTFDEFLANG'} || '') =~ m/^(\d{1,10})$/s ?? $1
-    !! (%ENV{?'RTFDEFLANG'} || '') =~ m/^0?x([a-fA-F0-9]{1,10})$/s ?? hex($1)
+    (  env::var('RTFDEFLANG') || '') =~ m/^(\d{1,10})$/s ?? $1
+    !! (env::var('RTFDEFLANG') || '') =~ m/^0?x([a-fA-F0-9]{1,10})$/s ?? hex($1)
                                       # yes, tolerate hex!
-    !! (%ENV{?'RTFDEFLANG'} || '') =~ m/^([a-fA-F0-9]{4})$/s ?? hex($1)
+    !! (env::var('RTFDEFLANG') || '') =~ m/^([a-fA-F0-9]{4})$/s ?? hex($1)
                                       # yes, tolerate even more hex!
     !! '1033'
   );

@@ -15,7 +15,7 @@ $VERSION = '3.14_02';
 
 BEGIN {  # Make a DEBUG constant very first thing...
   unless(defined &DEBUG) {
-    if((%ENV{?'PERLDOCDEBUG'} || '') =~ m/^(\d+)/) { # untaint
+    if((env::var('PERLDOCDEBUG') || '') =~ m/^(\d+)/) { # untaint
       eval("sub DEBUG () \{$1\}");
       die "WHAT? Couldn't eval-up a DEBUG constant!? $@" if $@;
     } else {
@@ -366,8 +366,8 @@ sub init_formatter_class_list {
   $self->opt_M_with('Pod::Perldoc::ToPod');   # the always-there fallthru
   $self->opt_o_with('text');
   $self->opt_o_with('man') unless IS_MSWin32 || IS_Dos
-       || !(%ENV{?TERM} && (
-              (%ENV{?TERM} || '') !~ m/dumb|emacs|none|unknown/i
+       || !(env::var('TERM') && (
+              (env::var('TERM') || '') !~ m/dumb|emacs|none|unknown/i
            ));
 
   return;
@@ -597,12 +597,12 @@ sub render_and_page {
 sub options_reading {
     my $self = shift;
     
-    if( defined %ENV{?"PERLDOC"} and length %ENV{?"PERLDOC"} ) {
+    if( defined env::var("PERLDOC") and length env::var("PERLDOC") ) {
       require Text::ParseWords;
-      $self->aside("Noting env PERLDOC setting of %ENV{?'PERLDOC'}\n");
+      $self->aside("Noting env PERLDOC setting of $(env::var('PERLDOC'))\n");
       # Yes, appends to the beginning
       unshift @{ $self->{'args'} }, <
-        Text::ParseWords::shellwords( %ENV{?"PERLDOC"} )
+        Text::ParseWords::shellwords( env::var("PERLDOC") )
       ;
       DEBUG +> 1 and print "  Args now: $(join ' ',@{$self->{?'args'}})\n\n";
     } else {
@@ -717,7 +717,7 @@ sub grand_search_init {
             if (IS_VMS) {
                 my($trn);
                 my $i = 0;
-                while ($trn = %ENV{?'DCL$PATH;'.$i}) {
+                while ($trn = env::var('DCL$PATH;'.$i)) {
                     push(@searchdirs,$trn);
                     $i++;
                 }
@@ -725,7 +725,7 @@ sub grand_search_init {
             }
             else {
                 push(@searchdirs, < grep(-d, split(config_value("path_sep"),
-                                                 %ENV{?'PATH'})));
+                                                 env::var('PATH'))));
             }
         }
         my @files = $self->searchfor(0,$page,< @searchdirs);
@@ -1077,7 +1077,7 @@ sub MSWin_temp_cleanup {
  
   my $self = shift;
 
-  my $tempdir = %ENV{?'TEMP'};
+  my $tempdir = env::var('TEMP');
   return unless defined $tempdir and length $tempdir
    and -e $tempdir and -d _ and -w _;
 
@@ -1124,7 +1124,7 @@ sub MSWin_temp_cleanup {
 sub MSWin_perldoc_tempfile {
   my@($self, $suffix, $infix) =  @_;
 
-  my $tempdir = %ENV{?'TEMP'};
+  my $tempdir = env::var('TEMP');
   return unless defined $tempdir and length $tempdir
    and -e $tempdir and -d _ and -w _;
 
@@ -1264,21 +1264,21 @@ sub pagers_guessing {
 
     if (IS_MSWin32) {
         push @pagers, < qw( more< less notepad );
-        unshift @pagers, %ENV{?PAGER}  if %ENV{?PAGER};
+        unshift @pagers, env::var('PAGER')  if env::var('PAGER');
     }
     elsif (IS_VMS) {
         push @pagers, < qw( most more less type/page );
     }
     elsif (IS_Dos) {
         push @pagers, < qw( less.exe more.com< );
-        unshift @pagers, %ENV{?PAGER}  if %ENV{?PAGER};
+        unshift @pagers, env::var('PAGER')  if env::var('PAGER');
     }
     else {
         if (IS_OS2) {
           unshift @pagers, 'less', 'cmd /c more <';
         }
         push @pagers, < qw( more less pg view cat );
-        unshift @pagers, %ENV{?PAGER}  if %ENV{?PAGER};
+        unshift @pagers, env::var('PAGER')  if env::var('PAGER');
     }
 
     if (IS_Cygwin) {
@@ -1287,7 +1287,7 @@ sub pagers_guessing {
         }
     }
 
-    unshift @pagers, %ENV{?PERLDOC_PAGER} if %ENV{?PERLDOC_PAGER};
+    unshift @pagers, env::var('PERLDOC_PAGER') if env::var('PERLDOC_PAGER');
     
     return;   
 }
@@ -1647,9 +1647,9 @@ sub tweak_found_pathnames {
 
 sub am_taint_checking {
     my $self = shift;
-    die "NO ENVIRONMENT?!?!" unless keys %ENV; # reset iterator along the way
-    my@($k,$v) =@( each %ENV);
-    return is_tainted($v);  
+    die "NO ENVIRONMENT?!?!" unless env::keys(); # reset iterator along the way
+    my $v = env::var( env::keys()[0] );
+    return is_tainted($v);
 }
 
 #..........................................................................

@@ -12,7 +12,7 @@ BEGIN {
 use warnings;
 use Config;
 
-plan tests => 43;
+plan tests => 39;
 
 
 my $Is_MSWin32  = $^O eq 'MSWin32';
@@ -23,16 +23,16 @@ my $Is_os2      = $^O eq 'os2';
 my $Is_Cygwin   = $^O eq 'cygwin';
 my $Is_MacOS    = $^O eq 'MacOS';
 my $Is_MPE      = $^O eq 'mpeix';		
-my $Is_miniperl = %ENV{?PERL_CORE_MINITEST};
+my $Is_miniperl = env::var('PERL_CORE_MINITEST');
 my $Is_BeOS     = $^O eq 'beos';
 
-my $PERL = %ENV{?PERL}
+my $PERL = env::var('PERL')
     || ($Is_NetWare           ?? 'perl'   !!
        ($Is_MacOS || $Is_VMS) ?? $^X      !!
        $Is_MSWin32            ?? '.\perl' !!
        './perl');
 
-eval '%ENV{+"FOO"} = "hi there";';	# check that ENV is inited inside eval
+eval 'env::set_var("FOO" => "hi there");';	# check that ENV is inited inside eval
 # cmd.exe will echo 'variable=value' but 4nt will echo just the value
 # -- Nikola Knezevic
 if ($Is_MSWin32)  { ok `set FOO` =~ m/^(?:FOO=)?hi there$/; }
@@ -45,12 +45,6 @@ $! = 0;
 open(FOO, "<",'ajslkdfpqjsjfk');
 ok $!, $!;
 close FOO; # just mention it, squelch used-only-once
-
-# can we slice ENV?
-my @val1 = %ENV{[keys(%ENV)]};
-my @val2 = values(%ENV);
-ok join(':', @val1) eq join(':', @val2);
-ok( (nelems @val1) +> 1 );
 
 # regex vars
 
@@ -188,20 +182,22 @@ if ($Is_VMS || $Is_Dos || $Is_MacOS) {
     skip("\%ENV manipulations fail or aren't safe on $^O") for 1..4;
 }
 else {
-	if (%ENV{?PERL_VALGRIND}) {
+	if (env::var('PERL_VALGRIND')) {
 	    skip("clearing \%ENV is not safe when running under valgrind");
 	} else {
-	    my $PATH = %ENV{?PATH};
-	    my $PDL = %ENV{?PERL_DESTRUCT_LEVEL} || 0;
-	    %ENV{+foo} = "bar";
-	    %ENV = %( () );
-	    %ENV{+PATH} = $PATH;
-	    %ENV{+PERL_DESTRUCT_LEVEL} = $PDL || 0;
+	    my $PATH = env::var('PATH');
+	    my $PDL = env::var('PERL_DESTRUCT_LEVEL') || 0;
+	    env::set_var('foo' => "bar");
+            for (env::keys()) {
+                env::set_var($_, undef);
+            }
+	    env::set_var('PATH' => $PATH);
+	    env::set_var('PERL_DESTRUCT_LEVEL' => $PDL || 0);
 	    ok ($Is_MSWin32 ?? (`set foo 2>NUL` eq "")
 			    !! (`echo \$foo` eq "\n") );
 	}
 
-	%ENV{+__NoNeSuCh} = "foo";
+	env::set_var('__NoNeSuCh' => "foo");
 	$0 = "bar";
 # cmd.exe will echo 'variable=value' but 4nt will echo just the value
 # -- Nikola Knezevic
@@ -256,13 +252,15 @@ SKIP: do {
     # test case-insignificance of %ENV (these tests must be enabled only
     # when perl is compiled with -DENV_IS_CASELESS)
     skip('no caseless %ENV support', 4) unless $Is_MSWin32 || $Is_NetWare;
-    %ENV = %( () );
-    %ENV{+'Foo'} = 'bar';
-    %ENV{+'fOo'} = 'baz';
-    ok (scalar(keys(%ENV)) == 1);
-    ok exists(%ENV{'FOo'});
-    ok (delete(%ENV{'foO'}) eq 'baz');
-    ok (scalar(keys(%ENV)) == 0);
+    for (env::keys()) {
+        env::set_var($_, undef);
+    }
+    env::set_var('Foo' => 'bar');
+    env::set_var('fOo' => 'baz');
+    ok (nelems(env::keys()) == 1);
+    ok defined(env::var('FOo'));
+    env::set_var('foO', undef);
+    ok (nelems(env::keys()) == 0);
 };
 
 if ($Is_miniperl) {
@@ -310,26 +308,13 @@ do {
 };
 
 # Test for bug [perl #36434]
-if (!$Is_VMS) {
+do {
     our @ISA;
     local @ISA;
-    local %ENV;
     # This used to be __PACKAGE__, but that causes recursive
     #  inheritance, which is detected earlier now and broke
     #  this test
     try { push @ISA, __FILE__ };
     ok( $@ eq '', 'Push a constant on a magic array');
     $@ and print "# $@";
-    try { %ENV = %(PATH => __PACKAGE__) };
-    ok( $@ eq '', 'Assign a constant to a magic hash');
-    $@ and print "# $@";
-    try { my %h = %( < qw(A B) ); %ENV = %(PATH => (keys %h)[0]) };
-    ok( $@ eq '', 'Assign a shared key to a magic hash');
-    $@ and print "# $@";
-}
-else {
-# Can not do this test on VMS, EPOC, and SYMBIAN according to comments
-# in mg.c/Perl_magic_clear_all_env()
-#
-    skip(q|Can't make assignment to \%ENV on this system|) for 1..3;
-}
+};

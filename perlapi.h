@@ -268,8 +268,8 @@ END_EXTERN_C
 #define PL_egid			(*Perl_Iegid_ptr(aTHX))
 #undef  PL_endav
 #define PL_endav		(*Perl_Iendav_ptr(aTHX))
-#undef  PL_envgv
-#define PL_envgv		(*Perl_Ienvgv_ptr(aTHX))
+#undef  PL_envhv
+#define PL_envhv		(*Perl_Ienvhv_ptr(aTHX))
 #undef  PL_errgv
 #define PL_errgv		(*Perl_Ierrgv_ptr(aTHX))
 #undef  PL_errorcreatehook

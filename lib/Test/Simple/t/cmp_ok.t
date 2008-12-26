@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 BEGIN {
-    if( %ENV{?PERL_CORE} ) {
+    if( env::var('PERL_CORE') ) {
         chdir 't';
         @INC = @('../lib', 'lib');
     }
@@ -12,8 +12,9 @@ BEGIN {
 
 
 require Test::Simple::Catch;
+use env;
 my@($out, $err) =  Test::Simple::Catch::caught();
-local %ENV{+HARNESS_ACTIVE} = 0;
+env::temp_set_var('HARNESS_ACTIVE' => 0);
 
 require Test::Builder;
 my $TB = Test::Builder->create;

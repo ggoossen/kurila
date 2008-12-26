@@ -47,7 +47,7 @@ my $needs_fh_reopen =
 $needs_fh_reopen = 1 if (defined &Win32::IsWin95 && Win32::IsWin95());
 
 my $skip_mode_checks =
-    $^O eq 'cygwin' && %ENV{?CYGWIN} !~ m/ntsec/;
+    $^O eq 'cygwin' && env::var('CYGWIN') !~ m/ntsec/;
 
 plan tests => 51;
 
@@ -415,7 +415,7 @@ SKIP: do {
 # check if rename() can be used to just change case of filename
 SKIP: do {
     skip "Works in Cygwin only if check_case is set to relaxed", 1
-      if (%ENV{?'CYGWIN'} && (%ENV{?'CYGWIN'} =~ m/check_case:(?:adjust|strict)/));
+      if (env::var('CYGWIN') && (env::var('CYGWIN') =~ m/check_case:(?:adjust|strict)/));
 
     chdir './tmp';
     open(FH, ">",'x') || die "Can't create x";

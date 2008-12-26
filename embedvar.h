@@ -116,7 +116,7 @@
 #define PL_efloatsize		(vTHX->Iefloatsize)
 #define PL_egid			(vTHX->Iegid)
 #define PL_endav		(vTHX->Iendav)
-#define PL_envgv		(vTHX->Ienvgv)
+#define PL_envhv		(vTHX->Ienvhv)
 #define PL_errgv		(vTHX->Ierrgv)
 #define PL_errorcreatehook	(vTHX->Ierrorcreatehook)
 #define PL_errors		(vTHX->Ierrors)
@@ -399,7 +399,7 @@
 #define PL_Iefloatsize		PL_efloatsize
 #define PL_Iegid		PL_egid
 #define PL_Iendav		PL_endav
-#define PL_Ienvgv		PL_envgv
+#define PL_Ienvhv		PL_envhv
 #define PL_Ierrgv		PL_errgv
 #define PL_Ierrorcreatehook	PL_errorcreatehook
 #define PL_Ierrors		PL_errors

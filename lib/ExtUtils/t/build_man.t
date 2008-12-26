@@ -3,7 +3,7 @@
 # Test if MakeMaker declines to build man pages under the right conditions.
 
 BEGIN {
-    if( %ENV{PERL_CORE} ) {
+    if( env::var('PERL_CORE') ) {
         chdir 't' if -d 't';
         @INC = @('../lib', 'lib');
     }

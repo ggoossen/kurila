@@ -383,11 +383,7 @@ Rethrows a previously caught exception.  See L<perlguts/"Exception Handling">.
 
 #if 1		/* for compatibility */
 #  define VTBL_sv		&PL_vtbl_sv
-#  define VTBL_env		&PL_vtbl_env
-#  define VTBL_envelem		&PL_vtbl_envelem
 #  define VTBL_hints		&PL_vtbl_hints
-#  define VTBL_pack		&PL_vtbl_pack
-#  define VTBL_packelem		&PL_vtbl_packelem
 #  define VTBL_dbline		&PL_vtbl_dbline
 #  define VTBL_isa		&PL_vtbl_isa
 #  define VTBL_isaelem		&PL_vtbl_isaelem
@@ -397,7 +393,6 @@ Rethrows a previously caught exception.  See L<perlguts/"Exception Handling">.
 #  define VTBL_taint		&PL_vtbl_taint
 #  define VTBL_bm		&PL_vtbl_bm
 #  define VTBL_uvar		&PL_vtbl_uvar
-#  define VTBL_defelem		&PL_vtbl_defelem
 #  define VTBL_regexp		&PL_vtbl_regexp
 #  define VTBL_regdata		&PL_vtbl_regdata
 #  define VTBL_regdatum		&PL_vtbl_regdatum

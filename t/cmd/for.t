@@ -1,6 +1,6 @@
 #!./perl
 
-print "1..37\n";
+print "1..36\n";
 
 
 our (@x, $y, $c, @ary, $loop_count, @array, $r, $TODO);
@@ -134,10 +134,8 @@ for (1 .. 3) {
 }
 is ($r, '123', 'Forwards for list via ..');
 $r = '';
-for ('A' .. 'C') {
-    $r .= $_;
-}
-is ($r, 'ABC', 'Forwards for list via ..');
+try { for ('A' .. 'C') { $r .= $_; } };
+is($@->message =~ m/Range must be numeric/, 1, "for with non-numeric range");
 
 $r = '';
 for (reverse @array) {
@@ -165,10 +163,9 @@ for (reverse 1 .. 3) {
 }
 is ($r, '321', 'Reverse for list via ..');
 $r = '';
-for (reverse 'A' .. 'C') {
-    $r .= $_;
-}
-is ($r, 'CBA', 'Reverse for list via ..');
+
+try { for (reverse 'A' .. 'C') { $r .= $_; } };
+is($@->message =~ m/Range must be numeric/, 1, "for with non-numeric range");
 
 $r = '';
 for my $i ( @array) {
@@ -195,11 +192,6 @@ for my $i (1 .. 3) {
     $r .= $i;
 }
 is ($r, '123', 'Forwards for list via .. with var');
-$r = '';
-for my $i ('A' .. 'C') {
-    $r .= $i;
-}
-is ($r, 'ABC', 'Forwards for list via .. with var');
 
 $r = '';
 for my $i (reverse @array) {

@@ -123,7 +123,7 @@ print "# we seem to have sparse files...\n";
 # if we are not, the following will hog 5 gigabytes of disk.  Ooops.
 # This may fail by producing some signal; run in a subprocess first for safety
 
-%ENV{LC_ALL} = "C";
+env::set_var('LC_ALL' => "C");
 
 my $r = system '../perl', '-e', <<'EOF';
 open(BIG, ">", "big");

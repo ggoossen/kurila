@@ -36,16 +36,15 @@ sub setcolor {
   require Term::Cap;
 
   my $terminal = Term::Cap->Tgetent(\%(OSPEED => 9600)); # Avoid warning.
-  my $props = %ENV{?PERL_RE_TC} || 'md,me,so,se,us,ue';
+  my $props = env::var('PERL_RE_TC') || 'md,me,so,se,us,ue';
   my @props = split m/,/, $props;
   my $colors = join "\t", map {$terminal->Tputs($_,1)} @props;
 
   $colors =~ s/\0//g;
-  %ENV{+PERL_RE_COLORS} = $colors;
+  env::set_var('PERL_RE_COLORS' => $colors);
  };
  if ($@) {
      die $@;
-    %ENV{+PERL_RE_COLORS} ||= qq'\t\t> <\t> <\t\t';
  }
 
 }

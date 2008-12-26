@@ -65,7 +65,6 @@ Perl_av_tmprefcnt
 Perl_av_unshift
 Perl_block_gimme
 Perl_call_list
-Perl_call_list_onleave
 Perl_cast_ulong
 Perl_cast_i32
 Perl_cast_iv
@@ -596,7 +595,6 @@ Perl_uvchr_to_utf8_flags
 Perl_uvuni_to_utf8_flags
 Perl_pv_uni_display
 Perl_sv_uni_display
-Perl_vivify_defelem
 Perl_seed
 Perl_report_uninit
 Perl_warn

@@ -23,9 +23,9 @@ $Is_MacOS = $^O eq 'MacOS';
 $Is_VMS   = $^O eq 'VMS';
 require VMS::Filespec if $Is_VMS;
 
-$Debug   = %ENV{?PERL_MM_MANIFEST_DEBUG} || 0;
-$Verbose = defined %ENV{?PERL_MM_MANIFEST_VERBOSE} ??
-                   %ENV{?PERL_MM_MANIFEST_VERBOSE} !! 1;
+$Debug   = env::var('PERL_MM_MANIFEST_DEBUG') || 0;
+$Verbose = defined env::var('PERL_MM_MANIFEST_VERBOSE') ??
+                   env::var('PERL_MM_MANIFEST_VERBOSE') !! 1;
 $Quiet = 0;
 $MANIFEST = 'MANIFEST';
 

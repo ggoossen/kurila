@@ -303,6 +303,7 @@ for file do
     pp) ;;
     pp_ctl) ;;
     pp_hot) ;;
+    pp_re) ;;
     pp_pack) ;;
     pp_sort) ;;
     pp_sys) ;;

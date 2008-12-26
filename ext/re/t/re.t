@@ -1,17 +1,18 @@
 #!./perl
 
 use Test::More tests => 13;
+use env;
 require_ok( 're' );
 
 # setcolor
 %INC{+'Term/Cap.pm' } = 1;
-local %ENV{?PERL_RE_TC};
+env::temp_set_var('PERL_RE_TC', undef);
 re::setcolor();
-is( %ENV{?PERL_RE_COLORS}, "md\tme\tso\tse\tus\tue", 
+is( env::var('PERL_RE_COLORS'), "md\tme\tso\tse\tus\tue", 
 	'setcolor() should provide default colors' );
-%ENV{+PERL_RE_TC} = 'su,n,ny';
+env::set_var('PERL_RE_TC' => 'su,n,ny');
 re::setcolor();
-is( %ENV{?PERL_RE_COLORS}, "su\tn\tny", '... or use %ENV{PERL_RE_COLORS}' );
+is( env::var('PERL_RE_COLORS'), "su\tn\tny", '... or use %ENV{PERL_RE_COLORS}' );
 
 # bits
 # get on
@@ -22,12 +23,12 @@ local $^WARN_HOOK = sub {
 #try { re::bits(1) };
 #like( $warn, qr/Useless use/, 'bits() should warn with no args' );
 
-delete %ENV{PERL_RE_COLORS};
+env::set_var('PERL_RE_COLORS', undef);
 re::bits(0, 'debug');
-is( %ENV{?PERL_RE_COLORS}, undef,
+is( env::var('PERL_RE_COLORS'), undef,
 	"... should not set regex colors given 'debug'" );
 re::bits(0, 'debugcolor');
-isnt( %ENV{?PERL_RE_COLORS}, '', 
+isnt( env::var('PERL_RE_COLORS'), '', 
 	"... should set regex colors given 'debugcolor'" );
 re::bits(0, 'nosuchsubpragma');
 like( $warn, qr/Unknown "re" subpragma/, 

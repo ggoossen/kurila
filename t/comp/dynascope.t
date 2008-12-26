@@ -3,7 +3,7 @@ BEGIN {
     require "./test.pl";
 }
 
-plan tests => 8;
+plan tests => 10;
 
 do {
     ## test basic dynascope scope
@@ -38,4 +38,14 @@ do {
         die "xx";
     };
     is( $leave, 1);
+    is( $@->description, "xx" );
+};
+
+do {
+    ## test 'die' inside 'onleave'
+
+    try {
+        push dynascope->{onleave}, sub { die "inside onleave" };
+    };
+    is( $@->description, "inside onleave" );
 };

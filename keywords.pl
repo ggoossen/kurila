@@ -280,7 +280,6 @@ values
 vec
 wait
 waitpid
-wantarray
 warn
 while
 write

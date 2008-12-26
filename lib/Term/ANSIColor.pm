@@ -87,7 +87,7 @@ for (reverse sort keys %attributes) {
 # sequences.  This is to make it easier to write scripts that also work on
 # systems without any ANSI support, like Windows consoles.
 for my $attr (keys %attributes) {
-    my $enable_colors = !defined %ENV{?ANSI_COLORS_DISABLED};
+    my $enable_colors = !defined env::var('ANSI_COLORS_DISABLED');
     Symbol::fetch_glob(uc $attr)->* =
         sub {
             my $xattr = $enable_colors ?? "\e[" . $attr . 'm' !! '';
@@ -105,7 +105,7 @@ for my $attr (keys %attributes) {
 
 # Return the escape code for a given set of color attributes.
 sub color {
-    return '' if defined %ENV{?ANSI_COLORS_DISABLED};
+    return '' if defined env::var('ANSI_COLORS_DISABLED');
     my @codes = map { < split } @_;
     my $attribute = '';
     foreach ( @codes) {
@@ -164,7 +164,7 @@ sub colored {
         $string = shift;
         @codes = @_;
     }
-    return $string if defined %ENV{?ANSI_COLORS_DISABLED};
+    return $string if defined env::var('ANSI_COLORS_DISABLED');
     if (defined $EACHLINE) {
         my $attr = color (< @codes);
         join '', map { $_ ne $EACHLINE ?? $attr . $_ . "\e[0m" !! $_ }

@@ -672,7 +672,7 @@ perl_destruct(pTHXx)
     PL_initav = NULL;
 
     /* shortcuts just get cleared */
-    PL_envgv = NULL;
+    PL_envhv = NULL;
     GvREFCNT_dec(PL_incgv);
     PL_incgv = NULL;
     PL_hintgv = NULL;
@@ -1524,14 +1524,14 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 #  endif
 #endif
 		    sv_catpvs(opts_prog, "; $\"=\"\\n    \"; "
-			      "our @env = map { \"$_=\\\"%ENV{$_}\\\"\" } "
-			      "sort grep {m/^PERL/} keys %ENV; ");
+			      "our @env = map { \"$_=\\\"$(env::var($_))\\\"\" } "
+			      "sort grep {m/^PERL/} env::keys; ");
 #ifdef __CYGWIN__
 		    sv_catpvs(opts_prog,
-			      "push @env, \"CYGWIN=\\\"%ENV{CYGWIN}\\\"\";");
+			      "push @env, \"CYGWIN=\\\"$(env::var('CYGWIN'))\\\"\";");
 #endif
 		    sv_catpvs(opts_prog, 
-			      "print \"  \\%ENV:\\n    $(join ' ', @env)\\n\" if @env;"
+			      "print \"  env:\\n    $(join ' ', @env)\\n\" if @env;"
 			      "print \"  \\@INC:\\n    $(join ' ', @INC)\\n\";");
 		}
 		else {
@@ -4190,12 +4190,9 @@ S_init_postdump_symbols(pTHX_ register int argc, register char **argv, register 
 	magicname("0", "0", 1);
 #endif
     }
-    if ((PL_envgv = gv_fetchpvs("ENV", GV_ADD|GV_NOTQUAL, SVt_PVHV))) {
-	HV *hv;
+    if ((PL_envhv = newHV())) {
+	HV *hv = PL_envhv;
 	bool env_is_not_environ;
-	GvMULTI_on(PL_envgv);
-	hv = GvHVn(PL_envgv);
-	hv_magic(hv, NULL, PERL_MAGIC_env);
 #ifndef PERL_MICRO
 #ifdef USE_ENVIRON_ARRAY
 	/* Note that if the supplied env parameter is actually a copy
@@ -4627,67 +4624,6 @@ S_incpush(pTHX_ const char *dir, bool addsubdirs, bool addoldvers, bool usesep,
     if (subdir) {
 	assert (SvREFCNT(subdir) == 1);
 	SvREFCNT_dec(subdir);
-    }
-}
-
-void
-Perl_call_list_onleave(pTHX_ I32 oldscope, AV *paramList)
-{
-    dVAR;
-    SV *atsv;
-    CV *cv;
-    int ret;
-    dJMPENV;
-
-    PERL_ARGS_ASSERT_CALL_LIST_ONLEAVE;
-
-    while (av_len(paramList) >= 0) {
-	cv = (CV*)av_pop(paramList);
-	JMPENV_PUSH(ret);
-	switch (ret) {
-	case 0:
-	    {
-		SV *old_diehook = PL_diehook;
-		PL_diehook = PERL_DIEHOOK_IGNORE;
-		PUSHMARK(PL_stack_sp);
-		call_sv((SV*)(cv), G_EVAL|G_KEEPERR|G_DISCARD|G_VOID);
-		PL_diehook = old_diehook;
-	    }
-	    atsv = ERRSV;
-	    if (SvTRUE(atsv)) {
-		PL_curcop = &PL_compiling;
-		while (PL_scopestack_ix > oldscope)
-		    LEAVE;
-		JMPENV_POP;
-
-		vdie_common(atsv, FALSE);
-	    }
-	    break;
-	case 1:
-	    STATUS_ALL_FAILURE;
-	    /* FALL THROUGH */
-	case 2:
-	    /* my_exit() was called */
-	    while (PL_scopestack_ix > oldscope)
-		LEAVE;
-	    FREETMPS;
-	    PL_curcop = &PL_compiling;
-	    JMPENV_POP;
-	    if (PL_statusvalue && !(PL_exit_flags & PERL_EXIT_EXPECTED)) {
-		Perl_croak(aTHX_ "'onleave' failed");
-	    }
-	    my_exit_jump();
-	    /* NOTREACHED */
-	case 3:
-	    if (PL_restartop) {
-		PL_curcop = &PL_compiling;
-		JMPENV_JUMP(3);
-	    }
-	    PerlIO_printf(Perl_error_log, "panic: restartop\n");
-	    FREETMPS;
-	    break;
-	}
-	JMPENV_POP;
     }
 }
 

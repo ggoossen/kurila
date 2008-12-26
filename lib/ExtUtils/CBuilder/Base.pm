@@ -239,7 +239,7 @@ sub perl_src {
   # N.B. makemaker actually searches regardless of PERL_CORE, but
   # only squawks at not finding it if PERL_CORE is set
 
-  return unless %ENV{?PERL_CORE};
+  return unless env::var('PERL_CORE');
 
   my $Updir = File::Spec->updir;
   my $dir   = File::Spec->curdir;

@@ -20,7 +20,7 @@ Use of uninitialized value $::3 in oct at - line 3 character 1.
 ########
 # mg.c
 use warnings 'uninitialized';
-%ENV{+FOO} = undef; # should not warn
+env::set_var(FOO => undef); # should not warn
 EXPECT
 
 ########

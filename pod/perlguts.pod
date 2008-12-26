@@ -1030,9 +1030,6 @@ The current kinds of Magic Virtual Tables are:
                                                  (@+ and @- vars)
     d  PERL_MAGIC_regdatum       vtbl_regdatum   Regex match position data
                                                  element
-    E  PERL_MAGIC_env            vtbl_env        %ENV hash
-    e  PERL_MAGIC_envelem        vtbl_envelem    %ENV hash element
-    f  PERL_MAGIC_fm             vtbl_fm         Formline ('compiled' format)
     g  PERL_MAGIC_regex_global   vtbl_mglob      m//g target / study()ed string
     H  PERL_MAGIC_hints          vtbl_hints      %^H hash
     h  PERL_MAGIC_hintselem      vtbl_hintselem  %^H hash element
@@ -1042,15 +1039,11 @@ The current kinds of Magic Virtual Tables are:
     L  PERL_MAGIC_dbfile         (none)          Debugger %_<filename
     l  PERL_MAGIC_dbline         vtbl_dbline     Debugger %_<filename element
     o  PERL_MAGIC_collxfrm       vtbl_collxfrm   Locale collate transformation
-    P  PERL_MAGIC_tied           vtbl_pack       Tied array or hash
-    p  PERL_MAGIC_tiedelem       vtbl_packelem   Tied array or hash element
-    q  PERL_MAGIC_tiedscalar     vtbl_packelem   Tied scalar or handle
     r  PERL_MAGIC_qr             vtbl_qr         precompiled qr// regex
     t  PERL_MAGIC_taint          vtbl_taint      Taintedness
     U  PERL_MAGIC_uvar           vtbl_uvar       Available for use by extensions
     V  PERL_MAGIC_vstring        (none)          v-string scalars
     w  PERL_MAGIC_utf8           vtbl_utf8       UTF-8 length+offset cache
-    y  PERL_MAGIC_defelem        vtbl_defelem    Shadow "foreach" iterator
                                                  variable / smart parameter
                                                  vivification
     .  PERL_MAGIC_pos            vtbl_pos        pos() lvalue

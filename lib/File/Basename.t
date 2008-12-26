@@ -1,5 +1,6 @@
 #!./perl -Tw
 
+use env;
 use Test::More tests => 64;
 
 BEGIN { use_ok 'File::Basename' }
@@ -40,8 +41,8 @@ do {
     is(dirname('arma:virumque.cano'), 'arma:');
 
     do {
-        local %ENV{+DEFAULT} = '' unless exists %ENV{DEFAULT};
-        is(dirname('virumque.cano'), %ENV{?DEFAULT});
+        env::temp_set_var('DEFAULT' => '') unless defined env::var('DEFAULT');
+        is(dirname('virumque.cano'), env::var('DEFAULT'));
         is(dirname('arma/'), '.');
     };
 };

@@ -32,7 +32,7 @@ my @neg = qw(__FILE__ __LINE__ __PACKAGE__ and abs alarm atan2 accept bless
 	    shmwrite shutdown sin sleep socket socketpair sprintf splice sqrt
 	    srand stat substr system symlink syscall sysopen sysread sysseek
 	    syswrite tell time times telldir truncate uc utime umask unpack
-	    unlink unshift ucfirst values vec warn wait write waitpid wantarray
+	    unlink unshift ucfirst values vec warn wait write waitpid
 	    x xor);
 
 my %feature_kw = (

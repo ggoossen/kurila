@@ -148,7 +148,7 @@ sub prompt ($;$) {  ## no critic
     print "$mess $dispdef";
 
     my $ans;
-    if (%ENV{?PERL_MM_USE_DEFAULT} || (!$isa_tty && eof STDIN)) {
+    if (env::var('PERL_MM_USE_DEFAULT') || (!$isa_tty && eof STDIN)) {
         print "$def\n";
     }
     else {
@@ -486,7 +486,7 @@ END
         my @fm = grep m/^FIRST_MAKEFILE=/, @ARGV;
         parse_args($self,< @fm) if (nelems @fm);
     } else {
-        parse_args($self, <split(' ', %ENV{?PERL_MM_OPT} || ''),< @ARGV);
+        parse_args($self, <split(' ', env::var('PERL_MM_OPT') || ''),< @ARGV);
     }
 
 

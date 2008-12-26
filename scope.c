@@ -599,12 +599,6 @@ Perl_save_aelem(pTHX_ AV *av, I32 idx, SV **sptr)
 	SvREFCNT_inc_void(*sptr);
     save_scalar_at(sptr);
     sv = *sptr;
-    /* If we're localizing a tied array element, this new sv
-     * won't actually be stored in the array - so it won't get
-     * reaped when the localize ends. Ensure it gets reaped by
-     * mortifying it instead. DAPM */
-    if (SvTIED_mg(sv, PERL_MAGIC_tiedelem))
-	sv_2mortal(sv);
 }
 
 void
@@ -623,12 +617,6 @@ Perl_save_helem(pTHX_ HV *hv, SV *key, SV **sptr)
     SSPUSHINT(SAVEt_HELEM);
     save_scalar_at(sptr);
     sv = *sptr;
-    /* If we're localizing a tied hash element, this new sv
-     * won't actually be stored in the hash - so it won't get
-     * reaped when the localize ends. Ensure it gets reaped by
-     * mortifying it instead. DAPM */
-    if (SvTIED_mg(sv, PERL_MAGIC_tiedelem))
-	sv_2mortal(sv);
 }
 
 SV*
@@ -924,8 +912,6 @@ Perl_leave_scope(pTHX_ I32 base)
 	    if (ptr) {
 		sv = *(SV**)ptr;
 		if (sv && sv != &PL_sv_undef) {
-		    if (SvTIED_mg((SV*)av, PERL_MAGIC_tied))
-			SvREFCNT_inc_void_NN(sv);
 		    goto restore_sv;
 		}
 	    }
@@ -941,8 +927,6 @@ Perl_leave_scope(pTHX_ I32 base)
 		const SV * const oval = HeVAL((HE*)ptr);
 		if (oval && oval != &PL_sv_undef) {
 		    ptr = &HeVAL((HE*)ptr);
-		    if (SvTIED_mg((SV*)hv, PERL_MAGIC_tied))
-			SvREFCNT_inc_void(*(SV**)ptr);
 		    SvREFCNT_dec(sv);
 		    av = (AV*)hv; /* what to refcnt_dec */
 		    goto restore_sv;
@@ -1143,7 +1127,6 @@ Perl_cx_dump(pTHX_ PERL_CONTEXT *cx)
 	break;
 
     case CXt_LOOP_LAZYIV:
-    case CXt_LOOP_LAZYSV:
     case CXt_LOOP_FOR:
     case CXt_LOOP_PLAIN:
 	PerlIO_printf(Perl_debug_log, "BLK_LOOP.LABEL = %s\n", CxLABEL(cx));

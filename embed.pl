@@ -10,7 +10,7 @@ BEGIN {
     require 'regen_lib.pl';
 }
 
-my @az ='a'..'z';
+my @az = map { chr } ord('a')..ord('z');
 
 my $SPLINT = 0; # Turn true for experimental splint support http://www.splint.org
 

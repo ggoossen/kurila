@@ -21,7 +21,7 @@ sub file_name_is_absolute {
 }
 
 sub path {
-    my $path = %ENV{?PATH};
+    my $path = env::var('PATH');
     $path =~ s:\\:/:g;
     my @path = split(';',$path);
     foreach ( @path) { $_ = '.' if $_ eq '' }
@@ -36,7 +36,7 @@ sub _cwd {
 my $tmpdir;
 sub tmpdir {
     return $tmpdir if defined $tmpdir;
-    my @d = %ENV{[qw(TMPDIR TEMP TMP)]};	# function call could autovivivy
+    my @d = map { env::var($_) } qw(TMPDIR TEMP TMP);
     $tmpdir = @_[0]->_tmpdir( < @d, '/tmp', '/'  );
 }
 

@@ -3673,9 +3673,6 @@ Gid_t getegid (void);
 
 #define PERL_MAGIC_sv		  '\0' /* Special scalar variable */
 #define PERL_MAGIC_bm		  'B' /* Boyer-Moore (fast string search) */
-#define PERL_MAGIC_env		  'E' /* %ENV hash */
-#define PERL_MAGIC_envelem	  'e' /* %ENV hash element */
-#define PERL_MAGIC_fm		  'f' /* Formline ('compiled' format) */
 #define PERL_MAGIC_regex_global	  'g' /* m//g target / study()ed string */
 #define PERL_MAGIC_hints	  'H' /* %^H hash */
 #define PERL_MAGIC_hintselem	  'h' /* %^H hash element */
@@ -3685,16 +3682,12 @@ Gid_t getegid (void);
 #define PERL_MAGIC_dbline	  'l' /* Debugger %_<filename element */
 #define PERL_MAGIC_shared	  'N' /* Shared between threads */
 #define PERL_MAGIC_shared_scalar  'n' /* Shared between threads */
-#define PERL_MAGIC_tied		  'P' /* Tied array or hash */
-#define PERL_MAGIC_tiedelem	  'p' /* Tied array or hash element */
 #define PERL_MAGIC_qr		  'r' /* precompiled qr// regex */
 #define PERL_MAGIC_taint	  't' /* Taintedness */
 #define PERL_MAGIC_uvar		  'U' /* Available for use by extensions */
 #define PERL_MAGIC_uvar_elem	  'u' /* Reserved for use by extensions */
 #define PERL_MAGIC_vstring	  'V' /* SV was vstring literal */
 #define PERL_MAGIC_utf8		  'w' /* Cached UTF-8 information */
-#define PERL_MAGIC_defelem	  'y' /* Shadow "foreach" iterator variable /
-					smart parameter vivification */
 #define PERL_MAGIC_backref	  '<' /* for weak ref data */
 #define PERL_MAGIC_symtab	  ':' /* extra data for symbol tables */
 #define PERL_MAGIC_rhash	  '%' /* extra data for restricted hashes */
@@ -4426,11 +4419,7 @@ typedef enum {
 
 enum {		/* pass one of these to get_vtbl */
     want_vtbl_sv,
-    want_vtbl_env,
-    want_vtbl_envelem,
     want_vtbl_hints,
-    want_vtbl_pack,
-    want_vtbl_packelem,
     want_vtbl_dbline,
     want_vtbl_isa,
     want_vtbl_isaelem,
@@ -4439,7 +4428,6 @@ enum {		/* pass one of these to get_vtbl */
     want_vtbl_taint,
     want_vtbl_bm,
     want_vtbl_uvar,
-    want_vtbl_defelem,
     want_vtbl_regexp,
     want_vtbl_backref,
     want_vtbl_utf8,
@@ -4727,59 +4715,11 @@ MGVTBL_SET(
 );
 
 MGVTBL_SET(
-    PL_vtbl_env,
-    0,
-    MEMBER_TO_FPTR(Perl_magic_set_all_env),
-    0,
-    MEMBER_TO_FPTR(Perl_magic_clear_all_env),
-    0,
-    0,
-    0,
-    0
-);
-
-MGVTBL_SET(
-    PL_vtbl_envelem,
-    0,
-    MEMBER_TO_FPTR(Perl_magic_setenv),
-    0,
-    MEMBER_TO_FPTR(Perl_magic_clearenv),
-    0,
-    0,
-    0,
-    0
-);
-
-MGVTBL_SET(
     PL_vtbl_hints,
     0,
     0,
     0,
     0,
-    0,
-    0,
-    0,
-    0
-);
-
-MGVTBL_SET(
-    PL_vtbl_pack,
-    0,
-    0,
-    MEMBER_TO_FPTR(Perl_magic_sizepack),
-    MEMBER_TO_FPTR(Perl_magic_wipepack),
-    0,
-    0,
-    0,
-    0
-);
-
-MGVTBL_SET(
-    PL_vtbl_packelem,
-    MEMBER_TO_FPTR(Perl_magic_getpack),
-    MEMBER_TO_FPTR(Perl_magic_setpack),
-    0,
-    MEMBER_TO_FPTR(Perl_magic_clearpack),
     0,
     0,
     0,
@@ -4874,18 +4814,6 @@ MGVTBL_SET(
     PL_vtbl_uvar,
     MEMBER_TO_FPTR(Perl_magic_getuvar),
     MEMBER_TO_FPTR(Perl_magic_setuvar),
-    0,
-    0,
-    0,
-    0,
-    0,
-    0
-);
-
-MGVTBL_SET(
-    PL_vtbl_defelem,
-    MEMBER_TO_FPTR(Perl_magic_getdefelem),
-    MEMBER_TO_FPTR(Perl_magic_setdefelem),
     0,
     0,
     0,

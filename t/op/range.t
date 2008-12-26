@@ -5,7 +5,7 @@ require './test.pl';
 
 use Config;
 
-plan (115);
+plan (101);
 
 our (@a, @foo, @bar, @bcd, $e, $x, @x, @b, @y);
 
@@ -39,14 +39,11 @@ for (@((100, <2..99,1))) {
 }
 is($x, 5050);
 
-$x = join('','a'..'z');
-is($x, 'abcdefghijklmnopqrstuvwxyz');
+eval_dies_like( qq[ join('','a'..'z') ],
+                qr/Range must be numeric/ );
 
-@x = 'A'..'ZZ';
-is (scalar nelems @x, 27 * 26);
-
-@x = '09' .. '08';  # should produce '09', '10',... '99' (strange but true)
-is(join(",", @x), join(",", map {sprintf "\%02d",$_} 9..99));
+@x = '09' .. '08';
+is(join(",", @x), '');
 
 # same test with foreach (which is a separate implementation)
 @y = @( () );
@@ -73,15 +70,6 @@ is ("$(join ' ',@a)", $a);
 
 is ("$(join ' ',@b)", $b);
 
-# check magic
-do {
-    my $bad = 0;
-    local $^WARN_HOOK = sub { $bad = 1 };
-    my $x = 'a-e';
-    $x =~ s/(\w)-(\w)/$(join ':', $1 .. $2)/;
-    is ($x, 'a:b:c:d:e');
-};
-
 # Should use magical autoinc only when both are strings
 do {
     my $scalar = "0"..-1;
@@ -107,14 +95,8 @@ is(join(":",-2..undef), '-2:-1:0');
 is(join(":",undef..'2'), '0:1:2');
 is(join(":",'-2'..undef), '-2:-1:0');
 
-# undef should be treated as "" for magical range
-is(join(":", map "[$_]", "".."B"), '[]');
-is(join(":", map "[$_]", undef.."B"), '[]');
-is(join(":", map "[$_]", "B"..""), '');
-is(join(":", map "[$_]", "B"..undef), '');
-
 # undef..undef used to segfault
-is(join(":", map "[$_]", undef..undef), '[]');
+is(join(":", map "[$_]", undef..undef), '[0]');
 
 # also test undef in foreach loops
 @foo= @(() ); push @foo, $_ for undef..2;
@@ -129,20 +111,8 @@ is(join(":", @foo), '0:1:2');
 @foo= @(() ); push @foo, $_ for '-2'..undef;
 is(join(":", @foo), '-2:-1:0');
 
-@foo= @(() ); push @foo, $_ for undef.."B";
-is(join(":", map "[$_]", @foo), '[]');
-
-@foo= @(() ); push @foo, $_ for "".."B";
-is(join(":", map "[$_]", @foo), '[]');
-
-@foo= @(() ); push @foo, $_ for "B"..undef;
-is(join(":", map "[$_]", @foo), '');
-
-@foo= @(() ); push @foo, $_ for "B".."";
-is(join(":", map "[$_]", @foo), '');
-
 @foo= @(() ); push @foo, $_ for undef..undef;
-is(join(":", map "[$_]", @foo), '[]');
+is(join(":", map "[$_]", @foo), '[0]');
 
 # again with magic
 do {
@@ -166,30 +136,6 @@ do {
     "-2" =~ m/(.+)/;
     @foo= @(() ); push @foo, $_ for $1..undef;
     is(join(":", @foo), '-2:-1:0');
-};
-do {
-    local $1;
-    "B" =~ m/(.+)/;
-    @foo= @(() ); push @foo, $_ for undef..$1;
-    is(join(":", map "[$_]", @foo), '[]');
-};
-do {
-    local $1;
-    "B" =~ m/(.+)/;
-    @foo= @(() ); push @foo, $_ for ""..$1;
-    is(join(":", map "[$_]", @foo), '[]');
-};
-do {
-    local $1;
-    "B" =~ m/(.+)/;
-    @foo= @(() ); push @foo, $_ for $1..undef;
-    is(join(":", map "[$_]", @foo), '');
-};
-do {
-    local $1;
-    "B" =~ m/(.+)/;
-    @foo= @(() ); push @foo, $_ for $1.."";
-    is(join(":", map "[$_]", @foo), '');
 };
 
 # Test upper range limit

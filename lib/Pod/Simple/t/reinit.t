@@ -4,7 +4,7 @@ plan tests => 5;
 
 sub source_path {
     my $file = shift;
-    if (%ENV{?PERL_CORE}) {
+    if (env::var('PERL_CORE')) {
         require File::Spec;
         my $updir = File::Spec->updir;
         my $dir = File::Spec->catdir ($updir, 'lib', 'Pod', 'Simple', 't');

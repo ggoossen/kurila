@@ -1960,6 +1960,7 @@ pp.c				Push/Pop code
 pp_ctl.c			Push/Pop code for control flow
 pp.h				Push/Pop code defs
 pp_hot.c			Push/Pop code for heavily used opcodes
+pp_re.c			Push/Pop code for regex related opcodes
 pp_pack.c			Push/Pop code for pack/unpack
 pp_proto.h			C++ definitions for Push/Pop code
 pp_sort.c			Push/Pop code for sort

@@ -3814,7 +3814,6 @@ Perl_sv_magic(pTHX_ register SV *const sv, SV *const obj, const int how,
 	    && IN_PERL_RUNTIME
 	    && how != PERL_MAGIC_regex_global
 	    && how != PERL_MAGIC_bm
-	    && how != PERL_MAGIC_fm
 	    && how != PERL_MAGIC_sv
 	    && how != PERL_MAGIC_backref
 	   )
@@ -3845,12 +3844,6 @@ Perl_sv_magic(pTHX_ register SV *const sv, SV *const obj, const int how,
     case PERL_MAGIC_bm:
 	vtable = &PL_vtbl_bm;
 	break;
-    case PERL_MAGIC_env:
-	vtable = &PL_vtbl_env;
-	break;
-    case PERL_MAGIC_envelem:
-	vtable = &PL_vtbl_envelem;
-	break;
     case PERL_MAGIC_regex_global:
 	vtable = &PL_vtbl_mglob;
 	break;
@@ -3865,12 +3858,6 @@ Perl_sv_magic(pTHX_ register SV *const sv, SV *const obj, const int how,
 	break;
     case PERL_MAGIC_dbline:
 	vtable = &PL_vtbl_dbline;
-	break;
-    case PERL_MAGIC_tied:
-	vtable = &PL_vtbl_pack;
-	break;
-    case PERL_MAGIC_tiedelem:
-	vtable = &PL_vtbl_packelem;
 	break;
     case PERL_MAGIC_qr:
 	vtable = &PL_vtbl_regexp;
@@ -3891,9 +3878,6 @@ Perl_sv_magic(pTHX_ register SV *const sv, SV *const obj, const int how,
 	break;
     case PERL_MAGIC_utf8:
 	vtable = &PL_vtbl_utf8;
-	break;
-    case PERL_MAGIC_defelem:
-	vtable = &PL_vtbl_defelem;
 	break;
     case PERL_MAGIC_backref:
 	vtable = &PL_vtbl_backref;

@@ -116,27 +116,27 @@ sub termcap_path
     my @termcap_path;
 
     # $TERMCAP, if it's a filespec
-    push( @termcap_path, %ENV{?TERMCAP} )
+    push( @termcap_path, env::var('TERMCAP') )
       if (
-        ( exists %ENV{TERMCAP} )
+        ( defined env::var('TERMCAP') )
         && (
             ( $^O eq 'os2' || $^O eq 'MSWin32' || $^O eq 'dos' )
-            ?? %ENV{?TERMCAP} =~ m/^[a-z]:[\\\/]/is
-            !! %ENV{?TERMCAP} =~ m/^\//s
+            ?? env::var('TERMCAP') =~ m/^[a-z]:[\\\/]/is
+            !! env::var('TERMCAP') =~ m/^\//s
         )
       );
-    if ( ( exists %ENV{TERMPATH} ) && ( %ENV{?TERMPATH} ) )
+    if ( env::var('TERMPATH') )
     {
 
         # Add the users $TERMPATH
-        push( @termcap_path, < split( m/(:|\s+)/, %ENV{?TERMPATH} ) );
+        push( @termcap_path, < split( m/(:|\s+)/, env::var('TERMPATH') ) );
     }
     else
     {
 
         # Defaults
         push( @termcap_path,
-            exists %ENV{'HOME'} ?? %ENV{?'HOME'} . '/.termcap' !! undef,
+            defined env::var('HOME') ?? env::var('HOME') . '/.termcap' !! undef,
             '/etc/termcap', '/usr/share/misc/termcap', );
     }
 
@@ -236,9 +236,9 @@ sub Tgetent
 
     unless ( $self->{?TERM} )
     {
-       if ( %ENV{?TERM} )
+       if ( env::var('TERM') )
        {
-         $self->{+TERM} =  %ENV{?TERM} ;
+         $self->{+TERM} =  env::var('TERM') ;
        }
        else
        {
@@ -262,7 +262,7 @@ sub Tgetent
     $termpat = $tmp_term;
     $termpat =~ s/(\W)/\\$1/g;
 
-    my $foo = ( exists %ENV{TERMCAP} ?? %ENV{?TERMCAP} !! '' );
+    my $foo = env::var('TERMCAP') // '' ;
 
     # $entry is the extracted termcap entry
     if ( ( $foo !~ m:^/:s ) && ( $foo =~ m/(^|\|)$termpat(?:)[:|]/s ) )
@@ -276,7 +276,7 @@ sub Tgetent
     {
 
         # last resort--fake up a termcap from terminfo
-        local %ENV{+TERM} = $term;
+        env::temp_set_var('TERM' => $term);
 
         if ( $^O eq 'VMS' )
         {
@@ -284,7 +284,7 @@ sub Tgetent
         }
         else
         {
-            if ( grep { -x "$_/infocmp" } split m/:/, %ENV{?PATH} )
+            if ( grep { -x "$_/infocmp" } split m/:/, env::var('PATH') )
             {
                 try {
                     my $tmp = `infocmp -C 2>/dev/null`;

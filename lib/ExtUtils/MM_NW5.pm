@@ -28,7 +28,7 @@ our @ISA = qw(ExtUtils::MM_Win32);
 
 use ExtUtils::MakeMaker < qw( &neatvalue );
 
-%ENV{+EMXSHELL} = 'sh'; # to run `commands`
+env::set_var('EMXSHELL' => 'sh'); # to run `commands`
 
 my $BORLAND  = %Config{?'cc'} =~ m/^bcc/i;
 my $GCC      = %Config{?'cc'} =~ m/^gcc/i;

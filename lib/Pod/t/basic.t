@@ -26,7 +26,7 @@ use Pod::Text::Termcap;
 # these tests are run as part of Perl core.
 sub source_path {
     my $file = shift;
-    if (%ENV{?PERL_CORE}) {
+    if (env::var('PERL_CORE')) {
         require File::Spec;
         my $updir = File::Spec->updir;
         my $dir = File::Spec->catdir ($updir, 'lib', 'Pod', 't');
@@ -39,9 +39,9 @@ sub source_path {
 print "ok 1\n";
 
 # Hard-code a few values to try to get reproducible results.
-%ENV{+COLUMNS} = 80;
-%ENV{+TERM} = 'xterm';
-%ENV{+TERMCAP} = 'xterm:co=80:do=^J:md=\E[1m:us=\E[4m:me=\E[m';
+env::set_var('COLUMNS' => 80);
+env::set_var('TERM' => 'xterm');
+env::set_var('TERMCAP' => 'xterm:co=80:do=^J:md=\E[1m:us=\E[4m:me=\E[m');
 
 # Map of translators to file extensions to find the formatted output to
 # compare against.

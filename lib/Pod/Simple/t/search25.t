@@ -20,7 +20,7 @@ print "# CWD: $cwd\n";
 my $dir;
 sub source_path {
     my $file = shift;
-    if (%ENV{?PERL_CORE}) {
+    if (env::var('PERL_CORE')) {
         my $updir = File::Spec->updir;
         $dir = File::Spec->catdir($updir, 'lib', 'Pod', 'Simple', 't');
         return File::Spec->catdir ($dir, $file);

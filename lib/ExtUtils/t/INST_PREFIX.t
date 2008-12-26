@@ -6,7 +6,7 @@
 # Essentially, this test is a Makefile.PL.
 
 BEGIN {
-    if( %ENV{PERL_CORE} ) {
+    if( env::var('PERL_CORE') ) {
         chdir 't' if -d 't';
         @INC = @('../lib', 'lib');
     }
@@ -51,7 +51,7 @@ my $mm = WriteMakefile(
     NAME          => 'Big::Dummy',
     VERSION_FROM  => 'lib/Big/Dummy.pm',
     PREREQ_PM     => \%(),
-    PERL_CORE     => %ENV{PERL_CORE},
+    PERL_CORE     => env::var('PERL_CORE'),
 );
 
 like( $stdout, qr{
@@ -80,7 +80,7 @@ $mm = WriteMakefile(
     NAME          => 'Big::Dummy',
     VERSION_FROM  => 'lib/Big/Dummy.pm',
     PREREQ_PM     => \%(),
-    PERL_CORE     => %ENV{PERL_CORE},
+    PERL_CORE     => env::var('PERL_CORE'),
     PREFIX        => $PREFIX,
 );
 like( $stdout, qr{
@@ -98,10 +98,10 @@ foreach my $prefix (qw(PERLPREFIX SITEPREFIX VENDORPREFIX)) {
     is( $mm->{$prefix}, '$(PREFIX)', "\$(PREFIX) overrides $prefix" );
 }
 
-is( ! ! $mm->{PERL_CORE}, ! ! %ENV{PERL_CORE}, 'PERL_CORE' );
+is( ! ! $mm->{PERL_CORE}, ! ! env::var('PERL_CORE'), 'PERL_CORE' );
 
 my($perl_src, $mm_perl_src);
-if( %ENV{PERL_CORE} ) {
+if( env::var('PERL_CORE') ) {
     $perl_src = File::Spec->catdir($Updir, $Updir);
     $perl_src = File::Spec->canonpath($perl_src);
     $mm_perl_src = File::Spec->canonpath($mm->{PERL_SRC});
@@ -157,7 +157,7 @@ do {
                            NAME          => 'Big::Dummy',
                            VERSION_FROM  => 'lib/Big/Dummy.pm',
                            PREREQ_PM     => \%(),
-                           PERL_CORE     => %ENV{PERL_CORE},
+                           PERL_CORE     => env::var('PERL_CORE'),
                            PREFIX        => $PREFIX,
                            INSTALLMAN1DIR=> $wibble,
                           );
@@ -178,7 +178,7 @@ do {
                    NAME          => 'Big::Dummy',
                    VERSION_FROM  => 'lib/Big/Dummy.pm',
                    PREREQ_PM     => \%(),
-                   PERL_CORE     => %ENV{PERL_CORE},
+                   PERL_CORE     => env::var('PERL_CORE'),
 
                    # In case the local installation doesn't have man pages.
                    INSTALLMAN1DIR=> 'foo/bar/baz',
@@ -207,7 +207,7 @@ do {
     my $mm = WriteMakefile(
                            NAME          => 'Big::Dummy',
                            VERSION_FROM  => 'lib/Big/Dummy.pm',
-                           PERL_CORE     => %ENV{PERL_CORE},
+                           PERL_CORE     => env::var('PERL_CORE'),
                           );
 
     is( $mm->{INSTALLMAN1DIR}, File::Spec->catdir('foo', 'bar') );
@@ -239,7 +239,7 @@ do {
     my $mm = WriteMakefile(
                            NAME          => 'Big::Dummy',
                            VERSION_FROM  => 'lib/Big/Dummy.pm',
-                           PERL_CORE     => %ENV{PERL_CORE},
+                           PERL_CORE     => env::var('PERL_CORE'),
                           );
 
     is( $mm->{INSTALLMAN1DIR}, File::Spec->catdir('foo', 'bar') );

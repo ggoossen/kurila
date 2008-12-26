@@ -420,7 +420,7 @@ sub fetch {
     }
 
     ### set passive ftp if required ###
-    local %ENV{+FTP_PASSIVE} = $FTP_PASSIVE;
+    env::temp_set_var('FTP_PASSIVE' => $FTP_PASSIVE);
 
     ### we dont use catfile on win32 because if we are using a cygwin tool
     ### under cmd.exe they wont understand windows style separators.

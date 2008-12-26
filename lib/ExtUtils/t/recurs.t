@@ -3,7 +3,7 @@
 # This tests MakeMaker against recursive builds
 
 BEGIN {
-    if( %ENV{?PERL_CORE} ) {
+    if( env::var('PERL_CORE') ) {
         unshift @INC, 'lib';
     }
     else {
@@ -19,7 +19,7 @@ use MakeMaker::Test::Setup::Recurs;
 
 # 'make disttest' sets a bunch of environment variables which interfere
 # with our testing.
-delete %ENV{[qw(PREFIX LIB MAKEFLAGS)]};
+env::set_var($_, undef) for qw(PREFIX LIB MAKEFLAGS);
 
 my $perl = which_perl();
 my $Is_VMS = $^O eq 'VMS';

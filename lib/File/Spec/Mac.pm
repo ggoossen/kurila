@@ -372,7 +372,7 @@ directory on your startup volume.
 my $tmpdir;
 sub tmpdir {
     return $tmpdir if defined $tmpdir;
-    $tmpdir = @_[0]->_tmpdir( %ENV{TMPDIR} );
+    $tmpdir = @_[0]->_tmpdir( env::var('TMPDIR') );
 }
 
 =item updir
@@ -431,8 +431,8 @@ sub path {
 #  The concept is meaningless under the MacPerl application.
 #  Under MPW, it has a meaning.
 #
-    return unless exists %ENV{Commands};
-    returnsplit(m/,/, %ENV{?Commands});
+    return unless defined env::var('Commands');
+    returnsplit(m/,/, env::var('Commands'));
 }
 
 =item splitpath

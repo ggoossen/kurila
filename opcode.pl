@@ -608,7 +608,6 @@ scalar		scalar			ck_fun		s%	S
 # Pushy stuff.
 
 pushmark	pushmark		ck_null		s0	
-wantarray	wantarray		ck_null		is0	
 
 logassign_assign		assignment part of a logical assignment	ck_null		0	
 
@@ -729,8 +728,6 @@ negate		negation (-)		ck_null		Ifst1	S
 i_negate	integer negation (-)	ck_null		ifsT1	S
 not		not			ck_null		ifs1	S
 complement	1's complement (^~^)	ck_bitop	fst1	S
-
-smartmatch	smart match		ck_smartmatch	s2
 
 # High falutin' math.
 

@@ -69,7 +69,7 @@ my $requested_version = 0;
 
 sub ConfigDefaults() {
     # Handle POSIX compliancy.
-    if ( defined %ENV{?"POSIXLY_CORRECT"} ) {
+    if ( defined env::var("POSIXLY_CORRECT") ) {
 	$genprefix = "(--|-)";
 	$autoabbrev = 0;		# no automatic abbrev of options
 	$bundling = 0;			# no bundling of single letter switches
@@ -1265,8 +1265,8 @@ sub Configure (@) {
 	    ConfigDefaults ();
 	}
 	elsif ( ($try eq 'posix_default' or $try eq 'posix_defaults') ) {
-	    local %ENV{POSIXLY_CORRECT};
-	    %ENV{+POSIXLY_CORRECT} = 1 if $action;
+            env::temp_set_var('POSIXLY_CORRECT', undef);
+	    env::set_var('POSIXLY_CORRECT' => 1) if $action;
 	    ConfigDefaults ();
 	}
 	elsif ( $try eq 'auto_abbrev' or $try eq 'autoabbrev' ) {

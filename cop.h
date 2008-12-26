@@ -332,10 +332,6 @@ struct block_loop {
 	CX_ITERDATA_SET(cx, dat, offset);
 
 #define POPLOOP(cx)							\
-	if (CxTYPE(cx) == CXt_LOOP_LAZYSV) {				\
-	    SvREFCNT_dec(cx->blk_loop.state_u.lazysv.cur);		\
-	    SvREFCNT_dec(cx->blk_loop.state_u.lazysv.end);		\
-	}								\
 	if (CxTYPE(cx) == CXt_LOOP_FOR)					\
 	    AvREFCNT_dec(cx->blk_loop.state_u.ary.ary);
 
@@ -460,11 +456,10 @@ struct context {
 /* This is first so that CXt_LOOP_FOR|CXt_LOOP_LAZYIV is CXt_LOOP_LAZYIV */
 #define CXt_LOOP_FOR	4
 #define CXt_LOOP_PLAIN	5
-#define CXt_LOOP_LAZYSV	6
-#define CXt_LOOP_LAZYIV	7
-#define CXt_SUB		8
-#define CXt_EVAL        9
-#define CXt_SUBST      10
+#define CXt_LOOP_LAZYIV	6
+#define CXt_SUB		7
+#define CXt_EVAL        8
+#define CXt_SUBST       9
 /* SUBST doesn't feature in all switch statements.  */
 
 /* private flags for CXt_SUB and CXt_NULL

@@ -7,7 +7,7 @@
 #
 
 BEGIN {
-    if (%ENV{?PERL_CORE}){
+    if (env::var('PERL_CORE')){
 	push @INC, '../ext/Storable/t';
     }
     require 'st-dump.pl';

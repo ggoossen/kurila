@@ -52,8 +52,8 @@ my %style =
     . "(?(\top_sv\t\t#svaddr\n)?)",
     "    GOTO #addr\n",
     "#addr"),
-   "env" => \@(%ENV{?B_CONCISE_FORMAT}, %ENV{?B_CONCISE_GOTO_FORMAT},
-	     %ENV{?B_CONCISE_TREE_FORMAT}),
+   "env" => \@(env::var('B_CONCISE_FORMAT'), env::var('B_CONCISE_GOTO_FORMAT'),
+	     env::var('B_CONCISE_TREE_FORMAT')),
   );
 
 # Renderings, ie how Concise prints, is controlled by these vars

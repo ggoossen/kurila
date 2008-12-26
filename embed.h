@@ -106,7 +106,6 @@
 #define boot_core_PerlIO	Perl_boot_core_PerlIO
 #endif
 #define call_list		Perl_call_list
-#define call_list_onleave	Perl_call_list_onleave
 #ifdef PERL_CORE
 #define cando			Perl_cando
 #endif
@@ -419,26 +418,17 @@
 #define grok_numeric_radix	Perl_grok_numeric_radix
 #define grok_oct		Perl_grok_oct
 #ifdef PERL_CORE
-#define magic_clearenv		Perl_magic_clearenv
-#define magic_clear_all_env	Perl_magic_clear_all_env
 #define magic_clearhint		Perl_magic_clearhint
 #define magic_clearisa		Perl_magic_clearisa
-#define magic_clearpack		Perl_magic_clearpack
-#define magic_existspack	Perl_magic_existspack
 #define magic_get		Perl_magic_get
-#define magic_getdefelem	Perl_magic_getdefelem
-#define magic_getpack		Perl_magic_getpack
 #define magic_gettaint		Perl_magic_gettaint
 #define magic_getuvar		Perl_magic_getuvar
 #define magic_len		Perl_magic_len
-#define magic_nextpack		Perl_magic_nextpack
 #define magic_regdata_cnt	Perl_magic_regdata_cnt
 #define magic_regdatum_get	Perl_magic_regdatum_get
 #define magic_regdatum_set	Perl_magic_regdatum_set
 #define magic_set		Perl_magic_set
 #define magic_setdbline		Perl_magic_setdbline
-#define magic_setdefelem	Perl_magic_setdefelem
-#define magic_setenv		Perl_magic_setenv
 #define magic_sethint		Perl_magic_sethint
 #define magic_setisa		Perl_magic_setisa
 #endif
@@ -449,14 +439,10 @@
 #endif
 #ifdef PERL_CORE
 #define magic_setmglob		Perl_magic_setmglob
-#define magic_setpack		Perl_magic_setpack
 #define magic_setregexp		Perl_magic_setregexp
 #define magic_settaint		Perl_magic_settaint
 #define magic_setuvar		Perl_magic_setuvar
 #define magic_setutf8		Perl_magic_setutf8
-#define magic_set_all_env	Perl_magic_set_all_env
-#define magic_sizepack		Perl_magic_sizepack
-#define magic_wipepack		Perl_magic_wipepack
 #define magicname		Perl_magicname
 #endif
 #define markstack_grow		Perl_markstack_grow
@@ -956,9 +942,6 @@
 #define uvuni_to_utf8_flags	Perl_uvuni_to_utf8_flags
 #define pv_uni_display		Perl_pv_uni_display
 #define sv_uni_display		Perl_sv_uni_display
-#if defined(PERL_CORE) || defined(PERL_EXT)
-#define vivify_defelem		Perl_vivify_defelem
-#endif
 #ifdef PERL_CORE
 #define vivify_ref		Perl_vivify_ref
 #define wait4pid		Perl_wait4pid
@@ -1075,7 +1058,6 @@
 #ifdef PERL_CORE
 #define gv_init_sv		S_gv_init_sv
 #define gv_get_super_pkg	S_gv_get_super_pkg
-#define require_tie_mod		S_require_tie_mod
 #endif
 #endif
 #if defined(PERL_IN_HV_C) || defined(PERL_DECL_PROT)
@@ -1096,8 +1078,6 @@
 #if defined(PERL_IN_MG_C) || defined(PERL_DECL_PROT)
 #ifdef PERL_CORE
 #define save_magic		S_save_magic
-#define magic_methpack		S_magic_methpack
-#define magic_methcall		S_magic_methcall
 #define restore_magic		S_restore_magic
 #define unwind_handler_stack	S_unwind_handler_stack
 #endif
@@ -1245,10 +1225,6 @@
 #ifdef PERL_CORE
 #define path_is_absolute	S_path_is_absolute
 #define run_user_filter		S_run_user_filter
-#define make_matcher		S_make_matcher
-#define matcher_matches_sv	S_matcher_matches_sv
-#define destroy_matcher		S_destroy_matcher
-#define do_smartmatch		S_do_smartmatch
 #endif
 #endif
 #if defined(PERL_IN_PP_HOT_C) || defined(PERL_DECL_PROT)
@@ -1580,9 +1556,6 @@
 #if defined(PERL_IN_DUMP_C) || defined(PERL_IN_HV_C) || defined(PERL_IN_SV_C) || defined(PERL_DECL_PROT)
 #endif
 #define hv_clear_placeholders	Perl_hv_clear_placeholders
-#ifdef PERL_CORE
-#define magic_scalarpack	Perl_magic_scalarpack
-#endif
 #if defined(PERL_IN_SV_C) || defined(PERL_DECL_PROT)
 #ifdef PERL_CORE
 #define find_hash_subscript	S_find_hash_subscript
@@ -2214,7 +2187,6 @@
 #define pp_vec			Perl_pp_vec
 #define pp_wait			Perl_pp_wait
 #define pp_waitpid		Perl_pp_waitpid
-#define pp_wantarray		Perl_pp_wantarray
 #define pp_warn			Perl_pp_warn
 #define pp_xor			Perl_pp_xor
 
@@ -2298,7 +2270,6 @@
 #define boot_core_PerlIO()	Perl_boot_core_PerlIO(aTHX)
 #endif
 #define call_list(a,b)		Perl_call_list(aTHX_ a,b)
-#define call_list_onleave(a,b)	Perl_call_list_onleave(aTHX_ a,b)
 #ifdef PERL_CORE
 #define cando(a,b,c)		Perl_cando(aTHX_ a,b,c)
 #endif
@@ -2598,26 +2569,17 @@
 #define grok_numeric_radix(a,b)	Perl_grok_numeric_radix(aTHX_ a,b)
 #define grok_oct(a,b,c,d)	Perl_grok_oct(aTHX_ a,b,c,d)
 #ifdef PERL_CORE
-#define magic_clearenv(a,b)	Perl_magic_clearenv(aTHX_ a,b)
-#define magic_clear_all_env(a,b)	Perl_magic_clear_all_env(aTHX_ a,b)
 #define magic_clearhint(a,b)	Perl_magic_clearhint(aTHX_ a,b)
 #define magic_clearisa(a,b)	Perl_magic_clearisa(aTHX_ a,b)
-#define magic_clearpack(a,b)	Perl_magic_clearpack(aTHX_ a,b)
-#define magic_existspack(a,b)	Perl_magic_existspack(aTHX_ a,b)
 #define magic_get(a,b)		Perl_magic_get(aTHX_ a,b)
-#define magic_getdefelem(a,b)	Perl_magic_getdefelem(aTHX_ a,b)
-#define magic_getpack(a,b)	Perl_magic_getpack(aTHX_ a,b)
 #define magic_gettaint(a,b)	Perl_magic_gettaint(aTHX_ a,b)
 #define magic_getuvar(a,b)	Perl_magic_getuvar(aTHX_ a,b)
 #define magic_len(a,b)		Perl_magic_len(aTHX_ a,b)
-#define magic_nextpack(a,b,c)	Perl_magic_nextpack(aTHX_ a,b,c)
 #define magic_regdata_cnt(a,b)	Perl_magic_regdata_cnt(aTHX_ a,b)
 #define magic_regdatum_get(a,b)	Perl_magic_regdatum_get(aTHX_ a,b)
 #define magic_regdatum_set(a,b)	Perl_magic_regdatum_set(aTHX_ a,b)
 #define magic_set(a,b)		Perl_magic_set(aTHX_ a,b)
 #define magic_setdbline(a,b)	Perl_magic_setdbline(aTHX_ a,b)
-#define magic_setdefelem(a,b)	Perl_magic_setdefelem(aTHX_ a,b)
-#define magic_setenv(a,b)	Perl_magic_setenv(aTHX_ a,b)
 #define magic_sethint(a,b)	Perl_magic_sethint(aTHX_ a,b)
 #define magic_setisa(a,b)	Perl_magic_setisa(aTHX_ a,b)
 #endif
@@ -2628,14 +2590,10 @@
 #endif
 #ifdef PERL_CORE
 #define magic_setmglob(a,b)	Perl_magic_setmglob(aTHX_ a,b)
-#define magic_setpack(a,b)	Perl_magic_setpack(aTHX_ a,b)
 #define magic_setregexp(a,b)	Perl_magic_setregexp(aTHX_ a,b)
 #define magic_settaint(a,b)	Perl_magic_settaint(aTHX_ a,b)
 #define magic_setuvar(a,b)	Perl_magic_setuvar(aTHX_ a,b)
 #define magic_setutf8(a,b)	Perl_magic_setutf8(aTHX_ a,b)
-#define magic_set_all_env(a,b)	Perl_magic_set_all_env(aTHX_ a,b)
-#define magic_sizepack(a,b)	Perl_magic_sizepack(aTHX_ a,b)
-#define magic_wipepack(a,b)	Perl_magic_wipepack(aTHX_ a,b)
 #define magicname(a,b,c)	Perl_magicname(aTHX_ a,b,c)
 #endif
 #define markstack_grow()	Perl_markstack_grow(aTHX)
@@ -3130,9 +3088,6 @@
 #define uvuni_to_utf8_flags(a,b,c)	Perl_uvuni_to_utf8_flags(aTHX_ a,b,c)
 #define pv_uni_display(a,b,c,d,e)	Perl_pv_uni_display(aTHX_ a,b,c,d,e)
 #define sv_uni_display(a,b,c,d)	Perl_sv_uni_display(aTHX_ a,b,c,d)
-#if defined(PERL_CORE) || defined(PERL_EXT)
-#define vivify_defelem(a)	Perl_vivify_defelem(aTHX_ a)
-#endif
 #ifdef PERL_CORE
 #define vivify_ref(a,b)		Perl_vivify_ref(aTHX_ a,b)
 #define wait4pid(a,b,c)		Perl_wait4pid(aTHX_ a,b,c)
@@ -3242,7 +3197,6 @@
 #ifdef PERL_CORE
 #define gv_init_sv(a,b)		S_gv_init_sv(aTHX_ a,b)
 #define gv_get_super_pkg(a,b)	S_gv_get_super_pkg(aTHX_ a,b)
-#define require_tie_mod(a,b,c,d,e)	S_require_tie_mod(aTHX_ a,b,c,d,e)
 #endif
 #endif
 #ifdef PERL_CORE
@@ -3265,8 +3219,6 @@
 #if defined(PERL_IN_MG_C) || defined(PERL_DECL_PROT)
 #ifdef PERL_CORE
 #define save_magic(a,b)		S_save_magic(aTHX_ a,b)
-#define magic_methpack(a,b,c)	S_magic_methpack(aTHX_ a,b,c)
-#define magic_methcall(a,b,c,d,e,f)	S_magic_methcall(aTHX_ a,b,c,d,e,f)
 #define restore_magic(a)	S_restore_magic(aTHX_ a)
 #define unwind_handler_stack(a)	S_unwind_handler_stack(aTHX_ a)
 #endif
@@ -3422,10 +3374,6 @@
 #ifdef PERL_CORE
 #define path_is_absolute	S_path_is_absolute
 #define run_user_filter(a,b,c)	S_run_user_filter(aTHX_ a,b,c)
-#define make_matcher(a)		S_make_matcher(aTHX_ a)
-#define matcher_matches_sv(a,b)	S_matcher_matches_sv(aTHX_ a,b)
-#define destroy_matcher(a)	S_destroy_matcher(aTHX_ a)
-#define do_smartmatch(a,b)	S_do_smartmatch(aTHX_ a,b)
 #endif
 #endif
 #if defined(PERL_IN_PP_HOT_C) || defined(PERL_DECL_PROT)
@@ -3762,9 +3710,6 @@
 #endif
 #endif
 #define hv_clear_placeholders(a)	Perl_hv_clear_placeholders(aTHX_ a)
-#ifdef PERL_CORE
-#define magic_scalarpack(a,b)	Perl_magic_scalarpack(aTHX_ a,b)
-#endif
 #if defined(PERL_IN_SV_C) || defined(PERL_DECL_PROT)
 #ifdef PERL_CORE
 #define find_hash_subscript(a,b)	S_find_hash_subscript(aTHX_ a,b)
@@ -4398,7 +4343,6 @@
 #define pp_vec()		Perl_pp_vec(aTHX)
 #define pp_wait()		Perl_pp_wait(aTHX)
 #define pp_waitpid()		Perl_pp_waitpid(aTHX)
-#define pp_wantarray()		Perl_pp_wantarray(aTHX)
 #define pp_warn()		Perl_pp_warn(aTHX)
 #define pp_xor()		Perl_pp_xor(aTHX)
 

@@ -9,11 +9,11 @@ $| = 1;
 
 # Let tests know they're running in the perl core.  Useful for modules
 # which live dual lives on CPAN.
-%ENV{PERL_CORE} = 1;
+env::set_var('PERL_CORE' => 1);
 
 # remove empty elements due to insertion of empty symbols via "''p1'" syntax
 @ARGV = grep($_, @ARGV) if $^O eq 'VMS';
-our $show_elapsed_time = %ENV{?HARNESS_TIMER} || 0;
+our $show_elapsed_time = env::var("HARNESS_TIMER") || 0;
 
 # Cheesy version of Getopt::Std.  Maybe we should replace it with that.
 do {
@@ -28,7 +28,7 @@ do {
 	$::taintwarn = 1 if $1 eq 'taintwarn';
 	$::failed = 1 if $1 eq 'failed';
 	$::failed = 2 if $1 eq 'ffailed';
-	%ENV{PERL_CORE_MINITEST} = 1 if $1 eq 'minitest';
+	env::set_var("PERL_CORE_MINITEST" => 1) if $1 eq 'minitest';
 	if ($1 =~ m/^deparse(,.+)?$/) {
 	    $::deparse = 1;
 	    $::deparse_opts = $1;
@@ -42,7 +42,7 @@ chdir 't' if -f 't/TEST';
 die "You need to run \"make test\" first to set things up.\n"
   unless -e 'perl' or -e 'perl.exe' or -e 'perl.pm';
 
-if (%ENV{?PERL_3LOG}) { # Tru64 third(1) tool, see perlhack
+if (env::var("PERL_3LOG")) { # Tru64 third(1) tool, see perlhack
     unless (-x 'perl.third') {
 	unless (-x '../perl.third') {
 	    die "You need to run \"make perl.third first.\n";
@@ -58,9 +58,9 @@ if (%ENV{?PERL_3LOG}) { # Tru64 third(1) tool, see perlhack
 }
 
 # check leakage for embedders
-%ENV{+PERL_DESTRUCT_LEVEL} = 2 unless exists %ENV{PERL_DESTRUCT_LEVEL};
+env::set_var("PERL_DESTRUCT_LEVEL" => 2) unless defined env::var("PERL_DESTRUCT_LEVEL");
 
-%ENV{+EMXSHELL} = 'sh';        # For OS/2
+env::set_var("EMXSHELL" => 'sh');        # For OS/2
 
 # Roll your own File::Find!
 use TestInit;
@@ -321,11 +321,11 @@ EOT
 		or print "can't deparse '$deparse_cmd': $!.\n";
 	}
 	elsif ($type eq 'perl') {
-	    my $perl = %ENV{?PERL} || './perl';
+	    my $perl = env::var("PERL") || './perl';
 	    my $redir = $^O eq 'VMS' ?? '2>&1' !! '';
-	    if (%ENV{?PERL_VALGRIND}) {
-		my $valgrind = %ENV{?VALGRIND} // 'valgrind';
-		my $vg_opts = %ENV{?VG_OPTS}
+	    if (env::var("PERL_VALGRIND")) {
+		my $valgrind = env::var("VALGRIND") // 'valgrind';
+		my $vg_opts = env::var("VG_OPTS")
 		    //  "--suppressions=perl.supp --leak-check=yes "
 			. "--leak-resolution=high --show-reachable=yes "
 			. "--num-callers=50"; 
@@ -425,7 +425,7 @@ EOT
 	    $failure = 'FAILED--no leader found' unless $seen_leader;
 	}
 
-	if (%ENV{?PERL_VALGRIND}) {
+	if (env::var("PERL_VALGRIND")) {
 	    my @valgrind;
 	    if (-e $valgrind_log) {
 		if (open(my $v, "<", $valgrind_log)) {
@@ -435,7 +435,7 @@ EOT
 		    warn "$0: Failed to open '$valgrind_log': $!\n";
 		}
 	    }
-	    if ((%ENV{?VG_OPTS} || '') =~ m/cachegrind/) {
+	    if ((env::var("VG_OPTS") || '') =~ m/cachegrind/) {
 		if (rename $valgrind_log, "$test.valgrind") {
 		    $valgrind++;
 		} else {
@@ -476,7 +476,7 @@ EOT
 	if ($type eq 'deparse') {
 	    unlink "./$test.dp";
 	}
-	if (%ENV{?PERL_3LOG}) {
+	if (env::var("PERL_3LOG")) {
 	    my $tpp = $test;
 	    $tpp =~ s:^\.\./::;
 	    $tpp =~ s:/:_:g;
@@ -555,7 +555,7 @@ SHRDLU_2
 ### You may have to set your dynamic library search path,
 ### $p, to point to the build directory:
 SHRDLU_3
-		if (exists %ENV{$p} && %ENV{$p} ne '') {
+		if (defined env::var($p) && env::var($p) ne '') {
 		    print STDERR <<SHRDLU_4a;
 ###   setenv $p `pwd`:\$$p; cd t; ./perl harness
 ###   $p=`pwd`:\$$p; export $p; cd t; ./perl harness
@@ -586,7 +586,7 @@ SHRDLU_5
     my @($user,$sys,$cuser,$csys) = @: times;
     print sprintf('u=%.2f  s=%.2f  cu=%.2f  cs=%.2f  scripts=%d  tests=%d' . "\n",
 	$user,$sys,$cuser,$csys,$tested_files,$totmax);
-    if (%ENV{?PERL_VALGRIND}) {
+    if (env::var("PERL_VALGRIND")) {
 	my $s = $valgrind == 1 ?? '' !! 's';
 	print "$valgrind valgrind report$s created.\n", ;
     }

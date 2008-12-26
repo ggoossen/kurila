@@ -191,7 +191,7 @@ sub can_run {
 
     } else {
         for my $dir (@:
-            < split(m/\Q$(Config::config_value('path_sep'))\E/, %ENV{?PATH}),
+            < split(m/\Q$(Config::config_value('path_sep'))\E/, env::var('PATH')),
             File::Spec->curdir
         ) {
             my $abs = File::Spec->catfile($dir, $command);

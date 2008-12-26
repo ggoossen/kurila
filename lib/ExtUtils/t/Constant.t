@@ -1,10 +1,6 @@
 #!/usr/bin/perl -w
 
 BEGIN {
-    if( %ENV{PERL_CORE} ) {
-        chdir 't' if -d 't';
-        @INC = @( '../lib' );
-    }
     use Config;
     unless (config_value("usedl")) {
 	print "1..0 # no usedl, skipping\n";
@@ -30,12 +26,11 @@ $perl = File::Spec->rel2abs ($perl);
 # whereas we will run the child with the full path in $perl. So make $^X for
 # us the same as our child will see.
 $^X = $perl;
-my $lib = %ENV{PERL_CORE} ?? '../../../lib' !! '../../blib/lib';
+my $lib = env::var('PERL_CORE') ?? '../../../lib' !! '../../blib/lib';
 my $runperl = "$perl \"-I$lib\"";
 print "# perl=$perl\n";
 
-my $make = config_value("make");
-$make = %ENV{MAKE} if exists %ENV{MAKE};
+my $make = env::var('MAKE') // config_value("make");
 if ($^O eq 'MSWin32' && $make eq 'nmake') { $make .= " -nologo"; }
 
 # VMS may be using something other than MMS/MMK
@@ -104,7 +99,7 @@ sub check_for_bonus_files {
 
 sub build_and_run {
   my @($tests, $expect, $files) =  @_;
-  my $core = %ENV{PERL_CORE} ?? ' PERL_CORE=1' !! '';
+  my $core = env::var('PERL_CORE') ?? ' PERL_CORE=1' !! '';
   my @perlout = @( `$runperl Makefile.PL $core` );
   if ($?) {
     print "not ok $realtest # $runperl Makefile.PL failed: $?\n";

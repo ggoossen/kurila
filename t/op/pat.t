@@ -1948,7 +1948,7 @@ EOF
 ok( "d" =~ m/\p{InConsonant}/ );
 ok( "e" =~ m/\P{InConsonant}/ );
 
-if (!%ENV{?PERL_SKIP_PSYCHO_TEST}){
+if (!env::var('PERL_SKIP_PSYCHO_TEST')){
     print "# [ID 20020630.002] utf8 regex only matches 32k\n";
     for (@(\@( 'byte', "\x{ff}" ), \@( 'utf8', "\x{1ff}" ))) {
 	my@($type, $char) =  @$_;
@@ -2381,7 +2381,7 @@ ok(("foba  ba$($s)pxySS$s$s" =~ qr/(b(?:a${\$s}t|a${\$s}f|a${\$s}p)[xy]+$s*)/i)
 
 
 print "# set PERL_SKIP_PSYCHO_TEST to skip this test\n";
-if (!%ENV{?PERL_SKIP_PSYCHO_TEST}){
+if (!env::var('PERL_SKIP_PSYCHO_TEST')){
     my @normal=qw(these are some normal words);
     use utf8;
     my $psycho=join "|", @(< @normal,< map chr $_,255..20000);
@@ -2470,7 +2470,7 @@ do {
     # https://rt.perl.org/rt3/Ticket/Display.html?id=39583
     
     # The printing characters
-    my @chars ="A".."Z";
+    my @chars = map { chr($_) } ord("A")..ord("Z");
     my $delim = ",";
     my $size = 32771 - 4;
     my $str = '';
@@ -2624,7 +2624,7 @@ SKIP:do {
 # CURLYX and WHILEM blocks, except those related to LONGJMP, the
 # super-linear cache and warnings. It executes about 0.5M regexes
 
-if (%ENV{?PERL_SKIP_PSYCHO_TEST}){
+if (env::var('PERL_SKIP_PSYCHO_TEST')){
   ok( 1, "Skip: No psycho tests");
 } else {    
   print "# set PERL_SKIP_PSYCHO_TEST to skip this test\n";

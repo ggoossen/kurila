@@ -8,7 +8,7 @@
 
 BEGIN {
     chdir('t') if -d 't';
-    if (%ENV{PERL_CORE}){
+    if (env::var('PERL_CORE')){
 	@INC = @('.', '../lib', '../ext/Storable/t');
     } else {
         if (!eval "require Hash::Util") {

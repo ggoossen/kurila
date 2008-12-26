@@ -3,7 +3,7 @@
 BEGIN {
     chdir 't' if -d 't';
     @INC = @( '../lib' );
-    %ENV{+PERL5LIB} = '../lib';
+    env::set_var('PERL5LIB' => '../lib');
 }
 
 our $pragma_name = "warnings";

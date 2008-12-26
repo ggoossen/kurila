@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 BEGIN {
-  if (%ENV{PERL_CORE}) {
+  if (env::var('PERL_CORE')) {
     chdir 't' if -d 't';
     chdir '../lib/ExtUtils/ParseXS'
       or die "Can't chdir to lib/ExtUtils/ParseXS: $!";
@@ -33,7 +33,7 @@ process_file(filename => 'XSTest.xs', output => $source_file, prototypes => 0);
 ok -e $source_file, 1, "Create an output file";
 
 # TEST doesn't like extraneous output
-my $quiet = %ENV{PERL_CORE} && !%ENV{?HARNESS_ACTIVE};
+my $quiet = env::var('PERL_CORE') && !env::var('HARNESS_ACTIVE');
 
 # Try to compile the file!  Don't get too fancy, though.
 my $b = ExtUtils::CBuilder->new(quiet => $quiet);

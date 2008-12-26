@@ -1,7 +1,7 @@
 #! perl -w
 
 BEGIN {
-  if (%ENV{?PERL_CORE}) {
+  if (env::var('PERL_CORE')) {
     chdir 't' if -d 't';
     chdir '../lib/ExtUtils/CBuilder'
       or die "Can't chdir to lib/ExtUtils/CBuilder: $!";
@@ -27,7 +27,7 @@ use ExtUtils::CBuilder;
 use File::Spec;
 
 # TEST doesn't like extraneous output
-my $quiet = %ENV{?PERL_CORE} && !%ENV{?HARNESS_ACTIVE};
+my $quiet = env::var('PERL_CORE') && !env::var('HARNESS_ACTIVE');
 
 my $b = ExtUtils::CBuilder->new(quiet => $quiet);
 ok $b;

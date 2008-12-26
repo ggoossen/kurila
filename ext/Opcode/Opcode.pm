@@ -297,7 +297,7 @@ invert_opset function.
 
 =item :base_core
 
-    null stub scalar pushmark wantarray const defined undef
+    null stub scalar pushmark const defined undef
 
     rv2sv sassign logassign_assign dotdotdot placeholder
 
@@ -527,7 +527,7 @@ This tag holds opcodes related to loading modules and getting information
 about calling environment and args.
 
     require dofile 
-    caller compsub
+    caller compsub dynascope
 
 =item :still_to_be_decided
 

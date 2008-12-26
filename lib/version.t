@@ -7,7 +7,7 @@
 use Test::More < qw(no_plan);
 use POSIX;
 
-diag "Tests with base class" unless %ENV{?PERL_CORE};
+diag "Tests with base class" unless env::var('PERL_CORE');
 
 BEGIN {
     use_ok("version", v0.50); # If we made it this far, we are ok.
@@ -17,7 +17,7 @@ our $Verbose;
 
 BaseTests("version");
 
-diag "Tests with empty derived class" unless %ENV{?PERL_CORE};
+diag "Tests with empty derived class" unless env::var('PERL_CORE');
 
 package version::Empty;
 use base 'version';
@@ -40,7 +40,7 @@ my $verobj = version->new("1.2.4");
 is( $verobj->vcmp($testobj), 1, "Comparison vs parent class" );
 BaseTests("version::Empty");
 
-diag "tests with bad subclass" unless %ENV{?PERL_CORE};
+diag "tests with bad subclass" unless env::var('PERL_CORE');
 $testobj = version::Bad->new(1.002_003);
 isa_ok( $testobj, "version::Bad" );
 try { my $string = $testobj->numify };

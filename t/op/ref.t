@@ -255,7 +255,7 @@ do {
     my @a;
     @a[+1] = "good";
     my $got;
-    for ( @a) {
+    for (@a) {
 	$got .= ${\$_};
 	$got .= ';';
     }

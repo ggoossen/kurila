@@ -106,7 +106,7 @@ my $Inc_uninstall_warn_handler;
 
 # install relative to here
 
-my $INSTALL_ROOT = %ENV{?PERL_INSTALL_ROOT};
+my $INSTALL_ROOT = env::var('PERL_INSTALL_ROOT');
 
 my $Curdir = File::Spec->curdir;
 my $Updir  = File::Spec->updir;
@@ -296,7 +296,7 @@ Handles loading the INSTALL.SKIP file. Returns an array of patterns to use.
 
 sub _get_install_skip {
     my @( $skip, $verbose )=  @_;
-    if (%ENV{?EU_INSTALL_IGNORE_SKIP}) {
+    if (env::var('EU_INSTALL_IGNORE_SKIP')) {
         print "EU_INSTALL_IGNORE_SKIP is set, ignore skipfile settings\n"
             if $verbose+>2;
         return \@();
@@ -304,7 +304,7 @@ sub _get_install_skip {
     if ( ! defined $skip ) {
         print "Looking for install skip list\n"
             if $verbose+>2;
-        for my $file (@( 'INSTALL.SKIP', %ENV{?EU_INSTALL_SITE_SKIPFILE}) ) {
+        for my $file (@( 'INSTALL.SKIP', env::var('EU_INSTALL_SITE_SKIPFILE')) ) {
             next unless $file;
             print "\tChecking for $file\n"
                 if $verbose+>2;
@@ -679,8 +679,8 @@ sub install { #XXX OS-SPECIFIC
     $dry_run  ||= 0;
 
     $skip= _get_install_skip($skip,$verbose);
-    $always_copy =  %ENV{?EU_INSTALL_ALWAYS_COPY}
-                 || %ENV{?EU_ALWAYS_COPY} 
+    $always_copy =  env::var('EU_INSTALL_ALWAYS_COPY')
+                 || env::var('EU_ALWAYS_COPY') 
                  || 0
         unless defined $always_copy;
 
@@ -1043,8 +1043,8 @@ sub inc_uninstall {
     my $file = (File::Spec->splitpath($filepath))[2];
     my %seen_dir = %( () );
     
-    my @PERL_ENV_LIB = split config_value("path_sep"), defined %ENV{?'PERL5LIB'}
-      ?? %ENV{?'PERL5LIB'} !! %ENV{?'PERLLIB'} || '';
+    my @PERL_ENV_LIB = split config_value("path_sep"), defined env::var('PERL5LIB')
+      ?? env::var('PERL5LIB') !! env::var('PERLLIB') || '';
         
     my @dirs=@( < @PERL_ENV_LIB, 
                < @INC,

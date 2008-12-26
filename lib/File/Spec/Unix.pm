@@ -158,7 +158,7 @@ sub _tmpdir {
 
 sub tmpdir {
     return $tmpdir if defined $tmpdir;
-    $tmpdir = @_[0]->_tmpdir( %ENV{?TMPDIR}, "/tmp" );
+    $tmpdir = @_[0]->_tmpdir( env::var('TMPDIR'), "/tmp" );
 }
 
 =item updir
@@ -212,8 +212,8 @@ Takes no argument, returns the environment variable PATH as an array.
 =cut
 
 sub path {
-    return () unless exists %ENV{PATH};
-    my @path = split(':', %ENV{PATH});
+    return () unless defined env::var('PATH');
+    my @path = split(':', env::var('PATH'));
     foreach ( @path) { $_ = '.' if $_ eq '' }
     return @path;
 }

@@ -35,7 +35,7 @@ struct magic {
     char*	mg_ptr;
 };
 
-#define MGf_TAINTEDDIR 1        /* PERL_MAGIC_envelem only */
+#define MGf_TAINTEDDIR 1        /* PERL_MAGIC_taint only */
 #define MGf_MINMATCH   1        /* PERL_MAGIC_regex_global only */
 #define MGf_REFCOUNTED 2
 #define MGf_GSKIP      4

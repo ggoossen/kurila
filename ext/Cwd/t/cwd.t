@@ -18,7 +18,7 @@ $tests += 4 if $EXTRA_ABSPATH_TESTS;
 plan tests => $tests;
 
 SKIP: do {
-  skip "no need to check for blib/ in the core", 1 if %ENV{?PERL_CORE};
+  skip "no need to check for blib/ in the core", 1 if env::var('PERL_CORE');
   like %INC{?'Cwd.pm'}, qr{blib}i, "Cwd should be loaded from blib/ during testing";
 };
 
@@ -33,9 +33,9 @@ ok( !defined(&fast_abs_path),   '  nor fast_abs_path()');
 
 do {
   my @fields = qw(PATH IFS CDPATH ENV BASH_ENV);
-  my $before = grep exists %ENV{$_}, @fields;
+  my $before = grep defined env::var($_), @fields;
   cwd();
-  my $after = grep exists %ENV{$_}, @fields;
+  my $after = grep defined env::var($_), @fields;
   is(nelems($before), nelems($after), "cwd() shouldn't create spurious entries in \%ENV");
 };
 
@@ -52,7 +52,7 @@ my $pwd_cmd =
     ($IsMacOS) ??
         "pwd" !!
         (grep { -x && -f } map { "$_/$pwd$(config_value('exe_ext'))" }
-	                   split m/$(config_value('path_sep'))/, %ENV{?PATH})[0];
+	                   split m/$(config_value('path_sep'))/, env::var('PATH'))[0];
 
 $pwd_cmd = 'SHOW DEFAULT' if $IsVMS;
 if ($^O eq 'MSWin32') {
@@ -66,7 +66,11 @@ SKIP: do {
 
     print "# native pwd = '$pwd_cmd'\n";
 
-    local %ENV{[qw(PATH IFS CDPATH ENV BASH_ENV)]} = @();
+    my %local_env_keys = %:< map { $_, env::var($_) } qw[PATH IFS CDPATH ENV BASH_ENV];
+    push dynascope->{onleave}, sub {
+        env::set_var($_, %local_env_keys{$_}) for keys %local_env_keys;
+    };
+    env::set_var($_, undef) for keys %local_env_keys;
     my @($pwd_cmd_untainted) = @: $pwd_cmd =~ m/^(.+)$/; # Untaint.
     chomp(my $start = `$pwd_cmd_untainted`);
 
@@ -91,7 +95,7 @@ SKIP: do {
 	# Admittedly fixing this in the Cwd module would be better
 	# long-term solution but deleting $ENV{PWD} should not be
 	# done light-heartedly. --jhi
-	delete %ENV{PWD} if $^O eq 'darwin';
+	env::set_var('PWD') if $^O eq 'darwin';
 
 	my $cwd        = cwd;
 	my $getcwd     = getcwd;
@@ -125,12 +129,12 @@ do {
 };
 
 # Cwd::chdir should also update $ENV{PWD}
-dir_ends_with( %ENV{?PWD}, $Test_Dir, 'Cwd::chdir() updates $ENV{PWD}' );
+dir_ends_with( env::var('PWD'), $Test_Dir, 'Cwd::chdir() updates $ENV{PWD}' );
 my $updir = File::Spec->updir;
 
 for (1..nelems @test_dirs) {
   Cwd::chdir $updir;
-  print "#%ENV{?PWD}\n";
+  print "#$(env::var('PWD'))\n";
 }
 
 rmtree(@test_dirs[0], 0, 0);
@@ -140,15 +144,15 @@ do {
 	       $IsMacOS ?? qr|\bt:$| !!
 			  qr|\bt$| );
   
-  like(%ENV{?PWD}, $check);
+  like(env::var('PWD'), $check);
 };
 
 do {
   # Make sure abs_path() doesn't trample $ENV{PWD}
-  my $start_pwd = %ENV{?PWD};
+  my $start_pwd = env::var('PWD');
   mkpath(\@($Test_Dir), 0, 0777);
   Cwd::abs_path($Test_Dir);
-  is %ENV{?PWD}, $start_pwd;
+  is env::var('PWD'), $start_pwd;
   rmtree(@test_dirs[0], 0, 0);
 };
 
@@ -162,7 +166,7 @@ SKIP: do {
     my $fast_abs_path =  Cwd::fast_abs_path("linktest");
     my $want          =  quotemeta(
                              File::Spec->rel2abs(
-			         %ENV{?PERL_CORE} ?? $Test_Dir !! < File::Spec->catdir('t', $Test_Dir)
+			         env::var('PERL_CORE') ?? $Test_Dir !! < File::Spec->catdir('t', $Test_Dir)
                                                 )
                                   );
 
@@ -174,7 +178,7 @@ SKIP: do {
     1 while unlink "linktest";
 };
 
-if (%ENV{?PERL_CORE}) {
+if (env::var('PERL_CORE')) {
     chdir '../ext/Cwd/t';
     unshift @INC, '../../../lib';
 }
