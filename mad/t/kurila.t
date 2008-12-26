@@ -36,8 +36,9 @@ sub p5convert {
     is($output, $expected) or $TODO or die "failed test";
 }
 
-t_pattern_assignment();
+t_env_using_package();
 die "END";
+t_pattern_assignment();
 t_hashkey_regulator();
 t_rename_ternary_op();
 t_call_parens();
@@ -1500,5 +1501,25 @@ my ($l) = "foo";
 my ($l) = m/(foo)/;
 ----
 my @($l) = @(m/(foo)/);
+END
+}
+
+sub t_env_using_package {
+    p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
+%ENV{foo};
+----
+env::var('foo');
+====
+%ENV{foo} = 3;
+----
+env::set_var('foo') = 3;
+====
+local %ENV{foo} = 3;
+----
+ env::temp_set_var('foo') = 3;
+====
+"foo%ENV{bar}baz";
+----
+"foo$(env::var('bar'))baz";
 END
 }

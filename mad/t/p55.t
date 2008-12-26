@@ -313,3 +313,6 @@ dynascope;
 ########
 # readpipe
 readpipe;
+########
+# optional
+push $a, $_ unless $a{$_};

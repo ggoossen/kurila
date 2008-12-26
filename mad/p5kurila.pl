@@ -1184,6 +1184,39 @@ sub pattern_assignment {
     }
 }
 
+sub env_using_package {
+    my $xml = shift;
+
+    for my $op ($xml->findnodes("//op_rv2hv")) {
+        next unless get_madprop($op, "hsh") eq "\%ENV";
+        next unless $op->parent->tag eq "op_helem";
+        if (get_madprop($op->parent, "local")) {
+            set_madprop($op, "hsh", "env::temp_set_var");
+            set_madprop($op->parent, "local", '');
+        }
+        elsif ($op->parent->att('flags') =~ m/\bASSIGN\b/) {
+            set_madprop($op, "hsh", "env::set_var");
+        }
+        elsif (is_in_string($op->parent)) {
+            set_madprop($op, "hsh", "\$(env::var");
+        }
+        else {
+            set_madprop($op, "hsh", "env::var");
+        }
+        set_madprop($op->parent, "curly_open", "(");
+        if (is_in_string($op->parent)) {
+            set_madprop($op->parent, "curly_close", "))");
+        } else {
+            set_madprop($op->parent, "curly_close", ")");
+        }
+        if ( $op->next_sibling->tag eq "op_const"
+         and $op->next_sibling->att("private") =~ m/\bBARE\b/ ) {
+            set_madprop($op->next_sibling, "value",
+                        qq['] . get_madprop($op->next_sibling, "value") . qq[']);
+        }
+    }
+}
+
 my $from; # floating point number with starting version of kurila.
 GetOptions("from=s" => \$from);
 $from =~ m/(\w+)[-]([\d.]+)$/ or die "invalid from: '$from'";
@@ -1279,11 +1312,15 @@ if ($from->{branch} ne "kurila" or $from->{v} < qv '1.15') {
     remove_use_strict($twig);
 }
 
-#add_call_parens($twig);
+if ($from->{branch} ne "kurila" or $from->{v} < qv '1.16') {
+    rename_ternary_op($twig);
+    hashkey_regulator($twig);
+    pattern_assignment($twig);
+}
 
-#rename_ternary_op($twig);
-#hashkey_regulator($twig);
-pattern_assignment($twig);
+env_using_package($twig);
+
+#add_call_parens($twig);
 
 # print
 $twig->print( pretty_print => 'indented' );
