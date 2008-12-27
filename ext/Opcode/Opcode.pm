@@ -405,8 +405,6 @@ These are a hotchpotch of opcodes still waiting to be considered
 
     entertry leavetry -- can be used to 'hide' fatal errors
 
-    smartmatch
-
     custom -- where should this go
 
 =item :base_math
