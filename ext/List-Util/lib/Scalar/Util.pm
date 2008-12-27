@@ -6,7 +6,7 @@
 
 package Scalar::Util;
 
-use vars < qw(@ISA @EXPORT_OK $VERSION);
+our (@ISA, @EXPORT_OK, $VERSION);
 require Exporter;
 require List::Util; # List::Util loads the XS
 

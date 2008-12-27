@@ -8,7 +8,7 @@ require Exporter;
 package Math::Trig;
 
 
-use vars < qw($VERSION $PACKAGE @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
+our ($VERSION, $PACKAGE, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS);
 
 @ISA = qw(Exporter);
 

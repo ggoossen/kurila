@@ -6,7 +6,7 @@ plan tests => 5;
 do {
    package Digest::Foo;
    require Digest::base;
-   use vars < qw(@ISA $VERSION);
+   our (@ISA, $VERSION);
    @ISA = qw(Digest::base);
 
    sub new {

@@ -1,6 +1,6 @@
 package TestCompare;
 
-use vars < qw(@ISA @EXPORT $MYPKG);
+our (@ISA, @EXPORT, $MYPKG);
 #use diagnostics;
 use Exporter;
 use File::Basename;

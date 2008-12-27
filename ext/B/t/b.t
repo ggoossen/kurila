@@ -9,7 +9,7 @@ BEGIN { use_ok( 'B' ); }
 
 
 package Testing::Symtable;
-use vars < qw($This @That %wibble $moo %moo);
+our ($This, @That, %wibble, $moo, %moo);
 my $not_a_sym = 'moo';
 
 sub moo { 42 }
@@ -23,7 +23,7 @@ package Testing::Symtable::Bar;
 sub hock { "yarrow" }
 
 package main;
-use vars < qw(%Subs);
+our (%Subs);
 local %Subs = %( () );
 B::walksymtable(\%Testing::Symtable::, 'find_syms', sub { @_[0] =~ m/Foo/ },
                 'Testing::Symtable::');

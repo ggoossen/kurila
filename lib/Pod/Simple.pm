@@ -8,11 +8,11 @@ use Pod::Simple::LinkSection ();
 use Pod::Simple::BlackBox ();
 use utf8;
 
-use vars < qw(
-  $VERSION @ISA
-  @Known_formatting_codes  @Known_directives
-  %Known_formatting_codes  %Known_directives
-  $NL
+our (
+,  $VERSION, @ISA
+,  @Known_formatting_codes,  @Known_directives
+,  %Known_formatting_codes,  %Known_directives
+,  $NL
 );
 
 @ISA = @('Pod::Simple::BlackBox');

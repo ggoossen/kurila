@@ -157,7 +157,7 @@ require Carp::Heavy;
 use base < qw/ IO::Handle IO::Seekable /;
 
 # use 'our' on v5.6.0
-use vars < qw($VERSION @EXPORT_OK %EXPORT_TAGS $DEBUG $KEEP_ALL);
+our ($VERSION, @EXPORT_OK, %EXPORT_TAGS, $DEBUG, $KEEP_ALL);
 
 $DEBUG = 0;
 $KEEP_ALL = 0;

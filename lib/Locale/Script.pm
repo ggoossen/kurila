@@ -15,7 +15,7 @@ use Locale::Constants;
 #-----------------------------------------------------------------------
 #	Public Global Variables
 #-----------------------------------------------------------------------
-use vars < qw($VERSION @ISA @EXPORT @EXPORT_OK);
+our ($VERSION, @ISA, @EXPORT, @EXPORT_OK);
 $VERSION   = sprintf("\%d.\%02d", q$Revision: 2.7 $ =~ m/(\d+)\.(\d+)/);
 @ISA       = qw(Exporter);
 @EXPORT    = qw(code2script script2code

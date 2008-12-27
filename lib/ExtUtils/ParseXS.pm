@@ -15,21 +15,21 @@ our @EXPORT_OK = qw(process_file);
 my(@XSStack);	# Stack of conditionals and INCLUDEs
 my($XSS_work_idx, $cpp_next_tmp);
 
-use vars < qw($VERSION);
+our ($VERSION);
 $VERSION = '2.19_01';
 
-use vars < qw(%input_expr %output_expr $ProtoUsed @InitFileCode $FH $proto_re $Overload $errors $Fallback
-	    $cplusplus $hiertype $WantPrototypes $WantVersionChk $except $WantLineNumbers
-	    $WantOptimize $process_inout $process_argtypes @tm
-	    $dir $filename $filepathname %IncludedFiles
-	    %type_kind %proto_letter
-            %targetable $BLOCK_re $lastline $lastline_no
-            $Package $Prefix @line @BootCode %args_match %defaults %var_types %arg_list @proto_arg
-            $processing_arg_with_types %argtype_seen @outlist %in_out %lengthof
-            $proto_in_this_xsub $scope_in_this_xsub $interface $prepush_done $interface_macro $interface_macro_set
-            $ProtoThisXSUB $ScopeThisXSUB $xsreturn
-            @line_no $ret_type $func_header $orig_args
-	   ); # Add these just to get compilation to happen.
+our (%input_expr, %output_expr, $ProtoUsed, @InitFileCode, $FH, $proto_re, $Overload, $errors, $Fallback
+	,    $cplusplus, $hiertype, $WantPrototypes, $WantVersionChk, $except, $WantLineNumbers
+	,    $WantOptimize, $process_inout, $process_argtypes, @tm
+	,    $dir, $filename, $filepathname, %IncludedFiles
+	,    %type_kind, %proto_letter
+,            %targetable, $BLOCK_re, $lastline, $lastline_no
+,            $Package, $Prefix, @line, @BootCode, %args_match, %defaults, %var_types, %arg_list, @proto_arg
+,            $processing_arg_with_types, %argtype_seen, @outlist, %in_out, %lengthof
+,            $proto_in_this_xsub, $scope_in_this_xsub, $interface, $prepush_done, $interface_macro, $interface_macro_set
+,            $ProtoThisXSUB, $ScopeThisXSUB, $xsreturn
+,            @line_no, $ret_type, $func_header, $orig_args
+	,   ); # Add these just to get compilation to happen.
 
 our ($func_args, $PPCODE, $CODE, $EXPLICIT_RETURN, $ALIAS, $INTERFACE, $Full_func_name,
      $cond, $min_args, $pname, $condnum, $thisdone, $retvaldone, $deferred, $gotRETVAL,

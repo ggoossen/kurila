@@ -12,7 +12,7 @@ require Exporter;
 #-----------------------------------------------------------------------
 #	Public Global Variables
 #-----------------------------------------------------------------------
-use vars < qw($VERSION @ISA @EXPORT);
+our ($VERSION, @ISA, @EXPORT);
 $VERSION      = sprintf("\%d.\%02d", q$Revision: 2.7 $ =~ m/(\d+)\.(\d+)/);
 @ISA          = qw(Exporter);
 @EXPORT       = qw(&code2language &language2code

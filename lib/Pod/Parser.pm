@@ -9,7 +9,7 @@
 
 package Pod::Parser;
 
-use vars < qw($VERSION);
+our ($VERSION);
 $VERSION = 1.35;  ## Current version of this package
 
 #############################################################################
@@ -198,7 +198,7 @@ for the setting and unsetting of parse-options.
 
 #############################################################################
 
-use vars < qw(@ISA);
+our (@ISA);
 
 #use diagnostics;
 use Pod::InputObjects;
@@ -206,7 +206,7 @@ use Exporter;
 @ISA = qw(Exporter);
 
 ## These "variables" are used as local "glob aliases" for performance
-use vars < qw(%myData %myOpts @input_stack);
+our (%myData, %myOpts, @input_stack);
 
 #############################################################################
 

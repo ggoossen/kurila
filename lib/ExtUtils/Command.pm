@@ -5,7 +5,7 @@ use File::Compare;
 use File::Basename;
 use File::Path < qw(rmtree);
 require Exporter;
-use vars < qw(@ISA @EXPORT @EXPORT_OK $VERSION);
+our (@ISA, @EXPORT, @EXPORT_OK, $VERSION);
 @ISA       = qw(Exporter);
 @EXPORT    = qw(cp rm_f rm_rf mv cat eqtime mkpath touch test_f test_d chmod
                 dos2unix);

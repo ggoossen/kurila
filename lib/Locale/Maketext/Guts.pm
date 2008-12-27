@@ -5,7 +5,7 @@ BEGIN { *zorp = sub { return scalar nelems @_ } unless defined &zorp; }
 
 package Locale::Maketext;
 
-use vars < qw($USE_LITERALS $GUTSPATH);
+our ($USE_LITERALS, $GUTSPATH);
 
 BEGIN {
   $GUTSPATH = __FILE__;

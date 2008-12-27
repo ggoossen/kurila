@@ -5,7 +5,7 @@ use File::Basename;
 use Config < qw(config_value config_keys);
 use Text::ParseWords;
 
-use vars < qw($VERSION);
+our ($VERSION);
 $VERSION = '0.22';
 
 sub new {

@@ -303,7 +303,7 @@ sub STORABLE_freeze {
 sub STORABLE_thaw { } # Not really used
 
 package main;
-use vars < qw($refcount_ok);
+our ($refcount_ok);
 
 my $o = CLASS_OTHER->make();
 my $c2 = CLASS_2->make($o);

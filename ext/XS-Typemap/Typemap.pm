@@ -34,7 +34,7 @@ to the test script.
 use base < qw/ DynaLoader Exporter /;
 
 
-use vars < qw/ $VERSION @EXPORT /;
+our (, $VERSION, @EXPORT, );
 
 $VERSION = '0.02';
 

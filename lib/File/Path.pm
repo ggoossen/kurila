@@ -514,7 +514,7 @@ use File::Basename ();
 use File::Spec     ();
 
 use Exporter ();
-use vars < qw($VERSION @ISA @EXPORT);
+our ($VERSION, @ISA, @EXPORT);
 $VERSION = '2.01';
 @ISA     = qw(Exporter);
 @EXPORT  = qw(mkpath rmtree);

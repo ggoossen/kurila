@@ -19,7 +19,7 @@ use Math::Trig v1.16 < qw(:pi);
 my $pip2 = pi / 2;
 
 
-use vars < qw($x $y $z);
+our ($x, $y, $z);
 
 my $eps = 1e-11;
 

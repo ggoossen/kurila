@@ -14,7 +14,7 @@ require ExtUtils::MakeMaker;
 ExtUtils::MakeMaker->import( <qw($Verbose neatvalue));
 
 # If we make $VERSION an our variable parse_version() breaks
-use vars < qw($VERSION);
+our ($VERSION);
 $VERSION = '6.44';
 
 require ExtUtils::MM_Any;

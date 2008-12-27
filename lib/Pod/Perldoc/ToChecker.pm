@@ -2,7 +2,7 @@
 package Pod::Perldoc::ToChecker;
 
 use warnings;
-use vars < qw(@ISA);
+our (@ISA);
 
 # Pick our superclass...
 #

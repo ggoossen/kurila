@@ -168,7 +168,7 @@ L<File::chdir>
 =cut
 
 use Exporter;
-use vars < qw(@ISA @EXPORT @EXPORT_OK $VERSION);
+our (@ISA, @EXPORT, @EXPORT_OK, $VERSION);
 use env;
 
 $VERSION = '3.2701';

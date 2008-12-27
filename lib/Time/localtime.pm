@@ -16,7 +16,7 @@ BEGIN {
     %EXPORT_TAGS = %( FIELDS => \@( < @EXPORT_OK, < @EXPORT ) );
     $VERSION     = 1.02;
 }
-use vars      < @EXPORT_OK;
+our ();
 
 sub populate (@) {
     return unless (nelems @_);

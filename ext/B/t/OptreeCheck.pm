@@ -2,7 +2,7 @@ package OptreeCheck;
 use base 'Exporter';
 
 use warnings;
-use vars < qw($TODO $Level $using_open);
+our ($TODO, $Level, $using_open);
 require "./test.pl";
 
 our $VERSION = '0.02';

@@ -2,7 +2,7 @@
 package Pod::Simple::HTMLLegacy;
 
 
-use vars < qw($VERSION);
+our ($VERSION);
 use Getopt::Long;
 
 $VERSION = "5.01";

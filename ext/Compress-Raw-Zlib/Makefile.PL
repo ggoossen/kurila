@@ -316,7 +316,7 @@ sub zlib_files
 
 
 
-use vars < qw ( @GZIP_OS_Names  %OSnames) ;
+our (, @GZIP_OS_Names,  %OSnames) ;
 
 BEGIN
 {

@@ -1,7 +1,7 @@
 # -*-perl-*-
 
 use Test < qw($ntest plan ok $TESTOUT $TESTERR);
-use vars < qw($mycnt);
+our ($mycnt);
 
 my $why = "zero != one";
 

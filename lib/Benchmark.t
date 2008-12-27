@@ -2,7 +2,7 @@
 
 use warnings;
 
-use vars < qw($foo $bar $baz $ballast);
+our ($foo, $bar, $baz, $ballast);
 use Test::More tests => 182;
 
 use Benchmark < qw(:all);

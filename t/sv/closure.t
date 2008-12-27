@@ -186,7 +186,7 @@ do {
 do {
     
 
-    use vars < qw!$test!;
+    our ($test);
     my($debugging, %expected);
     my($nc_attempt, $call_outer, $call_inner, $undef_outer);
     my($code, $expected, $errors, $output);

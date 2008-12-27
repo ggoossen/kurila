@@ -8,7 +8,7 @@ package IPC::Msg;
 
 use IPC::SysV < qw(IPC_STAT IPC_SET IPC_RMID);
 
-use vars < qw($VERSION);
+our ($VERSION);
 use Carp;
 
 $VERSION = "1.02";

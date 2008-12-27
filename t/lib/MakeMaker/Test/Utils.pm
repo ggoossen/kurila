@@ -4,7 +4,7 @@ use File::Spec;
 
 use Config;
 
-use vars < qw($VERSION @ISA @EXPORT);
+our ($VERSION, @ISA, @EXPORT);
 
 require Exporter;
 @ISA = qw(Exporter);

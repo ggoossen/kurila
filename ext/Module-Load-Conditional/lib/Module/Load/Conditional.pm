@@ -13,8 +13,8 @@ use version <     qw[qv];
 use constant ON_VMS  => $^O eq 'VMS';
 
 BEGIN {
-    use vars <        qw[ $VERSION @ISA $VERBOSE $CACHE @EXPORT_OK 
-                        $FIND_VERSION $ERROR $CHECK_INC_HASH];
+    our (, $VERSION, @ISA, $VERBOSE, $CACHE, @EXPORT_OK, 
+,                        $FIND_VERSION, $ERROR, $CHECK_INC_HASH);
     use Exporter;
     @ISA            = qw[Exporter];
     $VERSION        = '0.22';

@@ -1,8 +1,8 @@
 #!/usr/bin/perl -w
 
-use vars < qw($masterpodfile %Build %Targets $Verbose $Up %Ignore
-	    @Master %Readmes %Pods %Aux %Readmepods %Pragmata %Modules
-	    %Copies);
+our ($masterpodfile, %Build, %Targets, $Verbose, $Up, %Ignore
+	,    @Master, %Readmes, %Pods, %Aux, %Readmepods, %Pragmata, %Modules
+	,    %Copies);
 use File::Spec;
 use File::Find;
 use FindBin;

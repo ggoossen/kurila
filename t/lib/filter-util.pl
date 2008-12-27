@@ -1,7 +1,7 @@
  
 use warnings;
 
-use vars < qw( $Perl $Inc);
+our (, $Perl, $Inc);
 
 sub readFile
 {

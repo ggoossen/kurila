@@ -26,7 +26,7 @@ package Pod::Text;
 
 
 use utf8;
-use vars < qw(@ISA @EXPORT $VERSION);
+our (@ISA, @EXPORT, $VERSION);
 
 use Exporter ();
 use Pod::Simple ();

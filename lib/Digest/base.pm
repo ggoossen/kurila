@@ -1,6 +1,6 @@
 package Digest::base;
 
-use vars < qw($VERSION);
+our ($VERSION);
 $VERSION = "1.00";
 
 # subclass is supposed to implement at least these

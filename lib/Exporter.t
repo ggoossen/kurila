@@ -74,7 +74,7 @@ sub the         { 'the'         }
 sub Fasten      { 'Fasten'      }
 sub your        { 'your'        }
 sub under       { 'under'       }
-use vars < qw($seatbelt $seat @wailing %left);
+our ($seatbelt, $seat, @wailing, %left);
 $seatbelt = 'seatbelt';
 $seat     = 'seat';
 @wailing = qw(AHHHHHH);

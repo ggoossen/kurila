@@ -5,7 +5,7 @@ use Exporter ();
 use Carp < qw(croak);
 use Digest ();
 
-use vars < qw($VERSION @ISA @EXPORT_OK);
+our ($VERSION, @ISA, @EXPORT_OK);
 
 $VERSION = "1.00";
 @ISA = qw(Exporter);

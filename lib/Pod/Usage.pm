@@ -9,7 +9,7 @@
 
 package Pod::Usage;
 
-use vars < qw($VERSION);
+our ($VERSION);
 $VERSION = "1.35";  ## Current version of this package
 
 =head1 NAME
@@ -426,7 +426,7 @@ use Config;
 use Exporter;
 use File::Spec;
 
-use vars < qw(@ISA @EXPORT);
+our (@ISA, @EXPORT);
 @EXPORT = qw(&pod2usage);
 BEGIN {
        require Pod::Text;

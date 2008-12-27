@@ -32,14 +32,14 @@ package Getopt::Long;
 
 
 
-use vars < qw($VERSION);
+our ($VERSION);
 $VERSION        =  2.37;
 # For testing versions only.
-use vars < qw($VERSION_STRING);
+our ($VERSION_STRING);
 $VERSION_STRING = "2.37";
 
 use Exporter;
-use vars < qw(@ISA @EXPORT @EXPORT_OK);
+our (@ISA, @EXPORT, @EXPORT_OK);
 @ISA = qw(Exporter);
 
 BEGIN {
@@ -51,12 +51,12 @@ BEGIN {
 
 # User visible variables.
 our ($REQUIRE_ORDER, $PERMUTE, $RETURN_IN_ORDER);
-use vars < qw($error $debug $major_version $minor_version);
+our ($error, $debug, $major_version, $minor_version);
 # Deprecated visible variables.
-use vars < qw($autoabbrev $getopt_compat $ignorecase $bundling $order
-	    $passthrough);
+our ($autoabbrev, $getopt_compat, $ignorecase, $bundling, $order
+	,    $passthrough);
 # Official invisible variables.
-use vars < qw($genprefix $caller $gnu_compat $auto_help $auto_version $longprefix);
+our ($genprefix, $caller, $gnu_compat, $auto_help, $auto_version, $longprefix);
 
 ################ Local Variables ################
 

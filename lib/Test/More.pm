@@ -1,7 +1,7 @@
 package Test::More;
 
 
-use vars < qw($VERSION @ISA @EXPORT %EXPORT_TAGS $TODO);
+our ($VERSION, @ISA, @EXPORT, %EXPORT_TAGS, $TODO);
 $VERSION = '0.78';
 $VERSION = eval $VERSION;    # make the alpha version come out as a number
 
@@ -767,7 +767,7 @@ along these lines.
 
 =cut
 
-use vars < qw(@Data_Stack %Refs_Seen);
+our (@Data_Stack, %Refs_Seen);
 my $DNE = bless \@(), 'Does::Not::Exist';
 
 sub _dne {

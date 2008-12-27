@@ -1,7 +1,7 @@
 package ExtUtils::Packlist;
 
 use Config < qw(config_value config_keys);
-use vars < qw($VERSION $Relocations);
+our ($VERSION, $Relocations);
 $VERSION = '1.43';
 $VERSION = eval $VERSION;
 

@@ -4,7 +4,7 @@ use warnings;
 use B;
 
 require DynaLoader;
-use vars < qw( @ISA $VERSION );
+our (, @ISA, $VERSION, );
 @ISA = qw(DynaLoader);
 $VERSION = '1.10';
 

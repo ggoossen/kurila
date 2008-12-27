@@ -3,7 +3,7 @@ package ExtUtils::CBuilder::Platform::aix;
 use ExtUtils::CBuilder::Platform::Unix;
 use File::Spec;
 
-use vars < qw($VERSION @ISA);
+our ($VERSION, @ISA);
 $VERSION = '0.22';
 @ISA = qw(ExtUtils::CBuilder::Platform::Unix);
 

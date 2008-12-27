@@ -1,6 +1,6 @@
 package Module::CoreList;
 
-use vars < qw/$VERSION %released %patchlevel %version %families/;
+our ($VERSION, %released, %patchlevel, %version, %families);
 $VERSION = '2.14';
 
 =head1 NAME

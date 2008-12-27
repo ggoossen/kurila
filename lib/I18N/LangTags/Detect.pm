@@ -4,8 +4,8 @@
 package I18N::LangTags::Detect;
 
 
-use vars < qw( @ISA $VERSION $MATCH_SUPERS $USING_LANGUAGE_TAGS
-             $USE_LITERALS $MATCH_SUPERS_TIGHTLY);
+our (, @ISA, $VERSION, $MATCH_SUPERS, $USING_LANGUAGE_TAGS
+,             $USE_LITERALS, $MATCH_SUPERS_TIGHTLY);
 
 BEGIN { unless(defined &DEBUG) { *DEBUG = sub () {0} } }
  # define the constant 'DEBUG' at compile-time

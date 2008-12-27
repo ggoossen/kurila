@@ -18,7 +18,7 @@ use Exporter;
 #use File::Compare;
 #use Cwd qw(abs_path);
 
-use vars < qw($MYPKG @EXPORT @ISA);
+our ($MYPKG, @EXPORT, @ISA);
 $MYPKG = try { @(caller)[0] };
 @EXPORT = qw(&testpodplaintext);
 BEGIN {

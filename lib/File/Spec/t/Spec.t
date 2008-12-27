@@ -705,7 +705,7 @@ plan tests => scalar (nelems @tests) + 1;
 
 do {
     package File::Spec::FakeWin32;
-    use vars < qw(@ISA);
+    our (@ISA);
     @ISA = qw(File::Spec::Win32);
 
     sub _cwd { 'C:\one\two' }

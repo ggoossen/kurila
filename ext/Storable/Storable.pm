@@ -23,7 +23,7 @@ our @EXPORT_OK = qw(
 );
 
 use FileHandle;
-use vars < qw($canonical $forgive_me $VERSION);
+our ($canonical, $forgive_me, $VERSION);
 
 $VERSION = '2.18';
 

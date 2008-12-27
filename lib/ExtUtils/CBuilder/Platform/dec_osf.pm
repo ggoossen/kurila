@@ -3,7 +3,7 @@ package ExtUtils::CBuilder::Platform::dec_osf;
 use ExtUtils::CBuilder::Platform::Unix;
 use File::Spec;
 
-use vars < qw($VERSION @ISA);
+our ($VERSION, @ISA);
 @ISA = qw(ExtUtils::CBuilder::Platform::Unix);
 $VERSION = '0.22';
 

@@ -16,7 +16,7 @@ my $LIBS = \@();
 my $XSOPT = '';
 my $SYSCALL_H;
 
-use vars < qw($self); # Used in 'sourcing' the hints.
+our ($self); # Used in 'sourcing' the hints.
 
 # TBD: Can we just use $Config(exe_ext) here instead of this complex
 #      expression?

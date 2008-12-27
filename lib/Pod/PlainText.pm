@@ -20,7 +20,7 @@ package Pod::PlainText;
 
 use Pod::Select ();
 
-use vars < qw(@ISA %ESCAPES $VERSION);
+our (@ISA, %ESCAPES, $VERSION);
 
 # We inherit from Pod::Select instead of Pod::Parser so that we can be used
 # by Pod::Usage.

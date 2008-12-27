@@ -5,7 +5,7 @@ plan( tests => 8 );
 
 use warnings;
 
-use vars < qw{ @warnings };
+our (, @warnings, );
 
 BEGIN {
     $^WARN_HOOK = sub { push @warnings, @_[0]->message };

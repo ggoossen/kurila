@@ -11,10 +11,10 @@ use File::Spec;
 #require ExtUtils::MakeMaker;
 #require ExtUtils::Liblist;
 
-use vars < qw(@ISA @EXPORT $VERSION
-	    @Extensions $Verbose $lib_ext
-	    $opt_o $opt_s 
-	    );
+our (@ISA, @EXPORT, $VERSION
+	,    @Extensions, $Verbose, $lib_ext
+	,    $opt_o, $opt_s, 
+	,    );
 
 
 $VERSION = '1.26_01';

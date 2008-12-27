@@ -15,8 +15,8 @@ sub croak
 }
 
 
-use vars < qw($VERSION $VMS_TERMCAP);
-use vars < qw($termpat $state $first $entry);
+our ($VERSION, $VMS_TERMCAP);
+our ($termpat, $state, $first, $entry);
 
 $VERSION = '1.12';
 

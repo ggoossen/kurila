@@ -26,7 +26,7 @@ BEGIN {
         ALL    => \@( < @EXPORT, < @EXPORT_OK ),
     );
 }
-use vars < grep m/^\$pw_/, @EXPORT_OK;
+our ();
 
 #
 # XXX: these mean somebody hacked this module's source

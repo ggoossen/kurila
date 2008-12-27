@@ -1,6 +1,6 @@
 package Time::HiRes;
 
-use vars < qw($VERSION $XS_VERSION @ISA @EXPORT @EXPORT_OK);
+our ($VERSION, $XS_VERSION, @ISA, @EXPORT, @EXPORT_OK);
 
 require Exporter;
 require DynaLoader;

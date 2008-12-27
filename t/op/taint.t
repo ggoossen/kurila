@@ -16,7 +16,7 @@ plan tests => 228;
 
 $| = 1;
 
-use vars < qw($ipcsysv); # did we manage to load IPC::SysV?
+our ($ipcsysv); # did we manage to load IPC::SysV?
 
 my ($old_env_path, $old_env_dcl_path, $old_env_term);
 BEGIN {
@@ -772,7 +772,7 @@ do {
     # bug id 20010519.003
 
     BEGIN {
-	use vars < qw($has_fcntl);
+	our ($has_fcntl);
 	try { require Fcntl; Fcntl->import; };
 	unless ($@) {
 	    $has_fcntl = 1;

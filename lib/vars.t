@@ -15,7 +15,7 @@ $main::y = 3;
 @main::z = @( () );
 $X::x = 13;
 
-use vars < qw($p @q %r *s);
+our ($p, @q, %r, *s);
 
 my $e = !(grep m/^Name "X::x" used only once: possible typo/, @warns) && 'not ';
 print "$($e)ok 1\n";

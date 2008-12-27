@@ -8,9 +8,9 @@ use File::Find;
 use File::Spec;
 
 
-use vars < qw($VERSION @ISA @EXPORT_OK 
-          $Is_MacOS $Is_VMS 
-          $Debug $Verbose $Quiet $MANIFEST $DEFAULT_MSKIP);
+our ($VERSION, @ISA, @EXPORT_OK, 
+,          $Is_MacOS, $Is_VMS, 
+,          $Debug, $Verbose, $Quiet, $MANIFEST, $DEFAULT_MSKIP);
 
 $VERSION = '1.51_01';
 @ISA=@('Exporter');

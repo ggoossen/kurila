@@ -41,8 +41,8 @@
 my $file;
 
 use warnings FATAL=>"all";
-use vars < qw($iters $numtests $bang $ffff $nulnul $OP $utf8);
-use vars < qw($qr $skip_amp $qr_embed); # set by our callers
+our ($iters, $numtests, $bang, $ffff, $nulnul, $OP, $utf8);
+our ($qr, $skip_amp, $qr_embed); # set by our callers
 
 
 BEGIN {
@@ -56,8 +56,8 @@ BEGIN {
 }
 
 use warnings FATAL=>"all";
-use vars < qw($iters $numtests $bang $ffff $nulnul $OP);
-use vars < qw($qr $skip_amp $qr_embed $qr_embed_thr); # set by our callers
+our ($iters, $numtests, $bang, $ffff, $nulnul, $OP);
+our ($qr, $skip_amp, $qr_embed, $qr_embed_thr); # set by our callers
 
 
 if (!defined $file) {

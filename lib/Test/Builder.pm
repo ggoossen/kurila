@@ -103,7 +103,7 @@ test might be run multiple times in the same process.
 
 =cut
 
-use vars < qw($Level);
+our ($Level);
 
 sub reset {
     my @($self) =  @_;

@@ -1,7 +1,7 @@
 package ExtUtils::Install;
 
 
-use vars < qw(@ISA @EXPORT $VERSION $MUST_REBOOT);
+our (@ISA, @EXPORT, $VERSION, $MUST_REBOOT);
 
 use Config < qw(config_value);
 use Cwd < qw(cwd);

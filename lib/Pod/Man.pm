@@ -27,7 +27,7 @@ package Pod::Man;
 
 
 use utf8;
-use vars < qw(@ISA %ESCAPES $PREAMBLE $VERSION);
+our (@ISA, %ESCAPES, $PREAMBLE, $VERSION);
 
 use Carp < qw(croak);
 use Pod::Simple ();

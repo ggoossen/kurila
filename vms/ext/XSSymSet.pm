@@ -1,6 +1,6 @@
 package ExtUtils::XSSymSet;
 
-use vars < qw( $VERSION );
+our (, $VERSION, );
 $VERSION = '1.1';
 
 

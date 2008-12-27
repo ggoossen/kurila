@@ -6,7 +6,7 @@ plan tests => 12;
 do {
    package LenDigest;
    require Digest::base;
-   use vars < qw(@ISA);
+   our (@ISA);
    @ISA = qw(Digest::base);
 
    sub new {

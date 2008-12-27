@@ -2,11 +2,11 @@
 package Pod::Simple::HTML;
 
 use Pod::Simple::PullParser ();
-use vars < qw(
-  @ISA %Tagmap $Computerese $LamePad $Linearization_Limit $VERSION
-  $Perldoc_URL_Prefix $Perldoc_URL_Postfix
-  $Title_Prefix $Title_Postfix $HTML_EXTENSION %ToIndex
-  $Doctype_decl  $Content_decl
+our (
+,  @ISA, %Tagmap, $Computerese, $LamePad, $Linearization_Limit, $VERSION
+,  $Perldoc_URL_Prefix, $Perldoc_URL_Postfix
+,  $Title_Prefix, $Title_Postfix, $HTML_EXTENSION, %ToIndex
+,  $Doctype_decl,  $Content_decl
 );
 @ISA = @('Pod::Simple::PullParser');
 $VERSION = '3.03';

@@ -12,7 +12,7 @@ if (defined umask && (umask() ^&^ 0444)) {
 }
 
 getopts('Dd:rlhaQe');
-use vars < qw($opt_D $opt_d $opt_r $opt_l $opt_h $opt_a $opt_Q $opt_e);
+our ($opt_D, $opt_d, $opt_r, $opt_l, $opt_h, $opt_a, $opt_Q, $opt_e);
 die "-r and -a options are mutually exclusive\n" if ($opt_r and $opt_a);
 my @inc_dirs = inc_dirs() if $opt_a;
 

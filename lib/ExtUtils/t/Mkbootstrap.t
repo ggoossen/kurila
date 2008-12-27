@@ -11,7 +11,7 @@ BEGIN {
 }
 chdir 't';
 
-use vars < qw( $required );
+our (, $required, );
 use Test::More tests => 18;
 
 BEGIN { use_ok( 'ExtUtils::Mkbootstrap' ) }

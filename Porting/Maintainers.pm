@@ -8,9 +8,9 @@ package Maintainers;
 use lib "Porting";
 
 require "Maintainers.pl";
-use vars < qw(%Modules %Maintainers);
+our (%Modules, %Maintainers);
 
-use vars < qw(@ISA @EXPORT_OK);
+our (@ISA, @EXPORT_OK);
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(%Modules %Maintainers
 		get_module_files get_module_pat

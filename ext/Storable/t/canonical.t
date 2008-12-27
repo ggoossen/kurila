@@ -8,7 +8,7 @@
 
 
 use Storable < qw(freeze thaw dclone);
-use vars < qw($debugging $verbose);
+our ($debugging, $verbose);
 
 print "1..8\n";
 

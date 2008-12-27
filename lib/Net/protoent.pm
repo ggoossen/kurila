@@ -9,7 +9,7 @@ BEGIN {
     @EXPORT_OK   = qw( $p_name @p_aliases $p_proto );
     %EXPORT_TAGS = %( FIELDS => \@( < @EXPORT_OK, < @EXPORT ) );
 }
-use vars      < @EXPORT_OK;
+our ();
 
 # Class::Struct forbids use of @ISA
 sub import { goto &Exporter::import }

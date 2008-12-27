@@ -4,7 +4,7 @@ package Pod::Simple::XMLOutStream;
 use utf8;
 use Carp ();
 use Pod::Simple ();
-use vars < qw( $ATTR_PAD @ISA $VERSION $SORT_ATTRS);
+our (, $ATTR_PAD, @ISA, $VERSION, $SORT_ATTRS);
 $VERSION = '2.02';
 BEGIN {
   @ISA = @('Pod::Simple');

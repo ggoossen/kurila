@@ -2,7 +2,7 @@ package ExtUtils::CBuilder::Platform::Unix;
 
 use ExtUtils::CBuilder::Base;
 
-use vars < qw($VERSION @ISA);
+our ($VERSION, @ISA);
 $VERSION = '0.22';
 @ISA = qw(ExtUtils::CBuilder::Base);
 

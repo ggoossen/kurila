@@ -7,8 +7,8 @@ use Config 'config_value';
 use Fcntl;    # for sysopen
 use File::Spec::Functions < qw(catfile catdir splitdir);
 
-use vars < qw($VERSION @Pagers $Bindir $Pod2man
-  $Temp_Files_Created $Temp_File_Lifetime
+our ($VERSION, @Pagers, $Bindir, $Pod2man
+,  $Temp_Files_Created, $Temp_File_Lifetime
 );
 $VERSION = '3.14_02';
 #..........................................................................

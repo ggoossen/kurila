@@ -12,7 +12,7 @@ my $DOSISH = ($^O =~ m/^(MSWin\d\d|os2|dos|mint)$/);
 
 require VMS::Filespec if $Is_VMS;
 
-use vars < qw($VERSION);
+our ($VERSION);
 $VERSION = '1.43';
 $VERSION = eval $VERSION;
 

@@ -4,7 +4,7 @@ use Digest;
 
 do {
     package Digest::Dummy;
-    use vars < qw($VERSION @ISA);
+    our ($VERSION, @ISA);
     $VERSION = 1;
 
     require Digest::base;

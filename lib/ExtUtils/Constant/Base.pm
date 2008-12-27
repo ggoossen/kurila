@@ -1,6 +1,6 @@
 package ExtUtils::Constant::Base;
 
-use vars < qw($VERSION);
+our ($VERSION);
 use Text::Wrap;
 use ExtUtils::Constant::Utils < qw(C_stringify perl_stringify);
 $VERSION = '0.04';

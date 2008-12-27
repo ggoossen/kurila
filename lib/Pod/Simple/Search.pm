@@ -2,7 +2,7 @@
 package Pod::Simple::Search;
 
 
-use vars < qw($VERSION $MAX_VERSION_WITHIN $SLEEPY);
+our ($VERSION, $MAX_VERSION_WITHIN, $SLEEPY);
 $VERSION = 3.04;   ## Current version of this package
 
 BEGIN { *DEBUG = sub () {0} unless defined &DEBUG; }   # set DEBUG level

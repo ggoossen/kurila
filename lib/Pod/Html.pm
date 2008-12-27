@@ -2,7 +2,7 @@ package Pod::Html;
 
 require Exporter;
 
-use vars < qw($VERSION @ISA @EXPORT @EXPORT_OK);
+our ($VERSION, @ISA, @EXPORT, @EXPORT_OK);
 $VERSION = 1.09;
 @ISA = qw(Exporter);
 @EXPORT = qw(pod2html htmlify);
@@ -248,7 +248,7 @@ my $Doindex;
 my $Backlink;
 my($Listlevel, @Listtype);
 my $ListNewTerm;
-use vars < qw($Ignore);  # need to localize it later.
+our ($Ignore);  # need to localize it later.
 
 my(%Items_Named, @Items_Seen);
 my($Title, $Header);

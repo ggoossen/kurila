@@ -70,12 +70,12 @@ do {
 # 
 # Public variables
 # 
-use vars < qw($host);             # host to send syslog messages to (see notes at end)
+our ($host);             # host to send syslog messages to (see notes at end)
 
 # 
 # Global variables
 # 
-use vars < qw($facility);
+our ($facility);
 my $connected = 0;              # flag to indicate if we're connected or not
 my $syslog_send;                # coderef of the function used to send messages
 my $syslog_path = undef;        # syslog path for "stream" and "unix" mechanisms

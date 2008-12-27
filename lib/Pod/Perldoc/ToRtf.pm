@@ -2,7 +2,7 @@
 package Pod::Perldoc::ToRtf;
 
 use warnings;
-use vars < qw($VERSION);
+our ($VERSION);
 
 use base < qw( Pod::Simple::RTF );
 
