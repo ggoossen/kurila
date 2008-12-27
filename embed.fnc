@@ -1137,7 +1137,6 @@ s	|void	|no_bareword_allowed|NN const OP *o
 sR	|OP*	|no_fh_allowed|NN OP *o
 sR	|OP*	|too_few_arguments|NN OP *o|NN const char* name
 sR	|OP*	|too_many_arguments|NN OP *o|NN const char* name
-s	|OP*	|ref_array_or_hash|NULLOK OP* cond
 #endif
 #if defined(PL_OP_SLAB_ALLOC)
 Apa	|void*	|Slab_Alloc	|size_t sz
