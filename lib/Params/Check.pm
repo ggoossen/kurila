@@ -5,13 +5,13 @@ use Locale::Maketext::Simple    Style => 'gettext';
 
 use Data::Dumper;
 
+our (@ISA, $VERSION, @EXPORT_OK, $VERBOSE, $ALLOW_UNKNOWN,
+     $STRICT_TYPE, $STRIP_LEADING_DASHES, $NO_DUPLICATES,
+     $PRESERVE_CASE, $ONLY_ALLOW_DEFINED, $WARNINGS_FATAL,
+     $SANITY_CHECK_TEMPLATE, $CALLER_DEPTH, $_ERROR_STRING);
+
 BEGIN {
     use Exporter    ();
-    our (, @ISA, $VERSION, @EXPORT_OK, $VERBOSE, $ALLOW_UNKNOWN
-,                        $STRICT_TYPE, $STRIP_LEADING_DASHES, $NO_DUPLICATES
-,                        $PRESERVE_CASE, $ONLY_ALLOW_DEFINED, $WARNINGS_FATAL
-,                        $SANITY_CHECK_TEMPLATE, $CALLER_DEPTH, $_ERROR_STRING
-,                    );
 
     @ISA        =   qw[ Exporter ];
     @EXPORT_OK  =   qw[check allow last_error];

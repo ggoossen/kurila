@@ -20,14 +20,14 @@ our %EXPORT_TAGS = %('ALL' => \@EXPORT_OK);
 #==========================================================================
 
 our (
-,  %Code2USASCII
-,  %Name2character
-,  %Name2character_number
-,  %Latin1Code_to_fallback
-,  %Latin1Char_to_fallback
-,  $FAR_CHAR
-,  $FAR_CHAR_NUMBER
-,  $NOT_ASCII
+  %Code2USASCII,
+  %Name2character,
+  %Name2character_number,
+  %Latin1Code_to_fallback,
+  %Latin1Char_to_fallback,
+  $FAR_CHAR,
+  $FAR_CHAR_NUMBER,
+  $NOT_ASCII,
 );
 
 use utf8;

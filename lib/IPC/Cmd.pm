@@ -1,5 +1,7 @@
 package IPC::Cmd;
 
+our (@ISA, $VERSION, @EXPORT_OK, $VERBOSE, $DEBUG,
+     $USE_IPC_RUN, $USE_IPC_OPEN3, $WARN);
 
 BEGIN {
 
@@ -8,9 +10,6 @@ BEGIN {
     use constant IS_WIN98 => (IS_WIN32 and !Win32::IsWinNT())   ?? 1 !! 0;
 
     use Exporter    ();
-    our (, @ISA, $VERSION, @EXPORT_OK, $VERBOSE, $DEBUG
-,                        $USE_IPC_RUN, $USE_IPC_OPEN3, $WARN
-,                    );
 
     $VERSION        = '0.40_1';
     $VERBOSE        = 0;

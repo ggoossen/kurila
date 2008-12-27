@@ -2,7 +2,7 @@
 package version;
 
 
-our (@ISA, $VERSION, $CLASS, *qv);
+our (@ISA, $VERSION, $CLASS);
 
 $VERSION = 0.73;
 

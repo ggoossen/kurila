@@ -1,7 +1,7 @@
 #!./perl -T
 
 use warnings;
-our (, @warnings, $fagwoosh, $putt, $kloong);
+our (@warnings, $fagwoosh, $putt, $kloong);
 BEGIN {				# ...and save 'em for later
     $^WARN_HOOK = sub { push @warnings, @_[0]->{?description} }
 }

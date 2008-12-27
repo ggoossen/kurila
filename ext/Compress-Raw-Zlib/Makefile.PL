@@ -316,7 +316,7 @@ sub zlib_files
 
 
 
-our (, @GZIP_OS_Names,  %OSnames) ;
+our (@GZIP_OS_Names,  %OSnames) ;
 
 BEGIN
 {

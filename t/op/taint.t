@@ -771,8 +771,8 @@ do {
 do {
     # bug id 20010519.003
 
+    our ($has_fcntl);
     BEGIN {
-	our ($has_fcntl);
 	try { require Fcntl; Fcntl->import; };
 	unless ($@) {
 	    $has_fcntl = 1;

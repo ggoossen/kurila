@@ -8,9 +8,8 @@ use utf8;
 use Carp ();
 use Pod::Simple::Methody ();
 use Pod::Simple ();
-our (, @ISA, $VERSION, );
-$VERSION = '2.02';
-@ISA = @('Pod::Simple::Methody');
+our $VERSION = '2.02';
+our @ISA = @('Pod::Simple::Methody');
 BEGIN { *DEBUG = defined(&Pod::Simple::DEBUG)
           ?? \&Pod::Simple::DEBUG
           !! sub() {0}

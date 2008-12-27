@@ -576,6 +576,8 @@ sub dl_find_symbol_anywhere
     return undef;
 }
 
+1;
+
 =head1 NAME
 
 DynaLoader - Dynamically load C libraries into Perl code

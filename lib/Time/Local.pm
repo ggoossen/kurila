@@ -5,7 +5,7 @@ use Config;
 
 use integer;
 
-our (, $VERSION, @ISA, @EXPORT, @EXPORT_OK, );
+our ($VERSION, @ISA, @EXPORT, @EXPORT_OK);
 $VERSION   = '1.18_01';
 
 @ISA       = qw( Exporter );

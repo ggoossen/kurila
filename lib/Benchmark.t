@@ -82,7 +82,7 @@ do {
 # I found that the eval'ed version was 3 times faster than the coderef.
 # (now it has a different ballast value)
 $baz = 0;
-my $again = countit(1, '$baz += fib($ballast)');
+my $again = countit(1, '$main::baz += fib($main::ballast)');
 isa_ok($onesec, 'Benchmark', "countit 1, eval");
 isnt ($baz, 0, "benchmarked code was run");
 my $in_again = $again->iters;
@@ -146,7 +146,7 @@ like ($got, $Default_Pattern, 'default format is all or noc');
 $out = "";
 $bar = 0;
 select($out_fh);
-$got = timethis($iterations, '++$bar');
+$got = timethis($iterations, '++$main::bar');
 select(STDOUT);
 isa_ok($got, 'Benchmark', "timethis eval");
 is ($bar, $iterations, "benchmarked code was run $iterations times");
@@ -205,7 +205,7 @@ do {
 $foo = $bar = $baz = 0;
 $out = "";
 select($out_fh);
-$got = timethese($iterations, \%( Foo => sub {++$foo}, Bar => '++$bar',
+$got = timethese($iterations, \%( Foo => sub {++$foo}, Bar => '++$main::bar',
                                 Baz => sub {++$baz} ));
 select(STDOUT);
 is(ref ($got), 'HASH', "timethese should return a hashref");
@@ -336,7 +336,7 @@ sub check_graph_vs_output {
                                  $slowr, $slowratet, $slowslow, $slowfastt,
                                  $fastr, $fastratet, $fastslowt, $fastfast);
     $all_passed
-      ^&^= is_deeply ($chart, \@(\@('', $ratetext, $slowc, $fastc),
+      &&= is_deeply ($chart, \@(\@('', $ratetext, $slowc, $fastc),
                              \@($slowr, $slowratet, $slowslow, $slowfastt),
                              \@($fastr, $fastratet, $fastslowt, $fastfast)),
                     "check the chart layout matches the formatted output");
@@ -503,7 +503,7 @@ do {
     Benchmark->debug(0);
 
     $bar = 0;
-    isa_ok(timeit(5, '++$bar'), 'Benchmark', "timeit eval");
+    isa_ok(timeit(5, '++$main::bar'), 'Benchmark', "timeit eval");
     is ($bar, 5, "benchmarked code was run 5 times");
     is ($debug, '', "There was no debug output debug disabled");
 
@@ -516,7 +516,7 @@ do {
 clearallcache();
 my @before_keys =keys %Benchmark::Cache;
 $bar = 0;
-isa_ok(timeit(5, '++$bar'), 'Benchmark', "timeit eval");
+isa_ok(timeit(5, '++$main::bar'), 'Benchmark', "timeit eval");
 is ($bar, 5, "benchmarked code was run 5 times");
 my @after5_keys =keys %Benchmark::Cache;
 $bar = 0;

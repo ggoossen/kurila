@@ -3,8 +3,8 @@
 
 package Locale::Maketext;
 
-our (, @ISA, $VERSION, $MATCH_SUPERS, $USING_LANGUAGE_TAGS
-,             $USE_LITERALS, $MATCH_SUPERS_TIGHTLY);
+our (@ISA, $VERSION, $MATCH_SUPERS, $USING_LANGUAGE_TAGS,
+     $USE_LITERALS, $MATCH_SUPERS_TIGHTLY);
 use Carp ();
 use I18N::LangTags v0.30 ();
 

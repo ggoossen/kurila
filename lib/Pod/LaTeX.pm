@@ -30,7 +30,7 @@ use base < qw/ Pod::Select /;
 # use Data::Dumper; # for debugging
 use Carp;
 
-our (, $VERSION, %HTML_Escapes, @LatexSections, );
+our ($VERSION, %HTML_Escapes, @LatexSections);
 
 $VERSION = '0.58';
 

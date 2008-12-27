@@ -9,8 +9,8 @@ our @EXPORT_OK = qw($columns $break $huge);
 
 our $VERSION = 2006.1117;
 
-our ($VERSION, $columns, $debug, $break, $huge, $unexpand, $tabstop
-	$separator, $separator2);
+our ($VERSION, $columns, $debug, $break, $huge, $unexpand, $tabstop,
+     $separator, $separator2);
 
 
 BEGIN	{

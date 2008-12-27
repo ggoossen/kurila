@@ -15,10 +15,9 @@ use Params::Check <               qw[check];
 use Module::Load::Conditional <   qw[can_load];
 use Locale::Maketext::Simple    Style => 'gettext';
 
-our (, $VERBOSE, $PREFER_BIN, $FROM_EMAIL, $USER_AGENT
-,                $BLACKLIST, $METHOD_FAIL, $VERSION, $METHODS
-,                $FTP_PASSIVE, $TIMEOUT, $DEBUG, $WARN
-,            );
+our ($VERBOSE, $PREFER_BIN, $FROM_EMAIL, $USER_AGENT,
+     $BLACKLIST, $METHOD_FAIL, $VERSION, $METHODS,
+     $FTP_PASSIVE, $TIMEOUT, $DEBUG, $WARN);
 
 use constant QUOTE  => do { $^O eq 'MSWin32' ?? q["] !! q['] };            
             

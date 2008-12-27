@@ -2,7 +2,6 @@
 
 use Config;
 
-our (*CLOSED);
 use Test::More tests => 4;
 use Scalar::Util < qw(openhandle);
 

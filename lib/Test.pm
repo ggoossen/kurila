@@ -2,8 +2,8 @@
 package Test;
 # Time-stamp: "2004-04-28 21:46:51 ADT"
 
-
-our ();
+our (%todo, %history, @FAILDETAIL, $ntest, $TestLevel, $planned,
+     $ONFAIL, %Program_Lines, $told_about_diff);
 
 # In case a test is run in a persistent environment.
 sub _reset_globals {
@@ -15,16 +15,16 @@ sub _reset_globals {
     $planned    = 0;
 }
 
-$VERSION = '1.25';
+our $VERSION = '1.25';
 require Exporter;
-@ISA=@('Exporter');
+our @ISA=@('Exporter');
 
-@EXPORT    = qw(&plan &ok &skip);
-@EXPORT_OK = qw($ntest $TESTOUT $TESTERR);
+our @EXPORT    = qw(&plan &ok &skip);
+our @EXPORT_OK = qw($ntest $TESTOUT $TESTERR);
 
 $|=1;
-$TESTOUT = *STDOUT{IO};
-$TESTERR = *STDERR{IO};
+our $TESTOUT = *STDOUT{IO};
+our $TESTERR = *STDERR{IO};
 
 # Use of this variable is strongly discouraged.  It is set mainly to
 # help test coverage analyzers know which test is running.

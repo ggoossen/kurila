@@ -5,7 +5,7 @@ plan( tests => 8 );
 
 use warnings;
 
-our (, @warnings, );
+our (@warnings);
 
 BEGIN {
     $^WARN_HOOK = sub { push @warnings, @_[0]->message };

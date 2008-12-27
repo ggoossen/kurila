@@ -9,7 +9,8 @@ BEGIN {
     @EXPORT_OK   = qw($gr_name $gr_gid $gr_passwd $gr_mem @gr_members);
     %EXPORT_TAGS = %( FIELDS => \@( < @EXPORT_OK, < @EXPORT ) );
 }
-our ();
+
+our ($gr_name, $gr_gid, $gr_passwd, $gr_mem, @gr_members);
 
 # Class::Struct forbids use of @ISA
 sub import { goto &Exporter::import }
