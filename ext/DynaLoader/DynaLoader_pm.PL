@@ -261,8 +261,8 @@ if ($dl_debug) {
 	    unless defined(&boot_DynaLoader);
 }
 
-use vars < qw(@isa @args $module @dirs $file $dl_debug $dlsrc @dl_library_path
-            @do_expand);
+our (@isa, @args, $module, @dirs, $file, $dl_debug, $dlsrc, @dl_library_path,
+     @do_expand);
 
 sub bootstrap_inherit {
     my $module = @_[0];
