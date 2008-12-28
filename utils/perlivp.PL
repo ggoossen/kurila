@@ -56,7 +56,7 @@ Usage:
     exit;
 }
 
-use vars qw(%opt); # allow testing with older versions (do not use our)
+our (%opt);
 
 @opt{ qw/? H h P p V v/ } = qw(0 0 0 0 0 0 0);
 

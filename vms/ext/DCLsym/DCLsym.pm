@@ -2,7 +2,7 @@ package VMS::DCLsym;
 
 use Carp;
 use DynaLoader;
-use vars qw( @ISA $VERSION );
+our ( @ISA, $VERSION );
 use strict;
 
 # Package globals

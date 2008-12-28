@@ -7,8 +7,7 @@
 
 package VMS::Stdio;
 
-require 5.002;
-use vars qw( $VERSION @EXPORT @EXPORT_OK %EXPORT_TAGS @ISA );
+our ($VERSION, @EXPORT, @EXPORT_OK, %EXPORT_TAGS, @ISA);
 use Carp '&croak';
 use DynaLoader ();
 use Exporter ();

@@ -1122,8 +1122,7 @@ If you get tired of constantly saying C<print $lh-E<gt>maketext>,
 consider making a functional wrapper for it, like so:
 
   use Projname::L10N;
-  use vars qw($lh);
-  $lh = Projname::L10N->get_handle(...) || die "Language?";
+  our $lh = Projname::L10N->get_handle(...) || die "Language?";
   sub pmt (@) { print( $lh->maketext(@_)) }
    # "pmt" is short for "Print MakeText"
   $Carp::Verbose = 1;

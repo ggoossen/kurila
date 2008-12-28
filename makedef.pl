@@ -12,7 +12,7 @@
 BEGIN { unshift @INC, "lib" }
 use strict;
 
-use vars qw($PLATFORM $CCTYPE $FILETYPE $CONFIG_ARGS $ARCHNAME $PATCHLEVEL);
+our ($PLATFORM, $CCTYPE, $FILETYPE, $CONFIG_ARGS, $ARCHNAME, $PATCHLEVEL);
 
 my (%define, %ordinal);
 

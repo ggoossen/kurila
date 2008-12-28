@@ -415,13 +415,6 @@ variables C<@EXPORT_OK>, C<@EXPORT>, C<@ISA>, etc.
   our @ISA = qw(Exporter);
   our @EXPORT_OK = qw(munge frobnicate);
 
-If backward compatibility for Perls under 5.6 is important,
-one must write instead a C<use vars> statement.
-
-  use vars qw(@ISA @EXPORT_OK);
-  @ISA = qw(Exporter);
-  @EXPORT_OK = qw(munge frobnicate);
-
 =head2 Playing Safe
 
 There are some caveats with the use of runtime statements

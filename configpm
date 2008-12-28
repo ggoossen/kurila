@@ -115,7 +115,6 @@ $heavy_txt .= <<'ENDOFBEG';
 package Config;
 # use strict;
 # use warnings; Pulls in Carp
-# use vars pulls in Carp
 
 BEGIN {
    my @heavy_subs = qw|myconfig fetch_string FIRSTKEY NEXTKEY config_sh config_re
@@ -134,7 +133,6 @@ $config_txt .= sprintf <<'ENDOFBEG', < @($myver) x 3;
 package Config;
 # use strict;
 # use warnings; Pulls in Carp
-# use vars pulls in Carp
 @Config::EXPORT = qw(config_value config_keys);
 @Config::EXPORT_OK = qw(myconfig config_sh config_vars config_re);
 

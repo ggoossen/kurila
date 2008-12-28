@@ -57,7 +57,7 @@ sub _succeed {
 
 sub _fail {
     return grep { m/\S/ } map { s/^\s*//; $_ } split "\n", q[
-        use vars qw($VERSION %ERROR $ERROR $Warn $Die);
+        our ($VERSION, %ERROR, $ERROR, $Warn, $Die);
         sub version { $GD::Graph::colour::VERSION }
         my $VERS = qr{ $HWS VERSION $HWS \n }xms;
         diag( "Testing $main_module \$${main_module}::VERSION" );
@@ -67,7 +67,7 @@ sub _fail {
         'VERSION' => '1.030' # Variable and Value
         'VERSION' => '2.121_020'
         'VERSION' => '0.050', # Standard variable $VERSION
-        use vars qw( $VERSION $seq @FontDirs );
+        our ( $VERSION, $seq, @FontDirs );
         $VERSION
         # *VERSION = \'1.01';
         # ( $VERSION ) = '$Revision: 1.56 $ ' =~ m/\$Revision:\s+([^\s]+)/;

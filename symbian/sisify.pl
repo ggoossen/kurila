@@ -10,9 +10,7 @@
 
 use strict;
 
-use vars qw($VERSION);
-
-$VERSION = '0.2';
+our $VERSION = '0.2';
 
 use Getopt::Long;
 use File::Temp qw/tempdir/;

@@ -1,17 +1,15 @@
 package Win32;
 
 BEGIN {
-    use vars qw|$VERSION $XS_VERSION @ISA @EXPORT @EXPORT_OK|;
-
     require Exporter;
     require DynaLoader;
 
-    @ISA = qw|Exporter DynaLoader|;
-    $VERSION = '0.34_01';
-    $XS_VERSION = $VERSION;
+    our @ISA = qw|Exporter DynaLoader|;
+    our $VERSION = '0.34_01';
+    our $XS_VERSION = $VERSION;
     $VERSION = eval $VERSION;
 
-    @EXPORT = qw(
+    our @EXPORT = qw(
 	NULL
 	WIN31_CLASS
 	OWNER_SECURITY_INFORMATION
@@ -27,7 +25,7 @@ BEGIN {
 	MB_ICONINFORMATION
 	MB_ICONSTOP
     );
-    @EXPORT_OK = qw(
+    our @EXPORT_OK = qw(
         GetOSName
         SW_HIDE
         SW_SHOWNORMAL

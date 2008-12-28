@@ -2471,7 +2471,7 @@ When no destination is specified for an option, GetOptions will store
 the resultant value in a global variable named C<opt_>I<XXX>, where
 I<XXX> is the primary name of this option. When a progam executes
 under C<use strict> (recommended), these variables must be
-pre-declared with our() or C<use vars>.
+pre-declared with our().
 
     our $opt_length = 0;
     GetOptions ('length=i');	# will store in $opt_length

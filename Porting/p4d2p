@@ -30,7 +30,7 @@ USAGE
 	exit(0);
     }
     unless (@ARGV) { @ARGV = '-'; undef $^I; }
-    use vars qw($thisfile $time $file $fnum $v $h $help);
+    our ($thisfile, $time, $file, $fnum, $v, $h, $help);
     $thisfile = "";
     $time = localtime(time);
 }

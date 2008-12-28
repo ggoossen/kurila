@@ -195,12 +195,7 @@ forget to quote the name of your package on the C<XSLoader::load> line,
 and add comma (C<,>) before the arguments (C<$VERSION> above).
 
 Of course, if C<@ISA> contained only C<DynaLoader>, there is no need to have
-the C<@ISA> assignment at all; moreover, if instead of C<our> one uses the
-more backward-compatible
-
-    use vars qw($VERSION @ISA);
-
-one can remove this reference to C<@ISA> together with the C<@ISA> assignment.
+the C<@ISA> assignment at all.
 
 If no C<$VERSION> was specified on the C<bootstrap> line, the last line becomes
 
@@ -212,10 +207,9 @@ If you want to have your cake and eat it too, you need a more complicated
 boilerplate.
 
     package YourPackage;
-    use vars qw($VERSION @ISA);
 
-    @ISA = qw( OnePackage OtherPackage );
-    $VERSION = '0.01';
+    our @ISA = qw( OnePackage OtherPackage );
+    our $VERSION = '0.01';
     try {
        require XSLoader;
        XSLoader::load('YourPackage', $VERSION);
@@ -277,11 +271,10 @@ boilerplate as
 
     package YourPackage;
     use XSLoader;
-    use vars qw($VERSION @ISA);
 
     BEGIN {
-       @ISA = qw( OnePackage OtherPackage );
-       $VERSION = '0.01';
+       our @ISA = qw( OnePackage OtherPackage );
+       our $VERSION = '0.01';
 
        # Put Perl code used in the BOOT: section here
 
@@ -300,11 +293,10 @@ this:
 
     package YourPackage;
     use XSLoader;
-    use vars qw($VERSION @ISA);
 
     BEGIN {
-       @ISA = qw( OnePackage OtherPackage );
-       $VERSION = '0.01';
+       our @ISA = qw( OnePackage OtherPackage );
+       our $VERSION = '0.01';
        XSLoader::load 'YourPackage', $VERSION;
     }
 
