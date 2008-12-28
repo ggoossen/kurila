@@ -368,11 +368,10 @@ EOT
 EOT
   printf FH "use warnings;\n";
   print FH <<'EOT';
-use Carp;
 
 require Exporter;
 require DynaLoader;
-use vars < qw ($VERSION @ISA @EXPORT_OK);
+our ($VERSION, @ISA, @EXPORT_OK);
 
 $VERSION = '0.01';
 @ISA = qw(Exporter DynaLoader);

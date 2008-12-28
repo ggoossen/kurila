@@ -10,7 +10,7 @@ exit;
 
 package test;	# test from somewhere other than main
 
-use vars < qw($bar);
+our ($bar);
 
 use Opcode v1.00 < qw(opdesc opset opset_to_ops opset_to_hex
 	opmask_add full_opset empty_opset opcodes opmask define_optag);

@@ -1,6 +1,6 @@
 #!perl -w
 
-use vars '$file';
+our $file;
 
 $file = "storable-testfile.$$";
 die "Temporary file '$file' already exists" if -e $file;

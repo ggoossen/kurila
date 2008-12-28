@@ -25,8 +25,8 @@ BEGIN {
     }
 }
 
-use vars < qw($file_magic_str $other_magic $network_magic $byteorder
-            $major $minor $minor_write $fancy);
+our ($file_magic_str, $other_magic, $network_magic, $byteorder,
+     $major, $minor, $minor_write, $fancy);
 
 $byteorder = config_value('byteorder');
 
@@ -50,7 +50,7 @@ plan tests => 372 + length ($byteorder) * 4 + $fancy * 8;
 
 use Storable < qw (store retrieve freeze thaw nstore nfreeze);
 require 'testlib.pl';
-use vars '$file';
+our $file;
 
 # There is no UTF8 flag anymore
 use bytes;

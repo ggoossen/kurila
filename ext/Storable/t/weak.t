@@ -23,7 +23,7 @@ use Scalar::Util < qw(weaken isweak);
 use Test::More 'no_plan';
 use Storable < qw(store retrieve freeze thaw nstore nfreeze);
 require 'testlib.pl';
-use vars '$file';
+our $file;
 
 
 sub tester {
