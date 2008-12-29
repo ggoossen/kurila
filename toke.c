@@ -5923,14 +5923,12 @@ S_pending_ident(pTHX)
 	     * tests still give the expected answers, even though what
 	     * they're actually testing has now changed subtly.
 	     */
-	    (*PL_tokenbuf == '%'
-	     && *(d = PL_tokenbuf + tokenbuf_len - 1) == ':'
-	     && d[-1] == ':'
-	     ? 0
-	     : PL_in_eval ? (GV_ADDMULTI | GV_ADDINEVAL) : GV_ADD),
+	    (PL_in_eval ? (GV_ADDMULTI | GV_ADDINEVAL) : GV_ADD),
 	    ((PL_tokenbuf[0] == '$') ? SVt_PV
 	     : (PL_tokenbuf[0] == '@') ? SVt_PVAV
 	     : SVt_PVHV));
+    if ( ! gv )
+	Perl_croak(aTHX_ "variable %s does not exist", PL_tokenbuf);
     OP* gvop = (OP*)newGVOP(OP_GV, 0, gv, S_curlocation());
     pl_yylval.opval = newUNOP(
 	(*PL_tokenbuf == '%' ? OP_RV2HV : *PL_tokenbuf == '@' ? OP_RV2AV : OP_RV2SV),

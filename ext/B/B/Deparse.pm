@@ -679,10 +679,10 @@ sub ambient_pragmas {
 	    || $name eq 'utf8') {
 	    require "$name.pm";
 	    if ($val) {
-		$hint_bits ^|^= ${%::{"$($name)::"}->{?"hint_bits"}};
+		$hint_bits ^|^= ${Symbol::stash($name)->{?"hint_bits"}};
 	    }
 	    else {
-		$hint_bits ^&^= ^~^${%::{"$($name)::"}->{?"hint_bits"}};
+		$hint_bits ^&^= ^~^ ${Symbol::stash($name)->{?"hint_bits"}};
 	    }
 	}
 
