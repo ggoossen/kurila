@@ -3797,23 +3797,29 @@ Perl_yylex(pTHX)
 	}
 
 	start_force(PL_curforce);
-	s = SKIPSPACE1(s);
-	d = scan_word(s, PL_tokenbuf, sizeof PL_tokenbuf, FALSE, &len);
-	if (len == 4 && strEQ(PL_tokenbuf, "else")) {
-	    force_next(ELSE);
-	    s = d;
-	}
-	else if (len == 5 && strEQ(PL_tokenbuf, "elsif")) {
-	    force_next(ELSIF);
-	    s = d;
-	}
-	else if (len == 8 && strEQ(PL_tokenbuf, "continue")) {
-	    force_next(CONTINUE);
-	    s = d;
-	}
-	else
+	if (PL_lex_state == LEX_INTERPEND) {
 	    force_next(';');
+	}
+	else {
+	    s = SKIPSPACE1(s);
+	    d = scan_word(s, PL_tokenbuf, sizeof PL_tokenbuf, FALSE, &len);
+	    if (len == 4 && strEQ(PL_tokenbuf, "else")) {
+		force_next(ELSE);
+		s = d;
+	    }
+	    else if (len == 5 && strEQ(PL_tokenbuf, "elsif")) {
+		force_next(ELSIF);
+		s = d;
+	    }
+	    else if (len == 8 && strEQ(PL_tokenbuf, "continue")) {
+		force_next(CONTINUE);
+		s = d;
+	    }
+	    else
+		force_next(';');
+	}
 	    
+	start_force(PL_curforce);
 	force_next('}');
 #ifdef PERL_MAD
 	if (!PL_thistoken)

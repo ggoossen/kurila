@@ -252,8 +252,8 @@ Creates directories, including any parent directories.
 
 sub mkpath
 {
- expand_wildcards();
- File::Path::mkpath(\ @ARGV,0,0777);
+    expand_wildcards();
+    File::Path::mkpath(\ @ARGV,0,0777);
 }
 
 =item test_f

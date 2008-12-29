@@ -93,7 +93,7 @@
 
 %type <opval> mydef
 
-%type <opval> block mblock lineseq line loop cond else
+%type <opval> block dblock mblock lineseq line loop cond else
 %type <opval> expr term subscripted scalar star amper sideff
 %type <opval> argexpr texpr iexpr mexpr miexpr
 %type <opval> listexpr listexprcom indirob listop method
@@ -150,6 +150,14 @@ prog	:	progstart
 
 /* An ordinary block */
 block	:	'{' remember lineseq '}' ';'
+			{
+                            $$ = block_end($2, $3);
+                            TOKEN_GETMAD($1,$$,'{');
+                            TOKEN_GETMAD($4,$$,'}');
+			}
+	;
+
+dblock	:	'{' remember lineseq '}'
 			{
                             $$ = block_end($2, $3);
                             TOKEN_GETMAD($1,$$,'{');
@@ -311,7 +319,7 @@ cond	:	IF '(' remember mexpr ')' mblock else
 	;
 
 /* Continue blocks */
-cont	:	/* NULL */
+cont	:	';'     /* NULL */
 			{ $$ = (OP*)NULL; }
         |       CONTINUE block
                         { $$ = scope($2);
@@ -335,7 +343,7 @@ loop	:	label WHILE remember '(' texpr ')'
                                 $$ = $5;
                             }
                         }
-                    mintro mblock cont ';'
+                    mintro mblock cont
 			{
                             OP *innerop;
 			    $$ = block_end($3,
@@ -348,7 +356,7 @@ loop	:	label WHILE remember '(' texpr ')'
                             TOKEN_GETMAD($6,innerop,')');
 			}
 
-	|	label UNTIL '(' remember iexpr ')' mintro mblock cont ';'
+	|	label UNTIL '(' remember iexpr ')' mintro mblock cont
 			{ 
                             OP *innerop;
 			    $$ = block_end($4,
@@ -360,7 +368,7 @@ loop	:	label WHILE remember '(' texpr ')'
                             TOKEN_GETMAD($3,innerop,'(');
                             TOKEN_GETMAD($6,innerop,')');
 			}
-	|	label FOR MY remember my_scalar '(' mexpr ')' mblock cont ';'
+	|	label FOR MY remember my_scalar '(' mexpr ')' mblock cont
 			{ OP *innerop;
 			  $$ = block_end($4,
                               innerop = newFOROP(0, PVAL($1),
@@ -371,7 +379,7 @@ loop	:	label WHILE remember '(' texpr ')'
 			  TOKEN_GETMAD($6,((LISTOP*)innerop)->op_first->op_sibling,'(');
 			  TOKEN_GETMAD($8,((LISTOP*)innerop)->op_first->op_sibling,')');
 			}
-	|	label FOR remember mydef '(' mexpr ')' mblock cont ';'
+	|	label FOR remember mydef '(' mexpr ')' mblock cont
 			{ OP *innerop;
 			  $$ = block_end($3,
 			     innerop = newFOROP(0, PVAL($1),
@@ -970,7 +978,7 @@ termdo	:       DO term	%prec UNIOP                     /* do $filename */
                             $$ = dofile($2, IVAL($1), LOCATION($1));
                             TOKEN_GETMAD($1,$$,'o');
 			}
-	|	DO block cont %prec '('               /* do { code */
+	|	DO dblock cont %prec '('               /* do { code */
                         {
                             OP* op_scope =
                                 scope(newWHILEOP(0, 1, (LOOP*)(OP*)NULL,
@@ -980,7 +988,7 @@ termdo	:       DO term	%prec UNIOP                     /* do $filename */
                                 LOCATION($1));
                             $$ = scope($$);
                         }
-	|	LABEL DO block cont %prec '('               /* do { code */
+	|	LABEL DO dblock cont %prec '('               /* do { code */
                         {
                             OP* op_scope = 
                                 scope(newWHILEOP(0, 1, (LOOP*)(OP*)NULL,

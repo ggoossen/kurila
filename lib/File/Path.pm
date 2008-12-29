@@ -571,7 +571,7 @@ sub mkpath {
         else { 
             %{$arg}{[qw(verbose mode)]} = @(0, 0777);
         }
-        $paths = \ @_;
+        $paths = \$: @_;
     }
     return _mkpath($arg, $paths);
 }
