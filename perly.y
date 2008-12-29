@@ -70,7 +70,7 @@
 
 %token <i_tkval> '{' '}' '[' ']' '-' '+' '$' '@' '%' '*' '&' ';'
 
-%token <opval> WORD METHOD THING PMFUNC PRIVATEREF
+%token <opval> WORD METHOD THING PMFUNC PRIVATEVAR
 %token <opval> FUNC0SUB UNIOPSUB LSTOPSUB COMPSUB
 %token <p_tkval> LABEL
 %token <i_tkval> SUB ANONSUB PACKAGE USE
@@ -149,7 +149,7 @@ prog	:	progstart
 	;
 
 /* An ordinary block */
-block	:	'{' remember lineseq '}'
+block	:	'{' remember lineseq '}' ';'
 			{
                             $$ = block_end($2, $3);
                             TOKEN_GETMAD($1,$$,'{');
@@ -274,7 +274,7 @@ sideff	:	error
 /* else and elsif blocks */
 else	:	/* NULL */
 			{ $$ = (OP*)NULL; }
-	|	ELSE mblock
+	|	ELSE mblock ';'
 			{ ($2)->op_flags |= OPf_PARENS; $$ = scope($2);
 			  TOKEN_GETMAD($1,$$,'o');
 			}
@@ -335,7 +335,7 @@ loop	:	label WHILE remember '(' texpr ')'
                                 $$ = $5;
                             }
                         }
-                    mintro mblock cont
+                    mintro mblock cont ';'
 			{
                             OP *innerop;
 			    $$ = block_end($3,
@@ -348,7 +348,7 @@ loop	:	label WHILE remember '(' texpr ')'
                             TOKEN_GETMAD($6,innerop,')');
 			}
 
-	|	label UNTIL '(' remember iexpr ')' mintro mblock cont
+	|	label UNTIL '(' remember iexpr ')' mintro mblock cont ';'
 			{ 
                             OP *innerop;
 			    $$ = block_end($4,
@@ -360,7 +360,7 @@ loop	:	label WHILE remember '(' texpr ')'
                             TOKEN_GETMAD($3,innerop,'(');
                             TOKEN_GETMAD($6,innerop,')');
 			}
-	|	label FOR MY remember my_scalar '(' mexpr ')' mblock cont
+	|	label FOR MY remember my_scalar '(' mexpr ')' mblock cont ';'
 			{ OP *innerop;
 			  $$ = block_end($4,
                               innerop = newFOROP(0, PVAL($1),
@@ -371,7 +371,7 @@ loop	:	label WHILE remember '(' texpr ')'
 			  TOKEN_GETMAD($6,((LISTOP*)innerop)->op_first->op_sibling,'(');
 			  TOKEN_GETMAD($8,((LISTOP*)innerop)->op_first->op_sibling,')');
 			}
-	|	label FOR remember mydef '(' mexpr ')' mblock cont
+	|	label FOR remember mydef '(' mexpr ')' mblock cont ';'
 			{ OP *innerop;
 			  $$ = block_end($3,
 			     innerop = newFOROP(0, PVAL($1),
@@ -686,7 +686,7 @@ method :       METHOD
        ;
 
 /* Some kind of subscripted expression */
-subscripted:    star '{' expr ';' '}'        /* *main::{something} like *STDOUT{IO} */
+subscripted:    star '{' expr ';' '}' ';'       /* *main::{something} like *STDOUT{IO} */
                         /* In this and all the hash accessors, ';' is
                          * provided by the tokeniser */
 			{
@@ -738,7 +738,7 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} like *STDOUT{
                             TOKEN_GETMAD($3,$$,'[');
                             TOKEN_GETMAD($5,$$,']');
 			}
-	|	term ARROW HSLICE expr ']' ';' '}'    /* someref->{[bar();]} */
+	|	term ARROW HSLICE expr ']' ';' '}' ';'   /* someref->{[bar();]} */
 			{ $$ = newLISTOP(OP_HSLICE, 0,
                                     scalar($4),
                                     ref(newHVREF($1, LOCATION($2)), OP_HSLICE), LOCATION($3));
@@ -758,7 +758,7 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} like *STDOUT{
 			  TOKEN_GETMAD($5,$$,'j');
 			  TOKEN_GETMAD($6,$$,']');
 			}
-	|	term HSLICE expr ']' ';' '}'    /* %foo{[bar();]} */
+	|	term HSLICE expr ']' ';' '}' ';'    /* %foo{[bar();]} */
 			{ $$ = newLISTOP(OP_HSLICE, 0,
 					scalar($3),
 					ref($1, OP_HSLICE), LOCATION($2));
@@ -777,7 +777,7 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} like *STDOUT{
 			  TOKEN_GETMAD($4,$$,'j');
 			  TOKEN_GETMAD($5,$$,']');
 			}
-	|	term '{' expr ';' '}'    /* %foo{bar} or %foo{bar();} */
+	|	term '{' expr ';' '}' ';'   /* %foo{bar} or %foo{bar();} */
                         { 
                             $$ = newBINOP(OP_HELEM, 0, $1, scalar($3),
                                 LOCATION($2));
@@ -787,7 +787,7 @@ subscripted:    star '{' expr ';' '}'        /* *main::{something} like *STDOUT{
                             TOKEN_GETMAD($4,$$,';');
                             TOKEN_GETMAD($5,$$,'}');
 			}
-	|	term ARROW '{' expr ';' '}' /* somehref->{bar();} */
+	|	term ARROW '{' expr ';' '}' ';' /* somehref->{bar();} */
                         {
                             $$ = newBINOP(OP_HELEM, 0,
                                 ref(newHVREF($1, LOCATION($2)),OP_RV2HV),
@@ -1237,7 +1237,9 @@ amper	:	'&' indirob
 	;
 
 
-scalar	:	'$' indirob
+scalar  :	PRIVATEVAR
+			{ $$ = $1; }
+	|	'$' indirob
 			{ 
                             $$ = newSVREF($2, LOCATION($1));
                             TOKEN_GETMAD($1,$$,'$');
@@ -1302,13 +1304,10 @@ star	:	'*' indirob
 	;
 
 /* Indirect objects */
-indirob	:	WORD
-			{ $$ = scalar($1); }
-	|	scalar %prec PREC_LOW
+indirob	:       WORD
+                        { $$ = scalar($1); }
+        |	scalar %prec PREC_LOW
 			{ $$ = scalar($1); }
 	|	block
 			{ $$ = scope($1); }
-
-	|	PRIVATEREF
-			{ $$ = $1; }
 	;

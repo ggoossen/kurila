@@ -44,7 +44,7 @@
      METHOD = 259,
      THING = 260,
      PMFUNC = 261,
-     PRIVATEREF = 262,
+     PRIVATEVAR = 262,
      FUNC0SUB = 263,
      UNIOPSUB = 264,
      LSTOPSUB = 265,
@@ -127,7 +127,7 @@
 #define METHOD 259
 #define THING 260
 #define PMFUNC 261
-#define PRIVATEREF 262
+#define PRIVATEVAR 262
 #define FUNC0SUB 263
 #define UNIOPSUB 264
 #define LSTOPSUB 265

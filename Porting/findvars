@@ -233,7 +233,6 @@ padix
 padix_floor
 patchlevel
 patleave
-pending_ident
 perl_destruct_level
 perldb
 pidstatus
