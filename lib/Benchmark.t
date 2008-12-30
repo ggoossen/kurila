@@ -482,7 +482,7 @@ do {
     local *STDERR = *$debug_fh{IO};
 
     $bar = 0;
-    isa_ok(timeit(5, '++$bar'), 'Benchmark', "timeit eval");
+    isa_ok(timeit(5, '++$main::bar'), 'Benchmark', "timeit eval");
     is ($bar, 5, "benchmarked code was run 5 times");
     is ($debug, '', "There was no debug output");
 
@@ -491,7 +491,7 @@ do {
     $bar = 0;
     $out = "";
     select($out_fh);
-    $got = timeit(5, '++$bar');
+    $got = timeit(5, '++$main::bar');
     select(STDOUT);
     isa_ok($got, 'Benchmark', "timeit eval");
     is ($bar, 5, "benchmarked code was run 5 times");
@@ -519,7 +519,7 @@ isa_ok(timeit(5, '++$main::bar'), 'Benchmark', "timeit eval");
 is ($bar, 5, "benchmarked code was run 5 times");
 my @after5_keys =keys %Benchmark::Cache;
 $bar = 0;
-isa_ok(timeit(10, '++$bar'), 'Benchmark', "timeit eval");
+isa_ok(timeit(10, '++$main::bar'), 'Benchmark', "timeit eval");
 is ($bar, 10, "benchmarked code was run 10 times");
 ok (!eq_array (\keys %Benchmark::Cache, \@after5_keys), "10 differs from 5");
 
