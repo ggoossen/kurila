@@ -43,8 +43,6 @@ my $b ; chop $b ;
 #! perl -w
 require "./abcd";
 EXPECT
-Use of uninitialized value $b in scalar chop at ./abcd line 1 character 9.
-    (require) called at - line 2 character 1.
 ########
 
 --FILE-- abcd

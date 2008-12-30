@@ -382,7 +382,7 @@ sub fred {}
 no warnings 'redefine' ;
 sub fred {}
 EXPECT
-Subroutine fred redefined at - line 4 character 12.
+Subroutine fred redefined at - line 5 character 1.
 ########
 # op.c
 use warnings 'redefine' ;
@@ -391,7 +391,7 @@ sub fred () { 1 }
 no warnings 'redefine' ;
 sub fred () { 1 }
 EXPECT
-Constant subroutine fred redefined at - line 4 character 18.
+Constant subroutine fred redefined at - line 5 character 1.
 ########
 # op.c
 no warnings 'redefine' ;
@@ -454,15 +454,15 @@ in mainline
 in check
 in init
 in begin
-Too late to run CHECK block at abc.pm line 3 character 30.
+Too late to run CHECK block at abc.pm line 4 character 1.
     (require) called at - line 3 character 1.
-Too late to run INIT block at abc.pm line 4 character 28.
+Too late to run INIT block at abc.pm line 5 character 1.
     (require) called at - line 3 character 1.
 in mainline
 in begin
-Too late to run CHECK block at abc.pm line 3 character 30.
+Too late to run CHECK block at abc.pm line 4 character 1.
     (eval) called at - line 4 character 1.
-Too late to run INIT block at abc.pm line 4 character 28.
+Too late to run INIT block at abc.pm line 5 character 1.
     (eval) called at - line 4 character 1.
 in mainline
 in end
