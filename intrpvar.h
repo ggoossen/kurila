@@ -208,7 +208,6 @@ PERLVAR(Iminus_n,	bool)
 PERLVAR(Iminus_p,	bool)
 PERLVAR(Iminus_l,	bool)
 PERLVAR(Iminus_a,	bool)
-PERLVAR(Iminus_E,	bool)
 
 /*
 

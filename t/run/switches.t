@@ -6,7 +6,7 @@
 
 BEGIN { require "./test.pl"; }
 
-plan(tests => 63);
+plan(tests => 62);
 
 use Config;
 
@@ -288,11 +288,3 @@ __EOF__
        "foo yada dada:bada foo bing:king kong foo",
        "-i backup file");
 };
-
-# Tests for -E
-
-$r = runperl(
-    switches	=> \@( '-E', '"undef ~~ undef and print qq(Hello, world!\n)"')
-);
-is( $r, "Hello, world!\n", "-E ~~" );
-

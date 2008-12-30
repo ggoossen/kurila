@@ -1392,9 +1392,6 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 		s++;
 		goto reswitch;
 
-	    case 'E':
-		PL_minus_E = TRUE;
-		/* FALL THROUGH */
 	    case 'e':
 #ifdef MACOS_TRADITIONAL
 		/* ignore -e for Dev:Pseudo argument */
@@ -2507,7 +2504,6 @@ S_usage(pTHX_ const char *name)		/* XXX move this out into a module ? */
 "-d[:debugger]     run program under debugger",
 "-D[number/list]   set debugging flags (argument is a bit mask or alphabets)",
 "-e program        one line of program (several -e's allowed, omit programfile)",
-"-E program        like -e, but enables all optional features",
 "-f                don't do $sitelib/sitecustomize.pl at startup",
 "-F/pattern/       split() pattern for -a switch (//'s are optional)",
 "-i[extension]     edit <> files in place (makes backup if extension supplied)",
