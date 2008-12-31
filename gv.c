@@ -927,6 +927,8 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 			    goto magicalize;
 			if (strEQ(name2, "EGID"))
 			    goto magicalize;
+			if (strEQ(name2, "ERRNO"))
+			    goto magicalize;
 			break;
 		    case 'G':   /* $^GID */
 			if (strEQ(name2, "GID"))
@@ -1060,7 +1062,6 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 	case ',':
 	case '\\':
 	case '/':
-	case '!':
 	magicalize:
 	    sv_magic(GvSVn(gv), (SV*)gv, PERL_MAGIC_sv, name, len);
 

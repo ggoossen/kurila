@@ -775,6 +775,27 @@ Perl_magic_get(pTHX_ SV *sv, MAGIC *mg)
 #endif
 		    break;
 		}
+		if (strEQ(remaining, "ERRNO")) { /* $^ERRNO */
+#ifdef VMS
+		    sv_setnv(sv, (NV)((errno == EVMSERR) ? vaxc$errno : errno));
+		    sv_setpv(sv, errno ? Strerror(errno) : "");
+#else
+		    {
+			const int saveerrno = errno;
+			sv_setnv(sv, (NV)errno);
+#ifdef OS2
+			if (errno == errno_isOS2 || errno == errno_isOS2_set)
+			    sv_setpv(sv, os2error(Perl_rc));
+			else
+#endif
+			    sv_setpv(sv, errno ? Strerror(errno) : "");
+			errno = saveerrno;
+		    }
+#endif
+		    SvRTRIM(sv);
+		    SvNOK_on(sv);	/* what a wonderful hack! */
+		    break;
+		}
 		break;
 	    case 'G':
 		if (strEQ(remaining, "GID")) { /* $^GID */
@@ -1030,26 +1051,6 @@ Perl_magic_get(pTHX_ SV *sv, MAGIC *mg)
     case '\\':
 	if (PL_ors_sv)
 	    sv_copypv(sv, PL_ors_sv);
-	break;
-    case '!':
-#ifdef VMS
-	sv_setnv(sv, (NV)((errno == EVMSERR) ? vaxc$errno : errno));
-	sv_setpv(sv, errno ? Strerror(errno) : "");
-#else
-	{
-	const int saveerrno = errno;
-	sv_setnv(sv, (NV)errno);
-#ifdef OS2
-	if (errno == errno_isOS2 || errno == errno_isOS2_set)
-	    sv_setpv(sv, os2error(Perl_rc));
-	else
-#endif
-	sv_setpv(sv, errno ? Strerror(errno) : "");
-	errno = saveerrno;
-	}
-#endif
-	SvRTRIM(sv);
-	SvNOK_on(sv);	/* what a wonderful hack! */
 	break;
     case '<':
 	sv_setiv(sv, (IV)PL_uid);
@@ -1478,6 +1479,16 @@ Perl_magic_set(pTHX_ SV *sv, MAGIC *mg)
 		    PL_tainting |= (PL_uid && (PL_euid != PL_uid || PL_egid != PL_gid));
 		    break;
 		}
+		if (strEQ(remaining, "ERRNO")) {
+#ifdef VMS
+#   define PERL_VMS_BANG vaxc$errno
+#else
+#   define PERL_VMS_BANG 0
+#endif
+		    SETERRNO(SvIOK(sv) ? SvIVX(sv) : SvOK(sv) ? sv_2iv(sv) : 0,
+			(SvIV(sv) == EVMSERR) ? 4 : PERL_VMS_BANG);
+		    break;
+		}
 		break;
 	    case 'M':   /* $^MATCH */
 		if (strEQ(remaining, "MATCH"))
@@ -1733,17 +1744,6 @@ Perl_magic_set(pTHX_ SV *sv, MAGIC *mg)
         else
 #endif
             STATUS_UNIX_EXIT_SET(SvIV(sv));
-        break;
-    case '!':
-        {
-#ifdef VMS
-#   define PERL_VMS_BANG vaxc$errno
-#else
-#   define PERL_VMS_BANG 0
-#endif
-        SETERRNO(SvIOK(sv) ? SvIVX(sv) : SvOK(sv) ? sv_2iv(sv) : 0,
-                 (SvIV(sv) == EVMSERR) ? 4 : PERL_VMS_BANG);
-        }
         break;
     case '<':
         PL_uid = SvIV(sv);
