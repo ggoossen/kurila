@@ -631,33 +631,40 @@ Perl_magic_len(pTHX_ SV *sv, MAGIC *mg)
     PERL_ARGS_ASSERT_MAGIC_LEN;
 
     switch (*mg->mg_ptr) {
-    case '\020':		
-      if (*remaining == '\0') { /* ^P */
-          break;
-      } else if (strEQ(remaining, "REMATCH")) { /* $^PREMATCH */
-          goto do_prematch;
-      } else if (strEQ(remaining, "OSTMATCH")) { /* $^POSTMATCH */
-          goto do_postmatch;
-      }
-      break;
-    case '\015': /* $^MATCH */
-	if (strEQ(remaining, "ATCH")) {
-        goto do_match;
-    } else {
-        break;
-    }
-    case '`':
-      do_prematch:
-      paren = RX_BUFF_IDX_PREMATCH;
-      goto maybegetparen;
-    case '\'':
-      do_postmatch:
-      paren = RX_BUFF_IDX_POSTMATCH;
-      goto maybegetparen;
-    case '&':
-      do_match:
-      paren = RX_BUFF_IDX_FULLMATCH;
-      goto maybegetparen;
+    case '^':		
+	switch(*remaining) {
+	case 'M':
+	    if (strEQ(remaining, "MATCH")) {
+		/* $^MATCH */
+		paren = RX_BUFF_IDX_FULLMATCH;
+		goto maybegetparen;
+	    }
+	    break;
+	case 'N':
+	    if (strEQ(remaining, "N")) {
+		/* ^N */
+		if (PL_curpm && (rx = PM_GETRE(PL_curpm))) {
+		    paren = RX_LASTCLOSEPAREN(rx);
+		    if (paren)
+			goto getparen;
+		}
+		return 0;
+	    }
+	    break;
+	case 'P':
+	    if (strEQ(remaining, "PREMATCH")) {
+		/* $^PREMATCH */
+		paren = RX_BUFF_IDX_PREMATCH;
+		goto maybegetparen;
+	    } else if (strEQ(remaining, "POSTMATCH")) {
+		/* $^POSTMATCH */
+		paren = RX_BUFF_IDX_POSTMATCH;
+		goto maybegetparen;
+	    }
+	    break;
+	}
+	break;
+
     case '1': case '2': case '3': case '4':
     case '5': case '6': case '7': case '8': case '9':
       paren = atoi(mg->mg_ptr);
@@ -677,13 +684,6 @@ Perl_magic_len(pTHX_ SV *sv, MAGIC *mg)
     case '+':
 	if (PL_curpm && (rx = PM_GETRE(PL_curpm))) {
 	    paren = RX_LASTPAREN(rx);
-	    if (paren)
-		goto getparen;
-	}
-	return 0;
-    case '\016': /* ^N */
-	if (PL_curpm && (rx = PM_GETRE(PL_curpm))) {
-	    paren = RX_LASTCLOSEPAREN(rx);
 	    if (paren)
 		goto getparen;
 	}
@@ -830,9 +830,19 @@ Perl_magic_get(pTHX_ SV *sv, MAGIC *mg)
 		break;
 	    case 'P':
 		if (strEQ(remaining, "PREMATCH")) { /* $^PREMATCH */
-		    goto do_prematch_fetch;
+		    if (PL_curpm && (rx = PM_GETRE(PL_curpm))) {
+			CALLREG_NUMBUF_FETCH(rx,-2,sv);
+			break;
+		    }
+		    sv_setsv(sv,&PL_sv_undef);
+		    break;
 		} else if (strEQ(remaining, "POSTMATCH")) { /* $^POSTMATCH */
-		    goto do_postmatch_fetch;
+		    if (PL_curpm && (rx = PM_GETRE(PL_curpm))) {
+			CALLREG_NUMBUF_FETCH(rx,-1,sv);
+			break;
+		    }
+		    sv_setsv(sv,&PL_sv_undef);
+		    break;
 		}
 		break;
 	    case 'T':
@@ -1017,22 +1027,7 @@ Perl_magic_get(pTHX_ SV *sv, MAGIC *mg)
 	}
 	sv_setsv(sv,&PL_sv_undef);
 	break;
-    case '`':
-      do_prematch_fetch:
-	if (PL_curpm && (rx = PM_GETRE(PL_curpm))) {
-	    CALLREG_NUMBUF_FETCH(rx,-2,sv);
-	    break;
-	}
-	sv_setsv(sv,&PL_sv_undef);
-	break;
     case '\'':
-      do_postmatch_fetch:
-	if (PL_curpm && (rx = PM_GETRE(PL_curpm))) {
-	    CALLREG_NUMBUF_FETCH(rx,-1,sv);
-	    break;
-	}
-	sv_setsv(sv,&PL_sv_undef);
-	break;
     case '?':
 	{
 	    sv_setiv(sv, (IV)STATUS_CURRENT);
@@ -1491,8 +1486,10 @@ Perl_magic_set(pTHX_ SV *sv, MAGIC *mg)
 		}
 		break;
 	    case 'M':   /* $^MATCH */
-		if (strEQ(remaining, "MATCH"))
-		    goto do_match;
+		if (strEQ(remaining, "MATCH")) {
+		    paren = RX_BUFF_IDX_FULLMATCH;
+		    goto setparen;
+		}
 		break;
 	    case 'O':   /* $^OPEN */
 		if (strEQ(remaining, "OPEN")) {
@@ -1542,10 +1539,12 @@ Perl_magic_set(pTHX_ SV *sv, MAGIC *mg)
 		break;
 	    case 'P':
 		if (strEQ(remaining, "PREMATCH")) { /* $^PREMATCH */
-		    goto do_prematch;
+		    paren = RX_BUFF_IDX_PREMATCH;
+		    goto setparen;
 		} 
 		if (strEQ(remaining, "POSTMATCH")) { /* $^POSTMATCH */
-		    goto do_postmatch;
+		    paren = RX_BUFF_IDX_POSTMATCH;
+		    goto setparen;
 		}
 		break;
 	    case 'U':        /* ^UTF8CACHE */
@@ -1680,18 +1679,6 @@ Perl_magic_set(pTHX_ SV *sv, MAGIC *mg)
 	    }
 	}
 	break;
-    case '`': /* $^PREMATCH caught below */
-      do_prematch:
-      paren = RX_BUFF_IDX_PREMATCH;
-      goto setparen;
-    case '\'': /* $^POSTMATCH caught below */
-      do_postmatch:
-      paren = RX_BUFF_IDX_POSTMATCH;
-      goto setparen;
-    case '&':
-      do_match:
-      paren = RX_BUFF_IDX_FULLMATCH;
-      goto setparen;
     case '1': case '2': case '3': case '4':
     case '5': case '6': case '7': case '8': case '9':
       paren = atoi(mg->mg_ptr);
