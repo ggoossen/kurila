@@ -2655,7 +2655,7 @@ Perl_moreswitches(pTHX_ const char *s)
 		   PL_rs = newSVpvn(&ch, 1);
 	      }
 	 }
-	 sv_setsv(get_sv("/", TRUE), PL_rs);
+	 sv_setsv(get_sv("^INPUT_RECORD_SEPARATOR", TRUE), PL_rs);
 	 return s + numlen;
     }
     case 'C':
@@ -3143,7 +3143,7 @@ S_init_main_stash(pTHX)
     PL_globalstash = GvHV(gv_fetchpvs("CORE::GLOBAL::", GV_ADDMULTI,
 				      SVt_PVHV));
     /* We must init $/ before switches are processed. */
-    sv_setpvn(get_sv("/", TRUE), "\n", 1);
+    sv_setpvn(get_sv("^INPUT_RECORD_SEPARATOR", TRUE), "\n", 1);
 }
 
 STATIC int
