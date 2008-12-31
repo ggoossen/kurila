@@ -294,41 +294,6 @@ past where $2 ends, and so on.  You can use C<$#+> to determine
 how many subgroups were in the last successful match.  See the
 examples given for the C<@-> variable.
 
-=item HANDLE->input_line_number(EXPR)
-
-=item $INPUT_LINE_NUMBER
-
-=item $NR
-
-=item $.
-X<$.> X<$NR> X<$INPUT_LINE_NUMBER> X<line number>
-
-Current line number for the last filehandle accessed.
-
-Each filehandle in Perl counts the number of lines that have been read
-from it.  (Depending on the value of C<$/>, Perl's idea of what
-constitutes a line may not match yours.)  When a line is read from a
-filehandle (via readline() or C<< <> >>), or when tell() or seek() is
-called on it, C<$.> becomes an alias to the line counter for that
-filehandle.
-
-You can adjust the counter by assigning to C<$.>, but this will not
-actually move the seek pointer.  I<Localizing C<$.> will not localize
-the filehandle's line count>.  Instead, it will localize perl's notion
-of which filehandle C<$.> is currently aliased to.
-
-C<$.> is reset when the filehandle is closed, but B<not> when an open
-filehandle is reopened without an intervening close().  For more
-details, see L<perlop/"IE<sol>O Operators">.  Because C<< <> >> never does
-an explicit close, line numbers increase across ARGV files (but see
-examples in L<perlfunc/eof>).
-
-You can also use C<< HANDLE->input_line_number(EXPR) >> to access the
-line counter for a given filehandle without having to worry about
-which handle you last accessed.
-
-(Mnemonic: many programs use "." to mean the current line number.)
-
 =item IO::Handle->input_record_separator(EXPR)
 
 =item $INPUT_RECORD_SEPARATOR
@@ -386,15 +351,13 @@ See also L<perlport/"Newlines">.  Also see C<$.>.
 
 =item HANDLE->autoflush(EXPR)
 
-=item $OUTPUT_AUTOFLUSH
-
-=item $|
-X<$|> X<autoflush> X<flush> X<$OUTPUT_AUTOFLUSH>
+=item $^OUTPUT_AUTOFLUSH
+X<autoflush> X<flush> X<$^OUTPUT_AUTOFLUSH>
 
 If set to nonzero, forces a flush right away and after every write
 or print on the currently selected output channel.  Default is 0
 (regardless of whether the channel is really buffered by the
-system or not; C<$|> tells you only whether you've asked Perl
+system or not; C<$^OUTPUT_AUTOFLUSH> tells you only whether you've asked Perl
 explicitly to flush after each write).  STDOUT will
 typically be line buffered if output is to the terminal and block
 buffered otherwise.  Setting this variable is useful primarily when

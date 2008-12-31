@@ -747,8 +747,17 @@ Perl_magic_get(pTHX_ SV *sv, MAGIC *mg)
 	if (remaining[1] != '\0') {
 	    switch (*remaining) {
 	    case 'C':
+		if (strEQ(remaining, "CHILD_ERROR")) { /* $^CHILD_ERROR */
+		    sv_setiv(sv, (IV)STATUS_CURRENT);
+#ifdef COMPLEX_STATUS
+		    LvTARGOFF(sv) = PL_statusvalue;
+		    LvTARGLEN(sv) = PL_statusvalue_vms;
+#endif
+		    break;
+		}
 		if (strEQ(remaining, "CHILD_ERROR_NATIVE")) { /* $^CHILD_ERROR_NATIVE */
 		    sv_setiv(sv, (IV)STATUS_NATIVE);
+		    break;
 		}
 		break;
 	    case 'D':
@@ -1026,16 +1035,6 @@ Perl_magic_get(pTHX_ SV *sv, MAGIC *mg)
 	    }
 	}
 	sv_setsv(sv,&PL_sv_undef);
-	break;
-    case '\'':
-    case '?':
-	{
-	    sv_setiv(sv, (IV)STATUS_CURRENT);
-#ifdef COMPLEX_STATUS
-	    LvTARGOFF(sv) = PL_statusvalue;
-	    LvTARGLEN(sv) = PL_statusvalue_vms;
-#endif
-	}
 	break;
     case ':':
 	break;
@@ -1385,6 +1384,24 @@ Perl_magic_set(pTHX_ SV *sv, MAGIC *mg)
     case '^':
 	if (remaining[1] != '\0') {
 	    switch (*remaining) {
+	    case 'C':   /* $^CHILD_ERROR */
+		if (strEQ(remaining, "CHILD_ERROR")) {
+#ifdef COMPLEX_STATUS
+		    if (PL_localizing == 2) {
+			PL_statusvalue = LvTARGOFF(sv);
+			PL_statusvalue_vms = LvTARGLEN(sv);
+		    }
+		    else
+#endif
+#ifdef VMSISH_STATUS
+			if (VMSISH_STATUS)
+			    STATUS_NATIVE_CHILD_SET((U32)SvIV(sv));
+			else
+#endif
+			    STATUS_UNIX_EXIT_SET(SvIV(sv));
+		    break;
+		}
+		break;
 	    case 'D':   /* $^DIE_HOOK */
 		if (strEQ(remaining, "DIE_HOOK")) {
 		    SvREFCNT_dec(PL_diehook);
@@ -1716,21 +1733,6 @@ Perl_magic_set(pTHX_ SV *sv, MAGIC *mg)
         else {
             PL_ofs_sv = NULL;
         }
-        break;
-    case '?':
-#ifdef COMPLEX_STATUS
-        if (PL_localizing == 2) {
-            PL_statusvalue = LvTARGOFF(sv);
-            PL_statusvalue_vms = LvTARGLEN(sv);
-        }
-        else
-#endif
-#ifdef VMSISH_STATUS
-        if (VMSISH_STATUS)
-            STATUS_NATIVE_CHILD_SET((U32)SvIV(sv));
-        else
-#endif
-            STATUS_UNIX_EXIT_SET(SvIV(sv));
         break;
     case '<':
         PL_uid = SvIV(sv);

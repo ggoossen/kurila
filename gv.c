@@ -914,9 +914,18 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 	    case '^':
 		if (len > 2) {
 		    switch (*name2) {
-		    case 'C':        /* $^CHILD_ERROR_NATIVE */
-			if (strEQ(name2, "CHILD_ERROR_NATIVE"))
+		    case 'C':        
+			if (strEQ(name2, "CHILD_ERROR")) {
+                            /* $^CHILD_ERROR */
+#ifdef COMPLEX_STATUS
+			    SvUPGRADE(GvSVn(gv), SVt_PVLV);
+#endif
 			    goto magicalize;
+			}
+			if (strEQ(name2, "CHILD_ERROR_NATIVE")) {
+                            /* $^CHILD_ERROR_NATIVE */
+			    goto magicalize;
+			}
 			break;
 		    case 'D':        /* $^DIE_HOOK */
 			if (strEQ(name2, "DIE_HOOK"))
@@ -1037,12 +1046,6 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 	switch (*name) {
 	case ':':
 	    sv_setpv(GvSVn(gv),PL_chopset);
-	    goto magicalize;
-
-	case '?':
-#ifdef COMPLEX_STATUS
-	    SvUPGRADE(GvSVn(gv), SVt_PVLV);
-#endif
 	    goto magicalize;
 
 	ro_magicalize:
