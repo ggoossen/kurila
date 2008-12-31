@@ -849,6 +849,11 @@ Perl_magic_get(pTHX_ SV *sv, MAGIC *mg)
 		    break;
 		}
 
+		if (strEQ(remaining, "OUTPUT_FIELD_SEPARATOR")) {
+		    /* $^OUTPUT_FIELD_SEPARATOR */
+		    break;
+		}
+
 		if (strEQ(remaining, "OUTPUT_RECORD_SEPARATOR")) {
 		    /* $^OUTPUT_RECORD_SEPARATOR */
 		    if (PL_ors_sv)
@@ -1060,8 +1065,6 @@ Perl_magic_get(pTHX_ SV *sv, MAGIC *mg)
 	    break;
 	}
 	sv_setsv(sv,&PL_sv_undef);
-	break;
-    case ',':
 	break;
 #ifndef MACOS_TRADITIONAL
     case '0':
@@ -1609,6 +1612,19 @@ Perl_magic_set(pTHX_ SV *sv, MAGIC *mg)
 		    break;
 		}
 
+		if (strEQ(remaining, "OUTPUT_FIELD_SEPARATOR")) {
+		    /* $^OUTPUT_FIELD_SEPARATOR */
+		    if (PL_ofs_sv)
+			SvREFCNT_dec(PL_ofs_sv);
+		    if (SvOK(sv) || SvGMAGICAL(sv)) {
+			PL_ofs_sv = newSVsv(sv);
+		    }
+		    else {
+			PL_ofs_sv = NULL;
+		    }
+		    break;
+		}
+
 		if (strEQ(remaining, "OUTPUT_RECORD_SEPARATOR")) {
 		    /* $^OUTPUT_RECORD_SEPARATOR */
 		    if (PL_ors_sv)
@@ -1816,16 +1832,7 @@ Perl_magic_set(pTHX_ SV *sv, MAGIC *mg)
                 Perl_croak(aTHX_ PL_no_modify);
             }
         }
-    case ',':
-        if (PL_ofs_sv)
-            SvREFCNT_dec(PL_ofs_sv);
-        if (SvOK(sv) || SvGMAGICAL(sv)) {
-            PL_ofs_sv = newSVsv(sv);
-        }
-        else {
-            PL_ofs_sv = NULL;
-        }
-        break;
+	break;
 #ifndef MACOS_TRADITIONAL
     case '0':
         LOCK_DOLLARZERO_MUTEX;

@@ -335,16 +335,11 @@ See also L<IO::Handle>. (Mnemonic: when you want your pipes to be piping hot.)
 
 =item IO::Handle->output_field_separator EXPR
 
-=item $OUTPUT_FIELD_SEPARATOR
-
-=item $OFS
-
-=item $,
-X<$,> X<$OFS> X<$OUTPUT_FIELD_SEPARATOR>
+=item $^OUTPUT_FIELD_SEPARATOR
+X<$^OUTPUT_FIELD_SEPARATOR>
 
 The output field separator for the print operator.  If defined, this
 value is printed between each of print's arguments.  Default is C<undef>.
-(Mnemonic: what is printed when there is a "," in your print statement.)
 
 =item IO::Handle->output_record_separator EXPR
 
