@@ -87,7 +87,7 @@ sub X {
     sub {
         my $dummy = $n;	# eval can't close on $n without internal reference
 	eval 'print $n';
-	die $@ if $@;
+	die $^EVALERROR if $^EVALERROR;
     };
 }
 my $x = X();
@@ -101,7 +101,7 @@ sub X {
     eval 'sub { print $n }';
 }
 my $x = X();
-die $@ if $@;
+die $^EVALERROR if $^EVALERROR;
 undef &X;
 $x->();
 EXPECT

@@ -687,7 +687,7 @@ sub parse_args{
             $value =~ s [^~(\w*)]
                 [$($1 ??
                    ((getpwnam($1))[[7]] || "~$1") !!
-                   (getpwuid($>))[[7]]
+                   (getpwuid($^EUID))[[7]]
                  )]x;
         }
 

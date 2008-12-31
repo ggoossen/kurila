@@ -5,7 +5,7 @@
 # probably obsolete on the avoidance side, though still currrent
 # on the peculiarity side.)
 
-$| = 1;
+$^OUTPUT_AUTOFLUSH = 1;
 
 # Let tests know they're running in the perl core.  Useful for modules
 # which live dual lives on CPAN.
@@ -49,9 +49,9 @@ if (env::var("PERL_3LOG")) { # Tru64 third(1) tool, see perlhack
 	}
 	else {
 	    print "Symlinking ../perl.third as perl.third...\n";
-	    die "Failed to symlink: $!\n"
+	    die "Failed to symlink: $^ERRNO\n"
 		unless symlink("../perl.third", "perl.third");
-	    die "Symlinked but no executable perl.third: $!\n"
+	    die "Symlinked but no executable perl.third: $^ERRNO\n"
 		unless -x 'perl.third';
 	}
     }
@@ -71,7 +71,7 @@ my $updir  = File::Spec->updir;
 
 sub _find_tests {
     my @($dir) = @_;
-    opendir my $dirh, $dir or die "Trouble opening $dir: $!";
+    opendir my $dirh, $dir or die "Trouble opening $dir: $^ERRNO";
     foreach my $f (sort { $a cmp $b } @( readdir $dirh)) {
 	next if $f eq $curdir or $f eq $updir or
 	    $f =~ m/^(?:CVS|RCS|SCCS|\.svn)$/;
@@ -123,7 +123,7 @@ unless (nelems @ARGV) {
     my %skip;
     if (-f $configsh) {
 	my (%extensions, %known_extensions);
-	open my $fh, "<", $configsh or die "Can't open $configsh: $!";
+	open my $fh, "<", $configsh or die "Can't open $configsh: $^ERRNO";
 	while ( ~< *$fh) {
 	    if (m/^extensions=['"](.*)['"]$/) {
 		# Deliberate string interpolation to avoid triggering possible
@@ -168,7 +168,7 @@ unless (nelems @ARGV) {
 	}
 	close $mani;
     } else {
-	warn "$0: cannot open $mani: $!\n";
+	warn "$0: cannot open $mani: $^ERRNO\n";
     }
     unless ($::core) {
 	_find_tests('pod');
@@ -318,7 +318,7 @@ EOT
 		"$test +> $test.dp ".
 		"&& ./perl $testswitch $switch -I../lib $test.dp";
 	    open(RESULTS, "-|", $deparse_cmd)
-		or print "can't deparse '$deparse_cmd': $!.\n";
+		or print "can't deparse '$deparse_cmd': $^ERRNO.\n";
 	}
 	elsif ($type eq 'perl') {
 	    my $perl = env::var("PERL") || './perl';
@@ -334,7 +334,7 @@ EOT
 	    }
 	    my $run = "$perl" . _quote_args("$testswitch $switch $utf8")
 			      . " $test $redir";
-	    open(RESULTS,"-|",$run) or print "can't run '$run': $!.\n";
+	    open(RESULTS,"-|",$run) or print "can't run '$run': $^ERRNO.\n";
 	}
 	# Our environment may force us to use UTF-8, but we can't be sure that
 	# anything we're reading from will be generating (well formed) UTF-8
@@ -432,14 +432,14 @@ EOT
 		    @valgrind = @( ~< $v );
 		    close $v;
 		} else {
-		    warn "$0: Failed to open '$valgrind_log': $!\n";
+		    warn "$0: Failed to open '$valgrind_log': $^ERRNO\n";
 		}
 	    }
 	    if ((env::var("VG_OPTS") || '') =~ m/cachegrind/) {
 		if (rename $valgrind_log, "$test.valgrind") {
 		    $valgrind++;
 		} else {
-		    warn "$0: Failed to create '$test.valgrind': $!\n";
+		    warn "$0: Failed to create '$test.valgrind': $^ERRNO\n";
 		}
 	    }
 	    elsif ((nelems @valgrind)) {
@@ -462,7 +462,7 @@ EOT
 		    if (rename $valgrind_log, "$test.valgrind") {
 			$valgrind++;
 		    } else {
-			warn "$0: Failed to create '$test.valgrind': $!\n";
+			warn "$0: Failed to create '$test.valgrind': $^ERRNO\n";
 		    }
 		}
 	    } else {
@@ -470,7 +470,7 @@ EOT
 	    }
 	    if (-e $valgrind_log) {
 		unlink $valgrind_log
-		    or warn "$0: Failed to unlink '$valgrind_log': $!\n";
+		    or warn "$0: Failed to unlink '$valgrind_log': $^ERRNO\n";
 	    }
 	}
 	if ($type eq 'deparse') {
@@ -482,7 +482,7 @@ EOT
 	    $tpp =~ s:/:_:g;
 	    $tpp =~ s:\.t$:.3log:;
 	    rename("perl.3log", $tpp) ||
-		die "rename: perl3.log to $tpp: $!\n";
+		die "rename: perl3.log to $tpp: $^ERRNO\n";
 	}
 	if (not defined $failure and $next != $max) {
 	    $failure="FAILED--expected $max tests, saw $next";

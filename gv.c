@@ -967,6 +967,12 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 			    sv_setiv(GvSVn(gv), (IV)(IoFLAGS(GvIOp(PL_defoutgv)) & IOf_FLUSH) != 0);
 			    goto magicalize;
 			}
+			/* $^OUTPUT_RECORD_SEPARATOR */
+			if (strEQ(name2, "OUTPUT_RECORD_SEPARATOR"))
+			    goto magicalize;
+			/* $^OUTPUT_FIELD_SEPARATOR */
+			if (strEQ(name2, "OUTPUT_FIELD_SEPARATOR"))
+			    goto magicalize;
 
 			break;
 		    case 'P':        /* $^PREMATCH  $^POSTMATCH */
@@ -1091,12 +1097,23 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 	case '(':
 	case ')':
 	case '[':
+	case '$':
+	case '@':
+	case '"':
+	case ',':
+	case '\\':
+	case '/':
+	case '+':
+	case '-':
+	case '>':
+	case '<':
+	case '!':
+	case '|':
 	case '&':
 	case '`':
 	case '\'':
 	case '.':
 	case ';':
-	case '-':
 	    Perl_croak(aTHX_ "Unknown magic variable '%c%s'",
 		       sv_type == SVt_PVAV ? '@' : sv_type == SVt_PVHV ? '%' : '$',
 		       name);

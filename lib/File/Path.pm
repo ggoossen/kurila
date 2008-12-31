@@ -580,7 +580,6 @@ sub _mkpath {
     my $arg   = shift;
     my $paths = shift;
 
-    local($")=$Is_MacOS ?? ":" !! "/";
     my(@created);
     foreach my $path ( @$paths) {
         next unless length($path);

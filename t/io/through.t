@@ -118,8 +118,7 @@ ok(1, 'binmode');
 $c = undef;
 my @c;
 push @c, ord $c while $c = getc $fh;
-ok(1, 'got chars');
-is(scalar nelems @c, 9, 'got 9 chars');
+ok(1, 'got chars'); is(scalar nelems @c, 9, 'got 9 chars');
 is("$(join ' ',@c)", '97 10 98 10 10 99 10 10 10', 'got expected chars');
 ok(close($fh), 'close');
 

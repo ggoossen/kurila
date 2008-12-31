@@ -12,7 +12,7 @@ BEGIN {
 use warnings;
 use Config;
 
-plan tests => 39;
+plan tests => 35;
 
 
 my $Is_MSWin32  = $^O eq 'MSWin32';
@@ -47,14 +47,6 @@ ok $^OS_ERROR, $^OS_ERROR;
 close FOO; # just mention it, squelch used-only-once
 
 # regex vars
-
-# $"
-my @a = qw(foo bar baz);
-ok "$(join ' ',@a)" eq "foo bar baz", "$(join ' ',@a)";
-do {
-    local $" = ',';
-    ok qq|$(join $",@a)| eq "foo,bar,baz", "$(join ' ',@a)";
-};
 
 # $?, $@, $$
 if ($Is_MacOS) {
@@ -215,7 +207,7 @@ else {
               $0 = $arg if defined $arg;
 	      # In FreeBSD the ps -o command= will cause
 	      # an empty header line, grab only the last line.
-              my $ps = @(`ps -o command= -p $$`)[-1];
+              my $ps = @(`ps -o command= -p $^PID`)[-1];
               return if $^CHILD_ERROR;
               chomp $ps;
               printf "# 0[\%s]ps[\%s]\n", $0, $ps;
@@ -263,23 +255,6 @@ SKIP: do {
     ok (nelems(env::keys()) == 0);
 };
 
-if ($Is_miniperl) {
-    skip ("miniperl can't rely on loading \%Errno") for 1..2;
-} else {
-   no warnings 'void';
-
-# Make sure Errno hasn't been prematurely autoloaded
-
-   ok ! %{Symbol::stash("Errno")};
-
-# Test auto-loading of Errno when %! is used
-
-   ok scalar eval q{
-      %!;
-      defined %Errno::;
-   }, $^EVAL_ERROR && $^EVAL_ERROR->message;
-}
-
 ok $^S == 0 && defined $^S;
 try { ok $^S == 1 };
 eval " BEGIN \{ ok ! defined \$^S \} ";
@@ -302,7 +277,7 @@ do {
     $ok = 0;
     do {
 	local $^OUTPUT_RECORD_SEPARATOR = "a\0b";
-	$ok = "a$^OUTPUT_RECORD_SEPARATORb" eq "aa\0bb";
+	$ok = "a$($^OUTPUT_RECORD_SEPARATOR)b" eq "aa\0bb";
     };
     ok $ok;
 };

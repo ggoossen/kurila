@@ -7,7 +7,6 @@ sub glob {
     open my $outfh,"-|", "csh -cf 'set nonomatch; glob $pat' 2>/dev/null" or die;
     local $^INPUT_RECORD_SEPARATOR = "\0";
     my $files = @( ~< $outfh );
-    close $outfh or die;
     for ($files) {
         s/\0$//;
     }

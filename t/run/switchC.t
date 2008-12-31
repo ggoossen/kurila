@@ -43,7 +43,7 @@ $r = runperl( switches => \@( '-CE', '-w' ),
 like( $r, qr/^$b at -e line 1 character \d+.$/s, '-CE: UTF-8 stderr' );
 
 $r = runperl( switches => \@( '-Co', '-w' ),
-	      prog     => 'use utf8; open(F, q(>), q(out)) or die $!; print F chr(256); close F', stderr   => 1 ); like( $r, qr/^$/s, '-Co: auto-UTF-8 open for output' ); 
+	      prog     => 'use utf8; open(F, q(>), q(out)) or die $^ERRNO; print F chr(256); close F', stderr   => 1 ); like( $r, qr/^$/s, '-Co: auto-UTF-8 open for output' ); 
 push @tmpfiles, "out";
 
 $r = runperl( switches => \@( '-Ci', '-w' ),
