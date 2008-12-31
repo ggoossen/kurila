@@ -784,7 +784,15 @@ Perl_magic_get(pTHX_ SV *sv, MAGIC *mg)
 #endif
 		    break;
 		}
-		if (strEQ(remaining, "ERRNO")) { /* $^ERRNO */
+
+		if (strEQ(remaining, "EUID")) {
+		    /* $^EUID */
+		    sv_setiv(sv, (IV)PL_euid);
+		    break;
+		}
+
+		if (strEQ(remaining, "ERRNO")) {
+		    /* $^ERRNO */
 #ifdef VMS
 		    sv_setnv(sv, (NV)((errno == EVMSERR) ? vaxc$errno : errno));
 		    sv_setpv(sv, errno ? Strerror(errno) : "");
@@ -1059,9 +1067,6 @@ Perl_magic_get(pTHX_ SV *sv, MAGIC *mg)
     case '\\':
 	if (PL_ors_sv)
 	    sv_copypv(sv, PL_ors_sv);
-	break;
-    case '>':
-	sv_setiv(sv, (IV)PL_euid);
 	break;
 #ifndef MACOS_TRADITIONAL
     case '0':
@@ -1502,7 +1507,39 @@ Perl_magic_set(pTHX_ SV *sv, MAGIC *mg)
 		    PL_tainting |= (PL_uid && (PL_euid != PL_uid || PL_egid != PL_gid));
 		    break;
 		}
+
+		if (strEQ(remaining, "EUID")) {
+		    /* $^EUID */
+		    PL_euid = SvIV(sv);
+		    if (PL_delaymagic) {
+			PL_delaymagic |= DM_EUID;
+			break;                              /* don't do magic till later */
+		    }
+#ifdef HAS_SETEUID
+		    (void)seteuid((Uid_t)PL_euid);
+#else
+#ifdef HAS_SETREUID
+		    (void)setreuid((Uid_t)-1, (Uid_t)PL_euid);
+#else
+#ifdef HAS_SETRESUID
+		    (void)setresuid((Uid_t)-1, (Uid_t)PL_euid, (Uid_t)-1);
+#else
+		    if (PL_euid == PL_uid)          /* special case $> = $< */
+			PerlProc_setuid(PL_euid);
+		    else {
+			PL_euid = PerlProc_geteuid();
+			Perl_croak(aTHX_ "seteuid() not implemented");
+		    }
+#endif
+#endif
+#endif
+		    PL_euid = PerlProc_geteuid();
+		    PL_tainting |= (PL_uid && (PL_euid != PL_uid || PL_egid != PL_gid));
+		    break;
+		}
+
 		if (strEQ(remaining, "ERRNO")) {
+		    /* $^ERRNO */
 #ifdef VMS
 #   define PERL_VMS_BANG vaxc$errno
 #else
@@ -1780,33 +1817,6 @@ Perl_magic_set(pTHX_ SV *sv, MAGIC *mg)
         else {
             PL_ofs_sv = NULL;
         }
-        break;
-    case '>':
-        PL_euid = SvIV(sv);
-        if (PL_delaymagic) {
-            PL_delaymagic |= DM_EUID;
-            break;                              /* don't do magic till later */
-        }
-#ifdef HAS_SETEUID
-        (void)seteuid((Uid_t)PL_euid);
-#else
-#ifdef HAS_SETREUID
-        (void)setreuid((Uid_t)-1, (Uid_t)PL_euid);
-#else
-#ifdef HAS_SETRESUID
-        (void)setresuid((Uid_t)-1, (Uid_t)PL_euid, (Uid_t)-1);
-#else
-        if (PL_euid == PL_uid)          /* special case $> = $< */
-            PerlProc_setuid(PL_euid);
-        else {
-            PL_euid = PerlProc_geteuid();
-            Perl_croak(aTHX_ "seteuid() not implemented");
-        }
-#endif
-#endif
-#endif
-        PL_euid = PerlProc_geteuid();
-        PL_tainting |= (PL_uid && (PL_euid != PL_uid || PL_egid != PL_gid));
         break;
     case ':':
         PL_chopset = SvPV_force(sv,len);
