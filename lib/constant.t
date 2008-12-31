@@ -98,7 +98,7 @@ do {
 cmp_ok(abs(PI - 3.1416), '+<', 0.0001);
 is Other::PI, 3.141;
 
-use constant E2BIG => $! = 7;
+use constant E2BIG => $^OS_ERROR = 7;
 cmp_ok E2BIG, '==', 7;
 # This is something like "Arg list too long", but the actual message
 # text may vary, so we can't test much better than this.
@@ -125,7 +125,7 @@ print $output CCODE->($curr_test+4);
 $TB->current_test($curr_test+4);
 
 eval q{ CCODE->{foo} };
-like($@->{?description}, qr/^Expected a HASH ref but got a CODE ref/);
+like($^EVAL_ERROR->{?description}, qr/^Expected a HASH ref but got a CODE ref/);
 
 
 # Allow leading underscore
@@ -136,7 +136,7 @@ is _PRIVATE, 47;
 eval q{
     use constant __DISALLOWED => "Oops";
 };
-like $@->{?description}, qr/begins with '__'/;
+like $^EVAL_ERROR->{?description}, qr/begins with '__'/;
 
 # Check on declared() and %declared. This sub should be EXACTLY the
 # same as the one quoted in the docs!
@@ -220,7 +220,7 @@ else {
     my $rule = " -" x 20;
     diag "/!\\ unexpected case: ", scalar nelems @warnings, " warnings\n$rule\n";
     diag < map { "  $_" } @warnings;
-    diag $rule, $/;
+    diag $rule, $^INPUT_RECORD_SEPARATOR;
 }
 
 is nelems(@warnings), 0+nelems @Expected_Warnings;
@@ -252,8 +252,8 @@ do {
     eval q{
         use constant '_1_2_3' => 'allowed';
     };
-    die if $@;
-    ok( $@ eq '' );
+    die if $^EVAL_ERROR;
+    ok( $^EVAL_ERROR eq '' );
 };
 
 $fagwoosh = 'geronimo';
@@ -263,35 +263,35 @@ $kloong = 'schlozhauer';
 do {
     my @warnings;
     local $^WARN_HOOK = sub { push @warnings, < @_ };
-    eval 'use constant fagwoosh => 5; 1' or die $@;
+    eval 'use constant fagwoosh => 5; 1' or die $^EVAL_ERROR;
 
     is ("$(join ' ',@warnings)", "", "No warnings if the typeglob exists already");
 
     my $value = eval 'fagwoosh';
-    is ($@, '');
+    is ($^EVAL_ERROR, '');
     is ($value, 5);
 
     my @value = @( eval 'fagwoosh' );
-    is ($@, '');
+    is ($^EVAL_ERROR, '');
     is_deeply (\@value, \@(5));
 
-    eval 'use constant putt => 6, 7; 1' or die $@;
+    eval 'use constant putt => 6, 7; 1' or die $^EVAL_ERROR;
 
     is ("$(join ' ',@warnings)", "", "No warnings if the typeglob exists already");
 
     @value = eval 'putt';
-    is ($@, '');
+    is ($^EVAL_ERROR, '');
     is_deeply (\@value, \@(6, 7));
 
-    eval 'use constant "klong"; 1' or die $@;
+    eval 'use constant "klong"; 1' or die $^EVAL_ERROR;
 
     is ("$(join ' ',@warnings)", "", "No warnings if the typeglob exists already");
 
     $value = eval 'klong';
-    is ($@, '');
+    is ($^EVAL_ERROR, '');
     is ($value, undef);
 
     @value = eval 'klong';
-    is ($@, '');
+    is ($^EVAL_ERROR, '');
     is_deeply (\@value, \undef);
 };

@@ -149,7 +149,7 @@ sub concise_stashref {
 	my $codeobj = svref_2object($coderef);
 	next unless ref $codeobj eq 'B::CV';
 	try { concise_cv_obj($order, $codeobj, $k) };
-	warn "err $($@->message) on $(dump::view($codeobj))" if $@;
+	warn "err $($^EVAL_ERROR->message) on $(dump::view($codeobj))" if $^EVAL_ERROR;
     }
 }
 
@@ -719,7 +719,7 @@ sub fill_srclines {
 	return;
     }
     open (my $fh, '<', $fullnm)
-	or warn "# $fullnm: $!, (chdirs not supported by this feature yet)\n"
+	or warn "# $fullnm: $^OS_ERROR, (chdirs not supported by this feature yet)\n"
 	and return;
     my @l = @( ~< $fh );
     chomp @l;

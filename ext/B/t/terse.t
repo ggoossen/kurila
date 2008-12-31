@@ -10,14 +10,14 @@ is( B::Terse::indent(), '', 'indent with no argument' );
 
 # this should fail without a reference
 try { B::Terse::terse('scalar') };
-like( $@->{?description}, qr/not a reference/, 'terse() fed bad parameters' );
+like( $^EVAL_ERROR->{?description}, qr/not a reference/, 'terse() fed bad parameters' );
 
 # now point it at a sub and see what happens
 sub foo {}
 
 my $sub;
 try{ $sub = B::Terse::compile('', 'foo') };
-is( $@, '', 'compile()' );
+is( $^EVAL_ERROR, '', 'compile()' );
 ok( defined &$sub, 'valid subref back from compile()' );
 
 # and point it at a real sub and hope the returned ops look alright

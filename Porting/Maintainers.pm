@@ -29,7 +29,7 @@ if (open(MANIFEST, "<", "MANIFEST")) {
     }
     close MANIFEST;
 } else {
-    die "$0: Failed to open MANIFEST for reading: $!\n";
+    die "$0: Failed to open MANIFEST for reading: $^OS_ERROR\n";
 }
 
 sub get_module_pat {
@@ -104,7 +104,7 @@ sub process_options {
    
     if ($Opened) {
 	my @raw = @( `p4 opened` );
-	die if $?;
+	die if $^CHILD_ERROR;
 	@Files = map {s!#.*!!s; s!^//depot/.*?/perl/!!; $_} @raw;
     } else {
 	@Files = @ARGV;

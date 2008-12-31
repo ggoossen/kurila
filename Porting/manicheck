@@ -30,7 +30,7 @@ GetOptions("extra" => \$x, missing => \$m, lines => \$l, help => \$h);
 
 help() if $h;
 
-open(MANIFEST, "<", "MANIFEST") or die "MANIFEST: $!";
+open(MANIFEST, "<", "MANIFEST") or die "MANIFEST: $^OS_ERROR";
 
 my %mani;
 my %mand = %: ".", 1;

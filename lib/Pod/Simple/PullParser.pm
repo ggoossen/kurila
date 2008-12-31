@@ -122,7 +122,7 @@ sub get_token {
       my $i = Pod::Simple::MANY_LINES;
       while (1) {
         DEBUG +> 3 and print " Fetching a line from source filehandle $fh...\n";
-        local $/ = $Pod::Simple::NL;
+        local $^INPUT_RECORD_SEPARATOR = $Pod::Simple::NL;
         push @lines, scalar( ~< $fh); # readline
         DEBUG +> 3 and print "  Line is: ",
           defined(@lines[-1]) ?? @lines[-1] !! "<undef>\n";
@@ -257,7 +257,7 @@ sub set_source {
     DEBUG and print "$self 's source is filename @_[0]\n";
     do {
       local *PODSOURCE;
-      open(PODSOURCE, "<", "@_[0]") || Carp::croak "Can't open @_[0]: $!";
+      open(PODSOURCE, "<", "@_[0]") || Carp::croak "Can't open @_[0]: $^OS_ERROR";
       $handle = *PODSOURCE{IO};
     };
     $self->{+'source_filename'} = @_[0];

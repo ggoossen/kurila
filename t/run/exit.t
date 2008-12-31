@@ -27,7 +27,7 @@ my ($exit, $exit_arg);
 
 $exit = run('exit');
 is( $exit >> 8, 0,              'Normal exit' );
-is( $exit, $?,                  'Normal exit $?' );
+is( $exit, $^CHILD_ERROR,                  'Normal exit $?' );
 is( $^CHILD_ERROR_NATIVE, $native_success,  'Normal exit $^CHILD_ERROR_NATIVE' );
 
 if ($^O ne 'VMS') {
@@ -36,7 +36,7 @@ if ($^O ne 'VMS') {
 
   $exit = run('exit 42');
   is( $exit >> 8, 42,             'Non-zero exit' );
-  is( $exit, $?,                  'Non-zero exit $?' );
+  is( $exit, $^CHILD_ERROR,                  'Non-zero exit $?' );
   isnt( !$^CHILD_ERROR_NATIVE, 0, 'Non-zero exit $^CHILD_ERROR_NATIVE' );
   SKIP: do {
     skip("No POSIX", 3) unless $posix_ok;
@@ -53,7 +53,7 @@ if ($^O ne 'VMS') {
 
     is( $exit ^&^ 127, 15,            'Term by signal' );
     ok( !($exit ^&^ 128),             'No core dump' );
-    is( $? ^&^ 127, 15,               'Term by signal $?' );
+    is( $^CHILD_ERROR ^&^ 127, 15,               'Term by signal $?' );
     isnt( $^CHILD_ERROR_NATIVE,  0, 'Term by signal $^CHILD_ERROR_NATIVE' );
     SKIP: do {
       skip("No POSIX", 3) unless $posix_ok;

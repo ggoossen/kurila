@@ -143,8 +143,8 @@ sub prompt ($;$) {  ## no critic
     my $dispdef = defined $def ?? "[$def] " !! " ";
     $def = defined $def ?? $def !! "";
 
-    local $|=1;
-    local $\;
+    local $^OUTPUT_AUTOFLUSH=1;
+    local $^OUTPUT_RECORD_SEPARATOR;
     print "$mess $dispdef";
 
     my $ans;
@@ -175,27 +175,27 @@ sub eval_in_subdirs {
     foreach my $dir ( @{$self->{DIR}}){
         my $abs = $self->catdir($pwd,$dir);
         try { $self->eval_in_x($abs); };
-        last if $@;
+        last if $^EVAL_ERROR;
     }
     chdir $pwd;
-    die $@ if $@;
+    die $^EVAL_ERROR if $^EVAL_ERROR;
 }
 
 sub eval_in_x {
     my@($self,$dir) =  @_;
-    chdir $dir or warn("Couldn't change to directory $dir: $!");
+    chdir $dir or warn("Couldn't change to directory $dir: $^OS_ERROR");
 
     do {
         package main;
         do './Makefile.PL';
     };;
-    if ($@) {
+    if ($^EVAL_ERROR) {
 #         if ($@ =~ /prerequisites/) {
 #             die "MakeMaker WARNING: $@";
 #         } else {
 #             warn "WARNING from evaluation of $dir/Makefile.PL: $@";
 #         }
-        die "ERROR from evaluation of $dir/Makefile.PL: $($@->message)";
+        die "ERROR from evaluation of $dir/Makefile.PL: $($^EVAL_ERROR->message)";
     }
 }
 
@@ -400,7 +400,7 @@ sub new {
         # convert X.Y_Z alpha version #s to X.YZ for easier comparisons
         $pr_version =~ s/(\d+)\.(\d+)_(\d+)/$1.$2$3/;
 
-        if ($@) {
+        if ($^EVAL_ERROR) {
             warn sprintf 'Warning: prerequisite %s %s not found.', 
               $prereq, $self->{PREREQ_PM}->{?$prereq} 
                    unless $self->{?PREREQ_FATAL};
@@ -638,12 +638,12 @@ sub WriteEmptyMakefile {
     my $new = $self->{?MAKEFILE};
     my $old = $self->{?MAKEFILE_OLD};
     if (-f $old) {
-        _unlink($old) or warn "unlink $old: $!";
+        _unlink($old) or warn "unlink $old: $^OS_ERROR";
     }
     if ( -f $new ) {
-        _rename($new, $old) or warn "rename $new => $old: $!"
+        _rename($new, $old) or warn "rename $new => $old: $^OS_ERROR"
     }
-    open my $mfh, '>', $new or die "open $new for write: $!";
+    open my $mfh, '>', $new or die "open $new for write: $^OS_ERROR";
     print $mfh <<'EOP';
 all :
 
@@ -656,7 +656,7 @@ makemakerdflt :
 test :
 
 EOP
-    close $mfh or die "close $new for write: $!";
+    close $mfh or die "close $new for write: $^OS_ERROR";
 }
 
 sub check_manifest {
@@ -742,7 +742,7 @@ sub parse_args{
         print STDOUT "'$mmkey' is not a known MakeMaker parameter name.\n"
             unless exists %Recognized_Att_Keys{$mmkey};
     }
-    $| = 1 if $Verbose;
+    $^OUTPUT_AUTOFLUSH = 1 if $Verbose;
 }
 
 sub check_hints {
@@ -779,7 +779,7 @@ sub _run_hintfile {
     local($self) = shift;       # make $self available to the hint file.
     my@($hint_file) =@( shift);
 
-    local($@, $!);
+    local($^EVAL_ERROR, $^OS_ERROR);
     print STDERR "Processing hints file $hint_file\n";
 
     # Just in case the ./ isn't on the hint file, which File::Spec can
@@ -787,7 +787,7 @@ sub _run_hintfile {
     local @INC = @( File::Spec->curdir, < @INC);
     my $ret = do $hint_file;
     if( !defined $ret ) {
-        my $error = $@ && $@->message || $!;
+        my $error = $^EVAL_ERROR && $^EVAL_ERROR->message || $^OS_ERROR;
         print STDERR $error;
     }
 }
@@ -886,7 +886,7 @@ sub flush {
 
     unlink($finalname, "MakeMaker.tmp", $Is_VMS ?? 'Descrip.MMS' !! ());
     open(my $fh,">", "MakeMaker.tmp")
-        or die "Unable to open MakeMaker.tmp: $!";
+        or die "Unable to open MakeMaker.tmp: $^OS_ERROR";
 
     for my $chunk ( @{$self->{RESULT}}) {
         print $fh "$chunk\n";
@@ -894,7 +894,7 @@ sub flush {
 
     close $fh;
     _rename("MakeMaker.tmp", $finalname) or
-      warn "rename MakeMaker.tmp => $finalname: $!";
+      warn "rename MakeMaker.tmp => $finalname: $^OS_ERROR";
     chmod 0644, $finalname unless $Is_VMS;
 
     my %keep = %( < map { ($_ => 1) } qw(NEEDS_LINKING HAS_LINK_CODE) );

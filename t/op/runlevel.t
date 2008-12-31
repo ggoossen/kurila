@@ -8,7 +8,7 @@
 
 require './test.pl';
 
-undef $/;
+undef $^INPUT_RECORD_SEPARATOR;
 our @prgs = split "\n########\n", ~< *DATA;
 
 plan(tests => nelems @prgs);

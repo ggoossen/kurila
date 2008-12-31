@@ -79,7 +79,7 @@ sub _sock_info {
   if(defined $proto  && $proto =~ m/\D/) {
     my $num = _get_proto_number($proto);
     unless (defined $num) {
-      $@ = "Bad protocol '$proto'";
+      $^EVAL_ERROR = "Bad protocol '$proto'";
       return;
     }
     $proto = $num;
@@ -94,7 +94,7 @@ sub _sock_info {
 
     $port = @serv[?2] || $defport || $pnum;
     unless (defined $port) {
-	$@ = "Bad service '$origport'";
+	$^EVAL_ERROR = "Bad service '$origport'";
 	return;
     }
 
@@ -111,13 +111,13 @@ sub _error {
     my $sock = shift;
     my $err = shift;
     do {
-      local($!);
+      local($^OS_ERROR);
       my $title = ref($sock).": ";
-      $@ = join("", @( @_[0] =~ m/^$title/ ?? "" !! $title, < @_));
+      $^EVAL_ERROR = join("", @( @_[0] =~ m/^$title/ ?? "" !! $title, < @_));
       $sock->close()
 	if(defined fileno($sock));
     };
-    $! = $err;
+    $^OS_ERROR = $err;
     return undef;
 }
 
@@ -144,7 +144,7 @@ sub configure {
     @($laddr,$lport,$proto) =  _sock_info($arg->{?LocalAddr},
 					$arg->{?LocalPort},
 					$arg->{?Proto})
-			or return _error($sock, $!, $@);
+			or return _error($sock, $^OS_ERROR, $^EVAL_ERROR);
 
     $laddr = defined $laddr ?? inet_aton($laddr)
 			    !! INADDR_ANY;
@@ -159,7 +159,7 @@ sub configure {
 	@($raddr,$rport,$proto) =  _sock_info($arg->{?PeerAddr},
 					    $arg->{?PeerPort},
 					    $proto)
-			or return _error($sock, $!, $@);
+			or return _error($sock, $^OS_ERROR, $^EVAL_ERROR);
     }
 
     $proto ||= _get_proto_number('tcp');
@@ -177,36 +177,36 @@ sub configure {
     while(1) {
 
 	$sock->socket(AF_INET, $type, $proto) or
-	    return _error($sock, $!, "$!");
+	    return _error($sock, $^OS_ERROR, "$^OS_ERROR");
 
         if (defined $arg->{?Blocking}) {
 	    defined $sock->blocking($arg->{Blocking})
-		or return _error($sock, $!, "$!");
+		or return _error($sock, $^OS_ERROR, "$^OS_ERROR");
 	}
 
 	if ($arg->{?Reuse} || $arg->{?ReuseAddr}) {
 	    $sock->sockopt(SO_REUSEADDR,1) or
-		    return _error($sock, $!, "$!");
+		    return _error($sock, $^OS_ERROR, "$^OS_ERROR");
 	}
 
 	if ($arg->{?ReusePort}) {
 	    $sock->sockopt( <SO_REUSEPORT,1) or
-		    return _error($sock, $!, "$!");
+		    return _error($sock, $^OS_ERROR, "$^OS_ERROR");
 	}
 
 	if ($arg->{?Broadcast}) {
 		$sock->sockopt(SO_BROADCAST,1) or
-		    return _error($sock, $!, "$!");
+		    return _error($sock, $^OS_ERROR, "$^OS_ERROR");
 	}
 
 	if($lport || ($laddr ne INADDR_ANY) || exists $arg->{Listen}) {
 	    $sock->bind($lport || 0, $laddr) or
-		    return _error($sock, $!, "$!");
+		    return _error($sock, $^OS_ERROR, "$^OS_ERROR");
 	}
 
 	if(exists $arg->{Listen}) {
 	    $sock->listen($arg->{?Listen} || 5) or
-		return _error($sock, $!, "$!");
+		return _error($sock, $^OS_ERROR, "$^OS_ERROR");
 	    last;
 	}
 
@@ -227,13 +227,13 @@ sub configure {
 #        my $timeout = ${*$sock}{'io_socket_timeout'};
 #        my $before = time() if $timeout;
 
-	undef $@;
+	undef $^EVAL_ERROR;
         if ($sock->connect(pack_sockaddr_in($rport, $raddr))) {
 #            ${*$sock}{'io_socket_timeout'} = $timeout;
             return $sock;
         }
 
-	return _error($sock, $!, $@ || "Timeout")
+	return _error($sock, $^OS_ERROR, $^EVAL_ERROR || "Timeout")
 	    unless (nelems @raddr);
 
 #	if ($timeout) {

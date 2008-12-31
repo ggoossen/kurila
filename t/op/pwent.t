@@ -4,7 +4,7 @@ our (%Config, $where);
 
 BEGIN {
     try {my @n = @( getpwuid 0 ); setpwent()};
-    if ($@ && $@->{?description} =~ m/(The \w+ function is unimplemented)/) {
+    if ($^EVAL_ERROR && $^EVAL_ERROR->{?description} =~ m/(The \w+ function is unimplemented)/) {
 	print "1..0 # Skip: $1\n";
 	exit 0;
     }
@@ -103,7 +103,7 @@ while ( ~< *PW) {
 	next;
     }
     if ($n == $max) {
-	local $/;
+	local $^INPUT_RECORD_SEPARATOR;
 	my $junk = ~< *PW;
 	last;
     }

@@ -56,12 +56,12 @@ EOF
 ok 2, print WRITE "hi kid\n";
 ok 3, (~< *READ) =~ m/^hi kid\r?\n$/;
 ok 4, (~< *ERROR) =~ m/^hi error\r?\n$/;
-ok 5, close(*WRITE), $!;
-ok 6, close(*READ), $!;
-ok 7, close(*ERROR), $!;
+ok 5, close(*WRITE), $^OS_ERROR;
+ok 6, close(*READ), $^OS_ERROR;
+ok 7, close(*ERROR), $^OS_ERROR;
 $reaped_pid = waitpid $pid, 0;
 ok 8, $reaped_pid == $pid, $reaped_pid;
-ok 9, $? == 0, $?;
+ok 9, $^CHILD_ERROR == 0, $^CHILD_ERROR;
 
 # read and error together, both named
 $pid = open3 \*WRITE, \*READ, \*READ, $perl, '-e', cmd_line(<<'EOF');
@@ -136,8 +136,8 @@ waitpid $pid, 0;
 my $cmd = 'print(scalar(~< *STDIN))';
 $cmd = config_value('sh') =~ m/sh/ ?? "'$cmd'" !! cmd_line($cmd);
 try{$pid = open3 'WRITE', '>&STDOUT', 'ERROR', "$perl -e " . $cmd; };
-if ($@) {
-	print "error $($@->message)\n";
+if ($^EVAL_ERROR) {
+	print "error $($^EVAL_ERROR->message)\n";
 	print "not ok 22\n";
 }
 else {

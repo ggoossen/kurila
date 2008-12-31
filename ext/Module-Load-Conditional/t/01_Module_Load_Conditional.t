@@ -175,8 +175,8 @@ do {   local $Module::Load::Conditional::CHECK_INC_HASH = 1;
     local $Module::Load::Conditional::CHECK_INC_HASH = 1;
     
     do {   package A::B::C::D; 
-        $A::B::C::D::VERSION = $$; 
-        %INC{+'A/B/C/D.pm'}   = $$.$$;
+        $A::B::C::D::VERSION = $^PID; 
+        %INC{+'A/B/C/D.pm'}   = $^PID.$^PID;
         
         ### XXX this is no longer needed with M::Load 0.11_01
         #$INC{'[.A.B.C]D.pm'} = $$.$$ if $^O eq 'VMS';
@@ -185,8 +185,8 @@ do {   local $Module::Load::Conditional::CHECK_INC_HASH = 1;
     my $href = check_install( module => 'A::B::C::D', version => 0 );
 
     ok( $href,                  'Found package in %INC' );
-    is( $href->{?'file'}, $$.$$, '   Found correct file' );
-    is( $href->{?'version'}, $$, '   Found correct version' );
+    is( $href->{?'file'}, $^PID.$^PID, '   Found correct file' );
+    is( $href->{?'version'}, $^PID, '   Found correct version' );
     ok( $href->{?'uptodate'},    '   Marked as uptodate' );
     ok( can_load( modules => \%( 'A::B::C::D' => 0 ) ),
                                 '   can_load successful' );

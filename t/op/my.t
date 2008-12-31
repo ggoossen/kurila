@@ -96,10 +96,10 @@ for my $full (keys %fonts) {
 sub opta { my @a= @(() ) }
 sub opth { my %h= %(() ) }
 try { my $x = opta };
-print "not " if $@;
+print "not " if $^EVAL_ERROR;
 print "ok 32\n";
 try { my $x = opth };
-print "not " if $@;
+print "not " if $^EVAL_ERROR;
 print "ok 33\n";
 
 
@@ -109,5 +109,5 @@ sub foo3 {
     ++$x->{+bar};
 }
 try { foo3(); foo3(); };
-print "not " if $@;
+print "not " if $^EVAL_ERROR;
 print "ok 34\n";

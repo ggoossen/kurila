@@ -2,10 +2,10 @@
 
 env::set_var('LC_ALL' => 'C');
 
-open (OUT, ">", "perlmodlib.pod") or die $!;
+open (OUT, ">", "perlmodlib.pod") or die $^OS_ERROR;
 my (@pragma, @mod, @MANIFEST);
 
-open (MANIFEST, "<", "../MANIFEST") or die $!;
+open (MANIFEST, "<", "../MANIFEST") or die $^OS_ERROR;
 @MANIFEST = grep !m</(?:t|demo)/>, @( ~< *MANIFEST);
 push @MANIFEST, 'lib/Config.pod', 'lib/Errno.pm', 'lib/lib.pm',
     'lib/DynaLoader.pm', 'lib/XSLoader.pm';
@@ -18,7 +18,7 @@ for ( @MANIFEST) {
      next unless $filename =~ m!\.p(m|od)$!;
      unless (open (MOD, "<", "../lib/$filename")) {
 	unless (open (MOD, "<", "../$origfilename")) {
-	    warn "Couldn't open ../$origfilename: $!";
+	    warn "Couldn't open ../$origfilename: $^OS_ERROR";
 	    next;
 	}
 	$filename = $origfilename;
@@ -28,7 +28,7 @@ for ( @MANIFEST) {
      my ($name, $thing);
      my $foundit=0;
      do {
-	 local $/="";
+	 local $^INPUT_RECORD_SEPARATOR="";
 	 while ( ~< *MOD) {
 	     next unless m/^=head1 NAME/;
 	     $foundit++;
@@ -1460,6 +1460,6 @@ provisions.  But then you know when you C<use RedefineTheWorld> that
 you're redefining the world and willing to take the consequences.
 EOF
 
-close MANIFEST or warn "$0: failed to close MANIFEST (../MANIFEST): $!";
-close OUT      or warn "$0: failed to close OUT (perlmodlib.pod): $!";
+close MANIFEST or warn "$0: failed to close MANIFEST (../MANIFEST): $^OS_ERROR";
+close OUT      or warn "$0: failed to close OUT (perlmodlib.pod): $^OS_ERROR";
 

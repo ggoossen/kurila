@@ -80,10 +80,10 @@ try {
   my@($tfh,$filename) =  mkstemp($template);
   # NB. The trailing space is intentional (see [perl #37716])
   open my $tfhSP, ">", "$filename "
-      or die "Could not open '$filename ' for writing: $!";
+      or die "Could not open '$filename ' for writing: $^OS_ERROR";
   binmode($tfhSP);
   do {
-    local $/; #slurp
+    local $^INPUT_RECORD_SEPARATOR; #slurp
     my $fh;
     open($fh, "<",'README');
     binmode($fh);
@@ -100,7 +100,7 @@ try {
   @donetests[2] = compare('README', "$filename ");
   unlink "$filename ";
 };
-print "# problem '$($@->message)' when testing with a temporary file\n" if $@;
+print "# problem '$($^EVAL_ERROR->message)' when testing with a temporary file\n" if $^EVAL_ERROR;
 
 if ((nelems @donetests) == 3) {
   print "not " unless @donetests[0] == 0;

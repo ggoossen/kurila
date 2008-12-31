@@ -415,7 +415,7 @@ sub fetch {
     unless( -d $to ) {
         try { mkpath( $to ) };
 
-        return $self->_error( <loc("Could not create path '\%1'",$to)) if $@;
+        return $self->_error( <loc("Could not create path '\%1'",$to)) if $^EVAL_ERROR;
     }
 
     ### set passive ftp if required ###
@@ -559,7 +559,7 @@ sub _netftp_fetch {
         my @options =$self->host;
         push(@options, Timeout => $TIMEOUT) if $TIMEOUT;
         unless( $ftp = Net::FTP->new( < @options ) ) {
-            return $self->_error( <loc("Ftp creation failed: \%1",$@));
+            return $self->_error( <loc("Ftp creation failed: \%1",$^EVAL_ERROR));
         }
 
         ### login ###
@@ -663,7 +663,7 @@ sub _ftp_fetch {
         signals::temp_set_handler(CHLD => 'IGNORE');
 
         unless ($fh->open("|$ftp -n")) {
-            return $self->_error( <loc("\%1 creation failed: \%2", $ftp, $!));
+            return $self->_error( <loc("\%1 creation failed: \%2", $ftp, $^OS_ERROR));
         }
 
         my @dialog = @(
@@ -710,7 +710,7 @@ sub _lynx_fetch {
         ### write to the output file ourselves, since lynx ass_u_mes to much
         my $local = FileHandle->new(">$to")
                         or return $self->_error( <loc(
-                            "Could not open '\%1' for writing: \%2",$to,$!));
+                            "Could not open '\%1' for writing: \%2",$to,$^OS_ERROR));
 
         ### dump to stdout ###
         my $cmd = \@(
@@ -916,9 +916,9 @@ sub _file_fetch {
     my $rv = try { File::Copy::copy( $remote, $to ) };
 
     ### something went wrong ###
-    if( !$rv or $@ ) {
+    if( !$rv or $^EVAL_ERROR ) {
         return $self->_error( <loc("Could not copy '\%1' to '\%2': \%3 \%4",
-                             $remote, $to, $!, $@));
+                             $remote, $to, $^OS_ERROR, $^EVAL_ERROR));
     }
 
     return $to;

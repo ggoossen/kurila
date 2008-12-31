@@ -41,7 +41,7 @@ EOT
 
 use Search::Dict;
 
-open(my $dict_fh, "+>", "dict-$$") or die "Can't create dict-$$: $!";
+open(my $dict_fh, "+>", "dict-$^PID") or die "Can't create dict-$^PID: $^OS_ERROR";
 binmode $dict_fh;			# To make length expected one.
 print $dict_fh $DICT;
 
@@ -68,4 +68,4 @@ print "not " if $pos +< 0 || $word ne "Aarhus";
 print "ok 4\n";
 
 close $dict_fh or die "cannot close";
-unlink "dict-$$";
+unlink "dict-$^PID";

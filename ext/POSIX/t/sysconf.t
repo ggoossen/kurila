@@ -9,7 +9,7 @@ use File::Spec;
 use POSIX;
 use Scalar::Util < qw(looks_like_number);
 
-sub check(@) { grep { eval "&$_;1" or $@->{?description}!~m/vendor has not defined POSIX macro/ } @_
+sub check(@) { grep { eval "&$_;1" or $^EVAL_ERROR->{?description}!~m/vendor has not defined POSIX macro/ } @_
 }       
 
 my @path_consts = check < qw(
@@ -52,7 +52,7 @@ my $TTY = "/dev/tty";
 
 sub _check_and_report {
     my @($eval_status, $return_val, $description) =  @_;
-    my $success = defined($return_val) || $! == 0;
+    my $success = defined($return_val) || $^OS_ERROR == 0;
     is( $eval_status, '', $description );
     SKIP: do {
 	skip "terminal constants set errno on QNX", 1
@@ -60,7 +60,7 @@ sub _check_and_report {
         ok( $success, "\tchecking that the returned value is defined (" 
                         . (defined($return_val) ?? "yes, it's $return_val)" !! "it isn't)"
                         . " or that errno is clear ("
-                        . (!($!+0) ?? "it is)" !! "it isn't, it's $!)"))
+                        . (!($^OS_ERROR+0) ?? "it is)" !! "it isn't, it's $^OS_ERROR)"))
                         );
     };
     SKIP: do {
@@ -73,13 +73,13 @@ sub _check_and_report {
 # testing fpathconf() on a non-terminal file
 SKIP: do {
     my $fd = POSIX::open($testdir, O_RDONLY)
-        or skip "could not open test directory '$testdir' ($!)",
+        or skip "could not open test directory '$testdir' ($^OS_ERROR)",
 	  3 * nelems @path_consts;
 
     for my $constant ( @path_consts) {
-	    $! = 0;
+	    $^OS_ERROR = 0;
             $r = try { fpathconf( $fd, eval "$constant()" ) };
-            _check_and_report( $@, $r, "calling fpathconf($fd, $constant) " );
+            _check_and_report( $^EVAL_ERROR, $r, "calling fpathconf($fd, $constant) " );
     }
     
     POSIX::close($fd);
@@ -87,9 +87,9 @@ SKIP: do {
 
 # testing pathconf() on a non-terminal file
 for my $constant ( @path_consts) {
-	$! = 0;
+	$^OS_ERROR = 0;
         $r = try { pathconf( $testdir, eval "$constant()" ) };
-        _check_and_report( $@, $r, qq[calling pathconf("$testdir", $constant)] );
+        _check_and_report( $^EVAL_ERROR, $r, qq[calling pathconf("$testdir", $constant)] );
 }
 
 SKIP: do {
@@ -98,7 +98,7 @@ SKIP: do {
     -c $TTY
 	or skip("$TTY not a character file", $n);
     open(TTY, "<", $TTY)
-	or skip("failed to open $TTY: $!", $n);
+	or skip("failed to open $TTY: $^OS_ERROR", $n);
     -t *TTY
 	or skip("TTY ($TTY) not a terminal file", $n);
 
@@ -106,34 +106,34 @@ SKIP: do {
 
     # testing fpathconf() on a terminal file
     for my $constant ( @path_consts_terminal) {
-	$! = 0;
+	$^OS_ERROR = 0;
 	$r = try { fpathconf( $fd, eval "$constant()" ) };
-	_check_and_report( $@, $r, qq[calling fpathconf($fd, $constant) ($TTY)] );
+	_check_and_report( $^EVAL_ERROR, $r, qq[calling fpathconf($fd, $constant) ($TTY)] );
     }
     
     close(TTY);
     # testing pathconf() on a terminal file
     for my $constant ( @path_consts_terminal) {
-	$! = 0;
+	$^OS_ERROR = 0;
 	$r = try { pathconf( $TTY, eval "$constant()" ) };
-	_check_and_report( $@, $r, qq[calling pathconf($TTY, $constant)] );
+	_check_and_report( $^EVAL_ERROR, $r, qq[calling pathconf($TTY, $constant)] );
     }
 };
 
-my $fifo = "fifo$$";
+my $fifo = "fifo$^PID";
 
 SKIP: do {
     try { mkfifo($fifo, 0666) }
-	or skip("could not create fifo $fifo ($!)", 2 * 3 * nelems @path_consts_fifo);
+	or skip("could not create fifo $fifo ($^OS_ERROR)", 2 * 3 * nelems @path_consts_fifo);
 
   SKIP: do {
       my $fd = POSIX::open($fifo, O_RDWR)
-	  or skip("could not open $fifo ($!)", 3 * nelems @path_consts_fifo);
+	  or skip("could not open $fifo ($^OS_ERROR)", 3 * nelems @path_consts_fifo);
 
       for my $constant ( @path_consts_fifo) {
-	  $! = 0;
+	  $^OS_ERROR = 0;
 	  $r = try { fpathconf( $fd, eval "$constant()" ) };
-	  _check_and_report( $@, $r, "calling fpathconf($fd, $constant) ($fifo)" );
+	  _check_and_report( $^EVAL_ERROR, $r, "calling fpathconf($fd, $constant) ($fifo)" );
       }
     
       POSIX::close($fd);
@@ -141,9 +141,9 @@ SKIP: do {
 
   # testing pathconf() on a fifo file
   for my $constant ( @path_consts_fifo) {
-      $! = 0;
+      $^OS_ERROR = 0;
       $r = try { pathconf( $fifo, eval "$constant()" ) };
-      _check_and_report( $@, $r, qq[calling pathconf($fifo, $constant)] );
+      _check_and_report( $^EVAL_ERROR, $r, qq[calling pathconf($fifo, $constant)] );
   }
 };
 
@@ -160,8 +160,8 @@ SKIP: do {
 };
 # testing sysconf()
 for my $constant ( @sys_consts) {
-	$! = 0;
+	$^OS_ERROR = 0;
 	$r = try { sysconf( eval "$constant()" ) };
-	_check_and_report( $@, $r, "calling sysconf($constant)" );
+	_check_and_report( $^EVAL_ERROR, $r, "calling sysconf($constant)" );
 }
 

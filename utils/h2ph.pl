@@ -81,8 +81,8 @@ while (defined (my $file = next_file())) {
 	    }
 	}
 
-	open(IN,"<","$file") || (($Exit = 1),(warn "Can't open $file: $!\n"),next);
-	open(OUT,">","$Dest_dir/$outfile") || die "Can't create $outfile: $!\n";
+	open(IN,"<","$file") || (($Exit = 1),(warn "Can't open $file: $^OS_ERROR\n"),next);
+	open(OUT,">","$Dest_dir/$outfile") || die "Can't create $outfile: $^OS_ERROR\n";
     }
 
     print OUT
@@ -658,7 +658,7 @@ sub link_if_possible
     } else {
         if (-l "$Dest_dir/$dirlink") {
             unlink "$Dest_dir/$dirlink" or
-                print STDERR "Could not remove link $Dest_dir/$dirlink:  $!\n";
+                print STDERR "Could not remove link $Dest_dir/$dirlink:  $^OS_ERROR\n";
         }
 
         if (eval 'symlink($target, "$Dest_dir/$dirlink")') {
@@ -670,7 +670,7 @@ sub link_if_possible
                     print STDERR "Could not create $Dest_dir/$target/\n";
             }
         } else {
-            print STDERR "Could not symlink $target -> $Dest_dir/$dirlink:  $!\n";
+            print STDERR "Could not symlink $target -> $Dest_dir/$dirlink:  $^OS_ERROR\n";
         }
     }
 }
@@ -728,10 +728,10 @@ sub build_preamble_if_necessary
     # Can we skip building the preamble file?
     if (-r $preamble) {
         # Extract version number from first line of preamble:
-        open  PREAMBLE, "<", $preamble or die "Cannot open $preamble:  $!";
+        open  PREAMBLE, "<", $preamble or die "Cannot open $preamble:  $^OS_ERROR";
             my $line = ~< *PREAMBLE;
             $line =~ m/(\b\d+\b)/;
-        close PREAMBLE            or die "Cannot close $preamble:  $!";
+        close PREAMBLE            or die "Cannot close $preamble:  $^OS_ERROR";
 
         # Don't build preamble if a compatible preamble exists:
         return if $1 == $VERSION;
@@ -739,7 +739,7 @@ sub build_preamble_if_necessary
 
     my @(%define) =@( %( < _extract_cc_defines() ));
 
-    open  PREAMBLE, ">", "$preamble" or die "Cannot open $preamble:  $!";
+    open  PREAMBLE, ">", "$preamble" or die "Cannot open $preamble:  $^OS_ERROR";
 	print PREAMBLE "# This file was created by h2ph version $VERSION\n";
 
 	foreach (sort keys %define) {
@@ -767,7 +767,7 @@ sub build_preamble_if_necessary
 		    quotemeta(%define{?$_}), "\" \} \}\n\n";
 	    }
 	}
-    close PREAMBLE               or die "Cannot close $preamble:  $!";
+    close PREAMBLE               or die "Cannot close $preamble:  $^OS_ERROR";
 }
 
 

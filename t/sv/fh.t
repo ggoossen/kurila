@@ -8,7 +8,7 @@ plan tests => 5;
 
 # symbolic filehandles should only result in glob entries with FH constructors
 
-$|=1;
+$^OUTPUT_AUTOFLUSH=1;
 my $a = \*SYM000;
 ok(!defined(fileno($a)));
 

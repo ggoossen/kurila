@@ -130,7 +130,7 @@ sub pod2man {
 
         if (length %options{?perm_rw}) {
             chmod(oct(%options{?perm_rw}), $man)
-              or do { warn("chmod %options{?perm_rw} $man: $!\n"); next };
+              or do { warn("chmod %options{?perm_rw} $man: $^OS_ERROR\n"); next };
         }
     } while (nelems @ARGV);
 

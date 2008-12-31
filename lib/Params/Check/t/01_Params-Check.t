@@ -253,8 +253,8 @@ do {   my $tmpl = \%( foo => \%( allow => sub { 0 } ) );
 
     try { check( $tmpl, \%( foo => 1 ) ) };      
 
-    ok( $@,             "Call dies with fatal toggled" );
-    like( $@->{?description},           qr/invalid type/,
+    ok( $^EVAL_ERROR,             "Call dies with fatal toggled" );
+    like( $^EVAL_ERROR->{?description},           qr/invalid type/,
                             "   error stored ok" );
 };
 

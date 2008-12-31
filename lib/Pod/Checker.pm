@@ -1155,7 +1155,7 @@ sub _check_ptree {
             unless(defined $link) {
                 $self->poderror(\%( line => $line, file => $file,
                     severity => 'ERROR', 
-                    msg => "malformed link " . $_->raw_text() ." : $@"));
+                    msg => "malformed link " . $_->raw_text() ." : $^EVAL_ERROR"));
                 next;
             }
             $link->line($line); # remember line

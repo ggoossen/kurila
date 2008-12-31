@@ -1,6 +1,6 @@
 #!./perl
 
-$|  = 1;
+$^OUTPUT_AUTOFLUSH  = 1;
 use warnings;
 
 use Test::More tests => 56;
@@ -78,7 +78,7 @@ is(ref $pv_ret, "SCALAR", "Test object_2svref() return is SCALAR");
 is($$pv_ret, $pv, "Test object_2svref()");
 is($pv_ref->PV(), $pv, "Test PV()");
 try { is($pv_ref->RV(), $pv, "Test RV()"); };
-ok($@, "Test RV()");
+ok($^EVAL_ERROR, "Test RV()");
 is($pv_ref->PVX_const(), $pv, "Test PVX()");
 
 my $nv = 1.1;

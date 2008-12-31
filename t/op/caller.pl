@@ -80,9 +80,9 @@ do {
     }
     is(hint_fetch('dooot'), 6 * 7);
 
-    eval "is(hint_fetch('dooot'), 6 * 7); 1" or die $@;
+    eval "is(hint_fetch('dooot'), 6 * 7); 1" or die $^EVAL_ERROR;
 
-    eval <<'EOE' or die $@;
+    eval <<'EOE' or die $^EVAL_ERROR;
     is(hint_fetch('dooot'), 6 * 7);
     eval "is(hint_fetch('dooot'), 6 * 7); 1" or die $@;
     BEGIN {

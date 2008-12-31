@@ -51,8 +51,8 @@ SKIP: do {
     }
     else {
        try { chdir($dh); };
-       like($@->{?description}, qr/^The dirfd function is unimplemented at/, "dirfd is unimplemented");
-       chdir ".." or die $!;
+       like($^EVAL_ERROR->{?description}, qr/^The dirfd function is unimplemented at/, "dirfd is unimplemented");
+       chdir ".." or die $^OS_ERROR;
     }
 
     # same with bareword file handles
@@ -66,25 +66,25 @@ SKIP: do {
     }
     else {
        try { chdir(*DH); };
-       like($@->{?description}, qr/^The dirfd function is unimplemented at/, "dirfd is unimplemented");
-       chdir ".." or die $!;
+       like($^EVAL_ERROR->{?description}, qr/^The dirfd function is unimplemented at/, "dirfd is unimplemented");
+       chdir ".." or die $^OS_ERROR;
     }
     ok(-d "op", "verify that we are back");
 
     # And now the ambiguous case
     do {
 	no warnings < qw<io deprecated>;
-	ok(opendir(H, "op"), "opendir op") or $!-> diag();
-	ok(open(H, "<", "base"), "open base") or $!-> diag();
+	ok(opendir(H, "op"), "opendir op") or $^OS_ERROR-> diag();
+	ok(open(H, "<", "base"), "open base") or $^OS_ERROR-> diag();
     };
     if ($has_dirfd) {
 	ok(chdir(*H), "fchdir to op");
 	ok(-f "chdir.t", "verify that we are in 'op'");
-	chdir ".." or die $!;
+	chdir ".." or die $^OS_ERROR;
     }
     else {
 	try { chdir(*H); };
-	like($@->{?description}, qr/^The dirfd function is unimplemented at/,
+	like($^EVAL_ERROR->{?description}, qr/^The dirfd function is unimplemented at/,
 	     "dirfd is unimplemented");
 	SKIP: do {
 	    skip("dirfd is unimplemented");
@@ -93,14 +93,14 @@ SKIP: do {
     ok(closedir(H), "closedir");
     ok(chdir(*H), "fchdir to base");
     ok(-f "cond.t", "verify that we are in 'base'");
-    chdir ".." or die $!;
+    chdir ".." or die $^OS_ERROR;
 };
 
 SKIP: do {
     skip("has fchdir", 1) if $has_fchdir;
     opendir(my $dh, "op");
     try { chdir($dh); };
-    like($@->{?description}, qr/^The fchdir function is unimplemented at/, "fchdir is unimplemented");
+    like($^EVAL_ERROR->{?description}, qr/^The fchdir function is unimplemented at/, "fchdir is unimplemented");
 };
 
 # The environment variables chdir() pays attention to.

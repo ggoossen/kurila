@@ -122,13 +122,13 @@ SKIP: do {
 	   qw(stdio crlf),
 	  "open :crlf");
 
-    binmode(\*F, ":pop") or die "$!";
+    binmode(\*F, ":pop") or die "$^OS_ERROR";
 
     check(PerlIO::get_layers(\*F),
 	  qw(stdio),
 	  ":pop");
 
-    binmode(F, ":raw") or die "$!";
+    binmode(F, ":raw") or die "$^OS_ERROR";
 
     check(PerlIO::get_layers(\*F),
 	  @("stdio"),

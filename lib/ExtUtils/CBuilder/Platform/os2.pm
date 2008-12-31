@@ -18,7 +18,7 @@ sub prelink {
   die "Can't find DEF file in the output"
     unless @res[0] =~ m,^(.*)\.def$,si;
   my $libname = "$1$self->{config}->{?lib_ext}";	# Put .LIB file near .DEF file
-  $self->do_system('emximp', '-o', $libname, @res[0]) or die "emxexp: res=$?";
+  $self->do_system('emximp', '-o', $libname, @res[0]) or die "emxexp: res=$^CHILD_ERROR";
   return  @(@res, $libname);
 }
 

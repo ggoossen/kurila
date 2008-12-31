@@ -12,7 +12,7 @@ XSLoader::load 'OS2::ExtAttr', $VERSION;
 
 sub TIEHASH {
   my $class = shift;
-  my $ea = _create() || die "Cannot create EA: $!";
+  my $ea = _create() || die "Cannot create EA: $^OS_ERROR";
   my $file = shift;
   my ($name, $handle);
   if (ref $file eq 'GLOB' or ref \$file eq 'GLOB') {
@@ -28,7 +28,7 @@ sub TIEHASH {
 sub DESTROY {
   my $eas = shift;
   # 0 means: discard eas which are not in $eas->[0].
-  _write( $eas->[0], $eas->[1], $eas->[2], 0) and die "Cannot write EA: $!"
+  _write( $eas->[0], $eas->[1], $eas->[2], 0) and die "Cannot write EA: $^OS_ERROR"
     if $eas->[5];
   _destroy( $eas->[0] );
 }
@@ -63,7 +63,7 @@ sub EXISTS {
 sub STORE {
   my $eas = shift;
   $eas->[5] = 1;
-  add($eas->[0], shift, shift) +> 0 or die "Error setting EA: $!";
+  add($eas->[0], shift, shift) +> 0 or die "Error setting EA: $^OS_ERROR";
 }
 
 sub DELETE {
@@ -71,7 +71,7 @@ sub DELETE {
   my $index = _find($eas->[0], shift);
   return undef if $index +<= 0;
   my $value = value($eas->[0], $index);
-  _delete($eas->[0], $index) and die "Error deleting EA: $!";
+  _delete($eas->[0], $index) and die "Error deleting EA: $^OS_ERROR";
   $eas->[5] = 1;
   return $value;
 }
@@ -92,17 +92,17 @@ sub copy {
   my ($name, $handle);
   if (ref $file eq 'GLOB' or ref \$file eq 'GLOB') {
     die "File handle is not opened" unless $handle = fileno $file;
-    _write($eas->[0], undef, $handle, 0) or die "Cannot write EA: $!";
+    _write($eas->[0], undef, $handle, 0) or die "Cannot write EA: $^OS_ERROR";
   } else {
     $name = $file;
-    _write($eas->[0], $name, 0, 0) or die "Cannot write EA: $!";
+    _write($eas->[0], $name, 0, 0) or die "Cannot write EA: $^OS_ERROR";
   }
 }
 
 sub update {
   my $eas = shift;
   # 0 means: discard eas which are not in $eas->[0].
-  _write( $eas->[0], $eas->[1], $eas->[2], 0) and die "Cannot write EA: $!";
+  _write( $eas->[0], $eas->[1], $eas->[2], 0) and die "Cannot write EA: $^OS_ERROR";
 }
 
 # Autoload methods go after =cut, and are processed by the autosplit program.

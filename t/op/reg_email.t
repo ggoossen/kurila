@@ -67,7 +67,7 @@ run_tests() unless caller;
 sub run_tests {
     my $count = 0;
 
-    $| = 1;
+    $^OUTPUT_AUTOFLUSH = 1;
     # rewinding DATA is necessary with PERLIO=stdio when this
     # test is run from another thread
     seek *DATA, 0, 0;

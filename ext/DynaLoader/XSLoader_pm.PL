@@ -9,7 +9,7 @@ sub to_string {
 }
 
 1 while unlink "XSLoader.pm";
-open OUT, ">", "XSLoader.pm" or die $!;
+open OUT, ">", "XSLoader.pm" or die $^OS_ERROR;
 print OUT <<'EOT';
 # Generated from XSLoader.pm.PL (resolved config_value() value)
 
@@ -376,4 +376,4 @@ it under the same terms as Perl itself.
 =cut
 EOT
 
-close OUT or die $!;
+close OUT or die $^OS_ERROR;

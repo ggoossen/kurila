@@ -29,10 +29,10 @@ my $Test = Test::Builder->new;
 print "1..2\n";
 
 try { $Test->plan(7); };
-ok( $@->{?description} =~ m/^plan\(\) doesn't understand 7/, 'bad plan()' ) ||
-    print STDERR "# $@";
+ok( $^EVAL_ERROR->{?description} =~ m/^plan\(\) doesn't understand 7/, 'bad plan()' ) ||
+    print STDERR "# $^EVAL_ERROR";
 
 try { $Test->plan(wibble => 7); };
-ok( $@->{?description} =~ m/^plan\(\) doesn't understand wibble 7/, 'bad plan()' ) ||
-    print STDERR "# $@";
+ok( $^EVAL_ERROR->{?description} =~ m/^plan\(\) doesn't understand wibble 7/, 'bad plan()' ) ||
+    print STDERR "# $^EVAL_ERROR";
 

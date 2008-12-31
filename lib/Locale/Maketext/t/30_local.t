@@ -22,8 +22,8 @@ print "# Basic sanity:\n";
 ok defined( $lh = Woozle->new() ) && ref($lh);
 
 print "# Make sure \$@ is localized...\n";
-$@ = 'foo';
-ok $lh && $lh->maketext('Eval error: [_1]', $@), "Eval error: foo";
+$^EVAL_ERROR = 'foo';
+ok $lh && $lh->maketext('Eval error: [_1]', $^EVAL_ERROR), "Eval error: foo";
 
 print "# Byebye!\n";
 ok 1;

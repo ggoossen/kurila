@@ -278,7 +278,7 @@ foreach my $lexical (@('', 'my $a; ')) {
   my $result = runperl (switches => \@('-wl'), stderr => 1,
     prog => $lexical . 'BEGIN {$a = \q{pass}}; $a = $$a; print $a');
 
-  is ($?, 0);
+  is ($^CHILD_ERROR, 0);
   is ($result, $expect);
 }
 
@@ -300,7 +300,7 @@ is (runperl (switches=> \@('-l'),
 # bug #22719
 
 runperl(prog => 'sub f { my $x = shift; *z = $x; } f(\%()); f();');
-is ($?, 0, 'coredump on typeglob = (SvRV && !SvROK)');
+is ($^CHILD_ERROR, 0, 'coredump on typeglob = (SvRV && !SvROK)');
 
 # bug #27268: freeing self-referential typeglobs could trigger
 # "Attempt to free unreferenced scalar" warnings
@@ -397,7 +397,7 @@ do {
 
     $ref = *STDOUT{IO};
     try { *$ref };
-    is($@, '', "Glob dereference of PVIO is acceptable");
+    is($^EVAL_ERROR, '', "Glob dereference of PVIO is acceptable");
 
     cmp_ok($ref, '\==', *{$ref}{IO}, "IO slot of the temporary glob is set correctly");
 };

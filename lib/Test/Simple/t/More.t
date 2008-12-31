@@ -13,8 +13,8 @@ use Test::More tests => 49;
 # Make sure we don't mess with $@ or $!.  Test at bottom.
 my $Err   = "this should not be touched";
 my $Errno = 42;
-$@ = $Err;
-$! = $Errno;
+$^EVAL_ERROR = $Err;
+$^OS_ERROR = $Errno;
 
 use_ok('Dummy');
 is( $Dummy::VERSION, '5.562', 'use_ok() loads a module' );

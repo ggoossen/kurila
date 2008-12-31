@@ -185,7 +185,7 @@ sub struct {
 
     print $out if $print;
     my $result = eval $out;
-    warn $@ if $@;
+    warn $^EVAL_ERROR if $^EVAL_ERROR;
 }
 
 sub _usage_error {

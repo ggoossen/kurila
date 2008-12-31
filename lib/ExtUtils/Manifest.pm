@@ -95,7 +95,7 @@ sub mkmanifest {
     my $bakbase = $MANIFEST;
     $bakbase =~ s/\./_/g if $Is_VMS; # avoid double dots
     rename $MANIFEST, "$bakbase.bak" unless $manimiss;
-    open M, ">", "$MANIFEST" or die "Could not open $MANIFEST: $!";
+    open M, ">", "$MANIFEST" or die "Could not open $MANIFEST: $^OS_ERROR";
     my $skip = _maniskip();
     my $found = manifind();
     my($key,$val,%all);
@@ -308,7 +308,7 @@ sub maniread {
     my $read = \%();
     my $m;
     unless (open $m, "<", $mfile){
-        warn "Problem opening $mfile: $!";
+        warn "Problem opening $mfile: $^OS_ERROR";
         return $read;
     }
     local $_;
@@ -380,7 +380,7 @@ sub _check_mskip_directives {
     my @lines = @( () );
     my $flag = 0;
     unless (open M, "<", $mfile) {
-        warn "Problem opening $mfile: $!";
+        warn "Problem opening $mfile: $^OS_ERROR";
         return;
     }
     while ( ~< *M) {
@@ -410,7 +410,7 @@ sub _check_mskip_directives {
     rename $mfile, "$bakbase.bak";
     warn "Debug: Saving original $mfile as $bakbase.bak\n" if $Debug;
     unless (open M, ">", "$mfile") {
-        warn "Problem opening $mfile: $!";
+        warn "Problem opening $mfile: $^OS_ERROR";
         return;
     }
     print M $_ for @( (< @lines));
@@ -428,7 +428,7 @@ sub _include_mskip_file {
     }
     local (*M, $_);
     unless (open M, "<", $mskip) {
-        warn "Problem opening $mskip: $!";
+        warn "Problem opening $mskip: $^OS_ERROR";
         return;
     }
     my @lines = @( () );
@@ -494,7 +494,7 @@ sub cp_if_diff {
     -f $from or warn "$0: $from not found";
     my $diff = 0;
     local(*F,*T);
-    open(F, "<","$from\0") or die "Can't read $from: $!\n";
+    open(F, "<","$from\0") or die "Can't read $from: $^OS_ERROR\n";
     if (open(T, "<","$to\0")) {
         local $_;
 	while ( ~< *F) { $diff++,last if $_ ne ~< *T; }
@@ -505,7 +505,7 @@ sub cp_if_diff {
     close F;
     if ($diff) {
 	if (-e $to) {
-	    unlink($to) or die "unlink $to: $!";
+	    unlink($to) or die "unlink $to: $^OS_ERROR";
 	}
         STRICT_SWITCH: do {
 	    best($from,$to), last STRICT_SWITCH if $how eq 'best';
@@ -621,13 +621,13 @@ sub maniadd {
     return 1 unless (nelems @needed);
 
     open(MANIFEST, ">>", "$MANIFEST") or 
-      die "maniadd() could not open $MANIFEST: $!";
+      die "maniadd() could not open $MANIFEST: $^OS_ERROR";
 
     foreach my $file ( _sort < @needed) {
         my $comment = $additions->{?$file} || '';
         printf MANIFEST "\%-40s \%s\n", $file, $comment;
     }
-    close MANIFEST or die "Error closing $MANIFEST: $!";
+    close MANIFEST or die "Error closing $MANIFEST: $^OS_ERROR";
 
     return 1;
 }
@@ -637,7 +637,7 @@ sub maniadd {
 sub _fix_manifest {
     my $manifest_file = shift;
 
-    open MANIFEST, "<", $MANIFEST or die "Could not open $MANIFEST: $!";
+    open MANIFEST, "<", $MANIFEST or die "Could not open $MANIFEST: $^OS_ERROR";
 
     # Yes, we should be using seek(), but I'd like to avoid loading POSIX
     # to get SEEK_*
@@ -645,7 +645,7 @@ sub _fix_manifest {
     close MANIFEST;
 
     unless( @manifest[-1] =~ m/\n\z/ ) {
-        open MANIFEST, ">>", "$MANIFEST" or die "Could not open $MANIFEST: $!";
+        open MANIFEST, ">>", "$MANIFEST" or die "Could not open $MANIFEST: $^OS_ERROR";
         print MANIFEST "\n";
         close MANIFEST;
     }

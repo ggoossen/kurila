@@ -20,7 +20,7 @@ plan tests => 10;
 
 use Config;
 use signals;
-$| = 1;
+$^OUTPUT_AUTOFLUSH = 1;
 signals::set_handler(PIPE => 'IGNORE');
 signals::set_handler(HUP => 'IGNORE') if $^O eq 'interix';
 
@@ -64,7 +64,7 @@ is( $from_pid1, 'first process',    'message from first process' );
 
 $kill_cnt = kill $killsig, $pid1;
 is( $kill_cnt, 1,   'first process killed' ) ||
-  print "# errno == $!\n";
+  print "# errno == $^OS_ERROR\n";
 
 # get message from second process and kill second process and reader process
 chomp($from_pid2 = scalar( ~< *FH2));
@@ -72,11 +72,11 @@ is( $from_pid2, 'second process',   'message from second process' );
 
 $kill_cnt = kill $killsig, $pid2, $pid3;
 is( $kill_cnt, 2,   'killing procs 2 & 3' ) ||
-  print "# errno == $!\n";
+  print "# errno == $^OS_ERROR\n";
 
 
 # send one expected line of text to child process and then wait for it
-select(FH4); $| = 1; select(STDOUT);
+select(FH4); $^OUTPUT_AUTOFLUSH = 1; select(STDOUT);
 
 printf FH4 "ok \%d - text sent to fourth process\n", curr_test();
 next_test();

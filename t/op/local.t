@@ -74,13 +74,13 @@ is($y, "c 20");
 do {
 local our $TODO = "fix localization through reference";
 eval 'local($$e)';
-like($@ && $@->{?description}, qr/Can't localize through a reference/);
+like($^EVAL_ERROR && $^EVAL_ERROR->{?description}, qr/Can't localize through a reference/);
 
 eval '$e = \@(); local(@$e)';
-like($@ && $@->{?description}, qr/Can't localize through a reference/);
+like($^EVAL_ERROR && $^EVAL_ERROR->{?description}, qr/Can't localize through a reference/);
 
 eval '$e = \%(); local(%$e)';
-like($@ && $@->{?description}, qr/Can't localize through a reference/);
+like($^EVAL_ERROR && $^EVAL_ERROR->{?description}, qr/Can't localize through a reference/);
 };
 
 # Array and hash elements
@@ -174,7 +174,7 @@ do {
 # local() and readonly magic variables
 
 try { local $1 = 1 };
-like($@->{?description}, qr/Modification of a read-only value attempted/);
+like($^EVAL_ERROR->{?description}, qr/Modification of a read-only value attempted/);
 
 # sub localisation
 do {

@@ -569,7 +569,7 @@ sub pod2text {
         my @fhs = @_;
         local *IN;
         unless (open (IN, "<", @fhs[0])) {
-            die ("Can't open @fhs[0] for reading: $!\n");
+            die ("Can't open @fhs[0] for reading: $^OS_ERROR\n");
             return;
         }
         @fhs[0] = \*IN;
@@ -607,10 +607,10 @@ sub parse_from_file {
     # figure this out.
     my $fh = $self->output_fh ();
     my $oldfh = select $fh;
-    my $oldflush = $|;
-    $| = 1;
+    my $oldflush = $^OUTPUT_AUTOFLUSH;
+    $^OUTPUT_AUTOFLUSH = 1;
     print $fh '';
-    $| = $oldflush;
+    $^OUTPUT_AUTOFLUSH = $oldflush;
     select $oldfh;
     return $retval;
 }

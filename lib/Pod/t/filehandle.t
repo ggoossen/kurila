@@ -11,7 +11,7 @@
 use TestInit;
 
 BEGIN {
-    $| = 1;
+    $^OUTPUT_AUTOFLUSH = 1;
     print "1..3\n";
 }
 
@@ -25,22 +25,22 @@ my $text = Pod::Text->new or die "Cannot create parser\n";
 my $n = 2;
 while ( ~< *DATA) {
     next until $_ eq "###\n";
-    open (TMP, ">", 'tmp.pod') or die "Cannot create tmp.pod: $!\n";
+    open (TMP, ">", 'tmp.pod') or die "Cannot create tmp.pod: $^OS_ERROR\n";
     while ( ~< *DATA) {
         last if $_ eq "###\n";
         print TMP $_;
     }
     close TMP;
-    open (IN, "<", 'tmp.pod') or die "Cannot open tmp.pod: $!\n";
-    open (OUT, ">", 'out.tmp') or die "Cannot create out.tmp: $!\n";
+    open (IN, "<", 'tmp.pod') or die "Cannot open tmp.pod: $^OS_ERROR\n";
+    open (OUT, ">", 'out.tmp') or die "Cannot create out.tmp: $^OS_ERROR\n";
     $man->parse_from_filehandle (\*IN, \*OUT);
     close IN;
     close OUT;
-    open (OUT, "<", 'out.tmp') or die "Cannot open out.tmp: $!\n";
+    open (OUT, "<", 'out.tmp') or die "Cannot open out.tmp: $^OS_ERROR\n";
     while ( ~< *OUT) { last if m/^\.nh/ }
     my $output;
     do {
-        local $/;
+        local $^INPUT_RECORD_SEPARATOR;
         $output = ~< *OUT;
     };
     close OUT;
@@ -56,14 +56,14 @@ while ( ~< *DATA) {
         print "Expected\n========\n$expected\nOutput\n======\n$output\n";
     }
     $n++;
-    open (IN, "<", 'tmp.pod') or die "Cannot open tmp.pod: $!\n";
-    open (OUT, ">", 'out.tmp') or die "Cannot create out.tmp: $!\n";
+    open (IN, "<", 'tmp.pod') or die "Cannot open tmp.pod: $^OS_ERROR\n";
+    open (OUT, ">", 'out.tmp') or die "Cannot create out.tmp: $^OS_ERROR\n";
     $text->parse_from_filehandle (\*IN, \*OUT);
     close IN;
     close OUT;
-    open (OUT, "<", 'out.tmp') or die "Cannot open out.tmp: $!\n";
+    open (OUT, "<", 'out.tmp') or die "Cannot open out.tmp: $^OS_ERROR\n";
     do {
-        local $/;
+        local $^INPUT_RECORD_SEPARATOR;
         $output = ~< *OUT;
     };
     close OUT;

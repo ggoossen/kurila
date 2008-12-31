@@ -153,13 +153,13 @@ do {
 my $file = 'dolbar1.tmp';
 END { unlink $file; }
 do {
-    open my $_, '>', $file or die "Can't open $file: $!";
+    open my $_, '>', $file or die "Can't open $file: $^OS_ERROR";
     print $_ "hello\n";
     close $_;
     ok( -s $file, 'writing to filehandle $_ works' );
 };
 do {
-    open my $_, "<", $file or die "Can't open $file: $!";
+    open my $_, "<", $file or die "Can't open $file: $^OS_ERROR";
     my $x = ~< $_;
     ok( $x eq "hello\n", 'reading from <$_> works' );
     close $_;

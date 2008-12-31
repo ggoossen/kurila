@@ -45,12 +45,12 @@ my $pod_functions = File::Spec->catfile(
     $path, File::Spec->updir, 'Functions.pm' );
 
 SKIP: do {
-	my $test_out = do { local $/; ~< *DATA }; 
+	my $test_out = do { local $^INPUT_RECORD_SEPARATOR; ~< *DATA }; 
 	
-	skip( "Can't fork '$^X': $!", 1) 
+	skip( "Can't fork '$^X': $^OS_ERROR", 1) 
 	    unless open my $fh, "-|", qq[$^X "-I../lib" $pod_functions];
-	my $fake_out = do { local $/; ~< $fh };
-	skip( "Pipe error: $!", 1)
+	my $fake_out = do { local $^INPUT_RECORD_SEPARATOR; ~< $fh };
+	skip( "Pipe error: $^OS_ERROR", 1)
 	    unless close $fh;
 
 	is( $fake_out, $test_out, 'run as plain program' );

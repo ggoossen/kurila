@@ -58,7 +58,7 @@ my %OSTYPES = %( < qw(
 my $load = sub {
   my $mod = shift;
   eval "use $mod";
-  die $@ if $@;
+  die $^EVAL_ERROR if $^EVAL_ERROR;
   @ISA = @($mod);
 };
 

@@ -70,7 +70,7 @@ EOW
     $warning;
 } # do_not_edit
 
-open IN, '<', "embed.fnc" or die $!;
+open IN, '<', "embed.fnc" or die $^OS_ERROR;
 
 # walk table providing an array of components in each line to
 # subroutine, printing the result
@@ -323,7 +323,7 @@ sub readsyms (\%$) {
     my @($syms, $file) =  @_;
     local (*FILE, $_);
     open(FILE, "<", "$file")
-	or die "embed.pl: Can't open $file: $!\n";
+	or die "embed.pl: Can't open $file: $^OS_ERROR\n";
     while ( ~< *FILE) {
 	s/[ \t]*#.*//;		# Delete comments.
 	if (m/^\s*(\S+)\s*$/) {
@@ -343,7 +343,7 @@ sub readvars(\%$$@) {
     my @($syms, $file,$pre,?$keep_pre) =  @_;
     local (*FILE, $_);
     open(FILE, "<", "$file")
-	or die "embed.pl: Can't open $file: $!\n";
+	or die "embed.pl: Can't open $file: $^OS_ERROR\n";
     while ( ~< *FILE) {
 	s/[ \t]*#.*//;		# Delete comments.
 	if (m/PERLVARA?I?S?C?\($pre(\w+)/) {

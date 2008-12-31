@@ -154,7 +154,7 @@ do {
 	++$x;
     };
     ok($x == 1, $x);
-    ok($@ eq '', $@);
+    ok($^EVAL_ERROR eq '', $^EVAL_ERROR);
 
     my ($p, $q);
     try {
@@ -162,7 +162,7 @@ do {
 	--$p;
     };
     ok($p == -1, $p);
-    ok($@ eq '', $@);
+    ok($^EVAL_ERROR eq '', $^EVAL_ERROR);
 };
 
 $a = 2147483648;
@@ -175,7 +175,7 @@ $c=$a--;
 ok ($a == 2147483647, $a);
 
 try { my $x = qw|aap noot mies|; $x++ };
-ok($@->message =~ m/increment \(\+\+\) does not work on a ARRAY/);
+ok($^EVAL_ERROR->message =~ m/increment \(\+\+\) does not work on a ARRAY/);
 
 do {
     use integer;
@@ -206,7 +206,7 @@ for(0 .. 3) \{
 \}
 1;
 EOC
-    eval $code or die "# $@\n$code";
+    eval $code or die "# $^EVAL_ERROR\n$code";
 
     if ($warn) {
 	unless (ok (scalar nelems @warnings == 2, scalar nelems @warnings)) {

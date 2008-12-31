@@ -139,8 +139,8 @@ sub failure_handler_auto {
   };
   # If we make it here, there was an exception thrown in the
   #  call to $value, and so scream:
-  if($@) {
-    my $err = $@;
+  if($^EVAL_ERROR) {
+    my $err = $^EVAL_ERROR;
     # pretty up the error message
     $err =~ s<\s+at\s+\(eval\s+\d+\)\s+line\s+(\d+)\.?\n?>
              <\n in bracket code [compiled line $1],>s;
@@ -174,7 +174,7 @@ sub maketext {
   my@($handle, $phrase) = @: splice(@_,0,2);
 
   # Don't interefere with $@ in case that's being interpolated into the msg.
-  local $@;
+  local $^EVAL_ERROR;
 
   # Look up the value:
 
@@ -228,8 +228,8 @@ sub maketext {
   };
   # If we make it here, there was an exception thrown in the
   #  call to $value, and so scream:
-  if($@) {
-    my $err = $@->message;
+  if($^EVAL_ERROR) {
+    my $err = $^EVAL_ERROR->message;
     # pretty up the error message
     $err =~ s<\s+at\s+\(eval\s+\d+\)\s+line\s+(\d+)\.?\n?>
              <\n in bracket code [compiled line $1],>s;
@@ -388,8 +388,8 @@ sub _try_use {   # Basically a wrapper around "require Modulename"
   do {
     eval "require $module"; # used to be "use $module", but no point in that.
   };
-  if($@) {
-    print "Error using $module \: $@\n" if DEBUG +> 1;
+  if($^EVAL_ERROR) {
+    print "Error using $module \: $^EVAL_ERROR\n" if DEBUG +> 1;
     return %tried{+$module} = 0;
   } else {
     print " OK, $module is used\n" if DEBUG;

@@ -119,7 +119,7 @@ sub have_compiler {
   my $tmpfile = File::Spec->catfile(File::Spec->tmpdir, 'compilet.c');
   do {
     local *FH;
-    open FH, ">", "$tmpfile" or die "Can't create $tmpfile: $!";
+    open FH, ">", "$tmpfile" or die "Can't create $tmpfile: $^OS_ERROR";
     print FH "int boot_compilet() \{ return 1; \}\n";
     close FH;
   };
@@ -129,8 +129,8 @@ sub have_compiler {
     $obj_file = $self->compile(source => $tmpfile);
     @lib_files = $self->link(objects => $obj_file, module_name => 'compilet');
   };
-  warn $@ if $@;
-  my $result = $self->{+have_compiler} = $@ ?? 0 !! 1;
+  warn $^EVAL_ERROR if $^EVAL_ERROR;
+  my $result = $self->{+have_compiler} = $^EVAL_ERROR ?? 0 !! 1;
   
   foreach ( grep defined, @( $tmpfile, $obj_file, < @lib_files)) {
     1 while unlink;

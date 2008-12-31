@@ -229,7 +229,7 @@ sub checkCollator {
 
     if (defined $self->{?normalization}) {
 	try { require Unicode::Normalize };
-	$@ and die "Unicode::Normalize is required to normalize strings";
+	$^EVAL_ERROR and die "Unicode::Normalize is required to normalize strings";
 
 	$CVgetCombinClass ||= \&Unicode::Normalize::getCombinClass;
 
@@ -242,7 +242,7 @@ sub checkCollator {
 		Unicode::Normalize::normalize($norm, shift);
 	    };
 	    try { $self->{?normCode}->("") }; # try
-	    $@ and die "$PACKAGE unknown normalization form name: $norm";
+	    $^EVAL_ERROR and die "$PACKAGE unknown normalization form name: $norm";
 	}
     }
     return;

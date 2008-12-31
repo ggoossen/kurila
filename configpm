@@ -173,7 +173,7 @@ my %Data     = %();
 my %seen_quotes;
 do {
   my ($name, $val);
-  open(*CONFIG_SH, '<', $Config_SH) || die "Can't open $Config_SH: $!";
+  open(*CONFIG_SH, '<', $Config_SH) || die "Can't open $Config_SH: $^OS_ERROR";
   while (~< *CONFIG_SH) {
     next if m:^#!/bin/sh:;
 
@@ -291,7 +291,7 @@ $fetch_string .= <<'EOT';
 EOT
 
 eval $fetch_string;
-die if $@;
+die if $^EVAL_ERROR;
 
 # Calculation for the keys for byteorder
 # This is somewhat grim, but I need to run fetch_string here.
@@ -438,7 +438,7 @@ $heavy_txt .= join('', @non_v) . "\n";
 
 # copy config summary format from the myconfig.SH script
 $heavy_txt .= "our \$summary = <<'!END!';\n";
-open(*MYCONFIG,"<", "myconfig.SH") || die "open myconfig.SH failed: $!";
+open(*MYCONFIG,"<", "myconfig.SH") || die "open myconfig.SH failed: $^OS_ERROR";
 1 while defined($_ = ~< *MYCONFIG) && !m/^Summary of/;
 { $heavy_txt .= $_ } until !defined($_ = ~< *MYCONFIG) || m/^\s*$/;
 close(*MYCONFIG);
@@ -701,7 +701,7 @@ sub config_keys {
 ENDOFTIE
 
 
-open(*CONFIG_POD, ">", "$Config_POD") or die "Can't open $Config_POD: $!";
+open(*CONFIG_POD, ">", "$Config_POD") or die "Can't open $Config_POD: $^OS_ERROR";
 print CONFIG_POD <<'ENDOFTAIL';
 =head1 NAME
 
@@ -823,11 +823,11 @@ in such cases.
 ENDOFTAIL
 
 if (%Opts{?glossary}) {
-  open(*GLOS, "<", "$Glossary") or die "Can't open $Glossary: $!";
+  open(*GLOS, "<", "$Glossary") or die "Can't open $Glossary: $^OS_ERROR";
 }
 my %seen = %( () );
 my $text = 0;
-$/ = '';
+$^INPUT_RECORD_SEPARATOR = '';
 
 sub process {
   my $_ = shift;
@@ -913,15 +913,15 @@ print "written $Config_POD\n";
 my $orig_config_txt = "";
 my $orig_heavy_txt = "";
 do {
-    local $/;
+    local $^INPUT_RECORD_SEPARATOR;
     my $fh;
     $orig_config_txt = ~< $fh if open $fh, "<", $Config_PM;
     $orig_heavy_txt  = ~< $fh if open $fh, "<", $Config_heavy;
 };
 
 if ($orig_config_txt ne $config_txt or $orig_heavy_txt ne $heavy_txt) {
-    open *CONFIG, ">", $Config_PM or die "Can't open $Config_PM: $!\n";
-    open *CONFIG_HEAVY, ">", $Config_heavy or die "Can't open $Config_heavy: $!\n";
+    open *CONFIG, ">", $Config_PM or die "Can't open $Config_PM: $^OS_ERROR\n";
+    open *CONFIG_HEAVY, ">", $Config_heavy or die "Can't open $Config_heavy: $^OS_ERROR\n";
     print CONFIG $config_txt;
     print CONFIG_HEAVY $heavy_txt;
     close(*CONFIG_HEAVY);
@@ -933,7 +933,7 @@ if ($orig_config_txt ne $config_txt or $orig_heavy_txt ne $heavy_txt) {
 
 # Now create Cross.pm if needed
 if (%Opts{?cross}) {
-  open *CROSS, ">", "lib/Cross.pm" or die "Can not open >lib/Cross.pm: $!";
+  open *CROSS, ">", "lib/Cross.pm" or die "Can not open >lib/Cross.pm: $^OS_ERROR";
   my $cross = <<'EOS';
 # typical invocation:
 #   perl -MCross Makefile.PL

@@ -7,7 +7,7 @@
 #       guessing that if all of these work correctly, the bad ones will
 #       break correctly as well.
 
-BEGIN { $| = 1; }
+BEGIN { $^OUTPUT_AUTOFLUSH = 1; }
 BEGIN {
     env::set_var('PERL5LIB' => "../lib");
 
@@ -95,7 +95,7 @@ do {
     my $e;
     for (1..4) {
 	try { goto_croak("boo$_\n") };
-	$e .= $@->{?description};
+	$e .= $^EVAL_ERROR->{?description};
     }
     print $e eq "boo1\nboo2\nboo3\nboo4\n" ?? "ok 11\n" !! "not ok 11\n";
 };

@@ -88,14 +88,14 @@ sub writeAt
 
     if (defined $self->{?FH}) {
         my $here = tell($self->{?FH});
-        return $self->saveErrorString(undef, "Cannot seek to end of output filehandle: $!", $!) 
+        return $self->saveErrorString(undef, "Cannot seek to end of output filehandle: $^OS_ERROR", $^OS_ERROR) 
             if $here +< 0 ;
         seek($self->{?FH}, $offset, SEEK_SET)
-            or return $self->saveErrorString(undef, "Cannot seek to end of output filehandle: $!", $!) ;
+            or return $self->saveErrorString(undef, "Cannot seek to end of output filehandle: $^OS_ERROR", $^OS_ERROR) ;
         defined $self->{?FH}->write($data, length $data)
-            or return $self->saveErrorString(undef, $!, $!) ;
+            or return $self->saveErrorString(undef, $^OS_ERROR, $^OS_ERROR) ;
         seek($self->{?FH}, $here, SEEK_SET)
-            or return $self->saveErrorString(undef, "Cannot seek to end of output filehandle: $!", $!) ;
+            or return $self->saveErrorString(undef, "Cannot seek to end of output filehandle: $^OS_ERROR", $^OS_ERROR) ;
     }
     else {
         substr(${ $self->{?Buffer} }, $offset, length($data), $data) ;
@@ -120,7 +120,7 @@ sub output
 
     if ( defined $self->{?FH} ) {
         defined IO::Handle::write($self->{?FH}, $data, length $data )
-          or return $self->saveErrorString(0, $!, $!); 
+          or return $self->saveErrorString(0, $^OS_ERROR, $^OS_ERROR); 
     }
     else {
         ${ $self->{Buffer} } .= $data ;
@@ -238,7 +238,7 @@ sub _create
                 if ($appendOutput)
                 {
                     seek($obj->{?FH}, 0, SEEK_END)
-                        or return $obj->saveErrorString(undef, "Cannot seek to end of output filehandle: $!", $!) ;
+                        or return $obj->saveErrorString(undef, "Cannot seek to end of output filehandle: $^OS_ERROR", $^OS_ERROR) ;
 
                 }
             }
@@ -247,7 +247,7 @@ sub _create
                 $mode = '>>'
                     if $appendOutput;
                 $obj->{+FH} = IO::File->new( "$outValue", "$mode")
-                    or return $obj->saveErrorString(undef, "cannot open file '$outValue': $!", $!) ;
+                    or return $obj->saveErrorString(undef, "cannot open file '$outValue': $^OS_ERROR", $^OS_ERROR) ;
                 $obj->{+StdIO} = ($outValue eq '-'); 
             }
         }
@@ -451,7 +451,7 @@ sub _wr2
         if ( ! $isFilehandle )
         {
             $fh = IO::File->new( "$input", "<")
-                or return $self->saveErrorString(undef, "cannot open file '$input': $!", $!) ;
+                or return $self->saveErrorString(undef, "cannot open file '$input': $^OS_ERROR", $^OS_ERROR) ;
         }
         binmode $fh if $self->{?Got}->valueOrDefault('BinModeIn') ;
 
@@ -464,7 +464,7 @@ sub _wr2
                 or return undef ;
         }
 
-        return $self->saveErrorString(undef, $!, $!) 
+        return $self->saveErrorString(undef, $^OS_ERROR, $^OS_ERROR) 
             if $status +< 0 ;
 
         if ( (!$isFilehandle || $self->{?AutoClose}) && ! ref $input && $input ne '-')
@@ -606,15 +606,15 @@ sub print
     #    $self = $self{GLOB} ;
     #}
 
-    if (defined $\) {
-        if (defined $,) {
-            defined $self->syswrite(join($,, @_) . $\);
+    if (defined $^OUTPUT_RECORD_SEPARATOR) {
+        if (defined $^OUTPUT_FIELD_SEPARATOR) {
+            defined $self->syswrite(join($^OUTPUT_FIELD_SEPARATOR, @_) . $^OUTPUT_RECORD_SEPARATOR);
         } else {
-            defined $self->syswrite(join("", @_) . $\);
+            defined $self->syswrite(join("", @_) . $^OUTPUT_RECORD_SEPARATOR);
         }
     } else {
-        if (defined $,) {
-            defined $self->syswrite(join($,, @_));
+        if (defined $^OUTPUT_FIELD_SEPARATOR) {
+            defined $self->syswrite(join($^OUTPUT_FIELD_SEPARATOR, @_));
         } else {
             defined $self->syswrite(join("", @_));
         }
@@ -651,7 +651,7 @@ sub flush
 
     if ( defined $self->{?FH} ) {
         defined IO::Handle::flush($self->{?FH})
-            or return $self->saveErrorString(0, $!, $!); 
+            or return $self->saveErrorString(0, $^OS_ERROR, $^OS_ERROR); 
     }
 
     return 1;
@@ -737,13 +737,13 @@ sub close
 
         #if (! $self->{Handle} || $self->{AutoClose}) {
         if ((! $self->{?Handle} || $self->{?AutoClose}) && ! $self->{?StdIO}) {
-            $! = 0 ;
+            $^OS_ERROR = 0 ;
             close($self->{?FH})
-                or return $self->saveErrorString(0, $!, $!); 
+                or return $self->saveErrorString(0, $^OS_ERROR, $^OS_ERROR); 
         }
         delete $self->{FH} ;
         # This delete can set $! in older Perls, so reset the errno
-        $! = 0 ;
+        $^OS_ERROR = 0 ;
     }
 
     return 1;

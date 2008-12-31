@@ -40,11 +40,11 @@ do {
     try { $line1 = __LINE__;
            $line2 = __LINE__; die "foobar";
        };
-    is defined $@, 1, '$@ is set';
-    is ref $@, "error", '$@ is an error object';
-    is $@->{?description}, "foobar";
-    is $@->description, "foobar";
-    is $@->stacktrace, <<MSG;
+    is defined $^EVAL_ERROR, 1, '$@ is set';
+    is ref $^EVAL_ERROR, "error", '$@ is an error object';
+    is $^EVAL_ERROR->{?description}, "foobar";
+    is $^EVAL_ERROR->description, "foobar";
+    is $^EVAL_ERROR->stacktrace, <<MSG;
  at ../lib/error.t line $line2 character 31.
     (eval) called at ../lib/error.t line $line1 character 5.
 MSG
@@ -56,7 +56,7 @@ do {
     my ($line1, $line2);
     try { $line2 = __LINE__;
         try { die "my die"; }; $line1 = __LINE__;
-        $err = $@;
+        $err = $^EVAL_ERROR;
     };
     is defined $err, 1, '$@ is set';
     is ref $err, "error", '$@ is error object';
@@ -75,9 +75,9 @@ do {
         try { die "reuse die"; }; $line1 = __LINE__;
         die;
     };
-    is ref $@, "error", '$@ is an error object';
-    is $@->description, "reuse die";
-    is $@->stacktrace, <<MSG;
+    is ref $^EVAL_ERROR, "error", '$@ is an error object';
+    is $^EVAL_ERROR->description, "reuse die";
+    is $^EVAL_ERROR->stacktrace, <<MSG;
  at ../lib/error.t line $line1 character 15.
     (eval) called at ../lib/error.t line $line1 character 9.
     (eval) called at ../lib/error.t line $line2 character 5.
@@ -89,10 +89,10 @@ MSG
 do {
     my $line1;
     try { my $foo = "xx"; $$foo; }; $line1 = __LINE__;
-    is defined $@, 1, '$@ is set';
-    is ref $@, 'error', '$@ is an error object';
-    is $@->description, "Can't use PLAINVALUE as a SCALAR REF";
-    is $@->stacktrace, <<MSG;
+    is defined $^EVAL_ERROR, 1, '$@ is set';
+    is ref $^EVAL_ERROR, 'error', '$@ is an error object';
+    is $^EVAL_ERROR->description, "Can't use PLAINVALUE as a SCALAR REF";
+    is $^EVAL_ERROR->stacktrace, <<MSG;
  at ../lib/error.t line $line1 character 26.
     (eval) called at ../lib/error.t line $line1 character 5.
 MSG
@@ -115,10 +115,10 @@ MSG
 # yyerror
 do {
     eval 'undef "foo"'; my $line = __LINE__;
-    is defined $@, 1, '$@ is set';
-    is ref $@, 'error', '$@ is error object';
-    is $@->description, "Can't modify constant item in undef operator";
-    is $@->stacktrace, <<MSG ;
+    is defined $^EVAL_ERROR, 1, '$@ is set';
+    is ref $^EVAL_ERROR, 'error', '$@ is error object';
+    is $^EVAL_ERROR->description, "Can't modify constant item in undef operator";
+    is $^EVAL_ERROR->stacktrace, <<MSG ;
  at (eval 9) line 1 character 12.
     (eval) called at ../lib/error.t line $line character 5.
 MSG

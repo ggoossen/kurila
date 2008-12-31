@@ -1267,7 +1267,7 @@ sub interior_sequence {
 
     # undef on failure
     unless (defined $link) {
-      carp $@;
+      carp $^EVAL_ERROR;
       return;
     }
 

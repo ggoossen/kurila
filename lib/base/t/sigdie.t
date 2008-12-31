@@ -21,6 +21,6 @@ do {
       'base'->import( <qw(Huh::Boo));
     };
 
-    main::like($@->{?description}, qr/^Base class package "Huh::Boo" is empty/, 
+    main::like($^EVAL_ERROR->{?description}, qr/^Base class package "Huh::Boo" is empty/, 
          'Base class empty error message');
 };

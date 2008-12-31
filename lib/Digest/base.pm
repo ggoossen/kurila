@@ -25,7 +25,7 @@ sub addfile {
     }
     unless (defined $n) {
 	require Carp;
-	Carp::croak("Read failed: $!");
+	Carp::croak("Read failed: $^OS_ERROR");
     }
 
     $self;

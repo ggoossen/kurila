@@ -22,7 +22,7 @@ our @ISA=@('Exporter');
 our @EXPORT    = qw(&plan &ok &skip);
 our @EXPORT_OK = qw($ntest $TESTOUT $TESTERR);
 
-$|=1;
+$^OUTPUT_AUTOFLUSH=1;
 our $TESTOUT = *STDOUT{IO};
 our $TESTERR = *STDERR{IO};
 
@@ -145,7 +145,7 @@ sub plan {
     die "Test::plan(\%args): odd number of arguments" if (nelems @_) ^&^ 1;
     die "Test::plan(): should not be called more than once" if $planned;
 
-    local($\, $,);   # guard against -l and other things that screw with
+    local($^OUTPUT_RECORD_SEPARATOR, $^OUTPUT_FIELD_SEPARATOR);   # guard against -l and other things that screw with
                      # print
 
     _reset_globals();
@@ -348,7 +348,7 @@ problems.  See L</BUGS and CAVEATS>.
 sub ok ($;$$) {
     die "ok: plan before you test!" if !$planned;
 
-    local($\,$,);   # guard against -l and other things that screw with
+    local($^OUTPUT_RECORD_SEPARATOR,$^OUTPUT_FIELD_SEPARATOR);   # guard against -l and other things that screw with
                     # print
 
     my @($pkg,$file,$line, ...) = @: caller($TestLevel);
@@ -499,10 +499,10 @@ sub _diff_complain_external {
             close(DIFF);
         }
         else {
-            warn "Can't run diff: $!";
+            warn "Can't run diff: $^OS_ERROR";
         }
     } else {
-        warn "Can't write to tempfiles: $!";
+        warn "Can't write to tempfiles: $^OS_ERROR";
     }
     unlink($got_filename);
     unlink($exp_filename);
@@ -671,7 +671,7 @@ That is, both are like this:
 =cut
 
 sub skip ($;$$$) {
-    local($\, $,);   # guard against -l and other things that screw with
+    local($^OUTPUT_RECORD_SEPARATOR, $^OUTPUT_FIELD_SEPARATOR);   # guard against -l and other things that screw with
                      # print
 
     my $whyskip = _to_value(shift);

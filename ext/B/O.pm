@@ -54,7 +54,7 @@ sub import {
 	    close STDERR if $veryquiet;
 	}
     ];
-    die $@ if $@;
+    die $^EVAL_ERROR if $^EVAL_ERROR;
 }
 
 1;

@@ -38,7 +38,7 @@ my @delete;
 
 END {
     for ( @delete) {
-	unlink $_ or warn "unlink $_: $!";
+	unlink $_ or warn "unlink $_: $^OS_ERROR";
     }
 }
 
@@ -46,7 +46,7 @@ sub file_eq {
     my $f   = shift;
     my $val = shift;
 
-    open IN, "<", $f or die "open $f: $!";
+    open IN, "<", $f or die "open $f: $^OS_ERROR";
     chomp(my $line = ~< *IN);
     close IN;
 
@@ -57,7 +57,7 @@ sub file_eq {
 
 # This script will be used as the command to execute from
 # child processes
-open PROG, ">", "ff-prog" or die "open ff-prog: $!";
+open PROG, ">", "ff-prog" or die "open ff-prog: $^OS_ERROR";
 print PROG <<'EOF';
 my $f = shift(@ARGV);
 my $str = shift(@ARGV);
@@ -66,33 +66,33 @@ print OUT $str;
 close OUT;
 EOF
     ;
-close PROG or die "close ff-prog: $!";;
+close PROG or die "close ff-prog: $^OS_ERROR";;
 push @delete, "ff-prog";
 
-$| = 0; # we want buffered output
+$^OUTPUT_AUTOFLUSH = 0; # we want buffered output
 
 # Test flush on fork/exec
 if (!$d_fork) {
     print "ok 1 # skipped: no fork\n";
 } else {
-    my $f = "ff-fork-$$";
-    open OUT, ">", "$f" or die "open $f: $!";
+    my $f = "ff-fork-$^PID";
+    open OUT, ">", "$f" or die "open $f: $^OS_ERROR";
     print OUT "Pe";
     my $pid = fork;
     if ($pid) {
 	# Parent
 	wait;
-	close OUT or die "close $f: $!";
+	close OUT or die "close $f: $^OS_ERROR";
     } elsif (defined $pid) {
 	# Kid
 	print OUT "r";
 	my $command = qq{$runperl "ff-prog" "$f" "l"};
 	print "# $command\n";
-	exec $command or die $!;
+	exec $command or die $^OS_ERROR;
 	exit;
     } else {
 	# Bang
-	die "fork: $!";
+	die "fork: $^OS_ERROR";
     }
 
     print file_eq($f, "Perl") ?? "ok 1\n" !! "not ok 1\n";
@@ -111,18 +111,18 @@ my %subs = %(
             },
             "popen"  => sub {
                 my $c = shift;
-                open PIPE, "-|", "$c" or die "$c: $!";
+                open PIPE, "-|", "$c" or die "$c: $^OS_ERROR";
                 close PIPE;
             },
             );
 my $t = 2;
 for (qw(system qx popen)) {
     my $code    = %subs{?$_};
-    my $f       = "ff-$_-$$";
+    my $f       = "ff-$_-$^PID";
     my $command = qq{$runperl "ff-prog" "$f" "rl"};
-    open OUT, ">", "$f" or die "open $f: $!";
+    open OUT, ">", "$f" or die "open $f: $^OS_ERROR";
     print OUT "Pe";
-    close OUT or die "close $f: $!";;
+    close OUT or die "close $f: $^OS_ERROR";;
     print "# $command\n";
     $code->($command);
     print file_eq($f, "Perl") ?? "ok $t\n" !! "not ok $t\n";
@@ -135,7 +135,7 @@ my $cmd = _create_runperl(
 			  prog =>
 			  sprintf('print qq[ok $_] for (%d..%d)', $t, $t+2));
 print "# cmd = '$cmd'\n";
-open my $CMD, '-|', "$cmd" or die "Can't open pipe to '$cmd': $!";
+open my $CMD, '-|', "$cmd" or die "Can't open pipe to '$cmd': $^OS_ERROR";
 while ( ~< $CMD) {
     system("$runperl -e 0");
     print;

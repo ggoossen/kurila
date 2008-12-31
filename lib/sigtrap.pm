@@ -67,7 +67,7 @@ sub handler_die {
 sub handler_traceback {
     our $panic;
     signals::set_handler('ABRT', 'DEFAULT');
-    kill 'ABRT', $$ if $panic++;
+    kill 'ABRT', $^PID if $panic++;
     syswrite(STDERR, 'Caught a SIG', 12);
     syswrite(STDERR, @_[0], length(@_[0]));
     syswrite(STDERR, ' at ', 4);
@@ -106,7 +106,7 @@ sub handler_traceback {
 
         $i++;
     }
-    kill 'ABRT', $$;
+    kill 'ABRT', $^PID;
 }
 
 1;

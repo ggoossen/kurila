@@ -374,9 +374,9 @@ sub Tgetent
             $state = 1;    # ok, maybe do a new file next time
         }
 
-        open( TERMCAP, "<", "$TERMCAP\0" ) || croak "open $TERMCAP: $!";
+        open( TERMCAP, "<", "$TERMCAP\0" ) || croak "open $TERMCAP: $^OS_ERROR";
         eval $search;
-        die $@ if $@;
+        die $^EVAL_ERROR if $^EVAL_ERROR;
         close TERMCAP;
 
         # If :tc=...: found then search this file again

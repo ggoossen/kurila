@@ -539,7 +539,7 @@ sub pod2usage {
        ## spit out the entire PODs. Might as well invoke perldoc
        my $progpath = File::Spec->catfile(config_value('scriptdir'), "perldoc");
        system($progpath, %opts{?"input"});
-       if($?) {
+       if($^CHILD_ERROR) {
          # RT16091: fall back to more if perldoc failed
          system(env::var('PAGER') || 'more', %opts{?"input"});
        }

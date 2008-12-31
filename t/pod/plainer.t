@@ -11,16 +11,16 @@ print "1..7\n";
 while( ~< *DATA ) {
     my $expected = $header. ~< *DATA; 
 
-    open(IN, '>', $input) or die $!;
+    open(IN, '>', $input) or die $^OS_ERROR;
     print IN $header, $_;
-    close IN or die $!;
+    close IN or die $^OS_ERROR;
 
-    open IN, '<', $input or die $!;
-    open OUT, '>', $output or die $!;
+    open IN, '<', $input or die $^OS_ERROR;
+    open OUT, '>', $output or die $^OS_ERROR;
     $parser->parse_from_filehandle(\*IN,\*OUT);
 
-    open OUT, '<', $output or die $!;
-    my $returned; do { local $/; $returned = ~< *OUT; };
+    open OUT, '<', $output or die $^OS_ERROR;
+    my $returned; do { local $^INPUT_RECORD_SEPARATOR; $returned = ~< *OUT; };
     
     unless( $returned eq $expected ) {
        print < map { s/^/\#/mg; $_; }

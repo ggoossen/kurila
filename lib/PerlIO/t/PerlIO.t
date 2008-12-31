@@ -10,9 +10,9 @@ use Test::More tests => 37;
 
 use_ok('PerlIO');
 
-my $txt = "txt$$";
-my $bin = "bin$$";
-my $utf = "utf$$";
+my $txt = "txt$^PID";
+my $bin = "bin$^PID";
+my $utf = "utf$^PID";
 
 my $txtfh;
 my $binfh;
@@ -81,9 +81,9 @@ do {
     ok( tell($x) +>= 3,          '       tell' );
 
     # test magic temp file over STDOUT
-    open OLDOUT, ">&", \*STDOUT or die "cannot dup STDOUT: $!";
+    open OLDOUT, ">&", \*STDOUT or die "cannot dup STDOUT: $^OS_ERROR";
     my $status = open(STDOUT,"+<",undef);
-    open STDOUT, ">&",  \*OLDOUT or die "cannot dup OLDOUT: $!";
+    open STDOUT, ">&",  \*OLDOUT or die "cannot dup OLDOUT: $^OS_ERROR";
     # report after STDOUT is restored
     ok($status, '       re-open STDOUT');
     close OLDOUT;
@@ -107,21 +107,21 @@ do {
         local $TODO = "broken";
 
         # test in-memory open over STDOUT
-        open OLDOUT, ">&", \*STDOUT or die "cannot dup STDOUT: $!";
+        open OLDOUT, ">&", \*STDOUT or die "cannot dup STDOUT: $^OS_ERROR";
         #close STDOUT;
         my $status = open(STDOUT,">",\$var);
-        my $error = "$!" unless $status; # remember the error
+        my $error = "$^OS_ERROR" unless $status; # remember the error
 	close STDOUT unless $status;
-        open STDOUT, ">&",  \*OLDOUT or die "cannot dup OLDOUT: $!";
+        open STDOUT, ">&",  \*OLDOUT or die "cannot dup OLDOUT: $^OS_ERROR";
         print "# $error\n" unless $status;
         # report after STDOUT is restored
         ok($status, '       open STDOUT into in-memory var');
 
         # test in-memory open over STDERR
-        open OLDERR, ">&", \*STDERR or die "cannot dup STDERR: $!";
+        open OLDERR, ">&", \*STDERR or die "cannot dup STDERR: $^OS_ERROR";
         #close STDERR;
         ok( open(STDERR,">",\$var), '       open STDERR into in-memory var');
-        open STDERR, ">&",  \*OLDERR or die "cannot dup OLDERR: $!";
+        open STDERR, ">&",  \*OLDERR or die "cannot dup OLDERR: $^OS_ERROR";
     };
 };
 

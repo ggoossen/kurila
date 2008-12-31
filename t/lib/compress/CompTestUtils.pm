@@ -20,7 +20,7 @@ sub title
 
 sub like_eval
 {
-    like $@->{?description}, nelems @_ ;
+    like $^EVAL_ERROR->{?description}, nelems @_ ;
 }
 
 do {
@@ -85,7 +85,7 @@ sub readFile
     else
     {
         open (F, "<", "$f") 
-            or die "Cannot open $f: $!\n" ;
+            or die "Cannot open $f: $^OS_ERROR\n" ;
         binmode F;
         @strings = @( ~< *F ) ;	
         close F ;
@@ -104,7 +104,7 @@ sub writeFile
     my@($filename, @< @strings) =  @_ ;
     1 while unlink $filename ;
     open (F, ">", "$filename") 
-        or croak "Cannot open $filename: $!\n" ;
+        or croak "Cannot open $filename: $^OS_ERROR\n" ;
     binmode F;
     foreach ( @strings) {
         no warnings ;
@@ -618,7 +618,7 @@ sub getMultiValues
 sub gotScalarUtilXS
 {
     eval ' use Scalar::Util "dualvar" ';
-    return $@ ?? 0 !! 1 ;
+    return $^EVAL_ERROR ?? 0 !! 1 ;
 }
 
 package CompTestUtils;

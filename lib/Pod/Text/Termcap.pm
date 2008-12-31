@@ -51,7 +51,7 @@ sub new {
     # Fall back on a hard-coded terminal speed if POSIX::Termios isn't
     # available (such as on VMS).
     try { $termios = POSIX::Termios->new };
-    if ($@) {
+    if ($^EVAL_ERROR) {
         $ospeed = 9600;
     } else {
         $termios->getattr;

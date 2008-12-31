@@ -33,8 +33,8 @@ sub new
 	@($class, @< @args) =  @$class if ref($class);
 	unless (exists %{*{Symbol::fetch_glob("$class\::")}}{"VERSION"}) {
 	    eval "require $class";
-	    if ($@) {
-		$err ||= $@;
+	    if ($^EVAL_ERROR) {
+		$err ||= $^EVAL_ERROR;
 		next;
 	    }
 	}

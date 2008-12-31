@@ -128,14 +128,14 @@ while ((nelems @death))
 
     $_ = "x";
     eval $regex;
-    if (not $@) {
+    if (not $^EVAL_ERROR) {
 	print "# oops, $regex didn't die\nnot ok $count\n";
 	next;
     }
     $result =~ s/{\#}/$marker1/;
     $result =~ s/{\#}/$marker2/;
-    if ($@->description !~ m/^\Q$result\E$/) {
-	print "# For $regex, expected:\n#  $result\n# Got:\n#  $($@ && $@->message)\n#\nnot ";
+    if ($^EVAL_ERROR->description !~ m/^\Q$result\E$/) {
+	print "# For $regex, expected:\n#  $result\n# Got:\n#  $($^EVAL_ERROR && $^EVAL_ERROR->message)\n#\nnot ";
     }
     print "ok $count - $regex\n";
 }
@@ -154,9 +154,9 @@ while ((nelems @warning))
     $_ = "x";
     eval $regex;
 
-    if ($@)
+    if ($^EVAL_ERROR)
     {
-	print "# oops, $regex died with:\n#\t$@#\nnot ok $count\n";
+	print "# oops, $regex died with:\n#\t$^EVAL_ERROR#\nnot ok $count\n";
 	next;
     }
 

@@ -69,11 +69,11 @@ expected($d1, "D", "GLOB");
 "E" =~ m/(.)/;
 expected(bless(\%(), $1), "E", "HASH");
 do {
-    local $! = 1;
-    my $string = "$!";
-    $! = 2;	# attempt to avoid cached string
-    $! = 1;
-    expected(bless(\%(), $!), $string, "HASH");
+    local $^OS_ERROR = 1;
+    my $string = "$^OS_ERROR";
+    $^OS_ERROR = 2;	# attempt to avoid cached string
+    $^OS_ERROR = 1;
+    expected(bless(\%(), $^OS_ERROR), $string, "HASH");
 
 # ref is ref to magic
     do {
@@ -81,9 +81,9 @@ do {
 	    package F;
 	    sub test { main::is(${@_[0]}, $string) }
 	};
-	$! = 2;
-	$f1 = bless \$!, "F";
-	$! = 1;
+	$^OS_ERROR = 2;
+	$f1 = bless \$^OS_ERROR, "F";
+	$^OS_ERROR = 1;
 	$f1->test;
     };
 };
@@ -111,7 +111,7 @@ do {
 # class is a ref
 $a1 = bless \%(), "A4";
 $b1 = try { bless \%(), $a1 };
-like($@->message, qr/Attempt to bless into a reference/, "class is a ref");
+like($^EVAL_ERROR->message, qr/Attempt to bless into a reference/, "class is a ref");
 
 do {
     my %h = %( < 1..2 );

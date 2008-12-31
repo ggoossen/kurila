@@ -19,7 +19,7 @@ use ExtUtils::MakeMaker;
 
 chdir 't';
 perl_lib;
-$| = 1;
+$^OUTPUT_AUTOFLUSH = 1;
 
 my $Makefile = makefile_name;
 
@@ -30,7 +30,7 @@ END {
 }
 
 ok( chdir 'Big-Dummy', q{chdir'd to Big-Dummy} ) ||
-        diag("chdir failed: $!");
+        diag("chdir failed: $^OS_ERROR");
 
 do {
     my $warnings = '';
@@ -65,9 +65,9 @@ OUT
 }
 
 
-ok( open(MAKEFILE, "<", $Makefile) ) or diag "Can't open $Makefile: $!";
+ok( open(MAKEFILE, "<", $Makefile) ) or diag "Can't open $Makefile: $^OS_ERROR";
 do {
-    local $/; 
+    local $^INPUT_RECORD_SEPARATOR; 
     like( ~< *MAKEFILE, qr/^\# This makes sure the postamble gets written\n/m,
           'postamble added to the Makefile' );
 };

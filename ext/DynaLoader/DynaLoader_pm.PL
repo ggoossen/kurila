@@ -69,7 +69,7 @@ sub expand_os_specific {
 }
 
 unlink "DynaLoader.pm" if -f "DynaLoader.pm";
-open OUT, ">", "DynaLoader.pm" or die $!;
+open OUT, ">", "DynaLoader.pm" or die $^OS_ERROR;
 print OUT <<'EOT';
 
 # Generated from DynaLoader_pm.PL
@@ -1000,5 +1000,5 @@ assistance from Tim Bunce, January 1996.
 =cut
 EOT
 
-close OUT or die $!;
+close OUT or die $^OS_ERROR;
 

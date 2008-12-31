@@ -48,7 +48,7 @@ sub Mkbootstrap {
     my $method = '';
     if (@all) {
 	open my $bs, ">", "$baseext.bs"
-		or die "Unable to open $baseext.bs: $!";
+		or die "Unable to open $baseext.bs: $^OS_ERROR";
 	print STDOUT "Writing $baseext.bs\n";
 	print STDOUT "	containing: $(join ' ',@all)" if $Verbose;
 	print $bs "# $baseext DynaLoader bootstrap file for $^O architecture.\n";

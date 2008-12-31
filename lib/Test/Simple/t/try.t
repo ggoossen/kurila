@@ -17,8 +17,8 @@ require Test::Builder;
 my $tb = Test::Builder->new;
 
 # These should not change;
-local $@ = 42;
-local $! = 23;
+local $^EVAL_ERROR = 42;
+local $^OS_ERROR = 23;
 
 is $tb->_try(sub { 2 }), 2;
 is $tb->_try(sub { return '' }), '';
@@ -28,5 +28,5 @@ is $tb->_try(sub { die; }), undef;
 is_deeply \@($tb->_try(sub { die "Foo\n" })),
           \@(undef);
 
-is $@, 42;
-cmp_ok $!, '==', 23;
+is $^EVAL_ERROR, 42;
+cmp_ok $^OS_ERROR, '==', 23;

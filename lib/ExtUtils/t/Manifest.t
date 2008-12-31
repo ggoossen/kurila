@@ -172,7 +172,7 @@ $files = maniread();
 try { @(_, $warn) =  catch_warning( sub {
  		manicopy( $files, 'copy', 'cp' ) })
 };
-like( $@->{?description}, qr/^Can't read none: /, 'croaked about none' );
+like( $^EVAL_ERROR->{?description}, qr/^Can't read none: /, 'croaked about none' );
 
 # a newline comes through, so get rid of it
 chomp($warn);
@@ -272,12 +272,12 @@ SKIP: do {
     try {
         maniadd(\%( 'foo' => 'bar' ));
     };
-    is( $@, '',  "maniadd() won't open MANIFEST if it doesn't need to" );
+    is( $^EVAL_ERROR, '',  "maniadd() won't open MANIFEST if it doesn't need to" );
 
     try {
         maniadd(\%( 'grrrwoof' => 'yippie' ));
     };
-    like( $@->{?description}, qr/^\Qmaniadd() could not open MANIFEST:\E/,  
+    like( $^EVAL_ERROR->{?description}, qr/^\Qmaniadd() could not open MANIFEST:\E/,  
                  "maniadd() dies if it can't open the MANIFEST" );
 
     chmod( 0600, 'MANIFEST' );

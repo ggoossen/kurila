@@ -34,4 +34,4 @@ ok( !(grep !File::Spec->file_name_is_absolute($_), @blib_paths),
                     '  and theyre absolute');
 
 try { eval "# $(join ' ',@INC)"; };
-is( $@, '',     '@INC is not tainted' );
+is( $^EVAL_ERROR, '',     '@INC is not tainted' );

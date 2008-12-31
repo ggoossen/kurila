@@ -6,13 +6,13 @@
 my %declared;
 my %used;
 
-open my $fh, '<', 'proto.h' or die "Can't open proto.h: $!";
+open my $fh, '<', 'proto.h' or die "Can't open proto.h: $^OS_ERROR";
 while (~< $fh) {
     %declared{+$1}++ if m/^#define\s+(PERL_ARGS_ASSERT[A-Za-z_]+)\s+/;
 }
 
 if (!nelems @ARGV) {
-    open my $fh, '<', 'MANIFEST' or die "Can't open MANIFEST: $!";
+    open my $fh, '<', 'MANIFEST' or die "Can't open MANIFEST: $^OS_ERROR";
     while (~<$fh) {
 	# *.c or */*.c or *_i.h or */*_i.h
 	push @ARGV, $1 if m!^((?:[^/]+/)?[^/]+(?:\.c|_i\.h))\t!;

@@ -71,7 +71,7 @@ sub _do_link {
 
     my $optfile = 'sys$disk:[]' . @temp_files[0];
     open my $opt_fh, '>>', $optfile 
-        or die "_do_link: Unable to open $optfile: $!";
+        or die "_do_link: Unable to open $optfile: $^OS_ERROR";
     for my $lib ( @optlibs) {print $opt_fh "$lib\n" if length $lib }
     close $opt_fh;
 

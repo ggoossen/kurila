@@ -163,4 +163,4 @@ sub hint_fetch {
 
 $::testing_caller = 1;
 
-do './op/caller.pl' or die $@;
+do './op/caller.pl' or die $^EVAL_ERROR;

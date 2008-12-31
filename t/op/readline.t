@@ -57,21 +57,21 @@ foreach my $l (@(1, 21)) {
 use File::Spec;
 
 open F, '<', 'File::Spec'->curdir and sysread F, $_, 1;
-my $err = $! + 0;
+my $err = $^OS_ERROR + 0;
 close F;
 
 SKIP: do {
   skip "you can read directories as plain files", 2 unless( $err );
 
-  $!=0;
+  $^OS_ERROR=0;
   open F, "<", 'File::Spec'->curdir and $_= ~< *F;
-  ok( $!==$err && !defined($_) => 'readline( DIRECTORY )' );
+  ok( $^OS_ERROR==$err && !defined($_) => 'readline( DIRECTORY )' );
   close F;
 
-  $!=0;
-  do { local $/;
+  $^OS_ERROR=0;
+  do { local $^INPUT_RECORD_SEPARATOR;
     open F, "<", 'File::Spec'->curdir and $_= ~< *F;
-    ok( $!==$err && !defined($_) => 'readline( DIRECTORY ) slurp mode' );
+    ok( $^OS_ERROR==$err && !defined($_) => 'readline( DIRECTORY ) slurp mode' );
     close F;
   };
 };

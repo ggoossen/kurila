@@ -1,13 +1,13 @@
 #!./perl
 
 eval 'opendir(NOSUCH, "no/such/directory");';
-if ($@) { print "1..0\n"; exit; }
+if ($^EVAL_ERROR) { print "1..0\n"; exit; }
 
 print "1..11\n";
 
 for my $i (1..2000) {
     local *OP;
-    opendir(OP, "op") or die "can't opendir: $!";
+    opendir(OP, "op") or die "can't opendir: $^OS_ERROR";
     # should auto-closedir() here
 }
 
@@ -15,7 +15,7 @@ if (opendir(OP, "op")) { print "ok 1\n"; } else { print "not ok 1\n"; }
 our @D = grep(m/^[^\.].*\.t$/i, @( readdir(OP)));
 closedir(OP);
 
-open my $man, "<", "../MANIFEST" or die "Can't open ../MANIFEST: $!";
+open my $man, "<", "../MANIFEST" or die "Can't open ../MANIFEST: $^OS_ERROR";
 my $expect;
 while (~< $man) {
     ++$expect if m!^t/op/[^/]+\t!;

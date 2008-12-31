@@ -7,7 +7,7 @@
 # Ensure module can be loaded
 ##############################################################################
 
-BEGIN { $| = 1; print "1..16\n" }
+BEGIN { $^OUTPUT_AUTOFLUSH = 1; print "1..16\n" }
 env::set_var('ANSI_COLORS_DISABLED', undef);
 use Term::ANSIColor < qw(:constants color colored uncolor);
 print "ok 1\n";

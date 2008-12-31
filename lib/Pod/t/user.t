@@ -55,16 +55,16 @@ my $parser = Pod::LaTeX->new(< %params);
 ok($parser);
 
 # Create an output file
-open(OUTFH, ">", "test.tex" ) or die "Unable to open test tex file: $!\n";
+open(OUTFH, ">", "test.tex" ) or die "Unable to open test tex file: $^OS_ERROR\n";
 
 # Read from the DATA filehandle and write to a new output file
 # Really want to write this to a scalar
 $parser->parse_from_filehandle(\*DATA,\*OUTFH);
 
-close(OUTFH) or die "Error closing OUTFH test.tex: $!\n";
+close(OUTFH) or die "Error closing OUTFH test.tex: $^OS_ERROR\n";
 
 # Now read in OUTFH and compare
-open(INFH, "<", "test.tex") or die "Unable to read test tex file: $!\n";
+open(INFH, "<", "test.tex") or die "Unable to read test tex file: $^OS_ERROR\n";
 my @output = @( ~< *INFH );
 
 ok((nelems @output), nelems @reference);
@@ -74,7 +74,7 @@ for my $i (0..((nelems @reference)-1)) {
   ok(@output[$i], @reference[$i]);
 }
 
-close(INFH) or die "Error closing INFH test.tex: $!\n";
+close(INFH) or die "Error closing INFH test.tex: $^OS_ERROR\n";
 
 
 __DATA__

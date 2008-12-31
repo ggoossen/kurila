@@ -202,7 +202,7 @@ do {
 do {
     use utf8;
     try {utf8::encode("£")};
-    is($@, '', "utf8::encode is a NO-OP");
+    is($^EVAL_ERROR, '', "utf8::encode is a NO-OP");
 };
 
 do {

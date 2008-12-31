@@ -47,7 +47,7 @@ $RESTRICTED_CROAK = "/^Cannot retrieve restricted hash/";
 
 my %tests;
 do {
-  local $/ = "\n\nend\n";
+  local $^INPUT_RECORD_SEPARATOR = "\n\nend\n";
   while ( ~< *DATA) {
     next unless m/\S/s;
     unless (m/begin ([0-7]{3}) ([^\n]*)\n(.*)$/s) {
@@ -65,7 +65,7 @@ do {
 sub thaw_hash {
   my @($name, $expected) =  @_;
   my $hash = try {thaw %tests{?$name}};
-  is ($@, '', "Thawed $name without error?");
+  is ($^EVAL_ERROR, '', "Thawed $name without error?");
   isa_ok ($hash, 'HASH');
   ok (defined $hash && eq_hash($hash, $expected),
       "And it is the hash we expected?");
@@ -76,7 +76,7 @@ sub thaw_hash {
 sub thaw_scalar {
   my @($name, $expected, ?$bug) =  @_;
   my $scalar = try {thaw %tests{?$name}};
-  is ($@, '', "Thawed $name without error?");
+  is ($^EVAL_ERROR, '', "Thawed $name without error?");
   isa_ok ($scalar, 'SCALAR', "Thawed $name?");
   is ($$scalar, $expected, "And it is the data we expected?");
   $scalar;
@@ -86,7 +86,7 @@ sub thaw_fail {
   my @($name, $expected) =  @_;
   my $thing = try {thaw %tests{?$name}};
   is ($thing, undef, "Thawed $name failed as expected?");
-  like ($@->{?description}, $expected, "Error as predicted?");
+  like ($^EVAL_ERROR->{?description}, $expected, "Error as predicted?");
 }
 
 sub test_locked_hash {
@@ -94,11 +94,11 @@ sub test_locked_hash {
   my @keys = keys %$hash;
   my @($key, $value) =@( each %$hash);
   try {$hash->{+$key} = 'x' . $value};
-  like( $@->{?description}, "/^Modification of a read-only value attempted/",
+  like( $^EVAL_ERROR->{?description}, "/^Modification of a read-only value attempted/",
         'trying to change a locked key' );
   is ($hash->{?$key}, $value, "hash should not change?");
   try {$hash->{+use} = 'perl'};
-  like( $@->{?description}, "/^Attempt to access disallowed key 'use' in a restricted hash/",
+  like( $^EVAL_ERROR->{?description}, "/^Attempt to access disallowed key 'use' in a restricted hash/",
         'trying to add another key' );
   ok (eq_array(\keys %$hash, \@keys), "Still the same keys?");
 }
@@ -108,11 +108,11 @@ sub test_restricted_hash {
   my @keys = keys %$hash;
   my @($key, $value) =@( each %$hash);
   try {$hash->{+$key} = 'x' . $value};
-  is( $@, '',
+  is( $^EVAL_ERROR, '',
         'trying to change a restricted key' );
   is ($hash->{?$key}, 'x' . $value, "hash should change");
   try {$hash->{+use} = 'perl'};
-  like( $@->{?description}, "/^Attempt to access disallowed key 'use' in a restricted hash/",
+  like( $^EVAL_ERROR->{?description}, "/^Attempt to access disallowed key 'use' in a restricted hash/",
         'trying to add another key' );
   ok (eq_array(\keys %$hash, \@keys), "Still the same keys?");
 }
@@ -120,14 +120,14 @@ sub test_restricted_hash {
 sub test_placeholder {
   my $hash = shift;
   try {$hash->{+rules} = 42};
-  is ($@, '', 'No errors');
+  is ($^EVAL_ERROR, '', 'No errors');
   is ($hash->{?rules}, 42, "New value added");
 }
 
 sub test_newkey {
   my $hash = shift;
   try {$hash->{+nms} = "http://nms-cgi.sourceforge.net/"};
-  is ($@, '', 'No errors');
+  is ($^EVAL_ERROR, '', 'No errors');
   is ($hash->{?nms}, "http://nms-cgi.sourceforge.net/", "New value added");
 }
 

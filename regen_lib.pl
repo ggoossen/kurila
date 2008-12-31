@@ -25,7 +25,7 @@ sub safer_unlink {
     next unless -e $name;
     chmod 0777, $name if $Needs_Write;
     ( CORE::unlink($name) and ++$cnt
-      or warn "Couldn't unlink $name: $!\n" );
+      or warn "Couldn't unlink $name: $^OS_ERROR\n" );
   }
   return $cnt;
 }
@@ -48,14 +48,14 @@ sub rename_if_different {
       return;
   }
   warn "changed '$from' to '$to'\n";
-  safer_rename_silent($from, $to) or die "renaming $from to $to: $!";
+  safer_rename_silent($from, $to) or die "renaming $from to $to: $^OS_ERROR";
 }
 
 # Saf*er*, but not totally safe. And assumes always open for output.
 sub safer_open {
     my $name = shift;
     my $fh = gensym;
-    open $fh, ">", $name or die "Can't create $name: $!";
+    open $fh, ">", $name or die "Can't create $name: $^OS_ERROR";
     *{$fh}->{+SCALAR} = $name;
     binmode $fh;
     $fh;
@@ -63,7 +63,7 @@ sub safer_open {
 
 sub safer_close {
     my $fh = shift;
-    close $fh or die 'Error closing ' . *{$fh}->{?SCALAR} . ": $!";
+    close $fh or die 'Error closing ' . *{$fh}->{?SCALAR} . ": $^OS_ERROR";
 }
 
 1;

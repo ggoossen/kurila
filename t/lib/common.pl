@@ -13,7 +13,7 @@ our $pragma_name;
 
 our $got_files = 0; # set to 1 to generate output files.
 
-$| = 1;
+$^OUTPUT_AUTOFLUSH = 1;
 
 my $Is_MacOS = $^O eq 'MacOS';
 my $tmpfile = "tmp0000";
@@ -41,7 +41,7 @@ foreach my $file ( @w_files) {
     next if $file =~ m/perlio$/ && !('PerlIO::Layer'->find( 'perlio'));
     next if -d $file;
 
-    open F, "<", "$file" or die "Cannot open $file: $!\n" ;
+    open F, "<", "$file" or die "Cannot open $file: $^OS_ERROR\n" ;
     my $line = 0;
     open my $got_file, ">", "$file.got" or die if $got_files;
     while ( ~< *F) {
@@ -52,14 +52,14 @@ foreach my $file ( @w_files) {
     close $got_file if $got_files;
 
     do {
-        local $/ = undef;
+        local $^INPUT_RECORD_SEPARATOR = undef;
         $files++;
         @prgs = @(< @prgs, $file, < split "\n########\n", ~< *F) ;
     };
     close F ;
 }
 
-undef $/;
+undef $^INPUT_RECORD_SEPARATOR;
 
 plan tests => (scalar(nelems @prgs)-$files);
 
@@ -92,8 +92,8 @@ for ( @prgs){
     # This provides the flexibility to have conditional TODOs
     if ($todo_reason && $todo_reason =~ s/^\?//) {
 	my $temp = eval $todo_reason;
-	if ($@) {
-	    die "# In TODO code reason:\n# $todo_reason\n$($@->message)";
+	if ($^EVAL_ERROR) {
+	    die "# In TODO code reason:\n# $todo_reason\n$($^EVAL_ERROR->message)";
 	}
 	$todo_reason = $temp;
     }
@@ -111,9 +111,9 @@ for ( @prgs){
                 mkpath($1);
                 push(@temp_path, $1);
     	    }
-	    open F, ">", "$filename" or die "Cannot open $filename: $!\n" ;
+	    open F, ">", "$filename" or die "Cannot open $filename: $^OS_ERROR\n" ;
 	    print F $code ;
-	    close F or die "Cannot close $filename: $!\n";
+	    close F or die "Cannot close $filename: $^OS_ERROR\n";
 	}
 	shift @files ;
 	$prog = shift @files ;
@@ -125,7 +125,7 @@ for ( @prgs){
 	$prog =~ s|"\."|":"|g;
     }
 
-    open TEST, ">", "$tmpfile" or die "Cannot open >$tmpfile: $!";
+    open TEST, ">", "$tmpfile" or die "Cannot open >$tmpfile: $^OS_ERROR";
     print TEST q{
         BEGIN {
             open(STDERR, ">&", "STDOUT")
@@ -134,9 +134,9 @@ for ( @prgs){
     };
     print TEST "\n#line 1\n";  # So the line numbers don't get messed up.
     print TEST $prog,"\n";
-    close TEST or die "Cannot close $tmpfile: $!";
+    close TEST or die "Cannot close $tmpfile: $^OS_ERROR";
     my $results = runperl( switches => \@($switch), stderr => 1, progfile => $tmpfile );
-    my $status = $?;
+    my $status = $^CHILD_ERROR;
     $results =~ s/\n+$//;
     # allow expected output to be written as if $prog is on STDIN
     $results =~ s/tmp\d+/-/g;

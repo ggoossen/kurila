@@ -8,9 +8,9 @@ use File::Spec;
 
 my $devnull = 'File::Spec'->devnull;
 
-open(TRY, ">", 'Io_argv1.tmp') || (die "Can't open temp file: $!");
+open(TRY, ">", 'Io_argv1.tmp') || (die "Can't open temp file: $^OS_ERROR");
 print TRY "a line\n";
-close TRY or die "Could not close: $!";
+close TRY or die "Could not close: $^OS_ERROR";
 
 do {
     my $x = runperl(
@@ -31,16 +31,16 @@ do {
     # 5.10 stopped autovivifying scalars in globs leading to a
     # segfault when $ARGV is written to.
     runperl( prog => 'eof()', stdin => "nothing\n" );
-    is( 0+$?, 0, q(eof() doesn't segfault) );
+    is( 0+$^CHILD_ERROR, 0, q(eof() doesn't segfault) );
 };
 
-open(TRY, ">", 'Io_argv1.tmp') or die "Can't open temp file: $!";
-close TRY or die "Could not close: $!";
-open(TRY, ">", 'Io_argv2.tmp') or die "Can't open temp file: $!";
-close TRY or die "Could not close: $!";
+open(TRY, ">", 'Io_argv1.tmp') or die "Can't open temp file: $^OS_ERROR";
+close TRY or die "Could not close: $^OS_ERROR";
+open(TRY, ">", 'Io_argv2.tmp') or die "Can't open temp file: $^OS_ERROR";
+close TRY or die "Could not close: $^OS_ERROR";
 @ARGV = @('Io_argv1.tmp', 'Io_argv2.tmp');
 $^I = '_bak';   # not .bak which confuses VMS
-$/ = undef;
+$^INPUT_RECORD_SEPARATOR = undef;
 my $i = 4;
 while ( ~< *ARGV) {
     s/^/ok $i\n/;
@@ -48,11 +48,11 @@ while ( ~< *ARGV) {
     print;
     next_test();
 }
-open(TRY, "<", 'Io_argv1.tmp') or die "Can't open temp file: $!";
+open(TRY, "<", 'Io_argv1.tmp') or die "Can't open temp file: $^OS_ERROR";
 print while ~< *TRY;
-open(TRY, "<", 'Io_argv2.tmp') or die "Can't open temp file: $!";
+open(TRY, "<", 'Io_argv2.tmp') or die "Can't open temp file: $^OS_ERROR";
 print while ~< *TRY;
-close TRY or die "Could not close: $!";
+close TRY or die "Could not close: $^OS_ERROR";
 undef $^I;
 
 ok( eof TRY );
@@ -62,13 +62,13 @@ do {
     ok( eof NEVEROPENED,    'eof() true on unopened filehandle' );
 };
 
-open STDIN, "<", 'Io_argv1.tmp' or die $!;
+open STDIN, "<", 'Io_argv1.tmp' or die $^OS_ERROR;
 @ARGV = @( () );
 ok( !eof(),     'STDIN has something' );
 
 is( ~< *ARGV, "ok 4\n" );
 
-open STDIN, '<', $devnull or die $!;
+open STDIN, '<', $devnull or die $^OS_ERROR;
 @ARGV = @( () );
 ok( eof(),      'eof() true with empty @ARGV' );
 
@@ -78,12 +78,12 @@ ok( !eof() );
 @ARGV = @($devnull, $devnull);
 ok( !eof() );
 
-close ARGV or die $!;
+close ARGV or die $^OS_ERROR;
 ok( eof(),      'eof() true after closing ARGV' );
 
 do {
-    local $/;
-    open F, "<", 'Io_argv1.tmp' or die "Could not open Io_argv1.tmp: $!";
+    local $^INPUT_RECORD_SEPARATOR;
+    open F, "<", 'Io_argv1.tmp' or die "Could not open Io_argv1.tmp: $^OS_ERROR";
     ~< *F;	# set $. = 1
     is( ~< *F, undef );
 
@@ -96,7 +96,7 @@ do {
     open F, "<", $devnull or die;	# restart cycle again
     ok( defined( ~< *F) );
     is( ~< *F, undef );
-    close F or die "Could not close: $!";
+    close F or die "Could not close: $^OS_ERROR";
 };
 
 END {

@@ -390,12 +390,12 @@ sub WriteConstants {
 
   my $c_fh = %ARGS{?C_FH};
   if (!$c_fh) {
-      open $c_fh, ">", "%ARGS{?C_FILE}" or die "Can't open %ARGS{?C_FILE}: $!";
+      open $c_fh, ">", "%ARGS{?C_FILE}" or die "Can't open %ARGS{?C_FILE}: $^OS_ERROR";
   }
 
   my $xs_fh = %ARGS{?XS_FH};
   if (!$xs_fh) {
-      open $xs_fh, ">", "%ARGS{?XS_FILE}" or die "Can't open %ARGS{?XS_FILE}: $!";
+      open $xs_fh, ">", "%ARGS{?XS_FILE}" or die "Can't open %ARGS{?XS_FILE}: $^OS_ERROR";
   }
 
   # As this subroutine is intended to make code that isn't edited, there's no
@@ -411,8 +411,8 @@ sub WriteConstants {
       die "Ony ProxySubs are supported";
   }
 
-  close $c_fh or warn "Error closing %ARGS{?C_FILE}: $!" unless %ARGS{?C_FH};
-  close $xs_fh or warn "Error closing %ARGS{?XS_FILE}: $!" unless %ARGS{?XS_FH};
+  close $c_fh or warn "Error closing %ARGS{?C_FILE}: $^OS_ERROR" unless %ARGS{?C_FH};
+  close $xs_fh or warn "Error closing %ARGS{?XS_FILE}: $^OS_ERROR" unless %ARGS{?XS_FH};
 }
 
 1;

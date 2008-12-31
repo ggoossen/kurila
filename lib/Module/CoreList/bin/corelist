@@ -131,10 +131,10 @@ while ((nelems @ARGV)) {
 	} else {
 	    my $re;
 	    try { $re = $2 ?? qr/(?$2)($1)/ !! qr/$1/; }; # trap exceptions while building regex
-	    if ($@) {
+	    if ($^EVAL_ERROR) {
 		# regex errors are usually like 'Quantifier follow nothing in regex; marked by ...'
 		# then we drop text after ';' to shorten message
-		my $errmsg = $@->{?description} =~ m/(.*);/ ?? $1 !! $@;
+		my $errmsg = $^EVAL_ERROR->{?description} =~ m/(.*);/ ?? $1 !! $^EVAL_ERROR;
 		warn "\n$mod  is a bad regex: $errmsg\n";
 		next;
 	    }

@@ -206,7 +206,7 @@ sub check_install {
                 }
     
                 if (!UNIVERSAL::isa($fh, 'GLOB')) {
-                    warn < loc(q[Cannot open file '%1': %2], $file, $!)
+                    warn < loc(q[Cannot open file '%1': %2], $file, $^OS_ERROR)
                             if $args->{?verbose};
                     next;
                 }
@@ -219,7 +219,7 @@ sub check_install {
     
                 $fh = FileHandle->new;
                 if (!$fh->open($filename)) {
-                    warn < loc(q[Cannot open file '%1': %2], $file, $!)
+                    warn < loc(q[Cannot open file '%1': %2], $file, $^OS_ERROR)
                             if $args->{?verbose};
                     next;
                 }
@@ -333,7 +333,7 @@ sub _parse_version {
         
         my $rv = defined $result ?? $result !! '0.0';
 
-        print( $@ ?? "Error: $@\n" !! "Result: $rv\n" ) if $verbose;
+        print( $^EVAL_ERROR ?? "Error: $^EVAL_ERROR\n" !! "Result: $rv\n" ) if $verbose;
 
         return version->new($rv);
     }
@@ -458,8 +458,8 @@ sub can_load {
 
                 ### in case anything goes wrong, log the error, the fact
                 ### we tried to use this module and return 0;
-                if( $@ ) {
-                    $error = $@;
+                if( $^EVAL_ERROR ) {
+                    $error = $^EVAL_ERROR;
                     $CACHE->{$mod}->{+usable} = 0;
                     last BLOCK;
                 } else {

@@ -75,9 +75,9 @@ EOF
 # creates $tmpc_file and $tmph_file
 my_system("$bison -d -o $tmpc_file $y_file");
 
-open my $ctmpfile, "<", $tmpc_file or die "Can't open $tmpc_file: $!\n";
+open my $ctmpfile, "<", $tmpc_file or die "Can't open $tmpc_file: $^OS_ERROR\n";
 my $clines;
-do { local $/; $clines = ~< $ctmpfile; };
+do { local $^INPUT_RECORD_SEPARATOR; $clines = ~< $ctmpfile; };
 die "failed to read $tmpc_file: length mismatch\n"
     unless length $clines == -s $tmpc_file;
 close $ctmpfile;
@@ -87,13 +87,13 @@ my @($actlines, $tablines) =  extract($clines);
 $tablines .= make_type_tab($y_file, $tablines);
 
 chmod 0644, $act_file;
-open my $actfile, ">", "$act_file" or die "can't open $act_file: $!\n";
+open my $actfile, ">", "$act_file" or die "can't open $act_file: $^OS_ERROR\n";
 print $actfile $actlines;
 close $actfile;
 chmod 0444, $act_file;
 
 chmod 0644, $tab_file;
-open my $tabfile, ">", "$tab_file" or die "can't open $tab_file: $!\n";
+open my $tabfile, ">", "$tab_file" or die "can't open $tab_file: $^OS_ERROR\n";
 print $tabfile $tablines;
 close $tabfile;
 chmod 0444, $tab_file;
@@ -104,9 +104,9 @@ unlink $tmpc_file;
 # C<#line 30 "perly.y"> confuses the Win32 resource compiler and the
 # C<#line 188 "perlytmp.h"> gets picked up by make depend, so remove them.
 
-open TMPH_FILE, "<", $tmph_file or die "Can't open $tmph_file: $!\n";
+open TMPH_FILE, "<", $tmph_file or die "Can't open $tmph_file: $^OS_ERROR\n";
 chmod 0644, $h_file;
-open H_FILE, ">", "$h_file" or die "Can't open $h_file: $!\n";
+open H_FILE, ">", "$h_file" or die "Can't open $h_file: $^OS_ERROR\n";
 my $endcore_done = 0;
 while ( ~< *TMPH_FILE) {
     print H_FILE "#ifdef PERL_CORE\n" if iohandle::input_line_number(\*TMPH_FILE) == 1;
@@ -217,7 +217,7 @@ sub make_type_tab {
     my %tokens;
     my %types;
     my $default_token;
-    open my $fh, '<', $y_file or die "Can't open $y_file: $!\n";
+    open my $fh, '<', $y_file or die "Can't open $y_file: $^OS_ERROR\n";
     while ( ~< $fh) {
 	if (m/(\$\d+)\s*=/) {
 	    warn "$y_file:$(iohandle::input_line_number($fh)): dangerous assignment to $1: $_";
@@ -268,14 +268,14 @@ sub make_type_tab {
 
 sub my_system {
     system(< @_);
-    if ($? == -1) {
-	die "failed to execute command '$(join ' ',@_)': $!\n";
+    if ($^CHILD_ERROR == -1) {
+	die "failed to execute command '$(join ' ',@_)': $^OS_ERROR\n";
     }
-    elsif ($? ^&^ 127) {
+    elsif ($^CHILD_ERROR ^&^ 127) {
 	die sprintf "command '$(join ' ',@_)' died with signal \%d\n",
-	    ($? ^&^ 127);
+	    ($^CHILD_ERROR ^&^ 127);
     }
-    elsif ($? >> 8) {
-	die sprintf "command '$(join ' ',@_)' exited with value \%d\n", $? >> 8;
+    elsif ($^CHILD_ERROR >> 8) {
+	die sprintf "command '$(join ' ',@_)' exited with value \%d\n", $^CHILD_ERROR >> 8;
     }
 }

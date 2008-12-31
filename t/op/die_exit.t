@@ -10,7 +10,7 @@ if ($^O eq 'mpeix') {
     exit 0;
 }
 
-$| = 1;
+$^OUTPUT_AUTOFLUSH = 1;
 
 
 my %tests = %(
@@ -39,7 +39,7 @@ my $max = nkeys %tests;
 print "1..$max\n";
 
 # Dump any error messages from the dying processes off to a temp file.
-open(STDERR, ">", "die_exit.err") or die "Can't open temp error file:  $!";
+open(STDERR, ">", "die_exit.err") or die "Can't open temp error file:  $^OS_ERROR";
 
 foreach my $test (1 .. $max) {
     my @($bang, $query, ?$code) =  @{%tests{?$test}};
@@ -50,7 +50,7 @@ foreach my $test (1 .. $max) {
     else {
         system(qq{$^X -e '\$! = $bang; \$? = $query; $code'});
     }
-    my $exit = $?;
+    my $exit = $^CHILD_ERROR;
 
     # VMS exit code 44 (SS$_ABORT) is returned if a program dies.  We only get
     # the severity bits, which boils down to 4.  See L<perlvms/$?>.

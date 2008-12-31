@@ -380,8 +380,8 @@ sub run {
     ### return a list of flags and buffers (if available) in list
     ### context, or just a simple 'ok' in scalar
     return $have_buffer
-                    ??  @($ok, $?, \@buffer, \@buff_out, \@buff_err)
-                    !!  @($ok, $? );
+                    ??  @($ok, $^CHILD_ERROR, \@buffer, \@buff_out, \@buff_err)
+                    !!  @($ok, $^CHILD_ERROR );
 }
 
 sub _open3_run { 
@@ -450,7 +450,7 @@ sub _open3_run {
             ### see perldoc -f sysread: it returns undef on error,
             ### so bail out.
             if( not defined $len ) {
-                warn( <loc("Error reading from process: \%1", $!));
+                warn( <loc("Error reading from process: \%1", $^OS_ERROR));
                 last OUTER;
             }
             
@@ -474,7 +474,7 @@ sub _open3_run {
     ### this current perl process!
     __PACKAGE__->__reopen_fds( < @fds_to_dup );
     
-    return if $?;   # some error occurred
+    return if $^CHILD_ERROR;   # some error occurred
     return 1;
 }
 
@@ -569,7 +569,7 @@ sub _system_run {
     
     __PACKAGE__->__reopen_fds( < @fds_to_dup );
     
-    return if $?;
+    return if $^CHILD_ERROR;
     return 1;
 }
 
@@ -597,7 +597,7 @@ do {   use File::Spec;
             ### 5.6.x compatibilty. 5.8.x can use 3-arg open
             ### see perldoc5.6.2 -f open for details            
             open $glob, $redir, fileno($fh) or (
-                        Carp::carp( <loc("Could not dup '$name': \%1", $!)),
+                        Carp::carp( <loc("Could not dup '$name': \%1", $^OS_ERROR)),
                         return
                     );        
                 
@@ -605,7 +605,7 @@ do {   use File::Spec;
             ### just dup it
             if( $redir eq '>&' ) {
                 open( $fh, ">", '' . File::Spec->devnull ) or (
-                    Carp::carp( <loc("Could not reopen '$name': \%1", $!)),
+                    Carp::carp( <loc("Could not reopen '$name': \%1", $^OS_ERROR)),
                     return
                 );
             }
@@ -626,7 +626,7 @@ do {   use File::Spec;
                 Carp::carp( <loc("No such FD: '\%1'", $name)), next );
 
             open( $fh, $redir, fileno($glob) ) or (
-                    Carp::carp( <loc("Could not restore '$name': \%1", $!)),
+                    Carp::carp( <loc("Could not restore '$name': \%1", $^OS_ERROR)),
                     return
                 ); 
            

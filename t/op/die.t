@@ -9,7 +9,7 @@ try {
     die $err;
 };
 
-print "not " unless $@->{?description} eq $err;
+print "not " unless $^EVAL_ERROR->{?description} eq $err;
 print "ok 1\n";
 
 try {

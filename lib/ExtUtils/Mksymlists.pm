@@ -63,7 +63,7 @@ sub _write_aix {
     rename "$data->{?FILE}.exp", "$data->{?FILE}.exp_old";
 
     open( my $exp, ">", "$data->{?FILE}.exp")
-        or croak("Can't create $data->{?FILE}.exp: $!\n");
+        or croak("Can't create $data->{?FILE}.exp: $^OS_ERROR\n");
     print $exp join("\n", @(< @{$data->{?DL_VARS}}, "\n")) if (nelems @{$data->{?DL_VARS}});
     print $exp join("\n", @(< @{$data->{?FUNCLIST}}, "\n")) if (nelems @{$data->{?FUNCLIST}});
     close $exp;
@@ -94,7 +94,7 @@ sub _write_os2 {
     rename "$data->{?FILE}.def", "$data->{?FILE}_def.old";
 
     open(my $def, ">", "$data->{?FILE}.def")
-        or croak("Can't create $data->{?FILE}.def: $!\n");
+        or croak("Can't create $data->{?FILE}.def: $^OS_ERROR\n");
     print $def "LIBRARY '$data->{?DLBASE}' INITINSTANCE TERMINSTANCE\n";
     print $def "DESCRIPTION '\@#$distname:$data->{?VERSION}#\@ $comment'\n";
     print $def "CODE LOADONCALL\n";
@@ -123,7 +123,7 @@ sub _write_win32 {
     rename "$data->{?FILE}.def", "$data->{?FILE}_def.old";
 
     open( my $def, ">", "$data->{?FILE}.def" )
-        or croak("Can't create $data->{?FILE}.def: $!\n");
+        or croak("Can't create $data->{?FILE}.def: $^OS_ERROR\n");
     # put library name in quotes (it could be a keyword, like 'Alias')
     if (Config::config_value('cc') !~ m/^gcc/i) {
         print $def "LIBRARY \"$data->{?DLBASE}\"\n";
@@ -169,7 +169,7 @@ sub _write_vms {
     rename "$data->{?FILE}.opt", "$data->{?FILE}.opt_old";
 
     open(my $opt,">", "$data->{?FILE}.opt")
-        or croak("Can't create $data->{?FILE}.opt: $!\n");
+        or croak("Can't create $data->{?FILE}.opt: $^OS_ERROR\n");
 
     # Options file declaring universal symbols
     # Used when linking shareable image for dynamic extension,

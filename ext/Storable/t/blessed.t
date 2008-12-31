@@ -56,15 +56,15 @@ package $name;
 
 our \@ISA = \@("SHORT_NAME");
 EOC
-die $@ if $@;
-ok 1, $@ eq '';
+die $^EVAL_ERROR if $^EVAL_ERROR;
+ok 1, $^EVAL_ERROR eq '';
 
 eval <<EOC;
 package $($name)_WITH_HOOK;
 
 our \@ISA = \@("SHORT_NAME_WITH_HOOK");
 EOC
-ok 2, ! $@ ;
+ok 2, ! $^EVAL_ERROR ;
 
 # Construct a pool of objects
 my @pool;

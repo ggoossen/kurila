@@ -8,7 +8,7 @@ print tmp "tvi920\n";
 print tmp "vt100\n";
 print tmp "Amiga\n";
 print tmp "paper\n";
-close tmp or die "Could not close: $!";
+close tmp or die "Could not close: $^OS_ERROR";
 
 print "ok 1\n";
 print "ok 2\n";

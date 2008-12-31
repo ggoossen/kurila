@@ -45,7 +45,7 @@ sub match_test {
     my $res;
     $res = eval $tstr // "";	#/ <- fix syntax colouring
 
-    die "$($@->message) in '$tstr'" if $@;
+    die "$($^EVAL_ERROR->message) in '$tstr'" if $^EVAL_ERROR;
     ok( ($yn =~ m/!/ xor $res), "$tstr: $(dump::view($res))");
 }
 

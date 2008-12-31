@@ -11,7 +11,7 @@
 use TestInit;
 
 BEGIN {
-    $| = 1;
+    $^OUTPUT_AUTOFLUSH = 1;
     print "1..43\n";
 }
 
@@ -38,7 +38,7 @@ while ( ~< *DATA) {
         $expected .= $_;
     }
 
-    open (TMP, ">", 'tmp.pod') or die "Cannot create tmp.pod: $!\n";
+    open (TMP, ">", 'tmp.pod') or die "Cannot create tmp.pod: $^OS_ERROR\n";
 
     # We have a test in ISO 8859-1 encoding.  Make sure that nothing strange
     # happens if Perl thinks the world is Unicode.  Wrap this in eval so that
@@ -51,7 +51,7 @@ while ( ~< *DATA) {
 
     unlink('tmp.pod');
 
-    open (TMP2, ">", 'tmp.pod') or die "Cannot create tmp.pod: $!\n";
+    open (TMP2, ">", 'tmp.pod') or die "Cannot create tmp.pod: $^OS_ERROR\n";
     print TMP2 "\N{BOM}";
     print TMP2 $input;
     close TMP2;
@@ -63,14 +63,14 @@ while ( ~< *DATA) {
 sub test_outtmp {
     my $expected = shift;
     my $msg = shift;
-    open (OUT, ">", 'out.tmp') or die "Cannot create out.tmp: $!\n";
+    open (OUT, ">", 'out.tmp') or die "Cannot create out.tmp: $^OS_ERROR\n";
     $parser->parse_from_file ('tmp.pod', \*OUT);
     close OUT;
-    open (OUT, "<", 'out.tmp') or die "Cannot open out.tmp: $!\n";
+    open (OUT, "<", 'out.tmp') or die "Cannot open out.tmp: $^OS_ERROR\n";
     while ( ~< *OUT) { last if m/^\.nh/ }
     my $output;
     do {
-        local $/;
+        local $^INPUT_RECORD_SEPARATOR;
         $output = ~< *OUT;
     };
     close OUT;

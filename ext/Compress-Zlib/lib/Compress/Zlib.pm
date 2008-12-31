@@ -72,7 +72,7 @@ sub _set_gzerr
         $Compress::Zlib::gzerrno = 0 ;
     }
     elsif ($value == Z_ERRNO() || $value +> 2) {
-        $Compress::Zlib::gzerrno = $! ;
+        $Compress::Zlib::gzerrno = $^OS_ERROR ;
     }
     else {
         $Compress::Zlib::gzerrno = dualvar($value+0, @my_z_errmsg[2 - $value]);
@@ -171,7 +171,7 @@ sub Compress::Zlib::gzFile::gzreadline
     do {
         # Maintain backward compatibility with 1.x behaviour
         # It didn't support $/, so this can't either.
-        local $/ = "\n" ;
+        local $^INPUT_RECORD_SEPARATOR = "\n" ;
         @_[0] = $gz->getline() ; 
     };
     _save_gzerr($gz, 1);

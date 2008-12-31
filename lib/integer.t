@@ -55,10 +55,10 @@ SKIP: do {
     my $iv_min = $ivsize == 4 ?? -2147483648 !! -9223372036854775808;
     my $biff;
     try { $biff = $iv_min / -1 };
-    is($@, '', 'IV_MIN / -1 succeeds');
+    is($^EVAL_ERROR, '', 'IV_MIN / -1 succeeds');
     is($biff, -$iv_min, 'IV_MIN / -1 == -IV_MIN');
 
     try { $biff = $iv_min % -1 };
-    is($@, '', 'IV_MIN % -1 succeeds');
+    is($^EVAL_ERROR, '', 'IV_MIN % -1 succeeds');
     is($biff, 0, 'IV_MIN % -1 == 0');
 };

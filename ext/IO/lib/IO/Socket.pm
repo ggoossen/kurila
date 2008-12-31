@@ -108,35 +108,35 @@ sub connect {
 
     $blocking = $sock->blocking(0) if $timeout;
     if (!connect($sock, $addr)) {
-	if (defined $timeout && ($! == EINPROGRESS || $! == EWOULDBLOCK)) {
+	if (defined $timeout && ($^OS_ERROR == EINPROGRESS || $^OS_ERROR == EWOULDBLOCK)) {
 	    require IO::Select;
 
 	    my $sel = IO::Select->new( $sock);
 
-	    undef $!;
+	    undef $^OS_ERROR;
 	    if (!$sel->can_write($timeout)) {
-		$err = $! || (exists &Errno::ETIMEDOUT ?? &Errno::ETIMEDOUT( < @_ ) !! 1);
-		$@ = "connect: timeout";
+		$err = $^OS_ERROR || (exists &Errno::ETIMEDOUT ?? &Errno::ETIMEDOUT( < @_ ) !! 1);
+		$^EVAL_ERROR = "connect: timeout";
 	    }
 	    elsif (!connect($sock,$addr) &&
-                not ($! == EISCONN || ($! == 10022 && $^O eq 'MSWin32'))
+                not ($^OS_ERROR == EISCONN || ($^OS_ERROR == 10022 && $^O eq 'MSWin32'))
             ) {
 		# Some systems refuse to re-connect() to
 		# an already open socket and set errno to EISCONN.
 		# Windows sets errno to WSAEINVAL (10022)
-		$err = $!;
-		$@ = "connect: $!";
+		$err = $^OS_ERROR;
+		$^EVAL_ERROR = "connect: $^OS_ERROR";
 	    }
 	}
-        elsif ($blocking || !($! == EINPROGRESS || $! == EWOULDBLOCK))  {
-	    $err = $!;
-	    $@ = "connect: $!";
+        elsif ($blocking || !($^OS_ERROR == EINPROGRESS || $^OS_ERROR == EWOULDBLOCK))  {
+	    $err = $^OS_ERROR;
+	    $^EVAL_ERROR = "connect: $^OS_ERROR";
 	}
     }
 
     $sock->blocking(1) if $blocking;
 
-    $! = $err if $err;
+    $^OS_ERROR = $err if $err;
 
     $err ?? undef !! $sock;
 }
@@ -223,8 +223,8 @@ sub accept {
 	my $sel = IO::Select->new( $sock);
 
 	unless ( @( $sel->can_read($timeout) ) ) {
-	    $@ = 'accept: timeout';
-	    $! = (exists &Errno::ETIMEDOUT ?? &Errno::ETIMEDOUT( < @_ ) !! 1);
+	    $^EVAL_ERROR = 'accept: timeout';
+	    $^OS_ERROR = (exists &Errno::ETIMEDOUT ?? &Errno::ETIMEDOUT( < @_ ) !! 1);
 	    return;
 	}
     }

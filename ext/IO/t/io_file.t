@@ -7,7 +7,7 @@ plan(tests => ($^O =~ m/MSWin32/ ?? 9 !! 6));
 
 my $Class       = 'IO::File';
 my $All_Chars   = join '', @( "\r\n", < map( chr, 1..255 ), "zzz\n\r");
-my $File        = 'bin.'.$$;
+my $File        = 'bin.'.$^PID;
 my $Expect      = quotemeta $All_Chars;
 
 use_ok( $Class );
@@ -17,7 +17,7 @@ can_ok( $Class,                 "binmode" );
 ### use standard open to make sure we can compare binmodes
 ### on both.
 do {   my $tmp;
-    open $tmp, ">", "$File" or die "Could not open '$File': $!";
+    open $tmp, ">", "$File" or die "Could not open '$File': $^OS_ERROR";
     binmode $tmp;
     print $tmp $All_Chars; 
     close $tmp;
@@ -31,7 +31,7 @@ if( $^O =~ m/MSWin32/ ) {
     isa_ok( $fh,                $Class );
     ok( < $fh->open($File),       "   Opened '$File'" );
     
-    my $cont = do { local $/; ~< $fh };
+    my $cont = do { local $^INPUT_RECORD_SEPARATOR; ~< $fh };
     unlike( $cont, qr/$Expect/, "   Content match fails without binmode" );
 }    
 
@@ -39,10 +39,10 @@ if( $^O =~ m/MSWin32/ ) {
 do {   my $fh = $Class->new;
 
     isa_ok( $fh,                $Class );
-    ok( $fh->open($File),       "   Opened '$File' $!" );
+    ok( $fh->open($File),       "   Opened '$File' $^OS_ERROR" );
     ok( $fh->binmode,           "   binmode enabled" );
     
-    my $cont = do { local $/; ~< $fh };
+    my $cont = do { local $^INPUT_RECORD_SEPARATOR; ~< $fh };
     like( $cont, qr/$Expect/,   "   Content match passes with binmode" );
 };
     

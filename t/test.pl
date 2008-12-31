@@ -30,12 +30,12 @@ $NO_ENDING = 0;
 
 # Use this instead of print to avoid interference while testing globals.
 sub _print {
-    local@($\, $", $,) = @(undef, ' ', '');
+    local@($^OUTPUT_RECORD_SEPARATOR, $", $^OUTPUT_FIELD_SEPARATOR) = @(undef, ' ', '');
     print STDOUT < @_;
 }
 
 sub _print_stderr {
-    local@($\, $", $,) = @(undef, ' ', '');
+    local@($^OUTPUT_RECORD_SEPARATOR, $", $^OUTPUT_FIELD_SEPARATOR) = @(undef, ' ', '');
     print STDERR < @_;
 }
 
@@ -162,7 +162,7 @@ sub is ($$@) {
         $pass = $got \== $expected;
     }
     else {
-        local $@;
+        local $^EVAL_ERROR;
         $pass = try { $got eq $expected };
     }
 
@@ -201,7 +201,7 @@ sub cmp_ok ($$$@) {
     my $pass;
     do {
         local $^W = 0;
-        local($@,$!);   # don't interfere with $@
+        local($^EVAL_ERROR,$^OS_ERROR);   # don't interfere with $@
                         # eval() sometimes resets $!
         $pass = eval "\$got $type \$expected";
     };
@@ -368,7 +368,7 @@ sub require_ok ($) {
     eval <<REQUIRE_OK;
 require $require;
 REQUIRE_OK
-    _ok(!$@, _where(), "require $require");
+    _ok(!$^EVAL_ERROR, _where(), "require $require");
 }
 
 sub use_ok ($) {
@@ -376,7 +376,7 @@ sub use_ok ($) {
     eval <<USE_OK;
 use $use;
 USE_OK
-    _ok(!$@, _where(), "use $use");
+    _ok(!$^EVAL_ERROR, _where(), "use $use");
 }
 
 # runperl - Runs a separate perl interpreter.
@@ -514,8 +514,8 @@ sub runperl {
 
         our %Config;
 	eval "require Config; Config->import";
-	if ($@) {
-	    warn "test.pl had problems loading Config: $@";
+	if ($^EVAL_ERROR) {
+	    warn "test.pl had problems loading Config: $^EVAL_ERROR";
 	    $sep = ':';
 	} else {
 	    $sep = %Config{?path_sep};
@@ -561,8 +561,8 @@ sub which_perl {
 	my $exe;
         our %Config;
 	eval "require Config; Config->import";
-	if ($@) {
-	    warn "test.pl had problems loading Config: $@";
+	if ($^EVAL_ERROR) {
+	    warn "test.pl had problems loading Config: $^EVAL_ERROR";
 	    $exe = '';
 	} else {
 	    $exe = %Config{?_exe};
@@ -576,8 +576,8 @@ sub which_perl {
 	if ($Perl =~ m/^perl\Q$exe\E$/i) {
 	    my $perl = "perl$exe";
 	    eval "require File::Spec";
-	    if ($@) {
-		warn "test.pl had problems loading File::Spec: $@";
+	    if ($^EVAL_ERROR) {
+		warn "test.pl had problems loading File::Spec: $^EVAL_ERROR";
 		$Perl = "./$perl";
 	    } else {
 		$Perl = 'File::Spec'->catfile( <'File::Spec'->curdir(), $perl);
@@ -602,7 +602,7 @@ sub which_perl {
 sub unlink_all {
     foreach my $file ( @_) {
         1 while unlink $file;
-        _print_stderr "# Couldn't unlink '$file': $!\n" if -f $file;
+        _print_stderr "# Couldn't unlink '$file': $^OS_ERROR\n" if -f $file;
     }
 }
 
@@ -626,7 +626,7 @@ sub _fresh_perl {
     $runperl_args->{+progfile} = $tmpfile;
     $runperl_args->{+stderr} = 1;
 
-    open TEST, ">", "$tmpfile" or die "Cannot open $tmpfile: $!";
+    open TEST, ">", "$tmpfile" or die "Cannot open $tmpfile: $^OS_ERROR";
 
     # VMS adjustments
     if( $^O eq 'VMS' ) {
@@ -638,10 +638,10 @@ sub _fresh_perl {
     }
 
     print TEST $prog;
-    close TEST or die "Cannot close $tmpfile: $!";
+    close TEST or die "Cannot close $tmpfile: $^OS_ERROR";
 
     my $results = runperl(< %$runperl_args);
-    my $status = $?;
+    my $status = $^CHILD_ERROR;
 
     # Clean up the results into something a bit more predictable.
     $results =~ s/\n+$//;
@@ -719,7 +719,7 @@ sub can_ok ($@) {
 
     my @nok = @( () );
     foreach my $method ( @methods) {
-        local($!, $@);  # don't interfere with caller's $@
+        local($^OS_ERROR, $^EVAL_ERROR);  # don't interfere with caller's $@
                         # eval sometimes resets $!
         try { $proto->can($method) } || push @nok, $method;
     }
@@ -745,10 +745,10 @@ sub isa_ok ($$;$) {
     }
     else {
         # We can't use UNIVERSAL::isa because we want to honor isa() overrides
-        local($@, $!);  # eval sometimes resets $!
+        local($^EVAL_ERROR, $^OS_ERROR);  # eval sometimes resets $!
         my $rslt = try { $object->isa($class) };
-        if( $@ ) {
-            if( $@->{?description} =~ m/^Can't call method "isa" on unblessed reference/ ) {
+        if( $^EVAL_ERROR ) {
+            if( $^EVAL_ERROR->{?description} =~ m/^Can't call method "isa" on unblessed reference/ ) {
                 if( !UNIVERSAL::isa($object, $class) ) {
                     my $ref = ref $object;
                     $diag = "$obj_name isn't a '$class' it's a '$ref'";
@@ -758,7 +758,7 @@ sub isa_ok ($$;$) {
 WHOA! I tried to call ->isa on your object and got some weird error.
 This should never happen.  Please contact the author immediately.
 Here's the error.
-$@
+$^EVAL_ERROR
 WHOA
             }
         }
@@ -777,7 +777,7 @@ sub dies_not(&;$) {
     if (try { $e->(); 1; }) {
         return ok(1, $name);
     }
-    diag $@->message;
+    diag $^EVAL_ERROR->message;
     return ok(0, $name);
 }
 
@@ -788,7 +788,7 @@ sub dies_like(&$;$) {
         diag "didn't die";
         return ok(0, $name);
     }
-    my $err = $@->{?description};
+    my $err = $^EVAL_ERROR->{?description};
     return like_yn(0, $err, $qr );
 }
 
@@ -799,7 +799,7 @@ sub eval_dies_like($$;$) {
         todo_skip("Compile time abortion are known to leak memory", 1) if env::var('PERL_VALGRIND');
         
         eval "$e";
-        my $err = $@;
+        my $err = $^EVAL_ERROR;
         if (not $err) {
             local $Level = 2;
             diag "didn't die";

@@ -10,7 +10,7 @@ BEGIN {
 
 my $null;
 
-$! = 1;
+$^OS_ERROR = 1;
 my %types = %(
     null => $null,
     iv => 3,

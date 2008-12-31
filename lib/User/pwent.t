@@ -3,7 +3,7 @@
 BEGIN {
     our $haspw;
     try { my @n = @( getpwuid 0 ) };
-    $haspw = 1 unless $@ && $@->{?description} =~ m/unimplemented/;
+    $haspw = 1 unless $^EVAL_ERROR && $^EVAL_ERROR->{?description} =~ m/unimplemented/;
     unless ($haspw) { print "1..0 # Skip: no getpwuid\n"; exit 0 }
     use Config;
     # VMS's pwd.h struct passwd conflicts with the one in vmsish.h

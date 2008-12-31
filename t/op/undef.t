@@ -56,10 +56,10 @@ undef &foo;
 print defined(&foo) ?? "not ok 21\n" !! "ok 21\n";
 
 try { undef $1 };
-print $@->{?description} =~ m/^Modification of a read/ ?? "ok 22\n" !! "not ok 22\n";
+print $^EVAL_ERROR->{?description} =~ m/^Modification of a read/ ?? "ok 22\n" !! "not ok 22\n";
 
 try { $1 = undef };
-print $@->{?description} =~ m/^Modification of a read/ ?? "ok 23\n" !! "not ok 23\n";
+print $^EVAL_ERROR->{?description} =~ m/^Modification of a read/ ?? "ok 23\n" !! "not ok 23\n";
 
 print "ok 24\n";
 print "ok 25\n";

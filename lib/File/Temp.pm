@@ -259,7 +259,7 @@ my $OPENTEMPFLAGS = $OPENFLAGS;
 unless ($^O eq 'MacOS') {
   for my $oflag (qw/ TEMPORARY /) {
     my @($bit, $func) = @(0, "Fcntl::O_" . $oflag);
-    local($@);
+    local($^EVAL_ERROR);
     $OPENTEMPFLAGS ^|^= $bit if try {
       # Make sure that redefined die handlers do not cause problems
       # e.g. CGI::Carp
@@ -520,8 +520,8 @@ sub _gettemp {
 
 	# Error opening file - abort with error
 	# if the reason was anything but EEXIST
-	unless ($! == EEXIST) {
-	  ${%options{ErrStr}} = "Could not create temp file $path: $!";
+	unless ($^OS_ERROR == EEXIST) {
+	  ${%options{ErrStr}} = "Could not create temp file $path: $^OS_ERROR";
 	  return ();
 	}
 
@@ -540,8 +540,8 @@ sub _gettemp {
 
 	# Abort with error if the reason for failure was anything
 	# except EEXIST
-	unless ($! == EEXIST) {
-	  ${%options{ErrStr}} = "Could not create directory $path: $!";
+	unless ($^OS_ERROR == EEXIST) {
+	  ${%options{ErrStr}} = "Could not create directory $path: $^OS_ERROR";
 	  return ();
 	}
 
@@ -730,7 +730,7 @@ sub _is_verysafe {
 
   # Should Get the value of _PC_CHOWN_RESTRICTED if it is defined
   # and If it is not there do the extensive test
-  local($@);
+  local($^EVAL_ERROR);
   my $chown_restricted;
   $chown_restricted = &POSIX::_PC_CHOWN_RESTRICTED()
     if try { &POSIX::_PC_CHOWN_RESTRICTED(); 1};
@@ -869,8 +869,8 @@ do {
   sub cleanup {
     if (!$KEEP_ALL) {
       # Files
-      my @files = @(exists %files_to_unlink{$$} ??
-		   < @{ %files_to_unlink{?$$} } !! () );
+      my @files = @(exists %files_to_unlink{$^PID} ??
+		   < @{ %files_to_unlink{?$^PID} } !! () );
       foreach my $file ( @files) {
 	# close the filehandle without checking its state
 	# in order to make real sure that this is closed
@@ -884,8 +884,8 @@ do {
 	}
       }
       # Dirs
-      my @dirs = @(exists %dirs_to_unlink{$$} ??
-		  < @{ %dirs_to_unlink{?$$} } !! () );
+      my @dirs = @(exists %dirs_to_unlink{$^PID} ??
+		  < @{ %dirs_to_unlink{?$^PID} } !! () );
       foreach my $dir ( @dirs) {
 	if (-d $dir) {
 	  rmtree($dir, $DEBUG, 0);
@@ -893,10 +893,10 @@ do {
       }
 
       # clear the arrays
-      @{ %files_to_unlink{$$} } = @( () )
-	if exists %files_to_unlink{$$};
-      @{ %dirs_to_unlink{$$} } = @( () )
-	if exists %dirs_to_unlink{$$};
+      @{ %files_to_unlink{$^PID} } = @( () )
+	if exists %files_to_unlink{$^PID};
+      @{ %dirs_to_unlink{$^PID} } = @( () )
+	if exists %dirs_to_unlink{$^PID};
     }
   }
 
@@ -924,9 +924,9 @@ do {
 	# Directory exists so store it
 	# first on VMS turn []foo into [.foo] for rmtree
 	$fname = VMS::Filespec::vmspath($fname) if $^O eq 'VMS';
-	%dirs_to_unlink{+$$} = \@() 
-	  unless exists %dirs_to_unlink{$$};
-	push (@{ %dirs_to_unlink{$$} }, $fname);
+	%dirs_to_unlink{+$^PID} = \@() 
+	  unless exists %dirs_to_unlink{$^PID};
+	push (@{ %dirs_to_unlink{$^PID} }, $fname);
 
       } else {
 	carp "Request to remove directory $fname could not be completed since it does not exist!\n" if $^W;
@@ -937,9 +937,9 @@ do {
       if (-f $fname) {
 
 	# file exists so store handle and name for later removal
-	%files_to_unlink{+$$} = \@()
-	  unless exists %files_to_unlink{$$};
-	push(@{ %files_to_unlink{$$} }, \@($fh, $fname));
+	%files_to_unlink{+$^PID} = \@()
+	  unless exists %files_to_unlink{$^PID};
+	push(@{ %files_to_unlink{$^PID} }, \@($fh, $fname));
 
       } else {
 	carp "Request to remove file $fname could not be completed since it is not there!\n" if $^W;
@@ -1023,7 +1023,7 @@ sub new {
   ${*$fh} = $path;
 
   # Cache the filename by pid so that the destructor can decide whether to remove it
-  %FILES_CREATED_BY_OBJECT{+$$}->{+$path} = 1;
+  %FILES_CREATED_BY_OBJECT{+$^PID}->{+$path} = 1;
 
   # Store unlink information in hash slot (plus other constructor info)
   %{*$fh} = %( < %args );
@@ -1071,7 +1071,7 @@ sub newdir {
   }
   return bless \%( DIRNAME => $tempdir,
                    CLEANUP => $cleanup,
-                   LAUNCHPID => $$,
+                   LAUNCHPID => $^PID,
                  ), "File::Temp::Dir";
 }
 
@@ -1152,7 +1152,7 @@ sub DESTROY {
     print "# --------->   Unlinking $self\n" if $DEBUG;
 
     # only delete if this process created it
-    return unless exists %FILES_CREATED_BY_OBJECT{+$$}->{$self->filename};
+    return unless exists %FILES_CREATED_BY_OBJECT{+$^PID}->{$self->filename};
 
     # The unlink1 may fail if the file has been closed
     # by the caller. This leaves us with the decision
@@ -2370,7 +2370,7 @@ sub unlink_on_destroy {
 sub DESTROY {
   my $self = shift;
   if ($self->unlink_on_destroy && 
-      $$ == $self->{?LAUNCHPID} && !$File::Temp::KEEP_ALL) {
+      $^PID == $self->{?LAUNCHPID} && !$File::Temp::KEEP_ALL) {
     rmtree($self->{?DIRNAME}, $File::Temp::DEBUG, 0)
       if -d $self->{?DIRNAME};
   }

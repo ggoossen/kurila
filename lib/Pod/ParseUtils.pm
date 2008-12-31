@@ -608,7 +608,7 @@ sub _invalid_link {
     # this sets @_
     #try { die "$msg\n" };
     #chomp $@;
-    $@ = $msg; # this seems to work, too!
+    $^EVAL_ERROR = $msg; # this seems to work, too!
     undef;
 }
 

@@ -9,7 +9,7 @@ our ($xref, $runme, @a, %h, $aref, $chopit, @chopar, $posstr,
 
 our ($undefed, @z, @x, @aaa, $toself, $direct);
 
-$| = 1;
+$^OUTPUT_AUTOFLUSH = 1;
 umask 0;
 $xref = \ "";
 $runme = $^X;
@@ -86,11 +86,11 @@ for ( @INPUT) {
 EOE
     is($a, $b, $comment);
 EOE
-    if ($@) {
-      if ($@->{?description} =~ m/is unimplemented/) {
+    if ($^EVAL_ERROR) {
+      if ($^EVAL_ERROR->{?description} =~ m/is unimplemented/) {
         skip("$comment: unimplemented", 1);
       } else {
-        fail("error: $($@->message)");
+        fail("error: $($^EVAL_ERROR->message)");
       }
     }
   };
@@ -112,13 +112,13 @@ for ( @simple_input) {
   ok( \$toself eq \$direct,
      "\\\$$variable = $operator \\\$$variable");
 EOE
-  if ($@) {
-    if ($@->{?description} =~ m/is unimplemented/) {
+  if ($^EVAL_ERROR) {
+    if ($^EVAL_ERROR->{?description} =~ m/is unimplemented/) {
       skip("skipping $comment: unimplemented", 1);
-    } elsif ($@->{?description} =~ m/Can't (modify|take log of 0)/) {
+    } elsif ($^EVAL_ERROR->{?description} =~ m/Can't (modify|take log of 0)/) {
       skip("skipping $comment: syntax not good for selfassign", 1);
     } else {
-      fail("error: $($@->message)");
+      fail("error: $($^EVAL_ERROR->message)");
     }
   }
  };
@@ -135,7 +135,7 @@ try {
 
     1;
 };
-die if $@;
+die if $^EVAL_ERROR;
 ok 1;
 
 __END__

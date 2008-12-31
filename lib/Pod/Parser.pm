@@ -1174,7 +1174,7 @@ sub parse_from_file {
         ## We have a filename, open it for reading
         %myData{+_INFILE} = $infile;
         open($in_fh, "<", "$infile")  or
-             die "Can't open $infile for reading: $!\n";
+             die "Can't open $infile for reading: $^OS_ERROR\n";
         $close_input = 1;
     }
 
@@ -1228,7 +1228,7 @@ sub parse_from_file {
         %myData{+_OUTFILE} = $outfile;
         (-d $outfile) and die "$outfile is a directory, not POD input!\n";
         open($out_fh, ">", "$outfile")  or
-             die "Can't open $outfile for writing: $!\n";
+             die "Can't open $outfile for writing: $^OS_ERROR\n";
         $close_output = 1;
     }
 
@@ -1238,9 +1238,9 @@ sub parse_from_file {
     $self->parse_from_filehandle(\%opts, $in_fh, $out_fh);
 
     $close_input  and 
-        close($in_fh) || die "Can't close $infile after reading: $!\n";
+        close($in_fh) || die "Can't close $infile after reading: $^OS_ERROR\n";
     $close_output  and
-        close($out_fh) || die "Can't close $outfile after writing: $!\n";
+        close($out_fh) || die "Can't close $outfile after writing: $^OS_ERROR\n";
 }
 
 #############################################################################

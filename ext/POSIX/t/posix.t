@@ -9,7 +9,7 @@ use POSIX < qw(fcntl_h signal_h limits_h _exit getcwd open read strftime write
 	     errno);
 
 
-$| = 1;
+$^OUTPUT_AUTOFLUSH = 1;
 
 my $Is_W32     = $^O eq 'MSWin32';
 my $Is_Dos     = $^O eq 'dos';
@@ -77,7 +77,7 @@ SKIP: do {
 	my $todo = $^O eq 'netbsd' && config_value('osvers')=~m/^1\.6/;
 	my $why_todo = "# TODO $^O config_value('osvers') seems to lose blocked signals";
 	if (!$todo) { 
-	  kill 'HUP', $$; 
+	  kill 'HUP', $^PID; 
 	} else {
 	  print "not ok 9 - sigaction SIGHUP ",$why_todo,"\n";
 	  print "not ok 10 - sig mask delayed SIGINT ",$why_todo,"\n";
@@ -94,7 +94,7 @@ SKIP: do {
 	
 	sub SigHUP {
 	    print "ok 9 - sigaction SIGHUP\n";
-	    kill 'INT', $$;
+	    kill 'INT', $^PID;
 	    sleep 2;
 	    print "ok 10 - sig mask delayed SIGINT\n";
 	}
@@ -198,12 +198,12 @@ try_strftime("Fri Mar 31 00:00:00 2000 091", 0,0,0, 31,2,100);
 
 do {
     for my $test (@(0, 1)) {
-	$! = 0;
+	$^OS_ERROR = 0;
 	# POSIX::errno is autoloaded. 
 	# Autoloading requires many system calls.
 	# errno() looks at $! to generate its result.
 	# Autoloading should not munge the value.
-	my $foo  = $!;
+	my $foo  = $^OS_ERROR;
 	my $errno = POSIX::errno();
 
         # Force numeric context.
@@ -214,7 +214,7 @@ do {
 SKIP: do {
   skip("no kill() support on Mac OS", 1) if $Is_MacOS;
   is (eval "kill 0", 0, "check we have CORE::kill")
-    or print "\$\@ is " . _qq($@) . "\n";
+    or print "\$\@ is " . _qq($^EVAL_ERROR) . "\n";
 };
 
 # Check that we can import the POSIX kill routine
@@ -222,18 +222,18 @@ POSIX->import ('kill');
 my $result = eval "kill 0";
 is ($result, undef, "we should now have POSIX::kill");
 # Check usage.
-like ($@->{?description}, qr/^Usage: POSIX::kill\(pid, sig\)/, "check its usage message");
+like ($^EVAL_ERROR->{?description}, qr/^Usage: POSIX::kill\(pid, sig\)/, "check its usage message");
 
 # Check unimplemented.
 $result = try {POSIX::offsetof};
 is ($result, undef, "offsetof should fail");
-like ($@->{?description}, qr/^Unimplemented: POSIX::offsetof\(\) is C-specific/,
+like ($^EVAL_ERROR->{?description}, qr/^Unimplemented: POSIX::offsetof\(\) is C-specific/,
       "check its unimplemented message");
 
 # Check reimplemented.
 $result = try {POSIX::fgets};
 is ($result, undef, "fgets should fail");
-like ($@->{?description}, qr/^Use method IO::Handle::gets\(\) instead/,
+like ($^EVAL_ERROR->{?description}, qr/^Use method IO::Handle::gets\(\) instead/,
       "check its redef message");
 
 # Simplistic tests for the isXXX() functions (bug #16799)
@@ -268,14 +268,14 @@ dies_like( sub { POSIX::isalpha(\@()) }, qr/reference as string/,   'isalpha []'
 dies_like( sub { POSIX::isprint(\@()) }, qr/reference as string/,   'isalpha []' );
 
 try {  POSIX->import("S_ISBLK"); my $x = S_ISBLK };
-unlike( $@, qr/Can't use string .* as a symbol ref/, "Can import autoloaded constants" );
+unlike( $^EVAL_ERROR, qr/Can't use string .* as a symbol ref/, "Can import autoloaded constants" );
  
 # Check that output is not flushed by _exit. This test should be last
 # in the file, and is not counted in the total number of tests.
 if ($^O eq 'vos') {
  print "# TODO - hit VOS bug posix-885 - _exit flushes output buffers.\n";
 } else {
- $| = 0;
+ $^OUTPUT_AUTOFLUSH = 0;
  # The following line assumes buffered output, which may be not true:
  print '@#!*$@(!@#$' unless ($Is_MacOS || $Is_OS2 || $Is_UWin || $Is_OS390 ||
                             $Is_VMS ||

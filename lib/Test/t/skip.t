@@ -2,7 +2,7 @@
 use Test < qw($TESTOUT $TESTERR $ntest plan ok skip); 
 plan tests => 6;
 
-open F, ">", "skips" or die "open skips: $!";
+open F, ">", "skips" or die "open skips: $^OS_ERROR";
 $TESTOUT = *F{IO};
 $TESTERR = *F{IO};
 
@@ -18,7 +18,7 @@ close F;
 $TESTOUT = *STDOUT{IO};
 $TESTERR = *STDERR{IO};
 $ntest = 1;
-open F, "<", "skips" or die "open skips: $!";
+open F, "<", "skips" or die "open skips: $^OS_ERROR";
 
 ok $skipped, 1, 'not skipped?';
 

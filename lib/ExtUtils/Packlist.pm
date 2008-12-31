@@ -71,7 +71,7 @@ sub read($;$)
     die("No packlist filename specified") if (! defined($packfile));
 
     my $fh = mkfh();
-    open($fh, "<", "$packfile") || die("Can't open file $packfile: $!");
+    open($fh, "<", "$packfile") || die("Can't open file $packfile: $^OS_ERROR");
     $self->{data} = %();
     my ($line);
     while (defined($line = ~< $fh))
@@ -106,7 +106,7 @@ sub write($;$)
     else { $packfile = $self->{packfile}; }
     die("No packlist filename specified") if (! defined($packfile));
     my $fh = mkfh();
-    open($fh, ">", "$packfile") || die("Can't open file $packfile: $!");
+    open($fh, ">", "$packfile") || die("Can't open file $packfile: $^OS_ERROR");
     foreach my $key (sort(keys($self->{data}))) {
         my $data = $self->{data}{$key};
         if (config_value("userelocatableinc")) {

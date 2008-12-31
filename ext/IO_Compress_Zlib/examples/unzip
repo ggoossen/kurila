@@ -10,7 +10,7 @@ die "Usage: zipcat file"
 my $file = @ARGV[0] ;
 
 my $fh = IO::File->new( "<$file")
-            or die "Cannot open '$file': $!\n";
+            or die "Cannot open '$file': $^OS_ERROR\n";
 
 while ()
 {
@@ -20,7 +20,7 @@ while ()
 
     my $x ;
     ($x = $fh->read($buffer, $FIXED_HEADER_LENGTH)) == $FIXED_HEADER_LENGTH 
-        or die "Truncated file top: $x $!\n";
+        or die "Truncated file top: $x $^OS_ERROR\n";
 
     my $signature = unpack ("V", substr($buffer, 0, 4));
 

@@ -50,7 +50,7 @@ sub noot {
 for (qw(getc readlink undef umask ~<*ARGV ~<*FOO ~<$foo -f)) {
     our $foo;
     eval "sub \{ $_ // 0 \}";
-    is($@, '', "$_ // ... compiles");
+    is($^EVAL_ERROR, '', "$_ // ... compiles");
 }
 
 # Test for some ambiguous syntaxes
@@ -58,13 +58,13 @@ for (qw(getc readlink undef umask ~<*ARGV ~<*FOO ~<$foo -f)) {
 our ($y, $fh);
 
 eval q# sub f ($) { } f $x / 2; #;
-is( $@, '' );
+is( $^EVAL_ERROR, '' );
 eval q# sub f ($) { } f $x /2; #;
-is( $@, '' );
+is( $^EVAL_ERROR, '' );
 eval q# sub { print $fh / 2 } #;
-is( $@, '' );
+is( $^EVAL_ERROR, '' );
 eval q# sub { print $fh /2 } #;
-is( $@, '' );
+is( $^EVAL_ERROR, '' );
 
 # [perl #28123] Perl optimizes // away incorrectly
 

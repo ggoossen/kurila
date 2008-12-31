@@ -83,7 +83,7 @@ sub list_installed {
               join("\n   ", @files), "\n");
     }
     else { 
-        print($@); 
+        print($^EVAL_ERROR); 
     }
 };
 
@@ -100,7 +100,7 @@ sub list_directories {
               join("\n   ", @dirs), "\n");
     }
     else { 
-        print($@); 
+        print($^EVAL_ERROR); 
     }
 }
 
@@ -122,7 +122,7 @@ sub create_archive {
         for my $f ( @rest) {
             system('tar', 'rvf', $file, $f);
         }
-        print "Can't use tar\n" if $?;
+        print "Can't use tar\n" if $^CHILD_ERROR;
     }
 }
 

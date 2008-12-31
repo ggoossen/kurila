@@ -26,9 +26,9 @@ f("FOOBAR 42", ($foo .= $bar));
 f("FOOBAR 42", $foo);
 
 eval q{ f("foo") };
-like( $@->message, qr/Not enough arguments for main::f at/ );
+like( $^EVAL_ERROR->message, qr/Not enough arguments for main::f at/ );
 eval q{ f(1,2,3,4) };
-like( $@->message, qr/Too many arguments for main::f at/ );
+like( $^EVAL_ERROR->message, qr/Too many arguments for main::f at/ );
 
 do {
     my $_ = "quarante-deux";
@@ -60,10 +60,10 @@ undef $expected; &g( < @_ ); # $_ not passed
 do { $expected = my $_ = "bar"; g() };
 
 eval q{ sub wrong1 (_$); wrong1(1,2) };
-like( $@->message, qr/Malformed prototype for main::wrong1/, 'wrong1' );
+like( $^EVAL_ERROR->message, qr/Malformed prototype for main::wrong1/, 'wrong1' );
 
 eval q{ sub wrong2 ($__); wrong2(1,2) };
-like( $@->message, qr/Malformed prototype for main::wrong2/, 'wrong2' );
+like( $^EVAL_ERROR->message, qr/Malformed prototype for main::wrong2/, 'wrong2' );
 
 sub opt ($;_) { is(@_[0], "seen"); ok(!defined @_[?1], "; has precedence over _") }
 opt("seen");

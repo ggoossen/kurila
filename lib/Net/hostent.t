@@ -29,13 +29,13 @@ use Socket;
 
 my $h = gethost('localhost');
 ok(defined $h,  "gethost('localhost')") ||
-  DIE("Can't continue without working gethost: $!");
+  DIE("Can't continue without working gethost: $^OS_ERROR");
 
 is( inet_ntoa($h->addr), "127.0.0.1",   'addr from gethost' );
 
 my $i = gethostbyaddr(inet_aton("127.0.0.1"));
 ok(defined $i,  "gethostbyaddr('127.0.0.1')") || 
-  DIE("Can't continue without working gethostbyaddr: $!");
+  DIE("Can't continue without working gethostbyaddr: $^OS_ERROR");
 
 is( inet_ntoa($i->addr), "127.0.0.1",   'addr from gethostbyaddr' );
 

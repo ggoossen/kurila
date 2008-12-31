@@ -28,7 +28,7 @@ SKIP: do {
     my ($name, $home);
     skip $^O, 1 if $^O eq 'MSWin32' || $^O eq 'NetWare' || $^O eq 'VMS'
 	|| $^O eq 'os2' || $^O eq 'beos';
-    skip "Can't find user for $>: $@", 1 unless try {
+    skip "Can't find user for $>: $^EVAL_ERROR", 1 unless try {
 	@($name, $home) =  @(getpwuid($>))[[@:0,7]];
 	1;
     };
@@ -150,15 +150,15 @@ do {
 	or die "Could not create temporary directory";
     for my $file (qw(a_dej a_ghj a_qej)) {
 	open my $fh, ">", File::Spec->catfile($dir, $file)
-	    or die "Could not create file $dir/$file: $!";
+	    or die "Could not create file $dir/$file: $^OS_ERROR";
 	close $fh;
     }
     my $cwd = Cwd::cwd();
     chdir $dir
-	or die "Could not chdir to $dir: $!";
+	or die "Could not chdir to $dir: $^OS_ERROR";
     my @glob_files = glob('a*{d[e]}j');
     local $TODO = "home-made glob doesn't do regexes" if $^O eq 'VMS';
     is_deeply(\@glob_files, \@('a_dej'));
     chdir $cwd
-	or die "Could not chdir back to $cwd: $!";
+	or die "Could not chdir back to $cwd: $^OS_ERROR";
 };

@@ -1,6 +1,6 @@
 #!./perl
 
-$|  = 1;
+$^OUTPUT_AUTOFLUSH  = 1;
 use warnings;
 
 use Config;

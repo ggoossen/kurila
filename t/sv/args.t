@@ -51,7 +51,7 @@ sub method {
 
 sub trymethod {
     try { method('foo', 'bar'); };
-    print "# $@->{?description}" if $@;
+    print "# $^EVAL_ERROR->{?description}" if $^EVAL_ERROR;
 }
 
 for (1..5) { trymethod() }

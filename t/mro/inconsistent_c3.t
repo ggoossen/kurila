@@ -35,4 +35,4 @@ do {
 };
 
 try { @Z::ISA = @('XY', 'YX') };
-like($@->{?description}, qr/^Inconsistent /, '... got the right error with an inconsistent hierarchy');
+like($^EVAL_ERROR->{?description}, qr/^Inconsistent /, '... got the right error with an inconsistent hierarchy');

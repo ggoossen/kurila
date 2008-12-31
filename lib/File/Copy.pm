@@ -30,7 +30,7 @@ my $macfiles;
 if ($^O eq 'MacOS') {
 	$macfiles = try { require Mac::MoreFiles };
 	warn 'Mac::MoreFiles could not be loaded; using non-native syscopy'
-		if $@ && $^W;
+		if $^EVAL_ERROR && $^W;
 }
 
 sub _catname {
@@ -134,7 +134,7 @@ sub copy {
     my $closefrom = 0;
     my $closeto = 0;
     my ($size, $status, $r, $buf);
-    local($\) = '';
+    local($^OUTPUT_RECORD_SEPARATOR) = '';
 
     my $from_h;
     my $to_h;
@@ -143,10 +143,10 @@ sub copy {
     my $fail_open2 =
       sub {
           if ($closefrom) {
-              $status = $!;
-              $! = 0;
+              $status = $^OS_ERROR;
+              $^OS_ERROR = 0;
               close $from_h;
-              $! = $status unless $!;
+              $^OS_ERROR = $status unless $^OS_ERROR;
           }
           return $fail_open1->();
       };
@@ -154,10 +154,10 @@ sub copy {
     my $fail_inner =
       sub {
           if ($closeto) {
-              $status = $!;
-              $! = 0;
+              $status = $^OS_ERROR;
+              $^OS_ERROR = 0;
               close $to_h;
-              $! = $status unless $!;
+              $^OS_ERROR = $status unless $^OS_ERROR;
           }
           return $fail_open2->();
       };
@@ -167,7 +167,7 @@ sub copy {
     } else {
 	$from = _protect($from) if $from =~ m/^\s/s;
        open($from_h, "<", "$from\0") or return $fail_open1->();
-       binmode $from_h or die "($!,$^E)";
+       binmode $from_h or die "($^OS_ERROR,$^E)";
 	$closefrom = 1;
     }
 
@@ -176,7 +176,7 @@ sub copy {
     } else {
 	$to = _protect($to) if $to =~ m/^\s/s;
        open($to_h,">", "$to\0") or return $fail_open2->();
-       binmode $to_h or die "($!,$^E)";
+       binmode $to_h or die "($^OS_ERROR,$^E)";
 	$closeto = 1;
     }
 
@@ -189,7 +189,7 @@ sub copy {
 	$size = $Too_Big if ($size +> $Too_Big);
     }
 
-    $! = 0;
+    $^OS_ERROR = 0;
     while (1) {
 	my ($r, $w, $t);
        defined($r = sysread($from_h, $buf, $size))
@@ -260,20 +260,20 @@ sub move {
     @($tosz1,$tomt1) =  @(stat($to))[[@:7,9]];  # just in case rename did something
 
     do {
-        local $@;
+        local $^EVAL_ERROR;
         try {
             copy($from,$to) or die;
             my@($atime, $mtime) =  @(stat($from))[[8..9]];
             utime($atime, $mtime, $to);
             unlink($from)   or die;
         };
-        return 1 unless $@;
+        return 1 unless $^EVAL_ERROR;
     };
-    @($sts,$ossts) = @($! + 0, $^E + 0);
+    @($sts,$ossts) = @($^OS_ERROR + 0, $^E + 0);
 
     @($tosz2,$tomt2, ...) = @(< @(stat($to))[[@:7,9]],0,0) if defined $tomt1;
     unlink($to) if !defined($tomt1) or $tomt1 != $tomt2 or $tosz1 != $tosz2;
-    @($!,$^E) = @($sts,$ossts);
+    @($^OS_ERROR,$^E) = @($sts,$ossts);
     return 0;
 }
 

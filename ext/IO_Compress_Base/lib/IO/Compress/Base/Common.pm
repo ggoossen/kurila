@@ -50,7 +50,7 @@ sub hasEncode()
             Encode->import();
         };
 
-        $HAS_ENCODE = $@ ?? 0 !! 1 ;
+        $HAS_ENCODE = $^EVAL_ERROR ?? 0 !! 1 ;
     }
 
     return $HAS_ENCODE;
@@ -349,7 +349,7 @@ sub Validator::validateInputFilenames
 
         if (! -r _ )
         {
-            return $self->saveErrorString("cannot open file '$filename': $!");
+            return $self->saveErrorString("cannot open file '$filename': $^OS_ERROR");
         }
     }
 

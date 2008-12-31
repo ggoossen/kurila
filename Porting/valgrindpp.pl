@@ -50,7 +50,7 @@ my $hidden = do { local $"='|'; %opt{?hide} ?? qr/^(?:{join ' ', <@{%opt{?hide}}
 my $fh = \*STDOUT;
 if (exists %opt{'output-file'}) {
   $fh = IO::File->new( ">%opt{'output-file'}")
-        or die "$0: cannot open %opt{?'output-file'} ($!)\n";
+        or die "$0: cannot open %opt{?'output-file'} ($^OS_ERROR)\n";
 }
 
 # These hashes will receive the error and leak summary data:
@@ -197,7 +197,7 @@ sub filter {
 
   # Get all the valgrind output lines
   my @l = @( do {
-    my $fh = IO::File->new( $_) or die "$0: cannot open $_ ($!)\n";
+    my $fh = IO::File->new( $_) or die "$0: cannot open $_ ($^OS_ERROR)\n";
     # Process outputs can interrupt each other, so sort by pid first
     my %pid; local $_;
     while ( ~< $fh) {

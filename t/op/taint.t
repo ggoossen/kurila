@@ -14,7 +14,7 @@ use signals;
 BEGIN { require './test.pl'; }
 plan tests => 228;
 
-$| = 1;
+$^OUTPUT_AUTOFLUSH = 1;
 
 our ($ipcsysv); # did we manage to load IPC::SysV?
 
@@ -30,7 +30,7 @@ BEGIN {
   if (config_value('extensions') =~ m/\bIPC\/SysV\b/
       && (config_value('d_shm') || config_value('d_msg'))) {
       try { require IPC::SysV };
-      unless ($@) {
+      unless ($^EVAL_ERROR) {
 	  $ipcsysv++;
 	  'IPC::SysV'->import( <qw(IPC_PRIVATE IPC_RMID IPC_CREAT S_IRWXU IPC_NOWAIT));
       }
@@ -60,7 +60,7 @@ if ($Is_VMS) {
     # library in VMS on reference to the their keys in %ENV.
     # There is currently no way to determine if they did not exist
     # before this test was run.
-    eval <<EndOfCleanup; die if $@;
+    eval <<EndOfCleanup; die if $^EVAL_ERROR;
 	END \{
 	    \$ENV\{PATH\} = \$old_env_path;
 	    warn "# Note: logical name 'PATH' may have been created\n";
@@ -133,9 +133,9 @@ sub test ($;$) {
 }
 
 # We need an external program to call.
-my $ECHO = ($Is_MSWin32 ?? ".\\echo$$" !! $Is_MacOS ?? ":echo$$" !! ($Is_NetWare ?? "echo$$" !! "./echo$$"));
+my $ECHO = ($Is_MSWin32 ?? ".\\echo$^PID" !! $Is_MacOS ?? ":echo$^PID" !! ($Is_NetWare ?? "echo$^PID" !! "./echo$^PID"));
 END { unlink $ECHO }
-open PROG, ">", "$ECHO" or die "Can't create $ECHO: $!";
+open PROG, ">", "$ECHO" or die "Can't create $ECHO: $^OS_ERROR";
 print PROG 'print "$(join q| |, @ARGV)\n"', "\n";
 close PROG;
 my $echo = "$Invoke_Perl $ECHO";
@@ -158,10 +158,10 @@ do {
 	if (defined $bcc_dir) {
 	    require File::Copy;
 	    File::Copy::copy("$bcc_dir/cc3250mt.dll", '.') or
-		die "$0: failed to copy cc3250mt.dll: $!\n";
+		die "$0: failed to copy cc3250mt.dll: $^OS_ERROR\n";
 	    eval q{
 		END { unlink "cc3250mt.dll" }
-	    }; die if $@;
+	    }; die if $^EVAL_ERROR;
 	}
     }
     env::set_var('PATH' => ($Is_Cygwin) ?? '/usr/bin' !! '');
@@ -178,7 +178,7 @@ do {
 	while (my $v = @vars[?0]) {
             env::temp_set_var($v => $TAINT);
 	    last if try { `$echo 1` };
-	    last unless $@->{?description} =~ m/^Insecure \$ENV{$v}/;
+	    last unless $^EVAL_ERROR->{?description} =~ m/^Insecure \$ENV{$v}/;
 	    shift @vars;
 	}
 	test !nelems @vars, "$(join ' ',@vars)";
@@ -189,7 +189,7 @@ do {
 	test try { `$echo 1` } eq "1\n";
 	env::set_var('TERM' => 'e=mc2' . $TAINT);
 	test !try { `$echo 1` };
-	like( $@->{?description}, qr/^Insecure \$ENV{TERM}/ );
+	like( $^EVAL_ERROR->{?description}, qr/^Insecure \$ENV{TERM}/ );
     };
 
     my $tmp;
@@ -208,7 +208,7 @@ do {
 
         env::temp_set_var('PATH' => $tmp);
 	test !try { `$echo 1` };
-	test $@->{?description} =~ m/^Insecure directory in \$ENV{PATH}/, $@;
+	test $^EVAL_ERROR->{?description} =~ m/^Insecure directory in \$ENV{PATH}/, $^EVAL_ERROR;
     };
 
     SKIP: do {
@@ -216,14 +216,14 @@ do {
 
 	env::set_var('DCL$PATH' => $TAINT);
 	test  try { `$echo 1` } eq '';
-	test $@->{?description} =~ m/^Insecure \$ENV{DCL\$PATH}/, $@;
+	test $^EVAL_ERROR->{?description} =~ m/^Insecure \$ENV{DCL\$PATH}/, $^EVAL_ERROR;
 	SKIP: do {
             skip q[can't find world-writeable directory to test DCL$PATH], 2
               unless $tmp;
 
 	    env::set_var('DCL$PATH' => $tmp);
 	    test try { `$echo 1` } eq '';
-	    test $@->{?description} =~ m/^Insecure directory in \$ENV{DCL\$PATH}/, $@;
+	    test $^EVAL_ERROR->{?description} =~ m/^Insecure directory in \$ENV{DCL\$PATH}/, $^EVAL_ERROR;
 	};
 	env::set_var('DCL$PATH' => '');
     };
@@ -283,8 +283,8 @@ do {
 # How about command-line arguments? The problem is that we don't
 # always get some, so we'll run another process with some.
 SKIP: do {
-    my $arg = catfile(curdir(), "arg$$");
-    open PROG, ">", "$arg" or die "Can't create $arg: $!";
+    my $arg = catfile(curdir(), "arg$^PID");
+    open PROG, ">", "$arg" or die "Can't create $arg: $^OS_ERROR";
     print PROG q{
 	try { join('', @ARGV), kill 0 };
 	exit 0 if $@->{description} =~ m/^Insecure dependency/;
@@ -293,13 +293,13 @@ SKIP: do {
     };
     close PROG;
     print `$Invoke_Perl "-T" $arg and some suspect arguments`;
-    test !$?, "Exited with status $?";
+    test !$^CHILD_ERROR, "Exited with status $^CHILD_ERROR";
     unlink $arg;
 };
 
 # Reading from a file should be tainted
 do {
-    test open(FILE, "<", $TEST), "Couldn't open '$TEST': $!";
+    test open(FILE, "<", $TEST), "Couldn't open '$TEST': $^OS_ERROR";
 
     my $block;
     sysread(FILE, $block, 100);
@@ -315,10 +315,10 @@ SKIP: do {
     skip "globs should be forbidden", 2 if 1 or $Is_VMS;
 
     my @globs = @( try { glob( <"*") } );
-    test (nelems @globs) == 0 && $@->{?description} =~ m/^Insecure dependency/;
+    test (nelems @globs) == 0 && $^EVAL_ERROR->{?description} =~ m/^Insecure dependency/;
 
     @globs = @( try { glob < '*' } );
-    test (nelems @globs) == 0 && $@->{?description} =~ m/^Insecure dependency/;
+    test (nelems @globs) == 0 && $^EVAL_ERROR->{?description} =~ m/^Insecure dependency/;
 };
 
 # Output of commands should be tainted
@@ -414,21 +414,21 @@ do {
     dies_like( sub { require $foo },
                qr/^Insecure dependency/);
 
-    my $filename = "./taintB$$";	# NB: $filename isn't tainted!
+    my $filename = "./taintB$^PID";	# NB: $filename isn't tainted!
     END { unlink $filename if defined $filename }
     $foo = $filename . $TAINT;
     unlink $filename;	# in any case
 
     test !try { open FOO, "<", $foo }, 'open for read';
-    test $@ eq '', $@;		# NB: This should be allowed
+    test $^EVAL_ERROR eq '', $^EVAL_ERROR;		# NB: This should be allowed
 
     # Try first new style but allow also old style.
     # We do not want the whole taint.t to fail
     # just because Errno possibly failing.
     test eval('%!{ENOENT}') ||
-	$! == 2 || # File not found
-	($Is_Dos && $! == 22) ||
-	($^O eq 'mint' && $! == 33);
+	$^OS_ERROR == 2 || # File not found
+	($Is_Dos && $^OS_ERROR == 22) ||
+	($^O eq 'mint' && $^OS_ERROR == 33);
 
     dies_like( sub { open FOO, ">", "$foo" },
                qr/^Insecure dependency/);
@@ -465,7 +465,7 @@ do {
         skip "This is not VMS", 2 unless $Is_VMS;
     
 	test join('', @( try { glob < $foo }) ) ne '', 'globbing';
-	test $@ eq '', $@;
+	test $^EVAL_ERROR eq '', $^EVAL_ERROR;
     };
 };
 
@@ -502,9 +502,9 @@ do {
 	my $foo = "x" x 979;
 	taint_these $foo;
 	local *FOO;
-	my $temp = "./taintC$$";
+	my $temp = "./taintC$^PID";
 	END { unlink $temp }
-	test open(FOO, ">", "$temp"), "Couldn't open $temp for write: $!";
+	test open(FOO, ">", "$temp"), "Couldn't open $temp for write: $^OS_ERROR";
 
 	dies_like( sub { ioctl FOO, $TAINT0, $foo },
                    qr/^Insecure dependency/);
@@ -594,7 +594,7 @@ do {
 
 	setpwent();
 	my @getpwent = @( getpwent() );
-	die "getpwent: $!\n" unless (nelems @getpwent);
+	die "getpwent: $^OS_ERROR\n" unless (nelems @getpwent);
 	test (    not tainted @getpwent[0]
 	          and     tainted @getpwent[1]
 	          and not tainted @getpwent[2]
@@ -612,7 +612,7 @@ do {
         skip "readdir() is not available", 1 unless config_value('d_readdir');
 
 	local(*D);
-	opendir(D, "op") or die "opendir: $!\n";
+	opendir(D, "op") or die "opendir: $^OS_ERROR\n";
 	my $readdir = readdir(D);
 	test tainted $readdir;
 	closedir(D);
@@ -622,12 +622,12 @@ do {
         skip "readlink() or symlink() is not available" unless 
           config_value('d_readlink') && config_value('d_symlink');
 
-	my $symlink = "sl$$";
+	my $symlink = "sl$^PID";
 	unlink($symlink);
 	my $sl = "/something/naughty";
 	# it has to be a real path on Mac OS
 	$sl = MacPerl::MakePath(( <MacPerl::Volumes())[[0]]) if $Is_MacOS;
-	symlink($sl, $symlink) or die "symlink: $!\n";
+	symlink($sl, $symlink) or die "symlink: $^OS_ERROR\n";
 	my $readlink = readlink($symlink);
 	test tainted $readlink;
 	unlink($symlink);
@@ -654,7 +654,7 @@ do {
     $why =~ s/$z/zee/;
     test     tainted $why;
 
-    $why =~ s/e/$('-'.$$)/g;
+    $why =~ s/e/$('-'.$^PID)/g;
     test     tainted $why;
 };
 
@@ -676,14 +676,14 @@ SKIP: do {
                 if (shmread($id, $rcvd, 0, 60)) {
                     substr($rcvd, index($rcvd, "\0"), undef, '');
                 } else {
-                    warn "# shmread failed: $!\n";
+                    warn "# shmread failed: $^OS_ERROR\n";
                 }
             } else {
-                warn "# shmwrite failed: $!\n";
+                warn "# shmwrite failed: $^OS_ERROR\n";
             }
-            shmctl($id, IPC_RMID(), 0) or warn "# shmctl failed: $!\n";
+            shmctl($id, IPC_RMID(), 0) or warn "# shmctl failed: $^OS_ERROR\n";
         } else {
-            warn "# shmget failed: $!\n";
+            warn "# shmget failed: $^OS_ERROR\n";
         }
 
         skip "SysV shared memory operation failed", 1 unless 
@@ -709,12 +709,12 @@ SKIP: do {
 		if (msgrcv($id, $rcvd, 60, 0, IPC_NOWAIT())) {
 		    @($type_rcvd, $rcvd) = unpack@("l! a*", $rcvd);
 		} else {
-		    warn "# msgrcv failed: $!\n";
+		    warn "# msgrcv failed: $^OS_ERROR\n";
 		}
 	    } else {
-		warn "# msgsnd failed: $!\n";
+		warn "# msgsnd failed: $^OS_ERROR\n";
 	    }
-	    msgctl($id, IPC_RMID(), 0) or warn "# msgctl failed: $!\n";
+	    msgctl($id, IPC_RMID(), 0) or warn "# msgctl failed: $^OS_ERROR\n";
 	} else {
 	    warn "# msgget failed\n";
 	}
@@ -731,8 +731,8 @@ SKIP: do {
 do {
     # bug id 20001004.006
 
-    open IN, "<", $TEST or warn "$0: cannot read $TEST: $!" ;
-    local $/;
+    open IN, "<", $TEST or warn "$0: cannot read $TEST: $^OS_ERROR" ;
+    local $^INPUT_RECORD_SEPARATOR;
     my $a = ~< *IN;
     my $b = ~< *IN;
 
@@ -744,7 +744,7 @@ do {
 do {
     # bug id 20001004.007
 
-    open IN, "<", $TEST or warn "$0: cannot read $TEST: $!" ;
+    open IN, "<", $TEST or warn "$0: cannot read $TEST: $^OS_ERROR" ;
     my $a = ~< *IN;
 
     my $c = \%( a => 42,
@@ -774,7 +774,7 @@ do {
     our ($has_fcntl);
     BEGIN {
 	try { require Fcntl; Fcntl->import; };
-	unless ($@) {
+	unless ($^EVAL_ERROR) {
 	    $has_fcntl = 1;
 	}
     }
@@ -879,7 +879,7 @@ ok( $^TAINT == 1, '$^TAINT is on' );
 
 try { $^TAINT = 0 };
 ok( $^TAINT,  '$^TAINT is not assignable' );
-ok( $@->{?description} =~ m/^Modification of a read-only value attempted/,
+ok( $^EVAL_ERROR->{?description} =~ m/^Modification of a read-only value attempted/,
     'Assigning to $^TAINT fails' );
 
 do {
@@ -931,7 +931,7 @@ TODO: do {
         no warnings;
         system("lskdfj does not exist","with","args"); 
     };
-    test !$@;
+    test !$^EVAL_ERROR;
 
     SKIP: do {
         skip "no exec() on MacOS Classic" if $Is_MacOS;
@@ -940,7 +940,7 @@ TODO: do {
             no warnings;
             exec("lskdfj does not exist","with","args"); 
         };
-	test !$@;
+	test !$^EVAL_ERROR;
     };
 
     # If you add tests here update also the above skip block for VMS.
@@ -1080,7 +1080,7 @@ do {
 
 do {
     try { local $0, eval '1' };
-    test $@ eq '';
+    test $^EVAL_ERROR eq '';
 };
 
 # [perl #8262] //g loops infinitely on tainted data
@@ -1117,20 +1117,20 @@ do {
 	try {
 	    my $pid = open my $pipe, "|-", '-';
 	    if (!defined $pid) {
-		die "open failed: $!";
+		die "open failed: $^OS_ERROR";
 	    }
 	    if (!$pid) {
-		kill 'KILL', $$;	# child suicide
+		kill 'KILL', $^PID;	# child suicide
 	    }
 	    close $pipe;
 	};
-	test( ($@ && $@->{?description}) !~ m/Insecure \$ENV/, 'fork triggers %ENV check');
-	is $@, '',               'pipe/fork/open/close failed';
+	test( ($^EVAL_ERROR && $^EVAL_ERROR->{?description}) !~ m/Insecure \$ENV/, 'fork triggers %ENV check');
+	is $^EVAL_ERROR, '',               'pipe/fork/open/close failed';
 	try {
 	    open my $pipe, "|-", "$Invoke_Perl -e 1";
 	    close $pipe;
 	};
-	test $@->{?description} =~ m/Insecure \$ENV/, 'popen neglects %ENV check';
+	test $^EVAL_ERROR->{?description} =~ m/Insecure \$ENV/, 'popen neglects %ENV check';
     };
 };
 
@@ -1139,11 +1139,11 @@ do {
     dies_like( sub { printf($TAINT . "# \%s\n", "foo") },
                qr/^Insecure dependency in printf/, q/printf doesn't like tainted formats/);
     try { printf("# \%s\n", $TAINT . "foo") };
-    ok(!$@, q/printf accepts other tainted args/);
+    ok(!$^EVAL_ERROR, q/printf accepts other tainted args/);
     dies_like( sub { sprintf($TAINT . "# \%s\n", "foo") },
                qr/^Insecure dependency in sprintf/, q/sprintf doesn't like tainted formats/);
     try { sprintf("# \%s\n", $TAINT . "foo") };
-    ok(!$@, q/sprintf accepts other tainted args/);
+    ok(!$^EVAL_ERROR, q/sprintf accepts other tainted args/);
 };
 
 do {
@@ -1166,8 +1166,8 @@ do {
     is ($val, 0, "eval doesn't like tainted strings");
 
     # Rather nice code to get a tainted undef by from Rick Delaney
-    open FH, "<", "test.pl" or die $!;
-    seek FH, 0, 2 or die $!;
+    open FH, "<", "test.pl" or die $^OS_ERROR;
+    seek FH, 0, 2 or die $^OS_ERROR;
     $tainted = ~< *FH;
 
     dies_like( sub { eval $tainted },

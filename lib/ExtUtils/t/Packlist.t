@@ -32,7 +32,7 @@ SKIP: do {
 # and more read() tests
 SKIP: do {
     open my $in, "<", "eplist" or die;
-    my $file = do { local $/ = ~< $in };
+    my $file = do { local $^INPUT_RECORD_SEPARATOR = ~< $in };
     close $in;
 
     like( $file, qr/single\n/, 'key with value should be available' );
@@ -41,7 +41,7 @@ SKIP: do {
     like( $file, qr/hash.+foo=bar/, 'second embedded hash value should appear');
 
     try{ ExtUtils::Packlist::read($pl, 'eplist') };
-    is( $@, '', 'read() should normally succeed' );
+    is( $^EVAL_ERROR, '', 'read() should normally succeed' );
     is( $pl->{data}{?single}, undef, 'single keys should have undef value' );
     is( ref($pl->{data}{?hash}), 'HASH', 'multivalue keys should become hashes');
 

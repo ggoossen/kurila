@@ -96,11 +96,11 @@ do {
     # Without the fix this 5.7.0 would croak:
     # Modification of a read-only value attempted at ...
     try {"$2\x{1234}"};
-    ok(!$@, "bug id 20001020.006, left");
+    ok(!$^EVAL_ERROR, "bug id 20001020.006, left");
 
     # For symmetry with the above.
     try {"\x{1234}$2"};
-    ok(!$@, "bug id 20001020.006, right");
+    ok(!$^EVAL_ERROR, "bug id 20001020.006, right");
 
     our $pi;
     *pi = \undef;
@@ -108,11 +108,11 @@ do {
     # patch. Without the fix this 5.7.0 would also croak:
     # Modification of a read-only value attempted at ...
     try{"$pi\x{1234}"};
-    ok(!$@, "bug id 20001020.006, constant left");
+    ok(!$^EVAL_ERROR, "bug id 20001020.006, constant left");
 
     # For symmetry with the above.
     try{"\x{1234}$pi"};
-    ok(!$@, "bug id 20001020.006, constant right");
+    ok(!$^EVAL_ERROR, "bug id 20001020.006, constant right");
 };
 
 do {

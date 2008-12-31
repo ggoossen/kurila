@@ -256,14 +256,14 @@ sub new {
 
     #OUT->autoflush(1);		# Conflicts with debugger?
     my $sel = select(FOUT);
-    $| = 1;				# for DB::OUT
+    $^OUTPUT_AUTOFLUSH = 1;				# for DB::OUT
     select($sel);
     $ret = bless \@(\*FIN, \*FOUT);
   } else {			# Filehandles supplied
     $FIN = @_[2]; $FOUT = @_[3];
     #OUT->autoflush(1);		# Conflicts with debugger?
     my $sel = select($FOUT);
-    $| = 1;				# for DB::OUT
+    $^OUTPUT_AUTOFLUSH = 1;				# for DB::OUT
     select($sel);
     $ret = bless \@($FIN, $FOUT);
   }
@@ -280,7 +280,7 @@ sub newTTY {
   $self->[0] = $in;
   $self->[1] = $out;
   my $sel = select($out);
-  $| = 1;				# for DB::OUT
+  $^OUTPUT_AUTOFLUSH = 1;				# for DB::OUT
   select($sel);
 }
 
@@ -295,7 +295,7 @@ sub Features { \%features }
 sub get_line {
   my $self = shift;
   my $in = $self->IN;
-  local ($/) = "\n";
+  local ($^INPUT_RECORD_SEPARATOR) = "\n";
   return scalar ~< $in;
 }
 
@@ -358,7 +358,7 @@ sub ornaments {
   my @ts = split m/,/, $rl_term_set, 4;
   try { LoadTermCap };
   unless (defined $terminal) {
-    warn("Cannot find termcap: $@\n") unless $Term::ReadLine::termcap_nowarn;
+    warn("Cannot find termcap: $^EVAL_ERROR\n") unless $Term::ReadLine::termcap_nowarn;
     $rl_term_set = ',,,';
     return;
   }
@@ -403,7 +403,7 @@ sub get_line {
   my $self = shift;
   $self->Tk_loop if $Term::ReadLine::toloop && defined &Tk::DoOneEvent;
   my $in = $self->IN;
-  local ($/) = "\n";
+  local ($^INPUT_RECORD_SEPARATOR) = "\n";
   return scalar ~< $in;
 }
 

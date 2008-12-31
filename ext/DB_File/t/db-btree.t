@@ -52,7 +52,7 @@ do {
         my $class = shift ;
         my $filename = shift ;
 	my $fh = gensym ;
-	open ($fh, ">", "$filename") || die "Cannot open $filename: $!" ;
+	open ($fh, ">", "$filename") || die "Cannot open $filename: $^OS_ERROR" ;
 	my $real_stdout = select($fh) ;
 	return bless \@($fh, $real_stdout ) ;
 
@@ -68,8 +68,8 @@ do {
 sub docat
 { 
     my $file = shift;
-    local $/ = undef ;
-    open(CAT, "<",$file) || die "Cannot open $file: $!";
+    local $^INPUT_RECORD_SEPARATOR = undef ;
+    open(CAT, "<",$file) || die "Cannot open $file: $^OS_ERROR";
     my $result = ~< *CAT;
     close(CAT);
     $result = normalise($result) ;

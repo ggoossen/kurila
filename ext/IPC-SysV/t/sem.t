@@ -34,13 +34,13 @@ SKIP: do {
 my $sem =
     IPC::Semaphore->new(IPC_PRIVATE, 10, S_IRWXU ^|^ S_IRWXG ^|^ S_IRWXO ^|^ IPC_CREAT);
 if (!$sem) {
-    if ($! eq 'No space left on device') {
+    if ($^OS_ERROR eq 'No space left on device') {
         # "normal" error
-        skip( "cannot proceed: IPC::Semaphore->new() said: $!", $TEST_COUNT);
+        skip( "cannot proceed: IPC::Semaphore->new() said: $^OS_ERROR", $TEST_COUNT);
     }
     else {
         # unexpected error
-        die "IPC::Semaphore->new(): ",$!+0," $!\n";
+        die "IPC::Semaphore->new(): ",$^OS_ERROR+0," $^OS_ERROR\n";
     }
 }
 

@@ -22,7 +22,7 @@ use File::Spec;          # used to get absolute paths
 # Will move up one level to make it easier to generate
 # reliable pathnames for testing File::CheckTree
 
-chdir(File::Spec->updir) or die "cannot change to parent of t/ directory: $!";
+chdir(File::Spec->updir) or die "cannot change to parent of t/ directory: $^OS_ERROR";
 
 
 #### TEST 1 -- No warnings ####
@@ -48,7 +48,7 @@ do {
     };
 
     print STDERR $_ for  @warnings;
-    if ( !$@ && !@warnings && defined($num_warnings) && $num_warnings == 0 ) {
+    if ( !$^EVAL_ERROR && !@warnings && defined($num_warnings) && $num_warnings == 0 ) {
         ok(1);
     }
     else {
@@ -71,7 +71,7 @@ do {
         };
     };
 
-    if ( !$@ && (nelems @warnings) == 1
+    if ( !$^EVAL_ERROR && (nelems @warnings) == 1
              && @warnings[0] =~ m/lib is not a plain file/
              && defined($num_warnings)
              && $num_warnings == 1 )
@@ -102,7 +102,7 @@ do {
         };
     };
 
-    if ( !$@ && (nelems @warnings) == 3
+    if ( !$^EVAL_ERROR && (nelems @warnings) == 3
              && @warnings[0] =~ m/lib is not a plain file/
              && @warnings[1] =~ m/README is not a directory/
              && @warnings[2] =~ m/my warning: lib/
@@ -139,7 +139,7 @@ do {
         };
     };
 
-    if ( !$@ && (nelems @warnings) == 2
+    if ( !$^EVAL_ERROR && (nelems @warnings) == 2
              && @warnings[0] =~ m/Spec is not a plain file/
              && @warnings[1] =~ m/INSTALL is not a directory/
              && defined($num_warnings)
@@ -165,13 +165,13 @@ do {
         };
     };
 
-    if ( $@ && $@->{?description} =~ m/lib is not a plain file/
+    if ( $^EVAL_ERROR && $^EVAL_ERROR->{?description} =~ m/lib is not a plain file/
             && not defined $num_warnings )
     {
         ok(1);
     }
     else {
-        ok(0, "$@");
+        ok(0, "$^EVAL_ERROR");
     }
 };
 
@@ -188,7 +188,7 @@ do {
         };
     };
 
-    if ( $@ && $@->{?description} =~ m/yadda lib yadda/
+    if ( $^EVAL_ERROR && $^EVAL_ERROR->{?description} =~ m/yadda lib yadda/
             && not defined $num_warnings )
     {
         ok(1);
@@ -208,12 +208,12 @@ do {
         };
     };
 
-    if ( !$@ ) {
+    if ( !$^EVAL_ERROR ) {
 	# No errors mean we compile correctly
         ok(1);
     } else {
         ok(0);
-	print STDERR $@;
+	print STDERR $^EVAL_ERROR;
     };
 };
 
@@ -227,5 +227,5 @@ do {
     };
 
     # We got a syntax error for a malformed file query
-    like ( $@->message, qr/syntax error/);
+    like ( $^EVAL_ERROR->message, qr/syntax error/);
 };

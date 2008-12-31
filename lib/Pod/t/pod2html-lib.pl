@@ -23,13 +23,13 @@ sub convert_n_test {
 
     my ($expect, $result);
     do {
-	local $/;
+	local $^INPUT_RECORD_SEPARATOR;
 	# expected
 	$expect = ~< *DATA;
 	$expect =~ s/\[PERLADMIN\]/$(config_value('perladmin'))/;
 
 	# result
-	open my $in, "<", $outfile or die "cannot open $outfile: $!";
+	open my $in, "<", $outfile or die "cannot open $outfile: $^OS_ERROR";
 	$result = ~< $in;
 	close $in;
     };
@@ -39,11 +39,11 @@ sub convert_n_test {
 	-x $diff or $diff = '/usr/bin/diff';
 	if (-x $diff) {
 	    my $expectfile = "pod2html-lib.tmp";
-	    open my $tmpfile, ">", $expectfile or die $!;
+	    open my $tmpfile, ">", $expectfile or die $^OS_ERROR;
 	    print $tmpfile $expect;
 	    close $tmpfile;
 	    my $diffopt = $^O eq 'linux' ?? 'u' !! 'c';
-	    open my $diff, "-|", "diff -$diffopt $expectfile $outfile" or die $!;
+	    open my $diff, "-|", "diff -$diffopt $expectfile $outfile" or die $^OS_ERROR;
 	    print "# $_" while ~< $diff;
 	    close $diff;
 	    unlink $expectfile;

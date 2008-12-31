@@ -21,7 +21,7 @@ use ExtUtils::MakeMaker < qw(WriteEmptyMakefile);
 can_ok __PACKAGE__, 'WriteEmptyMakefile';
 
 try { WriteEmptyMakefile("something"); };
-like $@->{description}, qr/Need an even number of args/;
+like $^EVAL_ERROR->{description}, qr/Need an even number of args/;
 
 
 do {

@@ -648,7 +648,7 @@ sub runloop {
 	$subcode = "sub \{ for (1 .. $n) \{ package $pack; $c;\} \}";
         $subref  = _doeval($subcode);
     }
-    die "runloop unable to compile '$c': $($@->message)\ncode: $subcode\n" if $@;
+    die "runloop unable to compile '$c': $($^EVAL_ERROR->message)\ncode: $subcode\n" if $^EVAL_ERROR;
     print STDERR "runloop $n '$subcode'\n" if $Debug;
 
     # Wait for the user timer to tick.  This makes the error range more like 
@@ -827,7 +827,7 @@ sub timethis{
 	$title = "timethis for $fort" unless defined $title;
 	$forn  = $t->[-1];
     }
-    local $| = 1;
+    local $^OUTPUT_AUTOFLUSH = 1;
     $style = "" unless defined $style;
     printf("\%10s: ", $title) unless $style eq 'none';
     print timestr($t, $style, $Default_Format),"\n" unless $style eq 'none';

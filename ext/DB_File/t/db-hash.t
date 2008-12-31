@@ -22,7 +22,7 @@ do {
         my $class = shift ;
         my $filename = shift ;
 	my $fh = gensym ;
-	open ($fh, ">", "$filename") || die "Cannot open $filename: $!" ;
+	open ($fh, ">", "$filename") || die "Cannot open $filename: $^OS_ERROR" ;
 	my $real_stdout = select($fh) ;
 	return bless \@($fh, $real_stdout ) ;
 
@@ -38,8 +38,8 @@ do {
 sub docat_del
 { 
     my $file = shift;
-    local $/ = undef;
-    open(CAT, "<",$file) || die "Cannot open $file: $!";
+    local $^INPUT_RECORD_SEPARATOR = undef;
+    open(CAT, "<",$file) || die "Cannot open $file: $^OS_ERROR";
     my $result = ~< *CAT;
     close(CAT);
     $result = normalise($result) ;
@@ -305,7 +305,7 @@ do {
 
     unlink "fruit" ;
     my %h = DB_File->new( "fruit", O_RDWR^|^O_CREAT, 0640, $DB_HASH )
-        or die "Cannot open file 'fruit': $!\n";
+        or die "Cannot open file 'fruit': $^OS_ERROR\n";
 
     # Add a few key/value pairs to the file
     %h->put("apple" => "red");
@@ -355,7 +355,7 @@ do {
     my $a = "";
     local $^WARN_HOOK = sub {$a = @_[0]} ;
     
-    my %h = DB_File->new( $Dfile ) or die "Can't open file: $!\n" ;
+    my %h = DB_File->new( $Dfile ) or die "Can't open file: $^OS_ERROR\n" ;
     %h->put("ABC" => undef);
     ok( $a eq "") ;
     undef %h;

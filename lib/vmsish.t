@@ -31,22 +31,22 @@ SKIP: do {
 
 #========== vmsish status ==========
 `$Invoke_Perl -e 1`;  # Avoid system() from a pipe from harness.  Mutter.
-is($?,0,"simple Perl invokation: POSIX success status");
+is($^CHILD_ERROR,0,"simple Perl invokation: POSIX success status");
 do {
   use vmsish < qw(status);
-  is(($? ^&^ 1),1, "importing vmsish [vmsish status]");
+  is(($^CHILD_ERROR ^&^ 1),1, "importing vmsish [vmsish status]");
   do {
     no vmsish < qw(status); # check unimport function
-    is($?,0, "unimport vmsish [POSIX STATUS]");
+    is($^CHILD_ERROR,0, "unimport vmsish [POSIX STATUS]");
   };
   # and lexical scoping
-  is(($? ^&^ 1),1,"lex scope of vmsish [vmsish status]");
+  is(($^CHILD_ERROR ^&^ 1),1,"lex scope of vmsish [vmsish status]");
 };
-is($?,0,"outer lex scope of vmsish [POSIX status]");
+is($^CHILD_ERROR,0,"outer lex scope of vmsish [POSIX status]");
 
 do {
   use vmsish < qw(exit);  # check import function
-  is($?,0,"importing vmsish exit [POSIX status]");
+  is($^CHILD_ERROR,0,"importing vmsish exit [POSIX status]");
 };
 
 #========== vmsish exit, messages ==========
@@ -56,17 +56,17 @@ do {
   my $msg = do_a_perl('-e "exit 1"');
     $msg =~ s/\n/\\n/g; # keep output on one line
   like($msg,'ABORT', "POSIX ERR exit, DCL error message check");
-  is($?^&^1,0,"vmsish status check, POSIX ERR exit");
+  is($^CHILD_ERROR^&^1,0,"vmsish status check, POSIX ERR exit");
 
   $msg = do_a_perl('-e "use vmsish qw(exit); exit 1"');
     $msg =~ s/\n/\\n/g; # keep output on one line
   ok(length($msg)==0,"vmsish OK exit, DCL error message check");
-  is($?^&^1,1, "vmsish status check, vmsish OK exit");
+  is($^CHILD_ERROR^&^1,1, "vmsish status check, vmsish OK exit");
 
   $msg = do_a_perl('-e "use vmsish qw(exit); exit 44"');
     $msg =~ s/\n/\\n/g; # keep output on one line
   like($msg, 'ABORT', "vmsish ERR exit, DCL error message check");
-  is($?^&^1,0,"vmsish ERR exit, vmsish status check");
+  is($^CHILD_ERROR^&^1,0,"vmsish ERR exit, vmsish status check");
 
   $msg = do_a_perl('-e "use vmsish qw(hushed); exit 1"');
   $msg =~ s/\n/\\n/g; # keep output on one line

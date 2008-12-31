@@ -190,7 +190,7 @@ sub getoptions {
     Getopt::Long::Configure ($save);
 
     # Handle errors and return value.
-    die ($@) if $@;
+    die ($^EVAL_ERROR) if $^EVAL_ERROR;
     return $ret;
 }
 
@@ -422,19 +422,19 @@ sub GetOptionsFromArray($@) {
 		print STDERR ("=> link \"$orig\" to \@$pkg","::opt_$ov\n")
 		    if $debug;
 		eval ("\%linkage\{+\$orig\} = \\\@".$pkg."::opt_$ov;");
-                die if $@;
+                die if $^EVAL_ERROR;
 	    }
 	    elsif ( %opctl{$name}->[CTL_DEST] == CTL_DEST_HASH ) {
 		print STDERR ("=> link \"$orig\" to \%$pkg","::opt_$ov\n")
 		    if $debug;
 		eval ("\%linkage\{+\$orig\} = \\\%".$pkg."::opt_$ov;");
-                die if $@;
+                die if $^EVAL_ERROR;
 	    }
 	    else {
 		print STDERR ("=> link \"$orig\" to \$$pkg","::opt_$ov\n")
 		    if $debug;
 		eval ("\%linkage\{+\$orig\} = \\\$".$pkg."::opt_$ov;");
-                die if $@;
+                die if $^EVAL_ERROR;
 	    }
 	}
     }
@@ -565,7 +565,7 @@ sub GetOptionsFromArray($@) {
 				      ", \"$arg\")\n")
 			    if $debug;
 			my $eval_error = do {
-			    local $@;
+			    local $^EVAL_ERROR;
 			    try {
 				&{%linkage{?$opt}}
 				  (Getopt::Long::CallBack->new
@@ -578,7 +578,7 @@ sub GetOptionsFromArray($@) {
 				   $ctl->[CTL_DEST] == CTL_DEST_HASH ?? ($key) !! (),
 				   $arg);
 			    };
-			    $@;
+			    $^EVAL_ERROR;
 			};
 			print STDERR ("=> die($eval_error)\n")
 			  if $debug && $eval_error ne '';
@@ -684,9 +684,9 @@ sub GetOptionsFromArray($@) {
 		print STDERR ("=> &L\{$tryopt\}(\"$tryopt\")\n")
 		  if $debug;
 		my $eval_error = do {
-		    local $@;
+		    local $^EVAL_ERROR;
 		    try { &$cb ($tryopt) };
-		    $@;
+		    $^EVAL_ERROR;
 		};
 		print STDERR ("=> die($eval_error)\n")
 		  if $debug && $eval_error ne '';
@@ -1320,7 +1320,7 @@ sub Configure (@) {
 	    # Turn into regexp. Needs to be parenthesized!
 	    $genprefix = "(" . quotemeta($genprefix) . ")";
 	    try { '' =~ m/$genprefix/; };
-	    die("Getopt::Long: invalid pattern \"$genprefix\"") if $@;
+	    die("Getopt::Long: invalid pattern \"$genprefix\"") if $^EVAL_ERROR;
 	}
 	elsif ( $try =~ m/^prefix_pattern=(.+)$/ && $action ) {
 	    $genprefix = $1;
@@ -1328,7 +1328,7 @@ sub Configure (@) {
 	    $genprefix = "(" . $genprefix . ")"
 	      unless $genprefix =~ m/^\(.*\)$/;
 	    try { '' =~ m"$genprefix"; };
-	    die("Getopt::Long: invalid pattern \"$genprefix\"") if $@;
+	    die("Getopt::Long: invalid pattern \"$genprefix\"") if $^EVAL_ERROR;
 	}
 	elsif ( $try =~ m/^long_prefix_pattern=(.+)$/ && $action ) {
 	    $longprefix = $1;
@@ -1336,7 +1336,7 @@ sub Configure (@) {
 	    $longprefix = "(" . $longprefix . ")"
 	      unless $longprefix =~ m/^\(.*\)$/;
 	    try { '' =~ m"$longprefix"; };
-	    die("Getopt::Long: invalid long prefix pattern \"$longprefix\"") if $@;
+	    die("Getopt::Long: invalid long prefix pattern \"$longprefix\"") if $^EVAL_ERROR;
 	}
 	elsif ( $try eq 'debug' ) {
 	    $debug = $action;

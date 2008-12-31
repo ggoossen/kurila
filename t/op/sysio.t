@@ -4,10 +4,10 @@ print "1..42\n";
 
 our ($reopen, $x, $outfile);
 
-chdir('op') || chdir('t/op') || die "sysio.t: cannot look for myself: $!";
+chdir('op') || chdir('t/op') || die "sysio.t: cannot look for myself: $^OS_ERROR";
 @INC = @( '../../lib' );
 
-open(I, "<", 'sysio.t') || die "sysio.t: cannot find myself: $!";
+open(I, "<", 'sysio.t') || die "sysio.t: cannot find myself: $^OS_ERROR";
 
 $reopen = ($^O eq 'VMS' ||
            $^O eq 'os2' ||
@@ -20,7 +20,7 @@ $x = 'abc';
 
 # should not be able to do negative lengths
 try { sysread(I, $x, -1) };
-print 'not ' unless ($@->{?description} =~ m/^Negative length/);
+print 'not ' unless ($^EVAL_ERROR->{?description} =~ m/^Negative length/);
 print "ok 1\n";
 
 # $x should be intact
@@ -64,13 +64,13 @@ print "ok 10\n";
 
 $outfile = 'sysio.out';
 
-open(O, ">", "$outfile") || die "sysio.t: cannot write $outfile: $!";
+open(O, ">", "$outfile") || die "sysio.t: cannot write $outfile: $^OS_ERROR";
 
-select(O); $|=1; select(STDOUT);
+select(O); $^OUTPUT_AUTOFLUSH=1; select(STDOUT);
 
 # cannot write negative lengths
 try { syswrite(O, $x, -1) };
-print 'not ' unless ($@->{?description} =~ m/^Negative length/);
+print 'not ' unless ($^EVAL_ERROR->{?description} =~ m/^Negative length/);
 print "ok 11\n";
 
 # $x still intact
@@ -83,7 +83,7 @@ print "ok 13\n";
 
 # should not be able to write from after the buffer
 try { syswrite(O, $x, 1, 3) };
-print 'not ' unless ($@->{?description} =~ m/^Offset outside string/);
+print 'not ' unless ($^EVAL_ERROR->{?description} =~ m/^Offset outside string/);
 print "ok 14\n";
 
 # $x still intact
@@ -92,7 +92,7 @@ print "ok 15\n";
 
 # $outfile still intact
 if ($reopen) {  # must close file to update EOF marker for stat
-  close O; open(O, ">>", "$outfile") || die "sysio.t: cannot write $outfile: $!";
+  close O; open(O, ">>", "$outfile") || die "sysio.t: cannot write $outfile: $^OS_ERROR";
 }
 print 'not ' if (-s $outfile);
 print "ok 16\n";
@@ -100,7 +100,7 @@ print "ok 16\n";
 # should not be able to write from before the buffer
 
 try { syswrite(O, $x, 1, -4) };
-print 'not ' unless ($@->{?description} =~ m/^Offset outside string/);
+print 'not ' unless ($^EVAL_ERROR->{?description} =~ m/^Offset outside string/);
 print "ok 17\n";
 
 # $x still intact
@@ -109,7 +109,7 @@ print "ok 18\n";
 
 # $outfile still intact
 if ($reopen) {  # must close file to update EOF marker for stat
-  close O; open(O, ">>", "$outfile") || die "sysio.t: cannot write $outfile: $!";
+  close O; open(O, ">>", "$outfile") || die "sysio.t: cannot write $outfile: $^OS_ERROR";
 }
 print 'not ' if (-s $outfile);
 print "ok 19\n";
@@ -118,9 +118,9 @@ print "ok 19\n";
 if (syswrite(O, $a, 2) == 2){
   print "ok 20\n";
 } else {
-  print "# $!\nnot ok 20\n";
+  print "# $^OS_ERROR\nnot ok 20\n";
   # most other tests make no sense after e.g. "No space left on device"
-  die $!;
+  die $^OS_ERROR;
 }
 
 
@@ -130,7 +130,7 @@ print "ok 21\n";
 
 # $outfile should have grown now
 if ($reopen) {  # must close file to update EOF marker for stat
-  close O; open(O, ">>", "$outfile") || die "sysio.t: cannot write $outfile: $!";
+  close O; open(O, ">>", "$outfile") || die "sysio.t: cannot write $outfile: $^OS_ERROR";
 }
 print 'not ' unless (-s $outfile == 2);
 print "ok 22\n";
@@ -145,7 +145,7 @@ print "ok 24\n";
 
 # $outfile should have grown now
 if ($reopen) {  # must close file to update EOF marker for stat
-  close O; open(O, ">>", "$outfile") || die "sysio.t: cannot write $outfile: $!";
+  close O; open(O, ">>", "$outfile") || die "sysio.t: cannot write $outfile: $^OS_ERROR";
 }
 print 'not ' unless (-s $outfile == 4);
 print "ok 25\n";
@@ -160,7 +160,7 @@ print "ok 27\n";
 
 # $outfile should have grown now
 if ($reopen) {  # must close file to update EOF marker for stat
-  close O; open(O, ">>", "$outfile") || die "sysio.t: cannot write $outfile: $!";
+  close O; open(O, ">>", "$outfile") || die "sysio.t: cannot write $outfile: $^OS_ERROR";
 }
 print 'not ' unless (-s $outfile == 7);
 print "ok 28\n";
@@ -175,14 +175,14 @@ print "ok 30\n";
 
 # $outfile should have grown now
 if ($reopen) {  # must close file to update EOF marker for stat
-  close O; open(O, ">>", "$outfile") || die "sysio.t: cannot write $outfile: $!";
+  close O; open(O, ">>", "$outfile") || die "sysio.t: cannot write $outfile: $^OS_ERROR";
 }
 print 'not ' unless (-s $outfile == 10);
 print "ok 31\n";
 
 close(O);
 
-open(I, "<", $outfile) || die "sysio.t: cannot read $outfile: $!";
+open(I, "<", $outfile) || die "sysio.t: cannot read $outfile: $^OS_ERROR";
 
 $b = 'xyz';
 
@@ -217,10 +217,10 @@ close(I);
 unlink $outfile;
 
 # Check that utf8 IO doesn't upgrade the scalar
-open(I, ">", "$outfile") || die "sysio.t: cannot write $outfile: $!";
+open(I, ">", "$outfile") || die "sysio.t: cannot write $outfile: $^OS_ERROR";
 # Will skip harmlessly on stdioperl
 try {binmode STDOUT, ":utf8"};
-die $@ if $@ and $@->{?description} !~ m/^IO layers \(like ':utf8'\) unavailable/;
+die $^EVAL_ERROR if $^EVAL_ERROR and $^EVAL_ERROR->{?description} !~ m/^IO layers \(like ':utf8'\) unavailable/;
 
 $a = "\x[FF]";
 
@@ -233,7 +233,7 @@ print $a ne "\x[FF]" ?? "not ok 41\n" !! "ok 41\n";
 
 # This should work
 try {syswrite I, 2;};
-print $@ eq "" ?? "ok 42\n" !! "not ok 42 # $@";
+print $^EVAL_ERROR eq "" ?? "ok 42\n" !! "not ok 42 # $^EVAL_ERROR";
 
 close(I);
 unlink $outfile;

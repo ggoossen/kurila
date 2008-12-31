@@ -21,7 +21,7 @@ is(join(':', @bar[[1..5]]), ':c:d:e:');
 
 TODO: do {
    todo_skip("slices in the middle of a list assignment", 1);
-   eval <<'TODO'; die if $@;
+   eval <<'TODO'; die if $^EVAL_ERROR;
    ($a, < @bcd[[0..2]],$e) = ('a','b','c','d','e');
    is(join(':', @($a, < @bcd[[0..2]],$e)), 'a:b:c:d:e');
 TODO
@@ -154,11 +154,11 @@ foreach my $ii (-3 .. 3) {
         }
     };
     if ($ii +<= 0) {
-        ok(! $@, 'Upper bound accepted: ' . ($MAX_INT+$ii));
+        ok(! $^EVAL_ERROR, 'Upper bound accepted: ' . ($MAX_INT+$ii));
         is($first, $MAX_INT-10, 'Lower bound okay');
         is($last, $MAX_INT+$ii, 'Upper bound okay');
     } else {
-        ok($@, 'Upper bound rejected: ' . ($MAX_INT+$ii));
+        ok($^EVAL_ERROR, 'Upper bound rejected: ' . ($MAX_INT+$ii));
     }
 }
 
@@ -175,11 +175,11 @@ foreach my $ii (-3 .. 3) {
         }
     };
     if ($ii +<= 0) {
-        ok(! $@, 'Lower bound accepted: ' . ($MAX_INT+$ii));
+        ok(! $^EVAL_ERROR, 'Lower bound accepted: ' . ($MAX_INT+$ii));
         is($first, $MAX_INT+$ii, 'Lower bound okay');
         is($last, $MAX_INT, 'Upper bound okay');
     } else {
-        ok($@, 'Lower bound rejected: ' . ($MAX_INT+$ii));
+        ok($^EVAL_ERROR, 'Lower bound rejected: ' . ($MAX_INT+$ii));
     }
 }
 
@@ -194,7 +194,7 @@ do {
             last if ($lim++ +> 100);
         }
     };
-    ok(! $@, 'Range accepted');
+    ok(! $^EVAL_ERROR, 'Range accepted');
     ok(! defined($first), 'Range ineffectual');
 };
 
@@ -205,7 +205,7 @@ foreach my $ii (@(^~^0, ^~^0+1, ^~^0+(^~^0>>4))) {
             last if ($lim++ +> 100);
         }
     };
-    ok($@, 'Upper bound rejected: ' . $ii);
+    ok($^EVAL_ERROR, 'Upper bound rejected: ' . $ii);
 }
 
 # Test lower range limit
@@ -234,11 +234,11 @@ foreach my $ii (-3 .. 3) {
         }
     };
     if ($ii +>= 0) {
-        ok(! $@, 'Lower bound accepted: ' . ($MIN_INT+$ii));
+        ok(! $^EVAL_ERROR, 'Lower bound accepted: ' . ($MIN_INT+$ii));
         is($first, $MIN_INT+$ii, 'Lower bound okay');
         is($last, $MIN_INT+10, 'Upper bound okay');
     } else {
-        ok($@, 'Lower bound rejected: ' . ($MIN_INT+$ii));
+        ok($^EVAL_ERROR, 'Lower bound rejected: ' . ($MIN_INT+$ii));
     }
 }
 
@@ -255,11 +255,11 @@ foreach my $ii (-3 .. 3) {
         }
     };
     if ($ii +>= 0) {
-        ok(! $@, 'Upper bound accepted: ' . ($MIN_INT+$ii));
+        ok(! $^EVAL_ERROR, 'Upper bound accepted: ' . ($MIN_INT+$ii));
         is($first, $MIN_INT, 'Lower bound okay');
         is($last, $MIN_INT+$ii, 'Upper bound okay');
     } else {
-        ok($@, 'Upper bound rejected: ' . ($MIN_INT+$ii));
+        ok($^EVAL_ERROR, 'Upper bound rejected: ' . ($MIN_INT+$ii));
     }
 }
 
@@ -274,7 +274,7 @@ do {
             last if ($lim++ +> 100);
         }
     };
-    ok(! $@, 'Range accepted');
+    ok(! $^EVAL_ERROR, 'Range accepted');
     ok(! defined($first), 'Range ineffectual');
 };
 
@@ -285,7 +285,7 @@ foreach my $ii (@(^~^0, ^~^0+1, ^~^0+(^~^0>>4))) {
             last if ($lim++ +> 100);
         }
     };
-    ok($@, 'Lower bound rejected: ' . -$ii);
+    ok($^EVAL_ERROR, 'Lower bound rejected: ' . -$ii);
 }
 
 # EOF

@@ -19,7 +19,7 @@ do { my ($hint_bits, $warning_bits, $hinthash);
  );
 };
 
-$/ = "\n####\n";
+$^INPUT_RECORD_SEPARATOR = "\n####\n";
 while ( ~< *DATA) {
     chomp;
     my ($num, $testname, $todo);
@@ -38,8 +38,8 @@ while ( ~< *DATA) {
 
     my $coderef = eval "sub \{$input\}";
 
-    if ($@ and $@->{?description}) {
-	diag("$num deparsed: $($@->message)");
+    if ($^EVAL_ERROR and $^EVAL_ERROR->{?description}) {
+	diag("$num deparsed: $($^EVAL_ERROR->message)");
         diag("input: '$input'");
 	ok(0, $testname);
     }
@@ -57,7 +57,7 @@ use constant 'c', 'stuff';
 TODO: do {
     todo_skip("fix deparse", 4);
     my $deparsed_txt = "sub ".$deparse->coderef2text(\&c);
-    my $deparsed_sub = eval $deparsed_txt; die if $@;
+    my $deparsed_sub = eval $deparsed_txt; die if $^EVAL_ERROR;
     is($deparsed_sub->(), 'stuff');
 
     my $a = 0;
@@ -66,7 +66,7 @@ TODO: do {
     use constant cr => \@('hello');
     my $string = "sub " . $deparse->coderef2text(\&cr);
     my $subref = eval $string;
-    die "Failed eval '$string': $($@->message)" if $@;
+    die "Failed eval '$string': $($^EVAL_ERROR->message)" if $^EVAL_ERROR;
     my $val = $subref->() or diag $string;
     is(ref($val), 'ARRAY');
     is($val->[0], 'hello');

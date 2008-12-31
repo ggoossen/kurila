@@ -17,7 +17,7 @@ BEGIN {  # Make a DEBUG constant very first thing...
   unless(defined &DEBUG) {
     if((env::var('PERLDOCDEBUG') || '') =~ m/^(\d+)/) { # untaint
       eval("sub DEBUG () \{$1\}");
-      die "WHAT? Couldn't eval-up a DEBUG constant!? $@" if $@;
+      die "WHAT? Couldn't eval-up a DEBUG constant!? $^EVAL_ERROR" if $^EVAL_ERROR;
     } else {
       *DEBUG = sub () {0};
     }
@@ -232,7 +232,7 @@ sub usage {
   warn "$(join ' ',@_)\n" if (nelems @_);
   
   # Erase evidence of previous errors (if any), so exit status is simple.
-  $! = 0;
+  $^OS_ERROR = 0;
   
   die <<EOF;
 perldoc [options] PageName|ModuleName|ProgramName...
@@ -486,8 +486,8 @@ sub find_good_formatter_class {
       }
 
       eval "require $c";
-      if($@) {
-        DEBUG +> 4 and print "Couldn't load $c: $!\n";
+      if($^EVAL_ERROR) {
+        DEBUG +> 4 and print "Couldn't load $c: $^OS_ERROR\n";
         next;
       }
     }
@@ -693,7 +693,7 @@ sub grand_search_init {
                 chomp;
                 push(@found, $_) if m,/$searchfor(?:\.(?:pod|pm))?\z,i;
             }
-            close(PODIDX)            or die "Can't close %$self{?'podidx'}: $!";
+            close(PODIDX)            or die "Can't close %$self{?'podidx'}: $^OS_ERROR";
             next;
         }
 
@@ -745,13 +745,13 @@ sub grand_search_init {
                 if ( (nelems @{ $self->{?'found'} }) ) {
                     print STDERR "However, try\n";
                     for my $dir ( @{ $self->{'found'} }) {
-                        opendir(DIR, $dir) or die "opendir $dir: $!";
+                        opendir(DIR, $dir) or die "opendir $dir: $^OS_ERROR";
                         while (my $file = readdir(DIR)) {
                             next if ($file =~ m/^\./s);
                             $file =~ s/\.(pm|pod)\z//;  # XXX: badfs
                             print STDERR "\tperldoc $page\::$file\n";
                         }
-                        closedir(DIR)    or die "closedir $dir: $!";
+                        closedir(DIR)    or die "closedir $dir: $^OS_ERROR";
                     }
                 }
             }
@@ -783,10 +783,10 @@ sub maybe_generate_dynamic_pod {
 	my $in_list = $self->opt_f;
 
         print $buffd "=over 8\n\n" if $in_list;
-        print $buffd < @dynamic_pod  or die "Can't print $buffer: $!";
+        print $buffd < @dynamic_pod  or die "Can't print $buffer: $^OS_ERROR";
         print $buffd "=back\n"     if $in_list;
 
-        close $buffd        or die "Can't close $buffer: $!";
+        close $buffd        or die "Can't close $buffer: $^OS_ERROR";
         
         @$found_things = @( $buffer );
           # Yes, so found_things never has more than one thing in
@@ -836,7 +836,7 @@ sub add_translator { # $self->add_translator($lang);
     for my $lang ( @_) {
         my $pack = 'POD2::' . uc($lang);
         eval "require $pack";
-        if ( $@ ) {
+        if ( $^EVAL_ERROR ) {
             # XXX warn: non-installed translator package
         } else {
             push @{ $self->{'translators'} }, $pack;
@@ -856,7 +856,7 @@ sub search_perlfunc {
 
     my $perlfunc = shift @$found_things;
     open(PFUNC, "<", $perlfunc)               # "Funk is its own reward"
-        or die("Can't open $perlfunc: $!");
+        or die("Can't open $perlfunc: $^OS_ERROR");
 
     # Functions like -r, -e, etc. are listed under `-X'.
     my $search_re = ($self->opt_f =~ m/^-[rwxoRWXOeszfdlpSbctugkTBMAC]$/)
@@ -903,7 +903,7 @@ sub search_perlfunc {
           $self->opt_f
         ;
     }
-    close PFUNC                or die "Can't open $perlfunc: $!";
+    close PFUNC                or die "Can't open $perlfunc: $^OS_ERROR";
 
     return;
 }
@@ -920,16 +920,16 @@ sub search_perlfaqs {
     my $rx = try { qr/$search_key/ }
      or die <<EOD;
 Invalid regular expression '$search_key' given as -q pattern:
-$@
+$^EVAL_ERROR
 Did you mean \\Q$search_key ?
 
 EOD
 
     local $_;
     foreach my $file ( @$found_things) {
-        die "invalid file spec: $!" if $file =~ m/[<>|]/;
+        die "invalid file spec: $^OS_ERROR" if $file =~ m/[<>|]/;
         open(INFAQ, "<", $file)  # XXX 5.6ism
-         or die "Can't read-open $file: $!\nAborting";
+         or die "Can't read-open $file: $^OS_ERROR\nAborting";
         while ( ~< *INFAQ) {
             if ( m/^=head2\s+.*(?:$search_key)/i ) {
                 $found = 1;
@@ -986,8 +986,8 @@ sub render_findings {
       my@($switch, $value, $silent_fail) =  @$f;
       if( $formatter->can($switch) ) {
         try { $formatter->?$switch( defined($value) ?? $value !! () ) };
-        warn "Got an error when setting $formatter_class\->$switch:\n$@\n"
-         if $@;
+        warn "Got an error when setting $formatter_class\->$switch:\n$^EVAL_ERROR\n"
+         if $^EVAL_ERROR;
       } else {
         if( $silent_fail or $switch =~ m/^__/s ) {
           DEBUG +> 2 and print "Formatter $formatter_class doesn't support $switch\n";
@@ -1021,11 +1021,11 @@ sub render_findings {
     try {  $formatter->parse_from_file( $file, $out_fh )  };
   };
   
-  warn "Error while formatting with $formatter_class:\n $@\n" if $@;
+  warn "Error while formatting with $formatter_class:\n $^EVAL_ERROR\n" if $^EVAL_ERROR;
   DEBUG +> 2 and print "Back from formatting with $formatter_class\n";
 
   close $out_fh 
-   or warn "Can't close $out: $!\n(Did $formatter already close it?)";
+   or warn "Can't close $out: $^OS_ERROR\n(Did $formatter already close it?)";
   sleep 0; sleep 0; sleep 0;
    # Give the system a few timeslices to meditate on the fact
    # that the output file does in fact exist and is closed.
@@ -1061,7 +1061,7 @@ sub unlink_if_temp_file {
   my $temp_file_list = $self->{?'temp_file_list'} || return;
   if(grep $_ eq $file, @$temp_file_list) {
     $self->aside("Unlinking $file\n");
-    unlink($file) or warn "Odd, couldn't unlink $file: $!";
+    unlink($file) or warn "Odd, couldn't unlink $file: $^OS_ERROR";
   } else {
     DEBUG +> 1 and print "$file isn't a temp file, so not unlinking.\n";
   }
@@ -1136,7 +1136,7 @@ sub MSWin_perldoc_tempfile {
       $tempdir,
       $infix || 'x',
       time(),
-      $$,
+      $^PID,
       defined( &Win32::GetTickCount )
         ?? (Win32::GetTickCount() ^&^ 0xff)
         !! int(rand 256)
@@ -1157,7 +1157,7 @@ sub MSWin_perldoc_tempfile {
     # If we are running before perl5.6.0, we can't autovivify
     DEBUG +> 3 and print "About to try making temp file $spec\n";
     return @($fh, $spec) if open($fh, ">", $spec);    # XXX 5.6ism
-    $self->aside("Can't create temp file $spec: $!\n");
+    $self->aside("Can't create temp file $spec: $^OS_ERROR\n");
   }
 
   $self->aside("Giving up on making a temp file!\n");
@@ -1234,14 +1234,14 @@ sub minus_f_nocase {   # i.e., do like -f, but without regard to case
  	    my $found = 0;
  	    my $lcp = lc $p;
  	    my $p_dirspec = catdir(< @p);
- 	    opendir DIR, $p_dirspec  or die "opendir $p_dirspec: $!";
+ 	    opendir DIR, $p_dirspec  or die "opendir $p_dirspec: $^OS_ERROR";
  	    while(defined( $cip = readdir(DIR) )) {
  		if (lc $cip eq $lcp){
  		    $found++;
  		    last; # XXX stop at the first? what if there's others?
  		}
  	    }
- 	    closedir DIR  or die "closedir $p_dirspec: $!";
+ 	    closedir DIR  or die "closedir $p_dirspec: $^OS_ERROR";
  	    return "" unless $found;
 
  	    push @p, $cip;
@@ -1315,14 +1315,14 @@ sub page_module_file {
 	my $any_error = 0;
         foreach my $output ( @found) {
 	    unless( open(TMP, "<", $output) ) {    # XXX 5.6ism
-	      warn("Can't open $output: $!");
+	      warn("Can't open $output: $^OS_ERROR");
 	      $any_error = 1;
 	      next;
 	    }
 	    while ( ~< *TMP) {
-	        print or die "Can't print to stdout: $!";
+	        print or die "Can't print to stdout: $^OS_ERROR";
 	    } 
-	    close TMP  or die "Can't close while $output: $!";
+	    close TMP  or die "Can't close while $output: $^OS_ERROR";
 	    $self->unlink_if_temp_file($output);
 	}
 	return $any_error; # successful
@@ -1425,14 +1425,14 @@ sub containspod {
     }
 
     local($_);
-    open(TEST,"<", $file) 	or die "Can't open $file: $!";   # XXX 5.6ism
+    open(TEST,"<", $file) 	or die "Can't open $file: $^OS_ERROR";   # XXX 5.6ism
     while ( ~< *TEST) {
 	if (m/^=head/) {
-	    close(TEST) 	or die "Can't close $file: $!";
+	    close(TEST) 	or die "Can't close $file: $^OS_ERROR";
 	    return 1;
 	}
     }
-    close(TEST) 		or die "Can't close $file: $!";
+    close(TEST) 		or die "Can't close $file: $^OS_ERROR";
     return 0;
 }
 
@@ -1451,7 +1451,7 @@ sub maybe_diddle_INC {
     # don't add if superuser
     if ($< && $> && -f "blib") {   # don't be looking too hard now!
       eval q{ use blib; 1 };
-      warn $@ if $@ && $self->opt_v;
+      warn $^EVAL_ERROR if $^EVAL_ERROR && $self->opt_v;
     }
   }
   
@@ -1472,7 +1472,7 @@ sub new_output_file {
   my $fh;
   # If we are running before perl5.6.0, we can't autovivify
   DEBUG +> 3 and print "About to try writing to specified output file $outspec\n";
-  die "Can't write-open $outspec: $!"
+  die "Can't write-open $outspec: $^OS_ERROR"
    unless open($fh, ">", $outspec); # XXX 5.6ism
   
   DEBUG +> 3 and print "Successfully opened $outspec\n";
@@ -1533,12 +1533,12 @@ sub page {  # apply a pager to the output file
     my @($self, $output, $output_to_stdout, @< @pagers) =  @_;
     if ($output_to_stdout) {
         $self->aside("Sending unpaged output to STDOUT.\n");
-	open(TMP, "<", $output)  or  die "Can't open $output: $!"; # XXX 5.6ism
+	open(TMP, "<", $output)  or  die "Can't open $output: $^OS_ERROR"; # XXX 5.6ism
 	local $_;
 	while ( ~< *TMP) {
-	    print or die "Can't print to stdout: $!";
+	    print or die "Can't print to stdout: $^OS_ERROR";
 	} 
-	close TMP  or die "Can't close while $output: $!";
+	close TMP  or die "Can't close while $output: $^OS_ERROR";
 	$self->unlink_if_temp_file($output);
     } else {
         # On VMS, quoting prevents logical expansion, and temp files with no
@@ -1597,13 +1597,13 @@ sub searchfor {
 	}
 
 	if ($recurse) {
-	    opendir(D,$dir)	or die "Can't opendir $dir: $!";
+	    opendir(D,$dir)	or die "Can't opendir $dir: $^OS_ERROR";
 	    my @newdirs = map < catfile($dir, $_), grep {
 		not m/^\.\.?\z/s and
 		not m/^auto\z/s  and   # save time! don't search auto dirs
 		-d  catfile($dir, $_)
 	    } @( readdir D);
-	    closedir(D)		or die "Can't closedir $dir: $!";
+	    closedir(D)		or die "Can't closedir $dir: $^OS_ERROR";
 	    next unless (nelems @newdirs);
 	    # what a wicked map!
 	    @newdirs = map(@(s/\.dir\z//,$_)[1], @newdirs) if IS_VMS;
@@ -1625,7 +1625,7 @@ do {
     eval  q~ END { close(STDOUT) || die "Can't close STDOUT: $!" } ~;
      # What for? to let the pager know that nothing more will come?
   
-    die $@ if $@;
+    die $^EVAL_ERROR if $^EVAL_ERROR;
     $already_asserted = 1;
     return;
   }
@@ -1657,9 +1657,9 @@ sub am_taint_checking {
 sub is_tainted { # just a function
     my $arg  = shift;
     my $nada = substr($arg, 0, 0);  # zero-length!
-    local $@;  # preserve the caller's version of $@
+    local $^EVAL_ERROR;  # preserve the caller's version of $@
     try { eval "# $nada" };
-    return length($@) != 0;
+    return length($^EVAL_ERROR) != 0;
 }
 
 #..........................................................................
@@ -1701,7 +1701,7 @@ sub drop_privs_maybe {
             $< = $id; # real uid
             $> = $id; # effective uid
         };
-        if( !$@ && $< && $> ) {
+        if( !$^EVAL_ERROR && $< && $> ) {
           DEBUG and print "OK, I dropped privileges.\n";
         } elsif( $self->opt_U ) {
           DEBUG and print "Couldn't drop privileges, but in -U mode, so feh."

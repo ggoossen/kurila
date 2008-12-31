@@ -7,7 +7,7 @@ use English < qw( -no_match_vars ) ;
 use Config;
 use Errno;
 
-is( $PID, $$, '$PID' );
+is( $PID, $^PID, '$PID' );
 
 "abc" =~ m/b/;
 
@@ -30,7 +30,7 @@ do {
 	    open(OUT, ">", "en.tmp");
 	}
 	select(OUT);
-	$| = 1;
+	$^OUTPUT_AUTOFLUSH = 1;
 	print 'ok', '7';
 
 	# since $| is 1, this should be true

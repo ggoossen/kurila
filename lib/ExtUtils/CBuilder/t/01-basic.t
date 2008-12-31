@@ -4,7 +4,7 @@ BEGIN {
   if (env::var('PERL_CORE')) {
     chdir 't' if -d 't';
     chdir '../lib/ExtUtils/CBuilder'
-      or die "Can't chdir to lib/ExtUtils/CBuilder: $!";
+      or die "Can't chdir to lib/ExtUtils/CBuilder: $^OS_ERROR";
     @INC = qw(../..);
   }
 }
@@ -27,7 +27,7 @@ ok $b->have_compiler;
 my $source_file = File::Spec->catfile('t', 'compilet.c');
 do {
   local *FH;
-  open FH, ">", "$source_file" or die "Can't create $source_file: $!";
+  open FH, ">", "$source_file" or die "Can't create $source_file: $^OS_ERROR";
   print FH "int boot_compilet(void) \{ return 1; \}\n";
   close FH;
 };

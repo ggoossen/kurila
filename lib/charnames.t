@@ -11,7 +11,7 @@ BEGIN {
 }
 require File::Spec;
 
-$| = 1;
+$^OUTPUT_AUTOFLUSH = 1;
 
 plan tests => 75;
 
@@ -179,7 +179,7 @@ my $alifile = File::Spec->catfile(File::Spec->updir, < qw(lib unicore xyzzy_alia
 END { if ($tmpfile) { 1 while unlink $tmpfile; } }
 
 my @prgs;
-do {   local $/ = undef;
+do {   local $^INPUT_RECORD_SEPARATOR = undef;
     @prgs = split "\n########\n", ~< *DATA;
     };
 
@@ -187,18 +187,18 @@ for ( @prgs) {
     my @($code, $exp, ...) = @(( <split m/\nEXPECT\n/), '$');
     my @($prog, $fil, ...) = @(( <split m/\nFILE\n/, $code), "");
     $prog = "use utf8; " . $prog;
-    open my $tmp, ">", "$tmpfile" or die "Could not open $tmpfile: $!";
+    open my $tmp, ">", "$tmpfile" or die "Could not open $tmpfile: $^OS_ERROR";
     print $tmp $prog, "\n";
-    close $tmp or die "Could not close $tmpfile: $!";
+    close $tmp or die "Could not close $tmpfile: $^OS_ERROR";
     if ($fil) {
 	$fil .= "\n";
-	open my $ali, ">", "$alifile" or die "Could not open $alifile: $!";
+	open my $ali, ">", "$alifile" or die "Could not open $alifile: $^OS_ERROR";
 	print $ali $fil;
-	close $ali or die "Could not close $alifile: $!";
+	close $ali or die "Could not close $alifile: $^OS_ERROR";
 	}
     my $res = runperl( progfile => $tmpfile,
                        stderr => 1 );
-    my $status = $?;
+    my $status = $^CHILD_ERROR;
     $res =~ s/[\r\n]+$//;
     $res =~ s/tmp\d+/-/g;			# fake $prog from STDIN
     $res =~ s/\n%[A-Z]+-[SIWEF]-.*$//		# clip off DCL status msg
@@ -230,7 +230,7 @@ for ( @prgs) {
 
 # [perl #30409] charnames.pm clobbers default variable
 $_ = 'foobar';
-eval "use charnames ':full';"; die if $@;
+eval "use charnames ':full';"; die if $^EVAL_ERROR;
 ok $_ eq 'foobar';
 
 # Unicode slowdown noted by Phil Pennock, traced to a bug fix in index
@@ -248,7 +248,7 @@ do { # as on ASCII or UTF-8 machines
 
 # Verify that charnames propagate to eval("")
 my $evaltry = eval q[ "Eval: \N{LEFT-POINTING DOUBLE ANGLE QUOTATION MARK}" ];
-ok not $@;
+ok not $^EVAL_ERROR;
 ok $evaltry eq "Eval: \N{LEFT-POINTING DOUBLE ANGLE QUOTATION MARK}";
 
 __END__

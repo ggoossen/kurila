@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-$| = 1;
+$^OUTPUT_AUTOFLUSH = 1;
 
 # Note that because fork loses test count we do not use Test::More
 
@@ -30,7 +30,7 @@ myok( 1, -f $file->filename, "OO File exists" );
 my $children = 2;
 for my $i (1 .. $children) {
   my $pid = fork;
-  die "Can't fork: $!" unless defined $pid;
+  die "Can't fork: $^OS_ERROR" unless defined $pid;
   if ($pid) {
     # parent process
     next;
@@ -66,7 +66,7 @@ myok( 5, -f $filename, "non-OO File exists" );
 $children = 2;
 for my $i (1 .. $children) {
   my $pid = fork;
-  die "Can't fork: $!" unless defined $pid;
+  die "Can't fork: $^OS_ERROR" unless defined $pid;
   if ($pid) {
     # parent process
     next;

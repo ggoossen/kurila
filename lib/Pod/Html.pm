@@ -342,7 +342,7 @@ sub clean_data($){
 
 sub pod2html {
     local(@ARGV) = @_;
-    local($/);
+    local($^INPUT_RECORD_SEPARATOR);
     local $_;
 
     init_globals();
@@ -364,7 +364,7 @@ sub pod2html {
     unless ((nelems @ARGV) && @ARGV[0]) {
 	$Podfile  = "-" unless $Podfile;	# stdin
 	open(POD, "<", "$Podfile")
-		|| die "$0: cannot open $Podfile file for input: $!\n";
+		|| die "$0: cannot open $Podfile file for input: $^OS_ERROR\n";
     } else {
 	$Podfile = @ARGV[0];  # XXX: might be more filenames
 	*POD = *ARGV;
@@ -387,7 +387,7 @@ sub pod2html {
 
     # read the pod a paragraph at a time
     warn "Scanning for sections in input file(s)\n" if $Verbose;
-    $/ = "";
+    $^INPUT_RECORD_SEPARATOR = "";
     my @poddata  = @( ~< *POD );
     close(POD);
 
@@ -420,7 +420,7 @@ sub pod2html {
 
     # open the output file
     open(HTML, ">", "$Htmlfile")
-	    || die "$0: cannot open $Htmlfile file for output: $!\n";
+	    || die "$0: cannot open $Htmlfile file for output: $^OS_ERROR\n";
 
     # put a title in the HTML file if one wasn't specified
     if ($Title eq '') {
@@ -784,8 +784,8 @@ sub load_cache {
     $tests = 0;
 
     open(CACHE, "<", "$itemcache") ||
-	die "$0: error opening $itemcache for reading: $!\n";
-    $/ = "\n";
+	die "$0: error opening $itemcache for reading: $^OS_ERROR\n";
+    $^INPUT_RECORD_SEPARATOR = "\n";
 
     # is it the same podpath?
     $_ = ~< *CACHE;
@@ -812,8 +812,8 @@ sub load_cache {
 
     warn "scanning for directory cache\n" if $Verbose;
     open(CACHE, "<", "$dircache") ||
-	die "$0: error opening $dircache for reading: $!\n";
-    $/ = "\n";
+	die "$0: error opening $dircache for reading: $^OS_ERROR\n";
+    $^INPUT_RECORD_SEPARATOR = "\n";
     $tests = 0;
 
     # is it the same podpath?
@@ -861,7 +861,7 @@ sub scan_podpath {
     # scan each directory listed in @Podpath
     $pwd = getcwd();
     chdir($podroot)
-	|| die "$0: error changing to directory $podroot: $!\n";
+	|| die "$0: error changing to directory $podroot: $^OS_ERROR\n";
     foreach my $dir ( @Podpath) {
 	scan_dir($dir, $recurse);
     }
@@ -879,14 +879,14 @@ sub scan_podpath {
 	    #  find all the .pod and .pm files within the directory
 	    $dirname = $1;
 	    opendir(DIR, $dirname) ||
-		die "$0: error opening directory $dirname: $!\n";
+		die "$0: error opening directory $dirname: $^OS_ERROR\n";
 	    @files = grep(m/(\.pod|\.pm)\z/ && ! -d $_, @( readdir(DIR)));
 	    closedir(DIR);
 
 	    # scan each .pod and .pm file for =item directives
 	    foreach my $pod ( @files) {
 		open(POD, "<", "$dirname/$pod") ||
-		    die "$0: error opening $dirname/$pod for input: $!\n";
+		    die "$0: error opening $dirname/$pod for input: $^OS_ERROR\n";
 		@poddata = @( ~< *POD );
 		close(POD);
 		clean_data( \@poddata );
@@ -905,7 +905,7 @@ sub scan_podpath {
 	    # scan the .pod or .pm file for =item directives
 	    my $pod = $1;
 	    open(POD, "<", "$pod") ||
-		die "$0: error opening $pod for input: $!\n";
+		die "$0: error opening $pod for input: $^OS_ERROR\n";
 	    @poddata = @( ~< *POD );
 	    close(POD);
 	    clean_data( \@poddata );
@@ -918,12 +918,12 @@ sub scan_podpath {
     @poddata = @( () );	# clean-up a bit
 
     chdir($pwd)
-	|| die "$0: error changing to directory $pwd: $!\n";
+	|| die "$0: error changing to directory $pwd: $^OS_ERROR\n";
 
     # cache the item list for later use
     warn "caching items for later use\n" if $Verbose;
     open(CACHE, ">", "$Itemcache") ||
-	die "$0: error open $Itemcache for writing: $!\n";
+	die "$0: error open $Itemcache for writing: $^OS_ERROR\n";
 
     print CACHE join(":", @Podpath) . "\n$podroot\n";
     foreach my $key (keys %Items) {
@@ -935,7 +935,7 @@ sub scan_podpath {
     # cache the directory list for later use
     warn "caching directories for later use\n" if $Verbose;
     open(CACHE, ">", "$Dircache") ||
-	die "$0: error open $Dircache for writing: $!\n";
+	die "$0: error open $Dircache for writing: $^OS_ERROR\n";
 
     print CACHE join(":", @Podpath) . "\n$podroot\n";
     foreach my $key (keys %Pages) {
@@ -960,7 +960,7 @@ sub scan_dir {
     @pods = @( () );
 
     opendir(DIR, $dir) ||
-	die "$0: error opening directory $dir: $!\n";
+	die "$0: error opening directory $dir: $^OS_ERROR\n";
     while (defined($_ = readdir(DIR))) {
 	if (-d "$dir/$_" && $_ ne "." && $_ ne ".."
 	    && ($HiddenDirs || !m/^\./)

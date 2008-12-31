@@ -294,8 +294,8 @@ sub _handle_encoding_line {
       my @x = @('', "abc", "123");
       $self->{?'_transcoder'}->(< @x);
     };
-    $@ && die( $enc_error =
-      "Really unexpected error setting up encoding $e: $($@->message)\nAborting"
+    $^EVAL_ERROR && die( $enc_error =
+      "Really unexpected error setting up encoding $e: $($^EVAL_ERROR->message)\nAborting"
     );
 
   } else {

@@ -3,7 +3,7 @@ use Test::More  'no_plan';
 
 my $Class   = 'Module::Loaded';
 my @Funcs   = qw[mark_as_loaded mark_as_unloaded is_loaded];
-my $Mod     = 'Foo::Bar'.$$;
+my $Mod     = 'Foo::Bar'.$^PID;
 my $Strict  = 'error';
 
 ### load the thing
@@ -17,7 +17,7 @@ do {   ok( !is_loaded($Mod),       "$Mod not loaded yet" );
     
     my $rv = eval "require $Mod; 1";
     ok( $rv,                    "$Mod required" );
-    ok( !$@,                    "   require did not die" );
+    ok( !$^EVAL_ERROR,                    "   require did not die" );
 };
 
 ### unload again
@@ -26,8 +26,8 @@ do {   ok( mark_as_unloaded($Mod), "$Mod now marked as unloaded" );
 
     my $rv = eval "require $Mod; 1";
     ok( !$rv,                   "$Mod require failed" );
-    ok( $@,                     "   require died" );
-    like( $@->{?description}, qr/locate/,       "       with expected error" );
+    ok( $^EVAL_ERROR,                     "   require died" );
+    like( $^EVAL_ERROR->{?description}, qr/locate/,       "       with expected error" );
 };
 
 ### check for an already loaded module

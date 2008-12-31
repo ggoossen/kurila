@@ -64,7 +64,7 @@ our $VERSION = '1.05';
 
 main::ok( Testing->require_version(1.05),   'require_version()' );
 try { Testing->require_version(1.11); 1 };
-main::ok( $@,                               'require_version() fail' );
+main::ok( $^EVAL_ERROR,                               'require_version() fail' );
 main::ok( Testing->require_version(0),      'require_version(0)' );
 
 sub lifejacket  { 'lifejacket'  }
@@ -101,8 +101,8 @@ Testing->import;
 main::ok( defined &lifejacket,      'simple import' );
 
 my $got = try {&lifejacket( < @_ )};
-main::ok ( $@ eq "", 'check we can call the imported subroutine')
-  or print STDERR "# \$\@ is $@\n";
+main::ok ( $^EVAL_ERROR eq "", 'check we can call the imported subroutine')
+  or print STDERR "# \$\@ is $^EVAL_ERROR\n";
 main::ok ( $got eq 'lifejacket', 'and that it gave the correct result')
   or print STDERR "# expected 'lifejacket', got " .
   (defined $got ?? "'$got'" !! "undef") . "\n";
@@ -112,8 +112,8 @@ main::ok ( $got eq 'lifejacket', 'and that it gave the correct result')
 main::ok( eval "defined &is",
       "Import a subroutine where exporter must create the typeglob" );
 $got = eval "&is";
-main::ok ( $@ eq "", 'check we can call the imported autoloaded subroutine')
-  or chomp ($@), print STDERR "# \$\@ is $@\n";
+main::ok ( $^EVAL_ERROR eq "", 'check we can call the imported autoloaded subroutine')
+  or chomp ($^EVAL_ERROR), print STDERR "# \$\@ is $^EVAL_ERROR\n";
 main::ok ( $got eq 'Is', 'and that it gave the correct result')
   or print STDERR "# expected 'Is', got " .
   (defined $got ?? "'$got'" !! "undef") . "\n";
@@ -164,7 +164,7 @@ do {
   our @ISA = qw(Exporter);
   our $VERSION = 0;
   try { More::Testing->require_version(0); 1 };
-  main::ok(!$@,       'require_version(0) and $VERSION = 0');
+  main::ok(!$^EVAL_ERROR,       'require_version(0) and $VERSION = 0');
 };
 
 package Moving::Target;

@@ -26,18 +26,18 @@ unshift @INC, '.';
 
 # bug ID 20010920.007
 eval qq{ do qq(a file that does not exist); };
-ok( !$@, "do on a non-existing file, first try" );
+ok( !$^EVAL_ERROR, "do on a non-existing file, first try" );
 
 eval qq{ do uc qq(a file that does not exist); };
-ok( !$@, "do on a non-existing file, second try"  );
+ok( !$^EVAL_ERROR, "do on a non-existing file, second try"  );
 
 # 6 must be interpreted as a file name here
-ok( (!defined do 6) && $!, "'do 6' : $!" );
+ok( (!defined do 6) && $^OS_ERROR, "'do 6' : $^OS_ERROR" );
 
 # [perl #19545]
 push @t, ($u = (do {} . "This should be pushed."));
 ok( ((nelems @t)-1) == 0, "empty do result value" );
 
 END {
-    1 while unlink("$$.16", "$$.17", "$$.18");
+    1 while unlink("$^PID.16", "$^PID.17", "$^PID.18");
 }

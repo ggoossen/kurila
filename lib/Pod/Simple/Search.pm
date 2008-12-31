@@ -248,7 +248,7 @@ sub _path2modname {
   # filenames, so try to extract them from the "=head1 NAME" tag in the
   # file instead.
   if ($^O eq 'VMS' && ($name eq lc($name) || $name eq uc($name))) {
-      open PODFILE, "<", "$file" or die "_path2modname: Can't open $file: $!";
+      open PODFILE, "<", "$file" or die "_path2modname: Can't open $file: $^OS_ERROR";
       my $in_pod = 0;
       my $in_name = 0;
       my $line;
@@ -305,7 +305,7 @@ sub _recurse_dir {
       return;
     }
     unless( opendir(INDIR, $dir_long) ) {
-      $verbose +> 2 and print "Can't opendir $dir_long : $!\n";
+      $verbose +> 2 and print "Can't opendir $dir_long : $^OS_ERROR\n";
       closedir(INDIR);
       return
     }
@@ -373,7 +373,7 @@ sub run {
       # Don't bother looking for $VERSION in .pod files
       DEBUG and print "Not looking for \$VERSION in .pod $file\n";
     } elsif( !open(INPOD, "<", $file) ) {
-      DEBUG and print "Couldn't open $file: $!\n";
+      DEBUG and print "Couldn't open $file: $^OS_ERROR\n";
       close(INPOD);
     } else {
       # Sane case: file is readable
@@ -588,7 +588,7 @@ sub contains_pod {
   # check for one line of POD
   $verbose +> 1 and print " Scanning $file for pod...\n";
   unless( open(MAYBEPOD, "<","$file") ) {
-    print "Error: $file is unreadable: $!\n";
+    print "Error: $file is unreadable: $^OS_ERROR\n";
     return undef;
   }
 
@@ -598,13 +598,13 @@ sub contains_pod {
   local $_;
   while( ~< *MAYBEPOD ) {
     if(m/^=(head\d|pod|over|item)\b/s) {
-      close(MAYBEPOD) || die "Bizarre error closing $file: $!\nAborting";
+      close(MAYBEPOD) || die "Bizarre error closing $file: $^OS_ERROR\nAborting";
       chomp;
       $verbose +> 1 and print "  Found some pod ($_) in $file\n";
       return 1;
     }
   }
-  close(MAYBEPOD) || die "Bizarre error closing $file: $!\nAborting";
+  close(MAYBEPOD) || die "Bizarre error closing $file: $^OS_ERROR\nAborting";
   $verbose +> 1 and print "  No POD in $file, skipping.\n";
   return 0;
 }

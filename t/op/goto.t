@@ -52,7 +52,7 @@ $::LINE = __LINE__ + 1;
 do {
     my $wherever = 'NOWHERE';
     try { goto $wherever };
-    like($@->{?description}, qr/goto must have sub/, 'goto NOWHERE sets $@');
+    like($^EVAL_ERROR->{?description}, qr/goto must have sub/, 'goto NOWHERE sets $@');
 };
 
 # see if a modified @_ propagates
@@ -93,9 +93,9 @@ ok($chained_goto_ok, 'chained &goto');
 
 sub null { 1 };
 eval 'goto &null';
-like($@->{?description}, qr/Can't goto subroutine from an eval-string/, 'eval string');
+like($^EVAL_ERROR->{?description}, qr/Can't goto subroutine from an eval-string/, 'eval string');
 try { goto &null };
-like($@->{?description}, qr/Can't goto subroutine from an eval-block/, 'eval block');
+like($^EVAL_ERROR->{?description}, qr/Can't goto subroutine from an eval-block/, 'eval block');
 
 # [perl #36521] goto &foo in warn handler could defeat recursion avoider
 

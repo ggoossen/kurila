@@ -4,7 +4,7 @@ BEGIN {
     require './test.pl';
 }
 
-$|  = 1;
+$^OUTPUT_AUTOFLUSH  = 1;
 use warnings;
 use Config;
 my $Is_VMS = $^O eq 'VMS';
@@ -19,7 +19,7 @@ my $Perl = which_perl();
 do {
     unlink("afile") if -f "afile";
 
-    $! = 0;  # the -f above will set $! if 'afile' doesn't exist.
+    $^OS_ERROR = 0;  # the -f above will set $! if 'afile' doesn't exist.
     ok( open(my $f, "+>","afile"),  'open(my $f, "+>...")' );
 
     binmode $f;
@@ -107,7 +107,7 @@ EOC
 
 
 ok( !try { open my $f, '<&', 'afile'; 1; },    '<& on a non-filehandle' );
-like( $@->message, qr/Bad filehandle:\s+afile/,          '       right error' );
+like( $^EVAL_ERROR->message, qr/Bad filehandle:\s+afile/,          '       right error' );
 
 
 # local $file tests
@@ -200,7 +200,7 @@ EOC
 
 
 ok( !try { open local $f, '<&', 'afile'; 1 },  'local <& on non-filehandle');
-like( $@->message, qr/Bad filehandle:\s+afile/,          '       right error' );
+like( $^EVAL_ERROR->message, qr/Bad filehandle:\s+afile/,          '       right error' );
 
 do {
     local *F;
@@ -222,7 +222,7 @@ do {
     };
 
     # used to try to open a file [perl #17830]
-    ok( open(my $stdin,  "<&", fileno STDIN),   'dup fileno(STDIN) into lexical fh') or _diag $!;
+    ok( open(my $stdin,  "<&", fileno STDIN),   'dup fileno(STDIN) into lexical fh') or _diag $^OS_ERROR;
 };
 
 SKIP: do {
@@ -239,11 +239,11 @@ SKIP: do {
 
 do {
     ok( !try { open F, "BAR", "QUUX" },       'Unknown open() mode' );
-    like( $@->message, qr/\QUnknown open() mode 'BAR'/, '       right error' );
+    like( $^EVAL_ERROR->message, qr/\QUnknown open() mode 'BAR'/, '       right error' );
 };
 
 do {
-    local $^WARN_HOOK = sub { $@ = shift };
+    local $^WARN_HOOK = sub { $^EVAL_ERROR = shift };
 
     sub gimme {
         my $tmphandle = shift;
@@ -262,19 +262,19 @@ SKIP: do {
     try { open(F, ">>>", "afile") };
     like($w, qr/Invalid separator character '>' in PerlIO layer spec/,
 	 "bad open (>>>) warning");
-    like($@->message, qr/Unknown open\(\) mode '>>>'/,
+    like($^EVAL_ERROR->message, qr/Unknown open\(\) mode '>>>'/,
 	 "bad open (>>>) failure");
 
     try { open(F, ">:u", "afile" ) };
-    ok( ! $@ );
+    ok( ! $^EVAL_ERROR );
     like($w, qr/Unknown PerlIO layer "u"/,
 	 'bad layer ">:u" warning');
     try { open(F, "<:u", "afile" ) };
-    ok( ! $@ );
+    ok( ! $^EVAL_ERROR );
     like($w, qr/Unknown PerlIO layer "u"/,
 	 'bad layer "<:u" warning');
     try { open(F, ":c", "afile" ) };
-    like($@->message, qr/Unknown open\(\) mode ':c'/,
+    like($^EVAL_ERROR->message, qr/Unknown open\(\) mode ':c'/,
 	 'bad layer ":c" failure');
 };
 
@@ -292,4 +292,4 @@ fresh_perl_is(
 # an exception
 
 try { open $99, "<", "foo" };
-like($@->message, qr/Modification of a read-only value attempted/, "readonly fh");
+like($^EVAL_ERROR->message, qr/Modification of a read-only value attempted/, "readonly fh");

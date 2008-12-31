@@ -305,10 +305,10 @@ $snum = s/\ba/./g;
 ok( $_ eq '.aaa' && $snum == 1 );
 
 eval q% ($_ = "x") =~ s/(.)/$("$1 ")/ %;
-ok( $_ eq "x " and !length $@ );
+ok( $_ eq "x " and !length $^EVAL_ERROR );
 $x = $x = 'interp';
 eval q% ($_ = "x") =~ s/x(($x)*)/$(eval "$1")/ %;
-ok( $_ eq '' and !length $@ );
+ok( $_ eq '' and !length $^EVAL_ERROR );
 
 $_ = "C:/";
 ok( !s/^([a-z]:)/$(uc($1))/ );

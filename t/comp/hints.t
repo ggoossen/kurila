@@ -68,7 +68,7 @@ do {
 	print "not " unless $^H ^&^ 0x00020000;
 	print "ok 14 - \%^H contains HINT_LOCALIZE_HH at eval\"\"-time\n";
     *;
-    die if $@;
+    die if $^EVAL_ERROR;
 };
 BEGIN {
     print "not " if exists %^H{foo};
@@ -100,8 +100,8 @@ do {
             print %^H{x}==1 && !%^H{?y} ?? "ok\n" !! "not ok\n";
             %^H{+y} = 1;
         );
-        if ($@) {
-            print "not ok\n$($@->message)\n";
+        if ($^EVAL_ERROR) {
+            print "not ok\n$($^EVAL_ERROR->message)\n";
         }
     }
 };

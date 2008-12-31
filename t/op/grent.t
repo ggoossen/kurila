@@ -5,7 +5,7 @@ BEGIN {
 }
 
 try {my @n = @( getgrgid 0 )};
-if ($@ and $@->{?description} =~ m/(The \w+ function is unimplemented)/) {
+if ($^EVAL_ERROR and $^EVAL_ERROR->{?description} =~ m/(The \w+ function is unimplemented)/) {
     skip_all "getgrgid unimplemented";
 }
 
@@ -86,7 +86,7 @@ my %seen;
 
 print "# where $where\n";
 
-ok( setgrent(), 'setgrent' ) || print "# $!\n";
+ok( setgrent(), 'setgrent' ) || print "# $^OS_ERROR\n";
 
 while ( ~< *GR) {
     chomp;
@@ -100,7 +100,7 @@ while ( ~< *GR) {
 	next;
     }
     if ($n == $max) {
-	local $/;
+	local $^INPUT_RECORD_SEPARATOR;
 	my $junk = ~< *GR;
 	last;
     }

@@ -13,7 +13,7 @@ BEGIN { require "./test.pl"; }
 
 plan(tests => 46);
 
-$| = 1;
+$^OUTPUT_AUTOFLUSH = 1;
 
 use bytes;
 use utf8;
@@ -52,16 +52,16 @@ do {
     $a = chr(300); # This *is* UTF-encoded
     $b = chr(130); # This also.
 
-    open F, ">:utf8", 'a' or die $!;
+    open F, ">:utf8", 'a' or die $^OS_ERROR;
     print F $a,"\n";
     close F;
 
-    open F, "<:utf8", 'a' or die $!;
+    open F, "<:utf8", 'a' or die $^OS_ERROR;
     my $x = ~< *F;
     chomp($x);
     is( $x, chr(300) );
 
-    open F, "<", "a" or die $!; # Not UTF
+    open F, "<", "a" or die $^OS_ERROR; # Not UTF
     binmode(F, ":bytes");
     $x = ~< *F;
     chomp($x);
@@ -69,7 +69,7 @@ do {
     is( $x, $chr );
     close F;
 
-    open F, ">:utf8", 'a' or die $!;
+    open F, ">:utf8", 'a' or die $^OS_ERROR;
     binmode(F);  # we write a "\n" and then tell() - avoid CRLF issues.
     binmode(F,":utf8"); # turn UTF-8-ness back on
     print F $a;
@@ -89,20 +89,20 @@ do {
 
     close F;
 
-    open F, "<", "a" or die $!; # Not UTF
+    open F, "<", "a" or die $^OS_ERROR; # Not UTF
     binmode(F, ":bytes");
     $x = ~< *F;
     chomp($x);
     $chr = chr(300).chr(130);
     is( $x, $chr, sprintf('(%vd)', $x) );
 
-    open F, "<:utf8", "a" or die $!;
+    open F, "<:utf8", "a" or die $^OS_ERROR;
     $x = ~< *F;
     chomp($x);
     close F;
     is( $x, chr(300).chr(130), sprintf('(%vd)', $x) );
 
-    open F, ">", "a" or die $!;
+    open F, ">", "a" or die $^OS_ERROR;
     binmode(F, ":bytes:");
 
     # Now let's make it suffer.
@@ -111,34 +111,34 @@ do {
 	use warnings 'utf8';
 	local $^WARN_HOOK = sub { $w = @_[0] };
 	print F $a;
-        ok( (!$@));
+        ok( (!$^EVAL_ERROR));
 	ok( ! $w, , "No 'Wide character in print' warning" );
     };
 };
 
 # Hm. Time to get more evil.
-open F, ">:utf8", "a" or die $!;
+open F, ">:utf8", "a" or die $^OS_ERROR;
 print F $a;
 binmode(F, ":bytes");
 print F chr(130)."\n";
 close F;
 
-open F, "<", "a" or die $!;
+open F, "<", "a" or die $^OS_ERROR;
 binmode(F, ":bytes");
 my $x = ~< *F; chomp $x;
 $chr = chr(130);
 is( $x, $a . $chr );
 
 # Right.
-open F, ">:utf8", "a" or die $!;
+open F, ">:utf8", "a" or die $^OS_ERROR;
 print F $a;
 close F;
-open F, ">>", "a" or die $!;
+open F, ">>", "a" or die $^OS_ERROR;
 binmode(F, ":bytes");
 print F bytes::chr(130)."\n";
 close F;
 
-open F, "<", "a" or die $!;
+open F, "<", "a" or die $^OS_ERROR;
 binmode(F, ":bytes");
 $x = ~< *F; chomp $x;
 is( $x, $a . bytes::chr(130) );
@@ -147,7 +147,7 @@ is( $x, $a . bytes::chr(130) );
 
 SKIP: do {
 	my @warnings;
-	open F, "<:utf8", "a" or die $!;
+	open F, "<:utf8", "a" or die $^OS_ERROR;
 	$x = ~< *F; chomp $x;
 	local $^WARN_HOOK = sub { push @warnings, @_[0]->message; };
 	try { sprintf "\%vd\n", $x };
@@ -233,8 +233,8 @@ do {
     # <FH> on a :utf8 stream should complain immediately with -w
     # if it finds bad UTF-8 (:encoding(utf8) works this way)
     use warnings 'utf8';
-    undef $@;
-    local $^WARN_HOOK = sub { $@ = shift };
+    undef $^EVAL_ERROR;
+    local $^WARN_HOOK = sub { $^EVAL_ERROR = shift };
     open F, ">", "a";
     binmode F;
     my @($chrE4, $chrF6) = @("\x[E4]", "\x[F6]");
@@ -242,14 +242,14 @@ do {
     print F "foo", $chrF6, "\n";
     close F;
     open F, "<:utf8", "a";
-    undef $@;
+    undef $^EVAL_ERROR;
     my $line = ~< *F;
     my @($chrE4, $chrF6) = @("E4", "F6");
-    like( $@->message, qr/utf8 "\\x$chrE4" does not map to Unicode/,
+    like( $^EVAL_ERROR->message, qr/utf8 "\\x$chrE4" does not map to Unicode/,
 	  "<:utf8 readline must warn about bad utf8");
-    undef $@;
+    undef $^EVAL_ERROR;
     $line .= ~< *F;
-    like( $@->message, qr/utf8 "\\x$chrF6" does not map to Unicode/,
+    like( $^EVAL_ERROR->message, qr/utf8 "\\x$chrF6" does not map to Unicode/,
 	  "<:utf8 rcatline must warn about bad utf8");
     close F;
 };

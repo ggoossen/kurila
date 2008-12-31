@@ -31,6 +31,6 @@ my $c = scalar nelems @File::Temp::EXPORT;
 my $l = join ' ', @File::Temp::EXPORT;
 ok( $c == 9, "really exporting $c: $l" );
 
-ok(defined try { SEEK_SET() }, 'SEEK_SET defined by File::Temp') or diag $@;
-ok(defined try { SEEK_END() }, 'SEEK_END defined by File::Temp') or diag $@;
-ok(defined try { SEEK_CUR() }, 'SEEK_CUR defined by File::Temp') or diag $@;
+ok(defined try { SEEK_SET() }, 'SEEK_SET defined by File::Temp') or diag $^EVAL_ERROR;
+ok(defined try { SEEK_END() }, 'SEEK_END defined by File::Temp') or diag $^EVAL_ERROR;
+ok(defined try { SEEK_CUR() }, 'SEEK_CUR defined by File::Temp') or diag $^EVAL_ERROR;

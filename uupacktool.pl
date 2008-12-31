@@ -25,8 +25,8 @@ sub handle_file {
     my $mode    = @(stat($file))[2] ^&^ 07777;
 
     open my $fh, "<", $file
-        or do { warn "Could not open input file $file: $!"; exit 0 };
-    my $str = do { local $/; ~< $fh };
+        or do { warn "Could not open input file $file: $^OS_ERROR"; exit 0 };
+    my $str = do { local $^INPUT_RECORD_SEPARATOR; ~< $fh };
 
     ### unpack?
     my $outstr;
@@ -71,7 +71,7 @@ EOFBLURB
         $outfile = VMS::Filespec::vmsify($outfile) if $^O eq 'VMS';
         print "Writing $file into $outfile\n" if $opts->{?'v'};
         open my $outfh, ">", $outfile
-            or do { warn "Could not open $outfile for writing: $!"; exit 0 };
+            or do { warn "Could not open $outfile for writing: $^OS_ERROR"; exit 0 };
         binmode $outfh;
         ### $outstr might be empty, if the file was empty
         print $outfh $outstr if $outstr;
@@ -90,7 +90,7 @@ sub bulk_process {
     my $opts = shift;
     my $Manifest = $opts->{?'m'};
 
-    open my $fh, "<", $Manifest or die "Could not open '$Manifest':$!";
+    open my $fh, "<", $Manifest or die "Could not open '$Manifest':$^OS_ERROR";
 
     print "Reading $Manifest\n"
             if $opts->{?'v'};
@@ -204,7 +204,7 @@ die < usage() if $opts->{?'h'};
 
 if ( $opts->{?'d'} ) {
     chdir $opts->{?'d'}
-        or die "Failed to chdir to '$opts->{?'d'}':$!";
+        or die "Failed to chdir to '$opts->{?'d'}':$^OS_ERROR";
 }
 $opts->{+'u'} = 1 if !$opts->{?'p'};
 binmode STDOUT if $opts->{?'s'};

@@ -13,7 +13,7 @@ ok( require filetest, 'required pragma successfully' );
 
 # and here's one culprit, right here
 try { filetest->import('bad subpragma') };
-is( $@->{?description}, $error, 'filetest dies with bad subpragma on import' );
+is( $^EVAL_ERROR->{?description}, $error, 'filetest dies with bad subpragma on import' );
 
 is( $^H ^&^ $hint_bits, 0, 'hint bits not set without pragma in place' );
 
@@ -31,20 +31,20 @@ filetest->unimport('access');
 is( $^H ^&^ $hint_bits, 0, 'hint bits not set with pragma unimported' );
 
 try { filetest->unimport() };
-is( $@->{?description}, $error, 'filetest dies without subpragma on unimport' );
+is( $^EVAL_ERROR->{?description}, $error, 'filetest dies without subpragma on unimport' );
 
 # there'll be a compilation aborted failure here, with the eval string
 eval "no filetest 'fake pragma'";
-like( $@->{?description}, qr/^$error/, 'filetest dies with bad subpragma on unuse' );
+like( $^EVAL_ERROR->{?description}, qr/^$error/, 'filetest dies with bad subpragma on unuse' );
 
 eval "use filetest 'bad subpragma'";
-like( $@->{?description}, qr/^$error/, 'filetest dies with bad subpragma on use' );
+like( $^EVAL_ERROR->{?description}, qr/^$error/, 'filetest dies with bad subpragma on use' );
 
 eval "use filetest";
-like( $@->{?description}, qr/^$error/, 'filetest dies with missing subpragma on use' );
+like( $^EVAL_ERROR->{?description}, qr/^$error/, 'filetest dies with missing subpragma on use' );
 
 eval "no filetest";
-like( $@->{?description}, qr/^$error/, 'filetest dies with missing subpragma on unuse' );
+like( $^EVAL_ERROR->{?description}, qr/^$error/, 'filetest dies with missing subpragma on unuse' );
 
 SKIP: do {
     # A real test for filetest.
@@ -59,13 +59,13 @@ SKIP: do {
 
     try {
 	if (!-e $tstfile) {
-	    open(T, ">", "$tstfile") or die "Can't create $tstfile: $!";
+	    open(T, ">", "$tstfile") or die "Can't create $tstfile: $^OS_ERROR";
 	    close T;
 	}
 	system($chflags, "uchg", $tstfile);
-	die "Can't exec $chflags uchg" if $? != 0;
+	die "Can't exec $chflags uchg" if $^CHILD_ERROR != 0;
     };
-    skip("Errors in test using chflags: $@", 4) if $@;
+    skip("Errors in test using chflags: $^EVAL_ERROR", 4) if $^EVAL_ERROR;
 
     do {
 	use filetest 'access';
@@ -90,5 +90,5 @@ SKIP: do {
     # cleanup
     system($chflags, "nouchg", $tstfile);
     unlink $tstfile;
-    warn "Can't remove $tstfile: $!" if -e $tstfile;
+    warn "Can't remove $tstfile: $^OS_ERROR" if -e $tstfile;
 };

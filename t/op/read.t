@@ -8,7 +8,7 @@ BEGIN {
 plan tests => 24;
 
 open(FOO, "<",'op/read.t') || open(FOO, "<",'t/op/read.t') || open(FOO, "<",':op:read.t') || die "Can't open op.read";
-seek(FOO,4,0) or die "Seek failed: $!";
+seek(FOO,4,0) or die "Seek failed: $^OS_ERROR";
 my $buf;
 my $got = read(FOO,$buf,4);
 
@@ -35,7 +35,7 @@ do {
     use utf8;
     my $value = "\x{236a}" x 3; # e2.8d.aa x 3
 
-    open FH, ">", "$tmpfile" or die "Can't open $tmpfile: $!";
+    open FH, ">", "$tmpfile" or die "Can't open $tmpfile: $^OS_ERROR";
     print FH $value;
     close FH;
 
@@ -49,7 +49,7 @@ do {
     {
         my @($length, $offset, $buffer, $expect_length, $expect) =  @$_;
         my $buffer = "";
-        open FH, "<", $tmpfile or die "Can't open $tmpfile: $!";
+        open FH, "<", $tmpfile or die "Can't open $tmpfile: $^OS_ERROR";
         $got = read (FH, $buffer, $length, $offset);
         is($got, $expect_length);
         is($buffer, $expect);
@@ -66,7 +66,7 @@ do {
     {
         my @($length, $offset, $buffer, $expect_length, $expect) =  @$_;
         my $buffer = "";
-        open FH, "<", $tmpfile or die "Can't open $tmpfile: $!";
+        open FH, "<", $tmpfile or die "Can't open $tmpfile: $^OS_ERROR";
         $got = read (FH, $buffer, $length, $offset);
         is($got, $expect_length);
         is($buffer, $expect);

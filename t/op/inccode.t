@@ -25,11 +25,11 @@ sub get_temp_fh {
     my $f = "DummyModule0000";
     1 while -e ++$f;
     push @tempfiles, $f;
-    open my $fh, ">", "$f" or die "Can't create $f: $!";
+    open my $fh, ">", "$f" or die "Can't create $f: $^OS_ERROR";
     print $fh "package ".substr(@_[0],0,-3).";\n1;\n";
     print $fh @_[1] if (nelems @_) +> 1;
-    close $fh or die "Couldn't close: $!";
-    open $fh, "<", $f or die "Can't open $f: $!";
+    close $fh or die "Couldn't close: $^OS_ERROR";
+    open $fh, "<", $f or die "Can't open $f: $^OS_ERROR";
     return $fh;
 }
 
@@ -51,21 +51,21 @@ my $evalret = try { require Bar; 1 };
 ok( !$evalret,      'Trying non-magic package' );
 
 $evalret = try { require Foo; 1 };
-die $@ if $@;
+die $^EVAL_ERROR if $^EVAL_ERROR;
 ok( $evalret,                      'require Foo; magic via code ref'  );
 ok( exists %INC{'Foo.pm'},         '  %INC sees Foo.pm' );
 is( ref %INC{?'Foo.pm'}, 'CODE',    '  val Foo.pm is a coderef in %INC' );
 cmp_ok( %INC{?'Foo.pm'}, '\==', \&fooinc,	   '  val Foo.pm is correct in %INC' );
 
 $evalret = eval "use Foo1; 1;";
-die $@ if $@;
+die $^EVAL_ERROR if $^EVAL_ERROR;
 ok( $evalret,                      'use Foo1' );
 ok( exists %INC{'Foo1.pm'},        '  %INC sees Foo1.pm' );
 is( ref %INC{?'Foo1.pm'}, 'CODE',   '  val Foo1.pm is a coderef in %INC' );
 cmp_ok( %INC{?'Foo1.pm'}, '\==', \&fooinc,     '  val Foo1.pm is correct in %INC' );
 
 $evalret = try { do 'Foo2.pl'; 1 };
-die $@ if $@;
+die $^EVAL_ERROR if $^EVAL_ERROR;
 ok( $evalret,                      'do "Foo2.pl"' );
 ok( exists %INC{'Foo2.pl'},        '  %INC sees Foo2.pl' );
 is( ref %INC{?'Foo2.pl'}, 'CODE',   '  val Foo2.pl is a coderef in %INC' );
@@ -88,19 +88,19 @@ my $arrayref = \@( \&fooinc2, 'Bar' );
 push @INC, $arrayref;
 
 $evalret = try { require Foo; 1; };
-die $@ if $@;
+die $^EVAL_ERROR if $^EVAL_ERROR;
 ok( $evalret,                     'Originally loaded packages preserved' );
 $evalret = try { require Foo3; 1; };
 ok( !$evalret,                    'Original magic INC purged' );
 
 $evalret = try { require Bar; 1 };
-die $@ if $@;
+die $^EVAL_ERROR if $^EVAL_ERROR;
 ok( $evalret,                     'require Bar; magic via array ref' );
 ok( exists %INC{'Bar.pm'},        '  %INC sees Bar.pm' );
 is( ref %INC{?'Bar.pm'}, 'ARRAY',  '  val Bar.pm is an arrayref in %INC' );
 cmp_ok( %INC{?'Bar.pm'}, '\==', $arrayref,    '  val Bar.pm is correct in %INC' );
 
-ok( eval "use Bar1; 1;",          'use Bar1' ); die if $@;
+ok( eval "use Bar1; 1;",          'use Bar1' ); die if $^EVAL_ERROR;
 ok( exists %INC{'Bar1.pm'},       '  %INC sees Bar1.pm' );
 is( ref %INC{?'Bar1.pm'}, 'ARRAY', '  val Bar1.pm is an arrayref in %INC' );
 cmp_ok( %INC{?'Bar1.pm'}, '\==', $arrayref,   '  val Bar1.pm is correct in %INC' );
@@ -126,7 +126,7 @@ my $href = bless( \%(), 'FooLoader' );
 push @INC, $href;
 
 $evalret = try { require Quux; 1 };
-die $@ if $@;
+die $^EVAL_ERROR if $^EVAL_ERROR;
 ok( $evalret,                      'require Quux; magic via hash object' );
 ok( exists %INC{'Quux.pm'},        '  %INC sees Quux.pm' );
 is( ref %INC{?'Quux.pm'}, 'FooLoader',
@@ -139,7 +139,7 @@ my $aref = bless( \@(), 'FooLoader' );
 push @INC, $aref;
 
 $evalret = try { require Quux1; 1 };
-die $@ if $@;
+die $^EVAL_ERROR if $^EVAL_ERROR;
 ok( $evalret,                      'require Quux1; magic via array object' );
 ok( exists %INC{'Quux1.pm'},       '  %INC sees Quux1.pm' );
 is( ref %INC{?'Quux1.pm'}, 'FooLoader',
@@ -152,7 +152,7 @@ my $sref = bless( \(my $x = 1), 'FooLoader' );
 push @INC, $sref;
 
 $evalret = try { require Quux2; 1 };
-die $@ if $@;
+die $^EVAL_ERROR if $^EVAL_ERROR;
 ok( $evalret,                      'require Quux2; magic via scalar object' );
 ok( exists %INC{'Quux2.pm'},       '  %INC sees Quux2.pm' );
 is( ref %INC{?'Quux2.pm'}, 'FooLoader',
@@ -173,7 +173,7 @@ push @INC, sub {
 };
 
 $evalret = try { require Toto; 1 };
-die $@ if $@;
+die $^EVAL_ERROR if $^EVAL_ERROR;
 ok( $evalret,                      'require Toto; magic via anonymous code ref'  );
 ok( exists %INC{'Toto.pm'},        '  %INC sees Toto.pm' );
 ok( ! ref %INC{?'Toto.pm'},         q/  val Toto.pm isn't a ref in %INC/ );
@@ -216,7 +216,7 @@ SKIP: do {
         my $module = $filename; $module =~ s,/,::,g; $module =~ s/\.pm$//;
         open my $fh, '<',
              \"package $module; sub complain \{ warn q(barf) \}; \$main::file = __FILE__;"
-	    or die $!;
+	    or die $^OS_ERROR;
         %INC{+$filename} = "/custom/path/to/$filename";
         return $fh;
     };
@@ -247,12 +247,12 @@ if ($can_fork) {
 	    # Parent
 	    return $fh;
 	}
-	die "Can't fork self: $!" unless defined $pid;
+	die "Can't fork self: $^OS_ERROR" unless defined $pid;
 
 	# Child
 	my $count = $1;
 	# Lets force some fun with odd sized reads.
-	$| = 1;
+	$^OUTPUT_AUTOFLUSH = 1;
 	print 'push @main::bbblplast, ';
 	print "$count;\n";
 	if ($count--) {
@@ -261,7 +261,7 @@ if ($can_fork) {
         print "pass('In @_[1]');";
 	print '"Truth"';
 	POSIX::_exit(0);
-	die "Can't get here: $!";
+	die "Can't get here: $^OS_ERROR";
     };
 
     @::bbblplast = @( () );

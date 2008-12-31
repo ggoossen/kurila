@@ -63,18 +63,18 @@ do {
 };
 
 SKIP: do {
-	skip("Cannot write test files: $!", 7) unless $can_write;
+	skip("Cannot write test files: $^OS_ERROR", 7) unless $can_write;
 
 	$mm->{+IMPORTS} = \%( foo => 'bar' );
 
-	local $@->{description};
+	local $^EVAL_ERROR->{description};
 	try { $mm->dlsyms() };
-	like( $@->{?description}, qr/Can.t mkdir tmp_imp/, 
+	like( $^EVAL_ERROR->{?description}, qr/Can.t mkdir tmp_imp/, 
 		'... should die if directory cannot be made' );
 
-	unlink('tmp_imp') or skip("Cannot remove test file: $!", 9);
+	unlink('tmp_imp') or skip("Cannot remove test file: $^OS_ERROR", 9);
 	try { $mm->dlsyms() };
-	like( $@->{?description}, qr/Malformed IMPORT/, 'should die from malformed import symbols');
+	like( $^EVAL_ERROR->{?description}, qr/Malformed IMPORT/, 'should die from malformed import symbols');
 
 	$mm->{+IMPORTS} = \%( foo => 'bar.baz' );
 
@@ -95,20 +95,20 @@ SKIP: do {
 	try { $mm->dlsyms() };
 
 	like( $sysargs, qr/^emximp/, '... should try to call system() though' );
-	like( $@->{?description}, qr/Cannot make import library/, 
+	like( $^EVAL_ERROR->{?description}, qr/Cannot make import library/, 
 		'... should die if emximp syscall fails' );
 
 	# sysfail is 0 now, call emximp call should succeed
 	try { $mm->dlsyms() };
 	is( $unlinked, 1, '... should attempt to unlink temp files' );
-	like( $@->{?description}, qr/Cannot extract import/, 
+	like( $^EVAL_ERROR->{?description}, qr/Cannot extract import/, 
 		'... should die if other syscall fails' );
 	
 	# make both syscalls succeed
 	@sysfail = @(0, 0);
-	local $@->{description};
+	local $^EVAL_ERROR->{description};
 	try { $mm->dlsyms() };
-	is( $@, '', '... should not die if both syscalls succeed' );
+	is( $^EVAL_ERROR, '', '... should not die if both syscalls succeed' );
 };
 
 # static_lib

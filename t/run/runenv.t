@@ -43,16 +43,16 @@ sub runperl {
   env::temp_set_var('PERL5LIB', undef);
   env::temp_set_var('PERL5OPT', undef);
   my $pid = fork;
-  return  @(0, "Couldn't fork: $!") unless defined $pid;   # failure
+  return  @(0, "Couldn't fork: $^OS_ERROR") unless defined $pid;   # failure
   if ($pid) {                   # parent
     my ($actual_stdout, $actual_stderr);
     wait;
-    return  @(0, "Failure in child.\n") if ($?>>8) == $FAILURE_CODE;
+    return  @(0, "Failure in child.\n") if ($^CHILD_ERROR>>8) == $FAILURE_CODE;
 
     open F, "<", $STDOUT or return  @(0, "Couldn't read $STDOUT file");
-    do { local $/; $actual_stdout = ~< *F };
+    do { local $^INPUT_RECORD_SEPARATOR; $actual_stdout = ~< *F };
     open F, "<", $STDERR or return  @(0, "Couldn't read $STDERR file");
-    do { local $/; $actual_stderr = ~< *F };
+    do { local $^INPUT_RECORD_SEPARATOR; $actual_stderr = ~< *F };
 
     if ($actual_stdout ne $stdout) {
       return  @(0, "Stdout mismatch: expected:\n[$stdout]\nsaw:\n[$actual_stdout]");

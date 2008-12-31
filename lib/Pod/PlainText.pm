@@ -562,7 +562,7 @@ sub pod2text {
     if (defined @_[1]) {
         local *IN;
         unless (open (IN, "<", @_[0])) {
-            die ("Can't open @_[0] for reading: $!\n");
+            die ("Can't open @_[0] for reading: $^OS_ERROR\n");
             return;
         }
         @_[0] = \*IN;

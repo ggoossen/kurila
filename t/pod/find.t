@@ -11,7 +11,7 @@ BEGIN {
   }
 }
 
-$| = 1;
+$^OUTPUT_AUTOFLUSH = 1;
 
 use Test;
 

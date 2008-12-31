@@ -103,8 +103,8 @@ ok( -r 'install-test/packlist',              '  packlist exists' );
 ok( -r 'install-test/lib/perl/Big/Dummy.pm', '  UNINST=1 preserved same' );
 
 
-chmod 0644, 'blib/lib/Big/Dummy.pm' or die $!;
-open(DUMMY, ">>", "blib/lib/Big/Dummy.pm") or die $!;
+chmod 0644, 'blib/lib/Big/Dummy.pm' or die $^OS_ERROR;
+open(DUMMY, ">>", "blib/lib/Big/Dummy.pm") or die $^OS_ERROR;
 print DUMMY "Extra stuff\n";
 close DUMMY;
 
@@ -197,7 +197,7 @@ do {
   my $sfile='blib/lib/Big/Dummy.pm';
   ok(-r $tfile,"install file already exists");
   ok(-r $sfile,"source file already exists");
-  utime time-600, time-600, $sfile or die "utime '$sfile' failed:$!";   
+  utime time-600, time-600, $sfile or die "utime '$sfile' failed:$^OS_ERROR";   
   ok( @(stat $tfile)[9]!=@(stat $sfile)[9],'  Times are different');
   install(\@(from_to=>\%( 'blib/lib' => 'install-test/other_lib/perl',
            read   => 'install-test/packlist',
@@ -218,7 +218,7 @@ do {
   my $sfile='blib/lib/Big/Dummy.pm';
   ok(-r $tfile,"install file already exists");
   ok(-r $sfile,"source file already exists");
-  utime time-1200, time-1200, $sfile or die "utime '$sfile' failed:$!";   
+  utime time-1200, time-1200, $sfile or die "utime '$sfile' failed:$^OS_ERROR";   
   ok( @(stat $tfile)[9]!=@(stat $sfile)[9],'  Times are different');
   install(\@(from_to=>\%( 'blib/lib' => 'install-test/other_lib/perl',
            read   => 'install-test/packlist',

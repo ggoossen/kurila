@@ -20,12 +20,12 @@ chdir dirname($0);
 my $file = basename($0, '.PL');
 $file .= '.com' if $^O eq 'VMS';
 
-open OUT, ">", "$file" or die "Can't create $file: $!";
+open OUT, ">", "$file" or die "Can't create $file: $^OS_ERROR";
 
 # extract patchlevel.h information
 
 open PATCH_LEVEL, "<", catfile( updir, "patchlevel.h")
-    or die "Can't open patchlevel.h: $!";
+    or die "Can't open patchlevel.h: $^OS_ERROR";
 
 my $patchlevel_date = @(stat *PATCH_LEVEL)[9];
 
@@ -49,7 +49,7 @@ while ( ~< *PATCH_LEVEL) {
 my $patch_desc = "'" . join("',\n    '", @patches) . "'";
 my $patch_tags = join "", map m/(\S+)/ ?? "+$1 " !! (), @patches;
 
-close(PATCH_LEVEL) or die "Error closing patchlevel.h: $!";
+close(PATCH_LEVEL) or die "Error closing patchlevel.h: $^OS_ERROR";
 
 # TO DO (prehaps): store/embed $Config::config_sh into perlbug. When perlbug is
 # used, compare $Config::config_sh with the stored version. If they differ then
@@ -1379,7 +1379,7 @@ None known (guess what must have been used to report them?)
 
 !NO!SUBS!
 
-close OUT or die "Can't close $file: $!";
-chmod 0755, $file or die "Can't reset permissions for $file: $!\n";
+close OUT or die "Can't close $file: $^OS_ERROR";
+chmod 0755, $file or die "Can't reset permissions for $file: $^OS_ERROR\n";
 exec("$(config_value('eunicefix')) $file") if config_value('eunicefix') ne ':';
 chdir $origdir;

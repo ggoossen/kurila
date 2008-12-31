@@ -80,7 +80,7 @@ if (1) {
     # test for fatal errors. Im unsettled on fail vs die.
     # calling fail isnt good enough by itself.
 
-    $@='';
+    $^EVAL_ERROR='';
     try {
 	checkOptree ( name	=> 'test against empty expectations',
 		      bcopts	=> '-exec',
@@ -88,9 +88,9 @@ if (1) {
 		      expect	=> '',
 		      expect_nt	=> '');
     };
-    like($@->{?description}, m/no '\w+' golden-sample found/, "empty expectations prevented");
+    like($^EVAL_ERROR->{?description}, m/no '\w+' golden-sample found/, "empty expectations prevented");
     
-    $@='';
+    $^EVAL_ERROR='';
     try {
 	checkOptree ( name	=> 'prevent whitespace only expectations',
 		      bcopts	=> '-exec',
@@ -99,7 +99,7 @@ if (1) {
 		      expect_nt	=> "\n",
 		      expect	=> "\n");
     };
-    like($@->{?description}, m/no '\w+' golden-sample found/,
+    like($^EVAL_ERROR->{?description}, m/no '\w+' golden-sample found/,
 	 "just whitespace expectations prevented");
 }
     

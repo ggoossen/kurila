@@ -28,7 +28,7 @@ alarm 0;
 my $diff = time - $start_time;
 
 # alarm time might be one second less than you said.
-is( $@->{?description}, "ALARM!\n",             'alarm w/$SIG{ALRM} vs inf loop' );
+is( $^EVAL_ERROR->{?description}, "ALARM!\n",             'alarm w/$SIG{ALRM} vs inf loop' );
 ok( abs($diff - 3) +<= 1,   "   right time" );
 
 
@@ -42,7 +42,7 @@ alarm 0;
 $diff = time - $start_time;
 
 # alarm time might be one second less than you said.
-is( $@->{?description}, "ALARM!\n",             'alarm w/$SIG{ALRM} vs system()' );
+is( $^EVAL_ERROR->{?description}, "ALARM!\n",             'alarm w/$SIG{ALRM} vs system()' );
 
 do {
     local our $TODO = "Why does system() block alarm() on $^O?"

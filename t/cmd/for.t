@@ -135,7 +135,7 @@ for (1 .. 3) {
 is ($r, '123', 'Forwards for list via ..');
 $r = '';
 try { for ('A' .. 'C') { $r .= $_; } };
-is($@->message =~ m/Range must be numeric/, 1, "for with non-numeric range");
+is($^EVAL_ERROR->message =~ m/Range must be numeric/, 1, "for with non-numeric range");
 
 $r = '';
 for (reverse @array) {
@@ -165,7 +165,7 @@ is ($r, '321', 'Reverse for list via ..');
 $r = '';
 
 try { for (reverse 'A' .. 'C') { $r .= $_; } };
-is($@->message =~ m/Range must be numeric/, 1, "for with non-numeric range");
+is($^EVAL_ERROR->message =~ m/Range must be numeric/, 1, "for with non-numeric range");
 
 $r = '';
 for my $i ( @array) {

@@ -80,7 +80,7 @@ sub _make_fatal {
     } else {			# CORE subroutine
         $proto = try { prototype "CORE::$name" };
 	die "$name is neither a builtin, nor a Perl subroutine" 
-	  if $@;
+	  if $^EVAL_ERROR;
 	die "Cannot make the non-overridable builtin $name fatal"
 	  if not defined $proto;
 	$core = 1;
@@ -102,7 +102,7 @@ EOS
     print $code if $Debug;
     do {
       $code = eval("package $pkg; $code");
-      die if $@;
+      die if $^EVAL_ERROR;
       no warnings;   # to avoid: Subroutine foo redefined ...
       *{$sub} = $code;
     };

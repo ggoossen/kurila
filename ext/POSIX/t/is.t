@@ -9,7 +9,7 @@ use POSIX;
 # so let's reset to the default.
 setlocale(LC_ALL, 'C') if config_value("d_setlocale");
 
-$| = 1;
+$^OUTPUT_AUTOFLUSH = 1;
 
 # List of characters (and strings) to feed to the is<xxx> functions.
 #

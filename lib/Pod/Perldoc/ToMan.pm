@@ -100,10 +100,10 @@ sub parse_from_file {
      and print "filter_nroff isn't set, so not filtering.\n";
   }
 
-  if (($err = $?)) {
+  if (($err = $^CHILD_ERROR)) {
     defined(&Pod::Perldoc::DEBUG)
      and Pod::Perldoc::DEBUG()
-     and print "Nonzero exit ($?) while running $command.\n",
+     and print "Nonzero exit ($^CHILD_ERROR) while running $command.\n",
                "Falling back to Pod::Perldoc::ToPod\n ",
     ;
     # A desperate fallthru:
@@ -112,7 +112,7 @@ sub parse_from_file {
     
   } else {
     print $outfh $rslt
-     or die "Can't print to %$self{?__output_file}: $!";
+     or die "Can't print to %$self{?__output_file}: $^OS_ERROR";
   }
   
   return;

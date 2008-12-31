@@ -14,7 +14,7 @@ BEGIN {
 }
 
 
-$| = 1;
+$^OUTPUT_AUTOFLUSH = 1;
 
 our @s;
 our $fail;
@@ -78,26 +78,26 @@ if ($^O eq 'unicos') {
 # one megabyte blocks...)
 
 sysopen(BIG, "big1", O_WRONLY^|^O_CREAT^|^O_TRUNC) or
-    do { warn "sysopen big1 failed: $!\n"; bye };
+    do { warn "sysopen big1 failed: $^OS_ERROR\n"; bye };
 sysseek(BIG, 1_000_000, SEEK_SET) or
-    do { warn "sysseek big1 failed: $!\n"; bye };
+    do { warn "sysseek big1 failed: $^OS_ERROR\n"; bye };
 syswrite(BIG, "big") or
-    do { warn "syswrite big1 failed; $!\n"; bye };
+    do { warn "syswrite big1 failed; $^OS_ERROR\n"; bye };
 close(BIG) or
-    do { warn "close big1 failed: $!\n"; bye };
+    do { warn "close big1 failed: $^OS_ERROR\n"; bye };
 
 my @s1 = @( stat("big1") );
 
 print "# s1 = $(join ' ',@s1)\n";
 
 sysopen(BIG, "big2", O_WRONLY^|^O_CREAT^|^O_TRUNC) or
-    do { warn "sysopen big2 failed: $!\n"; bye };
+    do { warn "sysopen big2 failed: $^OS_ERROR\n"; bye };
 sysseek(BIG, 2_000_000, SEEK_SET) or
-    do { warn "sysseek big2 failed: $!\n"; bye };
+    do { warn "sysseek big2 failed: $^OS_ERROR\n"; bye };
 syswrite(BIG, "big") or
-    do { warn "syswrite big2 failed; $!\n"; bye };
+    do { warn "syswrite big2 failed; $^OS_ERROR\n"; bye };
 close(BIG) or
-    do { warn "close big2 failed: $!\n"; bye };
+    do { warn "close big2 failed: $^OS_ERROR\n"; bye };
 
 my @s2 = @( stat("big2") );
 
@@ -128,29 +128,29 @@ exit 0;
 EOF
 
 sysopen(BIG, "big", O_WRONLY^|^O_CREAT^|^O_TRUNC) or
-	do { warn "sysopen 'big' failed: $!\n"; bye };
+	do { warn "sysopen 'big' failed: $^OS_ERROR\n"; bye };
 my $sysseek = sysseek(BIG, 5_000_000_000, SEEK_SET);
 unless (! $r && defined $sysseek && $sysseek == 5_000_000_000) {
     $sysseek = 'undef' unless defined $sysseek;
     explain("seeking past 2GB failed: ",
-	    $r ?? 'signal '.($r ^&^ 0x7f) !! "$! (sysseek returned $sysseek)");
+	    $r ?? 'signal '.($r ^&^ 0x7f) !! "$^OS_ERROR (sysseek returned $sysseek)");
     bye();
 }
 
 # The syswrite will fail if there are are filesize limitations (process or fs).
 my $syswrite = syswrite(BIG, "big");
-print "# syswrite failed: $! (syswrite returned ",
+print "# syswrite failed: $^OS_ERROR (syswrite returned ",
       defined $syswrite ?? $syswrite !! 'undef', ")\n"
     unless defined $syswrite && $syswrite == 3;
 my $close     = close BIG;
-print "# close failed: $!\n" unless $close;
+print "# close failed: $^OS_ERROR\n" unless $close;
 unless($syswrite && $close) {
-    if ($! =~m/too large/i) {
+    if ($^OS_ERROR =~m/too large/i) {
 	explain("writing past 2GB failed: process limits?");
-    } elsif ($! =~ m/quota/i) {
+    } elsif ($^OS_ERROR =~ m/quota/i) {
 	explain("filesystem quota limits?");
     } else {
-	explain("error: $!");
+	explain("error: $^OS_ERROR");
     }
     bye();
 }
@@ -206,7 +206,7 @@ print "ok 3\n";
 fail unless -f "big";
 print "ok 4\n";
 
-sysopen(BIG, "big", O_RDONLY) or do { warn "sysopen failed: $!\n"; bye };
+sysopen(BIG, "big", O_RDONLY) or do { warn "sysopen failed: $^OS_ERROR\n"; bye };
 
 offset('sysseek(BIG, 4_500_000_000, SEEK_SET)', 4_500_000_000);
 print "ok 5\n";

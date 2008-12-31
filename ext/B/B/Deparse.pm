@@ -595,8 +595,8 @@ sub compile {
 	if ($^W) { # deparse -w
 	    print qq(BEGIN \{ \$^W = $^W; \}\n);
 	}
-	if ($/ ne "\n" or defined $O::savebackslash) { # deparse -l and -0
-	    my $fs = perlstring($/) || 'undef';
+	if ($^INPUT_RECORD_SEPARATOR ne "\n" or defined $O::savebackslash) { # deparse -l and -0
+	    my $fs = perlstring($^INPUT_RECORD_SEPARATOR) || 'undef';
 	    my $bs = perlstring($O::savebackslash) || 'undef';
 	    print qq(BEGIN \{ \$/ = $fs; \$\\ = $bs; \}\n);
 	}

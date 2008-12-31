@@ -4,7 +4,7 @@
 #
 
 BEGIN {
-    $| = 1;
+    $^OUTPUT_AUTOFLUSH = 1;
     require "./test.pl";
 }
 
@@ -107,7 +107,7 @@ dies_like( sub { $a->VERSION(2.719) },
            qr/^Alice version 2.719 required--this is only version 2.718/ );
 
 ok (try { $a->VERSION(2.718) });
-is $@, '';
+is $^EVAL_ERROR, '';
 
 my $subs = join ' ', sort grep { defined &{Symbol::fetch_glob("UNIVERSAL::$_")} } keys %UNIVERSAL::;
 ## The test for import here is *not* because we want to ensure that UNIVERSAL
@@ -163,7 +163,7 @@ ok $x->isa('UNIVERSAL');
 # Check that the "historical accident" of UNIVERSAL having an import()
 # method doesn't effect anyone else.
 try { 'Some::Package'->import("bar") };
-is $@, '';
+is $^EVAL_ERROR, '';
 
 
 # This segfaulted in a blead.
@@ -191,7 +191,7 @@ package Bodine;
 Bodine->isa('Pig');
 *isa = \&UNIVERSAL::isa;
 try { isa(\%(), 'HASH') };
-main::is($@, '', "*isa correctly found");
+main::is($^EVAL_ERROR, '', "*isa correctly found");
 
 package main;
 main::dies_like( sub { UNIVERSAL::DOES(\@(), "foo") },

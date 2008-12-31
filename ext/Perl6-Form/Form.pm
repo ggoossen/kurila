@@ -1234,7 +1234,7 @@ sub section {
     $structure = \ values %$structure if ref $structure eq 'HASH';
     my @section;
     for my $row (  @$structure ) {
-		local $,=",";
+		local $^OUTPUT_FIELD_SEPARATOR=",";
         my $type = ref $row or die "Too many indices (starting with [$(join ' ',@index)])";
         if ($type eq 'HASH') {
 			@index = keys %$row unless (nelems @index);

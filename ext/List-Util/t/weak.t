@@ -175,7 +175,7 @@ SKIP: do {
     $b = $a;
     try{weaken($b)};
     # we didn't die
-    ok($@ eq "") or print "# died with $@\n";
+    ok($^EVAL_ERROR eq "") or print "# died with $^EVAL_ERROR\n";
     ok(isweak($b));
     ok($$b eq "hello") or print "# b is '$$b'\n";
     $a="";

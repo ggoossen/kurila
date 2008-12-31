@@ -28,7 +28,7 @@ END {
 }
 
 ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
-  diag("chdir failed: $!");
+  diag("chdir failed: $^OS_ERROR");
 
 do {
     my $stdout = \$( '' );

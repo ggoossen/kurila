@@ -12,11 +12,11 @@ is( signals::handler("INT"), \&foo );
 do {
     my $called = 0;
     signals::set_handler("INT", sub { $called++ });
-    kill "INT",$$; sleep 1;
+    kill "INT",$^PID; sleep 1;
     is( $called, 1 );
 
     signals::set_handler("INT", "IGNORE");
-    kill "INT",$$; sleep 1;
+    kill "INT",$^PID; sleep 1;
     ok(1);
 };
 

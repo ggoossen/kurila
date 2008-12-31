@@ -5,7 +5,7 @@ BEGIN {
 
 # Time-stamp: "2004-12-29 19:59:33 AST"
 
-BEGIN { $| = 1; print "1..2\n"; }
+BEGIN { $^OUTPUT_AUTOFLUSH = 1; print "1..2\n"; }
 use Class::ISA;
 print "ok 1\n";
 

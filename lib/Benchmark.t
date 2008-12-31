@@ -545,7 +545,7 @@ do {   # Check usage error messages
                     );
     while( my@(?$name, ?$code) =@( each %cmpthese) ) {
         eval $code;
-        is( $@->{?description}, %usage{?cmpthese}, "cmpthese usage: $name" );
+        is( $^EVAL_ERROR->{?description}, %usage{?cmpthese}, "cmpthese usage: $name" );
     }
 
     my %timethese = %('forgot {}'  => 'timethese( 42, foo => sub { 1 } )',
@@ -554,12 +554,12 @@ do {   # Check usage error messages
 
     while( my@(?$name, ?$code) =@( each %timethese) ) {
         eval $code;
-        is( $@->{?description}, %usage{?timethese}, "timethese usage: $name" );
+        is( $^EVAL_ERROR->{?description}, %usage{?timethese}, "timethese usage: $name" );
     }
 
 
     foreach my $func ( @takes_no_args) {
         eval "$func(42)";
-        is( $@->{?description}, %usage{?$func}, "$func usage: with args" );
+        is( $^EVAL_ERROR->{?description}, %usage{?$func}, "$func usage: with args" );
     }
 };

@@ -1009,7 +1009,7 @@ $(join ' ',@$dirs)
         }
         else {
             warn <<WARNING;
-find_perl() can't dup STDERR: $!
+find_perl() can't dup STDERR: $^OS_ERROR
 You might see some garbage while we search for Perl
 WARNING
         }
@@ -1053,7 +1053,7 @@ WARNING
                 print "Using PERL=$abs\n" if $trace;
                 return $abs;
             } elsif ($trace +>= 2) {
-                print "Result: '$val' ".($? >> 8)."\n";
+                print "Result: '$val' ".($^CHILD_ERROR >> 8)."\n";
             }
         }
     }
@@ -1078,8 +1078,8 @@ sub fixin {    # stolen from the pink Camel book, more or less
         my $file_new = "$file.new";
         my $file_bak = "$file.bak";
 
-        open( my $fixin, '<', $file ) or die "Can't process '$file': $!";
-        local $/ = "\n";
+        open( my $fixin, '<', $file ) or die "Can't process '$file': $^OS_ERROR";
+        local $^INPUT_RECORD_SEPARATOR = "\n";
         chomp( my $line = ~< $fixin );
         next unless $line =~ s/^\s*\#!\s*//;    # Not a shbang file.
         # Now figure out the interpreter name.
@@ -1136,13 +1136,13 @@ eval 'exec $interpreter $arg -S \$0 \$\{1+"\$\@"\}'
         }
 
         open( my $fixout, ">", "$file_new" ) or do {
-            warn "Can't create new $file: $!\n";
+            warn "Can't create new $file: $^OS_ERROR\n";
             next;
         };
 
         # Print out the new #! line (or equivalent).
-        local $\;
-        local $/;
+        local $^OUTPUT_RECORD_SEPARATOR;
+        local $^INPUT_RECORD_SEPARATOR;
         print $fixout $shb, ~< $fixin;
         close $fixin;
         close $fixout;
@@ -1150,13 +1150,13 @@ eval 'exec $interpreter $arg -S \$0 \$\{1+"\$\@"\}'
         chmod 0666, $file_bak;
         unlink $file_bak;
         unless ( _rename( $file, $file_bak ) ) {
-            warn "Can't rename $file to $file_bak: $!";
+            warn "Can't rename $file to $file_bak: $^OS_ERROR";
             next;
         }
         unless ( _rename( $file_new, $file ) ) {
-            warn "Can't rename $file_new to $file: $!";
+            warn "Can't rename $file_new to $file: $^OS_ERROR";
             unless ( _rename( $file_bak, $file ) ) {
-                warn "Can't rename $file_bak back to $file either: $!";
+                warn "Can't rename $file_bak back to $file either: $^OS_ERROR";
                 warn "Leaving $file renamed as $file_bak\n";
             }
             next;
@@ -1281,7 +1281,7 @@ sub init_dirscan {	# --- File and Directory Lists (.xs .pm .pod etc)
 	} elsif ((%Is{?VMS} || %Is{?Dos}) && $name =~ m/[._]pl$/i) {
 	    # case-insensitive filesystem, one dot per name, so foo.h.PL
 	    # under Unix appears as foo.h_pl under VMS or fooh.pl on Dos
-	    local($/); open(my $pl, '<', $name); my $txt = ~< $pl; close $pl;
+	    local($^INPUT_RECORD_SEPARATOR); open(my $pl, '<', $name); my $txt = ~< $pl; close $pl;
 	    if ($txt =~ m/Extracting \S+ \(with variable substitutions/) {
 		(%pl_files{+$name} = $name) =~ s/[._]pl\z//i ;
 	    }
@@ -2646,8 +2646,8 @@ sub parse_abstract {
     my@($self,$parsefile) =  @_;
     my $result;
 
-    local $/ = "\n";
-    open(my $fh, '<', $parsefile) or die "Could not open '$parsefile': $!";
+    local $^INPUT_RECORD_SEPARATOR = "\n";
+    open(my $fh, '<', $parsefile) or die "Could not open '$parsefile': $^OS_ERROR";
     my $inpod = 0;
     my $package = $self->{?DISTNAME};
     $package =~ s/-/::/g;
@@ -2683,9 +2683,9 @@ sub parse_version {
     my@($self,$parsefile) =  @_;
     my $result;
 
-    local $/ = "\n";
+    local $^INPUT_RECORD_SEPARATOR = "\n";
     local $_;
-    open(my $fh, '<', $parsefile) or die "Could not open '$parsefile': $!";
+    open(my $fh, '<', $parsefile) or die "Could not open '$parsefile': $^OS_ERROR";
     my $inpod = 0;
     while (~< $fh) {
         $inpod = m/^=(?!cut)/ ?? 1 !! m/^=cut/ ?? 0 !! $inpod;
@@ -2716,7 +2716,7 @@ sub parse_version {
         if (ref $result) {
             $result = $result->stringify;
         }
-        warn "Could not eval '$eval' in $parsefile: $($@->message)" if $@;
+        warn "Could not eval '$eval' in $parsefile: $($^EVAL_ERROR->message)" if $^EVAL_ERROR;
         last;
     }
     close $fh;

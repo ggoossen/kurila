@@ -10,7 +10,7 @@ if (open(PATCHLEVEL_H, "<", "patchlevel.h")) {
   }
   close PATCHLEVEL_H;
 } else {
-  die "$0: patchlevel.h: $!\n";
+  die "$0: patchlevel.h: $^OS_ERROR\n";
 }
 
 die "$0: Perl release looks funny.\n"

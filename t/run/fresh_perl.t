@@ -15,7 +15,7 @@ BEGIN {
 
 my $Perl = which_perl();
 
-$|=1;
+$^OUTPUT_AUTOFLUSH=1;
 
 my @prgs = @( () );
 while( ~< *DATA) { 

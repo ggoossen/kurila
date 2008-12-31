@@ -35,7 +35,7 @@ sub compare_addr {
     "@a[0]@a[1]" eq "@b[0]@b[1]";
 }
 
-$| = 1;
+$^OUTPUT_AUTOFLUSH = 1;
 print "1..7\n";
 
 use Socket;
@@ -44,13 +44,13 @@ use IO::Socket::INET;
 
 my $udpa = IO::Socket::INET->new(Proto => 'udp', LocalAddr => 'localhost')
      || IO::Socket::INET->new(Proto => 'udp', LocalAddr => '127.0.0.1')
-    or die "$! (maybe your system does not have a localhost at all, 'localhost' or 127.0.0.1)";
+    or die "$^OS_ERROR (maybe your system does not have a localhost at all, 'localhost' or 127.0.0.1)";
 
 print "ok 1\n";
 
 my $udpb = IO::Socket::INET->new(Proto => 'udp', LocalAddr => 'localhost')
      || IO::Socket::INET->new(Proto => 'udp', LocalAddr => '127.0.0.1')
-    or die "$! (maybe your system does not have a localhost at all, 'localhost' or 127.0.0.1)";
+    or die "$^OS_ERROR (maybe your system does not have a localhost at all, 'localhost' or 127.0.0.1)";
 
 print "ok 2\n";
 

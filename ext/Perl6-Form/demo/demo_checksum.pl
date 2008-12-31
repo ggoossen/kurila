@@ -33,15 +33,15 @@ warn < form '[{||||||{50+}||}]', "oops!";
 warn < form '[{||||||{50+}||}]', "oops!"x50;
 
 warn "\nErrors:\n";
-try { warn < form '[{>>{11}>.<<<{10}<<}]', 1.2345678901 } || warn $!; 
-try { warn < form '[{|||(10)|||}]', "oops!" } || warn $!;
+try { warn < form '[{>>{11}>.<<<{10}<<}]', 1.2345678901 } || warn $^OS_ERROR; 
+try { warn < form '[{|||(10)|||}]', "oops!" } || warn $^OS_ERROR;
 
-try { warn < form '[{>(19.10).<<<<<<<<<}]', "1.23456789!" } || warn $!;
+try { warn < form '[{>(19.10).<<<<<<<<<}]', "1.23456789!" } || warn $^OS_ERROR;
 
-try { warn < form '[{>>>>>>>.<(9.10)<<}]', "1.23456789!" } || warn $!;
+try { warn < form '[{>>>>>>>.<(9.10)<<}]', "1.23456789!" } || warn $^OS_ERROR;
 
-try { warn < form '[{>>>>>>>>.<(10.10)<}]', "1.23456789!" } || warn $!;
+try { warn < form '[{>>>>>>>>.<(10.10)<}]', "1.23456789!" } || warn $^OS_ERROR;
 
-try { warn < form '[{>>{9.10}>>.<<<<<}]', "1.23456789!" } || warn $!;
+try { warn < form '[{>>{9.10}>>.<<<<<}]', "1.23456789!" } || warn $^OS_ERROR;
 
-try { warn < form '[{>>>>.<<<{10.10}<<}]', "1.23456789!" } || warn $!;
+try { warn < form '[{>>>>.<<<{10.10}<<}]', "1.23456789!" } || warn $^OS_ERROR;

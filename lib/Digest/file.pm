@@ -14,7 +14,7 @@ $VERSION = "1.00";
 sub digest_file_ctx {
     my $file = shift;
     croak("No digest algorithm specified") unless (nelems @_);
-    open(my $fh, "<", $file) || croak("Can't open '$file': $!");
+    open(my $fh, "<", $file) || croak("Can't open '$file': $^OS_ERROR");
     binmode($fh);
     my $ctx = Digest->new(< @_);
     $ctx->addfile($fh);

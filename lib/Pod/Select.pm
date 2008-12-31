@@ -686,9 +686,9 @@ sub _compile_section_spec {
         s|\002|\\/|g;        ## restore escaped forward slashes
         $negated = s/^\!//;  ## check for negation
         eval "m/$_/";         ## check regex syntax
-        if ($@) {
+        if ($^EVAL_ERROR) {
             ++$bad_regexs;
-            warn "Bad regular expression /$_/ in \"$section_spec\": $@\n";
+            warn "Bad regular expression /$_/ in \"$section_spec\": $^EVAL_ERROR\n";
         }
         else {
             ## Add the forward and rear anchors (and put the negator back)

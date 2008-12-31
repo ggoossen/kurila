@@ -20,7 +20,7 @@ for (@ARGV[[@(0, 1)]]) {
 }
 
 my $dir2 = rel2abs(@ARGV[1]);
-chdir @ARGV[0] or die "$0: chdir '@ARGV[0]' failed: $!\n";
+chdir @ARGV[0] or die "$0: chdir '@ARGV[0]' failed: $^OS_ERROR\n";
 
 # Files to skip from the check for one reason or another,
 # usually because they pull in their version from some other file.

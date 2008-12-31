@@ -125,7 +125,7 @@ do {
       if ($^O eq 'MacOS') {
           ok(1, "$^O: \$? is unreliable");
       } else {
-          is($?, 0, "64K deep recursion - no coredump expected");
+          is($^CHILD_ERROR, 0, "64K deep recursion - no coredump expected");
       }
 
   };

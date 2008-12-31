@@ -57,7 +57,7 @@ use base < qw(M B2);
 # Test that multiple inheritance fails.
 package D6;
 try { 'base'->import( <qw(B2 M B3)); };
-main::like($@->{?description}, qr/can't multiply inherit fields/i, 
+main::like($^EVAL_ERROR->{?description}, qr/can't multiply inherit fields/i, 
     'No multiple field inheritance');
 
 package Foo::Bar;
@@ -174,7 +174,7 @@ try {
     require base;
     'base'->import( <qw(E1 E2));
 };
-main::like( $@->{?description}, qr/Can't multiply inherit fields/i, 'Again, no multi inherit' );
+main::like( $^EVAL_ERROR->{?description}, qr/Can't multiply inherit fields/i, 'Again, no multi inherit' );
 
 
 # Test that a package with no fields can inherit from a package with

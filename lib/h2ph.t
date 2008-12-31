@@ -19,9 +19,9 @@ print "1..2\n";
 
 # quickly compare two text files
 sub txt_compare {
-    local ($/);
+    local ($^INPUT_RECORD_SEPARATOR);
     my $files = @_;
-    for ($files) { open(\*_, "<","$_") ?? $_ = ~< *_ !! die "$_ : $!"; close \*_ }
+    for ($files) { open(\*_, "<","$_") ?? $_ = ~< *_ !! die "$_ : $^OS_ERROR"; close \*_ }
     $files[0] cmp $files[1];
 }
 

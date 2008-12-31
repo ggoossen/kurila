@@ -17,11 +17,11 @@ if ($^O eq 'mpeix') {
     exit 0;
 }
 
-$|=1;
+$^OUTPUT_AUTOFLUSH=1;
 
 our (@prgs, $tmpfile, $CAT, $status, $i);
 
-undef $/;
+undef $^INPUT_RECORD_SEPARATOR;
 @prgs = split "\n########\n", ~< *DATA;
 print "1..", scalar nelems @prgs, "\n";
 
@@ -44,9 +44,9 @@ for ( @prgs){
     $expected =~ s/\n+$//;
     # results can be in any order, so sort 'em
     my @expected = sort split m/\n/, $expected;
-    open TEST, ">", "$tmpfile" or die "Cannot open $tmpfile: $!";
+    open TEST, ">", "$tmpfile" or die "Cannot open $tmpfile: $^OS_ERROR";
     print TEST $prog, "\n";
-    close TEST or die "Cannot close $tmpfile: $!";
+    close TEST or die "Cannot close $tmpfile: $^OS_ERROR";
     my $results;
     if ($^O eq 'MSWin32') {
       $results = `.\\perl -I../lib $switch $tmpfile 2>&1`;
@@ -57,7 +57,7 @@ for ( @prgs){
     else {
       $results = `./perl $switch $tmpfile 2>&1`;
     }
-    $status = $?;
+    $status = $^CHILD_ERROR;
     $results =~ s/\n+$//;
     $results =~ s/at\s+forktmp\d+\s+line/at - line/g;
     $results =~ s/of\s+forktmp\d+\s+aborted/of - aborted/g;
