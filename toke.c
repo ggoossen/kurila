@@ -957,10 +957,10 @@ S_skipspace(pTHX_ register char *s)
 	    if (PL_minus_p) {
 #ifdef PERL_MAD
 		sv_catpvs(PL_linestr,
-			 ";}continue{print or die qq(-p destination: $^ERRNO\\n);}");
+			 ";}continue{print or die qq(-p destination: $^OS_ERROR\\n);}");
 #else
 		sv_setpvs(PL_linestr,
-			 ";}continue{print or die qq(-p destination: $^ERRNO\\n);}");
+			 ";}continue{print or die qq(-p destination: $^OS_ERROR\\n);}");
 #endif
 		PL_minus_n = PL_minus_p = 0;
 	    }

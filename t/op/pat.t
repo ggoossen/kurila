@@ -1054,7 +1054,7 @@ do {
 	$input = "a\{b\}c\{d\}";
         eval <<EOT; die if $^EVAL_ERROR;
 	while (eval \$input =~ $rx) \{
-            die if \$\@;
+            die if \$^EVAL_ERROR;
 	    print "# \\\$1 = '\$1' \\\$2 = '\$2'\n";
 	    ++\$i;
 	\}

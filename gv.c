@@ -931,16 +931,14 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 			if (strEQ(name2, "DIE_HOOK"))
 			    goto magicalize;
 			break;
-		    case 'E':	/* $^ENCODING  $^EGID  $^EUID  $^ERRNO  $^EVALERROR */
+		    case 'E':	/* $^ENCODING  $^EGID  $^EUID  $^OS_ERROR  $^EVAL_ERROR */
 			if (strEQ(name2, "ENCODING"))
 			    goto magicalize;
 			if (strEQ(name2, "EGID"))
 			    goto magicalize;
 			if (strEQ(name2, "EUID"))
 			    goto magicalize;
-			if (strEQ(name2, "ERRNO"))
-			    goto magicalize;
-			if (strEQ(name2, "EVALERROR"))
+			if (strEQ(name2, "EVAL_ERROR"))
 			    goto no_magicalize;
 			break;
 
@@ -962,6 +960,8 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 
 		    case 'O':	/* $^OPEN */
 			if (strEQ(name2, "OPEN"))
+			    goto magicalize;
+			if (strEQ(name2, "OS_ERROR"))
 			    goto magicalize;
 			if (strEQ(name2, "OUTPUT_AUTOFLUSH")) {
 			    sv_setiv(GvSVn(gv), (IV)(IoFLAGS(GvIOp(PL_defoutgv)) & IOf_FLUSH) != 0);

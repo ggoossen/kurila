@@ -73,7 +73,7 @@ while ((nelems @ARGV))
 if ($FileList) {
     print "Reading file list '$FileList'\n"
         if $Verbose;
-    open my $fh,"<",$FileList or die "Failed to read '$FileList':$^ERRNO";
+    open my $fh,"<",$FileList or die "Failed to read '$FileList':$^OS_ERROR";
     my @input;
     my @output;
     for my $list (@( \@input, \@output) ) {
@@ -102,7 +102,7 @@ if ($FileList) {
     # we set maxtime to be the youngest input file, including $0 itself.
     my $maxtime = -M $0; # do this before the chdir!
     if ($UseDir) {
-        chdir $UseDir or die "Failed to chdir to '$UseDir':$^ERRNO";
+        chdir $UseDir or die "Failed to chdir to '$UseDir':$^OS_ERROR";
     }
     foreach my $in ( @input) {
         my $time = -M $in;
@@ -138,7 +138,7 @@ if ($FileList) {
         print "Not checking filelist.\n";
     }
     if ($UseDir) {
-        chdir $UseDir or die "Failed to chdir to '$UseDir':$^ERRNO";
+        chdir $UseDir or die "Failed to chdir to '$UseDir':$^OS_ERROR";
     }
 }
 
@@ -146,7 +146,7 @@ foreach my $lib (@('To', 'lib',
 		 < map { File::Spec->catdir("lib",$_)}
 		 qw(gc_sc dt bc hst ea jt lb nt ccc))) {
   next if -d $lib;
-  mkdir $lib, 0755 or die "mkdir '$lib': $^ERRNO";
+  mkdir $lib, 0755 or die "mkdir '$lib': $^OS_ERROR";
 }
 
 my $LastUnicodeCodepoint = 0x10FFFF; # As of Unicode 3.1.1.
@@ -163,7 +163,7 @@ sub force_unlink {
     return if CORE::unlink($filename);
     # We might need write permission
     chmod 0777, $filename;
-    CORE::unlink($filename) or die "Couldn't unlink $filename: $^ERRNO\n";
+    CORE::unlink($filename) or die "Couldn't unlink $filename: $^OS_ERROR\n";
 }
 
 ##
@@ -190,7 +190,7 @@ sub WriteIfChanged($$)
     }
     force_unlink ($file);
     if (not open OUT, ">", "$file") {
-        die "$0: can't open $file for output: $^ERRNO\n";
+        die "$0: can't open $file for output: $^OS_ERROR\n";
     }
     print "$file written.\n" if $Verbose;
 
@@ -261,7 +261,7 @@ sub Build_Aliases()
     %utf8::PVA_abbr_map = %( () );
 
     open PA, "<", "PropertyAliases.txt"
-	or die "Can't open PropertyAliases.txt: $^ERRNO";
+	or die "Can't open PropertyAliases.txt: $^OS_ERROR";
     while ( ~< *PA) {
 	s/#.*//;
 	s/\s+$//;
@@ -281,7 +281,7 @@ sub Build_Aliases()
     close PA;
 
     open PVA, "<", "PropValueAliases.txt"
-	or die "Can't open PropValueAliases.txt: $^ERRNO";
+	or die "Can't open PropValueAliases.txt: $^OS_ERROR";
     while ( ~< *PVA) {
 	s/#.*//;
 	s/\s+$//;
@@ -907,7 +907,7 @@ sub UnicodeData_Txt()
 
     ## open ane read file.....
     if (not open IN, "<", "UnicodeData.txt") {
-        die "$0: UnicodeData.txt: $^ERRNO\n";
+        die "$0: UnicodeData.txt: $^OS_ERROR\n";
     }
 
     ##
@@ -1171,7 +1171,7 @@ sub UnicodeData_Txt()
 sub LineBreak_Txt()
 {
     if (not open IN, "<", "LineBreak.txt") {
-        die "$0: LineBreak.txt: $^ERRNO\n";
+        die "$0: LineBreak.txt: $^OS_ERROR\n";
     }
 
     my $Lbrk = Table->New();
@@ -1212,7 +1212,7 @@ sub LineBreak_Txt()
 sub ArabicShaping_txt()
 {
     if (not open IN, "<", "ArabicShaping.txt") {
-        die "$0: ArabicShaping.txt: $^ERRNO\n";
+        die "$0: ArabicShaping.txt: $^OS_ERROR\n";
     }
 
     my $ArabLink      = Table->New();
@@ -1253,7 +1253,7 @@ sub ArabicShaping_txt()
 sub EastAsianWidth_txt()
 {
     if (not open IN, "<", "EastAsianWidth.txt") {
-        die "$0: EastAsianWidth.txt: $^ERRNO\n";
+        die "$0: EastAsianWidth.txt: $^OS_ERROR\n";
     }
 
     my %EAW;
@@ -1290,7 +1290,7 @@ sub EastAsianWidth_txt()
 sub HangulSyllableType_txt()
 {
     if (not open IN, "<", "HangulSyllableType.txt") {
-        die "$0: HangulSyllableType.txt: $^ERRNO\n";
+        die "$0: HangulSyllableType.txt: $^OS_ERROR\n";
     }
 
     my %HST;
@@ -1321,7 +1321,7 @@ sub HangulSyllableType_txt()
 sub Jamo_txt()
 {
     if (not open IN, "<", "Jamo.txt") {
-        die "$0: Jamo.txt: $^ERRNO\n";
+        die "$0: Jamo.txt: $^OS_ERROR\n";
     }
     my $Short = Table->New();
 
@@ -1344,7 +1344,7 @@ sub Scripts_txt()
     my @ScriptInfo;
 
     if (not open(IN, "<", "Scripts.txt")) {
-        die "$0: Scripts.txt: $^ERRNO\n";
+        die "$0: Scripts.txt: $^OS_ERROR\n";
     }
     while ( ~< *IN) {
         next unless m/^([0-9A-Fa-f]+)(?:\.\.([0-9A-Fa-f]+))?\s*;\s*(.+?)\s*\#/;
@@ -1413,7 +1413,7 @@ sub Blocks_txt()
     my %Blocks;
 
     if (not open IN, "<", "Blocks.txt") {
-        die "$0: Blocks.txt: $^ERRNO\n";
+        die "$0: Blocks.txt: $^OS_ERROR\n";
     }
 
     while ( ~< *IN)
@@ -1452,7 +1452,7 @@ sub PropList_txt()
     my @PropInfo;
 
     if (not open IN, "<", "PropList.txt") {
-        die "$0: PropList.txt: $^ERRNO\n";
+        die "$0: PropList.txt: $^OS_ERROR\n";
     }
 
     while ( ~< *IN)
@@ -1659,7 +1659,7 @@ sub MakePropTestScript()
     ## this written directly -- it's huge.
     force_unlink ("TestProp.pl");
     if (not open OUT, ">", "TestProp.pl") {
-        die "$0: TestProp.pl: $^ERRNO\n";
+        die "$0: TestProp.pl: $^OS_ERROR\n";
     }
     print OUT ~< *DATA;
 
@@ -1973,7 +1973,7 @@ sub SpecialCasing_txt()
     my %CaseInfo;
 
     if (not open IN, "<", "SpecialCasing.txt") {
-        die "$0: SpecialCasing.txt: $^ERRNO\n";
+        die "$0: SpecialCasing.txt: $^OS_ERROR\n";
     }
     while ( ~< *IN) {
         next unless m/^[0-9A-Fa-f]+;/;
@@ -2004,7 +2004,7 @@ sub SpecialCasing_txt()
 
     for my $case (qw(Lower Title Upper))
     {
-        my $NormalCase = do "To/$case.pl" || die "$0: $^EVALERROR\n";
+        my $NormalCase = do "To/$case.pl" || die "$0: $^EVAL_ERROR\n";
 
         my @OUT =
 	    @(
@@ -2041,7 +2041,7 @@ sub SpecialCasing_txt()
 sub CaseFolding_txt()
 {
     if (not open IN, "<", "CaseFolding.txt") {
-	die "$0: CaseFolding.txt: $^ERRNO\n";
+	die "$0: CaseFolding.txt: $^OS_ERROR\n";
     }
 
     my $Fold = Table->New();
@@ -2067,7 +2067,7 @@ sub CaseFolding_txt()
     #
     # Prepend the special foldings to the common foldings.
     #
-    my $CommonFold = do "To/Fold.pl" || die "$0: To/Fold.pl: $^ERRNO\n";
+    my $CommonFold = do "To/Fold.pl" || die "$0: To/Fold.pl: $^OS_ERROR\n";
 
     my @OUT =
 	@(
@@ -2115,7 +2115,7 @@ if ( $FileList and $MakeList ) {
         if ($Verbose);
         
     open my $ofh,">",$FileList 
-        or die "Can't write to '$FileList':$^ERRNO";
+        or die "Can't write to '$FileList':$^OS_ERROR";
     print $ofh <<"EOFHEADER";
 #
 # mktables.lst -- File list for mktables.
@@ -2159,7 +2159,7 @@ EOFHEADER
                "# ",scalar($count+1)," output files\n\n",
                "# End list\n";  
     close $ofh 
-        or warn "Failed to close $ofh: $^ERRNO";
+        or warn "Failed to close $ofh: $^OS_ERROR";
     
     print "Filelist has ",scalar(nelems @input)," input files and ",
           scalar($count+1)," output files\n"

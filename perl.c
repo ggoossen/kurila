@@ -3127,7 +3127,7 @@ S_init_main_stash(pTHX)
     GvMULTI_on(PL_hintgv);
     PL_defgv = gv_fetchpvs("_", GV_ADD|GV_NOTQUAL, SVt_PVAV);
     SvREFCNT_inc_simple_void(PL_defgv);
-    PL_errgv = gv_HVadd(gv_fetchpvs("^EVALERROR", GV_ADD|GV_NOTQUAL, SVt_PV));
+    PL_errgv = gv_HVadd(gv_fetchpvs("^EVAL_ERROR", GV_ADD|GV_NOTQUAL, SVt_PV));
     SvREFCNT_inc_simple_void(PL_errgv);
     GvMULTI_on(PL_errgv);
     PL_replgv = gv_fetchpvs("^R", GV_ADD|GV_NOTQUAL, SVt_PV); /* ^R */

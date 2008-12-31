@@ -694,7 +694,7 @@ sub _find_opt {
 	else { # no follow
 	    $topdir = $top_item;
 	    unless (defined $topnlink) {
-		warnings::warnif "Can't stat $top_item: $^ERRNO\n";
+		warnings::warnif "Can't stat $top_item: $^OS_ERROR\n";
 		next Proc_Top_Item;
 	    }
 	    if (-d _) {
@@ -731,7 +731,7 @@ sub _find_opt {
 	    }
 
 	    unless ($no_chdir || chdir $abs_dir) {
-		warnings::warnif "Couldn't chdir $abs_dir: $^ERRNO\n";
+		warnings::warnif "Couldn't chdir $abs_dir: $^OS_ERROR\n";
 		next Proc_Top_Item;
 	    }
 
@@ -751,7 +751,7 @@ sub _find_opt {
 		$check_t_cwd = 0;
 	    }
 	    unless (chdir $cwd_untainted) {
-		die "Can't cd to $cwd: $^ERRNO\n";
+		die "Can't cd to $cwd: $^OS_ERROR\n";
 	    }
 	}
     }
@@ -812,7 +812,7 @@ sub _find_dir($$$) {
 	    }
 	}
 	unless (chdir ($Is_VMS && $udir !~ m/[\/\[<]+/ ?? "./$udir" !! $udir)) {
-	    warnings::warnif "Can't cd to $udir: $^ERRNO\n";
+	    warnings::warnif "Can't cd to $udir: $^OS_ERROR\n";
 	    return;
 	}
     }
@@ -855,11 +855,11 @@ sub _find_dir($$$) {
 	    }
 	    unless (chdir ($Is_VMS && $udir !~ m/[\/\[<]+/ ?? "./$udir" !! $udir)) {
 		if ($Is_MacOS) {
-		    warnings::warnif "Can't cd to ($p_dir) $udir: $^ERRNO\n";
+		    warnings::warnif "Can't cd to ($p_dir) $udir: $^OS_ERROR\n";
 		}
 		else {
 		    warnings::warnif "Can't cd to (" .
-			($p_dir ne '/' ?? $p_dir !! '') . "/) $udir: $^ERRNO\n";
+			($p_dir ne '/' ?? $p_dir !! '') . "/) $udir: $^OS_ERROR\n";
 		}
 		next;
 	    }
@@ -874,7 +874,7 @@ sub _find_dir($$$) {
 
 	# Get the list of files in the current directory.
 	unless (opendir DIR, ($no_chdir ?? $dir_name !! $File::Find::current_dir)) {
-	    warnings::warnif "Can't opendir($dir_name): $^ERRNO\n";
+	    warnings::warnif "Can't opendir($dir_name): $^OS_ERROR\n";
 	    next;
 	}
 	@filenames = @( readdir DIR );
@@ -1078,7 +1078,7 @@ sub _find_dir_symlnk($$$) {
 	}
 	$ok = chdir($updir_loc) unless ($p_dir eq $File::Find::current_dir);
 	unless ($ok) {
-	    warnings::warnif "Can't cd to $updir_loc: $^ERRNO\n";
+	    warnings::warnif "Can't cd to $updir_loc: $^OS_ERROR\n";
 	    return;
 	}
     }
@@ -1095,7 +1095,7 @@ sub _find_dir_symlnk($$$) {
 	    # change (back) to parent directory (always untainted)
 	    unless ($no_chdir) {
 		unless (chdir $updir_loc) {
-		    warnings::warnif "Can't cd to $updir_loc: $^ERRNO\n";
+		    warnings::warnif "Can't cd to $updir_loc: $^OS_ERROR\n";
 		    next;
 		}
 	    }
@@ -1126,7 +1126,7 @@ sub _find_dir_symlnk($$$) {
 		}
 	    }
 	    unless (chdir $updir_loc) {
-		warnings::warnif "Can't cd to $updir_loc: $^ERRNO\n";
+		warnings::warnif "Can't cd to $updir_loc: $^OS_ERROR\n";
 		next;
 	    }
 	}
@@ -1139,7 +1139,7 @@ sub _find_dir_symlnk($$$) {
 
 	# Get the list of files in the current directory.
 	unless (opendir DIR, ($no_chdir ?? $dir_loc !! $File::Find::current_dir)) {
-	    warnings::warnif "Can't opendir($dir_loc): $^ERRNO\n";
+	    warnings::warnif "Can't opendir($dir_loc): $^OS_ERROR\n";
 	    next;
 	}
 	@filenames = @( readdir DIR );
@@ -1212,7 +1212,7 @@ sub _find_dir_symlnk($$$) {
 	    if ( $byd_flag +< 0 ) {  # must be finddepth, report dirname now
 		unless ($no_chdir || ($dir_rel eq $File::Find::current_dir)) {
 		    unless (chdir $updir_loc) { # $updir_loc (parent dir) is always untainted
-			warnings::warnif "Can't cd to $updir_loc: $^ERRNO\n";
+			warnings::warnif "Can't cd to $updir_loc: $^OS_ERROR\n";
 			next;
 		    }
 		}

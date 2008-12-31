@@ -155,10 +155,10 @@ SKIP: do {
 
     SKIP: do {
         # Going to try to switch away from root.  Might not work.
-        my $olduid = $>;
-        try { $> = 1; };
+        my $olduid = $^UID;
+        try { $^UID = 1; };
         skip "Can't test -r or -w meaningfully if you're superuser", 2
-          if $> == 0;
+          if $^UID == 0;
 
         SKIP: do {
             skip "Can't test -r meaningfully?", 1 if $Is_Dos || $Is_Cygwin;
@@ -168,7 +168,7 @@ SKIP: do {
         ok(!-w $tmpfile,    "   -w");
 
         # switch uid back (may not be implemented)
-        try { $> = $olduid; };
+        try { $^UID = $olduid; };
     };
 
     ok(! -x $tmpfile,   '   -x');

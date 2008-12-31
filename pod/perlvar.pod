@@ -52,14 +52,14 @@ the change may affect other modules which rely on the default values
 of the special variables that you have changed. This is one of the
 correct ways to read the whole file at once:
 
-    open my $fh, "<", "foo" or die $^ERRNO;
+    open my $fh, "<", "foo" or die $^OS_ERROR;
     local $/; # enable localized slurp mode
     my $content = <$fh>;
     close $fh;
 
 But the following code is quite bad:
 
-    open my $fh, "<", "foo" or die $^ERRNO;
+    open my $fh, "<", "foo" or die $^OS_ERROR;
     undef $/; # enable slurp mode
     my $content = <$fh>;
     close $fh;
@@ -75,7 +75,7 @@ inside some short C<{}> block, you should create one yourself. For
 example:
 
     my $content = '';
-    open my $fh, "<", "foo" or die $^ERRNO;
+    open my $fh, "<", "foo" or die $^OS_ERROR;
     {
         local $/;
         $content = <$fh>;
@@ -296,7 +296,7 @@ instead of lines, with the maximum record size being the referenced
 integer.  So this:
 
     local $^INPUT_RECORD_SEPARATOR = \32768; # or \"32768", or \$var_containing_32768
-    open my $fh, "<", $myfile or die $^ERRNO;
+    open my $fh, "<", $myfile or die $^OS_ERROR;
     local $_ = <$fh>;
 
 will read a record of no more than 32768 bytes from FILE.  If you're
@@ -405,32 +405,32 @@ manipulation of this variable is highly discouraged.
 
 =item $OS_ERROR
 
-=item $^ERRNO
-X<$^ERRNO> X<$OS_ERROR>
+=item $^OS_ERROR
+X<$^OS_ERROR> X<$OS_ERROR>
 
 If used numerically, yields the current value of the C C<errno>
 variable, or in other words, if a system or library call fails, it
-sets this variable.  This means that the value of C<$^ERRNO> is meaningful
+sets this variable.  This means that the value of C<$^OS_ERROR> is meaningful
 only I<immediately> after a B<failure>:
 
     if (open my $fh, "<", $filename) {
-	# Here $^ERRNO is meaningless.
+	# Here $^OS_ERROR is meaningless.
 	...
     } else {
-	# ONLY here is $^ERRNO meaningful.
+	# ONLY here is $^OS_ERROR meaningful.
 	...
-	# Already here $^ERRNO might be meaningless.
+	# Already here $^OS_ERROR might be meaningless.
     }
     # Since here we might have either success or failure,
-    # here $^ERRNO is meaningless.
+    # here $^OS_ERROR is meaningless.
 
 In the above I<meaningless> stands for anything: zero, non-zero,
 C<undef>.  A successful system or library call does B<not> set
 the variable to zero.
 
 If used as a string, yields the corresponding system error string.
-You can assign a number to C<$^ERRNO> to set I<errno> if, for instance,
-you want C<"$^ERRNO"> to return the string for error I<n>, or you want
+You can assign a number to C<$^OS_ERROR> to set I<errno> if, for instance,
+you want C<"$^OS_ERROR"> to return the string for error I<n>, or you want
 to set the exit value for the die() operator.  (Mnemonic: What just
 went bang?)
 
@@ -442,14 +442,14 @@ Also see L<Error Indicators>.
 X<$^E> X<$EXTENDED_OS_ERROR>
 
 Error information specific to the current operating system.  At
-the moment, this differs from C<$^ERRNO> under only VMS, OS/2, and Win32
+the moment, this differs from C<$^OS_ERROR> under only VMS, OS/2, and Win32
 (and for MacPerl).  On all other platforms, C<$^E> is always just
-the same as C<$^ERRNO>.
+the same as C<$^OS_ERROR>.
 
 Under VMS, C<$^E> provides the VMS status value from the last
 system error.  This is more specific information about the last
-system error than that provided by C<$^ERRNO>.  This is particularly
-important when C<$^ERRNO> is set to B<EVMSERR>.
+system error than that provided by C<$^OS_ERROR>.  This is particularly
+important when C<$^OS_ERROR> is set to B<EVMSERR>.
 
 Under OS/2, C<$^E> is set to the error code of the last call to
 OS/2 API either via CRT, or directly from perl.
@@ -459,9 +459,9 @@ reported by the Win32 call C<GetLastError()> which describes
 the last error from within the Win32 API.  Most Win32-specific
 code will report errors via C<$^E>.  ANSI C and Unix-like calls
 set C<errno> and so most portable Perl code will report errors
-via C<$^ERRNO>. 
+via C<$^OS_ERROR>. 
 
-Caveats mentioned in the description of C<$^ERRNO> generally apply to
+Caveats mentioned in the description of C<$^OS_ERROR> generally apply to
 C<$^E>, also.  (Mnemonic: Extra error explanation.)
 
 Also see L<Error Indicators>.
@@ -470,7 +470,7 @@ Also see L<Error Indicators>.
 X<$^EVAL_ERROR>
 
 The Perl syntax error message from the last eval() operator.
-If $^EVALERROR is the null string, the last eval() parsed and executed
+If $^EVAL_ERROR is the null string, the last eval() parsed and executed
 correctly (although the operations you invoked may have failed in the
 normal fashion).  (Mnemonic: Where was the syntax error "at"?)
 
@@ -503,7 +503,7 @@ X<$^UID> X<$REAL_USER_ID>
 The real uid of this process.  (Mnemonic: it's the uid you came I<from>,
 if you're running setuid.)  You can change both the real uid and
 the effective uid at the same time by using POSIX::setuid().  Since
-changes to $^UID require a system call, check $^ERRNO after a change attempt to 
+changes to $^UID require a system call, check $^OS_ERROR after a change attempt to 
 detect any possible errors.
 
 =item $EFFECTIVE_USER_ID
@@ -517,7 +517,7 @@ The effective uid of this process.  Example:
     @($^UID,$^EUID) = @($^EUID,$^UID);	# swap real and effective uid
 
 You can change both the effective uid and the real uid at the same
-time by using POSIX::setuid().  Changes to $^EUID require a check to $^ERRNO
+time by using POSIX::setuid().  Changes to $^EUID require a check to $^OS_ERROR
 to detect any possible errors after an attempted change. 
 
 (Mnemonic: it's the uid you went I<to>, if you're running setuid.)
@@ -543,7 +543,7 @@ that this is different to the effective gid (C<$^EGID>) which does take a
 list.
 
 You can change both the real gid and the effective gid at the same
-time by using POSIX::setgid().  Changes to $^GID require a check to $^ERRNO
+time by using POSIX::setgid().  Changes to $^GID require a check to $^OS_ERROR
 to detect any possible errors after an attempted change.
 
 (Mnemonic: parentheses are used to I<group> things.  The real gid is the
@@ -570,7 +570,7 @@ list, say C< $^EGID = "5 5" >.
 
 You can change both the effective gid and the real gid at the same
 time by using POSIX::setgid() (use only a single numeric argument).
-Changes to $) require a check to $^ERRNO to detect any possible errors
+Changes to $) require a check to $^OS_ERROR to detect any possible errors
 after an attempted change.
 
 (Mnemonic: parentheses are used to I<group> things.  The effective gid
@@ -1143,7 +1143,7 @@ immediate (also known as "unsafe") to deferred, also known as
 =head2 Error Indicators
 X<error> X<exception>
 
-The variables C<$^EVALERROR>, C<$^ERRNO>, C<$^E>, and C<$^CHILD_ERROR> contain information
+The variables C<$^EVAL_ERROR>, C<$^OS_ERROR>, C<$^E>, and C<$^CHILD_ERROR> contain information
 about different types of error conditions that may appear during
 execution of a Perl program.  The variables are shown ordered by
 the "distance" between the subsystem which reported the error and
@@ -1155,41 +1155,41 @@ To illustrate the differences between these variables, consider the
 following Perl expression, which uses a single-quoted string:
 
     eval q{
-	open my $pipe, "/cdrom/install |" or die $^ERRNO;
+	open my $pipe, "/cdrom/install |" or die $^OS_ERROR;
 	my @res = <$pipe>;
-	close $pipe or die "bad pipe: $^CHILD_ERROR, $^ERRNO";
+	close $pipe or die "bad pipe: $^CHILD_ERROR, $^OS_ERROR";
     };
 
 After execution of this statement all 4 variables may have been set.  
 
-C<$^EVALERROR> is set if the string to be C<eval>-ed did not compile (this
+C<$^EVAL_ERROR> is set if the string to be C<eval>-ed did not compile (this
 may happen if C<open> or C<close> were imported with bad prototypes),
 or if Perl code executed during evaluation die()d .  In these cases
-the value of $^EVALERROR is the compile error, or the argument to C<die>
-(which will interpolate C<$^ERRNO> and C<$^CHILD_ERROR>).  (See also L<Fatal>,
+the value of $^EVAL_ERROR is the compile error, or the argument to C<die>
+(which will interpolate C<$^OS_ERROR> and C<$^CHILD_ERROR>).  (See also L<Fatal>,
 though.)
 
 When the eval() expression above is executed, open(), C<< <PIPE> >>,
 and C<close> are translated to calls in the C run-time library and
-thence to the operating system kernel.  C<$^ERRNO> is set to the C library's
+thence to the operating system kernel.  C<$^OS_ERROR> is set to the C library's
 C<errno> if one of these calls fails. 
 
 Under a few operating systems, C<$^E> may contain a more verbose
 error indicator, such as in this case, "CDROM tray not closed."
 Systems that do not support extended error messages leave C<$^E>
-the same as C<$^ERRNO>.
+the same as C<$^OS_ERROR>.
 
 Finally, C<$^CHILD_ERROR> may be set to non-0 value if the external program
 F</cdrom/install> fails.  The upper eight bits reflect specific
 error conditions encountered by the program (the program's exit()
 value).   The lower eight bits reflect mode of failure, like signal
 death and core dump information  See wait(2) for details.  In
-contrast to C<$^ERRNO> and C<$^E>, which are set only if error condition
+contrast to C<$^OS_ERROR> and C<$^E>, which are set only if error condition
 is detected, the variable C<$^CHILD_ERROR> is set on each C<wait> or pipe
-C<close>, overwriting the old value.  This is more like C<$^EVALERROR>, which
+C<close>, overwriting the old value.  This is more like C<$^EVAL_ERROR>, which
 on every eval() is always set on failure and cleared on success.
 
-For more details, see the individual descriptions at C<$^EVALERROR>, C<$^ERRNO>, C<$^E>,
+For more details, see the individual descriptions at C<$^EVAL_ERROR>, C<$^OS_ERROR>, C<$^E>,
 and C<$^CHILD_ERROR>.
 
 =head2 Technical Note on the Syntax of Variable Names

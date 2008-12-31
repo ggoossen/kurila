@@ -784,29 +784,6 @@ Perl_magic_get(pTHX_ SV *sv, MAGIC *mg)
 		    break;
 		}
 
-		if (strEQ(remaining, "ERRNO")) {
-		    /* $^ERRNO */
-#ifdef VMS
-		    sv_setnv(sv, (NV)((errno == EVMSERR) ? vaxc$errno : errno));
-		    sv_setpv(sv, errno ? Strerror(errno) : "");
-#else
-		    {
-			const int saveerrno = errno;
-			sv_setnv(sv, (NV)errno);
-#ifdef OS2
-			if (errno == errno_isOS2 || errno == errno_isOS2_set)
-			    sv_setpv(sv, os2error(Perl_rc));
-			else
-#endif
-			    sv_setpv(sv, errno ? Strerror(errno) : "");
-			errno = saveerrno;
-		    }
-#endif
-		    SvRTRIM(sv);
-		    SvNOK_on(sv);	/* what a wonderful hack! */
-		    break;
-		}
-		break;
 	    case 'G':
 		if (strEQ(remaining, "GID")) { /* $^GID */
 		    sv_setiv(sv, (IV)PL_gid);
@@ -841,6 +818,30 @@ Perl_magic_get(pTHX_ SV *sv, MAGIC *mg)
 		    Perl_emulate_cop_io(aTHX_ &PL_compiling, sv);
 		    break;
 		}
+
+		if (strEQ(remaining, "OS_ERROR")) {
+		    /* $^OS_ERROR */
+#ifdef VMS
+		    sv_setnv(sv, (NV)((errno == EVMSERR) ? vaxc$errno : errno));
+		    sv_setpv(sv, errno ? Strerror(errno) : "");
+#else
+		    {
+			const int saveerrno = errno;
+			sv_setnv(sv, (NV)errno);
+#ifdef OS2
+			if (errno == errno_isOS2 || errno == errno_isOS2_set)
+			    sv_setpv(sv, os2error(Perl_rc));
+			else
+#endif
+			    sv_setpv(sv, errno ? Strerror(errno) : "");
+			errno = saveerrno;
+		    }
+#endif
+		    SvRTRIM(sv);
+		    SvNOK_on(sv);	/* what a wonderful hack! */
+		    break;
+		}
+		break;
 
 		if (strEQ(remaining, "OUTPUT_AUTOFLUSH")) {
 		    /* $^OUTPUT_AUTOFLUSH */
@@ -1536,8 +1537,8 @@ Perl_magic_set(pTHX_ SV *sv, MAGIC *mg)
 		    break;
 		}
 
-		if (strEQ(remaining, "ERRNO")) {
-		    /* $^ERRNO */
+		if (strEQ(remaining, "OS_ERROR")) {
+		    /* $^OS_ERROR */
 #ifdef VMS
 #   define PERL_VMS_BANG vaxc$errno
 #else

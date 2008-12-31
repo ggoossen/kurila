@@ -29,7 +29,7 @@ is ($^EVAL_ERROR, "");
 $a = eval q{
 	$b = eval q{if ($b) {return log 0} 4};
  	is ($b, 4);
-	is ($^EVALERROR, "");
+	is ($^EVAL_ERROR, "");
 	5;
 };
 is ($a, 5);

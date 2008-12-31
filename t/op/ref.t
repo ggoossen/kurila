@@ -294,7 +294,7 @@ do { my $a1 = bless \@(3),"x";
 curr_test($test+4);
 
 is (runperl (switches=> \@('-l'),
-	     prog=> 'print 1; print qq-*$\*-;print 1;'),
+	     prog=> 'print 1; print qq-*$^INPUT_RECORD_SEPARATOR*-;print 1;'),
     "1\n*\n*\n1\n");
 
 # bug #22719

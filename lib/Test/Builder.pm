@@ -1127,7 +1127,7 @@ sub _print {
 
     my $msg = join '', @msgs;
 
-    local@($^OUTPUT_RECORD_SEPARATOR, $", $^OUTPUT_FIELD_SEPARATOR) = @(undef, ' ', '');
+    local @($^OUTPUT_RECORD_SEPARATOR, $^OUTPUT_FIELD_SEPARATOR) = @(undef, '');
     my $fh = $self->output;
 
     # Escape each line after the first with a # so we don't
@@ -1155,7 +1155,7 @@ Like _print, but prints to the current diagnostic filehandle.
 sub _print_diag {
     my $self = shift;
 
-    local@($^OUTPUT_RECORD_SEPARATOR, $", $^OUTPUT_FIELD_SEPARATOR) = @(undef, ' ', '');
+    local@($^OUTPUT_RECORD_SEPARATOR, $^OUTPUT_FIELD_SEPARATOR) = @(undef, '');
     my $fh = $self->todo ?? $self->todo_output !! $self->failure_output;
     print $fh < @_;
 }    

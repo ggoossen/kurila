@@ -77,9 +77,9 @@ make_tmp_file($tmpfile2, $tmpfile2_contents);
 my $Child_prog = <<'CHILD_PROG';
 my $fd = shift(@ARGV);
 print qq{childfd=$fd\n};
-open INHERIT, qq{<&=}, qq{$fd} or die qq{open $fd: $!};
+open INHERIT, qq{<&=}, qq{$fd} or die qq{open $fd: $^OS_ERROR};
 my $line = ~< *INHERIT;
-close INHERIT or die qq{close $fd: $!};
+close INHERIT or die qq{close $fd: $^OS_ERROR};
 print $line
 CHILD_PROG
 $Child_prog =~ s/\n//g;

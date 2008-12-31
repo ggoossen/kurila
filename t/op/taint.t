@@ -287,8 +287,8 @@ SKIP: do {
     open PROG, ">", "$arg" or die "Can't create $arg: $^OS_ERROR";
     print PROG q{
 	try { join('', @ARGV), kill 0 };
-	exit 0 if $@->{description} =~ m/^Insecure dependency/;
-	print "# Oops: \$@ was [$@]\n";
+	exit 0 if $^EVAL_ERROR->{description} =~ m/^Insecure dependency/;
+	print "# Oops: \$^EVAL_ERROR was [$^EVAL_ERROR]\n";
 	exit 1;
     };
     close PROG;

@@ -63,7 +63,6 @@ $expected = $upperfirst ??
     'catchaseddoggonepunishedtoxyzAbelAxedCain' ;
 
 cmp_ok($x,'eq',$expected,'upper first 4');
-$" = ' ';
 @a = @( () );
 @b = reverse @a;
 cmp_ok("$(join ' ',@b)",'eq',"",'reverse 1');

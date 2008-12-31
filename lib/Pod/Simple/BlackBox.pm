@@ -213,7 +213,7 @@ sub parse_lines {             # Usage: $parser->parse_lines(@lines)
          # by now it's safe to consider the previous paragraph as done.
                 
         push @$paras, $new; # the new incipient paragraph
-        DEBUG +> 1 and print "Starting new @$($paras)[-1]->[0] para at line %{$self}{?'line_count'}\n";
+        DEBUG +> 1 and print "Starting new $paras->[-1]->[0] para at line %{$self}{?'line_count'}\n";
         
       } elsif($line =~ m/^\s/s) {
 
@@ -757,7 +757,7 @@ sub _ponder_paragraph_buffer {
       } elsif( $para_type =~ s/^=//s
         and defined( $para_type = $self->{'accept_directives'}->{?$para_type} )
       ) {
-        DEBUG +> 1 and print " Pondering known directive @$($para)[0] as $para_type\n";
+        DEBUG +> 1 and print " Pondering known directive $para->[0] as $para_type\n";
       } else {
         # An unknown directive!
         DEBUG +> 1 and printf "Unhandled directive \%s (Handled: \%s)\n",

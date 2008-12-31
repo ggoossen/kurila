@@ -56,7 +56,7 @@ __END__
 ########
 our $cusp = ^~^0 ^^^ (^~^0 >> 1);
 use integer;
-$, = " ";
+$^OUTPUT_FIELD_SEPARATOR = " ";
 print( ($cusp - 1) % 8, $cusp % 8, -$cusp % 8, 8 ^|^ (($cusp + 1) % 8 + 7), "!\n");
 EXPECT
 7 0 0 8 !
@@ -180,9 +180,9 @@ argv <e>
 -l
 # fdopen from a system descriptor to a system descriptor used to close
 # the former.
-open STDERR, '>&=', \*STDOUT or die $!;
-select STDOUT; $| = 1; print fileno STDOUT or die $!;
-select STDERR; $| = 1; print fileno STDERR or die $!;
+open STDERR, '>&=', \*STDOUT or die $^OS_ERROR;
+select STDOUT; $^OUTPUT_AUTOFLUSH = 1; print fileno STDOUT or die $^OS_ERROR;
+select STDERR; $^OUTPUT_AUTOFLUSH = 1; print fileno STDERR or die $^OS_ERROR;
 EXPECT
 1
 2
@@ -241,7 +241,7 @@ destroyed
 ########
 # TODO fix trace back of "call_sv"
 BEGIN {
-  $| = 1;
+  $^OUTPUT_AUTOFLUSH = 1;
   $^WARN_HOOK = sub {
     try { print @_[0]->{description} };
     die "bar";
@@ -307,7 +307,7 @@ our $foo;
 sub myeval { eval @_[0] }
 $foo = "ok 2\n";
 myeval('sub foo { local $foo = "ok 1\n"; print $foo; }');
-die $@ if $@;
+die $^EVAL_ERROR if $^EVAL_ERROR;
 foo();
 print $foo;
 EXPECT
@@ -316,10 +316,10 @@ ok 2
 ########
 # lexicals outside an eval"" should be visible inside subroutine definitions
 # within it
-eval <<'EOT'; die $@ if $@;
+eval <<'EOT'; die $^EVAL_ERROR if $^EVAL_ERROR;
 do {
     my $X = "ok\n";
-    eval 'sub Y { print $X }'; die $@ if $@;
+    eval 'sub Y { print $X }'; die $^EVAL_ERROR if $^EVAL_ERROR;
     Y();
 };
 EOT
