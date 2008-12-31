@@ -834,17 +834,29 @@ Perl_magic_get(pTHX_ SV *sv, MAGIC *mg)
 		    sv_setsv(sv,&PL_sv_undef);
 		}
 		break;
+
 	    case 'O':
-		if (strEQ(remaining, "OPEN")) { /* $^OPEN */
+		if (strEQ(remaining, "OPEN")) {
+		    /* $^OPEN */
 		    Perl_emulate_cop_io(aTHX_ &PL_compiling, sv);
 		    break;
 		}
+
 		if (strEQ(remaining, "OUTPUT_AUTOFLUSH")) {
+		    /* $^OUTPUT_AUTOFLUSH */
 		    if (GvIOp(PL_defoutgv))
 			sv_setiv(sv, (IV)(IoFLAGS(GvIOp(PL_defoutgv)) & IOf_FLUSH) != 0 );
 		    break;
 		}
+
+		if (strEQ(remaining, "OUTPUT_RECORD_SEPARATOR")) {
+		    /* $^OUTPUT_RECORD_SEPARATOR */
+		    if (PL_ors_sv)
+			sv_copypv(sv, PL_ors_sv);
+		    break;
+		}
 		break;
+
 	    case 'P':
 		if (strEQ(remaining, "PREMATCH")) { /* $^PREMATCH */
 		    if (PL_curpm && (rx = PM_GETRE(PL_curpm))) {
@@ -1052,10 +1064,6 @@ Perl_magic_get(pTHX_ SV *sv, MAGIC *mg)
     case ':':
 	break;
     case ',':
-	break;
-    case '\\':
-	if (PL_ors_sv)
-	    sv_copypv(sv, PL_ors_sv);
 	break;
 #ifndef MACOS_TRADITIONAL
     case '0':
@@ -1554,8 +1562,9 @@ Perl_magic_set(pTHX_ SV *sv, MAGIC *mg)
 		    goto setparen;
 		}
 		break;
-	    case 'O':   /* $^OPEN */
+	    case 'O':
 		if (strEQ(remaining, "OPEN")) {
+		    /* $^OPEN */
 		    STRLEN len;
 		    const char *const start = SvPV(sv, len);
 		    const char *out = (const char*)memchr(start, '\0', len);
@@ -1583,7 +1592,9 @@ Perl_magic_set(pTHX_ SV *sv, MAGIC *mg)
 				       newSVpvs_flags("open<", SVs_TEMP), tmp, 0);
 		    break;
 		}
+
 		if (strEQ(remaining, "OUTPUT_AUTOFLUSH")) {
+		    /* $^OUTPUT_AUTOFLUSH */
 		    IO * const io = GvIOp(PL_defoutgv);
 		    if(!io)
 			break;
@@ -1599,7 +1610,21 @@ Perl_magic_set(pTHX_ SV *sv, MAGIC *mg)
 		    }
 		    break;
 		}
+
+		if (strEQ(remaining, "OUTPUT_RECORD_SEPARATOR")) {
+		    /* $^OUTPUT_RECORD_SEPARATOR */
+		    if (PL_ors_sv)
+			SvREFCNT_dec(PL_ors_sv);
+		    if (SvOK(sv) || SvGMAGICAL(sv)) {
+			PL_ors_sv = newSVsv(sv);
+		    }
+		    else {
+			PL_ors_sv = NULL;
+		    }
+		    break;
+		}
 		break;
+
 	    case 'P':
 		if (strEQ(remaining, "PREMATCH")) { /* $^PREMATCH */
 		    paren = RX_BUFF_IDX_PREMATCH;
@@ -1793,16 +1818,6 @@ Perl_magic_set(pTHX_ SV *sv, MAGIC *mg)
                 Perl_croak(aTHX_ PL_no_modify);
             }
         }
-    case '\\':
-        if (PL_ors_sv)
-            SvREFCNT_dec(PL_ors_sv);
-        if (SvOK(sv) || SvGMAGICAL(sv)) {
-            PL_ors_sv = newSVsv(sv);
-        }
-        else {
-            PL_ors_sv = NULL;
-        }
-        break;
     case ',':
         if (PL_ofs_sv)
             SvREFCNT_dec(PL_ofs_sv);

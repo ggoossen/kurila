@@ -266,12 +266,8 @@ This variable is dynamically scoped to the current BLOCK.
 
 =item IO::Handle->input_record_separator(EXPR)
 
-=item $INPUT_RECORD_SEPARATOR
-
-=item $RS
-
-=item $/
-X<$/> X<$RS> X<$INPUT_RECORD_SEPARATOR>
+=item $^INPUT_RECORD_SEPARATOR
+X<$^INPUT_RECORD_SEPARATOR>
 
 The input record separator, newline by default.  This 
 influences Perl's idea of what a "line" is.  Works like B<awk>'s RS
@@ -287,19 +283,19 @@ blindly assume that the next input character belongs to the next
 paragraph, even if it's a newline.  (Mnemonic: / delimits
 line boundaries when quoting poetry.)
 
-    local $/;           # enable "slurp" mode
+    local $^INPUT_RECORD_SEPARATOR;           # enable "slurp" mode
     local $_ = <FH>;    # whole file now here
     s/\n[ \t]+/ /g;
 
-Remember: the value of C<$/> is a string, not a regex.  B<awk> has to be
+Remember: the value of C<$^INPUT_RECORD_SEPARATOR> is a string, not a regex.  B<awk> has to be
 better for something. :-)
 
-Setting C<$/> to a reference to an integer, scalar containing an integer, or
+Setting C<$^INPUT_RECORD_SEPARATOR> to a reference to an integer, scalar containing an integer, or
 scalar that's convertible to an integer will attempt to read records
 instead of lines, with the maximum record size being the referenced
 integer.  So this:
 
-    local $/ = \32768; # or \"32768", or \$var_containing_32768
+    local $^INPUT_RECORD_SEPARATOR = \32768; # or \"32768", or \$var_containing_32768
     open my $fh, "<", $myfile or die $^ERRNO;
     local $_ = <$fh>;
 
@@ -352,17 +348,13 @@ value is printed between each of print's arguments.  Default is C<undef>.
 
 =item IO::Handle->output_record_separator EXPR
 
-=item $OUTPUT_RECORD_SEPARATOR
-
-=item $ORS
-
-=item $\
-X<$\> X<$ORS> X<$OUTPUT_RECORD_SEPARATOR>
+=item $^OUTPUT_RECORD_SEPARATOR
+X<$^OUTPUT_RECORD_SEPARATOR>
 
 The output record separator for the print operator.  If defined, this
 value is printed after the last of print's arguments.  Default is C<undef>.
-(Mnemonic: you set C<$\> instead of adding "\n" at the end of the print.
-Also, it's just like C<$/>, but it's what you get "back" from Perl.)
+(Mnemonic: you set C<$^OUTPUT_RECORD_SEPARATOR> instead of adding "\n" at the end of the print.
+Also, it's just like C<$^INPUT_RECORD_SEPARATOR>, but it's what you get "back" from Perl.)
 
 =item $LIST_SEPARATOR
 
