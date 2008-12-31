@@ -972,6 +972,8 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 		    case 'P':        /* $^PREMATCH  $^POSTMATCH */
 			if (strEQ(name2, "PREMATCH") || strEQ(name2, "POSTMATCH"))
 			    goto magicalize;  
+			if (strEQ(name2, "PID"))
+			    goto no_magicalize;  
 			break;
 		    case 'R':        /* $^RE_TRIE_MAXBUF */
 			if (strEQ(name2, "RE_TRIE_MAXBUF") || strEQ(name2, "RE_DEBUG_FLAGS"))
@@ -1075,7 +1077,6 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 	magicalize:
 	    sv_magic(GvSVn(gv), (SV*)gv, PERL_MAGIC_sv, name, len);
 
-	case '$':
 	case '0':
 	case '_':
 	case 'a':
