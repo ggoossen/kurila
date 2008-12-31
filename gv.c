@@ -968,6 +968,8 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 			    goto ro_magicalize;
 			break;
 		    case 'U':	/* $^UNICODE, $^UTF8LOCALE, $^UTF8CACHE */
+			if (strEQ(name2, "UID"))
+			    goto magicalize;
 			if (strEQ(name2, "UNICODE"))
 			    goto ro_magicalize;
 			if (strEQ(name2, "UTF8LOCALE"))
@@ -1060,7 +1062,6 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 	case '7':
 	case '8':
 	case '9':
-	case '<':
 	case '>':
 	case ',':
 	case '\\':

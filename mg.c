@@ -860,13 +860,27 @@ Perl_magic_get(pTHX_ SV *sv, MAGIC *mg)
 			     ? (PL_taint_warn || PL_unsafe ? -1 : 1)
 			     : 0);
 		break;
-	    case 'U':		/* $^UNICODE, $^UTF8LOCALE, $^UTF8CACHE */
-		if (strEQ(remaining, "UNICODE"))
+	    case 'U':
+		if (strEQ(remaining, "UID")) {
+		    /* $^UID */
+		    sv_setiv(sv, (IV)PL_uid);
+		    break;
+		}
+		if (strEQ(remaining, "UNICODE")) {
+		    /* $^UNICODE */
 		    sv_setuv(sv, (UV) PL_unicode);
-		else if (strEQ(remaining, "UTF8LOCALE"))
+		    break;
+		}
+		if (strEQ(remaining, "UTF8LOCALE")) {
+		    /* $^UTF8LOCALE */
 		    sv_setuv(sv, (UV) PL_utf8locale);
-		else if (strEQ(remaining, "UTF8CACHE"))
+		    break;
+		}
+		if (strEQ(remaining, "UTF8CACHE")) {
+		    /* $^UTF8CACHE */
 		    sv_setiv(sv, (IV) PL_utf8cache);
+		    break;
+		}
 		break;
 	    case 'W':
 		if (strEQ(remaining, "WARNING_BITS")) { /* $^WARNING_BITS */
@@ -1045,9 +1059,6 @@ Perl_magic_get(pTHX_ SV *sv, MAGIC *mg)
     case '\\':
 	if (PL_ors_sv)
 	    sv_copypv(sv, PL_ors_sv);
-	break;
-    case '<':
-	sv_setiv(sv, (IV)PL_uid);
 	break;
     case '>':
 	sv_setiv(sv, (IV)PL_euid);
@@ -1564,9 +1575,45 @@ Perl_magic_set(pTHX_ SV *sv, MAGIC *mg)
 		    goto setparen;
 		}
 		break;
-	    case 'U':        /* ^UTF8CACHE */
+	    case 'U':
+		if (strEQ(remaining, "UID")) {
+		    /* $^UID */
+		    PL_uid = SvIV(sv);
+		    if (PL_delaymagic) {
+			PL_delaymagic |= DM_RUID;
+			break;                              /* don't do magic till later */
+		    }
+#ifdef HAS_SETRUID
+		    (void)setruid((Uid_t)PL_uid);
+#else
+#ifdef HAS_SETREUID
+		    (void)setreuid((Uid_t)PL_uid, (Uid_t)-1);
+#else
+#ifdef HAS_SETRESUID
+		    (void)setresuid((Uid_t)PL_uid, (Uid_t)-1, (Uid_t)-1);
+#else
+		    if (PL_uid == PL_euid) {                /* special case $< = $> */
+#ifdef PERL_DARWIN
+			/* workaround for Darwin's setuid peculiarity, cf [perl #24122] */
+			if (PL_uid != 0 && PerlProc_getuid() == 0)
+			    (void)PerlProc_setuid(0);
+#endif
+			(void)PerlProc_setuid(PL_uid);
+		    } else {
+			PL_uid = PerlProc_getuid();
+			Perl_croak(aTHX_ "setruid() not implemented");
+		    }
+#endif
+#endif
+#endif
+		    PL_uid = PerlProc_getuid();
+		    PL_tainting |= (PL_uid && (PL_euid != PL_uid || PL_egid != PL_gid));
+		    break;
+		}
 		if (strEQ(remaining, "UTF8CACHE")) {
+		    /* $^UTF8CACHE */
 		    PL_utf8cache = (signed char) sv_2iv(sv);
+		    break;
 		}
 		break;
 	    case 'W':
@@ -1733,38 +1780,6 @@ Perl_magic_set(pTHX_ SV *sv, MAGIC *mg)
         else {
             PL_ofs_sv = NULL;
         }
-        break;
-    case '<':
-        PL_uid = SvIV(sv);
-        if (PL_delaymagic) {
-            PL_delaymagic |= DM_RUID;
-            break;                              /* don't do magic till later */
-        }
-#ifdef HAS_SETRUID
-        (void)setruid((Uid_t)PL_uid);
-#else
-#ifdef HAS_SETREUID
-        (void)setreuid((Uid_t)PL_uid, (Uid_t)-1);
-#else
-#ifdef HAS_SETRESUID
-      (void)setresuid((Uid_t)PL_uid, (Uid_t)-1, (Uid_t)-1);
-#else
-        if (PL_uid == PL_euid) {                /* special case $< = $> */
-#ifdef PERL_DARWIN
-            /* workaround for Darwin's setuid peculiarity, cf [perl #24122] */
-            if (PL_uid != 0 && PerlProc_getuid() == 0)
-                (void)PerlProc_setuid(0);
-#endif
-            (void)PerlProc_setuid(PL_uid);
-        } else {
-            PL_uid = PerlProc_getuid();
-            Perl_croak(aTHX_ "setruid() not implemented");
-        }
-#endif
-#endif
-#endif
-        PL_uid = PerlProc_getuid();
-        PL_tainting |= (PL_uid && (PL_euid != PL_uid || PL_egid != PL_gid));
         break;
     case '>':
         PL_euid = SvIV(sv);
