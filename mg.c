@@ -681,13 +681,6 @@ Perl_magic_len(pTHX_ SV *sv, MAGIC *mg)
 		    report_uninit(sv);
 		return 0;
 	}
-    case '+':
-	if (PL_curpm && (rx = PM_GETRE(PL_curpm))) {
-	    paren = RX_LASTPAREN(rx);
-	    if (paren)
-		goto getparen;
-	}
-	return 0;
     }
     magic_get(sv,mg);
     if (!SvPOK(sv) && SvNIOK(sv)) {
@@ -820,6 +813,13 @@ Perl_magic_get(pTHX_ SV *sv, MAGIC *mg)
 		    goto add_groups;
 		}
 		break;
+
+	    case 'I':
+		if (strEQ(remaining, "INPUT_RECORD_SEPARATOR")) {
+		    break;
+		}
+		break;
+
 	    case 'M': /* $^MATCH */
 		if (strEQ(remaining, "MATCH")) {
 		    if (PL_curpm && (rx = PM_GETRE(PL_curpm))) {
@@ -1049,18 +1049,7 @@ Perl_magic_get(pTHX_ SV *sv, MAGIC *mg)
 	}
 	sv_setsv(sv,&PL_sv_undef);
 	break;
-    case '+':
-	if (PL_curpm && (rx = PM_GETRE(PL_curpm))) {
-	    if (RX_LASTPAREN(rx)) {
-	        CALLREG_NUMBUF_FETCH(rx,RX_LASTPAREN(rx),sv);
-	        break;
-	    }
-	}
-	sv_setsv(sv,&PL_sv_undef);
-	break;
     case ':':
-	break;
-    case '/':
 	break;
     case ',':
 	break;
@@ -1550,6 +1539,15 @@ Perl_magic_set(pTHX_ SV *sv, MAGIC *mg)
 		    break;
 		}
 		break;
+
+	    case 'I':
+		if (strEQ(remaining, "INPUT_RECORD_SEPARATOR")) {
+		    /* $^INPUT_RECORD_SEPARATOR */
+		    SVcpSTEAL(PL_rs, newSVsv(sv));
+		    break;
+		}
+		break;
+
 	    case 'M':   /* $^MATCH */
 		if (strEQ(remaining, "MATCH")) {
 		    paren = RX_BUFF_IDX_FULLMATCH;
@@ -1795,9 +1793,6 @@ Perl_magic_set(pTHX_ SV *sv, MAGIC *mg)
                 Perl_croak(aTHX_ PL_no_modify);
             }
         }
-    case '/':
-        SVcpSTEAL(PL_rs, newSVsv(sv));
-        break;
     case '\\':
         if (PL_ors_sv)
             SvREFCNT_dec(PL_ors_sv);
