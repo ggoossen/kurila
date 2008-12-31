@@ -466,13 +466,11 @@ C<$^E>, also.  (Mnemonic: Extra error explanation.)
 
 Also see L<Error Indicators>.
 
-=item $EVAL_ERROR
-
-=item $@
-X<$@> X<$EVAL_ERROR>
+=item $^EVAL_ERROR
+X<$^EVAL_ERROR>
 
 The Perl syntax error message from the last eval() operator.
-If $@ is the null string, the last eval() parsed and executed
+If $^EVALERROR is the null string, the last eval() parsed and executed
 correctly (although the operations you invoked may have failed in the
 normal fashion).  (Mnemonic: Where was the syntax error "at"?)
 
@@ -1147,7 +1145,7 @@ immediate (also known as "unsafe") to deferred, also known as
 =head2 Error Indicators
 X<error> X<exception>
 
-The variables C<$@>, C<$^ERRNO>, C<$^E>, and C<$^CHILD_ERROR> contain information
+The variables C<$^EVALERROR>, C<$^ERRNO>, C<$^E>, and C<$^CHILD_ERROR> contain information
 about different types of error conditions that may appear during
 execution of a Perl program.  The variables are shown ordered by
 the "distance" between the subsystem which reported the error and
@@ -1166,10 +1164,10 @@ following Perl expression, which uses a single-quoted string:
 
 After execution of this statement all 4 variables may have been set.  
 
-C<$@> is set if the string to be C<eval>-ed did not compile (this
+C<$^EVALERROR> is set if the string to be C<eval>-ed did not compile (this
 may happen if C<open> or C<close> were imported with bad prototypes),
 or if Perl code executed during evaluation die()d .  In these cases
-the value of $@ is the compile error, or the argument to C<die>
+the value of $^EVALERROR is the compile error, or the argument to C<die>
 (which will interpolate C<$^ERRNO> and C<$^CHILD_ERROR>).  (See also L<Fatal>,
 though.)
 
@@ -1190,10 +1188,10 @@ value).   The lower eight bits reflect mode of failure, like signal
 death and core dump information  See wait(2) for details.  In
 contrast to C<$^ERRNO> and C<$^E>, which are set only if error condition
 is detected, the variable C<$^CHILD_ERROR> is set on each C<wait> or pipe
-C<close>, overwriting the old value.  This is more like C<$@>, which
+C<close>, overwriting the old value.  This is more like C<$^EVALERROR>, which
 on every eval() is always set on failure and cleared on success.
 
-For more details, see the individual descriptions at C<$@>, C<$^ERRNO>, C<$^E>,
+For more details, see the individual descriptions at C<$^EVALERROR>, C<$^ERRNO>, C<$^E>,
 and C<$^CHILD_ERROR>.
 
 =head2 Technical Note on the Syntax of Variable Names

@@ -931,7 +931,7 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 			if (strEQ(name2, "DIE_HOOK"))
 			    goto magicalize;
 			break;
-		    case 'E':	/* $^ENCODING  $^EGID  $^EUID  $^ERRNO */
+		    case 'E':	/* $^ENCODING  $^EGID  $^EUID  $^ERRNO  $^EVALERROR */
 			if (strEQ(name2, "ENCODING"))
 			    goto magicalize;
 			if (strEQ(name2, "EGID"))
@@ -940,6 +940,8 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 			    goto magicalize;
 			if (strEQ(name2, "ERRNO"))
 			    goto magicalize;
+			if (strEQ(name2, "EVALERROR"))
+			    goto no_magicalize;
 			break;
 
 		    case 'G':   /* $^GID */
@@ -1074,7 +1076,6 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 	    sv_magic(GvSVn(gv), (SV*)gv, PERL_MAGIC_sv, name, len);
 
 	case '$':
-	case '@':
 	case '0':
 	case '_':
 	case 'a':
