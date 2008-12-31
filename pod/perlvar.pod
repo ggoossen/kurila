@@ -351,15 +351,6 @@ value is printed after the last of print's arguments.  Default is C<undef>.
 (Mnemonic: you set C<$^OUTPUT_RECORD_SEPARATOR> instead of adding "\n" at the end of the print.
 Also, it's just like C<$^INPUT_RECORD_SEPARATOR>, but it's what you get "back" from Perl.)
 
-=item $LIST_SEPARATOR
-
-=item $"
-X<$"> X<$LIST_SEPARATOR>
-
-This is like C<$,> except that it applies to array and slice values
-interpolated into a double-quoted string (or similar interpreted
-string).  Default is a space.  (Mnemonic: obvious, I think.)
-
 =item @LAST_MATCH_START
 
 =item @-

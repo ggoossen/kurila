@@ -4111,7 +4111,6 @@ S_init_predump_symbols(pTHX)
     GV *tmpgv;
     IO *io;
 
-    sv_setpvn(get_sv("\"", TRUE), " ", 1);
     PL_stdingv = gv_fetchpvs("STDIN", GV_ADD|GV_NOTQUAL, SVt_PVIO);
     GvMULTI_on(PL_stdingv);
     io = GvIOp(PL_stdingv);

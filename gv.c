@@ -1075,7 +1075,6 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 
 	case '$':
 	case '@':
-	case '"':
 	case '0':
 	case '_':
 	case 'a':
