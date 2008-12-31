@@ -938,6 +938,11 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 		    case 'O':	/* $^OPEN */
 			if (strEQ(name2, "OPEN"))
 			    goto magicalize;
+			if (strEQ(name2, "OUTPUT_AUTOFLUSH")) {
+			    sv_setiv(GvSVn(gv), (IV)(IoFLAGS(GvIOp(PL_defoutgv)) & IOf_FLUSH) != 0);
+			    goto magicalize;
+			}
+
 			break;
 		    case 'P':        /* $^PREMATCH  $^POSTMATCH */
 			if (strEQ(name2, "PREMATCH") || strEQ(name2, "POSTMATCH"))
@@ -1036,10 +1041,6 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 #ifdef COMPLEX_STATUS
 	    SvUPGRADE(GvSVn(gv), SVt_PVLV);
 #endif
-	    goto magicalize;
-
-	case '|':
-	    sv_setiv(GvSVn(gv), (IV)(IoFLAGS(GvIOp(PL_defoutgv)) & IOf_FLUSH) != 0);
 	    goto magicalize;
 
 	ro_magicalize:

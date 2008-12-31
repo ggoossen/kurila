@@ -799,6 +799,12 @@ Perl_magic_get(pTHX_ SV *sv, MAGIC *mg)
 	    case 'O':
 		if (strEQ(remaining, "OPEN")) { /* $^OPEN */
 		    Perl_emulate_cop_io(aTHX_ &PL_compiling, sv);
+		    break;
+		}
+		if (strEQ(remaining, "OUTPUT_AUTOFLUSH")) {
+		    if (GvIOp(PL_defoutgv))
+			sv_setiv(sv, (IV)(IoFLAGS(GvIOp(PL_defoutgv)) & IOf_FLUSH) != 0 );
+		    break;
 		}
 		break;
 	    case 'P':
@@ -1018,10 +1024,6 @@ Perl_magic_get(pTHX_ SV *sv, MAGIC *mg)
     case ':':
 	break;
     case '/':
-	break;
-    case '|':
-	if (GvIOp(PL_defoutgv))
-	    sv_setiv(sv, (IV)(IoFLAGS(GvIOp(PL_defoutgv)) & IOf_FLUSH) != 0 );
 	break;
     case ',':
 	break;
@@ -1508,6 +1510,23 @@ Perl_magic_set(pTHX_ SV *sv, MAGIC *mg)
 		    tmp = newSVpvn_flags(start, out ? (STRLEN)(out - start) : len, 0);
 		    (void)hv_store_ent(PL_compiling.cop_hints_hash,
 				       newSVpvs_flags("open<", SVs_TEMP), tmp, 0);
+		    break;
+		}
+		if (strEQ(remaining, "OUTPUT_AUTOFLUSH")) {
+		    IO * const io = GvIOp(PL_defoutgv);
+		    if(!io)
+			break;
+		    if ((SvIV(sv)) == 0)
+			IoFLAGS(io) &= ~IOf_FLUSH;
+		    else {
+			if (!(IoFLAGS(io) & IOf_FLUSH)) {
+			    PerlIO *ofp = IoOFP(io);
+			    if (ofp)
+				(void)PerlIO_flush(ofp);
+			    IoFLAGS(io) |= IOf_FLUSH;
+			}
+		    }
+		    break;
 		}
 		break;
 	    case 'P':
@@ -1677,23 +1696,6 @@ Perl_magic_set(pTHX_ SV *sv, MAGIC *mg)
                 Perl_croak(aTHX_ PL_no_modify);
             }
         }
-    case '|':
-        {
-            IO * const io = GvIOp(PL_defoutgv);
-            if(!io)
-              break;
-            if ((SvIV(sv)) == 0)
-                IoFLAGS(io) &= ~IOf_FLUSH;
-            else {
-                if (!(IoFLAGS(io) & IOf_FLUSH)) {
-                    PerlIO *ofp = IoOFP(io);
-                    if (ofp)
-                        (void)PerlIO_flush(ofp);
-                    IoFLAGS(io) |= IOf_FLUSH;
-                }
-            }
-        }
-        break;
     case '/':
         SVcpSTEAL(PL_rs, newSVsv(sv));
         break;
