@@ -180,8 +180,6 @@ END_EXTERN_C
 #define PL_body_roots		(*Perl_Ibody_roots_ptr(aTHX))
 #undef  PL_checkav
 #define PL_checkav		(*Perl_Icheckav_ptr(aTHX))
-#undef  PL_chopset
-#define PL_chopset		(*Perl_Ichopset_ptr(aTHX))
 #undef  PL_clocktick
 #define PL_clocktick		(*Perl_Iclocktick_ptr(aTHX))
 #undef  PL_colors

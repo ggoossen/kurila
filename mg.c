@@ -1061,8 +1061,6 @@ Perl_magic_get(pTHX_ SV *sv, MAGIC *mg)
 	}
 	sv_setsv(sv,&PL_sv_undef);
 	break;
-    case ':':
-	break;
     case ',':
 	break;
 #ifndef MACOS_TRADITIONAL
@@ -1827,9 +1825,6 @@ Perl_magic_set(pTHX_ SV *sv, MAGIC *mg)
         else {
             PL_ofs_sv = NULL;
         }
-        break;
-    case ':':
-        PL_chopset = SvPV_force(sv,len);
         break;
 #ifndef MACOS_TRADITIONAL
     case '0':

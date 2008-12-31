@@ -1058,10 +1058,6 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 	/* Names of length 1.  (Or 0. But name is NUL terminated, so that will
 	   be case '\0' in this switch statement (ie a default case)  */
 	switch (*name) {
-	case ':':
-	    sv_setpv(GvSVn(gv),PL_chopset);
-	    goto magicalize;
-
 	ro_magicalize:
 	    SvREADONLY_on(GvSVn(gv));
 	    /* FALL THROUGH */
