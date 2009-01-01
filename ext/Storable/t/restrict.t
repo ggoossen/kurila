@@ -12,7 +12,7 @@ BEGIN {
 	@INC = @('.', '../lib', '../ext/Storable/t');
     } else {
         if (!eval "require Hash::Util") {
-            if ($@->{description} =~ m/Can\'t locate Hash\/Util\.pm in \@INC/s) {
+            if ($^EVAL_ERROR->{description} =~ m/Can\'t locate Hash\/Util\.pm in \@INC/s) {
                 print "1..0 # Skip: No Hash::Util:\n";
                 exit 0;
             } else {
@@ -75,12 +75,12 @@ sub testit {
     "key 'answer' not locked in copy?";
 
   try { $copy->{+extra} = 15 } ;
-  unless (ok ++$test, !$@, "Can assign to reserved key 'extra'?") {
-      die $@;
+  unless (ok ++$test, !$^EVAL_ERROR, "Can assign to reserved key 'extra'?") {
+      die $^EVAL_ERROR;
   }
 
   try { $copy->{nono} = 7 } ;
-  ok ++$test, $@, "Can not assign to invalid key 'nono'?";
+  ok ++$test, $^EVAL_ERROR, "Can not assign to invalid key 'nono'?";
 
   ok ++$test, exists $copy->{undef},
     "key 'undef' exists";
@@ -109,8 +109,8 @@ for my $canonical  (@(0, 1)) {
     for (0..16) {
       my $k = "k$_";
       try { $copy->{+$k} = undef } ;
-      unless (ok ++$test, !$@, "Can assign to reserved key '$k'?") {
-          die $@;
+      unless (ok ++$test, !$^EVAL_ERROR, "Can assign to reserved key '$k'?") {
+          die $^EVAL_ERROR;
       }
     }
   }

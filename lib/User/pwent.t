@@ -17,7 +17,7 @@ BEGIN {
     $uid = 0;
     # On VMS getpwuid(0) may return [$gid,0] UIC info (which may not exist).
     # It is better to use the $< uid for testing on VMS instead.
-    if ( $^O eq 'VMS' ) { $uid = $< ; }
+    if ( $^O eq 'VMS' ) { $uid = $^UID ; }
     if ( $^O eq 'cygwin' ) { $uid = 500 ; }
     our @pwent = @( getpwuid $uid ); # This is the function getpwuid.
     unless (@pwent) { print "1..0 # Skip: no uid $uid\n"; exit 0 }

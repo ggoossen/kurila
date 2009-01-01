@@ -186,10 +186,10 @@ sub validate {
 }
 
 my %Val_Message = %(
-    'r' => "is not readable by uid $>.",
-    'w' => "is not writable by uid $>.",
-    'x' => "is not executable by uid $>.",
-    'o' => "is not owned by uid $>.",
+    'r' => "is not readable by uid $^UID.",
+    'w' => "is not writable by uid $^UID.",
+    'x' => "is not executable by uid $^UID.",
+    'o' => "is not owned by uid $^UID.",
     'R' => "is not readable by you.",
     'W' => "is not writable by you.",
     'X' => "is not executable by you.",

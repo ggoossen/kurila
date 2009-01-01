@@ -52,10 +52,10 @@ do {
     nothing;
 
     eval "nothing";
-    ok ! $@, "compsub in run-time eval";
+    ok ! $^EVAL_ERROR, "compsub in run-time eval";
 };
 eval "nothing";
-like $@->{description}, qr/Bareword "nothing" not allowed/, "compsub lexical scoped.";
+like $^EVAL_ERROR->{description}, qr/Bareword "nothing" not allowed/, "compsub lexical scoped.";
 
 
 ## calling a function

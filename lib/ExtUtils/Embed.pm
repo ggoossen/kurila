@@ -169,7 +169,6 @@ sub ldopts {
     my @(?$std,?$mods,?$link_args,?$path) =  @_;
     my(@mods,@link_args,@argv);
     my($dllib,$config_libs,@potential_libs,@path);
-    local($") = ' ' unless $" eq ' ';
     if (scalar nelems @_) {
        @link_args = @$link_args if $link_args;
        @mods = @$mods if $mods;

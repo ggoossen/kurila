@@ -296,7 +296,7 @@ try {File::Find::find( \%(wanted => \&simple_wanted, untaint => 1,
                          untaint_pattern => qr|^(NO_MATCH)$|),
                          topdir('fa') );};
 
-like( $^EVAL_ERROR->{?description}, qr|is still tainted|, 'Bad untaint pattern causes death (good)' );
+like( $^EVAL_ERROR->message, qr|is still tainted|, 'Bad untaint pattern causes death (good)' );
 chdir($cwd_untainted);
 
 

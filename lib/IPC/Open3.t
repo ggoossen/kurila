@@ -49,7 +49,7 @@ print "1..22\n";
 
 # basic
 ok 1, $pid = open3 \*WRITE, \*READ, \*ERROR, $perl, '-e', cmd_line(<<'EOF');
-    $| = 1;
+    $^OUTPUT_AUTOFLUSH = 1;
     print scalar ~< *STDIN;
     print STDERR "hi error\n";
 EOF
@@ -65,7 +65,7 @@ ok 9, $^CHILD_ERROR == 0, $^CHILD_ERROR;
 
 # read and error together, both named
 $pid = open3 \*WRITE, \*READ, \*READ, $perl, '-e', cmd_line(<<'EOF');
-    $| = 1;
+    $^OUTPUT_AUTOFLUSH = 1;
     print scalar ~< *STDIN;
     print STDERR scalar ~< *STDIN;
 EOF
@@ -77,7 +77,7 @@ waitpid $pid, 0;
 
 # read and error together, error empty
 $pid = open3 \*WRITE, \*READ, '', $perl, '-e', cmd_line(<<'EOF');
-    $| = 1;
+    $^OUTPUT_AUTOFLUSH = 1;
     print scalar ~< *STDIN;
     print STDERR scalar ~< *STDIN;
 EOF
@@ -113,7 +113,7 @@ waitpid $pid, 0;
 
 # dup reader and error together, both named
 $pid = open3 'WRITE', '>&STDOUT', '>&STDOUT', $perl, '-e', cmd_line(<<'EOF');
-    $| = 1;
+    $^OUTPUT_AUTOFLUSH = 1;
     print STDOUT scalar ~< *STDIN;
     print STDERR scalar ~< *STDIN;
 EOF
@@ -123,7 +123,7 @@ waitpid $pid, 0;
 
 # dup reader and error together, error empty
 $pid = open3 'WRITE', '>&STDOUT', '', $perl, '-e', cmd_line(<<'EOF');
-    $| = 1;
+    $^OUTPUT_AUTOFLUSH = 1;
     print STDOUT scalar ~< *STDIN;
     print STDERR scalar ~< *STDIN;
 EOF

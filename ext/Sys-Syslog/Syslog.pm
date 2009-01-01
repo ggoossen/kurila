@@ -124,7 +124,7 @@ sub openlog {
     @(?$ident, ?my $logopt, ?$facility) =  @_;
 
     # default values
-    $ident    ||= basename($0) || getlogin() || getpwuid($<) || 'syslog';
+    $ident    ||= basename($0) || getlogin() || getpwuid($^UID) || 'syslog';
     $logopt   ||= '';
     $facility ||= LOG_USER();
 

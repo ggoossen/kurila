@@ -6,9 +6,9 @@ use Fcntl;
 
 BEGIN {
 # see if we have O_EXLOCK
-  try { &Fcntl::O_EXLOCK; };
-  if ($@) {
-    plan skip_all => 'Do not seem to have O_EXLOCK';
+  try { Fcntl::O_EXLOCK; };
+  if ($^EVAL_ERROR && $^EVAL_ERROR->description =~ m/Your vendor has not defined/) {
+      plan skip_all => 'Do not seem to have O_EXLOCK';
   } else {
     plan tests => 4;
     use_ok( "File::Temp" );

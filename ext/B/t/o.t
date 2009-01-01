@@ -62,7 +62,7 @@ END {
 __END__
 package B::success;
 
-$| = 1;
+$^OUTPUT_AUTOFLUSH = 1;
 print "Compiling!\n";
 
 sub compile {

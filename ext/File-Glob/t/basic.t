@@ -28,11 +28,11 @@ SKIP: do {
     my ($name, $home);
     skip $^O, 1 if $^O eq 'MSWin32' || $^O eq 'NetWare' || $^O eq 'VMS'
 	|| $^O eq 'os2' || $^O eq 'beos';
-    skip "Can't find user for $>: $^EVAL_ERROR", 1 unless try {
-	@($name, $home) =  @(getpwuid($>))[[@:0,7]];
+    skip "Can't find user for $^EUID: $^EVAL_ERROR", 1 unless try {
+	@($name, $home) =  @(getpwuid($^EUID))[[@:0,7]];
 	1;
     };
-    skip "$> has no home directory", 1
+    skip "$^EUID has no home directory", 1
 	unless defined $home && defined $name && -d $home;
 
     @a = bsd_glob("~$name", GLOB_TILDE);
@@ -68,7 +68,7 @@ SKIP: do {
     skip $^O, 2 if $^O eq 'mpeix' or $^O eq 'MSWin32' or $^O eq 'NetWare'
 	or $^O eq 'os2' or $^O eq 'VMS' or $^O eq 'cygwin';
     skip "AFS", 2 if Cwd::cwd() =~ m#^$(config_value('afsroot'))#s;
-    skip "running as root", 2 if not $>;
+    skip "running as root", 2 if not $^EUID;
 
     my $dir = "pteerslo";
     mkdir $dir, 0;

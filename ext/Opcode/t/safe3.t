@@ -16,7 +16,7 @@ $safe->reval( qq{\@_[1] = qq/\0/ x } . $masksize );
 
 # Check that it didn't work
 $safe->reval( q{$x + $y} );
-like( $@->{?description}, qr/^'?addition \(\+\)'? trapped by operation mask/,
+like( $^EVAL_ERROR->{?description}, qr/^'?addition \(\+\)'? trapped by operation mask/,
 	    'opmask still in place with reval' );
 
 my $safe2 = Safe->new();
@@ -25,14 +25,14 @@ $safe2->deny('add');
 TODO: do {
     todo_skip("segmentation fault", 1);
 
-    open my $fh, ">", 'nasty.pl' or die "Can't write nasty.pl: $!\n";
+    open my $fh, ">", 'nasty.pl' or die "Can't write nasty.pl: $^OS_ERROR\n";
     print $fh <<EOF;
 \@_[1] = "\0" x $masksize;
 EOF
     close $fh;
     $safe2->rdo('nasty.pl');
     $safe2->reval( q{$x + $y} );
-    like( $@->{?description}, qr/^'?addition \(\+\)'? trapped by operation mask/,
+    like( $^EVAL_ERROR->{?description}, qr/^'?addition \(\+\)'? trapped by operation mask/,
           'opmask still in place with rdo' );
 };
 

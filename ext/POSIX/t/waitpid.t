@@ -5,12 +5,13 @@ BEGIN {
 	exit 0;
     }
     eval 'use POSIX qw(sys_wait_h)';
-    if ($@) {
+    if ($^EVAL_ERROR) {
+        die if $^EVAL_ERROR->message != m/sys_wait_h/;
 	print "1..0 # Skip: no POSIX sys_wait_h\n";
 	exit 0;
     }
     eval 'use Time::HiRes qw(time)';
-    if ($@) {
+    if ($^EVAL_ERROR) {
 	print "1..0 # Skip: no Time::HiRes\n";
 	exit 0;
     }

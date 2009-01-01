@@ -22,7 +22,7 @@ while ( ~< *DATA) {
     %code{+$1} = $2;
 }
 
-open my $fh, '<', '../opcode.pl' or die "Can't open opcode.pl: $!";
+open my $fh, '<', '../opcode.pl' or die "Can't open opcode.pl: $^OS_ERROR";
 while ( ~< $fh) {
     last if m/^__END__/;
 }
@@ -42,7 +42,7 @@ sub testop {
     my $c = Safe->new();
     $c->deny_only($op);
     $c->reval($code);
-    like($@->message, qr/'\Q$opname\E' trapped by operation mask/, $op);
+    like($^EVAL_ERROR->message, qr/'\Q$opname\E' trapped by operation mask/, $op);
 }
 
 foreach (@op) {

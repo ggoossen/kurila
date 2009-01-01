@@ -1,6 +1,6 @@
 #!./perl -w
 
-$|=1;
+$^OUTPUT_AUTOFLUSH=1;
 
 use Config;
 
@@ -65,7 +65,7 @@ ok( verify_opset($s1) && !verify_opset(42) );
 
 opmask_add(opset( <qw(fileno)));	# add to global op_mask
 ok( ! eval 'fileno STDOUT' ); # fail
-ok( $@ && $@->{?description} =~ m/'fileno' trapped/ );
+ok( $^EVAL_ERROR && $^EVAL_ERROR->{?description} =~ m/'fileno' trapped/ );
 
 # --- finally, check some opname assertions
 

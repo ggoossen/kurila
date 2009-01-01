@@ -1449,7 +1449,7 @@ sub maybe_diddle_INC {
     eval q{ use lib qw(. lib); 1; } or die;
 
     # don't add if superuser
-    if ($< && $> && -f "blib") {   # don't be looking too hard now!
+    if ($^UID && $^EUID && -f "blib") {   # don't be looking too hard now!
       eval q{ use blib; 1 };
       warn $^EVAL_ERROR if $^EVAL_ERROR && $self->opt_v;
     }
@@ -1671,7 +1671,7 @@ sub drop_privs_maybe {
     if (!(IS_VMS || IS_MSWin32 || IS_Dos
           || IS_OS2
          )
-        && ($> == 0 || $< == 0)
+        && ($^UID == 0 || $^EUID == 0)
         && !$self->am_taint_checking()
     ) {
         my $id = try { getpwnam("nobody") };
@@ -1696,12 +1696,12 @@ sub drop_privs_maybe {
             # when the effective uid is zero).
             #
         try {
-            $< = $id; # real uid
-            $> = $id; # effective uid
-            $< = $id; # real uid
-            $> = $id; # effective uid
+            $^UID = $id; # real uid
+            $^EUID = $id; # effective uid
+            $^UID = $id; # real uid
+            $^EUID = $id; # effective uid
         };
-        if( !$^EVAL_ERROR && $< && $> ) {
+        if( !$^EVAL_ERROR && $^UID && $^EUID ) {
           DEBUG and print "OK, I dropped privileges.\n";
         } elsif( $self->opt_U ) {
           DEBUG and print "Couldn't drop privileges, but in -U mode, so feh."

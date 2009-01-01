@@ -474,7 +474,7 @@ SKIP: do {
 	    $loc = POSIX::setlocale(&POSIX::LC_ALL( < @_ ), $_);
 	    last if POSIX::localeconv()->{?decimal_point} eq ',';
 	}
-	skip 'Cannot test locale handling without a comma locale', 4
+	skip 'Cannot test locale handling without a comma locale', 3
 	    unless ( $loc and ($ver eq '1,23') );
 
 	diag ("Testing locale handling with $loc") if $Verbose;
@@ -482,8 +482,7 @@ SKIP: do {
 	my $v = $CLASS->new($ver);
 	unlike($warning,qr/Version string '1,23' contains invalid data/,
 	    "Process locale-dependent floating point");
-	is ($v, "1.23", "Locale doesn't apply to version objects");
-	ok ($v == $ver, "Comparison to locale floating point");
+	is ($v->stringify, "1.23", "Locale doesn't apply to version objects");
     };
 
     eval 'my $v = $CLASS->new("1._1");';

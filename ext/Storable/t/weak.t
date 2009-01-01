@@ -30,7 +30,7 @@ sub tester {
   my @($contents, $sub, $testersub, $what) = @_;
   # Test that if we re-write it, everything still works:
   my $clone = &$sub ($contents);
-  is ($@, "", "There should be no error extracting for $what");
+  is ($^EVAL_ERROR, "", "There should be no error extracting for $what");
   &$testersub ($clone, $what);
 }
 

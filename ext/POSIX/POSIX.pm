@@ -636,7 +636,7 @@ sub getegid {
 
 sub geteuid {
     usage "geteuid()" if (nelems @_) != 0;
-    $> + 0;
+    $^EUID + 0;
 }
 
 sub getgid {
@@ -672,7 +672,7 @@ sub getppid {
 
 sub getuid {
     usage "getuid()" if (nelems @_) != 0;
-    $<;
+    $^UID;
 }
 
 sub isatty {

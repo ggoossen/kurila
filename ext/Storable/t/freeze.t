@@ -105,7 +105,7 @@ sub foo { @_[0] = 1 }
 $foo = \@();
 foo($foo->[?1]);
 try { freeze($foo) };
-print "not " if $@;
+print "not " if $^EVAL_ERROR;
 print "ok 15\n";
 
 # Test cleanup bug found by Claudio Garcia -- RAM, 08/06/2001
@@ -114,19 +114,19 @@ my $thaw_me = 'asdasdasdasd';
 try {
 	my $thawed = thaw $thaw_me;
 };
-ok 16, $@;
+ok 16, $^EVAL_ERROR;
 
 my %to_be_frozen = %(foo => 'bar');
 my $frozen;
 try {
 	$frozen = freeze \%to_be_frozen;
 };
-ok 17, !$@;
+ok 17, !$^EVAL_ERROR;
 
 freeze \%();
 try { thaw $thaw_me };
 try { $frozen = freeze \%( foo => \%() ) };
-ok 18, !$@;
+ok 18, !$^EVAL_ERROR;
 
 thaw $frozen;			# used to segfault here
 ok 19, 1;
@@ -138,4 +138,4 @@ ok 19, 1;
         our @b = map { exists $b->[$_] } 0 .. (nelems @$b)-1;
         ok 20, (join " ", @a) eq (join " ", @b);
     ';
-    die if $@;
+    die if $^EVAL_ERROR;

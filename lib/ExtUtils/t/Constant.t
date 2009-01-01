@@ -399,7 +399,7 @@ if (open OUTPUT, ">", "$output") \{
   print "ok 1\n";
   select OUTPUT;
 \} else \{
-  print "not ok 1 # Failed to open '$output': \$!\n";
+  print "not ok 1 # Failed to open '$output': \$^OS_ERROR\n";
   exit 1;
 \}
 EOT
@@ -409,7 +409,7 @@ select STDOUT;
 if (close OUTPUT) \{
   print "ok 2\n";
 \} else \{
-  print "not ok 2 # Failed to close '$output': \$!\n";
+  print "not ok 2 # Failed to close '$output': \$^OS_ERROR\n";
 \}
 EOT
   close FH or die "close $testpl: $^OS_ERROR\n";
@@ -589,8 +589,8 @@ $test++;
 my $notdef = try { NOTDEF; };
 if (defined $notdef) {
   print "not ok $test # \$notdef='$notdef'\n";
-} elsif ($@->{description} !~ m/Your vendor has not defined the requested ExtTest macro/) {
-  warn $@->message;
+} elsif ($^EVAL_ERROR->{description} !~ m/Your vendor has not defined the requested ExtTest macro/) {
+  warn $^EVAL_ERROR->message;
   print "not ok $test\n";
 } else {
   print "ok $test\n";
@@ -601,9 +601,9 @@ $test++;
 my $notthere = try { &ExtTest::NOTTHERE; };
 if (defined $notthere) {
   print "not ok $test # \$notthere='$notthere'\n";
-} elsif ($@->{description} !~ m/Undefined subroutine .*NOTTHERE called/) {
-  chomp $@;
-  print "not ok $test # \$@='$@'\n";
+} elsif ($^EVAL_ERROR->{description} !~ m/Undefined subroutine .*NOTTHERE called/) {
+  chomp $^EVAL_ERROR;
+  print "not ok $test # \$^EVAL_ERROR='$^EVAL_ERROR'\n";
 } else {
   print "ok $test\n";
 }
@@ -640,8 +640,8 @@ $test++;
 $notdef = try { &ExtTest::So };
 if (defined $notdef) {
   print "not ok $test # \$notdef='$notdef'\n";
-} elsif ($@->{description} !~ m/^Undefined subroutine .*So called/) {
-  print "not ok $test # \$@='$@'\n";
+} elsif ($^EVAL_ERROR->{description} !~ m/^Undefined subroutine .*So called/) {
+  print "not ok $test # \$^EVAL_ERROR='$^EVAL_ERROR'\n";
 } else {
   print "ok $test\n";
 }
@@ -651,8 +651,8 @@ $test++;
 $notdef = try { &ExtTest::EW };
 if (defined $notdef) {
   print "not ok $test # \$notdef='$notdef'\n";
-} elsif ($@->{description} !~ m/^Undefined subroutine .*EW called/) {
-  print "not ok $test # \$@='$@'\n";
+} elsif ($^EVAL_ERROR->{description} !~ m/^Undefined subroutine .*EW called/) {
+  print "not ok $test # \$^EVAL_ERROR='$^EVAL_ERROR'\n";
 } else {
   print "ok $test\n";
 }
@@ -672,8 +672,8 @@ $test_body .= <<'EOT';
 my $fail;
 while (my @(?$point, ?$bearing) = @: each %compass) {
   my $val = eval $point;
-  if ($@) {
-    print "# $point: \$@='$@'\n";
+  if ($^EVAL_ERROR) {
+    print "# $point: \$^EVAL_ERROR='$^EVAL_ERROR'\n";
     $fail = 1;
   } elsif (!defined $bearing) {
     print "# $point: \$val=undef\n";

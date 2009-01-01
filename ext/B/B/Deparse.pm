@@ -598,7 +598,7 @@ sub compile {
 	if ($^INPUT_RECORD_SEPARATOR ne "\n" or defined $O::savebackslash) { # deparse -l and -0
 	    my $fs = perlstring($^INPUT_RECORD_SEPARATOR) || 'undef';
 	    my $bs = perlstring($O::savebackslash) || 'undef';
-	    print qq(BEGIN \{ \$/ = $fs; \$\\ = $bs; \}\n);
+	    print qq(BEGIN \{ \$^INPUT_RECORD_SEPARATOR = $fs; \$^OUTPUT_RECORD_SEPARATOR = $bs; \}\n);
 	}
 	my @BEGINs  = @( B::begin_av->isa("B::AV") ?? < B::begin_av->ARRAY !! () );
 	my @UNITCHECKs = @( B::unitcheck_av->isa("B::AV")

@@ -801,7 +801,7 @@ sub _find_dir($$$) {
     unless ( $no_chdir || ($p_dir eq $File::Find::current_dir)) {
 	my $udir = $p_dir;
 	if (( $untaint ) && (is_tainted($p_dir) )) {
-	    @( $udir ) = @: $p_dir =~ m|$untaint_pat|;
+	    @( ?$udir ) = @: $p_dir =~ m|$untaint_pat|;
 	    unless (defined $udir) {
 		if ($untaint_skip == 0) {
 		    die "directory $p_dir is still tainted";
@@ -1312,6 +1312,6 @@ unless ($File::Find::dont_use_nlink) {
     $File::Find::dont_use_nlink = 1 if Config::config_value('dont_use_nlink');
 }
 
-*is_tainted = \&Internals::SvTAINTED;
+*is_tainted = sub { \&Internals::SvTAINTED(\@_[0]) };
 
 1;

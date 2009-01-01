@@ -166,7 +166,7 @@ __END__
 
 #define my_puts(a) if(puts(a) < 0) exit(666)
 
-static const char * cmds [] = { "perl", "-e", "$|=1; print qq[ok 5\\n]", NULL };
+static const char * cmds [] = { "perl", "-e", "$^OUTPUT_AUTOFLUSH=1; print qq[ok 5\\n]", NULL };
 
 #ifdef PERL_GLOBAL_STRUCT_PRIVATE
 static struct perl_vars *my_plvarsp;

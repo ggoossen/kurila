@@ -1,5 +1,5 @@
 #!./perl -w
-$|=1;
+$^OUTPUT_AUTOFLUSH=1;
 use Config;
 
 print "1..0\n# TODO for changes pckage system";

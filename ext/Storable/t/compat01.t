@@ -16,9 +16,9 @@ BEGIN {
     }
 }
 
-use Storable qw(retrieve);
+use Storable < qw(retrieve);
 
-my $file = "xx-$$.pst";
+my $file = "xx-$^PID.pst";
 my @dumps = @(
     # some sample dumps of the hash { one => 1 }
     "perl-store\x[04]1234\4\4\4\x[94]y\22\b\3\1\0\0\0vxz\22\b\1\1\0\0\x[00]1Xk\3\0\0\0oneX", # 0.1
@@ -28,13 +28,13 @@ my @dumps = @(
 print "1.." . (nelems @dumps) . "\n";
 
 my $testno;
-for my $dump (< @dumps) {
+for my $dump (@dumps) {
     $testno++;
 
-    open(FH, ">", "$file") || die "Can't create $file: $!";
+    open(FH, ">", "$file") || die "Can't create $file: $^OS_ERROR";
     binmode(FH);
     print FH $dump;
-    close(FH) || die "Can't write $file: $!";
+    close(FH) || die "Can't write $file: $^OS_ERROR";
 
     try {
 	my $data = retrieve($file);
@@ -45,7 +45,7 @@ for my $dump (< @dumps) {
 	    print "not ok $testno\n";
 	}
     };
-    warn $@ if $@;
+    warn if $^EVAL_ERROR;
 
     unlink($file);
 }

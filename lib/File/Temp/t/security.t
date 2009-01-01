@@ -90,7 +90,7 @@ sub test_security {
                                           DIR => File::Spec->tmpdir,
                                           UNLINK => 1,
                                       );
-			    };
+			    } || @(undef, undef);
 
   if (defined $fname1) {
       print "# fname1 = $fname1\n";
@@ -107,7 +107,7 @@ sub test_security {
   }
 
   # Explicitly 
-  if ( $< +< File::Temp->top_system_uid() ){
+  if ( $^UID +< File::Temp->top_system_uid() ){
       skip("Skip Test inappropriate for root", 1);
       eval q{ END { skip($skip,1); } 1; } || die;
       return;

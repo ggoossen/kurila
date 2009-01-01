@@ -95,10 +95,10 @@ sub test_truncated {
     my $clone = &$sub($short);
     is (defined ($clone), '', "truncated $what to $i should fail");
     if ($i +< $magic_len) {
-      like ($@ && $@->{description}, "/^Magic number checking on storable $what failed/",
+      like ($^EVAL_ERROR && $^EVAL_ERROR->{description}, "/^Magic number checking on storable $what failed/",
           "Should croak with magic number warning");
     } else {
-      is ($@, "", "Should not set \$\@");
+      is ($^EVAL_ERROR, "", "Should not set \$\@");
     }
   }
 }
@@ -108,7 +108,7 @@ sub test_corrupt {
 
   my $clone = &$sub($data);
   is (defined ($clone), '', "$name $what should fail");
-  like ($@->{description}, $what, $name);
+  like ($^EVAL_ERROR->{description}, $what, $name);
 }
 
 sub test_things {
@@ -122,7 +122,7 @@ sub test_things {
   # Test that if we re-write it, everything still works:
   my $clone = &$sub ($contents);
 
-  is ($@, "", "There should be no error");
+  is ($^EVAL_ERROR, "", "There should be no error");
 
   test_hash ($clone);
 
@@ -154,7 +154,7 @@ sub test_things {
   do {
     # Now by default newer minor version numbers are not a pain.
     $clone = &$sub($copy);
-    is ($@, "", "by default no error on higher minor");
+    is ($^EVAL_ERROR, "", "by default no error on higher minor");
     test_hash ($clone);
 
     local $Storable::accept_future_minor = 0;
@@ -238,7 +238,7 @@ ok (defined store(\%hash, $file));
 my $expected = 20 + bytes::length ($file_magic_str) + $other_magic + $fancy;
 my $length = -s $file;
 
-die "Don't seem to have written file '$file' as I can't get its length: $!"
+die "Don't seem to have written file '$file' as I can't get its length: $^OS_ERROR"
   unless defined $file;
 
 die "Expected file to be $expected bytes (sizeof long is $(config_value('longsize'))) but it is $length"
@@ -259,14 +259,14 @@ my $stored = freeze \%hash;
 test_things($stored, \&freeze_and_thaw, 'string');
 
 # Network order.
-unlink $file or die "Can't unlink '$file': $!";
+unlink $file or die "Can't unlink '$file': $^OS_ERROR";
 
 ok (defined nstore(\%hash, $file));
 
 $expected = 20 + length ($file_magic_str) + $network_magic + $fancy;
 $length = -s $file;
 
-die "Don't seem to have written file '$file' as I can't get its length: $!"
+die "Don't seem to have written file '$file' as I can't get its length: $^OS_ERROR"
   unless defined $file;
 
 die "Expected file to be $expected bytes (sizeof long is $(config_value('longsize'))) but it is $length"
@@ -300,6 +300,6 @@ do {
 
 # Unusual in that the empty string is stored with an SX_LSCALAR marker
 my $hash = store_and_retrieve("pst0\5\6\3\0\0\0\1\1\0\0\0\0\0\0\0\5empty");
-ok(!$@, "no exception");
+ok(!$^EVAL_ERROR, "no exception");
 is(ref($hash), "HASH", "got a hash");
 is($hash->{empty}, "", "got empty element");

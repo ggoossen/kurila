@@ -37,33 +37,7 @@ no warnings;
 my $globbed_match ;
 
 our @MINIMAL_EXPORT = qw(
-	$INPUT_RECORD_SEPARATOR
-	$RS
-	$OUTPUT_AUTOFLUSH
-	$OUTPUT_FIELD_SEPARATOR
-	$OFS
-	$OUTPUT_RECORD_SEPARATOR
-	$ORS
-	$LIST_SEPARATOR
-	$SUBSCRIPT_SEPARATOR
-	$SUBSEP
-	$CHILD_ERROR
-	$OS_ERROR
-	%OS_ERROR_FLAGS
-	$ERRNO
-	%ERRNO_FLAGS
 	$EXTENDED_OS_ERROR
-        $EVAL_ERROR
-	$PROCESS_ID
-	$PID
-	$REAL_USER_ID
-	$UID
-	$EFFECTIVE_USER_ID
-	$EUID
-	$REAL_GROUP_ID
-	$GID
-	$EFFECTIVE_GROUP_ID
-	$EGID
 	$PROGRAM_NAME
 	$PERL_VERSION
 	$COMPILING
@@ -93,41 +67,12 @@ sub import {
 
 	*LAST_SUBMATCH_RESULT			= *^N{SCALAR} ;
 
-# Input.
-
-	*INPUT_RECORD_SEPARATOR			= */{SCALAR}	;
-	    *RS					= */{SCALAR}	;
-
-# Output.
-
-	*OUTPUT_AUTOFLUSH			= *|{SCALAR}	;
-	*OUTPUT_FIELD_SEPARATOR			= *,{SCALAR}	;
-	    *OFS				= *,{SCALAR}	;
-	*OUTPUT_RECORD_SEPARATOR		= *\{SCALAR}	;
-	    *ORS				= *\{SCALAR}	;
-
-# Interpolation "constants".
-
-	*LIST_SEPARATOR				= *"{SCALAR}	;
-
 # Error status.
 
-	*CHILD_ERROR				= *?{SCALAR}	;
-	*OS_ERROR				= *!{SCALAR}	;
-	    *ERRNO				= *!{SCALAR}	;
 	*EXTENDED_OS_ERROR			= *^E{SCALAR}	;
-        *EVAL_ERROR                             = *@{SCALAR}    ;
 
 # Process info.
 
-	*PROCESS_ID				= *{\(*$)}{SCALAR}	;
-	    *PID				= *{\(*$)}{SCALAR}	;
-	*REAL_USER_ID				= *<{SCALAR}	;
-	    *UID				= *<{SCALAR}	;
-	*EFFECTIVE_USER_ID			= *>{SCALAR}	;
-	    *EUID				= *>{SCALAR}	;
-	*REAL_GROUP_ID				= *^GID{SCALAR}	;
-	*EFFECTIVE_GROUP_ID			= *^EGID{SCALAR}	;
 	*PROGRAM_NAME				= *0{SCALAR}	;
 
 # Internals.

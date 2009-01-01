@@ -59,7 +59,7 @@ EOC
 sub one_invocation {
   my @($core, $call, $name, @< @argv) =  @_;
   return qq{$call($(join ', ', @argv)) || die "Can't $name(\$(join ', ', map \{ dump::view(\$_) \} \@_))} . 
-    ($core ?? ': $!' !! ', \$! is \"$!\"') . '"';
+    ($core ?? ': $^OS_ERROR' !! ', \$^OS_ERROR is \"$^OS_ERROR\"') . '"';
 }
 
 sub _make_fatal {
@@ -94,7 +94,7 @@ sub _make_fatal {
     }
     $code = <<EOS;
 sub$real_proto \{
-	local(\$!) = (0);
+	local(\$^OS_ERROR) = (0);
 EOS
     my @protos = fill_protos($proto);
     $code .= write_invocation($core, $call, $name, < @protos);
