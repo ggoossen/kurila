@@ -21,7 +21,7 @@ BEGIN {
     'List::Util' => q| ::is( ref List::Util->can('first'), 'CODE' ) |,  # 5.7.2
     'Cwd'        => q| ::is( ref Cwd->can('fastcwd'),'CODE' ) |,         # 5.7 ?
     'File::Glob' => q| ::is( ref File::Glob->can('doglob'),'CODE' ) |,   # 5.6
-    $db_file     => q| ::is( ref $db_file->can('TIEHASH'), 'CODE' ) |,  # 5.0
+    ($db_file ?? ( $db_file     => q| ::is( ref $db_file->can('TIEHASH'), 'CODE' ) | ) !! () ),  # 5.0
     'Socket'     => q| ::is( ref Socket->can('inet_aton'),'CODE' ) |,    # 5.0
     'Time::HiRes'=> q| ::is( ref Time::HiRes->can('usleep'),'CODE' ) |,  # 5.7.3
     'Fcntl'      => q| ::is( ref Fcntl->can('O_BINARY'),'CODE' ) |,
