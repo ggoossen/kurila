@@ -80,7 +80,7 @@ my $x = 25;
 eval <<'EOT'; die if $^EVAL_ERROR;
   print "# $x\n";	# clone into eval's pad
   sub do_eval1 {
-     eval @_[0]; die if $@;
+     eval @_[0]; die if $^EVAL_ERROR;
   }
 EOT
 do_eval1('print "ok $x\n"');
@@ -94,7 +94,7 @@ $x++;
 
 eval <<'EOT'; die if $^EVAL_ERROR;
   sub do_eval2 {
-     eval @_[0]; die if $@;
+     eval @_[0]; die if $^EVAL_ERROR;
   }
 do_eval2('print "ok $x\n"');
 $x++;
@@ -111,7 +111,7 @@ my $ok = 'ok';
 eval <<'EOT'; die if $^EVAL_ERROR;
   # $x unbound here
   sub do_eval3 {
-     eval @_[0]; die if $@;
+     eval @_[0]; die if $^EVAL_ERROR;
   }
 EOT
 do {
@@ -168,7 +168,7 @@ do {
     $x++;
 };
 
-# return from try {} should clear $@ correctly
+# return from try {} should clear $^EVAL_ERROR correctly
 do {
     my $status = try {
 	try { die };
@@ -208,7 +208,7 @@ do {
   print $^EVAL_ERROR ?? "ok 45\n" !! "not ok 45\n";
 };
 
-# [ID 20020623.002] eval "" doesn't clear $@
+# [ID 20020623.002] eval "" doesn't clear $^EVAL_ERROR
 do {
     $^EVAL_ERROR = 5;
     eval q{};

@@ -22,10 +22,10 @@ ok( -r 'TEST' );
 try { chmod 0555, 'TEST' or die "chmod 0555, 'TEST' failed: $^OS_ERROR" };
 chomp ($bad_chmod = $^EVAL_ERROR);
 
-$oldeuid = $>;		# root can read and write anything
-eval '$> = 1';		# so switch uid (may not be implemented)
+$oldeuid = $^EUID;		# root can read and write anything
+eval '$^EUID = 1';		# so switch uid (may not be implemented)
 
-print "# oldeuid = $oldeuid, euid = $>\n";
+print "# oldeuid = $oldeuid, euid = $^EUID\n";
 
 SKIP: do {
     if (!config_value("d_seteuid")) {

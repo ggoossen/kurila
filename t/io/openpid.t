@@ -34,8 +34,8 @@ $perl .= qq[ "-I../lib"];
 # the other reader reads one line, waits a few seconds and then
 # exits to test the waitpid function.
 #
-my $cmd1 = qq/$perl -e "\$|=1; print qq[first process\\n]; sleep 30;"/;
-my $cmd2 = qq/$perl -e "\$|=1; print qq[second process\\n]; sleep 30;"/;
+my $cmd1 = qq/$perl -e "\$^OUTPUT_AUTOFLUSH=1; print qq[first process\\n]; sleep 30;"/;
+my $cmd2 = qq/$perl -e "\$^OUTPUT_AUTOFLUSH=1; print qq[second process\\n]; sleep 30;"/;
 my $cmd3 = qq/$perl -e "print ~< *ARGV;"/; # hangs waiting for end of STDIN
 my $cmd4 = qq/$perl -e "print scalar ~< *ARGV;"/;
 

@@ -4,10 +4,7 @@
 # (including weird syntax errors)
 
 BEGIN { require "./test.pl"; }
-plan( tests => 78 );
-
-eval '%@x=0;';
-like( $^EVAL_ERROR->{?description}, qr/^Can't coerce HASH to string in repeat/, '%@x=0' );
+plan( tests => 77 );
 
 # Bug 20010528.007
 eval q/"\x{"/;

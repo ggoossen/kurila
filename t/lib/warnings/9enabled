@@ -198,7 +198,7 @@ use abc ;
 try { 
   abc::check() ; 
 };
-print $@ ;
+print $^EVAL_ERROR ;
 EXPECT
 ok1
 ok2
@@ -219,7 +219,7 @@ use abc ;
 try { 
   abc::check() ; 
   } ;
-print $@ ;
+print $^EVAL_ERROR ;
 EXPECT
 ok1
 ok2
@@ -240,7 +240,7 @@ require "abc" ;
 try { 
   abc::check() ; 
   } ;
-print $@ ;
+print $^EVAL_ERROR ;
 EXPECT
 ok1
 ok2
@@ -263,7 +263,7 @@ try {
   abc::check() ; 
 };
 abc::check() ; 
-print $@ ;
+print $^EVAL_ERROR ;
 EXPECT
 ok1
 ok2
@@ -335,11 +335,11 @@ use warnings ;
 try { 
     warnings::warn() 
   } ;
-print $@->description, "\n";
+print $^EVAL_ERROR->description, "\n";
 try { 
   warnings::warn("fred", "joe") 
   } ;
-print $@->description, "\n";
+print $^EVAL_ERROR->description, "\n";
 EXPECT
 Usage: warnings::warn([category,] 'message')
 Unknown warnings category 'fred'
@@ -350,11 +350,11 @@ use warnings ;
 try { 
   warnings::warnif() 
 } ;
-print $@->description, "\n";
+print $^EVAL_ERROR->description, "\n";
 try { 
   warnings::warnif("fred", "joe") 
 } ;
-print $@->description, "\n";
+print $^EVAL_ERROR->description, "\n";
 EXPECT
 Usage: warnings::warnif([category,] 'message')
 Unknown warnings category 'fred'
@@ -401,7 +401,7 @@ use abc;
 try { 
     abc::check() ; 
   } ;
-print "[[$@]]\n";
+print "[[$^EVAL_ERROR]]\n";
 EXPECT
 hello at .../warnings.pm line xxx.
     warnings::warn called at abc.pm line 3 character 13.
@@ -421,7 +421,7 @@ use abc;
 try { 
   abc::check() ; 
 } ;
-print "[[$($@->description)]]\n";
+print "[[$($^EVAL_ERROR->description)]]\n";
 EXPECT
 [[hello]]
 ########
@@ -563,7 +563,7 @@ use warnings 'syntax' ;
 use abc ;
 use warnings 'abc' ;
 try { abc::check() ; };
-print $@ ;
+print $^EVAL_ERROR ;
 EXPECT
 ok1
 ok2
@@ -583,7 +583,7 @@ sub check {
 use warnings 'syntax' ;
 use abc ;
 try { abc::check() ; } ;
-print $@ ;
+print $^EVAL_ERROR ;
 EXPECT
 ok1
 ok2
@@ -694,7 +694,7 @@ use warnings < qw( FATAL deprecated ) ;
 try {
     abc::check() ; 
   } ;
-print "[[$@]]\n";
+print "[[$^EVAL_ERROR]]\n";
 EXPECT
 hello at .../warnings.pm line xxx.
     warnings::warn called at abc.pm line 3 character 13.
@@ -714,7 +714,7 @@ use warnings < qw( FATAL abc ) ;
 try { 
   abc::check() ; 
   } ;
-print "[[$($@->description)]]\n";
+print "[[$($^EVAL_ERROR->description)]]\n";
 EXPECT
 [[hello]]
 ########
@@ -996,7 +996,7 @@ ok3
 ########
 
 --FILE-- abc.pm
-$| = 1;
+$^OUTPUT_AUTOFLUSH = 1;
 package abc ;
 no warnings ;
 use warnings::register ;
@@ -1047,7 +1047,7 @@ sub in2 { no warnings ; check() }
 sub in1 { no warnings ; in2() }
 1;
 --FILE-- abc.pm
-$| = 1;
+$^OUTPUT_AUTOFLUSH = 1;
 package abc ;
 use def ;
 use warnings 'def';

@@ -129,7 +129,7 @@ for ( @prgs){
     print TEST q{
         BEGIN {
             open(STDERR, ">&", "STDOUT")
-              or die "Can't dup STDOUT->STDERR: $!;";
+              or die "Can't dup STDOUT->STDERR: $^OS_ERROR;";
         }
     };
     print TEST "\n#line 1\n";  # So the line numbers don't get messed up.

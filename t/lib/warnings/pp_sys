@@ -321,9 +321,9 @@ binmode() on unopened filehandle BLERG at - line 4 character 14.
 ########
 # pp_sys.c [pp_lstat]
 use warnings 'io';
-open FH, "<", "TEST" or die "# $!";
+open FH, "<", "TEST" or die "# $^OS_ERROR";
 lstat \*FH;
-open my $fh, "<", $0 or die "# $!";
+open my $fh, "<", $0 or die "# $^OS_ERROR";
 lstat $fh;
 no warnings 'io';
 lstat FH;

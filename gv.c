@@ -1114,6 +1114,7 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 	case '\'':
 	case '.':
 	case ';':
+	case '?':
 	    Perl_croak(aTHX_ "Unknown magic variable '%c%s'",
 		       sv_type == SVt_PVAV ? '@' : sv_type == SVt_PVHV ? '%' : '$',
 		       name);

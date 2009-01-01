@@ -292,9 +292,9 @@ do {
 
 # Keep this test last, as it can SEGV
 do {
-    local *@;
-    pass("Localised *@");
+    local *^EVAL_ERROR;
+    pass("Localised *^EVAL_ERROR");
     try {1};
-    pass("Can eval with *@ localised");
+    pass("Can eval with *^EVAL_ERROR localised");
 };
 

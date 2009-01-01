@@ -783,6 +783,7 @@ Perl_magic_get(pTHX_ SV *sv, MAGIC *mg)
 		    sv_setiv(sv, (IV)PL_euid);
 		    break;
 		}
+		break;
 
 	    case 'G':
 		if (strEQ(remaining, "GID")) { /* $^GID */
@@ -841,7 +842,6 @@ Perl_magic_get(pTHX_ SV *sv, MAGIC *mg)
 		    SvNOK_on(sv);	/* what a wonderful hack! */
 		    break;
 		}
-		break;
 
 		if (strEQ(remaining, "OUTPUT_AUTOFLUSH")) {
 		    /* $^OUTPUT_AUTOFLUSH */
@@ -1536,18 +1536,6 @@ Perl_magic_set(pTHX_ SV *sv, MAGIC *mg)
 		    PL_tainting |= (PL_uid && (PL_euid != PL_uid || PL_egid != PL_gid));
 		    break;
 		}
-
-		if (strEQ(remaining, "OS_ERROR")) {
-		    /* $^OS_ERROR */
-#ifdef VMS
-#   define PERL_VMS_BANG vaxc$errno
-#else
-#   define PERL_VMS_BANG 0
-#endif
-		    SETERRNO(SvIOK(sv) ? SvIVX(sv) : SvOK(sv) ? sv_2iv(sv) : 0,
-			(SvIV(sv) == EVMSERR) ? 4 : PERL_VMS_BANG);
-		    break;
-		}
 		break;
 
 	    case 'I':
@@ -1592,6 +1580,18 @@ Perl_magic_set(pTHX_ SV *sv, MAGIC *mg)
 		    tmp = newSVpvn_flags(start, out ? (STRLEN)(out - start) : len, 0);
 		    (void)hv_store_ent(PL_compiling.cop_hints_hash,
 				       newSVpvs_flags("open<", SVs_TEMP), tmp, 0);
+		    break;
+		}
+
+		if (strEQ(remaining, "OS_ERROR")) {
+		    /* $^OS_ERROR */
+#ifdef VMS
+#   define PERL_VMS_BANG vaxc$errno
+#else
+#   define PERL_VMS_BANG 0
+#endif
+		    SETERRNO(SvIOK(sv) ? SvIVX(sv) : SvOK(sv) ? sv_2iv(sv) : 0,
+			(SvIV(sv) == EVMSERR) ? 4 : PERL_VMS_BANG);
 		    break;
 		}
 

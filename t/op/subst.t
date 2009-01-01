@@ -6,7 +6,7 @@ BEGIN {
 
 
 require './test.pl';
-plan( tests => 118 );
+plan( tests => 119 );
 
 our ($x, $snum, $foo, $t, $r, $s);
 
@@ -219,7 +219,8 @@ ok( $_ eq "foobarfoobbar" && $snum == 1 );
 
 eval 's{foo} # this is a comment, not a delimiter
        {bar};';
-ok( ! nelems @?, 'parsing of split subst with comment' );
+ok( ! $^EVAL_ERROR, 'parsing of split subst with comment' );
+is( $_, "barbarfoobbar" );
 
 $_ = "ab";
 ok( s/a/b/ == 1 );

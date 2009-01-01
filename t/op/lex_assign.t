@@ -262,7 +262,7 @@ system "$runme -e 0"		# system skip(VMS)
 getppid				# getppid
 getpgrp				# getpgrp
 '???'				# setpgrp
-getpriority $$, $$		# getpriority
+getpriority $^PID, $^PID		# getpriority
 '???'				# setpriority
 time				# time
 localtime $^T			# localtime

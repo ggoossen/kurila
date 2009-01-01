@@ -187,10 +187,10 @@ $v = sin @ma[?1000];
 $v = sin %gh{?foo};
 $v = sin %mh{?bar};
 
-$v = sin @ga[?$$];
-$v = sin @ma[?$$];
-$v = sin %gh{?$$};
-$v = sin %mh{?$$};
+$v = sin @ga[?$^PID];
+$v = sin @ma[?$^PID];
+$v = sin %gh{?$^PID};
+$v = sin %mh{?$^PID};
 EXPECT
 Use of uninitialized value @main::ga[1000] in sin at - line 5 character 6.
 Use of uninitialized value @ma[1000] in sin at - line 6 character 6.

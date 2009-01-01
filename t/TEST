@@ -489,9 +489,9 @@ EOT
 	}
 
 	if( !defined $failure  # don't mask a test failure
-	    and $? )
+	    and $^CHILD_ERROR )
 	{
-	    $failure = "FAILED--non-zero wait status: $?";
+	    $failure = "FAILED--non-zero wait status: $^CHILD_ERROR";
 	}
 
 	if (defined $failure) {

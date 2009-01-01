@@ -61,7 +61,7 @@ open PROG, ">", "ff-prog" or die "open ff-prog: $^OS_ERROR";
 print PROG <<'EOF';
 my $f = shift(@ARGV);
 my $str = shift(@ARGV);
-open OUT, ">>", "$f" or die "open $f: $!";
+open OUT, ">>", "$f" or die "open $f: $^OS_ERROR";
 print OUT $str;
 close OUT;
 EOF

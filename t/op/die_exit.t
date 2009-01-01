@@ -10,6 +10,8 @@ if ($^O eq 'mpeix') {
     exit 0;
 }
 
+require "./test.pl";
+
 $^OUTPUT_AUTOFLUSH = 1;
 
 
@@ -31,12 +33,12 @@ my %tests = %(
 	15 => \@( 255,   1),
 	16 => \@( 255, 256),
 	# see if implicit close preserves $?
-	17 => \@(  0,  512, 'do { local *F; open F, q[TEST]; close F; $!=0 }; die;'),
+	17 => \@(  0,  512, 'do { local *F; open F, q[TEST]; close F; $^OS_ERROR=0 }; die;'),
 );
 
 my $max = nkeys %tests;
 
-print "1..$max\n";
+plan(tests => $max);
 
 # Dump any error messages from the dying processes off to a temp file.
 open(STDERR, ">", "die_exit.err") or die "Can't open temp error file:  $^OS_ERROR";
@@ -45,10 +47,10 @@ foreach my $test (1 .. $max) {
     my @($bang, $query, ?$code) =  @{%tests{?$test}};
     $code ||= 'die;';
     if ($^O eq 'MSWin32' || $^O eq 'NetWare' || $^O eq 'VMS') {
-        system(qq{$^X -e "\$! = $bang; \$? = $query; $code"});
+        system(qq{$^X -e "\$^OS_ERROR = $bang; \$^CHILD_ERROR = $query; $code"});
     }
     else {
-        system(qq{$^X -e '\$! = $bang; \$? = $query; $code'});
+        system(qq{$^X -e '\$^OS_ERROR = $bang; \$^CHILD_ERROR = $query; $code'});
     }
     my $exit = $^CHILD_ERROR;
 
@@ -57,8 +59,7 @@ foreach my $test (1 .. $max) {
     $bang = 4 if $^O eq 'VMS';
 
     printf "# 0x\%04x  0x\%04x  0x\%04x\n", $exit, $bang, $query;
-    print "not " unless $exit == (($bang || ($query >> 8) || 255) << 8);
-    print "ok $test\n";
+    is($exit, (($bang || ($query >> 8) || 255) << 8));
 }
     
 close STDERR;

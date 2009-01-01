@@ -437,7 +437,7 @@ EXPECT
 # op.c [Perl_newATTRSUB]
 --FILE-- abc.pm
 use warnings 'void' ;
-BEGIN { $| = 1; print "in begin\n"; }
+BEGIN { $^OUTPUT_AUTOFLUSH = 1; print "in begin\n"; }
 CHECK { print "in check\n"; }
 INIT { print "in init\n"; }
 END { print "in end\n"; }
@@ -472,7 +472,7 @@ in end
 # op.c [Perl_newATTRSUB]
 --FILE-- abc.pm
 no warnings 'void' ;
-BEGIN { $| = 1; print "in begin\n"; }
+BEGIN { $^OUTPUT_AUTOFLUSH = 1; print "in begin\n"; }
 CHECK { print "in check\n"; }
 INIT { print "in init\n"; }
 END { print "in end\n"; }

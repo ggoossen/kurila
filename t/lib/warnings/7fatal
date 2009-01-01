@@ -31,7 +31,7 @@ no warnings ;
 try {
     use warnings FATAL => 'uninitialized' ;
     my $b ; chop $b ;
-}; print STDERR "-- $($@->description)\n" ;
+}; print STDERR "-- $($^EVAL_ERROR->description)\n" ;
 my $b ; chop $b ;
 print STDERR "The End.\n" ;
 EXPECT
@@ -43,7 +43,7 @@ The End.
 use warnings FATAL => 'uninitialized' ;
 try {
     my $b ; chop $b ;
-}; print STDERR "-- $($@->description)\n" ;
+}; print STDERR "-- $($^EVAL_ERROR->description)\n" ;
 my $b ; chop $b ;
 print STDERR "The End.\n" ;
 EXPECT
@@ -56,7 +56,7 @@ use warnings FATAL => 'uninitialized' ;
 try {
     no warnings ;
     my $b ; chop $b ;
-}; print STDERR $@;
+}; print STDERR $^EVAL_ERROR;
 my $b ; chop $b ;
 print STDERR "The End.\n" ;
 EXPECT
@@ -68,7 +68,7 @@ no warnings ;
 eval q[ 
     use warnings FATAL => 'uninitialized' ;
     my $b ; chop $b ;
-]; print STDERR "-- $($@->description)\n";
+]; print STDERR "-- $($^EVAL_ERROR->description)\n";
 my $b ; chop $b ;
 print STDERR "The End.\n" ;
 EXPECT
@@ -80,7 +80,7 @@ The End.
 use warnings FATAL => 'uninitialized' ;
 eval '
     my $b ; chop $b ;
-'; print STDERR "-- $($@->description)\n" ;
+'; print STDERR "-- $($^EVAL_ERROR->description)\n" ;
 my $b ; chop $b ;
 print STDERR "The End.\n" ;
 EXPECT
@@ -93,7 +93,7 @@ use warnings FATAL => 'uninitialized' ;
 eval '
     no warnings ;
     my $b ; chop $b ;
-'; print STDERR $@;
+'; print STDERR $^EVAL_ERROR;
 my $b ; chop $b ;
 print STDERR "The End.\n" ;
 EXPECT
