@@ -363,7 +363,7 @@ sub bootstrap {
     if (-s $bs) { # only read file if it's not empty
         print STDERR "BS: $bs ($^O, $dlsrc)\n" if $dl_debug;
         try { do $bs; };
-        warn "$bs: $@\n" if $@;
+        warn "$bs: $^EVAL_ERROR\n" if $^EVAL_ERROR;
     }
 
     my $boot_symbol_ref;
