@@ -1217,6 +1217,50 @@ sub env_using_package {
     }
 }
 
+sub remove_vars {
+    my $xml = shift;
+    for my $madop ($xml->findnodes(qq(//mad_op[\@key="use"]))) {
+        next unless $madop->child(0)->att("PV") eq "vars.pm";
+        my $madprops = $madop->parent;
+        my $arrow_op = $madprops->child(2);
+        my $vars = get_madprop($arrow_op->child(0)->child(1), "assign");
+
+        $vars =~ s/^\s+|\s+$//g;
+        $vars =~ s/([\s\n]+)/,$1/g;
+
+        # replace whole tree
+        my $nullop = $madprops->parent;
+        my $ws = get_madprop($nullop, "operator", "wsbefore" );
+        $madop->delete();
+        $arrow_op->delete();
+        set_madprop($nullop, "value", qq[our ($vars)], wsbefore => $ws );
+        set_madprop($nullop, "null_type", "valuestatement");
+    }
+}
+
+sub rename_magic_vars {
+    my $xml = shift;
+
+    my $mapping = {
+        '$|' => '$^OUTPUT_AUTOFLUSH',
+        '$!' => '$^OS_ERROR',
+        '$?' => '$^CHILD_ERROR',
+        '$&lt;' => '$^UID',
+        '$&gt;' => '$^EUID',
+        '$$' => '$^PID',
+        '$/' => '$^INPUT_RECORD_SEPARATOR',
+        '$\\' => '$^OUTPUT_RECORD_SEPARATOR',
+        '$@' => '$^EVAL_ERROR',
+        '$,' => '$^OUTPUT_FIELD_SEPARATOR',
+    };
+    for ($xml->findnodes(qq[//op_null[\@was="rv2sv"]]), $xml->findnodes(qq[//op_rv2sv])) {
+        my $var = get_madprop($_, "variable");
+        if ($var and $mapping->{$var}) {
+            set_madprop($_, "variable" => $mapping->{$var});
+        }
+    }
+}
+
 my $from; # floating point number with starting version of kurila.
 GetOptions("from=s" => \$from);
 $from =~ m/(\w+)[-]([\d.]+)$/ or die "invalid from: '$from'";
@@ -1318,7 +1362,9 @@ if ($from->{branch} ne "kurila" or $from->{v} < qv '1.16') {
     pattern_assignment($twig);
 }
 
-env_using_package($twig);
+#env_using_package($twig);
+#remove_vars($twig);
+rename_magic_vars($twig);
 
 #add_call_parens($twig);
 
