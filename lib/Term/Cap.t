@@ -85,9 +85,9 @@ is( $t->{?pc}, 'pc', 'Tputs() should cache pc value when asked' );
 is( $out->read(), 'pc', 'Tputs() should write to filehandle when passed' );
 
 try { $t->Trequire( 'pc' ) };
-is( $@, '', 'Trequire() should finds existing cap' );
+is( $^EVAL_ERROR, '', 'Trequire() should finds existing cap' );
 try { $t->Trequire( 'nonsense' ) };
-like( $@->{?description}, qr/support: \(nonsense\)/, 
+like( $^EVAL_ERROR->{?description}, qr/support: \(nonsense\)/, 
 	'Trequire() should croak with unsupported cap' );
 
 my $warn;
@@ -99,7 +99,7 @@ local $^WARN_HOOK = sub {
 env::set_var('TERM', undef);
 my $vals = \%();
 try { local $^W = 1; $t = Term::Cap->Tgetent($vals) };
-like( $@->{?description}, qr/TERM not set/, 'Tgetent() should croaks without TERM' );
+like( $^EVAL_ERROR->{?description}, qr/TERM not set/, 'Tgetent() should croaks without TERM' );
 like( $warn, qr/OSPEED was not set/, 'Tgetent() should set default OSPEED' );
 
 is( $vals->{?PADDING}, 10000/9600, 'Default OSPEED implies default PADDING' );
@@ -124,7 +124,7 @@ SKIP: do {
         env::set_var('TERMPATH' => '!');
         env::set_var('TERMCAP' => '');
         try { $t = Term::Cap->Tgetent($vals) };
-        isnt( $@, '', 'Tgetent() should catch bad termcap file' );
+        isnt( $^EVAL_ERROR, '', 'Tgetent() should catch bad termcap file' );
 };
 
 SKIP: do {
@@ -134,14 +134,14 @@ SKIP: do {
 	$vals->{+TERM} = 'quux';
 	env::set_var('TERMPATH' => 'tcout');
 	try { $t = Term::Cap->Tgetent($vals) };
-	like( $@->{?description}, qr/failed termcap/, 'Tgetent() should die with bad termcap' );
+	like( $^EVAL_ERROR->{?description}, qr/failed termcap/, 'Tgetent() should die with bad termcap' );
 
 	# it shouldn't try to read one file more than 32(!) times
 	# see __END__ for a really awful termcap example
 	env::set_var('TERMPATH' => join(' ', @( ('tcout') x 33)));
 	$vals->{+TERM} = 'bar';
 	try { $t = Term::Cap->Tgetent($vals) };
-	like( $@->{?description}, qr/failed termcap loop/, 'Tgetent() should catch deep recursion');
+	like( $^EVAL_ERROR->{?description}, qr/failed termcap loop/, 'Tgetent() should catch deep recursion');
 
 	# now let it read a fake termcap file, and see if it sets properties 
 	env::set_var('TERMPATH' => 'tcout');

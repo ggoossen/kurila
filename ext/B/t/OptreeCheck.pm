@@ -2,7 +2,7 @@ package OptreeCheck;
 use base 'Exporter';
 
 use warnings;
-use vars < qw($TODO $Level $using_open);
+our ($TODO, $Level, $using_open);
 require "./test.pl";
 
 our $VERSION = '0.02';
@@ -528,7 +528,7 @@ sub getRendering {
 		$code = eval "$pkg sub \{ $code \} \}";
 	    };
 	    # return errors
-	    if ($@) { push @errs, $@->message }
+	    if ($^EVAL_ERROR) { push @errs, $^EVAL_ERROR->message }
 	}
 	# set walk-output b4 compiling, which writes 'announce' line
 	walk_output(\$rendering);
@@ -540,7 +540,7 @@ sub getRendering {
 	$opwalker->();
 
 	# kludge error into rendering if its empty.
-	$rendering = $@->message if $@ and ! $rendering;
+	$rendering = $^EVAL_ERROR->message if $^EVAL_ERROR and ! $rendering;
     }
     else {
 	die "bad testcase; no prog, code or Dx parameter\n";
@@ -1001,8 +1001,8 @@ sub OptreeCheck::processExamples {
     # turned into optreeCheck tests,
 
     foreach my $file ( @files) {
-	open (my $fh, "<", $file) or die "cant open $file: $!\n";
-	$/ = "";
+	open (my $fh, "<", $file) or die "cant open $file: $^OS_ERROR\n";
+	$^INPUT_RECORD_SEPARATOR = "";
 	my @chunks = @( ~< $fh );
 	print < preamble (scalar nelems @chunks);
 	foreach my $t ( @chunks) {

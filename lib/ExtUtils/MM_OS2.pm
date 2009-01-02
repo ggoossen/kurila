@@ -81,10 +81,10 @@ $self->{?BASEEXT}.def: Makefile.PL
 	close $imp or die "Can't close tmpimp.imp";
 	# print "emximp -o tmpimp$Config::Config{lib_ext} tmpimp.imp\n";
 	system "emximp -o tmpimp%Config::Config{?lib_ext} tmpimp.imp" 
-	    and die "Cannot make import library: $!, \$?=$?";
+	    and die "Cannot make import library: $^OS_ERROR, \$?=$^CHILD_ERROR";
 	unlink glob( <"tmp_imp/*");
 	system "cd tmp_imp; %Config::Config{?ar} x ../tmpimp%Config::Config{?lib_ext}" 
-	    and die "Cannot extract import objects: $!, \$?=$?";      
+	    and die "Cannot extract import objects: $^OS_ERROR, \$?=$^CHILD_ERROR";      
     }
     join('', @m);
 }

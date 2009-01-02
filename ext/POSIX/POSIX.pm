@@ -92,7 +92,7 @@ sub rewinddir {
 
 sub errno {
     usage "errno()" if (nelems @_) != 0;
-    $! + 0;
+    $^OS_ERROR + 0;
 }
 
 sub creat {
@@ -188,7 +188,7 @@ sub kill {
 
 sub raise {
     usage "raise(sig)" if (nelems @_) != 1;
-    CORE::kill @_[0], $$;	# Is this good enough?
+    CORE::kill @_[0], $^PID;	# Is this good enough?
 }
 
 sub offsetof {
@@ -300,7 +300,7 @@ sub gets {
 
 sub perror {
     print STDERR "$(join ' ',@_): " if (nelems @_);
-    print STDERR $!,"\n";
+    print STDERR $^OS_ERROR,"\n";
 }
 
 sub printf {
@@ -490,8 +490,8 @@ sub strcspn {
 
 sub strerror {
     usage "strerror(errno)" if (nelems @_) != 1;
-    local $! = @_[0];
-    $! . "";
+    local $^OS_ERROR = @_[0];
+    $^OS_ERROR . "";
 }
 
 sub strlen {
@@ -636,7 +636,7 @@ sub getegid {
 
 sub geteuid {
     usage "geteuid()" if (nelems @_) != 0;
-    $> + 0;
+    $^EUID + 0;
 }
 
 sub getgid {
@@ -662,7 +662,7 @@ sub getpgrp {
 
 sub getpid {
     usage "getpid()" if (nelems @_) != 0;
-    $$;
+    $^PID;
 }
 
 sub getppid {
@@ -672,7 +672,7 @@ sub getppid {
 
 sub getuid {
     usage "getuid()" if (nelems @_) != 0;
-    $<;
+    $^UID;
 }
 
 sub isatty {

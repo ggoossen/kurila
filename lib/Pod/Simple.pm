@@ -8,11 +8,11 @@ use Pod::Simple::LinkSection ();
 use Pod::Simple::BlackBox ();
 use utf8;
 
-use vars < qw(
-  $VERSION @ISA
-  @Known_formatting_codes  @Known_directives
-  %Known_formatting_codes  %Known_directives
-  $NL
+our (
+  $VERSION, @ISA,
+  @Known_formatting_codes,  @Known_directives,
+  %Known_formatting_codes,  %Known_directives,
+  $NL,
 );
 
 @ISA = @('Pod::Simple::BlackBox');
@@ -22,7 +22,7 @@ $VERSION = '3.05';
 %Known_formatting_codes = %( < map(($_=>1), @Known_formatting_codes) );
 @Known_directives       = qw(head1 head2 head3 head4 item over back); 
 %Known_directives       = %( < map(($_=>'Plain'), @Known_directives) );
-$NL = $/ unless defined $NL;
+$NL = $^INPUT_RECORD_SEPARATOR unless defined $NL;
 
 #-----------------------------------------------------------------------------
 # Set up some constants:
@@ -139,7 +139,7 @@ sub output_string {
   $$x = '' unless defined $$x;
   DEBUG +> 4 and print "# Output string set to $x ($$x)\n";
   $this->{+'output_fh'} = undef;
-  open $this->{+'output_fh'}, '>>', $x or die "Failed opening filehandle $!";
+  open $this->{+'output_fh'}, '>>', $x or die "Failed opening filehandle $^OS_ERROR";
   return
     $this->{+'output_string'} = @_[0];
     #${ ${ $this->{'output_fh'} } };
@@ -386,7 +386,7 @@ sub parse_file {
   } else {
     do {
       local *PODSOURCE;
-      open(PODSOURCE, "<", "$source") || die "Can't open $source: $!";
+      open(PODSOURCE, "<", "$source") || die "Can't open $source: $^OS_ERROR";
       $self->{+'source_filename'} = $source;
       $source = *PODSOURCE{IO};
     };
@@ -401,7 +401,7 @@ sub parse_file {
     splice @lines;
     $i = MANY_LINES;
     while (1) {  # read those many lines at a time
-      local $/ = $NL;
+      local $^INPUT_RECORD_SEPARATOR = $NL;
       push @lines, scalar( ~< $source );  # readline
       last unless defined @lines[-1];
       $i--;
@@ -442,7 +442,7 @@ sub parse_from_file {
     require Symbol;
     my $out_fh = Symbol::gensym();
     DEBUG and print "Write-opening to $to\n";
-    open($out_fh, ">", "$to")  or  die "Can't write-open $to: $!";
+    open($out_fh, ">", "$to")  or  die "Can't write-open $to: $^OS_ERROR";
     binmode($out_fh)
      if $self->can('write_with_binmode') and $self->write_with_binmode;
     $self->output_fh($out_fh);

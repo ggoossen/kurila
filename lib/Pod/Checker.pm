@@ -9,7 +9,7 @@
 
 package Pod::Checker;
 
-use vars < qw($VERSION);
+our ($VERSION);
 $VERSION = 1.43;  ## Current version of this package
 
 use Pod::ParseUtils; ## for hyperlinks and lists
@@ -342,11 +342,11 @@ get the well-known behavior.
 use Exporter;
 use Pod::Parser;
 
-use vars < qw(@ISA @EXPORT);
+our (@ISA, @EXPORT);
 @ISA = qw(Pod::Parser);
 @EXPORT = qw(&podchecker);
 
-use vars < qw(%VALID_COMMANDS %VALID_SEQUENCES);
+our (%VALID_COMMANDS, %VALID_SEQUENCES);
 
 my %VALID_COMMANDS = %(
     'pod'    =>  1,
@@ -1155,7 +1155,7 @@ sub _check_ptree {
             unless(defined $link) {
                 $self->poderror(\%( line => $line, file => $file,
                     severity => 'ERROR', 
-                    msg => "malformed link " . $_->raw_text() ." : $@"));
+                    msg => "malformed link " . $_->raw_text() ." : $^EVAL_ERROR"));
                 next;
             }
             $link->line($line); # remember line

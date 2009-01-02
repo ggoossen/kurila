@@ -49,7 +49,7 @@ is(%aa{?a},"b");
 
 sub test_err_localref () {
     local our $TODO = 1;
-    like($@ && $@->{?description},qr/Can't localize through a reference/,'error');
+    like($^EVAL_ERROR && $^EVAL_ERROR->{?description},qr/Can't localize through a reference/,'error');
 }
 $x = \$aa;
 my $y = \$aa;

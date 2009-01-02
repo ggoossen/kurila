@@ -252,7 +252,7 @@ sub _dump {
         my $freezer = $s->{?freezer};
         if ($freezer and UNIVERSAL::can($val, $freezer)) {
             try { $val->?$freezer() };
-            warn "WARNING(Freezer method call failed): $($@->message)" if $@;
+            warn "WARNING(Freezer method call failed): $($^EVAL_ERROR->message)" if $^EVAL_ERROR;
         }
 
         require Scalar::Util;

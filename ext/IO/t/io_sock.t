@@ -18,7 +18,7 @@ BEGIN {
 
 my $has_perlio = PerlIO::Layer->find( 'perlio');
 
-$| = 1;
+$^OUTPUT_AUTOFLUSH = 1;
 print "1..26\n";
 
 try {
@@ -33,7 +33,7 @@ my $listen = IO::Socket::INET->new(Listen => 2,
 				# some systems seem to need as much as 10,
 				# so be generous with the timeout
 				Timeout => 15,
-			       ) or die "$!";
+			       ) or die "$^OS_ERROR";
 
 print "ok 1\n";
 
@@ -48,7 +48,7 @@ my $port = $listen->sockport;
 
 if(my $pid = fork()) {
 
-    my $sock = $listen->accept() or die "accept failed: $!";
+    my $sock = $listen->accept() or die "accept failed: $^OS_ERROR";
     print "ok 2\n";
 
     $sock->autoflush(1);
@@ -72,7 +72,7 @@ if(my $pid = fork()) {
 				  Proto => 'tcp',
 				  PeerAddr => '127.0.0.1'
 				 )
-	or die "$! (maybe your system does not have a localhost at all, 'localhost' or 127.0.0.1)";
+	or die "$^OS_ERROR (maybe your system does not have a localhost at all, 'localhost' or 127.0.0.1)";
 
     $sock->autoflush(1);
 
@@ -89,7 +89,7 @@ if(my $pid = fork()) {
 
 # Test various other ways to create INET sockets that should
 # also work.
-$listen = IO::Socket::INET->new(Listen => '', Timeout => 15) or die "$!";
+$listen = IO::Socket::INET->new(Listen => '', Timeout => 15) or die "$^OS_ERROR";
 $port = $listen->sockport;
 
 if(my $pid = fork()) {
@@ -120,7 +120,7 @@ if(my $pid = fork()) {
        $sock->close;
     }
     else {
-	print "# $@\n";
+	print "# $^EVAL_ERROR\n";
 	print "not ok 6\n";
 	print "not ok 7\n";
 	print "not ok 8\n";
@@ -137,7 +137,7 @@ if(my $pid = fork()) {
        $sock->close;
     }
     else {
-	print "# $@\n";
+	print "# $^EVAL_ERROR\n";
 	print "not ok 10\n";
     }
 
@@ -207,7 +207,7 @@ if ( $^O eq 'qnx' ) {
 #
 local our @data;
 if( !open( SRC, "<", "$0")) {
-    print "not ok 15 - $!\n";
+    print "not ok 15 - $^OS_ERROR\n";
 } else {
     @data = @( ~< *SRC );
     close(SRC);

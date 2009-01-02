@@ -1,6 +1,6 @@
 package TestCompare;
 
-use vars < qw(@ISA @EXPORT $MYPKG);
+our (@ISA, @EXPORT, $MYPKG);
 #use diagnostics;
 use Exporter;
 use File::Basename;
@@ -48,10 +48,10 @@ sub testcmp( $ $ ; $) {
    my @($file1, $file2) =  @_;
    my @($fh1, $fh2) = @($file1, $file2);
    unless (ref $fh1) {
-      $fh1 = FileHandle->new($file1, "r") or die "Can't open $file1: $!";
+      $fh1 = FileHandle->new($file1, "r") or die "Can't open $file1: $^OS_ERROR";
    }
    unless (ref $fh2) {
-      $fh2 = FileHandle->new($file2, "r") or die "Can't open $file2: $!";
+      $fh2 = FileHandle->new($file2, "r") or die "Can't open $file2: $^OS_ERROR";
    }
   
    my $cmplines = %opts{?'cmplines'} || undef;

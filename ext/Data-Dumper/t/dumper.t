@@ -30,24 +30,24 @@ sub TEST {
   $t =~ s/([A-Z]+)\(0x[0-9a-f]+\)/$1(0xdeadbeef)/g
       if ($WANT =~ m/deadbeef/);
 
-  ok(($t eq $WANT and not $@), $name);
-  if ($@) {
-      diag("error: $($@->message)");
+  ok(($t eq $WANT and not $^EVAL_ERROR), $name);
+  if ($^EVAL_ERROR) {
+      diag("error: $($^EVAL_ERROR->message)");
   }
   elsif ($t ne $WANT) {
       diag("--Expected--\n$WANT\n--Got--\n$t\n");
   }
 
   eval "$t";
-  ok(!$@);
-  diag $@ if $@;
+  ok(!$^EVAL_ERROR);
+  diag $^EVAL_ERROR if $^EVAL_ERROR;
 
   $t = eval $string;
   $t =~ s/([A-Z]+)\(0x[0-9a-f]+\)/$1(0xdeadbeef)/g
       if ($WANT =~ m/deadbeef/);
-  ok($t eq $WANT and not $@);
-  if ($@) {
-      diag("error: $($@->message)");
+  ok($t eq $WANT and not $^EVAL_ERROR);
+  if ($^EVAL_ERROR) {
+      diag("error: $($^EVAL_ERROR->message)");
   }
   elsif ($t ne $WANT) {
       diag("--Expected--\n$WANT\n--Got--\n$t\n");

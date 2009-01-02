@@ -15,21 +15,21 @@ our @EXPORT_OK = qw(process_file);
 my(@XSStack);	# Stack of conditionals and INCLUDEs
 my($XSS_work_idx, $cpp_next_tmp);
 
-use vars < qw($VERSION);
+our ($VERSION);
 $VERSION = '2.19_01';
 
-use vars < qw(%input_expr %output_expr $ProtoUsed @InitFileCode $FH $proto_re $Overload $errors $Fallback
-	    $cplusplus $hiertype $WantPrototypes $WantVersionChk $except $WantLineNumbers
-	    $WantOptimize $process_inout $process_argtypes @tm
-	    $dir $filename $filepathname %IncludedFiles
-	    %type_kind %proto_letter
-            %targetable $BLOCK_re $lastline $lastline_no
-            $Package $Prefix @line @BootCode %args_match %defaults %var_types %arg_list @proto_arg
-            $processing_arg_with_types %argtype_seen @outlist %in_out %lengthof
-            $proto_in_this_xsub $scope_in_this_xsub $interface $prepush_done $interface_macro $interface_macro_set
-            $ProtoThisXSUB $ScopeThisXSUB $xsreturn
-            @line_no $ret_type $func_header $orig_args
-	   ); # Add these just to get compilation to happen.
+our (%input_expr, %output_expr, $ProtoUsed, @InitFileCode, $FH, $proto_re, $Overload, $errors, $Fallback
+	,    $cplusplus, $hiertype, $WantPrototypes, $WantVersionChk, $except, $WantLineNumbers
+	,    $WantOptimize, $process_inout, $process_argtypes, @tm
+	,    $dir, $filename, $filepathname, %IncludedFiles
+	,    %type_kind, %proto_letter
+,            %targetable, $BLOCK_re, $lastline, $lastline_no
+,            $Package, $Prefix, @line, @BootCode, %args_match, %defaults, %var_types, %arg_list, @proto_arg
+,            $processing_arg_with_types, %argtype_seen, @outlist, %in_out, %lengthof
+,            $proto_in_this_xsub, $scope_in_this_xsub, $interface, $prepush_done, $interface_macro, $interface_macro_set
+,            $ProtoThisXSUB, $ScopeThisXSUB, $xsreturn
+,            @line_no, $ret_type, $func_header, $orig_args
+	,   ); # Add these just to get compilation to happen.
 
 our ($func_args, $PPCODE, $CODE, $EXPLICIT_RETURN, $ALIAS, $INTERFACE, $Full_func_name,
      $cond, $min_args, $pname, $condnum, $thisdone, $retvaldone, $deferred, $gotRETVAL,
@@ -129,12 +129,12 @@ sub process_file {
   }
   
   # Open the input file
-  open($FH, "<", %args{?filename}) or die "cannot open %args{?filename}: $!\n";
+  open($FH, "<", %args{?filename}) or die "cannot open %args{?filename}: $^OS_ERROR\n";
 
   # Open the output file if given as a string.  If they provide some
   # other kind of reference, trust them that we can print to it.
   if (not ref %args{?output}) {
-    open my($fh), ">", "%args{?output}" or die "Can't create %args{?output}: $!";
+    open my($fh), ">", "%args{?output}" or die "Can't create %args{?output}: $^OS_ERROR";
     %args{+outfile} = %args{?output};
     %args{+output} = $fh;
   }
@@ -174,7 +174,7 @@ sub process_file {
     warn("Warning: ignoring non-text typemap file '$typemap'\n"), next
       unless -T $typemap ;
     open(TYPEMAP, "<", $typemap)
-      or warn ("Warning: could not open typemap file '$typemap': $!\n"), next;
+      or warn ("Warning: could not open typemap file '$typemap': $^OS_ERROR\n"), next;
     my $mode = 'Typemap';
     my $junk = "" ;
     my $current = \$junk;
@@ -885,19 +885,19 @@ EOF
 	if ($t and not $t->[1] and $t->[0] eq 'p') {
 	  # PUSHp corresponds to setpvn.  Treate setpv directly
 	  my $what = eval qq("$t->[2]");
-	  warn $@ if $@;
+	  warn $^EVAL_ERROR if $^EVAL_ERROR;
 	  
 	  print "\tsv_setpv(TARG, $what); XSprePUSH; PUSHTARG;\n";
 	  $prepush_done = 1;
 	}
 	elsif ($t) {
 	  my $what = eval qq("$t->[2]");
-	  warn $@ if $@;
+	  warn $^EVAL_ERROR if $^EVAL_ERROR;
 	  
 	  my $size = $t->[3];
 	  $size = '' unless defined $size;
 	  $size = eval qq("$size");
-	  warn $@ if $@;
+	  warn $^EVAL_ERROR if $^EVAL_ERROR;
 	  print "\tXSprePUSH; PUSH$t->[0]($what$size);\n";
 	  $prepush_done = 1;
 	}
@@ -1502,7 +1502,7 @@ sub INCLUDE_handler ()
     $FH = Symbol::gensym();
 
     # open the new file
-    open ($FH, "<", "$_") or death("Cannot open '$_': $!") ;
+    open ($FH, "<", "$_") or death("Cannot open '$_': $^OS_ERROR") ;
 
     print Q(<<"EOF");
 #
@@ -1550,9 +1550,9 @@ sub PopFile()
     @line       = @{ $data->{?Line} } ;
     @line_no    = @{ $data->{?LineNo} } ;
 
-    if ($isPipe and $? ) {
+    if ($isPipe and $^CHILD_ERROR ) {
       -- $lastline_no ;
-      print STDERR "Error reading from pipe '$ThisFile': $! in $filename, line $lastline_no\n"  ;
+      print STDERR "Error reading from pipe '$ThisFile': $^OS_ERROR in $filename, line $lastline_no\n"  ;
       exit 1 ;
     }
 
@@ -1732,7 +1732,7 @@ sub death
 sub evalqq {
     my $x = shift;
     my $ex = eval qq/"$x"/;
-    die "error in '$x': $($@->message)" if $@;
+    die "error in '$x': $($^EVAL_ERROR->message)" if $^EVAL_ERROR;
     return $ex;
 }
 
@@ -1844,21 +1844,21 @@ sub generate_output {
       $subexpr =~ s/\n\t/\n\t\t/g;
       $expr =~ s/DO_ARRAY_ELEM\n/$subexpr/;
       eval "print qq\a$expr\a";
-      warn $@   if  $@;
+      warn $^EVAL_ERROR   if  $^EVAL_ERROR;
       print "\t\tSvSETMAGIC(ST(ix_$var));\n" if $do_setmagic;
     } elsif ($var eq 'RETVAL') {
       if ($expr =~ m/^\t\$arg = new/) {
 	# We expect that $arg has refcnt 1, so we need to
 	# mortalize it.
 	eval "print qq\a$expr\a";
-	warn $@   if  $@;
+	warn $^EVAL_ERROR   if  $^EVAL_ERROR;
 	print "\tsv_2mortal(ST($num));\n";
 	print "\tSvSETMAGIC(ST($num));\n" if $do_setmagic;
       } elsif ($expr =~ m/^\s*\$arg\s*=/) {
 	# We expect that $arg has refcnt >=1, so we need
 	# to mortalize it!
 	eval "print qq\a$expr\a";
-	warn $@   if  $@;
+	warn $^EVAL_ERROR   if  $^EVAL_ERROR;
 	print "\tsv_2mortal(ST(0));\n";
 	print "\tSvSETMAGIC(ST(0));\n" if $do_setmagic;
       } else {
@@ -1868,18 +1868,18 @@ sub generate_output {
 	# works too.
 	print "\tST(0) = sv_newmortal();\n";
 	eval "print qq\a$expr\a";
-	warn $@   if  $@;
+	warn $^EVAL_ERROR   if  $^EVAL_ERROR;
 	# new mortals don't have set magic
       }
     } elsif ($do_push) {
       print "\tPUSHs(sv_newmortal());\n";
       $arg = "ST($num)";
       eval "print qq\a$expr\a";
-      warn $@   if  $@;
+      warn $^EVAL_ERROR   if  $^EVAL_ERROR;
       print "\tSvSETMAGIC($arg);\n" if $do_setmagic;
     } elsif ($arg =~ m/^ST\(\d+\)$/) {
       eval "print qq\a$expr\a";
-      warn $@   if  $@;
+      warn $^EVAL_ERROR   if  $^EVAL_ERROR;
       print "\tSvSETMAGIC($arg);\n" if $do_setmagic;
     }
   }

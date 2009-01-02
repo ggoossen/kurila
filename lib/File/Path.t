@@ -9,7 +9,7 @@ BEGIN {
 }
 
 eval "use Test::Output";
-my $has_Test_Output = $@ ?? 0 !! 1;
+my $has_Test_Output = $^EVAL_ERROR ?? 0 !! 1;
 
 my $Is_VMS   = $^O eq 'VMS';
 
@@ -32,7 +32,7 @@ for my $perm (@(0111,0777)) {
 my ($error, $list, $file, $message);
 my $tmp_base = catdir(
     curdir(),
-    sprintf( 'test-%x-%x-%x', time, $$, rand(99999) ),
+    sprintf( 'test-%x-%x-%x', time, $^PID, rand(99999) ),
 );
 
 # invent some names
@@ -162,7 +162,7 @@ if (chdir $tmp_base) {
     pass("chdir to temp dir");
 }
 else {
-    fail("chdir to temp dir: $!");
+    fail("chdir to temp dir: $^OS_ERROR");
 }
 
 $dir   = catdir('a', 'd1');
@@ -190,7 +190,7 @@ if (chdir updir()) {
     pass("chdir parent");
 }
 else {
-    fail("chdir parent: $!");
+    fail("chdir parent: $^OS_ERROR");
 }
 
 # see what happens if a file exists where we want a directory
@@ -207,7 +207,7 @@ SKIP: do {
     is( $entry, $file, "and the message is: $message");
 
     try {@created = mkpath($entry, 0, 0700)};
-    $error = $@;
+    $error = $^EVAL_ERROR;
     chomp $error; # just to remove silly # in TAP output
     cmp_ok( $error, 'ne', "", "no directory created (old-style) err=$error" )
         or diag(< @created);

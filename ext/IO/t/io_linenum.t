@@ -25,8 +25,8 @@ sub lineno
 
 my $t;
 
-open (F, "<", $File) or die $!;
-my $io = IO::File->new($File) or die $!;
+open (F, "<", $File) or die $^OS_ERROR;
+my $io = IO::File->new($File) or die $^OS_ERROR;
 
 ~< *F for @( ( <1 .. 10));
 ok(lineno($io), "0");

@@ -17,7 +17,7 @@ BEGIN {
     try {
         require_ok("Wibble");
     };
-    $result = $@;
+    $result = $^EVAL_ERROR;
 }
 
 plan tests => 1;

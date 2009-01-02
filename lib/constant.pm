@@ -2,7 +2,7 @@ package constant;
 
 use warnings::register;
 
-use vars < qw($VERSION %declared);
+our ($VERSION, %declared);
 $VERSION = '1.15';
 
 #=======================================================================

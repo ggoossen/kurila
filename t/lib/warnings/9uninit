@@ -110,8 +110,8 @@ Use of uninitialized value @main::gau[257] in addition (+) at - line 11 characte
 Use of uninitialized value @main::gau[256] in addition (+) at - line 11 character 15.
 Use of uninitialized value @main::gau[-2] in addition (+) at - line 12 character 14.
 Use of uninitialized value @main::gau[-1] in addition (+) at - line 12 character 14.
-Use of uninitialized value %main::ghu{"bar"} in addition (+) at - line 13 character 15.
-Use of uninitialized value %main::ghu{"foo"} in addition (+) at - line 13 character 15.
+Use of uninitialized value %main::ghu{"bar"} in addition (+) at - line 13 character 16.
+Use of uninitialized value %main::ghu{"foo"} in addition (+) at - line 13 character 16.
 ########
 use warnings 'uninitialized';
 my ($v);
@@ -139,12 +139,12 @@ Use of uninitialized value @main::gau[20] in addition (+) at - line 15 character
 Use of uninitialized value @main::gau[10] in addition (+) at - line 15 character 15.
 Use of uninitialized value in addition (+) at - line 16 character 15.
 Use of uninitialized value @main::gau[10] in addition (+) at - line 16 character 15.
-Use of uninitialized value %mhu{"bar"} in addition (+) at - line 17 character 15.
-Use of uninitialized value %mhu{"foo"} in addition (+) at - line 17 character 15.
-Use of uninitialized value %main::ghu{"bar"} in addition (+) at - line 18 character 15.
-Use of uninitialized value %main::ghu{"foo"} in addition (+) at - line 18 character 15.
-Use of uninitialized value in addition (+) at - line 19 character 15.
-Use of uninitialized value %main::ghu{"foo"} in addition (+) at - line 19 character 15.
+Use of uninitialized value %mhu{"bar"} in addition (+) at - line 17 character 16.
+Use of uninitialized value %mhu{"foo"} in addition (+) at - line 17 character 16.
+Use of uninitialized value %main::ghu{"bar"} in addition (+) at - line 18 character 16.
+Use of uninitialized value %main::ghu{"foo"} in addition (+) at - line 18 character 16.
+Use of uninitialized value in addition (+) at - line 19 character 16.
+Use of uninitialized value %main::ghu{"foo"} in addition (+) at - line 19 character 16.
 ########
 use warnings 'uninitialized';
 my ($m1, $m2, @ma, %mh, $v);
@@ -187,10 +187,10 @@ $v = sin @ma[?1000];
 $v = sin %gh{?foo};
 $v = sin %mh{?bar};
 
-$v = sin @ga[?$$];
-$v = sin @ma[?$$];
-$v = sin %gh{?$$};
-$v = sin %mh{?$$};
+$v = sin @ga[?$^PID];
+$v = sin @ma[?$^PID];
+$v = sin %gh{?$^PID};
+$v = sin %mh{?$^PID};
 EXPECT
 Use of uninitialized value @main::ga[1000] in sin at - line 5 character 6.
 Use of uninitialized value @ma[1000] in sin at - line 6 character 6.
@@ -225,7 +225,7 @@ our ($g1);
 close $m1;	# exercises rv2gv
 close $g1;	# exercises rv2gv
 EXPECT
-Can't use an undefined value as a symbol reference at - line 5 character 6.
+Can't use an undefined value as a symbol reference at - line 5 character 7.
 ########
 use warnings 'uninitialized';
 my ($m1, $m2, $v);

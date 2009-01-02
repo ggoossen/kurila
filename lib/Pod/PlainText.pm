@@ -20,7 +20,7 @@ package Pod::PlainText;
 
 use Pod::Select ();
 
-use vars < qw(@ISA %ESCAPES $VERSION);
+our (@ISA, %ESCAPES, $VERSION);
 
 # We inherit from Pod::Select instead of Pod::Parser so that we can be used
 # by Pod::Usage.
@@ -562,7 +562,7 @@ sub pod2text {
     if (defined @_[1]) {
         local *IN;
         unless (open (IN, "<", @_[0])) {
-            die ("Can't open @_[0] for reading: $!\n");
+            die ("Can't open @_[0] for reading: $^OS_ERROR\n");
             return;
         }
         @_[0] = \*IN;

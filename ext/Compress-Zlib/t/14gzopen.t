@@ -305,7 +305,7 @@ do {
 
     # missing parameters
     eval ' $fil = gzopen()  ' ;
-    like $@->{?description}, mkEvalErr('Not enough arguments for Compress::Zlib::gzopen'),
+    like $^EVAL_ERROR->{?description}, mkEvalErr('Not enough arguments for Compress::Zlib::gzopen'),
         '  gzopen with missing mode fails' ;
 
     # unknown parameters
@@ -446,10 +446,10 @@ do {
     ok ! $a->gzerror() 
         or print "# gzerrno is $Compress::Zlib::gzerrno \n" ;
     try { $a->gzseek(-1, 10) ; };
-    like $@->{?description}, mkErr("seek: unknown value, 10, for whence parameter");
+    like $^EVAL_ERROR->{?description}, mkErr("seek: unknown value, 10, for whence parameter");
 
     try { $a->gzseek(-1, SEEK_END) ; };
-    like $@->{?description}, mkErr("seek: cannot seek backwards");
+    like $^EVAL_ERROR->{?description}, mkErr("seek: cannot seek backwards");
 
     $a->gzwrite("fred");
     $a->gzclose ;
@@ -458,13 +458,13 @@ do {
     my $u = gzopen($name, "r");
 
     try { $u->gzseek(-1, 10) ; };
-    like $@->{?description}, mkErr("seek: unknown value, 10, for whence parameter");
+    like $^EVAL_ERROR->{?description}, mkErr("seek: unknown value, 10, for whence parameter");
 
     try { $u->gzseek(-1, SEEK_END) ; };
-    like $@->{?description}, mkErr("seek: SEEK_END not allowed");
+    like $^EVAL_ERROR->{?description}, mkErr("seek: SEEK_END not allowed");
 
     try { $u->gzseek(-1, SEEK_CUR) ; };
-    like $@->{?description}, mkErr("seek: cannot seek backwards");
+    like $^EVAL_ERROR->{?description}, mkErr("seek: cannot seek backwards");
 };
 
 do {
@@ -481,12 +481,12 @@ do {
 
     for my $delim ( @( undef, "", 0, 1, "abc", $text, "\n\n", "\n" ) )
     {
-        local $/ = $delim;
+        local $^INPUT_RECORD_SEPARATOR = $delim;
         my $u = gzopen($name, "r");
         my $line;
         is $u->gzreadline($line), length $text, "  read $len bytes";
         is $line, $text, "  got expected line";
         ok ! $u->gzclose, "  closed" ;
-        is $/, $delim, '  $/ unchanged by gzreadline';
+        is $^INPUT_RECORD_SEPARATOR, $delim, '  $/ unchanged by gzreadline';
     }
 };

@@ -6,7 +6,7 @@ plan tests => 12;
 do {
    package LenDigest;
    require Digest::base;
-   use vars < qw(@ISA);
+   our (@ISA);
    @ISA = qw(Digest::base);
 
    sub new {
@@ -52,22 +52,22 @@ ok($ctx->hexdigest, $EBCDIC ?? "86f0f0f0f3" !! "6630303033");
 $ctx->add("foo");
 ok($ctx->b64digest, $EBCDIC ?? "hvDw8PM" !! "ZjAwMDM");
 
-open(F, ">", "xxtest$$") || die;
+open(F, ">", "xxtest$^PID") || die;
 binmode(F);
 print F "abc" x 100, "\n";
 close(F) || die;
 
-open(F, "<", "xxtest$$") || die;
+open(F, "<", "xxtest$^PID") || die;
 $ctx->addfile(\*F);
 close(F);
-unlink("xxtest$$") || warn;
+unlink("xxtest$^PID") || warn;
 
 ok($ctx->digest, "a0301");
 
 try {
     $ctx->add_bits("1010");
 };
-ok($@->{?description} =~ m/^Number of bits must be multiple of 8/);
+ok($^EVAL_ERROR->{?description} =~ m/^Number of bits must be multiple of 8/);
 
 $ctx->add_bits($EBCDIC ?? "11100100" !! "01010101");
 ok($ctx->digest, "U0001");
@@ -75,7 +75,7 @@ ok($ctx->digest, "U0001");
 try {
     $ctx->add_bits("abc", 12);
 };
-ok($@->{?description} =~ m/^Number of bits must be multiple of 8/);
+ok($^EVAL_ERROR->{?description} =~ m/^Number of bits must be multiple of 8/);
 
 $ctx->add_bits("abc", 16);
 ok($ctx->digest, "a0002");

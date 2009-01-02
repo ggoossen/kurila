@@ -595,10 +595,10 @@ sub compile {
 	if ($^W) { # deparse -w
 	    print qq(BEGIN \{ \$^W = $^W; \}\n);
 	}
-	if ($/ ne "\n" or defined $O::savebackslash) { # deparse -l and -0
-	    my $fs = perlstring($/) || 'undef';
+	if ($^INPUT_RECORD_SEPARATOR ne "\n" or defined $O::savebackslash) { # deparse -l and -0
+	    my $fs = perlstring($^INPUT_RECORD_SEPARATOR) || 'undef';
 	    my $bs = perlstring($O::savebackslash) || 'undef';
-	    print qq(BEGIN \{ \$/ = $fs; \$\\ = $bs; \}\n);
+	    print qq(BEGIN \{ \$^INPUT_RECORD_SEPARATOR = $fs; \$^OUTPUT_RECORD_SEPARATOR = $bs; \}\n);
 	}
 	my @BEGINs  = @( B::begin_av->isa("B::AV") ?? < B::begin_av->ARRAY !! () );
 	my @UNITCHECKs = @( B::unitcheck_av->isa("B::AV")
@@ -679,10 +679,10 @@ sub ambient_pragmas {
 	    || $name eq 'utf8') {
 	    require "$name.pm";
 	    if ($val) {
-		$hint_bits ^|^= ${%::{"$($name)::"}->{?"hint_bits"}};
+		$hint_bits ^|^= ${Symbol::stash($name)->{?"hint_bits"}};
 	    }
 	    else {
-		$hint_bits ^&^= ^~^${%::{"$($name)::"}->{?"hint_bits"}};
+		$hint_bits ^&^= ^~^ ${Symbol::stash($name)->{?"hint_bits"}};
 	    }
 	}
 

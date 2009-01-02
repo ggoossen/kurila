@@ -10,7 +10,7 @@
 
 package Pod::InputObjects;
 
-use vars < qw($VERSION);
+our ($VERSION);
 $VERSION = 1.30;  ## Current version of this package
 
 #############################################################################
@@ -823,7 +823,7 @@ the current one.
 
 =cut
 
-use vars < qw(@ptree);  ## an alias used for performance reasons
+our (@ptree);  ## an alias used for performance reasons
 
 sub prepend {
    my $self = shift;

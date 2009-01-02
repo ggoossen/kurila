@@ -32,7 +32,7 @@ ok 1;
 foreach my $m ( @modules) {
   print "# Loading $m ...\n";
   eval "require $m;";
-  die if $@;
+  die if $^EVAL_ERROR;
   ok 1;
 }
 

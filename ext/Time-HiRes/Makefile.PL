@@ -16,7 +16,7 @@ my $LIBS = \@();
 my $XSOPT = '';
 my $SYSCALL_H;
 
-use vars < qw($self); # Used in 'sourcing' the hints.
+our ($self); # Used in 'sourcing' the hints.
 
 # TBD: Can we just use $Config(exe_ext) here instead of this complex
 #      expression?
@@ -42,7 +42,7 @@ sub try_compile_and_link {
     my @($c, %< %args) =  @_;
 
     my $ok = 0;
-    my $tmp = "tmp$$";
+    my $tmp = "tmp$^PID";
     local(*TMPC);
 
     my $obj_ext = config_value("obj_ext") || ".o";
@@ -105,7 +105,7 @@ __EOD__
 	    print CMDFILE "\$ IF \$SEVERITY .NE. 1 THEN EXIT 44\n"; # escalate
 	    close CMDFILE;
 	    system("\@ $tmp.com");
-	    $ok = $?==0;
+	    $ok = $^CHILD_ERROR==0;
 	    for (@: "$tmp.c", "$tmp$obj_ext", "$tmp.com",
                  $tmp . config_value('exe_ext')) {
 		1 while unlink $_;
@@ -126,12 +126,12 @@ __EOD__
 		    $ok = 1;
 		} else {
 		    $ok = 0;
-		    my $errno = $? >> 8;
-		    local $! = $errno;
+		    my $errno = $^CHILD_ERROR >> 8;
+		    local $^OS_ERROR = $errno;
 		    printf <<EOF;
 
-*** The test run of '$tmp_exe' failed: status $?
-*** (the status means: errno = $errno or '$!')
+*** The test run of '$tmp_exe' failed: status $^CHILD_ERROR
+*** (the status means: errno = $errno or '$^OS_ERROR')
 *** DO NOT PANIC: this just means that *some* functionality will be missing.
 EOF
 		}
@@ -769,12 +769,12 @@ sub doConstants {
     } else {
 	foreach my $file (@('const-c.inc', 'const-xs.inc')) {
 	    my $fallback = File::Spec->catfile('fallback', $file);
-	    local $/;
-	    open IN, "<$fallback" or die "Can't open $fallback: $!";
-	    open OUT, ">$file" or die "Can't open $file: $!";
-	    print OUT ~< *IN or die $!;
-	    close OUT or die "Can't close $file: $!";
-	    close IN or die "Can't close $fallback: $!";
+	    local $^INPUT_RECORD_SEPARATOR;
+	    open IN, "<$fallback" or die "Can't open $fallback: $^OS_ERROR";
+	    open OUT, ">$file" or die "Can't open $file: $^OS_ERROR";
+	    print OUT ~< *IN or die $^OS_ERROR;
+	    close OUT or die "Can't close $file: $^OS_ERROR";
+	    close IN or die "Can't close $fallback: $^OS_ERROR";
 	}
     }
 }

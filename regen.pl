@@ -34,11 +34,11 @@ sub do_cksum {
     for my $f ( @{ %gen{$pl} }) {
 	local *FH;
 	if (open(FH, "<", $f)) {
-	    local $/;
+	    local $^INPUT_RECORD_SEPARATOR;
 	    %cksum{+$f} = unpack("\%32C*", ~< *FH);
 	    close FH;
 	} else {
-	    warn "$0: $f: $!\n";
+	    warn "$0: $f: $^OS_ERROR\n";
 	}
     }
     return %cksum;

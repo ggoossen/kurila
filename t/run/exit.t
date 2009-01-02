@@ -27,7 +27,7 @@ my ($exit, $exit_arg);
 
 $exit = run('exit');
 is( $exit >> 8, 0,              'Normal exit' );
-is( $exit, $?,                  'Normal exit $?' );
+is( $exit, $^CHILD_ERROR,                  'Normal exit $?' );
 is( $^CHILD_ERROR_NATIVE, $native_success,  'Normal exit $^CHILD_ERROR_NATIVE' );
 
 if ($^O ne 'VMS') {
@@ -36,7 +36,7 @@ if ($^O ne 'VMS') {
 
   $exit = run('exit 42');
   is( $exit >> 8, 42,             'Non-zero exit' );
-  is( $exit, $?,                  'Non-zero exit $?' );
+  is( $exit, $^CHILD_ERROR,                  'Non-zero exit $?' );
   isnt( !$^CHILD_ERROR_NATIVE, 0, 'Non-zero exit $^CHILD_ERROR_NATIVE' );
   SKIP: do {
     skip("No POSIX", 3) unless $posix_ok;
@@ -49,11 +49,11 @@ if ($^O ne 'VMS') {
   SKIP: do {
     skip("Skip signals and core dump tests on Win32", 7) if $^O eq 'MSWin32';
 
-    $exit = run('kill 15, $$; sleep(1);');
+    $exit = run('kill 15, $^PID; sleep(1);');
 
     is( $exit ^&^ 127, 15,            'Term by signal' );
     ok( !($exit ^&^ 128),             'No core dump' );
-    is( $? ^&^ 127, 15,               'Term by signal $?' );
+    is( $^CHILD_ERROR ^&^ 127, 15,               'Term by signal $?' );
     isnt( $^CHILD_ERROR_NATIVE,  0, 'Term by signal $^CHILD_ERROR_NATIVE' );
     SKIP: do {
       skip("No POSIX", 3) unless $posix_ok;
@@ -118,7 +118,7 @@ if ($^O ne 'VMS') {
 }
 
 $exit_arg = 42;
-$exit = run("END \{ \$? = $exit_arg \}");
+$exit = run("END \{ \$^CHILD_ERROR = $exit_arg \}");
 
 # On VMS, in the child process the actual exit status will be SS$_ABORT, 
 # or 44, which is what you get from any non-zero value of $? except for

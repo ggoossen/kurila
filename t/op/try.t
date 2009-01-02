@@ -8,7 +8,7 @@ try {
     print "ok 1\n";
     die "ok 3\n";
     1;
-} || print "ok 2\n$@->{?description}";
+} || print "ok 2\n$^EVAL_ERROR->{?description}";
 
 my $test = 4;
 
@@ -19,7 +19,7 @@ do {
 	print "# eval \{ return \} test\n";
 	return; # removing this changes behavior
     };
-    print "not " if $@;
+    print "not " if $^EVAL_ERROR;
     print "ok $test\n";
     $test++;
 };
@@ -29,9 +29,9 @@ do {
 do {
     try {
 	try { goto foo; };
-	print ($@ ?? "ok $test\n" !! "not ok $test\n");
+	print ($^EVAL_ERROR ?? "ok $test\n" !! "not ok $test\n");
 	return;
     };
-    print "not ok $test\n" if $@;
+    print "not ok $test\n" if $^EVAL_ERROR;
     $test++;
 };

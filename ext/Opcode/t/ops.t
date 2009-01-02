@@ -9,13 +9,13 @@ eval <<'EOP';
 	$a = fileno STDIN;
 EOP
 
-print $@->{?description} =~ m/trapped/ ?? "ok 1\n" !! "not ok 1\n# $@\n";
+print $^EVAL_ERROR->{?description} =~ m/trapped/ ?? "ok 1\n" !! "not ok 1\n# $^EVAL_ERROR\n";
 
 eval <<'EOP';
 	use ops ':default';	# equiv to "perl -M(as above) -Mops=:default"
 	eval 1;
 EOP
 
-print $@->{?description} =~ m/trapped/ ?? "ok 2\n" !! "not ok 2\n# $@\n";
+print $^EVAL_ERROR->{?description} =~ m/trapped/ ?? "ok 2\n" !! "not ok 2\n# $^EVAL_ERROR\n";
 
 1;

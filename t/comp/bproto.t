@@ -12,13 +12,13 @@ my $bar = "bar";
 
 sub test_too_many {
     eval @_[0];
-    print "not " unless $@->{?description} =~ m/^Too many arguments/;
+    print "not " unless $^EVAL_ERROR->{?description} =~ m/^Too many arguments/;
     printf "ok \%d\n",$i++;
 }
 
 sub test_no_error {
     eval @_[0];
-    print "not " if $@;
+    print "not " if $^EVAL_ERROR;
     printf "ok \%d\n",$i++;
 }
 

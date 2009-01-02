@@ -16,7 +16,7 @@ ok open(STDOUT, '>', "foo.out"),"redirecting STDOUT";
 # Allow for it to be removed
 END { unlink "foo.out"; };
 
-select STDOUT; $| = 1; # make unbuffered
+select STDOUT; $^OUTPUT_AUTOFLUSH = 1; # make unbuffered
 
 # Run the printf tests
 print_double(5);

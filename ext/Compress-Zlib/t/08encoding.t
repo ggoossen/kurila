@@ -16,7 +16,7 @@ BEGIN
     try { require Encode; Encode->import(); };
 
     plan skip_all => "Encode is not available"
-        if $@ ;
+        if $^EVAL_ERROR ;
 
     # use Test::NoWarnings, if available
     my $extra = 0 ;

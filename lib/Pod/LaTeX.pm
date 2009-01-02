@@ -30,7 +30,7 @@ use base < qw/ Pod::Select /;
 # use Data::Dumper; # for debugging
 use Carp;
 
-use vars < qw/ $VERSION %HTML_Escapes @LatexSections /;
+our ($VERSION, %HTML_Escapes, @LatexSections);
 
 $VERSION = '0.58';
 
@@ -1267,7 +1267,7 @@ sub interior_sequence {
 
     # undef on failure
     unless (defined $link) {
-      carp $@;
+      carp $^EVAL_ERROR;
       return;
     }
 

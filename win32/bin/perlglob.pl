@@ -1,6 +1,6 @@
 #!perl -w
 use File::DosGlob;
-$| = 1;
+$^OUTPUT_AUTOFLUSH = 1;
 while ((nelems @ARGV)) {
     my $arg = shift;
     my @m = File::DosGlob::doglob(1,$arg);

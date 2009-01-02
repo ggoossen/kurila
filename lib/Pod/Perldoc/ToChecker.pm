@@ -2,12 +2,12 @@
 package Pod::Perldoc::ToChecker;
 
 use warnings;
-use vars < qw(@ISA);
+our (@ISA);
 
 # Pick our superclass...
 #
 eval 'require Pod::Simple::Checker';
-if($@) {
+if($^EVAL_ERROR) {
   require Pod::Checker;
   @ISA = @('Pod::Checker');
 } else {

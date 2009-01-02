@@ -89,7 +89,7 @@ foreach my $test ( @TESTS)
     diag($test->[0]);
     my $ok = eval "$test->[0]";
     if ($test->[1]) {
-        ok($@);
+        ok($^EVAL_ERROR);
     } else {
         ok($ok);
     }

@@ -11,7 +11,7 @@ BEGIN {
 
 chdir File::Spec->updir;
 my $manifest = File::Spec->catfile('MANIFEST');
-open(MANIFEST, "<", $manifest) or die "Can't open $manifest: $!";
+open(MANIFEST, "<", $manifest) or die "Can't open $manifest: $^OS_ERROR";
 my @modules = map { m{^lib/(\S+)}; $1 } 
  grep { m{^lib/ExtUtils/\S*\.pm} } 
  grep { !m{/t/} } @( ~< *MANIFEST);
@@ -25,7 +25,7 @@ foreach my $file ( @modules) {
     # they're already loaded.  This avoids recompilation warnings.
     local @INC = @INC;
     unshift @INC, ".";
-    ok try { require($file); 1 } or diag "require $file failed.\n$($@->message)";
+    ok try { require($file); 1 } or diag "require $file failed.\n$($^EVAL_ERROR->message)";
 
     SKIP: do {
         skip "Test::Pod not installed", 1 unless $Has_Test_Pod;

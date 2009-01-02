@@ -11,8 +11,8 @@ plan( tests => 5 );
 
 my ($a, $b, $c);
 
-$! = 1;
-$a = $!;
+$^OS_ERROR = 1;
+$a = $^OS_ERROR;
 my $a_str = sprintf "\%s", $a;
 my $a_num = sprintf "\%d", $a;
 

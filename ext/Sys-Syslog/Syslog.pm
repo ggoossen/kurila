@@ -70,12 +70,12 @@ do {
 # 
 # Public variables
 # 
-use vars < qw($host);             # host to send syslog messages to (see notes at end)
+our ($host);             # host to send syslog messages to (see notes at end)
 
 # 
 # Global variables
 # 
-use vars < qw($facility);
+our ($facility);
 my $connected = 0;              # flag to indicate if we're connected or not
 my $syslog_send;                # coderef of the function used to send messages
 my $syslog_path = undef;        # syslog path for "stream" and "unix" mechanisms
@@ -105,10 +105,10 @@ if ($^O =~ m/^(freebsd|linux)$/) {
 my $is_Win32 = $^O =~ m/Win32/i;
 eval "use Sys::Syslog::Win32";
 
-if (not $@) {
+if (not $^EVAL_ERROR) {
     unshift @connectMethods, 'eventlog';
 } elsif ($is_Win32) {
-    warn $@;
+    warn $^EVAL_ERROR;
 }
 
 my @defaultMethods = @connectMethods;
@@ -124,7 +124,7 @@ sub openlog {
     @(?$ident, ?my $logopt, ?$facility) =  @_;
 
     # default values
-    $ident    ||= basename($0) || getlogin() || getpwuid($<) || 'syslog';
+    $ident    ||= basename($0) || getlogin() || getpwuid($^UID) || 'syslog';
     $logopt   ||= '';
     $facility ||= LOG_USER();
 
@@ -258,7 +258,7 @@ sub syslog {
     my (@words, $num, $numpri, $numfac, $sum);
     my $failed = undef;
     my $fail_time = undef;
-    my $error = $!;
+    my $error = $^OS_ERROR;
 
     # if $ident is undefined, it means openlog() wasn't previously called
     # so do it now in order to have sensible defaults
@@ -321,7 +321,7 @@ sub syslog {
     }
     else {
         my $whoami = $ident;
-        $whoami .= "[$$]" if %options{?pid};
+        $whoami .= "[$^PID]" if %options{?pid};
 
         $sum = $numpri + $numfac;
         my $oldlocale = setlocale(LC_TIME);
@@ -382,7 +382,7 @@ sub _syslog_send_console {
 	    return 1;
 	} else {
 	    if (waitpid($pid, 0) +>= 0) {
-	    	return  $? >> 8;
+	    	return  $^CHILD_ERROR >> 8;
 	    } else {
 		# it's possible that the caller has other
 		# plans for SIGCHLD, so let's not interfere
@@ -469,7 +469,7 @@ sub connect_log {
     $transmit_ok = 0;
     if ($connected) {
 	$current_proto = $proto;
-        my $old = select(SYSLOG); $| = 1; select($old);
+        my $old = select(SYSLOG); $^OUTPUT_AUTOFLUSH = 1; select($old);
     } else {
 	@fallbackMethods = @( () );
         $err_sub->(join "\n\t- ", @( "no connection to syslog available", < @errs));
@@ -506,7 +506,7 @@ sub connect_tcp {
     $addr = sockaddr_in($syslog, $addr);
 
     if (!socket(SYSLOG, AF_INET, SOCK_STREAM, $tcp)) {
-	push @$errs, "tcp socket: $!";
+	push @$errs, "tcp socket: $^OS_ERROR";
 	return 0;
     }
 
@@ -516,7 +516,7 @@ sub connect_tcp {
         setsockopt(SYSLOG, IPPROTO_TCP(), TCP_NODELAY(), 1);
     }
     if (!connect(SYSLOG, $addr)) {
-	push @$errs, "tcp connect: $!";
+	push @$errs, "tcp connect: $^OS_ERROR";
 	return 0;
     }
 
@@ -553,11 +553,11 @@ sub connect_udp {
     $addr = sockaddr_in($syslog, $addr);
 
     if (!socket(SYSLOG, AF_INET, SOCK_DGRAM, $udp)) {
-	push @$errs, "udp socket: $!";
+	push @$errs, "udp socket: $^OS_ERROR";
 	return 0;
     }
     if (!connect(SYSLOG, $addr)) {
-	push @$errs, "udp connect: $!";
+	push @$errs, "udp connect: $^OS_ERROR";
 	return 0;
     }
 
@@ -584,7 +584,7 @@ sub connect_stream {
 	return 0;
     }
     if (!sysopen(SYSLOG, $syslog_path, 0400, O_WRONLY)) {
-	push @$errs, "stream can't open $syslog_path: $!";
+	push @$errs, "stream can't open $syslog_path: $^OS_ERROR";
 	return 0;
     }
     $syslog_send = \&_syslog_send_stream;
@@ -602,7 +602,7 @@ sub connect_pipe {
     }
 
     if (not open(SYSLOG, ">", "$syslog_path")) {
-        push @$errs, "can't write to $syslog_path: $!";
+        push @$errs, "can't write to $syslog_path: $^OS_ERROR";
         return 0;
     }
 
@@ -632,17 +632,17 @@ sub connect_unix {
 	return 0;
     }
     if (!socket(SYSLOG, AF_UNIX, SOCK_STREAM, 0)) {
-        push @$errs, "unix stream socket: $!";
+        push @$errs, "unix stream socket: $^OS_ERROR";
 	return 0;
     }
 
     if (!connect(SYSLOG, $addr)) {
         if (!socket(SYSLOG, AF_UNIX, SOCK_DGRAM, 0)) {
-	    push @$errs, "unix dgram socket: $!";
+	    push @$errs, "unix dgram socket: $^OS_ERROR";
 	    return 0;
 	}
         if (!connect(SYSLOG, $addr)) {
-	    push @$errs, "unix dgram connect: $!";
+	    push @$errs, "unix dgram connect: $^OS_ERROR";
 	    return 0;
 	}
     }
@@ -662,8 +662,8 @@ sub connect_native {
     }
 
     try { openlog_xs($ident, $logopt, xlate($facility)) };
-    if ($@) {
-        push @$errs, $@->message;
+    if ($^EVAL_ERROR) {
+        push @$errs, $^EVAL_ERROR->message;
         return 0;
     }
 

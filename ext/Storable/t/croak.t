@@ -17,11 +17,11 @@ print "1..2\n";
 
 for my $test (@(1,2)) {
   try {thaw "\xFF\xFF"};
-  if ($@->{?description} =~ m/Storable binary image v127.255 more recent than I am \(v2\.\d+\)/)
+  if ($^EVAL_ERROR->{?description} =~ m/Storable binary image v127.255 more recent than I am \(v2\.\d+\)/)
     {
       print "ok $test\n";
     } else {
-      chomp $@;
-      print "not ok $test # Expected a meaningful croak. Got '$@'\n";
+      chomp $^EVAL_ERROR;
+      print "not ok $test # Expected a meaningful croak. Got '$^EVAL_ERROR'\n";
     }
 }

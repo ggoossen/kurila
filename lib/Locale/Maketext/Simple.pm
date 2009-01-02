@@ -154,7 +154,7 @@ sub load_loc {
 	    unless defined &tense;
 
 	1;
-    " or die $@;
+    " or die $^EVAL_ERROR;
     
     my $lh = try { $pkg->get_handle } or return;
     my $style = lc(%args{?Style});

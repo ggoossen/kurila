@@ -63,7 +63,6 @@ $expected = $upperfirst ??
     'catchaseddoggonepunishedtoxyzAbelAxedCain' ;
 
 cmp_ok($x,'eq',$expected,'upper first 4');
-$" = ' ';
 @a = @( () );
 @b = reverse @a;
 cmp_ok("$(join ' ',@b)",'eq',"",'reverse 1');
@@ -347,7 +346,7 @@ my $fail_msg = q(Modification of a read-only value attempted);
 my @readonly =1..10;
 Internals::SvREADONLY(@readonly, 1);
 try { @readonly = sort @readonly; };
-main::cmp_ok(substr($@->{?description},0,length($fail_msg)),'eq',$fail_msg,'in-place sort of read-only array');
+main::cmp_ok(substr($^EVAL_ERROR->{?description},0,length($fail_msg)),'eq',$fail_msg,'in-place sort of read-only array');
 
 
 

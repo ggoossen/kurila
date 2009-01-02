@@ -13,7 +13,7 @@ my $IsSymbian = defined env::var("SDK") && -d "$(env::var('SDK'))\\epoc32";
 my $IsMSWin32 = $^O eq 'MSWin32' && !$IsSymbian;
 
 unlink "Errno.pm" if -f "Errno.pm";
-open OUT, ">", "Errno.pm" or die "Cannot open Errno.pm: $!";
+open OUT, ">", "Errno.pm" or die "Cannot open Errno.pm: $^OS_ERROR";
 select OUT;
 my @files = get_files();
 if (config_value("gccversion") ne '' && $^O eq 'MSWin32') {
@@ -317,11 +317,11 @@ EOF
 		}
 		close(C);
 	    } else {
-		die "failed to execute ./errno: $!\n";
+		die "failed to execute ./errno: $^OS_ERROR\n";
 	    }
             unlink("errno");
         } else {
-	    die "failed to create errno.c: $!\n";
+	    die "failed to create errno.c: $^OS_ERROR\n";
 	}
     }
 

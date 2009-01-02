@@ -7,7 +7,7 @@
 package IO::Select;
 
 use warnings::register;
-use     vars < qw($VERSION @ISA);
+our ($VERSION, @ISA);
 require Exporter;
 
 $VERSION = "1.17";

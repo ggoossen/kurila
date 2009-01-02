@@ -6,7 +6,7 @@
 
 package Scalar::Util;
 
-use vars < qw(@ISA @EXPORT_OK $VERSION);
+our (@ISA, @EXPORT_OK, $VERSION);
 require Exporter;
 require List::Util; # List::Util loads the XS
 
@@ -51,7 +51,7 @@ sub openhandle ($) {
 
 eval <<'ESQ' unless defined &dualvar;
 
-use vars qw(@EXPORT_FAIL);
+our @EXPORT_FAIL;
 push @EXPORT_FAIL, qw(weaken isweak dualvar isvstring set_prototype);
 
 # The code beyond here is only used if the XS is not installed

@@ -78,7 +78,7 @@ sub cleanup {
     }
     chdir File::Spec->updir;
     if (-d dir_path('for_find')) {
-	rmdir dir_path('for_find') or print "# Can't rmdir for_find: $!\n";
+	rmdir dir_path('for_find') or print "# Can't rmdir for_find: $^OS_ERROR\n";
     }
 }
 
@@ -283,34 +283,34 @@ is(nkeys %Expect_File, 0, 'Found all expected files');
 %Expect_File = %( () );
 %Expect_Name = %( () );
 %Expect_Dir  = %( () );
-undef $@;
+undef $^EVAL_ERROR;
 try {File::Find::find( \%(wanted => \&simple_wanted), topdir('fa') );};
-like( $@->{?description}, qr|Insecure dependency|, 'Tainted directory causes death (good)' );
+like( $^EVAL_ERROR->{?description}, qr|Insecure dependency|, 'Tainted directory causes death (good)' );
 chdir($cwd_untainted);
 
 
 # untaint pattern doesn't match, should die
-undef $@;
+undef $^EVAL_ERROR;
 
 try {File::Find::find( \%(wanted => \&simple_wanted, untaint => 1,
                          untaint_pattern => qr|^(NO_MATCH)$|),
                          topdir('fa') );};
 
-like( $@->{?description}, qr|is still tainted|, 'Bad untaint pattern causes death (good)' );
+like( $^EVAL_ERROR->message, qr|is still tainted|, 'Bad untaint pattern causes death (good)' );
 chdir($cwd_untainted);
 
 
 # untaint pattern doesn't match, should die when we chdir to cwd
 print "# check untaint_skip (No follow)\n";
-undef $@;
+undef $^EVAL_ERROR;
 
 try {File::Find::find( \%(wanted => \&simple_wanted, untaint => 1,
                          untaint_skip => 1, untaint_pattern =>
                          qr|^(NO_MATCH)$|), topdir('fa') );};
 
-print "# $@->{?description}\n" if $@;
+print "# $^EVAL_ERROR->{?description}\n" if $^EVAL_ERROR;
 #$^D = 8;
-like( $@->{?description}, qr|insecure cwd|, 'Bad untaint pattern causes death in cwd (good)' );
+like( $^EVAL_ERROR->{?description}, qr|insecure cwd|, 'Bad untaint pattern causes death in cwd (good)' );
 
 chdir($cwd_untainted);
 
@@ -355,7 +355,7 @@ SKIP: do {
 
 
     # don't untaint at all, should die
-    undef $@;
+    undef $^EVAL_ERROR;
 
     dies_like( sub { File::Find::find( \%(wanted => \&simple_wanted, follow => 1),
                                        topdir('fa') );},
@@ -363,23 +363,23 @@ SKIP: do {
     chdir($cwd_untainted);
 
     # untaint pattern doesn't match, should die
-    undef $@;
+    undef $^EVAL_ERROR;
 
     try {File::Find::find( \%(wanted => \&simple_wanted, follow => 1,
                              untaint => 1, untaint_pattern =>
                              qr|^(NO_MATCH)$|), topdir('fa') );};
 
-    like( $@->{?description}, qr|is still tainted|, 'Bat untaint pattern causes death (good)' );
+    like( $^EVAL_ERROR->{?description}, qr|is still tainted|, 'Bat untaint pattern causes death (good)' );
     chdir($cwd_untainted);
 
     # untaint pattern doesn't match, should die when we chdir to cwd
     print "# check untaint_skip (Follow)\n";
-    undef $@;
+    undef $^EVAL_ERROR;
 
     try {File::Find::find( \%(wanted => \&simple_wanted, untaint => 1,
                              untaint_skip => 1, untaint_pattern =>
                              qr|^(NO_MATCH)$|), topdir('fa') );};
-    like( $@->{?description}, qr|insecure cwd|, 'Cwd not untainted with bad pattern (good)' );
+    like( $^EVAL_ERROR->{?description}, qr|insecure cwd|, 'Cwd not untainted with bad pattern (good)' );
 
     chdir($cwd_untainted);
 };

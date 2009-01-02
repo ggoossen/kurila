@@ -16,8 +16,8 @@
 
 package Term::ANSIColor;
 
-use vars < qw($AUTORESET $EACHLINE @ISA @EXPORT @EXPORT_OK
-            %EXPORT_TAGS $VERSION %attributes %attributes_r);
+our ($AUTORESET, $EACHLINE, @ISA, @EXPORT, @EXPORT_OK
+,            %EXPORT_TAGS, $VERSION, %attributes, %attributes_r);
 
 use Exporter ();
 @ISA         = qw(Exporter);

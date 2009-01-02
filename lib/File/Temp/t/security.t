@@ -90,14 +90,14 @@ sub test_security {
                                           DIR => File::Spec->tmpdir,
                                           UNLINK => 1,
                                       );
-			    };
+			    } || @(undef, undef);
 
   if (defined $fname1) {
       print "# fname1 = $fname1\n";
       ok( (-e $fname1) );
       push(@files, $fname1); # store for end block
   } elsif (File::Temp->safe_level() != File::Temp::STANDARD) {
-      my $skip2 = "Skip: " . File::Spec->tmpdir() . " possibly insecure:  $($@ && $@->message).  " .
+      my $skip2 = "Skip: " . File::Spec->tmpdir() . " possibly insecure:  $($^EVAL_ERROR && $^EVAL_ERROR->message).  " .
 	 "See INSTALL under 'make test'";
       skip($skip2, 1);
       # plus we need an end block so the tests come out in the right order
@@ -107,7 +107,7 @@ sub test_security {
   }
 
   # Explicitly 
-  if ( $< +< File::Temp->top_system_uid() ){
+  if ( $^UID +< File::Temp->top_system_uid() ){
       skip("Skip Test inappropriate for root", 1);
       eval q{ END { skip($skip,1); } 1; } || die;
       return;
@@ -119,8 +119,8 @@ sub test_security {
       push(@files, $fname2); # store for end block
       close($fh2);
   } elsif (File::Temp->safe_level() != File::Temp::STANDARD) {
-      chomp($@);
-      my $skip2 = "Skip: current directory possibly insecure: $@.  " .
+      chomp($^EVAL_ERROR);
+      my $skip2 = "Skip: current directory possibly insecure: $^EVAL_ERROR.  " .
 	 "See INSTALL under 'make test'";
       skip($skip2, 1);
       # plus we need an end block so the tests come out in the right order

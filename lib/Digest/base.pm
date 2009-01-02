@@ -1,6 +1,6 @@
 package Digest::base;
 
-use vars < qw($VERSION);
+our ($VERSION);
 $VERSION = "1.00";
 
 # subclass is supposed to implement at least these
@@ -25,7 +25,7 @@ sub addfile {
     }
     unless (defined $n) {
 	require Carp;
-	Carp::croak("Read failed: $!");
+	Carp::croak("Read failed: $^OS_ERROR");
     }
 
     $self;

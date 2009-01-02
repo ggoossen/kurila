@@ -5,7 +5,7 @@ use Config;
 use Test::More tests => 20;
 
 use Scalar::Util < qw(reftype);
-use vars < qw($t $y $x);
+our ($t, $y, $x);
 use Symbol < qw(gensym);
 
 my @test = @(

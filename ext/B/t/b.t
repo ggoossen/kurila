@@ -1,6 +1,6 @@
 #!./perl
 
-$|  = 1;
+$^OUTPUT_AUTOFLUSH  = 1;
 use warnings;
 
 use Test::More tests => 56;
@@ -9,7 +9,7 @@ BEGIN { use_ok( 'B' ); }
 
 
 package Testing::Symtable;
-use vars < qw($This @That %wibble $moo %moo);
+our ($This, @That, %wibble, $moo, %moo);
 my $not_a_sym = 'moo';
 
 sub moo { 42 }
@@ -23,7 +23,7 @@ package Testing::Symtable::Bar;
 sub hock { "yarrow" }
 
 package main;
-use vars < qw(%Subs);
+our (%Subs);
 local %Subs = %( () );
 B::walksymtable(\%Testing::Symtable::, 'find_syms', sub { @_[0] =~ m/Foo/ },
                 'Testing::Symtable::');
@@ -78,7 +78,7 @@ is(ref $pv_ret, "SCALAR", "Test object_2svref() return is SCALAR");
 is($$pv_ret, $pv, "Test object_2svref()");
 is($pv_ref->PV(), $pv, "Test PV()");
 try { is($pv_ref->RV(), $pv, "Test RV()"); };
-ok($@, "Test RV()");
+ok($^EVAL_ERROR, "Test RV()");
 is($pv_ref->PVX_const(), $pv, "Test PVX()");
 
 my $nv = 1.1;

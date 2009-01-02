@@ -404,7 +404,7 @@ sub sysread {
 
 sub write {
     (nelems @_) +>= 2 && (nelems @_) +<= 4 or die 'usage: $io->write(BUF [, LEN [, OFFSET]])';
-    local($\) = "";
+    local($^OUTPUT_RECORD_SEPARATOR) = "";
     @_[+2] = length(@_[1]) unless defined @_[?2];
     print { @_[0] } substr(@_[1], @_[?3] || 0, @_[2]);
 }
@@ -429,32 +429,32 @@ sub stat {
 
 sub autoflush {
     my $old = SelectSaver->new( qualify(@_[0], caller));
-    my $prev = $|;
-    $| = (nelems @_) +> 1 ?? @_[1] !! 1;
+    my $prev = $^OUTPUT_AUTOFLUSH;
+    $^OUTPUT_AUTOFLUSH = (nelems @_) +> 1 ?? @_[1] !! 1;
     $prev;
 }
 
 sub output_field_separator {
     warn "output_field_separator is not supported on a per-handle basis"
 	if ref(@_[0]);
-    my $prev = $,;
-    $, = @_[1] if (nelems @_) +> 1;
+    my $prev = $^OUTPUT_FIELD_SEPARATOR;
+    $^OUTPUT_FIELD_SEPARATOR = @_[1] if (nelems @_) +> 1;
     $prev;
 }
 
 sub output_record_separator {
     warn "output_record_separator is not supported on a per-handle basis"
 	if ref(@_[0]);
-    my $prev = $\;
-    $\ = @_[1] if (nelems @_) +> 1;
+    my $prev = $^OUTPUT_RECORD_SEPARATOR;
+    $^OUTPUT_RECORD_SEPARATOR = @_[1] if (nelems @_) +> 1;
     $prev;
 }
 
 sub input_record_separator {
     warn "input_record_separator is not supported on a per-handle basis"
 	if ref(@_[0]);
-    my $prev = $/;
-    $/ = @_[1] if (nelems @_) +> 1;
+    my $prev = $^INPUT_RECORD_SEPARATOR;
+    $^INPUT_RECORD_SEPARATOR = @_[1] if (nelems @_) +> 1;
     $prev;
 }
 
@@ -499,7 +499,7 @@ sub printflush {
     my $io = shift;
     my $old;
     $old = SelectSaver->new( < qualify($io, caller)) if ref($io);
-    local $| = 1;
+    local $^OUTPUT_AUTOFLUSH = 1;
     if(ref($io)) {
         print $io < @_;
     }

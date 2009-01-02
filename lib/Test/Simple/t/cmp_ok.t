@@ -25,7 +25,7 @@ sub try_cmp_ok {
     
     my %expect;
     %expect{+ok}    = eval "\$left $cmp \$right";
-    %expect{+error} = $@;
+    %expect{+error} = $^EVAL_ERROR;
     %expect{+error} =~ s/ at .*\n?//;
 
     local $Test::Builder::Level = $Test::Builder::Level + 1;

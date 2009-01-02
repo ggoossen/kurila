@@ -265,7 +265,7 @@ do {
 do {
     my @a;
     eval '@a[+-1] = 0';
-    like $@->message,
+    like $^EVAL_ERROR->message,
       qr/Required array element -1 could not be created/, "\$a[+-1] = 0";
 };
 

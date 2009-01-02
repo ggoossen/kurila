@@ -23,7 +23,7 @@ our @EXPORT_OK = qw(
 );
 
 use FileHandle;
-use vars < qw($canonical $forgive_me $VERSION);
+our ($canonical, $forgive_me, $VERSION);
 
 $VERSION = '2.18';
 
@@ -115,9 +115,9 @@ EOM
 sub file_magic {
     my $file = shift;
     my $fh = FileHandle->new();
-    open($fh, "<", "". $file) || die "Can't open '$file': $!";
+    open($fh, "<", "". $file) || die "Can't open '$file': $^OS_ERROR";
     binmode($fh);
-    defined(sysread($fh, my $buf, 32)) || die "Can't read from '$file': $!";
+    defined(sysread($fh, my $buf, 32)) || die "Can't read from '$file': $^OS_ERROR";
     close($fh);
 
     $file = "./$file" unless $file;  # ensure TRUE value
@@ -242,27 +242,27 @@ sub _store {
 	logcroak "wrong argument number" unless (nelems @_) == 2;	# No @foo in arglist
 	local *FILE;
 	if ($use_locking) {
-		open(FILE, ">>", "$file") || logcroak "can't write into $file: $!";
+		open(FILE, ">>", "$file") || logcroak "can't write into $file: $^OS_ERROR";
 		unless (&CAN_FLOCK( < @_ )) {
 			logcarp "Storable::lock_store: fcntl/flock emulation broken on $^O";
 			return undef;
 		}
 		flock(FILE, LOCK_EX) ||
-			logcroak "can't get exclusive lock on $file: $!";
+			logcroak "can't get exclusive lock on $file: $^OS_ERROR";
 		truncate *FILE, 0;
 		# Unlocking will happen when FILE is closed
 	} else {
-		open(FILE, ">", "$file") || logcroak "can't create $file: $!";
+		open(FILE, ">", "$file") || logcroak "can't create $file: $^OS_ERROR";
 	}
 	binmode FILE;				# Archaic systems...
-	my $da = $@;				# Don't mess if called from exception handler
+	my $da = $^EVAL_ERROR;				# Don't mess if called from exception handler
 	my $ret;
 	# Call C routine nstore or pstore, depending on network order
 	try { $ret = &$xsptr(*FILE, $self) };
 	close(FILE) or $ret = undef;
-	unlink($file) or warn "Can't unlink $file: $!\n" if $@ || !defined $ret;
-	logcroak $@ if $@;
-	$@ = $da;
+	unlink($file) or warn "Can't unlink $file: $^OS_ERROR\n" if $^EVAL_ERROR || !defined $ret;
+	logcroak $^EVAL_ERROR if $^EVAL_ERROR;
+	$^EVAL_ERROR = $da;
 	return $ret ?? $ret !! undef;
 }
 
@@ -295,13 +295,13 @@ sub _store_fd {
 	logcroak "too many arguments" unless (nelems @_) == 1;	# No @foo in arglist
 	my $fd = fileno($file);
 	logcroak "not a valid file descriptor" unless defined $fd;
-	my $da = $@;				# Don't mess if called from exception handler
+	my $da = $^EVAL_ERROR;				# Don't mess if called from exception handler
 	my $ret;
 	# Call C routine nstore or pstore, depending on network order
 	try { $ret = &$xsptr($file, $self) };
-	logcroak $@ if $@;
-	local $\; $file->print('');	# Autoflush the file if wanted
-	$@ = $da;
+	logcroak $^EVAL_ERROR if $^EVAL_ERROR;
+	local $^OUTPUT_RECORD_SEPARATOR; $file->print('');	# Autoflush the file if wanted
+	$^EVAL_ERROR = $da;
 	return $ret ?? $ret !! undef;
 }
 
@@ -330,12 +330,12 @@ sub _freeze {
 	my $self = shift;
 	logcroak "not a reference" unless ref($self);
 	logcroak "too many arguments" unless (nelems @_) == 0;	# No @foo in arglist
-	my $da = $@;				# Don't mess if called from exception handler
+	my $da = $^EVAL_ERROR;				# Don't mess if called from exception handler
 	my $ret;
 	# Call C routine mstore or net_mstore, depending on network order
 	try { $ret = &$xsptr($self) };
-	logcroak $@ if $@;
-	$@ = $da;
+	logcroak $^EVAL_ERROR if $^EVAL_ERROR;
+	$^EVAL_ERROR = $da;
 	return $ret ?? $ret !! undef;
 }
 
@@ -362,22 +362,22 @@ sub lock_retrieve {
 sub _retrieve {
 	my @($file, $use_locking) =  @_;
 	local *FILE;
-	open(FILE, "<", $file) || logcroak "can't open $file: $!";
+	open(FILE, "<", $file) || logcroak "can't open $file: $^OS_ERROR";
 	binmode FILE;							# Archaic systems...
 	my $self;
-	my $da = $@;							# Could be from exception handler
+	my $da = $^EVAL_ERROR;							# Could be from exception handler
 	if ($use_locking) {
 		unless (&CAN_FLOCK( < @_ )) {
 			logcarp "Storable::lock_store: fcntl/flock emulation broken on $^O";
 			return undef;
 		}
-		flock(FILE, LOCK_SH) || logcroak "can't get shared lock on $file: $!";
+		flock(FILE, LOCK_SH) || logcroak "can't get shared lock on $file: $^OS_ERROR";
 		# Unlocking will happen when FILE is closed
 	}
 	try { $self = pretrieve(*FILE) };		# Call C routine
 	close(FILE);
-	logcroak $@ if $@;
-	$@ = $da;
+	logcroak $^EVAL_ERROR if $^EVAL_ERROR;
+	$^EVAL_ERROR = $da;
 	return $self;
 }
 
@@ -391,10 +391,10 @@ sub fd_retrieve {
 	my $fd = fileno($file);
 	logcroak "not a valid file descriptor" unless defined $fd;
 	my $self;
-	my $da = $@;							# Could be from exception handler
+	my $da = $^EVAL_ERROR;							# Could be from exception handler
 	try { $self = pretrieve($file) };		# Call C routine
-	logcroak $@ if $@;
-	$@ = $da;
+	logcroak $^EVAL_ERROR if $^EVAL_ERROR;
+	$^EVAL_ERROR = $da;
 	return $self;
 }
 
@@ -408,10 +408,10 @@ sub thaw {
 	my @($frozen) =  @_;
 	return undef unless defined $frozen;
 	my $self;
-	my $da = $@;							# Could be from exception handler
+	my $da = $^EVAL_ERROR;							# Could be from exception handler
 	try { $self = mretrieve($frozen) };	# Call C routine
-	logcroak $@ if $@;
-	$@ = $da;
+	logcroak $^EVAL_ERROR if $^EVAL_ERROR;
+	$^EVAL_ERROR = $da;
 	return $self;
 }
 

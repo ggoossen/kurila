@@ -2,7 +2,7 @@
 
 use Test::More tests => 3;
 
-open(POD, ">", "$$.pod") or die "$$.pod: $!";
+open(POD, ">", "$^PID.pod") or die "$^PID.pod: $^OS_ERROR";
 print POD <<__EOF__;
 =pod
 
@@ -34,8 +34,8 @@ use Pod::Html;
 
 # --- CR ---
 
-open(POD, "<", "$$.pod") or die "$$.pod: $!";
-open(IN, ">",  "$$.in")  or die "$$.in: $!";
+open(POD, "<", "$^PID.pod") or die "$^PID.pod: $^OS_ERROR";
+open(IN, ">",  "$^PID.in")  or die "$^PID.in: $^OS_ERROR";
 while ( ~< *POD) {
   s/[\r\n]+/\r/g;
   print IN $_;
@@ -43,12 +43,12 @@ while ( ~< *POD) {
 close(POD);
 close(IN);
 
-pod2html("--title=eol", "--infile=$$.in", "--outfile=$$.o1");
+pod2html("--title=eol", "--infile=$^PID.in", "--outfile=$^PID.o1");
 
 # --- LF ---
 
-open(POD, "<", "$$.pod") or die "$$.pod: $!";
-open(IN, ">",  "$$.in")  or die "$$.in: $!";
+open(POD, "<", "$^PID.pod") or die "$^PID.pod: $^OS_ERROR";
+open(IN, ">",  "$^PID.in")  or die "$^PID.in: $^OS_ERROR";
 while ( ~< *POD) {
   s/[\r\n]+/\n/g;
   print IN $_;
@@ -56,12 +56,12 @@ while ( ~< *POD) {
 close(POD);
 close(IN);
 
-pod2html("--title=eol", "--infile=$$.in", "--outfile=$$.o2");
+pod2html("--title=eol", "--infile=$^PID.in", "--outfile=$^PID.o2");
 
 # --- CRLF ---
 
-open(POD, "<", "$$.pod") or die "$$.pod: $!";
-open(IN, ">",  "$$.in")  or die "$$.in: $!";
+open(POD, "<", "$^PID.pod") or die "$^PID.pod: $^OS_ERROR";
+open(IN, ">",  "$^PID.in")  or die "$^PID.in: $^OS_ERROR";
 while ( ~< *POD) {
   s/[\r\n]+/\r\n/g;
   print IN $_;
@@ -69,19 +69,19 @@ while ( ~< *POD) {
 close(POD);
 close(IN);
 
-pod2html("--title=eol", "--infile=$$.in", "--outfile=$$.o3");
+pod2html("--title=eol", "--infile=$^PID.in", "--outfile=$^PID.o3");
 
 # --- now test ---
 
-local $/;
+local $^INPUT_RECORD_SEPARATOR;
 
-open(IN, "<", "$$.o1") or die "$$.o1: $!";
+open(IN, "<", "$^PID.o1") or die "$^PID.o1: $^OS_ERROR";
 my $cksum1 = unpack("\%32C*", ~< *IN);
 
-open(IN, "<", "$$.o2") or die "$$.o2: $!";
+open(IN, "<", "$^PID.o2") or die "$^PID.o2: $^OS_ERROR";
 my $cksum2 = unpack("\%32C*", ~< *IN);
 
-open(IN, "<", "$$.o3") or die "$$.o3: $!";
+open(IN, "<", "$^PID.o3") or die "$^PID.o3: $^OS_ERROR";
 my $cksum3 = unpack("\%32C*", ~< *IN);
 
 ok($cksum1 == $cksum2, "CR vs LF");
@@ -90,6 +90,6 @@ ok($cksum2 == $cksum3, "LF vs CRLF");
 close IN;
 
 END {
-  1 while unlink("$$.pod", "$$.in", "$$.o1", "$$.o2", "$$.o3",
+  1 while unlink("$^PID.pod", "$^PID.in", "$^PID.o1", "$^PID.o2", "$^PID.o3",
                  "pod2htmd.x~~", "pod2htmi.x~~");
 }

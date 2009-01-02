@@ -294,7 +294,7 @@ sub zap
     my $byte ;
     ( $self->smartSeek($block_offset) &&
       $self->smartRead(\$byte, 1) ) 
-        or return $self->saveErrorString(0, $!, $!); 
+        or return $self->saveErrorString(0, $^OS_ERROR, $^OS_ERROR); 
 
     #printf "#byte is %x\n", unpack('C*',$byte);
     *$self->{?Uncomp}->resetLastBlockByte($byte);
@@ -302,7 +302,7 @@ sub zap
 
     ( $self->smartSeek($block_offset) && 
       $self->smartWrite($byte) )
-        or return $self->saveErrorString(0, $!, $!); 
+        or return $self->saveErrorString(0, $^OS_ERROR, $^OS_ERROR); 
 
     #$self->smartSeek($end_offset, 1);
 

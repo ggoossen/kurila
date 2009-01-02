@@ -28,7 +28,7 @@ chdir 't';
 
 perl_lib;
 
-$| = 1;
+$^OUTPUT_AUTOFLUSH = 1;
 
 my $Makefile = makefile_name;
 my $Curdir = File::Spec->curdir;
@@ -41,7 +41,7 @@ END {
 }
 
 ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
-  diag("chdir failed: $!");
+  diag("chdir failed: $^OS_ERROR");
 
 my $stdout = '';
 close STDOUT;

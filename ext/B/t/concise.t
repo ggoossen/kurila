@@ -48,8 +48,8 @@ B::Concise->import( <qw( set_style set_style_standard add_callback
 # test that walk_output rejects non-HANDLE args
 foreach my $foo (@("string", \@(), \%())) {
     try {  walk_output($foo) };
-    isnt ($@ && $@->message, '', "walk_output() rejects arg $(dump::view($foo))");
-    $@=''; # clear the fail for next test
+    isnt ($^EVAL_ERROR && $^EVAL_ERROR->message, '', "walk_output() rejects arg $(dump::view($foo))");
+    $^EVAL_ERROR=''; # clear the fail for next test
 }
 # test accessor mode when arg undefd or 0
 foreach my $foo (@(undef, 0)) {
@@ -64,7 +64,7 @@ do {   # any object that can print should be ok for walk_output
 };
 my $foo = Hugo->new();	# suggested this API fix
 try {  walk_output($foo) };
-is ($@, '', "walk_output() accepts obj that can print");
+is ($^EVAL_ERROR, '', "walk_output() accepts obj that can print");
 
 # test that walk_output accepts a HANDLE arg
 SKIP: do {
@@ -73,39 +73,39 @@ SKIP: do {
 
     foreach my $foo (@(\*STDOUT, \*STDERR)) {
 	try {  walk_output($foo) };
-	is ($@, '', "walk_output() accepts STD* " . ref $foo);
+	is ($^EVAL_ERROR, '', "walk_output() accepts STD* " . ref $foo);
     }
 
     # now test a ref to scalar
     try {  walk_output(\my $junk) };
-    is ($@, '', "walk_output() accepts ref-to-sprintf target");
+    is ($^EVAL_ERROR, '', "walk_output() accepts ref-to-sprintf target");
 
     my $junk = "non-empty";
     try {  walk_output(\$junk) };
-    is ($@, '', "walk_output() accepts ref-to-non-empty-scalar");
+    is ($^EVAL_ERROR, '', "walk_output() accepts ref-to-non-empty-scalar");
 };
 
 ## add_style
 my @stylespec;
-$@='';
+$^EVAL_ERROR='';
 try { add_style ('junk_B' => < @stylespec) };
-like ($@->{?description}, 'expecting 3 style-format args',
+like ($^EVAL_ERROR->{?description}, 'expecting 3 style-format args',
     "add_style rejects insufficient args");
 
 @stylespec = @(0,0,0); # right length, invalid values
-$@='';
+$^EVAL_ERROR='';
 try { add_style ('junk' => < @stylespec) };
-is ($@, '', "add_style accepts: stylename => 3-arg-array");
+is ($^EVAL_ERROR, '', "add_style accepts: stylename => 3-arg-array");
 
-$@='';
+$^EVAL_ERROR='';
 try { add_style (junk => < @stylespec) };
-like ($@->{?description}, qr/style 'junk' already exists, choose a new name/,
+like ($^EVAL_ERROR->{?description}, qr/style 'junk' already exists, choose a new name/,
     "add_style correctly disallows re-adding same style-name" );
 
 # test new arg-checks on set_style
-$@='';
+$^EVAL_ERROR='';
 try { set_style (< @stylespec) };
-is ($@, '', "set_style accepts 3 style-format args");
+is ($^EVAL_ERROR, '', "set_style accepts 3 style-format args");
 
 @stylespec = @( () ); # bad style
 
@@ -118,7 +118,7 @@ sub render {
     walk_output(\my $out);
     try { B::Concise::compile(< @_)->() };
     # diag "rendering $@\n";
-    return  @($out, $@);
+    return  @($out, $^EVAL_ERROR);
 }
 
 SKIP: do {
@@ -164,7 +164,7 @@ SKIP: do {
 	    my $typ = ref $ref;
 	    walk_output(\my $out);
 	    try { B::Concise::compile('-basic', $ref)->() };
-	    like ($@->{?description}, qr/^err: not a coderef: $typ/,
+	    like ($^EVAL_ERROR->{?description}, qr/^err: not a coderef: $typ/,
 		  "compile detects $typ-ref where expecting subref");
 	    is($out,'', "no output when errd"); # announcement prints
 	}

@@ -11,10 +11,10 @@ use File::Spec;
 #require ExtUtils::MakeMaker;
 #require ExtUtils::Liblist;
 
-use vars < qw(@ISA @EXPORT $VERSION
-	    @Extensions $Verbose $lib_ext
-	    $opt_o $opt_s 
-	    );
+our (@ISA, @EXPORT, $VERSION
+	,    @Extensions, $Verbose, $lib_ext
+	,    $opt_o, $opt_s, 
+	,    );
 
 
 $VERSION = '1.26_01';
@@ -169,7 +169,6 @@ sub ldopts {
     my @(?$std,?$mods,?$link_args,?$path) =  @_;
     my(@mods,@link_args,@argv);
     my($dllib,$config_libs,@potential_libs,@path);
-    local($") = ' ' unless $" eq ' ';
     if (scalar nelems @_) {
        @link_args = @$link_args if $link_args;
        @mods = @$mods if $mods;

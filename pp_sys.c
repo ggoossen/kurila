@@ -3294,7 +3294,7 @@ PP(pp_fork)
     if (childpid < 0)
 	RETSETUNDEF;
     if (!childpid) {
-	GV * const tmpgv = gv_fetchpvs("$", GV_ADD|GV_NOTQUAL, SVt_PV);
+	GV * const tmpgv = gv_fetchpvs("^PID", GV_ADD|GV_NOTQUAL, SVt_PV);
 	if (tmpgv) {
             SvREADONLY_off(GvSV(tmpgv));
 	    sv_setiv(GvSV(tmpgv), (IV)PerlProc_getpid());

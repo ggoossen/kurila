@@ -27,7 +27,7 @@ package Pod::Man;
 
 
 use utf8;
-use vars < qw(@ISA %ESCAPES $PREAMBLE $VERSION);
+our (@ISA, %ESCAPES, $PREAMBLE, $VERSION);
 
 use Carp < qw(croak);
 use Pod::Simple ();
@@ -1237,10 +1237,10 @@ sub parse_from_file {
     # figure this out.
     my $fh = $self->output_fh ();
     my $oldfh = select $fh;
-    my $oldflush = $|;
-    $| = 1;
+    my $oldflush = $^OUTPUT_AUTOFLUSH;
+    $^OUTPUT_AUTOFLUSH = 1;
     print $fh '';
-    $| = $oldflush;
+    $^OUTPUT_AUTOFLUSH = $oldflush;
     select $oldfh;
     return $retval;
 }

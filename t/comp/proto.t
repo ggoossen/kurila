@@ -74,7 +74,7 @@ ok( 4 == &no_args( < @_ ) );
 ok( 2 == &no_args(1,2) );
 
 eval "no_args(1)";
-ok( $@ );
+ok( $^EVAL_ERROR );
 
 ##
 ##
@@ -96,10 +96,10 @@ ok( 4 == &one_args( < @_ ) );
 ok( 2 == &one_args(1,2) );
 
 eval "one_args(1,2)";
-ok( $@ );
+ok( $^EVAL_ERROR );
 
 eval "one_args()";
-ok( $@ );
+ok( $^EVAL_ERROR );
 
 sub one_a_args ($) {
     print "# \@_ = (",join(",", @_),")\n";
@@ -127,7 +127,7 @@ ok( 2 == &over_one_args(1,2) );
 ok( 5 == &over_one_args(1,< @_) );
 
 eval "over_one_args()";
-ok( $@ );
+ok( $^EVAL_ERROR );
 
 sub over_one_a_args ($@) {
     print "# \@_ = (",join(",", @_),")\n";
@@ -158,10 +158,10 @@ ok( 3 == &one_or_two(1,2,3) );
 ok( 5 == &one_or_two(1,< @_) );
 
 eval "one_or_two()";
-ok( $@ );
+ok( $^EVAL_ERROR );
 
 eval "one_or_two(1,2,3)";
-ok( $@ );
+ok( $^EVAL_ERROR );
 
 sub one_or_two_a ($;$) {
     print "# \@_ = (",join(",", @_),")\n";
@@ -190,7 +190,7 @@ a_sub \&tmp_sub_1;
 
 @array = @( \&tmp_sub_1 );
 eval 'a_sub @array';
-ok( $@ );
+ok( $^EVAL_ERROR );
 
 ##
 ##
@@ -245,16 +245,16 @@ ok( not defined prototype('CORE::system') );
 
 ok( not ($p = prototype('CORE::open')) ne '*;$@' );
 
-ok( not defined ($p = try { prototype('CORE::Foo') or 1 }) or $@->message !~ m/^Can't find an opnumber/ );
+ok( not defined ($p = try { prototype('CORE::Foo') or 1 }) or $^EVAL_ERROR->message !~ m/^Can't find an opnumber/ );
 
 # correctly note too-short parameter lists that don't end with '$',
 #  a possible regression.
 
 sub foo1 ($\@) { 1 };
 eval q{ foo1 "s" };
-ok( $@->message =~ m/^Not enough/ );
+ok( $^EVAL_ERROR->message =~ m/^Not enough/ );
 
 sub foo2 ($\%) { 1 };
 eval q{ foo2 "s" };
-ok( $@->message =~ m/^Not enough/ );
+ok( $^EVAL_ERROR->message =~ m/^Not enough/ );
 

@@ -97,7 +97,7 @@ do {
     cmp_ok( abs($new_stamp - $stamp), '+<=', 1, 'eqtime' );
 
     # eqtime use to clear the contents of the file being equalized!
-    open(FILE, ">>", "$Testfile") || die $!;
+    open(FILE, ">>", "$Testfile") || die $^OS_ERROR;
     print FILE "Foo";
     close FILE;
 
@@ -208,7 +208,7 @@ do {
     @ARGV = @( $Testfile ) x 3 ;
     try { cp() };
 
-    like( $@->{?description}, qr/Too many arguments/, 'cp croaks on error' );
+    like( $^EVAL_ERROR->{?description}, qr/Too many arguments/, 'cp croaks on error' );
 
     # move a file to a subdirectory
     @ARGV = @( $Testfile, 'ecmddir' );
@@ -223,7 +223,7 @@ do {
     @ARGV = @( $Testfile ) x 3 ;
 
     try { mv() };
-    like( $@->{?description}, qr/Too many arguments/, 'mv croaks on error' );
+    like( $^EVAL_ERROR->{?description}, qr/Too many arguments/, 'mv croaks on error' );
 
     # Test expand_wildcards()
     do {

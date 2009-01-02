@@ -1,9 +1,0 @@
-Check implicit loading of features with use VERSION.
-
-__END__
-# Standard feature bundle
-use feature ":5.10";
-1 ~~ 1 and print "Hello", "world\n";
-EXPECT
-Helloworld
-########

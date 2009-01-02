@@ -72,7 +72,6 @@
 #define PL_body_arenas		(vTHX->Ibody_arenas)
 #define PL_body_roots		(vTHX->Ibody_roots)
 #define PL_checkav		(vTHX->Icheckav)
-#define PL_chopset		(vTHX->Ichopset)
 #define PL_clocktick		(vTHX->Iclocktick)
 #define PL_colors		(vTHX->Icolors)
 #define PL_colorset		(vTHX->Icolorset)
@@ -172,7 +171,6 @@
 #define PL_memory_debug_header	(vTHX->Imemory_debug_header)
 #define PL_mess_sv		(vTHX->Imess_sv)
 #define PL_min_intro_pending	(vTHX->Imin_intro_pending)
-#define PL_minus_E		(vTHX->Iminus_E)
 #define PL_minus_a		(vTHX->Iminus_a)
 #define PL_minus_c		(vTHX->Iminus_c)
 #define PL_minus_l		(vTHX->Iminus_l)
@@ -355,7 +353,6 @@
 #define PL_Ibody_arenas		PL_body_arenas
 #define PL_Ibody_roots		PL_body_roots
 #define PL_Icheckav		PL_checkav
-#define PL_Ichopset		PL_chopset
 #define PL_Iclocktick		PL_clocktick
 #define PL_Icolors		PL_colors
 #define PL_Icolorset		PL_colorset
@@ -455,7 +452,6 @@
 #define PL_Imemory_debug_header	PL_memory_debug_header
 #define PL_Imess_sv		PL_mess_sv
 #define PL_Imin_intro_pending	PL_min_intro_pending
-#define PL_Iminus_E		PL_minus_E
 #define PL_Iminus_a		PL_minus_a
 #define PL_Iminus_c		PL_minus_c
 #define PL_Iminus_l		PL_minus_l

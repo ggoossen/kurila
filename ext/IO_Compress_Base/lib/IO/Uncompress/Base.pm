@@ -370,7 +370,7 @@ sub _create
             $mode = '+<' if $got->value('Scan');
             $obj->{+StdIO} = ($inValue eq '-');
             $obj->{+FH} = IO::File->new( "$inValue", $mode)
-                or return $obj->saveErrorString(undef, "cannot open file '$inValue': $!", $!) ;
+                or return $obj->saveErrorString(undef, "cannot open file '$inValue': $^OS_ERROR", $^OS_ERROR) ;
         }
         
         #*$obj->{LineNo} = $. = 0;
@@ -587,7 +587,7 @@ sub _singleTarget
         $mode = '>>'
             if $x->{?Got}->value('Append') ;
         $x->{+fh} = IO::File->new( "$output", $mode) 
-            or return retErr($x, "cannot open file '$output': $!") ;
+            or return retErr($x, "cannot open file '$output': $^OS_ERROR") ;
         binmode $x->{?fh} if $x->{?Got}->valueOrDefault('BinModeOut');
 
     }
@@ -597,7 +597,7 @@ sub _singleTarget
         binmode $x->{?fh} if $x->{?Got}->valueOrDefault('BinModeOut');
         if ($x->{?Got}->value('Append')) {
                 seek($x->{?fh}, 0, SEEK_END)
-                    or return retErr($x, "Cannot seek to end of output filehandle: $!") ;
+                    or return retErr($x, "Cannot seek to end of output filehandle: $^OS_ERROR") ;
             }
     }
 
@@ -627,7 +627,7 @@ sub _singleTarget
     if ( ($x->{?outType} eq 'filename' && $output ne '-') || 
          ($x->{?outType} eq 'handle' && $x->{?Got}->value('AutoClose'))) {
         $x->{fh}->close() 
-            or return retErr($x, $!); 
+            or return retErr($x, $^OS_ERROR); 
         delete $x->{fh};
     }
 
@@ -654,7 +654,7 @@ sub _rd2
         while (($status = $z->read($x->{buff})) +> 0) {
             if ($fh) {
                 print $fh ${ $x->{?buff} }
-                    or return $z->saveErrorString(undef, "Error writing to output file: $!", $!);
+                    or return $z->saveErrorString(undef, "Error writing to output file: $^OS_ERROR", $^OS_ERROR);
                 ${ $x->{buff} } = '' ;
             }
         }
@@ -759,7 +759,7 @@ sub _raw_read
         my $tmp_buff ;
         my $len = $self->smartRead(\$tmp_buff, $self->{BlockSize}) ;
         
-        return $self->saveErrorString( <G_ERR, "Error reading data: $!", $!) 
+        return $self->saveErrorString( <G_ERR, "Error reading data: $^OS_ERROR", $^OS_ERROR) 
                 if $len +< 0 ;
 
         if ($len == 0 ) {
@@ -1060,22 +1060,22 @@ sub _getline
     my $self = shift ;
 
     # Slurp Mode
-    if ( ! defined $/ ) {
+    if ( ! defined $^INPUT_RECORD_SEPARATOR ) {
         my $data ;
         1 while $self->read($data) +> 0 ;
         return \$data ;
     }
 
     # Record Mode
-    if ( ref $/ eq 'SCALAR' && ${$/} =~ m/^\d+$/ && ${$/} +> 0) {
-        my $reclen = ${$/} ;
+    if ( ref $^INPUT_RECORD_SEPARATOR eq 'SCALAR' && ${$^INPUT_RECORD_SEPARATOR} =~ m/^\d+$/ && ${$^INPUT_RECORD_SEPARATOR} +> 0) {
+        my $reclen = ${$^INPUT_RECORD_SEPARATOR} ;
         my $data ;
         $self->read($data, $reclen) ;
         return \$data ;
     }
 
     # Paragraph Mode
-    if ( ! length $/ ) {
+    if ( ! length $^INPUT_RECORD_SEPARATOR ) {
         my $paragraph ;    
         while ($self->read($paragraph) +> 0 ) {
             if ($paragraph =~ s/^(.*?\n\n+)//s) {
@@ -1094,17 +1094,17 @@ sub _getline
         my $p = \$self->{+Pending}  ;
 
         if (length($self->{?Pending}) && 
-                    ($offset = index($self->{?Pending}, $/)) +>=0) {
-            my $l = substr($self->{?Pending}, 0, $offset + length $/ );
-            substr($self->{Pending}, 0, $offset + length $/, '');    
+                    ($offset = index($self->{?Pending}, $^INPUT_RECORD_SEPARATOR)) +>=0) {
+            my $l = substr($self->{?Pending}, 0, $offset + length $^INPUT_RECORD_SEPARATOR );
+            substr($self->{Pending}, 0, $offset + length $^INPUT_RECORD_SEPARATOR, '');    
             return \$l;
         }
 
         while ($self->read($line) +> 0 ) {
-            my $offset = index($line, $/);
+            my $offset = index($line, $^INPUT_RECORD_SEPARATOR);
             if ($offset +>= 0) {
-                my $l = substr($line, 0, $offset + length $/ );
-                substr($line, 0, $offset + length $/, '');    
+                my $l = substr($line, 0, $offset + length $^INPUT_RECORD_SEPARATOR );
+                substr($line, 0, $offset + length $^INPUT_RECORD_SEPARATOR, '');    
                 $$p = $line;
                 return \$l;
             }
@@ -1206,13 +1206,13 @@ sub close
         if ((! $self->{?Handle} || $self->{?AutoClose}) && ! $self->{?StdIO}) {
         #if ( $self->{AutoClose}) {
             #local $.; 
-            $! = 0 ;
+            $^OS_ERROR = 0 ;
             $status = close($self->{?FH});
-            return $self->saveErrorString(0, $!, $!)
-                if !$self->{?InNew} && $self->saveStatus($!) != 0 ;
+            return $self->saveErrorString(0, $^OS_ERROR, $^OS_ERROR)
+                if !$self->{?InNew} && $self->saveStatus($^OS_ERROR) != 0 ;
         }
         delete $self->{FH} ;
-        $! = 0 ;
+        $^OS_ERROR = 0 ;
     }
     $self->{+Closed} = 1 ;
 

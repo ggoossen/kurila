@@ -6,7 +6,7 @@ our ($foo, $fact, $ans, $i, $x, $eval);
 
 eval 'print "ok 1\n";';
 
-if ($@ eq '') {print "ok 2\n";} else {print "not ok 2\n";}
+if ($^EVAL_ERROR eq '') {print "ok 2\n";} else {print "not ok 2\n";}
 
 eval "\$foo\n    = # this is a comment\n'ok 3';";
 print $foo,"\n";
@@ -16,10 +16,10 @@ print $foo;
 
 print eval '
 $foo =;';		# this tests for a call through yyerror()
-if ($@->message =~ m/line 2/) {print "ok 5\n";} else {print "not ok 5\n";}
+if ($^EVAL_ERROR->message =~ m/line 2/) {print "ok 5\n";} else {print "not ok 5\n";}
 
 print eval '$foo = m/';	# this tests for a call through fatal()
-if ($@->{?description} =~ m/Search/) {print "ok 6\n";} else {print "not ok 6\n";}
+if ($^EVAL_ERROR->{?description} =~ m/Search/) {print "ok 6\n";} else {print "not ok 6\n";}
 
 print eval '"ok 7\n";';
 
@@ -39,7 +39,7 @@ open(TRY, ">",'Op.eval');
 print TRY 'print "ok 10\n"; unlink "Op.eval";',"\n";
 close TRY;
 
-do './Op.eval'; print $@;
+do './Op.eval'; print $^EVAL_ERROR;
 
 # Test the singlequoted eval optimizer
 
@@ -52,7 +52,7 @@ try {
     print "ok 14\n";
     die "ok 16\n";
     1;
-} || print "ok 15\n$@->{?description}";
+} || print "ok 15\n$^EVAL_ERROR->{?description}";
 
 # check whether eval EXPR determines value of EXPR correctly
 
@@ -77,10 +77,10 @@ my $X = sub {
 # check navigation of multiple eval boundaries to find lexicals
 
 my $x = 25;
-eval <<'EOT'; die if $@;
+eval <<'EOT'; die if $^EVAL_ERROR;
   print "# $x\n";	# clone into eval's pad
   sub do_eval1 {
-     eval @_[0]; die if $@;
+     eval @_[0]; die if $^EVAL_ERROR;
   }
 EOT
 do_eval1('print "ok $x\n"');
@@ -92,9 +92,9 @@ $x++;
 
 # calls from within eval'' should clone outer lexicals
 
-eval <<'EOT'; die if $@;
+eval <<'EOT'; die if $^EVAL_ERROR;
   sub do_eval2 {
-     eval @_[0]; die if $@;
+     eval @_[0]; die if $^EVAL_ERROR;
   }
 do_eval2('print "ok $x\n"');
 $x++;
@@ -108,10 +108,10 @@ EOT
 
 $main::ok = 'not ok';
 my $ok = 'ok';
-eval <<'EOT'; die if $@;
+eval <<'EOT'; die if $^EVAL_ERROR;
   # $x unbound here
   sub do_eval3 {
-     eval @_[0]; die if $@;
+     eval @_[0]; die if $^EVAL_ERROR;
   }
 EOT
 do {
@@ -128,7 +128,7 @@ sub recurse {
   if ($l +< $x) {
      ++$l;
      eval 'print "# level $l\n"; recurse($l);';
-     die if $@;
+     die if $^EVAL_ERROR;
   }
   else {
     print "ok $l\n";
@@ -168,14 +168,14 @@ do {
     $x++;
 };
 
-# return from try {} should clear $@ correctly
+# return from try {} should clear $^EVAL_ERROR correctly
 do {
     my $status = try {
 	try { die };
 	print "# eval \{ return \} test\n";
 	return; # removing this changes behavior
     };
-    print "not " if $@;
+    print "not " if $^EVAL_ERROR;
     print "ok $x\n";
     $x++;
 };
@@ -187,7 +187,7 @@ do {
 	print "# eval ' return ' test\n";
 	return; # removing this changes behavior
     };
-    print "not " if $@;
+    print "not " if $^EVAL_ERROR;
     print "ok $x - return from eval\n";
     $x++;
 };
@@ -199,20 +199,20 @@ print "ok 41\n";
 # 20011224 MJD
 do {
   eval q{my $$x};
-  print $@ ?? "ok 42\n" !! "not ok 42\n";
+  print $^EVAL_ERROR ?? "ok 42\n" !! "not ok 42\n";
   eval q{my @$x};
-  print $@ ?? "ok 43\n" !! "not ok 43\n";
+  print $^EVAL_ERROR ?? "ok 43\n" !! "not ok 43\n";
   eval q{my %$x};
-  print $@ ?? "ok 44\n" !! "not ok 44\n";
+  print $^EVAL_ERROR ?? "ok 44\n" !! "not ok 44\n";
   eval q{my $$$x};
-  print $@ ?? "ok 45\n" !! "not ok 45\n";
+  print $^EVAL_ERROR ?? "ok 45\n" !! "not ok 45\n";
 };
 
-# [ID 20020623.002] eval "" doesn't clear $@
+# [ID 20020623.002] eval "" doesn't clear $^EVAL_ERROR
 do {
-    $@ = 5;
+    $^EVAL_ERROR = 5;
     eval q{};
-    print length($@) ?? "not ok 46\t# \$\@ = '$@'\n" !! "ok 46 - eval clear $@\n";
+    print length($^EVAL_ERROR) ?? "not ok 46\t# \$\@ = '$^EVAL_ERROR'\n" !! "ok 46 - eval clear $^EVAL_ERROR\n";
 };
 
 # DAPM Nov-2002. Perl should now capture the full lexical context during
@@ -233,7 +233,7 @@ eval q{
     sub fred2 {
 	print eval('$zzz') == 1 ?? 'ok' !! 'not ok', " @_[?0]\n";
     }
-}; die if $@;
+}; die if $^EVAL_ERROR;
 fred2(49);
 do { my $zzz = 2; fred2(50) };
 
@@ -309,7 +309,7 @@ eval q{
 	goto &fred4;
     }
     fred5();
-}; die if $@;
+}; die if $^EVAL_ERROR;
 fred5();
 do { my $yyy = 88; my $zzz = 99; fred5(); };
 eval q{ my $yyy = 888; my $zzz = 999; fred5(); };
@@ -393,9 +393,9 @@ print "ok ",$test++," - #20798 (used to dump core)\n";
 # eval undef should be the same as eval "" barring any warnings
 
 do {
-    local $@ = "foo";
+    local $^EVAL_ERROR = "foo";
     eval undef;
-    print "not " unless $@ eq "";
+    print "not " unless $^EVAL_ERROR eq "";
     print "ok $test # eval undef \n"; $test++;
 };
 

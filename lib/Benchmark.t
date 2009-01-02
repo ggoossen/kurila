@@ -2,7 +2,7 @@
 
 use warnings;
 
-use vars < qw($foo $bar $baz $ballast);
+our ($foo, $bar, $baz, $ballast);
 use Test::More tests => 182;
 
 use Benchmark < qw(:all);
@@ -39,7 +39,6 @@ isa_ok(timeit(5, '++ our $bar'), 'Benchmark', "timeit eval");
 is ($bar, 5, "benchmarked code was run 5 times");
 
 # is coderef called with spurious arguments?
-my $foo;
 timeit( 1, sub { $foo = @_[?0] });
 is ($foo, undef, "benchmarked code called without arguments");
 
@@ -82,7 +81,7 @@ do {
 # I found that the eval'ed version was 3 times faster than the coderef.
 # (now it has a different ballast value)
 $baz = 0;
-my $again = countit(1, '$baz += fib($ballast)');
+my $again = countit(1, '$main::baz += fib($main::ballast)');
 isa_ok($onesec, 'Benchmark', "countit 1, eval");
 isnt ($baz, 0, "benchmarked code was run");
 my $in_again = $again->iters;
@@ -146,7 +145,7 @@ like ($got, $Default_Pattern, 'default format is all or noc');
 $out = "";
 $bar = 0;
 select($out_fh);
-$got = timethis($iterations, '++$bar');
+$got = timethis($iterations, '++$main::bar');
 select(STDOUT);
 isa_ok($got, 'Benchmark', "timethis eval");
 is ($bar, $iterations, "benchmarked code was run $iterations times");
@@ -205,7 +204,7 @@ do {
 $foo = $bar = $baz = 0;
 $out = "";
 select($out_fh);
-$got = timethese($iterations, \%( Foo => sub {++$foo}, Bar => '++$bar',
+$got = timethese($iterations, \%( Foo => sub {++$foo}, Bar => '++$main::bar',
                                 Baz => sub {++$baz} ));
 select(STDOUT);
 is(ref ($got), 'HASH', "timethese should return a hashref");
@@ -336,7 +335,7 @@ sub check_graph_vs_output {
                                  $slowr, $slowratet, $slowslow, $slowfastt,
                                  $fastr, $fastratet, $fastslowt, $fastfast);
     $all_passed
-      ^&^= is_deeply ($chart, \@(\@('', $ratetext, $slowc, $fastc),
+      &&= is_deeply ($chart, \@(\@('', $ratetext, $slowc, $fastc),
                              \@($slowr, $slowratet, $slowslow, $slowfastt),
                              \@($fastr, $fastratet, $fastslowt, $fastfast)),
                     "check the chart layout matches the formatted output");
@@ -483,7 +482,7 @@ do {
     local *STDERR = *$debug_fh{IO};
 
     $bar = 0;
-    isa_ok(timeit(5, '++$bar'), 'Benchmark', "timeit eval");
+    isa_ok(timeit(5, '++$main::bar'), 'Benchmark', "timeit eval");
     is ($bar, 5, "benchmarked code was run 5 times");
     is ($debug, '', "There was no debug output");
 
@@ -492,7 +491,7 @@ do {
     $bar = 0;
     $out = "";
     select($out_fh);
-    $got = timeit(5, '++$bar');
+    $got = timeit(5, '++$main::bar');
     select(STDOUT);
     isa_ok($got, 'Benchmark', "timeit eval");
     is ($bar, 5, "benchmarked code was run 5 times");
@@ -503,7 +502,7 @@ do {
     Benchmark->debug(0);
 
     $bar = 0;
-    isa_ok(timeit(5, '++$bar'), 'Benchmark', "timeit eval");
+    isa_ok(timeit(5, '++$main::bar'), 'Benchmark', "timeit eval");
     is ($bar, 5, "benchmarked code was run 5 times");
     is ($debug, '', "There was no debug output debug disabled");
 
@@ -516,11 +515,11 @@ do {
 clearallcache();
 my @before_keys =keys %Benchmark::Cache;
 $bar = 0;
-isa_ok(timeit(5, '++$bar'), 'Benchmark', "timeit eval");
+isa_ok(timeit(5, '++$main::bar'), 'Benchmark', "timeit eval");
 is ($bar, 5, "benchmarked code was run 5 times");
 my @after5_keys =keys %Benchmark::Cache;
 $bar = 0;
-isa_ok(timeit(10, '++$bar'), 'Benchmark', "timeit eval");
+isa_ok(timeit(10, '++$main::bar'), 'Benchmark', "timeit eval");
 is ($bar, 10, "benchmarked code was run 10 times");
 ok (!eq_array (\keys %Benchmark::Cache, \@after5_keys), "10 differs from 5");
 
@@ -546,7 +545,7 @@ do {   # Check usage error messages
                     );
     while( my@(?$name, ?$code) =@( each %cmpthese) ) {
         eval $code;
-        is( $@->{?description}, %usage{?cmpthese}, "cmpthese usage: $name" );
+        is( $^EVAL_ERROR->{?description}, %usage{?cmpthese}, "cmpthese usage: $name" );
     }
 
     my %timethese = %('forgot {}'  => 'timethese( 42, foo => sub { 1 } )',
@@ -555,12 +554,12 @@ do {   # Check usage error messages
 
     while( my@(?$name, ?$code) =@( each %timethese) ) {
         eval $code;
-        is( $@->{?description}, %usage{?timethese}, "timethese usage: $name" );
+        is( $^EVAL_ERROR->{?description}, %usage{?timethese}, "timethese usage: $name" );
     }
 
 
     foreach my $func ( @takes_no_args) {
         eval "$func(42)";
-        is( $@->{?description}, %usage{?$func}, "$func usage: with args" );
+        is( $^EVAL_ERROR->{?description}, %usage{?$func}, "$func usage: with args" );
     }
 };

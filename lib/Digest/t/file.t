@@ -6,7 +6,7 @@ plan tests => 5;
 do {
    package Digest::Foo;
    require Digest::base;
-   use vars < qw(@ISA $VERSION);
+   our (@ISA, $VERSION);
    @ISA = qw(Digest::base);
 
    sub new {
@@ -29,12 +29,12 @@ do {
 
 use Digest::file < qw(digest_file digest_file_hex digest_file_base64);
 
-my $file = "test-$$";
+my $file = "test-$^PID";
 die if -f $file;
-open(F, ">", "$file") || die "Can't create '$file': $!";
+open(F, ">", "$file") || die "Can't create '$file': $^OS_ERROR";
 binmode(F);
 print F "foo\0\n";
-close(F) || die "Can't write '$file': $!";
+close(F) || die "Can't write '$file': $^OS_ERROR";
 
 ok(digest_file($file, "Foo"), "0005");
 
@@ -46,7 +46,7 @@ if (ord('A') == 193) { # EBCDIC.
     ok(digest_file_base64($file, "Foo"), "MDAwNQ");
 }
 
-unlink($file) || warn "Can't unlink '$file': $!";
+unlink($file) || warn "Can't unlink '$file': $^OS_ERROR";
 
 ok(try { digest_file("not-there.txt", "Foo") }, undef);
-ok($@);
+ok($^EVAL_ERROR);

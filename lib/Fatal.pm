@@ -59,7 +59,7 @@ EOC
 sub one_invocation {
   my @($core, $call, $name, @< @argv) =  @_;
   return qq{$call($(join ', ', @argv)) || die "Can't $name(\$(join ', ', map \{ dump::view(\$_) \} \@_))} . 
-    ($core ?? ': $!' !! ', \$! is \"$!\"') . '"';
+    ($core ?? ': $^OS_ERROR' !! ', \$^OS_ERROR is \"$^OS_ERROR\"') . '"';
 }
 
 sub _make_fatal {
@@ -80,7 +80,7 @@ sub _make_fatal {
     } else {			# CORE subroutine
         $proto = try { prototype "CORE::$name" };
 	die "$name is neither a builtin, nor a Perl subroutine" 
-	  if $@;
+	  if $^EVAL_ERROR;
 	die "Cannot make the non-overridable builtin $name fatal"
 	  if not defined $proto;
 	$core = 1;
@@ -94,7 +94,7 @@ sub _make_fatal {
     }
     $code = <<EOS;
 sub$real_proto \{
-	local(\$!) = (0);
+	local(\$^OS_ERROR) = (0);
 EOS
     my @protos = fill_protos($proto);
     $code .= write_invocation($core, $call, $name, < @protos);
@@ -102,7 +102,7 @@ EOS
     print $code if $Debug;
     do {
       $code = eval("package $pkg; $code");
-      die if $@;
+      die if $^EVAL_ERROR;
       no warnings;   # to avoid: Subroutine foo redefined ...
       *{$sub} = $code;
     };

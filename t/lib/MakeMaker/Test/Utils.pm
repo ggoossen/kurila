@@ -4,7 +4,7 @@ use File::Spec;
 
 use Config;
 
-use vars < qw($VERSION @ISA @EXPORT);
+our ($VERSION, @ISA, @EXPORT);
 
 require Exporter;
 @ISA = qw(Exporter);
@@ -223,7 +223,7 @@ touched.
 =cut
 
 sub calibrate_mtime {
-    open(FILE, ">", "calibrate_mtime.tmp") || die $!;
+    open(FILE, ">", "calibrate_mtime.tmp") || die $^OS_ERROR;
     print FILE "foo";
     close FILE;
     my $mtime = @(stat('calibrate_mtime.tmp'))[9];
@@ -273,7 +273,7 @@ sub setup_mm_test_root {
         # can't create logical names with attributes in Perl, so we do it
         # in a DCL subprocess and put it in the job table so the parent sees it.
         open( MMTMP, ">", 'mmtesttmp.com' ) || 
-          die "Error creating command file; $!";
+          die "Error creating command file; $^OS_ERROR";
         print MMTMP <<'COMMAND';
 $ MM_TEST_ROOT = F$PARSE("SYS$DISK:[-]",,,,"NO_CONCEAL")-".][000000"-"]["-"].;"+".]"
 $ DEFINE/JOB/NOLOG/TRANSLATION=CONCEALED MM_TEST_ROOT 'MM_TEST_ROOT'

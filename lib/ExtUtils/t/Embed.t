@@ -12,11 +12,11 @@ use Config;
 use ExtUtils::Embed;
 use File::Spec;
 
-open(my $fh, ">","embed_test.c") || die "Cannot open embed_test.c:$!";
+open(my $fh, ">","embed_test.c") || die "Cannot open embed_test.c:$^OS_ERROR";
 print $fh ~< *DATA;
 close($fh);
 
-$| = 1;
+$^OUTPUT_AUTOFLUSH = 1;
 print "1..9\n";
 my $cc = config_value('cc');
 my $cl  = ($^O eq 'MSWin32' && $cc eq 'cl');
@@ -135,7 +135,7 @@ my $cmd = join ' ', @cmd;
 chomp($cmd); # where is the newline coming from? ldopts()?
 print "# $cmd\n";
 my @out = @( `$cmd` );
-$status = $?;
+$status = $^CHILD_ERROR;
 print "# $_\n" foreach  @out;
 
 if ($^O eq 'VMS' && !$status) {
@@ -166,7 +166,7 @@ __END__
 
 #define my_puts(a) if(puts(a) < 0) exit(666)
 
-static const char * cmds [] = { "perl", "-e", "$|=1; print qq[ok 5\\n]", NULL };
+static const char * cmds [] = { "perl", "-e", "$^OUTPUT_AUTOFLUSH=1; print qq[ok 5\\n]", NULL };
 
 #ifdef PERL_GLOBAL_STRUCT_PRIVATE
 static struct perl_vars *my_plvarsp;

@@ -71,7 +71,7 @@ plan tests => (nelems @TESTS);
 foreach my $test ( @TESTS)
 {
     my $ok = eval "$test";
-    die if $@;
+    die if $^EVAL_ERROR;
     ok $ok;
 }
 

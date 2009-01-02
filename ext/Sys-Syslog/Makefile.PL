@@ -30,13 +30,13 @@ if ($use_eventlog) {
     if (! -f File::Spec->catfile("win32", "$name.dll")) {
         # read the uuencoded data
         open(UU, "<", '' . File::Spec->catfile("win32", "$name\_dll.uu"))
-            or die "fatal: Can't read file '$name\_dll.uu': $!";
-        my $uudata = do { local $/; ~< *UU };
+            or die "fatal: Can't read file '$name\_dll.uu': $^OS_ERROR";
+        my $uudata = do { local $^INPUT_RECORD_SEPARATOR; ~< *UU };
         close(UU);
 
         # write the DLL
         open(DLL, ">", '' . File::Spec->catfile("win32", "$name.dll"))
-            or die "fatal: Can't write DLL '$name.dll': $!";
+            or die "fatal: Can't write DLL '$name.dll': $^OS_ERROR";
         binmode(DLL);
         print DLL unpack "u", $uudata;
         close(DLL);
@@ -154,13 +154,13 @@ if(try {require ExtUtils::Constant; 1}) {
     );
 
     my @names = map { ref $_ ?? $_->{?name} !! $_ } @( < @levels, < @facilities, < @options);
-    open(MACROS, ">", 'macros.all') or warn "warning: Can't write 'macros.all': $!\n";
-    print MACROS join $/, @names;
+    open(MACROS, ">", 'macros.all') or warn "warning: Can't write 'macros.all': $^OS_ERROR\n";
+    print MACROS join $^INPUT_RECORD_SEPARATOR, @names;
     close(MACROS);
 }
 else {
     foreach my $file (@('const-c.inc', 'const-xs.inc')) {
         my $fallback = File::Spec->catfile('fallback', $file);
-        copy($fallback, $file) or die "fatal: Can't copy $fallback to $file: $!";
+        copy($fallback, $file) or die "fatal: Can't copy $fallback to $file: $^OS_ERROR";
     }
 }

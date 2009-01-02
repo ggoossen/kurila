@@ -8,7 +8,7 @@
 
 
 use Storable < qw(freeze thaw dclone);
-use vars < qw($debugging $verbose);
+our ($debugging, $verbose);
 
 print "1..8\n";
 
@@ -32,13 +32,13 @@ our $maxarraysize = 100;
 # Use MD5 if its available to make random string keys
 
 try { require "MD5.pm" };
-our $gotmd5 = !$@;
+our $gotmd5 = !$^EVAL_ERROR;
 
 # Use Data::Dumper if debugging and it is available to create an ASCII dump
 
 if ($debugging) {
     try { require "Data/Dumper.pm" };
-    our $gotdd  = !$@;
+    our $gotdd  = !$^EVAL_ERROR;
 }
 
 our @fixed_strings = @("January", "February", "March", "April", "May", "June",

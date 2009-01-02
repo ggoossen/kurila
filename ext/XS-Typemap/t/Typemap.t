@@ -39,7 +39,7 @@ is( T_SVREF($svref), $svref );
 # Now test that a non reference is rejected
 # the typemaps croak
 try { T_SVREF( "fail - not ref" ) };
-ok( $@ );
+ok( $^EVAL_ERROR );
 
 # T_AVREF - reference to a perl Array
 print "# T_AVREF\n";
@@ -49,7 +49,7 @@ is( T_AVREF(\@array), \@array);
 
 # Now test that a non array ref is rejected
 try { T_AVREF( \$sv ) };
-ok( $@ );
+ok( $^EVAL_ERROR );
 
 # T_HVREF - reference to a perl Hash
 print "# T_HVREF\n";
@@ -59,7 +59,7 @@ is( T_HVREF(\%hash), \%hash);
 
 # Now test that a non hash ref is rejected
 try { T_HVREF( \@array ) };
-ok( $@ );
+ok( $^EVAL_ERROR );
 
 
 # T_CVREF - reference to perl subroutine
@@ -69,7 +69,7 @@ is( T_CVREF($sub), $sub );
 
 # Now test that a non code ref is rejected
 try { T_CVREF( \@array ) };
-ok( $@ );
+ok( $^EVAL_ERROR );
 
 # T_SYSRET - system return values
 print "# T_SYSRET\n";
@@ -190,7 +190,7 @@ is( T_PTRREF_IN( $ptr ), $t );
 
 # test that a non-scalar ref is rejected
 try { T_PTRREF_IN( $t ); };
-ok( $@ );
+ok( $^EVAL_ERROR );
 
 # T_PTROBJ
 print "# T_PTROBJ\n";
@@ -202,7 +202,7 @@ is( $ptr->T_PTROBJ_IN, $t );
 
 # check that normal scalar refs fail
 try {intObjPtr::T_PTROBJ_IN( \$t );};
-ok( $@ );
+ok( $^EVAL_ERROR );
 
 # check that inheritance works
 bless $ptr, "intObjPtr::SubClass";
@@ -222,7 +222,7 @@ is( $ptr->T_REF_IV_PTR_IN(), $t);
 # inheritance should not work
 bless $ptr, "intRefIvPtr::SubClass";
 try { $ptr->T_REF_IV_PTR_IN };
-ok( $@ );
+ok( $^EVAL_ERROR );
 
 # Skip T_PTRDESC
 

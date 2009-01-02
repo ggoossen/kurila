@@ -16,5 +16,5 @@ while ((nelems @tests)) {
     eval qq[
         print STDERR "$str"=~$pat ?? '\%MATCHED\%' !! '\%FAILED\%',"\n";
     ];
-    die $@ if $@;
+    die $^EVAL_ERROR if $^EVAL_ERROR;
 }

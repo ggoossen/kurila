@@ -7,7 +7,7 @@ my $count=1;
 my @tests;
 
 my $file="../lib/unicore/CaseFolding.txt";
-open my $fh,"<",$file or die "Failed to read '$file': $!";
+open my $fh,"<",$file or die "Failed to read '$file': $^OS_ERROR";
 while (~< $fh) {
     chomp;
     my @(?$line, ?$comment)=  split m/\s+#\s+/, $_;
@@ -30,5 +30,5 @@ while (~< $fh) {
     }
 }
 eval join ";\n", @("plan tests=>".($count-1),< @tests,"1")
-    or die $@;
+    or die $^EVAL_ERROR;
 __DATA__

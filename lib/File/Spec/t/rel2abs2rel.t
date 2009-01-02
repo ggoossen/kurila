@@ -13,14 +13,14 @@ use Test::More (-x $^X
 
 BEGIN {                                # Set up a tiny script file
     local *F;
-    open(F, ">", "rel2abs2rel$$.pl")
-      or die "Can't open rel2abs2rel$$.pl file for script -- $!\n";
+    open(F, ">", "rel2abs2rel$^PID.pl")
+      or die "Can't open rel2abs2rel$^PID.pl file for script -- $^OS_ERROR\n";
     print F qq(print "ok\\n"\n);
     close(F);
 }
 END {
-    1 while unlink("rel2abs2rel$$.pl");
-    1 while unlink("rel2abs2rel$$.tmp");
+    1 while unlink("rel2abs2rel$^PID.pl");
+    1 while unlink("rel2abs2rel$^PID.tmp");
 }
 
 use Config;
@@ -41,15 +41,15 @@ sub safe_rel {
 sub sayok{
     my $perl = shift;
     open(STDOUTDUP, ">&", \*STDOUT);
-    open(STDOUT, ">", "rel2abs2rel$$.tmp")
-        or die "Can't open scratch file rel2abs2rel$$.tmp -- $!\n";
-    system($perl, "rel2abs2rel$$.pl");
+    open(STDOUT, ">", "rel2abs2rel$^PID.tmp")
+        or die "Can't open scratch file rel2abs2rel$^PID.tmp -- $^OS_ERROR\n";
+    system($perl, "rel2abs2rel$^PID.pl");
     open(STDOUT, ">&", \*STDOUTDUP);
     close(STDOUTDUP);
 
     local *F;
-    open(F, "<", "rel2abs2rel$$.tmp");
-    local $/ = undef;
+    open(F, "<", "rel2abs2rel$^PID.tmp");
+    local $^INPUT_RECORD_SEPARATOR = undef;
     my $output = ~< *F;
     close(F);
     return $output;
@@ -58,10 +58,10 @@ sub sayok{
 print "# Checking manipulations of \$^X=$^X\n";
 
 my $perl = safe_rel($^X);
-is( sayok($perl), "ok\n",   "`$perl rel2abs2rel$$.pl` works" );
+is( sayok($perl), "ok\n",   "`$perl rel2abs2rel$^PID.pl` works" );
 
 $perl = File::Spec->rel2abs($^X);
-is( sayok($perl), "ok\n",   "`$perl rel2abs2rel$$.pl` works" );
+is( sayok($perl), "ok\n",   "`$perl rel2abs2rel$^PID.pl` works" );
 
 $perl = File::Spec->canonpath($perl);
 is( sayok($perl), "ok\n",   "canonpath(rel2abs($^X)) = $perl" );

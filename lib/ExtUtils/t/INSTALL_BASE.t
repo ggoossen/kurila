@@ -32,12 +32,12 @@ END {
     ok( teardown_recurs(), 'teardown' );
 }
 
-ok( chdir('Big-Dummy'), "chdir'd to Big-Dummy") || diag("chdir failed; $!");
+ok( chdir('Big-Dummy'), "chdir'd to Big-Dummy") || diag("chdir failed; $^OS_ERROR");
 
 my $mpl_out = run(qq{$perl Makefile.PL "INSTALL_BASE=../dummy-install"});
 END { rmtree '../dummy-install'; }
 
-cmp_ok( $?, '==', 0, 'Makefile.PL exited with zero' ) ||
+cmp_ok( $^CHILD_ERROR, '==', 0, 'Makefile.PL exited with zero' ) ||
   diag($mpl_out);
 
 my $makefile = makefile_name();
@@ -47,7 +47,7 @@ like( $mpl_out, qr/^Writing $makefile for Big::Dummy/m,
 my $make = make_run();
 run("$make");   # this is necessary due to a dmake bug.
 my $install_out = run("$make install");
-is( $?, 0, '  make install exited normally' ) || diag $install_out;
+is( $^CHILD_ERROR, 0, '  make install exited normally' ) || diag $install_out;
 like( $install_out, qr/^Installing /m );
 like( $install_out, qr/^Writing /m );
 
@@ -69,11 +69,11 @@ foreach my $file ( @installed_files) {
 
 # nmake outputs its damned logo
 # Send STDERR off to oblivion.
-open(SAVERR, ">&", \*STDERR) or die $!;
-open(STDERR, ">", "".File::Spec->devnull) or die $!;
+open(SAVERR, ">&", \*STDERR) or die $^OS_ERROR;
+open(STDERR, ">", "".File::Spec->devnull) or die $^OS_ERROR;
 
 my $realclean_out = run("$make realclean");
-is( $?, 0, 'realclean' ) || diag($realclean_out);
+is( $^CHILD_ERROR, 0, 'realclean' ) || diag($realclean_out);
 
-open(STDERR, ">&", \*SAVERR) or die $!;
+open(STDERR, ">&", \*SAVERR) or die $^OS_ERROR;
 close SAVERR;

@@ -23,14 +23,14 @@ print "1..9\n";
 
 my $msq =
     IPC::Msg->new(IPC_PRIVATE, S_IRWXU ^|^ S_IRWXG ^|^ S_IRWXO)
-    || die "msgget: ",$!+0," $!\n";
+    || die "msgget: ",$^OS_ERROR+0," $^OS_ERROR\n";
 	
 print "ok 1\n";
 
 #Putting a message on the queue
 my $msgtype = 1;
 my $msg = "hello";
-print $msq->snd($msgtype,$msg,IPC_NOWAIT) ?? "ok 2\n" !! "not ok 2 # $!\n";
+print $msq->snd($msgtype,$msg,IPC_NOWAIT) ?? "ok 2\n" !! "not ok 2 # $^OS_ERROR\n";
 
 #Check if there are messages on the queue
 my $ds = $msq->stat() or print "not ";

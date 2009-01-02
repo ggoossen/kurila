@@ -16,7 +16,7 @@ sub _cleanup {
 sub _mkdirs {
     for my $dir (@_) {
         next if -d $dir;
-        mkdir $dir or die "Can't mkdir $dir: $!" if ! -d $dir;
+        mkdir $dir or die "Can't mkdir $dir: $^OS_ERROR" if ! -d $dir;
     }
 }
     
@@ -43,7 +43,7 @@ BEGIN {
 use Test::More tests => 7;
 
 eval 'use blib;';
-like( $@->message, qr/Cannot find blib/, 'Fails if blib directory not found' );
+like( $^EVAL_ERROR->message, qr/Cannot find blib/, 'Fails if blib directory not found' );
 
 _mkdirs( < @blib_dirs );
 

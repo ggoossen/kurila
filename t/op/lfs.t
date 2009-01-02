@@ -51,7 +51,7 @@ EOM
     print "1..0 # Skip: $(join ' ',@_)\n" if (nelems @_);
 }
 
-$| = 1;
+$^OUTPUT_AUTOFLUSH = 1;
 
 print "# checking whether we have sparse files...\n";
 
@@ -80,30 +80,30 @@ my @($SEEK_SET, $SEEK_CUR, $SEEK_END) = @(0, 1, 2);
 # one megabyte blocks...)
 
 open(BIG, ">", "big1") or
-    do { warn "open big1 failed: $!\n"; bye };
+    do { warn "open big1 failed: $^OS_ERROR\n"; bye };
 binmode(BIG) or
-    do { warn "binmode big1 failed: $!\n"; bye };
+    do { warn "binmode big1 failed: $^OS_ERROR\n"; bye };
 seek(BIG, 1_000_000, $SEEK_SET) or
-    do { warn "seek big1 failed: $!\n"; bye };
+    do { warn "seek big1 failed: $^OS_ERROR\n"; bye };
 print BIG "big" or
-    do { warn "print big1 failed: $!\n"; bye };
+    do { warn "print big1 failed: $^OS_ERROR\n"; bye };
 close(BIG) or
-    do { warn "close big1 failed: $!\n"; bye };
+    do { warn "close big1 failed: $^OS_ERROR\n"; bye };
 
 my @s1 = @( stat("big1") );
 
 print "# s1 = $(join ' ',@s1)\n";
 
 open(BIG, ">", "big2") or
-    do { warn "open big2 failed: $!\n"; bye };
+    do { warn "open big2 failed: $^OS_ERROR\n"; bye };
 binmode(BIG) or
-    do { warn "binmode big2 failed: $!\n"; bye };
+    do { warn "binmode big2 failed: $^OS_ERROR\n"; bye };
 seek(BIG, 2_000_000, $SEEK_SET) or
-    do { warn "seek big2 failed; $!\n"; bye };
+    do { warn "seek big2 failed; $^OS_ERROR\n"; bye };
 print BIG "big" or
-    do { warn "print big2 failed; $!\n"; bye };
+    do { warn "print big2 failed; $^OS_ERROR\n"; bye };
 close(BIG) or
-    do { warn "close big2 failed; $!\n"; bye };
+    do { warn "close big2 failed; $^OS_ERROR\n"; bye };
 
 my @s2 = @( stat("big2") );
 
@@ -132,10 +132,10 @@ print BIG "big";
 exit 0;
 EOF
 
-open(BIG, ">", "big") or do { warn "open failed: $!\n"; bye };
+open(BIG, ">", "big") or do { warn "open failed: $^OS_ERROR\n"; bye };
 binmode BIG;
 if ($r or not seek(BIG, 5_000_000_000, $SEEK_SET)) {
-    my $err = $r ?? 'signal '.($r ^&^ 0x7f) !! $!;
+    my $err = $r ?? 'signal '.($r ^&^ 0x7f) !! $^OS_ERROR;
     explain("seeking past 2GB failed: $err");
     bye();
 }
@@ -143,16 +143,16 @@ if ($r or not seek(BIG, 5_000_000_000, $SEEK_SET)) {
 # Either the print or (more likely, thanks to buffering) the close will
 # fail if there are are filesize limitations (process or fs).
 my $print = print BIG "big";
-print "# print failed: $!\n" unless $print;
+print "# print failed: $^OS_ERROR\n" unless $print;
 my $close = close BIG;
-print "# close failed: $!\n" unless $close;
+print "# close failed: $^OS_ERROR\n" unless $close;
 unless ($print && $close) {
-    if ($! =~m/too large/i) {
+    if ($^OS_ERROR =~m/too large/i) {
 	explain("writing past 2GB failed: process limits?");
-    } elsif ($! =~ m/quota/i) {
+    } elsif ($^OS_ERROR =~ m/quota/i) {
 	explain("filesystem quota limits?");
     } else {
-	explain("error: $!");
+	explain("error: $^OS_ERROR");
     }
     bye();
 }
@@ -208,7 +208,7 @@ print "ok 3\n";
 fail unless -f "big";
 print "ok 4\n";
 
-open(BIG, "<", "big") or do { warn "open failed: $!\n"; bye };
+open(BIG, "<", "big") or do { warn "open failed: $^OS_ERROR\n"; bye };
 binmode BIG;
 
 fail unless seek(BIG, 4_500_000_000, $SEEK_SET);

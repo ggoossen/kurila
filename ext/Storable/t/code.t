@@ -19,7 +19,7 @@ use Safe;
 
 #$Storable::DEBUGME = 1;
 
-use vars < qw($freezed $thawed @obj @res $blessed_code);
+our ($freezed, $thawed, @obj, @res, $blessed_code);
 
 $blessed_code = bless sub { "blessed" }, "Some::Package";
 do { package Another::Package; sub foo { __PACKAGE__ } };
@@ -91,7 +91,7 @@ ok($thawed->(), "JAPH");
 ######################################################################
 
 try { $freezed = freeze @obj[4] };
-ok($@, qr/The result of B::Deparse::coderef2text was empty/);
+ok($^EVAL_ERROR, qr/The result of B::Deparse::coderef2text was empty/);
 
 ######################################################################
 # Test dclone
@@ -133,9 +133,9 @@ do {
 
     for my $i (0 .. 1) {
 	$freezed = freeze @obj[$i];
-	$@ = "";
+	$^EVAL_ERROR = "";
 	try { $thawed  = thaw $freezed };
-	ok($@, qr/Can\'t eval/);
+	ok($^EVAL_ERROR, qr/Can\'t eval/);
     }
 };
 
@@ -143,9 +143,9 @@ do {
 
     local $Storable::Deparse = 0;
     for my $i (0 .. 1) {
-	$@ = "";
+	$^EVAL_ERROR = "";
 	try { $freezed = freeze @obj[$i] };
-	ok($@, qr/Can\'t store CODE items/);
+	ok($^EVAL_ERROR, qr/Can\'t store CODE items/);
     }
 };
 
@@ -154,9 +154,9 @@ do {
     local $Storable::forgive_me = 1;
     for my $i (0 .. 4) {
 	$freezed = freeze @obj[0]->[$i];
-	$@ = "";
+	$^EVAL_ERROR = "";
 	try { $thawed  = thaw $freezed };
-	ok($@, "");
+	ok($^EVAL_ERROR, "");
 	ok($$thawed, qr/^sub/);
     }
 };
@@ -169,13 +169,13 @@ do {
 
     open(SAVEERR, ">&", \*STDERR);
     open(STDERR, ">", $devnull) or
-	( print SAVEERR "Unable to redirect STDERR: $!\n" and exit(1) );
+	( print SAVEERR "Unable to redirect STDERR: $^OS_ERROR\n" and exit(1) );
 
     try { $freezed = freeze @obj[0]->[0] };
 
     open(STDERR, ">&", \*SAVEERR);
 
-    ok($@, "");
+    ok($^EVAL_ERROR, "");
     ok($freezed ne '');
 };
 
@@ -184,15 +184,15 @@ do {
     local $Storable::Eval = sub { $safe->reval(shift) };
 
     $freezed = freeze @obj[0]->[0];
-    $@ = "";
+    $^EVAL_ERROR = "";
     try { $thawed = thaw $freezed };
-    ok($@, "");
+    ok($^EVAL_ERROR, "");
     ok($thawed->(), "JAPH");
 
     $freezed = freeze @obj[0]->[6];
     try { $thawed = thaw $freezed };
     # The "Code sub ..." error message only appears if Log::Agent is installed
-    ok($@, qr/(trapped|Code sub)/);
+    ok($^EVAL_ERROR, qr/(trapped|Code sub)/);
 
     if (0) {
 	# Disable or fix this test if the internal representation of Storable
@@ -206,9 +206,9 @@ do {
 	my $len = ord(substr($freezed, 4, 1));
 	substr($freezed, 4, 1, chr($len+length($bad_code)));
 	substr($freezed, -1, 0, $bad_code);
-	$@ = "";
+	$^EVAL_ERROR = "";
 	try { $thawed = thaw $freezed };
-	ok($@, qr/(trapped|Code sub)/);
+	ok($^EVAL_ERROR, qr/(trapped|Code sub)/);
     }
 };
 
@@ -219,9 +219,9 @@ do {
     local $Storable::Eval = sub { $safe->reval(shift) };
 
     $freezed = freeze @obj[0]->[1];
-    $@ = "";
+    $^EVAL_ERROR = "";
     try { $thawed = thaw $freezed };
-    ok($@, "");
+    ok($^EVAL_ERROR, "");
     ok($thawed->(), 42);
 };
 
@@ -243,9 +243,9 @@ do {
 
     $freezed = freeze @obj[0];
     try { $thawed  = thaw $freezed };
-    ok($@, "");
+    ok($^EVAL_ERROR, "");
 
-    if ($@ ne "") {
+    if ($^EVAL_ERROR ne "") {
         ok(0) for @( ( <1..5));
     } else {
 	ok($thawed->[0]->(), "JAPH");
@@ -261,7 +261,7 @@ do {
     my $short_sub = sub { "short sub" }; # for SX_SCALAR
     # for SX_LSCALAR
     my $long_sub_code = 'sub { "' . "x"x255 . '" }';
-    my $long_sub = eval $long_sub_code; die $@ if $@;
+    my $long_sub = eval $long_sub_code; die $^EVAL_ERROR if $^EVAL_ERROR;
     my $sclr = \1;
 
     local $Storable::Deparse = 1;

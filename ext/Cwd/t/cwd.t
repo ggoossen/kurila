@@ -79,7 +79,7 @@ SKIP: do {
     # DCL SHOW DEFAULT has leading spaces
     $start =~ s/^\s+// if $IsVMS;
     SKIP: do {
-        skip("'$pwd_cmd' failed, nothing to test against", 4) if $?;
+        skip("'$pwd_cmd' failed, nothing to test against", 4) if $^CHILD_ERROR;
         skip("/afs seen, paths unlikely to match", 4) if $start =~ m|/afs/|;
 
 	# Darwin's getcwd(3) (which Cwd.xs:bsd_realpath() uses which
@@ -117,7 +117,7 @@ Cwd::chdir $Test_Dir;
 
 foreach my $func (qw(cwd getcwd fastcwd fastgetcwd)) {
   my $result = eval "$func()";
-  is $@, '';
+  is $^EVAL_ERROR, '';
   dir_ends_with( $result, $Test_Dir, "$func()" );
 }
 
@@ -203,7 +203,7 @@ SKIP: do {
   do {
     my $root = Cwd::abs_path(File::Spec->rootdir);	# Add drive letter?
     local *FH;
-    opendir FH, $root or skip("Can't opendir($root): $!", 2+$EXTRA_ABSPATH_TESTS);
+    opendir FH, $root or skip("Can't opendir($root): $^OS_ERROR", 2+$EXTRA_ABSPATH_TESTS);
     @(?$file) = grep {-f $_ and not -l $_} map File::Spec->catfile($root, $_), @( readdir FH);
     closedir FH;
   };

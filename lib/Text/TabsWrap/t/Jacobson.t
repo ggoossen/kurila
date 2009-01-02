@@ -14,11 +14,11 @@ $a=wrap('','',
 "mmmm,n,ooo,ppp.qqqq.rrrrr,sssssssssssss,ttttttttt,uu,vvv wwwwwwwww####\n");
 };
 
-if ($@) {
-	my $e = $@;
+if ($^EVAL_ERROR) {
+	my $e = $^EVAL_ERROR;
 	$e =~ s/^/# /gm;
 	print $e;
 }
-print $@ ?? "not ok 1\n" !! "ok 1\n";
+print $^EVAL_ERROR ?? "not ok 1\n" !! "ok 1\n";
 
 

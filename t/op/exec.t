@@ -9,7 +9,7 @@ our $TODO;
 # supress VMS whinging about bad execs.
 use vmsish qw(hushed);
 
-$| = 1;				# flush stdout
+$^OUTPUT_AUTOFLUSH = 1;				# flush stdout
 
 env::set_var('LC_ALL'   => 'C');		# Forge English error messages.
 env::set_var('LANGUAGE' => 'C');		# Ditto in GNU.
@@ -76,7 +76,7 @@ do {
         "ok\n", 'extra newlines on outgoing pipes');
 
     do {
-	local($/) = \2;       
+	local($^INPUT_RECORD_SEPARATOR) = \2;       
 	my $out = runperl(prog => 'print q{1234}');
 	is($out, "1234", 'ignore $/ when capturing output in scalar context');
     };
@@ -94,10 +94,10 @@ unless( ok($rc == 255 << 8 or $rc == -1 or $rc == 256 or $rc == 512) ) {
     print "# \$rc == $rc\n";
 }
 
-unless ( ok( $! == 2  or  $! =~ m/\bno\b.*\bfile/i or  
-             $! == 13 or  $! =~ m/permission denied/i or
-             $! == 22 or  $! =~ m/invalid argument/i  ) ) {
-    printf "# \$! eq \%d, '\%s'\n", $!, $!;
+unless ( ok( $^OS_ERROR == 2  or  $^OS_ERROR =~ m/\bno\b.*\bfile/i or  
+             $^OS_ERROR == 13 or  $^OS_ERROR =~ m/permission denied/i or
+             $^OS_ERROR == 22 or  $^OS_ERROR =~ m/invalid argument/i  ) ) {
+    printf "# \$! eq \%d, '\%s'\n", $^OS_ERROR, $^OS_ERROR;
 }
 
 

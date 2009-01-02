@@ -5,9 +5,9 @@ BEGIN {
     try {
 	require warnings;
     };
-    if ($@) {
+    if ($^EVAL_ERROR) {
 	print "1..0\n";
-	print $@;
+	print $^EVAL_ERROR;
 	exit;
     }
 }

@@ -2,7 +2,7 @@
 package Pod::Perldoc::ToXml;
 
 use warnings;
-use vars < qw($VERSION);
+our ($VERSION);
 
 use base < qw( Pod::Simple::XMLOutStream );
 

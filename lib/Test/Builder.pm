@@ -103,7 +103,7 @@ test might be run multiple times in the same process.
 
 =cut
 
-use vars < qw($Level);
+our ($Level);
 
 sub reset {
     my @($self) =  @_;
@@ -114,7 +114,7 @@ sub reset {
 
     $self->{+Have_Plan}    = 0;
     $self->{+No_Plan}      = 0;
-    $self->{+Original_Pid} = $$;
+    $self->{+Original_Pid} = $^PID;
 
     share($self->{?Curr_Test});
     $self->{+Curr_Test}    = 0;
@@ -592,7 +592,7 @@ sub cmp_ok {
 
     my $test;
     do {
-        local($@,$!);  # isolate eval
+        local($^EVAL_ERROR,$^OS_ERROR);  # isolate eval
 
         my $code = $self->_caller_context;
 
@@ -898,8 +898,8 @@ It is suggested you use this in place of eval BLOCK.
 sub _try {
     my @($self, $code) =  @_;
     
-    local $!;               # eval can mess up $!
-    local $@;               # don't set $@ in the test
+    local $^OS_ERROR;               # eval can mess up $!
+    local $^EVAL_ERROR;               # don't set $@ in the test
     my $return = try { $code->() };
     
     return $return;
@@ -1127,7 +1127,7 @@ sub _print {
 
     my $msg = join '', @msgs;
 
-    local@($\, $", $,) = @(undef, ' ', '');
+    local @($^OUTPUT_RECORD_SEPARATOR, $^OUTPUT_FIELD_SEPARATOR) = @(undef, '');
     my $fh = $self->output;
 
     # Escape each line after the first with a # so we don't
@@ -1155,7 +1155,7 @@ Like _print, but prints to the current diagnostic filehandle.
 sub _print_diag {
     my $self = shift;
 
-    local@($\, $", $,) = @(undef, ' ', '');
+    local@($^OUTPUT_RECORD_SEPARATOR, $^OUTPUT_FIELD_SEPARATOR) = @(undef, '');
     my $fh = $self->todo ?? $self->todo_output !! $self->failure_output;
     print $fh < @_;
 }    
@@ -1227,7 +1227,7 @@ sub _new_fh {
     }
     else {
         open $fh, ">", $file_or_fh or
-            die("Can't open test output log $file_or_fh: $!");
+            die("Can't open test output log $file_or_fh: $^OS_ERROR");
         _autoflush($fh);
     }
 
@@ -1238,7 +1238,7 @@ sub _new_fh {
 sub _autoflush {
     my@($fh) =@( shift);
     my $old_fh = select $fh;
-    $| = 1;
+    $^OUTPUT_AUTOFLUSH = 1;
     select $old_fh;
 }
 
@@ -1270,8 +1270,8 @@ sub _open_testhandles {
     
     # We dup STDOUT and STDERR so people can change them in their
     # test suites while still getting normal test output.
-    open($Testout, ">&", \*STDOUT) or die "Can't dup STDOUT:  $!";
-    open($Testerr, ">&", \*STDERR) or die "Can't dup STDERR:  $!";
+    open($Testout, ">&", \*STDOUT) or die "Can't dup STDOUT:  $^OS_ERROR";
+    open($Testerr, ">&", \*STDERR) or die "Can't dup STDERR:  $^OS_ERROR";
 
     $Opened_Testhandles = 1;
 }
@@ -1538,7 +1538,7 @@ doesn't actually exit, that's your job.
 =cut
 
 sub _my_exit {
-    $? ||= @_[0];
+    $^CHILD_ERROR ||= @_[0];
 
     return 1;
 }
@@ -1553,12 +1553,12 @@ sub _my_exit {
 sub _ending {
     my $self = shift;
 
-    my $real_exit_code = $?;
+    my $real_exit_code = $^CHILD_ERROR;
     $self->_sanity_check();
 
     # Don't bother with an ending if this is a forked copy.  Only the parent
     # should do the ending.
-    if( $self->{?Original_Pid} != $$ ) {
+    if( $self->{?Original_Pid} != $^PID ) {
         return;
     }
     

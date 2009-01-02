@@ -3,7 +3,7 @@
 
 use Test::More tests => 8;
 use Scalar::Util < qw(blessed);
-use vars < qw($t $x);
+our ($t, $x);
 
 ok(!blessed(undef),	'undef is not blessed');
 ok(!blessed(1),		'Numbers are not blessed');

@@ -167,7 +167,7 @@ do {
   my %files;
 
   my $dirname = 'File::Spec'->catdir($updir => lib => unicore => lib => 'gc_sc');
-  opendir D, $dirname or die $!;
+  opendir D, $dirname or die $^OS_ERROR;
    %files{[@(readdir(D))]} = @();
   closedir D;
 

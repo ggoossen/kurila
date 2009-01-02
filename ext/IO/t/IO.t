@@ -71,7 +71,7 @@ foreach my $default ( @default)
 }
 
 try { IO->import( 'nothere' ) };
-like( $@->{?description}, qr/Can.t locate IO.nothere\.pm/, '... croaking on any error' );
+like( $^EVAL_ERROR->{?description}, qr/Can.t locate IO.nothere\.pm/, '... croaking on any error' );
 
 my $fakedir = File::Spec->catdir( 'lib', 'IO' );
 my $fakemod = File::Spec->catfile( $fakedir, 'fakemod.pm' );
@@ -106,7 +106,7 @@ do {
 	skip("Could not write to disk", 2 ) unless $flag;
 	try { IO->import( 'fakemod' ) };
 	ok( IO::fakemod::exists(), 'import() should import IO:: modules by name' );
-	is( $@, '', '... and should not call import() on imported modules' );
+	is( $^EVAL_ERROR, '', '... and should not call import() on imported modules' );
 };
 
 END

@@ -16,7 +16,7 @@ use Cwd;
 
 # For debugging set this to 1.
 my $keep_files = 0;
-$| = 1;
+$^OUTPUT_AUTOFLUSH = 1;
 
 # Because were are going to be changing directory before running Makefile.PL
 my $perl = $^X;
@@ -46,21 +46,21 @@ my $makefile_rename = $makefile . ($mms_or_mmk ?? '.mms_old' !! '.old');
 
 my $output = "output";
 my $package = "ExtTest";
-my $dir = "ext-$$";
+my $dir = "ext-$^PID";
 my $subdir = 0;
 # The real test counter.
 my $realtest = 1;
 
 my $orig_cwd = cwd;
 my $updir = File::Spec->updir;
-die "Can't get current directory: $!" unless defined $orig_cwd;
+die "Can't get current directory: $^OS_ERROR" unless defined $orig_cwd;
 
 print "# $dir being created...\n";
-mkdir $dir, 0777 or die "mkdir: $!\n";
+mkdir $dir, 0777 or die "mkdir: $^OS_ERROR\n";
 
 END {
   if (defined $orig_cwd and length $orig_cwd) {
-    chdir $orig_cwd or die "Can't chdir back to '$orig_cwd': $!";
+    chdir $orig_cwd or die "Can't chdir back to '$orig_cwd': $^OS_ERROR";
     use File::Path;
     print "# $dir being removed...\n";
     rmtree($dir) unless $keep_files;
@@ -70,7 +70,7 @@ END {
   }
 }
 
-chdir $dir or die $!;
+chdir $dir or die $^OS_ERROR;
 push @INC, '../../lib', '../../../lib';
 
 package main;
@@ -80,7 +80,7 @@ sub check_for_bonus_files {
   my %expect = %( < map {($^O eq 'VMS' ?? lc($_) !! $_), 1} @_ );
 
   my $fail;
-  opendir DIR, $dir or die "opendir '$dir': $!";
+  opendir DIR, $dir or die "opendir '$dir': $^OS_ERROR";
   while (defined (my $entry = readdir DIR)) {
     $entry =~ s/\.$// if $^O eq 'VMS';  # delete trailing dot that indicates no extension
     next if %expect{$entry};
@@ -88,7 +88,7 @@ sub check_for_bonus_files {
     $fail = 1;
   }
 
-  closedir DIR or warn "closedir '.': $!";
+  closedir DIR or warn "closedir '.': $^OS_ERROR";
   if ($fail) {
     print "not ok $realtest\n";
   } else {
@@ -101,10 +101,10 @@ sub build_and_run {
   my @($tests, $expect, $files) =  @_;
   my $core = env::var('PERL_CORE') ?? ' PERL_CORE=1' !! '';
   my @perlout = @( `$runperl Makefile.PL $core` );
-  if ($?) {
-    print "not ok $realtest # $runperl Makefile.PL failed: $?\n";
+  if ($^CHILD_ERROR) {
+    print "not ok $realtest # $runperl Makefile.PL failed: $^CHILD_ERROR\n";
     print "# $_" foreach  @perlout;
-    exit($?);
+    exit($^CHILD_ERROR);
   } else {
     print "ok $realtest\n";
   }
@@ -150,10 +150,10 @@ sub build_and_run {
 
   print "# make = '$make'\n";
   @makeout = @( `$make` );
-  if ($?) {
-    print "not ok $realtest # $make failed: $?\n";
+  if ($^CHILD_ERROR) {
+    print "not ok $realtest # $make failed: $^CHILD_ERROR\n";
     print "# $_" foreach  @makeout;
-    exit($?);
+    exit($^CHILD_ERROR);
   } else {
     print "ok $realtest\n";
   }
@@ -167,10 +167,10 @@ sub build_and_run {
     my $makeperl = "$make perl";
     print "# make = '$makeperl'\n";
     @makeout = @( `$makeperl` );
-    if ($?) {
-      print "not ok $realtest # $makeperl failed: $?\n";
+    if ($^CHILD_ERROR) {
+      print "not ok $realtest # $makeperl failed: $^CHILD_ERROR\n";
       print "# $_" foreach  @makeout;
-      exit($?);
+      exit($^CHILD_ERROR);
     } else {
       print "ok $realtest\n";
     }
@@ -183,17 +183,17 @@ sub build_and_run {
   @makeout = @( `$maketest` );
 
   if (open OUTPUT, "<", "$output") {
-    local $/; # Slurp it - faster.
+    local $^INPUT_RECORD_SEPARATOR; # Slurp it - faster.
     print ~< *OUTPUT;
-    close OUTPUT or print "# Close $output failed: $!\n";
+    close OUTPUT or print "# Close $output failed: $^OS_ERROR\n";
   } else {
     # Harness will report missing test results at this point.
-    print "# Open <$output failed: $!\n";
+    print "# Open <$output failed: $^OS_ERROR\n";
   }
 
   $realtest += $tests;
-  if ($?) {
-    print "not ok $realtest # $maketest failed: $?\n";
+  if ($^CHILD_ERROR) {
+    print "not ok $realtest # $maketest failed: $^CHILD_ERROR\n";
     print "# $_" foreach  @makeout;
   } else {
     print "ok $realtest - maketest\n";
@@ -202,8 +202,8 @@ sub build_and_run {
 
   if (defined $expect) {
       my $regen = `$runperl -x $package.xs`;
-      if ($?) {
-	  print "not ok $realtest # $runperl -x $package.xs failed: $?\n";
+      if ($^CHILD_ERROR) {
+	  print "not ok $realtest # $runperl -x $package.xs failed: $^CHILD_ERROR\n";
 	  } else {
 	      print "ok $realtest - regen\n";
 	  }
@@ -227,8 +227,8 @@ sub build_and_run {
   my $makeclean = "$make clean";
   print "# make = '$makeclean'\n";
   @makeout = @( `$makeclean` );
-  if ($?) {
-    print "not ok $realtest # $make failed: $?\n";
+  if ($^CHILD_ERROR) {
+    print "not ok $realtest # $make failed: $^CHILD_ERROR\n";
     print "# $_" foreach  @makeout;
   } else {
     print "ok $realtest\n";
@@ -238,16 +238,16 @@ sub build_and_run {
   check_for_bonus_files ('.', < @$files, $output, $makefile_rename, '.', '..');
 
   rename $makefile_rename, $makefile . $makefile_ext
-    or die "Can't rename '$makefile_rename' to '$makefile$makefile_ext': $!";
+    or die "Can't rename '$makefile_rename' to '$makefile$makefile_ext': $^OS_ERROR";
 
-  unlink $output or warn "Can't unlink '$output': $!";
+  unlink $output or warn "Can't unlink '$output': $^OS_ERROR";
 
   # Need to make distclean to remove ../../lib/ExtTest.pm
   my $makedistclean = "$make distclean";
   print "# make = '$makedistclean'\n";
   @makeout = @( `$makedistclean` );
-  if ($?) {
-    print "not ok $realtest # $make failed: $?\n";
+  if ($^CHILD_ERROR) {
+    print "not ok $realtest # $make failed: $^CHILD_ERROR\n";
     print "# $_" foreach  @makeout;
   } else {
     print "ok $realtest\n";
@@ -258,7 +258,7 @@ sub build_and_run {
 
   unless ($keep_files) {
     foreach ( @$files) {
-      unlink $_ or warn "unlink $_: $!";
+      unlink $_ or warn "unlink $_: $^OS_ERROR";
     }
   }
 
@@ -271,7 +271,7 @@ sub Makefile_PL {
   # We really need a Makefile.PL because make test for a no dynamic linking perl
   # will run Makefile.PL again as part of the "make perl" target.
   my $makefilePL = "Makefile.PL";
-  open FH, ">", "$makefilePL" or die "open >$makefilePL: $!\n";
+  open FH, ">", "$makefilePL" or die "open >$makefilePL: $^OS_ERROR\n";
   print FH <<"EOT";
 #!$perl -w
 use ExtUtils::MakeMaker;
@@ -283,7 +283,7 @@ WriteMakefile(
              );
 EOT
 
-  close FH or die "close $makefilePL: $!\n";
+  close FH or die "close $makefilePL: $^OS_ERROR\n";
   return $makefilePL;
 }
 
@@ -293,9 +293,9 @@ sub MANIFEST {
   # We really need a MANIFEST because make distclean checks it.
   my $manifest = "MANIFEST";
   push @files, $manifest;
-  open FH, ">", "$manifest" or die "open >$manifest: $!\n";
+  open FH, ">", "$manifest" or die "open >$manifest: $^OS_ERROR\n";
   print FH "$_\n" foreach  @files;
-  close FH or die "close $manifest: $!\n";
+  close FH or die "close $manifest: $^OS_ERROR\n";
   return @files;
 }
 
@@ -325,22 +325,22 @@ sub write_and_run_extension {
   $expect = $C_code . "\n#### XS Section:\n" . $XS_code unless $wc_args;
 
   print "# $name\n# $dir/$subdir being created...\n";
-  mkdir $subdir, 0777 or die "mkdir: $!\n";
-  chdir $subdir or die $!;
+  mkdir $subdir, 0777 or die "mkdir: $^OS_ERROR\n";
+  chdir $subdir or die $^OS_ERROR;
 
   my @files;
 
   ################ Header
   my $header_name = "test.h";
   push @files, $header_name;
-  open FH, ">", "$header_name" or die "open >$header_name: $!\n";
-  print FH $header or die $!;
-  close FH or die "close $header_name: $!\n";
+  open FH, ">", "$header_name" or die "open >$header_name: $^OS_ERROR\n";
+  print FH $header or die $^OS_ERROR;
+  close FH or die "close $header_name: $^OS_ERROR\n";
 
   ################ XS
   my $xs_name = "$package.xs";
   push @files, $xs_name;
-  open FH, ">", "$xs_name" or die "open >$xs_name: $!\n";
+  open FH, ">", "$xs_name" or die "open >$xs_name: $^OS_ERROR\n";
 
   print FH <<"EOT";
 #include "EXTERN.h"
@@ -355,12 +355,12 @@ PROTOTYPES: ENABLE
 $XS_code;
 EOT
 
-  close FH or die "close $xs: $!\n";
+  close FH or die "close $xs: $^OS_ERROR\n";
 
   ################ PM
   my $pm = "$package.pm";
   push @files, $pm;
-  open FH, ">", "$pm" or die "open >$pm: $!\n";
+  open FH, ">", "$pm" or die "open >$pm: $^OS_ERROR\n";
   print FH "package $package;\n";
 
   print FH <<'EOT';
@@ -368,11 +368,10 @@ EOT
 EOT
   printf FH "use warnings;\n";
   print FH <<'EOT';
-use Carp;
 
 require Exporter;
 require DynaLoader;
-use vars < qw ($VERSION @ISA @EXPORT_OK);
+our ($VERSION, @ISA, @EXPORT_OK);
 
 $VERSION = '0.01';
 @ISA = qw(Exporter DynaLoader);
@@ -385,14 +384,14 @@ EOT
   print FH "\t$_\n" foreach @( (< @$export_names));
   print FH ");\n";
   print FH "$package->bootstrap(\$VERSION);\n1;\n__END__\n";
-  close FH or die "close $pm: $!\n";
+  close FH or die "close $pm: $^OS_ERROR\n";
 
   ################ test.pl
   my $testpl = "test.pl";
   push @files, $testpl;
-  open FH, ">", "$testpl" or die "open >$testpl: $!\n";
+  open FH, ">", "$testpl" or die "open >$testpl: $^OS_ERROR\n";
   # Standard test header (need an option to suppress this?)
-  print FH <<"EOT" or die $!;
+  print FH <<"EOT" or die $^OS_ERROR;
 use $package < qw($(join ' ',@$export_names));
 
 print "1..2\n";
@@ -400,27 +399,27 @@ if (open OUTPUT, ">", "$output") \{
   print "ok 1\n";
   select OUTPUT;
 \} else \{
-  print "not ok 1 # Failed to open '$output': \$!\n";
+  print "not ok 1 # Failed to open '$output': \$^OS_ERROR\n";
   exit 1;
 \}
 EOT
-  print FH $testfile or die $!;
-  print FH <<"EOT" or die $!;
+  print FH $testfile or die $^OS_ERROR;
+  print FH <<"EOT" or die $^OS_ERROR;
 select STDOUT;
 if (close OUTPUT) \{
   print "ok 2\n";
 \} else \{
-  print "not ok 2 # Failed to close '$output': \$!\n";
+  print "not ok 2 # Failed to close '$output': \$^OS_ERROR\n";
 \}
 EOT
-  close FH or die "close $testpl: $!\n";
+  close FH or die "close $testpl: $^OS_ERROR\n";
 
   push @files, Makefile_PL($package);
   @files = MANIFEST (< @files);
 
   build_and_run ($num_tests, $expect, \@files);
 
-  chdir $updir or die "chdir '$updir': $!";
+  chdir $updir or die "chdir '$updir': $^OS_ERROR";
   ++$subdir;
 }
 
@@ -590,8 +589,8 @@ $test++;
 my $notdef = try { NOTDEF; };
 if (defined $notdef) {
   print "not ok $test # \$notdef='$notdef'\n";
-} elsif ($@->{description} !~ m/Your vendor has not defined the requested ExtTest macro/) {
-  warn $@->message;
+} elsif ($^EVAL_ERROR->{description} !~ m/Your vendor has not defined the requested ExtTest macro/) {
+  warn $^EVAL_ERROR->message;
   print "not ok $test\n";
 } else {
   print "ok $test\n";
@@ -602,9 +601,9 @@ $test++;
 my $notthere = try { &ExtTest::NOTTHERE; };
 if (defined $notthere) {
   print "not ok $test # \$notthere='$notthere'\n";
-} elsif ($@->{description} !~ m/Undefined subroutine .*NOTTHERE called/) {
-  chomp $@;
-  print "not ok $test # \$@='$@'\n";
+} elsif ($^EVAL_ERROR->{description} !~ m/Undefined subroutine .*NOTTHERE called/) {
+  chomp $^EVAL_ERROR;
+  print "not ok $test # \$^EVAL_ERROR='$^EVAL_ERROR'\n";
 } else {
   print "ok $test\n";
 }
@@ -641,8 +640,8 @@ $test++;
 $notdef = try { &ExtTest::So };
 if (defined $notdef) {
   print "not ok $test # \$notdef='$notdef'\n";
-} elsif ($@->{description} !~ m/^Undefined subroutine .*So called/) {
-  print "not ok $test # \$@='$@'\n";
+} elsif ($^EVAL_ERROR->{description} !~ m/^Undefined subroutine .*So called/) {
+  print "not ok $test # \$^EVAL_ERROR='$^EVAL_ERROR'\n";
 } else {
   print "ok $test\n";
 }
@@ -652,8 +651,8 @@ $test++;
 $notdef = try { &ExtTest::EW };
 if (defined $notdef) {
   print "not ok $test # \$notdef='$notdef'\n";
-} elsif ($@->{description} !~ m/^Undefined subroutine .*EW called/) {
-  print "not ok $test # \$@='$@'\n";
+} elsif ($^EVAL_ERROR->{description} !~ m/^Undefined subroutine .*EW called/) {
+  print "not ok $test # \$^EVAL_ERROR='$^EVAL_ERROR'\n";
 } else {
   print "ok $test\n";
 }
@@ -673,8 +672,8 @@ $test_body .= <<'EOT';
 my $fail;
 while (my @(?$point, ?$bearing) = @: each %compass) {
   my $val = eval $point;
-  if ($@) {
-    print "# $point: \$@='$@'\n";
+  if ($^EVAL_ERROR) {
+    print "# $point: \$^EVAL_ERROR='$^EVAL_ERROR'\n";
     $fail = 1;
   } elsif (!defined $bearing) {
     print "# $point: \$val=undef\n";

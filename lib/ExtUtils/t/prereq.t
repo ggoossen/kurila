@@ -31,7 +31,7 @@ END {
 }
 
 ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
-  diag("chdir failed: $!");
+  diag("chdir failed: $^OS_ERROR");
 
 do {
     close *STDOUT;
@@ -98,7 +98,7 @@ do {
     };
     
     is $warnings, '';
-    is $@->{description}, <<'END', "PREREQ_FATAL";
+    is $^EVAL_ERROR->{description}, <<'END', "PREREQ_FATAL";
 MakeMaker FATAL: prerequisites not found.
     I::Do::Not::Exist not installed
     Nor::Do::I not installed
@@ -123,7 +123,7 @@ END
     };
     
     is $warnings, '';
-    is $@->{description}, <<'END', "PREREQ_FATAL happens before CONFIGURE";
+    is $^EVAL_ERROR->{description}, <<'END', "PREREQ_FATAL happens before CONFIGURE";
 MakeMaker FATAL: prerequisites not found.
     I::Do::Not::Exist not installed
 

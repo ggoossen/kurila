@@ -53,7 +53,7 @@ do {
     };
     my $phash;
     try { $phash = fields::phash(name => "Joe", rank => "Captain") };
-    like $@->{?description}, qr/^Pseudo-hashes have been removed from Perl/;
+    like $^EVAL_ERROR->{?description}, qr/^Pseudo-hashes have been removed from Perl/;
 };
 
 

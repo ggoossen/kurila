@@ -4,42 +4,39 @@
 # (including weird syntax errors)
 
 BEGIN { require "./test.pl"; }
-plan( tests => 78 );
-
-eval '%@x=0;';
-like( $@->{?description}, qr/^Can't coerce HASH to string in repeat/, '%@x=0' );
+plan( tests => 77 );
 
 # Bug 20010528.007
 eval q/"\x{"/;
-like( $@->{?description}, qr/^Missing right brace on \\x/,
+like( $^EVAL_ERROR->{?description}, qr/^Missing right brace on \\x/,
     'syntax error in string, used to dump core' );
 
 eval q/"\N{"/;
-like( $@->{?description}, qr/^Missing right brace on \\N/,
+like( $^EVAL_ERROR->{?description}, qr/^Missing right brace on \\N/,
     'syntax error in string with incomplete \N' );
 eval q/"\Nfoo"/;
-like( $@->{?description}, qr/^Missing braces on \\N/,
+like( $^EVAL_ERROR->{?description}, qr/^Missing braces on \\N/,
     'syntax error in string with incomplete \N' );
 
 # Bug 20010831.001
 eval '@($a, b) = @(1, 2);';
-like( $@->{?description}, qr/^Can't assign to constant item/,
+like( $^EVAL_ERROR->{?description}, qr/^Can't assign to constant item/,
     'bareword in list assignment' );
 
 eval 'read(our $bla, "FILE", 1);';
-like( $@->{?description}, qr/^Can't modify constant item in read/,
+like( $^EVAL_ERROR->{?description}, qr/^Can't modify constant item in read/,
     'read($var, FILE, 1) segfaults on 5.6.1 [ID 20011025.054]' );
 
 # This used to dump core (bug #17920)
 eval q{ sub { sub { f1(f2();); my($a,$b,$c) } } };
-like( $@->{?description}, qr/error/, 'lexical block discarded by yacc' );
+like( $^EVAL_ERROR->{?description}, qr/error/, 'lexical block discarded by yacc' );
 
 # bug #18573, used to corrupt memory
 eval q{ "\c" };
-like( $@->{?description}, qr/^Missing control char name in \\c/, q("\c" string) );
+like( $^EVAL_ERROR->{?description}, qr/^Missing control char name in \\c/, q("\c" string) );
 
 eval q{ qq(foo$) };
-like( $@->{?description}, qr/Final \$ should be \\\$ or \$name/, q($ at end of "" string) );
+like( $^EVAL_ERROR->{?description}, qr/Final \$ should be \\\$ or \$name/, q($ at end of "" string) );
 
 # two tests for memory corruption problems in the said variables
 # (used to dump core or produce strange results)
@@ -54,7 +51,7 @@ do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {do {
 };};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};
 };};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};};
 };
-is( $@, '', 'PL_lex_brackstack' );
+is( $^EVAL_ERROR, '', 'PL_lex_brackstack' );
 
 do {
     # tests for bug #20716
@@ -80,7 +77,7 @@ $($a)\{ $($a)[ $(join ' ', @b)\{
 };
 
 eval q{ sub a(;; &) { } a { } };
-is($@, '', "';&' sub prototype confuses the lexer");
+is($^EVAL_ERROR, '', "';&' sub prototype confuses the lexer");
 
 # Bug #21575
 # ensure that the second print statement works, by playing a bit
@@ -95,7 +92,7 @@ pass();
 do {
     local $^WARN_HOOK = sub { }; # silence mandatory warning
     eval q{ my $x = -F 1; };
-    like( $@->{?description}, qr/(?i:syntax|parse) error .* near "F 1"/, "unknown filetest operators" );
+    like( $^EVAL_ERROR->{?description}, qr/(?i:syntax|parse) error .* near "F 1"/, "unknown filetest operators" );
     is(
         eval q{ sub F { 42 } -F 1 },
 	'-42',
@@ -106,33 +103,33 @@ do {
 # Bug #24762
 do {
     eval q{ *foo{CODE} ?? 1 !! 0 };
-    is( $@, '', "glob subscript in conditional" );
+    is( $^EVAL_ERROR, '', "glob subscript in conditional" );
 };
 
 # Bug #25824
 do {
     eval q{ sub f { @a=@b=@c;  {use} } };
-    like( $@->{?description}, qr/syntax error/, "use without body" );
+    like( $^EVAL_ERROR->{?description}, qr/syntax error/, "use without body" );
 };
 
 # [perl #2738] perl segfautls on input
 do {
     eval q{ sub _ <> {} };
-    like($@->{?description}, qr/Illegal declaration of subroutine main::_/, "readline operator as prototype");
+    like($^EVAL_ERROR->{?description}, qr/Illegal declaration of subroutine main::_/, "readline operator as prototype");
 
     eval q{ $s = sub <> {} };
-    like($@->{?description}, qr/Illegal declaration of anonymous subroutine/, "readline operator as prototype");
+    like($^EVAL_ERROR->{?description}, qr/Illegal declaration of anonymous subroutine/, "readline operator as prototype");
 
     eval q{ sub _ __FILE__ {} };
-    like($@->{?description}, qr/Illegal declaration of subroutine main::_/, "__FILE__ as prototype");
+    like($^EVAL_ERROR->{?description}, qr/Illegal declaration of subroutine main::_/, "__FILE__ as prototype");
 };
 
 # tests for "Bad name"
 eval q{ foo::$bar };
-like( $@->{?description}, qr/Bad name after foo::/, 'Bad name after foo::' );
+like( $^EVAL_ERROR->{?description}, qr/Bad name after foo::/, 'Bad name after foo::' );
 
 eval q{ s/x/#/ };
-is( $@, '', 'comments in s///e' );
+is( $^EVAL_ERROR, '', 'comments in s///e' );
 
 # these five used to coredump because the op cleanup on parse error could
 # be to the wrong pad
@@ -142,27 +139,27 @@ eval q[
 	    sub { my $z
 ];
 
-like($@->{?description}, qr/Missing right curly/, 'nested sub syntax error' );
+like($^EVAL_ERROR->{?description}, qr/Missing right curly/, 'nested sub syntax error' );
 
 eval q[
     sub { my ($a,$b,$c,$d,$e,$f,$g,$h,$i,$j,$k,$l,$m,$n,$o,$p,$q,$r,$s,$r);
 	    sub { my $z
 ];
-like($@->{?description}, qr/Missing right curly/, 'nested sub syntax error 2' );
+like($^EVAL_ERROR->{?description}, qr/Missing right curly/, 'nested sub syntax error 2' );
 
 eval q[
     sub { our $a= 1;$a;$a;$a;$a;$a;$a;$a;$a;$a;$a;$a;$a;$a;$a;$a;$a;$a;$a;$a;
 	    use DieDieDie;
 ];
 
-like($@->{?description}, qr/Can't locate DieDieDie.pm/, 'croak cleanup' );
+like($^EVAL_ERROR->{?description}, qr/Can't locate DieDieDie.pm/, 'croak cleanup' );
 
 eval q[
     sub { my ($a,$b,$c,$d,$e,$f,$g,$h,$i,$j,$k,$l,$m,$n,$o,$p,$q,$r,$s,$r);
 	    use DieDieDie;
 ];
 
-like($@->{?description}, qr/Can't locate DieDieDie.pm/, 'croak cleanup 2' );
+like($^EVAL_ERROR->{?description}, qr/Can't locate DieDieDie.pm/, 'croak cleanup 2' );
 
 
 # these might leak, or have duplicate frees, depending on the bugginess of
@@ -170,22 +167,22 @@ like($@->{?description}, qr/Can't locate DieDieDie.pm/, 'croak cleanup 2' );
 # something to be run under valgrind, with PERL_DESTRUCT_LEVEL=1.
 
 eval q[ BEGIN { } ] for 1..10;
-is($@, "", 'BEGIN 1' );
+is($^EVAL_ERROR, "", 'BEGIN 1' );
 
 eval q[ BEGIN { my $x; $x = 1 } ] for 1..10;
-is($@, "", 'BEGIN 2' );
+is($^EVAL_ERROR, "", 'BEGIN 2' );
 
 eval q[ sub foo2 { } ] for 1..10;
-is($@, "", 'BEGIN 4' );
+is($^EVAL_ERROR, "", 'BEGIN 4' );
 
 eval q[ sub foo3 { my $x; $x=1 } ] for 1..10;
-is($@, "", 'BEGIN 5' );
+is($^EVAL_ERROR, "", 'BEGIN 5' );
 
 eval q[ BEGIN { die } ] for 1..10;
-like($@->stacktrace, qr/BEGIN/, 'BEGIN 6' );
+like($^EVAL_ERROR->stacktrace, qr/BEGIN/, 'BEGIN 6' );
 
 eval q[ BEGIN {\&foo4; die } ] for 1..10;
-like($@->stacktrace, qr/BEGIN/, 'BEGIN 7' );
+like($^EVAL_ERROR->stacktrace, qr/BEGIN/, 'BEGIN 7' );
 
 # Add new tests HERE:
 
@@ -241,7 +238,7 @@ check(qr/^"BBFRPRAFPGHPP$/, 43, "actually missing a quote is still valid");
 #line 47 bang eth
 check(qr/^"BBFRPRAFPGHPP$/, 46, "but spaces aren't allowed without quotes");
 
-eval <<'EOSTANZA'; die $@ if $@;
+eval <<'EOSTANZA'; die $^EVAL_ERROR if $^EVAL_ERROR;
 #line 51 "With wonderful deathless ditties|We build up the world's great cities,|And out of a fabulous story|We fashion an empire's glory:|One man with a dream, at pleasure,|Shall go forth and conquer a crown;|And three with a new song's measure|Can trample a kingdom down."
 check(qr/^With.*down\.$/, 51, "Overflow the second small buffer check");
 EOSTANZA
@@ -252,12 +249,12 @@ $^P = 0x100;
 #line 53 "For we are afar with the dawning|And the suns that are not yet high,|And out of the infinite morning|Intrepid you hear us cry-|How, spite of your human scorning,|Once more God's future draws nigh,|And already goes forth the warning|That ye of the past must die."
 check(qr/^For we.*must die\.$/, 53, "Our long line is set up");
 
-eval <<'EOT'; die $@ if $@;
+eval <<'EOT'; die $^EVAL_ERROR if $^EVAL_ERROR;
 #line 59 " "
 check(qr/^ $/, 59, "Overflow the first small buffer check only");
 EOT
 
-eval <<'EOSTANZA'; die $@ if $@;
+eval <<'EOSTANZA'; die $^EVAL_ERROR if $^EVAL_ERROR;
 #line 61 "Great hail! we cry to the comers|From the dazzling unknown shore;|Bring us hither your sun and your summers;|And renew our world as of yore;|You shall teach us your song's new numbers,|And things that we dreamed not before:|Yea, in spite of a dreamer who slumbers,|And a singer who sings no more."
 check(qr/^Great hail!.*no more\.$/, 61, "Overflow both small buffer checks");
 EOSTANZA

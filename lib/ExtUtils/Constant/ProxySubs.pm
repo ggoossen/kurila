@@ -1,8 +1,8 @@
 package ExtUtils::Constant::ProxySubs;
 
-use vars < qw($VERSION @ISA %type_to_struct %type_from_struct %type_to_sv
-	    %type_to_C_value %type_is_a_problem %type_num_args
-	    %type_temporary);
+our ($VERSION, @ISA, %type_to_struct, %type_from_struct, %type_to_sv
+	,    %type_to_C_value, %type_is_a_problem, %type_num_args
+	,    %type_temporary);
 require ExtUtils::Constant::XS;
 use ExtUtils::Constant::Utils < qw(C_stringify);
 use ExtUtils::Constant::XS < qw(%XS_TypeSet);

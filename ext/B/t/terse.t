@@ -10,14 +10,14 @@ is( B::Terse::indent(), '', 'indent with no argument' );
 
 # this should fail without a reference
 try { B::Terse::terse('scalar') };
-like( $@->{?description}, qr/not a reference/, 'terse() fed bad parameters' );
+like( $^EVAL_ERROR->{?description}, qr/not a reference/, 'terse() fed bad parameters' );
 
 # now point it at a sub and see what happens
 sub foo {}
 
 my $sub;
 try{ $sub = B::Terse::compile('', 'foo') };
-is( $@, '', 'compile()' );
+is( $^EVAL_ERROR, '', 'compile()' );
 ok( defined &$sub, 'valid subref back from compile()' );
 
 # and point it at a real sub and hope the returned ops look alright
@@ -56,7 +56,7 @@ warn "# didn't find " . join(' ', keys %ops) if %ops;
 # add it to the regex above too. (PADOPs are currently only produced
 # under ithreads, though).
 #
-use vars < qw( $a $b );
+our ($a, $b);
 sub bar {
 	# OP SVOP COP IV here or in sub definition
 	my @bar = @(1, 2, 3);

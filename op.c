@@ -3919,23 +3919,6 @@ Perl_newLOOPEX(pTHX_ I32 type, OP *label)
     return o;
 }
 
-/* if the condition is a literal array or hash
-   (or @{ ... } etc), make a reference to it.
- */
-STATIC OP *
-S_ref_array_or_hash(pTHX_ OP *cond)
-{
-    if (cond
-    && (cond->op_type == OP_RV2AV
-    ||  cond->op_type == OP_RV2HV))
-
-	return newUNOP(OP_SREFGEN,
-		       0, mod(cond, OP_SREFGEN), cond->op_location);
-
-    else
-	return cond;
-}
-
 /*
 =for apidoc cv_undef
 

@@ -9,7 +9,7 @@
 
 package Pod::Usage;
 
-use vars < qw($VERSION);
+our ($VERSION);
 $VERSION = "1.35";  ## Current version of this package
 
 =head1 NAME
@@ -426,7 +426,7 @@ use Config;
 use Exporter;
 use File::Spec;
 
-use vars < qw(@ISA @EXPORT);
+our (@ISA, @EXPORT);
 @EXPORT = qw(&pod2usage);
 BEGIN {
        require Pod::Text;
@@ -539,7 +539,7 @@ sub pod2usage {
        ## spit out the entire PODs. Might as well invoke perldoc
        my $progpath = File::Spec->catfile(config_value('scriptdir'), "perldoc");
        system($progpath, %opts{?"input"});
-       if($?) {
+       if($^CHILD_ERROR) {
          # RT16091: fall back to more if perldoc failed
          system(env::var('PAGER') || 'more', %opts{?"input"});
        }

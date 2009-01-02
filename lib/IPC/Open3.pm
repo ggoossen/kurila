@@ -145,12 +145,12 @@ our $Me = 'open3 (bug)';	# you should never see this, it's always localized
 
 sub xfork {
     my $pid = fork;
-    defined $pid or die "$Me: fork failed: $!";
+    defined $pid or die "$Me: fork failed: $^OS_ERROR";
     return $pid;
 }
 
 sub xpipe {
-    pipe @_[0], @_[1] or die "$Me: pipe(" . Symbol::glob_name(@_[0]) . ", " . Symbol::glob_name(@_[1]) . ") failed: $!";
+    pipe @_[0], @_[1] or die "$Me: pipe(" . Symbol::glob_name(@_[0]) . ", " . Symbol::glob_name(@_[1]) . ") failed: $^OS_ERROR";
 }
 
 # I tried using a * prototype character for the filehandle but it still
@@ -161,7 +161,7 @@ sub xopen {
 }
 
 sub xclose {
-    close @_[0] or die "$Me: close(*" . Symbol::glob_name(@_[0]->*) . ") failed: $!";
+    close @_[0] or die "$Me: close(*" . Symbol::glob_name(@_[0]->*) . ") failed: $^OS_ERROR";
 }
 
 sub fh_is_fd {
@@ -194,8 +194,8 @@ sub _open3 {
 	1; }) 
     {
 	# must strip crud for die to add back, or looks ugly
-	$@ =~ s/(?<=value attempted) at .*//s;
-	die "$Me: $@";
+	$^EVAL_ERROR =~ s/(?<=value attempted) at .*//s;
+	die "$Me: $^EVAL_ERROR";
     } 
 
     $dad_err ||= $dad_rdr;
@@ -256,7 +256,6 @@ sub _open3 {
 	    xopen \*STDERR, ">&", \*STDOUT if fileno(STDERR) != fileno(STDOUT);
 	}
 	return 0 if (@cmd[0] eq '-');
-	local($")=(" ");
 	exec < @cmd or do {
 	    warn "$Me: exec of $(join ' ',@cmd) failed";
 	    try { require POSIX; POSIX::_exit(255); };
@@ -302,7 +301,7 @@ sub _open3 {
 				    handle => \*STDERR ),
 				), \@close, < @cmd);
 	};
-	die "$Me: $@" if $@;
+	die "$Me: $^EVAL_ERROR" if $^EVAL_ERROR;
     }
 
     xclose $kid_rdr if !$dup_wtr;
@@ -312,14 +311,13 @@ sub _open3 {
     # of it.
     xclose $dad_wtr if $dup_wtr;
 
-    select(my $x = @(select($dad_wtr), $| = 1)[0]); # unbuffer pipe
+    select(my $x = @(select($dad_wtr), $^OUTPUT_AUTOFLUSH = 1)[0]); # unbuffer pipe
     $kidpid;
 }
 
 sub open3 {
     if ((nelems @_) +< 4) {
-	local $" = ', ';
-	die "open3($(join ' ',@_)): not enough arguments";
+	die "open3($(join ', ',@_)): not enough arguments";
     }
     return _open3 'open3', scalar caller, < @_
 }
@@ -345,19 +343,19 @@ sub spawn_with_handles {
     unless ($^O eq 'MSWin32') {
 	# Stderr may be redirected below, so we save the err text:
 	foreach my $fd ( @$close_in_child) {
-	    fcntl($fd, Fcntl::F_SETFD(), 1) or push @errs, "fcntl $fd: $!"
+	    fcntl($fd, Fcntl::F_SETFD(), 1) or push @errs, "fcntl $fd: $^OS_ERROR"
 		unless %saved{?fileno $fd}; # Do not close what we redirect!
 	}
     }
 
     unless (nelems @errs) {
 	$pid = try { system 1, < @_ }; # 1 == P_NOWAIT
-	push @errs, "IO::Pipe: Can't spawn-NOWAIT: $!" if !$pid || $pid +< 0;
+	push @errs, "IO::Pipe: Can't spawn-NOWAIT: $^OS_ERROR" if !$pid || $pid +< 0;
     }
 
     foreach my $fd ( @$fds) {
 	$fd->{?handle}->fdopen($fd->{?tmp_copy}, $fd->{mode});
-	$fd->{tmp_copy}->close or die "Can't close: $!";
+	$fd->{tmp_copy}->close or die "Can't close: $^OS_ERROR";
     }
     die join "\n", @errs if (nelems @errs);
     return $pid;

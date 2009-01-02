@@ -17,11 +17,11 @@ if ($^O eq 'mpeix') {
     exit 0;
 }
 
-$|=1;
+$^OUTPUT_AUTOFLUSH=1;
 
 our (@prgs, $tmpfile, $CAT, $status, $i);
 
-undef $/;
+undef $^INPUT_RECORD_SEPARATOR;
 @prgs = split "\n########\n", ~< *DATA;
 print "1..", scalar nelems @prgs, "\n";
 
@@ -44,9 +44,9 @@ for ( @prgs){
     $expected =~ s/\n+$//;
     # results can be in any order, so sort 'em
     my @expected = sort split m/\n/, $expected;
-    open TEST, ">", "$tmpfile" or die "Cannot open $tmpfile: $!";
+    open TEST, ">", "$tmpfile" or die "Cannot open $tmpfile: $^OS_ERROR";
     print TEST $prog, "\n";
-    close TEST or die "Cannot close $tmpfile: $!";
+    close TEST or die "Cannot close $tmpfile: $^OS_ERROR";
     my $results;
     if ($^O eq 'MSWin32') {
       $results = `.\\perl -I../lib $switch $tmpfile 2>&1`;
@@ -57,7 +57,7 @@ for ( @prgs){
     else {
       $results = `./perl $switch $tmpfile 2>&1`;
     }
-    $status = $?;
+    $status = $^CHILD_ERROR;
     $results =~ s/\n+$//;
     $results =~ s/at\s+forktmp\d+\s+line/at - line/g;
     $results =~ s/of\s+forktmp\d+\s+aborted/of - aborted/g;
@@ -77,7 +77,7 @@ for ( @prgs){
 }
 
 __END__
-$| = 1;
+$^OUTPUT_AUTOFLUSH = 1;
 if (my $cid = fork) {
     sleep 1;
     if (my $result = (kill 9, $cid)) {
@@ -96,7 +96,7 @@ EXPECT
 ok 1
 ok 2
 ########
-$| = 1;
+$^OUTPUT_AUTOFLUSH = 1;
 if (my $cid = fork) {
     sleep 1;
     print "not " unless kill 'INT', $cid;
@@ -115,7 +115,7 @@ EXPECT
 ok 1
 ok 2
 ########
-$| = 1;
+$^OUTPUT_AUTOFLUSH = 1;
 our $i;
 sub forkit {
     print "iteration $i start\n";
@@ -129,7 +129,7 @@ sub forkit {
 	}
     }
     else {
-	print "pid $$ failed to fork\n";
+	print "pid $^PID failed to fork\n";
     }
 }
 while ($i++ +< 3) { do { forkit(); }; }
@@ -156,7 +156,7 @@ iteration 3 start
 iteration 3 parent
 iteration 3 child
 ########
-$| = 1;
+$^OUTPUT_AUTOFLUSH = 1;
 fork()
  ?? (print("parent\n"),sleep(1))
  !! (print("child\n"),exit) ;
@@ -164,7 +164,7 @@ EXPECT
 parent
 child
 ########
-$| = 1;
+$^OUTPUT_AUTOFLUSH = 1;
 fork()
  ?? (print("parent\n"),exit)
  !! (print("child\n"),sleep(1)) ;
@@ -172,7 +172,7 @@ EXPECT
 parent
 child
 ########
-$| = 1;
+$^OUTPUT_AUTOFLUSH = 1;
 my @a = 1..3;
 for (@a) {
     if (fork) {
@@ -209,7 +209,7 @@ child 3
 [1] -2- -3-
 -1- -2- -3-
 ########
-$| = 1;
+$^OUTPUT_AUTOFLUSH = 1;
 foreach my $c (@(1,2,3)) {
     if (fork) {
 	print "parent $c\n";
@@ -232,8 +232,8 @@ waited
 waited
 ########
 use Config;
-$| = 1;
-$\ = "\n";
+$^OUTPUT_AUTOFLUSH = 1;
+$^OUTPUT_RECORD_SEPARATOR = "\n";
 fork()
  ?? print(config_value('osname') eq $^O)
  !! print(config_value('osname') eq $^O) ;
@@ -241,8 +241,8 @@ EXPECT
 1
 1
 ########
-$| = 1;
-$\ = "\n";
+$^OUTPUT_AUTOFLUSH = 1;
+$^OUTPUT_RECORD_SEPARATOR = "\n";
 fork()
  ?? do { require Config; print(Config::config_value("osname") eq $^O); }
  !! do { require Config; print(Config::config_value("osname") eq $^O); }
@@ -250,13 +250,13 @@ EXPECT
 1
 1
 ########
-$| = 1;
+$^OUTPUT_AUTOFLUSH = 1;
 use Cwd;
 my $cwd = cwd(); # Make sure we load Win32.pm while "../lib" still works.
-$\ = "\n";
+$^OUTPUT_RECORD_SEPARATOR = "\n";
 my $dir;
 if (fork) {
-    $dir = "f$$.tst";
+    $dir = "f$^PID.tst";
     mkdir $dir, 0755;
     chdir $dir;
     print cwd() =~ m/\Q$dir/i ?? "ok 1 parent" !! "not ok 1 parent";
@@ -265,7 +265,7 @@ if (fork) {
 }
 else {
     sleep 2;
-    $dir = "f$$.tst";
+    $dir = "f$^PID.tst";
     mkdir $dir, 0755;
     chdir $dir;
     print cwd() =~ m/\Q$dir/i ?? "ok 1 child" !! "not ok 1 child";
@@ -276,8 +276,8 @@ EXPECT
 ok 1 parent
 ok 1 child
 ########
-$| = 1;
-$\ = "\n";
+$^OUTPUT_AUTOFLUSH = 1;
+$^OUTPUT_RECORD_SEPARATOR = "\n";
 my $getenv;
 if ($^O eq 'MSWin32' || $^O eq 'NetWare') {
     $getenv = qq[$^X -e "print \$(env::var(q[TST]))"];
@@ -303,11 +303,11 @@ child after: baz
 parent before: foo
 parent after: bar
 ########
-$| = 1;
-$\ = "\n";
+$^OUTPUT_AUTOFLUSH = 1;
+$^OUTPUT_RECORD_SEPARATOR = "\n";
 if (my $pid = fork) {
     waitpid($pid,0);
-    print "parent got $?"
+    print "parent got $^CHILD_ERROR"
 }
 else {
     exit(42);
@@ -315,12 +315,12 @@ else {
 EXPECT
 parent got 10752
 ########
-$| = 1;
-$\ = "\n";
+$^OUTPUT_AUTOFLUSH = 1;
+$^OUTPUT_RECORD_SEPARATOR = "\n";
 my $echo = 'echo';
 if (my $pid = fork) {
     waitpid($pid,0);
-    print "parent got $?"
+    print "parent got $^CHILD_ERROR"
 }
 else {
     exec("$echo foo");
@@ -341,11 +341,11 @@ child died at - line 5 character 14.
 ########
 if (my $pid = fork) {
     try { die "parent died" };
-    print $@->message;
+    print $^EVAL_ERROR->message;
 }
 else {
     sleep 1; try { die "child died" };
-    print $@->message;
+    print $^EVAL_ERROR->message;
 }
 EXPECT
 parent died at - line 2 character 11.
@@ -356,11 +356,11 @@ child died at - line 6 character 20.
 my $pid;
 if (eval q{$pid = fork}) {
     eval q{ die "parent died" };
-    print $@->message;
+    print $^EVAL_ERROR->message;
 }
 else {
     sleep 1; eval q{ die "child died" };
-    print $@->message;
+    print $^EVAL_ERROR->message;
 }
 EXPECT
 parent died at (eval 2) line 1 character 2.
@@ -369,7 +369,7 @@ child died at (eval 2) line 1 character 2.
     (eval) called at - line 7 character 14.
 ########
 BEGIN {
-    $| = 1;
+    $^OUTPUT_AUTOFLUSH = 1;
     fork and exit;
     print "inner\n";
 }
@@ -386,7 +386,7 @@ sub pipe_to_fork ($$) {
     my $child = shift;
     pipe($child, $parent) or die;
     my $pid = fork();
-    die "fork() failed: $!" unless defined $pid;
+    die "fork() failed: $^OS_ERROR" unless defined $pid;
     close($pid ?? $child !! $parent);
     $pid;
 }
@@ -412,7 +412,7 @@ sub pipe_from_fork ($$) {
     my $child = shift;
     pipe($parent, $child) or die;
     my $pid = fork();
-    die "fork() failed: $!" unless defined $pid;
+    die "fork() failed: $^OS_ERROR" unless defined $pid;
     close($pid ?? $child !! $parent);
     $pid;
 }
@@ -432,7 +432,7 @@ EXPECT
 pipe_from_fork
 pipe_to_fork
 ########
-$|=1;
+$^OUTPUT_AUTOFLUSH=1;
 if (my $pid = fork()) {
     print "forked first kid\n";
     print "waitpid() returned ok\n" if waitpid($pid,0) == $pid;
@@ -457,9 +457,9 @@ forked second kid
 second child
 wait() returned ok
 ########
-pipe(my $rdr, my $wtr) or die $!;
+pipe(my $rdr, my $wtr) or die $^OS_ERROR;
 my $pid = fork;
-die "fork: $!" if !defined $pid;
+die "fork: $^OS_ERROR" if !defined $pid;
 if ($pid == 0) {
     my $rand_child = rand;
     close $rdr;

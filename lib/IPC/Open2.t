@@ -49,8 +49,8 @@ ok 1, $pid = open2 'READ', 'WRITE', $perl, '-e',
 	cmd_line('print scalar ~< *STDIN');
 ok 2, print WRITE "hi kid\n";
 ok 3, (~< *READ) =~ m/^hi kid\r?\n$/;
-ok 4, close(WRITE), $!;
-ok 5, close(READ), $!;
+ok 4, close(WRITE), $^OS_ERROR;
+ok 5, close(READ), $^OS_ERROR;
 $reaped_pid = waitpid $pid, 0;
 ok 6, $reaped_pid == $pid, $reaped_pid;
-ok 7, $? == 0, $?;
+ok 7, $^CHILD_ERROR == 0, $^CHILD_ERROR;

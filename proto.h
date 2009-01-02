@@ -4147,7 +4147,6 @@ STATIC OP*	S_too_many_arguments(pTHX_ OP *o, const char* name)
 #define PERL_ARGS_ASSERT_TOO_MANY_ARGUMENTS	\
 	assert(o); assert(name)
 
-STATIC OP*	S_ref_array_or_hash(pTHX_ OP* cond);
 #endif
 #if defined(PL_OP_SLAB_ALLOC)
 PERL_CALLCONV void*	Perl_Slab_Alloc(pTHX_ size_t sz)
@@ -4970,7 +4969,11 @@ STATIC char*	S_force_version(pTHX_ char *s)
 #define PERL_ARGS_ASSERT_FORCE_VERSION	\
 	assert(s)
 
-STATIC SV*	S_curlocation(pTHX);
+STATIC SV*	S_curlocation(pTHX_ const char* location)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_CURLOCATION	\
+	assert(location)
+
 STATIC char*	S_force_word(pTHX_ char *start, int token, int check_keyword, int allow_pack, int allow_tick)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_FORCE_WORD	\

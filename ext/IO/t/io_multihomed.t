@@ -14,7 +14,7 @@ BEGIN {
     }
 }
 
-$| = 1;
+$^OUTPUT_AUTOFLUSH = 1;
 
 print "1..8\n";
 
@@ -73,7 +73,7 @@ use IO::Socket;
 my $listen = IO::Socket::INET->new(Listen => 2,
 				Proto => 'tcp',
 				Timeout => 5,
-			       ) or die "$!";
+			       ) or die "$^OS_ERROR";
 
 print "ok 1\n";
 
@@ -81,7 +81,7 @@ my $port = $listen->sockport;
 
 if(my $pid = fork()) {
 
-    my $sock = $listen->accept() or die "$!";
+    my $sock = $listen->accept() or die "$^OS_ERROR";
     print "ok 5\n";
 
     print $sock->getline();
@@ -100,7 +100,7 @@ if(my $pid = fork()) {
 		       PeerAddr => 'localhost',
 		       MultiHomed => 1,
 		       Timeout => 1,
-		      ) or die "$!";
+		      ) or die "$^OS_ERROR";
 
     print $sock "ok 6\n";
     sleep(1); # race condition

@@ -4,7 +4,7 @@ use Config;
 my $arch = config_value('archname') . "-" . config_value('osvers');
 my $got = "";
 if (-e 'arch.txt') {
-    open my $in, "<", "arch.txt" or die "Can't read 'arch.txt': $!";
+    open my $in, "<", "arch.txt" or die "Can't read 'arch.txt': $^OS_ERROR";
     $got = ~< $in;
     close $in;
 }
@@ -12,9 +12,9 @@ if ($got ne $arch) {
     if (-e "Errno.pm") {
         print "Removing old 'Errno.pm'\n";
         unlink "Errno.pm" 
-            or die "Failed to remove out of date 'Errno.pm': $!";
+            or die "Failed to remove out of date 'Errno.pm': $^OS_ERROR";
     }
-    open my $out, ">", "arch.txt" or die "Can't write 'arch.txt': $!";
+    open my $out, ">", "arch.txt" or die "Can't write 'arch.txt': $^OS_ERROR";
     print $out $arch;
     close $out;
 }

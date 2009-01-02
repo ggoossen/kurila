@@ -13,7 +13,7 @@ use Pod::Man ();
 use Pod::Usage < qw(pod2usage);
 
 # Silence -w warnings.
-use vars < qw($running_under_some_shell);
+our ($running_under_some_shell);
 
 # Insert -- into @ARGV before any single dash argument to hide it from
 # Getopt::Long; we want to interpret it as meaning stdin.

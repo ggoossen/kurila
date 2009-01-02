@@ -45,5 +45,5 @@ if (open(CF, "<", $CF)) {
 	    "not ok $i \# $todo - $code - $name - $mapping - $status - $t0 $t1 $t2 $t3 $t4 $t5 $t6 $t7\n";
     }
 } else {
-    die qq[$0: failed to open "$CF": $!\n];
+    die qq[$0: failed to open "$CF": $^OS_ERROR\n];
 }

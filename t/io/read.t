@@ -5,7 +5,7 @@ BEGIN {
 }
 
 eval 'use Errno';
-die $@ if $@ and !env::var('PERL_CORE_MINITEST');
+die $^EVAL_ERROR if $^EVAL_ERROR and !env::var('PERL_CORE_MINITEST');
 
 plan tests => 2;
 
@@ -29,8 +29,8 @@ unlink 'a';
 SKIP: do {
     skip "no EBADF", 1 if (!exists &Errno::EBADF);
 
-    $! = 0;
+    $^OS_ERROR = 0;
     no warnings 'unopened';
     read(B,$b,1);
-    ok($! == &Errno::EBADF( < @_ ));
+    ok($^OS_ERROR == &Errno::EBADF( < @_ ));
 };

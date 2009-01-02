@@ -382,10 +382,10 @@ my @tests = @(
 
 plan tests => 31 + 2 * nelems @tests;
 
-my $file = "xx-$$.pst";
+my $file = "xx-$^PID.pst";
 
 is(try { Storable::file_magic($file) }, undef, "empty file give undef");
-like($@->{?description}, qq{/^Can't open '\Q$file\E':/}, "...and croaks");
+like($^EVAL_ERROR->{?description}, qq{/^Can't open '\Q$file\E':/}, "...and croaks");
 is(Storable::file_magic(__FILE__), undef, "not an image");
 
 store(\%(), $file);
@@ -434,10 +434,10 @@ do {
 
 for my $test ( @tests) {
     my@($data, $expected) =  @$test;
-    open(FH, ">", "$file") || die "Can't create $file: $!";
+    open(FH, ">", "$file") || die "Can't create $file: $^OS_ERROR";
     binmode(FH);
     print FH $data;
-    close(FH) || die "Can't write $file: $!";
+    close(FH) || die "Can't write $file: $^OS_ERROR";
 
     my $name = $expected->{?file};
     $expected->{+file} = $file;

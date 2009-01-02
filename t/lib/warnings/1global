@@ -43,8 +43,6 @@ my $b ; chop $b ;
 #! perl -w
 require "./abcd";
 EXPECT
-Use of uninitialized value $b in scalar chop at ./abcd line 1 character 9.
-    (require) called at - line 2 character 1.
 ########
 
 --FILE-- abcd
@@ -82,21 +80,21 @@ Use of uninitialized value $b in scalar chop at - line 3 character 9.
 
 $^W = 1;
 eval 'my $b ; chop $b ;' ;
-print $@ ;
+print $^EVAL_ERROR ;
 EXPECT
 Use of uninitialized value $b in scalar chop at (eval 1) line 1 character 9.
     (eval) called at - line 3 character 1.
 ########
 
 eval '$^W = 1;' ;
-print $@ ;
+print $^EVAL_ERROR ;
 my $b ; chop $b ;
 EXPECT
 Use of uninitialized value $b in scalar chop at - line 4 character 9.
 ########
 
 try {$^W = 1;} ;
-print $@ ;
+print $^EVAL_ERROR ;
 my $b ; chop $b ;
 EXPECT
 Use of uninitialized value $b in scalar chop at - line 4 character 9.

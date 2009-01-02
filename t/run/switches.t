@@ -6,7 +6,7 @@
 
 BEGIN { require "./test.pl"; }
 
-plan(tests => 63);
+plan(tests => 62);
 
 use Config;
 
@@ -72,7 +72,7 @@ is( $r, 'abc-def--ghi-jkl-mno--pq-/', '-0777 (slurp mode)' );
 
 $r = runperl(
     switches	=> \@( '-066' ),
-    prog	=> 'BEGIN { print qq{($/)} } print qq{[$/]}',
+    prog	=> 'BEGIN { print qq{($^INPUT_RECORD_SEPARATOR)} } print qq{[$^INPUT_RECORD_SEPARATOR]}',
 );
 is( $r, "(\066)[\066]", '$/ set at compile-time' );
 
@@ -82,7 +82,7 @@ my $filename = 'swctest.tmp';
 SKIP: do {
     local $TODO = '';   # this one works on VMS
 
-    open my $f, ">", "$filename" or skip( "Can't write temp file $filename: $!" );
+    open my $f, ">", "$filename" or skip( "Can't write temp file $filename: $^OS_ERROR" );
     print $f <<'SWTEST';
 BEGIN { print "block 1\n"; }
 CHECK { print "block 2\n"; }
@@ -90,7 +90,7 @@ INIT  { print "block 3\n"; }
 	print "block 4\n";
 END   { print "block 5\n"; }
 SWTEST
-    close $f or die "Could not close: $!";
+    close $f or die "Could not close: $^OS_ERROR";
     $r = runperl(
 	switches	=> \@( '-c' ),
 	progfile	=> $filename,
@@ -122,13 +122,13 @@ is( $r, 'fooxbarx', '-l with octal number' );
 
 $filename = 'swtest.pm';
 SKIP: do {
-    open my $f, ">", "$filename" or skip( "Can't write temp file $filename: $!",4 );
+    open my $f, ">", "$filename" or skip( "Can't write temp file $filename: $^OS_ERROR",4 );
     print $f <<'SWTESTPM';
 package swtest;
 sub import { print < map "<$_>", @_ }
 1;
 SWTESTPM
-    close $f or die "Could not close: $!";
+    close $f or die "Could not close: $^OS_ERROR";
     $r = runperl(
 	switches    => \@( '-Mswtest' ),
 	prog	    => '1',
@@ -261,7 +261,7 @@ do {
 
     sub do_i_unlink { 1 while unlink("file", "file.bak") }
 
-    open(FILE, ">", "file") or die "$0: Failed to create 'file': $!";
+    open(FILE, ">", "file") or die "$0: Failed to create 'file': $^OS_ERROR";
     print FILE <<__EOF__;
 foo yada dada
 bada foo bing
@@ -273,11 +273,11 @@ __EOF__
 
     runperl( switches => \@('-pi.bak'), prog => 's/foo/bar/', args => \@('file') );
 
-    open(FILE, "<", "file") or die "$0: Failed to open 'file': $!";
+    open(FILE, "<", "file") or die "$0: Failed to open 'file': $^OS_ERROR";
     chomp(my @file = @( ~< *FILE ));
     close FILE;
 
-    open(BAK, "<", "file.bak") or die "$0: Failed to open 'file': $!";
+    open(BAK, "<", "file.bak") or die "$0: Failed to open 'file': $^OS_ERROR";
     chomp(my @bak = @( ~< *BAK ));
     close BAK;
 
@@ -288,11 +288,3 @@ __EOF__
        "foo yada dada:bada foo bing:king kong foo",
        "-i backup file");
 };
-
-# Tests for -E
-
-$r = runperl(
-    switches	=> \@( '-E', '"undef ~~ undef and print qq(Hello, world!\n)"')
-);
-is( $r, "Hello, world!\n", "-E ~~" );
-

@@ -5,8 +5,8 @@ if ($^O eq 'mpeix') {
     exit 0;
 }
 
-select(STDERR); $| = 1;
-select(STDOUT); $| = 1;
+select(STDERR); $^OUTPUT_AUTOFLUSH = 1;
+select(STDOUT); $^OUTPUT_AUTOFLUSH = 1;
 
 print "1..10\n";
 

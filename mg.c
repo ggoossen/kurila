@@ -631,33 +631,40 @@ Perl_magic_len(pTHX_ SV *sv, MAGIC *mg)
     PERL_ARGS_ASSERT_MAGIC_LEN;
 
     switch (*mg->mg_ptr) {
-    case '\020':		
-      if (*remaining == '\0') { /* ^P */
-          break;
-      } else if (strEQ(remaining, "REMATCH")) { /* $^PREMATCH */
-          goto do_prematch;
-      } else if (strEQ(remaining, "OSTMATCH")) { /* $^POSTMATCH */
-          goto do_postmatch;
-      }
-      break;
-    case '\015': /* $^MATCH */
-	if (strEQ(remaining, "ATCH")) {
-        goto do_match;
-    } else {
-        break;
-    }
-    case '`':
-      do_prematch:
-      paren = RX_BUFF_IDX_PREMATCH;
-      goto maybegetparen;
-    case '\'':
-      do_postmatch:
-      paren = RX_BUFF_IDX_POSTMATCH;
-      goto maybegetparen;
-    case '&':
-      do_match:
-      paren = RX_BUFF_IDX_FULLMATCH;
-      goto maybegetparen;
+    case '^':		
+	switch(*remaining) {
+	case 'M':
+	    if (strEQ(remaining, "MATCH")) {
+		/* $^MATCH */
+		paren = RX_BUFF_IDX_FULLMATCH;
+		goto maybegetparen;
+	    }
+	    break;
+	case 'N':
+	    if (strEQ(remaining, "N")) {
+		/* ^N */
+		if (PL_curpm && (rx = PM_GETRE(PL_curpm))) {
+		    paren = RX_LASTCLOSEPAREN(rx);
+		    if (paren)
+			goto getparen;
+		}
+		return 0;
+	    }
+	    break;
+	case 'P':
+	    if (strEQ(remaining, "PREMATCH")) {
+		/* $^PREMATCH */
+		paren = RX_BUFF_IDX_PREMATCH;
+		goto maybegetparen;
+	    } else if (strEQ(remaining, "POSTMATCH")) {
+		/* $^POSTMATCH */
+		paren = RX_BUFF_IDX_POSTMATCH;
+		goto maybegetparen;
+	    }
+	    break;
+	}
+	break;
+
     case '1': case '2': case '3': case '4':
     case '5': case '6': case '7': case '8': case '9':
       paren = atoi(mg->mg_ptr);
@@ -674,20 +681,6 @@ Perl_magic_len(pTHX_ SV *sv, MAGIC *mg)
 		    report_uninit(sv);
 		return 0;
 	}
-    case '+':
-	if (PL_curpm && (rx = PM_GETRE(PL_curpm))) {
-	    paren = RX_LASTPAREN(rx);
-	    if (paren)
-		goto getparen;
-	}
-	return 0;
-    case '\016': /* ^N */
-	if (PL_curpm && (rx = PM_GETRE(PL_curpm))) {
-	    paren = RX_LASTCLOSEPAREN(rx);
-	    if (paren)
-		goto getparen;
-	}
-	return 0;
     }
     magic_get(sv,mg);
     if (!SvPOK(sv) && SvNIOK(sv)) {
@@ -747,8 +740,17 @@ Perl_magic_get(pTHX_ SV *sv, MAGIC *mg)
 	if (remaining[1] != '\0') {
 	    switch (*remaining) {
 	    case 'C':
+		if (strEQ(remaining, "CHILD_ERROR")) { /* $^CHILD_ERROR */
+		    sv_setiv(sv, (IV)STATUS_CURRENT);
+#ifdef COMPLEX_STATUS
+		    LvTARGOFF(sv) = PL_statusvalue;
+		    LvTARGLEN(sv) = PL_statusvalue_vms;
+#endif
+		    break;
+		}
 		if (strEQ(remaining, "CHILD_ERROR_NATIVE")) { /* $^CHILD_ERROR_NATIVE */
 		    sv_setiv(sv, (IV)STATUS_NATIVE);
+		    break;
 		}
 		break;
 	    case 'D':
@@ -775,13 +777,27 @@ Perl_magic_get(pTHX_ SV *sv, MAGIC *mg)
 #endif
 		    break;
 		}
+
+		if (strEQ(remaining, "EUID")) {
+		    /* $^EUID */
+		    sv_setiv(sv, (IV)PL_euid);
+		    break;
+		}
 		break;
+
 	    case 'G':
 		if (strEQ(remaining, "GID")) { /* $^GID */
 		    sv_setiv(sv, (IV)PL_gid);
 		    goto add_groups;
 		}
 		break;
+
+	    case 'I':
+		if (strEQ(remaining, "INPUT_RECORD_SEPARATOR")) {
+		    break;
+		}
+		break;
+
 	    case 'M': /* $^MATCH */
 		if (strEQ(remaining, "MATCH")) {
 		    if (PL_curpm && (rx = PM_GETRE(PL_curpm))) {
@@ -796,16 +812,72 @@ Perl_magic_get(pTHX_ SV *sv, MAGIC *mg)
 		    sv_setsv(sv,&PL_sv_undef);
 		}
 		break;
+
 	    case 'O':
-		if (strEQ(remaining, "OPEN")) { /* $^OPEN */
+		if (strEQ(remaining, "OPEN")) {
+		    /* $^OPEN */
 		    Perl_emulate_cop_io(aTHX_ &PL_compiling, sv);
+		    break;
+		}
+
+		if (strEQ(remaining, "OS_ERROR")) {
+		    /* $^OS_ERROR */
+#ifdef VMS
+		    sv_setnv(sv, (NV)((errno == EVMSERR) ? vaxc$errno : errno));
+		    sv_setpv(sv, errno ? Strerror(errno) : "");
+#else
+		    {
+			const int saveerrno = errno;
+			sv_setnv(sv, (NV)errno);
+#ifdef OS2
+			if (errno == errno_isOS2 || errno == errno_isOS2_set)
+			    sv_setpv(sv, os2error(Perl_rc));
+			else
+#endif
+			    sv_setpv(sv, errno ? Strerror(errno) : "");
+			errno = saveerrno;
+		    }
+#endif
+		    SvRTRIM(sv);
+		    SvNOK_on(sv);	/* what a wonderful hack! */
+		    break;
+		}
+
+		if (strEQ(remaining, "OUTPUT_AUTOFLUSH")) {
+		    /* $^OUTPUT_AUTOFLUSH */
+		    if (GvIOp(PL_defoutgv))
+			sv_setiv(sv, (IV)(IoFLAGS(GvIOp(PL_defoutgv)) & IOf_FLUSH) != 0 );
+		    break;
+		}
+
+		if (strEQ(remaining, "OUTPUT_FIELD_SEPARATOR")) {
+		    /* $^OUTPUT_FIELD_SEPARATOR */
+		    break;
+		}
+
+		if (strEQ(remaining, "OUTPUT_RECORD_SEPARATOR")) {
+		    /* $^OUTPUT_RECORD_SEPARATOR */
+		    if (PL_ors_sv)
+			sv_copypv(sv, PL_ors_sv);
+		    break;
 		}
 		break;
+
 	    case 'P':
 		if (strEQ(remaining, "PREMATCH")) { /* $^PREMATCH */
-		    goto do_prematch_fetch;
+		    if (PL_curpm && (rx = PM_GETRE(PL_curpm))) {
+			CALLREG_NUMBUF_FETCH(rx,-2,sv);
+			break;
+		    }
+		    sv_setsv(sv,&PL_sv_undef);
+		    break;
 		} else if (strEQ(remaining, "POSTMATCH")) { /* $^POSTMATCH */
-		    goto do_postmatch_fetch;
+		    if (PL_curpm && (rx = PM_GETRE(PL_curpm))) {
+			CALLREG_NUMBUF_FETCH(rx,-1,sv);
+			break;
+		    }
+		    sv_setsv(sv,&PL_sv_undef);
+		    break;
 		}
 		break;
 	    case 'T':
@@ -814,13 +886,27 @@ Perl_magic_get(pTHX_ SV *sv, MAGIC *mg)
 			     ? (PL_taint_warn || PL_unsafe ? -1 : 1)
 			     : 0);
 		break;
-	    case 'U':		/* $^UNICODE, $^UTF8LOCALE, $^UTF8CACHE */
-		if (strEQ(remaining, "UNICODE"))
+	    case 'U':
+		if (strEQ(remaining, "UID")) {
+		    /* $^UID */
+		    sv_setiv(sv, (IV)PL_uid);
+		    break;
+		}
+		if (strEQ(remaining, "UNICODE")) {
+		    /* $^UNICODE */
 		    sv_setuv(sv, (UV) PL_unicode);
-		else if (strEQ(remaining, "UTF8LOCALE"))
+		    break;
+		}
+		if (strEQ(remaining, "UTF8LOCALE")) {
+		    /* $^UTF8LOCALE */
 		    sv_setuv(sv, (UV) PL_utf8locale);
-		else if (strEQ(remaining, "UTF8CACHE"))
+		    break;
+		}
+		if (strEQ(remaining, "UTF8CACHE")) {
+		    /* $^UTF8CACHE */
 		    sv_setiv(sv, (IV) PL_utf8cache);
+		    break;
+		}
 		break;
 	    case 'W':
 		if (strEQ(remaining, "WARNING_BITS")) { /* $^WARNING_BITS */
@@ -980,80 +1066,6 @@ Perl_magic_get(pTHX_ SV *sv, MAGIC *mg)
 	    break;
 	}
 	sv_setsv(sv,&PL_sv_undef);
-	break;
-    case '+':
-	if (PL_curpm && (rx = PM_GETRE(PL_curpm))) {
-	    if (RX_LASTPAREN(rx)) {
-	        CALLREG_NUMBUF_FETCH(rx,RX_LASTPAREN(rx),sv);
-	        break;
-	    }
-	}
-	sv_setsv(sv,&PL_sv_undef);
-	break;
-    case '`':
-      do_prematch_fetch:
-	if (PL_curpm && (rx = PM_GETRE(PL_curpm))) {
-	    CALLREG_NUMBUF_FETCH(rx,-2,sv);
-	    break;
-	}
-	sv_setsv(sv,&PL_sv_undef);
-	break;
-    case '\'':
-      do_postmatch_fetch:
-	if (PL_curpm && (rx = PM_GETRE(PL_curpm))) {
-	    CALLREG_NUMBUF_FETCH(rx,-1,sv);
-	    break;
-	}
-	sv_setsv(sv,&PL_sv_undef);
-	break;
-    case '?':
-	{
-	    sv_setiv(sv, (IV)STATUS_CURRENT);
-#ifdef COMPLEX_STATUS
-	    LvTARGOFF(sv) = PL_statusvalue;
-	    LvTARGLEN(sv) = PL_statusvalue_vms;
-#endif
-	}
-	break;
-    case ':':
-	break;
-    case '/':
-	break;
-    case '|':
-	if (GvIOp(PL_defoutgv))
-	    sv_setiv(sv, (IV)(IoFLAGS(GvIOp(PL_defoutgv)) & IOf_FLUSH) != 0 );
-	break;
-    case ',':
-	break;
-    case '\\':
-	if (PL_ors_sv)
-	    sv_copypv(sv, PL_ors_sv);
-	break;
-    case '!':
-#ifdef VMS
-	sv_setnv(sv, (NV)((errno == EVMSERR) ? vaxc$errno : errno));
-	sv_setpv(sv, errno ? Strerror(errno) : "");
-#else
-	{
-	const int saveerrno = errno;
-	sv_setnv(sv, (NV)errno);
-#ifdef OS2
-	if (errno == errno_isOS2 || errno == errno_isOS2_set)
-	    sv_setpv(sv, os2error(Perl_rc));
-	else
-#endif
-	sv_setpv(sv, errno ? Strerror(errno) : "");
-	errno = saveerrno;
-	}
-#endif
-	SvRTRIM(sv);
-	SvNOK_on(sv);	/* what a wonderful hack! */
-	break;
-    case '<':
-	sv_setiv(sv, (IV)PL_uid);
-	break;
-    case '>':
-	sv_setiv(sv, (IV)PL_euid);
 	break;
 #ifndef MACOS_TRADITIONAL
     case '0':
@@ -1387,6 +1399,24 @@ Perl_magic_set(pTHX_ SV *sv, MAGIC *mg)
     case '^':
 	if (remaining[1] != '\0') {
 	    switch (*remaining) {
+	    case 'C':   /* $^CHILD_ERROR */
+		if (strEQ(remaining, "CHILD_ERROR")) {
+#ifdef COMPLEX_STATUS
+		    if (PL_localizing == 2) {
+			PL_statusvalue = LvTARGOFF(sv);
+			PL_statusvalue_vms = LvTARGLEN(sv);
+		    }
+		    else
+#endif
+#ifdef VMSISH_STATUS
+			if (VMSISH_STATUS)
+			    STATUS_NATIVE_CHILD_SET((U32)SvIV(sv));
+			else
+#endif
+			    STATUS_UNIX_EXIT_SET(SvIV(sv));
+		    break;
+		}
+		break;
 	    case 'D':   /* $^DIE_HOOK */
 		if (strEQ(remaining, "DIE_HOOK")) {
 		    SvREFCNT_dec(PL_diehook);
@@ -1476,13 +1506,55 @@ Perl_magic_set(pTHX_ SV *sv, MAGIC *mg)
 		    PL_tainting |= (PL_uid && (PL_euid != PL_uid || PL_egid != PL_gid));
 		    break;
 		}
+
+		if (strEQ(remaining, "EUID")) {
+		    /* $^EUID */
+		    PL_euid = SvIV(sv);
+		    if (PL_delaymagic) {
+			PL_delaymagic |= DM_EUID;
+			break;                              /* don't do magic till later */
+		    }
+#ifdef HAS_SETEUID
+		    (void)seteuid((Uid_t)PL_euid);
+#else
+#ifdef HAS_SETREUID
+		    (void)setreuid((Uid_t)-1, (Uid_t)PL_euid);
+#else
+#ifdef HAS_SETRESUID
+		    (void)setresuid((Uid_t)-1, (Uid_t)PL_euid, (Uid_t)-1);
+#else
+		    if (PL_euid == PL_uid)          /* special case $> = $< */
+			PerlProc_setuid(PL_euid);
+		    else {
+			PL_euid = PerlProc_geteuid();
+			Perl_croak(aTHX_ "seteuid() not implemented");
+		    }
+#endif
+#endif
+#endif
+		    PL_euid = PerlProc_geteuid();
+		    PL_tainting |= (PL_uid && (PL_euid != PL_uid || PL_egid != PL_gid));
+		    break;
+		}
 		break;
+
+	    case 'I':
+		if (strEQ(remaining, "INPUT_RECORD_SEPARATOR")) {
+		    /* $^INPUT_RECORD_SEPARATOR */
+		    SVcpSTEAL(PL_rs, newSVsv(sv));
+		    break;
+		}
+		break;
+
 	    case 'M':   /* $^MATCH */
-		if (strEQ(remaining, "MATCH"))
-		    goto do_match;
+		if (strEQ(remaining, "MATCH")) {
+		    paren = RX_BUFF_IDX_FULLMATCH;
+		    goto setparen;
+		}
 		break;
-	    case 'O':   /* $^OPEN */
+	    case 'O':
 		if (strEQ(remaining, "OPEN")) {
+		    /* $^OPEN */
 		    STRLEN len;
 		    const char *const start = SvPV(sv, len);
 		    const char *out = (const char*)memchr(start, '\0', len);
@@ -1508,19 +1580,115 @@ Perl_magic_set(pTHX_ SV *sv, MAGIC *mg)
 		    tmp = newSVpvn_flags(start, out ? (STRLEN)(out - start) : len, 0);
 		    (void)hv_store_ent(PL_compiling.cop_hints_hash,
 				       newSVpvs_flags("open<", SVs_TEMP), tmp, 0);
+		    break;
+		}
+
+		if (strEQ(remaining, "OS_ERROR")) {
+		    /* $^OS_ERROR */
+#ifdef VMS
+#   define PERL_VMS_BANG vaxc$errno
+#else
+#   define PERL_VMS_BANG 0
+#endif
+		    SETERRNO(SvIOK(sv) ? SvIVX(sv) : SvOK(sv) ? sv_2iv(sv) : 0,
+			(SvIV(sv) == EVMSERR) ? 4 : PERL_VMS_BANG);
+		    break;
+		}
+
+		if (strEQ(remaining, "OUTPUT_AUTOFLUSH")) {
+		    /* $^OUTPUT_AUTOFLUSH */
+		    IO * const io = GvIOp(PL_defoutgv);
+		    if(!io)
+			break;
+		    if ((SvIV(sv)) == 0)
+			IoFLAGS(io) &= ~IOf_FLUSH;
+		    else {
+			if (!(IoFLAGS(io) & IOf_FLUSH)) {
+			    PerlIO *ofp = IoOFP(io);
+			    if (ofp)
+				(void)PerlIO_flush(ofp);
+			    IoFLAGS(io) |= IOf_FLUSH;
+			}
+		    }
+		    break;
+		}
+
+		if (strEQ(remaining, "OUTPUT_FIELD_SEPARATOR")) {
+		    /* $^OUTPUT_FIELD_SEPARATOR */
+		    if (PL_ofs_sv)
+			SvREFCNT_dec(PL_ofs_sv);
+		    if (SvOK(sv) || SvGMAGICAL(sv)) {
+			PL_ofs_sv = newSVsv(sv);
+		    }
+		    else {
+			PL_ofs_sv = NULL;
+		    }
+		    break;
+		}
+
+		if (strEQ(remaining, "OUTPUT_RECORD_SEPARATOR")) {
+		    /* $^OUTPUT_RECORD_SEPARATOR */
+		    if (PL_ors_sv)
+			SvREFCNT_dec(PL_ors_sv);
+		    if (SvOK(sv) || SvGMAGICAL(sv)) {
+			PL_ors_sv = newSVsv(sv);
+		    }
+		    else {
+			PL_ors_sv = NULL;
+		    }
+		    break;
 		}
 		break;
+
 	    case 'P':
 		if (strEQ(remaining, "PREMATCH")) { /* $^PREMATCH */
-		    goto do_prematch;
+		    paren = RX_BUFF_IDX_PREMATCH;
+		    goto setparen;
 		} 
 		if (strEQ(remaining, "POSTMATCH")) { /* $^POSTMATCH */
-		    goto do_postmatch;
+		    paren = RX_BUFF_IDX_POSTMATCH;
+		    goto setparen;
 		}
 		break;
-	    case 'U':        /* ^UTF8CACHE */
+	    case 'U':
+		if (strEQ(remaining, "UID")) {
+		    /* $^UID */
+		    PL_uid = SvIV(sv);
+		    if (PL_delaymagic) {
+			PL_delaymagic |= DM_RUID;
+			break;                              /* don't do magic till later */
+		    }
+#ifdef HAS_SETRUID
+		    (void)setruid((Uid_t)PL_uid);
+#else
+#ifdef HAS_SETREUID
+		    (void)setreuid((Uid_t)PL_uid, (Uid_t)-1);
+#else
+#ifdef HAS_SETRESUID
+		    (void)setresuid((Uid_t)PL_uid, (Uid_t)-1, (Uid_t)-1);
+#else
+		    if (PL_uid == PL_euid) {                /* special case $< = $> */
+#ifdef PERL_DARWIN
+			/* workaround for Darwin's setuid peculiarity, cf [perl #24122] */
+			if (PL_uid != 0 && PerlProc_getuid() == 0)
+			    (void)PerlProc_setuid(0);
+#endif
+			(void)PerlProc_setuid(PL_uid);
+		    } else {
+			PL_uid = PerlProc_getuid();
+			Perl_croak(aTHX_ "setruid() not implemented");
+		    }
+#endif
+#endif
+#endif
+		    PL_uid = PerlProc_getuid();
+		    PL_tainting |= (PL_uid && (PL_euid != PL_uid || PL_egid != PL_gid));
+		    break;
+		}
 		if (strEQ(remaining, "UTF8CACHE")) {
+		    /* $^UTF8CACHE */
 		    PL_utf8cache = (signed char) sv_2iv(sv);
+		    break;
 		}
 		break;
 	    case 'W':
@@ -1650,18 +1818,6 @@ Perl_magic_set(pTHX_ SV *sv, MAGIC *mg)
 	    }
 	}
 	break;
-    case '`': /* $^PREMATCH caught below */
-      do_prematch:
-      paren = RX_BUFF_IDX_PREMATCH;
-      goto setparen;
-    case '\'': /* $^POSTMATCH caught below */
-      do_postmatch:
-      paren = RX_BUFF_IDX_POSTMATCH;
-      goto setparen;
-    case '&':
-      do_match:
-      paren = RX_BUFF_IDX_FULLMATCH;
-      goto setparen;
     case '1': case '2': case '3': case '4':
     case '5': case '6': case '7': case '8': case '9':
       paren = atoi(mg->mg_ptr);
@@ -1677,134 +1833,7 @@ Perl_magic_set(pTHX_ SV *sv, MAGIC *mg)
                 Perl_croak(aTHX_ PL_no_modify);
             }
         }
-    case '|':
-        {
-            IO * const io = GvIOp(PL_defoutgv);
-            if(!io)
-              break;
-            if ((SvIV(sv)) == 0)
-                IoFLAGS(io) &= ~IOf_FLUSH;
-            else {
-                if (!(IoFLAGS(io) & IOf_FLUSH)) {
-                    PerlIO *ofp = IoOFP(io);
-                    if (ofp)
-                        (void)PerlIO_flush(ofp);
-                    IoFLAGS(io) |= IOf_FLUSH;
-                }
-            }
-        }
-        break;
-    case '/':
-        SVcpSTEAL(PL_rs, newSVsv(sv));
-        break;
-    case '\\':
-        if (PL_ors_sv)
-            SvREFCNT_dec(PL_ors_sv);
-        if (SvOK(sv) || SvGMAGICAL(sv)) {
-            PL_ors_sv = newSVsv(sv);
-        }
-        else {
-            PL_ors_sv = NULL;
-        }
-        break;
-    case ',':
-        if (PL_ofs_sv)
-            SvREFCNT_dec(PL_ofs_sv);
-        if (SvOK(sv) || SvGMAGICAL(sv)) {
-            PL_ofs_sv = newSVsv(sv);
-        }
-        else {
-            PL_ofs_sv = NULL;
-        }
-        break;
-    case '?':
-#ifdef COMPLEX_STATUS
-        if (PL_localizing == 2) {
-            PL_statusvalue = LvTARGOFF(sv);
-            PL_statusvalue_vms = LvTARGLEN(sv);
-        }
-        else
-#endif
-#ifdef VMSISH_STATUS
-        if (VMSISH_STATUS)
-            STATUS_NATIVE_CHILD_SET((U32)SvIV(sv));
-        else
-#endif
-            STATUS_UNIX_EXIT_SET(SvIV(sv));
-        break;
-    case '!':
-        {
-#ifdef VMS
-#   define PERL_VMS_BANG vaxc$errno
-#else
-#   define PERL_VMS_BANG 0
-#endif
-        SETERRNO(SvIOK(sv) ? SvIVX(sv) : SvOK(sv) ? sv_2iv(sv) : 0,
-                 (SvIV(sv) == EVMSERR) ? 4 : PERL_VMS_BANG);
-        }
-        break;
-    case '<':
-        PL_uid = SvIV(sv);
-        if (PL_delaymagic) {
-            PL_delaymagic |= DM_RUID;
-            break;                              /* don't do magic till later */
-        }
-#ifdef HAS_SETRUID
-        (void)setruid((Uid_t)PL_uid);
-#else
-#ifdef HAS_SETREUID
-        (void)setreuid((Uid_t)PL_uid, (Uid_t)-1);
-#else
-#ifdef HAS_SETRESUID
-      (void)setresuid((Uid_t)PL_uid, (Uid_t)-1, (Uid_t)-1);
-#else
-        if (PL_uid == PL_euid) {                /* special case $< = $> */
-#ifdef PERL_DARWIN
-            /* workaround for Darwin's setuid peculiarity, cf [perl #24122] */
-            if (PL_uid != 0 && PerlProc_getuid() == 0)
-                (void)PerlProc_setuid(0);
-#endif
-            (void)PerlProc_setuid(PL_uid);
-        } else {
-            PL_uid = PerlProc_getuid();
-            Perl_croak(aTHX_ "setruid() not implemented");
-        }
-#endif
-#endif
-#endif
-        PL_uid = PerlProc_getuid();
-        PL_tainting |= (PL_uid && (PL_euid != PL_uid || PL_egid != PL_gid));
-        break;
-    case '>':
-        PL_euid = SvIV(sv);
-        if (PL_delaymagic) {
-            PL_delaymagic |= DM_EUID;
-            break;                              /* don't do magic till later */
-        }
-#ifdef HAS_SETEUID
-        (void)seteuid((Uid_t)PL_euid);
-#else
-#ifdef HAS_SETREUID
-        (void)setreuid((Uid_t)-1, (Uid_t)PL_euid);
-#else
-#ifdef HAS_SETRESUID
-        (void)setresuid((Uid_t)-1, (Uid_t)PL_euid, (Uid_t)-1);
-#else
-        if (PL_euid == PL_uid)          /* special case $> = $< */
-            PerlProc_setuid(PL_euid);
-        else {
-            PL_euid = PerlProc_geteuid();
-            Perl_croak(aTHX_ "seteuid() not implemented");
-        }
-#endif
-#endif
-#endif
-        PL_euid = PerlProc_geteuid();
-        PL_tainting |= (PL_uid && (PL_euid != PL_uid || PL_egid != PL_gid));
-        break;
-    case ':':
-        PL_chopset = SvPV_force(sv,len);
-        break;
+	break;
 #ifndef MACOS_TRADITIONAL
     case '0':
         LOCK_DOLLARZERO_MUTEX;

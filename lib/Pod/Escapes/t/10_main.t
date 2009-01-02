@@ -24,7 +24,7 @@ print "#\n#------------------------\n#\n";
 
 foreach my $quotie (qw( \n \r \cm \cj \t \f \b \a \e )) {
   my $val = eval "\"$quotie\"";
-  if($@) {
+  if($^EVAL_ERROR) {
     ok 0;
     print "# Error in evalling quotie \"$quotie\"\n";
   } elsif(!defined $val) {

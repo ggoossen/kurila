@@ -43,8 +43,8 @@ sub setcolor {
   $colors =~ s/\0//g;
   env::set_var('PERL_RE_COLORS' => $colors);
  };
- if ($@) {
-     die $@;
+ if ($^EVAL_ERROR) {
+     die $^EVAL_ERROR;
  }
 
 }
@@ -85,7 +85,7 @@ sub _do_install {
     if ( ! defined($installed) ) {
         require XSLoader;
         $installed = try { XSLoader::load('re', $VERSION) } || 0;
-        $installed_error = $@;
+        $installed_error = $^EVAL_ERROR;
     }
 }
 

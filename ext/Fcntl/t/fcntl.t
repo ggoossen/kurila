@@ -11,12 +11,12 @@ print "1..7\n";
 
 print "ok 1\n";
 
-if (sysopen(my $wo, "fcntl$$", O_WRONLY^|^O_CREAT)) {
+if (sysopen(my $wo, "fcntl$^PID", O_WRONLY^|^O_CREAT)) {
     print "ok 2\n";
     if (syswrite($wo, "foo") == 3) {
 	print "ok 3\n";
 	close($wo);
-	if (sysopen(my $ro, "fcntl$$", O_RDONLY)) {
+	if (sysopen(my $ro, "fcntl$^PID", O_RDONLY)) {
 	    print "ok 4\n";
 	    if (sysread($ro, my $read, 3)) {
 		print "ok 5\n";
@@ -26,18 +26,18 @@ if (sysopen(my $wo, "fcntl$$", O_WRONLY^|^O_CREAT)) {
 		    print "not ok 6 # content '$read' not ok\n";
 		}
 	    } else {
-		print "not ok 5 # sysread failed: $!\n";
+		print "not ok 5 # sysread failed: $^OS_ERROR\n";
 	    }
             close($ro);
 	} else {
-	    print "not ok 4 # sysopen O_RDONLY failed: $!\n";
+	    print "not ok 4 # sysopen O_RDONLY failed: $^OS_ERROR\n";
 	}
     } else {
-	print "not ok 3 # syswrite failed: $!\n";
+	print "not ok 3 # syswrite failed: $^OS_ERROR\n";
     }
     close($wo);
 } else {
-    print "not ok 2 # sysopen O_WRONLY failed: $!\n";
+    print "not ok 2 # sysopen O_WRONLY failed: $^OS_ERROR\n";
 }
 
 # Opening of character special devices gets special treatment in doio.c
@@ -59,5 +59,5 @@ else {
 }
 
 END {
-    1 while unlink "fcntl$$";
+    1 while unlink "fcntl$^PID";
 }

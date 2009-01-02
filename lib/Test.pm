@@ -2,11 +2,8 @@
 package Test;
 # Time-stamp: "2004-04-28 21:46:51 ADT"
 
-
-use vars ( <qw($VERSION @ISA @EXPORT @EXPORT_OK $ntest $TestLevel), < #public-ish
-          qw($TESTOUT $TESTERR %Program_Lines $told_about_diff
-             $ONFAIL %todo %history $planned @FAILDETAIL) #private-ish
-         );
+our (%todo, %history, @FAILDETAIL, $ntest, $TestLevel, $planned,
+     $ONFAIL, %Program_Lines, $told_about_diff);
 
 # In case a test is run in a persistent environment.
 sub _reset_globals {
@@ -18,16 +15,16 @@ sub _reset_globals {
     $planned    = 0;
 }
 
-$VERSION = '1.25';
+our $VERSION = '1.25';
 require Exporter;
-@ISA=@('Exporter');
+our @ISA=@('Exporter');
 
-@EXPORT    = qw(&plan &ok &skip);
-@EXPORT_OK = qw($ntest $TESTOUT $TESTERR);
+our @EXPORT    = qw(&plan &ok &skip);
+our @EXPORT_OK = qw($ntest $TESTOUT $TESTERR);
 
-$|=1;
-$TESTOUT = *STDOUT{IO};
-$TESTERR = *STDERR{IO};
+$^OUTPUT_AUTOFLUSH=1;
+our $TESTOUT = *STDOUT{IO};
+our $TESTERR = *STDERR{IO};
 
 # Use of this variable is strongly discouraged.  It is set mainly to
 # help test coverage analyzers know which test is running.
@@ -148,7 +145,7 @@ sub plan {
     die "Test::plan(\%args): odd number of arguments" if (nelems @_) ^&^ 1;
     die "Test::plan(): should not be called more than once" if $planned;
 
-    local($\, $,);   # guard against -l and other things that screw with
+    local($^OUTPUT_RECORD_SEPARATOR, $^OUTPUT_FIELD_SEPARATOR);   # guard against -l and other things that screw with
                      # print
 
     _reset_globals();
@@ -351,7 +348,7 @@ problems.  See L</BUGS and CAVEATS>.
 sub ok ($;$$) {
     die "ok: plan before you test!" if !$planned;
 
-    local($\,$,);   # guard against -l and other things that screw with
+    local($^OUTPUT_RECORD_SEPARATOR,$^OUTPUT_FIELD_SEPARATOR);   # guard against -l and other things that screw with
                     # print
 
     my @($pkg,$file,$line, ...) = @: caller($TestLevel);
@@ -502,10 +499,10 @@ sub _diff_complain_external {
             close(DIFF);
         }
         else {
-            warn "Can't run diff: $!";
+            warn "Can't run diff: $^OS_ERROR";
         }
     } else {
-        warn "Can't write to tempfiles: $!";
+        warn "Can't write to tempfiles: $^OS_ERROR";
     }
     unlink($got_filename);
     unlink($exp_filename);
@@ -674,7 +671,7 @@ That is, both are like this:
 =cut
 
 sub skip ($;$$$) {
-    local($\, $,);   # guard against -l and other things that screw with
+    local($^OUTPUT_RECORD_SEPARATOR, $^OUTPUT_FIELD_SEPARATOR);   # guard against -l and other things that screw with
                      # print
 
     my $whyskip = _to_value(shift);

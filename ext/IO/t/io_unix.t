@@ -8,7 +8,7 @@ BEGIN {
 	require IO::Socket;
 
 	try {IO::Socket::pack_sockaddr_un('/foo/bar') || 1}
-	  or $@->{?description} !~ m/not implemented/ or
+	  or $^EVAL_ERROR->{?description} !~ m/not implemented/ or
 	    $reason = 'compiled without TCP/IP stack v4';
     }
     elsif ($^O =~ m/^(?:qnx|nto|vos|MSWin32)$/ ) {
@@ -23,7 +23,7 @@ BEGIN {
     }
 }
 
-my $PATH = "sock-$$";
+my $PATH = "sock-$^PID";
 
 if ($^O eq 'os2') {	# Can't create sockets with relative path...
   require Cwd;
@@ -38,10 +38,10 @@ if (-e $PATH or not open(TEST, ">", "$PATH") and $^O ne 'os2') {
     exit 0;
 }
 close(TEST);
-unlink($PATH) or $^O eq 'os2' or die "Can't unlink $PATH: $!";
+unlink($PATH) or $^O eq 'os2' or die "Can't unlink $PATH: $^OS_ERROR";
 
 # Start testing
-$| = 1;
+$^OUTPUT_AUTOFLUSH = 1;
 print "1..5\n";
 
 use IO::Socket::UNIX;
@@ -54,7 +54,7 @@ my $listen = IO::Socket::UNIX->new(Local => $PATH, Listen => 0);
 # generated filename from a temp directory.
 unless (defined $listen) {
     try { require File::Temp };
-    unless ($@) {
+    unless ($^EVAL_ERROR) {
 	File::Temp->import( 'mktemp');
 	for my $TMPDIR (env::var('TMPDIR'), "/tmp") {
 	    if (defined $TMPDIR && -d $TMPDIR && -w $TMPDIR) {
@@ -64,7 +64,7 @@ unless (defined $listen) {
 	    }
 	}
     }
-    defined $listen or die "$PATH: $!";
+    defined $listen or die "$PATH: $^OS_ERROR";
 }
 print "ok 1\n";
 
@@ -82,18 +82,18 @@ if(my $pid = fork()) {
 	$sock->close;
 
 	waitpid($pid,0);
-	unlink($PATH) || $^O eq 'os2' || warn "Can't unlink $PATH: $!";
+	unlink($PATH) || $^O eq 'os2' || warn "Can't unlink $PATH: $^OS_ERROR";
 
 	print "ok 5\n";
     } else {
-	print "# accept() failed: $!\n";
+	print "# accept() failed: $^OS_ERROR\n";
 	for (2..5) {
 	    print "not ok $_ # accept failed\n";
 	}
     }
 } elsif(defined $pid) {
 
-    my $sock = IO::Socket::UNIX->new(Peer => $PATH) or die "$!";
+    my $sock = IO::Socket::UNIX->new(Peer => $PATH) or die "$^OS_ERROR";
 
     print $sock "ok 3\n";
 

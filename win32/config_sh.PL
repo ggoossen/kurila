@@ -19,7 +19,7 @@ sub loadopts {
 	shift @ARGV;
 	my $optfile = shift @ARGV;
 	local (*F);
-	open OPTF, "<", $optfile or die "Can't open $optfile: $!\n";
+	open OPTF, "<", $optfile or die "Can't open $optfile: $^OS_ERROR\n";
 	my @opts;
 	chomp(my $line = ~< *OPTF);
 	my @vars = split(m/\t+~\t+/, $line);
@@ -55,7 +55,7 @@ FindExt::set_static_extensions( <split ' ', %opt{?'static_ext'});
 my $pl_h = '../patchlevel.h';
 
 if (-e $pl_h) {
-    open PL, "<", "$pl_h" or die "Can't open $pl_h: $!";
+    open PL, "<", "$pl_h" or die "Can't open $pl_h: $^OS_ERROR";
     while ( ~< *PL) {
 	if (m/^#\s*define\s+(PERL_\w+)\s+([\d.]+)/) {
 	    %opt{+$1} = $2;
@@ -64,13 +64,13 @@ if (-e $pl_h) {
     close PL;
 }
 else {
-    die "Can't find $pl_h: $!";
+    die "Can't find $pl_h: $^OS_ERROR";
 }
 
 my $patch_file = '../.patch';
 
 if (-e $patch_file) {
-    open my $fh, "<", $patch_file or die "Can't open $patch_file: $!";
+    open my $fh, "<", $patch_file or die "Can't open $patch_file: $^OS_ERROR";
     chomp(%opt{+PERL_PATCHLEVEL} = ~< $fh);
     close $fh;
 }

@@ -12,7 +12,7 @@
 
 package Pod::Find;
 
-use vars < qw($VERSION);
+our ($VERSION);
 $VERSION = 1.34;   ## Current version of this package
 
 #############################################################################
@@ -52,7 +52,7 @@ use File::Spec;
 use File::Find;
 use Cwd;
 
-use vars < qw(@ISA @EXPORT_OK $VERSION);
+our (@ISA, @EXPORT_OK, $VERSION);
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(&pod_find &simplify_name &pod_where &contains_pod);
 
@@ -484,13 +484,13 @@ sub contains_pod {
 
   # check for one line of POD
   unless(open(POD, "<","$file")) {
-    warn "Error: $file is unreadable: $!\n";
+    warn "Error: $file is unreadable: $^OS_ERROR\n";
     return undef;
   }
   
-  local $/ = undef;
+  local $^INPUT_RECORD_SEPARATOR = undef;
   my $pod = ~< *POD;
-  close(POD) || die "Error closing $file: $!\n";
+  close(POD) || die "Error closing $file: $^OS_ERROR\n";
   unless($pod =~ m/^=(head\d|pod|over|item)\b/m) {
     warn "No POD in $file, skipping.\n"
       if($verbose);

@@ -45,6 +45,6 @@ if (try {require ExtUtils::Constant; 1}) {
   use File::Spec;
   foreach my $file (@('const-c.inc', 'const-xs.inc')) {
     my $fallback = File::Spec->catfile('fallback', $file);
-    copy ($fallback, $file) or die "Can't copy $fallback to $file: $!";
+    copy ($fallback, $file) or die "Can't copy $fallback to $file: $^OS_ERROR";
   }
 }

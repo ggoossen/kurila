@@ -17,7 +17,7 @@ END {
 }
 
 ok( chdir 'Problem-Module', "chdir'd to Problem-Module" ) ||
-  diag("chdir failed: $!");
+  diag("chdir failed: $^OS_ERROR");
 
 
 # Make sure when Makefile.PL's break, they issue a warning.
@@ -25,7 +25,7 @@ ok( chdir 'Problem-Module', "chdir'd to Problem-Module" ) ||
 do {
     my $stdout;
     close STDOUT;
-    open *STDOUT, '>>', \$stdout or die "$!";
+    open *STDOUT, '>>', \$stdout or die "$^OS_ERROR";
 
     my $warning = '';
     local $^WARN_HOOK = sub { $warning = @_[0]->{?description} };
@@ -33,7 +33,7 @@ do {
 
     is( $stdout, qq{\@INC has .\n}, 'cwd in @INC' );
     $stdout = '';
-    like( $@->{?description}, 
+    like( $^EVAL_ERROR->{?description}, 
           qr{^ERROR from evaluation of .*subdir.*Makefile.PL: YYYAaaaakkk},
           'Makefile.PL death in subdir warns' );
 };

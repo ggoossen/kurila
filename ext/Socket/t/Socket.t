@@ -37,7 +37,7 @@ if (socket(T, PF_INET, SOCK_STREAM, IPPROTO_TCP)) {
           print "# gethostbyname() cannot resolve your localhost.\n";
           print "# 'Connection refused' indicates disabled echo service.\n";
           print "# 'Interrupted system call' indicates a hanging echo service.\n";
-          print "# Error: $!\n";
+          print "# Error: $^OS_ERROR\n";
           skip "failed something", 2;
       }
 
@@ -66,7 +66,7 @@ if (socket(T, PF_INET, SOCK_STREAM, IPPROTO_TCP)) {
   };
 }
 else {
-	print "# Error: $!\n";
+	print "# Error: $^OS_ERROR\n";
         ok 0;
 }
 
@@ -81,7 +81,7 @@ if( socket(S, PF_INET,SOCK_STREAM, IPPROTO_TCP) ){
             print "# You're allowed to fail tests 5 and 6 if\n";
             print "# the echo service has been disabled.\n";
             print "# 'Interrupted system call' indicates a hanging echo service.\n";
-            print "# Error: $!\n";
+            print "# Error: $^OS_ERROR\n";
             skip "echo skipped", 2;
         }
 
@@ -110,7 +110,7 @@ if( socket(S, PF_INET,SOCK_STREAM, IPPROTO_TCP) ){
     };
 }
 else {
-	print "# Error: $!\n";
+	print "# Error: $^OS_ERROR\n";
         ok 0;
 }
 

@@ -91,7 +91,7 @@ sub cleanup {
     }
     chdir(File::Spec->updir);
     if (-d dir_path('for_find')) {
-	rmdir dir_path('for_find') or print "# Can't rmdir for_find: $!\n";
+	rmdir dir_path('for_find') or print "# Can't rmdir for_find: $^OS_ERROR\n";
     }
 }
 
@@ -108,7 +108,7 @@ sub Check($) {
 sub CheckDie($) {
     $case++;
     if (@_[0]) { print "ok $case\n"; }
-    else { print "not ok $case\n $!\n"; exit 0; }
+    else { print "not ok $case\n $^OS_ERROR\n"; exit 0; }
 }
 
 sub touch {
@@ -662,10 +662,10 @@ if ( $symlink_exists ) {
     } else {
         CheckDie( symlink('../faa','fa/faa/faa_sl') );
     }
-    undef $@;
+    undef $^EVAL_ERROR;
     try {File::Find::find( \%(wanted => \&simple_wanted, follow => 1,
                              no_chdir => 1), topdir('fa') ); };
-    Check( $@->{?description} =~ m|for_find[:/]fa[:/]faa[:/]faa_sl is a recursive symbolic link|i );  
+    Check( $^EVAL_ERROR->{?description} =~ m|for_find[:/]fa[:/]faa[:/]faa_sl is a recursive symbolic link|i );  
     unlink file_path('fa', 'faa', 'faa_sl'); 
 
 
@@ -675,14 +675,14 @@ if ( $symlink_exists ) {
     } else {
         CheckDie( symlink('./fa_ord','fa/fa_ord_sl') ); # symlink to a file
     }
-    undef $@;
+    undef $^EVAL_ERROR;
 
     try {File::Find::finddepth( \%(wanted => \&simple_wanted,
                                   follow => 1,
                                   follow_skip => 0, no_chdir => 1),
                                   topdir('fa') );};
 
-    Check( $@->{?description} =~ m|for_find[:/]fa[:/]fa_ord encountered a second time|i );
+    Check( $^EVAL_ERROR->{?description} =~ m|for_find[:/]fa[:/]fa_ord encountered a second time|i );
 
 
     # no_chdir is in effect, hence we use file_path_name to specify
@@ -725,22 +725,22 @@ if ( $symlink_exists ) {
     } else {
         CheckDie( symlink('./faa','fa/faa_sl') ); # symlink to a directory
     }
-    undef $@;
+    undef $^EVAL_ERROR;
 
     try {File::Find::find( \%(wanted => \&simple_wanted, follow => 1,
                             follow_skip => 0, no_chdir => 1),
                             topdir('fa') );};
 
-    Check( $@->{?description} =~ m|for_find[:/]fa[:/]faa[:/]? encountered a second time|i );
+    Check( $^EVAL_ERROR->{?description} =~ m|for_find[:/]fa[:/]faa[:/]? encountered a second time|i );
 
   
-    undef $@;
+    undef $^EVAL_ERROR;
 
     try {File::Find::find( \%(wanted => \&simple_wanted, follow => 1,
                             follow_skip => 1, no_chdir => 1),
                             topdir('fa') );};
 
-    Check( $@->{?description} =~ m|for_find[:/]fa[:/]faa[:/]? encountered a second time|i );  
+    Check( $^EVAL_ERROR->{?description} =~ m|for_find[:/]fa[:/]faa[:/]? encountered a second time|i );  
 
     # no_chdir is in effect, hence we use file_path_name to specify
     # the expected paths for %Expect_File

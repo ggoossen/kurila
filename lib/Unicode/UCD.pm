@@ -152,7 +152,7 @@ sub _getcode {
 # but it will be used if available.
 
 try { require Lingua::KO::Hangul::Util };
-my $hasHangulUtil = ! $@;
+my $hasHangulUtil = ! $^EVAL_ERROR;
 if ($hasHangulUtil) {
     Lingua::KO::Hangul::Util->import();
 }

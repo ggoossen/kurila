@@ -28,7 +28,7 @@ $x->flush;
 $x->setpos($p);
 print scalar ~< $x;
 
-$! = 0;
+$^OS_ERROR = 0;
 $x->setpos(undef);
-print $! ?? "ok 4 # $!\n" !! "not ok 4\n";
+print $^OS_ERROR ?? "ok 4 # $^OS_ERROR\n" !! "not ok 4\n";
 

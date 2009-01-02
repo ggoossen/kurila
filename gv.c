@@ -914,34 +914,72 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 	    case '^':
 		if (len > 2) {
 		    switch (*name2) {
-		    case 'C':        /* $^CHILD_ERROR_NATIVE */
-			if (strEQ(name2, "CHILD_ERROR_NATIVE"))
+		    case 'C':        
+			if (strEQ(name2, "CHILD_ERROR")) {
+                            /* $^CHILD_ERROR */
+#ifdef COMPLEX_STATUS
+			    SvUPGRADE(GvSVn(gv), SVt_PVLV);
+#endif
 			    goto magicalize;
+			}
+			if (strEQ(name2, "CHILD_ERROR_NATIVE")) {
+                            /* $^CHILD_ERROR_NATIVE */
+			    goto magicalize;
+			}
 			break;
 		    case 'D':        /* $^DIE_HOOK */
 			if (strEQ(name2, "DIE_HOOK"))
 			    goto magicalize;
 			break;
-		    case 'E':	/* $^ENCODING  $^EGID */
+		    case 'E':	/* $^ENCODING  $^EGID  $^EUID  $^OS_ERROR  $^EVAL_ERROR */
 			if (strEQ(name2, "ENCODING"))
 			    goto magicalize;
 			if (strEQ(name2, "EGID"))
 			    goto magicalize;
+			if (strEQ(name2, "EUID"))
+			    goto magicalize;
+			if (strEQ(name2, "EVAL_ERROR"))
+			    goto no_magicalize;
 			break;
+
 		    case 'G':   /* $^GID */
 			if (strEQ(name2, "GID"))
 			    goto magicalize;
 			break;
+
+		    case 'I':
+			/* $^INPUT_RECORD_SEPARATOR */
+			if (strEQ(name2, "INPUT_RECORD_SEPARATOR"))
+			    goto magicalize;
+			break;
+
 		    case 'M':        /* $^MATCH */
 			if (strEQ(name2, "MATCH"))
 			    goto magicalize;
+			break;
+
 		    case 'O':	/* $^OPEN */
 			if (strEQ(name2, "OPEN"))
 			    goto magicalize;
+			if (strEQ(name2, "OS_ERROR"))
+			    goto magicalize;
+			if (strEQ(name2, "OUTPUT_AUTOFLUSH")) {
+			    sv_setiv(GvSVn(gv), (IV)(IoFLAGS(GvIOp(PL_defoutgv)) & IOf_FLUSH) != 0);
+			    goto magicalize;
+			}
+			/* $^OUTPUT_RECORD_SEPARATOR */
+			if (strEQ(name2, "OUTPUT_RECORD_SEPARATOR"))
+			    goto magicalize;
+			/* $^OUTPUT_FIELD_SEPARATOR */
+			if (strEQ(name2, "OUTPUT_FIELD_SEPARATOR"))
+			    goto magicalize;
+
 			break;
 		    case 'P':        /* $^PREMATCH  $^POSTMATCH */
 			if (strEQ(name2, "PREMATCH") || strEQ(name2, "POSTMATCH"))
 			    goto magicalize;  
+			if (strEQ(name2, "PID"))
+			    goto no_magicalize;  
 			break;
 		    case 'R':        /* $^RE_TRIE_MAXBUF */
 			if (strEQ(name2, "RE_TRIE_MAXBUF") || strEQ(name2, "RE_DEBUG_FLAGS"))
@@ -952,6 +990,8 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 			    goto ro_magicalize;
 			break;
 		    case 'U':	/* $^UNICODE, $^UTF8LOCALE, $^UTF8CACHE */
+			if (strEQ(name2, "UID"))
+			    goto magicalize;
 			if (strEQ(name2, "UNICODE"))
 			    goto ro_magicalize;
 			if (strEQ(name2, "UTF8LOCALE"))
@@ -1028,20 +1068,6 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 	/* Names of length 1.  (Or 0. But name is NUL terminated, so that will
 	   be case '\0' in this switch statement (ie a default case)  */
 	switch (*name) {
-	case ':':
-	    sv_setpv(GvSVn(gv),PL_chopset);
-	    goto magicalize;
-
-	case '?':
-#ifdef COMPLEX_STATUS
-	    SvUPGRADE(GvSVn(gv), SVt_PVLV);
-#endif
-	    goto magicalize;
-
-	case '|':
-	    sv_setiv(GvSVn(gv), (IV)(IoFLAGS(GvIOp(PL_defoutgv)) & IOf_FLUSH) != 0);
-	    goto magicalize;
-
 	ro_magicalize:
 	    SvREADONLY_on(GvSVn(gv));
 	    /* FALL THROUGH */
@@ -1054,18 +1080,9 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 	case '7':
 	case '8':
 	case '9':
-	case '<':
-	case '>':
-	case ',':
-	case '\\':
-	case '/':
-	case '!':
 	magicalize:
 	    sv_magic(GvSVn(gv), (SV*)gv, PERL_MAGIC_sv, name, len);
 
-	case '$':
-	case '@':
-	case '"':
 	case '0':
 	case '_':
 	case 'a':
@@ -1080,13 +1097,24 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 	case '(':
 	case ')':
 	case '[':
+	case '$':
+	case '@':
+	case '"':
+	case ',':
+	case '\\':
+	case '/':
+	case '+':
+	case '-':
+	case '>':
+	case '<':
+	case '!':
+	case '|':
 	case '&':
 	case '`':
 	case '\'':
 	case '.':
 	case ';':
-	case '-':
-	case '+':
+	case '?':
 	    Perl_croak(aTHX_ "Unknown magic variable '%c%s'",
 		       sv_type == SVt_PVAV ? '@' : sv_type == SVt_PVHV ? '%' : '$',
 		       name);

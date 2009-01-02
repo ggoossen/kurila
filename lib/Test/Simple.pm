@@ -1,7 +1,7 @@
 package Test::Simple;
 
 
-use vars < qw($VERSION @ISA @EXPORT);
+our ($VERSION, @ISA, @EXPORT);
 $VERSION = '0.78';
 $VERSION = eval $VERSION;    # make the alpha version come out as a number
 

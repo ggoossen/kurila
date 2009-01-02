@@ -1137,7 +1137,6 @@ s	|void	|no_bareword_allowed|NN const OP *o
 sR	|OP*	|no_fh_allowed|NN OP *o
 sR	|OP*	|too_few_arguments|NN OP *o|NN const char* name
 sR	|OP*	|too_many_arguments|NN OP *o|NN const char* name
-s	|OP*	|ref_array_or_hash|NULLOK OP* cond
 #endif
 #if defined(PL_OP_SLAB_ALLOC)
 Apa	|void*	|Slab_Alloc	|size_t sz
@@ -1418,7 +1417,7 @@ sRn	|PTR_TBL_ENT_t *|ptr_table_find|NN PTR_TBL_t *tbl|NULLOK const void *sv
 s	|void	|check_uni
 s	|void	|force_next	|I32 type
 s	|char*	|force_version	|NN char *s
-s	|SV*	|curlocation
+s	|SV*	|curlocation    |NN const char* location
 s	|char*	|force_word	|NN char *start|int token|int check_keyword \
 				|int allow_pack|int allow_tick
 s	|SV*	|tokeq		|NN SV *sv

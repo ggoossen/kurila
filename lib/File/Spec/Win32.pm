@@ -1,7 +1,7 @@
 package File::Spec::Win32;
 
 
-use vars < qw(@ISA $VERSION);
+our (@ISA, $VERSION);
 require File::Spec::Unix;
 
 $VERSION = '3.2701';

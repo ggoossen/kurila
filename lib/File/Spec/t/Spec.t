@@ -15,7 +15,7 @@ try {
 
 my $skip_exception = "Install VMS::Filespec (from vms/ext)" ;
 
-if ( $@ ) {
+if ( $^EVAL_ERROR ) {
    # Not pretty, but it allows testing of things not implemented soley
    # on VMS.  It might be better to change File::Spec::VMS to do this,
    # making it more usable when running on (say) Unix but working with
@@ -705,7 +705,7 @@ plan tests => scalar (nelems @tests) + 1;
 
 do {
     package File::Spec::FakeWin32;
-    use vars < qw(@ISA);
+    our (@ISA);
     @ISA = qw(File::Spec::Win32);
 
     sub _cwd { 'C:\one\two' }
@@ -757,13 +757,13 @@ sub tryfunc {
     my $got = eval $function;
     $got = join ',',$got if (ref \$got) eq "ARRAY";
 
-    if ( $@ ) {
-      if ( $@->{?description} =~ m/^\Q$skip_exception/ ) {
+    if ( $^EVAL_ERROR ) {
+      if ( $^EVAL_ERROR->{?description} =~ m/^\Q$skip_exception/ ) {
 	skip "skip $function: $skip_exception", 1;
       }
       else {
-        die if $@;
-	is $@, '', $function;
+        die if $^EVAL_ERROR;
+	is $^EVAL_ERROR, '', $function;
       }
       return;
     }

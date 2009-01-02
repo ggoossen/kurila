@@ -7,7 +7,7 @@ env::set_var('LANGUAGE' => 'C'); # GNU locale extension
 
 BEGIN {
     require Config;
-    if ($@) {
+    if ($^EVAL_ERROR) {
 	print "1..0 # Skip: no Config\n";
     } else {
 	Config->import;

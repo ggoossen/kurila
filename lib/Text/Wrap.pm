@@ -9,8 +9,8 @@ our @EXPORT_OK = qw($columns $break $huge);
 
 our $VERSION = 2006.1117;
 
-use vars < qw($VERSION $columns $debug $break $huge $unexpand $tabstop
-	$separator $separator2);
+our ($columns, $debug, $break, $huge, $unexpand, $tabstop,
+     $separator, $separator2);
 
 
 BEGIN	{
@@ -68,7 +68,7 @@ sub wrap
 		} else {
 			die "This shouldn't happen";
 		}
-			
+
 		$lead = $xp;
 		$ll = $nll;
 		$nl = defined($separator2)

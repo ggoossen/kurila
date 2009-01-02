@@ -9,7 +9,7 @@ print "1..3\n";
 
 use SelectSaver;
 
-open(FOO, ">", "foo-$$") || die;
+open(FOO, ">", "foo-$^PID") || die;
 
 print "ok 1\n";
 do {
@@ -18,10 +18,10 @@ do {
 };
 
 # Get data written to file
-open(FOO, "<", "foo-$$") || die;
+open(FOO, "<", "foo-$^PID") || die;
 chomp(my $foo = ~< *FOO);
 close FOO;
-unlink "foo-$$";
+unlink "foo-$^PID";
 
 print "ok 2\n" if $foo eq "foo";
 

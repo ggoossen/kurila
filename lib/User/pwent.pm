@@ -26,8 +26,10 @@ BEGIN {
         ALL    => \@( < @EXPORT, < @EXPORT_OK ),
     );
 }
-use vars < grep m/^\$pw_/, @EXPORT_OK;
 
+our ($pw_name, $pw_passwd, $pw_uid, $pw_gid, $pw_change, $pw_age,
+     $pw_class, $pw_comment, $pw_gecos, $pw_dir, $pw_shell, $pw_expire,
+     $pw_quota);
 #
 # XXX: these mean somebody hacked this module's source
 #      without understanding the underlying assumptions.

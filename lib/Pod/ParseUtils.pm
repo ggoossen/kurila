@@ -9,7 +9,7 @@
 
 package Pod::ParseUtils;
 
-use vars < qw($VERSION);
+our ($VERSION);
 $VERSION = 1.35;   ## Current version of this package
 
 =head1 NAME
@@ -608,7 +608,7 @@ sub _invalid_link {
     # this sets @_
     #try { die "$msg\n" };
     #chomp $@;
-    $@ = $msg; # this seems to work, too!
+    $^EVAL_ERROR = $msg; # this seems to work, too!
     undef;
 }
 

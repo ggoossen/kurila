@@ -28,7 +28,7 @@ BEGIN {
 
     mkpath \@($Auto_Dir);
 
-    open(MOD, ">", "$Module") || $!-> DIE();
+    open(MOD, ">", "$Module") || $^OS_ERROR-> DIE();
     print MOD <<'MODULE';
 package Yup;
 our $Plan = 9;
@@ -72,14 +72,14 @@ BEGIN {
     is( try { do 'Yup.pm'  }, 42,  'do() works' );
     ok( try { require Yup; },      '   require()' );
     ok( eval "use Yup; 1;",         '   use()' );
-    is( $@, '' );
+    is( $^EVAL_ERROR, '' );
 
     is_deeply(\@OrigINC, \@lib::ORIG_INC,    '@lib::ORIG_INC' );
 }
 
 no lib $Lib_Dir;
 
-unlike( do { eval 'use lib config_value("installsitelib");'; $@ || '' },
+unlike( do { eval 'use lib config_value("installsitelib");'; $^EVAL_ERROR || '' },
 	qr/::Config is read-only/, 'lib handles readonly stuff' );
 
 BEGIN {

@@ -12,7 +12,7 @@ BEGIN {
 		   );
     %EXPORT_TAGS = %( FIELDS => \@( < @EXPORT_OK, < @EXPORT ) );
 }
-use vars      < @EXPORT_OK;
+our ($n_name, @n_aliases, $n_addrtype, $n_net);
 
 # Class::Struct forbids use of @ISA
 sub import { goto &Exporter::import }

@@ -136,7 +136,7 @@ my $testid = 1;
 foreach my $test ( @TESTS)
 {
     eval "print (($test->[0]) ?? \"ok $testid\\n\" !! \"not ok $testid\\n\" )";
-    if ($@)
+    if ($^EVAL_ERROR)
     {
 	if (!$test->[1])
 	{

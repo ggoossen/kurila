@@ -34,7 +34,7 @@ SKIP: do {
     skip "no EBADF", 1 if (!exists &Errno::EBADF);
 
     no warnings 'io', 'once';
-    $! = 0;
+    $^OS_ERROR = 0;
     binmode(B);
-    ok($! == &Errno::EBADF( < @_ ));
+    ok($^OS_ERROR == &Errno::EBADF( < @_ ));
 };

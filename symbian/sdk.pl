@@ -73,7 +73,7 @@ if (open(GCC, "-|", "gcc -v 2>&1")) {
    }
    close GCC;
 } else {
-  die "$0: failed to run gcc: $!\n";
+  die "$0: failed to run gcc: $^OS_ERROR\n";
 }
 
 die "$0: failed to locate the Symbian SDK\n" unless defined $SYMBIAN_ROOT;

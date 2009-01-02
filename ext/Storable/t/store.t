@@ -71,7 +71,7 @@ ok(defined $r);
 is_deeply(\%a, $r);
 
 try { $r = fd_retrieve(\*OUT); };
-ok($@);
+ok($^EVAL_ERROR);
 
-close OUT or die "Could not close: $!";
+close OUT or die "Could not close: $^OS_ERROR";
 END { 1 while unlink 'store' }

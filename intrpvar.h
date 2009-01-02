@@ -109,7 +109,6 @@ The output field separator - C<$,> in Perl space.
 PERLVAR(Irs,		SV *)		/* input record separator $/ */
 PERLVAR(Iofs_sv,	SV *)		/* output field separator $, */
 PERLVAR(Idefoutgv,	GV *)		/* default FH for output */
-PERLVARI(Ichopset,	const char *, " \n-")	/* $: */
 
 /* Stashes */
 PERLVAR(Idefstash,	HV *)		/* main symbol table */
@@ -208,7 +207,6 @@ PERLVAR(Iminus_n,	bool)
 PERLVAR(Iminus_p,	bool)
 PERLVAR(Iminus_l,	bool)
 PERLVAR(Iminus_a,	bool)
-PERLVAR(Iminus_E,	bool)
 
 /*
 

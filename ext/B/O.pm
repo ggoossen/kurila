@@ -37,8 +37,8 @@ sub import {
 	    # "fragile kludge") so that its output still looks
 	    # nice. Thanks. --smcc
 	    use B::].$backend.q[ ();
-	    if ($@) {
-		croak "use of backend $backend failed: $@";
+	    if ($^EVAL_ERROR) {
+		croak "use of backend $backend failed: $($^EVAL_ERROR->message)";
 	    }
 
 	    my $compilesub = &{*{Symbol::fetch_glob("B::$($backend)::compile")}}( < @options);
@@ -47,14 +47,14 @@ sub import {
 	    }
 
             our $savebackslash;
-	    local $savebackslash = $\;
-	    local @($\,$",$,) = @(undef,' ','');
+	    local $savebackslash = $^OUTPUT_RECORD_SEPARATOR;
+	    local @($^OUTPUT_RECORD_SEPARATOR,$^OUTPUT_FIELD_SEPARATOR) = @(undef,'');
 	    &$compilesub();
 
 	    close STDERR if $veryquiet;
 	}
     ];
-    die $@ if $@;
+    die $^EVAL_ERROR if $^EVAL_ERROR;
 }
 
 1;

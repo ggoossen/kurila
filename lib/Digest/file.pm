@@ -5,7 +5,7 @@ use Exporter ();
 use Carp < qw(croak);
 use Digest ();
 
-use vars < qw($VERSION @ISA @EXPORT_OK);
+our ($VERSION, @ISA, @EXPORT_OK);
 
 $VERSION = "1.00";
 @ISA = qw(Exporter);
@@ -14,7 +14,7 @@ $VERSION = "1.00";
 sub digest_file_ctx {
     my $file = shift;
     croak("No digest algorithm specified") unless (nelems @_);
-    open(my $fh, "<", $file) || croak("Can't open '$file': $!");
+    open(my $fh, "<", $file) || croak("Can't open '$file': $^OS_ERROR");
     binmode($fh);
     my $ctx = Digest->new(< @_);
     $ctx->addfile($fh);

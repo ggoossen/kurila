@@ -3,7 +3,7 @@ package Module::Loaded;
 use Carp < qw[carp];
 
 BEGIN { use base 'Exporter';
-        use vars < qw[@EXPORT $VERSION];
+        our (@EXPORT, $VERSION);
         
         $VERSION = '0.01';
         @EXPORT  = qw[mark_as_loaded mark_as_unloaded is_loaded];

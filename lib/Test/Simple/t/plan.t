@@ -11,10 +11,10 @@ use Test::More;
 
 plan tests => 4;
 try { plan tests => 4 };
-is( $@->{?description}, sprintf("You tried to plan twice"),
+is( $^EVAL_ERROR->{?description}, sprintf("You tried to plan twice"),
     'disallow double plan' );
 try { plan 'no_plan'  };
-is( $@->{?description}, sprintf("You tried to plan twice"),
+is( $^EVAL_ERROR->{?description}, sprintf("You tried to plan twice"),
     'disallow changing plan' );
 
 pass('Just testing plan()');

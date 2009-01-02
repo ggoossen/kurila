@@ -32,7 +32,7 @@ sub hostname {
 
     # method 2 - no sockets ==> return DECnet node name
     try { $host = (gethostbyname('me'))[0] };
-    if ($@) { return $host = env::var('SYS$NODE'); }
+    if ($^EVAL_ERROR) { return $host = env::var('SYS$NODE'); }
 
     # method 3 - has someone else done the job already?  It's common for the
     #    TCP/IP stack to advertise the hostname via a logical name.  (Are

@@ -8,7 +8,7 @@ use_ok('base');
 
 package No::Version;
 
-use vars < qw($Foo);
+our ($Foo);
 sub VERSION { 42 }
 
 package Test::Version;
@@ -38,7 +38,7 @@ my $eval1 = q{
 };
 
 eval $eval1;
-is( $@, '' );
+is( $^EVAL_ERROR, '' );
 
 is( $Eval1::VERSION, 1.01 );
 
@@ -46,11 +46,11 @@ is( $Eval2::VERSION, 1.02 );
 
 
 eval q{use base 'reallyReAlLyNotexists'};
-like( $@->{?description}, qr/^Base class package "reallyReAlLyNotexists" is empty\./,
+like( $^EVAL_ERROR->{?description}, qr/^Base class package "reallyReAlLyNotexists" is empty\./,
                                           'base with empty package');
 
 eval q{use base 'reallyReAlLyNotexists'};
-like( $@->{?description}, qr/^Base class package "reallyReAlLyNotexists" is empty\./,
+like( $^EVAL_ERROR->{?description}, qr/^Base class package "reallyReAlLyNotexists" is empty\./,
                                           '  still empty on 2nd load');
 do {
     my $warning;
@@ -76,5 +76,5 @@ do {
 
     package Basilisco;
     eval q{ use base 'Schlozhauer' };
-    main::is( $@, '', 'Can coexist with a FIELDS constant' );
+    main::is( $^EVAL_ERROR, '', 'Can coexist with a FIELDS constant' );
 };

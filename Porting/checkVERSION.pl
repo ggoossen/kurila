@@ -24,7 +24,7 @@ sub parse_file {
 
     my $result;
 
-    open(FH, "<",$parsefile) or warn "Could not open '$parsefile': $!";
+    open(FH, "<",$parsefile) or warn "Could not open '$parsefile': $^OS_ERROR";
 
     my $inpod = 0;
     while ( ~< *FH) {
@@ -41,7 +41,7 @@ sub parse_file {
 	};
 	no warnings;
 	$result = eval($eval);
-	warn "Could not eval '$eval' in $parsefile: $@" if $@;
+	warn "Could not eval '$eval' in $parsefile: $^EVAL_ERROR" if $^EVAL_ERROR;
 	$result = "undef" unless defined $result;
 	last;
     }

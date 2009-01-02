@@ -29,11 +29,11 @@ ok 1;
 print "# Testing exceptions being thrown...\n";
 
 try { $x->new->accept_directive('head1') };
-if($@) { ok 1 } # print " # Good: exception thrown: $@\n" }
+if($^EVAL_ERROR) { ok 1 } # print " # Good: exception thrown: $@\n" }
 else   { ok 0,1, 'No exception thrown!' }
 
 try { $x->new->accept_directive('I like pie') };
-if($@) { ok 1 } # print " # Good: exception thrown: $@\n" }
+if($^EVAL_ERROR) { ok 1 } # print " # Good: exception thrown: $@\n" }
 else   { ok 0,1, 'No exception thrown!' }
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

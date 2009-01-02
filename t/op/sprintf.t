@@ -45,7 +45,7 @@ while ( ~< *DATA) {
     }
 
     $evalData = eval $data;
-    die if $@;
+    die if $^EVAL_ERROR;
     $evalData = ref $evalData ?? $evalData !! \@($evalData);
     push @tests, \@($template, $evalData, $result, $comment, $data);
 }

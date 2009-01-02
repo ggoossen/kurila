@@ -265,7 +265,7 @@ do {
     $p="a,b";
     utf8::encode $p;
     try { @a=split(m/[, ]+/,$p) };
-    is ("$@-$(join ' ',@a)-", '-a b-', '#20912 - split() to array with /[]+/ and utf8');
+    is ("$^EVAL_ERROR-$(join ' ',@a)-", '-a b-', '#20912 - split() to array with /[]+/ and utf8');
 };
 
 do {

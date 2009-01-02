@@ -3,9 +3,9 @@ use strict;
 
 use Getopt::Std;
 
-use vars qw($trysource $tryout $sentinel);
-$trysource = "try.c";
-$tryout = "try.i";
+our $sentinel;
+our $trysource = "try.c";
+our $tryout = "try.i";
 
 getopts('fF:ekvI:', \my %opt) or usage();
 

@@ -4,7 +4,7 @@
 #
 
 
-use vars < qw($want_colon $want_comma);
+our ($want_colon, $want_comma);
 use Test::More tests => 9;
 
 no warnings < qw(once);

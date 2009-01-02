@@ -23,8 +23,8 @@ BEGIN {
 
 sub fork_and_retrieve {
     my $which = shift;
-    pipe my ($r, $w) or die "pipe: $!\n";
-    my $pid = fork; defined $pid or die "fork: $!\n";
+    pipe my ($r, $w) or die "pipe: $^OS_ERROR\n";
+    my $pid = fork; defined $pid or die "fork: $^OS_ERROR\n";
 
     if ($pid) {
 	# parent
@@ -49,7 +49,7 @@ sub fork_and_retrieve {
 	$::NO_ENDING = 1;
 	close $r;
 
-	my $pid2 = fork; defined $pid2 or die "fork: $!\n";
+	my $pid2 = fork; defined $pid2 or die "fork: $^OS_ERROR\n";
 	if ($pid2) {
 	    close $w;
 	    sleep 1;
@@ -72,4 +72,4 @@ SKIP: do {
     skip ("Orphan processes are not reparented on QNX", 1) if $^O eq 'nto';
     is ($first, $second, "Both orphaned grandchildren get the same new parent");
 };
-isnt ($first, $$, "And that new parent isn't this process");
+isnt ($first, $^PID, "And that new parent isn't this process");

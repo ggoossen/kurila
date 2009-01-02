@@ -49,9 +49,9 @@ sub _init_optags {
      %all{[opset_to_ops(full_opset())]} = @(); # keys only
 
     local($_);
-    local($/) = "\n=cut"; # skip to optags definition section
+    local($^INPUT_RECORD_SEPARATOR) = "\n=cut"; # skip to optags definition section
     ~< *DATA;
-    $/ = "\n=";		# now read in 'pod section' chunks
+    $^INPUT_RECORD_SEPARATOR = "\n=";		# now read in 'pod section' chunks
     while( ~< *DATA) {
 	next unless m/^item\s+(:\w+)/;
 	my $tag = $1;
@@ -404,8 +404,6 @@ These are a hotchpotch of opcodes still waiting to be considered
     getppid getpgrp setpgrp getpriority setpriority localtime gmtime
 
     entertry leavetry -- can be used to 'hide' fatal errors
-
-    smartmatch
 
     custom -- where should this go
 

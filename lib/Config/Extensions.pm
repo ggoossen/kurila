@@ -1,6 +1,6 @@
 package Config::Extensions;
 
-use vars < qw(%Extensions $VERSION @ISA @EXPORT_OK);
+our (%Extensions, $VERSION, @ISA, @EXPORT_OK);
 use Config;
 require Exporter;
 

@@ -1,7 +1,7 @@
 package ExtUtils::Install;
 
 
-use vars < qw(@ISA @EXPORT $VERSION $MUST_REBOOT);
+our (@ISA, @EXPORT, $VERSION, $MUST_REBOOT);
 
 use Config < qw(config_value);
 use Cwd < qw(cwd);
@@ -135,7 +135,7 @@ sub _chmod($$;$) {
     if (chmod $mode, $item) {
         print "chmod($mode, $item)\n" if $verbose +> 1;
     } else {
-        my $err="$!";
+        my $err="$^OS_ERROR";
         _warnonce "WARNING: Failed chmod($mode, $item): $err\n"
             if -e $item;
     }
@@ -248,9 +248,9 @@ sub _unlink_or_rename { #XXX OS-SPECIFIC
     _chmod( 0666, $file );
     unlink $file
         and return $file;
-    my $error="$!";
+    my $error="$^OS_ERROR";
 
-    _choke("Cannot unlink '$file': $!")
+    _choke("Cannot unlink '$file': $^OS_ERROR")
           unless $CanMoveAtBoot && $tryhard;
 
     my $tmp= "AAA";
@@ -269,12 +269,12 @@ sub _unlink_or_rename { #XXX OS-SPECIFIC
         _move_file_at_boot( $tmp, \@(), $installing );
         return $file;
     } elsif ( $installing ) {
-        _warnonce("Rename failed: $!. Scheduling '$tmp'\nfor".
+        _warnonce("Rename failed: $^OS_ERROR. Scheduling '$tmp'\nfor".
              " installation as '$file' at reboot.\n");
         _move_file_at_boot( $tmp, $file );
         return $tmp;
     } else {
-        _choke("Rename failed:$!", "Cannot procede.");
+        _choke("Rename failed:$^OS_ERROR", "Cannot procede.");
     }
 
 }
@@ -327,7 +327,7 @@ sub _get_install_skip {
             }
             $skip= \@patterns;
         } else {
-            warn "Can't read skip file:'$skip':$!\n";
+            warn "Can't read skip file:'$skip':$^OS_ERROR\n";
             $skip=\@();
         }
     } elsif ( UNIVERSAL::isa($skip,'ARRAY') ) {
@@ -446,7 +446,7 @@ sub _mkpath {
     }
     if (!$dry_run) {
         if ( ! try { File::Path::mkpath($dir,$show,$mode); 1 } ) {
-            _choke("Can't create '$dir'","$@");
+            _choke("Can't create '$dir'","$^EVAL_ERROR");
         }
 
     }
@@ -490,7 +490,7 @@ sub _copy {
     }
     if (!$dry_run) {
         File::Copy::copy($from,$to)
-            or Carp::croak( < _estr "ERROR: Cannot copy '$from' to '$to': $!" );
+            or Carp::croak( < _estr "ERROR: Cannot copy '$from' to '$to': $^OS_ERROR" );
     }
 }
 
@@ -516,7 +516,7 @@ sub _symlink {
     if (!$nonono) {
         $old = File::Spec->rel2abs( $old );
         symlink($old,$new)
-            or Carp::croak( < _estr "ERROR: Cannot symlink '$new' to '$old': $!" );
+            or Carp::croak( < _estr "ERROR: Cannot symlink '$new' to '$old': $^OS_ERROR" );
     }
 }
 
@@ -536,7 +536,7 @@ sub _chdir {
     my @($dir)=  @_;
     my $ret = cwd();
     chdir $dir
-        or _choke("Couldn't chdir to '$dir': $!");
+        or _choke("Couldn't chdir to '$dir': $^OS_ERROR");
     return $ret;
 }
 
@@ -806,7 +806,7 @@ sub install { #XXX OS-SPECIFIC
                 1
             } or do {
                 $result->{+install_fail}->{+$targetfile} = $sourcefile;
-                die $@;
+                die $^EVAL_ERROR;
             };
         } else {
             $result->{+install_unchanged}->{+$targetfile} = $sourcefile;
@@ -1103,7 +1103,7 @@ sub inc_uninstall {
                 if ($seen_ours) { 
                     warn "Failed to remove probably harmless shadow file '$targetfile'\n";
                 } else {
-                    die "$@\n";
+                    die "$^EVAL_ERROR\n";
                 }
             };
         }
@@ -1123,8 +1123,8 @@ Filter $src using $cmd into $dest.
 sub run_filter {
     my @($cmd, $src, $dest) =  @_;
     local(*CMD, *SRC);
-    open(CMD, '|-', "$cmd >$dest") || die "Cannot fork: $!";
-    open(SRC, "<", $src)           || die "Cannot open $src: $!";
+    open(CMD, '|-', "$cmd >$dest") || die "Cannot fork: $^OS_ERROR";
+    open(SRC, "<", $src)           || die "Cannot open $src: $^OS_ERROR";
     my $buf;
     my $sz = 1024;
     while (my $len = sysread(SRC, $buf, $sz)) {

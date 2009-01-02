@@ -4,7 +4,7 @@
 use File::Spec;
 use lib File::Spec->catfile('t', 'lib');
 use Test::More;
-local $|=1;
+local $^OUTPUT_AUTOFLUSH=1;
 
 my @platforms = qw(Cygwin Epoc Mac OS2 Unix VMS Win32);
 my $tests_per_platform = 10;
@@ -34,7 +34,7 @@ foreach my $platform ( @platforms) {
     eval "require $module; 1";
 
     skip "Can't load $module", $tests_per_platform
-      if $@;
+      if $^EVAL_ERROR;
     
     my $v = %volumes{?$platform} || '';
     my $other_v = %other_vols{?$platform} || '';

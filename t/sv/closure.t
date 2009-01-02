@@ -13,10 +13,10 @@ print "1..61\n";
 
 my $test = 1;
 sub test (&) {
-  my $ok = &{@_[0]};
-  print $ok ?? "ok $test\n" !! "not ok $test\n";
-  printf "# Failed at line \%d\n", @(caller)[2] unless $ok;
-  $test++;
+    my $ok = &{@_[0]};
+    print $ok ?? "ok $test\n" !! "not ok $test\n";
+    printf "# Failed at line \%d\n", @(caller)[2] unless $ok;
+    $test++;
 }
 
 my $i = 1;
@@ -40,8 +40,8 @@ test {&$bar() == 3 };
 
 # closure: lexical inside sub
 sub bar {
-  my $i = shift;
-  sub { $i = shift if (nelems @_); $i }
+    my $i = shift;
+    sub { $i = shift if (nelems @_); $i }
 }
 
 $foo = bar(4);
@@ -53,14 +53,14 @@ test {&$bar() == 5 };
 
 # nested closures
 sub bizz {
-  my $i = 7;
-  if ((nelems @_)) {
-    my $i = shift;
-    sub {$i = shift if (nelems @_); $i };
-  } else {
-    my $i = $i;
-    sub {$i = shift if (nelems @_); $i };
-  }
+    my $i = 7;
+    if ((nelems @_)) {
+        my $i = shift;
+        sub {$i = shift if (nelems @_); $i };
+    } else {
+        my $i = $i;
+        sub {$i = shift if (nelems @_); $i };
+    }
 }
 $foo = bizz();
 $bar = bizz();
@@ -75,59 +75,59 @@ test {&$foo(11)-1 == &$bar()};
 
 my @foo;
 for (qw(0 1 2 3 4)) {
-  my $i = $_;
-  @foo[+$_] = sub {$i = shift if (nelems @_); $i };
-}
-
-test {
-  &{@foo[0]}() == 0 and
-  &{@foo[1]}() == 1 and
-  &{@foo[2]}() == 2 and
-  &{@foo[3]}() == 3 and
-  &{@foo[4]}() == 4
-  };
-
-for (0 .. 4) {
-  &{@foo[$_]}(4-$_);
-}
-
-test {
-  &{@foo[0]}() == 4 and
-  &{@foo[1]}() == 3 and
-  &{@foo[2]}() == 2 and
-  &{@foo[3]}() == 1 and
-  &{@foo[4]}() == 0
-  };
-
-sub barf {
-  my @foo;
-  for (qw(0 1 2 3 4)) {
     my $i = $_;
     @foo[+$_] = sub {$i = shift if (nelems @_); $i };
-  }
-  @foo;
+}
+
+test {
+    &{@foo[0]}() == 0 and
+      &{@foo[1]}() == 1 and
+        &{@foo[2]}() == 2 and
+          &{@foo[3]}() == 3 and
+            &{@foo[4]}() == 4
+        };
+
+for (0 .. 4) {
+    &{@foo[$_]}(4-$_);
+}
+
+test {
+    &{@foo[0]}() == 4 and
+      &{@foo[1]}() == 3 and
+        &{@foo[2]}() == 2 and
+          &{@foo[3]}() == 1 and
+            &{@foo[4]}() == 0
+        };
+
+sub barf {
+    my @foo;
+    for (qw(0 1 2 3 4)) {
+        my $i = $_;
+        @foo[+$_] = sub {$i = shift if (nelems @_); $i };
+    }
+    @foo;
 }
 
 @foo = barf();
 test {
-  &{@foo[0]}() == 0 and
-  &{@foo[1]}() == 1 and
-  &{@foo[2]}() == 2 and
-  &{@foo[3]}() == 3 and
-  &{@foo[4]}() == 4
-  };
+    &{@foo[0]}() == 0 and
+      &{@foo[1]}() == 1 and
+        &{@foo[2]}() == 2 and
+          &{@foo[3]}() == 3 and
+            &{@foo[4]}() == 4
+        };
 
 for (0 .. 4) {
-  &{@foo[$_]}(4-$_);
+    &{@foo[$_]}(4-$_);
 }
 
 test {
-  &{@foo[0]}() == 4 and
-  &{@foo[1]}() == 3 and
-  &{@foo[2]}() == 2 and
-  &{@foo[3]}() == 1 and
-  &{@foo[4]}() == 0
-  };
+    &{@foo[0]}() == 4 and
+      &{@foo[1]}() == 3 and
+        &{@foo[2]}() == 2 and
+          &{@foo[3]}() == 1 and
+            &{@foo[4]}() == 0
+        };
 
 # test if closures get created in optimized for loops
 
@@ -137,39 +137,39 @@ for my $n (qw[A B C D E]) {
 }
 
 test {
-  &{%foo{?A}}('A') and
-  &{%foo{?B}}('B') and
-  &{%foo{?C}}('C') and
-  &{%foo{?D}}('D') and
-  &{%foo{?E}}('E')
-};
+    &{%foo{?A}}('A') and
+      &{%foo{?B}}('B') and
+        &{%foo{?C}}('C') and
+          &{%foo{?D}}('D') and
+            &{%foo{?E}}('E')
+        };
 
 for my $n (0..4) {
     @foo[$n] = sub { $n == @_[0] };
 }
 
 test {
-  &{@foo[0]}(0) and
-  &{@foo[1]}(1) and
-  &{@foo[2]}(2) and
-  &{@foo[3]}(3) and
-  &{@foo[4]}(4)
-};
+    &{@foo[0]}(0) and
+      &{@foo[1]}(1) and
+        &{@foo[2]}(2) and
+          &{@foo[3]}(3) and
+            &{@foo[4]}(4)
+        };
 
 for my $n (0..4) {
     @foo[$n] = sub {
-                     # no intervening reference to $n here
-                     sub { $n == @_[0] }
-		   };
+        # no intervening reference to $n here
+        sub { $n == @_[0] }
+    };
 }
 
 test {
-  @foo[0]->()->(0) and
-  @foo[1]->()->(1) and
-  @foo[2]->()->(2) and
-  @foo[3]->()->(3) and
-  @foo[4]->()->(4)
-};
+    @foo[0]->()->(0) and
+      @foo[1]->()->(1) and
+        @foo[2]->()->(2) and
+          @foo[3]->()->(3) and
+            @foo[4]->()->(4)
+        };
 
 do {
     my $w;
@@ -184,9 +184,7 @@ do {
 # Additional tests by Tom Phoenix <rootbeer@teleport.com>.
 
 do {
-    
 
-    use vars < qw!$test!;
     my($debugging, %expected);
     my($nc_attempt, $call_outer, $call_inner, $undef_outer);
     my($code, $expected, $errors, $output);
@@ -208,32 +206,32 @@ do {
 
     # Our innermost sub is either named or anonymous
     for my $inner_type (qw!anon!) {
-      # And it may be declared at filescope, within a named
-      # sub, or within an anon sub
-      for my $where_declared (qw!filescope in_named in_anon!) {
+        # And it may be declared at filescope, within a named
+        # sub, or within an anon sub
+        for my $where_declared (qw!filescope in_named in_anon!) {
 
-	# And that, in turn, may be within a foreach loop,
-	# a naked block, or another named sub
-	for my $within (qw!foreach!) {
+            # And that, in turn, may be within a foreach loop,
+            # a naked block, or another named sub
+            for my $within (qw!foreach!) {
 
-	  # Here are a number of variables which show what's
-	  # going on, in a way.
-	  $nc_attempt = 0+		# Named closure attempted
-	      ( ($inner_type eq 'named') ||
-	      ($within eq 'other_sub') ) ;
-	  $call_inner = 0+		# Need to call &inner
-	      ( ($inner_type eq 'anon') &&
-	      ($within eq 'other_sub') ) ;
-	  $call_outer = 0+		# Need to call &outer or &$outer
-	      ( ($inner_type eq 'anon') &&
-	      ($within ne 'other_sub') ) ;
-	  $undef_outer = 0+		# $outer is created but unused
-	      ( ($where_declared eq 'in_anon') &&
-	      (not $call_outer) ) ;
+                # Here are a number of variables which show what's
+                # going on, in a way.
+                $nc_attempt = 0+ # Named closure attempted
+                  ( ($inner_type eq 'named') ||
+                      ($within eq 'other_sub') ) ;
+                $call_inner = 0+ # Need to call &inner
+                  ( ($inner_type eq 'anon') &&
+                      ($within eq 'other_sub') ) ;
+                $call_outer = 0+ # Need to call &outer or &$outer
+                  ( ($inner_type eq 'anon') &&
+                      ($within ne 'other_sub') ) ;
+                $undef_outer = 0+ # $outer is created but unused
+                  ( ($where_declared eq 'in_anon') &&
+                      (not $call_outer) ) ;
 
-	  $code = "# This is a test script built by t/op/closure.t\n\n";
+                $code = "# This is a test script built by t/op/closure.t\n\n";
 
-	  print <<"DEBUG_INFO" if $debugging;
+                print <<"DEBUG_INFO" if $debugging;
 # inner_type:     $inner_type 
 # where_declared: $where_declared 
 # within:         $within
@@ -243,18 +241,18 @@ do {
 # undef_outer:    $undef_outer
 DEBUG_INFO
 
-	  $code .= <<"END_MARK_ONE";
+                $code .= <<"END_MARK_ONE";
 
 BEGIN \{ \$^WARN_HOOK = sub \{ 
     my \$msg = \@_[0]->message;
 END_MARK_ONE
 
-	  $code .=  <<"END_MARK_TWO" if $nc_attempt;
+                $code .=  <<"END_MARK_TWO" if $nc_attempt;
     return if index(\$msg, 'will not stay shared') != -1;
     return if index(\$msg, 'is not available') != -1;
 END_MARK_TWO
 
-	  $code .= <<"END_MARK_THREE";		# Backwhack a lot!
+                $code .= <<"END_MARK_THREE"; # Backwhack a lot!
     print "not ok: got unexpected warning \$msg\\n";
 \} \}
 
@@ -279,220 +277,223 @@ my \%fs_hash = \%( < 6000..6009);
 
 END_MARK_THREE
 
-	  if ($where_declared eq 'filescope') {
-	    # Nothing here
-	  } elsif ($where_declared eq 'in_named') {
-	    $code .= <<'END';
+                if ($where_declared eq 'filescope') {
+                    # Nothing here
+                } elsif ($where_declared eq 'in_named') {
+                    $code .= <<'END';
 sub outer {
   my $sub_scalar = 7000;
   my @sub_array = @(8000, 8100, 8200, 8300);
   my %sub_hash = %(<9000..9009);
 END
-    # }
-	  } elsif ($where_declared eq 'in_anon') {
-	    $code .= <<'END';
+                    # }
+                } elsif ($where_declared eq 'in_anon') {
+                    $code .= <<'END';
 our $outer = sub {
   my $sub_scalar = 7000;
   my @sub_array = @(8000, 8100, 8200, 8300);
   my %sub_hash = %(<9000..9009);
 END
-    # }
-	  } else {
-	    die "What was $where_declared?"
-	  }
+                    # }
+                } else {
+                    die "What was $where_declared?"
+                }
 
-	  if ($within eq 'foreach') {
-	    $code .= '
+                if ($within eq 'foreach') {
+                    $code .= '
       my @list = @(10000, 10010);
       foreach my $foreach (@list) {
     ' # }
-	  } elsif ($within eq 'other_sub') {
-	    $code .= "  sub inner_sub \{\n"	# }
-	  } else {
-	    die "What was $within?"
-	  }
+                } elsif ($within eq 'other_sub') {
+                    $code .= "  sub inner_sub \{\n" # }
+                } else {
+                    die "What was $within?"
+                }
 
-	  $sub_test = $test;
-	  @inners = @( < qw!global_scalar global_array global_hash! , <
-	    qw!fs_scalar fs_array fs_hash! );
-	  if ($where_declared ne 'filescope') {
-	    push @inners, < qw!sub_scalar sub_array sub_hash!;
-	  }
-	  for my $inner_sub_test ( @inners) {
+                $sub_test = $test;
+                @inners = @( < qw!global_scalar global_array global_hash! , <
+                               qw!fs_scalar fs_array fs_hash! );
+                if ($where_declared ne 'filescope') {
+                    push @inners, < qw!sub_scalar sub_array sub_hash!;
+                }
+                for my $inner_sub_test ( @inners) {
 
-	    if ($inner_type eq 'named') {
-	      $code .= "    sub named_$sub_test "
-	    } elsif ($inner_type eq 'anon') {
-	      $code .= "    our \$anon_$sub_test = sub "
-	    } else {
-	      die "What was $inner_type?"
-	    }
+                    if ($inner_type eq 'named') {
+                        $code .= "    sub named_$sub_test "
+                    } elsif ($inner_type eq 'anon') {
+                        $code .= "    our \$anon_$sub_test = sub "
+                    } else {
+                        die "What was $inner_type?"
+                    }
 
-	    # Now to write the body of the test sub
-	    if ($inner_sub_test eq 'global_scalar') {
-	      $code .= '{ ++$global_scalar }'
-	    } elsif ($inner_sub_test eq 'fs_scalar') {
-	      $code .= '{ ++$fs_scalar }'
-	    } elsif ($inner_sub_test eq 'sub_scalar') {
-	      $code .= '{ ++$sub_scalar }'
-	    } elsif ($inner_sub_test eq 'global_array') {
-	      $code .= '{ ++@global_array[1] }'
-	    } elsif ($inner_sub_test eq 'fs_array') {
-	      $code .= '{ ++@fs_array[1] }'
-	    } elsif ($inner_sub_test eq 'sub_array') {
-	      $code .= '{ ++@sub_array[1] }'
-	    } elsif ($inner_sub_test eq 'global_hash') {
-	      $code .= '{ ++%global_hash{3002} }'
-	    } elsif ($inner_sub_test eq 'fs_hash') {
-	      $code .= '{ ++%fs_hash{6002} }'
-	    } elsif ($inner_sub_test eq 'sub_hash') {
-	      $code .= '{ ++%sub_hash{9002} }'
-	    } else {
-	      die "What was $inner_sub_test?"
-	    }
+                    # Now to write the body of the test sub
+                    if ($inner_sub_test eq 'global_scalar') {
+                        $code .= '{ ++$global_scalar }'
+                    } elsif ($inner_sub_test eq 'fs_scalar') {
+                        $code .= '{ ++$fs_scalar }'
+                    } elsif ($inner_sub_test eq 'sub_scalar') {
+                        $code .= '{ ++$sub_scalar }'
+                    } elsif ($inner_sub_test eq 'global_array') {
+                        $code .= '{ ++@global_array[1] }'
+                    } elsif ($inner_sub_test eq 'fs_array') {
+                        $code .= '{ ++@fs_array[1] }'
+                    } elsif ($inner_sub_test eq 'sub_array') {
+                        $code .= '{ ++@sub_array[1] }'
+                    } elsif ($inner_sub_test eq 'global_hash') {
+                        $code .= '{ ++%global_hash{3002} }'
+                    } elsif ($inner_sub_test eq 'fs_hash') {
+                        $code .= '{ ++%fs_hash{6002} }'
+                    } elsif ($inner_sub_test eq 'sub_hash') {
+                        $code .= '{ ++%sub_hash{9002} }'
+                    } else {
+                        die "What was $inner_sub_test?"
+                    }
 	  
-	    # Close up
-	    if ($inner_type eq 'anon') {
-	      $code .= ';'
-	    }
-	    $code .= "\n";
-	    $sub_test++;	# sub name sequence number
+                    # Close up
+                    if ($inner_type eq 'anon') {
+                        $code .= ';'
+                    }
+                    $code .= "\n";
+                    $sub_test++; # sub name sequence number
 
-	  } # End of foreach $inner_sub_test
+                }               # End of foreach $inner_sub_test
 
-	  # Close up $within block		# {
-	  $code .= "  \}\n\n";
+                # Close up $within block		# {
+                $code .= "  \}\n\n";
 
-	  # Close up $where_declared block
-	  if ($where_declared eq 'in_named') {	# {
-	    $code .= "\}\n\n";
-	  } elsif ($where_declared eq 'in_anon') {	# {
-	    $code .= "\};\n\n";
-	  }
+                # Close up $where_declared block
+                if ($where_declared eq 'in_named') { # {
+                    $code .= "\}\n\n";
+                } elsif ($where_declared eq 'in_anon') { # {
+                    $code .= "\};\n\n";
+                }
 
-	  # We may need to do something with the sub we just made...
-	  $code .= "undef \$outer;\n" if $undef_outer;
-	  $code .= "&inner_sub;\n" if $call_inner;
-	  if ($call_outer) {
-	    if ($where_declared eq 'in_named') {
-	      $code .= "&outer;\n\n";
-	    } elsif ($where_declared eq 'in_anon') {
-	      $code .= "&\$outer;\n\n"
-	    }
-	  }
+                # We may need to do something with the sub we just made...
+                $code .= "undef \$outer;\n" if $undef_outer;
+                $code .= "&inner_sub;\n" if $call_inner;
+                if ($call_outer) {
+                    if ($where_declared eq 'in_named') {
+                        $code .= "&outer;\n\n";
+                    } elsif ($where_declared eq 'in_anon') {
+                        $code .= "&\$outer;\n\n"
+                    }
+                }
 
-	  # Now, we can actually prep to run the tests.
-	  for my $inner_sub_test ( @inners) {
-	    $expected = %expected{?$inner_sub_test} or
-	      die "expected $inner_sub_test missing";
+                # Now, we can actually prep to run the tests.
+                for my $inner_sub_test ( @inners) {
+                    $expected = %expected{?$inner_sub_test} or
+                      die "expected $inner_sub_test missing";
 
-	    # Named closures won't access the expected vars
-	    if ( $nc_attempt and 
-		substr($inner_sub_test, 0, 4) eq "sub_" ) {
-	      $expected = 1;
-	    }
+                    # Named closures won't access the expected vars
+                    if ( $nc_attempt and 
+                           substr($inner_sub_test, 0, 4) eq "sub_" ) {
+                        $expected = 1;
+                    }
 
-	    # If you make a sub within a foreach loop,
-	    # what happens if it tries to access the 
-	    # foreach index variable? If it's a named
-	    # sub, it gets the var from "outside" the loop,
-	    # but if it's anon, it gets the value to which
-	    # the index variable is aliased.
-	    #
-	    # Of course, if the value was set only
-	    # within another sub which was never called,
-	    # the value has not been set yet.
-	    #
-	    if ($inner_sub_test eq 'foreach') {
-	      if ($inner_type eq 'named') {
-		if ($call_outer || ($where_declared eq 'filescope')) {
-		  $expected = 12001
-		} else {
-		  $expected = 1
-		}
-	      }
-	    }
+                    # If you make a sub within a foreach loop,
+                    # what happens if it tries to access the 
+                    # foreach index variable? If it's a named
+                    # sub, it gets the var from "outside" the loop,
+                    # but if it's anon, it gets the value to which
+                    # the index variable is aliased.
+                    #
+                    # Of course, if the value was set only
+                    # within another sub which was never called,
+                    # the value has not been set yet.
+                    #
+                    if ($inner_sub_test eq 'foreach') {
+                        if ($inner_type eq 'named') {
+                            if ($call_outer || ($where_declared eq 'filescope')) {
+                                $expected = 12001
+                            } else {
+                                $expected = 1
+                            }
+                        }
+                    }
 
-	    # Here's the test:
-	    if ($inner_type eq 'anon') {
-	      $code .= "test \{ our \$anon_$test; &\$anon_$test == $expected \};\n"
-	    } else {
-	      $code .= "test \{ &named_$test == $expected \};\n"
-	    }
-	    $test++;
-	  }
+                    # Here's the test:
+                    if ($inner_type eq 'anon') {
+                        $code .= "test \{ our \$anon_$test; &\$anon_$test == $expected \};\n"
+                    } else {
+                        $code .= "test \{ &named_$test == $expected \};\n"
+                    }
+                    $test++;
+                }
 
-	  if (config_value('d_fork') and $^O ne 'VMS' and $^O ne 'MSWin32' and $^O ne 'NetWare') {
-	    # Fork off a new perl to run the tests.
-	    # (This is so we can catch spurious warnings.)
-	    $| = 1; print ""; $| = 0; # flush output before forking
-	    pipe READ, 'WRITE' or die "Can't make pipe: $!";
-	    pipe READ2, 'WRITE2' or die "Can't make second pipe: $!";
-	    die "Can't fork: $!" unless defined($pid = open PERL, "|-", '-');
-	    unless ($pid) {
-	      # Child process here. We're going to send errors back
-	      # through the extra pipe.
-	      close READ;
-	      close READ2;
-	      open STDOUT, ">&", \*WRITE  or die "Can't redirect STDOUT: $!";
-	      open STDERR, ">&", \*WRITE2 or die "Can't redirect STDERR: $!";
-	      exec which_perl(), '-w', '-MTestInit', '-'
-		or die "Can't exec perl: $!";
-	    } else {
-	      # Parent process here.
-	      close WRITE;
-	      close WRITE2;
-	      print PERL $code;
-	      close PERL;
-	      do { local $/;
-	        $output = join '', @( ~< *READ);
-	        $errors = join '', @( ~< *READ2); };
-	      close READ;
-	      close READ2;
-	    }
-	  } else {
-	    # No fork().  Do it the hard way.
-	    my $cmdfile = "tcmd$$";  $cmdfile++ while -e $cmdfile;
-	    my $errfile = "terr$$";  $errfile++ while -e $errfile;
-	    my @tmpfiles = @($cmdfile, $errfile);
-	    open CMD, ">", "$cmdfile"; print CMD $code; close CMD;
-	    my $cmd = which_perl();
-	    $cmd .= " -w $cmdfile 2>$errfile";
-	    if ($^O eq 'VMS' or $^O eq 'MSWin32' or $^O eq 'NetWare') {
-	      # Use pipe instead of system so we don't inherit STD* from
-	      # this process, and then foul our pipe back to parent by
-	      # redirecting output in the child.
-	      open PERL, "-", "$cmd" or die "Can't open pipe: $!\n";
-	      do { local $/; $output = join '', @( ~< *PERL) };
-	      close PERL;
-	    } else {
-	      my $outfile = "tout$$";  $outfile++ while -e $outfile;
-	      push @tmpfiles, $outfile;
-	      system "$cmd >$outfile";
-	      do { local $/; open IN, "<", $outfile; $output = ~< *IN; close IN };
-	    }
-	    if ($?) {
-	      printf "not ok: exited with error code \%04X\n", $?;
-	      $debugging or do { 1 while unlink < @tmpfiles };
-	      exit;
-	    }
-	    do { local $/; open IN, "<", $errfile; $errors = ~< *IN; close IN };
-	    1 while unlink < @tmpfiles;
-	  }
-	  print $output;
-	  print STDERR $errors;
-	  if ($debugging && ($errors || $? || ($output =~ m/not ok/))) {
-	    my $lnum = 0;
-	    for my $line (split '\n', $code) {
-	      printf "\%3d:  \%s\n", ++$lnum, $line;
-	    }
-	  }
-	  printf "not ok: exited with error code \%04X\n", $? if $?;
-	  print '#', "-" x 30, "\n" if $debugging;
+                if (config_value('d_fork') and $^O ne 'VMS' and $^O ne 'MSWin32' and $^O ne 'NetWare') {
+                    # Fork off a new perl to run the tests.
+                    # (This is so we can catch spurious warnings.)
+                    $^OUTPUT_AUTOFLUSH = 1; print ""; $^OUTPUT_AUTOFLUSH = 0; # flush output before forking
+                    pipe READ, 'WRITE' or die "Can't make pipe: $^OS_ERROR";
+                    pipe READ2, 'WRITE2' or die "Can't make second pipe: $^OS_ERROR";
+                    die "Can't fork: $^OS_ERROR" unless defined($pid = open PERL, "|-", '-');
+                    unless ($pid) {
+                        # Child process here. We're going to send errors back
+                        # through the extra pipe.
+                        close READ;
+                        close READ2;
+                        open STDOUT, ">&", \*WRITE  or die "Can't redirect STDOUT: $^OS_ERROR";
+                        open STDERR, ">&", \*WRITE2 or die "Can't redirect STDERR: $^OS_ERROR";
+                        exec which_perl(), '-w', '-MTestInit', '-'
+                          or die "Can't exec perl: $^OS_ERROR";
+                    } else {
+                        # Parent process here.
+                        close WRITE;
+                        close WRITE2;
+                        print PERL $code;
+                        close PERL;
+                        do { local $^INPUT_RECORD_SEPARATOR;
+                             $output = join '', @( ~< *READ);
+                             $errors = join '', @( ~< *READ2); };
+                        close READ;
+                        close READ2;
+                    }
+                } else {
+                    # No fork().  Do it the hard way.
+                    my $cmdfile = "tcmd$^PID";  $cmdfile++ while -e $cmdfile;
+                    my $errfile = "terr$^PID";  $errfile++ while -e $errfile;
+                    my @tmpfiles = @($cmdfile, $errfile);
+                    open CMD, ">", "$cmdfile"; print CMD $code; close CMD;
+                    my $cmd = which_perl();
+                    $cmd .= " -w $cmdfile 2>$errfile";
+                    if ($^O eq 'VMS' or $^O eq 'MSWin32' or $^O eq 'NetWare') {
+                        # Use pipe instead of system so we don't inherit STD* from
+                        # this process, and then foul our pipe back to parent by
+                        # redirecting output in the child.
+                        open PERL, "-", "$cmd" or die "Can't open pipe: $^OS_ERROR\n";
+                        do { local $^INPUT_RECORD_SEPARATOR; $output = join '', @( ~< *PERL) };
+                        close PERL;
+                    } else {
+                        my $outfile = "tout$^PID";  $outfile++ while -e $outfile;
+                        push @tmpfiles, $outfile;
+                        system "$cmd >$outfile";
+                        do { local $^INPUT_RECORD_SEPARATOR; open IN, "<", $outfile; $output = ~< *IN; close IN };
+                    }
+                    if ($^CHILD_ERROR) {
+                        printf "not ok: exited with error code \%04X\n", $^CHILD_ERROR;
+                        $debugging or do { 1 while unlink < @tmpfiles };
+                        exit;
+                    }
+                    do { local $^INPUT_RECORD_SEPARATOR; open IN, "<", $errfile; $errors = ~< *IN; close IN };
+                    1 while unlink < @tmpfiles;
+                }
+                print $output;
+                print STDERR $errors;
+                if ($debugging && ($errors || $^CHILD_ERROR || ($output =~ m/not ok/))) {
+                    my $lnum = 0;
+                    for my $line (split '\n', $code) {
+                        printf "\%3d:  \%s\n", ++$lnum, $line;
+                    }
+                }
+                if ($^CHILD_ERROR) {
+                    printf "not ok: exited with error code \%04X\n", $^CHILD_ERROR;
+                    diag("command:\n$code");
+                }
+                print '#', "-" x 30, "\n" if $debugging;
 
-	}	# End of foreach $within
-      }	# End of foreach $where_declared
-    }	# End of foreach $inner_type
+            }                   # End of foreach $within
+        }                       # End of foreach $where_declared
+    }                           # End of foreach $inner_type
 
 };
 
@@ -511,8 +512,8 @@ our ($newvar, @a, $x);
 
 sub deleteme { $a = sub { eval '$newvar' } }
 deleteme();
-*deleteme = sub {}; # delete the sub
-$newvar = 123; # realloc the SV of the freed CV
+*deleteme = sub {};             # delete the sub
+$newvar = 123;                  # realloc the SV of the freed CV
 test { $a->() == 123 };
 
 # ... and a further coredump variant - the fixup of the anon sub's
@@ -555,9 +556,9 @@ do {
 do {
     my $x = 1;
     sub fake {
-		test { sub {eval'$x'}->() == 1 };
+        test { sub {eval'$x'}->() == 1 };
 	do { $x;	test { sub {eval'$x'}->() == 1 } };
-		test { sub {eval'$x'}->() == 1 };
+        test { sub {eval'$x'}->() == 1 };
     }
 };
 fake();
@@ -633,11 +634,11 @@ do {
 };
 
 do {
-   # bugid #23265 - this used to coredump during destruction of PL_maincv
-   # and its children
+    # bugid #23265 - this used to coredump during destruction of PL_maincv
+    # and its children
 
     my $progfile = "b23265.pl";
-    open(T, ">", "$progfile") or die "$0: $!\n";
+    open(T, ">", "$progfile") or die "$0: $^OS_ERROR\n";
     print T << '__EOF__';
         print
             sub {@_[0]->(<@_)} -> (
@@ -662,8 +663,8 @@ do {
     # savestack, due to the early freeing of the anon closure
 
     my $got = runperl(stderr => 1, prog => 
-'sub d {die} my $f; $f = sub {my $x=1; $f = 0; d}; try{$f->()}; print qq(ok\n)'
-    );
+                        'sub d {die} my $f; $f = sub {my $x=1; $f = 0; d}; try{$f->()}; print qq(ok\n)'
+                    );
     test { $got eq "ok\n" };
 };
 

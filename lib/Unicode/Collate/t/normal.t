@@ -12,9 +12,9 @@ BEGIN {
 
 BEGIN {
     try { require Unicode::Normalize; };
-    if ($@) {
+    if ($^EVAL_ERROR) {
 	print "1..0 # skipped: Unicode::Normalize needed for this test\n";
-	print $@;
+	print $^EVAL_ERROR->message;
 	exit;
     }
 }

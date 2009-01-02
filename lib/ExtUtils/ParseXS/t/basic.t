@@ -4,19 +4,19 @@ BEGIN {
   if (env::var('PERL_CORE')) {
     chdir 't' if -d 't';
     chdir '../lib/ExtUtils/ParseXS'
-      or die "Can't chdir to lib/ExtUtils/ParseXS: $!";
+      or die "Can't chdir to lib/ExtUtils/ParseXS: $^OS_ERROR";
     @INC = qw(../.. ../../.. .);
   }
 }
 
 use Test;
-BEGIN { plan tests => 10 };
+BEGIN { plan tests => 9 };
 use DynaLoader;
 use ExtUtils::ParseXS < qw(process_file);
 use ExtUtils::CBuilder;
 ok(1); # If we made it this far, we're loaded.
 
-chdir 't' or die "Can't chdir to t/, $!";
+chdir 't' or die "Can't chdir to t/, $^OS_ERROR";
 
 #########################
 
@@ -48,8 +48,7 @@ if ($b->have_compiler) {
   ok $lib_file;
   ok -e $lib_file, 1, "Make sure $lib_file exists";
 
-  try {require XSTest}; die if $@;
-  ok $@, '';
+  require XSTest;
   ok  XSTest::is_even(8);
   ok !XSTest::is_even(9);
 

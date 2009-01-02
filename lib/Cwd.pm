@@ -168,7 +168,7 @@ L<File::chdir>
 =cut
 
 use Exporter;
-use vars < qw(@ISA @EXPORT @EXPORT_OK $VERSION);
+our (@ISA, @EXPORT, @EXPORT_OK, $VERSION);
 use env;
 
 $VERSION = '3.2701';
@@ -322,7 +322,7 @@ sub _backtick_pwd {
     
     my $cwd = `$pwd_cmd`;
     # Belt-and-suspenders in case someone said "undef $/".
-    local $/ = "\n";
+    local $^INPUT_RECORD_SEPARATOR = "\n";
     # `pwd` may fail e.g. if the disk is full
     chomp($cwd) if defined $cwd;
     $cwd;
@@ -504,7 +504,7 @@ sub _perl_abs_path
 
     unless (@cst = @( stat( $start ) ))
     {
-	warn("stat($start): $!");
+	warn("stat($start): $^OS_ERROR");
 	return '';
     }
 
@@ -518,7 +518,7 @@ sub _perl_abs_path
 	# Can't use "-l _" here, because the previous stat was a stat(), not an lstat().
 	if (-l $start) {
 	    my $link_target = readlink($start);
-	    die "Can't resolve link $start: $!" unless defined $link_target;
+	    die "Can't resolve link $start: $^OS_ERROR" unless defined $link_target;
 	    
 	    require File::Spec;
             $link_target = $dir . '/' . $link_target
@@ -543,7 +543,7 @@ sub _perl_abs_path
 	}
 	unless (@cst = @( stat($dotdots) ))
 	{
-	    war("stat($dotdots): $!");
+	    war("stat($dotdots): $^OS_ERROR");
 	    closedir($parent);
 	    return '';
 	}
@@ -556,7 +556,7 @@ sub _perl_abs_path
             {
 		unless (defined ($dir = readdir($parent)))
 	        {
-		    warn("readdir($dotdots): $!");
+		    warn("readdir($dotdots): $^OS_ERROR");
 		    closedir($parent);
 		    return '';
 		}
@@ -596,7 +596,7 @@ sub fast_abs_path {
 
 	if (-l $path) {
 	    my $link_target = readlink($path);
-	    die "Can't resolve link $path: $!" unless defined $link_target;
+	    die "Can't resolve link $path: $^OS_ERROR" unless defined $link_target;
 	    
 	    $link_target = File::Spec->catpath($vol, $dir, $link_target)
                 unless File::Spec->file_name_is_absolute($link_target);
@@ -610,11 +610,11 @@ sub fast_abs_path {
     }
 
     if (!CORE::chdir($path)) {
- 	die("Cannot chdir to $path: $!");
+ 	die("Cannot chdir to $path: $^OS_ERROR");
     }
     my $realpath = getcwd();
     if (! ((-d $cwd) && (CORE::chdir($cwd)))) {
- 	die("Cannot chdir back to $cwd: $!");
+ 	die("Cannot chdir back to $cwd: $^OS_ERROR");
     }
     $realpath;
 }
@@ -644,7 +644,7 @@ sub _vms_abs_path {
 
     if (-l $path) {
         my $link_target = readlink($path);
-        die "Can't resolve link $path: $!" unless defined $link_target;
+        die "Can't resolve link $path: $^OS_ERROR" unless defined $link_target;
 	    
         return _vms_abs_path($link_target);
     }
@@ -730,7 +730,7 @@ sub _qnx_abs_path {
 
     my $rpfh;
     defined( open($rpfh, "-|", '-') || exec '/usr/bin/fullpath', '-t', $path ) or
-      die "Can't open /usr/bin/fullpath: $!";
+      die "Can't open /usr/bin/fullpath: $^OS_ERROR";
     my $realpath = ~< *$rpfh;
     close $rpfh;
     chomp $realpath;

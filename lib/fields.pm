@@ -6,7 +6,7 @@ unless( eval q{require warnings::register; warnings::register->import; 1} ) {
         Carp::carp(< @_);
     }
 }
-use vars < qw(%attr $VERSION);
+our (%attr, $VERSION);
 
 $VERSION = '2.13';
 

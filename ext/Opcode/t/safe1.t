@@ -1,5 +1,5 @@
 #!./perl -w
-$|=1;
+$^OUTPUT_AUTOFLUSH=1;
 use Config;
 
 print "1..0\n# TODO for changes pckage system";
@@ -10,7 +10,7 @@ exit;
 
 package test;	# test from somewhere other than main
 
-use vars < qw($bar);
+our ($bar);
 
 use Opcode v1.00 < qw(opdesc opset opset_to_ops opset_to_hex
 	opmask_add full_opset empty_opset opcodes opmask define_optag);

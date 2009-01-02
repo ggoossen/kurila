@@ -5,7 +5,7 @@ BEGIN {
     require './test.pl';
 }
 
-$| = 1;
+$^OUTPUT_AUTOFLUSH = 1;
 use warnings;
 
 use Config;
@@ -68,7 +68,7 @@ SKIP: do {
     $ak = B::Showlex::walk_output (\$buf);
 
     my $src = 'sub { my ($scalar,@arr,%hash); 1 }';
-    my $sub = eval $src; die if $@;
+    my $sub = eval $src; die if $^EVAL_ERROR;
     $walker = B::Showlex::compile($sub);
     $walker->();
     $na = padrep('$scalar',$newlex);

@@ -41,8 +41,8 @@
 my $file;
 
 use warnings FATAL=>"all";
-use vars < qw($iters $numtests $bang $ffff $nulnul $OP $utf8);
-use vars < qw($qr $skip_amp $qr_embed); # set by our callers
+our ($iters, $numtests, $bang, $ffff, $nulnul, $OP, $utf8);
+our ($qr, $skip_amp, $qr_embed); # set by our callers
 
 
 BEGIN {
@@ -56,8 +56,8 @@ BEGIN {
 }
 
 use warnings FATAL=>"all";
-use vars < qw($iters $numtests $bang $ffff $nulnul $OP);
-use vars < qw($qr $skip_amp $qr_embed $qr_embed_thr); # set by our callers
+our ($iters, $numtests, $bang, $ffff, $nulnul, $OP);
+our ($qr, $skip_amp, $qr_embed, $qr_embed_thr); # set by our callers
 
 
 if (!defined $file) {
@@ -82,7 +82,7 @@ $ffff  = "\x[FF]\x[FF]";
 $nulnul = "\0" x 2;
 $OP = $qr ?? 'qr' !! 'm';
 
-$| = 1;
+$^OUTPUT_AUTOFLUSH = 1;
 printf "1..\%d\n# $iters iterations\n", scalar nelems @tests;
 
 my $test;
@@ -107,8 +107,8 @@ foreach ( @tests) {
     $pat =~ s/\$\{(\w+)\}/$(eval '$'.$1)/g;
     $pat =~ s/\\n/\n/g;
     my $keep = ($repl =~ m/\$\^MATCH/) ?? 'p' !! '';
-    $subject = eval qq("$subject"); die "error in '$subject': $($@->message)" if $@;
-    $expect  = eval qq("$expect"); die "error in '$expect': $($@->message)" if $@;
+    $subject = eval qq("$subject"); die "error in '$subject': $($^EVAL_ERROR->message)" if $^EVAL_ERROR;
+    $expect  = eval qq("$expect"); die "error in '$expect': $($^EVAL_ERROR->message)" if $^EVAL_ERROR;
     my $todo = $qr_embed_thr && ($result =~ s/t//);
     my $skip = ($skip_amp ?? ($result =~ s/B//i) !! ($result =~ s/B//));
     $reason = 'skipping $&' if $reason eq  '' && $skip_amp;
@@ -166,7 +166,7 @@ EOFCODE
 	    no warnings < qw(uninitialized regexp);
 	    eval $code;
 	};
-	my $err = $@;
+	my $err = $^EVAL_ERROR;
 	if ($result eq 'c') {
 	    if ($err->{?description} !~ m!^\Q$expect!) { print "not ok $test (compile) $input => `$err'\n"; next TEST }
 	    last;  # no need to study a syntax error
@@ -180,7 +180,7 @@ EOFCODE
 	    next TEST;
 	}
 	elsif ($err) {
-	    print "not ok $test $input => error: '$($@->message)'\n$(dump::view($code))\n"; next TEST;
+	    print "not ok $test $input => error: '$($^EVAL_ERROR->message)'\n$(dump::view($code))\n"; next TEST;
 	}
 	elsif ($result =~ m/^n/) {
 	    if ($match) { print "not ok $test ($study) $input => false positive\n"; next TEST }
@@ -188,7 +188,7 @@ EOFCODE
 	else {
 	    if (!$match || $got ne $expect) {
 	        try { require Data::Dumper };
-		if ($@) {
+		if ($^EVAL_ERROR) {
 		    print "not ok $test ($study) $input => `$got', match=$match\n$code\n";
 		}
 		else { # better diagnostics

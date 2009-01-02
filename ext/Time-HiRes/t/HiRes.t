@@ -4,7 +4,7 @@ use TestInit;
 use Config;
 use signals;
 
-BEGIN { $| = 1; print "1..38\n"; }
+BEGIN { $^OUTPUT_AUTOFLUSH = 1; print "1..38\n"; }
 
 use Time::HiRes v1.9704 < qw(tv_interval);
 
@@ -24,9 +24,9 @@ my $have_hires_stat      = &Time::HiRes::d_hires_stat( < @_ );
 sub has_symbol {
     my $symbol = shift;
     eval "use Time::HiRes < qw($symbol)";
-    return 0 unless $@ eq '';
+    return 0 unless $^EVAL_ERROR eq '';
     eval "my \$a = $symbol";
-    return $@ eq '';
+    return $^EVAL_ERROR eq '';
 }
 
 printf "# have_gettimeofday    = \%d\n", $have_gettimeofday;
@@ -59,24 +59,24 @@ my $timer_pid;
 my $TheEnd;
 
 if ($have_fork) {
-    print "# I am the main process $$, starting the timer process...\n";
+    print "# I am the main process $^PID, starting the timer process...\n";
     $timer_pid = fork();
     if (defined $timer_pid) {
 	if ($timer_pid == 0) { # We are the kid, set up the timer.
 	    my $ppid = getppid();
-	    print "# I am the timer process $$, sleeping for $waitfor seconds...\n";
+	    print "# I am the timer process $^PID, sleeping for $waitfor seconds...\n";
 	    sleep($waitfor);
 	    warn "\n$0: overall time allowed for tests ($($waitfor)s) exceeded!\n";
 	    print "# Terminating main process $ppid...\n";
 	    kill('TERM', $ppid);
-	    print "# This is the timer process $$, over and out.\n";
+	    print "# This is the timer process $^PID, over and out.\n";
 	    exit(0);
 	} else {
 	    print "# The timer process $timer_pid launched, continuing testing...\n";
 	    $TheEnd = time() + $waitfor;
 	}
     } else {
-	warn "$0: fork failed: $!\n";
+	warn "$0: fork failed: $^OS_ERROR\n";
     }
 } else {
     print "# No timer process (need fork)\n";
@@ -236,7 +236,7 @@ unless (   defined &Time::HiRes::gettimeofday
     use Time::HiRes < qw(time alarm sleep);
     try { require POSIX };
     my $use_sigaction =
-	!$@ && defined &POSIX::sigaction && &POSIX::SIGALRM( < @_ ) +> 0;
+	!$^EVAL_ERROR && defined &POSIX::sigaction && &POSIX::SIGALRM( < @_ ) +> 0;
 
     my ($f, $r, $i, $not, $ok);
 
@@ -261,7 +261,7 @@ unless (   defined &Time::HiRes::gettimeofday
 	POSIX::sigaction(&POSIX::SIGALRM( < @_ ),
 			 POSIX::SigAction->new(\&tick),
 			 $oldaction)
-	    or die "Error setting SIGALRM handler with sigaction: $!\n";
+	    or die "Error setting SIGALRM handler with sigaction: $^OS_ERROR\n";
     } else {
 	print "# SIG tick\n";
 	signals::set_handler(ALRM => "tick");
@@ -425,20 +425,20 @@ else {
 }
 
 try { sleep(-1) };
-print $@->{description} =~ m/::sleep\(-1\): negative time not invented yet/ ??
+print $^EVAL_ERROR->{description} =~ m/::sleep\(-1\): negative time not invented yet/ ??
     "ok 24\n" !! "not ok 24\n";
 
 try { usleep(-2) };
-print $@->{description} =~ m/::usleep\(-2\): negative time not invented yet/ ??
+print $^EVAL_ERROR->{description} =~ m/::usleep\(-2\): negative time not invented yet/ ??
     "ok 25\n" !! "not ok 25\n";
 
 if ($have_ualarm) {
     try { alarm(-3) };
-    print $@->{description} =~ m/::alarm\(-3, 0\): negative time not invented yet/ ??
+    print $^EVAL_ERROR->{description} =~ m/::alarm\(-3, 0\): negative time not invented yet/ ??
 	"ok 26\n" !! "not ok 26\n";
 
     try { ualarm(-4) };
-    print $@->{description} =~ m/::ualarm\(-4, 0\): negative time not invented yet/ ??
+    print $^EVAL_ERROR->{description} =~ m/::ualarm\(-4, 0\): negative time not invented yet/ ??
     "ok 27\n" !! "not ok 27\n";
 } else {
     skip 26;
@@ -447,7 +447,7 @@ if ($have_ualarm) {
 
 if ($have_nanosleep) {
     try { nanosleep(-5) };
-    print $@->{description} =~ m/::nanosleep\(-5\): negative time not invented yet/ ??
+    print $^EVAL_ERROR->{description} =~ m/::nanosleep\(-5\): negative time not invented yet/ ??
 	"ok 28\n" !! "not ok 28\n";
 } else {
     skip 28;
@@ -646,19 +646,19 @@ if ($^O =~ m/^(cygwin|MSWin)/) {
     my @mtime;
     for (1..5) {
 	Time::HiRes::sleep(rand(0.1) + 0.1);
-	open(X, ">", "$$");
-	print X $$;
+	open(X, ">", "$^PID");
+	print X $^PID;
 	close(X);
-	@stat = @( Time::HiRes::stat($$) );
+	@stat = @( Time::HiRes::stat($^PID) );
 	push @mtime, @stat[?9];
 	Time::HiRes::sleep(rand(0.1) + 0.1);
-	open(X, "<", "$$");
+	open(X, "<", "$^PID");
 	~< *X;
 	close(X);
-	@stat = @( Time::HiRes::stat($$) );
+	@stat = @( Time::HiRes::stat($^PID) );
 	push @atime, @stat[?8];
     }
-    1 while unlink $$;
+    1 while unlink $^PID;
     print "# mtime = $(join ' ', @mtime)\n";
     print "# atime = $(join ' ', @atime)\n";
     my $ai = 0;
@@ -700,7 +700,7 @@ if ($^O =~ m/^(cygwin|MSWin)/) {
 END {
     if ($timer_pid) { # Only in the main process.
 	my $left = $TheEnd - time();
-	printf "# I am the main process $$, terminating the timer process $timer_pid\n# before it terminates me in \%d seconds (testing took \%d seconds).\n", $left, $waitfor - $left;
+	printf "# I am the main process $^PID, terminating the timer process $timer_pid\n# before it terminates me in \%d seconds (testing took \%d seconds).\n", $left, $waitfor - $left;
 	my $kill = kill('TERM', $timer_pid); # We are done, the timer can go.
 	printf "# kill TERM $timer_pid = \%d\n", $kill;
 	unlink("ktrace.out"); # Used in BSD system call tracing.

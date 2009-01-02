@@ -35,11 +35,11 @@ is(asctime(localtime(0)), ctime(0), "asctime() and ctime() at zero");
 is(asctime(localtime(12345678)), ctime(12345678), "asctime() and ctime() at 12345678");
 
 # Careful!  strftime() is locale sensative.  Let's take care of that
-my $orig_loc = setlocale(LC_TIME, "C") || die "Cannot setlocale() to C:  $!";
+my $orig_loc = setlocale(LC_TIME, "C") || die "Cannot setlocale() to C:  $^OS_ERROR";
 my $jan_16 = 15 * 86400;
 is(ctime($jan_16), strftime("\%a \%b \%d \%H:\%M:\%S \%Y\n", localtime($jan_16)),
         "get ctime() equal to strftime()");
-setlocale(LC_TIME, $orig_loc) || die "Cannot setlocale() back to orig: $!";
+setlocale(LC_TIME, $orig_loc) || die "Cannot setlocale() back to orig: $^OS_ERROR";
 
 # clock() seems to have different definitions of what it does between POSIX
 # and BSD.  Cygwin, Win32, and Linux lean the BSD way.  So, the tests just

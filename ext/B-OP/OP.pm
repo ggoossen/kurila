@@ -4,9 +4,8 @@ use warnings;
 use B;
 
 require DynaLoader;
-use vars < qw( @ISA $VERSION );
-@ISA = qw(DynaLoader);
-$VERSION = '1.10';
+our @ISA = qw(DynaLoader);
+our $VERSION = '1.10';
 
 B::OP->bootstrap($VERSION);
 

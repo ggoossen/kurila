@@ -9,7 +9,7 @@
 
 package Pod::Select;
 
-use vars < qw($VERSION);
+our ($VERSION);
 $VERSION = 1.35;  ## Current version of this package
 
 #############################################################################
@@ -237,7 +237,7 @@ C</=item mine/../=(item|back)/>
 
 #use diagnostics;
 use Pod::Parser v1.04;
-use vars < qw(@ISA @EXPORT $MAX_HEADING_LEVEL);
+our (@ISA, @EXPORT, $MAX_HEADING_LEVEL);
 
 @ISA = qw(Pod::Parser);
 @EXPORT = qw(&podselect);
@@ -266,7 +266,7 @@ reference to the object itself as an implicit first parameter.
 ## 
 ## =end _PRIVATE_
 
-use vars < qw(%myData @section_headings);
+our (%myData, @section_headings);
 
 sub _init_headings {
     my $self = shift;
@@ -331,7 +331,7 @@ This method should I<not> normally be overridden by subclasses.
 
 =cut
 
-use vars < qw(@selected_sections);
+our (@selected_sections);
 
 sub select {
     my $self = shift;
@@ -686,9 +686,9 @@ sub _compile_section_spec {
         s|\002|\\/|g;        ## restore escaped forward slashes
         $negated = s/^\!//;  ## check for negation
         eval "m/$_/";         ## check regex syntax
-        if ($@) {
+        if ($^EVAL_ERROR) {
             ++$bad_regexs;
-            warn "Bad regular expression /$_/ in \"$section_spec\": $@\n";
+            warn "Bad regular expression /$_/ in \"$section_spec\": $^EVAL_ERROR\n";
         }
         else {
             ## Add the forward and rear anchors (and put the negator back)

@@ -48,7 +48,7 @@ END
 DONE
 
 
-$| = 1;
+$^OUTPUT_AUTOFLUSH = 1;
 
 my $numtests = scalar(nelems @tests) / 2;
 print "1..$numtests\n";
@@ -99,8 +99,8 @@ sub write_file
 
 	local(*F);
 
-	open(F, ">", "$f") || die "open >$f: $!";
-	(print F < @data) || die "write $f: $!";
-	close(F) || die "close $f: $!";
+	open(F, ">", "$f") || die "open >$f: $^OS_ERROR";
+	(print F < @data) || die "write $f: $^OS_ERROR";
+	close(F) || die "close $f: $^OS_ERROR";
 	return 1;
 }

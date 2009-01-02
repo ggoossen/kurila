@@ -5,7 +5,7 @@ use File::Compare;
 use File::Basename;
 use File::Path < qw(rmtree);
 require Exporter;
-use vars < qw(@ISA @EXPORT @EXPORT_OK $VERSION);
+our (@ISA, @EXPORT, @EXPORT_OK, $VERSION);
 @ISA       = qw(Exporter);
 @EXPORT    = qw(cp rm_f rm_rf mv cat eqtime mkpath touch test_f test_d chmod
                 dos2unix);
@@ -126,7 +126,7 @@ sub rm_f {
 
         next if _unlink($file);
 
-        warn "Cannot delete $file: $!";
+        warn "Cannot delete $file: $^OS_ERROR";
     }
 }
 
@@ -153,7 +153,7 @@ sub touch {
     my $t    = time;
     expand_wildcards();
     foreach my $file ( @ARGV) {
-        open(FILE, ">>","$file") || die "Cannot write $file:$!";
+        open(FILE, ">>","$file") || die "Cannot write $file:$^OS_ERROR";
         close(FILE);
         utime($t,$t,$file);
     }
@@ -239,7 +239,7 @@ sub chmod {
         }
     }
 
-    chmod(oct $mode,< @ARGV) || die "Cannot chmod ".join(' ', @($mode,< @ARGV)).":$!";
+    chmod(oct $mode,< @ARGV) || die "Cannot chmod ".join(' ', @($mode,< @ARGV)).":$^OS_ERROR";
 }
 
 =item mkpath
@@ -252,8 +252,8 @@ Creates directories, including any parent directories.
 
 sub mkpath
 {
- expand_wildcards();
- File::Path::mkpath(\ @ARGV,0,0777);
+    expand_wildcards();
+    File::Path::mkpath(\ @ARGV,0,0777);
 }
 
 =item test_f
@@ -300,13 +300,13 @@ sub dos2unix {
         return unless -r _;
         return if -B _;
 
-        local $\;
+        local $^OUTPUT_RECORD_SEPARATOR;
 
 	my $orig = $_;
 	my $temp = '.dos2unix_tmp';
-	open ORIG, "<", $_ or do { warn "dos2unix can't open $_: $!"; return };
+	open ORIG, "<", $_ or do { warn "dos2unix can't open $_: $^OS_ERROR"; return };
 	open TEMP, ">", "$temp" or 
-	    do { warn "dos2unix can't create .dos2unix_tmp: $!"; return };
+	    do { warn "dos2unix can't create .dos2unix_tmp: $^OS_ERROR"; return };
         while (my $line = ~< *ORIG) { 
             $line =~ s/\015\012/\012/g;
             print TEMP $line;

@@ -16,7 +16,7 @@ use FileHandle;
 (\*STDOUT)->autoflush( 1);
 
 my $mystdout = FileHandle->new_from_fd( 1,"w");
-$| = 1;
+$^OUTPUT_AUTOFLUSH = 1;
  $mystdout->autoflush();
 print "1..12\n";
 
@@ -56,12 +56,12 @@ print "ok 8\n";
 
 (\*STDOUT)->autoflush( 0);
 
-print "not " if ($|);
+print "not " if ($^OUTPUT_AUTOFLUSH);
 print "ok 9\n";
 
 (\*STDOUT)->autoflush( 1);
 
-print "not " unless ($|);
+print "not " unless ($^OUTPUT_AUTOFLUSH);
 print "ok 10\n";
 
 if ($^O eq 'dos')

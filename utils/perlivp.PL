@@ -20,7 +20,7 @@ my $file = basename($0, '.PL');
 $file .= '.com' if $^O eq 'VMS';
 
 # Create output file.
-open OUT,">", "$file" or die "Can't create $file: $!";
+open OUT,">", "$file" or die "Can't create $file: $^OS_ERROR";
 
 print "Extracting $file (with variable substitutions)\n";
 
@@ -56,7 +56,7 @@ Usage:
     exit;
 }
 
-use vars qw(%opt); # allow testing with older versions (do not use our)
+our (%opt);
 
 @opt{ qw/? H h P p V v/ } = qw(0 0 0 0 0 0 0);
 
@@ -497,8 +497,8 @@ Peter Prymmer
 
 !NO!SUBS!
 
-close OUT or die "Can't close $file: $!";
-chmod 0755, $file or die "Can't reset permissions for $file: $!\n";
+close OUT or die "Can't close $file: $^OS_ERROR";
+chmod 0755, $file or die "Can't reset permissions for $file: $^OS_ERROR\n";
 exec("$(config_value('eunicefix')) $file") if config_value('eunicefix') ne ':';
 chdir $origdir;
 

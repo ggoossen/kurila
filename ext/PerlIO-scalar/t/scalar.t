@@ -10,7 +10,7 @@ BEGIN {
 
 use Fcntl < qw(SEEK_SET SEEK_CUR SEEK_END); # Not 0, 1, 2 everywhere.
 
-$| = 1;
+$^OUTPUT_AUTOFLUSH = 1;
 
 use Test::More tests => 52;
 
@@ -31,7 +31,7 @@ $var = "foo\nbar\n";
 ok(seek($fh,0,SEEK_SET));
 ok(!eof($fh));
 is( ~< $fh, "foo\n");
-ok(close $fh, $!);
+ok(close $fh, $^OS_ERROR);
 
 # Test that semantics are similar to normal file-based I/O
 # Check that ">" clobbers the scalar
@@ -127,7 +127,7 @@ do {
 
 my $data = "a non-empty PV";
 $data = undef;
-open(MEM, '<', \$data) or die "Fail: $!\n";
+open(MEM, '<', \$data) or die "Fail: $^OS_ERROR\n";
 my $x = join '', @: ~< *MEM;
 is($x, '');
 
@@ -139,7 +139,7 @@ line B
 a third line
 EOF
     open(F, '<', \$s) or die "Could not open string as a file";
-    local $/ = "";
+    local $^INPUT_RECORD_SEPARATOR = "";
     my $ln = ~< *F;
     close F;
     is($ln, $s, "[perl #35929]");
@@ -147,14 +147,14 @@ EOF
 
 # [perl #40267] PerlIO::scalar doesn't respect readonly-ness
 do {
-    ok(!(defined open(F, '>', \undef)), "[perl #40267] - $!");
+    ok(!(defined open(F, '>', \undef)), "[perl #40267] - $^OS_ERROR");
     close F;
 
     my $ro = \43;
-    ok(!(defined open(F, '>', $ro)), $!);
+    ok(!(defined open(F, '>', $ro)), $^OS_ERROR);
     close F;
     # but we can read from it
-    ok(open(F, '<', $ro), $!);
+    ok(open(F, '<', $ro), $^OS_ERROR);
     is( ~< *F, 43);
     close F;
 };
@@ -196,9 +196,9 @@ do {
 
     # Seeking negative should not do funny business.
 
-    ok(!seek(F,  -50, SEEK_SET), $!);
+    ok(!seek(F,  -50, SEEK_SET), $^OS_ERROR);
     ok(seek(F, 0, SEEK_SET));
-    ok(!seek(F,  -50, SEEK_CUR), $!);
-    ok(!seek(F, -150, SEEK_END), $!);
+    ok(!seek(F,  -50, SEEK_CUR), $^OS_ERROR);
+    ok(!seek(F, -150, SEEK_END), $^OS_ERROR);
 };
 

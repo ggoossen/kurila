@@ -58,7 +58,7 @@ skip( 'lacking d_msgget d_msgctl d_msgsnd d_msgrcv', 6 ) unless
     $msg = msgget(IPC_PRIVATE, $perm);
     # Very first time called after machine is booted value may be 0 
     if (!(defined($msg) && $msg +>= 0)) {
-        skip( "msgget failed: $!", 6);
+        skip( "msgget failed: $^OS_ERROR", 6);
     }
     else {
         pass('msgget IPC_PRIVATE S_IRWXU');
@@ -84,7 +84,7 @@ The failure of the subtest #2 may indicate that the message queue
 resource limits either of the system or of the testing account
 have been reached.  Error message "Operating would block" is
 usually indicative of this situation.  The error message was now:
-"$!"
+"$^OS_ERROR"
 
 You can check the message queues with the 'ipcs' command and
 you can remove unneeded queues with the 'ipcrm -q id' command.
@@ -150,12 +150,12 @@ SKIP: do {
         pass($test_name);
     }
     else {
-        diag("cannot proceed: semget() error: $!");
+        diag("cannot proceed: semget() error: $^OS_ERROR");
         skip('semget() resource unavailable', 11)
-            if $! eq 'No space left on device';
+            if $^OS_ERROR eq 'No space left on device';
 
         # Very first time called after machine is booted value may be 0 
-        die "semget: $!\n" unless defined($sem) && $sem +>= 0;
+        die "semget: $^OS_ERROR\n" unless defined($sem) && $sem +>= 0;
     }
 
     my $data;

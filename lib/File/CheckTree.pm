@@ -163,10 +163,10 @@ sub validate {
                 eval $this;
 
                 # re-raise an exception caused by a "... || die" test 
-                if (my $err = $@) {
+                if (my $err = $^EVAL_ERROR) {
                     # in case of any cd directives, return from whence we came
                     if ($starting_dir ne cwd) {
-                        chdir($starting_dir) || die "$starting_dir: $!";
+                        chdir($starting_dir) || die "$starting_dir: $^OS_ERROR";
                     }
                     die $err;
                 }
@@ -179,17 +179,17 @@ sub validate {
 
     # in case of any cd directives, return from whence we came
     if ($starting_dir ne cwd) {
-        chdir($starting_dir) || die "chdir $starting_dir: $!";
+        chdir($starting_dir) || die "chdir $starting_dir: $^OS_ERROR";
     }
 
     return $Warnings;
 }
 
 my %Val_Message = %(
-    'r' => "is not readable by uid $>.",
-    'w' => "is not writable by uid $>.",
-    'x' => "is not executable by uid $>.",
-    'o' => "is not owned by uid $>.",
+    'r' => "is not readable by uid $^UID.",
+    'w' => "is not writable by uid $^UID.",
+    'x' => "is not executable by uid $^UID.",
+    'o' => "is not owned by uid $^UID.",
     'R' => "is not readable by you.",
     'W' => "is not writable by you.",
     'X' => "is not executable by you.",

@@ -7,7 +7,7 @@ require Exporter;
 our @ISA = @('Exporter');
 our @EXPORT = qw(expand unexpand $tabstop);
 
-use vars < qw($VERSION $tabstop $debug);
+our ($VERSION, $tabstop, $debug);
 $VERSION = 2007.1117;
 
 BEGIN	{

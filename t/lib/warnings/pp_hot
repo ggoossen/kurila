@@ -64,12 +64,12 @@ use warnings 'io' ;
 # 1 and 2 are opened read/write on the tty, and the IO layers may reflect this.
 # So we must make our own file handle that is read only.
 my $file = "./xcv" ; unlink $file ;
-open (FH, ">", "$file") or die $! ;
-close FH or die $! ;
+open (FH, ">", "$file") or die $^OS_ERROR ;
+close FH or die $^OS_ERROR ;
 die "There is no file $file" unless -f $file ;
-open (FH, "<", "$file") or die $! ;
+open (FH, "<", "$file") or die $^OS_ERROR ;
 print FH "anc" ;
-open(FOO, "<&", "FH") or die $! ;
+open(FOO, "<&", "FH") or die $^OS_ERROR ;
 print FOO "anc" ;
 no warnings 'io' ;
 print FH "anc" ;
@@ -77,8 +77,8 @@ print FOO "anc" ;
 use warnings 'io' ;
 print FH "anc" ;
 print FOO "anc" ;
-close (FH) or die $! ;
-close (FOO) or die $! ;
+close (FH) or die $^OS_ERROR ;
+close (FOO) or die $^OS_ERROR ;
 unlink $file ;
 EXPECT
 Filehandle FH opened only for input at - line 12 character 1.
@@ -150,20 +150,20 @@ readline() on closed filehandle STDIN at - line 4 character 26.
 # pp_hot.c [Perl_do_readline]
 use warnings 'io' ;
 my $file = "./xcv" ; unlink $file ;
-open (FH, ">", "$file") or die $! ;
+open (FH, ">", "$file") or die $^OS_ERROR ;
 my $a = ~< *FH ;
 no warnings 'io' ;
 $a = ~< *FH ;
 use warnings 'io' ;
-open(FOO, ">&", "FH") or die $! ;
+open(FOO, ">&", "FH") or die $^OS_ERROR ;
 $a = ~< *FOO ;
 no warnings 'io' ;
 $a = ~< *FOO ;
 use warnings 'io' ;
 $a = ~< *FOO ;
 $a = ~< *FH ;
-close (FH) or die $! ;
-close (FOO) or die $! ;
+close (FH) or die $^OS_ERROR ;
+close (FOO) or die $^OS_ERROR ;
 unlink $file ;
 EXPECT
 Filehandle FH opened only for output at - line 5 character 8.

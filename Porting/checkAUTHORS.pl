@@ -121,7 +121,7 @@ while ( ~< *DATA) {
 if ((nelems @authors)) {
   my %raw;
   foreach my $filename ( @authors) {
-    open FH, "<", "$filename" or die "Can't open $filename: $!";
+    open FH, "<", "$filename" or die "Can't open $filename: $^OS_ERROR";
     while ( ~< *FH) {
       next if m/^\#/;
       next if m/^-- /;

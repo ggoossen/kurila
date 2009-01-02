@@ -200,14 +200,14 @@ SKIP: do {
     skip "has fchmod", 1 if (config_value('d_fchmod') || "") eq "define";
     open(my $fh, "<", "a");
     try { chmod(0777, $fh); };
-    like($@->{?description}, qr/^The fchmod function is unimplemented at/, "fchmod is unimplemented");
+    like($^EVAL_ERROR->{?description}, qr/^The fchmod function is unimplemented at/, "fchmod is unimplemented");
 };
 
 SKIP: do {
     skip "has fchown", 1 if (config_value('d_fchown') || "") eq "define";
     open(my $fh, "<", "a");
     try { chown(0, 0, $fh); };
-    like($@->{?description}, qr/^The f?chown function is unimplemented at/, "fchown is unimplemented");
+    like($^EVAL_ERROR->{?description}, qr/^The f?chown function is unimplemented at/, "fchown is unimplemented");
 };
 
 is(rename('a','b'), 1, "rename a b");
@@ -297,7 +297,7 @@ SKIP: do {
     skip "has futimes", 1 if (config_value('d_futimes') || "") eq "define";
     open(my $fh, "<", "b") || die;
     try { utime(undef, undef, $fh); };
-    like($@->{?description}, qr/^The futimes function is unimplemented at/, "futimes is unimplemented");
+    like($^EVAL_ERROR->{?description}, qr/^The futimes function is unimplemented at/, "futimes is unimplemented");
 };
 
 is(unlink('b'), 1, "unlink b");
@@ -319,19 +319,19 @@ SKIP: do {
     skip "No symbolic links found to test with", 2
       unless  `ls -l perl 2>nul` =~ m/^l.*->/;
 
-    system("cp TEST TEST$$");
+    system("cp TEST TEST$^PID");
     # we have to copy because e.g. GNU grep gets huffy if we have
     # a symlink forest to another disk (it complains about too many
     # levels of symbolic links, even if we have only two)
-    is(symlink("TEST$$","c"), 1, "symlink");
+    is(symlink("TEST$^PID","c"), 1, "symlink");
     $foo = `grep perl c 2>&1`;
     ok($foo, "found perl in c");
     unlink 'c';
-    unlink("TEST$$");
+    unlink("TEST$^PID");
 };
 
 unlink "Iofs.tmp";
-open IOFSCOM, ">", "Iofs.tmp" or die "Could not write IOfs.tmp: $!";
+open IOFSCOM, ">", "Iofs.tmp" or die "Could not write IOfs.tmp: $^OS_ERROR";
 print IOFSCOM 'helloworld';
 close(IOFSCOM);
 
@@ -342,7 +342,7 @@ SKIP: do {
 # Check truncating a closed file.
     try { truncate "Iofs.tmp", 5; };
 
-    skip("no truncate - $@", 8) if $@;
+    skip("no truncate - $^EVAL_ERROR", 8) if $^EVAL_ERROR;
 
     is(-s "Iofs.tmp", 5, "truncation to five bytes");
 
@@ -361,7 +361,7 @@ SKIP: do {
 
     binmode FH;
     select FH;
-    $| = 1;
+    $^OUTPUT_AUTOFLUSH = 1;
     select STDOUT;
 
     do {
@@ -394,7 +394,7 @@ SKIP: do {
 
 	binmode FH;
 	select FH;
-	$| = 1;
+	$^OUTPUT_AUTOFLUSH = 1;
 	select STDOUT;
 
 	do {
@@ -434,7 +434,7 @@ if ($^O eq 'VMS') {
     # must have delete access to rename a directory
     `set file tmp.dir/protection=o:d`;
     ok(rename('tmp.dir', 'tmp1.dir'), "rename on directories") ||
-      print "# errno: $!\n";
+      print "# errno: $^OS_ERROR\n";
 }
 else {
     ok(rename('tmp', 'tmp1'), "rename on directories");

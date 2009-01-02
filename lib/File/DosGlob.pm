@@ -182,7 +182,7 @@ sub doglob_Mac {
 
 	#print "regex: '$_', head: '$head', unescaped head: '$not_esc_head'\n";
 	my $matchsub = eval 'sub { $_[0] =~ m|^' . $_ . '\z|ios }';
-	warn($@), next OUTER if $@;
+	warn($^EVAL_ERROR), next OUTER if $^EVAL_ERROR;
       INNER:
 	for my $e ( @leaves) {
 	    next INNER if $e eq '.' or $e eq '..';

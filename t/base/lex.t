@@ -29,7 +29,7 @@ m/^/ && (print "ok 5\n");
 our ($foo, %foo, $bar, $bar, @ary, $A, $X, @X, $N);
 
 eval '%foo{+1} / 1;';
-if (!$@) {print "ok 6\n";} else {print "not ok 6 $@\n";}
+if (!$^EVAL_ERROR) {print "ok 6\n";} else {print "not ok 6 $^EVAL_ERROR\n";}
 
 eval '$foo = 123+123.4+123e4+123.4E5+123.4e+5+.12;';
 
@@ -45,7 +45,7 @@ print <<EOF;
 $foo
 EOF
 
-eval <<\EOE, print $@;
+eval <<\EOE, print $^EVAL_ERROR;
 print <<'EOF';
 ok 10
 EOF
@@ -139,7 +139,7 @@ do {
   print "ok 32\n";
 
   eval "\$\cR = 24";                 # Literal control character
-  if ($@ or ${*{Symbol::fetch_glob("\cR")}} != 24) {  print "not "  }
+  if ($^EVAL_ERROR or ${*{Symbol::fetch_glob("\cR")}} != 24) {  print "not "  }
   print "ok 33\n";
   if ($^R == 24) {  print "not "  }  # Control character is NOT escape sequence
   print "ok 34\n";
@@ -163,12 +163,12 @@ do {
   # 
 
   eval 'my $^X;';
-  print "not " unless index ($@->{?description}, q|Can't use global $^X in "my"|) +> -1;
+  print "not " unless index ($^EVAL_ERROR->{?description}, q|Can't use global $^X in "my"|) +> -1;
   print "ok 37\n";
 #  print "($@)\n" if $@;
 
   eval 'my $^XYZ;';
-  print "not " unless index ($@->{?description}, q|Can't use global $^XYZ in "my"|) +> -1;
+  print "not " unless index ($^EVAL_ERROR->{?description}, q|Can't use global $^XYZ in "my"|) +> -1;
   print "ok 38\n";
 #  print "($@)\n" if $@;
 
@@ -211,7 +211,7 @@ EOT
 # line 1 "plunk"
 	T('^main:plunk:1$', $test++);
     };
-    print "not ok $test # TODO heredoc inside quoted construct\n" if $@; $test++;
+    print "not ok $test # TODO heredoc inside quoted construct\n" if $^EVAL_ERROR; $test++;
     T '^main:plink:53$', $test++;
     print "ok 44\nok 45\nok 46\n";
 };
@@ -224,7 +224,7 @@ EOT
 do {
   my $test = 47;
   our (@nosuch, @a, @example);
-  eval(q(">$(join ' ', < @nosuch)<" eq "><")) || print "# $@", "not ";
+  eval(q(">$(join ' ', < @nosuch)<" eq "><")) || print "# $^EVAL_ERROR", "not ";
   print "ok $test\n";
   ++$test;
 
@@ -236,7 +236,7 @@ do {
 
   # Ditto.
   eval(q{@nosuch = @('a', 'b', 'c'); ">$(join ' ', @nosuch)<" eq ">a b c<"}) 
-      || print "# $@", "not ";
+      || print "# $^EVAL_ERROR", "not ";
   print "ok $test\n";
   ++$test;
 
@@ -247,7 +247,7 @@ do {
   }
 
   eval(q{makearray(); ">$(join ' ', @R::crackers)<" eq ">fish dog carrot<"})
-    || print "# $@", "not ";
+    || print "# $^EVAL_ERROR", "not ";
   print "ok $test\n";
   ++$test;
 };
@@ -271,5 +271,5 @@ sub foo::::::bar { print "ok $test\n"; $test++ }
 foo::::::bar;
 
 eval "\$x =\x[E2]foo";
-if ($@->{?description} =~ m/Unrecognized character \\xE2 in column 5/) { print "ok $test\n"; } else { print "not ok $test\n"; }
+if ($^EVAL_ERROR->{?description} =~ m/Unrecognized character \\xE2 in column 5/) { print "ok $test\n"; } else { print "not ok $test\n"; }
 $test++;

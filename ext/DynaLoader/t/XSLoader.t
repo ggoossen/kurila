@@ -5,7 +5,7 @@ use Config;
 
 BEGIN {
     eval "use Test::More";
-    if ($@) {
+    if ($^EVAL_ERROR) {
         print "1..0 # Skip: Test::More not available\n";
         die "Test::More not available\n";
     }
@@ -33,11 +33,11 @@ can_ok( 'XSLoader' => 'bootstrap_inherit' );
 
 # Check error messages
 try { XSLoader::load() };
-like( $@->{?description}, q|/^XSLoader::load\('Your::Module', \$Your::Module::VERSION\)/|,
+like( $^EVAL_ERROR->{?description}, q|/^XSLoader::load\('Your::Module', \$Your::Module::VERSION\)/|,
         "calling XSLoader::load() with no argument" );
 
 eval q{ package Thwack; XSLoader::load('Thwack'); };
-like( $@->message, q{/^Can't locate loadable object for module Thwack in @INC/},
+like( $^EVAL_ERROR->message, q{/^Can't locate loadable object for module Thwack in @INC/},
         "calling XSLoader::load() under a package with no XS part" );
 
 # Now try to load well known XS modules
@@ -49,14 +49,14 @@ for my $module (sort keys %modules) {
         skip "$module not available", 3 if $extensions !~ m/\b$module\b/;
 
         eval qq{ package $module; XSLoader::load('$module', "qunckkk"); };
-        like( $@->message, "/^$module object version \\S+ does not match bootstrap parameter (?:qunckkk|0)/",  
+        like( $^EVAL_ERROR->message, "/^$module object version \\S+ does not match bootstrap parameter (?:qunckkk|0)/",  
                 "calling XSLoader::load() with a XS module and an incorrect version" );
 
         eval qq{ package $module; XSLoader::load('$module'); };
-        is( $@, '',  "XSLoader::load($module)");
+        is( $^EVAL_ERROR, '',  "XSLoader::load($module)");
 
         eval qq{ package $module; %modules{?$module}; };
-        die if $@;
+        die if $^EVAL_ERROR;
     };
 }
 

@@ -4,7 +4,7 @@ use File::Spec ();
 use File::Path ();
 use File::Basename ();
 
-use vars < qw($VERSION @ISA);
+our ($VERSION, @ISA);
 $VERSION = '0.22_01';
 $VERSION = eval $VERSION;
 
@@ -58,7 +58,7 @@ my %OSTYPES = %( < qw(
 my $load = sub {
   my $mod = shift;
   eval "use $mod";
-  die $@ if $@;
+  die $^EVAL_ERROR if $^EVAL_ERROR;
   @ISA = @($mod);
 };
 

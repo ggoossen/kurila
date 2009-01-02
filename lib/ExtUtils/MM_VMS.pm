@@ -718,7 +718,7 @@ sub cflags {
 	}
 	if ((nelems @terms)) {
 	    $quals =~ s:/${\$type}i?n?e?=[^/]+::ig;
-	    $quals .= "/$$(\$type)ine=(" . join(',', @terms) . ')';
+	    $quals .= "/$^PID(\$type)ine=(" . join(',', @terms) . ')';
 	}
     }
 
@@ -1442,7 +1442,7 @@ $(MAP_TARGET) :: $(MAKE_APERL_FILE)
 	# Get external libraries this extension will need
 	if (-f $extralibs ) {
 	    my %seenthis;
-	    open my $list, "<", $extralibs or warn $!,next;
+	    open my $list, "<", $extralibs or warn $^OS_ERROR,next;
 	    while (~< $list) {
 		chomp;
 		# Include a library in the link only once, unless it's mentioned
@@ -1457,7 +1457,7 @@ $(MAP_TARGET) :: $(MAKE_APERL_FILE)
 	}
 	# Get full name of extension for ExtUtils::Miniperl
 	if (-f $extopt) {
-	    open my $opt, '<', $extopt or die $!;
+	    open my $opt, '<', $extopt or die $^OS_ERROR;
 	    while (~< $opt) {
 		next unless m/(?:UNIVERSAL|VECTOR)=boot_([\w_]+)/;
 		my $pkg = $1;

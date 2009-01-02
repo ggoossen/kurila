@@ -8,7 +8,7 @@
 
 use strict;
 
-use vars qw($r);
+our $r;
 
 # This list is also in makerel.
 my @FILES = @( qw(

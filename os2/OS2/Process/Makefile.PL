@@ -38,7 +38,7 @@ sub create_constants {
     and warn("Can't build module with contants, falling back to no constants"),
       return;
   rename 'OS2/Process/Const', 'Process_constants'
-    or warn("Error renaming module, falling back to no constants: $!"),
+    or warn("Error renaming module, falling back to no constants: $^OS_ERROR"),
       return;
   return 1;
 }

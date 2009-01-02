@@ -1392,9 +1392,6 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 		s++;
 		goto reswitch;
 
-	    case 'E':
-		PL_minus_E = TRUE;
-		/* FALL THROUGH */
 	    case 'e':
 #ifdef MACOS_TRADITIONAL
 		/* ignore -e for Dev:Pseudo argument */
@@ -1523,16 +1520,16 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 		    sv_catpvs(opts_prog, "  Compiled on " __DATE__ "\\n\"");
 #  endif
 #endif
-		    sv_catpvs(opts_prog, "; $\"=\"\\n    \"; "
-			      "our @env = map { \"$_=\\\"$(env::var($_))\\\"\" } "
-			      "sort grep {m/^PERL/} env::keys; ");
+		    sv_catpvs(opts_prog,
+			"; our @env = map { \"$_=\\\"$(env::var($_))\\\"\" } "
+			"sort grep {m/^PERL/} env::keys; ");
 #ifdef __CYGWIN__
 		    sv_catpvs(opts_prog,
 			      "push @env, \"CYGWIN=\\\"$(env::var('CYGWIN'))\\\"\";");
 #endif
 		    sv_catpvs(opts_prog, 
-			      "print \"  env:\\n    $(join ' ', @env)\\n\" if @env;"
-			      "print \"  \\@INC:\\n    $(join ' ', @INC)\\n\";");
+			      "print \"  env:\\n    $(join '\\n', @env)\\n\" if @env;"
+			      "print \"  \\@INC:\\n    $(join '\\n', @INC)\\n\";");
 		}
 		else {
 		    ++s;
@@ -2507,7 +2504,6 @@ S_usage(pTHX_ const char *name)		/* XXX move this out into a module ? */
 "-d[:debugger]     run program under debugger",
 "-D[number/list]   set debugging flags (argument is a bit mask or alphabets)",
 "-e program        one line of program (several -e's allowed, omit programfile)",
-"-E program        like -e, but enables all optional features",
 "-f                don't do $sitelib/sitecustomize.pl at startup",
 "-F/pattern/       split() pattern for -a switch (//'s are optional)",
 "-i[extension]     edit <> files in place (makes backup if extension supplied)",
@@ -2659,7 +2655,7 @@ Perl_moreswitches(pTHX_ const char *s)
 		   PL_rs = newSVpvn(&ch, 1);
 	      }
 	 }
-	 sv_setsv(get_sv("/", TRUE), PL_rs);
+	 sv_setsv(get_sv("^INPUT_RECORD_SEPARATOR", TRUE), PL_rs);
 	 return s + numlen;
     }
     case 'C':
@@ -3131,7 +3127,7 @@ S_init_main_stash(pTHX)
     GvMULTI_on(PL_hintgv);
     PL_defgv = gv_fetchpvs("_", GV_ADD|GV_NOTQUAL, SVt_PVAV);
     SvREFCNT_inc_simple_void(PL_defgv);
-    PL_errgv = gv_HVadd(gv_fetchpvs("@", GV_ADD|GV_NOTQUAL, SVt_PV));
+    PL_errgv = gv_HVadd(gv_fetchpvs("^EVAL_ERROR", GV_ADD|GV_NOTQUAL, SVt_PV));
     SvREFCNT_inc_simple_void(PL_errgv);
     GvMULTI_on(PL_errgv);
     PL_replgv = gv_fetchpvs("^R", GV_ADD|GV_NOTQUAL, SVt_PV); /* ^R */
@@ -3147,7 +3143,7 @@ S_init_main_stash(pTHX)
     PL_globalstash = GvHV(gv_fetchpvs("CORE::GLOBAL::", GV_ADDMULTI,
 				      SVt_PVHV));
     /* We must init $/ before switches are processed. */
-    sv_setpvn(get_sv("/", TRUE), "\n", 1);
+    sv_setpvn(get_sv("^INPUT_RECORD_SEPARATOR", TRUE), "\n", 1);
 }
 
 STATIC int
@@ -4115,7 +4111,6 @@ S_init_predump_symbols(pTHX)
     GV *tmpgv;
     IO *io;
 
-    sv_setpvn(get_sv("\"", TRUE), " ", 1);
     PL_stdingv = gv_fetchpvs("STDIN", GV_ADD|GV_NOTQUAL, SVt_PVIO);
     GvMULTI_on(PL_stdingv);
     io = GvIOp(PL_stdingv);
@@ -4228,7 +4223,7 @@ S_init_postdump_symbols(pTHX_ register int argc, register char **argv, register 
 #endif /* !PERL_MICRO */
     }
     TAINT_NOT;
-    if ((tmpgv = gv_fetchpvs("$", GV_ADD|GV_NOTQUAL, SVt_PV))) {
+    if ((tmpgv = gv_fetchpvs("^PID", GV_ADD|GV_NOTQUAL, SVt_PV))) {
         SvREADONLY_off(GvSV(tmpgv));
 	sv_setiv(GvSV(tmpgv), (IV)PerlProc_getpid());
         SvREADONLY_on(GvSV(tmpgv));

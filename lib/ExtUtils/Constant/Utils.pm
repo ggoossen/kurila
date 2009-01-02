@@ -1,6 +1,6 @@
 package ExtUtils::Constant::Utils;
 
-use vars < qw($VERSION @EXPORT_OK @ISA);
+our ($VERSION, @EXPORT_OK, @ISA);
 
 @ISA = @( 'Exporter' );
 @EXPORT_OK = qw(C_stringify perl_stringify);

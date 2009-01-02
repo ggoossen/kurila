@@ -5,11 +5,11 @@ plan( tests => 8 );
 
 use warnings;
 
-use vars < qw{ @warnings };
+our (@warnings);
 
 BEGIN {
     $^WARN_HOOK = sub { push @warnings, @_[0]->message };
-    $| = 1;
+    $^OUTPUT_AUTOFLUSH = 1;
 }
 
 my $fail_odd      = 'Odd number of elements in hash assignment';

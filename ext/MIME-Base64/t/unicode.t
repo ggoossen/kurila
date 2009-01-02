@@ -9,7 +9,7 @@ try {
     my $tmp = MIME::Base64::encode("\x{12c}");
     print "# enc: $tmp\n";
 };
-print "not " if $@;
+print "not " if $^EVAL_ERROR;
 print "ok 1\n";
 
 require MIME::QuotedPrint;
@@ -18,6 +18,6 @@ try {
     my $tmp = MIME::QuotedPrint::encode("\x{12c}");
     print "# enc: $tmp\n";
 };
-print "not " if $@;
+print "not " if $^EVAL_ERROR;
 print "ok 2\n";
 

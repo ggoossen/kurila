@@ -33,7 +33,7 @@ SKIP: do {
         pod2usage(\%( verbose => 0, exit => 'noexit', 
                     output => $fake_out_fh, input => $file ));
     };
-    like( $@->message, qr/^Can't open $file/, 
+    like( $^EVAL_ERROR->message, qr/^Can't open $file/, 
           'File not found without -pathlist' );
 
     try {

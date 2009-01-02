@@ -23,7 +23,7 @@
 package Pod::ParseLink;
 
 
-use vars < qw(@EXPORT @ISA $VERSION);
+our (@EXPORT, @ISA, $VERSION);
 
 use Exporter;
 @ISA    = qw(Exporter);

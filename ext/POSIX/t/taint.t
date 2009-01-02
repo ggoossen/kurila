@@ -9,7 +9,7 @@ use Scalar::Util < qw/tainted/;
 use POSIX < qw(fcntl_h open read mkfifo);
  
 
-$| = 1;
+$^OUTPUT_AUTOFLUSH = 1;
 
 my $buffer;
 my @buffer;
@@ -23,13 +23,13 @@ my $TAINT = substr($^X, 0, 0);
 my $file = 'TEST';
 
 try { mkfifo($TAINT. $file, 0) };
-like($@->{?description}, qr/^Insecure dependency/,              'mkfifo with tainted data');
+like($^EVAL_ERROR->{?description}, qr/^Insecure dependency/,              'mkfifo with tainted data');
 
 try { $testfd = open($TAINT. $file, O_WRONLY, 0) };
-like($@->{?description}, qr/^Insecure dependency/,              'open with tainted data');
+like($^EVAL_ERROR->{?description}, qr/^Insecure dependency/,              'open with tainted data');
 
 try { $testfd = open($file, O_RDONLY, 0) };
-is($@, "",                                  'open with untainted data');
+is($^EVAL_ERROR, "",                                  'open with untainted data');
 
 read($testfd, $buffer, 2) if $testfd +> 2;
 is( $buffer, "#!",	                          '    read' );

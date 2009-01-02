@@ -45,62 +45,62 @@ ok ($got == 0) or print "# got $got\n";
 is ($_, "foo");
 
 $_ = "foo";
-$/ = "oo";
+$^INPUT_RECORD_SEPARATOR = "oo";
 $got = chomp();
 ok ($got == 2) or print "# got $got\n";
 is ($_, "f");
 
 $_ = "bar";
-$/ = "oo";
+$^INPUT_RECORD_SEPARATOR = "oo";
 $got = chomp();
 ok ($got == 0) or print "# got $got\n";
 is ($_, "bar");
 
 $_ = "f\n\n\n\n\n";
-$/ = "";
+$^INPUT_RECORD_SEPARATOR = "";
 $got = chomp();
 ok ($got == 5) or print "# got $got\n";
 is ($_, "f");
 
 $_ = "f\n\n";
-$/ = "";
+$^INPUT_RECORD_SEPARATOR = "";
 $got = chomp();
 ok ($got == 2) or print "# got $got\n";
 is ($_, "f");
 
 $_ = "f\n";
-$/ = "";
+$^INPUT_RECORD_SEPARATOR = "";
 $got = chomp();
 ok ($got == 1) or print "# got $got\n";
 is ($_, "f");
 
 $_ = "f";
-$/ = "";
+$^INPUT_RECORD_SEPARATOR = "";
 $got = chomp();
 ok ($got == 0) or print "# got $got\n";
 is ($_, "f");
 
 $_ = "xx";
-$/ = "xx";
+$^INPUT_RECORD_SEPARATOR = "xx";
 $got = chomp();
 ok ($got == 2) or print "# got $got\n";
 is ($_, "");
 
 $_ = "axx";
-$/ = "xx";
+$^INPUT_RECORD_SEPARATOR = "xx";
 $got = chomp();
 ok ($got == 2) or print "# got $got\n";
 is ($_, "a");
 
 $_ = "axx";
-$/ = "yy";
+$^INPUT_RECORD_SEPARATOR = "yy";
 $got = chomp();
 ok ($got == 0) or print "# got $got\n";
 is ($_, "axx");
 
 # This case once mistakenly behaved like paragraph mode.
 $_ = "ab\n";
-$/ = \3;
+$^INPUT_RECORD_SEPARATOR = \3;
 $got = chomp();
 ok ($got == 0) or print "# got $got\n";
 is ($_, "ab\n");
@@ -126,14 +126,14 @@ is ($_, "\x{1234}");
 
 # chomp should not stringify references unless it decides to modify them
 $_ = \@();
-$/ = "\n";
+$^INPUT_RECORD_SEPARATOR = "\n";
 dies_like( sub { $got = chomp(); }, qr/reference as string/, "chomp ref" );
 is (ref($_), "ARRAY", "chomp ref (no modify)");
-$/ = ")";  # the last char of something like "ARRAY(0x80ff6e4)"
+$^INPUT_RECORD_SEPARATOR = ")";  # the last char of something like "ARRAY(0x80ff6e4)"
 dies_like( sub { $got = chomp(); }, qr/reference as string/, "chomp ref no modify" );
 is (ref($_), "ARRAY", "chomp ref (no modify)");
 
-$/ = "\n";
+$^INPUT_RECORD_SEPARATOR = "\n";
 
 %chomp = %("One" => "One", "Two\n" => "Two", "" => "");
 %chop = %("One" => "On", "Two\n" => "Two", "" => "");
@@ -141,8 +141,8 @@ $/ = "\n";
 foreach (keys %chomp) {
   my $key = $_;
   try {chomp $_};
-  if ($@) {
-    my $err = $@;
+  if ($^EVAL_ERROR) {
+    my $err = $^EVAL_ERROR;
     $err =~ s/\n$//s;
     fail ("\$\@ = \"$err\"");
   } else {
@@ -153,8 +153,8 @@ foreach (keys %chomp) {
 foreach (keys %chop) {
   my $key = $_;
   try {chop $_};
-  if ($@) {
-    my $err = $@;
+  if ($^EVAL_ERROR) {
+    my $err = $^EVAL_ERROR;
     $err =~ s/\n$//s;
     fail ("\$\@ = \"$err\"");
   } else {
@@ -164,38 +164,38 @@ foreach (keys %chop) {
 
 # chop and chomp can't be lvalues
 eval 'chop($x) = 1;';
-like($@->description, qr/Can\'t assign.*chop/);
+like($^EVAL_ERROR->description, qr/Can\'t assign.*chop/);
 eval 'chomp($x) = 1;';
-ok($@->{?description} =~ m/Can\'t assign.*chom?p/);
+ok($^EVAL_ERROR->{?description} =~ m/Can\'t assign.*chom?p/);
 eval 'chop($x, $y) = (1, 2);';
-ok($@->{?description} =~ m/Can\'t assign.*chop/);
+ok($^EVAL_ERROR->{?description} =~ m/Can\'t assign.*chop/);
 eval 'chomp($x, $y) = (1, 2);';
-ok($@->{?description} =~ m/Can\'t assign.*chom?p/);
+ok($^EVAL_ERROR->{?description} =~ m/Can\'t assign.*chom?p/);
 
 do {
     use utf8;
     # returns length in code-points, but not in bytes.
-    $/ = "\x{100}";
-    $a = "A$/";
+    $^INPUT_RECORD_SEPARATOR = "\x{100}";
+    $a = "A$^INPUT_RECORD_SEPARATOR";
     $b = chomp $a;
     is ($b, 1);
 
-    $/ = "\x{100}\x{101}";
-    $a = "A$/";
+    $^INPUT_RECORD_SEPARATOR = "\x{100}\x{101}";
+    $a = "A$^INPUT_RECORD_SEPARATOR";
     $b = chomp $a;
     is ($b, 2);
 
     # returns length in bytes, not in code-points.
     use utf8;
-    $/ = "\x{100}";
+    $^INPUT_RECORD_SEPARATOR = "\x{100}";
     no utf8;
-    $a = "A$/";
+    $a = "A$^INPUT_RECORD_SEPARATOR";
     is( chomp($a), 2);
 
     use utf8;
-    $/ = "\x{100}\x{101}";
+    $^INPUT_RECORD_SEPARATOR = "\x{100}\x{101}";
     no utf8;
-    $a = "A$/";
+    $a = "A$^INPUT_RECORD_SEPARATOR";
     is( chomp($a), 4);
 };
 

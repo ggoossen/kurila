@@ -83,7 +83,7 @@ sub new
 
     if (GLOB_ERROR)
     {
-        $Error = $!;
+        $Error = $^OS_ERROR;
         return undef ;
     }
 

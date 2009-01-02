@@ -1,7 +1,7 @@
 #!./perl
 
 BEGIN {
-    $| = 1;
+    $^OUTPUT_AUTOFLUSH = 1;
     $^WARN_HOOK = sub { die "Dying on warning: ", < @_ };
 }
 
@@ -12,7 +12,7 @@ BEGIN {
 use warnings;
 use Config;
 
-plan tests => 39;
+plan tests => 35;
 
 
 my $Is_MSWin32  = $^O eq 'MSWin32';
@@ -41,20 +41,12 @@ elsif ($Is_VMS)   { ok `write sys\$output f\$trnlnm("FOO")` eq "hi there\n"; }
 else              { ok `echo \$FOO` eq "hi there\n"; }
 
 unlink 'ajslkdfpqjsjfk';
-$! = 0;
+$^OS_ERROR = 0;
 open(FOO, "<",'ajslkdfpqjsjfk');
-ok $!, $!;
+ok $^OS_ERROR, $^OS_ERROR;
 close FOO; # just mention it, squelch used-only-once
 
 # regex vars
-
-# $"
-my @a = qw(foo bar baz);
-ok "$(join ' ',@a)" eq "foo bar baz", "$(join ' ',@a)";
-do {
-    local $" = ',';
-    ok qq|$(join $",@a)| eq "foo,bar,baz", "$(join ' ',@a)";
-};
 
 # $?, $@, $$
 if ($Is_MacOS) {
@@ -62,17 +54,17 @@ if ($Is_MacOS) {
 }
 else {
     system qq[$PERL "-I../lib" -e "use vmsish qw(hushed); exit(0)"];
-    ok $? == 0, '$?';
+    ok $^CHILD_ERROR == 0, '$?';
     system qq[$PERL "-I../lib" -e "use vmsish qw(hushed); exit(1)"];
-    ok $? != 0, '$?';
+    ok $^CHILD_ERROR != 0, '$?';
 }
 
 try { die "foo\n" };
-ok $@->{?description} eq "foo\n", '$@';
+ok $^EVAL_ERROR->{?description} eq "foo\n", '$@';
 
-ok $$ +> 0, $$;
-try { $$++ };
-ok $@->{?description} =~ m/^Modification of a read-only value attempted/;
+ok $^PID +> 0, $^PID;
+try { $^PID++ };
+ok $^EVAL_ERROR->{?description} =~ m/^Modification of a read-only value attempted/;
 
 our ($wd, $script);
 
@@ -163,7 +155,7 @@ EOF
     s{./$perl}{$perl} if $Is_BeOS; # revert BeOS execvp() side-effect
     s{\\}{/}g;
     ok(($Is_MSWin32 || $Is_os2) ?? uc($_) eq uc($s1) !! $_ eq $s1) or diag " :$_:!=:$s1: after `$perl $script`";
-    ok unlink($script) or diag $!;
+    ok unlink($script) or diag $^OS_ERROR;
 };
 
 # $], $^O, $^T
@@ -204,7 +196,7 @@ else {
        ok ($Is_MSWin32 ?? (`set __NoNeSuCh` =~ m/^(?:__NoNeSuCh=)?foo$/)
 			    !! (`echo \$__NoNeSuCh` eq "foo\n") );
 	if ($^O =~ m/^(linux|freebsd)$/ &&
-	    open CMDLINE, '<', "/proc/$$/cmdline") {
+	    open CMDLINE, '<', "/proc/$^PID/cmdline") {
 	    chomp(my $line = scalar ~< *CMDLINE);
 	    my $me = (split m/\0/, $line)[0];
 	    ok($me eq $0, 'altering $0 is effective (testing with /proc/)');
@@ -215,8 +207,8 @@ else {
               $0 = $arg if defined $arg;
 	      # In FreeBSD the ps -o command= will cause
 	      # an empty header line, grab only the last line.
-              my $ps = @(`ps -o command= -p $$`)[-1];
-              return if $?;
+              my $ps = @(`ps -o command= -p $^PID`)[-1];
+              return if $^CHILD_ERROR;
               chomp $ps;
               printf "# 0[\%s]ps[\%s]\n", $0, $ps;
               $ps;
@@ -244,7 +236,7 @@ do {
     my $ok = 1;
     my $warn = '';
     local $^WARN_HOOK = sub { $ok = 0; $warn = join '', @_; };
-    $! = undef;
+    $^OS_ERROR = undef;
     ok($ok, $warn, $Is_VMS ?? "'\$!=undef' does throw a warning" !! '');
 };
 
@@ -263,23 +255,6 @@ SKIP: do {
     ok (nelems(env::keys()) == 0);
 };
 
-if ($Is_miniperl) {
-    skip ("miniperl can't rely on loading \%Errno") for 1..2;
-} else {
-   no warnings 'void';
-
-# Make sure Errno hasn't been prematurely autoloaded
-
-   ok ! %{Symbol::stash("Errno")};
-
-# Test auto-loading of Errno when %! is used
-
-   ok scalar eval q{
-      %!;
-      defined %Errno::;
-   }, $@ && $@->message;
-}
-
 ok $^S == 0 && defined $^S;
 try { ok $^S == 1 };
 eval " BEGIN \{ ok ! defined \$^S \} ";
@@ -294,15 +269,15 @@ do {
     my $ok = 0;
     # [perl #19330]
     do {
-	local $\ = undef;
-	$\++; $\++;
-	$ok = $\ eq 2;
+	local $^OUTPUT_RECORD_SEPARATOR = undef;
+	$^OUTPUT_RECORD_SEPARATOR++; $^OUTPUT_RECORD_SEPARATOR++;
+	$ok = $^OUTPUT_RECORD_SEPARATOR eq 2;
     };
     ok $ok;
     $ok = 0;
     do {
-	local $\ = "a\0b";
-	$ok = "a$\b" eq "aa\0bb";
+	local $^OUTPUT_RECORD_SEPARATOR = "a\0b";
+	$ok = "a$($^OUTPUT_RECORD_SEPARATOR)b" eq "aa\0bb";
     };
     ok $ok;
 };
@@ -315,6 +290,6 @@ do {
     #  inheritance, which is detected earlier now and broke
     #  this test
     try { push @ISA, __FILE__ };
-    ok( $@ eq '', 'Push a constant on a magic array');
-    $@ and print "# $@";
+    ok( $^EVAL_ERROR eq '', 'Push a constant on a magic array');
+    $^EVAL_ERROR and print "# $^EVAL_ERROR";
 };

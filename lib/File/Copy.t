@@ -21,7 +21,7 @@ foreach my $code (@("copy()", "copy('arg')", "copy('arg', 'arg', 'arg', 'arg')",
                  )
 {
     eval $code;
-    like $@->message, qr/^Usage: /, "'$code' is a usage error";
+    like $^EVAL_ERROR->message, qr/^Usage: /, "'$code' is a usage error";
 }
 
 
@@ -34,81 +34,81 @@ for my $cross_partition_test (0..1) {
   };
 
   # First we create a file
-  open(F, ">", "file-$$") or die;
+  open(F, ">", "file-$^PID") or die;
   binmode F; # for DOSISH platforms, because test 3 copies to stdout
   printf F "ok\n";
   close F;
 
-  copy "file-$$", "copy-$$";
+  copy "file-$^PID", "copy-$^PID";
 
-  open(F, "<", "copy-$$") or die;
+  open(F, "<", "copy-$^PID") or die;
   my $foo = ~< *F;
   close(F);
 
-  is -s "file-$$", -s "copy-$$", 'copy(fn, fn): files of the same size';
+  is -s "file-$^PID", -s "copy-$^PID", 'copy(fn, fn): files of the same size';
 
   is $foo, "ok\n", 'copy(fn, fn): same contents';
 
   print("# next test checks copying to STDOUT\n");
   binmode STDOUT unless $^O eq 'VMS'; # Copy::copy works in binary mode
   # This outputs "ok" so its a test.
-  copy "copy-$$", \*STDOUT;
+  copy "copy-$^PID", \*STDOUT;
   $TB->current_test($TB->current_test + 1);
-  unlink "copy-$$" or die "unlink: $!";
+  unlink "copy-$^PID" or die "unlink: $^OS_ERROR";
 
-  open(F, "<","file-$$");
-  copy(\*F, "copy-$$");
-  open(R, "<", "copy-$$") or die "open copy-$$: $!"; $foo = ~< *R; close(R);
+  open(F, "<","file-$^PID");
+  copy(\*F, "copy-$^PID");
+  open(R, "<", "copy-$^PID") or die "open copy-$^PID: $^OS_ERROR"; $foo = ~< *R; close(R);
   is $foo, "ok\n", 'copy(*F, fn): same contents';
-  unlink "copy-$$" or die "unlink: $!";
+  unlink "copy-$^PID" or die "unlink: $^OS_ERROR";
 
-  open(F, "<","file-$$");
-  copy(\*F, "copy-$$");
-  close(F) or die "close: $!";
-  open(R, "<", "copy-$$") or die; $foo = ~< *R; close(R) or die "close: $!";
+  open(F, "<","file-$^PID");
+  copy(\*F, "copy-$^PID");
+  close(F) or die "close: $^OS_ERROR";
+  open(R, "<", "copy-$^PID") or die; $foo = ~< *R; close(R) or die "close: $^OS_ERROR";
   is $foo, "ok\n", 'copy(\*F, fn): same contents';
-  unlink "copy-$$" or die "unlink: $!";
+  unlink "copy-$^PID" or die "unlink: $^OS_ERROR";
 
   require IO::File;
-  my $fh = IO::File->new("copy-$$", ">") or die "Cannot open copy-$$:$!";
+  my $fh = IO::File->new("copy-$^PID", ">") or die "Cannot open copy-$^PID:$^OS_ERROR";
   binmode $fh or die;
-  copy("file-$$",$fh);
-  $fh->close or die "close: $!";
-  open(R, "<", "copy-$$") or die; $foo = ~< *R; close(R);
+  copy("file-$^PID",$fh);
+  $fh->close or die "close: $^OS_ERROR";
+  open(R, "<", "copy-$^PID") or die; $foo = ~< *R; close(R);
   is $foo, "ok\n", 'copy(fn, io): same contents';
-  unlink "copy-$$" or die "unlink: $!";
+  unlink "copy-$^PID" or die "unlink: $^OS_ERROR";
 
   require FileHandle;
-  my $fh = FileHandle->new("copy-$$", ">") or die "Cannot open copy-$$:$!";
+  my $fh = FileHandle->new("copy-$^PID", ">") or die "Cannot open copy-$^PID:$^OS_ERROR";
   binmode $fh or die;
-  copy("file-$$",$fh);
+  copy("file-$^PID",$fh);
   $fh->close;
-  open(R, "<", "copy-$$") or die; $foo = ~< *R; close(R);
+  open(R, "<", "copy-$^PID") or die; $foo = ~< *R; close(R);
   is $foo, "ok\n", 'copy(fn, fh): same contents';
-  unlink "file-$$" or die "unlink: $!";
+  unlink "file-$^PID" or die "unlink: $^OS_ERROR";
 
-  ok !move("file-$$", "copy-$$"), "move on missing file";
-  ok -e "copy-$$",                '  target still there';
+  ok !move("file-$^PID", "copy-$^PID"), "move on missing file";
+  ok -e "copy-$^PID",                '  target still there';
 
   # Doesn't really matter what time it is as long as its not now.
   my $time = 1000000000;
-  utime( $time, $time, "copy-$$" );
+  utime( $time, $time, "copy-$^PID" );
 
   # Recheck the mtime rather than rely on utime in case we're on a
   # system where utime doesn't work or there's no mtime at all.
   # The destination file will reflect the same difficulties.
-  my $mtime = @(stat("copy-$$"))[9];
+  my $mtime = @(stat("copy-$^PID"))[9];
 
-  ok move("copy-$$", "file-$$"), 'move';
-  ok -e "file-$$",              '  destination exists';
-  ok !-e "copy-$$",              '  source does not';
-  open(R, "<", "file-$$") or die; $foo = ~< *R; close(R);
+  ok move("copy-$^PID", "file-$^PID"), 'move';
+  ok -e "file-$^PID",              '  destination exists';
+  ok !-e "copy-$^PID",              '  source does not';
+  open(R, "<", "file-$^PID") or die; $foo = ~< *R; close(R);
   is $foo, "ok\n", 'contents preserved';
 
   TODO: do {
     local $TODO = 'mtime only preserved on ODS-5 with POSIX dates and DECC$EFS_FILE_TIMESTAMPS enabled' if $^O eq 'VMS';
 
-    my $dest_mtime = @(stat("file-$$"))[9];
+    my $dest_mtime = @(stat("file-$^PID"))[9];
     is $dest_mtime, $mtime,
       "mtime preserved by copy()". 
       ($cross_partition_test ?? " while testing cross-partition" !! "");
@@ -116,76 +116,76 @@ for my $cross_partition_test (0..1) {
 
   # trick: create lib/ if not exists - not needed in Perl core
   unless (-d 'lib') { mkdir 'lib' or die; }
-  copy "file-$$", "lib";
-  open(R, "<", "lib/file-$$") or die $!; $foo = ~< *R; close(R);
+  copy "file-$^PID", "lib";
+  open(R, "<", "lib/file-$^PID") or die $^OS_ERROR; $foo = ~< *R; close(R);
   is $foo, "ok\n", 'copy(fn, dir): same contents';
-  unlink "lib/file-$$" or die "unlink: $!";
+  unlink "lib/file-$^PID" or die "unlink: $^OS_ERROR";
 
   # Do it twice to ensure copying over the same file works.
-  copy "file-$$", "lib";
-  open(R, "<", "lib/file-$$") or die; $foo = ~< *R; close(R);
+  copy "file-$^PID", "lib";
+  open(R, "<", "lib/file-$^PID") or die; $foo = ~< *R; close(R);
   is $foo, "ok\n", 'copy over the same file works';
-  unlink "lib/file-$$" or die "unlink: $!";
+  unlink "lib/file-$^PID" or die "unlink: $^OS_ERROR";
 
   do { 
     my $warnings = '';
     local $^WARN_HOOK = sub { $warnings .= @_[0]->{?description} };
-    ok copy("file-$$", "file-$$"), 'copy(fn, fn) succeeds';
+    ok copy("file-$^PID", "file-$^PID"), 'copy(fn, fn) succeeds';
 
     like $warnings, qr/are identical/, 'but warns';
-    ok -s "file-$$", 'contents preserved';
+    ok -s "file-$^PID", 'contents preserved';
   };
 
-  move "file-$$", "lib";
-  open(R, "<", "lib/file-$$") or die "open lib/file-$$: $!"; $foo = ~< *R; close(R);
+  move "file-$^PID", "lib";
+  open(R, "<", "lib/file-$^PID") or die "open lib/file-$^PID: $^OS_ERROR"; $foo = ~< *R; close(R);
   is $foo, "ok\n", 'move(fn, dir): same contents';
-  ok !-e "file-$$", 'file moved indeed';
-  unlink "lib/file-$$" or die "unlink: $!";
+  ok !-e "file-$^PID", 'file moved indeed';
+  unlink "lib/file-$^PID" or die "unlink: $^OS_ERROR";
 
   SKIP: do {
     skip "Testing symlinks", 3 unless config_value("d_symlink");
 
-    open(F, ">", "file-$$") or die $!;
+    open(F, ">", "file-$^PID") or die $^OS_ERROR;
     print F "dummy content\n";
     close F;
-    symlink("file-$$", "symlink-$$") or die $!;
+    symlink("file-$^PID", "symlink-$^PID") or die $^OS_ERROR;
 
     my $warnings = '';
     local $^WARN_HOOK = sub { $warnings .= @_[0]->{?description} };
-    ok !copy("file-$$", "symlink-$$"), 'copy to itself (via symlink) fails';
+    ok !copy("file-$^PID", "symlink-$^PID"), 'copy to itself (via symlink) fails';
 
     like $warnings, qr/are identical/, 'emits a warning';
-    ok !-z "file-$$", 
+    ok !-z "file-$^PID", 
       'rt.perl.org 5196: copying to itself would truncate the file';
 
-    unlink "symlink-$$";
-    unlink "file-$$";
+    unlink "symlink-$^PID";
+    unlink "file-$^PID";
   };
 
   SKIP: do {
     skip "Testing hard links", 3 
          if !config_value("d_link") or $^O eq 'MSWin32' or $^O eq 'cygwin';
 
-    open(F, ">", "file-$$") or die $!;
+    open(F, ">", "file-$^PID") or die $^OS_ERROR;
     print F "dummy content\n";
     close F;
-    link("file-$$", "hardlink-$$") or die $!;
+    link("file-$^PID", "hardlink-$^PID") or die $^OS_ERROR;
 
     my $warnings = '';
     local $^WARN_HOOK = sub { $warnings .= @_[0]->{?description} };
-    ok !copy("file-$$", "hardlink-$$"), 'copy to itself (via hardlink) fails';
+    ok !copy("file-$^PID", "hardlink-$^PID"), 'copy to itself (via hardlink) fails';
 
     like $warnings, qr/are identical/, 'emits a warning';
-    ok ! -z "file-$$",
+    ok ! -z "file-$^PID",
       'rt.perl.org 5196: copying to itself would truncate the file';
 
-    unlink "hardlink-$$";
-    unlink "file-$$";
+    unlink "hardlink-$^PID";
+    unlink "file-$^PID";
   };
 }
 
 
 END {
-    1 while unlink "file-$$";
-    1 while unlink "lib/file-$$";
+    1 while unlink "file-$^PID";
+    1 while unlink "lib/file-$^PID";
 }

@@ -11,7 +11,7 @@ BEGIN {
 }
 chdir 't';
 
-use vars < qw( $required );
+our ($required);
 use Test::More tests => 18;
 
 BEGIN { use_ok( 'ExtUtils::Mkbootstrap' ) }
@@ -26,7 +26,7 @@ if (open(OUT, ">", 'mkboot.bs')) {
 }
 
 SKIP: do {
-	skip("could not make dummy .bs file: $!", 2) unless $file_is_ready;
+	skip("could not make dummy .bs file: $^OS_ERROR", 2) unless $file_is_ready;
 
 	Mkbootstrap('mkboot');
 	ok( -s 'mkboot.bso', 'Mkbootstrap should backup the .bs file' );
@@ -62,7 +62,7 @@ like( $out, qr/bsloadlibs=foo/, 'should still report libraries' );
 $file_is_ready = open(OUT, ">", 'boot_BS');
 
 SKIP: do {
-	skip("cannot open boot_BS for writing: $!", 1) unless $file_is_ready;
+	skip("cannot open boot_BS for writing: $^OS_ERROR", 1) unless $file_is_ready;
 
 	print OUT '$main::required = 1';
 	close OUT;
@@ -76,7 +76,7 @@ SKIP: do {
 $file_is_ready = open(OUT, ">", 'dasboot.bs');
 
 SKIP: do {
-	skip("cannot make dasboot.bs: $!", 5) unless $file_is_ready;
+	skip("cannot make dasboot.bs: $^OS_ERROR", 5) unless $file_is_ready;
 
 	# if it can't be opened for writing, we want to prove that it'll die
 	close OUT;
@@ -86,14 +86,14 @@ SKIP: do {
 	    skip("cannot write readonly files", 1) if -w 'dasboot.bs'; 
 
 	    try{ Mkbootstrap('dasboot', 1) };
-	    like( $@->{?description}, qr/Unable to open dasboot\.bs/, 'should die given bad filename' );
+	    like( $^EVAL_ERROR->{?description}, qr/Unable to open dasboot\.bs/, 'should die given bad filename' );
 	};
 
 	# now put it back like it was
         $out = '';
 	chmod 0777, 'dasboot.bs';
 	try{ Mkbootstrap('dasboot', 'myarg') };
-	is( $@, '', 'should not die, given good filename' );
+	is( $^EVAL_ERROR, '', 'should not die, given good filename' );
 
 	# red and reed (a visual pun makes tests worth reading)
 	like( $out, qr/Writing dasboot.bs/, 'should print status' );
@@ -106,9 +106,9 @@ SKIP: do {
 
 
 SKIP: do {
-	skip("cannot read .bs file: $!", 2) unless $file_is_ready;
+	skip("cannot read .bs file: $^OS_ERROR", 2) unless $file_is_ready;
 
-	my $file = do { local $/ = ~< *IN };
+	my $file = do { local $^INPUT_RECORD_SEPARATOR = ~< *IN };
 
 	# filename should be in header
 	like( $file, qr/# dasboot DynaLoader/, 'file should have boilerplate' );
@@ -123,7 +123,7 @@ $file_is_ready = open(OUT, ">", 'dasboot.bs');
 $out = '';
 
 SKIP: do {
-	skip("cannot make dasboot.bs again: $!", 1) unless $file_is_ready;
+	skip("cannot make dasboot.bs again: $^OS_ERROR", 1) unless $file_is_ready;
 	close OUT;
 
 	# if $DynaLoader::bscode is set, write its contents to the file
@@ -133,15 +133,15 @@ SKIP: do {
 	
 	# if arguments contain '-l' or '-L' or '-R' print dl_findfile message
 	try{ Mkbootstrap('dasboot', '-Larry') };
-	is( $@, '', 'should be able to open a file again');
+	is( $^EVAL_ERROR, '', 'should be able to open a file again');
 
 	$file_is_ready = open(IN, "<", 'dasboot.bs');
 };
 
 SKIP: do {
-	skip("cannot open dasboot.bs for reading: $!", 3) unless $file_is_ready;
+	skip("cannot open dasboot.bs for reading: $^OS_ERROR", 3) unless $file_is_ready;
 
-	my $file = do { local $/ = ~< *IN };
+	my $file = do { local $^INPUT_RECORD_SEPARATOR = ~< *IN };
 	is( $out, "Writing dasboot.bs\n", 'should hush without Verbose set' );
 
 	# and find our hidden tribute to a fine example

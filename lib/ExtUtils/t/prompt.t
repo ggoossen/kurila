@@ -16,13 +16,13 @@ use ExtUtils::MakeMaker;
 eval q{
     prompt();
 };
-like( $@->{description}, qr/^Not enough arguments for ExtUtils::MakeMaker::prompt/,
+like( $^EVAL_ERROR->{description}, qr/^Not enough arguments for ExtUtils::MakeMaker::prompt/,
                                             'no args' );
 
 try {
     prompt(undef);
 };
-like( $@->{description}, qr/^prompt function called without an argument/, 
+like( $^EVAL_ERROR->{description}, qr/^prompt function called without an argument/, 
                                             'undef message' );
 
 my $stdout = \$( '' );

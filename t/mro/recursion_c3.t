@@ -76,7 +76,7 @@ foreach my $loopy ( @loopies) {
         mro::get_linear_isa('K', 'c3');
     };
 
-    if(my $err = $@) {
+    if(my $err = $^EVAL_ERROR) {
         if($err->{?description} =~ m/ALRMTimeout/) {
             ok(0, "Loop terminated by SIGALRM");
         }

@@ -28,7 +28,7 @@ sub import {
   }
 
   # We *need* to treat @{"$pkg\::EXPORT_FAIL"} since Carp uses it :-(
-  my @($exports, $fail) = @(\@{*{Symbol::fetch_glob("$pkg\::EXPORT")}}, 
+  my @($exports, $fail) = @(\@{*{Symbol::fetch_glob("$pkg\::EXPORT")}},
                             \@{*{Symbol::fetch_glob("$pkg\::EXPORT_FAIL")}});
   return export $pkg, $callpkg, < @_
     if $Verbose or $Debug or (nelems @$fail) +> 1;
@@ -414,13 +414,6 @@ variables C<@EXPORT_OK>, C<@EXPORT>, C<@ISA>, etc.
 
   our @ISA = qw(Exporter);
   our @EXPORT_OK = qw(munge frobnicate);
-
-If backward compatibility for Perls under 5.6 is important,
-one must write instead a C<use vars> statement.
-
-  use vars qw(@ISA @EXPORT_OK);
-  @ISA = qw(Exporter);
-  @EXPORT_OK = qw(munge frobnicate);
 
 =head2 Playing Safe
 

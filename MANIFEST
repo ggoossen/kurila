@@ -1551,9 +1551,6 @@ lib/User/pwent.t		See if User::pwent works
 lib/utf8_heavy.pl		Support routines for utf8 pragma
 lib/utf8.pm			Pragma to control Unicode support
 lib/utf8.t			See if utf8 operations work
-lib/vars_carp.t			See if "use vars" doesn't load Carp.pm per default
-lib/vars.pm			Declare pseudo-imported global variables
-lib/vars.t			See if "use vars" works
 lib/version.pm			Support for version objects
 lib/version.pod			Documentation of the version module
 lib/version.t			Tests for version objects
@@ -2169,7 +2166,6 @@ t/lib/Devel/switchd.pm		Module for t/run/switchd.t
 t/lib/Dev/Null.pm		Module for testing Test::Harness	
 t/lib/Dummy.pm			Module for testing base.pm
 t/lib/feature/bundle		Tests for feature bundles
-t/lib/feature/implicit		Tests for implicit loading of feature.pm
 t/lib/feature/nonesuch		Tests for enabling/disabling nonexistent feature
 t/lib/Filter/Simple/ExportTest.pm	Helper file for Filter::Simple tests
 t/lib/Filter/Simple/FilterOnlyTest.pm	Helper file for Filter::Simple tests

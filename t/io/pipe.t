@@ -16,7 +16,7 @@ BEGIN {
 my $Perl = which_perl();
 
 
-$| = 1;
+$^OUTPUT_AUTOFLUSH = 1;
 
 open(PIPE, "|-", "-") || exec $Perl, '-pe', 's/Y/k/g; s/X/o/g';
 
@@ -160,7 +160,7 @@ SKIP: do {
              $^O eq 'posix-bc';
 
         signals::temp_set_handler(PIPE => 'IGNORE');
-        open NIL, '|-', qq{$Perl -e "exit 0"} or die "open failed: $!";
+        open NIL, '|-', qq{$Perl -e "exit 0"} or die "open failed: $^OS_ERROR";
         sleep 5;
         if (print NIL 'foo') {
             # If print was allowed we had better get an error on close
@@ -176,11 +176,11 @@ SKIP: do {
 
         # check that errno gets forced to 0 if the piped program exited 
         # non-zero
-        open NIL, '|-', qq{$Perl -e "exit 23";} or die "fork failed: $!";
-        $! = 1;
+        open NIL, '|-', qq{$Perl -e "exit 23";} or die "fork failed: $^OS_ERROR";
+        $^OS_ERROR = 1;
         ok(!close NIL,  'close failure on non-zero piped exit');
-        is($!, '',      '       errno');
-        isnt($?, 0,     '       status');
+        is($^OS_ERROR, '',      '       errno');
+        isnt($^CHILD_ERROR, 0,     '       status');
 
         SKIP: do {
             skip "Don't work yet", 6 if $^O eq 'mpeix';
@@ -190,17 +190,17 @@ SKIP: do {
             unless( $zombie = fork ) {
                 exit 37;
             }
-            my $pipe = open *FH, "-|", "sleep 2;exit 13" or die "Open: $!\n";
+            my $pipe = open *FH, "-|", "sleep 2;exit 13" or die "Open: $^OS_ERROR\n";
             signals::set_handler(ALRM => sub { return });
             alarm(1);
             is( close FH, '',   'close failure for... umm, something' );
-            is( $?, 13*256,     '       status' );
-            is( $!, '',         '       errno');
+            is( $^CHILD_ERROR, 13*256,     '       status' );
+            is( $^OS_ERROR, '',         '       errno');
 
             my $wait = wait;
-            is( $?, 37*256,     'status correct after wait' );
+            is( $^CHILD_ERROR, 37*256,     'status correct after wait' );
             is( $wait, $zombie, '       wait pid' );
-            is( $!, '',         '       errno');
+            is( $^OS_ERROR, '',         '       errno');
         };
     };
 };
@@ -216,12 +216,12 @@ do { local *P;
 # check that status is unaffected by implicit close
 do {
     local(*NIL);
-    open NIL, '|-', qq{$Perl -e "exit 23"} or die "fork failed: $!";
-    $? = 42;
+    open NIL, '|-', qq{$Perl -e "exit 23"} or die "fork failed: $^OS_ERROR";
+    $^CHILD_ERROR = 42;
     # NIL implicitly closed here
 };
-is($?, 42,      'status unaffected by implicit close');
-$? = 0;
+is($^CHILD_ERROR, 42,      'status unaffected by implicit close');
+$^CHILD_ERROR = 0;
 
 # check that child is reaped if the piped program can't be executed
 SKIP: do {

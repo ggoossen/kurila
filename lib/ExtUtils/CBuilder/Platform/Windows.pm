@@ -7,7 +7,7 @@ use File::Spec;
 
 use ExtUtils::CBuilder::Base;
 
-use vars < qw($VERSION @ISA);
+our ($VERSION, @ISA);
 $VERSION = '0.22';
 @ISA = qw(ExtUtils::CBuilder::Base);
 
@@ -279,7 +279,7 @@ sub write_compiler_script {
   print "Generating script '$script'\n" if !$self->{?quiet};
 
   open( SCRIPT, ">$script" )
-    or die( "Could not create script '$script': $!" );
+    or die( "Could not create script '$script': $^OS_ERROR" );
 
   print SCRIPT join( "\n", map { ref $_ ?? < @{$_} !! $_ }
  grep defined, @(
@@ -351,7 +351,7 @@ sub write_linker_script {
   print "Generating script '$script'\n" if !$self->{?quiet};
 
   open( SCRIPT, ">$script" )
-    or die( "Could not create script '$script': $!" );
+    or die( "Could not create script '$script': $^OS_ERROR" );
 
   print SCRIPT join( "\n", map { ref $_ ?? < @{$_} !! $_ }
  grep defined, @(
@@ -407,7 +407,7 @@ sub write_compiler_script {
   print "Generating script '$script'\n" if !$self->{?quiet};
 
   open( SCRIPT, ">$script" )
-    or die( "Could not create script '$script': $!" );
+    or die( "Could not create script '$script': $^OS_ERROR" );
 
   # XXX Borland "response files" seem to be unable to accept macro
   # definitions containing quoted strings. Escaping strings with
@@ -472,7 +472,7 @@ sub write_linker_script {
 
   # Script 1: contains options & names of object files.
   open( LD_SCRIPT, ">$ld_script" )
-    or die( "Could not create linker script '$ld_script': $!" );
+    or die( "Could not create linker script '$ld_script': $^OS_ERROR" );
 
   print LD_SCRIPT join( " +\n", map { < @{$_} }
  grep defined, @(
@@ -484,7 +484,7 @@ sub write_linker_script {
 
   # Script 2: contains name of libs to link against.
   open( LD_LIBS, ">$ld_libs" )
-    or die( "Could not create linker script '$ld_libs': $!" );
+    or die( "Could not create linker script '$ld_libs': $^OS_ERROR" );
 
   print LD_LIBS join( " +\n", @(
      (delete %spec{libperl}  || ''),
@@ -615,7 +615,7 @@ sub write_linker_script {
   print "Generating script '$script'\n" if !$self->{?quiet};
 
   open( SCRIPT, ">$script" )
-    or die( "Could not create script '$script': $!" );
+    or die( "Could not create script '$script': $^OS_ERROR" );
 
   print( SCRIPT 'SEARCH_DIR(' . $_ . ")\n" )
     for  @{delete %spec{libpath} || \@()};

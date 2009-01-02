@@ -4,7 +4,7 @@ use Config;
 
 require "./test.pl";
 
-my $file = "crlf$$.dat";
+my $file = "crlf$^PID.dat";
 END {
     1 while unlink($file);
 }
@@ -16,13 +16,13 @@ if ('PerlIO::Layer'->find( 'perlio')) {
     ok(open(FOO,"<:crlf",$file));
 
     my $text;
-    do { local $/; $text = ~< *FOO };
+    do { local $^INPUT_RECORD_SEPARATOR; $text = ~< *FOO };
     is(count_chars($text, "\015\012"), 0);
     is(count_chars($text, "\n"), 2000);
 
     binmode(FOO);
     seek(FOO,0,0);
-    do { local $/; $text = ~< *FOO };
+    do { local $^INPUT_RECORD_SEPARATOR; $text = ~< *FOO };
     is(count_chars($text, "\015\012"), 2000);
 
     SKIP:
@@ -33,11 +33,11 @@ if ('PerlIO::Layer'->find( 'perlio')) {
 	require PerlIO::scalar;
 	my $fcontents = join "", map {"$_\015\012"} 10..100000;
 	open my $fh, "<:crlf", \$fcontents;
-	local $/ = "xxx";
+	local $^INPUT_RECORD_SEPARATOR = "xxx";
 	local $_ = ~< $fh;
 	my $pos = tell $fh; # pos must be behind "xxx", before "\nxxy\n"
 	seek $fh, $pos, 0;
-	$/ = "\n";
+	$^INPUT_RECORD_SEPARATOR = "\n";
 	my $s = ( ~< $fh ) . ~< $fh;
 	ok($s eq "\nxxy\n");
     };

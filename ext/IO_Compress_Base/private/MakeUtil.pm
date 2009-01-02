@@ -9,7 +9,7 @@ use File::Copy;
 BEGIN
 {
     try { require File::Spec::Functions ; File::Spec::Functions->import() } ;
-    if ($@)
+    if ($^EVAL_ERROR)
     {
         *catfile = sub { return "@_[0]/@_[1]" }
     }
@@ -75,7 +75,7 @@ sub getPerlFiles
             if $manifest =~ m#^(.*/)#;
 
         open M, "<", "$manifest"
-            or die "Cannot open '$manifest': $!\n";
+            or die "Cannot open '$manifest': $^OS_ERROR\n";
         while ( ~< *M)
         {
             chomp ;
@@ -164,8 +164,8 @@ sub UpDowngrade
         $our_sub = sub {
 	    if ( m/^(\s*)our\s+\(\s*([^)]+\s*)\)/ ) {
                 my $indent = $1;
-                my $vars = join ' ', split m/\s*,\s*/, $2;
-                $_ = "$($indent)use vars qw($vars);\n";
+                my $vars = join ', ', split m/\s*,\s*/, $2;
+                $_ = "$($indent)our ($vars);\n";
             }
 	    elsif ( m/^(\s*)((use|no)\s+(bytes|utf8)\s*;.*)$/)
             {
@@ -246,13 +246,13 @@ sub doUpDownViaCopy
     my $backup = $file . ($^O eq 'VMS') ?? "_bak" !! ".bak";
 
     copy($file, $backup)
-        or die "Cannot copy $file to $backup: $!";
+        or die "Cannot copy $file to $backup: $^OS_ERROR";
 
     my @keep = @( () );
 
     do {
         open F, "<", "$file"
-            or die "Cannot open $file: $!\n" ;
+            or die "Cannot open $file: $^OS_ERROR\n" ;
         while ( ~< *F)
         {
             if (m/^__(END|DATA)__/)
@@ -276,7 +276,7 @@ sub doUpDownViaCopy
 
     do {
         open F, ">", "$file"
-            or die "Cannot open $file: $!\n";
+            or die "Cannot open $file: $^OS_ERROR\n";
         print F < @keep ;
         close F;
     };

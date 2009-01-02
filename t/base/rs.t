@@ -10,10 +10,10 @@ $teststring = "1\n12\n123\n1234\n1234\n12345\n\n123456\n1234567\n";
 # Create our test datafile
 1 while unlink 'foo';                # in case junk left around
 rmdir 'foo';
-open TESTFILE, ">", "./foo" or die "error $! $^E opening";
+open TESTFILE, ">", "./foo" or die "error $^OS_ERROR $^E opening";
 binmode TESTFILE;
 print TESTFILE $teststring;
-close TESTFILE or die "error $! $^E closing";
+close TESTFILE or die "error $^OS_ERROR $^E closing";
 
 open TESTFILE, "<", "./foo";
 binmode TESTFILE;
@@ -23,35 +23,35 @@ $bar = ~< *TESTFILE;
 if ($bar eq "1\n") {print "ok 1\n";} else {print "not ok 1\n";}
 
 # explicitly set to \n
-$/ = "\n";
+$^INPUT_RECORD_SEPARATOR = "\n";
 $bar = ~< *TESTFILE;
 if ($bar eq "12\n") {print "ok 2\n";} else {print "not ok 2\n";}
 
 # Try a non line terminator
-$/ = 3;
+$^INPUT_RECORD_SEPARATOR = 3;
 $bar = ~< *TESTFILE;
 if ($bar eq "123") {print "ok 3\n";} else {print "not ok 3\n";}
 
 # Eat the line terminator
-$/ = "\n";
+$^INPUT_RECORD_SEPARATOR = "\n";
 $bar = ~< *TESTFILE;
 
 # How about a larger terminator
-$/ = "34";
+$^INPUT_RECORD_SEPARATOR = "34";
 $bar = ~< *TESTFILE;
 if ($bar eq "1234") {print "ok 4\n";} else {print "not ok 4\n";}
 
 # Eat the line terminator
-$/ = "\n";
+$^INPUT_RECORD_SEPARATOR = "\n";
 $bar = ~< *TESTFILE;
 
 # Does paragraph mode work?
-$/ = '';
+$^INPUT_RECORD_SEPARATOR = '';
 $bar = ~< *TESTFILE;
 if ($bar eq "1234\n12345\n\n") {print "ok 5\n";} else {print "not ok 5\n";}
 
 # Try slurping the rest of the file
-$/ = undef;
+$^INPUT_RECORD_SEPARATOR = undef;
 $bar = ~< *TESTFILE;
 if ($bar eq "123456\n1234567\n") {print "ok 6\n";} else {print "not ok 6\n";}
 
@@ -68,29 +68,29 @@ binmode TESTFILE;
 
 # Test straight number
 my $x = 2;
-$/ = \$x;
+$^INPUT_RECORD_SEPARATOR = \$x;
 $bar = ~< *TESTFILE;
 if ($bar eq "12") {print "ok 7\n";} else {print "not ok 7\n";}
 
 # Test stringified number
-$/ = \"2";
+$^INPUT_RECORD_SEPARATOR = \"2";
 $bar = ~< *TESTFILE;
 if ($bar eq "34") {print "ok 8\n";} else {print "not ok 8\n";}
 
 # Integer variable
 $foo = 2;
-$/ = \$foo;
+$^INPUT_RECORD_SEPARATOR = \$foo;
 $bar = ~< *TESTFILE;
 if ($bar eq "56") {print "ok 9\n";} else {print "not ok 9\n";}
 
 # String variable
 $foo = "2";
-$/ = \$foo;
+$^INPUT_RECORD_SEPARATOR = \$foo;
 $bar = ~< *TESTFILE;
 if ($bar eq "78") {print "ok 10\n";} else {print "not ok 10\n";}
 
 # Naughty straight number - should get the rest of the file
-$/ = undef;
+$^INPUT_RECORD_SEPARATOR = undef;
 $bar = ~< *TESTFILE;
 if ($bar eq "90123456789012345678901234567890") {print "ok 11\n";} else {print "not ok 11\n";}
 
@@ -111,18 +111,18 @@ if ($^O eq 'VMS') {
   print CREATEFILE "\$EXIT\n";
   close CREATEFILE;
   $throwaway = `\@\[\]foo`, "\n";
-  open(TEMPFILE, ">", "./foo.bar") or print "# open failed $! $^E\n";
+  open(TEMPFILE, ">", "./foo.bar") or print "# open failed $^OS_ERROR $^E\n";
   print TEMPFILE "foo\nfoobar\nbaz\n";
   close TEMPFILE;
 
   open TESTFILE, "<", "./foo.bar";
-  $/ = \10;
+  $^INPUT_RECORD_SEPARATOR = \10;
   $bar = ~< *TESTFILE;
   if ($bar eq "foo\n") {print "ok 12\n";} else {print "not ok 12\n";}
   $bar = ~< *TESTFILE;
   if ($bar eq "foobar\n") {print "ok 13\n";} else {print "not ok 13\n";}
   # can we do a short read?
-  $/ = \2;
+  $^INPUT_RECORD_SEPARATOR = \2;
   $bar = ~< *TESTFILE;
   if ($bar eq "ba") {print "ok 14\n";} else {print "not ok 14\n";}
   # do we get the rest of the record?
@@ -137,7 +137,7 @@ if ($^O eq 'VMS') {
   foreach my $test (12..15) {print "ok $test # skipped on non-VMS system\n"};
 }
 
-$/ = "\n";
+$^INPUT_RECORD_SEPARATOR = "\n";
 
 # see if open/readline/close work on our and my variables
 do {

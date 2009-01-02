@@ -35,7 +35,7 @@ do {
 	try {
 		$frozen = Storable::freeze( $goodfreeze );
 	};
-	ok( ! $@, 'Storable does not die when STORABLE_freeze does not return references' );
+	ok( ! $^EVAL_ERROR, 'Storable does not die when STORABLE_freeze does not return references' );
 	ok( $frozen, 'Storable freezes to a string successfully' );
 
 	package My::GoodFreeze;
@@ -61,9 +61,9 @@ do {
 	try {
 		Storable::freeze( $badfreeze );
 	};
-	ok( $@, 'Storable dies correctly when STORABLE_freeze returns a referece' );
+	ok( $^EVAL_ERROR, 'Storable dies correctly when STORABLE_freeze returns a referece' );
 	# Check for a unique substring of the error message
-	ok( $@->{?description} =~ m/cannot return references/, 'Storable dies with the expected error' );
+	ok( $^EVAL_ERROR->{?description} =~ m/cannot return references/, 'Storable dies with the expected error' );
 
 	package My::BadFreeze;
 
@@ -143,9 +143,9 @@ do {
 	try {
 		$thawed = Storable::thaw( $frozen );
 	};
-	ok( $@, 'My::BadThaw object dies when thawing as expected' );
+	ok( $^EVAL_ERROR, 'My::BadThaw object dies when thawing as expected' );
 	# Check for a snippet from the error message
-	ok( $@->{?description} =~ m/unexpected references/, 'Dies with the expected error message' );
+	ok( $^EVAL_ERROR->{?description} =~ m/unexpected references/, 'Dies with the expected error message' );
 
 	package My::BadThaw;
 
@@ -234,8 +234,8 @@ do {
 		try {
 			$thawed = Storable::thaw( $frozen );
 		};
-		ok( $@, 'BadAttach dies on thaw' );
-		ok( $@->{?description} =~ m/STORABLE_attach did not return a My::BadAttach object/,
+		ok( $^EVAL_ERROR, 'BadAttach dies on thaw' );
+		ok( $^EVAL_ERROR->{?description} =~ m/STORABLE_attach did not return a My::BadAttach object/,
 			'BadAttach dies on thaw with the expected error message' );
 		is( $thawed, undef, 'Double checking $thawed was not set' );
 	}

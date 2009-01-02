@@ -1,5 +1,5 @@
 #!./perl -w
-$|=1;
+$^OUTPUT_AUTOFLUSH=1;
 use Config;
 
 print "1..0\n# TODO for changes pckage system";
@@ -8,7 +8,7 @@ exit;
 # Tests Todo:
 #	'main' as root
 
-use vars < qw($bar);
+our ($bar);
 
 use Opcode v1.00 < qw(opdesc opset opset_to_ops opset_to_hex
 	opmask_add full_opset empty_opset opcodes opmask define_optag);
@@ -35,10 +35,10 @@ $cpt = Safe->new( "My::Root");
 $cpt->permit( <qw(:base_io));
 
 $cpt->reval(q{ system("echo not ok 1"); });
-if ($@ && $@->{?description} =~ m/^'?system'? trapped by operation mask/) {
+if ($^EVAL_ERROR && $^EVAL_ERROR->{?description} =~ m/^'?system'? trapped by operation mask/) {
     print "ok 1\n";
 } else {
-    print "#$@" if $@;
+    print "#$^EVAL_ERROR" if $^EVAL_ERROR;
     print "not ok 1\n";
 }
 
@@ -50,17 +50,16 @@ $cpt->reval(q{
     print defined($main::bar)		? "not ok 5\n" : "ok 5\n";
     print defined($main::bar)		? "not ok 6\n" : "ok 6\n";
 });
-print $@ ?? "not ok 7\n#$($@->message)" !! "ok 7\n";
+print $^EVAL_ERROR ?? "not ok 7\n#$($^EVAL_ERROR->message)" !! "ok 7\n";
 
 our $foo = "ok 8\n";
 our %bar = %(key => "ok 9\n");
-our @baz = @( () ); push(@baz, "o", "10"); $" = 'k ';
+our @baz = @( () ); push(@baz, "o", "10");
 our @glob = qw(not ok 16);
 
 sub sayok { print "ok $(join ' ',@_)\n" }
 
 $cpt->share( <qw($foo %bar @baz sayok));
-$cpt->share('$"');
 
 $cpt->reval(q{
     package other;
@@ -76,8 +75,7 @@ $cpt->reval(q{
     %bar{new} = "ok 15\n";
     @glob = @(qw(ok 16));
 });
-print $@ ?? "not ok 13\n#$($@->message)" !! "ok 13\n";
-$" = ' ';
+print $^EVAL_ERROR ?? "not ok 13\n#$($^EVAL_ERROR->message)" !! "ok 13\n";
 print $foo, %bar{?new}, "$(join ' ',@glob)\n";
 
 $Root::foo = "not ok 17";
@@ -111,20 +109,20 @@ print @t_array[2] == 4 ?? "ok 27\n" !! "not ok 27\n";
 
 my $t_scalar2 = $cpt->reval('die "foo bar"; 1');
 print defined $t_scalar2 ?? "not ok 28\n" !! "ok 28\n";
-print $@ && $@->{?description} =~ m/foo bar/ ?? "ok 29\n" !! "not ok 29\n";
+print $^EVAL_ERROR && $^EVAL_ERROR->{?description} =~ m/foo bar/ ?? "ok 29\n" !! "not ok 29\n";
 
 # --- rdo
   
 my $t = 30;
-$! = 0;
+$^OS_ERROR = 0;
 my $nosuch = '/non/existant/file.name';
 open(NOSUCH, "<", $nosuch);
-if ($@) {
-    my $errno  = $!;
-    die "Eek! Attempting to open $nosuch failed, but \$! is still 0" unless $!;
-    $! = 0;
+if ($^EVAL_ERROR) {
+    my $errno  = $^OS_ERROR;
+    die "Eek! Attempting to open $nosuch failed, but \$! is still 0" unless $^OS_ERROR;
+    $^OS_ERROR = 0;
     $cpt->rdo($nosuch);
-    print $! == $errno ?? "ok $t\n" !! sprintf "not ok $t # \"$!\" is \%d (expected \%d)\n", $!, $errno; $t++;
+    print $^OS_ERROR == $errno ?? "ok $t\n" !! sprintf "not ok $t # \"$^OS_ERROR\" is \%d (expected \%d)\n", $^OS_ERROR, $errno; $t++;
 } else {
     die "Eek! Didn't expect $nosuch to be there.";
 }

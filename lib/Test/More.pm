@@ -1,7 +1,7 @@
 package Test::More;
 
 
-use vars < qw($VERSION @ISA @EXPORT %EXPORT_TAGS $TODO);
+our ($VERSION, @ISA, @EXPORT, %EXPORT_TAGS, $TODO);
 $VERSION = '0.78';
 $VERSION = eval $VERSION;    # make the alpha version come out as a number
 
@@ -496,10 +496,10 @@ sub isa_ok ($$;$) {
     }
     else {
         # We can't use UNIVERSAL::isa because we want to honor isa() overrides
-        local $@;
+        local $^EVAL_ERROR;
         my $rslt = try { $object->isa($class) };
-        if( $@ ) {
-            if( $@->message =~ m/^Can't call method "isa" on unblessed reference/ ) {
+        if( $^EVAL_ERROR ) {
+            if( $^EVAL_ERROR->message =~ m/^Can't call method "isa" on unblessed reference/ ) {
                 # Its an unblessed reference
                 if( !UNIVERSAL::isa($object, $class) ) {
                     my $ref = ref $object;
@@ -509,7 +509,7 @@ sub isa_ok ($$;$) {
                 die <<WHOA;
 WHOA! I tried to call ->isa on your object and got some weird error.
 Here's the error.
-$($@->message)
+$($^EVAL_ERROR->message)
 WHOA
             }
         }
@@ -658,9 +658,9 @@ sub _eval {
 
     # Work around oddities surrounding resetting of $@ by immediately
     # storing it.
-    local($@,$!);   # isolate eval
+    local($^EVAL_ERROR,$^OS_ERROR);   # isolate eval
     my $eval_result = eval $code;
-    my $eval_error  = $@;
+    my $eval_error  = $^EVAL_ERROR;
 
     return @($eval_result, $eval_error);
 }
@@ -678,8 +678,8 @@ sub dies_like {
         $tb->diag("didn't die");
         return $tb->ok(0, $name);
     }
-    my $err = $@->description;
-    return $tb->like($err, $like, $name) or diag($@->stacktrace);
+    my $err = $^EVAL_ERROR->description;
+    return $tb->like($err, $like, $name) or diag($^EVAL_ERROR->stacktrace);
 }
 
 =item B<require_ok>
@@ -767,7 +767,7 @@ along these lines.
 
 =cut
 
-use vars < qw(@Data_Stack %Refs_Seen);
+our (@Data_Stack, %Refs_Seen);
 my $DNE = bless \@(), 'Does::Not::Exist';
 
 sub _dne {
@@ -1344,8 +1344,8 @@ sub eq_set  {
     return 0 unless (nelems @$a1) == nelems @$a2;
 
     return eq_array(
-           \ (sort { dump::view($a) cmp dump::view($b) } @$a1 ),
-           \ (sort { dump::view($a) cmp dump::view($b) } @$a2 ),
+           \ (sort { $a cmp $b } map { dump::view($_) } @$a1 ),
+           \ (sort { $a cmp $b } map { dump::view($_) } @$a2 ),
     );
 }
 

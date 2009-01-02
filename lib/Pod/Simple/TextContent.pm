@@ -6,7 +6,7 @@ use utf8;
 
 use Carp ();
 use Pod::Simple ();
-use vars < qw( @ISA $VERSION );
+our (@ISA, $VERSION);
 $VERSION = '2.02';
 @ISA = @('Pod::Simple');
 

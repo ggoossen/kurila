@@ -13,7 +13,7 @@ use_ok('I18N::Langinfo', 'langinfo', < @constants);
 for my $constant ( @constants) {
     SKIP: do {
         my $string = try { langinfo(eval "$constant()") };
-        is( $@ && $@->message, '', "calling langinfo() with $constant" );
+        is( $^EVAL_ERROR && $^EVAL_ERROR->message, '', "calling langinfo() with $constant" );
         skip "returned string was empty, skipping next two tests", 2 unless $string;
         ok( defined $string, "checking if the returned string is defined" );
         cmp_ok( length($string), '+>=', 1, "checking if the returned string has a positive length" );
@@ -58,7 +58,7 @@ print "1..", scalar nelems @want, "\n";
 for my $i (1..nelems @want) {
     my $try = @want[$i-1];
     try { I18N::Langinfo->import($try) };
-    unless ($@) {
+    unless ($^EVAL_ERROR) {
 	my $got = langinfo( <&$try);
 	if (ref %want{?$try} && $got =~ %want{?$try} || $got eq %want{?$try}) {
 	    print qq[ok $i - $try is "$got"\n];

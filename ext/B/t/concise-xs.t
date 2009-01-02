@@ -334,15 +334,15 @@ sub render {
 
     my $walker = B::Concise::compile($func_name);
     try { $walker->() };
-    diag("err: $($@->message) $buf") if $@;
+    diag("err: $($^EVAL_ERROR->message) $buf") if $^EVAL_ERROR;
     diag("verbose: $buf") if %opts{?V};
 
-    return  @($buf, $@);
+    return  @($buf, $^EVAL_ERROR);
 }
 
 sub corecheck {
     try { require Module::CoreList };
-    if ($@) {
+    if ($^EVAL_ERROR) {
 	warn "Module::CoreList not available on $^V\n";
 	return;
     }

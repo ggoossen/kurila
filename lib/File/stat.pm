@@ -17,7 +17,9 @@ BEGIN {
 		    );
     %EXPORT_TAGS = %( FIELDS => \@( < @EXPORT_OK, < @EXPORT ) );
 }
-use vars < @EXPORT_OK;
+our ($st_dev, $st_ino, $st_mode, $st_nlink, $st_uid, $st_gid,
+     $st_rdev, $st_size, $st_atime, $st_mtime, $st_ctime,
+     $st_blksize, $st_blocks);
 
 # Class::Struct forbids use of @ISA
 sub import { goto &Exporter::import }
@@ -46,7 +48,7 @@ sub stat ($) {
     return $st if $st;
 	my $fh;
     do {
-		local $!;
+		local $^OS_ERROR;
 		require Symbol;
                 my @($pkg) = caller@();
 		$fh = \*{ Symbol::fetch_glob( $pkg . "::" . $arg) };

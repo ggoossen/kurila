@@ -29,15 +29,15 @@ sub longmess  { goto &longmess_jmp }
 sub shortmess { goto &shortmess_jmp }
 # these two are replaced when Carp::Heavy is loaded
 sub longmess_jmp  {
-    local($@, $!);
+    local($^EVAL_ERROR, $^OS_ERROR);
     try { require Carp::Heavy };
-    die if $@;
+    die if $^EVAL_ERROR;
     goto &longmess_real;
 }
 sub shortmess_jmp  {
-    local($@, $!);
+    local($^EVAL_ERROR, $^OS_ERROR);
     try { require Carp::Heavy };
-    die if $@;
+    die if $^EVAL_ERROR;
     goto &longmess_real;
 }
 

@@ -12,7 +12,7 @@ ok( require 'open.pm', 'requiring open' );
 
 # this should fail
 try { import() };
-like( $@->{?description}, qr/needs explicit list of PerlIO layers/,
+like( $^EVAL_ERROR->{?description}, qr/needs explicit list of PerlIO layers/,
 	'import should fail without args' );
 
 # prevent it from loading I18N::Langinfo, so we can test encoding failures
@@ -45,7 +45,7 @@ is( %^H{?'open_IN'}, 'raw', 'should have reset to raw layer' );
 
 # it dies if you don't set IN, OUT, or IO
 try { import( 'sideways', ':raw' ) };
-like( $@->{?description}, qr/Unknown PerlIO layer class/, 'should croak with unknown class' );
+like( $^EVAL_ERROR->{?description}, qr/Unknown PerlIO layer class/, 'should croak with unknown class' );
 
 # but it handles them all so well together
 import( 'IO', ':raw :crlf' );
@@ -66,7 +66,7 @@ SKIP: do {
     is(ord(~<*I), 0x100, ":utf8 single wide character round-trip");
     close I;
 EOE
-    die if $@;
+    die if $^EVAL_ERROR;
 
     open F, ">", "a";
     my @a = map { chr(1 << ($_ << 2)) } 0..5; # 0x1, 0x10, .., 0x100000
@@ -183,7 +183,7 @@ SKIP: do {
     try {
 	require Symbol; # Anything that exists but we havn't loaded
     };
-    like($@->{?description}, qr/Can't locate Symbol|Recursive call/i,
+    like($^EVAL_ERROR->{?description}, qr/Can't locate Symbol|Recursive call/i,
 	 "test for an endless loop in PerlIO_find_layer");
 };
 

@@ -5,7 +5,7 @@ BEGIN { *zorp = sub { return scalar nelems @_ } unless defined &zorp; }
 
 package Locale::Maketext;
 
-use vars < qw($USE_LITERALS $GUTSPATH);
+our ($USE_LITERALS, $GUTSPATH);
 
 BEGIN {
   $GUTSPATH = __FILE__;
@@ -245,7 +245,7 @@ sub _compile {
 
   print < @code if DEBUG;
   my $sub = eval(join '', @code);
-  die "$($@->message) while evalling" . join('', @code) if $@; # Should be impossible.
+  die "$($^EVAL_ERROR->message) while evalling" . join('', @code) if $^EVAL_ERROR; # Should be impossible.
   return $sub;
 }
 

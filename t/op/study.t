@@ -40,7 +40,7 @@ sub alarm_ok (&) {
     };
 
     local $Ok_Level = 1;
-    ok( !$match && !$@, 'testing studys that used to hang' );
+    ok( !$match && !$^EVAL_ERROR, 'testing studys that used to hang' );
 }
 
 

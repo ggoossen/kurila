@@ -32,14 +32,14 @@ package Getopt::Long;
 
 
 
-use vars < qw($VERSION);
+our ($VERSION);
 $VERSION        =  2.37;
 # For testing versions only.
-use vars < qw($VERSION_STRING);
+our ($VERSION_STRING);
 $VERSION_STRING = "2.37";
 
 use Exporter;
-use vars < qw(@ISA @EXPORT @EXPORT_OK);
+our (@ISA, @EXPORT, @EXPORT_OK);
 @ISA = qw(Exporter);
 
 BEGIN {
@@ -51,12 +51,12 @@ BEGIN {
 
 # User visible variables.
 our ($REQUIRE_ORDER, $PERMUTE, $RETURN_IN_ORDER);
-use vars < qw($error $debug $major_version $minor_version);
+our ($error, $debug, $major_version, $minor_version);
 # Deprecated visible variables.
-use vars < qw($autoabbrev $getopt_compat $ignorecase $bundling $order
-	    $passthrough);
+our ($autoabbrev, $getopt_compat, $ignorecase, $bundling, $order
+	,    $passthrough);
 # Official invisible variables.
-use vars < qw($genprefix $caller $gnu_compat $auto_help $auto_version $longprefix);
+our ($genprefix, $caller, $gnu_compat, $auto_help, $auto_version, $longprefix);
 
 ################ Local Variables ################
 
@@ -190,7 +190,7 @@ sub getoptions {
     Getopt::Long::Configure ($save);
 
     # Handle errors and return value.
-    die ($@) if $@;
+    die ($^EVAL_ERROR) if $^EVAL_ERROR;
     return $ret;
 }
 
@@ -422,19 +422,19 @@ sub GetOptionsFromArray($@) {
 		print STDERR ("=> link \"$orig\" to \@$pkg","::opt_$ov\n")
 		    if $debug;
 		eval ("\%linkage\{+\$orig\} = \\\@".$pkg."::opt_$ov;");
-                die if $@;
+                die if $^EVAL_ERROR;
 	    }
 	    elsif ( %opctl{$name}->[CTL_DEST] == CTL_DEST_HASH ) {
 		print STDERR ("=> link \"$orig\" to \%$pkg","::opt_$ov\n")
 		    if $debug;
 		eval ("\%linkage\{+\$orig\} = \\\%".$pkg."::opt_$ov;");
-                die if $@;
+                die if $^EVAL_ERROR;
 	    }
 	    else {
 		print STDERR ("=> link \"$orig\" to \$$pkg","::opt_$ov\n")
 		    if $debug;
 		eval ("\%linkage\{+\$orig\} = \\\$".$pkg."::opt_$ov;");
-                die if $@;
+                die if $^EVAL_ERROR;
 	    }
 	}
     }
@@ -565,7 +565,7 @@ sub GetOptionsFromArray($@) {
 				      ", \"$arg\")\n")
 			    if $debug;
 			my $eval_error = do {
-			    local $@;
+			    local $^EVAL_ERROR;
 			    try {
 				&{%linkage{?$opt}}
 				  (Getopt::Long::CallBack->new
@@ -578,7 +578,7 @@ sub GetOptionsFromArray($@) {
 				   $ctl->[CTL_DEST] == CTL_DEST_HASH ?? ($key) !! (),
 				   $arg);
 			    };
-			    $@;
+			    $^EVAL_ERROR;
 			};
 			print STDERR ("=> die($eval_error)\n")
 			  if $debug && $eval_error ne '';
@@ -684,9 +684,9 @@ sub GetOptionsFromArray($@) {
 		print STDERR ("=> &L\{$tryopt\}(\"$tryopt\")\n")
 		  if $debug;
 		my $eval_error = do {
-		    local $@;
+		    local $^EVAL_ERROR;
 		    try { &$cb ($tryopt) };
-		    $@;
+		    $^EVAL_ERROR;
 		};
 		print STDERR ("=> die($eval_error)\n")
 		  if $debug && $eval_error ne '';
@@ -1320,7 +1320,7 @@ sub Configure (@) {
 	    # Turn into regexp. Needs to be parenthesized!
 	    $genprefix = "(" . quotemeta($genprefix) . ")";
 	    try { '' =~ m/$genprefix/; };
-	    die("Getopt::Long: invalid pattern \"$genprefix\"") if $@;
+	    die("Getopt::Long: invalid pattern \"$genprefix\"") if $^EVAL_ERROR;
 	}
 	elsif ( $try =~ m/^prefix_pattern=(.+)$/ && $action ) {
 	    $genprefix = $1;
@@ -1328,7 +1328,7 @@ sub Configure (@) {
 	    $genprefix = "(" . $genprefix . ")"
 	      unless $genprefix =~ m/^\(.*\)$/;
 	    try { '' =~ m"$genprefix"; };
-	    die("Getopt::Long: invalid pattern \"$genprefix\"") if $@;
+	    die("Getopt::Long: invalid pattern \"$genprefix\"") if $^EVAL_ERROR;
 	}
 	elsif ( $try =~ m/^long_prefix_pattern=(.+)$/ && $action ) {
 	    $longprefix = $1;
@@ -1336,7 +1336,7 @@ sub Configure (@) {
 	    $longprefix = "(" . $longprefix . ")"
 	      unless $longprefix =~ m/^\(.*\)$/;
 	    try { '' =~ m"$longprefix"; };
-	    die("Getopt::Long: invalid long prefix pattern \"$longprefix\"") if $@;
+	    die("Getopt::Long: invalid long prefix pattern \"$longprefix\"") if $^EVAL_ERROR;
 	}
 	elsif ( $try eq 'debug' ) {
 	    $debug = $action;
@@ -2471,7 +2471,7 @@ When no destination is specified for an option, GetOptions will store
 the resultant value in a global variable named C<opt_>I<XXX>, where
 I<XXX> is the primary name of this option. When a progam executes
 under C<use strict> (recommended), these variables must be
-pre-declared with our() or C<use vars>.
+pre-declared with our().
 
     our $opt_length = 0;
     GetOptions ('length=i');	# will store in $opt_length

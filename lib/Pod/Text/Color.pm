@@ -20,7 +20,7 @@ package Pod::Text::Color;
 use Pod::Text ();
 use Term::ANSIColor < qw(colored);
 
-use vars < qw(@ISA $VERSION);
+our (@ISA, $VERSION);
 use utf8;
 
 @ISA = qw(Pod::Text);

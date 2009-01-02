@@ -13,8 +13,8 @@ use Test::More tests => 49;
 # Make sure we don't mess with $@ or $!.  Test at bottom.
 my $Err   = "this should not be touched";
 my $Errno = 42;
-$@ = $Err;
-$! = $Errno;
+$^EVAL_ERROR = $Err;
+$^OS_ERROR = $Errno;
 
 use_ok('Dummy');
 is( $Dummy::VERSION, '5.562', 'use_ok() loads a module' );
@@ -79,18 +79,18 @@ ok( eq_set(\qw(this that whatever), \qw(that whatever this)),
 is( (nelems @Test::More::Data_Stack), 0);
 
 my @complex_array1 = @(
-                      \qw(this that whatever),
-                      \%(foo => 23, bar => 42),
+                      qw(this that whatever),
+                      %(foo => 23, bar => 42),
                       "moo",
                       "yarrow",
-                      \qw(498 10 29),
+                      qw(498 10 29),
                      );
 my @complex_array2 = @(
-                      \qw(this that whatever),
-                      \%(foo => 23, bar => 42),
+                      qw(this that whatever),
+                      %(foo => 23, bar => 42),
                       "moo",
                       "yarrow",
-                      \qw(498 10 29),
+                      qw(498 10 29),
                      );
 
 is_deeply( \@complex_array1, \@complex_array2,    'is_deeply with arrays' );

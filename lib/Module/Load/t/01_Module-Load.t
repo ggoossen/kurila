@@ -13,7 +13,7 @@ do {
 
     try { load $mod };
 
-    is( $@, '', qq[Loading module '$mod'] );
+    is( $^EVAL_ERROR, '', qq[Loading module '$mod'] );
     ok( defined(%INC{?$file}), q[... found in %INC] );
 };
 
@@ -23,7 +23,7 @@ do {
 
     try { load $mod };
 
-    is( $@, '', qq[Loading File '$mod'] );
+    is( $^EVAL_ERROR, '', qq[Loading File '$mod'] );
     ok( defined(%INC{?$file}), q[... found in %INC] );
 };
 
@@ -33,7 +33,7 @@ do {
 
     try { load $mod };
 
-    is( $@, '', qq[Loading Ambigious Module '$mod'] );
+    is( $^EVAL_ERROR, '', qq[Loading Ambigious Module '$mod'] );
     ok( defined(%INC{?$file}), q[... found in %INC] );
 };
 
@@ -43,7 +43,7 @@ do {
 
     try { load $mod };
 
-    is( $@ && $@->message, '', qq[Loading Ambigious File '$mod'] );
+    is( $^EVAL_ERROR && $^EVAL_ERROR->message, '', qq[Loading Ambigious File '$mod'] );
     ok( defined(%INC{?$file}), q[... found in %INC] );
 };
 
@@ -52,7 +52,7 @@ do {   my $mod     = 'TestModule';
     my @funcs   = qw[func1 func2];
     
     try { load $mod, < @funcs };
-    is( $@, '', qq[Loaded exporter module '$mod'] );
+    is( $^EVAL_ERROR, '', qq[Loaded exporter module '$mod'] );
     
     for my $func ( @funcs) {
         ok( $mod->can($func),           "$mod -> can( $func )" );

@@ -54,7 +54,7 @@ our %sortkeys;
 %sortkeys{+'KAat'} = $kjeNoN->viewSortKey("\x{043A}\x{0301}\x{0334}");
 
 try { require Unicode::Normalize };
-if (!$@) {
+if (!$^EVAL_ERROR) {
     my $kjeNFD = Unicode::Collate->new(
 	level => 1,
 	table => undef,

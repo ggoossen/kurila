@@ -573,16 +573,6 @@ sub Follow_SymLink($) {
 
 our($dir, $name, $fullname, $prune);
 
-# check whether or not a scalar variable is tainted
-# (code straight from the Camel, 3rd ed., page 561)
-sub is_tainted_pp {
-    my $arg = shift;
-    my $nada = substr($arg, 0, 0); # zero-length
-    local $@;
-    try { eval "# $nada" };
-    return $@ ?? 1 !! 0;
-}
-
 sub _find_opt {
     my $wanted = shift;
     die "invalid top directory" unless defined @_[0];
@@ -704,7 +694,7 @@ sub _find_opt {
 	else { # no follow
 	    $topdir = $top_item;
 	    unless (defined $topnlink) {
-		warnings::warnif "Can't stat $top_item: $!\n";
+		warnings::warnif "Can't stat $top_item: $^OS_ERROR\n";
 		next Proc_Top_Item;
 	    }
 	    if (-d _) {
@@ -741,14 +731,14 @@ sub _find_opt {
 	    }
 
 	    unless ($no_chdir || chdir $abs_dir) {
-		warnings::warnif "Couldn't chdir $abs_dir: $!\n";
+		warnings::warnif "Couldn't chdir $abs_dir: $^OS_ERROR\n";
 		next Proc_Top_Item;
 	    }
 
 	    $name = $abs_dir . $_; # $File::Find::name
 	    $_ = $name if $no_chdir;
 
-	    do { $wanted_callback->() };; # protect against wild "next"
+	    do { $wanted_callback->() }; # protect against wild "next"
 
 	}
 
@@ -761,7 +751,7 @@ sub _find_opt {
 		$check_t_cwd = 0;
 	    }
 	    unless (chdir $cwd_untainted) {
-		die "Can't cd to $cwd: $!\n";
+		die "Can't cd to $cwd: $^OS_ERROR\n";
 	    }
 	}
     }
@@ -811,7 +801,7 @@ sub _find_dir($$$) {
     unless ( $no_chdir || ($p_dir eq $File::Find::current_dir)) {
 	my $udir = $p_dir;
 	if (( $untaint ) && (is_tainted($p_dir) )) {
-	    @( $udir ) = @: $p_dir =~ m|$untaint_pat|;
+	    @( ?$udir ) = @: $p_dir =~ m|$untaint_pat|;
 	    unless (defined $udir) {
 		if ($untaint_skip == 0) {
 		    die "directory $p_dir is still tainted";
@@ -822,7 +812,7 @@ sub _find_dir($$$) {
 	    }
 	}
 	unless (chdir ($Is_VMS && $udir !~ m/[\/\[<]+/ ?? "./$udir" !! $udir)) {
-	    warnings::warnif "Can't cd to $udir: $!\n";
+	    warnings::warnif "Can't cd to $udir: $^OS_ERROR\n";
 	    return;
 	}
     }
@@ -865,11 +855,11 @@ sub _find_dir($$$) {
 	    }
 	    unless (chdir ($Is_VMS && $udir !~ m/[\/\[<]+/ ?? "./$udir" !! $udir)) {
 		if ($Is_MacOS) {
-		    warnings::warnif "Can't cd to ($p_dir) $udir: $!\n";
+		    warnings::warnif "Can't cd to ($p_dir) $udir: $^OS_ERROR\n";
 		}
 		else {
 		    warnings::warnif "Can't cd to (" .
-			($p_dir ne '/' ?? $p_dir !! '') . "/) $udir: $!\n";
+			($p_dir ne '/' ?? $p_dir !! '') . "/) $udir: $^OS_ERROR\n";
 		}
 		next;
 	    }
@@ -884,7 +874,7 @@ sub _find_dir($$$) {
 
 	# Get the list of files in the current directory.
 	unless (opendir DIR, ($no_chdir ?? $dir_name !! $File::Find::current_dir)) {
-	    warnings::warnif "Can't opendir($dir_name): $!\n";
+	    warnings::warnif "Can't opendir($dir_name): $^OS_ERROR\n";
 	    next;
 	}
 	@filenames = @( readdir DIR );
@@ -1088,7 +1078,7 @@ sub _find_dir_symlnk($$$) {
 	}
 	$ok = chdir($updir_loc) unless ($p_dir eq $File::Find::current_dir);
 	unless ($ok) {
-	    warnings::warnif "Can't cd to $updir_loc: $!\n";
+	    warnings::warnif "Can't cd to $updir_loc: $^OS_ERROR\n";
 	    return;
 	}
     }
@@ -1105,7 +1095,7 @@ sub _find_dir_symlnk($$$) {
 	    # change (back) to parent directory (always untainted)
 	    unless ($no_chdir) {
 		unless (chdir $updir_loc) {
-		    warnings::warnif "Can't cd to $updir_loc: $!\n";
+		    warnings::warnif "Can't cd to $updir_loc: $^OS_ERROR\n";
 		    next;
 		}
 	    }
@@ -1136,7 +1126,7 @@ sub _find_dir_symlnk($$$) {
 		}
 	    }
 	    unless (chdir $updir_loc) {
-		warnings::warnif "Can't cd to $updir_loc: $!\n";
+		warnings::warnif "Can't cd to $updir_loc: $^OS_ERROR\n";
 		next;
 	    }
 	}
@@ -1149,7 +1139,7 @@ sub _find_dir_symlnk($$$) {
 
 	# Get the list of files in the current directory.
 	unless (opendir DIR, ($no_chdir ?? $dir_loc !! $File::Find::current_dir)) {
-	    warnings::warnif "Can't opendir($dir_loc): $!\n";
+	    warnings::warnif "Can't opendir($dir_loc): $^OS_ERROR\n";
 	    next;
 	}
 	@filenames = @( readdir DIR );
@@ -1222,7 +1212,7 @@ sub _find_dir_symlnk($$$) {
 	    if ( $byd_flag +< 0 ) {  # must be finddepth, report dirname now
 		unless ($no_chdir || ($dir_rel eq $File::Find::current_dir)) {
 		    unless (chdir $updir_loc) { # $updir_loc (parent dir) is always untainted
-			warnings::warnif "Can't cd to $updir_loc: $!\n";
+			warnings::warnif "Can't cd to $updir_loc: $^OS_ERROR\n";
 			next;
 		    }
 		}
@@ -1322,13 +1312,6 @@ unless ($File::Find::dont_use_nlink) {
     $File::Find::dont_use_nlink = 1 if Config::config_value('dont_use_nlink');
 }
 
-# We need a function that checks if a scalar is tainted. Either use the
-# Scalar::Util module's tainted() function or our (slower) pure Perl
-# fallback is_tainted_pp()
-do {
-    local $@;
-    try { require Scalar::Util };
-    *is_tainted = $@ ?? \&is_tainted_pp !! \&Scalar::Util::tainted;
-};
+*is_tainted = sub { \&Internals::SvTAINTED(\@_[0]) };
 
 1;

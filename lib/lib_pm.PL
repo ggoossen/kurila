@@ -33,7 +33,7 @@ if (env::var('PERL_BUILD_EXPAND_CONFIG_VARS')) {
 	      q(reverse split m/ /, config_value('inc_version_list'));
 }
  
-open my $out,">", "$file" or die "Can't create $file: $!";
+open my $out,">", "$file" or die "Can't create $file: $^OS_ERROR";
  
 print "Extracting $file (with variable substitutions)\n";
  
@@ -253,5 +253,5 @@ Tim Bunce, 2nd June 1995.
 =cut
 !NO!SUBS!
 
-close $out or die "Can't close $file: $!";
+close $out or die "Can't close $file: $^OS_ERROR";
 chdir $origdir;

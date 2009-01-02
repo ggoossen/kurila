@@ -4,7 +4,7 @@ BEGIN{
 	# Don't do anything if POSIX is missing, or sigaction missing.
 	use Config;
 	eval 'use POSIX';
-	if($@ || $^O eq 'MSWin32' || $^O eq 'NetWare' || $^O eq 'dos' ||
+	if($^EVAL_ERROR || $^O eq 'MSWin32' || $^O eq 'NetWare' || $^O eq 'dos' ||
 	   $^O eq 'MacOS' || ($^O eq 'VMS' && ! config_value('d_sigaction'))) {
 		print "1..0\n";
 		exit 0;
@@ -13,7 +13,7 @@ BEGIN{
 
 use Test::More tests => 27;
 
-use vars < qw/$bad $bad7 $ok10 $bad18 $ok/;
+our ($bad, $bad7, $ok10, $bad18, $ok);
 
 $^W=1;
 
@@ -59,7 +59,7 @@ SKIP: do {
 
 $newaction=POSIX::SigAction->new('IGNORE');
 sigaction(SIGHUP, $newaction);
-kill 'HUP', $$;
+kill 'HUP', $^PID;
 ok(!$bad, "SIGHUP ignored");
 
 is(signals::handler("HUP"), 'IGNORE');
@@ -70,7 +70,7 @@ $newaction=POSIX::SigAction->new(sub { $ok10=1; });
 sigaction(SIGHUP, $newaction);
 do {
 	local($^W)=0;
-	kill 'HUP', $$;
+	kill 'HUP', $^PID;
 };
 ok($ok10, "SIGHUP handler called");
 
@@ -83,13 +83,13 @@ try {
 	delete $act->{HANDLER};
 	sigaction(SIGINT, $act);
 };
-kill 'HUP', $$;
+kill 'HUP', $^PID;
 ok($ok, "signal mask gets restored after croak");
 
 undef $ok;
 # Make sure the signal mask gets restored after sigaction returns early.
 my $x=defined sigaction(SIGKILL, $newaction, $oldaction);
-kill 'HUP', $$;
+kill 'HUP', $^PID;
 ok(!$x && $ok, "signal mask gets restored after early return");
 
 signals::set_handler( HUP => sub {} );
@@ -99,17 +99,17 @@ is(ref($oldaction->{?HANDLER}), 'CODE');
 try {
 	sigaction(SIGHUP, undef, $oldaction);
 };
-ok(!$@, "undef for new action");
+ok(!$^EVAL_ERROR, "undef for new action");
 
 try {
 	sigaction(SIGHUP, 0, $oldaction);
 };
-ok(!$@, "zero for new action");
+ok(!$^EVAL_ERROR, "zero for new action");
 
 try {
 	sigaction(SIGHUP, bless(\%(),'Class'), $oldaction);
 };
-ok($@, "any object not good as new action");
+ok($^EVAL_ERROR, "any object not good as new action");
 
 SKIP: do {
     skip("SIGCONT not trappable in $^O", 1)
@@ -119,7 +119,7 @@ SKIP: do {
 	sigaction(SIGCONT, POSIX::SigAction->new('DEFAULT'));
 	do {
 	    local($^W)=0;
-	    kill 'CONT', $$;
+	    kill 'CONT', $^PID;
 	};
     }
     ok(!$bad18, "SIGCONT trappable");
@@ -139,12 +139,12 @@ do {
 
     $newaction = POSIX::SigAction->new(\&hup20);
     sigaction("SIGHUP", $newaction);
-    kill "HUP", $$;
+    kill "HUP", $^PID;
     is($hup20, 1);
 
     $newaction = POSIX::SigAction->new(\&hup21);
     sigaction("HUP", $newaction);
-    kill "HUP", $$;
+    kill "HUP", $^PID;
     is ($hup21, 1);
 };
 
@@ -171,20 +171,20 @@ ok($oldaction->safe, "SigAction can be safe");
 
 # And safe signal delivery must work
 $ok = 0;
-kill 'HUP', $$;
+kill 'HUP', $^PID;
 ok($ok, "safe signal delivery must work");
 
 SKIP: do {
     eval 'use POSIX qw(SA_SIGINFO); SA_SIGINFO';
-    skip("no SA_SIGINFO", 1) if $@;
+    skip("no SA_SIGINFO", 1) if $^EVAL_ERROR;
     sub hiphup {
 	is(@_[1]->{?signo}, SIGHUP, "SA_SIGINFO got right signal");
     }
     my $act = POSIX::SigAction->new(\&hiphup, 0, SA_SIGINFO);
     sigaction(SIGHUP, $act);
-    kill 'HUP', $$;
+    kill 'HUP', $^PID;
 };
 
 try { sigaction(-999, "foo"); };
-like($@->{?description}, qr/Negative signals/,
+like($^EVAL_ERROR->{?description}, qr/Negative signals/,
     "Prevent negative signals instead of core dumping");

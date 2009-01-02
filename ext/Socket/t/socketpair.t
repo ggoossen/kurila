@@ -20,7 +20,7 @@ do {
     # so we need a self destruct timer. And IO can hang despite an alarm.
 
     if( $can_fork) {
-      my $parent = $$;
+      my $parent = $^PID;
       $child = fork;
       die "Fork failed" unless defined $child;
       if (!$child) {
@@ -31,7 +31,7 @@ do {
           sleep $remaining;
         }
         warn "Something unexpectedly hung during testing";
-        kill "INT", $parent or die "Kill failed: $!";
+        kill "INT", $parent or die "Kill failed: $^OS_ERROR";
         exit 1;
       }
     }
@@ -57,12 +57,12 @@ if( ! config_value('d_alarm') ) {
 } else {
   # This should fail but not die if there is real socketpair
   try {socketpair LEFT, 'RIGHT', -1, -1, -1};
-  if ($@ && $@->{?description} =~ m/^Unsupported socket function "socketpair" called/ ||
-      $! =~ m/^The operation requested is not supported./) { # Stratus VOS
+  if ($^EVAL_ERROR && $^EVAL_ERROR->{?description} =~ m/^Unsupported socket function "socketpair" called/ ||
+      $^OS_ERROR =~ m/^The operation requested is not supported./) { # Stratus VOS
     plan skip_all => 'No socketpair (real or emulated)';
   } else {
     try {AF_UNIX};
-    if ($@ && $@->{?description} =~ m/^Your vendor has not defined Socket macro AF_UNIX/) {
+    if ($^EVAL_ERROR && $^EVAL_ERROR->{?description} =~ m/^Your vendor has not defined Socket macro AF_UNIX/) {
       plan skip_all => 'No AF_UNIX';
     } else {
       plan tests => 45;
@@ -75,7 +75,7 @@ signals::set_handler(ALRM => sub {die "Unexpected alarm during testing"});
 
 ok (socketpair (LEFT, 'RIGHT', AF_UNIX, SOCK_STREAM, PF_UNSPEC),
     "socketpair (LEFT, RIGHT, AF_UNIX, SOCK_STREAM, PF_UNSPEC)")
-  or print "# \$\! = $!\n";
+  or print "# \$\! = $^OS_ERROR\n";
 
 if ($has_perlio) {
     binmode(LEFT,  ":bytes");
@@ -114,15 +114,15 @@ SKIP: do {
   local $TODO = "Known problems with unix sockets on $^O"
       if $^O eq 'hpux'   || $^O eq 'super-ux';
   alarm 3;
-  $! = 0;
+  $^OS_ERROR = 0;
   ok (eof RIGHT, "right is at EOF");
   local $TODO = "Known problems with unix sockets on $^O"
       if $^O eq 'unicos' || $^O eq 'unicosmk';
-  is ($!, '', 'and $! should report no error');
+  is ($^OS_ERROR, '', 'and $! should report no error');
   alarm 60;
 };
 
-my $err = $!;
+my $err = $^OS_ERROR;
 signals::set_handler(PIPE => 'IGNORE');
 do {
   signals::temp_set_handler(ALRM =>
@@ -131,15 +131,15 @@ do {
   # Split the system call from the is() - is() does IO so
   # (say) a flush may do a seek which on a pipe may disturb errno
   my $ans = syswrite (LEFT, "void");
-  $err = $!;
+  $err = $^OS_ERROR;
   is ($ans, undef, "syswrite to shutdown left should fail");
   alarm 60;
 };
 do {
   # This may need skipping on some OSes - restoring value saved above
   # should help
-  $! = $err;
-  ok (($! == EPIPE or $! == ESHUTDOWN), '$! should be EPIPE or ESHUTDOWN')
+  $^OS_ERROR = $err;
+  ok (($^OS_ERROR == EPIPE or $^OS_ERROR == ESHUTDOWN), '$! should be EPIPE or ESHUTDOWN')
     or printf "\$\!=\%d(\%s)\n", $err, $err;
 };
 
@@ -169,7 +169,7 @@ SKIP: do {
 
 ok (socketpair (LEFT, 'RIGHT', AF_UNIX, SOCK_DGRAM, PF_UNSPEC),
     "socketpair (LEFT, RIGHT, AF_UNIX, SOCK_DGRAM, PF_UNSPEC)")
-  or print "# \$\! = $!\n";
+  or print "# \$\! = $^OS_ERROR\n";
 
 if ($has_perlio) {
     binmode(LEFT,  ":bytes");
@@ -238,5 +238,5 @@ ok (close RIGHT, "close right");
 
 }; # end of DGRAM SKIP
 
-kill "INT", $child or warn "Failed to kill child process $child: $!";
+kill "INT", $child or warn "Failed to kill child process $child: $^OS_ERROR";
 exit 0;

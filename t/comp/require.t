@@ -24,15 +24,15 @@ sub do_require {
 
 sub write_file {
     my $f = shift;
-    open(REQ, ">","$f") or die "Can't write '$f': $!";
+    open(REQ, ">","$f") or die "Can't write '$f': $^OS_ERROR";
     binmode REQ;
     use bytes;
     print REQ < @_;
-    close REQ or die "Could not close $f: $!";
+    close REQ or die "Could not close $f: $^OS_ERROR";
 }
 
 eval 'require 5.005';
-print "not " unless $@;
+print "not " unless $^EVAL_ERROR;
 print "ok ",$i++,"\n";
 
 # interaction with pod (see the eof)
@@ -52,7 +52,7 @@ for my $expected_compile (@(1,0)) {
     print "not " unless -e $flag_file;
     print "ok ",$i++,"\n";
     write_file('bleah.pm', "unlink '$flag_file' or die; \$a=0; \$b=1/\$a; 1;\n");
-    print "# $@\nnot " if try { require 'bleah.pm' };
+    print "# $^EVAL_ERROR\nnot " if try { require 'bleah.pm' };
     print "ok ",$i++,"\n";
     print "not " unless -e $flag_file xor $expected_compile;
     print "ok ",$i++,"\n";
@@ -64,7 +64,7 @@ for my $expected_compile (@(1,0)) {
 do_require "1)\n";
 # bison says 'parse error' instead of 'syntax error',
 # various yaccs may or may not capitalize 'syntax'.
-print "# $@\nnot " unless $@->message =~ m/(syntax|parse) error/mi;
+print "# $^EVAL_ERROR\nnot " unless $^EVAL_ERROR->message =~ m/(syntax|parse) error/mi;
 print "ok ",$i++,"\n";
 
 # previous failure cached in %INC
@@ -72,9 +72,9 @@ print "not " unless exists %INC{'bleah.pm'};
 print "ok ",$i++,"\n";
 write_file($flag_file, 1);
 write_file('bleah.pm', "unlink '$flag_file'; 1");
-print "# $@\nnot " if try { require 'bleah.pm' };
+print "# $^EVAL_ERROR\nnot " if try { require 'bleah.pm' };
 print "ok ",$i++,"\n";
-print "# $@\nnot " unless $@->message =~ m/Compilation failed/i;
+print "# $^EVAL_ERROR\nnot " unless $^EVAL_ERROR->message =~ m/Compilation failed/i;
 print "ok ",$i++,"\n";
 print "not " unless -e $flag_file;
 print "ok ",$i++,"\n";
@@ -83,7 +83,7 @@ print "ok ",$i++,"\n";
 
 # successful require
 do_require "1";
-print "# $@\nnot " if $@;
+print "# $^EVAL_ERROR\nnot " if $^EVAL_ERROR;
 print "ok ",$i++,"\n";
 
 # do FILE shouldn't see any outside lexicals
@@ -91,16 +91,16 @@ my $x = "ok $i\n";
 write_file("bleah.do", <<EOT);
 our \$x = "not ok $i\\n";
 EOT
-do "bleah.do" or die $@;
+do "bleah.do" or die $^EVAL_ERROR;
 dofile();
-sub dofile { do "bleah.do" or die $@; };
+sub dofile { do "bleah.do" or die $^EVAL_ERROR; };
 print $x;
 
 # Test for fix of RT #24404 : "require $scalar" may load a directory
 my $r = "threads";
 try { require $r };
 $i++;
-if($@->message =~ m/Can't locate threads in \@INC/) {
+if($^EVAL_ERROR->message =~ m/Can't locate threads in \@INC/) {
     print "ok $i\n";
 } else {
     print "not ok $i\n";
@@ -109,7 +109,7 @@ if($@->message =~ m/Can't locate threads in \@INC/) {
 write_file('bleah.pm', qq(die "This is an expected error";\n));
 delete %INC{"bleah.pm"}; ++$main::i;
 try { CORE::require bleah; };
-if ($@->message =~ m/^This is an expected error/) {
+if ($^EVAL_ERROR->message =~ m/^This is an expected error/) {
     print "ok $i\n";
 } else {
     print "not ok $i\n";
@@ -161,7 +161,7 @@ do {
     require krunch;
     try {CORE::require whap; 1} and die;
 
-    if ($@->message =~ m/^This is an expected error/) {
+    if ($^EVAL_ERROR->message =~ m/^This is an expected error/) {
 	print "ok $pmc_dies\n";
     } else {
 	print "not ok $pmc_dies\n";
@@ -173,7 +173,7 @@ do {
 write_file("circleA.pm", 'BEGIN { require circleB } 1;');
 write_file("circleB.pm", 'require circleA; 1;');
 try { require circleA; };
-print "not " unless $@ && $@->message =~ m/Circular dependency: circleA.pm is still being compiled/;
+print "not " unless $^EVAL_ERROR && $^EVAL_ERROR->message =~ m/Circular dependency: circleA.pm is still being compiled/;
 print "ok ", ++$i, " circular require\n";
 
 

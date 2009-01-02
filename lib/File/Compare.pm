@@ -33,10 +33,10 @@ sub compare {
     my $fail_open2 =
       sub {
           if ($closefrom) {
-              my $status = $!;
-              $! = 0;
+              my $status = $^OS_ERROR;
+              $^OS_ERROR = 0;
               close $from_fh;
-              $! = $status unless $!;
+              $^OS_ERROR = $status unless $^OS_ERROR;
           }
           return $fail_open1->();
       };
@@ -83,7 +83,7 @@ sub compare {
     }
 
     if ($text_mode) {
-	local $/ = "\n";
+	local $^INPUT_RECORD_SEPARATOR = "\n";
 	my ($fline,$tline);
 	while (defined($fline = ~< $from_fh)) {
 	    return $fail_inner->() unless defined($tline = ~< $to_fh);

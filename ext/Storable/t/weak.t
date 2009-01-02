@@ -23,14 +23,14 @@ use Scalar::Util < qw(weaken isweak);
 use Test::More 'no_plan';
 use Storable < qw(store retrieve freeze thaw nstore nfreeze);
 require 'testlib.pl';
-use vars '$file';
+our $file;
 
 
 sub tester {
   my @($contents, $sub, $testersub, $what) = @_;
   # Test that if we re-write it, everything still works:
   my $clone = &$sub ($contents);
-  is ($@, "", "There should be no error extracting for $what");
+  is ($^EVAL_ERROR, "", "There should be no error extracting for $what");
   &$testersub ($clone, $what);
 }
 

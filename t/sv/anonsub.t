@@ -15,9 +15,9 @@ env::set_var('PERL5LIB' => "../lib") unless $Is_VMS;
 
 our $i = 0;
 
-$|=1;
+$^OUTPUT_AUTOFLUSH=1;
 
-undef $/;
+undef $^INPUT_RECORD_SEPARATOR;
 my @prgs = split "\n########\n", ~< *DATA;
 plan(6 + scalar nelems @prgs);
 
@@ -33,7 +33,7 @@ for ( @prgs){
     my@($prog,$expected) =  split(m/\nEXPECT\n/, $_);
     open TEST, ">", "$tmpfile";
     print TEST "$prog\n";
-    close TEST or die "Could not close: $!";
+    close TEST or die "Could not close: $^OS_ERROR";
     my $results = $Is_VMS ??
 		`$^X "-I[-.lib]" $switch $tmpfile 2>&1` !!
 		  $Is_MSWin32 ??
@@ -43,7 +43,7 @@ for ( @prgs){
 			    $Is_NetWare ??
 				`perl -I../lib $switch $tmpfile 2>&1` !!
 				    `./perl $switch $tmpfile 2>&1`;
-    my $status = $?;
+    my $status = $^CHILD_ERROR;
     $results =~ s/\n+$//;
     # allow expected output to be written as if $prog is on STDIN
     $results =~ s/runltmp\d+/-/g;
@@ -69,7 +69,7 @@ test_invalid_decl('sub ($) && 1');
 test_invalid_decl('sub ($) : lvalue;',' # TODO');
 
 eval "sub #foo\n\{print 1\}";
-is $@, '', "No error"
+is $^EVAL_ERROR, '', "No error"
 
 __END__
 sub X {
@@ -87,7 +87,7 @@ sub X {
     sub {
         my $dummy = $n;	# eval can't close on $n without internal reference
 	eval 'print $n';
-	die $@ if $@;
+	die $^EVAL_ERROR if $^EVAL_ERROR;
     };
 }
 my $x = X();
@@ -101,7 +101,7 @@ sub X {
     eval 'sub { print $n }';
 }
 my $x = X();
-die $@ if $@;
+die $^EVAL_ERROR if $^EVAL_ERROR;
 undef &X;
 $x->();
 EXPECT

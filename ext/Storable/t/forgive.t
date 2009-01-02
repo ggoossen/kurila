@@ -29,7 +29,7 @@ my $result;
 
 try {$result = store ($bad , 'store')};
 print ((!defined $result)??"ok $test\n"!!"not ok $test\n"); $test++;
-print ($@??"ok $test\n"!!"not ok $test\n"); $test++;
+print ($^EVAL_ERROR??"ok $test\n"!!"not ok $test\n"); $test++;
 
 $Storable::forgive_me=1;
 
@@ -37,14 +37,14 @@ my $devnull = File::Spec->devnull;
 
 open(SAVEERR, ">&", \*STDERR);
 open(STDERR, ">", "$devnull") or 
-  ( print SAVEERR "Unable to redirect STDERR: $!\n" and exit(1) );
+  ( print SAVEERR "Unable to redirect STDERR: $^OS_ERROR\n" and exit(1) );
 
 try {$result = store ($bad , 'store')};
 
 open(STDERR, ">&", \*SAVEERR);
 
 print ((defined $result)??"ok $test\n"!!"not ok $test\n"); $test++;
-print (($@ eq '')??"ok $test\n"!!"not ok $test\n"); $test++;
+print (($^EVAL_ERROR eq '')??"ok $test\n"!!"not ok $test\n"); $test++;
 
 my $ret = retrieve('store');
 print ((defined $ret)??"ok $test\n"!!"not ok $test\n"); $test++;

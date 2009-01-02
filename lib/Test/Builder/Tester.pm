@@ -488,7 +488,7 @@ sub new {
     my @($class, $type) = @_;
 
     my $self = bless \%( got => '', type => $type ), $class;
-    open my $fh, '>', \$self->{+'got'} or die "$!";
+    open my $fh, '>', \$self->{+'got'} or die "$^OS_ERROR";
     $self->{+'filehandle'} = $fh;
     return $self;
 }
@@ -558,7 +558,7 @@ sub complaint
     {
       # get color
       try { require Term::ANSIColor };
-      unless ($@)
+      unless ($^EVAL_ERROR)
       {
         # colours
 

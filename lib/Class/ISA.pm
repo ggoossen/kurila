@@ -3,7 +3,7 @@
 
 package Class::ISA;
 
-use vars < qw($Debug $VERSION);
+our ($Debug, $VERSION);
 $VERSION = '0.33';
 $Debug = 0 unless defined $Debug;
 

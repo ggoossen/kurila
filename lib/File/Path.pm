@@ -514,7 +514,7 @@ use File::Basename ();
 use File::Spec     ();
 
 use Exporter ();
-use vars < qw($VERSION @ISA @EXPORT);
+our ($VERSION, @ISA, @EXPORT);
 $VERSION = '2.01';
 @ISA     = qw(Exporter);
 @EXPORT  = qw(mkpath rmtree);
@@ -534,10 +534,10 @@ sub _error {
 
     if ($arg->{?error}) {
         $object = '' unless defined $object;
-        push @{${$arg->{error}}}, \%($object => "$message: $!");
+        push @{${$arg->{error}}}, \%($object => "$message: $^OS_ERROR");
     }
     else {
-        warn(defined($object) ?? "$message for $object: $!" !! "$message: $!");
+        warn(defined($object) ?? "$message for $object: $^OS_ERROR" !! "$message: $^OS_ERROR");
     }
 }
 
@@ -571,7 +571,7 @@ sub mkpath {
         else { 
             %{$arg}{[qw(verbose mode)]} = @(0, 0777);
         }
-        $paths = \ @_;
+        $paths = \$: @_;
     }
     return _mkpath($arg, $paths);
 }
@@ -580,7 +580,6 @@ sub _mkpath {
     my $arg   = shift;
     my $paths = shift;
 
-    local($")=$Is_MacOS ?? ":" !! "/";
     my(@created);
     foreach my $path ( @$paths) {
         next unless length($path);
@@ -600,12 +599,12 @@ sub _mkpath {
             push(@created, $path);
 	}
         else {
-            my $save_bang = $!;
+            my $save_bang = $^OS_ERROR;
             my @($e, $e1) = @($save_bang, $^E);
 	    $e .= "; $e1" if $e ne $e1;
 	    # allow for another process to have created it meanwhile
             if (!-d $path) {
-                $! = $save_bang;
+                $^OS_ERROR = $save_bang;
                 if ($arg->{?error}) {
                     push @{${$arg->{error}}}, \%($path => $e);
                 }
@@ -769,12 +768,12 @@ sub _rmtree {
 
             # don't leave the client code in an unexpected directory
             chdir($arg->{?cwd})
-                or die("cannot chdir to $arg->{?cwd} from $canon: $!, aborting.");
+                or die("cannot chdir to $arg->{?cwd} from $canon: $^OS_ERROR, aborting.");
 
             # ensure that a chdir upwards didn't take us somewhere other
             # than we expected (see CVE-2002-0435)
             @($device, $inode) =  @(stat $curdir)[[@(0,1)]]
-                or die("cannot stat prior working directory $arg->{?cwd}: $!, aborting.");
+                or die("cannot stat prior working directory $arg->{?cwd}: $^OS_ERROR, aborting.");
 
             ($arg->{?device} eq $device and $arg->{?inode} eq $inode)
                 or die("previous directory $arg->{?cwd} changed before entering $canon, expected dev=$ldev inode=$lino, actual dev=$device ino=$inode, aborting.");

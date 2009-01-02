@@ -18,13 +18,13 @@ sub getoutput
   my @($code) =  @_;
   my $pid = open(IN, "-|", "-");
   unless(defined $pid) {
-    die "Cannot fork: $!";
+    die "Cannot fork: $^OS_ERROR";
   }
   if($pid) {
     # parent
     my @out = @( ~< *IN );
     close(IN);
-    my $exit = $?>>8;
+    my $exit = $^CHILD_ERROR>>8;
     s/^/#/ for  @out;
     print "#EXIT=$exit OUTPUT=+++#$(join '',@out)#+++\n";
     return @($exit, join("", @out));

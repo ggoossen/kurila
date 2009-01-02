@@ -1,6 +1,6 @@
 package base;
 
-use vars < qw($VERSION);
+our ($VERSION);
 $VERSION = '2.13';
 
 # constant.pm is slow
@@ -65,7 +65,7 @@ sub import {
             eval "require $base";
             # Only ignore "Can't locate" errors from our eval require.
             # Other fatal errors (syntax etc) must be reported.
-            die if $@ && $@->{?description} !~ m/^Can't locate .*?/;
+            die if $^EVAL_ERROR && $^EVAL_ERROR->{?description} !~ m/^Can't locate .*?/;
             unless (%{*{Symbol::fetch_glob("$base\::")}}) {
                 die(<<ERROR);
 Base class package "$base" is empty.

@@ -4,7 +4,7 @@
 
 package I18N::LangTags;
 
-use vars < qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $VERSION %Panic);
+our (@ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS, $VERSION, %Panic);
 require Exporter;
 @ISA = qw(Exporter);
 @EXPORT = qw();

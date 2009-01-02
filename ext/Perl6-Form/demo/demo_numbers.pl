@@ -1,6 +1,6 @@
 use Perl6::Form;
 
-my $nums = do{local$/; ~< *DATA};
+my $nums = do{local$^INPUT_RECORD_SEPARATOR; ~< *DATA};
 
 print < form
 	 "Brittannia      Continental     East Indies      Tyrol           Nippon",

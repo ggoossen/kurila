@@ -38,7 +38,7 @@ do {
         die "xx";
     };
     is( $leave, 1);
-    is( $@->description, "xx" );
+    is( $^EVAL_ERROR->description, "xx" );
 };
 
 do {
@@ -47,5 +47,5 @@ do {
     try {
         push dynascope->{onleave}, sub { die "inside onleave" };
     };
-    is( $@->description, "inside onleave" );
+    is( $^EVAL_ERROR->description, "inside onleave" );
 };

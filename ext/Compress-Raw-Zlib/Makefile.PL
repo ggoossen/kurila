@@ -129,7 +129,7 @@ require ExtUtils::Constant;
 do {
     # Check the constants above all appear in @EXPORT in Zlib.pm
     my %names = %( < map { $_, 1} @( < @names, 'ZLIB_VERSION') );
-    open F, "<", "lib/Compress/Raw/Zlib.pm" or die "Cannot open Zlib.pm: $!\n";
+    open F, "<", "lib/Compress/Raw/Zlib.pm" or die "Cannot open Zlib.pm: $^OS_ERROR\n";
     while (~< *F)
     {
         last if m/^ \s* \@EXPORT \s+ = \s+ qw \( /x ;
@@ -173,7 +173,7 @@ sub ParseCONFIG
 
     print "Parsing $CONFIG...\n" ;
 
-    open(F, "<", "$CONFIG") or die "Cannot open file $CONFIG: $!\n" ;
+    open(F, "<", "$CONFIG") or die "Cannot open file $CONFIG: $^OS_ERROR\n" ;
     while (~< *F) {
 	s/^\s*|\s*$//g ;
 	next if m/^\s*$/ or m/^\s*#/ ;
@@ -316,7 +316,7 @@ sub zlib_files
 
 
 
-use vars < qw ( @GZIP_OS_Names  %OSnames) ;
+our (@GZIP_OS_Names,  %OSnames) ;
 
 BEGIN
 {

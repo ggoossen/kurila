@@ -1137,7 +1137,6 @@
 #define no_fh_allowed		S_no_fh_allowed
 #define too_few_arguments	S_too_few_arguments
 #define too_many_arguments	S_too_many_arguments
-#define ref_array_or_hash	S_ref_array_or_hash
 #endif
 #endif
 #if defined(PL_OP_SLAB_ALLOC)
@@ -1833,7 +1832,6 @@
 #define ck_sassign		Perl_ck_sassign
 #define ck_select		Perl_ck_select
 #define ck_shift		Perl_ck_shift
-#define ck_smartmatch		Perl_ck_smartmatch
 #define ck_sort			Perl_ck_sort
 #define ck_spair		Perl_ck_spair
 #define ck_split		Perl_ck_split
@@ -2137,7 +2135,6 @@
 #define pp_shutdown		Perl_pp_shutdown
 #define pp_sin			Perl_pp_sin
 #define pp_sleep		Perl_pp_sleep
-#define pp_smartmatch		Perl_pp_smartmatch
 #define pp_sne			Perl_pp_sne
 #define pp_snetent		Perl_pp_snetent
 #define pp_socket		Perl_pp_socket
@@ -3278,7 +3275,6 @@
 #define no_fh_allowed(a)	S_no_fh_allowed(aTHX_ a)
 #define too_few_arguments(a,b)	S_too_few_arguments(aTHX_ a,b)
 #define too_many_arguments(a,b)	S_too_many_arguments(aTHX_ a,b)
-#define ref_array_or_hash(a)	S_ref_array_or_hash(aTHX_ a)
 #endif
 #endif
 #if defined(PL_OP_SLAB_ALLOC)
@@ -3542,7 +3538,7 @@
 #define check_uni()		S_check_uni(aTHX)
 #define force_next(a)		S_force_next(aTHX_ a)
 #define force_version(a)	S_force_version(aTHX_ a)
-#define curlocation()		S_curlocation(aTHX)
+#define curlocation(a)		S_curlocation(aTHX_ a)
 #define force_word(a,b,c,d,e)	S_force_word(aTHX_ a,b,c,d,e)
 #define tokeq(a)		S_tokeq(aTHX_ a)
 #define readpipe_override()	S_readpipe_override(aTHX)
@@ -3989,7 +3985,6 @@
 #define ck_sassign(a)		Perl_ck_sassign(aTHX_ a)
 #define ck_select(a)		Perl_ck_select(aTHX_ a)
 #define ck_shift(a)		Perl_ck_shift(aTHX_ a)
-#define ck_smartmatch(a)	Perl_ck_smartmatch(aTHX_ a)
 #define ck_sort(a)		Perl_ck_sort(aTHX_ a)
 #define ck_spair(a)		Perl_ck_spair(aTHX_ a)
 #define ck_split(a)		Perl_ck_split(aTHX_ a)
@@ -4293,7 +4288,6 @@
 #define pp_shutdown()		Perl_pp_shutdown(aTHX)
 #define pp_sin()		Perl_pp_sin(aTHX)
 #define pp_sleep()		Perl_pp_sleep(aTHX)
-#define pp_smartmatch()		Perl_pp_smartmatch(aTHX)
 #define pp_sne()		Perl_pp_sne(aTHX)
 #define pp_snetent()		Perl_pp_snetent(aTHX)
 #define pp_socket()		Perl_pp_socket(aTHX)

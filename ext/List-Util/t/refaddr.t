@@ -5,7 +5,7 @@ use Config;
 use Test::More tests => 11;
 
 use Scalar::Util < qw(refaddr);
-use vars < qw($t $y $x);
+our ($t, $y, $x);
 use Symbol < qw(gensym);
 
 my $i = 1;

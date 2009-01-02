@@ -49,7 +49,7 @@ END {
 ok 1;
 print "# Output dir: $outdir\n";
 
-mkdir $outdir, 0777 or die "Can't mkdir $outdir: $!";
+mkdir $outdir, 0777 or die "Can't mkdir $outdir: $^OS_ERROR";
 
 print "# Converting $corpus_dir => $outdir\n";
 my $conv = Pod::Simple::HTMLBatch->new;

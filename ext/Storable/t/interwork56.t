@@ -25,7 +25,7 @@ BEGIN {
 use Storable qw(freeze thaw);
 use Test::More tests=>30;
 
-use vars qw(%tests);
+our (%tests);
 
 {
     local $/ = "\n\nend\n";

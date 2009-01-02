@@ -52,14 +52,14 @@ the change may affect other modules which rely on the default values
 of the special variables that you have changed. This is one of the
 correct ways to read the whole file at once:
 
-    open my $fh, "<", "foo" or die $!;
+    open my $fh, "<", "foo" or die $^OS_ERROR;
     local $/; # enable localized slurp mode
     my $content = <$fh>;
     close $fh;
 
 But the following code is quite bad:
 
-    open my $fh, "<", "foo" or die $!;
+    open my $fh, "<", "foo" or die $^OS_ERROR;
     undef $/; # enable slurp mode
     my $content = <$fh>;
     close $fh;
@@ -75,7 +75,7 @@ inside some short C<{}> block, you should create one yourself. For
 example:
 
     my $content = '';
-    open my $fh, "<", "foo" or die $!;
+    open my $fh, "<", "foo" or die $^OS_ERROR;
     {
         local $/;
         $content = <$fh>;
@@ -243,20 +243,6 @@ modifier (not counting any matches hidden within a BLOCK or eval()
 enclosed by the current BLOCK). This variable is read-only and
 dynamically scoped to the current BLOCK.
 
-=item $LAST_PAREN_MATCH
-
-=item $+
-X<$+> X<$LAST_PAREN_MATCH>
-
-The text matched by the last bracket of the last successful search pattern.
-This is useful if you don't know which one of a set of alternative patterns
-matched. For example:
-
-    /Version: (.*)|Revision: (.*)/ && ($rev = $+);
-
-(Mnemonic: be positive and forward looking.)
-This variable is read-only and dynamically scoped to the current BLOCK.
-
 =item $LAST_SUBMATCH_RESULT
 
 =item $^N
@@ -278,65 +264,10 @@ worry about exactly which numbered set of parentheses they are.
 
 This variable is dynamically scoped to the current BLOCK.
 
-=item @LAST_MATCH_END
-
-=item @+
-X<@+> X<@LAST_MATCH_END>
-
-This array holds the offsets of the ends of the last successful
-submatches in the currently active dynamic scope.  C<$+[0]> is
-the offset into the string of the end of the entire match.  This
-is the same value as what the C<pos> function returns when called
-on the variable that was matched against.  The I<n>th element
-of this array holds the offset of the I<n>th submatch, so
-C<$+[1]> is the offset past where $1 ends, C<$+[2]> the offset
-past where $2 ends, and so on.  You can use C<$#+> to determine
-how many subgroups were in the last successful match.  See the
-examples given for the C<@-> variable.
-
-=item HANDLE->input_line_number(EXPR)
-
-=item $INPUT_LINE_NUMBER
-
-=item $NR
-
-=item $.
-X<$.> X<$NR> X<$INPUT_LINE_NUMBER> X<line number>
-
-Current line number for the last filehandle accessed.
-
-Each filehandle in Perl counts the number of lines that have been read
-from it.  (Depending on the value of C<$/>, Perl's idea of what
-constitutes a line may not match yours.)  When a line is read from a
-filehandle (via readline() or C<< <> >>), or when tell() or seek() is
-called on it, C<$.> becomes an alias to the line counter for that
-filehandle.
-
-You can adjust the counter by assigning to C<$.>, but this will not
-actually move the seek pointer.  I<Localizing C<$.> will not localize
-the filehandle's line count>.  Instead, it will localize perl's notion
-of which filehandle C<$.> is currently aliased to.
-
-C<$.> is reset when the filehandle is closed, but B<not> when an open
-filehandle is reopened without an intervening close().  For more
-details, see L<perlop/"IE<sol>O Operators">.  Because C<< <> >> never does
-an explicit close, line numbers increase across ARGV files (but see
-examples in L<perlfunc/eof>).
-
-You can also use C<< HANDLE->input_line_number(EXPR) >> to access the
-line counter for a given filehandle without having to worry about
-which handle you last accessed.
-
-(Mnemonic: many programs use "." to mean the current line number.)
-
 =item IO::Handle->input_record_separator(EXPR)
 
-=item $INPUT_RECORD_SEPARATOR
-
-=item $RS
-
-=item $/
-X<$/> X<$RS> X<$INPUT_RECORD_SEPARATOR>
+=item $^INPUT_RECORD_SEPARATOR
+X<$^INPUT_RECORD_SEPARATOR>
 
 The input record separator, newline by default.  This 
 influences Perl's idea of what a "line" is.  Works like B<awk>'s RS
@@ -352,20 +283,20 @@ blindly assume that the next input character belongs to the next
 paragraph, even if it's a newline.  (Mnemonic: / delimits
 line boundaries when quoting poetry.)
 
-    local $/;           # enable "slurp" mode
+    local $^INPUT_RECORD_SEPARATOR;           # enable "slurp" mode
     local $_ = <FH>;    # whole file now here
     s/\n[ \t]+/ /g;
 
-Remember: the value of C<$/> is a string, not a regex.  B<awk> has to be
+Remember: the value of C<$^INPUT_RECORD_SEPARATOR> is a string, not a regex.  B<awk> has to be
 better for something. :-)
 
-Setting C<$/> to a reference to an integer, scalar containing an integer, or
+Setting C<$^INPUT_RECORD_SEPARATOR> to a reference to an integer, scalar containing an integer, or
 scalar that's convertible to an integer will attempt to read records
 instead of lines, with the maximum record size being the referenced
 integer.  So this:
 
-    local $/ = \32768; # or \"32768", or \$var_containing_32768
-    open my $fh, "<", $myfile or die $!;
+    local $^INPUT_RECORD_SEPARATOR = \32768; # or \"32768", or \$var_containing_32768
+    open my $fh, "<", $myfile or die $^OS_ERROR;
     local $_ = <$fh>;
 
 will read a record of no more than 32768 bytes from FILE.  If you're
@@ -386,15 +317,13 @@ See also L<perlport/"Newlines">.  Also see C<$.>.
 
 =item HANDLE->autoflush(EXPR)
 
-=item $OUTPUT_AUTOFLUSH
-
-=item $|
-X<$|> X<autoflush> X<flush> X<$OUTPUT_AUTOFLUSH>
+=item $^OUTPUT_AUTOFLUSH
+X<autoflush> X<flush> X<$^OUTPUT_AUTOFLUSH>
 
 If set to nonzero, forces a flush right away and after every write
 or print on the currently selected output channel.  Default is 0
 (regardless of whether the channel is really buffered by the
-system or not; C<$|> tells you only whether you've asked Perl
+system or not; C<$^OUTPUT_AUTOFLUSH> tells you only whether you've asked Perl
 explicitly to flush after each write).  STDOUT will
 typically be line buffered if output is to the terminal and block
 buffered otherwise.  Setting this variable is useful primarily when
@@ -406,113 +335,51 @@ See also L<IO::Handle>. (Mnemonic: when you want your pipes to be piping hot.)
 
 =item IO::Handle->output_field_separator EXPR
 
-=item $OUTPUT_FIELD_SEPARATOR
-
-=item $OFS
-
-=item $,
-X<$,> X<$OFS> X<$OUTPUT_FIELD_SEPARATOR>
+=item $^OUTPUT_FIELD_SEPARATOR
+X<$^OUTPUT_FIELD_SEPARATOR>
 
 The output field separator for the print operator.  If defined, this
 value is printed between each of print's arguments.  Default is C<undef>.
-(Mnemonic: what is printed when there is a "," in your print statement.)
 
 =item IO::Handle->output_record_separator EXPR
 
-=item $OUTPUT_RECORD_SEPARATOR
-
-=item $ORS
-
-=item $\
-X<$\> X<$ORS> X<$OUTPUT_RECORD_SEPARATOR>
+=item $^OUTPUT_RECORD_SEPARATOR
+X<$^OUTPUT_RECORD_SEPARATOR>
 
 The output record separator for the print operator.  If defined, this
 value is printed after the last of print's arguments.  Default is C<undef>.
-(Mnemonic: you set C<$\> instead of adding "\n" at the end of the print.
-Also, it's just like C<$/>, but it's what you get "back" from Perl.)
-
-=item $LIST_SEPARATOR
-
-=item $"
-X<$"> X<$LIST_SEPARATOR>
-
-This is like C<$,> except that it applies to array and slice values
-interpolated into a double-quoted string (or similar interpreted
-string).  Default is a space.  (Mnemonic: obvious, I think.)
-
-=item @LAST_MATCH_START
-
-=item @-
-X<@-> X<@LAST_MATCH_START>
-
-@-[0] is the offset of the start of the last successful match.
-C<@-[>I<n>C<]> is the offset of the start of the substring matched by
-I<n>-th subpattern, or undef if the subpattern did not match.
-
-Thus after a match against $_, $& coincides with C<substr $_, $-[0],
-$+[0] - $-[0]>.  Similarly, $I<n> coincides with C<substr $_, $-[n],
-$+[n] - $-[n]> if C<$-[n]> is defined, and $+ coincides with
-C<substr $_, @-[@- -1], @+[@- -1] - @-[@- -1]>.  One can use C<@- -1> to find the last
-matched subgroup in the last successful match.  Contrast with
-C<@+ -1>, the number of subgroups in the regular expression.  Compare
-with C<@+>.
-
-This array holds the offsets of the beginnings of the last
-successful submatches in the currently active dynamic scope.
-C<@-[0]> is the offset into the string of the beginning of the
-entire match.  The I<n>th element of this array holds the offset
-of the I<n>th submatch, so C<@-[1]> is the offset where $1
-begins, C<@-[2]> the offset where $2 begins, and so on.
-
-After a match against some variable $var:
-
-=over 5
-
-=item C<$^PREMATCH> is the same as C<substr($var, 0, @-[0])>
-
-=item C<$^MATCH> is the same as C<substr($var, @-[0], @+[0] - @-[0])>
-
-=item C<$^POSTMATCH> is the same as C<substr($var, @+[0])>
-
-=item C<$1> is the same as C<substr($var, @-[1], @+[1] - @-[1])>  
-
-=item C<$2> is the same as C<substr($var, @-[2], @+[2] - @-[2])>
-
-=item C<$3> is the same as C<substr($var, @-[3], @+[3] - @-[3])>
-
-=back
+(Mnemonic: you set C<$^OUTPUT_RECORD_SEPARATOR> instead of adding "\n" at the end of the print.
+Also, it's just like C<$^INPUT_RECORD_SEPARATOR>, but it's what you get "back" from Perl.)
 
 =item $CHILD_ERROR
-
-=item $?
-X<$?> X<$CHILD_ERROR>
+X<$CHILD_ERROR>
 
 The status returned by the last pipe close, backtick (C<``>) command,
 successful call to wait() or waitpid(), or from the system()
 operator.  This is just the 16-bit status word returned by the
 traditional Unix wait() system call (or else is made up to look like it).  Thus, the
-exit value of the subprocess is really (C<<< $? >> 8 >>>), and
-C<$? & 127> gives which signal, if any, the process died from, and
-C<$? & 128> reports whether there was a core dump.  (Mnemonic:
+exit value of the subprocess is really (C<<< $^CHILD_ERROR >> 8 >>>), and
+C<$^CHILD_ERROR ^&^ 127> gives which signal, if any, the process died from, and
+C<$^CHILD_ERROR ^&^ 128> reports whether there was a core dump.  (Mnemonic:
 similar to B<sh> and B<ksh>.)
 
 Additionally, if the C<h_errno> variable is supported in C, its value
-is returned via $? if any C<gethost*()> function fails.
+is returned via $^CHILD_ERROR if any C<gethost*()> function fails.
 
 If you have installed a signal handler for C<SIGCHLD>, the
-value of C<$?> will usually be wrong outside that handler.
+value of C<$^CHILD_ERROR> will usually be wrong outside that handler.
 
-Inside an C<END> subroutine C<$?> contains the value that is going to be
-given to C<exit()>.  You can modify C<$?> in an C<END> subroutine to
+Inside an C<END> subroutine C<$^CHILD_ERROR> contains the value that is going to be
+given to C<exit()>.  You can modify C<$^CHILD_ERROR> in an C<END> subroutine to
 change the exit status of your program.  For example:
 
     END {
-	$? = 1 if $? == 255;  # die would make it 255
+	$^CHILD_ERROR = 1 if $^CHILD_ERROR == 255;  # die would make it 255
     } 
 
-Under VMS, the pragma C<use vmsish 'status'> makes C<$?> reflect the
+Under VMS, the pragma C<use vmsish 'status'> makes C<$^CHILD_ERROR> reflect the
 actual VMS exit status, instead of the default emulation of POSIX
-status; see L<perlvms/$?> for details.
+status; see L<perlvms/$^CHILD_ERROR> for details.
 
 Also see L<Error Indicators>.
 
@@ -526,7 +393,7 @@ WIFEXITED, WEXITSTATUS, WIFSIGNALED, WTERMSIG, WIFSTOPPED, WSTOPSIG
 and WIFCONTINUED functions provided by the L<POSIX> module.
 
 Under VMS this reflects the actual VMS exit status; i.e. it is the same
-as $? when the pragma C<use vmsish 'status'> is in effect.
+as $^CHILD_ERROR when the pragma C<use vmsish 'status'> is in effect.
 
 =item $^ENCODING
 X<$^ENCODING>
@@ -538,55 +405,36 @@ manipulation of this variable is highly discouraged.
 
 =item $OS_ERROR
 
-=item $ERRNO
-
-=item $!
-X<$!> X<$ERRNO> X<$OS_ERROR>
+=item $^OS_ERROR
+X<$^OS_ERROR> X<$OS_ERROR>
 
 If used numerically, yields the current value of the C C<errno>
 variable, or in other words, if a system or library call fails, it
-sets this variable.  This means that the value of C<$!> is meaningful
+sets this variable.  This means that the value of C<$^OS_ERROR> is meaningful
 only I<immediately> after a B<failure>:
 
     if (open my $fh, "<", $filename) {
-	# Here $! is meaningless.
+	# Here $^OS_ERROR is meaningless.
 	...
     } else {
-	# ONLY here is $! meaningful.
+	# ONLY here is $^OS_ERROR meaningful.
 	...
-	# Already here $! might be meaningless.
+	# Already here $^OS_ERROR might be meaningless.
     }
     # Since here we might have either success or failure,
-    # here $! is meaningless.
+    # here $^OS_ERROR is meaningless.
 
 In the above I<meaningless> stands for anything: zero, non-zero,
 C<undef>.  A successful system or library call does B<not> set
 the variable to zero.
 
 If used as a string, yields the corresponding system error string.
-You can assign a number to C<$!> to set I<errno> if, for instance,
-you want C<"$!"> to return the string for error I<n>, or you want
+You can assign a number to C<$^OS_ERROR> to set I<errno> if, for instance,
+you want C<"$^OS_ERROR"> to return the string for error I<n>, or you want
 to set the exit value for the die() operator.  (Mnemonic: What just
 went bang?)
 
 Also see L<Error Indicators>.
-
-=item %OS_ERROR
-
-=item %ERRNO
-
-=item %!
-X<%!>
-
-Each element of C<%!> has a true value only if C<$!> is set to that
-value.  For example, C<$!{ENOENT}> is true if and only if the current
-value of C<$!> is C<ENOENT>; that is, if the most recent error was
-"No such file or directory" (or its moral equivalent: not all operating
-systems give that exact error, and certainly not all languages).
-To check if a particular key is meaningful on your system, use
-C<exists $!{the_key}>; for a list of legal keys, use C<keys %!>.
-See L<Errno> for more information, and also see above for the
-validity of C<$!>.
 
 =item $EXTENDED_OS_ERROR
 
@@ -594,14 +442,14 @@ validity of C<$!>.
 X<$^E> X<$EXTENDED_OS_ERROR>
 
 Error information specific to the current operating system.  At
-the moment, this differs from C<$!> under only VMS, OS/2, and Win32
+the moment, this differs from C<$^OS_ERROR> under only VMS, OS/2, and Win32
 (and for MacPerl).  On all other platforms, C<$^E> is always just
-the same as C<$!>.
+the same as C<$^OS_ERROR>.
 
 Under VMS, C<$^E> provides the VMS status value from the last
 system error.  This is more specific information about the last
-system error than that provided by C<$!>.  This is particularly
-important when C<$!> is set to B<EVMSERR>.
+system error than that provided by C<$^OS_ERROR>.  This is particularly
+important when C<$^OS_ERROR> is set to B<EVMSERR>.
 
 Under OS/2, C<$^E> is set to the error code of the last call to
 OS/2 API either via CRT, or directly from perl.
@@ -611,20 +459,18 @@ reported by the Win32 call C<GetLastError()> which describes
 the last error from within the Win32 API.  Most Win32-specific
 code will report errors via C<$^E>.  ANSI C and Unix-like calls
 set C<errno> and so most portable Perl code will report errors
-via C<$!>. 
+via C<$^OS_ERROR>. 
 
-Caveats mentioned in the description of C<$!> generally apply to
+Caveats mentioned in the description of C<$^OS_ERROR> generally apply to
 C<$^E>, also.  (Mnemonic: Extra error explanation.)
 
 Also see L<Error Indicators>.
 
-=item $EVAL_ERROR
-
-=item $@
-X<$@> X<$EVAL_ERROR>
+=item $^EVAL_ERROR
+X<$^EVAL_ERROR>
 
 The Perl syntax error message from the last eval() operator.
-If $@ is the null string, the last eval() parsed and executed
+If $^EVAL_ERROR is the null string, the last eval() parsed and executed
 correctly (although the operations you invoked may have failed in the
 normal fashion).  (Mnemonic: Where was the syntax error "at"?)
 
@@ -636,52 +482,46 @@ Also see L<Error Indicators>.
 
 =item $PROCESS_ID
 
-=item $PID
-
-=item $$
-X<$$> X<$PID> X<$PROCESS_ID>
+=item $^PID
+X<$^PID> X<$PROCESS_ID>
 
 The process number of the Perl running this script.  You should
 consider this variable read-only, although it will be altered
-across fork() calls.  (Mnemonic: same as shells.)
+across fork() calls.
 
 Note for Linux users: on Linux, the C functions C<getpid()> and
 C<getppid()> return different values from different threads. In order to
-be portable, this behavior is not reflected by C<$$>, whose value remains
+be portable, this behavior is not reflected by C<$^PID>, whose value remains
 consistent across threads. If you want to call the underlying C<getpid()>,
 you may use the CPAN module C<Linux::Pid>.
 
 =item $REAL_USER_ID
 
-=item $UID
-
-=item $<
-X<< $< >> X<$UID> X<$REAL_USER_ID>
+=item $^UID
+X<$^UID> X<$REAL_USER_ID>
 
 The real uid of this process.  (Mnemonic: it's the uid you came I<from>,
 if you're running setuid.)  You can change both the real uid and
 the effective uid at the same time by using POSIX::setuid().  Since
-changes to $< require a system call, check $! after a change attempt to 
+changes to $^UID require a system call, check $^OS_ERROR after a change attempt to 
 detect any possible errors.
 
 =item $EFFECTIVE_USER_ID
 
-=item $EUID
-
-=item $>
-X<< $> >> X<$EUID> X<$EFFECTIVE_USER_ID>
+=item $^EUID
+X<$^EUID> X<$EFFECTIVE_USER_ID>
 
 The effective uid of this process.  Example:
 
-    $< = $>;		# set real to effective uid
-    ($<,$>) = ($>,$<);	# swap real and effective uid
+    $^UID = $^EUID;		# set real to effective uid
+    @($^UID,$^EUID) = @($^EUID,$^UID);	# swap real and effective uid
 
 You can change both the effective uid and the real uid at the same
-time by using POSIX::setuid().  Changes to $> require a check to $!
+time by using POSIX::setuid().  Changes to $^EUID require a check to $^OS_ERROR
 to detect any possible errors after an attempted change. 
 
 (Mnemonic: it's the uid you went I<to>, if you're running setuid.)
-C<< $< >> and C<< $> >> can be swapped only on machines
+C<< $^UID >> and C<< $^EUID >> can be swapped only on machines
 supporting setreuid().
 
 =item $REAL_GROUP_ID
@@ -703,7 +543,7 @@ that this is different to the effective gid (C<$^EGID>) which does take a
 list.
 
 You can change both the real gid and the effective gid at the same
-time by using POSIX::setgid().  Changes to $^GID require a check to $!
+time by using POSIX::setgid().  Changes to $^GID require a check to $^OS_ERROR
 to detect any possible errors after an attempted change.
 
 (Mnemonic: parentheses are used to I<group> things.  The real gid is the
@@ -730,7 +570,7 @@ list, say C< $^EGID = "5 5" >.
 
 You can change both the effective gid and the real gid at the same
 time by using POSIX::setgid() (use only a single numeric argument).
-Changes to $) require a check to $! to detect any possible errors
+Changes to $) require a check to $^OS_ERROR to detect any possible errors
 after an attempted change.
 
 (Mnemonic: parentheses are used to I<group> things.  The effective gid
@@ -1303,7 +1143,7 @@ immediate (also known as "unsafe") to deferred, also known as
 =head2 Error Indicators
 X<error> X<exception>
 
-The variables C<$@>, C<$!>, C<$^E>, and C<$?> contain information
+The variables C<$^EVAL_ERROR>, C<$^OS_ERROR>, C<$^E>, and C<$^CHILD_ERROR> contain information
 about different types of error conditions that may appear during
 execution of a Perl program.  The variables are shown ordered by
 the "distance" between the subsystem which reported the error and
@@ -1315,42 +1155,42 @@ To illustrate the differences between these variables, consider the
 following Perl expression, which uses a single-quoted string:
 
     eval q{
-	open my $pipe, "/cdrom/install |" or die $!;
+	open my $pipe, "/cdrom/install |" or die $^OS_ERROR;
 	my @res = <$pipe>;
-	close $pipe or die "bad pipe: $?, $!";
+	close $pipe or die "bad pipe: $^CHILD_ERROR, $^OS_ERROR";
     };
 
 After execution of this statement all 4 variables may have been set.  
 
-C<$@> is set if the string to be C<eval>-ed did not compile (this
+C<$^EVAL_ERROR> is set if the string to be C<eval>-ed did not compile (this
 may happen if C<open> or C<close> were imported with bad prototypes),
 or if Perl code executed during evaluation die()d .  In these cases
-the value of $@ is the compile error, or the argument to C<die>
-(which will interpolate C<$!> and C<$?>).  (See also L<Fatal>,
+the value of $^EVAL_ERROR is the compile error, or the argument to C<die>
+(which will interpolate C<$^OS_ERROR> and C<$^CHILD_ERROR>).  (See also L<Fatal>,
 though.)
 
 When the eval() expression above is executed, open(), C<< <PIPE> >>,
 and C<close> are translated to calls in the C run-time library and
-thence to the operating system kernel.  C<$!> is set to the C library's
+thence to the operating system kernel.  C<$^OS_ERROR> is set to the C library's
 C<errno> if one of these calls fails. 
 
 Under a few operating systems, C<$^E> may contain a more verbose
 error indicator, such as in this case, "CDROM tray not closed."
 Systems that do not support extended error messages leave C<$^E>
-the same as C<$!>.
+the same as C<$^OS_ERROR>.
 
-Finally, C<$?> may be set to non-0 value if the external program
+Finally, C<$^CHILD_ERROR> may be set to non-0 value if the external program
 F</cdrom/install> fails.  The upper eight bits reflect specific
 error conditions encountered by the program (the program's exit()
 value).   The lower eight bits reflect mode of failure, like signal
 death and core dump information  See wait(2) for details.  In
-contrast to C<$!> and C<$^E>, which are set only if error condition
-is detected, the variable C<$?> is set on each C<wait> or pipe
-C<close>, overwriting the old value.  This is more like C<$@>, which
+contrast to C<$^OS_ERROR> and C<$^E>, which are set only if error condition
+is detected, the variable C<$^CHILD_ERROR> is set on each C<wait> or pipe
+C<close>, overwriting the old value.  This is more like C<$^EVAL_ERROR>, which
 on every eval() is always set on failure and cleared on success.
 
-For more details, see the individual descriptions at C<$@>, C<$!>, C<$^E>,
-and C<$?>.
+For more details, see the individual descriptions at C<$^EVAL_ERROR>, C<$^OS_ERROR>, C<$^E>,
+and C<$^CHILD_ERROR>.
 
 =head2 Technical Note on the Syntax of Variable Names
 

@@ -205,7 +205,7 @@ EXPECT
 $^W = 0 ;
 my $filename = "./temp.dir" ;
 mkdir $filename, 0777 
-  or die "Cannot create directory $filename: $!\n" ;
+  or die "Cannot create directory $filename: $^OS_ERROR\n" ;
 do {
     local @ARGV = @($filename) ;
     local ($^I) = "" ;

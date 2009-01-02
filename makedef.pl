@@ -12,7 +12,7 @@
 BEGIN { unshift @INC, "lib" }
 use strict;
 
-use vars qw($PLATFORM $CCTYPE $FILETYPE $CONFIG_ARGS $ARCHNAME $PATCHLEVEL);
+our ($PLATFORM, $CCTYPE, $FILETYPE, $CONFIG_ARGS, $ARCHNAME, $PATCHLEVEL);
 
 my (%define, %ordinal);
 
@@ -246,7 +246,6 @@ if ($PLATFORM eq 'win32') {
 		     PL_lastgotoprobe
 		     PL_linestart
 		     PL_modcount
-		     PL_pending_ident
 		     PL_sublex_info
 		     PL_timesbuf
 		     main
@@ -304,7 +303,6 @@ if ($PLATFORM eq 'wince') {
 		     PL_lastgotoprobe
 		     PL_linestart
 		     PL_modcount
-		     PL_pending_ident
 		     PL_sublex_info
 		     PL_timesbuf
 		     PL_numeric_compat1
@@ -493,7 +491,6 @@ elsif ($PLATFORM eq 'netware') {
 			PL_lastgotoprobe
 			PL_linestart
 			PL_modcount
-			PL_pending_ident
 			PL_sublex_info
 			PL_timesbuf
 			main

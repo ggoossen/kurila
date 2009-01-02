@@ -69,7 +69,7 @@ sub expand_os_specific {
 }
 
 unlink "DynaLoader.pm" if -f "DynaLoader.pm";
-open OUT, ">", "DynaLoader.pm" or die $!;
+open OUT, ">", "DynaLoader.pm" or die $^OS_ERROR;
 print OUT <<'EOT';
 
 # Generated from DynaLoader_pm.PL
@@ -261,8 +261,8 @@ if ($dl_debug) {
 	    unless defined(&boot_DynaLoader);
 }
 
-use vars < qw(@isa @args $module @dirs $file $dl_debug $dlsrc @dl_library_path
-            @do_expand);
+our (@isa, @args, $module, @dirs, $file, $dl_debug, $dlsrc, @dl_library_path,
+     @do_expand);
 
 sub bootstrap_inherit {
     my $module = @_[0];
@@ -363,7 +363,7 @@ sub bootstrap {
     if (-s $bs) { # only read file if it's not empty
         print STDERR "BS: $bs ($^O, $dlsrc)\n" if $dl_debug;
         try { do $bs; };
-        warn "$bs: $@\n" if $@;
+        warn "$bs: $^EVAL_ERROR\n" if $^EVAL_ERROR;
     }
 
     my $boot_symbol_ref;
@@ -575,6 +575,8 @@ sub dl_find_symbol_anywhere
     }
     return undef;
 }
+
+1;
 
 =head1 NAME
 
@@ -998,5 +1000,5 @@ assistance from Tim Bunce, January 1996.
 =cut
 EOT
 
-close OUT or die $!;
+close OUT or die $^OS_ERROR;
 
