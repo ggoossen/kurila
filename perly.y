@@ -323,12 +323,14 @@ cond	:	IF '(' remember mexpr ')' mblock else
 /* Continue blocks */
 cont	:	';'     /* NULL */
 			{
-#ifdef PERL_MAD
-                            $$ = newOP(OP_NULL,0, LOCATION($1));
-                            APPEND_MADPROPS_PV("value", $$, '>');
-                            TOKEN_GETMAD($1,$$,'X');
-#else
                             $$ = (OP*)NULL;
+#ifdef PERL_MAD
+                            if (PL_madskills) {
+                                /* FIXME produces different results in "do" blocks */
+                                $$ = newOP(OP_NULL,0, LOCATION($1));
+                                APPEND_MADPROPS_PV("value", $$, '>');
+                                TOKEN_GETMAD($1,$$,'X');
+                            }
 #endif /* PERL_MAD */
                         }
         |       CONTINUE block
