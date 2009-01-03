@@ -37,11 +37,11 @@ like( $warn, qr/Unknown PerlIO layer/,
 
 # see if it sets the magic variables appropriately
 import( 'IN', ':crlf' );
-is( %^H{?'open_IN'}, 'crlf', 'should have set crlf layer' );
+is( $^HINTS{?'open_IN'}, 'crlf', 'should have set crlf layer' );
 
 # it should reset them appropriately, too
 import( 'IN', ':raw' );
-is( %^H{?'open_IN'}, 'raw', 'should have reset to raw layer' );
+is( $^HINTS{?'open_IN'}, 'raw', 'should have reset to raw layer' );
 
 # it dies if you don't set IN, OUT, or IO
 try { import( 'sideways', ':raw' ) };
@@ -51,7 +51,7 @@ like( $^EVAL_ERROR->{?description}, qr/Unknown PerlIO layer class/, 'should croa
 import( 'IO', ':raw :crlf' );
 is( $^OPEN, ":raw :crlf\0:raw :crlf",
 	'should set multi types, multi layer' );
-is( %^H{?'open_IO'}, 'crlf', 'should record last layer set in %^H' );
+is( $^HINTS{?'open_IO'}, 'crlf', 'should record last layer set in %^H' );
 
 SKIP: do {
     skip("no perlio, no :utf8", 12) unless (PerlIO::Layer->find( 'perlio'));

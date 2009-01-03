@@ -374,7 +374,7 @@ our %msgs # announce cross-testing.
 #######
 sub getCmdLine {	# import assistant
     # offer help
-    print(qq{\n$0 accepts args to update these state-vars:
+    print(qq{\n$^PROGRAM_NAME accepts args to update these state-vars:
 	     turn on a flag by typing its name,
 	     select a value from list by typing name=val.\n    }, <
 	  mydumper(\%gOpts))
@@ -414,7 +414,7 @@ sub getCmdLine {	# import assistant
 	    grep s/$opt=(.*)/$(%gOpts{+$opt}=$1)/, @ARGV;
 	}
      }
-    print("$0 heres current state:\n", < mydumper(\%gOpts))
+    print("$^PROGRAM_NAME heres current state:\n", < mydumper(\%gOpts))
 	if %gOpts{?help} or %gOpts{?dump};
 
     exit if %gOpts{?help};
@@ -1014,7 +1014,7 @@ sub OptreeCheck::processExamples {
 
 # OK - now for the final insult to your good taste...  
 
-if ($0 =~ m/OptreeCheck\.pm/) {
+if ($^PROGRAM_NAME =~ m/OptreeCheck\.pm/) {
 
     #use lib 't';
     require './t/test.pl';
@@ -1025,7 +1025,7 @@ if ($0 =~ m/OptreeCheck\.pm/) {
 
     require Getopt::Std;
     Getopt::Std::getopts('') or 
-	die qq{ $0 sample-files*    # no options
+	die qq{ $^PROGRAM_NAME sample-files*    # no options
 
 	  expecting filenames as args.  Each should have paragraphs,
 	  these are converted to checkOptree() tests, and printed to

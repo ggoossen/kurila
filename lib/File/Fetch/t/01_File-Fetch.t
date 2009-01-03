@@ -142,7 +142,7 @@ for my $entry (@map) {
 ### file:// tests ###
 do {
     my $prefix = &File::Fetch::ON_UNIX( < @_ ) ?? 'file://' !! 'file:///';
-    my $uri = $prefix . cwd() .'/'. basename($0);
+    my $uri = $prefix . cwd() .'/'. basename($^PROGRAM_NAME);
 
     for (qw[lwp file]) {
         _fetch_uri( file => $uri, $_ );

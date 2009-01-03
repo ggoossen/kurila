@@ -11,7 +11,7 @@ ok($deparse);
 
 # Tell B::Deparse about our ambient pragmas
 do { my ($hint_bits, $warning_bits, $hinthash);
- BEGIN { @($hint_bits, $warning_bits, $hinthash) = @($^H, $^WARNING_BITS, \%^H); }
+ BEGIN { @($hint_bits, $warning_bits, $hinthash) = @($^HINT_BITS, $^WARNING_BITS, \$^HINTS); }
  $deparse->ambient_pragmas (
      hint_bits    => $hint_bits,
      warning_bits => $warning_bits,
@@ -72,8 +72,8 @@ TODO: do {
     is($val->[0], 'hello');
 };
 
-my $Is_VMS = $^O eq 'VMS';
-my $Is_MacOS = $^O eq 'MacOS';
+my $Is_VMS = $^OS_NAME eq 'VMS';
+my $Is_MacOS = $^OS_NAME eq 'MacOS';
 
 my $path = join " ", map { qq["-I$_"] } @INC;
 $path .= " -MMac::err=unix" if $Is_MacOS;

@@ -27,10 +27,10 @@ require Exporter;
 $Too_Big = 1024 * 1024 * 2;
 
 my $macfiles;
-if ($^O eq 'MacOS') {
+if ($^OS_NAME eq 'MacOS') {
 	$macfiles = try { require Mac::MoreFiles };
 	warn 'Mac::MoreFiles could not be loaded; using non-native syscopy'
-		if $^EVAL_ERROR && $^W;
+		if $^EVAL_ERROR && $^WARNING;
 }
 
 sub _catname {
@@ -40,7 +40,7 @@ sub _catname {
 	File::Basename->import('basename');
     }
 
-    if ($^O eq 'MacOS') {
+    if ($^OS_NAME eq 'MacOS') {
 	# a partial dir name that's valid only in the cwd (e.g. 'tmp')
 	$to = ':' . $to if $to !~ m/:/;
     }
@@ -83,7 +83,7 @@ sub copy {
 
     if (( (config_value("d_symlink") && config_value("d_readlink"))
             || config_value("d_link"))
-          && !($^O eq 'MSWin32' || $^O eq 'os2')) {
+          && !($^OS_NAME eq 'MSWin32' || $^OS_NAME eq 'os2')) {
 	my @fs = @( stat($from) );
 	if ((nelems @fs)) {
 	    my @ts = @( stat($to) );
@@ -100,16 +100,16 @@ sub copy {
 
     if (defined &syscopy && !$Syscopy_is_copy
 	&& !$to_a_handle
-	&& !($from_a_handle && $^O eq 'os2' )	# OS/2 cannot handle handles
-	&& !($from_a_handle && $^O eq 'mpeix')	# and neither can MPE/iX.
-	&& !($from_a_handle && $^O eq 'MSWin32')
-	&& !($from_a_handle && $^O eq 'MacOS')
-	&& !($from_a_handle && $^O eq 'NetWare')
+	&& !($from_a_handle && $^OS_NAME eq 'os2' )	# OS/2 cannot handle handles
+	&& !($from_a_handle && $^OS_NAME eq 'mpeix')	# and neither can MPE/iX.
+	&& !($from_a_handle && $^OS_NAME eq 'MSWin32')
+	&& !($from_a_handle && $^OS_NAME eq 'MacOS')
+	&& !($from_a_handle && $^OS_NAME eq 'NetWare')
        )
     {
 	my $copy_to = $to;
 
-        if ($^O eq 'VMS' && -e $from) {
+        if ($^OS_NAME eq 'VMS' && -e $from) {
 
             if (! -d $to && ! -d $from) {
 
@@ -167,7 +167,7 @@ sub copy {
     } else {
 	$from = _protect($from) if $from =~ m/^\s/s;
        open($from_h, "<", "$from\0") or return $fail_open1->();
-       binmode $from_h or die "($^OS_ERROR,$^E)";
+       binmode $from_h or die "($^OS_ERROR,$^EXTENDED_OS_ERROR)";
 	$closefrom = 1;
     }
 
@@ -176,7 +176,7 @@ sub copy {
     } else {
 	$to = _protect($to) if $to =~ m/^\s/s;
        open($to_h,">", "$to\0") or return $fail_open2->();
-       binmode $to_h or die "($^OS_ERROR,$^E)";
+       binmode $to_h or die "($^OS_ERROR,$^EXTENDED_OS_ERROR)";
 	$closeto = 1;
     }
 
@@ -223,13 +223,13 @@ sub move {
 
     @($tosz1,$tomt1) =  @(stat($to))[[@: 7,9]];
     $fromsz = -s $from;
-    if ($^O eq 'os2' and defined $tosz1 and defined $fromsz) {
+    if ($^OS_NAME eq 'os2' and defined $tosz1 and defined $fromsz) {
       # will not rename with overwrite
       unlink $to;
     }
 
     my $rename_to = $to;
-    if ($^O eq 'VMS' && -e $from) {
+    if ($^OS_NAME eq 'VMS' && -e $from) {
 
         if (! -d $to && ! -d $from) {
             # VMS has sticky defaults on extensions, which means that
@@ -269,11 +269,11 @@ sub move {
         };
         return 1 unless $^EVAL_ERROR;
     };
-    @($sts,$ossts) = @($^OS_ERROR + 0, $^E + 0);
+    @($sts,$ossts) = @($^OS_ERROR + 0, $^EXTENDED_OS_ERROR + 0);
 
     @($tosz2,$tomt2, ...) = @(< @(stat($to))[[@:7,9]],0,0) if defined $tomt1;
     unlink($to) if !defined($tomt1) or $tomt1 != $tomt2 or $tosz1 != $tosz2;
-    @($^OS_ERROR,$^E) = @($sts,$ossts);
+    @($^OS_ERROR,$^EXTENDED_OS_ERROR) = @($sts,$ossts);
     return 0;
 }
 
@@ -281,7 +281,7 @@ sub move {
 *mv = \&move;
 
 
-if ($^O eq 'MacOS') {
+if ($^OS_NAME eq 'MacOS') {
     *_protect = sub { MacPerl::MakeFSSpec(@_[0]) };
 } else {
     *_protect = sub { "./@_[0]" };
@@ -289,16 +289,16 @@ if ($^O eq 'MacOS') {
 
 # &syscopy is an XSUB under OS/2
 unless (defined &syscopy) {
-    if ($^O eq 'VMS') {
+    if ($^OS_NAME eq 'VMS') {
 	*syscopy = \&rmscopy;
-    } elsif ($^O eq 'mpeix') {
+    } elsif ($^OS_NAME eq 'mpeix') {
 	*syscopy = sub {
 	    return 0 unless (nelems @_) == 2;
 	    # Use the MPE cp program in order to
 	    # preserve MPE file attributes.
 	    return system('/bin/cp', '-f', @_[0], @_[1]) == 0;
 	};
-    } elsif ($^O eq 'MSWin32' && defined &DynaLoader::boot_DynaLoader) {
+    } elsif ($^OS_NAME eq 'MSWin32' && defined &DynaLoader::boot_DynaLoader) {
 	# Win32::CopyFile() fill only work if we can load Win32.xs
 	*syscopy = sub {
 	    return 0 unless (nelems @_) == 2;

@@ -29,7 +29,7 @@ if (open(MANIFEST, "<", "MANIFEST")) {
     }
     close MANIFEST;
 } else {
-    die "$0: Failed to open MANIFEST for reading: $^OS_ERROR\n";
+    die "$^PROGRAM_NAME: Failed to open MANIFEST for reading: $^OS_ERROR\n";
 }
 
 sub get_module_pat {
@@ -66,7 +66,7 @@ sub get_maintainer_modules {
 
 sub usage {
     print <<__EOF__;
-$0: Usage: $0 [[--maintainer M --module M --files]|[--check] file ...]
+$^PROGRAM_NAME: Usage: $^PROGRAM_NAME [[--maintainer M --module M --files]|[--check] file ...]
 --maintainer M	list all maintainers matching M
 --module M	list all modules matching M
 --files		list all files
@@ -113,14 +113,14 @@ sub process_options {
     usage() if (nelems @Files) && ($Maintainer || $Module || $Files);
 
     for my $mean (@($Maintainer, $Module)) {
-	warn "$0: Did you mean '$0 $mean'?\n"
+	warn "$^PROGRAM_NAME: Did you mean '$^PROGRAM_NAME $mean'?\n"
 	    if $mean && -e $mean && $mean ne '.' && !$Files;
     }
 
-    warn "$0: Did you mean '$0 -mo $Maintainer'?\n"
+    warn "$^PROGRAM_NAME: Did you mean '$^PROGRAM_NAME -mo $Maintainer'?\n"
 	if defined $Maintainer && exists %Modules{$Maintainer};
 
-    warn "$0: Did you mean '$0 -ma $Module'?\n"
+    warn "$^PROGRAM_NAME: Did you mean '$^PROGRAM_NAME -ma $Module'?\n"
 	if defined $Module     && exists %Maintainers{$Module};
 
     return  @($Maintainer, $Module, $Files, @Files);

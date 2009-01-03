@@ -4,7 +4,7 @@ use Test::More;
 use warnings;
 
 BEGIN {
-  if ($^O eq 'MSWin32' || $^O eq 'VMS') {
+  if ($^OS_NAME eq 'MSWin32' || $^OS_NAME eq 'VMS') {
     plan skip_all => "Not portable on Win32 or VMS\n";
   }
   else {

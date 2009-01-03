@@ -10,10 +10,10 @@ if (open(PATCHLEVEL_H, "<", "patchlevel.h")) {
   }
   close PATCHLEVEL_H;
 } else {
-  die "$0: patchlevel.h: $^OS_ERROR\n";
+  die "$^PROGRAM_NAME: patchlevel.h: $^OS_ERROR\n";
 }
 
-die "$0: Perl release looks funny.\n"
+die "$^PROGRAM_NAME: Perl release looks funny.\n"
   unless (defined %VERSION{?REVISION} && %VERSION{?REVISION} == 5 &&
           defined %VERSION{?VERSION}  && %VERSION{?VERSION}  +>= 8 &&
           defined %VERSION{?SUBVERSION});

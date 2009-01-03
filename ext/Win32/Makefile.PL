@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 
 my @libs;
-push @libs, '-L/lib/w32api -lole32 -lversion' if $^O eq "cygwin";
+push @libs, '-L/lib/w32api -lole32 -lversion' if $^OS_NAME eq "cygwin";
 
 WriteMakefile(
     NAME          => 'Win32',

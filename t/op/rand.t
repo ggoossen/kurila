@@ -97,7 +97,7 @@ DIAG
     unless (is( $off, 0 )) {
 	$shouldbe = config_value('randbits') + $off;
 	print "# max=[$max] min=[$min]\n";
-	print "# This perl was compiled with randbits=$randbits on $^O.\n";
+	print "# This perl was compiled with randbits=$randbits on $^OS_NAME.\n";
 	print "# Consider using randbits=$shouldbe instead.\n";
 	# And skip the remaining tests; they would be pointless now.
 	print "# Skipping remaining tests until randbits is fixed.\n";

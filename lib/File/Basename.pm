@@ -54,7 +54,7 @@ require Exporter;
 @EXPORT = qw(fileparse fileparse_set_fstype basename dirname);
 $VERSION = "2.76";
 
-fileparse_set_fstype($^O);
+fileparse_set_fstype($^OS_NAME);
 
 
 =over 4

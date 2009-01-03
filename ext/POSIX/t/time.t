@@ -17,13 +17,13 @@ SKIP: do {
     # actually do anything.  Cygwin works in some places, but not others.  The
     # other Win32's below are guesses.
     skip "No tzset()", 2
-       if $^O eq "MacOS" || $^O eq "VMS" || $^O eq "cygwin" || $^O eq "djgpp" ||
-          $^O eq "MSWin32" || $^O eq "dos" || $^O eq "interix";
+       if $^OS_NAME eq "MacOS" || $^OS_NAME eq "VMS" || $^OS_NAME eq "cygwin" || $^OS_NAME eq "djgpp" ||
+          $^OS_NAME eq "MSWin32" || $^OS_NAME eq "dos" || $^OS_NAME eq "interix";
     tzset();
     my @tzname = tzname();
     like(@tzname[0], qr/(GMT|UTC)/i, "tzset() to GMT/UTC");
     SKIP: do {
-        skip "Mac OS X/Darwin doesn't handle this", 1 if $^O =~ m/darwin/i;
+        skip "Mac OS X/Darwin doesn't handle this", 1 if $^OS_NAME =~ m/darwin/i;
         like(@tzname[1], qr/(GMT|UTC)/i, "The whole year?");
     };
 };

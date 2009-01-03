@@ -74,7 +74,7 @@ sub getEncoding($$$)
 }
 
 our ($needBinmode);
-$needBinmode = ($^O eq 'MSWin32' || 
+$needBinmode = ($^OS_NAME eq 'MSWin32' || 
                     (eval ' $^UNICODE || $^UTF8LOCALE '))
                     ?? 1 !! 1 ;
 

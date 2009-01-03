@@ -10,7 +10,7 @@ our (@c, @b, @a, $a, $b, $c, $d, $e, $x, $y, %d, %h, $m);
 my $list_assignment_supported = 1;
 
 #mg.c says list assignment not supported on VMS, EPOC, and SYMBIAN.
-$list_assignment_supported = 0 if ($^O eq 'VMS');
+$list_assignment_supported = 0 if ($^OS_NAME eq 'VMS');
 
 
 sub foo {

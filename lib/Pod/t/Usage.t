@@ -26,7 +26,7 @@ pod2usage(\%( verbose => 0, exit => 'noexit', output => $fake_out_fh,
 is( $$fake_out, "$msg\n$vbl_0", 'message parameter' );
 
 SKIP: do {
-    my @( $file, $path, _ ) =  fileparse( $0 );
+    my @( $file, $path, _ ) =  fileparse( $^PROGRAM_NAME );
     skip( 'File in current directory', 2 ) if -e $file; 
     $$fake_out = '';
     try {
@@ -45,22 +45,22 @@ SKIP: do {
 };
 
 SKIP: do { # Test exit status from pod2usage()
-    skip "Exit status broken on Mac OS", 1 if $^O eq 'MacOS';
-    my $exit = ($^O eq 'VMS' ?? 2 !! 42);
+    skip "Exit status broken on Mac OS", 1 if $^OS_NAME eq 'MacOS';
+    my $exit = ($^OS_NAME eq 'VMS' ?? 2 !! 42);
     my $dev_null = File::Spec->devnull;
     my $args = join ", ", @( (
         "verbose => 0", 
         "exit    => $exit",
         "output  => q\{$dev_null\}",
-        "input   => q\{$0\}",
+        "input   => q\{$^PROGRAM_NAME\}",
     ));
-    my $cq = (($^O eq 'MSWin32'
-               || $^O eq 'NetWare'
-               || $^O eq 'VMS') ?? '"'
+    my $cq = (($^OS_NAME eq 'MSWin32'
+               || $^OS_NAME eq 'NetWare'
+               || $^OS_NAME eq 'VMS') ?? '"'
               !! "");
     my @params = @( "$($cq)-I../lib$cq",  "$($cq)-MPod::Usage$cq", '-e' );
     my $prg = qq[$($cq)pod2usage(\\\%( $args ))$cq];
-    my @cmd = @( $^X, < @params, $prg );
+    my @cmd = @( $^EXECUTABLE_NAME, < @params, $prg );
 
     print "# cmd = $(join ' ',@cmd)\n";
 
@@ -87,7 +87,7 @@ is( $$fake_out, $vbl_1, 'Verbose level 1' );
 $$fake_out = '';
 require Pod::Text; # Pod::Usage->isa( 'Pod::Text' )
 
-( my $p2tp = Pod::Text->new() )->parse_from_file( $0, $fake_out_fh );
+( my $p2tp = Pod::Text->new() )->parse_from_file( $^PROGRAM_NAME, $fake_out_fh );
 my $pod2text = $$fake_out;
 
 $$fake_out = '';

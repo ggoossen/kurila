@@ -11,7 +11,7 @@ our (@ISA, @EXPORT, @EXPORT_OK, $VERSION);
                 dos2unix);
 $VERSION = '1.13';
 
-my $Is_VMS = $^O eq 'VMS';
+my $Is_VMS = $^OS_NAME eq 'VMS';
 
 =head1 NAME
 

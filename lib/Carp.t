@@ -4,7 +4,7 @@ BEGIN {
 	require './test.pl';
 }
 
-my $Is_VMS = $^O eq 'VMS';
+my $Is_VMS = $^OS_NAME eq 'VMS';
 
 use Carp < qw(carp cluck croak confess);
 

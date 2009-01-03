@@ -39,7 +39,7 @@ close TRY or die "Could not close: $^OS_ERROR";
 open(TRY, ">", 'Io_argv2.tmp') or die "Can't open temp file: $^OS_ERROR";
 close TRY or die "Could not close: $^OS_ERROR";
 @ARGV = @('Io_argv1.tmp', 'Io_argv2.tmp');
-$^I = '_bak';   # not .bak which confuses VMS
+$^INPLACE_EDIT = '_bak';   # not .bak which confuses VMS
 $^INPUT_RECORD_SEPARATOR = undef;
 my $i = 4;
 while ( ~< *ARGV) {
@@ -53,7 +53,7 @@ print while ~< *TRY;
 open(TRY, "<", 'Io_argv2.tmp') or die "Can't open temp file: $^OS_ERROR";
 print while ~< *TRY;
 close TRY or die "Could not close: $^OS_ERROR";
-undef $^I;
+undef $^INPLACE_EDIT;
 
 ok( eof TRY );
 

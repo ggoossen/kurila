@@ -244,7 +244,7 @@ check(qr/^With.*down\.$/, 51, "Overflow the second small buffer check");
 EOSTANZA
 
 # And now, turn on the debugger flag for long names
-$^P = 0x100;
+$^PERLDB = 0x100;
 
 #line 53 "For we are afar with the dawning|And the suns that are not yet high,|And out of the infinite morning|Intrepid you hear us cry-|How, spite of your human scorning,|Once more God's future draws nigh,|And already goes forth the warning|That ye of the past must die."
 check(qr/^For we.*must die\.$/, 53, "Our long line is set up");

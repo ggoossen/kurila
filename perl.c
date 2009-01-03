@@ -1055,7 +1055,7 @@ S_procself_val(pTHX_ SV *sv, const char *arg0)
     int len = readlink(PROCSELFEXE_PATH, buf, sizeof(buf) - 1);
 
     /* On Playstation2 Linux V1.0 (kernel 2.2.1) readlink(/proc/self/exe)
-       includes a spurious NUL which will cause $^X to fail in system
+       includes a spurious NUL which will cause $^EXECUTABLE_NAME to fail in system
        or backticks (this will prevent extensions from being built and
        many tests from working). readlink is not meant to add a NUL.
        Normal readlink works fine.
@@ -1082,7 +1082,7 @@ S_procself_val(pTHX_ SV *sv, const char *arg0)
 STATIC void
 S_set_caret_X(pTHX) {
     dVAR;
-    GV* tmpgv = gv_fetchpvs("^X", GV_ADD|GV_NOTQUAL, SVt_PV); /* $^X */
+    GV* tmpgv = gv_fetchpvs("^EXECUTABLE_NAME", GV_ADD|GV_NOTQUAL, SVt_PV); /* $^EXECUTABLE_NAME */
     if (tmpgv) {
 #ifdef HAS_PROCSELFEXE
 	S_procself_val(aTHX_ GvSV(tmpgv), PL_origargv[0]);
@@ -1653,7 +1653,7 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 	scriptname = "-";
     }
 
-    /* Set $^X early so that it can be used for relocatable paths in @INC  */
+    /* Set $^EXECUTABLE_NAME early so that it can be used for relocatable paths in @INC  */
     assert (!PL_tainted);
     TAINT;
     S_set_caret_X(aTHX);
@@ -3123,14 +3123,14 @@ S_init_main_stash(pTHX)
 					     SVt_PVAV)));
     SvREFCNT_inc_simple_void(PL_incgv); /* Don't allow it to be freed */
     GvMULTI_on(PL_incgv);
-    PL_hintgv = gv_fetchpvs("^H", GV_ADD|GV_NOTQUAL, SVt_PV); /* ^H */
+    PL_hintgv = gv_fetchpvs("^HINTS", GV_ADD|GV_NOTQUAL, SVt_PV); /* ^H */
     GvMULTI_on(PL_hintgv);
     PL_defgv = gv_fetchpvs("_", GV_ADD|GV_NOTQUAL, SVt_PVAV);
     SvREFCNT_inc_simple_void(PL_defgv);
     PL_errgv = gv_HVadd(gv_fetchpvs("^EVAL_ERROR", GV_ADD|GV_NOTQUAL, SVt_PV));
     SvREFCNT_inc_simple_void(PL_errgv);
     GvMULTI_on(PL_errgv);
-    PL_replgv = gv_fetchpvs("^R", GV_ADD|GV_NOTQUAL, SVt_PV); /* ^R */
+    PL_replgv = gv_fetchpvs("^LAST_REGEXP_CODE_RESULT", GV_ADD|GV_NOTQUAL, SVt_PV); /* ^R */
     GvMULTI_on(PL_replgv);
     (void)Perl_form(aTHX_ "%240s","");	/* Preallocate temp - for immediate signals. */
 #ifdef PERL_DONT_CREATE_GVSV
@@ -4176,13 +4176,13 @@ S_init_postdump_symbols(pTHX_ register int argc, register char **argv, register 
 
     init_argv_symbols(argc,argv);
 
-    if ((tmpgv = gv_fetchpvs("0", GV_ADD|GV_NOTQUAL, SVt_PV))) {
+    if ((tmpgv = gv_fetchpvs("^PROGRAM_NAME", GV_ADD|GV_NOTQUAL, SVt_PV))) {
 #ifdef MACOS_TRADITIONAL
 	/* $0 is not majick on a Mac */
 	sv_setpv(GvSV(tmpgv),MacPerl_MPWFileName(PL_origfilename));
 #else
 	sv_setpv(GvSV(tmpgv),PL_origfilename);
-	magicname("0", "0", 1);
+	magicname("^PROGRAM_NAME", STR_WITH_LEN("^PROGRAM_NAME"));
 #endif
     }
     if ((PL_envhv = newHV())) {
@@ -4479,7 +4479,7 @@ S_incpush(pTHX_ const char *dir, bool addsubdirs, bool addoldvers, bool usesep,
 		const char *prefix;
 		char *lastslash;
 
-		/* $^X is *the* source of taint if tainting is on, hence
+		/* $^EXECUTABLE_NAME is *the* source of taint if tainting is on, hence
 		   SvPOK() won't be true.  */
 		assert(caret_X);
 		assert(SvPOKp(caret_X));

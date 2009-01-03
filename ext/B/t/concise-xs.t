@@ -343,7 +343,7 @@ sub render {
 sub corecheck {
     try { require Module::CoreList };
     if ($^EVAL_ERROR) {
-	warn "Module::CoreList not available on $^V\n";
+	warn "Module::CoreList not available on $^PERL_VERSION\n";
 	return;
     }
     my $mods = %Module::CoreList::version{?'5.009002'};

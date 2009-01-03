@@ -9,7 +9,7 @@
 
 use kurila;
 
-my $perl = $^X;
+my $perl = $^EXECUTABLE_NAME;
 
 require 'regen_lib.pl';
 # keep warnings.pl in sync with the CPAN distribution by not requiring core
@@ -38,7 +38,7 @@ sub do_cksum {
 	    %cksum{+$f} = unpack("\%32C*", ~< *FH);
 	    close FH;
 	} else {
-	    warn "$0: $f: $^OS_ERROR\n";
+	    warn "$^PROGRAM_NAME: $f: $^OS_ERROR\n";
 	}
     }
     return %cksum;
@@ -46,10 +46,10 @@ sub do_cksum {
 
 foreach my $pl (qw (keywords.pl opcode.pl embed.pl
 		    regcomp.pl warnings.pl autodoc.pl reentr.pl)) {
-  print "$^X $pl\n";
+  print "$^EXECUTABLE_NAME $pl\n";
   my %cksum0;
   %cksum0 = %( < do_cksum($pl) ) unless $pl eq 'warnings.pl'; # the files were removed
-  system "$^X $pl";
+  system "$^EXECUTABLE_NAME $pl";
   next if $pl eq 'warnings.pl'; # the files were removed
   my %cksum1 = %( < do_cksum($pl) );
   my @chg;

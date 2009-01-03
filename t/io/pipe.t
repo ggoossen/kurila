@@ -29,7 +29,7 @@ close PIPE;
 SKIP: do {
     # Technically this should be TODO.  Someone try it if you happen to
     # have a vmesa machine.
-    skip "Doesn't work here yet", 6 if $^O eq 'vmesa';
+    skip "Doesn't work here yet", 6 if $^OS_NAME eq 'vmesa';
 
     if (open(PIPE, "-|", "-")) {
 	while( ~< *PIPE) {
@@ -147,7 +147,7 @@ pass();
 
 SKIP: do {
     skip "doesn't like spawning subprocesses that are still connected", 10
-      if $^O eq 'VMS';
+      if $^OS_NAME eq 'VMS';
 
     SKIP: do {
         # Sfio doesn't report failure when closing a broken pipe
@@ -156,8 +156,8 @@ SKIP: do {
         # BeOS will not write to broken pipes, either.
         # Nor does POSIX-BC.
         skip "Won't report failure on broken pipe", 1
-          if config_value('d_sfio') || $^O eq 'machten' || $^O eq 'beos' || 
-             $^O eq 'posix-bc';
+          if config_value('d_sfio') || $^OS_NAME eq 'machten' || $^OS_NAME eq 'beos' || 
+             $^OS_NAME eq 'posix-bc';
 
         signals::temp_set_handler(PIPE => 'IGNORE');
         open NIL, '|-', qq{$Perl -e "exit 0"} or die "open failed: $^OS_ERROR";
@@ -172,7 +172,7 @@ SKIP: do {
     };
 
     SKIP: do {
-        skip "Don't work yet", 9 if $^O eq 'vmesa';
+        skip "Don't work yet", 9 if $^OS_NAME eq 'vmesa';
 
         # check that errno gets forced to 0 if the piped program exited 
         # non-zero
@@ -183,7 +183,7 @@ SKIP: do {
         isnt($^CHILD_ERROR, 0,     '       status');
 
         SKIP: do {
-            skip "Don't work yet", 6 if $^O eq 'mpeix';
+            skip "Don't work yet", 6 if $^OS_NAME eq 'mpeix';
 
             # check that status for the correct process is collected
             my $zombie;

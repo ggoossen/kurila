@@ -38,7 +38,7 @@ do {
   my $filesopts = join(" | ", map { "--build-$_" } @( "all", < sort @files));
   my $showfiles;
   die <<__USAGE__
-$0: Usage: $0 [--verbose] [--showfiles] $filesopts
+$^PROGRAM_NAME: Usage: $^PROGRAM_NAME [--verbose] [--showfiles] $filesopts
 __USAGE__
   unless (nelems @ARGV)
 	&& GetOptions (verbose => \$Verbose,
@@ -75,9 +75,9 @@ if ($Verbose) {
   print "I'm building $_\n" foreach grep {%Build{$_}} keys %Build;
 }
 
-chdir $FindBin::Bin or die "$0: Can't chdir $FindBin::Bin: $^OS_ERROR";
+chdir $FindBin::Bin or die "$^PROGRAM_NAME: Can't chdir $FindBin::Bin: $^OS_ERROR";
 
-open MASTER, "<", $masterpodfile or die "$0: Can't open $masterpodfile: $^OS_ERROR";
+open MASTER, "<", $masterpodfile or die "$^PROGRAM_NAME: Can't open $masterpodfile: $^OS_ERROR";
 
 my ($delta_source, $delta_target);
 
@@ -91,7 +91,7 @@ foreach (@( ~< *MASTER)) {
     my %flags = %(header => 1);
     %flags{+toc_omit} = 1 if $flags =~ s/o//g;
     %flags{+aux} = 1 if $flags =~ s/a//g;
-    die "$0: Unknown flag found in heading line: $_" if length $flags;
+    die "$^PROGRAM_NAME: Unknown flag found in heading line: $_" if length $flags;
     push @Master, \@(\%flags, $2);
 
   } elsif (m/^(\S*)\s+(\S+)\s+(.*)/) {
@@ -122,12 +122,12 @@ foreach (@( ~< *MASTER)) {
     } else {
       %Pods{+$filename} = $desc;
     }
-    die "$0: Unknown flag found in section line: $_" if length $flags;
+    die "$^PROGRAM_NAME: Unknown flag found in section line: $_" if length $flags;
     push @Master, \@(\%flags, $filename, $desc);
   } elsif (m/^$/) {
     push @Master, undef;
   } else {
-    die "$0: Malformed line: $_" if $1 =~ m/[A-Z]/;
+    die "$^PROGRAM_NAME: Malformed line: $_" if $1 =~ m/[A-Z]/;
   }
 }
 if (defined $delta_source) {
@@ -138,10 +138,10 @@ if (defined $delta_source) {
     # with this?
     %Copies{+$delta_target} = $delta_source;
   } else {
-    die "$0: delta source defined but not target";
+    die "$^PROGRAM_NAME: delta source defined but not target";
   }
 } elsif (defined $delta_target) {
-  die "$0: delta target defined but not target";
+  die "$^PROGRAM_NAME: delta target defined but not target";
 }
 
 close MASTER;
@@ -168,7 +168,7 @@ do {
   # Things we copy to won't be in MANIFEST
   %sources{[values %Copies]} = @();
 
-  open(MANI, "<", "../MANIFEST") || die "$0: opening ../MANIFEST failed: $^OS_ERROR";
+  open(MANI, "<", "../MANIFEST") || die "$^PROGRAM_NAME: opening ../MANIFEST failed: $^OS_ERROR";
   while ( ~< *MANI) {
     if (m!^pod/([^.]+\.pod)\s+!i) {
       push @manipods, $1;
@@ -182,7 +182,7 @@ do {
   %manireadmes{[ @manireadmes]} = @manireadmes;
 
   my $in_perlpod;
-  open(PERLPOD, "<", "perl.pod") || die "$0: opening perl.pod failed: $^OS_ERROR\n";
+  open(PERLPOD, "<", "perl.pod") || die "$^PROGRAM_NAME: opening perl.pod failed: $^OS_ERROR\n";
   while ( ~< *PERLPOD) {
     $in_perlpod ||= m/^For ease of access/;
     $in_perlpod &&= ! m/^\(If you're intending /;
@@ -193,28 +193,28 @@ do {
     }
   }
   close(PERLPOD);
-  die "$0: could not find the pod listing of perl.pod\n"
+  die "$^PROGRAM_NAME: could not find the pod listing of perl.pod\n"
     unless (nelems @perlpods);
   %perlpods{[@perlpods]} = @perlpods;
 
   foreach my $i (sort keys %disk_pods) {
-    warn "$0: $i exists but is unknown by buildtoc\n"
+    warn "$^PROGRAM_NAME: $i exists but is unknown by buildtoc\n"
       unless %our_pods{?$i};
-    warn "$0: $i exists but is unknown by ../MANIFEST\n"
+    warn "$^PROGRAM_NAME: $i exists but is unknown by ../MANIFEST\n"
       if !%manipods{?$i} && !%manireadmes{?$i} && !%Copies{?$i};
-    warn "$0: $i exists but is unknown by perl.pod\n"
+    warn "$^PROGRAM_NAME: $i exists but is unknown by perl.pod\n"
 	if !%perlpods{?$i} && !exists %sources{$i};
   }
   foreach my $i (sort keys %our_pods) {
-    warn "$0: $i is known by buildtoc but does not exist\n"
+    warn "$^PROGRAM_NAME: $i is known by buildtoc but does not exist\n"
       unless %disk_pods{?$i};
   }
   foreach my $i (sort keys %manipods) {
-    warn "$0: $i is known by ../MANIFEST but does not exist\n"
+    warn "$^PROGRAM_NAME: $i is known by ../MANIFEST but does not exist\n"
       unless %disk_pods{$i};
   }
   foreach my $i (sort keys %perlpods) {
-    warn "$0: $i is known by perl.pod but does not exist\n"
+    warn "$^PROGRAM_NAME: $i is known by perl.pod but does not exist\n"
       unless %disk_pods{?$i};
   }
 };
@@ -235,9 +235,9 @@ do {
       return if $file =~ m!XS/(?:APItest|Typemap)!;
       my $pod = $file;
       return if $pod =~ s/pm$/pod/ && -e $pod;
-      die "$0: tut $File::Find::name" if $file =~ m/TUT/;
+      die "$^PROGRAM_NAME: tut $File::Find::name" if $file =~ m/TUT/;
       unless (open (F, "<", "$_\0")) {
-	warn "$0: bogus <$file>: $^OS_ERROR";
+	warn "$^PROGRAM_NAME: bogus <$file>: $^OS_ERROR";
 	system "ls", "-l", $file;
       }
       else {
@@ -249,12 +249,12 @@ do {
 	    return;
 	  }
 	}
-	warn "$0: $file: cannot find =head1 NAME\n";
+	warn "$^PROGRAM_NAME: $file: cannot find =head1 NAME\n";
       }
     }
   }
 
-  die "$0: no pods" unless (nelems @modpods);
+  die "$^PROGRAM_NAME: no pods" unless (nelems @modpods);
 
   my %done;
   for ( @modpods) {
@@ -285,7 +285,7 @@ sub path2modname {
 }
 
 sub output_kurilatoc {
-  open(OUT, ">", "kurilatoc.pod") || die "$0: creating kurilatoc.pod failed: $^OS_ERROR";
+  open(OUT, ">", "kurilatoc.pod") || die "$^PROGRAM_NAME: creating kurilatoc.pod failed: $^OS_ERROR";
 
   local $^INPUT_RECORD_SEPARATOR = '';
 
@@ -497,7 +497,7 @@ sub generate_perlpod {
       # blank line
       push @output, "\n";
     } else {
-      die "$0: Illegal length " . scalar nelems @$_;
+      die "$^PROGRAM_NAME: Illegal length " . scalar nelems @$_;
     }
   }
   # want at least 2 spaces padding
@@ -594,11 +594,11 @@ sub do_manifest {
 sub do_nmake {
   my $name = shift;
   my $makefile = join '', @_;
-  die "$0: $name contains NUL bytes" if $makefile =~ m/\0/;
+  die "$^PROGRAM_NAME: $name contains NUL bytes" if $makefile =~ m/\0/;
   $makefile =~ s/^\tcopy \.\.\\README.*\n/\0/gm;
   my $sections = @: $makefile =~ m/\0+/g;
-  die "$0: $name contains no README copies" if $sections +< 1;
-  die "$0: $name contains discontiguous README copies" if $sections +> 1;
+  die "$^PROGRAM_NAME: $name contains no README copies" if $sections +< 1;
+  die "$^PROGRAM_NAME: $name contains discontiguous README copies" if $sections +> 1;
   # Now remove the other copies that follow
   1 while $makefile =~ s/\0\tcopy .*\n/\0/gm;
   $makefile =~ s/\0+/$(join ("", &generate_nmake_1( < @_ )))/s;
@@ -622,7 +622,7 @@ sub do_perlpod {
 		   )+
 		  }
 	  {$($1 . join "", &generate_perlpod( < @_ ))}mx) {
-    die "$0: Failed to insert amendments in do_perlpod";
+    die "$^PROGRAM_NAME: Failed to insert amendments in do_perlpod";
   }
   $pod;
 }
@@ -631,7 +631,7 @@ sub do_podmak {
   my $name = shift;
   my $body = join '', @_;
   foreach my $variable (qw(pod man html tex)) {
-    die "$0: could not find $variable in $name"
+    die "$^PROGRAM_NAME: could not find $variable in $name"
       unless $body =~ s{\n\U$variable\E = (?:[^\n]*\\\n)*[^\n]*}
 	{$("\n" . generate_pod_mak ($variable))}s;
   }
@@ -641,15 +641,15 @@ sub do_podmak {
 sub do_vms {
   my $name = shift;
   my $makefile = join '', @_;
-  die "$0: $name contains NUL bytes" if $makefile =~ m/\0/;
+  die "$^PROGRAM_NAME: $name contains NUL bytes" if $makefile =~ m/\0/;
   $makefile =~ s/\npod\d* =[^\n]*/\0/gs;
   my $sections = @: $makefile =~ m/\0+/g;
-  die "$0: $name contains no pod assignments" if $sections +< 1;
-  die "$0: $name contains $sections discontigous pod assignments"
+  die "$^PROGRAM_NAME: $name contains no pod assignments" if $sections +< 1;
+  die "$^PROGRAM_NAME: $name contains $sections discontigous pod assignments"
     if $sections +> 1;
   $makefile =~ s/\0+/$(join "\n", @( '', < &generate_descrip_mms_1( < @_ )))/s;
 
-  die "$0: $name contains NUL bytes" if $makefile =~ m/\0/;
+  die "$^PROGRAM_NAME: $name contains NUL bytes" if $makefile =~ m/\0/;
 
 # Looking for rules like this
 # [.lib.pods]perl.pod : [.pod]perl.pod
@@ -661,8 +661,8 @@ sub do_vms {
 		 [^\n]+\Q[.lib.pods]\E\n		# ends [.lib.pods]
 		    /\0/gsx;
   $sections = @: $makefile =~ m/\0+/g;
-  die "$0: $name contains no copy rules" if $sections +< 1;
-  die "$0: $name contains $sections discontigous copy rules"
+  die "$^PROGRAM_NAME: $name contains no copy rules" if $sections +< 1;
+  die "$^PROGRAM_NAME: $name contains $sections discontigous copy rules"
     if $sections +> 1;
   $makefile =~ s/\0+/$(join "\n", @( '', < &generate_descrip_mms_2( < @_ )))/s;
   $makefile;
@@ -671,14 +671,14 @@ sub do_vms {
 sub do_unix {
   my $name = shift;
   my $makefile_SH = join '', @_;
-  die "$0: $name contains NUL bytes" if $makefile_SH =~ m/\0/;
+  die "$^PROGRAM_NAME: $name contains NUL bytes" if $makefile_SH =~ m/\0/;
 
   $makefile_SH =~ s/\n\s+-\@test -f \S+ && cd pod && \$\(LNS\) \S+ \S+ && cd \.\. && echo "\S+" >> extra.pods \# See buildtoc\n/\0/gm;
 
   my $sections = @: $makefile_SH =~ m/\0+/g;
 
-  die "$0: $name contains no copy rules" if $sections +< 1;
-  die "$0: $name contains $sections discontigous copy rules"
+  die "$^PROGRAM_NAME: $name contains no copy rules" if $sections +< 1;
+  die "$^PROGRAM_NAME: $name contains $sections discontigous copy rules"
     if $sections +> 1;
 
   my @copy_rules = map "\t-\@test -f pod/%Copies{$_} && cd pod && \$(LNS) %Copies{$_} $_ && cd .. && echo \"pod/$_\" >> extra.pods # See buildtoc",
@@ -712,10 +712,10 @@ while (my @(?$target, ?$name) = @: each %Targets) {
     print "Was not modified\n" if $Verbose;
     next;
   }
-  rename $name, "$name.old" or die "$0: Can't rename $name to $name.old: $^OS_ERROR";
-  open THING, ">", "$name" or die "$0: Can't open $name for writing: $^OS_ERROR";
-  print THING $new or die "$0: print to $name failed: $^OS_ERROR";
-  close THING or die die "$0: close $name failed: $^OS_ERROR";
+  rename $name, "$name.old" or die "$^PROGRAM_NAME: Can't rename $name to $name.old: $^OS_ERROR";
+  open THING, ">", "$name" or die "$^PROGRAM_NAME: Can't open $name for writing: $^OS_ERROR";
+  print THING $new or die "$^PROGRAM_NAME: print to $name failed: $^OS_ERROR";
+  close THING or die die "$^PROGRAM_NAME: close $name failed: $^OS_ERROR";
 }
 
-warn "$0: was not instructed to build anything\n" unless $built;
+warn "$^PROGRAM_NAME: was not instructed to build anything\n" unless $built;

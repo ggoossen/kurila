@@ -111,7 +111,7 @@ See L<perlmod/Pragmatic Modules>.
 
 =cut
 
-my $IsVMS = $^O eq 'VMS';
+my $IsVMS = $^OS_NAME eq 'VMS';
 
 sub bits {
     my $bits = 0;
@@ -128,11 +128,11 @@ sub import {
     return unless $IsVMS;
 
     shift;
-    $^H ^|^= bits((nelems @_) ?? < @_ !! < qw(status time));
+    $^HINT_BITS ^|^= bits((nelems @_) ?? < @_ !! < qw(status time));
     my $sememe;
 
     foreach my $sememe (@((nelems @_) ?? < @_ !! < qw(exit hushed))) {
-        %^H{+'vmsish_exit'}   = 1 if $sememe eq 'exit';
+        $^HINTS{+'vmsish_exit'}   = 1 if $sememe eq 'exit';
         vmsish::hushed(1) if $sememe eq 'hushed';
     }
 }
@@ -141,10 +141,10 @@ sub unimport {
     return unless $IsVMS;
 
     shift;
-    $^H ^&^= ^~^ bits((nelems @_) ?? < @_ !! < qw(status time));
+    $^HINT_BITS ^&^= ^~^ bits((nelems @_) ?? < @_ !! < qw(status time));
 
     foreach my $sememe (@((nelems @_) ?? < @_ !! < qw(exit hushed))) {
-        %^H{+'vmsish_exit'}   = 0 if $sememe eq 'exit';
+        $^HINTS{+'vmsish_exit'}   = 0 if $sememe eq 'exit';
         vmsish::hushed(0) if $sememe eq 'hushed';
     }
 }

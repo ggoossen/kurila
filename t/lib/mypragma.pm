@@ -29,11 +29,11 @@ package mypragma;
 use warnings;
 
 sub import {
-    %^H{+mypragma} = 42;
+    $^HINTS{+mypragma} = 42;
 }
 
 sub unimport {
-    %^H{+mypragma} = 0;
+    $^HINTS{+mypragma} = 0;
 }
 
 sub in_effect {

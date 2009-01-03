@@ -25,4 +25,4 @@ foreach my $func ( @Functions) {
 }
 
 # Previous versions of Cwd tainted $^O
-is !tainted($^O), 1, "\$^O should not be tainted";
+is !tainted($^OS_NAME), 1, "\$^O should not be tainted";

@@ -31,13 +31,17 @@ sub p5convert {
     my $output = Convert::convert($input,
                                   "/usr/bin/env perl ../mad/p5kurila.pl --from $from",
                                   from => $from, to => $to,
+                                  switches => "-I../lib",
                                   dumpcommand => "$ENV{madpath}/perl",
                                  );
     is($output, $expected) or $TODO or die "failed test";
 }
 
-t_env_using_package();
+t_rename_magic_vars_2();
 die "END";
+t_rename_magic_vars();
+t_remove_vars();
+t_env_using_package();
 t_pattern_assignment();
 t_hashkey_regulator();
 t_rename_ternary_op();
@@ -1521,5 +1525,47 @@ local %ENV{foo} = 3;
 "foo%ENV{bar}baz";
 ----
 "foo$(env::var('bar'))baz";
+END
+}
+
+sub t_remove_vars {
+    p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
+package X;
+#bar
+use vars < qw($foo);
+$foo;
+----
+package X;
+#bar
+our ($foo);
+$foo;
+====
+use vars < qw($foo $bar);
+----
+our ($foo, $bar);
+END
+}
+
+sub t_rename_magic_vars_2 {
+    p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
+%H;
+----
+$^HINTS;
+====
+%H{'foo'} = 3;
+----
+$^HINTS{'foo'} = 3;
+END
+}
+
+sub t_rename_magic_vars {
+    p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
+$|
+----
+$^OUTPUT_AUTOFLUSH
+====
+$@->{?description};
+----
+$^EVALERROR->{?description};
 END
 }

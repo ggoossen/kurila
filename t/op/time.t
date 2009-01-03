@@ -46,9 +46,9 @@ ok(localtime() =~ m/^(Sun|Mon|Tue|Wed|Thu|Fri|Sat)[ ]
 SKIP: do {
     # This conditional of "No tzset()" is stolen from ext/POSIX/t/time.t
     skip "No tzset()", 1
-        if $^O eq "MacOS" || $^O eq "VMS" || $^O eq "cygwin" ||
-           $^O eq "djgpp" || $^O eq "MSWin32" || $^O eq "dos" ||
-           $^O eq "interix";
+        if $^OS_NAME eq "MacOS" || $^OS_NAME eq "VMS" || $^OS_NAME eq "cygwin" ||
+           $^OS_NAME eq "djgpp" || $^OS_NAME eq "MSWin32" || $^OS_NAME eq "dos" ||
+           $^OS_NAME eq "interix";
 
 # check that localtime respects changes to $ENV{TZ}
 env::set_var('TZ' => "GMT-5");

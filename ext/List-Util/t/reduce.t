@@ -79,7 +79,7 @@ like($^EVAL_ERROR->{?description}, qr/^Can't undef active subroutine/, "undef ac
 # redefinition takes effect immediately depends on whether we're
 # running the Perl or XS implementation.
 
-sub self_updating { local $^W; *self_updating = sub{1} ;1 }
+sub self_updating { local $^WARNING; *self_updating = sub{1} ;1 }
 try { $v = reduce \&self_updating, 1,2; };
 is($^EVAL_ERROR, '', 'redefine self');
 

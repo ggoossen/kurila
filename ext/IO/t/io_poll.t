@@ -1,6 +1,6 @@
 #!./perl
 
-if ($^O eq 'mpeix') {
+if ($^OS_NAME eq 'mpeix') {
     print "1..0 # Skip: broken on MPE/iX\n";
     exit 0;
 }
@@ -32,7 +32,7 @@ print "ok 2\n";
 
 $poll->poll(0.1);
 
-if ($^O eq 'MSWin32' || $^O eq 'NetWare' || $^O eq 'VMS' || $^O eq 'beos') {
+if ($^OS_NAME eq 'MSWin32' || $^OS_NAME eq 'NetWare' || $^OS_NAME eq 'VMS' || $^OS_NAME eq 'beos') {
 print "ok 3 # skipped, doesn't work on non-socket fds\n";
 print "ok 4 # skipped, doesn't work on non-socket fds\n";
 }

@@ -46,7 +46,7 @@ if (env::var('PATH') =~ m!\\Symbian\\(.+?)\\(.+?)\\Epoc32\\gcc\\bin!i) {
     if ($SDK_VERSION =~ m/^2\./) {
 	$SYMBIAN_VERSION = '7.0s';
     } else {
-	die "$0: Unknown UIQ version '$SDK_VERSION'\n";
+	die "$^PROGRAM_NAME: Unknown UIQ version '$SDK_VERSION'\n";
     }
     $WIN = 'winscw'; # This is CodeWarrior, how about Borland?
     env::set_var('WIN' => $WIN);
@@ -73,10 +73,10 @@ if (open(GCC, "-|", "gcc -v 2>&1")) {
    }
    close GCC;
 } else {
-  die "$0: failed to run gcc: $^OS_ERROR\n";
+  die "$^PROGRAM_NAME: failed to run gcc: $^OS_ERROR\n";
 }
 
-die "$0: failed to locate the Symbian SDK\n" unless defined $SYMBIAN_ROOT;
+die "$^PROGRAM_NAME: failed to locate the Symbian SDK\n" unless defined $SYMBIAN_ROOT;
 
 my $UARM = env::var('UARM') ?? env::var('UARM') !! "urel";
 my $UREL = "$SYMBIAN_ROOT\\epoc32\\release\\-ARM-\\$UARM";

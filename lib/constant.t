@@ -74,7 +74,7 @@ is length(MESS), 8;
 
 use constant TRAILING	=> '12 cats';
 do {
-    local $^W;
+    local $^WARNING;
     cmp_ok TRAILING, '==', 12;
 };
 is TRAILING, '12 cats';

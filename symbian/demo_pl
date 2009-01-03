@@ -17,7 +17,7 @@
 
 
 unless ((nelems @ARGV) && @ARGV[0] =~ m/^(?:list|extract|cleanup)$/) {
-   die "$0: Usage: $0 [list|extract|cleanup]\n";
+   die "$^PROGRAM_NAME: Usage: $^PROGRAM_NAME [list|extract|cleanup]\n";
 }
 
 my $action = shift;
@@ -30,10 +30,10 @@ while ( ~< *DATA) {
    if (m/^-- (.+\.pl)$/) {
       if ($cleanup) {
          print "Deleting $1\n";
-         unlink $1 or warn "$0: $1: $^OS_ERROR\n";
+         unlink $1 or warn "$^PROGRAM_NAME: $1: $^OS_ERROR\n";
       } elsif ($extract) {
         defined $fh && close($fh);
-        open($fh, ">", "$1") or die "$0: '$1': $^OS_ERROR\n";
+        open($fh, ">", "$1") or die "$^PROGRAM_NAME: '$1': $^OS_ERROR\n";
         print "Extracting $1\n";
       } elsif ($list) {
         print "$1\n";

@@ -25,13 +25,13 @@ print $stdout "ok 2\n";
 print $stderr "ok 3\n";
 
 # Since some systems don't have echo, we use Perl.
-my $echo = qq{$^X -le "print q(ok \%d)"};
+my $echo = qq{$^EXECUTABLE_NAME -le "print q(ok \%d)"};
 
 my $cmd = sprintf $echo, 4;
 print `$cmd`;
 
 $cmd = sprintf "$echo 1>&2", 5;
-$cmd = sprintf $echo, 5 if $^O eq 'MacOS';
+$cmd = sprintf $echo, 5 if $^OS_NAME eq 'MacOS';
 print `$cmd`;
 
 $stderr->close;
@@ -40,8 +40,8 @@ $stdout->close;
 $stdout->fdopen($dupout,"w");
 $stderr->fdopen($duperr,"w");
 
-if ($^O eq 'MSWin32' || $^O eq 'NetWare' || $^O eq 'VMS') { print `type Io.dup` }
-elsif ($^O eq 'MacOS') { system 'Catenate Io.dup' }
+if ($^OS_NAME eq 'MSWin32' || $^OS_NAME eq 'NetWare' || $^OS_NAME eq 'VMS') { print `type Io.dup` }
+elsif ($^OS_NAME eq 'MacOS') { system 'Catenate Io.dup' }
 else                   { system 'cat Io.dup' }
 unlink 'Io.dup';
 

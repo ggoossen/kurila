@@ -8,7 +8,7 @@ $VERSION = '3.2701';
 @ISA = qw(File::Spec::Unix);
 
 my $macfiles;
-if ($^O eq 'MacOS') {
+if ($^OS_NAME eq 'MacOS') {
 	$macfiles = try { require Mac::Files };
 }
 

@@ -23,7 +23,7 @@ BEGIN {
    $old_env_path = env::var('PATH');
    $old_env_dcl_path = env::var('DCL$PATH');
    $old_env_term = env::var('TERM');
-  if ($^O eq 'VMS' && !defined(config_value('d_setenv'))) {
+  if ($^OS_NAME eq 'VMS' && !defined(config_value('d_setenv'))) {
       env::set_var('PATH' => env::var('PATH'));
       env::set_var('TERM' => env::var('TERM') ne ''?? env::var('TERM') !! 'dummy');
   }
@@ -37,13 +37,13 @@ BEGIN {
   }
 }
 
-my $Is_MacOS    = $^O eq 'MacOS';
-my $Is_VMS      = $^O eq 'VMS';
-my $Is_MSWin32  = $^O eq 'MSWin32';
-my $Is_NetWare  = $^O eq 'NetWare';
-my $Is_Dos      = $^O eq 'dos';
-my $Is_Cygwin   = $^O eq 'cygwin';
-my $Is_OpenBSD  = $^O eq 'openbsd';
+my $Is_MacOS    = $^OS_NAME eq 'MacOS';
+my $Is_VMS      = $^OS_NAME eq 'VMS';
+my $Is_MSWin32  = $^OS_NAME eq 'MSWin32';
+my $Is_NetWare  = $^OS_NAME eq 'NetWare';
+my $Is_Dos      = $^OS_NAME eq 'dos';
+my $Is_Cygwin   = $^OS_NAME eq 'cygwin';
+my $Is_OpenBSD  = $^OS_NAME eq 'openbsd';
 my $Invoke_Perl = $Is_VMS      ?? 'MCR Sys$Disk:[]Perl.exe' !!
                   $Is_MSWin32  ?? '.\perl'               !!
                   $Is_MacOS    ?? ':perl'                !!
@@ -78,7 +78,7 @@ EndOfCleanup
 
 # Sources of taint:
 #   The empty tainted value, for tainting strings
-my $TAINT = substr($^X, 0, 0);
+my $TAINT = substr($^EXECUTABLE_NAME, 0, 0);
 #   A tainted zero, useful for tainting numbers
 my $TAINT0;
 do {
@@ -158,7 +158,7 @@ do {
 	if (defined $bcc_dir) {
 	    require File::Copy;
 	    File::Copy::copy("$bcc_dir/cc3250mt.dll", '.') or
-		die "$0: failed to copy cc3250mt.dll: $^OS_ERROR\n";
+		die "$^PROGRAM_NAME: failed to copy cc3250mt.dll: $^OS_ERROR\n";
 	    eval q{
 		END { unlink "cc3250mt.dll" }
 	    }; die if $^EVAL_ERROR;
@@ -193,7 +193,7 @@ do {
     };
 
     my $tmp;
-    if ($^O eq 'os2' || $^O eq 'amigaos' || $Is_MSWin32 || $Is_NetWare || $Is_Dos) {
+    if ($^OS_NAME eq 'os2' || $^OS_NAME eq 'amigaos' || $Is_MSWin32 || $Is_NetWare || $Is_Dos) {
 	print "# all directories are writeable\n";
     }
     else {
@@ -329,7 +329,7 @@ do {
 
 # Certain system variables should be tainted
 do {
-    test all_tainted $^X, $0;
+    test all_tainted $^EXECUTABLE_NAME, $^PROGRAM_NAME;
 };
 
 # Results of matching should all be untainted
@@ -428,7 +428,7 @@ do {
     test eval('%!{ENOENT}') ||
 	$^OS_ERROR == 2 || # File not found
 	($Is_Dos && $^OS_ERROR == 22) ||
-	($^O eq 'mint' && $^OS_ERROR == 33);
+	($^OS_NAME eq 'mint' && $^OS_ERROR == 33);
 
     dies_like( sub { open FOO, ">", "$foo" },
                qr/^Insecure dependency/);
@@ -439,7 +439,7 @@ do {
     my $foo = $TAINT;
 
     SKIP: do {
-        skip "open('|') is not available", 4 if $^O eq 'amigaos';
+        skip "open('|') is not available", 4 if $^OS_NAME eq 'amigaos';
 
 	dies_like( sub { open FOO, "|-", "x$foo" },
                    qr/^Insecure dependency/);
@@ -731,7 +731,7 @@ SKIP: do {
 do {
     # bug id 20001004.006
 
-    open IN, "<", $TEST or warn "$0: cannot read $TEST: $^OS_ERROR" ;
+    open IN, "<", $TEST or warn "$^PROGRAM_NAME: cannot read $TEST: $^OS_ERROR" ;
     local $^INPUT_RECORD_SEPARATOR;
     my $a = ~< *IN;
     my $b = ~< *IN;
@@ -744,7 +744,7 @@ do {
 do {
     # bug id 20001004.007
 
-    open IN, "<", $TEST or warn "$0: cannot read $TEST: $^OS_ERROR" ;
+    open IN, "<", $TEST or warn "$^PROGRAM_NAME: cannot read $TEST: $^OS_ERROR" ;
     my $a = ~< *IN;
 
     my $c = \%( a => 42,
@@ -989,9 +989,9 @@ do {
     # accessing $^O  shoudn't taint it as a side-effect;
     # assigning tainted data to it is now an error
 
-    test !tainted($^O);
-    if (!$^X) { } elsif ($^O eq 'bar') { }
-    test !tainted($^O);
+    test !tainted($^OS_NAME);
+    if (!$^EXECUTABLE_NAME) { } elsif ($^OS_NAME eq 'bar') { }
+    test !tainted($^OS_NAME);
     eval_dies_like( '$^O = $^X',
                     qr/Insecure dependency in/ );
 };
@@ -1058,17 +1058,17 @@ do {
 # taint status, not the taint status of the current statement
 
 do {
-    our $x99 = $^X;
+    our $x99 = $^EXECUTABLE_NAME;
     test tainted $x99;
 
     $x99 = '';
     test not tainted $x99;
 
-    my $c = do { local $x99; $^X };
+    my $c = do { local $x99; $^EXECUTABLE_NAME };
     test not tainted $x99;
 };
 do {
-    our $x99 = $^X;
+    our $x99 = $^EXECUTABLE_NAME;
     test tainted $x99;
 
     my $c = do { local $x99; '' };
@@ -1079,7 +1079,7 @@ do {
 # statement
 
 do {
-    try { local $0, eval '1' };
+    try { local $^PROGRAM_NAME, eval '1' };
     test $^EVAL_ERROR eq '';
 };
 
@@ -1088,7 +1088,7 @@ do {
 do {
     my @a;
     local $main::TODO = 1;
-    @a[+0] = $^X;
+    @a[+0] = $^EXECUTABLE_NAME;
     my $i = 0;
     while(@a[0] =~ m/(.)/g ) {
 	last if $i++ +> 10000;
@@ -1101,7 +1101,7 @@ do {
     my $got_dualvar;
     eval 'use Scalar::Util "dualvar"; $got_dualvar++';
     skip "No Scalar::Util::dualvar" unless $got_dualvar;
-    my $a = Scalar::Util::dualvar(3, $^X);
+    my $a = Scalar::Util::dualvar(3, $^EXECUTABLE_NAME);
     my $b = $a + 5;
     is ($b, 8, "Arithmetic on tainted dualvars works");
 };

@@ -19,7 +19,7 @@ our ($VERBOSE, $PREFER_BIN, $FROM_EMAIL, $USER_AGENT,
      $BLACKLIST, $METHOD_FAIL, $VERSION, $METHODS,
      $FTP_PASSIVE, $TIMEOUT, $DEBUG, $WARN);
 
-use constant QUOTE  => do { $^O eq 'MSWin32' ?? q["] !! q['] };            
+use constant QUOTE  => do { $^OS_NAME eq 'MSWin32' ?? q["] !! q['] };            
             
 
 $VERSION        = '0.14';
@@ -49,8 +49,8 @@ local $Module::Load::Conditional::VERBOSE   = 0;
 local $Module::Load::Conditional::VERBOSE   = 0;
 
 ### see what OS we are on, important for file:// uris ###
-use constant ON_WIN         => ($^O eq 'MSWin32');
-use constant ON_VMS         => ($^O eq 'VMS');                                
+use constant ON_WIN         => ($^OS_NAME eq 'MSWin32');
+use constant ON_VMS         => ($^OS_NAME eq 'VMS');                                
 use constant ON_UNIX        => (!ON_WIN and !ON_VMS);
 use constant HAS_VOL        => (ON_WIN or ON_VMS);
 use constant HAS_SHARE      => (ON_WIN);

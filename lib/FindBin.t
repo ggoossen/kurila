@@ -11,14 +11,14 @@ use FindBin < qw($Bin);
 
 print "# $Bin\n";
 
-if ($^O eq 'MacOS') {
+if ($^OS_NAME eq 'MacOS') {
     print "not " unless $Bin =~ m,:lib:$,;
 } else {
     print "not " unless $Bin =~ m,[/.]lib\]?$,;
 }
 print "ok 1\n";
 
-$0 = "-";
+$^PROGRAM_NAME = "-";
 FindBin::again();
 
 print "not " if $FindBin::Script ne "-";

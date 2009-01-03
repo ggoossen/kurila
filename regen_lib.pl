@@ -7,9 +7,9 @@ use Symbol;
 
 # Common functions needed by the regen scripts
 
-$Is_W32 = $^O eq 'MSWin32';
-$Is_OS2 = $^O eq 'os2';
-$Is_Cygwin = $^O eq 'cygwin';
+$Is_W32 = $^OS_NAME eq 'MSWin32';
+$Is_OS2 = $^OS_NAME eq 'os2';
+$Is_Cygwin = $^OS_NAME eq 'cygwin';
 $Is_NetWare = config_value('osname') eq 'NetWare';
 if ($Is_NetWare) {
   $Is_W32 = 0;

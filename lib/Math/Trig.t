@@ -23,7 +23,7 @@ our ($x, $y, $z);
 
 my $eps = 1e-11;
 
-if ($^O eq 'unicos') { # See lib/Math/Complex.pm and t/lib/complex.t.
+if ($^OS_NAME eq 'unicos') { # See lib/Math/Complex.pm and t/lib/complex.t.
     $eps = 1e-10;
 }
 

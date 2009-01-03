@@ -9,7 +9,7 @@ BEGIN {
 }
 
 my $extracted_program = '../utils/h2ph'; # unix, nt, ...
-if ($^O eq 'VMS') { $extracted_program = '[-.utils]h2ph.com'; }
+if ($^OS_NAME eq 'VMS') { $extracted_program = '[-.utils]h2ph.com'; }
 if (!(-e $extracted_program)) {
     print "1..0 # Skip: $extracted_program was not built\n";
     exit 0;
@@ -26,7 +26,7 @@ sub txt_compare {
 }
 
 # does it run?
-my $ok = system("$^X \"-I../lib\" $extracted_program -d. \"-Q\" lib/h2ph.h");
+my $ok = system("$^EXECUTABLE_NAME \"-I../lib\" $extracted_program -d. \"-Q\" lib/h2ph.h");
 print(($ok == 0 ?? "" !! "not "), "ok 1\n");
     
 # does it work? well, does it do what we expect? :-)

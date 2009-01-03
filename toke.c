@@ -3754,7 +3754,10 @@ Perl_yylex(pTHX)
 	    break;
 	}
 	TOKEN('{');
-    case '}':
+    case '}': {
+#ifdef PERL_MAD
+	SV* PL_initialwhite;
+#endif
 	s++;
 	if (PL_lex_brackets <= 0)
 	    yyerror("Unmatched right curly bracket");
@@ -3789,28 +3792,36 @@ Perl_yylex(pTHX)
 	    PL_bufptr = s;
 	    return yylex();		/* ignore fake brackets */
 	}
-	start_force(PL_curforce);
-	if (PL_madskills) {
-	    curmad('X', newSVpvn(s-1,1));
-	    CURMAD('_', PL_thiswhite);
-	}
 
-	start_force(PL_curforce);
+#ifdef PERL_MAD
+	PL_initialwhite = PL_thiswhite;
+#endif
 	if (PL_lex_state == LEX_INTERPEND) {
+	    start_force(PL_curforce);
+	    if (PL_madskills) {
+		CURMAD('_', PL_thiswhite);
+	    }
 	    force_next(';');
 	}
 	else {
+#ifdef PERL_MAD
+	    PL_thiswhite = NULL;
+#endif
 	    s = SKIPSPACE1(s);
+	    start_force(PL_curforce);
 	    d = scan_word(s, PL_tokenbuf, sizeof PL_tokenbuf, FALSE, &len);
 	    if (len == 4 && strEQ(PL_tokenbuf, "else")) {
+		curmad('X', newSVpvs("else"));
 		force_next(ELSE);
 		s = d;
 	    }
 	    else if (len == 5 && strEQ(PL_tokenbuf, "elsif")) {
+		curmad('X', newSVpvs("elsif"));
 		force_next(ELSIF);
 		s = d;
 	    }
 	    else if (len == 8 && strEQ(PL_tokenbuf, "continue")) {
+		curmad('X', newSVpvs("continue"));
 		force_next(CONTINUE);
 		s = d;
 	    }
@@ -3818,13 +3829,15 @@ Perl_yylex(pTHX)
 		force_next(';');
 	}
 	    
-	start_force(PL_curforce);
+	start_force(-1);
+	curmad('X', newSVpvs("}"));
+	CURMAD('_', PL_initialwhite);
 	force_next('}');
 #ifdef PERL_MAD
-	if (!PL_thistoken)
-	    PL_thistoken = newSVpvs("");
+	PL_thistoken = newSVpvs("");
 #endif
 	TOKEN(';');
+    }
     case '&':
 	s++;
 	if (*s++ == '&')

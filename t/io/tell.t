@@ -2,9 +2,9 @@
 
 print "1..28\n";
 
-my $Is_Dosish = ($^O eq 'MSWin32' or $^O eq 'NetWare' or $^O eq 'dos' or
-              $^O eq 'os2' or $^O eq 'mint' or $^O eq 'cygwin' or
-              $^O =~ m/^uwin/);
+my $Is_Dosish = ($^OS_NAME eq 'MSWin32' or $^OS_NAME eq 'NetWare' or $^OS_NAME eq 'dos' or
+              $^OS_NAME eq 'os2' or $^OS_NAME eq 'mint' or $^OS_NAME eq 'cygwin' or
+              $^OS_NAME =~ m/^uwin/);
 
 open(my $TST, "<", 'TEST') || (die "Can't open TEST");
 binmode $TST if $Is_Dosish;
@@ -46,7 +46,7 @@ unless (eof $TST) { print "not ok 13\n"; } else { print "ok 13\n"; }
 print "ok 14\n";
 
 open(OTHER, "<", 'TEST') || (die "Can't open TEST: $^OS_ERROR");
-binmode OTHER if (($^O eq 'MSWin32') || ($^O eq 'NetWare'));
+binmode OTHER if (($^OS_NAME eq 'MSWin32') || ($^OS_NAME eq 'NetWare'));
 
 close(OTHER);
 do {
@@ -117,7 +117,7 @@ open($tst, ">>","$written")  || die "Cannot open $written:$^OS_ERROR";
 # This test makes a questionable assumption that the file pointer will
 # be at eof after opening a file but before seeking, reading, or writing.
 # Only known failure is on cygwin.
-my $todo = $^O eq "cygwin" && &PerlIO::get_layers($tst) eq 'stdio'
+my $todo = $^OS_NAME eq "cygwin" && &PerlIO::get_layers($tst) eq 'stdio'
     && ' # TODO: file pointer not at eof';
 
 if (tell($tst) == 6)

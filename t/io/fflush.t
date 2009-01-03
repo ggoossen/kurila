@@ -31,7 +31,7 @@ if ($useperlio || $fflushNULL || $d_sfio) {
     }
 }
 
-my $runperl = $^X =~ m/\s/ ?? qq{"$^X"} !! $^X;
+my $runperl = $^EXECUTABLE_NAME =~ m/\s/ ?? qq{"$^EXECUTABLE_NAME"} !! $^EXECUTABLE_NAME;
 $runperl .= qq{ "-I../lib"};
 
 my @delete;

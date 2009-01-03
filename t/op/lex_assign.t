@@ -12,7 +12,7 @@ our ($undefed, @z, @x, @aaa, $toself, $direct);
 $^OUTPUT_AUTOFLUSH = 1;
 umask 0;
 $xref = \ "";
-$runme = $^X;
+$runme = $^EXECUTABLE_NAME;
 @a =1..5;
 %h = %( <1..6);
 $aref = \@a;
@@ -72,7 +72,7 @@ for ( @INPUT) {
     $op = "$op==$op" unless $op =~ m/==/;
     @($op, $expectop) = @: $op =~ m/(.*)==(.*)/;
   
-    if ($op =~ m/^'\?\?\?'/ or $comment =~ m/skip\(.*\Q$^O\E.*\)/i) {
+    if ($op =~ m/^'\?\?\?'/ or $comment =~ m/skip\(.*\Q$^OS_NAME\E.*\)/i) {
       skip("$comment", 1);
     }
     $integer = ($comment =~ m/^i_/) ?? "use integer" !! '' ;

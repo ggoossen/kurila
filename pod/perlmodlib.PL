@@ -1460,6 +1460,6 @@ provisions.  But then you know when you C<use RedefineTheWorld> that
 you're redefining the world and willing to take the consequences.
 EOF
 
-close MANIFEST or warn "$0: failed to close MANIFEST (../MANIFEST): $^OS_ERROR";
-close OUT      or warn "$0: failed to close OUT (perlmodlib.pod): $^OS_ERROR";
+close MANIFEST or warn "$^PROGRAM_NAME: failed to close MANIFEST (../MANIFEST): $^OS_ERROR";
+close OUT      or warn "$^PROGRAM_NAME: failed to close OUT (perlmodlib.pod): $^OS_ERROR";
 

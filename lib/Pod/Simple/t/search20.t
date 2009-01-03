@@ -68,14 +68,14 @@ print $p;
 
 do {
 my $names = join "|", sort values %$where2name;
-skip $^O eq 'VMS' ?? '-- case may or may not be preserved' !! 0, 
+skip $^OS_NAME eq 'VMS' ?? '-- case may or may not be preserved' !! 0, 
      $names, 
      "Blorm|Suzzle|Zonk::Pronk|hinkhonk::Glunk|hinkhonk::Vliff|perlflif|perlthng|perlzuk|squaa|squaa::Glunk|squaa::Vliff|squaa::Wowo|zikzik";
 };
 
 do {
 my $names = join "|", sort keys %$name2where;
-skip $^O eq 'VMS' ?? '-- case may or may not be preserved' !! 0, 
+skip $^OS_NAME eq 'VMS' ?? '-- case may or may not be preserved' !! 0, 
      $names, 
      "Blorm|Suzzle|Zonk::Pronk|hinkhonk::Glunk|hinkhonk::Vliff|perlflif|perlthng|perlzuk|squaa|squaa::Glunk|squaa::Vliff|squaa::Wowo|zikzik";
 };

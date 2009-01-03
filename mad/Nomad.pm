@@ -1016,7 +1016,14 @@ BEGIN {
 	'nullstatement' => sub {		# null statements/blocks
 	    my $self = shift;
 	    my @newkids;
-	    push @newkids, $self->madness('{ ; }');
+	    push @newkids, $self->madness('{ ; } fake_semicolon');
+	    $::curstate = 0;
+	    return P5AST::nothing->new(Kids => [@newkids])
+	},
+	'valuestatement' => sub {		# null statements/blocks
+	    my $self = shift;
+	    my @newkids;
+	    push @newkids, $self->madness('X ;');
 	    $::curstate = 0;
 	    return P5AST::nothing->new(Kids => [@newkids])
 	},
@@ -1086,7 +1093,7 @@ BEGIN {
 	'sub' => sub {			# subroutine
 	    my $self = shift;
 	    my @newkids;
-	    push @newkids, $self->madness('d n s a : { & } ;');
+	    push @newkids, $self->madness('d n s a : { & } fake_semicolon ;');
 	    $::curstate = 0;
 	    return P5AST::sub->new(Kids => [@newkids])
 	},
@@ -1459,12 +1466,12 @@ sub ast {
     local $::curstate;	# in case there are statements in subscript
     local $::curenc = $::curenc;
     my @newkids;
-    push @newkids, $self->madness('dx d');
+    push @newkids, $self->madness('dx d optional_assign');
     for my $kid (@{$$self{Kids}}) {
 	push @newkids, $kid->ast($self, @_);
     }
     splice @newkids, -1, 0, $self->madness('o {');
-    push @newkids, $self->madness('}');
+    push @newkids, $self->madness('} fake_semicolon');
 
     return $self->newtype->new(Kids => [@newkids]);
 }
@@ -1474,7 +1481,7 @@ package PLXML::op_padsv;
 sub ast {
     my $self = shift;
     my @args;
-    push @args, $self->madness('optional_assign dx d ( $ @ % )');
+    push @args, $self->madness('optional_assign dx d ( X $ @ % )');
 
     return $self->newtype->new(Kids => [@args]);
 }
@@ -1529,7 +1536,7 @@ sub ast {
     my $self = shift;
 
     my @newkids;
-    push @newkids, $self->madness('dx d ( * $');
+    push @newkids, $self->madness('dx d optional_assign ( * $');
     for (@{$self->{Kids}}) {
         push @newkids, $_->ast($self,@_);
     }
@@ -1542,14 +1549,14 @@ package PLXML::op_rv2sv;
 
 sub astnull {
     my $self = shift;
-    return P5AST::op_rv2sv->new(Kids => [$self->madness('O o optional_assign dx d ( $ ) : a')]);
+    return P5AST::op_rv2sv->new(Kids => [$self->madness('O o optional_assign dx d ( X $ ) : a')]);
 }
 
 sub ast {
     my $self = shift;
 
     my @newkids;
-    push @newkids, $self->madness('dx d ( $');
+    push @newkids, $self->madness('dx d optional_assign ( X $');
     if (ref $$self{Kids}[0] ne "PLXML::op_gv") {
 	push @newkids, $$self{Kids}[0]->ast();
     }
@@ -2167,7 +2174,7 @@ package PLXML::op_rv2av;
 
 sub astnull {
     my $self = shift;
-    return P5AST::op_rv2av->new(Kids => [$self->madness('$ @')]);
+    return P5AST::op_rv2av->new(Kids => [$self->madness('X $ @')]);
 }
 
 sub ast {
@@ -2178,10 +2185,10 @@ sub ast {
     }
 
     my @before;
-    push @before, $self->madness('dx d (');
+    push @before, $self->madness('dx d optional_assign (');
 
     my @newkids;
-    push @newkids, $self->madness('$ @ K');
+    push @newkids, $self->madness('X $ @ K');
     if (ref $$self{Kids}[0] ne "PLXML::op_gv") {
 	push @newkids, $$self{Kids}[0]->ast();
     }
@@ -2202,7 +2209,7 @@ package PLXML::op_aelem;
 sub astnull {
     my $self = shift;
     my @newkids;
-    push @newkids, $self->madness('dx d');
+    push @newkids, $self->madness('dx d optional_assign');
     for my $kid (@{$$self{Kids}}) {
 	push @newkids, $kid->ast($self, @_);
     }
@@ -2214,7 +2221,7 @@ sub astnull {
 sub ast {
     my $self = shift;
 
-    my @before = $self->madness('dx d (');
+    my @before = $self->madness('dx d optional_assign (');
     my @newkids;
     for my $kid (@{$$self{Kids}}) {
 	push @newkids, $kid->ast(@_);
@@ -2235,7 +2242,7 @@ sub astnull {
 	push @newkids, $kid->ast(@_);
     }
     unshift @newkids, pop @newkids;
-    unshift @newkids, $self->madness('dx d');
+    unshift @newkids, $self->madness('dx d optional_assign');
     push @newkids, $self->madness('slice_close ]');
     return P5AST::op_aslice->new(Kids => [@newkids]);
 }
@@ -2249,7 +2256,7 @@ sub ast {
 	push @newkids, $kid->ast(@_);
     }
     unshift @newkids, pop @newkids;
-    unshift @newkids, $self->madness('dx d');
+    unshift @newkids, $self->madness('dx d optional_assign');
     push @newkids, $self->madness('slice_close ]');
 
     return $self->newtype->new(Kids => [@newkids]);
@@ -2283,17 +2290,17 @@ package PLXML::op_rv2hv;
 
 sub astnull {
     my $self = shift;
-    return P5AST::op_rv2hv->new(Kids => [$self->madness('$')]);
+    return P5AST::op_rv2hv->new(Kids => [$self->madness('X $')]);
 }
 
 sub ast {
     my $self = shift;
 
     my @before;
-    push @before, $self->madness('dx d (');
+    push @before, $self->madness('dx d optional_assign (');
 
     my @newkids;
-    push @newkids, $self->madness('$ @ % K');
+    push @newkids, $self->madness('X $ @ % K');
     if (ref $$self{Kids}[0] ne "PLXML::op_gv") {
 	push @newkids, $$self{Kids}[0]->ast();
     }
@@ -2310,12 +2317,12 @@ sub astnull {
     local $::curenc = $::curenc;
 
     my @newkids;
-    push @newkids, $self->madness('dx d');
+    push @newkids, $self->madness('dx d optional_assign');
     for my $kid (@{$$self{Kids}}) {
 	push @newkids, $kid->ast($self, @_);
     }
     splice @newkids, -1, 0, $self->madness('a {');
-    push @newkids, $self->madness('}');
+    push @newkids, $self->madness('} fake_semicolon');
     return P5AST::op_helem->new(Kids => [@newkids]);
 }
 
@@ -2324,13 +2331,13 @@ sub ast {
     local $::curstate;	# hash subscript potentially a lineseq
     local $::curenc = $::curenc;
 
-    my @before = $self->madness('dx d');
+    my @before = $self->madness('dx d optional_assign');
     my @newkids;
     for my $kid (@{$$self{Kids}}) {
 	push @newkids, $kid->ast($self, @_);
     }
     splice @newkids, -1, 0, $self->madness('a {');
-    push @newkids, $self->madness('}');
+    push @newkids, $self->madness('} fake_semicolon');
 
     return $self->newtype->new(Kids => [@before, @newkids]);
 }
@@ -2346,8 +2353,8 @@ sub astnull {
 	push @newkids, $kid->ast(@_);
     }
     unshift @newkids, pop @newkids;
-    unshift @newkids, $self->madness('dx d'); 
-    push @newkids, $self->madness('slice_close }');
+    unshift @newkids, $self->madness('dx d optional_assign'); 
+    push @newkids, $self->madness('slice_close } fake_semicolon');
     return P5AST::op_hslice->new(Kids => [@newkids]);
 }
 
@@ -2360,8 +2367,8 @@ sub ast {
 	push @newkids, $kid->ast(@_);
     }
     unshift @newkids, pop @newkids;
-    unshift @newkids, $self->madness('dx d'); 
-    push @newkids, $self->madness('slice_close }');
+    unshift @newkids, $self->madness('dx d optional_assign'); 
+    push @newkids, $self->madness('slice_close } fake_semicolon');
 
     return $self->newtype->new(Kids => [@newkids]);
 }
@@ -2724,7 +2731,7 @@ sub lineseq {
 	next unless defined $thing;
         if ( $::version_from->{branch} eq 'kurila' and $::version_from->{'v'} > v1.14 ) {
             if ($kid->{mp}{U} or $kid->{mp}{n} or $kid->{mp}{'&'} or
-                  ( ($kid->{mp}{null_type} || '') =~ m/^(peg|nullstatement|package)$/ )
+                  ( ($kid->{mp}{null_type} || '') =~ m/^(peg|package|.*statement)$/ )
               ) {
                 push @newstuff, $thing;
             }
@@ -2783,7 +2790,7 @@ sub blockast {
                  and $::version_from->{'v'} > v1.14 ) ) {
         push @retval, $self->madness(';');
     }
-    push @retval, $self->madness('}');
+    push @retval, $self->madness('} fake_semicolon');
     return $self->newtype->new(Kids => [@retval]);
 }
 
@@ -2869,7 +2876,7 @@ sub ast {
                  and $::version_from->{'v'} > v1.14 ) ) {
         push @retval, $self->madness(';');
     }
-    push @retval, $self->madness(q/}/);
+    push @retval, $self->madness(q/} fake_semicolon/);
     my $retval = $self->newtype->new(Kids => [@retval]);
 
     if ($$self{mp}{C}) {
@@ -2901,7 +2908,7 @@ sub ast {
     if ( $::version_from->{branch} eq 'kurila' and $::version_from->{'v'} > v1.14 ) {
         push @newkids, $self->madness(';');
     }
-    push @newkids, $self->madness('}');
+    push @newkids, $self->madness('} fake_semicolon');
 
     my @folded = $self->madness('C');
     if (@folded) {

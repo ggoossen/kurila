@@ -18,7 +18,7 @@ sub tryeq_sloppy ($$$) {
   } else {
     my $error = abs (@_[1] - @_[2]) / @_[1];
     if ($error +< 1e-9) {
-      print "ok @_[0] # @_[1] is close to @_[2], \$^O eq $^O\n";
+      print "ok @_[0] # @_[1] is close to @_[2], \$^O eq $^OS_NAME\n";
     } else {
       print "not ok @_[0] # @_[1] != @_[2]\n";
     }
@@ -48,7 +48,7 @@ my $limit = 1e6;
 
 # Division (and modulo) of floating point numbers
 # seem to be rather sloppy in Cray.
-$limit = 1e8 if $^O eq 'unicos';
+$limit = 1e8 if $^OS_NAME eq 'unicos';
 
 tryok $T++, abs( 13e21 %  4e21 -  1e21) +< $limit;
 tryok $T++, abs(-13e21 %  4e21 -  3e21) +< $limit;
@@ -285,18 +285,18 @@ do {
 };
 
 my $vms_no_ieee;
-if ($^O eq 'VMS') {
+if ($^OS_NAME eq 'VMS') {
   try {require Config; Config->import() };
   $vms_no_ieee = 1 unless defined(config_value('useieee'));
 }
 
-if ($^O eq 'vos') {
+if ($^OS_NAME eq 'vos') {
   print "not ok ", $T++, " # TODO VOS raises SIGFPE instead of producing infinity.\n";
 }
 elsif ($vms_no_ieee) {
  print $T++, " # SKIP -- the IEEE infinity model is unavailable in this configuration.\n"
 }
-elsif ($^O eq 'ultrix') {
+elsif ($^OS_NAME eq 'ultrix') {
   print "not ok ", $T++, " # TODO Ultrix enters deep nirvana instead of producing infinity.\n";
 }
 else {

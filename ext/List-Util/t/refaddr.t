@@ -16,7 +16,7 @@ foreach my $v (@: undef, 10, 'string') {
 foreach my $r (@: \%(), \$t, \@(), sub {}) {
   my $n = dump::view($r);
   $n =~ m/0x(\w+)/;
-  my $addr = do { local $^W; hex $1 };
+  my $addr = do { local $^WARNING; hex $1 };
   my $before = ref($r);
   is( refaddr($r), $addr, $n);
   is( ref($r), $before, $n);

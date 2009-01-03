@@ -132,7 +132,7 @@ sub reset {
 
     $self->{+TODO}       = undef;
 
-    $self->_dup_stdhandles unless $^C;
+    $self->_dup_stdhandles unless $^COMPILING;
 
     return;
 }
@@ -408,7 +408,7 @@ sub _is_object {
 sub _is_dualvar {
     my@($self, $val) =  @_;
 
-    local $^W = 0;
+    local $^WARNING = 0;
     my $numval = $val+0;
     return 1 if $numval != 0 and $numval ne $val;
 }
@@ -1088,7 +1088,7 @@ sub diag {
     return unless (nelems @msgs);
 
     # Prevent printing headers when compiling (i.e. -c)
-    return if $^C;
+    return if $^COMPILING;
 
     # Smash args together like print does.
     # Convert undef to 'undef' so its readable.
@@ -1123,7 +1123,7 @@ sub _print {
 
     # Prevent printing headers when only compiling.  Mostly for when
     # tests are deparsed with B::Deparse
-    return if $^C;
+    return if $^COMPILING;
 
     my $msg = join '', @msgs;
 

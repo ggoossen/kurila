@@ -22,7 +22,7 @@ ok(1);
 # The high security tests must currently be skipped on some platforms
 my $skipplat = ( (
 		  # No sticky bits.
-		  $^O eq 'MSWin32' || $^O eq 'NetWare' || $^O eq 'os2' || $^O eq 'dos' || $^O eq 'mpeix' || $^O eq 'MacOS'
+		  $^OS_NAME eq 'MSWin32' || $^OS_NAME eq 'NetWare' || $^OS_NAME eq 'os2' || $^OS_NAME eq 'dos' || $^OS_NAME eq 'mpeix' || $^OS_NAME eq 'MacOS'
 		  ) ?? 1 !! 0 );
 
 # Determine whether we need to skip things and why

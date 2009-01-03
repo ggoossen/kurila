@@ -27,7 +27,7 @@ sub create_constants {
     return unless defined $src_dir;
   # Can't name it *::Constants, otherwise constants.xs would overwrite it...
   # This produces warnings from PSZ-conversion on WS_* constants.
-  system $^X, "-I$src_dir/lib", "$src_dir/utils/h2xs", '-fn', 'OS2::Process::Const',
+  system $^EXECUTABLE_NAME, "-I$src_dir/lib", "$src_dir/utils/h2xs", '-fn', 'OS2::Process::Const',
     '--skip-exporter', '--skip-autoloader', # too large memory overhead
       '--skip-strict', '--skip-warnings', # likewise
 	'--skip-ppport',	# will not work without dynaloading.

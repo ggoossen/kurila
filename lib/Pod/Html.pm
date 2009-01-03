@@ -320,7 +320,7 @@ sub init_globals {
     %Sections = %( () );		# sections within this page
 
     %Local_Items = %( () );
-    $Is83 = $^O eq 'dos';       # Is it an 8.3 filesystem?
+    $Is83 = $^OS_NAME eq 'dos';       # Is it an 8.3 filesystem?
 }
 
 #
@@ -364,7 +364,7 @@ sub pod2html {
     unless ((nelems @ARGV) && @ARGV[0]) {
 	$Podfile  = "-" unless $Podfile;	# stdin
 	open(POD, "<", "$Podfile")
-		|| die "$0: cannot open $Podfile file for input: $^OS_ERROR\n";
+		|| die "$^PROGRAM_NAME: cannot open $Podfile file for input: $^OS_ERROR\n";
     } else {
 	$Podfile = @ARGV[0];  # XXX: might be more filenames
 	*POD = *ARGV;
@@ -420,7 +420,7 @@ sub pod2html {
 
     # open the output file
     open(HTML, ">", "$Htmlfile")
-	    || die "$0: cannot open $Htmlfile file for output: $^OS_ERROR\n";
+	    || die "$^PROGRAM_NAME: cannot open $Htmlfile file for output: $^OS_ERROR\n";
 
     # put a title in the HTML file if one wasn't specified
     if ($Title eq '') {
@@ -447,7 +447,7 @@ sub pod2html {
     if ($Title) {
 	$Title =~ s/\s*\(.*\)//;
     } else {
-	warn "$0: no title for $Podfile.\n" unless $Quiet;
+	warn "$^PROGRAM_NAME: no title for $Podfile.\n" unless $Quiet;
 	$Podfile =~ m/^(.*)(\.[^.\/]+)?\z/s;
 	$Title = ($Podfile eq "-" ?? 'No Title' !! $1);
 	warn "using $Title" if $Verbose;
@@ -552,7 +552,7 @@ END_OF_INDEX
 		    process_for($1,$2);
 		} else {
 		    m/^=(\S*)\s*/;
-		    warn "$0: $Podfile: unknown pod directive '$1' in "
+		    warn "$^PROGRAM_NAME: $Podfile: unknown pod directive '$1' in "
 		       . "paragraph $Paragraph.  ignoring.\n" unless $Quiet;
 		}
 	    }
@@ -629,9 +629,9 @@ END_OF_TAIL
 
 sub usage {
     my $podfile = shift;
-    warn "$0: $podfile: $(join ' ',@_)\n" if (nelems @_);
+    warn "$^PROGRAM_NAME: $podfile: $(join ' ',@_)\n" if (nelems @_);
     die <<END_OF_USAGE;
-Usage:  $0 --help --htmlroot=<name> --infile=<name> --outfile=<name>
+Usage:  $^PROGRAM_NAME --help --htmlroot=<name> --infile=<name> --outfile=<name>
            --podpath=<name>:...:<name> --podroot=<name>
            --libpods=<name>:...:<name> --recurse --verbose --index
            --netscape --norecurse --noindex --cachedir=<name>
@@ -784,7 +784,7 @@ sub load_cache {
     $tests = 0;
 
     open(CACHE, "<", "$itemcache") ||
-	die "$0: error opening $itemcache for reading: $^OS_ERROR\n";
+	die "$^PROGRAM_NAME: error opening $itemcache for reading: $^OS_ERROR\n";
     $^INPUT_RECORD_SEPARATOR = "\n";
 
     # is it the same podpath?
@@ -812,7 +812,7 @@ sub load_cache {
 
     warn "scanning for directory cache\n" if $Verbose;
     open(CACHE, "<", "$dircache") ||
-	die "$0: error opening $dircache for reading: $^OS_ERROR\n";
+	die "$^PROGRAM_NAME: error opening $dircache for reading: $^OS_ERROR\n";
     $^INPUT_RECORD_SEPARATOR = "\n";
     $tests = 0;
 
@@ -861,7 +861,7 @@ sub scan_podpath {
     # scan each directory listed in @Podpath
     $pwd = getcwd();
     chdir($podroot)
-	|| die "$0: error changing to directory $podroot: $^OS_ERROR\n";
+	|| die "$^PROGRAM_NAME: error changing to directory $podroot: $^OS_ERROR\n";
     foreach my $dir ( @Podpath) {
 	scan_dir($dir, $recurse);
     }
@@ -879,14 +879,14 @@ sub scan_podpath {
 	    #  find all the .pod and .pm files within the directory
 	    $dirname = $1;
 	    opendir(DIR, $dirname) ||
-		die "$0: error opening directory $dirname: $^OS_ERROR\n";
+		die "$^PROGRAM_NAME: error opening directory $dirname: $^OS_ERROR\n";
 	    @files = grep(m/(\.pod|\.pm)\z/ && ! -d $_, @( readdir(DIR)));
 	    closedir(DIR);
 
 	    # scan each .pod and .pm file for =item directives
 	    foreach my $pod ( @files) {
 		open(POD, "<", "$dirname/$pod") ||
-		    die "$0: error opening $dirname/$pod for input: $^OS_ERROR\n";
+		    die "$^PROGRAM_NAME: error opening $dirname/$pod for input: $^OS_ERROR\n";
 		@poddata = @( ~< *POD );
 		close(POD);
 		clean_data( \@poddata );
@@ -905,25 +905,25 @@ sub scan_podpath {
 	    # scan the .pod or .pm file for =item directives
 	    my $pod = $1;
 	    open(POD, "<", "$pod") ||
-		die "$0: error opening $pod for input: $^OS_ERROR\n";
+		die "$^PROGRAM_NAME: error opening $pod for input: $^OS_ERROR\n";
 	    @poddata = @( ~< *POD );
 	    close(POD);
 	    clean_data( \@poddata );
 
 	    scan_items( \%Items, "$pod", < @poddata);
 	} else {
-	    warn "$0: shouldn't be here (line ".__LINE__."\n" unless $Quiet;
+	    warn "$^PROGRAM_NAME: shouldn't be here (line ".__LINE__."\n" unless $Quiet;
 	}
     }
     @poddata = @( () );	# clean-up a bit
 
     chdir($pwd)
-	|| die "$0: error changing to directory $pwd: $^OS_ERROR\n";
+	|| die "$^PROGRAM_NAME: error changing to directory $pwd: $^OS_ERROR\n";
 
     # cache the item list for later use
     warn "caching items for later use\n" if $Verbose;
     open(CACHE, ">", "$Itemcache") ||
-	die "$0: error open $Itemcache for writing: $^OS_ERROR\n";
+	die "$^PROGRAM_NAME: error open $Itemcache for writing: $^OS_ERROR\n";
 
     print CACHE join(":", @Podpath) . "\n$podroot\n";
     foreach my $key (keys %Items) {
@@ -935,7 +935,7 @@ sub scan_podpath {
     # cache the directory list for later use
     warn "caching directories for later use\n" if $Verbose;
     open(CACHE, ">", "$Dircache") ||
-	die "$0: error open $Dircache for writing: $^OS_ERROR\n";
+	die "$^PROGRAM_NAME: error open $Dircache for writing: $^OS_ERROR\n";
 
     print CACHE join(":", @Podpath) . "\n$podroot\n";
     foreach my $key (keys %Pages) {
@@ -960,7 +960,7 @@ sub scan_dir {
     @pods = @( () );
 
     opendir(DIR, $dir) ||
-	die "$0: error opening directory $dir: $^OS_ERROR\n";
+	die "$^PROGRAM_NAME: error opening directory $dir: $^OS_ERROR\n";
     while (defined($_ = readdir(DIR))) {
 	if (-d "$dir/$_" && $_ ne "." && $_ ne ".."
 	    && ($HiddenDirs || !m/^\./)
@@ -1177,7 +1177,7 @@ sub process_item {
     # bad!  but, the proper thing to do seems to be to just assume
     # they did do an =over.  so warn them once and then continue.
     if( $Listlevel == 0 ){
-	warn "$0: $Podfile: unexpected =item directive in paragraph $Paragraph.  ignoring.\n" unless $Quiet;
+	warn "$^PROGRAM_NAME: $Podfile: unexpected =item directive in paragraph $Paragraph.  ignoring.\n" unless $Quiet;
 	process_over();
     }
 
@@ -1232,7 +1232,7 @@ sub process_over {
 #
 sub process_back {
     if( $Listlevel == 0 ){
-	warn "$0: $Podfile: unexpected =back directive in paragraph $Paragraph.  ignoring.\n" unless $Quiet;
+	warn "$^PROGRAM_NAME: $Podfile: unexpected =back directive in paragraph $Paragraph.  ignoring.\n" unless $Quiet;
 	return;
     }
 
@@ -1695,7 +1695,7 @@ sub process_text1($$;$$){
 
             # warning; show some text.
             $linktext = $opar unless defined $linktext;
-            warn "$0: $Podfile: cannot resolve L<$opar> in paragraph $Paragraph.\n" unless $Quiet;
+            warn "$^PROGRAM_NAME: $Podfile: cannot resolve L<$opar> in paragraph $Paragraph.\n" unless $Quiet;
         };
 
         # now we have a URL or just plain code
@@ -1713,11 +1713,11 @@ sub process_text1($$;$$){
 
     } elsif( $func eq 'X' ){
 	# X<> - ignore
-	warn "$0: $Podfile: invalid X<> in paragraph $Paragraph.\n"
+	warn "$^PROGRAM_NAME: $Podfile: invalid X<> in paragraph $Paragraph.\n"
 	    unless $$rstr =~ s/^[^>]*>// or $Quiet;
     } elsif( $func eq 'Z' ){
 	# Z<> - empty
-	warn "$0: $Podfile: invalid Z<> in paragraph $Paragraph.\n"
+	warn "$^PROGRAM_NAME: $Podfile: invalid Z<> in paragraph $Paragraph.\n"
 	    unless $$rstr =~ s/^>// or $Quiet;
 
     } else {
@@ -1737,7 +1737,7 @@ sub process_text1($$;$$){
 	    $res .= pure_text( $$rstr );
 	} elsif( ! $Quiet ) {
             my $snippet = substr($$rstr,0,60);
-            warn "$0: $Podfile: undelimited $func<> in paragraph $Paragraph: '$snippet'.\n" 
+            warn "$^PROGRAM_NAME: $Podfile: undelimited $func<> in paragraph $Paragraph: '$snippet'.\n" 
                 
 	}
 	$res = process_text_rfc_links($res);
@@ -1765,7 +1765,7 @@ sub go_ahead($$$){
     }
     unless ($Quiet) {
         my $snippet = substr($$rstr,0,60);
-        warn "$0: $Podfile: undelimited $func<> in paragraph $Paragraph (go_ahead): '$snippet'.\n" 
+        warn "$^PROGRAM_NAME: $Podfile: undelimited $func<> in paragraph $Paragraph (go_ahead): '$snippet'.\n" 
     }	        
     return $res;
 }
@@ -1814,7 +1814,7 @@ sub html_escape {
 #
 sub dosify {
     my@($str) =  @_;
-    return lc($str) if $^O eq 'VMS';     # VMS just needs casing
+    return lc($str) if $^OS_NAME eq 'VMS';     # VMS just needs casing
     if ($Is83) {
         $str = lc $str;
         $str =~ s/(\.\w+)/$(substr ($1,0,4))/g;
@@ -2034,7 +2034,7 @@ sub relative_url {
 #
 sub finish_list {
     if( $Listlevel ){
-	warn "$0: $Podfile: unterminated list(s) at =head in paragraph $Paragraph.  ignoring.\n" unless $Quiet;
+	warn "$^PROGRAM_NAME: $Podfile: unterminated list(s) at =head in paragraph $Paragraph.  ignoring.\n" unless $Quiet;
 	while( $Listlevel ){
             process_back();
         }

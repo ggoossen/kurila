@@ -24,23 +24,23 @@ print STDOUT "ok 2\n";
 print STDERR "ok 3\n";
 
 # Since some systems don't have echo, we use Perl.
-my $echo = qq{$^X -le "print q(ok \%d)"};
+my $echo = qq{$^EXECUTABLE_NAME -le "print q(ok \%d)"};
 
 my $cmd = sprintf $echo, 4;
 print `$cmd`;
 
 $cmd = sprintf "$echo 1>&2", 5;
-$cmd = sprintf $echo, 5 if $^O eq 'MacOS';  # don't know if we can do this ...
+$cmd = sprintf $echo, 5 if $^OS_NAME eq 'MacOS';  # don't know if we can do this ...
 print `$cmd`;
 
 # KNOWN BUG system() does not honor STDOUT redirections on VMS.
-if( $^O eq 'VMS' ) {
+if( $^OS_NAME eq 'VMS' ) {
     print "not ok $_ # TODO system() not honoring STDOUT redirect on VMS\n"
       for 6..7;
 }
 else {
     system sprintf $echo, 6;
-    if ($^O eq 'MacOS') {
+    if ($^OS_NAME eq 'MacOS') {
         system sprintf $echo, 7;
     }
     else {
@@ -54,8 +54,8 @@ close(STDERR) or die "Could not close: $^OS_ERROR";
 open(STDOUT, ">&", \*DUPOUT) or die "Could not open: $^OS_ERROR";
 open(STDERR, ">&", \*DUPERR) or die "Could not open: $^OS_ERROR";
 
-if (($^O eq 'MSWin32') || ($^O eq 'NetWare') || ($^O eq 'VMS')) { print `type Io.dup` }
-elsif ($^O eq 'MacOS') { system 'catenate Io.dup' }
+if (($^OS_NAME eq 'MSWin32') || ($^OS_NAME eq 'NetWare') || ($^OS_NAME eq 'VMS')) { print `type Io.dup` }
+elsif ($^OS_NAME eq 'MacOS') { system 'catenate Io.dup' }
 else                   { system 'cat Io.dup' }
 unlink 'Io.dup';
 

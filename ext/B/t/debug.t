@@ -7,8 +7,8 @@ use Config;
 use Test::More tests=>3;
 
 my $a;
-my $Is_VMS = $^O eq 'VMS';
-my $Is_MacOS = $^O eq 'MacOS';
+my $Is_VMS = $^OS_NAME eq 'VMS';
+my $Is_MacOS = $^OS_NAME eq 'MacOS';
 
 my $path = join " ", map { qq["-I$_"] } @INC;
 my $redir = $Is_MacOS ?? "" !! "2>&1";

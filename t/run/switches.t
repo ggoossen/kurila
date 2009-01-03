@@ -13,7 +13,7 @@ use Config;
 # due to a bug in VMS's piping which makes it impossible for runperl()
 # to emulate echo -n (ie. stdin always winds up with a newline), these 
 # tests almost totally fail.
-our $TODO = "runperl() unable to emulate echo -n due to pipe bug" if $^O eq 'VMS';
+our $TODO = "runperl() unable to emulate echo -n due to pipe bug" if $^OS_NAME eq 'VMS';
 
 my $r;
 my @tmpfiles = @( () );
@@ -200,7 +200,7 @@ do {
 
     # lookup a known config var
     chomp( $r=runperl( switches => \@('-V:osname') ) );
-    is( $r, "osname='$^O';", 'perl -V:osname');
+    is( $r, "osname='$^OS_NAME';", 'perl -V:osname');
 
     # regexp lookup
     # platforms that don't like this quoting can either skip this test
@@ -218,7 +218,7 @@ do {
 do {
     local $TODO = '';   # these ones should work on VMS
 
-    my @(_, $v) =  split m/-/, $^V;
+    my @(_, $v) =  split m/-/, $^PERL_VERSION;
     my $archname = config_value('archname');
     like( runperl( switches => \@('-v') ),
 	  qr/This[ ]is[ ]kurila,[  ]v$v [ ] (?:DEVEL\w+[ ])? built[ ]for[ ]
@@ -261,7 +261,7 @@ do {
 
     sub do_i_unlink { 1 while unlink("file", "file.bak") }
 
-    open(FILE, ">", "file") or die "$0: Failed to create 'file': $^OS_ERROR";
+    open(FILE, ">", "file") or die "$^PROGRAM_NAME: Failed to create 'file': $^OS_ERROR";
     print FILE <<__EOF__;
 foo yada dada
 bada foo bing
@@ -273,11 +273,11 @@ __EOF__
 
     runperl( switches => \@('-pi.bak'), prog => 's/foo/bar/', args => \@('file') );
 
-    open(FILE, "<", "file") or die "$0: Failed to open 'file': $^OS_ERROR";
+    open(FILE, "<", "file") or die "$^PROGRAM_NAME: Failed to open 'file': $^OS_ERROR";
     chomp(my @file = @( ~< *FILE ));
     close FILE;
 
-    open(BAK, "<", "file.bak") or die "$0: Failed to open 'file': $^OS_ERROR";
+    open(BAK, "<", "file.bak") or die "$^PROGRAM_NAME: Failed to open 'file': $^OS_ERROR";
     chomp(my @bak = @( ~< *BAK ));
     close BAK;
 

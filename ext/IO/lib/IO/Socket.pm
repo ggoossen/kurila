@@ -119,7 +119,7 @@ sub connect {
 		$^EVAL_ERROR = "connect: timeout";
 	    }
 	    elsif (!connect($sock,$addr) &&
-                not ($^OS_ERROR == EISCONN || ($^OS_ERROR == 10022 && $^O eq 'MSWin32'))
+                not ($^OS_ERROR == EISCONN || ($^OS_ERROR == 10022 && $^OS_NAME eq 'MSWin32'))
             ) {
 		# Some systems refuse to re-connect() to
 		# an already open socket and set errno to EISCONN.
@@ -151,7 +151,7 @@ sub blocking {
     my $sock = shift;
 
     return $sock->SUPER::blocking(< @_)
-        if $^O ne 'MSWin32';
+        if $^OS_NAME ne 'MSWin32';
 
     # Windows handles blocking differently
     #

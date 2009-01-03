@@ -6,7 +6,7 @@ require Exporter;
 
 BEGIN {
     # so we can compile the thing on non-VMS platforms.
-    if( $^O eq 'VMS' ) {
+    if( $^OS_NAME eq 'VMS' ) {
         require VMS::Filespec;
         VMS::Filespec->import;
     }

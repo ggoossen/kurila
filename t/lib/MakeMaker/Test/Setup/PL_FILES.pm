@@ -88,7 +88,7 @@ END
 
 sub setup {
     setup_mm_test_root();
-    chdir 'MM_TEST_ROOT:[t]' if $^O eq 'VMS';
+    chdir 'MM_TEST_ROOT:[t]' if $^OS_NAME eq 'VMS';
 
     while(my@(?$file, ?$text) =@( each %Files)) {
         # Convert to a relative, native file path.

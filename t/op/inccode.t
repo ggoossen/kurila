@@ -196,7 +196,7 @@ $ret ||= do 'abc.pl';
 is( $ret, 'abc', 'do "abc.pl" sees return value' );
 
 do {
-    my $filename = $^O eq 'MacOS' ?? ':Foo:Foo.pm' !! './Foo.pm';
+    my $filename = $^OS_NAME eq 'MacOS' ?? ':Foo:Foo.pm' !! './Foo.pm';
     #local @INC; # local fails on tied @INC
     my @old_INC = @INC; # because local doesn't work on tied arrays
     @INC = @( sub { $filename = 'seen'; return undef; } );

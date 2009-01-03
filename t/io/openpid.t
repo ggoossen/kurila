@@ -11,7 +11,7 @@ BEGIN {
     require './test.pl';
 }
 
-if ($^O eq 'dos' || $^O eq 'MacOS') {
+if ($^OS_NAME eq 'dos' || $^OS_NAME eq 'MacOS') {
     skip_all("no multitasking");
 }
 
@@ -22,7 +22,7 @@ use Config;
 use signals;
 $^OUTPUT_AUTOFLUSH = 1;
 signals::set_handler(PIPE => 'IGNORE');
-signals::set_handler(HUP => 'IGNORE') if $^O eq 'interix';
+signals::set_handler(HUP => 'IGNORE') if $^OS_NAME eq 'interix';
 
 my $perl = which_perl();
 $perl .= qq[ "-I../lib"];

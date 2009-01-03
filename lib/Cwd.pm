@@ -175,7 +175,7 @@ $VERSION = '3.2701';
 
 @ISA = qw/ Exporter /;
 @EXPORT = qw(cwd getcwd fastcwd fastgetcwd);
-push @EXPORT, < qw(getdcwd) if $^O eq 'MSWin32';
+push @EXPORT, < qw(getdcwd) if $^OS_NAME eq 'MSWin32';
 @EXPORT_OK = qw(chdir abs_path fast_abs_path realpath fast_realpath);
 
 # sys_cwd may keep the builtin command
@@ -184,8 +184,8 @@ push @EXPORT, < qw(getdcwd) if $^O eq 'MSWin32';
 # there is no sense to process the rest of the file.
 # The best choice may be to have this in BEGIN, but how to return from BEGIN?
 
-if ($^O eq 'os2') {
-    local $^W = 0;
+if ($^OS_NAME eq 'os2') {
+    local $^WARNING = 0;
 
     *cwd                = defined &sys_cwd ?? \&sys_cwd !! \&_os2_cwd;
     *getcwd             = \&cwd;
@@ -331,11 +331,11 @@ sub _backtick_pwd {
 # Since some ports may predefine cwd internally (e.g., NT)
 # we take care not to override an existing definition for cwd().
 
-unless (%METHOD_MAP{?$^O}{?cwd} or defined &cwd) {
+unless (%METHOD_MAP{?$^OS_NAME}{?cwd} or defined &cwd) {
     # The pwd command is not available in some chroot(2)'ed environments
     require Config;
     my $sep = Config::config_value("path_sep") || ':';
-    my $os = $^O;  # Protect $^O from tainting
+    my $os = $^OS_NAME;  # Protect $^O from tainting
 
 
     # Try again to find a pwd, this time searching the whole PATH.
@@ -357,10 +357,10 @@ unless (%METHOD_MAP{?$^O}{?cwd} or defined &cwd) {
     }
 }
 
-if ($^O eq 'cygwin') {
+if ($^OS_NAME eq 'cygwin') {
   # We need to make sure cwd() is called with no args, because it's
   # got an arg-less prototype and will die if args are present.
-  local $^W = 0;
+  local $^WARNING = 0;
   my $orig_cwd = \&cwd;
   *cwd = sub { &$orig_cwd() }
 }
@@ -412,7 +412,7 @@ sub fastcwd_ {
 	unshift(@path, $direntry);
     }
     $path = '/' . join('/', @path);
-    if ($^O eq 'apollo') { $path = "/".$path; }
+    if ($^OS_NAME eq 'apollo') { $path = "/".$path; }
     # At this point $path may be tainted (if tainting) and chdir would fail.
     # Untaint it then check that we landed where we started.
     $path =~ m/^(.*)\z/s		# untaint
@@ -433,7 +433,7 @@ if (not defined &fastcwd) { *fastcwd = \&fastcwd_ }
 my $chdir_init = 0;
 
 sub chdir_init {
-    if (env::var('PWD') and $^O ne 'os2' and $^O ne 'dos' and $^O ne 'MSWin32') {
+    if (env::var('PWD') and $^OS_NAME ne 'os2' and $^OS_NAME ne 'dos' and $^OS_NAME ne 'MSWin32') {
 	my@($dd,$di, ...) = @: stat('.');
 	my@($pd,$pi, ...) = @: stat(env::var('PWD'));
 	if (!defined $dd or !defined $pd or $di != $pi or $dd != $pd) {
@@ -442,11 +442,11 @@ sub chdir_init {
     }
     else {
 	my $wd = cwd();
-	$wd = Win32::GetFullPathName($wd) if $^O eq 'MSWin32';
+	$wd = Win32::GetFullPathName($wd) if $^OS_NAME eq 'MSWin32';
 	env::set_var('PWD' => $wd);
     }
     # Strip an automounter prefix (where /tmp_mnt/foo/bar == /foo/bar)
-    if ($^O ne 'MSWin32' and env::var('PWD') =~ m|(/[^/]+(/[^/]+/[^/]+))(.*)|s) {
+    if ($^OS_NAME ne 'MSWin32' and env::var('PWD') =~ m|(/[^/]+(/[^/]+/[^/]+))(.*)|s) {
 	my@(?$pd,?$pi, ...) = @: stat($2);
 	my@(?$dd,?$di, ...) = @: stat($1);
 	if (defined $pd and defined $dd and $di == $pi and $dd == $pd) {
@@ -458,23 +458,23 @@ sub chdir_init {
 
 sub chdir {
     my $newdir = (nelems @_) ?? shift !! '';	# allow for no arg (chdir to HOME dir)
-    $newdir =~ s|///*|/|g unless $^O eq 'MSWin32';
+    $newdir =~ s|///*|/|g unless $^OS_NAME eq 'MSWin32';
     chdir_init() unless $chdir_init;
     my $newpwd;
-    if ($^O eq 'MSWin32') {
+    if ($^OS_NAME eq 'MSWin32') {
 	# get the full path name *before* the chdir()
 	$newpwd = Win32::GetFullPathName($newdir);
     }
 
     return 0 unless CORE::chdir $newdir;
 
-    if ($^O eq 'VMS') {
+    if ($^OS_NAME eq 'VMS') {
 	return env::set_var('PWD' => env::var('DEFAULT'))
     }
-    elsif ($^O eq 'MacOS') {
+    elsif ($^OS_NAME eq 'MacOS') {
 	return env::set_var('PWD' => cwd());
     }
-    elsif ($^O eq 'MSWin32') {
+    elsif ($^OS_NAME eq 'MSWin32') {
 	env::set_var('PWD' => $newpwd);
 	return 1;
     }
@@ -746,10 +746,10 @@ sub _epoc_cwd {
 # Now that all the base-level functions are set up, alias the
 # user-level functions to the right places
 
-if (exists %METHOD_MAP{$^O}) {
-  my %map = %METHOD_MAP{?$^O};
+if (exists %METHOD_MAP{$^OS_NAME}) {
+  my %map = %METHOD_MAP{?$^OS_NAME};
   foreach my $name (keys %map) {
-    local $^W = 0;  # assignments trigger 'subroutine redefined' warning
+    local $^WARNING = 0;  # assignments trigger 'subroutine redefined' warning
     *{Symbol::fetch_glob($name)} = \&{%map{?$name}};
   }
 }

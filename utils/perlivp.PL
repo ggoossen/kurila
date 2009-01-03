@@ -15,9 +15,9 @@ use Cwd;
 # This forces PL files to create target in same directory as PL file.
 # This is so that make depend always knows where to find PL derivatives.
 my $origdir = cwd;
-chdir dirname($0);
-my $file = basename($0, '.PL');
-$file .= '.com' if $^O eq 'VMS';
+chdir dirname($^PROGRAM_NAME);
+my $file = basename($^PROGRAM_NAME, '.PL');
+$file .= '.com' if $^OS_NAME eq 'VMS';
 
 # Create output file.
 open OUT,">", "$file" or die "Can't create $file: $^OS_ERROR";
@@ -33,7 +33,7 @@ $(config_value('startperl'))
         if \$running_under_some_shell;
 !GROK!THIS!
 
-print OUT "\n# perlivp $^V\n";
+print OUT "\n# perlivp $^PERL_VERSION\n";
 
 # In the following, perl variables are not expanded during extraction.
 
@@ -119,7 +119,7 @@ print "## Checking Perl version via variable `\$^V'.\n" if $opt{'p'};
 !NO!SUBS!
 
 print OUT <<"!GROK!THIS!";
-my \$ivp_VERSION = "$^V";
+my \$ivp_VERSION = "$^PERL_VERSION";
 
 !GROK!THIS!
 print OUT <<'!NO!SUBS!';

@@ -14,7 +14,7 @@ use signals;
 
 plan tests => 14;
 
-my $has_echo = $^O ne 'MSWin32';
+my $has_echo = $^OS_NAME ne 'MSWin32';
 my $alarmed = 0;
 sub arm      { $alarmed = 0; alarm(shift) if $has_alarm }
 sub alarmed  { $alarmed = 1 }
@@ -23,8 +23,8 @@ signals::set_handler(ALRM => \&alarmed)                    if $has_alarm;
 if (socket(T, PF_INET, SOCK_STREAM, IPPROTO_TCP)) {
 
   arm(5);
-  my $host = $^O eq 'MacOS' ||
-    ($^O eq 'irix' && config_value('osvers') == 5) ??
+  my $host = $^OS_NAME eq 'MacOS' ||
+    ($^OS_NAME eq 'irix' && config_value('osvers') == 5) ??
                  '127.0.0.1' !! 'localhost';
   my $localhost = inet_aton($host);
 

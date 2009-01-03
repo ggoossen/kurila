@@ -7,10 +7,10 @@
 
 BEGIN { require "./test.pl" }
 
-my $Is_VMS = $^O eq 'VMS';
-my $Is_MSWin32 = $^O eq 'MSWin32';
-my $Is_MacOS = $^O eq 'MacOS';
-my $Is_NetWare = $^O eq 'NetWare';
+my $Is_VMS = $^OS_NAME eq 'VMS';
+my $Is_MSWin32 = $^OS_NAME eq 'MSWin32';
+my $Is_MacOS = $^OS_NAME eq 'MacOS';
+my $Is_NetWare = $^OS_NAME eq 'NetWare';
 env::set_var('PERL5LIB' => "../lib") unless $Is_VMS;
 
 our $i = 0;

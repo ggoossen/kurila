@@ -41,7 +41,7 @@ do {
     my $out = '';
     close STDOUT;
     open STDOUT, '>>', \$out or die;
-    my $self = $0;
+    my $self = $^PROGRAM_NAME;
     unless (-f $self) {
         my @($vol, $dirs, $file) =  File::Spec->splitpath($self);
         my @dirs = File::Spec->splitdir($dirs);
@@ -106,11 +106,11 @@ do {
     ok( -s $Testfile, "eqtime doesn't clear the file being equalized" );
 
     SKIP: do {
-        if ($^O eq 'amigaos' || $^O eq 'os2' || $^O eq 'MSWin32' ||
-            $^O eq 'NetWare' || $^O eq 'dos' || $^O eq 'cygwin'  ||
-            $^O eq 'MacOS'
+        if ($^OS_NAME eq 'amigaos' || $^OS_NAME eq 'os2' || $^OS_NAME eq 'MSWin32' ||
+            $^OS_NAME eq 'NetWare' || $^OS_NAME eq 'dos' || $^OS_NAME eq 'cygwin'  ||
+            $^OS_NAME eq 'MacOS'
            ) {
-            skip( "different file permission semantics on $^O", 3);
+            skip( "different file permission semantics on $^OS_NAME", 3);
         }
 
         # change a file to execute-only
@@ -125,14 +125,14 @@ do {
         ExtUtils::Command::chmod();
 
         is( (@(stat($Testfile))[2] ^&^ 07777) ^&^ 0700,
-            ($^O eq 'vos' ?? 0500 !! 0400), 'change a file to read-only' );
+            ($^OS_NAME eq 'vos' ?? 0500 !! 0400), 'change a file to read-only' );
 
         # change a file to write-only
         @ARGV = @( '0200', $Testfile );
         ExtUtils::Command::chmod();
 
         is( (@(stat($Testfile))[2] ^&^ 07777) ^&^ 0700,
-            ($^O eq 'vos' ?? 0700 !! 0200), 'change a file to write-only' );
+            ($^OS_NAME eq 'vos' ?? 0700 !! 0200), 'change a file to write-only' );
     };
 
     # change a file to read-write
@@ -142,15 +142,15 @@ do {
     is_deeply( \@ARGV, \@orig_argv, 'chmod preserves @ARGV' );
 
     is( (@(stat($Testfile))[2] ^&^ 07777) ^&^ 0700,
-        ($^O eq 'vos' ?? 0700 !! 0600), 'change a file to read-write' );
+        ($^OS_NAME eq 'vos' ?? 0700 !! 0600), 'change a file to read-write' );
 
 
     SKIP: do {
-        if ($^O eq 'amigaos' || $^O eq 'os2' || $^O eq 'MSWin32' ||
-            $^O eq 'NetWare' || $^O eq 'dos' || $^O eq 'cygwin'  ||
-            $^O eq 'MacOS' || $^O eq 'vos'
+        if ($^OS_NAME eq 'amigaos' || $^OS_NAME eq 'os2' || $^OS_NAME eq 'MSWin32' ||
+            $^OS_NAME eq 'NetWare' || $^OS_NAME eq 'dos' || $^OS_NAME eq 'cygwin'  ||
+            $^OS_NAME eq 'MacOS' || $^OS_NAME eq 'vos'
            ) {
-            skip( "different file permission semantics on $^O", 5);
+            skip( "different file permission semantics on $^OS_NAME", 5);
         }
 
         @ARGV = @('testdir');
@@ -169,14 +169,14 @@ do {
         ExtUtils::Command::chmod();
 
         is( (@(stat('testdir'))[2] ^&^ 07777) ^&^ 0700,
-            ($^O eq 'vos' ?? 0500 !! 0400), 'change a dir to read-only' );
+            ($^OS_NAME eq 'vos' ?? 0500 !! 0400), 'change a dir to read-only' );
 
         # change a dir to write-only
         @ARGV = @( '0200', 'testdir' );
         ExtUtils::Command::chmod();
 
         is( (@(stat('testdir'))[2] ^&^ 07777) ^&^ 0700,
-            ($^O eq 'vos' ?? 0700 !! 0200), 'change a dir to write-only' );
+            ($^OS_NAME eq 'vos' ?? 0700 !! 0200), 'change a dir to write-only' );
 
         @ARGV = @('testdir');
         rm_rf;
@@ -232,7 +232,7 @@ do {
         chdir 'ecmddir';
 
         # % means 'match one character' on VMS.  Everything else is ?
-        my $match_char = $^O eq 'VMS' ?? '%' !! '?';
+        my $match_char = $^OS_NAME eq 'VMS' ?? '%' !! '?';
         (@ARGV[0] = $file) =~ s/.\z/$match_char/;
 
         # this should find the file

@@ -23,7 +23,7 @@ use File::Path;
 env::set_var($_, undef) for qw(PREFIX LIB MAKEFLAGS);
 
 my $perl = which_perl();
-my $Is_VMS = $^O eq 'VMS';
+my $Is_VMS = $^OS_NAME eq 'VMS';
 
 # GNV logical interferes with testing
 env::set_var('bin' => '[.bin]') if $Is_VMS;

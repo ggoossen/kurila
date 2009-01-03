@@ -45,8 +45,8 @@ $diff = time - $start_time;
 is( $^EVAL_ERROR->{?description}, "ALARM!\n",             'alarm w/$SIG{ALRM} vs system()' );
 
 do {
-    local our $TODO = "Why does system() block alarm() on $^O?"
-		if $^O eq 'VMS' || $^O eq'MacOS' || $^O eq 'dos';
+    local our $TODO = "Why does system() block alarm() on $^OS_NAME?"
+		if $^OS_NAME eq 'VMS' || $^OS_NAME eq'MacOS' || $^OS_NAME eq 'dos';
     ok( abs($diff - 3) +<= 1,   "   right time (waited $diff secs for 3-sec alarm)" );
 };
 

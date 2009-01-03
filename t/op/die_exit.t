@@ -5,7 +5,7 @@
 #	-- Robin Barker <rmb@cise.npl.co.uk>
 #
 
-if ($^O eq 'mpeix') {
+if ($^OS_NAME eq 'mpeix') {
     print "1..0 # Skip: broken on MPE/iX\n";
     exit 0;
 }
@@ -46,17 +46,17 @@ open(STDERR, ">", "die_exit.err") or die "Can't open temp error file:  $^OS_ERRO
 foreach my $test (1 .. $max) {
     my @($bang, $query, ?$code) =  @{%tests{?$test}};
     $code ||= 'die;';
-    if ($^O eq 'MSWin32' || $^O eq 'NetWare' || $^O eq 'VMS') {
-        system(qq{$^X -e "\$^OS_ERROR = $bang; \$^CHILD_ERROR = $query; $code"});
+    if ($^OS_NAME eq 'MSWin32' || $^OS_NAME eq 'NetWare' || $^OS_NAME eq 'VMS') {
+        system(qq{$^EXECUTABLE_NAME -e "\$^OS_ERROR = $bang; \$^CHILD_ERROR = $query; $code"});
     }
     else {
-        system(qq{$^X -e '\$^OS_ERROR = $bang; \$^CHILD_ERROR = $query; $code'});
+        system(qq{$^EXECUTABLE_NAME -e '\$^OS_ERROR = $bang; \$^CHILD_ERROR = $query; $code'});
     }
     my $exit = $^CHILD_ERROR;
 
     # VMS exit code 44 (SS$_ABORT) is returned if a program dies.  We only get
     # the severity bits, which boils down to 4.  See L<perlvms/$?>.
-    $bang = 4 if $^O eq 'VMS';
+    $bang = 4 if $^OS_NAME eq 'VMS';
 
     printf "# 0x\%04x  0x\%04x  0x\%04x\n", $exit, $bang, $query;
     is($exit, (($bang || ($query >> 8) || 255) << 8));

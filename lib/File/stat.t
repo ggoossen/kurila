@@ -28,7 +28,7 @@ is( $stat->dev, @stat[0], "device number in position 0" );
 
 # On OS/2 (fake) ino is not constant, it is incremented each time
 SKIP: do {
-	skip('inode number is not constant on OS/2', 1) if $^O eq 'os2';
+	skip('inode number is not constant on OS/2', 1) if $^OS_NAME eq 'os2';
 	is( $stat->ino, @stat[1], "inode number in position 1" );
 };
 

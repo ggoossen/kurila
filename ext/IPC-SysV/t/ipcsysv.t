@@ -29,7 +29,7 @@ SIGSYS caught.
 It may be that your kernel does not have SysV IPC configured.
 
 EOM
-    if ($^O eq 'freebsd') {
+    if ($^OS_NAME eq 'freebsd') {
         diag(<<EOM);
 You must have following options in your kernel:
 

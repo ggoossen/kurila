@@ -28,11 +28,11 @@ isa_ok($mm, 'ExtUtils::MM_Any');
 sub try_oneliner {
     my@($code, $switches, $expect, $name) =  @_;
     my $cmd = $mm->oneliner($code, $switches);
-    $cmd =~ s{\$\(ABSPERLRUN\)}{$^X};
+    $cmd =~ s{\$\(ABSPERLRUN\)}{$^EXECUTABLE_NAME};
 
     # VMS likes to put newlines at the end of commands if there isn't
     # one already.
-    $expect =~ s/([^\n])\z/$1\n/ if $^O eq 'VMS';
+    $expect =~ s/([^\n])\z/$1\n/ if $^OS_NAME eq 'VMS';
 
     $TB->is_eq(scalar `$cmd`, $expect, $name) || $TB->diag("oneliner:\n$cmd");
 }

@@ -9,7 +9,7 @@ BEGIN {
 # Cwd::cwd does an implicit "require Win32", but
 # the ../lib directory in @INC will no longer work once
 # we chdir() out of the "t" directory.
-    if ($^O eq 'MSWin32') {
+    if ($^OS_NAME eq 'MSWin32') {
 	require Win32;
 	Win32->import();
     }

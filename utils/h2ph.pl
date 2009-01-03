@@ -530,7 +530,7 @@ sub next_line
 		next READ;
 	    }
 	    if ($in =~ m/^extern inline / && # Inlined assembler.
-		$^O eq 'linux' && $file =~ m!(?:^|/)asm/[^/]+\.h$!) {
+		$^OS_NAME eq 'linux' && $file =~ m!(?:^|/)asm/[^/]+\.h$!) {
 		while ( ~< *IN) {
 		    last if m/^}/;
 		}
@@ -569,7 +569,7 @@ sub next_line
                 $out    .= $1;
             } elsif ($in =~ s/^([^\'\"\\\/]+)//) {
                 $out    .= $1;
-            } elsif ($^O eq 'linux' &&
+            } elsif ($^OS_NAME eq 'linux' &&
                      $file =~ m!(?:^|/)linux/byteorder/pdp_endian\.h$! &&
                      $in   =~ s!\'T KNOW!!) {
                 $out    =~ s!I DON$!I_DO_NOT_KNOW!;

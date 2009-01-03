@@ -200,7 +200,7 @@ sub cmp_ok ($$$@) {
 
     my $pass;
     do {
-        local $^W = 0;
+        local $^WARNING = 0;
         local($^EVAL_ERROR,$^OS_ERROR);   # don't interfere with $@
                         # eval() sometimes resets $!
         $pass = eval "\$got $type \$expected";
@@ -307,7 +307,7 @@ sub skip {
         _print "ok $test # skip: $why\n";
         $test = $test + 1;
     }
-    local $^W = 0;
+    local $^WARNING = 0;
     last SKIP;
 }
 
@@ -319,7 +319,7 @@ sub todo_skip {
         _print "not ok $test # TODO & SKIP: $why\n";
         $test = $test + 1;
     }
-    local $^W = 0;
+    local $^WARNING = 0;
     last TODO;
 }
 
@@ -391,11 +391,11 @@ USE_OK
 #   args     => [ command-line arguments to the perl program ]
 #   verbose  => print the command line
 
-my $is_mswin    = $^O eq 'MSWin32';
-my $is_netware  = $^O eq 'NetWare';
-my $is_macos    = $^O eq 'MacOS';
-my $is_vms      = $^O eq 'VMS';
-my $is_cygwin   = $^O eq 'cygwin';
+my $is_mswin    = $^OS_NAME eq 'MSWin32';
+my $is_netware  = $^OS_NAME eq 'NetWare';
+my $is_macos    = $^OS_NAME eq 'MacOS';
+my $is_vms      = $^OS_NAME eq 'VMS';
+my $is_cygwin   = $^OS_NAME eq 'cygwin';
 
 sub _quote_args {
     my @($runperl, $args) =  @_;
@@ -410,7 +410,7 @@ sub _quote_args {
 
 sub _create_runperl { # Create the string to qx in runperl().
     my %args = %( < @_ );
-    my $runperl = $^X =~ m/\s/ ?? qq{"$^X"} !! $^X;
+    my $runperl = $^EXECUTABLE_NAME =~ m/\s/ ?? qq{"$^EXECUTABLE_NAME"} !! $^EXECUTABLE_NAME;
     #- this allows, for example, to set PERL_RUNPERL_DEBUG=/usr/bin/valgrind
     if (env::var('PERL_RUNPERL_DEBUG')) {
 	$runperl = "$(env::var('PERL_RUNPERL_DEBUG')) $runperl";
@@ -463,14 +463,14 @@ sub _create_runperl { # Create the string to qx in runperl().
 	%args{+stdin} =~ s/\r/\\r/g;
 
 	if ($is_mswin || $is_netware || $is_vms) {
-	    $runperl = qq{$^X -e "print qq(} .
+	    $runperl = qq{$^EXECUTABLE_NAME -e "print qq(} .
 		%args{?stdin} . q{)" | } . $runperl;
 	}
 	elsif ($is_macos) {
 	    # MacOS can only do two processes under MPW at once;
 	    # the test itself is one; we can't do two more, so
 	    # write to temp file
-	    my $stdin = qq{$^X -e 'print qq(} . %args{?stdin} . qq{)' > teststdin; };
+	    my $stdin = qq{$^EXECUTABLE_NAME -e 'print qq(} . %args{?stdin} . qq{)' > teststdin; };
 	    if (%args{?verbose}) {
 		my $stdindisplay = $stdin;
 		$stdindisplay =~ s/\n/\n\#/g;
@@ -480,7 +480,7 @@ sub _create_runperl { # Create the string to qx in runperl().
 	    $runperl .= q{ < teststdin };
 	}
 	else {
-	    $runperl = qq{$^X -e 'print qq(} .
+	    $runperl = qq{$^EXECUTABLE_NAME -e 'print qq(} .
 		%args{?stdin} . q{)' | } . $runperl;
 	}
     }
@@ -553,10 +553,10 @@ sub DIE {
 my $Perl;
 sub which_perl {
     unless (defined $Perl) {
-	$Perl = $^X;
+	$Perl = $^EXECUTABLE_NAME;
 
 	# VMS should have 'perl' aliased properly
-	return $Perl if $^O eq 'VMS';
+	return $Perl if $^OS_NAME eq 'VMS';
 
 	my $exe;
         our %Config;
@@ -591,7 +591,7 @@ sub which_perl {
 	    $Perl .= $exe;
 	}
 
-	warn "which_perl: cannot find $Perl from $^X" unless -f $Perl;
+	warn "which_perl: cannot find $Perl from $^EXECUTABLE_NAME" unless -f $Perl;
 
 	# For subcommands to use.
 	env::set_var('PERLEXE' => $Perl);
@@ -629,7 +629,7 @@ sub _fresh_perl {
     open TEST, ">", "$tmpfile" or die "Cannot open $tmpfile: $^OS_ERROR";
 
     # VMS adjustments
-    if( $^O eq 'VMS' ) {
+    if( $^OS_NAME eq 'VMS' ) {
         $prog =~ s#/dev/null#NL:#;
 
         # VMS file locking
@@ -652,7 +652,7 @@ sub _fresh_perl {
     # various yaccs may or may not capitalize 'syntax'.
     $results =~ s/^(syntax|parse) error/syntax error/mig;
 
-    if ($^O eq 'VMS') {
+    if ($^OS_NAME eq 'VMS') {
         # some tests will trigger VMS messages that won't be expected
         $results =~ s/\n?%[A-Z]+-[SIWEF]-[A-Z]+,.*//;
 

@@ -50,7 +50,7 @@ use lib $Lib_Dir;
 BEGIN { use_ok('Yup') }
 
 BEGIN {
-    if ($^O eq 'MacOS') {
+    if ($^OS_NAME eq 'MacOS') {
 	for (@($Lib_Dir, $Arch_Dir)) {
 	    s|/|:|g;
 	    $_ .= ":" unless m/:$/;
@@ -64,7 +64,7 @@ BEGIN {
     # Yes, %INC uses Unixy filepaths.
     # Not on Mac OS, it doesn't ... it never has, at least.
     my $path = join("/", @($Lib_Dir, 'Yup.pm'));
-    if ($^O eq 'MacOS') {
+    if ($^OS_NAME eq 'MacOS') {
 	$path = $Lib_Dir . 'Yup.pm';
     }
     is( %INC{?'Yup.pm'}, $path,    '%INC set properly' );

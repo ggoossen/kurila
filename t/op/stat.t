@@ -11,20 +11,20 @@ plan tests => 107;
 
 my $Perl = which_perl();
 
-my $Is_Amiga   = $^O eq 'amigaos';
-my $Is_Cygwin  = $^O eq 'cygwin';
-my $Is_Darwin  = $^O eq 'darwin';
-my $Is_Dos     = $^O eq 'dos';
-my $Is_MacOS   = $^O eq 'MacOS';
-my $Is_MPE     = $^O eq 'mpeix';
-my $Is_MSWin32 = $^O eq 'MSWin32';
-my $Is_NetWare = $^O eq 'NetWare';
-my $Is_OS2     = $^O eq 'os2';
-my $Is_Solaris = $^O eq 'solaris';
-my $Is_VMS     = $^O eq 'VMS';
-my $Is_DGUX    = $^O eq 'dgux';
-my $Is_MPRAS   = $^O =~ m/svr4/ && -f '/etc/.relid';
-my $Is_Rhapsody= $^O eq 'rhapsody';
+my $Is_Amiga   = $^OS_NAME eq 'amigaos';
+my $Is_Cygwin  = $^OS_NAME eq 'cygwin';
+my $Is_Darwin  = $^OS_NAME eq 'darwin';
+my $Is_Dos     = $^OS_NAME eq 'dos';
+my $Is_MacOS   = $^OS_NAME eq 'MacOS';
+my $Is_MPE     = $^OS_NAME eq 'mpeix';
+my $Is_MSWin32 = $^OS_NAME eq 'MSWin32';
+my $Is_NetWare = $^OS_NAME eq 'NetWare';
+my $Is_OS2     = $^OS_NAME eq 'os2';
+my $Is_Solaris = $^OS_NAME eq 'solaris';
+my $Is_VMS     = $^OS_NAME eq 'VMS';
+my $Is_DGUX    = $^OS_NAME eq 'dgux';
+my $Is_MPRAS   = $^OS_NAME =~ m/svr4/ && -f '/etc/.relid';
+my $Is_Rhapsody= $^OS_NAME eq 'rhapsody';
 
 my $Is_Dosish  = $Is_Dos || $Is_OS2 || $Is_MSWin32 || $Is_NetWare || $Is_Cygwin;
 
@@ -261,7 +261,7 @@ SKIP: do {
     @DEV = grep { ! m{^\..+$} } @DEV;
 
     # Irix ls -l marks sockets with 'S' while 's' is a 'XENIX semaphore'.
-    if ($^O eq 'irix') {
+    if ($^OS_NAME eq 'irix') {
         $DEV =~ s{^S(.+?)}{s$1}mg;
     }
 
@@ -418,7 +418,7 @@ unlink $tmpfile or print "# unlink failed: $^OS_ERROR\n";
 my @r = @( stat($Curdir) );
 is(nelems @r, 13,   'stat returns full 13 elements');
 
-stat $0;
+stat $^PROGRAM_NAME;
 dies_like( sub { lstat _ },
            qr/^The stat preceding lstat\(\) wasn't an lstat/,
            'lstat _ croaks after stat' );
@@ -426,7 +426,7 @@ dies_like( sub { -l _ },
            qr/^The stat preceding -l _ wasn't an lstat/,
            '-l _ croaks after stat' );
 
-lstat $0;
+lstat $^PROGRAM_NAME;
 try { lstat _ };
 is( "$^EVAL_ERROR", "", "lstat _ ok after lstat" );
 try { -l _ };
@@ -438,7 +438,7 @@ SKIP: do {
     # bug id 20020124.004
     # If we have d_lstat, we should have symlink()
     my $linkname = 'dolzero';
-    symlink $0, $linkname or die "# Can't symlink $0: $^OS_ERROR";
+    symlink $^PROGRAM_NAME, $linkname or die "# Can't symlink $^PROGRAM_NAME: $^OS_ERROR";
     lstat $linkname;
     -T _;
     dies_like(sub { lstat _ },
@@ -457,7 +457,7 @@ unlink $f;
 ok (open(S, ">", "$f"), 'can create tmp file');
 close S or die;
 my @a = @( stat $f );
-print "# time=$^T, stat=($(join ' ',@a))\n";
+print "# time=$^BASETIME, stat=($(join ' ',@a))\n";
 my @b = @(-M _, -A _, -C _);
 print "# -MAC=($(join ' ',@b))\n";
 ok( (-M _) +< 0, 'negative -M works');

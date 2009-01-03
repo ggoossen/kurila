@@ -15,7 +15,7 @@ ok( require filetest, 'required pragma successfully' );
 try { filetest->import('bad subpragma') };
 is( $^EVAL_ERROR->{?description}, $error, 'filetest dies with bad subpragma on import' );
 
-is( $^H ^&^ $hint_bits, 0, 'hint bits not set without pragma in place' );
+is( $^HINT_BITS ^&^ $hint_bits, 0, 'hint bits not set without pragma in place' );
 
 # now try the normal usage
 # can't check $^H here; it's lexically magic (see perlvar)
@@ -24,11 +24,11 @@ use_ok( 'filetest', 'access' );
 
 # and import again, to see it here
 filetest->import('access');
-ok( $^H ^&^ $hint_bits, 'hint bits set with pragma loaded' );
+ok( $^HINT_BITS ^&^ $hint_bits, 'hint bits set with pragma loaded' );
 
 # and now get rid of it
 filetest->unimport('access');
-is( $^H ^&^ $hint_bits, 0, 'hint bits not set with pragma unimported' );
+is( $^HINT_BITS ^&^ $hint_bits, 0, 'hint bits not set with pragma unimported' );
 
 try { filetest->unimport() };
 is( $^EVAL_ERROR->{?description}, $error, 'filetest dies without subpragma on unimport' );

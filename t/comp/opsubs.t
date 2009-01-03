@@ -55,11 +55,11 @@ is( &qr('amper'), "qr-amper", "&qr() is func" );
 # qx operator
 can_ok( 'main', "qx" );
 eval "qx('unqualified'".
-     ($^O eq 'MSWin32' ?? " 2>&1)" !! ")");
+     ($^OS_NAME eq 'MSWin32' ?? " 2>&1)" !! ")");
 SKIP: do {
-    skip("external command not portable on VMS", 1) if $^O eq 'VMS';
+    skip("external command not portable on VMS", 1) if $^OS_NAME eq 'VMS';
     TODO: do {
-	local our $TODO = $^O eq 'MSWin32' ?? "Tainting of PATH not working of Windows" !! $TODO;
+	local our $TODO = $^OS_NAME eq 'MSWin32' ?? "Tainting of PATH not working of Windows" !! $TODO;
 	like( $^EVAL_ERROR->{?description}, qr/^Insecure/, "qx('unqualified') doesn't work" );
     };
 };

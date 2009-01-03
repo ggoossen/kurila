@@ -44,9 +44,9 @@ BEGIN {
 
 $^OUTPUT_AUTOFLUSH=1;
 
-my $Is_VMS      = $^O eq 'VMS';
-my $Is_MacOS    = $^O eq 'MacOS';
-my $Is_Win32    = $^O eq 'MSWin32';
+my $Is_VMS      = $^OS_NAME eq 'VMS';
+my $Is_MacOS    = $^OS_NAME eq 'MacOS';
+my $Is_Win32    = $^OS_NAME eq 'MSWin32';
 
 # When in doubt, skip.
 skip_all("MacOS")    if $Is_MacOS;
@@ -121,23 +121,23 @@ sub test_inherited {
     is( @lines[1], "tmpfile1 line 1\n",      'child stdout: line 1' );
 }
 
-$^F == 2 or print STDERR "# warning: \$^F is $^F (not 2)\n";
+$^SYSTEM_FD_MAX == 2 or print STDERR "# warning: \$^F is $^SYSTEM_FD_MAX (not 2)\n";
 
 # Should not be able to inherit > $^F in the default case.
 open FHPARENT2, "<", "$tmpfile2" or die "open '$tmpfile2': $^OS_ERROR";
 my $parentfd2 = fileno FHPARENT2;
 defined $parentfd2 or die "fileno: $^OS_ERROR";
-cmp_ok( $parentfd2, '+>', $^F, "parent open fd=$parentfd2 (\$^F=$^F)" );
+cmp_ok( $parentfd2, '+>', $^SYSTEM_FD_MAX, "parent open fd=$parentfd2 (\$^F=$^SYSTEM_FD_MAX)" );
 test_not_inherited($parentfd2);
 close FHPARENT2 or die "close '$tmpfile2': $^OS_ERROR";
 
 # Should be able to inherit $^F after setting to $parentfd2
 # Need to set $^F before open because close-on-exec set at time of open.
-$^F = $parentfd2;
+$^SYSTEM_FD_MAX = $parentfd2;
 open FHPARENT1, "<", "$tmpfile1" or die "open '$tmpfile1': $^OS_ERROR";
 my $parentfd1 = fileno FHPARENT1;
 defined $parentfd1 or die "fileno: $^OS_ERROR";
-cmp_ok( $parentfd1, '+<=', $^F, "parent open fd=$parentfd1 (\$^F=$^F)" );
+cmp_ok( $parentfd1, '+<=', $^SYSTEM_FD_MAX, "parent open fd=$parentfd1 (\$^F=$^SYSTEM_FD_MAX)" );
 test_inherited($parentfd1);
 close FHPARENT1 or die "close '$tmpfile1': $^OS_ERROR";
 
@@ -146,18 +146,18 @@ open FHPARENT1, "<", "$tmpfile1" or die "open '$tmpfile1': $^OS_ERROR";
 open FHPARENT2, "<", "$tmpfile2" or die "open '$tmpfile2': $^OS_ERROR";
 $parentfd2 = fileno FHPARENT2;
 defined $parentfd2 or die "fileno: $^OS_ERROR";
-cmp_ok( $parentfd2, '+>', $^F, "parent open fd=$parentfd2 (\$^F=$^F)" );
+cmp_ok( $parentfd2, '+>', $^SYSTEM_FD_MAX, "parent open fd=$parentfd2 (\$^F=$^SYSTEM_FD_MAX)" );
 test_not_inherited($parentfd2);
 close FHPARENT2 or die "close '$tmpfile2': $^OS_ERROR";
 close FHPARENT1 or die "close '$tmpfile1': $^OS_ERROR";
 
 # ... and now you can inherit after incrementing.
-$^F = $parentfd2;
+$^SYSTEM_FD_MAX = $parentfd2;
 open FHPARENT2, "<", "$tmpfile2" or die "open '$tmpfile2': $^OS_ERROR";
 open FHPARENT1, "<", "$tmpfile1" or die "open '$tmpfile1': $^OS_ERROR";
 $parentfd1 = fileno FHPARENT1;
 defined $parentfd1 or die "fileno: $^OS_ERROR";
-cmp_ok( $parentfd1, '+<=', $^F, "parent open fd=$parentfd1 (\$^F=$^F)" );
+cmp_ok( $parentfd1, '+<=', $^SYSTEM_FD_MAX, "parent open fd=$parentfd1 (\$^F=$^SYSTEM_FD_MAX)" );
 test_inherited($parentfd1);
 close FHPARENT1 or die "close '$tmpfile1': $^OS_ERROR";
 close FHPARENT2 or die "close '$tmpfile2': $^OS_ERROR";

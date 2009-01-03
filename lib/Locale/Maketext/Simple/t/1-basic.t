@@ -12,7 +12,7 @@ ok(Locale::Maketext::Simple->VERSION);
 ok(loc("Just [_1] Perl [_2]", < qw(another hacker)), "Just another Perl hacker");
 
 do {
-    local $^W; # shuts up 'redefined' warnings
+    local $^WARNING; # shuts up 'redefined' warnings
     Locale::Maketext::Simple->reload_loc;
     Locale::Maketext::Simple->import(Style => 'gettext');
 };

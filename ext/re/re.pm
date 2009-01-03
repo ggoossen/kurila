@@ -104,10 +104,10 @@ sub _load_unload {
 	    # in C resolves to a structure containing the regex
 	    # hooks. Setting it to a random integer will guarantee
 	    # segfaults.
-	    %^H{+regcomp} = install();
+	    $^HINTS{+regcomp} = install();
         }
     } else {
-        delete %^H{regcomp};
+        delete $^HINTS{regcomp};
     }
 }
 
@@ -163,12 +163,12 @@ sub bits {
 
 sub import {
     shift;
-    $^H ^|^= bits(1, < @_);
+    $^HINT_BITS ^|^= bits(1, < @_);
 }
 
 sub unimport {
     shift;
-    $^H ^&^= ^~^ bits(0, < @_);
+    $^HINT_BITS ^&^= ^~^ bits(0, < @_);
 }
 
 1;

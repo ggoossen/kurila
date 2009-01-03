@@ -12,12 +12,12 @@ skip($^EVAL_ERROR ?? 'no IO::String' !! '', sub {
     my $pod_string = 'some I<silly> text';
     my $handle = 'IO::String'->new( \$pod_string );
     my $parser = 'Pod::Parser'->new();
-    $parser->parse_from_file( $0, $handle );
+    $parser->parse_from_file( $^PROGRAM_NAME, $handle );
   };
   # free the reference
   do {
     my $parser = 'Pod::Parser'->new();
-    $parser->parse_from_file( $0, < 'File::Spec'->devnull );
+    $parser->parse_from_file( $^PROGRAM_NAME, < 'File::Spec'->devnull );
   };
   1;
 });

@@ -10,7 +10,7 @@ our $VERSION = '6.44';
 
 sub Mksymlists {
     my@(%spec) =@( %( < @_ ));
-    my@($osname) = $^O;
+    my@($osname) = $^OS_NAME;
 
     croak("Insufficient information specified to Mksymlists")
         unless ( %spec{?NAME} or

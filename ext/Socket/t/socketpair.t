@@ -109,15 +109,15 @@ ok (shutdown(LEFT, SHUT_WR), "shutdown left for writing");
 # This will hang forever if eof is buggy, and alarm doesn't interrupt system
 # Calls. Hence the child process minder.
 SKIP: do {
-  skip "SCO Unixware / OSR have a bug with shutdown",2 if $^O =~ m/^(?:svr|sco)/;
+  skip "SCO Unixware / OSR have a bug with shutdown",2 if $^OS_NAME =~ m/^(?:svr|sco)/;
   signals::temp_set_handler(ALRM => sub { warn "EOF on right took over 3 seconds" });
-  local $TODO = "Known problems with unix sockets on $^O"
-      if $^O eq 'hpux'   || $^O eq 'super-ux';
+  local $TODO = "Known problems with unix sockets on $^OS_NAME"
+      if $^OS_NAME eq 'hpux'   || $^OS_NAME eq 'super-ux';
   alarm 3;
   $^OS_ERROR = 0;
   ok (eof RIGHT, "right is at EOF");
-  local $TODO = "Known problems with unix sockets on $^O"
-      if $^O eq 'unicos' || $^O eq 'unicosmk';
+  local $TODO = "Known problems with unix sockets on $^OS_NAME"
+      if $^OS_NAME eq 'unicos' || $^OS_NAME eq 'unicosmk';
   is ($^OS_ERROR, '', 'and $! should report no error');
   alarm 60;
 };
@@ -164,8 +164,8 @@ ok (close RIGHT, "close right");
 # guarantee that the stack won't drop a UDP packet, even if it is for localhost.
 
 SKIP: do {
-  skip "No usable SOCK_DGRAM for socketpair", 24 if ($^O =~ m/^(MSWin32|os2)\z/);
-  local $TODO = "socketpair not supported on $^O" if $^O eq 'nto';
+  skip "No usable SOCK_DGRAM for socketpair", 24 if ($^OS_NAME =~ m/^(MSWin32|os2)\z/);
+  local $TODO = "socketpair not supported on $^OS_NAME" if $^OS_NAME eq 'nto';
 
 ok (socketpair (LEFT, 'RIGHT', AF_UNIX, SOCK_DGRAM, PF_UNSPEC),
     "socketpair (LEFT, RIGHT, AF_UNIX, SOCK_DGRAM, PF_UNSPEC)")
@@ -206,7 +206,7 @@ ok (shutdown(LEFT, 1), "shutdown left for writing");
 # but for a datagram socket there's no way it can know nothing will ever be
 # sent
 SKIP: do {
-  skip "$^O does length 0 udp reads", 2 if ($^O eq 'os390');
+  skip "$^OS_NAME does length 0 udp reads", 2 if ($^OS_NAME eq 'os390');
 
   my $alarmed = 0;
   signals::temp_set_handler(ALRM => sub { $alarmed = 1; });

@@ -1004,7 +1004,7 @@ sub skip {
         $tb->skip($why);
     }
 
-    local $^W = 0;
+    local $^WARNING = 0;
     last SKIP;
 }
 
@@ -1085,7 +1085,7 @@ sub todo_skip {
         $tb->todo_skip($why);
     }
 
-    local $^W = 0;
+    local $^WARNING = 0;
     last TODO;
 }
 
@@ -1207,7 +1207,7 @@ sub _deep_check {
 
     do {
         # Quiet uninitialized value warnings when comparing undefs.
-        local $^W = 0; 
+        local $^WARNING = 0; 
 
         if( %Refs_Seen{?ref::address($e1)} ) {
             return %Refs_Seen{?ref::address($e1)} eq ref::address($e2);

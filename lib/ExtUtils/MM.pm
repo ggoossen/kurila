@@ -48,25 +48,25 @@ sub _is_win95 {
 }
 
 my %Is = %( () );
-%Is{+VMS}    = $^O eq 'VMS';
-%Is{+OS2}    = $^O eq 'os2';
-%Is{+MacOS}  = $^O eq 'MacOS';
-if( $^O eq 'MSWin32' ) {
+%Is{+VMS}    = $^OS_NAME eq 'VMS';
+%Is{+OS2}    = $^OS_NAME eq 'os2';
+%Is{+MacOS}  = $^OS_NAME eq 'MacOS';
+if( $^OS_NAME eq 'MSWin32' ) {
     ( _is_win95() ?? %Is{+Win95} !! %Is{+Win32} ) = 1;
 }
-%Is{+UWIN}   = $^O =~ m/^uwin(-nt)?$/;
-%Is{+Cygwin} = $^O eq 'cygwin';
+%Is{+UWIN}   = $^OS_NAME =~ m/^uwin(-nt)?$/;
+%Is{+Cygwin} = $^OS_NAME eq 'cygwin';
 %Is{+NW5}    = %Config{?osname} eq 'NetWare';  # intentional
-%Is{+BeOS}   = $^O =~ m/beos/i;    # XXX should this be that loose?
-%Is{+DOS}    = $^O eq 'dos';
+%Is{+BeOS}   = $^OS_NAME =~ m/beos/i;    # XXX should this be that loose?
+%Is{+DOS}    = $^OS_NAME eq 'dos';
 if( %Is{?NW5} ) {
-    $^O = 'NetWare';
+    $^OS_NAME = 'NetWare';
     delete %Is{Win32};
 }
-%Is{+VOS}    = $^O eq 'vos';
-%Is{+QNX}    = $^O eq 'qnx';
-%Is{+AIX}    = $^O eq 'aix';
-%Is{+Darwin} = $^O eq 'darwin';
+%Is{+VOS}    = $^OS_NAME eq 'vos';
+%Is{+QNX}    = $^OS_NAME eq 'qnx';
+%Is{+AIX}    = $^OS_NAME eq 'aix';
+%Is{+Darwin} = $^OS_NAME eq 'darwin';
 
 %Is{+Unix}   = !grep { $_ } values %Is;
 

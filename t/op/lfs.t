@@ -56,15 +56,15 @@ $^OUTPUT_AUTOFLUSH = 1;
 print "# checking whether we have sparse files...\n";
 
 # Known have-nots.
-if ($^O eq 'MSWin32' || $^O eq 'NetWare' || $^O eq 'VMS') {
-    print "1..0 # Skip: no sparse files in $^O\n";
+if ($^OS_NAME eq 'MSWin32' || $^OS_NAME eq 'NetWare' || $^OS_NAME eq 'VMS') {
+    print "1..0 # Skip: no sparse files in $^OS_NAME\n";
     bye();
 }
 
 # Known haves that have problems running this test
 # (for example because they do not support sparse files, like UNICOS)
-if ($^O eq 'unicos') {
-    print "1..0 # Skip: no sparse files in $^O, unable to test large files\n";
+if ($^OS_NAME eq 'unicos') {
+    print "1..0 # Skip: no sparse files in $^OS_NAME, unable to test large files\n";
     bye();
 }
 

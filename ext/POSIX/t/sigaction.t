@@ -4,8 +4,8 @@ BEGIN{
 	# Don't do anything if POSIX is missing, or sigaction missing.
 	use Config;
 	eval 'use POSIX';
-	if($^EVAL_ERROR || $^O eq 'MSWin32' || $^O eq 'NetWare' || $^O eq 'dos' ||
-	   $^O eq 'MacOS' || ($^O eq 'VMS' && ! config_value('d_sigaction'))) {
+	if($^EVAL_ERROR || $^OS_NAME eq 'MSWin32' || $^OS_NAME eq 'NetWare' || $^OS_NAME eq 'dos' ||
+	   $^OS_NAME eq 'MacOS' || ($^OS_NAME eq 'VMS' && ! config_value('d_sigaction'))) {
 		print "1..0\n";
 		exit 0;
 	}
@@ -15,7 +15,7 @@ use Test::More tests => 27;
 
 our ($bad, $bad7, $ok10, $bad18, $ok);
 
-$^W=1;
+$^WARNING=1;
 
 sub IGNORE {
 	$bad7=1;
@@ -52,8 +52,8 @@ is($oldaction->{?HANDLER}, \&foo);
 ok($oldaction->{?MASK}->ismember(SIGUSR1), "SIGUSR1 ismember MASK");
 
 SKIP: do {
-    skip("sigaction() thinks different in $^O", 1)
-	if $^O eq 'linux' || $^O eq 'unicos';
+    skip("sigaction() thinks different in $^OS_NAME", 1)
+	if $^OS_NAME eq 'linux' || $^OS_NAME eq 'unicos';
     is($oldaction->{?FLAGS}, 0);
 };
 
@@ -69,7 +69,7 @@ is(signals::handler("HUP"), undef);
 $newaction=POSIX::SigAction->new(sub { $ok10=1; });
 sigaction(SIGHUP, $newaction);
 do {
-	local($^W)=0;
+	local($^WARNING)=0;
 	kill 'HUP', $^PID;
 };
 ok($ok10, "SIGHUP handler called");
@@ -112,13 +112,13 @@ try {
 ok($^EVAL_ERROR, "any object not good as new action");
 
 SKIP: do {
-    skip("SIGCONT not trappable in $^O", 1)
-	if ($^O eq 'VMS');
+    skip("SIGCONT not trappable in $^OS_NAME", 1)
+	if ($^OS_NAME eq 'VMS');
     $newaction=POSIX::SigAction->new(sub { $ok10=1; });
     if (try { SIGCONT; 1 }) {
 	sigaction(SIGCONT, POSIX::SigAction->new('DEFAULT'));
 	do {
-	    local($^W)=0;
+	    local($^WARNING)=0;
 	    kill 'CONT', $^PID;
 	};
     }

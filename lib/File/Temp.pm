@@ -144,7 +144,7 @@ use File::Path < qw/ rmtree /;
 use Fcntl v1.03;
 use IO::Seekable; # For SEEK_*
 use Errno < qw|EEXIST|;
-require VMS::Stdio if $^O eq 'VMS';
+require VMS::Stdio if $^OS_NAME eq 'VMS';
 
 # pre-emptively load Carp::Heavy. If we don't when we run out of file
 # handles and attempt to call croak() we get an error message telling
@@ -229,7 +229,7 @@ use constant HIGH     => 2;
 my $OPENFLAGS = O_CREAT ^|^ O_EXCL ^|^ O_RDWR;
 my $LOCKFLAG;
 
-unless ($^O eq 'MacOS') {
+unless ($^OS_NAME eq 'MacOS') {
   for my $oflag (qw/ NOFOLLOW BINARY LARGEFILE NOINHERIT /) {
     my @($bit, $func) = @(0, "Fcntl::O_" . $oflag);
     $OPENFLAGS ^|^= $bit if try {
@@ -256,7 +256,7 @@ unless ($^O eq 'MacOS') {
 # this by using a second open flags variable
 
 my $OPENTEMPFLAGS = $OPENFLAGS;
-unless ($^O eq 'MacOS') {
+unless ($^OS_NAME eq 'MacOS') {
   for my $oflag (qw/ TEMPORARY /) {
     my @($bit, $func) = @(0, "Fcntl::O_" . $oflag);
     local($^EVAL_ERROR);
@@ -411,7 +411,7 @@ sub _gettemp {
       $parent = File::Spec->curdir;
     } else {
 
-      if ($^O eq 'VMS') {  # need volume to avoid relative dir spec
+      if ($^OS_NAME eq 'VMS') {  # need volume to avoid relative dir spec
         $parent = File::Spec->catdir($volume, < @dirs[[0..((nelems @dirs)-1)-1]]);
         $parent = 'sys$disk:[]' if $parent eq '';
       } else {
@@ -453,7 +453,7 @@ sub _gettemp {
     return ();
   }
 
-  if ( $^O eq 'cygwin' ) {
+  if ( $^OS_NAME eq 'cygwin' ) {
       # No-op special case. Under Windows Cygwin (FAT32) the directory
       # permissions cannot be trusted. Directories are always
       # writable.
@@ -493,11 +493,11 @@ sub _gettemp {
       # Try to make sure this will be marked close-on-exec
       # XXX: Win32 doesn't respect this, nor the proper fcntl,
       #      but may have O_NOINHERIT. This may or may not be in Fcntl.
-      local $^F = 2;
+      local $^SYSTEM_FD_MAX = 2;
 
       # Attempt to open the file
       my $open_success = undef;
-      if ( $^O eq 'VMS' and %options{?"unlink_on_close"} && !$KEEP_ALL) {
+      if ( $^OS_NAME eq 'VMS' and %options{?"unlink_on_close"} && !$KEEP_ALL) {
         # make it auto delete on close by setting FAB$V_DLT bit
 	$fh = VMS::Stdio::vmssysopen($path, $OPENFLAGS, 0600, 'fop=dlt');
 	$open_success = $fh;
@@ -668,7 +668,7 @@ sub _is_safe {
     $$err_ref = "stat(path) returned no values";
     return 0;
   };
-  return 1 if $^O eq 'VMS';  # owner delete control at file level
+  return 1 if $^OS_NAME eq 'VMS';  # owner delete control at file level
 
   # Check to see whether owner is neither superuser (or a system uid) nor me
   # Use the effective uid from the $> variable
@@ -724,7 +724,7 @@ sub _is_verysafe {
 
   my $path = shift;
   print "_is_verysafe testing $path\n" if $DEBUG;
-  return 1 if $^O eq 'VMS';  # owner delete control at file level
+  return 1 if $^OS_NAME eq 'VMS';  # owner delete control at file level
 
   my $err_ref = shift;
 
@@ -794,7 +794,7 @@ sub _is_verysafe {
 
 sub _can_unlink_opened_file {
 
-  if ($^O eq 'MSWin32' || $^O eq 'os2' || $^O eq 'VMS' || $^O eq 'dos' || $^O eq 'MacOS') {
+  if ($^OS_NAME eq 'MSWin32' || $^OS_NAME eq 'os2' || $^OS_NAME eq 'VMS' || $^OS_NAME eq 'dos' || $^OS_NAME eq 'MacOS') {
     return 0;
   } else {
     return 1;
@@ -818,7 +818,7 @@ sub _can_do_level {
   return 1 if $level == STANDARD;
 
   # Currently, the systems that can do HIGH or MEDIUM are identical
-  if ( $^O eq 'MSWin32' || $^O eq 'os2' || $^O eq 'cygwin' || $^O eq 'dos' || $^O eq 'MacOS' || $^O eq 'mpeix') {
+  if ( $^OS_NAME eq 'MSWin32' || $^OS_NAME eq 'os2' || $^OS_NAME eq 'cygwin' || $^OS_NAME eq 'dos' || $^OS_NAME eq 'MacOS' || $^OS_NAME eq 'mpeix') {
     return 0;
   } else {
     return 1;
@@ -923,13 +923,13 @@ do {
 
 	# Directory exists so store it
 	# first on VMS turn []foo into [.foo] for rmtree
-	$fname = VMS::Filespec::vmspath($fname) if $^O eq 'VMS';
+	$fname = VMS::Filespec::vmspath($fname) if $^OS_NAME eq 'VMS';
 	%dirs_to_unlink{+$^PID} = \@() 
 	  unless exists %dirs_to_unlink{$^PID};
 	push (@{ %dirs_to_unlink{$^PID} }, $fname);
 
       } else {
-	carp "Request to remove directory $fname could not be completed since it does not exist!\n" if $^W;
+	carp "Request to remove directory $fname could not be completed since it does not exist!\n" if $^WARNING;
       }
 
     } else {
@@ -942,7 +942,7 @@ do {
 	push(@{ %files_to_unlink{$^PID} }, \@($fh, $fname));
 
       } else {
-	carp "Request to remove file $fname could not be completed since it is not there!\n" if $^W;
+	carp "Request to remove file $fname could not be completed since it is not there!\n" if $^WARNING;
       }
 
     }
@@ -1293,11 +1293,11 @@ sub tempfile {
   if (! %options{?"OPEN"}) {
 
     warn "tempfile(): temporary filename requested but not opened.\nPossibly unsafe, consider using tempfile() with OPEN set to true\n"
-      if $^W;
+      if $^WARNING;
 
   }
 
-  if (%options{?"DIR"} and $^O eq 'VMS') {
+  if (%options{?"DIR"} and $^OS_NAME eq 'VMS') {
 
       # on VMS turn []foo into [.foo] for concatenation
       %options{+"DIR"} = VMS::Filespec::vmspath(%options{?"DIR"});
@@ -1474,7 +1474,7 @@ sub tempdir  {
       # Strip parent directory from the filename
       #
       # There is no filename at the end
-      $template = VMS::Filespec::vmspath($template) if $^O eq 'VMS';
+      $template = VMS::Filespec::vmspath($template) if $^OS_NAME eq 'VMS';
       my @($volume, $directories, _) =  File::Spec->splitpath( $template, 1);
 
       # Last directory is then our template
@@ -1511,11 +1511,11 @@ sub tempdir  {
   # Create the directory
   my $tempdir;
   my $suffixlen = 0;
-  if ($^O eq 'VMS') {  # dir names can end in delimiters
+  if ($^OS_NAME eq 'VMS') {  # dir names can end in delimiters
     $template =~ m/([\.\]:>]+)$/;
     $suffixlen = length($1);
   }
-  if ( ($^O eq 'MacOS') && (substr($template, -1) eq ':') ) {
+  if ( ($^OS_NAME eq 'MacOS') && (substr($template, -1) eq ':') ) {
     # dir name has a trailing ':'
     ++$suffixlen;
   }
@@ -1650,11 +1650,11 @@ sub mkdtemp {
 
   my $template = shift;
   my $suffixlen = 0;
-  if ($^O eq 'VMS') {  # dir names can end in delimiters
+  if ($^OS_NAME eq 'VMS') {  # dir names can end in delimiters
     $template =~ m/([\.\]:>]+)$/;
     $suffixlen = length($1);
   }
-  if ( ($^O eq 'MacOS') && (substr($template, -1) eq ':') ) {
+  if ( ($^OS_NAME eq 'MacOS') && (substr($template, -1) eq ':') ) {
     # dir name has a trailing ':'
     ++$suffixlen;
   }
@@ -1925,7 +1925,7 @@ sub unlink0 {
     #   on Win9x the link count remains 1
     # On NFS the link count may still be 1 but we cant know that
     # we are on NFS
-    return  @( @fh[3] == 0 or $^O eq 'cygwin' ?? 1 !! 0);
+    return  @( @fh[3] == 0 or $^OS_NAME eq 'cygwin' ?? 1 !! 0);
 
   } else {
     _deferred_unlink($fh, $path, 0);
@@ -1975,20 +1975,20 @@ sub cmpstat {
   # unless we upgrade to 5.006 minimum requirement
   my @fh;
   do {
-    local ($^W) = 0;
+    local ($^WARNING) = 0;
     @fh = @( stat $fh );
   };
   return unless (nelems @fh);
 
-  if (@fh[3] +> 1 && $^W) {
-    carp "unlink0: fstat found too many links; SB=$(join ' ',@fh)" if $^W;
+  if (@fh[3] +> 1 && $^WARNING) {
+    carp "unlink0: fstat found too many links; SB=$(join ' ',@fh)" if $^WARNING;
   }
 
   # Stat the path
   my @path = @( stat $path );
 
   unless (nelems @path) {
-    carp "unlink0: $path is gone already" if $^W;
+    carp "unlink0: $path is gone already" if $^WARNING;
     return;
   }
 
@@ -2003,15 +2003,15 @@ sub cmpstat {
   # Cannot simply compare all members of the stat return
   # Select the ones we can use
   my @okstat =0..((nelems @fh)-1);  # Use all by default
-  if ($^O eq 'MSWin32') {
+  if ($^OS_NAME eq 'MSWin32') {
     @okstat = @(1,2,3,4,5,7,8,9,10);
-  } elsif ($^O eq 'os2') {
+  } elsif ($^OS_NAME eq 'os2') {
     @okstat = @(0, < 2..((nelems @fh)-1));
-  } elsif ($^O eq 'VMS') { # device and file ID are sufficient
+  } elsif ($^OS_NAME eq 'VMS') { # device and file ID are sufficient
     @okstat = @(0, 1);
-  } elsif ($^O eq 'dos') {
+  } elsif ($^OS_NAME eq 'dos') {
     @okstat = @(0, <2..7, <11..((nelems @fh)-1));
-  } elsif ($^O eq 'mpeix') {
+  } elsif ($^OS_NAME eq 'mpeix') {
     @okstat = @( <0..4, <8..10);
   }
 
@@ -2175,7 +2175,7 @@ do {
     if ((nelems @_)) {
       my $level = shift;
       if (($level != STANDARD) && ($level != MEDIUM) && ($level != HIGH)) {
-	carp "safe_level: Specified level ($level) not STANDARD, MEDIUM or HIGH - ignoring\n" if $^W;
+	carp "safe_level: Specified level ($level) not STANDARD, MEDIUM or HIGH - ignoring\n" if $^WARNING;
       } else {
 	# Check that we are allowed to change level
 	# Silently ignore if we can not.
@@ -2209,7 +2209,7 @@ The value is only relevant when C<safe_level> is set to MEDIUM or higher.
 
 do {
   my $TopSystemUID = 10;
-  $TopSystemUID = 197108 if $^O eq 'interix'; # "Administrator"
+  $TopSystemUID = 197108 if $^OS_NAME eq 'interix'; # "Administrator"
   sub top_system_uid {
     my $self = shift;
     if ((nelems @_)) {

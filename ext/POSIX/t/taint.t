@@ -18,7 +18,7 @@ my $testfd;
 # Sources of taint:
 #   The empty tainted value, for tainting strings
 
-my $TAINT = substr($^X, 0, 0);
+my $TAINT = substr($^EXECUTABLE_NAME, 0, 0);
 
 my $file = 'TEST';
 

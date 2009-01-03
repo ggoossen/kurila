@@ -198,7 +198,7 @@ sub _push_tags {
 	< map { $export_tags->{?$_} ?? < @{$export_tags->{?$_}} 
                                  !! do { push(@nontag,$_); $_ } }
  @(		(nelems @$syms) ?? < @$syms !! < keys %$export_tags));
-    if ((nelems @nontag) and $^W) {
+    if ((nelems @nontag) and $^WARNING) {
 	# This may change to a die one day
 	warn(join(", ", @nontag)." are not tags of $pkg");
     }

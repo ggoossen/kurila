@@ -21,7 +21,7 @@ if (open(CF, "<", $CF)) {
 
     close(CF);
 
-    die qq[$0: failed to find casefoldings from "$CF"\n] unless @CF;
+    die qq[$^PROGRAM_NAME: failed to find casefoldings from "$CF"\n] unless @CF;
 
     print "1..", (nelems @CF), "\n";
 
@@ -45,5 +45,5 @@ if (open(CF, "<", $CF)) {
 	    "not ok $i \# $todo - $code - $name - $mapping - $status - $t0 $t1 $t2 $t3 $t4 $t5 $t6 $t7\n";
     }
 } else {
-    die qq[$0: failed to open "$CF": $^OS_ERROR\n];
+    die qq[$^PROGRAM_NAME: failed to open "$CF": $^OS_ERROR\n];
 }

@@ -78,7 +78,7 @@ do {
     ok(length $a == 998);
 };
 
-$^W = 1;
+$^WARNING = 1;
 
 my $warnings = 0;
 

@@ -53,7 +53,7 @@ not ok 1
 OUT
 
     My::Test::ok($$err eq <<ERR) || print $$err;
-#   Failed test at $0 line 45.
+#   Failed test at $^PROGRAM_NAME line 45.
 # Looks like you failed 1 test of 1.
 ERR
 

@@ -116,7 +116,7 @@ ok "\N{ESCAPE}" eq "\e";
 
 ok "\N{NULL}" eq "\c@";
 
-if ($^O eq 'MacOS')
+if ($^OS_NAME eq 'MacOS')
 {
 	ok "\N{CARRIAGE RETURN (CR)}" eq "\n";
 	ok "\N{CARRIAGE RETURN}" eq "\n";
@@ -202,9 +202,9 @@ for ( @prgs) {
     $res =~ s/[\r\n]+$//;
     $res =~ s/tmp\d+/-/g;			# fake $prog from STDIN
     $res =~ s/\n%[A-Z]+-[SIWEF]-.*$//		# clip off DCL status msg
-	if $^O eq "VMS";
+	if $^OS_NAME eq "VMS";
     $exp =~ s/[\r\n]+$//;
-    if ($^O eq "MacOS") {
+    if ($^OS_NAME eq "MacOS") {
 	$exp =~ s{(\./)?abc\.pm}{:abc.pm}g;
 	$exp =~ s{./abc}        {:abc}g;
 	}

@@ -4,8 +4,8 @@ use File::Spec;
 use Cwd;
 
 my $origdir = cwd;
-chdir dirname($0);
-my $file = basename($0, '.PL');
+chdir dirname($^PROGRAM_NAME);
+my $file = basename($^PROGRAM_NAME, '.PL');
 $file =~ s!_(pm)$!.$1!i;
 
 my $useConfig;

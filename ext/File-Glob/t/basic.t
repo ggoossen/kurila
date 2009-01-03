@@ -10,7 +10,7 @@ use Cwd ();
 env::set_var('PATH' => "/bin");
 env::set_var($_, undef) for qw(BASH_ENV CDPATH ENV IFS);
 my @correct = @( () );
-if (opendir(D, $^O eq "MacOS" ?? ":" !! ".")) {
+if (opendir(D, $^OS_NAME eq "MacOS" ?? ":" !! ".")) {
    @correct = grep { !m/^\./ } sort @( readdir(D));
    closedir D;
 }
@@ -26,8 +26,8 @@ if (GLOB_ERROR) {
 # should return a list with one item, and not set ERROR
 SKIP: do {
     my ($name, $home);
-    skip $^O, 1 if $^O eq 'MSWin32' || $^O eq 'NetWare' || $^O eq 'VMS'
-	|| $^O eq 'os2' || $^O eq 'beos';
+    skip $^OS_NAME, 1 if $^OS_NAME eq 'MSWin32' || $^OS_NAME eq 'NetWare' || $^OS_NAME eq 'VMS'
+	|| $^OS_NAME eq 'os2' || $^OS_NAME eq 'beos';
     skip "Can't find user for $^EUID: $^EVAL_ERROR", 1 unless try {
 	@($name, $home) =  @(getpwuid($^EUID))[[@:0,7]];
 	1;
@@ -58,15 +58,15 @@ if (GLOB_ERROR) {
 # XXX since errfunc is NULL on win32, this test is not valid there
 @a = bsd_glob("asdfasdf", 0);
 SKIP: do {
-    skip $^O, 1 if $^O eq 'MSWin32' || $^O eq 'NetWare';
+    skip $^OS_NAME, 1 if $^OS_NAME eq 'MSWin32' || $^OS_NAME eq 'NetWare';
     is_deeply(\@a, \@());
 };
 
 # check bad protections
 # should return an empty list, and set ERROR
 SKIP: do {
-    skip $^O, 2 if $^O eq 'mpeix' or $^O eq 'MSWin32' or $^O eq 'NetWare'
-	or $^O eq 'os2' or $^O eq 'VMS' or $^O eq 'cygwin';
+    skip $^OS_NAME, 2 if $^OS_NAME eq 'mpeix' or $^OS_NAME eq 'MSWin32' or $^OS_NAME eq 'NetWare'
+	or $^OS_NAME eq 'os2' or $^OS_NAME eq 'VMS' or $^OS_NAME eq 'cygwin';
     skip "AFS", 2 if Cwd::cwd() =~ m#^$(config_value('afsroot'))#s;
     skip "running as root", 2 if not $^EUID;
 
@@ -74,7 +74,7 @@ SKIP: do {
     mkdir $dir, 0;
     @a = bsd_glob("$dir/*", GLOB_ERR);
     rmdir $dir;
-    local $TODO = 'hit VOS bug posix-956' if $^O eq 'vos';
+    local $TODO = 'hit VOS bug posix-956' if $^OS_NAME eq 'vos';
 
     isnt(GLOB_ERROR, 0);
     is_deeply(\@a, \@());
@@ -86,23 +86,23 @@ is_deeply(\@a, \@('a', 'b'));
 
 @a = bsd_glob(
     '{TES?,doesntexist*,a,b}',
-    GLOB_BRACE ^|^ GLOB_NOMAGIC ^|^ ($^O eq 'VMS' ?? GLOB_NOCASE !! 0)
+    GLOB_BRACE ^|^ GLOB_NOMAGIC ^|^ ($^OS_NAME eq 'VMS' ?? GLOB_NOCASE !! 0)
 );
 
 # Working on t/TEST often causes this test to fail because it sees Emacs temp
 # and RCS files.  Filter them out, and .pm files too, and patch temp files.
 @a = grep !m/(,v$|~$|\.(pm|ori?g|rej)$)/, @a;
-@a = grep !m/test.pl/, @a if $^O eq 'VMS';
+@a = grep !m/test.pl/, @a if $^OS_NAME eq 'VMS';
 
 print "# $(join ' ',@a)\n";
 
-is_deeply(\@a, \@(($^O eq 'VMS'?? 'test.' !! 'TEST'), 'a', 'b'));
+is_deeply(\@a, \@(($^OS_NAME eq 'VMS'?? 'test.' !! 'TEST'), 'a', 'b'));
 
 # "~" should expand to $ENV{HOME}
 env::set_var('HOME' => "sweet home");
 @a = bsd_glob('~', GLOB_TILDE ^|^ GLOB_NOMAGIC);
 SKIP: do {
-    skip $^O, 1 if $^O eq "MacOS";
+    skip $^OS_NAME, 1 if $^OS_NAME eq "MacOS";
     is_deeply(\@a, \@(env::var('HOME')));
 };
 
@@ -112,7 +112,7 @@ chdir "pteerslo";
 
 my @f_names = sort qw(Ax.pl Bx.pl Cx.pl aY.pl bY.pl cY.pl);
 my @f_alpha = qw(Ax.pl aY.pl Bx.pl bY.pl Cx.pl cY.pl);
-if ($^O eq 'VMS') { # VMS is happily caseignorant
+if ($^OS_NAME eq 'VMS') { # VMS is happily caseignorant
     @f_alpha = qw(ax.pl ay.pl bx.pl by.pl cx.pl cy.pl);
     @f_names = @f_alpha;
 }
@@ -157,7 +157,7 @@ do {
     chdir $dir
 	or die "Could not chdir to $dir: $^OS_ERROR";
     my @glob_files = glob('a*{d[e]}j');
-    local $TODO = "home-made glob doesn't do regexes" if $^O eq 'VMS';
+    local $TODO = "home-made glob doesn't do regexes" if $^OS_NAME eq 'VMS';
     is_deeply(\@glob_files, \@('a_dej'));
     chdir $cwd
 	or die "Could not chdir back to $cwd: $^OS_ERROR";

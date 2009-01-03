@@ -316,3 +316,16 @@ readpipe;
 ########
 # optional
 push $a, $_ unless $a{$_};
+########
+# TODO ;; at end of for loop
+for my $x ($a) {
+    do { 1 };;
+}
+########
+# @( ... , ) assignment
+@( $a, ) = $b;
+########
+@( ? $a->{x} ) = qw();
+########
+*F{IO} ;
+

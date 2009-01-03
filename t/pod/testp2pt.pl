@@ -5,7 +5,7 @@ BEGIN {
    use File::Spec;
    use Cwd < qw(abs_path);
    push @INC, '..';
-   my $THISDIR = abs_path(dirname $0);
+   my $THISDIR = abs_path(dirname $^PROGRAM_NAME);
    unshift @INC, $THISDIR;
    require "testcmp.pl";
    TestCompare->import();
@@ -24,7 +24,7 @@ $MYPKG = try { @(caller)[0] };
 BEGIN {
     require Pod::PlainText;
     @ISA = qw( Pod::PlainText );
-    require VMS::Filespec if $^O eq 'VMS';
+    require VMS::Filespec if $^OS_NAME eq 'VMS';
 }
  
 ## Hardcode settings for TERMCAP and COLUMNS so we can try to get
@@ -34,12 +34,12 @@ env::set_var('COLUMNS' => 76);
 
 sub catfile(@) { 'File::Spec'->catfile(< @_); }
 
-my $INSTDIR = abs_path(dirname $0);
-$INSTDIR = VMS::Filespec::unixpath($INSTDIR) if $^O eq 'VMS';
-$INSTDIR =~ s#/$## if $^O eq 'VMS';
-$INSTDIR =~ s#:$## if $^O eq 'MacOS';
+my $INSTDIR = abs_path(dirname $^PROGRAM_NAME);
+$INSTDIR = VMS::Filespec::unixpath($INSTDIR) if $^OS_NAME eq 'VMS';
+$INSTDIR =~ s#/$## if $^OS_NAME eq 'VMS';
+$INSTDIR =~ s#:$## if $^OS_NAME eq 'MacOS';
 $INSTDIR = (dirname $INSTDIR) if (basename($INSTDIR) eq 'pod');
-$INSTDIR =~ s#:$## if $^O eq 'MacOS';
+$INSTDIR =~ s#:$## if $^OS_NAME eq 'MacOS';
 $INSTDIR = (dirname $INSTDIR) if (basename($INSTDIR) eq 't');
 my @PODINCDIRS = @(catfile($INSTDIR, 'lib', 'Pod'),
                    catfile($INSTDIR, 'scripts'),
@@ -95,7 +95,7 @@ sub command {
 }
 
 sub begin_input {
-   @_[0]->{+_INFILE} = VMS::Filespec::unixify(@_[0]->{?_INFILE}) if $^O eq 'VMS';
+   @_[0]->{+_INFILE} = VMS::Filespec::unixify(@_[0]->{?_INFILE}) if $^OS_NAME eq 'VMS';
 }
 
 sub podinc2plaintext( $ $ ) {

@@ -15,8 +15,8 @@ use File::Basename;
 use File::Spec;
 
 sub ext {
-  if   ($^O eq 'VMS')     { return &_vms_ext( < @_ );      }
-  elsif($^O eq 'MSWin32') { return &_win32_ext( < @_ );    }
+  if   ($^OS_NAME eq 'VMS')     { return &_vms_ext( < @_ );      }
+  elsif($^OS_NAME eq 'MSWin32') { return &_win32_ext( < @_ );    }
   else                    { return &_unix_os2_ext( < @_ ); }
 }
 
@@ -24,7 +24,7 @@ sub _unix_os2_ext {
     my @($self,$potential_libs, ?$verbose, ?$give_libs) =  @_;
     $verbose ||= 0;
 
-    if ($^O =~ 'os2' and config_value("perllibs")) { 
+    if ($^OS_NAME =~ 'os2' and config_value("perllibs")) { 
 	# Dynamic libraries are not transitive, so we may need including
 	# the libraries linked against perl.dll again.
 
@@ -131,7 +131,7 @@ sub _unix_os2_ext {
 	    } elsif (-f ($fullname="$thispth/$thislib$Config_libext")){
             } elsif (-f ($fullname="$thispth/lib$thislib.dll$Config_libext")){
 	    } elsif (-f ($fullname="$thispth/Slib$thislib$Config_libext")){
-	    } elsif ($^O eq 'dgux'
+	    } elsif ($^OS_NAME eq 'dgux'
 		 && -l ($fullname="$thispth/lib$thislib$Config_libext")
 		 && readlink($fullname) =~ m/^elink:/s) {
 		 # Some of DG's libraries look like misconnected symbolic
@@ -192,7 +192,7 @@ sub _unix_os2_ext {
                     # For SunOS4, do not add in this shared library if
                     # it is already linked in the main perl executable
 		    push(@ldloadlibs, "-l$thislib")
-			unless ($in_perl and $^O eq 'sunos');
+			unless ($in_perl and $^OS_NAME eq 'sunos');
 		} else {
 		    push(@ldloadlibs, "-l$thislib");
 		}

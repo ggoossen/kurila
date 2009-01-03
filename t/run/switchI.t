@@ -8,8 +8,8 @@ BEGIN {
     plan(4);
 }
 
-my $Is_MacOS = $^O eq 'MacOS';
-my $Is_VMS   = $^O eq 'VMS';
+my $Is_MacOS = $^OS_NAME eq 'MacOS';
+my $Is_VMS   = $^OS_NAME eq 'VMS';
 my $lib;
 
 $lib = $Is_MacOS ?? ':Bla:' !! 'Bla';

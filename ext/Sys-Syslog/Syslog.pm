@@ -97,12 +97,12 @@ my %options = %(
 # Default is now to first use the native mechanism, so Perl programs 
 # behave like other normal Unix programs, then try other mechanisms.
 my @connectMethods = qw(native tcp udp unix pipe stream console);
-if ($^O =~ m/^(freebsd|linux)$/) {
+if ($^OS_NAME =~ m/^(freebsd|linux)$/) {
     @connectMethods = grep { $_ ne 'udp' } @connectMethods;
 }
 
 # use EventLog on Win32
-my $is_Win32 = $^O =~ m/Win32/i;
+my $is_Win32 = $^OS_NAME =~ m/Win32/i;
 eval "use Sys::Syslog::Win32";
 
 if (not $^EVAL_ERROR) {
@@ -114,7 +114,7 @@ if (not $^EVAL_ERROR) {
 my @defaultMethods = @connectMethods;
 my @fallbackMethods = @( () );
 
-$sock_timeout = 0.25 if $^O =~ m/darwin/;
+$sock_timeout = 0.25 if $^OS_NAME =~ m/darwin/;
 
 # coderef for a nicer handling of errors
 my $err_sub = %options{?nofatal} ?? \&warnings::warnif !! sub { die shift; };
@@ -124,7 +124,7 @@ sub openlog {
     @(?$ident, ?my $logopt, ?$facility) =  @_;
 
     # default values
-    $ident    ||= basename($0) || getlogin() || getpwuid($^UID) || 'syslog';
+    $ident    ||= basename($^PROGRAM_NAME) || getlogin() || getpwuid($^UID) || 'syslog';
     $logopt   ||= '';
     $facility ||= LOG_USER();
 
@@ -310,7 +310,7 @@ sub syslog {
     $message = @_ ?? sprintf($mask, < @_) !! $mask;
 
     # See CPAN-RT#24431. Opened on Apple Radar as bug #4944407 on 2007.01.21
-    chomp $message if $^O =~ m/darwin/;
+    chomp $message if $^OS_NAME =~ m/darwin/;
 
     if ($current_proto eq 'native') {
         $buf = $message;

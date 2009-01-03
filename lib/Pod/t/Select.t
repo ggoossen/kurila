@@ -20,7 +20,7 @@ Select.t - Tests for Pod::Select.
 EO_NAME
 
 $p_s->select( 'NAME' );
-$p_s->parse_from_file( $0, $fake_out_fh );
+$p_s->parse_from_file( $^PROGRAM_NAME, $fake_out_fh );
 is( $$fake_out, $pod, 'select( NAME )' );
 
 $pod .= << 'EO_SYNOPSIS';
@@ -32,7 +32,7 @@ EO_SYNOPSIS
 
 $$fake_out = '';
 $p_s->select( 'NAME', 'SYNOPSIS' );
-$p_s->parse_from_file( $0, $fake_out_fh );
+$p_s->parse_from_file( $^PROGRAM_NAME, $fake_out_fh );
 is( $$fake_out, $pod, 'select( NAME, SYNOPSIS )' );
 
 $pod .= << 'EO_AUTHOR';
@@ -44,7 +44,7 @@ EO_AUTHOR
 
 $$fake_out = '';
 $p_s->add_selection( 'AUTHOR' );
-$p_s->parse_from_file( $0, $fake_out_fh );
+$p_s->parse_from_file( $^PROGRAM_NAME, $fake_out_fh );
 is( $$fake_out, $pod, 'add_selection( AUTHOR )' );
 
 my $head1 = $p_s->curr_headings(1);
@@ -59,7 +59,7 @@ EO_DESCRIPTION
 
 $$fake_out = '';
 $p_s->select( 'DESCRIPTION/subsection' );
-$p_s->parse_from_file( $0, $fake_out_fh );
+$p_s->parse_from_file( $^PROGRAM_NAME, $fake_out_fh );
 is( $$fake_out, $pod, 'select( DESCRIPTION/subsection )' );
 
 
@@ -75,7 +75,7 @@ EO_DESCRIPTION
 
 $$fake_out = '';
 $p_s->select( 'DESCRIPTION/!.+' );
-$p_s->parse_from_file( $0, $fake_out_fh );
+$p_s->parse_from_file( $^PROGRAM_NAME, $fake_out_fh );
 is( $$fake_out, $pod, 'select( DESCRIPTION/!.+ )' );
 
 

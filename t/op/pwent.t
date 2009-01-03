@@ -90,7 +90,7 @@ while ( ~< *PW) {
     my @s = split m/:/, $_, -1;
     my ($name_s, $passwd_s, $uid_s, $gid_s, $gcos_s, $home_s, $shell_s);
     (my $v) = %Config{?osvers} =~ m/^(\d+)/;
-    if ($^O eq 'darwin' && $v +< 9) {
+    if ($^OS_NAME eq 'darwin' && $v +< 9) {
        @($name_s, $passwd_s, $uid_s, $gid_s, $gcos_s, $home_s, $shell_s) =  @s[[@(0,1,2,3,7,8,9)]];
     } else {
        @($name_s, $passwd_s, $uid_s, $gid_s, $gcos_s, $home_s, $shell_s) =  @s;
@@ -109,7 +109,7 @@ while ( ~< *PW) {
     }
     # In principle we could whine if @s != 7 but do we know enough
     # of passwd file formats everywhere?
-    if ((nelems @s) == 7 || ($^O eq 'darwin' && (nelems @s) == 10)) {
+    if ((nelems @s) == 7 || ($^OS_NAME eq 'darwin' && (nelems @s) == 10)) {
 	my @n = @( getpwuid($uid_s) );
 	# 'nobody' et al.
 	next unless (nelems @n);

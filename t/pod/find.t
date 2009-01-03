@@ -33,7 +33,7 @@ my $lib_dir = env::var('PERL_CORE') ??
   'File::Spec'->catdir('pod', 'testpods', 'lib')
   !! 'File::Spec'->catdir($THISDIR,'lib');
 our $Qlib_dir;
-if ($^O eq 'VMS') {
+if ($^OS_NAME eq 'VMS') {
     $lib_dir = env::var('PERL_CORE') ??
       VMS::Filespec::unixify( <'File::Spec'->catdir('pod', 'testpods', 'lib'))
       !! VMS::Filespec::unixify( <'File::Spec'->catdir($THISDIR,'-','lib','pod'));
@@ -59,7 +59,7 @@ my $compare = env::var('PERL_CORE') ??
     Pod::Select
     Pod::Usage
 ));
-if ($^O eq 'VMS') {
+if ($^OS_NAME eq 'VMS') {
     $compare = lc($compare);
     my $undollared = $Qlib_dir;
     $undollared =~ s/\$/\\\$/g;
@@ -74,7 +74,7 @@ if ($^O eq 'VMS') {
     }
     ok($count/(((nelems @result)-1)+1)-1,((nelems @compare)-1));
 }
-elsif ('File::Spec'->case_tolerant || $^O eq 'dos') {
+elsif ('File::Spec'->case_tolerant || $^OS_NAME eq 'dos') {
     ok(lc $result,lc $compare);
 }
 else {
@@ -87,7 +87,7 @@ $result = pod_where(\%( inc => 1, verbose => $VERBOSE ), 'File::Find')
 print "### found $result\n";
 
 require Config;
-if ($^O eq 'VMS') { # privlib is perl_root:[lib] OK but not under mms
+if ($^OS_NAME eq 'VMS') { # privlib is perl_root:[lib] OK but not under mms
     $compare = "lib.File]Find.pm";
     $result =~ s/perl_root:\[\-?\.?//i;
     $result =~ s/\[\-?\.?//i; # needed under `mms test`

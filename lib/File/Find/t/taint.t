@@ -9,7 +9,7 @@ my ($cwd, $cwd_untainted);
 use Config;
 
 BEGIN {
-    if ($^O ne 'VMS') {
+    if ($^OS_NAME ne 'VMS') {
 	for (env::keys) { # untaint ENV
 	    env::set_var($_ => @( env::var($_) =~ m/(.*)/ )[0]);
 	}
@@ -97,8 +97,8 @@ sub MkDir($$) {
 sub wanted_File_Dir {
     print "# \$File::Find::dir => '$File::Find::dir'\n";
     print "# \$_ => '$_'\n";
-    s#\.$## if ($^O eq 'VMS' && $_ ne '.');
-    s/(.dir)?$//i if ($^O eq 'VMS' && -d _);
+    s#\.$## if ($^OS_NAME eq 'VMS' && $_ ne '.');
+    s/(.dir)?$//i if ($^OS_NAME eq 'VMS' && -d _);
 	ok( %Expect_File{?$_}, "Expected and found $File::Find::name" );
     if ( $FastFileTests_OK ) {
         delete %Expect_File{ $_}
@@ -139,7 +139,7 @@ sub dir_path {
     my $first_arg = shift @_;
 
     if ($first_arg eq '.') {
-        if ($^O eq 'MacOS') {
+        if ($^OS_NAME eq 'MacOS') {
             return '' unless (nelems @_);
             # ignore first argument; return a relative path
             # with leading ":" and with trailing ":"
@@ -155,7 +155,7 @@ sub dir_path {
     } else { # $first_arg ne '.'
         return $first_arg unless (nelems @_); # return plain filename
 	my $fname = File::Spec->catdir($first_arg, < @_); # relative path
-	$fname = VMS::Filespec::unixpath($fname) if $^O eq 'VMS';
+	$fname = VMS::Filespec::unixpath($fname) if $^OS_NAME eq 'VMS';
         return $fname;
     }
 }
@@ -167,7 +167,7 @@ sub dir_path {
 
 sub topdir {
     my $path = dir_path(< @_);
-    $path =~ s/:$// if ($^O eq 'MacOS');
+    $path =~ s/:$// if ($^OS_NAME eq 'MacOS');
     return $path;
 }
 
@@ -189,7 +189,7 @@ sub file_path {
     my $first_arg = shift @_;
 
     if ($first_arg eq '.') {
-        if ($^O eq 'MacOS') {
+        if ($^OS_NAME eq 'MacOS') {
             return '' unless (nelems @_);
             # ignore first argument; return a relative path
             # with leading ":", but without trailing ":"
@@ -205,7 +205,7 @@ sub file_path {
     } else { # $first_arg ne '.'
         return $first_arg unless (nelems @_); # return plain filename
 	my $fname = File::Spec->catfile($first_arg, < @_); # relative path
-	$fname = VMS::Filespec::unixify($fname) if $^O eq 'VMS';
+	$fname = VMS::Filespec::unixify($fname) if $^OS_NAME eq 'VMS';
         return $fname;
     }
 }
@@ -223,7 +223,7 @@ sub file_path {
 
 sub file_path_name {
     my $path = file_path(< @_);
-    $path = ":$path" if (($^O eq 'MacOS') && ($path !~ m/:/));
+    $path = ":$path" if (($^OS_NAME eq 'MacOS') && ($path !~ m/:/));
     return $path;
 }
 
@@ -241,7 +241,7 @@ MkDir( dir_path('fb', 'fba'), 0770  );
 touch( file_path('fb', 'fba', 'fba_ord') );
 SKIP: do {
 	skip "Creating symlink", 1, unless $symlink_exists;
-if ($^O eq 'MacOS') {
+if ($^OS_NAME eq 'MacOS') {
       ok( symlink(':fb',':fa:fsl'), 'Created symbolic link' );
 } else {
       ok( symlink('../fb','fa/fsl'), 'Created symbolic link' );

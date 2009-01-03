@@ -7,7 +7,7 @@ $^OUTPUT_AUTOFLUSH = 1;
 use Config;
 BEGIN {
     my $can_fork = config_value('d_fork') ||
-		    (($^O eq 'MSWin32' || $^O eq 'NetWare') and
+		    (($^OS_NAME eq 'MSWin32' || $^OS_NAME eq 'NetWare') and
 		     config_value('useithreads') and 
 		     config_value('ccflags') =~ m/-DPERL_IMPLICIT_SYS/
 		    );

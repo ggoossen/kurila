@@ -50,7 +50,7 @@ for my $cross_partition_test (0..1) {
   is $foo, "ok\n", 'copy(fn, fn): same contents';
 
   print("# next test checks copying to STDOUT\n");
-  binmode STDOUT unless $^O eq 'VMS'; # Copy::copy works in binary mode
+  binmode STDOUT unless $^OS_NAME eq 'VMS'; # Copy::copy works in binary mode
   # This outputs "ok" so its a test.
   copy "copy-$^PID", \*STDOUT;
   $TB->current_test($TB->current_test + 1);
@@ -106,7 +106,7 @@ for my $cross_partition_test (0..1) {
   is $foo, "ok\n", 'contents preserved';
 
   TODO: do {
-    local $TODO = 'mtime only preserved on ODS-5 with POSIX dates and DECC$EFS_FILE_TIMESTAMPS enabled' if $^O eq 'VMS';
+    local $TODO = 'mtime only preserved on ODS-5 with POSIX dates and DECC$EFS_FILE_TIMESTAMPS enabled' if $^OS_NAME eq 'VMS';
 
     my $dest_mtime = @(stat("file-$^PID"))[9];
     is $dest_mtime, $mtime,
@@ -164,7 +164,7 @@ for my $cross_partition_test (0..1) {
 
   SKIP: do {
     skip "Testing hard links", 3 
-         if !config_value("d_link") or $^O eq 'MSWin32' or $^O eq 'cygwin';
+         if !config_value("d_link") or $^OS_NAME eq 'MSWin32' or $^OS_NAME eq 'cygwin';
 
     open(F, ">", "file-$^PID") or die $^OS_ERROR;
     print F "dummy content\n";

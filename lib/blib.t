@@ -10,7 +10,7 @@ my($blib, $blib_arch, $blib_lib, @blib_dirs);
 
 sub _cleanup {
     rmdir foreach reverse @_;
-    unlink "stderr" unless $^O eq 'MacOS';
+    unlink "stderr" unless $^OS_NAME eq 'MacOS';
 }
 
 sub _mkdirs {
@@ -22,7 +22,7 @@ sub _mkdirs {
     
 
 BEGIN {
-    if ($^O eq 'MacOS')
+    if ($^OS_NAME eq 'MacOS')
     {
 	$MacPerl::Architecture = $MacPerl::Architecture; # shhhhh
 	$blib = ":blib:";
@@ -57,13 +57,13 @@ do {
 is( nelems(@INC), 3, '@INC now has 3 elements' );
 is( @INC[2],    '../lib',       'blib added to the front of @INC' );
 
-if ($^O eq 'VMS') {
+if ($^OS_NAME eq 'VMS') {
     # Unix syntax is accepted going in but it's not what comes out
     # So we don't use catdir above
     $blib_arch = 'blib.arch]';
     $blib_lib = 'blib.lib]';
 }
-elsif ($^O ne 'MacOS')
+elsif ($^OS_NAME ne 'MacOS')
 {
     $blib_arch = File::Spec->catdir("blib","arch");
     $blib_lib  = File::Spec->catdir("blib","lib");

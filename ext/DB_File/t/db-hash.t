@@ -51,7 +51,7 @@ sub normalise
 {
     my $data = shift ;
     $data =~ s#\r\n#\n#g 
-        if $^O eq 'cygwin' ;
+        if $^OS_NAME eq 'cygwin' ;
     return $data ;
 }
 
@@ -104,8 +104,8 @@ my @($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
 
 my %noMode = %( < map { $_, 1} qw( amigaos MSWin32 NetWare cygwin ) ) ;
 
-ok( ($mode ^&^ 0777) == (($^O eq 'os2' || $^O eq 'MacOS') ?? 0666 !! 0640) ||
-   %noMode{?$^O} );
+ok( ($mode ^&^ 0777) == (($^OS_NAME eq 'os2' || $^OS_NAME eq 'MacOS') ?? 0666 !! 0640) ||
+   %noMode{?$^OS_NAME} );
 
 my ($key, $value, $i);
 # while (@(?$key,?$value) = @: each(%h)) {

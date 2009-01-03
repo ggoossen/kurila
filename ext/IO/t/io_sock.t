@@ -38,8 +38,8 @@ my $listen = IO::Socket::INET->new(Listen => 2,
 print "ok 1\n";
 
 # Check if can fork with dynamic extensions (bug in CRT):
-if ($^O eq 'os2' and
-    system "$^X -I../lib -MOpcode -e 'defined fork or die'  > /dev/null 2>&1") {
+if ($^OS_NAME eq 'os2' and
+    system "$^EXECUTABLE_NAME -I../lib -MOpcode -e 'defined fork or die'  > /dev/null 2>&1") {
     print "ok $_ # skipped: broken fork\n" for 2..5;
     exit 0;
 }
@@ -191,7 +191,7 @@ if (my $pid = fork()) {
 print "not " unless $server->blocking;
 print "ok 13\n";
 
-if ( $^O eq 'qnx' ) {
+if ( $^OS_NAME eq 'qnx' ) {
   # QNX4 library bug: Can set non-blocking on socket, but
   # cannot return that status.
   print "ok 14 # skipped on QNX4\n";
@@ -206,7 +206,7 @@ if ( $^O eq 'qnx' ) {
 ### the client. We'll use own source code ...
 #
 local our @data;
-if( !open( SRC, "<", "$0")) {
+if( !open( SRC, "<", "$^PROGRAM_NAME")) {
     print "not ok 15 - $^OS_ERROR\n";
 } else {
     @data = @( ~< *SRC );
@@ -379,7 +379,7 @@ my $sock = IO::Socket::INET->new(Blocking => 0)
     or print "not ";
 print "ok 25\n";
 
-if ( $^O eq 'qnx' ) {
+if ( $^OS_NAME eq 'qnx' ) {
   print "ok 26 # skipped on QNX4\n";
   # QNX4 library bug: Can set non-blocking on socket, but
   # cannot return that status.

@@ -164,9 +164,9 @@ sub version_mess ($;$) {
 	$v = '[unknown]' unless defined $v;
 	my $myv = $VERSION;
 	$myv .= ' [paranoid]' unless $STANDARD_HELP_VERSION;
-	my $perlv = $^V;
+	my $perlv = $^PERL_VERSION;
 	print $h <<EOH;
-$0 version $v calling Getopt::Std::getopts (version $myv),
+$^PROGRAM_NAME version $v calling Getopt::Std::getopts (version $myv),
 running under Perl version $perlv.
 EOH
     }
@@ -188,7 +188,7 @@ sub help_mess ($;$) {
 	if ((nelems @rest)) {
 	    $help .= "\n\tBoolean (without arguments): -" . join " -", @rest;
 	}
-	my @($scr) = @($0 =~ m,([^/\\]+)$,);
+	my @($scr) = @($^PROGRAM_NAME =~ m,([^/\\]+)$,);
 	print $h <<EOH if (nelems @_);			# Let the script override this
 
 Usage: $scr [-OPTIONS [-MORE_OPTIONS]] [--] [PROGRAM_ARG1 ...]
@@ -200,8 +200,8 @@ The following single-character options are accepted:$help
 Options may be merged together.  -- stops processing of options.$arg
 EOH
 	my $has_pod;
-	if ( defined $0 and $0 ne '-e' and -f $0 and -r $0
-	     and open my $script, '<', $0 ) {
+	if ( defined $^PROGRAM_NAME and $^PROGRAM_NAME ne '-e' and -f $^PROGRAM_NAME and -r $^PROGRAM_NAME
+	     and open my $script, '<', $^PROGRAM_NAME ) {
 	    while ( ~< $script) {
 		$has_pod = 1, last if m/^=(pod|head1)/;
 	    }
@@ -209,7 +209,7 @@ EOH
 	print $h <<EOH if $has_pod;
 
 For more details run
-	perldoc -F $0
+	perldoc -F $^PROGRAM_NAME
 EOH
     }
 }

@@ -14,7 +14,7 @@ BEGIN {
 
 our ($gid, @grent);
 BEGIN {
-    $gid = $^O ne 'cygwin' ?? 0 !! 18;
+    $gid = $^OS_NAME ne 'cygwin' ?? 0 !! 18;
     @grent = @( getgrgid $gid ); # This is the function getgrgid.
     unless (@grent) { plan skip_all => "no gid 0"; }
 }

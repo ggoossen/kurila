@@ -25,9 +25,9 @@ sub new {
 
 sub find_perl_interpreter {
   my $perl;
-  File::Spec->file_name_is_absolute($perl = $^X)
+  File::Spec->file_name_is_absolute($perl = $^EXECUTABLE_NAME)
     or -f ($perl = Config::config_value("perlpath"))
-    or ($perl = $^X);
+    or ($perl = $^EXECUTABLE_NAME);
   return $perl;
 }
 

@@ -111,7 +111,7 @@ Default: 1
 =cut
 
 sub case_tolerant () {
-  return 1 unless $^O eq 'cygwin'
+  return 1 unless $^OS_NAME eq 'cygwin'
     and defined &Cygwin::mount_flags;
 
   my $drive = shift;

@@ -25,7 +25,7 @@ else {
     plan skip_all => "ExtUtils::CBuilder not installed or couldn't find a compiler";
 }
 
-my $Is_VMS = $^O eq 'VMS';
+my $Is_VMS = $^OS_NAME eq 'VMS';
 my $perl = which_perl();
 
 # GNV logical interferes with testing

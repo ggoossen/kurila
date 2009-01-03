@@ -20,7 +20,7 @@ my $curdir = File::Spec->curdir;
 @INC = grep { $_ ne $curdir && $_ ne '.' } @INC;
 
 mkdir('hints', 0777);
-(my $os = $^O) =~ s/\./_/g;
+(my $os = $^OS_NAME) =~ s/\./_/g;
 my $hint_file = File::Spec->catfile('hints', "$os.pl");
 
 open(HINT, ">", "$hint_file") || die "Can't write dummy hints file $hint_file: $^OS_ERROR";

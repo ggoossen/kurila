@@ -61,7 +61,7 @@ my @years =
 my $neg_epoch_ok = defined (@(localtime(-259200))[0]) ?? 1 !! 0;
 
 # use vmsish 'time' makes for oddness around the Unix epoch
-if ($^O eq 'VMS') {
+if ($^OS_NAME eq 'VMS') {
     @time[0]->[2]++;
     $neg_epoch_ok = 0; # time_t is unsigned
 }
@@ -82,7 +82,7 @@ for ( @( < @time, < @neg_time) ) {
 
  SKIP: do {
         skip '1970 test on VOS fails.', 12
-            if $^O eq 'vos' && $year == 70;
+            if $^OS_NAME eq 'vos' && $year == 70;
         skip 'this platform does not support negative epochs.', 12
             if $year +< 70 && ! $neg_epoch_ok;
 

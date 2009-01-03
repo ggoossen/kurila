@@ -10,7 +10,7 @@ $TESTERR = *F{IO};
 my $r=0;
 do {
     # Shut up deprecated usage warning.
-    local $^W = 0;
+    local $^WARNING = 0;
     $r ^|^= skip(0,0);
 };
 $r ^|^= ok(0);
@@ -66,38 +66,38 @@ for my $x (0 .. nelems(@got) -1 ) {
 
 BEGIN {
     $Expect = <<"EXPECT";
-# Failed test 1 in $0 at line 15
+# Failed test 1 in $^PROGRAM_NAME at line 15
 
-# Failed test 2 in $0 at line 17
+# Failed test 2 in $^PROGRAM_NAME at line 17
 
-# Test 3 got: '0' ($0 at line 18)
+# Test 3 got: '0' ($^PROGRAM_NAME at line 18)
 #   Expected: '1'
 
-# Test 4 got: '2' ($0 at line 19)
+# Test 4 got: '2' ($^PROGRAM_NAME at line 19)
 #   Expected: '3'
 
-# Test 5 got: '2' ($0 at line 20)
+# Test 5 got: '2' ($^PROGRAM_NAME at line 20)
 #   Expected: '0'
 
-# Test 6 got: '2' ($0 at line 23)
+# Test 6 got: '2' ($^PROGRAM_NAME at line 23)
 #   Expected: '1' (\@list=0,0)
 
-# Test 7 got: '2' ($0 at line 24)
+# Test 7 got: '2' ($^PROGRAM_NAME at line 24)
 #   Expected: '1' (\@list=0,0)
 
-# Test 8 got: 'segmentation fault' ($0 at line 25)
+# Test 8 got: 'segmentation fault' ($^PROGRAM_NAME at line 25)
 #   Expected: qr\{bongo\}
 
-# Failed test 9 in $0 at line 27
+# Failed test 9 in $^PROGRAM_NAME at line 27
 
-# Failed test 10 in $0 at line 27 fail #2
+# Failed test 10 in $^PROGRAM_NAME at line 27 fail #2
 
-# Failed test 11 in $0 at line 29
+# Failed test 11 in $^PROGRAM_NAME at line 29
 
-# Test 12 got: <UNDEF> ($0 at line 30)
+# Test 12 got: <UNDEF> ($^PROGRAM_NAME at line 30)
 #    Expected: '1'
 
-# Failed test 13 in $0 at line 32
+# Failed test 13 in $^PROGRAM_NAME at line 32
 EXPECT
 
 }

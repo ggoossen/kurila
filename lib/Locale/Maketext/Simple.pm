@@ -270,7 +270,7 @@ sub auto_path {
     my $path = %INC{?$calldir . '.pm'} or return;
 
     # Try absolute path name.
-    if ($^O eq 'MacOS') {
+    if ($^OS_NAME eq 'MacOS') {
 	(my $malldir = $calldir) =~ s!/!:!g;
 	$path =~ s#^(.*)$malldir\.pm\z#$1auto:$malldir:#s;
     } else {

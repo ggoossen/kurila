@@ -15,7 +15,7 @@ print "ok $i\n"; ++$i;
 
 my $foo = 'FOO';
 for (@("*$foo", "\\*$foo")) {
-    eval qq{ open $_, '<', '$0' }; die if $^EVAL_ERROR;
+    eval qq{ open $_, '<', '$^PROGRAM_NAME' }; die if $^EVAL_ERROR;
     print "not " if $^EVAL_ERROR;
     print "ok $i\n"; ++$i;
 

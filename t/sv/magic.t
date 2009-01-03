@@ -15,20 +15,20 @@ use Config;
 plan tests => 35;
 
 
-my $Is_MSWin32  = $^O eq 'MSWin32';
-my $Is_NetWare  = $^O eq 'NetWare';
-my $Is_VMS      = $^O eq 'VMS';
-my $Is_Dos      = $^O eq 'dos';
-my $Is_os2      = $^O eq 'os2';
-my $Is_Cygwin   = $^O eq 'cygwin';
-my $Is_MacOS    = $^O eq 'MacOS';
-my $Is_MPE      = $^O eq 'mpeix';		
+my $Is_MSWin32  = $^OS_NAME eq 'MSWin32';
+my $Is_NetWare  = $^OS_NAME eq 'NetWare';
+my $Is_VMS      = $^OS_NAME eq 'VMS';
+my $Is_Dos      = $^OS_NAME eq 'dos';
+my $Is_os2      = $^OS_NAME eq 'os2';
+my $Is_Cygwin   = $^OS_NAME eq 'cygwin';
+my $Is_MacOS    = $^OS_NAME eq 'MacOS';
+my $Is_MPE      = $^OS_NAME eq 'mpeix';		
 my $Is_miniperl = env::var('PERL_CORE_MINITEST');
-my $Is_BeOS     = $^O eq 'beos';
+my $Is_BeOS     = $^OS_NAME eq 'beos';
 
 my $PERL = env::var('PERL')
     || ($Is_NetWare           ?? 'perl'   !!
-       ($Is_MacOS || $Is_VMS) ?? $^X      !!
+       ($Is_MacOS || $Is_VMS) ?? $^EXECUTABLE_NAME      !!
        $Is_MSWin32            ?? '.\perl' !!
        './perl');
 
@@ -70,7 +70,7 @@ our ($wd, $script);
 
 # $^X and $0
 do {
-    if ($^O eq 'qnx') {
+    if ($^OS_NAME eq 'qnx') {
 	chomp($wd = `/usr/bin/fullpath -t`);
     }
     elsif($Is_Cygwin || config_value('d_procselfexe')) {
@@ -90,7 +90,7 @@ do {
     else {
 	$wd = '.';
     }
-    my $perl = ($Is_MacOS || $Is_VMS) ?? $^X !! "$wd/perl";
+    my $perl = ($Is_MacOS || $Is_VMS) ?? $^EXECUTABLE_NAME !! "$wd/perl";
     my $headmaybe = '';
     my $middlemaybe = '';
     my $tailmaybe = '';
@@ -128,7 +128,7 @@ $^X = Cygwin::win_to_posix_path(Cygwin::posix_to_win_path($^X, 1));
 $0 = Cygwin::win_to_posix_path(Cygwin::posix_to_win_path($0, 1));
 EOX
     }
-    if ($^O eq 'os390' or $^O eq 'posix-bc' or $^O eq 'vmesa') {  # no shebang
+    if ($^OS_NAME eq 'os390' or $^OS_NAME eq 'posix-bc' or $^OS_NAME eq 'vmesa') {  # no shebang
 	$headmaybe = <<EOH ;
     eval 'exec ./perl -S \$0 \$\{1+"\$\@"\}'
         if 0;
@@ -159,19 +159,19 @@ EOF
 };
 
 # $], $^O, $^T
-ok $^O;
-ok $^T +> 850000000, $^T;
+ok $^OS_NAME;
+ok $^BASETIME +> 850000000, $^BASETIME;
 
 # Test change 25062 is working
-my $orig_osname = $^O;
+my $orig_osname = $^OS_NAME;
 do {
-local $^I = '.bak';
-ok($^O eq $orig_osname, 'Assigning $^I does not clobber $^O');
+local $^INPLACE_EDIT = '.bak';
+ok($^OS_NAME eq $orig_osname, 'Assigning $^I does not clobber $^O');
 };
-$^O = $orig_osname;
+$^OS_NAME = $orig_osname;
 
 if ($Is_VMS || $Is_Dos || $Is_MacOS) {
-    skip("\%ENV manipulations fail or aren't safe on $^O") for 1..4;
+    skip("\%ENV manipulations fail or aren't safe on $^OS_NAME") for 1..4;
 }
 else {
 	if (env::var('PERL_VALGRIND')) {
@@ -190,27 +190,27 @@ else {
 	}
 
 	env::set_var('__NoNeSuCh' => "foo");
-	$0 = "bar";
+	$^PROGRAM_NAME = "bar";
 # cmd.exe will echo 'variable=value' but 4nt will echo just the value
 # -- Nikola Knezevic
        ok ($Is_MSWin32 ?? (`set __NoNeSuCh` =~ m/^(?:__NoNeSuCh=)?foo$/)
 			    !! (`echo \$__NoNeSuCh` eq "foo\n") );
-	if ($^O =~ m/^(linux|freebsd)$/ &&
+	if ($^OS_NAME =~ m/^(linux|freebsd)$/ &&
 	    open CMDLINE, '<', "/proc/$^PID/cmdline") {
 	    chomp(my $line = scalar ~< *CMDLINE);
 	    my $me = (split m/\0/, $line)[0];
-	    ok($me eq $0, 'altering $0 is effective (testing with /proc/)');
+	    ok($me eq $^PROGRAM_NAME, 'altering $0 is effective (testing with /proc/)');
 	    close CMDLINE;
             # perlbug #22811
             my $mydollarzero = sub {
               my@($arg) =@( shift);
-              $0 = $arg if defined $arg;
+              $^PROGRAM_NAME = $arg if defined $arg;
 	      # In FreeBSD the ps -o command= will cause
 	      # an empty header line, grab only the last line.
               my $ps = @(`ps -o command= -p $^PID`)[-1];
               return if $^CHILD_ERROR;
               chomp $ps;
-              printf "# 0[\%s]ps[\%s]\n", $0, $ps;
+              printf "# 0[\%s]ps[\%s]\n", $^PROGRAM_NAME, $ps;
               $ps;
             };
             my $ps = $mydollarzero->("x");
@@ -225,7 +225,7 @@ else {
 	       # FreeBSD cannot get rid of both the leading "perl :"
 	       # and the trailing " (perl)": some FreeBSD versions
 	       # can get rid of the first one.
-	       || ($^O eq 'freebsd' && $ps =~ m/^(?:perl: )?x(?: \(perl\))?$/),
+	       || ($^OS_NAME eq 'freebsd' && $ps =~ m/^(?:perl: )?x(?: \(perl\))?$/),
 		       'altering $0 is effective (testing with `ps`)');
 	} else {
 	    skip("\$0 check only on Linux and FreeBSD") for @( 0, 1);
@@ -255,10 +255,10 @@ SKIP: do {
     ok (nelems(env::keys()) == 0);
 };
 
-ok $^S == 0 && defined $^S;
-try { ok $^S == 1 };
+ok $^EXCEPTIONS_BEING_CAUGHT == 0 && defined $^EXCEPTIONS_BEING_CAUGHT;
+try { ok $^EXCEPTIONS_BEING_CAUGHT == 1 };
 eval " BEGIN \{ ok ! defined \$^S \} ";
-ok $^S == 0 && defined $^S;
+ok $^EXCEPTIONS_BEING_CAUGHT == 0 && defined $^EXCEPTIONS_BEING_CAUGHT;
 
 ok $^TAINT == 0;
 try { $^TAINT = 1 };

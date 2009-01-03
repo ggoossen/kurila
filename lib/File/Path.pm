@@ -519,13 +519,13 @@ $VERSION = '2.01';
 @ISA     = qw(Exporter);
 @EXPORT  = qw(mkpath rmtree);
 
-my $Is_VMS = $^O eq 'VMS';
-my $Is_MacOS = $^O eq 'MacOS';
+my $Is_VMS = $^OS_NAME eq 'VMS';
+my $Is_MacOS = $^OS_NAME eq 'MacOS';
 
 # These OSes complain if you want to remove a file that you have no
 # write permission to:
-my $Force_Writeable = ($^O eq 'os2' || $^O eq 'dos' || $^O eq 'MSWin32' ||
-		       $^O eq 'amigaos' || $^O eq 'MacOS' || $^O eq 'epoc');
+my $Force_Writeable = ($^OS_NAME eq 'os2' || $^OS_NAME eq 'dos' || $^OS_NAME eq 'MSWin32' ||
+		       $^OS_NAME eq 'amigaos' || $^OS_NAME eq 'MacOS' || $^OS_NAME eq 'epoc');
 
 sub _error {
     my $arg     = shift;
@@ -583,7 +583,7 @@ sub _mkpath {
     my(@created);
     foreach my $path ( @$paths) {
         next unless length($path);
-	$path .= '/' if $^O eq 'os2' and $path =~ m/^\w:\z/s; # feature of CRT 
+	$path .= '/' if $^OS_NAME eq 'os2' and $path =~ m/^\w:\z/s; # feature of CRT 
 	# Logic wants Unix paths, so go with the flow.
 	if ($Is_VMS) {
 	    next if $path eq '/';
@@ -600,7 +600,7 @@ sub _mkpath {
 	}
         else {
             my $save_bang = $^OS_ERROR;
-            my @($e, $e1) = @($save_bang, $^E);
+            my @($e, $e1) = @($save_bang, $^EXTENDED_OS_ERROR);
 	    $e .= "; $e1" if $e ne $e1;
 	    # allow for another process to have created it meanwhile
             if (!-d $path) {

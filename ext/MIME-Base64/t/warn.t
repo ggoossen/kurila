@@ -36,11 +36,11 @@ $a = do {
 };
 warn;
 $a = do {
-    local $^W;
+    local $^WARNING;
     decode_base64("aa");
 };
 $a = do {
-    local $^W;
+    local $^WARNING;
     decode_base64("a===");
 };
 warn;

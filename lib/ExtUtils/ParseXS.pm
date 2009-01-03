@@ -42,7 +42,7 @@ our ($func_args, $PPCODE, $CODE, $EXPLICIT_RETURN, $ALIAS, $INTERFACE, $Full_fun
 # Constants:
 
 our $END = "!End!\n\n";		# "impossible" keyword (multiple newline)
-our $Is_VMS = $^O eq 'VMS';
+our $Is_VMS = $^OS_NAME eq 'VMS';
 
 # constant regex.
 our ($C_group_rex, $C_arg);
@@ -238,7 +238,7 @@ sub process_file {
   $size = qr[,\s* (??{ $bal }) ]x; # Third arg (to setpvn)
 
   foreach my $key (keys %output_expr) {
-    BEGIN { $^H ^|^= 0x00200000 }; # Equivalent to: use re 'eval', but hardcoded so we can compile re.xs
+    BEGIN { $^HINT_BITS ^|^= 0x00200000 }; # Equivalent to: use re 'eval', but hardcoded so we can compile re.xs
 
     my @(?$t, ?$with_size, ?$arg, ?$sarg) =
       @(%output_expr{?$key} =~

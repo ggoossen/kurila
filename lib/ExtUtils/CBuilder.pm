@@ -65,19 +65,19 @@ my $load = sub {
 do {
   my @package = split m/::/, __PACKAGE__;
   
-  if (grep {-e File::Spec->catfile($_, < @package, 'Platform', $^O) . '.pm'} @INC) {
-    $load->(__PACKAGE__ . "::Platform::$^O");
+  if (grep {-e File::Spec->catfile($_, < @package, 'Platform', $^OS_NAME) . '.pm'} @INC) {
+    $load->(__PACKAGE__ . "::Platform::$^OS_NAME");
     
-  } elsif (exists %OSTYPES{$^O} and
-	   grep {-e File::Spec->catfile($_, < @package, 'Platform', %OSTYPES{$^O}) . '.pm'} @INC) {
-    $load->(__PACKAGE__ . "::Platform::%OSTYPES{?$^O}");
+  } elsif (exists %OSTYPES{$^OS_NAME} and
+	   grep {-e File::Spec->catfile($_, < @package, 'Platform', %OSTYPES{$^OS_NAME}) . '.pm'} @INC) {
+    $load->(__PACKAGE__ . "::Platform::%OSTYPES{?$^OS_NAME}");
     
   } else {
     $load->(__PACKAGE__ . "::Base");
   }
 };
 
-sub os_type { %OSTYPES{?$^O} }
+sub os_type { %OSTYPES{?$^OS_NAME} }
 
 1;
 __END__

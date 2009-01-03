@@ -409,17 +409,17 @@ sub f {
 $x =~ m/.a/g;
 ok(f(pos($x)) == 4);
 
-$x = $^R = 67;
+$x = $^LAST_REGEXP_CODE_RESULT = 67;
 'foot' =~ m/foo(?{$x = 12; 75})[t]/;
-ok($^R eq '75');
+ok($^LAST_REGEXP_CODE_RESULT eq '75');
 
-$x = $^R = 67;
+$x = $^LAST_REGEXP_CODE_RESULT = 67;
 'foot' =~ m/foo(?{$x = 12; 75})[xy]/;
-ok($^R eq '67' and $x eq '12');
+ok($^LAST_REGEXP_CODE_RESULT eq '67' and $x eq '12');
 
-$x = $^R = 67;
+$x = $^LAST_REGEXP_CODE_RESULT = 67;
 'foot' =~ m/foo(?{ $^R + 12 })((?{ $x = 12; $^R + 17 })[xy])?/;
-ok( ( $^R eq '79' and $x eq '12' ));
+ok( ( $^LAST_REGEXP_CODE_RESULT eq '79' and $x eq '12' ));
 
 ok(qr/\b\v$/i eq '(?iu-xsm:\b\v$)');
 ok(qr/\b\v$/s eq '(?su-xim:\b\v$)');
@@ -652,7 +652,7 @@ ok( ('123||x|123|' eq join '|', @res) );
 
 # see if matching against temporaries (created via pp_helem()) is safe
 my $x = "abc";
-%( foo => "ok $x\n".$^X ){?foo} =~ m/^(.*)\n/g;
+%( foo => "ok $x\n".$^EXECUTABLE_NAME ){?foo} =~ m/^(.*)\n/g;
 ok( $1 eq "ok abc" );
 
 # See if $i work inside (?{}) in the presense of saved substrings and
@@ -765,7 +765,7 @@ ok( 'a1b' =~ ('xyz' =~ m/t/) );
 our $w = 0;
 do {
     local $^WARN_HOOK = sub { $w = 1 };
-    local $^W = 1;
+    local $^WARNING = 1;
 	$w = 1 if ("1\n" x 102) =~ m/^\s*\n/m;
 };
 ok( not $w );
@@ -1221,26 +1221,26 @@ ok( " " =~ m/[[:print:]]/ );
 ## Test basic $^N usage outside of a regex
 ##
 $x = "abcdef";
-ok($x =~ m/cde/ and not defined $^N);
-ok($x =~ m/(cde)/          and $^N eq "cde");
-ok($x =~ m/(c)(d)(e)/      and $^N eq   "e");
-ok($x =~ m/(c(d)e)/        and $^N eq "cde");
-ok($x =~ m/(foo)|(c(d)e)/  and $^N eq "cde");
-ok($x =~ m/(c(d)e)|(foo)/  and $^N eq "cde");
-ok($x =~ m/(c(d)e)|(abc)/  and $^N eq "abc");
-ok($x =~ m/(c(d)e)|(abc)x/ and $^N eq "cde");
-ok($x =~ m/(c(d)e)(abc)?/  and $^N eq "cde");
-ok($x =~ m/(?:c(d)e)/      and $^N eq  "d" );
-ok($x =~ m/(?:c(d)e)(?:f)/ and $^N eq  "d" );
-ok($x =~ m/(?:([abc])|([def]))*/ and $^N eq  "f" );
-ok($x =~ m/(?:([ace])|([bdf]))*/ and $^N eq  "f" );
-ok($x =~ m/(([ace])|([bd]))*/    and $^N eq  "e" );
+ok($x =~ m/cde/ and not defined $^LAST_SUBMATCH_RESULT);
+ok($x =~ m/(cde)/          and $^LAST_SUBMATCH_RESULT eq "cde");
+ok($x =~ m/(c)(d)(e)/      and $^LAST_SUBMATCH_RESULT eq   "e");
+ok($x =~ m/(c(d)e)/        and $^LAST_SUBMATCH_RESULT eq "cde");
+ok($x =~ m/(foo)|(c(d)e)/  and $^LAST_SUBMATCH_RESULT eq "cde");
+ok($x =~ m/(c(d)e)|(foo)/  and $^LAST_SUBMATCH_RESULT eq "cde");
+ok($x =~ m/(c(d)e)|(abc)/  and $^LAST_SUBMATCH_RESULT eq "abc");
+ok($x =~ m/(c(d)e)|(abc)x/ and $^LAST_SUBMATCH_RESULT eq "cde");
+ok($x =~ m/(c(d)e)(abc)?/  and $^LAST_SUBMATCH_RESULT eq "cde");
+ok($x =~ m/(?:c(d)e)/      and $^LAST_SUBMATCH_RESULT eq  "d" );
+ok($x =~ m/(?:c(d)e)(?:f)/ and $^LAST_SUBMATCH_RESULT eq  "d" );
+ok($x =~ m/(?:([abc])|([def]))*/ and $^LAST_SUBMATCH_RESULT eq  "f" );
+ok($x =~ m/(?:([ace])|([bdf]))*/ and $^LAST_SUBMATCH_RESULT eq  "f" );
+ok($x =~ m/(([ace])|([bd]))*/    and $^LAST_SUBMATCH_RESULT eq  "e" );
 do {
-  ok($x =~ m/(([ace])|([bdf]))*/   and $^N eq  "f" );
+  ok($x =~ m/(([ace])|([bdf]))*/   and $^LAST_SUBMATCH_RESULT eq  "f" );
 };
 ## test to see if $^N is automatically localized -- it should now
 ## have the value set in test 653
-ok($^N eq  "e" );
+ok($^LAST_SUBMATCH_RESULT eq  "e" );
 
 ##
 ## Now test inside (?{...})
@@ -2908,46 +2908,46 @@ do {
 };
 do {
     local $Message = "RT#36909 test";
-    $^R = 'Nothing';
+    $^LAST_REGEXP_CODE_RESULT = 'Nothing';
     do {
-        local $^R = "Bad";
+        local $^LAST_REGEXP_CODE_RESULT = "Bad";
         ok('x foofoo y' =~ m{
          (foo) # $^R correctly set
         (?{ "last regexp code result" })
         }x);
-        is($^R,'last regexp code result');
+        is($^LAST_REGEXP_CODE_RESULT,'last regexp code result');
     };
-    is($^R,'Nothing');
+    is($^LAST_REGEXP_CODE_RESULT,'Nothing');
     do {
-        local $^R = "Bad";
+        local $^LAST_REGEXP_CODE_RESULT = "Bad";
 
         ok('x foofoo y' =~ m{
          (?:foo|bar)+ # $^R correctly set
         (?{"last regexp code result"})
         }x);
-        is($^R,'last regexp code result');
+        is($^LAST_REGEXP_CODE_RESULT,'last regexp code result');
     };
-    is($^R,'Nothing');
+    is($^LAST_REGEXP_CODE_RESULT,'Nothing');
 
     do {
-        local $^R = "Bad";
+        local $^LAST_REGEXP_CODE_RESULT = "Bad";
         ok('x foofoo y' =~ m{
          (foo|bar)\1+ # $^R undefined
         (?{"last regexp code result"})
         }x);
-        is($^R,'last regexp code result');
+        is($^LAST_REGEXP_CODE_RESULT,'last regexp code result');
     };
-    is($^R,'Nothing');
+    is($^LAST_REGEXP_CODE_RESULT,'Nothing');
 
     do {
-        local $^R = "Bad";
+        local $^LAST_REGEXP_CODE_RESULT = "Bad";
         ok('x foofoo y' =~ m{
          (foo|bar)\1 # this time without the +
         (?{"last regexp code result"})
         }x);
-        is($^R,'last regexp code result');
+        is($^LAST_REGEXP_CODE_RESULT,'last regexp code result');
     };
-    is($^R,'Nothing');
+    is($^LAST_REGEXP_CODE_RESULT,'Nothing');
 };
 do {
     local $Message="RT 22395";

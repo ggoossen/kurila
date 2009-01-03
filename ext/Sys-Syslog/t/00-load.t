@@ -6,5 +6,5 @@ BEGIN {
     use_ok( 'Sys::Syslog' );
 }
 
-diag( "Testing Sys::Syslog $Sys::Syslog::VERSION, Perl $^V, $^X" )
+diag( "Testing Sys::Syslog $Sys::Syslog::VERSION, Perl $^PERL_VERSION, $^EXECUTABLE_NAME" )
     unless env::var('PERL_CORE');

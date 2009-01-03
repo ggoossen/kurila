@@ -24,7 +24,7 @@ sub ok {
 
 print "1..5\n";
 
-my $DIR = $^O eq 'MacOS' ?? ":" !! ".";
+my $DIR = $^OS_NAME eq 'MacOS' ?? ":" !! ".";
 
 my $dot = IO::Dir->new( $DIR);
 ok(defined($dot));

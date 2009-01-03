@@ -147,7 +147,7 @@ sub import {
 	if (!exists %feature{$name}) {
 	    unknown_feature($name);
 	}
-	%^H{+%feature{?$name}} = 1;
+	$^HINTS{+%feature{?$name}} = 1;
     }
 }
 
@@ -156,7 +156,7 @@ sub unimport {
 
     # A bare C<no feature> should disable *all* features
     if (!nelems @_) {
-	delete %^H{[ <values(%feature) ]};
+	delete $^HINTS{[ <values(%feature) ]};
 	return;
     }
 
@@ -177,7 +177,7 @@ sub unimport {
 	    unknown_feature($name);
 	}
 	else {
-	    delete %^H{%feature{?$name}};
+	    delete $^HINTS{%feature{?$name}};
 	}
     }
 }
@@ -185,13 +185,13 @@ sub unimport {
 sub unknown_feature {
     my $feature = shift;
     die(sprintf('Feature "%s" is not supported by Perl %s',
-                $feature, $^V));
+                $feature, $^PERL_VERSION));
 }
 
 sub unknown_feature_bundle {
     my $feature = shift;
     die(sprintf('Feature bundle "%s" is not supported by Perl %s',
-	    $feature, $^V));
+	    $feature, $^PERL_VERSION));
 }
 
 1;

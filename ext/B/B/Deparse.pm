@@ -589,11 +589,11 @@ sub compile {
     return sub {
 	my $self = B::Deparse->new(< @args);
 	# First deparse command-line args
-	if (defined $^I) { # deparse -i
-	    print q(BEGIN { $^I = ).perlstring($^I).qq(; \}\n);
+	if (defined $^INPLACE_EDIT) { # deparse -i
+	    print q(BEGIN { $^I = ).perlstring($^INPLACE_EDIT).qq(; \}\n);
 	}
-	if ($^W) { # deparse -w
-	    print qq(BEGIN \{ \$^W = $^W; \}\n);
+	if ($^WARNING) { # deparse -w
+	    print qq(BEGIN \{ \$^W = $^WARNING; \}\n);
 	}
 	if ($^INPUT_RECORD_SEPARATOR ne "\n" or defined $O::savebackslash) { # deparse -l and -0
 	    my $fs = perlstring($^INPUT_RECORD_SEPARATOR) || 'undef';

@@ -12,7 +12,7 @@ $^OUTPUT_AUTOFLUSH = 1;
 env::set_var('PERL_CORE' => 1);
 
 # remove empty elements due to insertion of empty symbols via "''p1'" syntax
-@ARGV = grep($_, @ARGV) if $^O eq 'VMS';
+@ARGV = grep($_, @ARGV) if $^OS_NAME eq 'VMS';
 our $show_elapsed_time = env::var("HARNESS_TIMER") || 0;
 
 # Cheesy version of Getopt::Std.  Maybe we should replace it with that.
@@ -79,7 +79,7 @@ sub _find_tests {
 	my $fullpath = File::Spec->catfile($dir, $f);
 
 	_find_tests($fullpath) if -d $fullpath;
-	$fullpath = VMS::Filespec::unixify($fullpath) if $^O eq 'VMS';
+	$fullpath = VMS::Filespec::unixify($fullpath) if $^OS_NAME eq 'VMS';
 	push @ARGV, $fullpath if $f =~ m/\.t$/;
     }
 }
@@ -91,7 +91,7 @@ sub _quote_args {
     foreach (split(m/\s+/,$args)) {
        # In VMS protect with doublequotes because otherwise
        # DCL will lowercase -- unless already doublequoted.
-       $_ = q(").$_.q(") if ($^O eq 'VMS') && !m/^\"/ && length($_) +> 0;
+       $_ = q(").$_.q(") if ($^OS_NAME eq 'VMS') && !m/^\"/ && length($_) +> 0;
        $argstring .= ' ' . $_;
     }
     return $argstring;
@@ -148,7 +148,7 @@ unless (nelems @ARGV) {
     }
     my $mani = File::Spec->catfile($updir, "MANIFEST");
     if (open(my $mani, "<", $mani)) {
-	my $ext_pat = $^O eq 'MSWin32' ?? '(?:win32/)?ext' !! 'ext';
+	my $ext_pat = $^OS_NAME eq 'MSWin32' ?? '(?:win32/)?ext' !! 'ext';
 	while ( ~< *$mani) { # similar code in t/harness
 	    if (m!^($ext_pat/(\S+)/+(?:[^/\s]+\.t|test\.pl)|lib/\S+?(?:\.t|test\.pl))\s!) {
 		my $t = $1;
@@ -168,7 +168,7 @@ unless (nelems @ARGV) {
 	}
 	close $mani;
     } else {
-	warn "$0: cannot open $mani: $^OS_ERROR\n";
+	warn "$^PROGRAM_NAME: cannot open $mani: $^OS_ERROR\n";
     }
     unless ($::core) {
 	_find_tests('pod');
@@ -223,7 +223,7 @@ EOT
     foreach my $t ( @tests) {
       unless (exists %::path_to_name{$t}) {
 	my $tname = File::Spec->catfile('t',$t);
-	$tname = VMS::Filespec::unixify($tname) if $^O eq 'VMS';
+	$tname = VMS::Filespec::unixify($tname) if $^OS_NAME eq 'VMS';
 	%::path_to_name{+$t} = $tname;
       }
     }
@@ -271,7 +271,7 @@ EOT
 	my $te = %::path_to_name{$test} . '.'
 		    x ($dotdotdot - length(%::path_to_name{$test}));
 
-	if ($^O ne 'VMS') {  # defer printing on VMS due to piping bug
+	if ($^OS_NAME ne 'VMS') {  # defer printing on VMS due to piping bug
 	    print $te;
 	    $te = '';
 	}
@@ -322,7 +322,7 @@ EOT
 	}
 	elsif ($type eq 'perl') {
 	    my $perl = env::var("PERL") || './perl';
-	    my $redir = $^O eq 'VMS' ?? '2>&1' !! '';
+	    my $redir = $^OS_NAME eq 'VMS' ?? '2>&1' !! '';
 	    if (env::var("PERL_VALGRIND")) {
 		my $valgrind = env::var("VALGRIND") // 'valgrind';
 		my $vg_opts = env::var("VG_OPTS")
@@ -432,14 +432,14 @@ EOT
 		    @valgrind = @( ~< $v );
 		    close $v;
 		} else {
-		    warn "$0: Failed to open '$valgrind_log': $^OS_ERROR\n";
+		    warn "$^PROGRAM_NAME: Failed to open '$valgrind_log': $^OS_ERROR\n";
 		}
 	    }
 	    if ((env::var("VG_OPTS") || '') =~ m/cachegrind/) {
 		if (rename $valgrind_log, "$test.valgrind") {
 		    $valgrind++;
 		} else {
-		    warn "$0: Failed to create '$test.valgrind': $^OS_ERROR\n";
+		    warn "$^PROGRAM_NAME: Failed to create '$test.valgrind': $^OS_ERROR\n";
 		}
 	    }
 	    elsif ((nelems @valgrind)) {
@@ -462,7 +462,7 @@ EOT
 		    if (rename $valgrind_log, "$test.valgrind") {
 			$valgrind++;
 		    } else {
-			warn "$0: Failed to create '$test.valgrind': $^OS_ERROR\n";
+			warn "$^PROGRAM_NAME: Failed to create '$test.valgrind': $^OS_ERROR\n";
 		    }
 		}
 	    } else {
@@ -470,7 +470,7 @@ EOT
 	    }
 	    if (-e $valgrind_log) {
 		unlink $valgrind_log
-		    or warn "$0: Failed to unlink '$valgrind_log': $^OS_ERROR\n";
+		    or warn "$^PROGRAM_NAME: Failed to unlink '$valgrind_log': $^OS_ERROR\n";
 	    }
 	}
 	if ($type eq 'deparse') {

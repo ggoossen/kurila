@@ -4,15 +4,15 @@ use Config;
 
 BEGIN {
     my $reason;
-    if ($^O eq 'os2') {
+    if ($^OS_NAME eq 'os2') {
 	require IO::Socket;
 
 	try {IO::Socket::pack_sockaddr_un('/foo/bar') || 1}
 	  or $^EVAL_ERROR->{?description} !~ m/not implemented/ or
 	    $reason = 'compiled without TCP/IP stack v4';
     }
-    elsif ($^O =~ m/^(?:qnx|nto|vos|MSWin32)$/ ) {
-	$reason = "UNIX domain sockets not implemented on $^O";
+    elsif ($^OS_NAME =~ m/^(?:qnx|nto|vos|MSWin32)$/ ) {
+	$reason = "UNIX domain sockets not implemented on $^OS_NAME";
     }
     elsif (! config_value('d_fork')) {
 	$reason = 'no fork';
@@ -25,7 +25,7 @@ BEGIN {
 
 my $PATH = "sock-$^PID";
 
-if ($^O eq 'os2') {	# Can't create sockets with relative path...
+if ($^OS_NAME eq 'os2') {	# Can't create sockets with relative path...
   require Cwd;
   my $d = Cwd::cwd();
   $d =~ s/^[a-z]://i;
@@ -33,12 +33,12 @@ if ($^O eq 'os2') {	# Can't create sockets with relative path...
 }
 
 # Test if we can create the file within the tmp directory
-if (-e $PATH or not open(TEST, ">", "$PATH") and $^O ne 'os2') {
+if (-e $PATH or not open(TEST, ">", "$PATH") and $^OS_NAME ne 'os2') {
     print "1..0 # Skip: cannot open '$PATH' for write\n";
     exit 0;
 }
 close(TEST);
-unlink($PATH) or $^O eq 'os2' or die "Can't unlink $PATH: $^OS_ERROR";
+unlink($PATH) or $^OS_NAME eq 'os2' or die "Can't unlink $PATH: $^OS_ERROR";
 
 # Start testing
 $^OUTPUT_AUTOFLUSH = 1;
@@ -82,7 +82,7 @@ if(my $pid = fork()) {
 	$sock->close;
 
 	waitpid($pid,0);
-	unlink($PATH) || $^O eq 'os2' || warn "Can't unlink $PATH: $^OS_ERROR";
+	unlink($PATH) || $^OS_NAME eq 'os2' || warn "Can't unlink $PATH: $^OS_ERROR";
 
 	print "ok 5\n";
     } else {

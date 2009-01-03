@@ -276,7 +276,7 @@ sub GetOptionsFromArray($@) {
 
     if ( $debug ) {
 	# Avoid some warnings if debugging.
-	local ($^W) = 0;
+	local ($^WARNING) = 0;
 	print STDERR
 	  ("Getopt::Long $Getopt::Long::VERSION (",
 	   '$Revision: 2.74 $', ") ",
@@ -859,7 +859,7 @@ sub ParseOptionSpec ($$) {
 	}
     }
 
-    if ( $dups && $^W ) {
+    if ( $dups && $^WARNING ) {
 	foreach ( split(m/\n+/, $dups) ) {
 	    warn($_."\n");
 	}
@@ -1370,13 +1370,13 @@ sub VersionMessage(@) {
       ($pa->{?exitval} eq "NOEXIT" || $pa->{?exitval} +< 2) ?? \*STDOUT !! \*STDERR;
 
     print $fh (defined($pa->{?message}) ?? $pa->{?message} !! (),
-	       $0, defined $v ?? " version $v" !! (),
+	       $^PROGRAM_NAME, defined $v ?? " version $v" !! (),
 	       "\n",
 	       "(", __PACKAGE__, "::", "GetOptions",
 	       " version ",
 	       defined($Getopt::Long::VERSION_STRING)
 	         ?? $Getopt::Long::VERSION_STRING !! $VERSION, ";",
-	       " Perl version $^V",
+	       " Perl version $^PERL_VERSION",
 	       ")\n");
     exit($pa->{?exitval}) unless $pa->{?exitval} eq "NOEXIT";
 }

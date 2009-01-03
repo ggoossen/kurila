@@ -180,7 +180,7 @@ sub init_page {
 
     # We used to try first to get the version number from a local binary, but
     # we shouldn't need that any more.  Get the version from the running Perl.
-    my $version = $^V;
+    my $version = $^PERL_VERSION;
 
     # Set the defaults for page titles and indentation if the user didn't
     # override anything.
@@ -803,7 +803,7 @@ sub devise_title {
             splice (@dirs, 0, $cut);
             shift @dirs if (@dirs[0] =~ m/^(site|vendor)(_perl)?$/);
             shift @dirs if (@dirs[0] =~ m/^[\d.]+$/);
-            shift @dirs if (@dirs[0] =~ m/^(.*-$^O|$^O-.*|$^O)$/);
+            shift @dirs if (@dirs[0] =~ m/^(.*-$^OS_NAME|$^OS_NAME-.*|$^OS_NAME)$/);
         }
         shift @dirs if @dirs[?0] eq 'lib';
         splice (@dirs, 0, 2) if (@dirs[?0] eq 'blib' && @dirs[?1] eq 'lib');

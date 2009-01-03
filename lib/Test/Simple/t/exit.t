@@ -15,7 +15,7 @@ unless( try { require File::Spec } ) {
     exit 0;
 }
 
-if( $^O eq 'MacOS' ) {
+if( $^OS_NAME eq 'MacOS' ) {
     print "1..0 # Skip exit status broken on Mac OS\n";
     exit 0;
 }
@@ -27,7 +27,7 @@ $TB->level(0);
 
 package main;
 
-my $IsVMS = $^O eq 'VMS';
+my $IsVMS = $^OS_NAME eq 'VMS';
 
 print "# Ahh!  I see you're running VMS.\n" if $IsVMS;
 
@@ -64,9 +64,9 @@ my $lib = File::Spec->catdir( <qw(lib Test Simple sample_tests));
 while( my@(?$test_name, ?$exit_codes) =@( each %Tests) ) {
     my $exit_code = $exit_codes[$IsVMS ?? 1 !! 0];
 
-    my $Perl = $^X;
+    my $Perl = $^EXECUTABLE_NAME;
 
-    if( $^O eq 'VMS' ) {
+    if( $^OS_NAME eq 'VMS' ) {
         # Quiet noisy 'SYS$ABORT'.  'hushed' only exists in 5.6 and up,
         # but it doesn't do any harm on eariler perls.
         $Perl .= q{ -"Mvmsish=hushed"};

@@ -11,7 +11,7 @@ BEGIN {
 }
 chdir 't';
 
-my $Is_VMS = $^O eq 'VMS';
+my $Is_VMS = $^OS_NAME eq 'VMS';
 
 use File::Spec;
 

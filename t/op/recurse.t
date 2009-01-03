@@ -99,7 +99,7 @@ do {
 };
 
 do {
-    local $^W = 0; # We do not need recursion depth warning.
+    local $^WARNING = 0; # We do not need recursion depth warning.
 
     sub sillysum {
 	return @_[0] + (@_[0] +> 0 ?? sillysum(@_[0] - 1) !! 0);
@@ -122,8 +122,8 @@ do {
 	  if $r =~ m/Out of memory/i;
       is($r, '', "64K deep recursion - no output expected");
 
-      if ($^O eq 'MacOS') {
-          ok(1, "$^O: \$? is unreliable");
+      if ($^OS_NAME eq 'MacOS') {
+          ok(1, "$^OS_NAME: \$? is unreliable");
       } else {
           is($^CHILD_ERROR, 0, "64K deep recursion - no coredump expected");
       }

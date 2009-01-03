@@ -26,7 +26,7 @@ unless (try { getgrgid(0); 1 }) {
     exit 0;
 }
 
-quit() if (($^O eq 'MSWin32' || $^O eq 'NetWare') or $^O =~ m/lynxos/i);
+quit() if (($^OS_NAME eq 'MSWin32' || $^OS_NAME eq 'NetWare') or $^OS_NAME =~ m/lynxos/i);
 
 # We have to find a command that prints all (effective
 # and real) group names (not ids).  The known commands are:
@@ -135,7 +135,7 @@ for (split(' ', $^GID)) {
 print "# gr = $(join ' ',@gr)\n";
 
 my %did;
-if ($^O =~ m/^(?:uwin|cygwin|interix|solaris)$/) {
+if ($^OS_NAME =~ m/^(?:uwin|cygwin|interix|solaris)$/) {
 	# Or anybody else who can have spaces in group names.
 	$gr1 = join(' ', grep(!%did{+$_}++, sort split(' ', join(' ', @gr))));
 } else {

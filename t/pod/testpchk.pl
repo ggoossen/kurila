@@ -4,13 +4,13 @@ BEGIN {
    use File::Basename;
    use File::Spec;
    push @INC, '..';
-   my $THISDIR = dirname $0;
+   my $THISDIR = dirname $^PROGRAM_NAME;
    unshift @INC, $THISDIR;
    require "testcmp.pl";
    TestCompare->import();
    my $PARENTDIR = dirname $THISDIR;
    push @INC, < map { 'File::Spec'->catfile($_, 'lib') } @( ($PARENTDIR, $THISDIR));
-   require VMS::Filespec if $^O eq 'VMS';
+   require VMS::Filespec if $^OS_NAME eq 'VMS';
 }
 
 use Pod::Checker;
@@ -57,7 +57,7 @@ sub testpodcheck( @ ) {
 
    print "# Running podchecker for '$testname'...\n";
    ## Compare the output against the expected result
-   if ($^O eq 'VMS') {
+   if ($^OS_NAME eq 'VMS') {
       for (@($infile, $outfile, $cmpfile)) {
          $_ = VMS::Filespec::unixify($_)  unless  ref;
       }

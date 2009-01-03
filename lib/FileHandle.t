@@ -4,7 +4,7 @@ use TestInit;
 use Config;
 
 BEGIN {
-    if ($^O eq 'mpeix') {
+    if ($^OS_NAME eq 'mpeix') {
 	print "1..0 # Skip: broken on MPE/iX\n";
 	exit 0;
     }
@@ -64,7 +64,7 @@ print "ok 9\n";
 print "not " unless ($^OUTPUT_AUTOFLUSH);
 print "ok 10\n";
 
-if ($^O eq 'dos')
+if ($^OS_NAME eq 'dos')
 {
     printf("ok \%d\n",11);
     exit(0);
@@ -72,7 +72,7 @@ if ($^O eq 'dos')
 
 my @($rd,$wr) =  FileHandle::pipe;
 
-if ($^O eq 'VMS' || $^O eq 'os2' || $^O eq 'amigaos' || $^O eq 'MSWin32' || $^O eq 'NetWare' ||
+if ($^OS_NAME eq 'VMS' || $^OS_NAME eq 'os2' || $^OS_NAME eq 'amigaos' || $^OS_NAME eq 'MSWin32' || $^OS_NAME eq 'NetWare' ||
     config_value('d_fork') ne 'define') {
   $wr->autoflush;
   $wr->printf("ok \%d\n",11);
