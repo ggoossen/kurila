@@ -52,7 +52,7 @@ BEGIN {
 
 BEGIN {
     use Test::More;
-    if ($^O eq 'VMS') {
+    if ($^OS_NAME eq 'VMS') {
         plan( tests => @Methods + 1 );
     }
     else {

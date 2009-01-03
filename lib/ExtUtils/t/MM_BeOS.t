@@ -3,7 +3,7 @@
 use Test::More;
 
 BEGIN {
-	if ($^O =~ m/beos/i) {
+	if ($^OS_NAME =~ m/beos/i) {
 		plan tests => 4;
 	} else {
 		plan skip_all => 'This is not BeOS';

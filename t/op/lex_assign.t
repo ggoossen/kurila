@@ -265,8 +265,8 @@ getpgrp				# getpgrp
 getpriority $^PID, $^PID		# getpriority
 '???'				# setpriority
 time				# time
-localtime $^T			# localtime
-gmtime $^T			# gmtime
+localtime $^BASETIME			# localtime
+gmtime $^BASETIME			# gmtime
 '???'				# sleep: can randomly fail
 '???'				# alarm
 '???'				# shmget

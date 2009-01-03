@@ -164,7 +164,7 @@ do {
    skip("QNX's termcap database does not contain an entry for dumb terminals",
         1) if $^OS_NAME eq 'nto';
 
-   local *^O;
+   local *^OS_NAME;
    local *ENV;
    env::set_var('TERM', undef);
    $^OS_NAME = 'Win32';

@@ -493,10 +493,10 @@ sub segment ($\@\%$\%) {
 	use re 'eval';
 	my @format;
 	while ($format =~ m/\G ((?>(?:\\.|(?!$userdef|$bullet|\{).)*))
-														 (?{litval($^N)})
-						  (?: ($userdef)                 (?{fldvals($^N,$^R)})
-						    | ($bullet)                  (?{fldvals($^N,-1)})
-						    | ($nestedbraces)			 (?{fldvals($^N,undef)})
+														 (?{litval($^LAST_SUBMATCH_RESULT)})
+						  (?: ($userdef)                 (?{fldvals($^LAST_SUBMATCH_RESULT,$^LAST_REGEXP_CODE_RESULT)})
+						    | ($bullet)                  (?{fldvals($^LAST_SUBMATCH_RESULT,-1)})
+						    | ($nestedbraces)			 (?{fldvals($^LAST_SUBMATCH_RESULT,undef)})
 						  )
 					  /gcsx) {
             push @format, litval(), < fldvals();
@@ -1297,7 +1297,7 @@ sub break_nl {
     }
 }
 
-my $wsnzw = q{ (??{length($^N)?'(?=)':'(?!)'}) };
+my $wsnzw = q{ (??{length($^LAST_SUBMATCH_RESULT)?'(?=)':'(?!)'}) };
 
 sub break_at {
     my @($hyphen) =  @_;

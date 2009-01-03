@@ -13,14 +13,14 @@ my $Is_MacOS = $^OS_NAME eq 'MacOS';
 my $path = join " ", map { qq["-I$_"] } @INC;
 my $redir = $Is_MacOS ?? "" !! "2>&1";
 
-$a = `$^X $path "-MO=Debug" -e 1 $redir`;
+$a = `$^EXECUTABLE_NAME $path "-MO=Debug" -e 1 $redir`;
 like($a, qr/\bLISTOP\b.*\bOP\b.*\bCOP\b.*\bOP\b/s);
 
 
-$a = `$^X $path "-MO=Terse" -e 1 $redir`;
+$a = `$^EXECUTABLE_NAME $path "-MO=Terse" -e 1 $redir`;
 like($a, qr/\bLISTOP\b.*leave.*\n    OP\b.*enter.*\n    COP\b.*nextstate.*\n    OP\b.*null/s);
 
-$a = `$^X $path "-MO=Terse" -ane "s/foo/bar/" $redir`;
+$a = `$^EXECUTABLE_NAME $path "-MO=Terse" -ane "s/foo/bar/" $redir`;
 $a =~ s/\(0x[^)]+\)//g;
 $a =~ s/\[[^\]]+\]//g;
 $a =~ s/-e syntax OK//;

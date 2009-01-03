@@ -60,10 +60,10 @@
 __END__
 # doio.c [Perl_do_open9]
 use warnings 'io' ;
-open(F, '|-|', "$^X -e 1");
+open(F, '|-|', "$^EXECUTABLE_NAME -e 1");
 close(F);
 no warnings 'io' ;
-open(G, '|-|', "$^X -e 1");
+open(G, '|-|', "$^EXECUTABLE_NAME -e 1");
 close(G);
 EXPECT
 Can't open bidirectional pipe at - line 3 character 1.
@@ -152,7 +152,7 @@ Unsuccessful stat on filename containing newline at - line 4 character 1.
 ########
 # doio.c [Perl_do_aexec5]
 BEGIN {
-    if ($^O eq 'MacOS') {
+    if ($^OS_NAME eq 'MacOS') {
 	print <<EOM;
 SKIPPED
 # no exec on Mac OS
@@ -170,7 +170,7 @@ Can't exec "lskdjfalksdjfdjfkls": .+
 ########
 # doio.c [Perl_do_exec3]
 BEGIN {
-    if ($^O eq 'MacOS') {
+    if ($^OS_NAME eq 'MacOS') {
 	print <<EOM;
 SKIPPED
 # no exec on Mac OS
@@ -188,7 +188,7 @@ Can't exec "lskdjfalksdjfdjfkls(:? abc)?": .+
 ########
 # doio.c [win32_execvp]
 BEGIN {
-    if ($^O eq 'MacOS') {
+    if ($^OS_NAME eq 'MacOS') {
 	print <<EOM;
 SKIPPED
 # no exec on Mac OS
@@ -197,30 +197,30 @@ EOM
     }
 }
 use warnings 'exec' ;
-exec $^X, "-e0" ;
+exec $^EXECUTABLE_NAME, "-e0" ;
 EXPECT
 
 ########
 # doio.c [Perl_nextargv]
-$^W = 0 ;
+$^WARNING = 0 ;
 my $filename = "./temp.dir" ;
 mkdir $filename, 0777 
   or die "Cannot create directory $filename: $^OS_ERROR\n" ;
 do {
     local @ARGV = @($filename) ;
-    local ($^I) = "" ;
+    local ($^INPLACE_EDIT) = "" ;
     my $x = ~< *ARGV ;
 };
 do {
     no warnings 'inplace' ;
     local @ARGV = @($filename) ;
-    local ($^I) = "" ;
+    local ($^INPLACE_EDIT) = "" ;
     my $x = ~< *ARGV ;
 };
 do {
     use warnings 'inplace' ;
     local @ARGV = @($filename) ;
-    local ($^I) = "" ;
+    local ($^INPLACE_EDIT) = "" ;
     my $x = ~< *ARGV ;
 };
 rmdir $filename ;

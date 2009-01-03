@@ -66,7 +66,7 @@ if ($have_fork) {
 	    my $ppid = getppid();
 	    print "# I am the timer process $^PID, sleeping for $waitfor seconds...\n";
 	    sleep($waitfor);
-	    warn "\n$0: overall time allowed for tests ($($waitfor)s) exceeded!\n";
+	    warn "\n$^PROGRAM_NAME: overall time allowed for tests ($($waitfor)s) exceeded!\n";
 	    print "# Terminating main process $ppid...\n";
 	    kill('TERM', $ppid);
 	    print "# This is the timer process $^PID, over and out.\n";
@@ -76,7 +76,7 @@ if ($have_fork) {
 	    $TheEnd = time() + $waitfor;
 	}
     } else {
-	warn "$0: fork failed: $^OS_ERROR\n";
+	warn "$^PROGRAM_NAME: fork failed: $^OS_ERROR\n";
     }
 } else {
     print "# No timer process (need fork)\n";
@@ -268,7 +268,7 @@ unless (   defined &Time::HiRes::gettimeofday
     }
 
     # On VMS timers can not interrupt select.
-    if ($^O eq 'VMS') {
+    if ($^OS_NAME eq 'VMS') {
 	$ok = "Skip: VMS select() does not get interrupted.";
     } else {
 	while ($i +> 0) {
@@ -324,7 +324,7 @@ unless (   defined &Time::HiRes::setitimer
 	&& defined &Time::HiRes::getitimer
 	&& has_symbol('ITIMER_VIRTUAL')
 	&& config_value("sig_name") =~ m/\bVTALRM\b/
-        && $^O !~ m/^(nto)$/) { # nto: QNX 6 has the API but no implementation
+        && $^OS_NAME !~ m/^(nto)$/) { # nto: QNX 6 has the API but no implementation
     for (18..19) {
 	print "ok $_ # Skip: no virtual interval timers\n";
     }
@@ -637,8 +637,8 @@ if ($have_ualarm) {
     skip 34..37;
 }
 
-if ($^O =~ m/^(cygwin|MSWin)/) {
-    print "# $^O: timestamps may not be good enough\n";
+if ($^OS_NAME =~ m/^(cygwin|MSWin)/) {
+    print "# $^OS_NAME: timestamps may not be good enough\n";
     skip 38;
 } elsif (&Time::HiRes::d_hires_stat( < @_ )) {
     my @stat;

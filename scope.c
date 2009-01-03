@@ -940,18 +940,18 @@ Perl_leave_scope(pTHX_ I32 base)
 	    PL_op = (OP*)SSPOPPTR;
 	    break;
 	case SAVEt_HINTS:
-	    if ((PL_hints & HINT_LOCALIZE_HH) && GvHV(PL_hintgv)) {
-		SvREFCNT_dec((SV*)GvHV(PL_hintgv));
-		GvHV(PL_hintgv) = NULL;
+	    if ((PL_hints & HINT_LOCALIZE_HH) && GvSV(PL_hintgv)) {
+		SvREFCNT_dec((SV*)GvSV(PL_hintgv));
+		GvSV(PL_hintgv) = NULL;
 	    }
 	    *(I32*)&PL_hints = (I32)SSPOPINT;
 	    HvREFCNT_dec(PL_compiling.cop_hints_hash);
  	    PL_compiling.cop_hints_hash = (HV*) SSPOPPTR;
 	    if (PL_hints & HINT_LOCALIZE_HH) {
-		SvREFCNT_dec((SV*)GvHV(PL_hintgv));
-		GvHV(PL_hintgv) = (HV*)SSPOPPTR;
-		assert(GvHV(PL_hintgv));
-	    } else if (!GvHV(PL_hintgv)) {
+		SvREFCNT_dec((SV*)GvSV(PL_hintgv));
+		GvSV(PL_hintgv) = (HV*)SSPOPPTR;
+		assert(GvSV(PL_hintgv));
+	    } else if (!GvSV(PL_hintgv)) {
 		/* Need to add a new one manually, else gv_fetchpv() can
 		   add one in this code:
 		   
@@ -969,9 +969,9 @@ Perl_leave_scope(pTHX_ I32 base)
 
 		HV *const hv = newHV();
 		hv_magic(hv, NULL, PERL_MAGIC_hints);
-		GvHV(PL_hintgv) = hv;
+		GvSV(PL_hintgv) = hv;
 	    }
-	    assert(GvHV(PL_hintgv));
+	    assert(GvSV(PL_hintgv));
 	    break;
 	case SAVEt_COMPPAD:
 	    PL_comppad = (PAD*)SSPOPPTR;

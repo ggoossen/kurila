@@ -385,7 +385,7 @@ EXPECT
 Warning: Use of "rand" without parentheses is ambiguous at - line 2 character 13.
 ########
 # toke.c
-$^W = 0 ;
+$^WARNING = 0 ;
 my $a = rand - 4 ;
 do {
     no warnings 'ambiguous' ;
@@ -406,7 +406,7 @@ EXPECT
 Ambiguous use of -fred resolved as -&fred() at - line 3 character 2.
 ########
 # toke.c
-$^W = 0 ;
+$^WARNING = 0 ;
 sub fred {} ;
 -fred ;
 do {
@@ -432,7 +432,7 @@ EXPECT
 
 ########
 # toke.c
-$^W = 0 ;
+$^WARNING = 0 ;
 open FOO || time;
 do {
     no warnings 'precedence' ;
@@ -515,7 +515,7 @@ Integer overflow in hexadecimal number at - line 8 character 8.
 Integer overflow in octal number at - line 11 character 8.
 ########
 # toke.c
-BEGIN { $^C = 1; }
+BEGIN { $^COMPILING = 1; }
 use warnings 'misc';
 dump;
 CORE::dump;

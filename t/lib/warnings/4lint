@@ -2,16 +2,16 @@ Check lint
 
 __END__
 -W
-# lint: check runtime $^W is zapped
-$^W = 0 ;
+# lint: check runtime $^WARNING is zapped
+$^WARNING = 0 ;
 close STDIN ; print STDIN "abc" ;
 EXPECT
 print() on closed filehandle STDIN at - line 4 character 15.
 ########
 -W
-# lint: check runtime $^W is zapped
+# lint: check runtime $^WARNING is zapped
 do {
-  $^W = 0 ;
+  $^WARNING = 0 ;
   close STDIN ; print STDIN "abc" ;
 };
 EXPECT
@@ -29,7 +29,7 @@ print() on closed filehandle STDIN at - line 5 character 17.
 -Ww
 # lint: check combination of -w and -W
 do {
-  $^W = 0 ;
+  $^WARNING = 0 ;
   close STDIN ; print STDIN "abc" ;
 };
 EXPECT

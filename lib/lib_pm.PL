@@ -57,7 +57,7 @@ print $out <<'!NO!SUBS!';
 
 our @ORIG_INC = @INC;	# take a handy copy of 'original' value
 our $VERSION = '0.5565';
-my $Is_MacOS = $^O eq 'MacOS';
+my $Is_MacOS = $^OS_NAME eq 'MacOS';
 my $Mac_FS;
 if ($Is_MacOS) {
 	require File::Spec;

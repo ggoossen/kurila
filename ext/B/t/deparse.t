@@ -79,14 +79,14 @@ my $path = join " ", map { qq["-I$_"] } @INC;
 $path .= " -MMac::err=unix" if $Is_MacOS;
 my $redir = $Is_MacOS ?? "" !! "2>&1";
 
-$a = `$^X $path "-MO=Deparse" -anlwi.bak -e 1 $redir`;
+$a = `$^EXECUTABLE_NAME $path "-MO=Deparse" -anlwi.bak -e 1 $redir`;
 $a =~ s/-e syntax OK\n//g;
 $a =~ s/.*possible typo.*\n//;	   # Remove warning line
 $a =~ s{\\340\\242}{\\s} if (ord("\\") == 224); # EBCDIC, cp 1047 or 037
 $a =~ s{\\274\\242}{\\s} if (ord("\\") == 188); # $^O eq 'posix-bc'
 $b = <<'EOF';
-BEGIN { $^I = ".bak"; }
-BEGIN { $^W = 1; }
+BEGIN { $^INPLACE_EDIT = ".bak"; }
+BEGIN { $^WARNING = 1; }
 BEGIN { $^INPUT_RECORD_SEPARATOR = "\n"; $^OUTPUT_RECORD_SEPARATOR = "\n"; }
 LINE: while (defined($_ = ~< *ARGV)) {
     do {

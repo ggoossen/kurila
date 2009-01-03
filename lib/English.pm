@@ -36,23 +36,7 @@ no warnings;
 
 my $globbed_match ;
 
-our @MINIMAL_EXPORT = qw(
-	$EXTENDED_OS_ERROR
-	$PROGRAM_NAME
-	$PERL_VERSION
-	$COMPILING
-	$DEBUGGING
-	$SYSTEM_FD_MAX
-	$INPLACE_EDIT
-	$PERLDB
-	$BASETIME
-	$WARNING
-	$EXECUTABLE_NAME
-	$OSNAME
-	$LAST_REGEXP_CODE_RESULT
-	$EXCEPTIONS_BEING_CAUGHT
-	$LAST_SUBMATCH_RESULT
-);
+our @MINIMAL_EXPORT = qw();
 
 # Grandfather $NAME import
 sub import {
@@ -62,32 +46,5 @@ sub import {
     *EXPORT = \@MINIMAL_EXPORT ;
     Exporter::import($this,< grep {s/^\$/*/} @list);
 }
-
-# Matching.
-
-	*LAST_SUBMATCH_RESULT			= *^N{SCALAR} ;
-
-# Error status.
-
-	*EXTENDED_OS_ERROR			= *^E{SCALAR}	;
-
-# Process info.
-
-	*PROGRAM_NAME				= *0{SCALAR}	;
-
-# Internals.
-
-	*PERL_VERSION				= *^V{SCALAR}	;
-	*COMPILING				= *^C{SCALAR}	;
-	*DEBUGGING				= *^D{SCALAR}	;
-	*SYSTEM_FD_MAX				= *^F{SCALAR}	;
-	*INPLACE_EDIT				= *^I{SCALAR}	;
-	*PERLDB					= *^P{SCALAR}	;
-	*LAST_REGEXP_CODE_RESULT		= *^R{SCALAR}	;
-	*EXCEPTIONS_BEING_CAUGHT		= *^S{SCALAR}	;
-	*BASETIME				= *^T{SCALAR}	;
-	*WARNING				= *^W{SCALAR}	;
-	*EXECUTABLE_NAME			= *^X{SCALAR}	;
-	*OSNAME					= *^O{SCALAR}	;
 
 1;

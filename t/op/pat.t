@@ -418,7 +418,7 @@ $x = $^LAST_REGEXP_CODE_RESULT = 67;
 ok($^LAST_REGEXP_CODE_RESULT eq '67' and $x eq '12');
 
 $x = $^LAST_REGEXP_CODE_RESULT = 67;
-'foot' =~ m/foo(?{ $^R + 12 })((?{ $x = 12; $^R + 17 })[xy])?/;
+'foot' =~ m/foo(?{ $^LAST_REGEXP_CODE_RESULT + 12 })((?{ $x = 12; $^LAST_REGEXP_CODE_RESULT + 17 })[xy])?/;
 ok( ( $^LAST_REGEXP_CODE_RESULT eq '79' and $x eq '12' ));
 
 ok(qr/\b\v$/i eq '(?iu-xsm:\b\v$)');
@@ -1246,11 +1246,11 @@ ok($^LAST_SUBMATCH_RESULT eq  "e" );
 ## Now test inside (?{...})
 ##
 our ($y, $z);
-ok($x =~ m/a([abc])(?{$y=$^N})c/      and $y eq "b" );
-ok($x =~ m/a([abc]+)(?{$y=$^N})d/     and $y eq "bc");
-ok($x =~ m/a([abcdefg]+)(?{$y=$^N})d/ and $y eq "bc");
-ok($x =~ m/(a([abcdefg]+)(?{$y=$^N})d)(?{$z=$^N})e/ and $y eq "bc" and $z eq "abcd");
-ok($x =~ m/(a([abcdefg]+)(?{$y=$^N})de)(?{$z=$^N})/ and $y eq "bc" and $z eq "abcde");
+ok($x =~ m/a([abc])(?{$y=$^LAST_SUBMATCH_RESULT})c/      and $y eq "b" );
+ok($x =~ m/a([abc]+)(?{$y=$^LAST_SUBMATCH_RESULT})d/     and $y eq "bc");
+ok($x =~ m/a([abcdefg]+)(?{$y=$^LAST_SUBMATCH_RESULT})d/ and $y eq "bc");
+ok($x =~ m/(a([abcdefg]+)(?{$y=$^LAST_SUBMATCH_RESULT})d)(?{$z=$^LAST_SUBMATCH_RESULT})e/ and $y eq "bc" and $z eq "abcd");
+ok($x =~ m/(a([abcdefg]+)(?{$y=$^LAST_SUBMATCH_RESULT})de)(?{$z=$^LAST_SUBMATCH_RESULT})/ and $y eq "bc" and $z eq "abcde");
 
 # Test the Unicode script classes
 

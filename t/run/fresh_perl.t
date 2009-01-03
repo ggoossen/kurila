@@ -87,7 +87,7 @@ EXPECT
 ########
 eval 'sub bar {print "In bar"}';
 ########
-system './perl -ne "print if eof" /dev/null' unless $^O eq 'MacOS'
+system './perl -ne "print if eof" /dev/null' unless $^OS_NAME eq 'MacOS'
 ########
 our $file;
 chop($file = ~< *DATA);
@@ -147,7 +147,7 @@ print "ok\n" if ("\0" cmp "\x[FF]") +< 0;
 EXPECT
 ok
 ########
-open(my $h,"<",$^O eq 'MacOS' ?? ':run:fresh_perl.t' !! 'run/fresh_perl.t'); # must be in the 't' directory
+open(my $h,"<",$^OS_NAME eq 'MacOS' ?? ':run:fresh_perl.t' !! 'run/fresh_perl.t'); # must be in the 't' directory
 stat($h);
 print "ok\n" if (-e _ and -f _ and -r _);
 EXPECT

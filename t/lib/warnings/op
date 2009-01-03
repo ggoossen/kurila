@@ -170,7 +170,7 @@ Useless use of times in void context at - line 13 character 1.
 use warnings 'void' ;
 use Config ;
 BEGIN {
-    if ( ! config_value("d_getprior") or $^O eq 'os2') { # Locks before fixpak22
+    if ( ! config_value("d_getprior") or $^OS_NAME eq 'os2') { # Locks before fixpak22
         print <<EOM ;
 SKIPPED
 # getpriority not present
@@ -402,7 +402,7 @@ Constant subroutine main::fred redefined at - line 4 character 1.
 ########
 # op.c
 BEGIN {
-    if ($^O eq 'MacOS') {
+    if ($^OS_NAME eq 'MacOS') {
 	print <<EOM;
 SKIPPED
 # no exec on Mac OS
@@ -411,7 +411,7 @@ EOM
     }
 }
 use warnings 'syntax' ;
-exec "$^X -e 1" ; 
+exec "$^EXECUTABLE_NAME -e 1" ; 
 my $a
 EXPECT
 Statement unlikely to be reached at - line 12 character 1.
@@ -420,7 +420,7 @@ Statement unlikely to be reached at - line 12 character 1.
 ########
 # op.c
 BEGIN {
-    if ($^O eq 'MacOS') {
+    if ($^OS_NAME eq 'MacOS') {
 	print <<EOM;
 SKIPPED
 # no exec on Mac OS
@@ -429,7 +429,7 @@ EOM
     }
 }
 no warnings 'syntax' ;
-exec "$^X -e 1" ; 
+exec "$^EXECUTABLE_NAME -e 1" ; 
 my $a
 EXPECT
 

@@ -12,7 +12,7 @@ BEGIN {
 use warnings;
 use Config;
 
-plan tests => 35;
+plan tests => 33;
 
 
 my $Is_MSWin32  = $^OS_NAME eq 'MSWin32';
@@ -124,8 +124,8 @@ EOT
     }
     elsif ($Is_Cygwin) {
       $middlemaybe = <<'EOX'
-$^X = Cygwin::win_to_posix_path(Cygwin::posix_to_win_path($^X, 1));
-$0 = Cygwin::win_to_posix_path(Cygwin::posix_to_win_path($0, 1));
+$^EXECUTABLE_NAME = Cygwin::win_to_posix_path(Cygwin::posix_to_win_path($^EXECUTABLE_NAME, 1));
+$^PROGRAM_NAME = Cygwin::win_to_posix_path(Cygwin::posix_to_win_path($^PROGRAM_NAME, 1));
 EOX
     }
     if ($^OS_NAME eq 'os390' or $^OS_NAME eq 'posix-bc' or $^OS_NAME eq 'vmesa') {  # no shebang
@@ -134,12 +134,12 @@ EOX
         if 0;
 EOH
     }
-    my $s1 = "\$^X is $perl, \$0 is $script\n";
+    my $s1 = "\$^EXECUTABLE_NAME is $perl, \$^PROGRAM_NAME is $script\n";
     ok open(SCRIPT, ">", "$script"), '$!';
     ok print(SCRIPT $headmaybe . <<EOB . $middlemaybe . <<'EOF' . $tailmaybe), '$!';
 #!$wd/perl
 EOB
-print "\$^X is $^X, \$0 is $0\n";
+print "\$^EXECUTABLE_NAME is $^EXECUTABLE_NAME, \$^PROGRAM_NAME is $^PROGRAM_NAME\n";
 EOF
     ok close(SCRIPT), '$!';
     ok chmod(0755, $script), '$!';
@@ -243,7 +243,7 @@ do {
 SKIP: do {
     # test case-insignificance of %ENV (these tests must be enabled only
     # when perl is compiled with -DENV_IS_CASELESS)
-    skip('no caseless %ENV support', 4) unless $Is_MSWin32 || $Is_NetWare;
+    skip('no caseless %ENV support', 3) unless $Is_MSWin32 || $Is_NetWare;
     for (env::keys()) {
         env::set_var($_, undef);
     }

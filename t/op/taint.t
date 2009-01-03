@@ -990,9 +990,8 @@ do {
     # assigning tainted data to it is now an error
 
     test !tainted($^OS_NAME);
-    if (!$^EXECUTABLE_NAME) { } elsif ($^OS_NAME eq 'bar') { }
-    test !tainted($^OS_NAME);
-    eval_dies_like( '$^O = $^X',
+    if (!$^EXECUTABLE_NAME) { } elsif ($^OS_NAME eq 'bar') { } test !tainted($^OS_NAME);
+    eval_dies_like( '$^OS_NAME = $^EXECUTABLE_NAME',
                     qr/Insecure dependency in/ );
 };
 

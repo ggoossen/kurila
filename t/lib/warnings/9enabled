@@ -965,7 +965,7 @@ sub check {
 use abc ;
 use warnings 'abc';
 no warnings ;
-BEGIN { $^W = 1 ; }
+BEGIN { $^WARNING = 1 ; }
 abc::check() ;
 EXPECT
 ok1
@@ -987,7 +987,7 @@ sub check {
 use abc ;
 use warnings 'abc';
 no warnings ;
-$^W = 1 ;
+$^WARNING = 1 ;
 abc::check() ;
 EXPECT
 ok1

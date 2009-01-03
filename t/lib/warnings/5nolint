@@ -2,16 +2,16 @@ syntax anti-lint
 
 __END__
 -X
-# nolint: check runtime $^W is zapped
-$^W = 1 ;
+# nolint: check runtime $^WARNING is zapped
+$^WARNING = 1 ;
 close STDIN ; print STDIN "abc" ;
 EXPECT
 
 ########
 -X
-# nolint: check runtime $^W is zapped
+# nolint: check runtime $^WARNING is zapped
 do {
-  $^W = 1 ;
+  $^WARNING = 1 ;
   close STDIN ; print STDIN "abc" ;
 };
 EXPECT
@@ -29,7 +29,7 @@ EXPECT
 -Xw
 # nolint: check combination of -w and -X
 do {
-  $^W = 1 ;
+  $^WARNING = 1 ;
   close STDIN ; print STDIN "abc" ;
 };
 EXPECT

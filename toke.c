@@ -9254,7 +9254,7 @@ S_new_constant(pTHX_ const char *s, STRLEN len, const char *key, STRLEN keylen,
 	       SV *sv, SV *pv, const char *type, STRLEN typelen)
 {
     dVAR; dSP;
-    HV * const table = GvHV(PL_hintgv);		 /* ^H */
+    HV * const table = SvHv(GvSV(PL_hintgv));		 /* ^H */
     SV *res;
     SV **cvp;
     SV *cv, *typesv;

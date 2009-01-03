@@ -1,26 +1,26 @@
-Check existing $^W functionality
+Check existing $^WARNING functionality
 
 
 __END__
 
-# warnable code, warnings enabled via runtime $^W
-$^W = 1 ;
+# warnable code, warnings enabled via runtime $^WARNING
+$^WARNING = 1 ;
 my $b ; chop $b ;
 EXPECT
 Use of uninitialized value $b in scalar chop at - line 4 character 9.
 ########
 
 # warnings enabled at compile time, disabled at run time
-BEGIN { $^W = 1 }
-$^W = 0 ;
+BEGIN { $^WARNING = 1 }
+$^WARNING = 0 ;
 my $b ; chop $b ;
 EXPECT
 
 ########
 
 # warnings disabled at compile time, enabled at run time
-BEGIN { $^W = 0 }
-$^W = 1 ;
+BEGIN { $^WARNING = 0 }
+$^WARNING = 1 ;
 my $b ; chop $b ;
 EXPECT
 Use of uninitialized value $b in scalar chop at - line 5 character 9.
@@ -49,7 +49,7 @@ EXPECT
 my $b ; chop $b ;
 1 ;
 --FILE-- 
-$^W =1 ;
+$^WARNING =1 ;
 require "./abcd";
 EXPECT
 Use of uninitialized value $b in scalar chop at ./abcd line 1 character 9.
@@ -57,28 +57,28 @@ Use of uninitialized value $b in scalar chop at ./abcd line 1 character 9.
 ########
 
 --FILE-- abcd
-$^W = 0;
+$^WARNING = 0;
 my $b ; chop $b ;
 1 ;
 --FILE-- 
-$^W =1 ;
+$^WARNING =1 ;
 require "./abcd";
 EXPECT
 
 ########
 
 --FILE-- abcd
-$^W = 1;
+$^WARNING = 1;
 1 ;
 --FILE-- 
-$^W =0 ;
+$^WARNING =0 ;
 require "./abcd";
 my $b ; chop $b ;
 EXPECT
 Use of uninitialized value $b in scalar chop at - line 3 character 9.
 ########
 
-$^W = 1;
+$^WARNING = 1;
 eval 'my $b ; chop $b ;' ;
 print $^EVAL_ERROR ;
 EXPECT
@@ -86,14 +86,14 @@ Use of uninitialized value $b in scalar chop at (eval 1) line 1 character 9.
     (eval) called at - line 3 character 1.
 ########
 
-eval '$^W = 1;' ;
+eval '$^WARNING = 1;' ;
 print $^EVAL_ERROR ;
 my $b ; chop $b ;
 EXPECT
 Use of uninitialized value $b in scalar chop at - line 4 character 9.
 ########
 
-try {$^W = 1;} ;
+try {$^WARNING = 1;} ;
 print $^EVAL_ERROR ;
 my $b ; chop $b ;
 EXPECT
@@ -101,7 +101,7 @@ Use of uninitialized value $b in scalar chop at - line 4 character 9.
 ########
 
 do {
-    local ($^W) = 1;
+    local ($^WARNING) = 1;
 };
 my $b ; chop $b ;
 EXPECT
@@ -110,7 +110,7 @@ EXPECT
 
 my $a ; chop $a ;
 do {
-    local ($^W) = 1;
+    local ($^WARNING) = 1;
     my $b ; chop $b ;
 };
 my $c ; chop $c ;
@@ -123,24 +123,24 @@ EXPECT
 Use of uninitialized value in -e at - line 2 character 2.
 ########
 
-$^W = 1 + 2 ;
+$^WARNING = 1 + 2 ;
 EXPECT
 
 ########
 
-$^W = $a ;
+$^WARNING = $a ;
 EXPECT
 
 ########
 
 sub fred {}
-$^W = fred() ;
+$^WARNING = fred() ;
 EXPECT
 
 ########
 
 sub fred { my $b ; chop $b ;}
-do { local $^W = 0 ;
+do { local $^WARNING = 0 ;
   fred() ;
 };
 EXPECT
@@ -148,7 +148,7 @@ EXPECT
 ########
 
 sub fred { my $b ; chop $b ;}
-do { local $^W = 1 ;
+do { local $^WARNING = 1 ;
   fred() ;
 };
 EXPECT

@@ -1,7 +1,7 @@
 #!./perl
 
 BEGIN {
-    push @INC, "::lib:$MacPerl::Architecture:" if $^O eq 'MacOS';
+    push @INC, "::lib:$MacPerl::Architecture:" if $^OS_NAME eq 'MacOS';
     require "../t/test.pl";
     skip_all("No perlio") unless (PerlIO::Layer->find( 'perlio'));
     if (ord("A") == 193) {

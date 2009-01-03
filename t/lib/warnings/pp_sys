@@ -145,7 +145,7 @@ Can't use an undefined value as a symbol reference at - line 20 character 7.
 use warnings 'io' ;
 use Config; 
 BEGIN { 
-  if ( $^O ne 'VMS' and ! config_value("d_socket")) {
+  if ( $^OS_NAME ne 'VMS' and ! config_value("d_socket")) {
     print <<EOM ;
 SKIPPED
 # send not present
@@ -285,7 +285,7 @@ Unsuccessful open on filename containing newline at - line 3 character 2.
 ########
 # pp_sys.c [pp_sysread]
 use warnings 'io' ;
-if ($^O eq 'dos') {
+if ($^OS_NAME eq 'dos') {
     print <<EOM ;
 SKIPPED
 # skipped on dos
@@ -323,7 +323,7 @@ binmode() on unopened filehandle BLERG at - line 4 character 14.
 use warnings 'io';
 open FH, "<", "TEST" or die "# $^OS_ERROR";
 lstat \*FH;
-open my $fh, "<", $0 or die "# $^OS_ERROR";
+open my $fh, "<", $^PROGRAM_NAME or die "# $^OS_ERROR";
 lstat $fh;
 no warnings 'io';
 lstat FH;

@@ -3,7 +3,7 @@
 use Test::More;
 
 BEGIN {
-	if ($^O =~ m/cygwin/i) {
+	if ($^OS_NAME =~ m/cygwin/i) {
 		plan tests => 11;
 	} else {
 		plan skip_all => "This is not cygwin";

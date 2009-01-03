@@ -86,7 +86,7 @@ if (my $cid = fork) {
     else {
 	print "not ok 2 $result\n";
     }
-    sleep 1 if $^O eq 'MSWin32';	# avoid WinNT race bug
+    sleep 1 if $^OS_NAME eq 'MSWin32';	# avoid WinNT race bug
 }
 else {
     print "ok 1\n";
@@ -235,8 +235,8 @@ use Config;
 $^OUTPUT_AUTOFLUSH = 1;
 $^OUTPUT_RECORD_SEPARATOR = "\n";
 fork()
- ?? print(config_value('osname') eq $^O)
- !! print(config_value('osname') eq $^O) ;
+ ?? print(config_value('osname') eq $^OS_NAME)
+ !! print(config_value('osname') eq $^OS_NAME) ;
 EXPECT
 1
 1
@@ -244,8 +244,8 @@ EXPECT
 $^OUTPUT_AUTOFLUSH = 1;
 $^OUTPUT_RECORD_SEPARATOR = "\n";
 fork()
- ?? do { require Config; print(Config::config_value("osname") eq $^O); }
- !! do { require Config; print(Config::config_value("osname") eq $^O); }
+ ?? do { require Config; print(Config::config_value("osname") eq $^OS_NAME); }
+ !! do { require Config; print(Config::config_value("osname") eq $^OS_NAME); }
 EXPECT
 1
 1
@@ -279,11 +279,11 @@ ok 1 child
 $^OUTPUT_AUTOFLUSH = 1;
 $^OUTPUT_RECORD_SEPARATOR = "\n";
 my $getenv;
-if ($^O eq 'MSWin32' || $^O eq 'NetWare') {
-    $getenv = qq[$^X -e "print \$(env::var(q[TST]))"];
+if ($^OS_NAME eq 'MSWin32' || $^OS_NAME eq 'NetWare') {
+    $getenv = qq[$^EXECUTABLE_NAME -e "print \$(env::var(q[TST]))"];
 }
 else {
-    $getenv = qq[$^X -e 'print \$(env::var(q[TST]))'];
+    $getenv = qq[$^EXECUTABLE_NAME -e 'print \$(env::var(q[TST]))'];
 }
 env::set_var(TST => 'foo');
 if (fork) {

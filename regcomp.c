@@ -3715,7 +3715,7 @@ REGEXP *
 Perl_pregcomp(pTHX_ const SV * const pattern, const U32 flags)
 {
     dVAR;
-    HV * const table = GvHV(PL_hintgv);
+    HV * const table = GvSV(PL_hintgv);
 
     PERL_ARGS_ASSERT_PREGCOMP;
 
@@ -6254,7 +6254,7 @@ S_reg_namedseq(pTHX_ RExC_state_t *pRExC_state, UV *valuep)
         sv_str= newSVpvn(&string, 1);
     } else {
         /* fetch the charnames handler for this scope */
-        HV * const table = GvHV(PL_hintgv);
+        HV * const table = SvHv(GvSV(PL_hintgv));
         SV **cvp= table ? 
             hv_fetchs(table, "charnames", FALSE) :
             NULL;

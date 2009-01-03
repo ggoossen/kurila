@@ -157,8 +157,8 @@ Closing bracket on a callback.  See C<ENTER> and L<perlcall>.
     STMT_START {					\
 	SSCHECK(4);					\
 	if (PL_hints & HINT_LOCALIZE_HH) {		\
-	    SSPUSHPTR(GvHV(PL_hintgv));			\
-	    GvHV(PL_hintgv) = Perl_hv_copy_hints_hv(aTHX_ GvHV(PL_hintgv)); \
+	    SSPUSHPTR(GvSV(PL_hintgv));			\
+	    GvSV(PL_hintgv) = HvSv(Perl_hv_copy_hints_hv(aTHX_ SvHv(GvSV(PL_hintgv)))); \
 	}						\
         SvREFCNT_inc(PL_compiling.cop_hints_hash);      \
 	SSPUSHPTR(PL_compiling.cop_hints_hash);		\

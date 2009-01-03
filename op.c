@@ -4815,10 +4815,10 @@ Perl_ck_eval(pTHX_ OP *o)
 	op_getmad(oldo,o,'O');
     }
     o->op_targ = (PADOFFSET)PL_hints;
-    if ((PL_hints & HINT_LOCALIZE_HH) != 0 && GvHV(PL_hintgv)) {
+    if ((PL_hints & HINT_LOCALIZE_HH) != 0 && GvSV(PL_hintgv)) {
 	/* Store a copy of %^H that pp_entereval can pick up. */
 	OP *hhop = newSVOP(OP_HINTSEVAL, 0,
-			   (SV*)Perl_hv_copy_hints_hv(aTHX_ GvHV(PL_hintgv)), o->op_location);
+	    (SV*)Perl_hv_copy_hints_hv(aTHX_ GvSV(PL_hintgv)), o->op_location);
 	cUNOPo->op_first->op_sibling = hhop;
 	o->op_private |= OPpEVAL_HAS_HH;
     }
@@ -4885,7 +4885,7 @@ Perl_ck_exit(pTHX_ OP *o)
     PERL_ARGS_ASSERT_CK_EXIT;
 
 #ifdef VMS
-    HV * const table = GvHV(PL_hintgv);
+    HV * const table = GvSV(PL_hintgv);
     if (table) {
        SV * const * const svp = hv_fetchs(table, "vmsish_exit", FALSE);
        if (svp && *svp && SvTRUE(*svp))
@@ -5727,7 +5727,7 @@ OP *
 Perl_ck_open(pTHX_ OP *o)
 {
     dVAR;
-    HV * const table = GvHV(PL_hintgv);
+    HV * const table = GvSV(PL_hintgv);
 
     PERL_ARGS_ASSERT_CK_OPEN;
 
@@ -5946,7 +5946,7 @@ Perl_ck_sort(pTHX_ OP *o)
     PERL_ARGS_ASSERT_CK_SORT;
 
     if (o->op_type == OP_SORT && (PL_hints & HINT_LOCALIZE_HH) != 0) {
-	HV * const hinthv = GvHV(PL_hintgv);
+	HV * const hinthv = GvSV(PL_hintgv);
 	if (hinthv) {
 	    SV ** const svp = hv_fetchs(hinthv, "sort", FALSE);
 	    if (svp) {
