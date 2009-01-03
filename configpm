@@ -158,8 +158,8 @@ sub import {
     return;
 }
 
-$^V eq '%s'
-    or die "Perl lib version (%s) doesn't match executable version (" . $^V . ")";
+$^PERL_VERSION eq '%s'
+    or die "Perl lib version (%s) doesn't match executable version (" . $^PERL_VERSION . ")";
 
 ENDOFBEG
 

@@ -945,13 +945,13 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 		    if (strEQ(name2, "EGID"))
 			goto magicalize;
                     if (strEQ(name2, "EMERGENCY_MEMORY"))
-			goto magicalize;
+			goto no_magicalize;
 		    if (strEQ(name2, "EUID"))
 			goto magicalize;
 		    if (strEQ(name2, "EVAL_ERROR"))
 			goto no_magicalize;
                     if (strEQ(name2, "EXECUTABLE_NAME"))
-			goto magicalize;
+			goto no_magicalize;
 		    if (strEQ(name2, "EXCEPTIONS_BEING_CAUGHT"))
 			goto ro_magicalize;
                     if (strEQ(name2, "EXTENDED_OS_ERROR"))
@@ -965,8 +965,10 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 
 		case 'H':
 		    if (strEQ(name2, "HINTS")) {
-			HV *const hv = SvHv(GvSVn(gv));
-			hv_magic(hv, NULL, PERL_MAGIC_hints);
+			SV *const hv = GvSVn(gv);
+			if ( ! SvHVOK(hv) )
+			    sv_upgrade(hv, SVt_PVHV);
+			hv_magic(SvHv(hv), NULL, PERL_MAGIC_hints);
 			goto magicalize;
 		    }
                     if (strEQ(name2, "HINT_BITS"))
@@ -983,7 +985,7 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 
 		case 'L':
                     if (strEQ(name2, "LAST_REGEXP_CODE_RESULT"))
-			goto magicalize;
+			goto no_magicalize;
                     if (strEQ(name2, "LAST_SUBMATCH_RESULT"))
 			goto magicalize;
 		    break;
@@ -1015,8 +1017,11 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 		case 'P':        /* $^PREMATCH  $^POSTMATCH */
                     if (strEQ(name2, "PERLDB"))
 			goto magicalize;
-                    if (strEQ(name2, "PERL_VERSION"))
-			goto magicalize;
+                    if (strEQ(name2, "PERL_VERSION")) {
+			SV * const sv = GvSVn(gv);
+			sv_setsv(sv, PL_patchlevel);
+			goto no_magicalize;  
+		    }
 		    if (strEQ(name2, "PREMATCH") || strEQ(name2, "POSTMATCH"))
 			goto magicalize;  
 		    if (strEQ(name2, "PROGRAM_NAME"))
@@ -1056,7 +1061,6 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 		    break;
 		}
 		Perl_croak(aTHX_ "Unknown magic variable '$%s'", name);
-	    }
 	    case '1':
 	    case '2':
 	    case '3':
@@ -1065,8 +1069,7 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 	    case '6':
 	    case '7':
 	    case '8':
-	    case '9':
-	    {
+	    case '9': {
 		/* Ensures that we have an all-digit variable, ${"1foo"} fails
 		   this test  */
 		/* This snippet is taken from is_gv_magical */

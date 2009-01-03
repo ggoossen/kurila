@@ -1031,7 +1031,7 @@ WARNING
             next unless $self->maybe_command($abs);
             print "Executing $abs\n" if ($trace +>= 2);
 
-            my $version_check = qq{$abs -le "\$^V =~ m/^\Q$ver\E/; print qq\{VER_OK\}"};
+            my $version_check = qq{$abs -le "\$^PERL_VERSION =~ m/^\Q$ver\E/; print qq\{VER_OK\}"};
             $version_check = "%Config{?run} $version_check"
                 if defined %Config{?run} and length %Config{?run};
 

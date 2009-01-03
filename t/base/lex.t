@@ -127,7 +127,7 @@ print $foo;
 # MJD 19990227
 
 do {
-  my $CX = "^X";
+  my $CX = "^EXECUTABLE_NAME";
   my $CXY  ="^RE_TRIE_MAXBUF";
   ${*{Symbol::fetch_glob($CX)}} = 17;
   ${*{Symbol::fetch_glob($CXY)}} = 23;
