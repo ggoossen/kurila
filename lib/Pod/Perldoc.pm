@@ -303,7 +303,7 @@ EOUSAGE
 
 #..........................................................................
 
-sub pagers { < @{ shift->{?'pagers'} } } 
+sub pagers { shift->{'pagers'} }
 
 #..........................................................................
 
@@ -333,7 +333,7 @@ sub init {
 
   $self->init_formatter_class_list;
 
-  $self->{+'pagers' } = \ @Pagers unless exists $self->{'pagers'};
+  $self->{+'pagers' } = @Pagers unless exists $self->{'pagers'};
   $self->{+'bindir' } = $Bindir   unless exists $self->{'bindir'};
   $self->{+'pod2man'} = $Pod2man  unless exists $self->{'pod2man'};
 
@@ -1260,7 +1260,7 @@ sub pagers_guessing {
 
     my @pagers;
     push @pagers, < $self->pagers;
-    $self->{+'pagers'} = \@pagers;
+    $self->{+'pagers'} = @pagers;
 
     if (IS_MSWin32) {
         push @pagers, < qw( more< less notepad );
