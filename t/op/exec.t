@@ -14,10 +14,10 @@ $^OUTPUT_AUTOFLUSH = 1;				# flush stdout
 env::set_var('LC_ALL'   => 'C');		# Forge English error messages.
 env::set_var('LANGUAGE' => 'C');		# Ditto in GNU.
 
-my $Is_VMS   = $^O eq 'VMS';
-my $Is_Win32 = $^O eq 'MSWin32';
+my $Is_VMS   = $^OS_NAME eq 'VMS';
+my $Is_Win32 = $^OS_NAME eq 'MSWin32';
 
-skip_all("Tests mostly usesless on MacOS") if $^O eq 'MacOS';
+skip_all("Tests mostly usesless on MacOS") if $^OS_NAME eq 'MacOS';
 
 plan(tests => 22);
 
@@ -25,7 +25,7 @@ my $Perl = which_perl();
 
 my $exit;
 SKIP: do {
-    skip("bug/feature of pdksh", 2) if $^O eq 'os2';
+    skip("bug/feature of pdksh", 2) if $^OS_NAME eq 'os2';
 
     my $tnum = curr_test();
     $exit = system qq{$Perl -le "print q\{ok $tnum - interp system(EXPR)"\}};
@@ -113,7 +113,7 @@ do {
 
 TODO: do {
     my $tnum = curr_test();
-    if( $^O =~ m/Win32/ ) {
+    if( $^OS_NAME =~ m/Win32/ ) {
         print "not ok $tnum - exec failure doesn't terminate process " .
               "# TODO Win32 exec failure waits for user input\n";
         next_test();

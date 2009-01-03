@@ -495,13 +495,13 @@ sub pod2usage {
                         %opts{?"exitval"} +< 2) ?? \*STDOUT !! \*STDERR
             unless (defined %opts{?"output"});
     ## Default the input file
-    %opts{+"input"} = $0  unless (defined %opts{?"input"});
+    %opts{+"input"} = $^PROGRAM_NAME  unless (defined %opts{?"input"});
 
     ## Look up input file in path if it doesnt exist.
     unless ((ref %opts{?"input"}) || (-e %opts{?"input"})) {
         my @($basename) = @(%opts{?"input"});
-        my $pathsep = ($^O =~ m/^(?:dos|os2|MSWin32)$/) ?? ";"
-                            !! (($^O eq 'MacOS' || $^O eq 'VMS') ?? ',' !!  ":");
+        my $pathsep = ($^OS_NAME =~ m/^(?:dos|os2|MSWin32)$/) ?? ";"
+                            !! (($^OS_NAME eq 'MacOS' || $^OS_NAME eq 'VMS') ?? ',' !!  ":");
         my $pathspec = %opts{?"pathlist"} || env::var('PATH') || env::var('PERL5LIB');
 
         my @paths = @( (ref $pathspec) ?? < @$pathspec !! < split($pathsep, $pathspec) );

@@ -6,7 +6,7 @@
 use File::Spec;
 use lib File::Spec->catdir('t', 'lib');
 
-use Test::More (-x $^X
+use Test::More (-x $^EXECUTABLE_NAME
 		?? (tests => 5)
 		!! (skip_all => "Can't find an executable file")
 	       );
@@ -55,19 +55,19 @@ sub sayok{
     return $output;
 }
 
-print "# Checking manipulations of \$^X=$^X\n";
+print "# Checking manipulations of \$^X=$^EXECUTABLE_NAME\n";
 
-my $perl = safe_rel($^X);
+my $perl = safe_rel($^EXECUTABLE_NAME);
 is( sayok($perl), "ok\n",   "`$perl rel2abs2rel$^PID.pl` works" );
 
-$perl = File::Spec->rel2abs($^X);
+$perl = File::Spec->rel2abs($^EXECUTABLE_NAME);
 is( sayok($perl), "ok\n",   "`$perl rel2abs2rel$^PID.pl` works" );
 
 $perl = File::Spec->canonpath($perl);
-is( sayok($perl), "ok\n",   "canonpath(rel2abs($^X)) = $perl" );
+is( sayok($perl), "ok\n",   "canonpath(rel2abs($^EXECUTABLE_NAME)) = $perl" );
 
 $perl = safe_rel(File::Spec->abs2rel($perl));
-is( sayok($perl), "ok\n",   "safe_rel(abs2rel(canonpath(rel2abs($^X)))) = $perl" );
+is( sayok($perl), "ok\n",   "safe_rel(abs2rel(canonpath(rel2abs($^EXECUTABLE_NAME)))) = $perl" );
 
-$perl = safe_rel(File::Spec->canonpath($^X));
-is( sayok($perl), "ok\n",   "safe_rel(canonpath($^X)) = $perl" );
+$perl = safe_rel(File::Spec->canonpath($^EXECUTABLE_NAME));
+is( sayok($perl), "ok\n",   "safe_rel(canonpath($^EXECUTABLE_NAME)) = $perl" );

@@ -31,7 +31,7 @@ $VERSION = '1.26_01';
 $Verbose = 0;
 $lib_ext = config_value("lib_ext") || '.a';
 
-sub is_cmd { $0 eq '-e' }
+sub is_cmd { $^PROGRAM_NAME eq '-e' }
 
 sub my_return {
     my $val = shift;
@@ -189,7 +189,7 @@ sub ldopts {
 
     push(@potential_libs, < @link_args)    if scalar nelems @link_args;
     # makemaker includes std libs on windows by default
-    if ($^O ne 'MSWin32' and defined($std)) {
+    if ($^OS_NAME ne 'MSWin32' and defined($std)) {
 	push(@potential_libs, config_value("perllibs"));
     }
 
@@ -222,10 +222,10 @@ sub ldopts {
     #print STDERR "\@potential_libs = @potential_libs\n";
 
     my $libperl;
-    if ($^O eq 'MSWin32') {
+    if ($^OS_NAME eq 'MSWin32') {
 	$libperl = config_value("libperl");
     }
-    elsif ($^O eq 'os390' && config_value("usedl")) {
+    elsif ($^OS_NAME eq 'os390' && config_value("usedl")) {
 	# Nothing for OS/390 (z/OS) dynamic.
     } else {
 	$libperl = (grep(m/^-l\w*perl\w*$/, @link_args))[?0]
@@ -235,7 +235,7 @@ sub ldopts {
     }
 
     my $lpath = File::Spec->catdir(config_value("archlibexp"), 'CORE');
-    $lpath = qq["$lpath"] if $^O eq 'MSWin32';
+    $lpath = qq["$lpath"] if $^OS_NAME eq 'MSWin32';
     my @($extralibs, $bsloadlibs, $ldloadlibs, $ld_run_path, ...) = 
 	MM->ext(join ' ', @( "-L$lpath", $libperl, < @potential_libs));
 
@@ -262,7 +262,7 @@ sub ccdlflags {
 
 sub perl_inc {
     my $dir = File::Spec->catdir(config_value("archlibexp"), 'CORE');
-    $dir = qq["$dir"] if $^O eq 'MSWin32';
+    $dir = qq["$dir"] if $^OS_NAME eq 'MSWin32';
     my_return(" -I$dir ");
 }
 

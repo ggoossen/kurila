@@ -20,7 +20,7 @@ WriteMakefile(
 my $ivtype = config_value("ivtype");
 
 # I don't know if the VMS folks ever supported long long on 5.6.x
-if ($ivtype and $ivtype eq 'long long' and $^O !~ m/^MSWin/) {
+if ($ivtype and $ivtype eq 'long long' and $^OS_NAME !~ m/^MSWin/) {
   print <<'EOM';
 
 You appear to have a perl configured to use 64 bit integers in its scalar

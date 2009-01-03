@@ -10,13 +10,13 @@ my %wsa = %( () );
 # Symbian cross-compiling environment.
 my $IsSymbian = defined env::var("SDK") && -d "$(env::var('SDK'))\\epoc32";
 
-my $IsMSWin32 = $^O eq 'MSWin32' && !$IsSymbian;
+my $IsMSWin32 = $^OS_NAME eq 'MSWin32' && !$IsSymbian;
 
 unlink "Errno.pm" if -f "Errno.pm";
 open OUT, ">", "Errno.pm" or die "Cannot open Errno.pm: $^OS_ERROR";
 select OUT;
 my @files = get_files();
-if (config_value("gccversion") ne '' && $^O eq 'MSWin32') {
+if (config_value("gccversion") ne '' && $^OS_NAME eq 'MSWin32') {
     # MinGW complains "warning: #pragma system_header ignored outside include
     # file" if the header files are processed individually, so include them
     # all in .c file and process that instead.
@@ -43,7 +43,7 @@ sub process_file {
     my@($file) =  @_;
 
     # for win32 perl under cygwin, we need to get a windows pathname
-    if ($^O eq 'MSWin32' && config_value("cc") =~ m/\B-mno-cygwin\b/ &&
+    if ($^OS_NAME eq 'MSWin32' && config_value("cc") =~ m/\B-mno-cygwin\b/ &&
         defined($file) && !-f $file) {
         chomp($file = `cygpath -w "$file"`);
     }
@@ -52,7 +52,7 @@ sub process_file {
 #    warn "Processing $file\n";
 
     local *FH;
-    if (($^O eq 'VMS') && (config_value("vms_cc_type") ne 'gnuc')) {
+    if (($^OS_NAME eq 'VMS') && (config_value("vms_cc_type") ne 'gnuc')) {
 	unless(open(FH, "-|", "LIBRARY/EXTRACT=ERRNO/OUTPUT=SYS\$OUTPUT $file")) {
             warn "Cannot open '$file'";
             return;
@@ -60,7 +60,7 @@ sub process_file {
     } elsif (config_value("gccversion") ne ''
              # OpenSTEP has gcc 2.7.2.1 which recognizes but
 	     # doesn't implement the -dM flag.
-	     && $^O ne 'openstep' && $^O ne 'next' && $^O ne 'darwin'
+	     && $^OS_NAME ne 'openstep' && $^OS_NAME ne 'next' && $^OS_NAME ne 'darwin'
 	     ) { 
 	# With the -dM option, gcc outputs every #define it finds
 	unless(open(FH,"-|","$(config_value('cc')) -E -dM $(config_value('cppflags')) $file")) {
@@ -71,12 +71,12 @@ sub process_file {
 	unless(open(FH, "<"," $file")) {
 	    # This file could be a temporary file created by cppstdin
 	    # so only warn under -w, and return
-            warn "Cannot open '$file'" if $^W;
+            warn "Cannot open '$file'" if $^WARNING;
             return;
 	}
     }
     
-    if ($^O eq 'MacOS') {
+    if ($^OS_NAME eq 'MacOS') {
 	while( ~< *FH) {
 	    %err{+$1} = $2
 		if m/^\s*#\s*define\s+(E\w+)\s+(\d+)/;
@@ -116,7 +116,7 @@ sub default_cpp {
 sub get_files {
     my %file = %( () );
     # VMS keeps its include files in system libraries (well, except for Gcc)
-    if ($^O eq 'VMS') {
+    if ($^OS_NAME eq 'VMS') {
 	if ($(config_value('vms_cc_type')) eq 'decc') {
 	    %file{+'Sys$Library:DECC$RTLDEF.TLB'} = 1;
 	} elsif ($(config_value('vms_cc_type')) eq 'vaxc') {
@@ -124,10 +124,10 @@ sub get_files {
 	} elsif ($(config_value('vms_cc_type')) eq 'gcc') {
 	    %file{+'gnu_cc_include:[000000]errno.h'} = 1;
 	}
-    } elsif ($^O eq 'os390') {
+    } elsif ($^OS_NAME eq 'os390') {
 	# OS/390 C compiler doesn't generate #file or #line directives
 	%file{+'/usr/include/errno.h'} = 1;
-    } elsif ($^O eq 'vmesa') {
+    } elsif ($^OS_NAME eq 'vmesa') {
 	# OS/390 C compiler doesn't generate #file or #line directives
 	%file{+'../../vmesa/errno.h'} = 1;
     } elsif ($(config_value('archname')) eq 'epoc') {
@@ -139,7 +139,7 @@ sub get_files {
 	if ($dep =~ m/(\S+errno\.h)/) {
 	     %file{+$1} = 1;
 	}
-    } elsif ($^O eq 'linux' &&
+    } elsif ($^OS_NAME eq 'linux' &&
 	      $(config_value('gccversion')) ne '' && 
 	      $(config_value('gccversion')) !~ m/intel/i
 	      # might be using, say, Intel's icc
@@ -149,16 +149,16 @@ sub get_files {
 	my $linux_errno_h = -e '/usr/include/errno.h' ??
 	    '/usr/include/errno.h' !! '/usr/local/include/errno.h';
 	%file{+$linux_errno_h} = 1;
-    } elsif ($^O eq 'MacOS') {
+    } elsif ($^OS_NAME eq 'MacOS') {
 	# note that we are only getting the GUSI errno's here ...
 	# we might miss out on compiler-specific ones
 	%file{+"$(env::var('GUSI'))include:sys:errno.h"} = 1;
 
-    } elsif ($^O eq 'beos') {
+    } elsif ($^OS_NAME eq 'beos') {
 	# hidden in a special place
 	%file{+'/boot/develop/headers/posix/errno.h'} = 1;
 
-    } elsif ($^O eq 'vos') {
+    } elsif ($^OS_NAME eq 'vos') {
 	# avoid problem where cpp returns non-POSIX pathnames
 	%file{+'/system/include_library/errno.h'} = 1;
     } elsif ($IsSymbian) {
@@ -169,7 +169,7 @@ sub get_files {
 	open(CPPI, ">","errno.c") or
 	    die "Cannot open errno.c";
 
-	if ($^O eq 'NetWare') {
+	if ($^OS_NAME eq 'NetWare') {
 	    print CPPI "#include <nwerrno.h>\n";
 	} else {
 	    print CPPI "#include <errno.h>\n";
@@ -182,7 +182,7 @@ sub get_files {
 	close(CPPI);
 
 	# invoke CPP and read the output
-	if ($IsMSWin32 || $^O eq 'NetWare') {
+	if ($IsMSWin32 || $^OS_NAME eq 'NetWare') {
 	    open(CPPO,"-|","$(config_value('cpprun')) $(config_value('cppflags')) errno.c") or
 		die "Cannot run '$(config_value('cpprun')) $(config_value('cppflags')) errno.c'";
 	} else {
@@ -192,14 +192,14 @@ sub get_files {
 	}
 
 	my $pat;
-	if (($IsMSWin32 || $^O eq 'NetWare') and config_value("cc") =~ m/^bcc/i) {
+	if (($IsMSWin32 || $^OS_NAME eq 'NetWare') and config_value("cc") =~ m/^bcc/i) {
 	    $pat = '^/\*\s+(.+)\s+\d+\s*:\s+\*/';
 	}
 	else {
 	    $pat = '^#\s*(?:line)?\s*\d+\s+"([^"]+)"';
 	}
 	while( ~< *CPPO) {
-	    if ($^O eq 'os2' or $IsMSWin32 or $^O eq 'NetWare') {
+	    if ($^OS_NAME eq 'os2' or $IsMSWin32 or $^OS_NAME eq 'NetWare') {
 		if (m/$pat/o) {
 		   my $f = $1;
 		   $f =~ s,\\\\,/,g;
@@ -226,7 +226,7 @@ sub write_errno_pm {
     open(CPPI, ">","errno.c") or
 	die "Cannot open errno.c";
 
-    if ($^O eq 'NetWare') {
+    if ($^OS_NAME eq 'NetWare') {
 	print CPPI "#include <nwerrno.h>\n";
 	} 
     else {
@@ -248,15 +248,15 @@ sub write_errno_pm {
 
     close(CPPI);
 
-    unless ($^O eq 'MacOS' || $^O eq 'beos') {	# trust what we have / get later
+    unless ($^OS_NAME eq 'MacOS' || $^OS_NAME eq 'beos') {	# trust what we have / get later
     # invoke CPP and read the output
 
-	if ($^O eq 'VMS') {
+	if ($^OS_NAME eq 'VMS') {
 	    my $cpp = "$(config_value('cppstdin')) $(config_value('cppflags')) $(config_value('cppminus'))";
 	    $cpp =~ s/sys\$input//i;
 	    open(CPPO,"-|", "$cpp  errno.c") or
 		die "Cannot exec $(config_value('cppstdin'))";
-	} elsif ($IsMSWin32 || $^O eq 'NetWare') {
+	} elsif ($IsMSWin32 || $^OS_NAME eq 'NetWare') {
 	    open(CPPO,"-|", "$(config_value('cpprun')) $(config_value('cppflags')) errno.c") or
 		die "Cannot run '$(config_value('cpprun')) $(config_value('cppflags')) errno.c'";
 	} elsif ($IsSymbian) {
@@ -296,7 +296,7 @@ sub write_errno_pm {
     # didn't even bother to get the values of the ones that have numeric
     # values, since we can get all of them here, anyway.
 
-    if ($^O eq 'beos') {
+    if ($^OS_NAME eq 'beos') {
 	if (open(C, ">", "errno.c")) {
 	    my @allerrs = keys %err;
 	    print C <<EOF;

@@ -5,8 +5,8 @@ BEGIN {
     @INC = @( '../lib' ); 
 }
 
-my $perl = $^X;
-$perl = VMS::Filespec::vmsify($perl) if $^O eq 'VMS';
+my $perl = $^EXECUTABLE_NAME;
+$perl = VMS::Filespec::vmsify($perl) if $^OS_NAME eq 'VMS';
 
 my $Invoke_Perl = qq(MCR $perl "-I[-.lib]");
 
@@ -14,20 +14,20 @@ BEGIN { require "./test.pl"; }
 plan(tests => 25);
 
 SKIP: do {
-    skip("tests for non-VMS only", 1) if $^O eq 'VMS';
+    skip("tests for non-VMS only", 1) if $^OS_NAME eq 'VMS';
 
     no utf8;
 
     our $Orig_Bits;
 
-    BEGIN { $Orig_Bits = $^H }
+    BEGIN { $Orig_Bits = $^HINT_BITS }
 
     # make sure that all those 'use vmsish' calls didn't do anything.
-    is( $Orig_Bits, $^H,    'use vmsish a no-op' );
+    is( $Orig_Bits, $^HINT_BITS,    'use vmsish a no-op' );
 };
 
 SKIP: do {
-    skip("tests for VMS only", 24) unless $^O eq 'VMS';
+    skip("tests for VMS only", 24) unless $^OS_NAME eq 'VMS';
 
 #========== vmsish status ==========
 `$Invoke_Perl -e 1`;  # Avoid system() from a pipe from harness.  Mutter.

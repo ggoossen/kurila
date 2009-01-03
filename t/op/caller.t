@@ -137,9 +137,9 @@ is( $i, 11, "do not skip over eval (and caller returns 10 elements)" );
 
 is( eval 'pb()', 'main::pb', "actually return the right function name" );
 
-my $saved_perldb = $^P;
-$^P = 16;
-$^P = $saved_perldb;
+my $saved_perldb = $^PERLDB;
+$^PERLDB = 16;
+$^PERLDB = $saved_perldb;
 
 $i = eval $debugger_test;
 is( $i, 11, 'do not skip over eval even if $^P had been on at some point' );

@@ -17,12 +17,12 @@ my $result = GetOptions ("rank" => \$rank,		    # rank authors
 
 if (!$result or (($rank||0) + ($ta||0) + ((nelems @authors) ?? 1 !! 0) != 1) or !nelems @ARGV) {
   die <<"EOS";
-$0 --rank Changelogs                        # rank authors by patches
-$0 --acknowledged <authors file> Changelogs # Display unacknowledged authors
-$0 --thanks-applied Changelogs		    # ranks committers
-$0 --percentage ...                         # show rankings as percentages
-$0 --cumulative ...                         # show rankings cumulatively
-$0 --reverse ...                            # show rankings in reverse
+$^PROGRAM_NAME --rank Changelogs                        # rank authors by patches
+$^PROGRAM_NAME --acknowledged <authors file> Changelogs # Display unacknowledged authors
+$^PROGRAM_NAME --thanks-applied Changelogs		    # ranks committers
+$^PROGRAM_NAME --percentage ...                         # show rankings as percentages
+$^PROGRAM_NAME --cumulative ...                         # show rankings cumulatively
+$^PROGRAM_NAME --reverse ...                            # show rankings in reverse
 Specify stdin as - if needs be. Remember that option names can be abbreviated.
 EOS
 }

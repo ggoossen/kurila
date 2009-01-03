@@ -15,7 +15,7 @@ our $got_files = 0; # set to 1 to generate output files.
 
 $^OUTPUT_AUTOFLUSH = 1;
 
-my $Is_MacOS = $^O eq 'MacOS';
+my $Is_MacOS = $^OS_NAME eq 'MacOS';
 my $tmpfile = "tmp0000";
 1 while -e ++$tmpfile;
 END { 1 while unlink $tmpfile }
@@ -141,7 +141,7 @@ for ( @prgs){
     # allow expected output to be written as if $prog is on STDIN
     $results =~ s/tmp\d+/-/g;
     $results =~ s|at \.\./lib/warnings\.pm line \d+ character \d+\.|at .../warnings.pm line xxx.|g;
-    if ($^O eq 'VMS') {
+    if ($^OS_NAME eq 'VMS') {
         # some tests will trigger VMS messages that won't be expected
         $results =~ s/\n?%[A-Z]+-[SIWEF]-[A-Z]+,.*//;
 
@@ -174,11 +174,11 @@ for ( @prgs){
 		$option_random = 1;
 	    }
 	    else {
-		die "$0: Unknown OPTION '$option'\n";
+		die "$^PROGRAM_NAME: Unknown OPTION '$option'\n";
 	    }
 	}
     }
-    die "$0: can't have OPTION regex and random\n"
+    die "$^PROGRAM_NAME: can't have OPTION regex and random\n"
         if $option_regex + $option_random +> 1;
     my $ok = 0;
     if ($results =~ s/^SKIPPED\n//) {

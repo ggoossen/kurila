@@ -47,7 +47,7 @@ sub canonpath {
     # may be interpreted in an implementation-defined manner, although
     # more than two leading slashes shall be treated as a single slash.")
     my $node = '';
-    my $double_slashes_special = $^O eq 'qnx' || $^O eq 'nto';
+    my $double_slashes_special = $^OS_NAME eq 'qnx' || $^OS_NAME eq 'nto';
     if ( $double_slashes_special && $path =~ s{^(//[^/]+)(?:/|\z)}{/}s ) {
       $node = $1;
     }

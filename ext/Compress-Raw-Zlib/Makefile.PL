@@ -22,7 +22,7 @@ my $USE_PPPORT_H = (env::var('PERL_CORE')) ?? '' !! '-DUSE_PPPORT_H';
 # ExtUtils::Install.
 
 # Don't ask if MM_USE_DEFAULT is set -- enables perl core building on cygwin
-if ($^O =~ m/cygwin/i and $ExtUtils::Install::VERSION +< 1.39 
+if ($^OS_NAME =~ m/cygwin/i and $ExtUtils::Install::VERSION +< 1.39 
         and not (env::var('PERL_MM_USE_DEFAULT') or env::var('PERL_CORE')))
 {
     print <<EOM ;
@@ -202,7 +202,7 @@ sub ParseCONFIG
     $ZLIB_INCLUDE = env::var('ZLIB_INCLUDE') || %Info{?'INCLUDE'} ;
     $ZLIB_LIB = env::var('ZLIB_LIB') || %Info{?'LIB'} ;
 
-    if ($^O eq 'VMS') {
+    if ($^OS_NAME eq 'VMS') {
         $ZLIB_INCLUDE = VMS::Filespec::vmspath($ZLIB_INCLUDE);
         $ZLIB_LIB = VMS::Filespec::vmspath($ZLIB_LIB);
     }
@@ -351,7 +351,7 @@ sub getOSCode
 {
     my $default = 3 ; # Unix is the default
 
-    my $uname = $^O;
+    my $uname = $^OS_NAME;
 
     for my $h ( @GZIP_OS_Names)
     {

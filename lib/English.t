@@ -11,11 +11,11 @@ use Errno;
 
 our $threads;
 
-is( $PROGRAM_NAME, $0, '$PROGRAM_NAME' );
-is( $BASETIME, $^T, '$BASETIME' );
+is( $PROGRAM_NAME, $^PROGRAM_NAME, '$PROGRAM_NAME' );
+is( $BASETIME, $^BASETIME, '$BASETIME' );
 
-is( $PERL_VERSION, $^V, '$PERL_VERSION' );
-is( $DEBUGGING, $^D, '$DEBUGGING' );
+is( $PERL_VERSION, $^PERL_VERSION, '$PERL_VERSION' );
+is( $DEBUGGING, $^DEBUGGING, '$DEBUGGING' );
 
 is( $WARNING, 0, '$WARNING' );
 like( $EXECUTABLE_NAME, qr/perl/i, '$EXECUTABLE_NAME' );

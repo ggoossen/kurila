@@ -9,12 +9,12 @@ chdir('op') || chdir('t/op') || die "sysio.t: cannot look for myself: $^OS_ERROR
 
 open(I, "<", 'sysio.t') || die "sysio.t: cannot find myself: $^OS_ERROR";
 
-$reopen = ($^O eq 'VMS' ||
-           $^O eq 'os2' ||
-           $^O eq 'MSWin32' ||
-           $^O eq 'NetWare' ||
-           $^O eq 'dos' ||
-	   $^O eq 'mpeix');
+$reopen = ($^OS_NAME eq 'VMS' ||
+           $^OS_NAME eq 'os2' ||
+           $^OS_NAME eq 'MSWin32' ||
+           $^OS_NAME eq 'NetWare' ||
+           $^OS_NAME eq 'dos' ||
+	   $^OS_NAME eq 'mpeix');
 
 $x = 'abc';
 

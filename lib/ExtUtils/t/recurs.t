@@ -22,7 +22,7 @@ use MakeMaker::Test::Setup::Recurs;
 env::set_var($_, undef) for qw(PREFIX LIB MAKEFLAGS);
 
 my $perl = which_perl();
-my $Is_VMS = $^O eq 'VMS';
+my $Is_VMS = $^OS_NAME eq 'VMS';
 
 chdir('t');
 

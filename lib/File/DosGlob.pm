@@ -373,7 +373,7 @@ sub glob {
 
     # if we're just beginning, do it all first
     if (%iter{?$cxix} == 0) {
-	if ($^O eq 'MacOS') {
+	if ($^OS_NAME eq 'MacOS') {
 		# first, take care of updirs and trailing colons
 		@pat = _preprocess_pattern(< @pat);
 		# expand volume names

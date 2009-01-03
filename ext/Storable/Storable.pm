@@ -244,7 +244,7 @@ sub _store {
 	if ($use_locking) {
 		open(FILE, ">>", "$file") || logcroak "can't write into $file: $^OS_ERROR";
 		unless (&CAN_FLOCK( < @_ )) {
-			logcarp "Storable::lock_store: fcntl/flock emulation broken on $^O";
+			logcarp "Storable::lock_store: fcntl/flock emulation broken on $^OS_NAME";
 			return undef;
 		}
 		flock(FILE, LOCK_EX) ||
@@ -368,7 +368,7 @@ sub _retrieve {
 	my $da = $^EVAL_ERROR;							# Could be from exception handler
 	if ($use_locking) {
 		unless (&CAN_FLOCK( < @_ )) {
-			logcarp "Storable::lock_store: fcntl/flock emulation broken on $^O";
+			logcarp "Storable::lock_store: fcntl/flock emulation broken on $^OS_NAME";
 			return undef;
 		}
 		flock(FILE, LOCK_SH) || logcroak "can't get shared lock on $file: $^OS_ERROR";

@@ -10,7 +10,7 @@ my $OS2 = "-DOS2" if config_value('osname') eq 'os2' ;
 
 my $LIB = "-ldb" ;
 # so is win32
-$LIB = "-llibdb" if $^O eq 'MSWin32' ;
+$LIB = "-llibdb" if $^OS_NAME eq 'MSWin32' ;
 
 WriteMakefile(
 	NAME 		=> 'DB_File',
@@ -20,7 +20,7 @@ WriteMakefile(
 	OBJECT		=> 'version$(OBJ_EXT) DB_File$(OBJ_EXT)',
 	XSPROTOARG	=> '-noprototypes',
 	DEFINE		=> $OS2 || "",
-	INC		=> ($^O eq "MacOS" ?? "-i ::::db:include" !! ""),
+	INC		=> ($^OS_NAME eq "MacOS" ?? "-i ::::db:include" !! ""),
         XS_VERSION      => eval MM->parse_version('DB_File.pm'),
         LICENSE  => 'perl',
         ABSTRACT_FROM => 'DB_File.pm',

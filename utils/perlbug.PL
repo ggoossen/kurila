@@ -16,9 +16,9 @@ use File::Spec::Functions;
 # This forces PL files to create target in same directory as PL file.
 # This is so that make depend always knows where to find PL derivatives.
 my $origdir = cwd;
-chdir dirname($0);
-my $file = basename($0, '.PL');
-$file .= '.com' if $^O eq 'VMS';
+chdir dirname($^PROGRAM_NAME);
+my $file = basename($^PROGRAM_NAME, '.PL');
+$file .= '.com' if $^OS_NAME eq 'VMS';
 
 open OUT, ">", "$file" or die "Can't create $file: $^OS_ERROR";
 
@@ -61,7 +61,7 @@ print "Extracting $file (with variable substitutions)\n";
 # In this section, perl variables will be expanded during extraction.
 # You can use $Config{...} to use Configure variables.
 
-my $extract_version = sprintf("\%vd", $^V);
+my $extract_version = sprintf("\%vd", $^PERL_VERSION);
 
 print OUT <<"!GROK!THIS!";
 $(config_value("startperl"))

@@ -141,7 +141,7 @@ do {
   eval "\$\cR = 24";                 # Literal control character
   if ($^EVAL_ERROR or ${*{Symbol::fetch_glob("\cR")}} != 24) {  print "not "  }
   print "ok 33\n";
-  if ($^R == 24) {  print "not "  }  # Control character is NOT escape sequence
+  if ($^LAST_REGEXP_CODE_RESULT == 24) {  print "not "  }  # Control character is NOT escape sequence
   print "ok 34\n";
 
 # Does the old UNBRACED syntax still do what it used to?
@@ -150,10 +150,10 @@ do {
 
   sub XX () { 6 }
   $ {*{Symbol::fetch_glob("\cR\cXX")}} = 119; 
-  $^R = 5; #  This should be an unused ^Var.
+  $^LAST_REGEXP_CODE_RESULT = 5; #  This should be an unused ^Var.
   $N = 5;
   # The second caret here should be interpreted as an xor
-  if (($^R^^^XX) != 3) { print "not " } 
+  if (($^LAST_REGEXP_CODE_RESULT^^^XX) != 3) { print "not " } 
   print "ok 36\n";
 #  if (($N  ^  XX()) != 3) { print "not " } 
 #  print "ok 32\n";
@@ -174,15 +174,15 @@ do {
 
 # Now let's make sure that caret variables are all forced into the main package.
   package Someother;
-  $^R = 'Someother';
+  $^LAST_REGEXP_CODE_RESULT = 'Someother';
   $^RE_TRIE_MAXBUF = 'Someother 2';
-  $^M = 'Someother 3';
+  $^EMERGENCY_MEMORY = 'Someother 3';
   package main;
-  print "not " unless $^R eq 'Someother';
+  print "not " unless $^LAST_REGEXP_CODE_RESULT eq 'Someother';
   print "ok 39\n";
   print "not " unless $^RE_TRIE_MAXBUF eq 'Someother 2';
   print "ok 40\n";
-  print "not " unless $^M eq 'Someother 3';
+  print "not " unless $^EMERGENCY_MEMORY eq 'Someother 3';
   print "ok 41\n";
 
   

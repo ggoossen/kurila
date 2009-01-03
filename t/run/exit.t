@@ -6,23 +6,23 @@
 # Run some code, return its wait status.
 sub run {
     my@($code) =@( shift);
-    $code = "\"" . $code . "\"" if $^O eq 'VMS'; #VMS needs quotes for this.
-    return system($^X, "-e", $code);
+    $code = "\"" . $code . "\"" if $^OS_NAME eq 'VMS'; #VMS needs quotes for this.
+    return system($^EXECUTABLE_NAME, "-e", $code);
 }
 
 our $numtests;
 BEGIN {
     # MacOS system() doesn't have good return value
-    $numtests = ($^O eq 'VMS') ?? 16 !! ($^O eq 'MacOS') ?? 0 !! 17;
+    $numtests = ($^OS_NAME eq 'VMS') ?? 16 !! ($^OS_NAME eq 'MacOS') ?? 0 !! 17;
 }
 
 require "./test.pl";
 plan(tests => $numtests);
 
 my $native_success = 0;
-   $native_success = 1 if $^O eq 'VMS';
+   $native_success = 1 if $^OS_NAME eq 'VMS';
 
-if ($^O ne 'MacOS') {
+if ($^OS_NAME ne 'MacOS') {
 my ($exit, $exit_arg);
 
 $exit = run('exit');
@@ -30,7 +30,7 @@ is( $exit >> 8, 0,              'Normal exit' );
 is( $exit, $^CHILD_ERROR,                  'Normal exit $?' );
 is( $^CHILD_ERROR_NATIVE, $native_success,  'Normal exit $^CHILD_ERROR_NATIVE' );
 
-if ($^O ne 'VMS') {
+if ($^OS_NAME ne 'VMS') {
   my $posix_ok = try { require POSIX; };
   my $wait_macros_ok = defined &POSIX::WIFEXITED;
 
@@ -47,7 +47,7 @@ if ($^O ne 'VMS') {
   };
 
   SKIP: do {
-    skip("Skip signals and core dump tests on Win32", 7) if $^O eq 'MSWin32';
+    skip("Skip signals and core dump tests on Win32", 7) if $^OS_NAME eq 'MSWin32';
 
     $exit = run('kill 15, $^PID; sleep(1);');
 
@@ -134,7 +134,7 @@ $exit = run("END \{ \$^CHILD_ERROR = $exit_arg \}");
 # status codes to SS$_ABORT on exit, but passes through unmodified UNIX
 # status codes that exit() is called with by scripts.
 
-$exit_arg = (44 ^&^ 7) if $^O eq 'VMS';  
+$exit_arg = (44 ^&^ 7) if $^OS_NAME eq 'VMS';  
 
 is( $exit >> 8, $exit_arg,             'Changing $? in END block' );
 }

@@ -12,7 +12,7 @@ BEGIN {
 
 use Test::More tests => 18;
 
-BEGIN { $^W = 1; }
+BEGIN { $^WARNING = 1; }
 
 my $warnings = '';
 local $^WARN_HOOK = sub { $warnings .= @_[0]->message };
@@ -34,7 +34,7 @@ sub warnings_like {
 }
 
 
-my $Filename = quotemeta $0;
+my $Filename = quotemeta $^PROGRAM_NAME;
    
 
 is( undef, undef,           'undef is undef');

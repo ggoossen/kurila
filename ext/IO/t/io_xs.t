@@ -3,7 +3,7 @@
 use Config;
 
 BEGIN {
-    if( $^O eq 'VMS' && config_value('vms_cc_type') ne 'decc' ) {
+    if( $^OS_NAME eq 'VMS' && config_value('vms_cc_type') ne 'decc' ) {
         print "1..0 # Skip: not compatible with the VAXCRTL\n";
         exit 0;
     }

@@ -15,12 +15,12 @@ use File::Find;
 use File::Spec::Functions < qw(rel2abs abs2rel catfile catdir curdir);
 
 for (@ARGV[[@(0, 1)]]) {
-    die "$0: '$_' does not look like Perl directory\n"
+    die "$^PROGRAM_NAME: '$_' does not look like Perl directory\n"
 	unless -f catfile($_, "perl.h") && -d catdir($_, "Porting");
 }
 
 my $dir2 = rel2abs(@ARGV[1]);
-chdir @ARGV[0] or die "$0: chdir '@ARGV[0]' failed: $^OS_ERROR\n";
+chdir @ARGV[0] or die "$^PROGRAM_NAME: chdir '@ARGV[0]' failed: $^OS_ERROR\n";
 
 # Files to skip from the check for one reason or another,
 # usually because they pull in their version from some other file.

@@ -10,7 +10,7 @@ use Test::More tests => 14;
 use mypragma (); # don't enable this pragma yet
 
 BEGIN {
-   is(%^H{?mypragma}, undef, "Shouldn't be in %^H yet");
+   is($^HINTS{?mypragma}, undef, "Shouldn't be in %^H yet");
 }
 
 is(mypragma::in_effect(), undef, "pragma not in effect yet");
@@ -43,5 +43,5 @@ eval qq{is(mypragma::in_effect(), undef, "pragma not in effect"); 1} or die $^EV
 
 
 BEGIN {
-   is(%^H{?mypragma}, undef, "Should no longer be in %^H");
+   is($^HINTS{?mypragma}, undef, "Should no longer be in %^H");
 }

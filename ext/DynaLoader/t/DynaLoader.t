@@ -41,7 +41,7 @@ can_ok( 'DynaLoader' => 'dl_load_file'            ); # defined in XS section
 can_ok( 'DynaLoader' => 'dl_load_flags'           ); # defined in Perl section
 can_ok( 'DynaLoader' => 'dl_undef_symbols'        ); # defined in XS section
 SKIP: do {
-    skip "unloading unsupported on $^O", 1 if ($^O eq 'VMS' || $^O eq 'darwin');
+    skip "unloading unsupported on $^OS_NAME", 1 if ($^OS_NAME eq 'VMS' || $^OS_NAME eq 'darwin');
     can_ok( 'DynaLoader' => 'dl_unload_file'          ); # defined in XS section
 };
 
@@ -75,7 +75,7 @@ my ($dlhandle, $dlerr);
 try { $dlhandle = DynaLoader::dl_load_file("egg_bacon_sausage_and_spam") };
 $dlerr = DynaLoader::dl_error();
 SKIP: do {
-    skip "dl_load_file() does not attempt to load file on VMS (and thus does not fail) when \@dl_require_symbols is empty", 1 if $^O eq 'VMS';
+    skip "dl_load_file() does not attempt to load file on VMS (and thus does not fail) when \@dl_require_symbols is empty", 1 if $^OS_NAME eq 'VMS';
     ok( !$dlhandle, "calling DynaLoader::dl_load_file() without an existing library should fail" );
 };
 ok( defined $dlerr, "dl_error() returning an error message: '$dlerr'" );
@@ -92,11 +92,11 @@ SKIP: do {
     # Some platforms are known to not have a "libc"
     # (not at least by that name) that the dl_findfile()
     # could find.
-    skip "dl_findfile test not appropriate on $^O", 1
-	if $^O =~ m/(win32|vms|openbsd|cygwin)/i;
+    skip "dl_findfile test not appropriate on $^OS_NAME", 1
+	if $^OS_NAME =~ m/(win32|vms|openbsd|cygwin)/i;
     # Play safe and only try this test if this system
     # looks pretty much Unix-like.
-    skip "dl_findfile test not appropriate on $^O", 1
+    skip "dl_findfile test not appropriate on $^OS_NAME", 1
 	unless -d '/usr' && -f '/bin/ls';
     cmp_ok( scalar nelems @files, '+>=', 1, "array should contain one result result or more: libc => ($(join ' ',@files))" );
 };
@@ -123,7 +123,7 @@ is( nelems @DynaLoader::dl_modules, nelems( keys %modules), "checking number of 
 my @loaded_modules = @DynaLoader::dl_modules;
 for my $libref (reverse @DynaLoader::dl_librefs) {
   SKIP: do {
-    skip "unloading unsupported on $^O", 2 if ($^O eq 'VMS' || $^O eq 'darwin');
+    skip "unloading unsupported on $^OS_NAME", 2 if ($^OS_NAME eq 'VMS' || $^OS_NAME eq 'darwin');
     my $module = pop @loaded_modules;
     my $r = try { DynaLoader::dl_unload_file($libref) };
     is( $^EVAL_ERROR, '', "calling dl_unload_file() for $module" );

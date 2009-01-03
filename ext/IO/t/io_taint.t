@@ -13,7 +13,7 @@ $x->close;
 $x = IO::File->new( "./__taint__$^PID", "<") || die("Cannot open ./__taint__$^PID\n");
 chop(my $unsafe = ~< $x);
 try { kill 0 * $unsafe };
-print "not " if ((($^O ne 'MSWin32') && ($^O ne 'NetWare')) and ($^EVAL_ERROR->{?description} !~ m/^Insecure/o));
+print "not " if ((($^OS_NAME ne 'MSWin32') && ($^OS_NAME ne 'NetWare')) and ($^EVAL_ERROR->{?description} !~ m/^Insecure/o));
 print "ok 1\n";
 $x->close;
 

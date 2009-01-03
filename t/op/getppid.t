@@ -37,7 +37,7 @@ sub fork_and_retrieve {
 	cmp_ok ($second, '+>=', 1, "New parent of orphaned $which grandchild");
 	SKIP: do {
 	    skip("Orphan processes are not reparented on QNX", 1)
-		if $^O eq 'nto';
+		if $^OS_NAME eq 'nto';
 	    isnt($first, $second,
                  "Orphaned $which grandchild got a new parent");
 	};
@@ -69,7 +69,7 @@ sub fork_and_retrieve {
 my $first = fork_and_retrieve("first");
 my $second = fork_and_retrieve("second");
 SKIP: do {
-    skip ("Orphan processes are not reparented on QNX", 1) if $^O eq 'nto';
+    skip ("Orphan processes are not reparented on QNX", 1) if $^OS_NAME eq 'nto';
     is ($first, $second, "Both orphaned grandchildren get the same new parent");
 };
 isnt ($first, $^PID, "And that new parent isn't this process");

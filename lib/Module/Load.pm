@@ -48,7 +48,7 @@ sub _to_file{
     my @parts = split m/::/;
 
     ### because of [perl #19213], see caveats ###
-    my $file = $^O eq 'MSWin32'
+    my $file = $^OS_NAME eq 'MSWin32'
                     ?? join "/", @parts
                     !! File::Spec->catfile( < @parts );
 
@@ -59,7 +59,7 @@ sub _to_file{
     ### format. Therefor, better unixify it first
     ### Patch in reply to John Malmbergs patch (as mentioned
     ### above) on p5p Tue 21 Aug 2007 04:55:07
-    $file = VMS::Filespec::unixify($file) if $^O eq 'VMS';
+    $file = VMS::Filespec::unixify($file) if $^OS_NAME eq 'VMS';
 
     return $file;
 }

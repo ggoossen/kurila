@@ -101,7 +101,7 @@ ok(m/^$_$/);
 # used to be a test for $*
 ok("ab\ncd\n" =~ m/^cd/m);
 
-if ($^O eq 'os390' or $^O eq 'posix-bc' or $^O eq 'MacOS') {
+if ($^OS_NAME eq 'os390' or $^OS_NAME eq 'posix-bc' or $^OS_NAME eq 'MacOS') {
     # Even with the alarm() OS/390 and BS2000 can't manage these tests
     # (Perl just goes into a busy loop, luckily an interruptable one)
     for (25..26) { print "not ok $_ # TODO compiler bug?\n" }

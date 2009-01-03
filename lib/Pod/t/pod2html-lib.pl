@@ -42,7 +42,7 @@ sub convert_n_test {
 	    open my $tmpfile, ">", $expectfile or die $^OS_ERROR;
 	    print $tmpfile $expect;
 	    close $tmpfile;
-	    my $diffopt = $^O eq 'linux' ?? 'u' !! 'c';
+	    my $diffopt = $^OS_NAME eq 'linux' ?? 'u' !! 'c';
 	    open my $diff, "-|", "diff -$diffopt $expectfile $outfile" or die $^OS_ERROR;
 	    print "# $_" while ~< $diff;
 	    close $diff;

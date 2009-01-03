@@ -228,7 +228,7 @@ ok( s/a/b/ == 1 );
 $_ = <<'EOL';
      $url = new URI::URL "http://www/";   die if $url eq "xXx";
 EOL
-$^R = 'junk';
+$^LAST_REGEXP_CODE_RESULT = 'junk';
 
 $foo = ' $@%#lowercase $@%# lowercase UPPERCASE$@%#UPPERCASE' .
   ' $@%#lowercase$@%#lowercase$@%# lowercase lowercase $@%#lowercase' .
@@ -250,7 +250,7 @@ s{  \d+          \b [,.;]? (?{ 'digits' })
     \s+                    (?{ ' ' })
    |
     [^A-Za-z0-9\s]+          (?{ '$@%#' })
-}{$^R}xg;
+}{$^LAST_REGEXP_CODE_RESULT}xg;
 ok( $_ eq $foo );
 ok( $snum == 31 );
 
@@ -458,7 +458,7 @@ is("<$_> <$s>", "<> <4>", "[perl #7806]");
 
 # [perl #19048] Coredump in silly replacement
 do {
-    local $^W = 0;
+    local $^WARNING = 0;
     $_="abcdef\n";
     s!.!$('')!g;
     is($_, "\n", "[perl #19048]");
@@ -479,7 +479,7 @@ is(s/(??{1})/$(2)/g, 4, '#20684 s/// with (??{..}) inside');
 
 # [perl #20682] $^N not visible in replacement
 $_ = "abc";
-m/(a)/; s/(b)|(c)/-$($^N)/g;
+m/(a)/; s/(b)|(c)/-$($^LAST_SUBMATCH_RESULT)/g;
 is($_,'a-b-c','# TODO #20682 $^N not visible in replacement');
 
 # [perl #22351] perl bug with 'e' substitution modifier

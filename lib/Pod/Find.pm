@@ -134,7 +134,7 @@ sub pod_find
     }
 
     if(%opts{?inc}) {
-        if ($^O eq 'MacOS') {
+        if ($^OS_NAME eq 'MacOS') {
             # tolerate '.', './some_dir' and '(../)+some_dir' on Mac OS
             my @new_INC = @INC;
             for ( @new_INC) {
@@ -166,7 +166,7 @@ sub pod_find
         # * remove ":?site_perl:"
         # * remove :?pod: if followed by *.pod (e.g. in :pod:perlfunc.pod)
 
-        if ($^O eq 'MacOS') {
+        if ($^OS_NAME eq 'MacOS') {
             $SIMPLIFY_RX =
               qq!^(?i:\:?site_perl\:|\:?pod\:(?=.*?\\.pod\\z))*!;
         } else {
@@ -188,8 +188,8 @@ sub pod_find
         # simplify path
         # on VMS canonpath will vmsify:[the.path], but File::Find::find
         # wants /unixy/paths
-        $try = File::Spec->canonpath($try) if ($^O ne 'VMS');
-        $try = VMS::Filespec::unixify($try) if ($^O eq 'VMS');
+        $try = File::Spec->canonpath($try) if ($^OS_NAME ne 'VMS');
+        $try = VMS::Filespec::unixify($try) if ($^OS_NAME eq 'VMS');
         my $name;
         if(-f $try) {
             if($name = _check_and_extract_name($try, %opts{?verbose})) {
@@ -197,7 +197,7 @@ sub pod_find
             }
             next;
         }
-        my $root_rx = $^O eq 'MacOS' ?? qq!^\Q$try\E! !! qq!^\Q$try\E/!;
+        my $root_rx = $^OS_NAME eq 'MacOS' ?? qq!^\Q$try\E! !! qq!^\Q$try\E/!;
         File::Find::find( sub {
             my $item = $File::Find::name;
             if(-d) {
@@ -214,9 +214,9 @@ sub pod_find
                 else {
                     %dirs_visited{+$item} = 1;
                 }
-                if(%opts{?perl} && m/^(\d+\.[\d_]+)\z/s && eval "$1" != $^V) {
+                if(%opts{?perl} && m/^(\d+\.[\d_]+)\z/s && eval "$1" != $^PERL_VERSION) {
                     $File::Find::prune = 1;
-                    warn "Perl $^V version mismatch on $_, skipping.\n"
+                    warn "Perl $^PERL_VERSION version mismatch on $_, skipping.\n"
                         if(%opts{?verbose});
                 }
                 return;
@@ -262,7 +262,7 @@ sub _check_and_extract_name {
         $name =~ s!$SIMPLIFY_RX!!os if(defined $SIMPLIFY_RX);
     }
     else {
-        if ($^O eq 'MacOS') {
+        if ($^OS_NAME eq 'MacOS') {
             $name =~ s/^.*://s;
         } else {
             $name =~ s:^.*/::s;
@@ -270,7 +270,7 @@ sub _check_and_extract_name {
     }
     _simplify($name);
     $name =~ s!/+!::!g; #/
-    if ($^O eq 'MacOS') {
+    if ($^OS_NAME eq 'MacOS') {
         $name =~ s!:+!::!g; # : -> ::
     } else {
         $name =~ s!/+!::!g; # / -> ::
@@ -291,7 +291,7 @@ F<.bat>, F<.cmd> on Win32 and OS/2, or F<.com> on VMS, respectively.
 sub simplify_name {
     my @($str) =  @_;
     # remove all path components
-    if ($^O eq 'MacOS') {
+    if ($^OS_NAME eq 'MacOS') {
         $str =~ s/^.*://s;
     } else {
         $str =~ s:^.*/::s;
@@ -305,9 +305,9 @@ sub _simplify {
     # strip Perl's own extensions
     @_[0] =~ s/\.(pod|pm|plx?)\z//i;
     # strip meaningless extensions on Win32 and OS/2
-    @_[0] =~ s/\.(bat|exe|cmd)\z//i if($^O =~ m/mswin|os2/i);
+    @_[0] =~ s/\.(bat|exe|cmd)\z//i if($^OS_NAME =~ m/mswin|os2/i);
     # strip meaningless extensions on VMS
-    @_[0] =~ s/\.(com)\z//i if($^O eq 'VMS');
+    @_[0] =~ s/\.(com)\z//i if($^OS_NAME eq 'VMS');
 }
 
 # contribution from Tim Jenness <t.jenness@jach.hawaii.edu>
@@ -391,7 +391,7 @@ sub pod_where {
     require Config;
 
     # Add @INC
-    if ($^O eq 'MacOS' && %options{?'inc'}) {
+    if ($^OS_NAME eq 'MacOS' && %options{?'inc'}) {
         # tolerate '.', './some_dir' and '(../)+some_dir' on Mac OS
         my @new_INC = @INC;
         for ( @new_INC) {
@@ -456,7 +456,7 @@ sub pod_where {
     # have a case-tolerant file system, but File::Spec
     # does not recognize 'darwin' yet. And cygwin also has "pods",
     # but is not case tolerant. Oh well...
-    if((File::Spec->case_tolerant || $^O =~ m/macos|darwin|cygwin/i)
+    if((File::Spec->case_tolerant || $^OS_NAME =~ m/macos|darwin|cygwin/i)
      && -d File::Spec->catdir($dir,'pods')) {
       $dir = File::Spec->catdir($dir,'pods');
       redo Dir;

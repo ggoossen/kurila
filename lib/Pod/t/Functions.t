@@ -40,15 +40,15 @@ my @cat_keys = grep exists %Type_Description{ $_ }, @Type_Order;
 ok( eq_array( \@cat_keys, \@catagories ),
     'keys() %Type_Description' );
 
-my@( _, $path, _ ) =  fileparse( $0 );
+my@( _, $path, _ ) =  fileparse( $^PROGRAM_NAME );
 my $pod_functions = File::Spec->catfile( 
     $path, File::Spec->updir, 'Functions.pm' );
 
 SKIP: do {
 	my $test_out = do { local $^INPUT_RECORD_SEPARATOR; ~< *DATA }; 
 	
-	skip( "Can't fork '$^X': $^OS_ERROR", 1) 
-	    unless open my $fh, "-|", qq[$^X "-I../lib" $pod_functions];
+	skip( "Can't fork '$^EXECUTABLE_NAME': $^OS_ERROR", 1) 
+	    unless open my $fh, "-|", qq[$^EXECUTABLE_NAME "-I../lib" $pod_functions];
 	my $fake_out = do { local $^INPUT_RECORD_SEPARATOR; ~< $fh };
 	skip( "Pipe error: $^OS_ERROR", 1)
 	    unless close $fh;

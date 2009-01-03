@@ -5,7 +5,7 @@ BEGIN { plan tests => 64 };
 BEGIN { ok 1 }
 use I18N::LangTags (':ALL');
 
-print "# Perl $^V, I18N::LangTags v$I18N::LangTags::VERSION\n";
+print "# Perl $^PERL_VERSION, I18N::LangTags v$I18N::LangTags::VERSION\n";
 
 ok !is_language_tag('');
 ok  is_language_tag('fr');

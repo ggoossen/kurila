@@ -5,7 +5,7 @@ BEGIN {
 }
 
 BEGIN {
-    if ($^O eq 'riscos') {
+    if ($^OS_NAME eq 'riscos') {
 	skip_all("kill() not implemented on this platform");
     }
 }

@@ -39,7 +39,7 @@ if (($x ^|^ 1) == 101) {print "ok 5\n";} else {print "not ok 5\n";}
 
 # check <> pseudoliteral
 
-if ($^O eq 'MacOS') {
+if ($^OS_NAME eq 'MacOS') {
 	open(TRY, "<", "Dev:Null") || (die "Can't open /dev/null.");
 } else {
 	open(TRY, "<", "/dev/null") || open(TRY,"<", "nla0:") || (die "Can't open /dev/null.");

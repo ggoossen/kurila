@@ -15,8 +15,8 @@ chdir 't';
 use ExtUtils::MM;
 use MakeMaker::Test::Utils;
 
-my $Is_VMS   = $^O eq 'VMS';
-my $Is_Win32 = $^O eq 'MSWin32';
+my $Is_VMS   = $^OS_NAME eq 'VMS';
+my $Is_Win32 = $^OS_NAME eq 'MSWin32';
 
 use Test::More tests => 7;
 

@@ -8,7 +8,7 @@ use File::Path;
 use File::Basename;
 use MakeMaker::Test::Utils;
 
-my $Is_VMS = $^O eq 'VMS';
+my $Is_VMS = $^OS_NAME eq 'VMS';
 
 my %Files = %(
              'XS-Test/lib/XS/Test.pm'     => <<'END',

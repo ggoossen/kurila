@@ -28,7 +28,7 @@ sub hostname {
   $host = ghname() if defined &ghname;
   return $host if defined $host;
 
-  if ($^O eq 'VMS') {
+  if ($^OS_NAME eq 'VMS') {
 
     # method 2 - no sockets ==> return DECnet node name
     try { $host = (gethostbyname('me'))[0] };
@@ -52,12 +52,12 @@ sub hostname {
     croak "Cannot get host name of local machine";  
 
   }
-  elsif ($^O eq 'MSWin32') {
+  elsif ($^OS_NAME eq 'MSWin32') {
     ($host) = gethostbyname('localhost');
     chomp($host = `hostname 2> NUL`) unless defined $host;
     return $host;
   }
-  elsif ($^O eq 'epoc') {
+  elsif ($^OS_NAME eq 'epoc') {
     $host = 'localhost';
     return $host;
   }

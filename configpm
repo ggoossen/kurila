@@ -31,7 +31,7 @@
 # on Config.pm should trigger even if only Config_heavy.pl has changed.
 
 sub usage { die <<EOF }
-usage: $0  [ options ]
+usage: $^PROGRAM_NAME  [ options ]
     --cross=PLATFORM    cross-compile for a different platform
     --no-glossary       don't include Porting/Glossary in lib/Config.pod
 EOF
@@ -124,7 +124,7 @@ BEGIN {
 
 ENDOFBEG
 
-my $myver = $^V;
+my $myver = $^PERL_VERSION;
 
 $config_txt .= sprintf <<'ENDOFBEG', < @($myver) x 3;
 # This file was created by configpm when Perl was built. Any changes
@@ -605,7 +605,7 @@ sub config_vars {
 1;
 ENDOFEND
 
-if ($^O eq 'os2') {
+if ($^OS_NAME eq 'os2') {
     $config_txt .= <<'ENDOFSET';
 my %preconfig;
 if ($OS2::is_aout) {
@@ -967,15 +967,15 @@ require $Config_PM;
 require $Config_heavy;
 Config->import();
 
-die "$0: $Config_PM not valid"
+die "$^PROGRAM_NAME: $Config_PM not valid"
 	unless config_value('PERL_CONFIG_SH') eq 'true';
 
-die "$0: error processing $Config_PM"
+die "$^PROGRAM_NAME: error processing $Config_PM"
 	if defined(config_value('an impossible name'))
 	or config_value('PERL_CONFIG_SH') ne 'true' # test cache
 	;
 
-die "$0: error processing $Config_PM"
+die "$^PROGRAM_NAME: error processing $Config_PM"
 	if eval '%Config{"cc"} = 1'
 	or eval 'delete %Config{"cc"}'
 	;

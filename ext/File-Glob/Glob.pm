@@ -64,7 +64,7 @@ sub import {
 	    $DEFAULT_FLAGS ^&^= ^~^GLOB_NOCASE() if $1 eq 'case';
 	    $DEFAULT_FLAGS ^|^= GLOB_NOCASE() if $1 eq 'nocase';
 	    if ($1 eq 'globally') {
-		local $^W;
+		local $^WARNING;
 		*CORE::GLOBAL::glob = \&File::Glob::csh_glob;
 	    }
 	    next;
@@ -87,7 +87,7 @@ sub GLOB_CSH () {
 }
 
 $DEFAULT_FLAGS = GLOB_CSH();
-if ($^O =~ m/^(?:MSWin32|VMS|os2|dos|riscos|MacOS)$/) {
+if ($^OS_NAME =~ m/^(?:MSWin32|VMS|os2|dos|riscos|MacOS)$/) {
     $DEFAULT_FLAGS ^|^= GLOB_NOCASE();
 }
 

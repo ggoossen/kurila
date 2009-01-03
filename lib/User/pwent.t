@@ -7,7 +7,7 @@ BEGIN {
     unless ($haspw) { print "1..0 # Skip: no getpwuid\n"; exit 0 }
     use Config;
     # VMS's pwd.h struct passwd conflicts with the one in vmsish.h
-    $haspw = 0 unless ( config_value('i_pwd') eq 'define' || $^O eq 'VMS' );
+    $haspw = 0 unless ( config_value('i_pwd') eq 'define' || $^OS_NAME eq 'VMS' );
     unless ($haspw) { print "1..0 # Skip: no pwd.h\n"; exit 0 }
 }
 
@@ -17,8 +17,8 @@ BEGIN {
     $uid = 0;
     # On VMS getpwuid(0) may return [$gid,0] UIC info (which may not exist).
     # It is better to use the $< uid for testing on VMS instead.
-    if ( $^O eq 'VMS' ) { $uid = $^UID ; }
-    if ( $^O eq 'cygwin' ) { $uid = 500 ; }
+    if ( $^OS_NAME eq 'VMS' ) { $uid = $^UID ; }
+    if ( $^OS_NAME eq 'cygwin' ) { $uid = 500 ; }
     our @pwent = @( getpwuid $uid ); # This is the function getpwuid.
     unless (@pwent) { print "1..0 # Skip: no uid $uid\n"; exit 0 }
 }
@@ -32,7 +32,7 @@ print "ok 1\n";
 my $pwent = getpwuid $uid; # This is the OO getpwuid.
 
 my $uid_expect = $uid;
-if ( $^O eq 'cygwin' ) {
+if ( $^OS_NAME eq 'cygwin' ) {
     print "not " unless (   $pwent->uid == $uid_expect
                          || $pwent->uid == 500         );  # go figure
 }
@@ -44,7 +44,7 @@ print "ok 2\n";
 print "not " unless $pwent->name   eq @pwent[0];
 print "ok 3\n";
 
-if ($^O eq 'os390') {
+if ($^OS_NAME eq 'os390') {
     print "not "
 	unless not defined $pwent->passwd &&
 	       @pwent[1] eq '0'; # go figure

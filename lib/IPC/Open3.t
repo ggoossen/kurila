@@ -4,7 +4,7 @@ use Config;
 BEGIN {
     if (!config_value('d_fork')
        # open2/3 supported on win32 (but not Borland due to CRT bugs)
-       && (($^O ne 'MSWin32' && $^O ne 'NetWare') || config_value('cc') =~ m/^bcc/i))
+       && (($^OS_NAME ne 'MSWin32' && $^OS_NAME ne 'NetWare') || config_value('cc') =~ m/^bcc/i))
     {
 	print "1..0\n";
 	exit 0;
@@ -16,7 +16,7 @@ BEGIN {
 use IO::Handle;
 use IPC::Open3;
 
-my $perl = $^X;
+my $perl = $^EXECUTABLE_NAME;
 
 sub ok {
     my @($n, $result, ?$info) =  @_;
@@ -30,7 +30,7 @@ sub ok {
 }
 
 sub cmd_line {
-	if ($^O eq 'MSWin32' || $^O eq 'NetWare') {
+	if ($^OS_NAME eq 'MSWin32' || $^OS_NAME eq 'NetWare') {
 		my $cmd = shift;
 		$cmd =~ s/[\r\n]//g;
 		$cmd =~ s/"/\\"/g;

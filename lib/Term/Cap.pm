@@ -103,7 +103,7 @@ output the string to $FH if specified.
 # If a different termcap is required then the text of one can be supplied
 # in $Term::Cap::VMS_TERMCAP before Tgetent is called.
 
-if ( $^O eq 'VMS' )
+if ( $^OS_NAME eq 'VMS' )
 {
     chomp( my @entry = @( ~< *DATA ) );
     $VMS_TERMCAP = join '', @entry;
@@ -120,7 +120,7 @@ sub termcap_path
       if (
         ( defined env::var('TERMCAP') )
         && (
-            ( $^O eq 'os2' || $^O eq 'MSWin32' || $^O eq 'dos' )
+            ( $^OS_NAME eq 'os2' || $^OS_NAME eq 'MSWin32' || $^OS_NAME eq 'dos' )
             ?? env::var('TERMCAP') =~ m/^[a-z]:[\\\/]/is
             !! env::var('TERMCAP') =~ m/^\//s
         )
@@ -213,7 +213,7 @@ sub Tgetent
     # Compute PADDING factor from OSPEED (to be used by Tpad)
     if ( !$self->{?OSPEED} )
     {
-        if ($^W)
+        if ($^WARNING)
         {
             carp "OSPEED was not set, defaulting to 9600";
         }
@@ -242,7 +242,7 @@ sub Tgetent
        }
        else
        {
-          if ( $^O eq 'Win32' )
+          if ( $^OS_NAME eq 'Win32' )
           {
              $self->{+TERM} =  'dumb';
           }
@@ -278,7 +278,7 @@ sub Tgetent
         # last resort--fake up a termcap from terminfo
         env::temp_set_var('TERM' => $term);
 
-        if ( $^O eq 'VMS' )
+        if ( $^OS_NAME eq 'VMS' )
         {
             $entry = $VMS_TERMCAP;
         }

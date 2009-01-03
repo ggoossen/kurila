@@ -12,7 +12,7 @@ if (config_value("sig_name") =~ m/\bRTMIN\b/
 }
 
 my @libs;
-if ($^O ne 'MSWin32') {
+if ($^OS_NAME ne 'MSWin32') {
     @libs = @('LIBS' => \@("-lm -lposix -lcposix"));
 }
 WriteMakefile(

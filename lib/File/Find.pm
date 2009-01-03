@@ -609,8 +609,8 @@ sub _find_opt {
     $pre_process       = $wanted->{?preprocess};
     $post_process      = $wanted->{?postprocess};
     $no_chdir          = $wanted->{?no_chdir};
-    $full_check        = $^O eq 'MSWin32' ?? 0 !! $wanted->{?follow};
-    $follow            = $^O eq 'MSWin32' ?? 0 !!
+    $full_check        = $^OS_NAME eq 'MSWin32' ?? 0 !! $wanted->{?follow};
+    $follow            = $^OS_NAME eq 'MSWin32' ?? 0 !!
                              $full_check || $wanted->{?follow_fast};
     $follow_skip       = $wanted->{?follow_skip};
     $untaint           = $wanted->{?untaint};
@@ -635,7 +635,7 @@ sub _find_opt {
 	if ($Is_MacOS) {
 	    $top_item = ":$top_item"
 		if ( (-d _) && ( $top_item !~ m/:/ ) );
-	} elsif ($^O eq 'MSWin32') {
+	} elsif ($^OS_NAME eq 'MSWin32') {
 	    $top_item =~ s|/\z|| unless $top_item =~ m|\w:/$|;
 	}
 	else {
@@ -779,9 +779,9 @@ sub _find_dir($$$) {
 
     if ($Is_MacOS) {
 	$dir_pref= ($p_dir =~ m/:$/) ?? $p_dir !! "$p_dir:"; # preface
-    } elsif ($^O eq 'MSWin32') {
+    } elsif ($^OS_NAME eq 'MSWin32') {
 	$dir_pref = ($p_dir =~ m|\w:/$| ?? $p_dir !! "$p_dir/" );
-    } elsif ($^O eq 'VMS') {
+    } elsif ($^OS_NAME eq 'VMS') {
 
 	#	VMS is returning trailing .dir on directories
 	#	and trailing . on files and symbolic links
@@ -971,11 +971,11 @@ sub _find_dir($$$) {
 		$dir_name = "$p_dir$dir_rel";
 		$dir_pref = "$dir_name:";
 	    }
-	    elsif ($^O eq 'MSWin32') {
+	    elsif ($^OS_NAME eq 'MSWin32') {
 		$dir_name = ($p_dir =~ m|\w:/$| ?? "$p_dir$dir_rel" !! "$p_dir/$dir_rel");
 		$dir_pref = "$dir_name/";
 	    }
-	    elsif ($^O eq 'VMS') {
+	    elsif ($^OS_NAME eq 'VMS') {
                 if ($p_dir =~ m/[\]>]+$/) {
                     $dir_name = $p_dir;
                     $dir_name =~ s/([\]>]+)$/.$dir_rel$1/;
@@ -1283,11 +1283,11 @@ $File::Find::skip_pattern    = qr/^\.{1,2}\z/;
 $File::Find::untaint_pattern = qr|^([-+@\w./]+)$|;
 
 # These are hard-coded for now, but may move to hint files.
-if ($^O eq 'VMS') {
+if ($^OS_NAME eq 'VMS') {
     $Is_VMS = 1;
     $File::Find::dont_use_nlink  = 1;
 }
-elsif ($^O eq 'MacOS') {
+elsif ($^OS_NAME eq 'MacOS') {
     $Is_MacOS = 1;
     $File::Find::dont_use_nlink  = 1;
     $File::Find::skip_pattern    = qr/^Icon\015\z/;
@@ -1299,9 +1299,9 @@ elsif ($^O eq 'MacOS') {
 $File::Find::current_dir = File::Spec->curdir || '.';
 
 $File::Find::dont_use_nlink = 1
-    if $^O eq 'os2' || $^O eq 'dos' || $^O eq 'amigaos' || $^O eq 'MSWin32' ||
-       $^O eq 'interix' || $^O eq 'cygwin' || $^O eq 'epoc' || $^O eq 'qnx' ||
-	   $^O eq 'nto';
+    if $^OS_NAME eq 'os2' || $^OS_NAME eq 'dos' || $^OS_NAME eq 'amigaos' || $^OS_NAME eq 'MSWin32' ||
+       $^OS_NAME eq 'interix' || $^OS_NAME eq 'cygwin' || $^OS_NAME eq 'epoc' || $^OS_NAME eq 'qnx' ||
+	   $^OS_NAME eq 'nto';
 
 # Set dont_use_nlink in your hint file if your system's stat doesn't
 # report the number of links in a directory as an indication

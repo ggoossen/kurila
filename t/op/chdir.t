@@ -4,8 +4,8 @@ use Config;
 require "./test.pl";
 plan(tests => 48);
 
-my $IsVMS   = $^O eq 'VMS';
-my $IsMacOS = $^O eq 'MacOS';
+my $IsVMS   = $^OS_NAME eq 'VMS';
+my $IsMacOS = $^OS_NAME eq 'MacOS';
 
 # For an op regression test, I don't want to rely on "use constant" working.
 my $has_fchdir = (config_value("d_fchdir") || "") eq "define";
@@ -20,7 +20,7 @@ sub abs_path {
     my $d = rel2abs(curdir);
 
     $d = uc($d) if $IsVMS;
-    $d = lc($d) if $^O =~ m/^uwin/;
+    $d = lc($d) if $^OS_NAME =~ m/^uwin/;
     $d;
 }
 
@@ -111,9 +111,9 @@ sub check_env {
 
     # Make sure $ENV{'SYS$LOGIN'} is only honored on VMS.
     if( $key eq 'SYS$LOGIN' && !$IsVMS && !$IsMacOS ) {
-        ok( !chdir(),         "chdir() on $^O ignores only \$ENV\{$key\} set" );
+        ok( !chdir(),         "chdir() on $^OS_NAME ignores only \$ENV\{$key\} set" );
         is( abs_path, $Cwd,   '  abs_path() did not change' );
-        pass( "  no need to test SYS\$LOGIN on $^O" ) for 1..7;
+        pass( "  no need to test SYS\$LOGIN on $^OS_NAME" ) for 1..7;
     }
     else {
         ok( chdir(),              "chdir() w/ only \$ENV\{$key\} set" );

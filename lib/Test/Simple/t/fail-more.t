@@ -52,14 +52,14 @@ Test::More->import(tests => $Total);
 my $tb = Test::More->builder;
 $tb->use_numbers(0);
 
-my $Filename = quotemeta $0;
+my $Filename = quotemeta $^PROGRAM_NAME;
 
 # Preserve the line numbers.
 #line 38
 ok( 0, 'failing' );
 err_ok( <<ERR );
 #   Failed test 'failing'
-#   at $0 line 38.
+#   at $^PROGRAM_NAME line 38.
 ERR
 
 #line 40
@@ -69,19 +69,19 @@ is( undef, 0,     'undef is 0?');
 is( '',    0,     'empty string is 0?' );
 err_ok( <<ERR );
 #   Failed test 'foo is bar?'
-#   at $0 line 40.
+#   at $^PROGRAM_NAME line 40.
 #          got: 'foo'
 #     expected: 'bar'
 #   Failed test 'undef is empty string?'
-#   at $0 line 41.
+#   at $^PROGRAM_NAME line 41.
 #          got: undef
 #     expected: ''
 #   Failed test 'undef is 0?'
-#   at $0 line 42.
+#   at $^PROGRAM_NAME line 42.
 #          got: undef
 #     expected: 0
 #   Failed test 'empty string is 0?'
-#   at $0 line 43.
+#   at $^PROGRAM_NAME line 43.
 #          got: ''
 #     expected: '0'
 ERR
@@ -91,12 +91,12 @@ isnt("foo", "foo", 'foo isnt foo?' );
 isnt(undef, undef, 'undef isnt undef?');
 err_ok( <<ERR );
 #   Failed test 'foo isnt foo?'
-#   at $0 line 45.
+#   at $^PROGRAM_NAME line 45.
 #     'foo'
 #         ne
 #     'foo'
 #   Failed test 'undef isnt undef?'
-#   at $0 line 46.
+#   at $^PROGRAM_NAME line 46.
 #     undef
 #         ne
 #     undef
@@ -107,11 +107,11 @@ like( "foo", '/that/',  'is foo like that' );
 unlike( "foo", '/foo/', 'is foo unlike foo' );
 err_ok( <<ERR );
 #   Failed test 'is foo like that'
-#   at $0 line 48.
+#   at $^PROGRAM_NAME line 48.
 #                   'foo'
 #     doesn't match '/that/'
 #   Failed test 'is foo unlike foo'
-#   at $0 line 49.
+#   at $^PROGRAM_NAME line 49.
 #                   'foo'
 #           matches '/foo/'
 ERR
@@ -121,7 +121,7 @@ ERR
 like( "bug", '/(%)/',   'regex with % in it' );
 err_ok( <<ERR );
 #   Failed test 'regex with \% in it'
-#   at $0 line 60.
+#   at $^PROGRAM_NAME line 60.
 #                   'bug'
 #     doesn't match '/(\%)/'
 ERR
@@ -130,7 +130,7 @@ ERR
 fail('fail()');
 err_ok( <<ERR );
 #   Failed test 'fail()'
-#   at $0 line 67.
+#   at $^PROGRAM_NAME line 67.
 ERR
 
 #line 52
@@ -140,17 +140,17 @@ can_ok(undef, undef);
 can_ok(\@(), "foo");
 err_ok( <<ERR );
 #   Failed test 'Mooble::Hooble::Yooble->can(...)'
-#   at $0 line 52.
+#   at $^PROGRAM_NAME line 52.
 #     Mooble::Hooble::Yooble->can('this') failed
 #     Mooble::Hooble::Yooble->can('that') failed
 #   Failed test 'Mooble::Hooble::Yooble->can(...)'
-#   at $0 line 53.
+#   at $^PROGRAM_NAME line 53.
 #     can_ok() called with no methods
 #   Failed test '->can(...)'
-#   at $0 line 54.
+#   at $^PROGRAM_NAME line 54.
 #     can_ok() called with empty class or reference
 #   Failed test 'ARRAY->can('foo')'
-#   at $0 line 55.
+#   at $^PROGRAM_NAME line 55.
 #     ARRAY->can('foo') failed
 ERR
 
@@ -161,16 +161,16 @@ isa_ok(undef, "Wibble", "Another Wibble");
 isa_ok(\@(),    "HASH");
 err_ok( <<ERR );
 #   Failed test 'The object isa Wibble'
-#   at $0 line 55.
+#   at $^PROGRAM_NAME line 55.
 #     The object isn't a 'Wibble' it's a 'Foo'
 #   Failed test 'My Wibble isa Wibble'
-#   at $0 line 56.
+#   at $^PROGRAM_NAME line 56.
 #     My Wibble isn't a reference
 #   Failed test 'Another Wibble isa Wibble'
-#   at $0 line 57.
+#   at $^PROGRAM_NAME line 57.
 #     Another Wibble isn't defined
 #   Failed test 'The object isa HASH'
-#   at $0 line 58.
+#   at $^PROGRAM_NAME line 58.
 #     The object isn't a 'HASH' it's a 'ARRAY'
 ERR
 
@@ -181,20 +181,20 @@ cmp_ok( 42,    '!=', 42   , '       !=' );
 cmp_ok( 1,     '&&', 0    , '       &&' );
 err_ok( <<ERR );
 #   Failed test 'cmp_ok eq'
-#   at $0 line 68.
+#   at $^PROGRAM_NAME line 68.
 #          got: 'foo'
 #     expected: 'bar'
 #   Failed test '       =='
-#   at $0 line 69.
+#   at $^PROGRAM_NAME line 69.
 #          got: 42.1
 #     expected: 23
 #   Failed test '       !='
-#   at $0 line 70.
+#   at $^PROGRAM_NAME line 70.
 #     42
 #         !=
 #     42
 #   Failed test '       &&'
-#   at $0 line 71.
+#   at $^PROGRAM_NAME line 71.
 #     1
 #         &&
 #     0
@@ -205,7 +205,7 @@ ERR
 cmp_ok( 42,    'eq', "foo", '       eq with numbers' );
 err_ok( <<ERR );
 #   Failed test '       eq with numbers'
-#   at $0 line 196.
+#   at $^PROGRAM_NAME line 196.
 #          got: '42'
 #     expected: 'foo'
 ERR
@@ -219,7 +219,7 @@ do {
     cmp_ok( 42,    '==', "foo", '       == with strings' );
     err_ok( <<ERR );
 #   Failed test '       == with strings'
-#   at $0 line 211.
+#   at $^PROGRAM_NAME line 211.
 #          got: 42
 #     expected: 'foo'
 ERR

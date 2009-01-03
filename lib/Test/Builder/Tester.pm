@@ -234,7 +234,7 @@ sub test_fail
     $line = $line + (shift() || 0); # prevent warnings
 
     # expect that on stderr
-    $err->expect("#     Failed test ($0 at line $line)");
+    $err->expect("#     Failed test ($^PROGRAM_NAME at line $line)");
 }
 
 =item test_diag
@@ -530,7 +530,7 @@ sub check
     my $self = shift;
 
     # turn off warnings as these might be undef
-    local $^W = 0;
+    local $^WARNING = 0;
 
     my @checks = @{$self->{?wanted}};
     my $got = $self->{?got};

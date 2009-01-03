@@ -12,8 +12,8 @@ use warnings < qw(closure deprecated exiting glob io misc numeric once overflow
                 pack portable recursion redefine regexp severe signal substr
                 syntax taint uninitialized unpack untie utf8 void);
 
-my $is_Win32  = $^O =~ m/win32/i;
-my $is_Cygwin = $^O =~ m/cygwin/i;
+my $is_Win32  = $^OS_NAME =~ m/win32/i;
+my $is_Cygwin = $^OS_NAME =~ m/cygwin/i;
 
 my $tests;
 plan tests => $tests;
@@ -53,7 +53,7 @@ like( $^EVAL_ERROR->{?description}, qr/^syslog: expecting argument \$format/,
     "calling syslog() with one empty argument" );
 
 
-my $test_string = "uid $^UID is testing Perl $^V syslog(3) capabilities";
+my $test_string = "uid $^UID is testing Perl $^PERL_VERSION syslog(3) capabilities";
 my $r = 0;
 
 BEGIN { $tests += 8 }
@@ -64,7 +64,7 @@ SKIP: do {
 
     # The only known $^O eq 'svr4' that needs this is NCR MP-RAS,
     # but assuming 'stream' in SVR4 is probably not that bad.
-    my $sock_type = $^O =~ m/^(solaris|irix|svr4|powerux)$/ ?? 'stream' !! 'unix';
+    my $sock_type = $^OS_NAME =~ m/^(solaris|irix|svr4|powerux)$/ ?? 'stream' !! 'unix';
 
     try { setlogsock($sock_type) };
     is( $^EVAL_ERROR, '', "setlogsock() called with '$sock_type'" );

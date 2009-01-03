@@ -29,7 +29,7 @@
 # it may work elsewhere but no specific attempt has been made to make it
 # portable.
 
-sub usage { die "usage: $0 [ -b bison_executable ] [ file.y ]\n" }
+sub usage { die "usage: $^PROGRAM_NAME [ -b bison_executable ] [ file.y ]\n" }
 
 use warnings;
 

@@ -40,11 +40,11 @@ foreach my $platform ( @platforms) {
     my $other_v = %other_vols{?$platform} || '';
     
     # Fake out the environment on MacOS and Win32
-    my $save_w = $^W;
-    $^W = 0;
+    my $save_w = $^WARNING;
+    $^WARNING = 0;
     local *{Symbol::fetch_glob("File::Spec::Mac::rootdir")} = sub { "Macintosh HD:" };
     local *{Symbol::fetch_glob("File::Spec::Win32::_cwd")}  = sub { "C:\\foo" };
-    $^W = $save_w;
+    $^WARNING = $save_w;
     
 
 

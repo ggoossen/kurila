@@ -173,7 +173,7 @@ sub xfileno {
     return fileno @_[0];
 }
 
-my $do_spawn = $^O eq 'os2' || $^O eq 'MSWin32';
+my $do_spawn = $^OS_NAME eq 'os2' || $^OS_NAME eq 'MSWin32';
 
 sub _open3 {
     local $Me = shift;
@@ -340,7 +340,7 @@ sub spawn_with_handles {
 	$fd->{?handle}->fdopen(%saved{?fileno $fd->{?open_as}} || $fd->{?open_as},
 			      $fd->{mode});
     }
-    unless ($^O eq 'MSWin32') {
+    unless ($^OS_NAME eq 'MSWin32') {
 	# Stderr may be redirected below, so we save the err text:
 	foreach my $fd ( @$close_in_child) {
 	    fcntl($fd, Fcntl::F_SETFD(), 1) or push @errs, "fcntl $fd: $^OS_ERROR"

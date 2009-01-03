@@ -19,8 +19,8 @@ $VERSION = '1.51_01';
                 manifind   maniread   manicopy   maniadd
                );
 
-$Is_MacOS = $^O eq 'MacOS';
-$Is_VMS   = $^O eq 'VMS';
+$Is_MacOS = $^OS_NAME eq 'MacOS';
+$Is_VMS   = $^OS_NAME eq 'VMS';
 require VMS::Filespec if $Is_VMS;
 
 $Debug   = env::var('PERL_MM_MANIFEST_DEBUG') || 0;
@@ -491,7 +491,7 @@ sub manicopy {
 
 sub cp_if_diff {
     my@($from, $to, $how)= @_;
-    -f $from or warn "$0: $from not found";
+    -f $from or warn "$^PROGRAM_NAME: $from not found";
     my $diff = 0;
     local(*F,*T);
     open(F, "<","$from\0") or die "Can't read $from: $^OS_ERROR\n";
@@ -530,7 +530,7 @@ sub cp {
 
 sub ln {
     my @($srcFile, $dstFile) =  @_;
-    return &cp( < @_ ) if $Is_VMS or ($^O eq 'MSWin32' and Win32::IsWin95());
+    return &cp( < @_ ) if $Is_VMS or ($^OS_NAME eq 'MSWin32' and Win32::IsWin95());
     link($srcFile, $dstFile);
 
     unless( _manicopy_chmod($srcFile, $dstFile) ) {

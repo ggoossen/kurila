@@ -6,7 +6,7 @@ use Test::More 'no_plan';
 my $Class   = 'IPC::Cmd';
 my @Funcs   = qw[run can_run];
 my @Meths   = qw[can_use_ipc_run can_use_ipc_open3 can_capture_buffer];
-my $IsWin32 = $^O eq 'MSWin32';
+my $IsWin32 = $^OS_NAME eq 'MSWin32';
 my $Verbose = (nelems @ARGV) ?? 1 !! 0;
 
 use_ok( $Class,         $_ ) for  @Funcs;
@@ -35,8 +35,8 @@ do {
 do {   ### list of commands and regexes matching output ###
     my $map = \@(
         # command                                    # output regex
-        \@( "$^X -v",                                  qr/gerard\s+goossen/i, ),
-        \@( \@($^X, '-v'),                               qr/gerard\s+goossen/i, ),
+        \@( "$^EXECUTABLE_NAME -v",                                  qr/gerard\s+goossen/i, ),
+        \@( \@($^EXECUTABLE_NAME, '-v'),                               qr/gerard\s+goossen/i, ),
     );
 
     diag( "Running tests that print only to stdout" ) if $Verbose;
@@ -109,8 +109,8 @@ do {   ### list of commands and regexes matching output ###
 do {   ### list of commands and regexes matching output ###
     my $map = \@(
         # command                                    # output regex
-        \@( "$^X -e'warn 42'",                          qr/^42 /, ),
-        \@( \@($^X, "-e'warn 42'"),                       qr/^42 /, ),
+        \@( "$^EXECUTABLE_NAME -e'warn 42'",                          qr/^42 /, ),
+        \@( \@($^EXECUTABLE_NAME, "-e'warn 42'"),                       qr/^42 /, ),
     );
 
     diag( "Running tests that print only to stderr" ) if $Verbose;
@@ -188,7 +188,7 @@ do {   ### for each configuarion
         $IPC::Cmd::USE_IPC_RUN    = $IPC::Cmd::USE_IPC_RUN      = $pref->[0];
         $IPC::Cmd::USE_IPC_OPEN3  = $IPC::Cmd::USE_IPC_OPEN3    = $pref->[1];
 
-        my $ok = run( command => "$^X -ledie" );
+        my $ok = run( command => "$^EXECUTABLE_NAME -ledie" );
         ok( !$ok[0],               "Failure caught" );
     }
 };    

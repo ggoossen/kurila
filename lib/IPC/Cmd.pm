@@ -5,8 +5,8 @@ our (@ISA, $VERSION, @EXPORT_OK, $VERBOSE, $DEBUG,
 
 BEGIN {
 
-    use constant IS_VMS   => $^O eq 'VMS'                       ?? 1 !! 0;    
-    use constant IS_WIN32 => $^O eq 'MSWin32'                   ?? 1 !! 0;
+    use constant IS_VMS   => $^OS_NAME eq 'VMS'                       ?? 1 !! 0;    
+    use constant IS_WIN32 => $^OS_NAME eq 'MSWin32'                   ?? 1 !! 0;
     use constant IS_WIN98 => (IS_WIN32 and !Win32::IsWinNT())   ?? 1 !! 0;
 
     use Exporter    ();
@@ -175,7 +175,7 @@ sub can_run {
 
     # a lot of VMS executables have a symbol defined
     # check those first
-    if ( $^O eq 'VMS' ) {
+    if ( $^OS_NAME eq 'VMS' ) {
         require VMS::DCLsym;
         my $syms = VMS::DCLsym->new;
         return $command if scalar $syms->getsym( uc $command );

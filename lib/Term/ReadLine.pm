@@ -195,7 +195,7 @@ sub readline {
 	and defined &Tk::DoOneEvent;
   #$str = scalar <$in>;
   $str = $self->get_line;
-  $str =~ s/^\s*\Q$prompt\E// if ($^O eq 'MacOS');
+  $str =~ s/^\s*\Q$prompt\E// if ($^OS_NAME eq 'MacOS');
   utf8::upgrade($str)
       if ($^UNICODE ^&^ PERL_UNICODE_STDIN || defined $^ENCODING) &&
          utf8::valid($str);
@@ -210,21 +210,21 @@ sub findConsole {
     my $console;
     my $consoleOUT;
 
-    if ($^O eq 'MacOS') {
+    if ($^OS_NAME eq 'MacOS') {
         $console = "Dev:Console";
     } elsif (-e "/dev/tty") {
 	$console = "/dev/tty";
-    } elsif (-e "con" or $^O eq 'MSWin32') {
+    } elsif (-e "con" or $^OS_NAME eq 'MSWin32') {
        $console = 'CONIN$';
        $consoleOUT = 'CONOUT$';
     } else {
 	$console = "sys\$command";
     }
 
-    if (($^O eq 'amigaos') || ($^O eq 'beos') || ($^O eq 'epoc')) {
+    if (($^OS_NAME eq 'amigaos') || ($^OS_NAME eq 'beos') || ($^OS_NAME eq 'epoc')) {
 	$console = undef;
     }
-    elsif ($^O eq 'os2') {
+    elsif ($^OS_NAME eq 'os2') {
       if ($DB::emacs) {
 	$console = undef;
       } else {
@@ -235,7 +235,7 @@ sub findConsole {
     $consoleOUT = $console unless defined $consoleOUT;
     $console = "&STDIN" unless defined $console;
     if (!defined $consoleOUT) {
-      $consoleOUT = defined fileno(STDERR) && $^O ne 'MSWin32' ?? "&STDERR" !! "&STDOUT";
+      $consoleOUT = defined fileno(STDERR) && $^OS_NAME ne 'MSWin32' ?? "&STDERR" !! "&STDOUT";
     }
     return @($console,$consoleOUT);
 }
@@ -251,7 +251,7 @@ sub new {
 
     # the Windows CONIN$ needs GENERIC_WRITE mode to allow
     # a SetConsoleMode() if we end up using Term::ReadKey
-    open FIN, ((  $^O eq 'MSWin32' && $console eq 'CONIN$' ) ?? "+<" !! "<"), "$console";
+    open FIN, ((  $^OS_NAME eq 'MSWin32' && $console eq 'CONIN$' ) ?? "+<" !! "<"), "$console";
     open FOUT, ">","$consoleOUT";
 
     #OUT->autoflush(1);		# Conflicts with debugger?

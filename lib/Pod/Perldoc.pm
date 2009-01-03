@@ -32,13 +32,13 @@ sub TRUE  () {1}
 sub FALSE () {return}
 
 BEGIN {
- *IS_VMS     = $^O eq 'VMS'     ?? \&TRUE !! \&FALSE unless defined &IS_VMS;
- *IS_MSWin32 = $^O eq 'MSWin32' ?? \&TRUE !! \&FALSE unless defined &IS_MSWin32;
- *IS_Dos     = $^O eq 'dos'     ?? \&TRUE !! \&FALSE unless defined &IS_Dos;
- *IS_OS2     = $^O eq 'os2'     ?? \&TRUE !! \&FALSE unless defined &IS_OS2;
- *IS_Cygwin  = $^O eq 'cygwin'  ?? \&TRUE !! \&FALSE unless defined &IS_Cygwin;
- *IS_Linux   = $^O eq 'linux'   ?? \&TRUE !! \&FALSE unless defined &IS_Linux;
- *IS_HPUX    = $^O =~ m/hpux/   ?? \&TRUE !! \&FALSE unless defined &IS_HPUX;
+ *IS_VMS     = $^OS_NAME eq 'VMS'     ?? \&TRUE !! \&FALSE unless defined &IS_VMS;
+ *IS_MSWin32 = $^OS_NAME eq 'MSWin32' ?? \&TRUE !! \&FALSE unless defined &IS_MSWin32;
+ *IS_Dos     = $^OS_NAME eq 'dos'     ?? \&TRUE !! \&FALSE unless defined &IS_Dos;
+ *IS_OS2     = $^OS_NAME eq 'os2'     ?? \&TRUE !! \&FALSE unless defined &IS_OS2;
+ *IS_Cygwin  = $^OS_NAME eq 'cygwin'  ?? \&TRUE !! \&FALSE unless defined &IS_Cygwin;
+ *IS_Linux   = $^OS_NAME eq 'linux'   ?? \&TRUE !! \&FALSE unless defined &IS_Linux;
+ *IS_HPUX    = $^OS_NAME =~ m/hpux/   ?? \&TRUE !! \&FALSE unless defined &IS_HPUX;
 }
 
 $Temp_File_Lifetime ||= 60 * 60 * 24 * 5;
@@ -111,7 +111,7 @@ sub opt_M_with { # specify formatter class name(s)
 
 sub opt_V { # report version and exit
   print join '', @(
-    "Perldoc v$VERSION, under perl $^V for $^O",
+    "Perldoc v$VERSION, under perl $^PERL_VERSION for $^OS_NAME",
 
     (defined(&Win32::BuildNumber) and defined &Win32::BuildNumber())
      ?? (" (win32 build ", < &Win32::BuildNumber(), ")") !! (),
@@ -286,7 +286,7 @@ EOF
 #..........................................................................
 
 sub usage_brief {
-  my $me = $0;		# Editing $0 is unportable
+  my $me = $^PROGRAM_NAME;		# Editing $0 is unportable
 
   $me =~ s,.*[/\\],,; # get basename
   
@@ -399,7 +399,7 @@ sub process {
     return $self->usage_brief  unless  (nelems @{ $self->{?'args'} });
     $self->pagers_guessing;
     $self->options_reading;
-    $self->aside(sprintf "$0 => \%s v\%s\n", ref($self), < $self->VERSION);
+    $self->aside(sprintf "$^PROGRAM_NAME => \%s v\%s\n", ref($self), < $self->VERSION);
     $self->drop_privs_maybe;
     $self->options_processing;
     
@@ -476,11 +476,11 @@ sub find_good_formatter_class {
     } else {
       DEBUG +> 4 and print "Trying to eval 'require $c'...\n";
 
-      local $^W = $^W;
+      local $^WARNING = $^WARNING;
       if(DEBUG() or $self->opt_v) {
         # feh, let 'em see it
       } else {
-        $^W = 0;
+        $^WARNING = 0;
         # The average user just has no reason to be seeing
         #  $^W-suppressable warnings from the the require!
       }
@@ -1009,11 +1009,11 @@ sub render_findings {
 
   # Now, finally, do the formatting!
   do {
-    local $^W = $^W;
+    local $^WARNING = $^WARNING;
     if(DEBUG() or $self->opt_v) {
       # feh, let 'em see it
     } else {
-      $^W = 0;
+      $^WARNING = 0;
       # The average user just has no reason to be seeing
       #  $^W-suppressable warnings from the formatting!
     }

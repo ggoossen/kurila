@@ -19,23 +19,23 @@ my $keep_files = 0;
 $^OUTPUT_AUTOFLUSH = 1;
 
 # Because were are going to be changing directory before running Makefile.PL
-my $perl = $^X;
+my $perl = $^EXECUTABLE_NAME;
 $perl = File::Spec->rel2abs ($perl);
 # ExtUtils::Constant::C_constant uses $^X inside a comment, and we want to
 # compare output to ensure that it is the same. We were probably run as ./perl
 # whereas we will run the child with the full path in $perl. So make $^X for
 # us the same as our child will see.
-$^X = $perl;
+$^EXECUTABLE_NAME = $perl;
 my $lib = env::var('PERL_CORE') ?? '../../../lib' !! '../../blib/lib';
 my $runperl = "$perl \"-I$lib\"";
 print "# perl=$perl\n";
 
 my $make = env::var('MAKE') // config_value("make");
-if ($^O eq 'MSWin32' && $make eq 'nmake') { $make .= " -nologo"; }
+if ($^OS_NAME eq 'MSWin32' && $make eq 'nmake') { $make .= " -nologo"; }
 
 # VMS may be using something other than MMS/MMK
 my $mms_or_mmk = 0;
-if ($^O eq 'VMS') {
+if ($^OS_NAME eq 'VMS') {
    $mms_or_mmk = 1 if (($make eq 'MMK') || ($make eq 'MMS'));
 }
 
@@ -77,12 +77,12 @@ package main;
 
 sub check_for_bonus_files {
   my $dir = shift;
-  my %expect = %( < map {($^O eq 'VMS' ?? lc($_) !! $_), 1} @_ );
+  my %expect = %( < map {($^OS_NAME eq 'VMS' ?? lc($_) !! $_), 1} @_ );
 
   my $fail;
   opendir DIR, $dir or die "opendir '$dir': $^OS_ERROR";
   while (defined (my $entry = readdir DIR)) {
-    $entry =~ s/\.$// if $^O eq 'VMS';  # delete trailing dot that indicates no extension
+    $entry =~ s/\.$// if $^OS_NAME eq 'VMS';  # delete trailing dot that indicates no extension
     next if %expect{$entry};
     print "# Extra file '$entry'\n";
     $fail = 1;
@@ -119,7 +119,7 @@ sub build_and_run {
 
   my @makeout;
 
-  if ($^O eq 'VMS') { $make .= ' all'; }
+  if ($^OS_NAME eq 'VMS') { $make .= ' all'; }
 
   # Sometimes it seems that timestamps can get confused
 
@@ -159,7 +159,7 @@ sub build_and_run {
   }
   $realtest++;
 
-  if ($^O eq 'VMS') { $make =~ s{ all}{}; }
+  if ($^OS_NAME eq 'VMS') { $make =~ s{ all}{}; }
 
   if (config_value("usedl")) {
     print "ok $realtest # This is dynamic linking, so no need to make perl\n";
@@ -279,7 +279,7 @@ WriteMakefile(
               'NAME'		=> "$package",
               'VERSION_FROM'	=> "$package.pm", # finds \$VERSION
               #ABSTRACT_FROM => "$package.pm", # XXX add this
-              AUTHOR     => "$0",
+              AUTHOR     => "$^PROGRAM_NAME",
              );
 EOT
 

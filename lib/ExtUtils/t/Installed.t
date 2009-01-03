@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-my $Is_VMS = $^O eq 'VMS';
+my $Is_VMS = $^OS_NAME eq 'VMS';
 
 
 use Config < qw|config_keys config_value|;
@@ -51,7 +51,7 @@ my $prefix = config_value("prefix") || config_value("prefixexp");
 $prefix = VMS::Filespec::unixify($prefix) if $Is_VMS;
 
 # ActivePerl 5.6.1/631 has $Config{prefixexp} as 'p:' for some reason
-$prefix = config_value("prefix") if $prefix eq 'p:' && $^O eq 'MSWin32';
+$prefix = config_value("prefix") if $prefix eq 'p:' && $^OS_NAME eq 'MSWin32';
 
 ok( $ei->_is_type( File::Spec->catfile($prefix, 'bar'), 'prog'),
         "... should find prog file under $prefix" );

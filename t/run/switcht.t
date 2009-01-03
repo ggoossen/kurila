@@ -27,7 +27,7 @@ do {
 };
 
 # Get ourselves a tainted variable.
-my $file = $0;
+my $file = $^PROGRAM_NAME;
 $file =~ s/.*/some.tmp/;
 ok( open(FILE, ">", "$file"),   'open >' ) or DIE $^OS_ERROR;
 print FILE "Stuff\n";
@@ -40,4 +40,4 @@ like( $warning, qr/^Insecure dependency in unlink $Tmsg/,
                                                   'unlink() taint warn' );
 ok( !-e $file,  'unlink worked' );
 
-ok( !$^W,   "-t doesn't enable regular warnings" );
+ok( !$^WARNING,   "-t doesn't enable regular warnings" );

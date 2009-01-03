@@ -7,7 +7,7 @@ use File::Basename;
 use File::Spec;
 
 BEGIN {
-    if ($^O eq 'VMS') {
+    if ($^OS_NAME eq 'VMS') {
         require VMS::Filespec;
         VMS::Filespec->import;
     }
@@ -15,13 +15,13 @@ BEGIN {
 
 Getopt::Long::Configure('no_ignore_case');
 
-our $LastUpdate = -M $0;
+our $LastUpdate = -M $^PROGRAM_NAME;
 
 sub handle_file {
     my $opts    = shift;
     my $file    = shift or die "Need file\n". usage();
     my $outfile = shift || '';
-    $file = vms_check_name($file) if $^O eq 'VMS';
+    $file = vms_check_name($file) if $^OS_NAME eq 'VMS';
     my $mode    = @(stat($file))[2] ^&^ 07777;
 
     open my $fh, "<", $file
@@ -43,7 +43,7 @@ sub handle_file {
     } else {
         $outfile ||= $file . '.packed';
 
-        my $me = basename($0);
+        my $me = basename($^PROGRAM_NAME);
 
         $outstr = <<"EOFBLURB" . pack 'u', $str;
 #########################################################################
@@ -68,7 +68,7 @@ EOFBLURB
     if( $opts->{?'s'} ) {
         print STDOUT $outstr;
     } else {
-        $outfile = VMS::Filespec::vmsify($outfile) if $^O eq 'VMS';
+        $outfile = VMS::Filespec::vmsify($outfile) if $^OS_NAME eq 'VMS';
         print "Writing $file into $outfile\n" if $opts->{?'v'};
         open my $outfh, ">", $outfile
             or do { warn "Could not open $outfile for writing: $^OS_ERROR"; exit 0 };
@@ -109,7 +109,7 @@ sub bulk_process {
 
         my $out = $file;
         $out =~ s/\.packed\z//;
-        $out = vms_check_name($out) if $^O eq 'VMS';
+        $out = vms_check_name($out) if $^OS_NAME eq 'VMS';
 
         ### unpack
         if( !$opts->{?'c'} ) {
@@ -146,7 +146,7 @@ sub bulk_process {
 
 sub usage {
     return qq[
-Usage: $^X $0 [-d dir] [-v] [-c] [-D] -p|-u [orig [packed|-s] | -m [manifest]]
+Usage: $^EXECUTABLE_NAME $^PROGRAM_NAME [-d dir] [-v] [-c] [-D] -p|-u [orig [packed|-s] | -m [manifest]]
 
     Handle binary files in source tree. Can be used to pack or
     unpack files individiually or as specified by a manifest file.

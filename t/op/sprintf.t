@@ -16,19 +16,19 @@ my ($i, $template, $data, $result, $comment, $w, $x, $evalData, $n, $p);
 
 my $Is_VMS_VAX = 0;
 # We use HW_MODEL since ARCH_NAME was not in VMS V5.*
-if ($^O eq 'VMS') {
+if ($^OS_NAME eq 'VMS') {
     my $hw_model;
     chomp($hw_model = `write sys\$output f\$getsyi("HW_MODEL")`);
     $Is_VMS_VAX = $hw_model +< 1024 ?? 1 !! 0;
 }
 
 # No %Config.
-my $Is_Ultrix_VAX = $^O eq 'ultrix' && `uname -m` =~ m/^VAX$/;
+my $Is_Ultrix_VAX = $^OS_NAME eq 'ultrix' && `uname -m` =~ m/^VAX$/;
 
 while ( ~< *DATA) {
     s/^\s*>//; s/<\s*$//;
     @($template, $data, $result, ?$comment) =  split(m/<\s*>/, $_, 4);
-    if ($^O eq 'os390' || $^O eq 's390') { # non-IEEE (s390 is UTS)
+    if ($^OS_NAME eq 'os390' || $^OS_NAME eq 's390') { # non-IEEE (s390 is UTS)
         $data   =~ s/([eE])96$/$163/;      # smaller exponents
         $result =~ s/([eE]\+)102$/$169/;   #  "       "
         $data   =~ s/([eE])\-101$/$1-56/;  # larger exponents
@@ -92,14 +92,14 @@ for my  $i (1 .. nelems(@tests)) {
 	if ($os =~ m/\ball\b/i) {
 	    $skip = 1;
 	# >comment skip: VMS hpux:10.20<
-	} elsif ($os =~ m/\b$^O(?::(\S+))?\b/i) {
+	} elsif ($os =~ m/\b$^OS_NAME(?::(\S+))?\b/i) {
 	    my $vsn = defined $1 ?? $1 !! "0";
 	    # Only compare on the the first pair of digits, as numeric
 	    # compares don't like 2.6.10-3mdksmp or 2.6.8-24.10-default
 	    s/^(\d+(\.\d+)?).*/$1/ for @( $osv, $vsn);
 	    $skip = $vsn ?? ($osv +<= $vsn ?? 1 !! 0) !! 1;
 	}
-	$skip and $comment =~ s/$/, failure expected on $^O $osv/;
+	$skip and $comment =~ s/$/, failure expected on $^OS_NAME $osv/;
     }
 
     if ($x eq ">$result<") {

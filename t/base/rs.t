@@ -10,10 +10,10 @@ $teststring = "1\n12\n123\n1234\n1234\n12345\n\n123456\n1234567\n";
 # Create our test datafile
 1 while unlink 'foo';                # in case junk left around
 rmdir 'foo';
-open TESTFILE, ">", "./foo" or die "error $^OS_ERROR $^E opening";
+open TESTFILE, ">", "./foo" or die "error $^OS_ERROR $^EXTENDED_OS_ERROR opening";
 binmode TESTFILE;
 print TESTFILE $teststring;
-close TESTFILE or die "error $^OS_ERROR $^E closing";
+close TESTFILE or die "error $^OS_ERROR $^EXTENDED_OS_ERROR closing";
 
 open TESTFILE, "<", "./foo";
 binmode TESTFILE;
@@ -97,7 +97,7 @@ if ($bar eq "90123456789012345678901234567890") {print "ok 11\n";} else {print "
 close TESTFILE;
 
 # Now for the tricky bit--full record reading
-if ($^O eq 'VMS') {
+if ($^OS_NAME eq 'VMS') {
   # Create a temp file. We jump through these hoops 'cause CREATE really
   # doesn't like our methods for some reason.
   open FDLFILE, ">", "./foo.fdl";
@@ -111,7 +111,7 @@ if ($^O eq 'VMS') {
   print CREATEFILE "\$EXIT\n";
   close CREATEFILE;
   $throwaway = `\@\[\]foo`, "\n";
-  open(TEMPFILE, ">", "./foo.bar") or print "# open failed $^OS_ERROR $^E\n";
+  open(TEMPFILE, ">", "./foo.bar") or print "# open failed $^OS_ERROR $^EXTENDED_OS_ERROR\n";
   print TEMPFILE "foo\nfoobar\nbaz\n";
   close TEMPFILE;
 

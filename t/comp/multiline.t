@@ -38,8 +38,8 @@ is($z, $y,  'basic multiline reading');
 
 is($count, 7,   '    line count');
 
-my $out = (($^O eq 'MSWin32') || $^O eq 'NetWare' || $^O eq 'VMS') ?? `type Comp.try`
-    !! ($^O eq 'MacOS') ?? `catenate Comp.try`
+my $out = (($^OS_NAME eq 'MSWin32') || $^OS_NAME eq 'NetWare' || $^OS_NAME eq 'VMS') ?? `type Comp.try`
+    !! ($^OS_NAME eq 'MacOS') ?? `catenate Comp.try`
     !! `cat Comp.try`;
 
 like($out, qr/.*\n.*\n.*\n$/);

@@ -37,7 +37,7 @@ require File::Spec::Cygwin ;
 # $root is only needed by Mac OS tests; these particular
 # tests are skipped on other OSs
 my $root = '';
-if ($^O eq 'MacOS') {
+if ($^OS_NAME eq 'MacOS') {
 	$root = File::Spec::Mac->rootdir();
 }
 
@@ -713,10 +713,10 @@ do {
     # Some funky stuff to override Cwd::getdcwd() for testing purposes,
     # in the limited scope of the rel2abs() method.
     if ($Cwd::VERSION) {  # Avoid a 'used only once' warning
-	local $^W;
+	local $^WARNING;
 	*rel2abs = sub {
 	    my $self = shift;
-	    local $^W;
+	    local $^WARNING;
 	    local *Cwd::getdcwd = sub {
 	      return 'D:\alpha\beta' if @_[0] eq 'D:';
 	      return 'C:\one\two'    if @_[0] eq 'C:';
@@ -748,7 +748,7 @@ sub tryfunc {
     my $expected = shift ;
     my $platform = shift ;
 
-    if ($platform && $^O ne $platform) {
+    if ($platform && $^OS_NAME ne $platform) {
 	skip("skip $function", 1);
 	return;
     }

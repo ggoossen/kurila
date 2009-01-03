@@ -20,9 +20,9 @@ our ($self); # Used in 'sourcing' the hints.
 
 # TBD: Can we just use $Config(exe_ext) here instead of this complex
 #      expression?
-my $ld_exeext = ($^O eq 'cygwin' ||
-                 $^O eq 'os2' && config_value("ldflags") =~ m/-Zexe\b/) ?? '.exe' !!
-                (($^O eq 'vos') ?? config_value("exe_ext") !! '');
+my $ld_exeext = ($^OS_NAME eq 'cygwin' ||
+                 $^OS_NAME eq 'os2' && config_value("ldflags") =~ m/-Zexe\b/) ?? '.exe' !!
+                (($^OS_NAME eq 'vos') ?? config_value("exe_ext") !! '');
 
 unless(env::var('PERL_CORE')) {
     env::set_var('PERL_CORE' => 1) if grep { $_ eq 'PERL_CORE=1' } @ARGV;
@@ -77,7 +77,7 @@ __EOD__
 
 	my $ccflags = config_value('ccflags') . ' ' . "-I$COREincdir";
 
-	if ($^O eq 'VMS') {
+	if ($^OS_NAME eq 'VMS') {
 	    if (env::var('PERL_CORE')) {
 		# Fragile if the extensions change hierarchy within
 		# the Perl core but this should do for now.
@@ -98,7 +98,7 @@ __EOD__
         $cccmd = "$(config_value('cc')) -o $tmp $ccflags $tmp.c $(join ' ',@$LIBS) $errornull"
 	    unless defined $cccmd;
 
-       if ($^O eq 'VMS') {
+       if ($^OS_NAME eq 'VMS') {
 	    open( CMDFILE, ">$tmp.com" );
 	    print CMDFILE "\$ SET MESSAGE/NOFACILITY/NOSEVERITY/NOIDENT/NOTEXT\n";
 	    print CMDFILE "\$ $cccmd\n";
@@ -329,7 +329,7 @@ sub DEFINE {
 }
 
 sub init {
-    my $hints = File::Spec->catfile("hints", "$^O.pl");
+    my $hints = File::Spec->catfile("hints", "$^OS_NAME.pl");
     if (-f $hints) {
 	print "Using hints $hints...\n";
 	local $self;
@@ -479,9 +479,9 @@ EOD
 	    $has_nanosleep++;
 	    $DEFINE .= ' -DTIME_HIRES_NANOSLEEP';
 	}
-    } elsif ($^O =~ m/^(mpeix)$/) {
+    } elsif ($^OS_NAME =~ m/^(mpeix)$/) {
 	# MPE/iX falsely finds nanosleep from its libc equivalent.
-	print "skipping because in $^O... ";
+	print "skipping because in $^OS_NAME... ";
     } else {
 	if (has_nanosleep()) {
 	    $has_nanosleep++;
@@ -495,7 +495,7 @@ EOD
         print "(It's still not portable, though.)\n";
     } else {
 	print "NOT found.\n";
-	my $nt = ($^O eq 'os2' ?? '' !! 'not');
+	my $nt = ($^OS_NAME eq 'os2' ?? '' !! 'not');
         print "You can$nt mix subsecond sleeps with signals.\n";
         print "(It would not be portable anyway.)\n";
     }
@@ -685,7 +685,7 @@ EOM
 
     my $has_w32api_windows_h;
 
-    if ($^O eq 'cygwin') {
+    if ($^OS_NAME eq 'cygwin') {
         print "Looking for <w32api/windows.h>... ";
         if (has_include('w32api/windows.h')) {
 	    $has_w32api_windows_h++;
@@ -782,10 +782,10 @@ sub doConstants {
 sub main {
     print "Configuring Time::HiRes...\n";
 
-    if ($^O =~ m/Win32/i) {
+    if ($^OS_NAME =~ m/Win32/i) {
       DEFINE('SELECT_IS_BROKEN');
       $LIBS = \@();
-      print "System is $^O, skipping full configure...\n";
+      print "System is $^OS_NAME, skipping full configure...\n";
     } else {
       init();
     }

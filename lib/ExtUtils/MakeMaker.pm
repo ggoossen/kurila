@@ -26,8 +26,8 @@ our @EXPORT_OK = qw($VERSION &neatvalue &mkbootstrap &mksymlists
 
 # These will go away once the last of the Win32 & VMS specific code is 
 # purged.
-my $Is_VMS     = $^O eq 'VMS';
-my $Is_Win32   = $^O eq 'MSWin32';
+my $Is_VMS     = $^OS_NAME eq 'VMS';
+my $Is_Win32   = $^OS_NAME eq 'MSWin32';
 
 full_setup();
 
@@ -756,7 +756,7 @@ sub check_hints {
     return unless -d $hint_dir;
 
     # First we look for the best hintsfile we have
-    my $hint="$($^O)_%Config{?osvers}";
+    my $hint="$($^OS_NAME)_%Config{?osvers}";
     $hint =~ s/\./_/g;
     $hint =~ s/_$//;
     return unless $hint;

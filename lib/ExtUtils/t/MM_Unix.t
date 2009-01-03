@@ -14,7 +14,7 @@ chdir 't';
 BEGIN { 
     use Test::More; 
 
-    if( $^O =~ m/^VMS|os2|MacOS|MSWin32|cygwin|beos|netware$/i ) {
+    if( $^OS_NAME =~ m/^VMS|os2|MacOS|MSWin32|cygwin|beos|netware$/i ) {
         plan skip_all => 'Non-Unix platform';
     }
     else {
@@ -170,7 +170,7 @@ is ($t->libscan('Fatty'), 'Fatty', 'libscan on something not a VC file' );
 
 open(FILE, ">", "command"); print FILE "foo"; close FILE;
 SKIP: do {
-    skip ("no separate execute mode", 1) if ($^O eq "vos");
+    skip ("no separate execute mode", 1) if ($^OS_NAME eq "vos");
     ok (!$t->maybe_command('command') ,"non executable file isn't a command");
 };
 

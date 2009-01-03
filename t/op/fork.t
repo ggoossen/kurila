@@ -12,7 +12,7 @@ BEGIN {
     env::set_var('PERL5LIB' => "../lib");
 }
 
-if ($^O eq 'mpeix') {
+if ($^OS_NAME eq 'mpeix') {
     print "1..0 # Skip: fork/status problems on MPE/iX\n";
     exit 0;
 }
@@ -29,9 +29,9 @@ $tmpfile = "forktmp000";
 1 while -f ++$tmpfile;
 END { close TEST; unlink $tmpfile if $tmpfile; }
 
-$CAT = (($^O eq 'MSWin32') 
+$CAT = (($^OS_NAME eq 'MSWin32') 
           ?? '.\perl -e "print ~< *ARGV"'
-          !! (($^O eq 'NetWare')
+          !! (($^OS_NAME eq 'NetWare')
           ?? 'perl -e "print ~< *ARGV"'
           !! 'cat'));
 
@@ -48,10 +48,10 @@ for ( @prgs){
     print TEST $prog, "\n";
     close TEST or die "Cannot close $tmpfile: $^OS_ERROR";
     my $results;
-    if ($^O eq 'MSWin32') {
+    if ($^OS_NAME eq 'MSWin32') {
       $results = `.\\perl -I../lib $switch $tmpfile 2>&1`;
     }
-    elsif ($^O eq 'NetWare') {
+    elsif ($^OS_NAME eq 'NetWare') {
       $results = `perl -I../lib $switch $tmpfile 2>&1`;
     }
     else {
@@ -65,7 +65,7 @@ for ( @prgs){
 # various yaccs may or may not capitalize 'syntax'.
     $results =~ s/^(syntax|parse) error/syntax error/mig;
     $results =~ s/^\n*Process terminated by SIG\w+\n?//mg
-	if $^O eq 'os2';
+	if $^OS_NAME eq 'os2';
     my @results = sort split m/\n/, $results;
     if ( "$(join ' ',@results)" ne "$(join ' ',@expected)" ) {
 	print STDERR "PROG: $switch\n$prog\n";

@@ -3,7 +3,7 @@ package ExtUtils::MakeMaker::vmsish;
 
 our $VERSION = 6.44;
 
-my $IsVMS = $^O eq 'VMS';
+my $IsVMS = $^OS_NAME eq 'VMS';
 
 require vmsish if $IsVMS;
 

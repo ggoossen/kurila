@@ -10,7 +10,7 @@ use File::Spec  ();
 use FileHandle  ();
 use version <     qw[qv];
 
-use constant ON_VMS  => $^O eq 'VMS';
+use constant ON_VMS  => $^OS_NAME eq 'VMS';
 
 our ($VERSION, @ISA, $VERBOSE, $CACHE, @EXPORT_OK,
      $FIND_VERSION, $ERROR, $CHECK_INC_HASH);
@@ -264,7 +264,7 @@ sub check_install {
     ### only complain if we're expected to find a version higher than 0.0 anyway
     if( $FIND_VERSION and not defined $href->{?version} ) {
         do {   ### don't warn about the 'not numeric' stuff ###
-            local $^W;
+            local $^WARNING;
 
             ### if we got here, we didn't find the version
             warn < loc(q[Could not check version on '%1'], $args->{?module} )
@@ -274,7 +274,7 @@ sub check_install {
 
     } else {
         ### don't warn about the 'not numeric' stuff ###
-        local $^W;
+        local $^WARNING;
         
         ### use qv(), as it will deal with developer release number
         ### ie ones containing _ as well. This addresses bug report
@@ -326,7 +326,7 @@ sub _parse_version {
         print "Evaltext: $eval\n" if $verbose;
         
         my $result = do {
-            local $^W = 0;
+            local $^WARNING = 0;
             eval($eval); 
         };
         
@@ -515,7 +515,7 @@ sub requires {
     }
 
     my $lib = join " ", map { qq["-I$_"] } @INC;
-    my $cmd = qq[$^X $lib -M$who -e"print(join(qq[\\n],keys(\%INC)))"];
+    my $cmd = qq[$^EXECUTABLE_NAME $lib -M$who -e"print(join(qq[\\n],keys(\%INC)))"];
 
     return  sort grep { !m/^$who$/  }
  map  { chomp; s|/|::|g; $_ }

@@ -3,7 +3,7 @@
 my $file;
 
 BEGIN {
-        $file = $0;
+        $file = $^PROGRAM_NAME;
         chdir 't' if -d 't';
 
         if ( env::var('PERL_CORE') ) {
@@ -23,7 +23,7 @@ my $files = join '', grep { -f $_ }
  @(	( $(env::var('HOME')) . '/.termcap', # we assume pretty UNIXy system anyway
 	  '/etc/termcap', 
 	  '/usr/share/misc/termcap' ));
-unless( $files || $^O eq 'VMS' ) {
+unless( $files || $^OS_NAME eq 'VMS' ) {
     plan skip_all => 'no termcap available to test';
 }
 else {
@@ -98,14 +98,14 @@ local $^WARN_HOOK = sub {
 # test the first few features by forcing Tgetent() to croak (line 156)
 env::set_var('TERM', undef);
 my $vals = \%();
-try { local $^W = 1; $t = Term::Cap->Tgetent($vals) };
+try { local $^WARNING = 1; $t = Term::Cap->Tgetent($vals) };
 like( $^EVAL_ERROR->{?description}, qr/TERM not set/, 'Tgetent() should croaks without TERM' );
 like( $warn, qr/OSPEED was not set/, 'Tgetent() should set default OSPEED' );
 
 is( $vals->{?PADDING}, 10000/9600, 'Default OSPEED implies default PADDING' );
 
 $warn = 'xxxx';
-try { local $^W = 0; $t = Term::Cap->Tgetent($vals) };
+try { local $^WARNING = 0; $t = Term::Cap->Tgetent($vals) };
 is($warn,'xxxx',"Tgetent() doesn't carp() without warnings on");
 
 # check values for very slow speeds
@@ -118,7 +118,7 @@ is( $vals->{?PADDING}, 200, 'Tgetent() should set slow PADDING when needed' );
 
 SKIP: do {
         skip('Tgetent() bad termcap test, since using a fixed termcap',1)
-              if $^O eq 'VMS';
+              if $^OS_NAME eq 'VMS';
         # now see if lines 177 or 180 will fail
         env::set_var('TERM' => 'foo');
         env::set_var('TERMPATH' => '!');
@@ -162,12 +162,12 @@ SKIP: do {
 SKIP:
 do {
    skip("QNX's termcap database does not contain an entry for dumb terminals",
-        1) if $^O eq 'nto';
+        1) if $^OS_NAME eq 'nto';
 
    local *^O;
    local *ENV;
    env::set_var('TERM', undef);
-   $^O = 'Win32';
+   $^OS_NAME = 'Win32';
 
    my $foo = Term::Cap->Tgetent();
    is($foo->{?TERM} ,'dumb','Windows gets "dumb" by default');

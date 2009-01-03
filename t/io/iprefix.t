@@ -2,7 +2,7 @@
 
 require './test.pl';
 
-$^I = 'bak*';
+$^INPLACE_EDIT = 'bak*';
 
 # Modified from the original inplace.t to test adding prefixes
 

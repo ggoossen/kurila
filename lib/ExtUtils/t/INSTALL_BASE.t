@@ -19,7 +19,7 @@ use Test::More tests => 21;
 use MakeMaker::Test::Utils;
 use MakeMaker::Test::Setup::BFD;
 
-my $Is_VMS = $^O eq 'VMS';
+my $Is_VMS = $^OS_NAME eq 'VMS';
 
 my $perl = which_perl();
 

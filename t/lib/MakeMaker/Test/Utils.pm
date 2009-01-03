@@ -17,8 +17,8 @@ $VERSION = 0.03;
 	     have_compiler
             );
 
-my $Is_VMS   = $^O eq 'VMS';
-my $Is_MacOS = $^O eq 'MacOS';
+my $Is_VMS   = $^OS_NAME eq 'VMS';
+my $Is_MacOS = $^OS_NAME eq 'MacOS';
 
 
 =head1 NAME
@@ -67,7 +67,7 @@ matter where you chdir to.
 =cut
 
 sub which_perl {
-    my $perl = $^X;
+    my $perl = $^EXECUTABLE_NAME;
     $perl ||= 'perl';
 
     # VMS should have 'perl' aliased properly
@@ -81,7 +81,7 @@ sub which_perl {
 
         # When building in the core, *don't* go off and find
         # another perl
-        die "Can't find a perl to use (\$^X=$^X), (\$perlpath=$perlpath)" 
+        die "Can't find a perl to use (\$^X=$^EXECUTABLE_NAME), (\$perlpath=$perlpath)" 
           if env::var('PERL_CORE');
 
         foreach my $path ( 'File::Spec'->path) {

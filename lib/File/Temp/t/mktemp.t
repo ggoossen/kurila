@@ -48,7 +48,7 @@ ok($string, $line);
 # to the file which are not recognised by stat(filename)
 # Simply waiting 3 seconds seems to be enough for the system to update
 
-if ($^O eq 'MSWin32') {
+if ($^OS_NAME eq 'MSWin32') {
   sleep 3;
 }
 my $status = unlink0($fh, $template);

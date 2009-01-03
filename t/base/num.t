@@ -109,7 +109,7 @@ print $a + 1 == 1001  ?? "ok 30\n" !! "not ok 30 #" . $a + 1 . "\n";
 # back to some basic stringify tests
 # we expect NV stringification to work according to C sprintf %.*g rules
 
-if ($^O eq 'os2') { # In the long run, fix this.  For 5.8.0, deal.
+if ($^OS_NAME eq 'os2') { # In the long run, fix this.  For 5.8.0, deal.
     $a = 0.01; "$a";
     print $a eq "0.01"   || $a eq '1e-02' ?? "ok 31\n" !! "not ok 31 # $a\n";
 
@@ -163,10 +163,10 @@ $a = 123.456; "$a";
 print $a eq "123.456" ?? "ok 44\n" !! "not ok 44 # $a\n";
 
 $a = 1e34; "$a";
-unless ($^O eq 'posix-bc')
+unless ($^OS_NAME eq 'posix-bc')
 { print $a eq "1e+34" || $a eq "1e+034" ?? "ok 45\n" !! "not ok 45 # $a\n"; }
 else
-{ print "ok 45 # skipped on $^O\n"; }
+{ print "ok 45 # skipped on $^OS_NAME\n"; }
 
 # see bug #15073
 
@@ -174,7 +174,7 @@ $a = 0.00049999999999999999999999999999999999999;
 $b = 0.0005000000000000000104;
 print $a +<= $b ?? "ok 46\n" !! "not ok 46\n";
 
-if ($^O eq 'ultrix' || $^O eq 'VMS') {
+if ($^OS_NAME eq 'ultrix' || $^OS_NAME eq 'VMS') {
   # Ultrix enters looong nirvana over this. VMS blows up when configured with
   # D_FLOAT (but with G_FLOAT or IEEE works fine).  The test should probably
   # make the number of 0's a function of NV_DIG, but that's not in Config and 

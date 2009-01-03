@@ -109,7 +109,7 @@ if ((nelems @donetests) == 3) {
   print "ok 12 # file/file [@donetests[1]]\n";
   print "not " unless @donetests[2] == 0;
   print "ok 13 # ";
-  print "TODO" if $^O eq "cygwin"; # spaces after filename silently trunc'd
+  print "TODO" if $^OS_NAME eq "cygwin"; # spaces after filename silently trunc'd
   print " file/fileCR [@donetests[2]]\n";
 }
 else {

@@ -26,7 +26,7 @@ ok(rmdir('blurfl'));
 SKIP: do {
     # trailing slashes will be removed before the system call to mkdir
     # but we don't care for MacOS ...
-    skip("MacOS", 4) if $^O eq 'MacOS';
+    skip("MacOS", 4) if $^OS_NAME eq 'MacOS';
     ok(mkdir('blurfl///'));
     ok(-d 'blurfl');
     ok(rmdir('blurfl///'));

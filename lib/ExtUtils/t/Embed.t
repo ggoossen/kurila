@@ -19,9 +19,9 @@ close($fh);
 $^OUTPUT_AUTOFLUSH = 1;
 print "1..9\n";
 my $cc = config_value('cc');
-my $cl  = ($^O eq 'MSWin32' && $cc eq 'cl');
-my $borl  = ($^O eq 'MSWin32' && $cc eq 'bcc32');
-my $skip_exe = $^O eq 'os2' && config_value("ldflags") =~ m/(?<!\S)-Zexe\b/;
+my $cl  = ($^OS_NAME eq 'MSWin32' && $cc eq 'cl');
+my $borl  = ($^OS_NAME eq 'MSWin32' && $cc eq 'bcc32');
+my $skip_exe = $^OS_NAME eq 'os2' && config_value("ldflags") =~ m/(?<!\S)-Zexe\b/;
 my $exe = 'embed_test';
 $exe .= config_value('exe_ext') unless $skip_exe;	# Linker will auto-append it
 my $obj = 'embed_test' . config_value('obj_ext');
@@ -30,12 +30,12 @@ my $lib = File::Spec->updir;
 my $libperl_copied;
 my $testlib;
 my @cmd;
-my (@cmd2) if $^O eq 'VMS';
+my (@cmd2) if $^OS_NAME eq 'VMS';
 # Don't use ccopts() here as we may want to overwrite an existing
 # perl with a new one with inconsistent header files, meaning
 # the usual value for perl_inc(), which is used by ccopts(),
 # will be wrong.
-if ($^O eq 'VMS') {
+if ($^OS_NAME eq 'VMS') {
     push(@cmd,$cc,"/Obj=$obj");
     my @(@incs) =@( @($inc));
     my $crazy = ccflags();
@@ -63,7 +63,7 @@ if ($^O eq 'VMS') {
    else {
     push(@cmd,$cc,'-o' => $exe);
    }
-   if ($^O eq 'dec_osf' && !defined config_value("usedl")) {
+   if ($^OS_NAME eq 'dec_osf' && !defined config_value("usedl")) {
        # The -non_shared is needed in case of -Uusedl or otherwise
        # the test application will try to use libperl.so
        # instead of libperl.a.
@@ -71,7 +71,7 @@ if ($^O eq 'VMS') {
    }
 
    push(@cmd,"-I$inc", ccflags(),'embed_test.c');
-   if ($^O eq 'MSWin32') {
+   if ($^OS_NAME eq 'MSWin32') {
     $inc = File::Spec->catdir($inc,'win32');
     push(@cmd,"-I$inc");
     $inc = File::Spec->catdir($inc,'include');
@@ -86,7 +86,7 @@ if ($^O eq 'VMS') {
              config_value('libc'));
     }
    }
-   elsif ($^O eq 'os390' && config_value('usedl')) {
+   elsif ($^OS_NAME eq 'os390' && config_value('usedl')) {
     # Nothing for OS/390 (z/OS) dynamic.
    } else { # Not MSWin32 or OS/390 (z/OS) dynamic.
     push(@cmd,"-L$lib",'-lperl');
@@ -94,21 +94,21 @@ if ($^O eq 'VMS') {
 	print STDERR @_[0]->message unless @_[0]->message =~ m/No library found for .*perl/
     };
     push(@cmd, '-Zlinker', '/PM:VIO')	# Otherwise puts a warning to STDOUT!
-	if $^O eq 'os2' and config_value('ldflags') =~ m/(?<!\S)-Zomf\b/;
+	if $^OS_NAME eq 'os2' and config_value('ldflags') =~ m/(?<!\S)-Zomf\b/;
     push(@cmd, ldopts());
    }
    if ($borl) {
      @cmd = @(@cmd[0],(< grep{m/^-[LI]/}@cmd[[1..((nelems @cmd)-1)]]),(< grep{!m/^-[LI]/}@cmd[[1..((nelems @cmd)-1)]]));
    }
 
-   if ($^O eq 'aix') { # AIX needs an explicit symbol export list.
+   if ($^OS_NAME eq 'aix') { # AIX needs an explicit symbol export list.
     my @($perl_exp) =  grep { -f } qw(perl.exp ../perl.exp);
     die "where is perl.exp?\n" unless defined $perl_exp;
     for ( @cmd) {
         s!-bE:(\S+)!-bE:$perl_exp!;
     }
    }
-   elsif ($^O eq 'cygwin') { # Cygwin needs the shared libperl copied
+   elsif ($^OS_NAME eq 'cygwin') { # Cygwin needs the shared libperl copied
      my $v_e_r_s = substr(config_version('version'),0,-2);
      $v_e_r_s =~ s/[.]/_/g;
      system("cp ../cygperl$v_e_r_s.dll ./");    # for test 1
@@ -138,22 +138,22 @@ my @out = @( `$cmd` );
 $status = $^CHILD_ERROR;
 print "# $_\n" foreach  @out;
 
-if ($^O eq 'VMS' && !$status) {
+if ($^OS_NAME eq 'VMS' && !$status) {
   print "# $(join ' ',@cmd2)\n";
   $status = system(join(' ', @cmd2)); 
 }
 print (($status?? 'not '!! '')."ok 1\n");
 
 my $embed_test = File::Spec->catfile(File::Spec->curdir, $exe);
-$embed_test = "run/nodebug $exe" if $^O eq 'VMS';
+$embed_test = "run/nodebug $exe" if $^OS_NAME eq 'VMS';
 print "# embed_test = $embed_test\n";
 $status = system($embed_test);
 print (($status?? 'not '!!'')."ok 9 # system returned $status\n");
 unlink($exe,"embed_test.c",$obj);
 unlink("$exe.manifest") if $cl and config_value('ccversion') =~ m/^(\d+)/ and $1 +>= 14;
 unlink("$exe" . config_value("exe_ext")) if $skip_exe;
-unlink("embed_test.map","embed_test.lis") if $^O eq 'VMS';
-unlink(glob( <"./*.dll")) if $^O eq 'cygwin';
+unlink("embed_test.map","embed_test.lis") if $^OS_NAME eq 'VMS';
+unlink(glob( <"./*.dll")) if $^OS_NAME eq 'cygwin';
 unlink($testlib)	       if $libperl_copied;
 
 # gcc -g -I.. -L../ -o perl_test perl_test.c -lperl `../perl -I../lib -MExtUtils::Embed -I../ -e ccflags -e ldopts`

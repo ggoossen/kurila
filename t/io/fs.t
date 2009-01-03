@@ -7,15 +7,15 @@ BEGIN {
 use Config;
 use File::Spec::Functions;
 
-my $Is_MacOS  = ($^O eq 'MacOS');
-my $Is_VMSish = ($^O eq 'VMS');
+my $Is_MacOS  = ($^OS_NAME eq 'MacOS');
+my $Is_VMSish = ($^OS_NAME eq 'VMS');
 
 our ($wd, $newmode, $delta, $foo);
 
-if (($^O eq 'MSWin32') || ($^O eq 'NetWare')) {
+if (($^OS_NAME eq 'MSWin32') || ($^OS_NAME eq 'NetWare')) {
     $wd = `cd`;
 }
-elsif ($^O eq 'VMS') {
+elsif ($^OS_NAME eq 'VMS') {
     $wd = `show default`;
 }
 else {
@@ -25,10 +25,10 @@ chomp($wd);
 
 my $has_link            = config_value('d_link');
 my $accurate_timestamps =
-    !($^O eq 'MSWin32' || $^O eq 'NetWare' ||
-      $^O eq 'dos'     || $^O eq 'os2'     ||
-      $^O eq 'mint'    || $^O eq 'cygwin'  ||
-      $^O eq 'amigaos' || $wd =~ m#$(config_value('afsroot'))/# ||
+    !($^OS_NAME eq 'MSWin32' || $^OS_NAME eq 'NetWare' ||
+      $^OS_NAME eq 'dos'     || $^OS_NAME eq 'os2'     ||
+      $^OS_NAME eq 'mint'    || $^OS_NAME eq 'cygwin'  ||
+      $^OS_NAME eq 'amigaos' || $wd =~ m#$(config_value('afsroot'))/# ||
       $Is_MacOS
      );
 
@@ -40,23 +40,23 @@ if (defined &Win32::IsWinNT && Win32::IsWinNT()) {
 }
 
 my $needs_fh_reopen =
-    $^O eq 'dos'
+    $^OS_NAME eq 'dos'
     # Not needed on HPFS, but needed on HPFS386 ?!
-    || $^O eq 'os2';
+    || $^OS_NAME eq 'os2';
 
 $needs_fh_reopen = 1 if (defined &Win32::IsWin95 && Win32::IsWin95());
 
 my $skip_mode_checks =
-    $^O eq 'cygwin' && env::var('CYGWIN') !~ m/ntsec/;
+    $^OS_NAME eq 'cygwin' && env::var('CYGWIN') !~ m/ntsec/;
 
 plan tests => 51;
 
 
-if (($^O eq 'MSWin32') || ($^O eq 'NetWare')) {
+if (($^OS_NAME eq 'MSWin32') || ($^OS_NAME eq 'NetWare')) {
     `rmdir /s /q tmp 2>nul`;
     `mkdir tmp`;
 }
-elsif ($^O eq 'VMS') {
+elsif ($^OS_NAME eq 'VMS') {
     `if f\$search("[.tmp]*.*") .nes. "" then delete/nolog/noconfirm [.tmp]*.*.*`;
     `if f\$search("tmp.dir") .nes. "" then set file/prot=o:rwed tmp.dir;`;
     `if f\$search("tmp.dir") .nes. "" then delete/nolog/noconfirm tmp.dir;`;
@@ -76,7 +76,7 @@ chdir catdir(curdir(), 'tmp');
 umask(022);
 
 SKIP: do {
-    skip "bogus umask", 1 if ($^O eq 'MSWin32') || ($^O eq 'NetWare') || ($^O eq 'epoc') || $Is_MacOS;
+    skip "bogus umask", 1 if ($^OS_NAME eq 'MSWin32') || ($^OS_NAME eq 'NetWare') || ($^OS_NAME eq 'epoc') || $Is_MacOS;
 
     is((umask(0)^&^0777), 022, 'umask'),
 };
@@ -107,7 +107,7 @@ SKIP: do {
     };
 
     SKIP: do {
-        skip "hard links not that hard in $^O", 1 if $^O eq 'amigaos';
+        skip "hard links not that hard in $^OS_NAME", 1 if $^OS_NAME eq 'amigaos';
 	skip "no mode checks", 1 if $skip_mode_checks;
 
 #      if ($^O eq 'cygwin') { # new files on cygwin get rwx instead of rw-
@@ -120,7 +120,7 @@ SKIP: do {
     };
 };
 
-$newmode = (($^O eq 'MSWin32') || ($^O eq 'NetWare')) ?? 0444 !! 0777;
+$newmode = (($^OS_NAME eq 'MSWin32') || ($^OS_NAME eq 'NetWare')) ?? 0444 !! 0777;
 
 is(chmod($newmode,'a'), 1, "chmod succeeding");
 
@@ -244,7 +244,7 @@ sub check_utime_result {
      $blksize,$blocks) = @: stat('b');
 
  SKIP: do {
-	skip "bogus inode num", 1 if ($^O eq 'MSWin32') || ($^O eq 'NetWare');
+	skip "bogus inode num", 1 if ($^OS_NAME eq 'MSWin32') || ($^OS_NAME eq 'NetWare');
 
 	ok($ino,    'non-zero inode num');
     };
@@ -259,7 +259,7 @@ sub check_utime_result {
 	    pass('mtime');
 	}
 	else {
-	    if ($^O =~ m/\blinux\b/i) {
+	    if ($^OS_NAME =~ m/\blinux\b/i) {
 		print "# Maybe stat() cannot get the correct atime, ".
 		    "as happens via NFS on linux?\n";
 		$foo = (utime 400000000,500000000 + 2*$delta,'b');
@@ -274,12 +274,12 @@ sub check_utime_result {
 		    fail("mtime - $atime/$new_atime $mtime/$new_mtime");
 		}
 	    }
-	    elsif ($^O eq 'VMS') {
+	    elsif ($^OS_NAME eq 'VMS') {
 		# why is this 1 second off?
 		is( $atime, 500000001,          'atime' );
 		is( $mtime, 500000000 + $delta, 'mtime' );
 	    }
-	    elsif ($^O eq 'beos') {
+	    elsif ($^OS_NAME eq 'beos') {
             SKIP: do {
 		    skip "atime not updated", 1;
 		};
@@ -315,7 +315,7 @@ chdir $wd || die "Can't cd back to $wd";
 
 SKIP: do {
     skip "Win32/Netware specific test", 2
-      unless ($^O eq 'MSWin32') || ($^O eq 'NetWare');
+      unless ($^OS_NAME eq 'MSWin32') || ($^OS_NAME eq 'NetWare');
     skip "No symbolic links found to test with", 2
       unless  `ls -l perl 2>nul` =~ m/^l.*->/;
 
@@ -374,7 +374,7 @@ SKIP: do {
     }
 
     SKIP: do {
-        if ($^O eq 'vos') {
+        if ($^OS_NAME eq 'vos') {
 	    skip ("# TODO - hit VOS bug posix-973 - cannot resize an open file below the current file pos.", 5);
 	}
 
@@ -430,7 +430,7 @@ SKIP: do {
 };
 
 # check if rename() works on directories
-if ($^O eq 'VMS') {
+if ($^OS_NAME eq 'VMS') {
     # must have delete access to rename a directory
     `set file tmp.dir/protection=o:d`;
     ok(rename('tmp.dir', 'tmp1.dir'), "rename on directories") ||

@@ -420,7 +420,7 @@ END
                     $test++;
                 }
 
-                if (config_value('d_fork') and $^O ne 'VMS' and $^O ne 'MSWin32' and $^O ne 'NetWare') {
+                if (config_value('d_fork') and $^OS_NAME ne 'VMS' and $^OS_NAME ne 'MSWin32' and $^OS_NAME ne 'NetWare') {
                     # Fork off a new perl to run the tests.
                     # (This is so we can catch spurious warnings.)
                     $^OUTPUT_AUTOFLUSH = 1; print ""; $^OUTPUT_AUTOFLUSH = 0; # flush output before forking
@@ -456,7 +456,7 @@ END
                     open CMD, ">", "$cmdfile"; print CMD $code; close CMD;
                     my $cmd = which_perl();
                     $cmd .= " -w $cmdfile 2>$errfile";
-                    if ($^O eq 'VMS' or $^O eq 'MSWin32' or $^O eq 'NetWare') {
+                    if ($^OS_NAME eq 'VMS' or $^OS_NAME eq 'MSWin32' or $^OS_NAME eq 'NetWare') {
                         # Use pipe instead of system so we don't inherit STD* from
                         # this process, and then foul our pipe back to parent by
                         # redirecting output in the child.
@@ -638,7 +638,7 @@ do {
     # and its children
 
     my $progfile = "b23265.pl";
-    open(T, ">", "$progfile") or die "$0: $^OS_ERROR\n";
+    open(T, ">", "$progfile") or die "$^PROGRAM_NAME: $^OS_ERROR\n";
     print T << '__EOF__';
         print
             sub {@_[0]->(<@_)} -> (

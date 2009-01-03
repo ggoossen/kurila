@@ -5,7 +5,7 @@ BEGIN { use FindBin; }
 use File::Spec ();
 use Test::More 'no_plan';
 
-use constant ON_VMS     => $^O eq 'VMS';
+use constant ON_VMS     => $^OS_NAME eq 'VMS';
 
 use lib "$FindBin::Bin/../lib";
 use lib "$FindBin::Bin/to_load";
@@ -58,7 +58,7 @@ do {
 
 ### the version may contain an _, which means perl will warn about 'not
 ### numeric' -- turn off that warning here.
-do {   local $^W;
+do {   local $^WARNING;
     my $rv = check_install(
                         module  => 'Module::Load::Conditional',
                         version => $Module::Load::Conditional::VERSION + 1,

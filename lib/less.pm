@@ -36,9 +36,9 @@ sub import {
 
     @_ = @( 'please' ) if not nelems @_;
     my %tags;
-     %tags{[_unpack_tags( < @_, %^H{?$class} ) ]} = @();
+     %tags{[_unpack_tags( < @_, $^HINTS{?$class} ) ]} = @();
 
-    %^H{+$class} = _pack_tags( < keys %tags );
+    $^HINTS{+$class} = _pack_tags( < keys %tags );
     return;
 }
 
@@ -47,19 +47,19 @@ sub unimport {
 
     if ((nelems @_)) {
         my %tags;
-         %tags{[_unpack_tags( %^H{?$class} ) ]} = @();
+         %tags{[_unpack_tags( $^HINTS{?$class} ) ]} = @();
         delete %tags{[ <_unpack_tags(< @_) ]};
         my $new = _pack_tags( < keys %tags );
 
         if ( not length $new ) {
-            delete %^H{$class};
+            delete $^HINTS{$class};
         }
         else {
-            %^H{+$class} = $new;
+            $^HINTS{+$class} = $new;
         }
     }
     else {
-        delete %^H{$class};
+        delete $^HINTS{$class};
     }
 
     return;

@@ -9,7 +9,7 @@ do {
 	require XSLoader;
 
 	my @load;
-	local $^W;
+	local $^WARNING;
 	local *XSLoader::load = sub {
 		push @load, \@_;
 	};
@@ -35,14 +35,14 @@ do {
 };
 
 do {
-    local $^W = 0;
+    local $^WARNING = 0;
     IO->import();
     is( $warn, '', "... import default, should not warn");
     $warn = '' ;
 };
 
 do {
-    local $^W = 1;
+    local $^WARNING = 1;
     IO->import();
     like( $warn, qr/^Parameterless "use IO" deprecated/, 
               "... import default, should warn");

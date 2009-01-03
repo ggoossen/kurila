@@ -13,7 +13,7 @@ do {   use_ok( $Class );
 
 do {   ok( !is_loaded($Mod),       "$Mod not loaded yet" );
     ok( mark_as_loaded($Mod),   "   $Mod now marked as loaded" );
-    is( is_loaded($Mod), $0,    "   $Mod is loaded from $0" );
+    is( is_loaded($Mod), $^PROGRAM_NAME,    "   $Mod is loaded from $^PROGRAM_NAME" );
     
     my $rv = eval "require $Mod; 1";
     ok( $rv,                    "$Mod required" );

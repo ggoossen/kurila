@@ -35,8 +35,8 @@ sub _expansion {
     if ($op ne 'eq' and $op ne 'ne') {die "wrong eq-ne arg"};
     if ($expr =~ m[^(.*?)<<\|\$\^O-$op-$os>>(.*?)$]s) {
         my @($if,$el) = @($1,$2);
-        if (($op eq 'eq' and ($^O eq $os || config_value("osname") eq $os))
-              || ($op eq 'ne' and ($^O ne $os || config_value("osname") ne $os))) {
+        if (($op eq 'eq' and ($^OS_NAME eq $os || config_value("osname") eq $os))
+              || ($op eq 'ne' and ($^OS_NAME ne $os || config_value("osname") ne $os))) {
             return $if
         }
         else {
@@ -45,8 +45,8 @@ sub _expansion {
     }
     else {
         # #if;#endif
-        if (($op eq 'eq' and ($^O eq $os || config_value("osname") eq $os))
-              || ($op eq 'ne' and ($^O ne $os || config_value("osname") ne $os))) {
+        if (($op eq 'eq' and ($^OS_NAME eq $os || config_value("osname") eq $os))
+              || ($op eq 'ne' and ($^OS_NAME ne $os || config_value("osname") ne $os))) {
             return $expr
         }
         else {

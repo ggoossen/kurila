@@ -290,15 +290,15 @@ do {
     # Is this a stupid thing to do on VMS, VOS and other unusual platforms?
 
     skip("-- the IEEE infinity model is unavailable in this configuration.", 1)
-       if ($^O eq 'VMS') && !defined(config_value("useieee"));
+       if ($^OS_NAME eq 'VMS') && !defined(config_value("useieee"));
 
-    skip("-- $^O has serious fp indigestion on w-packed infinities", 1)
+    skip("-- $^OS_NAME has serious fp indigestion on w-packed infinities", 1)
        if (
-	   ($^O eq 'mpeix')
+	   ($^OS_NAME eq 'mpeix')
 	   ||
-	   ($^O eq 'ultrix')
+	   ($^OS_NAME eq 'ultrix')
 	   ||
-	   ($^O =~ m/^svr4/ && -f "/etc/issue" && -f "/etc/.relid") # NCR MP-RAS
+	   ($^OS_NAME =~ m/^svr4/ && -f "/etc/issue" && -f "/etc/.relid") # NCR MP-RAS
 	   );
 
     my $inf = eval '2**1000000';
@@ -308,7 +308,7 @@ do {
 
     local our $TODO;
     $TODO = "VOS needs a fix for posix-1022 to pass this test."
-      if ($^O eq 'vos');
+      if ($^OS_NAME eq 'vos');
 
     dies_like( sub { $x = pack 'w', $inf },
                qr/^Cannot compress integer/, "Cannot compress integer");
@@ -317,10 +317,10 @@ do {
  SKIP: do {
 
     skip("-- the full range of an IEEE double may not be available in this configuration.", 3)
-       if ($^O eq 'VMS') && !defined(config_value("useieee"));
+       if ($^OS_NAME eq 'VMS') && !defined(config_value("useieee"));
 
-    skip("-- $^O does not like 2**1023", 3)
-       if (($^O eq 'ultrix'));
+    skip("-- $^OS_NAME does not like 2**1023", 3)
+       if (($^OS_NAME eq 'ultrix'));
 
     # This should be about the biggest thing possible on an IEEE double
     my $big = eval '2**1023';
@@ -1331,7 +1331,7 @@ do {  # Repeat count [SUBEXPR]
 			| [svnSiIlVNLqQjJ]  (?{ 10111 })
 			| [FfDd]  (?{ 1.36514538e67 })
 			| [pP]  (?{ "try this buffer" })
-			/x; $^R } @codes;
+			/x; $^LAST_REGEXP_CODE_RESULT } @codes;
    my @end = @(0x12345678, 0x23456781, 0x35465768, 0x15263748);
    my $end = "N4";
 

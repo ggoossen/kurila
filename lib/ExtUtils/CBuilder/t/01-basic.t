@@ -52,7 +52,7 @@ for (@($source_file, $object_file, $lib_file)) {
 }
 
 my @words = $b->split_like_shell(' foo bar');
-if ($^O eq 'MSWin32') {
+if ($^OS_NAME eq 'MSWin32') {
   ok (nelems @words), 1;
   ok @words[0], ' foo bar';
   skip 'No splitting in split_like_shell() on Win32';

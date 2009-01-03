@@ -64,7 +64,7 @@ print OUT <<'EOT' if defined &DynaLoader::mod2fname;
 
 EOT
 
-print OUT <<'EOT' if $^O eq 'os2';
+print OUT <<'EOT' if $^OS_NAME eq 'os2';
 
     # os2 static build can dynaload, but cannot dynaload Perl modules...
     die 'Dynaloaded Perl modules are not available in this build of Perl' if $OS2::is_static;
@@ -97,7 +97,7 @@ print OUT <<'EOT';
 
 EOT
 
-    if ($^O eq 'darwin') {
+    if ($^OS_NAME eq 'darwin') {
 print OUT <<'EOT';
         if ($boot_symbol_ref = dl_find_symbol(0, $bootname)) {
             goto boot; #extension library has already been loaded, e.g. darwin

@@ -7,8 +7,8 @@ BEGIN {
 $^OUTPUT_AUTOFLUSH  = 1;
 use warnings;
 use Config;
-my $Is_VMS = $^O eq 'VMS';
-my $Is_MacOS = $^O eq 'MacOS';
+my $Is_VMS = $^OS_NAME eq 'VMS';
+my $Is_MacOS = $^OS_NAME eq 'MacOS';
 
 our ($f);
 

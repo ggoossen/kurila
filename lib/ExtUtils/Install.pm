@@ -89,10 +89,10 @@ Dies with a special message.
 
 =cut
 
-my $Is_VMS     = $^O eq 'VMS';
-my $Is_MacPerl = $^O eq 'MacOS';
-my $Is_Win32   = $^O eq 'MSWin32';
-my $Is_cygwin  = $^O eq 'cygwin';
+my $Is_VMS     = $^OS_NAME eq 'VMS';
+my $Is_MacPerl = $^OS_NAME eq 'MacOS';
+my $Is_Win32   = $^OS_NAME eq 'MSWin32';
+my $Is_cygwin  = $^OS_NAME eq 'cygwin';
 my $CanMoveAtBoot = ($Is_Win32 || $Is_cygwin);
 
 # *note* CanMoveAtBoot is only incidentally the same condition as below
@@ -197,7 +197,7 @@ sub _move_file_at_boot { #XXX OS-SPECIFIC
         return 1;
     } else {
         my @msg=@(
-            "MoveFileEx $descr at reboot failed: $^E",
+            "MoveFileEx $descr at reboot failed: $^EXTENDED_OS_ERROR",
             "You may try to perform the operation by hand yourself. ",
             "(You may need to close other perl processes first).",
         );

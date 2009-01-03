@@ -30,7 +30,7 @@ env::set_var($_, undef) for qw(PREFIX LIB MAKEFLAGS);
 
 my $Perl = which_perl();
 my $Makefile = makefile_name();
-my $Is_VMS = $^O eq 'VMS';
+my $Is_VMS = $^OS_NAME eq 'VMS';
 
 chdir 't';
 perl_lib;

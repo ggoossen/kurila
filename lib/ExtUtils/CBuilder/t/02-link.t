@@ -11,11 +11,11 @@ BEGIN {
 
 use Test;
 BEGIN { 
-  if ($^O eq 'MSWin32') {
+  if ($^OS_NAME eq 'MSWin32') {
     print "1..0 # Skipped: link_executable() is not implemented yet on Win32\n";
     exit;
   }
-  if ($^O eq 'VMS') {
+  if ($^OS_NAME eq 'VMS') {
     # So we can get the return value of system()
     require vmsish;
     vmsish->import();
@@ -50,7 +50,7 @@ my ($exe_file, @temps);
 @($exe_file, @< @temps) =  $b->link_executable(objects => $object_file);
 ok $exe_file;
 
-if ($^O eq 'os2') {		# Analogue of LDLOADPATH...
+if ($^OS_NAME eq 'os2') {		# Analogue of LDLOADPATH...
 	# Actually, not needed now, since we do not link with the generated DLL
   my $old = OS2::extLibpath();	# [builtin function]
   $old = ";$old" if defined $old and length $old;
@@ -69,7 +69,7 @@ for (@($source_file, $object_file, $exe_file)) {
 
 sub my_system {
   my $cmd = shift;
-  if ($^O eq 'VMS') {
+  if ($^OS_NAME eq 'VMS') {
     return system("mcr $cmd");
   }
   return system($cmd) >> 8;

@@ -44,7 +44,7 @@ plan $tests
 # Testing on "/" may not be portable to non-Unix as it may not be readable
 # "/tmp" should be readable and likely also local.
 my $testdir = File::Spec->tmpdir;
-$testdir = VMS::Filespec::fileify($testdir) if $^O eq 'VMS';
+$testdir = VMS::Filespec::fileify($testdir) if $^OS_NAME eq 'VMS';
 
 my $r;
 
@@ -56,7 +56,7 @@ sub _check_and_report {
     is( $eval_status, '', $description );
     SKIP: do {
 	skip "terminal constants set errno on QNX", 1
-	    if $^O eq 'nto' and $description =~ $TTY;
+	    if $^OS_NAME eq 'nto' and $description =~ $TTY;
         ok( $success, "\tchecking that the returned value is defined (" 
                         . (defined($return_val) ?? "yes, it's $return_val)" !! "it isn't)"
                         . " or that errno is clear ("
@@ -64,7 +64,7 @@ sub _check_and_report {
                         );
     };
     SKIP: do {
-        skip "constant not implemented on $^O or no limit in effect", 1 
+        skip "constant not implemented on $^OS_NAME or no limit in effect", 1 
             if !defined($return_val);
         ok( looks_like_number($return_val), "\tchecking that the returned value looks like a number" );
     };
@@ -152,7 +152,7 @@ END {
 }
 
 SKIP: do {
-    if($^O eq 'cygwin') {
+    if($^OS_NAME eq 'cygwin') {
         pop @sys_consts;
         skip("No _SC_TZNAME_MAX on Cygwin", 3);
     }

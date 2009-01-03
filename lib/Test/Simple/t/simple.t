@@ -6,7 +6,7 @@ BEGIN {
 }
 
 
-BEGIN { $^OUTPUT_AUTOFLUSH = 1; $^W = 1; }
+BEGIN { $^OUTPUT_AUTOFLUSH = 1; $^WARNING = 1; }
 
 use Test::Simple tests => 3;
 

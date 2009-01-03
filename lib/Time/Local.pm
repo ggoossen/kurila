@@ -31,20 +31,20 @@ use constant SECS_PER_DAY    => 86400;
 my $MaxInt = ( ( 1 << ( 8 * config_value('ivsize') - 2 ) ) - 1 ) * 2 + 1;
 my $MaxDay = int( ( $MaxInt - ( SECS_PER_DAY / 2 ) ) / SECS_PER_DAY ) - 1;
 
-if ( $^O eq 'MacOS' ) {
+if ( $^OS_NAME eq 'MacOS' ) {
     # time_t is unsigned...
     $MaxInt = ( 1 << ( 8 * config_value('ivsize') ) ) - 1;
 }
 
 # Determine the EPOC day for this machine
 my $Epoc = 0;
-if ( $^O eq 'vos' ) {
+if ( $^OS_NAME eq 'vos' ) {
     # work around posix-977 -- VOS doesn't handle dates in the range
     # 1970-1980.
     $Epoc = _daygm( 0, 0, 0, 1, 0, 70, 4, 0 );
 }
-elsif ( $^O eq 'MacOS' ) {
-    $MaxDay *=2 if $^O eq 'MacOS';  # time_t unsigned ... quick hack?
+elsif ( $^OS_NAME eq 'MacOS' ) {
+    $MaxDay *=2 if $^OS_NAME eq 'MacOS';  # time_t unsigned ... quick hack?
     # MacOS time() is seconds since 1 Jan 1904, localtime
     # so we need to calculate an offset to apply later
     $Epoc = 693901;

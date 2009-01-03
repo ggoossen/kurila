@@ -23,7 +23,7 @@ foreach my $k (@(1, 82)) {
     = runperl (stdin => '', stderr => 1,
               prog => "our (\$x, \%a); \$x = q(k) x $k; \%a\{+\$x\} = q(v); \$_ = ~< *ARGV foreach keys \%a; print q(end)",
 	      );
-  $result =~ s/\n\z// if $^O eq 'VMS';
+  $result =~ s/\n\z// if $^OS_NAME eq 'VMS';
   is ($result, "end", '[perl #21614] for length ' . length('k' x $k));
 }
 
@@ -33,7 +33,7 @@ foreach my $k (@(1, 21)) {
     = runperl (stdin => ' rules', stderr => 1,
               prog => "our (\$x, \%a); \$x = q(perl) x $k; \%a\{+\$x\} = q(v); foreach (keys \%a) \{\$_ .= ~< *ARGV; print\}",
 	      );
-  $result =~ s/\n\z// if $^O eq 'VMS';
+  $result =~ s/\n\z// if $^OS_NAME eq 'VMS';
   is ($result, ('perl' x $k) . " rules", 'rcatline to shared sv for length ' . length('perl' x $k));
 }
 

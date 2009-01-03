@@ -17,7 +17,7 @@ BEGIN {
     @EXPORT_OK  =   qw[check allow last_error];
 
     $VERSION                = '0.26';
-    $VERBOSE                = $^W ?? 1 !! 0;
+    $VERBOSE                = $^WARNING ?? 1 !! 0;
     $NO_DUPLICATES          = 0;
     $STRIP_LEADING_DASHES   = 0;
     $STRICT_TYPE            = 0;
@@ -421,7 +421,7 @@ sub allow {
 
     ### it's a regexp ###
     if( ref @_[1] eq 'Regexp' ) {
-        local $^W;  # silence warnings if $val is undef #
+        local $^WARNING;  # silence warnings if $val is undef #
         return if @_[0] !~ m/@_[1]/;
 
     ### it's a sub ###

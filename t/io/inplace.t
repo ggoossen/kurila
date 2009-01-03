@@ -1,14 +1,14 @@
 #!./perl
 require './test.pl';
 
-$^I = $^O eq 'VMS' ?? '_bak' !! '.bak';
+$^INPLACE_EDIT = $^OS_NAME eq 'VMS' ?? '_bak' !! '.bak';
 
 plan( tests => 2 );
 
 my @tfiles     = @('.a','.b','.c');
-my @tfiles_bak = @(".a$^I", ".b$^I", ".c$^I");
+my @tfiles_bak = @(".a$^INPLACE_EDIT", ".b$^INPLACE_EDIT", ".c$^INPLACE_EDIT");
 
-END { unlink_all('.a','.b','.c',".a$^I", ".b$^I", ".c$^I"); }
+END { unlink_all('.a','.b','.c',".a$^INPLACE_EDIT", ".b$^INPLACE_EDIT", ".c$^INPLACE_EDIT"); }
 
 for my $file ( @tfiles) {
     runperl( prog => 'print qq(foo\n);', 

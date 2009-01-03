@@ -29,13 +29,13 @@ else {
 
 our @R = sort @D;
 our @G = sort(glob("op/*.t"));
-@G = sort glob(":op:*.t") if $^O eq 'MacOS';
+@G = sort glob(":op:*.t") if $^OS_NAME eq 'MacOS';
 if (@G[0] =~ m#.*\](\w+\.t)#i) {
     # grep is to convert filespecs returned from glob under VMS to format
     # identical to that returned by readdir
     @G = grep(s#.*\](\w+\.t).*#op/$1#i, @(glob("op/*.t")));
 }
-while (@R && @G && @G[0] eq ($^O eq 'MacOS' ?? ':op:' !! 'op/').@R[0]) {
+while (@R && @G && @G[0] eq ($^OS_NAME eq 'MacOS' ?? ':op:' !! 'op/').@R[0]) {
     shift(@R);
     shift(@G);
 }

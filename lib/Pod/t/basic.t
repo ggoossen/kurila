@@ -104,7 +104,7 @@ for my $translator (sort keys %translators) {
 
         # OS/390 is EBCDIC, which uses a different character for ESC
         # apparently.  Try to convert so that the test still works.
-        if ($^O eq 'os390' && $_ eq 'Pod::Text::Termcap') {
+        if ($^OS_NAME eq 'os390' && $_ eq 'Pod::Text::Termcap') {
             $output =~ s/\033/\047/g;
         }
 

@@ -12,7 +12,7 @@ BEGIN {
 chdir 't';
 
 use Test::More;
-if ($^O =~ m/os2/i) {
+if ($^OS_NAME =~ m/os2/i) {
 	plan( tests => 32 );
 } else {
 	plan( skip_all => "This is not OS/2" );

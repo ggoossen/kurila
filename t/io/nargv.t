@@ -13,7 +13,7 @@ for my $i (@( 1,2,5,4,3) ) {
 
 do {
     local *ARGV;
-    local $^I = '.bak';
+    local $^INPLACE_EDIT = '.bak';
     @ARGV = mkfiles( <1..3);
     my $n = 0;
     while ( ~< *ARGV) {
@@ -25,7 +25,7 @@ do {
     }
 };
 
-$^I = undef;
+$^INPLACE_EDIT = undef;
 @ARGV = mkfiles( <1..3);
 my $n = 0;
 while ( ~< *ARGV) {

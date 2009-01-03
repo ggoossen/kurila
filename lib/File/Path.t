@@ -11,7 +11,7 @@ BEGIN {
 eval "use Test::Output";
 my $has_Test_Output = $^EVAL_ERROR ?? 0 !! 1;
 
-my $Is_VMS   = $^O eq 'VMS';
+my $Is_VMS   = $^OS_NAME eq 'VMS';
 
 # first check for stupid permissions second for full, so we clean up
 # behind ourselves
@@ -66,7 +66,7 @@ SKIP: do {
     # rather than foo/bar/..    
     skip "updir() canonicalises path on this platform", 2
         if $dir2 eq $tmp_base
-            or $^O eq 'cygwin';
+            or $^OS_NAME eq 'cygwin';
         
     @created = mkpath($dir2, \%(mask => 0700));
     is(scalar(nelems @created), 1, "make directory with trailing parent segment");

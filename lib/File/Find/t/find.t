@@ -35,7 +35,7 @@ else                   { print "1..85\n";  }
 
 BEGIN {
     use File::Spec;
-    if ($^O eq 'MSWin32' || $^O eq 'cygwin' || $^O eq 'VMS')
+    if ($^OS_NAME eq 'MSWin32' || $^OS_NAME eq 'cygwin' || $^OS_NAME eq 'VMS')
      {
       # This is a hack - at present File::Find does not produce native names on 
       # Win32 or VMS, so force File::Spec to use Unix names.
@@ -121,8 +121,8 @@ sub MkDir($$) {
 
 sub wanted_File_Dir {
     printf "# \$File::Find::dir => '$File::Find::dir'\t\$_ => '$_'\n";
-    s#\.$## if ($^O eq 'VMS' && $_ ne '.');
-    s/(.dir)?$//i if ($^O eq 'VMS' && -d _);
+    s#\.$## if ($^OS_NAME eq 'VMS' && $_ ne '.');
+    s/(.dir)?$//i if ($^OS_NAME eq 'VMS' && -d _);
     Check( %Expect_File{?$_} );
     if ( $FastFileTests_OK ) {
         delete %Expect_File{ $_} 
@@ -140,11 +140,11 @@ sub wanted_File_Dir_prune {
 
 sub wanted_Name {
     my $n = $File::Find::name;
-    $n =~ s#\.$## if ($^O eq 'VMS' && $n ne '.');
+    $n =~ s#\.$## if ($^OS_NAME eq 'VMS' && $n ne '.');
     print "# \$File::Find::name => '$n'\n";
     my $i = rindex($n,'/');
     my $OK = exists(%Expect_Name{$n});
-    unless ($^O eq 'MacOS') {
+    unless ($^OS_NAME eq 'MacOS') {
         if ( $OK ) {
             $OK= exists(%Expect_Name{substr($n,0,$i)})  if $i +>= 0;    
         }
@@ -155,10 +155,10 @@ sub wanted_Name {
 
 sub wanted_File {
     print "# \$_ => '$_'\n";
-    s#\.$## if ($^O eq 'VMS' && $_ ne '.');
+    s#\.$## if ($^OS_NAME eq 'VMS' && $_ ne '.');
     my $i = rindex($_,'/');
     my $OK = exists(%Expect_File{ $_});
-    unless ($^O eq 'MacOS') {
+    unless ($^OS_NAME eq 'MacOS') {
         if ( $OK ) {
             $OK= exists(%Expect_File{ substr($_,0,$i)})  if $i +>= 0;
         }
@@ -179,7 +179,7 @@ sub my_preprocess {
     print "# --preprocess--\n";
     print "#   \$File::Find::dir => '$File::Find::dir' \n";
     foreach my $file ( @files) {
-        $file =~ s/\.(dir)?$// if $^O eq 'VMS';
+        $file =~ s/\.(dir)?$// if $^OS_NAME eq 'VMS';
         print "#   $file \n";
         delete %Expect_Dir{ $File::Find::dir }->{$file};
     }
@@ -216,7 +216,7 @@ sub dir_path {
     my $first_arg = shift @_;
 
     if ($first_arg eq '.') {
-        if ($^O eq 'MacOS') {
+        if ($^OS_NAME eq 'MacOS') {
             return '' unless (nelems @_);
             # ignore first argument; return a relative path
             # with leading ":" and with trailing ":"
@@ -242,7 +242,7 @@ sub dir_path {
 
 sub topdir {
     my $path = dir_path(< @_);
-    $path =~ s/:$// if ($^O eq 'MacOS');
+    $path =~ s/:$// if ($^OS_NAME eq 'MacOS');
     return $path;
 }
 
@@ -264,7 +264,7 @@ sub file_path {
     my $first_arg = shift @_;
 
     if ($first_arg eq '.') {
-        if ($^O eq 'MacOS') {
+        if ($^OS_NAME eq 'MacOS') {
             return '' unless (nelems @_);
             # ignore first argument; return a relative path  
             # with leading ":", but without trailing ":"
@@ -296,7 +296,7 @@ sub file_path {
 
 sub file_path_name {
     my $path = file_path(< @_);
-    $path = ":$path" if (($^O eq 'MacOS') && ($path !~ m/:/));
+    $path = ":$path" if (($^OS_NAME eq 'MacOS') && ($path !~ m/:/));
     return $path;
 }
 
@@ -309,7 +309,7 @@ MkDir( dir_path('fb'), 0770  );
 touch( file_path('fb', 'fb_ord') );
 MkDir( dir_path('fb', 'fba'), 0770  );
 touch( file_path('fb', 'fba', 'fba_ord') );
-if ($^O eq 'MacOS') {
+if ($^OS_NAME eq 'MacOS') {
       CheckDie( symlink(':fb',':fa:fsl') ) if $symlink_exists;
 } else {
       CheckDie( symlink('../fb','fa/fsl') ) if $symlink_exists;
@@ -613,7 +613,7 @@ if ( $symlink_exists ) {
 		       file_path('dangling_dir_sl') ) );
     rmdir dir_path('dangling_dir');
     touch(file_path('dangling_file'));  
-    if ($^O eq 'MacOS') {
+    if ($^OS_NAME eq 'MacOS') {
         CheckDie( symlink('dangling_file', ':fa:dangling_file_sl') );
     } else {
         CheckDie( symlink('../dangling_file','fa/dangling_file_sl') );
@@ -657,7 +657,7 @@ if ( $symlink_exists ) {
 
 
     print "# check recursion\n";
-    if ($^O eq 'MacOS') {
+    if ($^OS_NAME eq 'MacOS') {
         CheckDie( symlink(':fa:faa',':fa:faa:faa_sl') );
     } else {
         CheckDie( symlink('../faa','fa/faa/faa_sl') );
@@ -670,7 +670,7 @@ if ( $symlink_exists ) {
 
 
     print "# check follow_skip (file)\n";
-    if ($^O eq 'MacOS') {
+    if ($^OS_NAME eq 'MacOS') {
         CheckDie( symlink(':fa:fa_ord',':fa:fa_ord_sl') ); # symlink to a file
     } else {
         CheckDie( symlink('./fa_ord','fa/fa_ord_sl') ); # symlink to a file
@@ -720,7 +720,7 @@ if ( $symlink_exists ) {
 
 
     print "# check follow_skip (directory)\n";
-    if ($^O eq 'MacOS') {
+    if ($^OS_NAME eq 'MacOS') {
         CheckDie( symlink(':fa:faa',':fa:faa_sl') ); # symlink to a directory
     } else {
         CheckDie( symlink('./faa','fa/faa_sl') ); # symlink to a directory

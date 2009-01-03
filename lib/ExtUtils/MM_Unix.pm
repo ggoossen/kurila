@@ -22,19 +22,19 @@ our @ISA = qw(ExtUtils::MM_Any);
 
 my %Is;
 BEGIN { 
-    %Is{+OS2}     = $^O eq 'os2';
-    %Is{+Win32}   = $^O eq 'MSWin32' || %Config{?osname} eq 'NetWare';
-    %Is{+Dos}     = $^O eq 'dos';
-    %Is{+VMS}     = $^O eq 'VMS';
-    %Is{+OSF}     = $^O eq 'dec_osf';
-    %Is{+IRIX}    = $^O eq 'irix';
-    %Is{+NetBSD}  = $^O eq 'netbsd';
-    %Is{+Interix} = $^O eq 'interix';
-    %Is{+SunOS4}  = $^O eq 'sunos';
-    %Is{+Solaris} = $^O eq 'solaris';
+    %Is{+OS2}     = $^OS_NAME eq 'os2';
+    %Is{+Win32}   = $^OS_NAME eq 'MSWin32' || %Config{?osname} eq 'NetWare';
+    %Is{+Dos}     = $^OS_NAME eq 'dos';
+    %Is{+VMS}     = $^OS_NAME eq 'VMS';
+    %Is{+OSF}     = $^OS_NAME eq 'dec_osf';
+    %Is{+IRIX}    = $^OS_NAME eq 'irix';
+    %Is{+NetBSD}  = $^OS_NAME eq 'netbsd';
+    %Is{+Interix} = $^OS_NAME eq 'interix';
+    %Is{+SunOS4}  = $^OS_NAME eq 'sunos';
+    %Is{+Solaris} = $^OS_NAME eq 'solaris';
     %Is{+SunOS}   = %Is{?SunOS4} || %Is{?Solaris};
-    %Is{+BSD}     = ($^O =~ m/^(?:free|net|open)bsd$/ or
-                   grep( $^O eq $_, qw(bsdos interix dragonfly) )
+    %Is{+BSD}     = ($^OS_NAME =~ m/^(?:free|net|open)bsd$/ or
+                   grep( $^OS_NAME eq $_, qw(bsdos interix dragonfly) )
                   );
 }
 
@@ -1921,7 +1921,7 @@ sub init_PERL {
     }
 
     # Build up a set of file names (not command names).
-    my $thisperl = $self->canonpath($^X);
+    my $thisperl = $self->canonpath($^EXECUTABLE_NAME);
     $thisperl .= %Config{?exe_ext} unless 
                 # VMS might have a file version # at the end
       %Is{?VMS} ?? $thisperl =~ m/%Config{?exe_ext}(;\d+)?$/i
@@ -2711,7 +2711,7 @@ sub parse_version {
             \};
             \$$2;
         |;
-        local $^W = 0;
+        local $^WARNING = 0;
         $result = eval($eval);  ## no critic
         if (ref $result) {
             $result = $result->stringify;

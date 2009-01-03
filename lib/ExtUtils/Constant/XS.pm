@@ -201,7 +201,7 @@ sub dogfood {
      Regenerate these constant functions by feeding this entire source file to
      perl -x
 
-#!$^X -w
+#!$^EXECUTABLE_NAME -w
 use ExtUtils::Constant qw (constant_types C_constant XS_constant);
 
 EOT

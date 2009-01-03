@@ -5,7 +5,7 @@ use Config;
 BEGIN {
     my $reason;
 
-    if ($^O eq 'apollo') {
+    if ($^OS_NAME eq 'apollo') {
       $reason = "unknown *FIXME*";
     }
     if ($reason) {

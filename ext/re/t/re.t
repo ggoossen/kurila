@@ -36,17 +36,17 @@ like( $warn, qr/Unknown "re" subpragma/,
 ok( re::bits(0, 'taint') ^&^ 0x00100000, '... should set taint bits' );
 ok( re::bits(0, 'eval')  ^&^ 0x00200000, '... should set eval bits' );
 
-local $^H;
+local $^HINT_BITS;
 
 # import
 re->import('taint', 'eval');
-ok( $^H ^&^ 0x00100000, 'import should set taint bits in $^H when requested' );
-ok( $^H ^&^ 0x00200000, 'import should set eval bits in $^H when requested' );
+ok( $^HINT_BITS ^&^ 0x00100000, 'import should set taint bits in $^H when requested' );
+ok( $^HINT_BITS ^&^ 0x00200000, 'import should set eval bits in $^H when requested' );
 
 re->unimport('taint');
-ok( !( $^H ^&^ 0x00100000 ), 'unimport should clear bits in $^H when requested' );
+ok( !( $^HINT_BITS ^&^ 0x00100000 ), 'unimport should clear bits in $^H when requested' );
 re->unimport('eval');
-ok( !( $^H ^&^ 0x00200000 ), '... and again' );
+ok( !( $^HINT_BITS ^&^ 0x00200000 ), '... and again' );
 my $reg=qr/(foo|bar|baz|blah)/;
 close STDERR;
 eval"use re Debug=>'ALL'";

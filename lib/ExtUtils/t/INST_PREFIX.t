@@ -22,7 +22,7 @@ use ExtUtils::MakeMaker;
 use File::Spec;
 use ExtUtils::MakeMaker::Config;
 
-my $Is_VMS = $^O eq 'VMS';
+my $Is_VMS = $^OS_NAME eq 'VMS';
 
 chdir 't';
 

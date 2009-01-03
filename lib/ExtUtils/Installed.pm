@@ -7,8 +7,8 @@ use File::Find;
 use File::Basename;
 use File::Spec;
 
-my $Is_VMS = $^O eq 'VMS';
-my $DOSISH = ($^O =~ m/^(MSWin\d\d|os2|dos|mint)$/);
+my $Is_VMS = $^OS_NAME eq 'VMS';
+my $DOSISH = ($^OS_NAME =~ m/^(MSWin\d\d|os2|dos|mint)$/);
 
 require VMS::Filespec if $Is_VMS;
 

@@ -1,13 +1,13 @@
 BEGIN {
    use File::Basename;
-   my $THISDIR = dirname $0;
+   my $THISDIR = dirname $^PROGRAM_NAME;
    unshift @INC, $THISDIR;
    require "testp2pt.pl";
    TestPodIncPlainText->import();
 }
 
 my %options = %( < map { $_ => 1 } @ARGV );  ## convert cmdline to options-hash
-my $passed  = testpodplaintext \%options, $0;
+my $passed  = testpodplaintext \%options, $^PROGRAM_NAME;
 exit( ($passed == 1) ?? 0 !! -1 )  unless env::var('HARNESS_ACTIVE');
 
 

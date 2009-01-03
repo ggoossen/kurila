@@ -12,7 +12,7 @@ BEGIN {
 
 use Test::More;
 
-if( $^O eq 'VMS' ) {
+if( $^OS_NAME eq 'VMS' ) {
     plan skip_all => 'prefixify works differently on VMS';
 }
 else {
@@ -22,7 +22,7 @@ use ExtUtils::MakeMaker::Config;
 use File::Spec;
 use ExtUtils::MM;
 
-my $Is_Dosish = $^O =~ m/^(dos|MSWin32)$/;
+my $Is_Dosish = $^OS_NAME =~ m/^(dos|MSWin32)$/;
 
 my $mm = bless \%(), 'MM';
 

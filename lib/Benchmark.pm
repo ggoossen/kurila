@@ -459,7 +459,7 @@ sub import {
     my $class = shift;
     if (grep { $_ eq ":hireswallclock" } @_) {
 	@_ = grep { $_ ne ":hireswallclock" } @_;
-	local $^W=0;
+	local $^WARNING=0;
 	*mytime = $hirestime if defined $hirestime;
     }
     Benchmark->export_to_level(1, $class, < @_);

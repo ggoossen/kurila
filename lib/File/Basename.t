@@ -152,7 +152,7 @@ do {
 ### Test tainting
 do {
     #   The empty tainted value, for tainting strings
-    my $TAINT = substr($^X, 0, 0);
+    my $TAINT = substr($^EXECUTABLE_NAME, 0, 0);
 
     # How to identify taint when you see it
     sub any_tainted (@) {

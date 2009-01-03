@@ -108,14 +108,14 @@ sub charnames
 
     my $hexre = "[0-9A-Fa-f]+";
     ## If :full, look for the name exactly
-    if (%^H{?charnames_full} and $txt =~ m/($hexre)\t\t\Q$name\E$/m) {
+    if ($^HINTS{?charnames_full} and $txt =~ m/($hexre)\t\t\Q$name\E$/m) {
         $hexstr = $1;
     }
 
     ## If we didn't get above, and :short allowed, look for the short name.
     ## The short name is like "greek:Sigma"
     unless (defined $hexstr) {
-      if (%^H{?charnames_short} and $name =~ m/^(.+?):(.+)/s) {
+      if ($^HINTS{?charnames_short} and $name =~ m/^(.+?):(.+)/s) {
 	my @($script, $cname) = @($1, $2);
 	my $case = $cname =~ m/[[:upper:]]/ ?? "CAPITAL" !! "SMALL";
         my $uc_cname = uc($cname);
@@ -130,7 +130,7 @@ sub charnames
     ## scripts.
     if (not defined $hexstr) {
       my $case = $name =~ m/[[:upper:]]/ ?? "CAPITAL" !! "SMALL";
-      for my $script ( @{%^H{charnames_scripts}}) {
+      for my $script ( @{$^HINTS{charnames_scripts}}) {
         my $ucname = uc($name);
 	if ($txt =~ m/($hexre)\t\t$script (?:$case )?LETTER \Q$ucname\E$/m) {
             $hexstr = $1;
@@ -161,7 +161,7 @@ sub import
   if (not nelems @_) {
     warn("`use charnames' needs explicit imports list");
   }
-  %^H{+charnames} = \&charnames ;
+  $^HINTS{+charnames} = \&charnames ;
 
   ##
   ## fill %h keys with our @_ args.
@@ -196,18 +196,18 @@ sub import
   (nelems @args) == 0 && $promote and @args = @(":full");
    %h{[ @args]} = @(1) x nelems @args;
 
-  %^H{+charnames_full} = delete %h{':full'};
-  %^H{+charnames_short} = delete %h{':short'};
-  %^H{+charnames_scripts} = \ map uc, keys %h;
+  $^HINTS{+charnames_full} = delete %h{':full'};
+  $^HINTS{+charnames_short} = delete %h{':short'};
+  $^HINTS{+charnames_scripts} = \ map uc, keys %h;
 
   ##
   ## If utf8? warnings are enabled, and some scripts were given,
   ## see if at least we can find one letter of each script.
   ##
-  if (warnings::enabled('utf8') && nelems @{%^H{?charnames_scripts}}) {
+  if (warnings::enabled('utf8') && nelems @{$^HINTS{?charnames_scripts}}) {
     $txt = do "unicore/Name.pl" unless $txt;
 
-    for my $script ( @{%^H{charnames_scripts}}) {
+    for my $script ( @{$^HINTS{charnames_scripts}}) {
       if (not $txt =~ m/\t\t$script (?:CAPITAL |SMALL )?LETTER /) {
 	warnings::warn('utf8',  "No such script: '$script'");
       }

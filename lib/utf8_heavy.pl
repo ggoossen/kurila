@@ -19,7 +19,7 @@ use bytes;
 
 sub SWASHNEW_real {
     my @($class, $type, $list, $minbits, $none) =  @_;
-    local $^D = 0 if $^D;
+    local $^DEBUGGING = 0 if $^DEBUGGING;
 
     print STDERR "SWASHNEW $(join ' ',@_)\n" if DEBUG;
 

@@ -8,7 +8,7 @@ $VERSION = 3.04;   ## Current version of this package
 BEGIN { *DEBUG = sub () {0} unless defined &DEBUG; }   # set DEBUG level
 use Carp ();
 
-$SLEEPY = 1 if !defined $SLEEPY and $^O =~ m/mswin|mac/i;
+$SLEEPY = 1 if !defined $SLEEPY and $^OS_NAME =~ m/mswin|mac/i;
   # flag to occasionally sleep for $SLEEPY - 1 seconds.
 
 $MAX_VERSION_WITHIN ||= 60;
@@ -247,7 +247,7 @@ sub _path2modname {
   # On VMS, case-preserved document names can't be constructed from
   # filenames, so try to extract them from the "=head1 NAME" tag in the
   # file instead.
-  if ($^O eq 'VMS' && ($name eq lc($name) || $name eq uc($name))) {
+  if ($^OS_NAME eq 'VMS' && ($name eq lc($name) || $name eq uc($name))) {
       open PODFILE, "<", "$file" or die "_path2modname: Can't open $file: $^OS_ERROR";
       my $in_pod = 0;
       my $in_name = 0;
@@ -327,7 +327,7 @@ sub _recurse_dir {
         $callback->(          $i_full, $i, 0, $modname_bits );
 
       } elsif(-d _) {
-        $i =~ s/\.DIR\z//i if $^O eq 'VMS';
+        $i =~ s/\.DIR\z//i if $^OS_NAME eq 'VMS';
         $_ = $i;
         my $rv = $callback->( $i_full, $i, 1, $modname_bits ) || '';
 
@@ -423,7 +423,7 @@ sub simplify_name {
   # Remove all path components
   #                             XXX Why not just use basename()? -- SMB
 
-  if ($^O eq 'MacOS') { $str =~ s{^.*:+}{}s }
+  if ($^OS_NAME eq 'MacOS') { $str =~ s{^.*:+}{}s }
   else                { $str =~ s{^.*/+}{}s }
   
   $self->_simplify_base($str);
@@ -438,10 +438,10 @@ sub _simplify_base {   # Internal method only
   @_[1] =~ s/\.(pod|pm|plx?)\z//i;
 
   # strip meaningless extensions on Win32 and OS/2
-  @_[1] =~ s/\.(bat|exe|cmd)\z//i if $^O =~ m/mswin|os2/i;
+  @_[1] =~ s/\.(bat|exe|cmd)\z//i if $^OS_NAME =~ m/mswin|os2/i;
 
   # strip meaningless extensions on VMS
-  @_[1] =~ s/\.(com)\z//i if $^O eq 'VMS';
+  @_[1] =~ s/\.(com)\z//i if $^OS_NAME eq 'VMS';
 
   return;
 }
@@ -453,7 +453,7 @@ sub _expand_inc {
   
   return unless $self->{?'inc'};
 
-  if ($^O eq 'MacOS') {
+  if ($^OS_NAME eq 'MacOS') {
     push @$search_dirs,
       < grep $_ ne File::Spec->curdir, $self->_mac_whammy(< @INC);
   # Any other OSs need custom handling here?
@@ -528,7 +528,7 @@ sub find {
   #@search_dirs = File::Spec->curdir unless @search_dirs;
   
   if( $self->inc ) {
-    if( $^O eq 'MacOS' ) {
+    if( $^OS_NAME eq 'MacOS' ) {
       push @search_dirs, < $self->_mac_whammy(< @INC);
     } else {
       push @search_dirs,                    < @INC;

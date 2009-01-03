@@ -1,13 +1,13 @@
 BEGIN {
    use File::Basename;
-   my $THISDIR = dirname $0;
+   my $THISDIR = dirname $^PROGRAM_NAME;
    unshift @INC, $THISDIR;
    require "testpchk.pl";
    TestPodChecker->import();
 }
 
 my %options = %( < map { $_ => 1 } @ARGV );  ## convert cmdline to options-hash
-my $passed  = testpodchecker \%options, $0;
+my $passed  = testpodchecker \%options, $^PROGRAM_NAME;
 exit( ($passed == 1) ?? 0 !! -1 )  unless env::var('HARNESS_ACTIVE');
 
 ### Deliberately throw in some blank but non-empty lines

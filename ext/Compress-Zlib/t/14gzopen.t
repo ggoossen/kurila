@@ -375,7 +375,7 @@ do {
     do {
         my $lex = LexFile->new( my $name) ;
         skip "Cannot create non-readable file", 3 
-            if $^O eq 'cygwin';
+            if $^OS_NAME eq 'cygwin';
 
         writeFile($name, "abc");
         chmod 0222, $name ;

@@ -126,7 +126,7 @@ sub munge_c_files () {
 	    $functions->{+@_[2]} = \@_ if @_[(nelems @_)-1] =~ m/\.\.\./;
 	}
     } '/dev/null', '', '';
-    local $^I = '.bak';
+    local $^INPLACE_EDIT = '.bak';
     while ( ~< *ARGV) {
 	s{(\b(\w+)[ \t]*\([ \t]*(?!aTHX))}
 	 {$( do {

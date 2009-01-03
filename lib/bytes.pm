@@ -8,12 +8,12 @@ BEGIN {
 }
 
 sub import {
-    $^H ^|^= $bytes::hint_bits;
-    $^H ^&^= ^~^$bytes::codepoints_hint_bits;
+    $^HINT_BITS ^|^= $bytes::hint_bits;
+    $^HINT_BITS ^&^= ^~^$bytes::codepoints_hint_bits;
 }
 
 sub unimport {
-    $^H ^&^= ^~^$bytes::hint_bits;
+    $^HINT_BITS ^&^= ^~^$bytes::hint_bits;
 }
 
 BEGIN { bytes::import() }

@@ -11,14 +11,14 @@ use POSIX < qw(fcntl_h signal_h limits_h _exit getcwd open read strftime write
 
 $^OUTPUT_AUTOFLUSH = 1;
 
-my $Is_W32     = $^O eq 'MSWin32';
-my $Is_Dos     = $^O eq 'dos';
-my $Is_MPE     = $^O eq 'mpeix';
-my $Is_MacOS   = $^O eq 'MacOS';
-my $Is_VMS     = $^O eq 'VMS';
-my $Is_OS2     = $^O eq 'os2';
-my $Is_UWin    = $^O eq 'uwin';
-my $Is_OS390   = $^O eq 'os390';
+my $Is_W32     = $^OS_NAME eq 'MSWin32';
+my $Is_Dos     = $^OS_NAME eq 'dos';
+my $Is_MPE     = $^OS_NAME eq 'mpeix';
+my $Is_MacOS   = $^OS_NAME eq 'MacOS';
+my $Is_VMS     = $^OS_NAME eq 'VMS';
+my $Is_OS2     = $^OS_NAME eq 'os2';
+my $Is_UWin    = $^OS_NAME eq 'uwin';
+my $Is_OS390   = $^OS_NAME eq 'os390';
 
 ok( my $testfd = open("TEST", O_RDONLY, 0),        'O_RDONLY with open' );
 read($testfd, my $buffer, 4) if $testfd +> 2;
@@ -74,8 +74,8 @@ SKIP: do {
 	# So the kill() must not be done with this config in order to
 	# finish the test.
 	# For others (darwin & freebsd), let the test fail without crashing.
-	my $todo = $^O eq 'netbsd' && config_value('osvers')=~m/^1\.6/;
-	my $why_todo = "# TODO $^O config_value('osvers') seems to lose blocked signals";
+	my $todo = $^OS_NAME eq 'netbsd' && config_value('osvers')=~m/^1\.6/;
+	my $why_todo = "# TODO $^OS_NAME config_value('osvers') seems to lose blocked signals";
 	if (!$todo) { 
 	  kill 'HUP', $^PID; 
 	} else {
@@ -84,8 +84,8 @@ SKIP: do {
 	}
 	sleep 1;
 
-	$todo = 1 if ($^O eq 'freebsd')
-		  || ($^O eq 'darwin' && config_value('osvers') +<= v6.6);
+	$todo = 1 if ($^OS_NAME eq 'freebsd')
+		  || ($^OS_NAME eq 'darwin' && config_value('osvers') +<= v6.6);
 	printf "\%s 11 - masked SIGINT received \%s\n",
 	    $sigint_called ?? "ok" !! "not ok",
 	    $todo ?? $why_todo !! '';
@@ -272,7 +272,7 @@ unlike( $^EVAL_ERROR, qr/Can't use string .* as a symbol ref/, "Can import autol
  
 # Check that output is not flushed by _exit. This test should be last
 # in the file, and is not counted in the total number of tests.
-if ($^O eq 'vos') {
+if ($^OS_NAME eq 'vos') {
  print "# TODO - hit VOS bug posix-885 - _exit flushes output buffers.\n";
 } else {
  $^OUTPUT_AUTOFLUSH = 0;

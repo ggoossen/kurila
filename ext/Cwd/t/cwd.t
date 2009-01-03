@@ -8,12 +8,12 @@ use File::Path;
 
 use lib File::Spec->catdir('t', 'lib');
 use Test::More;
-require VMS::Filespec if $^O eq 'VMS';
+require VMS::Filespec if $^OS_NAME eq 'VMS';
 
 my $tests = 30;
 # _perl_abs_path() currently only works when the directory separator
 # is '/', so don't test it when it won't work.
-my $EXTRA_ABSPATH_TESTS = (config_value('prefix') =~ m/\//) && $^O ne 'cygwin';
+my $EXTRA_ABSPATH_TESTS = (config_value('prefix') =~ m/\//) && $^OS_NAME ne 'cygwin';
 $tests += 4 if $EXTRA_ABSPATH_TESTS;
 plan tests => $tests;
 
@@ -22,8 +22,8 @@ SKIP: do {
   like %INC{?'Cwd.pm'}, qr{blib}i, "Cwd should be loaded from blib/ during testing";
 };
 
-my $IsVMS = $^O eq 'VMS';
-my $IsMacOS = $^O eq 'MacOS';
+my $IsVMS = $^OS_NAME eq 'VMS';
+my $IsMacOS = $^OS_NAME eq 'MacOS';
 
 # check imports
 can_ok('main', < qw(cwd getcwd fastcwd fastgetcwd));
@@ -45,9 +45,9 @@ try { fastcwd };
 
 # Must find an external pwd (or equivalent) command.
 
-my $pwd = $^O eq 'MSWin32' ?? "cmd" !! "pwd";
+my $pwd = $^OS_NAME eq 'MSWin32' ?? "cmd" !! "pwd";
 my $pwd_cmd =
-    ($^O eq "NetWare") ??
+    ($^OS_NAME eq "NetWare") ??
         "cd" !!
     ($IsMacOS) ??
         "pwd" !!
@@ -55,11 +55,11 @@ my $pwd_cmd =
 	                   split m/$(config_value('path_sep'))/, env::var('PATH'))[0];
 
 $pwd_cmd = 'SHOW DEFAULT' if $IsVMS;
-if ($^O eq 'MSWin32') {
+if ($^OS_NAME eq 'MSWin32') {
     $pwd_cmd =~ s,/,\\,g;
     $pwd_cmd = "$pwd_cmd /c cd";
 }
-$pwd_cmd =~ s=\\=/=g if ($^O eq 'dos');
+$pwd_cmd =~ s=\\=/=g if ($^OS_NAME eq 'dos');
 
 SKIP: do {
     skip "No native pwd command found to test against", 4 unless $pwd_cmd;
@@ -75,7 +75,7 @@ SKIP: do {
     chomp(my $start = `$pwd_cmd_untainted`);
 
     # Win32's cd returns native C:\ style
-    $start =~ s,\\,/,g if ($^O eq 'MSWin32' || $^O eq "NetWare");
+    $start =~ s,\\,/,g if ($^OS_NAME eq 'MSWin32' || $^OS_NAME eq "NetWare");
     # DCL SHOW DEFAULT has leading spaces
     $start =~ s/^\s+// if $IsVMS;
     SKIP: do {
@@ -95,7 +95,7 @@ SKIP: do {
 	# Admittedly fixing this in the Cwd module would be better
 	# long-term solution but deleting $ENV{PWD} should not be
 	# done light-heartedly. --jhi
-	env::set_var('PWD') if $^O eq 'darwin';
+	env::set_var('PWD') if $^OS_NAME eq 'darwin';
 
 	my $cwd        = cwd;
 	my $getcwd     = getcwd;
@@ -209,7 +209,7 @@ SKIP: do {
   };
   skip "No plain file in root directory to test with", 2+$EXTRA_ABSPATH_TESTS unless $file;
   
-  $file = VMS::Filespec::rmsexpand($file) if $^O eq 'VMS';
+  $file = VMS::Filespec::rmsexpand($file) if $^OS_NAME eq 'VMS';
   is Cwd::abs_path($file), $file, 'abs_path() works on files in the root directory';
   is Cwd::fast_abs_path($file), $file, 'fast_abs_path() works on files in the root directory';
   is Cwd::_perl_abs_path($file), $file, '_perl_abs_path() works on files in the root directory'
