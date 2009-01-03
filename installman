@@ -16,7 +16,7 @@ BEGIN {
 config_value("initialinstalllocation") is not defined - can't install a relocatable
 perl without this.
 OS
-	$^X = "$location/perl";
+	$^EXECUTABLE_NAME = "$location/perl";
 	# And then remove all trace of ever having loaded Config.pm, so that
 	# it will reload with the revised $^X
 	undef %Config::;
@@ -39,10 +39,10 @@ if (config_value("d_umask")) {
     umask(022); # umasks like 077 aren't that useful for installations
 }
 
-env::set_var("SHELL" => 'sh') if $^O eq 'os2';
+env::set_var("SHELL" => 'sh') if $^OS_NAME eq 'os2';
 
 my $ver = config_value("version");     # Not used presently.
-$^V =~ m/kurila-(\d+).(\d+)/ or die "Invalid \$^V";
+$^PERL_VERSION =~ m/kurila-(\d+).(\d+)/ or die "Invalid \$^PERL_VERSION";
 my @($release, $patchlevel) = @($1, $2);
 warn "Patchlevel of perl ($patchlevel)" .
     "and patchlevel of config.sh ($(config_value('KURILA_VERSION'))) don't match\n"
@@ -195,7 +195,7 @@ sub pod2man {
 	# Convert name from  File/Basename.pm to File::Basename.3 format,
 	# if necessary.
 	$manpage =~ s#\.p(m|od)$##;
-	if ($^O eq 'os2' || $^O eq 'amigaos' || $^O eq 'uwin' || $^O eq 'cygwin') {
+	if ($^OS_NAME eq 'os2' || $^OS_NAME eq 'amigaos' || $^OS_NAME eq 'uwin' || $^OS_NAME eq 'cygwin') {
 	  $manpage =~ s#/#.#g;
 	}
 	else {
@@ -242,7 +242,7 @@ sub unlink {
 
     foreach my $name (@names) {
 	next unless -e $name;
-	chmod 0777, $name if $^O eq 'os2';
+	chmod 0777, $name if $^OS_NAME eq 'os2';
 	print "  unlink $name\n" if %opts{verbose};
 	( CORE::unlink($name) and ++$cnt 
 	    or warn "Couldn't unlink $name: $^OS_ERROR\n" ) unless %opts{notify};

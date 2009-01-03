@@ -21,9 +21,9 @@ BEGIN {
 config_value("initialinstalllocation") is not defined - can't install a relocatable
 perl without this.
 OS
-	$^X = "$location/perl";
+	$^EXECUTABLE_NAME = "$location/perl";
 	# And then remove all trace of ever having loaded Config.pm, so that
-	# it will reload with the revised $^X
+	# it will reload with the revised $^EXECUTABLE_NAME
 	undef %Config::;
 	delete %INC{"Config.pm"};
 	delete %INC{"Config_heavy.pl"};
@@ -37,11 +37,11 @@ my ($Is_VMS, $Is_W32, $Is_OS2, $Is_Cygwin, $Is_Darwin,
 our $depth;
 
 BEGIN {
-    $Is_VMS = $^O eq 'VMS';
-    $Is_W32 = $^O eq 'MSWin32';
-    $Is_OS2 = $^O eq 'os2';
-    $Is_Cygwin = $^O eq 'cygwin';
-    $Is_Darwin = $^O eq 'darwin';
+    $Is_VMS = $^OS_NAME eq 'VMS';
+    $Is_W32 = $^OS_NAME eq 'MSWin32';
+    $Is_OS2 = $^OS_NAME eq 'os2';
+    $Is_Cygwin = $^OS_NAME eq 'cygwin';
+    $Is_Darwin = $^OS_NAME eq 'darwin';
     if ($Is_VMS) { eval 'use VMS::Filespec;' }
 }
 
@@ -109,7 +109,7 @@ while (@ARGV) {
     $destdir = $1 if @ARGV[0] =~ m/^-?-destdir=(.*)$/;
     if (@ARGV[0] eq '-?' or @ARGV[0] =~ m/^-?-h/) {
 	print <<"EOT";
-Usage $0: [switches]
+Usage $^PROGRAM_NAME: [switches]
   -n	    Don't actually run any commands; just print them.
   -s        Run strip on installed binaries.
   -v        Only install perl as a binary with the version number in the name.
@@ -164,7 +164,7 @@ my %archpms = %(
     Cwd => 1,
 );
 
-if ($^O eq 'dos') {
+if ($^OS_NAME eq 'dos') {
     push(@scripts,'djgpp/fixpmain');
     %archpms{config} = %archpms{filehand} = 1;
 }
@@ -194,7 +194,7 @@ find(sub {
 # print "[$_]\n" for sort keys %archpms;
 
 my $ver = config_value("version");
-$^V =~ m/kurila-(\d+).(\d+)/ or die "Invalid \$^V";
+$^PERL_VERSION =~ m/kurila-(\d+).(\d+)/ or die "Invalid \$^PERL_VERSION";
 my @($release, $patchlevel) = @($1, $2);
 warn "Patchlevel of perl ($patchlevel) and patchlevel of config.sh ($(config_value('KURILA_VERSION'))) don't match\n"
 	if $patchlevel != config_value('KURILA_VERSION');
@@ -213,13 +213,13 @@ my $libperl = config_value("libperl");
 my $so = config_value("so");
 my $dlext = config_value("dlext");
 my $dlsrc = config_value("dlsrc");
-if ($^O eq 'os390') {
+if ($^OS_NAME eq 'os390') {
     my $pwd;
     chomp($pwd=`pwd`);
     my $archlibexp = config_value("archlibexp");
     my $usedl = config_value("usedl");
     if ($usedl eq 'define') {
-	`./$^X -pibak -e 's<$pwd\/libperl.x><$archlibexp/CORE/libperl.x>' lib/Config.pm`;
+	`./$^EXECUTABLE_NAME -pibak -e 's<$pwd\/libperl.x><$archlibexp/CORE/libperl.x>' lib/Config.pm`;
     }
 }
 
@@ -317,7 +317,7 @@ if ($Is_VMS) {
         chmod(0755, "$installbin/$ndbg$perl$exe_ext");
     }
 }
-elsif ($^O eq 'mpeix') {
+elsif ($^OS_NAME eq 'mpeix') {
     # MPE lacks hard links and requires that executables with special
     # capabilities reside in the MPE namespace.
     safe_unlink("$installbin/perl$ver$exe_ext", config_value("perlpath"));
@@ -327,7 +327,7 @@ elsif ($^O eq 'mpeix') {
     # Create a backup copy with the version number.
     link(config_value("perlpath"), "$installbin/perl$ver$exe_ext");
 }
-elsif ($^O ne 'dos') {
+elsif ($^OS_NAME ne 'dos') {
     if (!$Is_NetWare) {
 	safe_unlink("$installbin/$perl_verbase$ver$exe_ext");
 	copy("perl$exe_ext", "$installbin/$perl_verbase$ver$exe_ext");
@@ -397,8 +397,8 @@ else {
     @corefiles = glob("*.h libperl*.* perl*" . config_value('lib_ext'));
 
     # AIX needs perl.exp installed as well.
-    push(@corefiles,'perl.exp') if $^O eq 'aix';
-    if ($^O eq 'mpeix') {
+    push(@corefiles,'perl.exp') if $^OS_NAME eq 'aix';
+    if ($^OS_NAME eq 'mpeix') {
 	# MPE needs mpeixish.h installed as well.
 	mkpath("$installarchlib/CORE/mpeix", $verbose, 0777);
 	push(@corefiles,'mpeix/mpeixish.h');
@@ -411,7 +411,7 @@ foreach my $file (@corefiles) {
     # on dynamically-loadable libraries. So we do it for all.
     if (copy_if_diff($file,"$installarchlib/CORE/$file")) {
 	if ($file =~ m/\.(\Q$so\E|\Q$dlext\E)$/) {
-	    strip("-S", "$installarchlib/CORE/$file") if $^O =~ m/^(rhapsody|darwin)$/;
+	    strip("-S", "$installarchlib/CORE/$file") if $^OS_NAME =~ m/^(rhapsody|darwin)$/;
 	    chmod(0555, "$installarchlib/CORE/$file");
 	} else {
 	    chmod(0444, "$installarchlib/CORE/$file");
@@ -422,13 +422,13 @@ foreach my $file (@corefiles) {
 # Install main perl executables
 # Make links to ordinary names if installbin directory isn't current directory.
 
-if (! $versiononly && ! samepath($installbin, '.') && ($^O ne 'dos') && ! $Is_VMS && ! $Is_NetWare) {
+if (! $versiononly && ! samepath($installbin, '.') && ($^OS_NAME ne 'dos') && ! $Is_VMS && ! $Is_NetWare) {
     safe_unlink("$installbin/$perl$exe_ext", "$installbin/suid$perl$exe_ext");
-    if ($^O eq 'mpeix') {
+    if ($^OS_NAME eq 'mpeix') {
 	# MPE doesn't support hard links, so use a symlink.
 	# We don't want another cloned copy.
 	symlink(config_value("perlpath"), "$installbin/perl$exe_ext");
-    } elsif ($^O eq 'vos') {
+    } elsif ($^OS_NAME eq 'vos') {
 	# VOS doesn't support hard links, so use a symlink.
 	symlink("$installbin/$perl_verbase$ver$exe_ext",
 		"$installbin/$perl$exe_ext");
@@ -443,14 +443,14 @@ if (! $versiononly && ! samepath($installbin, '.') && ($^O ne 'dos') && ! $Is_VM
 
 # For development purposes it can be very useful to have multiple perls
 # build for different "architectures" (eg threading or not) simultaneously.
-if ($archname && ! samepath($installbin, '.') && ($^O ne 'dos') && ! $Is_VMS) {
+if ($archname && ! samepath($installbin, '.') && ($^OS_NAME ne 'dos') && ! $Is_VMS) {
     my $archperl = "$perl_verbase$ver-$(config_value('archname'))$exe_ext";
     safe_unlink("$installbin/$archperl");
-    if ($^O eq 'mpeix') {
+    if ($^OS_NAME eq 'mpeix') {
 	# MPE doesn't support hard links, so use a symlink.
 	# We don't want another cloned copy.
 	symlink(config_value("perlpath"), "$installbin/$archperl");
-    } elsif ($^O eq 'vos') {
+    } elsif ($^OS_NAME eq 'vos') {
 	# VOS doesn't support hard links, so use a symlink.
 	symlink("$installbin/$perl_verbase$ver$exe_ext",
 		"$installbin/$archperl");
@@ -507,10 +507,10 @@ sub script_alias {
     my @($installscript, $orig, $alias, $scr_ext) = @_;
 
     safe_unlink("$installscript/$alias$scr_ext");
-    if ($^O eq 'dos' or $Is_VMS or $^O eq 'transit') {
+    if ($^OS_NAME eq 'dos' or $Is_VMS or $^OS_NAME eq 'transit') {
 	copy("$installscript/$orig$scr_ext",
 	     "$installscript/$alias$scr_ext");
-    } elsif ($^O eq 'vos') {
+    } elsif ($^OS_NAME eq 'vos') {
 	symlink("$installscript/$orig$scr_ext",
 		"$installscript/$alias$scr_ext");
     } else {
@@ -725,7 +725,7 @@ sub link {
 sub chmod {
     my @($mode,$name) = @_;
 
-    return if ($^O eq 'dos');
+    return if ($^OS_ERROR eq 'dos');
     printf '  chmod %o %s'."\n", $mode, $name if $verbose;
     CORE::chmod($mode,$name)
 	|| warn sprintf("Couldn't chmod \%o \%s: $^OS_ERROR", $mode, $name)
@@ -856,11 +856,11 @@ sub installlib {
 	   } else {
 		if (copy_if_diff($_, "$installlib/$name")) {
 		    if ($name =~ m/\.(so|$dlext)$/o) {
-			strip("-S", "$installlib/$name") if $^O =~ m/^(rhapsody|darwin)$/;
+			strip("-S", "$installlib/$name") if $^OS_NAME =~ m/^(rhapsody|darwin)$/;
 			chmod(0555, "$installlib/$name");
 		    } else {
 			strip("-S", "$installlib/$name")
-			    if ($name =~ m/\.a$/o and $^O =~ m/^(rhapsody|darwin)$/);
+			    if ($name =~ m/\.a$/o and $^OS_NAME =~ m/^(rhapsody|darwin)$/);
 			chmod(0444, "$installlib/$name");
 		    }
 		}
@@ -881,7 +881,7 @@ sub installlib {
 
 sub copy_if_diff {
     my @($from,$to)=@_;
-    return 1 if (($^O eq 'VMS') && (-d $from));
+    return 1 if (($^OS_NAME eq 'VMS') && (-d $from));
     my $xto = $to;
     $xto =~ s/^\Q$destdir\E// if $destdir;
     my $perlpodbadsymlink;
@@ -895,7 +895,7 @@ sub copy_if_diff {
 	# and you end up with those pods not getting installed.
 	$perlpodbadsymlink = 1;
     }
-    -f $from || $perlpodbadsymlink || warn "$0: $from not found";
+    -f $from || $perlpodbadsymlink || warn "$^PROGRAM_NAME: $from not found";
     $packlist->{data}{+$xto} = \%( type => 'file' );
     if ($force || compare($from, $to) || $nonono) {
 	safe_unlink($to);   # In case we don't have write permissions.
