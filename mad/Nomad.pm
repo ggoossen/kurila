@@ -1016,7 +1016,7 @@ BEGIN {
 	'nullstatement' => sub {		# null statements/blocks
 	    my $self = shift;
 	    my @newkids;
-	    push @newkids, $self->madness('{ ; }');
+	    push @newkids, $self->madness('{ ; } fake_semicolon');
 	    $::curstate = 0;
 	    return P5AST::nothing->new(Kids => [@newkids])
 	},
@@ -1093,7 +1093,7 @@ BEGIN {
 	'sub' => sub {			# subroutine
 	    my $self = shift;
 	    my @newkids;
-	    push @newkids, $self->madness('d n s a : { & } ;');
+	    push @newkids, $self->madness('d n s a : { & } fake_semicolon ;');
 	    $::curstate = 0;
 	    return P5AST::sub->new(Kids => [@newkids])
 	},
@@ -1471,7 +1471,7 @@ sub ast {
 	push @newkids, $kid->ast($self, @_);
     }
     splice @newkids, -1, 0, $self->madness('o {');
-    push @newkids, $self->madness('}');
+    push @newkids, $self->madness('} fake_semicolon');
 
     return $self->newtype->new(Kids => [@newkids]);
 }
@@ -1481,7 +1481,7 @@ package PLXML::op_padsv;
 sub ast {
     my $self = shift;
     my @args;
-    push @args, $self->madness('optional_assign dx d ( $ @ % )');
+    push @args, $self->madness('optional_assign dx d ( X $ @ % )');
 
     return $self->newtype->new(Kids => [@args]);
 }
@@ -1549,14 +1549,14 @@ package PLXML::op_rv2sv;
 
 sub astnull {
     my $self = shift;
-    return P5AST::op_rv2sv->new(Kids => [$self->madness('O o optional_assign dx d ( $ ) : a')]);
+    return P5AST::op_rv2sv->new(Kids => [$self->madness('O o optional_assign dx d ( X $ ) : a')]);
 }
 
 sub ast {
     my $self = shift;
 
     my @newkids;
-    push @newkids, $self->madness('dx d optional_assign ( $');
+    push @newkids, $self->madness('dx d optional_assign ( X $');
     if (ref $$self{Kids}[0] ne "PLXML::op_gv") {
 	push @newkids, $$self{Kids}[0]->ast();
     }
@@ -2174,7 +2174,7 @@ package PLXML::op_rv2av;
 
 sub astnull {
     my $self = shift;
-    return P5AST::op_rv2av->new(Kids => [$self->madness('$ @')]);
+    return P5AST::op_rv2av->new(Kids => [$self->madness('X $ @')]);
 }
 
 sub ast {
@@ -2188,7 +2188,7 @@ sub ast {
     push @before, $self->madness('dx d optional_assign (');
 
     my @newkids;
-    push @newkids, $self->madness('$ @ K');
+    push @newkids, $self->madness('X $ @ K');
     if (ref $$self{Kids}[0] ne "PLXML::op_gv") {
 	push @newkids, $$self{Kids}[0]->ast();
     }
@@ -2290,7 +2290,7 @@ package PLXML::op_rv2hv;
 
 sub astnull {
     my $self = shift;
-    return P5AST::op_rv2hv->new(Kids => [$self->madness('$')]);
+    return P5AST::op_rv2hv->new(Kids => [$self->madness('X $')]);
 }
 
 sub ast {
@@ -2300,7 +2300,7 @@ sub ast {
     push @before, $self->madness('dx d optional_assign (');
 
     my @newkids;
-    push @newkids, $self->madness('$ @ % K');
+    push @newkids, $self->madness('X $ @ % K');
     if (ref $$self{Kids}[0] ne "PLXML::op_gv") {
 	push @newkids, $$self{Kids}[0]->ast();
     }
@@ -2322,7 +2322,7 @@ sub astnull {
 	push @newkids, $kid->ast($self, @_);
     }
     splice @newkids, -1, 0, $self->madness('a {');
-    push @newkids, $self->madness('}');
+    push @newkids, $self->madness('} fake_semicolon');
     return P5AST::op_helem->new(Kids => [@newkids]);
 }
 
@@ -2337,7 +2337,7 @@ sub ast {
 	push @newkids, $kid->ast($self, @_);
     }
     splice @newkids, -1, 0, $self->madness('a {');
-    push @newkids, $self->madness('}');
+    push @newkids, $self->madness('} fake_semicolon');
 
     return $self->newtype->new(Kids => [@before, @newkids]);
 }
@@ -2354,7 +2354,7 @@ sub astnull {
     }
     unshift @newkids, pop @newkids;
     unshift @newkids, $self->madness('dx d optional_assign'); 
-    push @newkids, $self->madness('slice_close }');
+    push @newkids, $self->madness('slice_close } fake_semicolon');
     return P5AST::op_hslice->new(Kids => [@newkids]);
 }
 
@@ -2368,7 +2368,7 @@ sub ast {
     }
     unshift @newkids, pop @newkids;
     unshift @newkids, $self->madness('dx d optional_assign'); 
-    push @newkids, $self->madness('slice_close }');
+    push @newkids, $self->madness('slice_close } fake_semicolon');
 
     return $self->newtype->new(Kids => [@newkids]);
 }
@@ -2790,7 +2790,7 @@ sub blockast {
                  and $::version_from->{'v'} > v1.14 ) ) {
         push @retval, $self->madness(';');
     }
-    push @retval, $self->madness('}');
+    push @retval, $self->madness('} fake_semicolon');
     return $self->newtype->new(Kids => [@retval]);
 }
 
@@ -2876,7 +2876,7 @@ sub ast {
                  and $::version_from->{'v'} > v1.14 ) ) {
         push @retval, $self->madness(';');
     }
-    push @retval, $self->madness(q/}/);
+    push @retval, $self->madness(q/} fake_semicolon/);
     my $retval = $self->newtype->new(Kids => [@retval]);
 
     if ($$self{mp}{C}) {
@@ -2908,7 +2908,7 @@ sub ast {
     if ( $::version_from->{branch} eq 'kurila' and $::version_from->{'v'} > v1.14 ) {
         push @newkids, $self->madness(';');
     }
-    push @newkids, $self->madness('}');
+    push @newkids, $self->madness('} fake_semicolon');
 
     my @folded = $self->madness('C');
     if (@folded) {

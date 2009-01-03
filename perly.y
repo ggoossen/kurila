@@ -154,6 +154,7 @@ block	:	'{' remember lineseq '}' ';'
                             $$ = block_end($2, $3);
                             TOKEN_GETMAD($1,$$,'{');
                             TOKEN_GETMAD($4,$$,'}');
+                            TOKEN_GETMAD($5,$$,'u');
 			}
 	;
 
@@ -285,6 +286,7 @@ else	:	/* NULL */
 	|	ELSE mblock ';'
 			{ ($2)->op_flags |= OPf_PARENS; $$ = scope($2);
 			  TOKEN_GETMAD($1,$$,'o');
+			  TOKEN_GETMAD($3,$$,'u');
 			}
 	|	ELSIF '(' mexpr ')' mblock else
 			{ 
@@ -320,7 +322,15 @@ cond	:	IF '(' remember mexpr ')' mblock else
 
 /* Continue blocks */
 cont	:	';'     /* NULL */
-			{ $$ = (OP*)NULL; }
+			{
+#ifdef PERL_MAD
+                            $$ = newOP(OP_NULL,0, LOCATION($1));
+                            APPEND_MADPROPS_PV("value", $$, '>');
+                            TOKEN_GETMAD($1,$$,'X');
+#else
+                            $$ = (OP*)NULL;
+#endif /* PERL_MAD */
+                        }
         |       CONTINUE block
                         { $$ = scope($2);
                             TOKEN_GETMAD($1,$$,'o');
@@ -703,6 +713,7 @@ subscripted:    star '{' expr ';' '}' ';'       /* *main::{something} like *STDO
 			  TOKEN_GETMAD($2,$$,'{');
 			  TOKEN_GETMAD($4,$$,';');
 			  TOKEN_GETMAD($5,$$,'}');
+			  TOKEN_GETMAD($6,$$,'u');
 			}
         |       term DEREFARY                /* somearef->@ */
                         {
@@ -756,6 +767,7 @@ subscripted:    star '{' expr ';' '}' ';'       /* *main::{something} like *STDO
 			  TOKEN_GETMAD($5,$$,'j');
 			  TOKEN_GETMAD($6,$$,';');
 			  TOKEN_GETMAD($7,$$,'}');
+			  TOKEN_GETMAD($8,$$,'u');
 			}
 	|	term ARROW ASLICE expr ']' ']'                     /* someref->[[...]] */
 			{ $$ = newLISTOP(OP_ASLICE, 0,
@@ -775,6 +787,7 @@ subscripted:    star '{' expr ';' '}' ';'       /* *main::{something} like *STDO
 			  TOKEN_GETMAD($4,$$,'j');
 			  TOKEN_GETMAD($5,$$,';');
 			  TOKEN_GETMAD($6,$$,'}');
+			  TOKEN_GETMAD($7,$$,'u');
 			}
 	|	term ASLICE expr ']' ']'    /* foo[[bar()]] */
 			{ $$ = newLISTOP(OP_ASLICE, 0,
@@ -794,6 +807,7 @@ subscripted:    star '{' expr ';' '}' ';'       /* *main::{something} like *STDO
                             TOKEN_GETMAD($2,$$,'{');
                             TOKEN_GETMAD($4,$$,';');
                             TOKEN_GETMAD($5,$$,'}');
+                            TOKEN_GETMAD($6,$$,'u');
 			}
 	|	term ARROW '{' expr ';' '}' ';' /* somehref->{bar();} */
                         {
@@ -806,6 +820,7 @@ subscripted:    star '{' expr ';' '}' ';'       /* *main::{something} like *STDO
                             TOKEN_GETMAD($3,$$,'{');
                             TOKEN_GETMAD($5,$$,';');
                             TOKEN_GETMAD($6,$$,'}');
+                            TOKEN_GETMAD($7,$$,'u');
 			}
 	|	term ARROW '(' ')'          /* $subref->() */
 			{ $$ = newUNOP(OP_ENTERSUB, OPf_STACKED,

@@ -37,8 +37,9 @@ sub p5convert {
     is($output, $expected) or $TODO or die "failed test";
 }
 
-t_rename_magic_vars();
+t_rename_magic_vars_2();
 die "END";
+t_rename_magic_vars();
 t_remove_vars();
 t_env_using_package();
 t_pattern_assignment();
@@ -1542,6 +1543,18 @@ $foo;
 use vars < qw($foo $bar);
 ----
 our ($foo, $bar);
+END
+}
+
+sub t_rename_magic_vars_2 {
+    p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
+%H;
+----
+$^HINTS;
+====
+%H{'foo'} = 3;
+----
+$^HINTS{'foo'} = 3;
 END
 }
 
