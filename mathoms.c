@@ -520,11 +520,6 @@ Perl_oopsCV(pTHX_ OP *o)
     NORETURN_FUNCTION_END;
 }
 
-PP(pp_padany)
-{
-    DIE(aTHX_ "NOT IMPL LINE %d",__LINE__);
-}
-
 PP(pp_mapstart)
 {
     DIE(aTHX_ "panic: mapstart");	/* uses grepstart */

@@ -905,7 +905,6 @@ Perl_scalarvoid(pTHX_ OP *o)
     case OP_GVSV:
     case OP_GV:
     case OP_PADSV:
-    case OP_PADANY:
     case OP_REF:
     case OP_SREFGEN:
     case OP_DEFINED:
@@ -4564,13 +4563,7 @@ Perl_newAVREF(pTHX_ OP *o, SV* location)
 
     PERL_ARGS_ASSERT_NEWAVREF;
 
-    if (o->op_type == OP_PADANY) {
-	o->op_type = OP_PADSV;
-	o->op_ppaddr = PL_ppaddr[OP_PADSV];
-	SVcpREPLACE(o->op_location, location);
-	return o;
-    }
-    else if ((o->op_type == OP_RV2AV || o->op_type == OP_ANONARRAY )) {
+    if ((o->op_type == OP_RV2AV || o->op_type == OP_ANONARRAY )) {
 	yyerror(Perl_form(aTHX_ "Array may not be used as a reference"));
     }
     return newUNOP(OP_RV2AV, 0, scalar(o), location);
@@ -4591,13 +4584,7 @@ Perl_newHVREF(pTHX_ OP *o, SV* location)
 
     PERL_ARGS_ASSERT_NEWHVREF;
 
-    if (o->op_type == OP_PADANY) {
-	o->op_type = OP_PADSV;
-	o->op_ppaddr = PL_ppaddr[OP_PADSV];
-	SVcpREPLACE(o->op_location, location);
-	return o;
-    }
-    else if (o->op_type == OP_RV2HV || o->op_type == OP_ANONHASH) {
+    if (o->op_type == OP_RV2HV || o->op_type == OP_ANONHASH) {
 	yyerror(Perl_form(aTHX_ "Hash may not be used as a reference"));
     }
     return newUNOP(OP_RV2HV, 0, scalar(o), location);
@@ -4616,12 +4603,6 @@ Perl_newSVREF(pTHX_ OP *o, SV* location)
 
     PERL_ARGS_ASSERT_NEWSVREF;
 
-    if (o->op_type == OP_PADANY) {
-	o->op_type = OP_PADSV;
-	o->op_ppaddr = PL_ppaddr[OP_PADSV];
-	SVcpREPLACE(o->op_location, location);
-	return o;
-    }
     return newUNOP(OP_RV2SV, 0, scalar(o), location);
 }
 
