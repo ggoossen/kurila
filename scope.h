@@ -53,6 +53,7 @@
 #define SAVEt_COMPILE_WARNINGS	42
 #define SAVEt_STACK_CXPOS	43
 #define SAVEt_PARSER		44
+#define SAVEt_SET_MAGICSV		45
 
 #ifndef SCOPE_SAVES_SIGNAL_MASK
 #define SCOPE_SAVES_SIGNAL_MASK 0
@@ -157,8 +158,8 @@ Closing bracket on a callback.  See C<ENTER> and L<perlcall>.
     STMT_START {					\
 	SSCHECK(4);					\
 	if (PL_hints & HINT_LOCALIZE_HH) {		\
-	    SSPUSHPTR(GvSV(PL_hintgv));			\
-	    GvSV(PL_hintgv) = HvSv(Perl_hv_copy_hints_hv(aTHX_ SvHv(GvSV(PL_hintgv)))); \
+	    SSPUSHPTR(PL_hinthv);			\
+	    PL_hinthv = Perl_hv_copy_hints_hv(aTHX_ PL_hinthv); \
 	}						\
         SvREFCNT_inc(PL_compiling.cop_hints_hash);      \
 	SSPUSHPTR(PL_compiling.cop_hints_hash);		\

@@ -1259,7 +1259,7 @@ S_make_trie(pTHX_ RExC_state_t *pRExC_state, regnode *startbranch, regnode *firs
         trie_words = newAV();
     });
 
-    re_trie_maxbuff = get_sv(RE_TRIE_MAXBUF_NAME, 1);
+    re_trie_maxbuff = *hv_fetchs(PL_magicsvhv, RE_TRIE_MAXBUF_NAME, 1);
     if (!SvIOK(re_trie_maxbuff)) {
         sv_setiv(re_trie_maxbuff, RE_TRIE_MAXBUF_INIT);
     }
@@ -2483,7 +2483,7 @@ S_study_chunk(pTHX_ RExC_state_t *pRExC_state, regnode **scanp,
 		
 		    int made=0;
 		    if (!re_trie_maxbuff) {
-			re_trie_maxbuff = get_sv(RE_TRIE_MAXBUF_NAME, 1);
+			re_trie_maxbuff = *hv_fetchs(PL_magicsvhv, RE_TRIE_MAXBUF_NAME, 1);
 			if (!SvIOK(re_trie_maxbuff))
 			    sv_setiv(re_trie_maxbuff, RE_TRIE_MAXBUF_INIT);
 		    }
@@ -3715,7 +3715,7 @@ REGEXP *
 Perl_pregcomp(pTHX_ const SV * const pattern, const U32 flags)
 {
     dVAR;
-    HV * const table = GvSV(PL_hintgv);
+    HV * const table = PL_hinthv;
 
     PERL_ARGS_ASSERT_PREGCOMP;
 
@@ -6254,7 +6254,7 @@ S_reg_namedseq(pTHX_ RExC_state_t *pRExC_state, UV *valuep)
         sv_str= newSVpvn(&string, 1);
     } else {
         /* fetch the charnames handler for this scope */
-        HV * const table = SvHv(GvSV(PL_hintgv));
+        HV * const table = PL_hinthv;
         SV **cvp= table ? 
             hv_fetchs(table, "charnames", FALSE) :
             NULL;

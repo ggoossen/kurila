@@ -116,9 +116,9 @@
 #define PL_egid			(vTHX->Iegid)
 #define PL_endav		(vTHX->Iendav)
 #define PL_envhv		(vTHX->Ienvhv)
-#define PL_errgv		(vTHX->Ierrgv)
 #define PL_errorcreatehook	(vTHX->Ierrorcreatehook)
 #define PL_errors		(vTHX->Ierrors)
+#define PL_errsv		(vTHX->Ierrsv)
 #define PL_euid			(vTHX->Ieuid)
 #define PL_eval_root		(vTHX->Ieval_root)
 #define PL_eval_start		(vTHX->Ieval_start)
@@ -136,7 +136,7 @@
 #define PL_glob_index		(vTHX->Iglob_index)
 #define PL_globalstash		(vTHX->Iglobalstash)
 #define PL_hash_seed		(vTHX->Ihash_seed)
-#define PL_hintgv		(vTHX->Ihintgv)
+#define PL_hinthv		(vTHX->Ihinthv)
 #define PL_hints		(vTHX->Ihints)
 #define PL_hv_fetch_ent_mh	(vTHX->Ihv_fetch_ent_mh)
 #define PL_in_clean_all		(vTHX->Iin_clean_all)
@@ -157,6 +157,7 @@
 #define PL_localpatches		(vTHX->Ilocalpatches)
 #define PL_lockhook		(vTHX->Ilockhook)
 #define PL_madskills		(vTHX->Imadskills)
+#define PL_magicsvhv		(vTHX->Imagicsvhv)
 #define PL_main_cv		(vTHX->Imain_cv)
 #define PL_main_root		(vTHX->Imain_root)
 #define PL_main_start		(vTHX->Imain_start)
@@ -226,7 +227,7 @@
 #define PL_regmatch_state	(vTHX->Iregmatch_state)
 #define PL_rehash_seed		(vTHX->Irehash_seed)
 #define PL_rehash_seed_set	(vTHX->Irehash_seed_set)
-#define PL_replgv		(vTHX->Ireplgv)
+#define PL_replsv		(vTHX->Ireplsv)
 #define PL_restartop		(vTHX->Irestartop)
 #define PL_rs			(vTHX->Irs)
 #define PL_runops		(vTHX->Irunops)
@@ -397,9 +398,9 @@
 #define PL_Iegid		PL_egid
 #define PL_Iendav		PL_endav
 #define PL_Ienvhv		PL_envhv
-#define PL_Ierrgv		PL_errgv
 #define PL_Ierrorcreatehook	PL_errorcreatehook
 #define PL_Ierrors		PL_errors
+#define PL_Ierrsv		PL_errsv
 #define PL_Ieuid		PL_euid
 #define PL_Ieval_root		PL_eval_root
 #define PL_Ieval_start		PL_eval_start
@@ -417,7 +418,7 @@
 #define PL_Iglob_index		PL_glob_index
 #define PL_Iglobalstash		PL_globalstash
 #define PL_Ihash_seed		PL_hash_seed
-#define PL_Ihintgv		PL_hintgv
+#define PL_Ihinthv		PL_hinthv
 #define PL_Ihints		PL_hints
 #define PL_Ihv_fetch_ent_mh	PL_hv_fetch_ent_mh
 #define PL_Iin_clean_all	PL_in_clean_all
@@ -438,6 +439,7 @@
 #define PL_Ilocalpatches	PL_localpatches
 #define PL_Ilockhook		PL_lockhook
 #define PL_Imadskills		PL_madskills
+#define PL_Imagicsvhv		PL_magicsvhv
 #define PL_Imain_cv		PL_main_cv
 #define PL_Imain_root		PL_main_root
 #define PL_Imain_start		PL_main_start
@@ -507,7 +509,7 @@
 #define PL_Iregmatch_state	PL_regmatch_state
 #define PL_Irehash_seed		PL_rehash_seed
 #define PL_Irehash_seed_set	PL_rehash_seed_set
-#define PL_Ireplgv		PL_replgv
+#define PL_Ireplsv		PL_replsv
 #define PL_Irestartop		PL_restartop
 #define PL_Irs			PL_rs
 #define PL_Irunops		PL_runops

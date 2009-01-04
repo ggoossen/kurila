@@ -682,7 +682,7 @@ Perl_magic_len(pTHX_ SV *sv, MAGIC *mg)
 		return 0;
 	}
     }
-    magic_get(sv,mg);
+/*     magic_get(sv,mg); */
     if (!SvPOK(sv) && SvNIOK(sv)) {
 	sv_2pv(sv, 0);
     }
@@ -726,16 +726,22 @@ Perl_emulate_cop_io(pTHX_ const COP *const c, SV *const sv)
 }
 
 int
-Perl_magic_get(pTHX_ SV *sv, MAGIC *mg)
+Perl_magic_get(pTHX_ const char* name, SV* sv)
 {
     dVAR;
     register I32 paren;
     register REGEXP *rx;
-    const char * const remaining = mg->mg_ptr + 1;
+    const char * const remaining = name + 1;
 
     PERL_ARGS_ASSERT_MAGIC_GET;
 
-    switch (*mg->mg_ptr) {
+    {
+	SV** oldsv = hv_fetch(PL_magicsvhv, name, strlen(name), 0);
+	if (oldsv)
+	    sv_setsv(sv, *oldsv);
+    }
+
+    switch (*name) {
     case '^':
 	switch (*remaining) {
 	case 'B':
@@ -800,6 +806,12 @@ Perl_magic_get(pTHX_ SV *sv, MAGIC *mg)
 		/* $^EUID */
 		sv_setiv(sv, (IV)PL_euid);
 		break;
+	    }
+
+	    if (strEQ(remaining, "EVAL_ERROR")) {
+		/* $^EVAL_ERROR */
+		sv_setsv(sv, PL_errsv);
+		return;
 	    }
 
 	    if (strEQ(remaining, "EXCEPTIONS_BEING_CAUGHT")) {
@@ -882,6 +894,11 @@ Perl_magic_get(pTHX_ SV *sv, MAGIC *mg)
 		sv_setiv(sv, (IV)PL_hints);
 		break;
 	    }
+
+	    if (strEQ(remaining, "HINTS")) {
+		sv_setsv(sv, HvSv(PL_hinthv));
+		return;
+	    }
 	    break;
 
 	case 'I':
@@ -914,7 +931,7 @@ Perl_magic_get(pTHX_ SV *sv, MAGIC *mg)
 		     * Pre-threads, this was paren = atoi(GvENAME((GV*)mg->mg_obj));
 		     * XXX Does the new way break anything?
 		     */
-		    paren = atoi(mg->mg_ptr); /* $& is in [0] */
+		    paren = atoi(name); /* $& is in [0] */
 		    CALLREG_NUMBUF_FETCH(rx,paren,sv);
 		    break;
 		}
@@ -981,6 +998,10 @@ Perl_magic_get(pTHX_ SV *sv, MAGIC *mg)
 	case 'P':
 	    if (strEQ(remaining, "PERLDB")) {
 		sv_setiv(sv, (IV)PL_perldb);
+		break;
+	    }
+	    if (strEQ(remaining, "PERL_VERSION")) {
+		sv_setsv(sv, PL_patchlevel);
 		break;
 	    }
 	    if (strEQ(remaining, "PREMATCH")) { /* $^PREMATCH */
@@ -1085,7 +1106,7 @@ Perl_magic_get(pTHX_ SV *sv, MAGIC *mg)
 	     * Pre-threads, this was paren = atoi(GvENAME((GV*)mg->mg_obj));
 	     * XXX Does the new way break anything?
 	     */
-	    paren = atoi(mg->mg_ptr); /* $& is in [0] */
+	    paren = atoi(name); /* $& is in [0] */
 	    CALLREG_NUMBUF_FETCH(rx,paren,sv);
 	    break;
 	}
@@ -1402,20 +1423,193 @@ Perl_magic_setutf8(pTHX_ SV *sv, MAGIC *mg)
     return 0;
 }
 
+bool
+Perl_is_magicsv(pTHX_ SV* name)
+{
+/* 	    case '^': */
+/* 		switch (*name2) { */
+/* 		case 'B': */
+/*                     if (strEQ(name2, "BASETIME")) */
+/* 			goto magicalize; */
+/* 		    break; */
+
+/* 		case 'C':         */
+/* 		    if (strEQ(name2, "CHILD_ERROR")) { */
+/* 			/\* $^CHILD_ERROR *\/ */
+/* #ifdef COMPLEX_STATUS */
+/* 			SvUPGRADE(GvSVn(gv), SVt_PVLV); */
+/* #endif */
+/* 			goto magicalize; */
+/* 		    } */
+/* 		    if (strEQ(name2, "CHILD_ERROR_NATIVE")) { */
+/* 			/\* $^CHILD_ERROR_NATIVE *\/ */
+/* 			goto magicalize; */
+/* 		    } */
+/*                     if (strEQ(name2, "COMPILING")) */
+/* 			goto magicalize; */
+/* 		    break; */
+/* 		case 'D':        /\* $^DIE_HOOK *\/ */
+/*                     if (strEQ(name2, "DEBUGGING")) */
+/* 			goto magicalize; */
+/* 		    if (strEQ(name2, "DIE_HOOK")) */
+/* 			goto magicalize; */
+/* 		    break; */
+/* 		case 'E':	/\* $^ENCODING  $^EGID  $^EUID  $^OS_ERROR  $^EVAL_ERROR *\/ */
+/* 		    if (strEQ(name2, "ENCODING")) */
+/* 			goto magicalize; */
+/* 		    if (strEQ(name2, "EGID")) */
+/* 			goto magicalize; */
+/*                     if (strEQ(name2, "EMERGENCY_MEMORY")) */
+/* 			goto no_magicalize; */
+/* 		    if (strEQ(name2, "EUID")) */
+/* 			goto magicalize; */
+/* 		    if (strEQ(name2, "EVAL_ERROR")) */
+/* 			goto no_magicalize; */
+/*                     if (strEQ(name2, "EXECUTABLE_NAME")) */
+/* 			goto no_magicalize; */
+/* 		    if (strEQ(name2, "EXCEPTIONS_BEING_CAUGHT")) */
+/* 			goto ro_magicalize; */
+/*                     if (strEQ(name2, "EXTENDED_OS_ERROR")) */
+/* 			goto magicalize; */
+/* 		    break; */
+
+/* 		case 'G':   /\* $^GID *\/ */
+/* 		    if (strEQ(name2, "GID")) */
+/* 			goto magicalize; */
+/* 		    break; */
+
+/* 		case 'H': */
+/* 		    if (strEQ(name2, "HINTS")) { */
+/* 			SV *const hv = GvSVn(gv); */
+/* 			if ( ! SvHVOK(hv) ) */
+/* 			    sv_upgrade(hv, SVt_PVHV); */
+/* 			hv_magic(SvHv(hv), NULL, PERL_MAGIC_hints); */
+/* 			goto magicalize; */
+/* 		    } */
+/*                     if (strEQ(name2, "HINT_BITS")) */
+/* 			goto magicalize; */
+/* 		    break; */
+
+/* 		case 'I': */
+/*                     if (strEQ(name2, "INPLACE_EDIT")) */
+/* 			goto magicalize; */
+/* 		    /\* $^INPUT_RECORD_SEPARATOR *\/ */
+/* 		    if (strEQ(name2, "INPUT_RECORD_SEPARATOR")) */
+/* 			goto magicalize; */
+/* 		    break; */
+
+/* 		case 'L': */
+/*                     if (strEQ(name2, "LAST_REGEXP_CODE_RESULT")) */
+/* 			goto no_magicalize; */
+/*                     if (strEQ(name2, "LAST_SUBMATCH_RESULT")) */
+/* 			goto magicalize; */
+/* 		    break; */
+
+/* 		case 'M':        /\* $^MATCH *\/ */
+/* 		    if (strEQ(name2, "MATCH")) */
+/* 			goto magicalize; */
+/* 		    break; */
+
+/* 		case 'O':	/\* $^OPEN *\/ */
+/* 		    if (strEQ(name2, "OPEN")) */
+/* 			goto magicalize; */
+/* 		    if (strEQ(name2, "OS_ERROR")) */
+/* 			goto magicalize; */
+/*                     if (strEQ(name2, "OS_NAME")) */
+/* 			goto magicalize; */
+/* 		    if (strEQ(name2, "OUTPUT_AUTOFLUSH")) { */
+/* 			sv_setiv(GvSVn(gv), (IV)(IoFLAGS(GvIOp(PL_defoutgv)) & IOf_FLUSH) != 0); */
+/* 			goto magicalize; */
+/* 		    } */
+/* 		    /\* $^OUTPUT_RECORD_SEPARATOR *\/ */
+/* 		    if (strEQ(name2, "OUTPUT_RECORD_SEPARATOR")) */
+/* 			goto magicalize; */
+/* 		    /\* $^OUTPUT_FIELD_SEPARATOR *\/ */
+/* 		    if (strEQ(name2, "OUTPUT_FIELD_SEPARATOR")) */
+/* 			goto magicalize; */
+
+/* 		    break; */
+/* 		case 'P':        /\* $^PREMATCH  $^POSTMATCH *\/ */
+/*                     if (strEQ(name2, "PERLDB")) */
+/* 			goto magicalize; */
+/*                     if (strEQ(name2, "PERL_VERSION")) { */
+/* 			SV * const sv = GvSVn(gv); */
+/* 			sv_setsv(sv, PL_patchlevel); */
+/* 			goto no_magicalize;   */
+/* 		    } */
+/* 		    if (strEQ(name2, "PREMATCH") || strEQ(name2, "POSTMATCH")) */
+/* 			goto magicalize;   */
+/* 		    if (strEQ(name2, "PROGRAM_NAME")) */
+/* 			goto magicalize; */
+/* 		    if (strEQ(name2, "PID")) */
+/* 			goto no_magicalize;   */
+/* 		    break; */
+/* 		case 'R':        /\* $^RE_TRIE_MAXBUF *\/ */
+/* 		    if (strEQ(name2, "RE_TRIE_MAXBUF") || strEQ(name2, "RE_DEBUG_FLAGS")) */
+/* 			goto no_magicalize; */
+/* 		    break; */
+/* 		case 'S': */
+/*                     if (strEQ(name2, "SYSTEM_FD_MAX")) */
+/* 			goto magicalize; */
+/* 		    break; */
+/* 		case 'T':	/\* $^TAINT *\/ */
+/* 		    if (strEQ(name2, "TAINT")) */
+/* 			goto ro_magicalize; */
+/* 		    break; */
+/* 		case 'U':	/\* $^UNICODE, $^UTF8LOCALE, $^UTF8CACHE *\/ */
+/* 		    if (strEQ(name2, "UID")) */
+/* 			goto magicalize; */
+/* 		    if (strEQ(name2, "UNICODE")) */
+/* 			goto ro_magicalize; */
+/* 		    if (strEQ(name2, "UTF8LOCALE")) */
+/* 			goto ro_magicalize; */
+/* 		    if (strEQ(name2, "UTF8CACHE")) */
+/* 			goto magicalize; */
+/* 		    break; */
+/* 		case 'W':	/\* $^WARNING_BITS, $^WARN_HOOK *\/ */
+/* 		    if (strEQ(name2, "WARN_HOOK")) */
+/* 			goto magicalize; */
+/*                     if (strEQ(name2, "WARNING")) */
+/* 			goto magicalize; */
+/* 		    if (strEQ(name2, "WARNING_BITS")) */
+/* 			goto magicalize; */
+/* 		    break; */
+/* 		} */
+/* 		Perl_croak(aTHX_ "Unknown magic variable '$%s'", name); */
+/* 	    case '1': */
+/* 	    case '2': */
+/* 	    case '3': */
+/* 	    case '4': */
+/* 	    case '5': */
+/* 	    case '6': */
+/* 	    case '7': */
+/* 	    case '8': */
+/* 	    case '9': { */
+/* 		/\* Ensures that we have an all-digit variable, ${"1foo"} fails */
+/* 		   this test  *\/ */
+/* 		/\* This snippet is taken from is_gv_magical *\/ */
+/* 		const char *end = name + len; */
+/* 		while (--end > name) { */
+/* 		    if (!isDIGIT(*end))	return gv; */
+/* 		} */
+/* 		goto magicalize; */
+/* 	    } */
+}
+
 int
-Perl_magic_set(pTHX_ SV *sv, MAGIC *mg)
+Perl_magic_set(pTHX_ const char* name, SV *sv)
 {
     dVAR;
     register const char *s;
     register I32 paren;
     register const REGEXP * rx;
-    const char * const remaining = mg->mg_ptr + 1;
+    const char * const remaining = name + 1;
     I32 i;
     STRLEN len;
 
     PERL_ARGS_ASSERT_MAGIC_SET;
 
-    switch (*mg->mg_ptr) {
+    switch (*name) {
     case '^':
 	switch (*remaining) {
 	case 'B':
@@ -1472,6 +1666,12 @@ Perl_magic_set(pTHX_ SV *sv, MAGIC *mg)
 	    break;
 
 	case 'E':
+	    if (strEQ(remaining, "EVAL_ERROR")) {
+		/* $^EVAL_ERROR */
+		sv_setsv(PL_errsv, sv);
+		break;
+	    }
+
 	    if (strEQ(remaining, "EXTENDED_OS_ERROR")) {
 #ifdef MACOS_TRADITIONAL
 		gMacPerl_OSErr = SvIV(sv);
@@ -1613,6 +1813,10 @@ Perl_magic_set(pTHX_ SV *sv, MAGIC *mg)
 		PL_hints = SvIV(sv);
 		break;
 	    }
+	    if (strEQ(remaining, "HINTS")) {
+		sv_setsv(PL_hinthv, sv);
+		return;
+	    }
 	    break;
 
 	case 'I':
@@ -1739,6 +1943,8 @@ Perl_magic_set(pTHX_ SV *sv, MAGIC *mg)
 		    init_debugger();
 		break;
 	    }
+	    if (strEQ(remaining, "PERL_VERSION"))
+		goto magicset_readonly;
 	    if (strEQ(remaining, "PREMATCH")) { /* $^PREMATCH */
 		paren = RX_BUFF_IDX_PREMATCH;
 		goto setparen;
@@ -1930,7 +2136,7 @@ Perl_magic_set(pTHX_ SV *sv, MAGIC *mg)
 
     case '1': case '2': case '3': case '4':
     case '5': case '6': case '7': case '8': case '9':
-      paren = atoi(mg->mg_ptr);
+      paren = atoi(name);
       setparen:
         if (PL_curpm && (rx = PM_GETRE(PL_curpm))) {
             CALLREG_NUMBUF_STORE((REGEXP * const)rx,paren,sv);
@@ -1944,6 +2150,12 @@ Perl_magic_set(pTHX_ SV *sv, MAGIC *mg)
             }
         }
 	break;
+    magicset_readonly:
+	Perl_croak(aTHX_ "magic variable %s is readonly", name);
+    }
+    {
+	SV** storesv = hv_fetch(PL_magicsvhv, name, strlen(name), 1);
+	sv_setsv(*storesv, sv);
     }
     return 0;
 }

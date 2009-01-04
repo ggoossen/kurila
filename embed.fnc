@@ -432,14 +432,14 @@ ApdR	|bool	|grok_numeric_radix|NN const char **sp|NN const char *send
 Apd	|UV	|grok_oct	|NN const char* start|NN STRLEN* len_p|NN I32* flags|NULLOK NV *result
 dp	|int	|magic_clearhint|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_clearisa	|NN SV* sv|NN MAGIC* mg
-p	|int	|magic_get	|NN SV* sv|NN MAGIC* mg
+p	|int	|magic_get	|NN const char* name|NN SV* sv
 p	|int	|magic_gettaint	|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_getuvar	|NN SV* sv|NN MAGIC* mg
 p	|U32	|magic_len	|NN SV* sv|NN MAGIC* mg
 p	|U32	|magic_regdata_cnt|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_regdatum_get|NN SV* sv|NN MAGIC* mg
 pr	|int	|magic_regdatum_set|NN SV* sv|NN MAGIC* mg
-p	|int	|magic_set	|NN SV* sv|NN MAGIC* mg
+p	|int	|magic_set	|NN const char* name|NN SV* sv
 p	|int	|magic_setdbline|NN SV* sv|NN MAGIC* mg
 dp	|int	|magic_sethint	|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_setisa	|NN SV* sv|NN MAGIC* mg
@@ -473,6 +473,7 @@ Ap	|I32	|mg_size	|NN SV* sv
 Ap	|void	|mini_mktime	|NN struct tm *ptm
 EXp	|OP*	|mod		|NULLOK OP* o|I32 type
 p	|OP*	|assign		|NN OP* o|bool partial|NN I32 *min_modcount|NN I32 *max_modcount
+p	|OP*	|op_assign		|NN OP** po
 p	|int	|mode_from_discipline|NULLOK SV* discp
 Ap	|const char*	|moreswitches	|NN const char* s
 p	|OP*	|my		|NN OP* o

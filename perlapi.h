@@ -268,12 +268,12 @@ END_EXTERN_C
 #define PL_endav		(*Perl_Iendav_ptr(aTHX))
 #undef  PL_envhv
 #define PL_envhv		(*Perl_Ienvhv_ptr(aTHX))
-#undef  PL_errgv
-#define PL_errgv		(*Perl_Ierrgv_ptr(aTHX))
 #undef  PL_errorcreatehook
 #define PL_errorcreatehook	(*Perl_Ierrorcreatehook_ptr(aTHX))
 #undef  PL_errors
 #define PL_errors		(*Perl_Ierrors_ptr(aTHX))
+#undef  PL_errsv
+#define PL_errsv		(*Perl_Ierrsv_ptr(aTHX))
 #undef  PL_euid
 #define PL_euid			(*Perl_Ieuid_ptr(aTHX))
 #undef  PL_eval_root
@@ -308,8 +308,8 @@ END_EXTERN_C
 #define PL_globalstash		(*Perl_Iglobalstash_ptr(aTHX))
 #undef  PL_hash_seed
 #define PL_hash_seed		(*Perl_Ihash_seed_ptr(aTHX))
-#undef  PL_hintgv
-#define PL_hintgv		(*Perl_Ihintgv_ptr(aTHX))
+#undef  PL_hinthv
+#define PL_hinthv		(*Perl_Ihinthv_ptr(aTHX))
 #undef  PL_hints
 #define PL_hints		(*Perl_Ihints_ptr(aTHX))
 #undef  PL_hv_fetch_ent_mh
@@ -350,6 +350,8 @@ END_EXTERN_C
 #define PL_lockhook		(*Perl_Ilockhook_ptr(aTHX))
 #undef  PL_madskills
 #define PL_madskills		(*Perl_Imadskills_ptr(aTHX))
+#undef  PL_magicsvhv
+#define PL_magicsvhv		(*Perl_Imagicsvhv_ptr(aTHX))
 #undef  PL_main_cv
 #define PL_main_cv		(*Perl_Imain_cv_ptr(aTHX))
 #undef  PL_main_root
@@ -488,8 +490,8 @@ END_EXTERN_C
 #define PL_rehash_seed		(*Perl_Irehash_seed_ptr(aTHX))
 #undef  PL_rehash_seed_set
 #define PL_rehash_seed_set	(*Perl_Irehash_seed_set_ptr(aTHX))
-#undef  PL_replgv
-#define PL_replgv		(*Perl_Ireplgv_ptr(aTHX))
+#undef  PL_replsv
+#define PL_replsv		(*Perl_Ireplsv_ptr(aTHX))
 #undef  PL_restartop
 #define PL_restartop		(*Perl_Irestartop_ptr(aTHX))
 #undef  PL_rs

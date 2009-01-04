@@ -227,6 +227,39 @@ PP(pp_padsv)
     RETURN;
 }
 
+PP(pp_magicsv)
+{
+    dVAR; dSP;
+    const OPFLAGS op_flags = PL_op->op_flags;
+    if (PL_op->op_private & OPpLVAL_INTRO) {
+	SV* sv = sv_2mortal(newSV(0));
+	magic_get(SvPVX_const(cSVOP_sv), sv);
+	Perl_save_set_magicsv(SvPVX_const(cSVOP_sv), sv);
+    }
+    if (op_flags & OPf_ASSIGN) {
+	if (op_flags & OPf_ASSIGN_PART) {
+	    SV* src;
+	    if (PL_stack_base + TOPMARK >= SP) {
+		if ( ! (op_flags & OPf_OPTIONAL) )
+		    Perl_croak(aTHX_ "Missing required assignment value");
+		src = &PL_sv_undef;
+	    } 
+	    else
+		src = POPs;
+	    magic_set(SvPVX_const(cSVOP_sv), src);
+	    RETURN;
+	}
+	magic_set(SvPVX_const(cSVOP_sv), POPs);
+    }
+    {
+	SV* sv = sv_2mortal(newSV(0));
+	magic_get(SvPVX_const(cSVOP_sv), sv);
+	XPUSHs(sv);
+    }
+
+    RETURN;
+}
+
 PP(pp_readline)
 {
     dVAR;

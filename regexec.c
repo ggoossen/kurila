@@ -2416,7 +2416,7 @@ S_regmatch(pTHX_ regmatch_info *reginfo, regnode *prog)
                                during a successfull match */
     U32 lastopen = 0;       /* last open we saw */
     bool has_cutgroup = RX_HAS_CUTGROUP(rex) ? 1 : 0;   
-    SV* const oreplsv = GvSV(PL_replgv);
+    SV* const oreplsv = PL_replsv;
     /* these three flags are set by various ops to signal information to
      * the very next op. They have a useful lifetime of exactly one loop
      * iteration, and are not preserved or restored by state pushes/pops
@@ -3137,7 +3137,7 @@ S_regmatch(pTHX_ regmatch_info *reginfo, regnode *prog)
 		PL_curcop = ocurcop;
 		if (!logical) {
 		    /* /(?{...})/ */
-		    sv_setsv(save_scalar(PL_replgv), ret);
+		    sv_setsv(save_scalar(PL_replsv), ret);
 		    break;
 		}
 	    }
@@ -4627,8 +4627,8 @@ yes:
 	 * When popping the save stack, all these locals would be undone;
 	 * bypass this by setting the outermost saved $^R to the latest
 	 * value */
-	if (oreplsv != GvSV(PL_replgv))
-	    sv_setsv(oreplsv, GvSV(PL_replgv));
+	if (oreplsv != PL_replsv)
+	    sv_setsv(oreplsv, PL_replsv);
     }
     result = 1;
     goto final_exit;

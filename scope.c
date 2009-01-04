@@ -283,14 +283,6 @@ Perl_save_gp(pTHX_ GV *gv, I32 empty)
 	    gp->gp_io = newIO();
 	    IoFLAGS(gp->gp_io) |= IOf_ARGV|IOf_START;
 	}
-#ifdef PERL_DONT_CREATE_GVSV
-	if (gv == PL_errgv) {
-	    /* We could scatter this logic everywhere by changing the
-	       definition of ERRSV from GvSV() to GvSVn(), but it seems more
-	       efficient to do this check once here.  */
-	    gp->gp_sv = newSV(0);
-	}
-#endif
 	GvGP(gv) = gp;
     }
     else {
@@ -474,6 +466,16 @@ Perl_save_padsv_and_mortalize(pTHX_ PADOFFSET off)
     SSPUSHPTR(PL_comppad);
     SSPUSHLONG((long)off);
     SSPUSHINT(SAVEt_PADSV_AND_MORTALIZE);
+}
+
+void
+Perl_save_set_magicsv(pTHX_ SV* name, SV* value)
+{
+    dVAR;
+    SSCHECK(3);
+    SSPUSHPTR(SvREFCNT_inc_simple_NN(name));
+    SSPUSHPTR(SvREFCNT_inc_simple_NN(value));
+    SSPUSHINT(SAVEt_SET_MAGICSV);
 }
 
 void
@@ -940,18 +942,17 @@ Perl_leave_scope(pTHX_ I32 base)
 	    PL_op = (OP*)SSPOPPTR;
 	    break;
 	case SAVEt_HINTS:
-	    if ((PL_hints & HINT_LOCALIZE_HH) && GvSV(PL_hintgv)) {
-		SvREFCNT_dec((SV*)GvSV(PL_hintgv));
-		GvSV(PL_hintgv) = NULL;
+	    if ((PL_hints & HINT_LOCALIZE_HH) && PL_hinthv) {
+		HVcpNULL(PL_hinthv);
 	    }
 	    *(I32*)&PL_hints = (I32)SSPOPINT;
 	    HvREFCNT_dec(PL_compiling.cop_hints_hash);
  	    PL_compiling.cop_hints_hash = (HV*) SSPOPPTR;
 	    if (PL_hints & HINT_LOCALIZE_HH) {
-		SvREFCNT_dec((SV*)GvSV(PL_hintgv));
-		GvSV(PL_hintgv) = (HV*)SSPOPPTR;
-		assert(GvSV(PL_hintgv));
-	    } else if (!GvSV(PL_hintgv)) {
+		HvREFCNT_dec(PL_hinthv);
+		PL_hinthv = (HV*)SSPOPPTR;
+		assert(PL_hinthv);
+	    } else if (!PL_hinthv) {
 		/* Need to add a new one manually, else gv_fetchpv() can
 		   add one in this code:
 		   
@@ -969,9 +970,9 @@ Perl_leave_scope(pTHX_ I32 base)
 
 		HV *const hv = newHV();
 		hv_magic(hv, NULL, PERL_MAGIC_hints);
-		GvSV(PL_hintgv) = hv;
+		PL_hinthv = hv;
 	    }
-	    assert(GvSV(PL_hintgv));
+	    assert(PL_hinthv);
 	    break;
 	case SAVEt_COMPPAD:
 	    PL_comppad = (PAD*)SSPOPPTR;
@@ -994,6 +995,12 @@ Perl_leave_scope(pTHX_ I32 base)
 		*svp = (SV*)SSPOPPTR;
 	    }
 	    break;
+	case SAVEt_SET_MAGICSV: {
+	    SV *value = sv_2mortal((SV*)SSPOPPTR);
+	    SV *name = sv_2mortal((SV*)SSPOPPTR);
+	    magic_set(name, value);
+	    break;
+	}
 	case SAVEt_SAVESWITCHSTACK:
 	    {
 		dSP;

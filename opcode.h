@@ -44,6 +44,7 @@ EXTCONST char* const PL_op_name[] = {
 	"gv",
 	"gelem",
 	"padsv",
+	"magicsv",
 	"pushre",
 	"rv2gv",
 	"rv2sv",
@@ -402,6 +403,7 @@ EXTCONST char* const PL_op_desc[] = {
 	"glob value",
 	"glob elem",
 	"private variable",
+	"magic variable",
 	"push regexp",
 	"ref-to-glob cast",
 	"scalar dereference",
@@ -772,6 +774,7 @@ EXT Perl_ppaddr_t PL_ppaddr[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_pp_gv),
 	MEMBER_TO_FPTR(Perl_pp_gelem),
 	MEMBER_TO_FPTR(Perl_pp_padsv),
+	MEMBER_TO_FPTR(Perl_pp_magicsv),
 	MEMBER_TO_FPTR(Perl_pp_pushre),
 	MEMBER_TO_FPTR(Perl_pp_rv2gv),
 	MEMBER_TO_FPTR(Perl_pp_rv2sv),
@@ -1139,6 +1142,7 @@ EXT Perl_check_t PL_check[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* gv */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* gelem */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* padsv */
+	MEMBER_TO_FPTR(Perl_ck_null),	/* magicsv */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* pushre */
 	MEMBER_TO_FPTR(Perl_ck_rvconst),	/* rv2gv */
 	MEMBER_TO_FPTR(Perl_ck_rvconst),	/* rv2sv */
@@ -1500,6 +1504,7 @@ EXTCONST U32 PL_opargs[] = {
 	0x00000c44,	/* gv */
 	0x00022440,	/* gelem */
 	0x00000044,	/* padsv */
+	0x00000044,	/* magicsv */
 	0x00000a40,	/* pushre */
 	0x00000244,	/* rv2gv */
 	0x00000244,	/* rv2sv */

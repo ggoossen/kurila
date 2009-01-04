@@ -5924,6 +5924,14 @@ S_pending_ident(pTHX_ const char* begin_s)
         }
     }
 
+    if (PL_tokenbuf[1] == '^'
+	|| ( PL_tokenbuf[1] >= '0' && PL_tokenbuf[1] <= '9' ) ) {
+	OP* o = newSVOP(OP_MAGICSV, 0, newSVpvn(PL_tokenbuf+1, tokenbuf_len-1),
+	    S_curlocation(begin_s));
+	pl_yylval.opval = o;
+	return PRIVATEVAR;
+    }
+
     /* build ops for a global variable */
     GV * gv = gv_fetchpvn_flags(
 	    PL_tokenbuf + 1, tokenbuf_len - 1,
@@ -9254,7 +9262,7 @@ S_new_constant(pTHX_ const char *s, STRLEN len, const char *key, STRLEN keylen,
 	       SV *sv, SV *pv, const char *type, STRLEN typelen)
 {
     dVAR; dSP;
-    HV * const table = SvHv(GvSV(PL_hintgv));		 /* ^H */
+    HV * const table = PL_hinthv;		 /* ^HINTS */
     SV *res;
     SV **cvp;
     SV *cv, *typesv;

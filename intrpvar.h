@@ -192,7 +192,8 @@ PERLVAR(Iorigargc,	int)
 PERLVAR(Iorigargv,	char **)
 PERLVAR(Ienvhv,		HV *)
 PERLVAR(Iincgv,		GV *)
-PERLVAR(Ihintgv,	GV *)
+PERLVAR(Imagicsvhv,		HV *)
+PERLVAR(Ihinthv,	HV *)
 PERLVAR(Iorigfilename,	char *)
 PERLVAR(Ierrorcreatehook,	SV *)
 PERLVAR(Idiehook,	SV *)
@@ -250,10 +251,10 @@ PERLVAR(Iargvoutgv,	GV *)
 PERLVAR(Iargvout_stack,	AV *)
 
 /* shortcuts to regexp stuff */
-PERLVAR(Ireplgv,	GV *)
+PERLVAR(Ireplsv,	SV *)
 
 /* shortcuts to misc objects */
-PERLVAR(Ierrgv,		GV *)
+PERLVAR(Ierrsv,		SV *)
 
 /* shortcuts to debugging objects */
 PERLVAR(IDBgv,		GV *)

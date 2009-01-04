@@ -1364,6 +1364,10 @@ Perl_mod(pTHX_ OP *o, I32 type)
 		 PAD_COMPNAME_PV(o->op_targ));
 	break;
 
+    case OP_MAGICSV:
+	localize = 1;
+	break;
+
     case OP_PUSHMARK:
 	localize = 0;
 	break;
@@ -2076,6 +2080,23 @@ Perl_convert(pTHX_ I32 type, OPFLAGS flags, OP *o, SV *location)
 }
 
 OP *
+Perl_op_assign(pTHX_ OP **po)
+{
+    switch ((*po)->op_type) {
+    case OP_MAGICSV: {
+	I32 min_modcount = 0;
+	I32 max_modcount = 0;
+	OP* o = newSVOP(OP_MAGICSV, 0, cSVOPx_sv(*po),
+	    newSVsv((*po)->op_location));
+	o = assign(o, FALSE, &min_modcount, &max_modcount);
+
+	return o;
+    }
+    }
+    Perl_croak_at(aTHX_ (*po)->op_location, "Can't modify %s", OP_DESC(*po));
+}
+
+OP *
 Perl_assign(pTHX_ OP *o, bool partial, I32 *min_modcount, I32 *max_modcount)
 {
     OP* kid;
@@ -2092,6 +2113,7 @@ Perl_assign(pTHX_ OP *o, bool partial, I32 *min_modcount, I32 *max_modcount)
     case OP_RV2HV:
     case OP_RV2GV:
     case OP_PADSV:
+    case OP_MAGICSV:
     case OP_HELEM:
     case OP_AELEM:
     case OP_HSLICE:
@@ -3254,9 +3276,21 @@ Perl_newASSIGNOP(pTHX_ OPFLAGS flags, OP *left, I32 optype, OP *right, SV *locat
 		newOP(OP_LOGASSIGN_ASSIGN, 0, location), location);
 	    return newLOGOP(optype, 0, mod(scalar(left), optype), o, location);
 	}
+	else if (left->op_type == OP_MAGICSV) {
+	    OP* new_right;
+	    o = op_assign(&left);
+	    new_right = newBINOP(optype, 0,
+		scalar(left), scalar(right), location);
+	    return 
+		newBINOP(OP_SASSIGN,
+		    flags,
+		    scalar(new_right), 
+		    o,
+		    location );
+	}
 	else {
 	    return newBINOP(optype, OPf_STACKED,
-			    mod(scalar(left), optype), scalar(right), location);
+		mod(scalar(left), optype), scalar(right), location);
 	}
     }
 
@@ -4796,10 +4830,10 @@ Perl_ck_eval(pTHX_ OP *o)
 	op_getmad(oldo,o,'O');
     }
     o->op_targ = (PADOFFSET)PL_hints;
-    if ((PL_hints & HINT_LOCALIZE_HH) != 0 && GvSV(PL_hintgv)) {
+    if ((PL_hints & HINT_LOCALIZE_HH) != 0 && PL_hinthv) {
 	/* Store a copy of %^H that pp_entereval can pick up. */
 	OP *hhop = newSVOP(OP_HINTSEVAL, 0,
-	    (SV*)Perl_hv_copy_hints_hv(aTHX_ GvSV(PL_hintgv)), o->op_location);
+	    (SV*)Perl_hv_copy_hints_hv(aTHX_ PL_hinthv), o->op_location);
 	cUNOPo->op_first->op_sibling = hhop;
 	o->op_private |= OPpEVAL_HAS_HH;
     }
@@ -4866,7 +4900,7 @@ Perl_ck_exit(pTHX_ OP *o)
     PERL_ARGS_ASSERT_CK_EXIT;
 
 #ifdef VMS
-    HV * const table = GvSV(PL_hintgv);
+    HV * const table = PL_hinthv;
     if (table) {
        SV * const * const svp = hv_fetchs(table, "vmsish_exit", FALSE);
        if (svp && *svp && SvTRUE(*svp))
@@ -5708,7 +5742,7 @@ OP *
 Perl_ck_open(pTHX_ OP *o)
 {
     dVAR;
-    HV * const table = GvSV(PL_hintgv);
+    HV * const table = PL_hinthv;
 
     PERL_ARGS_ASSERT_CK_OPEN;
 
@@ -5927,7 +5961,7 @@ Perl_ck_sort(pTHX_ OP *o)
     PERL_ARGS_ASSERT_CK_SORT;
 
     if (o->op_type == OP_SORT && (PL_hints & HINT_LOCALIZE_HH) != 0) {
-	HV * const hinthv = GvSV(PL_hintgv);
+	HV * const hinthv = PL_hinthv;
 	if (hinthv) {
 	    SV ** const svp = hv_fetchs(hinthv, "sort", FALSE);
 	    if (svp) {

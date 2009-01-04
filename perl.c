@@ -675,16 +675,16 @@ perl_destruct(pTHXx)
     PL_envhv = NULL;
     GvREFCNT_dec(PL_incgv);
     PL_incgv = NULL;
-    PL_hintgv = NULL;
-    GvREFCNT_dec(PL_errgv);
-    PL_errgv = NULL;
+    SVcpNULL(PL_hinthv);
+    SVcpNULL(PL_errsv);
+    HVcpNULL(PL_magicsvhv);
     HvREFCNT_dec(PL_globalstash);
     PL_globalstash = NULL;
     PL_argvgv = NULL;
     PL_argvoutgv = NULL;
     PL_stdingv = NULL;
     PL_stderrgv = NULL;
-    PL_replgv = NULL;
+    PL_replsv = NULL;
     PL_DBgv = NULL;
     PL_DBline = NULL;
     PL_DBsub = NULL;
@@ -1082,15 +1082,15 @@ S_procself_val(pTHX_ SV *sv, const char *arg0)
 STATIC void
 S_set_caret_X(pTHX) {
     dVAR;
-    GV* tmpgv = gv_fetchpvs("^EXECUTABLE_NAME", GV_ADD|GV_NOTQUAL, SVt_PV); /* $^EXECUTABLE_NAME */
-    if (tmpgv) {
+    SV** tmpsv = hv_fetchs(PL_magicsvhv, "^EXECUTABLE_NAME", 1);
+    if (tmpsv) {
 #ifdef HAS_PROCSELFEXE
-	S_procself_val(aTHX_ GvSV(tmpgv), PL_origargv[0]);
+	S_procself_val(aTHX_ *tmpsv, PL_origargv[0]);
 #else
 #ifdef OS2
-	sv_setpv(GvSVn(tmpgv), os2_execname(aTHX));
+	sv_setpv(*tmpsv, os2_execname(aTHX));
 #else
-	sv_setpv(GvSVn(tmpgv),PL_origargv[0]);
+	sv_setpv(*tmpsv,PL_origargv[0]);
 #endif
 #endif
     }
@@ -2655,7 +2655,7 @@ Perl_moreswitches(pTHX_ const char *s)
 		   PL_rs = newSVpvn(&ch, 1);
 	      }
 	 }
-	 sv_setsv(get_sv("^INPUT_RECORD_SEPARATOR", TRUE), PL_rs);
+	 sv_setsv(*hv_fetchs(PL_magicsvhv, "^INPUT_RECORD_SEPARATOR", 1), PL_rs);
 	 return s + numlen;
     }
     case 'C':
@@ -3123,19 +3123,13 @@ S_init_main_stash(pTHX)
 					     SVt_PVAV)));
     SvREFCNT_inc_simple_void(PL_incgv); /* Don't allow it to be freed */
     GvMULTI_on(PL_incgv);
-    PL_hintgv = gv_fetchpvs("^HINTS", GV_ADD|GV_NOTQUAL, SVt_PV); /* ^H */
-    GvMULTI_on(PL_hintgv);
+    PL_magicsvhv = newHV();
+    PL_hinthv = newHV(); /* ^HINTS */
     PL_defgv = gv_fetchpvs("_", GV_ADD|GV_NOTQUAL, SVt_PVAV);
     SvREFCNT_inc_simple_void(PL_defgv);
-    PL_errgv = gv_HVadd(gv_fetchpvs("^EVAL_ERROR", GV_ADD|GV_NOTQUAL, SVt_PV));
-    SvREFCNT_inc_simple_void(PL_errgv);
-    GvMULTI_on(PL_errgv);
-    PL_replgv = gv_fetchpvs("^LAST_REGEXP_CODE_RESULT", GV_ADD|GV_NOTQUAL, SVt_PV); /* ^R */
-    GvMULTI_on(PL_replgv);
+    PL_errsv = newSV(0);
+    PL_replsv = *hv_fetchs(PL_magicsvhv, "^LAST_REGEXP_CODE_RESULT", 1); /* ^R */
     (void)Perl_form(aTHX_ "%240s","");	/* Preallocate temp - for immediate signals. */
-#ifdef PERL_DONT_CREATE_GVSV
-    gv_SVadd(PL_errgv);
-#endif
     sv_grow(ERRSV, 240);	/* Preallocate - for immediate signals. */
     sv_setpvn(ERRSV, "", 0);
     CopSTASH_set(&PL_compiling, PL_defstash);
@@ -3143,7 +3137,7 @@ S_init_main_stash(pTHX)
     PL_globalstash = GvHV(gv_fetchpvs("CORE::GLOBAL::", GV_ADDMULTI,
 				      SVt_PVHV));
     /* We must init $/ before switches are processed. */
-    sv_setpvn(get_sv("^INPUT_RECORD_SEPARATOR", TRUE), "\n", 1);
+    magic_set("^INPUT_RECORD_SEPARATOR", sv_2mortal(newSVpvs("\n")));
 }
 
 STATIC int
@@ -4176,15 +4170,14 @@ S_init_postdump_symbols(pTHX_ register int argc, register char **argv, register 
 
     init_argv_symbols(argc,argv);
 
-    if ((tmpgv = gv_fetchpvs("^PROGRAM_NAME", GV_ADD|GV_NOTQUAL, SVt_PV))) {
 #ifdef MACOS_TRADITIONAL
-	/* $0 is not majick on a Mac */
-	sv_setpv(GvSV(tmpgv),MacPerl_MPWFileName(PL_origfilename));
+    /* $0 is not majick on a Mac */
+    magic_set("^PROGRAM_NAME",
+	sv_2mortal(newSVpv(MacPerl_MPWFileName(PL_origfilename), 0)));
 #else
-	sv_setpv(GvSV(tmpgv),PL_origfilename);
-	magicname("^PROGRAM_NAME", STR_WITH_LEN("^PROGRAM_NAME"));
+    magic_set("^PROGRAM_NAME",
+	sv_2mortal(newSVpv(PL_origfilename, 0)));
 #endif
-    }
     if ((PL_envhv = newHV())) {
 	HV *hv = PL_envhv;
 	bool env_is_not_environ;
@@ -4223,11 +4216,7 @@ S_init_postdump_symbols(pTHX_ register int argc, register char **argv, register 
 #endif /* !PERL_MICRO */
     }
     TAINT_NOT;
-    if ((tmpgv = gv_fetchpvs("^PID", GV_ADD|GV_NOTQUAL, SVt_PV))) {
-        SvREADONLY_off(GvSV(tmpgv));
-	sv_setiv(GvSV(tmpgv), (IV)PerlProc_getpid());
-        SvREADONLY_on(GvSV(tmpgv));
-    }
+    sv_setiv(*hv_fetchs(PL_magicsvhv, "^PID", 1), (IV)PerlProc_getpid());
 #ifdef THREADS_HAVE_PIDS
     PL_ppid = (IV)getppid();
 #endif

@@ -472,6 +472,7 @@
 #endif
 #ifdef PERL_CORE
 #define assign			Perl_assign
+#define op_assign		Perl_op_assign
 #define mode_from_discipline	Perl_mode_from_discipline
 #endif
 #define moreswitches		Perl_moreswitches
@@ -2033,6 +2034,7 @@
 #define pp_lslice		Perl_pp_lslice
 #define pp_lstat		Perl_pp_lstat
 #define pp_lt			Perl_pp_lt
+#define pp_magicsv		Perl_pp_magicsv
 #define pp_mapstart		Perl_pp_mapstart
 #define pp_mapwhile		Perl_pp_mapwhile
 #define pp_match		Perl_pp_match
@@ -2061,7 +2063,6 @@
 #define pp_orassign		Perl_pp_orassign
 #define pp_ord			Perl_pp_ord
 #define pp_pack			Perl_pp_pack
-#define pp_padany		Perl_pp_padany
 #define pp_padsv		Perl_pp_padsv
 #define pp_pipe_op		Perl_pp_pipe_op
 #define pp_placeholder		Perl_pp_placeholder
@@ -2619,6 +2620,7 @@
 #endif
 #ifdef PERL_CORE
 #define assign(a,b,c,d)		Perl_assign(aTHX_ a,b,c,d)
+#define op_assign(a)		Perl_op_assign(aTHX_ a)
 #define mode_from_discipline(a)	Perl_mode_from_discipline(aTHX_ a)
 #endif
 #define moreswitches(a)		Perl_moreswitches(aTHX_ a)
@@ -4186,6 +4188,7 @@
 #define pp_lslice()		Perl_pp_lslice(aTHX)
 #define pp_lstat()		Perl_pp_lstat(aTHX)
 #define pp_lt()			Perl_pp_lt(aTHX)
+#define pp_magicsv()		Perl_pp_magicsv(aTHX)
 #define pp_mapstart()		Perl_pp_mapstart(aTHX)
 #define pp_mapwhile()		Perl_pp_mapwhile(aTHX)
 #define pp_match()		Perl_pp_match(aTHX)
@@ -4214,7 +4217,6 @@
 #define pp_orassign()		Perl_pp_orassign(aTHX)
 #define pp_ord()		Perl_pp_ord(aTHX)
 #define pp_pack()		Perl_pp_pack(aTHX)
-#define pp_padany()		Perl_pp_padany(aTHX)
 #define pp_padsv()		Perl_pp_padsv(aTHX)
 #define pp_pipe_op()		Perl_pp_pipe_op(aTHX)
 #define pp_placeholder()	Perl_pp_placeholder(aTHX)

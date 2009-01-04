@@ -2105,7 +2105,7 @@ PP(pp_entereval)
     SAVEHINTS();
     PL_hints = PL_op->op_targ;
     if (saved_hh)
-	GvSV(PL_hintgv) = saved_hh;
+	PL_hinthv = saved_hh;
 
     SAVESPTR(PL_diehook);
     SVcpREPLACE(PL_diehook, PERL_DIEHOOK_IGNORE);

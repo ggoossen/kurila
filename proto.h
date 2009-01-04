@@ -1471,11 +1471,11 @@ PERL_CALLCONV int	Perl_magic_clearisa(pTHX_ SV* sv, MAGIC* mg)
 #define PERL_ARGS_ASSERT_MAGIC_CLEARISA	\
 	assert(sv); assert(mg)
 
-PERL_CALLCONV int	Perl_magic_get(pTHX_ SV* sv, MAGIC* mg)
+PERL_CALLCONV int	Perl_magic_get(pTHX_ const char* name, SV* sv)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2);
 #define PERL_ARGS_ASSERT_MAGIC_GET	\
-	assert(sv); assert(mg)
+	assert(name); assert(sv)
 
 PERL_CALLCONV int	Perl_magic_gettaint(pTHX_ SV* sv, MAGIC* mg)
 			__attribute__nonnull__(pTHX_1)
@@ -1514,11 +1514,11 @@ PERL_CALLCONV int	Perl_magic_regdatum_set(pTHX_ SV* sv, MAGIC* mg)
 #define PERL_ARGS_ASSERT_MAGIC_REGDATUM_SET	\
 	assert(sv); assert(mg)
 
-PERL_CALLCONV int	Perl_magic_set(pTHX_ SV* sv, MAGIC* mg)
+PERL_CALLCONV int	Perl_magic_set(pTHX_ const char* name, SV* sv)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2);
 #define PERL_ARGS_ASSERT_MAGIC_SET	\
-	assert(sv); assert(mg)
+	assert(name); assert(sv)
 
 PERL_CALLCONV int	Perl_magic_setdbline(pTHX_ SV* sv, MAGIC* mg)
 			__attribute__nonnull__(pTHX_1)
@@ -1675,6 +1675,11 @@ PERL_CALLCONV OP*	Perl_assign(pTHX_ OP* o, bool partial, I32 *min_modcount, I32 
 			__attribute__nonnull__(pTHX_4);
 #define PERL_ARGS_ASSERT_ASSIGN	\
 	assert(o); assert(min_modcount); assert(max_modcount)
+
+PERL_CALLCONV OP*	Perl_op_assign(pTHX_ OP** po)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_OP_ASSIGN	\
+	assert(po)
 
 PERL_CALLCONV int	Perl_mode_from_discipline(pTHX_ SV* discp);
 PERL_CALLCONV const char*	Perl_moreswitches(pTHX_ const char* s)

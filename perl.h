@@ -1276,12 +1276,10 @@ EXTERN_C char *crypt(const char *, const char *);
 #   define SS_NORMAL  		0
 #endif
 
-#define ERRSV GvSV(PL_errgv)
+#define ERRSV PL_errsv
 /* FIXME? Change the assignments to PL_defgv to instantiate GvSV?  */
 #define DEFSV GvSVn(PL_defgv)
 #define SAVE_DEFSV SAVESPTR(GvSV(PL_defgv))
-
-#define ERRHV GvHV(PL_errgv)	/* XXX unused, here for compatibility */
 
 #ifndef errno
 	extern int errno;     /* ANSI allows errno to be an lvalue expr.
