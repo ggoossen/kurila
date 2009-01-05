@@ -874,7 +874,6 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
         GvMULTI_on(gv) ;
 
     /* set up magic where warranted */
-    assert( name[0] != '^' );
     if (len > 1) {
 #ifndef EBCDIC
 	if (*name >= 'a' ) {
@@ -912,6 +911,8 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 		if (strEQ(name2, "ERSION"))
 		    GvMULTI_on(gv);
 		break;
+	    case '^':
+		Perl_croak(aTHX_ "Globs can not start with a ^");
 	    }
 	}
     } else {

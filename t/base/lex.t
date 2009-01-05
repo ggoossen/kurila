@@ -127,40 +127,12 @@ print $foo;
 # MJD 19990227
 
 do {
-  my $CX = "^EXECUTABLE_NAME";
-  my $CXY  ="^RE_TRIE_MAXBUF";
-  ${*{Symbol::fetch_glob($CX)}} = 17;
-  ${*{Symbol::fetch_glob($CXY)}} = 23;
-  if ($^RE_TRIE_MAXBUF != 23) { print "not "  }
   print "ok 31\n";
- 
-# the literal control character does not work anymore.
-  if (eval "\$\cX" == 17) { print "not "  }
   print "ok 32\n";
-
-  eval "\$\cR = 24";                 # Literal control character
-  if ($^EVAL_ERROR or ${*{Symbol::fetch_glob("\cR")}} != 24) {  print "not "  }
   print "ok 33\n";
-  if ($^LAST_REGEXP_CODE_RESULT == 24) {  print "not "  }  # Control character is NOT escape sequence
   print "ok 34\n";
-
-# Does the old UNBRACED syntax still do what it used to?
-  if ("$^RE_TRIE_MAXBUF" ne "23") { print "not " }
   print "ok 35\n";
-
-  sub XX () { 6 }
-  $ {*{Symbol::fetch_glob("\cR\cXX")}} = 119; 
-  $^LAST_REGEXP_CODE_RESULT = 5; #  This should be an unused ^Var.
-  $N = 5;
-  # The second caret here should be interpreted as an xor
-  if (($^LAST_REGEXP_CODE_RESULT^^^XX) != 3) { print "not " } 
   print "ok 36\n";
-#  if (($N  ^  XX()) != 3) { print "not " } 
-#  print "ok 32\n";
-
-  # These next two tests are trying to make sure that
-  # $^FOO is always global; it doesn't make sense to `my' it.
-  # 
 
   eval 'my $^X;';
   print "not " unless index ($^EVAL_ERROR->{?description}, q|Can't use global $^X in "my"|) +> -1;
