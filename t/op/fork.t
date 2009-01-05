@@ -21,7 +21,7 @@ $^OUTPUT_AUTOFLUSH=1;
 
 our (@prgs, $tmpfile, $CAT, $status, $i);
 
-undef $^INPUT_RECORD_SEPARATOR;
+$^INPUT_RECORD_SEPARATOR = undef;
 @prgs = split "\n########\n", ~< *DATA;
 print "1..", scalar nelems @prgs, "\n";
 

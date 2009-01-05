@@ -1366,6 +1366,8 @@ Perl_mod(pTHX_ OP *o, I32 type)
 
     case OP_MAGICSV:
 	localize = 1;
+	if ( type && type != OP_SASSIGN)
+	    goto nomod;
 	break;
 
     case OP_PUSHMARK:
@@ -1375,8 +1377,6 @@ Perl_mod(pTHX_ OP *o, I32 type)
     case OP_KEYS:
 	if (type != OP_SASSIGN)
 	    goto nomod;
-	goto lvalue_func;
-      lvalue_func:
 	if (o->op_flags & OPf_KIDS)
 	    mod(cBINOPo->op_first->op_sibling, type);
 	break;

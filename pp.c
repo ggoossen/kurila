@@ -4701,6 +4701,7 @@ PP(pp_placeholder)
 {
     dSP;
     OPFLAGS op_flags = PL_op->op_flags;
+    SV* sv;
     if ( ! ( op_flags & OPf_ASSIGN ) )
 	DIE(aTHX_ "%s must be part of an assignment", OP_DESC(PL_op));
     if (op_flags & OPf_ASSIGN_PART) {
@@ -4712,7 +4713,8 @@ PP(pp_placeholder)
 	    SP--;
 	RETURN;
     }
-    XPUSHs(sv_mortalcopy(POPs));
+    sv = POPs;
+    XPUSHs(sv_mortalcopy(sv));
     RETURN;
 }
 

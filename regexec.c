@@ -3137,7 +3137,11 @@ S_regmatch(pTHX_ regmatch_info *reginfo, regnode *prog)
 		PL_curcop = ocurcop;
 		if (!logical) {
 		    /* /(?{...})/ */
-		    sv_setsv(save_scalar(PL_replsv), ret);
+		    SV* sv = sv_2mortal(newSV(0));
+		    SV* name = newSVpvs("^LAST_REGEXP_CODE_RESULT");
+		    magic_get("^LAST_REGEXP_CODE_RESULT", sv);
+		    Perl_save_set_magicsv(name, sv);
+		    sv_setsv(PL_replsv, ret);
 		    break;
 		}
 	    }

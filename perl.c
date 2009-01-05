@@ -675,7 +675,7 @@ perl_destruct(pTHXx)
     PL_envhv = NULL;
     GvREFCNT_dec(PL_incgv);
     PL_incgv = NULL;
-    SVcpNULL(PL_hinthv);
+    HVcpNULL(PL_hinthv);
     SVcpNULL(PL_errsv);
     HVcpNULL(PL_magicsvhv);
     HvREFCNT_dec(PL_globalstash);
@@ -4162,7 +4162,6 @@ STATIC void
 S_init_postdump_symbols(pTHX_ register int argc, register char **argv, register char **env)
 {
     dVAR;
-    GV* tmpgv;
 
     PERL_ARGS_ASSERT_INIT_POSTDUMP_SYMBOLS;
 

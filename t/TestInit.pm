@@ -26,5 +26,6 @@ BEGIN {
 env::set_var('PERL_CORE' => 1) unless $^TAINT;
 
 $^PROGRAM_NAME =~ s/\.dp$//; # for the test.deparse make target
+
 1;
 

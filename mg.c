@@ -725,7 +725,7 @@ Perl_emulate_cop_io(pTHX_ const COP *const c, SV *const sv)
     }
 }
 
-int
+void
 Perl_magic_get(pTHX_ const char* name, SV* sv)
 {
     dVAR;
@@ -1113,7 +1113,7 @@ Perl_magic_get(pTHX_ const char* name, SV* sv)
 	sv_setsv(sv,&PL_sv_undef);
 	break;
     }
-    return 0;
+    return;
 }
 
 int
@@ -1594,9 +1594,10 @@ Perl_is_magicsv(pTHX_ SV* name)
 /* 		} */
 /* 		goto magicalize; */
 /* 	    } */
+    return 1;
 }
 
-int
+void
 Perl_magic_set(pTHX_ const char* name, SV *sv)
 {
     dVAR;
@@ -1814,7 +1815,10 @@ Perl_magic_set(pTHX_ const char* name, SV *sv)
 		break;
 	    }
 	    if (strEQ(remaining, "HINTS")) {
-		sv_setsv(PL_hinthv, sv);
+		if ( ! SvHVOK(sv) ) {
+		    Perl_croak(aTHX_ "%s must be a hash not an %s", name, Ddesc(sv));
+		}
+		hv_sethv(PL_hinthv, SvHv(sv));
 		return;
 	    }
 	    break;
@@ -2157,7 +2161,7 @@ Perl_magic_set(pTHX_ const char* name, SV *sv)
 	SV** storesv = hv_fetch(PL_magicsvhv, name, strlen(name), 1);
 	sv_setsv(*storesv, sv);
     }
-    return 0;
+    return;
 }
 
 I32

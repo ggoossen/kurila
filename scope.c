@@ -998,7 +998,7 @@ Perl_leave_scope(pTHX_ I32 base)
 	case SAVEt_SET_MAGICSV: {
 	    SV *value = sv_2mortal((SV*)SSPOPPTR);
 	    SV *name = sv_2mortal((SV*)SSPOPPTR);
-	    magic_set(name, value);
+	    magic_set(SvPVX_const(name), value);
 	    break;
 	}
 	case SAVEt_SAVESWITCHSTACK:

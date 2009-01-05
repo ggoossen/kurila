@@ -1471,7 +1471,7 @@ PERL_CALLCONV int	Perl_magic_clearisa(pTHX_ SV* sv, MAGIC* mg)
 #define PERL_ARGS_ASSERT_MAGIC_CLEARISA	\
 	assert(sv); assert(mg)
 
-PERL_CALLCONV int	Perl_magic_get(pTHX_ const char* name, SV* sv)
+PERL_CALLCONV void	Perl_magic_get(pTHX_ const char* name, SV* sv)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2);
 #define PERL_ARGS_ASSERT_MAGIC_GET	\
@@ -1514,7 +1514,7 @@ PERL_CALLCONV int	Perl_magic_regdatum_set(pTHX_ SV* sv, MAGIC* mg)
 #define PERL_ARGS_ASSERT_MAGIC_REGDATUM_SET	\
 	assert(sv); assert(mg)
 
-PERL_CALLCONV int	Perl_magic_set(pTHX_ const char* name, SV* sv)
+PERL_CALLCONV void	Perl_magic_set(pTHX_ const char* name, SV* sv)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2);
 #define PERL_ARGS_ASSERT_MAGIC_SET	\
@@ -2642,6 +2642,12 @@ PERL_CALLCONV void	Perl_save_vptr(pTHX_ void *ptr)
 
 PERL_CALLCONV void	Perl_save_re_context(pTHX);
 PERL_CALLCONV void	Perl_save_padsv_and_mortalize(pTHX_ PADOFFSET off);
+PERL_CALLCONV void	Perl_save_set_magicsv(pTHX_ SV* name, SV* value)
+			__attribute__nonnull__(pTHX_1)
+			__attribute__nonnull__(pTHX_2);
+#define PERL_ARGS_ASSERT_SAVE_SET_MAGICSV	\
+	assert(name); assert(value)
+
 PERL_CALLCONV void	Perl_save_sptr(pTHX_ SV** sptr)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_SAVE_SPTR	\
