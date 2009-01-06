@@ -188,6 +188,7 @@ Perl_pp_enter_anonhash_assign
 Perl_pp_anonarray
 Perl_pp_anonhash
 Perl_pp_listlast
+Perl_pp_listfirst
 Perl_pp_expand
 Perl_pp_arrayexpand
 Perl_pp_enter_arrayexpand_assign

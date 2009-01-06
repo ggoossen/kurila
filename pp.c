@@ -3697,6 +3697,15 @@ PP(pp_listlast)
     RETURN;
 }
 
+PP(pp_listfirst)
+{
+    dVAR; dSP; dMARK;
+    if ( ! (++MARK <= SP) )
+	*MARK = &PL_sv_undef;
+    SP = MARK;
+    RETURN;
+}
+
 PP(pp_lslice)
 {
     dVAR;

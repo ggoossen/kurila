@@ -177,6 +177,7 @@ EXTCONST char* const PL_op_name[] = {
 	"anonarray",
 	"anonhash",
 	"listlast",
+	"listfirst",
 	"expand",
 	"arrayexpand",
 	"enter_arrayexpand_assign",
@@ -536,6 +537,7 @@ EXTCONST char* const PL_op_desc[] = {
 	"anonymous array (@())",
 	"anonymous hash (%())",
 	"listlast",
+	"listfirst",
 	"expand",
 	"array expand",
 	"array expand assignment",
@@ -907,6 +909,7 @@ EXT Perl_ppaddr_t PL_ppaddr[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_pp_anonarray),
 	MEMBER_TO_FPTR(Perl_pp_anonhash),
 	MEMBER_TO_FPTR(Perl_pp_listlast),
+	MEMBER_TO_FPTR(Perl_pp_listfirst),
 	MEMBER_TO_FPTR(Perl_pp_expand),
 	MEMBER_TO_FPTR(Perl_pp_arrayexpand),
 	MEMBER_TO_FPTR(Perl_pp_enter_arrayexpand_assign),
@@ -1275,6 +1278,7 @@ EXT Perl_check_t PL_check[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_ck_anonarray),	/* anonarray */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* anonhash */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* listlast */
+	MEMBER_TO_FPTR(Perl_ck_null),	/* listfirst */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* expand */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* arrayexpand */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* enter_arrayexpand_assign */
@@ -1637,6 +1641,7 @@ EXTCONST U32 PL_opargs[] = {
 	0x00004801,	/* anonarray */
 	0x00004801,	/* anonhash */
 	0x00004805,	/* listlast */
+	0x00004805,	/* listfirst */
 	0x00002200,	/* expand */
 	0x00002200,	/* arrayexpand */
 	0x00000000,	/* enter_arrayexpand_assign */

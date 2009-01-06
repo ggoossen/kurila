@@ -830,6 +830,16 @@ Perl_scalar(pTHX_ OP *o)
 	}
 	PL_curcop = &PL_compiling;
 	break;
+    case OP_LISTFIRST:
+	kid = cLISTOPo->op_first;
+	if (kid) {
+	    scalar(kid);
+	    for (kid = kid->op_sibling; kid; kid = kid->op_sibling) {
+		scalarvoid(kid);
+	    }
+	}
+	PL_curcop = &PL_compiling;
+	break;
     case OP_LIST:
 	yyerror(Perl_form(aTHX_ "%s may not be used in scalar context", PL_op_desc[o->op_type]));
 	break;
@@ -1073,6 +1083,7 @@ Perl_scalarvoid(pTHX_ OP *o)
     case OP_LINESEQ:
     case OP_LIST:
     case OP_LISTLAST:
+    case OP_LISTFIRST:
 	for (kid = cLISTOPo->op_first; kid; kid = kid->op_sibling)
 	    scalarvoid(kid);
 	break;
@@ -1370,7 +1381,7 @@ Perl_mod(pTHX_ OP *o, I32 type)
 
     case OP_MAGICSV:
 	localize = 1;
-	if ( type && type != OP_SASSIGN)
+	if ( type && type != OP_SASSIGN && type != OP_POSTINC && type != OP_SUBST)
 	    goto nomod;
 	break;
 
@@ -1426,6 +1437,9 @@ Perl_mod(pTHX_ OP *o, I32 type)
 	if (o->op_flags & OPf_KIDS)
 	    mod(cLISTOPo->op_last, type);
 	break;
+
+    case OP_LISTFIRST:
+	goto nomod;
 
     case OP_RETURN:
 	goto nomod;
@@ -1584,6 +1598,11 @@ Perl_doref(pTHX_ OP *o, I32 type, bool set_op_ref)
 	    break;
 	doref(cLISTOPo->op_last, type, set_op_ref);
 	break;
+    case OP_LISTFIRST:
+	if (!(o->op_flags & OPf_KIDS))
+	    break;
+	doref(cLISTOPo->op_first, type, set_op_ref);
+	break;
     default:
 	break;
     }
@@ -1712,10 +1731,9 @@ the operator directly to the C<operand>.
 =cut
 */
 OP *
-Perl_op_mod_assign(pTHX_ OP *operand, OP *operator)
+Perl_op_mod_assign(pTHX_ OP *operator)
 {
     PADOFFSET tmpsv = pad_alloc(OP_SASSIGN, SVs_PADTMP);
-    OP* op_a = op_assign(&operand);
     OP* padop;
     OP* padop2;
     OP* copy_to_tmp;
@@ -1723,15 +1741,15 @@ Perl_op_mod_assign(pTHX_ OP *operand, OP *operator)
     OP* o;
     I32 min_modcount = 0;
     I32 max_modcount = 0;
-    operator->op_private |= OPpTARGET_MY;
-    operator->op_targ = tmpsv;
     
+    OP* operand = cBINOPx(operator)->op_first;
+    OP* operand_sibling = operand->op_sibling;
+    operand->op_sibling = NULL;
+    OP* op_a = op_assign(&operand);
+
     padop = newOP(OP_PADSV, 0, operand->op_location);
     padop->op_targ = tmpsv;
 	    
-    padop2 = newOP(OP_PADSV, 0, operand->op_location);
-    padop2->op_targ = tmpsv;
-
     copy_to_tmp =
 	newBINOP(
 	    OP_SASSIGN,
@@ -1740,19 +1758,22 @@ Perl_op_mod_assign(pTHX_ OP *operand, OP *operator)
 		assign(padop, FALSE, &min_modcount, &max_modcount),
 		operator->op_location
 	    );
+    copy_to_tmp->op_sibling = operand_sibling;
+    cBINOPx(operator)->op_first = copy_to_tmp;
     
+    padop2 = newOP(OP_PADSV, 0, operand->op_location);
+    padop2->op_targ = tmpsv;
+
     copy_from_tmp =
 	newBINOP(
 	    OP_SASSIGN,
 		0,
-		scalar(padop2), 
+		padop2,
 		op_a,
 		operator->op_location
 	    );
     
-    o = append_elem(OP_LIST, scalarvoid(copy_to_tmp), operator);
-    o = append_elem(OP_LIST, o, scalarvoid(copy_from_tmp));
-    return o;
+    return append_elem(OP_LISTFIRST, scalar(operator), copy_from_tmp);
 }
 
 OP *
@@ -1786,11 +1807,6 @@ Perl_bind_match(pTHX_ I32 type, OP *left, OP *right)
 
     ismatchop = rtype == OP_MATCH ||
          	rtype == OP_SUBST;
-    if (rtype == OP_SUBST) {
-	if (left && left->op_type == OP_MAGICSV) {
-	    return op_mod_assign(left, right);
-	}
-    }
     if (ismatchop && right->op_private & OPpTARGET_MY) {
 	right->op_targ = 0;
 	right->op_private &= ~OPpTARGET_MY;
@@ -1804,6 +1820,11 @@ Perl_bind_match(pTHX_ I32 type, OP *left, OP *right)
 	else
 	    newleft = left;
 	o = prepend_elem(rtype, scalar(newleft), right);
+	if (rtype == OP_SUBST) {
+	    if (left && left->op_type == OP_MAGICSV) {
+		return op_mod_assign(o);
+	    }
+	}
 	if (type == OP_NOT)
 	    return newUNOP(OP_NOT, 0, scalar(o), o->op_location);
 	return o;
@@ -2714,7 +2735,7 @@ Perl_newLISTOP(pTHX_ I32 type, OPFLAGS flags, OP *first, OP *last, SV *location)
 	first->op_sibling = last;
     listop->op_first = first;
     listop->op_last = last;
-    if (type == OP_LIST || type == OP_LISTLAST) {
+    if (type == OP_LIST || type == OP_LISTLAST || type == OP_LISTFIRST) {
 	OP* const pushop = newOP(OP_PUSHMARK, 0, location);
 	pushop->op_sibling = first;
 	listop->op_first = pushop;
@@ -2753,12 +2774,12 @@ Perl_newOP(pTHX_ I32 type, OPFLAGS flags, SV* location)
 OP *
 Perl_new_mod_UNOP(pTHX_ I32 type, OPFLAGS flags, OP *first, SV* location)
 {
-    if (first->op_type != OP_MAGICSV) {
-	return newUNOP(type, flags, mod(first, type), location);
+    OP* o;
+    o = newUNOP(type, flags, mod(first, type), location);
+    if (first->op_type == OP_MAGICSV) {
+	o = op_mod_assign(o);
     }
-    else {
-	return op_mod_assign(first, newOP(type, flags, location));
-    }
+    return o;
 }
 
 OP *

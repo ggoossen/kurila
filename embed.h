@@ -2916,7 +2916,7 @@
 #define scalarkids(a)		Perl_scalarkids(aTHX_ a)
 #define scalarseq(a)		Perl_scalarseq(aTHX_ a)
 #define scalarvoid(a)		Perl_scalarvoid(aTHX_ a)
-#define op_mod_assign(a,b)	Perl_op_mod_assign(aTHX_ a,b)
+#define op_mod_assign(a)	Perl_op_mod_assign(aTHX_ a)
 #endif
 #define scan_bin(a,b,c)		Perl_scan_bin(aTHX_ a,b,c)
 #define scan_hex(a,b,c)		Perl_scan_hex(aTHX_ a,b,c)

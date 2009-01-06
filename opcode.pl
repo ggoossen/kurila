@@ -801,6 +801,7 @@ enter_anonhash_assign	anonymous hash assignment (%())	ck_null	0
 anonarray	anonymous array (@())	ck_anonarray	m@	L
 anonhash	anonymous hash (%())	ck_fun		m@	L
 listlast	listlast		ck_null		ms@	L
+listfirst	listfirst		ck_null		ms@	L
 
 expand		expand			ck_fun		1	S
 arrayexpand	array expand			ck_fun		1	S
