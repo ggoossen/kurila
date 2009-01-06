@@ -1610,6 +1610,8 @@ Perl_magic_set(pTHX_ const char* name, SV *sv)
 
     PERL_ARGS_ASSERT_MAGIC_SET;
 
+    sv = sv_mortalcopy(sv);
+
     switch (*name) {
     case '^':
 	switch (*remaining) {

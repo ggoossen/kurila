@@ -912,7 +912,7 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 		    GvMULTI_on(gv);
 		break;
 	    case '^':
-		Perl_croak(aTHX_ "Globs can not start with a ^");
+		Perl_croak(aTHX_ "Invalid glob name %s", name);
 	    }
 	}
     } else {
