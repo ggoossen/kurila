@@ -989,7 +989,7 @@ Perl_scalarvoid(pTHX_ OP *o)
     case OP_RV2AV:
     case OP_RV2HV:
 	if (!(o->op_private & (OPpLVAL_INTRO|OPpOUR_INTRO)) &&
-		(!o->op_sibling || o->op_sibling->op_type != OP_READLINE))
+	    (!o->op_sibling || o->op_sibling->op_type != OP_READLINE))
 	    useless = "a variable";
 	break;
 
@@ -1076,6 +1076,9 @@ Perl_scalarvoid(pTHX_ OP *o)
 	for (kid = cLISTOPo->op_first; kid; kid = kid->op_sibling)
 	    scalarvoid(kid);
 	break;
+    case OP_SASSIGN:
+	scalarvoid(cBINOPo->op_last);
+	break;
     case OP_ENTEREVAL:
 	scalarkids(o);
 	break;
@@ -1092,7 +1095,8 @@ Perl_scalarvoid(pTHX_ OP *o)
 	}
 	break;
     }
-    if (useless && ckWARN(WARN_VOID))
+    if (useless && !(o->op_flags & OPf_ASSIGN) 
+	&& ckWARN(WARN_VOID))
 	Perl_warner_at(aTHX_ o->op_location, packWARN(WARN_VOID), "Useless use of %s in void context", useless);
     return o;
 }
@@ -1696,6 +1700,61 @@ Perl_sawparens(pTHX_ OP *o)
     return o;
 }
 
+/*
+=for apidoc op_mod_assign
+
+C<operator> is an opcode which modifies the
+top item of the stack. C<operand> is an opcode which will be split into
+a get and a set part using op_assign.
+The tree returns uses a temporary variable and the get and set to mimic applying
+the operator directly to the C<operand>.
+
+=cut
+*/
+OP *
+Perl_op_mod_assign(pTHX_ OP *operand, OP *operator)
+{
+    PADOFFSET tmpsv = pad_alloc(OP_SASSIGN, SVs_PADTMP);
+    OP* op_a = op_assign(&operand);
+    OP* padop;
+    OP* padop2;
+    OP* copy_to_tmp;
+    OP* copy_from_tmp;
+    OP* o;
+    I32 min_modcount = 0;
+    I32 max_modcount = 0;
+    operator->op_private |= OPpTARGET_MY;
+    operator->op_targ = tmpsv;
+    
+    padop = newOP(OP_PADSV, 0, operand->op_location);
+    padop->op_targ = tmpsv;
+	    
+    padop2 = newOP(OP_PADSV, 0, operand->op_location);
+    padop2->op_targ = tmpsv;
+
+    copy_to_tmp =
+	newBINOP(
+	    OP_SASSIGN,
+		0,
+		scalar(operand), 
+		assign(padop, FALSE, &min_modcount, &max_modcount),
+		operator->op_location
+	    );
+    
+    copy_from_tmp =
+	newBINOP(
+	    OP_SASSIGN,
+		0,
+		scalar(padop2), 
+		op_a,
+		operator->op_location
+	    );
+    
+    o = append_elem(OP_LIST, scalarvoid(copy_to_tmp), operator);
+    o = append_elem(OP_LIST, o, scalarvoid(copy_from_tmp));
+    return o;
+}
+
 OP *
 Perl_bind_match(pTHX_ I32 type, OP *left, OP *right)
 {
@@ -1727,6 +1786,11 @@ Perl_bind_match(pTHX_ I32 type, OP *left, OP *right)
 
     ismatchop = rtype == OP_MATCH ||
          	rtype == OP_SUBST;
+    if (rtype == OP_SUBST) {
+	if (left && left->op_type == OP_MAGICSV) {
+	    return op_mod_assign(left, right);
+	}
+    }
     if (ismatchop && right->op_private & OPpTARGET_MY) {
 	right->op_targ = 0;
 	right->op_private &= ~OPpTARGET_MY;
@@ -2687,6 +2751,17 @@ Perl_newOP(pTHX_ I32 type, OPFLAGS flags, SV* location)
 }
 
 OP *
+Perl_new_mod_UNOP(pTHX_ I32 type, OPFLAGS flags, OP *first, SV* location)
+{
+    if (first->op_type != OP_MAGICSV) {
+	return newUNOP(type, flags, mod(first, type), location);
+    }
+    else {
+	return op_mod_assign(first, newOP(type, flags, location));
+    }
+}
+
+OP *
 Perl_newUNOP(pTHX_ I32 type, OPFLAGS flags, OP *first, SV* location)
 {
     dVAR;
@@ -3271,22 +3346,38 @@ Perl_newASSIGNOP(pTHX_ OPFLAGS flags, OP *left, I32 optype, OP *right, SV *locat
     OP *o;
 
     if (optype) {
-	if (optype == OP_ANDASSIGN || optype == OP_ORASSIGN || optype == OP_DORASSIGN) {
-	    o = newBINOP(OP_SASSIGN, 0, scalar(right),
-		newOP(OP_LOGASSIGN_ASSIGN, 0, location), location);
-	    return newLOGOP(optype, 0, mod(scalar(left), optype), o, location);
-	}
-	else if (left->op_type == OP_MAGICSV) {
+	bool is_logassign = (optype == OP_ANDASSIGN || optype == OP_ORASSIGN || optype == OP_DORASSIGN);
+	if (left->op_type == OP_MAGICSV) {
 	    OP* new_right;
 	    o = op_assign(&left);
-	    new_right = newBINOP(optype, 0,
-		scalar(left), scalar(right), location);
+	    if (is_logassign) {
+		new_right = newLOGOP(
+		    optype == OP_ANDASSIGN ? OP_AND 
+			: optype == OP_ORASSIGN ? OP_OR
+			: OP_DOR,
+			0,
+			scalar(left), scalar(right), location
+		    );
+	    }
+	    else {
+		new_right = newBINOP(
+		    optype,
+			0,
+			scalar(left), scalar(right), location
+		    );
+	    }
+
 	    return 
 		newBINOP(OP_SASSIGN,
 		    flags,
 		    scalar(new_right), 
 		    o,
 		    location );
+	}
+	else if (is_logassign) {
+	    o = newBINOP(OP_SASSIGN, 0, scalar(right),
+		newOP(OP_LOGASSIGN_ASSIGN, 0, location), location);
+	    return newLOGOP(optype, 0, mod(scalar(left), optype), o, location);
 	}
 	else {
 	    return newBINOP(optype, OPf_STACKED,

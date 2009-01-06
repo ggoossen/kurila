@@ -956,8 +956,8 @@ termunop : '-' term %prec UMINUS                       /* -$x */
 			  TOKEN_GETMAD($1,$$,'o');
                         }
 	|	term POSTINC                           /* $x++ */
-			{ $$ = newUNOP(OP_POSTINC, 0,
-                                mod(scalar($1), OP_POSTINC), LOCATION($2));
+			{ $$ = new_mod_UNOP(OP_POSTINC, 0,
+                                scalar($1), LOCATION($2));
 			  TOKEN_GETMAD($2,$$,'o');
 			}
 	|	term POSTDEC                           /* $x-- */

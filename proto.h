@@ -2040,6 +2040,10 @@ PERL_CALLCONV OP*	Perl_newUNOP(pTHX_ I32 type, OPFLAGS flags, OP* first, SV* loc
 			__attribute__malloc__
 			__attribute__warn_unused_result__;
 
+PERL_CALLCONV OP*	Perl_new_mod_UNOP(pTHX_ I32 type, OPFLAGS flags, OP* first, SV* location)
+			__attribute__malloc__
+			__attribute__warn_unused_result__;
+
 PERL_CALLCONV OP*	Perl_newWHILEOP(pTHX_ OPFLAGS flags, I32 debuggable, LOOP* loop, SV* location, OP* expr, OP* block, OP* cont, I32 has_my)
 			__attribute__malloc__
 			__attribute__warn_unused_result__;
@@ -2666,6 +2670,12 @@ PERL_CALLCONV OP*	Perl_scalarvoid(pTHX_ OP* o)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_SCALARVOID	\
 	assert(o)
+
+PERL_CALLCONV OP*	Perl_op_mod_assign(pTHX_ OP* operand, OP* operator)
+			__attribute__nonnull__(pTHX_1)
+			__attribute__nonnull__(pTHX_2);
+#define PERL_ARGS_ASSERT_OP_MOD_ASSIGN	\
+	assert(operand); assert(operator)
 
 PERL_CALLCONV NV	Perl_scan_bin(pTHX_ const char* start, STRLEN len, STRLEN* retlen)
 			__attribute__nonnull__(pTHX_1)

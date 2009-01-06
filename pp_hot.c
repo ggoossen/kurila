@@ -196,6 +196,7 @@ PP(pp_concat)
 PP(pp_padsv)
 {
     dVAR; dSP; dTARGET;
+    const I32 gimme = GIMME_V;
     const OPFLAGS op_flags = PL_op->op_flags;
     if (op_flags & OPf_ASSIGN) {
 	if (op_flags & OPf_ASSIGN_PART) {
@@ -214,7 +215,8 @@ PP(pp_padsv)
 	}
 	sv_setsv_mg(TARG, POPs);
     }
-    XPUSHs(TARG);
+    if (gimme != G_VOID)
+	XPUSHs(TARG);
     if (PL_op->op_flags & OPf_MOD) {
 	if (PL_op->op_private & OPpLVAL_INTRO)
 	    SAVECLEARSV(PAD_SVl(PL_op->op_targ));
@@ -230,6 +232,7 @@ PP(pp_padsv)
 PP(pp_magicsv)
 {
     dVAR; dSP;
+    const I32 gimme = GIMME_V;
     const OPFLAGS op_flags = PL_op->op_flags;
     const char* name = SvPVX_const(cSVOP_sv);
     if (PL_op->op_private & OPpLVAL_INTRO) {
@@ -252,7 +255,7 @@ PP(pp_magicsv)
 	}
 	magic_set(name, POPs);
     }
-    {
+    if (gimme != G_VOID) {
 	SV* sv = sv_2mortal(newSV(0));
 	magic_get(name, sv);
 	XPUSHs(sv);

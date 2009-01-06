@@ -566,6 +566,7 @@
 #define newSVsv			Perl_newSVsv
 #define newSV_type		Perl_newSV_type
 #define newUNOP			Perl_newUNOP
+#define new_mod_UNOP		Perl_new_mod_UNOP
 #define newWHILEOP		Perl_newWHILEOP
 #define new_stackinfo		Perl_new_stackinfo
 #define scan_vstring		Perl_scan_vstring
@@ -766,6 +767,7 @@
 #define scalarkids		Perl_scalarkids
 #define scalarseq		Perl_scalarseq
 #define scalarvoid		Perl_scalarvoid
+#define op_mod_assign		Perl_op_mod_assign
 #endif
 #define scan_bin		Perl_scan_bin
 #define scan_hex		Perl_scan_hex
@@ -2714,6 +2716,7 @@
 #define newSVsv(a)		Perl_newSVsv(aTHX_ a)
 #define newSV_type(a)		Perl_newSV_type(aTHX_ a)
 #define newUNOP(a,b,c,d)	Perl_newUNOP(aTHX_ a,b,c,d)
+#define new_mod_UNOP(a,b,c,d)	Perl_new_mod_UNOP(aTHX_ a,b,c,d)
 #define newWHILEOP(a,b,c,d,e,f,g,h)	Perl_newWHILEOP(aTHX_ a,b,c,d,e,f,g,h)
 #define new_stackinfo(a,b)	Perl_new_stackinfo(aTHX_ a,b)
 #define scan_vstring(a,b,c)	Perl_scan_vstring(aTHX_ a,b,c)
@@ -2913,6 +2916,7 @@
 #define scalarkids(a)		Perl_scalarkids(aTHX_ a)
 #define scalarseq(a)		Perl_scalarseq(aTHX_ a)
 #define scalarvoid(a)		Perl_scalarvoid(aTHX_ a)
+#define op_mod_assign(a,b)	Perl_op_mod_assign(aTHX_ a,b)
 #endif
 #define scan_bin(a,b,c)		Perl_scan_bin(aTHX_ a,b,c)
 #define scan_hex(a,b,c)		Perl_scan_hex(aTHX_ a,b,c)

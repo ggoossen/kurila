@@ -568,6 +568,7 @@ Apd	|SV*	|newSVrv	|NN SV *const rv|NULLOK const char *const classname
 Apda	|SV*	|newSVsv	|NULLOK SV *const old
 Apda	|SV*	|newSV_type	|const svtype type
 Apa	|OP*	|newUNOP	|I32 type|OPFLAGS flags|NULLOK OP* first|NULLOK SV* location
+Apa	|OP*	|new_mod_UNOP	|I32 type|OPFLAGS flags|NULLOK OP* first|NULLOK SV* location
 Apa	|OP*	|newWHILEOP	|OPFLAGS flags|I32 debuggable|NULLOK LOOP* loop \
 				|NULLOK SV* location|NULLOK OP* expr|NULLOK OP* block|NULLOK OP* cont \
 				|I32 has_my
@@ -744,6 +745,7 @@ p	|OP*	|scalar		|NULLOK OP* o
 p	|OP*	|scalarkids	|NULLOK OP* o
 p	|OP*	|scalarseq	|NULLOK OP* o
 p	|OP*	|scalarvoid	|NN OP* o
+p	|OP*	|op_mod_assign	|NN OP* operand|NN OP* operator
 Apd	|NV	|scan_bin	|NN const char* start|STRLEN len|NN STRLEN* retlen
 Apd	|NV	|scan_hex	|NN const char* start|STRLEN len|NN STRLEN* retlen
 Ap	|char*	|scan_num	|NN const char* s|NN YYSTYPE *lvalp
