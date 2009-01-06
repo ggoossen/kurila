@@ -476,6 +476,7 @@ Perl_save_set_magicsv(pTHX_ SV* name, SV* value)
     SSPUSHPTR(SvREFCNT_inc_simple_NN(name));
     SSPUSHPTR(SvREFCNT_inc_simple_NN(value));
     SSPUSHINT(SAVEt_SET_MAGICSV);
+    magic_set(SvPVX_const(name), sv_2mortal(newSV(0)));
 }
 
 void

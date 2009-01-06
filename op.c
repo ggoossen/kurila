@@ -6738,7 +6738,7 @@ Perl_peep(pTHX_ register OP *o)
 		    op_null(o->op_next);
 		    o->op_private |= o->op_next->op_private & (OPpLVAL_INTRO
 							       | OPpOUR_INTRO);
-		    o->op_flags |= o->op_next->op_flags & (OPf_ASSIGN|OPf_ASSIGN_PART|OPf_OPTIONAL);
+		    o->op_flags |= o->op_next->op_flags & (OPf_ASSIGN|OPf_ASSIGN_PART|OPf_OPTIONAL|OPf_MOD);
 		    o->op_next = o->op_next->op_next;
 		    o->op_type = OP_GVSV;
 		    o->op_ppaddr = PL_ppaddr[OP_GVSV];
