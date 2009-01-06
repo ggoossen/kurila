@@ -64,7 +64,8 @@ ok $^EVAL_ERROR->{?description} eq "foo\n", '$@';
 
 ok $^PID +> 0, $^PID;
 try { $^PID++ };
-ok $^EVAL_ERROR->{?description} =~ m/^Modification of a read-only value attempted/;
+
+ok $^EVAL_ERROR->{?description} =~ m/^Modification of the read-only magic variable \$\^PID attempted/;
 
 our ($wd, $script);
 

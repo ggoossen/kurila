@@ -1673,6 +1673,10 @@ Perl_magic_set(pTHX_ const char* name, SV *sv)
 		break;
 	    }
 
+	    if (strEQ(remaining, "EXCEPTIONS_BEING_CAUGHT")) {
+		goto magicset_readonly;
+	    }
+
 	    if (strEQ(remaining, "EXTENDED_OS_ERROR")) {
 #ifdef MACOS_TRADITIONAL
 		gMacPerl_OSErr = SvIV(sv);
@@ -1947,12 +1951,20 @@ Perl_magic_set(pTHX_ const char* name, SV *sv)
 		    init_debugger();
 		break;
 	    }
-	    if (strEQ(remaining, "PERL_VERSION"))
+
+	    if (strEQ(remaining, "PERL_VERSION")) {
 		goto magicset_readonly;
+	    }
+
 	    if (strEQ(remaining, "PREMATCH")) { /* $^PREMATCH */
 		paren = RX_BUFF_IDX_PREMATCH;
 		goto setparen;
 	    } 
+
+	    if (strEQ(remaining, "PID")) {
+		goto magicset_readonly;
+	    }
+
 	    if (strEQ(remaining, "POSTMATCH")) { /* $^POSTMATCH */
 		paren = RX_BUFF_IDX_POSTMATCH;
 		goto setparen;
@@ -2034,6 +2046,12 @@ Perl_magic_set(pTHX_ const char* name, SV *sv)
 	    }
 	    break;
 
+	case 'T':
+	    if (strEQ(remaining, "TAINT")) {
+		goto magicset_readonly;
+	    }
+	    break;
+
 	case 'U':
 	    if (strEQ(remaining, "UID")) {
 		/* $^UID */
@@ -2069,10 +2087,17 @@ Perl_magic_set(pTHX_ const char* name, SV *sv)
 		PL_tainting |= (PL_uid && (PL_euid != PL_uid || PL_egid != PL_gid));
 		break;
 	    }
+
+	    if (strEQ(remaining, "UNICODE")) {
+		goto magicset_readonly;
+	    }
 	    if (strEQ(remaining, "UTF8CACHE")) {
 		/* $^UTF8CACHE */
 		PL_utf8cache = (signed char) sv_2iv(sv);
 		break;
+	    }
+	    if (strEQ(remaining, "UTF8LOCALE")) {
+		goto magicset_readonly;
 	    }
 	    break;
 	case 'W':
@@ -2154,8 +2179,10 @@ Perl_magic_set(pTHX_ const char* name, SV *sv)
             }
         }
 	break;
+
     magicset_readonly:
-	Perl_croak(aTHX_ "magic variable %s is readonly", name);
+	Perl_croak(aTHX_ "Modification of the read-only magic variable $%s attempted",
+	    name);
     }
     {
 	SV** storesv = hv_fetch(PL_magicsvhv, name, strlen(name), 1);
