@@ -566,7 +566,6 @@
 #define newSVsv			Perl_newSVsv
 #define newSV_type		Perl_newSV_type
 #define newUNOP			Perl_newUNOP
-#define new_mod_UNOP		Perl_new_mod_UNOP
 #define newWHILEOP		Perl_newWHILEOP
 #define new_stackinfo		Perl_new_stackinfo
 #define scan_vstring		Perl_scan_vstring
@@ -2029,6 +2028,7 @@
 #define pp_link			Perl_pp_link
 #define pp_list			Perl_pp_list
 #define pp_listen		Perl_pp_listen
+#define pp_listfirst		Perl_pp_listfirst
 #define pp_listlast		Perl_pp_listlast
 #define pp_localtime		Perl_pp_localtime
 #define pp_lock			Perl_pp_lock
@@ -2716,7 +2716,6 @@
 #define newSVsv(a)		Perl_newSVsv(aTHX_ a)
 #define newSV_type(a)		Perl_newSV_type(aTHX_ a)
 #define newUNOP(a,b,c,d)	Perl_newUNOP(aTHX_ a,b,c,d)
-#define new_mod_UNOP(a,b,c,d)	Perl_new_mod_UNOP(aTHX_ a,b,c,d)
 #define newWHILEOP(a,b,c,d,e,f,g,h)	Perl_newWHILEOP(aTHX_ a,b,c,d,e,f,g,h)
 #define new_stackinfo(a,b)	Perl_new_stackinfo(aTHX_ a,b)
 #define scan_vstring(a,b,c)	Perl_scan_vstring(aTHX_ a,b,c)
@@ -4186,6 +4185,7 @@
 #define pp_link()		Perl_pp_link(aTHX)
 #define pp_list()		Perl_pp_list(aTHX)
 #define pp_listen()		Perl_pp_listen(aTHX)
+#define pp_listfirst()		Perl_pp_listfirst(aTHX)
 #define pp_listlast()		Perl_pp_listlast(aTHX)
 #define pp_localtime()		Perl_pp_localtime(aTHX)
 #define pp_lock()		Perl_pp_lock(aTHX)

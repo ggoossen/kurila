@@ -1034,7 +1034,7 @@ case 2:
 
   case 120:
 #line 959 "perly.y"
-    { (yyval.opval) = new_mod_UNOP(OP_POSTINC, 0,
+    { (yyval.opval) = newUNOP(OP_POSTINC, 0,
                                 scalar((ps[(1) - (2)].val.opval)), LOCATION((ps[(2) - (2)].val.i_tkval)));
 			  TOKEN_GETMAD((ps[(2) - (2)].val.i_tkval),(yyval.opval),'o');
 			;}

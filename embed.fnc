@@ -568,7 +568,6 @@ Apd	|SV*	|newSVrv	|NN SV *const rv|NULLOK const char *const classname
 Apda	|SV*	|newSVsv	|NULLOK SV *const old
 Apda	|SV*	|newSV_type	|const svtype type
 Apa	|OP*	|newUNOP	|I32 type|OPFLAGS flags|NULLOK OP* first|NULLOK SV* location
-Apa	|OP*	|new_mod_UNOP	|I32 type|OPFLAGS flags|NULLOK OP* first|NULLOK SV* location
 Apa	|OP*	|newWHILEOP	|OPFLAGS flags|I32 debuggable|NULLOK LOOP* loop \
 				|NULLOK SV* location|NULLOK OP* expr|NULLOK OP* block|NULLOK OP* cont \
 				|I32 has_my

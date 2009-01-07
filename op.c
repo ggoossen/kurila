@@ -1738,7 +1738,6 @@ Perl_op_mod_assign(pTHX_ OP *operator)
     OP* padop2;
     OP* copy_to_tmp;
     OP* copy_from_tmp;
-    OP* o;
     I32 min_modcount = 0;
     I32 max_modcount = 0;
     
@@ -2769,17 +2768,6 @@ Perl_newOP(pTHX_ I32 type, OPFLAGS flags, SV* location)
     if (PL_opargs[type] & OA_TARGET)
 	o->op_targ = pad_alloc(type, SVs_PADTMP);
     return CHECKOP(type, o);
-}
-
-OP *
-Perl_new_mod_UNOP(pTHX_ I32 type, OPFLAGS flags, OP *first, SV* location)
-{
-    OP* o;
-    o = newUNOP(type, flags, mod(first, type), location);
-    if (first->op_type == OP_MAGICSV) {
-	o = op_mod_assign(o);
-    }
-    return o;
 }
 
 OP *
@@ -5623,6 +5611,10 @@ Perl_ck_lfun(pTHX_ OP *o)
 
     PERL_ARGS_ASSERT_CK_LFUN;
 
+    if (cBINOPo->op_first
+	&& cBINOPo->op_first->op_type == OP_MAGICSV) {
+	o = op_mod_assign(o);
+    }
     return modkids(ck_fun(o), type);
 }
 

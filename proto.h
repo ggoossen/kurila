@@ -2040,10 +2040,6 @@ PERL_CALLCONV OP*	Perl_newUNOP(pTHX_ I32 type, OPFLAGS flags, OP* first, SV* loc
 			__attribute__malloc__
 			__attribute__warn_unused_result__;
 
-PERL_CALLCONV OP*	Perl_new_mod_UNOP(pTHX_ I32 type, OPFLAGS flags, OP* first, SV* location)
-			__attribute__malloc__
-			__attribute__warn_unused_result__;
-
 PERL_CALLCONV OP*	Perl_newWHILEOP(pTHX_ OPFLAGS flags, I32 debuggable, LOOP* loop, SV* location, OP* expr, OP* block, OP* cont, I32 has_my)
 			__attribute__malloc__
 			__attribute__warn_unused_result__;
