@@ -763,6 +763,8 @@
 #ifdef PERL_CORE
 #define sawparens		Perl_sawparens
 #define scalar			Perl_scalar
+#define scalarboolean		Perl_scalarboolean
+#define modkids			Perl_modkids
 #define scalarkids		Perl_scalarkids
 #define scalarseq		Perl_scalarseq
 #define scalarvoid		Perl_scalarvoid
@@ -1129,8 +1131,6 @@
 #define ck_unpack		Perl_ck_unpack
 #define is_handle_constructor	S_is_handle_constructor
 #define cop_free		S_cop_free
-#define modkids			S_modkids
-#define scalarboolean		S_scalarboolean
 #define newDEFSVOP		S_newDEFSVOP
 #define new_logop		S_new_logop
 #define simplify_sort		S_simplify_sort
@@ -2912,6 +2912,8 @@
 #ifdef PERL_CORE
 #define sawparens(a)		Perl_sawparens(aTHX_ a)
 #define scalar(a)		Perl_scalar(aTHX_ a)
+#define scalarboolean(a)	Perl_scalarboolean(aTHX_ a)
+#define modkids(a,b)		Perl_modkids(aTHX_ a,b)
 #define scalarkids(a)		Perl_scalarkids(aTHX_ a)
 #define scalarseq(a)		Perl_scalarseq(aTHX_ a)
 #define scalarvoid(a)		Perl_scalarvoid(aTHX_ a)
@@ -3271,8 +3273,6 @@
 #define ck_unpack(a)		Perl_ck_unpack(aTHX_ a)
 #define is_handle_constructor	S_is_handle_constructor
 #define cop_free(a)		S_cop_free(aTHX_ a)
-#define modkids(a,b)		S_modkids(aTHX_ a,b)
-#define scalarboolean(a)	S_scalarboolean(aTHX_ a)
 #define newDEFSVOP(a)		S_newDEFSVOP(aTHX_ a)
 #define new_logop(a,b,c,d,e)	S_new_logop(aTHX_ a,b,c,d,e)
 #define simplify_sort(a)	S_simplify_sort(aTHX_ a)

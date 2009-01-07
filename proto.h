@@ -2660,6 +2660,12 @@ PERL_CALLCONV SV*	Perl_save_svref(pTHX_ SV** sptr)
 
 PERL_CALLCONV OP*	Perl_sawparens(pTHX_ OP* o);
 PERL_CALLCONV OP*	Perl_scalar(pTHX_ OP* o);
+PERL_CALLCONV OP*	Perl_scalarboolean(pTHX_ OP *o)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_SCALARBOOLEAN	\
+	assert(o)
+
+PERL_CALLCONV OP*	Perl_modkids(pTHX_ OP *o, I32 type);
 PERL_CALLCONV OP*	Perl_scalarkids(pTHX_ OP* o);
 PERL_CALLCONV OP*	Perl_scalarseq(pTHX_ OP* o);
 PERL_CALLCONV OP*	Perl_scalarvoid(pTHX_ OP* o)
@@ -4104,12 +4110,6 @@ STATIC void	S_cop_free(pTHX_ COP *cop)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_COP_FREE	\
 	assert(cop)
-
-STATIC OP*	S_modkids(pTHX_ OP *o, I32 type);
-STATIC OP*	S_scalarboolean(pTHX_ OP *o)
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_SCALARBOOLEAN	\
-	assert(o)
 
 STATIC OP*	S_newDEFSVOP(pTHX_ SV* location)
 			__attribute__warn_unused_result__;

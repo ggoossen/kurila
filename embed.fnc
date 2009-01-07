@@ -741,6 +741,8 @@ Ap	|void	|save_sptr	|NN SV** sptr
 Ap	|SV*	|save_svref	|NN SV** sptr
 p	|OP*	|sawparens	|NULLOK OP* o
 p	|OP*	|scalar		|NULLOK OP* o
+p	|OP*	|scalarboolean	|NN OP *o
+p	|OP*	|modkids	|NULLOK OP *o|I32 type
 p	|OP*	|scalarkids	|NULLOK OP* o
 p	|OP*	|scalarseq	|NULLOK OP* o
 p	|OP*	|scalarvoid	|NN OP* o
@@ -1129,8 +1131,6 @@ pR	|OP*	|ck_trunc	|NN OP *o
 pR	|OP*	|ck_unpack	|NN OP *o
 sRn	|bool	|is_handle_constructor|NN const OP *o|I32 numargs
 s	|void	|cop_free	|NN COP *cop
-s	|OP*	|modkids	|NULLOK OP *o|I32 type
-s	|OP*	|scalarboolean	|NN OP *o
 sR	|OP*	|newDEFSVOP     |NULLOK SV* location
 sR	|OP*	|new_logop	|I32 type|OPFLAGS flags|NN OP **firstp|NN OP **otherp|NULLOK SV *location
 s	|void	|simplify_sort	|NN OP *o
