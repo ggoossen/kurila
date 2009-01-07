@@ -5611,11 +5611,16 @@ Perl_ck_lfun(pTHX_ OP *o)
 
     PERL_ARGS_ASSERT_CK_LFUN;
 
-    if (cBINOPo->op_first
-	&& cBINOPo->op_first->op_type == OP_MAGICSV) {
-	o = op_mod_assign(o);
+    o = ck_fun(o);
+    if (cBINOPo->op_first) {
+	if (cBINOPo->op_first->op_type == OP_MAGICSV) {
+	    o = op_mod_assign(o);
+	}
+	else {
+	    cBINOPo->op_first = mod(cBINOPo->op_first, type);
+	}
     }
-    return modkids(ck_fun(o), type);
+    return o;
 }
 
 OP *
