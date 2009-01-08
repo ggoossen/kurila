@@ -494,9 +494,9 @@ OP *
 Perl_modkids(pTHX_ OP *o, I32 type)
 {
     if (o && o->op_flags & OPf_KIDS) {
-        OP *kid;
-	for (kid = cLISTOPo->op_first; kid; kid = kid->op_sibling)
-	    mod(kid, type);
+        OP **tokid;
+	for (tokid = &(cLISTOPo->op_first); *tokid; tokid = &((*tokid)->op_sibling))
+	    *tokid = mod(*tokid, type);
     }
     return o;
 }
@@ -516,7 +516,7 @@ OP *
 Perl_mod(pTHX_ OP *o, I32 type)
 {
     dVAR;
-    OP *kid;
+    OP **tokid;
     /* -1 = error on localize, 0 = ignore localize, 1 = ok to localize */
     int localize = -1;
 
@@ -592,8 +592,8 @@ Perl_mod(pTHX_ OP *o, I32 type)
 
     case OP_COND_EXPR:
 	localize = 1;
-	for (kid = cUNOPo->op_first->op_sibling; kid; kid = kid->op_sibling)
-	    mod(kid, type);
+	for (tokid = &(cUNOPo->op_first->op_sibling); *tokid; tokid = &((*tokid)->op_sibling))
+	    *tokid = mod(*tokid, type);
 	break;
 
     case OP_RV2GV:
@@ -628,7 +628,7 @@ Perl_mod(pTHX_ OP *o, I32 type)
 	break;
 
     case OP_EXPAND:
-	mod(cUNOPo->op_first, type);
+	cUNOPo->op_first = mod(cUNOPo->op_first, type);
 	break;
 
     case OP_DOTDOTDOT:
@@ -644,7 +644,8 @@ Perl_mod(pTHX_ OP *o, I32 type)
 
     case OP_MAGICSV:
 	localize = 1;
-	if ( type && type != OP_SASSIGN && type != OP_POSTINC && type != OP_SUBST)
+	if ( type && type != OP_SASSIGN && type != OP_POSTINC && type != OP_SUBST
+            && type != OP_HELEM )
 	    goto nomod;
 	break;
 
@@ -653,15 +654,16 @@ Perl_mod(pTHX_ OP *o, I32 type)
 	break;
 
     case OP_KEYS:
-	if (type != OP_SASSIGN)
-	    goto nomod;
-	if (o->op_flags & OPf_KIDS)
-	    mod(cBINOPo->op_first->op_sibling, type);
+        goto nomod;
 	break;
 
     case OP_AELEM:
     case OP_HELEM:
-	mod(cBINOPo->op_first, type == OP_NULL ? o->op_type : type);
+        o = op_mod_assign(
+            o,
+            &(cBINOPo->op_first),
+            type == OP_NULL ? o->op_type : type
+            );
 	localize = 1;
 	break;
 
@@ -671,7 +673,7 @@ Perl_mod(pTHX_ OP *o, I32 type)
     case OP_LINESEQ:
 	localize = 0;
 	if (o->op_flags & OPf_KIDS)
-	    mod(cLISTOPo->op_last, type);
+	    cLISTOPo->op_last = mod(cLISTOPo->op_last, type);
 	break;
 
     case OP_NULL:
@@ -681,7 +683,7 @@ Perl_mod(pTHX_ OP *o, I32 type)
 	else if (!(o->op_flags & OPf_KIDS))
 	    break;
 	if (o->op_targ != OP_LIST) {
-	    mod(cBINOPo->op_first, type);
+	    cBINOPo->op_first = mod(cBINOPo->op_first, type);
 	    break;
 	}
 	/* FALL THROUGH */
@@ -691,14 +693,14 @@ Perl_mod(pTHX_ OP *o, I32 type)
     case OP_ANONHASH:
     case OP_LIST:
 	localize = 0;
-	for (kid = cLISTOPo->op_first; kid; kid = kid->op_sibling)
-	    mod(kid, type);
+	for (tokid = &(cLISTOPo->op_first); *tokid; tokid = &((*tokid)->op_sibling))
+	    *tokid = mod(*tokid, type);
 	break;
 
     case OP_LISTLAST:
 	localize = 0;
 	if (o->op_flags & OPf_KIDS)
-	    mod(cLISTOPo->op_last, type);
+	    cLISTOPo->op_last = mod(cLISTOPo->op_last, type);
 	break;
 
     case OP_LISTFIRST:

@@ -892,8 +892,12 @@ the operator directly to the C<operand>.
 =cut
 */
 OP *
-Perl_op_mod_assign(pTHX_ OP *operator)
+Perl_op_mod_assign(pTHX_ OP *operator, OP **operandp, I32 type)
 {
+    if ((*operandp)->op_type != OP_MAGICSV) {
+	*operandp = mod(*operandp, type); 
+	return operator;
+    }
     PADOFFSET tmpsv = pad_alloc(OP_SASSIGN, SVs_PADTMP);
     OP* padop;
     OP* padop2;
@@ -902,10 +906,10 @@ Perl_op_mod_assign(pTHX_ OP *operator)
     I32 min_modcount = 0;
     I32 max_modcount = 0;
     
-    OP* operand = cBINOPx(operator)->op_first;
-    OP* operand_sibling = operand->op_sibling;
-    operand->op_sibling = NULL;
-    OP* op_a = op_assign(&operand);
+    OP* operand_sibling = (*operandp)->op_sibling;
+    (*operandp)->op_sibling = NULL;
+    OP* op_a = op_assign(operandp);
+    OP* operand = *operandp;
 
     padop = newOP(OP_PADSV, 0, operand->op_location);
     padop->op_targ = tmpsv;
@@ -919,7 +923,7 @@ Perl_op_mod_assign(pTHX_ OP *operator)
 		operator->op_location
 	    );
     copy_to_tmp->op_sibling = operand_sibling;
-    cBINOPx(operator)->op_first = copy_to_tmp;
+    *operandp = copy_to_tmp;
     
     padop2 = newOP(OP_PADSV, 0, operand->op_location);
     padop2->op_targ = tmpsv;
@@ -933,7 +937,10 @@ Perl_op_mod_assign(pTHX_ OP *operator)
 		operator->op_location
 	    );
     
-    return append_elem(OP_LISTFIRST, scalar(operator), copy_from_tmp);
+    OP* operator_sibling = operator->op_sibling;
+    OP* o = append_elem(OP_LISTFIRST, scalar(operator), copy_from_tmp);
+    o->op_sibling = operator_sibling;
+    return o;
 }
 
 OP *
@@ -981,9 +988,7 @@ Perl_bind_match(pTHX_ I32 type, OP *left, OP *right)
 	    newleft = left;
 	o = prepend_elem(rtype, scalar(newleft), right);
 	if (rtype == OP_SUBST) {
-	    if (left && left->op_type == OP_MAGICSV) {
-		return op_mod_assign(o);
-	    }
+	    return op_mod_assign(o, &(cBINOPo->op_first), OP_SUBST);
 	}
 	if (type == OP_NOT)
 	    return newUNOP(OP_NOT, 0, scalar(o), o->op_location);
@@ -1359,10 +1364,6 @@ Perl_assign(pTHX_ OP *o, bool partial, I32 *min_modcount, I32 *max_modcount)
     case OP_RV2GV:
     case OP_PADSV:
     case OP_MAGICSV:
-    case OP_HELEM:
-    case OP_AELEM:
-    case OP_HSLICE:
-    case OP_ASLICE:
     case OP_PLACEHOLDER:
 	o->op_flags |= OPf_ASSIGN;
 	if (partial)
@@ -1370,7 +1371,20 @@ Perl_assign(pTHX_ OP *o, bool partial, I32 *min_modcount, I32 *max_modcount)
 	(*max_modcount)++;
 	if ( ! (o->op_flags & OPf_OPTIONAL) )
 	    (*min_modcount)++;
-	mod(o, OP_SASSIGN);
+	o = mod(o, OP_SASSIGN);
+	break;
+
+    case OP_HELEM:
+    case OP_AELEM:
+    case OP_HSLICE:
+    case OP_ASLICE:
+	o->op_flags |= OPf_ASSIGN;
+	if (partial)
+	    o->op_flags |= OPf_ASSIGN_PART;
+	(*max_modcount)++;
+	if ( ! (o->op_flags & OPf_OPTIONAL) )
+	    (*min_modcount)++;
+	o = mod(o, o->op_type);
 	break;
 
     case OP_DOTDOTDOT:
@@ -4442,7 +4456,7 @@ Perl_ck_fun(pTHX_ OP *o)
 			"Useless use of %s with no values",
 			PL_op_desc[type]);
 
-		mod(kid, type);
+		*tokid = kid = mod(kid, type);
 #ifdef PERL_MAD
 		addmad(newMADsv('c', newSVpvn("@", 1)), &kid->op_madprop, 0);
 #endif
@@ -4451,7 +4465,7 @@ Perl_ck_fun(pTHX_ OP *o)
 		if (kid->op_type != OP_RV2HV && kid->op_type != OP_PADSV && kid->op_type != OP_ANONHASH
 		    && kid->op_type != OP_RV2SV)
 		    bad_type(numargs, "hash", PL_op_desc[type], kid);
-		mod(kid, type);
+		*tokid = kid = mod(kid, type);
 #ifdef PERL_MAD
 		addmad(newMADsv('c', newSVpvn("%", 1)), &kid->op_madprop, 0);
 #endif
@@ -4549,7 +4563,7 @@ Perl_ck_fun(pTHX_ OP *o)
 				      name = "__ANONIO__";
 				      len = 10;
 				 }
-				 mod(kid, type);
+				 *tokid = kid = mod(kid, type);
 			    }
 			    if (name) {
 				SV *namesv;
@@ -4572,7 +4586,7 @@ Perl_ck_fun(pTHX_ OP *o)
 		scalar(kid);
 		break;
 	    case OA_SCALARREF:
-		mod(scalar(kid), type);
+		*tokid = kid = mod(scalar(kid), type);
 		break;
 	    }
 	    oa >>= 4;
@@ -4688,6 +4702,7 @@ Perl_ck_grep(pTHX_ OP *o)
     dVAR;
     LOGOP *gwop = NULL;
     OP *kid;
+    OP **tokid;
     const OPCODE type = o->op_type == OP_GREPSTART ? OP_GREPWHILE : OP_MAPWHILE;
     PADOFFSET offset;
 
@@ -4744,8 +4759,8 @@ Perl_ck_grep(pTHX_ OP *o)
     kid = cLISTOPo->op_first->op_sibling;
     if (!kid || !kid->op_sibling)
 	return too_few_arguments(o,OP_DESC(o));
-    for (kid = kid->op_sibling; kid; kid = kid->op_sibling)
-	mod(kid, OP_GREPSTART);
+    for (tokid = &kid->op_sibling; *tokid; tokid = &((*tokid)->op_sibling))
+	*tokid = mod(*tokid, OP_GREPSTART);
 
     return (OP*)gwop;
 }
@@ -4773,9 +4788,9 @@ Perl_ck_lfun(pTHX_ OP *o)
     PERL_ARGS_ASSERT_CK_LFUN;
 
     o = ck_fun(o);
-    if (cBINOPo->op_first) {
+    if ((cBINOPo->op_flags & OPf_KIDS) && cBINOPo->op_first) {
 	if (cBINOPo->op_first->op_type == OP_MAGICSV) {
-	    o = op_mod_assign(o);
+	    o = op_mod_assign(o, &(cBINOP->op_first), type);
 	}
 	else {
 	    cBINOPo->op_first = mod(cBINOPo->op_first, type);
@@ -5675,7 +5690,7 @@ Perl_ck_subr(pTHX_ OP *o)
 	}
 	else
 	    list(o2);
-	mod(o2, OP_ENTERSUB);
+	prev->op_sibling = o2 = mod(o2, OP_ENTERSUB);
 	prev = o2;
 	o2 = o2->op_sibling;
     } /* while */

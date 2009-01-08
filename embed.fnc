@@ -746,7 +746,7 @@ p	|OP*	|modkids	|NULLOK OP *o|I32 type
 p	|OP*	|scalarkids	|NULLOK OP* o
 p	|OP*	|scalarseq	|NULLOK OP* o
 p	|OP*	|scalarvoid	|NN OP* o
-p	|OP*	|op_mod_assign	|NN OP* operator
+p	|OP*	|op_mod_assign	|NN OP* operator|NN OP** operandp|I32 type
 Apd	|NV	|scan_bin	|NN const char* start|STRLEN len|NN STRLEN* retlen
 Apd	|NV	|scan_hex	|NN const char* start|STRLEN len|NN STRLEN* retlen
 Ap	|char*	|scan_num	|NN const char* s|NN YYSTYPE *lvalp
