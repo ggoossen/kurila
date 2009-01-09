@@ -236,9 +236,7 @@ PP(pp_magicsv)
     const OPFLAGS op_flags = PL_op->op_flags;
     const char* name = SvPVX_const(cSVOP_sv);
     if (PL_op->op_private & OPpLVAL_INTRO) {
-	SV* sv = sv_2mortal(newSV(0));
-	magic_get(name, sv);
-	Perl_save_set_magicsv(cSVOP_sv, sv);
+	Perl_save_set_magicsv(cSVOP_sv);
     }
     if (op_flags & OPf_ASSIGN) {
 	if (op_flags & OPf_ASSIGN_PART) {

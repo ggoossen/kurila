@@ -2642,11 +2642,10 @@ PERL_CALLCONV void	Perl_save_vptr(pTHX_ void *ptr)
 
 PERL_CALLCONV void	Perl_save_re_context(pTHX);
 PERL_CALLCONV void	Perl_save_padsv_and_mortalize(pTHX_ PADOFFSET off);
-PERL_CALLCONV void	Perl_save_set_magicsv(pTHX_ SV* name, SV* value)
-			__attribute__nonnull__(pTHX_1)
-			__attribute__nonnull__(pTHX_2);
+PERL_CALLCONV void	Perl_save_set_magicsv(pTHX_ SV* name)
+			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_SAVE_SET_MAGICSV	\
-	assert(name); assert(value)
+	assert(name)
 
 PERL_CALLCONV void	Perl_save_sptr(pTHX_ SV** sptr)
 			__attribute__nonnull__(pTHX_1);

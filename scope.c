@@ -469,14 +469,18 @@ Perl_save_padsv_and_mortalize(pTHX_ PADOFFSET off)
 }
 
 void
-Perl_save_set_magicsv(pTHX_ SV* name, SV* value)
+Perl_save_set_magicsv(pTHX_ SV* name)
 {
     dVAR;
     SSCHECK(3);
+    SV* sv = sv_2mortal(newSV(0));
+    PL_localizing = 1;
+    magic_get(SvPVX_const(name), sv);
     SSPUSHPTR(SvREFCNT_inc_simple_NN(name));
-    SSPUSHPTR(SvREFCNT_inc_simple_NN(value));
+    SSPUSHPTR(SvREFCNT_inc_simple_NN(sv));
     SSPUSHINT(SAVEt_SET_MAGICSV);
     magic_set(SvPVX_const(name), sv_2mortal(newSV(0)));
+    PL_localizing = 0;
 }
 
 void
@@ -999,7 +1003,9 @@ Perl_leave_scope(pTHX_ I32 base)
 	case SAVEt_SET_MAGICSV: {
 	    SV *value = sv_2mortal((SV*)SSPOPPTR);
 	    SV *name = sv_2mortal((SV*)SSPOPPTR);
+	    PL_localizing = 2;
 	    magic_set(SvPVX_const(name), value);
+	    PL_localizing = 0;
 	    break;
 	}
 	case SAVEt_SAVESWITCHSTACK:
