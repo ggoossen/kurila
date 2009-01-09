@@ -36,7 +36,7 @@ sub import {
 
     @_ = @( 'please' ) if not nelems @_;
     my %tags;
-     %tags{[_unpack_tags( < @_, $^HINTS{?$class} ) ]} = @();
+    %tags{[_unpack_tags( < @_, $^HINTS{?$class} ) ]} = @();
 
     $^HINTS{+$class} = _pack_tags( < keys %tags );
     return;

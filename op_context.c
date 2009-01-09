@@ -93,10 +93,10 @@ Perl_scalar(pTHX_ OP *o)
     case OP_LISTFIRST:
 	kid = cLISTOPo->op_first;
 	if (kid) {
-	    scalar(kid);
-	    for (kid = kid->op_sibling; kid; kid = kid->op_sibling) {
-		scalarvoid(kid);
-	    }
+            scalar(kid);
+            for (kid = kid->op_sibling; kid; kid = kid->op_sibling) {
+                scalarvoid(kid);
+            }
 	}
 	PL_curcop = &PL_compiling;
 	break;
@@ -644,8 +644,7 @@ Perl_mod(pTHX_ OP *o, I32 type)
 
     case OP_MAGICSV:
 	localize = 1;
-	if ( type && type != OP_SASSIGN && type != OP_POSTINC && type != OP_SUBST
-            && type != OP_HELEM )
+	if ( type && type != OP_SASSIGN && type != OP_SUBST )
 	    goto nomod;
 	break;
 
