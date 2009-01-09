@@ -4038,6 +4038,7 @@ Perl_ck_delete(pTHX_ OP *o)
 	}
 	op_null(kid);
     }
+    o = op_mod_assign(o, &(cBINOPx(cBINOPo->op_first)->op_first), o->op_type);
     return o;
 }
 
@@ -4789,12 +4790,7 @@ Perl_ck_lfun(pTHX_ OP *o)
 
     o = ck_fun(o);
     if ((cBINOPo->op_flags & OPf_KIDS) && cBINOPo->op_first) {
-	if (cBINOPo->op_first->op_type == OP_MAGICSV) {
-	    o = op_mod_assign(o, &(cBINOPo->op_first), type);
-	}
-	else {
-	    cBINOPo->op_first = mod(cBINOPo->op_first, type);
-	}
+	o = op_mod_assign(o, &(cBINOPo->op_first), type);
     }
     return o;
 }
