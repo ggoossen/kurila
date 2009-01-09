@@ -1824,6 +1824,7 @@ Perl_magic_set(pTHX_ const char* name, SV *sv)
 		if ( ! SvHVOK(sv) ) {
 		    Perl_croak(aTHX_ "%s must be a hash not an %s", name, Ddesc(sv));
 		}
+		PL_hints |= HINT_LOCALIZE_HH;
 		hv_sethv(PL_hinthv, SvHv(sv));
 		return;
 	    }
