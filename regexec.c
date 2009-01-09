@@ -2416,7 +2416,6 @@ S_regmatch(pTHX_ regmatch_info *reginfo, regnode *prog)
                                during a successfull match */
     U32 lastopen = 0;       /* last open we saw */
     bool has_cutgroup = RX_HAS_CUTGROUP(rex) ? 1 : 0;   
-    SV* const oreplsv = PL_replsv;
     /* these three flags are set by various ops to signal information to
      * the very next op. They have a useful lifetime of exactly one loop
      * iteration, and are not preserved or restored by state pushes/pops
@@ -3137,9 +3136,6 @@ S_regmatch(pTHX_ regmatch_info *reginfo, regnode *prog)
 		PL_curcop = ocurcop;
 		if (!logical) {
 		    /* /(?{...})/ */
-		    SV* name = sv_2mortal(newSVpvs("^LAST_REGEXP_CODE_RESULT"));
-		    Perl_save_set_magicsv(name);
-		    sv_setsv(PL_replsv, ret);
 		    break;
 		}
 	    }
@@ -4623,15 +4619,6 @@ yes:
     DEBUG_EXECUTE_r(PerlIO_printf(Perl_debug_log, "%sMatch successful!%s\n",
 			  PL_colors[4], PL_colors[5]));
 
-    if (PL_reg_eval_set) {
-	/* each successfully executed (?{...}) block does the equivalent of
-	 *   local $^R = do {...}
-	 * When popping the save stack, all these locals would be undone;
-	 * bypass this by setting the outermost saved $^R to the latest
-	 * value */
-	if (oreplsv != PL_replsv)
-	    sv_setsv(oreplsv, PL_replsv);
-    }
     result = 1;
     goto final_exit;
 

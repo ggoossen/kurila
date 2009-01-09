@@ -432,6 +432,7 @@ ApdR	|bool	|grok_numeric_radix|NN const char **sp|NN const char *send
 Apd	|UV	|grok_oct	|NN const char* start|NN STRLEN* len_p|NN I32* flags|NULLOK NV *result
 dp	|int	|magic_clearhint|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_clearisa	|NN SV* sv|NN MAGIC* mg
+p	|bool	|is_magicsv	|NN const char* name
 p	|void	|magic_get	|NN const char* name|NN SV* sv
 p	|int	|magic_gettaint	|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_getuvar	|NN SV* sv|NN MAGIC* mg

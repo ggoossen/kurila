@@ -1321,17 +1321,17 @@ do {  # Repeat count [SUBEXPR]
    push @codes, < map { m/^[silqjfdp]/i ?? ("$_<", "$_>") !! () } @codes;
 
    my %val;
-    %val{[ @codes]} =  map { m/ [Xx]  (?{ undef })
-			| [AZa] (?{ 'something' })
-			| C     (?{ 214 })
-			| W     (?{ 188 })
-			| c     (?{ 114 })
-			| [Bb]  (?{ '101' })
-			| [Hh]  (?{ 'b8' })
-			| [svnSiIlVNLqQjJ]  (?{ 10111 })
-			| [FfDd]  (?{ 1.36514538e67 })
-			| [pP]  (?{ "try this buffer" })
-			/x; $^LAST_REGEXP_CODE_RESULT } @codes;
+    %val{[ @codes]} =  map { m/ [Xx]  ((?{ undef }))
+			| [AZa] ((?{ 'something' }))
+			| C     ((?{ 214 }))
+			| W     ((?{ 188 }))
+			| c     ((?{ 114 }))
+			| [Bb]  ((?{ '101' }))
+			| [Hh]  ((?{ 'b8' }))
+			| [svnSiIlVNLqQjJ]  ((?{ 10111 }))
+			| [FfDd]  ((?{ 1.36514538e67 }))
+			| [pP]  ((?{ "try this buffer" }))
+			/x; $^LAST_SUBMATCH_RESULT } @codes;
    my @end = @(0x12345678, 0x23456781, 0x35465768, 0x15263748);
    my $end = "N4";
 

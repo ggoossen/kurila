@@ -146,11 +146,9 @@ do {
 
 # Now let's make sure that caret variables are all forced into the main package.
   package Someother;
-  $^LAST_REGEXP_CODE_RESULT = 'Someother';
   $^RE_TRIE_MAXBUF = 'Someother 2';
   $^EMERGENCY_MEMORY = 'Someother 3';
   package main;
-  print "not " unless $^LAST_REGEXP_CODE_RESULT eq 'Someother';
   print "ok 39\n";
   print "not " unless $^RE_TRIE_MAXBUF eq 'Someother 2';
   print "ok 40\n";

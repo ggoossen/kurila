@@ -227,7 +227,6 @@
 #define PL_regmatch_state	(vTHX->Iregmatch_state)
 #define PL_rehash_seed		(vTHX->Irehash_seed)
 #define PL_rehash_seed_set	(vTHX->Irehash_seed_set)
-#define PL_replsv		(vTHX->Ireplsv)
 #define PL_restartop		(vTHX->Irestartop)
 #define PL_rs			(vTHX->Irs)
 #define PL_runops		(vTHX->Irunops)
@@ -509,7 +508,6 @@
 #define PL_Iregmatch_state	PL_regmatch_state
 #define PL_Irehash_seed		PL_rehash_seed
 #define PL_Irehash_seed_set	PL_rehash_seed_set
-#define PL_Ireplsv		PL_replsv
 #define PL_Irestartop		PL_restartop
 #define PL_Irs			PL_rs
 #define PL_Irunops		PL_runops

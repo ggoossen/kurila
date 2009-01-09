@@ -420,6 +420,7 @@
 #ifdef PERL_CORE
 #define magic_clearhint		Perl_magic_clearhint
 #define magic_clearisa		Perl_magic_clearisa
+#define is_magicsv		Perl_is_magicsv
 #define magic_get		Perl_magic_get
 #define magic_gettaint		Perl_magic_gettaint
 #define magic_getuvar		Perl_magic_getuvar
@@ -2572,6 +2573,7 @@
 #ifdef PERL_CORE
 #define magic_clearhint(a,b)	Perl_magic_clearhint(aTHX_ a,b)
 #define magic_clearisa(a,b)	Perl_magic_clearisa(aTHX_ a,b)
+#define is_magicsv(a)		Perl_is_magicsv(aTHX_ a)
 #define magic_get(a,b)		Perl_magic_get(aTHX_ a,b)
 #define magic_gettaint(a,b)	Perl_magic_gettaint(aTHX_ a,b)
 #define magic_getuvar(a,b)	Perl_magic_getuvar(aTHX_ a,b)

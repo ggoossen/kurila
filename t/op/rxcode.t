@@ -6,38 +6,22 @@ BEGIN {
 
 plan tests => 38;
 
-$^LAST_REGEXP_CODE_RESULT = undef;
 like( 'a',  qr/^a(?{1})(?:b(?{2}))?/, 'a =~ ab?' );
-cmp_ok( $^LAST_REGEXP_CODE_RESULT, '==', 1, '..$^R after a =~ ab?' );
 
-$^LAST_REGEXP_CODE_RESULT = undef;
 unlike( 'abc', qr/^a(?{3})(?:b(?{4}))$/, 'abc !~ a(?:b)$' );
-ok( !defined $^LAST_REGEXP_CODE_RESULT, '..$^R after abc !~ a(?:b)$' );
 
-$^LAST_REGEXP_CODE_RESULT = undef;
 like( 'ab', qr/^a(?{5})b(?{6})/, 'ab =~ ab' );
-cmp_ok( $^LAST_REGEXP_CODE_RESULT, '==', 6, '..$^R after ab =~ ab' );
 
-$^LAST_REGEXP_CODE_RESULT = undef;
 like( 'ab', qr/^a(?{7})(?:b(?{8}))?/, 'ab =~ ab?' );
 
-cmp_ok( $^LAST_REGEXP_CODE_RESULT, '==', 8, '..$^R after ab =~ ab?' );
 
-$^LAST_REGEXP_CODE_RESULT = undef;
 like( 'ab', qr/^a(?{9})b?(?{10})/, 'ab =~ ab? (2)' );
-cmp_ok( $^LAST_REGEXP_CODE_RESULT, '==', 10, '..$^R after ab =~ ab? (2)' );
 
-$^LAST_REGEXP_CODE_RESULT = undef;
 like( 'ab', qr/^(a(?{11})(?:b(?{12})))?/, 'ab =~ (ab)? (3)' );
-cmp_ok( $^LAST_REGEXP_CODE_RESULT, '==', 12, '..$^R after ab =~ ab? (3)' );
 
-$^LAST_REGEXP_CODE_RESULT = undef;
 unlike( 'ac', qr/^a(?{13})b(?{14})/, 'ac !~ ab' );
-ok( !defined $^LAST_REGEXP_CODE_RESULT, '..$^R after ac !~ ab' );
 
-$^LAST_REGEXP_CODE_RESULT = undef;
 like( 'ac', qr/^a(?{15})(?:b(?{16}))?/, 'ac =~ ab?' );
-cmp_ok( $^LAST_REGEXP_CODE_RESULT, '==', 15, '..$^R after ac =~ ab?' );
 
 my @ar;
 like( 'ab', qr/^a(?{push @ar,101})(?:b(?{push @ar,102}))?/, 'ab =~ ab? with code push' );

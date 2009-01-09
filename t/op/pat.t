@@ -409,18 +409,6 @@ sub f {
 $x =~ m/.a/g;
 ok(f(pos($x)) == 4);
 
-$x = $^LAST_REGEXP_CODE_RESULT = 67;
-'foot' =~ m/foo(?{$x = 12; 75})[t]/;
-ok($^LAST_REGEXP_CODE_RESULT eq '75');
-
-$x = $^LAST_REGEXP_CODE_RESULT = 67;
-'foot' =~ m/foo(?{$x = 12; 75})[xy]/;
-ok($^LAST_REGEXP_CODE_RESULT eq '67' and $x eq '12');
-
-$x = $^LAST_REGEXP_CODE_RESULT = 67;
-'foot' =~ m/foo(?{ $^LAST_REGEXP_CODE_RESULT + 12 })((?{ $x = 12; $^LAST_REGEXP_CODE_RESULT + 17 })[xy])?/;
-ok( ( $^LAST_REGEXP_CODE_RESULT eq '79' and $x eq '12' ));
-
 ok(qr/\b\v$/i eq '(?iu-xsm:\b\v$)');
 ok(qr/\b\v$/s eq '(?su-xim:\b\v$)');
 ok(qr/\b\v$/m eq '(?mu-xis:\b\v$)');
@@ -2905,49 +2893,6 @@ do {
     s/(?>\s+bar)(?{$count++})//g;
     is($_,$spaces,"SUSPEND final string");
     is($count,1,"Optimiser should have prevented more than one match");
-};
-do {
-    local $Message = "RT#36909 test";
-    $^LAST_REGEXP_CODE_RESULT = 'Nothing';
-    do {
-        local $^LAST_REGEXP_CODE_RESULT = "Bad";
-        ok('x foofoo y' =~ m{
-         (foo) # $^R correctly set
-        (?{ "last regexp code result" })
-        }x);
-        is($^LAST_REGEXP_CODE_RESULT,'last regexp code result');
-    };
-    is($^LAST_REGEXP_CODE_RESULT,'Nothing');
-    do {
-        local $^LAST_REGEXP_CODE_RESULT = "Bad";
-
-        ok('x foofoo y' =~ m{
-         (?:foo|bar)+ # $^R correctly set
-        (?{"last regexp code result"})
-        }x);
-        is($^LAST_REGEXP_CODE_RESULT,'last regexp code result');
-    };
-    is($^LAST_REGEXP_CODE_RESULT,'Nothing');
-
-    do {
-        local $^LAST_REGEXP_CODE_RESULT = "Bad";
-        ok('x foofoo y' =~ m{
-         (foo|bar)\1+ # $^R undefined
-        (?{"last regexp code result"})
-        }x);
-        is($^LAST_REGEXP_CODE_RESULT,'last regexp code result');
-    };
-    is($^LAST_REGEXP_CODE_RESULT,'Nothing');
-
-    do {
-        local $^LAST_REGEXP_CODE_RESULT = "Bad";
-        ok('x foofoo y' =~ m{
-         (foo|bar)\1 # this time without the +
-        (?{"last regexp code result"})
-        }x);
-        is($^LAST_REGEXP_CODE_RESULT,'last regexp code result');
-    };
-    is($^LAST_REGEXP_CODE_RESULT,'Nothing');
 };
 do {
     local $Message="RT 22395";

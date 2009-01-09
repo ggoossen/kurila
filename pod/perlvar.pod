@@ -820,14 +820,6 @@ Debug assertion subroutines enter/exit.
 Some bits may be relevant at compile-time only, some at
 run-time only.  This is a new mechanism and the details may change.
 
-=item $LAST_REGEXP_CODE_RESULT
-
-=item $^R
-X<$^R> X<$LAST_REGEXP_CODE_RESULT>
-
-The result of evaluation of the last successful C<(?{ code })>
-regular expression assertion (see L<perlre>).  May be written to.
-
 =item $EXCEPTIONS_BEING_CAUGHT
 
 =item $^S

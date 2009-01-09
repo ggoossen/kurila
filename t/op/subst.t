@@ -225,35 +225,6 @@ is( $_, "barbarfoobbar" );
 $_ = "ab";
 ok( s/a/b/ == 1 );
 
-$_ = <<'EOL';
-     $url = new URI::URL "http://www/";   die if $url eq "xXx";
-EOL
-$^LAST_REGEXP_CODE_RESULT = 'junk';
-
-$foo = ' $@%#lowercase $@%# lowercase UPPERCASE$@%#UPPERCASE' .
-  ' $@%#lowercase$@%#lowercase$@%# lowercase lowercase $@%#lowercase' .
-  ' lowercase $@%#MiXeD$@%# ';
-
-$snum =
-s{  \d+          \b [,.;]? (?{ 'digits' })
-   |
-    [a-z]+       \b [,.;]? (?{ 'lowercase' })
-   |
-    [A-Z]+       \b [,.;]? (?{ 'UPPERCASE' })
-   |
-    [A-Z] [a-z]+ \b [,.;]? (?{ 'Capitalized' })
-   |
-    [A-Za-z]+    \b [,.;]? (?{ 'MiXeD' })
-   |
-    [A-Za-z0-9]+ \b [,.;]? (?{ 'alphanumeric' })
-   |
-    \s+                    (?{ ' ' })
-   |
-    [^A-Za-z0-9\s]+          (?{ '$@%#' })
-}{$^LAST_REGEXP_CODE_RESULT}xg;
-ok( $_ eq $foo );
-ok( $snum == 31 );
-
 $_ = 'a' x 6;
 $snum = s/a(?{})//g;
 ok( $_ eq '' && $snum == 6 );

@@ -250,9 +250,6 @@ PERLVAR(Iargvgv,	GV *)
 PERLVAR(Iargvoutgv,	GV *)
 PERLVAR(Iargvout_stack,	AV *)
 
-/* shortcuts to regexp stuff */
-PERLVAR(Ireplsv,	SV *)
-
 /* shortcuts to misc objects */
 PERLVAR(Ierrsv,		SV *)
 

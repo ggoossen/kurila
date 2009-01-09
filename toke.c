@@ -5926,6 +5926,9 @@ S_pending_ident(pTHX_ const char* begin_s)
 
     if (PL_tokenbuf[1] == '^'
 	|| ( PL_tokenbuf[1] >= '0' && PL_tokenbuf[1] <= '9' ) ) {
+	if ( ! is_magicsv(&PL_tokenbuf[1]) ) {
+	    Perl_croak(aTHX_ "unknown magical variable %s", PL_tokenbuf);
+	}
 	OP* o = newSVOP(OP_MAGICSV, 0, newSVpvn(PL_tokenbuf+1, tokenbuf_len-1),
 	    S_curlocation(begin_s));
 	pl_yylval.opval = o;

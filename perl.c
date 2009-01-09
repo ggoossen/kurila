@@ -684,7 +684,6 @@ perl_destruct(pTHXx)
     PL_argvoutgv = NULL;
     PL_stdingv = NULL;
     PL_stderrgv = NULL;
-    PL_replsv = NULL;
     PL_DBgv = NULL;
     PL_DBline = NULL;
     PL_DBsub = NULL;
@@ -3128,7 +3127,6 @@ S_init_main_stash(pTHX)
     PL_defgv = gv_fetchpvs("_", GV_ADD|GV_NOTQUAL, SVt_PVAV);
     SvREFCNT_inc_simple_void(PL_defgv);
     PL_errsv = newSV(0);
-    PL_replsv = *hv_fetchs(PL_magicsvhv, "^LAST_REGEXP_CODE_RESULT", 1); /* ^R */
     (void)Perl_form(aTHX_ "%240s","");	/* Preallocate temp - for immediate signals. */
     sv_grow(ERRSV, 240);	/* Preallocate - for immediate signals. */
     sv_setpvn(ERRSV, "", 0);

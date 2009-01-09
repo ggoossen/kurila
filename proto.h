@@ -1471,6 +1471,11 @@ PERL_CALLCONV int	Perl_magic_clearisa(pTHX_ SV* sv, MAGIC* mg)
 #define PERL_ARGS_ASSERT_MAGIC_CLEARISA	\
 	assert(sv); assert(mg)
 
+PERL_CALLCONV bool	Perl_is_magicsv(pTHX_ const char* name)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_IS_MAGICSV	\
+	assert(name)
+
 PERL_CALLCONV void	Perl_magic_get(pTHX_ const char* name, SV* sv)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2);
