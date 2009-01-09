@@ -4038,7 +4038,11 @@ Perl_ck_delete(pTHX_ OP *o)
 	}
 	op_null(kid);
     }
-    o = op_mod_assign(o, &(cBINOPx(cBINOPo->op_first)->op_first), o->op_type);
+    o = op_mod_assign(o,
+	o->op_private & OPpSLICE
+	? &(cBINOPx(cBINOPo->op_first)->op_last)
+	: &(cBINOPx(cBINOPo->op_first)->op_first),
+	o->op_type);
     return o;
 }
 
