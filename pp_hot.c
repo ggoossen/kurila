@@ -256,6 +256,7 @@ PP(pp_magicsv)
     if (gimme != G_VOID) {
 	SV* sv = sv_2mortal(newSV(0));
 	magic_get(name, sv);
+	SvREADONLY_on(sv);
 	XPUSHs(sv);
     }
 
