@@ -91,7 +91,8 @@ Perl_scalar(pTHX_ OP *o)
 	PL_curcop = &PL_compiling;
 	break;
     case OP_LISTFIRST:
-	kid = cLISTOPo->op_first;
+        assert(cLISTOPo->op_first->op_type == OP_PUSHMARK);
+	kid = cLISTOPo->op_first->op_sibling;
 	if (kid) {
             scalar(kid);
             for (kid = kid->op_sibling; kid; kid = kid->op_sibling) {
