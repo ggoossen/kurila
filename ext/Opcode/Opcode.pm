@@ -321,7 +321,7 @@ invert_opset function.
 
     match split qr
 
-    list listlast lslice splice push pop shift unshift reverse
+    list listlast listfirst lslice splice push pop shift unshift reverse
     arrayexpand enter_arrayexpand_assign enter_hashexpand_assign
     hashexpand expand nelems
 
@@ -386,7 +386,7 @@ These are a hotchpotch of opcodes still waiting to be considered
 
     gvsv gv gelem
 
-    padsv padany
+    padsv magicsv
 
     rv2gv srefgen ref
 
