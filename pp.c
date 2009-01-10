@@ -644,7 +644,7 @@ PP(pp_study)
 
 /* Lvalue operators. */
 
-PP(pp_schop)
+PP(pp_chop)
 {
     dVAR; dSP; dTARGET;
     do_arg_check(SP-1);
@@ -653,34 +653,11 @@ PP(pp_schop)
     RETURN;
 }
 
-PP(pp_chop)
-{
-    dVAR; dSP; dMARK; dTARGET; dORIGMARK;
-    do_arg_check(MARK+1);
-    while (MARK < SP)
-	do_chop(TARG, *++MARK);
-    SP = ORIGMARK;
-    XPUSHTARG;
-    RETURN;
-}
-
-PP(pp_schomp)
+PP(pp_chomp)
 {
     dVAR; dSP; dTARGET;
     do_arg_check(SP-1);
     SETi(do_chomp(TOPs));
-    RETURN;
-}
-
-PP(pp_chomp)
-{
-    dVAR; dSP; dMARK; dTARGET;
-    register I32 count = 0;
-    do_arg_check(MARK+1);
-
-    while (SP > MARK)
-	count += do_chomp(POPs);
-    XPUSHi(count);
     RETURN;
 }
 

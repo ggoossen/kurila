@@ -9071,7 +9071,6 @@ S_find_uninit_var(pTHX_ OP* obase, SV* uninit_sv, bool match)
 	if ( !(obase->op_flags & OPf_MOD))
 	    break;
 
-    case OP_SCHOMP:
     case OP_CHOMP:
 	if (SvROK(PL_rs) && uninit_sv == SvRV(PL_rs))
 	    return newSVpvs_flags("${$/}", SVs_TEMP);

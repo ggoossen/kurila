@@ -70,9 +70,7 @@ EXTCONST char* const PL_op_name[] = {
 	"dotdotdot",
 	"placeholder",
 	"chop",
-	"schop",
 	"chomp",
-	"schomp",
 	"defined",
 	"undef",
 	"study",
@@ -430,9 +428,7 @@ EXTCONST char* const PL_op_desc[] = {
 	"dotdotdot (...)",
 	"placeholder (_)",
 	"chop",
-	"scalar chop",
 	"chomp",
-	"scalar chomp",
 	"defined operator",
 	"undef operator",
 	"study",
@@ -802,9 +798,7 @@ EXT Perl_ppaddr_t PL_ppaddr[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_pp_dotdotdot),
 	MEMBER_TO_FPTR(Perl_pp_placeholder),
 	MEMBER_TO_FPTR(Perl_pp_chop),
-	MEMBER_TO_FPTR(Perl_pp_schop),
 	MEMBER_TO_FPTR(Perl_pp_chomp),
-	MEMBER_TO_FPTR(Perl_pp_schomp),
 	MEMBER_TO_FPTR(Perl_pp_defined),
 	MEMBER_TO_FPTR(Perl_pp_undef),
 	MEMBER_TO_FPTR(Perl_pp_study),
@@ -1170,10 +1164,8 @@ EXT Perl_check_t PL_check[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_ck_sassign),	/* sassign */
 	MEMBER_TO_FPTR(Perl_ck_dotdotdot),	/* dotdotdot */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* placeholder */
-	MEMBER_TO_FPTR(Perl_ck_spair),	/* chop */
-	MEMBER_TO_FPTR(Perl_ck_null),	/* schop */
-	MEMBER_TO_FPTR(Perl_ck_spair),	/* chomp */
-	MEMBER_TO_FPTR(Perl_ck_null),	/* schomp */
+	MEMBER_TO_FPTR(Perl_ck_lfun),	/* chop */
+	MEMBER_TO_FPTR(Perl_ck_lfun),	/* chomp */
 	MEMBER_TO_FPTR(Perl_ck_defined),	/* defined */
 	MEMBER_TO_FPTR(Perl_ck_lfun),	/* undef */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* study */
@@ -1533,10 +1525,8 @@ EXTCONST U32 PL_opargs[] = {
 	0x00000004,	/* sassign */
 	0x00000000,	/* dotdotdot */
 	0x00000000,	/* placeholder */
-	0x0000560d,	/* chop */
-	0x0001368c,	/* schop */
-	0x0000570d,	/* chomp */
-	0x0001378c,	/* schomp */
+	0x0001368c,	/* chop */
+	0x0001378c,	/* chomp */
 	0x00013694,	/* defined */
 	0x00013604,	/* undef */
 	0x00013684,	/* study */

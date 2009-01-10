@@ -658,10 +658,8 @@ sassign		assignment	ck_sassign	s0
 dotdotdot		dotdotdot (...)	ck_dotdotdot	0
 placeholder		placeholder (_)	ck_null	0
 
-chop		chop			ck_spair	mts%	L
-schop		scalar chop		ck_null		stu%	S?
-chomp		chomp			ck_spair	mTs%	L
-schomp		scalar chomp		ck_null		sTu%	S?
+chop		chop		ck_lfun		stu%	S?
+chomp		chomp		ck_lfun		sTu%	S?
 defined		defined operator	ck_defined	isu%	S?
 undef		undef operator		ck_lfun		s%	S?
 study		study			ck_fun		su%	S?

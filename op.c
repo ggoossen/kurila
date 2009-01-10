@@ -3982,37 +3982,6 @@ Perl_ck_concat(pTHX_ OP *o)
 }
 
 OP *
-Perl_ck_spair(pTHX_ OP *o)
-{
-    dVAR;
-
-    PERL_ARGS_ASSERT_CK_SPAIR;
-
-    if (o->op_flags & OPf_KIDS) {
-	OP* newop;
-	OP* kid;
-	const OPCODE type = o->op_type;
-	o = modkids(ck_fun(o), type);
-	kid = cUNOPo->op_first;
-	newop = kUNOP->op_first->op_sibling;
-	if (newop) {
-	    const OPCODE type = newop->op_type;
-	    if (newop->op_sibling || !(PL_opargs[type] & OA_RETSCALAR) ||
-		    type == OP_RV2AV || type == OP_RV2HV)
-		return o;
-	}
-#ifdef PERL_MAD
-	op_getmad(kUNOP->op_first,newop,'K');
-#else
-	op_free(kUNOP->op_first);
-#endif
-	kUNOP->op_first = newop;
-    }
-    o->op_ppaddr = PL_ppaddr[++o->op_type];
-    return ck_fun(o);
-}
-
-OP *
 Perl_ck_delete(pTHX_ OP *o)
 {
     PERL_ARGS_ASSERT_CK_DELETE;
