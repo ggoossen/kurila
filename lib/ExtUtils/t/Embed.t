@@ -1,13 +1,5 @@
 #!/usr/bin/perl
 
-BEGIN {
-    if( env::var('PERL_CORE') ) {
-        chdir 't' if -d 't';
-        @INC = @( '../lib' );
-    }
-}
-chdir 't';
-
 use Config;
 use ExtUtils::Embed;
 use File::Spec;
