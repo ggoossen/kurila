@@ -4,7 +4,7 @@ BEGIN {
     require './test.pl';
 }
 
-plan tests => 57;
+plan tests => 56;
 
 our (@foo, $foo, $c, @bar, $got, %chop, %chomp, $x, $y);
 
@@ -24,10 +24,6 @@ sub foo {
 @bar = @foo;
 chop(@bar);
 is (join('', @bar), 'hi there!');
-
-$foo = "\n";
-chop($foo, @foo);
-is (join('', @($foo,< @foo)), 'hi there!');
 
 $_ = "foo\n\n";
 $got = chomp();
