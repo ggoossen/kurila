@@ -908,7 +908,7 @@ Perl_op_mod_assign(pTHX_ OP *operator, OP **operandp, I32 type)
     
     OP* operand_sibling = (*operandp)->op_sibling;
     (*operandp)->op_sibling = NULL;
-    OP* op_a = op_assign(operandp);
+    OP* op_a = op_assign(*operandp);
     OP* operand = *operandp;
 
     padop = newOP(OP_PADSV, OPf_MOD, operand->op_location);
@@ -1339,17 +1339,15 @@ can be assigned to.
 =cut
 */
 OP *
-Perl_op_assign(pTHX_ OP **po)
+Perl_op_assign(pTHX_ OP* o)
 {
-    switch ((*po)->op_type) {
+    switch (o->op_type) {
     case OP_MAGICSV: {
 	I32 min_modcount = 0;
 	I32 max_modcount = 0;
-	OP* o = newSVOP(OP_MAGICSV, 0, cSVOPx_sv(*po),
-	    newSVsv((*po)->op_location));
-	o = assign(o, FALSE, &min_modcount, &max_modcount);
-
-	return o;
+	OP* newo = newSVOP(OP_MAGICSV, 0, cSVOPx_sv(o), newSVsv(o->op_location));
+	newo = assign(newo, FALSE, &min_modcount, &max_modcount);
+	return newo;
     }
     }
     return NULL;
@@ -2548,7 +2546,7 @@ Perl_newASSIGNOP(pTHX_ OPFLAGS flags, OP *left, I32 optype, OP *right, SV *locat
     if (optype) {
 	bool is_logassign = (optype == OP_ANDASSIGN || optype == OP_ORASSIGN || optype == OP_DORASSIGN);
 	if (is_logassign) {
-	    OP* left_assign = op_assign(&left);
+	    OP* left_assign = op_assign(left);
 	    if (left_assign) {
 		OP* new_right =
 		    newBINOP(OP_SASSIGN,

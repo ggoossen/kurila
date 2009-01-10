@@ -1837,7 +1837,6 @@
 #define ck_select		Perl_ck_select
 #define ck_shift		Perl_ck_shift
 #define ck_sort			Perl_ck_sort
-#define ck_spair		Perl_ck_spair
 #define ck_split		Perl_ck_split
 #define ck_subr			Perl_ck_subr
 #define ck_substr		Perl_ck_substr
@@ -2116,8 +2115,6 @@
 #define pp_rv2sv		Perl_pp_rv2sv
 #define pp_sassign		Perl_pp_sassign
 #define pp_scalar		Perl_pp_scalar
-#define pp_schomp		Perl_pp_schomp
-#define pp_schop		Perl_pp_schop
 #define pp_scmp			Perl_pp_scmp
 #define pp_scope		Perl_pp_scope
 #define pp_seek			Perl_pp_seek
@@ -3995,7 +3992,6 @@
 #define ck_select(a)		Perl_ck_select(aTHX_ a)
 #define ck_shift(a)		Perl_ck_shift(aTHX_ a)
 #define ck_sort(a)		Perl_ck_sort(aTHX_ a)
-#define ck_spair(a)		Perl_ck_spair(aTHX_ a)
 #define ck_split(a)		Perl_ck_split(aTHX_ a)
 #define ck_subr(a)		Perl_ck_subr(aTHX_ a)
 #define ck_substr(a)		Perl_ck_substr(aTHX_ a)
@@ -4274,8 +4270,6 @@
 #define pp_rv2sv()		Perl_pp_rv2sv(aTHX)
 #define pp_sassign()		Perl_pp_sassign(aTHX)
 #define pp_scalar()		Perl_pp_scalar(aTHX)
-#define pp_schomp()		Perl_pp_schomp(aTHX)
-#define pp_schop()		Perl_pp_schop(aTHX)
 #define pp_scmp()		Perl_pp_scmp(aTHX)
 #define pp_scope()		Perl_pp_scope(aTHX)
 #define pp_seek()		Perl_pp_seek(aTHX)
