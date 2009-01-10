@@ -805,6 +805,9 @@ subscripted:    star '{' expr ';' '}' ';'       /* *main::{something} like *STDO
                             $$ = newBINOP(OP_HELEM, 0, $1, scalar($3),
                                 LOCATION($2));
                             $$->op_private = IVAL($2);
+                            if ($$->op_private & OPpELEM_ADD) {
+                                $$ = op_mod_assign($$, &(cBINOPx($$)->op_first), OP_HELEM);
+                            }
 			    PL_parser->expect = XOPERATOR;
                             TOKEN_GETMAD($2,$$,'{');
                             TOKEN_GETMAD($4,$$,';');

@@ -274,6 +274,10 @@ C<SV*>.
 #define HvREHASH_on(hv)		(SvFLAGS(hv) |= SVphv_REHASH)
 #define HvREHASH_off(hv)	(SvFLAGS(hv) &= ~SVphv_REHASH)
 
+#define HvRESTRICTED(hv)		(SvFLAGS(hv) & SVphv_RESTRICTED)
+#define HvRESTRICTED_on(hv)	(SvFLAGS(hv) |= SVphv_SVphv_RESTRICTED)
+#define HvRESTRICTED_off(hv)	(SvFLAGS(hv) &= ~SVphv_SVphv_RESTRICTED)
+
 #ifndef PERL_CORE
 #  define Nullhe Null(HE*)
 #endif

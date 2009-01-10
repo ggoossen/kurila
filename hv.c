@@ -504,7 +504,7 @@ Perl_hv_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
 	return entry;
     }
 
-    if (!entry && SvREADONLY(hv) && !(action & HV_FETCH_ISEXISTS)) {
+    if (!entry && HvRESTRICTED(hv) && !(action & HV_FETCH_ISEXISTS)) {
 	hv_notallowed(flags, key, klen,
 			"Attempt to access disallowed key '%"SVf"' in"
 			" a restricted hash");
@@ -732,7 +732,11 @@ S_hv_delete_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
 		Safefree(key);
 	    return NULL;
 	}
-	if (SvREADONLY(hv) && HeVAL(entry) && SvREADONLY(HeVAL(entry))) {
+	if (SvREADONLY(hv)) {
+	    hv_notallowed(k_flags, key, klen,
+			    "Attempt to delete key '%"SVf"' from a read-only hash");
+	}
+	if (HvRESTRICTED(hv) && HeVAL(entry) && SvREADONLY(HeVAL(entry))) {
 	    hv_notallowed(k_flags, key, klen,
 			    "Attempt to delete readonly key '%"SVf"' from"
 			    " a restricted hash");
@@ -753,7 +757,7 @@ S_hv_delete_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
 	 * we can still access via not-really-existing key without raising
 	 * an error.
 	 */
-	if (SvREADONLY(hv)) {
+	if (HvRESTRICTED(hv)) {
 	    SvREFCNT_dec(HeVAL(entry));
 	    HeVAL(entry) = &PL_sv_placeholder;
 	    /* We'll be saving this slot, so the number of allocated keys
@@ -772,7 +776,7 @@ S_hv_delete_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
 	}
 	return sv;
     }
-    if (SvREADONLY(hv)) {
+    if (HvRESTRICTED(hv)) {
 	hv_notallowed(k_flags, key, klen,
 			"Attempt to delete disallowed key '%"SVf"' from"
 			" a restricted hash");
@@ -802,7 +806,7 @@ S_hsplit(pTHX_ HV *hv)
     /*PerlIO_printf(PerlIO_stderr(), "hsplit called for %p which had %d\n",
       (void*)hv, (int) oldsize);*/
 
-    if (HvPLACEHOLDERS_get(hv) && !SvREADONLY(hv)) {
+    if (HvPLACEHOLDERS_get(hv) && !HvRESTRICTED(hv)) {
       /* Can make this clear any placeholders first for non-restricted hashes,
 	 even though Storable rebuilds restricted hashes by putting in all the
 	 placeholders (first) before turning on the readonly flag, because
@@ -1300,7 +1304,7 @@ Perl_hv_clear(pTHX_ HV *hv)
 
     xhv = (XPVHV*)SvANY(hv);
 
-    if (SvREADONLY(hv) && HvARRAY(hv) != NULL) {
+    if (HvRESTRICTED(hv) && HvARRAY(hv) != NULL) {
 	/* restricted hash: convert all keys to placeholders */
 	STRLEN i;
 	for (i = 0; i <= xhv->xhv_max; i++) {
@@ -1308,7 +1312,7 @@ Perl_hv_clear(pTHX_ HV *hv)
 	    for (; entry; entry = HeNEXT(entry)) {
 		/* not already placeholder */
 		if (HeVAL(entry) != &PL_sv_placeholder) {
-		    if (HeVAL(entry) && SvREADONLY(HeVAL(entry))) {
+		    if (HeVAL(entry) && HvRESTRICTED(HeVAL(entry))) {
 			SV* const keysv = hv_iterkeysv(entry);
 			Perl_croak(aTHX_
 				   "Attempt to delete readonly key '%"SVf"' from a restricted hash",

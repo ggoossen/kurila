@@ -1359,6 +1359,13 @@ Perl_assign(pTHX_ OP *o, bool partial, I32 *min_modcount, I32 *max_modcount)
     case OP_STUB:
 	break;
 #endif /* PERL_MAD */
+
+    case OP_LISTFIRST:
+	assert(cBINOPo->op_first->op_sibling);
+	cBINOPo->op_first->op_sibling
+	    = assign(cBINOPo->op_first->op_sibling, partial, min_modcount, max_modcount);
+	break;
+
     case OP_RV2SV:
     case OP_RV2AV:
     case OP_RV2HV:

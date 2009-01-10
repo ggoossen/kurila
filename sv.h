@@ -357,8 +357,6 @@ perform the upgrade if necessary.  See C<svtype>.
 
 #define PRIVSHIFT 4	/* (SVp_?OK >> PRIVSHIFT) == SVf_?OK */
 
-#define SVf_NOTUSED	0x10000000  /* has magical overloaded methods */
-
 /* Some private flags. */
 
 /* PVAV could probably use 0x2000000 without conflict. I assume that PVFM can
@@ -366,6 +364,7 @@ perform the upgrade if necessary.  See C<svtype>.
    been restructured, so sometimes get used as string buffers.  */
 
 /* PVHV */
+#define SVphv_RESTRICTED	0x10000000  /* PVHV is restricted */
 #define SVphv_SHAREKEYS 0x20000000  /* PVHV keys live on shared string table */
 /* PVNV, PVMG, presumably only inside pads */
 #define SVpad_NAME	0x40000000  /* This SV is a name in the PAD, so
