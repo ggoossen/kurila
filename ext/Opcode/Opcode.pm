@@ -317,7 +317,7 @@ invert_opset function.
 
     substr vec stringify study pos length index rindex ord chr
 
-    ucfirst lcfirst uc lc quotemeta chop schop chomp schomp
+    ucfirst lcfirst uc lc quotemeta chop chomp
 
     match split qr
 
