@@ -4,7 +4,7 @@ BEGIN {
     require './test.pl';
 }
 
-plan tests => 38;
+plan tests => 27;
 
 like( 'a',  qr/^a(?{1})(?:b(?{2}))?/, 'a =~ ab?' );
 
@@ -29,9 +29,7 @@ cmp_ok( scalar(nelems @ar), '==', 2, '..@ar pushed' );
 cmp_ok( @ar[0], '==', 101, '..first element pushed' );
 cmp_ok( @ar[1], '==', 102, '..second element pushed' );
 
-$^LAST_REGEXP_CODE_RESULT = undef;
 unlike( 'a', qr/^a(?{103})b(?{104})/, 'a !~ ab with code push' );
-ok( !defined $^LAST_REGEXP_CODE_RESULT, '..$^R after a !~ ab with code push' );
 
 @ar = @( () );
 unlike( 'a', qr/^a(?{push @ar,105})b(?{push @ar,106})/, 'a !~ ab (push)' );
@@ -56,13 +54,5 @@ cmp_ok( scalar(nelems @var), '==', 0, '..nothing pushed (package)' );
 unlike( 'abc', qr/^a(?{push @var,113})b(?{push @var,114})$/, 'abc !~ ab$ (push package var)' );
 cmp_ok( scalar(nelems @var), '==', 0, '..still nothing pushed (package)' );
 
-do {
-    local $^LAST_REGEXP_CODE_RESULT = undef;
-    ok( 'ac' =~ m/^a(?{30})(?:b(?{31})|c(?{32}))?/, 'ac =~ a(?:b|c)?' );
-    ok( $^LAST_REGEXP_CODE_RESULT == 32, '$^R == 32' );
-};
-do {
-    local $^LAST_REGEXP_CODE_RESULT = undef;
-    ok( 'abbb' =~ m/^a(?{36})(?:b(?{37})|c(?{38}))+/, 'abbbb =~ a(?:b|c)+' );
-    ok( $^LAST_REGEXP_CODE_RESULT == 37, '$^R == 37' ) or print "# \$^R=$^LAST_REGEXP_CODE_RESULT\n";
-};
+ok( 'ac' =~ m/^a(?{30})(?:b(?{31})|c(?{32}))?/, 'ac =~ a(?:b|c)?' );
+ok( 'abbb' =~ m/^a(?{36})(?:b(?{37})|c(?{38}))+/, 'abbbb =~ a(?:b|c)+' );

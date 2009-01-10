@@ -879,7 +879,7 @@ ok( $^TAINT == 1, '$^TAINT is on' );
 
 try { $^TAINT = 0 };
 ok( $^TAINT,  '$^TAINT is not assignable' );
-ok( $^EVAL_ERROR->{?description} =~ m/^Modification of a read-only value attempted/,
+like( $^EVAL_ERROR->{?description}, qr/^Modification of the read-only magic variable \$\^TAINT attempted/,
     'Assigning to $^TAINT fails' );
 
 do {

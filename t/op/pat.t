@@ -43,7 +43,7 @@ BEGIN {
   require "./test.pl";
 }
 
-plan 1653;
+plan 1638;
 
 our ($x, %XXX, @XXX, $foo, @x, $null, @words);
 our ($TODO);

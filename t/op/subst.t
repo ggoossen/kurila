@@ -6,7 +6,7 @@ BEGIN {
 
 
 require './test.pl';
-plan( tests => 119 );
+plan( tests => 115 );
 
 our ($x, $snum, $foo, $t, $r, $s);
 
@@ -470,14 +470,4 @@ do { # [perl #27940] perlbug: [\x00-\x1f] works, [\c@-\c_] does not
 
     ($c = "\x20\x00\x30\x01\x40\x1A\x50\x1F\x60") =~ s/[\x00-\x1f]//g;
     is($c, "\x20\x30\x40\x50\x60", "s/[\\x00-\\x1f]//g");
-};
-do {
-    $_ = "xy";
-    no warnings 'uninitialized';
-    m/(((((((((x)))))))))(z)/;	# clear $10
-    s/(((((((((x)))))))))(y)/${*{Symbol::fetch_glob(10)}}/;
-    is($_,"y","RT#6006: \$_ eq '$_'");
-    $_ = "xr";
-    s/(((((((((x)))))))))(r)/fooba${*{Symbol::fetch_glob(10)}}/;
-    is($_,"foobar","RT#6006: \$_ eq '$_'");
 };

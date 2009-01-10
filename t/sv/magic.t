@@ -12,7 +12,7 @@ BEGIN {
 use warnings;
 use Config;
 
-plan tests => 34;
+plan tests => 33;
 
 
 my $Is_MSWin32  = $^OS_NAME eq 'MSWin32';

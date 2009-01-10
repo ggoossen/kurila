@@ -492,15 +492,16 @@ sub segment ($\@\%$\%) {
 	my $bullet  = join("|", map quotemeta, @{$opts->{bullet}}) || qr/(?!)/;
 	use re 'eval';
 	my @format;
-	while ($format =~ m/\G ((?>(?:\\.|(?!$userdef|$bullet|\{).)*))
-														 (?{litval($^LAST_SUBMATCH_RESULT)})
-						  (?: ($userdef)                 (?{fldvals($^LAST_SUBMATCH_RESULT,$^LAST_REGEXP_CODE_RESULT)})
-						    | ($bullet)                  (?{fldvals($^LAST_SUBMATCH_RESULT,-1)})
-						    | ($nestedbraces)			 (?{fldvals($^LAST_SUBMATCH_RESULT,undef)})
-						  )
-					  /gcsx) {
-            push @format, litval(), < fldvals();
-	}
+        die "FIXME - $format";
+# 	while ($format =~ m/\G ((?>(?:\\.|(?!$userdef|$bullet|\{).)*))
+#                             (?{litval($^LAST_SUBMATCH_RESULT)})
+#                             (?: ($userdef)                 (?{fldvals($^LAST_SUBMATCH_RESULT,$^LAST_REGEXP_CODE_RESULT)})
+#                             | ($bullet)                  (?{fldvals($^LAST_SUBMATCH_RESULT,-1)})
+#                             | ($nestedbraces)			 (?{fldvals($^LAST_SUBMATCH_RESULT,undef)})
+#                             )
+#                            /gcsx) {
+#             push @format, litval(), < fldvals();
+# 	}
 	push @format, substr ($format, pos($format)||0);
 	my $args_req = int((nelems @format)/3);
 	my (@formatters,@starred,@vstarred);

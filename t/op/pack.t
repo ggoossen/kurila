@@ -1321,17 +1321,21 @@ do {  # Repeat count [SUBEXPR]
    push @codes, < map { m/^[silqjfdp]/i ?? ("$_<", "$_>") !! () } @codes;
 
    my %val;
-    %val{[ @codes]} =  map { m/ [Xx]  ((?{ undef }))
-			| [AZa] ((?{ 'something' }))
-			| C     ((?{ 214 }))
-			| W     ((?{ 188 }))
-			| c     ((?{ 114 }))
-			| [Bb]  ((?{ '101' }))
-			| [Hh]  ((?{ 'b8' }))
-			| [svnSiIlVNLqQjJ]  ((?{ 10111 }))
-			| [FfDd]  ((?{ 1.36514538e67 }))
-			| [pP]  ((?{ "try this buffer" }))
-			/x; $^LAST_SUBMATCH_RESULT } @codes;
+   %val{[ @codes]} =  map { 
+                            my %( 1 => $v, ...) =
+                              %( $( m/ [Xx] /x )=> undef,
+                                 $( m/ [AZa] /x )=> 'something',
+                                 $( m/ C     /x )=> 214,
+                                 $( m/ W     /x )=> 188,
+                                 $( m/ c     /x )=> 114,
+                                 $( m/ [Bb]  /x )=> '101',
+                                 $( m/ [Hh]  /x )=> 'b8',
+                                 $( m/ [svnSiIlVNLqQjJ]  /x )=> 10111,
+                                 $( m/ [FfDd]  /x )=> 1.36514538e67,
+                                 $( m/ [pP]  /x )=> "try this buffer",
+                             );
+                            $v;
+			 } @codes;
    my @end = @(0x12345678, 0x23456781, 0x35465768, 0x15263748);
    my $end = "N4";
 
@@ -1360,7 +1364,7 @@ do {  # Repeat count [SUBEXPR]
 	     my $half = int( (length $p)/2 );
 	     for my $move (@('', "X$half", "X!$half", 'x1', 'x!8', "x$half")) {
 	       my $junk = "$junk1 $move";
-	       # print "# junk='$junk', list=(@list2)\n";
+	       print "# junk='$junk', end='$end' list=($(join ', ', @list2))\n";
 	       $p = pack "$junk $end", < @list2, < @end;
 	       my @l = @( unpack "x[$junk] $end", $p );
 	       is(scalar nelems @l, scalar nelems @end);

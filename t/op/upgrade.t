@@ -19,12 +19,14 @@ my %types = %(
     pv => "Perl rules",
     pviv => 3,
     pvnv => 1==1,
-    pvmg => $^,
 );
 
 # This is somewhat cheating but I can't think of anything built in that I can
 # copy that already has type PVIV
 %types{+pviv} = "Perl rules!";
+
+%types{+pvmg} = "Perl rules!!";
+study(%types{pvmg});
 
 # use Devel::Peek; Dump $pvmg;
 

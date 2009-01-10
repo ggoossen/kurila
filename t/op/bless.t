@@ -4,7 +4,7 @@ BEGIN {
     require './test.pl';
 }
 
-plan (91);
+plan (90);
 
 our ($a1, $b1, $c1, $d1, $e1, $f1, $g1, @w);
 
@@ -74,18 +74,6 @@ do {
     $^OS_ERROR = 2;	# attempt to avoid cached string
     $^OS_ERROR = 1;
     expected(bless(\%(), $^OS_ERROR), $string, "HASH");
-
-# ref is ref to magic
-    do {
-	do {
-	    package F;
-	    sub test { main::is(${@_[0]}, $string) }
-	};
-	$^OS_ERROR = 2;
-	$f1 = bless \$^OS_ERROR, "F";
-	$^OS_ERROR = 1;
-	$f1->test;
-    };
 };
 
 # ref is magic
