@@ -989,7 +989,7 @@ Perl_bind_match(pTHX_ I32 type, OP *left, OP *right)
 	    newleft = left;
 	o = prepend_elem(rtype, scalar(newleft), right);
 	if (rtype == OP_SUBST) {
-	    return op_mod_assign(o, &(cBINOPo->op_first), OP_SUBST);
+	    o = op_mod_assign(o, &(cBINOPo->op_first), OP_SUBST);
 	}
 	if (type == OP_NOT)
 	    return newUNOP(OP_NOT, 0, scalar(o), o->op_location);

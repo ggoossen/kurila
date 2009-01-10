@@ -6,7 +6,7 @@ BEGIN {
 
 
 require './test.pl';
-plan( tests => 115 );
+plan( tests => 117 );
 
 our ($x, $snum, $foo, $t, $r, $s);
 
@@ -36,6 +36,10 @@ ok( ($a =~ s/a/x/g) == 4 && $a eq 'xbxcxdx' );
 ok( ($a =~ s/a/y/g) == 0 && $a eq 'xbxcxdx' );
 
 ok( ($a =~ s/b/y/g) == 1 && $a eq 'xyxcxdx' );
+
+ok( ($a !~ s/c/z/g) eq '' && $a eq 'xyxzxdx' );
+
+ok( ($a !~ s/c/z/g) eq '1' && $a eq 'xyxzxdx' );
 
 $_ = 'ABACADA';
 ok( m/a/i && s///gi && $_ eq 'BCD' );
