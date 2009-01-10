@@ -4160,6 +4160,7 @@ STATIC void
 S_init_postdump_symbols(pTHX_ register int argc, register char **argv, register char **env)
 {
     dVAR;
+    SV** tmpsv;
 
     PERL_ARGS_ASSERT_INIT_POSTDUMP_SYMBOLS;
 
@@ -4167,13 +4168,13 @@ S_init_postdump_symbols(pTHX_ register int argc, register char **argv, register 
 
     init_argv_symbols(argc,argv);
 
+    tmpsv = hv_fetchs(PL_magicsvhv, "^PROGRAM_NAME", 1); /* access PL_magicsv_hv directly without going through magic */
+
 #ifdef MACOS_TRADITIONAL
     /* $0 is not majick on a Mac */
-    magic_set("^PROGRAM_NAME",
-	sv_2mortal(newSVpv(MacPerl_MPWFileName(PL_origfilename), 0)));
+    sv_setpv(*tmpsv, MacPerl_MPWFileName(PL_origfilename));
 #else
-    magic_set("^PROGRAM_NAME",
-	sv_2mortal(newSVpv(PL_origfilename, 0)));
+    sv_setpv(*tmpsv, PL_origfilename);
 #endif
     if ((PL_envhv = newHV())) {
 	HV *hv = PL_envhv;
