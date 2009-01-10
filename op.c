@@ -911,7 +911,8 @@ Perl_op_mod_assign(pTHX_ OP *operator, OP **operandp, I32 type)
     OP* op_a = op_assign(operandp);
     OP* operand = *operandp;
 
-    padop = newOP(OP_PADSV, 0, operand->op_location);
+    padop = newOP(OP_PADSV, OPf_MOD, operand->op_location);
+    padop->op_private |= OPpLVAL_INTRO;
     padop->op_targ = tmpsv;
 	    
     copy_to_tmp =
