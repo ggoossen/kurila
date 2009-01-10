@@ -704,7 +704,10 @@ Perl_mod(pTHX_ OP *o, I32 type)
 	break;
 
     case OP_LISTFIRST:
-	goto nomod;
+	localize = 0;
+	if (o->op_flags & OPf_KIDS)
+	    cLISTOPo->op_first->op_sibling = mod(cLISTOPo->op_first->op_sibling, type);
+	break;
 
     case OP_RETURN:
 	goto nomod;

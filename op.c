@@ -1330,6 +1330,14 @@ Perl_convert(pTHX_ I32 type, OPFLAGS flags, OP *o, SV *location)
     return fold_constants(o);
 }
 
+/*
+=for apidoc op_assign
+
+op_assign returns the assign copy of the operator. NULL is returned if the operator pushes a value on the stack which
+can be assigned to.
+
+=cut
+*/
 OP *
 Perl_op_assign(pTHX_ OP **po)
 {
@@ -1344,7 +1352,7 @@ Perl_op_assign(pTHX_ OP **po)
 	return o;
     }
     }
-    Perl_croak_at(aTHX_ (*po)->op_location, "Can't modify %s", OP_DESC(*po));
+    return NULL;
 }
 
 OP *
@@ -2539,37 +2547,28 @@ Perl_newASSIGNOP(pTHX_ OPFLAGS flags, OP *left, I32 optype, OP *right, SV *locat
 
     if (optype) {
 	bool is_logassign = (optype == OP_ANDASSIGN || optype == OP_ORASSIGN || optype == OP_DORASSIGN);
-	if (left->op_type == OP_MAGICSV) {
-	    OP* new_right;
-	    o = op_assign(&left);
-	    if (is_logassign) {
-		new_right = newLOGOP(
+	if (is_logassign) {
+	    OP* left_assign = op_assign(&left);
+	    if (left_assign) {
+		OP* new_right =
+		    newBINOP(OP_SASSIGN,
+			flags,
+			scalar(right), 
+			left_assign,
+			location );
+		return newLOGOP(
 		    optype == OP_ANDASSIGN ? OP_AND 
 			: optype == OP_ORASSIGN ? OP_OR
 			: OP_DOR,
 			0,
-			scalar(left), scalar(right), location
+			scalar(left), scalar(new_right), location
 		    );
 	    }
 	    else {
-		new_right = newBINOP(
-		    optype,
-			0,
-			scalar(left), scalar(right), location
-		    );
+		o = newBINOP(OP_SASSIGN, 0, scalar(right),
+		    newOP(OP_LOGASSIGN_ASSIGN, 0, location), location);
+		return newLOGOP(optype, 0, mod(scalar(left), optype), o, location);
 	    }
-
-	    return 
-		newBINOP(OP_SASSIGN,
-		    flags,
-		    scalar(new_right), 
-		    o,
-		    location );
-	}
-	else if (is_logassign) {
-	    o = newBINOP(OP_SASSIGN, 0, scalar(right),
-		newOP(OP_LOGASSIGN_ASSIGN, 0, location), location);
-	    return newLOGOP(optype, 0, mod(scalar(left), optype), o, location);
 	}
 	else {
 	    return newBINOP(optype, OPf_STACKED,
