@@ -1358,6 +1358,33 @@ Perl_op_assign(pTHX_ OP** po)
     {
 	return op_assign(&(cBINOPx(o)->op_first));
     }
+    case OP_LISTFIRST:
+    {
+	/* LISTFIRST is only generated as part of C<op_assign> finish_assign op. */
+	OP* copyo;
+	OP* padop2;
+	I32 min_modcount = 0;
+	I32 max_modcount = 0;
+	BINOP* oldassign = cBINOPx(cLISTOPo->op_last);
+	assert(oldassign->op_type == OP_SASSIGN);
+
+	copyo = newSVOP(oldassign->op_last->op_type, 0, cSVOPx_sv(oldassign->op_last), 
+	    newSVsv(oldassign->op_location));
+	copyo = assign(copyo, FALSE, &min_modcount, &max_modcount);
+
+	padop2 = newOP(OP_PADSV, 0, oldassign->op_location);
+	padop2->op_targ = oldassign->op_first->op_targ;
+
+	return newBINOP(
+	    OP_SASSIGN,
+		0, 
+		padop2,
+		copyo,
+		o->op_location
+	    );
+    }
+    default:
+	*po = mod(o, OP_SASSIGN);
     }
     return NULL;
 }
