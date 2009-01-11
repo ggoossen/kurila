@@ -3669,7 +3669,6 @@ Gid_t getegid (void);
  * Update the magic_names table in dump.c when adding/amending these
  */
 
-#define PERL_MAGIC_sv		  '\0' /* Special scalar variable */
 #define PERL_MAGIC_bm		  'B' /* Boyer-Moore (fast string search) */
 #define PERL_MAGIC_regex_global	  'g' /* m//g target / study()ed string */
 #define PERL_MAGIC_hints	  'H' /* %^H hash */
@@ -4416,7 +4415,6 @@ typedef enum {
 } expectation;
 
 enum {		/* pass one of these to get_vtbl */
-    want_vtbl_sv,
     want_vtbl_hints,
     want_vtbl_dbline,
     want_vtbl_isa,
@@ -4701,18 +4699,6 @@ START_EXTERN_C
  * not the same beast. ANSI doesn't allow the assignment from one to the other.
  * (although most, but not all, compilers are prepared to do it)
  */
-MGVTBL_SET(
-    PL_vtbl_sv,
-    MEMBER_TO_FPTR(Perl_magic_get),
-    MEMBER_TO_FPTR(Perl_magic_set),
-    MEMBER_TO_FPTR(Perl_magic_len),
-    0,
-    0,
-    0,
-    0,
-    0
-);
-
 MGVTBL_SET(
     PL_vtbl_hints,
     0,

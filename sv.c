@@ -3814,7 +3814,6 @@ Perl_sv_magic(pTHX_ register SV *const sv, SV *const obj, const int how,
 	    && IN_PERL_RUNTIME
 	    && how != PERL_MAGIC_regex_global
 	    && how != PERL_MAGIC_bm
-	    && how != PERL_MAGIC_sv
 	    && how != PERL_MAGIC_backref
 	   )
 	{
@@ -3838,9 +3837,6 @@ Perl_sv_magic(pTHX_ register SV *const sv, SV *const obj, const int how,
     }
 
     switch (how) {
-    case PERL_MAGIC_sv:
-	vtable = &PL_vtbl_sv;
-	break;
     case PERL_MAGIC_bm:
 	vtable = &PL_vtbl_bm;
 	break;

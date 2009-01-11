@@ -3359,9 +3359,6 @@ Perl_get_vtbl(pTHX_ int vtbl_id)
     PERL_UNUSED_CONTEXT;
 
     switch(vtbl_id) {
-    case want_vtbl_sv:
-	result = &PL_vtbl_sv;
-	break;
     case want_vtbl_hints:
 	result = &PL_vtbl_hints;
 	break;

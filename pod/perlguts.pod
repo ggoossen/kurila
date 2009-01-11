@@ -1024,7 +1024,6 @@ The current kinds of Magic Virtual Tables are:
     mg_type
     (old-style char and macro)   MGVTBL          Type of magic
     --------------------------   ------          -------------
-    \0 PERL_MAGIC_sv             vtbl_sv         Special scalar variable
     B  PERL_MAGIC_bm             vtbl_bm         Boyer-Moore (fast string search)
     D  PERL_MAGIC_regdata        vtbl_regdata    Regex match position data
                                                  (@+ and @- vars)

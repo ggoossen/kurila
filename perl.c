@@ -2478,17 +2478,6 @@ Perl_require_pv(pTHX_ const char *pv)
     POPSTACK;
 }
 
-void
-Perl_magicname(pTHX_ const char *sym, const char *name, I32 namlen)
-{
-    register GV * const gv = gv_fetchpv(sym, GV_ADD, SVt_PV);
-
-    PERL_ARGS_ASSERT_MAGICNAME;
-
-    if (gv)
-	sv_magic(GvSV(gv), (SV*)gv, PERL_MAGIC_sv, name, namlen);
-}
-
 STATIC void
 S_usage(pTHX_ const char *name)		/* XXX move this out into a module ? */
 {

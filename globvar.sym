@@ -50,7 +50,6 @@ vtbl_regexp
 vtbl_hints
 vtbl_substr
 vtbl_substr_utf8
-vtbl_sv
 vtbl_taint
 vtbl_utf8
 vtbl_uvar
