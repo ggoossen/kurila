@@ -336,9 +336,9 @@ Ap	|void	|hv_ksplit	|NN HV *hv|IV newmax
 Apdbm	|void	|hv_magic	|NN HV *hv|NULLOK GV *gv|int how
 Aip	|void	|hv_store	|NULLOK HV *hv|NULLOK const char *key \
 				|I32 klen|NULLOK SV *val|U32 hash
-Abmd	|HE*	|hv_store_ent	|NULLOK HV *hv|NULLOK SV *key|NULLOK SV *val\
+Aip	|void	|hv_store_ent	|NULLOK HV *hv|NULLOK SV *key|NULLOK SV *val\
 				|U32 hash
-AbmdM	|SV**	|hv_store_flags	|NULLOK HV *hv|NULLOK const char *key \
+Aip	|void	|hv_store_flags	|NULLOK HV *hv|NULLOK const char *key \
 				|I32 klen|NULLOK SV *val|U32 hash|int flags
 Apd	|void	|hv_undef	|NULLOK HV *hv
 Apd	|void	|hv_tmprefcnt	|NN HV *hv

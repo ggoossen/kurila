@@ -356,10 +356,6 @@ C<SV*>.
 	->shared_he_he.he_valu.hent_refcount),				\
      hek)
 
-#define hv_store_ent(zlonk, awk, touche, zgruppp)			\
-    ((HE *) hv_common((zlonk), (awk), NULL, 0, 0, HV_FETCH_ISSTORE,	\
-		      (touche), (zgruppp)))
-
 #define hv_exists_ent(zlonk, awk, zgruppp)				\
     (hv_common((zlonk), (awk), NULL, 0, 0, HV_FETCH_ISEXISTS, 0, (zgruppp))\
      ? TRUE : FALSE)
@@ -369,11 +365,6 @@ C<SV*>.
 #define hv_delete_ent(zlonk, awk, touche, zgruppp)			\
     ((SV *) hv_common((zlonk), (awk), NULL, 0, 0, (touche) | HV_DELETE,	\
 		      NULL, (zgruppp)))
-
-#define hv_store_flags(urkk, zamm, clunk, thwape, sploosh, eee_yow)	\
-    ((SV**) hv_common((urkk), NULL, (zamm), (clunk), (eee_yow),		\
-		      (HV_FETCH_ISSTORE|HV_FETCH_JUST_SV), (thwape),	\
-		      (sploosh)))
 
 #define hv_exists(urkk, zamm, clunk)					\
     (hv_common_key_len((urkk), (zamm), (clunk), HV_FETCH_ISEXISTS, NULL, 0) \

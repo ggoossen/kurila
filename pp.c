@@ -3586,11 +3586,11 @@ PP(pp_hslice)
 		}
             }
 
-	    HE* he = hv_store_ent(hv, keysv,
+	    hv_store_ent(hv, keysv,
 		newSVsv(newitem ? *newitem : &PL_sv_undef),
 		0);
 	    if ( ! partial) {
-		av_push(ret, newSVsv(he ? HeVAL(he) : &PL_sv_undef));
+		av_push(ret, newSVsv(newitem ? *newitem : &PL_sv_undef));
 	    }
 	    i++;
 	    sliceitem++;
@@ -3919,7 +3919,6 @@ PP(pp_enter_hashexpand_assign)
     IV duplicates = 0;
     
     while (SP > base) {	/* gobble up all the rest */
-	HE *didstore;
 	SV* sv = POPs;
 	SV* tmpstr = newSV(0);
 	if (SP > base)
@@ -3933,7 +3932,7 @@ PP(pp_enter_hashexpand_assign)
 	if (gimme != G_VOID && hv_exists_ent(hv, sv, 0))
 	    /* key overwrites an existing entry */
 	    duplicates += 2;
-	didstore = hv_store_ent(hv,sv,tmpstr,0);
+	hv_store_ent(hv,sv,tmpstr,0);
     }
 
     PUSHMARK(SP);

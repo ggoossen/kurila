@@ -4984,8 +4984,7 @@ static SV *retrieve_flag_hash(pTHX_ stcxt_t *cxt, const char *cname)
             if (!keysv)
                 return (SV *) 0;
 
-            if (!hv_store_ent(hv, keysv, sv, 0))
-                return (SV *) 0;
+            hv_store_ent(hv, keysv, sv, 0);
         } else {
             /*
              * Get key.
@@ -5020,8 +5019,7 @@ static SV *retrieve_flag_hash(pTHX_ stcxt_t *cxt, const char *cname)
              */
 
 #ifdef HAS_RESTRICTED_HASHES
-            if (hv_store_flags(hv, kbuf, size, sv, 0, store_flags) == 0)
-                return (SV *) 0;
+            hv_store_flags(hv, kbuf, size, sv, 0, store_flags);
 #else
             if (!(store_flags & HVhek_PLACEHOLD))
                 if (hv_store(hv, kbuf, size, sv, 0) == 0)

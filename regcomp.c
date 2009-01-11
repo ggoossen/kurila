@@ -6313,8 +6313,7 @@ S_reg_namedseq(pTHX_ RExC_state_t *pRExC_state, UV *valuep)
                 vFAIL2("Constant(\\N{%s}): Call to &{$^H{charnames}} "
                       "did not return a defined value",SvPVX_const(sv_name));
             }
-            if (hv_store_ent( RExC_charnames, sv_name, sv_str, 0))
-                cached = 1;
+            hv_store_ent( RExC_charnames, sv_name, sv_str, 0);
         }
     }
     if (valuep) {

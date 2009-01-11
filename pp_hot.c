@@ -737,7 +737,6 @@ S_do_oddball(pTHX_ HV *hash, SV **relem, SV **firstrelem)
 
     if (*relem) {
 	SV *tmpstr;
-        const HE *didstore;
 
         if (ckWARN(WARN_MISC)) {
 	    const char *err;
@@ -746,12 +745,10 @@ S_do_oddball(pTHX_ HV *hash, SV **relem, SV **firstrelem)
 	}
 
         tmpstr = newSV(0);
-        didstore = hv_store_ent(hash,*relem,tmpstr,0);
+        hv_store_ent(hash,*relem,tmpstr,0);
         if (SvMAGICAL(hash)) {
             if (SvSMAGICAL(tmpstr))
                 mg_set(tmpstr);
-            if (!didstore)
-                sv_2mortal(tmpstr);
         }
         TAINT_NOT;
     }
