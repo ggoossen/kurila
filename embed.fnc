@@ -474,7 +474,7 @@ Ap	|I32	|mg_size	|NN SV* sv
 Ap	|void	|mini_mktime	|NN struct tm *ptm
 EXp	|OP*	|mod		|NULLOK OP* o|I32 type
 p	|OP*	|assign		|NN OP* o|bool partial|NN I32 *min_modcount|NN I32 *max_modcount
-p	|OP*	|op_assign		|NN OP* o
+p	|OP*	|op_assign		|NN OP** po
 p	|int	|mode_from_discipline|NULLOK SV* discp
 Ap	|const char*	|moreswitches	|NN const char* s
 p	|OP*	|my		|NN OP* o

@@ -898,48 +898,11 @@ Perl_op_mod_assign(pTHX_ OP *operator, OP **operandp, I32 type)
 	*operandp = mod(*operandp, type); 
 	return operator;
     }
-    PADOFFSET tmpsv = pad_alloc(OP_SASSIGN, SVs_PADTMP);
-    OP* padop;
-    OP* padop2;
-    OP* copy_to_tmp;
-    OP* copy_from_tmp;
-    I32 min_modcount = 0;
-    I32 max_modcount = 0;
     
-    OP* operand_sibling = (*operandp)->op_sibling;
-    (*operandp)->op_sibling = NULL;
-    OP* op_a = op_assign(*operandp);
-    OP* operand = *operandp;
+    OP* finish_assign = op_assign(operandp);
 
-    padop = newOP(OP_PADSV, OPf_MOD, operand->op_location);
-    padop->op_private |= OPpLVAL_INTRO;
-    padop->op_targ = tmpsv;
-	    
-    copy_to_tmp =
-	newBINOP(
-	    OP_SASSIGN,
-		0,
-		scalar(operand), 
-		assign(padop, FALSE, &min_modcount, &max_modcount),
-		operator->op_location
-	    );
-    copy_to_tmp->op_sibling = operand_sibling;
-    *operandp = copy_to_tmp;
-    
-    padop2 = newOP(OP_PADSV, 0, operand->op_location);
-    padop2->op_targ = tmpsv;
-
-    copy_from_tmp =
-	newBINOP(
-	    OP_SASSIGN,
-		0,
-		padop2,
-		op_a,
-		operator->op_location
-	    );
-    
     OP* operator_sibling = operator->op_sibling;
-    OP* o = append_elem(OP_LISTFIRST, scalar(operator), copy_from_tmp);
+    OP* o = append_elem(OP_LISTFIRST, scalar(operator), finish_assign);
     o->op_sibling = operator_sibling;
     return o;
 }
@@ -1333,21 +1296,67 @@ Perl_convert(pTHX_ I32 type, OPFLAGS flags, OP *o, SV *location)
 /*
 =for apidoc op_assign
 
-op_assign returns the assign copy of the operator. NULL is returned if the operator pushes a value on the stack which
-can be assigned to.
+op_assign modified the OP C<*o> to be assignable, and returns the OP which finishes the assignment.
 
 =cut
 */
 OP *
-Perl_op_assign(pTHX_ OP* o)
+Perl_op_assign(pTHX_ OP** po)
 {
+    OP* o = *po;
+
     switch (o->op_type) {
-    case OP_MAGICSV: {
+    case OP_MAGICSV:
+    {
 	I32 min_modcount = 0;
 	I32 max_modcount = 0;
-	OP* newo = newSVOP(OP_MAGICSV, 0, cSVOPx_sv(o), newSVsv(o->op_location));
-	newo = assign(newo, FALSE, &min_modcount, &max_modcount);
-	return newo;
+	OP* copyo;
+	OP* padop;
+	OP* padop2;
+	OP* copy_to_tmp;
+	OP* copy_from_tmp;
+	OP* o_sibling;
+
+	const PADOFFSET tmpsv = pad_alloc(OP_SASSIGN, SVs_PADTMP);
+
+	padop = newOP(OP_PADSV, OPf_MOD | OPf_ASSIGN, o->op_location);
+	padop->op_private |= OPpLVAL_INTRO;
+	padop->op_targ = tmpsv;
+
+	o_sibling = o->op_sibling;
+	o->op_sibling = NULL;
+	copy_to_tmp =
+	    newBINOP(
+		OP_SASSIGN,
+		    0,
+		    scalar(o), 
+		    scalar(padop),
+		    o->op_location
+		);
+	copy_to_tmp->op_sibling = o_sibling;
+	*po = copy_to_tmp;
+
+	copyo = newSVOP(OP_MAGICSV, 0, cSVOPx_sv(o), newSVsv(o->op_location));
+	copyo = assign(copyo, FALSE, &min_modcount, &max_modcount);
+
+	padop2 = newOP(OP_PADSV, 0, o->op_location);
+	padop2->op_targ = tmpsv;
+
+	copy_from_tmp =
+	    newBINOP(
+		OP_SASSIGN,
+		    0,
+		    padop2,
+		    copyo,
+		    o->op_location
+		);
+    
+	return copy_from_tmp;
+    }
+    case OP_HELEM:
+    case OP_AELEM:
+    {
+	return op_assign(&(cBINOPx(o)->op_first));
     }
     }
     return NULL;
@@ -2546,21 +2555,13 @@ Perl_newASSIGNOP(pTHX_ OPFLAGS flags, OP *left, I32 optype, OP *right, SV *locat
     if (optype) {
 	bool is_logassign = (optype == OP_ANDASSIGN || optype == OP_ORASSIGN || optype == OP_DORASSIGN);
 	if (is_logassign) {
-	    OP* left_assign = op_assign(left);
-	    if (left_assign) {
-		OP* new_right =
-		    newBINOP(OP_SASSIGN,
-			flags,
-			scalar(right), 
-			left_assign,
-			location );
-		return newLOGOP(
-		    optype == OP_ANDASSIGN ? OP_AND 
-			: optype == OP_ORASSIGN ? OP_OR
-			: OP_DOR,
-			0,
-			scalar(left), scalar(new_right), location
-		    );
+	    OP* new_left = left;
+	    OP* finish_assign = op_assign(&new_left);
+	    if (finish_assign) {
+		o = newBINOP(OP_SASSIGN, 0, scalar(right),
+		    newOP(OP_LOGASSIGN_ASSIGN, 0, location), location);
+		o = append_elem(OP_LISTFIRST, o, finish_assign);
+		return newLOGOP(optype, 0, scalar(new_left), o, location);
 	    }
 	    else {
 		o = newBINOP(OP_SASSIGN, 0, scalar(right),
