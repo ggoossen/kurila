@@ -108,11 +108,7 @@ hv_store(hvref, key, val)
 	   croak("First argument to hv_store() must be a hash reference");
 	hv = (HV*)SvRV(hvref);
         SvREFCNT_inc(val);
-	if (!hv_store_ent(hv, key, val, 0)) {
-	    SvREFCNT_dec(val);
-	    XSRETURN_NO;
-	} else {
-	    XSRETURN_YES;
-	}
+	hv_store_ent(hv, key, val, 0);
+        XSRETURN_YES;
     }
 

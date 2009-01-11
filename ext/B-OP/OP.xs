@@ -113,7 +113,7 @@ find_cv_by_root(OP* o) {
   OP* root = o;
   SV* key;
   SV* val;
-  HE* cached;
+  SV* cached;
 
   if(PL_compcv && SvTYPE(PL_compcv) == SVt_PVCV &&
         !PL_eval_root) {
@@ -131,15 +131,16 @@ find_cv_by_root(OP* o) {
 
   key = newSViv(PTR2IV(root));
   
-  cached = hv_fetch_ent(root_cache, key, 0, 0);
+  cached = hv_fetch(root_cache, key, strlen(key), 0);
   if(cached) {
-    return HeVAL(cached);
+      return cached;
   }
   
 
   if(PL_main_root == root) {
     /* Special case, this is the main root */
-    cached = hv_store_ent(root_cache, key, newRV((SV*)PL_main_cv), 0);
+      cached = newRV((SV*)PL_main_cv);
+      hv_store_ent(root_cache, key, cached, 0);
   } else if(PL_eval_root == root && PL_compcv) { 
     SV* tmpcv = (SV*)NEWSV(1104,0);
     sv_upgrade((SV *)tmpcv, SVt_PVCV);
@@ -149,7 +150,8 @@ find_cv_by_root(OP* o) {
     OP_REFCNT_LOCK;
     OpREFCNT_inc(root);
     OP_REFCNT_UNLOCK;
-    cached = hv_store_ent(root_cache, key, newRV((SV*)tmpcv), 0);
+    cached = newRV((SV*)tmpcv);
+    hv_store_ent(root_cache, key, cached, 0);
   } else {
     /* Need to walk the symbol table, yay */
     CV* cv = 0;
@@ -179,10 +181,11 @@ find_cv_by_root(OP* o) {
       Perl_die(aTHX_ "I am sorry but we couldn't find this root!\n");
     }
 
-    cached = hv_store_ent(root_cache, key, newRV((SV*)cv), 0);
+    cached = newRV((SV*)cv);
+    hv_store_ent(root_cache, key, cached, 0);
   }
 
-  return (SV*) HeVAL(cached);
+  return cached;
 }
 
 
@@ -489,7 +492,7 @@ make_temp_object(pTHX_ SV *arg, SV *temp)
     /* Need to keep our "temp" around as long as the target exists.
        Simplest way seems to be to hang it from magic, and let that clear
        it up.  No vtable, so won't actually get in the way of anything.  */
-    sv_magicext(target, temp, PERL_MAGIC_sv, NULL, NULL, 0);
+    sv_magicext(target, temp, PERL_MAGIC_ext, NULL, NULL, 0);
     /* magic object has had its reference count increased, so we must drop
        our reference.  */
     SvREFCNT_dec(temp);

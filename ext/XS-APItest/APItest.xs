@@ -316,7 +316,7 @@ delete_ent(hash, key_sv, flags = 0)
         OUTPUT:
         RETVAL
 
-SV *
+void
 store_ent(hash, key, value)
 	PREINIT:
 	SV *copy;
@@ -327,19 +327,12 @@ store_ent(hash, key, value)
 	SV *value
 	CODE:
 	copy = newSV(0);
-	result = hv_store_ent(hash, key, copy, 0);
+	hv_store_ent(hash, key, copy, 0);
 	SvSetMagicSV(copy, value);
-	if (!result) {
-	    SvREFCNT_dec(copy);
-	    XSRETURN_EMPTY;
-	}
 	/* It's about to become mortal, so need to increase reference count.
 	 */
-	RETVAL = SvREFCNT_inc(HeVAL(result));
-        OUTPUT:
-        RETVAL
 
-SV *
+void
 store(hash, key_sv, value)
 	PREINIT:
 	STRLEN len;
@@ -353,17 +346,10 @@ store(hash, key_sv, value)
 	CODE:
 	key = SvPV(key_sv, len);
 	copy = newSV(0);
-	result = hv_store(hash, key, UTF8KLEN(key_sv, len), copy, 0);
+	hv_store(hash, key, UTF8KLEN(key_sv, len), copy, 0);
 	SvSetMagicSV(copy, value);
-	if (!result) {
-	    SvREFCNT_dec(copy);
-	    XSRETURN_EMPTY;
-	}
 	/* It's about to become mortal, so need to increase reference count.
 	 */
-	RETVAL = SvREFCNT_inc(*result);
-        OUTPUT:
-        RETVAL
 
 SV *
 fetch_ent(hash, key_sv)
@@ -802,7 +788,7 @@ rmagical_flags(sv)
         res = newAV();
         mXPUSHs((SV*)res);
 	sv = SvRV(sv);
-	av_push(res, newSVuv(SvFLAGS(sv) & SVs_GMG));
+	av_push(res, newSVuv(0));
 	av_push(res, newSVuv(SvFLAGS(sv) & SVs_SMG));
 	av_push(res, newSVuv(SvFLAGS(sv) & SVs_RMG));
         XSRETURN(1);

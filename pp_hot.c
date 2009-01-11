@@ -1680,7 +1680,7 @@ S_method_common(pTHX_ SV* meth, U32* hashp)
 	    packsv = sv;
 	else {
 	    SV* const ref = newSViv(PTR2IV(stash));
-	    (void)hv_store(PL_stashcache, packname, packlen, ref, 0);
+	    hv_store(PL_stashcache, packname, packlen, ref, 0);
 	}
 	goto fetch;
     }

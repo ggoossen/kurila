@@ -2960,8 +2960,10 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV* sstr, const I32 flags)
 	else
 	    (void)SvOK_off(dstr);
     }
-    if (SvTAINTED(sstr))
-	SvTAINT(dstr);
+    if (SvTAINTED(sstr)) {
+	TAINT;
+	SvTAINTED_on(dstr);
+    }
     if (sstr_ref_incremented)
 	SvREFCNT_dec(sstr);
 }

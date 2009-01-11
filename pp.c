@@ -1313,6 +1313,7 @@ PP(pp_repeat)
   {
     register IV count;
     dPOPss;
+    TAINT_FROM_SV(sv);
     if (SvIOKp(sv)) {
 	 if (SvUOK(sv)) {
 	      const UV uv = SvUV(sv);
@@ -2022,6 +2023,8 @@ PP(pp_bit_and)
     dVAR; dSP; dATARGET;
     {
       dPOPTOPssrl;
+      TAINT_FROM_SV(left);
+      TAINT_FROM_SV(right);
       if (SvNIOKp(left) || SvNIOKp(right)) {
 	if (PL_op->op_private & HINT_INTEGER) {
 	  const IV i = SvIV_nomg(left) & SvIV_nomg(right);
@@ -2047,6 +2050,8 @@ PP(pp_bit_or)
 
     {
       dPOPTOPssrl;
+      TAINT_FROM_SV(left);
+      TAINT_FROM_SV(right);
       if (SvNIOKp(left) || SvNIOKp(right)) {
 	if (PL_op->op_private & HINT_INTEGER) {
 	  const IV l = (USE_LEFT(left) ? SvIV_nomg(left) : 0);
@@ -2075,6 +2080,7 @@ PP(pp_negate)
     {
 	SV * const sv = sv_2num(TOPs);
 	const int flags = SvFLAGS(sv);
+	TAINT_FROM_SV(sv);
 	if ((flags & SVf_IOK) || ((flags & (SVp_IOK | SVp_NOK)) == SVp_IOK)) {
 	    /* It's publicly an integer, or privately an integer-not-float */
 	oops_its_an_int:

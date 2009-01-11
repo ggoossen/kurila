@@ -388,10 +388,8 @@ EXPLODE
             \}
             sv_setsv((SV*)gv, sv_2mortal(newRV_inc((SV*)GvCV(notfoundgv))));
 #ifndef SYMBIAN
-	    if (!hv_store($($c_subname)_missing, value_for_notfound->name,
-			  value_for_notfound->namelen, &PL_sv_yes, 0))
-		Perl_croak($athx "Couldn't add key '\%s' to missing_hash",
-			   value_for_notfound->name);
+	    hv_store($($c_subname)_missing, value_for_notfound->name,
+			  value_for_notfound->namelen, &PL_sv_yes, 0);
 #endif
 DONT
 

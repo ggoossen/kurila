@@ -4194,7 +4194,7 @@ S_init_postdump_symbols(pTHX_ register int argc, register char **argv, register 
 	    *s = '=';
 #endif
 	    sv = newSVpv(s+1, 0);
-	    (void)hv_store(hv, *env, s - *env, sv, 0);
+	    hv_store(hv, *env, s - *env, sv, 0);
 	    if (env_is_not_environ)
 	        mg_set(sv);
 	  }

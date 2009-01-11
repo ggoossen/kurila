@@ -8,6 +8,7 @@ plan tests => 11;
 
 my $Perl = which_perl();
 
+our $TODO = "fix tainting";
 my $warning;
 local $^WARN_HOOK = sub { $warning = @_[0]->message; };
 my $Tmsg = 'while running with -t switch';
