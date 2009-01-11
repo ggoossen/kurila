@@ -501,43 +501,8 @@ sub runperl {
     die "test.pl:runperl() does not take a hashref"
 	if ref @_[0] and ref @_[0] eq 'HASH';
     my $runperl = &_create_runperl( < @_ );
-    my $result;
 
-    my $tainted = $^TAINT;
-    my %args = %( < @_ );
-    exists %args{switches} && grep m/^-T$/, @{%args{switches}} and $tainted = $tainted + 1;
-
-    if ($tainted) {
-	# We will assume that if you're running under -T, you really mean to
-	# run a fresh perl, so we'll brute force launder everything for you
-	my $sep;
-
-        our %Config;
-	eval "require Config; Config->import";
-	if ($^EVAL_ERROR) {
-	    warn "test.pl had problems loading Config: $^EVAL_ERROR";
-	    $sep = ':';
-	} else {
-	    $sep = %Config{?path_sep};
-	}
-
-	env::temp_set_var($_, undef) for qw(CDPATH IFS ENV BASH_ENV);
-	# Untaint, plus take out . and empty string:
-        env::temp_set_var('DCL$PATH' => $1) if $is_vms && (env::var('DCL$PATH') =~ m/(.*)/s);
-	env::var('PATH') =~ m/(.*)/s;
-        env::temp_set_var('PATH' =>
-	    join $sep, grep { $_ ne "" and $_ ne "." and -d $_ and
-		($is_mswin or $is_vms or !(stat && @(stat '_')[?2]^&^0022)) }
-		    split quotemeta ($sep), $1);
-	env::set_var('PATH' => env::var('PATH') . "$sep/bin") if $is_cygwin;  # Must have /bin under Cygwin
-
-	$runperl =~ m/(.*)/s;
-	$runperl = $1;
-
-	$result = `$runperl`;
-    } else {
-	$result = `$runperl`;
-    }
+    my $result = `$runperl`;
     $result =~ s/\n\n/\n/ if $is_vms; # XXX pipes sometimes double these
     return $result;
 }

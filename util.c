@@ -2259,10 +2259,6 @@ Perl_my_popen_list(pTHX_ const char *mode, int n, SV * const *args)
     PERL_FLUSHALL_FOR_CHILD;
     This = (*mode == 'w');
     that = !This;
-    if (PL_tainting) {
-	taint_env();
-	taint_proper("Insecure %s%s", "EXEC");
-    }
     if (PerlProc_pipe(p) < 0)
 	return NULL;
     /* Try for another pipe pair for error return */
@@ -2406,10 +2402,6 @@ Perl_my_popen(pTHX_ const char *cmd, const char *mode)
 #endif
     This = (*mode == 'w');
     that = !This;
-    if (doexec && PL_tainting) {
-	taint_env();
-	taint_proper("Insecure %s%s", "EXEC");
-    }
     if (PerlProc_pipe(p) < 0)
 	return NULL;
     if (doexec && PerlProc_pipe(pp) >= 0)
@@ -3374,9 +3366,6 @@ Perl_get_vtbl(pTHX_ int vtbl_id)
     case want_vtbl_mglob:
 	result = &PL_vtbl_mglob;
 	break;
-    case want_vtbl_taint:
-	result = &PL_vtbl_taint;
-	break;
     case want_vtbl_bm:
 	result = &PL_vtbl_bm;
 	break;
@@ -3910,9 +3899,6 @@ Perl_getcwd_sv(pTHX_ register SV *sv)
 {
 #ifndef PERL_MICRO
     dVAR;
-#ifndef INCOMPLETE_TAINTS
-    SvTAINTED_on(sv);
-#endif
 
     PERL_ARGS_ASSERT_GETCWD_SV;
 

@@ -39,7 +39,6 @@ Perl_runops_standard(pTHX)
 	PERL_ASYNC_CHECK();
     }
 
-    TAINT_NOT;
     return 0;
 }
 

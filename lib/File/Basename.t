@@ -148,27 +148,3 @@ do {
     is(basename('.foo.bar', '.bar'), '.foo');
 };
 
-
-### Test tainting
-do {
-    #   The empty tainted value, for tainting strings
-    my $TAINT = substr($^EXECUTABLE_NAME, 0, 0);
-
-    # How to identify taint when you see it
-    sub any_tainted (@) {
-        return ! try { eval("#" . substr(join("", @( @_)), 0, 0)); 1 };
-    }
-
-    sub tainted ($) {
-        any_tainted @_;
-    }
-
-    sub all_tainted (@) {
-        for (@(@_)) { return 0 unless tainted $_ }
-        1;
-    }
-
-    fileparse_set_fstype 'Unix';
-    ok tainted(dirname($TAINT.'/perl/lib//'));
-    ok all_tainted(< fileparse($TAINT.'/dir/draft.book7','\.book\d+'));
-};

@@ -1482,12 +1482,6 @@ PERL_CALLCONV void	Perl_magic_get(pTHX_ const char* name, SV* sv)
 #define PERL_ARGS_ASSERT_MAGIC_GET	\
 	assert(name); assert(sv)
 
-PERL_CALLCONV int	Perl_magic_gettaint(pTHX_ SV* sv, MAGIC* mg)
-			__attribute__nonnull__(pTHX_1)
-			__attribute__nonnull__(pTHX_2);
-#define PERL_ARGS_ASSERT_MAGIC_GETTAINT	\
-	assert(sv); assert(mg)
-
 PERL_CALLCONV int	Perl_magic_getuvar(pTHX_ SV* sv, MAGIC* mg)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2);
@@ -1561,12 +1555,6 @@ PERL_CALLCONV int	Perl_magic_setregexp(pTHX_ SV* sv, MAGIC* mg)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2);
 #define PERL_ARGS_ASSERT_MAGIC_SETREGEXP	\
-	assert(sv); assert(mg)
-
-PERL_CALLCONV int	Perl_magic_settaint(pTHX_ SV* sv, MAGIC* mg)
-			__attribute__nonnull__(pTHX_1)
-			__attribute__nonnull__(pTHX_2);
-#define PERL_ARGS_ASSERT_MAGIC_SETTAINT	\
 	assert(sv); assert(mg)
 
 PERL_CALLCONV int	Perl_magic_setuvar(pTHX_ SV* sv, MAGIC* mg)

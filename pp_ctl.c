@@ -658,7 +658,6 @@ PP(pp_dbstate)
 {
     dVAR;
     PL_curcop = (COP*)PL_op;
-    TAINT_NOT;		/* Each statement is presumed innocent */
     PL_stack_sp = PL_stack_base + cxstack[cxstack_ix].blk_oldsp;
     FREETMPS;
 
@@ -835,7 +834,6 @@ PP(pp_leaveloop)
     mark = newsp;
     newsp = PL_stack_base + cx->blk_loop.resetsp;
 
-    TAINT_NOT;
     if (gimme == G_VOID)
 	NOOP;
     else if (gimme == G_SCALAR) {
@@ -847,7 +845,6 @@ PP(pp_leaveloop)
     else {
 	while (mark < SP) {
 	    *++newsp = sv_mortalcopy(*++mark);
-	    TAINT_NOT;		/* Each item is independent */
 	}
     }
     SP = newsp;
@@ -923,7 +920,6 @@ PP(pp_return)
 	DIE(aTHX_ "panic: return");
     }
 
-    TAINT_NOT;
     if (gimme == G_SCALAR) {
 	if (MARK < SP) {
 	    if (popsub2) {
@@ -953,7 +949,6 @@ PP(pp_return)
 	while (++MARK <= SP) {
 	    *++newsp = (popsub2 && SvTEMP(*MARK))
 			? *MARK : sv_mortalcopy(*MARK);
-	    TAINT_NOT;		/* Each item is independent */
 	}
     }
     PL_stack_sp = newsp;
@@ -1009,7 +1004,6 @@ PP(pp_last)
     newsp = PL_stack_base + cx->blk_loop.resetsp;
     nextop = cx->blk_loop.my_op->op_lastop->op_next;
 
-    TAINT_NOT;
     if (gimme == G_SCALAR) {
 	if (MARK < SP)
 	    *++newsp = sv_mortalcopy(*SP);
@@ -1019,7 +1013,6 @@ PP(pp_last)
     else if (gimme == G_ARRAY) {
 	while (++MARK <= SP) {
 	    *++newsp = sv_mortalcopy(*MARK);
-	    TAINT_NOT;		/* Each item is independent */
 	}
     }
     SP = newsp;
@@ -1704,7 +1697,6 @@ PP(pp_require)
     name = SvPV_const(sv, len);
     if (!(name && len > 0 && *name))
 	DIE(aTHX_ "Null filename used");
-    TAINT_PROPER("require");
 
 
 #ifdef VMS
@@ -1927,7 +1919,6 @@ PP(pp_require)
 #    endif
 #  endif
 #endif
-		    TAINT_PROPER("require");
 		    tryname = SvPVX_const(namesv);
 		    tryrsfp = doopen_pm(tryname, SvCUR(namesv));
 		    if (tryrsfp) {
@@ -2078,9 +2069,6 @@ PP(pp_entereval)
     }
     sv = POPs;
 
-    TAINT_IF(SvTAINTED(sv));
-    TAINT_PROPER("eval");
-
     ENTER;
     lex_start(sv, NULL, FALSE);
     PL_parser->lex_line_number++;
@@ -2157,7 +2145,6 @@ PP(pp_leaveeval)
     POPEVAL(cx);
     retop = cx->blk_eval.retop;
 
-    TAINT_NOT;
     if (gimme == G_VOID)
 	MARK = newsp;
     else if (gimme == G_SCALAR) {
@@ -2179,7 +2166,6 @@ PP(pp_leaveeval)
 	for (mark = newsp + 1; mark <= SP; mark++) {
 	    if (!(SvFLAGS(*mark) & SVs_TEMP)) {
 		*mark = sv_mortalcopy(*mark);
-		TAINT_NOT;	/* Each item is independent */
 	    }
 	}
     }
@@ -2268,7 +2254,6 @@ PP(pp_leavetry)
     POPEVAL(cx);
     PERL_UNUSED_VAR(optype);
 
-    TAINT_NOT;
     if (gimme == G_VOID)
 	SP = newsp;
     else if (gimme == G_SCALAR) {
@@ -2292,7 +2277,6 @@ PP(pp_leavetry)
 	for (mark = newsp + 1; mark <= SP; mark++) {
 	    if (!(SvFLAGS(*mark) & (SVs_PADTMP|SVs_TEMP))) {
 		*mark = sv_mortalcopy(*mark);
-		TAINT_NOT;	/* Each item is independent */
 	    }
 	}
     }

@@ -140,8 +140,6 @@ do_aspawn(SV* really, SV **mark, SV **sp)
        /*-----------------------------------------------------*/
        /* Will execvp() use PATH?                             */
        /*-----------------------------------------------------*/
-       if (*PL_Argv[0] != '/')
-           TAINT_ENV();
        if (really && *(tmps = SvPV(really, n_a)))
            pid = spawnp(tmps, nFd, fdMap, &inherit,
                         (const char **) PL_Argv,

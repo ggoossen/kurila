@@ -4689,29 +4689,7 @@ Perl_reg_numbered_buff_fetch(pTHX_ REGEXP * const r, const I32 paren,
     }          
     assert(rx->sublen >= (s - rx->subbeg) + i );
     if (i >= 0) {
-        const int oldtainted = PL_tainted;
-        TAINT_NOT;
         sv_setpvn(sv, s, i);
-        PL_tainted = oldtainted;
-        if (PL_tainting) {
-            if (RXp_MATCH_TAINTED(rx)) {
-                if (SvTYPE(sv) >= SVt_PVMG) {
-                    MAGIC* const mg = SvMAGIC(sv);
-                    MAGIC* mgt;
-                    PL_tainted = 1;
-                    SvMAGIC_set(sv, mg->mg_moremagic);
-                    SvTAINT(sv);
-                    if ((mgt = SvMAGIC(sv))) {
-                        mg->mg_moremagic = mgt;
-                        SvMAGIC_set(sv, mg);
-                    }
-                } else {
-                    PL_tainted = 1;
-                    SvTAINT(sv);
-                }
-            } else 
-                SvTAINTED_off(sv);
-        }
     } else {
         sv_setsv(sv,&PL_sv_undef);
         return;
@@ -5378,8 +5356,6 @@ S_reg(pTHX_ RExC_state_t *pRExC_state, I32 paren, I32 *flagp,U32 depth)
 			/* No compiled RE interpolated, has runtime
 			   components ===> unsafe.  */
 			FAIL("Eval-group not allowed at runtime, use re 'eval'");
-		    if (PL_tainting && PL_tainted)
-			FAIL("Eval-group in insecure regular expression");
 #if PERL_VERSION > 8
 		    if (IN_PERL_COMPILETIME)
 			PL_cv_has_eval = 1;

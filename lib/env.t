@@ -34,7 +34,5 @@ do {
 };
 
 my $v = env::var("PERL_CORE");
-ok Internals::SvTAINTED($v);
 env::set_var("PERL_CORE", 1);
 $v = env::var("PERL_CORE");
-ok ! Internals::SvTAINTED($v);

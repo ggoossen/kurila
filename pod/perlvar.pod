@@ -844,12 +844,6 @@ The time at which the program began running, in seconds since the
 epoch (beginning of 1970).  The values returned by the B<-M>, B<-A>,
 and B<-C> filetests are based on this value.
 
-=item $^TAINT
-
-Reflects if taint mode is on or off.  1 for on (the program was run with
-B<-T>), 0 for off, -1 when only taint warnings are enabled (i.e. with
-B<-t> or B<-TU>).  This variable is read-only.
-
 =item $^UNICODE
 
 Reflects certain Unicode settings of Perl.  See L<perlrun>

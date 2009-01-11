@@ -566,8 +566,6 @@ S_pm_description(pTHX_ const PMOP *pm)
     PERL_ARGS_ASSERT_PM_DESCRIPTION;
 
     if (regex) {
-        if (RX_EXTFLAGS(regex) & RXf_TAINTED)
-            sv_catpv(desc, ",TAINTED");
         if (RX_CHECK_SUBSTR(regex)) {
             if (!(RX_EXTFLAGS(regex) & RXf_NOSCAN))
                 sv_catpv(desc, ",SCANFIRST");
@@ -586,8 +584,6 @@ S_pm_description(pTHX_ const PMOP *pm)
 	sv_catpv(desc, ",GLOBAL");
     if (pmflags & PMf_CONTINUE)
 	sv_catpv(desc, ",CONTINUE");
-    if (pmflags & PMf_RETAINT)
-	sv_catpv(desc, ",RETAINT");
     return desc;
 }
 
@@ -1159,7 +1155,6 @@ static const struct { const char type; const char *name; } magic_names[] = {
 	{ PERL_MAGIC_dbline,         "dbline(l)" },
 	{ PERL_MAGIC_shared_scalar,  "shared_scalar(n)" },
 	{ PERL_MAGIC_qr,             "qr(r)" },
-	{ PERL_MAGIC_taint,          "taint(t)" },
 	{ PERL_MAGIC_uvar_elem,      "uvar_elem(u)" },
 	{ PERL_MAGIC_vstring,        "vstring(V)" },
 	{ PERL_MAGIC_utf8,           "utf8(w)" },
@@ -1183,7 +1178,6 @@ Perl_do_magic_dump(pTHX_ I32 level, PerlIO *file, const MAGIC *mg, I32 nest, I32
             else if (v == &PL_vtbl_dbline)     s = "dbline";
             else if (v == &PL_vtbl_isa)        s = "isa";
             else if (v == &PL_vtbl_mglob)      s = "mglob";
-            else if (v == &PL_vtbl_taint)      s = "taint";
             else if (v == &PL_vtbl_bm)         s = "bm";
             else if (v == &PL_vtbl_uvar)       s = "uvar";
 	    else if (v == &PL_vtbl_backref)    s = "backref";
@@ -1220,9 +1214,6 @@ Perl_do_magic_dump(pTHX_ I32 level, PerlIO *file, const MAGIC *mg, I32 nest, I32
 
         if (mg->mg_flags) {
             Perl_dump_indent(aTHX_ level, file, "    MG_FLAGS = 0x%02X\n", mg->mg_flags);
-	    if (mg->mg_type == PERL_MAGIC_taint &&
-		mg->mg_flags & MGf_TAINTEDDIR)
-	        Perl_dump_indent(aTHX_ level, file, "      TAINTEDDIR\n");
 	    if (mg->mg_flags & MGf_REFCOUNTED)
 	        Perl_dump_indent(aTHX_ level, file, "      REFCOUNTED\n");
             if (mg->mg_flags & MGf_GSKIP)
@@ -1848,7 +1839,6 @@ Perl_runops_debug(pTHX)
     DEBUG_R(refcnt_check(aTHX));
     DEBUG_l(Perl_deb(aTHX_ "leaving RUNOPS level\n"));
 
-    TAINT_NOT;
     return 0;
 }
 

@@ -575,9 +575,9 @@ EXTCONST char * const PL_reg_extflags_name[] = {
 	"USE_INTUIT_ML",    /* 0x04000000 */
 	"INTUIT_TAIL",      /* 0x08000000 */
 	"COPY_DONE",        /* 0x10000000 */
-	"TAINTED_SEEN",     /* 0x20000000 */
+	"UNUSED",     /* 0x20000000 */
 	"UNUSED_BIT_30",    /* 0x40000000 */
-	"TAINTED",          /* 0x80000000 */
+	"UNUSED",          /* 0x80000000 */
 };
 #endif /* DOINIT */
 

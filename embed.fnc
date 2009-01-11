@@ -434,7 +434,6 @@ dp	|int	|magic_clearhint|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_clearisa	|NN SV* sv|NN MAGIC* mg
 p	|bool	|is_magicsv	|NN const char* name
 p	|void	|magic_get	|NN const char* name|NN SV* sv
-p	|int	|magic_gettaint	|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_getuvar	|NN SV* sv|NN MAGIC* mg
 p	|U32	|magic_len	|NN SV* sv|NN MAGIC* mg
 p	|U32	|magic_regdata_cnt|NN SV* sv|NN MAGIC* mg
@@ -449,7 +448,6 @@ p	|int	|magic_setglob	|NN SV* sv|NN MAGIC* mg
 #endif
 p	|int	|magic_setmglob	|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_setregexp|NN SV* sv|NN MAGIC* mg
-p	|int	|magic_settaint	|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_setuvar	|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_setutf8	|NN SV* sv|NN MAGIC* mg
 p	|void	|magicname	|NN const char* sym|NULLOK const char* name|I32 namlen

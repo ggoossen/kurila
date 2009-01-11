@@ -60,8 +60,6 @@ PPCODE:
 	    /* printf("# bsd_glob: %s\n", pglob.gl_pathv[i]); */
 	    tmp = newSVpvn(pglob.gl_pathv[i],
 			  strlen(pglob.gl_pathv[i]));
-	    TAINT;
-	    SvTAINT(tmp);
             av_push(av, tmp);
 	}
 

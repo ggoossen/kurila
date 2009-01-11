@@ -586,12 +586,6 @@ END_EXTERN_C
 #define PL_sv_yes		(*Perl_Isv_yes_ptr(aTHX))
 #undef  PL_sys_intern
 #define PL_sys_intern		(*Perl_Isys_intern_ptr(aTHX))
-#undef  PL_taint_warn
-#define PL_taint_warn		(*Perl_Itaint_warn_ptr(aTHX))
-#undef  PL_tainted
-#define PL_tainted		(*Perl_Itainted_ptr(aTHX))
-#undef  PL_tainting
-#define PL_tainting		(*Perl_Itainting_ptr(aTHX))
 #undef  PL_threadhook
 #define PL_threadhook		(*Perl_Ithreadhook_ptr(aTHX))
 #undef  PL_timesbuf

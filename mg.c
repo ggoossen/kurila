@@ -150,7 +150,6 @@ S_is_container_magic(const MAGIC *mg)
     case PERL_MAGIC_bm:
     case PERL_MAGIC_regex_global:
     case PERL_MAGIC_qr:
-    case PERL_MAGIC_taint:
     case PERL_MAGIC_vstring:
     case PERL_MAGIC_utf8:
     case PERL_MAGIC_backref:
@@ -969,7 +968,6 @@ Perl_magic_get(pTHX_ const char* name, SV* sv)
 
 	    if (strEQ(remaining, "OS_NAME")) {
 		sv_setpv(sv, PL_osname);
-		SvTAINTED_off(sv);
 		break;
 	    }
 
@@ -1026,12 +1024,6 @@ Perl_magic_get(pTHX_ const char* name, SV* sv)
 	    }
 	    break;
 
-	case 'T':
-	    if (strEQ(remaining, "TAINT")) /* $^TAINT */
-		sv_setiv(sv, PL_tainting
-		    ? (PL_taint_warn || PL_unsafe ? -1 : 1)
-		    : 0);
-	    break;
 	case 'U':
 	    if (strEQ(remaining, "UID")) {
 		/* $^UID */
@@ -1336,34 +1328,6 @@ Perl_magic_setdbline(pTHX_ SV *sv, MAGIC *mg)
 }
 
 int
-Perl_magic_gettaint(pTHX_ SV *sv, MAGIC *mg)
-{
-    dVAR;
-
-    PERL_ARGS_ASSERT_MAGIC_GETTAINT;
-    PERL_UNUSED_ARG(sv);
-
-    TAINT_IF((PL_localizing != 1) && (mg->mg_len & 1));
-    return 0;
-}
-
-int
-Perl_magic_settaint(pTHX_ SV *sv, MAGIC *mg)
-{
-    dVAR;
-
-    PERL_ARGS_ASSERT_MAGIC_SETTAINT;
-    PERL_UNUSED_ARG(sv);
-
-    /* update taint status */
-    if (PL_tainted)
-        mg->mg_len |= 1;
-    else
-        mg->mg_len &= ~1;
-    return 0;
-}
-
-int
 Perl_magic_killbackrefs(pTHX_ SV *sv, MAGIC *mg)
 {
     PERL_ARGS_ASSERT_MAGIC_KILLBACKREFS;
@@ -1536,10 +1500,6 @@ Perl_is_magicsv(pTHX_ const char* name)
 	    break;
 	case 'S':
 	    if (strEQ(name2, "SYSTEM_FD_MAX"))
-		return 1;
-	    break;
-	case 'T':	/* $^TAINT */
-	    if (strEQ(name2, "TAINT"))
 		return 1;
 	    break;
 	case 'U':	/* $^UNICODE, $^UTF8LOCALE, $^UTF8CACHE */
@@ -1739,7 +1699,6 @@ Perl_magic_set(pTHX_ const char* name, SV *sv)
 #endif
 #endif
 		PL_egid = PerlProc_getegid();
-		PL_tainting |= (PL_uid && (PL_euid != PL_uid || PL_egid != PL_gid));
 		break;
 	    }
 
@@ -1769,7 +1728,6 @@ Perl_magic_set(pTHX_ const char* name, SV *sv)
 #endif
 #endif
 		PL_euid = PerlProc_geteuid();
-		PL_tainting |= (PL_uid && (PL_euid != PL_uid || PL_egid != PL_gid));
 		break;
 	    }
 	    break;
@@ -1800,7 +1758,6 @@ Perl_magic_set(pTHX_ const char* name, SV *sv)
 #endif
 #endif
 		PL_gid = PerlProc_getgid();
-		PL_tainting |= (PL_uid && (PL_euid != PL_uid || PL_egid != PL_gid));
 	    }
 	    break;
 
@@ -1887,7 +1844,6 @@ Perl_magic_set(pTHX_ const char* name, SV *sv)
 		Safefree(PL_osname);
 		PL_osname = NULL;
 		if (SvOK(sv)) {
-		    TAINT_PROPER("assigning to $^O");
 		    PL_osname = savesvpv(sv);
 		}
 		break;
@@ -2040,12 +1996,6 @@ Perl_magic_set(pTHX_ const char* name, SV *sv)
 	    }
 	    break;
 
-	case 'T':
-	    if (strEQ(remaining, "TAINT")) {
-		goto magicset_readonly;
-	    }
-	    break;
-
 	case 'U':
 	    if (strEQ(remaining, "UID")) {
 		/* $^UID */
@@ -2078,7 +2028,6 @@ Perl_magic_set(pTHX_ const char* name, SV *sv)
 #endif
 #endif
 		PL_uid = PerlProc_getuid();
-		PL_tainting |= (PL_uid && (PL_euid != PL_uid || PL_egid != PL_gid));
 		break;
 	    }
 

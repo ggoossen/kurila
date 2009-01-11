@@ -1312,6 +1312,4 @@ unless ($File::Find::dont_use_nlink) {
     $File::Find::dont_use_nlink = 1 if Config::config_value('dont_use_nlink');
 }
 
-*is_tainted = sub { \&Internals::SvTAINTED(\@_[0]) };
-
 1;

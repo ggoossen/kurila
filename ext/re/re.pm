@@ -17,13 +17,9 @@ our %EXPORT_OK = %( < map { $_ => 1 } @EXPORT_OK );
 # If you modify these values see comment below!
 
 my %bitmask = %(
-    taint   => 0x00100000, # HINT_RE_TAINT
     eval    => 0x00200000, # HINT_RE_EVAL
 );
 
-# - File::Basename contains a literal for 'taint' as a fallback.  If
-# taint is changed here, File::Basename must be updated as well.
-#
 # - ExtUtils::ParseXS uses a hardcoded 
 # BEGIN { $^H |= 0x00200000 } 
 # in it to allow re.xs to be built. So if 'eval' is changed here then
@@ -181,17 +177,11 @@ re - Perl pragma to alter regular expression behaviour
 
 =head1 SYNOPSIS
 
-    use re 'taint';
-    ($x) = ($^X =~ /^(.*)$/s);     # $x is tainted here
-
     $pat = '(?{ $foo = 1 })';
     use re 'eval';
     /foo${pat}bar/;		   # won't fail (when not under -T switch)
 
     {
-	no re 'taint';		   # the default
-	($x) = ($^X =~ /^(.*)$/s); # $x is not tainted here
-
 	no re 'eval';		   # the default
 	/foo${pat}bar/;		   # disallowed (with or without -T switch)
     }
@@ -214,26 +204,14 @@ re - Perl pragma to alter regular expression behaviour
             scalar regexp_pattern($obj); # just as perl would stringify it
     }                                    # but no hassle with blessed re's.
 
-(We use $^X in these examples because it's tainted by default.)
-
 =head1 DESCRIPTION
-
-=head2 'taint' mode
-
-When C<use re 'taint'> is in effect, and a tainted string is the target
-of a regex, the regex memories (or values returned by the m// operator
-in list context) are tainted.  This feature is useful when regex operations
-on tainted data aren't meant to extract safe substrings, but to perform
-other transformations.
 
 =head2 'eval' mode
 
 When C<use re 'eval'> is in effect, a regex is allowed to contain
 C<(?{ ... })> zero-width assertions even if regular expression contains
 variable interpolation.  That is normally disallowed, since it is a
-potential security risk.  Note that this pragma is ignored when the regular
-expression is obtained from tainted data, i.e.  evaluation is always
-disallowed with tainted regular expressions.  See L<perlre/(?{ code })>.
+potential security risk.  See L<perlre/(?{ code })>.
 
 For the purpose of this pragma, interpolation of precompiled regular
 expressions (i.e., the result of C<qr//>) is I<not> considered variable

@@ -976,7 +976,7 @@ Perl_scope(pTHX_ OP *o)
 {
     dVAR;
     if (o) {
-	if (o->op_flags & OPf_PARENS || PERLDB_NOOPT) { /* || PL_tainting) { */
+	if (o->op_flags & OPf_PARENS || PERLDB_NOOPT) {
 	    o = prepend_elem(OP_LINESEQ, newOP(OP_ENTER, 0, o->op_location), o);
 	    o->op_type = OP_LEAVE;
 	    o->op_ppaddr = PL_ppaddr[OP_LEAVE];
@@ -2068,9 +2068,6 @@ Perl_newPMOP(pTHX_ I32 type, OPFLAGS flags, SV *location)
     pmop->op_flags = (U8)flags;
     pmop->op_private = (U8)(0 | (flags >> 8));
     pmop->op_location = SvREFCNT_inc(location);
-
-    if (PL_hints & HINT_RE_TAINT)
-	pmop->op_pmflags |= PMf_RETAINT;
 
     return CHECKOP(type, pmop);
 }

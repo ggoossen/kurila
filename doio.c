@@ -133,17 +133,6 @@ Perl_do_openn(pTHX_ GV *gv, register const char *oname, I32 len, int as_raw,
     if (as_raw) {
         /* sysopen style args, i.e. integer mode and permissions */
 	STRLEN ix = 0;
-	const int appendtrunc =
-	     0
-#ifdef O_APPEND	/* Not fully portable. */
-	     |O_APPEND
-#endif
-#ifdef O_TRUNC	/* Not fully portable. */
-	     |O_TRUNC
-#endif
-	     ;
-	const int modifyingmode = O_WRONLY|O_RDWR|O_CREAT|appendtrunc;
-	int ismodifying;
 
 	if (num_svs != 0) {
 	     Perl_croak(aTHX_ "panic: sysopen with multiple args");
@@ -164,12 +153,6 @@ Perl_do_openn(pTHX_ GV *gv, register const char *oname, I32 len, int as_raw,
 	   like O_RDONLY is present.  Therefore we have to
 	   be more careful.
 	*/
-	if ((ismodifying = (rawmode & modifyingmode))) {
-	     if ((ismodifying & O_WRONLY) == O_WRONLY ||
-		 (ismodifying & O_RDWR)   == O_RDWR   ||
-		 (ismodifying & (O_CREAT|appendtrunc)))
-		  TAINT_PROPER("sysopen");
-	}
 	mode[ix++] = IoTYPE_NUMERIC; /* Marker to openn to use numeric "sysopen" */
 
 #if defined(USE_64_BIT_RAWIO) && defined(O_LARGEFILE)
@@ -204,7 +187,6 @@ Perl_do_openn(pTHX_ GV *gv, register const char *oname, I32 len, int as_raw,
 	if ((*type == IoTYPE_RDWR) && /* scary */
 	    (*(type+1) == IoTYPE_RDONLY || *(type+1) == IoTYPE_WRONLY) &&
 	    (tend > type+1 && tend[-1] != IoTYPE_PIPE)) {
-	    TAINT_PROPER("open");
 	    mode[1] = *type++;
 	    writing = 1;
 	} 
@@ -239,7 +221,6 @@ Perl_do_openn(pTHX_ GV *gv, register const char *oname, I32 len, int as_raw,
         } else if (supplied_fp) {
 	    /* '+>&' with a supllied_fd */
 
-            TAINT_PROPER("open");
             if ( ! ((*type == IoTYPE_WRONLY ||*type==IoTYPE_RDONLY) && type[1] == '&' && type[2] == '\0' ) ) {
 		Perl_croak(aTHX_ "open() with supplied_fd with incompatible type '%s'", type);
 	    }
@@ -300,9 +281,6 @@ Perl_do_openn(pTHX_ GV *gv, register const char *oname, I32 len, int as_raw,
 		    errno = EPIPE;
 		    goto say_false;
 		}
-		if ( ! (*name == '-' && name[1] == '\0') )
-		    TAINT_ENV();
-		TAINT_PROPER("piped open");
 		mode[0] = 'w';
 		writing = 1;
 		if (out_raw)
@@ -322,7 +300,6 @@ Perl_do_openn(pTHX_ GV *gv, register const char *oname, I32 len, int as_raw,
 		}
 	    } /* IoTYPE_PIPE */
 	    else if (*type == IoTYPE_WRONLY) {
-		TAINT_PROPER("open");
 		type++;
 		if (*type == IoTYPE_WRONLY) {
 		    /* Two IoTYPE_WRONLYs in a row make for an IoTYPE_APPEND. */
@@ -461,8 +438,6 @@ Perl_do_openn(pTHX_ GV *gv, register const char *oname, I32 len, int as_raw,
 		    errno = EPIPE;
 		    goto say_false;
 		}
-		TAINT_ENV();
-		TAINT_PROPER("piped open");
 		mode[0] = 'r';
 
 		if (in_raw)
@@ -721,7 +696,6 @@ Perl_nextargv(pTHX_ register GV *gv)
 	    }
 	} else {
 	    if (do_openn(gv,PL_oldname,oldlen,TRUE,O_RDONLY,0,NULL,NULL,0)) {
-		TAINT_PROPER("inplace open");
 		if (oldlen == 1 && *PL_oldname == '-') {
 		    setdefout(gv_fetchpvs("STDOUT", GV_ADD|GV_NOTQUAL,
 					  SVt_PVIO));
@@ -1356,9 +1330,6 @@ Perl_do_aexec5(pTHX_ SV *really, register SV * const *mark, register SV * const 
 	*a = NULL;
 	if (really)
 	    tmps = SvPV_nolen_const(really);
-	if ((!really && *PL_Argv[0] != '/') ||
-	    (really && *tmps != '/'))		/* will execvp use PATH? */
-	    TAINT_ENV();		/* testing IFS here is overkill, probably */
 	PERL_FPU_PRE_EXEC
 	if (really && *tmps)
 	    PerlProc_execvp(tmps,EXEC_ARGV_CAST(PL_Argv));
@@ -1523,9 +1494,7 @@ Perl_apply(pTHX_ I32 type, register SV **mark, register SV **sp)
     dVAR;
     register I32 val;
     register I32 tot = 0;
-    const char *const what = PL_op_name[type];
     const char *s;
-    SV ** const oldmark = mark;
 
     PERL_ARGS_ASSERT_APPLY;
 
@@ -1541,28 +1510,10 @@ Perl_apply(pTHX_ I32 type, register SV **mark, register SV **sp)
 	Perl_die(aTHX_ PL_no_func, what);
 #endif
 
-
-#define APPLY_TAINT_PROPER() \
-    STMT_START {							\
-	if (PL_tainted) { TAINT_PROPER(what); }				\
-    } STMT_END
-
-    /* This is a first heuristic; it doesn't catch tainting magic. */
-    if (PL_tainting) {
-	while (++mark <= sp) {
-	    if (SvTAINTED(*mark)) {
-		TAINT;
-		break;
-	    }
-	}
-	mark = oldmark;
-    }
     switch (type) {
     case OP_CHMOD:
-	APPLY_TAINT_PROPER();
 	if (++mark <= sp) {
 	    val = SvIV(*mark);
-	    APPLY_TAINT_PROPER();
 	    tot = sp - mark;
 	    while (++mark <= sp) {
                 GV* gv;
@@ -1571,7 +1522,6 @@ Perl_apply(pTHX_ I32 type, register SV **mark, register SV **sp)
 		do_fchmod:
 		    if (GvIO(gv) && IoIFP(GvIOp(gv))) {
 #ifdef HAS_FCHMOD
-			APPLY_TAINT_PROPER();
 			if (fchmod(PerlIO_fileno(IoIFP(GvIOn(gv))), val))
 			    tot--;
 #else
@@ -1588,7 +1538,6 @@ Perl_apply(pTHX_ I32 type, register SV **mark, register SV **sp)
 		}
 		else {
 		    const char *name = SvPV_nolen_const(*mark);
-		    APPLY_TAINT_PROPER();
 		    if (PerlLIO_chmod(name, val))
 			tot--;
 		}
@@ -1597,12 +1546,10 @@ Perl_apply(pTHX_ I32 type, register SV **mark, register SV **sp)
 	break;
 #ifdef HAS_CHOWN
     case OP_CHOWN:
-	APPLY_TAINT_PROPER();
 	if (sp - mark > 2) {
             register I32 val2;
 	    val = SvIV(*++mark);
 	    val2 = SvIV(*++mark);
-	    APPLY_TAINT_PROPER();
 	    tot = sp - mark;
 	    while (++mark <= sp) {
                 GV* gv;
@@ -1611,7 +1558,6 @@ Perl_apply(pTHX_ I32 type, register SV **mark, register SV **sp)
 		do_fchown:
 		    if (GvIO(gv) && IoIFP(GvIOp(gv))) {
 #ifdef HAS_FCHOWN
-			APPLY_TAINT_PROPER();
 			if (fchown(PerlIO_fileno(IoIFP(GvIOn(gv))), val, val2))
 			    tot--;
 #else
@@ -1628,7 +1574,6 @@ Perl_apply(pTHX_ I32 type, register SV **mark, register SV **sp)
 		}
 		else {
 		    const char *name = SvPV_nolen_const(*mark);
-		    APPLY_TAINT_PROPER();
 		    if (PerlLIO_chown(name, val, val2))
 			tot--;
 		}
@@ -1644,7 +1589,6 @@ nothing in the core.
 */
 #ifdef HAS_KILL
     case OP_KILL:
-	APPLY_TAINT_PROPER();
 	if (mark == sp)
 	    break;
 	s = SvPVx_nolen_const(*++mark);
@@ -1656,7 +1600,6 @@ nothing in the core.
 	}
 	else
 	    val = SvIV(*mark);
-	APPLY_TAINT_PROPER();
 	tot = sp - mark;
 #ifdef VMS
 	/* kill() doesn't do process groups (job trees?) under VMS */
@@ -1670,7 +1613,6 @@ nothing in the core.
 	    while (++mark <= sp) {
 		I32 proc = SvIV(*mark);
 		register unsigned long int __vmssts;
-		APPLY_TAINT_PROPER();
 		if (!((__vmssts = sys$delprc(&proc,0)) & 1)) {
 		    tot--;
 		    switch (__vmssts) {
@@ -1693,7 +1635,6 @@ nothing in the core.
 	    val = -val;
 	    while (++mark <= sp) {
 		const I32 proc = SvIV(*mark);
-		APPLY_TAINT_PROPER();
 #ifdef HAS_KILLPG
 		if (PerlProc_killpg(proc,val))	/* BSD */
 #else
@@ -1705,7 +1646,6 @@ nothing in the core.
 	else {
 	    while (++mark <= sp) {
 		const I32 proc = SvIV(*mark);
-		APPLY_TAINT_PROPER();
 		if (PerlProc_kill(proc, val))
 		    tot--;
 	    }
@@ -1713,11 +1653,9 @@ nothing in the core.
 	break;
 #endif
     case OP_UNLINK:
-	APPLY_TAINT_PROPER();
 	tot = sp - mark;
 	while (++mark <= sp) {
 	    s = SvPV_nolen_const(*mark);
-	    APPLY_TAINT_PROPER();
 	    if (PL_euid || PL_unsafe) {
 		if (UNLINK(s))
 		    tot--;
@@ -1734,7 +1672,6 @@ nothing in the core.
 	break;
 #if defined(HAS_UTIME) || defined(HAS_FUTIMES)
     case OP_UTIME:
-	APPLY_TAINT_PROPER();
 	if (sp - mark > 2) {
 #if defined(HAS_FUTIMES)
 	    struct timeval utbuf[2];
@@ -1774,7 +1711,6 @@ nothing in the core.
                 utbuf.modtime = (Time_t)SvIV(modified); /* time modified */
 #endif
             }
-	    APPLY_TAINT_PROPER();
 	    tot = sp - mark;
 	    while (++mark <= sp) {
                 GV* gv;
@@ -1783,7 +1719,6 @@ nothing in the core.
 		do_futimes:
 		    if (GvIO(gv) && IoIFP(GvIOp(gv))) {
 #ifdef HAS_FUTIMES
-			APPLY_TAINT_PROPER();
 			if (futimes(PerlIO_fileno(IoIFP(GvIOn(gv))),
                             (struct timeval *) utbufp))
 			    tot--;
@@ -1801,7 +1736,6 @@ nothing in the core.
 		}
 		else {
 		    const char * const name = SvPV_nolen_const(*mark);
-		    APPLY_TAINT_PROPER();
 #ifdef HAS_FUTIMES
 		    if (utimes(name, (struct timeval *)utbufp))
 #else
@@ -1818,8 +1752,6 @@ nothing in the core.
 #endif
     }
     return tot;
-
-#undef APPLY_TAINT_PROPER
 }
 
 /* Do the permissions allow some operation?  Assumes statcache already set. */
@@ -2133,10 +2065,6 @@ Perl_do_msgrcv(pTHX_ SV **mark, SV **sp)
     if (ret >= 0) {
 	SvCUR_set(mstr, sizeof(long)+ret);
 	*SvEND(mstr) = '\0';
-#ifndef INCOMPLETE_TAINTS
-	/* who knows who has been playing with this message? */
-	SvTAINTED_on(mstr);
-#endif
     }
     return ret;
 #else
@@ -2238,10 +2166,6 @@ Perl_do_shmio(pTHX_ I32 optype, SV **mark, SV **sp)
 	SvCUR_set(mstr, msize);
 	*SvEND(mstr) = '\0';
 	SvSETMAGIC(mstr);
-#ifndef INCOMPLETE_TAINTS
-	/* who knows who has been playing with this shared memory? */
-	SvTAINTED_on(mstr);
-#endif
     }
     else {
 	STRLEN len;

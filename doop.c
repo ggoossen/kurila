@@ -65,9 +65,6 @@ Perl_do_join(pTHX_ register SV *sv, SV *delim, register SV *av)
 
     sv_setpvn(sv, "", 0);
 
-    if (PL_tainting && SvMAGICAL(sv))
-	SvTAINTED_off(sv);
-
     if (items-- > 0) {
 	if (*mark)
 	    sv_catsv(sv, *mark);
@@ -99,8 +96,6 @@ Perl_do_sprintf(pTHX_ SV *sv, I32 len, SV **sarg)
 
     sv_vsetpvfn(sv, pat, patlen, NULL, sarg + 1, len - 1, &do_taint);
     SvSETMAGIC(sv);
-    if (do_taint)
-	SvTAINTED_on(sv);
 }
 
 /* currently converts input to bytes if possible, but doesn't sweat failure */
@@ -611,7 +606,6 @@ Perl_do_vop(pTHX_ I32 optype, SV *sv, SV *left, SV *right)
 	    break;
 	}
     }
-    SvTAINT(sv);
 }
 
 OP *

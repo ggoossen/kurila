@@ -1393,7 +1393,6 @@ Perl_sv_setiv(pTHX_ register SV *const sv, const IV i)
     }
     (void)SvIOK_only(sv);			/* validate number */
     SvIV_set(sv, i);
-    SvTAINT(sv);
 }
 
 /*
@@ -1499,7 +1498,6 @@ Perl_sv_setnv(pTHX_ register SV *const sv, const NV num)
     }
     SvNV_set(sv, num);
     (void)SvNOK_only(sv);			/* validate number */
-    SvTAINT(sv);
 }
 
 /*
@@ -2507,8 +2505,6 @@ S_glob_assign_ref(pTHX_ SV *const dstr, SV *const sstr)
 	break;
     }
     SvREFCNT_dec(dref);
-    if (SvTAINTED(sstr))
-	SvTAINT(dstr);
     return;
 }
 
@@ -2524,7 +2520,6 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV* sstr, const I32 flags)
     PERL_ARGS_ASSERT_SV_SETSV_FLAGS;
 
     if (sstr == dstr) {
-	TAINT_IF(SvTAINTED(sstr));
 	return;
     }
 
@@ -2593,11 +2588,6 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV* sstr, const I32 flags)
 	    SvIV_set(dstr,  SvIVX(sstr));
 	    if (SvIsUV(sstr))
 		SvIsUV_on(dstr);
-	    /* SvTAINTED can only be true if the SV has taint magic, which in
-	       turn means that the SV type is PVMG (or greater). This is the
-	       case statement for SVt_IV, so this cannot be true (whatever gcov
-	       may say).  */
-	    assert(!SvTAINTED(sstr));
 	    return;
 	}
 	if (!SvROK(sstr))
@@ -2624,11 +2614,6 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV* sstr, const I32 flags)
 	    }
 	    SvNV_set(dstr, SvNVX(sstr));
 	    (void)SvNOK_only(dstr);
-	    /* SvTAINTED can only be true if the SV has taint magic, which in
-	       turn means that the SV type is PVMG (or greater). This is the
-	       case statement for SVt_NV, so this cannot be true (whatever gcov
-	       may say).  */
-	    assert(!SvTAINTED(sstr));
 	    return;
 	}
 	goto undef_sstr;
@@ -2960,10 +2945,6 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV* sstr, const I32 flags)
 	else
 	    (void)SvOK_off(dstr);
     }
-    if (SvTAINTED(sstr)) {
-	TAINT;
-	SvTAINTED_on(dstr);
-    }
     if (sstr_ref_incremented)
 	SvREFCNT_dec(sstr);
 }
@@ -3090,7 +3071,6 @@ Perl_sv_setpvn(pTHX_ register SV *const sv, register const char *const ptr, regi
     dptr[len] = '\0';
     SvCUR_set(sv, len);
     (void)SvPOK_only(sv);		/* validate pointer */
-    SvTAINT(sv);
 }
 
 /*
@@ -3139,7 +3119,6 @@ Perl_sv_setpv(pTHX_ register SV *const sv, register const char *const ptr)
     Move(ptr,SvPVX_mutable(sv),len+1,char);
     SvCUR_set(sv, len);
     (void)SvPOK_only(sv);		/* validate pointer */
-    SvTAINT(sv);
 }
 
 /*
@@ -3236,7 +3215,6 @@ Perl_sv_usepvn_flags(pTHX_ SV *const sv, char *ptr, const STRLEN len, const U32 
 	ptr[len] = '\0';
     }
     (void)SvPOK_only(sv);		/* validate pointer */
-    SvTAINT(sv);
     if (flags & SV_SMAGIC)
 	SvSETMAGIC(sv);
 }
@@ -3486,7 +3464,6 @@ Perl_sv_catpvn_flags(pTHX_ register SV *const dsv, register const char *sstr, re
     SvCUR_set(dsv, SvCUR(dsv) + slen);
     *SvEND(dsv) = '\0';
     (void)SvPOK_only(dsv);		/* validate pointer */
-    SvTAINT(dsv);
     if (flags & SV_SMAGIC)
 	SvSETMAGIC(dsv);
 }
@@ -3554,7 +3531,6 @@ Perl_sv_catpv(pTHX_ register SV *const sv, register const char *ptr)
     Move(ptr,SvPVX_mutable(sv)+tlen,len+1,char);
     SvCUR_set(sv, SvCUR(sv) + len);
     (void)SvPOK_only(sv);		/* validate pointer */
-    SvTAINT(sv);
 }
 
 /*
@@ -3719,18 +3695,11 @@ Perl_sv_magic(pTHX_ register SV *const sv, SV *const obj, const int how,
 	    Perl_croak(aTHX_ PL_no_modify);
 	}
     }
-    if (SvMAGICAL(sv) || (how == PERL_MAGIC_taint && SvTYPE(sv) >= SVt_PVMG)) {
+    if (SvMAGICAL(sv)) {
 	if (SvMAGIC(sv) && (mg = mg_find(sv, how))) {
 	    /* sv_magic() refuses to add a magic of the same 'how' as an
 	       existing one
 	     */
-	    if (how == PERL_MAGIC_taint) {
-		mg->mg_len |= 1;
-		/* Any scalar which already had taint magic on which someone
-		   (erroneously?) did SvIOK_on() or similar will now be
-		   incorrectly sporting public "OK" flags.  */
-		SvFLAGS(sv) &= ~(SVf_IOK|SVf_NOK|SVf_POK);
-	    }
 	    return;
 	}
     }
@@ -3759,9 +3728,6 @@ Perl_sv_magic(pTHX_ register SV *const sv, SV *const obj, const int how,
 	break;
     case PERL_MAGIC_hints:
 	vtable = &PL_vtbl_hints;
-	break;
-    case PERL_MAGIC_taint:
-	vtable = &PL_vtbl_taint;
 	break;
     case PERL_MAGIC_uvar:
 	vtable = &PL_vtbl_uvar;
@@ -3795,9 +3761,6 @@ Perl_sv_magic(pTHX_ register SV *const sv, SV *const obj, const int how,
     mg = sv_magicext(sv,obj,how,vtable,name,namlen);
 
     switch (how) {
-    case PERL_MAGIC_taint:
-	mg->mg_len = 1;
-	break;
     case PERL_MAGIC_ext:
     case PERL_MAGIC_dbfile:
 	SvRMAGICAL_on(sv);
@@ -4062,7 +4025,6 @@ Perl_sv_insert(pTHX_ SV *const bigstr, const STRLEN offset, const STRLEN len,
 	SvCUR_set(bigstr, offset+len);
     }
 
-    SvTAINT(bigstr);
     i = littlelen - len;
     if (i > 0) {			/* string might grow */
 	big = SvGROW(bigstr, SvCUR(bigstr) + i + 1);
@@ -6485,7 +6447,6 @@ Perl_sv_pvn_force_flags(pTHX_ SV *const sv, STRLEN *const lp, const I32 flags)
 	}
 	if (!SvPOK(sv)) {
 	    SvPOK_on(sv);		/* validate pointer */
-	    SvTAINT(sv);
 	    DEBUG_c(PerlIO_printf(Perl_debug_log, "0x%"UVxf" 2pv(%s)\n",
 				  PTR2UV(sv),SvPVX_const(sv)));
 	}
@@ -6895,45 +6856,6 @@ Perl_sv_unref_flags(pTHX_ SV *const ref, const U32 flags)
 	SvREFCNT_dec(target);
     else /* XXX Hack, but hard to make $a=$a->[1] work otherwise */
 	sv_2mortal(target);	/* Schedule for freeing later */
-}
-
-/*
-=for apidoc sv_untaint
-
-Untaint an SV. Use C<SvTAINTED_off> instead.
-=cut
-*/
-
-void
-Perl_sv_untaint(pTHX_ SV *const sv)
-{
-    PERL_ARGS_ASSERT_SV_UNTAINT;
-
-    if (SvTYPE(sv) >= SVt_PVMG && SvMAGIC(sv)) {
-	MAGIC * const mg = mg_find(sv, PERL_MAGIC_taint);
-	if (mg)
-	    mg->mg_len &= ~1;
-    }
-}
-
-/*
-=for apidoc sv_tainted
-
-Test an SV for taintedness. Use C<SvTAINTED> instead.
-=cut
-*/
-
-bool
-Perl_sv_tainted(pTHX_ SV *const sv)
-{
-    PERL_ARGS_ASSERT_SV_TAINTED;
-
-    if (SvTYPE(sv) >= SVt_PVMG && SvMAGIC(sv)) {
-	const MAGIC * const mg = mg_find(sv, PERL_MAGIC_taint);
-	if (mg && (mg->mg_len & 1) )
-	    return TRUE;
-    }
-    return FALSE;
 }
 
 /*

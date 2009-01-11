@@ -425,7 +425,6 @@
 #define magic_clearisa		Perl_magic_clearisa
 #define is_magicsv		Perl_is_magicsv
 #define magic_get		Perl_magic_get
-#define magic_gettaint		Perl_magic_gettaint
 #define magic_getuvar		Perl_magic_getuvar
 #define magic_len		Perl_magic_len
 #define magic_regdata_cnt	Perl_magic_regdata_cnt
@@ -444,7 +443,6 @@
 #ifdef PERL_CORE
 #define magic_setmglob		Perl_magic_setmglob
 #define magic_setregexp		Perl_magic_setregexp
-#define magic_settaint		Perl_magic_settaint
 #define magic_setuvar		Perl_magic_setuvar
 #define magic_setutf8		Perl_magic_setutf8
 #define magicname		Perl_magicname
@@ -2577,7 +2575,6 @@
 #define magic_clearisa(a,b)	Perl_magic_clearisa(aTHX_ a,b)
 #define is_magicsv(a)		Perl_is_magicsv(aTHX_ a)
 #define magic_get(a,b)		Perl_magic_get(aTHX_ a,b)
-#define magic_gettaint(a,b)	Perl_magic_gettaint(aTHX_ a,b)
 #define magic_getuvar(a,b)	Perl_magic_getuvar(aTHX_ a,b)
 #define magic_len(a,b)		Perl_magic_len(aTHX_ a,b)
 #define magic_regdata_cnt(a,b)	Perl_magic_regdata_cnt(aTHX_ a,b)
@@ -2596,7 +2593,6 @@
 #ifdef PERL_CORE
 #define magic_setmglob(a,b)	Perl_magic_setmglob(aTHX_ a,b)
 #define magic_setregexp(a,b)	Perl_magic_setregexp(aTHX_ a,b)
-#define magic_settaint(a,b)	Perl_magic_settaint(aTHX_ a,b)
 #define magic_setuvar(a,b)	Perl_magic_setuvar(aTHX_ a,b)
 #define magic_setutf8(a,b)	Perl_magic_setutf8(aTHX_ a,b)
 #define magicname(a,b,c)	Perl_magicname(aTHX_ a,b,c)

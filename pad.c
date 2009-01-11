@@ -1016,7 +1016,7 @@ Perl_pad_reset(pTHX)
 	    )
     );
 
-    if (!PL_tainting) {	/* Can't mix tainted and non-tainted temporaries. */
+    {	/* Can't mix tainted and non-tainted temporaries. */
         register I32 po;
 	for (po = AvMAX(PL_comppad); po > PL_padix_floor; po--) {
 	    if (PL_curpad[po] && !SvIMMORTAL(PL_curpad[po]))

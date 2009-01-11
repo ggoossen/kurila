@@ -412,8 +412,6 @@ typedef DBT DBTKEY ;
 #define OutputValue(arg, name)  					\
 	{ if (RETVAL == 0) {						\
 	      my_sv_setpvn(arg, (const char *)name.data, name.size) ;			\
-	      TAINT;                                       		\
-	      SvTAINTED_on(arg);                                       	\
 	  }								\
 	}
 
@@ -425,8 +423,6 @@ typedef DBT DBTKEY ;
 		}							\
 		else 							\
 		    sv_setiv(arg, (I32)*(I32*)name.data - 1); 		\
-	      TAINT;                                       		\
-	      SvTAINTED_on(arg);                                       	\
 	  } 								\
 	}
 

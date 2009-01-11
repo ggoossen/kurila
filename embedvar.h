@@ -275,9 +275,6 @@
 #define PL_sv_undef		(vTHX->Isv_undef)
 #define PL_sv_yes		(vTHX->Isv_yes)
 #define PL_sys_intern		(vTHX->Isys_intern)
-#define PL_taint_warn		(vTHX->Itaint_warn)
-#define PL_tainted		(vTHX->Itainted)
-#define PL_tainting		(vTHX->Itainting)
 #define PL_threadhook		(vTHX->Ithreadhook)
 #define PL_timesbuf		(vTHX->Itimesbuf)
 #define PL_tmps_floor		(vTHX->Itmps_floor)
@@ -556,9 +553,6 @@
 #define PL_Isv_undef		PL_sv_undef
 #define PL_Isv_yes		PL_sv_yes
 #define PL_Isys_intern		PL_sys_intern
-#define PL_Itaint_warn		PL_taint_warn
-#define PL_Itainted		PL_tainted
-#define PL_Itainting		PL_tainting
 #define PL_Ithreadhook		PL_threadhook
 #define PL_Itimesbuf		PL_timesbuf
 #define PL_Itmps_floor		PL_tmps_floor

@@ -3010,7 +3010,6 @@ Perl_yylex(pTHX)
 			    }
 			}
 		    }
-		    TAINT_NOT;	/* $^X is always tainted, but that's OK */
 		}
 #endif /* ARG_ZERO_IS_SCRIPT */
 
@@ -4723,8 +4722,6 @@ Perl_yylex(pTHX)
 		    fcntl(fd,F_SETFD,fd >= 3);
 		}
 #endif
-		/* Mark this internal pseudo-handle as clean */
-		IoFLAGS(GvIOp(gv)) |= IOf_UNTAINT;
 		if ((PerlIO*)PL_rsfp == PerlIO_stdin())
 		    IoTYPE(GvIOp(gv)) = IoTYPE_STD;
 		else

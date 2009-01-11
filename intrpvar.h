@@ -178,7 +178,6 @@ PERLVAR(Icolorset,	bool)		/* from regcomp.c */
 PERLVARI(Idirty,	bool, FALSE)	/* in the middle of tearing things
 					   down? */
 PERLVAR(Iin_eval,	U8)		/* trap "fatal" errors? */
-PERLVAR(Itainted,	bool)		/* using variables controlled by $< */
 
 /* This value may be set when embedding for full cleanup  */
 /* 0=none, 1=full, 2=full with checks */
@@ -224,7 +223,6 @@ PERLVAR(Iunsafe,	bool)
 PERLVAR(Iexit_flags,	U8)		/* was exit() unexpected, etc. */
 PERLVAR(Isrand_called,	bool)
 /* Part of internal state, but makes the 16th 1 byte variable in a row.  */
-PERLVAR(Itainting,	bool)		/* doing taint checks */
 /* Space for a U8 */
 PERLVAR(Iinplace,	char *)
 PERLVAR(Ie_script,	SV *)
@@ -515,7 +513,6 @@ PERLVAR(Ipsig_pend, int *)		/* per-signal "count" of pending */
 PERLVARI(Isig_pending, int,0)           /* Number if highest signal pending */
 
 
-PERLVAR(Itaint_warn,	bool)      /* taint warns instead of dying */
 PERLVAR(Iutf8locale,	bool)		/* utf8 locale detected */
 PERLVARI(Irehash_seed_set, bool, FALSE)	/* 582 hash initialized? */
 

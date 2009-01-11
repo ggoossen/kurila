@@ -261,10 +261,6 @@ try { ok $^EXCEPTIONS_BEING_CAUGHT == 1 };
 eval " BEGIN \{ ok ! defined \$^S \} ";
 ok $^EXCEPTIONS_BEING_CAUGHT == 0 && defined $^EXCEPTIONS_BEING_CAUGHT;
 
-ok $^TAINT == 0;
-try { $^TAINT = 1 };
-ok $^TAINT == 0;
-
 # Tests for the magic get of $\
 do {
     my $ok = 0;

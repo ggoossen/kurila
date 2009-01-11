@@ -47,7 +47,6 @@ PP(pp_nextstate)
 {
     dVAR;
     PL_curcop = (COP*)PL_op;
-    TAINT_NOT;		/* Each statement is presumed innocent */
     PL_stack_sp = PL_stack_base + cxstack[cxstack_ix].blk_oldsp;
     FREETMPS;
     return NORMAL;
@@ -141,7 +140,6 @@ PP(pp_unstack)
 {
     dVAR;
     I32 oldsave;
-    TAINT_NOT;		/* Each statement is presumed innocent */
     PL_stack_sp = PL_stack_base + cxstack[cxstack_ix].blk_oldsp;
     FREETMPS;
     oldsave = PL_scopestack[PL_scopestack_ix - 1];
@@ -823,13 +821,6 @@ Perl_do_readline(pTHX_ GV* gv)
 	offset = 0;
     }
 
-    /* This should not be marked tainted if the fp is marked clean */
-#define MAYBE_TAINT_LINE(io, sv) \
-    if (!(IoFLAGS(io) & IOf_UNTAINT)) { \
-	TAINT;				\
-	SvTAINTED_on(sv);		\
-    }
-
 /* delay EOF state for a snarfed empty file */
 #define SNARF_EOF(gimme,rs,io,sv) \
     (gimme != G_SCALAR || SvCUR(sv)					\
@@ -865,10 +856,8 @@ Perl_do_readline(pTHX_ GV* gv)
 		SPAGAIN;
 		PUSHTARG;
 	    }
-	    MAYBE_TAINT_LINE(io, sv);
 	    RETURN;
 	}
-	MAYBE_TAINT_LINE(io, sv);
 	IoLINES(io)++;
 	IoFLAGS(io) |= IOf_NOLINE;
 	SvSETMAGIC(sv);
@@ -1073,7 +1062,6 @@ PP(pp_leave)
 	    gimme = G_SCALAR;
     }
 
-    TAINT_NOT;
     if (gimme == G_VOID)
 	SP = newsp;
     else if (gimme == G_SCALAR) {
@@ -1096,7 +1084,6 @@ PP(pp_leave)
 	for (mark = newsp + 1; mark <= SP; mark++) {
 	    if (!(SvFLAGS(*mark) & (SVs_PADTMP|SVs_TEMP))) {
 		*mark = sv_mortalcopy(*mark);
-		TAINT_NOT;	/* Each item is independent */
 	    }
 	}
     }
@@ -1272,7 +1259,6 @@ PP(pp_leavesub)
     POPBLOCK(cx,newpm);
     cxstack_ix++; /* temporarily protect top context */
 
-    TAINT_NOT;
     if (gimme == G_VOID) {
 	MARK = newsp + 1;
 	if (MARK <= SP) {
@@ -1313,7 +1299,6 @@ PP(pp_leavesub)
 	for (MARK = newsp + 1; MARK <= SP; MARK++) {
 	    if (!SvTEMP(*MARK)) {
 		*MARK = sv_mortalcopy(*MARK);
-		TAINT_NOT;	/* Each item is independent */
 	    }
 	}
     }

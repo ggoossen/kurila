@@ -75,7 +75,6 @@
 #  include "regcomp.h"
 #endif
 
-#define RF_tainted	1		/* tainted information used? */
 #define RF_warned	2		/* warned about big count? */
 
 #define RF_utf8		8		/* Pattern contains multibyte chars? */
@@ -1042,7 +1041,6 @@ if ((!reginfo || regtry(reginfo, &s))) \
     break
 
 #define REXEC_FBC_CSCAN_TAINT(CoNdUtF8,CoNd)                   \
-    PL_reg_flags |= RF_tainted;                                \
     if (do_utf8) {                                             \
 	REXEC_FBC_UTF8_CLASS_SCAN(CoNdUtF8);                   \
     }                                                          \
@@ -1114,7 +1112,6 @@ S_find_byclass(pTHX_ regexp * prog, const regnode *c, char *s,
 	    );
 	    break;
 	case BOUNDL:
-	    PL_reg_flags |= RF_tainted;
 	    /* FALL THROUGH */
 	case BOUND:
 	    if (do_utf8) {
@@ -1152,7 +1149,6 @@ S_find_byclass(pTHX_ regexp * prog, const regnode *c, char *s,
 		goto got_it;
 	    break;
 	case NBOUNDL:
-	    PL_reg_flags |= RF_tainted;
 	    /* FALL THROUGH */
 	case NBOUND:
 	    if (do_utf8) {
@@ -1818,8 +1814,6 @@ Perl_regexec_flags(pTHX_ REGEXP * const rx, char *stringarg, register char *stre
     goto phooey;
 
 got_it:
-    RX_MATCH_TAINTED_set(rx, PL_reg_flags & RF_tainted);
-
     if (PL_reg_eval_set)
 	restore_pos(aTHX_ prog);
     if (RXp_PAREN_NAMES(prog)) 
@@ -2915,7 +2909,6 @@ S_regmatch(pTHX_ regmatch_info *reginfo, regnode *prog)
 	    break;
 	case BOUNDL:
 	case NBOUNDL:
-	    PL_reg_flags |= RF_tainted;
 	    /* FALL THROUGH */
 	case BOUND:
 	case NBOUND:
@@ -2977,7 +2970,6 @@ S_regmatch(pTHX_ regmatch_info *reginfo, regnode *prog)
 	{
 	    char *s;
 	    char type;
-	    PL_reg_flags |= RF_tainted;
 	    /* FALL THROUGH */
 	case NREF:
 	case NREFF:
@@ -2992,7 +2984,6 @@ S_regmatch(pTHX_ regmatch_info *reginfo, regnode *prog)
             }
             /* unreached */
 	case REFFL:
-	    PL_reg_flags |= RF_tainted;
 	    /* FALL THROUGH */
         case REF:
 	case REFF: 
@@ -4813,9 +4804,6 @@ S_reginclass(pTHX_ const regexp *prog, register const regnode *n, register const
     RXi_GET_DECL(prog, progi);
     GET_RE_DEBUG_FLAGS_DECL;
     PERL_ARGS_ASSERT_REGINCLASS;
-
-    if (flags & ANYOF_FOLD)
-	PL_reg_flags |= RF_tainted;
 
     if ((flags & ANYOF_UNICODE) && (!UTF8_IS_INVARIANT(c))) {
 	c = utf8n_to_uvchr(p, UTF8_MAXBYTES, &len,

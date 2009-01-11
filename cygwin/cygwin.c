@@ -65,12 +65,6 @@ do_aspawn (SV *really, void **mark, void **sp)
             *a++ = "";
     *a = (char*)NULL;
 
-    if (argv[0][0] != '/' && argv[0][0] != '\\'
-        && !(argv[0][0] && argv[0][1] == ':'
-        && (argv[0][2] == '/' || argv[0][2] != '\\'))
-     ) /* will swawnvp use PATH? */
-         TAINT_ENV();	/* testing IFS here is overkill, probably */
-
     if (really && *(tmps = SvPV(really, n_a)))
         rc=do_spawnvp (tmps,(const char * const *)argv);
     else
@@ -154,9 +148,6 @@ XS(Cygwin_cwd)
     if((cwd = getcwd(NULL, -1))) {
 	ST(0) = sv_2mortal(newSVpv(cwd, 0));
 	free(cwd);
-#ifndef INCOMPLETE_TAINTS
-	SvTAINTED_on(ST(0));
-#endif
 	XSRETURN(1);
     }
     XSRETURN_UNDEF;

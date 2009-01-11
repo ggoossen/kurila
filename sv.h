@@ -527,7 +527,6 @@ typedef struct {
 #define IOf_START	2	/* check for null ARGV and substitute '-' */
 #define IOf_FLUSH	4	/* this fp wants a flush after write op */
 #define IOf_DIDTOP	8	/* just did top of form */
-#define IOf_UNTAINT	16	/* consider this fp (and its data) "safe" */
 #define IOf_NOLINE	32	/* slurped a pseudo-line from empty file */
 #define IOf_FAKE_DIRP	64	/* xio_dirp is fake (source filters kludge) */
 
@@ -1169,43 +1168,6 @@ in gv.h: */
 #define IoTYPE_CLOSED		' '
 #define IoTYPE_IMPLICIT		'I'	/* stdin or stdout or stderr */
 #define IoTYPE_NUMERIC		'#'	/* fdopen */
-
-/*
-=for apidoc Am|bool|SvTAINTED|SV* sv
-Checks to see if an SV is tainted. Returns TRUE if it is, FALSE if
-not.
-
-=for apidoc Am|void|SvTAINTED_on|SV* sv
-Marks an SV as tainted if tainting is enabled.
-
-=for apidoc Am|void|SvTAINTED_off|SV* sv
-Untaints an SV. Be I<very> careful with this routine, as it short-circuits
-some of Perl's fundamental security features. XS module authors should not
-use this function unless they fully understand all the implications of
-unconditionally untainting the value. Untainting should be done in the
-standard perl fashion, via a carefully crafted regexp, rather than directly
-untainting variables.
-
-=for apidoc Am|void|SvTAINT|SV* sv
-Taints an SV if tainting is enabled.
-
-=cut
-*/
-
-#define sv_taint(sv)	  sv_magic((sv), NULL, PERL_MAGIC_taint, NULL, 0)
-
-#define SvTAINTED(sv)	  (SvMAGICAL(sv) && sv_tainted(sv))
-#define SvTAINTED_on(sv)  STMT_START{ if(PL_tainting){sv_taint(sv);}   }STMT_END
-#define SvTAINTED_off(sv) STMT_START{ if(PL_tainting){sv_untaint(sv);} }STMT_END
-
-#define SvTAINT(sv)			\
-    STMT_START {			\
-	if (PL_tainting) {		\
-	    if (PL_tainted)		\
-		SvTAINTED_on(sv);	\
-	}				\
-    } STMT_END
-
 
 /* all these 'functions' are now just macros */
 

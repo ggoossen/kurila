@@ -8580,9 +8580,6 @@ sub restart {
         push @flags, '-I', $_;
     }
 
-    # Turn on taint if it was on before.
-    push @flags, '-T' if $^TAINT;
-
     # Arrange for setting the old INC:
     # Save the current @init_INC in the environment.
     set_list( "PERLDB_INC", < @ini_INC );

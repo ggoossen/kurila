@@ -37,16 +37,6 @@ is equivalent to the original path for all systems but VMS.
 
 package File::Basename;
 
-# A bit of juggling to insure that C<use re 'taint';> always works, since
-# File::Basename is used during the Perl build, when the re extension may
-# not be available.
-BEGIN {
-  unless (try { require re; })
-    { eval ' sub re::import { $^H ^|^= 0x00100000; } ' } # HINT_RE_TAINT
-  re->import('taint');
-}
-
-
 use warnings;
 our(@ISA, @EXPORT, $VERSION, $Fileparse_fstype, $Fileparse_igncase);
 require Exporter;

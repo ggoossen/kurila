@@ -22,8 +22,7 @@ BEGIN {
     @INC = @('../lib');
 }
 
-# Don't interfere with the taintedness of %ENV, this could perturbate tests
-env::set_var('PERL_CORE' => 1) unless $^TAINT;
+env::set_var('PERL_CORE' => 1);
 
 $^PROGRAM_NAME =~ s/\.dp$//; # for the test.deparse make target
 

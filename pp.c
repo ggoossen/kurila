@@ -1313,7 +1313,6 @@ PP(pp_repeat)
   {
     register IV count;
     dPOPss;
-    TAINT_FROM_SV(sv);
     if (SvIOKp(sv)) {
 	 if (SvUOK(sv)) {
 	      const UV uv = SvUV(sv);
@@ -2023,8 +2022,6 @@ PP(pp_bit_and)
     dVAR; dSP; dATARGET;
     {
       dPOPTOPssrl;
-      TAINT_FROM_SV(left);
-      TAINT_FROM_SV(right);
       if (SvNIOKp(left) || SvNIOKp(right)) {
 	if (PL_op->op_private & HINT_INTEGER) {
 	  const IV i = SvIV_nomg(left) & SvIV_nomg(right);
@@ -2050,8 +2047,6 @@ PP(pp_bit_or)
 
     {
       dPOPTOPssrl;
-      TAINT_FROM_SV(left);
-      TAINT_FROM_SV(right);
       if (SvNIOKp(left) || SvNIOKp(right)) {
 	if (PL_op->op_private & HINT_INTEGER) {
 	  const IV l = (USE_LEFT(left) ? SvIV_nomg(left) : 0);
@@ -2080,7 +2075,6 @@ PP(pp_negate)
     {
 	SV * const sv = sv_2num(TOPs);
 	const int flags = SvFLAGS(sv);
-	TAINT_FROM_SV(sv);
 	if ((flags & SVf_IOK) || ((flags & (SVp_IOK | SVp_NOK)) == SVp_IOK)) {
 	    /* It's publicly an integer, or privately an integer-not-float */
 	oops_its_an_int:
@@ -2652,7 +2646,6 @@ PP(pp_substr)
     const int num_args = PL_op->op_private & 7;
     bool has_len = FALSE;
 
-    SvTAINTED_off(TARG);			/* decontaminate */
     if (num_args > 2) {
 	if (num_args > 3) {
 	    repl_sv = POPs;
@@ -2736,8 +2729,6 @@ PP(pp_vec)
 {
     dVAR; dSP; dTARGET;
 
-    SvTAINTED_off(TARG);		/* decontaminate */
-
     if (MAXARG > 3) {			/* it's an lvalue! */
 	do_vecset();      /* XXX slurp this routine */
     }
@@ -2818,10 +2809,7 @@ PP(pp_index)
 PP(pp_sprintf)
 {
     dVAR; dSP; dMARK; dORIGMARK; dTARGET;
-    if (SvTAINTED(MARK[1]))
-	TAINT_PROPER("sprintf");
     do_sprintf(TARG, SP-MARK, MARK+1);
-    TAINT_IF(SvTAINTED(TARG));
     SP = ORIGMARK;
     PUSHTARG;
     RETURN;
@@ -4496,7 +4484,6 @@ PP(pp_split)
 	    SPAGAIN;
 	    if (rex_return == 0)
 		break;
-	    TAINT_IF(RX_MATCH_TAINTED(rx));
 	    if (RX_MATCH_COPIED(rx) && RX_SUBBEG(rx) != orig) {
 		m = s;
 		s = orig;

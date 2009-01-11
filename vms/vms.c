@@ -1366,7 +1366,6 @@ prime_env_iter(void)
         else {
           start++;
           sv = newSVpv(start,0);
-          SvTAINTED_on(sv);
           (void) hv_store(envhv,environ[j],start - environ[j] - 1,sv,0);
         }
       }
@@ -1472,7 +1471,6 @@ prime_env_iter(void)
         sv = newSVpvn(cp2,cp1 - cp2 + 1);
       }
 
-      SvTAINTED_on(sv);
       hv_store(envhv,key,keylen,sv,hash);
       hv_store(seenhv,key,keylen,&PL_sv_yes,hash);
     }
@@ -1484,7 +1482,6 @@ prime_env_iter(void)
       for (i = 0; ppfs[i]; i++) {
         trnlen = vmstrnenv(ppfs[i],eqv,0,fildev,0);
         sv = newSVpv(eqv,trnlen);
-        SvTAINTED_on(sv);
         hv_store(envhv,ppfs[i],strlen(ppfs[i]),sv,0);
       }
     }
@@ -4424,8 +4421,6 @@ PerlIO *
 Perl_my_popen(pTHX_ const char *cmd, const char *mode)
 {
     int sts;
-    TAINT_ENV();
-    TAINT_PROPER("popen");
     PERL_FLUSHALL_FOR_CHILD;
     return safe_popen(aTHX_ cmd,mode,&sts);
 }
@@ -10151,8 +10146,6 @@ Perl_vms_do_exec(pTHX_ const char *cmd)
   {                               /* no vfork - act VMSish */
     unsigned long int retsts;
 
-    TAINT_ENV();
-    TAINT_PROPER("exec");
     if ((retsts = setup_cmddsc(aTHX_ cmd,1,0,&vmscmd)) & 1)
       retsts = lib$do_command(vmscmd);
 
@@ -10252,8 +10245,6 @@ do_spawn2(pTHX_ const char *cmd, int flags)
   /* The caller of this routine expects to Safefree(PL_Cmd) */
   Newx(PL_Cmd,10,char);
 
-  TAINT_ENV();
-  TAINT_PROPER("spawn");
   if (!cmd || !*cmd) {
     sts = lib$spawn(0,0,0,&flags,0,0,&substs,0,0,0,0,0,0);
     if (!(sts & 1)) {
@@ -12885,7 +12876,6 @@ Perl_vms_start_glob
 	    PerlIO_rewind(tmpfp);
 	    IoTYPE(io) = IoTYPE_RDONLY;
 	    IoIFP(io) = fp = tmpfp;
-	    IoFLAGS(io) &= ~IOf_UNTAINT;  /* maybe redundant */
 	}
     }
     Safefree(vmsspec);

@@ -296,17 +296,12 @@ Perl_hv_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
 	    bool needs_copy;
 	    hv_magic_check (hv, &needs_copy);
 	    if (needs_copy) {
-		const bool save_taint = PL_tainted;
 		if (keysv) {
-		    if (PL_tainting)
-			PL_tainted = SvTAINTED(keysv);
 		    keysv = sv_2mortal(newSVsv(keysv));
 		    mg_copy((SV*)hv, val, (char*)keysv, HEf_SVKEY);
 		} else {
 		    mg_copy((SV*)hv, val, key, klen);
 		}
-
-		TAINT_IF(save_taint);
 	    }
 	} /* ISSTORE */
     } /* SvMAGICAL */

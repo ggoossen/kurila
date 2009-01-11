@@ -6,7 +6,6 @@
 
 XS(XS_Internals_SvREADONLY);
 XS(XS_Internals_HvRESTRICTED);
-XS(XS_Internals_SvTAINTED);
 XS(XS_Internals_peek);
 XS(XS_Internals_SvREFCNT);
 XS(XS_Internals_hv_clear_placehold);
@@ -25,7 +24,6 @@ Perl_boot_core_Internals(pTHX)
 
     newXSproto("Internals::SvREADONLY",XS_Internals_SvREADONLY, file, "\\[$%@];$");
     newXSproto("Internals::HvRESTRICTED",XS_Internals_HvRESTRICTED, file, "\\[$%@];$");
-    newXSproto("Internals::SvTAINTED",XS_Internals_SvTAINTED, file, "\\[$%@];$");
     newXS("Internals::SvREFCNT",XS_Internals_SvREFCNT, file);
     newXS("Internals::peek",XS_Internals_peek, file);
     newXSproto("Internals::hv_clear_placeholders",
@@ -86,32 +84,6 @@ XS(XS_Internals_HvRESTRICTED)	/* This is dangerous stuff. */
 	}
 	else {
 	    HvRESTRICTED_off(sv);
-	    XSRETURN_NO;
-	}
-    }
-    XSRETURN_UNDEF; /* Can't happen. */
-}
-
-XS(XS_Internals_SvTAINTED)
-{
-    dVAR;
-    dXSARGS;
-    SV * const sv = SvRV(ST(0));
-    PERL_UNUSED_ARG(cv);
-
-    if (items == 1) {
-	 if (SvTAINTED(sv))
-	     XSRETURN_YES;
-	 else
-	     XSRETURN_NO;
-    }
-    else if (items == 2) {
-	if (SvTRUE(ST(1))) {
-	    SvTAINTED_on(sv);
-	    XSRETURN_YES;
-	}
-	else {
-	    SvTAINTED_off(sv);
 	    XSRETURN_NO;
 	}
     }

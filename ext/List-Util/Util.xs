@@ -252,8 +252,6 @@ CODE:
 	SvIV_set(ST(0), SvIV(num));
 	SvIOK_on(ST(0));
     }
-    if(PL_tainting && (SvTAINTED(num) || SvTAINTED(str)))
-	SvTAINTED_on(ST(0));
     XSRETURN(1);
 }
 

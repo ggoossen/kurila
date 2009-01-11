@@ -15,7 +15,6 @@ PP(pp_match)
     U8 r_flags = REXEC_CHECKED;
     const char *truebase;			/* Start of string  */
     register REGEXP *rx = PM_GETRE(pm);
-    bool rxtainted;
     const I32 gimme = GIMME;
     STRLEN len;
     I32 minmatch = 0;
@@ -38,9 +37,6 @@ PP(pp_match)
     if (!s)
 	DIE(aTHX_ "panic: pp_match");
     strend = s + len;
-    rxtainted = ((RX_EXTFLAGS(rx) & RXf_TAINTED) ||
-		 (PL_tainted && (pm->op_pmflags & PMf_RETAINT)));
-    TAINT_NOT;
 
     /* PMdf_USED is set after a ?? matches once */
     if (0) {
@@ -128,9 +124,6 @@ play_it_again:
     /*NOTREACHED*/
 
   gotcha:
-    if (rxtainted)
-	RX_MATCH_TAINTED_on(rx);
-    TAINT_IF(RX_MATCH_TAINTED(rx));
     if (gimme == G_ARRAY) {
 	const I32 nparens = RX_NPARENS(rx);
 	I32 i = (global && !nparens) ? 1 : 0;
@@ -210,9 +203,6 @@ play_it_again:
     }
 
 yup:					/* Confirmed by INTUIT */
-    if (rxtainted)
-	RX_MATCH_TAINTED_on(rx);
-    TAINT_IF(RX_MATCH_TAINTED(rx));
     PL_curpm = pm;
     if (RX_MATCH_COPIED(rx))
 	Safefree(RX_SUBBEG(rx));
@@ -294,7 +284,6 @@ PP(pp_subst)
     I32 maxiters;
     register I32 i;
     bool once;
-    U8 rxtainted;
     char *orig;
     U8 r_flags;
     register REGEXP *rx = PM_GETRE(pm);
@@ -343,11 +332,6 @@ PP(pp_subst)
     s = SvPV_mutable(TARG, len);
     if (!SvPOKp(TARG) || SvTYPE(TARG) == SVt_PVGV)
 	force_on_match = 1;
-    rxtainted = ((RX_EXTFLAGS(rx) & RXf_TAINTED) ||
-		 (PL_tainted && (pm->op_pmflags & PMf_RETAINT)));
-    if (PL_tainted)
-	rxtainted |= 2;
-    TAINT_NOT;
 
   force_it:
     if (!pm || !s)
@@ -426,7 +410,6 @@ PP(pp_subst)
 	PL_curpm = pm;
 	SvSCREAM_off(TARG);	/* disable possible screamer */
 	if (once) {
-	    rxtainted |= RX_MATCH_TAINTED(rx);
 	    m = orig + RX_OFFS(rx)[0].start;
 	    d = orig + RX_OFFS(rx)[0].end;
 	    s = orig;
@@ -459,7 +442,6 @@ PP(pp_subst)
 	    else {
 		sv_chop(TARG, d);
 	    }
-	    TAINT_IF(rxtainted & 1);
 	    SPAGAIN;
 	    PUSHs(&PL_sv_yes);
 	}
@@ -467,7 +449,6 @@ PP(pp_subst)
 	    do {
 		if (iters++ > maxiters)
 		    DIE(aTHX_ "Substitution loop");
-		rxtainted |= RX_MATCH_TAINTED(rx);
 		m = RX_OFFS(rx)[0].start + orig;
 		if ((i = m - s)) {
 		    if (s != d)
@@ -488,18 +469,15 @@ PP(pp_subst)
 		SvCUR_set(TARG, d - SvPVX_const(TARG) + i);
 		Move(s, d, i+1, char);		/* include the NUL */
 	    }
-	    TAINT_IF(rxtainted & 1);
 	    SPAGAIN;
 	    mPUSHi((I32)iters);
 	}
 	(void)SvPOK_only(TARG);
-	TAINT_IF(rxtainted);
 	if (SvSMAGICAL(TARG)) {
 	    PUTBACK;
 	    mg_set(TARG);
 	    SPAGAIN;
 	}
-	SvTAINT(TARG);
 	LEAVE_SCOPE(oldsave);
 	RETURN;
     }
@@ -514,7 +492,6 @@ PP(pp_subst)
 #ifdef PERL_OLD_COPY_ON_WRITE
       have_a_cow:
 #endif
-	rxtainted |= RX_MATCH_TAINTED(rx);
 	dstr = newSVpvn(m, s-m);
 	SAVEFREESV(dstr);
 	PL_curpm = pm;
@@ -528,7 +505,6 @@ PP(pp_subst)
 	do {
 	    if (iters++ > maxiters)
 		DIE(aTHX_ "Substitution loop");
-	    rxtainted |= RX_MATCH_TAINTED(rx);
 	    if (RX_MATCH_COPIED(rx) && RX_SUBBEG(rx) != orig) {
 		m = s;
 		s = orig;
@@ -565,14 +541,11 @@ PP(pp_subst)
 	SvLEN_set(TARG, SvLEN(dstr));
 	SvPV_set(dstr, NULL);
 
-	TAINT_IF(rxtainted & 1);
 	SPAGAIN;
 	mPUSHi((I32)iters);
 
 	(void)SvPOK_only(TARG);
-	TAINT_IF(rxtainted);
 	SvSETMAGIC(TARG);
-	SvTAINT(TARG);
 	LEAVE_SCOPE(oldsave);
 	RETURN;
     }
@@ -611,8 +584,6 @@ PP(pp_substcont)
 	if (cx->sb_iters > cx->sb_maxiters)
 	    DIE(aTHX_ "Substitution loop");
 
-	if (!(cx->sb_rxtainted & 2) && SvTAINTED(TOPs))
-	    cx->sb_rxtainted |= 2;
 	sv_catsv(dstr, POPs);
 
 	/* Are we done */
@@ -628,7 +599,6 @@ PP(pp_substcont)
 	    if(cx->sb_strend > s) {
 		sv_catpvn(dstr, s, cx->sb_strend - s);
 	    }
-	    cx->sb_rxtainted |= RX_MATCH_TAINTED(rx);
 
 #ifdef PERL_OLD_COPY_ON_WRITE
 	    if (SvIsCOW(targ)) {
@@ -643,13 +613,10 @@ PP(pp_substcont)
 	    SvLEN_set(targ, SvLEN(dstr));
 	    SvPV_set(dstr, NULL);
 
-	    TAINT_IF(cx->sb_rxtainted & 1);
 	    mPUSHi(saviters - 1);
 
 	    (void)SvPOK_only(targ);
-	    TAINT_IF(cx->sb_rxtainted);
 	    SvSETMAGIC(targ);
-	    SvTAINT(targ);
 
 	    LEAVE_SCOPE(cx->sb_oldsave);
 	    POPSUBST(cx);
@@ -687,7 +654,6 @@ PP(pp_substcont)
     }
     if (old != rx)
 	(void)ReREFCNT_inc(rx);
-    cx->sb_rxtainted |= RX_MATCH_TAINTED(rx);
     rxres_save(&cx->sb_rxres, rx);
     RETURNOP(pm->op_pmstashstartu.op_pmreplstart);
 }
@@ -712,8 +678,6 @@ PP(pp_qr)
 	(void)sv_bless(rv, stash);
     }
 
-    if (RX_EXTFLAGS(rx) & RXf_TAINTED)
-        SvTAINTED_on(rv);
     XPUSHs(rv);
     RETURN;
 }
@@ -724,7 +688,6 @@ PP(pp_regcreset)
     /* XXXX Should store the old value to allow for tie/overload - and
        restore in regcomp, where marked with XXXX. */
     PL_reginterp_cnt = 0;
-    TAINT_NOT;
     return NORMAL;
 }
 
@@ -795,15 +758,6 @@ PP(pp_regcomp)
     }
     
     re = PM_GETRE(pm);
-
-#ifndef INCOMPLETE_TAINTS
-    if (PL_tainting) {
-	if (PL_tainted)
-	    RX_EXTFLAGS(re) |= RXf_TAINTED;
-	else
-	    RX_EXTFLAGS(re) &= ~RXf_TAINTED;
-    }
-#endif
 
     if (!RX_PRELEN(PM_GETRE(pm)) && PL_curpm)
 	pm = PL_curpm;

@@ -299,7 +299,6 @@ struct pmop {
 #define PM_SETRE(o,r)   ((o)->op_pmregexp = (r))
 
 
-#define PMf_RETAINT	0x0001		/* taint $1 etc. if target tainted */
 #define PMf_UNSED	0x0002		/* was PMf_ONCE */
 
 #define PMf_NOTUSED2	0x0004		/* free for use */

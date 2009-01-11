@@ -917,8 +917,6 @@ perl_destruct(pTHXx)
     PL_bitcount = NULL;
     Safefree(PL_psig_pend);
     PL_psig_pend = (int*)NULL;
-    PL_tainting = FALSE;
-    PL_taint_warn = FALSE;
     PL_hints = 0;		/* Reset hints. Should hints be per-interpreter ? */
     PL_debug = 0;
 
@@ -1238,10 +1236,7 @@ perl_parse(pTHXx_ XSINIT_t xsinit, int argc, char **argv, char **env)
 	PL_do_undump = FALSE;
 	cxstack_ix = -1;		/* start label stack again */
 	init_ids();
-	assert (!PL_tainted);
-	TAINT;
 	S_set_caret_X(aTHX);
-	TAINT_NOT;
 	init_postdump_symbols(argc,argv,env);
 	return 0;
     }
@@ -1375,21 +1370,6 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 		if ((s = moreswitches(s)))
 		    goto reswitch;
 		break;
-
-	    case 't':
-		CHECK_MALLOC_TOO_LATE_FOR('t');
-		if( !PL_tainting ) {
-		    PL_taint_warn = TRUE;
-		    PL_tainting = TRUE;
-		}
-		s++;
-		goto reswitch;
-	    case 'T':
-		CHECK_MALLOC_TOO_LATE_FOR('T');
-		PL_tainting = TRUE;
-		PL_taint_warn = FALSE;
-		s++;
-		goto reswitch;
 
 	    case 'e':
 #ifdef MACOS_TRADITIONAL
@@ -1578,20 +1558,12 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 	char *s;
 
 	if (
-#ifndef SECURE_INTERNAL_GETENV
-	    !PL_tainting &&
-#endif
 	    (s = PerlEnv_getenv("PERL5OPT")))
 	    {
 		const char *popt = s;
 		while (isSPACE(*s))
 		    s++;
-		if (*s == '-' && *(s+1) == 'T') {
-		    CHECK_MALLOC_TOO_LATE_FOR('T');
-		    PL_tainting = TRUE;
-		    PL_taint_warn = FALSE;
-		}
-		else {
+		{
 		    char *popt_copy = NULL;
 		    while (s && *s) {
 			char *d;
@@ -1618,14 +1590,7 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 				break;
 			    }
 			}
-			if (*d == 't') {
-			    if( !PL_tainting ) {
-				PL_taint_warn = TRUE;
-				PL_tainting = TRUE;
-			    }
-			} else {
-			    moreswitches(d);
-			}
+			moreswitches(d);
 		    }
 		}
 	    }
@@ -1653,10 +1618,7 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
     }
 
     /* Set $^EXECUTABLE_NAME early so that it can be used for relocatable paths in @INC  */
-    assert (!PL_tainted);
-    TAINT;
     S_set_caret_X(aTHX);
-    TAINT_NOT;
     init_perllib();
 
     {
@@ -2368,7 +2330,6 @@ Perl_eval_sv(pTHX_ SV *sv, I32 flags)
 
     /* fail now; otherwise we could fail after the JMPENV_PUSH but
      * before a PUSHEVAL, which corrupts the stack after a croak */
-    TAINT_PROPER("eval_sv()");
 
     JMPENV_PUSH(ret);
     switch (ret) {
@@ -2844,16 +2805,6 @@ Perl_moreswitches(pTHX_ const char *s)
 	return s;
     case 'p':
 	PL_minus_p = TRUE;
-	s++;
-	return s;
-    case 't':
-        if (!PL_tainting)
-	    TOO_LATE_FOR('t');
-        s++;
-        return s;
-    case 'T':
-	if (!PL_tainting)
-	    TOO_LATE_FOR('T');
 	s++;
 	return s;
     case 'u':
@@ -3899,7 +3850,6 @@ S_init_ids(pTHX)
 #endif
     /* Should not happen: */
     CHECK_MALLOC_TAINT(PL_uid && (PL_euid != PL_uid || PL_egid != PL_gid));
-    PL_tainting |= (PL_uid && (PL_euid != PL_uid || PL_egid != PL_gid));
     /* BUG */
     /* PSz 27 Feb 04
      * Should go by suidscript, not uid!=euid: why disallow
@@ -3909,43 +3859,6 @@ S_init_ids(pTHX)
      * (We never have suidscript, can we be sure to have fdscript?)
      * Or must then go by UID checks? See comments in forbid_setid also.
      */
-}
-
-/* This is used very early in the lifetime of the program,
- * before even the options are parsed, so PL_tainting has
- * not been initialized properly.  */
-bool
-Perl_doing_taint(int argc, char *argv[], char *envp[])
-{
-#ifndef PERL_IMPLICIT_SYS
-    /* If we have PERL_IMPLICIT_SYS we can't call getuid() et alia
-     * before we have an interpreter-- and the whole point of this
-     * function is to be called at such an early stage.  If you are on
-     * a system with PERL_IMPLICIT_SYS but you do have a concept of
-     * "tainted because running with altered effective ids', you'll
-     * have to add your own checks somewhere in here.  The two most
-     * known samples of 'implicitness' are Win32 and NetWare, neither
-     * of which has much of concept of 'uids'. */
-    int uid  = PerlProc_getuid();
-    int euid = PerlProc_geteuid();
-    int gid  = PerlProc_getgid();
-    int egid = PerlProc_getegid();
-    (void)envp;
-
-#ifdef VMS
-    uid  |=  gid << 16;
-    euid |= egid << 16;
-#endif
-    if (uid && (euid != uid || egid != gid))
-	return 1;
-#endif /* !PERL_IMPLICIT_SYS */
-    /* This is a really primitive check; environment gets ignored only
-     * if -T are the first chars together; otherwise one gets
-     *  "Too late" message. */
-    if ( argc > 1 && argv[1][0] == '-'
-         && (argv[1][1] == 't' || argv[1][1] == 'T') )
-	return 1;
-    return 0;
 }
 
 /* Passing the flag as a single char rather than a string is a slight space
@@ -4153,8 +4066,6 @@ S_init_postdump_symbols(pTHX_ register int argc, register char **argv, register 
 
     PERL_ARGS_ASSERT_INIT_POSTDUMP_SYMBOLS;
 
-    TAINT;
-
     init_argv_symbols(argc,argv);
 
     tmpsv = hv_fetchs(PL_magicsvhv, "^PROGRAM_NAME", 1); /* access PL_magicsv_hv directly without going through magic */
@@ -4202,7 +4113,6 @@ S_init_postdump_symbols(pTHX_ register int argc, register char **argv, register 
 #endif /* USE_ENVIRON_ARRAY */
 #endif /* !PERL_MICRO */
     }
-    TAINT_NOT;
     sv_setiv(*hv_fetchs(PL_magicsvhv, "^PID", 1), (IV)PerlProc_getpid());
 #ifdef THREADS_HAVE_PIDS
     PL_ppid = (IV)getppid();
@@ -4219,33 +4129,33 @@ S_init_perllib(pTHX)
 {
     dVAR;
     char *s;
-    if (!PL_tainting) {
+    {
 #ifndef VMS
-	s = PerlEnv_getenv("PERL5LIB");
+       s = PerlEnv_getenv("PERL5LIB");
 /*
  * It isn't possible to delete an environment variable with
  * PERL_USE_SAFE_PUTENV set unless unsetenv() is also available, so in that
  * case we treat PERL5LIB as undefined if it has a zero-length value.
  */
 #if defined(PERL_USE_SAFE_PUTENV) && ! defined(HAS_UNSETENV)
-	if (s && *s != '\0')
+       if (s && *s != '\0')
 #else
-	if (s)
+       if (s)
 #endif
-	    incpush(s, TRUE, TRUE, TRUE, FALSE);
-	else
-	    incpush(PerlEnv_getenv("PERLLIB"), FALSE, FALSE, TRUE, FALSE);
+           incpush(s, TRUE, TRUE, TRUE, FALSE);
+       else
+           incpush(PerlEnv_getenv("PERLLIB"), FALSE, FALSE, TRUE, FALSE);
 #else /* VMS */
-	/* Treat PERL5?LIB as a possible search list logical name -- the
-	 * "natural" VMS idiom for a Unix path string.  We allow each
-	 * element to be a set of |-separated directories for compatibility.
-	 */
-	char buf[256];
-	int idx = 0;
-	if (my_trnlnm("PERL5LIB",buf,0))
-	    do { incpush(buf,TRUE,TRUE,TRUE,FALSE); } while (my_trnlnm("PERL5LIB",buf,++idx));
-	else
-	    while (my_trnlnm("PERLLIB",buf,idx++)) incpush(buf,FALSE,FALSE,TRUE,FALSE);
+       /* Treat PERL5?LIB as a possible search list logical name -- the
+        * "natural" VMS idiom for a Unix path string.  We allow each
+        * element to be a set of |-separated directories for compatibility.
+        */
+       char buf[256];
+       int idx = 0;
+       if (my_trnlnm("PERL5LIB",buf,0))
+           do { incpush(buf,TRUE,TRUE,TRUE,FALSE); } while (my_trnlnm("PERL5LIB",buf,++
+       else
+           while (my_trnlnm("PERLLIB",buf,idx++)) incpush(buf,FALSE,FALSE,TRUE,FALSE);
 #endif /* VMS */
     }
 
@@ -4277,8 +4187,7 @@ S_init_perllib(pTHX)
 	
    	SvREFCNT_dec(privdir);
     }
-    if (!PL_tainting)
-	incpush(":", FALSE, FALSE, TRUE, FALSE);
+    incpush(":", FALSE, FALSE, TRUE, FALSE);
 #else
 #ifndef PRIVLIB_EXP
 #  define PRIVLIB_EXP "/usr/local/lib/perl5:/usr/local/lib/perl"
@@ -4334,9 +4243,8 @@ S_init_perllib(pTHX)
 #ifdef PERL_OTHERLIBDIRS
     incpush(PERL_OTHERLIBDIRS, TRUE, TRUE, TRUE, TRUE);
 #endif
-
-    if (!PL_tainting)
-	incpush(".", FALSE, FALSE, TRUE, FALSE);
+	   
+    incpush(".", FALSE, FALSE, TRUE, FALSE);
 #endif /* MACOS_TRADITIONAL */
 }
 
@@ -4512,11 +4420,6 @@ S_incpush(pTHX_ const char *dir, bool addsubdirs, bool addoldvers, bool usesep,
 		    SvREFCNT_dec(libdir);
 		    /* And this is the new libdir.  */
 		    libdir = tempsv;
-		    if (PL_tainting &&
-			(PL_uid != PL_euid || PL_gid != PL_egid)) {
-			/* Need to taint reloccated paths if running set ID  */
-			SvTAINTED_on(libdir);
-		    }
 		}
 		SvREFCNT_dec(prefix_sv);
 	    }

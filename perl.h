@@ -507,13 +507,6 @@ register struct op *Perl_op asm(stringify(OP_IN_REGISTER));
 #   define VOL
 #endif
 
-#define TAINT		(PL_tainted = TRUE)
-#define TAINT_NOT	(PL_tainted = FALSE)
-#define TAINT_IF(c)	if (c) { PL_tainted = TRUE; }
-#define TAINT_FROM_SV(sv) if (SvTAINTED(sv)) { PL_tainted = TRUE; }
-#define TAINT_ENV()	if (PL_tainting) { taint_env(); }
-#define TAINT_PROPER(s)	if (PL_tainting) { taint_proper(NULL, s); }
-
 /* XXX All process group stuff is handled in pp_sys.c.  Should these
    defines move there?  If so, I could simplify this a lot. --AD  9/96.
 */
@@ -987,7 +980,7 @@ EXTERN_C int usleep(unsigned int);
 #  define saferealloc Perl_realloc
 #  define safefree    Perl_mfree
 #  define CHECK_MALLOC_TOO_LATE_FOR_(code)	STMT_START {		\
-	if (!PL_tainting && MallocCfg_ptr[MallocCfg_cfg_env_read])	\
+	if (MallocCfg_ptr[MallocCfg_cfg_env_read])	\
 		code;							\
     } STMT_END
 #  define CHECK_MALLOC_TOO_LATE_FOR(ch)				\
@@ -3681,7 +3674,6 @@ Gid_t getegid (void);
 #define PERL_MAGIC_shared	  'N' /* Shared between threads */
 #define PERL_MAGIC_shared_scalar  'n' /* Shared between threads */
 #define PERL_MAGIC_qr		  'r' /* precompiled qr// regex */
-#define PERL_MAGIC_taint	  't' /* Taintedness */
 #define PERL_MAGIC_uvar		  'U' /* Available for use by extensions */
 #define PERL_MAGIC_uvar_elem	  'u' /* Reserved for use by extensions */
 #define PERL_MAGIC_vstring	  'V' /* SV was vstring literal */
@@ -4422,7 +4414,6 @@ enum {		/* pass one of these to get_vtbl */
     want_vtbl_isaelem,
     want_vtbl_glob,
     want_vtbl_mglob,
-    want_vtbl_taint,
     want_vtbl_bm,
     want_vtbl_uvar,
     want_vtbl_regexp,
@@ -4456,7 +4447,6 @@ enum {		/* pass one of these to get_vtbl */
 #define HINT_LEXICAL_IO_IN	0x00040000 /* $^OPEN is set for input */
 #define HINT_LEXICAL_IO_OUT	0x00080000 /* $^OPEN is set for output */
 
-#define HINT_RE_TAINT		0x00100000 /* re pragma */
 #define HINT_RE_EVAL		0x00200000 /* re pragma */
 
 #define HINT_FILETEST_ACCESS	0x00400000 /* filetest pragma */
@@ -4752,18 +4742,6 @@ MGVTBL_SET(
     PL_vtbl_mglob,
     0,
     MEMBER_TO_FPTR(Perl_magic_setmglob),
-    0,
-    0,
-    0,
-    0,
-    0,
-    0
-);
-
-MGVTBL_SET(
-    PL_vtbl_taint,
-    MEMBER_TO_FPTR(Perl_magic_gettaint),
-    MEMBER_TO_FPTR(Perl_magic_settaint),
     0,
     0,
     0,

@@ -325,8 +325,6 @@ and check for NULL.
 
 /* Copy and tainted info */
 #define RXf_COPY_DONE   	0x10000000
-#define RXf_TAINTED_SEEN	0x20000000
-#define RXf_TAINTED             0x80000000 /* this pattern is tainted */
 
 /*
  * NOTE: if you modify any RXf flags you should run regen.pl or regcomp.pl
@@ -335,13 +333,6 @@ and check for NULL.
  */
 
 #define RX_HAS_CUTGROUP(prog) ((prog)->intflags & PREGf_CUTGROUP_SEEN)
-#define RXp_MATCH_TAINTED(prog)	(RXp_EXTFLAGS(prog) & RXf_TAINTED_SEEN)
-#define RX_MATCH_TAINTED(prog)	(RX_EXTFLAGS(prog) & RXf_TAINTED_SEEN)
-#define RX_MATCH_TAINTED_on(prog) (RX_EXTFLAGS(prog) |= RXf_TAINTED_SEEN)
-#define RX_MATCH_TAINTED_off(prog) (RX_EXTFLAGS(prog) &= ~RXf_TAINTED_SEEN)
-#define RX_MATCH_TAINTED_set(prog, t) ((t) \
-				       ? RX_MATCH_TAINTED_on(prog) \
-				       : RX_MATCH_TAINTED_off(prog))
 
 #define RXp_MATCH_COPIED(prog)		(RXp_EXTFLAGS(prog) & RXf_COPY_DONE)
 #define RX_MATCH_COPIED(prog)		(RX_EXTFLAGS(prog) & RXf_COPY_DONE)
