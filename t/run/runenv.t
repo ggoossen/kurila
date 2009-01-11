@@ -16,7 +16,7 @@ BEGIN {
 
 BEGIN { require './test.pl'; }
 
-plan tests => 12;
+plan tests => 11;
 
 my $STDOUT = './results-0';
 my $STDERR = './results-1';
@@ -120,11 +120,6 @@ tryrun(\%(PERL5OPT => '-Mwarnings'),
 tryrun(\%(PERL5OPT => '-w -w'),
     \@('-e', 'print env::var(q[PERL5OPT])'),
     '-w -w',
-    '');
-
-tryrun(\%(PERL5OPT => '-t'),
-    \@('-e', 'print $^TAINT'),
-    '-1',
     '');
 
 tryrun(\%(PERLLIB => "foobar$(config_value('path_sep'))42"),

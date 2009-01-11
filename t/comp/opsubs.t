@@ -15,7 +15,7 @@ This test verifies this behavior for nine different operators.
 #use Test::More tests => 36;
 BEGIN { require "./test.pl" }
 
-plan tests => 24;
+plan tests => 23;
 
 sub m  { return "m-".shift }
 sub q  { return "q-".shift }
@@ -54,15 +54,6 @@ is( &qr('amper'), "qr-amper", "&qr() is func" );
 
 # qx operator
 can_ok( 'main', "qx" );
-eval "qx('unqualified'".
-     ($^OS_NAME eq 'MSWin32' ?? " 2>&1)" !! ")");
-SKIP: do {
-    skip("external command not portable on VMS", 1) if $^OS_NAME eq 'VMS';
-    TODO: do {
-	local our $TODO = $^OS_NAME eq 'MSWin32' ?? "Tainting of PATH not working of Windows" !! $TODO;
-	like( $^EVAL_ERROR->{?description}, qr/^Insecure/, "qx('unqualified') doesn't work" );
-    };
-};
 is( main::qx('main'), "qx-main", "main::qx() is func" );
 is( &qx('amper'), "qx-amper", "&qx() is func" );
 

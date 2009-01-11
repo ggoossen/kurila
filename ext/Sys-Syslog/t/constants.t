@@ -1,4 +1,4 @@
-#!perl -wT
+#!perl -w
 
 use File::Spec;
 use Test::More;

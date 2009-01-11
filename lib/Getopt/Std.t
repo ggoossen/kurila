@@ -1,4 +1,4 @@
-#!./perl -wT
+#!./perl -w
 
 
 use Test::More tests => 21;

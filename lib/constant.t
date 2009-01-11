@@ -1,4 +1,4 @@
-#!./perl -T
+#!./perl
 
 use warnings;
 our (@warnings, $fagwoosh, $putt, $kloong);

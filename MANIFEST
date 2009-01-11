@@ -161,7 +161,6 @@ ext/Cwd/Changes			Cwd extension Changelog
 ext/Cwd/Cwd.xs			Cwd extension external subroutines
 ext/Cwd/Makefile.PL		Cwd extension makefile maker
 ext/Cwd/t/cwd.t			See if Cwd works
-ext/Cwd/t/taint.t		See if Cwd works with taint
 ext/Cwd/t/win32.t		See if Cwd works on Win32
 ext/Data-Dumper/Changes		Data pretty printer, changelog
 ext/Data-Dumper/Dumper.pm	Data pretty printer, module
@@ -232,7 +231,6 @@ ext/File-Glob/Makefile.PL	File::Glob extension makefile writer
 ext/File-Glob/t/basic.t		See if File::Glob works
 ext/File-Glob/t/case.t		See if File::Glob works
 ext/File-Glob/TODO		File::Glob extension todo list
-ext/File-Glob/t/taint.t		See if File::Glob works
 ext/Hash-Util/Changes		Change history of Hash::Util
 ext/Hash-Util/lib/Hash/Util.pm	Hash::Util
 ext/Hash-Util/Makefile.PL	Makefile for Hash::Util
@@ -308,7 +306,6 @@ ext/IO/t/io_poll.t	See if poll()-related methods from IO work
 ext/IO/t/io_sel.t	See if select()-related methods from IO work
 ext/IO/t/io_sock.t	See if INET socket-related methods from IO work
 ext/IO/t/IO.t	See if IO works
-ext/IO/t/io_taint.t	See if the untaint method from IO works
 ext/IO/t/io_tell.t	See if seek()/tell()-related methods from IO work
 ext/IO/t/io_udp.t	See if UDP socket-related methods from IO work
 ext/IO/t/io_unix.t	See if UNIX socket-related methods from IO work
@@ -350,7 +347,6 @@ ext/List-Util/t/refaddr.t	Scalar::Util
 ext/List-Util/t/reftype.t	Scalar::Util
 ext/List-Util/t/shuffle.t	List::Util
 ext/List-Util/t/sum.t		List::Util
-ext/List-Util/t/tainted.t	Scalar::Util
 ext/List-Util/t/weak.t		Scalar::Util
 ext/List-Util/Util.xs		Util extension
 ext/MIME-Base64/Base64.pm	MIME::Base64 extension
@@ -490,7 +486,6 @@ ext/POSIX/t/math.t		Basic math tests for POSIX
 ext/POSIX/t/posix.t		See if POSIX works
 ext/POSIX/t/sigaction.t		See if POSIX::sigaction works
 ext/POSIX/t/sysconf.t		See if POSIX works
-ext/POSIX/t/taint.t		See if POSIX works with taint
 ext/POSIX/t/termios.t		See if POSIX works
 ext/POSIX/t/time.t		See if POSIX time-related functions work
 ext/POSIX/t/waitpid.t		See if waitpid works
@@ -975,7 +970,6 @@ lib/File/Fetch.pm	File::Fetch
 lib/File/Fetch/t/01_File-Fetch.t	File::Fetch tests
 lib/File/Find.pm		Routines to do a find
 lib/File/Find/t/find.t		See if File::Find works
-lib/File/Find/t/taint.t		See if File::Find works with taint
 lib/File/GlobPP.pm		Pure perl glob
 lib/FileHandle.pm		Backward-compatible front end to IO extension
 lib/FileHandle.t		See if FileHandle works
@@ -1468,7 +1462,6 @@ lib/Text/Abbrev.pm		An abbreviation table builder
 lib/Text/Abbrev.t		Test Text::Abbrev
 lib/Text/ParseWords.pm		Perl module to split words on arbitrary delimiter
 lib/Text/ParseWords.t		See if Text::ParseWords works
-lib/Text/ParseWords/taint.t	See if Text::ParseWords works with tainting
 lib/Text/Tabs.pm		Do expand and unexpand
 lib/Text/TabsWrap/CHANGELOG	ChangeLog for Tabs+Wrap
 lib/Text/TabsWrap/t/37000.t	See if Text::Tabs is working
@@ -2230,7 +2223,6 @@ t/lib/warnings/pp_sys		Tests for pp_sys.c for warnings.t
 t/lib/warnings/regcomp		Tests for regcomp.c for warnings.t
 t/lib/warnings/regexec		Tests for regexec.c for warnings.t
 t/lib/warnings/sv		Tests for sv.c for warnings.t
-t/lib/warnings/taint		Tests for taint.c for warnings.t
 t/lib/warnings/toke		Tests for toke.c for warnings.t
 t/lib/warnings/universal	Tests for universal.c for warnings.t
 t/lib/warnings/utf8		Tests for utf8.c for warnings.t
@@ -2372,7 +2364,6 @@ t/op/stat.t			See if stat works
 t/op/study.t			See if study works
 t/op/substr.t			See if substr works
 t/op/subst.t			See if substitution works
-t/op/substT.t			See if substitution works with -T
 t/op/sub.t			See if subroutines work
 t/op/symbolcache.t		See if undef/delete works on stashes with functions
 t/op/sysio.t			See if sysread and syswrite work
@@ -2382,7 +2373,6 @@ t/op/universal.t		See if UNIVERSAL class works
 t/op/unshift.t			See if unshift works
 t/op/upgrade.t			See if upgrading and assigning scalars works
 t/op/utf8decode.t		See if UTF-8 decoding works
-t/op/utftaint.t			See if utf8 and taint work together
 t/op/vec.t			See if vectors work
 t/op/view.t			See if view function works
 t/perl.supp			Perl valgrind suppressions
@@ -2439,7 +2429,6 @@ t/run/switchI.t			Test the -I switch
 t/run/switchn.t			Test the -n switch
 t/run/switchp.t			Test the -p switch
 t/run/switchp.aux			Test the -p switch
-t/run/switcht.t			Test the -t switch
 t/run/switchx2.aux		Data for switchx.t
 t/run/switchx.aux		Data for switchx.t
 t/run/switchx.t			Test the -x switch

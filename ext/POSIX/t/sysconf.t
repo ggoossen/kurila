@@ -1,4 +1,4 @@
-#!perl -T
+#!perl
 
 BEGIN {
     use Config;

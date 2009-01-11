@@ -482,11 +482,9 @@ char * string;
 #endif
 {
     dTHX;
-    TAINT_FROM_SV(sv);
 
     if (SvROK(sv)) {
         sv = SvRV(sv) ;
-        TAINT_FROM_SV(sv);
         switch(SvTYPE(sv)) {
             case SVt_PVAV:
             case SVt_PVHV:
@@ -515,13 +513,11 @@ char * string ;
 {
     dTHX;
     bool wipe = 0 ;
-    TAINT_FROM_SV(sv);
     
     wipe = ! SvOK(sv) ;
 
     if (SvROK(sv)) {
         sv = SvRV(sv) ;
-        TAINT_FROM_SV(sv);
         wipe = ! SvOK(sv) ;
 
         switch(SvTYPE(sv)) {

@@ -1020,8 +1020,6 @@ open(filename, flags = O_RDONLY, mode = 0666)
 	int		flags
 	Mode_t		mode
     CODE:
-	if (flags & (O_APPEND|O_CREAT|O_TRUNC|O_RDWR|O_WRONLY|O_EXCL))
-	    TAINT_PROPER("open");
 	RETVAL = open(filename, flags, mode);
     OUTPUT:
 	RETVAL
@@ -1534,7 +1532,6 @@ read(fd, buffer, nbytes)
             SvCUR_set(sv_buffer, RETVAL);
             SvPOK_only(sv_buffer);
             *SvEND(sv_buffer) = '\0';
-            SvTAINTED_on(sv_buffer);
         }
 
 SysRet
@@ -1715,7 +1712,6 @@ mkfifo(filename, mode)
 	char *		filename
 	Mode_t		mode
     CODE:
-	TAINT_PROPER("mkfifo");
 	RETVAL = mkfifo(filename, mode);
     OUTPUT:
 	RETVAL

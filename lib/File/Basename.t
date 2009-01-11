@@ -1,7 +1,7 @@
-#!./perl -Tw
+#!./perl -w
 
 use env;
-use Test::More tests => 64;
+use Test::More tests => 62;
 
 BEGIN { use_ok 'File::Basename' }
 

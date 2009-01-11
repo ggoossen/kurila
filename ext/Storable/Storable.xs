@@ -297,7 +297,6 @@ typedef struct stcxt {
 	IV tagnum;			/* incremented at store time for each seen object */
 	IV classnum;		/* incremented at store time for each seen classname */
 	int netorder;		/* true if network order used */
-	int s_tainted;		/* true if input source is tainted, at retrieve time */
 	int forgive_me;		/* whether to be forgiving... */
 	int deparse;        /* whether to deparse code refs */
 	SV *eval;           /* whether to eval source code */
@@ -1348,7 +1347,7 @@ static void clean_store_context(pTHX_ stcxt_t *cxt)
  *
  * Initialize a new retrieve context for real recursion.
  */
-static void init_retrieve_context(pTHX_ stcxt_t *cxt, int optype, int is_tainted)
+static void init_retrieve_context(pTHX_ stcxt_t *cxt, int optype)
 {
 	TRACEME(("init_retrieve_context"));
 
@@ -1383,7 +1382,6 @@ static void init_retrieve_context(pTHX_ stcxt_t *cxt, int optype, int is_tainted
 	cxt->tagnum = 0;				/* Have to count objects... */
 	cxt->classnum = 0;				/* ...and class names as well */
 	cxt->optype = optype;
-	cxt->s_tainted = is_tainted;
 	cxt->entry = 1;					/* No recursion yet */
 #ifndef HAS_RESTRICTED_HASHES
         cxt->derestrict = -1;		/* Fetched from perl if needed */
@@ -4045,8 +4043,6 @@ static SV *retrieve_hook(pTHX_ stcxt_t *cxt, const char *cname)
 		*SvEND(frozen) = '\0';
 	}
 	(void) SvPOK_only(frozen);		/* Validates string pointer */
-	if (cxt->s_tainted)				/* Is input source tainted? */
-		SvTAINT(frozen);
 
 	TRACEME(("frozen string: %d bytes", len2));
 
@@ -4544,8 +4540,6 @@ static SV *retrieve_lscalar(pTHX_ stcxt_t *cxt, const char *cname)
 	SvCUR_set(sv, len);				/* Record C string length */
 	*SvEND(sv) = '\0';				/* Ensure it's null terminated anyway */
 	(void) SvPOK_only(sv);			/* Validate string pointer */
-	if (cxt->s_tainted)				/* Is input source tainted? */
-		SvTAINT(sv);				/* External data cannot be trusted */
 
 	TRACEME(("large scalar len %"IVdf" '%s'", (IV) len, SvPVX_const(sv)));
 	TRACEME(("ok (retrieve_lscalar at 0x%"UVxf")", PTR2UV(sv)));
@@ -4608,8 +4602,6 @@ static SV *retrieve_scalar(pTHX_ stcxt_t *cxt, const char *cname)
 	}
 
 	(void) SvPOK_only(sv);			/* Validate string pointer */
-	if (cxt->s_tainted)				/* Is input source tainted? */
-		SvTAINT(sv);				/* External data cannot be trusted */
 
 	TRACEME(("ok (retrieve_scalar at 0x%"UVxf")", PTR2UV(sv)));
 	return sv;
@@ -5676,7 +5668,6 @@ static SV *do_retrieve(
 {
 	dSTCXT;
 	SV *sv;
-	int is_tainted;				/* Is input source tainted? */
 	int pre_06_fmt = 0;			/* True with pre Storable 0.6 formats */
 
 	TRACEME(("do_retrieve (optype = 0x%x)", optype));
@@ -5746,19 +5737,7 @@ static SV *do_retrieve(
 	TRACEME(("data stored in %s format",
 		cxt->netorder ? "net order" : "native"));
 
-	/*
-	 * Check whether input source is tainted, so that we don't wrongly
-	 * taint perfectly good values...
-	 *
-	 * We assume file input is always tainted.  If both `f' and `in' are
-	 * NULL, then we come from dclone, and tainted is already filled in
-	 * the context.  That's a kludge, but the whole dclone() thing is
-	 * already quite a kludge anyway! -- RAM, 15/09/2000.
-	 */
-
-	is_tainted = f ? 1 : (in ? SvTAINTED(in) : cxt->s_tainted);
-	TRACEME(("input source is %s", is_tainted ? "tainted" : "trusted"));
-	init_retrieve_context(aTHX_ cxt, optype, is_tainted);
+	init_retrieve_context(aTHX_ cxt, optype);
 
 	ASSERT(is_retrieving(aTHX), ("within retrieve operation"));
 
@@ -5922,7 +5901,6 @@ static SV *dclone(pTHX_ SV *sv)
 	 * do_retrieve() will free non-root context.
 	 */
 
-	cxt->s_tainted = SvTAINTED(sv);
 	out = do_retrieve(aTHX_ (PerlIO*) 0, Nullsv, ST_CLONE);
 
 	TRACEME(("dclone returns 0x%"UVxf, PTR2UV(out)));

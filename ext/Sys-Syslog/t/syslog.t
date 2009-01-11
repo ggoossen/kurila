@@ -1,5 +1,4 @@
-#!perl -T
-
+#!perl
 
 use Config;
 use File::Spec;

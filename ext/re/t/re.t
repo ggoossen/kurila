@@ -1,6 +1,6 @@
 #!./perl
 
-use Test::More tests => 13;
+use Test::More tests => 11;
 use env;
 require_ok( 're' );
 
@@ -33,14 +33,12 @@ isnt( env::var('PERL_RE_COLORS'), '',
 re::bits(0, 'nosuchsubpragma');
 like( $warn, qr/Unknown "re" subpragma/, 
 	'... should warn about unknown subpragma' );
-ok( re::bits(0, 'taint') ^&^ 0x00100000, '... should set taint bits' );
 ok( re::bits(0, 'eval')  ^&^ 0x00200000, '... should set eval bits' );
 
 local $^HINT_BITS;
 
 # import
-re->import('taint', 'eval');
-ok( $^HINT_BITS ^&^ 0x00100000, 'import should set taint bits in $^H when requested' );
+re->import('eval');
 ok( $^HINT_BITS ^&^ 0x00200000, 'import should set eval bits in $^H when requested' );
 
 re->unimport('taint');

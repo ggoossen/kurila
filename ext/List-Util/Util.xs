@@ -328,15 +328,6 @@ OUTPUT:
   RETVAL
 
 int
-tainted(sv)
-	SV *sv
-PROTOTYPE: $
-CODE:
-  RETVAL = SvTAINTED(sv);
-OUTPUT:
-  RETVAL
-
-int
 looks_like_number(sv)
 	SV *sv
 PROTOTYPE: $
