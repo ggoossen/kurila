@@ -334,7 +334,7 @@ ApMdR	|HE*	|hv_iternext_flags|NN HV *hv|I32 flags
 ApdR	|SV*	|hv_iterval	|NN HV *hv|NN HE *entry
 Ap	|void	|hv_ksplit	|NN HV *hv|IV newmax
 Apdbm	|void	|hv_magic	|NN HV *hv|NULLOK GV *gv|int how
-Abmd	|SV**	|hv_store	|NULLOK HV *hv|NULLOK const char *key \
+Aip	|void	|hv_store	|NULLOK HV *hv|NULLOK const char *key \
 				|I32 klen|NULLOK SV *val|U32 hash
 Abmd	|HE*	|hv_store_ent	|NULLOK HV *hv|NULLOK SV *key|NULLOK SV *val\
 				|U32 hash

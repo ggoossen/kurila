@@ -1159,18 +1159,6 @@ Perl_hv_store_flags(pTHX_ HV *hv, const char *key, I32 klen, SV *val, U32 hash,
 			    (HV_FETCH_ISSTORE|HV_FETCH_JUST_SV), val, hash);
 }
 
-SV**
-Perl_hv_store(pTHX_ HV *hv, const char *key, I32 klen_i32, SV *val, U32 hash)
-{
-    STRLEN klen;
-    int flags;
-
-    klen = klen_i32;
-    flags = 0;
-    return (SV **) hv_common(hv, NULL, key, klen, flags,
-			     (HV_FETCH_ISSTORE|HV_FETCH_JUST_SV), val, hash);
-}
-
 bool
 Perl_hv_exists(pTHX_ HV *hv, const char *key, I32 klen_i32)
 {

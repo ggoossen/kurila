@@ -267,8 +267,7 @@ Perl_hv_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
     int masked_flags;
     const int return_svp = action & HV_FETCH_JUST_SV;
 
-    if (!hv)
-	return NULL;
+    assert(hv);
 
     assert(SvTYPE(hv) == SVt_PVHV);
 

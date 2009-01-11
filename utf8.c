@@ -1800,10 +1800,11 @@ Perl_swash_fetch(pTHX_ SV *swash, const char *ptr, bool do_utf8)
 	    if (IN_PERL_COMPILETIME)
 		CopHINTS_set(PL_curcop, PL_hints);
 
-	    svp = hv_store(hv, (const char *)ptr, klen, swatch, 0);
+	    hv_store(hv, (const char *)ptr, klen, swatch, 0);
+	    svp = &swatch;
 
-	    if (!svp || !(tmps = (const U8*)SvPV_const(*svp, slen))
-		     || (slen << 3) < needents)
+	    if (!(tmps = (const U8*)SvPV_const(*svp, slen))
+		|| (slen << 3) < needents)
 		Perl_croak(aTHX_ "panic: swash_fetch got improper swatch");
 	}
     }

@@ -4674,6 +4674,7 @@ START_EXTERN_C
 
 #include "gv.h"
 #include "sv_i.h"
+#include "hv_i.h"
 #include "cop_i.h"
 
 /* PERL_GLOBAL_STRUCT_PRIVATE wants to keep global data like the

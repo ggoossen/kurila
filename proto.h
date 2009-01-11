@@ -1052,7 +1052,7 @@ PERL_CALLCONV void	Perl_hv_ksplit(pTHX_ HV *hv, IV newmax)
 #define PERL_ARGS_ASSERT_HV_MAGIC	\
 	assert(hv)
 
-/* PERL_CALLCONV SV**	Perl_hv_store(pTHX_ HV *hv, const char *key, I32 klen, SV *val, U32 hash); */
+PERL_INLINE_CALLCONV void	Perl_hv_store(pTHX_ HV *hv, const char *key, I32 klen, SV *val, U32 hash);
 /* PERL_CALLCONV HE*	Perl_hv_store_ent(pTHX_ HV *hv, SV *key, SV *val, U32 hash); */
 /* PERL_CALLCONV SV**	Perl_hv_store_flags(pTHX_ HV *hv, const char *key, I32 klen, SV *val, U32 hash, int flags); */
 PERL_CALLCONV void	Perl_hv_undef(pTHX_ HV *hv);

@@ -1810,8 +1810,7 @@ static int known_class(
 	 */
 
 	cxt->classnum++;
-	if (!hv_store(hclass, name, len, INT2PTR(SV*, cxt->classnum), 0))
-		CROAK(("Unable to record new classname"));
+	hv_store(hclass, name, len, INT2PTR(SV*, cxt->classnum), 0);
 
 	*classnum = cxt->classnum;
 	return FALSE;
@@ -4898,8 +4897,7 @@ static SV *retrieve_hash(pTHX_ stcxt_t *cxt, const char *cname)
 		 * Enter key/value pair into hash table.
 		 */
 
-		if (hv_store(hv, kbuf, (U32) size, sv, 0) == 0)
-			return (SV *) 0;
+		hv_store(hv, kbuf, (U32) size, sv, 0);
 	}
 
 	TRACEME(("ok (retrieve_hash at 0x%"UVxf")", PTR2UV(hv)));
@@ -5300,8 +5298,7 @@ static SV *old_retrieve_hash(pTHX_ stcxt_t *cxt, const char *cname)
 		 * Enter key/value pair into hash table.
 		 */
 
-		if (hv_store(hv, kbuf, (U32) size, sv, 0) == 0)
-			return (SV *) 0;
+		hv_store(hv, kbuf, (U32) size, sv, 0);
 	}
 
 	TRACEME(("ok (retrieve_hash at 0x%"UVxf")", PTR2UV(hv)));
@@ -5569,9 +5566,8 @@ static SV *retrieve(pTHX_ stcxt_t *cxt, const char *cname)
 		 * tag number. See test for SX_OBJECT above to see how this is perused.
 		 */
 
-		if (!hv_store(cxt->hseen, (char *) &tag, sizeof(tag),
-				newSViv(cxt->tagnum), 0))
-			return (SV *) 0;
+		 hv_store(cxt->hseen, (char *) &tag, sizeof(tag),
+			              	newSViv(cxt->tagnum), 0);
 
 		goto first_time;
 	}

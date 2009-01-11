@@ -311,6 +311,7 @@
 #define hv_iternext_flags	Perl_hv_iternext_flags
 #define hv_iterval		Perl_hv_iterval
 #define hv_ksplit		Perl_hv_ksplit
+#define hv_store		Perl_hv_store
 #define hv_undef		Perl_hv_undef
 #define hv_tmprefcnt		Perl_hv_tmprefcnt
 #define ibcmp			Perl_ibcmp
@@ -2462,6 +2463,7 @@
 #define hv_iternext_flags(a,b)	Perl_hv_iternext_flags(aTHX_ a,b)
 #define hv_iterval(a,b)		Perl_hv_iterval(aTHX_ a,b)
 #define hv_ksplit(a,b)		Perl_hv_ksplit(aTHX_ a,b)
+#define hv_store(a,b,c,d,e)	Perl_hv_store(aTHX_ a,b,c,d,e)
 #define hv_undef(a)		Perl_hv_undef(aTHX_ a)
 #define hv_tmprefcnt(a)		Perl_hv_tmprefcnt(aTHX_ a)
 #define ibcmp(a,b,c)		Perl_ibcmp(aTHX_ a,b,c)

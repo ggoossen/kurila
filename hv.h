@@ -375,11 +375,6 @@ C<SV*>.
 		      (HV_FETCH_ISSTORE|HV_FETCH_JUST_SV), (thwape),	\
 		      (sploosh)))
 
-#define hv_store(urkk, zamm, clunk, thwape, sploosh)			\
-    ((SV**) hv_common_key_len((urkk), (zamm), (clunk),			\
-			      (HV_FETCH_ISSTORE|HV_FETCH_JUST_SV),	\
-			      (thwape), (sploosh)))
-
 #define hv_exists(urkk, zamm, clunk)					\
     (hv_common_key_len((urkk), (zamm), (clunk), HV_FETCH_ISEXISTS, NULL, 0) \
      ? TRUE : FALSE)
