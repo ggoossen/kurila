@@ -142,14 +142,14 @@ sub lock_ref_keys {
         foreach my $k ( @keys) {
             $hash->{+$k} = undef unless exists $hash->{$k};
         }
-        Internals::SvREADONLY %$hash, 1;
+        Internals::HvRESTRICTED %$hash, 1;
 
         foreach my $k ( @keys) {
             delete $hash->{$k} unless %original_keys{?$k};
         }
     }
     else {
-        Internals::SvREADONLY %$hash, 1;
+        Internals::HvRESTRICTED %$hash, 1;
     }
 
     return $hash;
@@ -158,7 +158,7 @@ sub lock_ref_keys {
 sub unlock_ref_keys {
     my $hash = shift;
 
-    Internals::SvREADONLY %$hash, 0;
+    Internals::HvRESTRICTED %$hash, 0;
     return $hash;
 }
 
@@ -190,7 +190,7 @@ sub lock_ref_keys_plus {
             push @delete,$key;
         }
     }
-    Internals::SvREADONLY(%$hash,1);
+    Internals::HvRESTRICTED(%$hash,1);
     delete %{$hash}{[@delete]};
     return $hash
 }
@@ -221,14 +221,14 @@ sub lock_ref_value {
     # Marking a value in the hash as RO is useful, regardless
     # of the status of the hash itself.
     warn "Cannot usefully lock values in an unlocked hash"
-      if !Internals::SvREADONLY(%$hash) && warnings::enabled;
-    Internals::SvREADONLY $hash->{?$key}, 1;
+      if !Internals::HvRESTRICTED(%$hash) && warnings::enabled;
+    Internals::HvRESTRICTED $hash->{?$key}, 1;
     return $hash
 }
 
 sub unlock_ref_value {
     my@($hash, $key) =  @_;
-    Internals::SvREADONLY $hash->{?$key}, 0;
+    Internals::HvRESTRICTED $hash->{?$key}, 0;
     return $hash
 }
 
@@ -261,7 +261,7 @@ sub lock_hashref {
     lock_ref_keys($hash);
 
     foreach my $value (values %$hash) {
-        Internals::SvREADONLY($value,1);
+        Internals::HvRESTRICTED($value,1);
     }
 
     return $hash;
@@ -271,7 +271,7 @@ sub unlock_hashref {
     my $hash = shift;
 
     foreach my $value (values %$hash) {
-        Internals::SvREADONLY($value, 0);
+        Internals::HvRESTRICTED($value, 0);
     }
 
     unlock_ref_keys($hash);
@@ -314,7 +314,7 @@ sub lock_hashref_recurse {
         if (reftype($value) eq 'HASH') {
             lock_hashref_recurse($value);
         }
-        Internals::SvREADONLY($value,1);
+        Internals::HvRESTRICTED($value,1);
     }
     return $hash
 }
@@ -326,7 +326,7 @@ sub unlock_hashref_recurse {
         if (reftype($value) eq 'HASH') {
             unlock_hashref_recurse($value);
         }
-        Internals::SvREADONLY($value,1);
+        Internals::HvRESTRICTED($value,1);
     }
     unlock_ref_keys($hash);
     return $hash;
@@ -346,7 +346,7 @@ Returns true if the hash and its keys are unlocked.
 
 sub hashref_unlocked {
     my $hash=shift;
-    return Internals::SvREADONLY($hash)
+    return Internals::HvRESTRICTED($hash)
 }
 
 sub hash_unlocked(\%) { hashref_unlocked(< @_) }
