@@ -728,32 +728,6 @@ PP(pp_print)
     RETURN;
 }
 
-STATIC void
-S_do_oddball(pTHX_ HV *hash, SV **relem, SV **firstrelem)
-{
-    dVAR;
-
-    PERL_ARGS_ASSERT_DO_ODDBALL;
-
-    if (*relem) {
-	SV *tmpstr;
-
-        if (ckWARN(WARN_MISC)) {
-	    const char *err;
-	    err = "Odd number of elements in hash assignment";
-	    Perl_warner(aTHX_ packWARN(WARN_MISC), err);
-	}
-
-        tmpstr = newSV(0);
-        hv_store_ent(hash,*relem,tmpstr,0);
-        if (SvMAGICAL(hash)) {
-            if (SvSMAGICAL(tmpstr))
-                mg_set(tmpstr);
-        }
-        TAINT_NOT;
-    }
-}
-
 OP *
 Perl_do_readline(pTHX_ GV* gv)
 {
@@ -1430,7 +1404,7 @@ PP(pp_entersub)
     SAVETMPS;
 
     if (!CvROOT(cv) && !CvXSUB(cv)) {
-	DIE(aTHX_ "Undefined subroutine called",
+	DIE(aTHX_ "Undefined subroutine %s called",
 	    SvPVX_const(loc_desc(SvLOCATION(cv))));
     }
 
@@ -1603,9 +1577,9 @@ PP(pp_aelem)
 		RETPUSHUNDEF;
 	}
 	if ( add )
-	    DIE(aTHX_ "Required array element %d could not be created", elem);
+	    DIE(aTHX_ "Required array element %"IVdf" could not be created", elem);
 	else
-	    DIE(aTHX_ "Required array element %d does not exists", elem);
+	    DIE(aTHX_ "Required array element %"IVdf" does not exists", elem);
     }
     if (PL_op->op_private & OPpLVAL_INTRO)
 	save_aelem(av, elem, svp);

@@ -1231,7 +1231,6 @@ sR	|I32	|run_user_filter|int idx|NN SV *buf_sv|int maxlen
 #endif
 
 #if defined(PERL_IN_PP_HOT_C) || defined(PERL_DECL_PROT)
-s	|void	|do_oddball	|NN HV *hash|NN SV **relem|NN SV **firstrelem
 sR	|SV*	|method_common	|NN SV* meth|NULLOK U32* hashp
 #endif
 

@@ -146,7 +146,7 @@ XS(XS_env_set_var)
             hv_store_ent(PL_envhv, key, SvREFCNT_inc(value), 0);
         }
         else {
-            hv_delete_ent(PL_envhv, key, G_DISCARD, 0);
+            (void)hv_delete_ent(PL_envhv, key, G_DISCARD, 0);
         }
     }
     XSRETURN(0);

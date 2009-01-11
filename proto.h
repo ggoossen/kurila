@@ -4401,13 +4401,6 @@ STATIC I32	S_run_user_filter(pTHX_ int idx, SV *buf_sv, int maxlen)
 #endif
 
 #if defined(PERL_IN_PP_HOT_C) || defined(PERL_DECL_PROT)
-STATIC void	S_do_oddball(pTHX_ HV *hash, SV **relem, SV **firstrelem)
-			__attribute__nonnull__(pTHX_1)
-			__attribute__nonnull__(pTHX_2)
-			__attribute__nonnull__(pTHX_3);
-#define PERL_ARGS_ASSERT_DO_ODDBALL	\
-	assert(hash); assert(relem); assert(firstrelem)
-
 STATIC SV*	S_method_common(pTHX_ SV* meth, U32* hashp)
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(pTHX_1);

@@ -1235,7 +1235,6 @@
 #endif
 #if defined(PERL_IN_PP_HOT_C) || defined(PERL_DECL_PROT)
 #ifdef PERL_CORE
-#define do_oddball		S_do_oddball
 #define method_common		S_method_common
 #endif
 #endif
@@ -3386,7 +3385,6 @@
 #endif
 #if defined(PERL_IN_PP_HOT_C) || defined(PERL_DECL_PROT)
 #ifdef PERL_CORE
-#define do_oddball(a,b,c)	S_do_oddball(aTHX_ a,b,c)
 #define method_common(a,b)	S_method_common(aTHX_ a,b)
 #endif
 #endif
