@@ -7,7 +7,7 @@ __END__
 $^WARNING = 1 ;
 my $b ; chop $b ;
 EXPECT
-Use of uninitialized value $b in scalar chop at - line 4 character 9.
+Use of uninitialized value $b in chop at - line 4 character 9.
 ########
 
 # warnings enabled at compile time, disabled at run time
@@ -23,7 +23,7 @@ BEGIN { $^WARNING = 0 }
 $^WARNING = 1 ;
 my $b ; chop $b ;
 EXPECT
-Use of uninitialized value $b in scalar chop at - line 5 character 9.
+Use of uninitialized value $b in chop at - line 5 character 9.
 ########
 -w
 --FILE-- abcd
@@ -32,7 +32,7 @@ my $b ; chop $b ;
 --FILE-- 
 require "./abcd";
 EXPECT
-Use of uninitialized value $b in scalar chop at ./abcd line 1 character 9.
+Use of uninitialized value $b in chop at ./abcd line 1 character 9.
     (require) called at - line 1 character 1.
 ########
 
@@ -52,7 +52,7 @@ my $b ; chop $b ;
 $^WARNING =1 ;
 require "./abcd";
 EXPECT
-Use of uninitialized value $b in scalar chop at ./abcd line 1 character 9.
+Use of uninitialized value $b in chop at ./abcd line 1 character 9.
     (require) called at - line 2 character 1.
 ########
 
@@ -75,14 +75,14 @@ $^WARNING =0 ;
 require "./abcd";
 my $b ; chop $b ;
 EXPECT
-Use of uninitialized value $b in scalar chop at - line 3 character 9.
+Use of uninitialized value $b in chop at - line 3 character 9.
 ########
 
 $^WARNING = 1;
 eval 'my $b ; chop $b ;' ;
 print $^EVAL_ERROR ;
 EXPECT
-Use of uninitialized value $b in scalar chop at (eval 1) line 1 character 9.
+Use of uninitialized value $b in chop at (eval 1) line 1 character 9.
     (eval) called at - line 3 character 1.
 ########
 
@@ -90,14 +90,14 @@ eval '$^WARNING = 1;' ;
 print $^EVAL_ERROR ;
 my $b ; chop $b ;
 EXPECT
-Use of uninitialized value $b in scalar chop at - line 4 character 9.
+Use of uninitialized value $b in chop at - line 4 character 9.
 ########
 
 try {$^WARNING = 1;} ;
 print $^EVAL_ERROR ;
 my $b ; chop $b ;
 EXPECT
-Use of uninitialized value $b in scalar chop at - line 4 character 9.
+Use of uninitialized value $b in chop at - line 4 character 9.
 ########
 
 do {
@@ -115,7 +115,7 @@ do {
 };
 my $c ; chop $c ;
 EXPECT
-Use of uninitialized value $b in scalar chop at - line 5 character 13.
+Use of uninitialized value $b in chop at - line 5 character 13.
 ########
 -w
 -e undef
@@ -152,6 +152,6 @@ do { local $^WARNING = 1 ;
   fred() ;
 };
 EXPECT
-Use of uninitialized value $b in scalar chop at - line 2 character 20.
+Use of uninitialized value $b in chop at - line 2 character 20.
     main::fred called at - line 4 character 3.
 ########

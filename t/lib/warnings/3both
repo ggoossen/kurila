@@ -13,7 +13,7 @@ do { local $^WARNING = 0 ;
 };
 
 EXPECT
-Use of uninitialized value $b in scalar chop at - line 6 character 5.
+Use of uninitialized value $b in chop at - line 6 character 5.
     main::fred called at - line 9 character 3.
 ########
 
@@ -28,7 +28,7 @@ do { $^WARNING = 0 ;
 };
 
 EXPECT
-Use of uninitialized value $b in scalar chop at - line 6 character 5.
+Use of uninitialized value $b in chop at - line 6 character 5.
     main::fred called at - line 9 character 3.
 ########
 
@@ -66,7 +66,7 @@ $^WARNING = 1 ;
 my $b ; 
 chop $b ;
 EXPECT
-Use of uninitialized value $b in scalar chop at - line 6 character 1.
+Use of uninitialized value $b in chop at - line 6 character 1.
 ########
 
 # Check interaction of $^WARNING and use warnings
@@ -75,7 +75,7 @@ use warnings ;
 my $b ; 
 chop $b ;
 EXPECT
-Use of uninitialized value $b in scalar chop at - line 6 character 1.
+Use of uninitialized value $b in chop at - line 6 character 1.
 ########
 
 # Check interaction of $^WARNING and use warnings
@@ -109,7 +109,7 @@ use warnings ;
 my $b ; 
 chop $b ;
 EXPECT
-Use of uninitialized value $b in scalar chop at - line 5 character 1.
+Use of uninitialized value $b in chop at - line 5 character 1.
 ########
 
 # Check interaction of $^WARNING and use warnings
@@ -121,7 +121,7 @@ sub fred {
 BEGIN {  $^WARNING = 0 }
 fred() ;
 EXPECT
-Use of uninitialized value $b in scalar chop at - line 6 character 5.
+Use of uninitialized value $b in chop at - line 6 character 5.
     main::fred called at - line 9 character 1.
 ########
 
@@ -144,7 +144,7 @@ BEGIN {  $^WARNING = 1 }
 my $b ; 
 chop $b ;
 EXPECT
-Use of uninitialized value $b in scalar chop at - line 6 character 1.
+Use of uninitialized value $b in chop at - line 6 character 1.
 ########
 
 # Check interaction of $^WARNING and use warnings
@@ -153,7 +153,7 @@ use warnings ;
 my $b ; 
 chop $b ;
 EXPECT
-Use of uninitialized value $b in scalar chop at - line 6 character 1.
+Use of uninitialized value $b in chop at - line 6 character 1.
 ########
 
 # Check interaction of $^WARNING and use warnings
@@ -184,7 +184,7 @@ do {
 my $b ;
 chop $b ;
 EXPECT
-Use of uninitialized value $b in scalar chop at - line 10 character 1.
+Use of uninitialized value $b in chop at - line 10 character 1.
 ########
 
 # Check interaction of $^WARNING and use warnings
@@ -197,7 +197,7 @@ do {
 my $b ;
 chop $b ;
 EXPECT
-Use of uninitialized value $b in scalar chop at - line 7 character 5.
+Use of uninitialized value $b in chop at - line 7 character 5.
 ########
 
 # Check scope of pragma with eval
@@ -225,7 +225,7 @@ do {
     my $b ; chop $b ;
 };
 EXPECT
-Use of uninitialized value $b in scalar chop at (eval 1) line 3 character 58.
+Use of uninitialized value $b in chop at (eval 1) line 3 character 58.
     (eval) called at - line 7 character 5.
 ########
 
@@ -239,9 +239,9 @@ do {
     my $b ; chop $b ;
 };
 EXPECT
-Use of uninitialized value $b in scalar chop at (eval 1) line 2 character 18.
+Use of uninitialized value $b in chop at (eval 1) line 2 character 18.
     (eval) called at - line 6 character 5.
-Use of uninitialized value $b in scalar chop at - line 9 character 13.
+Use of uninitialized value $b in chop at - line 9 character 13.
 ########
 
 # Check scope of pragma with eval
@@ -255,4 +255,4 @@ do {
     my $b ; chop $b ;
 };
 EXPECT
-Use of uninitialized value $b in scalar chop at - line 10 character 13.
+Use of uninitialized value $b in chop at - line 10 character 13.

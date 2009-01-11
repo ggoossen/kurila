@@ -275,15 +275,9 @@ use warnings 'uninitialized';
 
 my $s1; chomp $s1;
 my $s2; chop  $s2;
-my ($s3,$s4); chomp ($s3,$s4);
-my ($s5,$s6); chop  ($s5,$s6);
 EXPECT
-Use of uninitialized value $s1 in scalar chomp at - line 3 character 9.
-Use of uninitialized value $s2 in scalar chop at - line 4 character 9.
-Use of uninitialized value $s4 in chomp at - line 5 character 15.
-Use of uninitialized value $s3 in chomp at - line 5 character 15.
-Use of uninitialized value $s5 in chop at - line 6 character 15.
-Use of uninitialized value $s6 in chop at - line 6 character 15.
+Use of uninitialized value $s1 in chomp at - line 3 character 9.
+Use of uninitialized value $s2 in chop at - line 4 character 9.
 ########
 use warnings 'uninitialized';
 my ($m1, @ma, %mh);

@@ -135,7 +135,7 @@ my $x = chop my $y ; # h
 no warnings 'uninitialized' ;
 $x = chop my $z ; # h
 EXPECT
-Use of uninitialized value $y in scalar chop at - line 3 character 9.
+Use of uninitialized value $y in chop at - line 3 character 9.
 ########
 # perlbug 20011116.125
 use warnings 'uninitialized';

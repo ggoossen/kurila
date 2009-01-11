@@ -11,7 +11,7 @@ do {
 my $b ; chop $b ;
 print STDERR "The End.\n" ;
 EXPECT
-Use of uninitialized value $b in scalar chop at - line 8 character 9.
+Use of uninitialized value $b in chop at - line 8 character 9.
 ########
 
 # Check runtime scope of pragma
@@ -23,7 +23,7 @@ do {
 my $b ; chop $b ;
 print STDERR "The End.\n" ;
 EXPECT
-Use of uninitialized value $b in scalar chop at - line 8 character 9.
+Use of uninitialized value $b in chop at - line 8 character 9.
 ########
 
 # Check scope of pragma with eval
@@ -35,7 +35,7 @@ try {
 my $b ; chop $b ;
 print STDERR "The End.\n" ;
 EXPECT
--- Use of uninitialized value $b in scalar chop
+-- Use of uninitialized value $b in chop
 The End.
 ########
 
@@ -47,8 +47,8 @@ try {
 my $b ; chop $b ;
 print STDERR "The End.\n" ;
 EXPECT
--- Use of uninitialized value $b in scalar chop
-Use of uninitialized value $b in scalar chop at - line 7 character 9.
+-- Use of uninitialized value $b in chop
+Use of uninitialized value $b in chop at - line 7 character 9.
 ########
 
 # Check scope of pragma with eval
@@ -60,7 +60,7 @@ try {
 my $b ; chop $b ;
 print STDERR "The End.\n" ;
 EXPECT
-Use of uninitialized value $b in scalar chop at - line 8 character 9.
+Use of uninitialized value $b in chop at - line 8 character 9.
 ########
 
 # Check scope of pragma with eval
@@ -72,7 +72,7 @@ eval q[
 my $b ; chop $b ;
 print STDERR "The End.\n" ;
 EXPECT
--- Use of uninitialized value $b in scalar chop
+-- Use of uninitialized value $b in chop
 The End.
 ########
 
@@ -84,8 +84,8 @@ eval '
 my $b ; chop $b ;
 print STDERR "The End.\n" ;
 EXPECT
--- Use of uninitialized value $b in scalar chop
-Use of uninitialized value $b in scalar chop at - line 7 character 9.
+-- Use of uninitialized value $b in chop
+Use of uninitialized value $b in chop at - line 7 character 9.
 ########
 
 # Check scope of pragma with eval
@@ -97,4 +97,4 @@ eval '
 my $b ; chop $b ;
 print STDERR "The End.\n" ;
 EXPECT
-Use of uninitialized value $b in scalar chop at - line 8 character 9.
+Use of uninitialized value $b in chop at - line 8 character 9.

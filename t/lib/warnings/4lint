@@ -45,9 +45,9 @@ do {
     my $b ; chop $b ;
 };
 EXPECT
-Use of uninitialized value $b in scalar chop at (eval 1) line 2 character 18.
+Use of uninitialized value $b in chop at (eval 1) line 2 character 18.
     (eval) called at - line 5 character 5.
-Use of uninitialized value $b in scalar chop at - line 8 character 13.
+Use of uninitialized value $b in chop at - line 8 character 13.
 ########
 -W
 # Check scope of pragma with eval
@@ -61,9 +61,9 @@ do {
     my $b ; chop $b ;
 };
 EXPECT
-Use of uninitialized value $b in scalar chop at (eval 1) line 3 character 58.
+Use of uninitialized value $b in chop at (eval 1) line 3 character 58.
     (eval) called at - line 6 character 5.
-Use of uninitialized value $b in scalar chop at - line 10 character 13.
+Use of uninitialized value $b in chop at - line 10 character 13.
 ########
 -W
 # Check scope of pragma with eval
@@ -76,9 +76,9 @@ do {
     my $b ; chop $b ;
 };
 EXPECT
-Use of uninitialized value $b in scalar chop at (eval 1) line 2 character 18.
+Use of uninitialized value $b in chop at (eval 1) line 2 character 18.
     (eval) called at - line 6 character 5.
-Use of uninitialized value $b in scalar chop at - line 9 character 13.
+Use of uninitialized value $b in chop at - line 9 character 13.
 ########
 -W
 # Check scope of pragma with eval
@@ -92,6 +92,6 @@ do {
     my $b ; chop $b ;
 };
 EXPECT
-Use of uninitialized value $b in scalar chop at (eval 1) line 3 character 40.
+Use of uninitialized value $b in chop at (eval 1) line 3 character 40.
     (eval) called at - line 6 character 5.
-Use of uninitialized value $b in scalar chop at - line 10 character 13.
+Use of uninitialized value $b in chop at - line 10 character 13.

@@ -1306,6 +1306,12 @@ Perl_op_assign(pTHX_ OP** po)
     OP* o = *po;
 
     switch (o->op_type) {
+    case OP_NULL:
+    case OP_HELEM:
+    case OP_AELEM:
+    {
+	return op_assign(&(cBINOPx(o)->op_first));
+    }
     case OP_MAGICSV:
     {
 	I32 min_modcount = 0;
@@ -1352,11 +1358,6 @@ Perl_op_assign(pTHX_ OP** po)
 		);
     
 	return copy_from_tmp;
-    }
-    case OP_HELEM:
-    case OP_AELEM:
-    {
-	return op_assign(&(cBINOPx(o)->op_first));
     }
     case OP_LISTFIRST:
     {

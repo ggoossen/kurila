@@ -106,8 +106,8 @@ ok( !Internals::SvREADONLY %foo );
 is((nkeys(%foo)), 2);
 is(%foo{?'foo'}, 1);
 
-ok(  Internals::SvREADONLY %foo, 1 );
-ok(  Internals::SvREADONLY %foo );
+ok(  Internals::HvRESTRICTED %foo, 1 );
+ok(  Internals::HvRESTRICTED %foo );
 try { undef(%foo); };
 like($^EVAL_ERROR->message, $ro_err, q/Can't undef read-only hash/);
 TODO: do {

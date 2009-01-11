@@ -5,14 +5,14 @@
   Can't break at that line	[magic_setdbline]
 
 __END__
-# mg.c
+# TODO variable name extraction mg.c
 use warnings 'uninitialized';
 'foo' =~ m/(foo)/;
 oct $3;
 EXPECT
 Use of uninitialized value $::3 in oct at - line 4 character 1.
 ########
-# mg.c
+# TODO variable name extraction mg.c
 use warnings 'uninitialized';
 oct $3;
 EXPECT

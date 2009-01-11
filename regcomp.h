@@ -737,15 +737,12 @@ re.pm, especially to the documentation.
         | RE_DEBUG_EXECUTE_TRIE )) x )
 
 /* initialization */
-/* get_sv() can return NULL during global destruction. */
 #define GET_RE_DEBUG_FLAGS DEBUG_r({ \
-        SV * re_debug_flags_sv = NULL; \
-        re_debug_flags_sv = get_sv(RE_DEBUG_FLAGS, 1); \
-        if (re_debug_flags_sv) { \
-            if (!SvIOK(re_debug_flags_sv)) \
-                sv_setuv(re_debug_flags_sv, RE_DEBUG_COMPILE_DUMP | RE_DEBUG_EXECUTE_MASK ); \
-            re_debug_flags=SvIV(re_debug_flags_sv); \
-        }\
+	SV * re_debug_flags_sv = sv_2mortal(newSV(0)); \
+        Perl_magic_get(RE_DEBUG_FLAGS, re_debug_flags_sv);	\
+        if (!SvIOK(re_debug_flags_sv)) \
+            sv_setuv(re_debug_flags_sv, RE_DEBUG_COMPILE_DUMP | RE_DEBUG_EXECUTE_MASK ); \
+        re_debug_flags=SvIV(re_debug_flags_sv); \
 })
 
 #ifdef DEBUGGING
