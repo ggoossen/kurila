@@ -2252,14 +2252,6 @@ S_pack_rec(pTHX_ SV *cat, tempsym_t* symptr, SV **beglist, SV **endlist )
 		if (lookahead.howlen == e_number) count = lookahead.length;
 		else {
 		    if (items > 0) {
-			if (SvGMAGICAL(*beglist)) {
-			    /* Avoid reading the active data more than once
-			       by copying it to a temporary.  */
-			    STRLEN len;
-			    const char *const pv = SvPV_const(*beglist, len);
-			    SV *const temp = newSVpvn_flags(pv, len, SVs_TEMP);
-			    *beglist = temp;
-			}
 			count = sv_len(*beglist);
 		    }
 		    else count = 0;
@@ -3058,7 +3050,6 @@ extern const double _double_constants[];
 		const char *aptr;
 
 		fromstr = NEXTFROM;
-		SvGETMAGIC(fromstr);
 		if (!SvOK(fromstr)) aptr = NULL;
 		else {
 		    /* XXX better yet, could spirit away the string to

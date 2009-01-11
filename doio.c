@@ -1193,7 +1193,6 @@ Perl_do_print(pTHX_ register SV *sv, PerlIO *fp)
     if (!sv)
 	return TRUE;
     if (SvTYPE(sv) == SVt_IV && SvIOK(sv)) {
-	assert(!SvGMAGICAL(sv));
 	if (SvIsUV(sv))
 	    PerlIO_printf(fp, "%"UVuf, (UV)SvUVX(sv));
 	else

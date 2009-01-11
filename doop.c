@@ -50,7 +50,7 @@ Perl_do_join(pTHX_ register SV *sv, SV *delim, register SV *av)
     SvUPGRADE(sv, SVt_PV);
     if (SvLEN(sv) < len + items) {	/* current length is way too short */
 	while (items-- > 0) {
-	    if (*mark && !SvGMAGICAL(*mark) && SvOK(*mark)) {
+	    if (*mark && SvOK(*mark)) {
 		STRLEN tmplen;
 		SvPV_const(*mark, tmplen);
 		len += tmplen;
@@ -514,7 +514,7 @@ Perl_do_vop(pTHX_ I32 optype, SV *sv, SV *left, SV *right)
 
     PERL_ARGS_ASSERT_DO_VOP;
 
-    if (sv != left || (optype != OP_BIT_AND && !SvOK(sv) && !SvGMAGICAL(sv)))
+    if (sv != left || (optype != OP_BIT_AND && !SvOK(sv)))
 	sv_setpvn(sv, "", 0);	/* avoid undef warning on |= and ^= */
     lsave = lc = SvPV_nomg_const(left, leftlen);
     rsave = rc = SvPV_nomg_const(right, rightlen);

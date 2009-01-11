@@ -22,8 +22,7 @@
    } while (0)
 
 #define MAYBE_TAINT_SASSIGN_SRC(sv) \
-    if (PL_tainting && PL_tainted && (!SvGMAGICAL(left) || !SvSMAGICAL(left) || \
-        !((mg=mg_find(left, PERL_MAGIC_taint)) && mg->mg_len & 1)))\
+    if (PL_tainting && PL_tainted)  \
         TAINT_NOT
 
 #define PP_PREINC(sv) do {	\

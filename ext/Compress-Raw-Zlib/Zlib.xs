@@ -482,11 +482,9 @@ char * string;
 #endif
 {
     dTHX;
-    SvGETMAGIC(sv);
 
     if (SvROK(sv)) {
         sv = SvRV(sv) ;
-        SvGETMAGIC(sv);
         switch(SvTYPE(sv)) {
             case SVt_PVAV:
             case SVt_PVHV:
@@ -516,12 +514,10 @@ char * string ;
     dTHX;
     bool wipe = 0 ;
     
-    SvGETMAGIC(sv);
     wipe = ! SvOK(sv) ;
 
     if (SvROK(sv)) {
         sv = SvRV(sv) ;
-        SvGETMAGIC(sv);
         wipe = ! SvOK(sv) ;
 
         switch(SvTYPE(sv)) {

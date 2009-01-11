@@ -1254,16 +1254,9 @@ PP(pp_send)
 	IV offset;
 
 	if (IN_CODEPOINTS) {
-		/* The SV really is UTF-8.  */
-		if (SvGMAGICAL(bufsv)) {
-		    /* Don't call sv_len_utf8 again because it will call magic
-		       or overloading a second time, and we might get back a
-		       different result.  */
-		    blen_chars = utf8_length(buffer, buffer + blen);
-		} else {
-		    /* It's safe, and it may well be cached.  */
-		    blen_chars = sv_len_utf8(bufsv);
-		}
+	    /* The SV really is UTF-8.  */
+	    /* It's safe, and it may well be cached.  */
+	    blen_chars = sv_len_utf8(bufsv);
 	} else {
 	    blen_chars = blen;
 	}
@@ -1300,27 +1293,18 @@ PP(pp_send)
 	    length = blen_chars - offset;
 	if (IN_CODEPOINTS) {
 	    /* Here we convert length from characters to bytes.  */
-	    if (SvGMAGICAL(bufsv)) {
-		/* Either we had to convert the SV, or the SV is magical, or
-		   the SV has overloading, in which case we can't or mustn't
-		   or mustn't call it again.  */
+	    /* It's a real UTF-8 SV, and it's not going to change under
+	       us.  Take advantage of any cache.  */
+	    I32 start = offset;
+	    I32 len_I32 = length;
 
-		buffer = utf8_hop(buffer, offset);
-		length = utf8_hop(buffer, length) - buffer;
-	    } else {
-		/* It's a real UTF-8 SV, and it's not going to change under
-		   us.  Take advantage of any cache.  */
-		I32 start = offset;
-		I32 len_I32 = length;
+	    /* Convert the start and end character positions to bytes.
+	       Remember that the second argument to sv_pos_u2b is relative
+	       to the first.  */
+	    sv_pos_u2b(bufsv, &start, &len_I32);
 
-		/* Convert the start and end character positions to bytes.
-		   Remember that the second argument to sv_pos_u2b is relative
-		   to the first.  */
-		sv_pos_u2b(bufsv, &start, &len_I32);
-
-		buffer += start;
-		length = len_I32;
-	    }
+	    buffer += start;
+	    length = len_I32;
 	}
 	else {
 	    buffer = buffer+offset;

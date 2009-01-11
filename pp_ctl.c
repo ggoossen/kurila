@@ -174,9 +174,6 @@ PP(pp_flop)
     AV* res = av_2mortal(newAV());
     dPOPPOPssrl;
 
-    SvGETMAGIC(left);
-    SvGETMAGIC(right);
-
     if ( !SvNIOKp(left) && SvPOKp(left) && !looks_like_number(left)) {
 	Perl_croak(aTHX_ "Range must be numeric");
     }
@@ -751,8 +748,6 @@ PP(pp_enteriter)
     if (PL_op->op_flags & OPf_SPECIAL) {
 	SV * const right = POPs;
 	dPOPss;
-	SvGETMAGIC(sv);
-	SvGETMAGIC(right);
 
 	if ( !SvNIOKp(sv) && SvPOKp(sv) && !looks_like_number(sv)) {
 	    Perl_croak(aTHX_ "Range must be numeric");
@@ -2333,7 +2328,7 @@ S_run_user_filter(pTHX_ int idx, SV *buf_sv, int maxlen)
        then clearly what it contains is already filtered by this filter, so we
        don't want to pass it in a second time.
        I'm going to use a mortal in case the upstream filter croaks.  */
-    upstream = ((SvOK(buf_sv) && sv_len(buf_sv)) || SvGMAGICAL(buf_sv))
+    upstream = ((SvOK(buf_sv) && sv_len(buf_sv)))
 	? sv_newmortal() : buf_sv;
     SvUPGRADE(upstream, SVt_PV);
 	

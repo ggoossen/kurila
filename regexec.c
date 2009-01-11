@@ -3159,20 +3159,12 @@ S_regmatch(pTHX_ regmatch_info *reginfo, regnode *prog)
 		    } else if (SvTYPE(ret) == SVt_REGEXP) {
 			rx = (REGEXP*) ret;
 		    } else if (SvSMAGICAL(ret)) {
-			if (SvGMAGICAL(ret)) {
-			    /* I don't believe that there is ever qr magic
-			       here.  */
-			    assert(!mg_find(ret, PERL_MAGIC_qr));
-			    sv_unmagic(ret, PERL_MAGIC_qr);
-			}
-			else {
-			    mg = mg_find(ret, PERL_MAGIC_qr);
+			mg = mg_find(ret, PERL_MAGIC_qr);
 			    /* testing suggests mg only ends up non-NULL for
 			       scalars who were upgraded and compiled in the
 			       else block below. In turn, this is only
 			       triggered in the "postponed utf8 string" tests
 			       in t/op/pat.t  */
-			}
 		    }
 
 		    if (mg) {
@@ -3189,8 +3181,7 @@ S_regmatch(pTHX_ regmatch_info *reginfo, regnode *prog)
 			if (DO_UTF8(ret)) pm_flags |= RXf_PMf_UTF8;
 			rx = CALLREGCOMP(ret, pm_flags);
 			if (!(SvFLAGS(ret)
-			      & (SVs_TEMP | SVs_PADTMP | SVf_READONLY
-				 | SVs_GMG))) {
+			      & (SVs_TEMP | SVs_PADTMP | SVf_READONLY ))) {
 			    /* This isn't a first class regexp. Instead, it's
 			       caching a regexp onto an existing, Perl visible
 			       scalar.  */

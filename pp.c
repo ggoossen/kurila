@@ -86,11 +86,6 @@ PP(pp_rv2gv)
     }
     else {
 	if (SvTYPE(sv) != SVt_PVGV) {
-	    if (SvGMAGICAL(sv)) {
-		mg_get(sv);
-		if (SvROK(sv))
-		    goto wasref;
-	    }
 	    if (!SvOK(sv) && sv != &PL_sv_undef) {
 		/* If this is a 'my' scalar and flag is set then vivify
 		 * NI-S 1999/05/07
@@ -155,18 +150,12 @@ PP(pp_rv2sv)
     static const char a_scalar[] = "a SCALAR";
 
     if (SvROK(sv)) {
-      wasref:
 	sv = SvRV(sv);
     }
     else {
 	gv = (GV*)sv;
 
 	if (SvTYPE(gv) != SVt_PVGV) {
-	    if (SvGMAGICAL(sv)) {
-		mg_get(sv);
-		if (SvROK(sv))
-		    goto wasref;
-	    }
 	    Perl_croak(aTHX_ "Can't use %s as %s REF", Ddesc(sv), is_pp_rv2sv ? a_scalar : is_pp_rv2av ? an_array : a_hash);
 	}
 
@@ -463,9 +452,6 @@ PP(pp_ref)
     const char *pv;
     SV * const sv = POPs;
 
-    if (sv)
-	SvGETMAGIC(sv);
-
     if (!sv || !SvROK(sv))
 	RETPUSHNO;
 
@@ -486,7 +472,7 @@ PP(pp_bless)
 	STRLEN len;
 	const char *ptr;
 
-	if (ssv && !SvGMAGICAL(ssv) && SvROK(ssv))
+	if (ssv && SvROK(ssv))
 	    Perl_croak(aTHX_ "Attempt to bless into a reference");
 	ptr = SvPV_const(ssv,len);
 	if (len == 0)
@@ -1327,7 +1313,6 @@ PP(pp_repeat)
   {
     register IV count;
     dPOPss;
-    SvGETMAGIC(sv);
     if (SvIOKp(sv)) {
 	 if (SvUOK(sv)) {
 	      const UV uv = SvUV(sv);
@@ -2037,8 +2022,6 @@ PP(pp_bit_and)
     dVAR; dSP; dATARGET;
     {
       dPOPTOPssrl;
-      SvGETMAGIC(left);
-      SvGETMAGIC(right);
       if (SvNIOKp(left) || SvNIOKp(right)) {
 	if (PL_op->op_private & HINT_INTEGER) {
 	  const IV i = SvIV_nomg(left) & SvIV_nomg(right);
@@ -2064,8 +2047,6 @@ PP(pp_bit_or)
 
     {
       dPOPTOPssrl;
-      SvGETMAGIC(left);
-      SvGETMAGIC(right);
       if (SvNIOKp(left) || SvNIOKp(right)) {
 	if (PL_op->op_private & HINT_INTEGER) {
 	  const IV l = (USE_LEFT(left) ? SvIV_nomg(left) : 0);
@@ -2094,7 +2075,6 @@ PP(pp_negate)
     {
 	SV * const sv = sv_2num(TOPs);
 	const int flags = SvFLAGS(sv);
-	SvGETMAGIC(sv);
 	if ((flags & SVf_IOK) || ((flags & (SVp_IOK | SVp_NOK)) == SVp_IOK)) {
 	    /* It's publicly an integer, or privately an integer-not-float */
 	oops_its_an_int:
@@ -2154,7 +2134,6 @@ PP(pp_complement)
     dVAR; dSP; dTARGET;
     {
       dTOPss;
-      SvGETMAGIC(sv);
       if (SvNIOKp(sv)) {
 	if (PL_op->op_private & HINT_INTEGER) {
 	  const IV i = ~SvIV_nomg(sv);
@@ -2639,25 +2618,7 @@ PP(pp_length)
     dVAR; dSP; dTARGET;
     SV * const sv = TOPs;
 
-    if (SvGMAGICAL(sv)) {
-	/* For an overloaded or magic scalar, we can't know in advance if
-	   it's going to be UTF-8 or not. Also, we can't call sv_len_utf8 as
-	   it likes to cache the length. Maybe that should be a documented
-	   feature of it.
-	*/
-	STRLEN len;
-	const char *const p
-	    = sv_2pv_flags(sv, &len,
-			   SV_UNDEF_RETURNS_NULL|SV_CONST_RETURN|SV_GMAGIC);
-
-	if (!p)
-	    SETs(&PL_sv_undef);
-	else if (IN_CODEPOINTS) {
-	    SETi(utf8_length(p, p + len));
-	}
-	else
-	    SETi(len);
-    } else if (SvOK(sv)) {
+    if (SvOK(sv)) {
 	/* Neither magic nor overloaded.  */
 	if (IN_CODEPOINTS)
 	    SETi(sv_len_utf8(sv));
@@ -2806,15 +2767,7 @@ PP(pp_index)
     big_p = SvPV_const(big, biglen);
     little_p = SvPV_const(little, llen);
 
-    if (SvGMAGICAL(big)) {
-	/* Life just becomes a lot easier if I use a temporary here.
-	   Otherwise I need to avoid calls to sv_pos_u2b(), which (dangerously)
-	   will trigger magic and overloading again, as will fbm_instr()
-	*/
-	big = newSVpvn_flags(big_p, biglen, SVs_TEMP);
-	big_p = SvPVX_mutable(big);
-    }
-    if (SvGMAGICAL(little) || (is_index && !SvOK(little))) {
+    if (is_index && !SvOK(little)) {
 	/* index && SvOK() is a hack. fbm_instr() calls SvPV_const, which will
 	   warn on undef, and we've already triggered a warning with the
 	   SvPV_const some lines above. We can't remove that, as we need to
@@ -2966,7 +2919,6 @@ PP(pp_ucfirst)
     STRLEN ulen;
     STRLEN tculen;
 
-    SvGETMAGIC(source);
     if (SvOK(source)) {
 	s = SvPV_nomg_const(source, slen);
     } else {
@@ -3066,8 +3018,6 @@ PP(pp_uc)
     const char *s;
     char *d;
 
-    SvGETMAGIC(source);
-
     {
 	dTARGET;
 
@@ -3148,8 +3098,6 @@ PP(pp_lc)
     SV *dest;
     const char *s;
     char *d;
-
-    SvGETMAGIC(source);
 
     {
 	dTARGET;
@@ -3984,9 +3932,7 @@ PP(pp_arrayexpand)
 		for (i=0; i < (U32)maxarg; i++) {
 		    SV ** const svp = av_fetch(av, i, FALSE);
 		    /* See note in pp_helem, and bug id #27839 */
-		    SP[i+1] = svp
-			? SvGMAGICAL(*svp) ? sv_mortalcopy(*svp) : *svp
-			: &PL_sv_undef;
+		    SP[i+1] = svp ? *svp : &PL_sv_undef;
 		}
 	    }
 	    else {

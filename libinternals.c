@@ -97,7 +97,6 @@ XS(XS_Internals_SvTAINTED)
     dVAR;
     dXSARGS;
     SV * const sv = SvRV(ST(0));
-    SvGETMAGIC(sv);
     PERL_UNUSED_ARG(cv);
 
     if (items == 1) {

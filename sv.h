@@ -320,7 +320,7 @@ perform the upgrade if necessary.  See C<svtype>.
 #define SVpad_OUR	0x00040000  /* pad name is "our" instead of "my" */
 #define SVs_TEMP	0x00080000  /* string is stealable? */
 #define SVs_OBJECT	0x00100000  /* is "blessed" */
-#define SVs_GMG		0x00200000  /* has magical get method */
+#define SVs_NOTUSED		0x00200000  /* has magical get method */
 #define SVs_SMG		0x00400000  /* has magical set method */
 #define SVs_RMG		0x00800000  /* has random magical methods */
 
@@ -783,13 +783,9 @@ in gv.h: */
 #define SvROK_on(sv)		(SvFLAGS(sv) |= SVf_ROK)
 #define SvROK_off(sv)		(SvFLAGS(sv) &= ~(SVf_ROK))
 
-#define SvMAGICAL(sv)		(SvFLAGS(sv) & (SVs_GMG|SVs_SMG|SVs_RMG))
-#define SvMAGICAL_on(sv)	(SvFLAGS(sv) |= (SVs_GMG|SVs_SMG|SVs_RMG))
-#define SvMAGICAL_off(sv)	(SvFLAGS(sv) &= ~(SVs_GMG|SVs_SMG|SVs_RMG))
-
-#define SvGMAGICAL(sv)		(SvFLAGS(sv) & SVs_GMG)
-#define SvGMAGICAL_on(sv)	(SvFLAGS(sv) |= SVs_GMG)
-#define SvGMAGICAL_off(sv)	(SvFLAGS(sv) &= ~SVs_GMG)
+#define SvMAGICAL(sv)		(SvFLAGS(sv) & (SVs_SMG|SVs_RMG))
+#define SvMAGICAL_on(sv)	(SvFLAGS(sv) |= (SVs_SMG|SVs_RMG))
+#define SvMAGICAL_off(sv)	(SvFLAGS(sv) &= ~(SVs_SMG|SVs_RMG))
 
 #define SvSMAGICAL(sv)		(SvFLAGS(sv) & SVs_SMG)
 #define SvSMAGICAL_on(sv)	(SvFLAGS(sv) |= SVs_SMG)
@@ -1428,7 +1424,7 @@ mg.c:1024: warning: left-hand operand of comma expression has no effect
 #  define SvRELEASE_IVX_(sv)  /**/
 #endif /* PERL_OLD_COPY_ON_WRITE */
 
-#define CAN_COW_MASK	(SVs_OBJECT|SVs_GMG|SVs_SMG|SVs_RMG|SVf_IOK|SVf_NOK| \
+#define CAN_COW_MASK	(SVs_OBJECT|SVs_SMG|SVs_RMG|SVf_IOK|SVf_NOK| \
 			 SVf_POK|SVf_ROK|SVp_IOK|SVp_NOK|SVp_POK|SVf_FAKE| \
 			 SVf_OOK|SVf_BREAK|SVf_READONLY)
 #define CAN_COW_FLAGS	(SVp_POK|SVf_POK)
@@ -1452,10 +1448,6 @@ incremented.
 
 /*
 =head1 Magical Functions
-
-=for apidoc Am|void|SvGETMAGIC|SV* sv
-Invokes C<mg_get> on an SV if it has 'get' magic.  This macro evaluates its
-argument more than once.
 
 =for apidoc Am|void|SvSETMAGIC|SV* sv
 Invokes C<mg_set> on an SV if it has 'set' magic.  This macro evaluates its
@@ -1502,7 +1494,6 @@ Returns a pointer to the character buffer.
 #define SvLOCK(sv) CALL_FPTR(PL_lockhook)(aTHX_ sv)
 #define SvUNLOCK(sv) CALL_FPTR(PL_unlockhook)(aTHX_ sv)
 
-#define SvGETMAGIC(x) STMT_START { if (SvGMAGICAL(x)) mg_get(x); } STMT_END
 #define SvSETMAGIC(x) STMT_START { if (SvSMAGICAL(x)) mg_set(x); } STMT_END
 
 #define SvSetSV_and(dst,src,finally) \

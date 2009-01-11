@@ -173,7 +173,6 @@ PP(pp_concat)
     }
     else { /* TARG == left */
         STRLEN llen;
-	SvGETMAGIC(left);		/* or mg_get(left) may happen here */
 	if (!SvOK(TARG)) {
 	    if (left == right && ckWARN(WARN_UNINITIALIZED))
 		report_uninit(right);
@@ -410,7 +409,6 @@ PP(pp_defined)
 	    defined = TRUE;
     }
     else {
-	SvGETMAGIC(sv);
 	if (SvOK(sv))
 	    defined = TRUE;
     }
@@ -608,8 +606,6 @@ PP(pp_aelemfast)
 	SV *sv = (svp ? *svp : &PL_sv_undef);
 	OPFLAGS op_flags = PL_op->op_flags;
 	EXTEND(SP, 1);
-	if (!lval && SvGMAGICAL(sv))	/* see note in pp_helem() */
-	    sv = sv_mortalcopy(sv);
 	if (op_flags & OPf_ASSIGN) {
 	    if (op_flags & OPf_ASSIGN_PART) {
 		SV* src;
@@ -728,6 +724,7 @@ PP(pp_print)
     RETURN;
 }
 
+
 OP *
 Perl_do_readline(pTHX_ GV* gv)
 {
@@ -794,8 +791,7 @@ Perl_do_readline(pTHX_ GV* gv)
     if (gimme == G_SCALAR) {
 	sv = TARG;
 	if (type == OP_RCATLINE) {
-	    if (SvGMAGICAL(sv))
-		mg_get(sv);
+	    NOOP;
 	}
 	else {
 	    if ( SvOK(sv) && ! SvPVOK(sv) )
@@ -955,7 +951,6 @@ PP(pp_helem)
     SV * const keysv = POPs;
     HV * const hv = (HV*)POPs;
     const OPFLAGS op_flags = PL_op->op_flags;
-    const U32 lval = op_flags & OPf_MOD;
     const U32 optional = PL_op->op_private & OPpELEM_OPTIONAL;
     const U32 add = PL_op->op_private & OPpELEM_ADD;
     SV *sv;
@@ -1036,8 +1031,6 @@ PP(pp_helem)
      * and thus the later pp_sassign() will fail to mg_get() the
      * old value.  This should also cure problems with delayed
      * mg_get()s.  GSAR 98-07-03 */
-    if (!lval && SvGMAGICAL(sv))
-	sv = sv_mortalcopy(sv);
     if (op_flags & OPf_ASSIGN) {
 	if (op_flags & OPf_ASSIGN_PART) {
 	    SV* src;
@@ -1367,26 +1360,11 @@ PP(pp_entersub)
 		    SP = PL_stack_base + POPMARK;
 		RETURN;
 	    }
-	    if (SvGMAGICAL(sv)) {
-		mg_get(sv);
-		if (SvROK(sv))
-		    goto got_rv;
-		if (SvPOKp(sv)) {
-		    sym = SvPVX_const(sv);
-		    len = SvCUR(sv);
-		} else {
-		    sym = NULL;
-		    len = 0;
-		}
-	    }
-	    else {
-		sym = SvPV_const(sv, len);
-            }
+	    sym = SvPV_const(sv, len);
 	    if (!sym)
 		DIE(aTHX_ PL_no_usym, "a subroutine");
 	    DIE(aTHX_ PL_no_symref, sym, "a subroutine");
 	}
-  got_rv:
 	cv = (CV*)SvRV(sv);
 	if (SvTYPE(cv) == SVt_PVCV)
 	    break;
@@ -1615,7 +1593,6 @@ Perl_vivify_ref(pTHX_ SV *sv, U32 to_what)
 {
     PERL_ARGS_ASSERT_VIVIFY_REF;
 
-    SvGETMAGIC(sv);
     if (!SvOK(sv)) {
 	if (SvREADONLY(sv))
 	    Perl_croak(aTHX_ PL_no_modify);
@@ -1682,7 +1659,6 @@ S_method_common(pTHX_ SV* meth, U32* hashp)
     if (!sv)
 	Perl_croak(aTHX_ "Can't call method \"%s\" on an undefined value", name);
 
-    SvGETMAGIC(sv);
     if (SvROK(sv))
 	ob = (SV*)SvRV(sv);
     else {

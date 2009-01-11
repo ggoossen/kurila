@@ -263,7 +263,6 @@ Perl_hv_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
     XPVHV* xhv;
     HE *entry;
     HE **oentry;
-    SV *sv;
     int masked_flags;
     const int return_svp = action & HV_FETCH_JUST_SV;
 
@@ -271,29 +270,6 @@ Perl_hv_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
 
     assert(SvTYPE(hv) == SVt_PVHV);
 
-    if (SvSMAGICAL(hv) && SvGMAGICAL(hv) && !(action & HV_DISABLE_UVAR_XKEY)) {
-	MAGIC* mg;
-	if ((mg = mg_find((SV*)hv, PERL_MAGIC_uvar))) {
-	    struct ufuncs * const uf = (struct ufuncs *)mg->mg_ptr;
-	    if (uf->uf_set == NULL) {
-		SV* obj = mg->mg_obj;
-
-		if (!keysv) {
-		    keysv = newSVpvn_flags(key, klen, SVs_TEMP);
-		}
-		
-		mg->mg_obj = keysv;         /* pass key */
-		uf->uf_index = action;      /* pass action */
-		magic_getuvar((SV*)hv, mg);
-		keysv = mg->mg_obj;         /* may have changed */
-		mg->mg_obj = obj;
-
-		/* If the key may have changed, then we need to invalidate
-		   any passed-in computed hash value.  */
-		hash = 0;
-	    }
-	}
-    }
     if (keysv) {
 	if (flags & HVhek_FREEKEY)
 	    Safefree(key);
@@ -310,66 +286,10 @@ Perl_hv_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
     xhv = (XPVHV*)SvANY(hv);
     if (SvMAGICAL(hv)) {
 	if (SvRMAGICAL(hv) && !(action & (HV_FETCH_ISSTORE|HV_FETCH_ISEXISTS))) {
-	    if (SvGMAGICAL((SV*)hv))
-	    {
-		/* FIXME should be able to skimp on the HE/HEK here when
-		   HV_FETCH_JUST_SV is true.  */
-		if (!keysv) {
-		    keysv = newSVpvn(key, klen);
-		} else {
-		    keysv = newSVsv(keysv);
-		}
-                sv = sv_newmortal();
-                mg_copy((SV*)hv, sv, (char *)keysv, HEf_SVKEY);
-
-		/* grab a fake HE/HEK pair from the pool or make a new one */
-		entry = PL_hv_fetch_ent_mh;
-		if (entry)
-		    PL_hv_fetch_ent_mh = HeNEXT(entry);
-		else {
-		    char *k;
-		    entry = new_HE();
-		    Newx(k, HEK_BASESIZE + sizeof(SV*), char);
-		    HeKEY_hek(entry) = (HEK*)k;
-		}
-		HeNEXT(entry) = NULL;
-		HeSVKEY_set(entry, keysv);
-		HeVAL(entry) = sv;
-		sv_upgrade(sv, SVt_PVLV);
-		LvTYPE(sv) = 'T';
-		 /* so we can free entry when freeing sv */
-		LvTARG(sv) = (SV*)entry;
-
-		/* XXX remove at some point? */
-		if (flags & HVhek_FREEKEY)
-		    Safefree(key);
-
-		if (return_svp) {
-		    return entry ? (void *) &HeVAL(entry) : NULL;
-		}
-		return (void *) entry;
-	    }
+	    NOOP;
 	} /* ISFETCH */
 	else if (SvRMAGICAL(hv) && (action & HV_FETCH_ISEXISTS)) {
-	    if (SvGMAGICAL((SV*)hv)) {
-		/* I don't understand why hv_exists_ent has svret and sv,
-		   whereas hv_exists only had one.  */
-		SV * const svret = sv_newmortal();
-		sv = sv_newmortal();
-
-		if (keysv) {
-		    keysv = newSVsv(keysv);
-		    mg_copy((SV*)hv, sv, (char *)sv_2mortal(keysv), HEf_SVKEY);
-		} else {
-		    mg_copy((SV*)hv, sv, key, klen);
-		}
-		if (flags & HVhek_FREEKEY)
-		    Safefree(key);
-		/* This cast somewhat evil, but I'm merely using NULL/
-		   not NULL to return the boolean exists.
-		   And I know hv is not NULL.  */
-		return SvTRUE(svret) ? (void *)hv : NULL;
-		}
+	    NOOP;
 	} /* ISEXISTS */
 	else if (action & HV_FETCH_ISSTORE) {
 	    bool needs_copy;

@@ -411,7 +411,6 @@ typedef DBT DBTKEY ;
 
 #define OutputValue(arg, name)  					\
 	{ if (RETVAL == 0) {						\
-	      SvGETMAGIC(arg) ;          				\
 	      my_sv_setpvn(arg, (const char *)name.data, name.size) ;			\
 	      TAINT;                                       		\
 	      SvTAINTED_on(arg);                                       	\
@@ -421,7 +420,6 @@ typedef DBT DBTKEY ;
 #define OutputKey(arg, name)	 					\
 	{ if (RETVAL == 0) 						\
 	  { 								\
-		SvGETMAGIC(arg) ;          				\
 		if (db->type != DB_RECNO) {				\
 		    my_sv_setpvn(arg, (const char *)name.data, name.size); 		\
 		}							\

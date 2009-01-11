@@ -31,7 +31,6 @@ PerlIOScalar_pushed(pTHX_ PerlIO * f, const char *mode, SV * arg,
 		return -1;
 	    }
 	    s->var = SvREFCNT_inc(SvRV(arg));
-	    SvGETMAGIC(s->var);
 	    if (!SvPOK(s->var) && SvOK(s->var))
 		(void)SvPV_nomg_const_nolen(s->var);
 	}

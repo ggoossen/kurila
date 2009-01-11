@@ -170,12 +170,6 @@ S_save_scalar_at(pTHX_ SV **sptr)
     PERL_ARGS_ASSERT_SAVE_SCALAR_AT;
 
     if (SvTYPE(osv) >= SVt_PVMG && SvMAGIC(osv) && SvTYPE(osv) != SVt_PVGV) {
-	if (SvGMAGICAL(osv)) {
-	    const bool oldtainted = PL_tainted;
-	    SvFLAGS(osv) |= (SvFLAGS(osv) &
-	       (SVp_IOK|SVp_NOK|SVp_POK)) >> PRIVSHIFT;
-	    PL_tainted = oldtainted;
-	}
 	mg_localize(osv, sv);
     }
     return sv;
@@ -190,7 +184,6 @@ Perl_save_scalar(pTHX_ GV *gv)
     PERL_ARGS_ASSERT_SAVE_SCALAR;
 
     PL_localizing = 1;
-    SvGETMAGIC(*sptr);
     PL_localizing = 0;
     SSCHECK(3);
     SSPUSHPTR(SvREFCNT_inc_simple(gv));
@@ -595,7 +588,6 @@ Perl_save_aelem(pTHX_ AV *av, I32 idx, SV **sptr)
 
     PERL_ARGS_ASSERT_SAVE_AELEM;
 
-    SvGETMAGIC(*sptr);
     SSCHECK(4);
     SSPUSHPTR(SvREFCNT_inc_simple(av));
     SSPUSHINT(idx);
@@ -616,7 +608,6 @@ Perl_save_helem(pTHX_ HV *hv, SV *key, SV **sptr)
 
     PERL_ARGS_ASSERT_SAVE_HELEM;
 
-    SvGETMAGIC(*sptr);
     SSCHECK(4);
     SSPUSHPTR(SvREFCNT_inc_simple(hv));
     SSPUSHPTR(newSVsv(key));
@@ -633,7 +624,6 @@ Perl_save_svref(pTHX_ SV **sptr)
 
     PERL_ARGS_ASSERT_SAVE_SVREF;
 
-    SvGETMAGIC(*sptr);
     SSCHECK(3);
     SSPUSHPTR(sptr);
     SSPUSHPTR(SvREFCNT_inc(*sptr));

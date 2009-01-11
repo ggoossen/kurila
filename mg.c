@@ -128,15 +128,13 @@ Perl_mg_magical(pTHX_ SV *sv)
 	do {
 	    const MGVTBL* const vtbl = mg->mg_virtual;
 	    if (vtbl) {
-		if (vtbl->svt_get && !(mg->mg_flags & MGf_GSKIP))
-		    SvGMAGICAL_on(sv);
 		if (vtbl->svt_set)
 		    SvSMAGICAL_on(sv);
 		if (vtbl->svt_clear)
 		    SvRMAGICAL_on(sv);
 	    }
 	} while ((mg = mg->mg_moremagic));
-	if (!(SvFLAGS(sv) & (SVs_GMG|SVs_SMG)))
+	if (!(SvFLAGS(sv) & SVs_SMG))
 	    SvRMAGICAL_on(sv);
     }
 }
@@ -1917,7 +1915,7 @@ Perl_magic_set(pTHX_ const char* name, SV *sv)
 		/* $^OUTPUT_FIELD_SEPARATOR */
 		if (PL_ofs_sv)
 		    SvREFCNT_dec(PL_ofs_sv);
-		if (SvOK(sv) || SvGMAGICAL(sv)) {
+		if (SvOK(sv)) {
 		    PL_ofs_sv = newSVsv(sv);
 		}
 		else {
@@ -1930,7 +1928,7 @@ Perl_magic_set(pTHX_ const char* name, SV *sv)
 		/* $^OUTPUT_RECORD_SEPARATOR */
 		if (PL_ors_sv)
 		    SvREFCNT_dec(PL_ors_sv);
-		if (SvOK(sv) || SvGMAGICAL(sv)) {
+		if (SvOK(sv)) {
 		    PL_ors_sv = newSVsv(sv);
 		}
 		else {
@@ -2374,16 +2372,6 @@ S_restore_magic(pTHX_ const void *p)
 	    SvFLAGS(sv) |= mgs->mgs_flags;
 	else
 	    mg_magical(sv);
-	if (SvGMAGICAL(sv)) {
-	    /* downgrade public flags to private,
-	       and discard any other private flags */
-
-	    const U32 pubflags = SvFLAGS(sv) & (SVf_IOK|SVf_NOK|SVf_POK);
-	    if (pubflags) {
-		SvFLAGS(sv) &= ~( pubflags | (SVp_IOK|SVp_NOK|SVp_POK) );
-		SvFLAGS(sv) |= ( pubflags << PRIVSHIFT );
-	    }
-	}
     }
 
     mgs->mgs_sv = NULL;  /* mark the MGS structure as restored */

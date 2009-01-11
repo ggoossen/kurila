@@ -170,7 +170,6 @@ usage:
 
     rv = ST(0);
     ST(0) = TARG;
-    SvGETMAGIC(rv);
     if (!(SvOK(rv) && SvROK(rv)))
 	goto usage;
     sv = SvRV(rv);

@@ -100,8 +100,6 @@ Perl_sv_derived_from(pTHX_ SV *sv, const char *const name)
 
     PERL_ARGS_ASSERT_SV_DERIVED_FROM;
 
-    SvGETMAGIC(sv);
-
     if (SvROK(sv)) {
 	const char *type;
         sv = SvRV(sv);
@@ -146,10 +144,7 @@ Perl_sv_does(pTHX_ SV *sv, const char *const name)
     ENTER;
     SAVETMPS;
 
-    SvGETMAGIC(sv);
-
-    if (!SvOK(sv) || !(SvROK(sv) || (SvPOK(sv) && SvCUR(sv))
-		|| (SvGMAGICAL(sv) && SvPOKp(sv) && SvCUR(sv))))
+    if (!SvOK(sv) || !(SvROK(sv) || (SvPOK(sv) && SvCUR(sv))))
 	return FALSE;
 
     if (sv_isobject(sv)) {
@@ -253,10 +248,7 @@ XS(XS_UNIVERSAL_isa)
 	SV * const sv = ST(0);
 	const char *name;
 
-	SvGETMAGIC(sv);
-
-	if (!SvOK(sv) || !(SvROK(sv) || (SvPOK(sv) && SvCUR(sv))
-		    || (SvGMAGICAL(sv) && SvPOKp(sv) && SvCUR(sv))))
+	if (!SvOK(sv) || !(SvROK(sv) || (SvPOK(sv) && SvCUR(sv))))
 	    XSRETURN_UNDEF;
 
 	name = SvPV_nolen_const(ST(1));
@@ -281,10 +273,7 @@ XS(XS_UNIVERSAL_can)
 
     sv = ST(0);
 
-    SvGETMAGIC(sv);
-
-    if (!SvOK(sv) || !(SvROK(sv) || (SvPOK(sv) && SvCUR(sv))
-		|| (SvGMAGICAL(sv) && SvPOKp(sv) && SvCUR(sv))))
+    if (!SvOK(sv) || !(SvROK(sv) || (SvPOK(sv) && SvCUR(sv))))
 	XSRETURN_UNDEF;
 
     name = SvPV_nolen_const(ST(1));
@@ -780,8 +769,6 @@ XS(XS_dump_view)
 
     if (items != 1)
        Perl_croak(aTHX_ "Usage: %s(%s)", "dump::view", "sv");
-
-    SvGETMAGIC(sv);
 
     if ( ! SvOK(sv) ) {
 	sv_setpv(retsv, "undef");

@@ -2992,7 +2992,7 @@ Perl_yylex(pTHX)
 		     */
 		    SV * const x = GvSV(gv_fetchpvs("^X", GV_ADD|GV_NOTQUAL,
 						    SVt_PV)); /* $^X */
-		    assert(SvPOK(x) || SvGMAGICAL(x));
+		    assert(SvPOK(x));
 		    if (sv_eq(x, CopFILESV(PL_curcop))) {
 			sv_setpvn(x, ipath, ipathend - ipath);
 			SvSETMAGIC(x);

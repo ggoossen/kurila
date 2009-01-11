@@ -1672,44 +1672,8 @@ Perl_sv_2iv_flags(pTHX_ register SV *const sv, const I32 flags)
     if (!sv)
 	return 0;
     assert( ! (SvTYPE(sv) == SVt_PVMG && SvVALID(sv)) ); /* FBMs are never used as ivs */
-    if (SvGMAGICAL(sv)) {
-	if (flags & SV_GMAGIC)
-	    mg_get(sv);
-	if (SvIOKp(sv))
-	    return SvIVX(sv);
-	if (SvNOKp(sv)) {
-	    return I_V(SvNVX(sv));
-	}
-	if (SvPOKp(sv) && SvLEN(sv)) {
-	    UV value;
-	    const int numtype
-		= grok_number(SvPVX_const(sv), SvCUR(sv), &value);
-
-	    if ((numtype & (IS_NUMBER_IN_UV | IS_NUMBER_NOT_INT))
-		== IS_NUMBER_IN_UV) {
-		/* It's definitely an integer */
-		if (numtype & IS_NUMBER_NEG) {
-		    if (value < (UV)IV_MIN)
-			return -(IV)value;
-		} else {
-		    if (value < (UV)IV_MAX)
-			return (IV)value;
-		}
-	    }
-	    if (!numtype) {
-		if (ckWARN(WARN_NUMERIC))
-		    not_a_number(sv);
-	    }
-	    return I_V(Atof(SvPVX_const(sv)));
-	}
-        if (SvROK(sv)) {
-	    goto return_rok;
-	}
-	assert(SvTYPE(sv) >= SVt_PVMG);
-	/* This falls through to the report_uninit inside S_sv_2iuv_common.  */
-    } else if (SvTHINKFIRST(sv)) {
+    if (SvTHINKFIRST(sv)) {
 	if (SvROK(sv)) {
-	return_rok:
 	    Perl_croak(aTHX_ "%s used as a number", Ddesc(sv));
 	}
 	if (SvIsCOW(sv)) {
@@ -1783,7 +1747,7 @@ Perl_sv_2uv_flags(pTHX_ register SV *const sv, const I32 flags)
     dVAR;
     if (!sv)
 	return 0;
-    if (SvGMAGICAL(sv) || (SvTYPE(sv) == SVt_PVGV && SvVALID(sv))) {
+    if ((SvTYPE(sv) == SVt_PVGV && SvVALID(sv))) {
 	/* FBMs use the same flag bit as SVf_IVisUV, so must let them
 	   cache IVs just in case.  */
 	if (flags & SV_GMAGIC)
@@ -1932,7 +1896,7 @@ Perl_sv_2nv(pTHX_ register SV *const sv)
     dVAR;
     if (!sv)
 	return 0.0;
-    if (SvGMAGICAL(sv) || (SvTYPE(sv) == SVt_PVGV && SvVALID(sv))) {
+    if ((SvTYPE(sv) == SVt_PVGV && SvVALID(sv))) {
 	/* FBMs use the same flag bit as SVf_IVisUV, so must let them
 	   cache IVs just in case.  */
 	mg_get(sv);
@@ -2210,59 +2174,8 @@ Perl_sv_2pv_flags(pTHX_ register SV *const sv, STRLEN *const lp, const I32 flags
 	    *lp = 0;
 	return (char *)"";
     }
-    if (SvGMAGICAL(sv)) {
-	if (flags & SV_GMAGIC)
-	    mg_get(sv);
-	if (SvPOKp(sv)) {
-	    if (lp)
-		*lp = SvCUR(sv);
-	    if (flags & SV_MUTABLE_RETURN)
-		return SvPVX_mutable(sv);
-	    if (flags & SV_CONST_RETURN)
-		return (char *)SvPVX_const(sv);
-	    return SvPVX_mutable(sv);
-	}
-	if (SvIOKp(sv) || SvNOKp(sv)) {
-	    char tbuf[64];  /* Must fit sprintf/Gconvert of longest IV/NV */
-	    STRLEN len;
-
-	    if (SvIOKp(sv)) {
-		len = SvIsUV(sv)
-		    ? my_snprintf(tbuf, sizeof(tbuf), "%"UVuf, (UV)SvUVX(sv))
-		    : my_snprintf(tbuf, sizeof(tbuf), "%"IVdf, (IV)SvIVX(sv));
-	    } else {
-		Gconvert(SvNVX(sv), NV_DIG, 0, tbuf);
-		len = strlen(tbuf);
-	    }
-	    assert(!SvROK(sv));
-	    {
-		dVAR;
-
-#ifdef FIXNEGATIVEZERO
-		if (len == 2 && tbuf[0] == '-' && tbuf[1] == '0') {
-		    tbuf[0] = '0';
-		    tbuf[1] = 0;
-		    len = 1;
-		}
-#endif
-		SvUPGRADE(sv, SVt_PV);
-		if (lp)
-		    *lp = len;
-		s = SvGROW_mutable(sv, len + 1);
-		SvCUR_set(sv, len);
-		SvPOKp_on(sv);
-		return (char*)memcpy(s, tbuf, len + 1);
-	    }
-	}
-        if (SvROK(sv)) {
-	    goto return_rok;
-	}
-	assert(SvTYPE(sv) >= SVt_PVMG);
-	/* This falls through to the report_uninit near the end of the
-	   function. */
-    } else if (SvTHINKFIRST(sv)) {
+    if (SvTHINKFIRST(sv)) {
 	if (SvROK(sv)) {
-	return_rok:
 	    {
 		const SV *const referent = (SV*)SvRV(sv);
 
@@ -2414,8 +2327,6 @@ Perl_sv_2bool(pTHX_ register SV *const sv)
     dVAR;
 
     PERL_ARGS_ASSERT_SV_2BOOL;
-
-    SvGETMAGIC(sv);
 
     if (SvTYPE(sv) == SVt_PVAV) {
 	return av_len((AV*)sv) != -1;
@@ -2763,16 +2674,6 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV* sstr, const I32 flags)
 	/*FALLTHROUGH*/
 
     case SVt_PVMG:
-	if (SvGMAGICAL(sstr) && (flags & SV_GMAGIC)) {
-	    mg_get(sstr);
-	    if (SvTYPE(sstr) != stype) {
-		stype = SvTYPE(sstr);
-		if (isGV_with_GP(sstr) && stype == SVt_PVGV && dtype <= SVt_PVGV) {
-		    Perl_croak(aTHX_ "glob to glob assignment have been removed");
-		    return;
-		}
-	    }
-	}
 	if (stype == SVt_PVLV)
 	    SvUPGRADE(dstr, SVt_PVNV);
 	else
@@ -3615,8 +3516,6 @@ Perl_sv_catsv_flags(pTHX_ SV *const dsv, register SV *const ssv, const I32 flags
 	STRLEN slen;
 	const char *spv = SvPV_const(ssv, slen);
 	if (spv) {
-	    if (SvGMAGICAL(dsv) && (flags & SV_GMAGIC))
-		mg_get(dsv);
 	    sv_catpvn_nomg(dsv, spv, slen);
 	}
     }
@@ -3771,8 +3670,6 @@ Perl_sv_magicext(pTHX_ SV *const sv, SV *const obj, const int how,
     mg->mg_virtual = (MGVTBL *) vtable;
 
     mg_magical(sv);
-    if (SvGMAGICAL(sv))
-	SvFLAGS(sv) &= ~(SVf_IOK|SVf_NOK|SVf_POK);
     return mg;
 }
 
@@ -4628,10 +4525,7 @@ Perl_sv_len(pTHX_ register SV *const sv)
     if (!sv)
 	return 0;
 
-    if (SvGMAGICAL(sv))
-	len = mg_length(sv);
-    else
-        (void)SvPV_const(sv, len);
+    (void)SvPV_const(sv, len);
     return len;
 }
 
@@ -4659,9 +4553,6 @@ Perl_sv_len_utf8(pTHX_ register SV *const sv)
     if (!sv)
 	return 0;
 
-    if (SvGMAGICAL(sv))
-	return mg_length(sv);
-    else
     {
 	STRLEN len;
 	const char *s = SvPV_const(sv, len);
@@ -5241,7 +5132,7 @@ Perl_sv_eq(pTHX_ register SV *sv1, register SV *sv2)
     else {
 	/* if pv1 and pv2 are the same, second SvPV_const call may
 	 * invalidate pv1, so we may need to make a copy */
-	if (sv1 == sv2 && (SvTHINKFIRST(sv1) || SvGMAGICAL(sv1))) {
+	if (sv1 == sv2 && (SvTHINKFIRST(sv1))) {
 	    pv1 = SvPV_const(sv1, cur1);
 	    sv1 = newSVpvn_flags(pv1, cur1, SVs_TEMP);
 	}
@@ -5670,7 +5561,6 @@ Perl_sv_inc(pTHX_ register SV *const sv)
 
     if (!sv)
 	return;
-    SvGETMAGIC(sv);
     if (SvTHINKFIRST(sv)) {
 	if (SvIsCOW(sv))
 	    sv_force_normal_flags(sv, 0);
@@ -5831,7 +5721,6 @@ Perl_sv_dec(pTHX_ register SV *const sv)
 
     if (!sv)
 	return;
-    SvGETMAGIC(sv);
     if (SvTHINKFIRST(sv)) {
 	if (SvIsCOW(sv))
 	    sv_force_normal_flags(sv, 0);
@@ -6455,8 +6344,6 @@ Perl_sv_2cv(pTHX_ SV *sv, GV **const gvp, const I32 lref)
 	return NULL;
     }
 
-    SvGETMAGIC(sv);
-
     switch (SvTYPE(sv)) {
     case SVt_PVCV:
 	*gvp = NULL;
@@ -6669,7 +6556,6 @@ Perl_sv_isobject(pTHX_ SV *sv)
 {
     if (!sv)
 	return 0;
-    SvGETMAGIC(sv);
     if (!SvROK(sv))
 	return 0;
     sv = (SV*)SvRV(sv);
@@ -6697,7 +6583,6 @@ Perl_sv_isa(pTHX_ SV *sv, const char *const name)
 
     if (!sv)
 	return 0;
-    SvGETMAGIC(sv);
     if (!SvROK(sv))
 	return 0;
     sv = (SV*)SvRV(sv);
