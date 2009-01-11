@@ -94,7 +94,7 @@ sub _load_unload {
     if ($on) {
         _do_install();        
         if ( ! $installed ) {
-            die "'re' not installed!? ($installed_error)";
+            die "'re' not installed!? ($($installed_error->message))";
 	} else {
 	    # We call install() every time, as if we didn't, we wouldn't
 	    # "see" any changes to the color environment var since
