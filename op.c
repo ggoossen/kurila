@@ -2570,8 +2570,14 @@ Perl_newASSIGNOP(pTHX_ OPFLAGS flags, OP *left, I32 optype, OP *right, SV *locat
 	    }
 	}
 	else {
-	    return newBINOP(optype, OPf_STACKED,
-		mod(scalar(left), optype), scalar(right), location);
+	    OP* new_left = scalar(left);
+	    OP* finish_assign = op_assign(&new_left);
+	    o = newBINOP(optype, OPf_STACKED,
+		mod(new_left, optype), scalar(right), location);
+	    if (finish_assign) {
+		o = append_elem(OP_LISTFIRST, o, finish_assign);
+	    }
+	    return o;
 	}
     }
 
