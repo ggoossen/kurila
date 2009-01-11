@@ -222,13 +222,13 @@ sub lock_ref_value {
     # of the status of the hash itself.
     warn "Cannot usefully lock values in an unlocked hash"
       if !Internals::HvRESTRICTED(%$hash) && warnings::enabled;
-    Internals::HvRESTRICTED $hash->{?$key}, 1;
+    Internals::SvREADONLY $hash->{?$key}, 1;
     return $hash
 }
 
 sub unlock_ref_value {
     my@($hash, $key) =  @_;
-    Internals::HvRESTRICTED $hash->{?$key}, 0;
+    Internals::SvREADONLY $hash->{?$key}, 0;
     return $hash
 }
 
@@ -261,7 +261,7 @@ sub lock_hashref {
     lock_ref_keys($hash);
 
     foreach my $value (values %$hash) {
-        Internals::HvRESTRICTED($value,1);
+        Internals::SvREADONLY($value,1);
     }
 
     return $hash;
@@ -271,7 +271,7 @@ sub unlock_hashref {
     my $hash = shift;
 
     foreach my $value (values %$hash) {
-        Internals::HvRESTRICTED($value, 0);
+        Internals::SvREADONLY($value, 0);
     }
 
     unlock_ref_keys($hash);

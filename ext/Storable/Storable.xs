@@ -2122,7 +2122,7 @@ static int store_hash(pTHX_ stcxt_t *cxt, HV *hv)
 	int ret = 0;
 	I32 riter;
 	HE *eiter;
-        int flagged_hash = ((SvREADONLY(hv)
+        int flagged_hash = ((SvREADONLY(hv) || HvRESTRICTED(hv)
 #ifdef HAS_HASH_KEY_FLAGS
                              || HvHASKFLAGS(hv)
 #endif

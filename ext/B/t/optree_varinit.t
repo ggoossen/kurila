@@ -38,11 +38,11 @@ checkOptree ( name	=> 'sub {local $a}',
 	      strip_open_hints => 1,
 	      expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT');
 1  <;> nextstate(main 23 optree.t:57) v:{
-2  <#> gvsv[*a] s/LVINTRO
+2  <#> gvsv[*a] sM/LVINTRO
 3  <1> leavesub[1 ref] K/REFC,1
 EOT_EOT
 # 1  <;> nextstate(main 53 optree.t:67) v:{
-# 2  <$> gvsv(*a) s/LVINTRO
+# 2  <$> gvsv(*a) sM/LVINTRO
 # 3  <1> leavesub[1 ref] K/REFC,1
 EONT_EONT
 
@@ -90,13 +90,13 @@ checkOptree ( name	=> 'local $a',
 1     <0> enter ->2
 2     <;> nextstate(main 1 -e:1) v:{ ->3
 -     <1> ex-rv2sv vKM/129 ->4
-3        <#> gvsv[*a] s/LVINTRO ->4
+3        <#> gvsv[*a] sM/LVINTRO ->4
 EOT_EOT
 # 4  <@> leave[1 ref] vKP/REFC ->(end)
 # 1     <0> enter ->2
 # 2     <;> nextstate(main 1 -e:1) v:{ ->3
 # -     <1> ex-rv2sv vKM/129 ->4
-# 3        <$> gvsv(*a) s/LVINTRO ->4
+# 3        <$> gvsv(*a) sM/LVINTRO ->4
 EONT_EONT
 
 pass("MY, OUR, LOCAL, BOTH SUB AND MAIN, = undef");
@@ -157,7 +157,7 @@ checkOptree ( name	=> 'local $a=undef',
 5     <2> sassign vKS/2 ->6
 3        <0> undef s ->4
 -        <1> ex-rv2sv sKRM*/129 ->5
-4           <#> gvsv[*a] s/LVINTRO ->5
+4           <#> gvsv[*a] sM/LVINTRO ->5
 EOT_EOT
 # 6  <@> leave[1 ref] vKP/REFC ->(end)
 # 1     <0> enter ->2
@@ -165,7 +165,7 @@ EOT_EOT
 # 5     <2> sassign vKS/2 ->6
 # 3        <0> undef s ->4
 # -        <1> ex-rv2sv sKRM*/129 ->5
-# 4           <$> gvsv(*a) s/LVINTRO ->5
+# 4           <$> gvsv(*a) sM/LVINTRO ->5
 EONT_EONT
 
 checkOptree ( name	=> 'sub {my $a=()}',
