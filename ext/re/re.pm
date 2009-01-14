@@ -159,12 +159,14 @@ sub bits {
 
 sub import {
     shift;
-    $^HINT_BITS ^|^= bits(1, < @_);
+    my $selected_bits = bits(1, < @_);
+    $^HINT_BITS ^|^= $selected_bits;
 }
 
 sub unimport {
     shift;
-    $^HINT_BITS ^&^= ^~^ bits(0, < @_);
+    my $selected_bits = bits(0, < @_);
+    $^HINT_BITS ^&^= ^~^ $selected_bits;
 }
 
 1;
