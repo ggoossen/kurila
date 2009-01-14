@@ -894,15 +894,23 @@ the operator directly to the C<operand>.
 OP *
 Perl_op_mod_assign(pTHX_ OP *operator, OP **operandp, I32 type)
 {
-    if ((*operandp)->op_type != OP_MAGICSV) {
-	*operandp = mod(*operandp, type); 
+    OP* finish_assign;
+    OP* operator_sibling;
+    OP* o;
+
+    if (type == OP_ENTERSUB) {
+	*operandp = mod(*operandp, type);
 	return operator;
     }
-    
-    OP* finish_assign = op_assign(operandp);
 
-    OP* operator_sibling = operator->op_sibling;
-    OP* o = append_elem(OP_LISTFIRST, scalar(operator), finish_assign);
+    finish_assign = op_assign(operandp);
+
+    if (!finish_assign) {
+	return operator;
+    }
+
+    operator_sibling = operator->op_sibling;
+    o = append_elem(OP_LISTFIRST, scalar(operator), finish_assign);
     o->op_sibling = operator_sibling;
     return o;
 }
