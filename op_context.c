@@ -698,6 +698,11 @@ Perl_mod(pTHX_ OP *o, I32 type)
     case OP_ANONARRAY:
     case OP_ANONHASH:
     case OP_ANONSCALAR:
+        if ( ! type ) {
+            /* propagate localize */
+            for (tokid = &(cLISTOPo->op_first); *tokid; tokid = &((*tokid)->op_sibling))
+                *tokid = mod(*tokid, type);
+        }
         localize = 0;
         break;
         

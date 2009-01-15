@@ -18,7 +18,7 @@ sub foo {
     local($c, $d);
     $c = "c 3";
     $d = "d 4";
-    do { local@($a,$c) = @("a 9", "c 10"); @($x, $y) = @($a, $c); };
+    do { local @($a,$c) = @("a 9", "c 10"); @($x, $y) = @($a, $c); };
     is($a, "a 1");
     is($b, "b 2");
     return @($c, $d);
