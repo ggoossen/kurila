@@ -689,14 +689,18 @@ Perl_mod(pTHX_ OP *o, I32 type)
 	/* FALL THROUGH */
     case OP_HASHEXPAND:
     case OP_ARRAYEXPAND:
-    case OP_ANONARRAY:
-    case OP_ANONHASH:
     case OP_LIST:
 	localize = 0;
 	for (tokid = &(cLISTOPo->op_first); *tokid; tokid = &((*tokid)->op_sibling))
 	    *tokid = mod(*tokid, type);
 	break;
 
+    case OP_ANONARRAY:
+    case OP_ANONHASH:
+    case OP_ANONSCALAR:
+        localize = 0;
+        break;
+        
     case OP_LISTLAST:
 	localize = 0;
 	if (o->op_flags & OPf_KIDS)

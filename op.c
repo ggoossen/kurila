@@ -892,18 +892,18 @@ the operator directly to the C<operand>.
 =cut
 */
 OP *
-Perl_op_mod_assign(pTHX_ OP *operator, OP **operandp, I32 type)
+Perl_op_mod_assign(pTHX_ OP *operator, OP **operandp, I32 optype)
 {
     OP* finish_assign;
     OP* operator_sibling;
     OP* o;
 
-    if (type == OP_ENTERSUB) {
-	*operandp = mod(*operandp, type);
+    if (optype == OP_ENTERSUB) {
+	*operandp = mod(*operandp, optype);
 	return operator;
     }
 
-    finish_assign = op_assign(operandp);
+    finish_assign = op_assign(operandp, optype);
 
     if (!finish_assign) {
 	return operator;
@@ -1309,7 +1309,7 @@ op_assign modified the OP C<*o> to be assignable, and returns the OP which finis
 =cut
 */
 OP *
-Perl_op_assign(pTHX_ OP** po)
+Perl_op_assign(pTHX_ OP** po, I32 optype)
 {
     OP* o = *po;
 
@@ -1318,7 +1318,7 @@ Perl_op_assign(pTHX_ OP** po)
     case OP_HELEM:
     case OP_AELEM:
     {
-	return op_assign(&(cBINOPx(o)->op_first));
+	return op_assign(&(cBINOPx(o)->op_first), optype);
     }
     case OP_MAGICSV:
     {
@@ -1393,7 +1393,7 @@ Perl_op_assign(pTHX_ OP** po)
 	    );
     }
     default:
-	*po = mod(o, OP_SASSIGN);
+	*po = mod(o, optype);
     }
     return NULL;
 }
@@ -2589,7 +2589,7 @@ Perl_newASSIGNOP(pTHX_ OPFLAGS flags, OP *left, I32 optype, OP *right, SV *locat
 	bool is_logassign = (optype == OP_ANDASSIGN || optype == OP_ORASSIGN || optype == OP_DORASSIGN);
 	if (is_logassign) {
 	    OP* new_left = left;
-	    OP* finish_assign = op_assign(&new_left);
+	    OP* finish_assign = op_assign(&new_left, optype);
 	    if (finish_assign) {
 		o = newBINOP(OP_SASSIGN, 0, scalar(right),
 		    newOP(OP_LOGASSIGN_ASSIGN, 0, location), location);
@@ -2604,7 +2604,7 @@ Perl_newASSIGNOP(pTHX_ OPFLAGS flags, OP *left, I32 optype, OP *right, SV *locat
 	}
 	else {
 	    OP* new_left = scalar(left);
-	    OP* finish_assign = op_assign(&new_left);
+	    OP* finish_assign = op_assign(&new_left, optype);
 	    o = newBINOP(optype, OPf_STACKED,
 		mod(new_left, optype), scalar(right), location);
 	    if (finish_assign) {

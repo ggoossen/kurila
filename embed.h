@@ -2623,7 +2623,7 @@
 #endif
 #ifdef PERL_CORE
 #define assign(a,b,c,d)		Perl_assign(aTHX_ a,b,c,d)
-#define op_assign(a)		Perl_op_assign(aTHX_ a)
+#define op_assign(a,b)		Perl_op_assign(aTHX_ a,b)
 #define mode_from_discipline(a)	Perl_mode_from_discipline(aTHX_ a)
 #endif
 #define moreswitches(a)		Perl_moreswitches(aTHX_ a)
