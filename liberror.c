@@ -172,10 +172,13 @@ XS(XS_error_create)
 	    sv_setpvn(sv,"",0);
 	    if ( items >= 2 ) {
 		if (location && SvAVOK(location) && av_len(SvAv(location)) >= 2) {
+                    SV* loc_0 = *av_fetch((AV*)location, 0, FALSE);
+                    SV* loc_1 = *av_fetch((AV*)location, 1, FALSE);
+                    SV* loc_2 = *av_fetch((AV*)location, 2, FALSE);
 		    Perl_sv_catpvf(aTHX_ sv, " at %s line %"IVdf" character %"IVdf".",
-			SvPVX_const(*av_fetch((AV*)location, 0, FALSE)),
-			SvIV(*av_fetch((AV*)location, 1, FALSE)),
-			SvIV(*av_fetch((AV*)location, 2, FALSE))
+			SvPVOK(loc_0) ? SvPVX_const(loc_0) : "???",
+			SvPVOK(loc_1) ? SvIV(loc_1) : "0",
+			SvPVOK(loc_2) ? SvIV(loc_2) : "0"
 			);
 		}
 	    }
