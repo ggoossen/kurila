@@ -531,9 +531,10 @@ sub process_para {
       $_ = shift(@line);
     }
 
+    my $begin_lineno = @line_no[(nelems @line_no) - nelems @line];
     if (check_keyword("BOOT")) {
       &check_cpp( < @_ );
-      push (@BootCode, "#line @line_no[(nelems @line_no) - nelems @line] \"$filepathname\"")
+      push (@BootCode, "#line $begin_lineno \"$filepathname\"")
 	if $WantLineNumbers && @line[0] !~ m/^\s*#\s*line\b/;
       push (@BootCode, < @line, "") ;
       next PARAGRAPH ;
@@ -576,7 +577,8 @@ sub process_para {
       last;
     }
     @XSStack[$XSS_work_idx]->{?functions}->{+$Full_func_name} ++ ;
-    %XsubAliases = %XsubAliasValues =  %Interfaces = %( < ( @Attributes = @() ) );
+    @Attributes = @();
+    %XsubAliases = %XsubAliasValues =  %Interfaces = %();
     $DoSetMagic = 1;
 
     $orig_args =~ s/\\\s*/ /g;	# process line continuations
@@ -1026,7 +1028,8 @@ EOF
     }
     else {
       push(@InitFileCode,
-	   "        CV* CV_$Full_func_name = $($newXS)(\"$pname\", XS_$Full_func_name, file$proto);\n");
+	   "        CV* CV_$Full_func_name = $($newXS)(\"$pname\", XS_$Full_func_name, file$proto);\n"
+         . "        sv_setiv(*av_fetch(SvAv(SvLOCATION(CV_$Full_func_name)), 1, TRUE), $begin_lineno);\n");
       if ($pname =~ m/::(BEGIN|INIT|UNITCHECK|CHECK|END)$/) {
           my $keyword = $1;
           push @InitFileCode,
