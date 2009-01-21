@@ -733,7 +733,7 @@ EOF
     if ($ALIAS)
       { print Q(<<"EOF") if $cond }
 #    if ($cond)
-#       Perl_croak(aTHX_ "Usage: \%s(\%s)", SvPVX_const(SvNAME(cv)), "$report_args");
+#       Perl_croak(aTHX_ "Usage: \%s(\%s)", SvPVX_const(SvNAME(CvSv(cv))), "$report_args");
 EOF
     else
       { print Q(<<"EOF") if $cond }
