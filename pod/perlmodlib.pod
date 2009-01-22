@@ -135,10 +135,6 @@ Control sort() behaviour
 
 Enable/disable UTF-8 (or UTF-EBCDIC) in source code
 
-=item vars
-
-Predeclare global variable names (obsolete)
-
 =item version
 
 Perl extension for Version Objects
@@ -1100,14 +1096,6 @@ Line wrapping to form simple paragraphs
 =item Tie::Hash
 
 Base class definitions for tied hashes
-
-=item Tie::Hash::NamedCapture
-
-Named regexp capture buffers
-
-=item Tie::SubstrHash
-
-Fixed-table-size, fixed-key-length hashing
 
 =item Time::HiRes
 
