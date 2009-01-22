@@ -767,6 +767,7 @@ hints/vmesa.sh			Hints for named architecture
 hints/vos.sh			Hints for named architecture
 hv.c				Hash value code
 hv.h				Hash value header
+hv_i.h				Hash value inline functions
 INSTALL				Detailed installation instructions
 installhtml			Perl script to install html files for pods
 installman			Perl script to install man pages for pods
@@ -824,6 +825,8 @@ lib/dumpvar.pl			A variable dumper
 lib/dumpvar.t			A variable dumper tester
 lib/English.pm			Readable aliases for short variables
 lib/English.t			See if English works
+lib/env.pm                      Environemnt package
+lib/env.t                       Environemnt package tests
 lib/error.pm                    Error Objects
 lib/error.pod                   Error Objects documentation
 lib/error.t                     See if error works
@@ -1363,6 +1366,9 @@ lib/Search/Dict.pm		Perform binary search on dictionaries
 lib/Search/Dict.t		See if Search::Dict works
 lib/SelectSaver.pm		Enforce proper select scoping
 lib/SelectSaver.t		See if SelectSaver works
+lib/SelectSaver.t		See if SelectSaver works
+lib/signals.pm			For handling signals
+lib/signals.t			See if signals works
 lib/sigtrap.pm			For trapping an abort and giving traceback
 lib/sigtrap.t			See if sigtrap works
 lib/sort.pm			For "use sort"
@@ -1652,6 +1658,7 @@ NetWare/win32ish.h		NetWare port
 nostdio.h			Cause compile error on stdio calls
 numeric.c			Miscellaneous numeric conversion routines
 op.c				Opcode syntax tree code
+op_context.c			Opcode context propagation code
 opcode.h			Automatically generated opcode header
 opcode.pl			Opcode header generator
 op.h				Opcode syntax tree header
@@ -2091,6 +2098,7 @@ t/comp/blocks.t			See if BEGIN and friends work
 t/comp/bproto.t			See if builtins conform to their prototypes
 t/comp/cmdopt.t			See if command optimization works
 t/comp/colon.t			See if colons are parsed correctly
+t/comp/dynascope.t		See if dynascope work
 t/comp/decl.t			See if declarations work
 t/comp/fold.t			See if constant folding works
 t/comp/hints.t			See if %^H works
@@ -2459,6 +2467,12 @@ t/win32/system_tests		Test runner for system.t
 uconfig.h			Configuration header for microperl
 uconfig.sh			Configuration script for microperl
 universal.c			The default UNIVERSAL package methods
+libenv.c			The env package methods
+liberror.c			The error package methods
+libinternals.c			The Internals package methods
+libutf8.c			The utf8 package methods
+libversion.c			The version package methods
+libsignals.c			The signals package methods
 unixish.h			Defines that are assumed on Unix
 utf8.c				Unicode routines
 utf8.h				Unicode header

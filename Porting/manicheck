@@ -14,7 +14,7 @@
 
 sub help {
   die <<EOF;
-$0: Usage: $0 [-x|-m|-l|-h]
+$^PROGRAM_NAME: Usage: $^PROGRAM_NAME [-x|-m|-l|-h]
 -x show only the extra files
 -m show only the missing files
 -l show the files one per line instead of one line
@@ -71,13 +71,13 @@ for (sort keys %mani) {
   push @miss, $_ unless %find{$_};
 }
 
-$" = "\n" if $l;
+my $separator = $l ?? "\n" !! " ";
 
 unshift @xtra, "extra:"   if (nelems @xtra) && !$x;
 unshift @miss, "missing:" if (nelems @miss) && !$m;
 
-print join(' ', @xtra) . "\n", if (nelems @xtra) && !$m;
-print join(' ', @miss) . "\n"  if (nelems @miss) && !$x;
+print join($separator, @xtra) . "\n", if (nelems @xtra) && !$m;
+print join($separator, @miss) . "\n"  if (nelems @miss) && !$x;
 
 exit 0;
 
