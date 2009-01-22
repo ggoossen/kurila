@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-use Test::More tests => 74;
+use Test::More tests => 72;
 
 my $ro_err = qr/^Modification of a read-only value attempted/;
 
@@ -106,26 +106,26 @@ ok( !Internals::SvREADONLY %foo );
 is((nkeys(%foo)), 2);
 is(%foo{?'foo'}, 1);
 
-ok(  Internals::HvRESTRICTED %foo, 1 );
-ok(  Internals::HvRESTRICTED %foo );
+ok(  Internals::SvREADONLY %foo, 1 );
+ok(  Internals::SvREADONLY %foo );
 try { undef(%foo); };
 like($^EVAL_ERROR->message, $ro_err, q/Can't undef read-only hash/);
-TODO: do {
-    local $TODO = 'Due to restricted hashes implementation';
-    try { %foo = %('ping' => 'pong'); };
-    like($^EVAL_ERROR->message, $ro_err, q/Can't modify read-only hash/);
+dies_like( sub { %foo = %('ping' => 'pong'); },
+           $ro_err, q/Can't modify read-only hash/ );
+do {
+    local our $TODO = 1;
+    try { %foo{+'baz'} = 123; };
+    like( $^EVAL_ERROR && $^EVAL_ERROR->message, qr/Attempt to access disallowed key/, q/Can't add to a read-only hash/);
 };
-try { %foo{+'baz'} = 123; };
-like($^EVAL_ERROR->message, qr/Attempt to access disallowed key/, q/Can't add to a read-only hash/);
 
 # These ops are allow for Hash::Util functionality
 %foo{+2} = 'qux';
 is(%foo{?2}, 'qux', 'Can modify elements in a read-only hash');
-my $qux = delete(%foo{2});
-ok(! exists(%foo{2}), 'Can delete keys from a read-only hash');
-is($qux, 'qux');
-%foo{+2} = 2;
-is(%foo{?2}, 2, 'Can add back deleted keys in a read-only hash');
+do {
+    local our $TODO = 1;
+    dies_like( sub { delete(%foo{2}) },
+               qr/Can delete keys from a read-only hash/);
+};
 
 ok( !Internals::SvREADONLY %foo, 0 );
 ok( !Internals::SvREADONLY %foo );

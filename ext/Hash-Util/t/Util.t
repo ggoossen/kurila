@@ -88,7 +88,8 @@ do {
     lock_keys(%hash);
     try { %hash = %( wubble => 42 ) };  # we know this will bomb
     local $TODO = 1;
-    like( $^EVAL_ERROR->{?description}, qr/^Attempt to access disallowed key 'wubble'/,'Disallowed 3' );
+    like( $^EVAL_ERROR && $^EVAL_ERROR->{?description},
+          qr/^Attempt to access disallowed key 'wubble'/,'Disallowed 3' );
     unlock_keys(%hash);
 };
 
@@ -99,7 +100,8 @@ do {
 
     try { %hash = %(KEY => 1) };
     local $TODO = 1;
-    like( $^EVAL_ERROR->{?description}, qr/^Attempt to delete readonly key 'RO' from a restricted hash/ );
+    like( $^EVAL_ERROR && $^EVAL_ERROR->{?description},
+          qr/^Attempt to delete readonly key 'RO' from a restricted hash/ );
 };
 
 do {

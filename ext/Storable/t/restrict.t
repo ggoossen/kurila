@@ -66,7 +66,7 @@ sub testit {
 
   # $copy = $hash;	# used in initial debug of the tests
 
-  ok ++$test, Internals::SvREADONLY(%$copy), "cloned hash restricted?";
+  ok ++$test, Internals::HvRESTRICTED(%$copy), "cloned hash restricted?";
 
   ok ++$test, Internals::SvREADONLY($copy->{question}),
     "key 'question' not locked in copy?";

@@ -2124,7 +2124,7 @@ static int store_hash(pTHX_ stcxt_t *cxt, HV *hv)
                              || HvHASKFLAGS(hv)
 #endif
                                 ) ? 1 : 0);
-        unsigned char hash_flags = (SvREADONLY(hv) ? SHV_RESTRICTED : 0);
+        unsigned char hash_flags = (HvRESTRICTED(hv) ? SHV_RESTRICTED : 0);
 
         if (flagged_hash) {
             /* needs int cast for C++ compilers, doesn't it?  */
@@ -5021,7 +5021,7 @@ static SV *retrieve_flag_hash(pTHX_ stcxt_t *cxt, const char *cname)
     }
 #ifdef HAS_RESTRICTED_HASHES
     if (hash_flags & SHV_RESTRICTED)
-        SvREADONLY_on(hv);
+        HvRESTRICTED_on(hv);
 #endif
 
     TRACEME(("ok (retrieve_hash at 0x%"UVxf")", PTR2UV(hv)));

@@ -129,8 +129,10 @@ XS(XS_Internals_hv_clear_placehold)
     if (items != 1)
 	Perl_croak(aTHX_ "Usage: UNIVERSAL::hv_clear_placeholders(hv)");
     else {
-	HV * const hv = (HV *) SvRV(ST(0));
-	hv_clear_placeholders(hv);
+	SV * const sv = SvRV(ST(0));
+        if (!SvHVOK(sv))
+            Perl_croak(aTHX_ "argument to hv_clear_placeholders must be an HASH not a %s", Ddesc(sv));
+	hv_clear_placeholders(SvHv(sv));
 	XSRETURN(0);
     }
 }
