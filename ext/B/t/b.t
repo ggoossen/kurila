@@ -3,7 +3,7 @@
 $^OUTPUT_AUTOFLUSH  = 1;
 use warnings;
 
-use Test::More tests => 56;
+use Test::More tests => 55;
 
 BEGIN { use_ok( 'B' ); }
 
@@ -44,9 +44,6 @@ do {
 
 # Make sure we only hit them each once.
 ok( (!grep $_ != 1, values %Subs), '...and found once' );
-
-# Tests for MAGIC / MOREMAGIC
-ok( B::svref_2object(\$1)->MAGIC->TYPE eq "\0", '$1 has \0 magic' );
 
 my $r = qr/foo/;
 my $obj = B::svref_2object($r);

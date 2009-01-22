@@ -24,7 +24,7 @@ cmdline args in 'standard' way across all clients of OptreeCheck.
 
 our %gOpts;
 
-my $tests = 15 + 16 * %gOpts{?selftest};	# pass()s + $#tests
+my $tests = 14 + 16 * %gOpts{?selftest};	# pass()s + $#tests
 plan tests => $tests;
 
 SKIP: do {
@@ -135,24 +135,6 @@ EONT_EONT
 
 #################################
 pass("CANONICAL B::Concise EXAMPLE");
-
-checkOptree ( name	=> 'canonical example w -basic',
-	      bcopts	=> '-basic',
-	      code	=>  sub{$a=$b+42},
-	      crossfail => 1,
-	      debug	=> 1,
-	      expect_nt => <<'EONT_EONT');
-# 7  <1> leavesub[1 ref] K/REFC,1 ->(end)
-# -     <@> lineseq sKP ->7
-# 1        <;> nextstate(main 60 optree_concise.t:122) v:{ ->2
-# 6        <2> sassign sKS/2 ->7
-# 4           <2> add[t1] sK/2 ->5
-# -              <1> ex-rv2sv sK/1 ->3
-# 2                 <$> gvsv(*b) s ->3
-# 3              <$> const(IV 42) s ->4
-# -           <1> ex-rv2sv sKRM*/1 ->6
-# 5              <$> gvsv(*a) s ->6
-EONT_EONT
 
 };
 

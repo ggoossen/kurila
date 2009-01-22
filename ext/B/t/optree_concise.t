@@ -15,7 +15,7 @@ BEGIN {
 use OptreeCheck;	# ALSO DOES @ARGV HANDLING !!!!!!
 use Config;
 
-my $tests = 10;
+my $tests = 8;
 plan tests => $tests;
 SKIP: do {
 skip "no perlio in this build", $tests unless Config::config_value("useperlio");
@@ -27,50 +27,8 @@ $^WARN_HOOK = sub {
 #################################
 pass("CANONICAL B::Concise EXAMPLE");
 
-checkOptree ( name	=> 'canonical example w -exec',
-	      bcopts	=> '-exec',
-	      code	=> sub{$a=$b+42},
-	      expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT');
-# 1  <;> nextstate(main 61 optree_concise.t:139) v:{
-# 2  <#> gvsv[*b] s
-# 3  <$> const[IV 42] s
-# 4  <2> add[t3] sK/2
-# 5  <#> gvsv[*a] s
-# 6  <2> sassign sKS/2
-# 7  <1> leavesub[1 ref] K/REFC,1
-EOT_EOT
-# 1  <;> nextstate(main 61 optree_concise.t:139) v:{
-# 2  <$> gvsv(*b) s
-# 3  <$> const(IV 42) s
-# 4  <2> add[t1] sK/2
-# 5  <$> gvsv(*a) s
-# 6  <2> sassign sKS/2
-# 7  <1> leavesub[1 ref] K/REFC,1
-EONT_EONT
-
 #################################
 pass("B::Concise OPTION TESTS");
-
-checkOptree ( name	=> '-base3 sticky-exec',
-	      bcopts	=> '-base3',
-	      code	=> sub{$a=$b+42},
-	      expect	=> <<'EOT_EOT', expect_nt => <<'EONT_EONT');
-1  <;> dbstate(main 24 optree_concise.t:132) v:{
-2  <#> gvsv[*b] s
-10 <$> const[IV 42] s
-11 <2> add[t3] sK/2
-12 <#> gvsv[*a] s
-20 <2> sassign sKS/2
-21 <1> leavesub[1 ref] K/REFC,1
-EOT_EOT
-# 1  <;> nextstate(main 62 optree_concise.t:161) v:{
-# 2  <$> gvsv(*b) s
-# 10 <$> const(IV 42) s
-# 11 <2> add[t1] sK/2
-# 12 <$> gvsv(*a) s
-# 20 <2> sassign sKS/2
-# 21 <1> leavesub[1 ref] K/REFC,1
-EONT_EONT
 
 pass("OPTIONS IN CMDLINE MODE");
 
