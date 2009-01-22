@@ -1,9 +1,9 @@
-#! perl -T
+#! perl
 
 BEGIN {
     require "./test.pl";
 }
-plan tests => 11;
+plan tests => 9;
 use env;
 
 is( env::var("PERL_CORE"), 1, "PERL_CORE is set to '1'" );
