@@ -1,0 +1,71 @@
+=head1 NAME
+
+kurila117delta - what is new for Perl Kurila 1.17
+
+=head1 DESCRIPTION
+
+This document describes differences between Perl Kurila 1.16 and Perl Kurila 1.17
+
+=head1 Highlights In Perl Kurila 1.17
+
+Structured assignments. 
+
+=head1 Core Enhancements
+
+=head2 Renaming special variables
+
+Special variables have been renamed and now all start with $^
+
+=head3 Rationale
+
+Descriptive names. Frees to be used as operators.
+
+=head2 Removed 'get' magic
+
+Special variables like $1, $^HINTS are evaluated where declared.
+
+=head3 Rationale
+
+Prevents action-at-a-distance.
+
+=head2 Removed 'tie'
+
+All C<tie> functionality has been removed.
+
+=head3 Rationale
+
+Prevents action-at-a-distance.
+
+=head2 Dynamic scope
+
+=head3 Rationale
+
+Dynamic scope.
+
+=head1 KNOWN BUGS
+
+=head2 Documentation
+
+Documentation has not been updated for many of the changes for kurila.
+
+=head2 Self referential assignment problems
+
+Assigning some value to a part of itself behaves unexpected.
+
+=head2 Limited platform support
+
+Perl Kurila has only been tested/build for x86_64-linux-gnu-thread-multi platform.
+
+=head1 SEE ALSO
+
+The F<INSTALL> file for how to build Perl Kurila.
+
+The F<README> file for general stuff.
+
+The F<Artistic> and F<Copying> files for copyright information.
+
+=head1 HISTORY
+
+Written by Gerard Goossen <F<gerard@tty.nl>>.
+
+=cut
