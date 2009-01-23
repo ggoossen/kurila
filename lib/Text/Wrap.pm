@@ -41,8 +41,6 @@ sub wrap
 	my $nl = "";
 	my $remainder = "";
 
-	use re 'taint';
-
 	while ($t !~ m/\G(?:$break)*\Z/gc) {
 		if ($t =~ m/\G([^\n]{0,$ll})($break|\n+|\z)/xmgc) {
 			$r .= $unexpand 
