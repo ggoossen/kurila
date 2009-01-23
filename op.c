@@ -1318,6 +1318,7 @@ Perl_op_assign(pTHX_ OP** po, I32 optype)
     case OP_HELEM:
     case OP_AELEM:
     {
+	o->op_flags |= OPf_MOD;
 	return op_assign(&(cBINOPx(o)->op_first), optype);
     }
     case OP_MAGICSV:
