@@ -8,19 +8,19 @@ This document describes differences between Perl Kurila 1.16 and Perl Kurila 1.1
 
 =head1 Highlights In Perl Kurila 1.17
 
-Structured assignments. 
+Getting the value of a variable can't have any side effects.
 
 =head1 Core Enhancements
 
 =head2 Renaming special variables
 
-Special variables have been renamed and now all start with $^
+Special variables have been renamed and now all all the form $^NAME
 
 =head3 Rationale
 
-Descriptive names. Frees to be used as operators.
+The names are descriptive. Frees to be used as operators.
 
-=head2 Removed 'get' magic
+=head2 Special variables are evaluated where declared.
 
 Special variables like $1, $^HINTS are evaluated where declared.
 
@@ -38,9 +38,16 @@ Prevents action-at-a-distance.
 
 =head2 Dynamic scope
 
+A dynamic scope is added. It can be accessed using keyword
+C<dynascope>. When a new scope is entered a C<dynascope> becomes a
+copy of the current value, when the scope is leaved the C<dynascope>
+is restored the the old value.  At the moment it is only used for
+adding events to the end of a scope, by adding a sub-ref to the array
+C<dynascope->{onleave}>.
+
 =head3 Rationale
 
-Dynamic scope.
+A more generic alternative for C<local>.
 
 =head1 KNOWN BUGS
 
