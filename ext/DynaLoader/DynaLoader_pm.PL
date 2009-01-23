@@ -278,7 +278,7 @@ sub bootstrap_inherit {
 sub bootstrap {
     # use local vars to enable $module.bs script to edit values
     local(@args) = @_;
-    local($module) = @args[0];
+    local($module) = @args[?0];
     local(@dirs, $file);
 
     unless ($module) {

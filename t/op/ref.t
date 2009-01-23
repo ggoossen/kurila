@@ -45,10 +45,10 @@ is (ref($vstref), "version", "ref(vstr) eq 'version'");
 
 my $test = curr_test();
 @ary = @($test,$test+1,$test+2,$test+3);
-@ref[0] = \@a;
-@ref[1] = \@b;
-@ref[2] = \@c;
-@ref[3] = \@d;
+@ref[+0] = \@a;
+@ref[+1] = \@b;
+@ref[+2] = \@c;
+@ref[+3] = \@d;
 for my $i (@(3,1,2,0)) {
     push(@{@ref[$i]}, "ok @ary[$i]\n");
 }

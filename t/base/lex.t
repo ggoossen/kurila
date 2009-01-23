@@ -96,7 +96,7 @@ do {
     $foo = 'FOO';
     $bar = 'BAR';
     %foo{+$bar} = 'BAZ';
-    @ary[0] = 'ABC';
+    @ary[+0] = 'ABC';
 };
 
 print "%foo{?$bar}" eq "BAZ" ?? "ok 21\n" !! "not ok 21\n";

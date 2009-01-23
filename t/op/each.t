@@ -96,14 +96,14 @@ is ($i, 5);
 our @tests = @(&next_test( < @_ ), &next_test( < @_ ), &next_test( < @_ ));
 do {
     package Obj;
-    sub DESTROY { print "ok @::tests[1] # DESTROY called\n"; }
+    sub DESTROY { print "ok @::tests[?1] # DESTROY called\n"; }
     do {
 	my $h = \%( A => bless \@(), __PACKAGE__ );
         while (my@(?$k,?$v) =@( each %$h)) {
-	    print "ok @::tests[0]\n" if $k eq 'A' and ref($v) eq 'Obj';
+	    print "ok @::tests[?0]\n" if $k eq 'A' and ref($v) eq 'Obj';
 	}
     };
-    print "ok @::tests[2]\n";
+    print "ok @::tests[?2]\n";
 };
 
 # Check for Unicode hash keys.

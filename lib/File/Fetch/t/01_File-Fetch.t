@@ -8,8 +8,8 @@ use Data::Dumper;
 use File::Fetch;
 
 ### optionally set debugging ###
-$File::Fetch::DEBUG = $File::Fetch::DEBUG   = 1 if @ARGV[0];
-$IPC::Cmd::DEBUG    = $IPC::Cmd::DEBUG      = 1 if @ARGV[0];
+$File::Fetch::DEBUG = $File::Fetch::DEBUG   = 1 if @ARGV[?0];
+$IPC::Cmd::DEBUG    = $IPC::Cmd::DEBUG      = 1 if @ARGV[?0];
 
 unless( env::var('PERL_CORE') ) {
     warn qq[

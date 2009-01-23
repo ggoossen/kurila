@@ -158,6 +158,6 @@ do {
 is(  Internals::SvREFCNT(\$foo), 2 );
 
 is(  Internals::SvREFCNT(\@foo), 2 );
-is(  Internals::SvREFCNT(\@foo[2]), 3 );
+is(  Internals::SvREFCNT(\@foo[2]), 2 );
 is(  Internals::SvREFCNT(\%foo), 2 );
 is(  Internals::SvREFCNT(\%foo{+foo}), 2 );

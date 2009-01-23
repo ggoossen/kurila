@@ -233,7 +233,7 @@ do {
 
         # % means 'match one character' on VMS.  Everything else is ?
         my $match_char = $^OS_NAME eq 'VMS' ?? '%' !! '?';
-        (@ARGV[0] = $file) =~ s/.\z/$match_char/;
+        (@ARGV[+0] = $file) =~ s/.\z/$match_char/;
 
         # this should find the file
         ExtUtils::Command::expand_wildcards();

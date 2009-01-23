@@ -48,7 +48,7 @@ if ((nelems @R) == 0 && (nelems @G) == 0) {
 our ($fh, @fh, %fh);
 if (opendir($fh, "op")) { print "ok 4\n"; } else { print "not ok 4\n"; }
 if (ref($fh) eq 'GLOB') { print "ok 5\n"; } else { print "not ok 5\n"; }
-if (opendir(@fh[0], "op")) { print "ok 6\n"; } else { print "not ok 6\n"; }
+if (opendir(@fh[+0], "op")) { print "ok 6\n"; } else { print "not ok 6\n"; }
 if (ref(@fh[0]) eq 'GLOB') { print "ok 7\n"; } else { print "not ok 7\n"; }
 if (opendir(%fh{+abc}, "op")) { print "ok 8\n"; } else { print "not ok 8\n"; }
 if (ref(%fh{?abc}) eq 'GLOB') { print "ok 9\n"; } else { print "not ok 9\n"; }

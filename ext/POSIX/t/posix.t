@@ -29,7 +29,7 @@ do {
     local our $TODO = "read to array element not working";
 
     our @buffer;
-    read($testfd, @buffer[1], 5) if $testfd +> 2;
+    read($testfd, @buffer[+1], 5) if $testfd +> 2;
     is( @buffer[1], "perl\n",	               '    read to array element' );
 };
 

@@ -275,7 +275,7 @@ do {
 
     my $x;
     @a = split m/,/, ',,,,,';
-    @a[3]=1;
+    @a[+3]=1;
     $x = \@a[2];
     is (ref $x, 'SCALAR', '#28938 - garbage after extend');
 };

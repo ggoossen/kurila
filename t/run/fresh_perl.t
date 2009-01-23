@@ -71,7 +71,7 @@ BEGIN
         }
 ########
 our @array;
-@array[128]=1
+@array[+128]=1
 ########
 our $x=0x0eabcd; print $x->ref;
 EXPECT

@@ -107,7 +107,7 @@ if ($::failed) {
     push @ARGV, < map { chomp; $_ } @( ~< $fh);
     close $fh;
     if ($::failed +> 1) {
-        @ARGV = @(@ARGV[0]);
+        @ARGV = @(@ARGV[?0]);
     }
 }
 

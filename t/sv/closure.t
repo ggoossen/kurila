@@ -189,7 +189,7 @@ do {
     my($nc_attempt, $call_outer, $call_inner, $undef_outer);
     my($code, $expected, $errors, $output);
     my(@inners, $sub_test, $pid);
-    $debugging = 1 if defined(@ARGV[0]) and @ARGV[0] eq '-debug';
+    $debugging = 1 if defined(@ARGV[?0]) and @ARGV[0] eq '-debug';
 
     # The expected values for these tests
     %expected = %(

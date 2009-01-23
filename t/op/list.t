@@ -27,7 +27,7 @@ cmp_ok("$a-$b",'eq','222-111','duo swap');
 @($a, $b) = @($b, $a) = @($a, $b);
 cmp_ok("$a-$b",'eq','222-111','duo swap swap');
 
-@($a, @b[1], %c{+2}, $d) = @(1, 2, 3, 4);
+@($a, @b[+1], %c{+2}, $d) = @(1, 2, 3, 4);
 cmp_ok($a,'==',1,'assign scalar in list');
 cmp_ok(@b[1],'==',2,'assign aelem in list');
 cmp_ok(%c{?2},'==',3,'assign helem in list');
