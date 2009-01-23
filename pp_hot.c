@@ -590,9 +590,11 @@ PP(pp_add)
 PP(pp_aelemfast)
 {
     dVAR; dSP;
-    AV * const av = PL_op->op_flags & OPf_SPECIAL ?
+    OPFLAGS const op_flags = PL_op->op_flags;
+    AV * const av = op_flags & OPf_SPECIAL ?
 		(AV*)PAD_SV(PL_op->op_targ) : GvAV(cGVOP_gv);
-    const U32 lval = PL_op->op_flags & OPf_MOD;
+    const U32 lval = op_flags & OPf_MOD;
+    const I32 elem = PL_op->op_private;
     if (!SvAVOK(av)) {
 	if (lval && ! SvOK(av))
 	    sv_upgrade((SV*)av, SVt_PVAV);
@@ -600,10 +602,13 @@ PP(pp_aelemfast)
 	    bad_arg(1, "array", PL_op_desc[PL_op->op_type], (SV*)av);
     }
     {
-	SV** const svp = av_fetch(av, PL_op->op_private, lval);
-	SV *sv = (svp ? *svp : &PL_sv_undef);
-	OPFLAGS op_flags = PL_op->op_flags;
+	SV** svp = av_fetch(av, elem, 0);
 	EXTEND(SP, 1);
+	if ( ! svp ) {
+	    DIE(aTHX_ "Required array element %"IVdf" does not exists", elem);
+	}
+	if (lval && *svp == &PL_sv_undef)
+	    svp = av_store(av, elem, newSV(0));
 	if (op_flags & OPf_ASSIGN) {
 	    if (op_flags & OPf_ASSIGN_PART) {
 		SV* src;
@@ -614,12 +619,12 @@ PP(pp_aelemfast)
 		} 
 		else
 		    src = POPs;
-		sv_setsv_mg(sv, src);
+		sv_setsv_mg(*svp, src);
 		RETURN;
 	    }
-	    sv_setsv_mg(sv, POPs);
+	    sv_setsv_mg(*svp, POPs);
 	}
-	PUSHs(sv);
+	PUSHs(*svp);
     }
     RETURN;
 }
@@ -1547,7 +1552,7 @@ PP(pp_aelem)
     if (PL_op->op_private & OPpLVAL_INTRO)
 	save_aelem(av, elem, svp);
     if (lval && *svp == &PL_sv_undef)
-	SVcpREPLACE(*svp, newSV(0));
+	svp = av_store(av, elem, newSV(0));
     sv = *svp;
     if (PL_op->op_private & OPpDEREF && ! SvOK(sv)) {
 	vivify_ref(sv, PL_op->op_private & OPpDEREF);

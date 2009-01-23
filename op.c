@@ -5893,7 +5893,7 @@ Perl_peep(pTHX_ register OP *o)
 		    ((PL_op = pop->op_next)) &&
 		    pop->op_next->op_type == OP_AELEM &&
 		    !(pop->op_next->op_private &
-		      (OPpLVAL_INTRO|OPpDEREF)) &&
+		      (OPpLVAL_INTRO|OPpDEREF|OPpELEM_ADD|OPpELEM_OPTIONAL)) &&
 		    (i = SvIV(((SVOP*)pop)->op_sv))
 				<= 255 &&
 		    i >= 0)
