@@ -15,6 +15,11 @@ sub fst(@) {
     return $_[0];
 }
 
+sub find_ops {
+    my ($xml, $name) = @_;
+    return $xml->findnodes(qq[//op_null[\@was="$name"]]), $xml->findnodes(qq[//op_$name]);
+}
+
 sub entersub_handler {
     my ($twig, $sub) = @_;
 
@@ -1252,11 +1257,38 @@ sub rename_magic_vars {
         '$\\' => '$^OUTPUT_RECORD_SEPARATOR',
         '$@' => '$^EVAL_ERROR',
         '$,' => '$^OUTPUT_FIELD_SEPARATOR',
+        '$0' => '$^PROGRAM_NAME',
+        '$^C' => '$^COMPILING',
+        '$^D' => '$^DEBUGGING',
+        '$^E' => '$^EXTENDED_OS_ERROR',
+        '$^F' => '$^SYSTEM_FD_MAX',
+        '$^H' => '$^HINT_BITS',
+        '$^I' => '$^INPLACE_EDIT',
+        '$^N' => '$^LAST_SUBMATCH_RESULT',
+        '$^M' => '$^EMERGENCY_MEMORY',
+        '$^O' => '$^OS_NAME',
+        '$^P' => '$^PERLDB',
+        '$^R' => '$^LAST_REGEXP_CODE_RESULT',
+        '$^S' => '$^EXCEPTIONS_BEING_CAUGHT',
+        '$^T' => '$^BASETIME',
+        '$^V' => '$^PERL_VERSION',
+        '$^W' => '$^WARNING',
+        '$^X' => '$^EXECUTABLE_NAME',
     };
-    for ($xml->findnodes(qq[//op_null[\@was="rv2sv"]]), $xml->findnodes(qq[//op_rv2sv])) {
-        my $var = get_madprop($_, "variable");
-        if ($var and $mapping->{$var}) {
-            set_madprop($_, "variable" => $mapping->{$var});
+
+    for my $propname (qw[value variable]) {
+        for ( find_ops( $xml, "rv2sv" ) ) {
+            my $var = get_madprop($_, $propname);
+            if ($var and $mapping->{$var}) {
+                set_madprop($_, $propname => $mapping->{$var});
+            }
+        }
+
+        for ( find_ops( $xml, "rv2hv" ) ) {
+            my $var = get_madprop($_, $propname);
+            if ($var and $var eq "%^H") {
+                set_madprop($_, $propname => "\$^HINTS");
+            }
         }
     }
 }

@@ -19,8 +19,8 @@ use Fatal qw|open close|;
 
 use Convert;
 
-my $from = 'kurila-1.15';
-my $to = 'kurila-1.15';
+my $from = 'kurila-1.16';
+my $to = 'kurila-1.16';
 
 sub p5convert {
     my ($input, $expected) = @_;
@@ -1548,11 +1548,11 @@ END
 
 sub t_rename_magic_vars_2 {
     p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
-%H;
+%^H;
 ----
 $^HINTS;
 ====
-%H{'foo'} = 3;
+%^H{'foo'} = 3;
 ----
 $^HINTS{'foo'} = 3;
 END
