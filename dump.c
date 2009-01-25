@@ -2198,14 +2198,14 @@ Perl_sv_xmlpeek(pTHX_ SV *sv)
 	if (sv == &PL_sv_undef) {
 	    sv_catpv(t, "SV_UNDEF=\"1\"");
 	    if (!(SvFLAGS(sv) & (SVf_OK|SVf_OOK|SVs_OBJECT|
-				 SVs_GMG|SVs_SMG|SVs_RMG)) &&
+				 SVs_SMG|SVs_RMG)) &&
 		SvREADONLY(sv))
 		goto finish;
 	}
 	else if (sv == &PL_sv_no) {
 	    sv_catpv(t, "SV_NO=\"1\"");
 	    if (!(SvFLAGS(sv) & (SVf_ROK|SVf_OOK|SVs_OBJECT|
-				 SVs_GMG|SVs_SMG|SVs_RMG)) &&
+				 SVs_SMG|SVs_RMG)) &&
 		!(~SvFLAGS(sv) & (SVf_POK|SVf_NOK|SVf_READONLY|
 				  SVp_POK|SVp_NOK)) &&
 		SvCUR(sv) == 0 &&
@@ -2215,7 +2215,7 @@ Perl_sv_xmlpeek(pTHX_ SV *sv)
 	else if (sv == &PL_sv_yes) {
 	    sv_catpv(t, "SV_YES=\"1\"");
 	    if (!(SvFLAGS(sv) & (SVf_ROK|SVf_OOK|SVs_OBJECT|
-				 SVs_GMG|SVs_SMG|SVs_RMG)) &&
+				 SVs_SMG|SVs_RMG)) &&
 		!(~SvFLAGS(sv) & (SVf_POK|SVf_NOK|SVf_READONLY|
 				  SVp_POK|SVp_NOK)) &&
 		SvCUR(sv) == 1 &&
@@ -2226,7 +2226,7 @@ Perl_sv_xmlpeek(pTHX_ SV *sv)
 	else {
 	    sv_catpv(t, "SV_PLACEHOLDER=\"1\"");
 	    if (!(SvFLAGS(sv) & (SVf_OK|SVf_OOK|SVs_OBJECT|
-				 SVs_GMG|SVs_SMG|SVs_RMG)) &&
+				 SVs_SMG|SVs_RMG)) &&
 		SvREADONLY(sv))
 		goto finish;
 	}

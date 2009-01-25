@@ -1476,6 +1476,16 @@ sub ast {
     return $self->newtype->new(Kids => [@newkids]);
 }
 
+package PLXML::op_magicsv;
+
+sub ast {
+    my $self = shift;
+    my @args;
+    push @args, $self->madness('optional_assign dx d ( X )');
+
+    return $self->newtype->new(Kids => [@args]);
+}
+
 package PLXML::op_padsv;
 
 sub ast {
@@ -2377,6 +2387,16 @@ package PLXML::op_unpack;
 package PLXML::op_pack;
 package PLXML::op_split;
 package PLXML::op_join;
+package PLXML::op_listfirst;
+
+sub ast {
+    my $self = shift;
+    my $mainop = $self->{Kids}->[1];
+    $mainop->{mp} = $self->{mp};
+    my @kids = ( $mainop->ast($self, @_) );
+    return $self->newtype->new(Kids => [@kids]);
+}
+
 package PLXML::op_list;
 
 sub astnull {

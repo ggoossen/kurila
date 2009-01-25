@@ -228,6 +228,11 @@ sub check { 'ck_null' }
 sub flags { 'd2' }
 sub args { 'S S' }
 
+package PLXML::op_magicsv;
+
+our @ISA = ('PLXML::baseop');
+
+sub key { 'magicsv' }
 
 package PLXML::op_padsv;
 
@@ -1808,6 +1813,10 @@ sub args { 'S L' }
 
 
 # List operators.
+
+package PLXML::op_listfirst;
+
+our @ISA = ('PLXML::listop');
 
 package PLXML::op_list;
 
