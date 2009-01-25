@@ -563,7 +563,7 @@ sub init_VERSION {
 
     $self->{+DEFINE_VERSION}    = '"$(VERSION_MACRO)=""$(VERSION)"""';
     $self->{+XS_DEFINE_VERSION} = '"$(XS_VERSION_MACRO)=""$(XS_VERSION)"""';
-    $self->{+MAKEMAKER} = vmsify(%INC{?'ExtUtils/MakeMaker.pm'});
+    $self->{+MAKEMAKER} = vmsify($^INCLUDED{?'ExtUtils/MakeMaker.pm'});
 }
 
 

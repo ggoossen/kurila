@@ -25,7 +25,7 @@ if ( $^EVAL_ERROR ) {
       sub File::Spec::VMS::unixify \{ die "$skip_exception" \}
       sub File::Spec::VMS::vmspath \{ die "$skip_exception" \}
    - ;
-   %INC{+"VMS/Filespec.pm"} = 1 ;
+   $^INCLUDED{+"VMS/Filespec.pm"} = 1 ;
 }
 require File::Spec::VMS ;
 

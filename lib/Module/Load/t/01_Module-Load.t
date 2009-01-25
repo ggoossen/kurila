@@ -1,6 +1,6 @@
 ### Module::Load test suite ###
 BEGIN { 
-    push @INC, "../lib/Module/Load/t/to_load";
+    push $^INCLUDE_PATH, "../lib/Module/Load/t/to_load";
 } 
 
 use Module::Load;
@@ -14,7 +14,7 @@ do {
     try { load $mod };
 
     is( $^EVAL_ERROR, '', qq[Loading module '$mod'] );
-    ok( defined(%INC{?$file}), q[... found in %INC] );
+    ok( defined($^INCLUDED{?$file}), q[... found in %INC] );
 };
 
 do {
@@ -24,7 +24,7 @@ do {
     try { load $mod };
 
     is( $^EVAL_ERROR, '', qq[Loading File '$mod'] );
-    ok( defined(%INC{?$file}), q[... found in %INC] );
+    ok( defined($^INCLUDED{?$file}), q[... found in %INC] );
 };
 
 do {
@@ -34,7 +34,7 @@ do {
     try { load $mod };
 
     is( $^EVAL_ERROR, '', qq[Loading Ambigious Module '$mod'] );
-    ok( defined(%INC{?$file}), q[... found in %INC] );
+    ok( defined($^INCLUDED{?$file}), q[... found in %INC] );
 };
 
 do {
@@ -44,7 +44,7 @@ do {
     try { load $mod };
 
     is( $^EVAL_ERROR && $^EVAL_ERROR->message, '', qq[Loading Ambigious File '$mod'] );
-    ok( defined(%INC{?$file}), q[... found in %INC] );
+    ok( defined($^INCLUDED{?$file}), q[... found in %INC] );
 };
 
 ### Test importing functions ###

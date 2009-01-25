@@ -11,9 +11,9 @@ use Config;
 BEGIN {
     if (env::var('PERL_CORE')){
 	chdir('t') if -d 't';
-	push @INC, '../ext/Storable/t';
+	push $^INCLUDE_PATH, '../ext/Storable/t';
     } else {
-	unshift @INC, 't';
+	unshift $^INCLUDE_PATH, 't';
     }
     require 'st-dump.pl';
 }

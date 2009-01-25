@@ -957,12 +957,12 @@ EOS
   print CROSS $cross;
   close *CROSS;
   print "written lib/Cross.pm\n";
-  unshift(@INC,"xlib/%Opts{?cross}");
+  unshift($^INCLUDE_PATH,"xlib/%Opts{?cross}");
 }
 
 # Now do some simple tests on the Config.pm file we have created
-unshift(@INC,'lib');
-unshift(@INC,'xlib/symbian') if %Opts{?cross};
+unshift($^INCLUDE_PATH,'lib');
+unshift($^INCLUDE_PATH,'xlib/symbian') if %Opts{?cross};
 require $Config_PM;
 require $Config_heavy;
 Config->import();

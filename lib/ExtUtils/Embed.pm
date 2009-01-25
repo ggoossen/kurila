@@ -185,7 +185,7 @@ sub ldopts {
     }
     $std = 1 unless scalar nelems @link_args;
     my $sep = config_value("path_sep") || ':';
-    @path = @( $path ?? < split(m/\Q$sep/, $path) !! < @INC );
+    @path = @( $path ?? < split(m/\Q$sep/, $path) !! < $^INCLUDE_PATH );
 
     push(@potential_libs, < @link_args)    if scalar nelems @link_args;
     # makemaker includes std libs on windows by default

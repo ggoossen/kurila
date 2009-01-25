@@ -306,7 +306,7 @@ sub const_config {
     my@($self) =@( shift);
     my @m = @( <<"END" );
 
-# These definitions are from config.sh (via %INC{?'Config.pm'}).
+# These definitions are from config.sh (via $^INCLUDED{?'Config.pm'}).
 # They may have been overridden via Makefile.PL or on the command line.
 END
 
@@ -1581,7 +1581,7 @@ sub init_main {
     # --- Initialize PERL_LIB, PERL_SRC
 
     # *Real* information: where did we get these two from? ...
-    my $inc_config_dir = dirname(%INC{?'Config.pm'});
+    my $inc_config_dir = dirname($^INCLUDED{?'Config.pm'});
 
     unless ($self->{?PERL_SRC}){
         foreach my $dir_count (1..8) { # 8 is the VMS limit for nesting
@@ -1653,7 +1653,7 @@ from the perl source tree.
 	    # Maybe somebody tries to build an extension with an
 	    # uninstalled Perl outside of Perl build tree
 	    my $lib;
-	    for my $dir ( @INC) {
+	    for my $dir ( $^INCLUDE_PATH) {
 	      $lib = $dir, last if -e $self->catdir($dir, "Config.pm");
 	    }
 	    if ($lib) {
@@ -3545,7 +3545,7 @@ sub tool_xsubpp {
     return "" unless $self->needs_linking;
 
     my $xsdir;
-    my @xsubpp_dirs = @INC;
+    my @xsubpp_dirs = $^INCLUDE_PATH;
 
     # Make sure we pick up the new xsubpp if we're building perl.
     unshift @xsubpp_dirs, $self->{?PERL_LIB} if $self->{?PERL_CORE};

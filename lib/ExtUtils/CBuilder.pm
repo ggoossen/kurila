@@ -65,11 +65,11 @@ my $load = sub {
 do {
   my @package = split m/::/, __PACKAGE__;
   
-  if (grep {-e File::Spec->catfile($_, < @package, 'Platform', $^OS_NAME) . '.pm'} @INC) {
+  if (grep {-e File::Spec->catfile($_, < @package, 'Platform', $^OS_NAME) . '.pm'} $^INCLUDE_PATH) {
     $load->(__PACKAGE__ . "::Platform::$^OS_NAME");
     
   } elsif (exists %OSTYPES{$^OS_NAME} and
-	   grep {-e File::Spec->catfile($_, < @package, 'Platform', %OSTYPES{$^OS_NAME}) . '.pm'} @INC) {
+	   grep {-e File::Spec->catfile($_, < @package, 'Platform', %OSTYPES{$^OS_NAME}) . '.pm'} $^INCLUDE_PATH) {
     $load->(__PACKAGE__ . "::Platform::%OSTYPES{?$^OS_NAME}");
     
   } else {

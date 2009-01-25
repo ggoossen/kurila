@@ -1,5 +1,5 @@
 BEGIN {
-    push @INC, 'uni';
+    push $^INCLUDE_PATH, 'uni';
     require "case.pl";
 }
 

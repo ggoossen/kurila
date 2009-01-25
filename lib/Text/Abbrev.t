@@ -4,7 +4,7 @@ print "1..6\n";
 
 BEGIN {
     chdir 't' if -d 't';
-    @INC = @( '../lib' );
+    $^INCLUDE_PATH = @( '../lib' );
 }
 
 use Text::Abbrev;

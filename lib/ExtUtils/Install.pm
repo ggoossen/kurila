@@ -1047,7 +1047,7 @@ sub inc_uninstall {
       ?? env::var('PERL5LIB') !! env::var('PERLLIB') || '';
         
     my @dirs=@( < @PERL_ENV_LIB, 
-               < @INC,
+               < $^INCLUDE_PATH,
                < map { config_value($_) } qw(archlibexp
                           privlibexp
                           sitearchexp
@@ -1245,7 +1245,7 @@ sub _invokant {
 
     my $builder;
     my $top = pop @stack;
-    if ($top =~ m/^Build/i || exists(%INC{'Module/Build.pm'})) {
+    if ($top =~ m/^Build/i || exists($^INCLUDED{'Module/Build.pm'})) {
         $builder = 'Module::Build';
     } else {
         $builder = 'ExtUtils::MakeMaker';

@@ -1,5 +1,5 @@
 BEGIN {
-    push @INC, < qw(uni .);
+    push $^INCLUDE_PATH, < qw(uni .);
     require "case.pl";
 }
 

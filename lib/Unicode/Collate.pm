@@ -287,14 +287,14 @@ sub read_table {
     my $self = shift;
 
     my($f, $fh);
-    foreach my $d ( @INC) {
+    foreach my $d ( $^INCLUDE_PATH) {
 	$f = File::Spec->catfile($d, < @Path, $self->{table});
 	last if open($fh, "<", $f);
 	$f = undef;
     }
     if (!defined $f) {
 	$f = File::Spec->catfile(< @Path, $self->{table});
-	die("$PACKAGE: Can't locate $f in \@INC (\@INC contains: $(join ' ',@INC))");
+	die("$PACKAGE: Can't locate $f in \@INC (\@INC contains: $(join ' ',$^INCLUDE_PATH))");
     }
 
     while (my $line = ~< $fh) {

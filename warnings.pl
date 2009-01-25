@@ -4,7 +4,7 @@ our $VERSION = '1.02_02';
 
 BEGIN {
     require 'regen_lib.pl';
-    push @INC, './lib';
+    push $^INCLUDE_PATH, './lib';
 }
 use kurila;
  

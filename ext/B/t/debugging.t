@@ -3,10 +3,10 @@
 
 BEGIN {
     if (env::var('PERL_CORE')){
-        push @INC, '../ext/B/t';
+        push $^INCLUDE_PATH, '../ext/B/t';
     } else {
-        unshift @INC, 't';
-        push @INC, "../../t";
+        unshift $^INCLUDE_PATH, 't';
+        push $^INCLUDE_PATH, "../../t";
     }
     # skip all tests unless perl was compiled with -DDEBUGGING
     require Config;

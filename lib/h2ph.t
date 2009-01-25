@@ -5,7 +5,7 @@
 
 BEGIN {
     chdir 't' if -d 't';
-    @INC = @( '../lib' );
+    $^INCLUDE_PATH = @( '../lib' );
 }
 
 my $extracted_program = '../utils/h2ph'; # unix, nt, ...

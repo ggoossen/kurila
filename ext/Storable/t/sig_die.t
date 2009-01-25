@@ -11,9 +11,9 @@ use Config;
 sub BEGIN {
     if (env::var('PERL_CORE')){
        chdir('t') if -d 't';
-       @INC = @('.', '../lib');
+       $^INCLUDE_PATH = @('.', '../lib');
     } else {
-       unshift @INC, 't';
+       unshift $^INCLUDE_PATH, 't';
     }
 }
 

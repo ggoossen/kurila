@@ -169,8 +169,8 @@ sub eval_in_subdirs {
     use Cwd < qw(cwd abs_path);
     my $pwd = cwd() || die "Can't figure out your cwd!";
 
-    local @INC = map try {abs_path($_) if -e} || $_, @INC;
-    push @INC, '.';     # '.' has to always be at the end of @INC
+    local $^INCLUDE_PATH = map try {abs_path($_) if -e} || $_, $^INCLUDE_PATH;
+    push $^INCLUDE_PATH, '.';     # '.' has to always be at the end of @INC
 
     foreach my $dir ( @{$self->{DIR}}){
         my $abs = $self->catdir($pwd,$dir);
@@ -512,7 +512,7 @@ END
 
     if (! $self->{?PERL_SRC} ) {
         require VMS::Filespec if $Is_VMS;
-        my $pthinks = $self->canonpath(%INC{'Config.pm'});
+        my $pthinks = $self->canonpath($^INCLUDED{'Config.pm'});
         my $cthinks = $self->catfile(%Config{?'archlibexp'},'Config.pm');
         $pthinks = VMS::Filespec::vmsify($pthinks) if $Is_VMS;
         if ($pthinks ne $cthinks &&
@@ -784,7 +784,7 @@ sub _run_hintfile {
 
     # Just in case the ./ isn't on the hint file, which File::Spec can
     # often strip off, we bung the curdir into @INC
-    local @INC = @( File::Spec->curdir, < @INC);
+    local $^INCLUDE_PATH = @( File::Spec->curdir, < $^INCLUDE_PATH);
     my $ret = do $hint_file;
     if( !defined $ret ) {
         my $error = $^EVAL_ERROR && $^EVAL_ERROR->message || $^OS_ERROR;

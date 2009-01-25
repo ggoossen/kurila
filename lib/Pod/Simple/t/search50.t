@@ -2,7 +2,7 @@ BEGIN {
     if( env::var('PERL_CORE') ) {
         chdir 't';
         use File::Spec;
-        @INC = @(File::Spec->rel2abs('../lib') );
+        $^INCLUDE_PATH = @(File::Spec->rel2abs('../lib') );
     }
 }
 
@@ -30,7 +30,7 @@ $x->callback(sub {
   return;
 });
 
-print "# \@INC == $(join ' ',@INC)\n";
+print "# \@INC == $(join ' ',$^INCLUDE_PATH)\n";
 
 my $t = time();   my $name2where = $x->survey();
 $t = time() - $t;
@@ -54,6 +54,6 @@ if( $warningspath ) {
 
 ok 1;
 print "# Byebye from ", __FILE__, "\n";
-print "# $(join ' ',@INC)\n";
+print "# $(join ' ',$^INCLUDE_PATH)\n";
 __END__
 

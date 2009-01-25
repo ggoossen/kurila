@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w                                         # -*- perl -*-
 
 BEGIN {
-    unshift @INC, '../lib/Pod/t';
+    unshift $^INCLUDE_PATH, '../lib/Pod/t';
     require "pod2html-lib.pl";
 }
 

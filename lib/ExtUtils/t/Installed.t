@@ -21,7 +21,7 @@ my $ei = bless( \%(), 'ExtUtils::Installed' );
 # Make sure meta info is available
 $ei->{+':private:'}->{+Config} = \%:<
   map { ($_ => config_value($_)) } config_keys();
-$ei->{':private:'}->{+INC} = \@INC;
+$ei->{':private:'}->{+INC} = \$^INCLUDE_PATH;
 
 # _is_prefix
 ok( $ei->_is_prefix('foo/bar', 'foo'),
@@ -105,7 +105,7 @@ do {
     $config_override->{+sitearchexp} = $fake_mod_dir;
     $config_override->{+version} = 'fake_test_version';
 
-    my @inc_override = @(< @INC, $fake_mod_dir);
+    my @inc_override = @(< $^INCLUDE_PATH, $fake_mod_dir);
 
     my $realei = ExtUtils::Installed->new(
         'config_override' => $config_override,
@@ -122,7 +122,7 @@ do {
 	'... should find version in modules' );
 };
 
-push @INC, $fake_mod_dir;
+push $^INCLUDE_PATH, $fake_mod_dir;
 
 # Check if extra_libs works.
 do {

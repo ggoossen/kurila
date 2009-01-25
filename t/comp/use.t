@@ -1,7 +1,7 @@
 #!./perl
 
 BEGIN {
-    %INC{+"feature.pm"} = 1; # so we don't attempt to load feature.pm
+    $^INCLUDED{+"feature.pm"} = 1; # so we don't attempt to load feature.pm
 }
 
 print "1..26\n";
@@ -72,7 +72,7 @@ like ($^EVAL_ERROR->message, qr/use VERSION is not valid in Perl Kurila/);
 # fake package 'testuse'
 our $testimport;
 our $version_check;
-%INC{+'testuse.pm'} = 1;
+$^INCLUDED{+'testuse.pm'} = 1;
 *testuse::import = sub { $testimport = \ @_ };
 *testuse::VERSION = sub { $version_check = @_[1] };
 

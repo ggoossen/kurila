@@ -2,7 +2,7 @@
 
 our @OrigINC;
 BEGIN {
-    @OrigINC = @INC;
+    @OrigINC = $^INCLUDE_PATH;
 }
 
 use Test::More tests => 13;
@@ -57,9 +57,9 @@ BEGIN {
 	    $_ = ":$_" unless m/^:/; # we know this path is relative
 	}
     }
-    is( @INC[1], $Lib_Dir,          'lib adding at end of @INC' );
-    is( @INC[0], $Arch_Dir,        '    auto/ dir in front of that' );
-    is( nelems(grep(m/^\Q$Lib_Dir\E$/,@INC)), 1,   '    no duplicates' );
+    is( $^INCLUDE_PATH[1], $Lib_Dir,          'lib adding at end of @INC' );
+    is( $^INCLUDE_PATH[0], $Arch_Dir,        '    auto/ dir in front of that' );
+    is( nelems(grep(m/^\Q$Lib_Dir\E$/,$^INCLUDE_PATH)), 1,   '    no duplicates' );
 
     # Yes, %INC uses Unixy filepaths.
     # Not on Mac OS, it doesn't ... it never has, at least.
@@ -67,7 +67,7 @@ BEGIN {
     if ($^OS_NAME eq 'MacOS') {
 	$path = $Lib_Dir . 'Yup.pm';
     }
-    is( %INC{?'Yup.pm'}, $path,    '%INC set properly' );
+    is( $^INCLUDED{?'Yup.pm'}, $path,    '%INC set properly' );
 
     is( try { do 'Yup.pm'  }, 42,  'do() works' );
     ok( try { require Yup; },      '   require()' );
@@ -83,6 +83,6 @@ unlike( do { eval 'use lib config_value("installsitelib");'; $^EVAL_ERROR || '' 
 	qr/::Config is read-only/, 'lib handles readonly stuff' );
 
 BEGIN {
-    is( nelems(grep(m/stuff/,@INC)), 0, 'no lib' );
+    is( nelems(grep(m/stuff/,$^INCLUDE_PATH)), 0, 'no lib' );
     ok( !do 'Yup.pm',           '   do() effected' );
 }

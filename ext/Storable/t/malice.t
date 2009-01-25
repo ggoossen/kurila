@@ -18,10 +18,10 @@ use Config;
 BEGIN {
     if (env::var('PERL_CORE')){
 	chdir('t') if -d 't';
-	@INC = @('.', '../lib', '../ext/Storable/t');
+	$^INCLUDE_PATH = @('.', '../lib', '../ext/Storable/t');
     } else {
 	# This lets us distribute Test::More in t/
-	unshift @INC, 't';
+	unshift $^INCLUDE_PATH, 't';
     }
 }
 

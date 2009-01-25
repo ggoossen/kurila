@@ -22,7 +22,7 @@ do {
 };
 
 my @default = map { "IO/$_.pm" } qw( Handle Seekable File Socket Dir );
-delete %INC{[@default ]};
+delete $^INCLUDED{[@default ]};
 
 my $warn = '' ;
 local $^WARN_HOOK = sub { $warn = @_[0]->{?description} } ;
@@ -67,7 +67,7 @@ do {
 
 foreach my $default ( @default)
 {
-	ok( exists %INC{ $default }, "... import should default load $default" );
+	ok( exists $^INCLUDED{ $default }, "... import should default load $default" );
 }
 
 try { IO->import( 'nothere' ) };
@@ -97,7 +97,7 @@ if ( -d $fakedir or mkpath( $fakedir ))
 	if (close OUT)
 	{
 		$flag = 1;
-		push @INC, 'lib';
+		push $^INCLUDE_PATH, 'lib';
 	}
 }
 

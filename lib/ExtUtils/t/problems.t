@@ -1,7 +1,7 @@
 # Test problems in Makefile.PL's and hint files.
 
 BEGIN {
-  unshift @INC, 'lib', '../../lib';
+  unshift $^INCLUDE_PATH, 'lib', '../../lib';
 }
 
 use Test::More tests => 6;

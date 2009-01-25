@@ -4,7 +4,7 @@
 # build, test and installation of the Big::Fat::Dummy module.
 
 BEGIN {
-  unshift @INC, 'lib';
+  unshift $^INCLUDE_PATH, 'lib';
 }
 
 use env;

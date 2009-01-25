@@ -22,7 +22,7 @@ print "1..6\n";
 $result = do { ok 1; 'value';};
 ok( $result eq 'value',  ":$result: eq :value:" );
 
-unshift @INC, '.';
+unshift $^INCLUDE_PATH, '.';
 
 # bug ID 20010920.007
 eval qq{ do qq(a file that does not exist); };

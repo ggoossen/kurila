@@ -4,7 +4,7 @@ my $has_perlio;
 
 BEGIN {
     chdir 't' if -d 't';
-    @INC = @( '../lib' );
+    $^INCLUDE_PATH = @( '../lib' );
     require './test.pl';
     unless ($has_perlio = PerlIO::Layer->find( 'perlio')) {
 	print <<EOF;

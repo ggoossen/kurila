@@ -49,7 +49,7 @@ do {
         @path;
     };
     
-    is( %INC{?'Module/Load/Conditional.pm'},            
+    is( $^INCLUDED{?'Module/Load/Conditional.pm'},            
             File::Spec::Unix->catfile(< @rv_path),
                             q[  Found proper file]
     );
@@ -145,13 +145,13 @@ do {
 };
 
 do {
-    delete %INC{'LoadIt.pm'};
-    delete %INC{'MustBe/Loaded.pm'};
+    delete $^INCLUDED{'LoadIt.pm'};
+    delete $^INCLUDED{'MustBe/Loaded.pm'};
 
     my $use_list = \%( 'LoadIt' => 1, 'MustBe::Loaded' => 1 );
     my $bool = can_load( modules => $use_list );
 
-    ok( !%INC{?'LoadIt.pm'} && !%INC{?'MustBe/Loaded.pm'},
+    ok( !$^INCLUDED{?'LoadIt.pm'} && !$^INCLUDED{?'MustBe/Loaded.pm'},
         q[Do not load if one prerequisite fails]
     );
 };
@@ -176,7 +176,7 @@ do {   local $Module::Load::Conditional::CHECK_INC_HASH = 1;
     
     do {   package A::B::C::D; 
         $A::B::C::D::VERSION = $^PID; 
-        %INC{+'A/B/C/D.pm'}   = $^PID.$^PID;
+        $^INCLUDED{+'A/B/C/D.pm'}   = $^PID.$^PID;
         
         ### XXX this is no longer needed with M::Load 0.11_01
         #$INC{'[.A.B.C]D.pm'} = $$.$$ if $^O eq 'VMS';

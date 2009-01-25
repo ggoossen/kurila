@@ -11,7 +11,7 @@
 #
 # Version 1.0, Feb 2nd 1995 by Andreas Koenig
 
-BEGIN { unshift @INC, "lib" }
+BEGIN { unshift $^INCLUDE_PATH, "lib" }
 
 
 print <<'END';

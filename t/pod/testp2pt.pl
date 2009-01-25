@@ -4,13 +4,13 @@ BEGIN {
    use File::Basename;
    use File::Spec;
    use Cwd < qw(abs_path);
-   push @INC, '..';
+   push $^INCLUDE_PATH, '..';
    my $THISDIR = abs_path(dirname $^PROGRAM_NAME);
-   unshift @INC, $THISDIR;
+   unshift $^INCLUDE_PATH, $THISDIR;
    require "testcmp.pl";
    TestCompare->import();
    my $PARENTDIR = dirname $THISDIR;
-   push @INC, < map { 'File::Spec'->catfile($_, 'lib') } @( ($PARENTDIR, $THISDIR));
+   push $^INCLUDE_PATH, < map { 'File::Spec'->catfile($_, 'lib') } @( ($PARENTDIR, $THISDIR));
 }
 
 #use diagnostics;

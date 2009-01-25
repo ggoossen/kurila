@@ -712,7 +712,7 @@ sub grand_search_init {
 
         # We must look both in @INC for library modules and in $bindir
         # for executables, like h2xs or perldoc itself.
-        push @searchdirs, ($self->{?'bindir'}, < @INC);
+        push @searchdirs, ($self->{?'bindir'}, < $^INCLUDE_PATH);
         unless ($self->opt_m) {
             if (IS_VMS) {
                 my($trn);
@@ -734,7 +734,7 @@ sub grand_search_init {
         }
         else {
             # no match, try recursive search
-            @searchdirs = grep(!m/^\.\z/s, @INC);
+            @searchdirs = grep(!m/^\.\z/s, $^INCLUDE_PATH);
             @files= $self->searchfor(1,$page,< @searchdirs) if $self->opt_r;
             if ((nelems @files)) {
                 $self->aside( "Loosely found as $(join ' ',@files)\n" );
@@ -824,7 +824,7 @@ sub pod_dirs { # @dirs = pod_dirs($translator);
     $mod =~ s|::|/|g;
     $mod .= '.pm';
 
-    my $dir = %INC{?$mod};
+    my $dir = $^INCLUDED{?$mod};
     $dir =~ s/\.pm\z//;
     return $dir;
 }

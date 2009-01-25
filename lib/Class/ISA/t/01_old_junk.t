@@ -1,6 +1,6 @@
 BEGIN {
     chdir 't' if -d 't';
-    @INC = @( '../lib' );
+    $^INCLUDE_PATH = @( '../lib' );
 }
 
 # Time-stamp: "2004-12-29 19:59:33 AST"

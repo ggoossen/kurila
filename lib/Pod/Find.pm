@@ -136,7 +136,7 @@ sub pod_find
     if(%opts{?inc}) {
         if ($^OS_NAME eq 'MacOS') {
             # tolerate '.', './some_dir' and '(../)+some_dir' on Mac OS
-            my @new_INC = @INC;
+            my @new_INC = $^INCLUDE_PATH;
             for ( @new_INC) {
                 if ( $_ eq '.' ) {
                     $_ = ':';
@@ -148,7 +148,7 @@ sub pod_find
             }
             push(@search, < grep($_ ne File::Spec->curdir, @new_INC));
         } else {
-            push(@search, < grep($_ ne File::Spec->curdir, @INC));
+            push(@search, < grep($_ ne File::Spec->curdir, $^INCLUDE_PATH));
         }
 
         %opts{+perl} = 1;
@@ -393,7 +393,7 @@ sub pod_where {
     # Add @INC
     if ($^OS_NAME eq 'MacOS' && %options{?'inc'}) {
         # tolerate '.', './some_dir' and '(../)+some_dir' on Mac OS
-        my @new_INC = @INC;
+        my @new_INC = $^INCLUDE_PATH;
         for ( @new_INC) {
             if ( $_ eq '.' ) {
                 $_ = ':';
@@ -405,7 +405,7 @@ sub pod_where {
         }
         push (@search_dirs, < @new_INC);
     } elsif (%options{?'inc'}) {
-        push (@search_dirs, < @INC);
+        push (@search_dirs, < $^INCLUDE_PATH);
     }
 
     # Add location of pod documentation for perl man pages (eg perlfunc)

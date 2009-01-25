@@ -75,7 +75,7 @@ TODO: do {
 my $Is_VMS = $^OS_NAME eq 'VMS';
 my $Is_MacOS = $^OS_NAME eq 'MacOS';
 
-my $path = join " ", map { qq["-I$_"] } @INC;
+my $path = join " ", map { qq["-I$_"] } $^INCLUDE_PATH;
 $path .= " -MMac::err=unix" if $Is_MacOS;
 my $redir = $Is_MacOS ?? "" !! "2>&1";
 

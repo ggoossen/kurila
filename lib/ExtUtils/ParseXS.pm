@@ -1055,7 +1055,7 @@ sub standard_typemap_locations {
     unshift @tm, File::Spec->catfile($dir, 'typemap');
     unshift @tm, File::Spec->catfile($dir, lib => ExtUtils => 'typemap');
   }
-  foreach my $dir ( @INC) {
+  foreach my $dir ( $^INCLUDE_PATH) {
     my $file = File::Spec->catfile($dir, ExtUtils => 'typemap');
     unshift @tm, $file if -e $file;
   }

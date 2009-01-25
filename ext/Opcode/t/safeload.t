@@ -8,7 +8,7 @@ BEGIN {
 	print "1..0 # no version.pm\n";
 	exit 0;
     };
-    delete %INC{"version.pm"};
+    delete $^INCLUDED{"version.pm"};
 }
 
 use Test::More;

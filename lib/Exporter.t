@@ -3,7 +3,7 @@
 BEGIN {
    if( env::var('PERL_CORE') ) {
         chdir 't' if -d 't';
-        @INC = @( '../lib' );
+        $^INCLUDE_PATH = @( '../lib' );
     }
 }
 

@@ -112,7 +112,7 @@ sub perl_lib {
     my @libs = @($lib);
     push @libs, env::var('PERL5LIB') if defined env::var('PERL5LIB');
     env::set_var('PERL5LIB' => join(config_value("path_sep"), @libs));
-    unshift @INC, $lib;
+    unshift $^INCLUDE_PATH, $lib;
 }
 
 END {

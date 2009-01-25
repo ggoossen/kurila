@@ -5,7 +5,7 @@ use env;
 require_ok( 're' );
 
 # setcolor
-%INC{+'Term/Cap.pm' } = 1;
+$^INCLUDED{+'Term/Cap.pm' } = 1;
 env::temp_set_var('PERL_RE_TC', undef);
 re::setcolor();
 is( env::var('PERL_RE_COLORS'), "md\tme\tso\tse\tus\tue", 

@@ -175,7 +175,7 @@ sub check_install {
     ### check the inc hash if we're allowed to
     if( $CHECK_INC_HASH ) {
         $filename = $href->{+'file'} = 
-            %INC{?$file_inc } if defined %INC{?$file_inc };
+            $^INCLUDED{?$file_inc } if defined $^INCLUDED{?$file_inc };
 
         ### find the version by inspecting the package
         if( defined $filename && $FIND_VERSION ) {
@@ -187,7 +187,7 @@ sub check_install {
     ### so scan the dirs
     unless( $filename ) {
 
-        DIR: for my $dir (  @INC ) {
+        DIR: for my $dir (  $^INCLUDE_PATH ) {
     
             my $fh;
     
@@ -211,7 +211,7 @@ sub check_install {
                     next;
                 }
     
-                $filename = %INC{?$file_inc} || $file;
+                $filename = $^INCLUDED{?$file_inc} || $file;
     
             } else {
                 $filename = File::Spec->catfile($dir, $file);
@@ -514,7 +514,7 @@ sub requires {
         return undef;
     }
 
-    my $lib = join " ", map { qq["-I$_"] } @INC;
+    my $lib = join " ", map { qq["-I$_"] } $^INCLUDE_PATH;
     my $cmd = qq[$^EXECUTABLE_NAME $lib -M$who -e"print(join(qq[\\n],keys(\%INC)))"];
 
     return  sort grep { !m/^$who$/  }

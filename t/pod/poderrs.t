@@ -1,7 +1,7 @@
 BEGIN {
    use File::Basename;
    my $THISDIR = dirname $^PROGRAM_NAME;
-   unshift @INC, $THISDIR;
+   unshift $^INCLUDE_PATH, $THISDIR;
    require "testpchk.pl";
    TestPodChecker->import();
 }

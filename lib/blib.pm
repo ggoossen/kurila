@@ -85,7 +85,7 @@ sub import
 
    if (-d $blib && -d $blib_arch && -d $blib_lib)
     {
-     unshift(@INC,$blib_arch,$blib_lib);
+     unshift($^INCLUDE_PATH,$blib_arch,$blib_lib);
      warn "Using $blib\n" if $Verbose;
      return;
     }

@@ -84,7 +84,7 @@ sub decomposeHangul {
 ########## getting full decomposion ##########
 do {
     my($f, $fh);
-    foreach my $d ( @INC) {
+    foreach my $d ( $^INCLUDE_PATH) {
 	$f = File::Spec->catfile($d, "unicore", "CompositionExclusions.txt");
 	last if open($fh, "<", $f);
 	$f = File::Spec->catfile($d, "unicode", "CompExcl.txt");
@@ -92,7 +92,7 @@ do {
 	$f = undef;
     }
     die "$PACKAGE: neither unicore/CompositionExclusions.txt "
-	. "nor unicode/CompExcl.txt is found in $(join ' ',@INC)" unless defined $f;
+	. "nor unicode/CompExcl.txt is found in $(join ' ',$^INCLUDE_PATH)" unless defined $f;
 
     while ( ~< $fh) {
 	next if m/^#/ or m/^$/;

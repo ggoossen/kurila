@@ -1,7 +1,7 @@
 #!./perl
 
 BEGIN {
-    push @INC, '.';
+    push $^INCLUDE_PATH, '.';
 }
 
 # don't make this lexical
@@ -16,7 +16,7 @@ my $total_tests = 26;
 print "1..$total_tests\n";
 
 sub do_require {
-    %INC = %( () );
+    $^INCLUDED = %( () );
     write_file('bleah.pm',< @_);
     try { require "bleah.pm" };
     my @a; # magic guard for scope violations (must be first lexical in file)
@@ -39,10 +39,10 @@ print "ok ",$i++,"\n";
 write_file('bleah.pm', "print 'ok $i\n'; 1;\n");
 require "bleah.pm";
 $i++;
-delete %INC{'bleah.pm'};
+delete $^INCLUDED{'bleah.pm'};
 
 # run-time failure in require
-print "not " if exists %INC{'bleah.pm'};
+print "not " if exists $^INCLUDED{'bleah.pm'};
 print "ok ",$i++,"\n";
 
 my $flag_file = 'bleah.flg';
@@ -56,7 +56,7 @@ for my $expected_compile (@(1,0)) {
     print "ok ",$i++,"\n";
     print "not " unless -e $flag_file xor $expected_compile;
     print "ok ",$i++,"\n";
-    print "not " unless exists %INC{'bleah.pm'};
+    print "not " unless exists $^INCLUDED{'bleah.pm'};
     print "ok ",$i++,"\n";
 }
 
@@ -68,7 +68,7 @@ print "# $^EVAL_ERROR\nnot " unless $^EVAL_ERROR->message =~ m/(syntax|parse) er
 print "ok ",$i++,"\n";
 
 # previous failure cached in %INC
-print "not " unless exists %INC{'bleah.pm'};
+print "not " unless exists $^INCLUDED{'bleah.pm'};
 print "ok ",$i++,"\n";
 write_file($flag_file, 1);
 write_file('bleah.pm', "unlink '$flag_file'; 1");
@@ -78,7 +78,7 @@ print "# $^EVAL_ERROR\nnot " unless $^EVAL_ERROR->message =~ m/Compilation faile
 print "ok ",$i++,"\n";
 print "not " unless -e $flag_file;
 print "ok ",$i++,"\n";
-print "not " unless exists %INC{'bleah.pm'};
+print "not " unless exists $^INCLUDED{'bleah.pm'};
 print "ok ",$i++,"\n";
 
 # successful require
@@ -107,7 +107,7 @@ if($^EVAL_ERROR->message =~ m/Can't locate threads in \@INC/) {
 }
 
 write_file('bleah.pm', qq(die "This is an expected error";\n));
-delete %INC{"bleah.pm"}; ++$main::i;
+delete $^INCLUDED{"bleah.pm"}; ++$main::i;
 try { CORE::require bleah; };
 if ($^EVAL_ERROR->message =~ m/^This is an expected error/) {
     print "ok $i\n";

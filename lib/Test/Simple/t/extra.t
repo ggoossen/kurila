@@ -3,7 +3,7 @@
 BEGIN {
     if( env::var('PERL_CORE') ) {
         chdir 't';
-        @INC = @( '../lib' );
+        $^INCLUDE_PATH = @( '../lib' );
     }
 }
 
@@ -22,7 +22,7 @@ package main;
 require Test::Simple;
 
 chdir 't';
-push @INC, '../t/lib/';
+push $^INCLUDE_PATH, '../t/lib/';
 require Test::Simple::Catch;
 use env;
 my@($out, $err) =  Test::Simple::Catch::caught();

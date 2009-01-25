@@ -3,7 +3,7 @@ use Test;
 
 BEGIN {
     plan tests => 9;
-    %INC{+'Locale/Maketext/Lexicon.pm'} = __FILE__;
+    $^INCLUDED{+'Locale/Maketext/Lexicon.pm'} = __FILE__;
     $Locale::Maketext::Lexicon::VERSION = 0;
 }
 

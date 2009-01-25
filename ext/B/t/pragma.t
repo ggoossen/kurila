@@ -2,10 +2,10 @@
 
 BEGIN {    ## no critic strict
     if ( env::var('PERL_CORE') ) {
-	push @INC, < qw(lib);
+	push $^INCLUDE_PATH, < qw(lib);
     }
     else {
-        unshift @INC, 't';
+        unshift $^INCLUDE_PATH, 't';
     }
 }
 

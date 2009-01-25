@@ -79,14 +79,14 @@ sub openunicode {
     my @($rfh, @< @path) =  @_;
     my $f;
     unless (defined $$rfh) {
-	for my $d ( @INC) {
+	for my $d ( $^INCLUDE_PATH) {
 	    use File::Spec;
 	    $f = File::Spec->catfile($d, "unicore", < @path);
 	    last if open($$rfh, "<", $f);
 	    undef $f;
 	}
 	croak __PACKAGE__, ": failed to find ", <
-              File::Spec->catfile(< @path), " in $(join ' ',@INC)"
+              File::Spec->catfile(< @path), " in $(join ' ',$^INCLUDE_PATH)"
 	    unless defined $f;
     }
     return $f;

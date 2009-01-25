@@ -4,10 +4,10 @@
 
 BEGIN {
     if( env::var('PERL_CORE') ) {
-        unshift @INC, 'lib';
+        unshift $^INCLUDE_PATH, 'lib';
     }
     else {
-        unshift @INC, 't/lib';
+        unshift $^INCLUDE_PATH, 't/lib';
     }
 }
 

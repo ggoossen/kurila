@@ -23,8 +23,8 @@ plan tests => scalar (nelems @modules) * 2;
 foreach my $file ( @modules) {
     # Make sure we look at the local files and do not reload them if
     # they're already loaded.  This avoids recompilation warnings.
-    local @INC = @INC;
-    unshift @INC, ".";
+    local $^INCLUDE_PATH = $^INCLUDE_PATH;
+    unshift $^INCLUDE_PATH, ".";
     ok try { require($file); 1 } or diag "require $file failed.\n$($^EVAL_ERROR->message)";
 
     SKIP: do {

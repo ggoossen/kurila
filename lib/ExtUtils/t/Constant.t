@@ -71,7 +71,7 @@ END {
 }
 
 chdir $dir or die $^OS_ERROR;
-push @INC, '../../lib', '../../../lib';
+push $^INCLUDE_PATH, '../../lib', '../../../lib';
 
 package main;
 

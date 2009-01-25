@@ -455,10 +455,10 @@ sub _expand_inc {
 
   if ($^OS_NAME eq 'MacOS') {
     push @$search_dirs,
-      < grep $_ ne File::Spec->curdir, $self->_mac_whammy(< @INC);
+      < grep $_ ne File::Spec->curdir, $self->_mac_whammy(< $^INCLUDE_PATH);
   # Any other OSs need custom handling here?
   } else {
-    push @$search_dirs, < grep $_ ne File::Spec->curdir, @INC;
+    push @$search_dirs, < grep $_ ne File::Spec->curdir, $^INCLUDE_PATH;
   }
 
   $self->{+'laborious'} = 0;   # Since inc said to use INC
@@ -529,9 +529,9 @@ sub find {
   
   if( $self->inc ) {
     if( $^OS_NAME eq 'MacOS' ) {
-      push @search_dirs, < $self->_mac_whammy(< @INC);
+      push @search_dirs, < $self->_mac_whammy(< $^INCLUDE_PATH);
     } else {
-      push @search_dirs,                    < @INC;
+      push @search_dirs,                    < $^INCLUDE_PATH;
     }
 
     # Add location of pod documentation for perl man pages (eg perlfunc)

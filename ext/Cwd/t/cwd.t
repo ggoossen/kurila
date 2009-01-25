@@ -19,7 +19,7 @@ plan tests => $tests;
 
 SKIP: do {
   skip "no need to check for blib/ in the core", 1 if env::var('PERL_CORE');
-  like %INC{?'Cwd.pm'}, qr{blib}i, "Cwd should be loaded from blib/ during testing";
+  like $^INCLUDED{?'Cwd.pm'}, qr{blib}i, "Cwd should be loaded from blib/ during testing";
 };
 
 my $IsVMS = $^OS_NAME eq 'VMS';
@@ -180,7 +180,7 @@ SKIP: do {
 
 if (env::var('PERL_CORE')) {
     chdir '../ext/Cwd/t';
-    unshift @INC, '../../../lib';
+    unshift $^INCLUDE_PATH, '../../../lib';
 }
 
 # Make sure we can run abs_path() on files, not just directories

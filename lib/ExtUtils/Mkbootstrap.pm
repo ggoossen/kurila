@@ -34,9 +34,9 @@ sub Mkbootstrap {
 	local our @($osname, $dlsrc) = @(undef, undef); # avoid warnings
 	@($osname, $dlsrc) =  map { config_value($_) } qw(osname dlsrc);
 	our $bscode = "";
-	unshift @INC, ".";
+	unshift $^INCLUDE_PATH, ".";
 	require $_;
-	shift @INC;
+	shift $^INCLUDE_PATH;
     }
 
     if (config_value('dlsrc') =~ m/^dl_dld/){

@@ -97,7 +97,7 @@ sub new {
           map { ($_ => config_value($_)) } config_keys();
     }
     
-    for my $tuple (@(\@(inc_override => INC => \ @INC ),
+    for my $tuple (@(\@(inc_override => INC => \ $^INCLUDE_PATH ),
                    \@( extra_libs => EXTRA => \@() ))) 
     {
         my @($arg,$key,$val)= @$tuple;

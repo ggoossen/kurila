@@ -5,7 +5,7 @@ print "1..42\n";
 our ($reopen, $x, $outfile);
 
 chdir('op') || chdir('t/op') || die "sysio.t: cannot look for myself: $^OS_ERROR";
-@INC = @( '../../lib' );
+$^INCLUDE_PATH = @( '../../lib' );
 
 open(I, "<", 'sysio.t') || die "sysio.t: cannot find myself: $^OS_ERROR";
 

@@ -267,7 +267,7 @@ sub _unescape {
 sub auto_path {
     my @($self, $calldir) =  @_;
     $calldir =~ s#::#/#g;
-    my $path = %INC{?$calldir . '.pm'} or return;
+    my $path = $^INCLUDED{?$calldir . '.pm'} or return;
 
     # Try absolute path name.
     if ($^OS_NAME eq 'MacOS') {
@@ -281,7 +281,7 @@ sub auto_path {
 
     # If that failed, try relative path with normal @INC searching.
     $path = "auto/$calldir/";
-    foreach my $inc ( @INC) {
+    foreach my $inc ( $^INCLUDE_PATH) {
 	return "$inc/$path" if -d "$inc/$path";
     }
 

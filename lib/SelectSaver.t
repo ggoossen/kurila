@@ -2,7 +2,7 @@
 
 BEGIN {
     chdir 't' if -d 't';
-    @INC = @( '../lib' );
+    $^INCLUDE_PATH = @( '../lib' );
 }
 
 print "1..3\n";

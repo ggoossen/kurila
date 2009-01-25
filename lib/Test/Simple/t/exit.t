@@ -6,7 +6,7 @@ package My::Test;
 BEGIN {
     if( env::var('PERL_CORE') ) {
         chdir 't';
-        @INC = @( '../lib' );
+        $^INCLUDE_PATH = @( '../lib' );
     }
 }
 

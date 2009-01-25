@@ -1,7 +1,7 @@
 #!./perl
 
 BEGIN {
-    push @INC, 'lib';
+    push $^INCLUDE_PATH, 'lib';
 }
 
 use warnings;

@@ -95,7 +95,7 @@ sub import {
 }
 
 END {
-    print "---INC---\n", join "\n", keys %INC
+    print "---INC---\n", join "\n", keys $^INCLUDED
       if $dumpinc;
 }
 

@@ -2,10 +2,10 @@
 
 BEGIN {
     if (env::var('PERL_CORE')){
-	push @INC, '../ext/B/t';
+	push $^INCLUDE_PATH, '../ext/B/t';
     } else {
-	unshift @INC, 't';
-	push @INC, "../../t";
+	unshift $^INCLUDE_PATH, 't';
+	push $^INCLUDE_PATH, "../../t";
     }
     require Config;
     if (!Config::config_value("useperlio")) {

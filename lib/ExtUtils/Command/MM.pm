@@ -54,8 +54,8 @@ sub test_harness {
     require ExtUtils::Command;
     my @argv = ExtUtils::Command::expand_wildcards(< @ARGV);
 
-    local @INC = @INC;
-    unshift @INC, < map { File::Spec->rel2abs($_) } @_;
+    local $^INCLUDE_PATH = $^INCLUDE_PATH;
+    unshift $^INCLUDE_PATH, < map { File::Spec->rel2abs($_) } @_;
     Test::Harness::runtests( <sort { lc $a cmp lc $b } @argv);
 }
 
