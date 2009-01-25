@@ -1,6 +1,6 @@
 BEGIN {
     if (env::var('PERL_CORE')) {
-	push @INC, "lib/compress";
+	push $^INCLUDE_PATH, "lib/compress";
     }
 }
 

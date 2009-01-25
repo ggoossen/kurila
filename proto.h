@@ -3804,12 +3804,6 @@ STATIC HEK*	S_save_hek_flags(const char *str, I32 len, U32 hash, int flags)
 #define PERL_ARGS_ASSERT_SAVE_HEK_FLAGS	\
 	assert(str)
 
-STATIC void	S_hv_magic_check(HV *hv, bool *needs_copy)
-			__attribute__nonnull__(1)
-			__attribute__nonnull__(2);
-#define PERL_ARGS_ASSERT_HV_MAGIC_CHECK	\
-	assert(hv); assert(needs_copy)
-
 STATIC void	S_unshare_hek_or_pvn(pTHX_ const HEK* hek, const char* str, I32 len, U32 hash);
 STATIC HEK*	S_share_hek_flags(pTHX_ const char *str, I32 len, U32 hash, int flags)
 			__attribute__warn_unused_result__

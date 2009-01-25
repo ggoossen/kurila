@@ -4,10 +4,10 @@
 
 BEGIN {
     if( env::var('PERL_CORE') ) {
-        @INC = @('../../lib', '../lib', 'lib');
+        $^INCLUDE_PATH = @('../../lib', '../lib', 'lib');
     }
     else {
-        unshift @INC, 't/lib';
+        unshift $^INCLUDE_PATH, 't/lib';
     }
 }
 chdir 't';
@@ -114,7 +114,7 @@ close DUMMY;
 do {
   ok( -r 'install-test/lib/perl/Big/Dummy.pm', 'different install exists' );
 
-  local @INC = @('install-test/lib/perl');
+  local $^INCLUDE_PATH = @('install-test/lib/perl');
   env::temp_set_var('PERL5LIB' => '');
   install( \%( 'blib/lib' => 'install-test/other_lib/perl',
            read   => 'install-test/packlist',
@@ -132,7 +132,7 @@ do {
 do {
   my $tfile='install-test/lib/perl/Big/Dummy.pm';
   local $ExtUtils::Install::Testing = $tfile; 
-  local @INC = @('install-test/other_lib/perl','install-test/lib/perl');
+  local $^INCLUDE_PATH = @('install-test/other_lib/perl','install-test/lib/perl');
   env::temp_set_var('PERL5LIB' => '');
   ok( -r $tfile, 'different install exists' );
   my @warn;
@@ -154,7 +154,7 @@ do {
 do {
   my $tfile='install-test/lib/perl/Big/Dummy.pm';
   local $ExtUtils::Install::Testing = $tfile;
-  local @INC = @('install-test/lib/perl','install-test/other_lib/perl');
+  local $^INCLUDE_PATH = @('install-test/lib/perl','install-test/other_lib/perl');
   env::temp_set_var('PERL5LIB' => '');
   ok( -r $tfile, 'different install exists' );
   my @warn;
@@ -177,7 +177,7 @@ do {
 
 # Test UNINST=1 removing other versions in other dirs.
 do {
-  local @INC = @('install-test/lib/perl');
+  local $^INCLUDE_PATH = @('install-test/lib/perl');
   env::temp_set_var('PERL5LIB' => '');
   install( \%( 'blib/lib' => 'install-test/other_lib/perl',
            read   => 'install-test/packlist',

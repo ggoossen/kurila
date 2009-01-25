@@ -673,9 +673,8 @@ perl_destruct(pTHXx)
 
     /* shortcuts just get cleared */
     PL_envhv = NULL;
-    GvREFCNT_dec(PL_incgv);
-    PL_incgv = NULL;
-    HVcpNULL(PL_hinthv);
+    AVcpNULL(PL_includepathav);
+    HVcpNULL(PL_includedhv);
     SVcpNULL(PL_errsv);
     HVcpNULL(PL_magicsvhv);
     HvREFCNT_dec(PL_globalstash);
@@ -1508,7 +1507,7 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 #endif
 		    sv_catpvs(opts_prog, 
 			      "print \"  env:\\n    $(join '\\n', @env)\\n\" if @env;"
-			      "print \"  \\@INC:\\n    $(join '\\n', @INC)\\n\";");
+			      "print \"  \\$^INCLUDE_PATH:\\n    $(join '\\n', $^INCLUDE_PATH)\\n\";");
 		}
 		else {
 		    ++s;
@@ -1617,7 +1616,7 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 	scriptname = "-";
     }
 
-    /* Set $^EXECUTABLE_NAME early so that it can be used for relocatable paths in @INC  */
+    /* Set $^EXECUTABLE_NAME early so that it can be used for relocatable paths in $^INCLUDE_PATH  */
     S_set_caret_X(aTHX);
     init_perllib();
 
@@ -2456,7 +2455,7 @@ S_usage(pTHX_ const char *name)		/* XXX move this out into a module ? */
 "-f                don't do $sitelib/sitecustomize.pl at startup",
 "-F/pattern/       split() pattern for -a switch (//'s are optional)",
 "-i[extension]     edit <> files in place (makes backup if extension supplied)",
-"-Idirectory       specify @INC/#include directory (several -I's allowed)",
+"-Idirectory       specify $^INCLUDE_PATH/#include directory (several -I's allowed)",
 "-l[octal]         enable line ending processing, specifies line terminator",
 "-[mM][-]module    execute \"use/no module...\" before executing program",
 "-n                assume \"while (<>) { ... }\" loop around program",
@@ -3058,10 +3057,8 @@ S_init_main_stash(pTHX)
     /* the default stash has no name, and is thus known as :: */
     hv_name_set(PL_defstash, "", 0, 0);
     SvREADONLY_on(gv);
-    PL_incgv = gv_HVadd(gv_AVadd(gv_fetchpvs("INC", GV_ADD|GV_NOTQUAL,
-					     SVt_PVAV)));
-    SvREFCNT_inc_simple_void(PL_incgv); /* Don't allow it to be freed */
-    GvMULTI_on(PL_incgv);
+    PL_includedhv = newHV();
+    PL_includepathav = newAV();
     PL_magicsvhv = newHV();
     PL_hinthv = newHV(); /* ^HINTS */
     PL_defgv = gv_fetchpvs("_", GV_ADD|GV_NOTQUAL, SVt_PVAV);
@@ -4265,9 +4262,9 @@ S_init_perllib(pTHX)
 #  define PERLLIB_MANGLE(s,n) (s)
 #endif
 
-/* Push a directory onto @INC if it exists.
+/* Push a directory onto $^INCLUDE_PATH if it exists.
    Generate a new SV if we do this, to save needing to copy the SV we push
-   onto @INC  */
+   onto $^INCLUDE_PATH  */
 STATIC SV *
 S_incpush_if_exists(pTHX_ SV *dir)
 {
@@ -4278,7 +4275,7 @@ S_incpush_if_exists(pTHX_ SV *dir)
 
     if (PerlLIO_stat(SvPVX_const(dir), &tmpstatbuf) >= 0 &&
 	S_ISDIR(tmpstatbuf.st_mode)) {
-	av_push(GvAVn(PL_incgv), dir);
+	av_push(PL_includepathav, dir);
 	dir = newSV(0);
     }
     return dir;
@@ -4308,7 +4305,7 @@ S_incpush(pTHX_ const char *dir, bool addsubdirs, bool addoldvers, bool usesep,
 	if (usesep) {
 	    while ( *p == PERLLIB_SEP ) {
 		/* Uncomment the next line for PATH semantics */
-		/* av_push(GvAVn(PL_incgv), newSVpvs(".")); */
+		/* av_push(PL_includepathav, newSVpvs(".")); */
 		p++;
 	    }
 	}
@@ -4344,11 +4341,11 @@ S_incpush(pTHX_ const char *dir, bool addsubdirs, bool addoldvers, bool usesep,
 	 * 1: Remove trailing executable name (anything after the last '/')
 	 *    from the perl path to give a perl prefix
 	 * Then
-	 * While the @INC element starts "../" and the prefix ends with a real
+	 * While the $^INCLUDE_PATH element starts "../" and the prefix ends with a real
 	 * directory (ie not . or ..) chop that real directory off the prefix
-	 * and the leading "../" from the @INC element. ie a logical "../"
+	 * and the leading "../" from the $^INCLUDE_PATH element. ie a logical "../"
 	 * cleanup
-	 * Finally concatenate the prefix and the remainder of the @INC element
+	 * Finally concatenate the prefix and the remainder of the $^INCLUDE_PATH element
 	 * The intent is that /usr/local/bin/perl and .../../lib/perl5
 	 * generates /usr/local/lib/perl5
 	 */
@@ -4426,7 +4423,7 @@ S_incpush(pTHX_ const char *dir, bool addsubdirs, bool addoldvers, bool usesep,
 #endif
 	}
 	/*
-	 * BEFORE pushing libdir onto @INC we may first push version- and
+	 * BEFORE pushing libdir onto $^INCLUDE_PATH we may first push version- and
 	 * archname-specific sub-directories.
 	 */
 	if (addsubdirs || addoldvers) {
@@ -4446,7 +4443,7 @@ S_incpush(pTHX_ const char *dir, bool addsubdirs, bool addoldvers, bool usesep,
 	    }
 	    else
 		PerlIO_printf(Perl_error_log,
-		              "Failed to unixify @INC element \"%s\"\n",
+		              "Failed to unixify $^INCLUDE_PATH element \"%s\"\n",
 			      SvPV(libdir,len));
 #endif
 	    if (addsubdirs) {
@@ -4492,8 +4489,8 @@ S_incpush(pTHX_ const char *dir, bool addsubdirs, bool addoldvers, bool usesep,
 #endif
 	}
 
-	/* finally push this lib directory on the end of @INC */
-	av_push(GvAVn(PL_incgv), libdir);
+	/* finally push this lib directory on the end of $^INCLUDE_PATH */
+	av_push(PL_includepathav, libdir);
     }
     if (subdir) {
 	assert (SvREFCNT(subdir) == 1);

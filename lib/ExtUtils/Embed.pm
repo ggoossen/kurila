@@ -385,7 +385,7 @@ with the current Perl.
 B<-I> E<lt>path1:path2E<gt>
 
 Search path for ModuleName.a archives.  
-Default path is B<@INC>.
+Default path is B<$^INCLUDE_PATH>.
 Library archives are expected to be found as 
 B</some/path/auto/ModuleName/ModuleName.a>
 For example, when looking for B<Socket.a> relative to a search path, 
@@ -430,7 +430,7 @@ rather than print it to STDOUT.
 This will print arguments for linking with B<libperl> and
 extensions found in B<$Config{static_ext}>.  This includes libraries
 found in B<$Config{libs}> and the first ModuleName.a library
-for each extension that is found by searching B<@INC> or the path 
+for each extension that is found by searching B<$^INCLUDE_PATH> or the path 
 specified by the B<-I> option.  
 In addition, when ModuleName.a is found, additional linker arguments
 are picked up from the B<extralibs.ld> file in the same directory.

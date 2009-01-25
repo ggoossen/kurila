@@ -947,7 +947,7 @@ sub import {
     # 'configpm; was invoked with --cross option
     $platform = '***replace-marker***';
   }
-  @INC = map {/\blib\b/?(do{local $_=$_;s/\blib\b/xlib\/$platform/;$_},$_):($_)} @INC;
+  $^INCLUDE_PATH = map {/\blib\b/?(do{local $_=$_;s/\blib\b/xlib\/$platform/;$_},$_):($_)} $^INCLUDE_PATH;
   $::Cross::platform = $platform;
 }
 

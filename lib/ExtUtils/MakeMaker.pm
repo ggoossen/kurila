@@ -169,8 +169,8 @@ sub eval_in_subdirs {
     use Cwd < qw(cwd abs_path);
     my $pwd = cwd() || die "Can't figure out your cwd!";
 
-    local $^INCLUDE_PATH = map try {abs_path($_) if -e} || $_, $^INCLUDE_PATH;
-    push $^INCLUDE_PATH, '.';     # '.' has to always be at the end of @INC
+    local $^INCLUDE_PATH = map { try {abs_path($_) if -e} || $_ } $^INCLUDE_PATH;
+    push $^INCLUDE_PATH, '.';     # '.' has to always be at the end of $^INCLUDE_PATH
 
     foreach my $dir ( @{$self->{DIR}}){
         my $abs = $self->catdir($pwd,$dir);
@@ -783,7 +783,7 @@ sub _run_hintfile {
     print STDERR "Processing hints file $hint_file\n";
 
     # Just in case the ./ isn't on the hint file, which File::Spec can
-    # often strip off, we bung the curdir into @INC
+    # often strip off, we bung the curdir into $^INCLUDE_PATH
     local $^INCLUDE_PATH = @( File::Spec->curdir, < $^INCLUDE_PATH);
     my $ret = do $hint_file;
     if( !defined $ret ) {
@@ -834,20 +834,20 @@ sub mv_all_methods {
         };
     }
 
-    # We have to clean out %INC also, because the current directory is
+    # We have to clean out $^INCLUDED also, because the current directory is
     # changed frequently and Graham Barr prefers to get his version
     # out of a History.pl file which is "required" so woudn't get
     # loaded again in another extension requiring a History.pl
 
-    # With perl5.002_01 the deletion of entries in %INC caused Tk-b11
+    # With perl5.002_01 the deletion of entries in $^INCLUDED caused Tk-b11
     # to core dump in the middle of a require statement. The required
     # file was Tk/MMutil.pm.  The consequence is, we have to be
     # extremely careful when we try to give perl a reason to reload a
     # library with same name.  The workaround prefers to drop nothing
-    # from %INC and teach the writers not to use such libraries.
+    # from $^INCLUDED and teach the writers not to use such libraries.
 
 #    my $inc;
-#    foreach $inc (keys %INC) {
+#    foreach $inc (keys $^INCLUDED) {
 #       #warn "***$inc*** deleted";
 #       delete $INC{$inc};
 #    }
@@ -1110,10 +1110,10 @@ You can check the values of these variables on your system with
 And to check the sequence in which the library directories are
 searched by perl, run
 
-    perl -le 'print join $/, @INC'
+    perl -le 'print join $/, $^INCLUDE_PATH'
 
 Sometimes older versions of the module you're installing live in other
-directories in @INC.  Because Perl loads the first version of a module it 
+directories in $^INCLUDE_PATH.  Because Perl loads the first version of a module it 
 finds, not the newest, you might accidentally get one of these older
 versions even after installing a brand new version.  To delete I<all other
 versions of the module you're installing> (not simply older ones) set the
@@ -1873,7 +1873,7 @@ to $(CC).
 Same as for PERL_LIB, but for architecture dependent files.
 
 Used only when MakeMaker is building the extensions of the Perl core
-distribution (because normally $(PERL_ARCHLIB) is automatically in @INC,
+distribution (because normally $(PERL_ARCHLIB) is automatically in $^INCLUDE_PATH,
 and adding it would get in the way of PERL5LIB).
 
 =item PERL_LIB
@@ -1881,7 +1881,7 @@ and adding it would get in the way of PERL5LIB).
 Directory containing the Perl library to use.
 
 Used only when MakeMaker is building the extensions of the Perl core
-distribution (because normally $(PERL_LIB) is automatically in @INC,
+distribution (because normally $(PERL_LIB) is automatically in $^INCLUDE_PATH,
 and adding it would get in the way of PERL5LIB).
 
 =item PERL_MALLOC_OK
@@ -1977,10 +1977,10 @@ In this case the program will be run multiple times using each target file.
     perl bin/foobar.PL bin/foobar2
 
 PL files are normally run B<after> pm_to_blib and include INST_LIB and
-INST_ARCH in its C<@INC> so the just built modules can be
+INST_ARCH in its C<$^INCLUDE_PATH> so the just built modules can be
 accessed... unless the PL file is making a module (or anything else in
 PM) in which case it is run B<before> pm_to_blib and does not include
-INST_LIB and INST_ARCH in its C<@INC>.  This apparently odd behavior
+INST_LIB and INST_ARCH in its C<$^INCLUDE_PATH>.  This apparently odd behavior
 is there for backwards compatibility (and its somewhat DWIM).
 
 

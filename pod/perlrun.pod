@@ -453,7 +453,7 @@ Disable executing F<$Config{sitelib}/sitecustomize.pl> at startup.
 Perl can be built so that it by default will try to execute
 F<$Config{sitelib}/sitecustomize.pl> at startup (in a BEGIN block).
 This is a hook that allows the sysadmin to customize how perl behaves.
-It can for instance be used to add entries to the @INC array to make perl
+It can for instance be used to add entries to the $^INCLUDE_PATH array to make perl
 find modules in non-standard locations.
 
 =item B<-h>
@@ -574,10 +574,10 @@ files are given on the command line.  In this case, no backup is made
 proceeds from STDIN to STDOUT as might be expected.
 
 =item B<-I>I<directory>
-X<-I> X<@INC>
+X<-I> X<$^INCLUDE_PATH>
 
 Directories specified by B<-I> are prepended to the search path for
-modules (C<@INC>).
+modules (C<$^INCLUDE_PATH>).
 
 =item B<-l>[I<octnum>]
 X<-l> X<$/> X<$\>
@@ -792,7 +792,7 @@ prints the version and patchlevel of your perl executable.
 X<-V>
 
 prints summary of the major perl configuration values and the current
-values of @INC.
+values of $^INCLUDE_PATH.
 
 =item B<-V:>I<configvar>
 
@@ -1205,7 +1205,7 @@ See also hash_seed() of L<Hash::Util>.
 X<PERL_ROOT>
 
 A translation concealed rooted logical name that contains perl and the
-logical device for the @INC path on VMS only.  Other logical names that
+logical device for the $^INCLUDE_PATH path on VMS only.  Other logical names that
 affect perl on VMS include PERLSHR, PERL_ENV_TABLES, and
 SYS$TIMEZONE_DIFFERENTIAL but are optional and discussed further in
 L<perlvms> and in F<README.vms> in the Perl source distribution.

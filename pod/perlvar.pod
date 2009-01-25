@@ -1034,10 +1034,10 @@ mode is turned on.  See L<perlrun> for the B<-a> switch.  This array
 is package-specific, and must be declared or given a full package name
 if not in package main when running under C<strict 'vars'>.
 
-=item @INC
-X<@INC>
+=item $^INCLUDE_PATH
+X<$^INCLUDE_PATH>
 
-The array @INC contains the list of places that the C<do EXPR>,
+The array $^INCLUDE_PATH contains the list of places that the C<do EXPR>,
 C<require>, or C<use> constructs look for their library files.  It
 initially consists of the arguments to any B<-I> command-line
 switches, followed by the default Perl library, probably
@@ -1051,7 +1051,7 @@ loaded also:
     use SomeMod;
 
 You can also insert hooks into the file inclusion system by putting Perl
-code directly into @INC.  Those hooks may be subroutine references, array
+code directly into $^INCLUDE_PATH.  Those hooks may be subroutine references, array
 references or blessed objects.  See L<perlfunc/require> for details.
 
 =item @ARG
@@ -1062,10 +1062,10 @@ X<@_> X<@ARG>
 Within a subroutine the array @_ contains the parameters passed to that
 subroutine.  See L<perlsub>.
 
-=item %INC
-X<%INC>
+=item $^INCLUDED
+X<$^INCLUDED>
 
-The hash %INC contains entries for each filename included via the
+The hash $^INCLUDED contains entries for each filename included via the
 C<do>, C<require>, or C<use> operators.  The key is the filename
 you specified (with module names converted to pathnames), and the
 value is the location of the file found.  The C<require>
@@ -1074,8 +1074,8 @@ already been included.
 
 If the file was loaded via a hook (e.g. a subroutine reference, see
 L<perlfunc/require> for a description of these hooks), this hook is
-by default inserted into %INC in place of a filename.  Note, however,
-that the hook may have set the %INC entry by itself to provide some more
+by default inserted into $^INCLUDED in place of a filename.  Note, however,
+that the hook may have set the $^INCLUDED entry by itself to provide some more
 specific info.
 
 =item %ENV

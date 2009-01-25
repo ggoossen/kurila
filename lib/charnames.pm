@@ -420,7 +420,7 @@ or customized aliases to standard Unicode naming conventions (:full)
 
     use charnames ":full", ":alias" => "pro";
 
-    will try to read "unicore/pro_alias.pl" from the @INC path. This
+    will try to read "unicore/pro_alias.pl" from the $^INCLUDE_PATH path. This
     file should return a list in plain perl:
 
     (

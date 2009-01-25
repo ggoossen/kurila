@@ -27,7 +27,7 @@ END
 	     'PL_FILES-Module/multi.PL'         => _gen_pl_files(),
 	     'PL_FILES-Module/Bar_pm.PL'        => _gen_pm_files(),
 	     'PL_FILES-Module/lib/PL/Foo.pm' => <<'END',
-# Module to load to ensure PL_FILES have blib in @INC.
+# Module to load to ensure PL_FILES have blib in $^INCLUDE_PATH.
 package PL::Foo;
 sub bar { 42 }
 1;
@@ -40,7 +40,7 @@ sub _gen_pl_files {
     my $test = <<'END';
 #!/usr/bin/perl -w
 
-# Ensure we have blib in @INC
+# Ensure we have blib in $^INCLUDE_PATH
 use PL::Foo;
 die unless PL::Foo::bar() == 42;
 
@@ -65,9 +65,9 @@ sub _gen_pm_files {
     my $test = <<'END';
 #!/usr/bin/perl -w
 
-# Ensure we do NOT have blib in @INC when building a module
+# Ensure we do NOT have blib in $^INCLUDE_PATH when building a module
 try { require PL::Foo; };
-#die $@ unless $@ =~ m{^Can't locate PL/Foo.pm in \@INC };
+#die $@ unless $@ =~ m{^Can't locate PL/Foo.pm in \$^INCLUDE_PATH };
 
 # Had a bug where PL_FILES weren't sent the file to generate
 die "argv empty\n" unless @ARGV;

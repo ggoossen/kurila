@@ -53,7 +53,7 @@ readily cut-and-pastable into this file.
 
 
 C<< -r <file> >> reads a file, as written by C<-c>, and adjusts the expected
-results accordingly.  The file is 'required', so @INC settings apply.
+results accordingly.  The file is 'required', so $^INCLUDE_PATH settings apply.
 
 If module-names are given as args, those packages are run through the
 test harness; this is handy for collecting further items to test, and

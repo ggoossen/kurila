@@ -1,5 +1,5 @@
 #!./perl -w
-BEGIN { @INC = @('lib') }
+BEGIN { $^INCLUDE_PATH = @('lib') }
 
 BEGIN {
     use Config;
@@ -20,8 +20,8 @@ OS
 	# And then remove all trace of ever having loaded Config.pm, so that
 	# it will reload with the revised $^X
 	undef %Config::;
-	delete %INC{"Config.pm"};
-	delete %INC{"Config_heavy.pl"};
+	delete $^INCLUDED{"Config.pm"};
+	delete $^INCLUDED{"Config_heavy.pl"};
 	# You never saw us. We weren't here.
     }
 }
@@ -144,7 +144,7 @@ sub pod2man {
 
     mkpath($mandir, %opts{verbose}, 0777) unless %opts{notify};  # In File::Path
     # Make a list of all the .pm and .pod files in the directory.  We avoid
-    # chdir because we are running with @INC = '../lib', and modules may wish
+    # chdir because we are running with $^INCLUDE_PATH = '../lib', and modules may wish
     # to dynamically require Carp::Heavy or other diagnostics warnings.
     # Hash the names of files we find, keys are names relative to perl build
     # dir ('.'), values are names relative to $poddir.

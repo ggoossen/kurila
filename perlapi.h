@@ -322,8 +322,10 @@ END_EXTERN_C
 #define PL_in_eval		(*Perl_Iin_eval_ptr(aTHX))
 #undef  PL_in_load_module
 #define PL_in_load_module	(*Perl_Iin_load_module_ptr(aTHX))
-#undef  PL_incgv
-#define PL_incgv		(*Perl_Iincgv_ptr(aTHX))
+#undef  PL_includedhv
+#define PL_includedhv		(*Perl_Iincludedhv_ptr(aTHX))
+#undef  PL_includepathav
+#define PL_includepathav	(*Perl_Iincludepathav_ptr(aTHX))
 #undef  PL_initav
 #define PL_initav		(*Perl_Iinitav_ptr(aTHX))
 #undef  PL_inplace

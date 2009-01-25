@@ -97,7 +97,7 @@ sub new {
           map { ($_ => config_value($_)) } config_keys();
     }
     
-    for my $tuple (@(\@(inc_override => INC => \ $^INCLUDE_PATH ),
+    for my $tuple (@(\@(inc_override => INC => \$($^INCLUDE_PATH) ),
                    \@( extra_libs => EXTRA => \@() ))) 
     {
         my @($arg,$key,$val)= @$tuple;
@@ -161,7 +161,7 @@ sub new {
         my $modfile = "$module.pm";
         $module =~ s!/!::!g;
 
-        # Find the top-level module file in @INC
+        # Find the top-level module file in $^INCLUDE_PATH
         $self->{+$module}->{+version} = '';
         foreach my $dir ( @{$self->{':private:'}->{INC}} ) {
             my $p = File::Spec->catfile($dir, $modfile);
@@ -328,7 +328,7 @@ in C<Config::config_value>, and what the value is of the PERL5LIB environment va
 This takes optional named parameters. Without parameters, this
 searches for all the installed .packlists on the system using
 information from C<Config::config_value> and the default module search
-paths C<@INC>. The packlists are read using the
+paths C<$^INCLUDE_PATH>. The packlists are read using the
 L<ExtUtils::Packlist> module.
 
 If the named parameter C<config_override> is specified,
@@ -342,7 +342,7 @@ pass that in.
 
 Similarly, the parameter C<inc_override> may be a reference to an
 array which is used in place of the default module search paths
-from C<@INC>. 
+from C<$^INCLUDE_PATH>. 
 
     use Config;
     my @dirs = split(/\Q$Config{path_sep}\E/, $ENV{PERL5LIB});

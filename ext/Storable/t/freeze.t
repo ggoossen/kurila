@@ -9,9 +9,9 @@
 BEGIN {
     if (env::var('PERL_CORE')){
 	chdir('t') if -d 't';
-	@INC = @('.', '../lib', '../ext/Storable/t');
+	$^INCLUDE_PATH = @('.', '../lib', '../ext/Storable/t');
     } else {
-	unshift @INC, 't';
+	unshift $^INCLUDE_PATH, 't';
     }
     require 'st-dump.pl';
 }

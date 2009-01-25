@@ -209,7 +209,7 @@ of a language-tag that has an existing language class)
 can be used for making sure that
 C<get_handle> will always manage to construct a language
 handle (assuming your language classes are in an appropriate
-@INC directory).  Or you can use the next method:
+$^INCLUDE_PATH directory).  Or you can use the next method:
 
 =item *
 

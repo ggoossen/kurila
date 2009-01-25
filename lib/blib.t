@@ -2,7 +2,7 @@
 
 BEGIN {
     chdir 't' if -d 't';
-    @INC = @('../lib');
+    $^INCLUDE_PATH = @('../lib');
 }
 
 use File::Spec;
@@ -54,8 +54,8 @@ do {
     is( $warnings, '',  'use blib is nice and quiet' );
 };
 
-is( nelems(@INC), 3, '@INC now has 3 elements' );
-is( @INC[2],    '../lib',       'blib added to the front of @INC' );
+is( nelems($^INCLUDE_PATH), 3, '@INC now has 3 elements' );
+is( $^INCLUDE_PATH[2],    '../lib',       'blib added to the front of @INC' );
 
 if ($^OS_NAME eq 'VMS') {
     # Unix syntax is accepted going in but it's not what comes out
@@ -70,7 +70,7 @@ elsif ($^OS_NAME ne 'MacOS')
 }
 
 
-ok( nelems(grep(m|\Q$blib_lib\E$|, @INC[[0..1]]))  == 1,     "  $blib_lib in \@INC");
-ok( nelems(grep(m|\Q$blib_arch\E$|, @INC[[0..1]])) == 1,     "  $blib_arch in \@INC");
+ok( nelems(grep(m|\Q$blib_lib\E$|, $^INCLUDE_PATH[[0..1]]))  == 1,     "  $blib_lib in \@INC");
+ok( nelems(grep(m|\Q$blib_arch\E$|, $^INCLUDE_PATH[[0..1]])) == 1,     "  $blib_arch in \@INC");
 
 END { _cleanup( < @blib_dirs ); }

@@ -12,17 +12,17 @@ BEGIN {
 
     chdir('t') if -d 't';
     if (env::var('PERL_CORE')){
-	@INC = @('.', '../lib', '../ext/Storable/t');
+	$^INCLUDE_PATH = @('.', '../lib', '../ext/Storable/t');
     } else {
         if (!eval "require Hash::Util") {
-            if ($^EVAL_ERROR->{description} =~ m/Can\'t locate Hash\/Util\.pm in \@INC/s) {
+            if ($^EVAL_ERROR->{description} =~ m/Can\'t locate Hash\/Util\.pm in \$^INCLUDE_PATH/s) {
                 print "1..0 # Skip: No Hash::Util:\n";
                 exit 0;
             } else {
                 die;
             }
         }
-	unshift @INC, 't';
+	unshift $^INCLUDE_PATH, 't';
     }
     require 'st-dump.pl';
 }

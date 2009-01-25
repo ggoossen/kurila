@@ -143,12 +143,12 @@ our undef
 pack ($@)
 package undef
 pipe (**)
-pop (;\@)
+pop (;$)
 pos undef
 print undef
 printf undef
 prototype undef
-push (\@@)
+push ($@)
 q undef
 qq undef
 qr undef
@@ -229,7 +229,7 @@ undef undef
 unless undef
 unlink (@)
 unpack ($;$)
-unshift (\@@)
+unshift ($@)
 until undef
 use undef
 utime (@)

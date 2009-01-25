@@ -1347,8 +1347,8 @@ L<perlipc/"Deferred Signals (Safe Signals)">). (Rafael)
 =item @INC-hook fix
 
 When a module or a file is loaded through an @INC-hook, and when this hook
-has set a filename entry in %INC, __FILE__ is now set for this module
-accordingly to the contents of that %INC entry. (Rafael)
+has set a filename entry in $^INCLUDED, __FILE__ is now set for this module
+accordingly to the contents of that $^INCLUDED entry. (Rafael)
 
 =item C<-t> switch fix
 

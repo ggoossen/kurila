@@ -909,7 +909,7 @@
  */
 /* PERL_RELOCATABLE_INC:
  *	This symbol, if defined, indicates that we'd like to relocate entries
- *	in @INC at run time based on the location of the perl binary.
+ *	in $^INCLUDE_PATH at run time based on the location of the perl binary.
  */
 #define BIN "c:\\perl\\bin"	/**/
 #define BIN_EXP "c:\\perl\\bin"	/**/
@@ -2467,7 +2467,7 @@
 /* PERL_INC_VERSION_LIST:
  *	This variable specifies the list of subdirectories in over
  *	which perl.c:incpush() and lib/lib.pm will automatically
- *	search when adding directories to @INC, in a format suitable
+ *	search when adding directories to $^INCLUDE_PATH, in a format suitable
  *	for a C initialization string.  See the inc_version_list entry
  *	in Porting/Glossary for more details.
  */
@@ -2546,7 +2546,7 @@
 /* PERL_OTHERLIBDIRS:
  *	This variable contains a colon-separated set of paths for the perl
  *	binary to search for additional library files or modules.
- *	These directories will be tacked to the end of @INC.
+ *	These directories will be tacked to the end of $^INCLUDE_PATH.
  *	Perl will automatically search below each path for version-
  *	and architecture-specific directories.  See PERL_INC_VERSION_LIST
  *	for more details.

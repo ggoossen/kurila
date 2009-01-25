@@ -10,7 +10,7 @@ BEGIN {
 BEGIN {
     if (env::var('PERL_CORE')) {
         chdir('t') if -d 't';
-        @INC = @( $^OS_NAME eq 'MacOS' ?? < qw(::lib) !! < qw(../lib) );
+        $^INCLUDE_PATH = @( $^OS_NAME eq 'MacOS' ?? < qw(::lib) !! < qw(../lib) );
     }
 }
 

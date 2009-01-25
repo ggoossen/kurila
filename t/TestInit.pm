@@ -4,7 +4,7 @@
 #
 # BEGIN {
 #   chdir 't' if -d 't';
-#   @INC = '../lib';
+#   $^INCLUDE_PATH = '../lib';
 # }
 #
 # t/TEST will use -MTestInit.  You may "use TestInit" in the test
@@ -19,7 +19,7 @@ our $VERSION = 1.01;
 
 BEGIN {
     chdir 't' if -d 't';
-    @INC = @('../lib');
+    $^INCLUDE_PATH = @('../lib');
 }
 
 env::set_var('PERL_CORE' => 1);

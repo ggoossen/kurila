@@ -35,7 +35,7 @@ in right place and its corresponding Cross.pm.
 Unlike Win32 build, miniperl will not have C<Config.pm> of host within reach;
 it rather will use C<Config.pm> from within cross-compilation directories.
 
-File C<Cross.pm> is dead simple: for given cross-architecture places in @INC
+File C<Cross.pm> is dead simple: for given cross-architecture places in $^INCLUDE_PATH
 a path where perl modules are, and right C<Config.pm> in that place.
 
 That said, C<miniperl -Ilib -MConfig -we 1> should report an error, because

@@ -623,7 +623,7 @@ C<set PERLLIB_PREFIX> in F<Config.sys>, see L<"PERLLIB_PREFIX">.
   unzip perl_ste.zip -d f:/perllib/lib/site_perl/5.8.3/
 
 Same remark as above applies.  Additionally, if this directory is not
-one of directories on @INC (and @INC is influenced by C<PERLLIB_PREFIX>), you
+one of directories on $^INCLUDE_PATH (and @INC is influenced by C<PERLLIB_PREFIX>), you
 need to put this
 directory and subdirectory F<./os2> in C<PERLLIB> or C<PERL5LIB>
 variable. Do not use C<PERL5LIB> unless you have it set already. See
@@ -1260,7 +1260,7 @@ to C<perl_.exe>.  You are done with generation of the local Perl installation.
 =item 8.
 
 Make sure that the installed modules are actually installed in the location
-of the new Perl, and are not inherited from entries of @INC given for
+of the new Perl, and are not inherited from entries of $^INCLUDE_PATH given for
 inheritance from the older versions of Perl: set C<PERLLIB_582_PREFIX> to
 redirect the new version of Perl to a new location, and copy the installed
 files to this new location.  Redo the tests to make sure that the versions of
@@ -1511,7 +1511,7 @@ Here is the sample C file:
       if ( !h((void *)"~installprefix", Perlos2_handler_perllib_from)
            || !h((void *)"~dll", Perlos2_handler_perllib_to)
            || !h((void *)"~dll/sh/ksh.exe", Perlos2_handler_perl_sh) )
-          die_with(PERL_DLL_BASENAME, ": Can't install @INC manglers", "", "");
+          die_with(PERL_DLL_BASENAME, ": Can't install $^INCLUDE_PATH manglers", "", "");
 
       if (DosQueryProcAddr(handle, 0, "dll_perlmain", (PFN*)&f))
           die_with(PERL_DLL_BASENAME, ": DLL exports no symbol ", "dll_perlmain", "");
@@ -2339,13 +2339,13 @@ substituted with F<path2>.
 
 Should be used if the perl library is moved from the default
 location in preference to C<PERL(5)LIB>, since this would not leave wrong
-entries in @INC.  For example, if the compiled version of perl looks for @INC
+entries in $^INCLUDE_PATH.  For example, if the compiled version of perl looks for @INC
 in F<f:/perllib/lib>, and you want to install the library in
 F<h:/opt/gnu>, do
 
   set PERLLIB_PREFIX=f:/perllib/lib;h:/opt/gnu
 
-This will cause Perl with the prebuilt @INC of
+This will cause Perl with the prebuilt $^INCLUDE_PATH of
 
   f:/perllib/lib/5.00553/os2
   f:/perllib/lib/5.00553
@@ -2353,7 +2353,7 @@ This will cause Perl with the prebuilt @INC of
   f:/perllib/lib/site_perl/5.00553
   .
 
-to use the following @INC:
+to use the following $^INCLUDE_PATH:
 
   h:/opt/gnu/5.00553/os2
   h:/opt/gnu/5.00553
@@ -2425,7 +2425,7 @@ It may be possible to code a simple workaround which would
 
 =item *
 
-find the old DLLs looking through the old @INC;
+find the old DLLs looking through the old $^INCLUDE_PATH;
 
 =item *
 
@@ -2496,11 +2496,11 @@ the DLL name for perl DLL.
 Since the Perl extension DLLs are always loaded with the full path,
 there is no need to mangle their names in a version-specific ways:
 their directory already reflects the corresponding version of perl,
-and @INC takes into account binary compatibility with older version.
+and $^INCLUDE_PATH takes into account binary compatibility with older version.
 Starting from C<5.6.2> the name mangling scheme is fixed to be the
 same as for Perl 5.005_53 (same as in a popular binary release).  Thus
 new Perls will be able to I<resolve the names> of old extension DLLs
-if @INC allows finding their directories.
+if $^INCLUDE_PATH allows finding their directories.
 
 However, this still does not guarantee that these DLL may be loaded.
 The reason is the mangling of the name of the I<Perl DLL>.  And since

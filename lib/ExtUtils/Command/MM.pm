@@ -37,7 +37,7 @@ Any $(FOO) used in the examples are make variables, not Perl.
   test_harness($verbose, @test_libs);
 
 Runs the tests on @ARGV via Test::Harness passing through the $verbose
-flag.  Any @test_libs will be unshifted onto the test's @INC.
+flag.  Any @test_libs will be unshifted onto the test's $^INCLUDE_PATH.
 
 @test_libs are run in alphabetical order.
 

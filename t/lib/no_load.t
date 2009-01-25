@@ -26,7 +26,7 @@ foreach my $test ( @TESTS) {
     foreach my $module ( @modules) {
         my $prog = <<"        --";
             use $module;
-            print exists \%INC \{'$exclude.pm'\} ?? "not ok" !! "ok";
+            print exists \$^INCLUDED \{'$exclude.pm'\} ?? "not ok" !! "ok";
         --
         fresh_perl_is ($prog, "ok", "", "$module does not load $exclude");
     }

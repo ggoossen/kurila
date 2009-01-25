@@ -57,24 +57,24 @@ BEGIN {
 	    $_ = ":$_" unless m/^:/; # we know this path is relative
 	}
     }
-    is( $^INCLUDE_PATH[1], $Lib_Dir,          'lib adding at end of @INC' );
+    is( $^INCLUDE_PATH[1], $Lib_Dir,          'lib adding at end of $^INCLUDE_PATH' );
     is( $^INCLUDE_PATH[0], $Arch_Dir,        '    auto/ dir in front of that' );
     is( nelems(grep(m/^\Q$Lib_Dir\E$/,$^INCLUDE_PATH)), 1,   '    no duplicates' );
 
-    # Yes, %INC uses Unixy filepaths.
+    # Yes, $^INCLUDED uses Unixy filepaths.
     # Not on Mac OS, it doesn't ... it never has, at least.
     my $path = join("/", @($Lib_Dir, 'Yup.pm'));
     if ($^OS_NAME eq 'MacOS') {
 	$path = $Lib_Dir . 'Yup.pm';
     }
-    is( $^INCLUDED{?'Yup.pm'}, $path,    '%INC set properly' );
+    is( $^INCLUDED{?'Yup.pm'}, $path,    '$^INCLUDED set properly' );
 
     is( try { do 'Yup.pm'  }, 42,  'do() works' );
     ok( try { require Yup; },      '   require()' );
     ok( eval "use Yup; 1;",         '   use()' );
     is( $^EVAL_ERROR, '' );
 
-    is_deeply(\@OrigINC, \@lib::ORIG_INC,    '@lib::ORIG_INC' );
+    is_deeply(\@OrigINC, \@lib::ORIG_INCLUDE_PATH,    '@lib::ORIG_INC' );
 }
 
 no lib $Lib_Dir;

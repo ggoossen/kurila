@@ -24,7 +24,7 @@ instance, C<perl -MCGI::Carp -e 1>.
 If you don't see an error message, you have the module.  (If you do
 see an error message, it's still possible you have the module, but
 that it's not in your path, which you can display with C<perl -e
-"print qq(@INC)">.)  For the remainder of this document, we'll assume
+"print qq($^INCLUDE_PATH)">.)  For the remainder of this document, we'll assume
 that you really honestly truly lack an installed module, but have
 found it on the CPAN.
 
@@ -57,7 +57,7 @@ C</my/perl_directory>.  Then you can use the modules from your Perl
 programs with C<use lib "/my/perl_directory/lib/site_perl";> or
 sometimes just C<use "/my/perl_directory";>.  If you're on a system
 that requires superuser/root access to install modules into the
-directories you see when you type C<perl -e "print qq(@INC)">, you'll
+directories you see when you type C<perl -e "print qq($^INCLUDE_PATH)">, you'll
 want to install them into a local directory (such as your home
 directory) and use this approach.
 
@@ -231,7 +231,7 @@ may be some additional ones, too; check the module documentation)
 to their final destination: This will
 most likely be in C<$ENV{MACPERL}site_lib:> (i.e.,
 C<HD:MacPerl folder:site_lib:>).  You can add new paths to
-the default C<@INC> in the Preferences menu item in the
+the default C<$^INCLUDE_PATH> in the Preferences menu item in the
 MacPerl application (C<$ENV{MACPERL}site_lib:> is added
 automagically).  Create whatever directory structures are required
 (i.e., for C<Some::Module>, create

@@ -3,10 +3,10 @@
 BEGIN {
     if( env::var('PERL_CORE') ) {
         chdir 't';
-        @INC = @('../lib', 'lib');
+        $^INCLUDE_PATH = @('../lib', 'lib');
     }
     else {
-        unshift @INC, 't/lib';
+        unshift $^INCLUDE_PATH, 't/lib';
     }
 }
 
@@ -236,7 +236,7 @@ my $more_err_re = <<ERR;
 #   Failed test 'use Hooble::mooble::yooble;'
 #   at $Filename line 84\\.
 #     Tried to use 'Hooble::mooble::yooble'.
-#     Error:  Can't locate Hooble.* in \\\@INC .*
+#     Error:  Can't locate Hooble.* in \\\$\\\^INCLUDE_PATH .*
 ERR
 
 My::Test::like($$err, "/^$more_err_re/");
@@ -249,7 +249,7 @@ $more_err_re = <<ERR;
 #   Failed test 'require ALL::YOUR::BASE::ARE::BELONG::TO::US::wibble;'
 #   at $Filename line 85\\.
 #     Tried to require 'ALL::YOUR::BASE::ARE::BELONG::TO::US::wibble'.
-#     Error:  Can't locate ALL.* in \\\@INC .*
+#     Error:  Can't locate ALL.* in \\\$\\\^INCLUDE_PATH .*
 ERR
 
 My::Test::like($$err, "/^$more_err_re/");

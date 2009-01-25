@@ -3,7 +3,7 @@
                 # we build the new one
 
 BEGIN {
-  push @INC, 'lib';
+  push $^INCLUDE_PATH, 'lib';
   require 'regen_lib.pl';
 }
 

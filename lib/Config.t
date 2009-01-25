@@ -127,14 +127,14 @@ foreach my $pain (@($first, < @virtual)) {
 	"which is the expected result for $pain");
 }
 
-# Check that config entries appear correctly in @INC
-# TestInit.pm has probably already messed with our @INC
+# Check that config entries appear correctly in $^INCLUDE_PATH
+# TestInit.pm has probably already messed with our $^INCLUDE_PATH
 # This little bit of evil is to avoid a @ in the program, in case it confuses
 # shell 1 liners. Perl 1 rules.
 my @($path, $ver, @< @orig_inc)
   =  split m/\n/,
     runperl (nolib=>1,
-	     prog=>'print qq{$^EXECUTABLE_NAME\n$^PERL_VERSION\n}; print qq{$_\n} while $_ = shift @INC');
+	     prog=>'print qq{$^EXECUTABLE_NAME\n$^PERL_VERSION\n}; print qq{$_\n} while $_ = shift $^INCLUDE_PATH');
 
 die "This perl is $^PERL_VERSION at $^EXECUTABLE_NAME; other perl is $ver (at $path) "
   . '- failed to find this perl' unless $^PERL_VERSION eq $ver;
@@ -143,18 +143,18 @@ my %orig_inc;
  %orig_inc{[ @orig_inc]} =@( @());
 
 my $failed;
-# This is the order that directories are pushed onto @INC in perl.c:
+# This is the order that directories are pushed onto $^INCLUDE_PATH in perl.c:
 foreach my $lib (qw(applibexp archlibexp privlibexp sitearchexp sitelibexp
 		     vendorarchexp vendorlibexp vendorlib_stem)) {
   my $dir = config_value($lib);
   SKIP: do {
-    skip "lib $lib not in \@INC on Win32" if $^OS_NAME eq 'MSWin32';
+    skip "lib $lib not in \$^INCLUDE_PATH on Win32" if $^OS_NAME eq 'MSWin32';
     skip "lib $lib not defined" unless defined $dir;
     skip "lib $lib not set" unless length $dir;
-    # So we expect to find it in @INC
+    # So we expect to find it in $^INCLUDE_PATH
 
-    ok (exists %orig_inc{$dir}, "Expect $lib '$dir' to be in \@INC")
+    ok (exists %orig_inc{$dir}, "Expect $lib '$dir' to be in \$^INCLUDE_PATH")
       or $failed++;
   };
 }
-_diag ('@INC is:', @orig_inc) if $failed;
+_diag ('$^INCLUDE_PATH is:', @orig_inc) if $failed;

@@ -25,8 +25,8 @@ OS
 	# And then remove all trace of ever having loaded Config.pm, so that
 	# it will reload with the revised $^EXECUTABLE_NAME
 	undef %Config::;
-	delete %INC{"Config.pm"};
-	delete %INC{"Config_heavy.pl"};
+	delete $^INCLUDED{"Config.pm"};
+	delete $^INCLUDED{"Config_heavy.pl"};
 	# You never saw us. We weren't here.
     }
 }

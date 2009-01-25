@@ -21,7 +21,7 @@ ok( chdir 'Problem-Module', "chdir'd to Problem-Module" ) ||
 
 
 # Make sure when Makefile.PL's break, they issue a warning.
-# Also make sure Makefile.PL's in subdirs still have '.' in @INC.
+# Also make sure Makefile.PL's in subdirs still have '.' in $^INCLUDE_PATH.
 do {
     my $stdout;
     close STDOUT;
@@ -31,7 +31,7 @@ do {
     local $^WARN_HOOK = sub { $warning = @_[0]->{?description} };
     try { $MM->eval_in_subdirs; };
 
-    is( $stdout, qq{\@INC has .\n}, 'cwd in @INC' );
+    is( $stdout, qq{\$^INCLUDE_PATH has .\n}, 'cwd in $^INCLUDE_PATH' );
     $stdout = '';
     like( $^EVAL_ERROR->{?description}, 
           qr{^ERROR from evaluation of .*subdir.*Makefile.PL: YYYAaaaakkk},

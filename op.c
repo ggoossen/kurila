@@ -4456,6 +4456,12 @@ Perl_ck_fun(pTHX_ OP *o)
 		{
 		    return too_many_arguments(o,PL_op_desc[type]);
 		}
+		if ((type == OP_PUSH || type == OP_UNSHIFT)
+		    && !kid->op_sibling && ckWARN(WARN_SYNTAX))
+		    Perl_warner(aTHX_ packWARN(WARN_SYNTAX),
+			"Useless use of %s with no values",
+			PL_op_desc[type]);
+
 		scalar(kid);
 #ifdef PERL_MAD
 		addmad(newMADsv('c', newSVpvn("$", 1)), &kid->op_madprop, 0);
@@ -4470,12 +4476,6 @@ Perl_ck_fun(pTHX_ OP *o)
 		    list(kid);
 		break;
 	    case OA_AVREF:
-		if ((type == OP_PUSH || type == OP_UNSHIFT)
-		    && !kid->op_sibling && ckWARN(WARN_SYNTAX))
-		    Perl_warner(aTHX_ packWARN(WARN_SYNTAX),
-			"Useless use of %s with no values",
-			PL_op_desc[type]);
-
 		*tokid = kid = mod(kid, type);
 #ifdef PERL_MAD
 		addmad(newMADsv('c', newSVpvn("@", 1)), &kid->op_madprop, 0);
@@ -4809,7 +4809,12 @@ Perl_ck_lfun(pTHX_ OP *o)
 
     o = ck_fun(o);
     if ((cBINOPo->op_flags & OPf_KIDS) && cBINOPo->op_first) {
-	o = op_mod_assign(o, &(cBINOPo->op_first), type);
+	OP** kidp;
+	if (cBINOPo->op_first->op_type == OP_PUSHMARK)
+	    kidp = &(cBINOPo->op_first->op_sibling);
+	else
+	    kidp = &(cBINOPo->op_first);
+	o = op_mod_assign(o, kidp, type);
     }
     return o;
 }
@@ -5249,7 +5254,7 @@ Perl_ck_shift(pTHX_ OP *o)
 	return newUNOP(type, 0, scalar(argop), argop->op_location);
 #endif
     }
-    return scalar(modkids(ck_fun(o), type));
+    return scalar(ck_lfun(o));
 }
 
 OP *

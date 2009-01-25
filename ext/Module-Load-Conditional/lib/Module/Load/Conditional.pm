@@ -58,8 +58,8 @@ Module::Load::Conditional - Looking up module information / loading at runtime
     print "LWP requires the following modules to be installed:\n";
     print join "\n", requires('LWP');
 
-    ### allow M::L::C to peek in your %INC rather than just
-    ### scanning @INC
+    ### allow M::L::C to peek in your $^INCLUDED rather than just
+    ### scanning $^INCLUDE_PATH
     $Module::Load::Conditional::CHECK_INC_HASH = 1;
 
     ### reset the 'can_load' cache
@@ -183,7 +183,7 @@ sub check_install {
         }
     }     
 
-    ### we didnt find the filename yet by looking in %INC,
+    ### we didnt find the filename yet by looking in $^INCLUDED,
     ### so scan the dirs
     unless( $filename ) {
 
@@ -192,7 +192,7 @@ sub check_install {
             my $fh;
     
             if ( ref $dir ) {
-                ### @INC hook -- we invoke it and get the filehandle back
+                ### $^INCLUDE_PATH hook -- we invoke it and get the filehandle back
                 ### this is actually documented behaviour as of 5.8 ;)
     
                 if (UNIVERSAL::isa($dir, 'CODE')) {
@@ -466,7 +466,7 @@ sub can_load {
                     $CACHE->{$mod}->{+usable} = 1;
                 }
 
-            ### module not found in @INC, store the result in
+            ### module not found in $^INCLUDE_PATH, store the result in
             ### $CACHE and return 0
             } else {
 
@@ -515,7 +515,7 @@ sub requires {
     }
 
     my $lib = join " ", map { qq["-I$_"] } $^INCLUDE_PATH;
-    my $cmd = qq[$^EXECUTABLE_NAME $lib -M$who -e"print(join(qq[\\n],keys(\%INC)))"];
+    my $cmd = qq[$^EXECUTABLE_NAME $lib -M$who -e"print(join(qq[\\n],keys(\$^INCLUDED)))"];
 
     return  sort grep { !m/^$who$/  }
  map  { chomp; s|/|::|g; $_ }
@@ -555,10 +555,10 @@ The default is 1;
 =head2 $Module::Load::Conditional::CHECK_INC_HASH
 
 This controls whether C<Module::Load::Conditional> checks your
-C<%INC> hash to see if a module is available. By default, only
-C<@INC> is scanned to see if a module is physically on your
-filesystem, or avialable via an C<@INC-hook>. Setting this variable
-to C<true> will trust any entries in C<%INC> and return them for
+C<$^INCLUDED> hash to see if a module is available. By default, only
+C<$^INCLUDE_PATH> is scanned to see if a module is physically on your
+filesystem, or avialable via an C<$^INCLUDE_PATH-hook>. Setting this variable
+to C<true> will trust any entries in C<$^INCLUDED> and return them for
 you.
 
 The default is 0;

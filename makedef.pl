@@ -9,7 +9,7 @@
 # reads global.sym, pp.sym, perlvars.h, intrpvar.h, config.h
 # On OS/2 reads miniperl.map and the previous version of perl5.def as well
 
-BEGIN { unshift @INC, "lib" }
+BEGIN { unshift $^INCLUDE_PATH, "lib" }
 use strict;
 
 our ($PLATFORM, $CCTYPE, $FILETYPE, $CONFIG_ARGS, $ARCHNAME, $PATCHLEVEL);

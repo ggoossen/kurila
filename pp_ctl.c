@@ -461,7 +461,7 @@ Perl_die_where(pTHX_ SV *msv)
 
 	    if (optype == OP_REQUIRE) {
 		SV * const nsv = cx->blk_eval.old_namesv;
-                (void)hv_store(GvHVn(PL_incgv), SvPVX_const(nsv), SvCUR(nsv),
+                (void)hv_store(PL_includedhv, SvPVX_const(nsv), SvCUR(nsv),
                                &PL_sv_undef, 0);
 		die_where(ERRSV);
 	    }
@@ -1539,7 +1539,7 @@ S_doeval(pTHX_ int gimme, OP** startop, CV* outside, U32 seq)
 	msg = SvPVx_nolen_const(ERRSV);
 	if (optype == OP_REQUIRE) {
 	    SV * const nsv = cx->blk_eval.old_namesv;
-	    (void)hv_store(GvHVn(PL_incgv), SvPVX_const(nsv), SvCUR(nsv),
+	    (void)hv_store(PL_includedhv, SvPVX_const(nsv), SvCUR(nsv),
                           &PL_sv_undef, 0);
 	    Perl_croak(aTHX_ "%sCompilation failed in require",
 		       *msg ? msg : "Unknown error\n");
@@ -1720,7 +1720,7 @@ PP(pp_require)
 	unixlen = len;
     }
     if (PL_op->op_type == OP_REQUIRE) {
-	SV * const * const svp = hv_fetch(GvHVn(PL_incgv),
+	SV * const * const svp = hv_fetch(PL_includedhv,
 					  unixname, unixlen, 0);
 	if ( svp ) {
 	    if (SvTRUE(*svp))
@@ -1751,10 +1751,10 @@ PP(pp_require)
     }
 #endif
     if (!tryrsfp) {
-	AV * const ar = GvAVn(PL_incgv);
+	AV * const ar = PL_includepathav;
 	I32 i;
 	if (!SvAVOK(ar)) 
-	    Perl_croak(aTHX_ "@INC must be an array not a %s", Ddesc((SV*)ar));
+	    Perl_croak(aTHX_ "$^INCLUDE_PATH must be an array not a %s", Ddesc((SV*)ar));
 #ifdef VMS
 	if (vms_unixname)
 #endif
@@ -1793,8 +1793,8 @@ PP(pp_require)
 			count = call_sv(loader, G_ARRAY);
 		    SPAGAIN;
 
-		    /* Adjust file name if the hook has set an %INC entry */
-		    svp = hv_fetch(GvHVn(PL_incgv), name, len, 0);
+		    /* Adjust file name if the hook has set an $^INCLUDED entry */
+		    svp = hv_fetch(PL_includedhv, name, len, 0);
 		    if (svp)
 			tryname = SvPVX_const(*svp);
 
@@ -1945,11 +1945,11 @@ PP(pp_require)
 					       Strerror(errno)));
 		msgstr = SvPV_nolen_const(msg);
 	    } else {
-	        if (namesv) {			/* did we lookup @INC? */
-		    AV * const ar = GvAVn(PL_incgv);
+	        if (namesv) {			/* did we lookup $^INCLUDE_PATH? */
+		    AV * const ar = PL_includepathav;
 		    I32 i;
 		    SV * const msg = sv_2mortal(Perl_newSVpvf(aTHX_ 
-			"%s in @INC (@INC contains:", msgstr));
+			"%s in $^INCLUDE_PATH ($^INCLUDE_PATH contains:", msgstr));
 		    
 		    for (i = 0; i <= AvFILL(ar); i++) {
 			sv_catpvs(msg, " ");
@@ -1969,14 +1969,14 @@ PP(pp_require)
 
     /* Assume success here to prevent recursive requirement. */
     /* name is never assigned to again, so len is still strlen(name)  */
-    /* Check whether a hook in @INC has already filled %INC */
+    /* Check whether a hook in $^INCLUDE_PATH has already filled $^INCLUDED */
     if (!hook_sv) {
-	(void)hv_store(GvHVn(PL_incgv),
+	(void)hv_store(PL_includedhv,
 	    unixname, unixlen, &PL_sv_no, 0);
     } else {
-	SV** const svp = hv_fetch(GvHVn(PL_incgv), unixname, unixlen, 0);
+	SV** const svp = hv_fetch(PL_includedhv, unixname, unixlen, 0);
 	if (!svp)
-	    (void)hv_store(GvHVn(PL_incgv),
+	    (void)hv_store(PL_includedhv,
 			   unixname, unixlen, &PL_sv_no, 0 );
     }
 
@@ -2020,12 +2020,12 @@ PP(pp_require)
 
     /* mark require as finished */
     if (!hook_sv) {
-	(void)hv_store(GvHVn(PL_incgv),
+	(void)hv_store(PL_includedhv,
 	    unixname, unixlen, newSVsv(filename), 0);
     } else {
-	SV** const svp = hv_fetch(GvHVn(PL_incgv), unixname, unixlen, 0);
+	SV** const svp = hv_fetch(PL_includedhv, unixname, unixlen, 0);
 	if ( ! ( svp && SvTRUE(*svp) ) )
-	    (void)hv_store(GvHVn(PL_incgv),
+	    (void)hv_store(PL_includedhv,
 		unixname, unixlen, SvREFCNT_inc(hook_sv), 0 );
     }
     SvREFCNT_dec(filename);

@@ -96,7 +96,7 @@ close FAKEMOD;
 my $fake_mod_dir = File::Spec->catdir(cwd(), 'auto', 'FakeMod');
 
 # Do the same thing as the last block, but with overrides for
-# %Config and @INC.
+# %Config and $^INCLUDE_PATH.
 do {
     my $config_override = \%:<
       map { $_ => Config::config_value($_) }

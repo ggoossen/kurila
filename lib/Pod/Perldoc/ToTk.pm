@@ -51,7 +51,7 @@ sub parse_from_file {
     # 'Scrolled' will find doc in 'Tk/Scrolled'
     
     if( $tk_opt ) {
-      push @INC, grep -d $_, map catfile($_,'Tk'), @INC;
+      push $^INCLUDE_PATH, grep -d $_, map catfile($_,'Tk'), $^INCLUDE_PATH;
     }
     
     my $mw = MainWindow->new();

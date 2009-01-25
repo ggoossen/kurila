@@ -67,7 +67,7 @@ do_require "1)\n";
 print "# $^EVAL_ERROR\nnot " unless $^EVAL_ERROR->message =~ m/(syntax|parse) error/mi;
 print "ok ",$i++,"\n";
 
-# previous failure cached in %INC
+# previous failure cached in $^INCLUDED
 print "not " unless exists $^INCLUDED{'bleah.pm'};
 print "ok ",$i++,"\n";
 write_file($flag_file, 1);
@@ -100,7 +100,7 @@ print $x;
 my $r = "threads";
 try { require $r };
 $i++;
-if($^EVAL_ERROR->message =~ m/Can't locate threads in \@INC/) {
+if($^EVAL_ERROR->message =~ m/Can't locate threads in \$^INCLUDE_PATH/) {
     print "ok $i\n";
 } else {
     print "not ok $i\n";

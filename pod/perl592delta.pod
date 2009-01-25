@@ -250,12 +250,12 @@ optimization.
 
 =head1 Installation and Configuration Improvements
 
-Run-time customization of @INC can be enabled by passing the
+Run-time customization of $^INCLUDE_PATH can be enabled by passing the
 C<-Dusesitecustomize> flag to configure. When enabled, this will make perl
 run F<$sitelibexp/sitecustomize.pl> before anything else.  This script can
-then be set up to add additional entries to @INC.
+then be set up to add additional entries to $^INCLUDE_PATH.
 
-There is alpha support for relocatable @INC entries.
+There is alpha support for relocatable $^INCLUDE_PATH entries.
 
 Perl should build on Interix and on GNU/kFreeBSD.
 

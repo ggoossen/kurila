@@ -52,7 +52,7 @@ sub import
      # call Win32::GetCwd(), which will get the Win32 module loaded.
      # That means that it would not be possible to run `make test`
      # for the Win32 module because blib.pm would always load the
-     # installed version before @INC gets updated with the blib path.
+     # installed version before $^INCLUDE_PATH gets updated with the blib path.
      chomp($dir = `cd`);
  }
  else {

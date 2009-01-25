@@ -899,6 +899,14 @@ Perl_magic_get(pTHX_ const char* name, SV* sv)
 	    break;
 
 	case 'I':
+	    if (strEQ(remaining, "INCLUDE_PATH")) {
+		sv_setsv(sv, AvSv(PL_includepathav));
+		break;
+	    }
+	    if (strEQ(remaining, "INCLUDED")) {
+		sv_setsv(sv, HvSv(PL_includedhv));
+		break;
+	    }
 	    if (strEQ(remaining, "INPLACE_EDIT")) {
 		sv_setpv(sv, PL_inplace); /* Will undefine sv if PL_inplace is NULL */
 		break;
@@ -1446,6 +1454,10 @@ Perl_is_magicsv(pTHX_ const char* name)
 	    break;
 
 	case 'I':
+	    if (strEQ(name2, "INCLUDE_PATH"))
+		return 1;
+	    if (strEQ(name2, "INCLUDED"))
+		return 1;
 	    if (strEQ(name2, "INPLACE_EDIT"))
 		return 1;
 	    /* $^INPUT_RECORD_SEPARATOR */
@@ -1779,6 +1791,30 @@ Perl_magic_set(pTHX_ const char* name, SV *sv)
 	    break;
 
 	case 'I':
+	    if (strEQ(remaining, "INCLUDE_PATH")) {
+		if ( ! SvOK(sv) ) {
+		    av_clear(PL_includepathav);
+		    break;
+		}
+		if ( ! SvAVOK(sv) ) {
+		    Perl_croak(aTHX_ "%s must be an ARRAY not a %s", name, Ddesc(sv));
+		}
+		sv_setsv(AvSv(PL_includepathav), sv);
+		break;
+	    }
+	    
+	    if (strEQ(remaining, "INCLUDED")) {
+		if ( ! SvOK(sv) ) {
+		    hv_clear(PL_includedhv);
+		    break;
+		}
+		if ( ! SvHVOK(sv) ) {
+		    Perl_croak(aTHX_ "%s must be a HASH not a %s", name, Ddesc(sv));
+		}
+		sv_setsv(HvSv(PL_includedhv), sv);
+		break;
+	    }
+
 	    if (strEQ(remaining, "INPLACE_EDIT")) {
 		Safefree(PL_inplace);
 		PL_inplace = SvOK(sv) ? savesvpv(sv) : NULL;

@@ -12,7 +12,7 @@ BEGIN {
 use Pod::Simple::Search;
 use Test::More tests => 6;
 
-print "#  Test the scanning of the whole of \@INC ...\n";
+print "#  Test the scanning of the whole of \$^INCLUDE_PATH ...\n";
 
 my $x = Pod::Simple::Search->new;
 die "Couldn't make an object!?" unless ok defined $x;
@@ -30,7 +30,7 @@ $x->callback(sub {
   return;
 });
 
-print "# \@INC == $(join ' ',$^INCLUDE_PATH)\n";
+print "# \$^INCLUDE_PATH == $(join ' ',$^INCLUDE_PATH)\n";
 
 my $t = time();   my $name2where = $x->survey();
 $t = time() - $t;

@@ -69,7 +69,7 @@ already be overwhelming.
    7 size   7 yearday    7 is_require   $$    process ID
    8 atime  8 is_dst     8 hints        $.    line number
    9 mtime               9 bitmask      @ARGV command line args
-  10 ctime  just use                    @INC  include paths
+  10 ctime  just use                    $^INCLUDE_PATH  include paths
   11 blksz  POSIX::      3..9 only      @_    subroutine args
   12 blcks  strftime!    with EXPR      %ENV  environment
 

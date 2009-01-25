@@ -76,7 +76,7 @@ Only text files containing at least one valid POD command are found.
 
 A warning is printed if more than one POD file with the same POD name
 is found, e.g. F<CPAN.pm> in different directories. This usually
-indicates duplicate occurrences of modules in the I<@INC> search path.
+indicates duplicate occurrences of modules in the I<$^INCLUDE_PATH> search path.
 
 B<OPTIONS> The first argument for B<pod_find> may be a hash reference
 with options. The rest are either directories that are searched
@@ -103,9 +103,9 @@ B<scriptdir>. This is taken from the local L<Config|Config> module.
 
 =item C<inc =E<gt> 1>
 
-Search for PODs in the current Perl interpreter's I<@INC> paths. This
+Search for PODs in the current Perl interpreter's I<$^INCLUDE_PATH> paths. This
 automatically considers paths specified in the C<PERL5LIB> environment
-as this is prepended to I<@INC> by the Perl interpreter itself.
+as this is prepended to I<$^INCLUDE_PATH> by the Perl interpreter itself.
 
 =back
 
@@ -323,13 +323,13 @@ Options:
 
 =item C<inc =E<gt> 1>
 
-Search @INC for the pod and also the C<scriptdir> defined in the
+Search $^INCLUDE_PATH for the pod and also the C<scriptdir> defined in the
 L<Config|Config> module.
 
 =item C<dirs =E<gt> [ $dir1, $dir2, ... ]>
 
 Reference to an array of search directories. These are searched in order
-before looking in C<@INC> (if B<-inc>). Current directory is used if
+before looking in C<$^INCLUDE_PATH> (if B<-inc>). Current directory is used if
 none are specified.
 
 =item C<verbose =E<gt> 1>
@@ -390,7 +390,7 @@ sub pod_where {
 
     require Config;
 
-    # Add @INC
+    # Add $^INCLUDE_PATH
     if ($^OS_NAME eq 'MacOS' && %options{?'inc'}) {
         # tolerate '.', './some_dir' and '(../)+some_dir' on Mac OS
         my @new_INC = $^INCLUDE_PATH;

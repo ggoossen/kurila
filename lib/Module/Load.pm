@@ -55,7 +55,7 @@ sub _to_file{
     $file   .= '.pm' if $pm;
     
     ### on perl's before 5.10 (5.9.5@31746) if you require
-    ### a file in VMS format, it's stored in %INC in VMS
+    ### a file in VMS format, it's stored in $^INCLUDED in VMS
     ### format. Therefor, better unixify it first
     ### Patch in reply to John Malmbergs patch (as mentioned
     ### above) on p5p Tue 21 Aug 2007 04:55:07
@@ -139,8 +139,8 @@ If the argument matches only C<[\w:']>, it must be a module
 =item *
 
 If the argument matches only C<\w>, it could either be a module or a
-file. We will try to find C<file> first in C<@INC> and if that fails,
-we will try to find C<file.pm> in @INC.
+file. We will try to find C<file> first in C<$^INCLUDE_PATH> and if that fails,
+we will try to find C<file.pm> in $^INCLUDE_PATH.
 If both fail, we die with the respective error messages.
 
 =back
@@ -150,7 +150,7 @@ If both fail, we die with the respective error messages.
 Because of a bug in perl (#19213), at least in version 5.6.1, we have
 to hardcode the path separator for a require on Win32 to be C</>, like
 on Unix rather than the Win32 C<\>. Otherwise perl will not read its
-own %INC accurately double load files if they are required again, or
+own $^INCLUDED accurately double load files if they are required again, or
 in the worst case, core dump.
 
 C<Module::Load> cannot do implicit imports, only explicit imports.

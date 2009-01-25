@@ -143,7 +143,7 @@ use warnings ();
 # Current test.deparse failures
 # comp/hints 6 - location of BEGIN blocks wrt. block openings
 # run/switchI 1 - missing -I switches entirely
-#    perl -Ifoo -e 'print @INC'
+#    perl -Ifoo -e 'print $^INCLUDE_PATH'
 # op/caller 2 - warning mask propagates backwards before warnings::register
 #    'use warnings; BEGIN {$^WARNING_BITS eq "U"x12;} use warnings::register'
 # op/getpid 2 - can't assign to shared my() declaration (threads only)

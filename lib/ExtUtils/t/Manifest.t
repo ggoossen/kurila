@@ -3,10 +3,10 @@
 BEGIN {
     if( env::var('PERL_CORE') ) {
         chdir 't' if -d 't';
-        unshift @INC, '../lib';
+        unshift $^INCLUDE_PATH, '../lib';
     }
     else {
-        unshift @INC, 't/lib';
+        unshift $^INCLUDE_PATH, 't/lib';
     }
 }
 chdir 't';
@@ -23,8 +23,8 @@ use Config;
 my $Is_VMS = $^OS_NAME eq 'VMS';
 
 # We're going to be chdir'ing and modules are sometimes loaded on the
-# fly in this test, so we need an absolute @INC.
-@INC = map { File::Spec->rel2abs($_) } @INC;
+# fly in this test, so we need an absolute $^INCLUDE_PATH.
+$^INCLUDE_PATH = map { File::Spec->rel2abs($_) } $^INCLUDE_PATH;
 
 # keep track of everything added so it can all be deleted
 my %Files;

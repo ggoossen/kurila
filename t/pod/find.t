@@ -7,7 +7,7 @@ BEGIN {
     # when running under all-utf8 settings (pod/find.t)
     # does not directly require lib/utf8.pm but regular
     # expressions will need that.
-    @INC = qw(../lib ../../../../../lib);
+    $^INCLUDE_PATH = qw(../lib ../../../../../lib);
   }
 }
 

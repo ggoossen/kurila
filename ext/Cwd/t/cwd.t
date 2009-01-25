@@ -39,7 +39,7 @@ do {
   is(nelems($before), nelems($after), "cwd() shouldn't create spurious entries in \%ENV");
 };
 
-# XXX force Cwd to bootsrap its XSUBs since we have set @INC = "../lib"
+# XXX force Cwd to bootsrap its XSUBs since we have set $^INCLUDE_PATH = "../lib"
 # XXX and subsequent chdir()s can make them impossible to find
 try { fastcwd };
 

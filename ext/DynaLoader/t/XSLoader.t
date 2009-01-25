@@ -37,7 +37,7 @@ like( $^EVAL_ERROR->{?description}, q|/^XSLoader::load\('Your::Module', \$Your::
         "calling XSLoader::load() with no argument" );
 
 eval q{ package Thwack; XSLoader::load('Thwack'); };
-like( $^EVAL_ERROR->message, q{/^Can't locate loadable object for module Thwack in @INC/},
+like( $^EVAL_ERROR->message, q{/^Can't locate loadable object for module Thwack in \$\^INCLUDE_PATH/},
         "calling XSLoader::load() under a package with no XS part" );
 
 # Now try to load well known XS modules

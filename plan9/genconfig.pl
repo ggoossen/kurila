@@ -24,7 +24,7 @@ $installsitelib="$installprivlib/site_perl";
 $installsitearch="$installarchlib/site_perl";
 $installscript="/bin";
 
-unshift(@INC,'lib');  # In case someone didn't define Perl_Root
+unshift($^INCLUDE_PATH,'lib');  # In case someone didn't define Perl_Root
                       # before the build
 
 if ($ARGV[0] eq '-f') {

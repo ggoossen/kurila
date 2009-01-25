@@ -3,10 +3,10 @@
 BEGIN {
     if( env::var('PERL_CORE') ) {
         chdir 't';
-        @INC = @('../lib', 'lib/');
+        $^INCLUDE_PATH = @('../lib', 'lib/');
     }
     else {
-        unshift @INC, 't/lib/';
+        unshift $^INCLUDE_PATH, 't/lib/';
     }
 }
 chdir 't';
@@ -15,9 +15,9 @@ use File::Spec;
 
 use Test::More tests => 3;
 
-# Having the CWD in @INC masked a bug in finding hint files
+# Having the CWD in $^INCLUDE_PATH masked a bug in finding hint files
 my $curdir = File::Spec->curdir;
-@INC = grep { $_ ne $curdir && $_ ne '.' } @INC;
+$^INCLUDE_PATH = grep { $_ ne $curdir && $_ ne '.' } $^INCLUDE_PATH;
 
 mkdir('hints', 0777);
 (my $os = $^OS_NAME) =~ s/\./_/g;

@@ -932,7 +932,7 @@ sub preamble {
 
 BEGIN \{
     chdir q(t);
-    \@INC = qw(../lib ../ext/B/t);
+    \$^INCLUDE_PATH = qw(../lib ../ext/B/t);
     require q(./test.pl);
 \}
 use OptreeCheck;

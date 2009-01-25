@@ -722,9 +722,9 @@ together set-attribute calls like this:
 =item $search->inc( I<true-or-false> );
 
 This attribute, if set to a true value, means that searches should
-implicitly add perl's I<@INC> paths. This
+implicitly add perl's I<$^INCLUDE_PATH> paths. This
 automatically considers paths specified in the C<PERL5LIB> environment
-as this is prepended to I<@INC> by the Perl interpreter itself.
+as this is prepended to I<$^INCLUDE_PATH> by the Perl interpreter itself.
 This attribute's default value is B<TRUE>.  If you want to search
 only specific directories, set $self->inc(0) before calling
 $inc->survey or $inc->find.
@@ -867,7 +867,7 @@ in particular ways.
 The method C<survey> searches for POD documents in a given set of
 files and/or directories.  This runs the search according to the various
 options set by the accessors above.  (For example, if the C<inc> attribute
-is on, as it is by default, then the perl @INC directories are implicitly
+is on, as it is by default, then the perl $^INCLUDE_PATH directories are implicitly
 added to the list of directories (if any) that you specify.)
 
 The return value of C<survey> is two hashes:
@@ -907,7 +907,7 @@ Only text files containing at least one valid POD command are found.
 In verbose mode, a warning is printed if shadows are found (i.e., more
 than one POD file with the same POD name is found, e.g. F<CPAN.pm> in
 different directories).  This usually indicates duplicate occurrences of
-modules in the I<@INC> search path, which is occasionally inadvertent
+modules in the I<$^INCLUDE_PATH> search path, which is occasionally inadvertent
 (but is often simply a case of a user's path dir having a more recent
 version than the system's general path dirs in general.)
 
@@ -942,7 +942,7 @@ Returns the location of a Pod file, given a Pod/module/script name
 what files/directories to look in.
 It searches according to the various options set by the accessors above.
 (For example, if the C<inc> attribute is on, as it is by default, then
-the perl @INC directories are implicitly added to the list of
+the perl $^INCLUDE_PATH directories are implicitly added to the list of
 directories (if any) that you specify.)
 
 This returns the full path of the first occurrence to the file.
@@ -959,11 +959,11 @@ then it is searched.  (That's how we manage to find F<perlfunc>,
 for example, which is usually in F<pod/perlfunc> in most Perl dists.)
 
 The C<verbose> and C<inc> attributes influence the behavior of this
-search; notably, C<inc>, if true, adds @INC I<and also
+search; notably, C<inc>, if true, adds $^INCLUDE_PATH I<and also
 Config::config_value('scriptdir')> to the list of directories to search.
 
 It is common to simply say C<< $filename = Pod::Simple::Search-> new 
-->find("perlvar") >> so that just the @INC (well, and scriptdir)
+->find("perlvar") >> so that just the $^INCLUDE_PATH (well, and scriptdir)
 directories are searched.  (This happens because the C<inc>
 attribute is true by default.)
 

@@ -14,7 +14,7 @@ do {
     try { load $mod };
 
     is( $^EVAL_ERROR, '', qq[Loading module '$mod'] );
-    ok( defined($^INCLUDED{?$file}), q[... found in %INC] );
+    ok( defined($^INCLUDED{?$file}), q[... found in $^INCLUDED] );
 };
 
 do {
@@ -24,7 +24,7 @@ do {
     try { load $mod };
 
     is( $^EVAL_ERROR, '', qq[Loading File '$mod'] );
-    ok( defined($^INCLUDED{?$file}), q[... found in %INC] );
+    ok( defined($^INCLUDED{?$file}), q[... found in $^INCLUDED] );
 };
 
 do {
@@ -34,7 +34,7 @@ do {
     try { load $mod };
 
     is( $^EVAL_ERROR, '', qq[Loading Ambigious Module '$mod'] );
-    ok( defined($^INCLUDED{?$file}), q[... found in %INC] );
+    ok( defined($^INCLUDED{?$file}), q[... found in $^INCLUDED] );
 };
 
 do {
@@ -44,7 +44,7 @@ do {
     try { load $mod };
 
     is( $^EVAL_ERROR && $^EVAL_ERROR->message, '', qq[Loading Ambigious File '$mod'] );
-    ok( defined($^INCLUDED{?$file}), q[... found in %INC] );
+    ok( defined($^INCLUDED{?$file}), q[... found in $^INCLUDED] );
 };
 
 ### Test importing functions ###

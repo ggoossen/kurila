@@ -61,7 +61,7 @@ my $w32dir = Win32::GetCwd();
 my $subdir = cwd();
 
 # change back to home directory to make sure relative paths
-# in @INC continue to work
+# in $^INCLUDE_PATH continue to work
 ok(chdir($home));
 ok(Win32::GetCwd(), $home);
 

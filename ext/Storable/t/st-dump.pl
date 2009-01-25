@@ -8,7 +8,7 @@
 # NOTE THAT THIS FILE IS COPIED FROM ext/Storable/t/st-dump.pl
 # TO t/lib/st-dump.pl.  One could also play games with
 # File::Spec->updir and catdir to get the st-dump.pl in
-# ext/Storable into @INC.
+# ext/Storable into $^INCLUDE_PATH.
 
 sub ok {
 	my @($num, $ok, ?$name) =  @_;

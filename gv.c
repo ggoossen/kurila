@@ -758,10 +758,6 @@ Perl_gv_fetchpvn_flags(pTHX_ const char *nambeg, STRLEN full_len, I32 flags,
 		if (*name == '_')
 		    global = TRUE;
 		break;
-	    case 3:
-		if (name[0] == 'I' && name[1] == 'N' && name[2] == 'C')
-		    global = TRUE;
-		break;
 	    case 4:
 		if (name[0] == 'A' && name[1] == 'R' && name[2] == 'G'
 		    && name[3] == 'V')

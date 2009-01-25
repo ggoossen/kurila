@@ -136,22 +136,22 @@ else {
 $tests_total++;
 
 
-print "## Checking roots of the Perl library directory tree via variable `\@INC'.\n" if $opt{'p'};
+print "## Checking roots of the Perl library directory tree via variable `\$^INCLUDE_PATH'.\n" if $opt{'p'};
 
 my $INC_total = 0;
 my $INC_there = 0;
-foreach (@INC) {
+foreach ($^INCLUDE_PATH) {
     next if $_ eq '.'; # skip -d test here
     if ($^O eq 'MacOS') {
         next if $_ eq ':'; # skip -d test here
-        next if $_ eq 'Dev:Pseudo:'; # why is this in @INC?
+        next if $_ eq 'Dev:Pseudo:'; # why is this in $^INCLUDE_PATH?
     }
     if (-d $_) {
-        print "## Perl \@INC directory `$_' exists.\n" if $opt{'v'};
+        print "## Perl \$^INCLUDE_PATH directory `$_' exists.\n" if $opt{'v'};
         $INC_there++;
     }
     else {
-        print "# Perl \@INC directory `$_' does not appear to exist.\n";
+        print "# Perl \$^INCLUDE_PATH directory `$_' does not appear to exist.\n";
     }
     $INC_total++;
 }
@@ -447,7 +447,7 @@ Correct by conducting a proper installation.
 Likely to occur for a perl that was not properly installed.
 Correct by conducting a proper installation.
 
-=item * print "# Perl \@INC directory `$_' does not appear to exist.\n";
+=item * print "# Perl \$^INCLUDE_PATH directory `$_' does not appear to exist.\n";
 
 Likely to occur for a perl library tree that was not properly installed.
 Correct by conducting a proper installation.

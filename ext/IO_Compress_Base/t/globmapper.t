@@ -1,7 +1,7 @@
 BEGIN {
     if (env::var('PERL_CORE')) {
 	chdir 't' if -d 't';
-	@INC = @("../lib", "lib/compress");
+	$^INCLUDE_PATH = @("../lib", "lib/compress");
     }
 }
 

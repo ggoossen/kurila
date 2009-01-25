@@ -583,7 +583,7 @@ up to 5 show increasingly more diagnostics output.
 If $dry_run is true it will only print what it was going to do
 without actually doing it.  Default is false.
 
-If $uninstall_shadows is true any differing versions throughout @INC
+If $uninstall_shadows is true any differing versions throughout $^INCLUDE_PATH
 will be uninstalled.  This is "make install UNINST=1"
 
 As of 1.37_02 install() supports the use of a list of patterns to filter out 
@@ -627,7 +627,7 @@ the install. Currently these keys and their structure are:
     uninstall_fail      => { $uninstalled => $source },
         
 where C<$source> is the filespec of the file being installed. C<$target> is where
-it is being installed to, and C<$uninstalled> is any shadow file that is in C<@INC>
+it is being installed to, and C<$uninstalled> is any shadow file that is in C<$^INCLUDE_PATH>
 or C<$ENV{PERL5LIB}> or other standard locations, and C<$pattern> is the pattern that
 caused a source file to be skipped. In future more keys will be added, such as to
 show created directories, however this requires changes in other modules and must 

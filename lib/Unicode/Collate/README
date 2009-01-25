@@ -28,7 +28,7 @@ Perl 5.8.1 or later is recommended.
 Though this module can be used without any C<table> file,
 to use this module easily, it is recommended to install a table file
 in the UCA format, by copying it under the directory
-<a place in @INC>/Unicode/Collate.
+<a place in $^INCLUDE_PATH>/Unicode/Collate.
 
 You can install such a table file by adding it
 to "Collate" directory (where "keys.txt" is placed) in this distribution
@@ -43,7 +43,7 @@ The most preferable one is "The Default Unicode Collation Element Table"
 
 If DUCET is not installed, it is recommended to copy the file
 from http://www.unicode.org/Public/UCA/latest/allkeys.txt
-to <a place in @INC>/Unicode/Collate/allkeys.txt
+to <a place in $^INCLUDE_PATH>/Unicode/Collate/allkeys.txt
 manually.
 
 Though this distribution contains a subset of allkeys.txt, named "keys.txt",

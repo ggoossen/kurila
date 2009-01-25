@@ -256,7 +256,7 @@ boot_DynaLoader('DynaLoader') if defined(&boot_DynaLoader) &&
                                 !defined(&dl_error);
 
 if ($dl_debug) {
-    print STDERR "DynaLoader.pm loaded (@INC, @dl_library_path)\n";
+    print STDERR "DynaLoader.pm loaded ($^INCLUDE_PATH, @dl_library_path)\n";
     print STDERR "DynaLoader not linked into this perl\n"
 	    unless defined(&boot_DynaLoader);
 }
@@ -320,7 +320,7 @@ sub bootstrap {
 		       <<|$^O-eq-MacOS>>"(auto/$modpname/$modfname.$dl_dlext)\n"<</$^O-eq-MacOS>>
 	if $dl_debug;
 
-    foreach (@INC) {
+    foreach ($^INCLUDE_PATH) {
 	<<$^O-eq-VMS>>chop($_ = VMS::Filespec::unixpath($_));<</$^O-eq-VMS>>
 	<<$^O-eq-MacOS>>
 	    my $path = $_;
@@ -345,9 +345,9 @@ sub bootstrap {
 	push @dirs, $dir;
     }
     # last resort, let dl_findfile have a go in all known locations
-    @(?$file) = dl_findfile(< map("-L$_",@(<@dirs,<@INC)), $modfname) unless $file;
+    @(?$file) = dl_findfile(< map("-L$_",@(<@dirs,<$^INCLUDE_PATH)), $modfname) unless $file;
 
-    die("Can't locate loadable object for module $module in \@INC (\@INC contains: $(join ' ', @INC))")
+    die("Can't locate loadable object for module $module in \$^INCLUDE_PATH (\$^INCLUDE_PATH contains: $(join ' ', $^INCLUDE_PATH))")
 	unless $file;	# wording similar to error from 'require'
 
     <<$^O-eq-VMS>>$file = uc($file) if config_value("d_vms_case_sensitive_symbols");<</$^O-eq-VMS>>
@@ -937,7 +937,7 @@ It performs the following actions:
 
 =item *
 
-locates an auto/$module directory by searching @INC
+locates an auto/$module directory by searching $^INCLUDE_PATH
 
 =item *
 

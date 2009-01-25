@@ -18,7 +18,7 @@ Revision history for Perl module Unicode::Collate.
     - Added META.yml.
 
 0.40  Sat Apr 24 06:54:40 2004
-    - Now a table file is searched in @INC.
+    - Now a table file is searched in $^INCLUDE_PATH.
 
 0.33  Sat Dec 13 14:07:27 2003
     - documentation improvement: in "entry", "overrideHangul", etc.

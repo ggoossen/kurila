@@ -1,6 +1,6 @@
 require Test::Simple;
 
-push @INC, 't/lib';
+push $^INCLUDE_PATH, 't/lib';
 require Test::Simple::Catch;
 my @($out, $err) = Test::Simple::Catch::caught();
 

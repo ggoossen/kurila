@@ -79,7 +79,7 @@ following directories:
 
 =item 4
 
-You can examine the @INC variable from within a perl program
+You can examine the $^INCLUDE_PATH variable from within a perl program
 to see the order in which Perl searches these directories.
 
 =back

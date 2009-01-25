@@ -294,7 +294,7 @@ sub read_table {
     }
     if (!defined $f) {
 	$f = File::Spec->catfile(< @Path, $self->{table});
-	die("$PACKAGE: Can't locate $f in \@INC (\@INC contains: $(join ' ',$^INCLUDE_PATH))");
+	die("$PACKAGE: Can't locate $f in \$^INCLUDE_PATH (\@INC contains: $(join ' ',$^INCLUDE_PATH))");
     }
 
     while (my $line = ~< $fh) {
@@ -1455,8 +1455,8 @@ but it is not warned at present.>
 You can use another collation element table if desired.
 
 The table file should locate in the F<Unicode/Collate> directory
-on C<@INC>. Say, if the filename is F<Foo.txt>,
-the table file is searched as F<Unicode/Collate/Foo.txt> in C<@INC>.
+on C<$^INCLUDE_PATH>. Say, if the filename is F<Foo.txt>,
+the table file is searched as F<Unicode/Collate/Foo.txt> in C<$^INCLUDE_PATH>.
 
 By default, F<allkeys.txt> (as the filename of DUCET) is used.
 If you will prepare your own table file, any name other than F<allkeys.txt>
@@ -1785,7 +1785,7 @@ No method will be exported.
 Though this module can be used without any C<table> file,
 to use this module easily, it is recommended to install a table file
 in the UCA format, by copying it under the directory
-<a place in @INC>/Unicode/Collate.
+<a place in $^INCLUDE_PATH>/Unicode/Collate.
 
 The most preferable one is "The Default Unicode Collation Element Table"
 (aka DUCET), available from the Unicode Consortium's website:
@@ -1796,7 +1796,7 @@ The most preferable one is "The Default Unicode Collation Element Table"
 
 If DUCET is not installed, it is recommended to copy the file
 from http://www.unicode.org/Public/UCA/latest/allkeys.txt
-to <a place in @INC>/Unicode/Collate/allkeys.txt
+to <a place in $^INCLUDE_PATH>/Unicode/Collate/allkeys.txt
 manually.
 
 =head1 CAVEATS

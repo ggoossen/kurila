@@ -1672,7 +1672,7 @@ Usage: $me [-dehrsEKOSV] [-f config.sh] [-D symbol] [-D symbol=value]
          -Duse64bitint            use 64bit integers
          -Duse64bitall            use 64bit integers and pointers
          -Dusethreads             use thread support
-         -Dinc_version_list=none  do not include older perl trees in @INC
+         -Dinc_version_list=none  do not include older perl trees in $^INCLUDE_PATH
          -DEBUGGING=none          DEBUGGING options
          -Dcc=gcc                 choose your compiler
          -Dprefix=/opt/perl5      choose your destination
@@ -6098,13 +6098,13 @@ esac
 cat <<EOM
 
 Would you like to build Perl so that the installation is relocatable, so that
-library paths in @INC are determined relative to the path of the perl binary?
+library paths in $^INCLUDE_PATH are determined relative to the path of the perl binary?
 This is not advised for system Perl installs, or if you need to run setid
 scripts or scripts under taint mode.
 
 If this doesn't make any sense to you, just accept the default '$dflt'.
 EOM
-rp='Use relocatable @INC?'
+rp='Use relocatable $^INCLUDE_PATH?'
 . ./myread
 case "$ans" in
 y|Y)	val="$define" ;;
@@ -6386,7 +6386,7 @@ prefixvar=sitelib
 . ./setprefixvar
 sitelib_stem=`echo "$sitelibexp" | sed "s,/$version$,,"`
 
-: Determine list of previous versions to include in @INC
+: Determine list of previous versions to include in $^INCLUDE_PATH
 $cat > getverlist <<EOPL
 #!$perl5 -w
 use File::Basename;
@@ -6471,7 +6471,7 @@ The default should almost always be sensible, so if you're not sure,
 just accept the default.
 EOM
 
-rp='List of earlier versions to include in @INC?'
+rp='List of earlier versions to include in $^INCLUDE_PATH?'
 . ./myread
 case "$ans" in
 [Nn]one|''|' '|$undef) inc_version_list=' ' ;;
@@ -6934,7 +6934,7 @@ case "$otherlibdirs" in
 *)	dflt="$otherlibdirs" ;;
 esac
 $cat <<EOM
-Enter a colon-separated set of extra paths to include in perl's @INC
+Enter a colon-separated set of extra paths to include in perl's $^INCLUDE_PATH
 search path, or enter 'none' for no extra paths.
 
 EOM
@@ -8725,7 +8725,7 @@ versiononly="$define"
 : figure out how to guarantee perl startup
 : XXX Note that this currently takes advantage of the bug that binexp ignores
 :     the Configure -Dinstallprefix setting, which in turn means that under
-:     relocatable @INC, initialinstalllocation is what binexp started as.
+:     relocatable $^INCLUDE_PATH, initialinstalllocation is what binexp started as.
 case "$startperl" in
 '')
 	case "$sharpbang" in

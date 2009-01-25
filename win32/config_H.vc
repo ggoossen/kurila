@@ -914,7 +914,7 @@
  */
 /* PERL_RELOCATABLE_INC:
  *	This symbol, if defined, indicates that we'd like to relocate entries
- *	in @INC at run time based on the location of the perl binary.
+ *	in $^INCLUDE_PATH at run time based on the location of the perl binary.
  */
 #define BIN "c:\\perl\\bin"	/**/
 #define BIN_EXP "c:\\perl\\bin"	/**/

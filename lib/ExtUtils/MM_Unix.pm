@@ -3097,7 +3097,7 @@ sub processPL {
             }
 
 	    # Normally a .PL file runs AFTER pm_to_blib so it can have
-	    # blib in its @INC and load the just built modules.  BUT if
+	    # blib in its $^INCLUDE_PATH and load the just built modules.  BUT if
 	    # the generated module is something in $(TO_INST_PM) which
 	    # pm_to_blib depends on then it can't depend on pm_to_blib
 	    # else we have a dependency loop.

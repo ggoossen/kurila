@@ -5,7 +5,7 @@ BEGIN {
     chdir 't' if -d 't';
     chdir '../lib/ExtUtils/CBuilder'
       or die "Can't chdir to lib/ExtUtils/CBuilder: $^OS_ERROR";
-    @INC = qw(../..);
+    $^INCLUDE_PATH = qw(../..);
   }
 }
 

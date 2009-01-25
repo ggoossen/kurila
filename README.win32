@@ -520,12 +520,12 @@ C<HKEY_CURRENT_USER\Software\Perl> and C<HKEY_LOCAL_MACHINE\Software\Perl>.
 Entries in the former override entries in the latter.  One or more of the
 following entries (of type REG_SZ or REG_EXPAND_SZ) may be set:
 
-    lib-$]		version-specific standard library path to add to @INC
-    lib			standard library path to add to @INC
-    sitelib-$]		version-specific site library path to add to @INC
-    sitelib		site library path to add to @INC
-    vendorlib-$]	version-specific vendor library path to add to @INC
-    vendorlib		vendor library path to add to @INC
+    lib-$]		version-specific standard library path to add to $^INCLUDE_PATH
+    lib			standard library path to add to $^INCLUDE_PATH
+    sitelib-$]		version-specific site library path to add to $^INCLUDE_PATH
+    sitelib		site library path to add to $^INCLUDE_PATH
+    vendorlib-$]	version-specific vendor library path to add to $^INCLUDE_PATH
+    vendorlib		vendor library path to add to $^INCLUDE_PATH
     PERL*		fallback for all %ENV lookups that begin with "PERL"
 
 Note the C<$]> in the above is not literal.  Substitute whatever version

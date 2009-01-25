@@ -55,7 +55,7 @@ my \@inc_version_list = \@( $Config_inc_version_list );
 !GROK!THIS!
 print $out <<'!NO!SUBS!';
 
-our @ORIG_INC = @INC;	# take a handy copy of 'original' value
+our @ORIG_INCLUDE_PATH = $^INCLUDE_PATH;	# take a handy copy of 'original' value
 our $VERSION = '0.5565';
 my $Is_MacOS = $^OS_NAME eq 'MacOS';
 my $Mac_FS;
@@ -81,26 +81,26 @@ sub import {
 	    require Carp;
 	    Carp::carp("Parameter to use lib must be directory, not file");
 	}
-	unshift(@INC, $path);
+	unshift($^INCLUDE_PATH, $path);
 	# Add any previous version directories we found at configure time
 	foreach my $incver (< @inc_version_list)
 	{
 	    my $dir = $Is_MacOS
 		?? File::Spec->catdir( $path, $incver )
 		!! "$path/$incver";
-	    unshift(@INC, $dir) if -d $dir;
+	    unshift($^INCLUDE_PATH, $dir) if -d $dir;
 	}
 	# Put a corresponding archlib directory in front of $path if it
 	# looks like $path has an archlib directory below it.
 	my @($arch_auto_dir, $arch_dir, $version_dir, $version_arch_dir)
 	    = _get_dirs($path);
-	unshift(@INC, $arch_dir)         if -d $arch_auto_dir;
-	unshift(@INC, $version_dir)      if -d $version_dir;
-	unshift(@INC, $version_arch_dir) if -d $version_arch_dir;
+	unshift($^INCLUDE_PATH, $arch_dir)         if -d $arch_auto_dir;
+	unshift($^INCLUDE_PATH, $version_dir)      if -d $version_dir;
+	unshift($^INCLUDE_PATH, $version_arch_dir) if -d $version_arch_dir;
     }
 
     # remove trailing duplicates
-    @INC = grep { ++%names{+$_} == 1 } @INC;
+    $^INCLUDE_PATH = grep { ++%names{+$_} == 1 } $^INCLUDE_PATH;
     return;
 }
 
@@ -121,7 +121,7 @@ sub unimport {
     }
 
     # Remove ALL instances of each named directory.
-    @INC = grep { !exists %names{$_} } @INC;
+    $^INCLUDE_PATH = grep { !exists %names{$_} } $^INCLUDE_PATH;
     return;
 }
 
@@ -161,7 +161,7 @@ __END__
 
 =head1 NAME
 
-lib - manipulate @INC at compile time
+lib - manipulate $^INCLUDE_PATH at compile time
 
 =head1 SYNOPSIS
 
@@ -171,14 +171,14 @@ lib - manipulate @INC at compile time
 
 =head1 DESCRIPTION
 
-This is a small simple module which simplifies the manipulation of @INC
+This is a small simple module which simplifies the manipulation of $^INCLUDE_PATH
 at compile time.
 
 It is typically used to add extra directories to perl's search path so
 that later C<use> or C<require> statements will find modules which are
 not located on perl's default search path.
 
-=head2 Adding directories to @INC
+=head2 Adding directories to $^INCLUDE_PATH
 
 The parameters to C<use lib> are added to the start of the perl search
 path. Saying
@@ -187,43 +187,43 @@ path. Saying
 
 is I<almost> the same as saying
 
-    BEGIN { unshift(@INC, LIST) }
+    BEGIN { unshift($^INCLUDE_PATH, LIST) }
 
 For each directory in LIST (called $dir here) the lib module also
 checks to see if a directory called $dir/$archname/auto exists.
 If so the $dir/$archname directory is assumed to be a corresponding
-architecture specific directory and is added to @INC in front of $dir.
+architecture specific directory and is added to $^INCLUDE_PATH in front of $dir.
 
 The current value of C<$archname> can be found with this command:
 
     perl -V:archname
 
-To avoid memory leaks, all trailing duplicate entries in @INC are
+To avoid memory leaks, all trailing duplicate entries in $^INCLUDE_PATH are
 removed.
 
-=head2 Deleting directories from @INC
+=head2 Deleting directories from $^INCLUDE_PATH
 
-You should normally only add directories to @INC.  If you need to
-delete directories from @INC take care to only delete those which you
+You should normally only add directories to $^INCLUDE_PATH.  If you need to
+delete directories from $^INCLUDE_PATH take care to only delete those which you
 added yourself or which you are certain are not needed by other modules
 in your script.  Other modules may have added directories which they
 need for correct operation.
 
 The C<no lib> statement deletes all instances of each named directory
-from @INC.
+from $^INCLUDE_PATH.
 
 For each directory in LIST (called $dir here) the lib module also
 checks to see if a directory called $dir/$archname/auto exists.
 If so the $dir/$archname directory is assumed to be a corresponding
-architecture specific directory and is also deleted from @INC.
+architecture specific directory and is also deleted from $^INCLUDE_PATH.
 
-=head2 Restoring original @INC
+=head2 Restoring original $^INCLUDE_PATH
 
-When the lib module is first loaded it records the current value of @INC
-in an array C<@lib::ORIG_INC>. To restore @INC to that value you
+When the lib module is first loaded it records the current value of $^INCLUDE_PATH
+in an array C<@lib::ORIG_INCLUDE_PATH. To restore $^INCLUDE_PATH to that value you
 can say
 
-    @INC = @lib::ORIG_INC;
+    $^INCLUDE_PATH = @lib::ORIG_INC;
 
 =head1 CAVEATS
 
@@ -232,7 +232,7 @@ filepaths.  This doesn't mean it only works on Unix, but non-Unix
 users must first translate their file paths to Unix conventions.
 
     # VMS users wanting to put [.stuff.moo] into 
-    # their @INC would write
+    # their $^INCLUDE_PATH would write
     use lib 'stuff/moo';
 
 =head1 NOTES
@@ -240,7 +240,7 @@ users must first translate their file paths to Unix conventions.
 In the future, this module will likely use File::Spec for determining
 paths, as it does now for Mac OS (where Unix-style or Mac-style paths
 work, and Unix-style paths are converted properly to Mac-style paths
-before being added to @INC).
+before being added to $^INCLUDE_PATH).
 
 =head1 SEE ALSO
 

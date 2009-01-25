@@ -653,7 +653,7 @@ network.  One way to do that would be something like
 
 As a final catch-all, Configure also offers an $otherlibdirs
 variable.  This variable contains a colon-separated list of additional
-directories to add to @INC.  By default, it will be empty.
+directories to add to $^INCLUDE_PATH.  By default, it will be empty.
 Perl will search these directories (including architecture and
 version-specific subdirectories) for add-on modules and extensions.
 
@@ -664,31 +664,31 @@ installation, perhaps in a strange place:
 
 =item APPLLIB_EXP
 
-There is one other way of adding paths to @INC at perl build time, and
+There is one other way of adding paths to $^INCLUDE_PATH at perl build time, and
 that is by setting the APPLLIB_EXP C pre-processor token to a colon-
 separated list of directories, like this
 
        sh Configure -Accflags='-DAPPLLIB_EXP=\"/usr/libperl\"'
 
-The directories defined by APPLLIB_EXP get added to @INC I<first>,
+The directories defined by APPLLIB_EXP get added to $^INCLUDE_PATH I<first>,
 ahead of any others, and so provide a way to override the standard perl
 modules should you, for example, want to distribute fixes without
 touching the perl distribution proper.  And, like otherlib dirs,
 version and architecture specific subdirectories are also searched, if
-present, at run time.  Of course, you can still search other @INC
+present, at run time.  Of course, you can still search other $^INCLUDE_PATH
 directories ahead of those in APPLLIB_EXP by using any of the standard
 run-time methods: $PERLLIB, $PERL5LIB, -I, use lib, etc.
 
 =item usesitecustomize
 
-Run-time customization of @INC can be enabled with:
+Run-time customization of $^INCLUDE_PATH can be enabled with:
 
 	sh Configure -Dusesitecustomize
 
 which will define USE_SITECUSTOMIZE and $Config{usesitecustomize}.
 When enabled, this makes perl run F<$sitelibexp/sitecustomize.pl> before
 anything else.  This script can then be set up to add additional
-entries to @INC.
+entries to $^INCLUDE_PATH.
 
 =item Man Pages
 
@@ -2434,7 +2434,7 @@ size about 1.9MB in its i386 version:
 A nice trick to find out the minimal set of Perl library files you will
 need to run a Perl program is
 
-   perl -e 'do "prog.pl"; END { print "$_\n" for sort keys %INC }'
+   perl -e 'do "prog.pl"; END { print "$_\n" for sort keys $^INCLUDED }'
 
 (this will not find libraries required in runtime, unfortunately, but
 it's a minimal set) and if you want to find out all the files you can

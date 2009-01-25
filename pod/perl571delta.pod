@@ -623,7 +623,7 @@ pointers are 64 bits wide.  (To be exact, the use64bitall is ignored.)
 
 APPLLIB_EXP, a less-know configuration-time definition, has been
 documented.  It can be used to prepend site-specific directories
-to Perl's default search path (@INC), see INSTALL for information.
+to Perl's default search path ($^INCLUDE_PATH), see INSTALL for information.
 
 =item *
 

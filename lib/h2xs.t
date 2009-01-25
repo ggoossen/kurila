@@ -148,11 +148,11 @@ while (my ($args, $version, $expectation) = splice @tests, 0, 3) {
   # Aargh. Something wants to load a bit of regexp. And we have to chdir
   # for ExtUtils::Manifest. Caught between a rock and a hard place, so this
   # seems the least evil thing to do:
-  push @INC, "../../lib";
+  push $^INCLUDE_PATH, "../../lib";
   my ($missing, $extra) = ExtUtils::Manifest::fullcheck();
   is_deeply ($missing, \@(), "No files in the MANIFEST should be missing");
   is_deeply ($extra, \@(),   "and all files present should be in the MANIFEST");
-  pop @INC;
+  pop $^INCLUDE_PATH;
   chdir ($up) or die "chdir $up failed: $!";
  
   foreach my $leaf (File::Spec->catfile('lib', "$name.pm"), 'Makefile.PL') {

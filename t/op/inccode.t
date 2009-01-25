@@ -1,6 +1,6 @@
 #!./perl -w
 
-# Tests for the coderef-in-@INC feature
+# Tests for the coderef-in-$^INCLUDE_PATH feature
 
 use Config;
 
@@ -53,23 +53,23 @@ ok( !$evalret,      'Trying non-magic package' );
 $evalret = try { require Foo; 1 };
 die $^EVAL_ERROR if $^EVAL_ERROR;
 ok( $evalret,                      'require Foo; magic via code ref'  );
-ok( exists $^INCLUDED{'Foo.pm'},         '  %INC sees Foo.pm' );
-is( ref $^INCLUDED{?'Foo.pm'}, 'CODE',    '  val Foo.pm is a coderef in %INC' );
-cmp_ok( $^INCLUDED{?'Foo.pm'}, '\==', \&fooinc,	   '  val Foo.pm is correct in %INC' );
+ok( exists $^INCLUDED{'Foo.pm'},         '  $^INCLUDED sees Foo.pm' );
+is( ref $^INCLUDED{?'Foo.pm'}, 'CODE',    '  val Foo.pm is a coderef in $^INCLUDED' );
+cmp_ok( $^INCLUDED{?'Foo.pm'}, '\==', \&fooinc,	   '  val Foo.pm is correct in $^INCLUDED' );
 
 $evalret = eval "use Foo1; 1;";
 die $^EVAL_ERROR if $^EVAL_ERROR;
 ok( $evalret,                      'use Foo1' );
-ok( exists $^INCLUDED{'Foo1.pm'},        '  %INC sees Foo1.pm' );
-is( ref $^INCLUDED{?'Foo1.pm'}, 'CODE',   '  val Foo1.pm is a coderef in %INC' );
-cmp_ok( $^INCLUDED{?'Foo1.pm'}, '\==', \&fooinc,     '  val Foo1.pm is correct in %INC' );
+ok( exists $^INCLUDED{'Foo1.pm'},        '  $^INCLUDED sees Foo1.pm' );
+is( ref $^INCLUDED{?'Foo1.pm'}, 'CODE',   '  val Foo1.pm is a coderef in $^INCLUDED' );
+cmp_ok( $^INCLUDED{?'Foo1.pm'}, '\==', \&fooinc,     '  val Foo1.pm is correct in $^INCLUDED' );
 
 $evalret = try { do 'Foo2.pl'; 1 };
 die $^EVAL_ERROR if $^EVAL_ERROR;
 ok( $evalret,                      'do "Foo2.pl"' );
-ok( exists $^INCLUDED{'Foo2.pl'},        '  %INC sees Foo2.pl' );
-is( ref $^INCLUDED{?'Foo2.pl'}, 'CODE',   '  val Foo2.pl is a coderef in %INC' );
-cmp_ok( $^INCLUDED{?'Foo2.pl'}, '\==', \&fooinc,     '  val Foo2.pl is correct in %INC' );
+ok( exists $^INCLUDED{'Foo2.pl'},        '  $^INCLUDED sees Foo2.pl' );
+is( ref $^INCLUDED{?'Foo2.pl'}, 'CODE',   '  val Foo2.pl is a coderef in $^INCLUDED' );
+cmp_ok( $^INCLUDED{?'Foo2.pl'}, '\==', \&fooinc,     '  val Foo2.pl is correct in $^INCLUDED' );
 
 pop $^INCLUDE_PATH;
 
@@ -96,19 +96,19 @@ ok( !$evalret,                    'Original magic INC purged' );
 $evalret = try { require Bar; 1 };
 die $^EVAL_ERROR if $^EVAL_ERROR;
 ok( $evalret,                     'require Bar; magic via array ref' );
-ok( exists $^INCLUDED{'Bar.pm'},        '  %INC sees Bar.pm' );
-is( ref $^INCLUDED{?'Bar.pm'}, 'ARRAY',  '  val Bar.pm is an arrayref in %INC' );
-cmp_ok( $^INCLUDED{?'Bar.pm'}, '\==', $arrayref,    '  val Bar.pm is correct in %INC' );
+ok( exists $^INCLUDED{'Bar.pm'},        '  $^INCLUDED sees Bar.pm' );
+is( ref $^INCLUDED{?'Bar.pm'}, 'ARRAY',  '  val Bar.pm is an arrayref in $^INCLUDED' );
+cmp_ok( $^INCLUDED{?'Bar.pm'}, '\==', $arrayref,    '  val Bar.pm is correct in $^INCLUDED' );
 
 ok( eval "use Bar1; 1;",          'use Bar1' ); die if $^EVAL_ERROR;
-ok( exists $^INCLUDED{'Bar1.pm'},       '  %INC sees Bar1.pm' );
-is( ref $^INCLUDED{?'Bar1.pm'}, 'ARRAY', '  val Bar1.pm is an arrayref in %INC' );
-cmp_ok( $^INCLUDED{?'Bar1.pm'}, '\==', $arrayref,   '  val Bar1.pm is correct in %INC' );
+ok( exists $^INCLUDED{'Bar1.pm'},       '  $^INCLUDED sees Bar1.pm' );
+is( ref $^INCLUDED{?'Bar1.pm'}, 'ARRAY', '  val Bar1.pm is an arrayref in $^INCLUDED' );
+cmp_ok( $^INCLUDED{?'Bar1.pm'}, '\==', $arrayref,   '  val Bar1.pm is correct in $^INCLUDED' );
 
 ok( try { do 'Bar2.pl'; 1 },     'do "Bar2.pl"' );
-ok( exists $^INCLUDED{'Bar2.pl'},       '  %INC sees Bar2.pl' );
-is( ref $^INCLUDED{?'Bar2.pl'}, 'ARRAY', '  val Bar2.pl is an arrayref in %INC' );
-cmp_ok( $^INCLUDED{?'Bar2.pl'}, '\==', $arrayref,   '  val Bar2.pl is correct in %INC' );
+ok( exists $^INCLUDED{'Bar2.pl'},       '  $^INCLUDED sees Bar2.pl' );
+is( ref $^INCLUDED{?'Bar2.pl'}, 'ARRAY', '  val Bar2.pl is an arrayref in $^INCLUDED' );
+cmp_ok( $^INCLUDED{?'Bar2.pl'}, '\==', $arrayref,   '  val Bar2.pl is correct in $^INCLUDED' );
 
 pop $^INCLUDE_PATH;
 
@@ -128,10 +128,10 @@ push $^INCLUDE_PATH, $href;
 $evalret = try { require Quux; 1 };
 die $^EVAL_ERROR if $^EVAL_ERROR;
 ok( $evalret,                      'require Quux; magic via hash object' );
-ok( exists $^INCLUDED{'Quux.pm'},        '  %INC sees Quux.pm' );
+ok( exists $^INCLUDED{'Quux.pm'},        '  $^INCLUDED sees Quux.pm' );
 is( ref $^INCLUDED{?'Quux.pm'}, 'FooLoader',
-				   '  val Quux.pm is an object in %INC' );
-cmp_ok( $^INCLUDED{?'Quux.pm'}, '\==', $href,        '  val Quux.pm is correct in %INC' );
+				   '  val Quux.pm is an object in $^INCLUDED' );
+cmp_ok( $^INCLUDED{?'Quux.pm'}, '\==', $href,        '  val Quux.pm is correct in $^INCLUDED' );
 
 pop $^INCLUDE_PATH;
 
@@ -141,10 +141,10 @@ push $^INCLUDE_PATH, $aref;
 $evalret = try { require Quux1; 1 };
 die $^EVAL_ERROR if $^EVAL_ERROR;
 ok( $evalret,                      'require Quux1; magic via array object' );
-ok( exists $^INCLUDED{'Quux1.pm'},       '  %INC sees Quux1.pm' );
+ok( exists $^INCLUDED{'Quux1.pm'},       '  $^INCLUDED sees Quux1.pm' );
 is( ref $^INCLUDED{?'Quux1.pm'}, 'FooLoader',
-				   '  val Quux1.pm is an object in %INC' );
-cmp_ok( $^INCLUDED{?'Quux1.pm'}, '\==', $aref,       '  val Quux1.pm  is correct in %INC' );
+				   '  val Quux1.pm is an object in $^INCLUDED' );
+cmp_ok( $^INCLUDED{?'Quux1.pm'}, '\==', $aref,       '  val Quux1.pm  is correct in $^INCLUDED' );
 
 pop $^INCLUDE_PATH;
 
@@ -154,10 +154,10 @@ push $^INCLUDE_PATH, $sref;
 $evalret = try { require Quux2; 1 };
 die $^EVAL_ERROR if $^EVAL_ERROR;
 ok( $evalret,                      'require Quux2; magic via scalar object' );
-ok( exists $^INCLUDED{'Quux2.pm'},       '  %INC sees Quux2.pm' );
+ok( exists $^INCLUDED{'Quux2.pm'},       '  $^INCLUDED sees Quux2.pm' );
 is( ref $^INCLUDED{?'Quux2.pm'}, 'FooLoader',
-				   '  val Quux2.pm is an object in %INC' );
-cmp_ok( $^INCLUDED{?'Quux2.pm'}, '\==', $sref,       '  val Quux2.pm is correct in %INC' );
+				   '  val Quux2.pm is an object in $^INCLUDED' );
+cmp_ok( $^INCLUDED{?'Quux2.pm'}, '\==', $sref,       '  val Quux2.pm is correct in $^INCLUDED' );
 
 pop $^INCLUDE_PATH;
 
@@ -175,9 +175,9 @@ push $^INCLUDE_PATH, sub {
 $evalret = try { require Toto; 1 };
 die $^EVAL_ERROR if $^EVAL_ERROR;
 ok( $evalret,                      'require Toto; magic via anonymous code ref'  );
-ok( exists $^INCLUDED{'Toto.pm'},        '  %INC sees Toto.pm' );
-ok( ! ref $^INCLUDED{?'Toto.pm'},         q/  val Toto.pm isn't a ref in %INC/ );
-is( $^INCLUDED{?'Toto.pm'}, 'xyz',	   '  val Toto.pm is correct in %INC' );
+ok( exists $^INCLUDED{'Toto.pm'},        '  $^INCLUDED sees Toto.pm' );
+ok( ! ref $^INCLUDED{?'Toto.pm'},         q/  val Toto.pm isn't a ref in $^INCLUDED/ );
+is( $^INCLUDED{?'Toto.pm'}, 'xyz',	   '  val Toto.pm is correct in $^INCLUDED' );
 
 pop $^INCLUDE_PATH;
 
@@ -197,7 +197,7 @@ is( $ret, 'abc', 'do "abc.pl" sees return value' );
 
 do {
     my $filename = $^OS_NAME eq 'MacOS' ?? ':Foo:Foo.pm' !! './Foo.pm';
-    #local @INC; # local fails on tied @INC
+    #local $^INCLUDE_PATH; # local fails on tied @INC
     my @old_INC = $^INCLUDE_PATH; # because local doesn't work on tied arrays
     $^INCLUDE_PATH = @( sub { $filename = 'seen'; return undef; } );
     try { require $filename; };
@@ -223,7 +223,7 @@ SKIP: do {
 
     require Publius::Vergilius::Maro;
     is( $^INCLUDED{?'Publius/Vergilius/Maro.pm'},
-        '/custom/path/to/Publius/Vergilius/Maro.pm', '%INC set correctly');
+        '/custom/path/to/Publius/Vergilius/Maro.pm', '$^INCLUDED set correctly');
     is( our $file, '/custom/path/to/Publius/Vergilius/Maro.pm',
         '__FILE__ set correctly' );
     do {

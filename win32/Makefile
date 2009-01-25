@@ -49,7 +49,7 @@ INST_TOP	= $(INST_DRV)\perl
 # Uncomment this if you want perl to run
 # 	$Config{sitelibexp}\sitecustomize.pl
 # before anything else.  This script can then be set up, for example,
-# to add additional entries to @INC.
+# to add additional entries to $^INCLUDE_PATH.
 #
 #USE_SITECUST	= define
 

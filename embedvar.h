@@ -143,7 +143,8 @@
 #define PL_in_clean_objs	(vTHX->Iin_clean_objs)
 #define PL_in_eval		(vTHX->Iin_eval)
 #define PL_in_load_module	(vTHX->Iin_load_module)
-#define PL_incgv		(vTHX->Iincgv)
+#define PL_includedhv		(vTHX->Iincludedhv)
+#define PL_includepathav	(vTHX->Iincludepathav)
 #define PL_initav		(vTHX->Iinitav)
 #define PL_inplace		(vTHX->Iinplace)
 #define PL_isarev		(vTHX->Iisarev)
@@ -421,7 +422,8 @@
 #define PL_Iin_clean_objs	PL_in_clean_objs
 #define PL_Iin_eval		PL_in_eval
 #define PL_Iin_load_module	PL_in_load_module
-#define PL_Iincgv		PL_incgv
+#define PL_Iincludedhv		PL_includedhv
+#define PL_Iincludepathav	PL_includepathav
 #define PL_Iinitav		PL_initav
 #define PL_Iinplace		PL_inplace
 #define PL_Iisarev		PL_isarev

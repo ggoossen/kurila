@@ -710,7 +710,7 @@ sub grand_search_init {
         # prepend extra search directories (including language specific)
         push @searchdirs, < @{ $self->{?'extra_search_dirs'} };
 
-        # We must look both in @INC for library modules and in $bindir
+        # We must look both in $^INCLUDE_PATH for library modules and in $bindir
         # for executables, like h2xs or perldoc itself.
         push @searchdirs, ($self->{?'bindir'}, < $^INCLUDE_PATH);
         unless ($self->opt_m) {
@@ -1445,7 +1445,7 @@ sub maybe_diddle_INC {
   
   if (-f "Makefile.PL") {
 
-    # Add "." and "lib" to @INC (if they exist)
+    # Add "." and "lib" to $^INCLUDE_PATH (if they exist)
     eval q{ use lib qw(. lib); 1; } or die;
 
     # don't add if superuser

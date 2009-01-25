@@ -7,7 +7,7 @@ BEGIN { plan tests => 8 }
 
 BEGIN {
 # Cwd::cwd does an implicit "require Win32", but
-# the ../lib directory in @INC will no longer work once
+# the ../lib directory in $^INCLUDE_PATH will no longer work once
 # we chdir() out of the "t" directory.
     if ($^OS_NAME eq 'MSWin32') {
 	require Win32;

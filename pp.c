@@ -4245,7 +4245,7 @@ PP(pp_splice)
 
 PP(pp_push)
 {
-    dVAR; dSP; dMARK; dORIGMARK; dTARGET;
+    dVAR; dSP; dMARK; dORIGMARK;
     register AV * const ary = (AV*)*++MARK;
 
     do_arg_check(MARK);
@@ -4268,7 +4268,7 @@ PP(pp_push)
 
 	PL_delaymagic = 0;
 	SP = ORIGMARK;
-	PUSHi( AvFILLp(ary) + 1 );
+	mPUSHi( AvFILLp(ary) + 1 );
     }
     RETURN;
 }
@@ -4294,7 +4294,7 @@ PP(pp_shift)
 
 PP(pp_unshift)
 {
-    dVAR; dSP; dMARK; dORIGMARK; dTARGET;
+    dVAR; dSP; dMARK; dORIGMARK;
     register AV *ary = (AV*)*++MARK;
 
     do_arg_check(MARK);
@@ -4308,7 +4308,7 @@ PP(pp_unshift)
 	}
     }
     SP = ORIGMARK;
-    PUSHi( AvFILL(ary) + 1 );
+    mPUSHi( AvFILL(ary) + 1 );
     RETURN;
 }
 

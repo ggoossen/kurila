@@ -33,7 +33,7 @@
 
    This is used by Configure et al to figure out 
    PERL_INC_VERSION_LIST, which lists version libraries
-   to include in @INC.  See INSTALL for how this works.
+   to include in $^INCLUDE_PATH.  See INSTALL for how this works.
 */
 #define PERL_API_REVISION	5	/* Adjust manually as needed.  */
 #define PERL_API_VERSION	11	/* Adjust manually as needed.  */

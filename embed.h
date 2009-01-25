@@ -1073,7 +1073,6 @@
 #define hfreeentries		S_hfreeentries
 #define new_he			S_new_he
 #define save_hek_flags		S_save_hek_flags
-#define hv_magic_check		S_hv_magic_check
 #define unshare_hek_or_pvn	S_unshare_hek_or_pvn
 #define share_hek_flags		S_share_hek_flags
 #define hv_notallowed		S_hv_notallowed
@@ -3213,7 +3212,6 @@
 #define hfreeentries(a)		S_hfreeentries(aTHX_ a)
 #define new_he()		S_new_he(aTHX)
 #define save_hek_flags		S_save_hek_flags
-#define hv_magic_check		S_hv_magic_check
 #define unshare_hek_or_pvn(a,b,c,d)	S_unshare_hek_or_pvn(aTHX_ a,b,c,d)
 #define share_hek_flags(a,b,c,d)	S_share_hek_flags(aTHX_ a,b,c,d)
 #define hv_notallowed(a,b,c,d)	S_hv_notallowed(aTHX_ a,b,c,d)

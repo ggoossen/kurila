@@ -445,7 +445,7 @@ print "in mainline\n";
 1;
 --FILE--
 use abc;
-delete %INC{"abc.pm"};
+delete $^INCLUDED{"abc.pm"};
 require abc;
 do "abc.pm";
 EXPECT

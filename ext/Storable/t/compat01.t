@@ -5,9 +5,9 @@ use Config;
 BEGIN {
     if (env::var('PERL_CORE')){
         chdir('t') if -d 't';
-        @INC = @('.', '../lib', '../ext/Storable/t');
+        $^INCLUDE_PATH = @('.', '../lib', '../ext/Storable/t');
     } else {
-        unshift @INC, 't';
+        unshift $^INCLUDE_PATH, 't';
     }
 
     if (config_value('byteorder') ne "1234") {

@@ -177,8 +177,8 @@ XS(XS_error_create)
                     SV* loc_2 = *av_fetch((AV*)location, 2, FALSE);
 		    Perl_sv_catpvf(aTHX_ sv, " at %s line %"IVdf" character %"IVdf".",
 			SvPVOK(loc_0) ? SvPVX_const(loc_0) : "???",
-			SvPVOK(loc_1) ? SvIV(loc_1) : "0",
-			SvPVOK(loc_2) ? SvIV(loc_2) : "0"
+			SvPVOK(loc_1) ? SvIV(loc_1) : 0,
+			SvPVOK(loc_2) ? SvIV(loc_2) : 0
 			);
 		}
 	    }

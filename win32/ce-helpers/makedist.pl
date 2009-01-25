@@ -215,7 +215,7 @@ sub bootstrap {
     my $modfname = $modparts[-1];
     my $modpname = join('/',@modparts);
 
-    for (@INC) {
+    for ($^INCLUDE_PATH) {
 	my $dir = "$_/auto/$modpname";
 	next unless -d $dir;
 	my $try = "$dir/$modfname.dll";
@@ -225,9 +225,9 @@ sub bootstrap {
 	last if $file = ( (-f $try) && $try);
 	push @dirs, $dir;
     }
-    $file = dl_findfile(map("-L$_",@dirs,@INC), $modfname) unless $file;
+    $file = dl_findfile(map("-L$_",@dirs,$^INCLUDE_PATH), $modfname) unless $file;
 
-    croak("Can't locate loadable object for module $module in \@INC (\@INC contains: @INC)")
+    croak("Can't locate loadable object for module $module in \$^INCLUDE_PATH (\@INC contains: @INC)")
 	unless $file;
 
     (my $bootname = "boot_$module") =~ s/\W/_/g;

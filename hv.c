@@ -285,27 +285,6 @@ Perl_hv_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
     }
 
     xhv = (XPVHV*)SvANY(hv);
-    if (SvMAGICAL(hv)) {
-	if (SvRMAGICAL(hv) && !(action & (HV_FETCH_ISSTORE|HV_FETCH_ISEXISTS))) {
-	    NOOP;
-	} /* ISFETCH */
-	else if (SvRMAGICAL(hv) && (action & HV_FETCH_ISEXISTS)) {
-	    NOOP;
-	} /* ISEXISTS */
-	else if (action & HV_FETCH_ISSTORE) {
-	    bool needs_copy;
-	    hv_magic_check (hv, &needs_copy);
-	    if (needs_copy) {
-		if (keysv) {
-		    keysv = sv_2mortal(newSVsv(keysv));
-		    mg_copy((SV*)hv, val, (char*)keysv, HEf_SVKEY);
-		} else {
-		    mg_copy((SV*)hv, val, key, klen);
-		}
-	    }
-	} /* ISSTORE */
-    } /* SvMAGICAL */
-
     if (!HvARRAY(hv)) {
 	if ((action & (HV_FETCH_LVALUE | HV_FETCH_ISSTORE))) {
 	    char *array;
@@ -381,18 +360,6 @@ Perl_hv_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
 	    if (HeVAL(entry) == &PL_sv_placeholder) {
 		/* yes, can store into placeholder slot */
 		if (action & HV_FETCH_LVALUE) {
-		    if (SvMAGICAL(hv)) {
-			/* This preserves behaviour with the old hv_fetch
-			   implementation which at this point would bail out
-			   with a break; (at "if we find a placeholder, we
-			   pretend we haven't found anything")
-
-			   That break mean that if a placeholder were found, it
-			   caused a call into hv_store, which in turn would
-			   check magic, and if there is no magic end up pretty
-			   much back at this point (in hv_store's code).  */
-			break;
-		    }
 		    /* LVAL fetch which actaully needs a store.  */
 		    val = newSV(0);
 		    HvPLACEHOLDERS(hv)--;
@@ -432,23 +399,6 @@ Perl_hv_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
     }
     if (action & HV_FETCH_LVALUE) {
 	val = newSV(0);
-	if (SvMAGICAL(hv)) {
-	    /* At this point the old hv_fetch code would call to hv_store,
-	       which in turn might do some tied magic. So we need to make that
-	       magic check happen.  */
-	    /* gonna assign to this, so it better be there */
-	    /* If a fetch-as-store fails on the fetch, then the action is to
-	       recurse once into "hv_store". If we didn't do this, then that
-	       recursive call would call the key conversion routine again.
-	       However, as we replace the original key with the converted
-	       key, this would result in a double conversion, which would show
-	       up as a bug if the conversion routine is not idempotent.  */
-	    return hv_common(hv, keysv, key, klen, flags,
-			     HV_FETCH_ISSTORE|HV_DISABLE_UVAR_XKEY|return_svp,
-			     val, hash);
-	    /* XXX Surely that could leak if the fetch-was-store fails?
-	       Just like the hv_fetch.  */
-	}
     }
 
     /* Welcome to hv_store...  */
@@ -520,22 +470,6 @@ Perl_hv_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
     return (void *) entry;
 }
 
-STATIC void
-S_hv_magic_check(HV *hv, bool *needs_copy)
-{
-    const MAGIC *mg = SvMAGIC(hv);
-
-    PERL_ARGS_ASSERT_HV_MAGIC_CHECK;
-    
-    *needs_copy = FALSE;
-    while (mg) {
-	if (isUPPER(mg->mg_type)) {
-	    *needs_copy = TRUE;
-	}
-	mg = mg->mg_moremagic;
-    }
-}
-
 /*
 =for apidoc hv_scalar
 
@@ -590,24 +524,6 @@ S_hv_delete_common(pTHX_ HV *hv, SV *keysv, const char *key, STRLEN klen,
     HE *const *first_entry;
     int masked_flags;
 
-    if (SvRMAGICAL(hv)) {
-	bool needs_copy;
-	hv_magic_check (hv, &needs_copy);
-
-	if (needs_copy) {
-	    SV *sv;
-	    entry = (HE *) hv_common(hv, keysv, key, klen,
-				     k_flags & ~HVhek_FREEKEY,
-				     HV_FETCH_LVALUE|HV_DISABLE_UVAR_XKEY,
-				     NULL, hash);
-	    sv = entry ? HeVAL(entry) : NULL;
-	    if (sv) {
-		if (SvMAGICAL(sv)) {
-		    mg_clear(sv);
-		}
-	    }
-	}
-    }
     xhv = (XPVHV*)SvANY(hv);
     if (!HvARRAY(hv))
 	return NULL;
@@ -978,7 +894,7 @@ Perl_hv_sethv(pTHX_ HV* dstr, HV* sstr)
 	return;
     hv_max = HvMAX(sstr);
 
-    if (! (SvMAGICAL((SV *)sstr) || SvMAGICAL((SV*)dstr)) ) {
+    {
 	/* It's an ordinary hash, so copy it fast. AMS 20010804 */
 	STRLEN i;
 	const bool shared = !!HvSHAREKEYS(sstr);
@@ -1022,26 +938,6 @@ Perl_hv_sethv(pTHX_ HV* dstr, HV* sstr)
 	HvFILL(dstr)  = hv_fill;
 	HvTOTALKEYS(dstr)  = HvTOTALKEYS(sstr);
 	HvARRAY(dstr) = ents;
-    } /* not magical */
-    else {
-	/* Iterate over sstr, copying keys and values one at a time. */
-	HE *entry;
-	const I32 riter = HvRITER_get(sstr);
-	HE * const eiter = HvEITER_get(sstr);
-
-	/* Can we use fewer buckets? (hv_max is always 2^n-1) */
-	while (hv_max && hv_max + 1 >= hv_fill * 2)
-	    hv_max = hv_max / 2;
-	HvMAX(dstr) = hv_max;
-
-	hv_iterinit(sstr);
-	while ((entry = hv_iternext_flags(sstr, 0))) {
-	    (void)hv_store_flags(dstr, HeKEY(entry), HeKLEN(entry),
-			         newSVsv(HeVAL(entry)), HeHASH(entry),
-			         HeKFLAGS(entry));
-	}
-	HvRITER_set(sstr, riter);
-	HvEITER_set(sstr, eiter);
     }
 }
 
@@ -1055,7 +951,7 @@ Perl_newHVhv(pTHX_ HV *ohv)
 	return hv;
     hv_max = HvMAX(ohv);
 
-    if (!SvMAGICAL((SV *)ohv)) {
+    {
 	/* It's an ordinary hash, so copy it fast. AMS 20010804 */
 	STRLEN i;
 	const bool shared = !!HvSHAREKEYS(ohv);
@@ -1099,26 +995,6 @@ Perl_newHVhv(pTHX_ HV *ohv)
 	HvFILL(hv)  = hv_fill;
 	HvTOTALKEYS(hv)  = HvTOTALKEYS(ohv);
 	HvARRAY(hv) = ents;
-    } /* not magical */
-    else {
-	/* Iterate over ohv, copying keys and values one at a time. */
-	HE *entry;
-	const I32 riter = HvRITER_get(ohv);
-	HE * const eiter = HvEITER_get(ohv);
-
-	/* Can we use fewer buckets? (hv_max is always 2^n-1) */
-	while (hv_max && hv_max + 1 >= hv_fill * 2)
-	    hv_max = hv_max / 2;
-	HvMAX(hv) = hv_max;
-
-	hv_iterinit(ohv);
-	while ((entry = hv_iternext_flags(ohv, 0))) {
-	    (void)hv_store_flags(hv, HeKEY(entry), HeKLEN(entry),
-			         newSVsv(HeVAL(entry)), HeHASH(entry),
-			         HeKFLAGS(entry));
-	}
-	HvRITER_set(ohv, riter);
-	HvEITER_set(ohv, eiter);
     }
 
     return hv;

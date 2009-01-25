@@ -23,13 +23,13 @@ Module::Loaded - mark modules as loaded or unloaded
     eval "require 'Foo'";            # is now a no-op
 
     $bool = mark_as_unloaded('Foo'); # Foo.pm no longer marked as loaded
-    eval "require 'Foo'";            # Will try to find Foo.pm in @INC
+    eval "require 'Foo'";            # Will try to find Foo.pm in $^INCLUDE_PATH
 
 =head1 DESCRIPTION
 
 When testing applications, often you find yourself needing to provide
 functionality in your test environment that would usually be provided
-by external modules. Rather than munging the C<%INC> by hand to mark
+by external modules. Rather than munging the C<$^INCLUDED> by hand to mark
 these external modules as loaded, so they are not attempted to be loaded
 by perl, this module offers you a very simple way to mark modules as
 loaded and/or unloaded.

@@ -113,7 +113,7 @@ tryrun(\%(PERL5OPT => '-MExporter -MExporter'), \@('-e0'),
     "");
 
 tryrun(\%(PERL5OPT => '-Mwarnings'), 
-    \@('-e', 'print "ok" if %INC{"warnings.pm"}'),
+    \@('-e', 'print "ok" if $^INCLUDED{"warnings.pm"}'),
     "ok",
     "");
 
@@ -123,34 +123,34 @@ tryrun(\%(PERL5OPT => '-w -w'),
     '');
 
 tryrun(\%(PERLLIB => "foobar$(config_value('path_sep'))42"),
-    \@('-e', 'print < grep { $_ eq "foobar" } @INC'),
+    \@('-e', 'print < grep { $_ eq "foobar" } $^INCLUDE_PATH'),
     'foobar',
     '');
 
 tryrun(\%(PERLLIB => "foobar$(config_value('path_sep'))42"),
-    \@('-e', 'print < grep { $_ eq "42" } @INC'),
+    \@('-e', 'print < grep { $_ eq "42" } $^INCLUDE_PATH'),
     '42',
     '');
 
 tryrun(\%(PERL5LIB => "foobar$(config_value('path_sep'))42"),
-    \@('-e', 'print < grep { $_ eq "foobar" } @INC'),
+    \@('-e', 'print < grep { $_ eq "foobar" } $^INCLUDE_PATH'),
     'foobar',
     '');
 
 tryrun(\%(PERL5LIB => "foobar$(config_value('path_sep'))42"),
-    \@('-e', 'print < grep { $_ eq "42" } @INC'),
+    \@('-e', 'print < grep { $_ eq "42" } $^INCLUDE_PATH'),
     '42',
     '');
 
 tryrun(\%(PERL5LIB => "foo",
      PERLLIB => "bar"),
-    \@('-e', 'print < grep { $_ eq "foo" } @INC'),
+    \@('-e', 'print < grep { $_ eq "foo" } $^INCLUDE_PATH'),
     'foo',
     '');
 
 tryrun(\%(PERL5LIB => "foo",
      PERLLIB => "bar"),
-    \@('-e', 'print < grep { $_ eq "bar" } @INC'),
+    \@('-e', 'print < grep { $_ eq "bar" } $^INCLUDE_PATH'),
     '',
     '');
 

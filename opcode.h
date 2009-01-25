@@ -1278,10 +1278,10 @@ EXT Perl_check_t PL_check[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* enter_hashexpand_assign */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* nelems */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* splice */
-	MEMBER_TO_FPTR(Perl_ck_fun),	/* push */
+	MEMBER_TO_FPTR(Perl_ck_lfun),	/* push */
 	MEMBER_TO_FPTR(Perl_ck_shift),	/* pop */
 	MEMBER_TO_FPTR(Perl_ck_shift),	/* shift */
-	MEMBER_TO_FPTR(Perl_ck_fun),	/* unshift */
+	MEMBER_TO_FPTR(Perl_ck_lfun),	/* unshift */
 	MEMBER_TO_FPTR(Perl_ck_sort),	/* sort */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* reverse */
 	MEMBER_TO_FPTR(Perl_ck_grep),	/* grepstart */
@@ -1639,10 +1639,10 @@ EXTCONST U32 PL_opargs[] = {
 	0x00000000,	/* enter_hashexpand_assign */
 	0x00002208,	/* nelems */
 	0x05326801,	/* splice */
-	0x0004691d,	/* push */
-	0x00017604,	/* pop */
-	0x00017604,	/* shift */
-	0x0004691d,	/* unshift */
+	0x00042815,	/* push */
+	0x00013604,	/* pop */
+	0x00013604,	/* shift */
+	0x00042815,	/* unshift */
 	0x0005a841,	/* sort */
 	0x00002808,	/* reverse */
 	0x0004a841,	/* grepstart */

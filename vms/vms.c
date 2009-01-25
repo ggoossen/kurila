@@ -3604,7 +3604,7 @@ store_pipelocs(pTHX)
 #ifdef PERL_IMPLICIT_CONTEXT
     if (aTHX)
 #endif
-    if (PL_incgv) av = GvAVn(PL_incgv);
+    av = PL_includepathav;
 
     for (i = 0; av && i <= AvFILL(av); i++) {
         dirsv = *av_fetch(av,i,TRUE);

@@ -279,7 +279,7 @@ sub auto_path {
 
     return $path if -d $path;
 
-    # If that failed, try relative path with normal @INC searching.
+    # If that failed, try relative path with normal $^INCLUDE_PATH searching.
     $path = "auto/$calldir/";
     foreach my $inc ( $^INCLUDE_PATH) {
 	return "$inc/$path" if -d "$inc/$path";

@@ -5,7 +5,7 @@
 BEGIN {
    if( env::var('PERL_CORE') ) {
         chdir 't' if -d 't';
-        @INC = qw(../lib);
+        $^INCLUDE_PATH = qw(../lib);
     }
 }
 

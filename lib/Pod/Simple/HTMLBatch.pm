@@ -51,7 +51,7 @@ Pod::Simple::_accessorize( __PACKAGE__,
 # Just so we can run from the command line more easily
 sub go {
   (nelems @ARGV) == 2 or die sprintf(
-    "Usage: perl -M\%s -e \%s:go indirs outdir\n  (or use \"\@INC\" for indirs)\n",
+    "Usage: perl -M\%s -e \%s:go indirs outdir\n  (or use \"\$^INCLUDE_PATH\" for indirs)\n",
     __PACKAGE__, __PACKAGE__, 
   );
   
@@ -122,7 +122,7 @@ sub batch_convert {
 
   if(ref $dirs) {
     # OK, it's an explicit set of dirs to scan, specified as an arrayref.
-  } elsif(!defined($dirs)  or  $dirs eq ''  or  $dirs eq '@INC' ) {
+  } elsif(!defined($dirs)  or  $dirs eq ''  or  $dirs eq '$^INCLUDE_PATH' ) {
     $dirs = '';
   } else {
     # OK, it's an explicit set of dirs to scan, specified as a
@@ -165,7 +165,7 @@ sub _batch_convert_main {
   if($dirs) {
     $self->muse(scalar(nelems @$dirs), " dirs to scan: $(join ' ',@$dirs)");
   } else {
-    $self->muse("Scanning \@INC.  This could take a minute or two.");
+    $self->muse("Scanning \$^INCLUDE_PATH.  This could take a minute or two.");
   }
   my $mod2path = $self->find_all_pods($dirs ?? $dirs !! ());
   $self->muse("Done scanning.");
@@ -1080,14 +1080,14 @@ arguments, C<indirs> and C<outdir>.
 Example:
 
   % mkdir out_html
-  % perl -MPod::Simple::HTMLBatch -e Pod::Simple::HTMLBatch::go @INC out_html
-      (to convert the pod from Perl's @INC
+  % perl -MPod::Simple::HTMLBatch -e Pod::Simple::HTMLBatch::go $^INCLUDE_PATH out_html
+      (to convert the pod from Perl's $^INCLUDE_PATH
        files under the directory ../htmlversion)
 
 (Note that the command line there contains a literal atsign-I-N-C.  This
 is handled as a special case by batch_convert, in order to save you having
 to enter the odd-looking "" as the first command-line parameter when you
-mean "just use whatever's in @INC".)
+mean "just use whatever's in $^INCLUDE_PATH".)
 
 Example:
 
@@ -1119,9 +1119,9 @@ this TODO
 
 =item $batchconv->batch_convert( undef    , ...);
 
-=item $batchconv->batch_convert( q{@INC}, ...);
+=item $batchconv->batch_convert( q{$^INCLUDE_PATH}, ...);
 
-These two values for I<indirs> specify that the normal Perl @INC
+These two values for I<indirs> specify that the normal Perl $^INCLUDE_PATH
 
 =item $batchconv->batch_convert( \@dirs , ...);
 
@@ -1159,7 +1159,7 @@ directory.
 
 (Note that a missing or undefined value means a different thing in
 the first slot than in the second.  That's so that C<batch_convert()>
-with no arguments (or undef arguments) means "go from @INC, into
+with no arguments (or undef arguments) means "go from $^INCLUDE_PATH, into
 the current directory.)
 
 =item $batchconv->batch_convert( ... , 'somedir' );

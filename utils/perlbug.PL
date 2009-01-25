@@ -723,9 +723,9 @@ EOF
     print OUT <<EOF;
 
 ---
-\@INC for perl $perl_version:
+\$^INCLUDE_PATH for perl $perl_version:
 EOF
-    for my $i (@INC) {
+    for my $i ($^INCLUDE_PATH) {
 	print OUT "    $i\n";
     }
 

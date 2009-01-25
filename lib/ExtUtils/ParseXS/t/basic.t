@@ -5,7 +5,7 @@ BEGIN {
     chdir 't' if -d 't';
     chdir '../lib/ExtUtils/ParseXS'
       or die "Can't chdir to lib/ExtUtils/ParseXS: $^OS_ERROR";
-    @INC = qw(../.. ../../.. .);
+    $^INCLUDE_PATH = qw(../.. ../../.. .);
   }
 }
 

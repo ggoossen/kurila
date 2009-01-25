@@ -6,10 +6,10 @@
 BEGIN {
     if( env::var('PERL_CORE') ) {
         chdir 't' if -d 't';
-        @INC = @('../lib', 'lib');
+        $^INCLUDE_PATH = @('../lib', 'lib');
     }
     else {
-        unshift @INC, 't/lib';
+        unshift $^INCLUDE_PATH, 't/lib';
     }
 }
 

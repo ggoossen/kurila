@@ -42,7 +42,7 @@ sub ok
 }
 
 $Inc = '' ;
-foreach ( @INC)
+foreach ( $^INCLUDE_PATH)
  { $Inc .= "\"-I$_\" " }
 $Inc = "-I::lib" if $^O eq 'MacOS';
 

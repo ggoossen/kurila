@@ -340,9 +340,9 @@ a module name, and optionally its version.
 To reduce the overhead as much as possible, only one possible location
 is checked to find the extension DLL (this location is where C<make install>
 would put the DLL).  If not found, the search for the DLL is transparently
-delegated to C<DynaLoader>, which looks for the DLL along the C<@INC> list.
+delegated to C<DynaLoader>, which looks for the DLL along the C<$^INCLUDE_PATH> list.
 
-In particular, this is applicable to the structure of C<@INC> used for testing
+In particular, this is applicable to the structure of C<$^INCLUDE_PATH> used for testing
 not-yet-installed extensions.  This means that running uninstalled extensions
 may have much more overhead than running the same extensions after
 C<make install>.

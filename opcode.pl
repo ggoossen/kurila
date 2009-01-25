@@ -809,10 +809,10 @@ enter_hashexpand_assign	hash expand assignment			ck_null		0
 nelems		numer of elements	ck_fun		t1	S
 
 splice		splice			ck_fun		m@	A S? S? L
-push		push			ck_fun		imsT@	A L
-pop		pop			ck_shift	s%	A?
-shift		shift			ck_shift	s%	A?
-unshift		unshift			ck_fun		imsT@	A L
+push		push			ck_lfun		ims@	S L
+pop		pop			ck_shift	s%	S?
+shift		shift			ck_shift	s%	S?
+unshift		unshift			ck_lfun		ims@	S L
 sort		sort			ck_sort		dm@	C? L
 reverse		reverse			ck_fun		t@	S
 
