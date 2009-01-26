@@ -12,11 +12,10 @@ use Test::More (-x $^EXECUTABLE_NAME
 	       );
 
 BEGIN {                                # Set up a tiny script file
-    local *F;
-    open(F, ">", "rel2abs2rel$^PID.pl")
+    open(my $f, ">", "rel2abs2rel$^PID.pl")
       or die "Can't open rel2abs2rel$^PID.pl file for script -- $^OS_ERROR\n";
-    print F qq(print "ok\\n"\n);
-    close(F);
+    print $f qq(print "ok\\n"\n);
+    close($f);
 }
 END {
     1 while unlink("rel2abs2rel$^PID.pl");
@@ -40,18 +39,17 @@ sub safe_rel {
 # `$perl -le "print 'ok'"`. And, for portability, we can't use fork().
 sub sayok{
     my $perl = shift;
-    open(STDOUTDUP, ">&", \*STDOUT);
-    open(STDOUT, ">", "rel2abs2rel$^PID.tmp")
+    open(my $stdoutdup, ">&", \*STDOUT);
+    open(\*STDOUT, ">", "rel2abs2rel$^PID.tmp")
         or die "Can't open scratch file rel2abs2rel$^PID.tmp -- $^OS_ERROR\n";
     system($perl, "rel2abs2rel$^PID.pl");
-    open(STDOUT, ">&", \*STDOUTDUP);
-    close(STDOUTDUP);
+    open(\*STDOUT, ">&", \*$stdoutdup);
+    close($stdoutdup);
 
-    local *F;
-    open(F, "<", "rel2abs2rel$^PID.tmp");
+    open(my $f, "<", "rel2abs2rel$^PID.tmp");
     local $^INPUT_RECORD_SEPARATOR = undef;
-    my $output = ~< *F;
-    close(F);
+    my $output = ~< *$f;
+    close($f);
     return $output;
 }
 

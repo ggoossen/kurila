@@ -78,20 +78,20 @@ rmtree 'auto/FakeMod';
 ok( mkpath('auto/FakeMod') );
 END { rmtree 'auto' }
 
-ok(open(PACKLIST, ">", 'auto/FakeMod/.packlist'));
-print PACKLIST 'list';
-close PACKLIST;
+ok(open(my $packlist, ">", 'auto/FakeMod/.packlist'));
+print $packlist 'list';
+close $packlist;
 
-ok(open(FAKEMOD, ">", 'auto/FakeMod/FakeMod.pm'));
+ok(open(my $fakemod, ">", 'auto/FakeMod/FakeMod.pm'));
 
-print FAKEMOD <<'FAKE';
+print $fakemod <<'FAKE';
 package FakeMod;
 use vars qw( $VERSION );
 $VERSION = '1.1.1';
 1;
 FAKE
 
-close FAKEMOD;
+close $fakemod;
 
 my $fake_mod_dir = File::Spec->catdir(cwd(), 'auto', 'FakeMod');
 

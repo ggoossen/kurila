@@ -58,8 +58,7 @@ like( $res, qr/"IMPORTS" => .+imports/, '... and allow parameter options too' );
 
 my $can_write;
 do {
-    local *OUT;
-    $can_write = open(OUT, ">", 'tmp_imp');
+    $can_write = open(my $out, ">", 'tmp_imp');
 };
 
 SKIP: do {
@@ -147,7 +146,6 @@ is( ExtUtils::MM_OS2->replace_manpage_separator($sep), '.a.b.c.de',
 
 # maybe_command
 do {
-	local *DIR;
 	my ($dir, $noext, $exe, $cmd);
 	my $found = 0;
 
@@ -163,8 +161,8 @@ do {
 	# an earlier file test in maybe_command().  Portability.
 
 	foreach my $path (split(m/:/, env::var('PATH'))) {
-		opendir(DIR, $path) or next;
-		while (defined(my $file = readdir(DIR))) {
+		opendir(my $dh, $path) or next;
+		while (defined(my $file = readdir($dh))) {
 			next if $file eq $curdir or $file eq $updir;
 			$file = File::Spec->catfile($path, $file);
 			unless (defined $dir) {

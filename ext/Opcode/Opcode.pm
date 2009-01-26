@@ -69,7 +69,7 @@ sub _init_optags {
 	# opset will croak on invalid names
 	define_optag($tag, opset(< @ops));
     }
-    close(DATA);
+    close(\*DATA);
     warn "Untagged opnames: ".join(' ',keys %all)."\n" if %all;
 }
 

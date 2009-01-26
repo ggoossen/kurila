@@ -207,9 +207,8 @@ sub ldopts {
 	    next unless -e ($archive = File::Spec->catdir($_,"auto",$root,"$sub$lib_ext"));
 	    push @archives, $archive;
 	    if(-e ($extra = File::Spec->catdir($_,"auto",$root,"extralibs.ld"))) {
-		local(*FH); 
-		if(open(FH, "<", $extra)) {
-		    my@($libs) = ~< *FH; chomp $libs;
+		if(open(my $fh, "<", $extra)) {
+		    my@($libs) = ~< *$fh; chomp $libs;
 		    push @potential_libs, < split m/\s+/, $libs;
 		}
 		else {  

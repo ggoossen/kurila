@@ -146,9 +146,9 @@ do {
 do {
     # Regression test for patch 14937: 
     #   Check that a .pm file with no package or VERSION doesn't core.
-    open F, ">", "xxx.pm" or die "Cannot open xxx.pm: $^OS_ERROR\n";
-    print F "1;\n";
-    close F;
+    open my $f, ">", "xxx.pm" or die "Cannot open xxx.pm: $^OS_ERROR\n";
+    print $f "1;\n";
+    close $f;
     eval "use lib '.'; use xxx v3;";
     like ($^EVAL_ERROR->message, qr/^xxx defines neither package nor VERSION--version check failed/);
     unlink 'xxx.pm';

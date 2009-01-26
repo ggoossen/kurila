@@ -223,9 +223,9 @@ touched.
 =cut
 
 sub calibrate_mtime {
-    open(FILE, ">", "calibrate_mtime.tmp") || die $^OS_ERROR;
-    print FILE "foo";
-    close FILE;
+    open(my $file, ">", "calibrate_mtime.tmp") || die $^OS_ERROR;
+    print $file "foo";
+    close $file;
     my $mtime = @(stat('calibrate_mtime.tmp'))[9];
     unlink 'calibrate_mtime.tmp';
     return $mtime;
@@ -272,13 +272,13 @@ sub setup_mm_test_root {
         # imposed by RMS.  We get around this with a rooted logical, but we
         # can't create logical names with attributes in Perl, so we do it
         # in a DCL subprocess and put it in the job table so the parent sees it.
-        open( MMTMP, ">", 'mmtesttmp.com' ) || 
+        open( my $mmtmp, ">", 'mmtesttmp.com' ) || 
           die "Error creating command file; $^OS_ERROR";
-        print MMTMP <<'COMMAND';
+        print $mmtmp <<'COMMAND';
 $ MM_TEST_ROOT = F$PARSE("SYS$DISK:[-]",,,,"NO_CONCEAL")-".][000000"-"]["-"].;"+".]"
 $ DEFINE/JOB/NOLOG/TRANSLATION=CONCEALED MM_TEST_ROOT 'MM_TEST_ROOT'
 COMMAND
-        close MMTMP;
+        close $mmtmp;
 
         system '@mmtesttmp.com';
         1 while unlink 'mmtesttmp.com';

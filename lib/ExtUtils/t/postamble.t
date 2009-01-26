@@ -39,8 +39,8 @@ do {
     };
 
     my $stdout = '';
-    close STDOUT;
-    open STDOUT, '>>', \$stdout or die;
+    close \*STDOUT;
+    open \*STDOUT, '>>', \$stdout or die;
     my $mm = WriteMakefile(
                            NAME            => 'Big::Dummy',
                            VERSION_FROM    => 'lib/Big/Dummy.pm',
@@ -65,10 +65,10 @@ OUT
 }
 
 
-ok( open(MAKEFILE, "<", $Makefile) ) or diag "Can't open $Makefile: $^OS_ERROR";
+ok( open(my $makefh, "<", $Makefile) ) or diag "Can't open $Makefile: $^OS_ERROR";
 do {
     local $^INPUT_RECORD_SEPARATOR; 
-    like( ~< *MAKEFILE, qr/^\# This makes sure the postamble gets written\n/m,
+    like( ~< *$makefh, qr/^\# This makes sure the postamble gets written\n/m,
           'postamble added to the Makefile' );
 };
-close MAKEFILE;
+close $makefh;

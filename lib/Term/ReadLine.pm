@@ -235,7 +235,7 @@ sub findConsole {
     $consoleOUT = $console unless defined $consoleOUT;
     $console = "&STDIN" unless defined $console;
     if (!defined $consoleOUT) {
-      $consoleOUT = defined fileno(STDERR) && $^OS_NAME ne 'MSWin32' ?? "&STDERR" !! "&STDOUT";
+      $consoleOUT = defined fileno(\*STDERR) && $^OS_NAME ne 'MSWin32' ?? "&STDERR" !! "&STDOUT";
     }
     return @($console,$consoleOUT);
 }
@@ -243,7 +243,6 @@ sub findConsole {
 sub new {
   die "method new called with wrong number of arguments" 
     unless (nelems @_)==2 or (nelems @_)==4;
-  #local (*FIN, *FOUT);
   my ($FIN, $FOUT, $ret);
   if ((nelems @_)==2) {
     my@($console, $consoleOUT) =  @_[0]->findConsole;
@@ -251,14 +250,14 @@ sub new {
 
     # the Windows CONIN$ needs GENERIC_WRITE mode to allow
     # a SetConsoleMode() if we end up using Term::ReadKey
-    open FIN, ((  $^OS_NAME eq 'MSWin32' && $console eq 'CONIN$' ) ?? "+<" !! "<"), "$console";
-    open FOUT, ">","$consoleOUT";
+    open my $fin, ((  $^OS_NAME eq 'MSWin32' && $console eq 'CONIN$' ) ?? "+<" !! "<"), "$console";
+    open my $fout, ">","$consoleOUT";
 
     #OUT->autoflush(1);		# Conflicts with debugger?
-    my $sel = select(FOUT);
+    my $sel = select($fout);
     $^OUTPUT_AUTOFLUSH = 1;				# for DB::OUT
     select($sel);
-    $ret = bless \@(\*FIN, \*FOUT);
+    $ret = bless \@(\*$fin, \*$fout);
   } else {			# Filehandles supplied
     $FIN = @_[2]; $FOUT = @_[3];
     #OUT->autoflush(1);		# Conflicts with debugger?

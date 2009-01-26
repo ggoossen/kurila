@@ -116,47 +116,47 @@ SKIP: do {
 	  $UTF8_STDIN ?? @( "stdio", "utf8" ) !! @( "stdio" ),
 	  "STDIN");
 
-    open(F, ">:crlf", "afile");
+    open(my $f, ">:crlf", "afile");
 
-    check( PerlIO::get_layers(\*F),
+    check( PerlIO::get_layers($f),
 	   qw(stdio crlf),
 	  "open :crlf");
 
-    binmode(\*F, ":pop") or die "$^OS_ERROR";
+    binmode($f, ":pop") or die "$^OS_ERROR";
 
-    check(PerlIO::get_layers(\*F),
+    check(PerlIO::get_layers($f),
 	  qw(stdio),
 	  ":pop");
 
-    binmode(F, ":raw") or die "$^OS_ERROR";
+    binmode($f, ":raw") or die "$^OS_ERROR";
 
-    check(PerlIO::get_layers(\*F),
+    check(PerlIO::get_layers($f),
 	  @("stdio"),
 	  ":raw");
 
-    binmode(F, ":utf8");
+    binmode($f, ":utf8");
 
-    check(PerlIO::get_layers('F'),
+    check(PerlIO::get_layers($f),
 	  qw(stdio utf8),
 	  ":utf8");
 
-    binmode(F, ":bytes");
+    binmode($f, ":bytes");
 
-    check(PerlIO::get_layers('F'),
+    check(PerlIO::get_layers($f),
 	  @( "stdio" ),
 	  ":bytes");
 
-    binmode(F, ":raw :crlf");
+    binmode($f, ":raw :crlf");
 
-    check(PerlIO::get_layers('F'),
+    check(PerlIO::get_layers($f),
 	  qw(stdio crlf),
 	  ":raw:crlf");
 
-    binmode(F, ":raw :encoding(latin1)"); # "latin1" will be canonized
+    binmode($f, ":raw :encoding(latin1)"); # "latin1" will be canonized
 
     # 7 tests potentially skipped.
     unless ($DOSISH || !$FASTSTDIO) {
-	my @results = PerlIO::get_layers('F', details => 1);
+	my @results = PerlIO::get_layers($f, details => 1);
 
 	# Get rid of the args and the flags.
 	splice(@results, 1, 2) if $NONSTDIO;
@@ -167,30 +167,30 @@ SKIP: do {
 	      ":raw:encoding(latin1)");
     }
 
-    binmode(F);
+    binmode($f);
 
-    check(PerlIO::get_layers('F'),
+    check(PerlIO::get_layers($f),
 	  @("stdio"),
 	  "binmode");
 
-    close F;
+    close $f;
 
     do {
 	use open(IN => ":crlf", OUT => ":utf8");
 
-	open F, "<", "afile";
-	open G, ">", "afile";
+	open $f, "<", "afile";
+	open my $g, ">", "afile";
 
-	check(PerlIO::get_layers('F', input  => 1),
+	check(PerlIO::get_layers($f, input  => 1),
 	      qw(stdio crlf),
 	      "use open IN");
 	
-	check(PerlIO::get_layers('G', output => 1),
+	check(PerlIO::get_layers($g, output => 1),
 	      qw[stdio utf8],
 	      "use open OUT");
 
-	close F;
-	close G;
+	close $f;
+	close $g;
     };
 
     1 while unlink "afile";

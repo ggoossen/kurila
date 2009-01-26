@@ -1,16 +1,16 @@
   doio.c	
 
   Can't open bidirectional pipe		[Perl_do_open9]
-    open(F, "| true |");
+    open($f, "| true |");
 
   Missing command in piped open		[Perl_do_open9]
-    open(F, "| ");
+    open($f, "| ");
 
   Missing command in piped open		[Perl_do_open9]
-    open(F, " |");
+    open($f, " |");
 
   warn(warn_nl, "open");		[Perl_do_open9]
-    open(F, "true\ncd")
+    open($f, "true\ncd")
 
   close() on unopened filehandle %s	[Perl_do_close]
     $a = "fred";close("$a")
@@ -60,27 +60,27 @@
 __END__
 # doio.c [Perl_do_open9]
 use warnings 'io' ;
-open(F, '|-|', "$^EXECUTABLE_NAME -e 1");
-close(F);
+open(my $f, '|-|', "$^EXECUTABLE_NAME -e 1");
+close($f);
 no warnings 'io' ;
-open(G, '|-|', "$^EXECUTABLE_NAME -e 1");
-close(G);
+open(my $g, '|-|', "$^EXECUTABLE_NAME -e 1");
+close($g);
 EXPECT
 Can't open bidirectional pipe at - line 3 character 1.
 ########
 # doio.c [Perl_do_open9]
 use warnings 'io' ;
-open(F, "|-", "");
+open(my $f, "|-", "");
 no warnings 'io' ;
-open(G, "|-", "");
+open(my $g, "|-", "");
 EXPECT
 Missing command in piped open at - line 3 character 1.
 ########
 # doio.c [Perl_do_open9]
 use warnings 'io' ;
-open(F, "-|", "");
+open(my $f, "-|", "");
 no warnings 'io' ;
-open(G, "-|", "");
+open(my $g, "-|", "");
 EXPECT
 Missing command in piped open at - line 3 character 1.
 ########
@@ -94,10 +94,10 @@ close() on unopened filehandle fred at - line 3 character 1.
 ########
 # doio.c [Perl_do_tell Perl_do_seek Perl_do_sysseek Perl_my_stat]
 use warnings 'io' ;
-close STDIN ;
-tell(STDIN);
-$a = seek(STDIN,1,1);
-$a = sysseek(STDIN,1,1);
+close \*STDIN ;
+tell(\*STDIN);
+$a = seek(\*STDIN,1,1);
+$a = sysseek(\*STDIN,1,1);
 -x \*STDIN ;
 stat(\*STDIN) ;
 $a = \*fred;
@@ -107,10 +107,10 @@ sysseek($a,1,1);
 -x $a; # ok
 stat($a); # ok
 no warnings 'io' ;
-close STDIN ;
-tell(STDIN);
-$a = seek(STDIN,1,1);
-$a = sysseek(STDIN,1,1);
+close \*STDIN ;
+tell(\*STDIN);
+$a = seek(\*STDIN,1,1);
+$a = sysseek(\*STDIN,1,1);
 -x \*STDIN ;
 stat(\*STDIN) ;
 $a = \*fred;
@@ -230,9 +230,9 @@ Can't do inplace edit: ./temp.dir is not a regular file at - line 21 character 1
 ########
 # doio.c [Perl_do_eof]
 use warnings 'io' ;
-my $a = eof STDOUT ;
+my $a = eof \*STDOUT ;
 no warnings 'io' ;
-$a = eof STDOUT ;
+$a = eof \*STDOUT ;
 EXPECT
 Filehandle STDOUT opened only for output at - line 3 character 9.
 ########
@@ -268,10 +268,10 @@ EOM
     }
 }
 use warnings 'io' ;
-close STDOUT;
-open FH1, "<", "TEST"; close FH1;
+close \*STDOUT;
+open \*FH1, "<", "TEST"; close \*FH1;
 no warnings 'io' ;
-open FH2, "<", "TEST"; close FH2;
+open \*FH2, "<", "TEST"; close \*FH2;
 EXPECT
 Filehandle STDOUT reopened as FH1 only for input at - line 14 character 1.
 ########
@@ -287,7 +287,7 @@ EOM
     }
 }
 use warnings 'io' ;
-close STDIN;
+close \*STDIN;
 open my $fh1, ">", "doiowarn.tmp"; close $fh1;
 no warnings 'io' ;
 open my $fh2, ">", "doiowarn.tmp"; close $fh2;

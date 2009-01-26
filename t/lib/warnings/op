@@ -225,8 +225,8 @@ SKIPPED
 EOM
     exit 
 } }
-getsockname STDIN ;	# OP_GETSOCKNAME
-getpeername STDIN ;	# OP_GETPEERNAME
+getsockname \*STDIN ;	# OP_GETSOCKNAME
+getpeername \*STDIN ;	# OP_GETPEERNAME
 gethostbyname 1 ;	# OP_GHBYNAME
 gethostbyaddr 1,2;	# OP_GHBYADDR
 gethostent ;		# OP_GHOSTENT
@@ -241,8 +241,8 @@ getservbyport 1,2;	# OP_GSBYPORT
 getservent ;		# OP_GSERVENT
 
 no warnings 'void' ;
-getsockname STDIN ;	# OP_GETSOCKNAME
-getpeername STDIN ;	# OP_GETPEERNAME
+getsockname \*STDIN ;	# OP_GETSOCKNAME
+getpeername \*STDIN ;	# OP_GETPEERNAME
 gethostbyname 1 ;	# OP_GHBYNAME
 gethostbyaddr 1,2;	# OP_GHBYADDR
 gethostent ;		# OP_GHOSTENT
@@ -327,7 +327,7 @@ Bareword found in conditional at - line 3 character 17.
 --FILE--
 # op.c
 use warnings 'misc' ;
-open FH, "<", "abc" ;
+open \*FH, "<", "abc" ;
 our $x;
 $x = 1 if $x = ~< *FH ;
 no warnings 'misc' ;
@@ -337,14 +337,14 @@ Value of <HANDLE> construct can be "0"; test with defined() at - line 5 characte
 ########
 # op.c
 use warnings 'misc' ;
-opendir FH, "." ;
+opendir \*FH, "." ;
 our $x;
-$x = 1 if $x = readdir FH ;
+$x = 1 if $x = readdir \*FH ;
 no warnings 'misc' ;
-$x = 1 if $x = readdir FH ;
-closedir FH ;
+$x = 1 if $x = readdir \*FH ;
+closedir \*FH ;
 EXPECT
-Value of readdir() operator can be "0"; test with defined() at - line 5 character 28.
+Value of readdir() operator can be "0"; test with defined() at - line 5 character 30.
 ########
 # op.c
 use warnings 'misc' ;
@@ -366,14 +366,14 @@ Value of glob construct can be "0"; test with defined() at - line 4 character 36
 ########
 # op.c
 use warnings 'misc' ;
-opendir FH, "." ;
+opendir \*FH, "." ;
 our $x;
-$x = 1 while $x = readdir FH and 0 ;
+$x = 1 while $x = readdir \*FH and 0 ;
 no warnings 'misc' ;
-$x = 1 while $x = readdir FH and 0 ;
-closedir FH ;
+$x = 1 while $x = readdir \*FH and 0 ;
+closedir \*FH ;
 EXPECT
-Value of readdir() operator can be "0"; test with defined() at - line 5 character 37.
+Value of readdir() operator can be "0"; test with defined() at - line 5 character 39.
 ########
 # op.c
 use warnings 'redefine' ;

@@ -31,10 +31,10 @@ my $testno;
 for my $dump (@dumps) {
     $testno++;
 
-    open(FH, ">", "$file") || die "Can't create $file: $^OS_ERROR";
-    binmode(FH);
-    print FH $dump;
-    close(FH) || die "Can't write $file: $^OS_ERROR";
+    open(my $fh, ">", "$file") || die "Can't create $file: $^OS_ERROR";
+    binmode($fh);
+    print $fh $dump;
+    close($fh) || die "Can't write $file: $^OS_ERROR";
 
     try {
 	my $data = retrieve($file);

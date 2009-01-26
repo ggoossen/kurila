@@ -39,8 +39,8 @@ env::temp_set_var('EU_ALWAYS_COPY', undef);
 chdir 'Big-Dummy';
 
 my $stdout = '';
-close STDOUT;
-open STDOUT, '>>', \$stdout or die;
+close \*STDOUT;
+open \*STDOUT, '>>', \$stdout or die;
 pm_to_blib( \%( 'lib/Big/Dummy.pm' => 'blib/lib/Big/Dummy.pm' ),
             'blib/lib/auto'
           );
@@ -104,9 +104,9 @@ ok( -r 'install-test/lib/perl/Big/Dummy.pm', '  UNINST=1 preserved same' );
 
 
 chmod 0644, 'blib/lib/Big/Dummy.pm' or die $^OS_ERROR;
-open(DUMMY, ">>", "blib/lib/Big/Dummy.pm") or die $^OS_ERROR;
-print DUMMY "Extra stuff\n";
-close DUMMY;
+open(my $dummy, ">>", "blib/lib/Big/Dummy.pm") or die $^OS_ERROR;
+print $dummy "Extra stuff\n";
+close $dummy;
 
 
 # Test UNINST=0 does not remove other versions in other dirs.

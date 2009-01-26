@@ -11,14 +11,14 @@ my $test = 1;
 print "1..29\n";
 print "ok 1\n";
 
-open(DUPOUT, ">&", \*STDOUT);
-open(DUPERR, ">&", \*STDERR);
+open(my $dupout, ">&", \*STDOUT);
+open(my $duperr, ">&", \*STDERR);
 
-open(STDOUT, ">","Io.dup")  || die "Can't open stdout";
-open(STDERR, ">&", \*STDOUT) || die "Can't open stderr";
+open(\*STDOUT, ">","Io.dup")  || die "Can't open stdout";
+open(\*STDERR, ">&", \*STDOUT) || die "Can't open stderr";
 
-select(STDERR); $^OUTPUT_AUTOFLUSH = 1;
-select(STDOUT); $^OUTPUT_AUTOFLUSH = 1;
+select(\*STDERR); $^OUTPUT_AUTOFLUSH = 1;
+select(\*STDOUT); $^OUTPUT_AUTOFLUSH = 1;
 
 print STDOUT "ok 2\n";
 print STDERR "ok 3\n";
@@ -48,11 +48,11 @@ else {
     }
 }
 
-close(STDOUT) or die "Could not close: $^OS_ERROR";
-close(STDERR) or die "Could not close: $^OS_ERROR";
+close(\*STDOUT) or die "Could not close: $^OS_ERROR";
+close(\*STDERR) or die "Could not close: $^OS_ERROR";
 
-open(STDOUT, ">&", \*DUPOUT) or die "Could not open: $^OS_ERROR";
-open(STDERR, ">&", \*DUPERR) or die "Could not open: $^OS_ERROR";
+open(\*STDOUT, ">&", $dupout) or die "Could not open: $^OS_ERROR";
+open(\*STDERR, ">&", $duperr) or die "Could not open: $^OS_ERROR";
 
 if (($^OS_NAME eq 'MSWin32') || ($^OS_NAME eq 'NetWare') || ($^OS_NAME eq 'VMS')) { print `type Io.dup` }
 elsif ($^OS_NAME eq 'MacOS') { system 'catenate Io.dup' }
@@ -61,94 +61,94 @@ unlink 'Io.dup';
 
 print STDOUT "ok 8\n";
 
-open(F,">&",1) or die "Cannot dup to numeric 1: $^OS_ERROR";
-print F "ok 9\n";
-close(F);
+open(my $f,">&",1) or die "Cannot dup to numeric 1: $^OS_ERROR";
+print $f "ok 9\n";
+close($f);
 
-open(F,">&",'1') or die "Cannot dup to string '1': $^OS_ERROR";
-print F "ok 10\n";
-close(F);
+open($f,">&",'1') or die "Cannot dup to string '1': $^OS_ERROR";
+print $f "ok 10\n";
+close($f);
 
-open(F,">&=",1) or die "Cannot dup to numeric 1: $^OS_ERROR";
-print F "ok 11\n";
-close(F);
+open($f,">&=",1) or die "Cannot dup to numeric 1: $^OS_ERROR";
+print $f "ok 11\n";
+close($f);
 
 if (config_value("useperlio")) {
-    open(F,">&=",'1') or die "Cannot dup to string '1': $^OS_ERROR";
-    print F "ok 12\n";
-    close(F);
+    open($f,">&=",'1') or die "Cannot dup to string '1': $^OS_ERROR";
+    print $f "ok 12\n";
+    close($f);
 } else {
-    open(F, ">&", \*DUPOUT) or die "Cannot dup stdout back: $^OS_ERROR";
-    print F "ok 12\n";
-    close(F);
+    open($f, ">&", $dupout) or die "Cannot dup stdout back: $^OS_ERROR";
+    print $f "ok 12\n";
+    close($f);
 }
 
 # To get STDOUT back.
-open(F, ">&", \*DUPOUT) or die "Cannot dup stdout back: $^OS_ERROR";
+open($f, ">&", $dupout) or die "Cannot dup stdout back: $^OS_ERROR";
 
 curr_test(13);
 
 SKIP: do {
     skip("need perlio", 14) unless config_value("useperlio");
     
-    ok(open(F, ">&", 'STDOUT'));
-    isnt(fileno(F), fileno(STDOUT));
-    close F;
+    ok(open($f, ">&", \*STDOUT));
+    isnt(fileno($f), fileno(\*STDOUT));
+    close $f;
 
-    ok(open(F, "<&=", \*STDIN)) or _diag $^OS_ERROR;
-    is(fileno(F), fileno(STDIN));
-    close F;
+    ok(open($f, "<&=", \*STDIN)) or _diag $^OS_ERROR;
+    is(fileno($f), fileno(\*STDIN));
+    close $f;
 
-    ok(open(F, ">&=", \*STDOUT));
-    is(fileno(F), fileno(STDOUT));
-    close F;
+    ok(open($f, ">&=", \*STDOUT));
+    is(fileno($f), fileno(\*STDOUT));
+    close $f;
 
-    ok(open(F, ">&=", \*STDERR));
-    is(fileno(F), fileno(STDERR));
-    close F;
+    ok(open($f, ">&=", \*STDERR));
+    is(fileno($f), fileno(\*STDERR));
+    close $f;
 
-    open(G, ">", "dup$^PID") or die;
-    my $g = fileno(G);
+    open(my $gfh, ">", "dup$^PID") or die;
+    my $g = fileno($gfh);
 
-    ok(open(F, ">&=", "$g"));
-    is(fileno(F), $g);
-    close F;
+    ok(open($f, ">&=", "$g"));
+    is(fileno($f), $g);
+    close $f;
 
-    ok(open(F, ">&=", "G"));
-    is(fileno(F), $g);
+    ok(open($f, ">&=", $gfh));
+    is(fileno($f), $g);
 
-    print G "ggg\n";
-    print F "fff\n";
+    print $gfh "ggg\n";
+    print $f "fff\n";
 
-    close G; # flush first
-    close F; # flush second
+    close $gfh; # flush first
+    close $f; # flush second
 
-    open(G, "<", "dup$^PID") or die;
+    open($gfh, "<", "dup$^PID") or die;
     do {
 	my $line;
-	$line = ~< *G; chomp $line; is($line, "ggg");
-	$line = ~< *G; chomp $line; is($line, "fff");
+	$line = ~< *$gfh; chomp $line; is($line, "ggg");
+	$line = ~< *$gfh; chomp $line; is($line, "fff");
     };
-    close G;
+    close $gfh;
 
-    open UTFOUT, '>:utf8', "dup$^PID" or die $^OS_ERROR;
-    open UTFDUP, ">&", \*UTFOUT or die $^OS_ERROR;
+    open my $utfout, '>:utf8', "dup$^PID" or die $^OS_ERROR;
+    open my $utfdup, ">&", \*$utfout or die $^OS_ERROR;
     # some old greek saying.
     my $message = "\x{03A0}\x{0391}\x{039D}\x{03A4}\x{0391} \x{03A1}\x{0395}\x{0399}\n";
-    print UTFOUT $message;
-    print UTFDUP $message;
-    binmode UTFDUP, ':utf8';
-    print UTFDUP $message;
-    close UTFOUT;
-    close UTFDUP;
-    open(UTFIN, "<:utf8", "dup$^PID") or die $^OS_ERROR;
+    print $utfout $message;
+    print $utfdup $message;
+    binmode $utfdup, ':utf8';
+    print $utfdup $message;
+    close $utfout;
+    close $utfdup;
+    open(my $utfin, "<:utf8", "dup$^PID") or die $^OS_ERROR;
     do {
 	my $line;
-	$line = ~< *UTFIN; is($line, $message);
-	$line = ~< *UTFIN; is($line, $message);
-	$line = ~< *UTFIN; is($line, $message);
+	$line = ~< *$utfin; is($line, $message);
+	$line = ~< *$utfin; is($line, $message);
+	$line = ~< *$utfin; is($line, $message);
     };
-    close UTFIN;
+    close $utfin;
 
     END { 1 while unlink "dup$^PID" }
 };

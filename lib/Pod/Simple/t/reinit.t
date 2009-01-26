@@ -40,12 +40,12 @@ foreach my $file (@(
     $parser->output_string(\$strings[0]);
     $parser->parse_file( source_path($file));
 
-    open(IN, "<", $precooked) or die "Can't read-open $precooked: $^OS_ERROR";
+    open(my $in, "<", $precooked) or die "Can't read-open $precooked: $^OS_ERROR";
     do {
       local $^INPUT_RECORD_SEPARATOR;
-      $strings[1] = ~< *IN;
+      $strings[1] = ~< *$in;
     };
-    close(IN);
+    close($in);
 
     for ($strings) { s/\s+/ /g; s/^\s+//s; s/\s+$//s; }
 

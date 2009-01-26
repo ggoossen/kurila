@@ -136,9 +136,9 @@ do {
     title "whatIsInput" ;
 
     my $lex = LexFile->new( my $out_file) ;
-    open FH, ">", "$out_file" ;
-    is whatIsInput(*FH), 'handle', "Match filehandle" ;
-    close FH ;
+    open my $fh, ">", "$out_file" ;
+    is whatIsInput(*$fh), 'handle', "Match filehandle" ;
+    close $fh ;
 
     my $stdin = '-';
     is whatIsInput($stdin),       'handle',   "Match '-' as stdin";
@@ -155,9 +155,9 @@ do {
     title "whatIsOutput" ;
 
     my $lex = LexFile->new( my $out_file) ;
-    open FH, ">", "$out_file" ;
-    is whatIsOutput(*FH), 'handle', "Match filehandle" ;
-    close FH ;
+    open my $fh, ">", "$out_file" ;
+    is whatIsOutput(*$fh), 'handle', "Match filehandle" ;
+    close $fh ;
 
     my $stdout = '-';
     is whatIsOutput($stdout),     'handle',   "Match '-' as stdout";

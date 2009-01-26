@@ -191,8 +191,8 @@ sub _module_name {
     my@($file, $orig_module) =  @_;
 
     my $module = '';
-    if (open PACKFH, "<", $file) {
-        while ( ~< *PACKFH) {
+    if (open my $packfh, "<", $file) {
+        while ( ~< *$packfh) {
             if (m/package\s+(\S+)\s*;/) {
                 my $pack = $1;
                 # Make a sanity check, that lower case $module
@@ -204,7 +204,7 @@ sub _module_name {
                 }
             }
         }
-        close PACKFH;
+        close $packfh;
     }
 
     print STDERR "Couldn't figure out the package name for $file\n"

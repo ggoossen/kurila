@@ -11,12 +11,12 @@ BEGIN {
 
 chdir File::Spec->updir;
 my $manifest = File::Spec->catfile('MANIFEST');
-open(MANIFEST, "<", $manifest) or die "Can't open $manifest: $^OS_ERROR";
+open(my $manifestfh, "<", $manifest) or die "Can't open $manifest: $^OS_ERROR";
 my @modules = map { m{^lib/(\S+)}; $1 } 
  grep { m{^lib/ExtUtils/\S*\.pm} } 
- grep { !m{/t/} } @( ~< *MANIFEST);
+ grep { !m{/t/} } @( ~< *$manifestfh);
 chomp @modules;
-close MANIFEST;
+close $manifestfh;
 
 chdir 'lib';
 plan tests => scalar (nelems @modules) * 2;

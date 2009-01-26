@@ -46,7 +46,7 @@ ok( !( $^HINT_BITS ^&^ 0x00100000 ), 'unimport should clear bits in $^H when req
 re->unimport('eval');
 ok( !( $^HINT_BITS ^&^ 0x00200000 ), '... and again' );
 my $reg=qr/(foo|bar|baz|blah)/;
-close STDERR;
+close \*STDERR;
 eval"use re Debug=>'ALL'";
 my $ok='foo'=~m/$reg/;
 eval"no re Debug=>'ALL'";

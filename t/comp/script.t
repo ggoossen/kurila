@@ -12,9 +12,9 @@ our $x = `$Perl -le "print 'ok';"`;
 
 if ($x eq "ok\n") {print "ok 1\n";} else {print "not ok 1\n";}
 
-open(TRY, ">","Comp.script") || (die "Can't open temp file.");
-print TRY 'print "ok\n";'; print TRY "\n";
-close TRY or die "Could not close: $^OS_ERROR";
+open(my $try, ">","Comp.script") || (die "Can't open temp file.");
+print $try 'print "ok\n";'; print $try "\n";
+close $try or die "Could not close: $^OS_ERROR";
 
 $x = `$Perl Comp.script`;
 

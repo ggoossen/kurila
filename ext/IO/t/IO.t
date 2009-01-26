@@ -79,7 +79,8 @@ my $fakemod = File::Spec->catfile( $fakedir, 'fakemod.pm' );
 my $flag;
 if ( -d $fakedir or mkpath( $fakedir ))
 {
-	if (open( OUT, ">", "$fakemod"))
+        my $outfh;
+	if (open( $outfh, ">", "$fakemod"))
 	{
 		(my $package = <<'		END_HERE') =~ s/\t//g;
 		package IO::fakemod;
@@ -91,10 +92,10 @@ if ( -d $fakedir or mkpath( $fakedir ))
 		1;
 		END_HERE
 
-		print OUT $package;
+		print $outfh $package;
 	}
 
-	if (close OUT)
+	if (close $outfh)
 	{
 		$flag = 1;
 		push $^INCLUDE_PATH, 'lib';

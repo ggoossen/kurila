@@ -25,37 +25,37 @@ sub lineno
 
 my $t;
 
-open (F, "<", $File) or die $^OS_ERROR;
+open (my $fh, "<", $File) or die $^OS_ERROR;
 my $io = IO::File->new($File) or die $^OS_ERROR;
 
-~< *F for @( ( <1 .. 10));
+~< *$fh for @( ( <1 .. 10));
 ok(lineno($io), "0");
 
 $io->getline for @( ( <1 .. 5));
 ok(lineno($io), "5");
 
-~< *F;
+~< *$fh;
 ok(lineno($io), "5");
 
 $io->getline;
 ok(lineno($io), "6");
 
-$t = tell F;                                        # tell F; provokes a warning
+$t = tell $fh;                                        # tell $fh; provokes a warning
 ok(lineno($io), "6");
 
-~< *F;
+~< *$fh;
 ok(lineno($io), "6");
 
-select F;
+select $fh;
 ok(lineno($io), "6");
 
-~< *F for @( ( <1 .. 10));
+~< *$fh for @( ( <1 .. 10));
 ok(lineno($io), "6");
 
 $io->getline for @( ( <1 .. 5));
 ok(lineno($io), "11");
 
-$t = tell F;
+$t = tell $fh;
 # We used to have problems here before local $. worked.
 # input_line_number() used to use select and tell.  When we did the
 # same, that mechanism broke.  It should work now.

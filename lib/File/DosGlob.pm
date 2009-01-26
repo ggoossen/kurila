@@ -59,9 +59,9 @@ sub doglob {
 	    else              { push(@retval,$head) if -e $head }
 	    next OUTER;
 	}
-	opendir(D, $head) or next OUTER;
-	my @leaves = @( readdir D );
-	closedir D;
+	opendir(my $d, $head) or next OUTER;
+	my @leaves = @( readdir $d );
+	closedir $d;
 	$head = '' if $head eq '.';
 	$head .= $sepchr unless $head eq '' or substr($head,-1) eq $sepchr;
 
@@ -170,9 +170,9 @@ sub doglob_Mac {
 	    next OUTER;
 	}
 	#print "opendir($not_esc_head)\n";
-	opendir(D, $not_esc_head) or next OUTER;
-	my @leaves = @( readdir D );
-	closedir D;
+	opendir(my $d, $not_esc_head) or next OUTER;
+	my @leaves = @( readdir $d );
+	closedir $d;
 
 	# escape regex metachars but not '\' and glob chars '*', '?'
 	$_ =~ s:([].+^\-\${}[|]):\\$1:g;

@@ -206,11 +206,12 @@ if ( $^OS_NAME eq 'qnx' ) {
 ### the client. We'll use own source code ...
 #
 local our @data;
-if( !open( SRC, "<", "$^PROGRAM_NAME")) {
+my $src;
+if( !open( $src, "<", "$^PROGRAM_NAME")) {
     print "not ok 15 - $^OS_ERROR\n";
 } else {
-    @data = @( ~< *SRC );
-    close(SRC);
+    @data = @( ~< *$src );
+    close($src);
     print "ok 15\n";
 }
 

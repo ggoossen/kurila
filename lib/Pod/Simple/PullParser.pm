@@ -256,9 +256,9 @@ sub set_source {
   } else {  # It's a filename!
     DEBUG and print "$self 's source is filename @_[0]\n";
     do {
-      local *PODSOURCE;
-      open(PODSOURCE, "<", "@_[0]") || Carp::croak "Can't open @_[0]: $^OS_ERROR";
-      $handle = *PODSOURCE{IO};
+        my $podsource;
+        open($podsource, "<", "@_[0]") || Carp::croak "Can't open @_[0]: $^OS_ERROR";
+        $handle = $podsource;
     };
     $self->{+'source_filename'} = @_[0];
     DEBUG and print "  Its name is @_[0].\n";

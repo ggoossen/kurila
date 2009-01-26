@@ -23,14 +23,14 @@ mkdir('Odd-Version', 0777);
 END { chdir File::Spec->updir;  rmtree 'Odd-Version' }
 chdir 'Odd-Version';
 
-open(MPL, ">", "Version") || die $^OS_ERROR;
-print MPL "\$VERSION = 0\n";
-close MPL;
+open(my $mpl, ">", "Version") || die $^OS_ERROR;
+print $mpl "\$VERSION = 0\n";
+close $mpl;
 END { unlink 'Version' }
 
 my $stdout = '';
-close STDOUT;
-open STDOUT, '>>', \$stdout or die;
+close \*STDOUT;
+open \*STDOUT, '>>', \$stdout or die;
 my $mm = WriteMakefile(
     NAME         => 'Version',
     VERSION_FROM => 'Version'

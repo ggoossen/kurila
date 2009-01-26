@@ -127,8 +127,8 @@ do {
 
 my $data = "a non-empty PV";
 $data = undef;
-open(MEM, '<', \$data) or die "Fail: $^OS_ERROR\n";
-my $x = join '', @: ~< *MEM;
+open(my $mem, '<', \$data) or die "Fail: $^OS_ERROR\n";
+my $x = join '', @: ~< *$mem;
 is($x, '');
 
 do {
@@ -138,25 +138,25 @@ line A
 line B
 a third line
 EOF
-    open(F, '<', \$s) or die "Could not open string as a file";
+    open(my $f, '<', \$s) or die "Could not open string as a file";
     local $^INPUT_RECORD_SEPARATOR = "";
-    my $ln = ~< *F;
-    close F;
+    my $ln = ~< *$f;
+    close $f;
     is($ln, $s, "[perl #35929]");
 };
 
 # [perl #40267] PerlIO::scalar doesn't respect readonly-ness
 do {
-    ok(!(defined open(F, '>', \undef)), "[perl #40267] - $^OS_ERROR");
-    close F;
+    ok(!(defined open(my $f, '>', \undef)), "[perl #40267] - $^OS_ERROR");
+    close $f;
 
     my $ro = \43;
-    ok(!(defined open(F, '>', $ro)), $^OS_ERROR);
-    close F;
+    ok(!(defined open($f, '>', $ro)), $^OS_ERROR);
+    close $f;
     # but we can read from it
-    ok(open(F, '<', $ro), $^OS_ERROR);
-    is( ~< *F, 43);
-    close F;
+    ok(open($f, '<', $ro), $^OS_ERROR);
+    is( ~< *$f, 43);
+    close $f;
 };
 
 do {
@@ -165,40 +165,40 @@ do {
 
     my $foo;
 
-    ok(open(F, '>', \$foo));
+    ok(open(my $f, '>', \$foo));
 
     # Seeking forward should zero fill.
 
-    ok(seek(F, 50, SEEK_SET));
-    print F "x";
+    ok(seek($f, 50, SEEK_SET));
+    print $f "x";
     is(length($foo), 51);
     like($foo, qr/^\0{50}x$/);
 
-    is(tell(F), 51);
-    ok(seek(F, 0, SEEK_SET));
+    is(tell($f), 51);
+    ok(seek($f, 0, SEEK_SET));
     is(length($foo), 51);
 
     # Seeking forward again should zero fill but only the new bytes.
 
-    ok(seek(F, 100, SEEK_SET));
-    print F "y";
+    ok(seek($f, 100, SEEK_SET));
+    print $f "y";
     is(length($foo), 101);
     like($foo, qr/^\0{50}x\0{49}y$/);
-    is(tell(F), 101);
+    is(tell($f), 101);
 
     # Seeking back and writing should not zero fill.
 
-    ok(seek(F, 75, SEEK_SET));
-    print F "z";
+    ok(seek($f, 75, SEEK_SET));
+    print $f "z";
     is(length($foo), 101);
     like($foo, qr/^\0{50}x\0{24}z\0{24}y$/);
-    is(tell(F), 76);
+    is(tell($f), 76);
 
     # Seeking negative should not do funny business.
 
-    ok(!seek(F,  -50, SEEK_SET), $^OS_ERROR);
-    ok(seek(F, 0, SEEK_SET));
-    ok(!seek(F,  -50, SEEK_CUR), $^OS_ERROR);
-    ok(!seek(F, -150, SEEK_END), $^OS_ERROR);
+    ok(!seek($f,  -50, SEEK_SET), $^OS_ERROR);
+    ok(seek($f, 0, SEEK_SET));
+    ok(!seek($f,  -50, SEEK_CUR), $^OS_ERROR);
+    ok(!seek($f, -150, SEEK_END), $^OS_ERROR);
 };
 

@@ -116,7 +116,7 @@ print $^EVAL_ERROR && $^EVAL_ERROR->{?description} =~ m/foo bar/ ?? "ok 29\n" !!
 my $t = 30;
 $^OS_ERROR = 0;
 my $nosuch = '/non/existant/file.name';
-open(NOSUCH, "<", $nosuch);
+open(my $nosuch_fh, "<", $nosuch);
 if ($^EVAL_ERROR) {
     my $errno  = $^OS_ERROR;
     die "Eek! Attempting to open $nosuch failed, but \$! is still 0" unless $^OS_ERROR;
@@ -126,7 +126,7 @@ if ($^EVAL_ERROR) {
 } else {
     die "Eek! Didn't expect $nosuch to be there.";
 }
-close(NOSUCH);
+close($nosuch_fh);
 
 # test #31 is gone.
 print "ok $t\n"; $t++;

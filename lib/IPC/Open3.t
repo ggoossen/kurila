@@ -91,9 +91,9 @@ waitpid $pid, 0;
 ok 14, pipe *PIPE_READ, *PIPE_WRITE;
 $pid = open3 '<&PIPE_READ', \*READ, undef,
 		    $perl, '-e', cmd_line('print scalar ~< *STDIN');
-close PIPE_READ;
-print PIPE_WRITE "ok 15\n";
-close PIPE_WRITE;
+close \*PIPE_READ;
+print {\*PIPE_WRITE} "ok 15\n";
+close \*PIPE_WRITE;
 print scalar ~< *READ;
 waitpid $pid, 0;
 

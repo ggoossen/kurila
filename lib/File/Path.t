@@ -196,9 +196,9 @@ else {
 # see what happens if a file exists where we want a directory
 SKIP: do {
     my $entry = catdir($tmp_base, "file");
-    skip "Cannot create $entry", 4 unless open OUT, ">", " $entry";
-    print OUT "test file, safe to delete\n", scalar(localtime), "\n";
-    close OUT;
+    skip "Cannot create $entry", 4 unless open my $out, ">", " $entry";
+    print $out "test file, safe to delete\n", scalar(localtime), "\n";
+    close $out;
     ok(-e $entry, "file exists in place of directory");
 
     mkpath( $entry, \%(error => \$error) );
@@ -353,9 +353,9 @@ cannot restore permissions to \d+ for [^:]+: .* at \1 line \2},
 
     SKIP: do {
         $file = catdir($dir2, "file");
-        skip "Cannot create $file", 2 unless open OUT, ">", " $file";
-        print OUT "test file, safe to delete\n", scalar(localtime), "\n";
-        close OUT;
+        skip "Cannot create $file", 2 unless open my $out, ">", " $file";
+        print $out "test file, safe to delete\n", scalar(localtime), "\n";
+        close $out;
 
         ok(-e $file, "file created in directory");
 

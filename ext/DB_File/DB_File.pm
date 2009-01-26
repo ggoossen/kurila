@@ -170,8 +170,8 @@ sub new
     # recno in version 1.
     if ($db_version +> 1 and defined $hash_info and (ref $hash_info) =~ m/RECNO/ and 
 	$filename and ! -e $filename) {
-	open(FH, ">", $filename) or return undef ;
-	close FH ;
+	open(my $fh, ">", $filename) or return undef ;
+	close $fh ;
 	chmod $mode || 0666 , $filename;
     }
 

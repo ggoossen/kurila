@@ -84,9 +84,9 @@ if ($have_fork) {
 
 my $xdefine = ''; 
 
-if (open(XDEFINE, "<", "xdefine")) {
-    chomp($xdefine = ~< *XDEFINE);
-    close(XDEFINE);
+if (open(my $fh, "<", "xdefine")) {
+    chomp($xdefine = ~< *$fh);
+    close($fh);
 }
 
 # Ideally, we'd like to test that the timers are rather precise.
@@ -646,15 +646,15 @@ if ($^OS_NAME =~ m/^(cygwin|MSWin)/) {
     my @mtime;
     for (1..5) {
 	Time::HiRes::sleep(rand(0.1) + 0.1);
-	open(X, ">", "$^PID");
-	print X $^PID;
-	close(X);
+	open(my $x, ">", "$^PID");
+	print $x $^PID;
+	close($x);
 	@stat = @( Time::HiRes::stat($^PID) );
 	push @mtime, @stat[?9];
 	Time::HiRes::sleep(rand(0.1) + 0.1);
-	open(X, "<", "$^PID");
-	~< *X;
-	close(X);
+	open($x, "<", "$^PID");
+	~< *$x;
+	close($x);
 	@stat = @( Time::HiRes::stat($^PID) );
 	push @atime, @stat[?8];
     }

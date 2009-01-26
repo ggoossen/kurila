@@ -34,39 +34,39 @@ for my $cross_partition_test (0..1) {
   };
 
   # First we create a file
-  open(F, ">", "file-$^PID") or die;
-  binmode F; # for DOSISH platforms, because test 3 copies to stdout
-  printf F "ok\n";
-  close F;
+  open(my $f, ">", "file-$^PID") or die;
+  binmode $f; # for DOSISH platforms, because test 3 copies to stdout
+  printf $f "ok\n";
+  close $f;
 
   copy "file-$^PID", "copy-$^PID";
 
-  open(F, "<", "copy-$^PID") or die;
-  my $foo = ~< *F;
-  close(F);
+  open($f, "<", "copy-$^PID") or die;
+  my $foo = ~< *$f;
+  close($f);
 
   is -s "file-$^PID", -s "copy-$^PID", 'copy(fn, fn): files of the same size';
 
   is $foo, "ok\n", 'copy(fn, fn): same contents';
 
   print("# next test checks copying to STDOUT\n");
-  binmode STDOUT unless $^OS_NAME eq 'VMS'; # Copy::copy works in binary mode
+  binmode \*STDOUT unless $^OS_NAME eq 'VMS'; # Copy::copy works in binary mode
   # This outputs "ok" so its a test.
   copy "copy-$^PID", \*STDOUT;
   $TB->current_test($TB->current_test + 1);
   unlink "copy-$^PID" or die "unlink: $^OS_ERROR";
 
-  open(F, "<","file-$^PID");
-  copy(\*F, "copy-$^PID");
-  open(R, "<", "copy-$^PID") or die "open copy-$^PID: $^OS_ERROR"; $foo = ~< *R; close(R);
-  is $foo, "ok\n", 'copy(*F, fn): same contents';
+  open($f, "<","file-$^PID");
+  copy(\*$f, "copy-$^PID");
+  open(my $r, "<", "copy-$^PID") or die "open copy-$^PID: $^OS_ERROR"; $foo = ~< *$r; close($r);
+  is $foo, "ok\n", 'copy(*$f, fn): same contents';
   unlink "copy-$^PID" or die "unlink: $^OS_ERROR";
 
-  open(F, "<","file-$^PID");
-  copy(\*F, "copy-$^PID");
-  close(F) or die "close: $^OS_ERROR";
-  open(R, "<", "copy-$^PID") or die; $foo = ~< *R; close(R) or die "close: $^OS_ERROR";
-  is $foo, "ok\n", 'copy(\*F, fn): same contents';
+  open($f, "<","file-$^PID");
+  copy(\*$f, "copy-$^PID");
+  close($f) or die "close: $^OS_ERROR";
+  open($r, "<", "copy-$^PID") or die; $foo = ~< *$r; close($r) or die "close: $^OS_ERROR";
+  is $foo, "ok\n", 'copy(\*$f, fn): same contents';
   unlink "copy-$^PID" or die "unlink: $^OS_ERROR";
 
   require IO::File;
@@ -74,7 +74,7 @@ for my $cross_partition_test (0..1) {
   binmode $fh or die;
   copy("file-$^PID",$fh);
   $fh->close or die "close: $^OS_ERROR";
-  open(R, "<", "copy-$^PID") or die; $foo = ~< *R; close(R);
+  open($r, "<", "copy-$^PID") or die; $foo = ~< *$r; close($r);
   is $foo, "ok\n", 'copy(fn, io): same contents';
   unlink "copy-$^PID" or die "unlink: $^OS_ERROR";
 
@@ -83,7 +83,7 @@ for my $cross_partition_test (0..1) {
   binmode $fh or die;
   copy("file-$^PID",$fh);
   $fh->close;
-  open(R, "<", "copy-$^PID") or die; $foo = ~< *R; close(R);
+  open($r, "<", "copy-$^PID") or die; $foo = ~< *$r; close($r);
   is $foo, "ok\n", 'copy(fn, fh): same contents';
   unlink "file-$^PID" or die "unlink: $^OS_ERROR";
 
@@ -102,7 +102,7 @@ for my $cross_partition_test (0..1) {
   ok move("copy-$^PID", "file-$^PID"), 'move';
   ok -e "file-$^PID",              '  destination exists';
   ok !-e "copy-$^PID",              '  source does not';
-  open(R, "<", "file-$^PID") or die; $foo = ~< *R; close(R);
+  open($r, "<", "file-$^PID") or die; $foo = ~< *$r; close($r);
   is $foo, "ok\n", 'contents preserved';
 
   TODO: do {
@@ -117,13 +117,13 @@ for my $cross_partition_test (0..1) {
   # trick: create lib/ if not exists - not needed in Perl core
   unless (-d 'lib') { mkdir 'lib' or die; }
   copy "file-$^PID", "lib";
-  open(R, "<", "lib/file-$^PID") or die $^OS_ERROR; $foo = ~< *R; close(R);
+  open($r, "<", "lib/file-$^PID") or die $^OS_ERROR; $foo = ~< *$r; close($r);
   is $foo, "ok\n", 'copy(fn, dir): same contents';
   unlink "lib/file-$^PID" or die "unlink: $^OS_ERROR";
 
   # Do it twice to ensure copying over the same file works.
   copy "file-$^PID", "lib";
-  open(R, "<", "lib/file-$^PID") or die; $foo = ~< *R; close(R);
+  open($r, "<", "lib/file-$^PID") or die; $foo = ~< *$r; close($r);
   is $foo, "ok\n", 'copy over the same file works';
   unlink "lib/file-$^PID" or die "unlink: $^OS_ERROR";
 
@@ -137,7 +137,7 @@ for my $cross_partition_test (0..1) {
   };
 
   move "file-$^PID", "lib";
-  open(R, "<", "lib/file-$^PID") or die "open lib/file-$^PID: $^OS_ERROR"; $foo = ~< *R; close(R);
+  open($r, "<", "lib/file-$^PID") or die "open lib/file-$^PID: $^OS_ERROR"; $foo = ~< *$r; close($r);
   is $foo, "ok\n", 'move(fn, dir): same contents';
   ok !-e "file-$^PID", 'file moved indeed';
   unlink "lib/file-$^PID" or die "unlink: $^OS_ERROR";
@@ -145,9 +145,9 @@ for my $cross_partition_test (0..1) {
   SKIP: do {
     skip "Testing symlinks", 3 unless config_value("d_symlink");
 
-    open(F, ">", "file-$^PID") or die $^OS_ERROR;
-    print F "dummy content\n";
-    close F;
+    open($f, ">", "file-$^PID") or die $^OS_ERROR;
+    print $f "dummy content\n";
+    close $f;
     symlink("file-$^PID", "symlink-$^PID") or die $^OS_ERROR;
 
     my $warnings = '';
@@ -166,9 +166,9 @@ for my $cross_partition_test (0..1) {
     skip "Testing hard links", 3 
          if !config_value("d_link") or $^OS_NAME eq 'MSWin32' or $^OS_NAME eq 'cygwin';
 
-    open(F, ">", "file-$^PID") or die $^OS_ERROR;
-    print F "dummy content\n";
-    close F;
+    open($f, ">", "file-$^PID") or die $^OS_ERROR;
+    print $f "dummy content\n";
+    close $f;
     link("file-$^PID", "hardlink-$^PID") or die $^OS_ERROR;
 
     my $warnings = '';

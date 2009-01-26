@@ -73,7 +73,7 @@ sub doconst
 {
  my $sym = shift;
  my $l = length($sym);
- print OUT <<"END";
+ print $out_fh <<"END";
  ENTER;
  SAVESPTR(PL_curstash);
  HVcpREPLACE(PL_curstash, stash);

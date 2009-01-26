@@ -49,10 +49,10 @@ die "argv empty\n" unless @ARGV;
 die "too many in argv: $(join ' ', @ARGV)\n" unless nelems @ARGV == 1;
 
 my $file = @ARGV[0];
-open OUT, ">", "$file" or die $^OS_ERROR;
+open my $out, ">", "$file" or die $^OS_ERROR;
 
-print OUT "Testing\n";
-close OUT
+print $out "Testing\n";
+close $out
 END
 
     $test =~ s/^\n//;
@@ -74,10 +74,10 @@ die "argv empty\n" unless @ARGV;
 die "too many in argv: @ARGV\n" unless nelems @ARGV == 1;
 
 my $file = @ARGV[0];
-open OUT, ">", "$file" or die $^OS_ERROR;
+open my $out, ">", "$file" or die $^OS_ERROR;
 
-print OUT "Testing\n";
-close OUT
+print $out "Testing\n";
+close $out
 END
 
     $test =~ s/^\n//;
@@ -96,9 +96,9 @@ sub setup {
 
         my $dir = dirname($file);
         mkpath $dir;
-        open(FILE, ">", "$file") || die "Can't create $file: $^OS_ERROR";
-        print FILE $text;
-        close FILE;
+        open(my $fh, ">", "$file") || die "Can't create $file: $^OS_ERROR";
+        print $fh $text;
+        close $fh;
     }
 
     return 1;

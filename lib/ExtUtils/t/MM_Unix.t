@@ -168,7 +168,7 @@ is ($t->libscan('Fatty'), 'Fatty', 'libscan on something not a VC file' );
 ###############################################################################
 # maybe_command
 
-open(FILE, ">", "command"); print FILE "foo"; close FILE;
+open(my $fh, ">", "command"); print $fh "foo"; close $fh;
 SKIP: do {
     skip ("no separate execute mode", 1) if ($^OS_NAME eq "vos");
     ok (!$t->maybe_command('command') ,"non executable file isn't a command");

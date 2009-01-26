@@ -10,9 +10,9 @@ use Cwd ();
 env::set_var('PATH' => "/bin");
 env::set_var($_, undef) for qw(BASH_ENV CDPATH ENV IFS);
 my @correct = @( () );
-if (opendir(D, $^OS_NAME eq "MacOS" ?? ":" !! ".")) {
-   @correct = grep { !m/^\./ } sort @( readdir(D));
-   closedir D;
+if (opendir(my $d, $^OS_NAME eq "MacOS" ?? ":" !! ".")) {
+   @correct = grep { !m/^\./ } sort @( readdir($d));
+   closedir $d;
 }
 my @a = File::Glob::bsd_glob("*", 0);
 @a = sort @a;
@@ -118,8 +118,8 @@ if ($^OS_NAME eq 'VMS') { # VMS is happily caseignorant
 }
 
 for ( @f_names) {
-    open T, ">", "$_";
-    close T;
+    open my $t, ">", "$_";
+    close $t;
 }
 
 my $pat = "*.pl";

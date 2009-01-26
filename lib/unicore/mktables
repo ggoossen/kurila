@@ -1224,7 +1224,7 @@ sub ArabicShaping_txt()
 
     my %JoinType;
 
-    while ( ~< *IN)
+    while ( ~< *$in)
     {
 	next unless m/^[0-9A-Fa-f]+;/;
 	s/\s+$//;
@@ -1263,7 +1263,7 @@ sub EastAsianWidth_txt()
 
     my %EAW;
 
-    while ( ~< *IN)
+    while ( ~< *$in)
     {
 	next unless m/^[0-9A-Fa-f]+(\.\.[0-9A-Fa-f]+)?;/;
 	s/#.*//;
@@ -1301,7 +1301,7 @@ sub HangulSyllableType_txt()
 
     my %HST;
 
-    while ( ~< *IN)
+    while ( ~< *$in)
     {
         next unless m/^([0-9A-Fa-f]+)(?:\.\.([0-9A-Fa-f]+))?\s*;\s*(\w+)/;
 	my @($first, $last, $pv) = @(hex($1), hex($2||""), $3);
@@ -1332,7 +1332,7 @@ sub Jamo_txt()
     }
     my $Short = Table->New();
 
-    while ( ~< *IN)
+    while ( ~< *$in)
     {
 	next unless m/^([0-9A-Fa-f]+)\s*;\s*(\w*)/;
 	my @($code, $short) = @(hex($1), $2);

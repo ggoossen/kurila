@@ -46,9 +46,9 @@ sub setup_recurs {
 
         my $dir = dirname($file);
         mkpath $dir;
-        open(FILE, ">", "$file") || die "Can't create $file: $^OS_ERROR";
-        print FILE $text;
-        close FILE;
+        open(my $fh, ">", "$file") || die "Can't create $file: $^OS_ERROR";
+        print $fh $text;
+        close $fh;
     }
 
     return 1;

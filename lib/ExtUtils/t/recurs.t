@@ -103,12 +103,12 @@ ok( -e $makefile,    'Makefile written' );
 ok( -e $submakefile, 'sub Makefile written' );
 
 my $inst_script = File::Spec->catdir(File::Spec->updir, 'cgi');
-ok( open(MAKEFILE, "<", $submakefile) ) || diag("Can't open $submakefile: $^OS_ERROR");
+ok( open(my $makefh, "<", $submakefile) ) || diag("Can't open $submakefile: $^OS_ERROR");
 do { local $^INPUT_RECORD_SEPARATOR;  
-  like( ~< *MAKEFILE, qr/^\s*INST_SCRIPT\s*=\s*\Q$inst_script\E/m, 
+  like( ~< *$makefh, qr/^\s*INST_SCRIPT\s*=\s*\Q$inst_script\E/m, 
         'prepend .. not stomping WriteMakefile args' ) 
 };
-close MAKEFILE;
+close $makefh;
 
 
 do {

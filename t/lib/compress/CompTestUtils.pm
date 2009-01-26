@@ -84,11 +84,11 @@ sub readFile
     }
     else
     {
-        open (F, "<", "$f") 
+        open (my $fh, "<", "$f") 
             or die "Cannot open $f: $^OS_ERROR\n" ;
-        binmode F;
-        @strings = @( ~< *F ) ;	
-        close F ;
+        binmode $fh;
+        @strings = @( ~< *$fh ) ;	
+        close $fh ;
     }
 
     return join "", @strings ;
@@ -103,14 +103,14 @@ sub writeFile
 {
     my@($filename, @< @strings) =  @_ ;
     1 while unlink $filename ;
-    open (F, ">", "$filename") 
+    open (my $fh, ">", "$filename") 
         or croak "Cannot open $filename: $^OS_ERROR\n" ;
-    binmode F;
+    binmode $fh;
     foreach ( @strings) {
         no warnings ;
-        print F $_ ;
+        print $fh $_ ;
     }
-    close F ;
+    close $fh ;
 }
 
 sub GZreadFile

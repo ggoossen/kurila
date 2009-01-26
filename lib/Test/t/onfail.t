@@ -22,12 +22,12 @@ BEGIN { plan test => 6, onfail => \&myfail }
 $mycnt = 0;
 
 # sneak in a test that Test::Harness wont see
-open J, ">", "junk";
-$TESTOUT = *J{IO};
-$TESTERR = *J{IO};
+open my $j, ">", "junk";
+$TESTOUT = $j;
+$TESTERR = $j;
 ok(0, 1, $why);
 $TESTOUT = *STDOUT{IO};
 $TESTERR = *STDERR{IO};
-close J;
+close $j;
 unlink "junk";
 $ntest = 1;

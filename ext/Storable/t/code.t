@@ -48,7 +48,7 @@ local *FOO;
 
      \&dclone,                 # XS function
 
-     sub { open FOO, "/" },
+     sub { open my $foo, "/" },
     );
 
 $Storable::Deparse = 1;
@@ -167,13 +167,13 @@ do {
 
     my $devnull = File::Spec->devnull;
 
-    open(SAVEERR, ">&", \*STDERR);
-    open(STDERR, ">", $devnull) or
+    open(my $saverr, ">&", \*STDERR);
+    open(\*STDERR, ">", $devnull) or
 	( print SAVEERR "Unable to redirect STDERR: $^OS_ERROR\n" and exit(1) );
 
     try { $freezed = freeze @obj[0]->[0] };
 
-    open(STDERR, ">&", \*SAVEERR);
+    open(\*STDERR, ">&", \*$saverr);
 
     ok($^EVAL_ERROR, "");
     ok($freezed ne '');

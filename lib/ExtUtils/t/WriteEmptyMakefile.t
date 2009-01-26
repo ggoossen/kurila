@@ -26,8 +26,8 @@ like $^EVAL_ERROR->{description}, qr/Need an even number of args/;
 
 do {
     my $stdout = '';
-    close STDOUT;
-    open STDOUT, '>>', \$stdout or die;
+    close \*STDOUT;
+    open \*STDOUT, '>>', \$stdout or die;
 
     ok !-e 'wibble';
     END { 1 while unlink 'wibble' }

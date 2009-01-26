@@ -9,8 +9,8 @@ BEGIN {
     }
 }
 
-select(STDERR); $^OUTPUT_AUTOFLUSH = 1;
-select(STDOUT); $^OUTPUT_AUTOFLUSH = 1;
+select(\*STDERR); $^OUTPUT_AUTOFLUSH = 1;
+select(\*STDOUT); $^OUTPUT_AUTOFLUSH = 1;
 
 use IO::Dir < qw(DIR_UNLINK);
 
@@ -45,7 +45,7 @@ $dot->close;
 $dot->rewind;
 ok(!defined($dot->read));
 
-open(FH,'>', 'X') || die "Can't create x";
-print FH "X";
-close(FH) or die "Can't close: $^OS_ERROR";
+open(my $fh,'>', 'X') || die "Can't create x";
+print $fh "X";
+close($fh) or die "Can't close: $^OS_ERROR";
 

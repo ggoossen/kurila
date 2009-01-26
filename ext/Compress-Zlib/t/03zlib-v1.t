@@ -337,10 +337,10 @@ EOM
     ok length $dest ;
 
     # write it to disk
-    ok open(FH, ">", "$name") ;
-    binmode(FH);
-    print FH $dest ;
-    close FH ;
+    ok open(my $fh, ">", "$name") ;
+    binmode($fh);
+    print $fh $dest ;
+    close $fh ;
 
     # uncompress with gzopen
     ok my $fil = gzopen($name, "rb") ;
@@ -365,10 +365,10 @@ EOM
     ok length $dest ;
 
     # write it to disk
-    ok open(FH, ">", "$name") ;
-    binmode(FH);
-    print FH $dest ;
-    close FH ;
+    ok open($fh, ">", "$name") ;
+    binmode($fh);
+    print $fh $dest ;
+    close $fh ;
 
     # uncompress with gzopen
     ok $fil = gzopen($name, "rb") ;
@@ -919,9 +919,9 @@ do {
     is trickle($name), $data1 . $data2, "got expected data from trickle";
 
     title "Trailing Data";
-    open F, ">>", "$name";
-    print F $trailing;
-    close F;
+    open my $f, ">>", "$name";
+    print $f $trailing;
+    close $f;
 
     is slurp($name), $data1 . $data2 . $trailing, "got expected data from slurp" ;
     is trickle($name), $data1 . $data2 . $trailing, "got expected data from trickle" ;

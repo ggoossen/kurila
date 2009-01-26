@@ -80,15 +80,15 @@ sub check_for_bonus_files {
   my %expect = %( < map {($^OS_NAME eq 'VMS' ?? lc($_) !! $_), 1} @_ );
 
   my $fail;
-  opendir DIR, $dir or die "opendir '$dir': $^OS_ERROR";
-  while (defined (my $entry = readdir DIR)) {
+  opendir my $dh, $dir or die "opendir '$dir': $^OS_ERROR";
+  while (defined (my $entry = readdir $dh)) {
     $entry =~ s/\.$// if $^OS_NAME eq 'VMS';  # delete trailing dot that indicates no extension
     next if %expect{$entry};
     print "# Extra file '$entry'\n";
     $fail = 1;
   }
 
-  closedir DIR or warn "closedir '.': $^OS_ERROR";
+  closedir $dh or warn "closedir '.': $^OS_ERROR";
   if ($fail) {
     print "not ok $realtest\n";
   } else {
@@ -182,10 +182,10 @@ sub build_and_run {
 
   @makeout = @( `$maketest` );
 
-  if (open OUTPUT, "<", "$output") {
+  if (open my $outputfh, "<", "$output") {
     local $^INPUT_RECORD_SEPARATOR; # Slurp it - faster.
-    print ~< *OUTPUT;
-    close OUTPUT or print "# Close $output failed: $^OS_ERROR\n";
+    print ~< *$outputfh;
+    close $outputfh or print "# Close $output failed: $^OS_ERROR\n";
   } else {
     # Harness will report missing test results at this point.
     print "# Open <$output failed: $^OS_ERROR\n";
@@ -271,8 +271,8 @@ sub Makefile_PL {
   # We really need a Makefile.PL because make test for a no dynamic linking perl
   # will run Makefile.PL again as part of the "make perl" target.
   my $makefilePL = "Makefile.PL";
-  open FH, ">", "$makefilePL" or die "open >$makefilePL: $^OS_ERROR\n";
-  print FH <<"EOT";
+  open my $fh, ">", "$makefilePL" or die "open >$makefilePL: $^OS_ERROR\n";
+  print $fh <<"EOT";
 #!$perl -w
 use ExtUtils::MakeMaker;
 WriteMakefile(
@@ -283,7 +283,7 @@ WriteMakefile(
              );
 EOT
 
-  close FH or die "close $makefilePL: $^OS_ERROR\n";
+  close $fh or die "close $makefilePL: $^OS_ERROR\n";
   return $makefilePL;
 }
 
@@ -293,9 +293,9 @@ sub MANIFEST {
   # We really need a MANIFEST because make distclean checks it.
   my $manifest = "MANIFEST";
   push @files, $manifest;
-  open FH, ">", "$manifest" or die "open >$manifest: $^OS_ERROR\n";
-  print FH "$_\n" foreach  @files;
-  close FH or die "close $manifest: $^OS_ERROR\n";
+  open my $fh, ">", "$manifest" or die "open >$manifest: $^OS_ERROR\n";
+  print $fh "$_\n" foreach  @files;
+  close $fh or die "close $manifest: $^OS_ERROR\n";
   return @files;
 }
 
@@ -333,16 +333,16 @@ sub write_and_run_extension {
   ################ Header
   my $header_name = "test.h";
   push @files, $header_name;
-  open FH, ">", "$header_name" or die "open >$header_name: $^OS_ERROR\n";
-  print FH $header or die $^OS_ERROR;
-  close FH or die "close $header_name: $^OS_ERROR\n";
+  open my $fh, ">", "$header_name" or die "open >$header_name: $^OS_ERROR\n";
+  print $fh $header or die $^OS_ERROR;
+  close $fh or die "close $header_name: $^OS_ERROR\n";
 
   ################ XS
   my $xs_name = "$package.xs";
   push @files, $xs_name;
-  open FH, ">", "$xs_name" or die "open >$xs_name: $^OS_ERROR\n";
+  open $fh, ">", "$xs_name" or die "open >$xs_name: $^OS_ERROR\n";
 
-  print FH <<"EOT";
+  print $fh <<"EOT";
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
@@ -355,19 +355,19 @@ PROTOTYPES: ENABLE
 $XS_code;
 EOT
 
-  close FH or die "close $xs: $^OS_ERROR\n";
+  close $fh or die "close $xs: $^OS_ERROR\n";
 
   ################ PM
   my $pm = "$package.pm";
   push @files, $pm;
-  open FH, ">", "$pm" or die "open >$pm: $^OS_ERROR\n";
-  print FH "package $package;\n";
+  open $fh, ">", "$pm" or die "open >$pm: $^OS_ERROR\n";
+  print $fh "package $package;\n";
 
-  print FH <<'EOT';
+  print $fh <<'EOT';
 
 EOT
-  printf FH "use warnings;\n";
-  print FH <<'EOT';
+  printf $fh "use warnings;\n";
+  print $fh <<'EOT';
 
 require Exporter;
 require DynaLoader;
@@ -378,41 +378,42 @@ $VERSION = '0.01';
 EOT
   # Having this qw( in the here doc confuses cperl mode far too much to be
   # helpful. And I'm using cperl mode to edit this, even if you're not :-)
-  print FH "\@EXPORT_OK = qw(\n";
+  print $fh "\@EXPORT_OK = qw(\n";
 
   # Print the names of all our autoloaded constants
-  print FH "\t$_\n" foreach @( (< @$export_names));
-  print FH ");\n";
-  print FH "$package->bootstrap(\$VERSION);\n1;\n__END__\n";
-  close FH or die "close $pm: $^OS_ERROR\n";
+  print $fh "\t$_\n" foreach @( (< @$export_names));
+  print $fh ");\n";
+  print $fh "$package->bootstrap(\$VERSION);\n1;\n__END__\n";
+  close $fh or die "close $pm: $^OS_ERROR\n";
 
   ################ test.pl
   my $testpl = "test.pl";
   push @files, $testpl;
-  open FH, ">", "$testpl" or die "open >$testpl: $^OS_ERROR\n";
+  open $fh, ">", "$testpl" or die "open >$testpl: $^OS_ERROR\n";
   # Standard test header (need an option to suppress this?)
-  print FH <<"EOT" or die $^OS_ERROR;
+  print $fh <<"EOT" or die $^OS_ERROR;
 use $package < qw($(join ' ',@$export_names));
 
 print "1..2\n";
-if (open OUTPUT, ">", "$output") \{
+my \$outputfh;
+if (open \$outputfh, ">", "$output") \{
   print "ok 1\n";
-  select OUTPUT;
+  select \$outputfh;
 \} else \{
   print "not ok 1 # Failed to open '$output': \$^OS_ERROR\n";
   exit 1;
 \}
 EOT
-  print FH $testfile or die $^OS_ERROR;
-  print FH <<"EOT" or die $^OS_ERROR;
-select STDOUT;
-if (close OUTPUT) \{
+  print $fh $testfile or die $^OS_ERROR;
+  print $fh <<"EOT" or die $^OS_ERROR;
+select \*STDOUT;
+if (close \$outputfh) \{
   print "ok 2\n";
 \} else \{
   print "not ok 2 # Failed to close '$output': \$^OS_ERROR\n";
 \}
 EOT
-  close FH or die "close $testpl: $^OS_ERROR\n";
+  close $fh or die "close $testpl: $^OS_ERROR\n";
 
   push @files, Makefile_PL($package);
   @files = MANIFEST (< @files);

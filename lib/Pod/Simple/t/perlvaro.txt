@@ -326,8 +326,8 @@ $ARGV
 contains the name of the current file when reading from <>.
 @ARGV
 The array @ARGV contains the command-line arguments intended for the script. $#ARGV is generally the number of arguments minus one, because $ARGV[0] is the first argument, not the program's command name itself. See $0 for the command name.
-@INC
-The array @INC contains the list of places that the do EXPR, require, or use constructs look for their library files. It initially consists of the arguments to any -I command-line switches, followed by the default Perl library, probably /usr/local/lib/perl, followed by ".", to represent the current directory. If you need to modify this at runtime, you should use the use lib pragma to get the machine-dependent library properly loaded also:
+$^INCLUDE_PATH
+The array $^INCLUDE_PATH contains the list of places that the do EXPR, require, or use constructs look for their library files. It initially consists of the arguments to any -I command-line switches, followed by the default Perl library, probably /usr/local/lib/perl, followed by ".", to represent the current directory. If you need to modify this at runtime, you should use the use lib pragma to get the machine-dependent library properly loaded also:
     use lib '/mypath/libdir/';
     use SomeMod;
 @_

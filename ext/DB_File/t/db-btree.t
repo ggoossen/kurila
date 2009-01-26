@@ -69,9 +69,9 @@ sub docat
 { 
     my $file = shift;
     local $^INPUT_RECORD_SEPARATOR = undef ;
-    open(CAT, "<",$file) || die "Cannot open $file: $^OS_ERROR";
-    my $result = ~< *CAT;
-    close(CAT);
+    open(my $catfh, "<",$file) || die "Cannot open $file: $^OS_ERROR";
+    my $result = ~< *$catfh;
+    close($catfh);
     $result = normalise($result) ;
     return $result ;
 }   

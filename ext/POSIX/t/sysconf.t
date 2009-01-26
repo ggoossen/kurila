@@ -97,12 +97,12 @@ SKIP: do {
 
     -c $TTY
 	or skip("$TTY not a character file", $n);
-    open(TTY, "<", $TTY)
+    open(my $ttyfh, "<", $TTY)
 	or skip("failed to open $TTY: $^OS_ERROR", $n);
-    -t *TTY
+    -t *$ttyfh
 	or skip("TTY ($TTY) not a terminal file", $n);
 
-    my $fd = fileno(TTY);
+    my $fd = fileno($ttyfh);
 
     # testing fpathconf() on a terminal file
     for my $constant ( @path_consts_terminal) {
@@ -111,7 +111,7 @@ SKIP: do {
 	_check_and_report( $^EVAL_ERROR, $r, qq[calling fpathconf($fd, $constant) ($TTY)] );
     }
     
-    close(TTY);
+    close($ttyfh);
     # testing pathconf() on a terminal file
     for my $constant ( @path_consts_terminal) {
 	$^OS_ERROR = 0;

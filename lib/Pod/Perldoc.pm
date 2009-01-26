@@ -685,15 +685,15 @@ sub grand_search_init {
     my@($self, $pages, @< @found) =  @_;
 
     foreach my $page ( @$pages) {
-        if ($self->{?'podidx'} && open(PODIDX, $self->{?'podidx'})) {
+        if ($self->{?'podidx'} && open(my $podidx, $self->{?'podidx'})) {
             my $searchfor = catfile < split '::', $page;
             $self->aside( "Searching for '$searchfor' in $self->{?'podidx'}\n" );
             local $_;
-            while ( ~< *PODIDX) {
+            while ( ~< *$podidx) {
                 chomp;
                 push(@found, $_) if m,/$searchfor(?:\.(?:pod|pm))?\z,i;
             }
-            close(PODIDX)            or die "Can't close %$self{?'podidx'}: $^OS_ERROR";
+            close($podidx)            or die "Can't close %$self{?'podidx'}: $^OS_ERROR";
             next;
         }
 
@@ -745,13 +745,13 @@ sub grand_search_init {
                 if ( (nelems @{ $self->{?'found'} }) ) {
                     print STDERR "However, try\n";
                     for my $dir ( @{ $self->{'found'} }) {
-                        opendir(DIR, $dir) or die "opendir $dir: $^OS_ERROR";
-                        while (my $file = readdir(DIR)) {
+                        opendir(my $dh, $dir) or die "opendir $dir: $^OS_ERROR";
+                        while (my $file = readdir($dh)) {
                             next if ($file =~ m/^\./s);
                             $file =~ s/\.(pm|pod)\z//;  # XXX: badfs
                             print STDERR "\tperldoc $page\::$file\n";
                         }
-                        closedir(DIR)    or die "closedir $dir: $^OS_ERROR";
+                        closedir($dh)    or die "closedir $dir: $^OS_ERROR";
                     }
                 }
             }
@@ -855,7 +855,7 @@ sub search_perlfunc {
     DEBUG +> 2 and print "Search: $(join ' ',@$found_things)\n";
 
     my $perlfunc = shift @$found_things;
-    open(PFUNC, "<", $perlfunc)               # "Funk is its own reward"
+    open(my $pfunc, "<", $perlfunc)               # "Funk is its own reward"
         or die("Can't open $perlfunc: $^OS_ERROR");
 
     # Functions like -r, -e, etc. are listed under `-X'.
@@ -873,14 +873,14 @@ sub search_perlfunc {
 
     # Skip introduction
     local $_;
-    while ( ~< *PFUNC) {
+    while ( ~< *$pfunc) {
         last if m/^=head2 $re/;
     }
 
     # Look for our function
     my $found = 0;
     my $inlist = 0;
-    while ( ~< *PFUNC) {  # "The Mothership Connection is here!"
+    while ( ~< *$pfunc) {  # "The Mothership Connection is here!"
         if ( m/^=item\s+$search_re\b/ )  {
             $found = 1;
         }
@@ -903,7 +903,7 @@ sub search_perlfunc {
           $self->opt_f
         ;
     }
-    close PFUNC                or die "Can't open $perlfunc: $^OS_ERROR";
+    close $pfunc                or die "Can't open $perlfunc: $^OS_ERROR";
 
     return;
 }
@@ -928,9 +928,9 @@ EOD
     local $_;
     foreach my $file ( @$found_things) {
         die "invalid file spec: $^OS_ERROR" if $file =~ m/[<>|]/;
-        open(INFAQ, "<", $file)  # XXX 5.6ism
+        open(my $infaq, "<", $file)  # XXX 5.6ism
          or die "Can't read-open $file: $^OS_ERROR\nAborting";
-        while ( ~< *INFAQ) {
+        while ( ~< *$infaq) {
             if ( m/^=head2\s+.*(?:$search_key)/i ) {
                 $found = 1;
                 push @$pod, "=head1 Found in $file\n\n" unless %found_in{+$file}++;
@@ -941,7 +941,7 @@ EOD
             next unless $found;
             push @$pod, $_;
         }
-        close(INFAQ);
+        close($infaq);
     }
     die("No documentation for perl FAQ keyword `$search_key' found\n")
      unless (nelems @$pod);
@@ -1085,7 +1085,7 @@ sub MSWin_temp_cleanup {
    "Considering whether any old files of mine in $tempdir need unlinking.\n"
   );
 
-  opendir(TMPDIR, $tempdir) || return;
+  opendir(my $tmpdh, $tempdir) || return;
   my @to_unlink;
   
   my $limit = time() - $Temp_File_Lifetime;
@@ -1095,7 +1095,7 @@ sub MSWin_temp_cleanup {
   
   my $filespec;
   
-  while(defined($filespec = readdir(TMPDIR))) {
+  while(defined($filespec = readdir($tmpdh))) {
     if(
      $filespec =~ m{^perldoc_[a-zA-Z0-9]+_T([a-fA-F0-9]{7,})_[a-fA-F0-9]{3,}}s
     ) {
@@ -1111,7 +1111,7 @@ sub MSWin_temp_cleanup {
        print "  $tempdir/$filespec doesn't look like a perldoc temp file.\n";
     }
   }
-  closedir(TMPDIR);
+  closedir($tmpdh);
   $self->aside(sprintf "Unlinked \%s items of mine in \%s\n",
     scalar(unlink(< @to_unlink)),
     $tempdir
@@ -1205,7 +1205,6 @@ sub minus_f_nocase {   # i.e., do like -f, but without regard to case
 	return '';
      }
      
-     local *DIR;
      my @p = @($dir);
      my($cip);
      foreach my $p ( splitdir $file){
@@ -1234,14 +1233,14 @@ sub minus_f_nocase {   # i.e., do like -f, but without regard to case
  	    my $found = 0;
  	    my $lcp = lc $p;
  	    my $p_dirspec = catdir(< @p);
- 	    opendir DIR, $p_dirspec  or die "opendir $p_dirspec: $^OS_ERROR";
- 	    while(defined( $cip = readdir(DIR) )) {
+ 	    opendir my $dh, $p_dirspec  or die "opendir $p_dirspec: $^OS_ERROR";
+ 	    while(defined( $cip = readdir($dh) )) {
  		if (lc $cip eq $lcp){
  		    $found++;
  		    last; # XXX stop at the first? what if there's others?
  		}
  	    }
- 	    closedir DIR  or die "closedir $p_dirspec: $^OS_ERROR";
+ 	    closedir $dh  or die "closedir $p_dirspec: $^OS_ERROR";
  	    return "" unless $found;
 
  	    push @p, $cip;
@@ -1314,15 +1313,16 @@ sub page_module_file {
 	local $_;
 	my $any_error = 0;
         foreach my $output ( @found) {
-	    unless( open(TMP, "<", $output) ) {    # XXX 5.6ism
+            my $tmpfh;
+	    unless( open($tmpfh, "<", $output) ) {    # XXX 5.6ism
 	      warn("Can't open $output: $^OS_ERROR");
 	      $any_error = 1;
 	      next;
 	    }
-	    while ( ~< *TMP) {
+	    while ( ~< *$tmpfh) {
 	        print or die "Can't print to stdout: $^OS_ERROR";
 	    } 
-	    close TMP  or die "Can't close while $output: $^OS_ERROR";
+	    close $tmpfh  or die "Can't close while $output: $^OS_ERROR";
 	    $self->unlink_if_temp_file($output);
 	}
 	return $any_error; # successful
@@ -1425,14 +1425,14 @@ sub containspod {
     }
 
     local($_);
-    open(TEST,"<", $file) 	or die "Can't open $file: $^OS_ERROR";   # XXX 5.6ism
-    while ( ~< *TEST) {
+    open(my $test,"<", $file) 	or die "Can't open $file: $^OS_ERROR";   # XXX 5.6ism
+    while ( ~< *$test) {
 	if (m/^=head/) {
-	    close(TEST) 	or die "Can't close $file: $^OS_ERROR";
+	    close($test) 	or die "Can't close $file: $^OS_ERROR";
 	    return 1;
 	}
     }
-    close(TEST) 		or die "Can't close $file: $^OS_ERROR";
+    close($test) 		or die "Can't close $file: $^OS_ERROR";
     return 0;
 }
 
@@ -1533,12 +1533,12 @@ sub page {  # apply a pager to the output file
     my @($self, $output, $output_to_stdout, @< @pagers) =  @_;
     if ($output_to_stdout) {
         $self->aside("Sending unpaged output to STDOUT.\n");
-	open(TMP, "<", $output)  or  die "Can't open $output: $^OS_ERROR"; # XXX 5.6ism
+	open(my $tmpfh, "<", $output)  or  die "Can't open $output: $^OS_ERROR"; # XXX 5.6ism
 	local $_;
-	while ( ~< *TMP) {
+	while ( ~< *$tmpfh) {
 	    print or die "Can't print to stdout: $^OS_ERROR";
 	} 
-	close TMP  or die "Can't close while $output: $^OS_ERROR";
+	close $tmpfh  or die "Can't close while $output: $^OS_ERROR";
 	$self->unlink_if_temp_file($output);
     } else {
         # On VMS, quoting prevents logical expansion, and temp files with no
@@ -1597,13 +1597,13 @@ sub searchfor {
 	}
 
 	if ($recurse) {
-	    opendir(D,$dir)	or die "Can't opendir $dir: $^OS_ERROR";
+	    opendir(my $d,$dir)	or die "Can't opendir $dir: $^OS_ERROR";
 	    my @newdirs = map < catfile($dir, $_), grep {
 		not m/^\.\.?\z/s and
 		not m/^auto\z/s  and   # save time! don't search auto dirs
 		-d  catfile($dir, $_)
-	    } @( readdir D);
-	    closedir(D)		or die "Can't closedir $dir: $^OS_ERROR";
+	    } @( readdir $d);
+	    closedir($d)		or die "Can't closedir $dir: $^OS_ERROR";
 	    next unless (nelems @newdirs);
 	    # what a wicked map!
 	    @newdirs = map(@(s/\.dir\z//,$_)[1], @newdirs) if IS_VMS;

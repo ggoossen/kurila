@@ -35,9 +35,9 @@ for my $v (@: @(q[use version; $VERSION = v1.2.3;], v1.2.3),
 sub parse_version_string {
     my $code = shift;
 
-    open(FILE, ">", "VERSION.tmp") || die $^OS_ERROR;
-    print FILE "$code\n";
-    close FILE;
+    open(my $fh, ">", "VERSION.tmp") || die $^OS_ERROR;
+    print $fh "$code\n";
+    close $fh;
 
     $_ = 'foo';
     my $version = MM->parse_version('VERSION.tmp');

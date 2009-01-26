@@ -5,8 +5,8 @@ use Config;
 use IO::Handle;
 use IO::File;
 
-select(STDERR); $^OUTPUT_AUTOFLUSH = 1;
-select(STDOUT); $^OUTPUT_AUTOFLUSH = 1;
+select(\*STDERR); $^OUTPUT_AUTOFLUSH = 1;
+select(\*STDOUT); $^OUTPUT_AUTOFLUSH = 1;
 
 print "1..6\n";
 

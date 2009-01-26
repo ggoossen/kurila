@@ -3,9 +3,9 @@ our ($Expect);
 use Test < qw($TESTOUT $TESTERR $ntest ok skip plan); 
 plan tests => 14;
 
-open F, ">", "fails";
-$TESTOUT = *F{IO};
-$TESTERR = *F{IO};
+open my $f, ">", "fails";
+$TESTOUT = $f;
+$TESTERR = $f;
 
 my $r=0;
 do {
@@ -30,15 +30,15 @@ $r ^|^= ok(undef, 1);
 
 ok($r); # (failure==success :-)
 
-close F;
+close $f;
 $TESTOUT = *STDOUT{IO};
 $TESTERR = *STDERR{IO};
 $ntest = 1;
 
-open F, "<", "fails";
+open $f, "<", "fails";
 my $O;
-while ( ~< *F) { $O .= $_; }
-close F;
+while ( ~< *$f) { $O .= $_; }
+close $f;
 unlink "fails";
 
 ok join(' ', map { m/(\d+)/; $1 } grep m/^not ok/, split m/\n+/, $O),

@@ -36,9 +36,9 @@ local (*TCOUT, *OUT);
 open \*OUT, ">>", \(my $out);
 my $writable = 1;
 
-if (open(TCOUT, ">", "tcout")) {
-	print TCOUT ~< *DATA;
-	close TCOUT;
+if (open(my $tcout, ">", "tcout")) {
+	print $tcout ~< *DATA;
+	close $tcout;
 } else {
 	$writable = 0;
 }

@@ -87,6 +87,8 @@ my $ident = '';                 # identifiant prepended to each message
 $facility = '';                 # current facility
 my $maskpri = LOG_UPTO(LOG_DEBUG());     # current log mask
 
+my $syslogfh;
+
 my %options = %(
     ndelay  => 0, 
     nofatal => 0, 
@@ -390,10 +392,10 @@ sub _syslog_send_console {
 	    }
 	}
     } else {
-        if (open(CONS, ">", "/dev/console")) {
-	    my $ret = print CONS $buf . "\r";  # XXX: should this be \x0A ?
+        if (open(my $consfh, ">", "/dev/console")) {
+	    my $ret = print $consfh $buf . "\r";  # XXX: should this be \x0A ?
 	    exit $ret if defined $pid;
-	    close CONS;
+	    close $consfh;
 	}
 	exit if defined $pid;
     }
@@ -405,18 +407,18 @@ sub _syslog_send_stream {
     # look like a putmsg() with simple header. For instance it works on 
     # Solaris 8 but not Solaris 7.
     # To be correct, it should use a STREAMS API, but perl doesn't have one.
-    return syswrite(SYSLOG, $buf, length($buf));
+    return syswrite($syslogfh, $buf, length($buf));
 }
 
 sub _syslog_send_pipe {
     my @($buf) =  @_;
-    return print SYSLOG $buf;
+    return print $syslogfh $buf;
 }
 
 sub _syslog_send_socket {
     my @($buf, ...) =  @_;
-    return syswrite(SYSLOG, $buf, length($buf));
-    #return send(SYSLOG, $buf, 0);
+    return syswrite($syslogfh, $buf, length($buf));
+    #return send($syslogfh, $buf, 0);
 }
 
 sub _syslog_send_native {
@@ -469,7 +471,7 @@ sub connect_log {
     $transmit_ok = 0;
     if ($connected) {
 	$current_proto = $proto;
-        my $old = select(SYSLOG); $^OUTPUT_AUTOFLUSH = 1; select($old);
+        my $old = select($syslogfh); $^OUTPUT_AUTOFLUSH = 1; select($old);
     } else {
 	@fallbackMethods = @( () );
         $err_sub->(join "\n\t- ", @( "no connection to syslog available", < @errs));
@@ -505,17 +507,17 @@ sub connect_tcp {
     }
     $addr = sockaddr_in($syslog, $addr);
 
-    if (!socket(SYSLOG, AF_INET, SOCK_STREAM, $tcp)) {
+    if (!socket($syslogfh, AF_INET, SOCK_STREAM, $tcp)) {
 	push @$errs, "tcp socket: $^OS_ERROR";
 	return 0;
     }
 
-    setsockopt(SYSLOG, SOL_SOCKET, SO_KEEPALIVE, 1);
+    setsockopt($syslogfh, SOL_SOCKET, SO_KEEPALIVE, 1);
     if (try { IPPROTO_TCP() }) {
         # These constants don't exist in 5.005. They were added in 1999
-        setsockopt(SYSLOG, IPPROTO_TCP(), TCP_NODELAY(), 1);
+        setsockopt($syslogfh, IPPROTO_TCP(), TCP_NODELAY(), 1);
     }
-    if (!connect(SYSLOG, $addr)) {
+    if (!connect($syslogfh, $addr)) {
 	push @$errs, "tcp connect: $^OS_ERROR";
 	return 0;
     }
@@ -552,11 +554,11 @@ sub connect_udp {
     }
     $addr = sockaddr_in($syslog, $addr);
 
-    if (!socket(SYSLOG, AF_INET, SOCK_DGRAM, $udp)) {
+    if (!socket($syslogfh, AF_INET, SOCK_DGRAM, $udp)) {
 	push @$errs, "udp socket: $^OS_ERROR";
 	return 0;
     }
-    if (!connect(SYSLOG, $addr)) {
+    if (!connect($syslogfh, $addr)) {
 	push @$errs, "udp connect: $^OS_ERROR";
 	return 0;
     }
@@ -583,7 +585,7 @@ sub connect_stream {
 	push @$errs, "stream $syslog_path is not writable";
 	return 0;
     }
-    if (!sysopen(SYSLOG, $syslog_path, 0400, O_WRONLY)) {
+    if (!sysopen($syslogfh, $syslog_path, 0400, O_WRONLY)) {
 	push @$errs, "stream can't open $syslog_path: $^OS_ERROR";
 	return 0;
     }
@@ -601,7 +603,7 @@ sub connect_pipe {
         return 0;
     }
 
-    if (not open(SYSLOG, ">", "$syslog_path")) {
+    if (not open($syslogfh, ">", "$syslog_path")) {
         push @$errs, "can't write to $syslog_path: $^OS_ERROR";
         return 0;
     }
@@ -631,17 +633,17 @@ sub connect_unix {
 	push @$errs, "can't locate $syslog_path";
 	return 0;
     }
-    if (!socket(SYSLOG, AF_UNIX, SOCK_STREAM, 0)) {
+    if (!socket($syslogfh, AF_UNIX, SOCK_STREAM, 0)) {
         push @$errs, "unix stream socket: $^OS_ERROR";
 	return 0;
     }
 
-    if (!connect(SYSLOG, $addr)) {
-        if (!socket(SYSLOG, AF_UNIX, SOCK_DGRAM, 0)) {
+    if (!connect($syslogfh, $addr)) {
+        if (!socket($syslogfh, AF_UNIX, SOCK_DGRAM, 0)) {
 	    push @$errs, "unix dgram socket: $^OS_ERROR";
 	    return 0;
 	}
-        if (!connect(SYSLOG, $addr)) {
+        if (!connect($syslogfh, $addr)) {
 	    push @$errs, "unix dgram connect: $^OS_ERROR";
 	    return 0;
 	}
@@ -704,7 +706,7 @@ sub connection_ok {
     );
 
     my $rin = '';
-    vec($rin, fileno(SYSLOG), 1, 1);
+    vec($rin, fileno($syslogfh), 1, 1);
     my $ret = select $rin, undef, $rin, $sock_timeout;
     return $ret ?? 0 !! 1;
 }
@@ -722,7 +724,7 @@ sub disconnect_log {
         return 1;
     }
 
-    return close SYSLOG;
+    return close $syslogfh;
 }
 
 1;

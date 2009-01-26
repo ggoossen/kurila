@@ -118,10 +118,9 @@ sub have_compiler {
   
   my $tmpfile = File::Spec->catfile(File::Spec->tmpdir, 'compilet.c');
   do {
-    local *FH;
-    open FH, ">", "$tmpfile" or die "Can't create $tmpfile: $^OS_ERROR";
-    print FH "int boot_compilet() \{ return 1; \}\n";
-    close FH;
+    open my $fh, ">", "$tmpfile" or die "Can't create $tmpfile: $^OS_ERROR";
+    print $fh "int boot_compilet() \{ return 1; \}\n";
+    close $fh;
   };
 
   my ($obj_file, @lib_files);

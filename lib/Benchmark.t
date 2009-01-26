@@ -134,7 +134,7 @@ my $iterations = 3;
 $foo = 0;
 select($out_fh);
 my $got = timethis($iterations, sub {++$foo});
-select(STDOUT);
+select(\*STDOUT);
 isa_ok($got, 'Benchmark', "timethis CODEREF");
 is ($foo, $iterations, "benchmarked code was run $iterations times");
 
@@ -146,7 +146,7 @@ $out = "";
 $bar = 0;
 select($out_fh);
 $got = timethis($iterations, '++$main::bar');
-select(STDOUT);
+select(\*STDOUT);
 isa_ok($got, 'Benchmark', "timethis eval");
 is ($bar, $iterations, "benchmarked code was run $iterations times");
 
@@ -159,7 +159,7 @@ $foo = 0;
 $out = "";
 select($out_fh);
 $got = timethis($iterations, sub {++$foo}, $title);
-select(STDOUT);
+select(\*STDOUT);
 isa_ok($got, 'Benchmark', "timethis with title");
 is ($foo, $iterations, "benchmarked code was run $iterations times");
 
@@ -172,7 +172,7 @@ $foo = 0;
 $out = "";
 select($out_fh);
 $got = timethis($iterations, sub {++$foo}, $title, 'nop');
-select(STDOUT);
+select(\*STDOUT);
 isa_ok($got, 'Benchmark', "timethis with format");
 is ($foo, $iterations, "benchmarked code was run $iterations times");
 
@@ -187,7 +187,7 @@ do {
     my $start = time;
     $got = timethis(-2, sub {$foo+= fib($ballast)}, $title, 'none');
     my $end = time;
-    select(STDOUT);
+    select(\*STDOUT);
     isa_ok($got, 'Benchmark',
            "timethis, at least 2 seconds with format 'none'");
     ok ($foo +> 0, "benchmarked code was run");
@@ -206,7 +206,7 @@ $out = "";
 select($out_fh);
 $got = timethese($iterations, \%( Foo => sub {++$foo}, Bar => '++$main::bar',
                                 Baz => sub {++$baz} ));
-select(STDOUT);
+select(\*STDOUT);
 is(ref ($got), 'HASH', "timethese should return a hashref");
 isa_ok($got->{?Foo}, 'Benchmark', "Foo value");
 isa_ok($got->{?Bar}, 'Benchmark', "Bar value");
@@ -239,7 +239,7 @@ do {
     my $start = times;
     $results = timethese(-0.1, $code_to_test, 'none');
     my $end = times;
-    select(STDOUT);
+    select(\*STDOUT);
 
     is(ref ($results), 'HASH', "timethese should return a hashref");
     isa_ok($results->{?Foo}, 'Benchmark', "Foo value");
@@ -360,7 +360,7 @@ do {
     my $start = times;
     my $chart = cmpthese( -0.1, \%( a => "++ our \$i", b => "our \$i; \$i = sqrt( \$i++)" ), "auto" ) ;
     my $end = times;
-    select(STDOUT);
+    select(\*STDOUT);
     ok (($end - $start) +> 0.05, "benchmarked code ran for over 0.05 seconds");
 
     $got = $out;
@@ -383,7 +383,7 @@ do {
     my $start = times;
     my $chart = cmpthese( -0.1, \%( a => "++ our \$i", b => "our \$i; \$i = sqrt(\$i++)" ) ) ;
     my $end = times;
-    select(STDOUT);
+    select(\*STDOUT);
     ok (($end - $start) +> 0.05, "benchmarked code ran for over 0.05 seconds");
 
     $got = $out;
@@ -404,7 +404,7 @@ do {
     $out = "";
     select($out_fh);
     my $chart = cmpthese( 10, $code_to_test, 'nop' ) ;
-    select(STDOUT);
+    select(\*STDOUT);
     ok ($foo +> 0, "Foo code was run");
     ok ($bar +> 0, "Bar code was run");
 
@@ -425,7 +425,7 @@ do {
     $out = "";
     select($out_fh);
     my $chart = cmpthese( 10, $code_to_test, 'none' ) ;
-    select(STDOUT);
+    select(\*STDOUT);
     ok ($foo +> 0, "Foo code was run");
     ok ($bar +> 0, "Bar code was run");
 
@@ -446,7 +446,7 @@ do {
     $out = "";
     select($out_fh);
     my $chart = cmpthese( $results ) ;
-    select(STDOUT);
+    select(\*STDOUT);
     is ($foo, 0, "Foo code was not run");
     is ($bar, 0, "Bar code was not run");
 
@@ -461,7 +461,7 @@ do {
     $out = "";
     select($out_fh);
     my $chart = cmpthese( $results, 'none' ) ;
-    select(STDOUT);
+    select(\*STDOUT);
     is ($foo, 0, "Foo code was not run");
     is ($bar, 0, "Bar code was not run");
 
@@ -492,7 +492,7 @@ do {
     $out = "";
     select($out_fh);
     $got = timeit(5, '++$main::bar');
-    select(STDOUT);
+    select(\*STDOUT);
     isa_ok($got, 'Benchmark', "timeit eval");
     is ($bar, 5, "benchmarked code was run 5 times");
     is ($out, '', "There was no STDOUT output with debug enabled");

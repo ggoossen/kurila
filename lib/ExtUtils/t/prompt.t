@@ -46,7 +46,7 @@ $$stdout = '';
 
 do {
     env::set_var('PERL_MM_USE_DEFAULT' => 0);
-    close STDIN;
+    close \*STDIN;
     my $stdin = '';
     open my $stdin_fh, '<', \$stdin or die;
     *STDIN = *$stdin_fh{IO};

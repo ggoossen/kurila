@@ -2,13 +2,13 @@
 
 print "1..22\n";
 
-open (tmp, ">",'Cmd_while.tmp') || die "Can't create Cmd_while.tmp.";
-print tmp "tvi925\n";
-print tmp "tvi920\n";
-print tmp "vt100\n";
-print tmp "Amiga\n";
-print tmp "paper\n";
-close tmp or die "Could not close: $^OS_ERROR";
+open (my $tmp, ">",'Cmd_while.tmp') || die "Can't create Cmd_while.tmp.";
+print $tmp "tvi925\n";
+print $tmp "tvi920\n";
+print $tmp "vt100\n";
+print $tmp "Amiga\n";
+print $tmp "paper\n";
+close $tmp or die "Could not close: $^OS_ERROR";
 
 print "ok 1\n";
 print "ok 2\n";
@@ -20,22 +20,22 @@ print "ok 5\n";
 
 my $bad = '';
 my $badcont = 1;
-open(fh, "<",'Cmd_while.tmp') || die "Can't open Cmd_while.tmp.";
-entry: while ( ~< *fh) {
+open(my $fh, "<",'Cmd_while.tmp') || die "Can't open Cmd_while.tmp.";
+entry: while ( ~< *$fh) {
     next entry if m/vt100/;
     $bad = 1 if m/vt100/;
 } continue {
     $badcont = '' if m/vt100/;
 }
-if (!eof(\*fh) || m/vt100/ || $bad) {print "not ok 6\n";} else {print "ok 6\n";}
+if (!eof(\*$fh) || m/vt100/ || $bad) {print "not ok 6\n";} else {print "ok 6\n";}
 if (!$badcont) {print "ok 7\n";} else {print "not ok 7\n";}
 
 # test "redo" command
 
 $bad = '';
 $badcont = '';
-open(fh, "<",'Cmd_while.tmp') || die "Can't open Cmd_while.tmp.";
-loop: while ( ~< *fh) {
+open($fh, "<",'Cmd_while.tmp') || die "Can't open Cmd_while.tmp.";
+loop: while ( ~< *$fh) {
     if (s/vt100/VT100/g) {
 	s/VT100/Vt100/g;
 	redo loop;
@@ -45,10 +45,10 @@ loop: while ( ~< *fh) {
 } continue {
     $badcont = 1 if m/vt100/;
 }
-if (!eof(\*fh) || $bad) {print "not ok 8\n";} else {print "ok 8\n";}
+if (!eof(\*$fh) || $bad) {print "not ok 8\n";} else {print "ok 8\n";}
 if (!$badcont) {print "ok 9\n";} else {print "not ok 9\n";}
 
-close(fh) || die "Can't close Cmd_while.tmp.";
+close($fh) || die "Can't close Cmd_while.tmp.";
 unlink 'Cmd_while.tmp' || `/bin/rm Cmd_While.tmp`;
 
 #$x = 0;

@@ -5,8 +5,8 @@ if ($^OS_NAME eq 'mpeix') {
     exit 0;
 }
 
-select(STDERR); $^OUTPUT_AUTOFLUSH = 1;
-select(STDOUT); $^OUTPUT_AUTOFLUSH = 1;
+select(\*STDERR); $^OUTPUT_AUTOFLUSH = 1;
+select(\*STDOUT); $^OUTPUT_AUTOFLUSH = 1;
 
 print "1..10\n";
 
@@ -77,7 +77,7 @@ print "ok 9\n";
 my $stdin = \*STDIN;
 $poll->mask($stdin => POLLIN);
 $poll->remove($stdin);
-close STDIN;
+close \*STDIN;
 print "not "
     if $poll->poll(0.1);
 print "ok 10\n";

@@ -24,7 +24,7 @@ ok( chdir 'Problem-Module', "chdir'd to Problem-Module" ) ||
 # Also make sure Makefile.PL's in subdirs still have '.' in $^INCLUDE_PATH.
 do {
     my $stdout;
-    close STDOUT;
+    close \*STDOUT;
     open *STDOUT, '>>', \$stdout or die "$^OS_ERROR";
 
     my $warning = '';

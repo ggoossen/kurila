@@ -24,11 +24,11 @@ sub do_require {
 
 sub write_file {
     my $f = shift;
-    open(REQ, ">","$f") or die "Can't write '$f': $^OS_ERROR";
-    binmode REQ;
+    open(my $req, ">","$f") or die "Can't write '$f': $^OS_ERROR";
+    binmode $req;
     use bytes;
-    print REQ < @_;
-    close REQ or die "Could not close $f: $^OS_ERROR";
+    print $req < @_;
+    close $req or die "Could not close $f: $^OS_ERROR";
 }
 
 eval 'require 5.005';
@@ -100,7 +100,7 @@ print $x;
 my $r = "threads";
 try { require $r };
 $i++;
-if($^EVAL_ERROR->message =~ m/Can't locate threads in \$^INCLUDE_PATH/) {
+if($^EVAL_ERROR->message =~ m/Can't locate threads in \$\^INCLUDE_PATH/) {
     print "ok $i\n";
 } else {
     print "not ok $i\n";
@@ -118,7 +118,7 @@ if ($^EVAL_ERROR->message =~ m/^This is an expected error/) {
 sub write_file_not_thing {
     my @($file, $thing, $test) =  @_;
     write_file($file, <<"EOT");
-    print "not ok $test\n";
+    print "not ok $test - from file\n";
     die "The $thing file should not be loaded";
 EOT
 }

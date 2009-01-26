@@ -5,14 +5,16 @@ our $VERSION = '1.00';
 use B < qw(minus_c save_BEGINs);
 use Carp;
 
+my $saveout;
+
 sub import {
     my @($class, @< @options) =  @_;
     my @($quiet, $veryquiet) = @(0, 0);
     if (@options[0] eq '-q' || @options[0] eq '-qq') {
 	$quiet = 1;
-	open (SAVEOUT, ">&", \*STDOUT);
-	close STDOUT;
-	open (STDOUT, ">", \$O::BEGIN_output);
+	open ($saveout, ">&", \*STDOUT);
+	close \*STDOUT;
+	open (\*STDOUT, ">", \$O::BEGIN_output);
 	if (@options[0] eq '-qq') {
 	    $veryquiet = 1;
 	}
@@ -27,9 +29,9 @@ sub import {
 
 	CHECK {
 	    if ($quiet) {
-		close STDOUT;
-		open (STDOUT, ">&", \*SAVEOUT);
-		close SAVEOUT;
+		close \*STDOUT;
+		open (\*STDOUT, ">&", \*$saveout);
+		close $saveout;
 	    }
 
 	    # Note: if you change the code after this 'use', please
@@ -51,7 +53,7 @@ sub import {
 	    local @($^OUTPUT_RECORD_SEPARATOR,$^OUTPUT_FIELD_SEPARATOR) = @(undef,'');
 	    &$compilesub();
 
-	    close STDERR if $veryquiet;
+	    close \*STDERR if $veryquiet;
 	}
     ];
     die $^EVAL_ERROR if $^EVAL_ERROR;

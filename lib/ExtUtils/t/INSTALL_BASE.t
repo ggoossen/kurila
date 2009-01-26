@@ -69,11 +69,11 @@ foreach my $file ( @installed_files) {
 
 # nmake outputs its damned logo
 # Send STDERR off to oblivion.
-open(SAVERR, ">&", \*STDERR) or die $^OS_ERROR;
-open(STDERR, ">", "".File::Spec->devnull) or die $^OS_ERROR;
+open(my $saverr, ">&", \*STDERR) or die $^OS_ERROR;
+open(\*STDERR, ">", "".File::Spec->devnull) or die $^OS_ERROR;
 
 my $realclean_out = run("$make realclean");
 is( $^CHILD_ERROR, 0, 'realclean' ) || diag($realclean_out);
 
-open(STDERR, ">&", \*SAVERR) or die $^OS_ERROR;
-close SAVERR;
+open(\*STDERR, ">&", \*$saverr) or die $^OS_ERROR;
+close $saverr;

@@ -549,9 +549,9 @@ sub _ipc_run {
  
     # \*STDIN is already included in the @command, see a few lines up
     return IPC::Run::run(   < @command, 
-                            fileno(STDOUT).'>',
+                            fileno(\*STDOUT).'>',
                             $_out_handler,
-                            fileno(STDERR).'>',
+                            fileno(\*STDERR).'>',
                             $_err_handler
                         );
 }

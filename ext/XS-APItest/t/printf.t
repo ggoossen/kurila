@@ -11,12 +11,12 @@ my $ldok = have_long_double();
 
 # first some IO redirection
 ok open(my $oldout, ">&", \*STDOUT), "saving STDOUT";
-ok open(STDOUT, '>', "foo.out"),"redirecting STDOUT";
+ok open(\*STDOUT, '>', "foo.out"),"redirecting STDOUT";
 
 # Allow for it to be removed
 END { unlink "foo.out"; };
 
-select STDOUT; $^OUTPUT_AUTOFLUSH = 1; # make unbuffered
+select \*STDOUT; $^OUTPUT_AUTOFLUSH = 1; # make unbuffered
 
 # Run the printf tests
 print_double(5);
@@ -28,7 +28,7 @@ print_long_double() if $ldok;  # val=7 hardwired
 print_flush();
 
 # Now redirect STDOUT and read from the file
-ok open(STDOUT, ">&", $oldout), "restore STDOUT";
+ok open(\*STDOUT, ">&", $oldout), "restore STDOUT";
 ok open(my $foo, "<", "foo.out"), "open foo.out";
 #print "# Test output by reading from file\n";
 # now test the output

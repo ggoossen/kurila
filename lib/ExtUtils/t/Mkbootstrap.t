@@ -18,11 +18,12 @@ BEGIN { use_ok( 'ExtUtils::Mkbootstrap' ) }
 
 # Mkbootstrap makes a backup copy of "$_[0].bs" if it exists and is non-zero
 my $file_is_ready;
-local *OUT;
-if (open(OUT, ">", 'mkboot.bs')) {
+my $outfh;
+my $in;
+if (open($outfh, ">", 'mkboot.bs')) {
 	$file_is_ready = 1;
-	print OUT 'meaningless text';
-	close OUT;
+	print $outfh 'meaningless text';
+	close $outfh;
 }
 
 SKIP: do {
@@ -30,10 +31,9 @@ SKIP: do {
 
 	Mkbootstrap('mkboot');
 	ok( -s 'mkboot.bso', 'Mkbootstrap should backup the .bs file' );
-	local *IN;
-	if (open(IN, "<", 'mkboot.bso')) {
-		chomp ($file_is_ready = ~< *IN);
-		close IN;
+	if (open(my $infh, "<", 'mkboot.bso')) {
+		chomp ($file_is_ready = ~< *$infh);
+		close $infh;
 	}
 
 	is( $file_is_ready, 'meaningless text', 'backup should be a perfect copy' );
@@ -45,8 +45,8 @@ Mkbootstrap('fakeboot');
 ok( !( -f 'fakeboot.bso' ), 'Mkbootstrap should not backup an empty file' );
 
 my $out = '';
-close STDOUT;
-open STDOUT, '>>', \$out or die;
+close \*STDOUT;
+open \*STDOUT, '>>', \$out or die;
 
 # with $Verbose set, it should print status messages about libraries
 $ExtUtils::Mkbootstrap::Verbose = 1;
@@ -59,13 +59,13 @@ like( $out, qr/bsloadlibs=foo/, 'should still report libraries' );
 
 
 # if ${_[0]}_BS exists, require it
-$file_is_ready = open(OUT, ">", 'boot_BS');
+$file_is_ready = open($outfh, ">", 'boot_BS');
 
 SKIP: do {
 	skip("cannot open boot_BS for writing: $^OS_ERROR", 1) unless $file_is_ready;
 
-	print OUT '$main::required = 1';
-	close OUT;
+	print $outfh '$main::required = 1';
+	close $outfh;
 	Mkbootstrap('boot');
 
 	ok( $required, 'baseext_BS file should be require()d' );
@@ -73,13 +73,13 @@ SKIP: do {
 
 
 # if there are any arguments, open a file named baseext.bs
-$file_is_ready = open(OUT, ">", 'dasboot.bs');
+$file_is_ready = open($outfh, ">", 'dasboot.bs');
 
 SKIP: do {
 	skip("cannot make dasboot.bs: $^OS_ERROR", 5) unless $file_is_ready;
 
 	# if it can't be opened for writing, we want to prove that it'll die
-	close OUT;
+	close $outfh;
 	chmod 0444, 'dasboot.bs';
 
 	SKIP: do {
@@ -100,7 +100,7 @@ SKIP: do {
 	like( $out, qr/containing: my/, 'should print verbose status on request' );
 
 	# now be tricky, and set the status for the next skip block
-	$file_is_ready = open(IN, "<", 'dasboot.bs');
+	$file_is_ready = open($in, "<", 'dasboot.bs');
 	ok( $file_is_ready, 'should have written a new .bs file' );
 };
 
@@ -108,7 +108,7 @@ SKIP: do {
 SKIP: do {
 	skip("cannot read .bs file: $^OS_ERROR", 2) unless $file_is_ready;
 
-	my $file = do { local $^INPUT_RECORD_SEPARATOR; ~< *IN };
+	my $file = do { local $^INPUT_RECORD_SEPARATOR; ~< *$in };
 
 	# filename should be in header
 	like( $file, qr/# dasboot DynaLoader/, 'file should have boilerplate' );
@@ -119,12 +119,12 @@ SKIP: do {
 
 
 # overwrite this file (may whack portability, but the name's too good to waste)
-$file_is_ready = open(OUT, ">", 'dasboot.bs');
+$file_is_ready = open($outfh, ">", 'dasboot.bs');
 $out = '';
 
 SKIP: do {
 	skip("cannot make dasboot.bs again: $^OS_ERROR", 1) unless $file_is_ready;
-	close OUT;
+	close $outfh;
 
 	# if $DynaLoader::bscode is set, write its contents to the file
     local $DynaLoader::bscode;
@@ -135,13 +135,13 @@ SKIP: do {
 	try{ Mkbootstrap('dasboot', '-Larry') };
 	is( $^EVAL_ERROR, '', 'should be able to open a file again');
 
-	$file_is_ready = open(IN, "<", 'dasboot.bs');
+	$file_is_ready = open($in, "<", 'dasboot.bs');
 };
 
 SKIP: do {
 	skip("cannot open dasboot.bs for reading: $^OS_ERROR", 3) unless $file_is_ready;
 
-	my $file = do { local $^INPUT_RECORD_SEPARATOR; ~< *IN };
+	my $file = do { local $^INPUT_RECORD_SEPARATOR; ~< *$in };
 	is( $out, "Writing dasboot.bs\n", 'should hush without Verbose set' );
 
 	# and find our hidden tribute to a fine example
@@ -149,8 +149,8 @@ SKIP: do {
 	like( $file, qr/Wall\n1;\n/ms, 'should write $DynaLoader::bscode if set' );
 };
 
-close IN;
-close OUT;
+close $in;
+close $outfh;
 
 END {
 	# clean things up, even on VMS

@@ -44,22 +44,22 @@ print $out "hi!\n";
 close *$out;
 
 undef $out;
-open(IN, "<", $tmpfile) or die $^OS_ERROR;
-chomp(my $line = ~< *IN);
-close IN;
+open(my $in, "<", $tmpfile) or die $^OS_ERROR;
+chomp(my $line = ~< *$in);
+close $in;
 
 ok($line eq 'hi!');
 
-open(FOO, ">>", "$tmpfile") or die $^OS_ERROR;
-$out = $Test->output(\*FOO);
+open(my $foo, ">>", "$tmpfile") or die $^OS_ERROR;
+$out = $Test->output(\*$foo);
 my $old = select *$out;
 print "Hello!\n";
 close *$out;
 undef $out;
 select $old;
-open(IN, "<", $tmpfile) or die $^OS_ERROR;
-my @lines = @( ~< *IN );
-close IN;
+open($in, "<", $tmpfile) or die $^OS_ERROR;
+my @lines = @( ~< *$in );
+close $in;
 
 ok(@lines[0] =~ m/hi!/);
 ok(@lines[1] =~ m/Hello!/);

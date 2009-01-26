@@ -52,14 +52,14 @@ ok($ctx->hexdigest, $EBCDIC ?? "86f0f0f0f3" !! "6630303033");
 $ctx->add("foo");
 ok($ctx->b64digest, $EBCDIC ?? "hvDw8PM" !! "ZjAwMDM");
 
-open(F, ">", "xxtest$^PID") || die;
-binmode(F);
-print F "abc" x 100, "\n";
-close(F) || die;
+open(my $fh, ">", "xxtest$^PID") || die;
+binmode($fh);
+print $fh "abc" x 100, "\n";
+close($fh) || die;
 
-open(F, "<", "xxtest$^PID") || die;
-$ctx->addfile(\*F);
-close(F);
+open($fh, "<", "xxtest$^PID") || die;
+$ctx->addfile(\*$fh);
+close($fh);
 unlink("xxtest$^PID") || warn;
 
 ok($ctx->digest, "a0301");

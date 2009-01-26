@@ -208,8 +208,8 @@ SKIP: do {
     # setlogsock() with "stream" and a local file
     SKIP: do {
         my $logfile = "test.log";
-        open(LOG, ">", "$logfile") or skip "can't create file '$logfile': $^OS_ERROR", 2;
-        close(LOG);
+        open(my $logfh, ">", "$logfile") or skip "can't create file '$logfile': $^OS_ERROR", 2;
+        close($logfh);
         $r = try { setlogsock("stream", $logfile ) } || '';
         is( $^EVAL_ERROR, '', "setlogsock() called, with 'stream' and '$logfile' (file exists)" );
         ok( $r, "setlogsock() should return true: '$r'" );

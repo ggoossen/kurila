@@ -39,8 +39,8 @@ do {
     # concatenate this file with itself
     # be extra careful the regex doesn't match itself
     my $out = '';
-    close STDOUT;
-    open STDOUT, '>>', \$out or die;
+    close \*STDOUT;
+    open \*STDOUT, '>>', \$out or die;
     my $self = $^PROGRAM_NAME;
     unless (-f $self) {
         my @($vol, $dirs, $file) =  File::Spec->splitpath($self);
@@ -97,9 +97,9 @@ do {
     cmp_ok( abs($new_stamp - $stamp), '+<=', 1, 'eqtime' );
 
     # eqtime use to clear the contents of the file being equalized!
-    open(FILE, ">>", "$Testfile") || die $^OS_ERROR;
-    print FILE "Foo";
-    close FILE;
+    open(my $fh, ">>", "$Testfile") || die $^OS_ERROR;
+    print $fh "Foo";
+    close $fh;
 
     @ARGV = @('newfile', $Testfile);
     eqtime();
@@ -264,30 +264,30 @@ do {
 
 do {
     do { local @ARGV = @( 'd2utest' ); mkpath; };
-    open(FILE, ">", 'd2utest/foo');
-    binmode(FILE);
-    print FILE "stuff\015\012and thing\015\012";
-    close FILE;
+    open(my $fh, ">", 'd2utest/foo');
+    binmode($fh);
+    print $fh "stuff\015\012and thing\015\012";
+    close $fh;
 
-    open(FILE, ">", 'd2utest/bar');
-    binmode(FILE);
+    open($fh, ">", 'd2utest/bar');
+    binmode($fh);
     my $bin = "\c@\c@\c@\c@\c@\c@\cA\c@\c@\c@\015\012".
               "\@\c@\cA\c@\c@\c@8__LIN\015\012";
-    print FILE $bin;
-    close FILE;
+    print $fh $bin;
+    close $fh;
 
     local @ARGV = @( 'd2utest' );
     ExtUtils::Command::dos2unix();
 
-    open(FILE, "<", 'd2utest/foo');
-    is( join('', @( ~< *FILE)), "stuff\012and thing\012", 'dos2unix' );
-    close FILE;
+    open($fh, "<", 'd2utest/foo');
+    is( join('', @( ~< *$fh)), "stuff\012and thing\012", 'dos2unix' );
+    close $fh;
 
-    open(FILE, "<", 'd2utest/bar');
-    binmode(FILE);
+    open($fh, "<", 'd2utest/bar');
+    binmode($fh);
     ok( -B 'd2utest/bar' );
-    is( join('', @( ~< *FILE)), $bin, 'dos2unix preserves binaries');
-    close FILE;
+    is( join('', @( ~< *$fh)), $bin, 'dos2unix preserves binaries');
+    close $fh;
 };
 
 END {

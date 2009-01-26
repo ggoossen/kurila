@@ -421,30 +421,10 @@ Ambiguous use of -fred resolved as -&fred() at - line 4 character 2.
 Ambiguous use of -fred resolved as -&fred() at - line 9 character 6.
 Ambiguous use of -fred resolved as -&fred() at - line 11 character 2.
 ########
-# toke.c
-open FOO || time;
-EXPECT
-Precedence problem: open FOO should be open(FOO) at - line 2 character 1.
-########
 # toke.c (and [perl #16184])
-open FOO => "<&", "0"; close FOO;
+open \*FOO => "<&", "0"; close \*FOO;
 EXPECT
 
-########
-# toke.c
-$^WARNING = 0 ;
-open FOO || time;
-do {
-    no warnings 'precedence' ;
-    open FOO || time;
-    use warnings 'precedence' ;
-    open FOO || time;
-};
-open FOO || time;
-EXPECT
-Precedence problem: open FOO should be open(FOO) at - line 3 character 1.
-Precedence problem: open FOO should be open(FOO) at - line 8 character 5.
-Precedence problem: open FOO should be open(FOO) at - line 10 character 1.
 ########
 # toke.c
 use warnings 'misc' ;

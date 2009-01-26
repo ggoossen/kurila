@@ -33,11 +33,10 @@ if ($^OS_NAME eq 'os2') {	# Can't create sockets with relative path...
 }
 
 # Test if we can create the file within the tmp directory
-if (-e $PATH or not open(TEST, ">", "$PATH") and $^OS_NAME ne 'os2') {
+if (-e $PATH or not open(my $testfh, ">", "$PATH") and $^OS_NAME ne 'os2') {
     print "1..0 # Skip: cannot open '$PATH' for write\n";
     exit 0;
 }
-close(TEST);
 unlink($PATH) or $^OS_NAME eq 'os2' or die "Can't unlink $PATH: $^OS_ERROR";
 
 # Start testing

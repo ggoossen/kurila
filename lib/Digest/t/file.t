@@ -31,10 +31,10 @@ use Digest::file < qw(digest_file digest_file_hex digest_file_base64);
 
 my $file = "test-$^PID";
 die if -f $file;
-open(F, ">", "$file") || die "Can't create '$file': $^OS_ERROR";
-binmode(F);
-print F "foo\0\n";
-close(F) || die "Can't write '$file': $^OS_ERROR";
+open(my $fh, ">", "$file") || die "Can't create '$file': $^OS_ERROR";
+binmode($fh);
+print $fh "foo\0\n";
+close($fh) || die "Can't write '$file': $^OS_ERROR";
 
 ok(digest_file($file, "Foo"), "0005");
 

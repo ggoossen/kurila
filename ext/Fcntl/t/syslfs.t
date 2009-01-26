@@ -19,8 +19,10 @@ $^OUTPUT_AUTOFLUSH = 1;
 our @s;
 our $fail;
 
+my $big_fh;
+
 sub zap {
-    close(BIG);
+    close($big_fh);
     unlink("big");
     unlink("big1");
     unlink("big2");
@@ -77,26 +79,26 @@ if ($^OS_NAME eq 'unicos') {
 # consume less blocks than one megabyte (assuming nobody has
 # one megabyte blocks...)
 
-sysopen(BIG, "big1", O_WRONLY^|^O_CREAT^|^O_TRUNC) or
+sysopen($big_fh, "big1", O_WRONLY^|^O_CREAT^|^O_TRUNC) or
     do { warn "sysopen big1 failed: $^OS_ERROR\n"; bye };
-sysseek(BIG, 1_000_000, SEEK_SET) or
+sysseek($big_fh, 1_000_000, SEEK_SET) or
     do { warn "sysseek big1 failed: $^OS_ERROR\n"; bye };
-syswrite(BIG, "big") or
+syswrite($big_fh, "big") or
     do { warn "syswrite big1 failed; $^OS_ERROR\n"; bye };
-close(BIG) or
+close($big_fh) or
     do { warn "close big1 failed: $^OS_ERROR\n"; bye };
 
 my @s1 = @( stat("big1") );
 
 print "# s1 = $(join ' ',@s1)\n";
 
-sysopen(BIG, "big2", O_WRONLY^|^O_CREAT^|^O_TRUNC) or
+sysopen($big_fh, "big2", O_WRONLY^|^O_CREAT^|^O_TRUNC) or
     do { warn "sysopen big2 failed: $^OS_ERROR\n"; bye };
-sysseek(BIG, 2_000_000, SEEK_SET) or
+sysseek($big_fh, 2_000_000, SEEK_SET) or
     do { warn "sysseek big2 failed: $^OS_ERROR\n"; bye };
-syswrite(BIG, "big") or
+syswrite($big_fh, "big") or
     do { warn "syswrite big2 failed; $^OS_ERROR\n"; bye };
-close(BIG) or
+close($big_fh) or
     do { warn "close big2 failed: $^OS_ERROR\n"; bye };
 
 my @s2 = @( stat("big2") );
@@ -121,15 +123,15 @@ env::set_var('LC_ALL' => "C");
 
 my $r = system '../perl', '-I../lib', '-e', <<'EOF';
 use Fcntl qw(/^O_/ /^SEEK_/);
-sysopen(BIG, "big", O_WRONLY^|^O_CREAT^|^O_TRUNC) or die $!;
-my $sysseek = sysseek(BIG, 5_000_000_000, SEEK_SET);
-my $syswrite = syswrite(BIG, "big");
+sysopen($big_fh, "big", O_WRONLY^|^O_CREAT^|^O_TRUNC) or die $!;
+my $sysseek = sysseek($big_fh, 5_000_000_000, SEEK_SET);
+my $syswrite = syswrite($big_fh, "big");
 exit 0;
 EOF
 
-sysopen(BIG, "big", O_WRONLY^|^O_CREAT^|^O_TRUNC) or
+sysopen($big_fh, "big", O_WRONLY^|^O_CREAT^|^O_TRUNC) or
 	do { warn "sysopen 'big' failed: $^OS_ERROR\n"; bye };
-my $sysseek = sysseek(BIG, 5_000_000_000, SEEK_SET);
+my $sysseek = sysseek($big_fh, 5_000_000_000, SEEK_SET);
 unless (! $r && defined $sysseek && $sysseek == 5_000_000_000) {
     $sysseek = 'undef' unless defined $sysseek;
     explain("seeking past 2GB failed: ",
@@ -138,11 +140,11 @@ unless (! $r && defined $sysseek && $sysseek == 5_000_000_000) {
 }
 
 # The syswrite will fail if there are are filesize limitations (process or fs).
-my $syswrite = syswrite(BIG, "big");
+my $syswrite = syswrite($big_fh, "big");
 print "# syswrite failed: $^OS_ERROR (syswrite returned ",
       defined $syswrite ?? $syswrite !! 'undef', ")\n"
     unless defined $syswrite && $syswrite == 3;
-my $close     = close BIG;
+my $close     = close $big_fh;
 print "# close failed: $^OS_ERROR\n" unless $close;
 unless($syswrite && $close) {
     if ($^OS_ERROR =~m/too large/i) {
@@ -206,35 +208,35 @@ print "ok 3\n";
 fail unless -f "big";
 print "ok 4\n";
 
-sysopen(BIG, "big", O_RDONLY) or do { warn "sysopen failed: $^OS_ERROR\n"; bye };
+sysopen($big_fh, "big", O_RDONLY) or do { warn "sysopen failed: $^OS_ERROR\n"; bye };
 
-offset('sysseek(BIG, 4_500_000_000, SEEK_SET)', 4_500_000_000);
+offset('sysseek($big_fh, 4_500_000_000, SEEK_SET)', 4_500_000_000);
 print "ok 5\n";
 
-offset('sysseek(BIG, 0, SEEK_CUR)', 4_500_000_000);
+offset('sysseek($big_fh, 0, SEEK_CUR)', 4_500_000_000);
 print "ok 6\n";
 
-offset('sysseek(BIG, 1, SEEK_CUR)', 4_500_000_001);
+offset('sysseek($big_fh, 1, SEEK_CUR)', 4_500_000_001);
 print "ok 7\n";
 
-offset('sysseek(BIG, 0, SEEK_CUR)', 4_500_000_001);
+offset('sysseek($big_fh, 0, SEEK_CUR)', 4_500_000_001);
 print "ok 8\n";
 
-offset('sysseek(BIG, -1, SEEK_CUR)', 4_500_000_000);
+offset('sysseek($big_fh, -1, SEEK_CUR)', 4_500_000_000);
 print "ok 9\n";
 
-offset('sysseek(BIG, 0, SEEK_CUR)', 4_500_000_000);
+offset('sysseek($big_fh, 0, SEEK_CUR)', 4_500_000_000);
 print "ok 10\n";
 
-offset('sysseek(BIG, -3, SEEK_END)', 5_000_000_000);
+offset('sysseek($big_fh, -3, SEEK_END)', 5_000_000_000);
 print "ok 11\n";
 
-offset('sysseek(BIG, 0, SEEK_CUR)', 5_000_000_000);
+offset('sysseek($big_fh, 0, SEEK_CUR)', 5_000_000_000);
 print "ok 12\n";
 
 my $big;
 
-fail unless sysread(BIG, $big, 3) == 3;
+fail unless sysread($big_fh, $big, 3) == 3;
 print "ok 13\n";
 
 fail unless $big eq "big";
@@ -243,12 +245,12 @@ print "ok 14\n";
 # 705_032_704 = (I32)5_000_000_000
 # See that we don't have "big" in the 705_... spot:
 # that would mean that we have a wraparound.
-fail unless sysseek(BIG, 705_032_704, SEEK_SET);
+fail unless sysseek($big_fh, 705_032_704, SEEK_SET);
 print "ok 15\n";
 
 my $zero;
 
-fail unless read(BIG, $zero, 3) == 3;
+fail unless read($big_fh, $zero, 3) == 3;
 print "ok 16\n";
 
 fail unless $zero eq "\0\0\0";
@@ -261,8 +263,8 @@ bye(); # does the necessary cleanup
 END {
     # unlink may fail if applied directly to a large file
     # be paranoid about leaving 5 gig files lying around
-    open(BIG, ">", "big"); # truncate
-    close(BIG);
+    open($big_fh, ">", "big"); # truncate
+    close($big_fh);
     1 while unlink "big"; # standard portable idiom
 }
 

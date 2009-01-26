@@ -212,12 +212,12 @@ do {
 print "# Testing pullparsing from a file\n";
 my $p = Pod::Simple::PullParser->new;
 ok 1;
-open(OUT, ">", "temp.pod") || die "Can't write-open temp.pod: $^OS_ERROR";
-print OUT
+open(my $out, ">", "temp.pod") || die "Can't write-open temp.pod: $^OS_ERROR";
+print $out
  < map "$_\n", @(
   '','Bzorch', '','=pod', '', 'Lala', 'zaza', '', '=cut')
 ;
-close(OUT);
+close($out);
 ok 1;
 sleep 1;
 
@@ -250,8 +250,8 @@ do {
 print "# Testing pullparsing from a glob\n";
 my $p = Pod::Simple::PullParser->new;
 ok 1;
-open(IN, "<", "temp.pod") || die "Can't read-open temp.pod: $^OS_ERROR";
-$p->set_source(\*IN);
+open(my $in, "<", "temp.pod") || die "Can't read-open temp.pod: $^OS_ERROR";
+$p->set_source(\*$in);
 
 my( @t, $t );
 while($t = $p->get_token) {
@@ -271,7 +271,7 @@ ok @t[1]->tagname, 'Para';
 ok @t[2]->text,    'Lala zaza';
 ok @t[3]->tagname, 'Para';
 ok @t[4]->tagname, 'Document';
-close(IN);
+close($in);
 
 };
 
@@ -281,8 +281,8 @@ do {
 print "# Testing pullparsing from a globref\n";
 my $p = Pod::Simple::PullParser->new;
 ok 1;
-open(IN, "<", "temp.pod") || die "Can't read-open temp.pod: $^OS_ERROR";
-$p->set_source(\*IN);
+open(my $in, "<", "temp.pod") || die "Can't read-open temp.pod: $^OS_ERROR";
+$p->set_source(\*$in);
 
 my( @t, $t );
 while($t = $p->get_token) {
@@ -302,7 +302,7 @@ ok @t[1]->tagname, 'Para';
 ok @t[2]->text,    'Lala zaza';
 ok @t[3]->tagname, 'Para';
 ok @t[4]->tagname, 'Document';
-close(IN);
+close($in);
 
 };
 
@@ -312,8 +312,8 @@ do {
 print "# Testing pullparsing from a filehandle\n";
 my $p = Pod::Simple::PullParser->new;
 ok 1;
-open(IN, "<", "temp.pod") || die "Can't read-open temp.pod: $^OS_ERROR";
-$p->set_source(*IN{IO});
+open(my $in, "<", "temp.pod") || die "Can't read-open temp.pod: $^OS_ERROR";
+$p->set_source($in);
 
 my( @t, $t );
 while($t = $p->get_token) {
@@ -333,7 +333,7 @@ ok @t[1]->tagname, 'Para';
 ok @t[2]->text,    'Lala zaza';
 ok @t[3]->tagname, 'Para';
 ok @t[4]->tagname, 'Document';
-close(IN);
+close($in);
 
 };
 

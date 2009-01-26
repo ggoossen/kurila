@@ -81,10 +81,10 @@ END { unlink 'MANIFEST'; }
 
 my $ppd_out = run("$make ppd");
 is( $^CHILD_ERROR, 0,                      '  exited normally' ) || diag $ppd_out;
-ok( open(PPD, "<", 'Big-Dummy.ppd'), '  .ppd file generated' );
+ok( open(my $ppd, "<", 'Big-Dummy.ppd'), '  .ppd file generated' );
 my $ppd_html;
-do { local $^INPUT_RECORD_SEPARATOR; $ppd_html = ~< *PPD };
-close PPD;
+do { local $^INPUT_RECORD_SEPARATOR; $ppd_html = ~< *$ppd };
+close $ppd;
 like( $ppd_html, qr{^<SOFTPKG NAME="Big-Dummy" VERSION="0,01,0,0">}m, 
                                                            '  <SOFTPKG>' );
 like( $ppd_html, qr{^\s*<TITLE>Big-Dummy</TITLE>}m,        '  <TITLE>'   );
@@ -190,12 +190,12 @@ SKIP: do {
     ok( %files{?'.packlist'},    '  packlist created'   );
     ok( %files{?'perllocal.pod'},'  perllocal.pod created' );
 
-    ok( open(PERLLOCAL, "<", %files{?'perllocal.pod'} ) ) || 
+    ok( open(my $perllocalfh, "<", %files{?'perllocal.pod'} ) ) || 
         diag("Can't open %files{?'perllocal.pod'}: $^OS_ERROR");
     do { local $^INPUT_RECORD_SEPARATOR;
-      unlike( ~< *PERLLOCAL, qr/other/, 'DESTDIR should not appear in perllocal');
+      unlike( ~< *$perllocalfh, qr/other/, 'DESTDIR should not appear in perllocal');
     };
-    close PERLLOCAL;
+    close $perllocalfh;
 
 # TODO not available in the min version of Test::Harness we require
 #    ok( open(PACKLIST, $files{'.packlist'} ) ) || 
@@ -255,9 +255,9 @@ ok( !-f 'META.yml',  'META.yml not written to source dir' );
 ok( -f $meta_yml,    'META.yml written to dist dir' );
 ok( !-e "META_new.yml", 'temp META.yml file not left around' );
 
-ok open META, "<", $meta_yml or diag $^OS_ERROR;
-my $meta = join '', @( ~< \*META);
-ok close META;
+ok open my $metafh, "<", $meta_yml or diag $^OS_ERROR;
+my $meta = join '', @( ~< \*$metafh);
+ok close $metafh;
 
 is $meta, <<"END";
 --- #YAML:1.0
@@ -304,14 +304,14 @@ like( $mpl_out, qr/^Writing $makefile for Big::Dummy/m,
 
 # I know we'll get ignored errors from make here, that's ok.
 # Send STDERR off to oblivion.
-open(SAVERR, ">&", \*STDERR) or die $^OS_ERROR;
-open(STDERR, ">", "".File::Spec->devnull) or die $^OS_ERROR;
+open(my $saverr, ">&", \*STDERR) or die $^OS_ERROR;
+open(\*STDERR, ">", "".File::Spec->devnull) or die $^OS_ERROR;
 
 my $realclean_out = run("$make realclean");
 is( $^CHILD_ERROR, 0, 'realclean' ) || diag($realclean_out);
 
-open(STDERR, ">&", \*SAVERR) or die $^OS_ERROR;
-close SAVERR;
+open(\*STDERR, ">&", \*$saverr) or die $^OS_ERROR;
+close $saverr;
 
 
 sub _normalize {

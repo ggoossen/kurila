@@ -224,7 +224,7 @@ fileno \*STDERR			# fileno
 umask 0				# umask
 select \*STDOUT			# sselect
 select undef,undef,undef,0	# select
-getc $op_fh				# getc
+getc($op_fh)				# getc
 '???'				# read
 '???'				# sysread
 '???'				# syswrite

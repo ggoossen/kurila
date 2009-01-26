@@ -34,10 +34,9 @@ ok $b;
 
 my $source_file = File::Spec->catfile('t', 'compilet.c');
 do {
-  local *FH;
-  open FH, ">", "$source_file" or die "Can't create $source_file: $^OS_ERROR";
-  print FH "int main(void) \{ return 11; \}\n";
-  close FH;
+  open my $fh, ">", "$source_file" or die "Can't create $source_file: $^OS_ERROR";
+  print $fh "int main(void) \{ return 11; \}\n";
+  close $fh;
 };
 ok -e $source_file;
 

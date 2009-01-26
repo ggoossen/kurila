@@ -40,8 +40,8 @@ END {
 chdir 'Big-Dummy';
 
 my $stdout = '';
-close STDOUT;
-open STDOUT, '>>', \$stdout or die;
+close \*STDOUT;
+open \*STDOUT, '>>', \$stdout or die;
 pm_to_blib( \%( 'lib/Big/Dummy.pm' => 'blib/lib/Big/Dummy.pm' ),
             'blib/lib/auto'
           );
@@ -81,9 +81,9 @@ ok( -r 'install-test/lib/perl/Big/Dummy.pm',    '  .pm file installed' );
 ok(!-r 'install-test/lib/perl/Big/Dummy.SKIP',  '  ignored .SKIP file' );
 ok( -r 'install-test/packlist',                 '  packlist exists' );
 
-open(PACKLIST, "<", 'install-test/packlist' );
-my %packlist = %( < map { chomp;  ($_ => 1) } @( ~< *PACKLIST) );
-close PACKLIST;
+open(my $packlist, "<", 'install-test/packlist' );
+my %packlist = %( < map { chomp;  ($_ => 1) } @( ~< *$packlist) );
+close $packlist;
 
 # On case-insensitive filesystems (ie. VMS), the keys of the packlist might
 # be lowercase. :(
@@ -105,9 +105,9 @@ ok( -r 'install-test/lib/perl/Big/Dummy.pm', '  UNINST=1 preserved same' );
 
 
 chmod 0644, 'blib/lib/Big/Dummy.pm' or die $^OS_ERROR;
-open(DUMMY, ">>", "blib/lib/Big/Dummy.pm") or die $^OS_ERROR;
-print DUMMY "Extra stuff\n";
-close DUMMY;
+open(my $dummy, ">>", "blib/lib/Big/Dummy.pm") or die $^OS_ERROR;
+print $dummy "Extra stuff\n";
+close $dummy;
 
 
 # Test UNINST=0 does not remove other versions in other dirs.

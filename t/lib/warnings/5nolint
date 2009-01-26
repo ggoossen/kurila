@@ -4,7 +4,7 @@ __END__
 -X
 # nolint: check runtime $^WARNING is zapped
 $^WARNING = 1 ;
-close STDIN ; print STDIN "abc" ;
+close \*STDIN ; print {\*STDIN} "abc" ;
 EXPECT
 
 ########
@@ -12,16 +12,8 @@ EXPECT
 # nolint: check runtime $^WARNING is zapped
 do {
   $^WARNING = 1 ;
-  close STDIN ; print STDIN "abc" ;
-};
-EXPECT
-
-########
--X
-# nolint: check "no warnings" is zapped
-do {
-  use warnings ;
-  close STDIN ; print STDIN "abc" ;
+  close \*STDIN ;
+  print {\*STDIN} "abc" ;
 };
 EXPECT
 
@@ -30,7 +22,7 @@ EXPECT
 # nolint: check combination of -w and -X
 do {
   $^WARNING = 1 ;
-  close STDIN ; print STDIN "abc" ;
+  close \*STDIN ; print {\*STDIN} "abc" ;
 };
 EXPECT
 
@@ -42,7 +34,7 @@ do {
     no warnings ;
     eval '
         my $b ; chop $b ;
-    '; print STDERR $^EVAL_ERROR ;
+    '; print {\*STDERR} $^EVAL_ERROR ;
     my $b ; chop $b ;
 };
 EXPECT

@@ -81,10 +81,10 @@ SKIP: do {
     is((umask(0)^&^0777), 022, 'umask'),
 };
 
-open(FH, ">",'x') || die "Can't create x";
-close(FH);
-open(FH, ">",'a') || die "Can't create a";
-close(FH);
+open(my $fh, ">",'x') || die "Can't create x";
+close($fh);
+open($fh, ">",'a') || die "Can't create a";
+close($fh);
 
 my ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
     $blksize,$blocks,$a_mode);
@@ -331,9 +331,9 @@ SKIP: do {
 };
 
 unlink "Iofs.tmp";
-open IOFSCOM, ">", "Iofs.tmp" or die "Could not write IOfs.tmp: $^OS_ERROR";
-print IOFSCOM 'helloworld';
-close(IOFSCOM);
+open my $iofscom, ">", "Iofs.tmp" or die "Could not write IOfs.tmp: $^OS_ERROR";
+print $iofscom 'helloworld';
+close($iofscom);
 
 # TODO: pp_truncate needs to be taught about F_CHSIZE and F_FREESP,
 # as per UNIX FAQ.
@@ -351,26 +351,26 @@ SKIP: do {
     ok(-z "Iofs.tmp",    "truncation to zero bytes");
 
 #these steps are necessary to check if file is really truncated
-#On Win95, FH is updated, but file properties aren't
-    open(FH, ">", "Iofs.tmp") or die "Can't create Iofs.tmp";
-    print FH "x\n" x 200;
-    close FH;
+#On Win95, $fh is updated, but file properties aren't
+    open($fh, ">", "Iofs.tmp") or die "Can't create Iofs.tmp";
+    print $fh "x\n" x 200;
+    close $fh;
 
 # Check truncating an open file.
-    open(FH, ">>", "Iofs.tmp") or die "Can't open Iofs.tmp for appending";
+    open($fh, ">>", "Iofs.tmp") or die "Can't open Iofs.tmp for appending";
 
-    binmode FH;
-    select FH;
+    binmode $fh;
+    select $fh;
     $^OUTPUT_AUTOFLUSH = 1;
-    select STDOUT;
+    select \*STDOUT;
 
     do {
-	print FH "x\n" x 200;
-	ok(truncate(*FH, 200), "fh resize to 200");
+	print $fh "x\n" x 200;
+	ok(truncate($fh, 200), "fh resize to 200");
     };
 
     if ($needs_fh_reopen) {
-	close (FH); open (FH, ">>", "Iofs.tmp") or die "Can't reopen Iofs.tmp";
+	close ($fh); open ($fh, ">>", "Iofs.tmp") or die "Can't reopen Iofs.tmp";
     }
 
     SKIP: do {
@@ -380,35 +380,35 @@ SKIP: do {
 
 	is(-s "Iofs.tmp", 200, "fh resize to 200 working (filename check)");
 
-	ok(truncate(*FH, 0), "fh resize to zero");
+	ok(truncate($fh, 0), "fh resize to zero");
 
 	if ($needs_fh_reopen) {
-	    close (FH); open (FH, ">>", "Iofs.tmp") or die "Can't reopen Iofs.tmp";
+	    close ($fh); open ($fh, ">>", "Iofs.tmp") or die "Can't reopen Iofs.tmp";
 	}
 
 	ok(-z "Iofs.tmp", "fh resize to zero working (filename check)");
 
-	close FH;
+	close $fh;
 
-	open(FH, ">>", "Iofs.tmp") or die "Can't open Iofs.tmp for appending";
+	open($fh, ">>", "Iofs.tmp") or die "Can't open Iofs.tmp for appending";
 
-	binmode FH;
-	select FH;
+	binmode $fh;
+	select $fh;
 	$^OUTPUT_AUTOFLUSH = 1;
-	select STDOUT;
+	select \*STDOUT;
 
 	do {
-	    print FH "x\n" x 200;
-	    ok(truncate(*FH{IO}, 100), "fh resize by IO slot");
+	    print $fh "x\n" x 200;
+	    ok(truncate($fh, 100), "fh resize by IO slot");
 	};
 
 	if ($needs_fh_reopen) {
-	    close (FH); open (FH, ">>", "Iofs.tmp") or die "Can't reopen Iofs.tmp";
+	    close ($fh); open ($fh, ">>", "Iofs.tmp") or die "Can't reopen Iofs.tmp";
 	}
 
 	is(-s "Iofs.tmp", 100, "fh resize by IO slot working");
 
-	close FH;
+	close $fh;
     };
 };
 
@@ -418,8 +418,8 @@ SKIP: do {
       if (env::var('CYGWIN') && (env::var('CYGWIN') =~ m/check_case:(?:adjust|strict)/));
 
     chdir './tmp';
-    open(FH, ">",'x') || die "Can't create x";
-    close(FH);
+    open($fh, ">",'x') || die "Can't create x";
+    close($fh);
     rename('x', 'X');
 
     # this works on win32 only, because fs isn't casesensitive

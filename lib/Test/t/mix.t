@@ -5,9 +5,9 @@ use Test < qw(:DEFAULT $TESTOUT $TESTERR $ntest);
 ### seeing the todo tests, otherwise you get people sending in bug reports
 ### about Test.pm having "UNEXPECTEDLY SUCCEEDED" tests.
 
-open F, ">", "mix";
-$TESTOUT = *F{IO};
-$TESTERR = *F{IO};
+open my $f, ">", "mix";
+$TESTOUT = $f;
+$TESTERR = $f;
 
 plan tests => 4, todo => \@(2,3);
 
@@ -25,14 +25,14 @@ ok(1);
 
 skip(1,0);
 
-close F;
+close $f;
 $TESTOUT = *STDOUT{IO};
 $TESTERR = *STDERR{IO};
 $ntest = 1;
 
-open F, "<", "mix";
-my $out = join '', @( ~< *F);
-close F;
+open $f, "<", "mix";
+my $out = join '', @( ~< *$f);
+close $f;
 unlink "mix";
 
 my $expect = <<"EXPECT";
