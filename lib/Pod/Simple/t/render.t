@@ -67,12 +67,12 @@ foreach my $file (@(
   }
 
   print "# Reading $precooked...\n";
-  open(IN, "<", $precooked) or die "Can't read-open $precooked: $^OS_ERROR";
+  open(my $in, "<", $precooked) or die "Can't read-open $precooked: $^OS_ERROR";
   do {
     local $^INPUT_RECORD_SEPARATOR;
-    push @out, ~< *IN;
+    push @out, ~< $in;
   };
-  close(IN);
+  close($in);
   print "#   ", length(@out[-1]), " bytes pulled in.\n";
   
   @out = map {
@@ -93,23 +93,23 @@ foreach my $file (@(
     ++$outfile;
     
     my @outnames = map $outfile . $_, qw(0 1);
-    open(OUT2, ">", "@outnames[0].~out.txt") || die "Can't write-open @outnames[0].txt: $^OS_ERROR";
+    open(my $out2, ">", "@outnames[0].~out.txt") || die "Can't write-open @outnames[0].txt: $^OS_ERROR";
 
     foreach my $out ( @out) { push @outnames, @outnames[-1];  ++@outnames[-1] };
     pop @outnames;
     printf "# Writing to \%s.txt .. \%s.txt\n", @outnames[0], @outnames[-1];
     shift @outnames;
     
-    binmode(OUT2);
+    binmode($out2);
     foreach my $out ( @out) {
       my $outname = shift @outnames;
-      open(OUT, ">", "$outname.txt") || die "Can't write-open $outname.txt: $^OS_ERROR";
-      binmode(OUT);
-      print OUT  $out, "\n";
-      print OUT2 $out, "\n";
-      close(OUT);
+      open(my $out_fh, ">", "$outname.txt") || die "Can't write-open $outname.txt: $^OS_ERROR";
+      binmode($out_fh);
+      print $out_fh  $out, "\n";
+      print $out2 $out, "\n";
+      close($out_fh);
     }
-    close(OUT2);
+    close($out2);
   }
 }
 

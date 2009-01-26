@@ -118,7 +118,7 @@ do {
         %CURRENCIES{+lc "$currency"} = $code;
     }
 
-    close(DATA);
+    close(\*DATA);
 };
 
 1;

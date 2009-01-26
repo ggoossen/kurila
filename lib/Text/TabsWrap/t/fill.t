@@ -97,10 +97,8 @@ sub write_file
 {
 	my @($f, @< @data) =  @_;
 
-	local(*F);
-
-	open(F, ">", "$f") || die "open >$f: $^OS_ERROR";
-	(print F < @data) || die "write $f: $^OS_ERROR";
-	close(F) || die "close $f: $^OS_ERROR";
+	open(my $fh, ">", "$f") || die "open >$f: $^OS_ERROR";
+	(print $fh < @data) || die "write $f: $^OS_ERROR";
+	close($fh) || die "close $f: $^OS_ERROR";
 	return 1;
 }

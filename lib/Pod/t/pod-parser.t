@@ -21,20 +21,20 @@ use Pod::Text;
 print "ok 1\n";
 
 my $parser = Pod::Man->new or die "Cannot create parser\n";
-open (TMP, ">", 'tmp.pod') or die "Cannot create tmp.pod: $^OS_ERROR\n";
-print TMP "Some random B<text>.\n";
-close TMP;
-open (OUT, ">", 'out.tmp') or die "Cannot create out.tmp: $^OS_ERROR\n";
-$parser->parse_from_file (\%( cutting => 0 ), 'tmp.pod', \*OUT);
-close OUT;
-open (OUT, "<", 'out.tmp') or die "Cannot open out.tmp: $^OS_ERROR\n";
-while ( ~< *OUT) { last if m/^\.nh/ }
+open (my $tmp, ">", 'tmp.pod') or die "Cannot create tmp.pod: $^OS_ERROR\n";
+print $tmp "Some random B<text>.\n";
+close $tmp;
+open (my $out, ">", 'out.tmp') or die "Cannot create out.tmp: $^OS_ERROR\n";
+$parser->parse_from_file (\%( cutting => 0 ), 'tmp.pod', $out);
+close $out;
+open ($out, "<", 'out.tmp') or die "Cannot open out.tmp: $^OS_ERROR\n";
+while ( ~< $out) { last if m/^\.nh/ }
 my $output;
 do {
     local $^INPUT_RECORD_SEPARATOR;
-    $output = ~< *OUT;
+    $output = ~< $out;
 };
-close OUT;
+close $out;
 if ($output eq "Some random \\fBtext\\fR.\n") {
     print "ok 2\n";
 } else {
@@ -44,15 +44,15 @@ if ($output eq "Some random \\fBtext\\fR.\n") {
 }
 
 $parser = Pod::Text->new or die "Cannot create parser\n";
-open (OUT, ">", 'out.tmp') or die "Cannot create out.tmp: $^OS_ERROR\n";
-$parser->parse_from_file (\%( cutting => 0 ), 'tmp.pod', \*OUT);
-close OUT;
-open (OUT, "<", 'out.tmp') or die "Cannot open out.tmp: $^OS_ERROR\n";
+open ($out, ">", 'out.tmp') or die "Cannot create out.tmp: $^OS_ERROR\n";
+$parser->parse_from_file (\%( cutting => 0 ), 'tmp.pod', $out);
+close $out;
+open ($out, "<", 'out.tmp') or die "Cannot open out.tmp: $^OS_ERROR\n";
 do {
     local $^INPUT_RECORD_SEPARATOR;
-    $output = ~< *OUT;
+    $output = ~< $out;
 };
-close OUT;
+close $out;
 if ($output eq "    Some random text.\n\n") {
     print "ok 3\n";
 } else {

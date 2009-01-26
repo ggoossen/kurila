@@ -98,18 +98,18 @@ sub import {
     if ($std) {
 	if ($in) {
 	    if ($in =~ m/:utf8\b/) {
-		    binmode(STDIN,  ":utf8");
+		    binmode(\*STDIN,  ":utf8");
 		} elsif ($in =~ m/(\w+\(.+\))/) {
-		    binmode(STDIN,  ":$1");
+		    binmode(\*STDIN,  ":$1");
 		}
 	}
 	if ($out) {
 	    if ($out =~ m/:utf8\b/) {
-		binmode(STDOUT,  ":utf8");
-		binmode(STDERR,  ":utf8");
+		binmode(\*STDOUT,  ":utf8");
+		binmode(\*STDERR,  ":utf8");
 	    } elsif ($out =~ m/(\w+\(.+\))/) {
-		binmode(STDOUT,  ":$1");
-		binmode(STDERR,  ":$1");
+		binmode(\*STDOUT,  ":$1");
+		binmode(\*STDERR,  ":$1");
 	    }
 	}
     }

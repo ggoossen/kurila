@@ -56,23 +56,23 @@ is( $^HINTS{?'open_IO'}, 'crlf', 'should record last layer set in %^H' );
 SKIP: do {
     skip("no perlio, no :utf8", 12) unless (PerlIO::Layer->find( 'perlio'));
 
-    eval <<EOE;
+    eval <<'EOE';
     use open ':utf8';
     use utf8;
-    open(O, ">", "utf8");
-    print O chr(0x100);
-    close O;
-    open(I, "<", "utf8");
-    is(ord(~<*I), 0x100, ":utf8 single wide character round-trip");
-    close I;
+    open(my $o, ">", "utf8");
+    print $o chr(0x100);
+    close $o;
+    open(my $i, "<", "utf8");
+    is(ord(~<$i), 0x100, ":utf8 single wide character round-trip");
+    close $i;
 EOE
     die if $^EVAL_ERROR;
 
-    open F, ">", "a";
+    open my $f, ">", "a";
     my @a = map { chr(1 << ($_ << 2)) } 0..5; # 0x1, 0x10, .., 0x100000
     unshift @a, chr(0); # ... and a null byte in front just for fun
-    print F <@a;
-    close F;
+    print $f <@a;
+    close $f;
 
     sub systell {
         use Fcntl 'SEEK_CUR';
@@ -84,27 +84,27 @@ EOE
     my $ok;
     my $c;
 
-    open F, "<:utf8", "a";
+    open $f, "<:utf8", "a";
     $ok = $a = 0;
     for (@a) {
         unless (
-		($c = sysread(F, $b, 1)) == 1  &&
+		($c = sysread($f, $b, 1)) == 1  &&
 		length($b)               == 1  &&
 		ord($b)                  == ord($_) &&
-		systell(*F)               == ($a += bytes::length($b))
+		systell($f)               == ($a += bytes::length($b))
 		) {
 	    print '# ord($_)           == ', ord($_), "\n";
 	    print '# ord($b)           == ', ord($b), "\n";
 	    print '# length($b)        == ', length($b), "\n";
 	    print '# bytes::length($b) == ', bytes::length($b), "\n";
-	    print '# systell(F)        == ', systell(*F), "\n";
+	    print '# systell($f)        == ', systell($f), "\n";
 	    print '# $a                == ', $a, "\n";
 	    print '# $c                == ', $c, "\n";
 	    last;
 	}
 	$ok++;
     }
-    close F;
+    close $f;
     ok($ok == (nelems @a),
        "on :utf8 streams sysread() should work on characters, not bytes");
 
@@ -117,61 +117,62 @@ EOE
     }
 
 
+    my $g;
     my %actions = %(
-		   syswrite => sub { syswrite G, shift; },
-		   'syswrite len' => sub { syswrite G, shift, 1; },
+		   syswrite => sub { syswrite $g, shift; },
+		   'syswrite len' => sub { syswrite $g, shift, 1; },
 		   'syswrite len pad' => sub {
 		       my $temp = shift() . "\243";
-		       syswrite G, $temp, 1; },
+		       syswrite $g, $temp, 1; },
 		   'syswrite off' => sub { 
 		       my $temp = "\351" . shift();
-		       syswrite G, $temp, 1, 1; },
+		       syswrite $g, $temp, 1, 1; },
 		   'syswrite off pad' => sub { 
 		       my $temp = "\351" . shift() . "\243";
-		       syswrite G, $temp, 1, 1; },
+		       syswrite $g, $temp, 1, 1; },
 		  );
 
     foreach my $key (sort keys %actions) {
 	# syswrite() on should work on characters, not bytes
-	open G, ">:utf8", "b";
+	open $g, ">:utf8", "b";
 
 	print "# $key\n";
 	$ok = $a = 0;
 	for (@a) {
 	    unless (
 		    ($c = %actions{?$key}->($_)) == 1 &&
-		    systell(*G)                == ($a += bytes::length($_))
+		    systell($g)                == ($a += bytes::length($_))
 		   ) {
 		diagnostics();
 		last;
 	    }
 	    $ok++;
 	}
-	close G;
+	close $g;
 	ok($ok == (nelems @a),
 	   "on :utf8 streams syswrite() should work on characters, not bytes");
 
-	open G, "<:utf8", "b";
+	open $g, "<:utf8", "b";
 	$ok = $a = 0;
 	for (@a) {
 	    unless (
-		    ($c = sysread(G, $b, 1)) == 1 &&
+		    ($c = sysread($g, $b, 1)) == 1 &&
 		    length($b)               == 1 &&
 		    ord($b)                  == ord($_) &&
-		    systell(*G)               == ($a += bytes::length($_))
+		    systell($g)               == ($a += bytes::length($_))
 		   ) {
 		print '# ord($_)           == ', ord($_), "\n";
 		print '# ord($b)           == ', ord($b), "\n";
 		print '# length($b)        == ', length($b), "\n";
 		print '# bytes::length($b) == ', bytes::length($b), "\n";
-		print '# systell(G)        == ', systell(*G), "\n";
+		print '# systell($g)        == ', systell($g), "\n";
 		print '# $a                == ', $a, "\n";
 		print '# $c                == ', $c, "\n";
 		last;
 	    }
 	    $ok++;
 	}
-	close G;
+	close $g;
 	ok($ok == (nelems @a),
 	   "checking syswrite() output on :utf8 streams by reading it back in");
     }

@@ -92,12 +92,11 @@ do {
   $msg =~ s/\n/\\n/g; # keep output on one line
   ok(($msg !~ m/ABORT/),"vmsish ERR exit, vmsish hushed at runtime, DCL error message check");
 
-  local *TEST;
-  open(TEST, ">",'vmsish_test.pl') || die('not ok ?? : unable to open "vmsish_test.pl" for writing');  
-  print TEST "#! perl\n";
-  print TEST "use vmsish qw(hushed);\n";
-  print TEST "\$obvious = (\$compile(\$error;\n";
-  close TEST;
+  open(my $test, ">",'vmsish_test.pl') || die('not ok ?? : unable to open "vmsish_test.pl" for writing');  
+  print $test "#! perl\n";
+  print $test "use vmsish qw(hushed);\n";
+  print $test "\$obvious = (\$compile(\$error;\n";
+  close $test;
   $msg = do_a_perl('vmsish_test.pl');
   $msg =~ s/\n/\\n/g; # keep output on one line
   ok(($msg !~ m/ABORT/),"compile ERR exit, vmsish hushed, DCL error message check");
@@ -124,8 +123,8 @@ do {
   # we create a file rather than using an existing one for the stat() test.
 
   my $file = 'sys$scratch:vmsish_t_flirble.tmp';
-  open TMP, ">", "$file" or die "Couldn't open file $file";
-  close TMP;
+  open my $tmp, ">", "$file" or die "Couldn't open file $file";
+  close $tmp;
   END { 1 while unlink $file; }
 
   do {
@@ -173,12 +172,11 @@ do {
 #====== need this to make sure error messages come out, even if
 #       they were turned off in invoking procedure
 sub do_a_perl {
-    local *P;
-    open(P, ">",'vmsish_test.com') || die('not ok ?? : unable to open "vmsish_test.com" for writing');
-    print P "\$ set message/facil/sever/ident/text\n";
-    print P "\$ define/nolog/user sys\$error _nla0:\n";
-    print P "\$ $Invoke_Perl $(join ' ',@_)\n";
-    close P;
+    open(my $p, ">",'vmsish_test.com') || die('not ok ?? : unable to open "vmsish_test.com" for writing');
+    print $p "\$ set message/facil/sever/ident/text\n";
+    print $p "\$ define/nolog/user sys\$error _nla0:\n";
+    print $p "\$ $Invoke_Perl $(join ' ',@_)\n";
+    close $p;
     my $x = `\@vmsish_test.com`;
     unlink 'vmsish_test.com';
     return $x;

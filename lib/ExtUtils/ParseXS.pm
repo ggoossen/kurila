@@ -173,14 +173,14 @@ sub process_file {
     # skip directories, binary files etc.
     warn("Warning: ignoring non-text typemap file '$typemap'\n"), next
       unless -T $typemap ;
-    open(TYPEMAP, "<", $typemap)
+    open(my $typemap_fh, "<", $typemap)
       or warn ("Warning: could not open typemap file '$typemap': $^OS_ERROR\n"), next;
     my $mode = 'Typemap';
     my $junk = "" ;
     my $current = \$junk;
-    while ( ~< *TYPEMAP) {
+    while ( ~< $typemap_fh) {
       next if m/^\s*		#/;
-        my $line_no = iohandle::input_line_number(\*TYPEMAP) + 1;
+        my $line_no = iohandle::input_line_number($typemap_fh) + 1;
       if (m/^INPUT\s*$/) {
 	$mode = 'Input';   $current = \$junk;  next;
       }
@@ -217,7 +217,7 @@ sub process_file {
 	$current = \%output_expr{+$_};
       }
     }
-    close(TYPEMAP);
+    close($typemap_fh);
   }
 
   foreach my $value (values %input_expr) {

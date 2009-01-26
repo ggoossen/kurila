@@ -374,10 +374,10 @@ sub Tgetent
             $state = 1;    # ok, maybe do a new file next time
         }
 
-        open( TERMCAP, "<", "$TERMCAP\0" ) || croak "open $TERMCAP: $^OS_ERROR";
+        open( my $termcap_fh, "<", "$TERMCAP\0" ) || croak "open $TERMCAP: $^OS_ERROR";
         eval $search;
         die $^EVAL_ERROR if $^EVAL_ERROR;
-        close TERMCAP;
+        close $termcap_fh;
 
         # If :tc=...: found then search this file again
         $entry =~ s/:tc=([^:]+):/:/ && ( $tmp_term = $1, $state = 2 );

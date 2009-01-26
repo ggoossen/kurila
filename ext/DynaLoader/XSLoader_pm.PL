@@ -9,8 +9,8 @@ sub to_string {
 }
 
 1 while unlink "XSLoader.pm";
-open OUT, ">", "XSLoader.pm" or die $^OS_ERROR;
-print OUT <<'EOT';
+open my $out, ">", "XSLoader.pm" or die $^OS_ERROR;
+print {$out} <<'EOT';
 # Generated from XSLoader.pm.PL (resolved config_value() value)
 
 package XSLoader;
@@ -22,9 +22,9 @@ our $VERSION = "0.08";
 
 EOT
 
-print OUT '  my $dl_dlext = ', to_string(Config::config_value('dlext')), ";\n" ;
+print {$out} '  my $dl_dlext = ', to_string(Config::config_value('dlext')), ";\n" ;
 
-print OUT <<'EOT';
+print {$out} <<'EOT';
 
 package DynaLoader;
 
@@ -56,7 +56,7 @@ sub load {
 
 EOT
 
-print OUT <<'EOT' if defined &DynaLoader::mod2fname;
+print {$out} <<'EOT' if defined &DynaLoader::mod2fname;
     # Some systems have restrictions on files names for DLL's etc.
     # mod2fname returns appropriate file base name (typically truncated)
     # It may also edit @modparts if required.
@@ -64,14 +64,14 @@ print OUT <<'EOT' if defined &DynaLoader::mod2fname;
 
 EOT
 
-print OUT <<'EOT' if $^OS_NAME eq 'os2';
+print {$out} <<'EOT' if $^OS_NAME eq 'os2';
 
     # os2 static build can dynaload, but cannot dynaload Perl modules...
     die 'Dynaloaded Perl modules are not available in this build of Perl' if $OS2::is_static;
 
 EOT
 
-print OUT <<'EOT';
+print {$out} <<'EOT';
     my $modpname = join('/', @modparts);
     my $modlibname = @(caller())[1];
     my $c = nelems @modparts;
@@ -98,14 +98,14 @@ print OUT <<'EOT';
 EOT
 
     if ($^OS_NAME eq 'darwin') {
-print OUT <<'EOT';
+print {$out} <<'EOT';
         if ($boot_symbol_ref = dl_find_symbol(0, $bootname)) {
             goto boot; #extension library has already been loaded, e.g. darwin
         }
 EOT
     }
 
-print OUT <<'EOT';
+print {$out} <<'EOT';
     # Many dynamic extension loading problems will appear to come from
     # this section of code: XYZ failed at line 123 of DynaLoader.pm.
     # Often these errors are actually occurring in the initialisation
@@ -376,4 +376,4 @@ it under the same terms as Perl itself.
 =cut
 EOT
 
-close OUT or die $^OS_ERROR;
+close $out or die $^OS_ERROR;

@@ -271,9 +271,9 @@ SKIP: do {
     
     
     do {
-	open F, ">", "aaa.pm" or die "Cannot open aaa.pm: $^OS_ERROR\n";
-	print F "package aaa;\n\$aaa::VERSION=0.58;\n1;\n";
-	close F;
+	open my $f, ">", "aaa.pm" or die "Cannot open aaa.pm: $^OS_ERROR\n";
+	print $f "package aaa;\n\$aaa::VERSION=0.58;\n1;\n";
+	close $f;
 
 	$version = "v0.580";
 	eval "use lib '.'; use aaa $version";
@@ -304,9 +304,9 @@ SKIP: do {
     };
 
     do { # dummy up some variously broken modules for testing
-	open F, ">", "xxx.pm" or die "Cannot open xxx.pm: $^OS_ERROR\n";
-	print F "1;\n";
-	close F;
+	open my $f, ">", "xxx.pm" or die "Cannot open xxx.pm: $^OS_ERROR\n";
+	print $f "1;\n";
+	close $f;
 
 	eval "use lib '.'; use xxx v3;";
         like($^EVAL_ERROR->{?description}, qr/xxx defines neither package nor VERSION/,
@@ -319,9 +319,9 @@ SKIP: do {
     };
     
     do { # dummy up some variously broken modules for testing
-	open F, ">", "yyy.pm" or die "Cannot open yyy.pm: $^OS_ERROR\n";
-	print F "package yyy;\n#look ma no VERSION\n1;\n";
-	close F;
+	open my $f, ">", "yyy.pm" or die "Cannot open yyy.pm: $^OS_ERROR\n";
+	print $f "package yyy;\n#look ma no VERSION\n1;\n";
+	close $f;
 	eval "use lib '.'; use yyy v3;";
 	like ($^EVAL_ERROR->{?description}, qr/$error_regex/,
 	    'Replacement handles modules without VERSION'); 
@@ -332,9 +332,9 @@ SKIP: do {
     };
 
     do { # dummy up some variously broken modules for testing
-	open F, ">", "zzz.pm" or die "Cannot open zzz.pm: $^OS_ERROR\n";
-	print F "package zzz;\nour \@VERSION = ();\n1;\n";
-	close F;
+	open my $f, ">", "zzz.pm" or die "Cannot open zzz.pm: $^OS_ERROR\n";
+	print $f "package zzz;\nour \@VERSION = ();\n1;\n";
+	close $f;
 	eval "use lib '.'; use zzz v3;";
 	like ($^EVAL_ERROR->{?description}, qr/$error_regex/,
 	    'Replacement handles modules without VERSION'); 
@@ -401,13 +401,13 @@ SKIP: 	do {
 
 SKIP: do {
 	# dummy up a legal module for testing RT#19017
-	open F, ">", "www.pm" or die "Cannot open www.pm: $^OS_ERROR\n";
-	print F <<"EOF";
+	open my $f, ">", "www.pm" or die "Cannot open www.pm: $^OS_ERROR\n";
+	print {$f} <<"EOF";
 package www;
 use version; our \$VERSION = qv('0.0.4');
 1;
 EOF
-	close F;
+	close $f;
 
 	eval "use lib '.'; use www v0.000008;";
 	like ($^EVAL_ERROR->{?description}, qr/^www version v0.8.0 required/,
@@ -431,13 +431,13 @@ EOF
 	unlink 'www.pm';
     };
 
-    open F, ">", "vvv.pm" or die "Cannot open vvv.pm: $^OS_ERROR\n";
-    print F <<"EOF";
+    open my $f, ">", "vvv.pm" or die "Cannot open vvv.pm: $^OS_ERROR\n";
+    print {$f} <<"EOF";
 package vvv;
 use base q(version);
 1;
 EOF
-    close F;
+    close $f;
     # need to eliminate any other qv()'s
     undef *main::qv;
     ok(!defined(&{Symbol::fetch_glob("main\::qv")}), "make sure we cleared qv() properly");
@@ -447,13 +447,13 @@ EOF
     unlink 'vvv.pm';
 
 SKIP: do {
-	open F, ">", "uuu.pm" or die "Cannot open uuu.pm: $^OS_ERROR\n";
-	print F <<"EOF";
+	open my $f, ">", "uuu.pm" or die "Cannot open uuu.pm: $^OS_ERROR\n";
+	print {$f} <<"EOF";
 package uuu;
 our \$VERSION = 1.0;
 1;
 EOF
-	close F;
+	close $f;
 	eval "use lib '.'; use uuu v1.001;";
 	like ($^EVAL_ERROR->{?description}, qr/^uuu version v1.1.0 required/,
 	    "User typed numeric so we error with numeric"); 

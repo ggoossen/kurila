@@ -74,9 +74,9 @@ sub getPerlFiles
         $prefix = $1
             if $manifest =~ m#^(.*/)#;
 
-        open M, "<", "$manifest"
+        open my $m, "<", "$manifest"
             or die "Cannot open '$manifest': $^OS_ERROR\n";
-        while ( ~< *M)
+        while ( ~< $m)
         {
             chomp ;
             next if m/^\s*#/ || m/^\s*$/ ;
@@ -98,7 +98,7 @@ sub getPerlFiles
             }
 
         }
-        close M;
+        close $m;
     }
 
     return @files;
@@ -251,9 +251,9 @@ sub doUpDownViaCopy
     my @keep = @( () );
 
     do {
-        open F, "<", "$file"
+        open my $f, "<", "$file"
             or die "Cannot open $file: $^OS_ERROR\n" ;
-        while ( ~< *F)
+        while ( ~< $f)
         {
             if (m/^__(END|DATA)__/)
             {
@@ -266,19 +266,19 @@ sub doUpDownViaCopy
             push @keep, $_;
         }
 
-        if (! eof F)
+        if (! eof $f)
         {
-            while ( ~< *F)
+            while ( ~< $f)
               { push @keep, $_ }
         }
-        close F;
+        close $f;
     };
 
     do {
-        open F, ">", "$file"
+        open my $f, ">", "$file"
             or die "Cannot open $file: $^OS_ERROR\n";
-        print F < @keep ;
-        close F;
+        print $f < @keep ;
+        close $f;
     };
 }
 

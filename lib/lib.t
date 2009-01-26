@@ -28,14 +28,14 @@ BEGIN {
 
     mkpath \@($Auto_Dir);
 
-    open(MOD, ">", "$Module") || $^OS_ERROR-> DIE();
-    print MOD <<'MODULE';
+    open(my $mod, ">", "$Module") || $^OS_ERROR-> DIE();
+    print {$mod} <<'MODULE';
 package Yup;
 our $Plan = 9;
 return '42';
 MODULE
 
-    close MOD;
+    close $mod;
 }
 
 END {

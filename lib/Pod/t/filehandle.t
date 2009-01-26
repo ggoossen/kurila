@@ -25,25 +25,25 @@ my $text = Pod::Text->new or die "Cannot create parser\n";
 my $n = 2;
 while ( ~< *DATA) {
     next until $_ eq "###\n";
-    open (TMP, ">", 'tmp.pod') or die "Cannot create tmp.pod: $^OS_ERROR\n";
+    open (my $tmp, ">", 'tmp.pod') or die "Cannot create tmp.pod: $^OS_ERROR\n";
     while ( ~< *DATA) {
         last if $_ eq "###\n";
-        print TMP $_;
+        print $tmp $_;
     }
-    close TMP;
-    open (IN, "<", 'tmp.pod') or die "Cannot open tmp.pod: $^OS_ERROR\n";
-    open (OUT, ">", 'out.tmp') or die "Cannot create out.tmp: $^OS_ERROR\n";
-    $man->parse_from_filehandle (\*IN, \*OUT);
-    close IN;
-    close OUT;
-    open (OUT, "<", 'out.tmp') or die "Cannot open out.tmp: $^OS_ERROR\n";
-    while ( ~< *OUT) { last if m/^\.nh/ }
+    close $tmp;
+    open (my $in, "<", 'tmp.pod') or die "Cannot open tmp.pod: $^OS_ERROR\n";
+    open (my $out, ">", 'out.tmp') or die "Cannot create out.tmp: $^OS_ERROR\n";
+    $man->parse_from_filehandle ($in, $out);
+    close $in;
+    close $out;
+    open ($out, "<", 'out.tmp') or die "Cannot open out.tmp: $^OS_ERROR\n";
+    while ( ~< $out) { last if m/^\.nh/ }
     my $output;
     do {
         local $^INPUT_RECORD_SEPARATOR;
-        $output = ~< *OUT;
+        $output = ~< $out;
     };
-    close OUT;
+    close $out;
     my $expected = '';
     while ( ~< *DATA) {
         last if $_ eq "###\n";
@@ -56,17 +56,17 @@ while ( ~< *DATA) {
         print "Expected\n========\n$expected\nOutput\n======\n$output\n";
     }
     $n++;
-    open (IN, "<", 'tmp.pod') or die "Cannot open tmp.pod: $^OS_ERROR\n";
-    open (OUT, ">", 'out.tmp') or die "Cannot create out.tmp: $^OS_ERROR\n";
-    $text->parse_from_filehandle (\*IN, \*OUT);
-    close IN;
-    close OUT;
-    open (OUT, "<", 'out.tmp') or die "Cannot open out.tmp: $^OS_ERROR\n";
+    open ($in, "<", 'tmp.pod') or die "Cannot open tmp.pod: $^OS_ERROR\n";
+    open ($out, ">", 'out.tmp') or die "Cannot create out.tmp: $^OS_ERROR\n";
+    $text->parse_from_filehandle ($in, $out);
+    close $in;
+    close $out;
+    open ($out, "<", 'out.tmp') or die "Cannot open out.tmp: $^OS_ERROR\n";
     do {
         local $^INPUT_RECORD_SEPARATOR;
-        $output = ~< *OUT;
+        $output = ~< $out;
     };
-    close OUT;
+    close $out;
     unlink ('tmp.pod', 'out.tmp');
     $expected = '';
     while ( ~< *DATA) {

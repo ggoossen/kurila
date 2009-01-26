@@ -20,24 +20,24 @@ my $file = basename($^PROGRAM_NAME, '.PL');
 $file .= '.com' if $^OS_NAME eq 'VMS';
 
 # Create output file.
-open OUT,">", "$file" or die "Can't create $file: $^OS_ERROR";
+open my $out,">", "$file" or die "Can't create $file: $^OS_ERROR";
 
 print "Extracting $file (with variable substitutions)\n";
 
 # In this section, perl variables will be expanded during extraction.
 # You can use $Config{...} to use Configure variables.
 
-print OUT <<"!GROK!THIS!";
+print {$out} <<"!GROK!THIS!";
 $(config_value('startperl'))
     eval 'exec $(config_value('perlpath')) -S \$0 \$\{1+"\$@"\}'
         if \$running_under_some_shell;
 !GROK!THIS!
 
-print OUT "\n# perlivp $^PERL_VERSION\n";
+print {$out} "\n# perlivp $^PERL_VERSION\n";
 
 # In the following, perl variables are not expanded during extraction.
 
-print OUT <<'!NO!SUBS!';
+print {$out} <<'!NO!SUBS!';
 
 sub usage {
     warn "@_\n" if @_;
@@ -92,12 +92,12 @@ if (defined(config_value('perlpath'))) { $perlpath = config_value('perlpath'); }
 my $useithreads = '';
 if (defined(config_value('useithreads'))) { $useithreads = config_value('useithreads'); }
 
-print OUT <<"!GROK!THIS!";
+print {$out} <<"!GROK!THIS!";
 my \$perlpath = '$perlpath';
 my \$useithreads = '$useithreads';
 !GROK!THIS!
 
-print OUT <<'!NO!SUBS!';
+print {$out} <<'!NO!SUBS!';
 
 print "## Checking Perl binary via variable `\$perlpath' = $perlpath.\n" if $opt{'p'};
 
@@ -118,11 +118,11 @@ print "## Checking Perl version via variable `\$^V'.\n" if $opt{'p'};
 
 !NO!SUBS!
 
-print OUT <<"!GROK!THIS!";
+print {$out} <<"!GROK!THIS!";
 my \$ivp_VERSION = "$^PERL_VERSION";
 
 !GROK!THIS!
-print OUT <<'!NO!SUBS!';
+print {$out} <<'!NO!SUBS!';
 if ($ivp_VERSION eq $^V) {
     print "## Perl version `$^V' appears installed as expected.\n" if $opt{'v'};
     print "ok 2\n";
@@ -497,7 +497,7 @@ Peter Prymmer
 
 !NO!SUBS!
 
-close OUT or die "Can't close $file: $^OS_ERROR";
+close $out or die "Can't close $file: $^OS_ERROR";
 chmod 0755, $file or die "Can't reset permissions for $file: $^OS_ERROR\n";
 exec("$(config_value('eunicefix')) $file") if config_value('eunicefix') ne ':';
 chdir $origdir;

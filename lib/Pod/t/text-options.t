@@ -28,23 +28,23 @@ while ( ~< *DATA) {
         my @($option, $value) =  split;
         %options{+$option} = $value;
     }
-    open (TMP, ">", 'tmp.pod') or die "Cannot create tmp.pod: $^OS_ERROR\n";
+    open (my $tmp, ">", 'tmp.pod') or die "Cannot create tmp.pod: $^OS_ERROR\n";
     while ( ~< *DATA) {
         last if $_ eq "###\n";
-        print TMP $_;
+        print $tmp $_;
     }
-    close TMP;
+    close $tmp;
     my $parser = Pod::Text->new (< %options) or die "Cannot create parser\n";
-    open (OUT, ">", 'out.tmp') or die "Cannot create out.tmp: $^OS_ERROR\n";
-    $parser->parse_from_file ('tmp.pod', \*OUT);
-    close OUT;
-    open (TMP, "<", 'out.tmp') or die "Cannot open out.tmp: $^OS_ERROR\n";
+    open (my $out, ">", 'out.tmp') or die "Cannot create out.tmp: $^OS_ERROR\n";
+    $parser->parse_from_file ('tmp.pod', $out);
+    close $out;
+    open ($tmp, "<", 'out.tmp') or die "Cannot open out.tmp: $^OS_ERROR\n";
     my $output;
     do {
         local $^INPUT_RECORD_SEPARATOR;
-        $output = ~< *TMP;
+        $output = ~< $tmp;
     };
-    close TMP;
+    close $tmp;
     unlink ('tmp.pod', 'out.tmp');
     my $expected = '';
     while ( ~< *DATA) {

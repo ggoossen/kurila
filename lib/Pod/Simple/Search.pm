@@ -248,11 +248,11 @@ sub _path2modname {
   # filenames, so try to extract them from the "=head1 NAME" tag in the
   # file instead.
   if ($^OS_NAME eq 'VMS' && ($name eq lc($name) || $name eq uc($name))) {
-      open PODFILE, "<", "$file" or die "_path2modname: Can't open $file: $^OS_ERROR";
+      open my $podfile, "<", "$file" or die "_path2modname: Can't open $file: $^OS_ERROR";
       my $in_pod = 0;
       my $in_name = 0;
       my $line;
-      while ($line = ~< *PODFILE) {
+      while ($line = ~< $podfile) {
         chomp $line;
         $in_pod = 1 if ($line =~ m/^=\w/);
         $in_pod = 0 if ($line =~ m/^=cut/);
@@ -274,7 +274,7 @@ sub _path2modname {
         }
         $in_name = 1 if ($line =~ m/^=head1 NAME/);
     }
-    close PODFILE;
+    close $podfile;
   }
 
   return $name;
@@ -304,13 +304,14 @@ sub _recurse_dir {
       $verbose +> 2 and print "But it's not a dir! $dir_long\n";
       return;
     }
-    unless( opendir(INDIR, $dir_long) ) {
+    my $indir;
+    unless( opendir($indir, $dir_long) ) {
       $verbose +> 2 and print "Can't opendir $dir_long : $^OS_ERROR\n";
-      closedir(INDIR);
+      closedir($indir);
       return
     }
-    my @items = sort @( readdir(INDIR));
-    closedir(INDIR);
+    my @items = sort @( readdir($indir));
+    closedir($indir);
 
     push @$modname_bits, $dir_bare unless $dir_bare eq '';
 
@@ -369,16 +370,17 @@ sub run {
     #  if we see File/Thing.pod first.  That's just the way the
     #  cookie crumbles.  -- SMB
      
+    my $inpod;
     if($file =~ m/\.pod$/i) {
       # Don't bother looking for $VERSION in .pod files
       DEBUG and print "Not looking for \$VERSION in .pod $file\n";
-    } elsif( !open(INPOD, "<", $file) ) {
+    } elsif( !open($inpod, "<", $file) ) {
       DEBUG and print "Couldn't open $file: $^OS_ERROR\n";
-      close(INPOD);
+      close($inpod);
     } else {
       # Sane case: file is readable
       my $lines = 0;
-      while( ~< *INPOD) {
+      while( ~< $inpod) {
         last if $lines++ +> $MAX_VERSION_WITHIN; # some degree of sanity
         if( s/^\s*\$VERSION\s*=\s*//s and m/\d/ ) {
           DEBUG and print "Found version line (#$lines): $_";
@@ -405,7 +407,7 @@ sub run {
           last;
         }
       }
-      close(INPOD);
+      close($inpod);
     }
     print "$name\t$version\t$file\n";
     return;
@@ -587,7 +589,8 @@ sub contains_pod {
 
   # check for one line of POD
   $verbose +> 1 and print " Scanning $file for pod...\n";
-  unless( open(MAYBEPOD, "<","$file") ) {
+  my $maybepod;
+  unless( open($maybepod, "<","$file") ) {
     print "Error: $file is unreadable: $^OS_ERROR\n";
     return undef;
   }
@@ -596,15 +599,15 @@ sub contains_pod {
    # avoid totally hogging the processor on OSs with poor process control
   
   local $_;
-  while( ~< *MAYBEPOD ) {
+  while( ~< $maybepod ) {
     if(m/^=(head\d|pod|over|item)\b/s) {
-      close(MAYBEPOD) || die "Bizarre error closing $file: $^OS_ERROR\nAborting";
+      close($maybepod) || die "Bizarre error closing $file: $^OS_ERROR\nAborting";
       chomp;
       $verbose +> 1 and print "  Found some pod ($_) in $file\n";
       return 1;
     }
   }
-  close(MAYBEPOD) || die "Bizarre error closing $file: $^OS_ERROR\nAborting";
+  close($maybepod) || die "Bizarre error closing $file: $^OS_ERROR\nAborting";
   $verbose +> 1 and print "  No POD in $file, skipping.\n";
   return 0;
 }

@@ -29,17 +29,17 @@ if ($use_eventlog) {
     # recreate the DLL from its uuencoded form if it's not here
     if (! -f File::Spec->catfile("win32", "$name.dll")) {
         # read the uuencoded data
-        open(UU, "<", '' . File::Spec->catfile("win32", "$name\_dll.uu"))
+        open(my $uu, "<", '' . File::Spec->catfile("win32", "$name\_dll.uu"))
             or die "fatal: Can't read file '$name\_dll.uu': $^OS_ERROR";
         my $uudata = do { local $^INPUT_RECORD_SEPARATOR; ~< *UU };
-        close(UU);
+        close($uu);
 
         # write the DLL
-        open(DLL, ">", '' . File::Spec->catfile("win32", "$name.dll"))
+        open(my $dll, ">", '' . File::Spec->catfile("win32", "$name.dll"))
             or die "fatal: Can't write DLL '$name.dll': $^OS_ERROR";
-        binmode(DLL);
-        print DLL unpack "u", $uudata;
-        close(DLL);
+        binmode($dll);
+        print $dll unpack "u", $uudata;
+        close($dll);
     }
 }
 elsif ($^OS_NAME =~ m/Win32/) {
@@ -154,9 +154,9 @@ if(try {require ExtUtils::Constant; 1}) {
     );
 
     my @names = map { ref $_ ?? $_->{?name} !! $_ } @( < @levels, < @facilities, < @options);
-    open(MACROS, ">", 'macros.all') or warn "warning: Can't write 'macros.all': $^OS_ERROR\n";
-    print MACROS join $^INPUT_RECORD_SEPARATOR, @names;
-    close(MACROS);
+    open(my $macros, ">", 'macros.all') or warn "warning: Can't write 'macros.all': $^OS_ERROR\n";
+    print $macros join $^INPUT_RECORD_SEPARATOR, @names;
+    close($macros);
 }
 else {
     foreach my $file (@('const-c.inc', 'const-xs.inc')) {

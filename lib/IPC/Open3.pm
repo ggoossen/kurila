@@ -223,7 +223,7 @@ sub _open3 {
 	# If she wants to dup the kid's stderr onto her stdout I need to
 	# save a copy of her stdout before I put something else there.
 	if (Symbol::glob_name($dad_rdr->*) ne Symbol::glob_name($dad_err->*) && $dup_err
-		&& xfileno($dad_err) == fileno(STDOUT)) {
+		&& xfileno($dad_err) == fileno(\*STDOUT)) {
 	    my $tmp = gensym;
 	    xopen($tmp, ">&", $dad_err);
 	    $dad_err = $tmp;
@@ -247,13 +247,13 @@ sub _open3 {
 		# I'm doing a dup but the filehandle might be a reference
 		# (from the special case above).
 		xopen \*STDERR, ">&", xfileno($dad_err)
-		    if fileno(STDERR) != xfileno($dad_err);
+		    if fileno(\*STDERR) != xfileno($dad_err);
 	    } else {
 		xclose $dad_err;
 		xopen \*STDERR, ">&=", fileno $kid_err;
 	    }
 	} else {
-	    xopen \*STDERR, ">&", \*STDOUT if fileno(STDERR) != fileno(STDOUT);
+	    xopen \*STDERR, ">&", \*STDOUT if fileno(\*STDERR) != fileno(\*STDOUT);
 	}
 	return 0 if (@cmd[0] eq '-');
 	exec < @cmd or do {

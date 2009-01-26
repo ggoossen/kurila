@@ -38,23 +38,23 @@ while ( ~< *DATA) {
         $expected .= $_;
     }
 
-    open (TMP, ">", 'tmp.pod') or die "Cannot create tmp.pod: $^OS_ERROR\n";
+    open (my $tmp, ">", 'tmp.pod') or die "Cannot create tmp.pod: $^OS_ERROR\n";
 
     # We have a test in ISO 8859-1 encoding.  Make sure that nothing strange
     # happens if Perl thinks the world is Unicode.  Wrap this in eval so that
     # older versions of Perl don't croak.
     no warnings 'utf8';
-    print TMP $input;
-    close TMP;
+    print $tmp $input;
+    close $tmp;
 
     test_outtmp($expected, "latin1\nINPUT:\n$input");
 
     unlink('tmp.pod');
 
-    open (TMP2, ">", 'tmp.pod') or die "Cannot create tmp.pod: $^OS_ERROR\n";
-    print TMP2 "\N{BOM}";
-    print TMP2 $input;
-    close TMP2;
+    open (my $tmp2, ">", 'tmp.pod') or die "Cannot create tmp.pod: $^OS_ERROR\n";
+    print $tmp2 "\N{BOM}";
+    print $tmp2 $input;
+    close $tmp2;
     test_outtmp($expected, "UTF-8 BOM\nINPUT:\n$input");
 
     unlink('tmp.pod');
@@ -63,17 +63,17 @@ while ( ~< *DATA) {
 sub test_outtmp {
     my $expected = shift;
     my $msg = shift;
-    open (OUT, ">", 'out.tmp') or die "Cannot create out.tmp: $^OS_ERROR\n";
-    $parser->parse_from_file ('tmp.pod', \*OUT);
-    close OUT;
-    open (OUT, "<", 'out.tmp') or die "Cannot open out.tmp: $^OS_ERROR\n";
-    while ( ~< *OUT) { last if m/^\.nh/ }
+    open (my $out, ">", 'out.tmp') or die "Cannot create out.tmp: $^OS_ERROR\n";
+    $parser->parse_from_file ('tmp.pod', $out);
+    close $out;
+    open ($out, "<", 'out.tmp') or die "Cannot open out.tmp: $^OS_ERROR\n";
+    while ( ~< $out) { last if m/^\.nh/ }
     my $output;
     do {
         local $^INPUT_RECORD_SEPARATOR;
-        $output = ~< *OUT;
+        $output = ~< $out;
     };
-    close OUT;
+    close $out;
     if ($output eq $expected) {
         print "ok $n\n";
     } else {

@@ -63,19 +63,19 @@ my @names = qw(
 
     # Check the constants above all appear in @EXPORT in DB_File.pm
     my %names = %( < map { $_, 1} @names );
-    open F, "<", "DB_File.pm" or die "Cannot open DB_File.pm: $^OS_ERROR\n";
-    while ( ~< *F)
+    open my $f, "<", "DB_File.pm" or die "Cannot open DB_File.pm: $^OS_ERROR\n";
+    while ( ~< $f)
     {
         last if m/^\s*\@EXPORT\s+=\s+ qw\(/x ;
     }
 
-    while ( ~< *F)
+    while ( ~< $f)
     {
         last if m/^\s*\)/ ;
         m/(\S+)/ ;
         delete %names{$1} if defined $1 ;
     }
-    close F ;
+    close $f ;
 
     if ( %names )
     {

@@ -136,7 +136,7 @@ while ( ~< *DATA) {
     }
 }
 
-close DATA;
+close \*DATA;
 
 my( $typedesc, $list );
 unless (caller) {

@@ -204,7 +204,7 @@ sub rename_country
 
     if (not defined $codeset)
     {
-        carp "rename_country(): unknown country code \"$code\"\n";
+        warn "rename_country(): unknown country code \"$code\"\n";
         return 0;
     }
 
@@ -297,7 +297,7 @@ do {
 
     }
 
-    close(DATA);
+    close(\*DATA);
 };
 
 1;

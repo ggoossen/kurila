@@ -13,21 +13,21 @@ my $IsSymbian = defined env::var("SDK") && -d "$(env::var('SDK'))\\epoc32";
 my $IsMSWin32 = $^OS_NAME eq 'MSWin32' && !$IsSymbian;
 
 unlink "Errno.pm" if -f "Errno.pm";
-open OUT, ">", "Errno.pm" or die "Cannot open Errno.pm: $^OS_ERROR";
-select OUT;
+open my $out, ">", "Errno.pm" or die "Cannot open Errno.pm: $^OS_ERROR";
+select $out;
 my @files = get_files();
 if (config_value("gccversion") ne '' && $^OS_NAME eq 'MSWin32') {
     # MinGW complains "warning: #pragma system_header ignored outside include
     # file" if the header files are processed individually, so include them
     # all in .c file and process that instead.
-    open INCS, ">", 'includes.c' or
+    open my $incs, ">", 'includes.c' or
 	die "Cannot open includes.c";
     foreach my $file ( @files) {
 	next if $file eq 'errno.c';
 	next unless -f $file;
-	print INCS qq[#include "$file"\n];
+	print $incs qq[#include "$file"\n];
     }
-    close INCS;
+    close $incs;
     process_file('includes.c');
     unlink 'includes.c';
 }
@@ -51,9 +51,9 @@ sub process_file {
     return unless defined $file and -f $file;
 #    warn "Processing $file\n";
 
-    local *FH;
+    my $fh;
     if (($^OS_NAME eq 'VMS') && (config_value("vms_cc_type") ne 'gnuc')) {
-	unless(open(FH, "-|", "LIBRARY/EXTRACT=ERRNO/OUTPUT=SYS\$OUTPUT $file")) {
+	unless(open($fh, "-|", "LIBRARY/EXTRACT=ERRNO/OUTPUT=SYS\$OUTPUT $file")) {
             warn "Cannot open '$file'";
             return;
 	}     
@@ -63,12 +63,12 @@ sub process_file {
 	     && $^OS_NAME ne 'openstep' && $^OS_NAME ne 'next' && $^OS_NAME ne 'darwin'
 	     ) { 
 	# With the -dM option, gcc outputs every #define it finds
-	unless(open(FH,"-|","$(config_value('cc')) -E -dM $(config_value('cppflags')) $file")) {
+	unless(open($fh,"-|","$(config_value('cc')) -E -dM $(config_value('cppflags')) $file")) {
             warn "Cannot open '$file'";
             return;
 	}     
     } else {
-	unless(open(FH, "<"," $file")) {
+	unless(open($fh, "<"," $file")) {
 	    # This file could be a temporary file created by cppstdin
 	    # so only warn under -w, and return
             warn "Cannot open '$file'" if $^WARNING;
@@ -77,12 +77,12 @@ sub process_file {
     }
     
     if ($^OS_NAME eq 'MacOS') {
-	while( ~< *FH) {
+	while( ~< $fh) {
 	    %err{+$1} = $2
 		if m/^\s*#\s*define\s+(E\w+)\s+(\d+)/;
 	}
     } else {
-	while( ~< *FH) {
+	while( ~< $fh) {
 	    %err{+$1} = 1
 		if m/^\s*#\s*define\s+(E\w+)\s+/;
             if ($IsMSWin32) {
@@ -92,7 +92,7 @@ sub process_file {
 	}
     }
 
-    close(FH);
+    close($fh);
 }
 
 my $cppstdin;
@@ -166,28 +166,29 @@ sub get_files {
         $SDK =~ s!\\!/!g;
 	%file{+"$SDK/epoc32/include/libc/sys/errno.h"} = 1;
     } else {
-	open(CPPI, ">","errno.c") or
+	open(my $cppi, ">","errno.c") or
 	    die "Cannot open errno.c";
 
 	if ($^OS_NAME eq 'NetWare') {
-	    print CPPI "#include <nwerrno.h>\n";
+	    print $cppi "#include <nwerrno.h>\n";
 	} else {
-	    print CPPI "#include <errno.h>\n";
+	    print $cppi "#include <errno.h>\n";
 	    if ($IsMSWin32) {
-		print CPPI "#define _WINSOCKAPI_\n"; # don't drag in everything
-		print CPPI "#include <winsock.h>\n";
+		print $cppi "#define _WINSOCKAPI_\n"; # don't drag in everything
+		print $cppi "#include <winsock.h>\n";
 	    }
 	}
 
-	close(CPPI);
+	close($cppi);
 
+        my $cppo;
 	# invoke CPP and read the output
 	if ($IsMSWin32 || $^OS_NAME eq 'NetWare') {
-	    open(CPPO,"-|","$(config_value('cpprun')) $(config_value('cppflags')) errno.c") or
+	    open($cppo,"-|","$(config_value('cpprun')) $(config_value('cppflags')) errno.c") or
 		die "Cannot run '$(config_value('cpprun')) $(config_value('cppflags')) errno.c'";
 	} else {
 	    my $cpp = default_cpp();
-	    open(CPPO,"-|", "$cpp < errno.c") or
+	    open($cppo,"-|", "$cpp < errno.c") or
 		die "Cannot exec $cpp";
 	}
 
@@ -198,7 +199,7 @@ sub get_files {
 	else {
 	    $pat = '^#\s*(?:line)?\s*\d+\s+"([^"]+)"';
 	}
-	while( ~< *CPPO) {
+	while( ~< $cppo) {
 	    if ($^OS_NAME eq 'os2' or $IsMSWin32 or $^OS_NAME eq 'NetWare') {
 		if (m/$pat/o) {
 		   my $f = $1;
@@ -210,7 +211,7 @@ sub get_files {
 		%file{+$1} = 1 if m/$pat/o;
 	    }
 	}
-	close(CPPO);
+	close($cppo);
     }
     return keys %file;
 }
@@ -223,55 +224,56 @@ sub write_errno_pm {
 
     # create the CPP input
 
-    open(CPPI, ">","errno.c") or
+    open(my $cppi, ">","errno.c") or
 	die "Cannot open errno.c";
 
     if ($^OS_NAME eq 'NetWare') {
-	print CPPI "#include <nwerrno.h>\n";
+	print $cppi "#include <nwerrno.h>\n";
 	} 
     else {
-	print CPPI "#include <errno.h>\n";
+	print $cppi "#include <errno.h>\n";
     }
     if ($IsMSWin32) {
-	print CPPI "#include <winsock.h>\n";
+	print $cppi "#include <winsock.h>\n";
 	foreach my $err (keys %wsa) {
-	    print CPPI "#ifndef $err\n";
-	    print CPPI "#define $err WSA$err\n";
-	    print CPPI "#endif\n";
+	    print $cppi "#ifndef $err\n";
+	    print $cppi "#define $err WSA$err\n";
+	    print $cppi "#endif\n";
 	    %err{+$err} = 1;
 	}
     }
  
     foreach my $err (keys %err) {
-	print CPPI '"',$err,'" [[',$err,']]',"\n";
+	print $cppi '"',$err,'" [[',$err,']]',"\n";
     }
 
-    close(CPPI);
+    close($cppi);
 
     unless ($^OS_NAME eq 'MacOS' || $^OS_NAME eq 'beos') {	# trust what we have / get later
     # invoke CPP and read the output
 
+        my $cppo;
 	if ($^OS_NAME eq 'VMS') {
 	    my $cpp = "$(config_value('cppstdin')) $(config_value('cppflags')) $(config_value('cppminus'))";
 	    $cpp =~ s/sys\$input//i;
-	    open(CPPO,"-|", "$cpp  errno.c") or
+	    open($cppo,"-|", "$cpp  errno.c") or
 		die "Cannot exec $(config_value('cppstdin'))";
 	} elsif ($IsMSWin32 || $^OS_NAME eq 'NetWare') {
-	    open(CPPO,"-|", "$(config_value('cpprun')) $(config_value('cppflags')) errno.c") or
+	    open($cppo,"-|", "$(config_value('cpprun')) $(config_value('cppflags')) errno.c") or
 		die "Cannot run '$(config_value('cpprun')) $(config_value('cppflags')) errno.c'";
 	} elsif ($IsSymbian) {
             my $cpp = "gcc -E -I$(env::var('SDK'))\\epoc32\\include\\libc -";
-	    open(CPPO,"-|", "$cpp < errno.c")
+	    open($cppo,"-|", "$cpp < errno.c")
 		or die "Cannot exec $cpp";
         } else {
 	    my $cpp = default_cpp();
-	    open(CPPO,"-|", "$cpp < errno.c")
+	    open($cppo,"-|", "$cpp < errno.c")
 		or die "Cannot exec $cpp";
 	}
 
 	%err = %( () );
 
-	while( ~< *CPPO) {
+	while( ~< $cppo) {
 	    my($name,$expr);
 	    next unless @(?$name, ?$expr) = @: m/"(.*?)"\s*\[\s*\[\s*(.*?)\s*\]\s*\]/;
 	    next if $name eq $expr;
@@ -286,7 +288,7 @@ sub write_errno_pm {
 	}
 	    delete %err{$name} unless defined %err{?$name};
 	}
-	close(CPPO);
+	close($cppo);
     }
 
     # Many of the E constants (including ENOENT, which is being
@@ -297,25 +299,25 @@ sub write_errno_pm {
     # values, since we can get all of them here, anyway.
 
     if ($^OS_NAME eq 'beos') {
-	if (open(C, ">", "errno.c")) {
+	if (open(my $c, ">", "errno.c")) {
 	    my @allerrs = keys %err;
-	    print C <<EOF;
+	    print {$c} <<EOF;
 #include <errno.h>
 #include <stdio.h>
 int main() \{
 EOF
             for ( @allerrs) {
-		print C qq[printf("$_ \%d\n", $_);]
+		print {$c} qq[printf("$_ \%d\n", $_);]
 	    }
-            print C "\}\n";
-            close C;
+            print {$c} "\}\n";
+            close $c;
             system("cc -o errno errno.c");
             unlink("errno.c");
-            if (open(C, "-|", "./errno")) {
-		while ( ~< *C) {
+            if (open($c, "-|", "./errno")) {
+		while ( ~< $c) {
 		    if (m/^(\w+) (-?\d+)$/) { %err{+$1} = $2 }
 		}
-		close(C);
+		close($c);
 	    } else {
 		die "failed to execute ./errno: $^OS_ERROR\n";
 	    }

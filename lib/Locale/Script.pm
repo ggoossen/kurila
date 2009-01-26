@@ -184,7 +184,7 @@ do {
 
     }
 
-    close(DATA);
+    close(\*DATA);
 };
 
 1;

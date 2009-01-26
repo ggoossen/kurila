@@ -290,7 +290,7 @@ sub getc {
 
 sub getchar {
     usage "getchar()" if (nelems @_) != 0;
-    CORE::getc(STDIN);
+    CORE::getc(\*STDIN);
 }
 
 sub gets {
@@ -538,10 +538,9 @@ sub chmod {
 
 sub fstat {
     usage "fstat(fd)" if (nelems @_) != 1;
-    local *TMP;
-    CORE::open(TMP, "<&", @_[0]);		# Gross.
-    my @l = @( CORE::stat(*TMP) );
-    CORE::close(TMP);
+    CORE::open(my $tmp, "<&", @_[0]);		# Gross.
+    my @l = @( CORE::stat($tmp) );
+    CORE::close($tmp);
     @l;
 }
 

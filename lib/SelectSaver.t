@@ -9,18 +9,18 @@ print "1..3\n";
 
 use SelectSaver;
 
-open(FOO, ">", "foo-$^PID") || die;
+open(my $foo_fh, ">", "foo-$^PID") || die;
 
 print "ok 1\n";
 do {
-    my $saver = SelectSaver->new(*FOO);
+    my $saver = SelectSaver->new($foo_fh);
     print "foo\n";
 };
 
 # Get data written to file
-open(FOO, "<", "foo-$^PID") || die;
-chomp(my $foo = ~< *FOO);
-close FOO;
+open($foo_fh, "<", "foo-$^PID") || die;
+chomp(my $foo = ~< $foo_fh);
+close $foo_fh;
 unlink "foo-$^PID";
 
 print "ok 2\n" if $foo eq "foo";

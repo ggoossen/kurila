@@ -129,19 +129,19 @@ require ExtUtils::Constant;
 do {
     # Check the constants above all appear in @EXPORT in Zlib.pm
     my %names = %( < map { $_, 1} @( < @names, 'ZLIB_VERSION') );
-    open F, "<", "lib/Compress/Raw/Zlib.pm" or die "Cannot open Zlib.pm: $^OS_ERROR\n";
-    while (~< *F)
+    open my $f, "<", "lib/Compress/Raw/Zlib.pm" or die "Cannot open Zlib.pm: $^OS_ERROR\n";
+    while (~< $f)
     {
         last if m/^ \s* \@EXPORT \s+ = \s+ qw \( /x ;
     }
 
-    while (~< *F)
+    while (~< $f)
     {
         last if m/^\s*\)/ ;
         m/(\S+)/ ;
         delete %names{$1} if defined $1 ;
     }
-    close F ;
+    close $f ;
 
     if ( %names )
     {
@@ -173,8 +173,8 @@ sub ParseCONFIG
 
     print "Parsing $CONFIG...\n" ;
 
-    open(F, "<", "$CONFIG") or die "Cannot open file $CONFIG: $^OS_ERROR\n" ;
-    while (~< *F) {
+    open(my $f, "<", "$CONFIG") or die "Cannot open file $CONFIG: $^OS_ERROR\n" ;
+    while (~< $f) {
 	s/^\s*|\s*$//g ;
 	next if m/^\s*$/ or m/^\s*#/ ;
 	s/\s*#\s*$// ;
@@ -189,7 +189,7 @@ sub ParseCONFIG
 	    push(@badkey, $k) ;
 	}
     }
-    close F ;
+    close $f ;
 
     print "Unknown keys in $CONFIG ignored [$(join ' ',@badkey)]\n"
 	if (nelems @badkey) ;

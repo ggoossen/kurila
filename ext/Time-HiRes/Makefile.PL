@@ -43,14 +43,13 @@ sub try_compile_and_link {
 
     my $ok = 0;
     my $tmp = "tmp$^PID";
-    local(*TMPC);
 
     my $obj_ext = config_value("obj_ext") || ".o";
     unlink("$tmp.c", "$tmp$obj_ext");
 
-    if (open(TMPC, ">", "$tmp.c")) {
-	print TMPC $c;
-	close(TMPC);
+    if (open(my $tmpc, ">", "$tmp.c")) {
+	print $tmpc $c;
+	close($tmpc);
 
 	my $cccmd = %args{?cccmd};
 
@@ -99,11 +98,11 @@ __EOD__
 	    unless defined $cccmd;
 
        if ($^OS_NAME eq 'VMS') {
-	    open( CMDFILE, ">$tmp.com" );
-	    print CMDFILE "\$ SET MESSAGE/NOFACILITY/NOSEVERITY/NOIDENT/NOTEXT\n";
-	    print CMDFILE "\$ $cccmd\n";
-	    print CMDFILE "\$ IF \$SEVERITY .NE. 1 THEN EXIT 44\n"; # escalate
-	    close CMDFILE;
+	    open( my $cmdfile, ">$tmp.com" );
+	    print $cmdfile "\$ SET MESSAGE/NOFACILITY/NOSEVERITY/NOIDENT/NOTEXT\n";
+	    print $cmdfile "\$ $cccmd\n";
+	    print $cmdfile "\$ IF \$SEVERITY .NE. 1 THEN EXIT 44\n"; # escalate
+	    close $cmdfile;
 	    system("\@ $tmp.com");
 	    $ok = $^CHILD_ERROR==0;
 	    for (@: "$tmp.c", "$tmp$obj_ext", "$tmp.com",
@@ -700,9 +699,9 @@ EOM
 
     if ($DEFINE) {
         $DEFINE =~ s/^\s+//;
-        if (open(XDEFINE, ">", "xdefine")) {
-	    print XDEFINE $DEFINE, "\n";
-	    close(XDEFINE);
+        if (open(my $xdefine, ">", "xdefine")) {
+	    print $xdefine $DEFINE, "\n";
+	    close($xdefine);
         }
     }
 }
@@ -770,11 +769,11 @@ sub doConstants {
 	foreach my $file (@('const-c.inc', 'const-xs.inc')) {
 	    my $fallback = File::Spec->catfile('fallback', $file);
 	    local $^INPUT_RECORD_SEPARATOR;
-	    open IN, "<$fallback" or die "Can't open $fallback: $^OS_ERROR";
-	    open OUT, ">$file" or die "Can't open $file: $^OS_ERROR";
-	    print OUT ~< *IN or die $^OS_ERROR;
-	    close OUT or die "Can't close $file: $^OS_ERROR";
-	    close IN or die "Can't close $fallback: $^OS_ERROR";
+	    open my $in, "<", "$fallback" or die "Can't open $fallback: $^OS_ERROR";
+	    open my $out, ">", "$file" or die "Can't open $file: $^OS_ERROR";
+	    print $out ~< $in or die $^OS_ERROR;
+	    close $out or die "Can't close $file: $^OS_ERROR";
+	    close $in or die "Can't close $fallback: $^OS_ERROR";
 	}
     }
 }

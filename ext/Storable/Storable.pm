@@ -240,26 +240,26 @@ sub _store {
 	my @($file, $use_locking) =  @_;
 	logcroak "not a reference" unless ref($self);
 	logcroak "wrong argument number" unless (nelems @_) == 2;	# No @foo in arglist
-	local *FILE;
+        my $fh;
 	if ($use_locking) {
-		open(FILE, ">>", "$file") || logcroak "can't write into $file: $^OS_ERROR";
+		open($fh, ">>", "$file") || logcroak "can't write into $file: $^OS_ERROR";
 		unless (&CAN_FLOCK( < @_ )) {
 			logcarp "Storable::lock_store: fcntl/flock emulation broken on $^OS_NAME";
 			return undef;
 		}
-		flock(FILE, LOCK_EX) ||
+		flock($fh, LOCK_EX) ||
 			logcroak "can't get exclusive lock on $file: $^OS_ERROR";
-		truncate *FILE, 0;
+		truncate $fh, 0;
 		# Unlocking will happen when FILE is closed
 	} else {
-		open(FILE, ">", "$file") || logcroak "can't create $file: $^OS_ERROR";
+		open($fh, ">", "$file") || logcroak "can't create $file: $^OS_ERROR";
 	}
-	binmode FILE;				# Archaic systems...
+	binmode $fh;				# Archaic systems...
 	my $da = $^EVAL_ERROR;				# Don't mess if called from exception handler
 	my $ret;
 	# Call C routine nstore or pstore, depending on network order
-	try { $ret = &$xsptr(*FILE, $self) };
-	close(FILE) or $ret = undef;
+	try { $ret = &$xsptr($fh, $self) };
+	close($fh) or $ret = undef;
 	unlink($file) or warn "Can't unlink $file: $^OS_ERROR\n" if $^EVAL_ERROR || !defined $ret;
 	logcroak $^EVAL_ERROR if $^EVAL_ERROR;
 	$^EVAL_ERROR = $da;
@@ -361,9 +361,9 @@ sub lock_retrieve {
 # Internal retrieve routine
 sub _retrieve {
 	my @($file, $use_locking) =  @_;
-	local *FILE;
-	open(FILE, "<", $file) || logcroak "can't open $file: $^OS_ERROR";
-	binmode FILE;							# Archaic systems...
+        my $fh;
+	open($fh, "<", $file) || logcroak "can't open $file: $^OS_ERROR";
+	binmode $fh;							# Archaic systems...
 	my $self;
 	my $da = $^EVAL_ERROR;							# Could be from exception handler
 	if ($use_locking) {
@@ -371,11 +371,11 @@ sub _retrieve {
 			logcarp "Storable::lock_store: fcntl/flock emulation broken on $^OS_NAME";
 			return undef;
 		}
-		flock(FILE, LOCK_SH) || logcroak "can't get shared lock on $file: $^OS_ERROR";
-		# Unlocking will happen when FILE is closed
+		flock($fh, LOCK_SH) || logcroak "can't get shared lock on $file: $^OS_ERROR";
+		# Unlocking will happen when $fh is closed
 	}
-	try { $self = pretrieve(*FILE) };		# Call C routine
-	close(FILE);
+	try { $self = pretrieve($fh) };		# Call C routine
+	close($fh);
 	logcroak $^EVAL_ERROR if $^EVAL_ERROR;
 	$^EVAL_ERROR = $da;
 	return $self;

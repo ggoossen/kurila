@@ -59,8 +59,8 @@ SKIP: do {
 
     try {
 	if (!-e $tstfile) {
-	    open(T, ">", "$tstfile") or die "Can't create $tstfile: $^OS_ERROR";
-	    close T;
+	    open(my $t, ">", "$tstfile") or die "Can't create $tstfile: $^OS_ERROR";
+	    close $t;
 	}
 	system($chflags, "uchg", $tstfile);
 	die "Can't exec $chflags uchg" if $^CHILD_ERROR != 0;

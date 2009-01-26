@@ -41,10 +41,10 @@ foreach my $file ( @w_files) {
     next if $file =~ m/perlio$/ && !('PerlIO::Layer'->find( 'perlio'));
     next if -d $file;
 
-    open F, "<", "$file" or die "Cannot open $file: $^OS_ERROR\n" ;
+    open my $f, "<", "$file" or die "Cannot open $file: $^OS_ERROR\n" ;
     my $line = 0;
     open my $got_file, ">", "$file.got" or die if $got_files;
-    while ( ~< *F) {
+    while ( ~< $f) {
         print $got_file $_ if $got_files;
         $line++;
 	last if m/^__END__/ ;
@@ -54,9 +54,9 @@ foreach my $file ( @w_files) {
     do {
         local $^INPUT_RECORD_SEPARATOR = undef;
         $files++;
-        @prgs = @(< @prgs, $file, < split "\n########\n", ~< *F) ;
+        @prgs = @(< @prgs, $file, < split "\n########\n", ~< $f) ;
     };
-    close F ;
+    close $f ;
 }
 
 undef $^INPUT_RECORD_SEPARATOR;
@@ -111,9 +111,9 @@ for ( @prgs){
                 mkpath($1);
                 push(@temp_path, $1);
     	    }
-	    open F, ">", "$filename" or die "Cannot open $filename: $^OS_ERROR\n" ;
-	    print F $code ;
-	    close F or die "Cannot close $filename: $^OS_ERROR\n";
+	    open my $f, ">", "$filename" or die "Cannot open $filename: $^OS_ERROR\n" ;
+	    print {$f} $code ;
+	    close $f or die "Cannot close $filename: $^OS_ERROR\n";
 	}
 	shift @files ;
 	$prog = shift @files ;
@@ -125,16 +125,16 @@ for ( @prgs){
 	$prog =~ s|"\."|":"|g;
     }
 
-    open TEST, ">", "$tmpfile" or die "Cannot open >$tmpfile: $^OS_ERROR";
-    print TEST q{
+    open my $test, ">", "$tmpfile" or die "Cannot open >$tmpfile: $^OS_ERROR";
+    print $test q{
         BEGIN {
-            open(STDERR, ">&", "STDOUT")
+            open(\*STDERR, ">&", \*STDOUT)
               or die "Can't dup STDOUT->STDERR: $^OS_ERROR;";
         }
     };
-    print TEST "\n#line 1\n";  # So the line numbers don't get messed up.
-    print TEST $prog,"\n";
-    close TEST or die "Cannot close $tmpfile: $^OS_ERROR";
+    print $test "\n#line 1\n";  # So the line numbers don't get messed up.
+    print $test $prog,"\n";
+    close $test or die "Cannot close $tmpfile: $^OS_ERROR";
     my $results = runperl( switches => \@($switch), stderr => 1, progfile => $tmpfile );
     my $status = $^CHILD_ERROR;
     $results =~ s/\n+$//;

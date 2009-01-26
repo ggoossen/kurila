@@ -117,7 +117,7 @@ do {
         %LANGUAGES{+lc "$language"} = $code;
     }
 
-    close(DATA);
+    close(\*DATA);
 };
 
 1;
