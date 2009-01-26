@@ -17,71 +17,71 @@ my $saved_filename = $^OS_NAME eq 'MacOS' ?? ':0' !! './0';
 
 cmp_ok($warns,'==',0,'no warns at start');
 
-open(FILE, ">","$saved_filename");
+open(my $file, ">","$saved_filename");
 ok(defined('FILE'),'created work file');
-print FILE "1\n";
-print FILE "0";
-close(FILE);
+print $file "1\n";
+print $file "0";
+close($file);
 
-open(FILE, "<","$saved_filename");
+open($file, "<","$saved_filename");
 ok(defined('FILE'),'opened work file');
 my $seen = 0;
 my $dummy;
-while (my $name = ~< *FILE)
+while (my $name = ~< $file)
  {
   $seen++ if $name eq '0';
  }
 cmp_ok($seen,'==',1,'seen in while()');
 
-seek(FILE,0,0);
+seek($file,0,0);
 $seen = 0;
 my $line = '';
 do
  {
   $seen++ if $line eq '0';
- } while ($line = ~< *FILE);
+ } while ($line = ~< $file);
 cmp_ok($seen,'==',1,'seen in do/while');
 
-seek(FILE,0,0);
+seek($file,0,0);
 $seen = 0;
 my $name;
-while (($seen ?? $dummy !! $name) = ~< *FILE )
+while (($seen ?? $dummy !! $name) = ~< $file )
  {
   $seen++ if $name eq '0';
  }
 cmp_ok($seen,'==',1,'seen in while() ternary');
 
-seek(FILE,0,0);
+seek($file,0,0);
 $seen = 0;
 my %where;
-while (%where{+$seen} = ~< *FILE)
+while (%where{+$seen} = ~< $file)
  {
   $seen++ if %where{?$seen} eq '0';
  }
 cmp_ok($seen,'==',1,'seen in hash while()');
-close FILE;
+close $file;
 
-opendir(DIR,($^OS_NAME eq 'MacOS' ?? ':' !! '.'));
+opendir(my $dir,($^OS_NAME eq 'MacOS' ?? ':' !! '.'));
 ok(defined('DIR'),'opened current directory');
 $seen = 0;
-while (my $name = readdir(DIR))
+while (my $name = readdir($dir))
  {
   $seen++ if $name eq $wanted_filename;
  }
 cmp_ok($seen,'==',1,'saw work file once');
 
-rewinddir(DIR);
+rewinddir($dir);
 $seen = 0;
 $dummy = '';
-while (($seen ?? $dummy !! $name) = readdir(DIR))
+while (($seen ?? $dummy !! $name) = readdir($dir))
  {
   $seen++ if $name eq $wanted_filename;
  }
 cmp_ok($seen,'+>',0,'saw file in while() ternary');
 
-rewinddir(DIR);
+rewinddir($dir);
 $seen = 0;
-while (%where{+$seen} = readdir(DIR))
+while (%where{+$seen} = readdir($dir))
  {
   $seen++ if %where{?$seen} eq $wanted_filename;
  }

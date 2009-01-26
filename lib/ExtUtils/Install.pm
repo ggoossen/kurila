@@ -1122,16 +1122,16 @@ Filter $src using $cmd into $dest.
 
 sub run_filter {
     my @($cmd, $src, $dest) =  @_;
-    local(*CMD, *SRC);
-    open(CMD, '|-', "$cmd >$dest") || die "Cannot fork: $^OS_ERROR";
-    open(SRC, "<", $src)           || die "Cannot open $src: $^OS_ERROR";
+    my ($cmd_fh, $src_fh);
+    open($cmd_fh, '|-', "$cmd >$dest") || die "Cannot fork: $^OS_ERROR";
+    open($src_fh, "<", $src)           || die "Cannot open $src: $^OS_ERROR";
     my $buf;
     my $sz = 1024;
-    while (my $len = sysread(SRC, $buf, $sz)) {
-        syswrite(CMD, $buf, $len);
+    while (my $len = sysread($src_fh, $buf, $sz)) {
+        syswrite($cmd_fh, $buf, $len);
     }
-    close SRC;
-    close CMD or die "Filter command '$cmd' failed for $src";
+    close $src_fh;
+    close $cmd_fh or die "Filter command '$cmd' failed for $src";
 }
 
 =pod

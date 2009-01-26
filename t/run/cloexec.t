@@ -55,10 +55,10 @@ skip_all("Win32")    if $Is_Win32;
 
 sub make_tmp_file {
     my @($fname, $fcontents) =  @_;
-    local *FHTMP;
-    open   FHTMP, ">", "$fname"  or die "open  '$fname': $^OS_ERROR";
-    print  FHTMP $fcontents  or die "print '$fname': $^OS_ERROR";
-    close  FHTMP             or die "close '$fname': $^OS_ERROR";
+    my $fhtmp;
+    open   $fhtmp, ">", "$fname"  or die "open  '$fname': $^OS_ERROR";
+    print  $fhtmp $fcontents  or die "print '$fname': $^OS_ERROR";
+    close  $fhtmp             or die "close '$fname': $^OS_ERROR";
 }
 
 my $Perl = which_perl();
@@ -77,9 +77,9 @@ make_tmp_file($tmpfile2, $tmpfile2_contents);
 my $Child_prog = <<'CHILD_PROG';
 my $fd = shift(@ARGV);
 print qq{childfd=$fd\n};
-open INHERIT, qq{<&=}, qq{$fd} or die qq{open $fd: $^OS_ERROR};
-my $line = ~< *INHERIT;
-close INHERIT or die qq{close $fd: $^OS_ERROR};
+open my $inherit, qq{<&=}, qq{$fd} or die qq{open $fd: $^OS_ERROR};
+my $line = ~< $inherit;
+close $inherit or die qq{close $fd: $^OS_ERROR};
 print $line
 CHILD_PROG
 $Child_prog =~ s/\n//g;
@@ -91,12 +91,12 @@ sub test_not_inherited {
     ok( -f $tmpfile2, "tmpfile '$tmpfile2' exists" );
     my $cmd = qq{$Perl -e $quote$Child_prog$quote $expected_fd};
     # Expect 'Bad file descriptor' or similar to be written to STDERR.
-    local *SAVERR; open SAVERR, ">&", \*STDERR;  # save original STDERR
-    open STDERR, ">", "$tmperr" or die "open '$tmperr': $^OS_ERROR";
+    my $saverr; open $saverr, ">&", \*STDERR;  # save original STDERR
+    open \*STDERR, ">", "$tmperr" or die "open '$tmperr': $^OS_ERROR";
     my $out = `$cmd`;
     my $rc  = $^CHILD_ERROR >> 8;
-    open STDERR, ">&", \*SAVERR or die "error: restore STDERR: $^OS_ERROR";
-    close SAVERR or die "error: close SAVERR: $^OS_ERROR";
+    open \*STDERR, ">&", $saverr or die "error: restore STDERR: $^OS_ERROR";
+    close $saverr or die "error: close SAVERR: $^OS_ERROR";
     # XXX: it seems one cannot rely on a non-zero return code,
     # at least not on Tru64.
     # cmp_ok( $rc, '!=', 0,
@@ -124,43 +124,43 @@ sub test_inherited {
 $^SYSTEM_FD_MAX == 2 or print STDERR "# warning: \$^F is $^SYSTEM_FD_MAX (not 2)\n";
 
 # Should not be able to inherit > $^F in the default case.
-open FHPARENT2, "<", "$tmpfile2" or die "open '$tmpfile2': $^OS_ERROR";
-my $parentfd2 = fileno FHPARENT2;
+open my $fhparent2, "<", "$tmpfile2" or die "open '$tmpfile2': $^OS_ERROR";
+my $parentfd2 = fileno $fhparent2;
 defined $parentfd2 or die "fileno: $^OS_ERROR";
 cmp_ok( $parentfd2, '+>', $^SYSTEM_FD_MAX, "parent open fd=$parentfd2 (\$^F=$^SYSTEM_FD_MAX)" );
 test_not_inherited($parentfd2);
-close FHPARENT2 or die "close '$tmpfile2': $^OS_ERROR";
+close $fhparent2 or die "close '$tmpfile2': $^OS_ERROR";
 
 # Should be able to inherit $^F after setting to $parentfd2
 # Need to set $^F before open because close-on-exec set at time of open.
 $^SYSTEM_FD_MAX = $parentfd2;
-open FHPARENT1, "<", "$tmpfile1" or die "open '$tmpfile1': $^OS_ERROR";
-my $parentfd1 = fileno FHPARENT1;
+open my $fhparent1, "<", "$tmpfile1" or die "open '$tmpfile1': $^OS_ERROR";
+my $parentfd1 = fileno $fhparent1;
 defined $parentfd1 or die "fileno: $^OS_ERROR";
 cmp_ok( $parentfd1, '+<=', $^SYSTEM_FD_MAX, "parent open fd=$parentfd1 (\$^F=$^SYSTEM_FD_MAX)" );
 test_inherited($parentfd1);
-close FHPARENT1 or die "close '$tmpfile1': $^OS_ERROR";
+close $fhparent1 or die "close '$tmpfile1': $^OS_ERROR";
 
 # ... and test that you cannot inherit fd = $^F+n.
-open FHPARENT1, "<", "$tmpfile1" or die "open '$tmpfile1': $^OS_ERROR";
-open FHPARENT2, "<", "$tmpfile2" or die "open '$tmpfile2': $^OS_ERROR";
-$parentfd2 = fileno FHPARENT2;
+open $fhparent1, "<", "$tmpfile1" or die "open '$tmpfile1': $^OS_ERROR";
+open $fhparent2, "<", "$tmpfile2" or die "open '$tmpfile2': $^OS_ERROR";
+$parentfd2 = fileno $fhparent2;
 defined $parentfd2 or die "fileno: $^OS_ERROR";
 cmp_ok( $parentfd2, '+>', $^SYSTEM_FD_MAX, "parent open fd=$parentfd2 (\$^F=$^SYSTEM_FD_MAX)" );
 test_not_inherited($parentfd2);
-close FHPARENT2 or die "close '$tmpfile2': $^OS_ERROR";
-close FHPARENT1 or die "close '$tmpfile1': $^OS_ERROR";
+close $fhparent2 or die "close '$tmpfile2': $^OS_ERROR";
+close $fhparent1 or die "close '$tmpfile1': $^OS_ERROR";
 
 # ... and now you can inherit after incrementing.
 $^SYSTEM_FD_MAX = $parentfd2;
-open FHPARENT2, "<", "$tmpfile2" or die "open '$tmpfile2': $^OS_ERROR";
-open FHPARENT1, "<", "$tmpfile1" or die "open '$tmpfile1': $^OS_ERROR";
-$parentfd1 = fileno FHPARENT1;
+open $fhparent2, "<", "$tmpfile2" or die "open '$tmpfile2': $^OS_ERROR";
+open $fhparent1, "<", "$tmpfile1" or die "open '$tmpfile1': $^OS_ERROR";
+$parentfd1 = fileno $fhparent1;
 defined $parentfd1 or die "fileno: $^OS_ERROR";
 cmp_ok( $parentfd1, '+<=', $^SYSTEM_FD_MAX, "parent open fd=$parentfd1 (\$^F=$^SYSTEM_FD_MAX)" );
 test_inherited($parentfd1);
-close FHPARENT1 or die "close '$tmpfile1': $^OS_ERROR";
-close FHPARENT2 or die "close '$tmpfile2': $^OS_ERROR";
+close $fhparent1 or die "close '$tmpfile1': $^OS_ERROR";
+close $fhparent2 or die "close '$tmpfile2': $^OS_ERROR";
 
 END {
     defined $tmperr   and unlink($tmperr);

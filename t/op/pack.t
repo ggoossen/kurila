@@ -122,10 +122,10 @@ do {
     is( ($x = unpack("\%32B*", "Now is the time for all good blurfl")), $sum );
 
     my $foo;
-    open(BIN, '<', $Perl) || die "Can't open $Perl: $^OS_ERROR\n";
-    binmode BIN;
-    sysread BIN, $foo, 8192;
-    close BIN;
+    open(my $bin, '<', $Perl) || die "Can't open $Perl: $^OS_ERROR\n";
+    binmode $bin;
+    sysread $bin, $foo, 8192;
+    close $bin;
 
     $sum = unpack("\%32b*", $foo);
     my $longway = unpack("b*", $foo);

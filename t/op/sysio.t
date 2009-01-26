@@ -7,7 +7,7 @@ our ($reopen, $x, $outfile);
 chdir('op') || chdir('t/op') || die "sysio.t: cannot look for myself: $^OS_ERROR";
 $^INCLUDE_PATH = @( '../../lib' );
 
-open(I, "<", 'sysio.t') || die "sysio.t: cannot find myself: $^OS_ERROR";
+open(my $i_fh, "<", 'sysio.t') || die "sysio.t: cannot find myself: $^OS_ERROR";
 
 $reopen = ($^OS_NAME eq 'VMS' ||
            $^OS_NAME eq 'os2' ||
@@ -19,7 +19,7 @@ $reopen = ($^OS_NAME eq 'VMS' ||
 $x = 'abc';
 
 # should not be able to do negative lengths
-try { sysread(I, $x, -1) };
+try { sysread($i_fh, $x, -1) };
 print 'not ' unless ($^EVAL_ERROR->{?description} =~ m/^Negative length/);
 print "ok 1\n";
 
@@ -28,7 +28,7 @@ print 'not ' unless ($x eq 'abc');
 print "ok 2\n";
 
 # should not be able to read before the buffer
-try { sysread(I, $x, 1, -4) };
+try { sysread($i_fh, $x, 1, -4) };
 print 'not ' unless ($x eq 'abc');
 print "ok 3\n";
 
@@ -39,7 +39,7 @@ print "ok 4\n";
 $a ='0123456789';
 
 # default offset 0
-print 'not ' unless(sysread(I, $a, 3) == 3);
+print 'not ' unless(sysread($i_fh, $a, 3) == 3);
 print "ok 5\n";
 
 # $a should be as follows
@@ -47,7 +47,7 @@ print 'not ' unless ($a eq '#!.');
 print "ok 6\n";
 
 # reading past the buffer should zero pad
-print 'not ' unless(sysread(I, $a, 2, 5) == 2);
+print 'not ' unless(sysread($i_fh, $a, 2, 5) == 2);
 print "ok 7\n";
 
 # the zero pad should be seen now
@@ -55,7 +55,7 @@ print 'not ' unless ($a eq "#!.\0\0/p");
 print "ok 8\n";
 
 # try changing the last two characters of $a
-print 'not ' unless(sysread(I, $a, 3, -2) == 3);
+print 'not ' unless(sysread($i_fh, $a, 3, -2) == 3);
 print "ok 9\n";
 
 # the last two characters of $a should have changed (into three)
@@ -64,12 +64,12 @@ print "ok 10\n";
 
 $outfile = 'sysio.out';
 
-open(O, ">", "$outfile") || die "sysio.t: cannot write $outfile: $^OS_ERROR";
+open(my $o_fh, ">", "$outfile") || die "sysio.t: cannot write $outfile: $^OS_ERROR";
 
-select(O); $^OUTPUT_AUTOFLUSH=1; select(STDOUT);
+select($o_fh); $^OUTPUT_AUTOFLUSH=1; select(\*STDOUT);
 
 # cannot write negative lengths
-try { syswrite(O, $x, -1) };
+try { syswrite($o_fh, $x, -1) };
 print 'not ' unless ($^EVAL_ERROR->{?description} =~ m/^Negative length/);
 print "ok 11\n";
 
@@ -82,7 +82,7 @@ print 'not ' if (-s $outfile);
 print "ok 13\n";
 
 # should not be able to write from after the buffer
-try { syswrite(O, $x, 1, 3) };
+try { syswrite($o_fh, $x, 1, 3) };
 print 'not ' unless ($^EVAL_ERROR->{?description} =~ m/^Offset outside string/);
 print "ok 14\n";
 
@@ -92,14 +92,14 @@ print "ok 15\n";
 
 # $outfile still intact
 if ($reopen) {  # must close file to update EOF marker for stat
-  close O; open(O, ">>", "$outfile") || die "sysio.t: cannot write $outfile: $^OS_ERROR";
+  close $o_fh; open($o_fh, ">>", "$outfile") || die "sysio.t: cannot write $outfile: $^OS_ERROR";
 }
 print 'not ' if (-s $outfile);
 print "ok 16\n";
 
 # should not be able to write from before the buffer
 
-try { syswrite(O, $x, 1, -4) };
+try { syswrite($o_fh, $x, 1, -4) };
 print 'not ' unless ($^EVAL_ERROR->{?description} =~ m/^Offset outside string/);
 print "ok 17\n";
 
@@ -109,13 +109,13 @@ print "ok 18\n";
 
 # $outfile still intact
 if ($reopen) {  # must close file to update EOF marker for stat
-  close O; open(O, ">>", "$outfile") || die "sysio.t: cannot write $outfile: $^OS_ERROR";
+  close $o_fh; open($o_fh, ">>", "$outfile") || die "sysio.t: cannot write $outfile: $^OS_ERROR";
 }
 print 'not ' if (-s $outfile);
 print "ok 19\n";
 
 # default offset 0
-if (syswrite(O, $a, 2) == 2){
+if (syswrite($o_fh, $a, 2) == 2){
   print "ok 20\n";
 } else {
   print "# $^OS_ERROR\nnot ok 20\n";
@@ -130,13 +130,13 @@ print "ok 21\n";
 
 # $outfile should have grown now
 if ($reopen) {  # must close file to update EOF marker for stat
-  close O; open(O, ">>", "$outfile") || die "sysio.t: cannot write $outfile: $^OS_ERROR";
+  close $o_fh; open($o_fh, ">>", "$outfile") || die "sysio.t: cannot write $outfile: $^OS_ERROR";
 }
 print 'not ' unless (-s $outfile == 2);
 print "ok 22\n";
 
 # with offset
-print 'not ' unless (syswrite(O, $a, 2, 5) == 2);
+print 'not ' unless (syswrite($o_fh, $a, 2, 5) == 2);
 print "ok 23\n";
 
 # $a still intact
@@ -145,13 +145,13 @@ print "ok 24\n";
 
 # $outfile should have grown now
 if ($reopen) {  # must close file to update EOF marker for stat
-  close O; open(O, ">>", "$outfile") || die "sysio.t: cannot write $outfile: $^OS_ERROR";
+  close $o_fh; open($o_fh, ">>", "$outfile") || die "sysio.t: cannot write $outfile: $^OS_ERROR";
 }
 print 'not ' unless (-s $outfile == 4);
 print "ok 25\n";
 
 # with negative offset and a bit too much length
-print 'not ' unless (syswrite(O, $a, 5, -3) == 3);
+print 'not ' unless (syswrite($o_fh, $a, 5, -3) == 3);
 print "ok 26\n";
 
 # $a still intact
@@ -160,13 +160,13 @@ print "ok 27\n";
 
 # $outfile should have grown now
 if ($reopen) {  # must close file to update EOF marker for stat
-  close O; open(O, ">>", "$outfile") || die "sysio.t: cannot write $outfile: $^OS_ERROR";
+  close $o_fh; open($o_fh, ">>", "$outfile") || die "sysio.t: cannot write $outfile: $^OS_ERROR";
 }
 print 'not ' unless (-s $outfile == 7);
 print "ok 28\n";
 
 # with implicit length argument
-print 'not ' unless (syswrite(O, $x) == 3);
+print 'not ' unless (syswrite($o_fh, $x) == 3);
 print "ok 29\n";
 
 # $a still intact
@@ -175,19 +175,19 @@ print "ok 30\n";
 
 # $outfile should have grown now
 if ($reopen) {  # must close file to update EOF marker for stat
-  close O; open(O, ">>", "$outfile") || die "sysio.t: cannot write $outfile: $^OS_ERROR";
+  close $o_fh; open($o_fh, ">>", "$outfile") || die "sysio.t: cannot write $outfile: $^OS_ERROR";
 }
 print 'not ' unless (-s $outfile == 10);
 print "ok 31\n";
 
-close(O);
+close($o_fh);
 
-open(I, "<", $outfile) || die "sysio.t: cannot read $outfile: $^OS_ERROR";
+open($i_fh, "<", $outfile) || die "sysio.t: cannot read $outfile: $^OS_ERROR";
 
 $b = 'xyz';
 
 # reading too much only return as much as available
-print 'not ' unless (sysread(I, $b, 100) == 10);
+print 'not ' unless (sysread($i_fh, $b, 100) == 10);
 print "ok 32\n";
 # this we should have
 print 'not ' unless ($b eq '#!ererlabc');
@@ -195,47 +195,47 @@ print "ok 33\n";
 
 # test sysseek
 
-print 'not ' unless sysseek(I, 2, 0) == 2;
+print 'not ' unless sysseek($i_fh, 2, 0) == 2;
 print "ok 34\n";
-sysread(I, $b, 3);
+sysread($i_fh, $b, 3);
 print 'not ' unless $b eq 'ere';
 print "ok 35\n";
 
-print 'not ' unless sysseek(I, -2, 1) == 3;
+print 'not ' unless sysseek($i_fh, -2, 1) == 3;
 print "ok 36\n";
-sysread(I, $b, 4);
+sysread($i_fh, $b, 4);
 print 'not ' unless $b eq 'rerl';
 print "ok 37\n";
 
-print 'not ' unless sysseek(I, 0, 0) eq '0 but true';
+print 'not ' unless sysseek($i_fh, 0, 0) eq '0 but true';
 print "ok 38\n";
-print 'not ' if defined sysseek(I, -1, 1);
+print 'not ' if defined sysseek($i_fh, -1, 1);
 print "ok 39\n";
 
-close(I);
+close($i_fh);
 
 unlink $outfile;
 
 # Check that utf8 IO doesn't upgrade the scalar
-open(I, ">", "$outfile") || die "sysio.t: cannot write $outfile: $^OS_ERROR";
+open($i_fh, ">", "$outfile") || die "sysio.t: cannot write $outfile: $^OS_ERROR";
 # Will skip harmlessly on stdioperl
-try {binmode STDOUT, ":utf8"};
+try {binmode \*STDOUT, ":utf8"};
 die $^EVAL_ERROR if $^EVAL_ERROR and $^EVAL_ERROR->{?description} !~ m/^IO layers \(like ':utf8'\) unavailable/;
 
 $a = "\x[FF]";
 
 print $a ne "\x[FF]" ?? "not ok 40\n" !! "ok 40\n";
 
-syswrite I, $a;
+syswrite $i_fh, $a;
 
 # Should not be changed as a side effect of syswrite.
 print $a ne "\x[FF]" ?? "not ok 41\n" !! "ok 41\n";
 
 # This should work
-try {syswrite I, 2;};
+try {syswrite $i_fh, 2;};
 print $^EVAL_ERROR eq "" ?? "ok 42\n" !! "not ok 42 # $^EVAL_ERROR";
 
-close(I);
+close($i_fh);
 unlink $outfile;
 
 chdir('..');

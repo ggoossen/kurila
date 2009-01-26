@@ -44,6 +44,7 @@ use warnings FATAL=>"all";
 our ($iters, $numtests, $bang, $ffff, $nulnul, $OP, $utf8);
 our ($qr, $skip_amp, $qr_embed); # set by our callers
 
+my $tests_fh;
 
 BEGIN {
     $iters = shift || 1;	# Poor man performance suite, 10000 is OK.
@@ -51,7 +52,7 @@ BEGIN {
     # Do this open before any chdir
     $file = shift;
     if (defined $file) {
-	open TESTS, "<", $file or die "Can't open $file";
+	open $tests_fh, "<", $file or die "Can't open $file";
     }
 }
 
@@ -61,13 +62,13 @@ our ($qr, $skip_amp, $qr_embed, $qr_embed_thr); # set by our callers
 
 
 if (!defined $file) {
-    open(TESTS, "<",'op/re_tests') || open(TESTS, "<",'t/op/re_tests')
-	|| open(TESTS, "<",':op:re_tests') || die "Can't open re_tests";
+    open($tests_fh, "<",'op/re_tests') || open($tests_fh, "<",'t/op/re_tests')
+	|| open($tests_fh, "<",':op:re_tests') || die "Can't open re_tests";
 }
 
-my @tests = @( ~< *TESTS );
+my @tests = @( ~< $tests_fh );
 
-close TESTS;
+close $tests_fh;
 
 BEGIN {
     require utf8;

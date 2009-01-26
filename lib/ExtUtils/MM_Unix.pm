@@ -1044,9 +1044,9 @@ WARNING
             if (%Is{?BSD}) {
                 $val = `$version_check 2>&1`;
             } else {
-                close STDERR if $stderr_duped;
+                close \*STDERR if $stderr_duped;
                 $val = `$version_check`;
-                open STDERR, '>&', $stderr_copy if $stderr_duped;
+                open \*STDERR, '>&', $stderr_copy if $stderr_duped;
             }
 
             if ($val =~ m/^VER_OK/m) {

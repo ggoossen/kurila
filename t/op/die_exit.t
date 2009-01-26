@@ -33,7 +33,7 @@ my %tests = %(
 	15 => \@( 255,   1),
 	16 => \@( 255, 256),
 	# see if implicit close preserves $?
-	17 => \@(  0,  512, 'do { local *F; open F, q[TEST]; close F; $^OS_ERROR=0 }; die;'),
+	17 => \@(  0,  512, 'do { my $f; open $f, q[TEST]; close $f; $^OS_ERROR=0 }; die;'),
 );
 
 my $max = nkeys %tests;
@@ -41,7 +41,7 @@ my $max = nkeys %tests;
 plan(tests => $max);
 
 # Dump any error messages from the dying processes off to a temp file.
-open(STDERR, ">", "die_exit.err") or die "Can't open temp error file:  $^OS_ERROR";
+open(\*STDERR, ">", "die_exit.err") or die "Can't open temp error file:  $^OS_ERROR";
 
 foreach my $test (1 .. $max) {
     my @($bang, $query, ?$code) =  @{%tests{?$test}};
@@ -62,6 +62,6 @@ foreach my $test (1 .. $max) {
     is($exit, (($bang || ($query >> 8) || 255) << 8));
 }
     
-close STDERR;
+close \*STDERR;
 END { 1 while unlink 'die_exit.err' }
 

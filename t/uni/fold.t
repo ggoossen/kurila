@@ -8,10 +8,10 @@ my $CF = 'File::Spec'->catfile('File::Spec'->catdir('File::Spec'->updir,
 
 use constant EBCDIC => ord 'A' == 193;
 
-if (open(CF, "<", $CF)) {
+if (open(my $cf_fh, "<", $CF)) {
     my @CF;
 
-    while ( ~< *CF) {
+    while ( ~< $cf_fh) {
 	# Skip S since we are going for 'F'ull case folding
         if (m/^([0-9A-F]+); ([CFI]); ((?:[0-9A-F]+)(?: [0-9A-F]+)*); \# (.+)/) {
 	    next if EBCDIC && hex $1 +< 0x100;
@@ -19,7 +19,7 @@ if (open(CF, "<", $CF)) {
 	}
     }
 
-    close(CF);
+    close($cf_fh);
 
     die qq[$^PROGRAM_NAME: failed to find casefoldings from "$CF"\n] unless @CF;
 

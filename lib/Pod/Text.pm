@@ -567,12 +567,12 @@ sub pod2text {
     # handle the <&STDIN case automagically.
     if (defined @_[1]) {
         my @fhs = @_;
-        local *IN;
-        unless (open (IN, "<", @fhs[0])) {
+        my $in;
+        unless (open ($in, "<", @fhs[0])) {
             die ("Can't open @fhs[0] for reading: $^OS_ERROR\n");
             return;
         }
-        @fhs[0] = \*IN;
+        @fhs[0] = $in;
         $parser->output_fh (@fhs[1]);
         my $retval = $parser->parse_file (@fhs[0]);
         my $fh = $parser->output_fh ();

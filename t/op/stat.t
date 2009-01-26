@@ -41,12 +41,12 @@ my $tmpfile_link = $tmpfile.'2';
 
 chmod 0666, $tmpfile;
 1 while unlink $tmpfile;
-open(FOO, ">", "$tmpfile") || DIE("Can't open temp test file: $^OS_ERROR");
-close FOO;
+open(my $foo, ">", "$tmpfile") || DIE("Can't open temp test file: $^OS_ERROR");
+close $foo;
 
-open(FOO, ">", "$tmpfile") || DIE("Can't open temp test file: $^OS_ERROR");
+open($foo, ">", "$tmpfile") || DIE("Can't open temp test file: $^OS_ERROR");
 
-my@($nlink, $mtime, $ctime) =  @(stat(*FOO))[[@($NLINK, $MTIME, $CTIME)]];
+my@($nlink, $mtime, $ctime) =  @(stat($foo))[[@($NLINK, $MTIME, $CTIME)]];
 
 #nlink should if link support configured in Perl.
 SKIP: do {
@@ -69,8 +69,8 @@ SKIP: do {
 my $funky_FAT_timestamps = $Is_Cygwin;
 sleep 3 if $funky_FAT_timestamps;
 
-print FOO "Now is the time for all good men to come to.\n";
-close(FOO);
+print $foo "Now is the time for all good men to come to.\n";
+close($foo);
 
 sleep 2;
 
@@ -126,22 +126,22 @@ DIAG
 };
 
 # truncate and touch $tmpfile.
-open(F, ">", "$tmpfile") || DIE("Can't open temp test file: $^OS_ERROR");
-ok(-z \*F,     '-z on empty filehandle');
-ok(! -s \*F,   '   and -s');
-close F;
+open(my $f, ">", "$tmpfile") || DIE("Can't open temp test file: $^OS_ERROR");
+ok(-z $f,     '-z on empty filehandle');
+ok(! -s $f,   '   and -s');
+close $f;
 
 ok(-z $tmpfile,     '-z on empty file');
 ok(! -s $tmpfile,   '   and -s');
 
-open(F, ">", "$tmpfile") || DIE("Can't open temp test file: $^OS_ERROR");
-print F "hi\n";
-close F;
+open($f, ">", "$tmpfile") || DIE("Can't open temp test file: $^OS_ERROR");
+print $f "hi\n";
+close $f;
 
-open(F, "<", "$tmpfile") || DIE("Can't open temp test file: $^OS_ERROR");
-ok(!-z *F,     '-z on empty filehandle');
-ok( -s *F,   '   and -s');
-close F;
+open($f, "<", "$tmpfile") || DIE("Can't open temp test file: $^OS_ERROR");
+ok(!-z $f,     '-z on empty filehandle');
+ok( -s $f,   '   and -s');
+close $f;
 
 ok(! -z $tmpfile,   '-z on non-empty file');
 ok(-s $tmpfile,     '   and -s');
@@ -298,15 +298,15 @@ SKIP: do {
     skip "Can't find a setuid file to test with", 3 unless (nelems @bin);
 
     for my $bin ( @bin) {
-        opendir BIN, $bin or die "Can't opendir $bin: $^OS_ERROR";
-        while (defined($_ = readdir BIN)) {
+        opendir my $bin_dh, $bin or die "Can't opendir $bin: $^OS_ERROR";
+        while (defined($_ = readdir $bin_dh)) {
             $_ = "$bin/$_";
             $cnt++;
             $uid++ if -u;
             last if $uid && $uid +< $cnt;
         }
+        closedir $bin_dh;
     }
-    closedir BIN;
 
     skip "No setuid programs", 3 if $uid == 0;
 
@@ -328,11 +328,11 @@ SKIP: do {
         skip "Test uses unixisms", 2 if $Is_MSWin32 || $Is_NetWare;
         skip "No TTY to test -t with", 2 unless -e $TTY;
 
-        open(TTY, "<", $TTY) ||
+        open(my $tty_fh, "<", $TTY) ||
           warn "Can't open $TTY--run t/TEST outside of make.\n";
-        ok(-t *TTY,  '-t');
-        ok(-c *TTY,  'tty is -c');
-        close(TTY);
+        ok(-t $tty_fh,  '-t');
+        ok(-c $tty_fh,  'tty is -c');
+        close($tty_fh);
     };
     ok(! -t *TTY,    '!-t on closed TTY filehandle');
 
@@ -347,9 +347,9 @@ SKIP: do {
     skip "No null device to test with", 1 unless -e $Null;
     skip "We know Win32 thinks '$Null' is a TTY", 1 if $Is_MSWin32;
 
-    open(NULL, "<", $Null) or DIE("Can't open $Null: $^OS_ERROR");
-    ok(! -t *NULL,   'null device is not a TTY');
-    close(NULL);
+    open(my $null_fh, "<", $Null) or DIE("Can't open $Null: $^OS_ERROR");
+    ok(! -t $null_fh,   'null device is not a TTY');
+    close($null_fh);
 };
 
 
@@ -365,38 +365,38 @@ ok(-B $Perl,      '-B');
 
 ok(! -T $Perl,    '!-T');
 
-open(FOO, "<",$statfile);
+open($foo, "<",$statfile);
 SKIP: do {
-    try { -T *FOO; };
+    try { -T $foo; };
     skip "-T/B on filehandle not implemented", 15 if $^EVAL_ERROR and $^EVAL_ERROR->{?description} =~ m/not implemented/;
 
     is( $^EVAL_ERROR, '',     '-T on filehandle causes no errors' );
 
-    ok(-T *FOO,      '   -T');
-    ok(! -B *FOO,    '   !-B');
+    ok(-T $foo,      '   -T');
+    ok(! -B $foo,    '   !-B');
 
-    $_ = ~< *FOO;
+    $_ = ~< $foo;
     like($_, qr/perl/, 'after readline');
-    ok(-T *FOO,      '   still -T');
-    ok(! -B *FOO,    '   still -B');
-    close(FOO);
+    ok(-T $foo,      '   still -T');
+    ok(! -B $foo,    '   still -B');
+    close($foo);
 
-    open(FOO, "<",$statfile);
-    $_ = ~< *FOO;
+    open($foo, "<",$statfile);
+    $_ = ~< $foo;
     like($_, qr/perl/,      'reopened and after readline');
-    ok(-T *FOO,      '   still -T');
-    ok(! -B *FOO,    '   still !-B');
+    ok(-T $foo,      '   still -T');
+    ok(! -B $foo,    '   still !-B');
 
-    ok(seek(FOO,0,0),   'after seek');
-    ok(-T *FOO,          '   still -T');
-    ok(! -B *FOO,        '   still !-B');
+    ok(seek($foo,0,0),   'after seek');
+    ok(-T $foo,          '   still -T');
+    ok(! -B $foo,        '   still !-B');
 
-    @: ~< *FOO;
-    ok(eof FOO,         'at EOF');
-    ok(-T *FOO,          '   still -T');
-    ok(-B *FOO,          '   now -B');
+    @: ~< $foo;
+    ok(eof $foo,         'at EOF');
+    ok(-T $foo,          '   still -T');
+    ok(-B $foo,          '   now -B');
 };
-close(FOO);
+close($foo);
 
 
 SKIP: do {
@@ -454,8 +454,8 @@ print "# Zzz...\n";
 sleep(3);
 my $f = 'tstamp.tmp';
 unlink $f;
-ok (open(S, ">", "$f"), 'can create tmp file');
-close S or die;
+ok (open(my $s, ">", "$f"), 'can create tmp file');
+close $s or die;
 my @a = @( stat $f );
 print "# time=$^BASETIME, stat=($(join ' ',@a))\n";
 my @b = @(-M _, -A _, -C _);
@@ -466,8 +466,8 @@ ok( (-C _) +< 0, 'negative -C works');
 ok(unlink($f), 'unlink tmp file');
 
 do {
-    ok(open(F, ">", $tmpfile), 'can create temp file');
-    close F;
+    ok(open(my $f, ">", $tmpfile), 'can create temp file');
+    close $f;
     chmod 0077, $tmpfile;
     my @a = @( stat($tmpfile) );
     my $s1 = -s _;
@@ -479,52 +479,52 @@ do {
 
 SKIP: do {
     skip "No dirfd()", 9 unless config_value('d_dirfd') || config_value('d_dir_dd_fd');
-    ok(opendir(DIR, "."), 'Can open "." dir') || diag "Can't open '.':  $^OS_ERROR";
-    ok(stat(*DIR), "stat() on dirhandle works"); 
+    ok(opendir(my $dir, "."), 'Can open "." dir') || diag "Can't open '.':  $^OS_ERROR";
+    ok(stat($dir), "stat() on dirhandle works"); 
     ok(-d -r _ , "chained -x's on dirhandle"); 
-    ok(-d *DIR, "-d on a dirhandle works");
+    ok(-d $dir, "-d on a dirhandle works");
 
     # And now for the ambigious bareword case
-    ok(open(DIR, "<", "TEST"), 'Can open "TEST" dir')
+    ok(open($dir, "<", "TEST"), 'Can open "TEST" dir')
 	|| diag "Can't open 'TEST':  $^OS_ERROR";
-    my $size = @(stat(*DIR))[7];
+    my $size = @(stat($dir))[7];
     ok(defined $size, "stat() on bareword works");
     is($size, -s "TEST", "size returned by stat of bareword is for the file");
     ok(-f _, "ambiguous bareword uses file handle, not dir handle");
-    ok(-f *DIR);
-    closedir DIR or die $^OS_ERROR;
-    close DIR or die $^OS_ERROR;
+    ok(-f $dir);
+    closedir $dir or die $^OS_ERROR;
+    close $dir or die $^OS_ERROR;
 };
 
 do {
     # RT #8244: *FILE{IO} does not behave like *FILE for stat() and -X() operators
-    ok(open(F, ">", $tmpfile), 'can create temp file');
-    my @thwap = @( stat *F{IO} );
-    ok((nelems @thwap), "stat(*F\{IO\}) works");    
-    ok( -f *F{IO} , "single file tests work with *F\{IO\}");
-    close F;
+    ok(open(my $f, ">", $tmpfile), 'can create temp file');
+    my @thwap = @( stat $f );
+    ok((nelems @thwap), "stat(\$f) works");    
+    ok( -f $f, "single file tests work with *F\{IO\}");
+    close $f;
     unlink $tmpfile;
 
     #PVIO's hold dirhandle information, so let's test them too.
 
     SKIP: do {
         skip "No dirfd()", 9 unless config_value('d_dirfd') || config_value('d_dir_dd_fd');
-        ok(opendir(DIR, "."), 'Can open "." dir') || diag "Can't open '.':  $^OS_ERROR";
-        ok(stat(*DIR{IO}), "stat() on *DIR\{IO\} works");
+        ok(opendir(my $dir, "."), 'Can open "." dir') || diag "Can't open '.':  $^OS_ERROR";
+        ok(stat($dir), "stat() on *DIR\{IO\} works");
 	ok(-d _ , "The special file handle _ is set correctly"); 
-        ok(-d -r *DIR{IO} , "chained -x's on *DIR\{IO\}");
+        ok(-d -r $dir , "chained -x's on *DIR\{IO\}");
 
 	# And now for the ambigious bareword case
-	ok(open(DIR, "<", "TEST"), 'Can open "TEST" dir')
+	ok(open($dir, "<", "TEST"), 'Can open "TEST" dir')
 	    || diag "Can't open 'TEST':  $^OS_ERROR";
-	my $size = @(stat(*DIR{IO}))[7];
+	my $size = @(stat($dir))[7];
 	ok(defined $size, "stat() on *THINGY\{IO\} works");
 	is($size, -s "TEST",
 	   "size returned by stat of *THINGY\{IO\} is for the file");
 	ok(-f _, "ambiguous *THINGY\{IO\} uses file handle, not dir handle");
-	ok(-f *DIR{IO});
-	closedir DIR or die $^OS_ERROR;
-	close DIR or die $^OS_ERROR;
+	ok(-f $dir);
+	closedir $dir or die $^OS_ERROR;
+	close $dir or die $^OS_ERROR;
     };
 };
 

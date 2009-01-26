@@ -101,7 +101,7 @@ EXPECT
 12345
 ########
 $_="foo";
-printf(STDOUT "\%s\n", $_);
+printf({\*STDOUT} "\%s\n", $_);
 EXPECT
 foo
 ########
@@ -180,9 +180,9 @@ argv <e>
 -l
 # fdopen from a system descriptor to a system descriptor used to close
 # the former.
-open STDERR, '>&=', \*STDOUT or die $^OS_ERROR;
-select STDOUT; $^OUTPUT_AUTOFLUSH = 1; print fileno STDOUT or die $^OS_ERROR;
-select STDERR; $^OUTPUT_AUTOFLUSH = 1; print fileno STDERR or die $^OS_ERROR;
+open \*STDERR, '>&=', \*STDOUT or die $^OS_ERROR;
+select \*STDOUT; $^OUTPUT_AUTOFLUSH = 1; print fileno \*STDOUT or die $^OS_ERROR;
+select \*STDERR; $^OUTPUT_AUTOFLUSH = 1; print fileno \*STDERR or die $^OS_ERROR;
 EXPECT
 1
 2
@@ -334,7 +334,7 @@ EXPECT
 ########
 # David Dyck
 # coredump in 5.7.1
-close STDERR; die;
+close \*STDERR; die;
 EXPECT
 ########
 # core dump in 20000716.007

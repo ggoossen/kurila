@@ -14,9 +14,10 @@ BEGIN {
 
 our @s;
 our $fail;
+my $big;
 
 sub zap {
-    close(BIG);
+    close($big);
     unlink("big");
     unlink("big1");
     unlink("big2");
@@ -79,30 +80,30 @@ my @($SEEK_SET, $SEEK_CUR, $SEEK_END) = @(0, 1, 2);
 # consume less blocks than one megabyte (assuming nobody has
 # one megabyte blocks...)
 
-open(BIG, ">", "big1") or
+open($big, ">", "big1") or
     do { warn "open big1 failed: $^OS_ERROR\n"; bye };
-binmode(BIG) or
+binmode($big) or
     do { warn "binmode big1 failed: $^OS_ERROR\n"; bye };
-seek(BIG, 1_000_000, $SEEK_SET) or
+seek($big, 1_000_000, $SEEK_SET) or
     do { warn "seek big1 failed: $^OS_ERROR\n"; bye };
-print BIG "big" or
+print $big "big" or
     do { warn "print big1 failed: $^OS_ERROR\n"; bye };
-close(BIG) or
+close($big) or
     do { warn "close big1 failed: $^OS_ERROR\n"; bye };
 
 my @s1 = @( stat("big1") );
 
 print "# s1 = $(join ' ',@s1)\n";
 
-open(BIG, ">", "big2") or
+open($big, ">", "big2") or
     do { warn "open big2 failed: $^OS_ERROR\n"; bye };
-binmode(BIG) or
+binmode($big) or
     do { warn "binmode big2 failed: $^OS_ERROR\n"; bye };
-seek(BIG, 2_000_000, $SEEK_SET) or
+seek($big, 2_000_000, $SEEK_SET) or
     do { warn "seek big2 failed; $^OS_ERROR\n"; bye };
-print BIG "big" or
+print $big "big" or
     do { warn "print big2 failed; $^OS_ERROR\n"; bye };
-close(BIG) or
+close($big) or
     do { warn "close big2 failed; $^OS_ERROR\n"; bye };
 
 my @s2 = @( stat("big2") );
@@ -126,15 +127,15 @@ print "# we seem to have sparse files...\n";
 env::set_var('LC_ALL' => "C");
 
 my $r = system '../perl', '-e', <<'EOF';
-open(BIG, ">", "big");
-seek(BIG, 5_000_000_000, 0);
-print BIG "big";
+open($big, ">", "big");
+seek($big, 5_000_000_000, 0);
+print $big "big";
 exit 0;
 EOF
 
-open(BIG, ">", "big") or do { warn "open failed: $^OS_ERROR\n"; bye };
-binmode BIG;
-if ($r or not seek(BIG, 5_000_000_000, $SEEK_SET)) {
+open($big, ">", "big") or do { warn "open failed: $^OS_ERROR\n"; bye };
+binmode $big;
+if ($r or not seek($big, 5_000_000_000, $SEEK_SET)) {
     my $err = $r ?? 'signal '.($r ^&^ 0x7f) !! $^OS_ERROR;
     explain("seeking past 2GB failed: $err");
     bye();
@@ -142,9 +143,9 @@ if ($r or not seek(BIG, 5_000_000_000, $SEEK_SET)) {
 
 # Either the print or (more likely, thanks to buffering) the close will
 # fail if there are are filesize limitations (process or fs).
-my $print = print BIG "big";
+my $print = print $big "big";
 print "# print failed: $^OS_ERROR\n" unless $print;
-my $close = close BIG;
+my $close = close $big;
 print "# close failed: $^OS_ERROR\n" unless $close;
 unless ($print && $close) {
     if ($^OS_ERROR =~m/too large/i) {
@@ -208,39 +209,39 @@ print "ok 3\n";
 fail unless -f "big";
 print "ok 4\n";
 
-open(BIG, "<", "big") or do { warn "open failed: $^OS_ERROR\n"; bye };
-binmode BIG;
+open($big, "<", "big") or do { warn "open failed: $^OS_ERROR\n"; bye };
+binmode $big;
 
-fail unless seek(BIG, 4_500_000_000, $SEEK_SET);
+fail unless seek($big, 4_500_000_000, $SEEK_SET);
 print "ok 5\n";
 
-offset('tell(BIG)', 4_500_000_000);
+offset('tell($big)', 4_500_000_000);
 print "ok 6\n";
 
-fail unless seek(BIG, 1, $SEEK_CUR);
+fail unless seek($big, 1, $SEEK_CUR);
 print "ok 7\n";
 
 # If you get 205_032_705 from here it means that
 # your tell() is returning 32-bit values since (I32)4_500_000_001
 # is exactly 205_032_705.
-offset('tell(BIG)', 4_500_000_001);
+offset('tell($big)', 4_500_000_001);
 print "ok 8\n";
 
-fail unless seek(BIG, -1, $SEEK_CUR);
+fail unless seek($big, -1, $SEEK_CUR);
 print "ok 9\n";
 
-offset('tell(BIG)', 4_500_000_000);
+offset('tell($big)', 4_500_000_000);
 print "ok 10\n";
 
-fail unless seek(BIG, -3, $SEEK_END);
+fail unless seek($big, -3, $SEEK_END);
 print "ok 11\n";
 
-offset('tell(BIG)', 5_000_000_000);
+offset('tell($big)', 5_000_000_000);
 print "ok 12\n";
 
 my $big;
 
-fail unless read(BIG, $big, 3) == 3;
+fail unless read($big, $big, 3) == 3;
 print "ok 13\n";
 
 fail unless $big eq "big";
@@ -249,12 +250,12 @@ print "ok 14\n";
 # 705_032_704 = (I32)5_000_000_000
 # See that we don't have "big" in the 705_... spot:
 # that would mean that we have a wraparound.
-fail unless seek(BIG, 705_032_704, $SEEK_SET);
+fail unless seek($big, 705_032_704, $SEEK_SET);
 print "ok 15\n";
 
 my $zero;
 
-fail unless read(BIG, $zero, 3) == 3;
+fail unless read($big, $zero, 3) == 3;
 print "ok 16\n";
 
 fail unless $zero eq "\0\0\0";
@@ -267,8 +268,8 @@ bye(); # does the necessary cleanup
 END {
     # unlink may fail if applied directly to a large file
     # be paranoid about leaving 5 gig files lying around
-    open(BIG, ">", "big"); # truncate
-    close(BIG);
+    open($big, ">", "big"); # truncate
+    close($big);
     1 while unlink "big"; # standard portable idiom
 }
 

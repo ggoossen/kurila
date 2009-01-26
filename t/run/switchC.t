@@ -43,11 +43,11 @@ $r = runperl( switches => \@( '-CE', '-w' ),
 like( $r, qr/^$b at -e line 1 character \d+.$/s, '-CE: UTF-8 stderr' );
 
 $r = runperl( switches => \@( '-Co', '-w' ),
-	      prog     => 'use utf8; open(F, q(>), q(out)) or die $^OS_ERROR; print F chr(256); close F', stderr   => 1 ); like( $r, qr/^$/s, '-Co: auto-UTF-8 open for output' ); 
+	      prog     => 'use utf8; open(my $f, q(>), q(out)) or die $^OS_ERROR; print $f chr(256); close $f', stderr   => 1 ); like( $r, qr/^$/s, '-Co: auto-UTF-8 open for output' ); 
 push @tmpfiles, "out";
 
 $r = runperl( switches => \@( '-Ci', '-w' ),
-	      prog     => 'use utf8; open(F, q(<), q(out)); print ord(~< *F); close F',
+	      prog     => 'use utf8; open(my $f, q(<), q(out)); print ord(~< $f); close $f',
               stderr   => 1 );
 like( $r, qr/^256(?:\r?\n)?$/s, '-Ci: auto-UTF-8 open for input' );
 

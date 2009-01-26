@@ -19,9 +19,10 @@ BEGIN {
 
     if (not defined $where) {	# Try NIS.
 	foreach my $ypcat (qw(/usr/bin/ypcat /bin/ypcat /etc/ypcat)) {
+            my $pw;
 	    if (-x $ypcat &&
-		open(PW, "$ypcat passwd 2>/dev/null |") &&
-		defined( ~< *PW)) {
+		open($pw, "$ypcat passwd 2>/dev/null |") &&
+		defined( ~< $pw)) {
 		$where = "NIS passwd";
 		undef $reason;
 		last;
@@ -31,9 +32,10 @@ BEGIN {
 
     if (not defined $where) {	# Try NetInfo.
 	foreach my $nidump (qw(/usr/bin/nidump)) {
+            my $pw;
 	    if (-x $nidump &&
-		open(PW, "$nidump passwd . 2>/dev/null |") &&
-		defined( ~< *PW)) {
+		open($pw, "$nidump passwd . 2>/dev/null |") &&
+		defined( ~< $pw)) {
 		$where = "NetInfo passwd";
 		undef $reason;
 		last;
@@ -43,7 +45,8 @@ BEGIN {
 
     if (not defined $where) {	# Try local.
 	my $PW = "/etc/passwd";
-	if (-f $PW && open(PW, "<", $PW) && defined( ~< *PW)) {
+        my $pw_fh;
+	if (-f $PW && open($pw_fh, "<", $PW) && defined( ~< $pw_fh)) {
 	    $where = $PW;
 	    undef $reason;
 	}
@@ -51,9 +54,10 @@ BEGIN {
 
     if (not defined $where) {      # Try NIS+
      foreach my $niscat (qw(/bin/niscat)) {
+         my $pw;
          if (-x $niscat &&
-           open(PW, "$niscat passwd.org_dir 2>/dev/null |") &&
-           defined( ~< *PW)) {
+           open($pw, "$niscat passwd.org_dir 2>/dev/null |") &&
+           defined( ~< $pw)) {
            $where = "NIS+ $niscat passwd.org_dir";
            undef $reason;
            last;
@@ -186,5 +190,3 @@ endpwent();
 
 print "not " unless "$(join ' ',@pw1)" eq "$(join ' ',@pw2)";
 print "ok ", $tst++, "\n";
-
-close(PW);

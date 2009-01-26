@@ -31,9 +31,9 @@ for ( @prgs){
        $switch = $1;
     }
     my@($prog,$expected) =  split(m/\nEXPECT\n/, $_);
-    open TEST, ">", "$tmpfile";
-    print TEST "$prog\n";
-    close TEST or die "Could not close: $^OS_ERROR";
+    open my $test, ">", "$tmpfile";
+    print $test "$prog\n";
+    close $test or die "Could not close: $^OS_ERROR";
     my $results = $Is_VMS ??
 		`$^EXECUTABLE_NAME "-I[-.lib]" $switch $tmpfile 2>&1` !!
 		  $Is_MSWin32 ??

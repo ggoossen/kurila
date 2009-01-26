@@ -873,12 +873,13 @@ sub _find_dir($$$) {
 	$dir= $dir_name; # $File::Find::dir
 
 	# Get the list of files in the current directory.
-	unless (opendir DIR, ($no_chdir ?? $dir_name !! $File::Find::current_dir)) {
+        my $dir;
+	unless (opendir $dir, ($no_chdir ?? $dir_name !! $File::Find::current_dir)) {
 	    warnings::warnif "Can't opendir($dir_name): $^OS_ERROR\n";
 	    next;
 	}
-	@filenames = @( readdir DIR );
-	closedir(DIR);
+	@filenames = @( readdir $dir );
+	closedir($dir);
 	@filenames = $pre_process->(< @filenames) if $pre_process;
 	push @Stack,\@($CdLvl,$dir_name,"",-2)   if $post_process;
 
@@ -1138,12 +1139,13 @@ sub _find_dir_symlnk($$$) {
 	$dir = $dir_name; # $File::Find::dir
 
 	# Get the list of files in the current directory.
-	unless (opendir DIR, ($no_chdir ?? $dir_loc !! $File::Find::current_dir)) {
+        my $dir;
+	unless (opendir $dir, ($no_chdir ?? $dir_loc !! $File::Find::current_dir)) {
 	    warnings::warnif "Can't opendir($dir_loc): $^OS_ERROR\n";
 	    next;
 	}
-	@filenames = @( readdir DIR );
-	closedir(DIR);
+	@filenames = @( readdir $dir );
+	closedir($dir);
 
 	for my $FN ( @filenames) {
 	    if ($Is_VMS) {

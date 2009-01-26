@@ -309,6 +309,7 @@ EOT
 	    close($script);
 	}
 
+        my $results_fh;
 	my $utf8 = $::with_utf8 ?? '-I../lib -Mutf8' !! '';
 	my $testswitch = '-I. -MTestInit'; # -T will strict . from @INC
 	if ($type eq 'deparse') {
@@ -317,7 +318,7 @@ EOT
 		"-l$::deparse_opts$file_opts ".
 		"$test +> $test.dp ".
 		"&& ./perl $testswitch $switch -I../lib $test.dp";
-	    open(RESULTS, "-|", $deparse_cmd)
+	    open($results_fh, "-|", $deparse_cmd)
 		or print "can't deparse '$deparse_cmd': $^OS_ERROR.\n";
 	}
 	elsif ($type eq 'perl') {
@@ -334,13 +335,13 @@ EOT
 	    }
 	    my $run = "$perl" . _quote_args("$testswitch $switch $utf8")
 			      . " $test $redir";
-	    open(RESULTS,"-|",$run) or print "can't run '$run': $^OS_ERROR.\n";
+	    open($results_fh,"-|",$run) or print "can't run '$run': $^OS_ERROR.\n";
 	}
 	# Our environment may force us to use UTF-8, but we can't be sure that
 	# anything we're reading from will be generating (well formed) UTF-8
 	# This may not be the best way - possibly we should unset ${^OPEN} up
 	# top?
-	binmode RESULTS;
+	binmode $results_fh;
 
 	my $failure;
 	my $next = 0;
@@ -349,7 +350,7 @@ EOT
 	my $trailing_leader = 0;
 	my $max;
 	my %todo;
-	while ( ~< *RESULTS) {
+	while ( ~< $results_fh) {
 	    next if m/^\s*$/; # skip blank lines
 	    if ($::verbose) {
 		print $_;
@@ -419,7 +420,7 @@ EOT
 		}
 	    }
 	}
-	close RESULTS;
+	close $results_fh;
 
 	if (not defined $failure) {
 	    $failure = 'FAILED--no leader found' unless $seen_leader;

@@ -148,7 +148,7 @@ sub prompt ($;$) {  ## no critic
     print "$mess $dispdef";
 
     my $ans;
-    if (env::var('PERL_MM_USE_DEFAULT') || (!$isa_tty && eof STDIN)) {
+    if (env::var('PERL_MM_USE_DEFAULT') || (!$isa_tty && eof \*STDIN)) {
         print "$def\n";
     }
     else {

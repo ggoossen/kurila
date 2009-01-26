@@ -591,7 +591,7 @@ sub _fresh_perl {
     $runperl_args->{+progfile} = $tmpfile;
     $runperl_args->{+stderr} = 1;
 
-    open TEST, ">", "$tmpfile" or die "Cannot open $tmpfile: $^OS_ERROR";
+    open my $test_fh, ">", "$tmpfile" or die "Cannot open $tmpfile: $^OS_ERROR";
 
     # VMS adjustments
     if( $^OS_NAME eq 'VMS' ) {
@@ -602,8 +602,8 @@ sub _fresh_perl {
                   {if (-e _ and -f _)}
     }
 
-    print TEST $prog;
-    close TEST or die "Cannot close $tmpfile: $^OS_ERROR";
+    print $test_fh $prog;
+    close $test_fh or die "Cannot close $tmpfile: $^OS_ERROR";
 
     my $results = runperl(< %$runperl_args);
     my $status = $^CHILD_ERROR;

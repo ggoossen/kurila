@@ -10,10 +10,10 @@ dies_like(sub { my $x = \2; $$x = ~< *FH; },
           qr/^Modification of a read-only value attempted$/, '[perl #19566]');
 
 do {
-  open A,"+>", "a"; $a = 3;
-  is($a .= (~< *A), 3, '#21628 - $a .= ~< *A , A eof');
-  close A; $a = 4;
-  is($a .= (~< *A), 4, '#21628 - $a .= ~< *A , A closed');
+  open my $a_fh,"+>", "a"; $a = 3;
+  is($a .= (~< $a_fh), 3, '#21628 - $a .= ~< $a_fh , A eof');
+  close $a_fh; $a = 4;
+  is($a .= (~< $a_fh), 4, '#21628 - $a .= ~< $a_fh , A closed');
   unlink "a";
 };
 
@@ -56,23 +56,24 @@ foreach my $l (@(1, 21)) {
 
 use File::Spec;
 
-open F, '<', 'File::Spec'->curdir and sysread F, $_, 1;
+my $f;
+open $f, '<', 'File::Spec'->curdir and sysread $f, $_, 1;
 my $err = $^OS_ERROR + 0;
-close F;
+close $f;
 
 SKIP: do {
   skip "you can read directories as plain files", 2 unless( $err );
 
   $^OS_ERROR=0;
-  open F, "<", 'File::Spec'->curdir and $_= ~< *F;
+  open $f, "<", 'File::Spec'->curdir and $_= ~< $f;
   ok( $^OS_ERROR==$err && !defined($_) => 'readline( DIRECTORY )' );
-  close F;
+  close $f;
 
   $^OS_ERROR=0;
   do { local $^INPUT_RECORD_SEPARATOR;
-    open F, "<", 'File::Spec'->curdir and $_= ~< *F;
+    open $f, "<", 'File::Spec'->curdir and $_= ~< $f;
     ok( $^OS_ERROR==$err && !defined($_) => 'readline( DIRECTORY ) slurp mode' );
-    close F;
+    close $f;
   };
 };
 

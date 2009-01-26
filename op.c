@@ -4506,6 +4506,8 @@ Perl_ck_fun(pTHX_ OP *o)
 		    if (kid->op_type == OP_CONST &&
 			(kid->op_private & OPpCONST_BARE))
 		    {
+			Perl_croak_at(aTHX_ kid->op_location,
+			    "Bareword not allowed as fileref");
 			OP * const newop = newGVOP(OP_GV, 0,
 						   gv_fetchsv(((SVOP*)kid)->op_sv, GV_ADD, SVt_PVIO), kid->op_location);
 			if (!(o->op_private & 1) && /* if not unop */

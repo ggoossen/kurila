@@ -45,13 +45,14 @@ our ($pid3, $pid4);
 our ($from_pid1, $from_pid2, $kill_cnt);
 
 # start the processes
-ok( my $pid1 = open(FH1, "-|", "$cmd1"), 'first process started');
-ok( my $pid2 = open(FH2, "-|", "$cmd2"), '    second' );
+ok( my $pid1 = open(my $fh1, "-|", "$cmd1"), 'first process started');
+ok( my $pid2 = open(my $fh2, "-|", "$cmd2"), '    second' );
+my $fh3;
 do {
     no warnings 'once';
-    ok( $pid3 = open(FH3, "|-", "$cmd3"), '    third'  );
+    ok( $pid3 = open($fh3, "|-", "$cmd3"), '    third'  );
 };
-ok( $pid4 = open(FH4, "|-", "$cmd4"), '    fourth' );
+ok( $pid4 = open(my $fh4, "|-", "$cmd4"), '    fourth' );
 
 print "# pids were $pid1, $pid2, $pid3, $pid4\n";
 
@@ -59,7 +60,7 @@ my $killsig = 'HUP';
 $killsig = 1 unless config_value("sig_name") =~ m/\bHUP\b/;
 
 # get message from first process and kill it
-chomp($from_pid1 = scalar( ~< *FH1));
+chomp($from_pid1 = scalar( ~< $fh1));
 is( $from_pid1, 'first process',    'message from first process' );
 
 $kill_cnt = kill $killsig, $pid1;
@@ -67,7 +68,7 @@ is( $kill_cnt, 1,   'first process killed' ) ||
   print "# errno == $^OS_ERROR\n";
 
 # get message from second process and kill second process and reader process
-chomp($from_pid2 = scalar( ~< *FH2));
+chomp($from_pid2 = scalar( ~< $fh2));
 is( $from_pid2, 'second process',   'message from second process' );
 
 $kill_cnt = kill $killsig, $pid2, $pid3;
@@ -76,9 +77,9 @@ is( $kill_cnt, 2,   'killing procs 2 & 3' ) ||
 
 
 # send one expected line of text to child process and then wait for it
-select(FH4); $^OUTPUT_AUTOFLUSH = 1; select(STDOUT);
+select($fh4); $^OUTPUT_AUTOFLUSH = 1; select(\*STDOUT);
 
-printf FH4 "ok \%d - text sent to fourth process\n", curr_test();
+printf $fh4 "ok \%d - text sent to fourth process\n", curr_test();
 next_test();
 print "# waiting for process $pid4 to exit\n";
 my $reap_pid = waitpid $pid4, 0;

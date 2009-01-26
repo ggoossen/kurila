@@ -6,14 +6,15 @@ if ($^EVAL_ERROR) { print "1..0\n"; exit; }
 print "1..11\n";
 
 for my $i (1..2000) {
-    local *OP;
-    opendir(OP, "op") or die "can't opendir: $^OS_ERROR";
+    my $op_dh;
+    opendir($op_dh, "op") or die "can't opendir: $^OS_ERROR";
     # should auto-closedir() here
 }
 
-if (opendir(OP, "op")) { print "ok 1\n"; } else { print "not ok 1\n"; }
-our @D = grep(m/^[^\.].*\.t$/i, @( readdir(OP)));
-closedir(OP);
+my $op_dh;
+if (opendir($op_dh, "op")) { print "ok 1\n"; } else { print "not ok 1\n"; }
+our @D = grep(m/^[^\.].*\.t$/i, @( readdir($op_dh)));
+closedir($op_dh);
 
 open my $man, "<", "../MANIFEST" or die "Can't open ../MANIFEST: $^OS_ERROR";
 my $expect;

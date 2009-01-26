@@ -72,26 +72,27 @@ SKIP: do {
     ok(-d "op", "verify that we are back");
 
     # And now the ambiguous case
+    my $h;
     do {
 	no warnings < qw<io deprecated>;
-	ok(opendir(H, "op"), "opendir op") or $^OS_ERROR-> diag();
-	ok(open(H, "<", "base"), "open base") or $^OS_ERROR-> diag();
+	ok(opendir($h, "op"), "opendir op") or $^OS_ERROR-> diag();
+	ok(open($h, "<", "base"), "open base") or $^OS_ERROR-> diag();
     };
     if ($has_dirfd) {
-	ok(chdir(*H), "fchdir to op");
+	ok(chdir($h), "fchdir to op");
 	ok(-f "chdir.t", "verify that we are in 'op'");
 	chdir ".." or die $^OS_ERROR;
     }
     else {
-	try { chdir(*H); };
+	try { chdir($h); };
 	like($^EVAL_ERROR->{?description}, qr/^The dirfd function is unimplemented at/,
 	     "dirfd is unimplemented");
 	SKIP: do {
 	    skip("dirfd is unimplemented");
 	};
     }
-    ok(closedir(H), "closedir");
-    ok(chdir(*H), "fchdir to base");
+    ok(closedir($h), "closedir");
+    ok(chdir($h), "fchdir to base");
     ok(-f "cond.t", "verify that we are in 'base'");
     chdir ".." or die $^OS_ERROR;
 };

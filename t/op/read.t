@@ -7,16 +7,17 @@ BEGIN {
 
 plan tests => 24;
 
-open(FOO, "<",'op/read.t') || open(FOO, "<",'t/op/read.t') || open(FOO, "<",':op:read.t') || die "Can't open op.read";
-seek(FOO,4,0) or die "Seek failed: $^OS_ERROR";
+my $foo;
+open($foo, "<",'op/read.t') || open($foo, "<",'t/op/read.t') || open($foo, "<",':op:read.t') || die "Can't open op.read";
+seek($foo,4,0) or die "Seek failed: $^OS_ERROR";
 my $buf;
-my $got = read(FOO,$buf,4);
+my $got = read($foo,$buf,4);
 
 is ($got, 4);
 is ($buf, "perl");
 
-seek (FOO,0,2) || seek(FOO,20000,0);
-$got = read(FOO,$buf,4);
+seek ($foo,0,2) || seek($foo,20000,0);
+$got = read($foo,$buf,4);
 
 is ($got, 0);
 is ($buf, "");
@@ -35,9 +36,9 @@ do {
     use utf8;
     my $value = "\x{236a}" x 3; # e2.8d.aa x 3
 
-    open FH, ">", "$tmpfile" or die "Can't open $tmpfile: $^OS_ERROR";
-    print FH $value;
-    close FH;
+    open my $fh, ">", "$tmpfile" or die "Can't open $tmpfile: $^OS_ERROR";
+    print $fh $value;
+    close $fh;
 
     use bytes;
     for (@(\@(length($value), 0, '', length($value), "$value"),
@@ -49,11 +50,11 @@ do {
     {
         my @($length, $offset, $buffer, $expect_length, $expect) =  @$_;
         my $buffer = "";
-        open FH, "<", $tmpfile or die "Can't open $tmpfile: $^OS_ERROR";
-        $got = read (FH, $buffer, $length, $offset);
+        open $fh, "<", $tmpfile or die "Can't open $tmpfile: $^OS_ERROR";
+        $got = read ($fh, $buffer, $length, $offset);
         is($got, $expect_length);
         is($buffer, $expect);
-        close FH;
+        close $fh;
     }
 
     use utf8;
@@ -66,11 +67,11 @@ do {
     {
         my @($length, $offset, $buffer, $expect_length, $expect) =  @$_;
         my $buffer = "";
-        open FH, "<", $tmpfile or die "Can't open $tmpfile: $^OS_ERROR";
-        $got = read (FH, $buffer, $length, $offset);
+        open $fh, "<", $tmpfile or die "Can't open $tmpfile: $^OS_ERROR";
+        $got = read ($fh, $buffer, $length, $offset);
         is($got, $expect_length);
         is($buffer, $expect);
-        close FH;
+        close $fh;
     }
 };
 

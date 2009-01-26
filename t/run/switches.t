@@ -261,25 +261,25 @@ do {
 
     sub do_i_unlink { 1 while unlink("file", "file.bak") }
 
-    open(FILE, ">", "file") or die "$^PROGRAM_NAME: Failed to create 'file': $^OS_ERROR";
-    print FILE <<__EOF__;
+    open(my $file, ">", "file") or die "$^PROGRAM_NAME: Failed to create 'file': $^OS_ERROR";
+    print {$file} <<__EOF__;
 foo yada dada
 bada foo bing
 king kong foo
 __EOF__
-    close FILE;
+    close $file;
 
     END { do_i_unlink() }
 
     runperl( switches => \@('-pi.bak'), prog => 's/foo/bar/', args => \@('file') );
 
-    open(FILE, "<", "file") or die "$^PROGRAM_NAME: Failed to open 'file': $^OS_ERROR";
-    chomp(my @file = @( ~< *FILE ));
-    close FILE;
+    open($file, "<", "file") or die "$^PROGRAM_NAME: Failed to open 'file': $^OS_ERROR";
+    chomp(my @file = @( ~< $file ));
+    close $file;
 
-    open(BAK, "<", "file.bak") or die "$^PROGRAM_NAME: Failed to open 'file': $^OS_ERROR";
-    chomp(my @bak = @( ~< *BAK ));
-    close BAK;
+    open(my $bak, "<", "file.bak") or die "$^PROGRAM_NAME: Failed to open 'file': $^OS_ERROR";
+    chomp(my @bak = @( ~< $bak ));
+    close $bak;
 
     is(join(":", @file),
        "bar yada dada:bada bar bing:king kong bar",

@@ -385,10 +385,9 @@ sub parse_file {
     die("Can't use empty-string as a source for parse_file");
   } else {
     do {
-      local *PODSOURCE;
-      open(PODSOURCE, "<", "$source") || die "Can't open $source: $^OS_ERROR";
+      open(my $podsource, "<", "$source") || die "Can't open $source: $^OS_ERROR";
       $self->{+'source_filename'} = $source;
-      $source = *PODSOURCE{IO};
+      $source = $podsource;
     };
     $self->_init_fh_source($source);
   }

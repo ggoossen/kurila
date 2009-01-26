@@ -13,8 +13,8 @@ print $foo "ok 1\n";
 print "ok 2\n","ok 3\n","ok 4\n";
 print STDOUT "ok 5\n";
 
-open(foo, ">-") or die;
-print foo "ok 6\n";
+open(my $foo, ">-") or die;
+print $foo "ok 6\n";
 
 printf "ok \%d\n",7;
 printf("ok \%d\n",8);

@@ -35,7 +35,7 @@ $c += 6;	# Tests with sleep()...
 print "1..$c\n";
 
 my $set_out = '';
-$set_out = "binmode STDOUT, ':crlf'"
+$set_out = "binmode \\*STDOUT, ':crlf'"
     if defined  $main::use_crlf && $main::use_crlf == 1;
 
 sub testread ($$$$$$$) {
@@ -74,7 +74,7 @@ sub testpipe ($$$$$$) {
     open $fh, '-|', qq[$Perl -we "$set_out;eval qq(\\x24^OUTPUT_AUTOFLUSH = 1) or die;print for grep length, split m/(.\{1,$write_c\})/s, qq($quoted) "] or die "open: $^OS_ERROR";
   } elsif ($how_w eq 'syswrite') {
     ### How to protect \$_
-    my $cmd = qq[$Perl -we "$set_out;eval qq(sub w \\\{syswrite STDOUT, \\x[24]_\\\} 1) or die; w() for grep \{ length \} split m/(.\{1,$write_c\})/s, qq($quoted)"];
+    my $cmd = qq[$Perl -we "$set_out;eval qq(sub w \\\{syswrite \\*STDOUT, \\x[24]_\\\} 1) or die; w() for grep \{ length \} split m/(.\{1,$write_c\})/s, qq($quoted)"];
     open $fh, '-|', $cmd or die "open '$cmd': $^OS_ERROR";
   } else {
     die "Unrecognized write: '$how_w'";
@@ -111,7 +111,7 @@ sub testfile ($$$$$$) {
 }
 
 # shell-neutral and miniperl-enabled autoflush? qq(\x24) eq '$'
-open my $fh, '-|', qq[$Perl -we "eval qq(\\x24^OUTPUT_AUTOFLUSH = 1) or die; binmode STDOUT; sleep 1, print for split m//, qq(a\nb\n\nc\n\n\n)"] or die "open: $^OS_ERROR";
+open my $fh, '-|', qq[$Perl -we "eval qq(\\x24^OUTPUT_AUTOFLUSH = 1) or die; binmode \\*STDOUT; sleep 1, print for split m//, qq(a\nb\n\nc\n\n\n)"] or die "open: $^OS_ERROR";
 ok(1, 'open pipe');
 binmode $fh, q(:crlf);
 ok(1, 'binmode');

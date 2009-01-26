@@ -483,14 +483,15 @@ sub contains_pod {
   $verbose = shift if (nelems @_);
 
   # check for one line of POD
-  unless(open(POD, "<","$file")) {
+  my $pod_fh;
+  unless(open($pod_fh, "<","$file")) {
     warn "Error: $file is unreadable: $^OS_ERROR\n";
     return undef;
   }
   
   local $^INPUT_RECORD_SEPARATOR = undef;
-  my $pod = ~< *POD;
-  close(POD) || die "Error closing $file: $^OS_ERROR\n";
+  my $pod = ~< $pod_fh;
+  close($pod_fh) || die "Error closing $file: $^OS_ERROR\n";
   unless($pod =~ m/^=(head\d|pod|over|item)\b/m) {
     warn "No POD in $file, skipping.\n"
       if($verbose);

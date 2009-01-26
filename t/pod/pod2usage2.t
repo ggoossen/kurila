@@ -16,21 +16,21 @@ use Pod::Usage;
 sub getoutput
 {
   my @($code) =  @_;
-  my $pid = open(IN, "-|", "-");
+  my $pid = open(my $in, "-|", "-");
   unless(defined $pid) {
     die "Cannot fork: $^OS_ERROR";
   }
   if($pid) {
     # parent
-    my @out = @( ~< *IN );
-    close(IN);
+    my @out = @( ~< $in );
+    close($in);
     my $exit = $^CHILD_ERROR>>8;
     s/^/#/ for  @out;
     print "#EXIT=$exit OUTPUT=+++#$(join '',@out)#+++\n";
     return @($exit, join("", @out));
   }
   # child
-  open(STDERR, ">&", \*STDOUT);
+  open(\*STDERR, ">&", \*STDOUT);
   &$code( < @_ );
   print "--NORMAL-RETURN--\n";
   exit 0;

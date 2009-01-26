@@ -203,11 +203,10 @@ ok( !try { open local $f, '<&', 'afile'; 1 },  'local <& on non-filehandle');
 like( $^EVAL_ERROR->message, qr/Bad filehandle:\s+afile/,          '       right error' );
 
 do {
-    local *F;
     for (1..2) {
-	ok( open(F, "-|", qq{$Perl -le "print 'ok'"}), 'open -|');
-	is( scalar ~< *F, "ok\n", '       readline');
-	ok( close F,            '       close' );
+	ok( open(my $f, "-|", qq{$Perl -le "print 'ok'"}), 'open -|');
+	is( scalar ~< $f, "ok\n", '       readline');
+	ok( close $f,            '       close' );
     }
 };
 
@@ -215,14 +214,14 @@ do {
 # other dupping techniques
 do {
     ok( open(my $stdout, ">&", \*STDOUT),       'dup \*STDOUT into lexical fh');
-    ok( open(STDOUT,     ">&", $stdout),        'restore dupped STDOUT from lexical fh');
+    ok( open(\*STDOUT,     ">&", $stdout),        'restore dupped STDOUT from lexical fh');
 
     do {
 	ok( open(my $stdout, ">&", 'STDOUT'),         'dup STDOUT into lexical fh');
     };
 
     # used to try to open a file [perl #17830]
-    ok( open(my $stdin,  "<&", fileno STDIN),   'dup fileno(STDIN) into lexical fh') or _diag $^OS_ERROR;
+    ok( open(my $stdin,  "<&", fileno \*STDIN),   'dup fileno(STDIN) into lexical fh') or _diag $^OS_ERROR;
 };
 
 SKIP: do {
@@ -234,11 +233,11 @@ SKIP: do {
 	unless exists %{"!"}{EINVAL};
 
     no warnings 'io';
-    ok(!open(F,'>',\my $s) && %{"!"}{?EINVAL}, 'open(reference) raises EINVAL');
+    ok(!open(my $f,'>',\my $s) && %{"!"}{?EINVAL}, 'open(reference) raises EINVAL');
 };
 
 do {
-    ok( !try { open F, "BAR", "QUUX" },       'Unknown open() mode' );
+    ok( !try { open my $f, "BAR", "QUUX" },       'Unknown open() mode' );
     like( $^EVAL_ERROR->message, qr/\QUnknown open() mode 'BAR'/, '       right error' );
 };
 
@@ -259,21 +258,21 @@ SKIP: do {
     use warnings 'layer';
     local $^WARN_HOOK = sub { $w = shift->message };
 
-    try { open(F, ">>>", "afile") };
+    try { open(my $f, ">>>", "afile") };
     like($w, qr/Invalid separator character '>' in PerlIO layer spec/,
 	 "bad open (>>>) warning");
     like($^EVAL_ERROR->message, qr/Unknown open\(\) mode '>>>'/,
 	 "bad open (>>>) failure");
 
-    try { open(F, ">:u", "afile" ) };
+    try { open(my $f, ">:u", "afile" ) };
     ok( ! $^EVAL_ERROR );
     like($w, qr/Unknown PerlIO layer "u"/,
 	 'bad layer ">:u" warning');
-    try { open(F, "<:u", "afile" ) };
+    try { open(my $f, "<:u", "afile" ) };
     ok( ! $^EVAL_ERROR );
     like($w, qr/Unknown PerlIO layer "u"/,
 	 'bad layer "<:u" warning');
-    try { open(F, ":c", "afile" ) };
+    try { open(my $f, ":c", "afile" ) };
     like($^EVAL_ERROR->message, qr/Unknown open\(\) mode ':c'/,
 	 'bad layer ":c" failure');
 };

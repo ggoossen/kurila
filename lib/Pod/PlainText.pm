@@ -560,12 +560,12 @@ sub pod2text {
     # means we need to turn the first argument into a file handle.  Magic
     # open will handle the <&STDIN case automagically.
     if (defined @_[1]) {
-        local *IN;
-        unless (open (IN, "<", @_[0])) {
+        my $in;
+        unless (open ($in, "<", @_[0])) {
             die ("Can't open @_[0] for reading: $^OS_ERROR\n");
             return;
         }
-        @_[0] = \*IN;
+        @_[0] = $in;
         return $parser->parse_from_filehandle (< @_);
     } else {
         return $parser->parse_from_file (< @_);

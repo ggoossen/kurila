@@ -49,10 +49,10 @@ sub runperl {
     wait;
     return  @(0, "Failure in child.\n") if ($^CHILD_ERROR>>8) == $FAILURE_CODE;
 
-    open F, "<", $STDOUT or return  @(0, "Couldn't read $STDOUT file");
-    do { local $^INPUT_RECORD_SEPARATOR; $actual_stdout = ~< *F };
-    open F, "<", $STDERR or return  @(0, "Couldn't read $STDERR file");
-    do { local $^INPUT_RECORD_SEPARATOR; $actual_stderr = ~< *F };
+    open my $f, "<", $STDOUT or return  @(0, "Couldn't read $STDOUT file");
+    do { local $^INPUT_RECORD_SEPARATOR; $actual_stdout = ~< $f };
+    open $f, "<", $STDERR or return  @(0, "Couldn't read $STDERR file");
+    do { local $^INPUT_RECORD_SEPARATOR; $actual_stderr = ~< $f };
 
     if ($actual_stdout ne $stdout) {
       return  @(0, "Stdout mismatch: expected:\n[$stdout]\nsaw:\n[$actual_stdout]");
@@ -69,8 +69,8 @@ sub runperl {
           }
       };
       env::set_var($_ => $env->{$_}) for keys %$env;
-      open STDOUT, ">", $STDOUT or exit $FAILURE_CODE;
-      open STDERR, ">", $STDERR or it_didnt_work();
+      open \*STDOUT, ">", $STDOUT or exit $FAILURE_CODE;
+      open \*STDERR, ">", $STDERR or it_didnt_work();
       do { exec $PERL, < @$args };
       it_didnt_work();
   }

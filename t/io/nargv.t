@@ -5,9 +5,9 @@ print "1..5\n";
 my $j = 1;
 for my $i (@( 1,2,5,4,3) ) {
     my $file = mkfiles($i)[0];
-    open(FH, ">", "$file") || die "can't create $file: $^OS_ERROR";
-    print FH "not ok " . $j++ . "\n";
-    close(FH) || die "Can't close $file: $^OS_ERROR";
+    open(my $fh, ">", "$file") || die "can't create $file: $^OS_ERROR";
+    print $fh "not ok " . $j++ . "\n";
+    close($fh) || die "Can't close $file: $^OS_ERROR";
 }
 
 

@@ -27,7 +27,8 @@ print "1..", scalar nelems @prgs, "\n";
 
 $tmpfile = "forktmp000";
 1 while -f ++$tmpfile;
-END { close TEST; unlink $tmpfile if $tmpfile; }
+my $test_fh;
+END { close $test_fh; unlink $tmpfile if $tmpfile; }
 
 $CAT = (($^OS_NAME eq 'MSWin32') 
           ?? '.\perl -e "print ~< *ARGV"'
@@ -44,9 +45,9 @@ for ( @prgs){
     $expected =~ s/\n+$//;
     # results can be in any order, so sort 'em
     my @expected = sort split m/\n/, $expected;
-    open TEST, ">", "$tmpfile" or die "Cannot open $tmpfile: $^OS_ERROR";
-    print TEST $prog, "\n";
-    close TEST or die "Cannot close $tmpfile: $^OS_ERROR";
+    open $test_fh, ">", "$tmpfile" or die "Cannot open $tmpfile: $^OS_ERROR";
+    print $test_fh $prog, "\n";
+    close $test_fh or die "Cannot close $tmpfile: $^OS_ERROR";
     my $results;
     if ($^OS_NAME eq 'MSWin32') {
       $results = `.\\perl -I../lib $switch $tmpfile 2>&1`;

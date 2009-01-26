@@ -180,9 +180,9 @@ sub _read_program {
   my@($file) =@( shift);
   return unless defined $file and length $file
     and -e $file and -f _ and -r _;
-  open(SOURCEFILE, "<", "$file") || return;
-  %Program_Lines{+$file} = \@( ~< *SOURCEFILE);
-  close(SOURCEFILE);
+  open(my $sourcefile, "<", "$file") || return;
+  %Program_Lines{+$file} = \@( ~< $sourcefile);
+  close($sourcefile);
 
   foreach my $x ( @{%Program_Lines{$file}})
    { $x =~ s/[\cm\cj\n\r]//g }
@@ -491,12 +491,12 @@ sub _diff_complain_external {
     if (close($got_fh) && close($exp_fh)) {
         my $diff_cmd = "$diff $exp_filename $got_filename";
         print $TESTERR "#\n# $prefix $diff_cmd\n";
-        if (open(DIFF, "$diff_cmd |")) {
+        if (open(my $diff_fh, "$diff_cmd |")) {
             local $_;
-            while ( ~< *DIFF) {
+            while ( ~< $diff_fh) {
                 print $TESTERR "# $prefix $_";
             }
-            close(DIFF);
+            close($diff_fh);
         }
         else {
             warn "Can't run diff: $^OS_ERROR";

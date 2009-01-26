@@ -207,7 +207,7 @@ if ( $opts->{?'d'} ) {
         or die "Failed to chdir to '$opts->{?'d'}':$^OS_ERROR";
 }
 $opts->{+'u'} = 1 if !$opts->{?'p'};
-binmode STDOUT if $opts->{?'s'};
+binmode \*STDOUT if $opts->{?'s'};
 if ( exists $opts->{'m'} or exists $opts->{'c'} ) {
     $opts->{+'m'} ||= "MANIFEST";
     bulk_process($opts);

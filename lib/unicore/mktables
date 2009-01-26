@@ -179,23 +179,24 @@ sub WriteIfChanged($$)
     $file = File::Spec->catfile(< @$file) if ref $file;
 
     my $TextToWrite = join '', $lines;
-    if (open IN, "<", $file) {
+    if (open my $in, "<", $file) {
         local($^INPUT_RECORD_SEPARATOR) = undef;
-        my $PreviousText = ~< *IN;
-        close IN;
+        my $PreviousText = ~< $in;
+        close $in;
         if ($PreviousText eq $TextToWrite) {
             print "$file unchanged.\n" if $Verbose;
             return unless $AlwaysWrite;
         }
     }
     force_unlink ($file);
-    if (not open OUT, ">", "$file") {
+    my $out;
+    if (not open $out, ">", "$file") {
         die "$^PROGRAM_NAME: can't open $file for output: $^OS_ERROR\n";
     }
     print "$file written.\n" if $Verbose;
 
-    print OUT $TextToWrite;
-    close OUT;
+    print $out $TextToWrite;
+    close $out;
 }
 
 ##
@@ -260,9 +261,9 @@ sub Build_Aliases()
     %utf8::PVA_reverse = %( () );
     %utf8::PVA_abbr_map = %( () );
 
-    open PA, "<", "PropertyAliases.txt"
+    open my $pa, "<", "PropertyAliases.txt"
 	or die "Can't open PropertyAliases.txt: $^OS_ERROR";
-    while ( ~< *PA) {
+    while ( ~< $pa) {
 	s/#.*//;
 	s/\s+$//;
 	next if m/^$/;
@@ -278,11 +279,11 @@ sub Build_Aliases()
 	%utf8::PropertyAlias{+lc $abbrev} = $name;
 	%utf8::PA_reverse{+lc $name} = $abbrev;
     }
-    close PA;
+    close $pa;
 
-    open PVA, "<", "PropValueAliases.txt"
+    open my $pva, "<", "PropValueAliases.txt"
 	or die "Can't open PropValueAliases.txt: $^OS_ERROR";
-    while ( ~< *PVA) {
+    while ( ~< $pva) {
 	s/#.*//;
 	s/\s+$//;
 	next if m/^$/;
@@ -309,7 +310,7 @@ sub Build_Aliases()
 	my $abbr_class = ($prop eq 'gc' or $prop eq 'sc') ?? 'gc_sc' !! $prop;
 	%utf8::PVA_abbr_map{+$abbr_class}->{+lc @data[0]} = @data[0];
     }
-    close PVA;
+    close $pva;
 
     # backwards compatibility for L& -> LC
     %utf8::PropValueAlias{gc}->{+'l&'} = %utf8::PropValueAlias{gc}->{?lc};
@@ -906,7 +907,8 @@ sub UnicodeData_Txt()
     }
 
     ## open ane read file.....
-    if (not open IN, "<", "UnicodeData.txt") {
+    my $in;
+    if (not open $in, "<", "UnicodeData.txt") {
         die "$^PROGRAM_NAME: UnicodeData.txt: $^OS_ERROR\n";
     }
 
@@ -923,7 +925,7 @@ sub UnicodeData_Txt()
                                Desc  => '(for internal casefolding use)',
                                Fuzzy => 0);
 
-    while ( ~< *IN)
+    while ( ~< $in)
     {
         next unless m/^[0-9A-Fa-f]+;/;
         s/\s+$//;
@@ -1020,7 +1022,7 @@ sub UnicodeData_Txt()
             }
         }
     }
-    close IN;
+    close $in;
 
     ##
     ## Tidy up a few special cases....
@@ -1170,14 +1172,15 @@ sub UnicodeData_Txt()
 ##
 sub LineBreak_Txt()
 {
-    if (not open IN, "<", "LineBreak.txt") {
+    my $in;
+    if (not open $in, "<", "LineBreak.txt") {
         die "$^PROGRAM_NAME: LineBreak.txt: $^OS_ERROR\n";
     }
 
     my $Lbrk = Table->New();
     my %Lbrk;
 
-    while ( ~< *IN)
+    while ( ~< $in)
     {
         next unless m/^([0-9A-Fa-f]+)(?:\.\.([0-9A-Fa-f]+))?\s*;\s*(\w+)/;
 
@@ -1193,7 +1196,7 @@ sub LineBreak_Txt()
 	    %Lbrk{?$lbrk}->Extend($last);
 	}
     }
-    close IN;
+    close $in;
 
     # $Lbrk->Write("Lbrk.pl");
 
@@ -1211,7 +1214,8 @@ sub LineBreak_Txt()
 ##
 sub ArabicShaping_txt()
 {
-    if (not open IN, "<", "ArabicShaping.txt") {
+    my $in;
+    if (not open $in, "<", "ArabicShaping.txt") {
         die "$^PROGRAM_NAME: ArabicShaping.txt: $^OS_ERROR\n";
     }
 
@@ -1233,7 +1237,7 @@ sub ArabicShaping_txt()
         %JoinType{+$link} ||= Table->New(Is => "JoinType$link");
         %JoinType{?$link}->Append($code);
     }
-    close IN;
+    close $in;
 
     # $ArabLink->Write("ArabLink.pl");
     # $ArabLinkGroup->Write("ArabLnkGrp.pl");
@@ -1252,7 +1256,8 @@ sub ArabicShaping_txt()
 ##
 sub EastAsianWidth_txt()
 {
-    if (not open IN, "<", "EastAsianWidth.txt") {
+    my $in;
+    if (not open $in, "<", "EastAsianWidth.txt") {
         die "$^PROGRAM_NAME: EastAsianWidth.txt: $^OS_ERROR\n";
     }
 
@@ -1273,7 +1278,7 @@ sub EastAsianWidth_txt()
         %EAW{?$pv}->Append(hex($start));
       }
     }
-    close IN;
+    close $in;
 
 
     for (keys %EAW) {
@@ -1289,7 +1294,8 @@ sub EastAsianWidth_txt()
 ##
 sub HangulSyllableType_txt()
 {
-    if (not open IN, "<", "HangulSyllableType.txt") {
+    my $in;
+    if (not open $in, "<", "HangulSyllableType.txt") {
         die "$^PROGRAM_NAME: HangulSyllableType.txt: $^OS_ERROR\n";
     }
 
@@ -1305,7 +1311,7 @@ sub HangulSyllableType_txt()
 
 	if ($last) { %HST{?$pv}->Extend($last) }
     }
-    close IN;
+    close $in;
 
     for (keys %HST) {
 	%HST{?$_}->Write(
@@ -1320,7 +1326,8 @@ sub HangulSyllableType_txt()
 ##
 sub Jamo_txt()
 {
-    if (not open IN, "<", "Jamo.txt") {
+    my $in;
+    if (not open $in, "<", "Jamo.txt") {
         die "$^PROGRAM_NAME: Jamo.txt: $^OS_ERROR\n";
     }
     my $Short = Table->New();
@@ -1332,7 +1339,7 @@ sub Jamo_txt()
 
 	$Short->Append($code, $short);
     }
-    close IN;
+    close $in;
     # $Short->Write("JamoShort.pl");
 }
 
@@ -1343,17 +1350,18 @@ sub Scripts_txt()
 {
     my @ScriptInfo;
 
-    if (not open(IN, "<", "Scripts.txt")) {
+    my $in;
+    if (not open($in, "<", "Scripts.txt")) {
         die "$^PROGRAM_NAME: Scripts.txt: $^OS_ERROR\n";
     }
-    while ( ~< *IN) {
+    while ( ~< $in) {
         next unless m/^([0-9A-Fa-f]+)(?:\.\.([0-9A-Fa-f]+))?\s*;\s*(.+?)\s*\#/;
 
         # Wait until all the scripts have been read since
         # they are not listed in numeric order.
         push @ScriptInfo, \@( hex($1), hex($2||""), $3 );
     }
-    close IN;
+    close $in;
 
     # Now append the scripts properties in their code point order.
 
@@ -1412,11 +1420,12 @@ sub Blocks_txt()
     my $Blocks = Table->New();
     my %Blocks;
 
-    if (not open IN, "<", "Blocks.txt") {
+    my $in;
+    if (not open $in, "<", "Blocks.txt") {
         die "$^PROGRAM_NAME: Blocks.txt: $^OS_ERROR\n";
     }
 
-    while ( ~< *IN)
+    while ( ~< $in)
     {
         #next if not /Private Use$/;
 	next if not m/^([0-9A-Fa-f]+)\.\.([0-9A-Fa-f]+)\s*;\s*(.+?)\s*$/;
@@ -1435,7 +1444,7 @@ sub Blocks_txt()
 	    %Blocks{?$name}->Extend($last);
 	}
     }
-    close IN;
+    close $in;
 
     # $Blocks->Write("Blocks.pl");
 }
@@ -1451,11 +1460,12 @@ sub PropList_txt()
 {
     my @PropInfo;
 
-    if (not open IN, "<", "PropList.txt") {
+    my $in;
+    if (not open $in, "<", "PropList.txt") {
         die "$^PROGRAM_NAME: PropList.txt: $^OS_ERROR\n";
     }
 
-    while ( ~< *IN)
+    while ( ~< $in)
     {
 	next unless m/^([0-9A-Fa-f]+)(?:\.\.([0-9A-Fa-f]+))?\s*;\s*(.+?)\s*\#/;
 
@@ -1463,7 +1473,7 @@ sub PropList_txt()
 	# they are not listed in numeric order.
 	push @PropInfo, \@( hex($1), hex($2||""), $3 );
     }
-    close IN;
+    close $in;
 
     # Now append the extended properties in their code point order.
     my $Props = Table->New();
@@ -1658,10 +1668,11 @@ sub MakePropTestScript()
 {
     ## this written directly -- it's huge.
     force_unlink ("TestProp.pl");
-    if (not open OUT, ">", "TestProp.pl") {
+    my $out;
+    if (not open $out, ">", "TestProp.pl") {
         die "$^PROGRAM_NAME: TestProp.pl: $^OS_ERROR\n";
     }
-    print OUT ~< *DATA;
+    print $out ~< *DATA;
 
     while (my @($Name, $Table) =@( each %ExactNameToTest))
     {
@@ -1687,8 +1698,8 @@ sub MakePropTestScript()
         ExpectError(*OUT, RandomlyFuzzifyName($Orig, 'ERROR'));
     }
 
-    print OUT "Finished();\n";
-    close OUT;
+    print $out "Finished();\n";
+    close $out;
 }
 
 
@@ -1972,10 +1983,11 @@ sub SpecialCasing_txt()
 
     my %CaseInfo;
 
-    if (not open IN, "<", "SpecialCasing.txt") {
+    my $in;
+    if (not open $in, "<", "SpecialCasing.txt") {
         die "$^PROGRAM_NAME: SpecialCasing.txt: $^OS_ERROR\n";
     }
-    while ( ~< *IN) {
+    while ( ~< $in) {
         next unless m/^[0-9A-Fa-f]+;/;
         s/\#.*//;
         s/\s+$//;
@@ -1997,7 +2009,7 @@ sub SpecialCasing_txt()
         push @{%CaseInfo{+Upper}}, \@( $ix, $code, $upper )
 	    unless $code eq $upper;
     }
-    close IN;
+    close $in;
 
     # Now write out the special cases properties in their code point order.
     # Prepend them to the To/{Upper,Lower,Title}.pl.
@@ -2040,14 +2052,15 @@ sub SpecialCasing_txt()
 #
 sub CaseFolding_txt()
 {
-    if (not open IN, "<", "CaseFolding.txt") {
+    my $in;
+    if (not open $in, "<", "CaseFolding.txt") {
 	die "$^PROGRAM_NAME: CaseFolding.txt: $^OS_ERROR\n";
     }
 
     my $Fold = Table->New();
     my %Fold;
 
-    while ( ~< *IN) {
+    while ( ~< $in) {
 	# Skip status 'S', simple case folding
 	next unless m/^([0-9A-Fa-f]+)\s*;\s*([CFI])\s*;\s*([0-9A-Fa-f]+(?: [0-9A-Fa-f]+)*)\s*;/;
 
@@ -2060,7 +2073,7 @@ sub CaseFolding_txt()
 	    %Fold{+$code} = $fold;
 	}
     }
-    close IN;
+    close $in;
 
     $Fold->Write("To/Fold.pl");
 

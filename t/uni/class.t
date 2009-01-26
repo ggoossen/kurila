@@ -167,9 +167,9 @@ do {
   my %files;
 
   my $dirname = 'File::Spec'->catdir($updir => lib => unicore => lib => 'gc_sc');
-  opendir D, $dirname or die $^OS_ERROR;
-   %files{[@(readdir(D))]} = @();
-  closedir D;
+  opendir my $dh, $dirname or die $^OS_ERROR;
+   %files{[@(readdir($dh))]} = @();
+  closedir $dh;
 
   for (keys %utf8::PA_reverse) {
     my $leafname = "%utf8::PA_reverse{?$_}.pl";

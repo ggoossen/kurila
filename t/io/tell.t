@@ -45,17 +45,17 @@ unless (eof $TST) { print "not ok 13\n"; } else { print "ok 13\n"; }
 
 print "ok 14\n";
 
-open(OTHER, "<", 'TEST') || (die "Can't open TEST: $^OS_ERROR");
-binmode OTHER if (($^OS_NAME eq 'MSWin32') || ($^OS_NAME eq 'NetWare'));
+open(my $other, "<", 'TEST') || (die "Can't open TEST: $^OS_ERROR");
+binmode $other if (($^OS_NAME eq 'MSWin32') || ($^OS_NAME eq 'NetWare'));
 
-close(OTHER);
+close($other);
 do {
     no warnings 'closed';
-    if (tell(OTHER) == -1)  { print "ok 15\n"; } else { print "not ok 15\n"; }
+    if (tell($other) == -1)  { print "ok 15\n"; } else { print "not ok 15\n"; }
 };
 do {
     no warnings 'unopened';
-    if (tell(ETHER) == -1)  { print "ok 16\n"; } else { print "not ok 16\n"; }
+    if (tell(\*ETHER) == -1)  { print "ok 16\n"; } else { print "not ok 16\n"; }
 };
 
 print "ok $_\n" for 17..23;

@@ -424,57 +424,57 @@ END
                     # Fork off a new perl to run the tests.
                     # (This is so we can catch spurious warnings.)
                     $^OUTPUT_AUTOFLUSH = 1; print ""; $^OUTPUT_AUTOFLUSH = 0; # flush output before forking
-                    pipe READ, 'WRITE' or die "Can't make pipe: $^OS_ERROR";
-                    pipe READ2, 'WRITE2' or die "Can't make second pipe: $^OS_ERROR";
-                    die "Can't fork: $^OS_ERROR" unless defined($pid = open PERL, "|-", '-');
+                    pipe my $read, my $write or die "Can't make pipe: $^OS_ERROR";
+                    pipe my $read2, my $write2 or die "Can't make second pipe: $^OS_ERROR";
+                    die "Can't fork: $^OS_ERROR" unless defined($pid = open my $perl_fh, "|-", '-');
                     unless ($pid) {
                         # Child process here. We're going to send errors back
                         # through the extra pipe.
-                        close READ;
-                        close READ2;
-                        open STDOUT, ">&", \*WRITE  or die "Can't redirect STDOUT: $^OS_ERROR";
-                        open STDERR, ">&", \*WRITE2 or die "Can't redirect STDERR: $^OS_ERROR";
+                        close $read;
+                        close $read2;
+                        open \*STDOUT, ">&", \*$write  or die "Can't redirect STDOUT: $^OS_ERROR";
+                        open \*STDERR, ">&", \*$write2 or die "Can't redirect STDERR: $^OS_ERROR";
                         exec which_perl(), '-w', '-MTestInit', '-'
                           or die "Can't exec perl: $^OS_ERROR";
                     } else {
                         # Parent process here.
-                        close WRITE;
-                        close WRITE2;
-                        print PERL $code;
-                        close PERL;
+                        close $write;
+                        close $write2;
+                        print $perl_fh $code;
+                        close $perl_fh;
                         do { local $^INPUT_RECORD_SEPARATOR;
-                             $output = join '', @( ~< *READ);
-                             $errors = join '', @( ~< *READ2); };
-                        close READ;
-                        close READ2;
+                             $output = join '', @( ~< $read);
+                             $errors = join '', @( ~< $read2); };
+                        close $read;
+                        close $read2;
                     }
                 } else {
                     # No fork().  Do it the hard way.
                     my $cmdfile = "tcmd$^PID";  $cmdfile++ while -e $cmdfile;
                     my $errfile = "terr$^PID";  $errfile++ while -e $errfile;
                     my @tmpfiles = @($cmdfile, $errfile);
-                    open CMD, ">", "$cmdfile"; print CMD $code; close CMD;
+                    open my $cmd_fh, ">", "$cmdfile"; print $cmd_fh $code; close $cmd_fh;
                     my $cmd = which_perl();
                     $cmd .= " -w $cmdfile 2>$errfile";
                     if ($^OS_NAME eq 'VMS' or $^OS_NAME eq 'MSWin32' or $^OS_NAME eq 'NetWare') {
                         # Use pipe instead of system so we don't inherit STD* from
                         # this process, and then foul our pipe back to parent by
                         # redirecting output in the child.
-                        open PERL, "-", "$cmd" or die "Can't open pipe: $^OS_ERROR\n";
-                        do { local $^INPUT_RECORD_SEPARATOR; $output = join '', @( ~< *PERL) };
-                        close PERL;
+                        open my $perl_fh, "-", "$cmd" or die "Can't open pipe: $^OS_ERROR\n";
+                        do { local $^INPUT_RECORD_SEPARATOR; $output = join '', @( ~< $perl_fh) };
+                        close $perl_fh;
                     } else {
                         my $outfile = "tout$^PID";  $outfile++ while -e $outfile;
                         push @tmpfiles, $outfile;
                         system "$cmd >$outfile";
-                        do { local $^INPUT_RECORD_SEPARATOR; open IN, "<", $outfile; $output = ~< *IN; close IN };
+                        do { local $^INPUT_RECORD_SEPARATOR; open my $in_fh, "<", $outfile; $output = ~< $in_fh; close $in_fh };
                     }
                     if ($^CHILD_ERROR) {
                         printf "not ok: exited with error code \%04X\n", $^CHILD_ERROR;
                         $debugging or do { 1 while unlink < @tmpfiles };
                         exit;
                     }
-                    do { local $^INPUT_RECORD_SEPARATOR; open IN, "<", $errfile; $errors = ~< *IN; close IN };
+                    do { local $^INPUT_RECORD_SEPARATOR; open my $in_fh, "<", $errfile; $errors = ~< $in_fh; close $in_fh };
                     1 while unlink < @tmpfiles;
                 }
                 print $output;
@@ -638,8 +638,8 @@ do {
     # and its children
 
     my $progfile = "b23265.pl";
-    open(T, ">", "$progfile") or die "$^PROGRAM_NAME: $^OS_ERROR\n";
-    print T << '__EOF__';
+    open(my $t, ">", "$progfile") or die "$^PROGRAM_NAME: $^OS_ERROR\n";
+    print { $t } << '__EOF__';
         print
             sub {@_[0]->(<@_)} -> (
                 sub {
@@ -652,7 +652,7 @@ do {
             , "\n"
         ;
 __EOF__
-    close T;
+    close $t;
     my $got = runperl(progfile => $progfile);
     test { chomp $got; $got eq "yxx" };
     END { 1 while unlink $progfile }

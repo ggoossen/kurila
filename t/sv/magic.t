@@ -42,9 +42,9 @@ else              { ok `echo \$FOO` eq "hi there\n"; }
 
 unlink 'ajslkdfpqjsjfk';
 $^OS_ERROR = 0;
-open(FOO, "<",'ajslkdfpqjsjfk');
+open(my $foo, "<",'ajslkdfpqjsjfk');
 ok $^OS_ERROR, $^OS_ERROR;
-close FOO; # just mention it, squelch used-only-once
+close $foo; # just mention it, squelch used-only-once
 
 # regex vars
 
@@ -136,13 +136,13 @@ EOX
 EOH
     }
     my $s1 = "\$^EXECUTABLE_NAME is $perl, \$^PROGRAM_NAME is $script\n";
-    ok open(SCRIPT, ">", "$script"), '$!';
-    ok print(SCRIPT $headmaybe . <<EOB . $middlemaybe . <<'EOF' . $tailmaybe), '$!';
+    ok open(my $script_fh, ">", "$script"), '$!';
+    ok print($script_fh $headmaybe . <<EOB . $middlemaybe . <<'EOF' . $tailmaybe), '$!';
 #!$wd/perl
 EOB
 print "\$^EXECUTABLE_NAME is $^EXECUTABLE_NAME, \$^PROGRAM_NAME is $^PROGRAM_NAME\n";
 EOF
-    ok close(SCRIPT), '$!';
+    ok close($script_fh), '$!';
     ok chmod(0755, $script), '$!';
     $_ = ($Is_MacOS || $Is_VMS) ?? `$perl $script` !! `$script`;
     s/\.exe//i if $Is_Dos or $Is_Cygwin or $Is_os2;
@@ -197,11 +197,11 @@ else {
        ok ($Is_MSWin32 ?? (`set __NoNeSuCh` =~ m/^(?:__NoNeSuCh=)?foo$/)
 			    !! (`echo \$__NoNeSuCh` eq "foo\n") );
 	if ($^OS_NAME =~ m/^(linux|freebsd)$/ &&
-	    open CMDLINE, '<', "/proc/$^PID/cmdline") {
-	    chomp(my $line = scalar ~< *CMDLINE);
+	    open my $cmdline, '<', "/proc/$^PID/cmdline") {
+	    chomp(my $line = scalar ~< $cmdline);
 	    my $me = (split m/\0/, $line)[0];
 	    ok($me eq $^PROGRAM_NAME, 'altering $0 is effective (testing with /proc/)');
-	    close CMDLINE;
+	    close $cmdline;
             # perlbug #22811
             my $mydollarzero = sub {
               my@($arg) =@( shift);
