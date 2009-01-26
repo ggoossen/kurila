@@ -276,9 +276,6 @@ B_unitcheck_av()
 B::AV
 B_end_av()
 
-B::GV
-B_inc_gv()
-
 B::CV
 B_main_cv()
 
