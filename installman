@@ -104,8 +104,8 @@ pod2man('lib', %opts{man3dir}, %opts{man3ext});
 
 # Install the pods embedded in the installed scripts
 my $has_man1dir = %opts{man1dir} ne '' && -d %opts{man1dir};
-open UTILS, "<", "utils.lst" or die "Can't open 'utils.lst': $^OS_ERROR";
-while (~< *UTILS) {
+open my $utilsfh, "<", "utils.lst" or die "Can't open 'utils.lst': $^OS_ERROR";
+while (~< *$utilsfh) {
     next if m/^#/;
     chomp;
     $_ = $1 if m/#.*pod\s*=\s*(\S+)/;
@@ -175,15 +175,15 @@ sub pod2man {
 
 	# Skip files without pod docs
 	my $has_pod;
-	if (open T, "<", $mod)
+	if (open my $t, "<", $mod)
 	{
 	    local $_;
-	    while (~< *T)
+	    while (~< *$t)
 	    {
 		++$has_pod and last if m/^=(?:head\d+|item|pod)\b/;
 	    }
 
-	    close T;
+	    close $t;
 	}
 
 	unless ($has_pod)
