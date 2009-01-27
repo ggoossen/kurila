@@ -133,8 +133,8 @@ EOT
 
 $versiononly = 1 if config_value("versiononly") && !defined $versiononly;
 my (@scripts, @tolink);
-open SCRIPTS, "<", "utils.lst" or die "Can't open utils.lst: $^OS_ERROR";
-while (~< *SCRIPTS) {
+open my $scriptfh, "<", "utils.lst" or die "Can't open utils.lst: $^OS_ERROR";
+while (~< *$scriptfh) {
     next if m/^#/;
     s/\s*#\s*pod\s*=.*//; # install script regardless of pod location
     next if m/a2p/; # a2p is binary, to be installed separately
@@ -146,7 +146,7 @@ while (~< *SCRIPTS) {
 	push @scripts, $_;
     }
 }
-close SCRIPTS;
+close $scriptfh;
 
 if ($scr_ext) { @scripts = map { "$_$scr_ext" } @scripts; }
 
@@ -558,9 +558,9 @@ if ( !$versiononly || ($installprivlib =~ m/\Q$vershort/)) {
     mkpath("$($installprivlib)/$pod", $verbose, 0777);
 
     # If Perl 5.003's perldiag.pod is there, rename it.
-    if (open POD, "<", "$($installprivlib)/$pod/perldiag.pod") {
-	read POD, $_, 4000;
-	close POD;
+    if (open my $podfh, "<", "$($installprivlib)/$pod/perldiag.pod") {
+	read $podfh, $_, 4000;
+	close $podfh;
 	# Some of Perl 5.003's diagnostic messages ended with periods.
 	if (m/^=.*\.$/m) {
 	    my @($from, $to) = @("$($installprivlib)/$pod/perldiag.pod",
