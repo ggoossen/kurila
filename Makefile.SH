@@ -1117,7 +1117,7 @@ _cleaner2:
 	rm -rf $(unidatafiles) $(unidatadirs)
 	rm -rf lib/auto
 	rm -f lib/.exists lib/*/.exists lib/*/*/.exists
-	rm -f h2ph.man pstruct
+	rm -f pstruct
 	rm -rf .config
 	rm -f preload lib/re.pm
 	rm -rf lib/Encode lib/Compress lib/Hash lib/re

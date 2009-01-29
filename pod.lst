@@ -226,7 +226,6 @@ aoh Auxiliary Documentation
 
 ao a2p
 ao dprofpp
-ao h2ph
 ao h2xs
 ao perlbug
 ao perldoc
