@@ -12,7 +12,7 @@ FIXIN = "-I../lib" "-MExtUtils::MY" -e "MY->fixin(shift @ARGV)"
 # available.  Dependencies handled manually below (for now).
 
 plextract = perlbug perlivp
-plfixlocal = h2xs h2ph perldoc pl2pm
+plfixlocal = h2xs perldoc pl2pm
 plfix = corelist instmodsh xsubpp
 
 all: $(plextract) $(plfixlocal) $(plfix)
@@ -27,8 +27,6 @@ $(plfixlocal):
 corelist: ../lib/Module/CoreList/bin/$@ ../config.sh
 	$(CPS) ../lib/Module/CoreList/bin/$@ $@
 	$(RUN) $(PERL) $(FIXIN) $@
-
-h2ph:		h2ph.pl ../config.sh
 
 h2xs:		h2xs.pl ../config.sh
 
@@ -52,7 +50,6 @@ clean:
 
 realclean:
 	rm -rf $(plextract) $(plextractexe)
-	rm -f ../t/_h2ph_pre.ph
 
 clobber:	realclean
 
