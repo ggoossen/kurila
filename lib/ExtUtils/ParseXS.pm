@@ -1929,7 +1929,11 @@ sub WRITE {
         my $line = $1;
         ++ $self->{+line_no};
         $line =~ s|^\#line\s+---(?=\s)|#line $self->{?line_no}|;
+<<<<<<< HEAD:lib/ExtUtils/ParseXS.pm
         print $self->{?fh} ,$line;
+=======
+        print $self->{?fh}, $line;
+>>>>>>> 8c54f3f... more filehandle fixes:lib/ExtUtils/ParseXS.pm
     }
 }
 
