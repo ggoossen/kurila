@@ -665,7 +665,7 @@ PP(pp_print)
     dVAR; dSP; dMARK; dORIGMARK;
     IO *io;
     register PerlIO *fp;
-    GV * const gv = (PL_op->op_flags & OPf_STACKED) ? (GV*)*++MARK : PL_defoutgv;
+    GV * const gv = (GV*)*++MARK;
 
     if (!(io = GvIO(gv))) {
 	if (ckWARN2(WARN_UNOPENED,WARN_CLOSED))

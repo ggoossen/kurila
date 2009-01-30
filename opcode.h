@@ -1335,8 +1335,8 @@ EXT Perl_check_t PL_check[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_ck_select),	/* select */
 	MEMBER_TO_FPTR(Perl_ck_eof),	/* getc */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* read */
-	MEMBER_TO_FPTR(Perl_ck_listiob),	/* prtf */
-	MEMBER_TO_FPTR(Perl_ck_listiob),	/* print */
+	MEMBER_TO_FPTR(Perl_ck_fun),	/* prtf */
+	MEMBER_TO_FPTR(Perl_ck_fun),	/* print */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* sysopen */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* sysseek */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* sysread */
@@ -1696,8 +1696,8 @@ EXTCONST U32 PL_opargs[] = {
 	0x0001c80c,	/* select */
 	0x0001d60c,	/* getc */
 	0x122ec81d,	/* read */
-	0x0005c815,	/* prtf */
-	0x0005c815,	/* print */
+	0x0004c815,	/* prtf */
+	0x0004c815,	/* print */
 	0x1222c804,	/* sysopen */
 	0x0022c804,	/* sysseek */
 	0x122ec81d,	/* sysread */

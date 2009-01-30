@@ -9239,16 +9239,16 @@ S_checkcomma(pTHX_ const char *s, const char *name, const char *what)
 	    s++;
 	while (s < PL_bufend && isSPACE(*s))
 	    s++;
-	if (*s == ',') {
-	    GV* gv;
-	    if (keyword(w, s - w))
-		return;
+/* 	if (*s == ',') { */
+/* 	    GV* gv; */
+/* 	    if (keyword(w, s - w)) */
+/* 		return; */
 
-	    gv = gv_fetchpvn_flags(w, s - w, 0, SVt_PVCV);
-	    if (gv && GvCVu(gv))
-		return;
-	    Perl_croak(aTHX_ "No comma allowed after %s", what);
-	}
+/* 	    gv = gv_fetchpvn_flags(w, s - w, 0, SVt_PVCV); */
+/* 	    if (gv && GvCVu(gv)) */
+/* 		return; */
+/* 	    Perl_croak(aTHX_ "No comma allowed after %s", what); */
+/* 	} */
     }
 }
 

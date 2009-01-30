@@ -533,7 +533,7 @@ EOT
 	}
     }
     else {
-	my $pct = $tested_files ?? sprintf("%.2f", ($tested_files - $::bad_files) / $tested_files * 100) !! "0.00";
+	my $pct = $tested_files ?? sprintf( "%.2f", ($tested_files - $::bad_files) / $tested_files * 100) !! "0.00";
 	my $s = $::bad_files == 1 ?? "" !! "s";
 	print \*STDERR, "Failed $::bad_files test$s out of $tested_files, $pct% okay.\n";
 	for my $test (sort grep { %failed_tests{$_} } keys %failed_tests) {

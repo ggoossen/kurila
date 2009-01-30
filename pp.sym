@@ -26,7 +26,6 @@ Perl_ck_glob
 Perl_ck_grep
 Perl_ck_index
 Perl_ck_lfun
-Perl_ck_listiob
 Perl_ck_match
 Perl_ck_method
 Perl_ck_null

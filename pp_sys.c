@@ -926,7 +926,7 @@ PP(pp_prtf)
     PerlIO *fp;
     SV *sv;
 
-    GV * const gv = (PL_op->op_flags & OPf_STACKED) ? (GV*)*++MARK : PL_defoutgv;
+    GV * const gv = (GV*)*++MARK;
 
     sv = newSV(0);
     if (!(io = GvIO(gv))) {
