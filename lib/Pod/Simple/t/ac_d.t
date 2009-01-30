@@ -12,7 +12,7 @@ BEGIN { plan tests => 14 };
 
 use Pod::Simple::DumpAsXML;
 use Pod::Simple::XMLOutStream;
-print "# Pod::Simple version $Pod::Simple::VERSION\n";
+print \*STDOUT, "# Pod::Simple version $Pod::Simple::VERSION\n";
 
 $Pod::Simple::XMLOutStream::ATTR_PAD   = ' ';
 $Pod::Simple::XMLOutStream::SORT_ATTRS = 1; # for predictably testable output
@@ -26,7 +26,7 @@ my $x = 'Pod::Simple::XMLOutStream';
 
 ok 1;
 
-print "# Testing exceptions being thrown...\n";
+print \*STDOUT, "# Testing exceptions being thrown...\n";
 
 try { $x->new->accept_directive('head1') };
 if($^EVAL_ERROR) { ok 1 } # print " # Good: exception thrown: $@\n" }
@@ -83,9 +83,9 @@ ok( $x->_out(\&Pv, "\n=head1 NAME\n\nPie Consortium -- me gustan pasteles\n\n=fr
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-print "# Wrapping up... one for the road...\n";
+print \*STDOUT, "# Wrapping up... one for the road...\n";
 ok 1;
-print "# --- Done with ", __FILE__, " --- \n";
+print \*STDOUT, "# --- Done with ", __FILE__, " --- \n";
 
 
 __END__

@@ -50,7 +50,7 @@ sub source_path {
 
 }
 
-print "# Testing that $thefile parses right.\n";
+print \*STDOUT, "# Testing that $thefile parses right.\n";
 my $outstring;
 do {
   my $p = Pod::Simple::DumpAsXML->new;

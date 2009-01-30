@@ -145,7 +145,7 @@ sub concise_stashref {
 	my $s = \($h->{+$k});
 	my $coderef = *$s{CODE} or next;
 	reset_sequence();
-	print "FUNC: *", Symbol::glob_name(*$s), "\n";
+	print \*STDOUT, "FUNC: *", Symbol::glob_name(*$s), "\n";
 	my $codeobj = svref_2object($coderef);
 	next unless ref $codeobj eq 'B::CV';
 	try { concise_cv_obj($order, $codeobj, $k) };
@@ -164,15 +164,15 @@ sub concise_cv_obj {
     $curcv = $cv;
 
     if (ref($cv->XSUBANY) =~ m/B::(\w+)/) {
-	print $walkHandle "$name is a constant sub, optimized to a $1\n";
+	print $walkHandle, "$name is a constant sub, optimized to a $1\n";
 	return;
     }
     if ($cv->XSUB) {
-	print $walkHandle "$name is XS code\n";
+	print $walkHandle, "$name is XS code\n";
 	return;
     }
     if (class($cv->START) eq "NULL") {
-        print $walkHandle "coderef $name has no START\n";
+        print $walkHandle, "coderef $name has no START\n";
 	return;
     }
     sequence($cv->START);
@@ -185,10 +185,10 @@ sub concise_cv_obj {
 	unless (ref $root eq 'B::NULL') {
 	    walk_topdown($root, sub { @_[0]->concise(@_[1]) }, 0);
 	} else {
-	    print $walkHandle "B::NULL encountered doing ROOT on $cv. avoiding disaster\n";
+	    print $walkHandle, "B::NULL encountered doing ROOT on $cv. avoiding disaster\n";
 	}
     } else {
-	print $walkHandle < tree($cv->ROOT, 0);
+	print $walkHandle, < tree($cv->ROOT, 0);
     }
 }
 
@@ -201,7 +201,7 @@ sub concise_main {
 	walk_exec(main_start);
     } elsif ($order eq "tree") {
 	return if class(main_root) eq "NULL";
-	print $walkHandle < tree(main_root, 0);
+	print $walkHandle, < tree(main_root, 0);
     } elsif ($order eq "basic") {
 	return if class(main_root) eq "NULL";
 	walk_topdown(main_root,
@@ -218,7 +218,7 @@ sub concise_specials {
 	pop @cv_s; # skip the CHECK block that calls us
     }
     for my $cv ( @cv_s) {
-	print $walkHandle "$name $i:\n";
+	print $walkHandle, "$name $i:\n";
 	$i++;
 	concise_cv_obj($order, $cv, $name);
     }
@@ -336,13 +336,13 @@ sub compile {
 		if (ref $objname) {
 		    $objref = $objname;
                     $objname = dump::view($objname);
-		    print $walkHandle "B::Concise::compile($objname)\n"
+		    print $walkHandle, "B::Concise::compile($objname)\n"
 			if $banner;
 		} else {
 		    $objname = "main::" . $objname unless $objname =~ m/::/;
-		    print $walkHandle "$objname:\n";
+		    print $walkHandle, "$objname:\n";
 		    unless (exists &{*{Symbol::fetch_glob($objname)}}) {
-			print $walkHandle "err: unknown function ($objname)\n";
+			print $walkHandle, "err: unknown function ($objname)\n";
 			return;
 		    }
 		    $objref = \&{*{Symbol::fetch_glob($objname)}};
@@ -355,7 +355,7 @@ sub compile {
 	}
 
 	if (!nelems @args or $do_main or nelems @render_packs) {
-	    print $walkHandle "main program:\n" if $do_main;
+	    print $walkHandle, "main program:\n" if $do_main;
 	    concise_main($order);
 	}
 	return @args;	# something
@@ -876,10 +876,10 @@ sub B::OP::concise {
 		     "addr" => sprintf("\%#x", $$lastnext),
 		     "goto" => seq($lastnext), # simplify goto '-' removal
 	     );
-	print $walkHandle fmt_line($synth, $op, $gotofmt, $level+1);
+	print $walkHandle, fmt_line($synth, $op, $gotofmt, $level+1);
     }
     $lastnext = $op->next;
-    print $walkHandle concise_op($op, $level, $format);
+    print $walkHandle, concise_op($op, $level, $format);
 }
 
 # B::OP::terse (see Terse.pm) now just calls this
@@ -901,11 +901,11 @@ sub b_terse {
 	# insert a 'goto'
 	my $h = \%("seq" => seq($lastnext), "class" => class($lastnext),
 		 "addr" => sprintf("\%#x", $$lastnext));
-	print # $walkHandle
+	print \*STDOUT, # $walkHandle
 	    fmt_line($h, $op, %style{"terse"}->[1], $level+1);
     }
     $lastnext = $op->next;
-    print # $walkHandle 
+    print \*STDOUT, # $walkHandle 
 	concise_op($op, $level, %style{"terse"}->[0]);
 }
 

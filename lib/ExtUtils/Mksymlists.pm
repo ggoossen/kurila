@@ -64,8 +64,8 @@ sub _write_aix {
 
     open( my $exp, ">", "$data->{?FILE}.exp")
         or croak("Can't create $data->{?FILE}.exp: $^OS_ERROR\n");
-    print $exp join("\n", @(< @{$data->{?DL_VARS}}, "\n")) if (nelems @{$data->{?DL_VARS}});
-    print $exp join("\n", @(< @{$data->{?FUNCLIST}}, "\n")) if (nelems @{$data->{?FUNCLIST}});
+    print $exp, join("\n", @(< @{$data->{?DL_VARS}}, "\n")) if (nelems @{$data->{?DL_VARS}});
+    print $exp, join("\n", @(< @{$data->{?FUNCLIST}}, "\n")) if (nelems @{$data->{?FUNCLIST}});
     close $exp;
 }
 
@@ -95,18 +95,18 @@ sub _write_os2 {
 
     open(my $def, ">", "$data->{?FILE}.def")
         or croak("Can't create $data->{?FILE}.def: $^OS_ERROR\n");
-    print $def "LIBRARY '$data->{?DLBASE}' INITINSTANCE TERMINSTANCE\n";
-    print $def "DESCRIPTION '\@#$distname:$data->{?VERSION}#\@ $comment'\n";
-    print $def "CODE LOADONCALL\n";
-    print $def "DATA LOADONCALL NONSHARED MULTIPLE\n";
-    print $def "EXPORTS\n  ";
-    print $def join("\n  ", @(< @{$data->{?DL_VARS}}, "\n")) if (nelems @{$data->{?DL_VARS}});
-    print $def join("\n  ", @(< @{$data->{?FUNCLIST}}, "\n")) if (nelems @{$data->{?FUNCLIST}});
+    print $def, "LIBRARY '$data->{?DLBASE}' INITINSTANCE TERMINSTANCE\n";
+    print $def, "DESCRIPTION '\@#$distname:$data->{?VERSION}#\@ $comment'\n";
+    print $def, "CODE LOADONCALL\n";
+    print $def, "DATA LOADONCALL NONSHARED MULTIPLE\n";
+    print $def, "EXPORTS\n  ";
+    print $def, join("\n  ", @(< @{$data->{?DL_VARS}}, "\n")) if (nelems @{$data->{?DL_VARS}});
+    print $def, join("\n  ", @(< @{$data->{?FUNCLIST}}, "\n")) if (nelems @{$data->{?FUNCLIST}});
     if (%{$data->{?IMPORTS}}) {
-        print $def "IMPORTS\n";
+        print $def, "IMPORTS\n";
         my ($name, $exp);
         while (@($name, $exp)=@( each %{$data->{IMPORTS}})) {
-            print $def "  $name=$exp\n";
+            print $def, "  $name=$exp\n";
         }
     }
     close $def;
@@ -126,9 +126,9 @@ sub _write_win32 {
         or croak("Can't create $data->{?FILE}.def: $^OS_ERROR\n");
     # put library name in quotes (it could be a keyword, like 'Alias')
     if (Config::config_value('cc') !~ m/^gcc/i) {
-        print $def "LIBRARY \"$data->{?DLBASE}\"\n";
+        print $def, "LIBRARY \"$data->{?DLBASE}\"\n";
     }
-    print $def "EXPORTS\n  ";
+    print $def, "EXPORTS\n  ";
     my @syms;
     # Export public symbols both with and without underscores to
     # ensure compatibility between DLLs from different compilers
@@ -145,12 +145,12 @@ sub _write_win32 {
             push @syms, "$_", "_$_ = $_";
         }
     }
-    print $def join("\n  ", @(< @syms, "\n")) if (nelems @syms);
+    print $def, join("\n  ", @(< @syms, "\n")) if (nelems @syms);
     if (%{$data->{?IMPORTS}}) {
-        print $def "IMPORTS\n";
+        print $def, "IMPORTS\n";
         my ($name, $exp);
         while (@($name, $exp)=@( each %{$data->{IMPORTS}})) {
-            print $def "  $name=$exp\n";
+            print $def, "  $name=$exp\n";
         }
     }
     close $def;
@@ -178,20 +178,20 @@ sub _write_vms {
     # We don't do anything to preserve order, so we won't relax
     # the GSMATCH criteria for a dynamic extension
 
-    print $opt "case_sensitive=yes\n"
+    print $opt, "case_sensitive=yes\n"
         if Config::config_value("d_vms_case_sensitive_symbols");
 
     foreach my $sym ( @{$data->{FUNCLIST}}) {
         my $safe = $set->addsym($sym);
-        if ($isvax) { print $opt "UNIVERSAL=$safe\n" }
-        else        { print $opt "SYMBOL_VECTOR=($safe=PROCEDURE)\n"; }
+        if ($isvax) { print $opt, "UNIVERSAL=$safe\n" }
+        else        { print $opt, "SYMBOL_VECTOR=($safe=PROCEDURE)\n"; }
     }
 
     foreach my $sym ( @{$data->{DL_VARS}}) {
         my $safe = $set->addsym($sym);
-        print $opt "PSECT_ATTR=$($sym),PIC,OVR,RD,NOEXE,WRT,NOSHR\n";
-        if ($isvax) { print $opt "UNIVERSAL=$safe\n" }
-        else        { print $opt "SYMBOL_VECTOR=($safe=DATA)\n"; }
+        print $opt, "PSECT_ATTR=$($sym),PIC,OVR,RD,NOEXE,WRT,NOSHR\n";
+        if ($isvax) { print $opt, "UNIVERSAL=$safe\n" }
+        else        { print $opt, "SYMBOL_VECTOR=($safe=DATA)\n"; }
     }
     
     close $opt;

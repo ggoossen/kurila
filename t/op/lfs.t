@@ -7,7 +7,7 @@ use Config;
 BEGIN {
 	# Don't bother if there are no quad offsets.
 	if (config_value('lseeksize') +< 8) {
-		print "1..0 # Skip: no 64-bit file offsets\n";
+		print \*STDOUT, "1..0 # Skip: no 64-bit file offsets\n";
 		exit(0);
 	}
 }
@@ -32,7 +32,7 @@ my $explained;
 
 sub explain {
     unless ($explained++) {
-	print <<EOM;
+	print \*STDOUT, <<EOM;
 #
 # If the lfs (large file support: large meaning larger than two
 # gigabytes) tests are skipped or fail, it may mean either that your
@@ -49,23 +49,23 @@ sub explain {
 #
 EOM
     }
-    print "1..0 # Skip: $(join ' ',@_)\n" if (nelems @_);
+    print \*STDOUT, "1..0 # Skip: $(join ' ',@_)\n" if (nelems @_);
 }
 
 $^OUTPUT_AUTOFLUSH = 1;
 
-print "# checking whether we have sparse files...\n";
+print \*STDOUT, "# checking whether we have sparse files...\n";
 
 # Known have-nots.
 if ($^OS_NAME eq 'MSWin32' || $^OS_NAME eq 'NetWare' || $^OS_NAME eq 'VMS') {
-    print "1..0 # Skip: no sparse files in $^OS_NAME\n";
+    print \*STDOUT, "1..0 # Skip: no sparse files in $^OS_NAME\n";
     bye();
 }
 
 # Known haves that have problems running this test
 # (for example because they do not support sparse files, like UNICOS)
 if ($^OS_NAME eq 'unicos') {
-    print "1..0 # Skip: no sparse files in $^OS_NAME, unable to test large files\n";
+    print \*STDOUT, "1..0 # Skip: no sparse files in $^OS_NAME, unable to test large files\n";
     bye();
 }
 
@@ -86,14 +86,14 @@ binmode($big) or
     do { warn "binmode big1 failed: $^OS_ERROR\n"; bye };
 seek($big, 1_000_000, $SEEK_SET) or
     do { warn "seek big1 failed: $^OS_ERROR\n"; bye };
-print $big "big" or
+print $big, "big" or
     do { warn "print big1 failed: $^OS_ERROR\n"; bye };
 close($big) or
     do { warn "close big1 failed: $^OS_ERROR\n"; bye };
 
 my @s1 = @( stat("big1") );
 
-print "# s1 = $(join ' ',@s1)\n";
+print \*STDOUT, "# s1 = $(join ' ',@s1)\n";
 
 open($big, ">", "big2") or
     do { warn "open big2 failed: $^OS_ERROR\n"; bye };
@@ -101,24 +101,24 @@ binmode($big) or
     do { warn "binmode big2 failed: $^OS_ERROR\n"; bye };
 seek($big, 2_000_000, $SEEK_SET) or
     do { warn "seek big2 failed; $^OS_ERROR\n"; bye };
-print $big "big" or
+print $big, "big" or
     do { warn "print big2 failed; $^OS_ERROR\n"; bye };
 close($big) or
     do { warn "close big2 failed; $^OS_ERROR\n"; bye };
 
 my @s2 = @( stat("big2") );
 
-print "# s2 = $(join ' ',@s2)\n";
+print \*STDOUT, "# s2 = $(join ' ',@s2)\n";
 
 zap();
 
 unless (@s1[7] == 1_000_003 && @s2[7] == 2_000_003 &&
 	@s1[11] == @s2[11] && @s1[12] == @s2[12]) {
-	print "1..0 # Skip: no sparse files?\n";
+	print \*STDOUT, "1..0 # Skip: no sparse files?\n";
 	bye;
 }
 
-print "# we seem to have sparse files...\n";
+print \*STDOUT, "# we seem to have sparse files...\n";
 
 # By now we better be sure that we do have sparse files:
 # if we are not, the following will hog 5 gigabytes of disk.  Ooops.
@@ -143,10 +143,10 @@ if ($r or not seek($big, 5_000_000_000, $SEEK_SET)) {
 
 # Either the print or (more likely, thanks to buffering) the close will
 # fail if there are are filesize limitations (process or fs).
-my $print = print $big "big";
-print "# print failed: $^OS_ERROR\n" unless $print;
+my $print = print $big, "big";
+print \*STDOUT, "# print failed: $^OS_ERROR\n" unless $print;
 my $close = close $big;
-print "# close failed: $^OS_ERROR\n" unless $close;
+print \*STDOUT, "# close failed: $^OS_ERROR\n" unless $close;
 unless ($print && $close) {
     if ($^OS_ERROR =~m/too large/i) {
 	explain("writing past 2GB failed: process limits?");
@@ -160,7 +160,7 @@ unless ($print && $close) {
 
 @s = @( stat("big") );
 
-print "# $(join ' ',@s)\n";
+print \*STDOUT, "# $(join ' ',@s)\n";
 
 unless (@s[7] == 5_000_000_003) {
     explain("kernel/fs not configured to use large files?");
@@ -168,7 +168,7 @@ unless (@s[7] == 5_000_000_003) {
 }
 
 sub fail () {
-    print "not ";
+    print \*STDOUT, "not ";
     $fail++;
 }
 
@@ -176,15 +176,15 @@ sub offset ($$) {
     my @($offset_will_be, $offset_want) =  @_;
     my $offset_is = eval $offset_will_be;
     unless ($offset_is == $offset_want) {
-        print "# bad offset $offset_is, want $offset_want\n";
+        print \*STDOUT, "# bad offset $offset_is, want $offset_want\n";
 	my @($offset_func) = @($offset_will_be =~ m/^(\w+)/);
 	if (unpack("L", pack("L", $offset_want)) == $offset_is) {
-	    print "# 32-bit wraparound suspected in $offset_func() since\n";
-	    print "# $offset_want cast into 32 bits equals $offset_is.\n";
+	    print \*STDOUT, "# 32-bit wraparound suspected in $offset_func() since\n";
+	    print \*STDOUT, "# $offset_want cast into 32 bits equals $offset_is.\n";
 	} elsif ($offset_want - unpack("L", pack("L", $offset_want)) - 1
 	         == $offset_is) {
-	    print "# 32-bit wraparound suspected in $offset_func() since\n";
-	    printf "# \%s - unpack('L', pack('L', \%s)) - 1 equals \%s.\n",
+	    print \*STDOUT, "# 32-bit wraparound suspected in $offset_func() since\n";
+	    printf \*STDOUT, "# \%s - unpack('L', pack('L', \%s)) - 1 equals \%s.\n",
 	        $offset_want,
 	        $offset_want,
 	        $offset_is;
@@ -193,73 +193,73 @@ sub offset ($$) {
     }
 }
 
-print "1..17\n";
+print \*STDOUT, "1..17\n";
 
 $fail = 0;
 
 fail unless @s[7] == 5_000_000_003;	# exercizes pp_stat
-print "ok 1\n";
+print \*STDOUT, "ok 1\n";
 
 fail unless -s "big" == 5_000_000_003;	# exercizes pp_ftsize
-print "ok 2\n";
+print \*STDOUT, "ok 2\n";
 
 fail unless -e "big";
-print "ok 3\n";
+print \*STDOUT, "ok 3\n";
 
 fail unless -f "big";
-print "ok 4\n";
+print \*STDOUT, "ok 4\n";
 
 open($big, "<", "big") or do { warn "open failed: $^OS_ERROR\n"; bye };
 binmode $big;
 
 fail unless seek($big, 4_500_000_000, $SEEK_SET);
-print "ok 5\n";
+print \*STDOUT, "ok 5\n";
 
 offset('tell($big)', 4_500_000_000);
-print "ok 6\n";
+print \*STDOUT, "ok 6\n";
 
 fail unless seek($big, 1, $SEEK_CUR);
-print "ok 7\n";
+print \*STDOUT, "ok 7\n";
 
 # If you get 205_032_705 from here it means that
 # your tell() is returning 32-bit values since (I32)4_500_000_001
 # is exactly 205_032_705.
 offset('tell($big)', 4_500_000_001);
-print "ok 8\n";
+print \*STDOUT, "ok 8\n";
 
 fail unless seek($big, -1, $SEEK_CUR);
-print "ok 9\n";
+print \*STDOUT, "ok 9\n";
 
 offset('tell($big)', 4_500_000_000);
-print "ok 10\n";
+print \*STDOUT, "ok 10\n";
 
 fail unless seek($big, -3, $SEEK_END);
-print "ok 11\n";
+print \*STDOUT, "ok 11\n";
 
 offset('tell($big)', 5_000_000_000);
-print "ok 12\n";
+print \*STDOUT, "ok 12\n";
 
 my $big;
 
 fail unless read($big, $big, 3) == 3;
-print "ok 13\n";
+print \*STDOUT, "ok 13\n";
 
 fail unless $big eq "big";
-print "ok 14\n";
+print \*STDOUT, "ok 14\n";
 
 # 705_032_704 = (I32)5_000_000_000
 # See that we don't have "big" in the 705_... spot:
 # that would mean that we have a wraparound.
 fail unless seek($big, 705_032_704, $SEEK_SET);
-print "ok 15\n";
+print \*STDOUT, "ok 15\n";
 
 my $zero;
 
 fail unless read($big, $zero, 3) == 3;
-print "ok 16\n";
+print \*STDOUT, "ok 16\n";
 
 fail unless $zero eq "\0\0\0";
-print "ok 17\n";
+print \*STDOUT, "ok 17\n";
 
 explain() if $fail;
 

@@ -6,14 +6,14 @@ use Config;
 
 BEGIN {
     unless (config_value('d_fork') or config_value('d_pseudofork')) {
-	print "1..0 # Skip: no fork\n";
+	print \*STDOUT, "1..0 # Skip: no fork\n";
 	exit 0;
     }
     env::set_var('PERL5LIB' => "../lib");
 }
 
 if ($^OS_NAME eq 'mpeix') {
-    print "1..0 # Skip: fork/status problems on MPE/iX\n";
+    print \*STDOUT, "1..0 # Skip: fork/status problems on MPE/iX\n";
     exit 0;
 }
 
@@ -23,7 +23,7 @@ our (@prgs, $tmpfile, $CAT, $status, $i);
 
 $^INPUT_RECORD_SEPARATOR = undef;
 @prgs = split "\n########\n", ~< *DATA;
-print "1..", scalar nelems @prgs, "\n";
+print \*STDOUT, "1..", scalar nelems @prgs, "\n";
 
 $tmpfile = "forktmp000";
 1 while -f ++$tmpfile;
@@ -46,7 +46,7 @@ for ( @prgs){
     # results can be in any order, so sort 'em
     my @expected = sort split m/\n/, $expected;
     open $test_fh, ">", "$tmpfile" or die "Cannot open $tmpfile: $^OS_ERROR";
-    print $test_fh $prog, "\n";
+    print $test_fh, $prog, "\n";
     close $test_fh or die "Cannot close $tmpfile: $^OS_ERROR";
     my $results;
     if ($^OS_NAME eq 'MSWin32') {
@@ -69,12 +69,12 @@ for ( @prgs){
 	if $^OS_NAME eq 'os2';
     my @results = sort split m/\n/, $results;
     if ( "$(join ' ',@results)" ne "$(join ' ',@expected)" ) {
-	print STDERR "PROG: $switch\n$prog\n";
-	print STDERR "EXPECTED:\n$expected\n";
-	print STDERR "GOT:\n$results\n";
-	print "not ";
+	print \*STDERR, "PROG: $switch\n$prog\n";
+	print \*STDERR, "EXPECTED:\n$expected\n";
+	print \*STDERR, "GOT:\n$results\n";
+	print \*STDOUT, "not ";
     }
-    print "ok ", ++$i, "\n";
+    print \*STDOUT, "ok ", ++$i, "\n";
 }
 
 __END__

@@ -303,7 +303,7 @@ sub _parse_version {
 
     if( $str =~ m/(?<!\\)([\$*])(([\w\:\']*)\bVERSION)\b.*\=/ ) {
         
-        print "Evaluating: $str\n" if $verbose;
+        print \*STDOUT, "Evaluating: $str\n" if $verbose;
         
         ### this creates a string to be eval'd, like:
         # package Module::Load::Conditional::_version;
@@ -323,7 +323,7 @@ sub _parse_version {
             \}; \$$2
         };
         
-        print "Evaltext: $eval\n" if $verbose;
+        print \*STDOUT, "Evaltext: $eval\n" if $verbose;
         
         my $result = do {
             local $^WARNING = 0;
@@ -333,7 +333,7 @@ sub _parse_version {
         
         my $rv = defined $result ?? $result !! '0.0';
 
-        print( $^EVAL_ERROR ?? "Error: $^EVAL_ERROR\n" !! "Result: $rv\n" ) if $verbose;
+        print(\*STDOUT,  $^EVAL_ERROR ?? "Error: $^EVAL_ERROR\n" !! "Result: $rv\n" ) if $verbose;
 
         return version->new($rv);
     }

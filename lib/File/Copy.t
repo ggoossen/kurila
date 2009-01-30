@@ -36,7 +36,7 @@ for my $cross_partition_test (0..1) {
   # First we create a file
   open(my $f, ">", "file-$^PID") or die;
   binmode $f; # for DOSISH platforms, because test 3 copies to stdout
-  printf $f "ok\n";
+  printf $f, "ok\n";
   close $f;
 
   copy "file-$^PID", "copy-$^PID";
@@ -49,7 +49,7 @@ for my $cross_partition_test (0..1) {
 
   is $foo, "ok\n", 'copy(fn, fn): same contents';
 
-  print("# next test checks copying to STDOUT\n");
+  print(\*STDOUT, "# next test checks copying to STDOUT\n");
   binmode \*STDOUT unless $^OS_NAME eq 'VMS'; # Copy::copy works in binary mode
   # This outputs "ok" so its a test.
   copy "copy-$^PID", \*STDOUT;
@@ -146,7 +146,7 @@ for my $cross_partition_test (0..1) {
     skip "Testing symlinks", 3 unless config_value("d_symlink");
 
     open($f, ">", "file-$^PID") or die $^OS_ERROR;
-    print $f "dummy content\n";
+    print $f, "dummy content\n";
     close $f;
     symlink("file-$^PID", "symlink-$^PID") or die $^OS_ERROR;
 
@@ -167,7 +167,7 @@ for my $cross_partition_test (0..1) {
          if !config_value("d_link") or $^OS_NAME eq 'MSWin32' or $^OS_NAME eq 'cygwin';
 
     open($f, ">", "file-$^PID") or die $^OS_ERROR;
-    print $f "dummy content\n";
+    print $f, "dummy content\n";
     close $f;
     link("file-$^PID", "hardlink-$^PID") or die $^OS_ERROR;
 

@@ -55,13 +55,13 @@ push(@files, $tempfile);
 # TEMPDIR test
 # Create temp directory in current dir
 my $template = 'tmpdirXXXXXX';
-print "# Template: $template\n";
+print \*STDOUT, "# Template: $template\n";
 my $tempdir = tempdir( $template ,
 		       DIR => File::Spec->curdir,
 		       CLEANUP => 1,
 		     );
 
-print "# TEMPDIR: $tempdir\n";
+print \*STDOUT, "# TEMPDIR: $tempdir\n";
 
 ok( (-d $tempdir) );
 push(@dirs, $tempdir);
@@ -73,7 +73,7 @@ push(@dirs, $tempdir);
 			    SUFFIX => '.dat',
 			   );
 
-print "# TEMPFILE: Created $tempfile\n";
+print \*STDOUT, "# TEMPFILE: Created $tempfile\n";
 
 ok( (-f $tempfile));
 push(@files, $tempfile);
@@ -98,7 +98,7 @@ chmod 0444, $tempfile;
 ok( (-f $tempfile ));
 push(@files, $tempfile);
 
-print "# TEMPFILE: Created $tempfile\n";
+print \*STDOUT, "# TEMPFILE: Created $tempfile\n";
 
 # and another (with template)
 
@@ -108,7 +108,7 @@ print "# TEMPFILE: Created $tempfile\n";
 			    SUFFIX => '.dat',
 			   );
 
-print "# TEMPFILE: Created $tempfile\n";
+print \*STDOUT, "# TEMPFILE: Created $tempfile\n";
 
 ok( (-f $tempfile) );
 push(@files, $tempfile);
@@ -117,7 +117,7 @@ push(@files, $tempfile);
 # Create a temporary file that should stay around after
 # it has been closed
 @($fh, $tempfile) =  tempfile( 'permXXXXXXX', UNLINK => 0 );
-print "# TEMPFILE: Created $tempfile\n";
+print \*STDOUT, "# TEMPFILE: Created $tempfile\n";
 ok( -f $tempfile );
 ok( close( $fh ) );
 push( @still_there, $tempfile); # check at END
@@ -135,7 +135,7 @@ $fh = try { tempfile( 'ftmpXXXXX', DIR => < File::Spec->tmpdir ) };
 if ($fh) {
 
   # print something to it to make sure something is there
-  ok( print $fh "Test\n" );
+  ok( print $fh, "Test\n" );
 
   # Close it - can not check it is gone since we dont know the name
   ok( close($fh) );
@@ -146,5 +146,5 @@ if ($fh) {
 }
 
 # Now END block will execute to test the removal of directories
-print "# End of tests. Execute END blocks\n";
+print \*STDOUT, "# End of tests. Execute END blocks\n";
 

@@ -25,7 +25,7 @@ chomp ($bad_chmod = $^EVAL_ERROR);
 $oldeuid = $^EUID;		# root can read and write anything
 eval '$^EUID = 1';		# so switch uid (may not be implemented)
 
-print "# oldeuid = $oldeuid, euid = $^EUID\n";
+print \*STDOUT, "# oldeuid = $oldeuid, euid = $^EUID\n";
 
 SKIP: do {
     if (!config_value("d_seteuid")) {

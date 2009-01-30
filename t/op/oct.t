@@ -2,7 +2,7 @@
 
 # tests 51 onwards aren't all warnings clean. (intentionally)
 
-print "1..71\n";
+print \*STDOUT, "1..71\n";
 
 my $test = 1;
 
@@ -22,7 +22,7 @@ sub test ($$$) {
     } else {
       $string = "\"$string\"";
     }
-    print "ok $test # $act $string\n";
+    print \*STDOUT, "ok $test # $act $string\n";
   } else {
     my ($valstr, $resstr);
     if ($act eq 'hex' or $string =~ m/x/) {
@@ -35,7 +35,7 @@ sub test ($$$) {
       $valstr = sprintf "0\%o", $value;
       $resstr = sprintf "0\%o", $result;
     }
-    print "not ok $test # $act \"$string\" gives \"$result\" ($resstr), not $value ($valstr)\n";
+    print \*STDOUT, "not ok $test # $act \"$string\" gives \"$result\" ($resstr), not $value ($valstr)\n";
   }
   $test++;
 }
@@ -86,29 +86,29 @@ test ('oct', '0xffff_ffff', 4294967295);
 test ('hex', '0xff_ff_ff_ff', 4294967295);
 
 $_ = "\0_7_7";
-print length eq 5                      ?? "ok" !! "not ok", " 37\n";
-print $_ eq "\0"."_"."7"."_"."7"       ?? "ok" !! "not ok", " 38\n";
+print \*STDOUT, length eq 5                      ?? "ok" !! "not ok", " 37\n";
+print \*STDOUT, $_ eq "\0"."_"."7"."_"."7"       ?? "ok" !! "not ok", " 38\n";
 chop, chop, chop, chop;
-print $_ eq "\0"                       ?? "ok" !! "not ok", " 39\n";
+print \*STDOUT, $_ eq "\0"                       ?? "ok" !! "not ok", " 39\n";
 if (ord("\t") != 9) {
     # question mark is 111 in 1047, 037, && POSIX-BC
-    print "\157_" eq "?_"                  ?? "ok" !! "not ok", " 40\n";
+    print \*STDOUT, "\157_" eq "?_"                  ?? "ok" !! "not ok", " 40\n";
 }
 else {
-    print "\077_" eq "?_"                  ?? "ok" !! "not ok", " 40\n";
+    print \*STDOUT, "\077_" eq "?_"                  ?? "ok" !! "not ok", " 40\n";
 }
 
 $_ = "\x[00]_7_7";
-print length eq 5                      ?? "ok" !! "not ok", " 41\n";
-print $_ eq "\0"."_"."7"."_"."7"       ?? "ok" !! "not ok", " 42\n";
+print \*STDOUT, length eq 5                      ?? "ok" !! "not ok", " 41\n";
+print \*STDOUT, $_ eq "\0"."_"."7"."_"."7"       ?? "ok" !! "not ok", " 42\n";
 chop, chop, chop, chop;
-print $_ eq "\0"                       ?? "ok" !! "not ok", " 43\n";
+print \*STDOUT, $_ eq "\0"                       ?? "ok" !! "not ok", " 43\n";
 if (ord("\t") != 9) {
     # / is 97 in 1047, 037, && POSIX-BC
-    print "\x[61]_" eq "/_"                  ?? "ok" !! "not ok", " 44\n";
+    print \*STDOUT, "\x[61]_" eq "/_"                  ?? "ok" !! "not ok", " 44\n";
 }
 else {
-    print "\x[2F]_" eq "/_"                  ?? "ok" !! "not ok", " 44\n";
+    print \*STDOUT, "\x[2F]_" eq "/_"                  ?? "ok" !! "not ok", " 44\n";
 }
 
 $test = 45;

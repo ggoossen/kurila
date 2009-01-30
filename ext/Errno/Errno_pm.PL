@@ -25,7 +25,7 @@ if (config_value("gccversion") ne '' && $^OS_NAME eq 'MSWin32') {
     foreach my $file ( @files) {
 	next if $file eq 'errno.c';
 	next unless -f $file;
-	print $incs qq[#include "$file"\n];
+	print $incs, qq[#include "$file"\n];
     }
     close $incs;
     process_file('includes.c');
@@ -170,12 +170,12 @@ sub get_files {
 	    die "Cannot open errno.c";
 
 	if ($^OS_NAME eq 'NetWare') {
-	    print $cppi "#include <nwerrno.h>\n";
+	    print $cppi, "#include <nwerrno.h>\n";
 	} else {
-	    print $cppi "#include <errno.h>\n";
+	    print $cppi, "#include <errno.h>\n";
 	    if ($IsMSWin32) {
-		print $cppi "#define _WINSOCKAPI_\n"; # don't drag in everything
-		print $cppi "#include <winsock.h>\n";
+		print $cppi, "#define _WINSOCKAPI_\n"; # don't drag in everything
+		print $cppi, "#include <winsock.h>\n";
 	    }
 	}
 
@@ -228,23 +228,23 @@ sub write_errno_pm {
 	die "Cannot open errno.c";
 
     if ($^OS_NAME eq 'NetWare') {
-	print $cppi "#include <nwerrno.h>\n";
+	print $cppi, "#include <nwerrno.h>\n";
 	} 
     else {
-	print $cppi "#include <errno.h>\n";
+	print $cppi, "#include <errno.h>\n";
     }
     if ($IsMSWin32) {
-	print $cppi "#include <winsock.h>\n";
+	print $cppi, "#include <winsock.h>\n";
 	foreach my $err (keys %wsa) {
-	    print $cppi "#ifndef $err\n";
-	    print $cppi "#define $err WSA$err\n";
-	    print $cppi "#endif\n";
+	    print $cppi, "#ifndef $err\n";
+	    print $cppi, "#define $err WSA$err\n";
+	    print $cppi, "#endif\n";
 	    %err{+$err} = 1;
 	}
     }
  
     foreach my $err (keys %err) {
-	print $cppi '"',$err,'" [[',$err,']]',"\n";
+	print $cppi, '"',$err,'" [[',$err,']]',"\n";
     }
 
     close($cppi);
@@ -301,15 +301,15 @@ sub write_errno_pm {
     if ($^OS_NAME eq 'beos') {
 	if (open(my $c, ">", "errno.c")) {
 	    my @allerrs = keys %err;
-	    print {$c} <<EOF;
+	    print $c ,<<EOF;
 #include <errno.h>
 #include <stdio.h>
 int main() \{
 EOF
             for ( @allerrs) {
-		print {$c} qq[printf("$_ \%d\n", $_);]
+		print $c ,qq[printf("$_ \%d\n", $_);]
 	    }
-            print {$c} "\}\n";
+            print $c ,"\}\n";
             close $c;
             system("cc -o errno errno.c");
             unlink("errno.c");
@@ -329,7 +329,7 @@ EOF
 
     # Write Errno.pm
 
-    print <<"EDQ";
+    print \*STDOUT, <<"EDQ";
 #
 # This file is auto-generated. ***ANY*** changes here will be lost
 #
@@ -355,9 +355,9 @@ EDQ
 
     my $j = "\@EXPORT_OK = qw(" . join(" ",keys %err) . ");\n";
     $j =~ s/(.{50,70})\s/$1\n\t/g;
-    print $j,"\n";
+    print \*STDOUT, $j,"\n";
 
-print <<'ESQ';
+print \*STDOUT, <<'ESQ';
 %EXPORT_TAGS = %(
     POSIX => \qw(
 ESQ
@@ -378,25 +378,25 @@ ESQ
 	EUSERS EWOULDBLOCK EXDEV));
 
     $k =~ s/(.{50,70})\s/$1\n\t/g;
-    print "\t",$k,"\n    )\n);\n\n";
+    print \*STDOUT, "\t",$k,"\n    )\n);\n\n";
 
     foreach my $err ( @err) {
-	printf "sub \%s () \{ \%d \}\n",$err,%err{?$err};
+	printf \*STDOUT, "sub \%s () \{ \%d \}\n",$err,%err{?$err};
     }
 
-    print <<'ESQ';
+    print \*STDOUT, <<'ESQ';
 my %name2no = %(
 ESQ
 
     foreach my $err ( @err) {
-	printf "    \%s => \%d,\n",$err,%err{?$err};
+	printf \*STDOUT, "    \%s => \%d,\n",$err,%err{?$err};
     }
 
-    print <<'ESQ';
+    print \*STDOUT, <<'ESQ';
 );
 ESQ
 
-    print <<'ESQ';
+    print \*STDOUT, <<'ESQ';
 
 1;
 __END__

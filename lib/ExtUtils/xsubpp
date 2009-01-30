@@ -28,7 +28,7 @@ GetOptions(\%args, < qw(hiertype!
   or die $usage;
 
 if (%args{?v}) {
-  print "xsubpp version $ExtUtils::ParseXS::VERSION\n";
+  print \*STDOUT, "xsubpp version $ExtUtils::ParseXS::VERSION\n";
   exit;
 }
 

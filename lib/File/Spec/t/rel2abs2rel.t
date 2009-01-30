@@ -14,7 +14,7 @@ use Test::More (-x $^EXECUTABLE_NAME
 BEGIN {                                # Set up a tiny script file
     open(my $f, ">", "rel2abs2rel$^PID.pl")
       or die "Can't open rel2abs2rel$^PID.pl file for script -- $^OS_ERROR\n";
-    print $f qq(print "ok\\n"\n);
+    print $f, qq(print "ok\\n"\n);
     close($f);
 }
 END {
@@ -53,7 +53,7 @@ sub sayok{
     return $output;
 }
 
-print "# Checking manipulations of \$^X=$^EXECUTABLE_NAME\n";
+print \*STDOUT, "# Checking manipulations of \$^X=$^EXECUTABLE_NAME\n";
 
 my $perl = safe_rel($^EXECUTABLE_NAME);
 is( sayok($perl), "ok\n",   "`$perl rel2abs2rel$^PID.pl` works" );

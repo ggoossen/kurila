@@ -1561,7 +1561,7 @@ sub _output {
   my $self = shift;
   my $text = shift;
 
-  print { $self->output_handle } $text
+  print  $self->output_handle  ,$text
     unless $self->{?_suppress_all_para};
 
 }

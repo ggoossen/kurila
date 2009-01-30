@@ -7,7 +7,7 @@
 our $warns;
 
 BEGIN {
-    $^WARN_HOOK = sub { $warns++; print STDERR @_[0]->message };
+    $^WARN_HOOK = sub { $warns++; print \*STDERR, @_[0]->message };
 }
 require './test.pl';
 plan( tests => 16 );
@@ -19,8 +19,8 @@ cmp_ok($warns,'==',0,'no warns at start');
 
 open(my $file, ">","$saved_filename");
 ok(defined('FILE'),'created work file');
-print $file "1\n";
-print $file "0";
+print $file, "1\n";
+print $file, "0";
 close($file);
 
 open($file, "<","$saved_filename");

@@ -1,14 +1,14 @@
 #!./perl
 
 if ($^OS_NAME eq 'mpeix') {
-    print "1..0 # Skip: broken on MPE/iX\n";
+    print \*STDOUT, "1..0 # Skip: broken on MPE/iX\n";
     exit 0;
 }
 
 select(\*STDERR); $^OUTPUT_AUTOFLUSH = 1;
 select(\*STDOUT); $^OUTPUT_AUTOFLUSH = 1;
 
-print "1..10\n";
+print \*STDOUT, "1..10\n";
 
 use IO::Handle;
 use IO::Poll < qw(/POLL/);
@@ -20,64 +20,64 @@ my $dupout = IO::Handle->new_from_fd(fileno($stdout),"w");
 
 $poll->mask($stdout => POLLOUT);
 
-print "not "
+print \*STDOUT, "not "
 	unless $poll->mask($stdout) == POLLOUT;
-print "ok 1\n";
+print \*STDOUT, "ok 1\n";
 
 $poll->mask($dupout => POLLPRI);
 
-print "not "
+print \*STDOUT, "not "
 	unless $poll->mask($dupout) == POLLPRI;
-print "ok 2\n";
+print \*STDOUT, "ok 2\n";
 
 $poll->poll(0.1);
 
 if ($^OS_NAME eq 'MSWin32' || $^OS_NAME eq 'NetWare' || $^OS_NAME eq 'VMS' || $^OS_NAME eq 'beos') {
-print "ok 3 # skipped, doesn't work on non-socket fds\n";
-print "ok 4 # skipped, doesn't work on non-socket fds\n";
+print \*STDOUT, "ok 3 # skipped, doesn't work on non-socket fds\n";
+print \*STDOUT, "ok 4 # skipped, doesn't work on non-socket fds\n";
 }
 else {
-print "not "
+print \*STDOUT, "not "
 	unless $poll->events($stdout) == POLLOUT;
-print "ok 3\n";
+print \*STDOUT, "ok 3\n";
 
-print "not "
+print \*STDOUT, "not "
 	if $poll->events($dupout);
-print "ok 4\n";
+print \*STDOUT, "ok 4\n";
 }
 
 my @h = $poll->handles;
-print "not "
+print \*STDOUT, "not "
 	unless (nelems @h) == 2;
-print "ok 5\n";
+print \*STDOUT, "ok 5\n";
 
 $poll->remove($stdout);
 
 @h = $poll->handles;
 
-print "not "
+print \*STDOUT, "not "
 	unless (nelems @h) == 1;
-print "ok 6\n";
+print \*STDOUT, "ok 6\n";
 
-print "not "
+print \*STDOUT, "not "
 	if $poll->mask($stdout);
-print "ok 7\n";
+print \*STDOUT, "ok 7\n";
 
 $poll->poll(0.1);
 
-print "not "
+print \*STDOUT, "not "
 	if $poll->events($stdout);
-print "ok 8\n";
+print \*STDOUT, "ok 8\n";
 
 $poll->remove($dupout);
-print "not "
+print \*STDOUT, "not "
     if $poll->handles;
-print "ok 9\n";
+print \*STDOUT, "ok 9\n";
 
 my $stdin = \*STDIN;
 $poll->mask($stdin => POLLIN);
 $poll->remove($stdin);
 close \*STDIN;
-print "not "
+print \*STDOUT, "not "
     if $poll->poll(0.1);
-print "ok 10\n";
+print \*STDOUT, "ok 10\n";

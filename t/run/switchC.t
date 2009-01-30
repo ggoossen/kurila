@@ -4,7 +4,7 @@
 
 BEGIN {
     unless ('PerlIO::Layer'->find( 'perlio')) {
-	print "1..0 # Skip: not perlio\n";
+	print \*STDOUT, "1..0 # Skip: not perlio\n";
 	exit 0;
     }
 }

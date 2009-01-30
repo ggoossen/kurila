@@ -10,12 +10,12 @@ if (-e 'arch.txt') {
 }
 if ($got ne $arch) {
     if (-e "Errno.pm") {
-        print "Removing old 'Errno.pm'\n";
+        print \*STDOUT, "Removing old 'Errno.pm'\n";
         unlink "Errno.pm" 
             or die "Failed to remove out of date 'Errno.pm': $^OS_ERROR";
     }
     open my $out, ">", "arch.txt" or die "Can't write 'arch.txt': $^OS_ERROR";
-    print $out $arch;
+    print $out, $arch;
     close $out;
 }
 

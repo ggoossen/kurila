@@ -219,7 +219,7 @@ sub init_page {
 # according to the current formatting instructions as we do.
 sub _handle_text {
     my @($self, $text) =  @_;
-    DEBUG +> 3 and print "== $text\n";
+    DEBUG +> 3 and print \*STDOUT, "== $text\n";
     my $tag = %$self{PENDING}->[-1];
     @$tag[2] .= $self->format_text (@$tag[1], $text);
 }
@@ -239,7 +239,7 @@ sub method_for_element {
 # text and nested elements.  Otherwise, if start_element is defined, call it.
 sub _handle_element_start {
     my @($self, $element, $attrs) =  @_;
-    DEBUG +> 3 and print "++ $element (<", join ('> <', %$attrs), ">)\n";
+    DEBUG +> 3 and print \*STDOUT, "++ $element (<", join ('> <', %$attrs), ">)\n";
     my $method = $self->method_for_element ($element);
 
     # If we have a command handler, we need to accumulate the contents of the
@@ -247,7 +247,7 @@ sub _handle_element_start {
     # <Para> so that IN_NAME isn't still set for the first heading after the
     # NAME heading.
     if ($self->can ("cmd_$method")) {
-        DEBUG +> 2 and print "<$element> starts saving a tag\n";
+        DEBUG +> 2 and print \*STDOUT, "<$element> starts saving a tag\n";
         %$self{+IN_NAME} = 0 if ($element ne 'Para');
 
         # How we're going to format embedded text blocks depends on the tag
@@ -257,12 +257,12 @@ sub _handle_element_start {
         my $formatting = %$self{PENDING}->[-1]->[?1];
         $formatting = $self->formatting ($formatting, $element);
         push (@{ %$self{PENDING} }, \@( $attrs, $formatting, '' ));
-        DEBUG +> 4 and print "Pending: [", < pretty (%$self{?PENDING}), "]\n";
+        DEBUG +> 4 and print \*STDOUT, "Pending: [", < pretty (%$self{?PENDING}), "]\n";
     } elsif ($self->can ("start_$method")) {
         my $method = 'start_' . $method;
         $self->?$method ($attrs, '');
     } else {
-        DEBUG +> 2 and print "No $method start method, skipping\n";
+        DEBUG +> 2 and print \*STDOUT, "No $method start method, skipping\n";
     }
 }
 
@@ -271,16 +271,16 @@ sub _handle_element_start {
 # an end_ method for the element, call that.
 sub _handle_element_end {
     my @($self, $element) =  @_;
-    DEBUG +> 3 and print "-- $element\n";
+    DEBUG +> 3 and print \*STDOUT, "-- $element\n";
     my $method = $self->method_for_element ($element);
 
     # If we have a command handler, pull off the pending text and pass it to
     # the handler along with the saved attribute hash.
     if ($self->can ("cmd_$method")) {
-        DEBUG +> 2 and print "</$element> stops saving a tag\n";
+        DEBUG +> 2 and print \*STDOUT, "</$element> stops saving a tag\n";
         my $tag = pop @{ %$self{PENDING} };
-        DEBUG +> 4 and print "Popped: [", < pretty ($tag), "]\n";
-        DEBUG +> 4 and print "Pending: [", < pretty (%$self{?PENDING}), "]\n";
+        DEBUG +> 4 and print \*STDOUT, "Popped: [", < pretty ($tag), "]\n";
+        DEBUG +> 4 and print \*STDOUT, "Pending: [", < pretty (%$self{?PENDING}), "]\n";
         my $method = 'cmd_' . $method;
         my $text = $self->?$method (@$tag[0], @$tag[2]);
         if (defined $text) {
@@ -294,7 +294,7 @@ sub _handle_element_end {
         my $method = 'end_' . $method;
         $self->?$method ();
     } else {
-        DEBUG +> 2 and print "No $method end method, skipping\n";
+        DEBUG +> 2 and print \*STDOUT, "No $method end method, skipping\n";
     }
 }
 
@@ -421,7 +421,7 @@ sub quote_literal {
 sub guesswork {
     my $self = shift;
     local $_ = shift;
-    DEBUG +> 5 and print "   Guesswork called on [$_]\n";
+    DEBUG +> 5 and print \*STDOUT, "   Guesswork called on [$_]\n";
 
     # By the time we reach this point, all hypens will be escaped by adding a
     # backslash.  We want to undo that escaping if they're part of regular
@@ -529,7 +529,7 @@ sub guesswork {
     }
 
     # Done.
-    DEBUG +> 5 and print "   Guesswork returning [$_]\n";
+    DEBUG +> 5 and print \*STDOUT, "   Guesswork returning [$_]\n";
     return $_;
 }
 
@@ -709,7 +709,7 @@ sub outindex {
 # Output some text, without any additional changes.
 sub output {
     my @($self, @< @text) =  @_;
-    print { %$self{?output_fh} } < @text;
+    print  %$self{?output_fh}  ,< @text;
 }
 
 ##############################################################################
@@ -721,7 +721,7 @@ sub output {
 sub start_document {
     my @($self, $attrs, _) =  @_;
     if (%$attrs{?contentless} && !%$self{?ALWAYS_EMIT_SOMETHING}) {
-        DEBUG and print "Document is contentless\n";
+        DEBUG and print \*STDOUT, "Document is contentless\n";
         %$self{+CONTENTLESS} = 1;
         return;
     }
@@ -1082,7 +1082,7 @@ sub over_common_start {
     my @($self, $type, $attrs, _) =  @_;
     my $line = %$attrs{?start_line};
     my $indent = %$attrs{?indent};
-    DEBUG +> 3 and print " Starting =over $type (line $line, indent ",
+    DEBUG +> 3 and print \*STDOUT, " Starting =over $type (line $line, indent ",
         ($indent || '?'), "\n";
 
     # Find the indentation level.
@@ -1116,7 +1116,7 @@ sub over_common_start {
 # .RE and then a new .RS to unconfuse *roff.
 sub over_common_end {
     my @($self) =  @_;
-    DEBUG +> 3 and print " Ending =over\n";
+    DEBUG +> 3 and print \*STDOUT, " Ending =over\n";
     %$self{+INDENT} = pop @{ %$self{INDENTS} };
     pop @{ %$self{ITEMTYPES} };
 
@@ -1155,7 +1155,7 @@ sub end_over_block  { @_[0]->over_common_end }
 sub item_common {
     my @($self, $type, $attrs, $text) =  @_;
     my $line = %$attrs{?start_line};
-    DEBUG +> 3 and print "  $type item (line $line): $text\n";
+    DEBUG +> 3 and print \*STDOUT, "  $type item (line $line): $text\n";
 
     # Clean up the text.  We want to end up with two variables, one ($text)
     # which contains any body text after taking out the item portion, and
@@ -1239,7 +1239,7 @@ sub parse_from_file {
     my $oldfh = select $fh;
     my $oldflush = $^OUTPUT_AUTOFLUSH;
     $^OUTPUT_AUTOFLUSH = 1;
-    print $fh '';
+    print $fh, '';
     $^OUTPUT_AUTOFLUSH = $oldflush;
     select $oldfh;
     return $retval;

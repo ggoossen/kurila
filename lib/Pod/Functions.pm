@@ -144,7 +144,7 @@ unless (caller) {
 	$list = join(", ", sort @{%Kinds{?$type}});
 	$typedesc = %Type_Description{?$type} . ":";
 
-        print < form("",
+        print \*STDOUT, < form("",
                    "\{[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[\}",
                    $typedesc,
                    "     \{[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[\}",

@@ -3,7 +3,7 @@
 
 use Test;
 BEGIN { plan tests => 26 };
-print "#\n# Testing normal (tight) insertion of super-ordinate language tags...\n#\n";
+print \*STDOUT, "#\n# Testing normal (tight) insertion of super-ordinate language tags...\n#\n";
 
 use I18N::LangTags < qw(implicate_supers);
 
@@ -73,16 +73,16 @@ foreach my $in ( @in) {
   if( (nelems @out) == nelems @should
       and lc( join "\e", @out ) eq lc( join "\e", @should )
   ) {
-    print "#     Happily got [$(join ' ',@out)] from [$in]\n";
+    print \*STDOUT, "#     Happily got [$(join ' ',@out)] from [$in]\n";
     ok 1;
   } else {
     ok 0;
-    print "#!!Got:         [$(join ' ',@out)]\n",
+    print \*STDOUT, "#!!Got:         [$(join ' ',@out)]\n",
           "#!! but wanted: [$(join ' ',@should)]\n",
           "#!! from \"$in\"\n#\n";
   }
 }
 
-print "#\n#\n# Bye-bye!\n";
+print \*STDOUT, "#\n#\n# Bye-bye!\n";
 ok 1;
 

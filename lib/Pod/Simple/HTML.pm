@@ -175,7 +175,7 @@ sub new {
   $new->accept_targets( 'html', 'HTML' );
   $new->accept_codes('VerbatimFormatted');
   $new->accept_codes(< @_to_accept);
-  DEBUG +> 2 and print "To accept: ", join(' ', @_to_accept), "\n";
+  DEBUG +> 2 and print \*STDOUT, "To accept: ", join(' ', @_to_accept), "\n";
 
   $new->perldoc_url_prefix(  $Perldoc_URL_Prefix  );
   $new->perldoc_url_postfix( $Perldoc_URL_Postfix );
@@ -200,7 +200,7 @@ sub new {
 
 sub batch_mode_page_object_init {
   my@($self, $batchconvobj, $module, $infile, $outfile, $depth) =  @_;
-  DEBUG and print "Initting $self\n  for $module\n",
+  DEBUG and print \*STDOUT, "Initting $self\n  for $module\n",
     "  in $infile\n  out $outfile\n  depth $depth\n";
   $self->batch_mode(1);
   $self->batch_mode_current_level($depth);
@@ -223,12 +223,12 @@ sub do_beginning {
   
   if(defined $self->force_title) {
     $title = $self->force_title;
-    DEBUG and print "Forcing title to be $title\n";
+    DEBUG and print \*STDOUT, "Forcing title to be $title\n";
   } else {
     # Actually try looking for the title in the document:
     $title = $self->get_short_title();
     unless($self->content_seen) {
-      DEBUG and print "No content seen in search for title.\n";
+      DEBUG and print \*STDOUT, "No content seen in search for title.\n";
       return;
     }
     $self->{+'Title'} = $title;
@@ -238,7 +238,7 @@ sub do_beginning {
     } else {
       $title = $self->default_title;    
       $title = '' unless defined $title;
-      DEBUG and print "Title defaults to $title\n";
+      DEBUG and print \*STDOUT, "Title defaults to $title\n";
     }
   }
 
@@ -267,13 +267,13 @@ sub do_beginning {
     $after =~ s{(</head>)}{$link\n$1}i;  # otherwise nevermind
   }
 
-  print {$self->{?'output_fh'}}
-    $self->html_header_before_title || '',
+  print $self->{?'output_fh'}
+    ,$self->html_header_before_title || '',
     $title, # already escaped
     $after,
   ;
 
-  DEBUG and print "Returning from do_beginning...\n";
+  DEBUG and print \*STDOUT, "Returning from do_beginning...\n";
   return 1;
 }
 
@@ -313,7 +313,7 @@ See 'perldoc $class' for more info.
 
 sub do_end {
   my $self = @_[0];
-  print {$self->{?'output_fh'}}  $self->html_footer || '';
+  print $self->{?'output_fh'}  ,$self->html_footer || '';
   return 1;
 }
 
@@ -336,9 +336,9 @@ sub do_middle {
     my $index = $self->index_as_html();
     if( $$out =~ s/$sneakytag/$index/s ) {
       # Expected case
-      DEBUG and print "Inserted ", length($index), " bytes of index HTML into $out.\n";
+      DEBUG and print \*STDOUT, "Inserted ", length($index), " bytes of index HTML into $out.\n";
     } else {
-      DEBUG and print "Odd, couldn't find where to insert the index in the output!\n";
+      DEBUG and print \*STDOUT, "Odd, couldn't find where to insert the index in the output!\n";
       # I don't think this should ever happen.
     }
     return 1;
@@ -360,8 +360,8 @@ sub do_middle {
     $self->abandon_output_string();
     $self->output_fh($fh);
   };
-  print $fh $self->index_as_html();
-  print $fh $content;
+  print $fh, $self->index_as_html();
+  print $fh, $content;
 
   return 1;
 }
@@ -438,13 +438,13 @@ sub _do_middle_main_loop {
           $linkto = esc($linkto);
             #   (Yes, SGML-escaping applies on top of %-escaping!
             #   But it's rarely noticeable in practice.)
-          print $fh qq{<a href="$linkto" class="podlink$linktype"\n>};
+          print $fh, qq{<a href="$linkto" class="podlink$linktype"\n>};
         } else {
-          print $fh "<a>"; # Yes, an 'a' element with no attributes!
+          print $fh, "<a>"; # Yes, an 'a' element with no attributes!
         }
 
       } elsif ($tagname eq 'item-text' or $tagname =~ m/^head\d$/s) {
-        print $fh $tagmap->{?$tagname} || next;
+        print $fh, $tagmap->{?$tagname} || next;
 
         my @to_unget;
         while(1) {
@@ -457,14 +457,14 @@ sub _do_middle_main_loop {
 
         my $name = $self->linearize_tokens(< @to_unget);
         
-        print $fh "<a ";
-        print $fh "class='u' href='#___top' title='click to go to top of document'\n"
+        print $fh, "<a ";
+        print $fh, "class='u' href='#___top' title='click to go to top of document'\n"
          if $tagname =~ m/^head\d$/s;
         
         if(defined $name) {
           my $esc = esc( $self->section_name_tidy( $name ) );
-          print $fh qq[name="$esc"];
-          DEBUG and print "Linearized ", scalar(nelems @to_unget),
+          print $fh, qq[name="$esc"];
+          DEBUG and print \*STDOUT, "Linearized ", scalar(nelems @to_unget),
            " tokens as \"$name\".\n";
           push @{ $self->{+'PSHTML_index_points'} }, \@($tagname, $name)
            if %ToIndex{?$tagname };
@@ -472,10 +472,10 @@ sub _do_middle_main_loop {
             #  just their content), but ahwell.
            
         } else {  # ludicrously long, so nevermind
-          DEBUG and print "Linearized ", scalar(nelems @to_unget),
+          DEBUG and print \*STDOUT, "Linearized ", scalar(nelems @to_unget),
            " tokens, but it was too long, so nevermind.\n";
         }
-        print $fh "\n>";
+        print $fh, "\n>";
         $self->unget_token(< @to_unget);
 
       } elsif ($tagname eq 'Data') {
@@ -485,18 +485,18 @@ sub _do_middle_main_loop {
           $self->unget_token($next);
           next;
         }
-        DEBUG and print "    raw text ", < $next->text, "\n";
-        printf $fh "\n" . $next->text . "\n";
+        DEBUG and print \*STDOUT, "    raw text ", < $next->text, "\n";
+        printf $fh, "\n" . $next->text . "\n";
         next;
        
       } else {
         if( $tagname =~ m/^over-/s ) {
           push @stack, '';
         } elsif( $tagname =~ m/^item-/s and nelems @stack and @stack[-1] ) {
-          print $fh @stack[-1];
+          print $fh, @stack[-1];
           @stack[-1] = '';
         }
-        print $fh $tagmap->{?$tagname} || next;
+        print $fh, $tagmap->{?$tagname} || next;
         ++$dont_wrap if $tagname eq 'Verbatim' or $tagname eq "VerbatimFormatted"
           or $tagname eq 'X';
       }
@@ -505,27 +505,27 @@ sub _do_middle_main_loop {
     } elsif( $type eq 'end' ) {
       if( ($tagname = $token->tagname) =~ m/^over-/s ) {
         if( my $end = pop @stack ) {
-          print $fh $end;
+          print $fh, $end;
         }
       } elsif( $tagname =~ m/^item-/s and nelems @stack) {
         @stack[-1] = $tagmap->{?"/$tagname"};
         if( $tagname eq 'item-text' and defined(my $next = $self->get_token) ) {
           $self->unget_token($next);
           if( $next->type eq 'start' and $next->tagname !~ m/^item-/s ) {
-            print $fh $tagmap->{?"/item-text"},$tagmap->{?"item-body"};
+            print $fh, $tagmap->{?"/item-text"},$tagmap->{?"item-body"};
             @stack[-1] = $tagmap->{?"/item-body"};
           }
         }
         next;
       }
-      print $fh $tagmap->{?"/$tagname"} || next;
+      print $fh, $tagmap->{?"/$tagname"} || next;
       --$dont_wrap if $tagname eq 'Verbatim' or $tagname eq 'X';
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     } elsif( $type eq 'text' ) {
       $type = esc($token->text);  # reuse $type, why not
       $type =~ s/([\?\!\"\'\.\,]) /$1\n/g unless $dont_wrap;
-      print $fh $type;
+      print $fh, $type;
     }
 
   }
@@ -571,18 +571,18 @@ sub do_pod_link {
   $section = $self->section_escape($section)
    if defined $section and length($section .= ''); # (stringify)
 
-  DEBUG and printf "Resolving \"\%s\" \"\%s\"...\n",
+  DEBUG and printf \*STDOUT, "Resolving \"\%s\" \"\%s\"...\n",
    $to || "(nil)",  $section || "(nil)";
    
   do {
     # An early hack:
     my $complete_url = $self->resolve_pod_link_by_table($to, $section);
     if( $complete_url ) {
-      DEBUG +> 1 and print "resolve_pod_link_by_table(T,S) gives ",
+      DEBUG +> 1 and print \*STDOUT, "resolve_pod_link_by_table(T,S) gives ",
         $complete_url, "\n  (Returning that.)\n";
       return $complete_url;
     } else {
-      DEBUG +> 4 and print " resolve_pod_link_by_table(T,S)", 
+      DEBUG +> 4 and print \*STDOUT, " resolve_pod_link_by_table(T,S)", 
        " didn't return anything interesting.\n";
     }
   };
@@ -592,15 +592,15 @@ sub do_pod_link {
     my $there = $self->resolve_pod_link_by_table($to);
     if(defined $there and length $there) {
       DEBUG +> 1
-       and print "resolve_pod_link_by_table(T) gives $there\n";
+       and print \*STDOUT, "resolve_pod_link_by_table(T) gives $there\n";
     } else {
       $there = 
         $self->resolve_pod_page_link($to, $section);
          # (I pass it the section value, but I don't see a
          #  particular reason it'd use it.)
-      DEBUG +> 1 and print "resolve_pod_page_link gives ", $to || "(nil)", "\n";
+      DEBUG +> 1 and print \*STDOUT, "resolve_pod_page_link gives ", $to || "(nil)", "\n";
       unless( defined $there and length $there ) {
-        DEBUG and print "Can't resolve $to\n";
+        DEBUG and print \*STDOUT, "Can't resolve $to\n";
         return undef;
       }
       # resolve_pod_page_link returning undef is how it
@@ -615,12 +615,12 @@ sub do_pod_link {
   $out .= "#" . $section if defined $section and length $section;
   
   unless(length $out) { # sanity check
-    DEBUG and printf "Oddly, couldn't resolve \"\%s\" \"\%s\"...\n",
+    DEBUG and printf \*STDOUT, "Oddly, couldn't resolve \"\%s\" \"\%s\"...\n",
      $to || "(nil)",  $section || "(nil)";
     return undef;
   }
 
-  DEBUG and print "Resolved to $out\n";
+  DEBUG and print \*STDOUT, "Resolved to $out\n";
   return $out;  
 }
 
@@ -695,16 +695,16 @@ sub resolve_pod_page_link_singleton_mode {
 
 sub resolve_pod_page_link_batch_mode {
   my@($self, $to) =  @_;
-  DEBUG +> 1 and print " During batch mode, resolving $to ...\n";
+  DEBUG +> 1 and print \*STDOUT, " During batch mode, resolving $to ...\n";
   my @path = grep length($_), split m/::/s, $to, -1;
   unless( nelems @path ) { # sanity
-    DEBUG and print "Very odd!  Splitting $to gives (nil)!\n";
+    DEBUG and print \*STDOUT, "Very odd!  Splitting $to gives (nil)!\n";
     return undef;
   }
   $self->batch_mode_rectify_path(\@path);
   my $out = join('/', map < $self->pagepath_url_escape($_), @path)
     . $HTML_EXTENSION;
-  DEBUG +> 1 and print " => $out\n";
+  DEBUG +> 1 and print \*STDOUT, " => $out\n";
   return $out;
 }
 

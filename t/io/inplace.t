@@ -21,7 +21,7 @@ while ( ~< *ARGV) {
     s/foo/bar/;
 }
 continue {
-    print;
+    print \*STDOUT,;
 }
 
 is ( runperl( prog => 'print ~< *ARGV;', args => \@tfiles ), 

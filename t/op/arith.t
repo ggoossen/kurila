@@ -1,26 +1,26 @@
 #!./perl -w
 
-print "1..145\n";
+print \*STDOUT, "1..145\n";
 
 sub tryok ($$) {
-   print( (@_[1] ?? "ok" !! "not ok"), " @_[0]\n" );
+   print(\*STDOUT,  (@_[1] ?? "ok" !! "not ok"), " @_[0]\n" );
 }
 sub tryeq ($$$) {
   if (@_[1] == @_[2]) {
-    print "ok @_[0]\n";
+    print \*STDOUT, "ok @_[0]\n";
   } else {
-    print "not ok @_[0] # @_[1] != @_[2]\n";
+    print \*STDOUT, "not ok @_[0] # @_[1] != @_[2]\n";
   }
 }
 sub tryeq_sloppy ($$$) {
   if (@_[1] == @_[2]) {
-    print "ok @_[0]\n";
+    print \*STDOUT, "ok @_[0]\n";
   } else {
     my $error = abs (@_[1] - @_[2]) / @_[1];
     if ($error +< 1e-9) {
-      print "ok @_[0] # @_[1] is close to @_[2], \$^O eq $^OS_NAME\n";
+      print \*STDOUT, "ok @_[0] # @_[1] is close to @_[2], \$^O eq $^OS_NAME\n";
     } else {
-      print "not ok @_[0] # @_[1] != @_[2]\n";
+      print \*STDOUT, "not ok @_[0] # @_[1] != @_[2]\n";
     }
   }
 }
@@ -291,13 +291,13 @@ if ($^OS_NAME eq 'VMS') {
 }
 
 if ($^OS_NAME eq 'vos') {
-  print "not ok ", $T++, " # TODO VOS raises SIGFPE instead of producing infinity.\n";
+  print \*STDOUT, "not ok ", $T++, " # TODO VOS raises SIGFPE instead of producing infinity.\n";
 }
 elsif ($vms_no_ieee) {
- print $T++, " # SKIP -- the IEEE infinity model is unavailable in this configuration.\n"
+ print \*STDOUT, $T++, " # SKIP -- the IEEE infinity model is unavailable in this configuration.\n"
 }
 elsif ($^OS_NAME eq 'ultrix') {
-  print "not ok ", $T++, " # TODO Ultrix enters deep nirvana instead of producing infinity.\n";
+  print \*STDOUT, "not ok ", $T++, " # TODO Ultrix enters deep nirvana instead of producing infinity.\n";
 }
 else {
   # The computation of $v should overflow and produce "infinity"
@@ -316,5 +316,5 @@ else {
   {
     $v *= 2;
   }
-  print "ok ", $T++, "\n";
+  print \*STDOUT, "ok ", $T++, "\n";
 }

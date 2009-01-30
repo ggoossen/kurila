@@ -224,7 +224,7 @@ touched.
 
 sub calibrate_mtime {
     open(my $file, ">", "calibrate_mtime.tmp") || die $^OS_ERROR;
-    print $file "foo";
+    print $file, "foo";
     close $file;
     my $mtime = @(stat('calibrate_mtime.tmp'))[9];
     unlink 'calibrate_mtime.tmp';
@@ -274,7 +274,7 @@ sub setup_mm_test_root {
         # in a DCL subprocess and put it in the job table so the parent sees it.
         open( my $mmtmp, ">", 'mmtesttmp.com' ) || 
           die "Error creating command file; $^OS_ERROR";
-        print $mmtmp <<'COMMAND';
+        print $mmtmp, <<'COMMAND';
 $ MM_TEST_ROOT = F$PARSE("SYS$DISK:[-]",,,,"NO_CONCEAL")-".][000000"-"]["-"].;"+".]"
 $ DEFINE/JOB/NOLOG/TRANSLATION=CONCEALED MM_TEST_ROOT 'MM_TEST_ROOT'
 COMMAND

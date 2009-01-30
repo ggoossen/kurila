@@ -1,6 +1,6 @@
 #!./perl
 
-print q(1..41
+print \*STDOUT, q(1..41
 );
 
 # This is() function is written to avoid ""
@@ -9,7 +9,7 @@ sub is {
     my @($left, $right, ?$msg) =  @_;
 
     if ($left eq $right) {
-      printf 'ok %d
+      printf \*STDOUT, 'ok %d
 ', $test++;
       return 1;
     }
@@ -21,10 +21,10 @@ sub is {
 #       s/^''\.//;
 #       s/\.''$//;
     }
-    printf q(not ok %d - got %s expected %s
+    printf \*STDOUT, q(not ok %d - got %s expected %s
 ), $test++, $left, $right;
 
-    printf q(# Failed test at line %d
+    printf \*STDOUT, q(# Failed test at line %d
 ), (caller)[[2]];
 
     return 0;

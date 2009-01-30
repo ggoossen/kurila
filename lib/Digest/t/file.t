@@ -33,7 +33,7 @@ my $file = "test-$^PID";
 die if -f $file;
 open(my $fh, ">", "$file") || die "Can't create '$file': $^OS_ERROR";
 binmode($fh);
-print $fh "foo\0\n";
+print $fh, "foo\0\n";
 close($fh) || die "Can't write '$file': $^OS_ERROR";
 
 ok(digest_file($file, "Foo"), "0005");

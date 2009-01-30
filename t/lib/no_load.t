@@ -18,7 +18,7 @@ my @TESTS = @(
 my $count = 0;
 $count += (nelems @$_) - 1 for  @TESTS;
 
-print "1..$count\n";
+print \*STDOUT, "1..$count\n";
 
 foreach my $test ( @TESTS) {
     my @($exclude, @< @modules) =  @$test;

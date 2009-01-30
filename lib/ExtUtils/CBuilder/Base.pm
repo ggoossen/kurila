@@ -119,7 +119,7 @@ sub have_compiler {
   my $tmpfile = File::Spec->catfile(File::Spec->tmpdir, 'compilet.c');
   do {
     open my $fh, ">", "$tmpfile" or die "Can't create $tmpfile: $^OS_ERROR";
-    print $fh "int boot_compilet() \{ return 1; \}\n";
+    print $fh, "int boot_compilet() \{ return 1; \}\n";
     close $fh;
   };
 
@@ -218,7 +218,7 @@ sub _do_link {
 
 sub do_system {
   my @($self, @< @cmd) =  @_;
-  print "$(join ' ',@cmd)\n" if !$self->{?quiet};
+  print \*STDOUT, "$(join ' ',@cmd)\n" if !$self->{?quiet};
   return !system(< @cmd);
 }
 

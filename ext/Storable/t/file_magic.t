@@ -436,7 +436,7 @@ for my $test ( @tests) {
     my@($data, $expected) =  @$test;
     open(my $fh, ">", "$file") || die "Can't create $file: $^OS_ERROR";
     binmode($fh);
-    print $fh $data;
+    print $fh, $data;
     close($fh) || die "Can't write $file: $^OS_ERROR";
 
     my $name = $expected->{?file};

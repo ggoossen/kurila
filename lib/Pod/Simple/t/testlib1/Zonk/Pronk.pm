@@ -38,6 +38,6 @@ dents d'une I<égale> blancheur.
 
 
 
-print "HOOBOY!\n";
+print \*STDOUT, "HOOBOY!\n";
 1;
 

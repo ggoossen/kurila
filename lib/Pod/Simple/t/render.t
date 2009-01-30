@@ -41,7 +41,7 @@ foreach my $file (@(
 
   unless(-e source_path($file)) {
     ok 0;
-    print "# But $file doesn't exist!!\n";
+    print \*STDOUT, "# But $file doesn't exist!!\n";
     exit 1;
   }
 
@@ -50,30 +50,30 @@ foreach my $file (@(
   $precooked =~ s<\.pod><o.txt>s;
   unless(-e $precooked) {
     ok 0;
-    print "# But $precooked doesn't exist!!\n";
+    print \*STDOUT, "# But $precooked doesn't exist!!\n";
     exit 1;
   }
   
-  print "#\n#\n#\n###################\n# $file\n";
+  print \*STDOUT, "#\n#\n#\n###################\n# $file\n";
   foreach my $class (@('Pod::Simple::TextContent', 'Pod::Simple::Text')) {
     my $p = $class->new;
     push @out, '';
     $p->output_string(\@out[-1]);
     my $t = mytime();
     $p->parse_file( source_path($file));
-    printf "# \%s \%s \%sb, \%.03fs\n",
+    printf \*STDOUT, "# \%s \%s \%sb, \%.03fs\n",
      ref($p), source_path($file), length(@out[-1]), mytime() - $t ;
     ok 1;
   }
 
-  print "# Reading $precooked...\n";
+  print \*STDOUT, "# Reading $precooked...\n";
   open(my $in, "<", $precooked) or die "Can't read-open $precooked: $^OS_ERROR";
   do {
     local $^INPUT_RECORD_SEPARATOR;
     push @out, ~< $in;
   };
   close($in);
-  print "#   ", length(@out[-1]), " bytes pulled in.\n";
+  print \*STDOUT, "#   ", length(@out[-1]), " bytes pulled in.\n";
   
   @out = map {
                join '', @( pack("U*", unpack("C*", $_))) # latin1 decode.
@@ -82,11 +82,11 @@ foreach my $file (@(
   for ( @out) { s/\s+/ /g; s/^\s+//s; s/\s+$//s; }
 
   my $faily = 0;
-  print "#\n#Now comparing 1 and 2...\n";
+  print \*STDOUT, "#\n#Now comparing 1 and 2...\n";
   $faily += compare2(@out[0], @out[1]);
-  print "#\n#Now comparing 2 and 3...\n";
+  print \*STDOUT, "#\n#Now comparing 2 and 3...\n";
   $faily += compare2(@out[1], @out[2]);
-  print "#\n#Now comparing 1 and 3...\n";
+  print \*STDOUT, "#\n#Now comparing 1 and 3...\n";
   $faily += compare2(@out[0], @out[2]);
 
   if($faily) {
@@ -97,7 +97,7 @@ foreach my $file (@(
 
     foreach my $out ( @out) { push @outnames, @outnames[-1];  ++@outnames[-1] };
     pop @outnames;
-    printf "# Writing to \%s.txt .. \%s.txt\n", @outnames[0], @outnames[-1];
+    printf \*STDOUT, "# Writing to \%s.txt .. \%s.txt\n", @outnames[0], @outnames[-1];
     shift @outnames;
     
     binmode($out2);
@@ -105,17 +105,17 @@ foreach my $file (@(
       my $outname = shift @outnames;
       open(my $out_fh, ">", "$outname.txt") || die "Can't write-open $outname.txt: $^OS_ERROR";
       binmode($out_fh);
-      print $out_fh  $out, "\n";
-      print $out2 $out, "\n";
+      print $out_fh,  $out, "\n";
+      print $out2, $out, "\n";
       close($out_fh);
     }
     close($out2);
   }
 }
 
-print "# Wrapping up... one for the road...\n";
+print \*STDOUT, "# Wrapping up... one for the road...\n";
 ok 1;
-print "# --- Done with ", __FILE__, " --- \n";
+print \*STDOUT, "# --- Done with ", __FILE__, " --- \n";
 exit;
 
 
@@ -128,7 +128,7 @@ sub compare2 {
     for (@(@out[0], @out[1])) { s/[ ]//g; };
     @out[0] eq @out[1];
   }){
-    print "# Differ only in whitespace.\n";
+    print \*STDOUT, "# Differ only in whitespace.\n";
     ok 1;
     return 0;
   } else {
@@ -137,20 +137,20 @@ sub compare2 {
     my $x = @out[0] ^^^ @out[1];
     $x =~ m/^(\x00*)/s or die;
     my $at = length($1);
-    print "# Difference at byte $at...\n";
+    print \*STDOUT, "# Difference at byte $at...\n";
     if($at +> 10) {
       $at -= 5;
     }
     do {
-      print "# ", substr(@out[0],$at,20), "\n";
-      print "# ", substr(@out[1],$at,20), "\n";
-      print "#      ^...";
+      print \*STDOUT, "# ", substr(@out[0],$at,20), "\n";
+      print \*STDOUT, "# ", substr(@out[1],$at,20), "\n";
+      print \*STDOUT, "#      ^...";
     };
     
     
     
     ok 0;
-    printf "# Unequal lengths \%s and \%s\n", length(@out[0]), length(@out[1]);
+    printf \*STDOUT, "# Unequal lengths \%s and \%s\n", length(@out[0]), length(@out[1]);
     return 1;
   }
 }

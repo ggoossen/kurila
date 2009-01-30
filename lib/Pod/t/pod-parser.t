@@ -12,17 +12,17 @@ use TestInit;
 
 BEGIN {
     $^OUTPUT_AUTOFLUSH = 1;
-    print "1..3\n";
+    print \*STDOUT, "1..3\n";
 }
 
 use Pod::Man;
 use Pod::Text;
 
-print "ok 1\n";
+print \*STDOUT, "ok 1\n";
 
 my $parser = Pod::Man->new or die "Cannot create parser\n";
 open (my $tmp, ">", 'tmp.pod') or die "Cannot create tmp.pod: $^OS_ERROR\n";
-print $tmp "Some random B<text>.\n";
+print $tmp, "Some random B<text>.\n";
 close $tmp;
 open (my $out, ">", 'out.tmp') or die "Cannot create out.tmp: $^OS_ERROR\n";
 $parser->parse_from_file (\%( cutting => 0 ), 'tmp.pod', $out);
@@ -36,11 +36,11 @@ do {
 };
 close $out;
 if ($output eq "Some random \\fBtext\\fR.\n") {
-    print "ok 2\n";
+    print \*STDOUT, "ok 2\n";
 } else {
-    print "not ok 2\n";
-    print "Expected\n========\nSome random \\fBtext\\fR.\n\n";
-    print "Output\n======\n$output\n";
+    print \*STDOUT, "not ok 2\n";
+    print \*STDOUT, "Expected\n========\nSome random \\fBtext\\fR.\n\n";
+    print \*STDOUT, "Output\n======\n$output\n";
 }
 
 $parser = Pod::Text->new or die "Cannot create parser\n";
@@ -54,11 +54,11 @@ do {
 };
 close $out;
 if ($output eq "    Some random text.\n\n") {
-    print "ok 3\n";
+    print \*STDOUT, "ok 3\n";
 } else {
-    print "not ok 3\n";
-    print "Expected\n========\n    Some random text.\n\n\n";
-    print "Output\n======\n$output\n";
+    print \*STDOUT, "not ok 3\n";
+    print \*STDOUT, "Expected\n========\n    Some random text.\n\n\n";
+    print \*STDOUT, "Output\n======\n$output\n";
 }
 
 unlink ('tmp.pod', 'out.tmp');

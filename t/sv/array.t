@@ -206,7 +206,7 @@ do {
 
 # make sure reification behaves
 my $t = curr_test();
-sub reify { @_[+1] = $t++; print( (join ' ',@_), "\n"); }
+sub reify { @_[+1] = $t++; print(\*STDOUT,  (join ' ',@_), "\n"); }
 reify('ok');
 reify('ok');
 

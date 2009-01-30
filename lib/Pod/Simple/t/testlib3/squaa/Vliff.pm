@@ -9,6 +9,6 @@ This is just a test file.
 
 =cut
 
-print "HOOBOY!\n";
+print \*STDOUT, "HOOBOY!\n";
 1;
 

@@ -15,6 +15,6 @@ my $str = "";
 open my $dummy_fh, '>>', \$str or die;
 *STDOUT = *$dummy_fh{IO};
 
-print "not ok 1\n";     # this should not print.
+print \*STDOUT, "not ok 1\n";     # this should not print.
 pass 'STDOUT can be mucked with';
 

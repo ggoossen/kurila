@@ -6,7 +6,7 @@
 #
 
 if ($^OS_NAME eq 'mpeix') {
-    print "1..0 # Skip: broken on MPE/iX\n";
+    print \*STDOUT, "1..0 # Skip: broken on MPE/iX\n";
     exit 0;
 }
 
@@ -58,7 +58,7 @@ foreach my $test (1 .. $max) {
     # the severity bits, which boils down to 4.  See L<perlvms/$?>.
     $bang = 4 if $^OS_NAME eq 'VMS';
 
-    printf "# 0x\%04x  0x\%04x  0x\%04x\n", $exit, $bang, $query;
+    printf \*STDOUT, "# 0x\%04x  0x\%04x  0x\%04x\n", $exit, $bang, $query;
     is($exit, (($bang || ($query >> 8) || 255) << 8));
 }
     

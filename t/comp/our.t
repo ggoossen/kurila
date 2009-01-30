@@ -4,7 +4,7 @@ BEGIN {
     require './test.pl';
 }
 
-print "1..1\n";
+print \*STDOUT, "1..1\n";
 
 
 our $y = 1;

@@ -22,7 +22,7 @@ BEGIN {
        use Test::More;
        1;
     }) {
-       print "1..0 # skip: tests only work with Test::More\n";
+       print \*STDOUT, "1..0 # skip: tests only work with Test::More\n";
        exit;
     }
 }

@@ -623,7 +623,7 @@ sub poderror {
         if(!%opts || (%opts{?severity} && %opts{?severity} eq 'WARNING'));
     unless($self->{?quiet}) {
       my $out_fh = $self->output_handle() || \*STDERR;
-      print $out_fh ($severity, $msg, $line, $file, "\n")
+      print $out_fh, ($severity, $msg, $line, $file, "\n")
         if($self->{?warnings} || !%opts || %opts{?severity} ne 'WARNING');
     }
 }

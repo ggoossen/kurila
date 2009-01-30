@@ -46,7 +46,7 @@ while ((nelems @ARGV))
         my $this = shift @ARGV;
         my $ok = shift @ARGV;
         if ($this ne $ok) {
-            print "Skipping as check params are not the same.\n";
+            print \*STDOUT, "Skipping as check params are not the same.\n";
             exit(0);
         }
     } elsif ($arg eq '-maketest') {
@@ -71,7 +71,7 @@ while ((nelems @ARGV))
 }
 
 if ($FileList) {
-    print "Reading file list '$FileList'\n"
+    print \*STDOUT, "Reading file list '$FileList'\n"
         if $Verbose;
     open my $fh,"<",$FileList or die "Failed to read '$FileList':$^OS_ERROR";
     my @input;
@@ -96,7 +96,7 @@ if ($FileList) {
         }
     }            
     if ( $Verbose ) {
-        print "Expecting ".scalar( nelems @input )." input files. ",
+        print \*STDOUT, "Expecting ".scalar( nelems @input )." input files. ",
               "Checking ".scalar( nelems @output )." output files.\n";
     }
     # we set maxtime to be the youngest input file, including $0 itself.
@@ -115,27 +115,27 @@ if ($FileList) {
     my $ok = 1;
     foreach my $out ( @output) {
         if ( ! -e $out ) {
-            print "'$out' is missing.\n"
+            print \*STDOUT, "'$out' is missing.\n"
                 if $Verbose;
             $ok = 0;
             last;
         }
         if ( -M $out +> $maxtime ) {
-            print "'$out' is too old.\n"
+            print \*STDOUT, "'$out' is too old.\n"
                 if $Verbose;
             $ok = 0;
             last;
         }
     }
     if ($ok) {
-        print "Files seem to be ok, not bothering to rebuild.\n";
+        print \*STDOUT, "Files seem to be ok, not bothering to rebuild.\n";
         exit(0);
     }
-    print "Must rebuild tables.\n"
+    print \*STDOUT, "Must rebuild tables.\n"
         if $Verbose;
 } else {
     if ($Verbose) {
-        print "Not checking filelist.\n";
+        print \*STDOUT, "Not checking filelist.\n";
     }
     if ($UseDir) {
         chdir $UseDir or die "Failed to chdir to '$UseDir':$^OS_ERROR";
@@ -184,7 +184,7 @@ sub WriteIfChanged($$)
         my $PreviousText = ~< $in;
         close $in;
         if ($PreviousText eq $TextToWrite) {
-            print "$file unchanged.\n" if $Verbose;
+            print \*STDOUT, "$file unchanged.\n" if $Verbose;
             return unless $AlwaysWrite;
         }
     }
@@ -193,9 +193,9 @@ sub WriteIfChanged($$)
     if (not open $out, ">", "$file") {
         die "$^PROGRAM_NAME: can't open $file for output: $^OS_ERROR\n";
     }
-    print "$file written.\n" if $Verbose;
+    print \*STDOUT, "$file written.\n" if $Verbose;
 
-    print $out $TextToWrite;
+    print $out, $TextToWrite;
     close $out;
 }
 
@@ -1584,16 +1584,16 @@ sub GenTests($$$$)
     my $FailCode = shift;
 
     if (defined $MatchCode) {
-        printf $FH qq/Expect(1, "\\x\{\%04X\}", '\\p\{$Prop\}' );\n/, $MatchCode;
-        printf $FH qq/Expect(0, "\\x\{\%04X\}", '\\p\{^$Prop\}');\n/, $MatchCode;
-        printf $FH qq/Expect(0, "\\x\{\%04X\}", '\\P\{$Prop\}' );\n/, $MatchCode;
-        printf $FH qq/Expect(1, "\\x\{\%04X\}", '\\P\{^$Prop\}');\n/, $MatchCode;
+        printf $FH, qq/Expect(1, "\\x\{\%04X\}", '\\p\{$Prop\}' );\n/, $MatchCode;
+        printf $FH, qq/Expect(0, "\\x\{\%04X\}", '\\p\{^$Prop\}');\n/, $MatchCode;
+        printf $FH, qq/Expect(0, "\\x\{\%04X\}", '\\P\{$Prop\}' );\n/, $MatchCode;
+        printf $FH, qq/Expect(1, "\\x\{\%04X\}", '\\P\{^$Prop\}');\n/, $MatchCode;
     }
     if (defined $FailCode) {
-        printf $FH qq/Expect(0, "\\x\{\%04X\}", '\\p\{$Prop\}' );\n/, $FailCode;
-        printf $FH qq/Expect(1, "\\x\{\%04X\}", '\\p\{^$Prop\}');\n/, $FailCode;
-        printf $FH qq/Expect(1, "\\x\{\%04X\}", '\\P\{$Prop\}' );\n/, $FailCode;
-        printf $FH qq/Expect(0, "\\x\{\%04X\}", '\\P\{^$Prop\}');\n/, $FailCode;
+        printf $FH, qq/Expect(0, "\\x\{\%04X\}", '\\p\{$Prop\}' );\n/, $FailCode;
+        printf $FH, qq/Expect(1, "\\x\{\%04X\}", '\\p\{^$Prop\}');\n/, $FailCode;
+        printf $FH, qq/Expect(1, "\\x\{\%04X\}", '\\P\{$Prop\}' );\n/, $FailCode;
+        printf $FH, qq/Expect(0, "\\x\{\%04X\}", '\\P\{^$Prop\}');\n/, $FailCode;
     }
 }
 
@@ -1603,8 +1603,8 @@ sub ExpectError($$)
     my $FH = shift;
     my $prop = shift;
 
-    print $FH qq/Error('\\p\{$prop\}');\n/;
-    print $FH qq/Error('\\P\{$prop\}');\n/;
+    print $FH, qq/Error('\\p\{$prop\}');\n/;
+    print $FH, qq/Error('\\P\{$prop\}');\n/;
 }
 
 ## This used only for making the test script
@@ -1672,7 +1672,7 @@ sub MakePropTestScript()
     if (not open $out, ">", "TestProp.pl") {
         die "$^PROGRAM_NAME: TestProp.pl: $^OS_ERROR\n";
     }
-    print $out ~< *DATA;
+    print $out, ~< *DATA;
 
     while (my @($Name, $Table) =@( each %ExactNameToTest))
     {
@@ -1698,7 +1698,7 @@ sub MakePropTestScript()
         ExpectError(*OUT, RandomlyFuzzifyName($Orig, 'ERROR'));
     }
 
-    print $out "Finished();\n";
+    print $out, "Finished();\n";
     close $out;
 }
 
@@ -1995,7 +1995,7 @@ sub SpecialCasing_txt()
         my @($code, $lower, $title, $upper, ? $condition) =  split(m/\s*;\s*/);
 
         if ($condition) { # not implemented yet
-            print "# SKIPPING $_\n" if $Verbose;
+            print \*STDOUT, "# SKIPPING $_\n" if $Verbose;
             next;
         }
 
@@ -2124,12 +2124,12 @@ CaseFolding_txt();
 
 if ( $FileList and $MakeList ) {
     
-    print "Updating '$FileList'\n"
+    print \*STDOUT, "Updating '$FileList'\n"
         if ($Verbose);
         
     open my $ofh,">",$FileList 
         or die "Can't write to '$FileList':$^OS_ERROR";
-    print $ofh <<"EOFHEADER";
+    print $ofh, <<"EOFHEADER";
 #
 # mktables.lst -- File list for mktables.
 #
@@ -2147,7 +2147,7 @@ if ( $FileList and $MakeList ) {
 
 EOFHEADER
     my @input=@("version",glob( <'*.txt'));
-    print $ofh "$_\n" for 
+    print $ofh, "$_\n" for 
          @input,
         "\n=================================\n",
         "# Output files:\n",
@@ -2162,23 +2162,23 @@ EOFHEADER
         wanted=>sub {
           if (m/\.pl$/) {
             s!^\./!!;
-            print $ofh "$_\n";
+            print $ofh, "$_\n";
             $count++;
           }
         },
     ),"."); 
     
-    print $ofh "\n# ",scalar(nelems @input)," input files\n",
+    print $ofh, "\n# ",scalar(nelems @input)," input files\n",
                "# ",scalar($count+1)," output files\n\n",
                "# End list\n";  
     close $ofh 
         or warn "Failed to close $ofh: $^OS_ERROR";
     
-    print "Filelist has ",scalar(nelems @input)," input files and ",
+    print \*STDOUT, "Filelist has ",scalar(nelems @input)," input files and ",
           scalar($count+1)," output files\n"
         if $Verbose;
 }
-print "All done\n" if $Verbose;
+print \*STDOUT, "All done\n" if $Verbose;
 exit(0);
 
 ## TRAILING CODE IS USED BY MakePropTestScript()

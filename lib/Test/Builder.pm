@@ -1137,7 +1137,7 @@ sub _print {
     # Stick a newline on the end if it needs it.
     $msg .= "\n" unless $msg =~ m/\n\Z/;
 
-    print $fh $msg;
+    print $fh, $msg;
 }
 
 =begin private
@@ -1157,7 +1157,7 @@ sub _print_diag {
 
     local@($^OUTPUT_RECORD_SEPARATOR, $^OUTPUT_FIELD_SEPARATOR) = @(undef, '');
     my $fh = $self->todo ?? $self->todo_output !! $self->failure_output;
-    print $fh < @_;
+    print $fh, < @_;
 }    
 
 =item B<output>

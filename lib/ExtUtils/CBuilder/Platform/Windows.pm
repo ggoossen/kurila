@@ -276,12 +276,12 @@ sub write_compiler_script {
                                     %spec{?basename} . '.ccs' );
 
   $self->add_to_cleanup($script);
-  print "Generating script '$script'\n" if !$self->{?quiet};
+  print \*STDOUT, "Generating script '$script'\n" if !$self->{?quiet};
 
   open( my $scriptfh, ">$script" )
     or die( "Could not create script '$script': $^OS_ERROR" );
 
-  print $scriptfh join( "\n", map { ref $_ ?? < @{$_} !! $_ }
+  print $scriptfh, join( "\n", map { ref $_ ?? < @{$_} !! $_ }
  grep defined, @(
     delete(
       %spec{[ <qw(includes cflags optimize defines perlinc) ]} ))
@@ -348,12 +348,12 @@ sub write_linker_script {
 
   $self->add_to_cleanup($script);
 
-  print "Generating script '$script'\n" if !$self->{?quiet};
+  print \*STDOUT, "Generating script '$script'\n" if !$self->{?quiet};
 
   open( my $scriptfh, ">$script" )
     or die( "Could not create script '$script': $^OS_ERROR" );
 
-  print $scriptfh join( "\n", map { ref $_ ?? < @{$_} !! $_ }
+  print $scriptfh, join( "\n", map { ref $_ ?? < @{$_} !! $_ }
  grep defined, @(
     delete(
       %spec{[ <qw(lddlflags libpath other_ldflags
@@ -404,7 +404,7 @@ sub write_compiler_script {
 
   $self->add_to_cleanup($script);
 
-  print "Generating script '$script'\n" if !$self->{?quiet};
+  print \*STDOUT, "Generating script '$script'\n" if !$self->{?quiet};
 
   open( my $scriptfh, ">$script" )
     or die( "Could not create script '$script': $^OS_ERROR" );
@@ -414,7 +414,7 @@ sub write_compiler_script {
   # backslash doesn't work, and any level of quotes are stripped. The
   # result is is a floating point number in the source file where a
   # string is expected. So we leave the macros on the command line.
-  print $scriptfh join( "\n", map { ref $_ ?? < @{$_} !! $_ }
+  print $scriptfh, join( "\n", map { ref $_ ?? < @{$_} !! $_ }
  grep defined, @(
     delete(
       %spec{[ <qw(includes cflags optimize perlinc) ]} ))
@@ -468,13 +468,13 @@ sub write_linker_script {
 
   $self->add_to_cleanup($ld_script, $ld_libs);
 
-  print "Generating scripts '$ld_script' and '$ld_libs'.\n" if !$self->{?quiet};
+  print \*STDOUT, "Generating scripts '$ld_script' and '$ld_libs'.\n" if !$self->{?quiet};
 
   # Script 1: contains options & names of object files.
   open( my $ld_scriptfh, ">$ld_script" )
     or die( "Could not create linker script '$ld_script': $^OS_ERROR" );
 
-  print $ld_scriptfh join( " +\n", map { < @{$_} }
+  print $ld_scriptfh, join( " +\n", map { < @{$_} }
  grep defined, @(
     delete(
       %spec{[ <qw(lddlflags libpath other_ldflags startup objects) ]} ))
@@ -486,7 +486,7 @@ sub write_linker_script {
   open( my $ld_libs_fh, ">$ld_libs" )
     or die( "Could not create linker script '$ld_libs': $^OS_ERROR" );
 
-  print $ld_libs_fh join( " +\n", @(
+  print $ld_libs_fh, join( " +\n", @(
      (delete %spec{libperl}  || ''),
     < @{delete %spec{perllibs} || \@()},)
   );
@@ -612,26 +612,26 @@ sub write_linker_script {
 
   $self->add_to_cleanup($script);
 
-  print "Generating script '$script'\n" if !$self->{?quiet};
+  print \*STDOUT, "Generating script '$script'\n" if !$self->{?quiet};
 
   open( my $scriptfh, ">$script" )
     or die( "Could not create script '$script': $^OS_ERROR" );
 
-  print( $scriptfh 'SEARCH_DIR(' . $_ . ")\n" )
+  print( $scriptfh, 'SEARCH_DIR(' . $_ . ")\n" )
     for  @{delete %spec{libpath} || \@()};
 
   # gcc takes only one startup file, so the first object in startup is
   # specified as the startup file and any others are shifted into the
   # beginning of the list of objects.
   if ( %spec{?startup} && nelems @{%spec{?startup}} ) {
-    print $scriptfh 'STARTUP(' . shift( @{%spec{startup}} ) . ")\n";
+    print $scriptfh, 'STARTUP(' . shift( @{%spec{startup}} ) . ")\n";
     unshift @{%spec{objects}},
       < @{delete %spec{startup} || \@()};
   }
 
-  print $scriptfh 'INPUT(' . join( ',', @{delete %spec{objects}  || \@()} ) . ")\n";
+  print $scriptfh, 'INPUT(' . join( ',', @{delete %spec{objects}  || \@()} ) . ")\n";
 
-  print $scriptfh 'INPUT(' . join( ' ', @(
+  print $scriptfh, 'INPUT(' . join( ' ', @(
      (delete %spec{libperl}  || ''),
     < @{delete %spec{perllibs} || \@()},)
   ) . ")\n";

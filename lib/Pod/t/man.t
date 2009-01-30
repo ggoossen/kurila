@@ -12,14 +12,14 @@ use TestInit;
 
 BEGIN {
     $^OUTPUT_AUTOFLUSH = 1;
-    print "1..43\n";
+    print \*STDOUT, "1..43\n";
 }
 
 use Pod::Man;
 use charnames ':full';
 use utf8;
 
-print "ok 1\n";
+print \*STDOUT, "ok 1\n";
 
 my $parser = Pod::Man->new or die "Cannot create parser\n";
 my $n = 2;
@@ -44,7 +44,7 @@ while ( ~< *DATA) {
     # happens if Perl thinks the world is Unicode.  Wrap this in eval so that
     # older versions of Perl don't croak.
     no warnings 'utf8';
-    print $tmp $input;
+    print $tmp, $input;
     close $tmp;
 
     test_outtmp($expected, "latin1\nINPUT:\n$input");
@@ -52,8 +52,8 @@ while ( ~< *DATA) {
     unlink('tmp.pod');
 
     open (my $tmp2, ">", 'tmp.pod') or die "Cannot create tmp.pod: $^OS_ERROR\n";
-    print $tmp2 "\N{BOM}";
-    print $tmp2 $input;
+    print $tmp2, "\N{BOM}";
+    print $tmp2, $input;
     close $tmp2;
     test_outtmp($expected, "UTF-8 BOM\nINPUT:\n$input");
 
@@ -75,10 +75,10 @@ sub test_outtmp {
     };
     close $out;
     if ($output eq $expected) {
-        print "ok $n\n";
+        print \*STDOUT, "ok $n\n";
     } else {
-        print "not ok $n\n";
-        print "$msg\nEXPECTED:\n$expected\nOUTPUT:\n$output\n";
+        print \*STDOUT, "not ok $n\n";
+        print \*STDOUT, "$msg\nEXPECTED:\n$expected\nOUTPUT:\n$output\n";
     }
     $n++;
 }

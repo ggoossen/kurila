@@ -7,17 +7,17 @@ sub ok {
     my@($ok, ?$name) =  @_;
 
     # You have to do it this way or VMS will get confused.
-    printf "\%s \%d\%s\n", $ok ?? "ok" !! "not ok", 
+    printf \*STDOUT, "\%s \%d\%s\n", $ok ?? "ok" !! "not ok", 
                         $test,
                         defined $name ?? " - $name" !! '';
 
-    printf "# Failed test at line \%d\n", (caller)[[2]] unless $ok;
+    printf \*STDOUT, "# Failed test at line \%d\n", (caller)[[2]] unless $ok;
 
     $test++;
     return $ok;
 }
 
-print "1..6\n";
+print \*STDOUT, "1..6\n";
 
 $result = do { ok 1; 'value';};
 ok( $result eq 'value',  ":$result: eq :value:" );

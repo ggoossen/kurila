@@ -77,14 +77,14 @@ sub wrap
 	}
 	$r .= $remainder;
 
-	print "-----------$r---------\n" if $debug;
+	print \*STDOUT, "-----------$r---------\n" if $debug;
 
-	print "Finish up with '$lead'\n" if $debug;
+	print \*STDOUT, "Finish up with '$lead'\n" if $debug;
 
 	$r .= $lead . substr($t, pos($t), length($t)-pos($t))
 		if pos($t) ne length($t);
 
-	print "-----------$r---------\n" if $debug;;
+	print \*STDOUT, "-----------$r---------\n" if $debug;;
 
 	return $r;
 }

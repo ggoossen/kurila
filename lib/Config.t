@@ -15,7 +15,7 @@ ok(nelems(config_keys) +> 500, "Config has more than 500 entries");
 
 my @($first) = @: Config::config_sh() =~ m/^(\S+)=/m;
 die "Can't find first entry in Config::config_sh()" unless defined $first;
-print "# First entry is '$first'\n";
+print \*STDOUT, "# First entry is '$first'\n";
 
 # It happens that the we know what the first key should be. This is somewhat
 # cheating, but there was briefly a bug where the key got a bonus newline.

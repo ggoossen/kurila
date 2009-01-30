@@ -31,12 +31,12 @@ $NO_ENDING = 0;
 # Use this instead of print to avoid interference while testing globals.
 sub _print {
     local@($^OUTPUT_RECORD_SEPARATOR, $^OUTPUT_FIELD_SEPARATOR) = @(undef, '');
-    print STDOUT < @_;
+    print \*STDOUT, < @_;
 }
 
 sub _print_stderr {
     local@($^OUTPUT_RECORD_SEPARATOR, $^OUTPUT_FIELD_SEPARATOR) = @(undef, '');
-    print STDERR < @_;
+    print \*STDERR, < @_;
 }
 
 sub plan {
@@ -602,7 +602,7 @@ sub _fresh_perl {
                   {if (-e _ and -f _)}
     }
 
-    print $test_fh $prog;
+    print $test_fh, $prog;
     close $test_fh or die "Cannot close $tmpfile: $^OS_ERROR";
 
     my $results = runperl(< %$runperl_args);

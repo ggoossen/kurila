@@ -51,7 +51,7 @@ sub method {
 
 sub trymethod {
     try { method('foo', 'bar'); };
-    print "# $^EVAL_ERROR->{?description}" if $^EVAL_ERROR;
+    print \*STDOUT, "# $^EVAL_ERROR->{?description}" if $^EVAL_ERROR;
 }
 
 for (1..5) { trymethod() }
@@ -61,7 +61,7 @@ pass();
 
 sub local1 { local @_[0] }
 my $foo = 'foo'; local1($foo); local1($foo);
-print "got [$foo], expected [foo]\nnot " if $foo ne 'foo';
+print \*STDOUT, "got [$foo], expected [foo]\nnot " if $foo ne 'foo';
 pass();
 
 sub local2 { local @_[?0]; last L }

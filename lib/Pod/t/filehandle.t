@@ -12,13 +12,13 @@ use TestInit;
 
 BEGIN {
     $^OUTPUT_AUTOFLUSH = 1;
-    print "1..3\n";
+    print \*STDOUT, "1..3\n";
 }
 
 use Pod::Man;
 use Pod::Text;
 
-print "ok 1\n";
+print \*STDOUT, "ok 1\n";
 
 my $man = Pod::Man->new or die "Cannot create parser\n";
 my $text = Pod::Text->new or die "Cannot create parser\n";
@@ -28,7 +28,7 @@ while ( ~< *DATA) {
     open (my $tmp, ">", 'tmp.pod') or die "Cannot create tmp.pod: $^OS_ERROR\n";
     while ( ~< *DATA) {
         last if $_ eq "###\n";
-        print $tmp $_;
+        print $tmp, $_;
     }
     close $tmp;
     open (my $in, "<", 'tmp.pod') or die "Cannot open tmp.pod: $^OS_ERROR\n";
@@ -50,10 +50,10 @@ while ( ~< *DATA) {
         $expected .= $_;
     }
     if ($output eq $expected) {
-        print "ok $n\n";
+        print \*STDOUT, "ok $n\n";
     } else {
-        print "not ok $n\n";
-        print "Expected\n========\n$expected\nOutput\n======\n$output\n";
+        print \*STDOUT, "not ok $n\n";
+        print \*STDOUT, "Expected\n========\n$expected\nOutput\n======\n$output\n";
     }
     $n++;
     open ($in, "<", 'tmp.pod') or die "Cannot open tmp.pod: $^OS_ERROR\n";
@@ -74,10 +74,10 @@ while ( ~< *DATA) {
         $expected .= $_;
     }
     if ($output eq $expected) {
-        print "ok $n\n";
+        print \*STDOUT, "ok $n\n";
     } else {
-        print "not ok $n\n";
-        print "Expected\n========\n$expected\nOutput\n======\n$output\n";
+        print \*STDOUT, "not ok $n\n";
+        print \*STDOUT, "Expected\n========\n$expected\nOutput\n======\n$output\n";
     }
     $n++;
 }

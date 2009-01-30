@@ -2,7 +2,7 @@
 
 BEGIN {
     unless (PerlIO::Layer->find( 'perlio')) {
-	print "1..0 # Skip: not perlio\n";
+	print \*STDOUT, "1..0 # Skip: not perlio\n";
 	exit 0;
     }
     require Config;
@@ -23,7 +23,7 @@ BEGIN { use_ok('PerlIO::via::QuotedPrint'); }
 
 ok( !open($fh,"<via(PerlIO::via::QuotedPrint)", $tmp), 'open QuotedPrint for input fails');
 ok(  open($fh,">via(PerlIO::via::QuotedPrint)", $tmp), 'open QuotedPrint for output');
-ok( (print $fh $a), "print to output file");
+ok( (print $fh, $a), "print to output file");
 ok( close($fh), 'close output file');
 
 ok( open($fh,"<via(PerlIO::via::QuotedPrint)", $tmp), 'open QuotedPrint for input');
@@ -41,7 +41,7 @@ do {
 
     # Find fd number we should be using
     my $fd = open($fh, ">","$tmp") && fileno($fh);
-    print $fh "Hello\n";
+    print $fh, "Hello\n";
     close($fh);
 
     ok( ! open($fh,">via(Unknown::Module)", $tmp), 'open via Unknown::Module will fail');

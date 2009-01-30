@@ -3,7 +3,7 @@
 use Test::More tests => 3;
 
 open(my $pod, ">", "$^PID.pod") or die "$^PID.pod: $^OS_ERROR";
-print {$pod} <<__EOF__;
+print $pod ,<<__EOF__;
 =pod
 
 =head1 NAME
@@ -39,7 +39,7 @@ open($pod, "<", "$^PID.pod") or die "$^PID.pod: $^OS_ERROR";
 open($in, ">",  "$^PID.in")  or die "$^PID.in: $^OS_ERROR";
 while ( ~< $pod) {
   s/[\r\n]+/\r/g;
-  print $in $_;
+  print $in, $_;
 }
 close($pod);
 close($in);
@@ -52,7 +52,7 @@ open($pod, "<", "$^PID.pod") or die "$^PID.pod: $^OS_ERROR";
 open($in, ">",  "$^PID.in")  or die "$^PID.in: $^OS_ERROR";
 while ( ~< $pod) {
   s/[\r\n]+/\n/g;
-  print $in $_;
+  print $in, $_;
 }
 close($pod);
 close($in);
@@ -65,7 +65,7 @@ open($pod, "<", "$^PID.pod") or die "$^PID.pod: $^OS_ERROR";
 open($in, ">",  "$^PID.in")  or die "$^PID.in: $^OS_ERROR";
 while ( ~< $pod) {
   s/[\r\n]+/\r\n/g;
-  print $in $_;
+  print $in, $_;
 }
 close($pod);
 close($in);

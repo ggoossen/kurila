@@ -299,13 +299,13 @@ sub gets {
 }
 
 sub perror {
-    print STDERR "$(join ' ',@_): " if (nelems @_);
-    print STDERR $^OS_ERROR,"\n";
+    print \*STDERR, "$(join ' ',@_): " if (nelems @_);
+    print \*STDERR, $^OS_ERROR,"\n";
 }
 
 sub printf {
     usage "printf(pattern, args...)" if (nelems @_) +< 1;
-    CORE::printf STDOUT < @_;
+    CORE::printf \*STDOUT, < @_;
 }
 
 sub putc {

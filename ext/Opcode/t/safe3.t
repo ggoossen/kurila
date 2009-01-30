@@ -26,7 +26,7 @@ TODO: do {
     todo_skip("segmentation fault", 1);
 
     open my $fh, ">", 'nasty.pl' or die "Can't write nasty.pl: $^OS_ERROR\n";
-    print $fh <<EOF;
+    print $fh, <<EOF;
 \@_[1] = "\0" x $masksize;
 EOF
     close $fh;

@@ -20,7 +20,7 @@ env::temp_set_var('HARNESS_ACTIVE' => 0);
 # Can't use Test.pm, that's a 5.005 thing.
 package My::Test;
 
-print "1..2\n";
+print \*STDOUT, "1..2\n";
 
 my $test_num = 1;
 # Utility testing functions.
@@ -31,7 +31,7 @@ sub ok ($;$) {
     $ok .= "ok $test_num";
     $ok .= " - $name" if defined $name;
     $ok .= "\n";
-    print $ok;
+    print \*STDOUT, $ok;
     $test_num++;
 
     return $test ?? 1 !! 0;
@@ -52,7 +52,7 @@ END {
 not ok 1
 OUT
 
-    My::Test::ok($$err eq <<ERR) || print $$err;
+    My::Test::ok($$err eq <<ERR) || print \*STDOUT, $$err;
 #   Failed test at $^PROGRAM_NAME line 45.
 # Looks like you failed 1 test of 1.
 ERR

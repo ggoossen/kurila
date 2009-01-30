@@ -23,16 +23,16 @@ sub _handle_element_start {
   # ($self, $element_name, $attr_hash_r)
   my $fh = @_[0]->{?'output_fh'};
   my($key, $value);
-  DEBUG and print "++ @_[1]\n";
+  DEBUG and print \*STDOUT, "++ @_[1]\n";
   
-  print $fh   '  ' x (@_[0]->{?'indent'} || 0),  "++", @_[1], "\n";
+  print $fh,   '  ' x (@_[0]->{?'indent'} || 0),  "++", @_[1], "\n";
   @_[0]->{+'indent'}++;
   while(@(?$key,?$value) =@( each %{@_[2]})) {
     unless($key =~ m/^~/s) {
       next if $key eq 'start_line' and @_[0]->{?'hide_line_numbers'};
       _perly_escape($key);
       _perly_escape($value);
-      printf $fh qq{\%s \\ "\%s" => "\%s"\n},
+      printf $fh, qq{\%s \\ "\%s" => "\%s"\n},
         '  ' x (@_[0]->{?'indent'} || 0), $key, $value;
     }
   }
@@ -40,7 +40,7 @@ sub _handle_element_start {
 }
 
 sub _handle_text {
-  DEBUG and print "== \"@_[1]\"\n";
+  DEBUG and print \*STDOUT, "== \"@_[1]\"\n";
   
   if(length @_[1]) {
     my $indent = '  ' x @_[0]->{?'indent'};
@@ -55,15 +55,15 @@ sub _handle_text {
        /$1"\n$indent . "/gx     # => line-break here
     ;
     
-    print {@_[0]->{?'output_fh'}} $indent, '* "', $text, "\"\n";
+    print @_[0]->{?'output_fh'} ,$indent, '* "', $text, "\"\n";
   }
   return;
 }
 
 sub _handle_element_end {
-  DEBUG and print "-- @_[1]\n";
-  print {@_[0]->{?'output_fh'}}
-   '  ' x --@_[0]->{+'indent'}, "--", @_[1], "\n";
+  DEBUG and print \*STDOUT, "-- @_[1]\n";
+  print @_[0]->{?'output_fh'}
+   ,'  ' x --@_[0]->{+'indent'}, "--", @_[1], "\n";
   return;
 }
 

@@ -9,13 +9,13 @@
 use Config;
 require './test.pl'; # for runperl()
 
-print "1..61\n";
+print \*STDOUT, "1..61\n";
 
 my $test = 1;
 sub test (&) {
     my $ok = &{@_[0]};
-    print $ok ?? "ok $test\n" !! "not ok $test\n";
-    printf "# Failed at line \%d\n", @(caller)[2] unless $ok;
+    print \*STDOUT, $ok ?? "ok $test\n" !! "not ok $test\n";
+    printf \*STDOUT, "# Failed at line \%d\n", @(caller)[2] unless $ok;
     $test++;
 }
 
@@ -231,7 +231,7 @@ do {
 
                 $code = "# This is a test script built by t/op/closure.t\n\n";
 
-                print <<"DEBUG_INFO" if $debugging;
+                print \*STDOUT, <<"DEBUG_INFO" if $debugging;
 # inner_type:     $inner_type 
 # where_declared: $where_declared 
 # within:         $within
@@ -423,7 +423,7 @@ END
                 if (config_value('d_fork') and $^OS_NAME ne 'VMS' and $^OS_NAME ne 'MSWin32' and $^OS_NAME ne 'NetWare') {
                     # Fork off a new perl to run the tests.
                     # (This is so we can catch spurious warnings.)
-                    $^OUTPUT_AUTOFLUSH = 1; print ""; $^OUTPUT_AUTOFLUSH = 0; # flush output before forking
+                    $^OUTPUT_AUTOFLUSH = 1; print \*STDOUT, ""; $^OUTPUT_AUTOFLUSH = 0; # flush output before forking
                     pipe my $read, my $write or die "Can't make pipe: $^OS_ERROR";
                     pipe my $read2, my $write2 or die "Can't make second pipe: $^OS_ERROR";
                     die "Can't fork: $^OS_ERROR" unless defined($pid = open my $perl_fh, "|-", '-');
@@ -440,7 +440,7 @@ END
                         # Parent process here.
                         close $write;
                         close $write2;
-                        print $perl_fh $code;
+                        print $perl_fh, $code;
                         close $perl_fh;
                         do { local $^INPUT_RECORD_SEPARATOR;
                              $output = join '', @( ~< $read);
@@ -453,7 +453,7 @@ END
                     my $cmdfile = "tcmd$^PID";  $cmdfile++ while -e $cmdfile;
                     my $errfile = "terr$^PID";  $errfile++ while -e $errfile;
                     my @tmpfiles = @($cmdfile, $errfile);
-                    open my $cmd_fh, ">", "$cmdfile"; print $cmd_fh $code; close $cmd_fh;
+                    open my $cmd_fh, ">", "$cmdfile"; print $cmd_fh, $code; close $cmd_fh;
                     my $cmd = which_perl();
                     $cmd .= " -w $cmdfile 2>$errfile";
                     if ($^OS_NAME eq 'VMS' or $^OS_NAME eq 'MSWin32' or $^OS_NAME eq 'NetWare') {
@@ -470,26 +470,26 @@ END
                         do { local $^INPUT_RECORD_SEPARATOR; open my $in_fh, "<", $outfile; $output = ~< $in_fh; close $in_fh };
                     }
                     if ($^CHILD_ERROR) {
-                        printf "not ok: exited with error code \%04X\n", $^CHILD_ERROR;
+                        printf \*STDOUT, "not ok: exited with error code \%04X\n", $^CHILD_ERROR;
                         $debugging or do { 1 while unlink < @tmpfiles };
                         exit;
                     }
                     do { local $^INPUT_RECORD_SEPARATOR; open my $in_fh, "<", $errfile; $errors = ~< $in_fh; close $in_fh };
                     1 while unlink < @tmpfiles;
                 }
-                print $output;
-                print STDERR $errors;
+                print \*STDOUT, $output;
+                print \*STDERR, $errors;
                 if ($debugging && ($errors || $^CHILD_ERROR || ($output =~ m/not ok/))) {
                     my $lnum = 0;
                     for my $line (split '\n', $code) {
-                        printf "\%3d:  \%s\n", ++$lnum, $line;
+                        printf \*STDOUT, "\%3d:  \%s\n", ++$lnum, $line;
                     }
                 }
                 if ($^CHILD_ERROR) {
-                    printf "not ok: exited with error code \%04X\n", $^CHILD_ERROR;
+                    printf \*STDOUT, "not ok: exited with error code \%04X\n", $^CHILD_ERROR;
                     diag("command:\n$code");
                 }
-                print '#', "-" x 30, "\n" if $debugging;
+                print \*STDOUT, '#', "-" x 30, "\n" if $debugging;
 
             }                   # End of foreach $within
         }                       # End of foreach $where_declared
@@ -639,7 +639,7 @@ do {
 
     my $progfile = "b23265.pl";
     open(my $t, ">", "$progfile") or die "$^PROGRAM_NAME: $^OS_ERROR\n";
-    print { $t } << '__EOF__';
+    print  $t  ,<< '__EOF__';
         print
             sub {@_[0]->(<@_)} -> (
                 sub {
@@ -681,7 +681,7 @@ do {
 	$x = bless \%(), 'X';
     };
     # test { $flag == 1 };
-    print "not ok $test # TODO cleanup sub freeing\n";
+    print \*STDOUT, "not ok $test # TODO cleanup sub freeing\n";
     $test++;
 };
 

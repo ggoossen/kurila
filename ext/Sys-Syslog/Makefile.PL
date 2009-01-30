@@ -18,7 +18,7 @@ my (@extra_params, @extra_prereqs);
 my $use_eventlog = eval "use Win32::EventLog; 1";
 
 if ($use_eventlog) {
-    print " * Win32::EventLog detected.\n";
+    print \*STDOUT, " * Win32::EventLog detected.\n";
     my $name = "PerlLog";
 
     push @extra_prereqs, "Win32::TieRegistry" => 0, "Win32::EventLog" => 0;
@@ -38,12 +38,12 @@ if ($use_eventlog) {
         open(my $dll, ">", '' . File::Spec->catfile("win32", "$name.dll"))
             or die "fatal: Can't write DLL '$name.dll': $^OS_ERROR";
         binmode($dll);
-        print $dll unpack "u", $uudata;
+        print $dll, unpack "u", $uudata;
         close($dll);
     }
 }
 elsif ($^OS_NAME =~ m/Win32/) {
-    print <<"NOTICE"
+    print \*STDOUT, <<"NOTICE"
  *** You're running on a Win32 system,  but you lack the Win32::EventLog\a
  *** module, part of the libwin32 distribution. Although Sys::Syslog can 
  *** be used without Win32::EventLog, it won't be very useful except for 
@@ -155,7 +155,7 @@ if(try {require ExtUtils::Constant; 1}) {
 
     my @names = map { ref $_ ?? $_->{?name} !! $_ } @( < @levels, < @facilities, < @options);
     open(my $macros, ">", 'macros.all') or warn "warning: Can't write 'macros.all': $^OS_ERROR\n";
-    print $macros join $^INPUT_RECORD_SEPARATOR, @names;
+    print $macros, join $^INPUT_RECORD_SEPARATOR, @names;
     close($macros);
 }
 else {

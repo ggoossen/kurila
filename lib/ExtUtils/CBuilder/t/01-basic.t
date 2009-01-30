@@ -27,7 +27,7 @@ ok $b->have_compiler;
 my $source_file = File::Spec->catfile('t', 'compilet.c');
 do {
   open my $fh, ">", "$source_file" or die "Can't create $source_file: $^OS_ERROR";
-  print $fh "int boot_compilet(void) \{ return 1; \}\n";
+  print $fh, "int boot_compilet(void) \{ return 1; \}\n";
   close $fh;
 };
 ok -e $source_file;

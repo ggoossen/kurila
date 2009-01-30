@@ -2,7 +2,7 @@
 
 BEGIN {
     if ($^OS_NAME eq 'VMS') {
-        print "1..0 # Skip on VMS -- too picky about line endings for record-oriented pipes\n";
+        print \*STDOUT, "1..0 # Skip on VMS -- too picky about line endings for record-oriented pipes\n";
         exit;
     }
 }
@@ -32,7 +32,7 @@ $c *= 3*2*2;	# $how_w, file/pipe, 2 reports
 
 $c += 6;	# Tests with sleep()...
 
-print "1..$c\n";
+print \*STDOUT, "1..$c\n";
 
 my $set_out = '';
 $set_out = "binmode \\*STDOUT, ':crlf'"
@@ -94,10 +94,10 @@ sub testfile ($$$$$$) {
       if defined $main::use_crlf && $main::use_crlf == 1;
   if ($how_w eq 'print') {	# AUTOFLUSH???
     $^OUTPUT_AUTOFLUSH = 0;
-    print $fh $_ for  @data;
+    print $fh, $_ for  @data;
   } elsif ($how_w eq 'print/flush') {
     $^OUTPUT_AUTOFLUSH = 1;
-    print $fh $_ for  @data;
+    print $fh, $_ for  @data;
   } elsif ($how_w eq 'syswrite') {
     syswrite $fh, $_ for  @data;
   } else {

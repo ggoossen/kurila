@@ -87,7 +87,7 @@ sub opt_w_with { # Specify an option for the formatter subclass
 sub opt_M_with { # specify formatter class name(s)
   my@($self, $classes) =  @_;
   return unless defined $classes and length $classes;
-  DEBUG +> 4 and print "Considering new formatter classes -M$classes\n";
+  DEBUG +> 4 and print \*STDOUT, "Considering new formatter classes -M$classes\n";
   my @classes_to_add;
   foreach my $classname (split m/[,;]+/s, $classes) {
     next unless $classname =~ m/\S/;
@@ -101,7 +101,7 @@ sub opt_M_with { # specify formatter class name(s)
   
   unshift @{ $self->{'formatter_classes'} }, < @classes_to_add;
   
-  DEBUG +> 3 and print(
+  DEBUG +> 3 and print(\*STDOUT, 
     "Adding $(join ' ',@classes_to_add) to the list of formatter classes, "
     . "making them $(join ' ',@{ $self->{?'formatter_classes'} }).\n"
   );
@@ -110,7 +110,7 @@ sub opt_M_with { # specify formatter class name(s)
 }
 
 sub opt_V { # report version and exit
-  print join '', @(
+  print \*STDOUT, join '', @(
     "Perldoc v$VERSION, under perl $^PERL_VERSION for $^OS_NAME",
 
     (defined(&Win32::BuildNumber) and defined &Win32::BuildNumber())
@@ -181,15 +181,15 @@ sub opt_o_with { # "o" for output format
 sub run {  # to be called by the "perldoc" executable
   my $class = shift;
   if(DEBUG +> 3) {
-    print "Parameters to $class\->run:\n";
+    print \*STDOUT, "Parameters to $class\->run:\n";
     my @x = @_;
     while((nelems @x)) {
       @x[1] = '<undef>'  unless defined @x[1];
       @x[1] = "$(join ' ',@{@x[1]})" if ref( @x[1] ) eq 'ARRAY';
-      print "  [@x[0]] => [@x[1]]\n";
+      print \*STDOUT, "  [@x[0]] => [@x[1]]\n";
       splice @x,0,2;
     }
-    print "\n";
+    print \*STDOUT, "\n";
   }
   return $class -> new(< @_) -> process() || 0;
 }
@@ -200,7 +200,7 @@ sub run {  # to be called by the "perldoc" executable
 sub new {  # yeah, nothing fancy
   my $class = shift;
   my $new = bless \%(< @_), (ref($class) || $class);
-  DEBUG +> 1 and print "New $class object $new\n";
+  DEBUG +> 1 and print \*STDOUT, "New $class object $new\n";
   $new->init();
   $new;
 }
@@ -220,7 +220,7 @@ sub aside {  # If we're in -v or DEBUG mode, say this.
       } !! '',
       < @_,)
     );
-    if(DEBUG) { print $out } else { print STDERR $out }
+    if(DEBUG) { print \*STDOUT, $out } else { print \*STDERR, $out }
   }
   return;
 }
@@ -345,7 +345,7 @@ sub init {
      \@( '__pod2man' => $self->{?'pod2man'} ),
   );
 
-  DEBUG +> 3 and printf "Formatter switches now: [\%s]\n",
+  DEBUG +> 3 and printf \*STDOUT, "Formatter switches now: [\%s]\n",
    join ' ', map "[$(join ' ',@$_)]", @{ $self->{'formatter_switches'} };
 
   $self->{+'translators'} = \@();
@@ -379,18 +379,18 @@ sub process {
     # if this ever returns, its retval will be used for exit(RETVAL)
 
     my $self = shift;
-    DEBUG +> 1 and print "  Beginning process.\n";
-    DEBUG +> 1 and print "  Args: $(join ' ',@{$self->{?'args'}})\n\n";
+    DEBUG +> 1 and print \*STDOUT, "  Beginning process.\n";
+    DEBUG +> 1 and print \*STDOUT, "  Args: $(join ' ',@{$self->{?'args'}})\n\n";
     if(DEBUG +> 3) {
-        print "Object contents:\n";
+        print \*STDOUT, "Object contents:\n";
         my @x = %$self;
         while((nelems @x)) {
             @x[1] = '<undef>'  unless defined @x[1];
             @x[1] = join ' ',@{@x[1]} if ref( @x[1] ) eq 'ARRAY';
-            print "  [@x[0]] => [@x[1]]\n";
+            print \*STDOUT, "  [@x[0]] => [@x[1]]\n";
             splice @x,0,2;
         }
-        print "\n";
+        print \*STDOUT, "\n";
     }
 
     # TODO: make it deal with being invoked as various different things
@@ -430,15 +430,15 @@ sub process {
     exit (IS_VMS ?? 98962 !! 1) unless (nelems @found);
     
     if ($self->opt_l) {
-        DEBUG and print "We're in -l mode, so byebye after this:\n";
-        print join("\n", @found), "\n";
+        DEBUG and print \*STDOUT, "We're in -l mode, so byebye after this:\n";
+        print \*STDOUT, join("\n", @found), "\n";
         return;
     }
 
     $self->tweak_found_pathnames(\@found);
     $self->assert_closing_stdout;
     return $self->page_module_file(< @found)  if  $self->opt_m;
-    DEBUG +> 2 and print "Found: [$(join ' ',@found)]\n";
+    DEBUG +> 2 and print \*STDOUT, "Found: [$(join ' ',@found)]\n";
 
     return $self->render_and_page(\@found);
 }
@@ -454,15 +454,15 @@ sub find_good_formatter_class {
   
   my $good_class_found;
   foreach my $c ( @class_list) {
-    DEBUG +> 4 and print "Trying to load $c...\n";
+    DEBUG +> 4 and print \*STDOUT, "Trying to load $c...\n";
     if(%class_loaded{?$c}) {
-      DEBUG +> 4 and print "OK, the already-loaded $c it is!\n";
+      DEBUG +> 4 and print \*STDOUT, "OK, the already-loaded $c it is!\n";
       $good_class_found = $c;
       last;
     }
     
     if(%class_seen{?$c}) {
-      DEBUG +> 4 and print
+      DEBUG +> 4 and print \*STDOUT,
        "I've tried $c before, and it's no good.  Skipping.\n";
       next;
     }
@@ -470,11 +470,11 @@ sub find_good_formatter_class {
     %class_seen{+$c} = 1;
     
     if( $c->can('parse_from_file') ) {
-      DEBUG +> 4 and print
+      DEBUG +> 4 and print \*STDOUT,
        "Interesting, the formatter class $c is already loaded!\n";
       
     } else {
-      DEBUG +> 4 and print "Trying to eval 'require $c'...\n";
+      DEBUG +> 4 and print \*STDOUT, "Trying to eval 'require $c'...\n";
 
       local $^WARNING = $^WARNING;
       if(DEBUG() or $self->opt_v) {
@@ -487,20 +487,20 @@ sub find_good_formatter_class {
 
       eval "require $c";
       if($^EVAL_ERROR) {
-        DEBUG +> 4 and print "Couldn't load $c: $^OS_ERROR\n";
+        DEBUG +> 4 and print \*STDOUT, "Couldn't load $c: $^OS_ERROR\n";
         next;
       }
     }
     
     if( $c->can('parse_from_file') ) {
-      DEBUG +> 4 and print "Settling on $c\n";
+      DEBUG +> 4 and print \*STDOUT, "Settling on $c\n";
       my $v = $c->VERSION;
       $v = ( defined $v and length $v ) ?? " version $v" !! '';
       $self->aside("Formatter class $c$v successfully loaded!\n");
       $good_class_found = $c;
       last;
     } else {
-      DEBUG +> 4 and print "Class $c isn't a formatter?!  Skipping.\n";
+      DEBUG +> 4 and print \*STDOUT, "Class $c isn't a formatter?!  Skipping.\n";
     }
   }
   
@@ -550,10 +550,10 @@ sub render_and_page {
     my@($out, $formatter) =  $self->render_findings($found_list);
     
     if($self->opt_d) {
-      printf "Perldoc (\%s) output saved to \%s\n",
+      printf \*STDOUT, "Perldoc (\%s) output saved to \%s\n",
         $self->{?'formatter_class'} || ref($self),
         $out;
-      print "But notice that it's 0 bytes long!\n" unless -s $out;
+      print \*STDOUT, "But notice that it's 0 bytes long!\n" unless -s $out;
       
       
     } elsif(  # Allow the formatter to "page" itself, if it wants.
@@ -604,19 +604,19 @@ sub options_reading {
       unshift @{ $self->{'args'} }, <
         Text::ParseWords::shellwords( env::var("PERLDOC") )
       ;
-      DEBUG +> 1 and print "  Args now: $(join ' ',@{$self->{?'args'}})\n\n";
+      DEBUG +> 1 and print \*STDOUT, "  Args now: $(join ' ',@{$self->{?'args'}})\n\n";
     } else {
-      DEBUG +> 1 and print "  Okay, no PERLDOC setting in ENV.\n";
+      DEBUG +> 1 and print \*STDOUT, "  Okay, no PERLDOC setting in ENV.\n";
     }
 
     DEBUG +> 1
-     and print "  Args right before switch processing: $(join ' ',@{$self->{?'args'}})\n";
+     and print \*STDOUT, "  Args right before switch processing: $(join ' ',@{$self->{?'args'}})\n";
 
     Pod::Perldoc::GetOptsOO::getopts( $self, $self->{?'args'}, 'YES' )
      or return $self->usage;
 
     DEBUG +> 1
-     and print "  Args after switch processing: $(join ' ',@{$self->{?'args'}})\n";
+     and print \*STDOUT, "  Args after switch processing: $(join ' ',@{$self->{?'args'}})\n";
 
     return $self->usage if $self->opt_h;
   
@@ -740,16 +740,16 @@ sub grand_search_init {
                 $self->aside( "Loosely found as $(join ' ',@files)\n" );
             }
             else {
-                print STDERR "No " .
+                print \*STDERR, "No " .
                     ($self->opt_m ?? "module" !! "documentation") . " found for \"$page\".\n";
                 if ( (nelems @{ $self->{?'found'} }) ) {
-                    print STDERR "However, try\n";
+                    print \*STDERR, "However, try\n";
                     for my $dir ( @{ $self->{'found'} }) {
                         opendir(my $dh, $dir) or die "opendir $dir: $^OS_ERROR";
                         while (my $file = readdir($dh)) {
                             next if ($file =~ m/^\./s);
                             $file =~ s/\.(pm|pod)\z//;  # XXX: badfs
-                            print STDERR "\tperldoc $page\::$file\n";
+                            print \*STDERR, "\tperldoc $page\::$file\n";
                         }
                         closedir($dh)    or die "closedir $dir: $^OS_ERROR";
                     }
@@ -772,7 +772,7 @@ sub maybe_generate_dynamic_pod {
     $self->search_perlfaqs($found_things, \@dynamic_pod)  if  $self->opt_q;
 
     if( ! $self->opt_f and ! $self->opt_q ) {
-        DEBUG +> 4 and print "That's a non-dynamic pod search.\n";
+        DEBUG +> 4 and print \*STDOUT, "That's a non-dynamic pod search.\n";
     } elsif ( (nelems @dynamic_pod) ) {
         $self->aside("Hm, I found some Pod from that search!\n");
         my @($buffd, $buffer) =  $self->new_tempfile('pod', 'dyn');
@@ -782,9 +782,9 @@ sub maybe_generate_dynamic_pod {
         
 	my $in_list = $self->opt_f;
 
-        print $buffd "=over 8\n\n" if $in_list;
-        print $buffd < @dynamic_pod  or die "Can't print $buffer: $^OS_ERROR";
-        print $buffd "=back\n"     if $in_list;
+        print $buffd, "=over 8\n\n" if $in_list;
+        print $buffd, < @dynamic_pod  or die "Can't print $buffer: $^OS_ERROR";
+        print $buffd, "=back\n"     if $in_list;
 
         close $buffd        or die "Can't close $buffer: $^OS_ERROR";
         
@@ -808,7 +808,7 @@ sub add_formatter_option { # $self->add_formatter_option('key' => 'value');
   my $self = shift;
   push @{ $self->{'formatter_switches'} }, \ @_ if (nelems @_);
 
-  DEBUG +> 3 and printf "Formatter switches now: [\%s]\n",
+  DEBUG +> 3 and printf \*STDOUT, "Formatter switches now: [\%s]\n",
    join ' ', map "[$(join ' ',@$_)]", @{ $self->{'formatter_switches'} };
   
   return;
@@ -852,7 +852,7 @@ sub add_translator { # $self->add_translator($lang);
 sub search_perlfunc {
     my@($self, $found_things, $pod) =  @_;
 
-    DEBUG +> 2 and print "Search: $(join ' ',@$found_things)\n";
+    DEBUG +> 2 and print \*STDOUT, "Search: $(join ' ',@$found_things)\n";
 
     my $perlfunc = shift @$found_things;
     open(my $pfunc, "<", $perlfunc)               # "Funk is its own reward"
@@ -863,7 +863,7 @@ sub search_perlfunc {
                         ?? '(?:I<)?-X' !! quotemeta($self->opt_f) ;
 
     DEBUG +> 2 and
-     print "Going to perlfunc-scan for $search_re in $perlfunc\n";
+     print \*STDOUT, "Going to perlfunc-scan for $search_re in $perlfunc\n";
 
     my $re = 'Alphabetical Listing of Perl Functions';
     if ( $self->opt_L ) {
@@ -977,7 +977,7 @@ sub render_findings {
 
   my $file = $found_things->[0];
   
-  DEBUG +> 3 and printf "Formatter switches now: [\%s]\n",
+  DEBUG +> 3 and printf \*STDOUT, "Formatter switches now: [\%s]\n",
    join ' ', map "[$(join ' ',@$_)]", @{ $self->{'formatter_switches'} };
 
   # Set formatter options:
@@ -990,7 +990,7 @@ sub render_findings {
          if $^EVAL_ERROR;
       } else {
         if( $silent_fail or $switch =~ m/^__/s ) {
-          DEBUG +> 2 and print "Formatter $formatter_class doesn't support $switch\n";
+          DEBUG +> 2 and print \*STDOUT, "Formatter $formatter_class doesn't support $switch\n";
         } else {
           warn "$formatter_class doesn't recognize the $switch switch.\n";
         }
@@ -1022,7 +1022,7 @@ sub render_findings {
   };
   
   warn "Error while formatting with $formatter_class:\n $^EVAL_ERROR\n" if $^EVAL_ERROR;
-  DEBUG +> 2 and print "Back from formatting with $formatter_class\n";
+  DEBUG +> 2 and print \*STDOUT, "Back from formatting with $formatter_class\n";
 
   close $out_fh 
    or warn "Can't close $out: $^OS_ERROR\n(Did $formatter already close it?)";
@@ -1043,7 +1043,7 @@ sub render_findings {
     }
   }
 
-  DEBUG and print "Finished writing to $out.\n";
+  DEBUG and print \*STDOUT, "Finished writing to $out.\n";
   return @($out, $formatter);
 }
 
@@ -1063,7 +1063,7 @@ sub unlink_if_temp_file {
     $self->aside("Unlinking $file\n");
     unlink($file) or warn "Odd, couldn't unlink $file: $^OS_ERROR";
   } else {
-    DEBUG +> 1 and print "$file isn't a temp file, so not unlinking.\n";
+    DEBUG +> 1 and print \*STDOUT, "$file isn't a temp file, so not unlinking.\n";
   }
   return;
 }
@@ -1090,7 +1090,7 @@ sub MSWin_temp_cleanup {
   
   my $limit = time() - $Temp_File_Lifetime;
   
-  DEBUG +> 5 and printf "Looking for things pre-dating \%s (\%x)\n",
+  DEBUG +> 5 and printf \*STDOUT, "Looking for things pre-dating \%s (\%x)\n",
    ($limit) x 2;
   
   my $filespec;
@@ -1104,11 +1104,11 @@ sub MSWin_temp_cleanup {
         $self->aside( "Will unlink my old temp file @to_unlink[-1]\n" );
       } else {
         DEBUG +> 5 and
-         printf "  $tempdir/$filespec is too recent (after \%x)\n", $limit;
+         printf \*STDOUT, "  $tempdir/$filespec is too recent (after \%x)\n", $limit;
       }
     } else {
       DEBUG +> 5 and
-       print "  $tempdir/$filespec doesn't look like a perldoc temp file.\n";
+       print \*STDOUT, "  $tempdir/$filespec doesn't look like a perldoc temp file.\n";
     }
   }
   closedir($tmpdh);
@@ -1155,7 +1155,7 @@ sub MSWin_perldoc_tempfile {
   while($counter +< 50) {
     my $fh;
     # If we are running before perl5.6.0, we can't autovivify
-    DEBUG +> 3 and print "About to try making temp file $spec\n";
+    DEBUG +> 3 and print \*STDOUT, "About to try making temp file $spec\n";
     return @($fh, $spec) if open($fh, ">", $spec);    # XXX 5.6ism
     $self->aside("Can't create temp file $spec: $^OS_ERROR\n");
   }
@@ -1320,7 +1320,7 @@ sub page_module_file {
 	      next;
 	    }
 	    while ( ~< *$tmpfh) {
-	        print or die "Can't print to stdout: $^OS_ERROR";
+	        print \*STDOUT, or die "Can't print to stdout: $^OS_ERROR";
 	    } 
 	    close $tmpfh  or die "Can't close while $output: $^OS_ERROR";
 	    $self->unlink_if_temp_file($output);
@@ -1348,7 +1348,7 @@ sub page_module_file {
     );
     
     if (IS_VMS) { 
-        DEBUG +> 1 and print "Bailing out in a VMSish way.\n";
+        DEBUG +> 1 and print \*STDOUT, "Bailing out in a VMSish way.\n";
         eval q{
             use vmsish qw(status exit); 
             exit $?;
@@ -1377,7 +1377,7 @@ sub check_file {
     }
     
     if(length $dir and not -d $dir) {
-      DEBUG +> 3 and print "  No dir $dir -- skipping.\n";
+      DEBUG +> 3 and print \*STDOUT, "  No dir $dir -- skipping.\n";
       return "";
     }
     
@@ -1388,12 +1388,12 @@ sub check_file {
     else {
 	my $path = $self->minus_f_nocase($dir,$file);
         if( length $path and $self->containspod($path) ) {
-            DEBUG +> 3 and print
+            DEBUG +> 3 and print \*STDOUT,
               "  The file $path indeed looks promising!\n";
             return $path;
         }
     }
-    DEBUG +> 3 and print "  No good: $file in $dir\n";
+    DEBUG +> 3 and print \*STDOUT, "  No good: $file in $dir\n";
     
     return "";
 }
@@ -1471,11 +1471,11 @@ sub new_output_file {
 
   my $fh;
   # If we are running before perl5.6.0, we can't autovivify
-  DEBUG +> 3 and print "About to try writing to specified output file $outspec\n";
+  DEBUG +> 3 and print \*STDOUT, "About to try writing to specified output file $outspec\n";
   die "Can't write-open $outspec: $^OS_ERROR"
    unless open($fh, ">", $outspec); # XXX 5.6ism
   
-  DEBUG +> 3 and print "Successfully opened $outspec\n";
+  DEBUG +> 3 and print \*STDOUT, "Successfully opened $outspec\n";
   binmode($fh) if $self->{?'output_is_binary'};
   return @($fh, $outspec);
 }
@@ -1536,7 +1536,7 @@ sub page {  # apply a pager to the output file
 	open(my $tmpfh, "<", $output)  or  die "Can't open $output: $^OS_ERROR"; # XXX 5.6ism
 	local $_;
 	while ( ~< *$tmpfh) {
-	    print or die "Can't print to stdout: $^OS_ERROR";
+	    print \*STDOUT, or die "Can't print to stdout: $^OS_ERROR";
 	} 
 	close $tmpfh  or die "Can't close while $output: $^OS_ERROR";
 	$self->unlink_if_temp_file($output);
@@ -1592,7 +1592,7 @@ sub searchfor {
 		or ( $ret = $self->check_file("$dir/pods","$s.pod"))
 		or ( $ret = $self->check_file("$dir/pods",$s))
 	) {
-	    DEBUG +> 1 and print "  Found $ret\n";
+	    DEBUG +> 1 and print \*STDOUT, "  Found $ret\n";
 	    return $ret;
 	}
 
@@ -1702,11 +1702,11 @@ sub drop_privs_maybe {
             $^EUID = $id; # effective uid
         };
         if( !$^EVAL_ERROR && $^UID && $^EUID ) {
-          DEBUG and print "OK, I dropped privileges.\n";
+          DEBUG and print \*STDOUT, "OK, I dropped privileges.\n";
         } elsif( $self->opt_U ) {
-          DEBUG and print "Couldn't drop privileges, but in -U mode, so feh."
+          DEBUG and print \*STDOUT, "Couldn't drop privileges, but in -U mode, so feh."
         } else {
-          DEBUG and print "Hm, couldn't drop privileges.  Ah well.\n";
+          DEBUG and print \*STDOUT, "Hm, couldn't drop privileges.  Ah well.\n";
           # We used to die here; but that seemed pointless.
         }
     }

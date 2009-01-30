@@ -13,7 +13,7 @@ use Config;
 BEGIN {
     for my $syscall (qw(pipe fork waitpid getppid)) {
 	if (!config_value("d_$syscall")) {
-	    print "1..0 # Skip: no $syscall\n";
+	    print \*STDOUT, "1..0 # Skip: no $syscall\n";
 	    exit;
 	}
     }
@@ -60,7 +60,7 @@ sub fork_and_retrieve {
 	    # Wait for immediate parent to exit
 	    sleep 2;
 	    my $ppid2 = getppid();
-	    print $w "$ppid1,$ppid2\n";
+	    print $w, "$ppid1,$ppid2\n";
 	}
 	exit 0;
     }

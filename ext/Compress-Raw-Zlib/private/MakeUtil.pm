@@ -220,17 +220,17 @@ sub doUpDown
  
     while ( ~< *ARGV)
     {
-        print, last if m/^__(END|DATA)__/ ;
+        print \*STDOUT,, last if m/^__(END|DATA)__/ ;
 
         &{ $our_sub }() if $our_sub ;
         &{ $warn_sub }() if $warn_sub ;
-        print $_;
+        print \*STDOUT, $_;
     }
 
     return if eof ;
 
     while ( ~< *ARGV)
-      { print $_; }
+      { print \*STDOUT, $_; }
 }
 
 sub doUpDownViaCopy
@@ -277,7 +277,7 @@ sub doUpDownViaCopy
     do {
         open my $f, ">", "$file"
             or die "Cannot open $file: $^OS_ERROR\n";
-        print $f < @keep ;
+        print $f, < @keep ;
         close $f;
     };
 }

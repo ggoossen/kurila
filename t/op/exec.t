@@ -91,13 +91,13 @@ is( system(qq{$Perl "-I../lib" -e "use vmsish qw(hushed); exit 1"}), $exit_one,
 
 my $rc = system { "lskdfj" } "lskdfj";
 unless( ok($rc == 255 << 8 or $rc == -1 or $rc == 256 or $rc == 512) ) {
-    print "# \$rc == $rc\n";
+    print \*STDOUT, "# \$rc == $rc\n";
 }
 
 unless ( ok( $^OS_ERROR == 2  or  $^OS_ERROR =~ m/\bno\b.*\bfile/i or  
              $^OS_ERROR == 13 or  $^OS_ERROR =~ m/permission denied/i or
              $^OS_ERROR == 22 or  $^OS_ERROR =~ m/invalid argument/i  ) ) {
-    printf "# \$! eq \%d, '\%s'\n", $^OS_ERROR, $^OS_ERROR;
+    printf \*STDOUT, "# \$! eq \%d, '\%s'\n", $^OS_ERROR, $^OS_ERROR;
 }
 
 
@@ -114,7 +114,7 @@ do {
 TODO: do {
     my $tnum = curr_test();
     if( $^OS_NAME =~ m/Win32/ ) {
-        print "not ok $tnum - exec failure doesn't terminate process " .
+        print \*STDOUT, "not ok $tnum - exec failure doesn't terminate process " .
               "# TODO Win32 exec failure waits for user input\n";
         next_test();
         last TODO;

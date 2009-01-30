@@ -11,11 +11,11 @@ BEGIN {
 my $extracted_program = '../utils/h2ph'; # unix, nt, ...
 if ($^OS_NAME eq 'VMS') { $extracted_program = '[-.utils]h2ph.com'; }
 if (!(-e $extracted_program)) {
-    print "1..0 # Skip: $extracted_program was not built\n";
+    print \*STDOUT, "1..0 # Skip: $extracted_program was not built\n";
     exit 0;
 }
 
-print "1..2\n";
+print \*STDOUT, "1..2\n";
 
 # quickly compare two text files
 sub txt_compare {
@@ -27,11 +27,11 @@ sub txt_compare {
 
 # does it run?
 my $ok = system("$^EXECUTABLE_NAME \"-I../lib\" $extracted_program -d. \"-Q\" lib/h2ph.h");
-print(($ok == 0 ?? "" !! "not "), "ok 1\n");
+print(\*STDOUT, ($ok == 0 ?? "" !! "not "), "ok 1\n");
     
 # does it work? well, does it do what we expect? :-)
 $ok = txt_compare("lib/h2ph.ph", "lib/h2ph.pht");
-print(($ok == 0 ?? "" !! "not "), "ok 2\n");
+print(\*STDOUT, ($ok == 0 ?? "" !! "not "), "ok 2\n");
     
 # cleanup - should this be in an END block?
 unlink("lib/h2ph.ph");

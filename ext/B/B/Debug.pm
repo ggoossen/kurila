@@ -16,7 +16,7 @@ sub _printop {
 
 sub B::OP::debug {
     my @($op) =  @_;
-    printf <<'EOT', class($op), $$op, $op->ppaddr, _printop($op->next), _printop($op->sibling), $op->targ, $op->type;
+    printf \*STDOUT, <<'EOT', class($op), $$op, $op->ppaddr, _printop($op->next), _printop($op->sibling), $op->targ, $op->type;
 %s (0x%lx)
 	op_ppaddr	%s
 	op_next		%s
@@ -24,10 +24,10 @@ sub B::OP::debug {
 	op_targ		%d
 	op_type		%d
 EOT
-    printf <<'EOT', $op->opt;
+    printf \*STDOUT, <<'EOT', $op->opt;
 	op_opt		%d
 EOT
-    printf <<'EOT', $op->flags, $op->private;
+    printf \*STDOUT, <<'EOT', $op->flags, $op->private;
 	op_flags	%d
 	op_private	%d
 EOT
@@ -36,19 +36,19 @@ EOT
 sub B::UNOP::debug {
     my @($op) =  @_;
     $op->B::OP::debug();
-    printf "\top_first\t\%s\n", _printop($op->first);
+    printf \*STDOUT, "\top_first\t\%s\n", _printop($op->first);
 }
 
 sub B::BINOP::debug {
     my @($op) =  @_;
     $op->B::UNOP::debug();
-    printf "\top_last \t\%s\n", _printop($op->last);
+    printf \*STDOUT, "\top_last \t\%s\n", _printop($op->last);
 }
 
 sub B::LOOP::debug {
     my @($op) =  @_;
     $op->B::BINOP::debug();
-    printf <<'EOT', < _printop($op->redoop), _printop($op->nextop), _printop($op->lastop);
+    printf \*STDOUT, <<'EOT', < _printop($op->redoop), _printop($op->nextop), _printop($op->lastop);
 	op_redoop	%s
 	op_nextop	%s
 	op_lastop	%s
@@ -58,24 +58,24 @@ EOT
 sub B::LOGOP::debug {
     my @($op) =  @_;
     $op->B::UNOP::debug();
-    printf "\top_other\t\%s\n", _printop($op->other);
+    printf \*STDOUT, "\top_other\t\%s\n", _printop($op->other);
 }
 
 sub B::LISTOP::debug {
     my @($op) =  @_;
     $op->B::BINOP::debug();
-    printf "\top_children\t\%d\n", $op->children;
+    printf \*STDOUT, "\top_children\t\%d\n", $op->children;
 }
 
 sub B::PMOP::debug {
     my @($op) =  @_;
     $op->B::LISTOP::debug();
-    printf "\top_pmreplroot\t0x\%x\n", ${$op->pmreplroot};
-    printf "\top_pmreplstart\t0x\%x\n", ${$op->pmreplstart};
-    printf "\top_pmstash\t\%s\n", < cstring( <$op->pmstash);
-    printf "\top_precomp->precomp\t\%s\n", < cstring( <$op->precomp);
-    printf "\top_pmflags\t0x\%x\n", < $op->pmflags;
-    printf "\top_reflags\t0x\%x\n", < $op->reflags;
+    printf \*STDOUT, "\top_pmreplroot\t0x\%x\n", ${$op->pmreplroot};
+    printf \*STDOUT, "\top_pmreplstart\t0x\%x\n", ${$op->pmreplstart};
+    printf \*STDOUT, "\top_pmstash\t\%s\n", < cstring( <$op->pmstash);
+    printf \*STDOUT, "\top_precomp->precomp\t\%s\n", < cstring( <$op->precomp);
+    printf \*STDOUT, "\top_pmflags\t0x\%x\n", < $op->pmflags;
+    printf \*STDOUT, "\top_reflags\t0x\%x\n", < $op->reflags;
     $op->pmreplroot->debug;
 }
 
@@ -83,7 +83,7 @@ sub B::COP::debug {
     my @($op) =  @_;
     $op->B::OP::debug();
     my $cop_io = class($op->io) eq 'SPECIAL' ?? '' !! $op->io->as_string;
-    printf <<'EOT', $op->label, $op->stashpv, $op->cop_seq, ${$op->warnings}, cstring($cop_io);
+    printf \*STDOUT, <<'EOT', $op->label, $op->stashpv, $op->cop_seq, ${$op->warnings}, cstring($cop_io);
 	cop_label	"%s"
 	cop_stashpv	"%s"
 	cop_seq		%d
@@ -95,38 +95,38 @@ EOT
 sub B::SVOP::debug {
     my @($op) =  @_;
     $op->B::OP::debug();
-    printf "\top_sv\t\t0x\%x\n", ${$op->sv};
+    printf \*STDOUT, "\top_sv\t\t0x\%x\n", ${$op->sv};
     $op->sv->debug;
 }
 
 sub B::PVOP::debug {
     my @($op) =  @_;
     $op->B::OP::debug();
-    printf "\top_pv\t\t\%s\n", < cstring( <$op->pv);
+    printf \*STDOUT, "\top_pv\t\t\%s\n", < cstring( <$op->pv);
 }
 
 sub B::PADOP::debug {
     my @($op) =  @_;
     $op->B::OP::debug();
-    printf "\top_padix\t\%ld\n", < $op->padix;
+    printf \*STDOUT, "\top_padix\t\%ld\n", < $op->padix;
 }
 
 sub B::NULL::debug {
     my @($sv) =  @_;
     if ($$sv == ${sv_undef()}) {
-	print "&sv_undef\n";
+	print \*STDOUT, "&sv_undef\n";
     } else {
-	printf "NULL (0x\%x)\n", $$sv;
+	printf \*STDOUT, "NULL (0x\%x)\n", $$sv;
     }
 }
 
 sub B::SV::debug {
     my @($sv) =  @_;
     if (!$$sv) {
-	print < class($sv), " = NULL\n";
+	print \*STDOUT, < class($sv), " = NULL\n";
 	return;
     }
-    printf <<'EOT', < class($sv), $$sv, < $sv->REFCNT, < $sv->FLAGS;
+    printf \*STDOUT, <<'EOT', < class($sv), $$sv, < $sv->REFCNT, < $sv->FLAGS;
 %s (0x%x)
 	REFCNT		%d
 	FLAGS		0x%x
@@ -136,7 +136,7 @@ EOT
 sub B::RV::debug {
     my @($rv) =  @_;
     B::SV::debug($rv);
-    printf <<'EOT', ${$rv->RV};
+    printf \*STDOUT, <<'EOT', ${$rv->RV};
 	RV		0x%x
 EOT
     $rv->RV->debug;
@@ -146,7 +146,7 @@ sub B::PV::debug {
     my @($sv) =  @_;
     $sv->B::SV::debug();
     my $pv = $sv->PV();
-    printf <<'EOT', < cstring($pv), length($pv);
+    printf \*STDOUT, <<'EOT', < cstring($pv), length($pv);
 	xpv_pv		%s
 	xpv_cur		%d
 EOT
@@ -155,41 +155,41 @@ EOT
 sub B::IV::debug {
     my @($sv) =  @_;
     $sv->B::SV::debug();
-    printf "\txiv_iv\t\t\%d\n", < $sv->IV;
+    printf \*STDOUT, "\txiv_iv\t\t\%d\n", < $sv->IV;
 }
 
 sub B::NV::debug {
     my @($sv) =  @_;
     $sv->B::IV::debug();
-    printf "\txnv_nv\t\t\%s\n", < $sv->NV;
+    printf \*STDOUT, "\txnv_nv\t\t\%s\n", < $sv->NV;
 }
 
 sub B::PVIV::debug {
     my @($sv) =  @_;
     $sv->B::PV::debug();
-    printf "\txiv_iv\t\t\%d\n", < $sv->IV;
+    printf \*STDOUT, "\txiv_iv\t\t\%d\n", < $sv->IV;
 }
 
 sub B::PVNV::debug {
     my @($sv) =  @_;
     $sv->B::PVIV::debug();
-    printf "\txnv_nv\t\t\%s\n", < $sv->NV;
+    printf \*STDOUT, "\txnv_nv\t\t\%s\n", < $sv->NV;
 }
 
 sub B::PVLV::debug {
     my @($sv) =  @_;
     $sv->B::PVNV::debug();
-    printf "\txlv_targoff\t\%d\n", < $sv->TARGOFF;
-    printf "\txlv_targlen\t\%u\n", < $sv->TARGLEN;
-    printf "\txlv_type\t\%s\n", < cstring(chr($sv->TYPE));
+    printf \*STDOUT, "\txlv_targoff\t\%d\n", < $sv->TARGOFF;
+    printf \*STDOUT, "\txlv_targlen\t\%u\n", < $sv->TARGLEN;
+    printf \*STDOUT, "\txlv_type\t\%s\n", < cstring(chr($sv->TYPE));
 }
 
 sub B::BM::debug {
     my @($sv) =  @_;
     $sv->B::PVNV::debug();
-    printf "\txbm_useful\t\%d\n", < $sv->USEFUL;
-    printf "\txbm_previous\t\%u\n", < $sv->PREVIOUS;
-    printf "\txbm_rare\t\%s\n", < cstring(chr($sv->RARE));
+    printf \*STDOUT, "\txbm_useful\t\%d\n", < $sv->USEFUL;
+    printf \*STDOUT, "\txbm_previous\t\%u\n", < $sv->PREVIOUS;
+    printf \*STDOUT, "\txbm_rare\t\%s\n", < cstring(chr($sv->RARE));
 }
 
 sub B::CV::debug {
@@ -201,7 +201,7 @@ sub B::CV::debug {
     my @($padlist) =  $sv->PADLIST;
     my @($file) =  $sv->FILE;
     my @($gv) =  $sv->GV;
-    printf <<'EOT', $$stash, $$start, $$root, $$gv, $file, < $sv->DEPTH, $padlist, ${$sv->OUTSIDE}, < $sv->OUTSIDE_SEQ;
+    printf \*STDOUT, <<'EOT', $$stash, $$start, $$root, $$gv, $file, < $sv->DEPTH, $padlist, ${$sv->OUTSIDE}, < $sv->OUTSIDE_SEQ;
 	STASH		0x%x
 	START		0x%x
 	ROOT		0x%x
@@ -222,8 +222,8 @@ sub B::AV::debug {
     my @($av) =  @_;
     $av->B::SV::debug;
     my @array = $av->ARRAY;
-    print "\tARRAY\t\t(", join(", ", map("0x" . $$_, @array)), ")\n";
-    printf <<'EOT', scalar(nelems @array), < $av->MAX, < $av->OFF;
+    print \*STDOUT, "\tARRAY\t\t(", join(", ", map("0x" . $$_, @array)), ")\n";
+    printf \*STDOUT, <<'EOT', scalar(nelems @array), < $av->MAX, < $av->OFF;
 	FILL		%d
 	MAX		%d
 	OFF		%d
@@ -233,14 +233,14 @@ EOT
 sub B::GV::debug {
     my @($gv) =  @_;
     if (%done_gv{+$$gv}++) {
-	printf "GV \%s::\%s\n", < $gv->STASH->NAME, < $gv->SAFENAME;
+	printf \*STDOUT, "GV \%s::\%s\n", < $gv->STASH->NAME, < $gv->SAFENAME;
 	return;
     }
     my @($sv) =  $gv->SV;
     my @($av) =  $gv->AV;
     my @($cv) =  $gv->CV;
     $gv->B::SV::debug;
-    printf <<'EOT', < $gv->SAFENAME, < $gv->STASH->NAME, < $gv->STASH, $$sv, < $gv->GvREFCNT, < $gv->FORM, $$av, ${$gv->HV}, ${$gv->EGV}, $$cv, < $gv->CVGEN, < $gv->LINE, < $gv->FILE, < $gv->GvFLAGS;
+    printf \*STDOUT, <<'EOT', < $gv->SAFENAME, < $gv->STASH->NAME, < $gv->STASH, $$sv, < $gv->GvREFCNT, < $gv->FORM, $$av, ${$gv->HV}, ${$gv->EGV}, $$cv, < $gv->CVGEN, < $gv->LINE, < $gv->FILE, < $gv->GvFLAGS;
 	NAME		%s
 	STASH		%s (0x%x)
 	SV		0x%x
@@ -262,7 +262,7 @@ EOT
 
 sub B::SPECIAL::debug {
     my $sv = shift;
-    print @specialsv_name[$$sv], "\n";
+    print \*STDOUT, @specialsv_name[$$sv], "\n";
 }
 
 sub compile {

@@ -10,7 +10,7 @@ die $^EVAL_ERROR if $^EVAL_ERROR and !env::var('PERL_CORE_MINITEST');
 plan tests => 2;
 
 open(my $a, "+>","a");
-print $a "_";
+print $a, "_";
 seek($a,0,0);
 
 my $b = "abcd"; 

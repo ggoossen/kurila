@@ -364,13 +364,13 @@ sub eof {
 sub print {
     (nelems @_) or die 'usage: $io->print(ARGS)';
     my $this = shift;
-    print $this < @_;
+    print $this, < @_;
 }
 
 sub printf {
     (nelems @_) +>= 2 or die 'usage: $io->printf(FMT,[ARGS])';
     my $this = shift;
-    printf $this < @_;
+    printf $this, < @_;
 }
 
 sub getline {
@@ -406,7 +406,7 @@ sub write {
     (nelems @_) +>= 2 && (nelems @_) +<= 4 or die 'usage: $io->write(BUF [, LEN [, OFFSET]])';
     local($^OUTPUT_RECORD_SEPARATOR) = "";
     @_[+2] = length(@_[1]) unless defined @_[?2];
-    print { @_[0] } substr(@_[1], @_[?3] || 0, @_[2]);
+    print  @_[0]  ,substr(@_[1], @_[?3] || 0, @_[2]);
 }
 
 sub syswrite {
@@ -501,10 +501,10 @@ sub printflush {
     $old = SelectSaver->new( < qualify($io, caller)) if ref($io);
     local $^OUTPUT_AUTOFLUSH = 1;
     if(ref($io)) {
-        print $io < @_;
+        print $io, < @_;
     }
     else {
-	print < @_;
+	print \*STDOUT, < @_;
     }
 }
 

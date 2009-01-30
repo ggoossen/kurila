@@ -9,7 +9,7 @@ ok 1;
 use Pod::Simple::DumpAsXML;
 use Pod::Simple::XMLOutStream;
 
-print "# Pod::Simple version $Pod::Simple::VERSION\n";
+print \*STDOUT, "# Pod::Simple version $Pod::Simple::VERSION\n";
 sub e  ($$) { Pod::Simple::DumpAsXML->_duo(\&without_vf, < @_) }
 sub ev ($$) { Pod::Simple::DumpAsXML->_duo(\&with_vf,    < @_) }
 
@@ -18,7 +18,7 @@ sub without_vf { @_[0]->unaccept_codes('VerbatimFormatted') }
 
 # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-print "# Testing VerbatimFormatted...\n";
+print \*STDOUT, "# Testing VerbatimFormatted...\n";
     # A formatty line has to have #: in the first two columns, and uses
     # "^" to mean bold, "/" to mean underline, and "%" to mean bold italic.
     # Example:
@@ -140,21 +140,21 @@ q{=pod
 
 # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-print "# Now running some tests adapted from verbatims.t...\n#\n#\n";
+print \*STDOUT, "# Now running some tests adapted from verbatims.t...\n#\n#\n";
 
-print "# Without VerbatimFormatted...\n";
+print \*STDOUT, "# Without VerbatimFormatted...\n";
 &ok( <  e "", "" );
 &ok( <  e "\n", "", );
 &ok( <  e "\n=pod\n\n foo bar baz", "\n=pod\n\n foo bar baz" );
 &ok( <  e "\n=pod\n\n foo bar baz", "\n=pod\n\n foo bar baz\n" );
-print "# With VerbatimFormatted...\n";
+print \*STDOUT, "# With VerbatimFormatted...\n";
 &ok( < ev "", "" );
 &ok( < ev "\n", "", );
 &ok( < ev "\n=pod\n\n foo bar baz", "\n=pod\n\n foo bar baz" );
 &ok( < ev "\n=pod\n\n foo bar baz", "\n=pod\n\n foo bar baz\n" );
 
 
-print "# Now testing via XMLOutStream without VerbatimFormatted...\n";
+print \*STDOUT, "# Now testing via XMLOutStream without VerbatimFormatted...\n";
 
 ok( Pod::Simple::XMLOutStream->_out(\&without_vf, "\n=pod\n\n foo bar baz\n"),
   qq{<Document><Verbatim\nxml:space="preserve"> foo bar baz</Verbatim></Document>}
@@ -166,7 +166,7 @@ ok( Pod::Simple::XMLOutStream->_out(\&without_vf, "\n=pod\n\n foo bar baz\nquux\
   qq{<Document><Verbatim\nxml:space="preserve"> foo bar baz\nquux</Verbatim></Document>}
 );
 
-print "# Contiguous verbatims...\n";
+print \*STDOUT, "# Contiguous verbatims...\n";
 ok( Pod::Simple::XMLOutStream->_out(\&without_vf, "\n=pod\n\n foo bar baz\n\n quux\n"),
   qq{<Document><Verbatim\nxml:space="preserve"> foo bar baz\n\n quux</Verbatim></Document>}
 );
@@ -174,7 +174,7 @@ ok( Pod::Simple::XMLOutStream->_out(\&without_vf, "\n=pod\n\n foo bar baz\n\n\n 
   qq{<Document><Verbatim\nxml:space="preserve"> foo bar baz\n\n\n quux</Verbatim></Document>}
 );
 
-print "# Testing =cut...\n";
+print \*STDOUT, "# Testing =cut...\n";
 ok( Pod::Simple::XMLOutStream->_out(\&without_vf, "\n=pod\n\n foo bar baz\n=cut\n quux\n"),
   qq{<Document><Verbatim\nxml:space="preserve"> foo bar baz</Verbatim></Document>}
 );
@@ -182,7 +182,7 @@ ok( Pod::Simple::XMLOutStream->_out(\&without_vf, "\n=pod\n\n foo bar baz\n=cut\
 
 
 
-print "#\n# Now retesting with VerbatimFormatted...\n";
+print \*STDOUT, "#\n# Now retesting with VerbatimFormatted...\n";
 
 ok( Pod::Simple::XMLOutStream->_out(\&with_vf, "\n=pod\n\n foo bar baz\n"),
   qq{<Document><VerbatimFormatted\nxml:space="preserve"> foo bar baz</VerbatimFormatted></Document>}
@@ -194,7 +194,7 @@ ok( Pod::Simple::XMLOutStream->_out(\&with_vf, "\n=pod\n\n foo bar baz\nquux\n")
   qq{<Document><VerbatimFormatted\nxml:space="preserve"> foo bar baz\nquux</VerbatimFormatted></Document>}
 );
 
-print "# Contiguous verbatims...\n";
+print \*STDOUT, "# Contiguous verbatims...\n";
 ok( Pod::Simple::XMLOutStream->_out(\&with_vf, "\n=pod\n\n foo bar baz\n\n quux\n"),
   qq{<Document><VerbatimFormatted\nxml:space="preserve"> foo bar baz\n\n quux</VerbatimFormatted></Document>}
 );
@@ -202,7 +202,7 @@ ok( Pod::Simple::XMLOutStream->_out(\&with_vf, "\n=pod\n\n foo bar baz\n\n\n quu
   qq{<Document><VerbatimFormatted\nxml:space="preserve"> foo bar baz\n\n\n quux</VerbatimFormatted></Document>}
 );
 
-print "# Testing =cut...\n";
+print \*STDOUT, "# Testing =cut...\n";
 ok( Pod::Simple::XMLOutStream->_out(\&with_vf, "\n=pod\n\n foo bar baz\n=cut\n quux\n"),
   qq{<Document><VerbatimFormatted\nxml:space="preserve"> foo bar baz</VerbatimFormatted></Document>}
 );
@@ -218,33 +218,33 @@ qq{<Document><Verbatim\nxml:space="preserve"> foo bar baz</Verbatim><head1>Foo</
 ;
 
 
-print "# Various \\n-(in)significance sanity checks...\n";
+print \*STDOUT, "# Various \\n-(in)significance sanity checks...\n";
 
-print "#  verbatim/cut/head/verbatim sanity zero...\n";
+print \*STDOUT, "#  verbatim/cut/head/verbatim sanity zero...\n";
 
 ok( Pod::Simple::XMLOutStream->_out(\&without_vf, "\n=pod\n\n foo bar baz\n\n=head1 Foo\n\n quux\nquum\n"), $it);
 ok( Pod::Simple::XMLOutStream->_out(\&without_vf, "\n=pod\n\n foo bar baz\n=cut\nsome code here...\n=head1 Foo\n\n quux\nquum\n"), $it);
 ok( Pod::Simple::XMLOutStream->_out(\&without_vf, "\n=pod\n\n foo bar baz\n=cut\nsome code here...\n\n=head1 Foo\n\n quux\nquum\n"), $it);
 
-print "#  verbatim/cut/head/verbatim sanity one...\n";
+print \*STDOUT, "#  verbatim/cut/head/verbatim sanity one...\n";
 
 ok( Pod::Simple::XMLOutStream->_out(\&without_vf, "\n=pod\n\n foo bar baz\n=cut\n\nsome code here...\n=head1 Foo\n\n quux\nquum\n"), $it);
 ok( Pod::Simple::XMLOutStream->_out(\&without_vf, "\n=pod\n\n foo bar baz\n\n=cut\nsome code here...\n=head1 Foo\n\n quux\nquum\n"), $it);
 ok( Pod::Simple::XMLOutStream->_out(\&without_vf, "\n=pod\n\n foo bar baz\n\n=cut\n\nsome code here...\n=head1 Foo\n\n quux\nquum\n"), $it);
 
-print "#  verbatim/cut/head/verbatim sanity two...\n";
+print \*STDOUT, "#  verbatim/cut/head/verbatim sanity two...\n";
 
 ok( Pod::Simple::XMLOutStream->_out(\&without_vf, "\n=pod\n\n foo bar baz\n=cut\n\nsome code here...\n\n=head1 Foo\n\n quux\nquum\n"), $it);
 ok( Pod::Simple::XMLOutStream->_out(\&without_vf, "\n=pod\n\n foo bar baz\n\n=cut\nsome code here...\n\n=head1 Foo\n\n quux\nquum\n"), $it);
 ok( Pod::Simple::XMLOutStream->_out(\&without_vf, "\n=pod\n\n foo bar baz\n\n=cut\n\n\nsome code here...\n\n=head1 Foo\n\n quux\nquum\n"), $it);
 
-print "#  verbatim/cut/head/verbatim sanity three...\n";
+print \*STDOUT, "#  verbatim/cut/head/verbatim sanity three...\n";
 
 ok( Pod::Simple::XMLOutStream->_out(\&without_vf, "\n=pod\n\n foo bar baz\n=cut\n\nsome code here...\n\n\n=head1 Foo\n\n quux\nquum\n"), $it);
 ok( Pod::Simple::XMLOutStream->_out(\&without_vf, "\n=pod\n\n foo bar baz\n\n=cut\nsome code here...\n\n\n=head1 Foo\n\n quux\nquum\n"), $it);
 ok( Pod::Simple::XMLOutStream->_out(\&without_vf, "\n=pod\n\n foo bar baz\n\n=cut\n\nsome code here...\n\n\n=head1 Foo\n\n quux\nquum\n"), $it);
 
-print "#  verbatim/cut/head/verbatim sanity four...\n";
+print \*STDOUT, "#  verbatim/cut/head/verbatim sanity four...\n";
 
 ok( Pod::Simple::XMLOutStream->_out(\&without_vf, "\n=pod\n\n foo bar baz\n\n\n\n\n=cut\n\nsome code here...\n\n\n=head1 Foo\n\n quux\nquum\n"), $it);
 ok( Pod::Simple::XMLOutStream->_out(\&without_vf, "\n=pod\n\n foo bar baz\n\n\n\n\n\n=cut\nsome code here...\n\n\n=head1 Foo\n\n quux\nquum\n"), $it);
@@ -255,7 +255,7 @@ ok( Pod::Simple::XMLOutStream->_out(\&without_vf, "\n=pod\n\n foo bar baz\n\n\n\
 
 # : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : : :
 
-print "#\n# Now retesting with VerbatimFormatted...\n";
+print \*STDOUT, "#\n# Now retesting with VerbatimFormatted...\n";
 
 do {
 my $it =
@@ -263,33 +263,33 @@ qq{<Document><VerbatimFormatted\nxml:space="preserve"> foo bar baz</VerbatimForm
 ;
 
 
-print "# Various \\n-(in)significance sanity checks...\n";
+print \*STDOUT, "# Various \\n-(in)significance sanity checks...\n";
 
-print "#  verbatim/cut/head/verbatim sanity zero...\n";
+print \*STDOUT, "#  verbatim/cut/head/verbatim sanity zero...\n";
 
 ok( Pod::Simple::XMLOutStream->_out(\&with_vf, "\n=pod\n\n foo bar baz\n\n=head1 Foo\n\n quux\nquum\n"), $it);
 ok( Pod::Simple::XMLOutStream->_out(\&with_vf, "\n=pod\n\n foo bar baz\n=cut\nsome code here...\n=head1 Foo\n\n quux\nquum\n"), $it);
 ok( Pod::Simple::XMLOutStream->_out(\&with_vf, "\n=pod\n\n foo bar baz\n=cut\nsome code here...\n\n=head1 Foo\n\n quux\nquum\n"), $it);
 
-print "#  verbatim/cut/head/verbatim sanity one...\n";
+print \*STDOUT, "#  verbatim/cut/head/verbatim sanity one...\n";
 
 ok( Pod::Simple::XMLOutStream->_out(\&with_vf, "\n=pod\n\n foo bar baz\n=cut\n\nsome code here...\n=head1 Foo\n\n quux\nquum\n"), $it);
 ok( Pod::Simple::XMLOutStream->_out(\&with_vf, "\n=pod\n\n foo bar baz\n\n=cut\nsome code here...\n=head1 Foo\n\n quux\nquum\n"), $it);
 ok( Pod::Simple::XMLOutStream->_out(\&with_vf, "\n=pod\n\n foo bar baz\n\n=cut\n\nsome code here...\n=head1 Foo\n\n quux\nquum\n"), $it);
 
-print "#  verbatim/cut/head/verbatim sanity two...\n";
+print \*STDOUT, "#  verbatim/cut/head/verbatim sanity two...\n";
 
 ok( Pod::Simple::XMLOutStream->_out(\&with_vf, "\n=pod\n\n foo bar baz\n=cut\n\nsome code here...\n\n=head1 Foo\n\n quux\nquum\n"), $it);
 ok( Pod::Simple::XMLOutStream->_out(\&with_vf, "\n=pod\n\n foo bar baz\n\n=cut\nsome code here...\n\n=head1 Foo\n\n quux\nquum\n"), $it);
 ok( Pod::Simple::XMLOutStream->_out(\&with_vf, "\n=pod\n\n foo bar baz\n\n=cut\n\n\nsome code here...\n\n=head1 Foo\n\n quux\nquum\n"), $it);
 
-print "#  verbatim/cut/head/verbatim sanity three...\n";
+print \*STDOUT, "#  verbatim/cut/head/verbatim sanity three...\n";
 
 ok( Pod::Simple::XMLOutStream->_out(\&with_vf, "\n=pod\n\n foo bar baz\n=cut\n\nsome code here...\n\n\n=head1 Foo\n\n quux\nquum\n"), $it);
 ok( Pod::Simple::XMLOutStream->_out(\&with_vf, "\n=pod\n\n foo bar baz\n\n=cut\nsome code here...\n\n\n=head1 Foo\n\n quux\nquum\n"), $it);
 ok( Pod::Simple::XMLOutStream->_out(\&with_vf, "\n=pod\n\n foo bar baz\n\n=cut\n\nsome code here...\n\n\n=head1 Foo\n\n quux\nquum\n"), $it);
 
-print "#  verbatim/cut/head/verbatim sanity four...\n";
+print \*STDOUT, "#  verbatim/cut/head/verbatim sanity four...\n";
 
 ok( Pod::Simple::XMLOutStream->_out(\&with_vf, "\n=pod\n\n foo bar baz\n\n\n\n\n=cut\n\nsome code here...\n\n\n=head1 Foo\n\n quux\nquum\n"), $it);
 ok( Pod::Simple::XMLOutStream->_out(\&with_vf, "\n=pod\n\n foo bar baz\n\n\n\n\n\n=cut\nsome code here...\n\n\n=head1 Foo\n\n quux\nquum\n"), $it);
@@ -299,8 +299,8 @@ ok( Pod::Simple::XMLOutStream->_out(\&with_vf, "\n=pod\n\n foo bar baz\n\n\n\n\n
 
 
 
-print "# Wrapping up... one for the road...\n";
+print \*STDOUT, "# Wrapping up... one for the road...\n";
 ok 1;
-print "# --- Done with ", __FILE__, " --- \n";
+print \*STDOUT, "# --- Done with ", __FILE__, " --- \n";
 
 

@@ -54,7 +54,7 @@ do {
 };
 ok( $pid4 = open(my $fh4, "|-", "$cmd4"), '    fourth' );
 
-print "# pids were $pid1, $pid2, $pid3, $pid4\n";
+print \*STDOUT, "# pids were $pid1, $pid2, $pid3, $pid4\n";
 
 my $killsig = 'HUP';
 $killsig = 1 unless config_value("sig_name") =~ m/\bHUP\b/;
@@ -65,7 +65,7 @@ is( $from_pid1, 'first process',    'message from first process' );
 
 $kill_cnt = kill $killsig, $pid1;
 is( $kill_cnt, 1,   'first process killed' ) ||
-  print "# errno == $^OS_ERROR\n";
+  print \*STDOUT, "# errno == $^OS_ERROR\n";
 
 # get message from second process and kill second process and reader process
 chomp($from_pid2 = scalar( ~< $fh2));
@@ -73,15 +73,15 @@ is( $from_pid2, 'second process',   'message from second process' );
 
 $kill_cnt = kill $killsig, $pid2, $pid3;
 is( $kill_cnt, 2,   'killing procs 2 & 3' ) ||
-  print "# errno == $^OS_ERROR\n";
+  print \*STDOUT, "# errno == $^OS_ERROR\n";
 
 
 # send one expected line of text to child process and then wait for it
 select($fh4); $^OUTPUT_AUTOFLUSH = 1; select(\*STDOUT);
 
-printf $fh4 "ok \%d - text sent to fourth process\n", curr_test();
+printf $fh4, "ok \%d - text sent to fourth process\n", curr_test();
 next_test();
-print "# waiting for process $pid4 to exit\n";
+print \*STDOUT, "# waiting for process $pid4 to exit\n";
 my $reap_pid = waitpid $pid4, 0;
 is( $reap_pid, $pid4, 'fourth process reaped' );
 

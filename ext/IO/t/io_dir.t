@@ -4,7 +4,7 @@ use Config;
 
 BEGIN {
     if (not config_value('d_readdir')) {
-	print "1..0 # Skip: readdir() not available\n";
+	print \*STDOUT, "1..0 # Skip: readdir() not available\n";
 	exit 0;
     }
 }
@@ -19,10 +19,10 @@ my $tcount = 0;
 sub ok {
   $tcount++;
   my $not = @_[0] ?? '' !! 'not ';
-  print "$($not)ok $tcount\n";
+  print \*STDOUT, "$($not)ok $tcount\n";
 }
 
-print "1..5\n";
+print \*STDOUT, "1..5\n";
 
 my $DIR = $^OS_NAME eq 'MacOS' ?? ":" !! ".";
 
@@ -46,6 +46,6 @@ $dot->rewind;
 ok(!defined($dot->read));
 
 open(my $fh,'>', 'X') || die "Can't create x";
-print $fh "X";
+print $fh, "X";
 close($fh) or die "Can't close: $^OS_ERROR";
 

@@ -29,17 +29,17 @@ my $fh;
 while ( ~< *DATA) {
    if (m/^-- (.+\.pl)$/) {
       if ($cleanup) {
-         print "Deleting $1\n";
+         print \*STDOUT, "Deleting $1\n";
          unlink $1 or warn "$^PROGRAM_NAME: $1: $^OS_ERROR\n";
       } elsif ($extract) {
         defined $fh && close($fh);
         open($fh, ">", "$1") or die "$^PROGRAM_NAME: '$1': $^OS_ERROR\n";
-        print "Extracting $1\n";
+        print \*STDOUT, "Extracting $1\n";
       } elsif ($list) {
-        print "$1\n";
+        print \*STDOUT, "$1\n";
       }
    } else {
-      print $fh $_ if $extract;
+      print $fh, $_ if $extract;
    }
 }
 defined $fh && close($fh);

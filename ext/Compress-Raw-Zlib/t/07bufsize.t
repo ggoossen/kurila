@@ -39,7 +39,7 @@ is Compress::Raw::Zlib::zlib_version, ZLIB_VERSION ;
 for my $i (1 .. 13)
 {
 
-    print "#\n#Length $i\n#\n";
+    print \*STDOUT, "#\n#Length $i\n#\n";
 
     my $hello = "I am a HAL 9000 computer" x 2001;
     my $tmp = $hello ;

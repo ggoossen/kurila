@@ -41,10 +41,10 @@ if ($^OS_NAME eq 'VMS') {
     $Qlib_dir =~ s#\/#::#g;
 }
 
-print "### searching $lib_dir\n";
+print \*STDOUT, "### searching $lib_dir\n";
 my %pods = %( < pod_find($lib_dir) );
 my $result = join(',', sort values %pods);
-print "### found $result\n";
+print \*STDOUT, "### found $result\n";
 my $compare = env::var('PERL_CORE') ?? 
   join(',', sort qw(
     Pod::Stuff
@@ -81,10 +81,10 @@ else {
     ok($result,$compare);
 }
 
-print "### searching for File::Find\n";
+print \*STDOUT, "### searching for File::Find\n";
 $result = pod_where(\%( inc => 1, verbose => $VERBOSE ), 'File::Find')
   || 'undef - pod not found!';
-print "### found $result\n";
+print \*STDOUT, "### found $result\n";
 
 require Config;
 if ($^OS_NAME eq 'VMS') { # privlib is perl_root:[lib] OK but not under mms
@@ -102,13 +102,13 @@ else {
 
 # Search for a documentation pod rather than a module
 my $searchpod = 'Stuff';
-print "### searching for $searchpod.pod\n";
+print \*STDOUT, "### searching for $searchpod.pod\n";
 $result = pod_where(
   \%( dirs => \@( 'File::Spec'->catdir(
     env::var('PERL_CORE') ?? () !! < qw(t), 'pod', 'testpods', 'lib', 'Pod') ),
     verbose => $VERBOSE ), $searchpod)
   || "undef - $searchpod.pod not found!";
-print "### found $result\n";
+print \*STDOUT, "### found $result\n";
 
 $compare = 'File::Spec'->catfile(
     env::var('PERL_CORE') ?? () !! < qw(t),
@@ -125,7 +125,7 @@ sub _canon
   @comp[1] = 'File::Spec'->catdir(< @dir);
   $path = 'File::Spec'->catpath(< @comp);
   $path = uc($path) if 'File::Spec'->case_tolerant;
-  print "### general path: $path\n" if $VERBOSE;
+  print \*STDOUT, "### general path: $path\n" if $VERBOSE;
   $path;
 }
 

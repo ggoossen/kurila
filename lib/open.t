@@ -71,7 +71,7 @@ EOE
     open my $f, ">", "a";
     my @a = map { chr(1 << ($_ << 2)) } 0..5; # 0x1, 0x10, .., 0x100000
     unshift @a, chr(0); # ... and a null byte in front just for fun
-    print $f <@a;
+    print $f, <@a;
     close $f;
 
     sub systell {
@@ -93,13 +93,13 @@ EOE
 		ord($b)                  == ord($_) &&
 		systell($f)               == ($a += bytes::length($b))
 		) {
-	    print '# ord($_)           == ', ord($_), "\n";
-	    print '# ord($b)           == ', ord($b), "\n";
-	    print '# length($b)        == ', length($b), "\n";
-	    print '# bytes::length($b) == ', bytes::length($b), "\n";
-	    print '# systell($f)        == ', systell($f), "\n";
-	    print '# $a                == ', $a, "\n";
-	    print '# $c                == ', $c, "\n";
+	    print \*STDOUT, '# ord($_)           == ', ord($_), "\n";
+	    print \*STDOUT, '# ord($b)           == ', ord($b), "\n";
+	    print \*STDOUT, '# length($b)        == ', length($b), "\n";
+	    print \*STDOUT, '# bytes::length($b) == ', bytes::length($b), "\n";
+	    print \*STDOUT, '# systell($f)        == ', systell($f), "\n";
+	    print \*STDOUT, '# $a                == ', $a, "\n";
+	    print \*STDOUT, '# $c                == ', $c, "\n";
 	    last;
 	}
 	$ok++;
@@ -109,11 +109,11 @@ EOE
        "on :utf8 streams sysread() should work on characters, not bytes");
 
     sub diagnostics {
-	print '# ord($_)           == ', ord($_), "\n";
-	print '# bytes::length($_) == ', bytes::length($_), "\n";
-	print '# systell(G)        == ', systell('G'), "\n";
-	print '# $a                == ', $a, "\n";
-	print '# $c                == ', $c, "\n";
+	print \*STDOUT, '# ord($_)           == ', ord($_), "\n";
+	print \*STDOUT, '# bytes::length($_) == ', bytes::length($_), "\n";
+	print \*STDOUT, '# systell(G)        == ', systell('G'), "\n";
+	print \*STDOUT, '# $a                == ', $a, "\n";
+	print \*STDOUT, '# $c                == ', $c, "\n";
     }
 
 
@@ -136,7 +136,7 @@ EOE
 	# syswrite() on should work on characters, not bytes
 	open $g, ">:utf8", "b";
 
-	print "# $key\n";
+	print \*STDOUT, "# $key\n";
 	$ok = $a = 0;
 	for (@a) {
 	    unless (
@@ -161,13 +161,13 @@ EOE
 		    ord($b)                  == ord($_) &&
 		    systell($g)               == ($a += bytes::length($_))
 		   ) {
-		print '# ord($_)           == ', ord($_), "\n";
-		print '# ord($b)           == ', ord($b), "\n";
-		print '# length($b)        == ', length($b), "\n";
-		print '# bytes::length($b) == ', bytes::length($b), "\n";
-		print '# systell($g)        == ', systell($g), "\n";
-		print '# $a                == ', $a, "\n";
-		print '# $c                == ', $c, "\n";
+		print \*STDOUT, '# ord($_)           == ', ord($_), "\n";
+		print \*STDOUT, '# ord($b)           == ', ord($b), "\n";
+		print \*STDOUT, '# length($b)        == ', length($b), "\n";
+		print \*STDOUT, '# bytes::length($b) == ', bytes::length($b), "\n";
+		print \*STDOUT, '# systell($g)        == ', systell($g), "\n";
+		print \*STDOUT, '# $a                == ', $a, "\n";
+		print \*STDOUT, '# $c                == ', $c, "\n";
 		last;
 	    }
 	    $ok++;

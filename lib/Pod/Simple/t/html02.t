@@ -23,10 +23,10 @@ my @pairs = @(
  
  
 foreach(  @pairs ) {
-  print "# Testing pod source @$_[0] ...\n" unless $_->[0] =~ m/\n/;
+  print \*STDOUT, "# Testing pod source @$_[0] ...\n" unless $_->[0] =~ m/\n/;
   ok( x($_->[0]), $_->[1] )
 }
-print "# And one for the road...\n";
+print \*STDOUT, "# And one for the road...\n";
 ok 1;
 
 

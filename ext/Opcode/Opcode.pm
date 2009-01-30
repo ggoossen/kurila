@@ -38,7 +38,7 @@ sub opdump (;$) {
     foreach( opset_to_ops( <full_opset())) {
         my $op = sprintf "  \%12s  \%s\n", $_, < opdesc($_);
 		next if defined $pat and $op !~ m/$pat/i;
-		print $op;
+		print \*STDOUT, $op;
     }
 }
 

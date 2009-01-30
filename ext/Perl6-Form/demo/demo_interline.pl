@@ -6,17 +6,17 @@ my @data = @(
 	\%(name=>'Patton', rank=>'General', num=>00012 ),
 );
 
-print form
+print form,
 	'      Rank Name         Serial Number',
 	'{]]]]]]]]} {[[[[[[[[[}     {IIIII}', <
 	drill @data, \@(), \qw{rank name num};
 
-print "\n\n";
+print \*STDOUT, "\n\n";
 
-print form
+print form,
 	'      Rank Name         Serial Number',
 	\%(under=>"="),
 	'{]]]]]]]]} {[[[[[[[[[}     {IIIII}', <
 	drill @data, \@(), \qw{rank name num};
 
-print "\n\n";
+print \*STDOUT, "\n\n";

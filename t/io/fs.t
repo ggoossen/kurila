@@ -226,7 +226,7 @@ check_utime_result();
 
 utime undef, undef, 'b';
 @($atime,$mtime) =  @(stat 'b')[[8..9]];
-print "# utime undef, undef --> $atime, $mtime\n";
+print \*STDOUT, "# utime undef, undef --> $atime, $mtime\n";
 isnt($atime, 500000000, 'atime');
 isnt($mtime, 500000000 + $delta, 'mtime');
 
@@ -253,18 +253,18 @@ sub check_utime_result {
 	skip "filesystem atime/mtime granularity too low", 2
 	    unless $accurate_timestamps;
 
-	print "# atime - $atime  mtime - $mtime  delta - $delta\n";
+	print \*STDOUT, "# atime - $atime  mtime - $mtime  delta - $delta\n";
 	if($atime == 500000000 && $mtime == 500000000 + $delta) {
 	    pass('atime');
 	    pass('mtime');
 	}
 	else {
 	    if ($^OS_NAME =~ m/\blinux\b/i) {
-		print "# Maybe stat() cannot get the correct atime, ".
+		print \*STDOUT, "# Maybe stat() cannot get the correct atime, ".
 		    "as happens via NFS on linux?\n";
 		$foo = (utime 400000000,500000000 + 2*$delta,'b');
 		my @($new_atime, $new_mtime) =  @(stat('b'))[[8..9]];
-		print "# newatime - $new_atime  nemtime - $new_mtime\n";
+		print \*STDOUT, "# newatime - $new_atime  nemtime - $new_mtime\n";
 		if ($new_atime == $atime && $new_mtime - $mtime == $delta) {
 		    pass("atime - accounted for possible NFS/glibc2.2 bug on linux");
 		    pass("mtime - accounted for possible NFS/glibc2.2 bug on linux");
@@ -332,7 +332,7 @@ SKIP: do {
 
 unlink "Iofs.tmp";
 open my $iofscom, ">", "Iofs.tmp" or die "Could not write IOfs.tmp: $^OS_ERROR";
-print $iofscom 'helloworld';
+print $iofscom, 'helloworld';
 close($iofscom);
 
 # TODO: pp_truncate needs to be taught about F_CHSIZE and F_FREESP,
@@ -353,7 +353,7 @@ SKIP: do {
 #these steps are necessary to check if file is really truncated
 #On Win95, $fh is updated, but file properties aren't
     open($fh, ">", "Iofs.tmp") or die "Can't create Iofs.tmp";
-    print $fh "x\n" x 200;
+    print $fh, "x\n" x 200;
     close $fh;
 
 # Check truncating an open file.
@@ -365,7 +365,7 @@ SKIP: do {
     select \*STDOUT;
 
     do {
-	print $fh "x\n" x 200;
+	print $fh, "x\n" x 200;
 	ok(truncate($fh, 200), "fh resize to 200");
     };
 
@@ -398,7 +398,7 @@ SKIP: do {
 	select \*STDOUT;
 
 	do {
-	    print $fh "x\n" x 200;
+	    print $fh, "x\n" x 200;
 	    ok(truncate($fh, 100), "fh resize by IO slot");
 	};
 
@@ -434,7 +434,7 @@ if ($^OS_NAME eq 'VMS') {
     # must have delete access to rename a directory
     `set file tmp.dir/protection=o:d`;
     ok(rename('tmp.dir', 'tmp1.dir'), "rename on directories") ||
-      print "# errno: $^OS_ERROR\n";
+      print \*STDOUT, "# errno: $^OS_ERROR\n";
 }
 else {
     ok(rename('tmp', 'tmp1'), "rename on directories");

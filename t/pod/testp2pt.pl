@@ -89,9 +89,9 @@ sub command {
     }
     my $incfile  = $self->findinclude(shift @incargs)  or  return;
     my $incbase  = basename $incfile;
-    print $out_fh "###### begin =include $incbase #####\n"  if ($incdebug);
+    print $out_fh, "###### begin =include $incbase #####\n"  if ($incdebug);
     $self->parse_from_file( \%(cutting => 1), $incfile );
-    print $out_fh "###### end =include $incbase #####\n"    if ($incdebug);
+    print $out_fh, "###### end =include $incbase #####\n"    if ($incdebug);
 }
 
 sub begin_input {
@@ -120,7 +120,7 @@ sub testpodinc2plaintext( @ ) {
       return  $msg;
    }
 
-   print "# Running testpodinc2plaintext for '$testname'...\n";
+   print \*STDOUT, "# Running testpodinc2plaintext for '$testname'...\n";
    ## Compare the output against the expected result
    podinc2plaintext($infile, $outfile);
    if ( testcmp($outfile, $cmpfile) ) {
@@ -142,7 +142,7 @@ sub testpodplaintext( @ ) {
    my $failed = 0;
    local $_;
 
-   print "1..", scalar nelems @testpods, "\n"  unless (%opts{?'xrgen'});
+   print \*STDOUT, "1..", scalar nelems @testpods, "\n"  unless (%opts{?'xrgen'});
 
    for my $podfile ( @testpods) {
       @($testname, $_, ...) = fileparse($podfile);
@@ -154,12 +154,12 @@ sub testpodplaintext( @ ) {
       if (%opts{?'xrgen'}) {
           if (%opts{?'force'} or ! -e $cmpfile) {
              ## Create the comparison file
-             print "# Creating expected result for \"$testname\"" .
+             print \*STDOUT, "# Creating expected result for \"$testname\"" .
                    " pod2plaintext test ...\n";
              podinc2plaintext($podfile, $cmpfile);
           }
           else {
-             print "# File $cmpfile already exists" .
+             print \*STDOUT, "# File $cmpfile already exists" .
                    " (use 'force' to regenerate it).\n";
           }
           next;
@@ -171,14 +171,14 @@ sub testpodplaintext( @ ) {
                         Cmp => $cmpfile;
       if ($failmsg) {
           ++$failed;
-          print "#\tFAILED. ($failmsg)\n";
-	  print "not ok ", $failed+$passes, "\n";
+          print \*STDOUT, "#\tFAILED. ($failmsg)\n";
+	  print \*STDOUT, "not ok ", $failed+$passes, "\n";
       }
       else {
           ++$passes;
           unlink($outfile);
-          print "#\tPASSED.\n";
-	  print "ok ", $failed+$passes, "\n";
+          print \*STDOUT, "#\tPASSED.\n";
+	  print \*STDOUT, "ok ", $failed+$passes, "\n";
       }
    }
    return  $passes;

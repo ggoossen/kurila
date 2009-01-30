@@ -5,7 +5,7 @@ our (@warnings, $fagwoosh, $putt, $kloong);
 BEGIN {				# ...and save 'em for later
     $^WARN_HOOK = sub { push @warnings, @_[0]->{?description} }
 }
-END { print STDERR < @warnings }
+END { print \*STDERR, < @warnings }
 
 
 use Test::More tests => 88;
@@ -117,10 +117,10 @@ use constant CARRAY	=> \@( undef, "ok 39\n" );
 use constant CCODE	=> sub { "ok @_[0]\n" };
 
 my $output = $TB->output ;
-print $output ${$: CSCALAR};
-print $output CHASH->{?foo};
-print $output CARRAY->[1];
-print $output CCODE->($curr_test+4);
+print $output, ${$: CSCALAR};
+print $output, CHASH->{?foo};
+print $output, CARRAY->[1];
+print $output, CCODE->($curr_test+4);
 
 $TB->current_test($curr_test+4);
 

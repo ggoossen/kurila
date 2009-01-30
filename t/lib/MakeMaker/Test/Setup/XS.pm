@@ -76,7 +76,7 @@ sub setup_xs {
         my $dir = dirname($file);
         mkpath $dir;
         open(my $file, ">", $file) || die "Can't create $file: $^OS_ERROR";
-        print $file $text;
+        print $file, $text;
         close $file;
     }
 

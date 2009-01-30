@@ -1,7 +1,7 @@
 BEGIN {
 	require Config; Config->import;
 	unless (PerlIO::Layer->find( 'perlio')) {
-	    print "1..0 # Skip: PerlIO not used\n";
+	    print \*STDOUT, "1..0 # Skip: PerlIO not used\n";
 	    exit 0;
 	}
 }
@@ -24,18 +24,18 @@ ok(open($binfh, ">:raw",  $bin));
 
 ok(open($utffh, ">:utf8", $utf));
 
-print $txtfh "foo\n";
-print $txtfh "bar\n";
+print $txtfh, "foo\n";
+print $txtfh, "bar\n";
 
 ok(close($txtfh));
 
-print $binfh "foo\n";
-print $binfh "bar\n";
+print $binfh, "foo\n";
+print $binfh, "bar\n";
 
 ok(close($binfh));
 
-print $utffh "foo\x{ff}\n";
-print $utffh "bar\x{abcd}\n";
+print $utffh, "foo\x{ff}\n";
+print $utffh, "bar\x{abcd}\n";
 
 ok(close($utffh));
 
@@ -73,7 +73,7 @@ do {
     ok( defined fileno($x),     '       fileno' );
 
     select $x;
-    ok( (print "ok\n"),         '       print' );
+    ok( (print \*STDOUT, "ok\n"),         '       print' );
 
     select \*STDOUT;
     ok( seek($x,0,0),           '       seek' );
@@ -96,7 +96,7 @@ do {
     ok( defined fileno($x),     '       fileno' );
 
     select $x;
-    ok( (print "ok\n"),         '       print' );
+    ok( (print \*STDOUT, "ok\n"),         '       print' );
 
     select \*STDOUT;
     ok( seek($x,0,0),           '       seek' );
@@ -113,7 +113,7 @@ do {
         my $error = "$^OS_ERROR" unless $status; # remember the error
 	close \*STDOUT unless $status;
         open \*STDOUT, ">&",  \*$oldout or die "cannot dup OLDOUT: $^OS_ERROR";
-        print "# $error\n" unless $status;
+        print \*STDOUT, "# $error\n" unless $status;
         # report after STDOUT is restored
         ok($status, '       open STDOUT into in-memory var');
 

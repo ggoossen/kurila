@@ -39,7 +39,7 @@ sub ambient_langprefs { # always returns things untainted
 
   foreach my $envname (qw( LANGUAGE LC_ALL LC_MESSAGES LANG )) {
     next unless env::var($envname);
-    DEBUG and print "Noting \$$envname: $(env::var($envname))\n";
+    DEBUG and print \*STDOUT, "Noting \$$envname: $(env::var($envname))\n";
     push @languages,
       < map locale2language_tag($_),
         # if it's a lg tag, fine, pass thru (untainted)
@@ -136,15 +136,15 @@ sub _try_use {   # Basically a wrapper around "require Modulename"
     # weird case: we never use'd it, but there it is!
   };
 
-  print " About to use $module ...\n" if DEBUG;
+  print \*STDOUT, " About to use $module ...\n" if DEBUG;
   do {
     eval "require $module"; # used to be "use $module", but no point in that.
   };
   if($^EVAL_ERROR) {
-    print "Error using $module \: $^EVAL_ERROR\n" if DEBUG +> 1;
+    print \*STDOUT, "Error using $module \: $^EVAL_ERROR\n" if DEBUG +> 1;
     return %tried{+$module} = 0;
   } else {
-    print " OK, $module is used\n" if DEBUG;
+    print \*STDOUT, " OK, $module is used\n" if DEBUG;
     return %tried{+$module} = 1;
   }
 }

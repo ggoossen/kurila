@@ -62,13 +62,13 @@ ok( !-f $qfname, "temp file now gone");
 # TEMPDIR test as somewhere to put the temp files
 # Create temp directory in current dir
 my $template = 'tmpdirXXXXXX';
-print "# Template: $template\n";
+print \*STDOUT, "# Template: $template\n";
 my $tempdir = File::Temp::tempdir( $template ,
 				   DIR => File::Spec->curdir,
 				   CLEANUP => 1,
 				 );
 
-print "# TEMPDIR: $tempdir\n";
+print \*STDOUT, "# TEMPDIR: $tempdir\n";
 
 ok( (-d $tempdir), "Does $tempdir directory exist" );
 push(@dirs, $tempdir);
@@ -79,7 +79,7 @@ $fh = File::Temp->new(
 		     SUFFIX => '.dat',);
 
 ok( $fh->unlink_on_destroy, "should unlink");
-print "# TEMPFILE: Created \$fh\n";
+print \*STDOUT, "# TEMPFILE: Created \$fh\n";
 
 ok( (-f $fh->filename), "File \$fh exists in tempdir?");
 push(@files, $fh->filename);
@@ -88,7 +88,7 @@ push(@files, $fh->filename);
 # ..and again (without unlinking it)
 $fh = File::Temp->new( DIR => $tempdir, UNLINK => 0);
 
-print "# TEMPFILE: Created \$fh\n";
+print \*STDOUT, "# TEMPFILE: Created \$fh\n";
 ok( (-f $fh->filename ), "Second file \$fh exists in tempdir [nounlink]?");
 push(@files, $fh->filename);
 
@@ -98,7 +98,7 @@ $fh = File::Temp->new( TEMPLATE => 'helloXXXXXXX',
 		      DIR => $tempdir,
 		      SUFFIX => '.dat',);
 
-print "# TEMPFILE: Created \$fh\n";
+print \*STDOUT, "# TEMPFILE: Created \$fh\n";
 
 ok( (-f $fh->filename), "File \$fh exists? [from template]" );
 push(@files, $fh->filename);
@@ -108,7 +108,7 @@ push(@files, $fh->filename);
 # it has been closed
 $fh = File::Temp->new( TEMPLATE => 'permXXXXXXX', UNLINK => 0);
 
-print "# TEMPFILE: Created \$fh\n";
+print \*STDOUT, "# TEMPFILE: Created \$fh\n";
 ok( -f $fh->filename, "File \$fh exists?" );
 ok( close( $fh ), "Close file \$fh" );
 ok( ! $fh->unlink_on_destroy, "should not unlink");
@@ -118,7 +118,7 @@ push( @still_there, $fh->filename); # check at END
 # goes out of scope because of $KEEP_ALL
 $fh = File::Temp->new( TEMPLATE => 'permXXXXXXX', UNLINK => 1);
 
-print "# TEMPFILE: Created \$fh\n";
+print \*STDOUT, "# TEMPFILE: Created \$fh\n";
 ok( -f $fh->filename, "File \$fh exists?" );
 ok( close( $fh ), "Close file \$fh" );
 ok( $fh->unlink_on_destroy, "should unlink (in principal)");
@@ -132,5 +132,5 @@ undef $fh;
 $File::Temp::KEEP_ALL = 0;
 
 # Now END block will execute to test the removal of directories
-print "# End of tests. Execute END blocks\n";
+print \*STDOUT, "# End of tests. Execute END blocks\n";
 

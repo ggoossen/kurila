@@ -1,6 +1,6 @@
 #!./perl
 
-print "1..3\n";
+print \*STDOUT, "1..3\n";
 
 my ($err, $x);
 
@@ -9,15 +9,15 @@ try {
     die $err;
 };
 
-print "not " unless $^EVAL_ERROR->{?description} eq $err;
-print "ok 1\n";
+print \*STDOUT, "not " unless $^EVAL_ERROR->{?description} eq $err;
+print \*STDOUT, "ok 1\n";
 
 try {
-    local $^DIE_HOOK = sub { print "ok ", @_[0]->{?description}, "\n" } ;
+    local $^DIE_HOOK = sub { print \*STDOUT, "ok ", @_[0]->{?description}, "\n" } ;
 
     die 2;
 
-    print "not ";
+    print \*STDOUT, "not ";
 };
 
-print "ok 3\n";
+print \*STDOUT, "ok 3\n";

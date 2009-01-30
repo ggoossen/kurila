@@ -1,20 +1,20 @@
 #!./perl
 
-print "1..22\n";
+print \*STDOUT, "1..22\n";
 
 open (my $tmp, ">",'Cmd_while.tmp') || die "Can't create Cmd_while.tmp.";
-print $tmp "tvi925\n";
-print $tmp "tvi920\n";
-print $tmp "vt100\n";
-print $tmp "Amiga\n";
-print $tmp "paper\n";
+print $tmp, "tvi925\n";
+print $tmp, "tvi920\n";
+print $tmp, "vt100\n";
+print $tmp, "Amiga\n";
+print $tmp, "paper\n";
 close $tmp or die "Could not close: $^OS_ERROR";
 
-print "ok 1\n";
-print "ok 2\n";
-print "ok 3\n";
-print "ok 4\n";
-print "ok 5\n";
+print \*STDOUT, "ok 1\n";
+print \*STDOUT, "ok 2\n";
+print \*STDOUT, "ok 3\n";
+print \*STDOUT, "ok 4\n";
+print \*STDOUT, "ok 5\n";
 
 # test "next" command
 
@@ -27,8 +27,8 @@ entry: while ( ~< *$fh) {
 } continue {
     $badcont = '' if m/vt100/;
 }
-if (!eof(\*$fh) || m/vt100/ || $bad) {print "not ok 6\n";} else {print "ok 6\n";}
-if (!$badcont) {print "ok 7\n";} else {print "not ok 7\n";}
+if (!eof(\*$fh) || m/vt100/ || $bad) {print \*STDOUT, "not ok 6\n";} else {print \*STDOUT, "ok 6\n";}
+if (!$badcont) {print \*STDOUT, "ok 7\n";} else {print \*STDOUT, "not ok 7\n";}
 
 # test "redo" command
 
@@ -45,8 +45,8 @@ loop: while ( ~< *$fh) {
 } continue {
     $badcont = 1 if m/vt100/;
 }
-if (!eof(\*$fh) || $bad) {print "not ok 8\n";} else {print "ok 8\n";}
-if (!$badcont) {print "ok 9\n";} else {print "not ok 9\n";}
+if (!eof(\*$fh) || $bad) {print \*STDOUT, "not ok 8\n";} else {print \*STDOUT, "ok 8\n";}
+if (!$badcont) {print \*STDOUT, "ok 9\n";} else {print \*STDOUT, "not ok 9\n";}
 
 close($fh) || die "Can't close Cmd_while.tmp.";
 unlink 'Cmd_while.tmp' || `/bin/rm Cmd_While.tmp`;
@@ -66,15 +66,15 @@ my $i = 9;
 do {
     $i++;
 };
-print "ok $i\n";
+print \*STDOUT, "ok $i\n";
 
 # Check curpm is reset when jumping out of a scope
 'abc' =~ m/b/p;
 WHILE:
 while (1) {
   $i++;
-  print "not " unless $^PREMATCH . $^MATCH . $^POSTMATCH eq "abc";
-  print "ok $i\n";
+  print \*STDOUT, "not " unless $^PREMATCH . $^MATCH . $^POSTMATCH eq "abc";
+  print \*STDOUT, "ok $i\n";
   do {                             # Localize changes to $` and friends
     'end' =~ m/end/p;
     redo WHILE if $i == 11;
@@ -84,8 +84,8 @@ while (1) {
   };
 }
 $i++;
-print "not " unless $^PREMATCH . $^MATCH . $^POSTMATCH eq "abc";
-print "ok $i\n";
+print \*STDOUT, "not " unless $^PREMATCH . $^MATCH . $^POSTMATCH eq "abc";
+print \*STDOUT, "ok $i\n";
 
 # check that scope cleanup happens right when there's a continue block
 do {
@@ -96,7 +96,7 @@ do {
 	my $i = 0;
     }
     continue {
-        print "ok ", $var-1, "\nok $i\n";
+        print \*STDOUT, "ok ", $var-1, "\nok $i\n";
     }
 };
 
@@ -107,7 +107,7 @@ do {
         local $l = 0
     }
     continue {
-        print "ok $l\n"
+        print \*STDOUT, "ok $l\n"
     };
 };
 
@@ -118,7 +118,7 @@ do {
         local $l = 0
     }
     continue {
-        print "ok $l\n"
+        print \*STDOUT, "ok $l\n"
     }
 };
 
@@ -126,15 +126,15 @@ $i = 20;
 do {
     while (1) {
 	my $x;
-	print $x if defined $x;
+	print \*STDOUT, $x if defined $x;
 	$x = "not ";
-	print "ok $i\n"; ++$i;
+	print \*STDOUT, "ok $i\n"; ++$i;
 	if ($i == 21) {
 	    next;
 	}
 	last;
     }
     continue {
-        print "ok $i\n"; ++$i;
+        print \*STDOUT, "ok $i\n"; ++$i;
     }
 };

@@ -5,7 +5,7 @@
 BEGIN { require "./test.pl"; }
 my $out = runperl(progfile => "../ext/re/t/lexical_debug.pl", stderr => 1 );
 
-print "1..10\n";
+print \*STDOUT, "1..10\n";
 
 # Each pattern will produce an EXACT node with a specific string in 
 # it, so we will look for that. We can't just look for the string

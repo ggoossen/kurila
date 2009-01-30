@@ -37,7 +37,7 @@ do {
     my $value = "\x{236a}" x 3; # e2.8d.aa x 3
 
     open my $fh, ">", "$tmpfile" or die "Can't open $tmpfile: $^OS_ERROR";
-    print $fh $value;
+    print $fh, $value;
     close $fh;
 
     use bytes;

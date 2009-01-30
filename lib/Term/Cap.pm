@@ -492,7 +492,7 @@ sub Tpad
             $string .= $self->{?'_pc'} x ( $ms / $decr );
         }
     }
-    print $FH $string if $FH;
+    print $FH, $string if $FH;
     $string;
 }
 
@@ -544,7 +544,7 @@ sub Tputs
 	}
 	$string = $self->{?$cap};
     }
-    print $FH $string if $FH;
+    print $FH, $string if $FH;
     $string;
 }
 
@@ -665,7 +665,7 @@ sub Tgoto
 	}
     }
     $string = Tpad( $self, $result . $string . $after, $cnt );
-    print $FH $string if $FH;
+    print $FH, $string if $FH;
     $string;
 }
 

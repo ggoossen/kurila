@@ -26,8 +26,8 @@ sub get_temp_fh {
     1 while -e ++$f;
     push @tempfiles, $f;
     open my $fh, ">", "$f" or die "Can't create $f: $^OS_ERROR";
-    print $fh "package ".substr(@_[0],0,-3).";\n1;\n";
-    print $fh @_[1] if (nelems @_) +> 1;
+    print $fh, "package ".substr(@_[0],0,-3).";\n1;\n";
+    print $fh, @_[1] if (nelems @_) +> 1;
     close $fh or die "Couldn't close: $^OS_ERROR";
     open $fh, "<", $f or die "Can't open $f: $^OS_ERROR";
     return $fh;
@@ -253,13 +253,13 @@ if ($can_fork) {
 	my $count = $1;
 	# Lets force some fun with odd sized reads.
 	$^OUTPUT_AUTOFLUSH = 1;
-	print 'push @main::bbblplast, ';
-	print "$count;\n";
+	print \*STDOUT, 'push @main::bbblplast, ';
+	print \*STDOUT, "$count;\n";
 	if ($count--) {
-	    print "use BBBLPLAST$count;\n";
+	    print \*STDOUT, "use BBBLPLAST$count;\n";
 	}
-        print "pass('In @_[1]');";
-	print '"Truth"';
+        print \*STDOUT, "pass('In @_[1]');";
+	print \*STDOUT, '"Truth"';
 	POSIX::_exit(0);
 	die "Can't get here: $^OS_ERROR";
     };

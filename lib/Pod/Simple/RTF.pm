@@ -99,7 +99,7 @@ sub new {
 
   $new->accept_codes(< @_to_accept);
   $new->accept_codes('VerbatimFormatted');
-  DEBUG +> 2 and print "To accept: ", join(' ', @_to_accept), "\n";
+  DEBUG +> 2 and print \*STDOUT, "To accept: ", join(' ', @_to_accept), "\n";
   $new->doc_lang(
     (  env::var('RTFDEFLANG') || '') =~ m/^(\d{1,10})$/s ?? $1
     !! (env::var('RTFDEFLANG') || '') =~ m/^0?x([a-fA-F0-9]{1,10})$/s ?? hex($1)
@@ -159,13 +159,13 @@ sub do_middle {      # the main work
   
     if( ($type = $token->type) eq 'text' ) {
       if( $self->{?'rtfverbatim'} ) {
-        DEBUG +> 1 and print "  $type " , < $token->text, " in verbatim!\n";
+        DEBUG +> 1 and print \*STDOUT, "  $type " , < $token->text, " in verbatim!\n";
         $scratch = rtf_esc_codely($token->text);
-        print $fh $scratch;
+        print $fh, $scratch;
         next;
       }
 
-      DEBUG +> 1 and print "  $type " , < $token->text, "\n";
+      DEBUG +> 1 and print \*STDOUT, "  $type " , < $token->text, "\n";
       
       $scratch = $token->text;
       $scratch =~ s/\t/ /g;
@@ -201,10 +201,10 @@ sub do_middle {      # the main work
         if $WRAP;
         # This may wrap at well past the 65th column, but not past the 120th.
       
-      print $fh $scratch;
+      print $fh, $scratch;
 
     } elsif( $type eq 'start' ) {
-      DEBUG +> 1 and print "  +$type ", <$token->tagname,
+      DEBUG +> 1 and print \*STDOUT, "  +$type ", <$token->tagname,
         " (", < map("<$_> ", %{$token->attr_hash}), ")\n";
 
       if( ($tagname = $token->tagname) eq 'Verbatim'
@@ -219,7 +219,7 @@ sub do_middle {      # the main work
           while( $$t =~ m/$/mg ) {
             last if  ++$line_count  +> 15; # no point in counting further
           }
-          DEBUG +> 3 and print "    verbatim line count: $line_count\n";
+          DEBUG +> 3 and print \*STDOUT, "    verbatim line count: $line_count\n";
         }
         $self->unget_token($next);
         $self->{+'rtfkeep'} = ($line_count +> 15) ?? '' !! '\keepn' ;     
@@ -241,7 +241,7 @@ sub do_middle {      # the main work
           
           if(@to_unget[-1]->type eq 'text') {
             if( ($text_count_here += length ${@to_unget[-1]->text_r}) +> 150 ){
-              DEBUG +> 1 and print "    item-* is too long to be keepn'd.\n";
+              DEBUG +> 1 and print \*STDOUT, "    item-* is too long to be keepn'd.\n";
               last;
             }
           } elsif ((nelems @to_unget) +> 1 and
@@ -253,13 +253,13 @@ sub do_middle {      # the main work
               @to_unget[-1]->type eq 'start' and
               @to_unget[-1]->tagname eq 'Para';
 
-            DEBUG +> 1 and printf "    item-* before \%s(\%s) \%s keepn'd.\n", <
+            DEBUG +> 1 and printf \*STDOUT, "    item-* before \%s(\%s) \%s keepn'd.\n", <
               @to_unget[-1]->type,
               @to_unget[-1]->can('tagname') ?? < @to_unget[-1]->tagname !! '',
               $self->{?'rtfitemkeepn'} ?? "gets" !! "doesn't get";
             last;
           } elsif ((nelems @to_unget) +> 40) {
-            DEBUG +> 1 and print "    item-* now has too many tokens (",
+            DEBUG +> 1 and print \*STDOUT, "    item-* now has too many tokens (",
               scalar(nelems @to_unget),
               (DEBUG +> 4) ?? (q<: >, < map( <$_->dump, @to_unget)) !! (),
               ") to be keepn'd.\n";
@@ -274,7 +274,7 @@ sub do_middle {      # the main work
         push @stack, $1;
         push @indent_stack,
          int($token->attr('indent') * 4 * $self->normal_halfpoint_size);
-        DEBUG and print "Indenting over @indent_stack[-1] twips.\n";
+        DEBUG and print \*STDOUT, "Indenting over @indent_stack[-1] twips.\n";
         $self->{+'rtfindent'} += @indent_stack[-1];
         
       } elsif ($tagname eq 'L') {
@@ -287,26 +287,26 @@ sub do_middle {      # the main work
           $self->unget_token($next);
           next;
         }
-        DEBUG and print "    raw text ", < $next->text, "\n";
-        printf $fh "\n" . $next->text . "\n";
+        DEBUG and print \*STDOUT, "    raw text ", < $next->text, "\n";
+        printf $fh, "\n" . $next->text . "\n";
         next;
       }
 
       defined($scratch = $self->{'Tagmap'}->{?$tagname}) or next;
       $scratch =~ s/\#([^\#]+)\#/%{$self}{?$1}/g; # interpolate
-      print $fh $scratch;
+      print $fh, $scratch;
       
       if ($tagname eq 'item-number') {
-        print $fh < $token->attr('number'), ". \n";
+        print $fh, < $token->attr('number'), ". \n";
       } elsif ($tagname eq 'item-bullet') {
-        print $fh "\\'95 \n";
+        print $fh, "\\'95 \n";
         #for funky testing: print $fh '', rtf_esc("\x{4E4B}\x{9053}");
       }
 
     } elsif( $type eq 'end' ) {
-      DEBUG +> 1 and print "  -$type ", <$token->tagname,"\n";
+      DEBUG +> 1 and print \*STDOUT, "  -$type ", <$token->tagname,"\n";
       if( ($tagname = $token->tagname) =~ m/^over-/s ) {
-        DEBUG and print "Indenting back @indent_stack[-1] twips.\n";
+        DEBUG and print \*STDOUT, "Indenting back @indent_stack[-1] twips.\n";
         $self->{+'rtfindent'} -= pop @indent_stack;
         pop @stack;
       } elsif( $tagname eq 'Verbatim' or $tagname eq 'VerbatimFormatted') {
@@ -314,7 +314,7 @@ sub do_middle {      # the main work
       }
       defined($scratch = $self->{'Tagmap'}->{?"/$tagname"}) or next;
       $scratch =~ s/\#([^\#]+)\#/%{$self}{?$1}/g; # interpolate
-      print $fh $scratch;
+      print $fh, $scratch;
     }
   }
   return 1;
@@ -324,7 +324,7 @@ sub do_middle {      # the main work
 sub do_beginning {
   my $self = @_[0];
   my $fh = $self->{?'output_fh'};
-  return print $fh join '', @( <
+  return print $fh, join '', @( <
     $self->doc_init, <
     $self->font_table, <
     $self->stylesheet, <
@@ -338,7 +338,7 @@ sub do_beginning {
 sub do_end {
   my $self = @_[0];
   my $fh = $self->{?'output_fh'};
-  return print $fh '}'; # that should do it
+  return print $fh, '}'; # that should do it
 }
 
 ###########################################################################
@@ -440,7 +440,7 @@ END
 sub doc_start {
   my $self = @_[0];
   my $title = $self->get_short_title();
-  DEBUG and print "Short Title: <$title>\n";
+  DEBUG and print \*STDOUT, "Short Title: <$title>\n";
   $title .= ' ' if length $title;
   
   $title =~ s/ *$/ /s;
@@ -453,9 +453,9 @@ sub doc_start {
    if $title =~ m/^\S+$/s and $title =~ m/::/s;
     # catches the most common case, at least
 
-  DEBUG and print "Title0: <$title>\n";
+  DEBUG and print \*STDOUT, "Title0: <$title>\n";
   $title = rtf_esc($title);
-  DEBUG and print "Title1: <$title>\n";
+  DEBUG and print \*STDOUT, "Title1: <$title>\n";
   $title = '\lang1024\noproof ' . $title
    if $is_obviously_module_name;
 

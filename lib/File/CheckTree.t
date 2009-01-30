@@ -47,7 +47,7 @@ do {
         };
     };
 
-    print STDERR $_ for  @warnings;
+    print \*STDERR, $_ for  @warnings;
     if ( !$^EVAL_ERROR && !@warnings && defined($num_warnings) && $num_warnings == 0 ) {
         ok(1);
     }
@@ -213,7 +213,7 @@ do {
         ok(1);
     } else {
         ok(0);
-	print STDERR $^EVAL_ERROR;
+	print \*STDERR, $^EVAL_ERROR;
     };
 };
 

@@ -130,7 +130,7 @@ our @TESTS =
 
 );
 
-print "1..", int(nelems @TESTS), "\n";
+print \*STDOUT, "1..", int(nelems @TESTS), "\n";
 
 my $testid = 1;
 foreach my $test ( @TESTS)
@@ -140,11 +140,11 @@ foreach my $test ( @TESTS)
     {
 	if (!$test->[1])
 	{
-	    print "not ok $testid\n";
+	    print \*STDOUT, "not ok $testid\n";
 	}
 	else
 	{
-	    print "ok $testid\n";
+	    print \*STDOUT, "ok $testid\n";
 	}
     }
     ++$testid;

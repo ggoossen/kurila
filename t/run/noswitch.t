@@ -1,8 +1,8 @@
 #!./perl
 
 BEGIN {
-    print "1..3\n";
+    print \*STDOUT, "1..3\n";
     push @ARGV, 'run/switchp.aux';
 }
-print ~< *ARGV;
-print "ok 3\n";
+print \*STDOUT, ~< *ARGV;
+print \*STDOUT, "ok 3\n";

@@ -23,7 +23,7 @@ my $y = 'now is the time' . "\n" .
 
 is($x, $y,  'test data is sane');
 
-print $try $x;
+print $try, $x;
 close $try or die "Could not close: $^OS_ERROR";
 
 open($try, "<",'Comp.try') || (die "Can't reopen temp file.");

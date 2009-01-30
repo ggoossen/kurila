@@ -108,7 +108,7 @@ sub writeFile
     binmode $fh;
     foreach ( @strings) {
         no warnings ;
-        print $fh $_ ;
+        print $fh, $_ ;
     }
     close $fh ;
 }
@@ -152,17 +152,17 @@ sub hexDump
     #while (read(STDIN, $data, 16)) {
     while (my $data = substr($d, 0, 16)) {
         substr($d, 0, 16, '') ;
-        printf "# \%8.8lx    ", $offset;
+        printf \*STDOUT, "# \%8.8lx    ", $offset;
         $offset += 16;
 
         my @array = @( unpack('C*', $data) );
         foreach ( @array) {
-            printf('%2.2x ', $_);
+            printf(\*STDOUT, '%2.2x ', $_);
         }
-        print "   " x (16 - nelems @array)
+        print \*STDOUT, "   " x (16 - nelems @array)
             if (nelems @array) +< 16 ;
         $data =~ s/[\0-\37\177-\377]/./g;
-        print "  $data\n";
+        print \*STDOUT, "  $data\n";
     }
 
 }
@@ -582,11 +582,11 @@ sub dumpObj
 
     if ((nelems @_))
     {
-        print "#\n# dumpOBJ from $file line $line $(join ' ',@_)\n" ;
+        print \*STDOUT, "#\n# dumpOBJ from $file line $line $(join ' ',@_)\n" ;
     }
     else
     {
-        print "#\n# dumpOBJ from $file line $line \n" ;
+        print \*STDOUT, "#\n# dumpOBJ from $file line $line \n" ;
     }
 
     my $max = 0 ;;
@@ -600,9 +600,9 @@ sub dumpObj
         my $v = $obj->{?$k} ;
         $v = '-undef-' unless defined $v;
         my $pad = ' ' x ($max - length($k) + 2) ;
-        print "# $k$pad: [$v]\n";
+        print \*STDOUT, "# $k$pad: [$v]\n";
     }
-    print "#\n" ;
+    print \*STDOUT, "#\n" ;
 }
 
 

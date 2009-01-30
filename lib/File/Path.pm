@@ -594,7 +594,7 @@ sub _mkpath {
 	unless (-d $parent or $path eq $parent) {
             push(@created, <_mkpath($arg, \@($parent)));
         }
-        print "mkdir $path\n" if $arg->{?verbose};
+        print \*STDOUT, "mkdir $path\n" if $arg->{?verbose};
         if (mkdir($path,$arg->{?mode})) {
             push(@created, $path);
 	}
@@ -774,7 +774,7 @@ sub _rmtree {
             if ($arg->{?depth} or !$arg->{?keep_root}) {
                 if ($arg->{?safe} &&
 		($Is_VMS ?? !&VMS::Filespec::candelete($root) !! !-w $root)) {
-                    print "skipped $root\n" if $arg->{?verbose};
+                    print \*STDOUT, "skipped $root\n" if $arg->{?verbose};
                     next ROOT_DIR;
 	    }
                 if (!chmod $perm ^|^ 0700, $root) {
@@ -782,7 +782,7 @@ sub _rmtree {
                         _error($arg, "cannot make directory writeable", $canon);
                     }
                 }
-                print "rmdir $root\n" if $arg->{?verbose};
+                print \*STDOUT, "rmdir $root\n" if $arg->{?verbose};
 	    if (rmdir $root) {
                     push @{${$arg->{result}}}, $root if $arg->{?result};
 		++$count;
@@ -806,7 +806,7 @@ sub _rmtree {
 		($Is_VMS ?? !&VMS::Filespec::candelete($root)
 		         !! !(-l $root || -w $root)))
 	    {
-                print "skipped $root\n" if $arg->{?verbose};
+                print \*STDOUT, "skipped $root\n" if $arg->{?verbose};
                 next ROOT_DIR;
 	    }
 
@@ -816,7 +816,7 @@ sub _rmtree {
                     _error($arg, "cannot make file writeable", $canon);
                     }
                 }
-            print "unlink $canon\n" if $arg->{?verbose};
+            print \*STDOUT, "unlink $canon\n" if $arg->{?verbose};
 	    # delete all versions under VMS
 	    while (1) {
                 if (unlink $root) {

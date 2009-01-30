@@ -3,16 +3,16 @@ use Perl6::Form;
 my @files = @( ~< *DATA );
 my $files = join "", @files;
 
-print "Number of cols: ";
+print \*STDOUT, "Number of cols: ";
 my $colcount = ~< *ARGV;
 
-print < form 
+print \*STDOUT, < form 
 	'{:[{*}[:}  ' x $colcount,
 	($files) x $colcount;
 
-print "\n\n";
+print \*STDOUT, "\n\n";
 
-print < form 
+print \*STDOUT, < form 
 	'{:[{*}[:}  ' x $colcount,
 	(\@files) x $colcount;
 

@@ -12,7 +12,7 @@ END {
 if ('PerlIO::Layer'->find( 'perlio')) {
     plan(tests => 16);
     ok(open(my $foo,">:crlf",$file));
-    ok(print $foo 'a'.((('a' x 14).qq{\n}) x 2000) || close($foo));
+    ok(print $foo, 'a'.((('a' x 14).qq{\n}) x 2000) || close($foo));
     ok(open($foo,"<:crlf",$file));
 
     my $text;
@@ -56,13 +56,13 @@ if ('PerlIO::Layer'->find( 'perlio')) {
 	    # require PerlIO; print PerlIO::get_layers($foo), "\n";
 	    binmode($foo_fh, "$utf8:crlf") for 1..$binmode;
 	    # require PerlIO; print PerlIO::get_layers($foo), "\n";
-	    print $foo_fh "Hello\n";
+	    print $foo_fh, "Hello\n";
 	    close $foo_fh;
 	    open($foo_fh, "<", "$file");
 	    binmode($foo_fh);
 	    my $foo = scalar ~< *$foo_fh;
 	    close $foo_fh;
-	    print join(" ", @( "#", < map { sprintf('%02x', $_) } @( unpack("C*", $foo)))),
+	    print \*STDOUT, join(" ", @( "#", < map { sprintf('%02x', $_) } @( unpack("C*", $foo)))),
 	    "\n";
 	    ok($foo =~ m/\x0d\x0a$/);
 	    ok($foo !~ m/\x0d\x0d/);

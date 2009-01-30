@@ -56,11 +56,11 @@ my $fil;
 
 try { compress(\@(1)); };
 ok $^EVAL_ERROR->{?description} =~ m#not a scalar reference#
-    or print "# $^EVAL_ERROR\n" ;;
+    or print \*STDOUT, "# $^EVAL_ERROR\n" ;;
 
 try { uncompress(\@(1)); };
 ok $^EVAL_ERROR->{?description} =~ m#not a scalar reference#
-    or print "# $^EVAL_ERROR\n" ;
+    or print \*STDOUT, "# $^EVAL_ERROR\n" ;
 
 $hello = "hello mum" ;
 my $keep_hello = $hello ;
@@ -339,7 +339,7 @@ EOM
     # write it to disk
     ok open(my $fh, ">", "$name") ;
     binmode($fh);
-    print $fh $dest ;
+    print $fh, $dest ;
     close $fh ;
 
     # uncompress with gzopen
@@ -367,7 +367,7 @@ EOM
     # write it to disk
     ok open($fh, ">", "$name") ;
     binmode($fh);
-    print $fh $dest ;
+    print $fh, $dest ;
     close $fh ;
 
     # uncompress with gzopen
@@ -614,7 +614,7 @@ do {
 
     try { gzopen(\@(), 0) ; }  ;
     ok $^EVAL_ERROR->{?description} =~ m/^gzopen: file parameter is not a filehandle or filename at/
-	or print "# $^EVAL_ERROR\n" ;
+	or print \*STDOUT, "# $^EVAL_ERROR\n" ;
 
 #    my $x = Symbol::gensym() ;
 #    try { gzopen($x, 0) ; }  ;
@@ -920,7 +920,7 @@ do {
 
     title "Trailing Data";
     open my $f, ">>", "$name";
-    print $f $trailing;
+    print $f, $trailing;
     close $f;
 
     is slurp($name), $data1 . $data2 . $trailing, "got expected data from slurp" ;

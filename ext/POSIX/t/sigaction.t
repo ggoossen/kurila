@@ -6,7 +6,7 @@ BEGIN{
 	eval 'use POSIX';
 	if($^EVAL_ERROR || $^OS_NAME eq 'MSWin32' || $^OS_NAME eq 'NetWare' || $^OS_NAME eq 'dos' ||
 	   $^OS_NAME eq 'MacOS' || ($^OS_NAME eq 'VMS' && ! config_value('d_sigaction'))) {
-		print "1..0\n";
+		print \*STDOUT, "1..0\n";
 		exit 0;
 	}
 }

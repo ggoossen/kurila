@@ -9,7 +9,7 @@ use Pod::Simple::Search;
 use Test;
 BEGIN { plan tests => 7 }
 
-print "# ", __FILE__,
+print \*STDOUT, "# ", __FILE__,
  ": Testing the scanning of several (well, two) docroots...\n";
 
 my $x = Pod::Simple::Search->new;
@@ -18,14 +18,14 @@ die "Couldn't make an object!?" unless ok defined $x;
 $x->inc(0);
 
 $x->callback(sub {
-  print "#  ", join("  ", map "\{$_\}", @_), "\n";
+  print \*STDOUT, "#  ", join("  ", map "\{$_\}", @_), "\n";
   return;
 });
 
 use File::Spec;
 use Cwd;
 my $cwd = cwd();
-print "# CWD: $cwd\n";
+print \*STDOUT, "# CWD: $cwd\n";
 
 sub source_path {
     my $file = shift;
@@ -48,23 +48,23 @@ if(        -e ($here1 = source_path('testlib1'))) {
 } else {
   die "Can't find the test corpora";
 }
-print "# OK, found the test corpora\n#  as $here1\n# and $here2\n";
+print \*STDOUT, "# OK, found the test corpora\n#  as $here1\n# and $here2\n";
 ok 1;
 
-print $x->_state_as_string;
+print \*STDOUT, $x->_state_as_string;
 #$x->verbose(12);
 
 use Pod::Simple;
 *pretty = \&Pod::Simple::BlackBox::pretty;
 
-print "# OK, starting run...\n# [[\n";
+print \*STDOUT, "# OK, starting run...\n# [[\n";
 my@($name2where, $where2name) = @($x->survey($here1, $here2), $x->path2name);
-print "# ]]\n#OK, run done.\n";
+print \*STDOUT, "# ]]\n#OK, run done.\n";
 
 my $p = pretty( $where2name, $name2where )."\n";
 $p =~ s/, +/,\n/g;
 $p =~ s/^/#  /mg;
-print $p;
+print \*STDOUT, $p;
 
 do {
 my $names = join "|", sort values %$where2name;

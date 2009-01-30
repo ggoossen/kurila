@@ -13,7 +13,7 @@ krunch.pm krunch.pmc whap.pm whap.pmc cirlceA.pm circleB.pm);
 
 my $total_tests = 26;
 
-print "1..$total_tests\n";
+print \*STDOUT, "1..$total_tests\n";
 
 sub do_require {
     $^INCLUDED = %( () );
@@ -27,13 +27,13 @@ sub write_file {
     open(my $req, ">","$f") or die "Can't write '$f': $^OS_ERROR";
     binmode $req;
     use bytes;
-    print $req < @_;
+    print $req, < @_;
     close $req or die "Could not close $f: $^OS_ERROR";
 }
 
 eval 'require 5.005';
-print "not " unless $^EVAL_ERROR;
-print "ok ",$i++,"\n";
+print \*STDOUT, "not " unless $^EVAL_ERROR;
+print \*STDOUT, "ok ",$i++,"\n";
 
 # interaction with pod (see the eof)
 write_file('bleah.pm', "print 'ok $i\n'; 1;\n");
@@ -42,49 +42,49 @@ $i++;
 delete $^INCLUDED{'bleah.pm'};
 
 # run-time failure in require
-print "not " if exists $^INCLUDED{'bleah.pm'};
-print "ok ",$i++,"\n";
+print \*STDOUT, "not " if exists $^INCLUDED{'bleah.pm'};
+print \*STDOUT, "ok ",$i++,"\n";
 
 my $flag_file = 'bleah.flg';
 # run-time error in require
 for my $expected_compile (@(1,0)) {
     write_file($flag_file, 1);
-    print "not " unless -e $flag_file;
-    print "ok ",$i++,"\n";
+    print \*STDOUT, "not " unless -e $flag_file;
+    print \*STDOUT, "ok ",$i++,"\n";
     write_file('bleah.pm', "unlink '$flag_file' or die; \$a=0; \$b=1/\$a; 1;\n");
-    print "# $^EVAL_ERROR\nnot " if try { require 'bleah.pm' };
-    print "ok ",$i++,"\n";
-    print "not " unless -e $flag_file xor $expected_compile;
-    print "ok ",$i++,"\n";
-    print "not " unless exists $^INCLUDED{'bleah.pm'};
-    print "ok ",$i++,"\n";
+    print \*STDOUT, "# $^EVAL_ERROR\nnot " if try { require 'bleah.pm' };
+    print \*STDOUT, "ok ",$i++,"\n";
+    print \*STDOUT, "not " unless -e $flag_file xor $expected_compile;
+    print \*STDOUT, "ok ",$i++,"\n";
+    print \*STDOUT, "not " unless exists $^INCLUDED{'bleah.pm'};
+    print \*STDOUT, "ok ",$i++,"\n";
 }
 
 # compile-time failure in require
 do_require "1)\n";
 # bison says 'parse error' instead of 'syntax error',
 # various yaccs may or may not capitalize 'syntax'.
-print "# $^EVAL_ERROR\nnot " unless $^EVAL_ERROR->message =~ m/(syntax|parse) error/mi;
-print "ok ",$i++,"\n";
+print \*STDOUT, "# $^EVAL_ERROR\nnot " unless $^EVAL_ERROR->message =~ m/(syntax|parse) error/mi;
+print \*STDOUT, "ok ",$i++,"\n";
 
 # previous failure cached in $^INCLUDED
-print "not " unless exists $^INCLUDED{'bleah.pm'};
-print "ok ",$i++,"\n";
+print \*STDOUT, "not " unless exists $^INCLUDED{'bleah.pm'};
+print \*STDOUT, "ok ",$i++,"\n";
 write_file($flag_file, 1);
 write_file('bleah.pm', "unlink '$flag_file'; 1");
-print "# $^EVAL_ERROR\nnot " if try { require 'bleah.pm' };
-print "ok ",$i++,"\n";
-print "# $^EVAL_ERROR\nnot " unless $^EVAL_ERROR->message =~ m/Compilation failed/i;
-print "ok ",$i++,"\n";
-print "not " unless -e $flag_file;
-print "ok ",$i++,"\n";
-print "not " unless exists $^INCLUDED{'bleah.pm'};
-print "ok ",$i++,"\n";
+print \*STDOUT, "# $^EVAL_ERROR\nnot " if try { require 'bleah.pm' };
+print \*STDOUT, "ok ",$i++,"\n";
+print \*STDOUT, "# $^EVAL_ERROR\nnot " unless $^EVAL_ERROR->message =~ m/Compilation failed/i;
+print \*STDOUT, "ok ",$i++,"\n";
+print \*STDOUT, "not " unless -e $flag_file;
+print \*STDOUT, "ok ",$i++,"\n";
+print \*STDOUT, "not " unless exists $^INCLUDED{'bleah.pm'};
+print \*STDOUT, "ok ",$i++,"\n";
 
 # successful require
 do_require "1";
-print "# $^EVAL_ERROR\nnot " if $^EVAL_ERROR;
-print "ok ",$i++,"\n";
+print \*STDOUT, "# $^EVAL_ERROR\nnot " if $^EVAL_ERROR;
+print \*STDOUT, "ok ",$i++,"\n";
 
 # do FILE shouldn't see any outside lexicals
 my $x = "ok $i\n";
@@ -94,25 +94,25 @@ EOT
 do "bleah.do" or die $^EVAL_ERROR;
 dofile();
 sub dofile { do "bleah.do" or die $^EVAL_ERROR; };
-print $x;
+print \*STDOUT, $x;
 
 # Test for fix of RT #24404 : "require $scalar" may load a directory
 my $r = "threads";
 try { require $r };
 $i++;
 if($^EVAL_ERROR->message =~ m/Can't locate threads in \$\^INCLUDE_PATH/) {
-    print "ok $i\n";
+    print \*STDOUT, "ok $i\n";
 } else {
-    print "not ok $i\n";
+    print \*STDOUT, "not ok $i\n";
 }
 
 write_file('bleah.pm', qq(die "This is an expected error";\n));
 delete $^INCLUDED{"bleah.pm"}; ++$main::i;
 try { CORE::require bleah; };
 if ($^EVAL_ERROR->message =~ m/^This is an expected error/) {
-    print "ok $i\n";
+    print \*STDOUT, "ok $i\n";
 } else {
-    print "not ok $i\n";
+    print \*STDOUT, "not ok $i\n";
 }
 
 sub write_file_not_thing {
@@ -133,24 +133,24 @@ do {
     my $pmc_older = ++$i;
     my $pmc_dies = ++$i;
     if ($ccflags =~ m/(?:^|\s)-DPERL_DISABLE_PMC\b/) {
-	print "# .pmc files are ignored, so test that\n";
+	print \*STDOUT, "# .pmc files are ignored, so test that\n";
 	write_file_not_thing('krunch.pmc', '.pmc', $pmc_older);
 	write_file('urkkk.pm', qq(print "ok $simple\n"));
 	write_file('whap.pmc', qq(die "This is not an expected error"));
 
-	print "# Sleeping for 2 seconds before creating some more files\n";
+	print \*STDOUT, "# Sleeping for 2 seconds before creating some more files\n";
 	sleep 2;
 
 	write_file('krunch.pm', qq(print "ok $pmc_older\n"));
 	write_file_not_thing('urkkk.pmc', '.pmc', $simple);
 	write_file('whap.pm', qq(die "This is an expected error"));
     } else {
-	print "# .pmc files should be loaded, so test that\n";
+	print \*STDOUT, "# .pmc files should be loaded, so test that\n";
 	write_file('krunch.pmc', qq(print "ok $pmc_older\n";));
 	write_file_not_thing('urkkk.pm', '.pm', $simple);
 	write_file('whap.pmc', qq(die "This is an expected error"));
 
-	print "# Sleeping for 2 seconds before creating some more files\n";
+	print \*STDOUT, "# Sleeping for 2 seconds before creating some more files\n";
 	sleep 2;
 
 	write_file_not_thing('krunch.pm', '.pm', $pmc_older);
@@ -162,9 +162,9 @@ do {
     try {CORE::require whap; 1} and die;
 
     if ($^EVAL_ERROR->message =~ m/^This is an expected error/) {
-	print "ok $pmc_dies\n";
+	print \*STDOUT, "ok $pmc_dies\n";
     } else {
-	print "not ok $pmc_dies\n";
+	print \*STDOUT, "not ok $pmc_dies\n";
     }
 };
 
@@ -173,8 +173,8 @@ do {
 write_file("circleA.pm", 'BEGIN { require circleB } 1;');
 write_file("circleB.pm", 'require circleA; 1;');
 try { require circleA; };
-print "not " unless $^EVAL_ERROR && $^EVAL_ERROR->message =~ m/Circular dependency: circleA.pm is still being compiled/;
-print "ok ", ++$i, " circular require\n";
+print \*STDOUT, "not " unless $^EVAL_ERROR && $^EVAL_ERROR->message =~ m/Circular dependency: circleA.pm is still being compiled/;
+print \*STDOUT, "ok ", ++$i, " circular require\n";
 
 
 ##########################################

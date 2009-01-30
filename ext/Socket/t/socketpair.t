@@ -36,7 +36,7 @@ do {
       }
     }
     unless ($has_perlio = PerlIO::Layer->find( 'perlio')) {
-	print <<EOF;
+	print \*STDOUT, <<EOF;
 # Since you don't have perlio you might get failures with UTF-8 locales.
 EOF
     }
@@ -75,7 +75,7 @@ signals::set_handler(ALRM => sub {die "Unexpected alarm during testing"});
 
 ok (socketpair (my $left, my $right, AF_UNIX, SOCK_STREAM, PF_UNSPEC),
     'socketpair ($left, $right, AF_UNIX, SOCK_STREAM, PF_UNSPEC)')
-  or print "# \$\! = $^OS_ERROR\n";
+  or print \*STDOUT, "# \$\! = $^OS_ERROR\n";
 
 if ($has_perlio) {
     binmode($left,  ":bytes");
@@ -140,7 +140,7 @@ do {
   # should help
   $^OS_ERROR = $err;
   ok (($^OS_ERROR == EPIPE or $^OS_ERROR == ESHUTDOWN), '$! should be EPIPE or ESHUTDOWN')
-    or printf "\$\!=\%d(\%s)\n", $err, $err;
+    or printf \*STDOUT, "\$\!=\%d(\%s)\n", $err, $err;
 };
 
 my @gripping = @(chr 255, chr 127);
@@ -169,7 +169,7 @@ SKIP: do {
 
 ok (socketpair ($left, $right, AF_UNIX, SOCK_DGRAM, PF_UNSPEC),
     "socketpair (\$left, \$right, AF_UNIX, SOCK_DGRAM, PF_UNSPEC)")
-  or print "# \$\! = $^OS_ERROR\n";
+  or print \*STDOUT, "# \$\! = $^OS_ERROR\n";
 
 if ($has_perlio) {
     binmode($left,  ":bytes");
@@ -210,7 +210,7 @@ SKIP: do {
 
   my $alarmed = 0;
   signals::temp_set_handler(ALRM => sub { $alarmed = 1; });
-  print "# Approximate forever as 3 seconds. Wait 'forever'...\n";
+  print \*STDOUT, "# Approximate forever as 3 seconds. Wait 'forever'...\n";
   alarm 3;
   undef $buffer;
   is (sysread ($right, $buffer, 1), undef,

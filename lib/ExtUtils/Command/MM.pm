@@ -122,7 +122,7 @@ sub pod2man {
                  (-M $man +< -M $pod) &&
                  (-M $man +< -M "Makefile"));
 
-        print "Manifying $man\n";
+        print \*STDOUT, "Manifying $man\n";
 
         my $parser = Pod::Man->new(< %options);
         $parser->parse_from_file($pod, $man)
@@ -151,7 +151,7 @@ sub warn_if_old_packlist {
     my $packlist = @ARGV[0];
 
     return unless -f $packlist;
-    print <<"PACKLIST_WARNING";
+    print \*STDOUT, <<"PACKLIST_WARNING";
 WARNING: I have found an old package in
     $packlist.
 Please make sure the two installations are not conflicting
@@ -216,7 +216,7 @@ POD
 
     $pod .= "=back\n\n";
     $pod =~ s/^ //mg;
-    print $pod;
+    print \*STDOUT, $pod;
 
     return 1;
 }
@@ -236,7 +236,7 @@ sub uninstall {
 
     require ExtUtils::Install;
 
-    print <<'WARNING';
+    print \*STDOUT, <<'WARNING';
 
 Uninstall is unsafe and deprecated, the uninstallation was not performed.
 We will show what would have been done.
@@ -245,7 +245,7 @@ WARNING
 
     ExtUtils::Install::uninstall($packlist, 1, 1);
 
-    print <<'WARNING';
+    print \*STDOUT, <<'WARNING';
 
 Uninstall is unsafe and deprecated, the uninstallation was not performed.
 Please check the list above carefully, there may be errors.

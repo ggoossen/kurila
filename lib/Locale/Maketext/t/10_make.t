@@ -2,7 +2,7 @@
 use Test;
 BEGIN { plan tests => 6; }
 use Locale::Maketext v1.01;
-print "# Hi there...\n";
+print \*STDOUT, "# Hi there...\n";
 ok 1;
 
 # declare some classes...
@@ -29,6 +29,6 @@ ok $lh && $lh->maketext('d2', 7), "hum 14"      ;
 ok $lh && $lh->maketext('d3', 7), "hoo 7 zazen" ;
 ok $lh && $lh->maketext('d4', 7), "hoo 7 zazen" ;
 
-print "# Byebye!\n";
+print \*STDOUT, "# Byebye!\n";
 ok 1;
 

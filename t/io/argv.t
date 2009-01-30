@@ -9,7 +9,7 @@ use File::Spec;
 my $devnull = 'File::Spec'->devnull;
 
 open(my $try, ">", 'Io_argv1.tmp') || (die "Can't open temp file: $^OS_ERROR");
-print $try "a line\n";
+print $try, "a line\n";
 close $try or die "Could not close: $^OS_ERROR";
 
 do {
@@ -45,13 +45,13 @@ my $i = 4;
 while ( ~< *ARGV) {
     s/^/ok $i\n/;
     ++$i;
-    print;
+    print \*STDOUT,;
     next_test();
 }
 open($try, "<", 'Io_argv1.tmp') or die "Can't open temp file: $^OS_ERROR";
-print while ~< *$try;
+print \*STDOUT, while ~< *$try;
 open($try, "<", 'Io_argv2.tmp') or die "Can't open temp file: $^OS_ERROR";
-print while ~< *$try;
+print \*STDOUT, while ~< *$try;
 close $try or die "Could not close: $^OS_ERROR";
 undef $^INPLACE_EDIT;
 

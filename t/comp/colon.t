@@ -13,13 +13,13 @@ $_ = '';	# to avoid undef warning on m// etc.
 
 sub ok {
     my@($test,$ok) =  @_;
-    print "not " unless $ok;
-    print "ok $test\n";
+    print \*STDOUT, "not " unless $ok;
+    print \*STDOUT, "ok $test\n";
 }
 
 $^WARN_HOOK = sub { 1; }; # avoid some spurious warnings
 
-print "1..9\n";
+print \*STDOUT, "1..9\n";
 
 ok 1, (eval "package ABC; sub zyx \{1\}; 1;" and
 	eval "ABC::zyx" and

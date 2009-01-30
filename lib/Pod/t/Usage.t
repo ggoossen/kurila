@@ -62,7 +62,7 @@ SKIP: do { # Test exit status from pod2usage()
     my $prg = qq[$($cq)pod2usage(\\\%( $args ))$cq];
     my @cmd = @( $^EXECUTABLE_NAME, < @params, $prg );
 
-    print "# cmd = $(join ' ',@cmd)\n";
+    print \*STDOUT, "# cmd = $(join ' ',@cmd)\n";
 
     is( system( < @cmd ) >> 8, $exit, 'Exit status of pod2usage()' );
 };

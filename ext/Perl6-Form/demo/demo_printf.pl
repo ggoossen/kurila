@@ -5,48 +5,48 @@ my @data = @( ~< *DATA );
 for ( @data) {
 	my @($pid, $cmd, $time, $cpu) =  split;
 	$cmd =~ s/_/ /g;
-	print < form
+	print \*STDOUT, < form
 		 "\{>>>\}  \{<<<<<<<<<<<<<<\}  \{>>>>>>\}  \{>>.\}\%",
 		  $pid,  $cmd,             $time,    $cpu;
 }
 
-print "---------------------------------------------\n";
+print \*STDOUT, "---------------------------------------------\n";
 
 for ( @data) {
 	my @($pid, $cmd, $time, $cpu) =  split;
 	$cmd =~ s/_/ /g;
-	print < form
+	print \*STDOUT, < form
 		 "\{>>>\}  \{<<<<<<<<<<<<<<\}  \{]]]]]]\}   \{>\{5.2\}.<\%\}",
 		  $pid,  $cmd,             $time,    $cpu;
 }
 
-print "---------------------------------------------\n";
+print \*STDOUT, "---------------------------------------------\n";
 
 for ( @data) {
 	my @($pid, $cmd, $time, $cpu) =  split;
 	$cmd =~ s/_/ /g;
-	print < form
+	print \*STDOUT, < form
 		 \%(single=>'%'),
 		 "\{>>>\}  \{<<<<<<<<<<<<<<\}  \{]]]]]]\}  \{>>.\}\%",
 		  $pid,  $cmd,             $time,    $cpu, '%';
 }
 
-print "---------------------------------------------\n";
+print \*STDOUT, "---------------------------------------------\n";
 
 for ( @data) {
 	my @($pid, $cmd, $time, $cpu) =  split;
 	$cmd =~ s/_/ /g;
-	print < form
+	print \*STDOUT, < form
 		 "\{>>>\}  \{<<<<<<<<<<<<<<\}  \{]]]]]+\}  \{>>.\}\%",
 		  $pid,  $cmd,             $time,    $cpu;
 }
 
-print "---------------------------------------------\n";
+print \*STDOUT, "---------------------------------------------\n";
 
 for ( @data) {
 	my @($pid, $cmd, $time, $cpu) =  split;
 	$cmd =~ s/_/ /g;
-	printf "\%5d  \%-16s  \%8s  \%5.1f\%\%\n",
+	printf \*STDOUT, "\%5d  \%-16s  \%8s  \%5.1f\%\%\n",
 		  $pid,  $cmd,  $time, $cpu;
 }
 

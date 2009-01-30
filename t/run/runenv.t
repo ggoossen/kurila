@@ -9,7 +9,7 @@ use Config;
 
 BEGIN {
     unless (config_value('d_fork')) {
-        print "1..0 # Skip: no fork\n";
+        print \*STDOUT, "1..0 # Skip: no fork\n";
         exit 0;
     }
 }
@@ -78,7 +78,7 @@ sub runperl {
 
 
 sub it_didnt_work {
-    print STDOUT "IWHCWJIHCI\cNHJWCJQWKJQJWCQW\n";
+    print \*STDOUT, "IWHCWJIHCI\cNHJWCJQWKJQJWCQW\n";
     exit $FAILURE_CODE;
 }
 

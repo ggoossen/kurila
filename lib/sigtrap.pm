@@ -23,7 +23,7 @@ sub import {
                 $saw_sig++;
                 unless ($untrapped and signals::handler($_)
                           and signals::handler($_) ne 'DEFAULT') {
-                    print "Installing handler $(dump::view($handler)) for $_\n" if $Verbose;
+                    print \*STDOUT, "Installing handler $(dump::view($handler)) for $_\n" if $Verbose;
                     signals::set_handler($_, $handler);
                 }
             } elsif ($_ eq 'normal-signals') {

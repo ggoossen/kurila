@@ -13,7 +13,7 @@
 sub ok {
 	my @($num, $ok, ?$name) =  @_;
         $num .= " - $name" if defined $name and length $name;
-	print $ok ?? "ok $num\n" !! "not ok $num\n";
+	print \*STDOUT, $ok ?? "ok $num\n" !! "not ok $num\n";
         $ok;
 }
 
@@ -21,14 +21,14 @@ sub num_equal {
 	my @($num, $left, $right, $name) =  @_;
         my $ok = ((defined $left) ?? $left == $right !! undef);
         unless (ok ($num, $ok, $name)) {
-          print "# Expected $right\n";
+          print \*STDOUT, "# Expected $right\n";
           if (!defined $left) {
-            print "# Got undef\n";
+            print \*STDOUT, "# Got undef\n";
           } elsif ($left !~ m/[^0-9]/) {
-            print "# Got $left\n";
+            print \*STDOUT, "# Got $left\n";
           } else {
             $left =~ s/([^-a-zA-Z0-9_+])/$(sprintf "\\\%03o", ord $1)/g;
-            print "# Got \"$left\"\n";
+            print \*STDOUT, "# Got \"$left\"\n";
           }
         }
         $ok;

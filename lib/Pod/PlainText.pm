@@ -527,7 +527,7 @@ sub reformat {
 }
 
 # Output text to the output device.
-sub output { @_[1] =~ s/\01/ /g; print { @_[0]->output_handle } @_[1] }
+sub output { @_[1] =~ s/\01/ /g; print  @_[0]->output_handle  ,@_[1] }
 
 
 ############################################################################

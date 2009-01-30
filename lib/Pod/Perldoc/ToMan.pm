@@ -82,7 +82,7 @@ sub parse_from_file {
   
   defined(&Pod::Perldoc::DEBUG)
    and Pod::Perldoc::DEBUG()
-   and print "About to run $command\n";
+   and print \*STDOUT, "About to run $command\n";
   ;
   
   my $rslt = `$command`;
@@ -92,18 +92,18 @@ sub parse_from_file {
   if( $self->{?'__filter_nroff'} ) {
     defined(&Pod::Perldoc::DEBUG)
      and &Pod::Perldoc::DEBUG()
-     and print "filter_nroff is set, so filtering...\n";
+     and print \*STDOUT, "filter_nroff is set, so filtering...\n";
     $rslt = $self->___Do_filter_nroff($rslt);
   } else {
     defined(&Pod::Perldoc::DEBUG)
      and Pod::Perldoc::DEBUG()
-     and print "filter_nroff isn't set, so not filtering.\n";
+     and print \*STDOUT, "filter_nroff isn't set, so not filtering.\n";
   }
 
   if (($err = $^CHILD_ERROR)) {
     defined(&Pod::Perldoc::DEBUG)
      and Pod::Perldoc::DEBUG()
-     and print "Nonzero exit ($^CHILD_ERROR) while running $command.\n",
+     and print \*STDOUT, "Nonzero exit ($^CHILD_ERROR) while running $command.\n",
                "Falling back to Pod::Perldoc::ToPod\n ",
     ;
     # A desperate fallthru:
@@ -111,7 +111,7 @@ sub parse_from_file {
     return  Pod::Perldoc::ToPod->new->parse_from_file(< @_);
     
   } else {
-    print $outfh $rslt
+    print $outfh, $rslt
      or die "Can't print to %$self{?__output_file}: $^OS_ERROR";
   }
   

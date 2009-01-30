@@ -1,24 +1,24 @@
 #!./perl
 
-print "1..55\n";
+print \*STDOUT, "1..55\n";
 
 my $x = 'x';
 
-print "#1	:$x: eq :x:\n";
-if ($x eq 'x') {print "ok 1\n";} else {print "not ok 1\n";}
+print \*STDOUT, "#1	:$x: eq :x:\n";
+if ($x eq 'x') {print \*STDOUT, "ok 1\n";} else {print \*STDOUT, "not ok 1\n";}
 
 $x = '';
 
-if ($x eq '') {print "ok 2\n";} else {print "not ok 2\n";}
+if ($x eq '') {print \*STDOUT, "ok 2\n";} else {print \*STDOUT, "not ok 2\n";}
 
 our @x;
 $x = ((nelems @x)-1);
 
-if ($x eq '-1') {print "ok 3\n";} else {print "not ok 3\n";}
+if ($x eq '-1') {print \*STDOUT, "ok 3\n";} else {print \*STDOUT, "not ok 3\n";}
 
 $x = '\\'; # ';
 
-if (length($x) == 2) {print "ok 4\n";} else {print "not ok 4\n";}
+if (length($x) == 2) {print \*STDOUT, "ok 4\n";} else {print \*STDOUT, "not ok 4\n";}
 
 eval 'while (0) {
     print "foo\n";
@@ -29,23 +29,23 @@ m/^/ && (print "ok 5\n");
 our ($foo, %foo, $bar, $bar, @ary, $A, $X, @X, $N);
 
 eval '%foo{+1} / 1;';
-if (!$^EVAL_ERROR) {print "ok 6\n";} else {print "not ok 6 $^EVAL_ERROR\n";}
+if (!$^EVAL_ERROR) {print \*STDOUT, "ok 6\n";} else {print \*STDOUT, "not ok 6 $^EVAL_ERROR\n";}
 
 eval '$foo = 123+123.4+123e4+123.4E5+123.4e+5+.12;';
 
 $foo = int($foo * 100 + .5);
-if ($foo eq 2591024652) {print "ok 7\n";} else {print "not ok 7 :$foo:\n";}
+if ($foo eq 2591024652) {print \*STDOUT, "ok 7\n";} else {print \*STDOUT, "not ok 7 :$foo:\n";}
 
-print <<'EOF';
+print \*STDOUT, <<'EOF';
 ok 8
 EOF
 
 $foo = 'ok 9';
-print <<EOF;
+print \*STDOUT, <<EOF;
 $foo
 EOF
 
-eval <<\EOE, print $^EVAL_ERROR;
+eval <<\EOE, print \*STDOUT, $^EVAL_ERROR;
 print <<'EOF';
 ok 10
 EOF
@@ -56,35 +56,35 @@ $foo
 EOF
 EOE
 
-print <<'EOS' . <<\EOF;
+print \*STDOUT, <<'EOS' . <<\EOF;
 ok 12 - make sure single quotes are honored \nnot ok
 EOS
 ok 13
 EOF
 
-print qq/ok 14\n/;
-print qq(ok 15\n);
+print \*STDOUT, qq/ok 14\n/;
+print \*STDOUT, qq(ok 15\n);
 
-print qq
+print \*STDOUT, qq
 [ok 16\n]
 ;
 
-print q<ok 17
+print \*STDOUT, q<ok 17
 >;
 
-print <<;   # Yow!
+print \*STDOUT, <<;   # Yow!
 ok 18
 
 # previous line intentionally left blank.
 
-print <<E1 eq "foo\n\n" ?? "ok 19\n" !! "not ok 19\n";
+print \*STDOUT, <<E1 eq "foo\n\n" ?? "ok 19\n" !! "not ok 19\n";
 $( <<E2
 foo
 E2
 )
 E1
 
-print <<E1 eq "foo\n\n" ?? "ok 20\n" !! "not ok 20\n";
+print \*STDOUT, <<E1 eq "foo\n\n" ?? "ok 20\n" !! "not ok 20\n";
 $(
   <<E2
 foo
@@ -99,49 +99,49 @@ do {
     @ary[+0] = 'ABC';
 };
 
-print "%foo{?$bar}" eq "BAZ" ?? "ok 21\n" !! "not ok 21\n";
+print \*STDOUT, "%foo{?$bar}" eq "BAZ" ?? "ok 21\n" !! "not ok 21\n";
 
-print "$($foo)\{$bar\}" eq "FOO\{BAR\}" ?? "ok 22\n" !! "not ok 22\n";
-print "$(%foo{?$bar})" eq "BAZ" ?? "ok 23\n" !! "not ok 23\n";
+print \*STDOUT, "$($foo)\{$bar\}" eq "FOO\{BAR\}" ?? "ok 22\n" !! "not ok 22\n";
+print \*STDOUT, "$(%foo{?$bar})" eq "BAZ" ?? "ok 23\n" !! "not ok 23\n";
 
 #print "FOO:" =~ m/$foo[:]/ ? "ok 24\n" : "not ok 24\n";
-print "ok 24\n";
-print "ABC" =~ m/^@ary[$A]$/ ?? "ok 25\n" !! "not ok 25\n";
+print \*STDOUT, "ok 24\n";
+print \*STDOUT, "ABC" =~ m/^@ary[$A]$/ ?? "ok 25\n" !! "not ok 25\n";
 #print "FOOZ" =~ m/^$foo[$A-Z]$/ ? "ok 26\n" : "not ok 26\n";
-print "ok 26\n";
+print \*STDOUT, "ok 26\n";
 
 # MJD 19980425
 @($X, @< @X) =  qw(a b c d); 
-print "d" =~ m/^@X[-1]$/ ?? "ok 27\n" !! "not ok 27\n";
-print "a1" !~ m/^@X[-1]$/ ?? "ok 28\n" !! "not ok 28\n";
+print \*STDOUT, "d" =~ m/^@X[-1]$/ ?? "ok 27\n" !! "not ok 27\n";
+print \*STDOUT, "a1" !~ m/^@X[-1]$/ ?? "ok 28\n" !! "not ok 28\n";
 
-print (((q{{\{\(}} . q{{\)\}}}) eq '{\{\(}} . q{{\)\}}') ?? "ok 29\n" !! "not ok 29\n");
+print (\*STDOUT, ((q{{\{\(}} . q{{\)\}}}) eq '{\{\(}} . q{{\)\}}') ?? "ok 29\n" !! "not ok 29\n");
 
 $foo = "not ok 30\n";
 $foo =~ s/^not /$(substr(<<EOF, 0, 0))/;
   Ignored
 EOF
-print $foo;
+print \*STDOUT, $foo;
 
 # Tests for new extended control-character variables
 # MJD 19990227
 
 do {
-  print "ok 31\n";
-  print "ok 32\n";
-  print "ok 33\n";
-  print "ok 34\n";
-  print "ok 35\n";
-  print "ok 36\n";
+  print \*STDOUT, "ok 31\n";
+  print \*STDOUT, "ok 32\n";
+  print \*STDOUT, "ok 33\n";
+  print \*STDOUT, "ok 34\n";
+  print \*STDOUT, "ok 35\n";
+  print \*STDOUT, "ok 36\n";
 
   eval 'my $^X;';
-  print "not " unless index ($^EVAL_ERROR->{?description}, q|Can't use global $^X in "my"|) +> -1;
-  print "ok 37\n";
+  print \*STDOUT, "not " unless index ($^EVAL_ERROR->{?description}, q|Can't use global $^X in "my"|) +> -1;
+  print \*STDOUT, "ok 37\n";
 #  print "($@)\n" if $@;
 
   eval 'my $^XYZ;';
-  print "not " unless index ($^EVAL_ERROR->{?description}, q|Can't use global $^XYZ in "my"|) +> -1;
-  print "ok 38\n";
+  print \*STDOUT, "not " unless index ($^EVAL_ERROR->{?description}, q|Can't use global $^XYZ in "my"|) +> -1;
+  print \*STDOUT, "ok 38\n";
 #  print "($@)\n" if $@;
 
 # Now let's make sure that caret variables are all forced into the main package.
@@ -149,11 +149,11 @@ do {
   $^RE_TRIE_MAXBUF = 'Someother 2';
   $^EMERGENCY_MEMORY = 'Someother 3';
   package main;
-  print "ok 39\n";
-  print "not " unless $^RE_TRIE_MAXBUF eq 'Someother 2';
-  print "ok 40\n";
-  print "not " unless $^EMERGENCY_MEMORY eq 'Someother 3';
-  print "ok 41\n";
+  print \*STDOUT, "ok 39\n";
+  print \*STDOUT, "not " unless $^RE_TRIE_MAXBUF eq 'Someother 2';
+  print \*STDOUT, "ok 40\n";
+  print \*STDOUT, "not " unless $^EMERGENCY_MEMORY eq 'Someother 3';
+  print \*STDOUT, "ok 41\n";
 
   
 };
@@ -163,8 +163,8 @@ do {
 sub T {
     my @($where, $num) =  @_;
     my @($p,$f,$l) =@( caller);
-    print "# $p:$f:$l vs /$where/\nnot " unless "$p:$f:$l" =~ m/$where/;
-    print "ok $num\n";
+    print \*STDOUT, "# $p:$f:$l vs /$where/\nnot " unless "$p:$f:$l" =~ m/$where/;
+    print \*STDOUT, "ok $num\n";
 }
 
 my $test = 42;
@@ -181,9 +181,9 @@ EOT
 # line 1 "plunk"
 	T('^main:plunk:1$', $test++);
     };
-    print "not ok $test # TODO heredoc inside quoted construct\n" if $^EVAL_ERROR; $test++;
+    print \*STDOUT, "not ok $test # TODO heredoc inside quoted construct\n" if $^EVAL_ERROR; $test++;
     T '^main:plink:53$', $test++;
-    print "ok 44\nok 45\nok 46\n";
+    print \*STDOUT, "ok 44\nok 45\nok 46\n";
 };
 #line 218 "lex.t"
 
@@ -194,20 +194,20 @@ EOT
 do {
   my $test = 47;
   our (@nosuch, @a, @example);
-  eval(q(">$(join ' ', < @nosuch)<" eq "><")) || print "# $^EVAL_ERROR", "not ";
-  print "ok $test\n";
+  eval(q(">$(join ' ', < @nosuch)<" eq "><")) || print \*STDOUT, "# $^EVAL_ERROR", "not ";
+  print \*STDOUT, "ok $test\n";
   ++$test;
 
   # Let's make sure that normal array interpolation still works right
   # For some reason, this appears not to be tested anywhere else.
   my @a = @(1,2,3);
-  print( ((">$(join ' ',@a)<" eq ">1 2 3<") ?? '' !! 'not '), "ok $test\n");
+  print(\*STDOUT,  ((">$(join ' ',@a)<" eq ">1 2 3<") ?? '' !! 'not '), "ok $test\n");
   ++$test;
 
   # Ditto.
   eval(q{@nosuch = @('a', 'b', 'c'); ">$(join ' ', @nosuch)<" eq ">a b c<"}) 
-      || print "# $^EVAL_ERROR", "not ";
-  print "ok $test\n";
+      || print \*STDOUT, "# $^EVAL_ERROR", "not ";
+  print \*STDOUT, "ok $test\n";
   ++$test;
 
   # This isn't actually a lex test, but it's testing the same feature
@@ -217,8 +217,8 @@ do {
   }
 
   eval(q{makearray(); ">$(join ' ', @R::crackers)<" eq ">fish dog carrot<"})
-    || print "# $^EVAL_ERROR", "not ";
-  print "ok $test\n";
+    || print \*STDOUT, "# $^EVAL_ERROR", "not ";
+  print \*STDOUT, "ok $test\n";
   ++$test;
 };
 
@@ -233,13 +233,13 @@ my %str = %(
 );
 
 my $test = 51;
-print ((exists %str{foo}      ?? "" !! "not ")."ok $test\n"); ++$test;
-print ((exists %str{bar}      ?? "" !! "not ")."ok $test\n"); ++$test;
-print ((exists %str{'xyz::bar'} ?? "" !! "not ")."ok $test\n"); ++$test;
+print (\*STDOUT, (exists %str{foo}      ?? "" !! "not ")."ok $test\n"); ++$test;
+print (\*STDOUT, (exists %str{bar}      ?? "" !! "not ")."ok $test\n"); ++$test;
+print (\*STDOUT, (exists %str{'xyz::bar'} ?? "" !! "not ")."ok $test\n"); ++$test;
 
-sub foo::::::bar { print "ok $test\n"; $test++ }
+sub foo::::::bar { print \*STDOUT, "ok $test\n"; $test++ }
 foo::::::bar;
 
 eval "\$x =\x[E2]foo";
-if ($^EVAL_ERROR->{?description} =~ m/Unrecognized character \\xE2 in column 5/) { print "ok $test\n"; } else { print "not ok $test\n"; }
+if ($^EVAL_ERROR->{?description} =~ m/Unrecognized character \\xE2 in column 5/) { print \*STDOUT, "ok $test\n"; } else { print \*STDOUT, "not ok $test\n"; }
 $test++;

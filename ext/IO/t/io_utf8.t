@@ -2,7 +2,7 @@
 
 BEGIN {
     unless (PerlIO::Layer->find( 'perlio')) {
-	print "1..0 # Skip: not perlio\n";
+	print \*STDOUT, "1..0 # Skip: not perlio\n";
 	exit 0;
     }
 }
@@ -20,7 +20,7 @@ use_ok('IO::File');
 $io = IO::File->new;
 
 ok($io->open("io_utf8", ">:utf8"), "open >:utf8");
-ok((print $io chr(256)), "print chr(256)");
+ok((print $io, chr(256)), "print chr(256)");
 undef $io;
 
 $io = IO::File->new;

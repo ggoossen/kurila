@@ -24,7 +24,7 @@ do {
 
     binmode $f;
     ok( -f "afile",             '       its a file');
-    ok( (print $f "SomeData\n"),  '       we can print to it');
+    ok( (print $f, "SomeData\n"),  '       we can print to it');
     is( tell($f), 9,            '       tell()' );
     ok( seek($f,0,0),           '       seek set' );
 
@@ -38,14 +38,14 @@ do {
 
 do {
     ok( open(my $f,'>', 'afile'),       "open(my \$f, '>', 'afile')" );
-    ok( (print $f "a row\n"),           '       print');
+    ok( (print $f, "a row\n"),           '       print');
     ok( close($f),                      '       close' );
     ok( -s 'afile' +< 10,                '       -s' );
 };
 
 do {
     ok( open(my $f,'>>', 'afile'),      "open(my \$f, '>>', 'afile')" );
-    ok( (print $f "a row\n"),           '       print' );
+    ok( (print $f, "a row\n"),           '       print' );
     ok( close($f),                      '       close' );
     ok( -s 'afile' +> 10,                '       -s'    );
 };
@@ -66,7 +66,7 @@ do {
     my @rows = @( ~< $f );
     is( scalar nelems @rows, 2,                '       readline, list context' );
     ok( seek($f, 0, 1),                 '       seek cur' );
-    ok( (print $f "yet another row\n"), '       print' );
+    ok( (print $f, "yet another row\n"), '       print' );
     ok( close($f),                      '       close' );
     ok( -s 'afile' +> 20,                '       -s' );
 
@@ -94,11 +94,11 @@ EOC
 
     my @rows = @( ~< $f );
     my $test = curr_test;
-    print $f "not ok $test - piped in\n";
+    print $f, "not ok $test - piped in\n";
     next_test;
 
     $test = curr_test;
-    print $f "not ok $test - piped in\n";
+    print $f, "not ok $test - piped in\n";
     next_test;
     ok( close($f),                      '       close' );
     sleep 1;
@@ -118,7 +118,7 @@ do {
     binmode $f;
 
     ok( -f "afile",                     '       -f' );
-    ok( (print $f "SomeData\n"),        '       print' );
+    ok( (print $f, "SomeData\n"),        '       print' );
     is( tell($f), 9,                    '       tell' );
     ok( seek($f,0,0),                   '       seek set' );
 
@@ -133,14 +133,14 @@ do {
 
 do {
     ok( open(local $f,'>', 'afile'),    'open local $f, ">", ...' );
-    ok( (print $f "a row\n"),           '       print');
+    ok( (print $f, "a row\n"),           '       print');
     ok( close($f),                      '       close');
     ok( -s 'afile' +< 10,                '       -s' );
 };
 
 do {
     ok( open(local $f,'>>', 'afile'),   'open local $f, ">>", ...' );
-    ok( (print $f "a row\n"),           '       print');
+    ok( (print $f, "a row\n"),           '       print');
     ok( close($f),                      '       close');
     ok( -s 'afile' +> 10,                '       -s' );
 };
@@ -159,7 +159,7 @@ do {
     my @rows = @( ~< $f );
     is( scalar nelems @rows, 2,                '       readline list context' );
     ok( seek($f, 0, 1),                 '       seek cur' );
-    ok( (print $f "yet another row\n"), '       print' );
+    ok( (print $f, "yet another row\n"), '       print' );
     ok( close($f),                      '       close' );
     ok( -s 'afile' +> 20,                '       -s' );
 
@@ -187,11 +187,11 @@ EOC
 
     my @rows = @( ~< $f );
     my $test = curr_test;
-    print $f "not ok $test - piping\n";
+    print $f, "not ok $test - piping\n";
     next_test;
 
     $test = curr_test;
-    print $f "not ok $test - piping\n";
+    print $f, "not ok $test - piping\n";
     next_test;
     ok( close($f),                      '       close' );
     sleep 1;

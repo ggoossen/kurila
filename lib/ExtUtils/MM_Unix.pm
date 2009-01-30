@@ -216,7 +216,7 @@ sub cflags {
     ( $name = $self->{?NAME} . "_cflags" ) =~ s/:/_/g ;
     if ($prog = %Config{?$name}) {
 	# Expand hints for this extension via the shell
-	print STDOUT "Processing $name hint:\n" if $Verbose;
+	print \*STDOUT, "Processing $name hint:\n" if $Verbose;
 	my@(@o)=@( @(`cc=\"%cflags{cc}\"
 	  ccflags=\"%cflags{ccflags}\"
 	  optimize=\"%cflags{optimize}\"
@@ -233,9 +233,9 @@ sub cflags {
 	    chomp $line;
 	    if ($line =~ m/(.*?)=\s*(.*)\s*$/){
 		%cflags{+$1} = $2;
-		print STDOUT "	$1 = $2\n" if $Verbose;
+		print \*STDOUT, "	$1 = $2\n" if $Verbose;
 	    } else {
-		print STDOUT "Unrecognised result from hint: '$line'\n";
+		print \*STDOUT, "Unrecognised result from hint: '$line'\n";
 	    }
 	}
     }
@@ -994,7 +994,7 @@ sub find_perl {
     my@($self, $ver, $names, $dirs, $trace) =  @_;
 
     if ($trace +>= 2){
-        print "Looking for perl $ver by these names:
+        print \*STDOUT, "Looking for perl $ver by these names:
 $(join ' ',@$names)
 in these dirs:
 $(join ' ',@$dirs)
@@ -1027,9 +1027,9 @@ WARNING
             } else {                                            # foo/bar
                 $abs = $self->catfile($Curdir, $name);
             }
-            print "Checking $abs\n" if ($trace +>= 2);
+            print \*STDOUT, "Checking $abs\n" if ($trace +>= 2);
             next unless $self->maybe_command($abs);
-            print "Executing $abs\n" if ($trace +>= 2);
+            print \*STDOUT, "Executing $abs\n" if ($trace +>= 2);
 
             my $version_check = qq{$abs -le "\$^PERL_VERSION =~ m/^\Q$ver\E/; print qq\{VER_OK\}"};
             $version_check = "%Config{?run} $version_check"
@@ -1050,14 +1050,14 @@ WARNING
             }
 
             if ($val =~ m/^VER_OK/m) {
-                print "Using PERL=$abs\n" if $trace;
+                print \*STDOUT, "Using PERL=$abs\n" if $trace;
                 return $abs;
             } elsif ($trace +>= 2) {
-                print "Result: '$val' ".($^CHILD_ERROR >> 8)."\n";
+                print \*STDOUT, "Result: '$val' ".($^CHILD_ERROR >> 8)."\n";
             }
         }
     }
-    print STDOUT "Unable to find a perl $ver (by these names: $(join ' ',@$names), in these dirs: $(join ' ',@$dirs))\n";
+    print \*STDOUT, "Unable to find a perl $ver (by these names: $(join ' ',@$names), in these dirs: $(join ' ',@$dirs))\n";
     0; # false and not empty
 }
 
@@ -1115,7 +1115,7 @@ sub fixin {    # stolen from the pink Camel book, more or less
 
         my $shb = "";
         if ($interpreter) {
-            print STDOUT "Changing sharpbang in $file to $interpreter"
+            print \*STDOUT, "Changing sharpbang in $file to $interpreter"
                 if $Verbose;
 
             # this is probably value-free on DOSISH platforms
@@ -1143,7 +1143,7 @@ eval 'exec $interpreter $arg -S \$0 \$\{1+"\$\@"\}'
         # Print out the new #! line (or equivalent).
         local $^OUTPUT_RECORD_SEPARATOR;
         local $^INPUT_RECORD_SEPARATOR;
-        print $fixout $shb, ~< $fixin;
+        print $fixout, $shb, ~< $fixin;
         close $fixin;
         close $fixout;
 
@@ -1215,7 +1215,7 @@ sub guess_name {
     $name =~ s|[\-_][\d\.\-]+\z||;  # this is new with MM 5.00, we
                                     # strip minus or underline
                                     # followed by a float or some such
-    print "Warning: Guessing NAME [$name] from current directory name.\n";
+    print \*STDOUT, "Warning: Guessing NAME [$name] from current directory name.\n";
     $name;
 }
 
@@ -1482,7 +1482,7 @@ sub init_PM {
     return if $self->{?PM} and $self->{ARGS}->{?PM};
 
     if ((nelems @{$self->{?PMLIBDIRS}})){
-	print "Searching PMLIBDIRS: $(join ' ',@{$self->{?PMLIBDIRS}})\n"
+	print \*STDOUT, "Searching PMLIBDIRS: $(join ' ',@{$self->{?PMLIBDIRS}})\n"
 	    if ($Verbose +>= 2);
 	require File::Find;
         File::Find::find(sub {
@@ -1508,7 +1508,7 @@ sub init_PM {
 	    my $inst = $self->catfile($prefix,$striplibpath);
 	    local($_) = $inst; # for backwards compatibility
 	    $inst = $self->libscan($inst);
-	    print "libscan($path) => '$inst'\n" if ($Verbose +>= 2);
+	    print \*STDOUT, "libscan($path) => '$inst'\n" if ($Verbose +>= 2);
 	    return unless $inst;
 	    $self->{PM}->{+$path} = $inst;
 	}, < @{$self->{PMLIBDIRS}});
@@ -1666,7 +1666,7 @@ from the perl source tree.
 		$self->{+PERL_ARCHLIB}	   = $lib;
 		$self->{+PERL_INC}	   = $inc;
 		$self->{+UNINSTALLED_PERL}  = 1;
-		print STDOUT <<EOP;
+		print \*STDOUT, <<EOP;
 ... Detected uninstalled Perl.  Trying to continue.
 EOP
 	      }
@@ -1685,7 +1685,7 @@ EOP
     $self->{+MAN3EXT} ||= %Config{?man3ext};
 
     # Get some stuff out of %Config if we haven't yet done so
-    print STDOUT "CONFIG must be an array ref\n"
+    print \*STDOUT, "CONFIG must be an array ref\n"
         if ($self->{?CONFIG} and ref $self->{?CONFIG} ne 'ARRAY');
     $self->{+CONFIG} = \@() unless (ref $self->{?CONFIG});
     push(@{$self->{CONFIG}}, < @ExtUtils::MakeMaker::Get_from_Config);
@@ -1693,7 +1693,7 @@ EOP
     my(%once_only);
     foreach my $m ( @{$self->{CONFIG}}){
         next if %once_only{?$m};
-        print STDOUT "CONFIG key '$m' does not exist in Config.pm\n"
+        print \*STDOUT, "CONFIG key '$m' does not exist in Config.pm\n"
                 unless exists %Config{$m};
         $self->{+uc $m} ||= %Config{?$m};
         %once_only{+$m} = 1;
@@ -1880,11 +1880,11 @@ sub init_lib2arch {
             $self->prefixify($Arch,$ilib,$self->{$Lib});
 
             unless (-d $self->{?$Arch}) {
-                print STDOUT "Directory $self->{?$Arch} not found\n" 
+                print \*STDOUT, "Directory $self->{?$Arch} not found\n" 
                   if $Verbose;
                 $self->{+$Arch} = $self->{?$Lib};
             }
-            print STDOUT "Defaulting $Arch to $self->{?$Arch}\n" if $Verbose;
+            print \*STDOUT, "Defaulting $Arch to $self->{?$Arch}\n" if $Verbose;
         }
     }
 }
@@ -2219,7 +2219,7 @@ sub installbin {
 
 	local($_) = $path; # for backwards compatibility
 	my $to = $self->libscan($path);
-	print "libscan($from) => '$to'\n" if ($Verbose +>=2);
+	print \*STDOUT, "libscan($from) => '$to'\n" if ($Verbose +>=2);
 
         $to = vmsify($to) if %Is{?VMS};
 	%fromto{+$from} = $to;
@@ -2480,7 +2480,7 @@ MAP_PRELIBS   = %Config{?perllibs} %Config{?cryptlib}
           }
         }
 
-	print STDOUT "Warning: $libperl not found
+	print \*STDOUT, "Warning: $libperl not found
     If you're going to build a static perl binary, make sure perl is installed
     otherwise ignore this warning\n"
 		unless (-f $lperl || defined($self->{?PERL_SRC}));
@@ -3054,20 +3054,20 @@ sub prefixify {
 
     $rprefix .= '/' if $sprefix =~ m|/$|;
 
-    print STDERR "  prefixify $var => $path\n" if $Verbose +>= 2;
-    print STDERR "    from $sprefix to $rprefix\n" if $Verbose +>= 2;
+    print \*STDERR, "  prefixify $var => $path\n" if $Verbose +>= 2;
+    print \*STDERR, "    from $sprefix to $rprefix\n" if $Verbose +>= 2;
 
     if( $self->{+ARGS}->{?PREFIX} && $self->file_name_is_absolute($path) && 
         $path !~ s{^\Q$sprefix\E\b}{$rprefix}s ) 
     {
 
-        print STDERR "    cannot prefix, using default.\n" if $Verbose +>= 2;
-        print STDERR "    no default!\n" if !$default && $Verbose +>= 2;
+        print \*STDERR, "    cannot prefix, using default.\n" if $Verbose +>= 2;
+        print \*STDERR, "    no default!\n" if !$default && $Verbose +>= 2;
 
         $path = $self->catdir($rprefix, $default) if $default;
     }
 
-    print "    now $path\n" if $Verbose +>= 2;
+    print \*STDOUT, "    now $path\n" if $Verbose +>= 2;
     return $self->{+uc $var} = $path;
 }
 
@@ -3661,9 +3661,9 @@ sub writedoc {
 # --- perllocal.pod section ---
     my@($self,$what,$name,@< @attribs)=  @_;
     my $time = localtime;
-    print "=head2 $time: $what C<$name>\n\n=over 4\n\n=item *\n\n";
-    print join "\n\n=item *\n\n", map("C<$_>", @attribs);
-    print "\n\n=back\n\n";
+    print \*STDOUT, "=head2 $time: $what C<$name>\n\n=over 4\n\n=item *\n\n";
+    print \*STDOUT, join "\n\n=item *\n\n", map("C<$_>", @attribs);
+    print \*STDOUT, "\n\n=back\n\n";
 }
 
 =item xs_c (o)

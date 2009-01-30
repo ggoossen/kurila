@@ -653,7 +653,7 @@ sub _rd2
 
         while (($status = $z->read($x->{buff})) +> 0) {
             if ($fh) {
-                print $fh ${ $x->{?buff} }
+                print $fh, ${ $x->{?buff} }
                     or return $z->saveErrorString(undef, "Error writing to output file: $^OS_ERROR", $^OS_ERROR);
                 ${ $x->{buff} } = '' ;
             }

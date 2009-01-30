@@ -66,15 +66,15 @@ EOFBLURB
 
     ### output the file
     if( $opts->{?'s'} ) {
-        print STDOUT $outstr;
+        print \*STDOUT, $outstr;
     } else {
         $outfile = VMS::Filespec::vmsify($outfile) if $^OS_NAME eq 'VMS';
-        print "Writing $file into $outfile\n" if $opts->{?'v'};
+        print \*STDOUT, "Writing $file into $outfile\n" if $opts->{?'v'};
         open my $outfh, ">", $outfile
             or do { warn "Could not open $outfile for writing: $^OS_ERROR"; exit 0 };
         binmode $outfh;
         ### $outstr might be empty, if the file was empty
-        print $outfh $outstr if $outstr;
+        print $outfh, $outstr if $outstr;
         close $outfh;
 
         chmod $mode, $outfile;
@@ -92,7 +92,7 @@ sub bulk_process {
 
     open my $fh, "<", $Manifest or die "Could not open '$Manifest':$^OS_ERROR";
 
-    print "Reading $Manifest\n"
+    print \*STDOUT, "Reading $Manifest\n"
             if $opts->{?'v'};
 
     my $count = 0;
@@ -117,13 +117,13 @@ sub bulk_process {
             if (-e $out) {
                 my $changed = -M _;
                 if ($changed +< $LastUpdate and $changed +< -M $file) {
-                    print "Skipping '$file' as '$out' is up-to-date.\n"
+                    print \*STDOUT, "Skipping '$file' as '$out' is up-to-date.\n"
                         if $opts->{?'v'};
                     next;
                 }
             }
             handle_file($opts, $file, $out);
-            print "Converted '$file' to '$out'\n"
+            print \*STDOUT, "Converted '$file' to '$out'\n"
                 if $opts->{?'v'};
 
         ### clean up
@@ -131,16 +131,16 @@ sub bulk_process {
 
             ### file exists?
             unless( -e $out ) {
-                print "File '$file' was not unpacked into '$out'. Can not remove.\n";
+                print \*STDOUT, "File '$file' was not unpacked into '$out'. Can not remove.\n";
 
             ### remove it
             } else {
-                print "Removing '$out'\n";
+                print \*STDOUT, "Removing '$out'\n";
                 1 while unlink $out;
             }
         }
     }
-    print "Found $count files to process out of $lines in '$Manifest'\n"
+    print \*STDOUT, "Found $count files to process out of $lines in '$Manifest'\n"
             if $opts->{?'v'};
 }
 

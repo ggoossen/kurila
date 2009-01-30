@@ -26,7 +26,7 @@ my $h = safer_open("overload.h");
 
 sub print_header {
   my $file = shift;
-  print <<"EOF";
+  print \*STDOUT, <<"EOF";
 /* -*- buffer-read-only: t -*-
  *
  *    $file
@@ -48,14 +48,14 @@ print_header('overload.c');
 
 select $h;
 print_header('overload.h');
-print <<'EOF';
+print \*STDOUT, <<'EOF';
 
 enum {
 EOF
 
-print "    $($_)_amg,\n", foreach  @enums;
+print \*STDOUT, "    $($_)_amg,\n", foreach  @enums;
 
-print <<'EOF';
+print \*STDOUT, <<'EOF';
     max_amg_code
     /* Do not leave a trailing comma here.  C9X allows it, C89 doesn't. */
 };
@@ -64,7 +64,7 @@ print <<'EOF';
 
 EOF
 
-print $c <<'EOF';
+print $c, <<'EOF';
 
 #define AMG_id2name(id) (PL_AMG_names[id]+1)
 #define AMG_id2namelen(id) (PL_AMG_namelens[id]-1)
@@ -78,9 +78,9 @@ char * const PL_AMG_names[NofAMmeth] = {
 EOF
 
 my $last = pop @names;
-print $c "    \"$_\",\n" foreach map { s/(["\\"])/\\$1/g; $_ } @names;
+print $c, "    \"$_\",\n" foreach map { s/(["\\"])/\\$1/g; $_ } @names;
 
-print $c <<"EOT";
+print $c, <<"EOT";
     "$last"
 \};
 EOT

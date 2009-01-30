@@ -24,7 +24,7 @@ my @prgs = @( () ) ;
 my @w_files = @( () ) ;
 
 if ((nelems @ARGV))
-  { print "ARGV = [$(join ' ',@ARGV)]\n" ;
+  { print \*STDOUT, "ARGV = [$(join ' ',@ARGV)]\n" ;
     if ($Is_MacOS) {
       @w_files = map { s#^#:lib:$pragma_name:#; $_ } @ARGV
     } else {
@@ -45,7 +45,7 @@ foreach my $file ( @w_files) {
     my $line = 0;
     open my $got_file, ">", "$file.got" or die if $got_files;
     while ( ~< $f) {
-        print $got_file $_ if $got_files;
+        print $got_file, $_ if $got_files;
         $line++;
 	last if m/^__END__/ ;
     }
@@ -68,7 +68,7 @@ my $file;
 for ( @prgs){
     unless (m/\n/)
      {
-      print "# From $_\n";
+      print \*STDOUT, "# From $_\n";
       $file = $_;
 
       if ($got_files) {
@@ -112,7 +112,7 @@ for ( @prgs){
                 push(@temp_path, $1);
     	    }
 	    open my $f, ">", "$filename" or die "Cannot open $filename: $^OS_ERROR\n" ;
-	    print {$f} $code ;
+	    print $f ,$code ;
 	    close $f or die "Cannot close $filename: $^OS_ERROR\n";
 	}
 	shift @files ;
@@ -126,14 +126,14 @@ for ( @prgs){
     }
 
     open my $test, ">", "$tmpfile" or die "Cannot open >$tmpfile: $^OS_ERROR";
-    print $test q{
+    print $test, q{
         BEGIN {
             open(\*STDERR, ">&", \*STDOUT)
               or die "Can't dup STDOUT->STDERR: $^OS_ERROR;";
         }
     };
-    print $test "\n#line 1\n";  # So the line numbers don't get messed up.
-    print $test $prog,"\n";
+    print $test, "\n#line 1\n";  # So the line numbers don't get messed up.
+    print $test, $prog,"\n";
     close $test or die "Cannot close $tmpfile: $^OS_ERROR";
     my $results = runperl( switches => \@($switch), stderr => 1, progfile => $tmpfile );
     my $status = $^CHILD_ERROR;
@@ -182,7 +182,7 @@ for ( @prgs){
         if $option_regex + $option_random +> 1;
     my $ok = 0;
     if ($results =~ s/^SKIPPED\n//) {
-	print "$results\n" ;
+	print \*STDOUT, "$results\n" ;
 	$ok = 1;
     }
     elsif ($option_random) {
@@ -199,7 +199,7 @@ for ( @prgs){
 
         $src =~ s/\nEXPECT(?:\n|$)(.|\n)*/\nEXPECT\n$results/;
     }
-    print $out_file $src, "\n########\n" if $got_files;
+    print $out_file, $src, "\n########\n" if $got_files;
  
     our $TODO = $todo ?? $todo_reason !! 0;
 
@@ -233,10 +233,10 @@ sub print_err_line {
 		   "GOT:\n$results\n";
     if ($todo) {
 	$err_line =~ s/^/# /mg;
-	print $err_line;  # Harness can't filter it out from STDERR.
+	print \*STDOUT, $err_line;  # Harness can't filter it out from STDERR.
     }
     else {
-	print STDERR $err_line;
+	print \*STDERR, $err_line;
     }
 
     return 1;

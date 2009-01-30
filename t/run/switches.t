@@ -83,7 +83,7 @@ SKIP: do {
     local $TODO = '';   # this one works on VMS
 
     open my $f, ">", "$filename" or skip( "Can't write temp file $filename: $^OS_ERROR" );
-    print $f <<'SWTEST';
+    print $f, <<'SWTEST';
 BEGIN { print "block 1\n"; }
 CHECK { print "block 2\n"; }
 INIT  { print "block 3\n"; }
@@ -123,7 +123,7 @@ is( $r, 'fooxbarx', '-l with octal number' );
 $filename = 'swtest.pm';
 SKIP: do {
     open my $f, ">", "$filename" or skip( "Can't write temp file $filename: $^OS_ERROR",4 );
-    print $f <<'SWTESTPM';
+    print $f, <<'SWTESTPM';
 package swtest;
 sub import { print < map "<$_>", @_ }
 1;
@@ -262,7 +262,7 @@ do {
     sub do_i_unlink { 1 while unlink("file", "file.bak") }
 
     open(my $file, ">", "file") or die "$^PROGRAM_NAME: Failed to create 'file': $^OS_ERROR";
-    print {$file} <<__EOF__;
+    print $file ,<<__EOF__;
 foo yada dada
 bada foo bing
 king kong foo

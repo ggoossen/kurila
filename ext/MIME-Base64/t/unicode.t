@@ -1,5 +1,5 @@
 
-print "1..2\n";
+print \*STDOUT, "1..2\n";
 
 # should encoded the string as encoded in UTF-8
 
@@ -7,17 +7,17 @@ require MIME::Base64;
 
 try {
     my $tmp = MIME::Base64::encode("\x{12c}");
-    print "# enc: $tmp\n";
+    print \*STDOUT, "# enc: $tmp\n";
 };
-print "not " if $^EVAL_ERROR;
-print "ok 1\n";
+print \*STDOUT, "not " if $^EVAL_ERROR;
+print \*STDOUT, "ok 1\n";
 
 require MIME::QuotedPrint;
 
 try {
     my $tmp = MIME::QuotedPrint::encode("\x{12c}");
-    print "# enc: $tmp\n";
+    print \*STDOUT, "# enc: $tmp\n";
 };
-print "not " if $^EVAL_ERROR;
-print "ok 2\n";
+print \*STDOUT, "not " if $^EVAL_ERROR;
+print \*STDOUT, "ok 2\n";
 

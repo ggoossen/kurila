@@ -188,12 +188,12 @@ for ( @prgs) {
     my @($prog, $fil, ...) = @(( <split m/\nFILE\n/, $code), "");
     $prog = "use utf8; " . $prog;
     open my $tmp, ">", "$tmpfile" or die "Could not open $tmpfile: $^OS_ERROR";
-    print $tmp $prog, "\n";
+    print $tmp, $prog, "\n";
     close $tmp or die "Could not close $tmpfile: $^OS_ERROR";
     if ($fil) {
 	$fil .= "\n";
 	open my $ali, ">", "$alifile" or die "Could not open $alifile: $^OS_ERROR";
-	print $ali $fil;
+	print $ali, $fil;
 	close $ali or die "Could not close $alifile: $^OS_ERROR";
 	}
     my $res = runperl( progfile => $tmpfile,
@@ -211,16 +211,16 @@ for ( @prgs) {
     my $pfx = ($res =~ s/^PREFIX\n//);
     my $rexp = qr{^$exp};
     if ($res =~ s/^SKIPPED\n//) {
-	print "$res\n";
+	print \*STDOUT, "$res\n";
 	}
     elsif (($pfx and $res !~ m/^\Q$exp/) or
 	  (!$pfx and $res !~ $rexp)) {
-        print STDERR
+        print \*STDERR,
 	    "PROG:\n$prog\n",
 	    "FILE:\n$fil",
 	    "EXPECTED:\n$exp\n",
 	    "GOT:\n$res\n";
-        print "not ";
+        print \*STDOUT, "not ";
 	}
     ok 1;
     1 while unlink $tmpfile;

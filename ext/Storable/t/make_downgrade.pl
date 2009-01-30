@@ -11,9 +11,9 @@ sub uuencode_it {
 
   my $uu = pack 'u', $frozen;
 
-  printf "begin \%3o $name\n", ord 'A';
-  print $uu;
-  print "\nend\n\n";
+  printf \*STDOUT, "begin \%3o $name\n", ord 'A';
+  print \*STDOUT, $uu;
+  print \*STDOUT, "\nend\n\n";
 }
 
 

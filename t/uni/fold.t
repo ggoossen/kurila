@@ -23,7 +23,7 @@ if (open(my $cf_fh, "<", $CF)) {
 
     die qq[$^PROGRAM_NAME: failed to find casefoldings from "$CF"\n] unless @CF;
 
-    print "1..", (nelems @CF), "\n";
+    print \*STDOUT, "1..", (nelems @CF), "\n";
 
     my $i = 0;
     for my $cf (@CF) {
@@ -40,7 +40,7 @@ if (open(my $cf_fh, "<", $CF)) {
 	my $t5 = ":$a:" =~ m/:[$b]:/i ?? 1 !! 0;
 	my $t6 = ":$b:" =~ m/:$a:/i   ?? 1 !! 0;
 	my $t7 = ":$b:" =~ m/:[$a]:/i ?? 1 !! 0;
-	print $t0 && $t1 && $t2 && $t3 && $t4 && $t5 && $t6 && $t7 ??
+	print \*STDOUT, $t0 && $t1 && $t2 && $t3 && $t4 && $t5 && $t6 && $t7 ??
 	    "ok $i \# $todo - $code - $name - $mapping - $status\n" !!
 	    "not ok $i \# $todo - $code - $name - $mapping - $status - $t0 $t1 $t2 $t3 $t4 $t5 $t6 $t7\n";
     }

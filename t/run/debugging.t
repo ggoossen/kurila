@@ -9,7 +9,7 @@ BEGIN {
 BEGIN {
     require Config;
     if (Config::config_value('ccflags') !~ m/-DDEBUGGING\b/) {
-        print "1..0 # Skip -- Perl built w/o -DDEBUGGING\n";
+        print \*STDOUT, "1..0 # Skip -- Perl built w/o -DDEBUGGING\n";
         exit 0;
     }
 }

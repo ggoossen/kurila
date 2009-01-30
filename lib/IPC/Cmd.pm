@@ -306,7 +306,7 @@ sub run {
         return;
     };        
 
-    print < loc("Running [\%1]...\n", (ref $cmd ?? "$(join ' ',@$cmd)" !! $cmd)) if $verbose;
+    print \*STDOUT, < loc("Running [\%1]...\n", (ref $cmd ?? "$(join ' ',@$cmd)" !! $cmd)) if $verbose;
 
     ### did the user pass us a buffer to fill or not? if so, set this
     ### flag so we know what is expected of us
@@ -322,7 +322,7 @@ sub run {
         my $buf = shift;
         return unless defined $buf;
         
-        print STDOUT $buf if $verbose;
+        print \*STDOUT, $buf if $verbose;
         push @buffer,   $buf;
         push @buff_out, $buf;
     };
@@ -332,7 +332,7 @@ sub run {
         my $buf = shift;
         return unless defined $buf;
         
-        print STDERR $buf if $verbose;
+        print \*STDERR, $buf if $verbose;
         push @buffer,   $buf;
         push @buff_err, $buf;
     };

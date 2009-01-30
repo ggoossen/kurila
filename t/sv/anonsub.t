@@ -32,7 +32,7 @@ for ( @prgs){
     }
     my@($prog,$expected) =  split(m/\nEXPECT\n/, $_);
     open my $test, ">", "$tmpfile";
-    print $test "$prog\n";
+    print $test, "$prog\n";
     close $test or die "Could not close: $^OS_ERROR";
     my $results = $Is_VMS ??
 		`$^EXECUTABLE_NAME "-I[-.lib]" $switch $tmpfile 2>&1` !!
@@ -50,7 +50,7 @@ for ( @prgs){
     $results =~ s/\n%[A-Z]+-[SIWEF]-.*$// if $Is_VMS;  # clip off DCL status msg
     $expected =~ s/\n+$//;
     if ($results ne $expected) {
-       print STDERR "PROG: $switch\n$prog\n";
+       print \*STDERR, "PROG: $switch\n$prog\n";
     }
     is($results, $expected);
 }

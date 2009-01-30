@@ -98,7 +98,7 @@ do {
 
     # eqtime use to clear the contents of the file being equalized!
     open(my $fh, ">>", "$Testfile") || die $^OS_ERROR;
-    print $fh "Foo";
+    print $fh, "Foo";
     close $fh;
 
     @ARGV = @('newfile', $Testfile);
@@ -266,14 +266,14 @@ do {
     do { local @ARGV = @( 'd2utest' ); mkpath; };
     open(my $fh, ">", 'd2utest/foo');
     binmode($fh);
-    print $fh "stuff\015\012and thing\015\012";
+    print $fh, "stuff\015\012and thing\015\012";
     close $fh;
 
     open($fh, ">", 'd2utest/bar');
     binmode($fh);
     my $bin = "\c@\c@\c@\c@\c@\c@\cA\c@\c@\c@\015\012".
               "\@\c@\cA\c@\c@\c@8__LIN\015\012";
-    print $fh $bin;
+    print $fh, $bin;
     close $fh;
 
     local @ARGV = @( 'd2utest' );

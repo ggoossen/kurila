@@ -190,7 +190,7 @@ sub WriteConstants {
     my $athx = $self->C_constant_prefix_param();
     my $symbol_table = C_stringify($package);
 
-    print $c_fh $self->header(), <<"EOADD";
+    print $c_fh, $self->header(), <<"EOADD";
 static void
 $($c_subname)_add_symbol($pthx HV *hash, const char *name, I32 namelen, SV *value) \{
         ENTER;
@@ -202,7 +202,7 @@ $($c_subname)_add_symbol($pthx HV *hash, const char *name, I32 namelen, SV *valu
 
 EOADD
 
-    print $c_fh $explosives ?? <<"EXPLODE" !! "\n";
+    print $c_fh, $explosives ?? <<"EXPLODE" !! "\n";
 
 static int
 Im_sorry_Dave(pTHX_ SV *sv, MAGIC *mg)
@@ -233,7 +233,7 @@ EXPLODE
         $key =~ s/::$//;
         my $key_len = length $key;
 
-        print $c_fh <<"MISSING";
+        print $c_fh, <<"MISSING";
 
 #ifndef SYMBIAN
 
@@ -272,7 +272,7 @@ MISSING
 
     };
 
-    print $xs_fh <<"EOBOOT";
+    print $xs_fh, <<"EOBOOT";
 BOOT:
   \{
 #ifdef dTHX
@@ -297,10 +297,10 @@ EOBOOT
 	    unless defined $struct;
 
 	my $struct_type = $type ?? lc($type) . '_s' !! 'notfound_s';
-	print $c_fh "struct $struct_type $struct;\n";
+	print $c_fh, "struct $struct_type $struct;\n";
 
 	my $array_name = 'values_for_' . ($type ?? lc $type !! 'notfound');
-	print $xs_fh <<"EOBOOT";
+	print $xs_fh, <<"EOBOOT";
 
     static const struct $struct_type $array_name\[] =
       \{
@@ -316,31 +316,31 @@ EOBOOT
 		carp("Attempting to supply a default for '$name' which has no conditional macro");
 		next;
 	    }
-	    print $xs_fh $ifdef;
+	    print $xs_fh, $ifdef;
 	    if ($item->{?invert_macro}) {
-		print $xs_fh
+		print $xs_fh,
 		    "        /* This is the default value: */\n" if $type;
-		print $xs_fh "#else\n";
+		print $xs_fh, "#else\n";
 	    }
-	    print $xs_fh "        \{ ", join (', ', @( "\"$name\"", $namelen, 
+	    print $xs_fh, "        \{ ", join (', ', @( "\"$name\"", $namelen, 
                                               < &$type_to_value($value))), " \},\n",
 						 $self->macro_to_endif($macro);
 	}
 
 
     # Terminate the list with a NULL
-	print $xs_fh "        \{ NULL, 0", (", 0" x $number_of_args), " \} \};\n";
+	print $xs_fh, "        \{ NULL, 0", (", 0" x $number_of_args), " \} \};\n";
 
 	%iterator{+$type} = "value_for_" . ($type ?? lc $type !! 'notfound');
 
-	print $xs_fh <<"EOBOOT";
+	print $xs_fh, <<"EOBOOT";
 	const struct $struct_type *%iterator{?$type} = $array_name;
 EOBOOT
     }
 
     delete $found->{''};
 
-    print $xs_fh <<"EOBOOT";
+    print $xs_fh, <<"EOBOOT";
 #ifndef SYMBIAN
 	$($c_subname)_missing = get_missing_hash(aTHX);
 #endif
@@ -348,16 +348,16 @@ EOBOOT
 
     my $add_symbol_subname = $c_subname . '_add_symbol';
     foreach my $type (sort keys %$found) {
-	print $xs_fh $self->boottime_iterator($type, %iterator{?$type}, 
+	print $xs_fh, $self->boottime_iterator($type, %iterator{?$type}, 
 					      'symbol_table',
 					      $add_symbol_subname);
     }
 
-    print $xs_fh <<"EOBOOT";
+    print $xs_fh, <<"EOBOOT";
 	while (value_for_notfound->name) \{
 EOBOOT
 
-    print $xs_fh $explosives ?? <<"EXPLODE" !! << "DONT";
+    print $xs_fh, $explosives ?? <<"EXPLODE" !! << "DONT";
 	    SV *tripwire = newSV(0);
 	    
 	    sv_magicext(tripwire, 0, PERL_MAGIC_ext, &not_defined_vtbl, 0, 0);
@@ -393,7 +393,7 @@ EXPLODE
 #endif
 DONT
 
-    print $xs_fh <<"EOBOOT";
+    print $xs_fh, <<"EOBOOT";
 
 	    ++value_for_notfound;
 	\}
@@ -406,44 +406,44 @@ EOBOOT
         my $type = $item->{?type};
 	my $type_to_value = $self->type_to_C_value($type);
 
-        print $xs_fh $ifdef;
+        print $xs_fh, $ifdef;
 	if ($item->{?invert_macro}) {
-	    print $xs_fh
+	    print $xs_fh,
 		 "        /* This is the default value: */\n" if $type;
-	    print $xs_fh "#else\n";
+	    print $xs_fh, "#else\n";
 	}
 	my $generator = %type_to_sv{?$type};
 	die "Can't find generator code for type $type"
 	    unless defined $generator;
 
-	print $xs_fh "        \{\n";
+	print $xs_fh, "        \{\n";
 	# We need to use a temporary value because some really troublesome
 	# items use C pre processor directives in their values, and in turn
 	# these don't fit nicely in the macro-ised generator functions
 	my $counter = 0;
-	printf $xs_fh "            \%s temp\%d;\n", $_, $counter++
+	printf $xs_fh, "            \%s temp\%d;\n", $_, $counter++
 	    foreach  @{%type_temporary{$type}};
 
-	print $xs_fh "            $item->{?pre}\n" if $item->{?pre};
+	print $xs_fh, "            $item->{?pre}\n" if $item->{?pre};
 
 	# And because the code in pre might be both declarations and
 	# statements, we can't declare and assign to the temporaries in one.
 	$counter = 0;
-	printf $xs_fh "            temp\%d = \%s;\n", $counter++, $_
+	printf $xs_fh, "            temp\%d = \%s;\n", $counter++, $_
 	    foreach  &$type_to_value($value);
 
 	my @tempvarnames = map {sprintf 'temp%d', $_} 0 .. $counter - 1;
-	printf $xs_fh <<"EOBOOT", $name, &$generator(<@tempvarnames);
+	printf $xs_fh, <<"EOBOOT", $name, &$generator(<@tempvarnames);
 	    $($c_subname)_add_symbol($athx symbol_table, "\%s",
 				    $namelen, \%s);
 EOBOOT
-	print $xs_fh "        $item->{?post}\n" if $item->{?post};
-	print $xs_fh "        \}\n";
+	print $xs_fh, "        $item->{?post}\n" if $item->{?post};
+	print $xs_fh, "        \}\n";
 
-        print $xs_fh $self->macro_to_endif($macro);
+        print $xs_fh, $self->macro_to_endif($macro);
     }
 
-    print $xs_fh <<EOBOOT;
+    print $xs_fh, <<EOBOOT;
     /* As we've been creating subroutines, we better invalidate any cached
        methods  */
     ++PL_sub_generation;
@@ -456,7 +456,7 @@ constant_not_found()
 
 EOBOOT
 
-    print $xs_fh $explosives ?? <<"EXPLODE" !! <<"DONT";
+    print $xs_fh, $explosives ?? <<"EXPLODE" !! <<"DONT";
 
 void
 $xs_subname(sv)

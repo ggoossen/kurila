@@ -24,7 +24,7 @@ sub store_and_retrieve {
   unlink $file or die "Can't unlink '$file': $^OS_ERROR";
   open my $fh, ">", "$file" or die "Can't open '$file': $^OS_ERROR";
   binmode $fh;
-  print $fh $data or die "Can't print to '$file': $^OS_ERROR";
+  print $fh, $data or die "Can't print to '$file': $^OS_ERROR";
   close $fh or die "Can't close '$file': $^OS_ERROR";
 
   return  try {retrieve $file};

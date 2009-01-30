@@ -2,10 +2,10 @@
 use Test;
 BEGIN { plan tests => 4; }
 use Locale::Maketext;
-print "# Hi there...\n";
+print \*STDOUT, "# Hi there...\n";
 ok 1;
 
-print "# --- Making sure that Perl globals are localized ---\n";
+print \*STDOUT, "# --- Making sure that Perl globals are localized ---\n";
 
 # declare a class...
 do {
@@ -18,12 +18,12 @@ do {
 };
 
 my $lh;
-print "# Basic sanity:\n";
+print \*STDOUT, "# Basic sanity:\n";
 ok defined( $lh = Woozle->new() ) && ref($lh);
 
-print "# Make sure \$@ is localized...\n";
+print \*STDOUT, "# Make sure \$@ is localized...\n";
 $^EVAL_ERROR = 'foo';
 ok $lh && $lh->maketext('Eval error: [_1]', $^EVAL_ERROR), "Eval error: foo";
 
-print "# Byebye!\n";
+print \*STDOUT, "# Byebye!\n";
 ok 1;

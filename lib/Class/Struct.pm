@@ -183,7 +183,7 @@ sub struct {
     }
     $out .= "\};\n1;\n";
 
-    print $out if $print;
+    print \*STDOUT, $out if $print;
     my $result = eval $out;
     warn $^EVAL_ERROR if $^EVAL_ERROR;
 }

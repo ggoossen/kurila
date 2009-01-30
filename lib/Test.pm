@@ -166,9 +166,9 @@ sub plan {
     }
     my @todo = sort { $a <+> $b } keys %todo;
     if ((nelems @todo)) {
-	print $TESTOUT "1..$max todo ".join(' ', @todo).";\n";
+	print $TESTOUT, "1..$max todo ".join(' ', @todo).";\n";
     } else {
-	print $TESTOUT "1..$max\n";
+	print $TESTOUT, "1..$max\n";
     }
     ++$planned;
 
@@ -384,14 +384,14 @@ sub ok ($;$$) {
     my $todo = %todo{?$ntest};
     if ($todo and $ok) {
 	$context .= ' TODO?!' if $todo;
-	print $TESTOUT "ok $ntest # ($context)\n";
+	print $TESTOUT, "ok $ntest # ($context)\n";
     } else {
         # Issuing two seperate prints() causes problems on VMS.
         if (!$ok) {
-            print $TESTOUT "not ok $ntest\n";
+            print $TESTOUT, "not ok $ntest\n";
         }
 	else {
-            print $TESTOUT "ok $ntest\n";
+            print $TESTOUT, "ok $ntest\n";
         }
 
         $ok or _complain($result, $expected,
@@ -421,20 +421,20 @@ sub _complain {
     %$detail{+context} .= ' *TODO*' if %$detail{?todo};
     if (!%$detail{?compare}) {
         if (!$diag) {
-            print $TESTERR "# Failed test $ntest in %$detail{?context}\n";
+            print $TESTERR, "# Failed test $ntest in %$detail{?context}\n";
         } else {
-            print $TESTERR "# Failed test $ntest in %$detail{?context}: $diag\n";
+            print $TESTERR, "# Failed test $ntest in %$detail{?context}: $diag\n";
         }
     } else {
         my $prefix = "Test $ntest";
 
-        print $TESTERR "# $prefix got: " . _quote($result) .
+        print $TESTERR, "# $prefix got: " . _quote($result) .
                        " (%$detail{?context})\n";
         $prefix = ' ' x (length($prefix) - 5);
         my $expected_quoted = (defined %$detail{?regex})
          ??  'qr{'.(%$detail{?regex}).'}'  !!  _quote($expected);
 
-        print $TESTERR "# $prefix Expected: $expected_quoted",
+        print $TESTERR, "# $prefix Expected: $expected_quoted",
            $diag ?? " ($diag)" !! (), "\n";
 
         _diff_complain( $result, $expected, $detail, $prefix )
@@ -442,7 +442,7 @@ sub _complain {
     }
 
     if(defined %Program_Lines{ %$detail{?file} }->[ %$detail{?line} ]) {
-        print $TESTERR
+        print $TESTERR,
           "#  %$detail{?file} line %$detail{?line} is: %Program_Lines{ %$detail{?file} }->[ %$detail{?line} ]\n"
          if %Program_Lines{ %$detail{?file} }->[ %$detail{?line} ]
           =~ m/[^\s\#\(\)\{\}\[\]\;]/;  # Otherwise it's uninformative
@@ -463,7 +463,7 @@ sub _diff_complain {
     return _diff_complain_algdiff(< @_)
      if try { require Algorithm::Diff; Algorithm::Diff->VERSION(1.15); 1; };
 
-    $told_about_diff++ or print $TESTERR <<"EOT";
+    $told_about_diff++ or print $TESTERR, <<"EOT";
 # $prefix   (Install the Algorithm::Diff module to have differences in multiline
 # $prefix    output explained.  You might also set the PERL_TEST_DIFF environment
 # $prefix    variable to run a diff program on the output.)
@@ -486,15 +486,15 @@ sub _diff_complain_external {
       return;
     }
 
-    print $got_fh $result;
-    print $exp_fh $expected;
+    print $got_fh, $result;
+    print $exp_fh, $expected;
     if (close($got_fh) && close($exp_fh)) {
         my $diff_cmd = "$diff $exp_filename $got_filename";
-        print $TESTERR "#\n# $prefix $diff_cmd\n";
+        print $TESTERR, "#\n# $prefix $diff_cmd\n";
         if (open(my $diff_fh, "$diff_cmd |")) {
             local $_;
             while ( ~< $diff_fh) {
-                print $TESTERR "# $prefix $_";
+                print $TESTERR, "# $prefix $_";
             }
             close($diff_fh);
         }
@@ -527,36 +527,36 @@ sub _diff_complain_algdiff {
         my $s = $count_lines == 1 ?? "" !! "s";
         my $first_line = @diff_lines[0]->[0] + 1;
 
-        print $TESTERR "# $prefix ";
+        print $TESTERR, "# $prefix ";
         if ($diff_kind eq "GOT") {
-            print $TESTERR "Got $count_lines extra line$s at line $first_line:\n";
+            print $TESTERR, "Got $count_lines extra line$s at line $first_line:\n";
             for my $i ( @diff_lines) {
-                print $TESTERR "# $prefix  + " . _quote(@got[$i->[0]]) . "\n";
+                print $TESTERR, "# $prefix  + " . _quote(@got[$i->[0]]) . "\n";
             }
         } elsif ($diff_kind eq "EXP") {
             if ($count_lines +> 1) {
                 my $last_line = @diff_lines[-1]->[0] + 1;
-                print $TESTERR "Lines $first_line-$last_line are";
+                print $TESTERR, "Lines $first_line-$last_line are";
             }
             else {
-                print $TESTERR "Line $first_line is";
+                print $TESTERR, "Line $first_line is";
             }
-            print $TESTERR " missing:\n";
+            print $TESTERR, " missing:\n";
             for my $i ( @diff_lines) {
-                print $TESTERR "# $prefix  - " . _quote(@exp[$i->[1]]) . "\n";
+                print $TESTERR, "# $prefix  - " . _quote(@exp[$i->[1]]) . "\n";
             }
         } elsif ($diff_kind eq "CH") {
             if ($count_lines +> 1) {
                 my $last_line = @diff_lines[-1]->[0] + 1;
-                print $TESTERR "Lines $first_line-$last_line are";
+                print $TESTERR, "Lines $first_line-$last_line are";
             }
             else {
-                print $TESTERR "Line $first_line is";
+                print $TESTERR, "Line $first_line is";
             }
-            print $TESTERR " changed:\n";
+            print $TESTERR, " changed:\n";
             for my $i ( @diff_lines) {
-                print $TESTERR "# $prefix  - " . _quote(@exp[$i->[1]]) . "\n";
-                print $TESTERR "# $prefix  + " . _quote(@got[$i->[0]]) . "\n";
+                print $TESTERR, "# $prefix  - " . _quote(@exp[$i->[1]]) . "\n";
+                print $TESTERR, "# $prefix  + " . _quote(@got[$i->[0]]) . "\n";
             }
         }
 
@@ -684,7 +684,7 @@ sub skip ($;$$$) {
         my $ok = "ok $ntest # skip";
         $ok .= " $whyskip" if length $whyskip;
         $ok .= "\n";
-        print $TESTOUT $ok;
+        print $TESTOUT, $ok;
         ++ $ntest;
         return 1;
     } else {

@@ -31,13 +31,13 @@ if ($skipplat) {
   $skip = "Skip Not supported on this platform";
 }
 
-print "# We will be skipping some tests : $skip\n" if $skip;
+print \*STDOUT, "# We will be skipping some tests : $skip\n" if $skip;
 
 # start off with basic checking
 
 File::Temp->safe_level( File::Temp::STANDARD );
 
-print "# Testing with STANDARD security...\n";
+print \*STDOUT, "# Testing with STANDARD security...\n";
 
 &test_security(0);
 
@@ -46,7 +46,7 @@ print "# Testing with STANDARD security...\n";
 File::Temp->safe_level( File::Temp::MEDIUM )
   unless $skip;
 
-print "# Testing with MEDIUM security...\n";
+print \*STDOUT, "# Testing with MEDIUM security...\n";
 
 # Now we need to start skipping tests
 &test_security($skip);
@@ -56,7 +56,7 @@ print "# Testing with MEDIUM security...\n";
 File::Temp->safe_level( File::Temp::HIGH )
   unless $skip;
 
-print "# Testing with HIGH security...\n";
+print \*STDOUT, "# Testing with HIGH security...\n";
 
 &test_security($skip);
 
@@ -93,7 +93,7 @@ sub test_security {
 			    } || @(undef, undef);
 
   if (defined $fname1) {
-      print "# fname1 = $fname1\n";
+      print \*STDOUT, "# fname1 = $fname1\n";
       ok( (-e $fname1) );
       push(@files, $fname1); # store for end block
   } elsif (File::Temp->safe_level() != File::Temp::STANDARD) {
@@ -114,7 +114,7 @@ sub test_security {
   }
   my @($fh2, $fname2) =  try { tempfile ($template,  UNLINK => 1 ); };
   if (defined $fname2) {
-      print "# fname2 = $fname2\n";
+      print \*STDOUT, "# fname2 = $fname2\n";
       ok( (-e $fname2) );
       push(@files, $fname2); # store for end block
       close($fh2);

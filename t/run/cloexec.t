@@ -35,7 +35,7 @@
 BEGIN {
     use Config;
     if (! config_value('d_fcntl')) {
-        print("1..0 # Skip: fcntl() is not available\n");
+        print(\*STDOUT, "1..0 # Skip: fcntl() is not available\n");
         exit(0);
     }
     require './test.pl';
@@ -57,7 +57,7 @@ sub make_tmp_file {
     my @($fname, $fcontents) =  @_;
     my $fhtmp;
     open   $fhtmp, ">", "$fname"  or die "open  '$fname': $^OS_ERROR";
-    print  $fhtmp $fcontents  or die "print '$fname': $^OS_ERROR";
+    print  $fhtmp, $fcontents  or die "print '$fname': $^OS_ERROR";
     close  $fhtmp             or die "close '$fname': $^OS_ERROR";
 }
 
@@ -121,7 +121,7 @@ sub test_inherited {
     is( @lines[1], "tmpfile1 line 1\n",      'child stdout: line 1' );
 }
 
-$^SYSTEM_FD_MAX == 2 or print STDERR "# warning: \$^F is $^SYSTEM_FD_MAX (not 2)\n";
+$^SYSTEM_FD_MAX == 2 or print \*STDERR, "# warning: \$^F is $^SYSTEM_FD_MAX (not 2)\n";
 
 # Should not be able to inherit > $^F in the default case.
 open my $fhparent2, "<", "$tmpfile2" or die "open '$tmpfile2': $^OS_ERROR";

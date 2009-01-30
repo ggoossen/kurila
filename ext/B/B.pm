@@ -174,7 +174,7 @@ sub walkoptree_exec {
     while ($$op) {
 	$sym = objsym($op);
 	if (defined($sym)) {
-	    print $prefix, "goto $sym\n";
+	    print \*STDOUT, $prefix, "goto $sym\n";
 	    return;
 	}
 	savesym($op, sprintf("\%s (0x\%lx)", < class($op), $$op));
@@ -183,35 +183,35 @@ sub walkoptree_exec {
 	if ($ppname =~
 	    m/^(d?or(assign)?|and(assign)?|mapwhile|grepwhile|entertry|range|cond_expr)$/)
 	{
-	    print $prefix, uc($1), " => \{\n";
+	    print \*STDOUT, $prefix, uc($1), " => \{\n";
 	    walkoptree_exec( <$op->other, $method, $level + 1);
-	    print $prefix, "\}\n";
+	    print \*STDOUT, $prefix, "\}\n";
 	} elsif ($ppname eq "match" || $ppname eq "subst") {
 	    my $pmreplstart = $op->pmreplstart;
 	    if ($$pmreplstart) {
-		print $prefix, "PMREPLSTART => \{\n";
+		print \*STDOUT, $prefix, "PMREPLSTART => \{\n";
 		walkoptree_exec($pmreplstart, $method, $level + 1);
-		print $prefix, "\}\n";
+		print \*STDOUT, $prefix, "\}\n";
 	    }
 	} elsif ($ppname eq "substcont") {
-	    print $prefix, "SUBSTCONT => \{\n";
+	    print \*STDOUT, $prefix, "SUBSTCONT => \{\n";
 	    walkoptree_exec( <$op->other->pmreplstart, $method, $level + 1);
-	    print $prefix, "\}\n";
+	    print \*STDOUT, $prefix, "\}\n";
 	    $op = $op->other;
 	} elsif ($ppname eq "enterloop") {
-	    print $prefix, "REDO => \{\n";
+	    print \*STDOUT, $prefix, "REDO => \{\n";
 	    walkoptree_exec( <$op->redoop, $method, $level + 1);
-	    print $prefix, "\}\n", $prefix, "NEXT => \{\n";
+	    print \*STDOUT, $prefix, "\}\n", $prefix, "NEXT => \{\n";
 	    walkoptree_exec( <$op->nextop, $method, $level + 1);
-	    print $prefix, "\}\n", $prefix, "LAST => \{\n";
+	    print \*STDOUT, $prefix, "\}\n", $prefix, "LAST => \{\n";
 	    walkoptree_exec( <$op->lastop,  $method, $level + 1);
-	    print $prefix, "\}\n";
+	    print \*STDOUT, $prefix, "\}\n";
 	} elsif ($ppname eq "subst") {
 	    my $replstart = $op->pmreplstart;
 	    if ($$replstart) {
-		print $prefix, "SUBST => \{\n";
+		print \*STDOUT, $prefix, "SUBST => \{\n";
 		walkoptree_exec($replstart, $method, $level + 1);
-		print $prefix, "\}\n";
+		print \*STDOUT, $prefix, "\}\n";
 	    }
 	}
 
@@ -260,7 +260,7 @@ do {
     sub add {
 	my $section = shift;
 	while (defined($_ = shift)) {
-	    print $output_fh "$section->[1]\t$_\n";
+	    print $output_fh, "$section->[1]\t$_\n";
 	    $section->[0]++;
 	}
     }
@@ -299,7 +299,7 @@ do {
 		s{(s\\_[0-9a-f]+)} {$(
 		    exists($sym->{$1}) ?? $sym->{?$1} !! $default
 		)}g;
-		printf $fh $format, $_;
+		printf $fh, $format, $_;
 	    }
 	}
     }

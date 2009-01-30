@@ -43,7 +43,7 @@ timeit( 1, sub { $foo = @_[?0] });
 is ($foo, undef, "benchmarked code called without arguments");
 
 
-print "# Burning CPU to benchmark things will take time...\n";
+print \*STDOUT, "# Burning CPU to benchmark things will take time...\n";
 
 
 
@@ -57,24 +57,24 @@ my $threesecs = countit(0, $coderef);
 isa_ok($threesecs, 'Benchmark', "countit 0, CODEREF");
 isnt ($baz, 0, "benchmarked code was run");
 my $in_threesecs = $threesecs->iters;
-print "# $in_threesecs iterations\n";
+print \*STDOUT, "# $in_threesecs iterations\n";
 ok ($in_threesecs +> 0, "iters returned positive iterations");
 
 my $estimate = int (100 * $in_threesecs / 3) / 100;
-print "# from the 3 second run estimate $estimate iterations in 1 second...\n";
+print \*STDOUT, "# from the 3 second run estimate $estimate iterations in 1 second...\n";
 $baz = 0;
 my $onesec = countit(1, $coderef);
 isa_ok($onesec, 'Benchmark', "countit 1, CODEREF");
 isnt ($baz, 0, "benchmarked code was run");
 my $in_onesec = $onesec->iters;
-print "# $in_onesec iterations\n";
+print \*STDOUT, "# $in_onesec iterations\n";
 ok ($in_onesec +> 0, "iters returned positive iterations");
 
 do {
   my $difference = $in_onesec - $estimate;
   my $actual = abs ($difference / $in_onesec);
   ok ($actual +< $delta, "is $in_onesec within $delta of estimate ($estimate)");
-  print "# $in_onesec is between " . ($delta / 2) .
+  print \*STDOUT, "# $in_onesec is between " . ($delta / 2) .
     " and $delta of estimate. Not that safe.\n" if $actual +> $delta/2;
 };
 
@@ -85,7 +85,7 @@ my $again = countit(1, '$main::baz += fib($main::ballast)');
 isa_ok($onesec, 'Benchmark', "countit 1, eval");
 isnt ($baz, 0, "benchmarked code was run");
 my $in_again = $again->iters;
-print "# $in_again iterations\n";
+print \*STDOUT, "# $in_again iterations\n";
 ok ($in_again +> 0, "iters returned positive iterations");
 
 
@@ -104,7 +104,7 @@ is ($auto, $default, 'timestr ($diff, "auto") matches timestr ($diff)');
 do {
     my $all = timestr ($diff, 'all');
     like ($all, $All_Pattern, 'timestr ($diff, "all")');
-    print "# $all\n";
+    print \*STDOUT, "# $all\n";
 
     my @($wallclock, $usr, $sys, $cusr, $csys, $cpu) = @: $all =~ $All_Pattern;
 
@@ -303,11 +303,11 @@ sub check_graph_consistency {
         pass ("slow rate is less than fast rate");
         unless (ok ($slowfast +<= 0 && $slowfast +>= -100,
                     "slowfast should be less than or equal to zero, and >= -100")) {
-          print STDERR "# slowfast $slowfast\n";
+          print \*STDERR, "# slowfast $slowfast\n";
           $all_passed = 0;
         }
         unless (ok ($fastslow +> 0, "fastslow should be > 0")) {
-          print STDERR "# fastslow $fastslow\n";
+          print \*STDERR, "# fastslow $fastslow\n";
           $all_passed = 0;
         }
     } else {
@@ -340,8 +340,8 @@ sub check_graph_vs_output {
                              \@($fastr, $fastratet, $fastslowt, $fastfast)),
                     "check the chart layout matches the formatted output");
     unless ($all_passed) {
-      print STDERR "# Something went wrong there. I got this chart:\n";
-      print STDERR "# $_\n" foreach split m/\n/, $got;
+      print \*STDERR, "# Something went wrong there. I got this chart:\n";
+      print \*STDERR, "# $_\n" foreach split m/\n/, $got;
     }
 }
 

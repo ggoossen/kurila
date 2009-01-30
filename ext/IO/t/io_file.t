@@ -19,7 +19,7 @@ can_ok( $Class,                 "binmode" );
 do {   my $tmp;
     open $tmp, ">", "$File" or die "Could not open '$File': $^OS_ERROR";
     binmode $tmp;
-    print $tmp $All_Chars; 
+    print $tmp, $All_Chars; 
     close $tmp;
 };
 

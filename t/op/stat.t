@@ -69,7 +69,7 @@ SKIP: do {
 my $funky_FAT_timestamps = $Is_Cygwin;
 sleep 3 if $funky_FAT_timestamps;
 
-print $foo "Now is the time for all good men to come to.\n";
+print $foo, "Now is the time for all good men to come to.\n";
 close($foo);
 
 sleep 2;
@@ -112,7 +112,7 @@ SKIP: do {
 
         if( !ok($mtime, 'hard link mtime') ||
             !isnt($mtime, $ctime, 'hard link ctime != mtime') ) {
-            print STDERR <<DIAG;
+            print \*STDERR, <<DIAG;
 # Check if you are on a tmpfs of some sort.  Building in /tmp sometimes
 # has this problem.  Building on the ClearCase VOBS filesystem may also
 # cause this failure.
@@ -135,7 +135,7 @@ ok(-z $tmpfile,     '-z on empty file');
 ok(! -s $tmpfile,   '   and -s');
 
 open($f, ">", "$tmpfile") || DIE("Can't open temp test file: $^OS_ERROR");
-print $f "hi\n";
+print $f, "hi\n";
 close $f;
 
 open($f, "<", "$tmpfile") || DIE("Can't open temp test file: $^OS_ERROR");
@@ -412,7 +412,7 @@ $_ = $tmpfile;
 ok(-f,      'bare -f   uses $_');
 ok(-f(),    '     -f() "');
 
-unlink $tmpfile or print "# unlink failed: $^OS_ERROR\n";
+unlink $tmpfile or print \*STDOUT, "# unlink failed: $^OS_ERROR\n";
 
 # bug id 20011101.069
 my @r = @( stat($Curdir) );
@@ -447,19 +447,19 @@ SKIP: do {
     dies_like(sub { -l _ },
               qr/^The stat preceding -l _ wasn't an lstat/,
               '-l _ croaks after -T _' );
-    unlink $linkname or print "# unlink $linkname failed: $^OS_ERROR\n";
+    unlink $linkname or print \*STDOUT, "# unlink $linkname failed: $^OS_ERROR\n";
 };
 
-print "# Zzz...\n";
+print \*STDOUT, "# Zzz...\n";
 sleep(3);
 my $f = 'tstamp.tmp';
 unlink $f;
 ok (open(my $s, ">", "$f"), 'can create tmp file');
 close $s or die;
 my @a = @( stat $f );
-print "# time=$^BASETIME, stat=($(join ' ',@a))\n";
+print \*STDOUT, "# time=$^BASETIME, stat=($(join ' ',@a))\n";
 my @b = @(-M _, -A _, -C _);
-print "# -MAC=($(join ' ',@b))\n";
+print \*STDOUT, "# -MAC=($(join ' ',@b))\n";
 ok( (-M _) +< 0, 'negative -M works');
 ok( (-A _) +< 0, 'negative -A works');
 ok( (-C _) +< 0, 'negative -C works');

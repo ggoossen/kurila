@@ -6,6 +6,6 @@
 use Test::Builder;
 my $TB = Test::Builder->new;
 $TB->plan(tests => 2);
-print "ok 1\n";
-print "ok 2\n";
+print \*STDOUT, "ok 1\n";
+print \*STDOUT, "ok 2\n";
 $TB->current_test(2);

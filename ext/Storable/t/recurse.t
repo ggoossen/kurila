@@ -19,7 +19,7 @@ BEGIN {
 
 use Storable < qw(freeze thaw dclone);
 
-print "1..33\n";
+print \*STDOUT, "1..33\n";
 
 package OBJ_REAL;
 

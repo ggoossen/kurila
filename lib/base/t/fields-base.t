@@ -9,7 +9,7 @@ BEGIN {
             $W++;
         }
         else {
-            print STDERR @_[0]->message;
+            print \*STDERR, @_[0]->message;
         }
     };
 }

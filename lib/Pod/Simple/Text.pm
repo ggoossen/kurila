@@ -77,7 +77,7 @@ sub emit_par {
   my $out = Text::Wrap::wrap($indent, $indent, $self->{+'Thispara'} .= "\n");
 
   $out =~ s/\x{A0}/ /g if Pod::Simple::ASCII;
-  print {$self->{?'output_fh'}} $out, "\n";
+  print $self->{?'output_fh'} ,$out, "\n";
   $self->{+'Thispara'} = '';
   
   return;
@@ -97,7 +97,7 @@ sub end_Verbatim  {
   
   $self->{+'Thispara'} =~ s/^/$i/mg;
   
-  print { $self->{?'output_fh'} }   '', 
+  print  $self->{?'output_fh'}    ,'', 
     $self->{?'Thispara'},
     "\n\n"
   ;

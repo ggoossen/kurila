@@ -18,7 +18,7 @@ BEGIN {
 	$reason = 'no fork';
     }
     if ($reason) {
-	print "1..0 # Skip: $reason\n";
+	print \*STDOUT, "1..0 # Skip: $reason\n";
 	exit 0;
     }
 }
@@ -34,14 +34,14 @@ if ($^OS_NAME eq 'os2') {	# Can't create sockets with relative path...
 
 # Test if we can create the file within the tmp directory
 if (-e $PATH or not open(my $testfh, ">", "$PATH") and $^OS_NAME ne 'os2') {
-    print "1..0 # Skip: cannot open '$PATH' for write\n";
+    print \*STDOUT, "1..0 # Skip: cannot open '$PATH' for write\n";
     exit 0;
 }
 unlink($PATH) or $^OS_NAME eq 'os2' or die "Can't unlink $PATH: $^OS_ERROR";
 
 # Start testing
 $^OUTPUT_AUTOFLUSH = 1;
-print "1..5\n";
+print \*STDOUT, "1..5\n";
 
 use IO::Socket::UNIX;
 
@@ -65,38 +65,38 @@ unless (defined $listen) {
     }
     defined $listen or die "$PATH: $^OS_ERROR";
 }
-print "ok 1\n";
+print \*STDOUT, "ok 1\n";
 
 if(my $pid = fork()) {
 
     my $sock = $listen->accept();
 
     if (defined $sock) {
-	print "ok 2\n";
+	print \*STDOUT, "ok 2\n";
 
-	print $sock->getline();
+	print \*STDOUT, $sock->getline();
 
-	print $sock "ok 4\n";
+	print $sock, "ok 4\n";
 
 	$sock->close;
 
 	waitpid($pid,0);
 	unlink($PATH) || $^OS_NAME eq 'os2' || warn "Can't unlink $PATH: $^OS_ERROR";
 
-	print "ok 5\n";
+	print \*STDOUT, "ok 5\n";
     } else {
-	print "# accept() failed: $^OS_ERROR\n";
+	print \*STDOUT, "# accept() failed: $^OS_ERROR\n";
 	for (2..5) {
-	    print "not ok $_ # accept failed\n";
+	    print \*STDOUT, "not ok $_ # accept failed\n";
 	}
     }
 } elsif(defined $pid) {
 
     my $sock = IO::Socket::UNIX->new(Peer => $PATH) or die "$^OS_ERROR";
 
-    print $sock "ok 3\n";
+    print $sock, "ok 3\n";
 
-    print $sock->getline();
+    print \*STDOUT, $sock->getline();
 
     $sock->close;
 

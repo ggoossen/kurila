@@ -11,12 +11,12 @@ BEGIN {
 }
 
 unless( try { require File::Spec } ) {
-    print "1..0 # Skip Need File::Spec to run this test\n";
+    print \*STDOUT, "1..0 # Skip Need File::Spec to run this test\n";
     exit 0;
 }
 
 if( $^OS_NAME eq 'MacOS' ) {
-    print "1..0 # Skip exit status broken on Mac OS\n";
+    print \*STDOUT, "1..0 # Skip exit status broken on Mac OS\n";
     exit 0;
 }
 
@@ -29,7 +29,7 @@ package main;
 
 my $IsVMS = $^OS_NAME eq 'VMS';
 
-print "# Ahh!  I see you're running VMS.\n" if $IsVMS;
+print \*STDOUT, "# Ahh!  I see you're running VMS.\n" if $IsVMS;
 
 my %Tests = %(
              #                      Everyone Else   VMS

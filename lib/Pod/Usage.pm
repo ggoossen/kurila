@@ -634,7 +634,7 @@ sub start_document {
     $self->SUPER::start_document();
     my $msg = $self->{USAGE_OPTIONS}->{?message}  or  return 1;
     my $out_fh = $self->output_fh();
-    print $out_fh "$msg\n";
+    print $out_fh, "$msg\n";
 }
 
 sub begin_pod {
@@ -642,7 +642,7 @@ sub begin_pod {
     $self->SUPER::begin_pod();  ## Have to call superclass
     my $msg = $self->{USAGE_OPTIONS}->{?message}  or  return 1;
     my $out_fh = $self->output_handle();
-    print $out_fh "$msg\n";
+    print $out_fh, "$msg\n";
 }
 
 sub preprocess_paragraph {

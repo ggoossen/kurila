@@ -26,7 +26,7 @@ if (not defined $where) {	# Try NIS.
             open($gr, "$ypcat group 2>/dev/null |") &&
             defined( ~< $gr)) 
         {
-            print "# `ypcat group` worked\n";
+            print \*STDOUT, "# `ypcat group` worked\n";
 
             # Check to make sure we're really using NIS.
             if( open(my $nssw, "<", "/etc/nsswitch.conf" ) ) {
@@ -34,7 +34,7 @@ if (not defined $where) {	# Try NIS.
 
                 # If there's no group line, assume it default to compat.
                 if( !$group || $group !~ m/(nis|compat)/ ) {
-                    print "# Doesn't look like you're using NIS in ".
+                    print \*STDOUT, "# Doesn't look like you're using NIS in ".
                           "/etc/nsswitch.conf\n";
                     last;
                 }
@@ -87,9 +87,9 @@ my $tst = 1;
 my %perfect;
 my %seen;
 
-print "# where $where\n";
+print \*STDOUT, "# where $where\n";
 
-ok( setgrent(), 'setgrent' ) || print "# $^OS_ERROR\n";
+ok( setgrent(), 'setgrent' ) || print \*STDOUT, "# $^OS_ERROR\n";
 
 while ( ~< *GR) {
     chomp;
@@ -138,11 +138,11 @@ while ( ~< *GR) {
 
 endgrent();
 
-print "# max = $max, n = $n, perfect = ", nkeys %perfect, "\n";
+print \*STDOUT, "# max = $max, n = $n, perfect = ", nkeys %perfect, "\n";
 
 if (nkeys %perfect == 0 && $n) {
     $max++;
-    print <<EOEX;
+    print \*STDOUT, <<EOEX;
 #
 # The failure of op/grent test is not necessarily serious.
 # It may fail due to local group administration conventions.
@@ -158,7 +158,7 @@ if (nkeys %perfect == 0 && $n) {
 EOEX
 
     fail();
-    print "#\t (not necessarily serious: run t/op/grent.t by itself)\n";
+    print \*STDOUT, "#\t (not necessarily serious: run t/op/grent.t by itself)\n";
 } else {
     pass();
 }

@@ -2,7 +2,7 @@
 
 BEGIN {
     unless (PerlIO::Layer->find( 'perlio')) {
-	print "1..0 # Skip: not perlio\n";
+	print \*STDOUT, "1..0 # Skip: not perlio\n";
 	exit 0;
     }
     require Config;
@@ -25,7 +25,7 @@ ok(eof($fh));
 ok(seek($fh,0,SEEK_SET));
 ok(!eof($fh));
 
-ok(print $fh "bbb\n");
+ok(print $fh, "bbb\n");
 is($var, "bbb\n");
 $var = "foo\nbar\n";
 ok(seek($fh,0,SEEK_SET));
@@ -43,7 +43,7 @@ my $off = tell($fh);
 is($off, 0);
 # Check that writes go where they should and update the offset
 $var = "Something";
-print $fh "Brea";
+print $fh, "Brea";
 $off = tell($fh);
 is($off, 4);
 is($var, "Breathing");
@@ -62,7 +62,7 @@ is($var, "Something else ");
 $off = tell($fh);
 is($off, 10);
 
-print $fh "is here";
+print $fh, "is here";
 is($var, "Something else is here");
 close $fh;
 
@@ -80,9 +80,9 @@ is($var, "foo");
 
 $var = '';
 open $fh, "+>", \$var;
-print $fh "xxx\n";
+print $fh, "xxx\n";
 open my $dup,'+<&',$fh;
-print $dup "yyy\n";
+print $dup, "yyy\n";
 seek($dup,0,SEEK_SET);
 is( ~< $dup, "xxx\n");
 is( ~< $dup, "yyy\n");
@@ -98,7 +98,7 @@ do {
     my $warn = 0;
     local $^WARN_HOOK = sub { $warn++ };
     open my $fh, '>', \my $scalar;
-    print $fh "foo";
+    print $fh, "foo";
     close $fh;
     is($warn, 0, "no warnings when writing to an undefined scalar");
 };
@@ -170,7 +170,7 @@ do {
     # Seeking forward should zero fill.
 
     ok(seek($f, 50, SEEK_SET));
-    print $f "x";
+    print $f, "x";
     is(length($foo), 51);
     like($foo, qr/^\0{50}x$/);
 
@@ -181,7 +181,7 @@ do {
     # Seeking forward again should zero fill but only the new bytes.
 
     ok(seek($f, 100, SEEK_SET));
-    print $f "y";
+    print $f, "y";
     is(length($foo), 101);
     like($foo, qr/^\0{50}x\0{49}y$/);
     is(tell($f), 101);
@@ -189,7 +189,7 @@ do {
     # Seeking back and writing should not zero fill.
 
     ok(seek($f, 75, SEEK_SET));
-    print $f "z";
+    print $f, "z";
     is(length($foo), 101);
     like($foo, qr/^\0{50}x\0{24}z\0{24}y$/);
     is(tell($f), 76);

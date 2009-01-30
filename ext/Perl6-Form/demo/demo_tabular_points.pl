@@ -13,16 +13,16 @@ my @name = @(
 );
 
 
-print < form
+print \*STDOUT, < form
 	 \%(layout=>'down', bullet=>'.'),
 	 "Index  Character     Appears in",
 	 \%(under=>"_"),
 	 "\{]]\}.  \{[[[[[[[[[[\}  \{[[[[[[[[[[\}",
       \1..nelems @name, \@name,       \@play;
 
-print "\n\n=================\n\n";
+print \*STDOUT, "\n\n=================\n\n";
 
-print < form
+print \*STDOUT, < form
 	 \%(layout=>'tabular', bullet=>'.'),
 	 "Index  Character     Appears in",
 	 \%(under=>"_"),

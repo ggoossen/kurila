@@ -55,7 +55,7 @@ sub testpodcheck( @ ) {
       return  $msg;
    }
 
-   print "# Running podchecker for '$testname'...\n";
+   print \*STDOUT, "# Running podchecker for '$testname'...\n";
    ## Compare the output against the expected result
    if ($^OS_NAME eq 'VMS') {
       for (@($infile, $outfile, $cmpfile)) {
@@ -82,7 +82,7 @@ sub testpodchecker( @ ) {
    my $failed = 0;
    local $_;
 
-   print "1..", nelems @testpods, "\n"  unless (%opts{?'xrgen'});
+   print \*STDOUT, "1..", nelems @testpods, "\n"  unless (%opts{?'xrgen'});
 
    for my $podfile ( @testpods) {
       @($testname, $_, ...) =  fileparse($podfile);
@@ -94,12 +94,12 @@ sub testpodchecker( @ ) {
       if (%opts{?'xrgen'}) {
           if (%opts{?'force'} or ! -e $cmpfile) {
              ## Create the comparison file
-             print "# Creating expected result for \"$testname\"" .
+             print \*STDOUT, "# Creating expected result for \"$testname\"" .
                    " podchecker test ...\n";
              podchecker($podfile, $cmpfile);
           }
           else {
-             print "# File $cmpfile already exists" .
+             print \*STDOUT, "# File $cmpfile already exists" .
                    " (use 'force' to regenerate it).\n";
           }
           next;
@@ -111,14 +111,14 @@ sub testpodchecker( @ ) {
                         Cmp => $cmpfile;
       if ($failmsg) {
           ++$failed;
-          print "#\tFAILED. ($failmsg)\n";
-	  print "not ok ", $failed+$passes, "\n";
+          print \*STDOUT, "#\tFAILED. ($failmsg)\n";
+	  print \*STDOUT, "not ok ", $failed+$passes, "\n";
       }
       else {
           ++$passes;
           unlink($outfile);
-          print "#\tPASSED.\n";
-	  print "ok ", $failed+$passes, "\n";
+          print \*STDOUT, "#\tPASSED.\n";
+	  print \*STDOUT, "ok ", $failed+$passes, "\n";
       }
    }
    return  $passes;

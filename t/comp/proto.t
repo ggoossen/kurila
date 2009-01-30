@@ -19,9 +19,9 @@ sub testing (&$) {
     my $p = prototype(shift);
     my $c = shift;
     my $what = defined $c ?? '(' . $p . ')' !! 'no prototype';   
-    print '#' x 25,"\n";
-    print '# Testing ',$what,"\n";
-    print '#' x 25,"\n";
+    print \*STDOUT, '#' x 25,"\n";
+    print \*STDOUT, '# Testing ',$what,"\n";
+    print \*STDOUT, '#' x 25,"\n";
     ok ( not ((defined($p) && defined($c) && $p ne $c)
                 || (defined($p) != defined($c))) );
 }
@@ -37,7 +37,7 @@ my %hash;
 testing \&no_proto, undef;
 
 sub no_proto {
-    print "# \@_ = (",join(",", @_),")\n";
+    print \*STDOUT, "# \@_ = (",join(",", @_),")\n";
     scalar(nelems @_)
 }
 
@@ -59,7 +59,7 @@ ok( 4 == no_proto(< @_) );
 testing \&no_args, '';
 
 sub no_args () {
-    print "# \@_ = (",join(",", @_),")\n";
+    print \*STDOUT, "# \@_ = (",join(",", @_),")\n";
     scalar(nelems @_)
 }
 
@@ -83,7 +83,7 @@ ok( $^EVAL_ERROR );
 testing \&one_args, '$';
 
 sub one_args ($) {
-    print "# \@_ = (",join(",", @_),")\n";
+    print \*STDOUT, "# \@_ = (",join(",", @_),")\n";
     scalar(nelems @_)
 }
 
@@ -102,7 +102,7 @@ eval "one_args()";
 ok( $^EVAL_ERROR );
 
 sub one_a_args ($) {
-    print "# \@_ = (",join(",", @_),")\n";
+    print \*STDOUT, "# \@_ = (",join(",", @_),")\n";
     ok( (nelems @_) == 1 && @_[0] == 4 );
 }
 
@@ -115,7 +115,7 @@ one_a_args((nelems @_));
 testing \&over_one_args, '$@';
 
 sub over_one_args ($@) {
-    print "# \@_ = (",join(",", @_),")\n";
+    print \*STDOUT, "# \@_ = (",join(",", @_),")\n";
     scalar(nelems @_)
 }
 
@@ -130,7 +130,7 @@ eval "over_one_args()";
 ok( $^EVAL_ERROR );
 
 sub over_one_a_args ($@) {
-    print "# \@_ = (",join(",", @_),")\n";
+    print \*STDOUT, "# \@_ = (",join(",", @_),")\n";
     ok(  (nelems @_) +>= 1 && @_[0] == 4 );
 }
 
@@ -146,7 +146,7 @@ over_one_a_args((nelems @_),< @_);
 testing \&one_or_two, '$;$';
 
 sub one_or_two ($;$) {
-    print "# \@_ = (",join(",", @_),")\n";
+    print \*STDOUT, "# \@_ = (",join(",", @_),")\n";
     scalar(nelems @_)
 }
 
@@ -164,7 +164,7 @@ eval "one_or_two(1,2,3)";
 ok( $^EVAL_ERROR );
 
 sub one_or_two_a ($;$) {
-    print "# \@_ = (",join(",", @_),")\n";
+    print \*STDOUT, "# \@_ = (",join(",", @_),")\n";
     ok( (nelems @_) +>= 1 && @_[0] == 4 );
 }
 
@@ -179,7 +179,7 @@ one_or_two_a((nelems @_),nelems @_);
 testing \&a_sub, '&';
 
 sub a_sub (&) {
-    print "# \@_ = (",join(",", map {dump::view($_)} @_),")\n";
+    print \*STDOUT, "# \@_ = (",join(",", map {dump::view($_)} @_),")\n";
     &{@_[0]}( < @_ );
 }
 
@@ -199,10 +199,10 @@ ok( $^EVAL_ERROR );
 testing \&sub_aref, '&\@';
 
 sub sub_aref (&\@) {
-    print "# \@_ = (",join(",", map {dump::view($_)} @_),")\n";
+    print \*STDOUT, "# \@_ = (",join(",", map {dump::view($_)} @_),")\n";
     my@($sub,$array) =  @_;
     ok( (nelems @_) == 2 && (nelems @{$array}) == 4 );
-    print < map { &{$sub}($_) } @{$array}
+    print \*STDOUT, < map { &{$sub}($_) } @{$array}
 }
 
 ##
@@ -212,10 +212,10 @@ sub sub_aref (&\@) {
 testing \&sub_array, '&@';
 
 sub sub_array (&@) {
-    print "# \@_ = (",join(",", map {dump::view($_)} @_),")\n";
+    print \*STDOUT, "# \@_ = (",join(",", map {dump::view($_)} @_),")\n";
     ok((nelems @_) == 5);
     my $sub = shift;
-    print < map { &{$sub}($_) } @_
+    print \*STDOUT, < map { &{$sub}($_) } @_
 }
 
 ##
@@ -225,7 +225,7 @@ sub sub_array (&@) {
 testing \&a_hash_ref, '\%';
 
 sub a_hash_ref (\%) {
-    print "# \@_ = (",join(",", map {dump::view($_)} @_),")\n";
+    print \*STDOUT, "# \@_ = (",join(",", map {dump::view($_)} @_),")\n";
     ok( ref(@_[0]) && @_[0]->{?'a'} );
     @_[0]->{+'b'} = 2;
 }

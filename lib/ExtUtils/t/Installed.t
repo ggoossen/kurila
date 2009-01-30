@@ -79,12 +79,12 @@ ok( mkpath('auto/FakeMod') );
 END { rmtree 'auto' }
 
 ok(open(my $packlist, ">", 'auto/FakeMod/.packlist'));
-print $packlist 'list';
+print $packlist, 'list';
 close $packlist;
 
 ok(open(my $fakemod, ">", 'auto/FakeMod/FakeMod.pm'));
 
-print $fakemod <<'FAKE';
+print $fakemod, <<'FAKE';
 package FakeMod;
 use vars qw( $VERSION );
 $VERSION = '1.1.1';

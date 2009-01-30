@@ -18,27 +18,27 @@ ok 1;
 
 eval " binmode(STDOUT, ':utf8') ";
 
-print "# Pod::Escapes version $Pod::Escapes::VERSION\n";
-print "# I'm ", (chr(65) eq 'A') ?? '' !! 'not ', "in ASCII world.\n";
-print "#\n#------------------------\n#\n";
+print \*STDOUT, "# Pod::Escapes version $Pod::Escapes::VERSION\n";
+print \*STDOUT, "# I'm ", (chr(65) eq 'A') ?? '' !! 'not ', "in ASCII world.\n";
+print \*STDOUT, "#\n#------------------------\n#\n";
 
 foreach my $quotie (qw( \n \r \cm \cj \t \f \b \a \e )) {
   my $val = eval "\"$quotie\"";
   if($^EVAL_ERROR) {
     ok 0;
-    print "# Error in evalling quotie \"$quotie\"\n";
+    print \*STDOUT, "# Error in evalling quotie \"$quotie\"\n";
   } elsif(!defined $val) {
     ok 0;
-    print "# \"$quotie\" is undef!?\n";
+    print \*STDOUT, "# \"$quotie\" is undef!?\n";
   } else {
     ok 1;
-    print "# \"$quotie\" is ", ord($val), "\n";
+    print \*STDOUT, "# \"$quotie\" is ", ord($val), "\n";
   }
 }
 
-print "#\n#------------------------\n#\n";
+print \*STDOUT, "#\n#------------------------\n#\n";
 
-print "# 'A' tests...\n";
+print \*STDOUT, "# 'A' tests...\n";
 ok e2char('65'), 'A';
 ok e2char('x41'), 'A';
 ok e2char('x041'), 'A';
@@ -49,7 +49,7 @@ ok e2char('00101'), 'A';
 ok e2char('000101'), 'A';
 ok e2char('0000101'), 'A';
 
-print "# '<' tests...\n";
+print \*STDOUT, "# '<' tests...\n";
 ok e2char('lt'), '<';
 ok e2char('60'), '<';
 ok e2char('074'), '<';
@@ -72,10 +72,10 @@ ok e2char('0x00003c'), '<';
 
 ok e2char('65') ne e2char('lt');
 
-print "# eacute tests...\n";
+print \*STDOUT, "# eacute tests...\n";
 ok defined e2char('eacute');
 
-print "#    eacute is <", e2char('eacute'), "> which is code ",
+print \*STDOUT, "#    eacute is <", e2char('eacute'), "> which is code ",
       ord(e2char('eacute')), "\n";
 
 ok e2char('eacute'), e2char('233');
@@ -83,10 +83,10 @@ ok e2char('eacute'), e2char('0351');
 ok e2char('eacute'), e2char('xe9');
 ok e2char('eacute'), e2char('xE9');
 
-print "# pi tests...\n";
+print \*STDOUT, "# pi tests...\n";
 ok defined e2char('pi');
 
-print "#    pi is <", e2char('pi'), "> which is code ",
+print \*STDOUT, "#    pi is <", e2char('pi'), "> which is code ",
       ord(e2char('pi')), "\n";
 
 ok e2char('pi'), e2char('960');
@@ -100,7 +100,7 @@ ok e2char('pi'), e2char('x003C0');
 ok e2char('pi'), e2char('x0003C0');
 
 
-print "# various hash tests...\n";
+print \*STDOUT, "# various hash tests...\n";
 
 ok nkeys %Name2character;
 ok defined %Name2character{?'eacute'};

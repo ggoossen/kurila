@@ -197,7 +197,7 @@ else {
 SKIP: do {
     my $entry = catdir($tmp_base, "file");
     skip "Cannot create $entry", 4 unless open my $out, ">", " $entry";
-    print $out "test file, safe to delete\n", scalar(localtime), "\n";
+    print $out, "test file, safe to delete\n", scalar(localtime), "\n";
     close $out;
     ok(-e $entry, "file exists in place of directory");
 
@@ -354,7 +354,7 @@ cannot restore permissions to \d+ for [^:]+: .* at \1 line \2},
     SKIP: do {
         $file = catdir($dir2, "file");
         skip "Cannot create $file", 2 unless open my $out, ">", " $file";
-        print $out "test file, safe to delete\n", scalar(localtime), "\n";
+        print $out, "test file, safe to delete\n", scalar(localtime), "\n";
         close $out;
 
         ok(-e $file, "file created in directory");

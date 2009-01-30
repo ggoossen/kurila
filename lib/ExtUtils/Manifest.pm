@@ -117,7 +117,7 @@ sub mkmanifest {
 	my $tabs = (5 - (length($file)+1)/8);
 	$tabs = 1 if $tabs +< 1;
 	$tabs = 0 unless $text;
-	print {$m} $file, "\t" x $tabs, $text, "\n";
+	print $m ,$file, "\t" x $tabs, $text, "\n";
     }
     close $m;
 }
@@ -415,7 +415,7 @@ sub _check_mskip_directives {
         warn "Problem opening $mfile: $^OS_ERROR";
         return;
     }
-    print {$m} $_ for @( (< @lines));
+    print $m ,$_ for @( (< @lines));
     close $m;
     return;
 }
@@ -628,7 +628,7 @@ sub maniadd {
 
     foreach my $file ( _sort < @needed) {
         my $comment = $additions->{?$file} || '';
-        printf {$manifest_fh} "\%-40s \%s\n", $file, $comment;
+        printf $manifest_fh ,"\%-40s \%s\n", $file, $comment;
     }
     close $manifest_fh or die "Error closing $MANIFEST: $^OS_ERROR";
 
@@ -649,7 +649,7 @@ sub _fix_manifest {
 
     unless( @manifest[-1] =~ m/\n\z/ ) {
         open $manifest_fh, ">>", "$MANIFEST" or die "Could not open $MANIFEST: $^OS_ERROR";
-        print $manifest_fh "\n";
+        print $manifest_fh, "\n";
         close $manifest_fh;
     }
 }

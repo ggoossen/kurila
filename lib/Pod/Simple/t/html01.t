@@ -63,6 +63,6 @@ like(x(
 );
 
 
-print "# And one for the road...\n";
+print \*STDOUT, "# And one for the road...\n";
 ok 1;
 

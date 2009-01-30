@@ -189,7 +189,7 @@ sub readline {
   my $self = shift;
   my @($in,$out,$str) =  @$self;
   my $prompt = shift;
-  print $out @rl_term_set[0], $prompt, @rl_term_set[1], @rl_term_set[2]; 
+  print $out, @rl_term_set[0], $prompt, @rl_term_set[1], @rl_term_set[2]; 
   $self->register_Tk 
      if not $Term::ReadLine::registered and $Term::ReadLine::toloop
 	and defined &Tk::DoOneEvent;
@@ -199,7 +199,7 @@ sub readline {
   utf8::upgrade($str)
       if ($^UNICODE ^&^ PERL_UNICODE_STDIN || defined $^ENCODING) &&
          utf8::valid($str);
-  print $out @rl_term_set[3]; 
+  print $out, @rl_term_set[3]; 
   # bug in 5.000: chomping empty string creats length -1:
   chomp $str if defined $str;
   $str;

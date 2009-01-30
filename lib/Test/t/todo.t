@@ -50,5 +50,5 @@ sub commentless {
   return $in;
 }
 
-print "1..1\n";
+print \*STDOUT, "1..1\n";
 ok( commentless($out), commentless($expect) );

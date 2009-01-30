@@ -14,11 +14,11 @@ ok 1;
 
 use Pod::Simple::DumpAsXML;
 use Pod::Simple::XMLOutStream;
-print "# Pod::Simple version $Pod::Simple::VERSION\n";
+print \*STDOUT, "# Pod::Simple version $Pod::Simple::VERSION\n";
 sub e ($$) { Pod::Simple::DumpAsXML->_duo(< @_) }
 
 
-print "# Simple tests for head1 - head4...\n";
+print \*STDOUT, "# Simple tests for head1 - head4...\n";
 ok( Pod::Simple::XMLOutStream->_out("\n=head1 Chacha\n\n"),
     '<Document><head1>Chacha</head1></Document>'
 );
@@ -32,7 +32,7 @@ ok( Pod::Simple::XMLOutStream->_out("\n=head4 Chacha\n\n"),
     '<Document><head4>Chacha</head4></Document>'
 );
 
-print "# Testing whitespace equivalence...\n";
+print \*STDOUT, "# Testing whitespace equivalence...\n";
 
 &ok( <e "\n=head1 Chacha\n\n", "\n=head1       Chacha\n\n");
 &ok( <e "\n=head1 Chacha\n\n", "\n=head1\tChacha\n\n");
@@ -45,7 +45,7 @@ ok( Pod::Simple::XMLOutStream->_out("=head1     Chachacha"),
 );
 
 
-print "# Testing whitespace variance ...\n";
+print \*STDOUT, "# Testing whitespace variance ...\n";
 ok( Pod::Simple::XMLOutStream->_out("=head1     Cha cha cha   \n"),
     '<Document><head1>Cha cha cha</head1></Document>'
 );
@@ -56,7 +56,7 @@ ok( Pod::Simple::XMLOutStream->_out("=head1     Cha   cha\tcha   \n"),
 
 
 
-print "# Testing head2, head3, head4 more...\n";
+print \*STDOUT, "# Testing head2, head3, head4 more...\n";
 
 ok( Pod::Simple::XMLOutStream->_out("=head2     Cha   cha\tcha   \n"),
     '<Document><head2>Cha cha cha</head2></Document>'
@@ -68,7 +68,7 @@ ok( Pod::Simple::XMLOutStream->_out("=head4     Cha   cha\tcha   \n"),
     '<Document><head4>Cha cha cha</head4></Document>'
 );
 
-print "# Testing entity expansion...\n";
+print \*STDOUT, "# Testing entity expansion...\n";
 
 ok( Pod::Simple::XMLOutStream->_out("=head4 fooE<64>bar!\n"),
     Pod::Simple::XMLOutStream->_out("\n=head4  foo\@bar!\n\n"),
@@ -78,14 +78,14 @@ ok( Pod::Simple::XMLOutStream->_out("=head4 fooE<64>bar!\n"),
 #  sequences to be fused?
 # &ok( e "=head4 fooE<64>bar!\n", "\n=head4  foo\@bar!\n\n");
 
-print "# Testing formatting sequences...\n";
+print \*STDOUT, "# Testing formatting sequences...\n";
 
 # True only if the sequences resolve, as they should...
 &ok( < e "=head4 C<foobar!>\n", "\n=head4 C<< foobar!    >>\n\n");
 &ok( < e "=head4 C<foobar!>\n", "\n\n=head4 C<<<  foobar! >>>\n");
 &ok( < e "=head4 C<foobar!>\n", "\n=head4 C<< foobar!\n\t>>\n\n");
 
-print "# Wrapping up... one for the road...\n";
+print \*STDOUT, "# Wrapping up... one for the road...\n";
 ok 1;
-print "# --- Done with ", __FILE__, " --- \n";
+print \*STDOUT, "# --- Done with ", __FILE__, " --- \n";
 

@@ -1,14 +1,14 @@
 #!./perl
 
-print "1..5\n";
+print \*STDOUT, "1..5\n";
 
 require './test.pl';
 
 try {
-    print "ok 1\n";
+    print \*STDOUT, "ok 1\n";
     die "ok 3\n";
     1;
-} || print "ok 2\n$^EVAL_ERROR->{?description}";
+} || print \*STDOUT, "ok 2\n$^EVAL_ERROR->{?description}";
 
 my $test = 4;
 
@@ -16,11 +16,11 @@ my $test = 4;
 do {
     my $status = try {
 	try { die };
-	print "# eval \{ return \} test\n";
+	print \*STDOUT, "# eval \{ return \} test\n";
 	return; # removing this changes behavior
     };
-    print "not " if $^EVAL_ERROR;
-    print "ok $test\n";
+    print \*STDOUT, "not " if $^EVAL_ERROR;
+    print \*STDOUT, "ok $test\n";
     $test++;
 };
 
@@ -29,9 +29,9 @@ do {
 do {
     try {
 	try { goto foo; };
-	print ($^EVAL_ERROR ?? "ok $test\n" !! "not ok $test\n");
+	print (\*STDOUT, $^EVAL_ERROR ?? "ok $test\n" !! "not ok $test\n");
 	return;
     };
-    print "not ok $test\n" if $^EVAL_ERROR;
+    print \*STDOUT, "not ok $test\n" if $^EVAL_ERROR;
     $test++;
 };

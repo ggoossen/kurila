@@ -13,7 +13,7 @@ chdir 't';
 
 
 # Can't use Test.pm, that's a 5.005 thing.
-print "1..5\n";
+print \*STDOUT, "1..5\n";
 
 my $test_num = 1;
 # Utility testing functions.
@@ -24,7 +24,7 @@ sub ok ($;$) {
     $ok .= "ok $test_num";
     $ok .= " - $name" if defined $name;
     $ok .= "\n";
-    print $ok;
+    print \*STDOUT, $ok;
     $test_num++;
 
     return $test;
@@ -40,7 +40,7 @@ END { 1 while unlink($tmpfile) }
 
 ok( defined $out );
 
-print $out "hi!\n";
+print $out, "hi!\n";
 close *$out;
 
 undef $out;
@@ -53,7 +53,7 @@ ok($line eq 'hi!');
 open(my $foo, ">>", "$tmpfile") or die $^OS_ERROR;
 $out = $Test->output(\*$foo);
 my $old = select *$out;
-print "Hello!\n";
+print \*STDOUT, "Hello!\n";
 close *$out;
 undef $out;
 select $old;
@@ -80,7 +80,7 @@ $Test->ok(1, "ok, like\nok");
 $Test->skip("wibble\nmoof");
 $Test->todo_skip("todo\nskip\n");
 
-ok( $output eq <<OUTPUT ) || print STDERR $output;
+ok( $output eq <<OUTPUT ) || print \*STDERR, $output;
 1..5
 ok 1 - ok
 ok 2 - ok

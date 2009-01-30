@@ -7,7 +7,7 @@ BEGIN {
        # open2/3 supported on win32 (but not Borland due to CRT bugs)
        && (($^OS_NAME ne 'MSWin32' && $^OS_NAME ne 'NetWare') || config_value('cc') =~ m/^bcc/i))
     {
-	print "1..0\n";
+	print \*STDOUT, "1..0\n";
 	exit 0;
     }
     # make warnings fatal
@@ -22,11 +22,11 @@ my $perl = './perl';
 sub ok {
     my @($n, $result, ?$info) =  @_;
     if ($result) {
-	print "ok $n\n";
+	print \*STDOUT, "ok $n\n";
     }
     else {
-	print "not ok $n\n";
-	print "# $info\n" if $info;
+	print \*STDOUT, "not ok $n\n";
+	print \*STDOUT, "# $info\n" if $info;
     }
 }
 
@@ -43,11 +43,11 @@ my ($pid, $reaped_pid);
 (\*STDOUT)->autoflush;
 (\*STDERR)->autoflush;
 
-print "1..7\n";
+print \*STDOUT, "1..7\n";
 
 ok 1, $pid = open2 'READ', 'WRITE', $perl, '-e',
 	cmd_line('print scalar ~< *STDIN');
-ok 2, print WRITE "hi kid\n";
+ok 2, print WRITE, "hi kid\n";
 ok 3, (~< *READ) =~ m/^hi kid\r?\n$/;
 ok 4, close(\*WRITE), $^OS_ERROR;
 ok 5, close(\*READ), $^OS_ERROR;

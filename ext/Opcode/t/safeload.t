@@ -5,7 +5,7 @@ use Config;
 BEGIN {
     # Can we load the version module ?
     try { require version; 1 } or do {
-	print "1..0 # no version.pm\n";
+	print \*STDOUT, "1..0 # no version.pm\n";
 	exit 0;
     };
     delete $^INCLUDED{"version.pm"};

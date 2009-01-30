@@ -12,13 +12,13 @@ use TestInit;
 
 BEGIN {
     $^OUTPUT_AUTOFLUSH = 1;
-    print "1..4\n";
+    print \*STDOUT, "1..4\n";
 }
 
 use Pod::Text;
 use Pod::Simple;
 
-print "ok 1\n";
+print \*STDOUT, "ok 1\n";
 
 my $parser = Pod::Text->new or die "Cannot create parser\n";
 my $n = 2;
@@ -27,7 +27,7 @@ while ( ~< *DATA) {
     open (my $tmp, ">", 'tmp.pod') or die "Cannot create tmp.pod: $^OS_ERROR\n";
     while ( ~< *DATA) {
         last if $_ eq "###\n";
-        print $tmp $_;
+        print $tmp, $_;
     }
     close $tmp;
     open (my $out, ">", 'out.tmp') or die "Cannot create out.tmp: $^OS_ERROR\n";
@@ -47,12 +47,12 @@ while ( ~< *DATA) {
         $expected .= $_;
     }
     if ($output eq $expected) {
-        print "ok $n\n";
+        print \*STDOUT, "ok $n\n";
     } elsif ($n == 4 && $Pod::Simple::VERSION +< 3.06) {
-        print "ok $n # skip Pod::Simple S<> parsing bug\n";
+        print \*STDOUT, "ok $n # skip Pod::Simple S<> parsing bug\n";
     } else {
-        print "not ok $n\n";
-        print "Expected\n========\n$expected\nOutput\n======\n$output\n";
+        print \*STDOUT, "not ok $n\n";
+        print \*STDOUT, "Expected\n========\n$expected\nOutput\n======\n$output\n";
     }
     $n++;
 }

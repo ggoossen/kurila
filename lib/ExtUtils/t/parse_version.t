@@ -36,7 +36,7 @@ sub parse_version_string {
     my $code = shift;
 
     open(my $fh, ">", "VERSION.tmp") || die $^OS_ERROR;
-    print $fh "$code\n";
+    print $fh, "$code\n";
     close $fh;
 
     $_ = 'foo';

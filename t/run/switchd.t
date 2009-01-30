@@ -14,7 +14,7 @@ my $filename = 'swdtest.tmp';
 SKIP: do {
 	open my $f, ">", "$filename"
 	    or skip( "Can't write temp file $filename: $^OS_ERROR" );
-	print $f <<'__SWDTEST__';
+	print $f, <<'__SWDTEST__';
 package Bar;
 sub bar { @_[0] * @_[0] }
 package Foo;

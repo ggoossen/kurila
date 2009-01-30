@@ -76,7 +76,7 @@ $self->{?BASEEXT}.def: Makefile.PL
 	open my $imp, '>', 'tmpimp.imp' or die "Can't open tmpimp.imp";
 	while (my@($name, $exp) =@( each %{$self->{IMPORTS}})) {
 	    my @($lib, $id) = @($exp =~ m/(.*)\.(.*)/) or die "Malformed IMPORT `$exp'";
-	    print $imp "$name $lib $id ?\n";
+	    print $imp, "$name $lib $id ?\n";
 	}
 	close $imp or die "Can't close tmpimp.imp";
 	# print "emximp -o tmpimp$Config::Config{lib_ext} tmpimp.imp\n";

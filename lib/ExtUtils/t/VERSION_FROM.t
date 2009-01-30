@@ -24,7 +24,7 @@ END { chdir File::Spec->updir;  rmtree 'Odd-Version' }
 chdir 'Odd-Version';
 
 open(my $mpl, ">", "Version") || die $^OS_ERROR;
-print $mpl "\$VERSION = 0\n";
+print $mpl, "\$VERSION = 0\n";
 close $mpl;
 END { unlink 'Version' }
 

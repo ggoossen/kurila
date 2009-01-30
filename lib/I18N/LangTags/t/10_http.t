@@ -69,12 +69,12 @@ foreach my $in ( @in) {
   
   foreach my $modus (@(
     sub {
-      print "# Testing with arg...\n";
+      print \*STDOUT, "# Testing with arg...\n";
       env::set_var('HTTP_ACCEPT_LANGUAGE' => 'PLORK');
       return @(@_[0]);
     },
     sub {
-      print "# Testing wath HTTP_ACCEPT_LANGUAGE...\n";
+      print \*STDOUT, "# Testing wath HTTP_ACCEPT_LANGUAGE...\n";
       env::set_var('HTTP_ACCEPT_LANGUAGE' => @_[0]);
      return();
     },)
@@ -89,17 +89,17 @@ foreach my $in ( @in) {
      (nelems @out) == nelems @should
        and lc( join "\e", @(<@out) ) eq lc( join "\e", @should )
     ) {
-      print "# Happily got [$(join ' ',@(<@out))] from [$in]\n";
+      print \*STDOUT, "# Happily got [$(join ' ',@(<@out))] from [$in]\n";
       ok 1;
     } else {
       ok 0;
-      print "#Got:         [$(join ' ',@out)]\n",
+      print \*STDOUT, "#Got:         [$(join ' ',@out)]\n",
             "# but wanted: [$(join ' ',@should)]\n",
             "# < \"$in\"\n#\n";
     }
   }
 }
 
-print "#\n#\n# Bye-bye!\n";
+print \*STDOUT, "#\n#\n# Bye-bye!\n";
 ok 1;
 

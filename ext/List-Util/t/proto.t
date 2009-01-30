@@ -29,7 +29,7 @@ set_prototype(\&g,undef);
 is( prototype(\&g),	undef,	'remove prototype');
 
 try { &set_prototype( 'f', '' ); };
-print "not " unless 
+print \*STDOUT, "not " unless 
 ok($^EVAL_ERROR->{?description} =~ m/^set_prototype: not a reference/,	'not a reference');
 
 try { &set_prototype( \'f', '' ); };

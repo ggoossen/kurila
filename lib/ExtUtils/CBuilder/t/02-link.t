@@ -12,7 +12,7 @@ BEGIN {
 use Test;
 BEGIN { 
   if ($^OS_NAME eq 'MSWin32') {
-    print "1..0 # Skipped: link_executable() is not implemented yet on Win32\n";
+    print \*STDOUT, "1..0 # Skipped: link_executable() is not implemented yet on Win32\n";
     exit;
   }
   if ($^OS_NAME eq 'VMS') {
@@ -35,7 +35,7 @@ ok $b;
 my $source_file = File::Spec->catfile('t', 'compilet.c');
 do {
   open my $fh, ">", "$source_file" or die "Can't create $source_file: $^OS_ERROR";
-  print $fh "int main(void) \{ return 11; \}\n";
+  print $fh, "int main(void) \{ return 11; \}\n";
   close $fh;
 };
 ok -e $source_file;

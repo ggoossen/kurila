@@ -56,14 +56,14 @@ close($patch_level) or die "Error closing patchlevel.h: $^OS_ERROR";
 # append a list of individual differences to the bug report.
 
 
-print "Extracting $file (with variable substitutions)\n";
+print \*STDOUT, "Extracting $file (with variable substitutions)\n";
 
 # In this section, perl variables will be expanded during extraction.
 # You can use $Config{...} to use Configure variables.
 
 my $extract_version = sprintf("\%vd", $^PERL_VERSION);
 
-print {$out} <<"!GROK!THIS!";
+print $out ,<<"!GROK!THIS!";
 $(config_value("startperl"))
     eval 'exec $(config_value("perlpath")) -S \$0 \$\{1+"\$@"\}'
 	if \$running_under_some_shell;
@@ -79,7 +79,7 @@ my \@patches = (
 
 # In the following, perl variables are not expanded during extraction.
 
-print {$out} <<'!NO!SUBS!';
+print $out ,<<'!NO!SUBS!';
 
 use strict;
 use Config;

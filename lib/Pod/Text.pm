@@ -245,7 +245,7 @@ sub output {
     my @($self, $text) =  @_;
     $text =~ s/\x{a0}/ /g; # non-breaking space
     $text =~ s/\x{ad}//g; # soft hyphen
-    print { %$self{?output_fh} } $text;
+    print  %$self{?output_fh}  ,$text;
 }
 
 # Output a block of code (something that isn't part of the POD text).  Called
@@ -609,7 +609,7 @@ sub parse_from_file {
     my $oldfh = select $fh;
     my $oldflush = $^OUTPUT_AUTOFLUSH;
     $^OUTPUT_AUTOFLUSH = 1;
-    print $fh '';
+    print $fh, '';
     $^OUTPUT_AUTOFLUSH = $oldflush;
     select $oldfh;
     return $retval;

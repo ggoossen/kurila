@@ -16,10 +16,10 @@ BEGIN {
 
     foreach (qw(Fcntl XS::APItest)) {
 	eval "require $_"
-	or do { print "1..0\n# $_ unavailable, can't test XS goto.\n"; exit 0 }
+	or do { print \*STDOUT, "1..0\n# $_ unavailable, can't test XS goto.\n"; exit 0 }
     }
 }
-print "1..11\n";
+print \*STDOUT, "1..11\n";
 
 our ($VALID, $value, $ret, $FNAME1, $FNAME2, $FREF);
 
@@ -37,7 +37,7 @@ $VALID = 'LOCK_SH';
 # Fcntl::constant("LOCK_SH",0) should always succeed.
 
 $value = Fcntl::constant($VALID);
-print((!defined $value)
+print(\*STDOUT, (!defined $value)
       ?? "not ok 1\n# Sanity check broke, remaining tests will fail.\n"
       !! "ok 1\n");
 
@@ -47,11 +47,11 @@ print((!defined $value)
 sub goto_const { goto &Fcntl::constant; }
 
 $ret = goto_const($VALID);
-print(($ret == $value) ?? "ok 2\n" !! "not ok 2\n# ($ret != $value)\n");
+print(\*STDOUT, ($ret == $value) ?? "ok 2\n" !! "not ok 2\n# ($ret != $value)\n");
 
-print "ok 3\n";
-print "ok 4\n";
-print "ok 5\n";
+print \*STDOUT, "ok 3\n";
+print \*STDOUT, "ok 4\n";
+print \*STDOUT, "ok 5\n";
 
 # test "goto &$function_name" from local package
 package Fcntl;
@@ -59,14 +59,14 @@ $FNAME2 = 'constant';
 sub goto_name2 { goto &$FNAME2; }
 package main;
 
-print "ok 6\n";
+print \*STDOUT, "ok 6\n";
 
 # test "goto &$function_ref"
 $FREF = \&Fcntl::constant;
 sub goto_ref { goto &$FREF; }
 
 $ret = goto_ref($VALID);
-print(($ret == $value) ?? "ok 7\n" !! "not ok 7\n# ($ret != $value)\n");
+print(\*STDOUT, ($ret == $value) ?? "ok 7\n" !! "not ok 7\n# ($ret != $value)\n");
 
 ### tests where the args are not on stack but in GvAV(defgv) (ie, @_)
 
@@ -74,15 +74,15 @@ print(($ret == $value) ?? "ok 7\n" !! "not ok 7\n# ($ret != $value)\n");
 sub call_goto_const { &goto_const( < @_ ); }
 
 $ret = call_goto_const($VALID);
-print(($ret == $value) ?? "ok 8\n" !! "not ok 8\n# ($ret != $value)\n");
+print(\*STDOUT, ($ret == $value) ?? "ok 8\n" !! "not ok 8\n# ($ret != $value)\n");
 
-print "ok 9\n";
+print \*STDOUT, "ok 9\n";
 
 # test "goto &$function_ref" from a sub called without arglist
 sub call_goto_ref { &goto_ref( < @_ ); }
 
 $ret = call_goto_ref($VALID);
-print(($ret == $value) ?? "ok 10\n" !! "not ok 10\n# ($ret != $value)\n");
+print(\*STDOUT, ($ret == $value) ?? "ok 10\n" !! "not ok 10\n# ($ret != $value)\n");
 
 
 # [perl #35878] croak in XS after goto segfaulted
@@ -97,6 +97,6 @@ do {
 	try { goto_croak("boo$_\n") };
 	$e .= $^EVAL_ERROR->{?description};
     }
-    print $e eq "boo1\nboo2\nboo3\nboo4\n" ?? "ok 11\n" !! "not ok 11\n";
+    print \*STDOUT, $e eq "boo1\nboo2\nboo3\nboo4\n" ?? "ok 11\n" !! "not ok 11\n";
 };
 

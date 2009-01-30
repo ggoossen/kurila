@@ -50,7 +50,7 @@ sub unexpand
                 if ($debug) {
                     my $x = $_;
                     $x =~ s/\t/^I\t/gs;
-                    print "sub on '$x'\n";
+                    print \*STDOUT, "sub on '$x'\n";
                 }
                 s/  +$/\t/;
             }

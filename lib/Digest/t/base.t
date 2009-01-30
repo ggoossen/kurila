@@ -54,7 +54,7 @@ ok($ctx->b64digest, $EBCDIC ?? "hvDw8PM" !! "ZjAwMDM");
 
 open(my $fh, ">", "xxtest$^PID") || die;
 binmode($fh);
-print $fh "abc" x 100, "\n";
+print $fh, "abc" x 100, "\n";
 close($fh) || die;
 
 open($fh, "<", "xxtest$^PID") || die;

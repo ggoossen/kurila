@@ -1,45 +1,45 @@
 #!./perl
 
-print "1..89\n";
+print \*STDOUT, "1..89\n";
 
 our ($foo, $fact, $ans, $i, $x, $eval);
 
 eval 'print "ok 1\n";';
 
-if ($^EVAL_ERROR eq '') {print "ok 2\n";} else {print "not ok 2\n";}
+if ($^EVAL_ERROR eq '') {print \*STDOUT, "ok 2\n";} else {print \*STDOUT, "not ok 2\n";}
 
 eval "\$foo\n    = # this is a comment\n'ok 3';";
-print $foo,"\n";
+print \*STDOUT, $foo,"\n";
 
 eval "\$foo\n    = # this is a comment\n'ok 4\n';";
-print $foo;
+print \*STDOUT, $foo;
 
-print eval '
+print \*STDOUT, eval '
 $foo =;';		# this tests for a call through yyerror()
-if ($^EVAL_ERROR->message =~ m/line 2/) {print "ok 5\n";} else {print "not ok 5\n";}
+if ($^EVAL_ERROR->message =~ m/line 2/) {print \*STDOUT, "ok 5\n";} else {print \*STDOUT, "not ok 5\n";}
 
-print eval '$foo = m/';	# this tests for a call through fatal()
-if ($^EVAL_ERROR->{?description} =~ m/Search/) {print "ok 6\n";} else {print "not ok 6\n";}
+print \*STDOUT, eval '$foo = m/';	# this tests for a call through fatal()
+if ($^EVAL_ERROR->{?description} =~ m/Search/) {print \*STDOUT, "ok 6\n";} else {print \*STDOUT, "not ok 6\n";}
 
-print eval '"ok 7\n";';
+print \*STDOUT, eval '"ok 7\n";';
 
 # calculate a factorial with recursive evals
 
 $foo = 5;
 $fact = 'our @x; if ($foo +<= 1) {1;} else {push(@x,$foo--); (eval $fact) * pop(@x);}';
 $ans = eval $fact;
-if ($ans == 120) {print "ok 8\n";} else {print "not ok 8\n";}
+if ($ans == 120) {print \*STDOUT, "ok 8\n";} else {print \*STDOUT, "not ok 8\n";}
 
 $foo = 5;
 $fact = 'local($foo)=$foo; $foo +<= 1 ?? 1 !! $foo-- * (eval $fact);';
 $ans = eval $fact;
-if ($ans == 120) {print "ok 9\n";} else {print "not ok 9 $ans\n";}
+if ($ans == 120) {print \*STDOUT, "ok 9\n";} else {print \*STDOUT, "not ok 9 $ans\n";}
 
 open(my $try, ">",'Op.eval');
-print $try 'print "ok 10\n"; unlink "Op.eval";',"\n";
+print $try, 'print "ok 10\n"; unlink "Op.eval";',"\n";
 close $try;
 
-do './Op.eval'; print $^EVAL_ERROR;
+do './Op.eval'; print \*STDOUT, $^EVAL_ERROR;
 
 # Test the singlequoted eval optimizer
 
@@ -49,27 +49,27 @@ for (1..3) {
 }
 
 try {
-    print "ok 14\n";
+    print \*STDOUT, "ok 14\n";
     die "ok 16\n";
     1;
-} || print "ok 15\n$^EVAL_ERROR->{?description}";
+} || print \*STDOUT, "ok 15\n$^EVAL_ERROR->{?description}";
 
 # check whether eval EXPR determines value of EXPR correctly
 
 do {
-  print "ok 17\n";
-  print "ok 18\n";
-  print "ok 19\n";
-  print "ok 20\n";
-  print "ok 21\n";
-  print "ok 22\n";
-  print "ok 23\n";
+  print \*STDOUT, "ok 17\n";
+  print \*STDOUT, "ok 18\n";
+  print \*STDOUT, "ok 19\n";
+  print \*STDOUT, "ok 20\n";
+  print \*STDOUT, "ok 21\n";
+  print \*STDOUT, "ok 22\n";
+  print \*STDOUT, "ok 23\n";
 };
 
 my $b = 'wrong';
 my $X = sub {
    my $b = "right";
-   print eval('"$b"') eq $b ?? "ok 24\n" !! "not ok 24\n";
+   print \*STDOUT, eval('"$b"') eq $b ?? "ok 24\n" !! "not ok 24\n";
 };
 &$X();
 
@@ -118,7 +118,7 @@ do {
     my $ok = 'not ok';
     do_eval3('print "$ok ' . $x++ . '\n"');
     do_eval3('eval q[print "$ok ' . $x++ . '\n"]');
-    print "# sub with eval\n";
+    print \*STDOUT, "# sub with eval\n";
     do_eval3('sub { eval q[print "$ok ' . $x++ . '\n"] }->()');
 };
 
@@ -131,7 +131,7 @@ sub recurse {
      die if $^EVAL_ERROR;
   }
   else {
-    print "ok $l\n";
+    print \*STDOUT, "ok $l\n";
   }
 }
 do {
@@ -164,7 +164,7 @@ $x++;
 # does scalar eval"" pop stack correctly?
 do {
     my $c = eval "(1,2)x10";
-    print $c eq '2222222222' ?? "ok $x\n" !! "# $c\nnot ok $x\n";
+    print \*STDOUT, $c eq '2222222222' ?? "ok $x\n" !! "# $c\nnot ok $x\n";
     $x++;
 };
 
@@ -172,11 +172,11 @@ do {
 do {
     my $status = try {
 	try { die };
-	print "# eval \{ return \} test\n";
+	print \*STDOUT, "# eval \{ return \} test\n";
 	return; # removing this changes behavior
     };
-    print "not " if $^EVAL_ERROR;
-    print "ok $x\n";
+    print \*STDOUT, "not " if $^EVAL_ERROR;
+    print \*STDOUT, "ok $x\n";
     $x++;
 };
 
@@ -187,32 +187,32 @@ do {
 	print "# eval ' return ' test\n";
 	return; # removing this changes behavior
     };
-    print "not " if $^EVAL_ERROR;
-    print "ok $x - return from eval\n";
+    print \*STDOUT, "not " if $^EVAL_ERROR;
+    print \*STDOUT, "ok $x - return from eval\n";
     $x++;
 };
 
-print "ok 40\n";
-print "ok 41\n";
+print \*STDOUT, "ok 40\n";
+print \*STDOUT, "ok 41\n";
 
 # Make sure that "my $$x" is forbidden
 # 20011224 MJD
 do {
   eval q{my $$x};
-  print $^EVAL_ERROR ?? "ok 42\n" !! "not ok 42\n";
+  print \*STDOUT, $^EVAL_ERROR ?? "ok 42\n" !! "not ok 42\n";
   eval q{my @$x};
-  print $^EVAL_ERROR ?? "ok 43\n" !! "not ok 43\n";
+  print \*STDOUT, $^EVAL_ERROR ?? "ok 43\n" !! "not ok 43\n";
   eval q{my %$x};
-  print $^EVAL_ERROR ?? "ok 44\n" !! "not ok 44\n";
+  print \*STDOUT, $^EVAL_ERROR ?? "ok 44\n" !! "not ok 44\n";
   eval q{my $$$x};
-  print $^EVAL_ERROR ?? "ok 45\n" !! "not ok 45\n";
+  print \*STDOUT, $^EVAL_ERROR ?? "ok 45\n" !! "not ok 45\n";
 };
 
 # [ID 20020623.002] eval "" doesn't clear $^EVAL_ERROR
 do {
     $^EVAL_ERROR = 5;
     eval q{};
-    print length($^EVAL_ERROR) ?? "not ok 46\t# \$\@ = '$^EVAL_ERROR'\n" !! "ok 46 - eval clear $^EVAL_ERROR\n";
+    print \*STDOUT, length($^EVAL_ERROR) ?? "not ok 46\t# \$\@ = '$^EVAL_ERROR'\n" !! "ok 46 - eval clear $^EVAL_ERROR\n";
 };
 
 # DAPM Nov-2002. Perl should now capture the full lexical context during
@@ -243,7 +243,7 @@ do { my $zzz = 2; fred2(50) };
 sub do_sort {
     my $zzz = 2;
     my @a = sort
-               { print eval('$zzz') == 2 ?? 'ok' !! 'not ok', " 51\n"; $a <+> $b }
+               { print \*STDOUT, eval('$zzz') == 2 ?? 'ok' !! 'not ok', " 51\n"; $a <+> $b }
  @(               2, 1);
 }
 do_sort();
@@ -275,15 +275,15 @@ eval q{
     print $r == 120 ?? 'ok' !! 'not ok', " 55\n";
 };
 my $r = fred3(5);
-print $r == 120 ?? 'ok' !! 'not ok', " 56\n";
+print \*STDOUT, $r == 120 ?? 'ok' !! 'not ok', " 56\n";
 $r = eval'fred3(5)';
-print $r == 120 ?? 'ok' !! 'not ok', " 57\n";
+print \*STDOUT, $r == 120 ?? 'ok' !! 'not ok', " 57\n";
 $r = 0;
 eval'$r = fred3(5)';
-print $r == 120 ?? 'ok' !! 'not ok', " 58\n";
+print \*STDOUT, $r == 120 ?? 'ok' !! 'not ok', " 58\n";
 $r = 0;
 do { my $yyy = 4; my $zzz = 5; my $l = 6; $r = eval 'fred3(5)' };;
-print $r == 120 ?? 'ok' !! 'not ok', " 59\n";
+print \*STDOUT, $r == 120 ?? 'ok' !! 'not ok', " 59\n";
 
 # check that goto &sub within evals doesn't leak lexical scope
 
@@ -292,9 +292,9 @@ my $yyy = 2;
 my $test = 60;
 sub fred4 { 
     my $zzz = 3;
-    print( ($zzz == 3  && eval '$zzz' == 3) ?? 'ok' !! 'not ok', " $test\n");
+    print(\*STDOUT,  ($zzz == 3  && eval '$zzz' == 3) ?? 'ok' !! 'not ok', " $test\n");
     $test++;
-    print eval '$yyy' == 2 ?? 'ok' !! 'not ok', " $test\n";
+    print \*STDOUT, eval '$yyy' == 2 ?? 'ok' !! 'not ok', " $test\n";
     $test++;
 }
 
@@ -318,7 +318,7 @@ eval q{ my $yyy = 888; my $zzz = 999; fred5(); };
 do {
    my $eval = eval 'sub { eval q|sub { %S }| }';
    $eval->(\%());
-   print "ok $test\n";
+   print \*STDOUT, "ok $test\n";
    $test++;
 };
 
@@ -341,12 +341,12 @@ do {
 };
 do {
     my $x = 3;
-    print db1()     == 2 ?? 'ok' !! 'not ok', " $test\n"; $test++;
-    print DB::db2() == 2 ?? 'ok' !! 'not ok', " $test\n"; $test++;
-    print DB::db3() == 3 ?? 'ok' !! 'not ok', " $test # TODO\n"; $test++;
-    print DB::db4() == 3 ?? 'ok' !! 'not ok', " $test # TODO\n"; $test++;
-    print DB::db5() == 3 ?? 'ok' !! 'not ok', " $test # TODO\n"; $test++;
-    print db6()     == 4 ?? 'ok' !! 'not ok', " $test\n"; $test++;
+    print \*STDOUT, db1()     == 2 ?? 'ok' !! 'not ok', " $test\n"; $test++;
+    print \*STDOUT, DB::db2() == 2 ?? 'ok' !! 'not ok', " $test\n"; $test++;
+    print \*STDOUT, DB::db3() == 3 ?? 'ok' !! 'not ok', " $test # TODO\n"; $test++;
+    print \*STDOUT, DB::db4() == 3 ?? 'ok' !! 'not ok', " $test # TODO\n"; $test++;
+    print \*STDOUT, DB::db5() == 3 ?? 'ok' !! 'not ok', " $test # TODO\n"; $test++;
+    print \*STDOUT, db6()     == 4 ?? 'ok' !! 'not ok', " $test\n"; $test++;
 };
 require './test.pl';
 our $NO_ENDING = 1;
@@ -356,9 +356,9 @@ my $got = runperl (prog => 'our %h; %h{+a}=1; foreach my $k (keys %h) {eval qq{\
 		   stderr => 1);
 
 if ($got eq '') {
-  print "ok $test\n";
+  print \*STDOUT, "ok $test\n";
 } else {
-  print "not ok $test\n";
+  print \*STDOUT, "not ok $test\n";
   _diag ("# Got '$got'\n");
 }
 $test++;
@@ -370,32 +370,32 @@ do {
   %h{+a}=1;
   foreach my $k (keys %h) {
     if (defined $k and $k eq 'a') {
-      print "ok $test\n";
+      print \*STDOUT, "ok $test\n";
     } else {
-      print "not $test # got ", _q ($k), "\n";
+      print \*STDOUT, "not $test # got ", _q ($k), "\n";
     }
     $test++;
 
     eval "\$k";
 
     if (defined $k and $k eq 'a') {
-      print "ok $test\n";
+      print \*STDOUT, "ok $test\n";
     } else {
-      print "not $test # got ", _q ($k), "\n";
+      print \*STDOUT, "not $test # got ", _q ($k), "\n";
     }
     $test++;
   }
 };
 
-sub Foo {} print Foo(try {});
-print "ok ",$test++," - #20798 (used to dump core)\n";
+sub Foo {} print \*STDOUT, Foo(try {});
+print \*STDOUT, "ok ",$test++," - #20798 (used to dump core)\n";
 
 # eval undef should be the same as eval "" barring any warnings
 
 do {
     local $^EVAL_ERROR = "foo";
     eval undef;
-    print "not " unless $^EVAL_ERROR eq "";
-    print "ok $test # eval undef \n"; $test++;
+    print \*STDOUT, "not " unless $^EVAL_ERROR eq "";
+    print \*STDOUT, "ok $test # eval undef \n"; $test++;
 };
 

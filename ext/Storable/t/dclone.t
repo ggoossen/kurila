@@ -16,7 +16,7 @@ BEGIN {
 
 use Storable < qw(dclone);
 
-print "1..10\n";
+print \*STDOUT, "1..10\n";
 
 $a = 'toto';
 $b = \$a;
@@ -26,17 +26,17 @@ our %a = %('key', 'value', 1, 0, $a, $b, 'cvar', \$c);
 our @a = @('first', undef, 3, -4, -3.14159, 456, 4.5,
 	$b, \$a, $a, $c, \$c, \%a);
 
-print "not " unless defined (our $aref = dclone(\@a));
-print "ok 1\n";
+print \*STDOUT, "not " unless defined (our $aref = dclone(\@a));
+print \*STDOUT, "ok 1\n";
 
 our $dumped = &dump(\@a);
-print "ok 2\n";
+print \*STDOUT, "ok 2\n";
 
 our $got = &dump($aref);
-print "ok 3\n";
+print \*STDOUT, "ok 3\n";
 
-print "not " unless $got eq $dumped; 
-print "ok 4\n";
+print \*STDOUT, "not " unless $got eq $dumped; 
+print \*STDOUT, "ok 4\n";
 
 package FOO; our @ISA = qw(Storable);
 
@@ -49,25 +49,25 @@ sub make {
 package main;
 
 our $foo = FOO->make;
-print "not " unless defined(our $r = $foo->dclone);
-print "ok 5\n";
+print \*STDOUT, "not " unless defined(our $r = $foo->dclone);
+print \*STDOUT, "ok 5\n";
 
-print "not " unless &dump($foo) eq &dump($r);
-print "ok 6\n";
+print \*STDOUT, "not " unless &dump($foo) eq &dump($r);
+print \*STDOUT, "ok 6\n";
 
 # Ensure refs to "undef" values are properly shared during cloning
 my $hash;
 push @{%$hash{+''}}, \%$hash{+a};
-print "not " unless %$hash{''}->[0] \== \%$hash{+a};
-print "ok 7\n";
+print \*STDOUT, "not " unless %$hash{''}->[0] \== \%$hash{+a};
+print \*STDOUT, "ok 7\n";
 
 my $cloned = dclone(dclone($hash));
-print "not " unless %$cloned{''}->[0] \== \%$cloned{+a};
-print "ok 8\n";
+print \*STDOUT, "not " unless %$cloned{''}->[0] \== \%$cloned{+a};
+print \*STDOUT, "ok 8\n";
 
 %$cloned{+a} = "blah";
-print "not " unless %$cloned{''}->[0] \== \%$cloned{+a};
-print "ok 9\n";
+print \*STDOUT, "not " unless %$cloned{''}->[0] \== \%$cloned{+a};
+print \*STDOUT, "ok 9\n";
 
 # [ID 20020221.007] SEGV in Storable with empty string scalar object
 package TestString;
@@ -79,7 +79,7 @@ package main;
 my $empty_string_obj = TestString->new('');
 my $clone = dclone($empty_string_obj);
 # If still here after the dclone the fix (#17543) worked.
-print ref $clone eq ref $empty_string_obj &&
+print \*STDOUT, ref $clone eq ref $empty_string_obj &&
       $$clone eq $$empty_string_obj &&
       $$clone eq '' ?? "ok 10\n" !! "not ok 10\n";
 

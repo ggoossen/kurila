@@ -18,7 +18,7 @@ my %page = %(
 	feed   => "^L\n",
 );
 
-print < form \%(page=>\%page),
+print \*STDOUT, < form \%(page=>\%page),
 	 '{]]]]]}  {"{*}"}  {[[[[[}',
 	 \1..nelems @text, \@text,  \1..nelems @text;
 	 

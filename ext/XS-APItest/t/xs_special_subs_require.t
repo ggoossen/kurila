@@ -15,7 +15,7 @@ use Test::More tests => $uc ?? 103 !! 83;
 # Doing this longhand cut&paste makes it clear
 # BEGIN and INIT are FIFO, CHECK and END are LIFO
 BEGIN {
-    print "# First BEGIN\n";
+    print \*STDOUT, "# First BEGIN\n";
     is($XS::APItest::BEGIN_called, undef, "BEGIN not yet called");
     is($XS::APItest::BEGIN_called_PP, undef, "BEGIN not yet called");
     is($XS::APItest::UNITCHECK_called, undef, "UNITCHECK not yet called")
@@ -31,7 +31,7 @@ BEGIN {
 }
 
 CHECK {
-    print "# First CHECK\n";
+    print \*STDOUT, "# First CHECK\n";
     is($XS::APItest::BEGIN_called, undef, "BEGIN not yet called");
     is($XS::APItest::BEGIN_called_PP, undef, "BEGIN not yet called");
     is($XS::APItest::UNITCHECK_called, undef, "UNITCHECK not yet called")
@@ -47,7 +47,7 @@ CHECK {
 }
 
 INIT {
-    print "# First INIT\n";
+    print \*STDOUT, "# First INIT\n";
     is($XS::APItest::BEGIN_called, undef, "BEGIN not yet called");
     is($XS::APItest::BEGIN_called_PP, undef, "BEGIN not yet called");
     is($XS::APItest::UNITCHECK_called, undef, "UNITCHECK not yet called")
@@ -63,7 +63,7 @@ INIT {
 }
 
 END {
-    print "# First END\n";
+    print \*STDOUT, "# First END\n";
     is($XS::APItest::BEGIN_called, 1, "BEGIN called");
     is($XS::APItest::BEGIN_called_PP, 1, "BEGIN called");
     is($XS::APItest::UNITCHECK_called, 1, "UNITCHECK called") if $uc;
@@ -76,7 +76,7 @@ END {
     is($XS::APItest::END_called_PP, 1, "END called");
 }
 
-print "# First body\n";
+print \*STDOUT, "# First body\n";
 is($XS::APItest::BEGIN_called, undef, "BEGIN not yet called");
 is($XS::APItest::BEGIN_called_PP, undef, "BEGIN not yet called");
 is($XS::APItest::UNITCHECK_called, undef, "UNITCHECK not yet called") if $uc;
@@ -99,7 +99,7 @@ do {
     is(@trap[1], "Too late to run INIT block");
 };
 
-print "# Second body\n";
+print \*STDOUT, "# Second body\n";
 is($XS::APItest::BEGIN_called, 1, "BEGIN called");
 is($XS::APItest::BEGIN_called_PP, 1, "BEGIN called");
 is($XS::APItest::UNITCHECK_called, 1, "UNITCHECK called") if $uc;
@@ -112,7 +112,7 @@ is($XS::APItest::END_called, undef, "END not yet called");
 is($XS::APItest::END_called_PP, undef, "END not yet called");
 
 BEGIN {
-    print "# Second BEGIN\n";
+    print \*STDOUT, "# Second BEGIN\n";
     is($XS::APItest::BEGIN_called, undef, "BEGIN not yet called");
     is($XS::APItest::BEGIN_called_PP, undef, "BEGIN not yet called");
     is($XS::APItest::UNITCHECK_called, undef, "UNITCHECK not yet called")
@@ -128,7 +128,7 @@ BEGIN {
 }
 
 CHECK {
-    print "# Second CHECK\n";
+    print \*STDOUT, "# Second CHECK\n";
     is($XS::APItest::BEGIN_called, undef, "BEGIN not yet called");
     is($XS::APItest::BEGIN_called_PP, undef, "BEGIN not yet called");
     is($XS::APItest::UNITCHECK_called, undef, "UNITCHECK not yet called")
@@ -144,7 +144,7 @@ CHECK {
 }
 
 INIT {
-    print "# Second INIT\n";
+    print \*STDOUT, "# Second INIT\n";
     is($XS::APItest::BEGIN_called, undef, "BEGIN not yet called");
     is($XS::APItest::BEGIN_called_PP, undef, "BEGIN not yet called");
     is($XS::APItest::UNITCHECK_called, undef, "UNITCHECK not yet called")
@@ -160,7 +160,7 @@ INIT {
 }
 
 END {
-    print "# Second END\n";
+    print \*STDOUT, "# Second END\n";
     is($XS::APItest::BEGIN_called, 1, "BEGIN called");
     is($XS::APItest::BEGIN_called_PP, 1, "BEGIN called");
     is($XS::APItest::UNITCHECK_called, 1, "UNITCHECK called") if $uc;

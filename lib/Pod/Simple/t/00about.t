@@ -30,7 +30,7 @@ ok 1;
 
 #chdir "t" if -e "t";
 foreach my $m ( @modules) {
-  print "# Loading $m ...\n";
+  print \*STDOUT, "# Loading $m ...\n";
   eval "require $m;";
   die if $^EVAL_ERROR;
   ok 1;

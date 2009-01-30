@@ -36,7 +36,7 @@ local *FOO;
       $blessed_code,            # blessed code reference
       \&Another::Package::foo,  # code in another package
       sub ($$;$) { 0 },         # prototypes
-      sub { print "test\n" },
+      sub { print \*STDOUT, "test\n" },
       \&Test::ok,               # large scalar
      ),
 
@@ -169,7 +169,7 @@ do {
 
     open(my $saverr, ">&", \*STDERR);
     open(\*STDERR, ">", $devnull) or
-	( print SAVEERR "Unable to redirect STDERR: $^OS_ERROR\n" and exit(1) );
+	( print SAVEERR, "Unable to redirect STDERR: $^OS_ERROR\n" and exit(1) );
 
     try { $freezed = freeze @obj[0]->[0] };
 

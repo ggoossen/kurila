@@ -105,7 +105,7 @@ ok $gzerrno == 0 || $gzerrno == Z_STREAM_END;
 ok ! $fil->gzclose ;
 
 ok $gzerrno == 0
-    or print "# gzerrno is $gzerrno\n" ;
+    or print \*STDOUT, "# gzerrno is $gzerrno\n" ;
 
 1 while unlink $name ;
 
@@ -138,7 +138,7 @@ is $f->gzread($uncompressed, $len), $len ;
 
 ok $contents eq $uncompressed 
 
-    or print "# Length orig $len" . 
+    or print \*STDOUT, "# Length orig $len" . 
              ", Length uncompressed " . length($uncompressed) . "\n" ;
 
 ok ! $f->gzclose ;
@@ -289,7 +289,7 @@ do {
 
     my $uncmomp;
     ok (($x = $fil->gzread($uncomp)) == $len) 
-        or print "# length $x, expected $len\n" ;
+        or print \*STDOUT, "# length $x, expected $len\n" ;
 
     ok ! $fil->gzclose ;
 
@@ -444,7 +444,7 @@ do {
     my $a = gzopen($name, "w");
 
     ok ! $a->gzerror() 
-        or print "# gzerrno is $Compress::Zlib::gzerrno \n" ;
+        or print \*STDOUT, "# gzerrno is $Compress::Zlib::gzerrno \n" ;
     try { $a->gzseek(-1, 10) ; };
     like $^EVAL_ERROR->{?description}, mkErr("seek: unknown value, 10, for whence parameter");
 

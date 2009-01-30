@@ -97,7 +97,7 @@ sub setup {
         my $dir = dirname($file);
         mkpath $dir;
         open(my $fh, ">", "$file") || die "Can't create $file: $^OS_ERROR";
-        print $fh $text;
+        print $fh, $text;
         close $fh;
     }
 

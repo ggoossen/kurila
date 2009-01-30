@@ -148,7 +148,7 @@ sub output_h () {
 sub try_exit () {
     exit 0 if $STANDARD_HELP_VERSION;
     my $p = __PACKAGE__;
-    print {output_h()} <<EOM;
+    print output_h() ,<<EOM;
   [Now continuing due to backward compatibility and excessive paranoia.
    See ``perldoc $p'' about \$$p\::STANDARD_HELP_VERSION.]
 EOM
@@ -165,7 +165,7 @@ sub version_mess ($;$) {
 	my $myv = $VERSION;
 	$myv .= ' [paranoid]' unless $STANDARD_HELP_VERSION;
 	my $perlv = $^PERL_VERSION;
-	print $h <<EOH;
+	print $h, <<EOH;
 $^PROGRAM_NAME version $v calling Getopt::Std::getopts (version $myv),
 running under Perl version $perlv.
 EOH
@@ -189,11 +189,11 @@ sub help_mess ($;$) {
 	    $help .= "\n\tBoolean (without arguments): -" . join " -", @rest;
 	}
 	my @($scr) = @($^PROGRAM_NAME =~ m,([^/\\]+)$,);
-	print $h <<EOH if (nelems @_);			# Let the script override this
+	print $h, <<EOH if (nelems @_);			# Let the script override this
 
 Usage: $scr [-OPTIONS [-MORE_OPTIONS]] [--] [PROGRAM_ARG1 ...]
 EOH
-	print $h <<EOH;
+	print $h, <<EOH;
 
 The following single-character options are accepted:$help
 
@@ -206,7 +206,7 @@ EOH
 		$has_pod = 1, last if m/^=(pod|head1)/;
 	    }
 	}
-	print $h <<EOH if $has_pod;
+	print $h, <<EOH if $has_pod;
 
 For more details run
 	perldoc -F $^PROGRAM_NAME

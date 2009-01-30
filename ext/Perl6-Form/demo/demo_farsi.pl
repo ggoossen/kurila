@@ -2,7 +2,7 @@ use Perl6::Form;
 
 my @amounts = @(0, 1, 1.2345, 1234.56, -1234.56, 1234567.89);
 
-print < form
+print \*STDOUT, < form
 	 "Farsi (Iranian):",
 	 "        \{-IRR 0/[[[[[[[[\}", <
 			  farsi(< @amounts);

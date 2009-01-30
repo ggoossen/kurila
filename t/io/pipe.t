@@ -20,9 +20,9 @@ $^OUTPUT_AUTOFLUSH = 1;
 
 open(my $pipe, "|-", "-") || exec $Perl, '-pe', 's/Y/k/g; s/X/o/g';
 
-printf $pipe "Xk \%d - open |- || exec\n", curr_test();
+printf $pipe, "Xk \%d - open |- || exec\n", curr_test();
 next_test();
-printf $pipe "oY \%d -    again\n", curr_test();
+printf $pipe, "oY \%d -    again\n", curr_test();
 next_test();
 close $pipe;
 
@@ -34,12 +34,12 @@ SKIP: do {
     if (open($pipe, "-|", "-")) {
 	while( ~< $pipe) {
 	    s/^not //;
-	    print;
+	    print \*STDOUT,;
 	}
 	close $pipe;        # avoid zombies
     }
     else {
-	printf STDOUT "not ok \%d - open -|\n", curr_test();
+	printf \*STDOUT, "not ok \%d - open -|\n", curr_test();
         next_test();
         my $tnum = curr_test;
         next_test();
@@ -60,11 +60,11 @@ SKIP: do {
 	} else {
 	    s/^(not ok \d+ -) .*/$1 expect '$(join ' ',@r)', got '$(join ' ',@r1)'\n/s;
 	}
-	print;
+	print \*STDOUT,;
 	close $pipe;        # avoid zombies
     }
     else {
-	printf STDOUT "not ok \%d - $raw", curr_test();
+	printf \*STDOUT, "not ok \%d - $raw", curr_test();
         exec $Perl, '-e0';	# Do not run END()...
     }
 
@@ -72,7 +72,7 @@ SKIP: do {
     next_test();
 
     if (open($pipe, "|-", "-")) {
-	printf $pipe "not ok \%d - $raw", curr_test();
+	printf $pipe, "not ok \%d - $raw", curr_test();
 	close $pipe;        # avoid zombies
     }
     else {
@@ -85,7 +85,7 @@ SKIP: do {
 	} else {
 	    s/^(not ok \d+ -) .*/$1 expect '$(join ' ',@r)', got '$(join ' ',@r1)'\n/s;
 	}
-	print;
+	print \*STDOUT,;
         exec $Perl, '-e0';	# Do not run END()...
     }
 
@@ -102,14 +102,14 @@ SKIP: do {
             while( ~< $reader) {
                 s/^not //;
                 s/([A-Z])/$(lc($1))/g;
-                print;
+                print \*STDOUT,;
             }
             close $reader;     # avoid zombies
         }
         else {
             die "Couldn't fork" unless defined $pid;
             close $reader;
-            printf $writer "not ok \%d - pipe & fork\n", curr_test;
+            printf $writer, "not ok \%d - pipe & fork\n", curr_test;
             next_test;
 
             open(\*STDOUT, ">&", $writer) || die "Can't dup WRITER to STDOUT";
@@ -133,10 +133,10 @@ signals::set_handler('PIPE' => \&broken_pipe);
 
 sub broken_pipe {
     signals::set_handler('PIPE' => 'IGNORE');       # loop preventer
-    printf "ok \%d - SIGPIPE\n", curr_test;
+    printf \*STDOUT, "ok \%d - SIGPIPE\n", curr_test;
 }
 
-printf $writer "not ok \%d - SIGPIPE\n", curr_test;
+printf $writer, "not ok \%d - SIGPIPE\n", curr_test;
 close $writer;
 sleep 1;
 next_test;
@@ -162,7 +162,7 @@ SKIP: do {
         signals::temp_set_handler(PIPE => 'IGNORE');
         open my $nil, '|-', qq{$Perl -e "exit 0"} or die "open failed: $^OS_ERROR";
         sleep 5;
-        if (print $nil 'foo') {
+        if (print $nil, 'foo') {
             # If print was allowed we had better get an error on close
             ok( !close $nil,     'close error on broken pipe' );
         }

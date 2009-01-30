@@ -15,18 +15,18 @@ ok 1;
 
 use Pod::Simple::DumpAsXML;
 use Pod::Simple::XMLOutStream;
-print "# Pod::Simple version $Pod::Simple::VERSION\n";
+print \*STDOUT, "# Pod::Simple version $Pod::Simple::VERSION\n";
 sub e ($$) { Pod::Simple::DumpAsXML->_duo(< @_) }
 
 my $x = 'Pod::Simple::XMLOutStream';
 
-print "##### Tests for =item directives via class $x\n";
+print \*STDOUT, "##### Tests for =item directives via class $x\n";
 
 $Pod::Simple::XMLOutStream::ATTR_PAD   = ' ';
 $Pod::Simple::XMLOutStream::SORT_ATTRS = 1; # for predictably testable output
 
 
-print "#\n# Tests for simple =item *'s\n";
+print \*STDOUT, "#\n# Tests for simple =item *'s\n";
 ok( $x->_out("\n=over\n\n=item *\n\nStuff\n\n=item *\n\nBar I<baz>!\n\n=back\n\n"),
     '<Document><over-bullet indent="4"><item-bullet>Stuff</item-bullet><item-bullet>Bar <I>baz</I>!</item-bullet></over-bullet></Document>'
 );
@@ -43,7 +43,7 @@ ok( $x->_out("\n=over\n\n=item *\n\nStuff\n=cut\nStuff\n\n=item *\n\nBar I<baz>!
 
 
 
-print "#\n# Tests for simple =item 1.'s\n";
+print \*STDOUT, "#\n# Tests for simple =item 1.'s\n";
 ok( $x->_out("\n=over\n\n=item 1.\n\nStuff\n\n=item 2.\n\nBar I<baz>!\n\n=back\n\n"),
     '<Document><over-number indent="4"><item-number number="1">Stuff</item-number><item-number number="2">Bar <I>baz</I>!</item-number></over-number></Document>'
 );
@@ -60,7 +60,7 @@ ok( $x->_out("\n=over\n\n=item 1\n\nStuff\n=cut\nStuff\n\n=item 2\n\nBar I<baz>!
 
 
 
-print "#\n# Tests for =over blocks (without =items)\n";
+print \*STDOUT, "#\n# Tests for =over blocks (without =items)\n";
 ok( $x->_out("\n=over\n\nStuff\n\nBar I<baz>!\n\n=back\n\n"),
     '<Document><over-block indent="4"><Para>Stuff</Para><Para>Bar <I>baz</I>!</Para></over-block></Document>'
 );
@@ -74,7 +74,7 @@ ok( $x->_out("\n=over\n\nBar I<baz>!\n\n Stuff\n\n=back\n\n"),
 
 
 
-print "#\n# Tests for =item Text blocks...\n";
+print \*STDOUT, "#\n# Tests for =item Text blocks...\n";
 ok( $x->_out("\n=over\n\n=item Foo\n\nStuff\n\n=cut\n\nCrunk\nZorp\n\n=item Bar I<baz>!\n\nQuux\n\n=back\n\n"),
     '<Document><over-text indent="4"><item-text>Foo</item-text><Para>Stuff</Para><item-text>Bar <I>baz</I>!</item-text><Para>Quux</Para></over-text></Document>'
 );
@@ -89,7 +89,7 @@ ok( $x->_out("\n=over\n\n=item Foo\n\n Stuff\n\tSnork\n=cut\n\nCrunk\nZorp\n\n=i
 
 
 
-print "#\n# Test for mixed =item blocks...\n";
+print \*STDOUT, "#\n# Test for mixed =item blocks...\n";
 ok( $x->_out("\n=over\n\n=item Foo\n\nStuff\n\n=item 2.\n\nBar I<baz>!\n\nQuux\n\n=item *\n\nThwoong\n\n=back\n\n"),
     qq{<Document><over-text indent="4"><item-text>Foo</item-text><Para>Stuff</Para>}
   . qq{<item-text>2.</item-text><Para>Bar <I>baz</I>!</Para><Para>Quux</Para>}
@@ -99,7 +99,7 @@ ok( $x->_out("\n=over\n\n=item Foo\n\nStuff\n\n=item 2.\n\nBar I<baz>!\n\nQuux\n
 # ok( $x->_out("\n=over\n\n=item *\n\nStuff\n\n=item 2.\n\nBar I<baz>!\n\nQuux\n\n=item *\n\nThwoong\n\n=back\n\n"),
 # ok( $x->_out("\n=over\n\n=item 1.\n\nStuff\n\n=item 2.\n\nBar I<baz>!\n\nQuux\n\n=item *\n\nThwoong\n\n=back\n\n"),
 
-print "#\n# Tests for indenting\n";
+print \*STDOUT, "#\n# Tests for indenting\n";
 ok( $x->_out("\n=over 19\n\n=item *\n\nStuff\n\n=item *\n\nBar I<baz>!\n\n=back\n\n"),
     '<Document><over-bullet indent="19"><item-bullet>Stuff</item-bullet><item-bullet>Bar <I>baz</I>!</item-bullet></over-bullet></Document>'
 );
@@ -115,7 +115,7 @@ ok( $x->_out("\n=over 19\n\n=item Foo\n\nStuff\n\n=cut\n\nCrunk\nZorp\n\n=item B
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-print "# Now testing nesting...\n";
+print \*STDOUT, "# Now testing nesting...\n";
 ok( $x->_out(join "\n\n", @( '',
   '=over',
     '=item *',
@@ -184,7 +184,7 @@ ok( $x->_out( join "\n\n", @( '', '',
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 $d = 11;
-print "# Now checking that document-end closes things right...\n";
+print \*STDOUT, "# Now checking that document-end closes things right...\n";
 
 ok( $x->_out( join "\n\n", @( '', '', 
   '=over',
@@ -219,7 +219,7 @@ ok( $x->_out( join "\n\n", @( '', '',
 
 
 
-print "# Wrapping up... one for the road...\n";
+print \*STDOUT, "# Wrapping up... one for the road...\n";
 ok 1;
-print "# --- Done with ", __FILE__, " --- \n";
+print \*STDOUT, "# --- Done with ", __FILE__, " --- \n";
 

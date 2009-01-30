@@ -60,7 +60,7 @@ foreach my $foo (@(undef, 0)) {
 do {   # any object that can print should be ok for walk_output
     package Hugo;
     sub new { my $foo = bless \%() };
-    sub print { CORE::print < @_ }
+    sub print { CORE::print \*STDOUT, < @_ }
 };
 my $foo = Hugo->new();	# suggested this API fix
 try {  walk_output($foo) };
@@ -191,7 +191,7 @@ SKIP: do {
 	do {
 	    package Bar;
 	    our $AUTOLOAD = 'garbage';
-	    sub AUTOLOAD { print "# in AUTOLOAD body: $AUTOLOAD\n" }
+	    sub AUTOLOAD { print \*STDOUT, "# in AUTOLOAD body: $AUTOLOAD\n" }
 	};
 	@($res,$err) =  render('-basic', 'Bar::auto_func');
 	like ($res, qr/unknown function \(Bar::auto_func\)/,

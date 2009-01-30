@@ -93,9 +93,9 @@ do {
   ok(($msg !~ m/ABORT/),"vmsish ERR exit, vmsish hushed at runtime, DCL error message check");
 
   open(my $test, ">",'vmsish_test.pl') || die('not ok ?? : unable to open "vmsish_test.pl" for writing');  
-  print $test "#! perl\n";
-  print $test "use vmsish qw(hushed);\n";
-  print $test "\$obvious = (\$compile(\$error;\n";
+  print $test, "#! perl\n";
+  print $test, "use vmsish qw(hushed);\n";
+  print $test, "\$obvious = (\$compile(\$error;\n";
   close $test;
   $msg = do_a_perl('vmsish_test.pl');
   $msg =~ s/\n/\\n/g; # keep output on one line
@@ -156,14 +156,14 @@ do {
   my $vmsval = @vmslocal[5] * 31536000 + @vmslocal[7] * 86400 +
             @vmslocal[2] * 3600     + @vmslocal[1] * 60 + @vmslocal[0];
   ok(abs($vmsval - $utcval + $offset) +<= 10, "(localtime) UTC: $utcval  VMS: $vmsval");
-  print "# UTC: $(join ' ',@utclocal)\n# VMS: $(join ' ',@vmslocal)\n";
+  print \*STDOUT, "# UTC: $(join ' ',@utclocal)\n# VMS: $(join ' ',@vmslocal)\n";
 
   $utcval = @utcgmtime[5] * 31536000 + @utcgmtime[7] * 86400 +
             @utcgmtime[2] * 3600     + @utcgmtime[1] * 60 + @utcgmtime[0];
   $vmsval = @vmsgmtime[5] * 31536000 + @vmsgmtime[7] * 86400 +
             @vmsgmtime[2] * 3600     + @vmsgmtime[1] * 60 + @vmsgmtime[0];
   ok(abs($vmsval - $utcval + $offset) +<= 10, "(gmtime) UTC: $utcval  VMS: $vmsval");
-  print "# UTC: $(join ' ',@utcgmtime)\n# VMS: $(join ' ',@vmsgmtime)\n";
+  print \*STDOUT, "# UTC: $(join ' ',@utcgmtime)\n# VMS: $(join ' ',@vmsgmtime)\n";
 
   ok(abs($utcmtime - $vmsmtime + $offset) +<= 10,"(stat) UTC: $utcmtime  VMS: $vmsmtime");
 };
@@ -173,9 +173,9 @@ do {
 #       they were turned off in invoking procedure
 sub do_a_perl {
     open(my $p, ">",'vmsish_test.com') || die('not ok ?? : unable to open "vmsish_test.com" for writing');
-    print $p "\$ set message/facil/sever/ident/text\n";
-    print $p "\$ define/nolog/user sys\$error _nla0:\n";
-    print $p "\$ $Invoke_Perl $(join ' ',@_)\n";
+    print $p, "\$ set message/facil/sever/ident/text\n";
+    print $p, "\$ define/nolog/user sys\$error _nla0:\n";
+    print $p, "\$ $Invoke_Perl $(join ' ',@_)\n";
     close $p;
     my $x = `\@vmsish_test.com`;
     unlink 'vmsish_test.com';

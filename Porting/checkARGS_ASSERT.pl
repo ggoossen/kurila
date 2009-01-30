@@ -29,4 +29,4 @@ foreach (keys %declared) {
     %unused{+$_}++ unless %used{?$_};
 }
 
-print $_, "\n" foreach sort keys %unused;
+print \*STDOUT, $_, "\n" foreach sort keys %unused;

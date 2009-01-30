@@ -15,7 +15,7 @@ ok 1;
 
 use Pod::Simple::DumpAsXML;
 use Pod::Simple::XMLOutStream;
-print "# Pod::Simple version $Pod::Simple::VERSION\n";
+print \*STDOUT, "# Pod::Simple version $Pod::Simple::VERSION\n";
 sub e     ($$) { Pod::Simple::XMLOutStream->_duo(\&nowhine, < @_) }
 
 sub nowhine {

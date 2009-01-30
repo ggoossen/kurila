@@ -4,7 +4,7 @@ BEGIN {
     $^INCLUDED{+"feature.pm"} = 1; # so we don't attempt to load feature.pm
 }
 
-print "1..26\n";
+print \*STDOUT, "1..26\n";
 
 # Can't require test.pl, as we're testing the use/require mechanism here.
 
@@ -25,25 +25,25 @@ sub _ok {
     }
     if ($result) {
 	if ($name) {
-	    print "ok $test - $name\n";
+	    print \*STDOUT, "ok $test - $name\n";
 	} else {
-	    print "ok $test\n";
+	    print \*STDOUT, "ok $test\n";
 	}
     } else {
 	if ($name) {
-	    print "not ok $test - $name\n";
+	    print \*STDOUT, "not ok $test - $name\n";
 	} else {
-	    print "not ok $test\n";
+	    print \*STDOUT, "not ok $test\n";
 	}
 	my @caller = @( caller(2) );
-	print "# Failed test at @caller[1] line @caller[2]\n";
-	print "# Got      '$got'\n";
+	print \*STDOUT, "# Failed test at @caller[1] line @caller[2]\n";
+	print \*STDOUT, "# Got      '$got'\n";
 	if ($type eq 'is') {
-	    print "# Expected '$expected'\n";
+	    print \*STDOUT, "# Expected '$expected'\n";
 	} elsif ($type eq 'isnt') {
-	    print "# Expected not '$expected'\n";
+	    print \*STDOUT, "# Expected not '$expected'\n";
 	} elsif ($type eq 'like') {
-	    print "# Expected $expected\n";
+	    print \*STDOUT, "# Expected $expected\n";
 	}
     }
     $test = $test + 1;
@@ -147,7 +147,7 @@ do {
     # Regression test for patch 14937: 
     #   Check that a .pm file with no package or VERSION doesn't core.
     open my $f, ">", "xxx.pm" or die "Cannot open xxx.pm: $^OS_ERROR\n";
-    print $f "1;\n";
+    print $f, "1;\n";
     close $f;
     eval "use lib '.'; use xxx v3;";
     like ($^EVAL_ERROR->message, qr/^xxx defines neither package nor VERSION--version check failed/);

@@ -23,7 +23,7 @@ use utf8;
 
 use Storable < qw(thaw freeze);
 
-print "1..5\n";
+print \*STDOUT, "1..5\n";
 
 my $x = chr(1234);
 ok 1, $x eq ${thaw freeze \$x};

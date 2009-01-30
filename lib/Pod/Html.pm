@@ -476,7 +476,7 @@ sub pod2html {
 </table>
 END_OF_BLOCK
 
-    print {$html_fh} <<END_OF_HEAD;
+    print $html_fh ,<<END_OF_HEAD;
 <?xml version="1.0" ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -508,7 +508,7 @@ END_OF_HEAD
         $index = qq(<!--\n$index\n-->\n);
     }
 
-    print {$html_fh} << "END_OF_INDEX";
+    print $html_fh ,<< "END_OF_INDEX";
 
 <!-- INDEX BEGIN -->
 <div name="index">
@@ -563,18 +563,18 @@ END_OF_INDEX
 	else {
 	    next if $Ignore;
 	    next if (nelems @Begin_Stack) && @Begin_Stack[-1] ne 'html';
-	    print $html_fh $_ and next if (nelems @Begin_Stack) && @Begin_Stack[-1] eq 'html';
+	    print $html_fh, $_ and next if (nelems @Begin_Stack) && @Begin_Stack[-1] eq 'html';
 	    my $text = $_;
 
 	    # Open tag for definition list as we have something to put in it
 	    if( $ListNewTerm ){
-		print {$html_fh} "<dd>\n";
+		print $html_fh ,"<dd>\n";
 		$ListNewTerm = 0;
 	    }
 
 	    if( $text =~ m/\A\s+/ ){
 		process_pre( \$text );
-	        print {$html_fh} "<pre>\n$text</pre>\n";
+	        print $html_fh ,"<pre>\n$text</pre>\n";
 
 	    } else {
 		process_text( \$text );
@@ -601,7 +601,7 @@ END_OF_INDEX
 		}
 		## end of experimental
 
-		print {$html_fh} "<p>$text</p>\n";
+		print $html_fh ,"<p>$text</p>\n";
 	    }
 	    $after_item = 0;
 	}
@@ -611,10 +611,10 @@ END_OF_INDEX
     finish_list();
 
     # link to page index
-    print {$html_fh} "<p><a href=\"#__index__\"><small>$Backlink</small></a></p>\n"
+    print $html_fh ,"<p><a href=\"#__index__\"><small>$Backlink</small></a></p>\n"
 	if $Doindex and $index and $Backlink;
 
-    print {$html_fh} <<END_OF_TAIL;
+    print $html_fh ,<<END_OF_TAIL;
 $block
 </body>
 
@@ -927,9 +927,9 @@ sub scan_podpath {
     open(my $cache, ">", "$Itemcache") ||
 	die "$^PROGRAM_NAME: error open $Itemcache for writing: $^OS_ERROR\n";
 
-    print $cache join(":", @Podpath) . "\n$podroot\n";
+    print $cache, join(":", @Podpath) . "\n$podroot\n";
     foreach my $key (keys %Items) {
-	print $cache "$key %Items{?$key}\n";
+	print $cache, "$key %Items{?$key}\n";
     }
 
     close($cache);
@@ -939,9 +939,9 @@ sub scan_podpath {
     open($cache, ">", "$Dircache") ||
 	die "$^PROGRAM_NAME: error open $Dircache for writing: $^OS_ERROR\n";
 
-    print $cache join(":", @Podpath) . "\n$podroot\n";
+    print $cache, join(":", @Podpath) . "\n$podroot\n";
     foreach my $key (keys %Pages) {
-	print $cache "$key %Pages{?$key}\n";
+	print $cache, "$key %Pages{?$key}\n";
     }
 
     close($cache);
@@ -1103,18 +1103,18 @@ sub process_head {
 
     finish_list();
 
-    print $html_fh "<p>\n";
+    print $html_fh, "<p>\n";
     if( $level == 1 && ! $Top ){
-      print $html_fh "<a href=\"#__index__\"><small>$Backlink</small></a>\n"
+      print $html_fh, "<a href=\"#__index__\"><small>$Backlink</small></a>\n"
         if $hasindex and $Backlink;
-      print $html_fh "</p>\n<hr />\n"
+      print $html_fh, "</p>\n<hr />\n"
     } else {
-      print $html_fh "</p>\n";
+      print $html_fh, "</p>\n";
     }
 
     my $name = anchorify( depod( $heading ) );
     my $convert = process_text( \$heading );
-    print $html_fh "<h$level><a name=\"$name\">$convert</a></h$level>\n";
+    print $html_fh, "<h$level><a name=\"$name\">$convert</a></h$level>\n";
 }
 
 
@@ -1132,15 +1132,15 @@ sub emit_item_tag($$$){
     $EmittedItem = $item;
     ### print STDERR "emit_item_tag=$item ($text)\n";
 
-    print $html_fh '<strong>';
+    print $html_fh, '<strong>';
     if (%Items_Named{+$item}++) {
-	print $html_fh process_text( \$otext );
+	print $html_fh, process_text( \$otext );
     } else {
         my $name = $item;
         $name = anchorify($name);
-	print $html_fh qq{<a name="$name" class="item">}, process_text( \$otext ), '</a>';
+	print $html_fh, qq{<a name="$name" class="item">}, process_text( \$otext ), '</a>';
     }
-    print $html_fh "</strong>";
+    print $html_fh, "</strong>";
     undef( $EmittedItem );
 }
 
@@ -1148,24 +1148,24 @@ sub new_listitem {
     my@( $tag ) =  @_;
     # Open tag for definition list as we have something to put in it
     if( ($tag ne 'dl') && ($ListNewTerm) ){
-	print $html_fh "<dd>\n";
+	print $html_fh, "<dd>\n";
 	$ListNewTerm = 0;
     }
 
     if( @Items_Seen[+$Listlevel]++ == 0 ){
 	# start of new list
 	push( @Listtype, "$tag" );
-	print $html_fh "<$tag>\n";
+	print $html_fh, "<$tag>\n";
     } else {
 	# if this is not the first item, close the previous one
 	if ( $tag eq 'dl' ){
-	    print $html_fh "</dd>\n" unless $ListNewTerm;
+	    print $html_fh, "</dd>\n" unless $ListNewTerm;
 	} else {
-	    print $html_fh "</li>\n";
+	    print $html_fh, "</li>\n";
 	}
     }
     my $opentag = $tag eq 'dl' ?? 'dt' !! 'li';
-    print $html_fh "<$opentag>";
+    print $html_fh, "<$opentag>";
 }
 
 #
@@ -1192,7 +1192,7 @@ sub process_item {
             my $tag = $1;
             $otext =~ s/\A\*\s+//;
             emit_item_tag( $otext, $tag, 1 );
-            print $html_fh "\n";
+            print $html_fh, "\n";
         }
 
     } elsif( $text =~ m/\A\d+/ ){ # numbered list
@@ -1201,7 +1201,7 @@ sub process_item {
             my $tag = $1;
             $otext =~ s/\A\d+\.?\s*//;
             emit_item_tag( $otext, $tag, 1 );
-            print $html_fh "\n";
+            print $html_fh, "\n";
         }
 
     } else {			# definition list
@@ -1210,13 +1210,13 @@ sub process_item {
         if ($text =~ m/\A(.+)\Z/s ){ # should have text
             emit_item_tag( $otext, $text, 1 );
 	    # write the definition term and close <dt> tag
-	    print $html_fh "</dt>\n";
+	    print $html_fh, "</dt>\n";
         }
         # trigger opening a <dd> tag for the actual definition; will not
         # happen if next paragraph is also a definition term (=item)
         $ListNewTerm = 1;
     }
-    print $html_fh "\n";
+    print $html_fh, "\n";
 }
 
 #
@@ -1243,11 +1243,11 @@ sub process_back {
     $Listlevel--;
     if( defined @Listtype[?$Listlevel] ){
         if ( @Listtype[$Listlevel] eq 'dl' ){
-            print $html_fh "</dd>\n" unless $ListNewTerm;
+            print $html_fh, "</dd>\n" unless $ListNewTerm;
         } else {
-            print $html_fh "</li>\n";
+            print $html_fh, "</li>\n";
         }
-        print $html_fh "</@Listtype[$Listlevel]>\n";
+        print $html_fh, "</@Listtype[$Listlevel]>\n";
         pop( @Listtype );
         $ListNewTerm = 0;
     }
@@ -1278,13 +1278,13 @@ sub process_pod {
 sub process_for {
     my@($whom, $text) =  @_;
     if ( $whom =~ m/^(pod2)?html$/i) {
-	print $html_fh $text;
+	print $html_fh, $text;
     } elsif ($whom =~ m/^illustration$/i) {
         1 while chomp $text;
 	for my $ext (qw[.png .gif .jpeg .jpg .tga .pcl .bmp]) {
 	  $text .= $ext, last if -r "$text$ext";
 	}
-        print $html_fh qq{<p align="center"><img src="$text" alt="$text illustration" /></p>};
+        print $html_fh, qq{<p align="center"><img src="$text" alt="$text illustration" /></p>};
     }
 }
 
@@ -1298,7 +1298,7 @@ sub process_begin {
     $whom = lc($whom);
     push (@Begin_Stack, $whom);
     if ( $whom =~ m/^(pod2)?html$/) {
-	print $html_fh $text if $text;
+	print $html_fh, $text if $text;
     }
 }
 

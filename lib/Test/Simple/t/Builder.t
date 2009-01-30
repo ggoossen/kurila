@@ -25,6 +25,6 @@ $Test->is_num( $Test->current_test, 4,  'current_test() get' );
 
 my $test_num = $Test->current_test + 1;
 $Test->current_test( $test_num );
-print "ok $test_num - current_test() set\n";
+print \*STDOUT, "ok $test_num - current_test() set\n";
 
 $Test->ok( 1, 'counter still good' );

@@ -15,9 +15,9 @@ ok 1;
 use Pod::Simple::DumpAsXML;
 use Pod::Simple::XMLOutStream;
 
-print "# Pod::Simple version $Pod::Simple::VERSION\n";
+print \*STDOUT, "# Pod::Simple version $Pod::Simple::VERSION\n";
 
-print "# Pod::Escapes version $Pod::Escapes::VERSION\n",
+print \*STDOUT, "# Pod::Escapes version $Pod::Escapes::VERSION\n",
  if $Pod::Escapes::VERSION;
 # Presumably that's the library being used
 
@@ -28,7 +28,7 @@ sub e ($$) { Pod::Simple::DumpAsXML->_duo(< @_) }
 &ok( < e "\n", "", );
 
 
-print "# Testing some basic mnemonic E sequences...\n";
+print \*STDOUT, "# Testing some basic mnemonic E sequences...\n";
 
 &ok( Pod::Simple::XMLOutStream->_out("=pod\n\n1E<lt>2\n"),
      Pod::Simple::XMLOutStream->_out("=pod\n\n1<2")
@@ -44,7 +44,7 @@ print "# Testing some basic mnemonic E sequences...\n";
 );
 
 
-print "# Testing some more mnemonic E sequences...\n";
+print \*STDOUT, "# Testing some more mnemonic E sequences...\n";
 
 &ok( Pod::Simple::XMLOutStream->_out("=pod\n\n1E<apos>2\n"),
      Pod::Simple::XMLOutStream->_out("=pod\n\n1'2")
@@ -77,7 +77,7 @@ print "# Testing some more mnemonic E sequences...\n";
 
 
 
-print "# Testing numeric E sequences...\n";
+print \*STDOUT, "# Testing numeric E sequences...\n";
 &ok( Pod::Simple::XMLOutStream->_out("=pod\n\n1E<0101>2\n"),
      Pod::Simple::XMLOutStream->_out("=pod\n\n1A2")
 );
@@ -90,8 +90,8 @@ print "# Testing numeric E sequences...\n";
 
 
 
-print "# Wrapping up... one for the road...\n";
+print \*STDOUT, "# Wrapping up... one for the road...\n";
 ok 1;
-print "# --- Done with ", __FILE__, " --- \n";
+print \*STDOUT, "# --- Done with ", __FILE__, " --- \n";
 
 

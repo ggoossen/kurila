@@ -6,7 +6,7 @@ require 'regen_lib.pl';
 my $kw = safer_open("keywords.h-new");
 select $kw;
 
-print <<EOM;
+print \*STDOUT, <<EOM;
 /* -*- buffer-read-only: t -*-
  *
  *    keywords.h
@@ -31,10 +31,10 @@ while ( ~< *DATA) {
     next unless $_;
     next if m/^#/;
     my @($keyword) =  split;
-    print &tab(5, "#define KEY_$keyword"), $keynum++, "\n";
+    print \*STDOUT, &tab(5, "#define KEY_$keyword"), $keynum++, "\n";
 }
 
-print $kw "\n/* ex: set ro: */\n";
+print $kw, "\n/* ex: set ro: */\n";
 
 safer_close($kw);
 

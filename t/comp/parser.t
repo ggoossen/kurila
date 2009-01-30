@@ -83,8 +83,8 @@ is($^EVAL_ERROR, '', "';&' sub prototype confuses the lexer");
 # ensure that the second print statement works, by playing a bit
 # with the test output.
 my %data = %( foo => "\n" );
-print "#";
-print(
+print \*STDOUT, "#";
+print(\*STDOUT, 
 %data{?foo});
 pass();
 

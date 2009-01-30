@@ -8,8 +8,8 @@ use Config;
 no warnings 'once';
 
 my $test = 1;
-print "1..29\n";
-print "ok 1\n";
+print \*STDOUT, "1..29\n";
+print \*STDOUT, "ok 1\n";
 
 open(my $dupout, ">&", \*STDOUT);
 open(my $duperr, ">&", \*STDERR);
@@ -20,22 +20,22 @@ open(\*STDERR, ">&", \*STDOUT) || die "Can't open stderr";
 select(\*STDERR); $^OUTPUT_AUTOFLUSH = 1;
 select(\*STDOUT); $^OUTPUT_AUTOFLUSH = 1;
 
-print STDOUT "ok 2\n";
-print STDERR "ok 3\n";
+print \*STDOUT, "ok 2\n";
+print \*STDERR, "ok 3\n";
 
 # Since some systems don't have echo, we use Perl.
 my $echo = qq{$^EXECUTABLE_NAME -le "print q(ok \%d)"};
 
 my $cmd = sprintf $echo, 4;
-print `$cmd`;
+print \*STDOUT, `$cmd`;
 
 $cmd = sprintf "$echo 1>&2", 5;
 $cmd = sprintf $echo, 5 if $^OS_NAME eq 'MacOS';  # don't know if we can do this ...
-print `$cmd`;
+print \*STDOUT, `$cmd`;
 
 # KNOWN BUG system() does not honor STDOUT redirections on VMS.
 if( $^OS_NAME eq 'VMS' ) {
-    print "not ok $_ # TODO system() not honoring STDOUT redirect on VMS\n"
+    print \*STDOUT, "not ok $_ # TODO system() not honoring STDOUT redirect on VMS\n"
       for 6..7;
 }
 else {
@@ -54,32 +54,32 @@ close(\*STDERR) or die "Could not close: $^OS_ERROR";
 open(\*STDOUT, ">&", $dupout) or die "Could not open: $^OS_ERROR";
 open(\*STDERR, ">&", $duperr) or die "Could not open: $^OS_ERROR";
 
-if (($^OS_NAME eq 'MSWin32') || ($^OS_NAME eq 'NetWare') || ($^OS_NAME eq 'VMS')) { print `type Io.dup` }
+if (($^OS_NAME eq 'MSWin32') || ($^OS_NAME eq 'NetWare') || ($^OS_NAME eq 'VMS')) { print \*STDOUT, `type Io.dup` }
 elsif ($^OS_NAME eq 'MacOS') { system 'catenate Io.dup' }
 else                   { system 'cat Io.dup' }
 unlink 'Io.dup';
 
-print STDOUT "ok 8\n";
+print \*STDOUT, "ok 8\n";
 
 open(my $f,">&",1) or die "Cannot dup to numeric 1: $^OS_ERROR";
-print $f "ok 9\n";
+print $f, "ok 9\n";
 close($f);
 
 open($f,">&",'1') or die "Cannot dup to string '1': $^OS_ERROR";
-print $f "ok 10\n";
+print $f, "ok 10\n";
 close($f);
 
 open($f,">&=",1) or die "Cannot dup to numeric 1: $^OS_ERROR";
-print $f "ok 11\n";
+print $f, "ok 11\n";
 close($f);
 
 if (config_value("useperlio")) {
     open($f,">&=",'1') or die "Cannot dup to string '1': $^OS_ERROR";
-    print $f "ok 12\n";
+    print $f, "ok 12\n";
     close($f);
 } else {
     open($f, ">&", $dupout) or die "Cannot dup stdout back: $^OS_ERROR";
-    print $f "ok 12\n";
+    print $f, "ok 12\n";
     close($f);
 }
 
@@ -117,8 +117,8 @@ SKIP: do {
     ok(open($f, ">&=", $gfh));
     is(fileno($f), $g);
 
-    print $gfh "ggg\n";
-    print $f "fff\n";
+    print $gfh, "ggg\n";
+    print $f, "fff\n";
 
     close $gfh; # flush first
     close $f; # flush second
@@ -135,10 +135,10 @@ SKIP: do {
     open my $utfdup, ">&", \*$utfout or die $^OS_ERROR;
     # some old greek saying.
     my $message = "\x{03A0}\x{0391}\x{039D}\x{03A4}\x{0391} \x{03A1}\x{0395}\x{0399}\n";
-    print $utfout $message;
-    print $utfdup $message;
+    print $utfout, $message;
+    print $utfdup, $message;
     binmode $utfdup, ':utf8';
-    print $utfdup $message;
+    print $utfdup, $message;
     close $utfout;
     close $utfdup;
     open(my $utfin, "<:utf8", "dup$^PID") or die $^OS_ERROR;

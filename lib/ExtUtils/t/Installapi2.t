@@ -105,7 +105,7 @@ ok( -r 'install-test/lib/perl/Big/Dummy.pm', '  UNINST=1 preserved same' );
 
 chmod 0644, 'blib/lib/Big/Dummy.pm' or die $^OS_ERROR;
 open(my $dummy, ">>", "blib/lib/Big/Dummy.pm") or die $^OS_ERROR;
-print $dummy "Extra stuff\n";
+print $dummy, "Extra stuff\n";
 close $dummy;
 
 

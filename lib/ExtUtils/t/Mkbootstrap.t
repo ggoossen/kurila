@@ -22,7 +22,7 @@ my $outfh;
 my $in;
 if (open($outfh, ">", 'mkboot.bs')) {
 	$file_is_ready = 1;
-	print $outfh 'meaningless text';
+	print $outfh, 'meaningless text';
 	close $outfh;
 }
 
@@ -64,7 +64,7 @@ $file_is_ready = open($outfh, ">", 'boot_BS');
 SKIP: do {
 	skip("cannot open boot_BS for writing: $^OS_ERROR", 1) unless $file_is_ready;
 
-	print $outfh '$main::required = 1';
+	print $outfh, '$main::required = 1';
 	close $outfh;
 	Mkbootstrap('boot');
 

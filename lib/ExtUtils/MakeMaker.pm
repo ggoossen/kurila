@@ -145,11 +145,11 @@ sub prompt ($;$) {  ## no critic
 
     local $^OUTPUT_AUTOFLUSH=1;
     local $^OUTPUT_RECORD_SEPARATOR;
-    print "$mess $dispdef";
+    print \*STDOUT, "$mess $dispdef";
 
     my $ans;
     if (env::var('PERL_MM_USE_DEFAULT') || (!$isa_tty && eof \*STDIN)) {
-        print "$def\n";
+        print \*STDOUT, "$def\n";
     }
     else {
         $ans = ~< *STDIN;
@@ -157,7 +157,7 @@ sub prompt ($;$) {  ## no critic
             chomp $ans;
         }
         else { # user hit ctrl-D
-            print "\n";
+            print \*STDOUT, "\n";
         }
     }
 
@@ -317,7 +317,7 @@ sub full_setup {
     }
     foreach my $item ( @Get_from_Config) {
         %Recognized_Att_Keys{+uc $item} = %Config{?$item};
-        print "Attribute '".uc($item)."' => '%Config{?$item}'\n"
+        print \*STDOUT, "Attribute '".uc($item)."' => '%Config{?$item}'\n"
             if ($Verbose +>= 2);
     }
 
@@ -364,18 +364,18 @@ sub new {
 
     if ("$(join ' ',@ARGV)" =~ m/\bPREREQ_PRINT\b/) {
         require Data::Dumper;
-        print Data::Dumper->Dump(\@($self->{?PREREQ_PM}), \qw(PREREQ_PM));
+        print \*STDOUT, Data::Dumper->Dump(\@($self->{?PREREQ_PM}), \qw(PREREQ_PM));
         exit 0;
     }
 
     # PRINT_PREREQ is RedHatism.
     if ("$(join ' ',@ARGV)" =~ m/\bPRINT_PREREQ\b/) {
-        print join(" ", map { "perl($_)>=$self->{PREREQ_PM}->{?$_} " } 
+        print \*STDOUT, join(" ", map { "perl($_)>=$self->{PREREQ_PM}->{?$_} " } 
                         sort keys %{$self->{?PREREQ_PM}}), "\n";
         exit 0;
    }
 
-    print STDOUT "MakeMaker (v$VERSION)\n" if $Verbose;
+    print \*STDOUT, "MakeMaker (v$VERSION)\n" if $Verbose;
     if (-f "MANIFEST" && ! -f "Makefile"){
         check_manifest();
     }
@@ -438,7 +438,7 @@ END
     my $newclass = ++$PACKNAME;
     local @Parent = @Parent;    # Protect against non-local exits
     do {
-        print "Blessing Object into class [$newclass]\n" if $Verbose+>=2;
+        print \*STDOUT, "Blessing Object into class [$newclass]\n" if $Verbose+>=2;
         mv_all_methods("MY",$newclass);
         bless $self, $newclass;
         push @Parent, $self;
@@ -517,14 +517,14 @@ END
         $pthinks = VMS::Filespec::vmsify($pthinks) if $Is_VMS;
         if ($pthinks ne $cthinks &&
             !($Is_Win32 and lc($pthinks) eq lc($cthinks))) {
-            print "Have $pthinks expected $cthinks\n";
+            print \*STDOUT, "Have $pthinks expected $cthinks\n";
             if ($Is_Win32) {
                 $pthinks =~ s![/\\]Config\.pm$!!i; $pthinks =~ s!.*[/\\]!!;
             }
             else {
                 $pthinks =~ s!/Config\.pm$!!; $pthinks =~ s!.*/!!;
             }
-            print STDOUT <<END unless $self->{?UNINSTALLED_PERL};
+            print \*STDOUT, <<END unless $self->{?UNINSTALLED_PERL};
 Your perl and your Config.pm seem to have different ideas about the 
 architecture they are running on.
 Perl thinks: [$pthinks]
@@ -610,7 +610,7 @@ END
         my $method = $section;
         $method .= '_target' unless $self->can($method);
 
-        print "Processing Makefile '$section' section\n" if ($Verbose +>= 2);
+        print \*STDOUT, "Processing Makefile '$section' section\n" if ($Verbose +>= 2);
         my $skipit = $self->skipcheck($section);
         if ($skipit){
             push @{$self->{RESULT}}, "\n# --- MakeMaker $section section $skipit.";
@@ -644,7 +644,7 @@ sub WriteEmptyMakefile {
         _rename($new, $old) or warn "rename $new => $old: $^OS_ERROR"
     }
     open my $mfh, '>', $new or die "open $new for write: $^OS_ERROR";
-    print $mfh <<'EOP';
+    print $mfh, <<'EOP';
 all :
 
 clean :
@@ -660,18 +660,18 @@ EOP
 }
 
 sub check_manifest {
-    print STDOUT "Checking if your kit is complete...\n";
+    print \*STDOUT, "Checking if your kit is complete...\n";
     require ExtUtils::Manifest;
     # avoid warning
     $ExtUtils::Manifest::Quiet = $ExtUtils::Manifest::Quiet = 1;
     my @missed = ExtUtils::Manifest::manicheck();
     if ((nelems @missed)) {
-        print STDOUT "Warning: the following files are missing in your kit:\n";
-        print "\t", join "\n\t", @missed;
-        print STDOUT "\n";
-        print STDOUT "Please inform the author.\n";
+        print \*STDOUT, "Warning: the following files are missing in your kit:\n";
+        print \*STDOUT, "\t", join "\n\t", @missed;
+        print \*STDOUT, "\n";
+        print \*STDOUT, "Please inform the author.\n";
     } else {
-        print STDOUT "Looks good\n";
+        print \*STDOUT, "Looks good\n";
     }
 }
 
@@ -699,9 +699,9 @@ sub parse_args{
     if (defined $self->{?potential_libs}){
         my@($msg)="'potential_libs' => '$self->{?potential_libs}' should be";
         if ($self->{?potential_libs}){
-            print STDOUT "$msg changed to:\n\t'LIBS' => ['$self->{?potential_libs}']\n";
+            print \*STDOUT, "$msg changed to:\n\t'LIBS' => ['$self->{?potential_libs}']\n";
         } else {
-            print STDOUT "$msg deleted.\n";
+            print \*STDOUT, "$msg deleted.\n";
         }
         $self->{+LIBS} = \@($self->{?potential_libs});
         delete $self->{potential_libs};
@@ -709,14 +709,14 @@ sub parse_args{
     # catch old-style 'ARMAYBE' and inform user how to 'upgrade'
     if (defined $self->{?ARMAYBE}){
         my@($armaybe) = $self->{?ARMAYBE};
-        print STDOUT "ARMAYBE => '$armaybe' should be changed to:\n",
+        print \*STDOUT, "ARMAYBE => '$armaybe' should be changed to:\n",
                         "\t'dynamic_lib' => \{ARMAYBE => '$armaybe'\}\n";
         my@(%dl) =@( %( < %{$self->{?dynamic_lib} || \%()} ));
         $self->{+dynamic_lib} = \%( < %dl, ARMAYBE => $armaybe);
         delete $self->{ARMAYBE};
     }
     if (defined $self->{?LDTARGET}){
-        print STDOUT "LDTARGET should be changed to LDFROM\n";
+        print \*STDOUT, "LDTARGET should be changed to LDFROM\n";
         $self->{+LDFROM} = $self->{?LDTARGET};
         delete $self->{LDTARGET};
     }
@@ -738,8 +738,8 @@ sub parse_args{
 
     foreach my $mmkey (sort keys %$self){
         next if $mmkey eq 'ARGS';
-        print STDOUT "  $mmkey => ", < neatvalue($self->{?$mmkey}), "\n" if $Verbose;
-        print STDOUT "'$mmkey' is not a known MakeMaker parameter name.\n"
+        print \*STDOUT, "  $mmkey => ", < neatvalue($self->{?$mmkey}), "\n" if $Verbose;
+        print \*STDOUT, "'$mmkey' is not a known MakeMaker parameter name.\n"
             unless exists %Recognized_Att_Keys{$mmkey};
     }
     $^OUTPUT_AUTOFLUSH = 1 if $Verbose;
@@ -780,7 +780,7 @@ sub _run_hintfile {
     my@($hint_file) =@( shift);
 
     local($^EVAL_ERROR, $^OS_ERROR);
-    print STDERR "Processing hints file $hint_file\n";
+    print \*STDERR, "Processing hints file $hint_file\n";
 
     # Just in case the ./ isn't on the hint file, which File::Spec can
     # often strip off, we bung the curdir into $^INCLUDE_PATH
@@ -788,7 +788,7 @@ sub _run_hintfile {
     my $ret = do $hint_file;
     if( !defined $ret ) {
         my $error = $^EVAL_ERROR && $^EVAL_ERROR->message || $^OS_ERROR;
-        print STDERR $error;
+        print \*STDERR, $error;
     }
 }
 
@@ -857,20 +857,20 @@ sub skipcheck {
     my@($self) =@( shift);
     my@($section) =  @_;
     if ($section eq 'dynamic') {
-        print STDOUT "Warning (non-fatal): Target 'dynamic' depends on targets ",
+        print \*STDOUT, "Warning (non-fatal): Target 'dynamic' depends on targets ",
         "in skipped section 'dynamic_bs'\n"
             if $self->{SKIPHASH}->{?dynamic_bs} && $Verbose;
-        print STDOUT "Warning (non-fatal): Target 'dynamic' depends on targets ",
+        print \*STDOUT, "Warning (non-fatal): Target 'dynamic' depends on targets ",
         "in skipped section 'dynamic_lib'\n"
             if $self->{SKIPHASH}->{?dynamic_lib} && $Verbose;
     }
     if ($section eq 'dynamic_lib') {
-        print STDOUT "Warning (non-fatal): Target '\$(INST_DYNAMIC)' depends on ",
+        print \*STDOUT, "Warning (non-fatal): Target '\$(INST_DYNAMIC)' depends on ",
         "targets in skipped section 'dynamic_bs'\n"
             if $self->{SKIPHASH}->{?dynamic_bs} && $Verbose;
     }
     if ($section eq 'static') {
-        print STDOUT "Warning (non-fatal): Target 'static' depends on targets ",
+        print \*STDOUT, "Warning (non-fatal): Target 'static' depends on targets ",
         "in skipped section 'static_lib'\n"
             if $self->{SKIPHASH}->{?static_lib} && $Verbose;
     }
@@ -882,14 +882,14 @@ sub flush {
     my $self = shift;
 
     my $finalname = $self->{?MAKEFILE};
-    print STDOUT "Writing $finalname for $self->{?NAME}\n";
+    print \*STDOUT, "Writing $finalname for $self->{?NAME}\n";
 
     unlink($finalname, "MakeMaker.tmp", $Is_VMS ?? 'Descrip.MMS' !! ());
     open(my $fh,">", "MakeMaker.tmp")
         or die "Unable to open MakeMaker.tmp: $^OS_ERROR";
 
     for my $chunk ( @{$self->{RESULT}}) {
-        print $fh "$chunk\n";
+        print $fh, "$chunk\n";
     }
 
     close $fh;

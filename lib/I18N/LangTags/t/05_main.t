@@ -5,7 +5,7 @@ BEGIN { plan tests => 64 };
 BEGIN { ok 1 }
 use I18N::LangTags (':ALL');
 
-print "# Perl $^PERL_VERSION, I18N::LangTags v$I18N::LangTags::VERSION\n";
+print \*STDOUT, "# Perl $^PERL_VERSION, I18N::LangTags v$I18N::LangTags::VERSION\n";
 
 ok !is_language_tag('');
 ok  is_language_tag('fr');
@@ -38,7 +38,7 @@ ok grep $_ eq 'es', panic_languages('it');
 ok grep $_ eq 'it', panic_languages('es');
 
 
-print "# Now the ::List tests...\n";
+print \*STDOUT, "# Now the ::List tests...\n";
 
 use I18N::LangTags::List;
 foreach my $lt (qw(
@@ -82,14 +82,14 @@ foreach my $lt (qw(
   my $name = I18N::LangTags::List::name($lt);
   if($name) {
     ok(1);
-    print "#        $lt -> $name\n";
+    print \*STDOUT, "#        $lt -> $name\n";
   } else {
     ok(0);
-    print "#        Failed lookup on $lt\n";
+    print \*STDOUT, "#        Failed lookup on $lt\n";
   }
 }
 
 
 
-print "# So there!\n";
+print \*STDOUT, "# So there!\n";
 

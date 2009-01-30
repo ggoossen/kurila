@@ -40,11 +40,11 @@ sub convert_n_test {
 	if (-x $diff) {
 	    my $expectfile = "pod2html-lib.tmp";
 	    open my $tmpfile, ">", $expectfile or die $^OS_ERROR;
-	    print $tmpfile $expect;
+	    print $tmpfile, $expect;
 	    close $tmpfile;
 	    my $diffopt = $^OS_NAME eq 'linux' ?? 'u' !! 'c';
 	    open my $diff, "-|", "diff -$diffopt $expectfile $outfile" or die $^OS_ERROR;
-	    print "# $_" while ~< $diff;
+	    print \*STDOUT, "# $_" while ~< $diff;
 	    close $diff;
 	    unlink $expectfile;
 	}

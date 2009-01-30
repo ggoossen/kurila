@@ -91,7 +91,7 @@ sub CAN_FLOCK {
 }
 
 sub show_file_magic {
-    print <<EOM;
+    print \*STDOUT, <<EOM;
 #
 # To recognize the data files of the Perl module Storable,
 # the following lines need to be added to the local magic(5) file,

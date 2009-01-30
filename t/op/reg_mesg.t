@@ -114,7 +114,7 @@ if ($Is_EBCDIC) {
     $total = $total - nelems @utf8_death;
 }
 
-print "1..$total\n";
+print \*STDOUT, "1..$total\n";
 
 my $count = 0;
 
@@ -129,15 +129,15 @@ while ((nelems @death))
     $_ = "x";
     eval $regex;
     if (not $^EVAL_ERROR) {
-	print "# oops, $regex didn't die\nnot ok $count\n";
+	print \*STDOUT, "# oops, $regex didn't die\nnot ok $count\n";
 	next;
     }
     $result =~ s/{\#}/$marker1/;
     $result =~ s/{\#}/$marker2/;
     if ($^EVAL_ERROR->description !~ m/^\Q$result\E$/) {
-	print "# For $regex, expected:\n#  $result\n# Got:\n#  $($^EVAL_ERROR && $^EVAL_ERROR->message)\n#\nnot ";
+	print \*STDOUT, "# For $regex, expected:\n#  $result\n# Got:\n#  $($^EVAL_ERROR && $^EVAL_ERROR->message)\n#\nnot ";
     }
-    print "ok $count - $regex\n";
+    print \*STDOUT, "ok $count - $regex\n";
 }
 
 
@@ -156,20 +156,20 @@ while ((nelems @warning))
 
     if ($^EVAL_ERROR)
     {
-	print "# oops, $regex died with:\n#\t$^EVAL_ERROR#\nnot ok $count\n";
+	print \*STDOUT, "# oops, $regex died with:\n#\t$^EVAL_ERROR#\nnot ok $count\n";
 	next;
     }
 
     if (not $warning)
     {
-	print "# oops, $regex didn't generate a warning\nnot ok $count\n";
+	print \*STDOUT, "# oops, $regex didn't generate a warning\nnot ok $count\n";
 	next;
     }
     $result =~ s/{\#}/$marker1/;
     $result =~ s/{\#}/$marker2/;
     if ($warning->description !~ m/^\Q$result\E$/)
     {
-	print <<"EOM";
+	print \*STDOUT, <<"EOM";
 # For $regex, expected:
 #   $result
 # Got:
@@ -179,7 +179,7 @@ not ok $count
 EOM
 	next;
     }
-    print "ok $count - $regex\n";
+    print \*STDOUT, "ok $count - $regex\n";
 }
 
 

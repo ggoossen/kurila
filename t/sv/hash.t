@@ -62,7 +62,7 @@ sub get_keys {
     # need to add 2 bits to cover the internal split cases
     $bits += 2;
     my $mask = 2**$bits-1;
-    print "# using mask: $mask ($bits)\n";
+    print \*STDOUT, "# using mask: $mask ($bits)\n";
 
     my @keys;
     my $s = START;
@@ -74,7 +74,7 @@ sub get_keys {
         $hash = hash($s);
         next unless ($hash ^&^ $mask) == 0;
         $c++;
-        printf "# \%2d: \%5s, \%10s\n", $c, $s, $hash;
+        printf \*STDOUT, "# \%2d: \%5s, \%10s\n", $c, $s, $hash;
         push @keys, $s;
     } continue {
         $s++;

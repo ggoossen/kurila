@@ -52,11 +52,11 @@ my $test = curr_test();
 for my $i (@(3,1,2,0)) {
     push(@{@ref[$i]}, "ok @ary[$i]\n");
 }
-print < @a;
-print @{@ref[1]}[0];
-print < @{@ref[2]}[[@(0)]];
+print \*STDOUT, < @a;
+print \*STDOUT, @{@ref[1]}[0];
+print \*STDOUT, < @{@ref[2]}[[@(0)]];
 do {
-    print < @{*{Symbol::fetch_glob('d')}};
+    print \*STDOUT, < @{*{Symbol::fetch_glob('d')}};
 };
 curr_test($test+4);
 
@@ -201,19 +201,19 @@ package main;
 
 # test for proper destruction of lexical objects
 $test = curr_test();
-sub larry::DESTROY { print "# larry\nok $test\n"; }
-sub curly::DESTROY { print "# curly\nok ", $test + 1, "\n"; }
-sub moe::DESTROY   { print "# moe\nok ", $test + 2, "\n"; }
+sub larry::DESTROY { print \*STDOUT, "# larry\nok $test\n"; }
+sub curly::DESTROY { print \*STDOUT, "# curly\nok ", $test + 1, "\n"; }
+sub moe::DESTROY   { print \*STDOUT, "# moe\nok ", $test + 2, "\n"; }
 
 do {
     my ($joe, @curly, %larry);
     my $moe = bless \$joe, 'moe';
     my $curly = bless \@curly, 'curly';
     my $larry = bless \%larry, 'larry';
-    print "# leaving block\n";
+    print \*STDOUT, "# leaving block\n";
 };
 
-print "# left block\n";
+print \*STDOUT, "# left block\n";
 curr_test($test + 3);
 
 # another glob test
@@ -235,7 +235,7 @@ do {
     local $^DIE_HOOK = sub {
 	my $m = shift;
 	if ($i++ +> 4) {
-	    print "# infinite recursion, bailing\nnot ok $test\n";
+	    print \*STDOUT, "# infinite recursion, bailing\nnot ok $test\n";
 	    exit 1;
         }
 	like ($m->{?description}, qr/^Modification of a read-only/);
@@ -244,10 +244,10 @@ do {
     sub new { bless \%(), shift }
     sub DESTROY { @_[0] = 'foo' }
     do {
-	print "# should generate an error...\n";
+	print \*STDOUT, "# should generate an error...\n";
 	my $c = C->new;
     };
-    print "# good, didn't recurse\n";
+    print \*STDOUT, "# good, didn't recurse\n";
 };
 
 # test if refgen behaves with autoviv magic
@@ -283,7 +283,7 @@ foreach my $lexical (@('', 'my $a; ')) {
 }
 
 $test = curr_test();
-sub x::DESTROY {print "ok ", $test + shift->[0], "\n"}
+sub x::DESTROY {print \*STDOUT, "ok ", $test + shift->[0], "\n"}
 do { my $a1 = bless \@(3),"x";
   my $a2 = bless \@(2),"x";
   do { my $a3 = bless \@(1),"x";
@@ -422,6 +422,6 @@ do {
 };
 
 sub DESTROY {
-    print @_[0]->[0];
+    print \*STDOUT, @_[0]->[0];
 }
 

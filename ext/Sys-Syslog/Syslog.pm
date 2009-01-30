@@ -393,7 +393,7 @@ sub _syslog_send_console {
 	}
     } else {
         if (open(my $consfh, ">", "/dev/console")) {
-	    my $ret = print $consfh $buf . "\r";  # XXX: should this be \x0A ?
+	    my $ret = print $consfh, $buf . "\r";  # XXX: should this be \x0A ?
 	    exit $ret if defined $pid;
 	    close $consfh;
 	}
@@ -412,7 +412,7 @@ sub _syslog_send_stream {
 
 sub _syslog_send_pipe {
     my @($buf) =  @_;
-    return print $syslogfh $buf;
+    return print $syslogfh, $buf;
 }
 
 sub _syslog_send_socket {
