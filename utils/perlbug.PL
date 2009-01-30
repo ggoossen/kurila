@@ -63,11 +63,7 @@ print \*STDOUT, "Extracting $file (with variable substitutions)\n";
 
 my $extract_version = sprintf("\%vd", $^PERL_VERSION);
 
-<<<<<<< HEAD:utils/perlbug.PL
-print $out ,<<"!GROK!THIS!";
-=======
 print $out, <<"!GROK!THIS!";
->>>>>>> 8c54f3f... more filehandle fixes:utils/perlbug.PL
 $(config_value("startperl"))
     eval 'exec $(config_value("perlpath")) -S \$0 \$\{1+"\$@"\}'
 	if \$running_under_some_shell;
@@ -83,11 +79,7 @@ my \@patches = (
 
 # In the following, perl variables are not expanded during extraction.
 
-<<<<<<< HEAD:utils/perlbug.PL
-print $out ,<<'!NO!SUBS!';
-=======
 print $out, <<'!NO!SUBS!';
->>>>>>> 8c54f3f... more filehandle fixes:utils/perlbug.PL
 
 use strict;
 use Config;

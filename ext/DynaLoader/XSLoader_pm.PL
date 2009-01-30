@@ -10,11 +10,7 @@ sub to_string {
 
 1 while unlink "XSLoader.pm";
 open my $out, ">", "XSLoader.pm" or die $^OS_ERROR;
-<<<<<<< HEAD:ext/DynaLoader/XSLoader_pm.PL
-print $out ,<<'EOT';
-=======
 print $out, <<'EOT';
->>>>>>> 8c54f3f... more filehandle fixes:ext/DynaLoader/XSLoader_pm.PL
 # Generated from XSLoader.pm.PL (resolved config_value() value)
 
 package XSLoader;
@@ -26,15 +22,9 @@ our $VERSION = "0.08";
 
 EOT
 
-<<<<<<< HEAD:ext/DynaLoader/XSLoader_pm.PL
-print $out ,'  my $dl_dlext = ', to_string(Config::config_value('dlext')), ";\n" ;
-
-print $out ,<<'EOT';
-=======
 print $out, '  my $dl_dlext = ', to_string(Config::config_value('dlext')), ";\n" ;
 
 print $out, <<'EOT';
->>>>>>> 8c54f3f... more filehandle fixes:ext/DynaLoader/XSLoader_pm.PL
 
 package DynaLoader;
 
@@ -66,11 +56,7 @@ sub load {
 
 EOT
 
-<<<<<<< HEAD:ext/DynaLoader/XSLoader_pm.PL
-print $out ,<<'EOT' if defined &DynaLoader::mod2fname;
-=======
 print $out, <<'EOT' if defined &DynaLoader::mod2fname;
->>>>>>> 8c54f3f... more filehandle fixes:ext/DynaLoader/XSLoader_pm.PL
     # Some systems have restrictions on files names for DLL's etc.
     # mod2fname returns appropriate file base name (typically truncated)
     # It may also edit @modparts if required.
@@ -78,22 +64,14 @@ print $out, <<'EOT' if defined &DynaLoader::mod2fname;
 
 EOT
 
-<<<<<<< HEAD:ext/DynaLoader/XSLoader_pm.PL
-print $out ,<<'EOT' if $^OS_NAME eq 'os2';
-=======
 print $out, <<'EOT' if $^OS_NAME eq 'os2';
->>>>>>> 8c54f3f... more filehandle fixes:ext/DynaLoader/XSLoader_pm.PL
 
     # os2 static build can dynaload, but cannot dynaload Perl modules...
     die 'Dynaloaded Perl modules are not available in this build of Perl' if $OS2::is_static;
 
 EOT
 
-<<<<<<< HEAD:ext/DynaLoader/XSLoader_pm.PL
-print $out ,<<'EOT';
-=======
 print $out, <<'EOT';
->>>>>>> 8c54f3f... more filehandle fixes:ext/DynaLoader/XSLoader_pm.PL
     my $modpname = join('/', @modparts);
     my $modlibname = @(caller())[1];
     my $c = nelems @modparts;
@@ -120,22 +98,14 @@ print $out, <<'EOT';
 EOT
 
     if ($^OS_NAME eq 'darwin') {
-<<<<<<< HEAD:ext/DynaLoader/XSLoader_pm.PL
-print $out ,<<'EOT';
-=======
 print $out, <<'EOT';
->>>>>>> 8c54f3f... more filehandle fixes:ext/DynaLoader/XSLoader_pm.PL
         if ($boot_symbol_ref = dl_find_symbol(0, $bootname)) {
             goto boot; #extension library has already been loaded, e.g. darwin
         }
 EOT
     }
 
-<<<<<<< HEAD:ext/DynaLoader/XSLoader_pm.PL
-print $out ,<<'EOT';
-=======
 print $out, <<'EOT';
->>>>>>> 8c54f3f... more filehandle fixes:ext/DynaLoader/XSLoader_pm.PL
     # Many dynamic extension loading problems will appear to come from
     # this section of code: XYZ failed at line 123 of DynaLoader.pm.
     # Often these errors are actually occurring in the initialisation

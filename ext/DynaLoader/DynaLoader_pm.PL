@@ -70,11 +70,7 @@ sub expand_os_specific {
 
 unlink "DynaLoader.pm" if -f "DynaLoader.pm";
 open my $out, ">", "DynaLoader.pm" or die $^OS_ERROR;
-<<<<<<< HEAD:ext/DynaLoader/DynaLoader_pm.PL
-print $out ,<<'EOT';
-=======
 print $out, <<'EOT';
->>>>>>> 8c54f3f... more filehandle fixes:ext/DynaLoader/DynaLoader_pm.PL
 
 # Generated from DynaLoader_pm.PL
 
@@ -118,30 +114,18 @@ sub dl_load_flags { 0x00 }
 EOT
 
 if (env::var('PERL_BUILD_EXPAND_CONFIG_VARS')) {
-<<<<<<< HEAD:ext/DynaLoader/DynaLoader_pm.PL
-    print $out ,"our @(\$dl_dlext, \$dl_so, \$dlsrc) = @(",
-=======
     print $out, "our @(\$dl_dlext, \$dl_so, \$dlsrc) = @(",
->>>>>>> 8c54f3f... more filehandle fixes:ext/DynaLoader/DynaLoader_pm.PL
               < to_string(config_value('dlext')), ",",
               < to_string(config_value('so')), ",",
               < to_string(config_value('dlsrc')), ")\n;" ;
 }
 else {
-<<<<<<< HEAD:ext/DynaLoader/DynaLoader_pm.PL
-    print $out ,<<'EOT';
-=======
     print $out, <<'EOT';
->>>>>>> 8c54f3f... more filehandle fixes:ext/DynaLoader/DynaLoader_pm.PL
 our @($dl_dlext, $dl_so, $dlsrc) = map { config_value($_) } qw(dlext so dlsrc);
 EOT
 }
 
-<<<<<<< HEAD:ext/DynaLoader/DynaLoader_pm.PL
-print $out ,expand_os_specific(<<'EOT');
-=======
 print $out, expand_os_specific(<<'EOT');
->>>>>>> 8c54f3f... more filehandle fixes:ext/DynaLoader/DynaLoader_pm.PL
 
 <<$^O-eq-VMS>>
 # Some systems need special handling to expand file specifications
@@ -185,11 +169,7 @@ if (env::var('PERL_BUILD_EXPAND_CONFIG_VARS')) {
     eval $cfg_dl_library_path;
     if (!env::var('PERL_BUILD_EXPAND_ENV_VARS')) {
         my $dl_library_path = dquoted_comma_list(< @dl_library_path);
-<<<<<<< HEAD:ext/DynaLoader/DynaLoader_pm.PL
-        print $out ,<<EOT;
-=======
         print $out, <<EOT;
->>>>>>> 8c54f3f... more filehandle fixes:ext/DynaLoader/DynaLoader_pm.PL
 # The below \@dl_library_path has been expanded (\%Config) in Perl build time.
 
 \@dl_library_path = ($dl_library_path);
@@ -198,11 +178,7 @@ EOT
     }
 }
 else {
-<<<<<<< HEAD:ext/DynaLoader/DynaLoader_pm.PL
-    print $out ,<<EOT;
-=======
     print $out, <<EOT;
->>>>>>> 8c54f3f... more filehandle fixes:ext/DynaLoader/DynaLoader_pm.PL
 # Initialise \@dl_library_path with the 'standard' library path
 # for this platform as determined by Configure.
 
@@ -225,11 +201,7 @@ else {
     $ldlibpthname_defined = q(defined config_value("ldlibpthname"));
     $pthsep               = q(config_value("path_sep"));
 }
-<<<<<<< HEAD:ext/DynaLoader/DynaLoader_pm.PL
-print $out ,<<EOT;
-=======
 print $out, <<EOT;
->>>>>>> 8c54f3f... more filehandle fixes:ext/DynaLoader/DynaLoader_pm.PL
 my \$ldlibpthname         = $ldlibpthname;
 my \$ldlibpthname_defined = $ldlibpthname_defined;
 my \$pthsep               = $pthsep;
@@ -255,11 +227,7 @@ if (env::var('PERL_BUILD_EXPAND_CONFIG_VARS') && env::var('PERL_BUILD_EXPAND_ENV
     eval $env_dl_library_path;
 }
 else {
-<<<<<<< HEAD:ext/DynaLoader/DynaLoader_pm.PL
-    print $out ,<<EOT;
-=======
     print $out, <<EOT;
->>>>>>> 8c54f3f... more filehandle fixes:ext/DynaLoader/DynaLoader_pm.PL
 # Add to \@dl_library_path any extra directories we can gather from environment
 # during runtime.
 
@@ -270,11 +238,7 @@ EOT
 
 if (env::var('PERL_BUILD_EXPAND_CONFIG_VARS') && env::var('PERL_BUILD_EXPAND_ENV_VARS')) {
     my $dl_library_path = dquoted_comma_list(< @dl_library_path);
-<<<<<<< HEAD:ext/DynaLoader/DynaLoader_pm.PL
-    print $out ,<<EOT;
-=======
     print $out, <<EOT;
->>>>>>> 8c54f3f... more filehandle fixes:ext/DynaLoader/DynaLoader_pm.PL
 # The below \@dl_library_path has been expanded (\%Config, \%ENV)
 # in Perl build time.
 
@@ -285,11 +249,7 @@ EOT
 
 
 # following long string contains $^O-specific stuff, which is factored out
-<<<<<<< HEAD:ext/DynaLoader/DynaLoader_pm.PL
-print $out ,expand_os_specific(<<'EOT');
-=======
 print $out, expand_os_specific(<<'EOT');
->>>>>>> 8c54f3f... more filehandle fixes:ext/DynaLoader/DynaLoader_pm.PL
 # No prizes for guessing why we don't say 'bootstrap DynaLoader;' here.
 # NOTE: All dl_*.xs (including dl_none.xs) define a dl_error() XSUB
 boot_DynaLoader('DynaLoader') if defined(&boot_DynaLoader) &&
