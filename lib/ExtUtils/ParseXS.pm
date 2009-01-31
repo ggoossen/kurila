@@ -156,7 +156,8 @@ sub process_file {
       $cfile = %args{?filename};
       $cfile =~ s/\.xs$/$csuffix/i or $cfile .= $csuffix;
     }
-    binmode %args{output}, ':via(ExtUtils::ParseXS::CountLines';
+    $ExtUtils::ParseXS::CountLines::cfile = $cfile;
+    binmode %args{output}, ':via(ExtUtils::ParseXS::CountLines)';
     select %args{output};
   } else {
     select %args{output};
@@ -327,7 +328,6 @@ firstmodule:
 #endif
 
 EOF
-
   print \*STDOUT, 'ExtUtils::ParseXS::CountLines'->end_marker, "\n" if $WantLineNumbers;
 
   $lastline    = $line;
@@ -535,7 +535,7 @@ sub process_para {
     my $begin_lineno = @line_no[(nelems @line_no) - nelems @line];
     if (check_keyword("BOOT")) {
       &check_cpp( < @_ );
-      push (@BootCode, "#line $begin_lineno \"$filepathname\"")
+      push (@BootCode, "#line $begin_lineno \"$filepathname\"\n")
 	if $WantLineNumbers && @line[0] !~ m/^\s*#\s*line\b/;
       push (@BootCode, < @line, "") ;
       next PARAGRAPH ;
@@ -1096,7 +1096,7 @@ sub print_section {
     # the "do" is required for right semantics
     { $_ = shift(@line) } while !m/\S/ && nelems @line;
 
-    print(\*STDOUT, "#line ", @line_no[(nelems @line_no) - (nelems @line) -1], " \"$filepathname\"\n")
+    print(\*STDOUT, "#line " . @line_no[((nelems @line_no) - (nelems @line) -1)] . " \"$filepathname\"\n")
 	if $WantLineNumbers && !m/^\s*#\s*line\b/ && !m/^#if XSubPPtmp/;
     while (defined($_) && !m/^$BLOCK_re/) {
 	print \*STDOUT, "$_\n";
@@ -1912,11 +1912,14 @@ package
 
 our ($SECTION_END_MARKER);
 
+our $cfile;
+
 sub PUSHED {
-  my @($class, $mode, $fh, $cfile) =  @_;
-  $cfile =~ s/\\/\\\\/g;
-  $SECTION_END_MARKER = qq{#line --- "$cfile"};
-  
+  my @($class, $mode, $fh) =  @_;
+  my $mcfile = $cfile;
+  $mcfile =~ s/\\/\\\\/g;
+  $SECTION_END_MARKER = qq{#line --- "$mcfile"};
+
   return bless \%(buffer => '',
                   fh => $fh,
                   line_no => 1,
@@ -1925,13 +1928,16 @@ sub PUSHED {
 
 sub WRITE {
     my @($self,$buf,$fh) = @_;
+    my $length = 0;
     $self->{+buffer} .= $buf;
     while ($self->{+buffer} =~ s/^([^\n]*\n)//) {
         my $line = $1;
         ++ $self->{+line_no};
         $line =~ s|^\#line\s+---(?=\s)|#line $self->{?line_no}|;
         print $self->{?fh}, $line;
+        $length += length($line);
     }
+    return $length;
 }
 
 sub FLUSH {
