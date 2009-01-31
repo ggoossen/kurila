@@ -1,12 +1,15 @@
 #!/usr/bin/perl -w
 
+use Test::More;
+
 BEGIN {
     use Config;
     unless (config_value("usedl")) {
-	print \*STDOUT, "1..0 # no usedl, skipping\n";
-	exit 0;
+        plan skip_all => "no usedl";
     }
 }
+
+plan "no_plan";
 
 # use warnings;
 use ExtUtils::MakeMaker;
@@ -28,7 +31,7 @@ $perl = File::Spec->rel2abs ($perl);
 $^EXECUTABLE_NAME = $perl;
 my $lib = env::var('PERL_CORE') ?? '../../../lib' !! '../../blib/lib';
 my $runperl = "$perl \"-I$lib\"";
-print \*STDOUT, "# perl=$perl\n";
+diag "perl=$perl";
 
 my $make = env::var('MAKE') // config_value("make");
 if ($^OS_NAME eq 'MSWin32' && $make eq 'nmake') { $make .= " -nologo"; }
@@ -49,20 +52,19 @@ my $package = "ExtTest";
 my $dir = "ext-$^PID";
 my $subdir = 0;
 # The real test counter.
-my $realtest = 1;
 
 my $orig_cwd = cwd;
 my $updir = File::Spec->updir;
 die "Can't get current directory: $^OS_ERROR" unless defined $orig_cwd;
 
-print \*STDOUT, "# $dir being created...\n";
+diag "$dir being created...";
 mkdir $dir, 0777 or die "mkdir: $^OS_ERROR\n";
 
 END {
   if (defined $orig_cwd and length $orig_cwd) {
     chdir $orig_cwd or die "Can't chdir back to '$orig_cwd': $^OS_ERROR";
     use File::Path;
-    print \*STDOUT, "# $dir being removed...\n";
+    diag "$dir being removed...";
     rmtree($dir) unless $keep_files;
   } else {
     # Can't get here.
@@ -84,17 +86,12 @@ sub check_for_bonus_files {
   while (defined (my $entry = readdir $dh)) {
     $entry =~ s/\.$// if $^OS_NAME eq 'VMS';  # delete trailing dot that indicates no extension
     next if %expect{$entry};
-    print \*STDOUT, "# Extra file '$entry'\n";
+    diag "Extra file '$entry'";
     $fail = 1;
   }
 
   closedir $dh or warn "closedir '.': $^OS_ERROR";
-  if ($fail) {
-    print \*STDOUT, "not ok $realtest\n";
-  } else {
-    print \*STDOUT, "ok $realtest\n";
-  }
-  $realtest++;
+  ok( ! $fail );
 }
 
 sub build_and_run {
@@ -102,20 +99,14 @@ sub build_and_run {
   my $core = env::var('PERL_CORE') ?? ' PERL_CORE=1' !! '';
   my @perlout = @( `$runperl Makefile.PL $core` );
   if ($^CHILD_ERROR) {
-    print \*STDOUT, "not ok $realtest # $runperl Makefile.PL failed: $^CHILD_ERROR\n";
-    print \*STDOUT, "# $_" foreach  @perlout;
-    exit($^CHILD_ERROR);
+      fail("$runperl Makefile.PL failed: $^CHILD_ERROR");
+      diag "$_" foreach  @perlout;
+      exit($^CHILD_ERROR);
   } else {
-    print \*STDOUT, "ok $realtest\n";
+      pass;
   }
-  $realtest++;
 
-  if (-f "$makefile$makefile_ext") {
-    print \*STDOUT, "ok $realtest\n";
-  } else {
-    print \*STDOUT, "not ok $realtest\n";
-  }
-  $realtest++;
+  ok(-f "$makefile$makefile_ext");
 
   my @makeout;
 
@@ -138,47 +129,32 @@ sub build_and_run {
   my $timewarp = (-M "Makefile.PL") - (-M "$makefile$makefile_ext");
   # Convert from days to seconds
   $timewarp *= 86400;
-  print \*STDOUT, "# Makefile.PL is $timewarp second(s) older than $makefile$makefile_ext\n";
+  diag "Makefile.PL is $timewarp second(s) older than $makefile$makefile_ext";
   if ($timewarp +< 0) {
       # Sleep for a while to catch up.
       $timewarp = -$timewarp;
       $timewarp+=2;
       $timewarp = 10 if $timewarp +> 10;
-      print \*STDOUT, "# Sleeping for $timewarp second(s) to try to resolve this\n";
+      diag "Sleeping for $timewarp second(s) to try to resolve this";
       sleep $timewarp;
   }
 
-  print \*STDOUT, "# make = '$make'\n";
+  diag "make = '$make'";
   @makeout = @( `$make` );
   if ($^CHILD_ERROR) {
-    print \*STDOUT, "not ok $realtest # $make failed: $^CHILD_ERROR\n";
-    print \*STDOUT, "# $_" foreach  @makeout;
-    exit($^CHILD_ERROR);
+      fail("$make failed: $^CHILD_ERROR");
+      diag "$_" foreach  @makeout;
+      exit($^CHILD_ERROR);
   } else {
-    print \*STDOUT, "ok $realtest\n";
+      pass();
   }
-  $realtest++;
 
   if ($^OS_NAME eq 'VMS') { $make =~ s{ all}{}; }
 
-  if (config_value("usedl")) {
-    print \*STDOUT, "ok $realtest # This is dynamic linking, so no need to make perl\n";
-  } else {
-    my $makeperl = "$make perl";
-    print \*STDOUT, "# make = '$makeperl'\n";
-    @makeout = @( `$makeperl` );
-    if ($^CHILD_ERROR) {
-      print \*STDOUT, "not ok $realtest # $makeperl failed: $^CHILD_ERROR\n";
-      print \*STDOUT, "# $_" foreach  @makeout;
-      exit($^CHILD_ERROR);
-    } else {
-      print \*STDOUT, "ok $realtest\n";
-    }
-  }
-  $realtest++;
+  ok 1, "This is dynamic linking, so no need to make perl";
 
   my $maketest = "$make test";
-  print \*STDOUT, "# make = '$maketest'\n";
+  diag "make = '$maketest'";
 
   @makeout = @( `$maketest` );
 
@@ -191,49 +167,40 @@ sub build_and_run {
     print \*STDOUT, "# Open <$output failed: $^OS_ERROR\n";
   }
 
-  $realtest += $tests;
+  my $tb = TestBuilder->new();
+  $tb->current_test($tb->current_test + $tests);
+
   if ($^CHILD_ERROR) {
-    print \*STDOUT, "not ok $realtest # $maketest failed: $^CHILD_ERROR\n";
-    print \*STDOUT, "# $_" foreach  @makeout;
+      fail("$maketest failed: $^CHILD_ERROR");
+      diag "$_" foreach  @makeout;
   } else {
-    print \*STDOUT, "ok $realtest - maketest\n";
+      pass("maketest");
   }
-  $realtest++;
 
   if (defined $expect) {
       my $regen = `$runperl -x $package.xs`;
       if ($^CHILD_ERROR) {
-	  print \*STDOUT, "not ok $realtest # $runperl -x $package.xs failed: $^CHILD_ERROR\n";
-	  } else {
-	      print \*STDOUT, "ok $realtest - regen\n";
-	  }
-      $realtest++;
-
-      if ($expect eq $regen) {
-	  print \*STDOUT, "ok $realtest - regen worked\n";
+	  fail("$runperl -x $package.xs failed: $^CHILD_ERROR");
       } else {
-	  print \*STDOUT, "not ok $realtest - regen worked\n";
-	  # open FOO, ">expect"; print FOO $expect;
-	  # open FOO, ">regen"; print FOO $regen; close FOO;
+          pass("regen");
       }
-      $realtest++;
+
+      is($expect eq $regen, "regen worked");
   } else {
     for (0..1) {
-      print \*STDOUT, "ok $realtest # skip no regen or expect for this set of tests\n";
-      $realtest++;
+      ok(1, "skip no regen or expect for this set of tests");
     }
   }
 
   my $makeclean = "$make clean";
-  print \*STDOUT, "# make = '$makeclean'\n";
+  diag "make = '$makeclean'";
   @makeout = @( `$makeclean` );
   if ($^CHILD_ERROR) {
-    print \*STDOUT, "not ok $realtest # $make failed: $^CHILD_ERROR\n";
-    print \*STDOUT, "# $_" foreach  @makeout;
+      fail("$make failed: $^CHILD_ERROR");
+      diag "$_" foreach  @makeout;
   } else {
-    print \*STDOUT, "ok $realtest\n";
+      pass;
   }
-  $realtest++;
 
   check_for_bonus_files ('.', < @$files, $output, $makefile_rename, '.', '..');
 
@@ -244,15 +211,14 @@ sub build_and_run {
 
   # Need to make distclean to remove ../../lib/ExtTest.pm
   my $makedistclean = "$make distclean";
-  print \*STDOUT, "# make = '$makedistclean'\n";
+  diag "make = '$makedistclean'";
   @makeout = @( `$makedistclean` );
   if ($^CHILD_ERROR) {
-    print \*STDOUT, "not ok $realtest # $make failed: $^CHILD_ERROR\n";
-    print \*STDOUT, "# $_" foreach  @makeout;
+      fail("$make failed: $^CHILD_ERROR");
+      diag "$_" foreach  @makeout;
   } else {
-    print \*STDOUT, "ok $realtest\n";
+      pass;
   }
-  $realtest++;
 
   check_for_bonus_files ('.', < @$files, '.', '..');
 
@@ -266,13 +232,13 @@ sub build_and_run {
 }
 
 sub Makefile_PL {
-  my $package = shift;
-  ################ Makefile.PL
-  # We really need a Makefile.PL because make test for a no dynamic linking perl
-  # will run Makefile.PL again as part of the "make perl" target.
-  my $makefilePL = "Makefile.PL";
-  open my $fh, ">", "$makefilePL" or die "open >$makefilePL: $^OS_ERROR\n";
-  print $fh, <<"EOT";
+    my $package = shift;
+    ################ Makefile.PL
+    # We really need a Makefile.PL because make test for a no dynamic linking perl
+    # will run Makefile.PL again as part of the "make perl" target.
+    my $makefilePL = "Makefile.PL";
+    open my $fh, ">", "$makefilePL" or die "open >$makefilePL: $^OS_ERROR\n";
+    print $fh, <<"EOT";
 #!$perl -w
 use ExtUtils::MakeMaker;
 WriteMakefile(
@@ -283,8 +249,8 @@ WriteMakefile(
              );
 EOT
 
-  close $fh or die "close $makefilePL: $^OS_ERROR\n";
-  return $makefilePL;
+    close $fh or die "close $makefilePL: $^OS_ERROR\n";
+    return $makefilePL;
 }
 
 sub MANIFEST {
@@ -324,7 +290,7 @@ sub write_and_run_extension {
   my $expect;
   $expect = $C_code . "\n#### XS Section:\n" . $XS_code unless $wc_args;
 
-  print \*STDOUT, "# $name\n# $dir/$subdir being created...\n";
+  diag "$name\n$dir/$subdir being created...";
   mkdir $subdir, 0777 or die "mkdir: $^OS_ERROR\n";
   chdir $subdir or die $^OS_ERROR;
 
@@ -817,7 +783,7 @@ write_and_run_extension < @$_ foreach  @tests;
 # This was causing an assertion failure (a C<confess>ion)
 # Any single byte > 128 should do it.
 C_constant ($package, undef, undef, undef, undef, undef, chr 255);
-print \*STDOUT, "ok $realtest\n"; $realtest++;
+pass;
 
 print \*STDERR, "# You were running with \$keep_files set to $keep_files\n"
   if $keep_files;

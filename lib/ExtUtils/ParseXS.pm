@@ -39,6 +39,8 @@ our ($func_args, $PPCODE, $CODE, $EXPLICIT_RETURN, $ALIAS, $INTERFACE, $Full_fun
      $type, $num, $var, $init, $arg, $argoff, $ntype, $tk, $subtype,
      $func_name, $expr, $do_setmagic, $do_push, $subexpr);
 
+my $output_fh;
+
 # Constants:
 
 our $END = "!End!\n\n";		# "impossible" keyword (multiple newline)
@@ -104,6 +106,7 @@ sub process_file {
   $Overload = 0;
   $errors = 0;
   $Fallback = '&PL_sv_undef';
+  $output_fh = %args{output};
 
   # Most of the 1500 lines below uses these globals.  We'll have to
   # clean this up sometime, probably.  For now, we just pull them out
@@ -157,10 +160,10 @@ sub process_file {
       $cfile =~ s/\.xs$/$csuffix/i or $cfile .= $csuffix;
     }
     $ExtUtils::ParseXS::CountLines::cfile = $cfile;
-    binmode %args{output}, ':via(ExtUtils::ParseXS::CountLines)';
-    select %args{output};
+    binmode $output_fh, ':via(ExtUtils::ParseXS::CountLines)';
+    select $output_fh;
   } else {
-    select %args{output};
+    select $output_fh;
   }
 
   foreach my $typemap ( @tm) {
@@ -261,7 +264,7 @@ sub process_file {
 
   
   # Identify the version of xsubpp used
-  print \*STDOUT, <<EOM ;
+  print $output_fh, <<EOM ;
 
 /*
  * This file was generated automatically by ExtUtils::ParseXS version $VERSION from the
@@ -274,7 +277,7 @@ sub process_file {
 EOM
 
 
-  print(\*STDOUT, "#line 1 \"$filepathname\"\n")
+  print($output_fh, "#line 1 \"$filepathname\"\n")
     if $WantLineNumbers;
 
   my $line;
@@ -299,8 +302,8 @@ firstmodule:
 	  # the "" we write must be a string literal. And they aren't
 	  # concatenated until 2 steps later, so we are safe.
 	  #     - Nicholas Clark
-	  print(\*STDOUT, "#if 0\n  \"Skipped embedded POD.\"\n#endif\n");
-	  printf(\*STDOUT, "#line \%d \"$filepathname\"\n", iohandle::input_line_number($FH) + 1)
+	  print($output_fh, "#if 0\n  \"Skipped embedded POD.\"\n#endif\n");
+	  printf($output_fh, "#line \%d \"$filepathname\"\n", iohandle::input_line_number($FH) + 1)
 	    if $WantLineNumbers;
 	  next firstmodule
 	}
@@ -315,20 +318,20 @@ firstmodule:
     last if @(?$Package, ?$Prefix) =
       @: m/^MODULE\s*=\s*[\w:]+(?:\s+PACKAGE\s*=\s*([\w:]+))?(?:\s+PREFIX\s*=\s*(\S+))?\s*$/;
     
-    print \*STDOUT, $_;
+    print $output_fh, $_;
   }
   unless (defined $line) {
     warn "Didn't find a 'MODULE ... PACKAGE ... PREFIX' line\n";
     exit 0; # Not a fatal error for the caller process
   }
 
-    print \*STDOUT, <<"EOF";
+    print $output_fh, <<"EOF";
 #ifndef PERL_UNUSED_VAR
 #  define PERL_UNUSED_VAR(var) if (0) var = var
 #endif
 
 EOF
-  print \*STDOUT, 'ExtUtils::ParseXS::CountLines'->end_marker, "\n" if $WantLineNumbers;
+  print $output_fh, 'ExtUtils::ParseXS::CountLines'->end_marker, "\n" if $WantLineNumbers;
 
   $lastline    = $line;
   $lastline_no = iohandle::input_line_number($FH);
@@ -340,7 +343,7 @@ EOF
 
   if ($Overload) # make it findable with fetchmethod
   {
-    print \*STDOUT, < Q(<<"EOF");
+    print $output_fh, < Q(<<"EOF");
 #XS(XS_$($Packid)_nil); /* prototype to pass -Wmissing-prototypes */
 #XS(XS_$($Packid)_nil)
 #\{
@@ -358,18 +361,18 @@ MAKE_FETCHMETHOD_WORK
 
   # print initialization routine
 
-  print \*STDOUT, Q(<<"EOF");
+  print $output_fh, Q(<<"EOF");
 ##ifdef __cplusplus
 #extern "C"
 ##endif
 EOF
 
-  print \*STDOUT, Q(<<"EOF");
+  print $output_fh, Q(<<"EOF");
 #XS(boot_$Module_cname); /* prototype to pass -Wmissing-prototypes */
 #XS(boot_$Module_cname)
 EOF
 
-  print \*STDOUT, Q(<<"EOF");
+  print $output_fh, Q(<<"EOF");
 #[[
 ##ifdef dVAR
 #    dVAR; dXSARGS;
@@ -380,29 +383,29 @@ EOF
 
   #-Wall: if there is no $Full_func_name there are no xsubs in this .xs
   #so `file' is unused
-  print \*STDOUT, Q(<<"EOF") if $Full_func_name;
+  print $output_fh, Q(<<"EOF") if $Full_func_name;
 #    char* file = __FILE__;
 EOF
 
-  print \*STDOUT, Q("#\n");
+  print $output_fh, Q("#\n");
 
-  print \*STDOUT, Q(<<"EOF");
+  print $output_fh, Q(<<"EOF");
 #    PERL_UNUSED_VAR(cv); /* -W */
 #    PERL_UNUSED_VAR(items); /* -W */
 EOF
     
-  print \*STDOUT, Q(<<"EOF") if $WantVersionChk ;
+  print $output_fh, Q(<<"EOF") if $WantVersionChk ;
 #    XS_VERSION_BOOTCHECK ;
 #
 EOF
 
-  print \*STDOUT, Q(<<"EOF") if defined $XsubAliases or defined $Interfaces ;
+  print $output_fh, Q(<<"EOF") if defined $XsubAliases or defined $Interfaces ;
 #    \{
 #        CV * cv ;
 #
 EOF
 
-  print \*STDOUT, Q(<<"EOF") if ($Overload);
+  print $output_fh, Q(<<"EOF") if ($Overload);
 #    /* register the overloading (type 'A') magic */
 #    PL_amagic_generation++;
 #    /* The magic for overload gets a GV* via gv_fetchmeth as */
@@ -414,26 +417,26 @@ EOF
 #    );
 EOF
 
-  print \*STDOUT, < @InitFileCode;
+  print $output_fh, < @InitFileCode;
 
-  print \*STDOUT, Q(<<"EOF") if defined $XsubAliases or defined $Interfaces ;
+  print $output_fh, Q(<<"EOF") if defined $XsubAliases or defined $Interfaces ;
 #    \}
 EOF
 
   if ((nelems @BootCode))
   {
-    print \*STDOUT, "\n    /* Initialisation Section */\n\n" ;
+    print $output_fh, "\n    /* Initialisation Section */\n\n" ;
     @line = @BootCode;
-    print_section();
-    print \*STDOUT, "\n    /* End of Initialisation Section */\n\n" ;
+    print_section( output => $output_fh );
+    print $output_fh, "\n    /* End of Initialisation Section */\n\n" ;
   }
 
-    print \*STDOUT, <<'EOF';
+    print $output_fh, <<'EOF';
     if (PL_unitcheckav)
          call_list(PL_scopestack_ix, PL_unitcheckav);
 EOF
 
-  print \*STDOUT, Q(<<"EOF");
+  print $output_fh, Q(<<"EOF");
 #    XSRETURN_YES;
 #]]
 #
@@ -455,7 +458,7 @@ sub process_para {
     # Print initial preprocessor statements and blank lines
     while ((nelems @line) && @line[0] !~ m/^[^\#]/) {
       my $line = shift(@line);
-      print \*STDOUT, $line, "\n";
+      print $output_fh, $line . "\n";
       next unless $line =~ m/^\#\s*(if(?:n?def)?|elsif|else|endif)\b/;
       my $statement = $1;
       if ($statement =~ m/^if/) {
@@ -489,7 +492,7 @@ sub process_para {
     
     if ($XSS_work_idx && !@XSStack[$XSS_work_idx]->{?varname}) {
       # We are inside an #if, but have not yet #defined its xsubpp variable.
-      print \*STDOUT, "#define $cpp_next_tmp 1\n\n";
+      print $output_fh, "#define $cpp_next_tmp 1\n\n";
       push(@InitFileCode, "#if $cpp_next_tmp\n");
       push(@BootCode,     "#if $cpp_next_tmp");
       @XSStack[$XSS_work_idx]->{+varname} = $cpp_next_tmp++;
@@ -703,7 +706,7 @@ sub process_para {
     $externC = $externC ?? qq[extern "C"] !! "";
 
     # print function header
-    print \*STDOUT, Q(<<"EOF");
+    print $output_fh, Q(<<"EOF");
 #$externC
 #XS(XS_$Full_func_name); /* prototype to pass -Wmissing-prototypes */
 #XS(XS_$Full_func_name)
@@ -714,10 +717,10 @@ sub process_para {
 #    dXSARGS;
 ##endif
 EOF
-    print \*STDOUT, Q(<<"EOF") if $ALIAS ;
+    print $output_fh, Q(<<"EOF") if $ALIAS ;
 #    dXSI32;
 EOF
-    print \*STDOUT, Q(<<"EOF") if $INTERFACE ;
+    print $output_fh, Q(<<"EOF") if $INTERFACE ;
 #    dXSFUNCTION($ret_type);
 EOF
     if ($ellipsis) {
@@ -728,25 +731,25 @@ EOF
       $cond = qq(items < $min_args || items > $num_args);
     }
 
-    print \*STDOUT, Q(<<"EOF") if $except;
+    print $output_fh, Q(<<"EOF") if $except;
 #    char errbuf[1024];
 #    *errbuf = '\0';
 EOF
 
     if ($ALIAS)
-      { print \*STDOUT, Q(<<"EOF") if $cond }
+      { print $output_fh, Q(<<"EOF") if $cond }
 #    if ($cond)
 #       Perl_croak(aTHX_ "Usage: \%s(\%s)", SvPVX_const(SvNAME(CvSv(cv))), "$report_args");
 EOF
     else
-      { print \*STDOUT, Q(<<"EOF") if $cond }
+      { print $output_fh, Q(<<"EOF") if $cond }
 #    if ($cond)
 #       Perl_croak(aTHX_ "Usage: \%s(\%s)", "$pname", "$report_args");
 EOF
     
      # cv doesn't seem to be used, in most cases unless we go in 
      # the if of this else
-     print \*STDOUT, Q(<<"EOF");
+     print $output_fh, Q(<<"EOF");
 #    PERL_UNUSED_VAR(cv); /* -W */
 EOF
 
@@ -755,11 +758,11 @@ EOF
     #hence `ax' (setup by dXSARGS) is unused
     #XXX: could breakup the dXSARGS; into dSP;dMARK;dITEMS
     #but such a move could break third-party extensions
-    print \*STDOUT, Q(<<"EOF") if $PPCODE;
+    print $output_fh, Q(<<"EOF") if $PPCODE;
 #    PERL_UNUSED_VAR(ax); /* -Wall */
 EOF
 
-    print \*STDOUT, Q(<<"EOF") if $PPCODE;
+    print $output_fh, Q(<<"EOF") if $PPCODE;
 #    SP -= items;
 EOF
 
@@ -773,7 +776,7 @@ EOF
     &check_cpp( < @_ );
     while ((nelems @line)) {
       &CASE_handler( < @_ ) if check_keyword("CASE");
-      print \*STDOUT, Q(<<"EOF");
+      print $output_fh, Q(<<"EOF");
 #   $except [[
 EOF
 
@@ -787,19 +790,19 @@ EOF
       INPUT_handler() ;
       process_keyword("INPUT|PREINIT|INTERFACE_MACRO|C_ARGS|ALIAS|ATTRS|PROTOTYPE|SCOPE") ;
 
-      print \*STDOUT, Q(<<"EOF") if $ScopeThisXSUB;
+      print $output_fh, Q(<<"EOF") if $ScopeThisXSUB;
 #   ENTER;
 #   [[
 EOF
 	
       if (!$thisdone && defined($class)) {
 	if (defined($static) or $func_name eq 'new') {
-	  print \*STDOUT, "\tchar *";
+	  print $output_fh, "\tchar *";
 	  %var_types{+"CLASS"} = "char *";
 	  &generate_init("char *", 1, "CLASS");
 	}
 	else {
-	  print \*STDOUT, "\t$class *";
+	  print $output_fh, "\t$class *";
 	  %var_types{+"THIS"} = "$class *";
 	  &generate_init("$class *", 1, "THIS");
 	}
@@ -807,15 +810,15 @@ EOF
       
       # do code
       if (m/^\s*NOT_IMPLEMENTED_YET/) {
-	print \*STDOUT, "\n\tPerl_croak(aTHX_ \"$pname: not implemented yet\");\n";
+	print $output_fh, "\n\tPerl_croak(aTHX_ \"$pname: not implemented yet\");\n";
 	$_ = '' ;
       } else {
 	if ($ret_type ne "void") {
-	  print \*STDOUT, "\t" . &map_type($ret_type, 'RETVAL') . ";\n"
+	  print $output_fh, "\t" . &map_type($ret_type, 'RETVAL') . ";\n"
 	    if !$retvaldone;
 	  %args_match{+"RETVAL"} = 0;
 	  %var_types{+"RETVAL"} = $ret_type;
-	  print \*STDOUT, "\tdXSTARG;\n"
+	  print $output_fh, "\tdXSTARG;\n"
 	    if $WantOptimize and %targetable{?%type_kind{?$ret_type}};
 	}
 	
@@ -825,43 +828,43 @@ EOF
 	  $processing_arg_with_types = 1;
 	  INPUT_handler() ;
 	}
-	print \*STDOUT, $deferred;
+	print $output_fh, $deferred;
 	
         process_keyword("INIT|ALIAS|ATTRS|PROTOTYPE|INTERFACE_MACRO|INTERFACE|C_ARGS") ;
 	
 	if (check_keyword("PPCODE")) {
-	  print_section();
+	  print_section( output => $output_fh );
 	  death ("PPCODE must be last thing") if (nelems @line);
-	  print \*STDOUT, "\tLEAVE;\n" if $ScopeThisXSUB;
-	  print \*STDOUT, "\tPUTBACK;\n\treturn;\n";
+	  print $output_fh, "\tLEAVE;\n" if $ScopeThisXSUB;
+	  print $output_fh, "\tPUTBACK;\n\treturn;\n";
 	} elsif (check_keyword("CODE")) {
-	  print_section() ;
+	  print_section( output => $output_fh ) ;
 	} elsif (defined($class) and $func_name eq "DESTROY") {
-	  print \*STDOUT, "\n\t";
-	  print \*STDOUT, "delete THIS;\n";
+	  print $output_fh, "\n\t";
+	  print $output_fh, "delete THIS;\n";
 	} else {
-	  print \*STDOUT, "\n\t";
+	  print $output_fh, "\n\t";
 	  if ($ret_type ne "void") {
-	    print \*STDOUT, "RETVAL = ";
+	    print $output_fh, "RETVAL = ";
 	    $wantRETVAL = 1;
 	  }
 	  if (defined($static)) {
 	    if ($func_name eq 'new') {
 	      $func_name = "$class";
 	    } else {
-	      print \*STDOUT, "$($class)::";
+	      print $output_fh, "$($class)::";
 	    }
 	  } elsif (defined($class)) {
 	    if ($func_name eq 'new') {
 	      $func_name .= " $class";
 	    } else {
-	      print \*STDOUT, "THIS->";
+	      print $output_fh, "THIS->";
 	    }
 	  }
 	  $func_name =~ s/^\Q%args{?'s'}//
 	    if exists %args{'s'};
 	  $func_name = 'XSFUNCTION' if $interface;
-	  print \*STDOUT, "$func_name($func_args);\n";
+	  print $output_fh, "$func_name($func_args);\n";
 	}
       }
       
@@ -878,7 +881,7 @@ EOF
       
       # all OUTPUT done, so now push the return value on the stack
       if ($gotRETVAL && $RETVAL_code) {
-	print \*STDOUT, "\t$RETVAL_code\n";
+	print $output_fh, "\t$RETVAL_code\n";
       } elsif ($gotRETVAL || $wantRETVAL) {
 	my $t = $WantOptimize && %targetable{?%type_kind{?$ret_type}};
 	my $var = 'RETVAL';
@@ -890,7 +893,7 @@ EOF
 	  my $what = eval qq("$t->[2]");
 	  warn $^EVAL_ERROR if $^EVAL_ERROR;
 	  
-	  print \*STDOUT, "\tsv_setpv(TARG, $what); XSprePUSH; PUSHTARG;\n";
+	  print $output_fh, "\tsv_setpv(TARG, $what); XSprePUSH; PUSHTARG;\n";
 	  $prepush_done = 1;
 	}
 	elsif ($t) {
@@ -901,7 +904,7 @@ EOF
 	  $size = '' unless defined $size;
 	  $size = eval qq("$size");
 	  warn $^EVAL_ERROR if $^EVAL_ERROR;
-	  print \*STDOUT, "\tXSprePUSH; PUSH$t->[0]($what$size);\n";
+	  print $output_fh, "\tXSprePUSH; PUSH$t->[0]($what$size);\n";
 	  $prepush_done = 1;
 	}
 	else {
@@ -913,26 +916,26 @@ EOF
       $xsreturn = 1 if $ret_type ne "void";
       my $num = $xsreturn;
       my $c = (nelems @outlist);
-      print \*STDOUT, "\tXSprePUSH;" if $c and not $prepush_done;
-      print \*STDOUT, "\tEXTEND(SP,$c);\n" if $c;
+      print $output_fh, "\tXSprePUSH;" if $c and not $prepush_done;
+      print $output_fh, "\tEXTEND(SP,$c);\n" if $c;
       $xsreturn += $c;
       generate_output(%var_types{?$_}, $num++, $_, 0, 1) for  @outlist;
       
       # do cleanup
       process_keyword("CLEANUP|ALIAS|ATTRS|PROTOTYPE") ;
       
-      print \*STDOUT, Q(<<"EOF") if $ScopeThisXSUB;
+      print $output_fh, Q(<<"EOF") if $ScopeThisXSUB;
 #   ]]
 EOF
-      print \*STDOUT, Q(<<"EOF") if $ScopeThisXSUB and not $PPCODE;
+      print $output_fh, Q(<<"EOF") if $ScopeThisXSUB and not $PPCODE;
 #   LEAVE;
 EOF
       
       # print function trailer
-      print \*STDOUT, Q(<<"EOF");
+      print $output_fh, Q(<<"EOF");
 #    ]]
 EOF
-      print \*STDOUT, Q(<<"EOF") if $except;
+      print $output_fh, Q(<<"EOF") if $except;
 #    BEGHANDLERS
 #    CATCHALL
 #	sprintf(errbuf, "\%s: \%s\\tpropagated", Xname, Xreason);
@@ -948,22 +951,22 @@ EOF
       death(m/^$BLOCK_re/o ?? "Misplaced `$1:'" !! "Junk at end of function");
     }
     
-    print \*STDOUT, Q(<<"EOF") if $except;
+    print $output_fh, Q(<<"EOF") if $except;
 #    if (errbuf[0])
 #	Perl_croak(aTHX_ errbuf);
 EOF
     
     if ($xsreturn) {
-      print \*STDOUT, Q(<<"EOF") unless $PPCODE;
+      print $output_fh, Q(<<"EOF") unless $PPCODE;
 #    XSRETURN($xsreturn);
 EOF
     } else {
-      print \*STDOUT, Q(<<"EOF") unless $PPCODE;
+      print $output_fh, Q(<<"EOF") unless $PPCODE;
 #    XSRETURN_EMPTY;
 EOF
     }
 
-    print \*STDOUT, Q(<<"EOF");
+    print $output_fh, Q(<<"EOF");
 #]]
 #
 EOF
@@ -1093,16 +1096,17 @@ sub check_keyword {
 }
 
 sub print_section {
+    my %args = %:< @_;
     # the "do" is required for right semantics
     { $_ = shift(@line) } while !m/\S/ && nelems @line;
 
-    print(\*STDOUT, "#line " . @line_no[((nelems @line_no) - (nelems @line) -1)] . " \"$filepathname\"\n")
+    print($output_fh, "#line " . @line_no[((nelems @line_no) - (nelems @line) -1)] . " \"$filepathname\"\n")
 	if $WantLineNumbers && !m/^\s*#\s*line\b/ && !m/^#if XSubPPtmp/;
     while (defined($_) && !m/^$BLOCK_re/) {
-	print \*STDOUT, "$_\n";
+	print $output_fh, "$_\n";
         $_ = shift(@line);
     }
-    print \*STDOUT, 'ExtUtils::ParseXS::CountLines'->end_marker, "\n" if $WantLineNumbers;
+    print $output_fh, 'ExtUtils::ParseXS::CountLines'->end_marker . "\n" if $WantLineNumbers;
 }
 
 sub merge_section {
@@ -1130,11 +1134,12 @@ sub process_keyword($)
   }
 
 sub CASE_handler {
+    my %args = %:< @_;
   blurt ("Error: `CASE:' after unconditional `CASE:'")
     if $condnum && $cond eq '';
   $cond = $_;
   TrimWhitespace($cond);
-  print \*STDOUT, "   ", ($condnum++ ?? " else" !! ""), ($cond ?? " if ($cond)\n" !! "\n");
+  print $output_fh, "   ", ($condnum++ ?? " else" !! ""), ($cond ?? " if ($cond)\n" !! "\n");
   $_ = '' ;
 }
 
@@ -1151,7 +1156,7 @@ sub INPUT_handler {
 
     # Process the length(foo) declarations
     if (s/^([^=]*)\blength\(\s*(\w+)\s*\)\s*$/$1 XSauto_length_of_$2=NO_INIT/x) {
-      print \*STDOUT, "\tSTRLEN\tSTRLEN_length_of_$2;\n";
+      print $output_fh, "\tSTRLEN\tSTRLEN_length_of_$2;\n";
       %lengthof{+$2} = $name;
       # $islengthof{$name} = $1;
       $deferred .= "\n\tXSauto_length_of_$2 = STRLEN_length_of_$2;";
@@ -1179,10 +1184,10 @@ sub INPUT_handler {
     # one can use 2-args map_type() unconditionally.
     if ($var_type =~ m/ \( \s* \* \s* \) /x) {
       # Function pointers are not yet supported with &output_init!
-      print \*STDOUT, "\t" . &map_type($var_type, $var_name);
+      print $output_fh, "\t" . &map_type($var_type, $var_name);
       $name_printed = 1;
     } else {
-      print \*STDOUT, "\t" . &map_type($var_type);
+      print $output_fh, "\t" . &map_type($var_type);
       $name_printed = 0;
     }
     $var_num = %args_match{?$var_name};
@@ -1194,9 +1199,9 @@ sub INPUT_handler {
 	or %in_out{?$var_name} and %in_out{?$var_name} =~ m/^OUT/
 	and $var_init !~ m/\S/) {
       if ($name_printed) {
-	print \*STDOUT, ";\n";
+	print $output_fh, ";\n";
       } else {
-	print \*STDOUT, "\t$var_name;\n";
+	print $output_fh, "\t$var_name;\n";
       }
     } elsif ($var_init =~ m/\S/) {
       &output_init($var_type, $var_num, $var_name, $var_init, $name_printed);
@@ -1204,7 +1209,7 @@ sub INPUT_handler {
       # generate initialization code
       &generate_init($var_type, $var_num, $var_name, $name_printed);
     } else {
-      print \*STDOUT, ";\n";
+      print $output_fh, ";\n";
     }
   }
   continue {
@@ -1234,8 +1239,8 @@ sub OUTPUT_handler {
       unless defined %var_types{?$outarg} ;
     $var_num = %args_match{?$outarg};
     if ($outcode) {
-      print \*STDOUT, "\t$outcode\n";
-      print \*STDOUT, "\tSvSETMAGIC(ST(" , $var_num-1 , "));\n" if $DoSetMagic;
+      print $output_fh, "\t$outcode\n";
+      print $output_fh, "\tSvSETMAGIC(ST(" , $var_num-1 , "));\n" if $DoSetMagic;
     } else {
       &generate_output(%var_types{?$outarg}, $var_num, $outarg, $DoSetMagic);
     }
@@ -1278,7 +1283,7 @@ sub INTERFACE_handler() {
     $name =~ s/^$Prefix//;
     %Interfaces{+$name} = $_;
   }
-  print \*STDOUT, Q(<<"EOF");
+  print $output_fh, Q(<<"EOF");
 #	XSFUNCTION = $interface_macro($ret_type,cv,XSANY.any_dptr);
 EOF
   $interface = 1;		# local
@@ -1508,7 +1513,7 @@ sub INCLUDE_handler ()
     # open the new file
     open ($FH, "<", "$_") or death("Cannot open '$_': $^OS_ERROR") ;
 
-    print \*STDOUT, Q(<<"EOF");
+    print $output_fh, Q(<<"EOF");
 #
 #/* INCLUDE:  Including '$_' from '$filename' */
 #
@@ -1560,7 +1565,7 @@ sub PopFile()
       exit 1 ;
     }
 
-    print \*STDOUT, Q(<<"EOF");
+    print $output_fh, Q(<<"EOF");
 #
 #/* INCLUDE: Returning to '$filename' from '$ThisFile' */
 #
@@ -1692,20 +1697,20 @@ sub output_init {
   if (  $init =~ m/^=/  ) {
       my $x_init = evalqq($init);
       if ($name_printed) {
-          print \*STDOUT, " $x_init\n";
+          print $output_fh, " $x_init\n";
       } else {
           my $x_var = evalqq($var);
-          print \*STDOUT, "\t$x_var $x_init\n";
+          print $output_fh, "\t$x_var $x_init\n";
       }
   } else {
     if (  $init =~ s/^\+//  &&  $num  ) {
         &generate_init($type, $num, $var, $name_printed);
     } elsif ($name_printed) {
-        print \*STDOUT, ";\n";
+        print $output_fh, ";\n";
         $init =~ s/^;//;
     } else {
         my $x_var = evalqq($var);
-        print \*STDOUT, "\t$x_var;\n";
+        print $output_fh, "\t$x_var;\n";
         $init =~ s/^;//;
     }
     my $x_init = evalqq($init);
@@ -1756,8 +1761,8 @@ sub generate_init {
   $tk = %type_kind{?$type};
   $tk =~ s/OBJ$/REF/ if $func_name =~ m/DESTROY$/;
   if ($tk eq 'T_PV' and exists %lengthof{$var}) {
-    print \*STDOUT, "\t$var" unless $name_printed;
-    print \*STDOUT, " = ($type)SvPV($arg, STRLEN_length_of_$var);\n";
+    print $output_fh, "\t$var" unless $name_printed;
+    print $output_fh, " = ($type)SvPV($arg, STRLEN_length_of_$var);\n";
     die "default value not supported with length(NAME) supplied"
       if defined %defaults{?$var};
     return;
@@ -1788,9 +1793,9 @@ sub generate_init {
     $expr =~ s/(\t+)/$1    /g;
     $expr =~ s/        /\t/g;
     if ($name_printed) {
-      print \*STDOUT, ";\n";
+      print $output_fh, ";\n";
     } else {
-      print \*STDOUT, "\t$x_var;\n";
+      print $output_fh, "\t$x_var;\n";
     }
     my $x_num = evalqq($num);
     my $x_expr = evalqq($expr);
@@ -1802,9 +1807,9 @@ sub generate_init {
     }
   } elsif ($ScopeThisXSUB or $expr !~ m/^\s*\$var =/) {
     if ($name_printed) {
-      print \*STDOUT, ";\n";
+      print $output_fh, ";\n";
     } else {
-      print \*STDOUT, "\t$x_var;\n";
+      print $output_fh, "\t$x_var;\n";
     }
     my $x_expr = evalqq($expr);
     $deferred .= "\n$x_expr;\n";
@@ -1812,7 +1817,7 @@ sub generate_init {
     die "panic: do not know how to handle this branch for function pointers"
       if $name_printed;
     my $x_expr = evalqq($expr);
-    print \*STDOUT, "$x_expr;\n";
+    print $output_fh, "$x_expr;\n";
   }
 }
 
@@ -1824,9 +1829,9 @@ sub generate_output {
 
   $type = TidyType($type) ;
   if ($type =~ m/^array\(([^,]*),(.*)\)/) {
-    print \*STDOUT, "\t$arg = sv_newmortal();\n";
-    print \*STDOUT, "\tsv_setpvn($arg, (char *)$var, $2 * sizeof($1));\n";
-    print \*STDOUT, "\tSvSETMAGIC($arg);\n" if $do_setmagic;
+    print $output_fh, "\t$arg = sv_newmortal();\n";
+    print $output_fh, "\tsv_setpvn($arg, (char *)$var, $2 * sizeof($1));\n";
+    print $output_fh, "\tSvSETMAGIC($arg);\n" if $do_setmagic;
   } else {
     blurt("Error: '$type' not in typemap"), return
       unless defined(%type_kind{?$type});
@@ -1847,44 +1852,44 @@ sub generate_output {
       $subexpr =~ s/\$var/$($var)\[ix_$var]/g;
       $subexpr =~ s/\n\t/\n\t\t/g;
       $expr =~ s/DO_ARRAY_ELEM\n/$subexpr/;
-      eval "print \\*STDOUT, qq\a$expr\a";
+      eval "print \$output_fh, qq\a$expr\a";
       warn $^EVAL_ERROR   if  $^EVAL_ERROR;
-      print \*STDOUT, "\t\tSvSETMAGIC(ST(ix_$var));\n" if $do_setmagic;
+      print $output_fh, "\t\tSvSETMAGIC(ST(ix_$var));\n" if $do_setmagic;
     } elsif ($var eq 'RETVAL') {
       if ($expr =~ m/^\t\$arg = new/) {
 	# We expect that $arg has refcnt 1, so we need to
 	# mortalize it.
-	eval "print \\*STDOUT, qq\a$expr\a";
+	eval "print \$output_fh, qq\a$expr\a";
 	warn $^EVAL_ERROR   if  $^EVAL_ERROR;
-	print \*STDOUT, "\tsv_2mortal(ST($num));\n";
-	print \*STDOUT, "\tSvSETMAGIC(ST($num));\n" if $do_setmagic;
+	print $output_fh, "\tsv_2mortal(ST($num));\n";
+	print $output_fh, "\tSvSETMAGIC(ST($num));\n" if $do_setmagic;
       } elsif ($expr =~ m/^\s*\$arg\s*=/) {
 	# We expect that $arg has refcnt >=1, so we need
 	# to mortalize it!
-	eval "print \\*STDOUT, qq\a$expr\a";
+	eval "print \$output_fh, qq\a$expr\a";
 	warn $^EVAL_ERROR   if  $^EVAL_ERROR;
-	print \*STDOUT, "\tsv_2mortal(ST(0));\n";
-	print \*STDOUT, "\tSvSETMAGIC(ST(0));\n" if $do_setmagic;
+	print $output_fh, "\tsv_2mortal(ST(0));\n";
+	print $output_fh, "\tSvSETMAGIC(ST(0));\n" if $do_setmagic;
       } else {
 	# Just hope that the entry would safely write it
 	# over an already mortalized value. By
 	# coincidence, something like $arg = &sv_undef
 	# works too.
-	print \*STDOUT, "\tST(0) = sv_newmortal();\n";
-	eval "print \\*STDOUT, qq\a$expr\a";
+	print $output_fh, "\tST(0) = sv_newmortal();\n";
+	eval "print \$output_fh, qq\a$expr\a";
 	warn $^EVAL_ERROR   if  $^EVAL_ERROR;
 	# new mortals don't have set magic
       }
     } elsif ($do_push) {
-      print \*STDOUT, "\tPUSHs(sv_newmortal());\n";
+      print $output_fh, "\tPUSHs(sv_newmortal());\n";
       $arg = "ST($num)";
-      eval "print \\*STDOUT, qq\a$expr\a";
+      eval "print \$output_fh, qq\a$expr\a";
       warn $^EVAL_ERROR   if  $^EVAL_ERROR;
-      print \*STDOUT, "\tSvSETMAGIC($arg);\n" if $do_setmagic;
+      print $output_fh, "\tSvSETMAGIC($arg);\n" if $do_setmagic;
     } elsif ($arg =~ m/^ST\(\d+\)$/) {
-      eval "print \\*STDOUT, qq\a$expr\a";
+      eval "print \$output_fh, qq\a$expr\a";
       warn $^EVAL_ERROR   if  $^EVAL_ERROR;
-      print \*STDOUT, "\tSvSETMAGIC($arg);\n" if $do_setmagic;
+      print $output_fh, "\tSvSETMAGIC($arg);\n" if $do_setmagic;
     }
   }
 }
