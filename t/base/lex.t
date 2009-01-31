@@ -21,9 +21,9 @@ $x = '\\'; # ';
 if (length($x) == 2) {print \*STDOUT, "ok 4\n";} else {print \*STDOUT, "not ok 4\n";}
 
 eval 'while (0) {
-    print "foo\n";
+    print \*STDOUT, "foo\n";
 }
-m/^/ && (print "ok 5\n");
+m/^/ && (print \*STDOUT, "ok 5\n");
 ';
 
 our ($foo, %foo, $bar, $bar, @ary, $A, $X, @X, $N);
@@ -46,12 +46,12 @@ $foo
 EOF
 
 eval <<\EOE, print \*STDOUT, $^EVAL_ERROR;
-print <<'EOF';
+print \*STDOUT, <<'EOF';
 ok 10
 EOF
 
 $foo = 'ok 11';
-print <<EOF;
+print \*STDOUT, <<EOF;
 $foo
 EOF
 EOE

@@ -8,5 +8,5 @@ plan (1);
 fresh_perl_is( <<'PROG', 'ref: FOO, svtype: HASH' );
 my $x = bless \@(), "FOO";
 $$x = %();
-print "ref: ", ref($x), ", svtype: ", ref::svtype($$x);
+print \*STDOUT, "ref: ", ref($x), ", svtype: ", ref::svtype($$x);
 PROG

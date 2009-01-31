@@ -7,7 +7,7 @@
 #
 
 BEGIN {
-    print "1..0 # Skip: Fix restricted hash\n";
+    print \*STDOUT, "1..0 # Skip: Fix restricted hash\n";
     exit;
 
     chdir('t') if -d 't';
@@ -16,7 +16,7 @@ BEGIN {
     } else {
         if (!eval "require Hash::Util") {
             if ($^EVAL_ERROR->{description} =~ m/Can\'t locate Hash\/Util\.pm in \$^INCLUDE_PATH/s) {
-                print "1..0 # Skip: No Hash::Util:\n";
+                print \*STDOUT, "1..0 # Skip: No Hash::Util:\n";
                 exit 0;
             } else {
                 die;

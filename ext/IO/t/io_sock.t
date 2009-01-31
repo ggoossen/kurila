@@ -100,7 +100,7 @@ if(my $pid = fork()) {
        while ( ~< $sock) {
            last SERVER_LOOP if m/^quit/;
            last if m/^done/;
-           print \*STDOUT,;
+           print \*STDOUT, $_;
        }
        $sock = undef;
     }

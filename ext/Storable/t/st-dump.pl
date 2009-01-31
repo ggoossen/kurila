@@ -10,13 +10,6 @@
 # File::Spec->updir and catdir to get the st-dump.pl in
 # ext/Storable into $^INCLUDE_PATH.
 
-sub ok {
-	my @($num, $ok, ?$name) =  @_;
-        $num .= " - $name" if defined $name and length $name;
-	print \*STDOUT, $ok ?? "ok $num\n" !! "not ok $num\n";
-        $ok;
-}
-
 sub num_equal {
 	my @($num, $left, $right, $name) =  @_;
         my $ok = ((defined $left) ?? $left == $right !! undef);

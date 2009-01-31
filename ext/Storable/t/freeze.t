@@ -18,7 +18,8 @@ BEGIN {
 
 use Storable < qw(freeze nfreeze thaw);
 
-print "1..20\n";
+use Test::More;
+plan tests => 20;
 
 $a = 'toto';
 $b = \$a;
@@ -32,21 +33,18 @@ our %a = %('key', 'value', 1, 0, $a, $b, 'cvar', \$c);
 our @a = @('first', undef, 3, -4, -3.14159, 456, 4.5, $d, \$d, \$e, $e,
 	$b, \$a, $a, $c, \$c, \%a);
 
-print "not " unless defined (our $f1 = freeze(\@a));
-print "ok 1\n";
+ok defined (our $f1 = freeze(\@a));
 
 our $dumped = &dump(\@a);
-print "ok 2\n";
+ok 1;
 
 our $root = thaw($f1);
-print "not " unless defined $root;
-print "ok 3\n";
+ok defined $root;
 
 our $got = &dump($root);
-print "ok 4\n";
+ok 1;
 
-print "not " unless $got eq $dumped; 
-print "ok 5\n";
+ok $got eq $dumped; 
 
 package FOO; our @ISA = qw(Storable);
 
@@ -59,33 +57,25 @@ sub make {
 package main;
 
 our $foo = FOO->make;
-print "not " unless our $f2 = $foo->freeze;
-print "ok 6\n";
+ok our $f2 = $foo->freeze;
 
-print "not " unless our $f3 = $foo->nfreeze;
-print "ok 7\n";
+ok our $f3 = $foo->nfreeze;
 
 our $root3 = thaw($f3);
-print "not " unless defined $root3;
-print "ok 8\n";
+ok defined $root3;
 
-print "not " unless &dump($foo) eq &dump($root3);
-print "ok 9\n";
+ok &dump($foo) eq &dump($root3);
 
 $root = thaw($f2);
-print "not " unless &dump($foo) eq &dump($root);
-print "ok 10\n";
+ok &dump($foo) eq &dump($root);
 
-print "not " unless &dump($root3) eq &dump($root);
-print "ok 11\n";
+ok &dump($root3) eq &dump($root);
 
 our $other = freeze($root);
-print "not " unless length($other) == length($f2);
-print "ok 12\n";
+ok length($other) == length($f2);
 
 our $root2 = thaw($other);
-print "not " unless &dump($root2) eq &dump($root);
-print "ok 13\n";
+ok &dump($root2) eq &dump($root);
 
 our $VAR1 = \@(
 	'method',
@@ -97,16 +87,14 @@ our $VAR1 = \@(
 
 our $x = nfreeze($VAR1);
 our $VAR2 = thaw($x);
-print "not " unless $VAR2->[3] eq $VAR1->[3];
-print "ok 14\n";
+ok $VAR2->[3] eq $VAR1->[3];
 
 # Test the workaround for LVALUE bug in perl 5.004_04 -- from Gisle Aas
 sub foo { @_[0] = 1 }
 $foo = \@();
 foo($foo->[?1]);
-try { freeze($foo) };
-print "not " if $^EVAL_ERROR;
-print "ok 15\n";
+freeze($foo);
+ok 1;
 
 # Test cleanup bug found by Claudio Garcia -- RAM, 08/06/2001
 my $thaw_me = 'asdasdasdasd';
@@ -114,28 +102,28 @@ my $thaw_me = 'asdasdasdasd';
 try {
 	my $thawed = thaw $thaw_me;
 };
-ok 16, $^EVAL_ERROR;
+ok $^EVAL_ERROR;
 
 my %to_be_frozen = %(foo => 'bar');
 my $frozen;
 try {
 	$frozen = freeze \%to_be_frozen;
 };
-ok 17, !$^EVAL_ERROR;
+ok !$^EVAL_ERROR;
 
 freeze \%();
 try { thaw $thaw_me };
 try { $frozen = freeze \%( foo => \%() ) };
-ok 18, !$^EVAL_ERROR;
+ok !$^EVAL_ERROR;
 
 thaw $frozen;			# used to segfault here
-ok 19, 1;
+ok 1;
 
     eval '
         $a = \@(undef, undef);
         $b = thaw freeze $a;
         @a = map { exists $a->[$_] } 0 .. (nelems @$a)-1;
         our @b = map { exists $b->[$_] } 0 .. (nelems @$b)-1;
-        ok 20, (join " ", @a) eq (join " ", @b);
+        ok (join " ", @a) eq (join " ", @b);
     ';
     die if $^EVAL_ERROR;

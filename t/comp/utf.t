@@ -4,15 +4,15 @@ use Config;
 
 BEGIN {
     unless ('PerlIO::Layer'->find('perlio')) {
-	print "1..0 # Skip: not perlio\n";
+	print \*STDOUT, "1..0 # Skip: not perlio\n";
 	exit 0;
     }
     if (env::var('PERL_CORE_MINITEST')) {
-	print "1..0 # Skip: no dynamic loading on miniperl, no threads\n";
+	print \*STDOUT, "1..0 # Skip: no dynamic loading on miniperl, no threads\n";
 	exit 0;
     }
     if (config_value('extensions') !~ m/\bEncode\b/) {
-      print "1..0 # Skip: Encode was not built\n";
+      print \*STDOUT, "1..0 # Skip: Encode was not built\n";
       exit 0;
     }
 }

@@ -666,6 +666,9 @@ PP(pp_print)
     IO *io;
     register PerlIO *fp;
     GV * const gv = (GV*)*++MARK;
+    if ( ! isGV(gv) )
+	Perl_croak(aTHX_ "First argument to print is not a filehandle but a %s",
+	    Ddesc((SV*)gv));
 
     if (!(io = GvIO(gv))) {
 	if (ckWARN2(WARN_UNOPENED,WARN_CLOSED))

@@ -21,7 +21,8 @@ BEGIN {
 
 use Storable < qw(store retrieve nstore);
 
-print "1..14\n";
+use Test::More;
+plan tests => 14;
 
 $a = 'toto';
 $b = \$a;
@@ -31,41 +32,29 @@ my %a = %('key', 'value', 1, 0, $a, $b, 'cvar', \$c);
 my @a = @('first', '', undef, 3, -4, -3.14159, 456, 4.5,
 	$b, \$a, $a, $c, \$c, \%a);
 
-print "not " unless defined store(\@a, 'store');
-print "ok 1\n";
-print "not " if Storable::last_op_in_netorder();
-print "ok 2\n";
-print "not " unless defined nstore(\@a, 'nstore');
-print "ok 3\n";
-print "not " unless Storable::last_op_in_netorder();
-print "ok 4\n";
-print "not " unless Storable::last_op_in_netorder();
-print "ok 5\n";
+ok defined store(\@a, 'store');
+ok not  Storable::last_op_in_netorder();
+ok defined nstore(\@a, 'nstore');
+ok Storable::last_op_in_netorder();
+ok Storable::last_op_in_netorder();
 
 my $root = retrieve('store');
-print "not " unless defined $root;
-print "ok 6\n";
-print "not " if Storable::last_op_in_netorder();
-print "ok 7\n";
+ok defined $root;
+ok not  Storable::last_op_in_netorder();
 
 my $nroot = retrieve('nstore');
-print "not " unless defined $nroot;
-print "ok 8\n";
-print "not " unless Storable::last_op_in_netorder();
-print "ok 9\n";
+ok defined $nroot;
+ok Storable::last_op_in_netorder();
 
 my $d1 = &dump($root);
-print "ok 10\n";
+ok 1;
 my $d2 = &dump($nroot);
-print "ok 11\n";
+ok 1;
 
-print "not " unless $d1 eq $d2; 
-print "ok 12\n";
+ok $d1 eq $d2; 
 
 # Make sure empty string is defined at retrieval time
-print "not " unless defined $root->[1];
-print "ok 13\n";
-print "not " if length $root->[1];
-print "ok 14\n";
+ok defined $root->[1];
+ok not  length $root->[1];
 
 END { 1 while unlink('store', 'nstore') }

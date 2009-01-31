@@ -51,7 +51,7 @@ die "too many in argv: $(join ' ', @ARGV)\n" unless nelems @ARGV == 1;
 my $file = @ARGV[0];
 open my $out, ">", "$file" or die $^OS_ERROR;
 
-print $out "Testing\n";
+print $out, "Testing\n";
 close $out
 END
 
@@ -76,7 +76,7 @@ die "too many in argv: @ARGV\n" unless nelems @ARGV == 1;
 my $file = @ARGV[0];
 open my $out, ">", "$file" or die $^OS_ERROR;
 
-print $out "Testing\n";
+print $out, "Testing\n";
 close $out
 END
 

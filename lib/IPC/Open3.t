@@ -51,9 +51,9 @@ print \*STDOUT, "1..22\n";
 ok 1, $pid = open3 \*WRITE, \*READ, \*ERROR, $perl, '-e', cmd_line(<<'EOF');
     $^OUTPUT_AUTOFLUSH = 1;
     print scalar ~< *STDIN;
-    print STDERR "hi error\n";
+    print \*STDERR, "hi error\n";
 EOF
-ok 2, print WRITE, "hi kid\n";
+ok 2, print \*WRITE, "hi kid\n";
 ok 3, (~< *READ) =~ m/^hi kid\r?\n$/;
 ok 4, (~< *ERROR) =~ m/^hi error\r?\n$/;
 ok 5, close(*WRITE), $^OS_ERROR;
@@ -69,9 +69,9 @@ $pid = open3 \*WRITE, \*READ, \*READ, $perl, '-e', cmd_line(<<'EOF');
     print scalar ~< *STDIN;
     print STDERR scalar ~< *STDIN;
 EOF
-print WRITE, "ok 10\n";
+print \*WRITE, "ok 10\n";
 print \*STDOUT, scalar ~< *READ;
-print WRITE, "ok 11\n";
+print \*WRITE, "ok 11\n";
 print \*STDOUT, scalar ~< *READ;
 waitpid $pid, 0;
 
@@ -81,9 +81,9 @@ $pid = open3 \*WRITE, \*READ, '', $perl, '-e', cmd_line(<<'EOF');
     print scalar ~< *STDIN;
     print STDERR scalar ~< *STDIN;
 EOF
-print WRITE, "ok 12\n";
+print \*WRITE, "ok 12\n";
 print \*STDOUT, scalar ~< *READ;
-print WRITE, "ok 13\n";
+print \*WRITE, "ok 13\n";
 print \*STDOUT, scalar ~< *READ;
 waitpid $pid, 0;
 
@@ -100,7 +100,7 @@ waitpid $pid, 0;
 # dup reader
 $pid = open3 'WRITE', '>&STDOUT', 'ERROR',
 		    $perl, '-e', cmd_line('print scalar ~< *STDIN');
-print WRITE, "ok 16\n";
+print \*WRITE, "ok 16\n";
 waitpid $pid, 0;
 
 # dup error:  This particular case, duping stderr onto the existing
@@ -108,7 +108,7 @@ waitpid $pid, 0;
 # used not to work.
 $pid = open3 'WRITE', 'READ', '>&STDOUT',
 		    $perl, '-e', cmd_line('print STDERR scalar ~< *STDIN');
-print WRITE, "ok 17\n";
+print \*WRITE, "ok 17\n";
 waitpid $pid, 0;
 
 # dup reader and error together, both named
@@ -117,8 +117,8 @@ $pid = open3 'WRITE', '>&STDOUT', '>&STDOUT', $perl, '-e', cmd_line(<<'EOF');
     print STDOUT scalar ~< *STDIN;
     print STDERR scalar ~< *STDIN;
 EOF
-print WRITE, "ok 18\n";
-print WRITE, "ok 19\n";
+print \*WRITE, "ok 18\n";
+print \*WRITE, "ok 19\n";
 waitpid $pid, 0;
 
 # dup reader and error together, error empty
@@ -127,8 +127,8 @@ $pid = open3 'WRITE', '>&STDOUT', '', $perl, '-e', cmd_line(<<'EOF');
     print STDOUT scalar ~< *STDIN;
     print STDERR scalar ~< *STDIN;
 EOF
-print WRITE, "ok 20\n";
-print WRITE, "ok 21\n";
+print \*WRITE, "ok 20\n";
+print \*WRITE, "ok 21\n";
 waitpid $pid, 0;
 
 # command line in single parameter variant of open3
@@ -141,6 +141,6 @@ if ($^EVAL_ERROR) {
 	print \*STDOUT, "not ok 22\n";
 }
 else {
-	print WRITE, "ok 22\n";
+	print \*WRITE, "ok 22\n";
 	waitpid $pid, 0;
 }        

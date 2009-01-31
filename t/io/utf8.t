@@ -2,7 +2,7 @@
 
 BEGIN {
     unless ('PerlIO::Layer'->find('perlio')) {
-	print "1..0 # Skip: not perlio\n";
+	print \*STDOUT, "1..0 # Skip: not perlio\n";
 	exit 0;
     }
 }
@@ -19,9 +19,9 @@ use bytes;
 use utf8;
 
 open(my $f,"+>:utf8",'a');
-print $f chr(0x100)."\x[c2]\x[a3]";
+print $f, chr(0x100)."\x[c2]\x[a3]";
 cmp_ok( tell($f), '==', 4, tell($f) );
-print $f "\n";
+print $f, "\n";
 cmp_ok( tell($f), '+>=', 5, tell($f) );
 seek($f,0,0);
 is( getc($f), chr(0x100) );
@@ -53,7 +53,7 @@ do {
     $b = chr(130); # This also.
 
     open $f, ">:utf8", 'a' or die $^OS_ERROR;
-    print $f $a,"\n";
+    print $f, $a,"\n";
     close $f;
 
     open $f, "<:utf8", 'a' or die $^OS_ERROR;
@@ -72,14 +72,14 @@ do {
     open $f, ">:utf8", 'a' or die $^OS_ERROR;
     binmode($f);  # we write a "\n" and then tell() - avoid CRLF issues.
     binmode($f,":utf8"); # turn UTF-8-ness back on
-    print $f $a;
+    print $f, $a;
     my $y;
     do { my $x = tell($f);
       do { use bytes; $y = length($a);};
       cmp_ok( $x, '==', $y );
   };
 
-    print $f $b,"\n";
+    print $f, $b,"\n";
 
     do {
 	my $x = tell($f);
@@ -110,7 +110,7 @@ do {
     do {
 	use warnings 'utf8';
 	local $^WARN_HOOK = sub { $w = @_[0] };
-	print $f $a;
+	print $f, $a;
         ok( (!$^EVAL_ERROR));
 	ok( ! $w, , "No 'Wide character in print' warning" );
     };
@@ -118,9 +118,9 @@ do {
 
 # Hm. Time to get more evil.
 open $f, ">:utf8", "a" or die $^OS_ERROR;
-print $f $a;
+print $f, $a;
 binmode($f, ":bytes");
-print $f chr(130)."\n";
+print $f, chr(130)."\n";
 close $f;
 
 open $f, "<", "a" or die $^OS_ERROR;
@@ -131,11 +131,11 @@ is( $x, $a . $chr );
 
 # Right.
 open $f, ">:utf8", "a" or die $^OS_ERROR;
-print $f $a;
+print $f, $a;
 close $f;
 open $f, ">>", "a" or die $^OS_ERROR;
 binmode($f, ":bytes");
-print $f bytes::chr(130)."\n";
+print $f, bytes::chr(130)."\n";
 close $f;
 
 open $f, "<", "a" or die $^OS_ERROR;
@@ -161,7 +161,7 @@ unlink('a');
 open $f, ">:utf8", "a";
 my @a = map { chr(1 << ($_ << 2)) } 0..5; # 0x1, 0x10, .., 0x100000
 unshift @a, chr(0); # ... and a null byte in front just for fun
-print $f < @a;
+print $f, < @a;
 close $f;
 
 my $c;
@@ -175,13 +175,13 @@ for ( @a) {
             length($b)           == 1  &&
             ord($b)              == ord($_) &&
             tell($f)              == ($a += bytes::length($b))) {
-        print '# ord($_)           == ', ord($_), "\n";
-        print '# ord($b)           == ', ord($b), "\n";
-        print '# length($b)        == ', length($b), "\n";
-        print '# bytes::length($b) == ', < bytes::length($b), "\n";
-        print '# tell($f)           == ', tell($f), "\n";
-        print '# $a                == ', $a, "\n";
-        print '# $c                == ', $c, "\n";
+        print \*STDOUT, '# ord($_)           == ', ord($_), "\n";
+        print \*STDOUT, '# ord($b)           == ', ord($b), "\n";
+        print \*STDOUT, '# length($b)        == ', length($b), "\n";
+        print \*STDOUT, '# bytes::length($b) == ', < bytes::length($b), "\n";
+        print \*STDOUT, '# tell($f)           == ', tell($f), "\n";
+        print \*STDOUT, '# $a                == ', $a, "\n";
+        print \*STDOUT, '# $c                == ', $c, "\n";
 	$failed++;
         last;
     }
@@ -200,7 +200,7 @@ do {
 	    # print "# @$u - @$v\n";
 	    open $f, ">", "a";
 	    binmode($f, ":" . $u->[1]);
-	    print $f chr($u->[0]);
+	    print $f, chr($u->[0]);
 	    close $f;
 
 	    open $f, "<", "a";
@@ -238,8 +238,8 @@ do {
     open $f, ">", "a";
     binmode $f;
     my @($chrE4, $chrF6) = @("\x[E4]", "\x[F6]");
-    print $f "foo", $chrE4, "\n";
-    print $f "foo", $chrF6, "\n";
+    print $f, "foo", $chrE4, "\n";
+    print $f, "foo", $chrF6, "\n";
     close $f;
     open $f, "<:utf8", "a";
     undef $^EVAL_ERROR;

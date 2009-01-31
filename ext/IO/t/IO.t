@@ -92,7 +92,7 @@ if ( -d $fakedir or mkpath( $fakedir ))
 		1;
 		END_HERE
 
-		print $outfh $package;
+		print $outfh, $package;
 	}
 
 	if (close $outfh)

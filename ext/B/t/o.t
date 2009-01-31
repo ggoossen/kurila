@@ -14,10 +14,10 @@ unless (-d $path) {
 }
 
 my $file = File::Spec->catfile( $path, 'success.pm' );
-local *OUT;
-open(OUT, '>', $file) or skip_all( 'Cannot write fake backend module');
-print OUT while ~< *DATA;
-close *OUT;
+my $out_fh;
+open($out_fh, '>', $file) or skip_all( 'Cannot write fake backend module');
+print $out_fh while ~< *DATA;
+close $out_fh;
 
 plan( 9 ); # And someone's responsible.
 

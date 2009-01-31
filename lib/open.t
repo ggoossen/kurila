@@ -60,7 +60,7 @@ SKIP: do {
     use open ':utf8';
     use utf8;
     open(my $o, ">", "utf8");
-    print $o chr(0x100);
+    print $o, chr(0x100);
     close $o;
     open(my $i, "<", "utf8");
     is(ord(~<$i), 0x100, ":utf8 single wide character round-trip");

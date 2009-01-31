@@ -463,14 +463,14 @@ sub _create_runperl { # Create the string to qx in runperl().
 	%args{+stdin} =~ s/\r/\\r/g;
 
 	if ($is_mswin || $is_netware || $is_vms) {
-	    $runperl = qq{$^EXECUTABLE_NAME -e "print qq(} .
+	    $runperl = qq{$^EXECUTABLE_NAME -e "print \\*STDOUT, qq(} .
 		%args{?stdin} . q{)" | } . $runperl;
 	}
 	elsif ($is_macos) {
 	    # MacOS can only do two processes under MPW at once;
 	    # the test itself is one; we can't do two more, so
 	    # write to temp file
-	    my $stdin = qq{$^EXECUTABLE_NAME -e 'print qq(} . %args{?stdin} . qq{)' > teststdin; };
+	    my $stdin = qq{$^EXECUTABLE_NAME -e 'print \*STDOUT, qq(} . %args{?stdin} . qq{)' > teststdin; };
 	    if (%args{?verbose}) {
 		my $stdindisplay = $stdin;
 		$stdindisplay =~ s/\n/\n\#/g;
@@ -480,7 +480,7 @@ sub _create_runperl { # Create the string to qx in runperl().
 	    $runperl .= q{ < teststdin };
 	}
 	else {
-	    $runperl = qq{$^EXECUTABLE_NAME -e 'print qq(} .
+	    $runperl = qq{$^EXECUTABLE_NAME -e 'print *STDOUT, qq(} .
 		%args{?stdin} . q{)' | } . $runperl;
 	}
     }
@@ -501,7 +501,6 @@ sub runperl {
     die "test.pl:runperl() does not take a hashref"
 	if ref @_[0] and ref @_[0] eq 'HASH';
     my $runperl = &_create_runperl( < @_ );
-
     my $result = `$runperl`;
     $result =~ s/\n\n/\n/ if $is_vms; # XXX pipes sometimes double these
     return $result;

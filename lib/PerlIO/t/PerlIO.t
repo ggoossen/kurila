@@ -73,7 +73,7 @@ do {
     ok( defined fileno($x),     '       fileno' );
 
     select $x;
-    ok( (print \*STDOUT, "ok\n"),         '       print' );
+    ok( (print $x, "ok\n"),         '       print' );
 
     select \*STDOUT;
     ok( seek($x,0,0),           '       seek' );
@@ -96,7 +96,7 @@ do {
     ok( defined fileno($x),     '       fileno' );
 
     select $x;
-    ok( (print \*STDOUT, "ok\n"),         '       print' );
+    ok( (print $x, "ok\n"),         '       print' );
 
     select \*STDOUT;
     ok( seek($x,0,0),           '       seek' );

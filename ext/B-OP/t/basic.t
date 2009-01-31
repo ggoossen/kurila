@@ -2,7 +2,7 @@
 
 use Config;
 BEGIN {
-    print "1..0 # Skip: FIX B-OP\n";
+    print \*STDOUT, "1..0 # Skip: FIX B-OP\n";
     exit 0;
 }
 

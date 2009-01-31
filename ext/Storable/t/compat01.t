@@ -11,7 +11,7 @@ BEGIN {
     }
 
     if (config_value('byteorder') ne "1234") {
-	print "1..0 # Skip: Test only works for 32 bit little-ending machines\n";
+	print \*STDOUT, "1..0 # Skip: Test only works for 32 bit little-ending machines\n";
 	exit 0;
     }
 }
@@ -25,7 +25,8 @@ my @dumps = @(
     "perl-store\0\x[04]1234\4\4\4\x[94]y\22\b\3\1\0\0\0vxz\22\b\b\x[81]Xk\3\0\0\0oneX",      # 0.4@7
 );
 
-print "1.." . (nelems @dumps) . "\n";
+use Test::More;
+plan tests => (nelems @dumps);
 
 my $testno;
 for my $dump (@dumps) {
@@ -33,19 +34,11 @@ for my $dump (@dumps) {
 
     open(my $fh, ">", "$file") || die "Can't create $file: $^OS_ERROR";
     binmode($fh);
-    print $fh $dump;
+    print $fh, $dump;
     close($fh) || die "Can't write $file: $^OS_ERROR";
 
-    try {
-	my $data = retrieve($file);
-	if (ref($data) eq "HASH" && $data->{one} eq "1") {
-	    print "ok $testno\n";
-	}
-	else {
-	    print "not ok $testno\n";
-	}
-    };
-    warn if $^EVAL_ERROR;
+    my $data = retrieve($file);
+    ok(ref($data) eq "HASH" && $data->{one} eq "1");
 
     unlink($file);
 }

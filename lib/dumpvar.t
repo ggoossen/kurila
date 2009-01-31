@@ -3,7 +3,7 @@
 BEGIN {
     require Config;
     if ((Config::config_value('extensions') !~ m!\bList/Util\b!) ){
-	print "1..0 # Skip -- Perl configured without List::Util module\n";
+	print \*STDOUT, "1..0 # Skip -- Perl configured without List::Util module\n";
 	exit 0;
     }
 }

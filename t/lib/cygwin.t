@@ -2,7 +2,7 @@
 
 BEGIN {
     unless ($^OS_NAME eq "cygwin") {
-	print "1..0 # skipped: cygwin specific test\n";
+	print \*STDOUT, "1..0 # skipped: cygwin specific test\n";
 	exit 0;
     }
 }

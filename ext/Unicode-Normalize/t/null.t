@@ -1,13 +1,5 @@
 
 BEGIN {
-    unless ("A" eq pack('U', 0x41)) {
-	print "1..0 # Unicode::Normalize " .
-	    "cannot stringify a Unicode code point\n";
-	exit 0;
-    }
-}
-
-BEGIN {
     if (env::var('PERL_CORE')) {
         chdir('t') if -d 't';
         $^INCLUDE_PATH = @( $^OS_NAME eq 'MacOS' ?? < qw(::lib) !! < qw(../lib) );
@@ -19,78 +11,80 @@ BEGIN {
 use warnings;
 
 use Unicode::Normalize < qw(:all);
-print "1..24\n";
+use Test::More;
 
-print "ok 1\n";
+plan tests => 24;
+
+ok 1;
 
 # if $_ is not NULL-terminated, test may fail.
 
 $_ = compose('abc');
-print m/c$/ ?? "ok" !! "not ok", " 2\n";
+like($_, qr/c$/);
 
 $_ = decompose('abc');
-print m/c$/ ?? "ok" !! "not ok", " 3\n";
+like($_, qr/c$/);
 
 $_ = reorder('abc');
-print m/c$/ ?? "ok" !! "not ok", " 4\n";
+like($_, qr/c$/);
 
 $_ = NFD('abc');
-print m/c$/ ?? "ok" !! "not ok", " 5\n";
+like($_, qr/c$/);
 
 $_ = NFC('abc');
-print m/c$/ ?? "ok" !! "not ok", " 6\n";
+like($_, qr/c$/);
 
 $_ = NFKD('abc');
-print m/c$/ ?? "ok" !! "not ok", " 7\n";
+like($_, qr/c$/);
 
 $_ = NFKC('abc');
-print m/c$/ ?? "ok" !! "not ok", " 8\n";
+like($_, qr/c$/);
 
 $_ = FCC('abc');
-print m/c$/ ?? "ok" !! "not ok", " 9\n";
+like($_, qr/c$/);
 
 $_ = decompose("\x{304C}abc");
-print m/c$/ ?? "ok" !! "not ok", " 10\n";
+like($_, qr/c$/);
 
 $_ = decompose("\x{304B}\x{3099}abc");
-print m/c$/ ?? "ok" !! "not ok", " 11\n";
+like($_, qr/c$/);
 
 $_ = reorder("\x{304C}abc");
-print m/c$/ ?? "ok" !! "not ok", " 12\n";
+like($_, qr/c$/);
 
 $_ = reorder("\x{304B}\x{3099}abc");
-print m/c$/ ?? "ok" !! "not ok", " 13\n";
+like($_, qr/c$/);
 
 $_ = compose("\x{304C}abc");
-print m/c$/ ?? "ok" !! "not ok", " 14\n";
+like($_, qr/c$/);
 
 $_ = compose("\x{304B}\x{3099}abc");
-print m/c$/ ?? "ok" !! "not ok", " 15\n";
+like($_, qr/c$/);
 
 $_ = NFD("\x{304C}abc");
-print m/c$/ ?? "ok" !! "not ok", " 16\n";
+like($_, qr/c$/);
 
 $_ = NFC("\x{304C}abc");
-print m/c$/ ?? "ok" !! "not ok", " 17\n";
+like($_, qr/c$/);
 
 $_ = NFKD("\x{304C}abc");
-print m/c$/ ?? "ok" !! "not ok", " 18\n";
+like($_, qr/c$/);
 
 $_ = NFKC("\x{304C}abc");
-print m/c$/ ?? "ok" !! "not ok", " 19\n";
+like($_, qr/c$/);
 
 $_ = FCC("\x{304C}abc");
-print m/c$/ ?? "ok" !! "not ok", " 20\n";
+like($_, qr/c$/);
 
 $_ = getCanon(0x100);
-print s/.$// ?? "ok" !! "not ok", " 21\n";
+ok($_ =~ s/.$//);
 
 $_ = getCompat(0x100);
-print s/.$// ?? "ok" !! "not ok", " 22\n";
+ok($_ =~ s/.$//);
 
 $_ = getCanon(0xAC00);
-print s/.$// ?? "ok" !! "not ok", " 23\n";
+ok($_ =~ s/.$//);
 
 $_ = getCompat(0xAC00);
-print s/.$// ?? "ok" !! "not ok", " 24\n";
+ok($_ =~ s/.$//);
 

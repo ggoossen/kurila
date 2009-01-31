@@ -13,7 +13,7 @@ BEGIN { plan tests => 13 };
 ok 1;
 
 use Pod::Simple::XMLOutStream;
-print "# Pod::Simple version $Pod::Simple::VERSION\n";
+print \*STDOUT, "# Pod::Simple version $Pod::Simple::VERSION\n";
 my $x = 'Pod::Simple::XMLOutStream';
 sub e ($$) { $x->_duo(< @_) }
 
@@ -21,7 +21,7 @@ $Pod::Simple::XMLOutStream::ATTR_PAD   = ' ';
 $Pod::Simple::XMLOutStream::SORT_ATTRS = 1; # for predictably testable output
 
 
-print "# S as such...\n";
+print \*STDOUT, "# S as such...\n";
 
 ok( $x->_out("=pod\n\nI like S<bric-a-brac>.\n"),
  =>  '<Document><Para>I like <S>bric-a-brac</S>.</Para></Document>' );
@@ -77,7 +77,7 @@ skip( $unless_ascii,
 
 
 
-print "# Wrapping up... one for the road...\n";
+print \*STDOUT, "# Wrapping up... one for the road...\n";
 ok 1;
-print "# --- Done with ", __FILE__, " --- \n";
+print \*STDOUT, "# --- Done with ", __FILE__, " --- \n";
 

@@ -37,7 +37,7 @@ my $devnull = File::Spec->devnull;
 
 open(my $saverr, ">&", \*STDERR);
 open(\*STDERR, ">", "$devnull") or 
-  ( print SAVEERR, "Unable to redirect STDERR: $^OS_ERROR\n" and exit(1) );
+  ( print $saverr, "Unable to redirect STDERR: $^OS_ERROR\n" and exit(1) );
 
 try {$result = store ($bad , 'store')};
 

@@ -532,9 +532,9 @@ sub dl_findfile {
     }
     if ($dl_debug) {
         foreach(@dirs) {
-            print STDERR " dl_findfile ignored non-existent directory: $_\n" unless -d $_;
+            print \*STDERR, " dl_findfile ignored non-existent directory: $_\n" unless -d $_;
         }
-        print STDERR "dl_findfile found: @found\n";
+        print \*STDERR, "dl_findfile found: @found\n";
     }
     @found;
 }
@@ -562,7 +562,7 @@ sub dl_expandspec {
     <<|$^O-eq-VMS>>
 	return undef unless -f $file;
     <</$^O-eq-VMS>>
-    print STDERR "dl_expandspec($spec) => $file\n" if $dl_debug;
+    print \*STDERR, "dl_expandspec($spec) => $file\n" if $dl_debug;
     $file;
 }
 

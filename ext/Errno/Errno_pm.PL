@@ -329,7 +329,7 @@ EOF
 
     # Write Errno.pm
 
-    print \*STDOUT, <<"EDQ";
+    print $out, <<"EDQ";
 #
 # This file is auto-generated. ***ANY*** changes here will be lost
 #
@@ -355,9 +355,9 @@ EDQ
 
     my $j = "\@EXPORT_OK = qw(" . join(" ",keys %err) . ");\n";
     $j =~ s/(.{50,70})\s/$1\n\t/g;
-    print \*STDOUT, $j,"\n";
+    print $out, $j,"\n";
 
-print \*STDOUT, <<'ESQ';
+print $out, <<'ESQ';
 %EXPORT_TAGS = %(
     POSIX => \qw(
 ESQ
@@ -378,25 +378,25 @@ ESQ
 	EUSERS EWOULDBLOCK EXDEV));
 
     $k =~ s/(.{50,70})\s/$1\n\t/g;
-    print \*STDOUT, "\t",$k,"\n    )\n);\n\n";
+    print $out, "\t",$k,"\n    )\n);\n\n";
 
     foreach my $err ( @err) {
-	printf \*STDOUT, "sub \%s () \{ \%d \}\n",$err,%err{?$err};
+	printf $out, "sub \%s () \{ \%d \}\n",$err,%err{?$err};
     }
 
-    print \*STDOUT, <<'ESQ';
+    print $out, <<'ESQ';
 my %name2no = %(
 ESQ
 
     foreach my $err ( @err) {
-	printf \*STDOUT, "    \%s => \%d,\n",$err,%err{?$err};
+	printf $out, "    \%s => \%d,\n",$err,%err{?$err};
     }
 
-    print \*STDOUT, <<'ESQ';
+    print $out, <<'ESQ';
 );
 ESQ
 
-    print \*STDOUT, <<'ESQ';
+    print $out, <<'ESQ';
 
 1;
 __END__

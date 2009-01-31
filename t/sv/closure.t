@@ -253,15 +253,15 @@ END_MARK_ONE
 END_MARK_TWO
 
                 $code .= <<"END_MARK_THREE"; # Backwhack a lot!
-    print "not ok: got unexpected warning \$msg\\n";
+    print \*STDOUT, "not ok: got unexpected warning \$msg\\n";
 \} \}
 
 do \{
     my \$test = $test;
     sub test (&) \{
       my \$ok = &\{\@_[0]\};
-      print \$ok ?? "ok \$test\n" !! "not ok \$test\n";
-      printf "# Failed at line \\\%d\n", @(caller)[2] unless \$ok;
+      print \*STDOUT, \$ok ?? "ok \$test\n" !! "not ok \$test\n";
+      printf \*STDOUT, "# Failed at line \\\%d\n", @(caller)[2] unless \$ok;
       \$test++;
     \}
 \};
@@ -640,7 +640,7 @@ do {
     my $progfile = "b23265.pl";
     open(my $t, ">", "$progfile") or die "$^PROGRAM_NAME: $^OS_ERROR\n";
     print  $t  ,<< '__EOF__';
-        print
+        print \*STDOUT,
             sub {@_[0]->(<@_)} -> (
                 sub {
                     @_[1]
@@ -663,7 +663,7 @@ do {
     # savestack, due to the early freeing of the anon closure
 
     my $got = runperl(stderr => 1, prog => 
-                        'sub d {die} my $f; $f = sub {my $x=1; $f = 0; d}; try{$f->()}; print qq(ok\n)'
+                        'sub d {die} my $f; $f = sub {my $x=1; $f = 0; d}; try{$f->()}; print \*STDOUT, qq(ok\n)'
                     );
     test { $got eq "ok\n" };
 };

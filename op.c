@@ -4503,11 +4503,10 @@ Perl_ck_fun(pTHX_ OP *o)
 		break;
 	    case OA_FILEREF:
 		if (kid->op_type != OP_GV && kid->op_type != OP_RV2GV) {
-		    if (kid->op_type == OP_CONST &&
-			(kid->op_private & OPpCONST_BARE))
+		    if (kid->op_type == OP_CONST)
 		    {
 			Perl_croak_at(aTHX_ kid->op_location,
-			    "Bareword not allowed as fileref");
+			    "%s not allowed as fileref", OP_DESC(kid));
 			OP * const newop = newGVOP(OP_GV, 0,
 						   gv_fetchsv(((SVOP*)kid)->op_sv, GV_ADD, SVt_PVIO), kid->op_location);
 			if (!(o->op_private & 1) && /* if not unop */

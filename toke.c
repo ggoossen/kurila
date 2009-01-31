@@ -957,10 +957,10 @@ S_skipspace(pTHX_ register char *s)
 	    if (PL_minus_p) {
 #ifdef PERL_MAD
 		sv_catpvs(PL_linestr,
-			 ";}continue{print or die qq(-p destination: $^OS_ERROR\\n);}");
+			 ";}continue{print \\*STDOUT, $_ or die qq(-p destination: $^OS_ERROR\\n);}");
 #else
 		sv_setpvs(PL_linestr,
-			 ";}continue{print or die qq(-p destination: $^OS_ERROR\\n);}");
+			 ";}continue{print \\*STDOUT, $_ or die qq(-p destination: $^OS_ERROR\\n);}");
 #endif
 		PL_minus_n = PL_minus_p = 0;
 	    }
@@ -2891,7 +2891,7 @@ Perl_yylex(pTHX)
 			PL_faketokens = 1;
 #endif
 		    if (PL_minus_p)
-			sv_setpvs(PL_linestr, ";}continue{print;}");
+			sv_setpvs(PL_linestr, ";}continue{print \\*STDOUT, $_;}");
 		    else
 			sv_setpvs(PL_linestr, ";}");
 		    PL_oldoldbufptr = PL_oldbufptr = s = PL_linestart = SvPVX_mutable(PL_linestr);
@@ -9234,21 +9234,10 @@ S_checkcomma(pTHX_ const char *s, const char *name, const char *what)
     while (s < PL_bufend && isSPACE(*s))
 	s++;
     if (isIDFIRST_lazy_if(s,UTF)) {
-	const char * const w = s++;
 	while (isALNUM_lazy_if(s,UTF))
 	    s++;
 	while (s < PL_bufend && isSPACE(*s))
 	    s++;
-/* 	if (*s == ',') { */
-/* 	    GV* gv; */
-/* 	    if (keyword(w, s - w)) */
-/* 		return; */
-
-/* 	    gv = gv_fetchpvn_flags(w, s - w, 0, SVt_PVCV); */
-/* 	    if (gv && GvCVu(gv)) */
-/* 		return; */
-/* 	    Perl_croak(aTHX_ "No comma allowed after %s", what); */
-/* 	} */
     }
 }
 

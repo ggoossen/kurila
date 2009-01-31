@@ -17,7 +17,7 @@ else {print \*STDOUT, "not ok 1\n";}
 
 # check `` processing
 
-$x = `$^EXECUTABLE_NAME -le "print 'hi there'"`;
+$x = `$^EXECUTABLE_NAME -le "print \\*STDOUT, 'hi there'"`;
 if ($x eq "hi there\n") {print \*STDOUT, "ok 2\n";} else {print \*STDOUT, "not ok 2\n";}
 
 # check $#array

@@ -7,7 +7,7 @@ use TestInit;
 use Config;
 
 BEGIN {
-    print "1..0 # TODO Skip: Adjust for kurila\n";
+    print \*STDOUT, "1..0 # TODO Skip: Adjust for kurila\n";
     exit 0;
 }
 
