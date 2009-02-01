@@ -106,7 +106,6 @@ sub process_file {
   $Overload = 0;
   $errors = 0;
   $Fallback = '&PL_sv_undef';
-  $output_fh = %args{output};
 
   # Most of the 1500 lines below uses these globals.  We'll have to
   # clean this up sometime, probably.  For now, we just pull them out
@@ -137,10 +136,12 @@ sub process_file {
   # Open the output file if given as a string.  If they provide some
   # other kind of reference, trust them that we can print to it.
   if (not ref %args{?output}) {
-    open my($fh), ">", "%args{?output}" or die "Can't create %args{?output}: $^OS_ERROR";
-    %args{+outfile} = %args{?output};
-    %args{+output} = $fh;
+      open my($fh), ">", "%args{?output}" or die "Can't create %args{?output}: $^OS_ERROR";
+      %args{+outfile} = %args{?output};
+      %args{+output} = $fh;
   }
+
+  $output_fh = %args{output};
 
   # Really, we shouldn't have to chdir() or select() in the first
   # place.  For now, just save & restore.
