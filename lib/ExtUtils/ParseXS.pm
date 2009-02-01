@@ -303,7 +303,8 @@ firstmodule:
 	  # concatenated until 2 steps later, so we are safe.
 	  #     - Nicholas Clark
 	  print($output_fh, "#if 0\n  \"Skipped embedded POD.\"\n#endif\n");
-	  printf($output_fh, "#line \%d \"$filepathname\"\n", iohandle::input_line_number($FH) + 1)
+	  print($output_fh, "#line " . (iohandle::input_line_number($FH) + 1)
+                  . " \"$filepathname\"\n")
 	    if $WantLineNumbers;
 	  next firstmodule
 	}
@@ -1139,7 +1140,7 @@ sub CASE_handler {
     if $condnum && $cond eq '';
   $cond = $_;
   TrimWhitespace($cond);
-  print $output_fh, "   ", ($condnum++ ?? " else" !! ""), ($cond ?? " if ($cond)\n" !! "\n");
+  print $output_fh, "   " . ($condnum++ ?? " else" !! "") . ($cond ?? " if ($cond)\n" !! "\n");
   $_ = '' ;
 }
 
