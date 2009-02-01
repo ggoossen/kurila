@@ -1938,10 +1938,10 @@ sub WRITE {
     $self->{+buffer} .= $buf;
     while ($self->{+buffer} =~ s/^([^\n]*\n)//) {
         my $line = $1;
+        $length += length($line);
         ++ $self->{+line_no};
         $line =~ s|^\#line\s+---(?=\s)|#line $self->{?line_no}|;
         print $self->{?fh}, $line;
-        $length += length($line);
     }
     return $length;
 }
