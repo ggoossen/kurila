@@ -332,7 +332,7 @@ firstmodule:
 #endif
 
 EOF
-  print $output_fh, 'ExtUtils::ParseXS::CountLines'->end_marker, "\n" if $WantLineNumbers;
+  print $output_fh, 'ExtUtils::ParseXS::CountLines'->end_marker . "\n" if $WantLineNumbers;
 
   $lastline    = $line;
   $lastline_no = iohandle::input_line_number($FH);
