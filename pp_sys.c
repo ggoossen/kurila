@@ -927,6 +927,9 @@ PP(pp_prtf)
     SV *sv;
 
     GV * const gv = (GV*)*++MARK;
+    if ( ! isGV(gv) )
+	Perl_croak(aTHX_ "First argument to %s must be a filehandle but a %s",
+	    OP_DESC(PL_op), Ddesc((SV*)gv));
 
     sv = newSV(0);
     if (!(io = GvIO(gv))) {
