@@ -57,7 +57,7 @@ __END__
 our $cusp = ^~^0 ^^^ (^~^0 >> 1);
 use integer;
 $^OUTPUT_FIELD_SEPARATOR = " ";
-print( ($cusp - 1) % 8, $cusp % 8, -$cusp % 8, 8 ^|^ (($cusp + 1) % 8 + 7), "!\n");
+print(\*STDOUT, ($cusp - 1) % 8, $cusp % 8, -$cusp % 8, 8 ^|^ (($cusp + 1) % 8 + 7), "!\n");
 EXPECT
 7 0 0 8 !
 ########
@@ -73,21 +73,21 @@ BEGIN
 our @array;
 @array[+128]=1
 ########
-our $x=0x0eabcd; print $x->ref;
+our $x=0x0eabcd; print \*STDOUT, $x->ref;
 EXPECT
-Can't locate object method "ref" via package "961485" (perhaps you forgot to load "961485"?) at - line 1 character 26.
+Can't locate object method "ref" via package "961485" (perhaps you forgot to load "961485"?) at - line 1 character 36.
 ########
 our $str;
 chop ($str .= ~< *DATA);
 ########
 our ($x, $y);
-$x=2;$y=3;$x+<$y ?? $x !! $y += 23;print $x;
+$x=2;$y=3;$x+<$y ?? $x !! $y += 23;print \*STDOUT, $x;
 EXPECT
 25
 ########
-eval 'sub bar {print "In bar"}';
+eval 'sub bar {print \*STDOUT, "In bar"}';
 ########
-system './perl -ne "print if eof" /dev/null' unless $^OS_NAME eq 'MacOS'
+system q[./perl -ne 'print \\*STDOUT, $_ if eof' /dev/null] unless $^OS_NAME eq 'MacOS'
 ########
 our $file;
 chop($file = ~< *DATA);
@@ -96,12 +96,12 @@ package N;
 sub new {my @($obj,$n)=@_; bless \$n}  
 our $aa=N->new(1);
 $aa=12345;
-print $aa;
+print \*STDOUT, $aa;
 EXPECT
 12345
 ########
 $_="foo";
-printf({\*STDOUT} "\%s\n", $_);
+printf(\*STDOUT, "\%s\n", $_);
 EXPECT
 foo
 ########
@@ -112,7 +112,7 @@ quotemeta ""
 ########
 $_="foo";
 s/.{1}//s;
-print;
+print \*STDOUT, $_;
 EXPECT
 oo
 ########
@@ -130,7 +130,7 @@ BEGIN { undef = 0 }
 EXPECT
 Can't assign to undef operator at - line 1 character 9.
 ########
-my @a; @a[+2] = 1; for (@a) { $_ = 2 } print join(' ', @a) . "\n"
+my @a; @a[+2] = 1; for (@a) { $_ = 2 } print \*STDOUT, join(' ', @a) . "\n"
 EXPECT
 2 2 2
 ########
@@ -139,36 +139,36 @@ EXPECT
 foo(2+>1);
 sub foo { bar() for @_;  }
 sub bar { local $_; }
-print "ok\n";
+print \*STDOUT, "ok\n";
 EXPECT
 ok
 ########
-print "ok\n" if ("\0" cmp "\x[FF]") +< 0;
+print \*STDOUT, "ok\n" if ("\0" cmp "\x[FF]") +< 0;
 EXPECT
 ok
 ########
 open(my $h,"<",$^OS_NAME eq 'MacOS' ?? ':run:fresh_perl.t' !! 'run/fresh_perl.t'); # must be in the 't' directory
 stat($h);
-print "ok\n" if (-e _ and -f _ and -r _);
+print \*STDOUT, "ok\n" if (-e _ and -f _ and -r _);
 EXPECT
 ok
 ########
 my $a = 'outer';
-eval q[ my $a = 'inner'; eval q[ print "$a " ] ];
-try { my $x = 'peace'; eval q[ print "$x\n" ] }
+eval q[ my $a = 'inner'; eval q[ print \*STDOUT, "$a " ] ];
+try { my $x = 'peace'; eval q[ print \*STDOUT, "$x\n" ] }
 EXPECT
 inner peace
 ########
 our $s = 0;
 map {#this newline here tickles the bug
 $s += $_} @(1,2,4);
-print "eat flaming death\n" unless ($s == 7);
+print \*STDOUT, "eat flaming death\n" unless ($s == 7);
 ########
 BEGIN { @ARGV = qw(a b c d e) }
-BEGIN { print "argv <$(join ' ', @ARGV)>\nbegin <",shift(@ARGV),">\n" }
-END { print "end <",shift(@ARGV),">\nargv <$(join ' ', @ARGV)>\n" }
-INIT { print "init <",shift(@ARGV),">\n" }
-CHECK { print "check <",shift(@ARGV),">\n" }
+BEGIN { print \*STDOUT, "argv <$(join ' ', @ARGV)>\nbegin <",shift(@ARGV),">\n" }
+END { print \*STDOUT, "end <",shift(@ARGV),">\nargv <$(join ' ', @ARGV)>\n" }
+INIT { print \*STDOUT, "init <",shift(@ARGV),">\n" }
+CHECK { print \*STDOUT, "check <",shift(@ARGV),">\n" }
 EXPECT
 argv <a b c d e>
 begin <a>
@@ -181,8 +181,8 @@ argv <e>
 # fdopen from a system descriptor to a system descriptor used to close
 # the former.
 open \*STDERR, '>&=', \*STDOUT or die $^OS_ERROR;
-select \*STDOUT; $^OUTPUT_AUTOFLUSH = 1; print fileno \*STDOUT or die $^OS_ERROR;
-select \*STDERR; $^OUTPUT_AUTOFLUSH = 1; print fileno \*STDERR or die $^OS_ERROR;
+print \*STDOUT, fileno \*STDOUT or die $^OS_ERROR;
+print \*STDOUT, fileno \*STDERR or die $^OS_ERROR;
 EXPECT
 1
 2
@@ -190,7 +190,7 @@ EXPECT
 # TODO
 package X;
 sub ascalar { my $r; bless \$r }
-sub DESTROY { print "destroyed\n" };
+sub DESTROY { print \*STDOUT, "destroyed\n" };
 package main;
 *s = X->ascalar();
 EXPECT
@@ -199,7 +199,7 @@ destroyed
 # TODO
 package X;
 sub anarray { bless \@() }
-sub DESTROY { print "destroyed\n" };
+sub DESTROY { print \*STDOUT, "destroyed\n" };
 package main;
 *a = X->anarray();
 EXPECT
@@ -208,7 +208,7 @@ destroyed
 # TODO
 package X;
 sub ahash { bless \%() }
-sub DESTROY { print "destroyed\n" };
+sub DESTROY { print \*STDOUT, "destroyed\n" };
 package main;
 *h = X->ahash();
 EXPECT
@@ -217,7 +217,7 @@ destroyed
 # TODO
 package X;
 sub aclosure { my $x; bless sub { ++$x } }
-sub DESTROY { print "destroyed\n" };
+sub DESTROY { print \*STDOUT, "destroyed\n" };
 package main;
 *c = X->aclosure;
 EXPECT
@@ -229,9 +229,9 @@ sub any { bless \%() }
 my $f = "FH000"; # just to thwart any future optimisations
 sub afh { select select *{Symbol::fetch_glob(++$f)};
           my $r = *{Symbol::fetch_glob($f)}{IO}; delete Symbol::stash('X')->{$f}; bless $r }
-sub DESTROY { print "destroyed\n" }
+sub DESTROY { print \*STDOUT, "destroyed\n" }
 package main;
-print "start\n";
+print \*STDOUT, "start\n";
 our $x = X->any(); # to bump sv_objcount. IO objs aren't counted??
 *f = X->afh();
 EXPECT
@@ -243,7 +243,7 @@ destroyed
 BEGIN {
   $^OUTPUT_AUTOFLUSH = 1;
   $^WARN_HOOK = sub {
-    try { print @_[0]->{description} };
+    try { print \*STDOUT, @_[0]->{description} };
     die "bar";
   };
   warn "foo\n";
@@ -262,22 +262,22 @@ sub re {
 EXPECT
 ########
 my $foo = "ZZZ\n";
-END { print $foo }
+END { print \*STDOUT, $foo }
 EXPECT
 ZZZ
 ########
 eval '
 my $foo = "ZZZ\n";
-END { print $foo }
+END { print \*STDOUT, $foo }
 ';
 EXPECT
 ZZZ
 ########
 -w
-if (@ARGV) { print "" }
+if (@ARGV) { print \*STDOUT, "" }
 else {
   our $x;
-  if ($x == 0) { print "" } else { print $x }
+  if ($x == 0) { print \*STDOUT, "" } else { print \*STDOUT, $x }
 }
 EXPECT
 Use of uninitialized value $main::x in numeric eq (==) at - line 4 character 10.
@@ -285,7 +285,7 @@ Use of uninitialized value $main::x in numeric eq (==) at - line 4 character 10.
 our $x = sub {};
 foo();
 sub foo { try { return }; }
-print "ok\n";
+print \*STDOUT, "ok\n";
 EXPECT
 ok
 ########
@@ -297,7 +297,7 @@ EXPECT
 Modification of a read-only value attempted at - line 2 character 11.
     main::M called at - line 4 character 1.
 ########
-print < qw(ab a\b a\\b);
+print \*STDOUT, < qw(ab a\b a\\b);
 EXPECT
 aba\ba\\b
 ########
@@ -306,10 +306,10 @@ aba\ba\\b
 our $foo;
 sub myeval { eval @_[0] }
 $foo = "ok 2\n";
-myeval('sub foo { local $foo = "ok 1\n"; print $foo; }');
+myeval('sub foo { local $foo = "ok 1\n"; print \*STDOUT, $foo; }');
 die $^EVAL_ERROR if $^EVAL_ERROR;
 foo();
-print $foo;
+print \*STDOUT, $foo;
 EXPECT
 ok 1
 ok 2
@@ -319,7 +319,7 @@ ok 2
 eval <<'EOT'; die $^EVAL_ERROR if $^EVAL_ERROR;
 do {
     my $X = "ok\n";
-    eval 'sub Y { print $X }'; die $^EVAL_ERROR if $^EVAL_ERROR;
+    eval 'sub Y { print \*STDOUT, $X }'; die $^EVAL_ERROR if $^EVAL_ERROR;
     Y();
 };
 EOT
@@ -346,16 +346,16 @@ my @h = 1 .. 10;
 bad(<@h);
 sub bad {
    undef @h;
-   print "O";
-   print for @_;
-   print "K";
+   print \*STDOUT, "O";
+   print \*STDOUT, $_ for @_;
+   print \*STDOUT, "K";
 }
 EXPECT
 O12345678910K
 ########
 # Bug 20010506.041
 use utf8;
-"abcd\x{1234}" =~ m/(a)(b[c])(d+)?/i and print "ok\n";
+"abcd\x{1234}" =~ m/(a)(b[c])(d+)?/i and print \*STDOUT, "ok\n";
 EXPECT
 ok
 ######## (?{...}) compilation bounces on PL_rs
@@ -365,17 +365,17 @@ do {
   m/(?{ $x })/;
   # {
 };
-BEGIN { print "ok\n" }
+BEGIN { print \*STDOUT, "ok\n" }
 EXPECT
 ok
 ######## scalar ref to file test operator segfaults on 5.6.1 [ID 20011127.155]
 # This only happens if the filename is 11 characters or less.
 my $foo = \-f "blah";
-print "ok" if ref $foo && !$$foo;
+print \*STDOUT, "ok" if ref $foo && !$$foo;
 EXPECT
 ok
 ######## [ID 20011128.159] 'X' =~ m/\X/ segfault in 5.6.1
-print "ok" if 'X' =~ m/\X/;
+print \*STDOUT, "ok" if 'X' =~ m/\X/;
 EXPECT
 ok
 ######## example from Camel 5, ch. 15, pp.406 (with my)
@@ -383,7 +383,7 @@ ok
 use utf8;
 my $人 = 2; # 0xe4 0xba 0xba: U+4eba, "human" in CJK ideograph
 $人++; # a child is born
-print $人, "\n";
+print \*STDOUT, $人, "\n";
 EXPECT
 3
 ######## example from Camel 5, ch. 15, pp.406 (with our)
@@ -391,7 +391,7 @@ EXPECT
 use utf8;
 our $人 = 2; # 0xe4 0xba 0xba: U+4eba, "human" in CJK ideograph
 $人++; # a child is born
-print $人, "\n";
+print \*STDOUT, $人, "\n";
 EXPECT
 3
 ######## example from Camel 5, ch. 15, pp.406 (with package vars)
@@ -399,7 +399,7 @@ EXPECT
 use utf8;
 our $人 = 2; # 0xe4 0xba 0xba: U+4eba, "human" in CJK ideograph
 $人++; # a child is born
-print $人, "\n";
+print \*STDOUT, $人, "\n";
 EXPECT
 3
 ########
@@ -410,7 +410,7 @@ our $code = eval q[
   sub { eval '$x = "ok 1\n"'; }
 ];
 &{$code}();
-print $x;
+print \*STDOUT, $x;
 EXPECT
 ok 1
 ######## [ID 20020623.009] nested eval/sub segfaults

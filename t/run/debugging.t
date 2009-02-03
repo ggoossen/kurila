@@ -9,14 +9,13 @@ BEGIN {
 BEGIN {
     require Config;
     if (Config::config_value('ccflags') !~ m/-DDEBUGGING\b/) {
-        print \*STDOUT, "1..0 # Skip -- Perl built w/o -DDEBUGGING\n";
-        exit 0;
+        skip_all("Perl built w/o -DDEBUGGING");
     }
 }
 
 plan(tests => 1);
 
-my $result = runperl( prog	=> 'print "foo"',
+my $result = runperl( prog	=> 'print \*STDOUT, "foo"',
 		       args	=> \@( '-Dx' ),
 		       stderr	=> 1,
 		       );
@@ -40,20 +39,39 @@ my $refdump = <<'EO_DX_OUT';
         PACKAGE = "main"
     }
     {
-6       TYPE = print  ===> 1
+10      TYPE = print  ===> 1
         LOCATION = -e 1 1 
         FLAGS = (VOID,KIDS)
         {
 4           TYPE = pushmark  ===> 5
-            LOCATION = -e 1 1 
+            LOCATION = -e 1 6 
             FLAGS = (SCALAR)
         }
         {
-5           TYPE = const  ===> 6
-            LOCATION = -e 1 12 
-            TARG = 1@THR
+8           TYPE = rv2gv  ===> 9
+            LOCATION = -e 1 6 
+            FLAGS = (SCALAR,KIDS,SPECIAL)
+            {
+7               TYPE = srefgen  ===> 8
+                LOCATION = -e 1 6 
+                FLAGS = (SCALAR,KIDS)
+                {
+6                   TYPE = rv2gv  ===> 7
+                    LOCATION = -e 1 8 
+                    FLAGS = (SCALAR,KIDS,REF,MOD)
+                    {
+5                       TYPE = gv  ===> 6
+                        LOCATION = -e 1 8 
+                        FLAGS = (SCALAR)
+                    }
+                }
+            }
+        }
+        {
+9           TYPE = const  ===> 10
+            LOCATION = -e 1 22 
             FLAGS = (SCALAR)
-            SV = PV("foo"\0) [UTF8 "foo"]@NO_THR
+            SV = PV("foo"\0) [UTF8 "foo"]
         }
     }
 }
