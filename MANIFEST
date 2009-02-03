@@ -1363,9 +1363,6 @@ lib/Pod/t/utils.t		Test for Pod::ParseUtils
 lib/Pod/Usage.pm		Pod-Parser - print usage messages
 lib/Search/Dict.pm		Perform binary search on dictionaries
 lib/Search/Dict.t		See if Search::Dict works
-lib/SelectSaver.pm		Enforce proper select scoping
-lib/SelectSaver.t		See if SelectSaver works
-lib/SelectSaver.t		See if SelectSaver works
 lib/signals.pm			For handling signals
 lib/signals.t			See if signals works
 lib/sigtrap.pm			For trapping an abort and giving traceback
