@@ -246,7 +246,6 @@ Derived from FileHandle.pm by Graham Barr E<lt>F<gbarr@pobox.com>E<gt>
 
 our($VERSION, @EXPORT_OK, @ISA);
 use Symbol;
-use SelectSaver;
 use IO ();	# Load the XS module
 
 require Exporter;
@@ -428,10 +427,10 @@ sub stat {
 ##
 
 sub autoflush {
-    my $old = SelectSaver->new( qualify(@_[0], caller));
-    my $prev = $^OUTPUT_AUTOFLUSH;
-    $^OUTPUT_AUTOFLUSH = (nelems @_) +> 1 ?? @_[1] !! 1;
-    $prev;
+    my $fh = shift;
+    my $prev = iohandle::output_autoflush($fh);
+    iohandle::output_autoflush($fh, @_ ?? @_[1] !! 1);
+    return $prev;
 }
 
 sub output_field_separator {
@@ -493,19 +492,12 @@ sub constant {
 }
 
 
-# so that flush.pl can be deprecated
-
 sub printflush {
     my $io = shift;
-    my $old;
-    $old = SelectSaver->new( < qualify($io, caller)) if ref($io);
-    local $^OUTPUT_AUTOFLUSH = 1;
-    if(ref($io)) {
-        print $io, < @_;
-    }
-    else {
-	print \*STDOUT, < @_;
-    }
+    my $prev_autoflush = iohandle::output_autoflush($io, 1);
+    print $io, < @_;
+    iohandle::output_autoflush($io, $prev_autoflush);
+    return;
 }
 
 1;

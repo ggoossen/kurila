@@ -698,7 +698,7 @@ PP(pp_binmode)
     }
 }
 
-PP(pp_sselect)
+PP(pp_select)
 {
 #ifdef HAS_SELECT
     dVAR; dSP; dTARGET;
@@ -870,25 +870,6 @@ Perl_setdefout(pTHX_ GV *gv)
     if (PL_defoutgv)
 	GvREFCNT_dec(PL_defoutgv);
     PL_defoutgv = gv;
-}
-
-PP(pp_select)
-{
-    dVAR; dSP;
-    GV * const newdefout = (PL_op->op_private > 0) ? ((GV *) POPs) : NULL;
-    GV * egv = GvEGV(PL_defoutgv);
-
-    if (!egv)
-	egv = PL_defoutgv;
-    XPUSHs( egv ? sv_2mortal(newRV_inc((SV*)egv)) : &PL_sv_undef );
-
-    if (newdefout) {
-	if (!GvIO(newdefout))
-	    gv_IOadd(newdefout);
-	setdefout(newdefout);
-    }
-
-    RETURN;
 }
 
 PP(pp_getc)

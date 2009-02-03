@@ -37,7 +37,6 @@ Perl_ck_return
 Perl_ck_rfun
 Perl_ck_rvconst
 Perl_ck_sassign
-Perl_ck_select
 Perl_ck_shift
 Perl_ck_sort
 Perl_ck_split
@@ -245,7 +244,6 @@ Perl_pp_pipe_op
 Perl_pp_fileno
 Perl_pp_umask
 Perl_pp_binmode
-Perl_pp_sselect
 Perl_pp_select
 Perl_pp_getc
 Perl_pp_read

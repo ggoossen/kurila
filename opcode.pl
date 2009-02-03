@@ -11,7 +11,6 @@ my $opcode_new = 'opcode.h-new';
 my $opname_new = 'opnames.h-new';
 my $oc = safer_open($opcode_new);
 my $on = safer_open($opname_new);
-select $oc;
 
 # Read data.
 
@@ -98,7 +97,7 @@ while (@raw_alias) {
 
 # Emit defines.
 
-print <<"END";
+print $oc, <<"END";
 /* -*- buffer-read-only: t -*-
  *
  *    opcode.h
@@ -125,7 +124,7 @@ PERL_PPDEF(Perl_unimplemented_op)
 
 END
 
-print $on <<"END";
+print $on, <<"END";
 /* -*- buffer-read-only: t -*-
  *
  *    opnames.h
@@ -147,18 +146,18 @@ END
 
 my $i = 0;
 for ( @ops) {
-    # print $on "\t", &tab(3,"OP_\U$_,"), "/* ", $i++, " */\n";
-      print $on "\t", &tab(3,"OP_\U$_"), " = ", $i++, ",\n";
+    # print $on, "\t", &tab(3,"OP_\U$_,"), "/* ", $i++, " */\n";
+      print $on, "\t", &tab(3,"OP_\U$_"), " = ", $i++, ",\n";
 }
-print $on "\t", &tab(3,"OP_max"), "\n";
-print $on "\} opcode;\n";
-print $on "\n#define MAXO ", scalar nelems @ops, "\n";
-print $on "#define OP_phoney_INPUT_ONLY -1\n";
-print $on "#define OP_phoney_OUTPUT_ONLY -2\n\n";
+print $on, "\t", &tab(3,"OP_max"), "\n";
+print $on, "\} opcode;\n";
+print $on, "\n#define MAXO ", scalar nelems @ops, "\n";
+print $on, "#define OP_phoney_INPUT_ONLY -1\n";
+print $on, "#define OP_phoney_OUTPUT_ONLY -2\n\n";
 
 # Emit op names and descriptions.
 
-print <<END;
+print $oc, <<END;
 START_EXTERN_C
 
 #define OP_NAME(o) ((o)->op_type == OP_CUSTOM ? custom_op_name(o) : \\
@@ -174,17 +173,17 @@ EXTCONST char* const PL_op_name[] = \{
 END
 
 for ( @ops) {
-    print qq(\t"$_",\n);
+    print $oc, qq(\t"$_",\n);
 }
 
-print <<END;
+print $oc, <<END;
 \tNULL,\n
 \};
 #endif
 
 END
 
-print <<END;
+print $oc, <<END;
 #ifndef DOINIT
 EXTCONST char* const PL_op_desc[];
 #else
@@ -197,10 +196,10 @@ for ( @ops) {
     # Have to escape double quotes and escape characters.
     $safe_desc =~ s/(^|[^\\])([\\"])/$1\\$2/g;
 
-    print qq(\t"$safe_desc",\n);
+    print $oc, qq(\t"$safe_desc",\n);
 }
 
-print <<END;
+print $oc, <<END;
 \};
 #endif
 
@@ -223,7 +222,7 @@ END
 
 # Emit ppcode switch array.
 
-print <<END;
+print $oc, <<END;
 
 START_EXTERN_C
 
@@ -243,14 +242,14 @@ END
 
 for ( @ops) {
     if (my $name = %alias{?$_}) {
-	print "\tMEMBER_TO_FPTR($name),\t/* Perl_pp_$_ */\n";
+	print $oc, "\tMEMBER_TO_FPTR($name),\t/* Perl_pp_$_ */\n";
     }
     else {
-	print "\tMEMBER_TO_FPTR(Perl_pp_$_),\n";
+	print $oc, "\tMEMBER_TO_FPTR(Perl_pp_$_),\n";
     }
 }
 
-print <<END;
+print $oc, <<END;
 \}
 #endif
 #ifdef PERL_PPADDR_INITED
@@ -261,7 +260,7 @@ END
 
 # Emit check routines.
 
-print <<END;
+print $oc, <<END;
 #ifdef PERL_GLOBAL_STRUCT_INIT
 #  define PERL_CHECK_INITED
 static const Perl_check_t Gcheck[]
@@ -277,10 +276,10 @@ EXT Perl_check_t PL_check[] /* or perlvars.h */
 END
 
 for ( @ops) {
-    print "\t", tab(3, "MEMBER_TO_FPTR(Perl_%check{?$_}),"), "\t/* $_ */\n";
+    print $oc, "\t", tab(3, "MEMBER_TO_FPTR(Perl_%check{?$_}),"), "\t/* $_ */\n";
 }
 
-print <<END;
+print $oc, <<END;
 \}
 #endif
 #ifdef PERL_CHECK_INITED
@@ -293,7 +292,7 @@ END
 
 my $ARGBITS = 32;
 
-print <<END;
+print $oc, <<END;
 #ifndef PERL_GLOBAL_STRUCT_INIT
 
 #ifndef DOINIT
@@ -378,10 +377,10 @@ for my $op ( @ops) {
 	$argshift += 4;
     }
     $argsum = sprintf("0x\%08x", $argsum);
-    print "\t",  tab(3, "$argsum,"), "/* $op */\n";
+    print $oc, "\t",  tab(3, "$argsum,"), "/* $op */\n";
 }
 
-print <<END;
+print $oc, <<END;
 \};
 #endif
 
@@ -393,7 +392,7 @@ END
 
 # Emit OP_IS_* macros
 
-print $on <<EO_OP_IS_COMMENT;
+print $on, <<EO_OP_IS_COMMENT;
 
 /* the OP_IS_(SOCKET|FILETEST) macros are optimized to a simple range
     check because all the member OPs are contiguous in opcode.pl
@@ -417,25 +416,25 @@ sub gen_op_is_macro {
 	my $last = pop @rest;	# @rest slurped, get its last
 	die "Invalid range of ops: $first .. $last\n" unless $last;
 
-	print $on "#define $macname(op)	\\\n\t(";
+	print $on, "#define $macname(op)	\\\n\t(";
 
 	# verify that op-ct matches 1st..last range (and fencepost)
 	# (we know there are no dups)
 	if ( $op_is->{?$last} - $op_is->{?$first} == scalar (nelems @rest) + 1) {
 	    
 	    # contiguous ops -> optimized version
-	    print $on "(op) >= OP_" . uc($first) . " && (op) <= OP_" . uc($last);
-	    print $on ")\n\n";
+	    print $on, "(op) >= OP_" . uc($first) . " && (op) <= OP_" . uc($last);
+	    print $on, ")\n\n";
 	}
 	else {
-	    print $on join(" || \\\n\t ", map { "(op) == OP_" . uc() } sort keys %$op_is);
-	    print $on ")\n\n";
+	    print $on, join(" || \\\n\t ", map { "(op) == OP_" . uc() } sort keys %$op_is);
+	    print $on, ")\n\n";
 	}
     }
 }
 
-print $oc "/* ex: set ro: */\n";
-print $on "/* ex: set ro: */\n";
+print $oc, "/* ex: set ro: */\n";
+print $on, "/* ex: set ro: */\n";
 
 safer_close($oc);
 safer_close($on);
@@ -449,7 +448,7 @@ my $pp_sym_new  = 'pp.sym-new';
 my $pp = safer_open($pp_proto_new);
 my $ppsym = safer_open($pp_sym_new);
 
-print $pp <<"END";
+print $pp, <<"END";
 /* -*- buffer-read-only: t -*-
    !!!!!!!   DO NOT EDIT THIS FILE   !!!!!!!
    This file is built by opcode.pl from its data.  Any changes made here
@@ -458,7 +457,7 @@ print $pp <<"END";
 
 END
 
-print $ppsym <<"END";
+print $ppsym, <<"END";
 # -*- buffer-read-only: t -*-
 #
 # !!!!!!!   DO NOT EDIT THIS FILE   !!!!!!!
@@ -470,21 +469,21 @@ END
 
 
 for (sort keys %ckname) {
-    print $pp "PERL_CKDEF(Perl_$_)\n";
-    print $ppsym "Perl_$_\n";
+    print $pp, "PERL_CKDEF(Perl_$_)\n";
+    print $ppsym, "Perl_$_\n";
 #OP *\t", &tab(3,$_),"(OP* o);\n";
 }
 
-print $pp "\n\n";
+print $pp, "\n\n";
 
 for ( @ops) {
     next if m/^i_(pre|post)(inc|dec)$/;
     next if m/^custom$/;
-    print $pp "PERL_PPDEF(Perl_pp_$_)\n";
-    print $ppsym "Perl_pp_$_\n";
+    print $pp, "PERL_PPDEF(Perl_pp_$_)\n";
+    print $ppsym, "Perl_pp_$_\n";
 }
-print $pp "\n/* ex: set ro: */\n";
-print $ppsym "\n# ex: set ro:\n";
+print $pp, "\n/* ex: set ro: */\n";
+print $ppsym, "\n# ex: set ro:\n";
 
 safer_close($pp);
 safer_close($ppsym);
@@ -877,8 +876,7 @@ fileno		fileno			ck_fun		ist%	F
 umask		umask			ck_fun		ist%	S?
 binmode		binmode			ck_fun		s@	F S?
 
-sselect		select system call	ck_select	t@	S S S S
-select		select			ck_select	st@	F?
+select		select system call	ck_fun	t@	S S S S
 
 getc		getc			ck_eof		st%	F?
 read		read			ck_fun		imst@	F R S S?

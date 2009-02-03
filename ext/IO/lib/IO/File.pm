@@ -126,7 +126,6 @@ Derived from FileHandle.pm by Graham Barr E<lt>F<gbarr@pobox.com>E<gt>.
 
 our($VERSION, @EXPORT, @EXPORT_OK, @ISA);
 use Symbol;
-use SelectSaver;
 use IO::Seekable;
 use File::Spec;
 

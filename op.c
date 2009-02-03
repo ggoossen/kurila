@@ -5207,28 +5207,6 @@ Perl_ck_return(pTHX_ OP *o)
 }
 
 OP *
-Perl_ck_select(pTHX_ OP *o)
-{
-    dVAR;
-    OP* kid;
-
-    PERL_ARGS_ASSERT_CK_SELECT;
-
-    if (o->op_flags & OPf_KIDS) {
-	kid = cLISTOPo->op_first->op_sibling;	/* get past pushmark */
-	if (kid && kid->op_sibling) {
-	    o->op_type = OP_SSELECT;
-	    o->op_ppaddr = PL_ppaddr[OP_SSELECT];
-	    o = ck_fun(o);
-	    return fold_constants(o);
-	}
-    }
-    o = ck_fun(o);
-    kid = cLISTOPo->op_first->op_sibling;    /* get past pushmark */
-    return o;
-}
-
-OP *
 Perl_ck_shift(pTHX_ OP *o)
 {
     dVAR;

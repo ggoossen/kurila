@@ -120,7 +120,7 @@ sub gensym () {
 sub geniosym () {
     my $sym = gensym();
     # force the IO slot to be filled
-    select(select $sym);
+    open $sym;
     *$sym{IO};
 }
 

@@ -236,7 +236,6 @@ EXTCONST char* const PL_op_name[] = {
 	"fileno",
 	"umask",
 	"binmode",
-	"sselect",
 	"select",
 	"getc",
 	"read",
@@ -595,7 +594,6 @@ EXTCONST char* const PL_op_desc[] = {
 	"umask",
 	"binmode",
 	"select system call",
-	"select",
 	"getc",
 	"read",
 	"printf",
@@ -964,7 +962,6 @@ EXT Perl_ppaddr_t PL_ppaddr[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_pp_fileno),
 	MEMBER_TO_FPTR(Perl_pp_umask),
 	MEMBER_TO_FPTR(Perl_pp_binmode),
-	MEMBER_TO_FPTR(Perl_pp_sselect),
 	MEMBER_TO_FPTR(Perl_pp_select),
 	MEMBER_TO_FPTR(Perl_pp_getc),
 	MEMBER_TO_FPTR(Perl_pp_sysread),	/* Perl_pp_read */
@@ -1331,8 +1328,7 @@ EXT Perl_check_t PL_check[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* fileno */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* umask */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* binmode */
-	MEMBER_TO_FPTR(Perl_ck_select),	/* sselect */
-	MEMBER_TO_FPTR(Perl_ck_select),	/* select */
+	MEMBER_TO_FPTR(Perl_ck_fun),	/* select */
 	MEMBER_TO_FPTR(Perl_ck_eof),	/* getc */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* read */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* prtf */
@@ -1692,8 +1688,7 @@ EXTCONST U32 PL_opargs[] = {
 	0x0000d61c,	/* fileno */
 	0x0001361c,	/* umask */
 	0x0012c804,	/* binmode */
-	0x02222808,	/* sselect */
-	0x0001c80c,	/* select */
+	0x02222808,	/* select */
 	0x0001d60c,	/* getc */
 	0x122ec81d,	/* read */
 	0x0004c815,	/* prtf */

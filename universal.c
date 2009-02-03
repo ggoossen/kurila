@@ -196,6 +196,7 @@ XS(XS_ref_address);
 XS(XS_ref_reftype);
 XS(XS_ref_svtype);
 XS(XS_iohandle_input_line_number);
+XS(XS_iohandle_output_autoflush);
 
 void
 Perl_boot_core_UNIVERSAL(pTHX)
@@ -225,7 +226,10 @@ Perl_boot_core_UNIVERSAL(pTHX)
     newXS("ref::reftype", XS_ref_reftype, file);
     newXS("ref::svtype", XS_ref_svtype, file);
 
-    newXSproto("iohandle::input_line_number", XS_iohandle_input_line_number, file, "$;$");
+    newXSproto("iohandle::input_line_number",
+	XS_iohandle_input_line_number, file, "$;$");
+    newXSproto("iohandle::output_autoflush",
+	XS_iohandle_output_autoflush, file, "$;$");
 
     boot_core_error();
     boot_core_version();
@@ -1093,6 +1097,51 @@ XS(XS_iohandle_input_line_number)
         XSRETURN_IV((IV)IoLINES(GvIOp(gv)));
     }
 }
+
+XS(XS_iohandle_output_autoflush)
+{
+    dVAR; 
+    dXSARGS;
+    PERL_UNUSED_VAR(cv);
+
+    if (items < 1 || items > 2 )
+      Perl_croak(aTHX_ "Usage: %s(%s[, %s])", "iohandle::output_autoflush", "gv", "boolean");
+
+    {
+	SV* sv = ST(0);
+        GV* gv;
+        
+	if (!SvROK(sv) || SvTYPE(SvRV(sv)) != SVt_PVGV) {
+	    XSRETURN_UNDEF;
+	}
+        gv = (GV*)(SvRV(sv));
+
+	if ( ! GvIO(gv) ) {
+	    XSRETURN_UNDEF;
+        }
+
+        if ( items == 2 ) {
+	    IO * const io = GvIOp(gv);
+	    if (SvTRUE(sv)) {
+		if (!(IoFLAGS(io) & IOf_FLUSH)) {
+		    PerlIO *ofp = IoOFP(io);
+		    if (ofp)
+			(void)PerlIO_flush(ofp);
+		    IoFLAGS(io) |= IOf_FLUSH;
+		}
+	    }
+	    else {
+		IoFLAGS(io) &= ~IOf_FLUSH;
+	    }
+        }
+	
+	if (IoFLAGS(GvIOp(gv)) & IOf_FLUSH) 
+	    XSRETURN_YES;
+	else
+	    XSRETURN_NO;
+    }
+}
+
 
 /*
  * Local variables:

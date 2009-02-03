@@ -1236,10 +1236,9 @@ sub _new_fh {
 
 
 sub _autoflush {
-    my@($fh) =@( shift);
-    my $old_fh = select $fh;
-    $^OUTPUT_AUTOFLUSH = 1;
-    select $old_fh;
+    my @($fh) = @_;
+    iohandle::output_autoflush($fh, 1);
+    return;
 }
 
 
