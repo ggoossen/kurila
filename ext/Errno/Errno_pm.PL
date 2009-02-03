@@ -14,7 +14,6 @@ my $IsMSWin32 = $^OS_NAME eq 'MSWin32' && !$IsSymbian;
 
 unlink "Errno.pm" if -f "Errno.pm";
 open my $out, ">", "Errno.pm" or die "Cannot open Errno.pm: $^OS_ERROR";
-select $out;
 my @files = get_files();
 if (config_value("gccversion") ne '' && $^OS_NAME eq 'MSWin32') {
     # MinGW complains "warning: #pragma system_header ignored outside include

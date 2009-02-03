@@ -346,7 +346,7 @@ foreach my $tbl ( @tripletable) {
     my $init = $tbl->{?init};
 
     open my $fh, ">", "$file" or die "$PACKAGE: $file can't be made";
-    binmode $fh; select $fh;
+    binmode $fh;
     my %val;
 
     print $fh ,<< 'EOF';

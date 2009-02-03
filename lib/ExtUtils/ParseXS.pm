@@ -143,10 +143,9 @@ sub process_file {
 
   $output_fh = %args{output};
 
-  # Really, we shouldn't have to chdir() or select() in the first
+  # Really, we shouldn't have to chdir() in the first
   # place.  For now, just save & restore.
   my $orig_cwd = cwd();
-  my $orig_fh = select();
   
   chdir($dir);
   my $pwd = cwd();
@@ -162,9 +161,6 @@ sub process_file {
     }
     $ExtUtils::ParseXS::CountLines::cfile = $cfile;
     binmode $output_fh, ':via(ExtUtils::ParseXS::CountLines)';
-    select $output_fh;
-  } else {
-    select $output_fh;
   }
 
   foreach my $typemap ( @tm) {
@@ -448,7 +444,6 @@ EOF
     unless $ProtoUsed ;
 
   chdir($orig_cwd);
-  select($orig_fh);
   close $FH;
 
   return 1;
