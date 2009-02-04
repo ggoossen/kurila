@@ -45,7 +45,7 @@ if (!exists &Errno::EBADF) {
 } else {
     $^OS_ERROR = 0;
     no warnings 'unopened';
-    print NONEXISTENT, "foo";
+    print \*NONEXISTENT, "foo";
     print \*STDOUT, "not " if ($^OS_ERROR != &Errno::EBADF( < @_ ));
     print \*STDOUT, "ok 19\n";
 }

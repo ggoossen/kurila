@@ -471,7 +471,7 @@ sub connect_log {
     $transmit_ok = 0;
     if ($connected) {
 	$current_proto = $proto;
-        my $old = select($syslogfh); $^OUTPUT_AUTOFLUSH = 1; select($old);
+        iohandle::output_autoflush($syslogfh, 1);
     } else {
 	@fallbackMethods = @( () );
         $err_sub->(join "\n\t- ", @( "no connection to syslog available", < @errs));

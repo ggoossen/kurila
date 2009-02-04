@@ -360,25 +360,11 @@ EOT
   print $fh, <<"EOT" or die $^OS_ERROR;
 use $package < qw($(join ' ',@$export_names));
 
-print \*STDOUT, "1..2\n";
-my \$outputfh;
-if (open \$outputfh, ">", "$output") \{
-  print \*STDOUT, "ok 1\n";
-  select \$outputfh;
-\} else \{
-  print \*STDOUT, "not ok 1 # Failed to open '$output': \$^OS_ERROR\n";
-  exit 1;
-\}
+print \\*STDOUT, "1..1\n";
+print \\*STDOUT, "ok 1\n";
+open \\*STDOUT, ">", "$output" or die "Failed to open '$output': \$^OS_ERROR";
 EOT
   print $fh, $testfile or die $^OS_ERROR;
-  print $fh, <<"EOT" or die $^OS_ERROR;
-select \*STDOUT;
-if (close \$outputfh) \{
-  print \*STDOUT, "ok 2\n";
-\} else \{
-  print \*STDOUT, "not ok 2 # Failed to close '$output': \$^OS_ERROR\n";
-\}
-EOT
   close $fh or die "close $testpl: $^OS_ERROR\n";
 
   push @files, Makefile_PL($package);
@@ -772,11 +758,6 @@ simple ("Three start", < qw(Bea kea Lea lea nea pea rea sea tea Wea yea Zea));
 simple ("Twos and three middle", < qw(aa ae ai ea eu ie io oe era eta));
 # Given the choice go for the end, else the earliest point
 simple ("Three end and four symetry", < qw(ean ear eat barb marm tart));
-
-
-# Need this if the single test below is rolled into @tests :
-# --$dummytest;
-print \*STDOUT, "1..$dummytest\n";
 
 write_and_run_extension < @$_ foreach  @tests;
 

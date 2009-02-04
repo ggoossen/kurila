@@ -66,7 +66,7 @@ $outfile = 'sysio.out';
 
 open(my $o_fh, ">", "$outfile") || die "sysio.t: cannot write $outfile: $^OS_ERROR";
 
-select($o_fh); $^OUTPUT_AUTOFLUSH=1; select(\*STDOUT);
+iohandle::output_autoflush($o_fh, 1);
 
 # cannot write negative lengths
 try { syswrite($o_fh, $x, -1) };

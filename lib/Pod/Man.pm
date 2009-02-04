@@ -1236,12 +1236,10 @@ sub parse_from_file {
     # close the file descriptor if we had to open one, but we can't easily
     # figure this out.
     my $fh = $self->output_fh ();
-    my $oldfh = select $fh;
-    my $oldflush = $^OUTPUT_AUTOFLUSH;
-    $^OUTPUT_AUTOFLUSH = 1;
+    my $oldflush = iohandle::output_autoflush($fh);
+    iohandle::output_autoflush($fh, 1);
     print $fh, '';
-    $^OUTPUT_AUTOFLUSH = $oldflush;
-    select $oldfh;
+    iohandle::output_autoflush($fh, $oldflush);
     return $retval;
 }
 

@@ -24,7 +24,7 @@ f1();
 
 my $r = runperl(
     prog =>
-	'our $d; sub f { return if $d; $d=1; my $a=sub {goto &f}; &$a; f() } f(); print qq(ok\n)',
+	'our $d; sub f { return if $d; $d=1; my $a=sub {goto &f}; &$a; f() } f(); print \*STDOUT, qq(ok\n)',
     stderr => 1
     );
 is($r, "ok\n", 'avoid pad without an @_');

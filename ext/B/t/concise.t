@@ -31,7 +31,7 @@ is($cop_base, 1, "Smallest COP sequence number");
 
 $out = runperl(
     switches => \@("-MO=Concise,-exec"),
-    prog => q{$a=$b && print q/foo/},
+    prog => q{$a=$b && print \*STDOUT, q/foo/},
     stderr => 1,
 );
 #diag($out);
@@ -364,7 +364,7 @@ $out = runperl ( switches => \@("-MO=Concise,-stash=Data::Dumper,-src,-exec"),
 like($out, qr/FUNC: \*Data::Dumper::format_refaddr/,
      "stash rendering loads package as needed");
 
-my $prog = q{package FOO; sub bar { print "bar" } package main; FOO::bar(); };
+my $prog = q{package FOO; sub bar { print \*STDOUT, "bar" } package main; FOO::bar(); };
 
 # this would fail if %INC used for -stash test
 $out = runperl ( switches => \@("-MO=Concise,-src,-stash=FOO,-main"),

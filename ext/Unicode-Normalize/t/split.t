@@ -1,13 +1,5 @@
 
 BEGIN {
-    unless ("A" eq pack('U', 0x41)) {
-	print "1..0 # Unicode::Normalize " .
-	    "cannot stringify a Unicode code point\n";
-	exit 0;
-    }
-}
-
-BEGIN {
     if (env::var('PERL_CORE')) {
         chdir('t') if -d 't';
         $^INCLUDE_PATH = @( $^OS_NAME eq 'MacOS' ?? < qw(::lib) !! < qw(../lib) );

@@ -86,7 +86,7 @@ sub bar {
 my $path = join " ", map { qq["-I$_"] } $^INCLUDE_PATH;
 $path = '-I::lib -MMac::err=unix' if $^OS_NAME eq 'MacOS';
 my $redir = $^OS_NAME eq 'MacOS' ?? '' !! "2>&1";
-my $items = qx{$^EXECUTABLE_NAME $path "-MO=Terse" -le "print \\42" $redir};
+my $items = qx{$^EXECUTABLE_NAME $path "-MO=Terse" -le "print \\*STDOUT, \\42" $redir};
 like( $items, qr/IV $hex \\42/, 'RV (but now stored in an IV)' );
 
 package TieOut;

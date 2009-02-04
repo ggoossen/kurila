@@ -41,7 +41,7 @@ do {
     local $^WARNING=1;		# 5.005 compat.
     my $warn;
     local $^WARN_HOOK = sub { $warn .= @_[0]->{?description} };
-    readline *FOO;
+    readline *FOOBAR;
     like( $warn, qr/unopened filehandle/, 'warns like an unopened filehandle' );
 };
 

@@ -32,19 +32,19 @@ EXPECT
 Can't "last" outside a loop block at - line 3 character 15.
 ########
 sub warnhook {
-  print "WARNHOOK\n";
+  print \*STDOUT, "WARNHOOK\n";
   eval('die("foooo\n")');
 }
 $^WARN_HOOK = \&warnhook;
 warn("dfsds\n");
-print "END\n";
+print \*STDOUT, "END\n";
 EXPECT
 WARNHOOK
 END
 ########
 our @a = @(3, 2, 1);
 @a = sort { eval('die("no way")') ;  $a <+> $b} @a;
-print join(", ", @a)."\n";
+print \*STDOUT, join(", ", @a)."\n";
 EXPECT
 1, 2, 3
 ########
@@ -61,6 +61,6 @@ foo:
 do {
   @a = sort { exit(0) } @a;
 };
-END { print "foobar\n" }
+END { print \*STDOUT, "foobar\n" }
 EXPECT
 foobar

@@ -9,8 +9,8 @@ BEGIN {
     }
 }
 
-select(\*STDERR); $^OUTPUT_AUTOFLUSH = 1;
-select(\*STDOUT); $^OUTPUT_AUTOFLUSH = 1;
+iohandle::output_autoflush(\*STDERR, 1);
+iohandle::output_autoflush(\*STDOUT, 1);
 
 use IO::Dir < qw(DIR_UNLINK);
 

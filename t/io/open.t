@@ -77,7 +77,7 @@ SKIP: do {
     skip "open -| busted and noisy on VMS", 3 if $Is_VMS;
 
     ok( open(my $f, '-|', <<EOC),     'open -|' );
-    $Perl -e "print qq(a row\\n); print qq(another row\\n)"
+    $Perl -e "print \\\\*STDOUT, qq(a row\\n); print  \\\\*STDOUT,qq(another row\\n)"
 EOC
 
     my @rows = @( ~< $f );
@@ -170,7 +170,7 @@ SKIP: do {
     skip "open -| busted and noisy on VMS", 3 if $Is_VMS;
 
     ok( open(local $f, '-|', <<EOC),  'open local $f, "-|", ...' );
-    $Perl -e "print qq(a row\\n); print qq(another row\\n)"
+    $Perl -e "print \\\\*STDOUT, qq(a row\\n); print \\\\*STDOUT, qq(another row\\n)"
 EOC
     my @rows = @( ~< $f );
 
@@ -204,7 +204,7 @@ like( $^EVAL_ERROR->message, qr/Bad filehandle:\s+afile/,          '       right
 
 do {
     for (1..2) {
-	ok( open(my $f, "-|", qq{$Perl -le "print 'ok'"}), 'open -|');
+	ok( open(my $f, "-|", qq{$Perl -le "print \\\\*STDOUT, 'ok'"}), 'open -|');
 	is( scalar ~< $f, "ok\n", '       readline');
 	ok( close $f,            '       close' );
     }
@@ -283,7 +283,7 @@ fresh_perl_like('open m', qr/^Search pattern not terminated at/,
 	\%( stderr => 1 ), 'open m test');
 
 fresh_perl_is(
-    'sub f { open(my $fh, "<", "xxx"); $fh = "f"; } f; f;print "ok"',
+    'sub f { open(my $fh, "<", "xxx"); $fh = "f"; } f; f;print \*STDOUT, "ok"',
     'ok', \%( stderr => 1 ),
     '#29102: Crash on assignment to lexical filehandle');
 

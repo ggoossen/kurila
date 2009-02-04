@@ -398,7 +398,7 @@ These are a hotchpotch of opcodes still waiting to be considered
 
     crypt
 
-    sselect select
+    select
     pipe_op sockpair
 
     getppid getpgrp setpgrp getpriority setpriority localtime gmtime

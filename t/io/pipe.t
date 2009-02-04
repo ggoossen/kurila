@@ -34,7 +34,7 @@ SKIP: do {
     if (open($pipe, "-|", "-")) {
 	while( ~< $pipe) {
 	    s/^not //;
-	    print \*STDOUT,;
+	    print \*STDOUT, $_;
 	}
 	close $pipe;        # avoid zombies
     }
@@ -43,7 +43,7 @@ SKIP: do {
         next_test();
         my $tnum = curr_test;
         next_test();
-	exec $Perl, '-le', "print q\{not ok $tnum -     again\}";
+	exec $Perl, '-le', "print \\*STDOUT, q\{not ok $tnum -     again\}";
     }
 
     # This has to be *outside* the fork
@@ -60,7 +60,7 @@ SKIP: do {
 	} else {
 	    s/^(not ok \d+ -) .*/$1 expect '$(join ' ',@r)', got '$(join ' ',@r1)'\n/s;
 	}
-	print \*STDOUT,;
+	print \*STDOUT, $_;
 	close $pipe;        # avoid zombies
     }
     else {
@@ -85,7 +85,7 @@ SKIP: do {
 	} else {
 	    s/^(not ok \d+ -) .*/$1 expect '$(join ' ',@r)', got '$(join ' ',@r1)'\n/s;
 	}
-	print \*STDOUT,;
+	print \*STDOUT, $_;
         exec $Perl, '-e0';	# Do not run END()...
     }
 
@@ -102,7 +102,7 @@ SKIP: do {
             while( ~< $reader) {
                 s/^not //;
                 s/([A-Z])/$(lc($1))/g;
-                print \*STDOUT,;
+                print \*STDOUT, $_;
             }
             close $reader;     # avoid zombies
         }
@@ -117,7 +117,7 @@ SKIP: do {
             
             my $tnum = curr_test;
             next_test;
-            exec $Perl, '-le', "print q\{not ok $tnum -     with fh dup \}";
+            exec $Perl, '-le', "print \\*STDOUT, q\{not ok $tnum -     with fh dup \}";
         }
 
         # This has to be done *outside* the fork.

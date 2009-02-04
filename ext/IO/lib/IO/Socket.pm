@@ -34,7 +34,7 @@ sub import {
 }
 
 sub new {
-    my@($class,%< %arg) =  @_;
+    my @($class,%< %arg) =  @_;
     my $sock = $class->SUPER::new();
 
     $sock->autoflush(1);
@@ -53,16 +53,16 @@ sub register_domain {
 }
 
 sub configure {
-    my@($sock,$arg) =  @_;
+    my @($sock,$arg) =  @_;
     my $domain = delete $arg->{Domain};
 
-    croak 'IO::Socket: Cannot configure a generic socket'
+    die 'IO::Socket: Cannot configure a generic socket'
 	unless defined $domain;
 
-    croak "IO::Socket: Unsupported socket domain"
+    die "IO::Socket: Unsupported socket domain"
 	unless defined @domain2pkg[$domain];
 
-    croak "IO::Socket: Cannot configure socket in domain '$domain'"
+    die "IO::Socket: Cannot configure socket in domain '$domain'"
 	unless ref($sock) eq "IO::Socket";
 
     bless($sock, @domain2pkg[$domain]);

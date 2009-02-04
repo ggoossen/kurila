@@ -276,7 +276,7 @@ is ($a, 2);
 foreach my $lexical (@('', 'my $a; ')) {
   my $expect = "pass\n";
   my $result = runperl (switches => \@('-wl'), stderr => 1,
-    prog => $lexical . 'BEGIN {$a = \q{pass}}; $a = $$a; print $a');
+    prog => $lexical . 'BEGIN {$a = \q{pass}}; $a = $$a; print \*STDOUT, $a');
 
   is ($^CHILD_ERROR, 0);
   is ($result, $expect);
@@ -294,7 +294,7 @@ do { my $a1 = bless \@(3),"x";
 curr_test($test+4);
 
 is (runperl (switches=> \@('-l'),
-	     prog=> 'print 1; print qq-*$^INPUT_RECORD_SEPARATOR*-;print 1;'),
+	     prog=> 'print \*STDOUT, 1; print \*STDOUT, qq-*$^INPUT_RECORD_SEPARATOR*-;print \*STDOUT, 1;'),
     "1\n*\n*\n1\n");
 
 # bug #22719
@@ -306,7 +306,7 @@ is ($^CHILD_ERROR, 0, 'coredump on typeglob = (SvRV && !SvROK)');
 # "Attempt to free unreferenced scalar" warnings
 
 is (runperl(
-    prog => 'use Symbol;my $x=bless \gensym,"t"; print;*$$x=$x',
+    prog => 'use Symbol;my $x=bless \gensym,"t"; print \*STDOUT, $_;*$$x=$x',
     stderr => 1
 ), '', 'freeing self-referential typeglob');
 

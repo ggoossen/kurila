@@ -14,14 +14,14 @@ close $try or die "Could not close: $^OS_ERROR";
 
 do {
     my $x = runperl(
-	prog	=> 'while (~< *ARGV) { print $_; }',
+	prog	=> 'while (~< *ARGV) { print \*STDOUT, $_; }',
 	stdin	=> "foo\n",
 	args	=> \@( 'Io_argv1.tmp', '-' ),
     );
     is($x, "a line\nfoo\n", '   from a file and STDIN');
 
     $x = runperl(
-	prog	=> 'while (~< *ARGV) { print $_; }',
+	prog	=> 'while (~< *ARGV) { print \*STDOUT, $_; }',
 	stdin	=> "foo\n",
     );
     is($x, "foo\n", '   from just STDIN');
@@ -45,13 +45,13 @@ my $i = 4;
 while ( ~< *ARGV) {
     s/^/ok $i\n/;
     ++$i;
-    print \*STDOUT,;
+    print \*STDOUT, $_;
     next_test();
 }
 open($try, "<", 'Io_argv1.tmp') or die "Can't open temp file: $^OS_ERROR";
-print \*STDOUT, while ~< *$try;
+print \*STDOUT, $_ while ~< *$try;
 open($try, "<", 'Io_argv2.tmp') or die "Can't open temp file: $^OS_ERROR";
-print \*STDOUT, while ~< *$try;
+print \*STDOUT, $_ while ~< *$try;
 close $try or die "Could not close: $^OS_ERROR";
 undef $^INPLACE_EDIT;
 
@@ -63,7 +63,7 @@ do {
 };
 
 open \*STDIN, "<", 'Io_argv1.tmp' or die $^OS_ERROR;
-@ARGV = @( () );
+@ARGV = @();
 ok( !eof(),     'STDIN has something' );
 
 is( ~< *ARGV, "ok 4\n" );

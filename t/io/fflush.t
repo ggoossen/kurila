@@ -62,7 +62,7 @@ print $prog_fh ,<<'EOF';
 my $f = shift(@ARGV);
 my $str = shift(@ARGV);
 open my $out, ">>", "$f" or die "open $f: $^OS_ERROR";
-print $out $str;
+print $out, $str;
 close $out;
 EOF
     ;
@@ -133,12 +133,12 @@ for (qw(system qx popen)) {
 my $cmd = _create_runperl(
 			  switches => \@('-l'),
 			  prog =>
-			  sprintf('print qq[ok $_] for (%d..%d)', $t, $t+2));
+			  sprintf('print \*STDOUT, qq[ok $_] for (%d..%d)', $t, $t+2));
 print \*STDOUT, "# cmd = '$cmd'\n";
 open my $CMD, '-|', "$cmd" or die "Can't open pipe to '$cmd': $^OS_ERROR";
 while ( ~< $CMD) {
     system("$runperl -e 0");
-    print \*STDOUT,;
+    print \*STDOUT, $_;
 }
 close $CMD;
 $t += 3;

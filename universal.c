@@ -1117,12 +1117,12 @@ XS(XS_iohandle_output_autoflush)
         gv = (GV*)(SvRV(sv));
 
 	if ( ! GvIO(gv) ) {
-	    XSRETURN_UNDEF;
+	    gv_IOadd(gv);
         }
 
         if ( items == 2 ) {
 	    IO * const io = GvIOp(gv);
-	    if (SvTRUE(sv)) {
+	    if (SvTRUE(ST(1))) {
 		if (!(IoFLAGS(io) & IOf_FLUSH)) {
 		    PerlIO *ofp = IoOFP(io);
 		    if (ofp)

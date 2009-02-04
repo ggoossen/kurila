@@ -16,7 +16,7 @@ unless (-d $path) {
 my $file = File::Spec->catfile( $path, 'success.pm' );
 my $out_fh;
 open($out_fh, '>', $file) or skip_all( 'Cannot write fake backend module');
-print $out_fh while ~< *DATA;
+print $out_fh, $_ while ~< *DATA;
 close $out_fh;
 
 plan( 9 ); # And someone's responsible.
@@ -63,12 +63,12 @@ __END__
 package B::success;
 
 $^OUTPUT_AUTOFLUSH = 1;
-print "Compiling!\n";
+print \*STDOUT, "Compiling!\n";
 
 sub compile {
 	return 'fail' if (@_[0] eq 'fail');
-	print "(@_[0]) <@_[1]>\n";
-	return sub { print "[$O::BEGIN_output]\n" };
+	print \*STDOUT, "(@_[0]) <@_[1]>\n";
+	return sub { print \*STDOUT, "[$O::BEGIN_output]\n" };
 }
 
 1;

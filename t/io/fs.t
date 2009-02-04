@@ -360,9 +360,7 @@ SKIP: do {
     open($fh, ">>", "Iofs.tmp") or die "Can't open Iofs.tmp for appending";
 
     binmode $fh;
-    select $fh;
-    $^OUTPUT_AUTOFLUSH = 1;
-    select \*STDOUT;
+    iohandle::output_autoflush($fh, 1);
 
     do {
 	print $fh, "x\n" x 200;
@@ -393,9 +391,7 @@ SKIP: do {
 	open($fh, ">>", "Iofs.tmp") or die "Can't open Iofs.tmp for appending";
 
 	binmode $fh;
-	select $fh;
-	$^OUTPUT_AUTOFLUSH = 1;
-	select \*STDOUT;
+	iohandle::output_autoflush($fh, 1);
 
 	do {
 	    print $fh, "x\n" x 200;

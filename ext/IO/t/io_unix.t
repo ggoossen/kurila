@@ -102,5 +102,5 @@ if(my $pid = fork()) {
 
     exit;
 } else {
- die;
+    die;
 }

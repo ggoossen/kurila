@@ -33,16 +33,15 @@
 # across an exec (though native Windows file handles are).
 
 BEGIN {
-    use Config;
-    if (! config_value('d_fcntl')) {
-        print(\*STDOUT, "1..0 # Skip: fcntl() is not available\n");
-        exit(0);
-    }
     require './test.pl';
 }
 
-
-$^OUTPUT_AUTOFLUSH=1;
+BEGIN {
+    use Config;
+    if (! config_value('d_fcntl')) {
+        skip_all("fcntl() is not available");
+    }
+}
 
 my $Is_VMS      = $^OS_NAME eq 'VMS';
 my $Is_MacOS    = $^OS_NAME eq 'MacOS';
@@ -76,11 +75,11 @@ make_tmp_file($tmpfile2, $tmpfile2_contents);
 # Note: avoid using ' or " in $Child_prog since it is run with -e
 my $Child_prog = <<'CHILD_PROG';
 my $fd = shift(@ARGV);
-print qq{childfd=$fd\n};
+print \*STDOUT, qq{childfd=$fd\n};
 open my $inherit, qq{<&=}, qq{$fd} or die qq{open $fd: $^OS_ERROR};
 my $line = ~< $inherit;
 close $inherit or die qq{close $fd: $^OS_ERROR};
-print $line
+print \*STDOUT, $line
 CHILD_PROG
 $Child_prog =~ s/\n//g;
 

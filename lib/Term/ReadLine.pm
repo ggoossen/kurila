@@ -253,17 +253,11 @@ sub new {
     open my $fin, ((  $^OS_NAME eq 'MSWin32' && $console eq 'CONIN$' ) ?? "+<" !! "<"), "$console";
     open my $fout, ">","$consoleOUT";
 
-    #OUT->autoflush(1);		# Conflicts with debugger?
-    my $sel = select($fout);
-    $^OUTPUT_AUTOFLUSH = 1;				# for DB::OUT
-    select($sel);
+    iohandle::output_autoflush($fout, 1);
     $ret = bless \@(\*$fin, \*$fout);
   } else {			# Filehandles supplied
     $FIN = @_[2]; $FOUT = @_[3];
-    #OUT->autoflush(1);		# Conflicts with debugger?
-    my $sel = select($FOUT);
-    $^OUTPUT_AUTOFLUSH = 1;				# for DB::OUT
-    select($sel);
+    iohandle::output_autoflush($FOUT, 1);
     $ret = bless \@($FIN, $FOUT);
   }
   if ($ret->Features->{?ornaments} 
@@ -278,9 +272,7 @@ sub newTTY {
   my @($self, $in, $out) =  @_;
   $self->[0] = $in;
   $self->[1] = $out;
-  my $sel = select($out);
-  $^OUTPUT_AUTOFLUSH = 1;				# for DB::OUT
-  select($sel);
+  iohandle::output_autoflush($out, 1);
 }
 
 sub IN { shift->[0] }

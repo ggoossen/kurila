@@ -429,7 +429,7 @@ sub stat {
 sub autoflush {
     my $fh = shift;
     my $prev = iohandle::output_autoflush($fh);
-    iohandle::output_autoflush($fh, @_ ?? @_[1] !! 1);
+    iohandle::output_autoflush($fh, @_ ?? @_[0] !! 1);
     return $prev;
 }
 

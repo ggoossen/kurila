@@ -166,11 +166,11 @@ $test /= 2 if ++$test;
 ####
 # 10
 my $x;
-print $main::x;
+print *STDOUT, $main::x;
 ####
 # 11
 my @x;
-print @main::x[1];
+print *STDOUT, @main::x[1];
 ####
 # 12
 my %x;
@@ -241,21 +241,21 @@ foreach our $i (1, 2) {
 ####
 # 29
 my @x;
-print reverse(sort(@x));
+print *STDOUT, reverse(sort(@x));
 ####
 # 30
 my @x;
-print((sort {$b cmp $a} @x));
+print *STDOUT, (sort {$b cmp $a} @x);
 ####
 # 31
 my @x;
-print reverse((sort {$b <+> $a} @x));
+print *STDOUT, reverse((sort {$b <+> $a} @x));
 ####
 # 32
-print $_ foreach (reverse @main::a);
+print *STDOUT, $_ foreach (reverse @main::a);
 ####
 # 33 TODO range
-print $_ foreach (reverse 1, 2..5);
+print *STDOUT, $_ foreach (reverse 1, 2..5);
 ####
 # 34  (bug #38684)
 @main::ary = @(split(' ', 'foo', 0));

@@ -19,8 +19,6 @@ BEGIN {
 
 use Storable < qw(freeze thaw dclone);
 
-print \*STDOUT, "1..33\n";
-
 package OBJ_REAL;
 
 use Storable < qw(freeze thaw);
@@ -129,53 +127,54 @@ sub STORABLE_thaw {
 
 package main;
 
+use Test::More tests => 32;
+
 my $real = OBJ_REAL->make;
 my $x = freeze $real;
-ok 1, 1;
 
 my $y = thaw $x;
-ok 2, ref $y eq 'OBJ_REAL';
-ok 3, $y->[0] eq 'a';
-ok 4, $y->[1] == 1;
+ok ref $y eq 'OBJ_REAL';
+ok $y->[0] eq 'a';
+ok $y->[1] == 1;
 
 my $sync = OBJ_SYNC->make;
 $x = freeze $sync;
-ok 5, 1;
+ok 1;
 
 $y = thaw $x;
-ok 6, 1;
-ok 7, $y->{?ok} \== $y;
+ok 1;
+ok $y->{?ok} \== $y;
 
 my $ext = \@(1, 2);
 $sync = OBJ_SYNC2->make($ext);
 $x = freeze \@($sync, $ext);
-ok 8, 1;
+ok 1;
 
 my $z = thaw $x;
 $y = $z->[0];
-ok 9, 1;
-ok 10, $y->{?ok} \== $y;
-ok 11, ref $y->{?sync} eq 'OBJ_SYNC';
-ok 12, $y->{?ext} \== $z->[1];
+ok 1;
+ok $y->{?ok} \== $y;
+ok ref $y->{?sync} eq 'OBJ_SYNC';
+ok $y->{?ext} \== $z->[1];
 
 $real = OBJ_REAL2->make;
 $x = freeze $real;
-ok 13, 1;
-ok 14, $OBJ_REAL2::recursed == $OBJ_REAL2::MAX;
-ok 15, $OBJ_REAL2::hook_called == $OBJ_REAL2::MAX;
+ok 1;
+ok $OBJ_REAL2::recursed == $OBJ_REAL2::MAX;
+ok $OBJ_REAL2::hook_called == $OBJ_REAL2::MAX;
 
 $y = thaw $x;
-ok 16, 1;
-ok 17, $OBJ_REAL2::recursed == 0;
+ok 1;
+ok $OBJ_REAL2::recursed == 0;
 
 $x = dclone $real;
-ok 18, 1;
-ok 19, ref $x eq 'OBJ_REAL2';
-ok 20, $OBJ_REAL2::recursed == 0;
-ok 21, $OBJ_REAL2::hook_called == 2 * $OBJ_REAL2::MAX;
+ok 1;
+ok ref $x eq 'OBJ_REAL2';
+ok $OBJ_REAL2::recursed == 0;
+ok $OBJ_REAL2::hook_called == 2 * $OBJ_REAL2::MAX;
 
-ok 22, !Storable::is_storing;
-ok 23, !Storable::is_retrieving;
+ok !Storable::is_storing;
+ok !Storable::is_retrieving;
 
 #
 # The following was a test-case that Salvador Ortiz Garcia <sog@msg.com.mx>
@@ -218,11 +217,11 @@ package main;
 my $bar = Bar->new();
 my $bar2 = thaw freeze $bar;
 
-ok 24, ref($bar2) eq 'Bar';
-ok 25, ref($bar->{b}->[0]) eq 'Foo';
-ok 26, ref($bar->{b}->[1]) eq 'Foo';
-ok 27, ref($bar2->{b}->[0]) eq 'Foo';
-ok 28, ref($bar2->{b}->[1]) eq 'Foo';
+ok ref($bar2) eq 'Bar';
+ok ref($bar->{b}->[0]) eq 'Foo';
+ok ref($bar->{b}->[1]) eq 'Foo';
+ok ref($bar2->{b}->[0]) eq 'Foo';
+ok ref($bar2->{b}->[1]) eq 'Foo';
 
 #
 # The following attempts to make sure blessed objects are blessed ASAP
@@ -255,10 +254,10 @@ sub STORABLE_freeze {
 
 sub STORABLE_thaw {
 	my@($self, $clonning, $frozen, $c1, $c3, $o) = @_;
-	main::ok 29, ref $self eq "CLASS_2";
-	main::ok 30, ref $c1 eq "CLASS_1";
-	main::ok 31, ref $c3 eq "CLASS_3";
-	main::ok 32, ref $o eq "CLASS_OTHER";
+	main::ok ref $self eq "CLASS_2";
+	main::ok ref $c1 eq "CLASS_1";
+	main::ok ref $c3 eq "CLASS_3";
+	main::ok ref $o eq "CLASS_OTHER";
 	$self->{+c1} = $c1;
 	$self->{+c3} = $c3;
 }
@@ -311,4 +310,4 @@ my $so = thaw freeze $o;
 
 $refcount_ok = 0;
 thaw freeze(Foo3->new);
-ok 33, $refcount_ok == 1;
+ok $refcount_ok == 1;

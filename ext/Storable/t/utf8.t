@@ -23,28 +23,28 @@ use utf8;
 
 use Storable < qw(thaw freeze);
 
-print \*STDOUT, "1..5\n";
+use Test::More tests => 5;
 
 my $x = chr(1234);
-ok 1, $x eq ${thaw freeze \$x};
+is $x, ${thaw freeze \$x};
 
 # Long scalar
 $x = join '', map {chr $_} @( ( <0..1023));
-ok 2, $x eq ${thaw freeze \$x};
+is $x, ${thaw freeze \$x};
 
 # Char in the range 127-255 (probably) in utf8
 $x = chr (175) . chr (256);
 chop $x;
-ok 3, $x eq ${thaw freeze \$x};
+is $x, ${thaw freeze \$x};
 
 # Storable needs to cope if a frozen string happens to be internall utf8
 # encoded
 
 $x = chr 256;
 my $data = freeze \$x;
-ok 4, $x eq ${thaw $data};
+is $x, ${thaw $data};
 
 $data .= chr 256;
 chop $data;
-ok 5, $x eq ${thaw $data};
+is $x, ${thaw $data};
 

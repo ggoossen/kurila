@@ -132,21 +132,23 @@ open my $out_fh, '>>', \$out or die;
 my $iterations = 3;
 
 $foo = 0;
-select($out_fh);
+open my $real_stdout, ">&", \*STDOUT;
+close \*STDOUT;
+open \*STDOUT, ">&", $out_fh;
 my $got = timethis($iterations, sub {++$foo});
-select(\*STDOUT);
+open \*STDOUT, ">&", $real_stdout;
 isa_ok($got, 'Benchmark', "timethis CODEREF");
 is ($foo, $iterations, "benchmarked code was run $iterations times");
-
 $got = $out;
 like ($got, qr/^timethis $iterations/, 'default title');
 like ($got, $Default_Pattern, 'default format is all or noc');
 
 $out = "";
 $bar = 0;
-select($out_fh);
+close \*STDOUT;
+open \*STDOUT, ">&", $out_fh;
 $got = timethis($iterations, '++$main::bar');
-select(\*STDOUT);
+open \*STDOUT, ">&", $real_stdout;
 isa_ok($got, 'Benchmark', "timethis eval");
 is ($bar, $iterations, "benchmarked code was run $iterations times");
 

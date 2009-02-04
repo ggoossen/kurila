@@ -23,7 +23,7 @@ do {
         my $filename = shift ;
 	my $fh = gensym ;
 	open ($fh, ">", "$filename") || die "Cannot open $filename: $^OS_ERROR" ;
-	my $real_stdout = select($fh) ;
+	my $real_stdout = \*STDOUT;
 	return bless \@($fh, $real_stdout ) ;
 
     }
@@ -31,7 +31,6 @@ do {
     {
         my $self = shift ;
 	close $self->[0] ;
-	select($self->[1]) ;
     }
 };
 

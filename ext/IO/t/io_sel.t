@@ -1,7 +1,7 @@
 #!./perl -w
 
-select(\*STDERR); $^OUTPUT_AUTOFLUSH = 1;
-select(\*STDOUT); $^OUTPUT_AUTOFLUSH = 1;
+iohandle::output_autoflush(\*STDERR, 1);
+iohandle::output_autoflush(\*STDOUT, 1);
 
 print \*STDOUT, "1..23\n";
 

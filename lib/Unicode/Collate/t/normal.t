@@ -1,7 +1,8 @@
+use Test::More;
 BEGIN {
     unless ("A" eq pack('U', 0x41)) {
-	print "1..0 # Unicode::Collate " .
-	    "cannot stringify a Unicode code point\n";
+	plan skip_all => "Unicode::Collate " .
+	    "cannot stringify a Unicode code point";
 	exit 0;
     }
     if (env::var('PERL_CORE')) {
@@ -10,15 +11,6 @@ BEGIN {
     }
 }
 
-BEGIN {
-    try { require Unicode::Normalize; };
-    if ($^EVAL_ERROR) {
-	print "1..0 # skipped: Unicode::Normalize needed for this test\n";
-	print $^EVAL_ERROR->message;
-	exit;
-    }
-}
-use Test::More;
 BEGIN { plan tests => 100 };
 
 use warnings;

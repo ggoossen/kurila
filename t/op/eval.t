@@ -4,7 +4,7 @@ print \*STDOUT, "1..89\n";
 
 our ($foo, $fact, $ans, $i, $x, $eval);
 
-eval 'print "ok 1\n";';
+eval 'print \*STDOUT, "ok 1\n";';
 
 if ($^EVAL_ERROR eq '') {print \*STDOUT, "ok 2\n";} else {print \*STDOUT, "not ok 2\n";}
 
@@ -36,7 +36,7 @@ $ans = eval $fact;
 if ($ans == 120) {print \*STDOUT, "ok 9\n";} else {print \*STDOUT, "not ok 9 $ans\n";}
 
 open(my $try, ">",'Op.eval');
-print $try, 'print "ok 10\n"; unlink "Op.eval";',"\n";
+print $try, 'print \*STDOUT, "ok 10\n"; unlink "Op.eval";',"\n";
 close $try;
 
 do './Op.eval'; print \*STDOUT, $^EVAL_ERROR;
@@ -45,7 +45,7 @@ do './Op.eval'; print \*STDOUT, $^EVAL_ERROR;
 
 $i = 11;
 for (1..3) {
-    eval 'print "ok ", $i++, "\n"';
+    eval 'print \*STDOUT, "ok ", $i++, "\n"';
 }
 
 try {
@@ -78,16 +78,16 @@ my $X = sub {
 
 my $x = 25;
 eval <<'EOT'; die if $^EVAL_ERROR;
-  print "# $x\n";	# clone into eval's pad
+  print \*STDOUT, "# $x\n";	# clone into eval's pad
   sub do_eval1 {
      eval @_[0]; die if $^EVAL_ERROR;
   }
 EOT
-do_eval1('print "ok $x\n"');
+do_eval1('print \*STDOUT, "ok $x\n"');
 $x++;
-do_eval1('eval q[print "ok $x\n"]');
+do_eval1('eval q[print \*STDOUT, "ok $x\n"]');
 $x++;
-do_eval1('sub { print "# $x\n"; eval q[print "ok $x\n"] }->()');
+do_eval1('sub { print \*STDOUT, "# $x\n"; eval q[print \*STDOUT, "ok $x\n"] }->()');
 $x++;
 
 # calls from within eval'' should clone outer lexicals
@@ -96,11 +96,11 @@ eval <<'EOT'; die if $^EVAL_ERROR;
   sub do_eval2 {
      eval @_[0]; die if $^EVAL_ERROR;
   }
-do_eval2('print "ok $x\n"');
+do_eval2('print \*STDOUT, "ok $x\n"');
 $x++;
-do_eval2('eval q[print "ok $x\n"]');
+do_eval2('eval q[print \*STDOUT, "ok $x\n"]');
 $x++;
-do_eval2('sub { print "# $x\n"; eval q[print "ok $x\n"] }->()');
+do_eval2('sub { print \*STDOUT, "# $x\n"; eval q[print \*STDOUT, "ok $x\n"] }->()');
 $x++;
 EOT
 
@@ -116,10 +116,10 @@ eval <<'EOT'; die if $^EVAL_ERROR;
 EOT
 do {
     my $ok = 'not ok';
-    do_eval3('print "$ok ' . $x++ . '\n"');
-    do_eval3('eval q[print "$ok ' . $x++ . '\n"]');
+    do_eval3('print \*STDOUT, "$ok ' . $x++ . '\n"');
+    do_eval3('eval q[print \*STDOUT, "$ok ' . $x++ . '\n"]');
     print \*STDOUT, "# sub with eval\n";
-    do_eval3('sub { eval q[print "$ok ' . $x++ . '\n"] }->()');
+    do_eval3('sub { eval q[print \*STDOUT, "$ok ' . $x++ . '\n"] }->()');
 };
 
 # can recursive subroutine-call inside eval'' see its own lexicals?
@@ -127,7 +127,7 @@ sub recurse {
   my $l = shift;
   if ($l +< $x) {
      ++$l;
-     eval 'print "# level $l\n"; recurse($l);';
+     eval 'print \*STDOUT, "# level $l\n"; recurse($l);';
      die if $^EVAL_ERROR;
   }
   else {
@@ -145,7 +145,7 @@ eval <<'EOT';
   sub create_closure {
     my $self = shift;
     return sub {
-       print $self;
+       print \*STDOUT, $self;
     };
   }
 EOT
@@ -154,7 +154,7 @@ $x++;
 
 # does lexical search terminate correctly at subroutine boundary?
 $main::r = "ok $x\n";
-sub terminal { eval 'our $r; print $r' }
+sub terminal { eval 'our $r; print \*STDOUT, $r' }
 do {
    my $r = "not ok $x\n";
    eval 'terminal($r)';
@@ -184,7 +184,7 @@ do {
 do {
     my $status = eval q{
 	eval q{ die };
-	print "# eval ' return ' test\n";
+	print \*STDOUT, "# eval ' return ' test\n";
 	return; # removing this changes behavior
     };
     print \*STDOUT, "not " if $^EVAL_ERROR;
@@ -223,7 +223,7 @@ my $zzz = 1;
 
 eval q{
     sub fred1 {
-	eval q{ print eval '$zzz' == 1 ?? 'ok' !! 'not ok', " @_[?0]\n"}
+	eval q{ print \*STDOUT, eval '$zzz' == 1 ?? 'ok' !! 'not ok', " @_[?0]\n"}
     }
     fred1(47);
     do { my $zzz = 2; fred1(48) };
@@ -231,7 +231,7 @@ eval q{
 
 eval q{
     sub fred2 {
-	print eval('$zzz') == 1 ?? 'ok' !! 'not ok', " @_[?0]\n";
+	print \*STDOUT, eval('$zzz') == 1 ?? 'ok' !! 'not ok', " @_[?0]\n";
     }
 }; die if $^EVAL_ERROR;
 fred2(49);
@@ -264,15 +264,15 @@ eval q{
 	return $l * fred3($l-1);
     }
     my $r = fred3(5);
-    print $r == 120 ?? 'ok' !! 'not ok', " 52\n";
+    print \*STDOUT, $r == 120 ?? 'ok' !! 'not ok', " 52\n";
     $r = eval'fred3(5)';
-    print $r == 120 ?? 'ok' !! 'not ok', " 53\n";
+    print \*STDOUT, $r == 120 ?? 'ok' !! 'not ok', " 53\n";
     $r = 0;
     eval '$r = fred3(5)';
-    print $r == 120 ?? 'ok' !! 'not ok', " 54\n";
+    print \*STDOUT, $r == 120 ?? 'ok' !! 'not ok', " 54\n";
     $r = 0;
     do { my $yyy = 4; my $zzz = 5; my $l = 6; $r = eval 'fred3(5)' };
-    print $r == 120 ?? 'ok' !! 'not ok', " 55\n";
+    print \*STDOUT, $r == 120 ?? 'ok' !! 'not ok', " 55\n";
 };
 my $r = fred3(5);
 print \*STDOUT, $r == 120 ?? 'ok' !! 'not ok', " 56\n";
@@ -302,9 +302,9 @@ eval q{
     fred4();
     sub fred5 {
 	my $zzz = 4;
-	print( ($zzz == 4  && eval '$zzz' == 4) ?? 'ok' !! 'not ok', " $test\n" );
+	print(\*STDOUT, ($zzz == 4  && eval '$zzz' == 4) ?? 'ok' !! 'not ok', " $test\n" );
 	$test++;
-	print eval '$yyy' == 2 ?? 'ok' !! 'not ok', " $test\n";
+	print \*STDOUT, eval '$yyy' == 2 ?? 'ok' !! 'not ok', " $test\n";
 	$test++;
 	goto &fred4;
     }

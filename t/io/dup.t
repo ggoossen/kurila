@@ -17,14 +17,14 @@ open(my $duperr, ">&", \*STDERR);
 open(\*STDOUT, ">","Io.dup")  || die "Can't open stdout";
 open(\*STDERR, ">&", \*STDOUT) || die "Can't open stderr";
 
-select(\*STDERR); $^OUTPUT_AUTOFLUSH = 1;
-select(\*STDOUT); $^OUTPUT_AUTOFLUSH = 1;
+iohandle::output_autoflush(\*STDERR, 1);
+iohandle::output_autoflush(\*STDOUT, 1);
 
 print \*STDOUT, "ok 2\n";
 print \*STDERR, "ok 3\n";
 
 # Since some systems don't have echo, we use Perl.
-my $echo = qq{$^EXECUTABLE_NAME -le "print q(ok \%d)"};
+my $echo = qq{$^EXECUTABLE_NAME -le "print \\\\*STDOUT, q(ok \%d)"};
 
 my $cmd = sprintf $echo, 4;
 print \*STDOUT, `$cmd`;

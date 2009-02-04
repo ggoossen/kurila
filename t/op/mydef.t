@@ -1,12 +1,12 @@
 #!./perl
 
-print "1..65\n";
+print \*STDOUT, "1..65\n";
 
 my $test = 0;
 sub ok ($$) {
     my @($ok, $name) =  @_;
     ++$test;
-    print $ok ?? "ok $test - $name\n" !! "not ok $test - $name\n";
+    print \*STDOUT, $ok ?? "ok $test - $name\n" !! "not ok $test - $name\n";
 }
 
 $_ = 'global';
@@ -154,7 +154,7 @@ my $file = 'dolbar1.tmp';
 END { unlink $file; }
 do {
     open my $_, '>', $file or die "Can't open $file: $^OS_ERROR";
-    print $_ "hello\n";
+    print $_, "hello\n";
     close $_;
     ok( -s $file, 'writing to filehandle $_ works' );
 };

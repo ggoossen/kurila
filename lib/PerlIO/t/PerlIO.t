@@ -71,11 +71,7 @@ ok(close($utffh));
 do {
     ok( open(my $x,"+<",undef), 'magic temp file via 3 arg open with undef');
     ok( defined fileno($x),     '       fileno' );
-
-    select $x;
     ok( (print $x, "ok\n"),         '       print' );
-
-    select \*STDOUT;
     ok( seek($x,0,0),           '       seek' );
     is( scalar ~< $x, "ok\n",    '       readline' );
     ok( tell($x) +>= 3,          '       tell' );
@@ -94,11 +90,7 @@ do {
     my $var;
     ok( open(my $x,"+<",\$var), 'magic in-memory file via 3 arg open with \$var');
     ok( defined fileno($x),     '       fileno' );
-
-    select $x;
     ok( (print $x, "ok\n"),         '       print' );
-
-    select \*STDOUT;
     ok( seek($x,0,0),           '       seek' );
     is( scalar ~< $x, "ok\n",    '       readline' );
     ok( tell($x) +>= 3,          '       tell' );

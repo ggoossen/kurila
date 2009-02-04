@@ -46,10 +46,9 @@ ok(lineno($io), "6");
 ~< *$fh;
 ok(lineno($io), "6");
 
-select $fh;
 ok(lineno($io), "6");
 
-~< *$fh for @( ( <1 .. 10));
+~< *$fh for 1 .. 10;
 ok(lineno($io), "6");
 
 $io->getline for @( ( <1 .. 5));

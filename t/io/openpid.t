@@ -34,10 +34,10 @@ $perl .= qq[ "-I../lib"];
 # the other reader reads one line, waits a few seconds and then
 # exits to test the waitpid function.
 #
-my $cmd1 = qq/$perl -e "\$^OUTPUT_AUTOFLUSH=1; print qq[first process\\n]; sleep 30;"/;
-my $cmd2 = qq/$perl -e "\$^OUTPUT_AUTOFLUSH=1; print qq[second process\\n]; sleep 30;"/;
-my $cmd3 = qq/$perl -e "print ~< *ARGV;"/; # hangs waiting for end of STDIN
-my $cmd4 = qq/$perl -e "print scalar ~< *ARGV;"/;
+my $cmd1 = qq/$perl -e "\$^OUTPUT_AUTOFLUSH=1; print \\\\*STDOUT, qq[first process\\n]; sleep 30;"/;
+my $cmd2 = qq/$perl -e "\$^OUTPUT_AUTOFLUSH=1; print \\\\*STDOUT, qq[second process\\n]; sleep 30;"/;
+my $cmd3 = qq/$perl -e "print \\\\*STDOUT, ~< *ARGV;"/; # hangs waiting for end of STDIN
+my $cmd4 = qq/$perl -e "print \\\\*STDOUT, scalar ~< *ARGV;"/;
 
 #warn "#$cmd1\n#$cmd2\n#$cmd3\n#$cmd4\n";
 
@@ -77,8 +77,7 @@ is( $kill_cnt, 2,   'killing procs 2 & 3' ) ||
 
 
 # send one expected line of text to child process and then wait for it
-select($fh4); $^OUTPUT_AUTOFLUSH = 1; select(\*STDOUT);
-
+iohandle::output_autoflush($fh4, 1);
 printf $fh4, "ok \%d - text sent to fourth process\n", curr_test();
 next_test();
 print \*STDOUT, "# waiting for process $pid4 to exit\n";

@@ -17,7 +17,7 @@ $runme = $^EXECUTABLE_NAME;
 %h = %( <1..6);
 $aref = \@a;
 $href = \%h;
-open my $op_fh, '-|', qq{$runme -le "print 'aaa Ok ok' for 1..100"};
+open my $op_fh, '-|', qq{$runme -le "print \\\\*STDOUT, 'aaa Ok ok' for 1..100"};
 $chopit = 'aaaaaa';
 @chopar =113 .. 119;
 $posstr = '123456';
@@ -141,7 +141,7 @@ ok 1;
 __END__
 ref $xref			# ref
 ref $cstr			# ref nonref
-`$runme -e "print qq[1\\n]"`				# backtick skip(MSWin32)
+`$runme -e "print \\\\*STDOUT, qq[1\\n]"`				# backtick skip(MSWin32)
 `$undefed`			# backtick undef skip(MSWin32)
 ~< $op_fh				# readline
 'faked'				# rcatline
@@ -222,7 +222,6 @@ caller				# caller
 open my $blah, "<", "non-existent"	# open
 fileno \*STDERR			# fileno
 umask 0				# umask
-select \*STDOUT			# sselect
 select undef,undef,undef,0	# select
 getc($op_fh)				# getc
 '???'				# read

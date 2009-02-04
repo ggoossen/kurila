@@ -654,8 +654,8 @@ sub dist_ci {
 ci :
 	$(PERLRUN) "-MExtUtils::Manifest=maniread" \\
 	  -e "@all = keys %{ maniread() };" \\
-	  -e "print(qq{Executing $(CI) @all\n}); system(qq{$(CI) @all});" \\
-	  -e "print(qq{Executing $(RCS_LABEL) ...\n}); system(qq{$(RCS_LABEL) @all});"
+	  -e "print(\\*STDOUT, qq{Executing $(CI) @all\n}); system(qq{$(CI) @all});" \\
+	  -e "print(\\*STDOUT, qq{Executing $(RCS_LABEL) ...\n}); system(qq{$(RCS_LABEL) @all});"
 };
 }
 
@@ -698,7 +698,7 @@ sub dist_target {
     my@($self) =@( shift);
 
     my $date_check = $self->oneliner(<<'CODE', \@('-l'));
-print 'Warning: Makefile possibly out of date with $(VERSION_FROM)'
+print \*STDOUT, 'Warning: Makefile possibly out of date with $(VERSION_FROM)'
     if -e '$(VERSION_FROM)' and -M '$(VERSION_FROM)' +< -M '$(FIRST_MAKEFILE)';
 CODE
 

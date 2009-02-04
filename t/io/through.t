@@ -68,10 +68,10 @@ sub testpipe ($$$$$$) {
   my $fh;
   if ($how_w eq 'print') {	# AUTOFLUSH???
     # Should be shell-neutral:
-    open $fh, '-|', qq[$Perl -we "$set_out;print \\\\*STDOUT, \$_ for grep length, split m/(.\{1,$write_c\})/s, qq($quoted)"] or die "open: $^OS_ERROR";
+    open $fh, '-|', qq[$Perl -we "$set_out;print \\\\*STDOUT, \\\$_ for grep length, split m/(.\{1,$write_c\})/s, qq($quoted)"] or die "open: $^OS_ERROR";
   } elsif ($how_w eq 'print/flush') {
     # shell-neutral and miniperl-enabled autoflush? qq(\x24) eq '$'
-    open $fh, '-|', qq[$Perl -we "$set_out;eval qq(\\x24^OUTPUT_AUTOFLUSH = 1) or die;print \\\\*STDOUT, \$_ for grep length, split m/(.\{1,$write_c\})/s, qq($quoted) "] or die "open: $^OS_ERROR";
+    open $fh, '-|', qq[$Perl -we "$set_out;eval qq(\\x24^OUTPUT_AUTOFLUSH = 1) or die;print \\\\*STDOUT, \\\$_ for grep length, split m/(.\{1,$write_c\})/s, qq($quoted) "] or die "open: $^OS_ERROR";
   } elsif ($how_w eq 'syswrite') {
     ### How to protect \$_
     my $cmd = qq[$Perl -we "$set_out;eval qq(sub w \\\{syswrite \\*STDOUT, \\x[24]_\\\} 1) or die; w() for grep \{ length \} split m/(.\{1,$write_c\})/s, qq($quoted)"];
@@ -89,7 +89,6 @@ sub testfile ($$$$$$) {
   my @data = grep length, split m/(.{1,$write_c})/s, $str;
 
   open my $fh, '>', 'io_io.tmp' or die;
-  select $fh;
   binmode $fh, ':crlf' 
       if defined $main::use_crlf && $main::use_crlf == 1;
   if ($how_w eq 'print') {	# AUTOFLUSH???
@@ -111,7 +110,7 @@ sub testfile ($$$$$$) {
 }
 
 # shell-neutral and miniperl-enabled autoflush? qq(\x24) eq '$'
-open my $fh, '-|', qq[$Perl -we "eval qq(\\x24^OUTPUT_AUTOFLUSH = 1) or die; binmode \\*STDOUT; sleep 1, print for split m//, qq(a\nb\n\nc\n\n\n)"] or die "open: $^OS_ERROR";
+open my $fh, '-|', qq[$Perl -we "eval qq(\\x24^OUTPUT_AUTOFLUSH = 1) or die; binmode \\\\*STDOUT; sleep 1, print \\\\*STDOUT, \\\$_ for split m//, qq(a\nb\n\nc\n\n\n)"] or die "open: $^OS_ERROR";
 ok(1, 'open pipe');
 binmode $fh, q(:crlf);
 ok(1, 'binmode');

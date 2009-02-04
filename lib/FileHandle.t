@@ -54,12 +54,12 @@ print \*STDOUT, "ok 7\n";
 print \*STDOUT, "not " unless ($fh->open("TEST","r") && !$fh->tell && $fh->close);
 print \*STDOUT, "ok 8\n";
 
-(\*STDOUT)->autoflush( 0);
+(\*STDOUT)->autoflush(0);
 
 print \*STDOUT, "not " if ($^OUTPUT_AUTOFLUSH);
 print \*STDOUT, "ok 9\n";
 
-(\*STDOUT)->autoflush( 1);
+(\*STDOUT)->autoflush(1);
 
 print \*STDOUT, "not " unless ($^OUTPUT_AUTOFLUSH);
 print \*STDOUT, "ok 10\n";

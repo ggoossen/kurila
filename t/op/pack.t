@@ -44,7 +44,7 @@ for my $size (@( 16, 32, 64) ) {
 }
 
 my $IsTwosComplement = pack('i', -1) eq "\x[FF]" x config_value("intsize");
-print "# \$IsTwosComplement = $IsTwosComplement\n";
+diag "\$IsTwosComplement = $IsTwosComplement";
 
 sub is_valid_error
 {
@@ -202,7 +202,7 @@ do {
 
 
 do {
-  print "# test exceptions\n";
+  diag "test exceptions";
   my $x;
   dies_like( sub { $x = unpack 'w', pack 'C*', 0xff, 0xff},
              qr/^Unterminated compressed integer/);
@@ -343,7 +343,7 @@ do {
 
 };
 
-print "# test the 'p' template\n";
+diag "test the 'p' template";
 
 # literals
 is(unpack("p",pack("p","foo")), "foo");
@@ -388,7 +388,7 @@ SKIP: do {
 #				 see #ifdef __osf__ in pp.c pp_unpack
 is((unpack("i",pack("i",-1))), -1);
 
-print "# test the pack lengths of s S i I l L n N v V + modifiers\n";
+diag "test the pack lengths of s S i I l L n N v V + modifiers";
 
 my @lengths = @( <
   qw(s 2 S 2 i -4 I -4 l 4 L 4 n 2 N 4 v 2 V 4 n! 2 N! 4 v! 2 V! 4),
@@ -410,14 +410,14 @@ while (my @(?$base, ?$expect) =@( splice @lengths, 0, 2)) {
       } else {
 	$expect = -$expect;
 	ok ($len +>= $expect, "format '$format'") ||
-	  print "# format '$format' has length $len, expected >= $expect\n";
+	  diag "format '$format' has length $len, expected >= $expect";
       }
     };
   }
 }
 
 
-print "# test unpack-pack lengths\n";
+diag "test unpack-pack lengths";
 
 my @templates = qw(c C W i I s S l L n N v V f d q Q);
 
@@ -510,12 +510,12 @@ foreach (@(
     my $got = $what eq 'u' ?? (unpack $template, $in) !! (pack $template, $in);
     unless (is($got, $out)) {
         my $un = $what eq 'u' ?? 'un' !! '';
-        print "# $($un)pack ('$template', "._qq($in).') gave '._qq($out).
-            ' not '._qq($got)."\n";
+        diag "$($un)pack ('$template', "._qq($in).') gave '._qq($out).
+            ' not '._qq($got);
     }
 }
 
-print "# packing native shorts/ints/longs\n";
+diag "packing native shorts/ints/longs";
 
 is(length(pack("s!", 0)), config_value("shortsize"));
 is(length(pack("i!", 0)), config_value("intsize"));
@@ -541,7 +541,7 @@ sub numbers_with_total {
       $total += $_;
     }
   }
-  print "# numbers test for $format\n";
+  diag "numbers test for $format";
   foreach ( @_) {
     SKIP: do {
         my $out = try {unpack($format, pack($format, $_))};
@@ -625,9 +625,9 @@ sub numbers_with_total {
             } else {
                 my $text = ref $total ?? &$total($len) !! $total;
                 fail;
-                print "# For list (" . join (", ", @_) . ") (total $text)"
+                diag "For list (" . join (", ", @_) . ") (total $text)"
                     . " packed with $format unpack '\%$_$format' gave $sum,"
-                    . " expected $calc_sum\n";
+                    . " expected $calc_sum";
             }
         }
       };
@@ -680,7 +680,7 @@ numbers_with_total ('Q', sub {
                     0, 1,9223372036854775807, 9223372036854775808,
                     18446744073709551615);
 
-print "# pack nvNV byteorders\n";
+diag "pack nvNV byteorders";
 
 is(pack("n", 0xdead), "\x[dead]");
 is(pack("v", 0xdead), "\x[adde]");
@@ -695,12 +695,12 @@ SKIP: do {
   is(pack("V!", 0xdeadbeef), "\x[efbeadde]");
 };
 
-print "# test big-/little-endian conversion\n";
+diag "test big-/little-endian conversion";
 
 sub byteorder
 {
   my $format = shift;
-  print "# byteorder test for $format\n";
+  diag "byteorder test for $format";
   for my $value ( @_) {
     SKIP: do {
       my ($nat,$be,$le);
@@ -710,7 +710,7 @@ sub byteorder
 
       do {
         use warnings < qw(NONFATAL utf8);
-        print "# [$value][$nat][$be][$le][$^EVAL_ERROR]\n";
+        diag "[$value][$nat][$be][$le][$^EVAL_ERROR]";
       };
 
       SKIP: do {
@@ -722,7 +722,7 @@ sub byteorder
       is($be, (join '', reverse( split m//, $le)));
       my @x = @( try { unpack "$format$format>$format<", $nat.$be.$le } );
 
-      print "# [$value][", join('][', @x), "][$^EVAL_ERROR]\n";
+      diag "[$value][", join('][', @x), "][$^EVAL_ERROR]";
 
       is($^EVAL_ERROR, '');
       is(@x[0], @x[1]);
@@ -752,7 +752,7 @@ byteorder('F', -1, 0, 0.5, 42, 2**34);
 byteorder('d', -(2**34), -1, 0, 1, 2**34);
 byteorder('D', -(2**34), -1, 0, 1, 2**34);
 
-print "# test negative numbers\n";
+diag "test negative numbers";
 
 SKIP: do {
   skip "platform is not using two's complement for negative integers", 120
@@ -867,14 +867,14 @@ do {
     try { ($x) = unpack $pat, $in };
     is($^EVAL_ERROR, '');
     is($x, $expect) ||
-      printf "# list unpack ('$pat', '$in') gave \%s, expected '$expect'\n", <
+      diag sprintf "list unpack ('$pat', '$in') gave \%s, expected '$expect'", <
              encode_list ($x);
 
     undef $x;
     try { $x = unpack $pat, $in };
     is($^EVAL_ERROR, '');
     is($x, $expect) ||
-      printf "# scalar unpack ('$pat', '$in') gave \%s, expected '$expect'\n", <
+      diag sprintf "scalar unpack ('$pat', '$in') gave \%s, expected '$expect'", <
              encode_list ($x);
   }
 
@@ -961,9 +961,9 @@ do {
   foreach my $pat (@('%32i*', ' %32i*', "# Muhahahaha\n\%32i*", '%32i*  ',
                    '%32i!*', ' %32i!*', "\n#\n#\n\r \t\f\%32i!*", '%32i!*#')) {
     @a = @( unpack $pat, $p );
-    is(@a[0], 0xFFFFFFFF) || print "# $pat\n";
+    is(@a[0], 0xFFFFFFFF) || diag "$pat";
     @a = @( scalar unpack $pat, $p );
-    is(@a[0], 0xFFFFFFFF) || print "# $pat\n";
+    is(@a[0], 0xFFFFFFFF) || diag "$pat";
   }
 
 
@@ -1010,8 +1010,8 @@ foreach (@(
   my $got = try {pack $template, < @in};
   is($^EVAL_ERROR, '');
   is($out, $got) ||
-    printf "# pack ('$template', \%s) gave \%s expected \%s\n", <
-           encode_list (< @in), < encode_list ($got), < encode_list ($out);
+    diag sprintf "pack ('$template', \%s) gave \%s expected \%s",
+           < encode_list (< @in), < encode_list ($got), < encode_list ($out);
 }
 
 # unpack x X @
@@ -1029,14 +1029,14 @@ foreach (@(
   my @got = @( try {unpack $template, $in} );
   is($^EVAL_ERROR, '');
   ok (list_eq (\@got, \@out)) ||
-    printf "# list unpack ('$template', \%s) gave \%s expected \%s\n", <
+    diag sprintf "list unpack ('$template', \%s) gave \%s expected \%s", <
            _qq($in), < encode_list (< @got), < encode_list (< @out);
 
   my $got = try {unpack $template, $in};
   is($^EVAL_ERROR, '');
   (nelems @out) ?? is( $got, @out[0] ) # 1 or more items; should get first
        !! ok( !defined $got ) # 0 items; should get undef
-    or printf "# scalar unpack ('$template', \%s) gave \%s expected \%s\n", <
+    or diag printf "scalar unpack ('$template', \%s) gave \%s expected \%s", <
               _qq($in), < encode_list ($got), < encode_list (@out[0]);
 }
 
@@ -1059,12 +1059,12 @@ do {
 };
 
 SKIP: do {
-  print "# group modifiers\n";
+  diag "group modifiers";
 
   skip $no_endianness, 3 * 2 + 3 * 2 + 1 if $no_endianness;
 
   for my $t (qw{ (s<)< (sl>s)> (s(l(sl)<l)s)< }) {
-    print "# testing pattern '$t'\n";
+    diag "testing pattern '$t'";
     try { ($_) = unpack($t, 'x'x18); };
     is($^EVAL_ERROR, '');
     try { $_ = pack($t, (0)x6); };
@@ -1072,7 +1072,7 @@ SKIP: do {
   }
 
   for my $t (qw{ (s<)> (sl>s)< (s(l(sl)<l)s)> }) {
-    print "# testing pattern '$t'\n";
+    diag "testing pattern '$t'";
     try { @($_) = @: unpack($t, 'x'x18); };
     like($^EVAL_ERROR->{?description}, qr/Can't use '[<>]' in a group with different byte-order in unpack/);
     try { $_ = pack($t, (0)x6); };
@@ -1114,7 +1114,7 @@ do {
     $tbe =~ s/</>/g;
     for my $t (@($tbe, $tle)) {
       my $c = compress_template($t);
-      print "# '$t' -> '$c'\n";
+      diag "'$t' -> '$c'";
       SKIP: do {
         my $p1 = try { pack $t, < @d };
         skip "cannot pack '$t' on this perl", 5 if is_valid_error($^EVAL_ERROR);
@@ -1355,7 +1355,7 @@ do {  # Repeat count [SUBEXPR]
 
            SKIP: do {
 	     my $junk1 = "$groupbegin $type$count $groupend";
-	      print "# junk1=$junk1\n";
+	      diag "junk1=$junk1";
 	     my $p = try { pack $junk1, < @list2 };
              skip "cannot pack '$type' on this perl", 12
                if is_valid_error($^EVAL_ERROR);
@@ -1364,7 +1364,7 @@ do {  # Repeat count [SUBEXPR]
 	     my $half = int( (length $p)/2 );
 	     for my $move (@('', "X$half", "X!$half", 'x1', 'x!8', "x$half")) {
 	       my $junk = "$junk1 $move";
-	       print "# junk='$junk', end='$end' list=($(join ', ', @list2))\n";
+	       diag "junk='$junk', end='$end' list=($(join ', ', @list2))";
 	       $p = pack "$junk $end", < @list2, < @end;
 	       my @l = @( unpack "x[$junk] $end", $p );
 	       is(scalar nelems @l, scalar nelems @end);
@@ -1482,7 +1482,7 @@ foreach my $template (qw(A Z c C s S i I l L n N v V q Q j J f d F D u U w)) {
     }
     foreach my $test ( @tests) {
       ok (list_eq ($test->[1], $test->[2]), $test->[0]) ||
-        printf "# unpack gave \%s expected \%s\n", <
+        diag sprintf "unpack gave \%s expected \%s", <
           encode_list (< @{$test->[1]}), < encode_list (< @{$test->[2]});
     }
   };

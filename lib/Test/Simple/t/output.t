@@ -52,11 +52,9 @@ ok($line eq 'hi!');
 
 open(my $foo, ">>", "$tmpfile") or die $^OS_ERROR;
 $out = $Test->output(\*$foo);
-my $old = select *$out;
 print $out, "Hello!\n";
 close $out;
 undef $out;
-select $old;
 open($in, "<", $tmpfile) or die $^OS_ERROR;
 my @lines = @( ~< *$in );
 close $in;

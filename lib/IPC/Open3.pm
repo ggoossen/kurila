@@ -311,7 +311,7 @@ sub _open3 {
     # of it.
     xclose $dad_wtr if $dup_wtr;
 
-    select(my $x = @(select($dad_wtr), $^OUTPUT_AUTOFLUSH = 1)[0]); # unbuffer pipe
+    iohandle::output_autoflush($dad_wtr, 1); # unbuffer pipe
     $kidpid;
 }
 
