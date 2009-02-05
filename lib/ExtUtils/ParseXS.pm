@@ -444,6 +444,7 @@ EOF
     unless $ProtoUsed ;
 
   chdir($orig_cwd);
+  $output_fh = undef;
   close $FH;
 
   return 1;
