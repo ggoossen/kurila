@@ -113,7 +113,7 @@ BEGIN {
   if ( !config_value("d_flock") &&
        !config_value("d_fcntl_can_lock") &&
        !config_value("d_lockf") ) {
-    print <<EOM ;
+    print \*STDOUT, <<EOM ;
 SKIPPED
 # flock not present
 EOM
@@ -146,7 +146,7 @@ use warnings 'io' ;
 use Config; 
 BEGIN { 
   if ( $^OS_NAME ne 'VMS' and ! config_value("d_socket")) {
-    print <<EOM ;
+    print \*STDOUT, <<EOM ;
 SKIPPED
 # send not present
 # bind not present
@@ -166,7 +166,7 @@ send \*STDIN, "fred", 1;
 bind \*STDIN, "fred" ;
 connect \*STDIN, "fred" ;
 listen \*STDIN, 2;
-accept "fred", \*STDIN;
+accept \*fred, \*STDIN;
 shutdown \*STDIN, 0;
 setsockopt \*STDIN, 1,2,3;
 getsockopt \*STDIN, 1,2;
@@ -177,7 +177,7 @@ send \*STDIN, "fred", 1;
 bind \*STDIN, "fred" ;
 connect \*STDIN, "fred" ;
 listen \*STDIN, 2;
-accept "fred", \*STDIN;
+accept \*fred, \*STDIN;
 shutdown \*STDIN, 0;
 setsockopt \*STDIN, 1,2,3;
 getsockopt \*STDIN, 1,2;
@@ -189,7 +189,7 @@ send \*STDIN, "fred", 1;
 bind \*STDIN, "fred" ;
 connect \*STDIN, "fred" ;
 listen \*STDIN, 2;
-accept \*STDIN, "fred" ;
+accept \*STDIN, \*fred ;
 shutdown \*STDIN, 0;
 setsockopt \*STDIN, 1,2,3;
 getsockopt \*STDIN, 1,2;
@@ -200,7 +200,7 @@ send \*STDIN, "fred", 1;
 bind \*STDIN, "fred" ;
 connect \*STDIN, "fred" ;
 listen \*STDIN, 2;
-accept "fred", \*STDIN;
+accept \*fred, \*STDIN;
 shutdown \*STDIN, 0;
 setsockopt \*STDIN, 1,2,3;
 getsockopt \*STDIN, 1,2;
@@ -286,7 +286,7 @@ Unsuccessful open on filename containing newline at - line 3 character 2.
 # pp_sys.c [pp_sysread]
 use warnings 'io' ;
 if ($^OS_NAME eq 'dos') {
-    print <<EOM ;
+    print \*STDOUT, <<EOM ;
 SKIPPED
 # skipped on dos
 EOM
@@ -341,7 +341,7 @@ Non-string passed as bitmask at - line 4 character 1.
 use Config;
 BEGIN {
     if (!config_value("d_fchdir")) {
-	print <<EOM;
+	print \*STDOUT, <<EOM;
 SKIPPED
 # fchdir not present
 EOM

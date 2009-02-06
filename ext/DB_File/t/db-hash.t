@@ -9,7 +9,7 @@ use Fcntl;
 
 use Test::More;
 
-plan tests => 57;
+plan tests => 56;
 
 unlink < glob "__db.*";
 
@@ -288,58 +288,6 @@ do {
 };
 
 ok( 1);
-
-
-do {
-   # Examples from the POD
-
-  my $file = "xyzt" ;
-  do {
-    my $redirect = Redirect->new( $file) ;
-
-    use warnings FATAL => < qw(all);
-     
-    use DB_File ;
-    our ($k, $v);
-
-    unlink "fruit" ;
-    my %h = DB_File->new( "fruit", O_RDWR^|^O_CREAT, 0640, $DB_HASH )
-        or die "Cannot open file 'fruit': $^OS_ERROR\n";
-
-    # Add a few key/value pairs to the file
-    %h->put("apple" => "red");
-    %h->put("orange" => "orange");
-    %h->put("banana" => "yellow");
-    %h->put("tomato" => "red");
-
-    # Check for existence of a key
-    print \*STDOUT, "Banana Exists\n\n" if %h->FETCH("banana") ;
-
-    # Delete a key/value pair.
-    %h->del("apple") ;
-
-    # print the contents of the file
-    %h->iterate(
-        sub {
-            my @($k, $v) = @_;
-            print \*STDOUT, "$k -> $v\n";
-        }
-    );
-
-    undef %h ;
-
-    unlink "fruit" ;
-  };  
-
-  ok( docat_del($file) eq <<'EOM') ;
-Banana Exists
-
-orange -> orange
-tomato -> red
-banana -> yellow
-EOM
-   
-};
 
 do {
     # Bug ID 20001013.009

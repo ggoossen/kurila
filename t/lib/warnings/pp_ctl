@@ -82,11 +82,11 @@ Exiting subroutine via last at - line 3 character 12.
 do {
   eval "use warnings 'exiting' ; last;" 
 };
-print STDERR $^EVAL_ERROR ;
+print \*STDERR, $^EVAL_ERROR ;
 do {
   eval "no warnings 'exiting' ;last;" 
 };
-print STDERR $^EVAL_ERROR ;
+print \*STDERR, $^EVAL_ERROR ;
 EXPECT
 Exiting eval via last at (eval 1) line 1 character 26.
     (eval) called at - line 3 character 3.
@@ -121,10 +121,10 @@ Exiting subroutine via last at - line 3 character 12.
 # pp_ctl.c
 joe:
 do { eval "use warnings 'exiting' ; last joe;" };
-print STDERR $^EVAL_ERROR ;
+print \*STDERR, $^EVAL_ERROR ;
 Joe:
 do { eval "no warnings 'exiting' ; last Joe;" };
-print STDERR $^EVAL_ERROR ;
+print \*STDERR, $^EVAL_ERROR ;
 EXPECT
 Exiting eval via last at (eval 1) line 1 character 26.
     (eval) called at - line 3 character 6.
@@ -253,21 +253,3 @@ sub fred
  
 fred()
 EXPECT
-########
-# pp_ctl.c
-use warnings;
-our $foo;
-eval 'print $foo';
-EXPECT
-Use of uninitialized value $main::foo in print at (eval 1) line 1 character 1.
-    (eval) called at - line 4 character 1.
-########
-# pp_ctl.c
-use warnings;
-do {
-    no warnings;
-    eval 'print $foo';
-};
-EXPECT
-
-########

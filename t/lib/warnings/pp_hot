@@ -46,18 +46,6 @@
 
 __END__
 # pp_hot.c [pp_print]
-use warnings 'unopened' ;
-our $f = $a = "abc" ; 
-print $f $a;
-no warnings 'unopened' ;
-print $f $a;
-use warnings;
-no warnings 'unopened' ;
-print $f $a;
-EXPECT
-Can't use string ("abc") as a symbol ref while "strict refs" in use at - line 4 character 1.
-########
-# pp_hot.c [pp_print]
 use warnings 'io' ;
 # There is no guarantee that STDOUT is output only, or STDIN input only.
 # Certainly on some BSDs (at least FreeBSD, Darwin, BSDi) file descriptors
@@ -68,15 +56,15 @@ open (my $fh, ">", "$file") or die $^OS_ERROR ;
 close $fh or die $^OS_ERROR ;
 die "There is no file $file" unless -f $file ;
 open ($fh, "<", "$file") or die $^OS_ERROR ;
-print $fh "anc" ;
+print $fh, "anc" ;
 open(my $foo, "<&", $fh) or die $^OS_ERROR ;
-print $foo "anc" ;
+print $foo, "anc" ;
 no warnings 'io' ;
-print $fh "anc" ;
-print $foo "anc" ;
+print $fh, "anc" ;
+print $foo, "anc" ;
 use warnings 'io' ;
-print $fh "anc" ;
-print $foo "anc" ;
+print $fh, "anc" ;
+print $foo, "anc" ;
 close ($fh) or die $^OS_ERROR ;
 close ($foo) or die $^OS_ERROR ;
 unlink $file ;
@@ -89,17 +77,17 @@ Filehandle $foo opened only for input at - line 20 character 1.
 # pp_hot.c [pp_print]
 use warnings 'closed' ;
 close \*STDIN ;
-print {\*STDIN} "anc";
+print \*STDIN, "anc";
 opendir \*STDIN, ".";
-print {\*STDIN} "anc";
+print \*STDIN, "anc";
 closedir \*STDIN;
 no warnings 'closed' ;
-print {\*STDIN} "anc";
+print \*STDIN, "anc";
 opendir \*STDIN, ".";
-print {\*STDIN} "anc";
+print \*STDIN, "anc";
 use warnings;
 no warnings 'closed' ;
-print {\*STDIN} "anc";
+print \*STDIN, "anc";
 EXPECT
 print() on closed filehandle STDIN at - line 4 character 1.
 print() on closed filehandle STDIN at - line 6 character 1.
@@ -112,7 +100,7 @@ print() on closed filehandle STDIN at - line 6 character 1.
 use warnings 'closed' ;
 my $fh = *STDOUT{IO};
 close \*STDOUT or die "Can't close STDOUT";
-print $fh "Shouldn't print anything, but shouldn't SEGV either\n";
+print $fh, "Shouldn't print anything, but shouldn't SEGV either\n";
 EXPECT
 print() on closed filehandle at - line 7 character 1.
 ########
@@ -120,11 +108,11 @@ print() on closed filehandle at - line 7 character 1.
 package foo;
 use warnings 'closed';
 open my $fh1, "<", "nonexistent";
-print $fh1 42;
+print $fh1, 42;
 open my $fh2, "<", "nonexistent";
-print $fh2 42;
+print $fh2, 42;
 open $bar::fh3, "<", "nonexistent";
-print $bar::fh3 42;
+print $bar::fh3, 42;
 EXPECT
 print() on closed filehandle $fh1 at - line 5 character 1.
 print() on closed filehandle $fh2 at - line 7 character 1.
@@ -177,7 +165,7 @@ sub fred
 do {
   local $^WARN_HOOK = sub {
     if (@_[0]->message =~ m/^Deep recursion on subroutine "main::fred"/) {
-        print "ok\n";
+        print \*STDOUT, "ok\n";
         exit 0;
     }
   };
@@ -195,7 +183,7 @@ sub fred
 do {
   local $^WARN_HOOK = sub {
     if (@_[0]->message =~ m/^Deep recursion on subroutine "main::fred"/) {
-        print "ok\n";
+        print \*STDOUT, "ok\n";
         exit 0;
     }
   };

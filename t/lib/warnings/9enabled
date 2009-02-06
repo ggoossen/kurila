@@ -5,8 +5,8 @@ __END__
 --FILE-- abc.pm
 package abc ;
 use warnings "io" ;
-print "ok1\n" if ! warnings::enabled('all') ;
-print "ok2\n" if ! warnings::enabled("io") ;
+print \*STDOUT, "ok1\n" if ! warnings::enabled('all') ;
+print \*STDOUT, "ok2\n" if ! warnings::enabled("io") ;
 1;
 --FILE-- 
 no warnings;
@@ -19,8 +19,8 @@ ok2
 --FILE-- abc.pm
 package abc ;
 no warnings ;
-print "ok1\n" if !warnings::enabled('all') ;
-print "ok2\n" if warnings::enabled("syntax") ;
+print \*STDOUT, "ok1\n" if !warnings::enabled('all') ;
+print \*STDOUT, "ok2\n" if warnings::enabled("syntax") ;
 1;
 --FILE-- 
 use warnings 'syntax' ;
@@ -33,8 +33,8 @@ ok2
 --FILE-- abc.pm
 package abc ;
 use warnings 'syntax' ;
-print "ok1\n" if   warnings::enabled('io') ;
-print "ok2\n" if ! warnings::enabled("syntax") ;
+print \*STDOUT, "ok1\n" if   warnings::enabled('io') ;
+print \*STDOUT, "ok2\n" if ! warnings::enabled("syntax") ;
 1;
 --FILE-- 
 use warnings 'io' ;
@@ -46,8 +46,8 @@ ok2
 
 --FILE-- abc
 no warnings ;
-print "ok1\n" if !warnings::enabled('all') ;
-print "ok2\n" if !warnings::enabled("syntax") ;
+print \*STDOUT, "ok1\n" if !warnings::enabled('all') ;
+print \*STDOUT, "ok2\n" if !warnings::enabled("syntax") ;
 1;
 --FILE-- 
 use warnings 'syntax' ;
@@ -58,9 +58,9 @@ ok1
 
 --FILE-- abc
 use warnings 'syntax' ;
-print "ok1\n" if ! warnings::enabled('all') ;
-print "ok2\n" if ! warnings::enabled("syntax") ;
-print "ok3\n" if ! warnings::enabled("io") ;
+print \*STDOUT, "ok1\n" if ! warnings::enabled('all') ;
+print \*STDOUT, "ok2\n" if ! warnings::enabled("syntax") ;
+print \*STDOUT, "ok3\n" if ! warnings::enabled("io") ;
 1;
 --FILE-- 
 use warnings 'io' ;
@@ -74,8 +74,8 @@ ok2
 package abc ;
 no warnings ;
 sub check {
-  print "ok1\n" if !warnings::enabled('all') ;
-  print "ok2\n" if warnings::enabled("syntax") ;
+  print \*STDOUT, "ok1\n" if !warnings::enabled('all') ;
+  print \*STDOUT, "ok2\n" if warnings::enabled("syntax") ;
 }
 1;
 --FILE-- 
@@ -91,9 +91,9 @@ ok2
 package abc ;
 use warnings 'io' ;
 sub check {
-  print "ok1\n" if ! warnings::enabled('all') ;
-  print "ok2\n" if   warnings::enabled("syntax") ;
-  print "ok3\n" if ! warnings::enabled("io") ;
+  print \*STDOUT, "ok1\n" if ! warnings::enabled('all') ;
+  print \*STDOUT, "ok2\n" if   warnings::enabled("syntax") ;
+  print \*STDOUT, "ok3\n" if ! warnings::enabled("io") ;
 }
 1;
 --FILE-- 
@@ -110,8 +110,8 @@ ok3
 package abc ;
 no warnings ;
 sub check {
-  print "ok1\n" if !warnings::enabled('all') ;
-  print "ok2\n" if warnings::enabled("syntax") ;
+  print \*STDOUT, "ok1\n" if !warnings::enabled('all') ;
+  print \*STDOUT, "ok2\n" if warnings::enabled("syntax") ;
 }
 1;
 --FILE-- 
@@ -127,9 +127,9 @@ ok2
 package abc ;
 use warnings 'io' ;
 sub check {
-  print "ok1\n" if ! warnings::enabled('all') ;
-  print "ok2\n" if   warnings::enabled("syntax") ;
-  print "ok3\n" if ! warnings::enabled("io") ;
+  print \*STDOUT, "ok1\n" if ! warnings::enabled('all') ;
+  print \*STDOUT, "ok2\n" if   warnings::enabled("syntax") ;
+  print \*STDOUT, "ok3\n" if ! warnings::enabled("io") ;
 }
 1;
 --FILE-- 
@@ -145,8 +145,8 @@ ok3
 --FILE-- abc.pm
 package abc ;
 use warnings "io" ;
-print "ok1\n" if ! warnings::enabled('all') ;
-print "ok2\n" if ! warnings::enabled("io") ;
+print \*STDOUT, "ok1\n" if ! warnings::enabled('all') ;
+print \*STDOUT, "ok2\n" if ! warnings::enabled("io") ;
 1;
 --FILE-- def.pm
 package def;
@@ -164,14 +164,14 @@ ok2
 --FILE-- abc.pm
 package abc ;
 no warnings ;
-print "ok1\n" if ! warnings::enabled('all') ;
-print "ok2\n" if warnings::enabled("syntax") ;
-print "ok3\n" if !warnings::enabled("io") ;
+print \*STDOUT, "ok1\n" if ! warnings::enabled('all') ;
+print \*STDOUT, "ok2\n" if warnings::enabled("syntax") ;
+print \*STDOUT, "ok3\n" if !warnings::enabled("io") ;
 1;
 --FILE-- def.pm
 use warnings 'syntax' ;
-print "ok4\n" if !warnings::enabled('all') ;
-print "ok5\n" if !warnings::enabled("io") ;
+print \*STDOUT, "ok4\n" if !warnings::enabled('all') ;
+print \*STDOUT, "ok5\n" if !warnings::enabled("io") ;
 use abc ;
 1;
 --FILE--
@@ -188,8 +188,8 @@ ok4
 package abc ;
 no warnings ;
 sub check {
-  print "ok1\n" if !warnings::enabled('all') ;
-  print "ok2\n" if warnings::enabled("syntax") ;
+  print \*STDOUT, "ok1\n" if !warnings::enabled('all') ;
+  print \*STDOUT, "ok2\n" if warnings::enabled("syntax") ;
 }
 1;
 --FILE-- 
@@ -198,7 +198,7 @@ use abc ;
 try { 
   abc::check() ; 
 };
-print $^EVAL_ERROR ;
+print \*STDOUT, $^EVAL_ERROR ;
 EXPECT
 ok1
 ok2
@@ -208,9 +208,9 @@ ok2
 package abc ;
 use warnings 'io' ;
 sub check {
-  print "ok1\n" if ! warnings::enabled('all') ;
-  print "ok2\n" if   warnings::enabled("syntax") ;
-  print "ok3\n" if ! warnings::enabled("io") ;
+  print \*STDOUT, "ok1\n" if ! warnings::enabled('all') ;
+  print \*STDOUT, "ok2\n" if   warnings::enabled("syntax") ;
+  print \*STDOUT, "ok3\n" if ! warnings::enabled("io") ;
 }
 1;
 --FILE-- 
@@ -219,7 +219,7 @@ use abc ;
 try { 
   abc::check() ; 
   } ;
-print $^EVAL_ERROR ;
+print \*STDOUT, $^EVAL_ERROR ;
 EXPECT
 ok1
 ok2
@@ -230,8 +230,8 @@ ok3
 package abc ;
 no warnings ;
 sub check {
-  print "ok1\n" if !warnings::enabled('all') ;
-  print "ok2\n" if warnings::enabled("syntax") ;
+  print \*STDOUT, "ok1\n" if !warnings::enabled('all') ;
+  print \*STDOUT, "ok2\n" if warnings::enabled("syntax") ;
 }
 1;
 --FILE-- 
@@ -240,7 +240,7 @@ require "abc" ;
 try { 
   abc::check() ; 
   } ;
-print $^EVAL_ERROR ;
+print \*STDOUT, $^EVAL_ERROR ;
 EXPECT
 ok1
 ok2
@@ -250,9 +250,9 @@ ok2
 package abc ;
 use warnings 'io' ;
 sub check {
-  print "ok1\n" if !warnings::enabled('all') ;
-  print "ok2\n" if warnings::enabled("syntax") ;
-  print "ok3\n" if warnings::enabled("io") ;
+  print \*STDOUT, "ok1\n" if !warnings::enabled('all') ;
+  print \*STDOUT, "ok2\n" if warnings::enabled("syntax") ;
+  print \*STDOUT, "ok3\n" if warnings::enabled("io") ;
 }
 1;
 --FILE-- 
@@ -263,7 +263,7 @@ try {
   abc::check() ; 
 };
 abc::check() ; 
-print $^EVAL_ERROR ;
+print \*STDOUT, $^EVAL_ERROR ;
 EXPECT
 ok1
 ok2
@@ -276,9 +276,9 @@ ok2
 package abc ;
 use warnings 'io' ;
 sub check {
-  print "ok1\n" if ! warnings::enabled('all') ;
-  print "ok2\n" if  warnings::enabled("syntax") ;
-  print "ok3\n" if ! warnings::enabled("io") ;
+  print \*STDOUT, "ok1\n" if ! warnings::enabled('all') ;
+  print \*STDOUT, "ok2\n" if  warnings::enabled("syntax") ;
+  print \*STDOUT, "ok3\n" if ! warnings::enabled("io") ;
 }
 1;
 --FILE-- 
@@ -296,7 +296,7 @@ ok3
 package abc ;
 use warnings 'io' ;
 sub check {
-  print "ok1\n" if  ! warnings::enabled('all') ;
+  print \*STDOUT, "ok1\n" if  ! warnings::enabled('all') ;
 }
 1;
 --FILE-- 
@@ -312,10 +312,10 @@ ok1
 package abc ;
 use warnings 'misc' ;
 sub check {
-  print "ok1\n" if  ! warnings::enabled('all') ;
-  print "ok2\n" if  warnings::enabled("syntax") ;
-  print "ok3\n" if  warnings::enabled("io") ;
-  print "ok4\n" if  ! warnings::enabled("misc") ;
+  print \*STDOUT, "ok1\n" if  ! warnings::enabled('all') ;
+  print \*STDOUT, "ok2\n" if  warnings::enabled("syntax") ;
+  print \*STDOUT, "ok3\n" if  warnings::enabled("io") ;
+  print \*STDOUT, "ok4\n" if  ! warnings::enabled("misc") ;
 }
 1;
 --FILE-- 
@@ -335,11 +335,11 @@ use warnings ;
 try { 
     warnings::warn() 
   } ;
-print $^EVAL_ERROR->description, "\n";
+print \*STDOUT, $^EVAL_ERROR->description, "\n";
 try { 
   warnings::warn("fred", "joe") 
   } ;
-print $^EVAL_ERROR->description, "\n";
+print \*STDOUT, $^EVAL_ERROR->description, "\n";
 EXPECT
 Usage: warnings::warn([category,] 'message')
 Unknown warnings category 'fred'
@@ -350,11 +350,11 @@ use warnings ;
 try { 
   warnings::warnif() 
 } ;
-print $^EVAL_ERROR->description, "\n";
+print \*STDOUT, $^EVAL_ERROR->description, "\n";
 try { 
   warnings::warnif("fred", "joe") 
 } ;
-print $^EVAL_ERROR->description, "\n";
+print \*STDOUT, $^EVAL_ERROR->description, "\n";
 EXPECT
 Usage: warnings::warnif([category,] 'message')
 Unknown warnings category 'fred'
@@ -401,7 +401,7 @@ use abc;
 try { 
     abc::check() ; 
   } ;
-print "[[$^EVAL_ERROR]]\n";
+print \*STDOUT, "[[$^EVAL_ERROR]]\n";
 EXPECT
 hello at .../warnings.pm line xxx.
     warnings::warn called at abc.pm line 3 character 13.
@@ -421,7 +421,7 @@ use abc;
 try { 
   abc::check() ; 
 } ;
-print "[[$($^EVAL_ERROR->description)]]\n";
+print \*STDOUT, "[[$($^EVAL_ERROR->description)]]\n";
 EXPECT
 [[hello]]
 ########
@@ -429,8 +429,8 @@ EXPECT
 --FILE-- abc.pm
 package abc ;
 use warnings "io" ;
-print "ok1\n" if warnings::enabled("io") ;
-print "ok2\n" if warnings::enabled("all") ;
+print \*STDOUT, "ok1\n" if warnings::enabled("io") ;
+print \*STDOUT, "ok2\n" if warnings::enabled("all") ;
 1;
 --FILE-- 
 no warnings;
@@ -443,8 +443,8 @@ ok2
 --FILE-- abc.pm
 package abc ;
 use warnings "io" ;
-print "ok1\n" if !warnings::enabled("io") ;
-print "ok2\n" if !warnings::enabled("all") ;
+print \*STDOUT, "ok1\n" if !warnings::enabled("io") ;
+print \*STDOUT, "ok2\n" if !warnings::enabled("all") ;
 1;
 --FILE-- 
 use warnings;
@@ -458,7 +458,7 @@ ok2
 package abc ;
 no warnings ;
 sub check {
-  print "ok\n" if ! warnings::enabled() ;
+  print \*STDOUT, "ok\n" if ! warnings::enabled() ;
 }
 1;
 --FILE-- 
@@ -468,7 +468,7 @@ abc::check() ;
 EXPECT
 package 'abc' not registered for warnings at .../warnings.pm line xxx.
     warnings::__chk called at .../warnings.pm line xxx.
-    warnings::enabled called at abc.pm line 4 character 21.
+    warnings::enabled called at abc.pm line 4 character 31.
     abc::check called at - line 3 character 1.
 ########
 
@@ -513,9 +513,9 @@ package abc ;
 use warnings 'io' ;
 use warnings::register ;
 sub check {
-  print "ok1\n" if  warnings::enabled ;
-  print "ok2\n" if  warnings::enabled("syntax") ;
-  print "ok3\n" if !warnings::enabled("io") ;
+  print \*STDOUT, "ok1\n" if  warnings::enabled ;
+  print \*STDOUT, "ok2\n" if  warnings::enabled("syntax") ;
+  print \*STDOUT, "ok3\n" if !warnings::enabled("io") ;
 }
 1;
 --FILE-- 
@@ -534,9 +534,9 @@ package abc ;
 use warnings 'io' ;
 use warnings::register ;
 sub check {
-  print "ok1\n" if !warnings::enabled ;
-  print "ok2\n" if  warnings::enabled("syntax") ;
-  print "ok3\n" if !warnings::enabled("io") ;
+  print \*STDOUT, "ok1\n" if !warnings::enabled ;
+  print \*STDOUT, "ok2\n" if  warnings::enabled("syntax") ;
+  print \*STDOUT, "ok3\n" if !warnings::enabled("io") ;
 }
 1;
 --FILE-- 
@@ -554,8 +554,8 @@ package abc ;
 no warnings ;
 use warnings::register ;
 sub check {
-  print "ok1\n" if warnings::enabled ;
-  print "ok2\n" if warnings::enabled("syntax") ;
+  print \*STDOUT, "ok1\n" if warnings::enabled ;
+  print \*STDOUT, "ok2\n" if warnings::enabled("syntax") ;
 }
 1;
 --FILE-- 
@@ -563,7 +563,7 @@ use warnings 'syntax' ;
 use abc ;
 use warnings 'abc' ;
 try { abc::check() ; };
-print $^EVAL_ERROR ;
+print \*STDOUT, $^EVAL_ERROR ;
 EXPECT
 ok1
 ok2
@@ -574,16 +574,16 @@ package abc ;
 use warnings 'io' ;
 use warnings::register ;
 sub check {
-  print "ok1\n" if !warnings::enabled ;
-  print "ok2\n" if  warnings::enabled("syntax") ;
-  print "ok3\n" if !warnings::enabled("io") ;
+  print \*STDOUT, "ok1\n" if !warnings::enabled ;
+  print \*STDOUT, "ok2\n" if  warnings::enabled("syntax") ;
+  print \*STDOUT, "ok3\n" if !warnings::enabled("io") ;
 }
 1;
 --FILE-- 
 use warnings 'syntax' ;
 use abc ;
 try { abc::check() ; } ;
-print $^EVAL_ERROR ;
+print \*STDOUT, $^EVAL_ERROR ;
 EXPECT
 ok1
 ok2
@@ -595,9 +595,9 @@ package abc ;
 use warnings 'io' ;
 use warnings::register ;
 sub check {
-  print "ok1\n" if  warnings::enabled ;
-  print "ok2\n" if  warnings::enabled("syntax") ;
-  print "ok3\n" if !warnings::enabled("io") ;
+  print \*STDOUT, "ok1\n" if  warnings::enabled ;
+  print \*STDOUT, "ok2\n" if  warnings::enabled("syntax") ;
+  print \*STDOUT, "ok3\n" if !warnings::enabled("io") ;
 }
 1;
 --FILE-- 
@@ -617,7 +617,7 @@ package abc ;
 use warnings 'io' ;
 use warnings::register ;
 sub check {
-  print "ok1\n" if  ! warnings::enabled ;
+  print \*STDOUT, "ok1\n" if  ! warnings::enabled ;
 }
 1;
 --FILE-- 
@@ -634,10 +634,10 @@ package abc ;
 use warnings 'misc' ;
 use warnings::register;
 sub check {
-  print "ok1\n" if  warnings::enabled ;
-  print "ok2\n" if  warnings::enabled("syntax") ;
-  print "ok3\n" if  warnings::enabled("io") ;
-  print "ok4\n" if  ! warnings::enabled("misc") ;
+  print \*STDOUT, "ok1\n" if  warnings::enabled ;
+  print \*STDOUT, "ok2\n" if  warnings::enabled("syntax") ;
+  print \*STDOUT, "ok3\n" if  warnings::enabled("io") ;
+  print \*STDOUT, "ok4\n" if  ! warnings::enabled("misc") ;
 }
 1;
 --FILE-- 
@@ -694,7 +694,7 @@ use warnings < qw( FATAL deprecated ) ;
 try {
     abc::check() ; 
   } ;
-print "[[$^EVAL_ERROR]]\n";
+print \*STDOUT, "[[$^EVAL_ERROR]]\n";
 EXPECT
 hello at .../warnings.pm line xxx.
     warnings::warn called at abc.pm line 3 character 13.
@@ -714,7 +714,7 @@ use warnings < qw( FATAL abc ) ;
 try { 
   abc::check() ; 
   } ;
-print "[[$($^EVAL_ERROR->description)]]\n";
+print \*STDOUT, "[[$($^EVAL_ERROR->description)]]\n";
 EXPECT
 [[hello]]
 ########
@@ -724,9 +724,9 @@ package abc ;
 use warnings "io" ;
 use warnings::register ;
 sub check { 
-  print "ok1\n" if warnings::enabled() ;
-  print "ok2\n" if warnings::enabled("io") ;
-  print "ok3\n" if warnings::enabled("all") ;
+  print \*STDOUT, "ok1\n" if warnings::enabled() ;
+  print \*STDOUT, "ok2\n" if warnings::enabled("io") ;
+  print \*STDOUT, "ok3\n" if warnings::enabled("all") ;
 }
 1;
 --FILE-- 
@@ -744,9 +744,9 @@ package abc ;
 use warnings "io" ;
 use warnings::register ;
 sub check { 
-  print "ok1\n" if !warnings::enabled() ;
-  print "ok2\n" if !warnings::enabled("io") ;
-  print "ok3\n" if !warnings::enabled("all") ;
+  print \*STDOUT, "ok1\n" if !warnings::enabled() ;
+  print \*STDOUT, "ok2\n" if !warnings::enabled("io") ;
+  print \*STDOUT, "ok3\n" if !warnings::enabled("all") ;
 }
 1;
 --FILE-- 
@@ -764,9 +764,9 @@ package abc ;
 use warnings "io" ;
 use warnings::register ;
 sub check { 
-  print "ok1\n" if warnings::enabled() ;
-  print "ok2\n" if warnings::enabled("io") ;
-  print "ok3\n" if warnings::enabled("all") ;
+  print \*STDOUT, "ok1\n" if warnings::enabled() ;
+  print \*STDOUT, "ok2\n" if warnings::enabled("io") ;
+  print \*STDOUT, "ok3\n" if warnings::enabled("all") ;
 }
 1;
 --FILE-- 
@@ -784,9 +784,9 @@ package abc ;
 use warnings "io" ;
 use warnings::register ;
 sub check { 
-  print "ok1\n" if !warnings::enabled() ;
-  print "ok2\n" if !warnings::enabled("io") ;
-  print "ok3\n" if !warnings::enabled("all") ;
+  print \*STDOUT, "ok1\n" if !warnings::enabled() ;
+  print \*STDOUT, "ok2\n" if !warnings::enabled("io") ;
+  print \*STDOUT, "ok3\n" if !warnings::enabled("all") ;
 }
 1;
 --FILE-- 
@@ -804,9 +804,9 @@ package abc ;
 use warnings "io" ;
 use warnings::register ;
 sub check { 
-  print "ok1\n" if !warnings::enabled() ;
-  print "ok2\n" if !warnings::enabled("io") ;
-  print "ok3\n" if !warnings::enabled("all") ;
+  print \*STDOUT, "ok1\n" if !warnings::enabled() ;
+  print \*STDOUT, "ok2\n" if !warnings::enabled("io") ;
+  print \*STDOUT, "ok3\n" if !warnings::enabled("all") ;
   warnings::warnif("my message 1") ;
   warnings::warnif('abc', "my message 2") ;
   warnings::warnif('io', "my message 3") ;
@@ -829,9 +829,9 @@ package abc ;
 use warnings "io" ;
 use warnings::register ;
 sub check { 
-  print "abc self" . (warnings::enabled() ?? "" !! " not") . " enabled\n" ;
-  print "abc def"  . (warnings::enabled('def') ?? "" !! " not") . " enabled\n" ;
-  print "abc all"  . (warnings::enabled('all') ?? "" !! " not") . " enabled\n" ;
+  print \*STDOUT, "abc self" . (warnings::enabled() ?? "" !! " not") . " enabled\n" ;
+  print \*STDOUT, "abc def"  . (warnings::enabled('def') ?? "" !! " not") . " enabled\n" ;
+  print \*STDOUT, "abc all"  . (warnings::enabled('all') ?? "" !! " not") . " enabled\n" ;
 }
 1;
 --FILE-- def.pm
@@ -839,9 +839,9 @@ package def ;
 use warnings "io" ;
 use warnings::register ;
 sub check { 
-  print "def self" . (warnings::enabled() ?? "" !! " not") . " enabled\n" ;
-  print "def abc"  . (warnings::enabled('abc') ?? "" !! " not") . " enabled\n" ;
-  print "def all"  . (warnings::enabled('all') ?? "" !! " not") . " enabled\n" ;
+  print \*STDOUT, "def self" . (warnings::enabled() ?? "" !! " not") . " enabled\n" ;
+  print \*STDOUT, "def abc"  . (warnings::enabled('abc') ?? "" !! " not") . " enabled\n" ;
+  print \*STDOUT, "def all"  . (warnings::enabled('all') ?? "" !! " not") . " enabled\n" ;
 }
 1;
 --FILE-- 
@@ -912,9 +912,9 @@ package abc ;
 no warnings ;
 use warnings::register ;
 sub check { 
-  print "ok1\n" if warnings::enabled() ;
-  print "ok2\n" if warnings::enabled("io") ;
-  print "ok3\n" if warnings::enabled("all") ;
+  print \*STDOUT, "ok1\n" if warnings::enabled() ;
+  print \*STDOUT, "ok2\n" if warnings::enabled("io") ;
+  print \*STDOUT, "ok3\n" if warnings::enabled("all") ;
 }
 1;
 --FILE-- 
@@ -931,9 +931,9 @@ package abc ;
 no warnings ;
 use warnings::register ;
 sub check { 
-  print "ok1\n" if !warnings::enabled() ;
-  print "ok2\n" if !warnings::enabled("io") ;
-  print "ok3\n" if !warnings::enabled("all") ;
+  print \*STDOUT, "ok1\n" if !warnings::enabled() ;
+  print \*STDOUT, "ok2\n" if !warnings::enabled("io") ;
+  print \*STDOUT, "ok3\n" if !warnings::enabled("all") ;
 }
 1;
 --FILE-- 
@@ -952,9 +952,9 @@ package abc ;
 no warnings ;
 use warnings::register ;
 sub check { 
-  print "ok1\n" if !warnings::enabled() ;
-  print "ok2\n" if !warnings::enabled("io") ;
-  print "ok3\n" if !warnings::enabled("all") ;
+  print \*STDOUT, "ok1\n" if !warnings::enabled() ;
+  print \*STDOUT, "ok2\n" if !warnings::enabled("io") ;
+  print \*STDOUT, "ok3\n" if !warnings::enabled("all") ;
   warnings::warnif("my message 1") ;
   warnings::warnif('abc', "my message 2") ;
   warnings::warnif('io', "my message 3") ;
@@ -978,9 +978,9 @@ package abc ;
 no warnings ;
 use warnings::register ;
 sub check { 
-  print "ok1\n" if !warnings::enabled() ;
-  print "ok2\n" if !warnings::enabled("io") ;
-  print "ok3\n" if !warnings::enabled("all") ;
+  print \*STDOUT, "ok1\n" if !warnings::enabled() ;
+  print \*STDOUT, "ok2\n" if !warnings::enabled("io") ;
+  print \*STDOUT, "ok3\n" if !warnings::enabled("all") ;
 }
 1;
 --FILE-- 
@@ -1001,10 +1001,10 @@ package abc ;
 no warnings ;
 use warnings::register ;
 sub check { 
-  print "ok1\n" if  warnings::enabled() ;
-  print "ok2\n" if !warnings::enabled("io") ;
-  print "ok3\n" if !warnings::enabled("all") ;
-  print "ok4\n" if  warnings::enabled("abc") ;
+  print \*STDOUT, "ok1\n" if  warnings::enabled() ;
+  print \*STDOUT, "ok2\n" if !warnings::enabled("io") ;
+  print \*STDOUT, "ok3\n" if !warnings::enabled("all") ;
+  print \*STDOUT, "ok4\n" if  warnings::enabled("abc") ;
   warnings::warn("my message 1") ;
   warnings::warnif("my message 2") ;
   warnings::warnif('abc', "my message 3") ;
@@ -1033,10 +1033,10 @@ package def ;
 no warnings ;
 use warnings::register ;
 sub check { 
-  print "ok1\n" if  warnings::enabled() ;
-  print "ok2\n" if !warnings::enabled("io") ;
-  print "ok3\n" if !warnings::enabled("all") ;
-  print "ok4\n" if  warnings::enabled("def") ;
+  print \*STDOUT, "ok1\n" if  warnings::enabled() ;
+  print \*STDOUT, "ok2\n" if !warnings::enabled("io") ;
+  print \*STDOUT, "ok3\n" if !warnings::enabled("all") ;
+  print \*STDOUT, "ok4\n" if  warnings::enabled("def") ;
   warnings::warn("my message 1") ;
   warnings::warnif("my message 2") ;
   warnings::warnif('def', "my message 3") ;
