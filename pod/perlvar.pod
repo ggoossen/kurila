@@ -713,14 +713,6 @@ version of the same lexical pragma:
 The %^H hash provides the same scoping semantic as $^H.  This makes it
 useful for implementation of lexically scoped pragmas. See L<perlpragma>.
 
-=item $INPLACE_EDIT
-
-=item $^I
-X<$^I> X<$INPLACE_EDIT>
-
-The current value of the inplace-edit extension.  Use C<undef> to disable
-inplace editing.  (Mnemonic: value of B<-i> switch.)
-
 =item $^M
 X<$^M>
 

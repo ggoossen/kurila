@@ -12,7 +12,7 @@ BEGIN {
 use warnings;
 use Config;
 
-plan tests => 31;
+plan tests => 30;
 
 
 my $Is_MSWin32  = $^OS_NAME eq 'MSWin32';
@@ -162,14 +162,6 @@ EOF
 # $], $^O, $^T
 ok $^OS_NAME;
 ok $^BASETIME +> 850000000, $^BASETIME;
-
-# Test change 25062 is working
-my $orig_osname = $^OS_NAME;
-do {
-local $^INPLACE_EDIT = '.bak';
-ok($^OS_NAME eq $orig_osname, 'Assigning $^I does not clobber $^O');
-};
-$^OS_NAME = $orig_osname;
 
 if ($Is_VMS || $Is_Dos || $Is_MacOS) {
     skip("\%ENV manipulations fail or aren't safe on $^OS_NAME") for 1..4;

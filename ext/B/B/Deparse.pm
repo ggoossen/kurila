@@ -589,9 +589,6 @@ sub compile {
     return sub {
 	my $self = B::Deparse->new(< @args);
 	# First deparse command-line args
-	if (defined $^INPLACE_EDIT) { # deparse -i
-	    print \*STDOUT, q(BEGIN { $^I = ).perlstring($^INPLACE_EDIT).qq(; \}\n);
-	}
 	if ($^WARNING) { # deparse -w
 	    print \*STDOUT, qq(BEGIN \{ \$^W = $^WARNING; \}\n);
 	}

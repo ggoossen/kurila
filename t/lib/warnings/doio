@@ -201,33 +201,6 @@ exec $^EXECUTABLE_NAME, "-e0" ;
 EXPECT
 
 ########
-# doio.c [Perl_nextargv]
-$^WARNING = 0 ;
-my $filename = "./temp.dir" ;
-mkdir $filename, 0777 
-  or die "Cannot create directory $filename: $^OS_ERROR\n" ;
-do {
-    local @ARGV = @($filename) ;
-    local ($^INPLACE_EDIT) = "" ;
-    my $x = ~< *ARGV ;
-};
-do {
-    no warnings 'inplace' ;
-    local @ARGV = @($filename) ;
-    local ($^INPLACE_EDIT) = "" ;
-    my $x = ~< *ARGV ;
-};
-do {
-    use warnings 'inplace' ;
-    local @ARGV = @($filename) ;
-    local ($^INPLACE_EDIT) = "" ;
-    my $x = ~< *ARGV ;
-};
-rmdir $filename ;
-EXPECT
-Can't do inplace edit: ./temp.dir is not a regular file at - line 9 character 12.
-Can't do inplace edit: ./temp.dir is not a regular file at - line 21 character 12.
-########
 # doio.c [Perl_do_eof]
 use warnings 'io' ;
 my $a = eof \*STDOUT ;
