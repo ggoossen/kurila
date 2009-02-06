@@ -39,7 +39,6 @@ close $try or die "Could not close: $^OS_ERROR";
 open($try, ">", 'Io_argv2.tmp') or die "Can't open temp file: $^OS_ERROR";
 close $try or die "Could not close: $^OS_ERROR";
 @ARGV = @('Io_argv1.tmp', 'Io_argv2.tmp');
-$^INPLACE_EDIT = '_bak';   # not .bak which confuses VMS
 $^INPUT_RECORD_SEPARATOR = undef;
 my $i = 4;
 while ( ~< *ARGV) {
@@ -53,7 +52,6 @@ print \*STDOUT, $_ while ~< *$try;
 open($try, "<", 'Io_argv2.tmp') or die "Can't open temp file: $^OS_ERROR";
 print \*STDOUT, $_ while ~< *$try;
 close $try or die "Could not close: $^OS_ERROR";
-undef $^INPLACE_EDIT;
 
 ok( eof $try );
 
@@ -64,7 +62,7 @@ do {
 
 open \*STDIN, "<", 'Io_argv1.tmp' or die $^OS_ERROR;
 @ARGV = @();
-ok( !eof(),     'STDIN has something' );
+ok( !eof(\*STDIN),     'STDIN has something' );
 
 is( ~< *ARGV, "ok 4\n" );
 
@@ -100,6 +98,6 @@ do {
 };
 
 END {
-    1 while unlink 'Io_argv1.tmp', 'Io_argv1.tmp_bak',
-	'Io_argv2.tmp', 'Io_argv2.tmp_bak', 'Io_argv3.tmp';
+    1 while unlink 'Io_argv1.tmp',
+	'Io_argv2.tmp', 'Io_argv3.tmp';
 }

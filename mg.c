@@ -1454,8 +1454,6 @@ Perl_is_magicsv(pTHX_ const char* name)
 		return 1;
 	    if (strEQ(name2, "INCLUDED"))
 		return 1;
-	    if (strEQ(name2, "INPLACE_EDIT"))
-		return 1;
 	    /* $^INPUT_RECORD_SEPARATOR */
 	    if (strEQ(name2, "INPUT_RECORD_SEPARATOR"))
 		return 1;
