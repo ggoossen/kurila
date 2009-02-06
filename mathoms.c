@@ -546,13 +546,6 @@ PP(pp_keys)
     return do_kv();
 }
 
-/* Ops that are simply calls to other ops.  */
-PP(pp_dump)
-{
-    return pp_goto();
-    /*NOTREACHED*/
-}
-
 PP(pp_dofile)
 {
     return pp_require();

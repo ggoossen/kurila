@@ -552,7 +552,6 @@ Perl_op_tmprefcnt(pTHX_ OP *o)
     case OP_HINTSEVAL:
 	SvTMPREFCNT_inc(cSVOPo->op_sv);
 	break;
-    case OP_GOTO:
     case OP_NEXT:
     case OP_LAST:
     case OP_REDO:
@@ -623,7 +622,6 @@ Perl_op_clear(pTHX_ OP *o)
     case OP_HINTSEVAL:
 	SVcpNULL(cSVOPo->op_sv);
 	break;
-    case OP_GOTO:
     case OP_NEXT:
     case OP_LAST:
     case OP_REDO:
@@ -3246,7 +3244,7 @@ Perl_newLOOPEX(pTHX_ I32 type, OP *label)
 
     PERL_ARGS_ASSERT_NEWLOOPEX;
 
-    if (type != OP_GOTO || label->op_type == OP_CONST) {
+    {
 	/* "last()" means "last" */
 	if (label->op_type == OP_STUB && (label->op_flags & OPf_PARENS))
 	    o = newOP(type, OPf_SPECIAL, label->op_location);
@@ -3260,13 +3258,6 @@ Perl_newLOOPEX(pTHX_ I32 type, OP *label)
 #else
 	op_free(label);
 #endif
-    }
-    else {
-	/* Check whether it's going to be a goto &function */
-	if (label->op_type == OP_ENTERSUB
-		&& !(label->op_flags & OPf_STACKED))
-	    label = newUNOP(OP_SREFGEN, 0, mod(label, OP_SREFGEN), label->op_location);
-	o = newUNOP(type, OPf_STACKED, label, label->op_location);
     }
     PL_hints |= HINT_BLOCK_SCOPE;
     return o;

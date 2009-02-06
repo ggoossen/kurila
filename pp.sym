@@ -234,8 +234,6 @@ Perl_pp_return
 Perl_pp_last
 Perl_pp_next
 Perl_pp_redo
-Perl_pp_dump
-Perl_pp_goto
 Perl_pp_exit
 Perl_pp_method_named
 Perl_pp_open

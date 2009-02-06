@@ -49,7 +49,6 @@ my @raw_alias = @(
 		 # All the ops with a body of { return NORMAL; }
 		 Perl_pp_null => \qw(scalar regcmaybe lineseq scope),
 
-		 Perl_pp_goto => \@('dump'),
 		 Perl_pp_require => \@('dofile'),
 		 Perl_pp_sysread => \qw(read recv),
 		 Perl_pp_sysseek => \@('seek'),
@@ -861,8 +860,6 @@ return		return			ck_return	dm@	S?
 last		last			ck_null		ds}	
 next		next			ck_null		ds}	
 redo		redo			ck_null		ds}	
-dump		dump			ck_null		ds}	
-goto		goto			ck_null		ds}	
 exit		exit			ck_exit		ds%	S?
 method_named	method with known name	ck_null		d$
 

@@ -4,9 +4,8 @@
 require 'regen_lib.pl';
 
 my $kw = safer_open("keywords.h-new");
-select $kw;
 
-print \*STDOUT, <<EOM;
+print $kw, <<EOM;
 /* -*- buffer-read-only: t -*-
  *
  *    keywords.h
@@ -31,7 +30,7 @@ while ( ~< *DATA) {
     next unless $_;
     next if m/^#/;
     my @($keyword) =  split;
-    print \*STDOUT, &tab(5, "#define KEY_$keyword"), $keynum++, "\n";
+    print $kw, &tab(5, "#define KEY_$keyword"), $keynum++, "\n";
 }
 
 print $kw, "\n/* ex: set ro: */\n";
@@ -89,7 +88,6 @@ defined
 delete
 die
 do
-dump
 dynascope
 each
 else
@@ -141,7 +139,6 @@ getsockname
 getsockopt
 glob
 gmtime
-goto
 grep
 hex
 if

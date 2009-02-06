@@ -226,8 +226,6 @@ EXTCONST char* const PL_op_name[] = {
 	"last",
 	"next",
 	"redo",
-	"dump",
-	"goto",
 	"exit",
 	"method_named",
 	"open",
@@ -583,8 +581,6 @@ EXTCONST char* const PL_op_desc[] = {
 	"last",
 	"next",
 	"redo",
-	"dump",
-	"goto",
 	"exit",
 	"method with known name",
 	"open",
@@ -952,8 +948,6 @@ EXT Perl_ppaddr_t PL_ppaddr[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_pp_last),
 	MEMBER_TO_FPTR(Perl_pp_next),
 	MEMBER_TO_FPTR(Perl_pp_redo),
-	MEMBER_TO_FPTR(Perl_pp_goto),	/* Perl_pp_dump */
-	MEMBER_TO_FPTR(Perl_pp_goto),
 	MEMBER_TO_FPTR(Perl_pp_exit),
 	MEMBER_TO_FPTR(Perl_pp_method_named),
 	MEMBER_TO_FPTR(Perl_pp_open),
@@ -1318,8 +1312,6 @@ EXT Perl_check_t PL_check[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* last */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* next */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* redo */
-	MEMBER_TO_FPTR(Perl_ck_null),	/* dump */
-	MEMBER_TO_FPTR(Perl_ck_null),	/* goto */
 	MEMBER_TO_FPTR(Perl_ck_exit),	/* exit */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* method_named */
 	MEMBER_TO_FPTR(Perl_ck_open),	/* open */
@@ -1678,8 +1670,6 @@ EXTCONST U32 PL_opargs[] = {
 	0x00001a44,	/* last */
 	0x00001a44,	/* next */
 	0x00001a44,	/* redo */
-	0x00001a44,	/* dump */
-	0x00001a44,	/* goto */
 	0x00013644,	/* exit */
 	0x00000c40,	/* method_named */
 	0x0052c81d,	/* open */

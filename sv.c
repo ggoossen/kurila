@@ -8863,7 +8863,6 @@ S_find_uninit_var(pTHX_ OP* obase, SV* uninit_sv, bool match)
 	goto do_op;
 
     case OP_ENTERSUB:
-    case OP_GOTO:
 	/* XXX tmp hack: these two may call an XS sub, and currently
 	  XS subs don't have a SUB entry on the context stack, so CV and
 	  pad determination goes wrong, and BAD things happen. So, just

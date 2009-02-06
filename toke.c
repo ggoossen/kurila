@@ -4359,10 +4359,6 @@ Perl_yylex(pTHX)
 	    }
 	    else {			/* no override */
 		tmp = -tmp;
-		if (tmp == KEY_dump && ckWARN(WARN_MISC)) {
-		    Perl_warner(aTHX_ packWARN(WARN_MISC),
-			    "dump() better written as CORE::dump()");
-		}
 		gv = NULL;
 		gvp = 0;
 		if (hgv && tmp != KEY_x && tmp != KEY_CORE
@@ -4911,10 +4907,6 @@ Perl_yylex(pTHX)
 	case KEY_delete:
 	    UNI(OP_DELETE);
 
-	case KEY_dump:
-	    s = force_word(s,WORD,TRUE,FALSE,FALSE);
-	    LOOPX(OP_DUMP);
-
 	case KEY_dynascope:
 	    FUN0(OP_DYNASCOPE);
 
@@ -5010,10 +5002,6 @@ Perl_yylex(pTHX)
 
 	case KEY_grep:
 	    LOP(OP_GREPSTART, XREF);
-
-	case KEY_goto:
-	    s = force_word(s,WORD,TRUE,FALSE,FALSE);
-	    LOOPX(OP_GOTO);
 
 	case KEY_gmtime:
 	    UNI(OP_GMTIME);
@@ -6444,16 +6432,6 @@ Perl_keyword (pTHX_ const char *name, I32 len)
               name[3] == 'p')
           {                                       /* chop       */
             return -KEY_chop;
-          }
-
-          goto unknown;
-
-        case 'd':
-          if (name[1] == 'u' &&
-              name[2] == 'm' &&
-              name[3] == 'p')
-          {                                       /* dump       */
-            return -KEY_dump;
           }
 
           goto unknown;
