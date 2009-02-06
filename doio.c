@@ -648,8 +648,6 @@ Perl_nextargv(pTHX_ register GV *gv)
     int filedev;
     int fileino;
 #endif
-    Uid_t fileuid;
-    Gid_t filegid;
     IO * const io = GvIOp(gv);
 
     PERL_ARGS_ASSERT_NEXTARGV;
@@ -658,11 +656,6 @@ Perl_nextargv(pTHX_ register GV *gv)
 	PL_argvoutgv = gv_fetchpvs("ARGVOUT", GV_ADD|GV_NOTQUAL, SVt_PVIO);
     if (io && (IoFLAGS(io) & IOf_ARGV) && (IoFLAGS(io) & IOf_START)) {
 	IoFLAGS(io) &= ~IOf_START;
-	if (PL_inplace) {
-	    assert(PL_defoutgv);
-	    Perl_av_create_and_push(aTHX_ &PL_argvout_stack,
-				    SvREFCNT_inc_simple_NN(PL_defoutgv));
-	}
     }
     if (PL_filemode & (S_ISUID|S_ISGID)) {
 	PerlIO_flush(IoIFP(GvIOn(PL_argvoutgv)));  /* chmod must follow last write */
@@ -684,189 +677,18 @@ Perl_nextargv(pTHX_ register GV *gv)
 	sv_setsv(GvSVn(gv),sv);
 	SvSETMAGIC(GvSV(gv));
 	PL_oldname = SvPV_const(GvSV(gv), oldlen);
-	if ( ! PL_inplace) {
-	    if (oldlen == 1 && *PL_oldname == '-') {
-		if (do_openn(gv,"-", 1, FALSE, O_RDONLY,0,NULL,NULL,0)) {
-		    return IoIFP(GvIOp(gv));
-		}
-	    } else {
-		if (do_openn(gv,"<", 1, FALSE, O_RDONLY,0,NULL,&sv,1)) {
-		    return IoIFP(GvIOp(gv));
-		}
-	    }
-	} else {
-	    if (do_openn(gv,PL_oldname,oldlen,TRUE,O_RDONLY,0,NULL,NULL,0)) {
-		if (oldlen == 1 && *PL_oldname == '-') {
-		    setdefout(gv_fetchpvs("STDOUT", GV_ADD|GV_NOTQUAL,
-					  SVt_PVIO));
-		    return IoIFP(GvIOp(gv));
-		}
-#ifndef FLEXFILENAMES
-		filedev = PL_statbuf.st_dev;
-		fileino = PL_statbuf.st_ino;
-#endif
-		PL_filemode = PL_statbuf.st_mode;
-		fileuid = PL_statbuf.st_uid;
-		filegid = PL_statbuf.st_gid;
-		if (!S_ISREG(PL_filemode)) {
-		    if (ckWARN_d(WARN_INPLACE))	
-		        Perl_warner(aTHX_ packWARN(WARN_INPLACE),
-			    "Can't do inplace edit: %s is not a regular file",
-		            PL_oldname );
-		    do_close(gv,FALSE);
-		    continue;
-		}
-		if (*PL_inplace) {
-		    const char *star = strchr(PL_inplace, '*');
-		    if (star) {
-			const char *begin = PL_inplace;
-			sv_setpvn(sv, "", 0);
-			do {
-			    sv_catpvn(sv, begin, star - begin);
-			    sv_catpvn(sv, PL_oldname, oldlen);
-			    begin = ++star;
-			} while ((star = strchr(begin, '*')));
-			if (*begin)
-			    sv_catpv(sv,begin);
-		    }
-		    else {
-			sv_catpv(sv,PL_inplace);
-		    }
-#ifndef FLEXFILENAMES
-		    if ((PerlLIO_stat(SvPVX_const(sv),&PL_statbuf) >= 0
-			 && PL_statbuf.st_dev == filedev
-			 && PL_statbuf.st_ino == fileino)
-#ifdef DJGPP
-			|| ((_djstat_fail_bits & _STFAIL_TRUENAME)!=0)
-#endif
-                      )
-		    {
-			if (ckWARN_d(WARN_INPLACE))	
-			    Perl_warner(aTHX_ packWARN(WARN_INPLACE),
-			      "Can't do inplace edit: %"SVf" would not be unique",
-			      SVfARG(sv));
-			do_close(gv,FALSE);
-			continue;
-		    }
-#endif
-#ifdef HAS_RENAME
-#if !defined(DOSISH) && !defined(__CYGWIN__) && !defined(EPOC)
-		    if (PerlLIO_rename(PL_oldname,SvPVX_const(sv)) < 0) {
-		        if (ckWARN_d(WARN_INPLACE))	
-			    Perl_warner(aTHX_ packWARN(WARN_INPLACE),
-			      "Can't rename %s to %"SVf": %s, skipping file",
-			      PL_oldname, SVfARG(sv), Strerror(errno));
-			do_close(gv,FALSE);
-			continue;
-		    }
-#else
-		    do_close(gv,FALSE);
-		    (void)PerlLIO_unlink(SvPVX_const(sv));
-		    (void)PerlLIO_rename(PL_oldname,SvPVX_const(sv));
-		    do_openn(gv,"<", 1,PL_inplace!=0,
-			     O_RDONLY,0,NULL, &sv, 1);
-#endif /* DOSISH */
-#else
-		    (void)UNLINK(SvPVX_const(sv));
-		    if (link(PL_oldname,SvPVX_const(sv)) < 0) {
-		        if (ckWARN_d(WARN_INPLACE))	
-			    Perl_warner(aTHX_ packWARN(WARN_INPLACE),
-			      "Can't rename %s to %"SVf": %s, skipping file",
-			      PL_oldname, SVfARG(sv), Strerror(errno) );
-			do_close(gv,FALSE);
-			continue;
-		    }
-		    (void)UNLINK(PL_oldname);
-#endif
-		}
-		else {
-#if !defined(DOSISH) && !defined(AMIGAOS)
-#  ifndef VMS  /* Don't delete; use automatic file versioning */
-		    if (UNLINK(PL_oldname) < 0) {
-		        if (ckWARN_d(WARN_INPLACE))	
-			    Perl_warner(aTHX_ packWARN(WARN_INPLACE),
-			      "Can't remove %s: %s, skipping file",
-			      PL_oldname, Strerror(errno) );
-			do_close(gv,FALSE);
-			continue;
-		    }
-#  endif
-#else
-		    Perl_croak(aTHX_ "Can't do inplace edit without backup");
-#endif
-		}
-
-		sv_setpvn(sv,">",!PL_inplace);
-		sv_catpvn(sv,PL_oldname,oldlen);
-		SETERRNO(0,0);		/* in case sprintf set errno */
-#ifdef VMS
-		if (!do_open(PL_argvoutgv,(char*)SvPVX_const(sv),SvCUR(sv),
-			     PL_inplace!=0,O_WRONLY|O_CREAT|O_TRUNC,0,NULL))
-#else
-		    if (!do_open(PL_argvoutgv,(char*)SvPVX_const(sv),SvCUR(sv),
-			     PL_inplace!=0,O_WRONLY|O_CREAT|OPEN_EXCL,0666,
-			     NULL))
-#endif
-		{
-		    if (ckWARN_d(WARN_INPLACE))	
-		        Perl_warner(aTHX_ packWARN(WARN_INPLACE), "Can't do inplace edit on %s: %s",
-		          PL_oldname, Strerror(errno) );
-		    do_close(gv,FALSE);
-		    continue;
-		}
-		setdefout(PL_argvoutgv);
-		PL_lastfd = PerlIO_fileno(IoIFP(GvIOp(PL_argvoutgv)));
-		(void)PerlLIO_fstat(PL_lastfd,&PL_statbuf);
-#ifdef HAS_FCHMOD
-		(void)fchmod(PL_lastfd,PL_filemode);
-#else
-#  if !(defined(WIN32) && defined(__BORLANDC__))
-		/* Borland runtime creates a readonly file! */
-		(void)PerlLIO_chmod(PL_oldname,PL_filemode);
-#  endif
-#endif
-		if (fileuid != PL_statbuf.st_uid || filegid != PL_statbuf.st_gid) {
-#ifdef HAS_FCHOWN
-		    (void)fchown(PL_lastfd,fileuid,filegid);
-#else
-#ifdef HAS_CHOWN
-		    (void)PerlLIO_chown(PL_oldname,fileuid,filegid);
-#endif
-#endif
-		}
+	if (oldlen == 1 && *PL_oldname == '-') {
+	    if (do_openn(gv,"-", 1, FALSE, O_RDONLY,0,NULL,NULL,0)) {
 		return IoIFP(GvIOp(gv));
 	    }
-	    else {
-		if (ckWARN_d(WARN_INPLACE)) {
-		    const int eno = errno;
-		    if (PerlLIO_stat(PL_oldname, &PL_statbuf) >= 0
-			&& !S_ISREG(PL_statbuf.st_mode))	
-			{
-			    Perl_warner(aTHX_ packWARN(WARN_INPLACE),
-					"Can't do inplace edit: %s is not a regular file",
-					PL_oldname);
-		}
-		    else
-			Perl_warner(aTHX_ packWARN(WARN_INPLACE), "Can't open %s: %s",
-				    PL_oldname, Strerror(eno));
-		}
+	} else {
+	    if (do_openn(gv,"<", 1, FALSE, O_RDONLY,0,NULL,&sv,1)) {
+		return IoIFP(GvIOp(gv));
 	    }
 	}
     }
     if (io && (IoFLAGS(io) & IOf_ARGV))
 	IoFLAGS(io) |= IOf_START;
-    if (PL_inplace) {
-	(void)do_close(PL_argvoutgv,FALSE);
-	if (io && (IoFLAGS(io) & IOf_ARGV)
-	    && PL_argvout_stack && AvFILLp(PL_argvout_stack) >= 0)
-	{
-	    GV * const oldout = (GV*)av_pop(PL_argvout_stack);
-	    setdefout(oldout);
-	    GvREFCNT_dec(oldout);
-	    return NULL;
-	}
-	setdefout(gv_fetchpvs("STDOUT", GV_ADD|GV_NOTQUAL, SVt_PVIO));
-    }
     return NULL;
 }
 

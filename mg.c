@@ -907,10 +907,6 @@ Perl_magic_get(pTHX_ const char* name, SV* sv)
 		sv_setsv(sv, HvSv(PL_includedhv));
 		break;
 	    }
-	    if (strEQ(remaining, "INPLACE_EDIT")) {
-		sv_setpv(sv, PL_inplace); /* Will undefine sv if PL_inplace is NULL */
-		break;
-	    }
 	    if (strEQ(remaining, "INPUT_RECORD_SEPARATOR")) {
 		break;
 	    }
@@ -1815,11 +1811,6 @@ Perl_magic_set(pTHX_ const char* name, SV *sv)
 		break;
 	    }
 
-	    if (strEQ(remaining, "INPLACE_EDIT")) {
-		Safefree(PL_inplace);
-		PL_inplace = SvOK(sv) ? savesvpv(sv) : NULL;
-		break;
-	    }
 	    if (strEQ(remaining, "INPUT_RECORD_SEPARATOR")) {
 		/* $^INPUT_RECORD_SEPARATOR */
 		SVcpSTEAL(PL_rs, newSVsv(sv));

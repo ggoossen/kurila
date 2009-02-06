@@ -6,7 +6,7 @@
 
 BEGIN { require "./test.pl"; }
 
-plan(tests => 62);
+plan(tests => 60);
 
 use Config;
 
@@ -253,38 +253,3 @@ foreach my $switch (split m//, "ABbGgHJjKkLNOoPQqRrYyZz123456789_")
           "-$switch correctly unknown" );
 
 }
-
-# Tests for -i
-
-do {
-    local $TODO = '';   # these ones should work on VMS
-
-    sub do_i_unlink { 1 while unlink("file", "file.bak") }
-
-    open(my $file, ">", "file") or die "$^PROGRAM_NAME: Failed to create 'file': $^OS_ERROR";
-    print $file, <<__EOF__;
-foo yada dada
-bada foo bing
-king kong foo
-__EOF__
-    close $file;
-
-    END { do_i_unlink() }
-
-    runperl( switches => \@('-pi.bak'), prog => 's/foo/bar/', args => \@('file') );
-
-    open($file, "<", "file") or die "$^PROGRAM_NAME: Failed to open 'file': $^OS_ERROR";
-    chomp(my @file = @( ~< $file ));
-    close $file;
-
-    open(my $bak, "<", "file.bak") or die "$^PROGRAM_NAME: Failed to open 'file': $^OS_ERROR";
-    chomp(my @bak = @( ~< $bak ));
-    close $bak;
-
-    is(join(":", @file),
-       "bar yada dada:bada bar bing:king kong bar",
-       "-i new file");
-    is(join(":", @bak),
-       "foo yada dada:bada foo bing:king kong foo",
-       "-i backup file");
-};

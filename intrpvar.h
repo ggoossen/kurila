@@ -225,7 +225,6 @@ PERLVAR(Iexit_flags,	U8)		/* was exit() unexpected, etc. */
 PERLVAR(Isrand_called,	bool)
 /* Part of internal state, but makes the 16th 1 byte variable in a row.  */
 /* Space for a U8 */
-PERLVAR(Iinplace,	char *)
 PERLVAR(Ie_script,	SV *)
 
 /* magical thingies */

@@ -1821,7 +1821,6 @@
 #define ck_grep			Perl_ck_grep
 #define ck_index		Perl_ck_index
 #define ck_lfun			Perl_ck_lfun
-#define ck_listiob		Perl_ck_listiob
 #define ck_match		Perl_ck_match
 #define ck_method		Perl_ck_method
 #define ck_null			Perl_ck_null
@@ -1833,7 +1832,6 @@
 #define ck_rfun			Perl_ck_rfun
 #define ck_rvconst		Perl_ck_rvconst
 #define ck_sassign		Perl_ck_sassign
-#define ck_select		Perl_ck_select
 #define ck_shift		Perl_ck_shift
 #define ck_sort			Perl_ck_sort
 #define ck_split		Perl_ck_split
@@ -2149,7 +2147,6 @@
 #define pp_sqrt			Perl_pp_sqrt
 #define pp_srand		Perl_pp_srand
 #define pp_srefgen		Perl_pp_srefgen
-#define pp_sselect		Perl_pp_sselect
 #define pp_sservent		Perl_pp_sservent
 #define pp_ssockopt		Perl_pp_ssockopt
 #define pp_stat			Perl_pp_stat
@@ -3975,7 +3972,6 @@
 #define ck_grep(a)		Perl_ck_grep(aTHX_ a)
 #define ck_index(a)		Perl_ck_index(aTHX_ a)
 #define ck_lfun(a)		Perl_ck_lfun(aTHX_ a)
-#define ck_listiob(a)		Perl_ck_listiob(aTHX_ a)
 #define ck_match(a)		Perl_ck_match(aTHX_ a)
 #define ck_method(a)		Perl_ck_method(aTHX_ a)
 #define ck_null(a)		Perl_ck_null(aTHX_ a)
@@ -3987,7 +3983,6 @@
 #define ck_rfun(a)		Perl_ck_rfun(aTHX_ a)
 #define ck_rvconst(a)		Perl_ck_rvconst(aTHX_ a)
 #define ck_sassign(a)		Perl_ck_sassign(aTHX_ a)
-#define ck_select(a)		Perl_ck_select(aTHX_ a)
 #define ck_shift(a)		Perl_ck_shift(aTHX_ a)
 #define ck_sort(a)		Perl_ck_sort(aTHX_ a)
 #define ck_split(a)		Perl_ck_split(aTHX_ a)
@@ -4303,7 +4298,6 @@
 #define pp_sqrt()		Perl_pp_sqrt(aTHX)
 #define pp_srand()		Perl_pp_srand(aTHX)
 #define pp_srefgen()		Perl_pp_srefgen(aTHX)
-#define pp_sselect()		Perl_pp_sselect(aTHX)
 #define pp_sservent()		Perl_pp_sservent(aTHX)
 #define pp_ssockopt()		Perl_pp_ssockopt(aTHX)
 #define pp_stat()		Perl_pp_stat(aTHX)

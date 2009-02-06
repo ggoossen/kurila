@@ -146,7 +146,6 @@
 #define PL_includedhv		(vTHX->Iincludedhv)
 #define PL_includepathav	(vTHX->Iincludepathav)
 #define PL_initav		(vTHX->Iinitav)
-#define PL_inplace		(vTHX->Iinplace)
 #define PL_isarev		(vTHX->Iisarev)
 #define PL_known_layers		(vTHX->Iknown_layers)
 #define PL_lastfd		(vTHX->Ilastfd)
@@ -425,7 +424,6 @@
 #define PL_Iincludedhv		PL_includedhv
 #define PL_Iincludepathav	PL_includepathav
 #define PL_Iinitav		PL_initav
-#define PL_Iinplace		PL_inplace
 #define PL_Iisarev		PL_isarev
 #define PL_Iknown_layers	PL_known_layers
 #define PL_Ilastfd		PL_lastfd

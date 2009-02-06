@@ -616,9 +616,6 @@ perl_destruct(pTHXx)
     PL_doextract    = FALSE;
     PL_unsafe       = FALSE;
 
-    Safefree(PL_inplace);
-    PL_inplace = NULL;
-
     SvREFCNT_dec(PL_patchlevel);
     PL_patchlevel = NULL;
 
@@ -1354,7 +1351,6 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 	    case 'd':
 	    case 'D':
 	    case 'h':
-	    case 'i':
 	    case 'l':
 	    case 'M':
 	    case 'm':
@@ -2673,27 +2669,6 @@ Perl_moreswitches(pTHX_ const char *s)
     case 'h':
 	usage(PL_origargv[0]);
 	my_exit(0);
-    case 'i':
-	Safefree(PL_inplace);
-#if defined(__CYGWIN__) /* do backup extension automagically */
-	if (*(s+1) == '\0') {
-	PL_inplace = savepvs(".bak");
-	return s+1;
-	}
-#endif /* __CYGWIN__ */
-	{
-	    const char * const start = ++s;
-	    while (*s && !isSPACE(*s))
-		++s;
-
-	    PL_inplace = savepvn(start, s - start);
-	}
-	if (*s) {
-	    ++s;
-	    if (*s == '-')	/* Additional switches on #! line. */
-		s++;
-	}
-	return s;
     case 'I':	/* -I handled both here and in parse_body() */
 	forbid_setid('I', FALSE);
 	++s;

@@ -70,7 +70,7 @@ EOW
     $warning;
 } # do_not_edit
 
-open IN, '<', "embed.fnc" or die $^OS_ERROR;
+open my $in, '<', "embed.fnc" or die $^OS_ERROR;
 
 # walk table providing an array of components in each line to
 # subroutine, printing the result
@@ -88,13 +88,13 @@ sub walk_table (&@) {
 	# safer_unlink $filename if $filename ne '/dev/null';
 	$F = safer_open("$filename-new");
     }
-    print $F $leader if $leader;
-    seek IN, 0, 0;		# so we may restart
-    while ( ~< *IN) {
+    print $F, $leader if $leader;
+    seek $in, 0, 0;		# so we may restart
+    while ( ~< *$in) {
 	chomp;
 	next if m/^:/;
 	while (s|\\$||) {
-	    $_ .= ~< *IN;
+	    $_ .= ~< *$in;
 	    chomp;
 	}
 	s/\s+$//;
@@ -106,9 +106,9 @@ sub walk_table (&@) {
 	    @args = split m/\s*\|\s*/, $_;
 	}
 	my @outs = @( $function->(< @args) );
-	print $F < @outs;
+	print $F, < @outs;
     }
-    print $F $trailer if $trailer;
+    print $F, $trailer if $trailer;
     unless (ref $filename) {
 	safer_close($F);
 	rename_if_different("$filename-new", $filename);
@@ -138,8 +138,8 @@ sub munge_c_files () {
 	    }
 	    $repl;
           })}g;
-	print;
-	close ARGV if eof;	# restart $.
+	print \*STDOUT, $_;
+	close *ARGV if eof;	# restart $.
     }
     exit;
 }
@@ -321,10 +321,11 @@ my @extvars = qw(sv_undef sv_yes sv_no na dowarn
 
 sub readsyms (\%$) {
     my @($syms, $file) =  @_;
-    local (*FILE, $_);
-    open(FILE, "<", "$file")
+    local ($_);
+    my $fh;
+    open($fh, "<", "$file")
 	or die "embed.pl: Can't open $file: $^OS_ERROR\n";
-    while ( ~< *FILE) {
+    while ( ~< *$fh) {
 	s/[ \t]*#.*//;		# Delete comments.
 	if (m/^\s*(\S+)\s*$/) {
 	    my $sym = $1;
@@ -333,7 +334,7 @@ sub readsyms (\%$) {
 	    %$syms{+$sym} = 1;
 	}
     }
-    close(FILE);
+    close($fh);
 }
 
 # Perl_pp_* and Perl_ck_* are in pp.sym
@@ -341,10 +342,10 @@ readsyms my %ppsym, 'pp.sym';
 
 sub readvars(\%$$@) {
     my @($syms, $file,$pre,?$keep_pre) =  @_;
-    local (*FILE, $_);
-    open(FILE, "<", "$file")
+    local ($_);
+    open(my $fh, "<", "$file")
 	or die "embed.pl: Can't open $file: $^OS_ERROR\n";
-    while ( ~< *FILE) {
+    while ( ~< *$fh) {
 	s/[ \t]*#.*//;		# Delete comments.
 	if (m/PERLVARA?I?S?C?\($pre(\w+)/) {
 	    my $sym = $1;
@@ -354,7 +355,7 @@ sub readvars(\%$$@) {
 	    %$syms{+$sym} = $pre || 1;
 	}
     }
-    close(FILE);
+    close($fh);
 }
 
 my %intrp;
@@ -392,7 +393,7 @@ sub multoff ($$) {
 
 my $em = safer_open('embed.h-new');
 
-print $em do_not_edit ("embed.h"), <<'END';
+print $em, do_not_edit ("embed.h"), <<'END';
 
 /* (Doing namespace management portably in C is really gross.) */
 
@@ -443,7 +444,7 @@ walk_table {
                     $xvname =~ s/^sv/$(lc $xv)/;
                     my $ret_convert = $retval =~ m/SV/;
                     my $call = "Perl_" . $func . "(aTHX_ " . $xv . "Sv" . "($a1)$alist)";
-                    print $em "#define $xvname(" . $a1 . $alist . ")\t\t" . ($ret_convert ?? "Sv" . $xv . "($call)" !! $call ) . "\n";
+                    print $em, "#define $xvname(" . $a1 . $alist . ")\t\t" . ($ret_convert ?? "Sv" . $xv . "($call)" !! $call ) . "\n";
                 }
             }
 	}
@@ -471,15 +472,15 @@ walk_table {
 } $em, "";
 
 if ($ifdef_state) {
-    print $em "#endif\n";
+    print $em, "#endif\n";
 }
 
 for my $sym (sort keys %ppsym) {
     $sym =~ s/^Perl_//;
-    print $em hide($sym, "Perl_$sym");
+    print $em, hide($sym, "Perl_$sym");
 }
 
-print $em <<'END';
+print $em, <<'END';
 
 #else	/* PERL_IMPLICIT_CONTEXT */
 
@@ -529,7 +530,7 @@ walk_table {
                     (my $xvname = $func) =~ s/^Sv/$xv/;
                     my $ret_convert = $retval =~ m/SV/;
                    my $call = "Perl_" . $func . "(aTHX_ " . $xv . "Sv" . "($a1)$alist)";
-                    print $em "#define $xvname(" . $a1 . $alist . ")\t\t" . ($ret_convert ?? "Sv" . $xv . "($call)" !! $call ) . "\n";
+                    print $em, "#define $xvname(" . $a1 . $alist . ")\t\t" . ($ret_convert ?? "Sv" . $xv . "($call)" !! $call ) . "\n";
                 }
             }
 	}
@@ -557,23 +558,23 @@ walk_table {
 } $em, "";
 
 if ($ifdef_state) {
-    print $em "#endif\n";
+    print $em, "#endif\n";
 }
 
 for my $sym (sort keys %ppsym) {
     $sym =~ s/^Perl_//;
     if ($sym =~ m/^ck_/) {
-	print $em hide("$sym(a)", "Perl_$sym(aTHX_ a)");
+	print $em, hide("$sym(a)", "Perl_$sym(aTHX_ a)");
     }
     elsif ($sym =~ m/^pp_/) {
-	print $em hide("$sym()", "Perl_$sym(aTHX)");
+	print $em, hide("$sym()", "Perl_$sym(aTHX)");
     }
     else {
 	warn "Illegal symbol '$sym' in pp.sym";
     }
 }
 
-print $em <<'END';
+print $em, <<'END';
 
 #endif	/* PERL_IMPLICIT_CONTEXT */
 
@@ -581,7 +582,7 @@ print $em <<'END';
 
 END
 
-print $em <<'END';
+print $em, <<'END';
 
 /* Compatibility stubs.  Compile extensions with -DPERL_NOCOMPAT to
    disable them.
@@ -666,7 +667,7 @@ rename_if_different('embed.h-new', 'embed.h');
 
 $em = safer_open('embedvar.h-new');
 
-print $em do_not_edit ("embedvar.h"), <<'END';
+print $em, do_not_edit ("embedvar.h"), <<'END';
 
 /* (Doing namespace management portably in C is really gross.) */
 
@@ -695,10 +696,10 @@ print $em do_not_edit ("embedvar.h"), <<'END';
 END
 
 for my $sym (sort keys %intrp) {
-    print $em multon($sym,'I','vTHX->');
+    print $em, multon($sym,'I','vTHX->');
 }
 
-print $em <<'END';
+print $em, <<'END';
 
 #else	/* !MULTIPLICITY */
 
@@ -707,14 +708,14 @@ print $em <<'END';
 END
 
 for my $sym (sort keys %intrp) {
-    print $em multoff($sym,'I');
+    print $em, multoff($sym,'I');
 }
 
-print $em <<'END';
+print $em, <<'END';
 
 END
 
-print $em <<'END';
+print $em, <<'END';
 
 #endif	/* MULTIPLICITY */
 
@@ -723,21 +724,21 @@ print $em <<'END';
 END
 
 for my $sym (sort keys %globvar) {
-    print $em multon($sym,   'G','my_vars->');
-    print $em multon("G$sym",'', 'my_vars->');
+    print $em, multon($sym,   'G','my_vars->');
+    print $em, multon("G$sym",'', 'my_vars->');
 }
 
-print $em <<'END';
+print $em, <<'END';
 
 #else /* !PERL_GLOBAL_STRUCT */
 
 END
 
 for my $sym (sort keys %globvar) {
-    print $em multoff($sym,'G');
+    print $em, multoff($sym,'G');
 }
 
-print $em <<'END';
+print $em, <<'END';
 
 #endif /* PERL_GLOBAL_STRUCT */
 
@@ -746,10 +747,10 @@ print $em <<'END';
 END
 
 for my $sym (sort @extvars) {
-    print $em hide($sym,"PL_$sym");
+    print $em, hide($sym,"PL_$sym");
 }
 
-print $em <<'END';
+print $em, <<'END';
 
 #endif /* PERL_POLLUTE */
 
@@ -762,7 +763,7 @@ rename_if_different('embedvar.h-new', 'embedvar.h');
 my $capi = safer_open('perlapi.c-new');
 my $capih = safer_open('perlapi.h-new');
 
-print $capih do_not_edit ("perlapi.h"), <<'EOT';
+print $capih, do_not_edit ("perlapi.h"), <<'EOT';
 
 /* declare accessor functions for Perl variables */
 #ifndef __perlapi_h__
@@ -867,14 +868,14 @@ END_EXTERN_C
 EOT
 
 foreach my $sym (sort keys %intrp) {
-    print $capih bincompat_var('I',$sym);
+    print $capih, bincompat_var('I',$sym);
 }
 
 foreach my $sym (sort keys %globvar) {
-    print $capih bincompat_var('G',$sym);
+    print $capih, bincompat_var('G',$sym);
 }
 
-print $capih <<'EOT';
+print $capih, <<'EOT';
 
 #endif /* !PERL_CORE */
 #endif /* MULTIPLICITY */
@@ -886,7 +887,7 @@ EOT
 safer_close($capih);
 rename_if_different('perlapi.h-new', 'perlapi.h');
 
-print $capi do_not_edit ("perlapi.c"), <<'EOT';
+print $capi, do_not_edit ("perlapi.c"), <<'EOT';
 
 #include "EXTERN.h"
 #include "perl.h"
