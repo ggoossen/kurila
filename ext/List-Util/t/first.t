@@ -2,7 +2,7 @@
 
 use List::Util < qw(first);
 use Test::More;
-plan tests => ($::PERL_ONLY ?? 13 !! 15);
+plan tests => ($::PERL_ONLY ?? 12 !! 14);
 my $v;
 
 ok(defined &first,	'defined');
@@ -85,9 +85,4 @@ if (!$::PERL_ONLY) { SKIP: do {
     $List::Util::REAL_MULTICALL ||= 0; # Avoid use only once
     skip("Poor man's MULTICALL can't cope", 2)
       if !$List::Util::REAL_MULTICALL;
-
-    # Can we goto a subroutine?
-    try {@()= first{goto sub{}} 1,2;};
-    like($^EVAL_ERROR->{?description}, qr/^Can't goto subroutine from a sort sub/, "goto sub");
-
 }; }

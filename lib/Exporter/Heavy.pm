@@ -1,7 +1,4 @@
-package Exporter::Heavy;
-
-# On one line so MakeMaker will see it.
-require Exporter;  our $VERSION = $Exporter::VERSION;
+package Exporter;
 
 =head1 NAME
 
@@ -33,7 +30,7 @@ sub _rebuild_cache {
     }
 }
 
-sub heavy_export {
+sub export {
 
     my @($pkg, $callpkg, @< @imports) = @_;
     my ($type, $cache_is_current, $oops);
@@ -179,7 +176,7 @@ sub heavy_export {
     }
 }
 
-sub heavy_export_to_level
+sub export_to_level
 {
       my $pkg = shift;
       my $level = shift;
@@ -204,17 +201,17 @@ sub _push_tags {
     }
 }
 
-sub heavy_require_version {
+sub require_version {
     my @($self, $wanted) = @_;
     my $pkg = ref $self || $self;
     return $pkg->VERSION($wanted);
 }
 
-sub heavy_export_tags {
+sub export_tags {
   _push_tags(@(caller)[0], "EXPORT",    \@_);
 }
 
-sub heavy_export_ok_tags {
+sub export_ok_tags {
   _push_tags(@(caller)[0], "EXPORT_OK", \@_);
 }
 

@@ -83,8 +83,8 @@ sub B::IV::int_value {
 }
 
 sub B::NULL::as_string() {""}
-sub B::IV::as_string()   {goto &B::IV::int_value}
-sub B::PV::as_string()   {goto &B::PV::PV}
+sub B::IV::as_string()   { return B::IV::int_value(< @_) }
+sub B::PV::as_string()   { return B::PV::PV(< @_) }
 
 my $debug;
 my $op_count = 0;

@@ -241,7 +241,6 @@ last		last
 next		next
 redo		redo THIS
 dump		dump
-goto		goto THERE
 exit		exit 0
 open		open FOO
 close		close FOO

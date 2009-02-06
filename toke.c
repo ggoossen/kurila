@@ -6546,15 +6546,6 @@ Perl_keyword (pTHX_ const char *name, I32 len)
 
               goto unknown;
 
-            case 'o':
-              if (name[2] == 't' &&
-                  name[3] == 'o')
-              {                                   /* goto       */
-                return KEY_goto;
-              }
-
-              goto unknown;
-
             case 'r':
               if (name[2] == 'e' &&
                   name[3] == 'p')

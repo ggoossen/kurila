@@ -74,7 +74,7 @@ sub import {
 
 sub inherit {
     require base;
-    goto &base::inherit_fields;
+    base::inherit_fields(< @_);
 }
 
 sub _dump  # sometimes useful for debugging

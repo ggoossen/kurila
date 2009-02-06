@@ -26,7 +26,7 @@ sub unimport {
 # SWASHNEW
 sub SWASHNEW {
     require "utf8_heavy.pl";
-    goto &utf8::SWASHNEW_real;
+    return utf8::SWASHNEW_real(< @_);
 }
 
 # utf version of string functions

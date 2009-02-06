@@ -17,7 +17,10 @@ our ($h_name, @h_aliases, $h_addrtype, $h_length,
      @h_addr_list, $h_addr);
 
 # Class::Struct forbids use of @ISA
-sub import { goto &Exporter::import }
+sub import {
+    local $Exporter::ExportLevel = $Exporter::ExportLevel + 1;
+    return Exporter::import(< @_);
+}
 
 use Class::Struct < qw(struct);
 struct 'Net::hostent' => \@(

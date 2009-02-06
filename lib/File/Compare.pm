@@ -12,13 +12,8 @@ $VERSION = '1.1005';
 
 $Too_Big = 1024 * 1024 * 2;
 
-sub croak {
-    require Carp;
-    goto &Carp::croak;
-}
-
 sub compare {
-    croak("Usage: compare( file1, file2 [, buffersize]) ")
+    die("Usage: compare( file1, file2 [, buffersize]) ")
       unless((nelems @_) == 2 || (nelems @_) == 3);
 
     my @($from,$to,?$size) =  @_;
@@ -49,8 +44,8 @@ sub compare {
           return 1;
       };
 
-    croak("from undefined") unless (defined $from);
-    croak("to undefined") unless (defined $to);
+    die("from undefined") unless (defined $from);
+    die("to undefined") unless (defined $to);
 
     if (ref($from) && 
         (UNIVERSAL::isa($from,'GLOB') || UNIVERSAL::isa($from,'IO::Handle'))) {
@@ -123,9 +118,9 @@ sub compare {
 
 sub compare_text {
     my @($from,$to,?$cmp) =  @_;
-    croak("Usage: compare_text( file1, file2 [, cmp-function])")
+    die("Usage: compare_text( file1, file2 [, cmp-function])")
 	unless (nelems @_) == 2 || (nelems @_) == 3;
-    croak("Third arg to compare_text() function must be a code reference")
+    die("Third arg to compare_text() function must be a code reference")
 	if (nelems @_) == 3 && ref($cmp) ne 'CODE';
 
     # Using a negative buffer size puts compare into text_mode too

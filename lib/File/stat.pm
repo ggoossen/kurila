@@ -22,7 +22,10 @@ our ($st_dev, $st_ino, $st_mode, $st_nlink, $st_uid, $st_gid,
      $st_blksize, $st_blocks);
 
 # Class::Struct forbids use of @ISA
-sub import { goto &Exporter::import }
+sub import {
+    local $Exporter::ExportLevel = $Exporter::ExportLevel + 1;
+    return Exporter::import(< @_);
+}
 
 use Class::Struct < qw(struct);
 struct 'File::stat' => \ map { $_ => '$' } qw{

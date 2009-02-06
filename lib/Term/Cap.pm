@@ -2,18 +2,6 @@ package Term::Cap;
 
 # Since the debugger uses Term::ReadLine which uses Term::Cap, we want
 # to load as few modules as possible.  This includes Carp.pm.
-sub carp
-{
-    require Carp;
-    goto &Carp::carp;
-}
-
-sub croak
-{
-    require Carp;
-    goto &Carp::croak;
-}
-
 
 our ($VERSION, $VMS_TERMCAP);
 our ($termpat, $state, $first, $entry);
@@ -190,11 +178,11 @@ an old DSD-style speed ( where 13 equals 9600).
 =item TERM
 
 The terminal type whose termcap entry will be used - if not supplied it will
-default to $ENV{TERM}: if that is not set then B<Tgetent> will croak.
+default to $ENV{TERM}: if that is not set then B<Tgetent> will die.
 
 =back
 
-It calls C<croak> on failure.
+It calls C<die> on failure.
 
 =cut
 
@@ -215,7 +203,7 @@ sub Tgetent
     {
         if ($^WARNING)
         {
-            carp "OSPEED was not set, defaulting to 9600";
+            warn "OSPEED was not set, defaulting to 9600";
         }
         $self->{+OSPEED} = 9600;
     }
@@ -248,7 +236,7 @@ sub Tgetent
           }
           else
           {
-             croak "TERM not set";
+             die "TERM not set";
           }
        }
     }
@@ -307,7 +295,7 @@ sub Tgetent
         }
     }
 
-    croak "Can't find a valid termcap file" unless (nelems @termcap_path) || $entry;
+    die "Can't find a valid termcap file" unless (nelems @termcap_path) || $entry;
 
     $state = 1;    # 0 == finished
                    # 1 == next file
@@ -363,18 +351,18 @@ sub Tgetent
 
             # get the next TERMCAP
             $TERMCAP = shift @termcap_path
-              || croak "failed termcap lookup on $tmp_term";
+              || die "failed termcap lookup on $tmp_term";
         }
         else
         {
 
             # do the same file again
             # prevent endless recursion
-            $max-- || croak "failed termcap loop at $tmp_term";
+            $max-- || die "failed termcap loop at $tmp_term";
             $state = 1;    # ok, maybe do a new file next time
         }
 
-        open( my $termcap_fh, "<", "$TERMCAP\0" ) || croak "open $TERMCAP: $^OS_ERROR";
+        open( my $termcap_fh, "<", "$TERMCAP\0" ) || die "open $TERMCAP: $^OS_ERROR";
         eval $search;
         die $^EVAL_ERROR if $^EVAL_ERROR;
         close $termcap_fh;
@@ -387,7 +375,7 @@ sub Tgetent
         $termpat =~ s/(\W)/\\$1/g;
     }
 
-    croak "Can't find $term" if $entry eq '';
+    die "Can't find $term" if $entry eq '';
     $entry =~ s/:+\s*:+/:/g;    # cleanup $entry
     $entry =~ s/:+/:/g;         # cleanup $entry
     $self->{+TERMCAP} = $entry;  # save it
@@ -436,7 +424,7 @@ sub Tgetent
             $self->{+'_' . $cap } = $_;
         }
 
-        # else { carp "junk in $term ignored: $field"; }
+        # else { warn "junk in $term ignored: $field"; }
     }
     $self->{+'_pc'} = "\0" unless defined $self->{?'_pc'};
     $self->{+'_bc'} = "\b" unless defined $self->{?'_bc'};
@@ -673,7 +661,7 @@ sub Tgoto
 
 =item B<Trequire>
 
-Takes a list of capabilities as an argument and will croak if one is not
+Takes a list of capabilities as an argument and will die if one is not
 found.
 
 =cut
@@ -687,7 +675,7 @@ sub Trequire
         push( @undefined, $cap )
           unless defined $self->{?'_' . $cap } && $self->{?'_' . $cap };
     }
-    croak "Terminal does not support: ($(join ' ',@undefined))" if (nelems @undefined);
+    die "Terminal does not support: ($(join ' ',@undefined))" if (nelems @undefined);
 }
 
 =back

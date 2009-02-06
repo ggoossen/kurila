@@ -28,7 +28,11 @@ sub import {
 	# do we ever export anything else than 'struct'...?
       $self->export_to_level( 1, $self, < @_ );
     } else {
-      goto &struct;
+        if (not ref @_[1]) {
+            return struct( @(caller)[0] => \@_);
+        } else {
+            return struct(< @_);
+        }
     }
 }
 

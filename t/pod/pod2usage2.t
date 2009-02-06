@@ -5,10 +5,10 @@ use warnings;
 
 BEGIN {
   if ($^OS_NAME eq 'MSWin32' || $^OS_NAME eq 'VMS') {
-    plan skip_all => "Not portable on Win32 or VMS\n";
+      plan skip_all => "Not portable on Win32 or VMS\n";
   }
   else {
-    plan tests => 14;
+      plan tests => 14;
   }
 }
 use Pod::Usage;

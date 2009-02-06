@@ -1,5 +1,7 @@
 package Exporter;
 
+use Exporter::Heavy;
+
 our $Debug = 0;
 our $ExportLevel = 0;
 our $Verbose ||= 0;
@@ -7,16 +9,6 @@ our $VERSION = '5.62';
 our (%Cache);
 # Carp does this now for us, so we can finally live w/o Carp
 #$Carp::Internal{Exporter} = 1;
-
-sub as_heavy {
-    my $name = shift;
-    require Exporter::Heavy;
-    \&{*{Symbol::fetch_glob("Exporter::Heavy::heavy_$name")}};
-}
-
-sub export {
-  goto &{as_heavy("export")};
-}
 
 sub import {
   my $pkg = shift;
@@ -62,26 +54,6 @@ sub import {
 sub export_fail {
     my $self = shift;
     < @_;
-}
-
-# Unfortunately, caller(1)[3] "does not work" if the caller is aliased as
-# *name = \&foo.  Thus the need to create a lot of identical subroutines
-# Otherwise we could have aliased them to export().
-
-sub export_to_level {
-  goto &{as_heavy("export_to_level")};
-}
-
-sub export_tags {
-  goto &{as_heavy("export_tags")};
-}
-
-sub export_ok_tags {
-  goto &{as_heavy("export_ok_tags")};
-}
-
-sub require_version {
-  goto &{as_heavy("require_version")};
 }
 
 1;

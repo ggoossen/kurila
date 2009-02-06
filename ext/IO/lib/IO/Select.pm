@@ -128,13 +128,6 @@ sub has_exception
     !! ();
 }
 
-sub has_error
-{
- warnings::warn("Call to deprecated method 'has_error', use 'has_exception'")
-	if warnings::enabled();
- goto &has_exception;
-}
-
 sub count
 {
  my $vec = shift;

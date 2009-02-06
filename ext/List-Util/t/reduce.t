@@ -4,7 +4,7 @@ use Config;
 
 use List::Util < qw(reduce min);
 use Test::More;
-plan tests => ($::PERL_ONLY ?? 19 !! 21);
+plan tests => ($::PERL_ONLY ?? 18 !! 20);
 
 my $v = reduce {};
 
@@ -114,9 +114,4 @@ if (!$::PERL_ONLY) { SKIP: do {
     $List::Util::REAL_MULTICALL ||= 0; # Avoid use only once
     skip("Poor man's MULTICALL can't cope", 2)
       if !$List::Util::REAL_MULTICALL;
-
-    # Can we goto a subroutine?
-    try {@()= reduce{goto sub{}} 1,2;};
-    like($^EVAL_ERROR->{?description}, qr/^Can't goto subroutine from a sort sub/, "goto sub");
-
 }; }

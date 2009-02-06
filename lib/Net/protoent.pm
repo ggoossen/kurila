@@ -12,7 +12,10 @@ BEGIN {
 our ($p_name, @p_aliases, $p_proto);
 
 # Class::Struct forbids use of @ISA
-sub import { goto &Exporter::import }
+sub import {
+    local $Exporter::ExportLevel = $Exporter::ExportLevel + 1;
+    return Exporter::import(< @_);
+}
 
 use Class::Struct < qw(struct);
 struct 'Net::protoent' => \@(

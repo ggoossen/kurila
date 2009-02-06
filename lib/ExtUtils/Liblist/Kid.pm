@@ -266,6 +266,7 @@ sub _win32_ext {
         push @libpath, < split m/;/, env::var('LIB');
     }
 
+  LIBS:
     foreach ( Text::ParseWords::quotewords('\s+', 0, $potential_libs)){
 
 	my $thislib = $_;
@@ -310,47 +311,47 @@ sub _win32_ext {
 	$_ .= $libext if !m/\Q$libext\E$/i;
 
 	my $secondpass = 0;
-    LOOKAGAIN:
-        do { };
+      LOOKAGAIN:
+        do {
 
-        # look for the file itself
-	if (-f) {
-	    warn "'$thislib' found as '$_'\n" if $verbose;
-	    $found++;
-	    push(@extralibs, $_);
-	    next;
-	}
+            # look for the file itself
+            if (-f) {
+                warn "'$thislib' found as '$_'\n" if $verbose;
+                $found++;
+                push(@extralibs, $_);
+                next LIBS;
+            }
 
-	my $found_lib = 0;
-	foreach my $thispth ( @searchpath, < @libpath){
-	    unless (-f ($fullname="$thispth\\$_")) {
-		warn "'$thislib' not found as '$fullname'\n" if $verbose;
-		next;
-	    }
-	    warn "'$thislib' found as '$fullname'\n" if $verbose;
-	    $found++;
-	    $found_lib++;
-	    push(@extralibs, $fullname);
-	    push @libs, $fullname unless %libs_seen{+$fullname}++;
-	    last;
-	}
+            my $found_lib = 0;
+            foreach my $thispth ( @searchpath, < @libpath){
+                unless (-f ($fullname="$thispth\\$_")) {
+                    warn "'$thislib' not found as '$fullname'\n" if $verbose;
+                    next;
+                }
+                warn "'$thislib' found as '$fullname'\n" if $verbose;
+                $found++;
+                $found_lib++;
+                push(@extralibs, $fullname);
+                push @libs, $fullname unless %libs_seen{+$fullname}++;
+                last;
+            }
 
-	# do another pass with (or without) leading 'lib' if they used -l
-	if (!$found_lib and $thislib =~ m/^-l/ and !$secondpass++) {
-	    if ($GC) {
-		goto LOOKAGAIN if s/^lib//i;
-	    }
-	    elsif (!m/^lib/i) {
-		$_ = "lib$_";
-		goto LOOKAGAIN;
-	    }
-	}
+            # do another pass with (or without) leading 'lib' if they used -l
+            if (!$found_lib and $thislib =~ m/^-l/ and !$secondpass++) {
+                if ($GC) {
+                    redo LOOKAGAIN if s/^lib//i;
+                }
+                elsif (!m/^lib/i) {
+                    $_ = "lib$_";
+                    redo LOOKAGAIN;
+                }
+            }
 
-	# give up
-	warn "Note (probably harmless): "
-		     ."No library found for $thislib\n"
-	    unless $found_lib+>0;
-
+            # give up
+            warn "Note (probably harmless): "
+              ."No library found for $thislib\n"
+                unless $found_lib+>0;
+        };
     }
 
     return  @('','','','',  @($give_libs ?? \@libs !! ())) unless $found;

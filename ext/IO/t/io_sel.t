@@ -3,7 +3,7 @@
 iohandle::output_autoflush(\*STDERR, 1);
 iohandle::output_autoflush(\*STDOUT, 1);
 
-print \*STDOUT, "1..23\n";
+print \*STDOUT, "1..22\n";
 
 use IO::Select v1.09;
 
@@ -41,14 +41,6 @@ print \*STDOUT, "ok 8\n";
 $sel->remove(\@(\*STDOUT, 5));
 print \*STDOUT, "not " unless $sel->count == 0 && !defined($sel->bits);
 print \*STDOUT, "ok 9\n";
-
-if ( grep $^OS_NAME eq $_, qw(MSWin32 NetWare dos VMS riscos beos) ) {
-    for (10 .. 15) { 
-        print \*STDOUT, "ok $_ # skip: 4-arg select is only valid on sockets\n"
-    }
-    $sel->add(\*STDOUT);  # update
-    goto POST_SOCKET;
-}
 
 my @a = $sel->can_read();  # should return imediately
 print \*STDOUT, "not " unless (nelems @a) == 0;
@@ -116,15 +108,8 @@ $^WARN_HOOK = sub {
 $w = 0 ;
 do {
 no warnings 'IO::Select' ;
-IO::Select::has_error();
+IO::Select::has_exception();
 };
 print \*STDOUT, "not " unless $w == 0 ;
 $w = 0 ;
 print \*STDOUT, "ok 22\n" ;
-do {
-use warnings 'IO::Select' ;
-IO::Select::has_error();
-};
-print \*STDOUT, "not " unless $w == 1 ;
-$w = 0 ;
-print \*STDOUT, "ok 23\n" ;

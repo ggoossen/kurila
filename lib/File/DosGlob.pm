@@ -357,7 +357,7 @@ sub glob {
 	    for (  @appendpat ) {
 	        push @pat, $_;
 	    }
-	    goto REHASH;
+	    redo REHASH;
 	}
     };
     for (  @pat ) {

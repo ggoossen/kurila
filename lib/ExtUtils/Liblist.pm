@@ -8,11 +8,6 @@ require ExtUtils::Liblist::Kid;
 
 our @ISA = qw(ExtUtils::Liblist::Kid File::Spec);
 
-# Backwards compatibility with old interface.
-sub ext {
-    goto &ExtUtils::Liblist::Kid::ext;
-}
-
 sub lsdir {
   shift;
   my $rex = qr/@_[1]/;

@@ -242,8 +242,9 @@ use constant PAT_XINT  =>
 use constant PAT_FLOAT => "[-+]?[0-9._]+(\.[0-9_]+)?([eE][-+]?[0-9_]+)?";
 
 sub GetOptions(@) {
-  unshift @_, \@ARGV;
-  goto &GetOptionsFromArray;
+    local $caller = $caller;
+    $caller ||= @(caller)[0];
+    return GetOptionsFromArray(\@ARGV, < @_);
 }
 
 sub GetOptionsFromString($@) {

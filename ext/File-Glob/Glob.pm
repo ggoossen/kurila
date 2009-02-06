@@ -71,7 +71,8 @@ sub import {
 	}
 	++$i;
     }
-    goto &Exporter::import;
+    local $Exporter::ExportLevel = $Exporter::ExportLevel + 1;
+    return Exporter::import(< @_);
 }
 
 XSLoader::load 'File::Glob', $VERSION;

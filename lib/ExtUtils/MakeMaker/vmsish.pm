@@ -14,7 +14,7 @@ sub import {
     shift;
     unshift @_, 'vmsish';
 
-    goto &vmsish::import;
+    return vmsish::import(< @_);
 }
 
 1;

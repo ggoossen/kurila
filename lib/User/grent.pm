@@ -13,7 +13,10 @@ BEGIN {
 our ($gr_name, $gr_gid, $gr_passwd, $gr_mem, @gr_members);
 
 # Class::Struct forbids use of @ISA
-sub import { goto &Exporter::import }
+sub import {
+    local $Exporter::ExportLevel = $Exporter::ExportLevel + 1;
+    return Exporter::import(< @_);
+}
 
 use Class::Struct < qw(struct);
 struct 'User::grent' => \@(

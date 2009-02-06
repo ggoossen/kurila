@@ -1,5 +1,4 @@
-#!./perl -i.inplace
-# note the extra switch, for the test below
+#!./perl
 
 use Test::More tests => 1;
 

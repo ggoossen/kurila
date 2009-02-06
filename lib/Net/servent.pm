@@ -12,7 +12,10 @@ BEGIN {
 our ($s_name, @s_aliases, $s_port, $s_proto);
 
 # Class::Struct forbids use of @ISA
-sub import { goto &Exporter::import }
+sub import {
+    local $Exporter::ExportLevel = $Exporter::ExportLevel + 1;
+    return Exporter::import(< @_);
+}
 
 use Class::Struct < qw(struct);
 struct 'Net::servent' => \@(

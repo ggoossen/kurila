@@ -671,7 +671,7 @@ my @heavy_subs = @(qw|myconfig fetch_string FIRSTKEY NEXTKEY EXISTS STORE config
 for my $name (< @heavy_subs) {
     Symbol::fetch_glob("Config::$name")->* =
        sub { require 'Config_heavy.pl';
-             goto &{Symbol::fetch_glob("Config::$name")->*};
+             return Symbol::fetch_glob("Config::$name")->*->(< @_);
            };
 }
 

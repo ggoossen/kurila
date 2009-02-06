@@ -37,7 +37,10 @@ our ($pw_name, $pw_passwd, $pw_uid, $pw_gid, $pw_change, $pw_age,
 my $IE = "[INTERNAL ERROR]";
 
 # Class::Struct forbids use of @ISA
-sub import { goto &Exporter::import }
+sub import {
+    local $Exporter::ExportLevel = $Exporter::ExportLevel + 1;
+    return Exporter::import(< @_);
+}
 
 use Class::Struct < qw(struct);
 struct 'User::pwent' => \@(

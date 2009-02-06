@@ -25,20 +25,20 @@ our @EXPORT_FAIL = qw(verbose);	# hook to enable verbose mode
 sub export_fail { shift; $Verbose = shift if @_[0] eq 'verbose'; < @_ }
 
 # fixed hooks for stashes to point to
-sub longmess  { goto &longmess_jmp }
-sub shortmess { goto &shortmess_jmp }
+sub longmess  { return longmess_jmp(< @_) }
+sub shortmess { return shortmess_jmp(< @_) }
 # these two are replaced when Carp::Heavy is loaded
 sub longmess_jmp  {
     local($^EVAL_ERROR, $^OS_ERROR);
     try { require Carp::Heavy };
     die if $^EVAL_ERROR;
-    goto &longmess_real;
+    return longmess_real(< @_);
 }
 sub shortmess_jmp  {
     local($^EVAL_ERROR, $^OS_ERROR);
     try { require Carp::Heavy };
     die if $^EVAL_ERROR;
-    goto &longmess_real;
+    return longmess_real(< @_);
 }
 
 sub croak   { die shortmess < @_ }

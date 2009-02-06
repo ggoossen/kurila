@@ -1,7 +1,7 @@
 #!./perl
 
 require './test.pl';
-plan( tests => 14 );
+plan( tests => 10 );
 
 # test various operations on @_
 
@@ -17,22 +17,6 @@ sub new2 { splice @_, 0, 0, "a", "b", "c"; return \@_ }
 do {
     my $x = new2("x");
     my $y = new2("y");
-    is((join ' ',$x->@),"a b c x");
-    is((join ' ',$y->@),"a b c y");
-};
-
-sub new3 { goto &new1 }
-do {
-    my $x = new3("x");
-    my $y = new3("y");
-    is((join ' ',$y->@),"y");
-    is((join ' ',$x->@),"x");
-};
-
-sub new4 { goto &new2 }
-do {
-    my $x = new4("x");
-    my $y = new4("y");
     is((join ' ',$x->@),"a b c x");
     is((join ' ',$y->@),"a b c y");
 };

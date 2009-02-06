@@ -15,7 +15,8 @@ our @EXPORT_OK = qw(isa can VERSION);
 # anything unless called on UNIVERSAL.
 sub import {
     return unless @_[0] eq __PACKAGE__;
-    goto &Exporter::import;
+    local $Exporter::ExportLevel = $Exporter::ExportLevel + 1;
+    return Exporter::import(< @_);
 }
 
 1;

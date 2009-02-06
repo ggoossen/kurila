@@ -1,15 +1,12 @@
 #!/usr/bin/perl -w
 
 
-use Test::More tests => 6;
+use Test::More tests => 5;
 
 
 BEGIN {
     use_ok( 'ExtUtils::Liblist' );
 }
-
-ok( defined &ExtUtils::Liblist::ext, 
-    'ExtUtils::Liblist::ext() defined for backwards compat' );
 
 do {
     my @warn;

@@ -10,10 +10,10 @@ sub tack_on {
 }
 
 sub as_string {
-  goto &Pod::Simple::BlackBox::stringify_lol;
+    return Pod::Simple::BlackBox::stringify_lol(<@_);
 }
 sub stringify {
-  goto &Pod::Simple::BlackBox::stringify_lol;
+    return Pod::Simple::BlackBox::stringify_lol(<@_);
 }
 
 sub new {

@@ -43,12 +43,12 @@ sub load {
 
     # work with static linking too
     my $b = Symbol::fetch_glob("$module\::bootstrap");
-    goto &{*{$b}} if defined &{*{$b}};
+    return $b->*->(< @_) if defined &{*{$b}};
 
     unless ($module and defined &dl_load_file) {
         my $bootstrap_inherit = DynaLoader->can('bootstrap_inherit') || 
                                 XSLoader->can('bootstrap_inherit');
-        goto &$bootstrap_inherit;
+        return $bootstrap_inherit->(< @_);
     }
 
     my @modparts = split(m/::/,$module);
@@ -86,7 +86,7 @@ print $out, <<'EOT';
     if (not -f $file or -s $bs) {
         my $bootstrap_inherit = DynaLoader->can('bootstrap_inherit') || 
                                 XSLoader->can('bootstrap_inherit');
-        goto &$bootstrap_inherit;
+        return $bootstrap_inherit->(< @_);
     }
 
     my $bootname = "boot_$module";

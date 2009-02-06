@@ -11,7 +11,7 @@ sub import {
     shift;
     unshift @_, 'bytes';
 
-    goto &bytes::import;
+    return bytes::import(< @_);
 }
 
 1;
