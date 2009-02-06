@@ -88,13 +88,13 @@ $tablines .= make_type_tab($y_file, $tablines);
 
 chmod 0644, $act_file;
 open my $actfile, ">", "$act_file" or die "can't open $act_file: $^OS_ERROR\n";
-print $actfile $actlines;
+print $actfile, $actlines;
 close $actfile;
 chmod 0444, $act_file;
 
 chmod 0644, $tab_file;
 open my $tabfile, ">", "$tab_file" or die "can't open $tab_file: $^OS_ERROR\n";
-print $tabfile $tablines;
+print $tabfile, $tablines;
 close $tabfile;
 chmod 0444, $tab_file;
 
@@ -104,25 +104,25 @@ unlink $tmpc_file;
 # C<#line 30 "perly.y"> confuses the Win32 resource compiler and the
 # C<#line 188 "perlytmp.h"> gets picked up by make depend, so remove them.
 
-open TMPH_FILE, "<", $tmph_file or die "Can't open $tmph_file: $^OS_ERROR\n";
+open my $tmph_fh, "<", $tmph_file or die "Can't open $tmph_file: $^OS_ERROR\n";
 chmod 0644, $h_file;
-open H_FILE, ">", "$h_file" or die "Can't open $h_file: $^OS_ERROR\n";
+open my $h_fh, ">", "$h_file" or die "Can't open $h_file: $^OS_ERROR\n";
 my $endcore_done = 0;
-while ( ~< *TMPH_FILE) {
-    print H_FILE "#ifdef PERL_CORE\n" if iohandle::input_line_number(\*TMPH_FILE) == 1;
+while ( ~< *$tmph_fh) {
+    print $h_fh, "#ifdef PERL_CORE\n" if iohandle::input_line_number($tmph_fh) == 1;
     if (!$endcore_done and m/YYSTYPE_IS_DECLARED/) {
-	print H_FILE "#endif /* PERL_CORE */\n";
+	print $h_fh, "#endif /* PERL_CORE */\n";
 	$endcore_done = 1;
     }
     next if m/^#line \d+ ".*"/;
-    print H_FILE $_;
+    print $h_fh, $_;
 }
-close TMPH_FILE;
-close H_FILE;
+close $tmph_fh;
+close $h_fh;
 chmod 0444, $h_file;
 unlink $tmph_file;
 
-print "rebuilt:  $h_file $tab_file $act_file\n";
+print \*STDOUT, "rebuilt:  $h_file $tab_file $act_file\n";
 
 exit 0;
 

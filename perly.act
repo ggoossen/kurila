@@ -1190,7 +1190,7 @@ case 2:
 
   case 143:
 #line 1073 "perly.y"
-    { (yyval.opval) = newUNOP(OP_ENTERSUB, 0, scalar((ps[(1) - (1)].val.opval)), (ps[(1) - (1)].val.opval)->op_location);
+    { (yyval.opval) = newUNOP(OP_ENTERSUB, OPf_STACKED, scalar((ps[(1) - (1)].val.opval)), (ps[(1) - (1)].val.opval)->op_location);
                               APPEND_MADPROPS_PV("amper", (yyval.opval), '>');
                         ;}
     break;
