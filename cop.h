@@ -518,12 +518,7 @@ L<perlcall>.
 Used to force a Perl C<eval> wrapper around a callback.  See
 L<perlcall>.
 
-=for apidoc AmU||G_NOARGS
-
-Indicates that no arguments are being sent to a callback.  See
-L<perlcall>.
-
-=cut
+=perl/gerard/cut
 */
 
 #define G_SCALAR	2
@@ -536,7 +531,6 @@ L<perlcall>.
 				   Don't change this without consulting the
 				   hash actions codes defined in hv.h */
 #define G_EVAL		8	/* Assume eval {} around subroutine call. */
-#define G_NOARGS       16	/* Don't construct a @_ array. */
 #define G_KEEPERR      32	/* Append errors to $@, don't overwrite it */
 #define G_NODEBUG      64	/* Disable debugging at toplevel.  */
 #define G_METHOD      128       /* Calling method. */
