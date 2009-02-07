@@ -48,14 +48,14 @@ sub import {
 
     return SUCCESS unless (nelems @_);
 
-    # List of base classes from which we will inherit %FIELDS.
-    my $fields_base;
-
-    return import_into(caller(0), < @_);
+    return import_into($(caller(0)), < @_);
 }
 
 sub import_into {
     my $inheritor = shift;
+
+    # List of base classes from which we will inherit %FIELDS.
+    my $fields_base;
 
     my @bases;
     foreach my $base ( @_) {
