@@ -51,7 +51,11 @@ sub import {
     # List of base classes from which we will inherit %FIELDS.
     my $fields_base;
 
-    my $inheritor = caller(0);
+    return import_into(caller(0), < @_);
+}
+
+sub import_into {
+    my $inheritor = shift;
 
     my @bases;
     foreach my $base ( @_) {
