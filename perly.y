@@ -628,21 +628,7 @@ argexpr	:	argexpr ','
 	;
 
 /* List operators */
-listop	:	LSTOP indirob argexpr /* map {...} @args or print $fh @args */
-			{ 
-                            $$ = convert(IVAL($1), OPf_STACKED,
-                                prepend_elem(OP_LIST, newGVREF(IVAL($1),$2, LOCATION($1)), $3), LOCATION($1) );
-                            TOKEN_GETMAD($1,$$,'o');
-			}
-	|	FUNC '(' indirob expr ')'      /* print ($fh @args */
-			{ $$ = convert(IVAL($1), OPf_STACKED,
-				prepend_elem(OP_LIST, newGVREF(IVAL($1),$3, LOCATION($1)), $4), LOCATION($1) );
-			  TOKEN_GETMAD($1,$$,'o');
-			  TOKEN_GETMAD($2,$$,'(');
-			  TOKEN_GETMAD($5,$$,')');
-                          APPEND_MADPROPS_PV("func", $$, '>');
-			}
-	|	term ARROW method '(' listexprcom ')' /* $foo->bar(list) */
+listop	:	term ARROW method '(' listexprcom ')' /* $foo->bar(list) */
 			{ $$ = convert(OP_ENTERSUB, OPf_STACKED,
 				append_elem(OP_LIST,
 				    prepend_elem(OP_LIST, scalar($1), $5),
@@ -989,8 +975,7 @@ anonymous:
                             TOKEN_GETMAD($1,$$,'o');
                             OP_GETMAD($3,$$,'s');
 			}
-
-    ;
+	;
 
 /* Things called with "do" */
 termdo	:       DO term	%prec UNIOP                     /* do $filename */

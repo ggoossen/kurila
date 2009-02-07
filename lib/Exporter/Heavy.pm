@@ -140,7 +140,7 @@ sub export {
 	    # Build cache of symbols. Optimise the lookup by adding
 	    # barewords twice... both with and without a leading &.
 	    # (Technique could be applied to $export_cache at cost of memory)
-	    my @expanded = map { m/^\w/ ?? ($_, '&'.$_) !! $_ } @$fail;
+	    my @expanded = map { m/^\w/ ?? ($_, '&'.$_) !! $_ }, @$fail;
 	    warn "$($pkg)::EXPORT_FAIL cached: $(join ' ',@expanded)" if $Exporter::Verbose;
  	    %{$fail_cache}{[ @expanded]} = (1) x nelems @expanded;
 	}

@@ -3750,6 +3750,8 @@ Perl_yylex(pTHX)
 		PL_lex_brackstack[PL_lex_brackets-1] = XSTATE;
 		PL_expect = XSTATE;
 	    }
+	    force_next('{');
+	    TOKEN(ANONSUB);
 	    break;
 	}
 	TOKEN('{');
@@ -4511,31 +4513,6 @@ Perl_yylex(pTHX)
 		    if (PL_tokenbuf[0] == '_' && PL_tokenbuf[1] == '\0'
 			&& ((PL_opargs[PL_last_lop_op] & OA_CLASS_MASK) == OA_FILESTATOP)) {
 			TOKEN(WORD);
-		    }
-
-		    /* If not a declared subroutine, it's an indirect object. */
-		    /* (But it's an indir obj regardless for sort.) */
-
-		    if (
-			( !immediate_paren && (PL_last_lop_op == OP_SORT ||
-                         ((!gv || !cv) &&
-                        (PL_last_lop_op != OP_MAPSTART &&
-			 PL_last_lop_op != OP_GREPSTART))))
-		       )
-		    {
-			PL_expect = (PL_last_lop == PL_oldoldbufptr) ? XTERM : XOPERATOR;
-
-			if (lastchar != '-') {
-			    if (ckWARN(WARN_RESERVED)) {
-				d = PL_tokenbuf;
-				while (isLOWER(*d))
-				    d++;
-				if (!*d && !gv_stashpv(PL_tokenbuf, 0))
-				    Perl_warner(aTHX_ packWARN(WARN_RESERVED), PL_warn_reserved,
-						PL_tokenbuf);
-			    }
-			}
-			goto bareword;
 		    }
 		}
 

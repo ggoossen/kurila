@@ -4482,13 +4482,7 @@ Perl_ck_fun(pTHX_ OP *o)
 		break;
 	    case OA_CVREF:
 		{
-		    OP * const newop = newUNOP(OP_NULL, 0, kid, kid->op_location);
-		    kid->op_sibling = 0;
-		    linklist(kid);
-		    newop->op_next = newop;
-		    kid = newop;
-		    kid->op_sibling = sibl;
-		    *tokid = kid;
+		    scalar(kid);
 		}
 		break;
 	    case OA_FILEREF:
@@ -4712,6 +4706,7 @@ Perl_ck_grep(pTHX_ OP *o)
 {
     dVAR;
     LOGOP *gwop = NULL;
+    OP* entersubop;
     OP *kid;
     OP **tokid;
     const OPCODE type = o->op_type == OP_GREPSTART ? OP_GREPWHILE : OP_MAPWHILE;
@@ -4722,41 +4717,16 @@ Perl_ck_grep(pTHX_ OP *o)
     o->op_ppaddr = PL_ppaddr[OP_GREPSTART];
     /* don't allocate gwop here, as we may leak it if PL_parser->error_count > 0 */
 
-    if (o->op_flags & OPf_STACKED) {
-	OP* k;
-	o = ck_sort(o);
-        kid = cLISTOPo->op_first->op_sibling;
-	if (!cUNOPx(kid)->op_next)
-	    Perl_croak(aTHX_ "panic: ck_grep");
-	for (k = cUNOPx(kid)->op_first; k; k = k->op_next) {
-	    kid = k;
-	}
-	NewOp(1101, gwop, 1, LOGOP);
-	kid->op_next = (OP*)gwop;
-	o->op_flags &= ~OPf_STACKED;
-    }
-    kid = cLISTOPo->op_first->op_sibling;
-    if (type == OP_MAPWHILE)
-	list(kid);
-    else
-	scalar(kid);
     o = ck_fun(o);
     if (PL_parser && PL_parser->error_count)
 	return o;
     kid = cLISTOPo->op_first->op_sibling;
-    if (kid->op_type != OP_NULL)
-	Perl_croak(aTHX_ "panic: ck_grep");
-    kid = kUNOP->op_first;
 
-    if (!gwop)
-	NewOp(1101, gwop, 1, LOGOP);
+    NewOp(11011, gwop, 1, LOGOP);
     gwop->op_type = type;
     gwop->op_ppaddr = PL_ppaddr[type];
-    gwop->op_first = listkids(o);
-    gwop->op_flags |= OPf_KIDS;
-    gwop->op_other = LINKLIST(kid);
-    gwop->op_location = SvREFCNT_inc(kid->op_location);
-    kid->op_next = (OP*)gwop;
+    gwop->op_location = SvREFCNT_inc(o->op_location);
+
     offset = pad_findmy("$_");
     if (offset == NOT_IN_PAD || PAD_COMPNAME_FLAGS_isOUR(offset)) {
 	o->op_private = gwop->op_private = 0;
@@ -4767,11 +4737,16 @@ Perl_ck_grep(pTHX_ OP *o)
 	gwop->op_targ = o->op_targ = offset;
     }
 
-    kid = cLISTOPo->op_first->op_sibling;
-    if (!kid || !kid->op_sibling)
-	return too_few_arguments(o,OP_DESC(o));
-    for (tokid = &kid->op_sibling; *tokid; tokid = &((*tokid)->op_sibling))
-	*tokid = mod(*tokid, OP_GREPSTART);
+    NewOp(11011, entersubop, 1, UNOP);
+    entersubop->op_type = OP_ENTERSUB;
+    entersubop->op_flags = OPf_STACKED;
+    entersubop->op_ppaddr = PL_ppaddr[OP_ENTERSUB];
+    entersubop->op_location = SvREFCNT_inc(o->op_location);
+    
+    gwop->op_flags |= OPf_KIDS;
+    gwop->op_first = o;
+    gwop->op_other = entersubop;
+    o->op_sibling = entersubop;
 
     return (OP*)gwop;
 }
