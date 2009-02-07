@@ -362,7 +362,6 @@ used to implement a resource attack (e.g., consume all available CPU time).
     enteriter iter
     enterloop leaveloop unstack
     last next redo
-    goto
 
 =item :base_io
 
