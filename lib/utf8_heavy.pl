@@ -68,7 +68,7 @@ sub SWASHNEW_real {
 	    ## It could be a user-defined property.
 	    ##
 
-	    my $caller1 = $type =~ s/(.+)::// ?? $1 !! caller(1);
+	    my $caller1 = $type =~ s/(.+)::// ?? $1 !! caller(2);
 
 	    if (defined $caller1 && $type =~ m/^(?:\w+)$/) {
 		my $prop = Symbol::fetch_glob("$($caller1)::$type");
@@ -146,7 +146,7 @@ sub SWASHNEW_real {
 	    ## See if it's a user-level "To".
 	    ##
 
-	    my $caller0 = caller(0);
+	    my $caller0 = caller(1);
 
 	    if (defined $caller0 && $type =~ m/^To(?:\w+)$/) {
 		my $map = $caller0 . "::" . $type;

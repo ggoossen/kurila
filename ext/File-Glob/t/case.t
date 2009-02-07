@@ -11,7 +11,7 @@ my $pat = $^OS_NAME eq "MacOS" ?? ":op:G*.t" !! "op/G*.t";
 # Test the actual use of the case sensitivity tags, via csh_glob()
 File::Glob->import(':nocase');
 my @a = csh_glob($pat);
-print \*STDOUT, "not " unless (nelems @a) +>= 7;
+print \*STDOUT, "not " unless (nelems @a) +>= 5;
 print \*STDOUT, "ok 2\n";
 
 # This may fail on systems which are not case-PRESERVING

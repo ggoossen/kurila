@@ -1,6 +1,6 @@
 #!./perl
 
-print \*STDOUT, "1..89\n";
+print \*STDOUT, "1..71\n";
 
 our ($foo, $fact, $ans, $i, $x, $eval);
 
@@ -298,22 +298,6 @@ sub fred4 {
     $test++;
 }
 
-eval q{
-    fred4();
-    sub fred5 {
-	my $zzz = 4;
-	print(\*STDOUT, ($zzz == 4  && eval '$zzz' == 4) ?? 'ok' !! 'not ok', " $test\n" );
-	$test++;
-	print \*STDOUT, eval '$yyy' == 2 ?? 'ok' !! 'not ok', " $test\n";
-	$test++;
-	goto &fred4;
-    }
-    fred5();
-}; die if $^EVAL_ERROR;
-fred5();
-do { my $yyy = 88; my $zzz = 99; fred5(); };
-eval q{ my $yyy = 888; my $zzz = 999; fred5(); };
-
 # [perl #9728] used to dump core
 do {
    my $eval = eval 'sub { eval q|sub { %S }| }';
@@ -326,7 +310,7 @@ do {
 # thing outside DB that called them (usually the debugged code), rather
 # than the usual surrounding scope
 
-$test=79;
+$test=61;
 our $x = 1;
 do {
     my $x=2;

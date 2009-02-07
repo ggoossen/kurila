@@ -2,7 +2,7 @@
 # Tests to ensure that we don't unexpectedly change prototypes of builtins
 
 BEGIN { require './test.pl'; }
-plan tests => 220;
+plan tests => 218;
 
 while ( ~< *DATA) {
     chomp;
@@ -48,7 +48,6 @@ defined undef
 delete undef
 die (@)
 do undef
-dump ()
 each (\%)
 else undef
 elsif undef
@@ -101,7 +100,6 @@ getsockname (*)
 getsockopt (*$$)
 glob undef
 gmtime (;$)
-goto undef
 grep undef
 hex (_)
 if undef

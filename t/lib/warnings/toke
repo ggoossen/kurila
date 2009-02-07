@@ -87,8 +87,6 @@ toke.c	AOK
         $a =  0037777777777 ;
         $a =  0047777777777 ;
 
-    dump() better written as CORE::dump()
-
     Use of /c modifier is meaningless without /g     
 
     Use of /c modifier is meaningless in s///
@@ -493,15 +491,6 @@ EXPECT
 Integer overflow in binary number at - line 5 character 8.
 Integer overflow in hexadecimal number at - line 8 character 8.
 Integer overflow in octal number at - line 11 character 8.
-########
-# toke.c
-BEGIN { $^COMPILING = 1; }
-use warnings 'misc';
-dump;
-CORE::dump;
-EXPECT
-dump() better written as CORE::dump() at - line 4 character 1.
-- syntax OK
 ########
 # toke.c
 # 20020328 mjd-perl-patch+@plover.com at behest of jfriedl@yahoo.com

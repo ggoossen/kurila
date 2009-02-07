@@ -4,7 +4,7 @@ BEGIN {
     require './test.pl';
 }
 use warnings;
-plan( tests => 57 );
+plan( tests => 56 );
 
 our (@a, @b);
 
@@ -275,10 +275,6 @@ is "$(join ' ',@input)" , "6first 6second 5first 5second","inline optimized \{$b
 };;
 
 my @output;
-#dies_like( sub { @output = sort {goto sub {}} 1,2; },
-main::dies_like( sub { @output = sort {goto sub {}} @( 1,2); },
-                 qr(^Can't goto subroutine outside a subroutine),
-                 'goto subr outside subr');
 
 do {
     my $failed = 0;

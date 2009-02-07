@@ -1,6 +1,6 @@
 #!./perl
 
-print \*STDOUT, "1..5\n";
+print \*STDOUT, "1..4\n";
 
 require './test.pl';
 
@@ -21,17 +21,5 @@ do {
     };
     print \*STDOUT, "not " if $^EVAL_ERROR;
     print \*STDOUT, "ok $test\n";
-    $test++;
-};
-
-# Check that eval catches bad goto calls
-#   (BUG ID 20010305.003)
-do {
-    try {
-	try { goto foo; };
-	print (\*STDOUT, $^EVAL_ERROR ?? "ok $test\n" !! "not ok $test\n");
-	return;
-    };
-    print \*STDOUT, "not ok $test\n" if $^EVAL_ERROR;
     $test++;
 };
