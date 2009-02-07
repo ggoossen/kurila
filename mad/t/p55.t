@@ -200,7 +200,7 @@ job system, though it's not on CPAN at the time of writing this.
 
 =cut
 ########
-@INC = @( qw(foo bar) );
+$^INCLUDE_PATH = @( qw(foo bar) );
 ########
 if (int(1.23) == 1) { print "1"; } else { print "2"; }
 ########

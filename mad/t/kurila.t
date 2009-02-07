@@ -19,8 +19,8 @@ use Fatal qw|open close|;
 
 use Convert;
 
-my $from = 'kurila-1.16';
-my $to = 'kurila-1.16';
+my $from = 'kurila-1.17';
+my $to = 'kurila-1.17';
 
 sub p5convert {
     my ($input, $expected) = @_;
@@ -37,8 +37,10 @@ sub p5convert {
     is($output, $expected) or $TODO or die "failed test";
 }
 
-t_rename_magic_vars_2();
+t_print();
 die "END";
+t_rename_inc_vars();
+t_rename_magic_vars_2();
 t_rename_magic_vars();
 t_remove_vars();
 t_env_using_package();
@@ -1567,5 +1569,37 @@ $^OUTPUT_AUTOFLUSH
 $@->{?description};
 ----
 $^EVALERROR->{?description};
+END
+}
+
+sub t_rename_inc_vars {
+    p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
+push @INC, '.';
+----
+push $^INCLUDE_PATH, '.';
+====
+%INC{"foo.pm"} = 1;
+----
+$^INCLUDED{"foo.pm"} = 1;
+END
+}
+
+sub t_print {
+    p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
+print "something";
+printf "something";
+print("something");
+----
+print \*STDOUT, "something";
+printf \*STDOUT, "something";
+print(\*STDOUT, "something");
+====
+print $a "something";
+print {$a} "something";
+print STDERR "something";
+----
+print $a, "something";
+print $a ,"something";
+print \*STDERR, "something";
 END
 }
