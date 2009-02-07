@@ -173,7 +173,7 @@ sub printTree
     my $prefix = shift ;
     my ($k, $v) ;
 
-    my $max = ( <sort {$a <+> $b} map { length $_ } keys %$tre)[[-1]] ;
+    my $max = ( <sort {$a <+> $b} map { length $_ }, keys %$tre)[[-1]] ;
     my @keys = sort keys %$tre ;
 
     while ($k = shift @keys) {

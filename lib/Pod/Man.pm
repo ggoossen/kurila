@@ -810,7 +810,7 @@ sub devise_title {
 
         # Remove empty directories when building the module name; they
         # occur too easily on Unix by doubling slashes.
-        $name = join ('::', @( (< grep { $_ ?? $_ !! () } @dirs), $file));
+        $name = join ('::', @( (< grep { $_ ?? $_ !! () }, @dirs), $file));
     }
     return  @($name, $section);
 }

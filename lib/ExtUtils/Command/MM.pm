@@ -56,7 +56,7 @@ sub test_harness {
 
     local $^INCLUDE_PATH = $^INCLUDE_PATH;
     unshift $^INCLUDE_PATH, < map { File::Spec->rel2abs($_) } @_;
-    Test::Harness::runtests( <sort { lc $a cmp lc $b } @argv);
+    Test::Harness::runtests( <sort { lc $a cmp lc $b }, @argv);
 }
 
 

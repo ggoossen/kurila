@@ -185,7 +185,7 @@ sub a_sub (&) {
 
 sub tmp_sub_1 { ok(1) }
 
-a_sub { ok(1) };
+a_sub { ok(1) },;
 a_sub \&tmp_sub_1;
 
 @array = @( \&tmp_sub_1 );

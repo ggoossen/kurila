@@ -102,7 +102,7 @@ our $VERSION = '1.06';
 my $genpkg = "Symbol";
 my $genseq = 0;
 
-my %global = %( < map {$_ => 1} qw(ARGV ARGVOUT ENV INC SIG STDERR STDIN STDOUT) );
+my %global = %( < map {$_ => 1}, qw(ARGV ARGVOUT ENV INC SIG STDERR STDIN STDOUT) );
 
 #
 # Note that we never _copy_ the glob; we just make a ref to it.

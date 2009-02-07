@@ -52,7 +52,7 @@ while ($how_many_common--) {
 }
 
 # names of things which may need to have slashes changed to double-colons
-my %Extensions = %( < map {($_,$_)}
+my %Extensions = %( < map {($_,$_)},
                  qw(dynamic_ext static_ext extensions known_extensions) );
 
 # allowed opts as well as specifies default and initial values
@@ -73,7 +73,7 @@ sub opts {
 
     my %opts = %(< %Allowed_Opts, < %given_opts);
 
-    for my $opt ( grep {!exists %Allowed_Opts{$_}} keys %given_opts) {
+    for my $opt ( grep {!exists %Allowed_Opts{$_}}, keys %given_opts) {
         warn "option '$opt' is not recognized";
 	usage;
     }
@@ -516,7 +516,7 @@ foreach my $prefix (qw(libs libswanted)) {
 		                    split(' ', fetch_string (\%(), 'libs'));
 	    $value = join(' ', @libs);
 	} else {
-	    my @libswanted = grep { not exists %lflibswanted{$_} }
+	    my @libswanted = grep { not exists %lflibswanted{$_} },
 	                          split(' ', fetch_string (\%(), 'libswanted'));
 	    $value = join(' ', @libswanted);
 	}
@@ -660,7 +660,7 @@ foreach my $key (keys %Common) {
 if (%Common{?byteorder}) {
     %Common{+byteorder} = 'byteorder => $byteorder';
 }
-my $fast_config = join '', map { "    $_,\n" } sort values %Common;
+my $fast_config = join '', map { "    $_,\n" }, sort values %Common;
 
 # Sanity check needed to stop an infite loop if Config_heavy.pl fails to define
 # &launcher for some reason (eg it got truncated)

@@ -38,7 +38,7 @@ do {
   # an a circumflex, so we need to be explicit.
 
   my $a_circumflex = "\x[e5]"; # a byte.
-  %U_HASH = %(< map {$_, $_} @( 'castle', "ch$($a_circumflex)teau", $utf8, chr 0x57CE));
+  %U_HASH = %(< map {$_, $_}, @( 'castle', "ch$($a_circumflex)teau", $utf8, chr 0x57CE));
   plan tests => 162;
 };
 

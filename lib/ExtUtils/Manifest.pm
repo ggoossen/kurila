@@ -84,7 +84,7 @@ that are found in the existing F<MANIFEST> file in the new one.
 =cut
 
 sub _sort {
-    return sort { lc $a cmp lc $b } @_;
+    return sort { lc $a cmp lc $b }, @_;
 }
 
 sub mkmanifest {
@@ -620,7 +620,7 @@ sub maniadd {
     _fix_manifest($MANIFEST);
 
     my $manifest = maniread();
-    my @needed = grep { !exists $manifest->{$_} } keys %$additions;
+    my @needed = grep { !exists $manifest->{$_} }, keys %$additions;
     return 1 unless (nelems @needed);
 
     open(my $manifest_fh, ">>", "$MANIFEST") or 

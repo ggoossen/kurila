@@ -60,7 +60,7 @@ $VERSION = '0.06';
 
 sub type_to_C_value {
     my @($self, $type) =  @_;
-    return %type_to_C_value{?$type} || sub {return map {ref $_ ?? < @$_ !! $_} @_ };
+    return %type_to_C_value{?$type} || sub {return map {ref $_ ?? < @$_ !! $_}, @_ };
 }
 
 # TODO - figure out if there is a clean way for the type_to_sv code to
@@ -287,7 +287,7 @@ EOBOOT
     my %iterator;
 
     $found->{+''}
-        = \ map {\%(< %$_, type=>'', invert_macro => 1)} @$notfound;
+        = \ map {\%(< %$_, type=>'', invert_macro => 1)}, @$notfound;
 
     foreach my $type (sort keys %$found) {
 	my $struct = %type_to_struct{?$type};
@@ -432,7 +432,7 @@ EOBOOT
 	printf $xs_fh, "            temp\%d = \%s;\n", $counter++, $_
 	    foreach  &$type_to_value($value);
 
-	my @tempvarnames = map {sprintf 'temp%d', $_} 0 .. $counter - 1;
+	my @tempvarnames = map {sprintf 'temp%d', $_}, 0 .. $counter - 1;
 	printf $xs_fh, <<"EOBOOT", $name, &$generator(<@tempvarnames);
 	    $($c_subname)_add_symbol($athx symbol_table, "\%s",
 				    $namelen, \%s);

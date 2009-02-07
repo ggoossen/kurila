@@ -55,7 +55,7 @@ sub object_file {
 
 sub arg_include_dirs {
   my $self = shift;
-  return map {"-I$_"} @_;
+  return map {"-I$_"}, @_;
 }
 
 sub arg_nolink { '-c' }

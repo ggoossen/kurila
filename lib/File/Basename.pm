@@ -109,7 +109,7 @@ sub fileparse {
 
   my($dirpath, $basename);
 
-  if (grep { $type eq $_ } qw(MSDOS DOS MSWin32 Epoc)) {
+  if (grep { $type eq $_ }, qw(MSDOS DOS MSWin32 Epoc)) {
     @($dirpath,$basename) = @($fullname =~ m/^((?:.*[:\\\/])?)(.*)/s);
     $dirpath .= '.\' unless $dirpath =~ m/[\\\/]\z/;
   }
@@ -288,7 +288,7 @@ sub dirname {
 	}
 	$dirname .= ":" unless $dirname =~ m/:\z/;
     }
-    elsif (grep { $type eq $_ } qw(MSDOS DOS MSWin32 OS2)) { 
+    elsif (grep { $type eq $_ }, qw(MSDOS DOS MSWin32 OS2)) { 
         _strip_trailing_sep($dirname);
         unless( length($basename) ) {
 	    @($basename,$dirname, _) =  fileparse $dirname;
@@ -319,7 +319,7 @@ sub _strip_trailing_sep  {
     if ($type eq 'MacOS') {
         @_[0] =~ s/([^:]):\z/$1/s;
     }
-    elsif (grep { $type eq $_ } qw(MSDOS DOS MSWin32 OS2)) { 
+    elsif (grep { $type eq $_ }, qw(MSDOS DOS MSWin32 OS2)) { 
         @_[0] =~ s/([^:])[\\\/]*\z/$1/;
     }
     else {

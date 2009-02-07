@@ -91,11 +91,11 @@ sub height_vals {
 							 }
 	die "Values for height option must be positive integers (not @_[0])"
 				unless ref $vals eq 'HASH'
-					&& !grep {int($vals->{?$_}) ne $vals->{?$_}} qw(min max);
+					&& !grep {int($vals->{?$_}) ne $vals->{?$_}}, qw(min max);
 	return $vals;
 }
 
-my %nothing = %( < map {$_=>sub{""}} qw(first even odd other) );
+my %nothing = %( < map {$_=>sub{""}}, qw(first even odd other) );
 
 sub std_body {
 	my @($rows, $fill, $opt) =  @_;
@@ -162,7 +162,7 @@ sub page_hash {
 		for grep $_ ne 'HASH', @( ref $h);
 	$h = \%( < %{$opts->{?page}}, < %$h );
 	die "Unknown page sub-option ('$_')"
-		for grep {!exists %def_page{$_}} keys %$h;
+		for grep {!exists %def_page{$_}}, keys %$h;
 	die "Page $_ must be greater than zero"
 		for grep $h->{?$_} +<= 0, qw(length width);
 	$h->{+body} =
@@ -175,7 +175,7 @@ sub page_hash {
 
 sub filehandle {
 	die "Value for 'out' option must be filehandle (not '$_')"
-			for grep {$_ ne 'GLOB' } @( ref @_[0]);
+			for grep {$_ ne 'GLOB' }, @( ref @_[0]);
 	return @_[0];
 }
 
@@ -229,7 +229,7 @@ my %std_opt = %(
 	locale  	=> \%( set => \&boolean,		def => 0,					),
 );
 
-my %def_opts = %( < map {$_=>%std_opt{$_}->{?def}}  keys %std_opt );
+my %def_opts = %( < map {$_=>%std_opt{$_}->{?def}},  keys %std_opt );
 
 sub get_locale_vals {   # args: $dec_mark, $thou_sep, $thou_group
     use POSIX;
@@ -705,7 +705,7 @@ sub segment ($\@\%$\%) {
 	@_[-1] = $fldcnt;	# remember field count
 	# Distribute {*} widths...
 	for my $f ( @vstarred) {
-		$f->{+maxwidth} = max @(0, < map {length} split "\n", ${$f->{?src}});
+		$f->{+maxwidth} = max @(0, < map {length}, split "\n", ${$f->{?src}});
 	}
 	if ((nelems @starred)||nelems @vstarred) {
 		my $fldwidth = int($width/((nelems @starred)+nelems @vstarred));
@@ -848,7 +848,7 @@ sub delineate_overflows {
 					    || $_->{?literal}
 					    || $_->{?notlastoverflow}
 					    )
-					 } @$formats;
+					 }, @$formats;
 		for ( @$formats) {
 			next unless $_->{?overflow};
 			if ($_->{?notlastoverflow}) {
@@ -907,13 +907,13 @@ sub make_cols($$\@\%$) {
 	}
 	my @maxgroups = layout_groups(< @max);
 	my @mingroups = layout_groups(< @min);
-	my $has_nonminimal = grep {!$_->{?literal} && !$_->{?line}} @max;
+	my $has_nonminimal = grep {!$_->{?literal} && !$_->{?line}}, @max;
 	if ($opts->{?layout} eq 'balanced') { # balanced column-by-column
 		for my $g ( @maxgroups) {
 			balance_cols($g,$opts, $maxheight);
 		}
 		$maxheight = max < map 0+nelems @{$_->{?formcol}||\@()}, @$formatters
-			if grep {!$_->{?literal} && !$_->{?opts}{?height}{?minimal}} @$formatters; 
+			if grep {!$_->{?literal} && !$_->{?opts}{?height}{?minimal}}, @$formatters; 
 		for my $g ( @mingroups) {
 			balance_cols($g, $opts, $maxheight);
 		}
@@ -928,7 +928,7 @@ sub make_cols($$\@\%$) {
 			$parts->[$col] = make_col($f,$opts, $maxheight);
 		}
 		$maxheight = min @($maxheight,
-						 max map { defined() ?? scalar nelems @$_ !! 0 } @$parts)
+						 max map { defined() ?? scalar nelems @$_ !! 0 }, @$parts)
 			if $has_nonminimal;
 		for my $col (0..(nelems @$formatters)-1) {
 			my $f = $formatters->[$col];
@@ -944,7 +944,7 @@ sub make_cols($$\@\%$) {
 	elsif ($opts->{?layout} eq 'across') { # across row-by-row
 		my %incomplete = %(first=>1);
 		for my $row (0 .. $maxheight -1) {
-                    last unless grep {$_} values %incomplete;
+                    last unless grep {$_}, values %incomplete;
 			%incomplete = %( () );
 			for my $col (0..(nelems @$formatters)-1) {
 				$parts->[$col] ||= \@();
@@ -998,7 +998,7 @@ sub make_cols($$\@\%$) {
 				$finished &&= !$tabular_more;
 			}
 			my $minimaxheight = min @($maxheight,
-							 max map { defined() ?? scalar nelems @$_ !! 0 } @$parts)
+							 max map { defined() ?? scalar nelems @$_ !! 0 }, @$parts)
 				if $has_nonminimal;
 			for my $col (0..(nelems @$formatters)-1) {
 				my $tabular = 1;
@@ -1038,7 +1038,7 @@ sub make_cols($$\@\%$) {
 	for my $i (1..nelems @$parts) {
 		$formatters->[-$i]{+complete} = 0
 	}
-	for my $f ( grep {!($_->{?literal}||$_->{?line})} @$formatters) {
+	for my $f ( grep {!($_->{?literal}||$_->{?line})}, @$formatters) {
 		next if $f->{?done} || $f->{?isbullet} || $f->{?opts}{?height}{?minimal};
 		return 1 if substr(${$f->{?src}},pos(${$f->{?src}})||0) =~ m/\S/;
 	}
@@ -1050,7 +1050,7 @@ sub make_underline {
 	$under =~ s/(\n*)\z//;
 	my $trail = "$1"^|^"\n";
 	for my $l (@($nextline, $prevline)) {
-		$l = join "", map {$_->{?literal} ?? ${$_->{?src}} !! '*'x$_->{?width} } @$l;
+		$l = join "", map {$_->{?literal} ?? ${$_->{?src}} !! '*'x$_->{?width} }, @$l;
 		$l =~ s{(.)}{$($1 =~ m/\s/ ?? "\0" !! "\1")}gs;
 	}
 	$nextline ^|^= $prevline;
@@ -1072,7 +1072,7 @@ sub form {
   my @($package, $file, $line) =@( caller);
     my $caller_opts = %caller_opts{+$package.','.$file} ||= \%();
     if (%$caller_opts) {
-        $line = first { $_ +< $line } < sort {$b<+>$a} keys %$caller_opts;
+        $line = first { $_ +< $line }, < sort {$b<+>$a} keys %$caller_opts;
         $caller_opts = $caller_opts->{?$line} || \%()
                 if defined $line;
     }
@@ -1208,10 +1208,10 @@ sub make_page {
 				my $f = $formatters->[$col];
 				push @{@parts[$col]}, ("") x (($f->{?height}{?min}||0)-nelems @{@parts[$col]});
 				my $fopts = $f->{?opts};
-				my $tfill = first {defined $_} < $fopts->{[qw(tfill vfill fill)]}, " ";
-				my $bfill = first {defined $_} < $fopts->{[qw(bfill vfill fill)]}, " ";
-				my $lfill = first {defined $_} < $fopts->{[qw(lfill hfill fill)]}, " ";
-				my $rfill = first {defined $_} < $fopts->{[qw(rfill hfill fill)]}, " ";
+				my $tfill = first {defined $_}, < $fopts->{[qw(tfill vfill fill)]}, " ";
+				my $bfill = first {defined $_}, < $fopts->{[qw(bfill vfill fill)]}, " ";
+				my $lfill = first {defined $_}, < $fopts->{[qw(lfill hfill fill)]}, " ";
+				my $rfill = first {defined $_}, < $fopts->{[qw(rfill hfill fill)]}, " ";
 				$f->{?vjust}->($maxheight,$tfill,$bfill,@parts[$col]);
 				for my $row (0..(nelems @{@parts[$col]})-1) {
 					my $last = @parts[$col][$row] =~ s/\r//;

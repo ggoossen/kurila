@@ -266,7 +266,7 @@ sub get_handle {  # This is a constructor and, yes, it CAN FAIL.
   @languages = $base_class->_langtag_munging(< @languages);
 
   my %seen;
-  foreach my $module_name ( map { $base_class . "::" . $_ } @languages ) {
+  foreach my $module_name ( map { $base_class . "::" . $_ }, @languages ) {
     next unless length $module_name; # sanity
     next if %seen{+$module_name}++        # Already been here, and it was no-go
             || ! _try_use($module_name); # Try to use() it, but can't it.

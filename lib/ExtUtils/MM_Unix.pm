@@ -381,7 +381,7 @@ sub constants {
                    ),
                    (< map { ("INSTALL".$_,
                           "DESTINSTALL".$_)
-                        } $self->installvars), <
+                        }, $self->installvars), <
                    qw(
               PERL_LIB    
               PERL_ARCHLIB
@@ -1251,7 +1251,7 @@ sub init_dirscan {	# --- File and Directory Lists (.xs .pm .pod etc)
     my@($self) =  @_;
     my(%dir, %xs, %c, %h, %pl_files, %pm);
 
-    my %ignore = %( < map {( $_ => 1 )} qw(Makefile.PL Build.PL test.pl t) );
+    my %ignore = %( < map {( $_ => 1 )}, qw(Makefile.PL Build.PL test.pl t) );
 
     # ignore the distdir
     ( %Is{?VMS} ?? %ignore{+"$self->{?DISTVNAME}.dir"}
@@ -1470,7 +1470,7 @@ sub init_PM {
     # @{$self->{PMLIBDIRS}} = grep -d && !$dir{$_}, @{$self->{PMLIBDIRS}};
     my @pmlibdirs = @{$self->{?PMLIBDIRS}};
     @{$self->{PMLIBDIRS}} = @( () );
-    my %dir = %( < map { ($_ => $_) } @{$self->{DIR}} );
+    my %dir = %( < map { ($_ => $_) }, @{$self->{DIR}} );
     foreach my $pmlibdir ( @pmlibdirs) {
 	-d $pmlibdir && !%dir{?$pmlibdir} && push @{$self->{PMLIBDIRS}}, $pmlibdir;
     }
@@ -1931,7 +1931,7 @@ sub init_PERL {
     $thisperl = $self->abs2rel($thisperl) if $self->{?PERL_CORE};
 
     my @perls = @($thisperl);
-    push @perls, < map { "$_%Config{?exe_ext}" }
+    push @perls, < map { "$_%Config{?exe_ext}" },
  @(                     ('perl', 'perl5', "perl%Config{?version}"));
 
     # miniperl has priority over all but the cannonical perl when in the
@@ -2901,7 +2901,7 @@ CODE
 
     my @cmds = $self->split_command($pm_to_blib, < %{$self->{PM}});
 
-    $r .= join '', map { "\t\$(NOECHO) $_\n" } @cmds;
+    $r .= join '', map { "\t\$(NOECHO) $_\n" }, @cmds;
     $r .= qq{\t\$(NOECHO) \$(TOUCH) pm_to_blib\n};
 
     return $r;
@@ -3169,7 +3169,7 @@ sub cd {
     my@($self, $dir, @< @cmds) =  @_;
 
     # No leading tab and no trailing newline makes for easier embedding
-    my $make_frag = join "\n\t", map { "cd $dir && $_" } @cmds;
+    my $make_frag = join "\n\t", map { "cd $dir && $_" }, @cmds;
 
     return $make_frag;
 }

@@ -86,7 +86,7 @@ sub _dump  # sometimes useful for debugging
         }
         print \*STDOUT, "\n";
         my $fields = \%{*{Symbol::fetch_glob("$pkg\::FIELDS")}};
-        for my $f (sort {$fields->{?$a} <+> $fields->{?$b}} keys %$fields) {
+        for my $f (sort {$fields->{?$a} <+> $fields->{?$b}}, keys %$fields) {
             my $no = $fields->{?$f};
             print \*STDOUT, "   $no: $f";
             my $fattr = %attr{$pkg}->[$no];

@@ -198,7 +198,7 @@ sub _do_all_batch_conversions {
   my@($self, $mod2path, $outdir) =  @_;
   $self->{+"__batch_conv_page_count"} = 0;
 
-  foreach my $module (sort {lc($a) cmp lc($b)} keys %$mod2path) {
+  foreach my $module (sort {lc($a) cmp lc($b)}, keys %$mod2path) {
     $self->_do_one_batch_conversion($module, $mod2path, $outdir);
     sleep($SLEEPY - 1) if $SLEEPY;
   }
@@ -357,7 +357,7 @@ sub _write_contents_middle {
   my@($self, $Contents, $outfile, $toplevel2submodules, $toplevel_form_freq) =  @_;
 
   foreach my $t (sort keys %$toplevel2submodules) {
-    my @downlines = sort {$a->[-1] cmp $b->[-1]}
+    my @downlines = sort {$a->[-1] cmp $b->[-1]},
  @{ $toplevel2submodules->{?$t} };
     
     printf $Contents, qq[<dt><a name="\%s">\%s</a></dt>\n<dd>\n],
@@ -414,7 +414,7 @@ sub _prep_contents_breakdown {
     my $fgroup = %toplevel_form_freq{?$toplevel};
     %toplevel_form_freq{+$toplevel} =
     (
-      sort { $fgroup->{?$b} <+> $fgroup->{?$a}  or  $a cmp $b }
+      sort { $fgroup->{?$b} <+> $fgroup->{?$a}  or  $a cmp $b },
         keys %$fgroup
       # This hash is extremely unlikely to have more than 4 members, so this
       # sort isn't so very wasteful
@@ -544,7 +544,7 @@ sub modnames2paths { # return a hashref mapping modulenames => paths
   $self->muse("That's odd... no modules found!") unless %$m2p;
   if( DEBUG +> 4 ) {
     print \*STDOUT, "Modules found (name => path):\n";
-    foreach my $m (sort {lc($a) cmp lc($b)} keys %$m2p) {
+    foreach my $m (sort {lc($a) cmp lc($b)}, keys %$m2p) {
       print \*STDOUT, "  $m  %$m2p{?$m}\n";
     }
     print \*STDOUT, "(total ",     nkeys %$m2p, ")\n\n";

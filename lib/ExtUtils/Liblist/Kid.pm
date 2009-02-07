@@ -448,7 +448,7 @@ sub _vms_ext {
         $dir = $self->catdir($cwd,$dir); 
     }
   }
-  @dirs = grep { length($_) } @dirs;
+  @dirs = grep { length($_) }, @dirs;
   unshift(@dirs,''); # Check each $lib without additions first
 
   LIB: foreach my $lib ( @libs) {
@@ -535,8 +535,8 @@ sub _vms_ext {
   }
 
   push @fndlibs, < @{%found{?OBJ}}                      if exists %found{OBJ};
-  push @fndlibs, < map { "$_/Library" } @{%found{OLB}} if exists %found{OLB};
-  push @fndlibs, < map { "$_/Share"   } @{%found{SHR}} if exists %found{SHR};
+  push @fndlibs, < map { "$_/Library" }, @{%found{OLB}} if exists %found{OLB};
+  push @fndlibs, < map { "$_/Share"   }, @{%found{SHR}} if exists %found{SHR};
   my $lib = join(' ', @fndlibs);
 
   $ldlib = $crtlstr ?? "$lib $crtlstr" !! $lib;

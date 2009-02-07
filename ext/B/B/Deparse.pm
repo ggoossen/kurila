@@ -612,7 +612,7 @@ sub compile {
 	$self->{+'curcvlex'} = undef;
 	print \*STDOUT, < $self->print_protos;
 	@{$self->{'subs_todo'}} =
-	  sort {$a->[0] <+> $b->[0]} @{$self->{?'subs_todo'}};
+	  sort {$a->[0] <+> $b->[0]}, @{$self->{?'subs_todo'}};
 	print \*STDOUT, $self->indent($self->deparse_root(main_root)), "\n"
 	  unless null main_root;
 	my @text;
@@ -1034,12 +1034,12 @@ sub lineseq {
     $self->walk_lineseq($root, \@ops,
 		       sub { push @exprs, @_[0]} );
 
-    my $body = join(";\n", grep {length} @exprs);
+    my $body = join(";\n", grep {length}, @exprs);
     my $subs = "";
     if (defined $root && defined $limit_seq && !$self->{?'in_format'}) {
 	$subs = join "\n", $self->seq_subs($limit_seq);
     }
-    return join(";\n", grep {length} @( $body, $subs));
+    return join(";\n", grep {length}, @( $body, $subs));
 }
 
 sub scopeop {

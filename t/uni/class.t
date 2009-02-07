@@ -97,7 +97,7 @@ sub char_range {
 
     my $str;
 
-    $str = join "", map { chr $_ } $h1 .. (($h2 || $h1) + 1);
+    $str = join "", map { chr $_ }, $h1 .. (($h2 || $h1) + 1);
 
     return $str;
 }

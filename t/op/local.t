@@ -121,9 +121,9 @@ do {
 is(%h{?'a'}, 1);
 is(%h{?'b'}, 2);
 do {
-    my $d = join("\n", map { "$_=>%h{?$_}" } sort keys %h);
+    my $d = join("\n", map { "$_=>%h{?$_}" }, sort keys %h);
     local %h = %( < %h );
-    is(join("\n", map { "$_=>%h{?$_}" } sort keys %h), $d);
+    is(join("\n", map { "$_=>%h{?$_}" }, sort keys %h), $d);
 };
 is(%h{?'c'}, 3);
 

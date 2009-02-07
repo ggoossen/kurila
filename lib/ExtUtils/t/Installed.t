@@ -203,7 +203,7 @@ SKIP: do {
 };
 @dirs = $ei->directories('goodmod');
 is( scalar nelems @dirs, 2 + $mandirs, '... should find all files files() would, again' );
-@files = sort map { exists %dirnames{lc($_)} ?? %dirnames{?lc($_)} !! '' } @files;
+@files = sort map { exists %dirnames{lc($_)} ?? %dirnames{?lc($_)} !! '' }, @files;
 is( join(' ', @files), join(' ', @dirs), '... should sort output' );
 
 # directory_tree

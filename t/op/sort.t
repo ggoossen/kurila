@@ -47,7 +47,7 @@ our $expected = $upperfirst ?? 'AbelCaincatdogx' !! 'catdogxAbelCain';
 
 cmp_ok($x,'eq',$expected,'upper first 1');
 
-$x = join('', sort( { Backwards } @harry));
+$x = join('', sort( { Backwards }, @harry));
 $expected = $upperfirst ?? 'xdogcatCainAbel' !! 'CainAbelxdogcat';
 
 cmp_ok($x,'eq',$expected,'upper first 2');
@@ -93,11 +93,11 @@ cmp_ok("$(join ' ',@b)",'eq',"2 3 4 10",'sort numeric');
 cmp_ok("$(join ' ',@b)",'eq','1 2 3 4','just sort');
 
 
-@b = sort grep { $_ } @( (4,1,3,2));
+@b = sort grep { $_ }, @( (4,1,3,2));
 cmp_ok("$(join ' ',@b)",'eq','1 2 3 4','grep then sort');
 
 
-@b = sort map { $_ } @( (4,1,3,2));
+@b = sort map { $_ }, @( (4,1,3,2));
 cmp_ok("$(join ' ',@b)",'eq','1 2 3 4','map then sort');
 
 
@@ -238,7 +238,7 @@ do {
     is "$(join ' ',@g)", "3 2 1", "inplace reversed sort of global";
 
     @g = @(2,3,1);
-    $r1 = \@g[1]; @g =sort { $a+<$b??1!!$a+>$b??-1!!0 } @g; $r2 = \@g[0];
+    $r1 = \@g[1]; @g =sort { $a+<$b??1!!$a+>$b??-1!!0 }, @g; $r2 = \@g[0];
     is "$(join ' ',@g)", "3 2 1", "inplace custom sort of global";
 
     #  [perl #29790] don't optimise @a = ('a', sort @a) !
@@ -258,9 +258,9 @@ do {
     @g = @(2,3,1); @g = @(( <sort { $b <+> $a } @g),'4');
     is "$(join ' ',@g)", "3 2 1 4", "un-inplace reversed sort of global 2";
 
-    @g = @(2,3,1); @g = @('0', < sort { $a+<$b??1!!$a+>$b??-1!!0 } @g);
+    @g = @(2,3,1); @g = @('0', < sort { $a+<$b??1!!$a+>$b??-1!!0 }, @g);
     is "$(join ' ',@g)", "0 3 2 1", "un-inplace custom sort of global";
-    @g = @(2,3,1); @g = @(( <sort { $a+<$b??1!!$a+>$b??-1!!0 } @g),'4');
+    @g = @(2,3,1); @g = @(( <sort { $a+<$b??1!!$a+>$b??-1!!0 }, @g),'4');
     is "$(join ' ',@g)", "3 2 1 4", "un-inplace custom sort of global 2";
 };
 

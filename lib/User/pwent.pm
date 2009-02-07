@@ -117,7 +117,7 @@ sub pw_has {
                     ?? \&die
                     !! sub { die("$IE $(join ' ',@_)") };
     if ((nelems @_) == 0) {
-        my @valid = sort grep { %Groks{?$_} } keys %Groks;
+        my @valid = sort grep { %Groks{?$_} }, keys %Groks;
         return @valid;
     }
     for my $feep ( map { < split } @_) {

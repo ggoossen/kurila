@@ -34,7 +34,7 @@ sub B::GV::find_syms {
     %main::Subs{+$symbol->STASH->NAME . '::' . $symbol->NAME}++;
 }
 
-my @syms = map { 'Testing::Symtable::'.$_ } qw(This That wibble moo car);
+my @syms = map { 'Testing::Symtable::'.$_ }, qw(This That wibble moo car);
 push @syms, "Testing::Symtable::Foo::yarrow";
 
 # Make sure we hit all the expected symbols.

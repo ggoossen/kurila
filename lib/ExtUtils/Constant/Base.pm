@@ -250,7 +250,7 @@ sub dump_names {
   $result .= wrap ($indent . "my \@names = (qw(",
 		   $indent . "               ", join (" ", sort @simple) . ")");
   if ((nelems @complex)) {
-    foreach my $item (sort {$a->{?name} cmp $b->{?name}} @complex) {
+    foreach my $item (sort {$a->{?name} cmp $b->{?name}}, @complex) {
       my $name = perl_stringify $item->{?name};
       my $line = ",\n$indent            \{name=>\"$name\"";
       $line .= ", type=>\"$item->{?type}\"" if defined $item->{?type};
@@ -311,7 +311,7 @@ sub assign {
   die "Can't generate code for type $type"
     unless $self->valid_type($type);
 
-  $clause .= join '', map {"$indent$_\n"}
+  $clause .= join '', map {"$indent$_\n"},
  @(    $self->assignment_clause_for_type(\%(type=>$type,item=>$item), < @_));
   chomp $post;
   if (length $post) {
@@ -438,7 +438,7 @@ sub switch_clause {
   local $Text::Wrap::huge = 'overflow';
   local $Text::Wrap::columns = 80;
 
-  my @names = sort map {$_->{?name}} @items;
+  my @names = sort map {$_->{?name}}, @items;
   my $leader = $indent . '/* ';
   my $follower = ' ' x length $leader;
   my $body = $indent . "/* Names all of length $namelen.  */\n";
@@ -786,7 +786,7 @@ sub C_constant {
     $default_type ||= $self->default_type();
     if (!ref $what) {
       # Convert line of the form IV,UV,NV to hash
-      $what = \%(< map {$_ => 1} split m/,\s*/, ($what || ''));
+      $what = \%(< map {$_ => 1}, split m/,\s*/, ($what || ''));
       # Figure out what types we're dealing with, and assign all unknowns to the
       # default type
     }

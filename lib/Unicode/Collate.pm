@@ -745,8 +745,8 @@ sub ne  { @_[0]->getSortKey(@_[1]) ne  @_[0]->getSortKey(@_[2]) }
 ##
 sub sort {
     my $obj = shift;
-    return map { $_[1] }
-           sort { $a[0] cmp $b[0] }
+    return map { $_[1] },
+           sort { $a[0] cmp $b[0] },
              map { @( $obj->getSortKey($_), $_) } @_;
 }
 

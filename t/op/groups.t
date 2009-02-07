@@ -123,7 +123,7 @@ print \*STDOUT, "# pwgid = $pwgid, pwgnam = $pwgnam\n";
 
 for (split(' ', $^GID)) {
     ($group) = getgrgid($_);
-    next if (! defined $group or ! grep { $_ eq $group } @gr) and %seen{+$_}++;
+    next if (! defined $group or ! grep { $_ eq $group }, @gr) and %seen{+$_}++;
     if (defined $group) {
 	push(@gr, $group);
     }

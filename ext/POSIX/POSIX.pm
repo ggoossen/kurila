@@ -26,7 +26,7 @@ sub import {
 
 XSLoader::load 'POSIX', $VERSION;
 
-my %NON_CONSTS = %(< map {($_,1)}
+my %NON_CONSTS = %(< map {($_,1)},
                   qw(S_ISBLK S_ISCHR S_ISDIR S_ISFIFO S_ISREG WEXITSTATUS
                      WIFEXITED WIFSIGNALED WIFSTOPPED WSTOPSIG WTERMSIG));
 
@@ -866,7 +866,7 @@ sub load_imports {
 do {
   # De-duplicate the export list: 
   my %export;
-   %export{[ map {< @$_} values %EXPORT_TAGS]} = @();
+   %export{[ map {< @$_}, values %EXPORT_TAGS]} = @();
   # Doing the de-dup with a temporary hash has the advantage that the SVs in
   # @EXPORT are actually shared hash key sacalars, which will save some memory.
   push @EXPORT, < keys %export;

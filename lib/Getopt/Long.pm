@@ -732,7 +732,7 @@ sub GetOptionsFromArray($@) {
 # A readable representation of what's in an optbl.
 sub OptCtl ($) {
     my @($v) =  @_;
-    my @v = map { defined($_) ?? ($_) !! ("<undef>") } @$v;
+    my @v = map { defined($_) ?? ($_) !! ("<undef>") }, @$v;
     "[".
       join(",", @(
 	   "\"@v[CTL_TYPE]\"",

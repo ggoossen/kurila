@@ -11,27 +11,27 @@ our $test;
 
 do {
     my @lol = @(\qw(a b c), \@(), \qw(1 2 3));
-    my @mapped = map  {scalar nelems @$_} @lol;
+    my @mapped = map  {scalar nelems @$_}, @lol;
     cmp_ok("$(join ' ',@mapped)", 'eq', "3 0 3", 'map scalar list of list');
 
-    my @grepped = grep {scalar nelems @$_} @lol;
+    my @grepped = grep {scalar nelems @$_}, @lol;
     cmp_ok( (join ' ', map { dump::view($_) } @grepped), 'eq',
             dump::view(@lol[0]) . ' ' . dump::view(@lol[2]), 'grep scalar list of list');
     $test++;
 
-    @grepped = grep { $_ } @mapped;
+    @grepped = grep { $_ }, @mapped;
     cmp_ok( "$(join ' ',@grepped)", 'eq',  "3 3", 'grep basic');
 };
 
 do {
     my @res;
 
-    @res = map({$_} @( ("geronimo")));
+    @res = map({$_}, @( ("geronimo")));
     cmp_ok( scalar(nelems @res), '==', 1, 'basic map nr');
     cmp_ok( @res[0], 'eq', 'geronimo', 'basic map is');
 
     @res = map
-             ({$_} @( ("yoyodyne")));
+             ({$_}, @( ("yoyodyne")));
     cmp_ok( scalar(nelems @res), '==', 1, 'linefeed map nr');
     cmp_ok( @res[0], 'eq', 'yoyodyne', 'linefeed map is');
 
@@ -41,12 +41,12 @@ do {
     cmp_ok( scalar(nelems @res), '==', 1, 'deref map nr');
     cmp_ok( @res[0], 'eq', 'chobb', 'deref map is');
 
-    @res = map {$_} @( ("geronimo"));
+    @res = map {$_}, @( ("geronimo"));
     cmp_ok( scalar(nelems @res), '==', 1, 'no paren basic map nr');
     cmp_ok( @res[0], 'eq', 'geronimo', 'no paren basic map is');
 
     @res = map
-             {$_} @( ("yoyodyne"));
+             {$_}, @( ("yoyodyne"));
     cmp_ok( scalar(nelems @res), '==', 1, 'no paren linefeed map nr');
     cmp_ok( @res[0], 'eq', 'yoyodyne', 'no paren linefeed map is');
 
@@ -67,21 +67,21 @@ do {
     cmp_ok( scalar(nelems @res), '==', 1, 'binand map nr 2');
     cmp_ok( @res[0], 'eq', "sferics\n", 'binand map is 2');
 
-    @res = map { $_ ^&^ $x } @( ("sferics\n"));
+    @res = map { $_ ^&^ $x }, @( ("sferics\n"));
     cmp_ok( scalar(nelems @res), '==', 1, 'binand map nr 3');
     cmp_ok( @res[0], 'eq', "sferics\n", 'binand map is 3');
 
     @res = map
-             { $_^&^$x } @( ("sferics\n"));
+             { $_^&^$x }, @( ("sferics\n"));
     cmp_ok( scalar(nelems @res), '==', 1, 'binand map nr 4');
     cmp_ok( @res[0], 'eq', "sferics\n", 'binand map is 4');
 
-    @res = grep({$_} @( ("geronimo")));
+    @res = grep({$_}, @( ("geronimo")));
     cmp_ok( scalar(nelems @res), '==', 1, 'basic grep nr');
     cmp_ok( @res[0], 'eq', 'geronimo', 'basic grep is');
 
     @res = grep
-                ({$_} @( ("yoyodyne")));
+                ({$_}, @( ("yoyodyne")));
     cmp_ok( scalar(nelems @res), '==', 1, 'linefeed grep nr');
     cmp_ok( @res[0], 'eq', 'yoyodyne', 'linefeed grep is');
 
@@ -91,12 +91,12 @@ do {
     cmp_ok( scalar(nelems @res), '==', 1, 'deref grep nr');
     cmp_ok( @res[0], 'eq', 'chobb', 'deref grep is');
 
-    @res = grep {$_} @( ("geronimo"));
+    @res = grep {$_}, @( ("geronimo"));
     cmp_ok( scalar(nelems @res), '==', 1, 'no paren basic grep nr');
     cmp_ok( @res[0], 'eq', 'geronimo', 'no paren basic grep is');
 
     @res = grep
-                {$_} @( ("yoyodyne"));
+                {$_}, @( ("yoyodyne"));
     cmp_ok( scalar(nelems @res), '==', 1, 'no paren linefeed grep nr');
     cmp_ok( @res[0], 'eq', 'yoyodyne', 'no paren linefeed grep is');
 
@@ -118,12 +118,12 @@ do {
     cmp_ok( scalar(nelems @res), '==', 1, 'binand X linefeed grep nr');
     cmp_ok( @res[0], 'eq', 'bodine', 'binand X linefeed grep is');
 
-    @res = grep {$_^&^"X"} @( ("bodine"));
+    @res = grep {$_^&^"X"}, @( ("bodine"));
     cmp_ok( scalar(nelems @res), '==', 1, 'no paren binand X grep nr');
     cmp_ok( @res[0], 'eq', 'bodine', 'no paren binand X grep is');
 
     @res = grep
-           {$_^&^"X"} @( ("bodine"));
+           {$_^&^"X"}, @( ("bodine"));
     cmp_ok( scalar(nelems @res), '==', 1, 'no paren binand X linefeed grep nr');
     cmp_ok( @res[0], 'eq', 'bodine', 'no paren binand X linefeed grep is');
 };

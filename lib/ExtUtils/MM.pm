@@ -68,9 +68,9 @@ if( %Is{?NW5} ) {
 %Is{+AIX}    = $^OS_NAME eq 'aix';
 %Is{+Darwin} = $^OS_NAME eq 'darwin';
 
-%Is{+Unix}   = !grep { $_ } values %Is;
+%Is{+Unix}   = !grep { $_ }, values %Is;
 
-map { delete %Is{$_} unless %Is{?$_} } keys %Is;
+map { delete %Is{$_} unless %Is{?$_} }, keys %Is;
 _assert( nelems(%Is) == 2 );
 my@($OS) =  keys %Is;
 

@@ -34,7 +34,7 @@ $matchMetaRE = '[' . quotemeta($metachars) . ']';
                 ')' => ')',
            );
 
-%wildCount = %( < map { $_ => 1 } qw/ * ? . { ( [ / );           
+%wildCount = %( < map { $_ => 1 }, qw/ * ? . { ( [ / );           
 
 sub globmap ($$;)
 {
@@ -89,7 +89,7 @@ sub new
 
     #if (whatever)
     do {
-        my $missing = grep { ! -e $_ } @inputFiles ;
+        my $missing = grep { ! -e $_ }, @inputFiles ;
 
         if ($missing)
         {
@@ -355,7 +355,7 @@ sub getHash
 {
     my $self = shift ;
 
-    return \%( < map { $_->[0] => $_->[1] } @{ $self->{Pairs} } ) ;
+    return \%( < map { $_->[0] => $_->[1] }, @{ $self->{Pairs} } ) ;
 }
 
 1;

@@ -36,7 +36,7 @@ use constant THRESHOLD => 14;
 use constant START     => "a";
 
 # some initial hash data
-my %h2 = %( < map {$_ => 1} 11..222 );
+my %h2 = %( < map {$_ => 1}, 11..222 );
 
 ok (!Internals::HvREHASH(%h2), 
     "starting with pre-populated non-pathological hash (rehash flag if off)");

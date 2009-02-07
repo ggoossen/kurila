@@ -83,7 +83,7 @@ sub bar {
 }
 
 # Schwern's example of finding an RV
-my $path = join " ", map { qq["-I$_"] } $^INCLUDE_PATH;
+my $path = join " ", map { qq["-I$_"] }, $^INCLUDE_PATH;
 $path = '-I::lib -MMac::err=unix' if $^OS_NAME eq 'MacOS';
 my $redir = $^OS_NAME eq 'MacOS' ?? '' !! "2>&1";
 my $items = qx{$^EXECUTABLE_NAME $path "-MO=Terse" -le "print \\*STDOUT, \\42" $redir};

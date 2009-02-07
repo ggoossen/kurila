@@ -35,7 +35,7 @@ is_deeply(\(sort keys %Module::CoreList::released),
 
 is_deeply( \(map {
     exists %Module::CoreList::version{ $_ }->{FindExt} ?? $_ !! ()
-} keys %Module::CoreList::version),
+}, keys %Module::CoreList::version),
            \@(), "FindExt shouldn't get included rt#6922" );
 
 

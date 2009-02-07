@@ -577,13 +577,13 @@ our @res = @( () );
 # List context:
 $_ = 'abcde|abcde';
 our @dummy = @( m/([ace]).(?{push @res, $1,$2})([ce])(?{push @res, $1,$2})/g );
-@res = map {defined $_ ?? "'$_'" !! 'undef'} @res;
+@res = map {defined $_ ?? "'$_'" !! 'undef'}, @res;
 $res = "$(join ' ',@res)";
 ok(  "$(join ' ',@res)" eq "'a' undef 'a' 'c' 'e' undef 'a' undef 'a' 'c'" );
 
 @res = @( () );
 @dummy = @( m/([ace]).(?{push @res, $^PREMATCH,$^MATCH,$^POSTMATCH})([ce])(?{push @res, $^PREMATCH,$^MATCH,$^POSTMATCH})/gp );
-@res = map {defined $_ ?? "'$_'" !! 'undef'} @res;
+@res = map {defined $_ ?? "'$_'" !! 'undef'}, @res;
 $res = "$(join ' ',@res)";
 ok(  "$(join ' ',@res)" eq
   "'' 'ab' 'cde|abcde' " .
@@ -891,7 +891,7 @@ SKIP: do {
 	     );
 	
     for my $char ( map { s/^\S+ //; $_ }
-                    sort map { sprintf("\%06x", ord($_))." $_" } keys %s) {
+                    sort map { sprintf("\%06x", ord($_))." $_" }, keys %s) {
 	my $class = %s{?$char};
 	my $code  = sprintf("\%06x", ord($char));
 	printf \*STDOUT, "#\n# 0x$code  $char\n#\n";
@@ -1268,12 +1268,12 @@ do {
 ## guarantee a specific locale......
 ##
     use bytes;
-    our $AllBytes = join('', map { chr($_) } 0..255);
+    our $AllBytes = join('', map { chr($_) }, 0..255);
     ($x = $AllBytes) =~ s/[[:cntrl:]]//g;
-    ok($x eq join('', map { chr($_) } @( < 0x20..0x7E, < 0x80..0xFF)));
+    ok($x eq join('', map { chr($_) }, @( < 0x20..0x7E, < 0x80..0xFF)));
 
     ($x = $AllBytes) =~ s/[^[:cntrl:]]//g;
-    ok($x eq join('', map { chr($_) } @( < 0..0x1F, 0x7F)));
+    ok($x eq join('', map { chr($_) }, @( < 0..0x1F, 0x7F)));
 };
 
 # With /s modifier UTF8 chars were interpreted as bytes
@@ -2299,7 +2299,7 @@ do { # TRIE related
     "words"=~m/(word|word|word)(?{push @got,$1})s$/i;
     ok((nelems @got)==1,"TRIEF optimisation is working") or warn "# $(join ' ',@got)";
 
-    my @nums= map {int rand 1000} 1..100;
+    my @nums= map {int rand 1000}, 1..100;
     my $re="(".(join "|", @nums).")";
     $re=qr/\b$re\b/;
 
@@ -2458,7 +2458,7 @@ do {
     # https://rt.perl.org/rt3/Ticket/Display.html?id=39583
     
     # The printing characters
-    my @chars = map { chr($_) } ord("A")..ord("Z");
+    my @chars = map { chr($_) }, ord("A")..ord("Z");
     my $delim = ",";
     my $size = 32771 - 4;
     my $str = '';
@@ -3028,7 +3028,7 @@ do {
 
     # ANYOF tests
 
-    for ( map { \$($$_) } @(\qw|\w aA #@!|,
+    for ( map { \$($$_) }, @(\qw|\w aA #@!|,
                           \qw|[abc] abc def|,
                           \qw|[^abc] def abc|,
                           \qw|[[:word:]] abc #@!|,
@@ -3114,7 +3114,7 @@ do {
 do {
     local $Message = "Various whitespace special patterns";
     my @lb=@( "\x{0D}\x{0A}",
-             < map { chr( $_ ) } @( ( < 0x0A..0x0D,0x85,0x2028,0x2029 )));
+             < map { chr( $_ ) }, @( ( < 0x0A..0x0D,0x85,0x2028,0x2029 )));
     foreach my $t (@(\@(\@lb,qr/\R/,qr/\R+/),)){
         my $ary=shift @$t;
         foreach my $pat ( @$t) {

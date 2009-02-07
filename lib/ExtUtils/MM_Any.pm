@@ -101,8 +101,8 @@ This is useful for code like:
 
 sub os_flavor_is {
     my $self = shift;
-    my %flavors = %( < map { ($_ => 1) } $self->os_flavor );
-    return (grep { %flavors{?$_} } @_) ?? 1 !! 0;
+    my %flavors = %( < map { ($_ => 1) }, $self->os_flavor );
+    return (grep { %flavors{?$_} }, @_) ?? 1 !! 0;
 }
 
 
@@ -401,13 +401,13 @@ The blibdirs.ts target is deprecated.  Depend on blibdirs instead.
 sub blibdirs_target {
     my $self = shift;
 
-    my @dirs = map { uc "\$(INST_$_)" } qw(libdir archlib
+    my @dirs = map { uc "\$(INST_$_)" }, qw(libdir archlib
                                            autodir archautodir
                                            bin script
                                            man1dir man3dir
                                           );
 
-    my @exists = map { $_.'$(DFSEP).exists' } @dirs;
+    my @exists = map { $_.'$(DFSEP).exists' }, @dirs;
 
     my $make = sprintf <<'MAKE', join(' ', @exists);
 blibdirs : %s
@@ -481,15 +481,15 @@ clean :: clean_subdirs
 
     # core files
     push(@files, < qw[core core.*perl.*.? *perl.core]);
-    push(@files, < map { "core." . "[0-9]"x$_ } @( ( <1..5)));
+    push(@files, < map { "core." . "[0-9]"x$_ }, @( ( <1..5)));
 
     # OS specific things to clean up.  Use @dirs since we don't know
     # what might be in here.
     push @dirs, < $self->extra_clean_files;
 
     # Occasionally files are repeated several times from different sources
-    do { my@(%f) =@( %( < map { ($_ => 1) } grep { defined $_ } @files )); @files = keys %f; };
-    do { my@(%d) =@( %( < map { ($_ => 1) } grep { defined $_ } @dirs ));  @dirs  = keys %d; };
+    do { my@(%f) =@( %( < map { ($_ => 1) }, grep { defined $_ }, @files )); @files = keys %f; };
+    do { my@(%d) =@( %( < map { ($_ => 1) }, grep { defined $_ }, @dirs ));  @dirs  = keys %d; };
 
     push @m, < map "\t$_\n", $self->split_command('- $(RM_F)',  < @files);
     push @m, < map "\t$_\n", $self->split_command('- $(RM_RF)', < @dirs);
@@ -701,7 +701,7 @@ CMD
     }
 
     $manify .= "\t\$(NOECHO) \$(NOOP)\n" unless (nelems @man_cmds);
-    $manify .= join '', map { "$_\n" } @man_cmds;
+    $manify .= join '', map { "$_\n" }, @man_cmds;
 
     return $manify;
 }
@@ -728,7 +728,7 @@ metafile :
 MAKE_FRAG
 
     my $prereq_pm = '';
-    foreach my $mod ( sort { lc $a cmp lc $b } keys %{$self->{?PREREQ_PM} || \%()} ) {
+    foreach my $mod ( sort { lc $a cmp lc $b }, keys %{$self->{?PREREQ_PM} || \%()} ) {
         my $ver = $self->{PREREQ_PM}->{?$mod};
         $prereq_pm .= sprintf "\n    \%-30s \%s", "$mod:", $ver;
     }
@@ -841,12 +841,12 @@ sub realclean {
     }
 
     # Occasionally files are repeated several times from different sources
-    do { my@(%f) =@( %( < map { ($_ => 1) } @files ));  @files = keys %f; };
-    do { my@(%d) =@( %( < map { ($_ => 1) } @dirs ));   @dirs  = keys %d; };
+    do { my@(%f) =@( %( < map { ($_ => 1) }, @files ));  @files = keys %f; };
+    do { my@(%d) =@( %( < map { ($_ => 1) }, @dirs ));   @dirs  = keys %d; };
 
-    my $rm_cmd  = join "\n\t", map { "$_" } 
+    my $rm_cmd  = join "\n\t", map { "$_" }, 
                     $self->split_command('- $(RM_F)',  < @files);
-    my $rmf_cmd = join "\n\t", map { "$_" } 
+    my $rmf_cmd = join "\n\t", map { "$_" }, 
                     $self->split_command('- $(RM_RF)', < @dirs);
 
     my $m = sprintf <<'MAKE', $rm_cmd, $rmf_cmd;

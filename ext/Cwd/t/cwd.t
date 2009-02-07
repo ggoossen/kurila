@@ -51,7 +51,7 @@ my $pwd_cmd =
         "cd" !!
     ($IsMacOS) ??
         "pwd" !!
-        (grep { -x && -f } map { "$_/$pwd$(config_value('exe_ext'))" }
+        (grep { -x && -f }, map { "$_/$pwd$(config_value('exe_ext'))" },
 	                   split m/$(config_value('path_sep'))/, env::var('PATH'))[0];
 
 $pwd_cmd = 'SHOW DEFAULT' if $IsVMS;
@@ -203,7 +203,7 @@ SKIP: do {
   do {
     my $root = Cwd::abs_path(File::Spec->rootdir);	# Add drive letter?
     opendir my $fh, $root or skip("Can't opendir($root): $^OS_ERROR", 2+$EXTRA_ABSPATH_TESTS);
-    @(?$file) = grep {-f $_ and not -l $_} map File::Spec->catfile($root, $_), @( readdir $fh);
+    @(?$file) = grep {-f $_ and not -l $_}, map File::Spec->catfile($root, $_), @( readdir $fh);
     closedir $fh;
   };
   skip "No plain file in root directory to test with", 2+$EXTRA_ABSPATH_TESTS unless $file;

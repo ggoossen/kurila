@@ -28,8 +28,8 @@ sub set_static_extensions {
     %static = %( () );
     my @list = @_;
     if (@_[0] eq '*') {
-	my %excl = %( < map {$_=>1} map {m/^!(.*)$/} @_[[1 .. ((nelems @_)-1)]] );
-	@list = grep {!exists %excl{$_}} keys %ext;
+	my %excl = %( < map {$_=>1}, map {m/^!(.*)$/} @_[[1 .. ((nelems @_)-1)]] );
+	@list = grep {!exists %excl{$_}}, keys %ext;
     }
     for ( @list) {
         %static{+$_} = 1;

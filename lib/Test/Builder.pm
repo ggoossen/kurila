@@ -187,7 +187,7 @@ sub plan {
         }
     }
     else {
-        my @args = grep { defined } @( ($cmd, $arg));
+        my @args = grep { defined }, @( ($cmd, $arg));
         die("plan() doesn't understand $(join ' ',@args)");
     }
 
@@ -584,7 +584,7 @@ Works just like Test::More's cmp_ok().
 =cut
 
 
-my %numeric_cmps = %( < map { ($_, 1) } 
+my %numeric_cmps = %( < map { ($_, 1) }, 
  @(                       ("<",  "<=", ">",  ">=", "==", "!=", "<=>")) );
 
 sub cmp_ok {
@@ -1092,7 +1092,7 @@ sub diag {
 
     # Smash args together like print does.
     # Convert undef to 'undef' so its readable.
-    my $msg = join '', map { defined($_) ?? $_ !! 'undef' } @msgs;
+    my $msg = join '', map { defined($_) ?? $_ !! 'undef' }, @msgs;
 
     # Escape each line with a #.
     $msg =~ s/^/# /gm;
@@ -1365,7 +1365,7 @@ Of course, test #1 is $tests[0], etc...
 sub summary {
     my@($self) =@( shift);
 
-    return map { $_->{?'ok'} } @{ $self->{Test_Results} };
+    return map { $_->{?'ok'} }, @{ $self->{Test_Results} };
 }
 
 =item B<details>

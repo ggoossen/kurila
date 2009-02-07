@@ -383,7 +383,7 @@ sub _charscripts {
 		}
 	    }
 	    close($SCRIPTSFH);
-	    @SCRIPTS = sort { $a->[0] <+> $b->[0] } @SCRIPTS;
+	    @SCRIPTS = sort { $a->[0] <+> $b->[0] }, @SCRIPTS;
 	}
     }
 }
@@ -863,7 +863,7 @@ sub _namedseq {
 	    while ( ~< $NAMEDSEQFH) {
 		if (m/^(.+)\s*;\s*([0-9A-F]+(?: [0-9A-F]+)*)$/) {
 		    my @($n, $s) = @($1, $2);
-		    my @s = map { chr(hex($_)) } split(' ', $s);
+		    my @s = map { chr(hex($_)) }, split(' ', $s);
 		    %NAMEDSEQ{+$n} = join("", @s);
 		}
 	    }
@@ -878,7 +878,7 @@ sub namedseq {
         return %NAMEDSEQ;
     } elsif ((nelems @_) == 1) {
         my $s = %NAMEDSEQ{?@_[0] };
-        return map { ord($_) } split('', $s);
+        return map { ord($_) }, split('', $s);
     }
     return;
 }

@@ -122,7 +122,7 @@ sub Seen {
     return $s;
   }
   else {
-    return map { < @$_ } values %{$s->{seen}};
+    return map { < @$_ }, values %{$s->{seen}};
   }
 }
 

@@ -5,7 +5,7 @@ use File::Spec;
 my $e = config_value('exe_ext');
 my $o = config_value('obj_ext');
 my $exeout_flag = '-o ';
-my $core = grep { $_ eq 'PERL_CORE=1' } @ARGV;
+my $core = grep { $_ eq 'PERL_CORE=1' }, @ARGV;
 if ($^OS_NAME eq 'MSWin32') {
     if (config_value('cc') =~ m/^cl/i) {
 	$exeout_flag = '-Fe';

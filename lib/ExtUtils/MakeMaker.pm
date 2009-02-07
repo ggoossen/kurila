@@ -370,7 +370,7 @@ sub new {
 
     # PRINT_PREREQ is RedHatism.
     if ("$(join ' ',@ARGV)" =~ m/\bPRINT_PREREQ\b/) {
-        print \*STDOUT, join(" ", map { "perl($_)>=$self->{PREREQ_PM}->{?$_} " } 
+        print \*STDOUT, join(" ", map { "perl($_)>=$self->{PREREQ_PM}->{?$_} " }, 
                         sort keys %{$self->{?PREREQ_PM}}), "\n";
         exit 0;
    }
@@ -416,7 +416,7 @@ sub new {
     }
     
      if (%unsatisfied && $self->{?PREREQ_FATAL}){
-        my $failedprereqs = join "\n", map {"    $_ %unsatisfied{?$_}"} 
+        my $failedprereqs = join "\n", map {"    $_ %unsatisfied{?$_}"}, 
                             sort { $a cmp $b } keys %unsatisfied;
         die <<"END";
 MakeMaker FATAL: prerequisites not found.
@@ -897,7 +897,7 @@ sub flush {
       warn "rename MakeMaker.tmp => $finalname: $^OS_ERROR";
     chmod 0644, $finalname unless $Is_VMS;
 
-    my %keep = %( < map { ($_ => 1) } qw(NEEDS_LINKING HAS_LINK_CODE) );
+    my %keep = %( < map { ($_ => 1) }, qw(NEEDS_LINKING HAS_LINK_CODE) );
 
     if ($self->{?PARENT} && !$self->{?_KEEP_AFTER_FLUSH}) {
         foreach (keys %$self) { # safe memory

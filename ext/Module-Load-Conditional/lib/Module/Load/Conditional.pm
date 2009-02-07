@@ -514,7 +514,7 @@ sub requires {
         return undef;
     }
 
-    my $lib = join " ", map { qq["-I$_"] } $^INCLUDE_PATH;
+    my $lib = join " ", map { qq["-I$_"] }, $^INCLUDE_PATH;
     my $cmd = qq[$^EXECUTABLE_NAME $lib -M$who -e"print(join(qq[\\n],keys(\$^INCLUDED)))"];
 
     return  sort grep { !m/^$who$/  }

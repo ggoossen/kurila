@@ -42,8 +42,8 @@ sub __find_relocations
 	%paths{+config_value($exp_key)}++;
     }
     # Longest prefixes go first in the alternatives
-    my $alternations = join "|", map {quotemeta $_}
-    sort {length $b <+> length $a} keys %paths;
+    my $alternations = join "|", map {quotemeta $_},
+    sort {length $b <+> length $a}, keys %paths;
     qr/^($alternations)/o;
 }
 

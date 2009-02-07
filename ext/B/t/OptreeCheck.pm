@@ -395,7 +395,7 @@ sub getCmdLine {	# import assistant
 	    if (grep s/$opt=(\w+)/$($tval=$1)/, @ARGV) {
 		# check val before accepting
 		my @allowed = @{%gOpts{?$opt}};
-		if (grep { $_ eq $tval } @allowed) {
+		if (grep { $_ eq $tval }, @allowed) {
 		    %gOpts{+$opt} = $tval;
 		}
 		else {die "invalid value: '$tval' for $opt\n"}

@@ -576,7 +576,7 @@ sub constants {
             INST_BIN INST_SCRIPT INST_LIB INST_ARCHLIB 
             PERL_LIB PERL_ARCHLIB
             PERL_INC PERL_SRC ],
-                        (< map { 'INSTALL'.$_ } $self->installvars))
+                        (< map { 'INSTALL'.$_ }, $self->installvars))
                       ) 
     {
         next unless defined $self->{?$macro};
@@ -1422,7 +1422,7 @@ $(MAP_TARGET) :: $(MAKE_APERL_FILE)
     # (e.g. Intuit::DWIM will precede Intuit, so unresolved
     # references from [.intuit.dwim]dwim.obj can be found
     # in [.intuit]intuit.olb).
-    for (sort { length($a) <+> length($b) } keys %olbs) {
+    for (sort { length($a) <+> length($b) }, keys %olbs) {
 	next unless %olbs{?$_} =~ m/\Q$self->{?LIB_EXT}\E$/;
 	my@($dir) =  $self->fixpath($_,1);
 	my@($extralibs) = $dir . "extralibs.ld";
@@ -1720,7 +1720,7 @@ sub oneliner {
     $cmd = $self->escape_newlines($cmd);
 
     # Switches must be quoted else they will be lowercased.
-    $switches = join ' ', map { qq{"$_"} } @$switches;
+    $switches = join ' ', map { qq{"$_"} }, @$switches;
 
     return qq{\$(ABSPERLRUN) $switches -e $cmd "--"};
 }

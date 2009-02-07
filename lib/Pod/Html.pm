@@ -399,12 +399,12 @@ sub pod2html {
 	    if (m/\r\n/) {
 		@poddata = map { s/\r\n/\n/g;
 				 m/\n\n/ ??
-				     < map { "$_\n\n" } split m/\n\n/ !!
+				     < map { "$_\n\n" }, split m/\n\n/ !!
 				     $_ } @poddata;
 	    } else {
 		@poddata = map { s/\r/\n/g;
 				 m/\n\n/ ??
-				     < map { "$_\n\n" } split m/\n\n/ !!
+				     < map { "$_\n\n" }, split m/\n\n/ !!
 				     $_ } @poddata;
 	    }
 	    last;
