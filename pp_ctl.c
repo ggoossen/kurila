@@ -46,22 +46,24 @@ PP(pp_grepstart)
     SV *srcitem;
     SV *src;
     SV *dst;
+    SV *cv;
 
     if (PL_stack_base + *PL_markstack_ptr == SP) {
 	(void)POPMARK;
 	mXPUSHs(AvSv(newAV()));
-	RETURNOP(PL_op->op_next->op_next);
+	RETURNOP(PL_op->op_next->op_next->op_next);
     }
 
     PL_stack_sp = PL_stack_base + *PL_markstack_ptr + 1;
 
     src = sv_mortalcopy(POPs);
     dst = sv_2mortal(AvSv(newAV()));
+    cv = POPs;
 
     if ( ! SvOK(src) ) {
 	(void)POPMARK;
 	XPUSHs(dst);
-	RETURNOP(PL_op->op_next->op_next);
+	RETURNOP(PL_op->op_next->op_next->op_next);
     }
     if ( ! SvAVOK(src) )
 	Perl_croak(aTHX_ "%s expected an array but got %s", OP_DESC(PL_op), Ddesc(src));
@@ -69,12 +71,13 @@ PP(pp_grepstart)
     if ( av_len(SvAv(src)) == -1 ) {
 	(void)POPMARK;
 	XPUSHs(dst);
-	RETURNOP(PL_op->op_next->op_next);
+	RETURNOP(PL_op->op_next->op_next->op_next);
     }
 
-    pp_pushmark();				/* push dst */
+    PUSHMARK(SP);				/* push dst */
     XPUSHs(dst);                          /* push dst */
     XPUSHs(src);                          /* push dst */
+    XPUSHs(cv);
 
     ENTER;					/* enter outer scope */
 
@@ -83,62 +86,53 @@ PP(pp_grepstart)
 	SAVESPTR(PAD_SVl(PL_op->op_targ));
     else
 	SAVE_DEFSV;
-    ENTER;					/* enter inner scope */
-    SAVEVPTR(PL_curpm);
 
     srcitem = av_shift(SvAv(src));
-    if (PL_op->op_type == OP_GREPSTART)
-	XPUSHs(srcitem);
     if (PL_op->op_private & OPpGREP_LEX) {
 	SVcpSTEAL(PAD_SVl(PL_op->op_targ), srcitem);
     }
     else
 	SVcpSTEAL(DEFSV, srcitem);
 
+    if (PL_op->op_type == OP_GREPSTART)
+	XPUSHs(srcitem);
+    PUSHMARK(SP);
+    PUSHs(srcitem);
+    PUSHs(cv);
     PUTBACK;
-    if (PL_op->op_type == OP_MAPSTART)
-	pp_pushmark();			/* push top */
-    return ((LOGOP*)PL_op->op_next)->op_other;
+    assert(PL_op->op_next->op_type == OP_ENTERSUB);
+    return PL_op->op_next;
 }
 
 PP(pp_mapwhile)
 {
     dVAR; dSP;
     const I32 gimme = GIMME_V;
-    I32 items = (SP - PL_stack_base) - *PL_markstack_ptr; /* how many new items */
+    SV* newitem;
     AV* src;
-    SV** dst;
+    SV* dst;
+    SV** cvp;
 
-    dst = PL_stack_base + PL_markstack_ptr[-1] + 0;
-    src = SvAv(*(PL_stack_base + PL_markstack_ptr[-1] + 1));
+    newitem = POPs;
+    cvp = SP;
+    src = SvAv(SP[-1]);
+    dst = SP[-2];
 
-    /* if there are new items, push them into the destination list */
-    if (items && gimme != G_VOID) {
-	int i;
-	SP -= items;
-	for (i=1; i <= items; i++) {
-	    av_push((AV*)*dst, SvTEMP(SP[i]) ? SvREFCNT_inc(SP[i]) : newSVsv(SP[i]));
-	}
-    }
-    LEAVE;					/* exit inner scope */
+    av_push(SvAv(dst), SvTEMP(newitem) ? SvREFCNT_inc(newitem) : newSVsv(newitem));
 
     /* All done yet? */
     if ( av_len(src) == -1 ) {
 
-	(void)POPMARK;				/* pop top */
 	LEAVE;					/* exit outer scope */
 	(void)POPMARK;				/* pop dst */
 	SP = PL_stack_base + POPMARK;		/* pop original mark */
 	if (gimme != G_VOID) {
-	    PUSHs(*dst);
+	    PUSHs(dst);
 	}
 	RETURN;
     }
     else {
 	SV *srcitem;
-
-	ENTER;					/* enter inner scope */
-	SAVEVPTR(PL_curpm);
 
 	/* set $_ to the new source item */
 	srcitem = av_shift(src);
@@ -146,6 +140,10 @@ PP(pp_mapwhile)
 	    SVcpSTEAL(PAD_SVl(PL_op->op_targ), srcitem)
 	else
 	    SVcpSTEAL(DEFSV, srcitem);
+	PUSHMARK(SP);
+	XPUSHs(srcitem);
+	XPUSHs(*cvp);
+	PUTBACK;
 
 	RETURNOP(cLOGOP->op_other);
     }

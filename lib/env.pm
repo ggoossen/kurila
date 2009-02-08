@@ -18,7 +18,7 @@ sub make_restore_var {
 }
 
 sub make_restore {
-    my %old = %:< map { $_ => env::var($_) }, env::keys();
+    my %old = %:<@+: map { @: $_ => env::var($_) }, env::keys();
     my $restore= sub {
         my $old_copy = %old;
         for my $key (env::keys()) {

@@ -101,7 +101,7 @@ This is useful for code like:
 
 sub os_flavor_is {
     my $self = shift;
-    my %flavors = %( < map { ($_ => 1) }, $self->os_flavor );
+    my %flavors = %( < @+: map { @($_ => 1) }, $self->os_flavor );
     return (grep { %flavors{?$_} }, @_) ?? 1 !! 0;
 }
 
@@ -488,8 +488,8 @@ clean :: clean_subdirs
     push @dirs, < $self->extra_clean_files;
 
     # Occasionally files are repeated several times from different sources
-    do { my@(%f) =@( %( < map { ($_ => 1) }, grep { defined $_ }, @files )); @files = keys %f; };
-    do { my@(%d) =@( %( < map { ($_ => 1) }, grep { defined $_ }, @dirs ));  @dirs  = keys %d; };
+    do { my@(%f) =@( %( < @+: map { @($_ => 1) }, grep { defined $_ }, @files )); @files = keys %f; };
+    do { my@(%d) =@( %( < @+: map { @($_ => 1) }, grep { defined $_ }, @dirs ));  @dirs  = keys %d; };
 
     push @m, < map { "\t$_\n" }, $self->split_command('- $(RM_F)',  < @files);
     push @m, < map { "\t$_\n" }, $self->split_command('- $(RM_RF)', < @dirs);
@@ -841,8 +841,8 @@ sub realclean {
     }
 
     # Occasionally files are repeated several times from different sources
-    do { my@(%f) =@( %( < map { ($_ => 1) }, @files ));  @files = keys %f; };
-    do { my@(%d) =@( %( < map { ($_ => 1) }, @dirs ));   @dirs  = keys %d; };
+    do { my@(%f) =@( %( < @+: map { @($_ => 1) }, @files ));  @files = keys %f; };
+    do { my@(%d) =@( %( < @+: map { @($_ => 1) }, @dirs ));   @dirs  = keys %d; };
 
     my $rm_cmd  = join "\n\t", map { "$_" }, 
                     $self->split_command('- $(RM_F)',  < @files);

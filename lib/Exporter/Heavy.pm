@@ -22,11 +22,11 @@ No user-serviceable parts inside.
 sub _rebuild_cache {
     my @($pkg, $exports, $cache) = @_;
     s/^&// foreach  @$exports;
-    %{$cache}{[ @$exports]} = @(1) x nelems @$exports;
+    $cache->{[ @$exports]} = @(1) x nelems @$exports;
     my $ok = \@{*{Symbol::fetch_glob("$($pkg)::EXPORT_OK")}};
     if ((nelems @$ok)) {
 	s/^&// foreach  @$ok;
- 	%{$cache}{[ @$ok]} = @(1) x nelems @$ok;
+ 	$cache->{[@$ok]} = @(1) x nelems @$ok;
     }
 }
 
@@ -140,7 +140,7 @@ sub export {
 	    # Build cache of symbols. Optimise the lookup by adding
 	    # barewords twice... both with and without a leading &.
 	    # (Technique could be applied to $export_cache at cost of memory)
-	    my @expanded = map { m/^\w/ ?? ($_, '&'.$_) !! $_ }, @$fail;
+	    my @expanded = @+: map { m/^\w/ ?? @($_, '&'.$_) !! @($_) }, @$fail;
 	    warn "$($pkg)::EXPORT_FAIL cached: $(join ' ',@expanded)" if $Exporter::Verbose;
  	    %{$fail_cache}{[ @expanded]} = (1) x nelems @expanded;
 	}
@@ -194,7 +194,7 @@ sub _push_tags {
     push(@{*{Symbol::fetch_glob("$($pkg)::$var")}},
 	< map { $export_tags->{?$_} ?? < @{$export_tags->{?$_}} 
                                  !! do { push(@nontag,$_); $_ } },
- @(		(nelems @$syms) ?? < @$syms !! < keys %$export_tags));
+ 		(nelems @$syms) ?? @$syms !! keys %$export_tags);
     if ((nelems @nontag) and $^WARNING) {
 	# This may change to a die one day
 	warn(join(", ", @nontag)." are not tags of $pkg");

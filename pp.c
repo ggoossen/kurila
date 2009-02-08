@@ -4337,6 +4337,41 @@ PP(pp_reverse)
     RETURN;
 }
 
+PP(pp_arrayjoin)
+{
+    dVAR; dSP;
+    SV * const av = POPs;
+    SV ** ary;
+    SV ** end;
+    AV * newav = av_2mortal(newAV());
+
+    if ( ! SvAVOK(av) ) {
+	Perl_croak(aTHX_ "%s expected an ARRAY but got %s", OP_DESC(PL_op), Ddesc(av));
+    }
+
+    ary = AvARRAY(av);
+    end = ary + av_len(SvAv(av));
+    
+    if (ary) {
+	while (ary <= end) {
+	    register SV * const tmp = *ary;
+	    SV ** subary;
+	    I32 sublen;
+	    I32 i;
+	    if ( ! SvAVOK(tmp) ) {
+		Perl_croak(aTHX_ "%s expected an ARRAY but got %s",
+		    OP_DESC(PL_op), Ddesc(tmp));
+	    }
+	    subary = AvARRAY(SvAv(tmp));
+	    sublen = av_len(SvAv(tmp));
+	    for (i=0; i<=sublen; i++)
+		av_push(newav, newSVsv(subary[i])); 
+	    ary++;
+	}
+    }
+    PUSHs(AvSv(newav));
+    RETURN;
+}
 PP(pp_split)
 {
     dVAR; dSP;

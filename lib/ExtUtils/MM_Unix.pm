@@ -379,7 +379,7 @@ sub constants {
               INSTALLDIRS INSTALL_BASE DESTDIR PREFIX
               PERLPREFIX      SITEPREFIX      VENDORPREFIX
                    ),
-                   (< map { ("INSTALL".$_,
+                   (<@+: map { @("INSTALL".$_,
                           "DESTINSTALL".$_)
                         }, $self->installvars), <
                    qw(
@@ -1251,7 +1251,7 @@ sub init_dirscan {	# --- File and Directory Lists (.xs .pm .pod etc)
     my@($self) =  @_;
     my(%dir, %xs, %c, %h, %pl_files, %pm);
 
-    my %ignore = %( < map {( $_ => 1 )}, qw(Makefile.PL Build.PL test.pl t) );
+    my %ignore = %( <@+: map {@( $_ => 1 )}, qw(Makefile.PL Build.PL test.pl t) );
 
     # ignore the distdir
     ( %Is{?VMS} ?? %ignore{+"$self->{?DISTVNAME}.dir"}
@@ -1470,7 +1470,7 @@ sub init_PM {
     # @{$self->{PMLIBDIRS}} = grep -d && !$dir{$_}, @{$self->{PMLIBDIRS}};
     my @pmlibdirs = @{$self->{?PMLIBDIRS}};
     @{$self->{PMLIBDIRS}} = @( () );
-    my %dir = %( < map { ($_ => $_) }, @{$self->{DIR}} );
+    my %dir = %( < @+: map { @($_ => $_) }, @{$self->{DIR}} );
     foreach my $pmlibdir ( @pmlibdirs) {
 	-d $pmlibdir && !%dir{?$pmlibdir} && push @{$self->{PMLIBDIRS}}, $pmlibdir;
     }

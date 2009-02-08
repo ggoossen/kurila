@@ -121,7 +121,7 @@ sub _unix_os2_ext {
 			while (length($ma) +< length($mb)) { $ma .= ".00"; }
 			while (length($mb) +< length($ma)) { $mb .= ".00"; }
 			# Comparison deliberately backwards
-			$mb cmp $ma;} @fullname )[0];
+			$mb cmp $ma;}, @fullname )[0];
 	    } elsif (-f ($fullname="$thispth/lib$thislib.$so")
 		 && ((config_value('dlsrc') ne "dl_dld.xs") || ($thislib eq "m"))){
 	    } elsif (-f ($fullname="$thispth/lib$($thislib)_s$Config_libext")

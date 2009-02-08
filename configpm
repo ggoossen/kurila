@@ -52,7 +52,7 @@ while ($how_many_common--) {
 }
 
 # names of things which may need to have slashes changed to double-colons
-my %Extensions = %( < map {($_,$_)},
+my %Extensions = %( < @+: map {@($_,$_)},
                  qw(dynamic_ext static_ext extensions known_extensions) );
 
 # allowed opts as well as specifies default and initial values
@@ -68,7 +68,8 @@ sub opts {
         # --opt=smth
         (< map {m/^--([\-_\w]+)=(.*)$/}, @ARGV),
         # --opt --no-opt --noopt
-        (< map {m/^no-?(.*)$/i??($1=>0)!!($_=>1)}, map {m/^--([\-_\w]+)$/}, @ARGV),
+        (< @+: map {m/^no-?(.*)$/i??@($1=>0)!!@($_=>1)},
+          map {m/^--([\-_\w]+)$/}, @ARGV),
     );
 
     my %opts = %(< %Allowed_Opts, < %given_opts);
@@ -139,7 +140,7 @@ package Config;
 # Need to stub all the functions to make code such as print Config::config_sh
 # keep working
 
-my %%Export_Cache = %%( < map {($_ => 1)} @(< @Config::EXPORT, < @Config::EXPORT_OK) );
+my %%Export_Cache = %%( < @+: map {@($_ => 1)}, @(< @Config::EXPORT, < @Config::EXPORT_OK) );
 
 # Define our own import method to avoid pulling in the full Exporter:
 sub import {
@@ -576,7 +577,7 @@ sub config_sh {
 
 sub config_re {
     my $re = shift;
-    return @(<map { chomp; $_ } grep try{ m/^(?:$re)=/ }, split m/^/,
+    return @(<map { chomp; $_ }, grep try{ m/^(?:$re)=/ }, split m/^/,
              $Config_SH_expanded );
 }
 
@@ -593,7 +594,7 @@ sub config_vars {
 	if ($qry =~ m/\W/) {
 	    my @matches = @(<config_re($qry));
 	    print \*STDOUT, < map "$_$lnend", @matches || @("$qry: not found")		if !$notag;
-	    print \*STDOUT, < map { s/\w+=//; "$_$lnend" } @matches || @("$qry: not found")	if  $notag;
+	    print \*STDOUT, < map { s/\w+=//; "$_$lnend" }, @matches || @("$qry: not found")	if  $notag;
 	} else {
 	    my $v = config_value($qry);
 	    $v = 'undef' unless defined $v;
@@ -947,7 +948,7 @@ sub import {
     # 'configpm; was invoked with --cross option
     $platform = '***replace-marker***';
   }
-  $^INCLUDE_PATH = map {/\blib\b/?(do{local $_=$_;s/\blib\b/xlib\/$platform/;$_},$_):($_)} $^INCLUDE_PATH;
+  $^INCLUDE_PATH = map {/\blib\b/?(do{local $_=$_;s/\blib\b/xlib\/$platform/;$_},$_):($_)}, $^INCLUDE_PATH;
   $::Cross::platform = $platform;
 }
 
