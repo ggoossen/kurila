@@ -1293,6 +1293,49 @@ sub rename_magic_vars {
     }
 }
 
+sub rename_inc_vars {
+    my $xml = shift;
+    for my $propname (qw[value variable]) {
+        for ( find_ops( $xml, "rv2av" ) ) {
+            my $var = get_madprop($_, $propname);
+            if ($var and $var eq "\@INC") {
+                set_madprop($_, $propname => "\$^INCLUDE_PATH");
+            }
+        }
+        for ( find_ops( $xml, "rv2hv" ) ) {
+            my $var = get_madprop($_, $propname);
+            if ($var and $var eq "\%INC") {
+                set_madprop($_, $propname => "\$^INCLUDED");
+            }
+        }
+    }
+}
+
+sub print_filehandle {
+    my $xml = shift;
+    for my $op ( find_ops( $xml, "print" ), find_ops( $xml, "prtf" ) ) {
+        my $has_fh = $op->att("flags") =~ m/\bSTACKED\b/;
+        my $stdout = XML::Twig::Elt->new("op_null");
+        if ($has_fh) {
+            my $fh = $op->child(2);
+            if ($fh->tag eq "op_rv2gv" and $fh->child(0)->tag eq "op_gv"
+                  and get_madprop($fh->child(0), "value") =~ m/^(STDOUT|STDERR)$/ ) {
+                set_madprop($fh->child(0), value => "\\*" . get_madprop($fh->child(0), "value"));
+            }
+            if ($fh->tag eq "op_rv2gv" and $fh->child(0)->tag eq "op_scope") {
+                set_madprop($fh->child(0), "curly_open", "");
+                set_madprop($fh->child(0), "curly_close", "");
+            }
+        }
+        my $arg = $has_fh ? "," : get_madprop($op, "round_open") ? "\\*STDOUT, " : " \\*STDOUT," ;
+        set_madprop($stdout, value => $arg);
+        set_madprop($stdout, "null_type" => "value");
+        $stdout->cut;
+        $stdout->paste( after => $op->child( $has_fh ? 2 : 1 ) );
+    }
+    return;
+}
+
 my $from; # floating point number with starting version of kurila.
 GetOptions("from=s" => \$from);
 $from =~ m/(\w+)[-]([\d.]+)$/ or die "invalid from: '$from'";
@@ -1394,9 +1437,14 @@ if ($from->{branch} ne "kurila" or $from->{v} < qv '1.16') {
     pattern_assignment($twig);
 }
 
-#env_using_package($twig);
-#remove_vars($twig);
-rename_magic_vars($twig);
+if ($from->{branch} ne "kurila" or $from->{v} < qv '1.17') {
+    env_using_package($twig);
+    remove_vars($twig);
+    rename_magic_vars($twig);
+}
+
+rename_inc_vars($twig);
+print_filehandle($twig);
 
 #add_call_parens($twig);
 
