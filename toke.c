@@ -3692,7 +3692,8 @@ Perl_yylex(pTHX)
 		PL_lex_brackstack[PL_lex_brackets++] = XTERM;
 	    else
 		PL_lex_brackstack[PL_lex_brackets++] = XOPERATOR;
-	    yyerror("'{' should be '\%(' expected");
+	    force_next('{');
+	    TOKEN(ANONSUB);
 	case XOPERATOR:
 	    if (*s == '[') {
 		s++;
@@ -3750,8 +3751,6 @@ Perl_yylex(pTHX)
 		PL_lex_brackstack[PL_lex_brackets-1] = XSTATE;
 		PL_expect = XSTATE;
 	    }
-	    force_next('{');
-	    TOKEN(ANONSUB);
 	    break;
 	}
 	TOKEN('{');
@@ -4085,6 +4084,11 @@ Perl_yylex(pTHX)
 	    /* array constructor */
 	    s += 2;
 	    OPERATOR(ANONARY);
+	}
+	if (s[1] == '+' && s[2] == ':') {
+	    /* arrayjoin  */
+	    s += 3;
+	    LOP(OP_ARRAYJOIN, XTERM);
 	}
 	if (s[1] == ':' && s[2] != ':') {
 	    /* array constructor */
@@ -4501,8 +4505,6 @@ Perl_yylex(pTHX)
 		    (PL_expect == XREF ||
 		     ((PL_opargs[PL_last_lop_op] >> OASHIFT)& 7) == OA_FILEREF))
 		{
-		    bool immediate_paren = *s == '(';
-
 		    /* (Now we can afford to cross potential line boundary.) */
 		    s = SKIPSPACE2(s,nextPL_nextwhite);
 #ifdef PERL_MAD
@@ -4644,8 +4646,6 @@ Perl_yylex(pTHX)
 		    yyerror(Perl_form("Unknown bare word %s", PL_tokenbuf));
 		}
 		
-	    bareword:
-
 		if ((lastchar == '*' || lastchar == '%' || lastchar == '&')
 		    && ckWARN_d(WARN_AMBIGUOUS)) {
 		    Perl_warner(aTHX_ packWARN(WARN_AMBIGUOUS),
@@ -4978,7 +4978,7 @@ Perl_yylex(pTHX)
 	    LOP(OP_FLOCK,XTERM);
 
 	case KEY_grep:
-	    LOP(OP_GREPSTART, XREF);
+	    LOP(OP_GREPSTART, XTERM);
 
 	case KEY_gmtime:
 	    UNI(OP_GMTIME);
@@ -5134,7 +5134,7 @@ Perl_yylex(pTHX)
 	    TERM(sublex_start(pl_yylval.i_tkval.ival, PL_lex_op));
 
 	case KEY_map:
-	    LOP(OP_MAPSTART, XREF);
+	    LOP(OP_MAPSTART, XTERM);
 
 	case KEY_mkdir:
 	    LOP(OP_MKDIR,XTERM);
@@ -5488,13 +5488,7 @@ Perl_yylex(pTHX)
 	    LOP(OP_SOCKPAIR,XTERM);
 
 	case KEY_sort:
-	    checkcomma(s,PL_tokenbuf,"subroutine name");
-	    s = SKIPSPACE1(s);
-	    if (*s == ';' || *s == ')')		/* probably a close */
-		Perl_croak(aTHX_ "sort is now a reserved word");
-	    PL_expect = XTERM;
-	    s = force_word(s,WORD,TRUE,TRUE,FALSE);
-	    LOP(OP_SORT,XREF);
+	    LOP(OP_SORT,XTERM);
 
 	case KEY_split:
 	    LOP(OP_SPLIT,XTERM);

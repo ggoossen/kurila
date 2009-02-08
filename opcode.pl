@@ -410,7 +410,7 @@ sub gen_op_is_macro {
 	# get opnames whose numbers are lowest and highest
 	my @($first, @< @rest) =  sort {
 	    $op_is->{?$a} <+> $op_is->{?$b}
-	}, keys %$op_is;
+	} keys %$op_is;
 	
 	my $last = pop @rest;	# @rest slurped, get its last
 	die "Invalid range of ops: $first .. $last\n" unless $last;
@@ -426,7 +426,7 @@ sub gen_op_is_macro {
 	    print $on, ")\n\n";
 	}
 	else {
-	    print $on, join(" || \\\n\t ", map { "(op) == OP_" . uc() }, sort keys %$op_is);
+	    print $on, join(" || \\\n\t ", map { "(op) == OP_" . uc() } sort keys %$op_is);
 	    print $on, ")\n\n";
 	}
     }
@@ -813,6 +813,7 @@ shift		shift			ck_shift	s%	S?
 unshift		unshift			ck_lfun		ims@	S L
 sort		sort			ck_sort		dm@	C? L
 reverse		reverse			ck_fun		t@	S
+arrayjoin	array join (@+:)	ck_fun		t@	S
 
 grepstart	grep			ck_grep		dm@	C L
 grepwhile	grep iterator		ck_null		dt|	

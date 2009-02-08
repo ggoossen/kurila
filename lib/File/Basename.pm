@@ -204,7 +204,7 @@ sub basename {
   # character present in string (after first stripping trailing slashes)
   _strip_trailing_sep($path);
 
-  my@($basename, $dirname, $suffix) =  fileparse( $path, < map("\Q$_\E", @_) );
+  my@($basename, $dirname, $suffix) =  fileparse( $path, < map({ "\Q$_\E" }, @_) );
 
   # From BSD basename(1)
   # The suffix is not stripped if it is identical to the remaining 
@@ -371,7 +371,7 @@ sub fileparse_set_fstype {
         }
 
         $Fileparse_igncase = 
-          (grep $Fileparse_fstype eq $_, @Ignore_Case) ?? 1 !! 0;
+          (grep { $Fileparse_fstype eq $_ }, @Ignore_Case) ?? 1 !! 0;
     }
 
     return $old;

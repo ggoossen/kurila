@@ -72,7 +72,7 @@ my $updir  = File::Spec->updir;
 sub _find_tests {
     my @($dir) = @_;
     opendir my $dirh, $dir or die "Trouble opening $dir: $^OS_ERROR";
-    foreach my $f (sort { $a cmp $b } @( readdir $dirh)) {
+    foreach my $f (sort { $a cmp $b }, @( readdir $dirh)) {
 	next if $f eq $curdir or $f eq $updir or
 	    $f =~ m/^(?:CVS|RCS|SCCS|\.svn)$/;
 
