@@ -55,7 +55,7 @@ sub extra_link_args_after_prelink {
   # Add .DEF file to the link line
   my @($self, %< %args) =  @_;
 
-  my @DEF = grep m/\.def$/i, @{%args{prelink_res}};
+  my @DEF = grep { m/\.def$/i }, @{%args{prelink_res}};
   die "More than one .def files created by `prelink' stage" if (nelems @DEF) +> 1;
   # XXXX No "$how" argument here, so how to test for dynamic link?
   die "No .def file created by `prelink' stage"

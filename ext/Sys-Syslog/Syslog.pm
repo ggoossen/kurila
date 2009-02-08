@@ -100,7 +100,7 @@ my %options = %(
 # behave like other normal Unix programs, then try other mechanisms.
 my @connectMethods = qw(native tcp udp unix pipe stream console);
 if ($^OS_NAME =~ m/^(freebsd|linux)$/) {
-    @connectMethods = grep { $_ ne 'udp' } @connectMethods;
+    @connectMethods = grep { $_ ne 'udp' }, @connectMethods;
 }
 
 # use EventLog on Win32

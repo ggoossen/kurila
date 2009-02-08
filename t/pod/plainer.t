@@ -23,8 +23,8 @@ while( ~< *DATA ) {
     my $returned; do { local $^INPUT_RECORD_SEPARATOR; $returned = ~< $out; };
     
     unless( $returned eq $expected ) {
-       print \*STDOUT, < map { s/^/\#/mg; $_; }
- map { $: $_ }               # to avoid readonly values
+       print \*STDOUT, < map { s/^/\#/mg; $_; },
+ map { $: $_ },               # to avoid readonly values
  @(                   "EXPECTED:\n", $expected, "GOT:\n", $returned);
        print \*STDOUT, "not ";
     }

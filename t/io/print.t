@@ -55,9 +55,9 @@ do {
     #               before pushing its return value
     # to make sure only that these obfuscated sentences will not crash.
 
-    map print(\*STDOUT, < reverse @($_)), @(('')x68);
+    map { print(\*STDOUT, < reverse @($_)) }, @(('')x68);
     print \*STDOUT, "ok 20\n";
 
-    map print(\*STDOUT, ), @(('')x68);
+    map { print(\*STDOUT, ) }, @(('')x68);
     print \*STDOUT, "ok 21\n";
 };

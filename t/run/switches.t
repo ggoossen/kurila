@@ -210,7 +210,7 @@ do {
     like( $r, qr/^(?!.*(not found|UNKNOWN))./, 'perl -V:re got a result' );
 
     # make sure each line we got matches the re
-    ok( !( grep !m/^i\D+size=/, split m/^/, $r ), '-V:re correct' );
+    ok( !( grep { !m/^i\D+size=/ }, split m/^/, $r ), '-V:re correct' );
 };
 
 # Tests for -v

@@ -63,12 +63,12 @@ use File::Find;
 find( sub { push @files, $File::Find::name; return }, $outdir );
 
 do {
-  my $long = ( grep m/zikzik\./i, @files )[0];
+  my $long = ( grep { m/zikzik\./i }, @files )[0];
   ok($long) or print \*STDOUT, "# How odd, no zikzik file in $outdir!?\n";
   if($long) {
     $long =~ s{zikzik\.html?$}{}s;
     for( @files) { substr($_, 0, length($long), '') }
-    @files = grep length($_), @files;
+    @files = grep { length($_) }, @files;
   }
 };
 
@@ -79,9 +79,9 @@ foreach my $f (sort @files) {
 print \*STDOUT, "# (", scalar(nelems @files), " items total)\n";
 
 # Some minimal sanity checks:
-ok nelems(grep m/\.css/i, @files) +> 5;
-ok nelems(grep m/\.html?/i, @files) +> 5;
-ok nelems grep m{squaa\W+Glunk.html?}i, @files;
+ok nelems(grep { m/\.css/i }, @files) +> 5;
+ok nelems(grep { m/\.html?/i }, @files) +> 5;
+ok nelems grep { m{squaa\W+Glunk.html?}i }, @files;
 
 # use Pod::Simple;
 # *pretty = \&Pod::Simple::BlackBox::pretty;

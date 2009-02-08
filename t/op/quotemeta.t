@@ -8,7 +8,7 @@ BEGIN {
 plan tests => 8;
 
 do {
-    $_ = join "", map chr($_), 32..127;
+    $_ = join "", map { chr($_) }, 32..127;
 
     # 96 characters - 52 letters - 10 digits - 1 underscore = 33 backslashes
     # 96 characters + 33 backslashes = 129 characters

@@ -59,7 +59,7 @@ Filenames with * and ? will be glob expanded.
 my $wild_regex = $Is_VMS ?? '*%' !! '*?';
 sub expand_wildcards
 {
- @ARGV = map(m/[$wild_regex]/o ?? < glob($_) !! $_, @ARGV);
+ @ARGV = map( {m/[$wild_regex]/o ?? < glob($_) !! $_ }, @ARGV);
 }
 
 
@@ -103,7 +103,7 @@ Removes files and directories - recursively (even if readonly)
 sub rm_rf
 {
  expand_wildcards();
- rmtree(< grep -e $_, @ARGV );
+ rmtree(< grep { -e $_ }, @ARGV );
 }
 
 =item rm_f

@@ -38,7 +38,7 @@ sub new {
 
 sub _cache_proto {
     my @proto = @_;
-    for ( map lc($_), @( @proto[0], < split(' ', @proto[1]))) {
+    for ( map { lc($_) }, @( @proto[0], < split(' ', @proto[1]))) {
 	%proto_number{+$_} = @proto[2];
     }
     %proto_name{+@proto[2]} = @proto[0];

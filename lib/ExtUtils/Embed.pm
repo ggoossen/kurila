@@ -68,7 +68,7 @@ sub xsinit {
     }
 
     push(@mods, < static_ext()) if defined $std;
-    @mods = grep(!%seen{+$_}++, @mods);
+    @mods = grep( {!%seen{+$_}++ }, @mods);
 
     print $fh, < &xsi_header();
     print $fh, "EXTERN_C void xs_init ($xsinit_proto);\n\n";     
@@ -227,7 +227,7 @@ sub ldopts {
     elsif ($^OS_NAME eq 'os390' && config_value("usedl")) {
 	# Nothing for OS/390 (z/OS) dynamic.
     } else {
-	$libperl = (grep(m/^-l\w*perl\w*$/, @link_args))[?0]
+	$libperl = (grep( {m/^-l\w*perl\w*$/ }, @link_args))[?0]
 	    || (config_value("libperl") =~ m/^lib(\w+)(\Q$lib_ext\E|\.\Q$(config_value("dlext"))\E)$/
 		?? "-l$1" !! '')
 		|| "-lperl";
@@ -277,7 +277,7 @@ sub canon {
        s:^(lib|ext)/(auto/)?::;
        s:/\w+\.\w+$::;
     }
-    map(s:/:$as:, @ext) if ($as ne '/');
+    map( {s:/:$as: }, @ext) if ($as ne '/');
     @ext;
 }
 

@@ -399,13 +399,13 @@ sub pod2html {
 	    if (m/\r\n/) {
 		@poddata = map { s/\r\n/\n/g;
 				 m/\n\n/ ??
-				     < map { "$_\n\n" } split m/\n\n/ !!
-				     $_ } @poddata;
+				     < map { "$_\n\n" }, split m/\n\n/ !!
+				     $_ }, @poddata;
 	    } else {
 		@poddata = map { s/\r/\n/g;
 				 m/\n\n/ ??
-				     < map { "$_\n\n" } split m/\n\n/ !!
-				     $_ } @poddata;
+				     < map { "$_\n\n" }, split m/\n\n/ !!
+				     $_ }, @poddata;
 	    }
 	    last;
 	}
@@ -882,7 +882,7 @@ sub scan_podpath {
 	    $dirname = $1;
 	    opendir(my $dir, $dirname) ||
 		die "$^PROGRAM_NAME: error opening directory $dirname: $^OS_ERROR\n";
-	    @files = grep(m/(\.pod|\.pm)\z/ && ! -d $_, @( readdir($dir)));
+	    @files = grep( {m/(\.pod|\.pm)\z/ && ! -d $_ }, @( readdir($dir)));
 	    closedir($dir);
 
 	    # scan each .pod and .pm file for =item directives

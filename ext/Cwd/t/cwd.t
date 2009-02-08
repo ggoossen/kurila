@@ -33,9 +33,9 @@ ok( !defined(&fast_abs_path),   '  nor fast_abs_path()');
 
 do {
   my @fields = qw(PATH IFS CDPATH ENV BASH_ENV);
-  my $before = grep defined env::var($_), @fields;
+  my $before = grep { defined env::var($_) }, @fields;
   cwd();
-  my $after = grep defined env::var($_), @fields;
+  my $after = grep { defined env::var($_) }, @fields;
   is(nelems($before), nelems($after), "cwd() shouldn't create spurious entries in \%ENV");
 };
 
@@ -51,7 +51,7 @@ my $pwd_cmd =
         "cd" !!
     ($IsMacOS) ??
         "pwd" !!
-        (grep { -x && -f } map { "$_/$pwd$(config_value('exe_ext'))" }
+        (grep { -x && -f }, map { "$_/$pwd$(config_value('exe_ext'))" },
 	                   split m/$(config_value('path_sep'))/, env::var('PATH'))[0];
 
 $pwd_cmd = 'SHOW DEFAULT' if $IsVMS;
@@ -66,7 +66,7 @@ SKIP: do {
 
     print \*STDOUT, "# native pwd = '$pwd_cmd'\n";
 
-    my %local_env_keys = %:< map { $_, env::var($_) } qw[PATH IFS CDPATH ENV BASH_ENV];
+    my %local_env_keys = %:< map { $_, env::var($_) }, qw[PATH IFS CDPATH ENV BASH_ENV];
     push dynascope->{onleave}, sub {
         env::set_var($_, %local_env_keys{$_}) for keys %local_env_keys;
     };
@@ -203,7 +203,7 @@ SKIP: do {
   do {
     my $root = Cwd::abs_path(File::Spec->rootdir);	# Add drive letter?
     opendir my $fh, $root or skip("Can't opendir($root): $^OS_ERROR", 2+$EXTRA_ABSPATH_TESTS);
-    @(?$file) = grep {-f $_ and not -l $_} map File::Spec->catfile($root, $_), @( readdir $fh);
+    @(?$file) = grep {-f $_ and not -l $_}, map { File::Spec->catfile($root, $_) }, @( readdir $fh);
     closedir $fh;
   };
   skip "No plain file in root directory to test with", 2+$EXTRA_ABSPATH_TESTS unless $file;
@@ -221,7 +221,7 @@ SKIP: do {
 # directory or path comparison capability.
 
 sub bracketed_form_dir {
-  return join '', map "[$_]", grep length, File::Spec->splitdir(File::Spec->canonpath( shift() ));
+  return join '', map { "[$_]" }, grep { length }, File::Spec->splitdir(File::Spec->canonpath( shift() ));
 }
 
 sub dir_ends_with {
@@ -231,7 +231,7 @@ sub dir_ends_with {
 }
 
 sub bracketed_form_path {
-  return join '', map "[$_]", grep length, File::Spec->splitpath(File::Spec->canonpath( shift() ));
+  return join '', map { "[$_]" }, grep { length }, File::Spec->splitpath(File::Spec->canonpath( shift() ));
 }
 
 sub path_ends_with {

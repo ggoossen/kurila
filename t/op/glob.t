@@ -8,21 +8,21 @@ our (@oops, @ops, %files, $not, @glops, $x);
 @oops = @ops = glob("op/*");
 
 if ($^OS_NAME eq 'MSWin32') {
-  map { %files{+lc($_)}++ } @( glob( <"op/*"));
-  map { delete %files{"op/$_"} } split m/[\s\n]/, `dir /b /l op & dir /b /l /ah op 2>nul`,
+  map { %files{+lc($_)}++ }, @( glob( <"op/*"));
+  map { delete %files{"op/$_"} }, split m/[\s\n]/, `dir /b /l op & dir /b /l /ah op 2>nul`,
 }
 elsif ($^OS_NAME eq 'VMS') {
-  map { %files{+lc($_)}++ } @( glob( <"[.op]*"));
-  map { s/;.*$//; delete %files{lc($_)}; } split m/[\n]/, `directory/noheading/notrailing/versions=1 [.op]`,
+  map { %files{+lc($_)}++ }, @( glob( <"[.op]*"));
+  map { s/;.*$//; delete %files{lc($_)}; }, split m/[\n]/, `directory/noheading/notrailing/versions=1 [.op]`,
 }
 elsif ($^OS_NAME eq 'MacOS') {
   @oops = @ops = glob ":op:*";
-  map { %files{+$_}++ } glob(":op:*");
-  map { delete %files{$_} } split m/[\s\n]/, `echo :op:\x[c5]`;
+  map { %files{+$_}++ }, glob(":op:*");
+  map { delete %files{$_} }, split m/[\s\n]/, `echo :op:\x[c5]`;
 }
 else {
-  map { %files{+$_}++ } glob("op/*");
-  map { delete %files{$_} } split m/[\s\n]/, `echo op/*`;
+  map { %files{+$_}++ }, glob("op/*");
+  map { delete %files{$_} }, split m/[\s\n]/, `echo op/*`;
 }
 ok( !(nkeys(%files)),'leftover op/* files' ) or diag(join(' ',sort keys %files));
 

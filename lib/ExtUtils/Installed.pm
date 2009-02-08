@@ -94,7 +94,7 @@ sub new {
     }
     else {
         $self->{':private:'}->{+Config} = \%:<
-          map { ($_ => config_value($_)) } config_keys();
+          map { ($_ => config_value($_)) }, config_keys();
     }
     
     for my $tuple (@(\@(inc_override => INC => \$($^INCLUDE_PATH) ),
@@ -114,7 +114,7 @@ sub new {
     }
     do {
         my %dupe;
-        @{$self->{':private:'}->{INC}} = grep { -e $_ && !%dupe{+$_}++ }
+        @{$self->{':private:'}->{INC}} = grep { -e $_ && !%dupe{+$_}++ },
           @: < @{$self->{':private:'}->{?INC}}, < @{$self->{':private:'}->{?EXTRA}};
     };
     my $perl5lib = defined env::var('PERL5LIB') ?? env::var('PERL5LIB') !! "";
@@ -178,7 +178,7 @@ sub new {
           ExtUtils::Packlist->new($File::Find::name);
     };
     my %dupe;
-    @dirs= grep { -e $_ && !%dupe{+$_}++ } @dirs;
+    @dirs= grep { -e $_ && !%dupe{+$_}++ }, @dirs;
     $self->{':private:'}->{+LIBDIRS} = \@dirs;    
     find($sub, < @dirs) if (nelems @dirs);
 
@@ -219,7 +219,7 @@ sub modules {
     my @($self) =  @_;
 
     # Bug/feature of sort in scalar context requires this.
-    return sort grep { not m/^:private:$/ } keys %$self;
+    return sort grep { not m/^:private:$/ }, keys %$self;
 }
 
 sub files {

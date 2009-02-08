@@ -86,7 +86,7 @@ sub testpipe ($$$$$$) {
 
 sub testfile ($$$$$$) {
   my @($str, $write_c, $read_c, $how_w, $how_r, $why) =  @_;
-  my @data = grep length, split m/(.{1,$write_c})/s, $str;
+  my @data = grep { length }, split m/(.{1,$write_c})/s, $str;
 
   open my $fh, '>', 'io_io.tmp' or die;
   binmode $fh, ':crlf' 

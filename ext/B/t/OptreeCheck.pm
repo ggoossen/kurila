@@ -378,7 +378,7 @@ sub getCmdLine {	# import assistant
 	     turn on a flag by typing its name,
 	     select a value from list by typing name=val.\n    }, <
 	  mydumper(\%gOpts))
-	if grep m/help/, @ARGV;
+	if grep { m/help/ }, @ARGV;
 
     # replace values for each key !! MUST MARK UP %gOpts
     foreach my $opt (keys %gOpts) {
@@ -392,10 +392,10 @@ sub getCmdLine {	# import assistant
 	    # uhh this WORKS. but it's inscrutable
 	    # grep s/$opt=(\w+)/grep {$_ eq $1} @ARGV and $gOpts{$opt}=$1/e, @ARGV;
 	    my $tval;  # temp
-	    if (grep s/$opt=(\w+)/$($tval=$1)/, @ARGV) {
+	    if (grep { s/$opt=(\w+)/$($tval=$1)/ }, @ARGV) {
 		# check val before accepting
 		my @allowed = @{%gOpts{?$opt}};
-		if (grep { $_ eq $tval } @allowed) {
+		if (grep { $_ eq $tval }, @allowed) {
 		    %gOpts{+$opt} = $tval;
 		}
 		else {die "invalid value: '$tval' for $opt\n"}
@@ -408,10 +408,10 @@ sub getCmdLine {	# import assistant
         else { # handle scalars
 
 	    # if 'opt' is present, true
-	    %gOpts{+$opt} = (grep m/^$opt/, @ARGV) ?? 1 !! 0;
+	    %gOpts{+$opt} = (grep { m/^$opt/ }, @ARGV) ?? 1 !! 0;
 
 	    # override with 'foo' if 'opt=foo' appears
-	    grep s/$opt=(.*)/$(%gOpts{+$opt}=$1)/, @ARGV;
+	    grep { s/$opt=(.*)/$(%gOpts{+$opt}=$1)/ }, @ARGV;
 	}
      }
     print(\*STDOUT, "$^PROGRAM_NAME heres current state:\n", < mydumper(\%gOpts))
@@ -584,7 +584,7 @@ sub checkErrs {
      %goterrs{[ @{$tc->{?goterrs}}]} = @(1) x nelems @{$tc->{?goterrs}};
     
     foreach my $k (keys %{$tc->{+errs} ||= \%()}) {
-	if (@got = grep m/^$k$/, keys %goterrs) {
+	if (@got = grep { m/^$k$/ }, keys %goterrs) {
 	    delete $tc->{errs}->{$k};
 	    delete %goterrs{$_} foreach  @got;
 	}
@@ -779,7 +779,7 @@ sub reduceDiffs {
     my @want	= split(m/\n/, $want);
 
     # split rexstr into units that should eat leading lines.
-    my @rexs = map qr/$_/, split (m/\n/, $tc->{?rexstr});
+    my @rexs = map { qr/$_/ }, split (m/\n/, $tc->{?rexstr});
 
     foreach my $rex ( @rexs) {
         my $exp = shift @want;

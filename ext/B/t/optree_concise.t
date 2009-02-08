@@ -130,7 +130,7 @@ sub set_up_relative_test {
 	    }
 	    elsif ($style eq 'scope') {
 		# supress printout entirely
-		$$format="" unless grep { $h->{?name} eq $_ } @scopeops;
+		$$format="" unless grep { $h->{?name} eq $_ }, @scopeops;
 	    }
 	});
 }

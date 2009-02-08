@@ -10,7 +10,7 @@ BEGIN {
     require 'regen_lib.pl';
 }
 
-my @az = map { chr } ord('a')..ord('z');
+my @az = map { chr }, ord('a')..ord('z');
 
 my $SPLINT = 0; # Turn true for experimental splint support http://www.splint.org
 
@@ -125,7 +125,7 @@ sub munge_c_files () {
 	if ((nelems @_) +> 1) {
 	    $functions->{+@_[2]} = \@_ if @_[(nelems @_)-1] =~ m/\.\.\./;
 	}
-    } '/dev/null', '', '';
+    }, '/dev/null', '', '';
     while ( ~< *ARGV) {
 	s{(\b(\w+)[ \t]*\([ \t]*(?!aTHX))}
 	 {$( do {
@@ -254,18 +254,18 @@ sub write_protos {
 				$prefix, $pat, $prefix, $args;
 	}
 	if ( (nelems @nonnull) ) {
-	    my @pos = map { $has_context ?? "pTHX_$_" !! $_ } @nonnull;
-	    push @attrs, < map { sprintf( "__attribute__nonnull__(\%s)", $_ ) } @pos;
+	    my @pos = map { $has_context ?? "pTHX_$_" !! $_ }, @nonnull;
+	    push @attrs, < map { sprintf( "__attribute__nonnull__(\%s)", $_ ) }, @pos;
 	}
 	if ( (nelems @attrs) ) {
 	    $ret .= "\n";
-	    $ret .= join( "\n", map { "\t\t\t$_" } @attrs );
+	    $ret .= join( "\n", map { "\t\t\t$_" }, @attrs );
 	}
 	$ret .= ";";
 	$ret = "/* $ret */" if $commented_out;
 	if ((nelems @names_of_nn)) {
 	    $ret .= "\n#define PERL_ARGS_ASSERT_\U$plain_func\E\t\\\n\t"
-		. join '; ', map "assert($_)", @names_of_nn;
+		. join '; ', map { "assert($_)" }, @names_of_nn;
 	}
 	$ret .= (nelems @attrs) ?? "\n\n" !! "\n";
     }
@@ -468,7 +468,7 @@ walk_table {
     # Remember the new state.
     $ifdef_state = $new_ifdef_state;
     $ret;
-} $em, "";
+}, $em, "";
 
 if ($ifdef_state) {
     print $em, "#endif\n";
@@ -554,7 +554,7 @@ walk_table {
     # Remember the new state.
     $ifdef_state = $new_ifdef_state;
     $ret;
-} $em, "";
+}, $em, "";
 
 if ($ifdef_state) {
     print $em, "#endif\n";

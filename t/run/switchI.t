@@ -13,11 +13,11 @@ my $Is_VMS   = $^OS_NAME eq 'VMS';
 my $lib;
 
 $lib = $Is_MacOS ?? ':Bla:' !! 'Bla';
-ok(grep { $_ eq $lib } $^INCLUDE_PATH);
+ok(grep { $_ eq $lib }, $^INCLUDE_PATH);
 SKIP: do {
   skip 'Double colons not allowed in dir spec', 1 if $Is_VMS;
   $lib = $Is_MacOS ?? 'Foo::Bar:' !! 'Foo::Bar';
-  ok(grep { $_ eq $lib } $^INCLUDE_PATH);
+  ok(grep { $_ eq $lib }, $^INCLUDE_PATH);
 };
 
 $lib = $Is_MacOS ?? ':Bla2:' !! 'Bla2';

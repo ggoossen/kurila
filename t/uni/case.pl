@@ -7,7 +7,7 @@ use utf8;
 
 
 sub unidump {
-    join " ", map { sprintf "\%04X", $_ } @( unpack "U*", @_[0]);
+    join " ", map { sprintf "\%04X", $_ }, @( unpack "U*", @_[0]);
 }
 
 sub casetest {
@@ -22,7 +22,7 @@ sub casetest {
 			    or die "'@_[0]' to '$r' mangled";
 			$r; # Result with $ballast removed.
 		    },
-		   )} @funcs;
+		   )}, @funcs;
 
     my $file = 'File::Spec'->catfile('File::Spec'->catdir('File::Spec'->updir,
 						      "lib", "unicore", "To"),
@@ -50,7 +50,7 @@ sub casetest {
     exit(1) if $both;
 
     my %none;
-    for my $i ( map { ord } split m//,
+    for my $i ( map { ord }, split m//,
 	       "\e !\"#\$\%&'()+,-./0123456789:;<=>?\@[\\]^_\{|\}~\b") {
 	next if pack("U0U", $i) =~ m/\w/;
 	%none{+$i}++ unless %seen{?$i};

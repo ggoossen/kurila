@@ -475,7 +475,7 @@ sub pod2usage {
         m/^msg/i   and  $_ = 'message';
         m/^exit/i  and  $_ = 'exitval';
         lc($_) => $val;    
-    } @( ( <keys %opts)) );
+    }, @( ( <keys %opts)) );
 
     ## Now determine default exitval and verbose values to use
     if ((! defined %opts{?"exitval"}) && (! defined %opts{?"verbose"})) {

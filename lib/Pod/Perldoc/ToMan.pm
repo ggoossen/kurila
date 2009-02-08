@@ -40,7 +40,7 @@ sub parse_from_file {
   my $render = $self->{?'__nroffer'} || die "no nroffer set!?";
   
   # turn the switches into CLIs
-  my $switches = join ' ', map qq{"--$_=$self->{?$_}"}, grep !m/^_/s,
+  my $switches = join ' ', map { qq{"--$_=$self->{?$_}"} }, grep { !m/^_/s },
         keys %$self
   ;
 

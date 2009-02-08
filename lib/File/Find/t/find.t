@@ -487,7 +487,7 @@ do {
 
     ### this checks the fix of perlbug [19977] ###
     my @foo = qw( a b c d e f );
-    my %pre = %( < map { $_ => } @foo );
+    my %pre = %( < map { $_ => }, @foo );
 
     File::Find::find( sub {  } , 'fa' ) for  @foo;
     delete %pre{$_} for  @foo;

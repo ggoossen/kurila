@@ -11,7 +11,7 @@ env::set_var('PATH' => "/bin");
 env::set_var($_, undef) for qw(BASH_ENV CDPATH ENV IFS);
 my @correct = @( () );
 if (opendir(my $d, $^OS_NAME eq "MacOS" ?? ":" !! ".")) {
-   @correct = grep { !m/^\./ } sort @( readdir($d));
+   @correct = grep { !m/^\./ }, sort @( readdir($d));
    closedir $d;
 }
 my @a = File::Glob::bsd_glob("*", 0);
@@ -91,8 +91,8 @@ is_deeply(\@a, \@('a', 'b'));
 
 # Working on t/TEST often causes this test to fail because it sees Emacs temp
 # and RCS files.  Filter them out, and .pm files too, and patch temp files.
-@a = grep !m/(,v$|~$|\.(pm|ori?g|rej)$)/, @a;
-@a = grep !m/test.pl/, @a if $^OS_NAME eq 'VMS';
+@a = grep { !m/(,v$|~$|\.(pm|ori?g|rej)$)/ }, @a;
+@a = grep { !m/test.pl/ }, @a if $^OS_NAME eq 'VMS';
 
 print \*STDOUT, "# $(join ' ',@a)\n";
 

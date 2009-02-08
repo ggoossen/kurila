@@ -142,13 +142,13 @@ do {
 
     ok "\N{HORIZONTAL TABULATION}" eq "\t";
 
-    ok grep { m/"HORIZONTAL TABULATION" is deprecated/ } @WARN;
+    ok grep { m/"HORIZONTAL TABULATION" is deprecated/ }, @WARN;
 
     no warnings 'deprecated';
 
     ok "\N{VERTICAL TABULATION}" eq "\013";
 
-    ok not grep { m/"VERTICAL TABULATION" is deprecated/ } @WARN;
+    ok not grep { m/"VERTICAL TABULATION" is deprecated/ }, @WARN;
 };
 
 ok charnames::viacode(0xFEFF) eq "ZERO WIDTH NO-BREAK SPACE";
@@ -168,7 +168,7 @@ do {
 };
 
 ok not defined charnames::viacode(0x110000);
-ok not grep { m/you asked for U+110000/ } @WARN;
+ok not grep { m/you asked for U+110000/ }, @WARN;
 
 
 # ---- Alias extensions

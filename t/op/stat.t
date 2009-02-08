@@ -245,20 +245,20 @@ SKIP: do {
     # you running the test, so let's censor that one away.
     # Similar remarks hold for stderr.
     $DEV =~ s{^[cpls].+?\sstdout$}{}m;
-    @DEV = grep { $_ ne 'stdout' } @DEV;
+    @DEV = grep { $_ ne 'stdout' }, @DEV;
     $DEV =~ s{^[cpls].+?\sstderr$}{}m;
-    @DEV = grep { $_ ne 'stderr' } @DEV;
+    @DEV = grep { $_ ne 'stderr' }, @DEV;
 
     # /dev/printer is also naughty: in IRIX it shows up as
     # Srwx-----, not srwx------.
     $DEV =~ s{^.+?\sprinter$}{}m;
-    @DEV = grep { $_ ne 'printer' } @DEV;
+    @DEV = grep { $_ ne 'printer' }, @DEV;
 
     # If running as root, we will see .files in the ls result,
     # and readdir() will see them always.  Potential for conflict,
     # so let's weed them out.
     $DEV =~ s{^.+?\s\..+?$}{}m;
-    @DEV = grep { ! m{^\..+$} } @DEV;
+    @DEV = grep { ! m{^\..+$} }, @DEV;
 
     # Irix ls -l marks sockets with 'S' while 's' is a 'XENIX semaphore'.
     if ($^OS_NAME eq 'irix') {
@@ -294,7 +294,7 @@ SKIP: do {
 
     # Find a set of directories that's very likely to have setuid files
     # but not likely to be *all* setuid files.
-    my @bin = grep {-d && -r && -x} qw(/sbin /usr/sbin /bin /usr/bin);
+    my @bin = grep {-d && -r && -x}, qw(/sbin /usr/sbin /bin /usr/bin);
     skip "Can't find a setuid file to test with", 3 unless (nelems @bin);
 
     for my $bin ( @bin) {

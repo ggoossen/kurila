@@ -105,7 +105,7 @@ do {
 ##
 ## converts string "hhhh hhhh hhhh" to a numeric list
 ##
-sub _getHexArray { return map hex, @( @_[0] =~ m/([0-9A-Fa-f]+)/g) }
+sub _getHexArray { return map { hex }, @( @_[0] =~ m/([0-9A-Fa-f]+)/g) }
 
 while ($Combin =~ m/(.+)/g) {
     my @tab = split m/\t/, $1;
@@ -182,7 +182,7 @@ sub getCanonList {
     my @dec = map {
 	(SBase +<= $_ && $_ +<= SFinal) ?? < decomposeHangul($_)
 	    !! %Canon{?$_} ?? < @{ %Canon{?$_} } !! $_
-		} @src;
+		}, @src;
     return join(" ", @src) eq join(" ", @dec) ?? @dec !! getCanonList(< @dec);
     # condition @src == @dec is not ok.
 }
@@ -192,7 +192,7 @@ sub getCompatList {
     my @dec = map {
 	(SBase +<= $_ && $_ +<= SFinal) ?? < decomposeHangul($_)
 	    !! %Compat{?$_} ?? < @{ %Compat{?$_} } !! $_
-		} @src;
+		}, @src;
     return join(" ", @src) eq join(" ", @dec) ?? @dec !! getCompatList(< @dec);
     # condition @src == @dec is not ok.
 }
@@ -223,7 +223,7 @@ sub split_into_char {
 }
 
 sub _U_stringify {
-    sprintf '"%s"', join '', map sprintf("\\x\%02x", $_), split_into_char( _pack_U(< @_));
+    sprintf '"%s"', join '', map { sprintf("\\x\%02x", $_) }, split_into_char( _pack_U(< @_));
 }
 
 foreach my $hash (@(\%Canon, \%Compat)) {
@@ -300,7 +300,7 @@ my $compinit =
 
 foreach my $i (sort keys %CompList) {
     $compinit .= "$structname $i [] = \{\n";
-    $compinit .= join ",\n", map sprintf("\t\{ \%d, \%d \}", $_, %CompList{$i}->{?$_}),
+    $compinit .= join ",\n", map { sprintf("\t\{ \%d, \%d \}", $_, %CompList{$i}->{?$_}) },
 	    sort { $a <+> $b } keys %{ %CompList{?$i} };
     $compinit .= ",\n\{0,0\}\n\};\n\n"; # with sentinel
 }

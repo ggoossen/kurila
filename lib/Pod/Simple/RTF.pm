@@ -21,7 +21,7 @@ sub _openclose {
  return map {;
    m/^([-A-Za-z]+)=(\w[^\=]*)$/s or die "what's <$_>?";
    ( $1,  "\{\\$2\n",   "/$1",  "\}" );
- } @_;
+ }, @_;
 }
 
 my @_to_accept;
@@ -38,7 +38,7 @@ my @_to_accept;
   'VerbatimB=cs27\b',
   'VerbatimBI=cs28\b\i',
 
-  < map {; m/^([-a-z]+)/s && push @_to_accept, $1; $_ }
+  < map {; m/^([-a-z]+)/s && push @_to_accept, $1; $_ },
    qw[
        underline=ul         smallcaps=scaps  shadow=shad
        superscript=super    subscript=sub    strikethrough=strike
@@ -205,7 +205,7 @@ sub do_middle {      # the main work
 
     } elsif( $type eq 'start' ) {
       DEBUG +> 1 and print \*STDOUT, "  +$type ", <$token->tagname,
-        " (", < map("<$_> ", %{$token->attr_hash}), ")\n";
+        " (", < map( {"<$_> " }, %{$token->attr_hash}), ")\n";
 
       if( ($tagname = $token->tagname) eq 'Verbatim'
           or $tagname eq 'VerbatimFormatted'
@@ -261,7 +261,7 @@ sub do_middle {      # the main work
           } elsif ((nelems @to_unget) +> 40) {
             DEBUG +> 1 and print \*STDOUT, "    item-* now has too many tokens (",
               scalar(nelems @to_unget),
-              (DEBUG +> 4) ?? (q<: >, < map( <$_->dump, @to_unget)) !! (),
+              (DEBUG +> 4) ?? (q<: >, < map( { <$_->dump }, @to_unget)) !! (),
               ") to be keepn'd.\n";
             last; # give up
           }
@@ -503,9 +503,9 @@ sub rtf_esc_codely {
 }
 
 %Escape = %(
-  < map( (chr($_),chr($_)),       # things not apparently needing escaping
+  < map( { (chr($_),chr($_)) },       # things not apparently needing escaping
        0x20 .. 0x7E ),
-  < map( (chr($_),sprintf("\\'\%02x", $_)), @( <    # apparently escapeworthy things
+  < map( { (chr($_),sprintf("\\'\%02x", $_)) }, @( <    # apparently escapeworthy things
        0x00 .. 0x1F, 0x5c, 0x7b, 0x7d, < 0x7f .. 0xFF, 0x46)),
 
   # We get to escape out 'F' so that we can send RTF files thru the mail

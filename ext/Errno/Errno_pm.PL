@@ -349,8 +349,8 @@ use Config;
 EDQ
    
     my $len = 0;
-    my @err = sort { %err{?$a} <+> %err{?$b} } keys %err;
-    map { $len = length if length +> $len } @err;
+    my @err = sort { %err{?$a} <+> %err{?$b} }, keys %err;
+    map { $len = length if length +> $len }, @err;
 
     my $j = "\@EXPORT_OK = qw(" . join(" ",keys %err) . ");\n";
     $j =~ s/(.{50,70})\s/$1\n\t/g;
@@ -361,7 +361,7 @@ print $out, <<'ESQ';
     POSIX => \qw(
 ESQ
 
-    my $k = join(" ", grep { exists %err{$_} } 
+    my $k = join(" ", grep { exists %err{$_} }, 
 	qw(E2BIG EACCES EADDRINUSE EADDRNOTAVAIL EAFNOSUPPORT
 	EAGAIN EALREADY EBADF EBUSY ECHILD ECONNABORTED
 	ECONNREFUSED ECONNRESET EDEADLK EDESTADDRREQ EDOM EDQUOT

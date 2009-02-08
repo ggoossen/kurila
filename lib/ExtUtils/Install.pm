@@ -1048,7 +1048,7 @@ sub inc_uninstall {
         
     my @dirs=@( < @PERL_ENV_LIB, 
                < $^INCLUDE_PATH,
-               < map { config_value($_) } qw(archlibexp
+               < map { config_value($_) }, qw(archlibexp
                           privlibexp
                           sitearchexp
                           sitelibexp));

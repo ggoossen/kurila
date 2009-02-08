@@ -13,7 +13,7 @@ for my $i (1..2000) {
 
 my $op_dh;
 if (opendir($op_dh, "op")) { print \*STDOUT, "ok 1\n"; } else { print \*STDOUT, "not ok 1\n"; }
-our @D = grep(m/^[^\.].*\.t$/i, @( readdir($op_dh)));
+our @D = grep( {m/^[^\.].*\.t$/i }, @( readdir($op_dh)));
 closedir($op_dh);
 
 open my $man, "<", "../MANIFEST" or die "Can't open ../MANIFEST: $^OS_ERROR";
@@ -34,7 +34,7 @@ our @G = sort(glob("op/*.t"));
 if (@G[0] =~ m#.*\](\w+\.t)#i) {
     # grep is to convert filespecs returned from glob under VMS to format
     # identical to that returned by readdir
-    @G = grep(s#.*\](\w+\.t).*#op/$1#i, @(glob("op/*.t")));
+    @G = grep( {s#.*\](\w+\.t).*#op/$1#i }, @(glob("op/*.t")));
 }
 while (@R && @G && @G[0] eq ($^OS_NAME eq 'MacOS' ?? ':op:' !! 'op/').@R[0]) {
     shift(@R);

@@ -257,7 +257,7 @@ sub make_type_tab {
 
     return 
 	  "\ntypedef enum \{\n\t"
-	. join(", ", map "toketype_$_", sort keys %types)
+	. join(", ", map { "toketype_$_" }, sort keys %types)
 	. "\n\} toketypes;\n\n"
 	. "/* type of each token/terminal */\n"
 	. "static const toketypes yy_type_tab[] =\n\{\n"

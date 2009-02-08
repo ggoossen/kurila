@@ -18,5 +18,5 @@ do {
     unlike( @out[2], qr/-ln0tt43r3_perl/, 'bogus library not added' );
     ok( (nelems @warn), 'had warning');
 
-    is( nelems(grep(m/\QNote (probably harmless): No library found for \E(-l)?n0tt43r3_perl/, map { < @$_ } @warn)), 1 ) || diag join "\n", < @warn;
+    is( nelems(grep( {m/\QNote (probably harmless): No library found for \E(-l)?n0tt43r3_perl/ }, map { < @$_ }, @warn)), 1 ) || diag join "\n", < @warn;
 };

@@ -205,7 +205,7 @@ for (@("a\x{100}", "ßyz\x{100}")) { # ß to Ss (different length)
 # the original report concerns PERL_MAGIC_utf8.
 # these cases concern PERL_MAGIC_regex_global.
 
-for ( map { $_ } @( "a\x{100}", "abc\x{100}", "\x{100}")) {
+for ( map { $_ }, @( "a\x{100}", "abc\x{100}", "\x{100}")) {
     chop; # get ("a", "abc", "") in utf8
     my $return =  uc($_) =~ m/\G(.?)/g;
     my $result = $return ?? $1 !! "not";
@@ -214,7 +214,7 @@ for ( map { $_ } @( "a\x{100}", "abc\x{100}", "\x{100}")) {
     is($result, $expect, "[perl #38619]");
 }
 
-for ( map { $_ } @( "A\x{100}", "ABC\x{100}", "\x{100}")) {
+for ( map { $_ }, @( "A\x{100}", "ABC\x{100}", "\x{100}")) {
     chop; # get ("A", "ABC", "") in utf8
     my $return =  lc($_) =~ m/\G(.?)/g;
     my $result = $return ?? $1 !! "not";

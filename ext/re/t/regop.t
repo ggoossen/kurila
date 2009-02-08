@@ -2,16 +2,16 @@
 
 BEGIN { require "./test.pl"; }
 our $NUM_SECTS;
-my @strs = map { chomp ; $_ } grep { !m/^\s*\#/ } @( ~< *DATA);
+my @strs = map { chomp ; $_ }, grep { !m/^\s*\#/ }, @( ~< *DATA);
 my $out = runperl(progfile => "../ext/re/t/regop.pl", stderr => 1 );
 # VMS currently embeds linefeeds in the output.
 $out =~ s/\cJ//g if $^OS_NAME = 'VMS';
-my @tests = grep { m/\S/ } split m/(?=Compiling REx)/, $out;
+my @tests = grep { m/\S/ }, split m/(?=Compiling REx)/, $out;
 # on debug builds we get an EXECUTING... message in there at the top
 shift @tests
     if @tests[0] =~ m/EXECUTING.../;
 
-plan( (nelems @tests) + 2 + ( (nelems @strs) - nelems(grep { !$_ or m/^---/ } @strs )));
+plan( (nelems @tests) + 2 + ( (nelems @strs) - nelems(grep { !$_ or m/^---/ }, @strs )));
 
 is( nelems @tests, $NUM_SECTS,
     "Expecting output for $NUM_SECTS patterns" );

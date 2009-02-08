@@ -99,7 +99,7 @@ my @passed = @( () );
 for my $sock_type (qw(native eventlog unix pipe stream inet tcp udp)) {
     SKIP: do {
         skip "the 'stream' mechanism because a previous mechanism with similar interface succeeded", 20 
-            if $sock_type eq 'stream' and grep {m/pipe|unix/} @passed;
+            if $sock_type eq 'stream' and grep {m/pipe|unix/}, @passed;
 
         # setlogsock() called with an arrayref
         $r = try { setlogsock(\@($sock_type)) } || 0; die $^EVAL_ERROR->message if $^EVAL_ERROR;
@@ -170,7 +170,7 @@ BEGIN { $tests += 10 }
 SKIP: do {
     skip "not testing setlogsock('stream') on Win32", 10 if $is_Win32;
     skip "the 'unix' mechanism works, so the tests will likely fail with the 'stream' mechanism", 10 
-        if grep {m/unix/} @passed;
+        if grep {m/unix/}, @passed;
 
     skip "not testing setlogsock('stream'): _PATH_LOG unavailable", 10
         unless -e Sys::Syslog::_PATH_LOG();

@@ -484,7 +484,7 @@ do {
     title "Check all bytes can be handled";
 
     my $lex = LexFile->new( my $name) ;
-    my $data = join '', map { chr } 0x00 .. 0xFF;
+    my $data = join '', map { chr }, 0x00 .. 0xFF;
     $data .= "\r\nabd\r\n";
 
     my $fil;

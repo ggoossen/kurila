@@ -111,7 +111,7 @@ if ($^OS_NAME eq 'os390' or $^OS_NAME eq 'posix-bc' or $^OS_NAME eq 'MacOS') {
 
     $_ = 'FGF';
     study;
-    alarm_ok { m/G.F$/ };
-    alarm_ok { m/[F]F$/ };
+    alarm_ok { m/G.F$/ },;
+    alarm_ok { m/[F]F$/ },;
 }
 

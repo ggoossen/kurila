@@ -357,8 +357,8 @@ sub _win32_ext {
     return  @('','','','',  @($give_libs ?? \@libs !! ())) unless $found;
 
     # make sure paths with spaces are properly quoted
-    @extralibs = map { (m/\s/ && !m/^".*"$/) ?? qq["$_"] !! $_ } @extralibs;
-    @libs = map { (m/\s/ && !m/^".*"$/) ?? qq["$_"] !! $_ } @libs;
+    @extralibs = map { (m/\s/ && !m/^".*"$/) ?? qq["$_"] !! $_ }, @extralibs;
+    @libs = map { (m/\s/ && !m/^".*"$/) ?? qq["$_"] !! $_ }, @libs;
     $lib = join(' ', @extralibs);
 
     # normalize back to backward slashes (to help braindead tools)
@@ -378,8 +378,8 @@ sub _vms_ext {
   my(@crtls,$crtlstr);
   @crtls = @( (config_value('ldflags') =~ m-/Debug-i ?? config_value('dbgprefix') !! '')
               . 'PerlShr/Share' );
-  push(@crtls, < grep { not m/\(/ } split m/\s+/, config_value('perllibs'));
-  push(@crtls, < grep { not m/\(/ } split m/\s+/, config_value('libc'));
+  push(@crtls, < grep { not m/\(/ }, split m/\s+/, config_value('perllibs'));
+  push(@crtls, < grep { not m/\(/ }, split m/\s+/, config_value('libc'));
   # In general, we pass through the basic libraries from %Config unchanged.
   # The one exception is that if we're building in the Perl source tree, and
   # a library spec could be resolved via a logical name, we go to some trouble
@@ -406,7 +406,7 @@ sub _vms_ext {
 
   my(%found,@fndlibs,$ldlib);
   my $cwd = cwd();
-  my@($so,$lib_ext,$obj_ext) =  map { config_value($_) } @: 'so','lib_ext','obj_ext';
+  my@($so,$lib_ext,$obj_ext) =  map { config_value($_) }, @: 'so','lib_ext','obj_ext';
   # List of common Unix library names and their VMS equivalents
   # (VMS equivalent of '' indicates that the library is automatically
   # searched by the linker, and should be skipped here.)
@@ -448,7 +448,7 @@ sub _vms_ext {
         $dir = $self->catdir($cwd,$dir); 
     }
   }
-  @dirs = grep { length($_) } @dirs;
+  @dirs = grep { length($_) }, @dirs;
   unshift(@dirs,''); # Check each $lib without additions first
 
   LIB: foreach my $lib ( @libs) {
@@ -535,8 +535,8 @@ sub _vms_ext {
   }
 
   push @fndlibs, < @{%found{?OBJ}}                      if exists %found{OBJ};
-  push @fndlibs, < map { "$_/Library" } @{%found{OLB}} if exists %found{OLB};
-  push @fndlibs, < map { "$_/Share"   } @{%found{SHR}} if exists %found{SHR};
+  push @fndlibs, < map { "$_/Library" }, @{%found{OLB}} if exists %found{OLB};
+  push @fndlibs, < map { "$_/Share"   }, @{%found{SHR}} if exists %found{SHR};
   my $lib = join(' ', @fndlibs);
 
   $ldlib = $crtlstr ?? "$lib $crtlstr" !! $lib;

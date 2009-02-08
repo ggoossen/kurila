@@ -601,7 +601,7 @@ sub podselect {
                 $key =~ m/^-se[cl]/  and  $key  = '-sections';
                 #! $key eq '-range'    and  $key .= 's';
                 ($key => $val);    
-            } @( ( <keys %opts)) );
+            }, @( ( <keys %opts)) );
 
             ## Process the options
             (exists %opts{'-output'})  and  $output = %opts{?'-output'};

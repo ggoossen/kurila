@@ -96,7 +96,7 @@ is(join(":",undef..'2'), '0:1:2');
 is(join(":",'-2'..undef), '-2:-1:0');
 
 # undef..undef used to segfault
-is(join(":", map "[$_]", undef..undef), '[0]');
+is(join(":", map { "[$_]" }, undef..undef), '[0]');
 
 # also test undef in foreach loops
 @foo= @(() ); push @foo, $_ for undef..2;
@@ -112,7 +112,7 @@ is(join(":", @foo), '0:1:2');
 is(join(":", @foo), '-2:-1:0');
 
 @foo= @(() ); push @foo, $_ for undef..undef;
-is(join(":", map "[$_]", @foo), '[0]');
+is(join(":", map { "[$_]" }, @foo), '[0]');
 
 # again with magic
 do {

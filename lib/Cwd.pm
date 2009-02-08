@@ -309,7 +309,7 @@ unless ($pwd_cmd) {
 sub _backtick_pwd {
     # Localize %ENV entries in a way that won't create new hash keys
     my @localize = qw(PATH IFS CDPATH ENV BASH_ENV);
-    my $oldvalue = map { env::var($_) } @localize;
+    my $oldvalue = map { env::var($_) }, @localize;
     push dynascope->{onleave},
       sub {
           for (@localize) {

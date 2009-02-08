@@ -63,7 +63,7 @@ sub import_into {
             warn "Class '$inheritor' tried to inherit from itself\n";
         }
 
-        next if grep $_->isa($base), @( ($inheritor, < @bases));
+        next if grep { $_->isa($base) }, @( ($inheritor, < @bases));
 
         do {
             eval "require $base";

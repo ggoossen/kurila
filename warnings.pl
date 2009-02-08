@@ -173,7 +173,7 @@ sub printTree
     my $prefix = shift ;
     my ($k, $v) ;
 
-    my $max = ( <sort {$a <+> $b} map { length $_ } keys %$tre)[[-1]] ;
+    my $max = ( <sort {$a <+> $b} map { length $_ }, keys %$tre)[[-1]] ;
     my @keys = sort keys %$tre ;
 
     while ($k = shift @keys) {
@@ -380,7 +380,7 @@ foreach my $k (sort keys  %list) {
 
     print $pm, tab(4, "    '$k'"), '=> "',
 		# mkHex($warn_size, @list),
-		mkHex($warn_size, < map $_ * 2, @list),
+		mkHex($warn_size, < map { $_ * 2 }, @list),
 		'", # [', mkRange(@list), "]\n" ;
 }
 
@@ -394,7 +394,7 @@ foreach my $k (sort keys  %list) {
 
     print $pm, tab(4, "    '$k'"), '=> "',
 		# mkHex($warn_size, @list),
-		mkHex($warn_size, < map $_ * 2 + 1, @list),
+		mkHex($warn_size, < map { $_ * 2 + 1 }, @list),
 		'", # [', mkRange(@list), "]\n" ;
 }
 

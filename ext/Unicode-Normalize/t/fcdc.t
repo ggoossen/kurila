@@ -17,7 +17,7 @@ use Unicode::Normalize < qw(:all);
 ok(1); # If we made it this far, we're ok.
 
 sub _pack_U { Unicode::Normalize::pack_U(< @_) }
-sub hexU { _pack_U < map hex, split ' ', shift }
+sub hexU { _pack_U < map { hex }, split ' ', shift }
 sub answer { defined @_[0] ?? @_[0] ?? "YES" !! "NO" !! "MAYBE" }
 
 #########################
