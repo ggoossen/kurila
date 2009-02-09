@@ -5209,7 +5209,7 @@ Perl_ck_sort(pTHX_ OP *o)
 
     PERL_ARGS_ASSERT_CK_SORT;
 
-    if (o->op_type == OP_SORT && (PL_hints & HINT_LOCALIZE_HH) != 0) {
+    if ((PL_hints & HINT_LOCALIZE_HH) != 0) {
 	HV * const hinthv = PL_hinthv;
 	if (hinthv) {
 	    SV ** const svp = hv_fetchs(hinthv, "sort", FALSE);
@@ -5223,8 +5223,7 @@ Perl_ck_sort(pTHX_ OP *o)
 	}
     }
 
-    if (o->op_type == OP_SORT && o->op_flags & OPf_STACKED)
-	simplify_sort(o);
+    simplify_sort(o);
     firstkid = cLISTOPo->op_first->op_sibling;		/* get past pushmark */
     if (o->op_flags & OPf_STACKED) {			/* may have been cleared */
 	OP *k = NULL;

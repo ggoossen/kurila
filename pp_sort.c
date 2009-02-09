@@ -1501,35 +1501,27 @@ PP(pp_sort)
 
     ENTER;
     SAVEVPTR(PL_sortcop);
-    if (flags & OPf_STACKED) {
-	if (flags & OPf_SPECIAL) {
-	    OP *kid = cLISTOP->op_first->op_sibling;	/* pass pushmark */
-	    kid = kUNOP->op_first;			/* pass rv2gv */
-	    kid = kUNOP->op_first;			/* pass leave */
-	    PL_sortcop = kid->op_next;
+    if (SP - MARK > 1) {
+	cv = sv_2cv(*++MARK, &gv, 0);
+	if (cv && SvPOK(cv)) {
+	    const char * const proto = SvPV_nolen_const((SV*)cv);
+	    if (proto && strEQ(proto, "$$")) {
+		hasargs = TRUE;
+	    }
 	}
-	else {
-	    cv = sv_2cv(*++MARK, &gv, 0);
-	    if (cv && SvPOK(cv)) {
-		const char * const proto = SvPV_nolen_const((SV*)cv);
-		if (proto && strEQ(proto, "$$")) {
-		    hasargs = TRUE;
-		}
+	if (!(cv && CvROOT(cv))) {
+	    if (cv && CvISXSUB(cv)) {
+		is_xsub = 1;
 	    }
-	    if (!(cv && CvROOT(cv))) {
-		if (cv && CvISXSUB(cv)) {
-		    is_xsub = 1;
-		}
-		else {
-		    DIE(aTHX_ "Undefined subroutine in sort");
-		}
+	    else {
+		DIE(aTHX_ "Undefined subroutine in sort");
 	    }
+	}
 
-	    if (is_xsub)
-		PL_sortcop = (OP*)cv;
-	    else
-		PL_sortcop = CvSTART(cv);
-	}
+	if (is_xsub)
+	    PL_sortcop = (OP*)cv;
+	else
+	    PL_sortcop = CvSTART(cv);
     }
     else {
 	PL_sortcop = NULL;
