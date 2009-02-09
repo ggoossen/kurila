@@ -406,7 +406,7 @@ do {
     my %attrs = %(
         nvsize  => 5.006, 
         ptrsize => 5.005, 
-        < map {$_ => 5.004}, qw(byteorder intsize longsize)
+        < @+: map { @: $_ => 5.004}, qw(byteorder intsize longsize)
     );
     for my $attr (keys %attrs) {
         is($info->{?$attr}, config_value($attr), "$attr match Config");

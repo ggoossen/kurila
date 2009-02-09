@@ -32,7 +32,7 @@ ok(eq_array(
     \qw/MRO_F MRO_D MRO_E MRO_A MRO_B MRO_C/
 ));
 
-my @isarev = sort { $a cmp $b } @{mro::get_isarev('MRO_B')};
+my @isarev = sort { $a cmp $b }, @{mro::get_isarev('MRO_B')};
 ok(eq_array(
     \@isarev,
     \qw/MRO_D MRO_E MRO_F/

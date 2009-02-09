@@ -20,7 +20,7 @@ my $ei = bless( \%(), 'ExtUtils::Installed' );
 
 # Make sure meta info is available
 $ei->{+':private:'}->{+Config} = \%:<
-  map { ($_ => config_value($_)) }, config_keys();
+  @+: map { @($_ => config_value($_)) }, config_keys();
 $ei->{':private:'}->{+INC} = \$^INCLUDE_PATH;
 
 # _is_prefix
@@ -99,7 +99,7 @@ my $fake_mod_dir = File::Spec->catdir(cwd(), 'auto', 'FakeMod');
 # %Config and $^INCLUDE_PATH.
 do {
     my $config_override = \%:<
-      map { $_ => Config::config_value($_) },
+      @+: map { @: $_ => Config::config_value($_) },
       Config::config_keys();
     $config_override->{+archlibexp} = cwd();
     $config_override->{+sitearchexp} = $fake_mod_dir;
@@ -190,7 +190,7 @@ is( scalar nelems @files, 1, '... should find doc file in correct dir' );
 like( @files[0], qr/foobar[>\]]?$/, '... checking file name' );
 @files = $ei->files('goodmod');
 is( scalar nelems @files, 2 + $mandirs, '... should find all files with no type specified' );
-my %dirnames = %( < map { lc($_) => dirname($_) }, @files );
+my %dirnames = %( < @+: map { @: lc($_) => dirname($_) }, @files );
 
 # directories
 my @dirs = $ei->directories('goodmod', 'prog', 'fake');

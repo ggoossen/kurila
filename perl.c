@@ -1495,8 +1495,8 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 #  endif
 #endif
 		    sv_catpvs(opts_prog,
-			"; our @env = map { \"$_=\\\"$(env::var($_))\\\"\" } "
-			"sort grep {m/^PERL/} env::keys; ");
+			"; our @env = map { \"$_=\\\"$(env::var($_))\\\"\" }, "
+			"sort grep {m/^PERL/}, env::keys; ");
 #ifdef __CYGWIN__
 		    sv_catpvs(opts_prog,
 			      "push @env, \"CYGWIN=\\\"$(env::var('CYGWIN'))\\\"\";");

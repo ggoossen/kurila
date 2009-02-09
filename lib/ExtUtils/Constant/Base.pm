@@ -522,7 +522,7 @@ sub switch_clause {
 	# Sort by weight first
 	($r->{?weight} || 0) <+> ($l->{?weight} || 0)
 	    # Sort equal weights by name
-	    or $l->{?name} cmp $r->{?name}}
+	    or $l->{?name} cmp $r->{?name}},
 			 # If this looks evil, maybe it is.  $items is a
 			 # hashref, and we're doing a hash slice on it
 			 %{$items}{[ @{$best->{?$char}}]}) {
@@ -786,7 +786,7 @@ sub C_constant {
     $default_type ||= $self->default_type();
     if (!ref $what) {
       # Convert line of the form IV,UV,NV to hash
-      $what = \%(< map {$_ => 1}, split m/,\s*/, ($what || ''));
+      $what = \%(< @+: map {@: $_ => 1}, split m/,\s*/, ($what || ''));
       # Figure out what types we're dealing with, and assign all unknowns to the
       # default type
     }

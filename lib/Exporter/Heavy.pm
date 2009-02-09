@@ -192,8 +192,8 @@ sub _push_tags {
     my @nontag = @( () );
     my $export_tags = \%{*{Symbol::fetch_glob("$($pkg)::EXPORT_TAGS")}};
     push(@{*{Symbol::fetch_glob("$($pkg)::$var")}},
-	< map { $export_tags->{?$_} ?? < @{$export_tags->{?$_}} 
-                                 !! do { push(@nontag,$_); $_ } },
+	< @+: map { $export_tags->{?$_} ?? @{$export_tags->{?$_}}
+                                 !! do { push(@nontag,$_); @($_) } },
  		(nelems @$syms) ?? @$syms !! keys %$export_tags);
     if ((nelems @nontag) and $^WARNING) {
 	# This may change to a die one day

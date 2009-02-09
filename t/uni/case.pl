@@ -15,8 +15,8 @@ sub casetest {
     # For each provided function run it, and run a version with some extra
     # characters afterwards. Use a recycling symbol, as it doesn't change case.
     my $ballast = chr (0x2672) x 3;
-    @funcs = map {my $f = $_;
-		  ($f,
+    @funcs = @+: map {my $f = $_;
+		  @($f,
 		   sub {my $r = $f->(@_[0] . $ballast); # Add it before
 			$r =~ s/$ballast\z//so # Remove it afterwards
 			    or die "'@_[0]' to '$r' mangled";
@@ -137,7 +137,7 @@ sub casetest {
 	}
     }
 
-    for my $i (sort { $a <+> $b } keys %none) {
+    for my $i (sort { $a <+> $b }, keys %none) {
 	my $w = $i = sprintf "\%04X", $i;
 	my $c = pack "U0U", hex $i;
 	foreach my $func ( @funcs) {

@@ -122,8 +122,8 @@ ok 1;
     eval '
         $a = \@(undef, undef);
         $b = thaw freeze $a;
-        @a = map { exists $a->[$_] } 0 .. (nelems @$a)-1;
-        our @b = map { exists $b->[$_] } 0 .. (nelems @$b)-1;
+        @a = map { exists $a->[$_] }, 0 .. (nelems @$a)-1;
+        our @b = map { exists $b->[$_] }, 0 .. (nelems @$b)-1;
         ok (join " ", @a) eq (join " ", @b);
     ';
     die if $^EVAL_ERROR;

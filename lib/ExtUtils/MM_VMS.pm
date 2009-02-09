@@ -108,7 +108,7 @@ sub guess_name {
       s/.pm$// for  @pm;
       if ((nelems @pm) == 1) { ($defpm = @pm[0]) =~ s/.pm$//; }
       elsif ((nelems @pm)) {
-        %xs = %( < map { s/.xs$//; ($_,1) }, @( glob( <'*.xs')) );  ## no critic
+        %xs = %( < @+: map { s/.xs$//; @($_,1) }, @( glob( <'*.xs')) );  ## no critic
         if (keys %xs) { 
             foreach my $pm ( @pm) { 
                 $defpm = $pm, last if exists %xs{$pm}; 
@@ -157,7 +157,7 @@ sub find_perl {
                         my@($absb) =  $self->file_name_is_absolute($b);
                         if ($absa && $absb) { return $a cmp $b }
                         else { return $absa ?? 1 !!  @($absb ?? -1 !!  @($a cmp $b)); }
-                      } @$dirs;
+                      }, @$dirs;
         # Check miniperl before perl, and check names likely to contain
         # version numbers before "generic" names, so we pick up an
         # executable that's less likely to be from an old installation.
@@ -169,7 +169,7 @@ sub find_perl {
                          elsif ($bhasdir and not $ahasdir) { return -1; }
                          else { $bb =~ m/\d/ <+> $ba =~ m/\d/
                                   or substr($ba,0,1) cmp substr($bb,0,1)
-                                  or length($bb) <+> length($ba) } } @$names;
+                                  or length($bb) <+> length($ba) } }, @$names;
     }
     else {
         @sdirs  = @$dirs;

@@ -680,7 +680,7 @@ sub makespace {
 # strip special escapes from index entries.
 sub outindex {
     my @($self, ?$section, ?$index) =  @_;
-    my @entries = map { < split m%\s*/\s*% }, @{ %$self{INDEX} };
+    my @entries = @+: map { split m%\s*/\s*% }, @{ %$self{INDEX} };
     return unless ($section || nelems @entries);
 
     # We're about to output all pending entries, so clear our pending queue.

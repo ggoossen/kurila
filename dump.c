@@ -956,6 +956,11 @@ STATIC SV* S_dump_op_flags_private(pTHX_ const OP* o)
 	if (o->op_private & OPpHUSH_VMSISH)
 	    sv_catpv(tmpsv, ",HUSH_VMSISH");
     }
+    else if (optype == OP_MAPWHILE || optype == OP_MAPSTART
+	|| optype == OP_GREPWHILE || optype == OP_GREPSTART) {
+	if (o->op_private & OPpGREP_LEX)
+	    sv_catpv(tmpsv, ",GREP_LEX");
+    }
     else if (PL_check[optype] != MEMBER_TO_FPTR(Perl_ck_ftst)) {
 	if (OP_IS_FILETEST_ACCESS(optype) && o->op_private & OPpFT_ACCESS)
 	    sv_catpv(tmpsv, ",FT_ACCESS");

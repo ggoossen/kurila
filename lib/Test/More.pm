@@ -1344,8 +1344,8 @@ sub eq_set  {
     return 0 unless (nelems @$a1) == nelems @$a2;
 
     return eq_array(
-           \ (sort { $a cmp $b } map { dump::view($_) }, @$a1 ),
-           \ (sort { $a cmp $b } map { dump::view($_) }, @$a2 ),
+           \ (sort { $a cmp $b }, map { dump::view($_) }, @$a1 ),
+           \ (sort { $a cmp $b }, map { dump::view($_) }, @$a2 ),
     );
 }
 

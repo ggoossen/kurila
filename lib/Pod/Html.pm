@@ -394,18 +394,18 @@ sub pod2html {
     close($pod);
 
     # be eol agnostic
-    for ( @poddata) {
-	if (m/\r/) {
-	    if (m/\r\n/) {
-		@poddata = map { s/\r\n/\n/g;
+    for my $pd ( @poddata) {
+	if ($pd =~ m/\r/) {
+	    if ($pd =~ m/\r\n/) {
+		@poddata = @+: map { s/\r\n/\n/g;
 				 m/\n\n/ ??
-				     < map { "$_\n\n" }, split m/\n\n/ !!
-				     $_ }, @poddata;
+				     map { "$_\n\n" }, split m/\n\n/ !!
+				     @($_) }, @poddata;
 	    } else {
-		@poddata = map { s/\r/\n/g;
+		@poddata = @+: map { s/\r/\n/g;
 				 m/\n\n/ ??
-				     < map { "$_\n\n" }, split m/\n\n/ !!
-				     $_ }, @poddata;
+				     map { "$_\n\n" }, split m/\n\n/ !!
+				     @($_) }, @poddata;
 	    }
 	    last;
 	}

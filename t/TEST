@@ -98,7 +98,7 @@ sub _quote_args {
 }
 
 sub _populate_hash {
-    return map {$_, 1}, split m/\s+/, @_[0];
+    return @+: map {@:$_, 1}, split m/\s+/, @_[0];
 }
 
 if ($::failed) {
@@ -365,7 +365,7 @@ EOT
 			$failure ||= 'FAILED--seen duplicate leader';
 		    }
 		    $max = $1;
-		    %todo = %( < map { $_ => 1 }, split m/ /, $3) if $3;
+		    %todo = %( < @+: map { @: $_ => 1 }, split m/ /, $3) if $3;
 		    $totmax += $max;
 		    $tested_files++;
 		    if ($seen_ok) {

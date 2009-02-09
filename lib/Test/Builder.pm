@@ -584,7 +584,7 @@ Works just like Test::More's cmp_ok().
 =cut
 
 
-my %numeric_cmps = %( < map { ($_, 1) }, 
+my %numeric_cmps = %( < @+: map { @($_, 1) }, 
  @(                       ("<",  "<=", ">",  ">=", "==", "!=", "<=>")) );
 
 sub cmp_ok {

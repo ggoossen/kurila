@@ -267,7 +267,7 @@ SKIP: do {
 
     my $try = sub {
 	my @c1 = @( eval qq[\$DEV =~ m/^@_[0].*/mg] );
-	my @c2 = eval qq[grep \{ @_[1] "/dev/\$_" \} \@DEV];
+	my @c2 = eval qq[grep \{ @_[1] "/dev/\$_" \}, \@DEV];
 	my $c1 = nelems @c1;
 	my $c2 = nelems @c2;
 	is($c1, $c2, "ls and @_[1] agreeing on /dev ($c1 $c2)");

@@ -164,7 +164,7 @@ sub plan {
 	}
 	else { warn "Test::plan(): skipping unrecognized directive '$k'" }
     }
-    my @todo = sort { $a <+> $b } keys %todo;
+    my @todo = sort { $a <+> $b }, keys %todo;
     if ((nelems @todo)) {
 	print $TESTOUT, "1..$max todo ".join(' ', @todo).";\n";
     } else {

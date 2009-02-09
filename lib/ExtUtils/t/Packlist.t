@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-use Test::More tests => 16;
+use Test::More tests => 15;
 
 use ExtUtils::Packlist;
 
@@ -40,8 +40,7 @@ SKIP: do {
     like( $file, qr/hash.+baz=bup/, 'key with hash value should be present' );
     like( $file, qr/hash.+foo=bar/, 'second embedded hash value should appear');
 
-    try{ ExtUtils::Packlist::read($pl, 'eplist') };
-    is( $^EVAL_ERROR, '', 'read() should normally succeed' );
+    ExtUtils::Packlist::read($pl, 'eplist');
     is( $pl->{data}{?single}, undef, 'single keys should have undef value' );
     is( ref($pl->{data}{?hash}), 'HASH', 'multivalue keys should become hashes');
 

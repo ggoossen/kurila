@@ -25,7 +25,7 @@ use Pod::Simple;
 
 my $found = 0;
 $x->callback(sub {
-  print \*STDOUT, "#  ", join("  ", map "\{$_\}", @_), "\n";
+  print \*STDOUT, "#  ", join("  ", map { "\{$_\}" }, @_), "\n";
   ++$found;
   return;
 });

@@ -19,9 +19,9 @@ our (
 $VERSION = '3.05';
 
 @Known_formatting_codes = qw(I B C L E F S X Z); 
-%Known_formatting_codes = %( < map( {($_=>1) }, @Known_formatting_codes) );
+%Known_formatting_codes = %( < @+: map( {@($_=>1) }, @Known_formatting_codes) );
 @Known_directives       = qw(head1 head2 head3 head4 item over back); 
-%Known_directives       = %( < map( {($_=>'Plain') }, @Known_directives) );
+%Known_directives       = %( < @+: map( {@($_=>'Plain') }, @Known_directives) );
 $NL = $^INPUT_RECORD_SEPARATOR unless defined $NL;
 
 #-----------------------------------------------------------------------------
@@ -159,7 +159,7 @@ sub new {
   #Carp::croak(__PACKAGE__ . " is a virtual base class -- see perldoc "
   #  . __PACKAGE__ );
   return bless \%(
-    'accept_codes'      => \%( < map( { ($_=>$_) }, @Known_formatting_codes ) ),
+    'accept_codes'      => \%( < @+: map( { @($_=>$_) }, @Known_formatting_codes ) ),
     'accept_directives' => \%( < %Known_directives ),
     'accept_targets'    => \%(),
   ), $class;

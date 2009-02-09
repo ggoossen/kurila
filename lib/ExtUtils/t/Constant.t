@@ -79,7 +79,7 @@ package main;
 
 sub check_for_bonus_files {
   my $dir = shift;
-  my %expect = %( < map {($^OS_NAME eq 'VMS' ?? lc($_) !! $_), 1}, @_ );
+  my %expect = %( < @+: map { @: ($^OS_NAME eq 'VMS' ?? lc($_) !! $_), 1}, @_ );
 
   my $fail;
   opendir my $dh, $dir or die "opendir '$dir': $^OS_ERROR";

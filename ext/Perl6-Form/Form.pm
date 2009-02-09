@@ -95,7 +95,7 @@ sub height_vals {
 	return $vals;
 }
 
-my %nothing = %( < map {$_=>sub{""}}, qw(first even odd other) );
+my %nothing = %( < @+: map {@:$_=>sub{""}}, qw(first even odd other) );
 
 sub std_body {
 	my @($rows, $fill, $opt) =  @_;
@@ -229,7 +229,7 @@ my %std_opt = %(
 	locale  	=> \%( set => \&boolean,		def => 0,					),
 );
 
-my %def_opts = %( < map {$_=>%std_opt{$_}->{?def}},  keys %std_opt );
+my %def_opts = %( < @+: map {@:$_=>%std_opt{$_}->{?def}},  keys %std_opt );
 
 sub get_locale_vals {   # args: $dec_mark, $thou_sep, $thou_group
     use POSIX;
@@ -1072,7 +1072,7 @@ sub form {
   my @($package, $file, $line) =@( caller);
     my $caller_opts = %caller_opts{+$package.','.$file} ||= \%();
     if (%$caller_opts) {
-        $line = first { $_ +< $line }, < sort {$b<+>$a} keys %$caller_opts;
+        $line = first { $_ +< $line }, < sort {$b<+>$a}, keys %$caller_opts;
         $caller_opts = $caller_opts->{?$line} || \%()
                 if defined $line;
     }

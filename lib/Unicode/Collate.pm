@@ -620,8 +620,8 @@ sub getWt
 		}
 	    }
 
-	    @hangulCE = map({
-		    $map->{?$_} ?? < @{ $map->{?$_} } !! < $der->($_);
+	    @hangulCE = @+: map({
+		    $map->{?$_} ?? @{ $map->{?$_} } !! $der->($_);
 		}, @decH);
 	}
 	return map { _varCE($vbl, $_) }, @hangulCE;
@@ -937,7 +937,7 @@ sub index
     my(@strWt, @iniPos, @finPos, @subWt, @g_ret);
 
     my $last_is_variable;
-    for my $vwt ( map { < $self->getWt($_) }, @$subE) {
+    for my $vwt ( @+: map { $self->getWt($_) }, @$subE) {
 	my @($var, @< @wt) = @: unpack(VCE_TEMPLATE, $vwt);
 	my $to_be_pushed = _nonIgnorAtLevel(\@wt,$lev);
 

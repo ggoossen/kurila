@@ -120,7 +120,7 @@ sub pw_has {
         my @valid = sort grep { %Groks{?$_} }, keys %Groks;
         return @valid;
     }
-    for my $feep ( map { < split }, @_) {
+    for my $feep ( @+: map { split }, @_) {
         defined %Groks{?$feep}
             || $sploder->("$feep is never a valid struct pwd field");
         $cando &&= %Groks{?$feep};

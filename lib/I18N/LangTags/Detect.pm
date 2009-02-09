@@ -16,7 +16,7 @@ use I18N::LangTags < qw(alternate_language_tags locale2language_tag);
 
 sub _uniq { my %seen; return grep( {!(%seen{+$_}++) }, @_); }
 sub _normalize {
-  my@(@languages) =@( map { lc($_) }, grep { $_ }, map {; $_, < alternate_language_tags($_) }, @_);
+  my @languages = map { lc($_) }, grep { $_ }, @+: map { @: $_, < alternate_language_tags($_) }, @_;
   return _uniq(< @languages);
 }
 
@@ -114,8 +114,8 @@ sub http_accept_langs {
 
   return _normalize(
     # Read off %pref, in descending key order...
-    < map { < @{%pref{?$_}} },
-    sort {$b <+> $a}
+    < @+: map { @{%pref{?$_}} },
+    sort {$b <+> $a},
     keys %pref
   );
 }

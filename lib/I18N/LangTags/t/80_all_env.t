@@ -25,7 +25,7 @@ sub show {
 }
 sub printenv {
   print \*STDOUT, "# ENV:\n";
-  foreach my $k (sort { $a cmp $b } env::keys()) {
+  foreach my $k (sort { $a cmp $b }, env::keys()) {
     my $p = env::var($k);  $p =~ s/\n/\n#/g;
     print \*STDOUT, "#   [$k] = [$p]\n"; }
   print \*STDOUT, "# [end of ENV]\n#\n";

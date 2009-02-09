@@ -60,7 +60,7 @@ $VERSION = '0.06';
 
 sub type_to_C_value {
     my @($self, $type) =  @_;
-    return %type_to_C_value{?$type} || sub {return map {ref $_ ?? < @$_ !! $_}, @_ };
+    return %type_to_C_value{?$type} || sub {return @+: map {ref $_ ?? @$_ !! @($_) }, @_ };
 }
 
 # TODO - figure out if there is a clean way for the type_to_sv code to

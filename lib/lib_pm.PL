@@ -100,7 +100,7 @@ sub import {
     }
 
     # remove trailing duplicates
-    $^INCLUDE_PATH = grep { ++%names{+$_} == 1 } $^INCLUDE_PATH;
+    $^INCLUDE_PATH = grep { ++%names{+$_} == 1 }, $^INCLUDE_PATH;
     return;
 }
 
@@ -121,7 +121,7 @@ sub unimport {
     }
 
     # Remove ALL instances of each named directory.
-    $^INCLUDE_PATH = grep { !exists %names{$_} } $^INCLUDE_PATH;
+    $^INCLUDE_PATH = grep { !exists %names{$_} }, $^INCLUDE_PATH;
     return;
 }
 

@@ -243,7 +243,7 @@ do { my $zzz = 2; fred2(50) };
 sub do_sort {
     my $zzz = 2;
     my @a = sort
-               { print \*STDOUT, eval('$zzz') == 2 ?? 'ok' !! 'not ok', " 51\n"; $a <+> $b }
+               { print \*STDOUT, eval('$zzz') == 2 ?? 'ok' !! 'not ok', " 51\n"; $a <+> $b },
  @(               2, 1);
 }
 do_sort();

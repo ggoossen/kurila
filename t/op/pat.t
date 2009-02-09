@@ -3028,14 +3028,14 @@ do {
 
     # ANYOF tests
 
-    for ( map { \$($$_) }, @(\qw|\w aA #@!|,
-                          \qw|[abc] abc def|,
-                          \qw|[^abc] def abc|,
-                          \qw|[[:word:]] abc #@!|,
-                          \qw|[[:^word:]] #@! abc|,)
-        ) {
-        my $m = shift @$_;
-        my @($s, $f) =  map { \split m/ */ }, @$_;
+    for my $p ( @(qw|\w aA #@!|,
+                  qw|[abc] abc def|,
+                  qw|[^abc] def abc|,
+                  qw|[[:word:]] abc #@!|,
+                  qw|[[:^word:]] #@! abc|,)
+            ) {
+        my $m = shift $p;
+        my @($s, $f) =  map { \split m/ */ }, $p;
         ok(m/$m/, " $m basic match") for  @$s;
         ok(not m/$m/) for  @$f;
         ok(m/^$m$/) for  @$s;

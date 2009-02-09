@@ -38,7 +38,7 @@ $Perldoc_URL_Postfix = ''
 
 $Title_Prefix  = '' unless defined $Title_Prefix;
 $Title_Postfix = '' unless defined $Title_Postfix;
-%ToIndex = %( < map {; $_ => 1 }, qw(head1 head2 head3 head4 ) ); # item-text
+%ToIndex = %( < @+: map { @: $_ => 1 }, qw(head1 head2 head3 head4 ) ); # item-text
   # 'item-text' stuff in the index doesn't quite work, and may
   # not be a good idea anyhow.
 
@@ -152,13 +152,13 @@ my @_to_accept;
 );
 
 sub changes {
-  return map {; m/^([-_:0-9a-zA-Z]+)=([-_:0-9a-zA-Z]+)$/s
-     ?? ( $1, => "\n<$2>", "/$1", => "</$2>\n" ) !! die "Funky $_"
+  return @+: map { m/^([-_:0-9a-zA-Z]+)=([-_:0-9a-zA-Z]+)$/s
+     ?? @( $1, => "\n<$2>", "/$1", => "</$2>\n" ) !! die "Funky $_"
   }, @_;
 }
 sub changes2 {
-  return map {; m/^([-_:0-9a-zA-Z]+)=([-_:0-9a-zA-Z]+)$/s
-     ?? ( $1, => "<$2>", "/$1", => "</$2>" ) !! die "Funky $_"
+  return @+: map {; m/^([-_:0-9a-zA-Z]+)=([-_:0-9a-zA-Z]+)$/s
+     ?? @( $1, => "<$2>", "/$1", => "</$2>" ) !! die "Funky $_"
   }, @_;
 }
 

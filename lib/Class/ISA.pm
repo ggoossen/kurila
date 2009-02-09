@@ -140,8 +140,8 @@ Sean M. Burke C<sburke@cpan.org>
 
 ###########################################################################
 
-sub self_and_super_versions { map {
-        $_ => (defined(${*{Symbol::fetch_glob("$_\::VERSION")}}) ?? ${*{Symbol::fetch_glob("$_\::VERSION")}} !! undef)
+sub self_and_super_versions { @+: map {
+        @: $_ => (defined(${*{Symbol::fetch_glob("$_\::VERSION")}}) ?? ${*{Symbol::fetch_glob("$_\::VERSION")}} !! undef)
       }, self_and_super_path(@_[0])
 }
 

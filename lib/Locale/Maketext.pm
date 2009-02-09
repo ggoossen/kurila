@@ -255,7 +255,7 @@ sub get_handle {  # This is a constructor and, yes, it CAN FAIL.
   if( (nelems @languages) ) {
     DEBUG and print \*STDOUT, "Lgs\@", __LINE__, ": ", < map( {"<$_>" }, @languages), "\n";
     if($USING_LANGUAGE_TAGS) {   # An explicit language-list was given!
-      @languages = map {; $_, < I18N::LangTags::alternate_language_tags($_) },
+      @languages = @+: map { @: $_, < I18N::LangTags::alternate_language_tags($_) },
  map { I18N::LangTags::locale2language_tag($_) }, @languages;
       DEBUG and print \*STDOUT, "Lgs\@", __LINE__, ": ", < map( {"<$_>" }, @languages), "\n";
     }

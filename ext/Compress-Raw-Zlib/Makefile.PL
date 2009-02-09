@@ -41,7 +41,7 @@ by hand by running 'make install' under the directory
 EOM
 
     print \*STDOUT, "Do you want to continue? [Y/N]: " ;
-    my $answer = ~< STDIN ;
+    my $answer = ~< \*STDIN ;
 
     if ($answer =~ m/^yes|y/i)
     {
@@ -128,7 +128,7 @@ require ExtUtils::Constant;
 
 do {
     # Check the constants above all appear in @EXPORT in Zlib.pm
-    my %names = %( < map { $_, 1}, @( < @names, 'ZLIB_VERSION') );
+    my %names = %( < @+: map { @: $_, 1 }, @( < @names, 'ZLIB_VERSION') );
     open my $f, "<", "lib/Compress/Raw/Zlib.pm" or die "Cannot open Zlib.pm: $^OS_ERROR\n";
     while (~< $f)
     {
@@ -167,7 +167,7 @@ sub ParseCONFIG
     my @badkey = @( () ) ;
     my %Info = %( () ) ;
     my @Options = qw( INCLUDE LIB BUILD_ZLIB OLD_ZLIB GZIP_OS_CODE ) ;
-    my %ValidOption = %( < map {$_, 1}, @Options ) ;
+    my %ValidOption = %( < @+: map { @: $_, 1 }, @Options ) ;
     my %Parsed = %( < %ValidOption ) ;
     my $CONFIG = 'config.in' ;
 
@@ -343,7 +343,7 @@ BEGIN
     \@( ''        => 255,  'Unknown OS'                   ),
   );
 
-  %OSnames = %( < map { @$_[1] => @$_[2] },  
+  %OSnames = %( < @+: map { @: @$_[1] => @$_[2] },
  @GZIP_OS_Names ) ;
 }
 

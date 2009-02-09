@@ -94,7 +94,7 @@ sub new {
     }
     else {
         $self->{':private:'}->{+Config} = \%:<
-          map { ($_ => config_value($_)) }, config_keys();
+          @+: map { @($_ => config_value($_)) }, config_keys();
     }
     
     for my $tuple (@(\@(inc_override => INC => \$($^INCLUDE_PATH) ),

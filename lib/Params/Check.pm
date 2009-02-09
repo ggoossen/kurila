@@ -29,7 +29,7 @@ BEGIN {
     $CALLER_DEPTH           = 0;
 }
 
-my %known_keys = %( < map { $_ => 1 },
+my %known_keys = %( < @+: map { @: $_ => 1 },
                     qw| required allow default strict_type no_override
                         store defined | );
 

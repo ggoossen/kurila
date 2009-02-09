@@ -106,7 +106,7 @@ for my $attr (keys %attributes) {
 # Return the escape code for a given set of color attributes.
 sub color {
     return '' if defined env::var('ANSI_COLORS_DISABLED');
-    my @codes = map { < split }, @_;
+    my @codes = @+: map { split }, @_;
     my $attribute = '';
     foreach ( @codes) {
         $_ = lc $_;

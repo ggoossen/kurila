@@ -33,7 +33,7 @@ sub wrap
 	local($Text::Tabs::tabstop) = $tabstop;
 	my $r = "";
 	my $tail = pop(@t);
-	my $t = expand(join("", @( (< map { m/\s+\z/ ?? ( $_ ) !! ($_, ' ') }, @t), $tail)));
+	my $t = expand(join("", @: < (@+: map { m/\s+\z/ ?? @( $_ ) !! @($_, ' ') }, @t), $tail));
 	my $lead = $ip;
 	my $ll = $columns - length(expand($ip)) - 1;
 	$ll = 0 if $ll +< 0;

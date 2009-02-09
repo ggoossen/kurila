@@ -33,8 +33,8 @@ is_deeply(\(sort keys %Module::CoreList::released),
           \(sort keys %Module::CoreList::version),
           "have a note of everythings release");
 
-is_deeply( \(map {
-    exists %Module::CoreList::version{ $_ }->{FindExt} ?? $_ !! ()
+is_deeply( \(grep {
+    exists %Module::CoreList::version{ $_ }->{FindExt}
 }, keys %Module::CoreList::version),
            \@(), "FindExt shouldn't get included rt#6922" );
 

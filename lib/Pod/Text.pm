@@ -84,7 +84,7 @@ sub new {
     # problems if we ever clash with Pod::Simple's own internal class
     # variables.
     my %opts = %( < @_ );
-    my @opts = map { ("opt_$_", %opts{?$_}) }, keys %opts;
+    my @opts = @+: map { @("opt_$_", %opts{?$_}) }, keys %opts;
     %$self = %(< %$self, < @opts);
 
     # Initialize various things from our parameters.

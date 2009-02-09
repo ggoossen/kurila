@@ -179,9 +179,9 @@ foreach my $j ( @(<0x1161..0x1175, < 0x11A8..0x11C2)) {
 
 sub getCanonList {
     my @src = @_;
-    my @dec = map {
-	(SBase +<= $_ && $_ +<= SFinal) ?? < decomposeHangul($_)
-	    !! %Canon{?$_} ?? < @{ %Canon{?$_} } !! $_
+    my @dec = @+: map {
+	(SBase +<= $_ && $_ +<= SFinal) ?? decomposeHangul($_)
+	    !! %Canon{?$_} ?? @{ %Canon{?$_} } !! @($_)
 		}, @src;
     return join(" ", @src) eq join(" ", @dec) ?? @dec !! getCanonList(< @dec);
     # condition @src == @dec is not ok.
@@ -189,9 +189,9 @@ sub getCanonList {
 
 sub getCompatList {
     my @src = @_;
-    my @dec = map {
-	(SBase +<= $_ && $_ +<= SFinal) ?? < decomposeHangul($_)
-	    !! %Compat{?$_} ?? < @{ %Compat{?$_} } !! $_
+    my @dec = @+: map {
+	(SBase +<= $_ && $_ +<= SFinal) ?? decomposeHangul($_)
+	    !! %Compat{?$_} ?? @{ %Compat{?$_} } !! @($_)
 		}, @src;
     return join(" ", @src) eq join(" ", @dec) ?? @dec !! getCompatList(< @dec);
     # condition @src == @dec is not ok.
@@ -269,7 +269,7 @@ binmode $fh;
 EOF
 
 foreach my $tbl ( @boolfunc) {
-    my @temp = sort {$a <+> $b} keys %{$tbl->{?hash}};
+    my @temp = sort {$a <+> $b}, keys %{$tbl->{?hash}};
     my $type = $tbl->{?type};
     my $name = $tbl->{?name};
     print $fh, "$type is$name (UV uv)\n\{\nreturn\n\t";
@@ -301,7 +301,7 @@ my $compinit =
 foreach my $i (sort keys %CompList) {
     $compinit .= "$structname $i [] = \{\n";
     $compinit .= join ",\n", map { sprintf("\t\{ \%d, \%d \}", $_, %CompList{$i}->{?$_}) },
-	    sort { $a <+> $b } keys %{ %CompList{?$i} };
+	    sort { $a <+> $b }, keys %{ %CompList{?$i} };
     $compinit .= ",\n\{0,0\}\n\};\n\n"; # with sentinel
 }
 
@@ -365,7 +365,7 @@ EOF
 	%val{ + @c[1] }->{ + @c[2] }->{+@c[3] } = $hash->{?$uv};
     }
 
-    foreach my $p (sort { $a <+> $b } keys %val) {
+    foreach my $p (sort { $a <+> $b }, keys %val) {
 	next if ! %val{?$p };
 	for my $r (0..255) {
 	    next if ! %val{ $p }->{?$r };
@@ -380,7 +380,7 @@ EOF
 	    print $fh, "\};\n\n";
 	}
     }
-    foreach my $p (sort { $a <+> $b } keys %val) {
+    foreach my $p (sort { $a <+> $b }, keys %val) {
 	next if ! %val{?$p };
 	printf $fh, "static $type* $($head)_\%02x [256] = \{\n", $p;
 	for my $r (0..255) {

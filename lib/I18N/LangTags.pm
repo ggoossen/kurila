@@ -814,7 +814,7 @@ sub implicate_supers {
 
 sub implicate_supers_strictly {
   my @tags = grep { is_language_tag($_) }, @_;
-  return uniq( < @_,   < map { < super_languages($_) }, @_ );
+  return uniq( < @_,   < @+: map { super_languages($_) }, @_ );
 }
 
 

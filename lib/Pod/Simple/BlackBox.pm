@@ -382,7 +382,7 @@ sub _gen_errata {
 
   my @out;
   
-  foreach my $line (sort {$a <+> $b} keys %{$self->{?'errata'}}) {
+  foreach my $line (sort {$a <+> $b}, keys %{$self->{?'errata'}}) {
     push @out,
       \@('=item', \%('start_line' => $m), "Around line $line:"),
       < map( { \@('~Para', \%('start_line' => $m, '~cooked' => 1),
