@@ -71,7 +71,7 @@
 %token <i_tkval> '{' '}' '[' ']' '-' '+' '$' '@' '%' '*' '&' ';'
 
 %token <opval> WORD METHOD THING PMFUNC PRIVATEVAR
-%token <opval> FUNC0SUB UNIOPSUB LSTOPSUB COMPSUB
+%token <opval> FUNC0SUB UNIOPSUB COMPSUB
 %token <p_tkval> LABEL
 %token <i_tkval> SUB ANONSUB PACKAGE USE
 %token <i_tkval> WHILE UNTIL IF UNLESS ELSE ELSIF CONTINUE FOR
@@ -108,7 +108,7 @@
 %left <i_tkval> OROP DOROP
 %left <i_tkval> ANDOP
 %right <i_tkval> NOTOP
-%nonassoc LSTOP LSTOPSUB
+%nonassoc LSTOP
 %left <i_tkval> ','
 %right <i_tkval> ASSIGNOP
 %right <i_tkval> TERNARY_IF TERNARY_ELSE
@@ -673,16 +673,6 @@ listop	:	term ARROW method '(' listexprcom ')' /* $foo->bar(list) */
                             TOKEN_GETMAD($2,$$,'(');
                             TOKEN_GETMAD($4,$$,')');
                             APPEND_MADPROPS_PV("func", $$, '>');
-			}
-	|	LSTOPSUB startanonsub block /* sub f(&@);   f { foo } ... */
-			{
-                            $<opval>$ = newANONSUB($2, 0, scalar($3)); }
-		    listexpr		%prec LSTOP  /* ... @bar */
-			{ 
-                            $$ = newUNOP(OP_ENTERSUB, OPf_STACKED,
-                                append_elem(OP_LIST,
-                                    prepend_elem(OP_LIST, $<opval>4, $5), $1), $1->op_location);
-                            APPEND_MADPROPS_PV("listop", $$, '>');
 			}
 	;
 

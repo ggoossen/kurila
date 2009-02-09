@@ -295,7 +295,6 @@ static struct debug_tokens {
     { LOCAL,		TOKENTYPE_IVAL,		"LOCAL" },
     { LOOPEX,		TOKENTYPE_OPNUM,	"LOOPEX" },
     { LSTOP,		TOKENTYPE_OPNUM,	"LSTOP" },
-    { LSTOPSUB,		TOKENTYPE_OPVAL,	"LSTOPSUB" },
     { MATCHOP,		TOKENTYPE_OPNUM,	"MATCHOP" },
     { METHOD,		TOKENTYPE_OPVAL,	"METHOD" },
     { MULOP,		TOKENTYPE_OPNUM,	"MULOP" },
@@ -2371,7 +2370,6 @@ Perl_madlex(pTHX)
     case PRIVATEVAR:
     case FUNC0SUB:
     case UNIOPSUB:
-    case LSTOPSUB:
 	if (pl_yylval.opval)
 	    append_madprops(PL_thismad, pl_yylval.opval, 0);
 	PL_thismad = 0;
@@ -4612,13 +4610,6 @@ Perl_yylex(pTHX)
 			    OPERATOR(UNIOPSUB);
 			while (*proto == ';')
 			    proto++;
-			if (*proto == '&' && *s == '{') {
-			    if (PL_curstash)
-				sv_setpvs(PL_subname, "__ANON__");
-			    else
-				sv_setpvs(PL_subname, "__ANON__::__ANON__");
-			    PREBLOCK(LSTOPSUB);
-			}
 		    }
 #ifdef PERL_MAD
 		    if (PL_madskills) {
