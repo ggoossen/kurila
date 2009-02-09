@@ -47,79 +47,78 @@
      PRIVATEVAR = 262,
      FUNC0SUB = 263,
      UNIOPSUB = 264,
-     LSTOPSUB = 265,
-     COMPSUB = 266,
-     LABEL = 267,
-     SUB = 268,
-     ANONSUB = 269,
-     PACKAGE = 270,
-     USE = 271,
-     WHILE = 272,
-     UNTIL = 273,
-     IF = 274,
-     UNLESS = 275,
-     ELSE = 276,
-     ELSIF = 277,
-     CONTINUE = 278,
-     FOR = 279,
-     LOOPEX = 280,
-     DOTDOT = 281,
-     FUNC0 = 282,
-     FUNC1 = 283,
-     FUNC = 284,
-     UNIOP = 285,
-     LSTOP = 286,
-     RELOP = 287,
-     EQOP = 288,
-     MULOP = 289,
-     ADDOP = 290,
-     DO = 291,
-     NOAMP = 292,
-     ANONARY = 293,
-     ANONARYL = 294,
-     ANONHSH = 295,
-     ANONHSHL = 296,
-     ANONSCALAR = 297,
-     ANONSCALARL = 298,
-     LOCAL = 299,
-     MY = 300,
-     MYSUB = 301,
-     REQUIRE = 302,
-     COLONATTR = 303,
-     SPECIALBLOCK = 304,
-     PREC_LOW = 305,
-     DOROP = 306,
-     OROP = 307,
-     ANDOP = 308,
-     NOTOP = 309,
-     ASSIGNOP = 310,
-     TERNARY_ELSE = 311,
-     TERNARY_IF = 312,
-     HASHEXPAND = 313,
-     ARRAYEXPAND = 314,
-     DORDOR = 315,
-     OROR = 316,
-     ANDAND = 317,
-     BITOROP = 318,
-     BITANDOP = 319,
-     SHIFTOP = 320,
-     MATCHOP = 321,
-     SREFGEN = 322,
-     UMINUS = 323,
-     POWOP = 324,
-     POSTDEC = 325,
-     POSTINC = 326,
-     PREDEC = 327,
-     PREINC = 328,
-     ASLICE = 329,
-     HSLICE = 330,
-     DEREFAMP = 331,
-     DEREFSTAR = 332,
-     DEREFHSH = 333,
-     DEREFARY = 334,
-     DEREFSCL = 335,
-     ARROW = 336,
-     PEG = 337
+     COMPSUB = 265,
+     LABEL = 266,
+     SUB = 267,
+     ANONSUB = 268,
+     PACKAGE = 269,
+     USE = 270,
+     WHILE = 271,
+     UNTIL = 272,
+     IF = 273,
+     UNLESS = 274,
+     ELSE = 275,
+     ELSIF = 276,
+     CONTINUE = 277,
+     FOR = 278,
+     LOOPEX = 279,
+     DOTDOT = 280,
+     FUNC0 = 281,
+     FUNC1 = 282,
+     FUNC = 283,
+     UNIOP = 284,
+     LSTOP = 285,
+     RELOP = 286,
+     EQOP = 287,
+     MULOP = 288,
+     ADDOP = 289,
+     DO = 290,
+     NOAMP = 291,
+     ANONARY = 292,
+     ANONARYL = 293,
+     ANONHSH = 294,
+     ANONHSHL = 295,
+     ANONSCALAR = 296,
+     ANONSCALARL = 297,
+     LOCAL = 298,
+     MY = 299,
+     MYSUB = 300,
+     REQUIRE = 301,
+     COLONATTR = 302,
+     SPECIALBLOCK = 303,
+     PREC_LOW = 304,
+     DOROP = 305,
+     OROP = 306,
+     ANDOP = 307,
+     NOTOP = 308,
+     ASSIGNOP = 309,
+     TERNARY_ELSE = 310,
+     TERNARY_IF = 311,
+     HASHEXPAND = 312,
+     ARRAYEXPAND = 313,
+     DORDOR = 314,
+     OROR = 315,
+     ANDAND = 316,
+     BITOROP = 317,
+     BITANDOP = 318,
+     SHIFTOP = 319,
+     MATCHOP = 320,
+     SREFGEN = 321,
+     UMINUS = 322,
+     POWOP = 323,
+     POSTDEC = 324,
+     POSTINC = 325,
+     PREDEC = 326,
+     PREINC = 327,
+     ASLICE = 328,
+     HSLICE = 329,
+     DEREFAMP = 330,
+     DEREFSTAR = 331,
+     DEREFHSH = 332,
+     DEREFARY = 333,
+     DEREFSCL = 334,
+     ARROW = 335,
+     PEG = 336
    };
 #endif
 /* Tokens.  */
@@ -130,79 +129,78 @@
 #define PRIVATEVAR 262
 #define FUNC0SUB 263
 #define UNIOPSUB 264
-#define LSTOPSUB 265
-#define COMPSUB 266
-#define LABEL 267
-#define SUB 268
-#define ANONSUB 269
-#define PACKAGE 270
-#define USE 271
-#define WHILE 272
-#define UNTIL 273
-#define IF 274
-#define UNLESS 275
-#define ELSE 276
-#define ELSIF 277
-#define CONTINUE 278
-#define FOR 279
-#define LOOPEX 280
-#define DOTDOT 281
-#define FUNC0 282
-#define FUNC1 283
-#define FUNC 284
-#define UNIOP 285
-#define LSTOP 286
-#define RELOP 287
-#define EQOP 288
-#define MULOP 289
-#define ADDOP 290
-#define DO 291
-#define NOAMP 292
-#define ANONARY 293
-#define ANONARYL 294
-#define ANONHSH 295
-#define ANONHSHL 296
-#define ANONSCALAR 297
-#define ANONSCALARL 298
-#define LOCAL 299
-#define MY 300
-#define MYSUB 301
-#define REQUIRE 302
-#define COLONATTR 303
-#define SPECIALBLOCK 304
-#define PREC_LOW 305
-#define DOROP 306
-#define OROP 307
-#define ANDOP 308
-#define NOTOP 309
-#define ASSIGNOP 310
-#define TERNARY_ELSE 311
-#define TERNARY_IF 312
-#define HASHEXPAND 313
-#define ARRAYEXPAND 314
-#define DORDOR 315
-#define OROR 316
-#define ANDAND 317
-#define BITOROP 318
-#define BITANDOP 319
-#define SHIFTOP 320
-#define MATCHOP 321
-#define SREFGEN 322
-#define UMINUS 323
-#define POWOP 324
-#define POSTDEC 325
-#define POSTINC 326
-#define PREDEC 327
-#define PREINC 328
-#define ASLICE 329
-#define HSLICE 330
-#define DEREFAMP 331
-#define DEREFSTAR 332
-#define DEREFHSH 333
-#define DEREFARY 334
-#define DEREFSCL 335
-#define ARROW 336
-#define PEG 337
+#define COMPSUB 265
+#define LABEL 266
+#define SUB 267
+#define ANONSUB 268
+#define PACKAGE 269
+#define USE 270
+#define WHILE 271
+#define UNTIL 272
+#define IF 273
+#define UNLESS 274
+#define ELSE 275
+#define ELSIF 276
+#define CONTINUE 277
+#define FOR 278
+#define LOOPEX 279
+#define DOTDOT 280
+#define FUNC0 281
+#define FUNC1 282
+#define FUNC 283
+#define UNIOP 284
+#define LSTOP 285
+#define RELOP 286
+#define EQOP 287
+#define MULOP 288
+#define ADDOP 289
+#define DO 290
+#define NOAMP 291
+#define ANONARY 292
+#define ANONARYL 293
+#define ANONHSH 294
+#define ANONHSHL 295
+#define ANONSCALAR 296
+#define ANONSCALARL 297
+#define LOCAL 298
+#define MY 299
+#define MYSUB 300
+#define REQUIRE 301
+#define COLONATTR 302
+#define SPECIALBLOCK 303
+#define PREC_LOW 304
+#define DOROP 305
+#define OROP 306
+#define ANDOP 307
+#define NOTOP 308
+#define ASSIGNOP 309
+#define TERNARY_ELSE 310
+#define TERNARY_IF 311
+#define HASHEXPAND 312
+#define ARRAYEXPAND 313
+#define DORDOR 314
+#define OROR 315
+#define ANDAND 316
+#define BITOROP 317
+#define BITANDOP 318
+#define SHIFTOP 319
+#define MATCHOP 320
+#define SREFGEN 321
+#define UMINUS 322
+#define POWOP 323
+#define POSTDEC 324
+#define POSTINC 325
+#define PREDEC 326
+#define PREINC 327
+#define ASLICE 328
+#define HSLICE 329
+#define DEREFAMP 330
+#define DEREFSTAR 331
+#define DEREFHSH 332
+#define DEREFARY 333
+#define DEREFSCL 334
+#define ARROW 335
+#define PEG 336
 
 
 

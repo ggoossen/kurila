@@ -592,9 +592,9 @@ our %priv; # used to display each opcode's BASEOP.op_private values
 %priv{+$_}->{+16} = "OURINTR" for @( ("gvsv", "rv2sv", "rv2av", "rv2hv", "r2gv",
 	"enteriter"));
 %priv{+$_}->{+16} = "TARGMY"
-  for @( (< map( {($_,"s$_") }, @("chop", "chomp")),
-       < map( {($_,"i_$_") }, @( "postinc", "postdec", "multiply", "divide", "modulo",
-	   "add", "subtract", "negate")), "pow", "concat", "stringify",
+  for @( (< ( @+: map( {@($_,"s$_") }, @("chop", "chomp")) ),
+       < ( @+: map( {@($_,"i_$_") }, @( "postinc", "postdec", "multiply", "divide", "modulo",
+	   "add", "subtract", "negate"))), "pow", "concat", "stringify",
        "left_shift", "right_shift", "bit_and", "bit_xor", "bit_or",
        "complement", "atan2", "sin", "cos", "rand", "exp", "log", "sqrt",
        "int", "hex", "oct", "abs", "length", "index", "rindex", "sprintf",
@@ -648,7 +648,7 @@ our %hints; # used to display each COP's op_hints values
 sub _flags {
     my@($hash, $x) =  @_;
     my @s;
-    for my $flag (sort {$b <+> $a} keys %{$hash || \%()}) {
+    for my $flag (sort {$b <+> $a}, keys %{$hash || \%()}) {
 	if ($hash->{?$flag} and $x ^&^ $flag and $x +>= $flag) {
 	    $x -= $flag;
 	    push @s, $hash->{?$flag};

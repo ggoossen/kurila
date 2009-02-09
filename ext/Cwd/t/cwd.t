@@ -66,7 +66,7 @@ SKIP: do {
 
     print \*STDOUT, "# native pwd = '$pwd_cmd'\n";
 
-    my %local_env_keys = %:< map { $_, env::var($_) }, qw[PATH IFS CDPATH ENV BASH_ENV];
+    my %local_env_keys = %:< @+: map { @: $_, env::var($_) }, qw[PATH IFS CDPATH ENV BASH_ENV];
     push dynascope->{onleave}, sub {
         env::set_var($_, %local_env_keys{$_}) for keys %local_env_keys;
     };

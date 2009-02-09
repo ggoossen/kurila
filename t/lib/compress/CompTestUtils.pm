@@ -297,7 +297,7 @@ my %TopFuncMap = %(  'IO::Compress::Gzip'          => 'IO::Compress::Gzip::gzip'
                     'IO::Uncompress::DummyUncomp' => 'IO::Uncompress::DummyUncomp::dummyuncomp',
                  );
 
-   %TopFuncMap = %( < map { ($_              => %TopFuncMap{?$_}, 
+   %TopFuncMap = %( < @+: map { @($_              => %TopFuncMap{?$_}, 
                         %TopFuncMap{?$_} => %TopFuncMap{?$_}) }, 
                  keys %TopFuncMap ) ;
 
@@ -323,7 +323,7 @@ my %inverse  = %( 'IO::Compress::Gzip'                    => 'IO::Uncompress::Gu
                  'IO::Compress::DummyComp'               => 'IO::Uncompress::DummyUncomp',
              );
 
-%inverse  = %( < map { ($_ => %inverse{?$_}, %inverse{?$_} => $_) }, keys %inverse );
+%inverse  = %( < @+: map { @($_ => %inverse{?$_}, %inverse{?$_} => $_) }, keys %inverse );
 
 sub getInverse
 {
