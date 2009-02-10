@@ -529,8 +529,8 @@ if ($versiononly) {
 	chmod(0755, "$installscript/$base");
     }
 
-    for (@tolink) {
-	my @($from, $to) = map { "$_$ver" }, @$_;
+    for my $fromto (@tolink) {
+	my @($from, $to) = map { "$_$ver" }, @$fromto;
 	(my $frbase = $from) =~ s#.*/##;
 	(my $tobase = $to) =~ s#.*/##;
 	script_alias($installscript, $frbase, $tobase, $scr_ext);
