@@ -148,7 +148,7 @@ while (~< *$scriptfh) {
 }
 close $scriptfh;
 
-if ($scr_ext) { @scripts = map { "$_$scr_ext" } @scripts; }
+if ($scr_ext) { @scripts = map { "$_$scr_ext" }, @scripts; }
 
 my @pods = $nopods ?? () !! glob("pod/*.pod");
 
@@ -390,7 +390,7 @@ my @corefiles;
 if ($Is_VMS) {  # We did core file selection during build
     my $coredir = "lib/$(config_value('archname'))/$ver/CORE";
     $coredir =~ s/[.]/_/g;
-    map { s|^$coredir/||i; } @corefiles = glob("$coredir/*.*");
+    map { s|^$coredir/||i }, @corefiles = glob("$coredir/*.*");
 }
 else {
     # [als] hard-coded 'libperl' name... not good!
@@ -530,7 +530,7 @@ if ($versiononly) {
     }
 
     for (@tolink) {
-	my @($from, $to) = map { "$_$ver" } @$_;
+	my @($from, $to) = map { "$_$ver" }, @$_;
 	(my $frbase = $from) =~ s#.*/##;
 	(my $tobase = $to) =~ s#.*/##;
 	script_alias($installscript, $frbase, $tobase, $scr_ext);
