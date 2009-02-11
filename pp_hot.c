@@ -1413,7 +1413,23 @@ PP(pp_entersub)
 	}
 	SAVECOMPPAD();
 	PAD_SET_CUR_NOSAVE(padlist, CvDEPTH(cv));
-	if (hasargs) {
+	if (CvFLAGS(cv) & CVf_BLOCK) {
+	    CX_CURPAD_SAVE(cx->blk_sub);
+	    ++MARK;
+
+	    if (items > 1)
+		Perl_croak(aTHX_ "Too many arguments for block sub: %"IVdf"",
+		    items);
+
+	    if (items == 1) {
+		SVcpREPLACE( PAD_SVl(PAD_ARGS_INDEX), *MARK);
+		MARK++;
+	    }
+	    else
+		SVcpREPLACE( PAD_SVl(PAD_ARGS_INDEX),
+		    sv_2mortal(newSV(0)));
+	}
+	else if (hasargs) {
 	    AV* av;
 	    SV* avsv = PAD_SVl(PAD_ARGS_INDEX);
 	    sv_upgrade(avsv, SVt_PVAV);

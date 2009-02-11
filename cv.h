@@ -66,6 +66,7 @@ Null CV pointer.
 #define CvPADLIST(sv)	((XPVCV*)SvANY(sv))->xcv_padlist
 #define CvFLAGS(sv)	((XPVCV*)SvANY(sv))->xcv_flags
 
+#define CVf_BLOCK	0x0001	/* CV accept one argument which is assigned to $_ */
 #define CVf_CLONE	0x0020	/* anon CV uses external lexicals */
 #define CVf_CLONED	0x0040	/* a clone of one of those */
 #define CVf_ANON	0x0080	/* CvGV() can't be trusted */

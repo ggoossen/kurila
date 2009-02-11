@@ -38,7 +38,7 @@ is($v, 12, 'return from loop');
 
 # Does it work from another package?
 do { package Foo;
-  main::is(List::Util::first(sub{$_+>4},( <1..4,24)), 24, 'other package');
+  main::is(List::Util::first({$_+>4},( <1..4,24)), 24, 'other package');
 };
 
 # Can we undefine a first sub while it's running?
@@ -56,7 +56,8 @@ is($^EVAL_ERROR, '', 'redefine self');
 
 do { my $failed = 0;
 
-    sub rec { my $n = shift;
+    sub rec {
+        my $n = shift;
         if (!defined($n)) {  # No arg means we're being called by first()
             return 1; }
         if ($n+<5) { rec($n+1); }

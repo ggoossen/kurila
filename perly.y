@@ -73,7 +73,7 @@
 %token <opval> WORD METHOD THING PMFUNC PRIVATEVAR
 %token <opval> FUNC0SUB UNIOPSUB COMPSUB
 %token <p_tkval> LABEL
-%token <i_tkval> SUB ANONSUB PACKAGE USE
+%token <i_tkval> SUB ANONSUB BLOCKSUB PACKAGE USE
 %token <i_tkval> WHILE UNTIL IF UNLESS ELSE ELSIF CONTINUE FOR
 %token <i_tkval> LOOPEX DOTDOT
 %token <i_tkval> FUNC0 FUNC1 FUNC UNIOP LSTOP
@@ -85,8 +85,7 @@
 %token <i_tkval> SPECIALBLOCK
 
 %type <ionlyval> prog progstart remember mremember
-%type <ionlyval>  startsub startanonsub
-/* FIXME for MAD - are these two ival? */
+%type <ionlyval> startsub startanonsub startblocksub
 %type <ionlyval> mintro
 
 %type <opval> decl subrout mysubrout package use peg
@@ -532,6 +531,11 @@ startanonsub:	/* NULL */	/* start an anonymous subroutine scope */
 			}
 	;
 
+startblocksub:	/* NULL */	/* start an anonymous subroutine scope */
+			{ $$ = start_subparse(CVf_ANON|CVf_BLOCK);
+			}
+	;
+
 /* Name of a subroutine - must be a bareword, could be special */
 subname	:	WORD	{
 			  $$ = $1;
@@ -959,10 +963,14 @@ termunop : '-' term %prec UMINUS                       /* -$x */
 
 /* Constructors for anonymous data */
 anonymous:
-	ANONSUB startanonsub proto block	%prec '('
+	BLOCKSUB startblocksub block	%prec '('
+			{
+                            $$ = newANONSUB($2, NULL, scalar($3));
+                            TOKEN_GETMAD($1,$$,'o');
+			}
+        |       ANONSUB startanonsub proto block	%prec '('
 			{
                             $$ = newANONSUB($2, $3, scalar($4));
-                            $$->op_private = IVAL($1);
                             TOKEN_GETMAD($1,$$,'o');
                             OP_GETMAD($3,$$,'s');
 			}

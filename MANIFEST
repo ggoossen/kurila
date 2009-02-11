@@ -2431,6 +2431,7 @@ t/run/switchx.aux		Data for switchx.t
 t/run/switchx.t			Test the -x switch
 t/sv/alarm.t			See if alarm works
 t/sv/anonsub.t			See if anonymous subroutines work
+t/sv/blocksub.t			See if anonymous block subroutines work
 t/sv/args.t			See if operations on @_ work
 t/sv/array.t			See if array operations work
 t/sv/object.t			See if objects work

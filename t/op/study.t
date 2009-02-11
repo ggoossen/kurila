@@ -11,7 +11,7 @@ sub ok ($;$) {
     printf \*STDOUT, "\%s $test\%s\n", $ok   ?? 'ok' !! 'not ok',
                            $name ?? " - $name" !! '';
 
-    printf \*STDOUT, "# Failed test at line \%d\n", (caller($Ok_Level))[[2]] unless $ok;
+    printf \*STDOUT, "# Failed test at line \%d\n", @(caller($Ok_Level))[2] unless $ok;
 
     $test++;
     return $ok;
@@ -109,9 +109,9 @@ if ($^OS_NAME eq 'os390' or $^OS_NAME eq 'posix-bc' or $^OS_NAME eq 'MacOS') {
 } else {
     # [ID 20010618.006] tests 25..26 may loop
 
-    $_ = 'FGF';
-    study;
-    alarm_ok { m/G.F$/ },;
-    alarm_ok { m/[F]F$/ },;
+    my $a = 'FGF';
+    study $a;
+    alarm_ok { $a =~ m/G.F$/ };
+    alarm_ok { $a =~ m/[F]F$/ };
 }
 

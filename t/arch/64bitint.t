@@ -1,11 +1,14 @@
 #./perl
 
 BEGIN {
-	try { my $q = pack "q", 0 };
-	if ($@) {
-		print "1..0 # Skip: no 64-bit types\n";
-		exit(0);
-	}
+    require "./test.pl";
+}
+
+BEGIN {
+    try { my $q = pack "q", 0 };
+    if ($^EVAL_ERROR) {
+        skip_all "no 64-bit types";
+    }
 }
 
 # This could use many more tests.

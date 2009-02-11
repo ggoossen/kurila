@@ -16,7 +16,6 @@ use B < qw(class main_root main_start main_cv svref_2object opnumber perlstring
 	 OPpEXISTS_SUB OPpSORT_NUMERIC OPpSORT_INTEGER
 	 OPpSORT_REVERSE OPpSORT_DESCEND OPpITER_REVERSED
 	 SVf_IOK SVf_NOK SVf_ROK SVf_POK SVpad_OUR SVf_FAKE SVs_RMG SVs_SMG
-         CVf_METHOD CVf_LOCKED
 	 PMf_KEEP PMf_GLOBAL PMf_CONTINUE
 	 PMf_MULTILINE PMf_SINGLELINE PMf_FOLD PMf_EXTENDED RXf_SKIPWHITE);
 our $VERSION = 0.86;
@@ -793,11 +792,6 @@ sub deparse_sub {
     local $self->{+'curcop'} = $self->{?'curcop'};
     if ($cv->FLAGS ^&^ SVf_POK) {
 	$proto = "(". $cv->PV . ") ";
-    }
-    if ($cv->CvFLAGS ^&^ (CVf_METHOD^|^CVf_LOCKED)) {
-        $proto .= ": ";
-        $proto .= "locked " if $cv->CvFLAGS ^&^ CVf_LOCKED;
-        $proto .= "method " if $cv->CvFLAGS ^&^ CVf_METHOD;
     }
 
     local($self->{+'curcv'}) = $cv;

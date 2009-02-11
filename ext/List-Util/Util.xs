@@ -7,8 +7,6 @@
 #include <perl.h>
 #include <XSUB.h>
 
-#include "multicall.h"
-
 #ifdef SVf_IVisUV
 #  define slu_sv_value(sv) (SvIOK(sv)) ? (SvIOK_UV(sv)) ? (NV)(SvUVX(sv)) : (NV)(SvIVX(sv)) : (SvNV(sv))
 #else
@@ -163,30 +161,36 @@ first(block,...)
 PROTOTYPE: &@
 CODE:
 {
-    dVAR; dMULTICALL;
+    dVAR;
     int index;
     GV *gv;
     I32 gimme = G_SCALAR;
-    SV **args = &PL_stack_base[ax];
-    CV *cv;
 
     if(items <= 1) {
 	XSRETURN_UNDEF;
     }
-    cv = sv_2cv(block, &gv, 0);
-    PUSH_MULTICALL(cv);
-    SAVESPTR(GvSV(PL_defgv));
+
+    block = sv_mortalcopy(block);
 
     for(index = 1 ; index < items ; index++) {
-	SVcpREPLACE(GvSV(PL_defgv), args[index]);
-	MULTICALL;
-	if (SvTRUE(*PL_stack_sp)) {
-	  POP_MULTICALL;
-	  ST(0) = ST(index);
-	  XSRETURN(1);
+        bool res;
+        SV** args = &ST(0);
+        ENTER;
+        SAVETMPS;
+        PUSHMARK(SP);
+        XPUSHs(args[index]);
+        PUTBACK;
+        call_sv(block, G_SCALAR);
+        SPAGAIN;
+        res = SvTRUE(POPs);
+        PUTBACK;
+        FREETMPS;
+        LEAVE;
+	if (res) {
+            ST(0) = ST(index);
+            XSRETURN(1);
 	}
     }
-    POP_MULTICALL;
     XSRETURN_UNDEF;
 }
 

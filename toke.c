@@ -271,6 +271,7 @@ static struct debug_tokens {
     { ANDAND,		TOKENTYPE_NONE,		"ANDAND" },
     { ANDOP,		TOKENTYPE_NONE,		"ANDOP" },
     { ANONSUB,		TOKENTYPE_IVAL,		"ANONSUB" },
+    { BLOCKSUB,		TOKENTYPE_IVAL,		"BLOCKSUB" },
     { ANONARY,		TOKENTYPE_IVAL,		"ANONARY" },
     { ARROW,		TOKENTYPE_NONE,		"ARROW" },
     { ASSIGNOP,		TOKENTYPE_OPNUM,	"ASSIGNOP" },
@@ -3656,8 +3657,7 @@ Perl_yylex(pTHX)
 	    else
 		PL_lex_brackstack[PL_lex_brackets++] = XOPERATOR;
 	    force_next('{');
-	    pl_yylval.i_tkval.ival = OPpENTERSUB_BLOCK;
-	    TOKEN(ANONSUB);
+	    TOKEN(BLOCKSUB);
 	case XOPERATOR:
 	    if (*s == '[') {
 		s++;
@@ -5617,7 +5617,6 @@ Perl_yylex(pTHX)
 			sv_setpvs(PL_subname, "__ANON__");
 		    else
 			sv_setpvs(PL_subname, "__ANON__::__ANON__");
-		    pl_yylval.i_tkval.ival = 0;
 		    TOKEN(ANONSUB);
 		}
 #ifndef PERL_MAD
@@ -10400,7 +10399,6 @@ Perl_start_subparse(pTHX_ U32 flags)
     const I32 oldsavestack_ix = PL_savestack_ix;
     CV* outsidecv = PL_compcv;
 
-
     if (PL_compcv) {
 	if ( ! ( flags & CVf_ANON ) ) {
 	    if ( CvFLAGS(PL_compcv) & CVf_ANON ) {
@@ -10423,7 +10421,10 @@ Perl_start_subparse(pTHX_ U32 flags)
 	outsidecv ? PADLIST_PADNAMES(CvPADLIST(outsidecv)) : NULL, 
 	outsidecv ? PADLIST_BASEPAD(CvPADLIST(outsidecv)) : NULL, 
 	PL_cop_seqmax);
-    PADOFFSET padoffset = pad_add_name("@_", NULL, FALSE);
+    if (flags & CVf_BLOCK)
+	pad_add_name("$_", NULL, FALSE);
+    else
+	pad_add_name("@_", NULL, FALSE);
     intro_my();
 
     return oldsavestack_ix;
