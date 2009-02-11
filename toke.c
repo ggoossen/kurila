@@ -3691,6 +3691,7 @@ Perl_yylex(pTHX)
 	    else
 		PL_lex_brackstack[PL_lex_brackets++] = XOPERATOR;
 	    force_next('{');
+	    pl_yylval.i_tkval.ival = OPpENTERSUB_BLOCK;
 	    TOKEN(ANONSUB);
 	case XOPERATOR:
 	    if (*s == '[') {
@@ -5653,6 +5654,7 @@ Perl_yylex(pTHX)
 			sv_setpvs(PL_subname, "__ANON__");
 		    else
 			sv_setpvs(PL_subname, "__ANON__::__ANON__");
+		    pl_yylval.i_tkval.ival = 0;
 		    TOKEN(ANONSUB);
 		}
 #ifndef PERL_MAD
@@ -10458,6 +10460,8 @@ Perl_start_subparse(pTHX_ U32 flags)
 	outsidecv ? PADLIST_PADNAMES(CvPADLIST(outsidecv)) : NULL, 
 	outsidecv ? PADLIST_BASEPAD(CvPADLIST(outsidecv)) : NULL, 
 	PL_cop_seqmax);
+    PADOFFSET padoffset = pad_add_name("@_", NULL, FALSE);
+    intro_my();
 
     return oldsavestack_ix;
 }

@@ -178,6 +178,7 @@ Deprecated.  Use C<GIMME_V> instead.
 #define OPpDEREF_HV		64	/*   Want ref to HV. */
 #define OPpDEREF_SV		(32|64)	/*   Want ref to SV. */
   /* OP_ENTERSUB only */
+#define OPpENTERSUB_BLOCK       2       /* Accepts only one arguments which is assigned to my $_ */
 #define OPpENTERSUB_DB		16	/* Debug subroutine. */
 #define OPpENTERSUB_HASTARG	32	/* Called from OP tree. */
 #define OPpENTERSUB_NOMOD	64	/* Immune to mod() for :attrlist. */

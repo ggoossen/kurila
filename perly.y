@@ -405,7 +405,7 @@ loop	:	label WHILE remember '(' texpr ')'
 
 /* determine whether there are any new my declarations */
 mintro	:	/* NULL */
-			{ $$ = (PL_min_intro_pending &&
+			{ $$ = (PL_min_intro_pending != -1 &&
 			    PL_max_intro_pending >=  PL_min_intro_pending);
 			  intro_my(); }
 
@@ -962,6 +962,7 @@ anonymous:
 	ANONSUB startanonsub proto block	%prec '('
 			{
                             $$ = newANONSUB($2, $3, scalar($4));
+                            $$->op_private = IVAL($1);
                             TOKEN_GETMAD($1,$$,'o');
                             OP_GETMAD($3,$$,'s');
 			}
