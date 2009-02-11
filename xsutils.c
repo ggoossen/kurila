@@ -90,13 +90,6 @@ usage:
     sv = SvRV(rv);
 
     switch (SvTYPE(sv)) {
-    case SVt_PVCV:
-	cvflags = CvFLAGS((CV*)sv);
-	if (cvflags & CVf_LOCKED)
-	    XPUSHs(newSVpvs_flags("locked", SVs_TEMP));
-	if (cvflags & CVf_METHOD)
-	    XPUSHs(newSVpvs_flags("method", SVs_TEMP));
-	break;
     case SVt_PVGV:
 	if (GvUNIQUE(sv))
 	    XPUSHs(newSVpvs_flags("unique", SVs_TEMP));

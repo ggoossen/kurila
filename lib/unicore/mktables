@@ -53,9 +53,9 @@ while ((nelems @ARGV))
         $MakeTestScript = 1;
     } elsif ($arg eq '-makelist') {
         $MakeList = 1;        
-    } elsif ($arg eq '-C' && defined ($UseDir = shift)) {
+    } elsif ($arg eq '-C' && defined ($UseDir = shift @ARGV)) {
 	-d $UseDir or die "Unknown directory '$UseDir'";
-    } elsif ($arg eq '-L' && defined ($FileList = shift)) {
+    } elsif ($arg eq '-L' && defined ($FileList = shift @ARGV)) {
         -e $FileList or die "Filelist '$FileList' doesn't appear to exist!";
     } else {
         die "usage: $^PROGRAM_NAME [-v|-q|-w|-C dir|-L filelist] [-maketest] [-makelist]\n",

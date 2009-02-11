@@ -1,13 +1,17 @@
 #!perl
 
 BEGIN {
+    require "./test.pl";
+}
+
+BEGIN {
     # We need '../../lib' as well as '../lib' because parts of Config are
     # delay-loaded, after we've chdir()'ed into $testdir.
     push $^INCLUDE_PATH, '../../lib';
     # XXX this could be further munged to enable some parts on other
     # platforms
-    unless ($^O =~ m/^MSWin/) {
-	print "1..0 # skipped: windows specific test\n";
+    unless ($^OS_NAME =~ m/^MSWin/) {
+	skip_all "windows specific test";
 	exit 0;
     }
 }

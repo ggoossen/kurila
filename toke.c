@@ -3565,41 +3565,6 @@ Perl_yylex(pTHX)
 		    SvREFCNT_dec(PL_lex_stuff.str_sv);
 		    PL_lex_stuff.str_sv = NULL;
 		}
-		else {
-		    if (len == 6 && strnEQ(SvPVX_mutable(sv), "unique", len)) {
-			sv_free(sv);
-			if (PL_in_my == KEY_our) {
-			    deprecate(":unique");
-			}
-			else
-			    Perl_croak(aTHX_ "The 'unique' attribute may only be applied to 'our' variables");
-		    }
-
-		    /* NOTE: any CV attrs applied here need to be part of
-		       the CVf_BUILTIN_ATTRS define in cv.h! */
-		    else if (!PL_in_my && len == 6 && strnEQ(SvPVX_mutable(sv), "locked", len)) {
-			sv_free(sv);
-			CvLOCKED_on(PL_compcv);
-		    }
-		    else if (!PL_in_my && len == 6 && strnEQ(SvPVX_mutable(sv), "method", len)) {
-			sv_free(sv);
-			CvMETHOD_on(PL_compcv);
-		    }
-		    /* After we've set the flags, it could be argued that
-		       we don't need to do the attributes.pm-based setting
-		       process, and shouldn't bother appending recognized
-		       flags.  To experiment with that, uncomment the
-		       following "else".  (Note that's already been
-		       uncommented.  That keeps the above-applied built-in
-		       attributes from being intercepted (and possibly
-		       rejected) by a package's attribute routines, but is
-		       justified by the performance win for the common case
-		       of applying only built-in attributes.) */
-		    else
-		        attrs = append_elem(OP_LIST, attrs,
-					    newSVOP(OP_CONST, 0,
-					      	    sv, S_curlocation(PL_bufptr)));
-		}
 		s = PEEKSPACE(d);
 		if (*s == ':' && s[1] != ':')
 		    s = PEEKSPACE(s+1);
@@ -4341,8 +4306,6 @@ Perl_yylex(pTHX)
 		{
 		    if (GvIMPORTED_CV(gv))
 			ogv = gv;
-		    else if (! CvMETHOD(cv))
-			hgv = gv;
 		}
 		if (!ogv &&
 		    (gvp = (GV**)hv_fetch(PL_globalstash,PL_tokenbuf,len,FALSE)) &&

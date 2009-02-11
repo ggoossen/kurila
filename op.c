@@ -3587,7 +3587,6 @@ Perl_newSUB(pTHX_ I32 floor, OP *proto, OP *block)
     cv = NULL;
 
     if (!block || !ps || *ps
-	|| (CvFLAGS(PL_compcv) & CVf_BUILTIN_ATTRS)
 #ifdef PERL_MAD
 	|| block->op_type == OP_NULL
 #endif
@@ -5187,6 +5186,8 @@ Perl_ck_shift(pTHX_ OP *o)
 
 	const PADOFFSET offset = pad_findmy("@_");
 	OP * const argop = newOP(OP_PADSV, 0, o->op_location);
+	if (offset == NOT_IN_PAD)
+	    Perl_croak_at(o->op_location, "shift requires lexical @_");
 	argop->op_targ = offset;
 
 #ifdef PERL_MAD
