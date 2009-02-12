@@ -5,7 +5,7 @@ our $VERSION = '6.44';
 use Config < qw(config_value config_keys);
 
 # Give us an overridable config.
-our %Config = %:<@+: map { @($_ => config_value($_)) }, config_keys();
+our %Config = %+: map { %: $_ => config_value($_) }, config_keys();
 
 sub import {
     my $caller = caller;
