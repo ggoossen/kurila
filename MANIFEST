@@ -2138,6 +2138,7 @@ t/lex/location.t		See if locations are correctly saved
 t/op/anon_array.t		See if @( ... ) work
 t/op/anon_hash.t		See if %( ... ) work
 t/op/aslice.t		See if [[...]] work
+t/op/hashjoin.t		See if %+: work
 t/lib/Cname.pm			Test charnames in regexes (op/pat.t)
 t/lib/common.pl			Helper for lib/{warnings,feature}.t
 t/lib/commonsense.t		See if configuration meets basic needs

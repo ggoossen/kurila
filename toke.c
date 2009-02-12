@@ -3425,17 +3425,22 @@ Perl_yylex(pTHX)
 	}
 
 	if (s[1] == '(') {
-	    /* anonymous hash constructor */
+	    /* anonymous hash constructor '%(' */
 	    s += 2;
 	    OPERATOR(ANONHSH);
 	}
 	if (s[1] == ':' && s[2] != ':') {
-	    /* hash constructor */
+	    /* hash constructor '%:' */
 	    s += 2;
 	    OPERATOR(ANONHSHL);
 	}
+	if (s[1] == '+' && s[2] == ':') {
+	    /* hashjoin '%+:' */
+	    s += 3;
+	    LOP(OP_HASHJOIN, XTERM);
+	}
 	if (s[1] == '<') {
-	    /* hash expand */
+	    /* hash expand '%<' */
 	    s += 2;
 	    OPERATOR(HASHEXPAND);
 	}

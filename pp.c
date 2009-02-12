@@ -4372,6 +4372,46 @@ PP(pp_arrayjoin)
     PUSHs(AvSv(newav));
     RETURN;
 }
+
+PP(pp_hashjoin)
+{
+    dVAR; dSP;
+    SV * const av = POPs;
+    SV ** ary;
+    SV ** end;
+    HV * newhv = hv_2mortal(newHV());
+
+    if ( ! SvAVOK(av) ) {
+	Perl_croak(aTHX_ "%s expected an ARRAY but got %s", OP_DESC(PL_op), Ddesc(av));
+    }
+
+    ary = AvARRAY(av);
+    end = ary + av_len(SvAv(av));
+    
+    if (ary) {
+	while (ary <= end) {
+	    register HV * tmp;
+	    register HE *entry;
+	    if ( ! SvHVOK(*ary) ) {
+		Perl_croak(aTHX_ "%s expected an ARRAY but got %s",
+		    OP_DESC(PL_op), Ddesc(*ary));
+	    }
+	    tmp = SvHv(*ary);
+	    (void)hv_iterinit(tmp);
+
+	    while ((entry = hv_iternext(tmp))) {
+		if ( ! hv_exists(newhv, HeKEY(entry), HeKLEN(entry)) ) {
+		    SV* val = newSVsv(HeVAL(entry));
+		    hv_store(newhv, HeKEY(entry), HeKLEN(entry), val, HeHASH(entry));
+		}
+	    }
+	    ary++;
+	}
+    }
+    PUSHs(HvSv(newhv));
+    RETURN;
+}
+
 PP(pp_split)
 {
     dVAR; dSP;
