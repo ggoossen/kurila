@@ -2171,14 +2171,11 @@ Perl_call_sv(pTHX_ SV *sv, VOL I32 flags)
 
     PERL_ARGS_ASSERT_CALL_SV;
 
+    assert( (flags & G_WANT) == G_SCALAR || (flags & G_DISCARD) );
     if (flags & G_DISCARD) {
 	ENTER;
 	SAVETMPS;
-    }
-    if (!(flags & G_WANT)) {
-	/* Backwards compatibility - as G_SCALAR was 0, it could be omitted.
-	 */
-	flags |= G_SCALAR;
+	flags |= G_VOID;
     }
 
     Zero(&myop, 1, LOGOP);
