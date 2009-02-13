@@ -341,7 +341,7 @@ These memory related ops are not included in :base_core because they
 can easily be used to implement a resource attack (e.g., consume all
 available memory).
 
-    concat repeat join range arrayjoin
+    concat repeat join range arrayjoin hashjoin arrayconcat hashconcat
 
     anonarray enter_anonarray_assign anonhash enter_anonhash_assign anonscalar
 
