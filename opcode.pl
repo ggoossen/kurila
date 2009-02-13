@@ -815,6 +815,7 @@ sort		sort			ck_sort		dm@	C? L
 reverse		reverse			ck_fun		t@	S
 arrayjoin	array join (@+:)	ck_fun		t@	S
 hashjoin	hash join (%+:)		ck_fun		t@	S
+hashconcat	hash concat (+%+)	ck_null		t@	S S
 
 grepstart	grep			ck_grep		dm@	C L
 grepwhile	grep iterator		ck_null		dt|	

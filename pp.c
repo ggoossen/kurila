@@ -4412,6 +4412,41 @@ PP(pp_hashjoin)
     RETURN;
 }
 
+PP(pp_hashconcat)
+{
+    dVAR; dSP;
+    dPOPTOPssrl;
+    SV * const av = POPs;
+    HV * newhv;
+    register HV *right_hv;
+    register HE *entry;
+
+    if ( ! SvHVOK(right) ) {
+	Perl_croak(aTHX_ "%s expected a HASH but got %s",
+	    OP_DESC(PL_op), Ddesc(right));
+    }
+    if ( ! SvHVOK(left) ) {
+	Perl_croak(aTHX_ "%s expected a HASH but got %s",
+	    OP_DESC(PL_op), Ddesc(left));
+    }
+
+    newhv = newSVsv(left);
+    right_hv = SvHv(right);
+
+    (void)hv_iterinit(right_hv);
+    
+    while ((entry = hv_iternext(right_hv))) {
+	if ( ! hv_exists(newhv, HeKEY(entry), HeKLEN(entry)) ) {
+	    SV* val = newSVsv(HeVAL(entry));
+	    hv_store(newhv, HeKEY(entry), HeKLEN(entry), val, HeHASH(entry));
+	}
+    }
+
+    PUSHs(HvSv(newhv));
+    RETURN;
+}
+
+
 PP(pp_split)
 {
     dVAR; dSP;

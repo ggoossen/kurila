@@ -191,6 +191,7 @@ EXTCONST char* const PL_op_name[] = {
 	"reverse",
 	"arrayjoin",
 	"hashjoin",
+	"hashconcat",
 	"grepstart",
 	"grepwhile",
 	"mapstart",
@@ -548,6 +549,7 @@ EXTCONST char* const PL_op_desc[] = {
 	"reverse",
 	"array join (@+:)",
 	"hash join (%+:)",
+	"hash concat (+%+)",
 	"grep",
 	"grep iterator",
 	"map",
@@ -917,6 +919,7 @@ EXT Perl_ppaddr_t PL_ppaddr[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_pp_reverse),
 	MEMBER_TO_FPTR(Perl_pp_arrayjoin),
 	MEMBER_TO_FPTR(Perl_pp_hashjoin),
+	MEMBER_TO_FPTR(Perl_pp_hashconcat),
 	MEMBER_TO_FPTR(Perl_pp_grepstart),
 	MEMBER_TO_FPTR(Perl_pp_grepwhile),
 	MEMBER_TO_FPTR(Perl_unimplemented_op),	/* Perl_pp_mapstart */
@@ -1283,6 +1286,7 @@ EXT Perl_check_t PL_check[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* reverse */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* arrayjoin */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* hashjoin */
+	MEMBER_TO_FPTR(Perl_ck_null),	/* hashconcat */
 	MEMBER_TO_FPTR(Perl_ck_grep),	/* grepstart */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* grepwhile */
 	MEMBER_TO_FPTR(Perl_ck_grep),	/* mapstart */
@@ -1643,6 +1647,7 @@ EXTCONST U32 PL_opargs[] = {
 	0x00002808,	/* reverse */
 	0x00002808,	/* arrayjoin */
 	0x00002808,	/* hashjoin */
+	0x00022808,	/* hashconcat */
 	0x0004a841,	/* grepstart */
 	0x00000648,	/* grepwhile */
 	0x0004a841,	/* mapstart */

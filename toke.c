@@ -3393,6 +3393,10 @@ Perl_yylex(pTHX)
 		else
 		    OPERATOR(PREINC);
 	    }
+	    if (*s == '%' && s[1] == '+') {
+		s += 2;
+		PWop(OP_HASHCONCAT);
+	    }
 	    if (PL_expect == XOPERATOR) {
 		Aop(OP_ADD);
 	    }
