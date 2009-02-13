@@ -1714,15 +1714,12 @@ static SV *scalar_call(
 	PUTBACK;
 
 	TRACEME(("calling..."));
-	count = perl_call_sv(hook, flags);		/* Go back to Perl code */
+	sv = perl_call_sv(hook, flags);		/* Go back to Perl code */
 	TRACEME(("count = %d", count));
 
 	SPAGAIN;
 
-	if (count) {
-		sv = POPs;
-		SvREFCNT_inc(sv);		/* We're returning it, must stay alive! */
-	}
+        SvREFCNT_inc(sv);		/* We're returning it, must stay alive! */
 
 	PUTBACK;
 	FREETMPS;
@@ -1758,13 +1755,9 @@ static AV *array_call(
 	XPUSHs(sv_2mortal(newSViv(cloning)));		/* Cloning flag */
 	PUTBACK;
 
-	count = perl_call_sv(hook, G_SCALAR);		/* Go back to Perl code */
+	av = SvREFCNT_inc( perl_call_sv(hook, G_SCALAR) );		/* Go back to Perl code */
 
 	SPAGAIN;
-
-        assert(count == 1);
-	av = SvREFCNT_inc(POPs);
-
 	PUTBACK;
 	FREETMPS;
 	LEAVE;
@@ -2442,11 +2435,8 @@ static int store_code(pTHX_ stcxt_t *cxt, CV *cv)
 	PUSHMARK(sp);
 	XPUSHs(sv_2mortal(newSVpvn("B::Deparse",10)));
 	PUTBACK;
-	count = call_method("new", G_SCALAR);
+	bdeparse = call_method("new", G_SCALAR);
 	SPAGAIN;
-	if (count != 1)
-		CROAK(("Unexpected return value from B::Deparse::new\n"));
-	bdeparse = POPs;
 
 	/*
 	 * call the coderef2text method
@@ -2456,12 +2446,8 @@ static int store_code(pTHX_ stcxt_t *cxt, CV *cv)
 	XPUSHs(bdeparse); /* XXX is this already mortal? */
 	XPUSHs(sv_2mortal(newRV_inc((SV*)cv)));
 	PUTBACK;
-	count = call_method("coderef2text", G_SCALAR);
+	text = call_method("coderef2text", G_SCALAR);
 	SPAGAIN;
-	if (count != 1)
-		CROAK(("Unexpected return value from B::Deparse::coderef2text\n"));
-
-	text = POPs;
 	len = SvCUR(text);
 	reallen = strlen(SvPV_nolen(text));
 
@@ -5114,11 +5100,8 @@ static SV *retrieve_code(pTHX_ stcxt_t *cxt, const char *cname)
 		PUSHMARK(sp);
 		XPUSHs(sv_2mortal(newSVsv(sub)));
 		PUTBACK;
-		count = call_sv(cxt->eval, G_SCALAR);
+		cv = call_sv(cxt->eval, G_SCALAR);
 		SPAGAIN;
-		if (count != 1)
-			CROAK(("Unexpected return value from $Storable::Eval callback\n"));
-		cv = POPs;
 		if (SvTRUE(errsv)) {
 			CROAK(("code %s caused an error: %s",
 				SvPV_nolen(sub), SvPV_nolen(errsv)));

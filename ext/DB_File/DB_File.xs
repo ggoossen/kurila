@@ -588,16 +588,9 @@ const DBT * key2 ;
     PUSHs(sv_2mortal(newSVpvn((const char*)data2,key2->size)));
     PUTBACK ;
 
-    count = perl_call_sv(CurrentDB->compare, G_SCALAR); 
+    retval = SvIV( perl_call_sv(CurrentDB->compare, G_SCALAR) ); 
 
     SPAGAIN ;
-
-    if (count != 1){
-        tidyUp(CurrentDB);
-        croak ("DB_File btree_compare: expected 1 return value from compare sub, got %d\n", count) ;
-    }
-
-    retval = POPi ;
 
     PUTBACK ;
     FREETMPS ;
@@ -672,16 +665,9 @@ const DBT * key2 ;
     PUSHs(sv_2mortal(newSVpvn(data2,key2->size)));
     PUTBACK ;
 
-    count = perl_call_sv(CurrentDB->prefix, G_SCALAR); 
+    retval = SvIV( perl_call_sv(CurrentDB->prefix, G_SCALAR) ); 
 
     SPAGAIN ;
-
-    if (count != 1){
-        tidyUp(CurrentDB);
-        croak ("DB_File btree_prefix: expected 1 return value from prefix sub, got %d\n", count) ;
-    }
- 
-    retval = POPi ;
  
     PUTBACK ;
     FREETMPS ;
@@ -753,16 +739,9 @@ HASH_CB_SIZE_TYPE size ;
     XPUSHs(sv_2mortal(newSVpvn((char*)data,size)));
     PUTBACK ;
 
-    count = perl_call_sv(CurrentDB->hash, G_SCALAR); 
+    retval = SvIV( perl_call_sv(CurrentDB->hash, G_SCALAR) );
 
     SPAGAIN ;
-
-    if (count != 1){
-        tidyUp(CurrentDB);
-        croak ("DB_File hash_cb: expected 1 return value from hash sub, got %d\n", count) ;
-    }
-
-    retval = POPi ;
 
     PUTBACK ;
     FREETMPS ;

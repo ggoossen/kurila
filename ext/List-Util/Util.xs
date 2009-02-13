@@ -180,9 +180,8 @@ CODE:
         PUSHMARK(SP);
         XPUSHs(args[index]);
         PUTBACK;
-        call_sv(block, G_SCALAR);
+        res = SvTRUE( call_sv(block, G_SCALAR) );
         SPAGAIN;
-        res = SvTRUE(POPs);
         PUTBACK;
         FREETMPS;
         LEAVE;

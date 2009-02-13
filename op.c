@@ -4707,7 +4707,6 @@ Perl_ck_grep(pTHX_ OP *o)
     LOGOP *gwop = NULL;
     OP* entersubop;
     OP *kid;
-    OP **tokid;
     const OPCODE type = o->op_type == OP_GREPSTART ? OP_GREPWHILE : OP_MAPWHILE;
     PADOFFSET offset;
 
@@ -4884,10 +4883,9 @@ Perl_ck_compsub(pTHX_ OP *o)
     }
     PUTBACK;
 
-    call_sv(cSVOPx_sv(first), G_SCALAR);
+    sv = call_sv(cSVOPx_sv(first), G_SCALAR);
 
     SPAGAIN;
-    sv = POPs;
     newop = INT2PTR(OP*, SvIV(SvRV(sv)));
 
     if (!newop)

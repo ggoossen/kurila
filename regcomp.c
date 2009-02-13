@@ -6236,7 +6236,6 @@ S_reg_namedseq(pTHX_ RExC_state_t *pRExC_state, UV *valuep)
             NULL;
         SV *cv= cvp ? *cvp : NULL;
         HE *he_str;
-        int count;
         /* create an SV with the name as argument */
         sv_name = newSVpvn(name, endbrace - name);
         
@@ -6273,12 +6272,8 @@ S_reg_namedseq(pTHX_ RExC_state_t *pRExC_state, UV *valuep)
             
             PUTBACK ;
             
-            count= call_sv(cv, G_SCALAR);
-            
-            if (count == 1) { /* XXXX is this right? dmq */
-                sv_str = POPs;
-                SvREFCNT_inc_simple_void(sv_str);
-            } 
+            sv_str = call_sv(cv, G_SCALAR);
+	    SvREFCNT_inc_simple_void(sv_str);
             
             SPAGAIN ;
             PUTBACK ;

@@ -2085,7 +2085,7 @@ Performs a callback to the specified Perl sub.  See L<perlcall>.
 =cut
 */
 
-I32
+SV*
 Perl_call_argv(pTHX_ const char *sub_name, I32 flags, register char **argv)
 
           		/* See G_* flags in cop.h */
@@ -2115,7 +2115,7 @@ Performs a callback to the specified Perl sub.  See L<perlcall>.
 =cut
 */
 
-I32
+SV*
 Perl_call_pv(pTHX_ const char *sub_name, I32 flags)
               		/* name of the subroutine */
           		/* See G_* flags in cop.h */
@@ -2134,7 +2134,7 @@ be on the stack.  See L<perlcall>.
 =cut
 */
 
-I32
+SV*
 Perl_call_method(pTHX_ const char *methname, I32 flags)
                		/* name of the subroutine */
           		/* See G_* flags in cop.h */
@@ -2154,7 +2154,7 @@ L<perlcall>.
 =cut
 */
 
-I32
+SV*
 Perl_call_sv(pTHX_ SV *sv, VOL I32 flags)
           		/* See G_* flags in cop.h */
 {
@@ -2162,7 +2162,7 @@ Perl_call_sv(pTHX_ SV *sv, VOL I32 flags)
     LOGOP myop;		/* fake syntax tree node */
     UNOP method_op;
     I32 oldmark;
-    VOL I32 retval = 0;
+    VOL SV* retval = &PL_sv_undef;
     I32 oldscope;
     bool oldcatch = CATCH_GET;
     int ret;
@@ -2213,7 +2213,9 @@ Perl_call_sv(pTHX_ SV *sv, VOL I32 flags)
     if (!(flags & G_EVAL)) {
 	CATCH_SET(TRUE);
 	CALL_BODY_SUB((OP*)&myop);
-	retval = PL_stack_sp - (PL_stack_base + oldmark);
+	if (PL_stack_sp - (PL_stack_base + oldmark) == 1)
+	    retval = *PL_stack_sp--;
+	assert(PL_stack_sp == (PL_stack_base + oldmark));
 	CATCH_SET(oldcatch);
     }
     else {
@@ -2228,7 +2230,9 @@ Perl_call_sv(pTHX_ SV *sv, VOL I32 flags)
 	case 0:
  redo_body:
 	    CALL_BODY_SUB((OP*)&myop);
-	    retval = PL_stack_sp - (PL_stack_base + oldmark);
+	    if (PL_stack_sp - (PL_stack_base + oldmark) == 1)
+		retval = *PL_stack_sp--;
+	    assert(PL_stack_sp == (PL_stack_base + oldmark));
 	    if (!(flags & G_KEEPERR))
 		sv_setpvn(ERRSV,"",0);
 	    break;
@@ -2250,12 +2254,6 @@ Perl_call_sv(pTHX_ SV *sv, VOL I32 flags)
 		goto redo_body;
 	    }
 	    PL_stack_sp = PL_stack_base + oldmark;
-	    if ((flags & G_WANT) == G_ARRAY)
-		retval = 0;
-	    else {
-		retval = 1;
-		*++PL_stack_sp = &PL_sv_undef;
-	    }
 	    break;
 	}
 
@@ -2265,13 +2263,13 @@ Perl_call_sv(pTHX_ SV *sv, VOL I32 flags)
     }
 
     if (flags & G_DISCARD) {
-	PL_stack_sp = PL_stack_base + oldmark;
-	retval = 0;
+	assert(PL_stack_sp == PL_stack_base + oldmark);
+	retval = NULL;
 	FREETMPS;
 	LEAVE;
     }
     PL_op = oldop;
-    return retval;
+    return (SV*)retval;
 }
 
 /* Eval a string. The G_EVAL flag is always assumed. */
@@ -4496,7 +4494,7 @@ Perl_call_list(pTHX_ I32 oldscope, AV *paramList)
 		SV *old_diehook = PL_diehook;
 		PL_diehook = PERL_DIEHOOK_IGNORE;
 		PUSHMARK(PL_stack_sp);
-		call_sv((SV*)(cv), G_EVAL|G_DISCARD|G_VOID);
+		call_sv((SV*)(cv), G_EVAL|G_DISCARD);
 		PL_diehook = old_diehook;
 	    }
 #ifdef PERL_MAD

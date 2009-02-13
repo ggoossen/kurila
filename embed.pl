@@ -418,7 +418,7 @@ END
 # by tracking state and merging foo and bar into one block.
 my $ifdef_state = '';
 
-walk_table {
+walk_table sub {
     my $ret = "";
     my $new_ifdef_state = '';
     if ((nelems @_) == 1) {
@@ -486,7 +486,7 @@ print $em, <<'END';
 END
 
 $ifdef_state = '';
-walk_table {
+walk_table sub {
     my $ret = "";
     my $new_ifdef_state = '';
     if ((nelems @_) == 1) {

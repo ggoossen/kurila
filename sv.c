@@ -8474,10 +8474,8 @@ Perl_sv_recode_to_utf8(pTHX_ SV *sv, SV *encoding)
 	XPUSHs(&PL_sv_yes);
 */
 	PUTBACK;
-	call_method("decode", G_SCALAR);
+	uni = call_method("decode", G_SCALAR);
 	SPAGAIN;
-	uni = POPs;
-	PUTBACK;
 	s = SvPV_const(uni, len);
 	if (s != SvPVX_const(sv)) {
 	    SvGROW(sv, len + 1);

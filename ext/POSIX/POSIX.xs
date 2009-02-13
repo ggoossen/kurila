@@ -1298,9 +1298,8 @@ sigaction(sig, optaction, oldaction = 0)
             PUSHMARK(SP);
             mXPUSHs(newSVpv(PL_sig_name[sig], 0));
             PUTBACK;
-            call_pv("signals::handler", G_SCALAR);
+            sigsv = call_pv("signals::handler", G_SCALAR);
             SPAGAIN;
-            sigsv = POPs;
             LEAVE;
 
 	    /* Check optaction and set action */

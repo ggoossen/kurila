@@ -1853,7 +1853,9 @@
 #define pp_anoncode		Perl_pp_anoncode
 #define pp_anonhash		Perl_pp_anonhash
 #define pp_anonscalar		Perl_pp_anonscalar
+#define pp_arrayconcat		Perl_pp_arrayconcat
 #define pp_arrayexpand		Perl_pp_arrayexpand
+#define pp_arrayjoin		Perl_pp_arrayjoin
 #define pp_aslice		Perl_pp_aslice
 #define pp_atan2		Perl_pp_atan2
 #define pp_backtick		Perl_pp_backtick
@@ -1890,7 +1892,6 @@
 #define pp_dor			Perl_pp_dor
 #define pp_dorassign		Perl_pp_dorassign
 #define pp_dotdotdot		Perl_pp_dotdotdot
-#define pp_dump			Perl_pp_dump
 #define pp_dynascope		Perl_pp_dynascope
 #define pp_each			Perl_pp_each
 #define pp_egrent		Perl_pp_egrent
@@ -1969,7 +1970,6 @@
 #define pp_gnbyaddr		Perl_pp_gnbyaddr
 #define pp_gnbyname		Perl_pp_gnbyname
 #define pp_gnetent		Perl_pp_gnetent
-#define pp_goto			Perl_pp_goto
 #define pp_gpbyname		Perl_pp_gpbyname
 #define pp_gpbynumber		Perl_pp_gpbynumber
 #define pp_gprotoent		Perl_pp_gprotoent
@@ -1985,7 +1985,9 @@
 #define pp_gt			Perl_pp_gt
 #define pp_gv			Perl_pp_gv
 #define pp_gvsv			Perl_pp_gvsv
+#define pp_hashconcat		Perl_pp_hashconcat
 #define pp_hashexpand		Perl_pp_hashexpand
+#define pp_hashjoin		Perl_pp_hashjoin
 #define pp_helem		Perl_pp_helem
 #define pp_hex			Perl_pp_hex
 #define pp_hintseval		Perl_pp_hintseval
@@ -4004,7 +4006,9 @@
 #define pp_anoncode()		Perl_pp_anoncode(aTHX)
 #define pp_anonhash()		Perl_pp_anonhash(aTHX)
 #define pp_anonscalar()		Perl_pp_anonscalar(aTHX)
+#define pp_arrayconcat()	Perl_pp_arrayconcat(aTHX)
 #define pp_arrayexpand()	Perl_pp_arrayexpand(aTHX)
+#define pp_arrayjoin()		Perl_pp_arrayjoin(aTHX)
 #define pp_aslice()		Perl_pp_aslice(aTHX)
 #define pp_atan2()		Perl_pp_atan2(aTHX)
 #define pp_backtick()		Perl_pp_backtick(aTHX)
@@ -4041,7 +4045,6 @@
 #define pp_dor()		Perl_pp_dor(aTHX)
 #define pp_dorassign()		Perl_pp_dorassign(aTHX)
 #define pp_dotdotdot()		Perl_pp_dotdotdot(aTHX)
-#define pp_dump()		Perl_pp_dump(aTHX)
 #define pp_dynascope()		Perl_pp_dynascope(aTHX)
 #define pp_each()		Perl_pp_each(aTHX)
 #define pp_egrent()		Perl_pp_egrent(aTHX)
@@ -4120,7 +4123,6 @@
 #define pp_gnbyaddr()		Perl_pp_gnbyaddr(aTHX)
 #define pp_gnbyname()		Perl_pp_gnbyname(aTHX)
 #define pp_gnetent()		Perl_pp_gnetent(aTHX)
-#define pp_goto()		Perl_pp_goto(aTHX)
 #define pp_gpbyname()		Perl_pp_gpbyname(aTHX)
 #define pp_gpbynumber()		Perl_pp_gpbynumber(aTHX)
 #define pp_gprotoent()		Perl_pp_gprotoent(aTHX)
@@ -4136,7 +4138,9 @@
 #define pp_gt()			Perl_pp_gt(aTHX)
 #define pp_gv()			Perl_pp_gv(aTHX)
 #define pp_gvsv()		Perl_pp_gvsv(aTHX)
+#define pp_hashconcat()		Perl_pp_hashconcat(aTHX)
 #define pp_hashexpand()		Perl_pp_hashexpand(aTHX)
+#define pp_hashjoin()		Perl_pp_hashjoin(aTHX)
 #define pp_helem()		Perl_pp_helem(aTHX)
 #define pp_hex()		Perl_pp_hex(aTHX)
 #define pp_hintseval()		Perl_pp_hintseval(aTHX)

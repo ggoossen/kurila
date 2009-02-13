@@ -167,10 +167,8 @@ Perl_sv_does(pTHX_ SV *sv, const char *const name)
      * can figure out we're calling DOES() and not isa(),
      * and report eventual errors correctly. --rgs */
     SvSCREAM_on(methodname);
-    call_sv(methodname, G_SCALAR | G_METHOD);
+    does_it = SvTRUE( call_sv(methodname, G_SCALAR | G_METHOD) );
     SPAGAIN;
-
-    does_it = SvTRUE( TOPs );
     FREETMPS;
     LEAVE;
 

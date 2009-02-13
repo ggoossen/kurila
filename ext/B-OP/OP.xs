@@ -406,11 +406,13 @@ walkoptree(pTHX_ SV *opsv, const char *method)
 	XPUSHs(opsv);
 	PUTBACK;
 	perl_call_method("walkoptree_debug", G_DISCARD);
+        SPAGAIN;
     }
     PUSHMARK(sp);
     XPUSHs(opsv);
     PUTBACK;
     perl_call_method(method, G_DISCARD);
+    SPAGAIN;
     if (o && (o->op_flags & OPf_KIDS)) {
 	for (kid = ((UNOP*)o)->op_first; kid; kid = kid->op_sibling) {
 	    /* Use the same opsv. Rely on methods not to mess it up. */

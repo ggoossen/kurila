@@ -9220,7 +9220,7 @@ S_new_constant(pTHX_ const char *s, STRLEN len, const char *key, STRLEN keylen,
     if (pv)
  	PUSHs(typesv);
     PUTBACK;
-    call_sv(cv, G_SCALAR | ( PL_in_eval ? 0 : G_EVAL));
+    res = call_sv(cv, G_SCALAR | ( PL_in_eval ? 0 : G_EVAL));
 
     SPAGAIN ;
 
@@ -9228,11 +9228,9 @@ S_new_constant(pTHX_ const char *s, STRLEN len, const char *key, STRLEN keylen,
     if (!PL_in_eval && SvTRUE(ERRSV)) {
  	sv_catpvs(ERRSV, "Propagated");
 	yyerror(SvPV_nolen_const(ERRSV)); /* Duplicates the message inside eval */
-	(void)POPs;
 	res = SvREFCNT_inc_simple(sv);
     }
     else {
- 	res = POPs;
 	SvREFCNT_inc_simple_void(res);
     }
 

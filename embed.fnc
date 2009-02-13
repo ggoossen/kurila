@@ -609,10 +609,10 @@ Ap	|void	|reentrant_free
 Anp	|void*	|reentrant_retry|NN const char *f|...
 #endif
 Ap	|void	|call_atexit	|ATEXIT_t fn|NULLOK void *ptr
-Apd	|I32	|call_argv	|NN const char* sub_name|I32 flags|NN char** argv
-Apd	|I32	|call_method	|NN const char* methname|I32 flags
-Apd	|I32	|call_pv	|NN const char* sub_name|I32 flags
-Apd	|I32	|call_sv	|NN SV* sv|VOL I32 flags
+Apd	|SV*	|call_argv	|NN const char* sub_name|I32 flags|NN char** argv
+Apd	|SV*	|call_method	|NN const char* methname|I32 flags
+Apd	|SV*	|call_pv	|NN const char* sub_name|I32 flags
+Apd	|SV*	|call_sv	|NN SV* sv|VOL I32 flags
 Ap	|void	|despatch_signals
 Ap	|OP *	|doref		|NN OP *o|I32 type|bool set_op_ref
 Apd	|SV*	|eval_pv	|NN const char* p|I32 croak_on_error

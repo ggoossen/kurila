@@ -246,17 +246,15 @@ XS(XS_error_message)
     PUSHMARK(SP);
     PUSHs(error);
     PUTBACK;
-    call_method("description", G_SCALAR);
+    msg = call_method("description", G_SCALAR);
     SPAGAIN;
-    msg = POPs;
     LEAVE;
     ENTER;
     PUSHMARK(SP);
     XPUSHs(error);
     PUTBACK;
-    call_method("stacktrace", G_SCALAR);
+    sv_catsv(msg, call_method("stacktrace", G_SCALAR) );
     SPAGAIN;
-    sv_catsv(msg, POPs);
     LEAVE;
     XPUSHs(msg);
     XSRETURN(1);
@@ -347,9 +345,8 @@ XS(XS_error_write_to_stderr) {
     PUSHs(ST(0));
     PUTBACK;
 
-    call_method("message", G_SCALAR);
+    tmpsv = call_method("message", G_SCALAR);
     SPAGAIN;
-    tmpsv = POPs;
     message = SvPV_const(tmpsv, msglen);
 
     LEAVE;

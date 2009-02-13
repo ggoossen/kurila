@@ -1409,9 +1409,8 @@ S_doeval(pTHX_ int gimme, OP** startop, CV* outside, U32 seq)
 	    XPUSHs(ERRSV);
 	    XPUSHs(PL_op->op_location);
 	    PUTBACK;
-	    call_sv(PL_errorcreatehook, G_SCALAR);
+	    sv_setsv(ERRSV, call_sv(PL_errorcreatehook, G_SCALAR));
 	    SPAGAIN;
-	    sv_setsv(ERRSV, POPs);
 	    PUTBACK;
 
 	    POPSTACK;
@@ -1614,9 +1613,9 @@ PP(pp_require)
 		SV * const dirsv = *av_fetch(ar, i, TRUE);
 
 		if (SvROK(dirsv)) {
-		    int count;
 		    SV **svp;
 		    SV *loader = dirsv;
+		    SV *arg;
 
 		    if (SvTYPE(SvRV(loader)) == SVt_PVAV
 			&& !sv_isobject(loader))
@@ -1638,9 +1637,9 @@ PP(pp_require)
 		    PUSHs(sv);
 		    PUTBACK;
 		    if (sv_isobject(loader))
-			count = call_method("INC", G_ARRAY);
+			arg = call_method("INC", G_SCALAR);
 		    else
-			count = call_sv(loader, G_ARRAY);
+			arg = call_sv(loader, G_SCALAR);
 		    SPAGAIN;
 
 		    /* Adjust file name if the hook has set an $^INCLUDED entry */
@@ -1648,64 +1647,42 @@ PP(pp_require)
 		    if (svp)
 			tryname = SvPVX_const(*svp);
 
-		    if (count > 0) {
-			int i = 0;
-			SV *arg;
-
-			SP -= count - 1;
-			arg = SP[i++];
-
-			if (SvROK(arg) && (SvTYPE(SvRV(arg)) <= SVt_PVLV)
-			    && !isGV_with_GP(SvRV(arg))) {
-			    filter_cache = SvRV(arg);
-			    SvREFCNT_inc_simple_void_NN(filter_cache);
-
-			    if (i < count) {
-				arg = SP[i++];
-			    }
-			}
-
-			if (SvROK(arg) && SvTYPE(SvRV(arg)) == SVt_PVGV) {
-			    arg = SvRV(arg);
-			}
-
-			if (SvTYPE(arg) == SVt_PVGV) {
-			    IO * const io = GvIO((GV *)arg);
-
-			    ++filter_has_file;
-
-			    if (io) {
-				tryrsfp = IoIFP(io);
-				if (IoOFP(io) && IoOFP(io) != IoIFP(io)) {
-				    PerlIO_close(IoOFP(io));
-				}
-				IoIFP(io) = NULL;
-				IoOFP(io) = NULL;
-			    }
-
-			    if (i < count) {
-				arg = SP[i++];
-			    }
-			}
-
-			if (SvROK(arg) && SvTYPE(SvRV(arg)) == SVt_PVCV) {
-			    filter_sub = arg;
-			    SvREFCNT_inc_simple_void_NN(filter_sub);
-
-			    if (i < count) {
-				filter_state = SP[i];
-				SvREFCNT_inc_simple_void(filter_state);
-			    }
-			}
-
-			if (!tryrsfp && (filter_cache || filter_sub)) {
-			    tryrsfp = PerlIO_open(BIT_BUCKET,
-						  PERL_SCRIPT_MODE);
-			}
-			SP--;
+		    if (SvROK(arg) && (SvTYPE(SvRV(arg)) <= SVt_PVLV)
+			&& !isGV_with_GP(SvRV(arg))) {
+			filter_cache = SvRV(arg);
+			SvREFCNT_inc_simple_void_NN(filter_cache);
 		    }
 
-		    PUTBACK;
+		    if (SvROK(arg) && SvTYPE(SvRV(arg)) == SVt_PVGV) {
+			arg = SvRV(arg);
+		    }
+
+		    if (SvTYPE(arg) == SVt_PVGV) {
+			IO * const io = GvIO((GV *)arg);
+
+			++filter_has_file;
+
+			if (io) {
+			    tryrsfp = IoIFP(io);
+			    if (IoOFP(io) && IoOFP(io) != IoIFP(io)) {
+				PerlIO_close(IoOFP(io));
+			    }
+			    IoIFP(io) = NULL;
+			    IoOFP(io) = NULL;
+			}
+
+		    }
+
+		    if (SvROK(arg) && SvTYPE(SvRV(arg)) == SVt_PVCV) {
+			filter_sub = arg;
+			SvREFCNT_inc_simple_void_NN(filter_sub);
+		    }
+
+		    if (!tryrsfp && (filter_cache || filter_sub)) {
+			tryrsfp = PerlIO_open(BIT_BUCKET,
+			    PERL_SCRIPT_MODE);
+		    }
+
 		    FREETMPS;
 		    LEAVE;
 
@@ -2172,7 +2149,7 @@ S_run_user_filter(pTHX_ int idx, SV *buf_sv, int maxlen)
 
     if (filter_sub && status >= 0) {
 	dSP;
-	int count;
+	SV* out;
 
 	ENTER;
 	SAVE_DEFSV;
@@ -2186,14 +2163,11 @@ S_run_user_filter(pTHX_ int idx, SV *buf_sv, int maxlen)
 	    PUSHs(filter_state);
 	}
 	PUTBACK;
-	count = call_sv(filter_sub, G_SCALAR);
+	out = call_sv(filter_sub, G_SCALAR);
 	SPAGAIN;
 
-	if (count > 0) {
-	    SV *out = POPs;
-	    if (SvOK(out)) {
-		status = SvIV(out);
-	    }
+	if (SvOK(out)) {
+	    status = SvIV(out);
 	}
 
 	PUTBACK;

@@ -1292,9 +1292,8 @@ S_vdie_croak_common(pTHX_ SV* location, const char* pat, va_list* args)
 	    XPUSHs(location);
 
 	    PUTBACK;
-	    call_sv(PL_errorcreatehook, G_SCALAR);
+	    msv = call_sv(PL_errorcreatehook, G_SCALAR);
 	    SPAGAIN;
-	    msv = TOPs;
 	    PUTBACK;
 	    POPSTACK;
 	    LEAVE;
@@ -1436,9 +1435,8 @@ Perl_vwarn_at(pTHX_ SV* location, const char* pat, va_list *args)
 	    XPUSHs(location);
 
 	    PUTBACK;
-	    call_sv(PL_errorcreatehook, G_SCALAR);
+	    msv = call_sv(PL_errorcreatehook, G_SCALAR);
 	    SPAGAIN;
-	    msv = POPs;
 	    PUTBACK;
 	    POPSTACK;
 	    LEAVE;

@@ -1687,10 +1687,8 @@ Perl_swash_init(pTHX_ const char* pkg, const char* name, SV *listsv, I32 minbits
     mPUSHi(none);
     PUTBACK;
     errsv_save = newSVsv(ERRSV);
-    if (call_method("SWASHNEW", G_SCALAR))
-	retval = newSVsv(*PL_stack_sp--);
-    else
-	retval = &PL_sv_undef;
+    retval = newSVsv( call_method("SWASHNEW", G_SCALAR) );
+    SPAGAIN;
     if (!SvTRUE(ERRSV))
 	sv_setsv(ERRSV, errsv_save);
     SvREFCNT_dec(errsv_save);
@@ -1726,7 +1724,7 @@ UV
 Perl_swash_fetch(pTHX_ SV *swash, const char *ptr, bool do_utf8)
 {
     dVAR;
-    HV* const hv = (HV*)SvRV(swash);
+    HV* const hv = SvHv(SvRV(swash));
     U32 klen;
     U32 off;
     STRLEN slen;
