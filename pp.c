@@ -4412,12 +4412,40 @@ PP(pp_hashjoin)
     RETURN;
 }
 
+PP(pp_arrayconcat)
+{
+    dVAR; dSP;
+    dTARGET;
+    dPOPTOPssrl;
+    SV ** ary;
+    I32 i;
+    I32 len;
+
+    if ( ! SvAVOK(right) ) {
+	Perl_croak(aTHX_ "%s expected an ARRAY but got %s",
+	    OP_DESC(PL_op), Ddesc(right));
+    }
+    if ( ! SvAVOK(left) ) {
+	Perl_croak(aTHX_ "%s expected an ARRAY but got %s",
+	    OP_DESC(PL_op), Ddesc(left));
+    }
+
+    sv_setsv(TARG, left);
+    
+    ary = AvARRAY(SvAv(right));
+    len = av_len(SvAv(right));
+    for (i=0; i<=len; i++)
+	av_push(SvAv(TARG), newSVsv(ary[i])); 
+
+    SETTARG;
+    RETURN;
+}
+
 PP(pp_hashconcat)
 {
     dVAR; dSP;
+    dTARGET;
     dPOPTOPssrl;
-    SV * const av = POPs;
-    HV * newhv;
     register HV *right_hv;
     register HE *entry;
 
@@ -4430,19 +4458,19 @@ PP(pp_hashconcat)
 	    OP_DESC(PL_op), Ddesc(left));
     }
 
-    newhv = newSVsv(left);
+    sv_setsv(TARG, left);
     right_hv = SvHv(right);
 
     (void)hv_iterinit(right_hv);
     
     while ((entry = hv_iternext(right_hv))) {
-	if ( ! hv_exists(newhv, HeKEY(entry), HeKLEN(entry)) ) {
+	if ( ! hv_exists(SvHv(TARG), HeKEY(entry), HeKLEN(entry)) ) {
 	    SV* val = newSVsv(HeVAL(entry));
-	    hv_store(newhv, HeKEY(entry), HeKLEN(entry), val, HeHASH(entry));
+	    hv_store(SvHv(TARG), HeKEY(entry), HeKLEN(entry), val, HeHASH(entry));
 	}
     }
 
-    PUSHs(HvSv(newhv));
+    SETTARG;
     RETURN;
 }
 

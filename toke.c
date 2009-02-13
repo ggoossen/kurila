@@ -3397,6 +3397,10 @@ Perl_yylex(pTHX)
 		s += 2;
 		PWop(OP_HASHCONCAT);
 	    }
+	    if (*s == '@' && s[1] == '+') {
+		s += 2;
+		PWop(OP_ARRAYCONCAT);
+	    }
 	    if (PL_expect == XOPERATOR) {
 		Aop(OP_ADD);
 	    }
