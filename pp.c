@@ -4400,10 +4400,8 @@ PP(pp_hashjoin)
 	    (void)hv_iterinit(tmp);
 
 	    while ((entry = hv_iternext(tmp))) {
-		if ( ! hv_exists(newhv, HeKEY(entry), HeKLEN(entry)) ) {
-		    SV* val = newSVsv(HeVAL(entry));
-		    hv_store(newhv, HeKEY(entry), HeKLEN(entry), val, HeHASH(entry));
-		}
+		SV* val = newSVsv(HeVAL(entry));
+		hv_store(newhv, HeKEY(entry), HeKLEN(entry), val, HeHASH(entry));
 	    }
 	    ary++;
 	}
@@ -4464,10 +4462,8 @@ PP(pp_hashconcat)
     (void)hv_iterinit(right_hv);
     
     while ((entry = hv_iternext(right_hv))) {
-	if ( ! hv_exists(SvHv(TARG), HeKEY(entry), HeKLEN(entry)) ) {
-	    SV* val = newSVsv(HeVAL(entry));
-	    hv_store(SvHv(TARG), HeKEY(entry), HeKLEN(entry), val, HeHASH(entry));
-	}
+	SV* val = newSVsv(HeVAL(entry));
+	hv_store(SvHv(TARG), HeKEY(entry), HeKLEN(entry), val, HeHASH(entry));
     }
 
     SETTARG;

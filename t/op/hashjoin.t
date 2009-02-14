@@ -13,5 +13,5 @@ is( dump::view(%+: @: ),
     dump::view(%:),
     "on empty list" );
 is( dump::view(%+: @: (%: key => "value1" ), (%: key => "value2" ) ),
-    dump::view(%: key => "value1"),
+    dump::view(%: key => "value2"),
     "duplicate keys" );
