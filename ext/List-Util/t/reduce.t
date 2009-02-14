@@ -105,13 +105,3 @@ SKIP: do {
     $v = reduce \&mult, < 1..6;
     is(&Internals::SvREFCNT(\&mult), $refcnt, "Refcount unchanged");
 };
-
-# The remainder of the tests are only relevant for the XS
-# implementation. The Perl-only implementation behaves differently
-# (and more flexibly) in a way that we can't emulate from XS.
-if (!$::PERL_ONLY) { SKIP: do {
-
-    $List::Util::REAL_MULTICALL ||= 0; # Avoid use only once
-    skip("Poor man's MULTICALL can't cope", 2)
-      if !$List::Util::REAL_MULTICALL;
-}; }

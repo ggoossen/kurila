@@ -2,7 +2,7 @@
 
 use List::Util < qw(first);
 use Test::More;
-plan tests => ($::PERL_ONLY ?? 12 !! 14);
+plan tests => 13;
 my $v;
 
 ok(defined &first,	'defined');
@@ -54,21 +54,6 @@ sub self_updating { local $^WARNING; *self_updating = sub{1} ;1}
 try { $v = first \&self_updating, 1,2; };
 is($^EVAL_ERROR, '', 'redefine self');
 
-do { my $failed = 0;
-
-    sub rec {
-        my $n = shift;
-        if (!defined($n)) {  # No arg means we're being called by first()
-            return 1; }
-        if ($n+<5) { rec($n+1); }
-        else { $v = first \&rec, 1,2; }
-        $failed = 1 if !defined $n;
-    }
-
-    rec(1);
-    ok(!$failed, 'from active sub');
-};
-
 # Calling a sub from first should leave its refcount unchanged.
 SKIP: do {
     skip("No Internals::SvREFCNT", 1) if !defined &Internals::SvREFCNT;
@@ -77,13 +62,3 @@ SKIP: do {
     $v = first \&huge, < 1..6;
     is(&Internals::SvREFCNT(\&huge), $refcnt, "Refcount unchanged");
 };
-
-# The remainder of the tests are only relevant for the XS
-# implementation. The Perl-only implementation behaves differently
-# (and more flexibly) in a way that we can't emulate from XS.
-if (!$::PERL_ONLY) { SKIP: do {
-
-    $List::Util::REAL_MULTICALL ||= 0; # Avoid use only once
-    skip("Poor man's MULTICALL can't cope", 2)
-      if !$List::Util::REAL_MULTICALL;
-}; }
