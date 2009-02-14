@@ -491,7 +491,7 @@ struct context {
 #define CxFOREACHDEF(c)	((CxTYPE_is_LOOP(c) && CxTYPE(c) != CXt_LOOP_PLAIN) \
 			 && ((c)->cx_type & CXp_FOR_DEF))
 
-#define CXINC (cxstack_ix < cxstack_max ? ++cxstack_ix : (cxstack_ix = cxinc()))
+#define CXINC (cxstack_ix < cxstack_max ? ++cxstack_ix : (cxstack_ix = Perl_cxinc(aTHX)))
 
 /* 
 =head1 "Gimme" Values
