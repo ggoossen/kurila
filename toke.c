@@ -5768,6 +5768,8 @@ S_pending_ident(pTHX_ const char* begin_s)
     dVAR;
     register char *d;
     PADOFFSET tmp = 0;
+    GV* gv;
+    OP* gvop;
     const STRLEN tokenbuf_len = strlen(PL_tokenbuf);
     /* All routes through this function want to know if there is a colon.  */
     const char *const has_colon = (const char*) memchr (PL_tokenbuf, ':', tokenbuf_len);
@@ -5853,14 +5855,14 @@ S_pending_ident(pTHX_ const char* begin_s)
 	if ( ! is_magicsv(&PL_tokenbuf[1]) ) {
 	    Perl_croak(aTHX_ "unknown magical variable %s", PL_tokenbuf);
 	}
-	OP* o = newSVOP(OP_MAGICSV, 0, newSVpvn(PL_tokenbuf+1, tokenbuf_len-1),
+	pl_yylval.opval = newSVOP(OP_MAGICSV, 0,
+	    newSVpvn(PL_tokenbuf+1, tokenbuf_len-1),
 	    S_curlocation(begin_s));
-	pl_yylval.opval = o;
 	return PRIVATEVAR;
     }
 
     /* build ops for a global variable */
-    GV * gv = gv_fetchpvn_flags(
+    gv = gv_fetchpvn_flags(
 	    PL_tokenbuf + 1, tokenbuf_len - 1,
 	    /* If the identifier refers to a stash, don't autovivify it.
 	     * Change 24660 had the side effect of causing symbol table
@@ -5880,7 +5882,7 @@ S_pending_ident(pTHX_ const char* begin_s)
 	     : SVt_PVHV));
     if ( ! gv )
 	Perl_croak(aTHX_ "variable %s does not exist", PL_tokenbuf);
-    OP* gvop = (OP*)newGVOP(OP_GV, 0, gv, S_curlocation(begin_s));
+    gvop = (OP*)newGVOP(OP_GV, 0, gv, S_curlocation(begin_s));
     pl_yylval.opval = newUNOP(
 	(*PL_tokenbuf == '%' ? OP_RV2HV : *PL_tokenbuf == '@' ? OP_RV2AV : OP_RV2SV),
 	    0, gvop, S_curlocation(begin_s));

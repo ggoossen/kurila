@@ -588,8 +588,7 @@ perl_destruct(pTHXx)
     /* reset so print() ends up where we expect */
     setdefout(NULL);
 
-    SvREFCNT_dec((SV*) PL_stashcache);
-    PL_stashcache = NULL;
+    HVcpNULL(PL_stashcache);
 
     /* unhook hooks which will soon be, or use, destroyed data */
     SvREFCNT_dec(PL_errorcreatehook);
@@ -669,11 +668,13 @@ perl_destruct(pTHXx)
     PL_initav = NULL;
 
     /* shortcuts just get cleared */
-    PL_envhv = NULL;
+    SVcpNULL(PL_dynamicscope);
+    HVcpNULL(PL_envhv);
     AVcpNULL(PL_includepathav);
     HVcpNULL(PL_includedhv);
     SVcpNULL(PL_errsv);
     HVcpNULL(PL_magicsvhv);
+    HVcpNULL(PL_hinthv);
     HvREFCNT_dec(PL_globalstash);
     PL_globalstash = NULL;
     PL_argvgv = NULL;
@@ -693,8 +694,7 @@ perl_destruct(pTHXx)
     AvREFCNT_dec(PL_argvout_stack);
     PL_argvout_stack = NULL;
 
-    HvREFCNT_dec(PL_modglobal);
-    PL_modglobal = NULL;
+    HVcpNULL(PL_modglobal);
     AvREFCNT_dec(PL_preambleav);
     PL_preambleav = NULL;
     SvREFCNT_dec(PL_subname);
@@ -757,8 +757,7 @@ perl_destruct(pTHXx)
     if (!specialWARN(PL_compiling.cop_warnings))
 	PerlMemShared_free(PL_compiling.cop_warnings);
     PL_compiling.cop_warnings = NULL;
-    HvREFCNT_dec(PL_compiling.cop_hints_hash);
-    PL_compiling.cop_hints_hash = NULL;
+    HVcpNULL(PL_compiling.cop_hints_hash);
     CopSTASH_free(&PL_compiling);
 
     /* Prepare to destruct main symbol table.  */
@@ -774,8 +773,7 @@ perl_destruct(pTHXx)
     SvREFCNT_dec(PL_errors);
     PL_errors = NULL;
 
-    HvREFCNT_dec(PL_isarev);
-    PL_isarev = NULL;
+    HVcpNULL(PL_isarev);
 
     FREETMPS;
     if (destruct_level >= 2 && ckWARN_d(WARN_INTERNAL)) {
@@ -872,10 +870,10 @@ perl_destruct(pTHXx)
     nuke_stacks();
 
 #ifdef DEBUGGING
-    if (PL_sv_count != 0) {
+/*     if (PL_sv_count != 0) { */
 /* 	PerlIO_printf(Perl_debug_log, "Scalars leaked: %ld\n", (long)PL_sv_count); */
 /* 	sv_report_used(); */
-    }
+/*     } */
 #endif
 
 #ifdef PERL_DEBUG_READONLY_OPS

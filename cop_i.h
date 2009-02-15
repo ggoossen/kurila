@@ -26,7 +26,7 @@ PERL_CONTEXT * Perl_PushBlock(U8 t, SV** sp, U8 gimme) {
 }
 
 PERL_CONTEXT * Perl_PopBlock() {
-
+    PERL_CONTEXT * cx;
     SV** onleave_ref = hv_fetchs(SvHv(PL_dynamicscope), "onleave", 0);
     if (onleave_ref && SvAVOK(*onleave_ref)) {
         AV* onleave = SvAv(*onleave_ref);
@@ -37,7 +37,7 @@ PERL_CONTEXT * Perl_PopBlock() {
         }
     }
 
-    PERL_CONTEXT * cx = &cxstack[cxstack_ix--];
+    cx = &cxstack[cxstack_ix--];
     PL_curcop	 = cx->blk_oldcop;
     PL_markstack_ptr = PL_markstack + cx->blk_oldmarksp;
     PL_scopestack_ix = cx->blk_oldscopesp;

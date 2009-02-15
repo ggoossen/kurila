@@ -620,6 +620,7 @@ Perl_op_clear(pTHX_ OP *o)
     case OP_METHOD_NAMED:
     case OP_CONST:
     case OP_HINTSEVAL:
+    case OP_MAGICSV:
 	SVcpNULL(cSVOPo->op_sv);
 	break;
     case OP_NEXT:
@@ -1348,7 +1349,8 @@ Perl_op_assign(pTHX_ OP** po, I32 optype)
 	copy_to_tmp->op_sibling = o_sibling;
 	*po = copy_to_tmp;
 
-	copyo = newSVOP(OP_MAGICSV, 0, cSVOPx_sv(o), newSVsv(o->op_location));
+	copyo = newSVOP(OP_MAGICSV, 0,
+	    SvREFCNT_inc_NN(cSVOPx_sv(o)), newSVsv(o->op_location));
 	copyo = assign(copyo, FALSE, &min_modcount, &max_modcount);
 
 	padop2 = newOP(OP_PADSV, 0, o->op_location);
@@ -4490,17 +4492,6 @@ Perl_ck_fun(pTHX_ OP *o)
 		    {
 			Perl_croak_at(aTHX_ kid->op_location,
 			    "%s not allowed as fileref", OP_DESC(kid));
-			OP * const newop = newGVOP(OP_GV, 0,
-						   gv_fetchsv(((SVOP*)kid)->op_sv, GV_ADD, SVt_PVIO), kid->op_location);
-			if (!(o->op_private & 1) && /* if not unop */
-			    kid == cLISTOPo->op_last)
-			    cLISTOPo->op_last = newop;
-#ifdef PERL_MAD
-			op_getmad(kid,newop,'K');
-#else
-			op_free(kid);
-#endif
-			kid = newop;
 		    }
 		    else if (kid->op_type == OP_READLINE) {
 			/* neophyte patrol: open(<FH>), close(<FH>) etc. */
@@ -4705,7 +4696,7 @@ Perl_ck_grep(pTHX_ OP *o)
 {
     dVAR;
     LOGOP *gwop = NULL;
-    OP* entersubop;
+    UNOP* entersubop;
     OP *kid;
     const OPCODE type = o->op_type == OP_GREPSTART ? OP_GREPWHILE : OP_MAPWHILE;
     PADOFFSET offset;
@@ -4743,8 +4734,8 @@ Perl_ck_grep(pTHX_ OP *o)
     
     gwop->op_flags |= OPf_KIDS;
     gwop->op_first = o;
-    gwop->op_other = entersubop;
-    o->op_sibling = entersubop;
+    gwop->op_other = (OP*)entersubop;
+    o->op_sibling = (OP*)entersubop;
 
     return (OP*)gwop;
 }
