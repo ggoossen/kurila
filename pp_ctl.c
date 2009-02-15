@@ -82,17 +82,8 @@ PP(pp_grepstart)
     ENTER;					/* enter outer scope */
 
     SAVETMPS;
-    if (PL_op->op_private & OPpGREP_LEX)
-	SAVESPTR(PAD_SVl(PL_op->op_targ));
-    else
-	SAVE_DEFSV;
 
     srcitem = av_shift(SvAv(src));
-    if (PL_op->op_private & OPpGREP_LEX) {
-	SVcpSTEAL(PAD_SVl(PL_op->op_targ), srcitem);
-    }
-    else
-	SVcpSTEAL(DEFSV, srcitem);
 
     if (PL_op->op_type == OP_GREPSTART)
 	XPUSHs(srcitem);
@@ -136,10 +127,6 @@ PP(pp_mapwhile)
 
 	/* set $_ to the new source item */
 	srcitem = av_shift(src);
-	if (PL_op->op_private & OPpGREP_LEX)
-	    SVcpSTEAL(PAD_SVl(PL_op->op_targ), srcitem)
-	else
-	    SVcpSTEAL(DEFSV, srcitem);
 	PUSHMARK(SP);
 	XPUSHs(srcitem);
 	XPUSHs(*cvp);

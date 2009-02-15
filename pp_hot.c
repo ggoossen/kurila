@@ -1234,10 +1234,6 @@ PP(pp_grepwhile)
 
 	/* set $_ to the new source item */
 	srcitem = av_shift(src);
-	if (PL_op->op_private & OPpGREP_LEX)
-	    SVcpSTEAL(PAD_SVl(PL_op->op_targ), srcitem)
-	else
-	    SVcpSTEAL(DEFSV, srcitem);
 	XPUSHs(srcitem);
 	PUSHMARK(SP);
 	XPUSHs(srcitem);

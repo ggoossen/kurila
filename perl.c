@@ -668,7 +668,6 @@ perl_destruct(pTHXx)
     PL_initav = NULL;
 
     /* shortcuts just get cleared */
-    SVcpNULL(PL_dynamicscope);
     HVcpNULL(PL_envhv);
     AVcpNULL(PL_includepathav);
     HVcpNULL(PL_includedhv);
@@ -759,6 +758,8 @@ perl_destruct(pTHXx)
     PL_compiling.cop_warnings = NULL;
     HVcpNULL(PL_compiling.cop_hints_hash);
     CopSTASH_free(&PL_compiling);
+
+    SVcpNULL(PL_dynamicscope);
 
     /* Prepare to destruct main symbol table.  */
 

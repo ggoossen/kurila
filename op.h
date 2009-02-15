@@ -248,9 +248,6 @@ Deprecated.  Use C<GIMME_V> instead.
 #define OPpFT_ACCESS		2	/* use filetest 'access' */
 #define OPpFT_STACKED		4	/* stacked filetest, as in "-f -x $f" */
 
-/* Private for OP_(MAP|GREP)(WHILE|START) */
-#define OPpGREP_LEX		2	/* iterate over lexical $_ */
-    
 /* Private for OP_ENTEREVAL */
 #define OPpEVAL_HAS_HH		2	/* Does it have a copy of %^H */
 

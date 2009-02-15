@@ -4699,7 +4699,6 @@ Perl_ck_grep(pTHX_ OP *o)
     UNOP* entersubop;
     OP *kid;
     const OPCODE type = o->op_type == OP_GREPSTART ? OP_GREPWHILE : OP_MAPWHILE;
-    PADOFFSET offset;
 
     PERL_ARGS_ASSERT_CK_GREP;
 
@@ -4715,16 +4714,6 @@ Perl_ck_grep(pTHX_ OP *o)
     gwop->op_type = type;
     gwop->op_ppaddr = PL_ppaddr[type];
     gwop->op_location = SvREFCNT_inc(o->op_location);
-
-    offset = pad_findmy("$_");
-    if (offset == NOT_IN_PAD || PAD_COMPNAME_FLAGS_isOUR(offset)) {
-	o->op_private = gwop->op_private = 0;
-	gwop->op_targ = pad_alloc(type, SVs_PADTMP);
-    }
-    else {
-	o->op_private = gwop->op_private = OPpGREP_LEX;
-	gwop->op_targ = o->op_targ = offset;
-    }
 
     NewOp(11011, entersubop, 1, UNOP);
     entersubop->op_type = OP_ENTERSUB;
