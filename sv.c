@@ -1243,12 +1243,12 @@ Perl_sv_upgrade(pTHX_ register SV *const sv, svtype new_type)
 	   Note that there is an assumption that all bodies of types that
 	   can be upgraded came from arenas. Only the more complex non-
 	   upgradable types are allowed to be directly malloc()ed.  */
-#ifdef PURIFY
-	my_safefree(old_body);
-#else
 	del_body((void*)((char*)old_body + old_type_details->offset),
 		 &PL_body_roots[old_type]);
-#endif
+    }
+    else if (old_type_details->body_size) {
+	if (old_type > SVt_IV)
+	    my_safefree(old_body);
     }
 }
 
