@@ -1350,7 +1350,7 @@ Perl_op_assign(pTHX_ OP** po, I32 optype)
 	*po = copy_to_tmp;
 
 	copyo = newSVOP(OP_MAGICSV, 0,
-	    SvREFCNT_inc_NN(cSVOPx_sv(o)), newSVsv(o->op_location));
+	    SvREFCNT_inc_NN(cSVOPx_sv(o)), sv_mortalcopy(o->op_location));
 	copyo = assign(copyo, FALSE, &min_modcount, &max_modcount);
 
 	padop2 = newOP(OP_PADSV, 0, o->op_location);
@@ -1378,7 +1378,7 @@ Perl_op_assign(pTHX_ OP** po, I32 optype)
 	assert(oldassign->op_type == OP_SASSIGN);
 
 	copyo = newSVOP(oldassign->op_last->op_type, 0, cSVOPx_sv(oldassign->op_last), 
-	    newSVsv(oldassign->op_location));
+	    sv_mortalcopy(oldassign->op_location));
 	copyo = assign(copyo, FALSE, &min_modcount, &max_modcount);
 
 	padop2 = newOP(OP_PADSV, 0, oldassign->op_location);
