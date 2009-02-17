@@ -347,9 +347,10 @@ Perl_dounwind(pTHX_ I32 cxix)
 
     while (cxstack_ix > cxix) {
 	SV *sv;
-        register PERL_CONTEXT *cx = &cxstack[cxstack_ix];
-	DEBUG_l(PerlIO_printf(Perl_debug_log, "Unwinding block %ld, type %s\n",
-			      (long) cxstack_ix, PL_block_type[CxTYPE(cx)]));
+        register PERL_CONTEXT *cx;
+	DEBUG_l(PerlIO_printf(Perl_debug_log, "Unwinding block %ld\n",
+		(long) cxstack_ix));
+	cx = PopBlock();
 	/* Note: we don't need to restore the base context info till the end. */
 	switch (CxTYPE(cx)) {
 	case CXt_SUBST:
@@ -370,7 +371,6 @@ Perl_dounwind(pTHX_ I32 cxix)
 	case CXt_NULL:
 	    break;
 	}
-	cxstack_ix--;
     }
     PERL_UNUSED_VAR(optype);
 }
@@ -966,7 +966,6 @@ PP(pp_last)
     PMOP *newpm;
     SV **mark;
 
-
     if (PL_op->op_flags & OPf_SPECIAL) {
 	cxix = dopoptoloop(cxstack_ix);
 	if (cxix < 0)
@@ -1069,7 +1068,10 @@ PP(pp_redo)
     redo_op = cxstack[cxix].blk_loop.my_op->op_redoop;
     if (redo_op->op_type == OP_ENTER) {
 	/* pop one less context to avoid $x being freed in while (my $x..) */
-	cxstack_ix++;
+	I32 gimme = cxstack[cxstack_ix+1].blk_gimme;
+	ENTER;
+	PUSHBLOCK(cx, CXt_BLOCK, PL_stack_sp);
+
 	assert(CxTYPE(&cxstack[cxstack_ix]) == CXt_BLOCK);
 	redo_op = redo_op->op_next;
     }
