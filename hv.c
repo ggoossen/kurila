@@ -1021,15 +1021,12 @@ Perl_hv_copy_hints_hv(pTHX_ HV *const ohv)
 	hv_iterinit(ohv);
 	while ((entry = hv_iternext_flags(ohv, 0))) {
 	    SV *const sv = newSVsv(HeVAL(entry));
-	    sv_magic(sv, NULL, PERL_MAGIC_hintselem,
-		     (char *)newSVhek (HeKEY_hek(entry)), HEf_SVKEY);
 	    (void)hv_store_flags(hv, HeKEY(entry), HeKLEN(entry),
 				 sv, HeHASH(entry), HeKFLAGS(entry));
 	}
 	HvRITER_set(ohv, riter);
 	HvEITER_set(ohv, eiter);
     }
-    hv_magic(hv, NULL, PERL_MAGIC_hints);
     return hv;
 }
 

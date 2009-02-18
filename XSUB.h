@@ -382,7 +382,6 @@ Rethrows a previously caught exception.  See L<perlguts/"Exception Handling">.
 	} } STMT_END                                                     
 
 #if 1		/* for compatibility */
-#  define VTBL_hints		&PL_vtbl_hints
 #  define VTBL_dbline		&PL_vtbl_dbline
 #  define VTBL_isa		&PL_vtbl_isa
 #  define VTBL_isaelem		&PL_vtbl_isaelem

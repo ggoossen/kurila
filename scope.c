@@ -964,7 +964,6 @@ Perl_leave_scope(pTHX_ I32 base)
 		   and it won't have the magic set.  */
 
 		HV *const hv = newHV();
-		hv_magic(hv, NULL, PERL_MAGIC_hints);
 		PL_hinthv = hv;
 	    }
 	    assert(PL_hinthv);

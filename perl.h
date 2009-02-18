@@ -3665,8 +3665,6 @@ Gid_t getegid (void);
 
 #define PERL_MAGIC_bm		  'B' /* Boyer-Moore (fast string search) */
 #define PERL_MAGIC_regex_global	  'g' /* m//g target / study()ed string */
-#define PERL_MAGIC_hints	  'H' /* %^H hash */
-#define PERL_MAGIC_hintselem	  'h' /* %^H hash element */
 #define PERL_MAGIC_isa		  'I' /* @ISA array */
 #define PERL_MAGIC_isaelem	  'i' /* @ISA array element */
 #define PERL_MAGIC_dbfile	  'L' /* Debugger %_<filename */
@@ -4408,7 +4406,6 @@ typedef enum {
 } expectation;
 
 enum {		/* pass one of these to get_vtbl */
-    want_vtbl_hints,
     want_vtbl_dbline,
     want_vtbl_isa,
     want_vtbl_isaelem,
@@ -4420,7 +4417,6 @@ enum {		/* pass one of these to get_vtbl */
     want_vtbl_backref,
     want_vtbl_utf8,
     want_vtbl_symtab,
-    want_vtbl_hintselem
 };
 
 
@@ -4691,18 +4687,6 @@ START_EXTERN_C
  * (although most, but not all, compilers are prepared to do it)
  */
 MGVTBL_SET(
-    PL_vtbl_hints,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0
-);
-
-MGVTBL_SET(
     PL_vtbl_dbline,
     0,
     MEMBER_TO_FPTR(Perl_magic_setdbline),
@@ -4816,18 +4800,6 @@ MGVTBL_SET(
     MEMBER_TO_FPTR(Perl_magic_setutf8),
     0,
     0,
-    0,
-    0,
-    0,
-    0
-);
-
-MGVTBL_SET(
-    PL_vtbl_hintselem,
-    0,
-    MEMBER_TO_FPTR(Perl_magic_sethint),
-    0,
-    MEMBER_TO_FPTR(Perl_magic_clearhint),
     0,
     0,
     0,

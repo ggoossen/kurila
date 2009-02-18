@@ -1777,8 +1777,7 @@ Perl_magic_set(pTHX_ const char* name, SV *sv)
 		    Perl_croak(aTHX_ "%s must be a hash not an %s", name, Ddesc(sv));
 		}
 		PL_hints |= HINT_LOCALIZE_HH;
-		HvREFCNT_dec(PL_compiling.cop_hints_hash);
-		PL_compiling.cop_hints_hash = SvHv(newSVsv(sv));
+		HVcpSTEAL(PL_compiling.cop_hints_hash, SvHv(newSVsv(sv)));
 		hv_sethv(PL_hinthv, SvHv(sv));
 		return;
 	    }
@@ -2384,77 +2383,6 @@ S_unwind_handler_stack(pTHX_ const void *p)
     if (flags & 64)
 	SvREFCNT_dec(PL_sig_sv);
 #endif
-}
-
-/*
-=for apidoc magic_sethint
-
-Triggered by a store to %^H, records the key/value pair to
-C<PL_compiling.cop_hints_hash>.  It is assumed that hints aren't storing
-anything that would need a deep copy.  Maybe we should warn if we find a
-reference.
-
-=cut
-*/
-int
-Perl_magic_sethint(pTHX_ SV *sv, MAGIC *mg)
-{
-    dVAR;
-    HV * new_hinthash;
-    if(!(mg->mg_len == HEf_SVKEY))
-	assert(mg->mg_len == HEf_SVKEY);
-
-    PERL_ARGS_ASSERT_MAGIC_SETHINT;
-
-    /* mg->mg_obj isn't being used.  If needed, it would be possible to store
-       an alternative leaf in there, with PL_compiling.cop_hints being used if
-       it's NULL. If needed for threads, the alternative could lock a mutex,
-       or take other more complex action.  */
-
-    /* Something changed in %^H, so it will need to be restored on scope exit.
-       Doing this here saves a lot of doing it manually in perl code (and
-       forgetting to do it, and consequent subtle errors.  */
-    PL_hints |= HINT_LOCALIZE_HH;
-
-    /* copy the hash, to preserve the old one */
-    new_hinthash = newHVhv(PL_compiling.cop_hints_hash);
-    HvREFCNT_dec(PL_compiling.cop_hints_hash);
-    PL_compiling.cop_hints_hash = new_hinthash;
-
-    (void)hv_store_ent(PL_compiling.cop_hints_hash, (SV *)mg->mg_ptr, newSVsv(sv), 0);
-    return 0;
-}
-
-/*
-=for apidoc magic_sethint
-
-Triggered by a delete from %^H, records the key to
-C<PL_compiling.cop_hints_hash>.
-
-=cut
-*/
-int
-Perl_magic_clearhint(pTHX_ SV *sv, MAGIC *mg)
-{
-    dVAR;
-    HV * new_hinthash;
-
-    PERL_ARGS_ASSERT_MAGIC_CLEARHINT;
-    PERL_UNUSED_ARG(sv);
-
-    assert(mg->mg_len == HEf_SVKEY);
-
-    PERL_UNUSED_ARG(sv);
-
-    PL_hints |= HINT_LOCALIZE_HH;
-
-    /* copy the hash, to preserve the old one */
-    new_hinthash = newHVhv(PL_compiling.cop_hints_hash);
-    HvREFCNT_dec(PL_compiling.cop_hints_hash);
-    PL_compiling.cop_hints_hash = new_hinthash;
-
-    (void)hv_delete_ent(PL_compiling.cop_hints_hash, (SV *)mg->mg_ptr, 0, 0);
-    return 0;
 }
 
 /*
