@@ -1857,7 +1857,7 @@ PP(pp_hintseval)
 {
     dVAR;
     dSP;
-    mXPUSHs((SV*)Perl_hv_copy_hints_hv(aTHX_ (HV*)cSVOP_sv));
+    mXPUSHs(newSVsv(cSVOP_sv));
     RETURN;
 }
 
@@ -1904,7 +1904,7 @@ PP(pp_entereval)
     SAVEHINTS();
     PL_hints = PL_op->op_targ;
     if (saved_hh)
-	PL_hinthv = saved_hh;
+	HVcpSTEAL(PL_hinthv, saved_hh);
 
     SAVESPTR(PL_diehook);
     SVcpREPLACE(PL_diehook, PERL_DIEHOOK_IGNORE);
