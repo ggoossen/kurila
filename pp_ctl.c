@@ -88,7 +88,7 @@ PP(pp_grepstart)
     if (PL_op->op_type == OP_GREPSTART)
 	XPUSHs(srcitem);
     PUSHMARK(SP);
-    PUSHs(srcitem);
+    mPUSHs(srcitem);
     PUSHs(cv);
     PUTBACK;
     assert(PL_op->op_next->op_type == OP_ENTERSUB);
@@ -128,7 +128,7 @@ PP(pp_mapwhile)
 	/* set $_ to the new source item */
 	srcitem = av_shift(src);
 	PUSHMARK(SP);
-	XPUSHs(srcitem);
+	mXPUSHs(srcitem);
 	XPUSHs(*cvp);
 	PUTBACK;
 

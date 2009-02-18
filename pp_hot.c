@@ -1236,7 +1236,7 @@ PP(pp_grepwhile)
 	srcitem = av_shift(src);
 	XPUSHs(srcitem);
 	PUSHMARK(SP);
-	XPUSHs(srcitem);
+	mXPUSHs(srcitem);
 	XPUSHs(*cvp);
 	PUTBACK;
 
