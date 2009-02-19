@@ -17,8 +17,6 @@
 #define SAVEt_I32		6
 #define SAVEt_IV		7
 #define SAVEt_SPTR		8
-#define SAVEt_APTR		9
-#define SAVEt_HPTR		10
 #define SAVEt_PPTR		11
 #define SAVEt_NSTAB		12
 #define SAVEt_SVREF		13

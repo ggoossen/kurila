@@ -792,14 +792,6 @@ Perl_leave_scope(pTHX_ I32 base)
 	    ptr = SSPOPPTR;
 	    *(char**)ptr = (char*)SSPOPPTR;
 	    break;
-	case SAVEt_HPTR:			/* HV* reference */
-	    ptr = SSPOPPTR;
-	    *(HV**)ptr = (HV*)SSPOPPTR;
-	    break;
-	case SAVEt_APTR:			/* AV* reference */
-	    ptr = SSPOPPTR;
-	    *(AV**)ptr = (AV*)SSPOPPTR;
-	    break;
 	case SAVEt_GP:				/* scalar reference */
 	    ptr = SSPOPPTR;
 	    gv = (GV*)SSPOPPTR;
@@ -1174,14 +1166,6 @@ Perl_scope_tmprefcnt(pTHX)
 	case SAVEt_PPTR:			/* char* reference */
 	    ptr = SSPOPPTR;
 	    (char*)SSPOPPTR;
-	    break;
-	case SAVEt_HPTR:			/* HV* reference */
-	    ptr = SSPOPPTR;
-	    (HV*)SSPOPPTR;
-	    break;
-	case SAVEt_APTR:			/* AV* reference */
-	    ptr = SSPOPPTR;
-	    (AV*)SSPOPPTR;
 	    break;
 	case SAVEt_GP:				/* scalar reference */
 	    ptr = SSPOPPTR;
