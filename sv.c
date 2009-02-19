@@ -8959,6 +8959,8 @@ do_sv_tmprefcnt(pTHX_ SV *const sv)
     if (sv == (SV*)PL_strtab)
 	return;
 
+    SvTMPREFCNT_inc(SvLOCATION(sv));
+
     if (type <= SVt_IV) {
 	/* See the comment in sv.h about the collusion between this early
 	   return and the overloading of the NULL and IV slots in the size
@@ -9025,7 +9027,7 @@ do_sv_tmprefcnt(pTHX_ SV *const sv)
 static void
 do_check_tmprefcnt(pTHX_ SV* const sv)
 {
-    if (SvTMPREFCNT(sv) > SvREFCNT(sv)) {
+    if (SvTMPREFCNT(sv) != SvREFCNT(sv)) {
 	PerlIO_printf(Perl_debug_log, "Invalid refcount (%ld) should be at least (%ld)\n", 
 		      (long)SvREFCNT(sv), (long)SvTMPREFCNT(sv));
 	sv_dump(sv);
@@ -9041,9 +9043,12 @@ Perl_refcnt_check(pTHX)
     visit(do_sv_tmprefcnt, 0, 0);
     SvTMPREFCNT_inc(PL_defstash);
     SvTMPREFCNT_inc(PL_curstash);
+    SvTMPREFCNT_inc(PL_curstname);
     SvTMPREFCNT_inc(PL_defgv);
     SvTMPREFCNT_inc(PL_compcv);
     SvTMPREFCNT_inc(PL_diehook);
+    SvTMPREFCNT_inc(PL_warnhook);
+    SvTMPREFCNT_inc(PL_errorcreatehook); 
     SvTMPREFCNT_inc(PL_main_cv);
     SvTMPREFCNT_inc(PL_unitcheckav);
     SvTMPREFCNT_inc(PL_rs);
@@ -9054,8 +9059,19 @@ Perl_refcnt_check(pTHX)
     SvTMPREFCNT_inc(PL_stashcache);
     SvTMPREFCNT_inc(PL_patchlevel);
     SvTMPREFCNT_inc(PL_compiling.cop_hints_hash);
+    SvTMPREFCNT_inc(PL_dynamicscope);
     SvTMPREFCNT_inc(PL_firstgv);
     SvTMPREFCNT_inc(PL_secondgv);
+    SvTMPREFCNT_inc(PL_e_script);
+    HvTMPREFCNT_inc(PL_includedhv);
+    AvTMPREFCNT_inc(PL_includepathav);
+    HvTMPREFCNT_inc(PL_magicsvhv);
+    HvTMPREFCNT_inc(PL_hinthv);
+    SvTMPREFCNT_inc(PL_errsv);
+    SvTMPREFCNT_inc(PL_isarev);
+
+    Perl_tmps_tmprefcnt(aTHX);
+    Perl_scope_tmprefcnt(aTHX);
 
     {
 	PERL_SI *si;

@@ -271,16 +271,6 @@ perform the upgrade if necessary.  See C<svtype>.
 	(void)((PL_Sv=(SV*)(sv)) ? ++(SvREFCNT(PL_Sv)) : 0)
 #endif
 
-#  define SvTMPREFCNT_inc(sv)		\
-    ({					\
-	SV * const _sv = (SV*)(sv);	\
-	if (_sv) {			\
-	    assert(SvTYPE(_sv) != SVTYPEMASK);	\
-	     (SvTMPREFCNT(_sv))++;		\
-        } \
-	_sv;				\
-    })
-
 /* These guys don't need the curly blocks */
 #define SvREFCNT_inc_simple_void(sv)	STMT_START { if (sv) SvREFCNT(sv)++; } STMT_END
 #define SvREFCNT_inc_simple_NN(sv)	(++(SvREFCNT(sv)),(SV*)(sv))

@@ -41,6 +41,7 @@ Perl_SvCv
 Perl_SvPVX_const
 Perl_SvPVX_mutable
 Perl_SvREFCNT_dec
+Perl_SvTMPREFCNT_inc
 Perl_SvIV
 Perl_SvUV
 Perl_SvNV
@@ -135,6 +136,7 @@ Perl_fbm_instr
 Perl_form
 Perl_vform
 Perl_free_tmps
+Perl_tmps_tmprefcnt
 Perl_gp_free
 Perl_gp_tmprefcnt
 Perl_gp_ref
@@ -241,6 +243,7 @@ Perl_is_utf8_punct
 Perl_is_utf8_xdigit
 Perl_is_utf8_mark
 Perl_leave_scope
+Perl_scope_tmprefcnt
 Perl_lex_end
 Perl_op_null
 Perl_op_clear

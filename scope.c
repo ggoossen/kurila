@@ -160,6 +160,15 @@ Perl_free_tmps(pTHX)
     }
 }
 
+void
+Perl_tmps_tmprefcnt(pTHX)
+{
+    I32 i;
+    for (i = PL_tmps_ix; i >= 0; i--) {
+	SvTMPREFCNT_inc(PL_tmps_stack[i]);
+    }
+}
+
 STATIC SV *
 S_save_scalar_at(pTHX_ SV **sptr)
 {
@@ -1080,6 +1089,250 @@ Perl_leave_scope(pTHX_ I32 base)
     }
 }
 
+void
+Perl_scope_tmprefcnt(pTHX)
+{
+    dVAR;
+    register SV *sv;
+    register SV *value;
+    register GV *gv;
+    register AV *av;
+    register HV *hv;
+    void* ptr;
+    register char* str;
+    I32 i;
+    I32 saved_savestack_ix;
+
+    saved_savestack_ix = PL_savestack_ix;
+    while (PL_savestack_ix > 0) {
+	switch (SSPOPINT) {
+	case SAVEt_ITEM:			/* normal string */
+	    value = (SV*)SSPOPPTR;
+	    sv = (SV*)SSPOPPTR;
+	    break;
+	case SAVEt_SV:				/* scalar reference */
+	    value = (SV*)SSPOPPTR;
+	    gv = (GV*)SSPOPPTR;
+	    ptr = &GvSV(gv);
+	    av = (AV*)gv; /* what to refcnt_dec */
+	restore_sv:
+	    sv = *(SV**)ptr;
+	    *(SV**)ptr = value;
+	    SvTMPREFCNT_inc(sv);
+	    SvTMPREFCNT_inc(value);
+	    if (av) /* actually an av, hv or gv */
+		AvTMPREFCNT_inc(av);
+	    break;
+	case SAVEt_GENERIC_PVREF:		/* generic pv */
+	    ptr = SSPOPPTR;
+	    str = (char*)SSPOPPTR;
+	    break;
+	case SAVEt_SHARED_PVREF:		/* shared pv */
+	    str = (char*)SSPOPPTR;
+	    ptr = SSPOPPTR;
+	    break;
+	case SAVEt_GENERIC_SVREF:		/* generic sv */
+	    value = (SV*)SSPOPPTR;
+	    ptr = SSPOPPTR;
+	    sv = *(SV**)ptr;
+	    SvTMPREFCNT_inc(sv);
+	    SvTMPREFCNT_inc(value);
+	    break;
+	case SAVEt_AV:				/* array reference */
+	    av = (AV*)SSPOPPTR;
+	    gv = (GV*)SSPOPPTR;
+	    AvTMPREFCNT_inc(av);
+	    break;
+	case SAVEt_HV:				/* hash reference */
+	    hv = (HV*)SSPOPPTR;
+	    gv = (GV*)SSPOPPTR;
+	    HvTMPREFCNT_inc(hv);
+	    break;
+	case SAVEt_INT:				/* int reference */
+	    ptr = SSPOPPTR;
+	    (int)SSPOPINT;
+	    break;
+	case SAVEt_BOOL:			/* bool reference */
+	    ptr = SSPOPPTR;
+	    (bool)SSPOPBOOL;
+	    break;
+	case SAVEt_I32:				/* I32 reference */
+	    ptr = SSPOPPTR;
+#ifdef PERL_DEBUG_READONLY_OPS
+	    {
+		const I32 val = SSPOPINT;
+	    }
+#else
+	    (I32)SSPOPINT;
+#endif
+	    break;
+	case SAVEt_SPTR:			/* SV* reference */
+	    ptr = SSPOPPTR;
+	    SvTMPREFCNT_inc((SV*)SSPOPPTR);
+	    break;
+	case SAVEt_VPTR:			/* random* reference */
+	case SAVEt_PPTR:			/* char* reference */
+	    ptr = SSPOPPTR;
+	    (char*)SSPOPPTR;
+	    break;
+	case SAVEt_HPTR:			/* HV* reference */
+	    ptr = SSPOPPTR;
+	    (HV*)SSPOPPTR;
+	    break;
+	case SAVEt_APTR:			/* AV* reference */
+	    ptr = SSPOPPTR;
+	    (AV*)SSPOPPTR;
+	    break;
+	case SAVEt_GP:				/* scalar reference */
+	    ptr = SSPOPPTR;
+	    gv = (GV*)SSPOPPTR;
+	    gp_tmprefcnt((GP*)ptr);
+	    GvTMPREFCNT_inc(gv);
+	    break;
+	case SAVEt_FREESV:
+	    ptr = SSPOPPTR;
+	    SvTMPREFCNT_inc((SV*)ptr);
+	    break;
+	case SAVEt_MORTALIZESV:
+	    ptr = SSPOPPTR;
+	    SvTMPREFCNT_inc((SV*)ptr);
+	    break;
+	case SAVEt_FREEOP:
+	    ptr = SSPOPPTR;
+	    op_tmprefcnt((OP*)ptr);
+	    break;
+	case SAVEt_FREEPV:
+	    ptr = SSPOPPTR;
+/* 	    Safefree(ptr); */
+	    break;
+	case SAVEt_CLEARSV:
+	    ptr = (void*)&PL_curpad[SSPOPLONG];
+	    sv = *(SV**)ptr;
+	    /* ... */
+	    break;
+	case SAVEt_DELETE:
+	    ptr = SSPOPPTR;
+	    hv = (HV*)ptr;
+	    ptr = SSPOPPTR;
+	    HvTMPREFCNT_inc(hv);
+	    break;
+	case SAVEt_DESTRUCTOR_X:
+	    ptr = SSPOPPTR;
+	    break;
+	case SAVEt_REGCONTEXT:
+	case SAVEt_ALLOC:
+	    i = SSPOPINT;
+	    PL_savestack_ix -= i;  	/* regexp must have croaked */
+	    break;
+	case SAVEt_STACK_POS:		/* Position on Perl stack */
+	    i = SSPOPINT;
+	    PL_stack_sp = PL_stack_base + i;
+	    break;
+	case SAVEt_STACK_CXPOS:         /* blk_oldsp on context stack */
+	    i = SSPOPINT;
+	    SSPOPINT;
+	    break;
+	case SAVEt_AELEM:		/* array element */
+	    value = (SV*)SSPOPPTR;
+	    i = SSPOPINT;
+	    av = (AV*)SSPOPPTR;
+	    AvTMPREFCNT_inc(av);
+	    SvTMPREFCNT_inc(value);
+	    break;
+	case SAVEt_HELEM:		/* hash element */
+	    value = (SV*)SSPOPPTR;
+	    sv = (SV*)SSPOPPTR;
+	    hv = (HV*)SSPOPPTR;
+	    HvTMPREFCNT_inc(hv);
+	    SvTMPREFCNT_inc(sv);
+	    SvTMPREFCNT_inc(value);
+	    break;
+	case SAVEt_OP:
+	    PL_op = (OP*)SSPOPPTR;
+	    break;
+	case SAVEt_HINTS: {
+	    I32 hints;
+	    (I32)SSPOPINT;
+	    hints = (I32)SSPOPINT;
+ 	    HvTMPREFCNT_inc((HV*) SSPOPPTR);
+	    if (hints & HINT_LOCALIZE_HH) {
+		HvTMPREFCNT_inc((HV*)SSPOPPTR);
+	    }
+	    break;
+	}
+	case SAVEt_COMPPAD:
+	    PL_comppad = (PAD*)SSPOPPTR;
+	    break;
+	case SAVEt_PADSV_AND_MORTALIZE:
+	    /* ... */
+	    break;
+	case SAVEt_SET_MAGICSV: {
+	    SvTMPREFCNT_inc((SV*)SSPOPPTR);
+	    SvTMPREFCNT_inc((SV*)SSPOPPTR);
+	    break;
+	}
+	case SAVEt_SAVESWITCHSTACK:
+	    {
+		/* ... */
+	    }
+	    break;
+	case SAVEt_SET_SVFLAGS:
+	    {
+		const U32 val  = (U32)SSPOPINT;
+		const U32 mask = (U32)SSPOPINT;
+	    }
+	    break;
+	    /* These are only saved in mathoms.c */
+	case SAVEt_SVREF:			/* scalar reference */
+	    value = (SV*)SSPOPPTR;
+	    ptr = SSPOPPTR;
+	    av = NULL; /* what to refcnt_dec */
+	    goto restore_sv;
+	case SAVEt_LONG:			/* long reference */
+	    ptr = SSPOPPTR;
+	    (long)SSPOPLONG;
+	    break;
+	case SAVEt_I16:				/* I16 reference */
+	    ptr = SSPOPPTR;
+	    (I16)SSPOPINT;
+	    break;
+	case SAVEt_I8:				/* I8 reference */
+	    ptr = SSPOPPTR;
+	    (I8)SSPOPINT;
+	    break;
+	case SAVEt_IV:				/* IV reference */
+	    ptr = SSPOPPTR;
+	    (IV)SSPOPIV;
+	    break;
+	case SAVEt_NSTAB:
+	    gv = (GV*)SSPOPPTR;
+	    (void)sv_clear((SV*)gv);
+	    break;
+	case SAVEt_DESTRUCTOR:
+	    ptr = SSPOPPTR;
+	    break;
+	case SAVEt_COMPILE_WARNINGS:
+	    ptr = SSPOPPTR;
+	    break;
+	case SAVEt_RE_STATE:
+	    {
+		const struct re_save_state *const state
+		    = (struct re_save_state *)
+		    (PL_savestack + PL_savestack_ix
+		     - SAVESTACK_ALLOC_FOR_RE_SAVE_STATE);
+		PL_savestack_ix -= SAVESTACK_ALLOC_FOR_RE_SAVE_STATE;
+	    }
+	    break;
+	case SAVEt_PARSER:
+	    ptr = SSPOPPTR;
+	    /* ... */
+	    break;
+	default:
+	    Perl_croak(aTHX_ "panic: leave_scope inconsistency");
+	}
+    }
+    PL_savestack_ix = saved_savestack_ix;
+}
 void
 Perl_cx_dump(pTHX_ PERL_CONTEXT *cx)
 {

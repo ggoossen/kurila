@@ -230,3 +230,10 @@ void Perl_SvREFCNT_dec(pTHX_ SV *sv) {
         }
     }
 }
+
+void Perl_SvTMPREFCNT_inc(pTHX_ SV *sv) {
+    if (sv) {
+        assert(SvTYPE(sv) != SVTYPEMASK);
+        (SvTMPREFCNT(sv))++;
+    }
+}

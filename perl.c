@@ -1310,9 +1310,8 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 
     sv = newSVpvs("");		/* first used for -I flags */
     SAVEFREESV(sv);
-    init_main_stash();
 
-    DEBUG_R(refcnt_check());
+    init_main_stash();
 
     PL_isarev = newHV();
 

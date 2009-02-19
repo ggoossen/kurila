@@ -95,6 +95,7 @@ Aip	|CV*	|SvCv	|NN SV *sv
 Aip	|const char*	|SvPVX_const	|NN SV *sv
 Aip	|char*	|SvPVX_mutable	|NN SV *sv
 AipS	|void	|SvREFCNT_dec	|NULLOK SV *sv
+AipS	|void	|SvTMPREFCNT_inc	|NULLOK SV *sv
 Aip	|IV	|SvIV	|NN SV *sv
 Aip	|UV	|SvUV	|NN SV *sv
 Aip	|NV	|SvNV	|NN SV *sv
@@ -281,6 +282,7 @@ p	|OP*	|fold_constants	|NN OP *o
 Afpd	|char*	|form		|NN const char* pat|...
 Ap	|char*	|vform		|NN const char* pat|NULLOK va_list* args
 Ap	|void	|free_tmps
+Ap	|void	|tmps_tmprefcnt
 p	|OP*	|gen_constant_list|NULLOK OP* o
 #if !defined(HAS_GETENV_LEN)
 p	|char*	|getenv_len	|NN const char *env_elem|NN unsigned long *len
@@ -411,6 +413,7 @@ ApR	|bool	|is_utf8_xdigit	|NN const char *p
 ApR	|bool	|is_utf8_mark	|NN const char *p
 pP	|I32	|keyword	|NN const char* name|I32 len
 Ap	|void	|leave_scope	|I32 base
+Ap	|void	|scope_tmprefcnt
 EXp	|void	|lex_end
 p	|void	|lex_start	|NULLOK SV* line|NULLOK PerlIO *rsfp|bool new_filter
 Ap	|void	|op_null	|NN OP* o

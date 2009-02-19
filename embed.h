@@ -57,6 +57,13 @@
 #define IoREFCNT_dec(a)		Perl_SvREFCNT_dec(aTHX_ IoSv(a))
 #define ReREFCNT_dec(a)		Perl_SvREFCNT_dec(aTHX_ ReSv(a))
 #define SvREFCNT_dec		Perl_SvREFCNT_dec
+#define AvTMPREFCNT_inc(a)		Perl_SvTMPREFCNT_inc(aTHX_ AvSv(a))
+#define HvTMPREFCNT_inc(a)		Perl_SvTMPREFCNT_inc(aTHX_ HvSv(a))
+#define CvTMPREFCNT_inc(a)		Perl_SvTMPREFCNT_inc(aTHX_ CvSv(a))
+#define GvTMPREFCNT_inc(a)		Perl_SvTMPREFCNT_inc(aTHX_ GvSv(a))
+#define IoTMPREFCNT_inc(a)		Perl_SvTMPREFCNT_inc(aTHX_ IoSv(a))
+#define ReTMPREFCNT_inc(a)		Perl_SvTMPREFCNT_inc(aTHX_ ReSv(a))
+#define SvTMPREFCNT_inc		Perl_SvTMPREFCNT_inc
 #define SvIV			Perl_SvIV
 #define SvUV			Perl_SvUV
 #define SvNV			Perl_SvNV
@@ -272,6 +279,7 @@
 #define form			Perl_form
 #define vform			Perl_vform
 #define free_tmps		Perl_free_tmps
+#define tmps_tmprefcnt		Perl_tmps_tmprefcnt
 #ifdef PERL_CORE
 #define gen_constant_list	Perl_gen_constant_list
 #endif
@@ -392,6 +400,7 @@
 #define keyword			Perl_keyword
 #endif
 #define leave_scope		Perl_leave_scope
+#define scope_tmprefcnt		Perl_scope_tmprefcnt
 #if defined(PERL_CORE) || defined(PERL_EXT)
 #define lex_end			Perl_lex_end
 #endif
@@ -2216,6 +2225,13 @@
 #define IoREFCNT_dec(a)		Perl_SvREFCNT_dec(aTHX_ IoSv(a))
 #define ReREFCNT_dec(a)		Perl_SvREFCNT_dec(aTHX_ ReSv(a))
 #define SvREFCNT_dec(a)		Perl_SvREFCNT_dec(aTHX_ a)
+#define AvTMPREFCNT_inc(a)		Perl_SvTMPREFCNT_inc(aTHX_ AvSv(a))
+#define HvTMPREFCNT_inc(a)		Perl_SvTMPREFCNT_inc(aTHX_ HvSv(a))
+#define CvTMPREFCNT_inc(a)		Perl_SvTMPREFCNT_inc(aTHX_ CvSv(a))
+#define GvTMPREFCNT_inc(a)		Perl_SvTMPREFCNT_inc(aTHX_ GvSv(a))
+#define IoTMPREFCNT_inc(a)		Perl_SvTMPREFCNT_inc(aTHX_ IoSv(a))
+#define ReTMPREFCNT_inc(a)		Perl_SvTMPREFCNT_inc(aTHX_ ReSv(a))
+#define SvTMPREFCNT_inc(a)	Perl_SvTMPREFCNT_inc(aTHX_ a)
 #define SvIV(a)			Perl_SvIV(aTHX_ a)
 #define SvUV(a)			Perl_SvUV(aTHX_ a)
 #define SvNV(a)			Perl_SvNV(aTHX_ a)
@@ -2413,6 +2429,7 @@
 #endif
 #define vform(a,b)		Perl_vform(aTHX_ a,b)
 #define free_tmps()		Perl_free_tmps(aTHX)
+#define tmps_tmprefcnt()	Perl_tmps_tmprefcnt(aTHX)
 #ifdef PERL_CORE
 #define gen_constant_list(a)	Perl_gen_constant_list(aTHX_ a)
 #endif
@@ -2537,6 +2554,7 @@
 #define keyword(a,b)		Perl_keyword(aTHX_ a,b)
 #endif
 #define leave_scope(a)		Perl_leave_scope(aTHX_ a)
+#define scope_tmprefcnt()	Perl_scope_tmprefcnt(aTHX)
 #if defined(PERL_CORE) || defined(PERL_EXT)
 #define lex_end()		Perl_lex_end(aTHX)
 #endif

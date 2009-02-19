@@ -134,6 +134,7 @@ PERL_INLINE_CALLCONV char*	Perl_SvPVX_mutable(pTHX_ SV *sv)
 	assert(sv)
 
 PERL_INLINE_CALLCONV void	Perl_SvREFCNT_dec(pTHX_ SV *sv);
+PERL_INLINE_CALLCONV void	Perl_SvTMPREFCNT_inc(pTHX_ SV *sv);
 PERL_INLINE_CALLCONV IV	Perl_SvIV(pTHX_ SV *sv)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_SVIV	\
@@ -837,6 +838,7 @@ PERL_CALLCONV char*	Perl_vform(pTHX_ const char* pat, va_list* args)
 	assert(pat)
 
 PERL_CALLCONV void	Perl_free_tmps(pTHX);
+PERL_CALLCONV void	Perl_tmps_tmprefcnt(pTHX);
 PERL_CALLCONV OP*	Perl_gen_constant_list(pTHX_ OP* o);
 #if !defined(HAS_GETENV_LEN)
 PERL_CALLCONV char*	Perl_getenv_len(pTHX_ const char *env_elem, unsigned long *len)
@@ -1383,6 +1385,7 @@ PERL_CALLCONV I32	Perl_keyword(pTHX_ const char* name, I32 len)
 	assert(name)
 
 PERL_CALLCONV void	Perl_leave_scope(pTHX_ I32 base);
+PERL_CALLCONV void	Perl_scope_tmprefcnt(pTHX);
 PERL_CALLCONV void	Perl_lex_end(pTHX);
 PERL_CALLCONV void	Perl_lex_start(pTHX_ SV* line, PerlIO *rsfp, bool new_filter);
 PERL_CALLCONV void	Perl_op_null(pTHX_ OP* o)
