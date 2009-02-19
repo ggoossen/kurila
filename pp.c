@@ -4428,7 +4428,7 @@ PP(pp_arrayconcat)
 	    OP_DESC(PL_op), Ddesc(left));
     }
 
-    res = SvAv(newSVsv(left));
+    res = SvAv(sv_2mortal(newSVsv(left)));
     TOPs = AvSv(res);
     
     ary = AvARRAY(SvAv(right));
@@ -4456,7 +4456,7 @@ PP(pp_hashconcat)
 	    OP_DESC(PL_op), Ddesc(left));
     }
 
-    res = SvHv(newSVsv(left));
+    res = SvHv(sv_2mortal(newSVsv(left)));
     TOPs = HvSv(res);
     right_hv = SvHv(right);
 
