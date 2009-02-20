@@ -344,7 +344,7 @@ S_tokereport(pTHX_ I32 rv, const YYSTYPE* lvalp)
 	const char *name = NULL;
 	enum token_type type = TOKENTYPE_NONE;
 	const struct debug_tokens *p;
-	SV* const report = newSVpvs("<== ");
+	SV* const report = sv_2mortal(newSVpvs("<== "));
 
 	for (p = debug_tokens; p->token; p++) {
 	    if (p->token == (int)rv) {
@@ -709,7 +709,6 @@ Perl_parser_free(pTHX_  const yy_parser *parser)
     PL_parser = parser->old_parser;
     Safefree(parser);
 }
-
 
 /*
  * Perl_lex_end
