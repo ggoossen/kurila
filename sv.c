@@ -8953,6 +8953,12 @@ do_reset_tmprefcnt(pTHX_ SV *const sv)
 static void
 do_sv_tmprefcnt(pTHX_ SV *const sv)
 {
+    Perl_sv_tmprefcnt(aTHX_ sv);
+}
+
+void
+Perl_sv_tmprefcnt(pTHX_ SV *const sv)
+{
     dVAR;
     const U32 type = SvTYPE(sv);
 
@@ -8974,11 +8980,11 @@ do_sv_tmprefcnt(pTHX_ SV *const sv)
     }
 
     if (SvOBJECT(sv)) {
-	SvTMPREFCNT_inc(SvSTASH(sv));	/* possibly of changed persuasion */
+	HvTMPREFCNT_inc(SvSTASH(sv));	/* possibly of changed persuasion */
     }
     if (type >= SVt_PVMG) {
 	if (type == SVt_PVMG && SvPAD_OUR(sv)) {
-	    SvTMPREFCNT_inc(SvOURGV(sv));
+	    GvTMPREFCNT_inc(SvOURGV(sv));
 	} else if (SvMAGIC(sv))
 	    Perl_mg_tmprefcnt(aTHX_ sv);
     }
@@ -9031,8 +9037,6 @@ do_check_tmprefcnt(pTHX_ SV* const sv)
 	PerlIO_printf(Perl_debug_log, "Invalid refcount (%ld) should be at least (%ld)\n", 
 		      (long)SvREFCNT(sv), (long)SvTMPREFCNT(sv));
 	sv_dump(sv);
-	visit(do_reset_tmprefcnt, 0, 0);
-	visit(do_sv_tmprefcnt, 0, 0);
     }
 }
 
@@ -9041,49 +9045,56 @@ Perl_refcnt_check(pTHX)
 {
     visit(do_reset_tmprefcnt, 0, 0);
     visit(do_sv_tmprefcnt, 0, 0);
-    SvTMPREFCNT_inc(PL_defstash);
-    SvTMPREFCNT_inc(PL_curstash);
+    HvTMPREFCNT_inc(PL_defstash);
+    HvTMPREFCNT_inc(PL_curstash);
     SvTMPREFCNT_inc(PL_curstname);
-    SvTMPREFCNT_inc(PL_defgv);
-    SvTMPREFCNT_inc(PL_compcv);
+    SvTMPREFCNT_inc(PL_subname);
+    GvTMPREFCNT_inc(PL_defgv);
+    CvTMPREFCNT_inc(PL_compcv);
+    AvTMPREFCNT_inc(PL_comppad_name);
     SvTMPREFCNT_inc(PL_diehook);
     SvTMPREFCNT_inc(PL_warnhook);
     SvTMPREFCNT_inc(PL_errorcreatehook); 
-    SvTMPREFCNT_inc(PL_main_cv);
-    SvTMPREFCNT_inc(PL_unitcheckav);
+    CvTMPREFCNT_inc(PL_main_cv);
+    AvTMPREFCNT_inc(PL_unitcheckav);
     SvTMPREFCNT_inc(PL_rs);
-    SvTMPREFCNT_inc(PL_fdpid);
-    SvTMPREFCNT_inc(PL_modglobal);
+    AvTMPREFCNT_inc(PL_fdpid);
+    HvTMPREFCNT_inc(PL_modglobal);
     SvTMPREFCNT_inc(PL_errors);
-    SvTMPREFCNT_inc(PL_strtab);
-    SvTMPREFCNT_inc(PL_stashcache);
+    HvTMPREFCNT_inc(PL_strtab);
+    HvTMPREFCNT_inc(PL_stashcache);
     SvTMPREFCNT_inc(PL_patchlevel);
-    SvTMPREFCNT_inc(PL_compiling.cop_hints_hash);
+    HvTMPREFCNT_inc(PL_compiling.cop_hints_hash);
     SvTMPREFCNT_inc(PL_dynamicscope);
-    SvTMPREFCNT_inc(PL_firstgv);
-    SvTMPREFCNT_inc(PL_secondgv);
+    GvTMPREFCNT_inc(PL_firstgv);
+    GvTMPREFCNT_inc(PL_secondgv);
     SvTMPREFCNT_inc(PL_e_script);
     HvTMPREFCNT_inc(PL_includedhv);
     AvTMPREFCNT_inc(PL_includepathav);
     HvTMPREFCNT_inc(PL_magicsvhv);
     HvTMPREFCNT_inc(PL_hinthv);
     SvTMPREFCNT_inc(PL_errsv);
-    SvTMPREFCNT_inc(PL_isarev);
+    HvTMPREFCNT_inc(PL_isarev);
+    SvTMPREFCNT_inc(PL_statname);
+    GvTMPREFCNT_inc(PL_defoutgv);
+    HvTMPREFCNT_inc(PL_envhv);
 
     Perl_tmps_tmprefcnt(aTHX);
     Perl_scope_tmprefcnt(aTHX);
+    if (PL_parser)
+	Perl_parser_tmprefcnt(PL_parser);
 
     {
 	PERL_SI *si;
 	si = PL_curstackinfo;
 	while (si) {
-	    SvTMPREFCNT_inc(si->si_stack);
+	    AvTMPREFCNT_inc(si->si_stack);
 	    si = si->si_next;
 	}
 	si = PL_curstackinfo;
 	si = si->si_prev;
 	while (si) {
-	    SvTMPREFCNT_inc(si->si_stack);
+	    AvTMPREFCNT_inc(si->si_stack);
 	    si = si->si_prev;
 	}
     }

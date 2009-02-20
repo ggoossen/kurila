@@ -692,6 +692,30 @@ Perl_yyparse (pTHX)
     return yyresult;
 }
 
+void
+Perl_parser_tmprefcnt(pTHX_  const yy_parser *parser)
+{
+    PERL_ARGS_ASSERT_PARSER_FREE;
+
+    SvTMPREFCNT_inc(parser->linestr);
+    SvTMPREFCNT_inc(parser->lex_filename);
+
+    AvTMPREFCNT_inc(parser->rsfp_filters);
+    
+    if (parser->old_parser) {
+	parser_tmprefcnt(parser->old_parser);
+    }
+
+    {
+	yy_stack_frame *ps;
+	for (ps = parser->stack; ps <= parser->ps; ps++) {
+	    if (yy_type_tab[yystos[ps->state]] == toketype_opval && ps->val.opval) {
+		op_tmprefcnt(ps->val.opval);
+	    }
+	}
+    }
+}
+
 /*
  * Local variables:
  * c-indentation-style: bsd

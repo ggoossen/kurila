@@ -990,6 +990,7 @@
 #ifdef PERL_CORE
 #define yyparse			Perl_yyparse
 #define parser_free		Perl_parser_free
+#define parser_tmprefcnt	Perl_parser_tmprefcnt
 #define yywarn			Perl_yywarn
 #endif
 #if defined(MYMALLOC)
@@ -1706,6 +1707,7 @@
 #endif
 #ifdef PERL_CORE
 #define refcnt_check		Perl_refcnt_check
+#define Perl_sv_tmprefcnt	Perl_Perl_sv_tmprefcnt
 #endif
 #ifndef SPRINTF_RETURNS_STRLEN
 #endif
@@ -3134,6 +3136,7 @@
 #ifdef PERL_CORE
 #define yyparse()		Perl_yyparse(aTHX)
 #define parser_free(a)		Perl_parser_free(aTHX_ a)
+#define parser_tmprefcnt(a)	Perl_parser_tmprefcnt(aTHX_ a)
 #define yywarn(a)		Perl_yywarn(aTHX_ a)
 #endif
 #if defined(MYMALLOC)
@@ -3864,6 +3867,7 @@
 #endif
 #ifdef PERL_CORE
 #define refcnt_check()		Perl_refcnt_check(aTHX)
+#define Perl_sv_tmprefcnt(a)	Perl_Perl_sv_tmprefcnt(aTHX_ a)
 #endif
 #ifndef SPRINTF_RETURNS_STRLEN
 #endif

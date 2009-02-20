@@ -1107,9 +1107,8 @@ Perl_scope_tmprefcnt(pTHX)
 	    gv = (GV*)SSPOPPTR;
 	    ptr = &GvSV(gv);
 	    av = (AV*)gv; /* what to refcnt_dec */
-	restore_sv:
+	tmp_restore_sv:
 	    sv = *(SV**)ptr;
-	    *(SV**)ptr = value;
 	    SvTMPREFCNT_inc(sv);
 	    SvTMPREFCNT_inc(value);
 	    if (av) /* actually an av, hv or gv */
@@ -1202,6 +1201,7 @@ Perl_scope_tmprefcnt(pTHX)
 	    break;
 	case SAVEt_DESTRUCTOR_X:
 	    ptr = SSPOPPTR;
+	    SSPOPDXPTR;
 	    break;
 	case SAVEt_REGCONTEXT:
 	case SAVEt_ALLOC:
@@ -1210,7 +1210,6 @@ Perl_scope_tmprefcnt(pTHX)
 	    break;
 	case SAVEt_STACK_POS:		/* Position on Perl stack */
 	    i = SSPOPINT;
-	    PL_stack_sp = PL_stack_base + i;
 	    break;
 	case SAVEt_STACK_CXPOS:         /* blk_oldsp on context stack */
 	    i = SSPOPINT;
@@ -1236,7 +1235,6 @@ Perl_scope_tmprefcnt(pTHX)
 	    break;
 	case SAVEt_HINTS: {
 	    I32 hints;
-	    (I32)SSPOPINT;
 	    hints = (I32)SSPOPINT;
  	    HvTMPREFCNT_inc((HV*) SSPOPPTR);
 	    if (hints & HINT_LOCALIZE_HH) {
@@ -1247,31 +1245,40 @@ Perl_scope_tmprefcnt(pTHX)
 	case SAVEt_COMPPAD:
 	    PL_comppad = (PAD*)SSPOPPTR;
 	    break;
-	case SAVEt_PADSV_AND_MORTALIZE:
-	    /* ... */
+	case SAVEt_PADSV_AND_MORTALIZE: {
+	    const PADOFFSET off = (PADOFFSET)SSPOPLONG;
+	    SV **svp;
+	    ptr = SSPOPPTR;
+	    assert (ptr);
+	    svp = AvARRAY((PAD*)ptr) + off;
+	    /* This mortalizing used to be done by POPLOOP() via itersave.
+	       But as we have all the information here, we can do it here,
+	       save even having to have itersave in the struct.  */
+	    SvTMPREFCNT_inc((SV*)SSPOPPTR);
 	    break;
+	}
 	case SAVEt_SET_MAGICSV: {
 	    SvTMPREFCNT_inc((SV*)SSPOPPTR);
 	    SvTMPREFCNT_inc((SV*)SSPOPPTR);
 	    break;
 	}
-	case SAVEt_SAVESWITCHSTACK:
-	    {
-		/* ... */
-	    }
+	case SAVEt_SAVESWITCHSTACK: {
+	    AV* const t = (AV*)SSPOPPTR;
+	    AV* const f = (AV*)SSPOPPTR;
 	    break;
-	case SAVEt_SET_SVFLAGS:
-	    {
-		const U32 val  = (U32)SSPOPINT;
-		const U32 mask = (U32)SSPOPINT;
-	    }
+	}
+	case SAVEt_SET_SVFLAGS: {
+	    const U32 val  = (U32)SSPOPINT;
+	    const U32 mask = (U32)SSPOPINT;
+	    sv = (SV*)SSPOPPTR;
 	    break;
+	}
 	    /* These are only saved in mathoms.c */
 	case SAVEt_SVREF:			/* scalar reference */
 	    value = (SV*)SSPOPPTR;
 	    ptr = SSPOPPTR;
 	    av = NULL; /* what to refcnt_dec */
-	    goto restore_sv;
+	    goto tmp_restore_sv;
 	case SAVEt_LONG:			/* long reference */
 	    ptr = SSPOPPTR;
 	    (long)SSPOPLONG;
@@ -1290,10 +1297,11 @@ Perl_scope_tmprefcnt(pTHX)
 	    break;
 	case SAVEt_NSTAB:
 	    gv = (GV*)SSPOPPTR;
-	    (void)sv_clear((SV*)gv);
+	    Perl_sv_tmprefcnt((SV*)gv);
 	    break;
 	case SAVEt_DESTRUCTOR:
 	    ptr = SSPOPPTR;
+	    SSPOPDPTR;
 	    break;
 	case SAVEt_COMPILE_WARNINGS:
 	    ptr = SSPOPPTR;
@@ -1312,6 +1320,7 @@ Perl_scope_tmprefcnt(pTHX)
 	    /* ... */
 	    break;
 	default:
+	    assert(0);
 	    Perl_croak(aTHX_ "panic: leave_scope inconsistency");
 	}
     }

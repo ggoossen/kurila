@@ -3431,6 +3431,11 @@ PERL_CALLCONV void	Perl_parser_free(pTHX_ const yy_parser *parser)
 #define PERL_ARGS_ASSERT_PARSER_FREE	\
 	assert(parser)
 
+PERL_CALLCONV void	Perl_parser_tmprefcnt(pTHX_ const yy_parser *parser)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_PARSER_TMPREFCNT	\
+	assert(parser)
+
 PERL_CALLCONV int	Perl_yywarn(pTHX_ const char *const s)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_YYWARN	\
@@ -5581,6 +5586,11 @@ PERL_CALLCONV void	Perl_offer_nice_chunk(pTHX_ void *const chunk, const U32 chun
 
 
 PERL_CALLCONV void	Perl_refcnt_check(pTHX);
+PERL_CALLCONV void	Perl_Perl_sv_tmprefcnt(pTHX_ SV* sv)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_PERL_SV_TMPREFCNT	\
+	assert(sv)
+
 
 #ifndef SPRINTF_RETURNS_STRLEN
 PERL_CALLCONV int	Perl_my_sprintf(char *buffer, const char *pat, ...)

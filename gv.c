@@ -1131,10 +1131,10 @@ Perl_gp_tmprefcnt(pTHX_ GV *gv)
 	return;
 
     SvTMPREFCNT_inc(gp->gp_sv);
-    SvTMPREFCNT_inc(gp->gp_av);
-    SvTMPREFCNT_inc(gp->gp_hv);
-    SvTMPREFCNT_inc(gp->gp_io);
-    SvTMPREFCNT_inc(gp->gp_cv);
+    AvTMPREFCNT_inc(gp->gp_av);
+    HvTMPREFCNT_inc(gp->gp_hv);
+    IoTMPREFCNT_inc(gp->gp_io);
+    CvTMPREFCNT_inc(gp->gp_cv);
 }
 
 /* Updates and caches the CV's */

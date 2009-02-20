@@ -949,6 +949,7 @@ p	|int	|yyerror	|NN const char *const s
 EXp	|int	|yylex
 p	|int	|yyparse
 p	|void	|parser_free	|NN const yy_parser *parser
+p	|void	|parser_tmprefcnt	|NN const yy_parser *parser
 p	|int	|yywarn		|NN const char *const s
 #if defined(MYMALLOC)
 Ap	|void	|dump_mstats	|NN const char* s
@@ -1686,6 +1687,7 @@ XEopMa	|STRLEN *|new_warnings_bitfield|NULLOK STRLEN *buffer \
 p	|void	|offer_nice_chunk	|NN void *const chunk|const U32 chunk_size
 
 p	|void	|refcnt_check
+p	|void	|Perl_sv_tmprefcnt	|NN SV* sv
 
 #ifndef SPRINTF_RETURNS_STRLEN
 Apnod	|int	|my_sprintf	|NN char *buffer|NN const char *pat|...
