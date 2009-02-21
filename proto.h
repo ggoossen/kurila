@@ -476,6 +476,11 @@ PERL_CALLCONV void	Perl_cx_dump(pTHX_ PERL_CONTEXT* cx)
 #define PERL_ARGS_ASSERT_CX_DUMP	\
 	assert(cx)
 
+PERL_CALLCONV void	Perl_cx_tmprefcnt(pTHX_ PERL_CONTEXT* cx)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_CX_TMPREFCNT	\
+	assert(cx)
+
 PERL_CALLCONV SV*	Perl_filter_add(pTHX_ filter_t funcp, SV* datasv);
 PERL_CALLCONV void	Perl_filter_del(pTHX_ filter_t funcp)
 			__attribute__nonnull__(pTHX_1);

@@ -1326,6 +1326,7 @@ Perl_scope_tmprefcnt(pTHX)
     }
     PL_savestack_ix = saved_savestack_ix;
 }
+
 void
 Perl_cx_dump(pTHX_ PERL_CONTEXT *cx)
 {
@@ -1423,6 +1424,24 @@ Perl_cx_dump(pTHX_ PERL_CONTEXT *cx)
     PERL_UNUSED_CONTEXT;
     PERL_UNUSED_ARG(cx);
 #endif	/* DEBUGGING */
+}
+
+void
+Perl_cx_tmprefcnt(pTHX_ PERL_CONTEXT *cx)
+{
+    switch (CxTYPE(cx)) {
+    case CXt_NULL:
+    case CXt_BLOCK:
+	HvTMPREFCNT_inc(cx->blk_dynascope);
+	break;
+    case CXt_LOOP_FOR:
+    case CXt_LOOP_PLAIN:
+    case CXt_LOOP_LAZYIV:
+    case CXt_SUB:
+    case CXt_EVAL:
+    case CXt_SUBST:
+	break;
+    }
 }
 
 /*

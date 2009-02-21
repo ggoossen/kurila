@@ -94,6 +94,7 @@ Perl_cv_const_sv
 Perl_cv_undef
 Perl_cv_tmprefcnt
 Perl_cx_dump
+Perl_cx_tmprefcnt
 Perl_filter_add
 Perl_filter_del
 Perl_filter_read

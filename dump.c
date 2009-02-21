@@ -1807,6 +1807,7 @@ Perl_runops_debug(pTHX)
 
     DEBUG_l(Perl_deb(aTHX_ "Entering new RUNOPS level\n"));
     do {
+	DEBUG_R(refcnt_check(aTHX));
 	PERL_ASYNC_CHECK();
 	if (PL_debug) {
 	    if (PL_watchaddr && (*PL_watchaddr != PL_watchok))
@@ -1827,7 +1828,6 @@ Perl_runops_debug(pTHX)
 	    if (DEBUG_t_TEST_) debop(PL_op);
 	    if (DEBUG_P_TEST_) debprof(PL_op);
 	}
-	DEBUG_R(refcnt_check(aTHX));
     } while ((PL_op = CALL_FPTR(PL_op->op_ppaddr)(aTHX)));
     DEBUG_R(refcnt_check(aTHX));
     DEBUG_l(Perl_deb(aTHX_ "leaving RUNOPS level\n"));

@@ -9079,22 +9079,33 @@ Perl_refcnt_check(pTHX)
     GvTMPREFCNT_inc(PL_defoutgv);
     HvTMPREFCNT_inc(PL_envhv);
 
-    Perl_tmps_tmprefcnt(aTHX);
-    Perl_scope_tmprefcnt(aTHX);
+    if (PL_main_root)
+	op_tmprefcnt(PL_main_root);
+    if (PL_eval_root)
+	op_tmprefcnt(PL_eval_root);
     if (PL_parser)
 	Perl_parser_tmprefcnt(PL_parser);
+
+    Perl_tmps_tmprefcnt(aTHX);
+    Perl_scope_tmprefcnt(aTHX);
 
     {
 	PERL_SI *si;
 	si = PL_curstackinfo;
 	while (si) {
+	    PERL_CONTEXT *cx;
 	    AvTMPREFCNT_inc(si->si_stack);
+	    for (cx = si->si_cxstack + si->si_cxix; cx >= si->si_cxstack; cx--)
+		cx_tmprefcnt(cx);
 	    si = si->si_next;
 	}
 	si = PL_curstackinfo;
 	si = si->si_prev;
 	while (si) {
+	    PERL_CONTEXT *cx;
 	    AvTMPREFCNT_inc(si->si_stack);
+	    for (cx = si->si_cxstack + si->si_cxix; cx >= si->si_cxstack; cx--)
+		cx_tmprefcnt(cx);
 	    si = si->si_prev;
 	}
     }

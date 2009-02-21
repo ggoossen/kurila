@@ -484,8 +484,6 @@ Perl_op_tmprefcnt(pTHX_ OP *o)
 	return;
     }
 
-    return;
-
     type = o->op_type;
 
     if (o->op_flags & OPf_KIDS) {
@@ -498,8 +496,10 @@ Perl_op_tmprefcnt(pTHX_ OP *o)
 	type = (OPCODE)o->op_targ;
 
     if (type == OP_NEXTSTATE || type == OP_DBSTATE) {
-	SvTMPREFCNT_inc(((COP*)o)->cop_hints_hash);
+	HvTMPREFCNT_inc(((COP*)o)->cop_hints_hash);
     }
+
+    SvTMPREFCNT_inc(o->op_location);
 
  retry:
     switch (o->op_type) {
@@ -543,7 +543,7 @@ Perl_op_tmprefcnt(pTHX_ OP *o)
     case OP_MATCH:
     case OP_QR:
 clear_pmop:
-	SvTMPREFCNT_inc(PM_GETRE(cPMOPo));
+	ReTMPREFCNT_inc(PM_GETRE(cPMOPo));
 	break;
     }
 }
@@ -4097,7 +4097,7 @@ Perl_ck_eval(pTHX_ OP *o)
     if ((PL_hints & HINT_LOCALIZE_HH) != 0 && PL_hinthv) {
 	/* Store a copy of %^H that pp_entereval can pick up. */
 	OP *hhop = newSVOP(OP_HINTSEVAL, 0,
-	    newSVsv(PL_hinthv), o->op_location);
+	    newSVsv(HvSv(PL_hinthv)), o->op_location);
 	cUNOPo->op_first->op_sibling = hhop;
 	o->op_private |= OPpEVAL_HAS_HH;
     }

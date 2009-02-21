@@ -181,6 +181,7 @@ pR	|SV*	|op_const_sv	|NULLOK const OP* o|NULLOK CV* cv
 Apd	|void	|cv_undef	|NN CV* cv
 Apd	|void	|cv_tmprefcnt	|NN CV* cv
 Ap	|void	|cx_dump	|NN PERL_CONTEXT* cx
+Ap	|void	|cx_tmprefcnt	|NN PERL_CONTEXT* cx
 Ap	|SV*	|filter_add	|NULLOK filter_t funcp|NULLOK SV* datasv
 Ap	|void	|filter_del	|NN filter_t funcp
 ApR	|I32	|filter_read	|int idx|NN SV *buf_sv|int maxlen

@@ -159,6 +159,7 @@
 #define cv_undef		Perl_cv_undef
 #define cv_tmprefcnt		Perl_cv_tmprefcnt
 #define cx_dump			Perl_cx_dump
+#define cx_tmprefcnt		Perl_cx_tmprefcnt
 #define filter_add		Perl_filter_add
 #define filter_del		Perl_filter_del
 #define filter_read		Perl_filter_read
@@ -2312,6 +2313,7 @@
 #define cv_undef(a)		Perl_cv_undef(aTHX_ a)
 #define cv_tmprefcnt(a)		Perl_cv_tmprefcnt(aTHX_ a)
 #define cx_dump(a)		Perl_cx_dump(aTHX_ a)
+#define cx_tmprefcnt(a)		Perl_cx_tmprefcnt(aTHX_ a)
 #define filter_add(a,b)		Perl_filter_add(aTHX_ a,b)
 #define filter_del(a)		Perl_filter_del(aTHX_ a)
 #define filter_read(a,b,c)	Perl_filter_read(aTHX_ a,b,c)
