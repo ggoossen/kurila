@@ -9078,6 +9078,7 @@ Perl_refcnt_check(pTHX)
     SvTMPREFCNT_inc(PL_statname);
     GvTMPREFCNT_inc(PL_defoutgv);
     HvTMPREFCNT_inc(PL_envhv);
+    HvTMPREFCNT_inc(PL_op_sequence);
 
     if (PL_main_root)
 	op_tmprefcnt(PL_main_root);
