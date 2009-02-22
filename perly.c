@@ -717,6 +717,20 @@ Perl_parser_tmprefcnt(pTHX_  const yy_parser *parser)
 	if (yy_type_tab[parser->yychar] == toketype_opval && parser->yylval.opval) {
 	    op_tmprefcnt(parser->yylval.opval);
 	}
+
+#ifdef PERL_MAD
+	...;
+#else
+	{
+	    I32 i;
+	    for (i=0; i<parser->nexttoke; i++) {
+		if (yy_type_tab[parser->nexttype[i]] == toketype_opval &&
+		    parser->nextval[i].opval ) {
+		    op_tmprefcnt(parser->nextval[i].opval);
+		}
+	    }
+	}
+#endif
     }
 }
 

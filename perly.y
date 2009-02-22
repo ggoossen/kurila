@@ -346,12 +346,12 @@ loop	:	label WHILE remember '(' texpr ')'
                                 OP* mydef;
                                 mydef = newOP(OP_PADSV, 0, NULL);
                                 mydef->op_targ = allocmy("$_");
-                                $$ = newUNOP(OP_DEFINED, 0,
+                                $<opval>$ = newUNOP(OP_DEFINED, 0,
                                     newASSIGNOP(0, mydef,
                                         0, $5, $5->op_location), $5->op_location );
                             }
                             else {
-                                $$ = $5;
+                                $<opval>$ = $5;
                             }
                         }
                     mintro mblock cont

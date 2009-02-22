@@ -198,7 +198,7 @@ static const char *const yytname[] =
   "UMINUS", "POWOP", "POSTDEC", "POSTINC", "PREDEC", "PREINC", "ASLICE",
   "HSLICE", "DEREFAMP", "DEREFSTAR", "DEREFHSH", "DEREFARY", "DEREFSCL",
   "ARROW", "')'", "'('", "PEG", "$accept", "prog", "block", "dblock",
-  "remember", "progstart", "mblock", "@1", "mremember", "lineseq", "line",
+  "remember", "progstart", "mblock", "$@1", "mremember", "lineseq", "line",
   "sideff", "else", "cond", "cont", "loop", "@2", "mintro", "texpr",
   "iexpr", "mexpr", "miexpr", "label", "decl", "peg", "mysubrout",
   "subrout", "startsub", "startanonsub", "startblocksub", "subname",

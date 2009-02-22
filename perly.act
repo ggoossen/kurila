@@ -1546,7 +1546,6 @@ case 2:
     break;
 
 
-/* Line 1267 of yacc.c.  */
 
       default: break;
     
