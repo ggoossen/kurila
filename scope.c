@@ -1231,7 +1231,7 @@ Perl_scope_tmprefcnt(pTHX)
 	    SvTMPREFCNT_inc(value);
 	    break;
 	case SAVEt_OP:
-	    PL_op = (OP*)SSPOPPTR;
+	    (OP*)SSPOPPTR;
 	    break;
 	case SAVEt_HINTS: {
 	    I32 hints;

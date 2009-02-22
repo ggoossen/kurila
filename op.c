@@ -528,6 +528,7 @@ Perl_op_tmprefcnt(pTHX_ OP *o)
     case OP_METHOD_NAMED:
     case OP_CONST:
     case OP_HINTSEVAL:
+    case OP_MAGICSV:
 	SvTMPREFCNT_inc(cSVOPo->op_sv);
 	break;
     case OP_NEXT:
