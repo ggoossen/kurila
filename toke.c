@@ -10422,7 +10422,7 @@ Perl_start_subparse(pTHX_ U32 flags)
 	assert(SvTYPE(PL_compcv) == SVt_PVCV);
     }
     SAVEI32(PL_subline);
-    save_item(PL_subname);
+    SAVESPTR(PL_subname);
     SAVESPTR(PL_compcv);
 
     CVcpSTEAL(PL_compcv, (CV*)newSV_type(SVt_PVCV));

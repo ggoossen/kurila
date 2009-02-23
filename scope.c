@@ -1243,7 +1243,7 @@ Perl_scope_tmprefcnt(pTHX)
 	    break;
 	}
 	case SAVEt_COMPPAD:
-	    PL_comppad = (PAD*)SSPOPPTR;
+	    (PAD*)SSPOPPTR;
 	    break;
 	case SAVEt_PADSV_AND_MORTALIZE: {
 	    const PADOFFSET off = (PADOFFSET)SSPOPLONG;
@@ -1438,7 +1438,11 @@ Perl_cx_tmprefcnt(pTHX_ PERL_CONTEXT *cx)
     case CXt_LOOP_PLAIN:
     case CXt_LOOP_LAZYIV:
     case CXt_SUB:
+	break;
     case CXt_EVAL:
+	HvTMPREFCNT_inc(cx->blk_dynascope);
+	SvTMPREFCNT_inc(cx->blk_eval.old_namesv);
+	break;
     case CXt_SUBST:
 	break;
     }

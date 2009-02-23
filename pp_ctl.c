@@ -1597,7 +1597,7 @@ PP(pp_require)
 	if (vms_unixname)
 #endif
 	{
-	    namesv = newSV_type(SVt_PV);
+	    namesv = sv_2mortal(newSV_type(SVt_PV));
 	    for (i = 0; i <= AvFILL(ar); i++) {
 		SV * const dirsv = *av_fetch(ar, i, TRUE);
 
@@ -1750,8 +1750,7 @@ PP(pp_require)
 	    }
 	}
     }
-    filename = newSVpv( tryrsfp ? tryname : name, 0); /* fixme possible leak. */
-    SvREFCNT_dec(namesv);
+    filename = sv_2mortal(newSVpv( tryrsfp ? tryname : name, 0));
     if (!tryrsfp) {
 	if (PL_op->op_type == OP_REQUIRE) {
 	    const char *msgstr = name;
@@ -1844,7 +1843,6 @@ PP(pp_require)
 	    (void)hv_store(PL_includedhv,
 		unixname, unixlen, SvREFCNT_inc(hook_sv), 0 );
     }
-    SvREFCNT_dec(filename);
 
     return op;
 }

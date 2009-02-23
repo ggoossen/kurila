@@ -2288,11 +2288,11 @@ Perl_package(pTHX_ OP *o)
     PERL_ARGS_ASSERT_PACKAGE;
 
     SAVESPTR(PL_curstash);
-    save_item(PL_curstname);
+    SAVESPTR(PL_curstname);
 
     HVcpREPLACE(PL_curstash, gv_stashsv(sv, GV_ADD));
 
-    sv_setsv(PL_curstname, sv);
+    SVcpSTEAL(PL_curstname, newSVsv(sv));
 
     PL_hints |= HINT_BLOCK_SCOPE;
     PL_parser->expect = XSTATE;
