@@ -8991,14 +8991,14 @@ Perl_sv_tmprefcnt(pTHX_ SV *const sv)
     switch (type) {
 	/* case SVt_BIND: */
     case SVt_PVIO:
-	goto freescalar;
+	goto tmpscalar;
     case SVt_REGEXP:
 	/* FIXME for plugins */
 	preg_tmprefcnt((REGEXP*) sv);
-	goto freescalar;
+	goto tmpscalar;
     case SVt_PVCV:
 	cv_tmprefcnt((CV*)sv);
-	goto freescalar;
+	goto tmpscalar;
     case SVt_PVHV:
 	hv_tmprefcnt((HV*)sv);
 	break;
@@ -9017,7 +9017,7 @@ Perl_sv_tmprefcnt(pTHX_ SV *const sv)
     case SVt_PVNV:
     case SVt_PVIV:
     case SVt_PV:
-      freescalar:
+      tmpscalar:
 	/* Don't bother with SvOOK_off(sv); as we're only going to free it.  */
 	if (SvROK(sv)) {
 	    SV * const target = SvRV(sv);
