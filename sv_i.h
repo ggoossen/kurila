@@ -176,10 +176,13 @@ SV* LocationFilename(pTHX_ SV *location) {
 static __inline__ SV* inline_loc_desc(pTHX_ SV *loc) {
     SV * str = sv_2mortal(newSVpv("", 0));
     if (loc && SvAVOK(loc)) {
+        SV ** loc0 = av_fetch((AV*)loc, 0, FALSE);
+        SV ** loc1 = av_fetch((AV*)loc, 1, FALSE);
+        SV ** loc2 = av_fetch((AV*)loc, 2, FALSE);
         Perl_sv_catpvf(aTHX_ str, "%s line %"IVdf" character %"IVdf".",
-                       SvPVX_const(*av_fetch((AV*)loc, 0, FALSE)),
-                       SvIV(*av_fetch((AV*)loc, 1, FALSE)),
-                       SvIV(*av_fetch((AV*)loc, 2, FALSE))
+            (loc0 && SvPVOK(*loc0)) ? SvPVX_const(*av_fetch((AV*)loc, 0, FALSE)) : "",
+            (loc1 && SvPVOK(*loc1)) ? SvIV(*loc1) : -1,
+            (loc2 && SvPVOK(*loc2)) ? SvIV(*loc2) : -1
             );
     }
     return str;
