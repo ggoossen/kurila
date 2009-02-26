@@ -2037,9 +2037,6 @@ Perl_create_eval_scope(pTHX_ U32 flags)
 	PL_in_eval |= EVAL_KEEPERR;
     else
 	sv_setpvn(ERRSV,"",0);
-    if (flags & G_FAKINGEVAL) {
-	PL_eval_root = PL_op; /* Only needed so that goto works right. */
-    }
     return cx;
 }
     
