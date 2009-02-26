@@ -4491,11 +4491,11 @@ Perl_call_list(pTHX_ I32 oldscope, AV *paramList)
 		PL_madskills |= 16384;
 #endif
 	    {
-		SV *old_diehook = PL_diehook;
-		PL_diehook = PERL_DIEHOOK_IGNORE;
+		SV *old_diehook = sv_2mortal(SvREFCNT_inc(PL_diehook));
+		SVcpREPLACE(PL_diehook, PERL_DIEHOOK_IGNORE);
 		PUSHMARK(PL_stack_sp);
 		call_sv((SV*)(cv), G_EVAL|G_DISCARD);
-		PL_diehook = old_diehook;
+		SVcpREPLACE(PL_diehook, old_diehook);
 	    }
 #ifdef PERL_MAD
 	    if (PL_madskills)

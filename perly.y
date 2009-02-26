@@ -580,7 +580,11 @@ use	:	USE startsub THING WORD listexpr ';'
 				      AvFILLp(PL_parser->rsfp_filters) >= 0)
 			      APPEND_MADPROPS_PV("sourcefilter", $$, '!');
 #else
-			  utilize(IVAL($1), $2, $3, $4, $5);
+                          CV* cv = utilize(IVAL($1), $2, $3, $4, $5);
+                          $<opval>3 = NULL;
+                          $<opval>4 = NULL;
+                          $<opval>5 = NULL;
+                          process_special_block(KEY_BEGIN, cv);
 			  $$ = (OP*)NULL;
 #endif
 			}

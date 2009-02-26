@@ -303,7 +303,7 @@ Perl_pad_tmprefcnt(pTHX_ CV* cv)
      * children, or integrate this loop with general cleanup */
     ix = AvFILLp(padlist);
     while (ix >= 0) {
-	const SV* const sv = AvARRAY(padlist)[ix--];
+	SV* const sv = AvARRAY(padlist)[ix--];
 	SvTMPREFCNT_inc(sv);
     }
     SvTMPREFCNT_inc((SV*)CvPADLIST(cv));

@@ -2314,7 +2314,7 @@ Perl_package(pTHX_ OP *o)
 #ifdef PERL_MAD
 OP*
 #else
-void
+CV*
 #endif
 Perl_utilize(pTHX_ int aver, I32 floor, OP *version, OP *idop, OP *arg)
 {
@@ -2322,6 +2322,7 @@ Perl_utilize(pTHX_ int aver, I32 floor, OP *version, OP *idop, OP *arg)
     OP *pack;
     OP *imop;
     OP *veop;
+    CV *cv;
 #ifdef PERL_MAD
     OP *pegop = newOP(OP_NULL,0, idop->op_location);
 #endif
@@ -2387,13 +2388,13 @@ Perl_utilize(pTHX_ int aver, I32 floor, OP *version, OP *idop, OP *arg)
 
     {
 	/* Fake up the BEGIN {}, which does its thing immediately. */
-	CV* cv = newSUB(floor,
+	cv = cv_2mortal(newSUB(floor,
 	    NULL,
 	    append_elem(OP_LINESEQ,
 		append_elem(OP_LINESEQ,
 		    newSTATEOP(0, NULL, newUNOP(OP_REQUIRE, 0, idop, idop->op_location), idop->op_location),
 		    newSTATEOP(0, NULL, veop, (veop ? veop : idop)->op_location)),
-		newSTATEOP(0, NULL, imop, (imop ? imop : idop)->op_location) ));
+		newSTATEOP(0, NULL, imop, (imop ? imop : idop)->op_location) )));
 	
 	SVcpSTEAL( SvLOCATION(CvSv(cv)), 
 	    idop->op_location ? newSVsv(idop->op_location) : AvSv(newAV()) );
@@ -2401,7 +2402,6 @@ Perl_utilize(pTHX_ int aver, I32 floor, OP *version, OP *idop, OP *arg)
 	    av_store(SvAv(SvLOCATION((SV*)cv)), LOC_NAME_INDEX, newSVpv("use", 0));
 	}
 
-	process_special_block(KEY_BEGIN, cv);
     }
 
     /* The "did you use incorrect case?" warning used to be here.
@@ -2425,6 +2425,7 @@ Perl_utilize(pTHX_ int aver, I32 floor, OP *version, OP *idop, OP *arg)
     PL_parser->expect = XSTATE;
     PL_cop_seqmax++; /* Purely for B::*'s benefit */
 
+    return cv;
 #ifdef PERL_MAD
     if (!PL_madskills) {
 	/* FIXME - don't allocate pegop if !PL_madskills */
@@ -2482,6 +2483,7 @@ Perl_vload_module(pTHX_ U32 flags, SV *name, SV *ver, va_list *args)
     dVAR;
     OP *veop, *imop;
     OP * const modname = newSVOP(OP_CONST, 0, name, NULL);
+    CV * cv;
 
     PERL_ARGS_ASSERT_VLOAD_MODULE;
 
@@ -2517,8 +2519,9 @@ Perl_vload_module(pTHX_ U32 flags, SV *name, SV *ver, va_list *args)
     SAVEVPTR(PL_curcop);
     lex_start(NULL, NULL, FALSE);
     SVcpREPLACE(PL_parser->lex_filename, newSVpv("fake begin block", 0));
-    utilize(!(flags & PERL_LOADMOD_DENY), start_subparse(0),
-	    veop, modname, imop);
+    cv = utilize(!(flags & PERL_LOADMOD_DENY), start_subparse(0),
+	veop, modname, imop);
+    process_special_block(KEY_BEGIN, cv);
     LEAVE;
 }
 
@@ -3671,7 +3674,7 @@ Perl_process_special_block(pTHX_ const I32 key, CV *const cv)
 
 	call_av = newAV();
 	av_2mortal(call_av);
-	av_push(call_av, CvSv(cv));
+	av_push(call_av, SvREFCNT_inc(CvSv(cv)));
 	call_list(oldscope, call_av);
 
 	PL_curcop = &PL_compiling;

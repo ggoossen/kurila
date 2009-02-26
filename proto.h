@@ -3215,7 +3215,7 @@ PERL_CALLCONV OP *	Perl_utilize(pTHX_ int aver, I32 floor, OP* version, OP* idop
 	assert(idop)
 
 #else
-PERL_CALLCONV void	Perl_utilize(pTHX_ int aver, I32 floor, OP* version, OP* idop, OP* arg)
+PERL_CALLCONV CV*	Perl_utilize(pTHX_ int aver, I32 floor, OP* version, OP* idop, OP* arg)
 			__attribute__nonnull__(pTHX_4);
 #define PERL_ARGS_ASSERT_UTILIZE	\
 	assert(idop)

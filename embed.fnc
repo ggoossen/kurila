@@ -897,7 +897,7 @@ p	|void	|unshare_hek	|NULLOK HEK* hek
 p	|OP *	|utilize	|int aver|I32 floor|NULLOK OP* version \
 				|NN OP* idop|NULLOK OP* arg
 #else
-p	|void	|utilize	|int aver|I32 floor|NULLOK OP* version|NN OP* idop|NULLOK OP* arg
+p	|CV*	|utilize	|int aver|I32 floor|NULLOK OP* version|NN OP* idop|NULLOK OP* arg
 #endif
 Ap	|char*	|utf16_to_utf8	|NN const char* p|NN char *d|I32 bytelen|NN I32 *newlen
 Ap	|char*	|utf16_to_utf8_reversed|NN char* p|NN char *d|I32 bytelen|NN I32 *newlen
