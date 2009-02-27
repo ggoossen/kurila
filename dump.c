@@ -1807,6 +1807,8 @@ Perl_runops_debug(pTHX)
 
     DEBUG_l(Perl_deb(aTHX_ "Entering new RUNOPS level\n"));
     do {
+	if (PL_destroyav)
+	    call_destructors();
 	DEBUG_R(refcnt_check(aTHX));
 	PERL_ASYNC_CHECK();
 	if (PL_debug) {

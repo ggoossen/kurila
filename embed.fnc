@@ -802,6 +802,7 @@ Apd	|void	|sv_catpv	|NN SV *const sv|NULLOK const char* ptr
 Amdb	|void	|sv_catpvn	|NN SV *dsv|NN const char *sstr|STRLEN len
 Amdb	|void	|sv_catsv	|NN SV *dstr|NULLOK SV *sstr
 Apd	|void	|sv_chop	|NN SV *const sv|NULLOK const char *const ptr
+Apd	|void	|call_destructors
 Apd	|void	|sv_clear	|NN SV *const sv
 p	|void	|sv_clear_body	|NN SV *const sv
 Apd	|I32	|sv_cmp		|NULLOK SV *const sv1|NULLOK SV *const sv2

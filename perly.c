@@ -700,7 +700,7 @@ Perl_parser_tmprefcnt(pTHX_  const yy_parser *parser)
 
     SvTMPREFCNT_inc(parser->linestr);
     SvTMPREFCNT_inc(parser->lex_filename);
-
+    SvTMPREFCNT_inc(parser->lex_stuff.str_sv);
     AvTMPREFCNT_inc(parser->rsfp_filters);
     
     if (parser->old_parser) {

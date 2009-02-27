@@ -242,6 +242,8 @@ END_EXTERN_C
 #define PL_defstash		(*Perl_Idefstash_ptr(aTHX))
 #undef  PL_delaymagic
 #define PL_delaymagic		(*Perl_Idelaymagic_ptr(aTHX))
+#undef  PL_destroyav
+#define PL_destroyav		(*Perl_Idestroyav_ptr(aTHX))
 #undef  PL_diehook
 #define PL_diehook		(*Perl_Idiehook_ptr(aTHX))
 #undef  PL_dirty

@@ -512,6 +512,7 @@ Perl_sv_catpv
 Perl_sv_catpvn
 Perl_sv_catsv
 Perl_sv_chop
+Perl_call_destructors
 Perl_sv_clear
 Perl_sv_cmp
 Perl_sv_compile_2op

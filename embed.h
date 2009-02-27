@@ -850,6 +850,7 @@
 #define sv_vcatpvf		Perl_sv_vcatpvf
 #define sv_catpv		Perl_sv_catpv
 #define sv_chop			Perl_sv_chop
+#define call_destructors	Perl_call_destructors
 #define sv_clear		Perl_sv_clear
 #ifdef PERL_CORE
 #define sv_clear_body		Perl_sv_clear_body
@@ -3003,6 +3004,7 @@
 #define sv_vcatpvf(a,b,c)	Perl_sv_vcatpvf(aTHX_ a,b,c)
 #define sv_catpv(a,b)		Perl_sv_catpv(aTHX_ a,b)
 #define sv_chop(a,b)		Perl_sv_chop(aTHX_ a,b)
+#define call_destructors()	Perl_call_destructors(aTHX)
 #define sv_clear(a)		Perl_sv_clear(aTHX_ a)
 #ifdef PERL_CORE
 #define sv_clear_body(a)	Perl_sv_clear_body(aTHX_ a)

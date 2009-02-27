@@ -501,6 +501,9 @@ perl_destruct(pTHXx)
         return STATUS_EXIT;
     }
     
+    if (PL_destroyav)
+	call_destructors();
+
     /* We must account for everything.  */
 
     /* Destroy the main CV and syntax tree */
@@ -528,17 +531,8 @@ perl_destruct(pTHXx)
 
     PerlIO_destruct(aTHX);
 
-    if (PL_sv_objcount) {
-	/*
-	 * Try to destruct global references.  We do this first so that the
-	 * destructors and destructees still exist.  Some sv's might remain.
-	 * Non-referenced objects are on their own.
-	 */
-/* 	sv_clean_objs(); */
-/* 	PL_sv_objcount = 0; */
-	if (PL_defoutgv && !SvREFCNT(PL_defoutgv))
-	    PL_defoutgv = NULL; /* may have been freed */
-    }
+    if (PL_destroyav)
+	call_destructors();
 
     /* call exit list functions */
     while (PL_exitlistlen-- > 0)
@@ -587,6 +581,9 @@ perl_destruct(pTHXx)
 
     /* reset so print() ends up where we expect */
     setdefout(NULL);
+
+    if (PL_destroyav)
+	call_destructors();
 
     HVcpNULL(PL_stashcache);
 
@@ -870,13 +867,16 @@ perl_destruct(pTHXx)
         }
     }
 
+    if (PL_destroyav)
+	call_destructors();
+
     nuke_stacks();
 
 #ifdef DEBUGGING
-/*     if (PL_sv_count != 0) { */
-/* 	PerlIO_printf(Perl_debug_log, "Scalars leaked: %ld\n", (long)PL_sv_count); */
-/* 	sv_report_used(); */
-/*     } */
+    if (PL_sv_count != 0) {
+	PerlIO_printf(Perl_debug_log, "Scalars leaked: %ld\n", (long)PL_sv_count);
+	sv_report_used();
+    }
 #endif
 
 #ifdef PERL_DEBUG_READONLY_OPS

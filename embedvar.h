@@ -103,6 +103,7 @@
 #define PL_defoutgv		(vTHX->Idefoutgv)
 #define PL_defstash		(vTHX->Idefstash)
 #define PL_delaymagic		(vTHX->Idelaymagic)
+#define PL_destroyav		(vTHX->Idestroyav)
 #define PL_diehook		(vTHX->Idiehook)
 #define PL_dirty		(vTHX->Idirty)
 #define PL_doextract		(vTHX->Idoextract)
@@ -381,6 +382,7 @@
 #define PL_Idefoutgv		PL_defoutgv
 #define PL_Idefstash		PL_defstash
 #define PL_Idelaymagic		PL_delaymagic
+#define PL_Idestroyav		PL_destroyav
 #define PL_Idiehook		PL_diehook
 #define PL_Idirty		PL_dirty
 #define PL_Idoextract		PL_doextract

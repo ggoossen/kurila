@@ -196,6 +196,7 @@ PERLVAR(Imagicsvhv,		HV *)
 PERLVAR(Ihinthv,	HV *)
 PERLVAR(Iorigfilename,	char *)
 PERLVAR(Ierrorcreatehook,	SV *)
+PERLVARI(Idestroyav,	AV *, NULL)
 PERLVAR(Idiehook,	SV *)
 PERLVAR(Iwarnhook,	SV *)
 

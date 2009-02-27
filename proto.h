@@ -2864,6 +2864,7 @@ PERL_CALLCONV void	Perl_sv_chop(pTHX_ SV *const sv, const char *const ptr)
 #define PERL_ARGS_ASSERT_SV_CHOP	\
 	assert(sv)
 
+PERL_CALLCONV void	Perl_call_destructors(pTHX);
 PERL_CALLCONV void	Perl_sv_clear(pTHX_ SV *const sv)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_SV_CLEAR	\

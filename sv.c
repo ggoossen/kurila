@@ -4322,6 +4322,44 @@ Perl_sv_clear_body(pTHX_ SV *const sv)
 }
 
 void
+Perl_call_destructors() {
+    while (PL_destroyav) {
+	dSP;
+
+	SV** svp = av_fetch(PL_destroyav, 0, FALSE);
+	SV** destructor = av_fetch(PL_destroyav, 1, FALSE);
+
+	ENTER;
+	SAVETMPS;
+	PUSHSTACKi(PERLSI_DESTROY);
+	EXTEND(SP, 2);
+	PUSHMARK(SP);
+	mPUSHs(newRV(*svp));
+	PUTBACK;
+	call_sv(*destructor, G_DISCARD|G_EVAL|G_KEEPERR|G_VOID);
+		
+	POPSTACK;
+	SPAGAIN;
+	FREETMPS;
+	LEAVE;
+
+	if (SvREFCNT(*svp) == 1) {
+	    if (SvOBJECT(*svp)) {
+		HvREFCNT_dec(SvSTASH(*svp));	/* possibly of changed persuasion */
+		SvOBJECT_off(*svp);	/* Curse the object. */
+		if (SvTYPE(*svp) != SVt_PVIO)
+		    --PL_sv_objcount;	/* XXX Might want something more general */
+	    }
+	}
+
+	SvREFCNT_dec(av_shift(PL_destroyav));
+	SvREFCNT_dec(av_shift(PL_destroyav));
+	if (av_len(PL_destroyav) == -1) 
+	    AVcpNULL(PL_destroyav);
+    }
+}
+
+void
 Perl_sv_clear(pTHX_ register SV *const sv)
 {
     dVAR;
@@ -4332,36 +4370,12 @@ Perl_sv_clear(pTHX_ register SV *const sv)
 
     if (SvOBJECT(sv)) {
 	if (PL_defstash) {		/* Still have a symbol table? */
-	    dSP;
 	    GV* destructor = gv_fetchmethod(SvSTASH(sv), "DESTROY");
 	    if (destructor) {
-		SV* const tmpref = newRV(sv);
-		SvREADONLY_on(tmpref);   /* DESTROY() could be naughty */
-		ENTER;
-		PUSHSTACKi(PERLSI_DESTROY);
-		EXTEND(SP, 2);
-		PUSHMARK(SP);
-		PUSHs(tmpref);
-		PUTBACK;
-		call_sv((SV*)GvCV(destructor), G_DISCARD|G_EVAL|G_KEEPERR|G_VOID);
-		
-		POPSTACK;
-		SPAGAIN;
-		LEAVE;
-		if(SvREFCNT(tmpref) < 2) {
-		    /* tmpref is not kept alive! */
-		    SvREFCNT(sv)--;
-		    SvRV_set(tmpref, NULL);
-		    SvROK_off(tmpref);
-		}
-		SvREFCNT_dec(tmpref);
-	    }
-
-	    if (SvREFCNT(sv)) {
-		if (PL_in_clean_objs)
-		    Perl_croak(aTHX_ "DESTROY created new reference to dead object '%s'",
-			HvNAME_get(SvSTASH(sv)));
-		/* DESTROY gave object new lease on life */
+		if ( ! PL_destroyav )
+		    PL_destroyav = newAV();
+		av_push(PL_destroyav, SvREFCNT_inc(sv));
+		av_push(PL_destroyav, SvREFCNT_inc(GvCV(destructor)));
 		return;
 	    }
 	}
@@ -4462,8 +4476,9 @@ Perl_sv_free2(pTHX_ SV *const sv)
 	return;
     }
     sv_clear(sv);
-    assert(SvREFCNT(sv) == 0);
-    del_SV(sv);
+    if (SvREFCNT(sv) == 0) {
+	del_SV(sv);
+    }
 }
 
 /*
@@ -9079,6 +9094,7 @@ Perl_refcnt_check(pTHX)
     GvTMPREFCNT_inc(PL_defoutgv);
     HvTMPREFCNT_inc(PL_envhv);
     HvTMPREFCNT_inc(PL_op_sequence);
+    AvTMPREFCNT_inc(PL_destroyav);
 
     if (PL_main_root)
 	op_tmprefcnt(PL_main_root);
