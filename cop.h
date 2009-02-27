@@ -253,7 +253,7 @@ struct block_eval {
 	assert(!(PL_op->op_type & ~0x1FF));				\
 	cx->blk_u16 = (PL_in_eval & 0x7F) | ((U16)PL_op->op_type << 7);	\
 	cx->blk_eval.old_namesv = (n ? newSVpv(n,0) : NULL);		\
-	cx->blk_eval.old_eval_root = PL_eval_root;			\
+	cx->blk_eval.old_eval_root = OpREFCNT_inc(PL_eval_root);	\
 	cx->blk_eval.cur_text = PL_parser ? PL_parser->linestr : NULL;	\
 	cx->blk_eval.cv = NULL; /* set by doeval(), as applicable */	\
 	cx->blk_eval.retop = NULL;					\

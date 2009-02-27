@@ -1038,7 +1038,7 @@ Perl_newPROG(pTHX_ OP *o)
 
     if (PL_in_eval) {
 	if (PL_eval_root)
-		return;
+	    return;
 	PL_eval_root = newUNOP(OP_LEAVEEVAL,
 			       ((PL_in_eval & EVAL_KEEPERR)
 				? OPf_SPECIAL : 0), o, o->op_location);
@@ -3680,23 +3680,23 @@ Perl_process_special_block(pTHX_ const I32 key, CV *const cv)
         break;
     }
     case KEY_END:
-	Perl_av_create_and_unshift_one(aTHX_ &PL_endav, (SV*)cv);
+	Perl_av_create_and_unshift_one(aTHX_ &PL_endav, SvREFCNT_inc(CvSv(cv)));
 	break;
     case KEY_UNITCHECK:
 	/* It's never too late to run a unitcheck block */
-	Perl_av_create_and_unshift_one(aTHX_ &PL_unitcheckav, (SV*)cv);
+	Perl_av_create_and_unshift_one(aTHX_ &PL_unitcheckav, SvREFCNT_inc(CvSv(cv)));
 	break;
     case KEY_CHECK:
 	if (PL_main_start && ckWARN(WARN_VOID))
 	    Perl_warner(aTHX_ packWARN(WARN_VOID),
 		"Too late to run CHECK block");
-	Perl_av_create_and_unshift_one(aTHX_ &PL_checkav, (SV*)cv);
+	Perl_av_create_and_unshift_one(aTHX_ &PL_checkav, SvREFCNT_inc(CvSv(cv)));
 	break;
     case KEY_INIT:
 	if (PL_main_start && ckWARN(WARN_VOID))
 	    Perl_warner(aTHX_ packWARN(WARN_VOID),
 		"Too late to run INIT block");
-	Perl_av_create_and_push(aTHX_ &PL_initav, (SV*)cv);
+	Perl_av_create_and_push(aTHX_ &PL_initav, SvREFCNT_inc(cv));
 	break;
     default:
 	Perl_croak(aTHX_ "end");

@@ -9485,8 +9485,7 @@ S_scan_subst(pTHX_ char *start)
     s = scan_str(s,TRUE,FALSE, &PL_lex_repl);
     if (!s) {
 	if (PL_lex_stuff.str_sv) {
-	    SvREFCNT_dec(PL_lex_stuff.str_sv);
-	    PL_lex_stuff.str_sv = NULL;
+	    SVcpNULL(PL_lex_stuff.str_sv);
 	}
 	Perl_croak(aTHX_ "Substitution replacement not terminated");
     }
