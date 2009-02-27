@@ -1621,7 +1621,6 @@ PP(pp_sort)
 		    sort_flags);
 
 	    if (!(flags & OPf_SPECIAL)) {
-		LEAVESUB((SV*)cv);
 		if (!is_xsub)
 		    CvDEPTH(cv)--;
 	    }

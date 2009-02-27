@@ -74,7 +74,6 @@ XS(XS_attributes__fetch_attrs)
     dVAR;
     dXSARGS;
     SV *rv, *sv;
-    cv_flags_t cvflags;
     PERL_UNUSED_ARG(cv);
 
     if (items != 1) {

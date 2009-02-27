@@ -1380,7 +1380,7 @@ Perl_hv_tmprefcnt(pTHX_ HV *hv)
 	   back to this HV, so the for loop below may well trigger
 	   the removal of backreferences from this array.  */
 
-	SvTMPREFCNT_inc(iter->xhv_backreferences);
+	AvTMPREFCNT_inc(iter->xhv_backreferences);
 
 	entry = iter->xhv_eiter; /* HvEITER(hv) */
 	if (entry && HvLAZYDEL(hv)) {	/* was deleted earlier? */
@@ -1391,8 +1391,8 @@ Perl_hv_tmprefcnt(pTHX_ HV *hv)
 	}
 
 	if((meta = iter->xhv_mro_meta)) {
-	    SvTMPREFCNT_inc(meta->mro_linear_c3);
-	    SvTMPREFCNT_inc(meta->mro_nextmethod);
+	    AvTMPREFCNT_inc(meta->mro_linear_c3);
+	    HvTMPREFCNT_inc(meta->mro_nextmethod);
 	}
     }
 

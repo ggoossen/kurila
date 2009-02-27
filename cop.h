@@ -229,12 +229,6 @@ struct block_sub {
 	SvREFCNT_dec(sv);                                               \
     } STMT_END
 
-#define LEAVESUB(sv)							\
-    STMT_START {							\
-	if (sv)								\
-	    SvREFCNT_dec(sv);						\
-    } STMT_END
-
 /* eval context */
 struct block_eval {
     OP *	retop;	/* op to execute on exit from eval */

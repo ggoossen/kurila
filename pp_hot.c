@@ -1310,7 +1310,6 @@ PP(pp_leavesub)
     POPSUB(cx,sv);	/* Stack values are safe: release CV and @_ ... */
     PL_curpm = newpm;	/* ... and pop $1 et al */
 
-    LEAVESUB(sv);
     return cx->blk_sub.retop;
 }
 

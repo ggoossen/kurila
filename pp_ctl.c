@@ -358,7 +358,6 @@ Perl_dounwind(pTHX_ I32 cxix)
 	    continue;  /* not break */
 	case CXt_SUB:
 	    POPSUB(cx,sv);
-	    LEAVESUB(sv);
 	    break;
 	case CXt_EVAL:
 	    POPEVAL(cx);
@@ -948,7 +947,6 @@ PP(pp_return)
 	sv = NULL;
     PL_curpm = newpm;	/* ... and pop $1 et al */
 
-    LEAVESUB(sv);
     if (clear_errsv)
 	sv_setsv(ERRSV, &PL_sv_undef);
     return retop;
