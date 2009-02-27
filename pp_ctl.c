@@ -1410,8 +1410,7 @@ S_doeval(pTHX_ int gimme, OP** startop, CV* outside, U32 seq)
     }
     if (startop) {
 	*startop = PL_eval_root;
-    } else
-	SAVEFREEOP(PL_eval_root);
+    }
 
     /* Set the context for this new optree.
      * If the last op is an OP_REQUIRE, force scalar context.
@@ -1954,8 +1953,6 @@ PP(pp_leaveeval)
     I32 optype;
 
     POPBLOCK(cx,newpm);
-    POPEVAL(cx);
-    retop = cx->blk_eval.retop;
 
     if (gimme == G_VOID)
 	MARK = newsp;
@@ -1981,6 +1978,10 @@ PP(pp_leaveeval)
 	    }
 	}
     }
+
+    POPEVAL(cx);
+    retop = cx->blk_eval.retop;
+
     PL_curpm = newpm;	/* Don't pop $1 et al till now */
 
 #ifdef DEBUGGING

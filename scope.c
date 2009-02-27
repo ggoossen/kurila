@@ -1432,11 +1432,13 @@ Perl_cx_tmprefcnt(pTHX_ PERL_CONTEXT *cx)
     switch (CxTYPE(cx)) {
     case CXt_NULL:
     case CXt_BLOCK:
+    case CXt_LOOP_PLAIN:
+    case CXt_LOOP_LAZYIV:
 	HvTMPREFCNT_inc(cx->blk_dynascope);
 	break;
     case CXt_LOOP_FOR:
-    case CXt_LOOP_PLAIN:
-    case CXt_LOOP_LAZYIV:
+	AvTMPREFCNT_inc(cx->blk_loop.state_u.ary.ary);
+	HvTMPREFCNT_inc(cx->blk_dynascope);
 	break;
     case CXt_SUB:
 	HvTMPREFCNT_inc(cx->blk_dynascope);
