@@ -1437,7 +1437,10 @@ Perl_cx_tmprefcnt(pTHX_ PERL_CONTEXT *cx)
     case CXt_LOOP_FOR:
     case CXt_LOOP_PLAIN:
     case CXt_LOOP_LAZYIV:
+	break;
     case CXt_SUB:
+	HvTMPREFCNT_inc(cx->blk_dynascope);
+	CvTMPREFCNT_inc(cx->blk_sub.cv);
 	break;
     case CXt_EVAL:
 	HvTMPREFCNT_inc(cx->blk_dynascope);

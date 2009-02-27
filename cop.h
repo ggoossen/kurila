@@ -193,15 +193,10 @@ struct block_sub {
 		CopFILE((COP*)CvSTART(cv)),				\
 		CopLINE((COP*)CvSTART(cv)));				\
 									\
-	cx->blk_sub.cv = cv;						\
+	cx->blk_sub.cv = SvREFCNT_inc(cv);				\
 	cx->blk_sub.olddepth = CvDEPTH(cv);				\
 	cx->cx_type |= (hasargs) ? CXp_HASARGS : 0;			\
-	cx->blk_sub.retop = NULL;					\
-	if (!CvDEPTH(cv)) {						\
-	    SvREFCNT_inc_simple_void_NN(cv);				\
-	    SvREFCNT_inc_simple_void_NN(cv);				\
-	    SAVEFREESV(cv);						\
-	}
+	cx->blk_sub.retop = NULL;
 
 
 #define PUSHSUB(cx)							\
@@ -231,8 +226,7 @@ struct block_sub {
 		CopLINE((COP*)CvSTART((CV*)cx->blk_sub.cv)));		\
 									\
 	sv = (SV*)cx->blk_sub.cv;					\
-	if (sv && (CvDEPTH((CV*)sv) = cx->blk_sub.olddepth))		\
-	    sv = NULL;						\
+	SvREFCNT_dec(sv);                                               \
     } STMT_END
 
 #define LEAVESUB(sv)							\

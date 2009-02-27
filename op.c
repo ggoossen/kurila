@@ -3672,8 +3672,7 @@ Perl_process_special_block(pTHX_ const I32 key, CV *const cv)
 		newSVpv("BEGIN", 0));
 	}
 
-	call_av = newAV();
-	av_2mortal(call_av);
+	call_av = av_2mortal(newAV());
 	av_push(call_av, SvREFCNT_inc(CvSv(cv)));
 	call_list(oldscope, call_av);
 

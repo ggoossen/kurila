@@ -8796,10 +8796,10 @@ Perl_preg_tmprefcnt(pTHX_ REGEXP *rx)
     PERL_ARGS_ASSERT_PREGFREE2;
 
     if (r->mother_re) {
-        SvTMPREFCNT_inc(r->mother_re);
+        ReTMPREFCNT_inc(r->mother_re);
     } else {
         if (RXp_PAREN_NAMES(r))
-            SvTMPREFCNT_inc(RXp_PAREN_NAMES(r));
+            HvTMPREFCNT_inc(RXp_PAREN_NAMES(r));
     }        
     if (r->substrs) {
         if (r->anchored_substr)
