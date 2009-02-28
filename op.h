@@ -348,6 +348,13 @@ struct loop {
     OP *	op_lastop;
 };
 
+struct rootop {
+    BASEOP
+    OP *	op_first;
+    ROOTOP *	op_prev_root;
+    ROOTOP *	op_next_root;
+};
+
 #define cUNOPx(o)	((UNOP*)o)
 #define cBINOPx(o)	((BINOP*)o)
 #define cLISTOPx(o)	((LISTOP*)o)
@@ -497,15 +504,11 @@ struct loop {
 #if defined(PL_OP_SLAB_ALLOC)
 #define NewOp(m,var,c,type)	\
 	(var = (type *) Perl_Slab_Alloc(aTHX_ c*sizeof(type)))
-#define NewOpSz(m,var,size)	\
-	(var = (OP *) Perl_Slab_Alloc(aTHX_ size))
 #define FreeOp(p) Perl_Slab_Free(aTHX_ p)
 #else
 #define NewOp(m, var, c, type)	\
 	(var = (MEM_WRAP_CHECK_(c,type) \
 	 (type*)PerlMemShared_calloc(c, sizeof(type))))
-#define NewOpSz(m, var, size)	\
-	(var = (OP*)PerlMemShared_calloc(1, size))
 #define FreeOp(p) PerlMemShared_free(p)
 #endif
 

@@ -494,6 +494,8 @@ END_EXTERN_C
 #define PL_rehash_seed_set	(*Perl_Irehash_seed_set_ptr(aTHX))
 #undef  PL_restartop
 #define PL_restartop		(*Perl_Irestartop_ptr(aTHX))
+#undef  PL_rootop_ll
+#define PL_rootop_ll		(*Perl_Irootop_ll_ptr(aTHX))
 #undef  PL_rs
 #define PL_rs			(*Perl_Irs_ptr(aTHX))
 #undef  PL_runops

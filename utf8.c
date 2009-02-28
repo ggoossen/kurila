@@ -2235,7 +2235,7 @@ Perl_pv_uni_display(pTHX_ SV *dsv, const char *spv, STRLEN len, STRLEN pvlim, UV
 	      truncated++;
 	      break;
 	 }
-	 u = utf8_to_uvchr(s, 0);
+	 u = utf8n_to_uvchr(s, e-s+1, NULL, UTF8_ALLOW_ANY | UTF8_CHECK_ONLY);
 	 if (u < 256) {
 	     const unsigned char c = (unsigned char)u & 0xFF;
 	     if (flags & UNI_DISPLAY_BACKSLASH) {

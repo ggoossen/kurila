@@ -45,7 +45,7 @@ my %alias;
 # Format is "this function" => "does these op names"
 my @raw_alias = @(
 		 Perl_do_kv => \qw( keys values ),
-		 Perl_unimplemented_op => \qw(mapstart custom),
+		 Perl_unimplemented_op => \qw(mapstart custom root),
 		 # All the ops with a body of { return NORMAL; }
 		 Perl_pp_null => \qw(scalar regcmaybe lineseq scope),
 
@@ -324,6 +324,7 @@ my %opclass = %(
     '%',  11,		# baseop_or_unop
     '-',  12,		# filestatop
     '}',  13,		# loopexop
+    '!',  14,		# rootop
 );
 
 my %opflags = %(
@@ -1081,3 +1082,4 @@ lock		lock			ck_rfun		s%	R
 compsub		compsub			ck_compsub		s%	S
 
 custom		unknown custom operator		ck_null		0
+root		refcounted root op		ck_null		!	

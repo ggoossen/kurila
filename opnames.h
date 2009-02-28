@@ -365,10 +365,11 @@ typedef enum opcode {
 	OP_LOCK		 = 347,
 	OP_COMPSUB	 = 348,
 	OP_CUSTOM	 = 349,
+	OP_ROOT		 = 350,
 	OP_max		
 } opcode;
 
-#define MAXO 350
+#define MAXO 351
 #define OP_phoney_INPUT_ONLY -1
 #define OP_phoney_OUTPUT_ONLY -2
 

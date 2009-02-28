@@ -391,5 +391,6 @@ Perl_pp_getlogin
 Perl_pp_syscall
 Perl_pp_lock
 Perl_pp_compsub
+Perl_pp_root
 
 # ex: set ro:

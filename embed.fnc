@@ -586,6 +586,8 @@ p	|PerlIO*|nextargv	|NN GV* gv
 ApP	|char*	|ninstr		|NN const char* big|NN const char* bigend \
 				|NN const char* little|NN const char* lend
 pr	|OP*	|oopsCV		|NN OP* o
+Ap	|ROOTOP*	|newROOTOP	|NN OP* main|NN SV* location
+Ap	|void	|rootop_ll_tmprefcnt
 Ap	|void	|op_free	|NULLOK OP* arg
 Ap	|void	|op_tmprefcnt	|NULLOK OP* arg
 #ifdef PERL_MAD

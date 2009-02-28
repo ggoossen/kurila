@@ -9049,7 +9049,7 @@ static void
 do_check_tmprefcnt(pTHX_ SV* const sv)
 {
     if (SvTMPREFCNT(sv) != SvREFCNT(sv)) {
-	PerlIO_printf(Perl_debug_log, "Invalid refcount (%ld) should be at %ld\n", 
+	PerlIO_printf(Perl_debug_log, "Invalid refcount (%ld) should be %ld\n", 
 		      (long)SvREFCNT(sv), (long)SvTMPREFCNT(sv));
 	sv_dump(sv);
     }
@@ -9099,10 +9099,8 @@ Perl_refcnt_check(pTHX)
     AvTMPREFCNT_inc(PL_preambleav);
     HvTMPREFCNT_inc(PL_endav);
 
-    if (PL_main_root)
-	op_tmprefcnt(PL_main_root);
-    if (PL_eval_root)
-	op_tmprefcnt(PL_eval_root);
+    rootop_ll_tmprefcnt(aTHX);
+
     if (PL_parser)
 	Perl_parser_tmprefcnt(PL_parser);
 

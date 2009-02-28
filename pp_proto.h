@@ -392,5 +392,6 @@ PERL_PPDEF(Perl_pp_getlogin)
 PERL_PPDEF(Perl_pp_syscall)
 PERL_PPDEF(Perl_pp_lock)
 PERL_PPDEF(Perl_pp_compsub)
+PERL_PPDEF(Perl_pp_root)
 
 /* ex: set ro: */

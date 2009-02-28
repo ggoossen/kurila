@@ -594,6 +594,8 @@
 #ifdef PERL_CORE
 #define oopsCV			Perl_oopsCV
 #endif
+#define newROOTOP		Perl_newROOTOP
+#define rootop_ll_tmprefcnt	Perl_rootop_ll_tmprefcnt
 #define op_free			Perl_op_free
 #define op_tmprefcnt		Perl_op_tmprefcnt
 #ifdef PERL_MAD
@@ -2119,6 +2121,7 @@
 #define pp_right_shift		Perl_pp_right_shift
 #define pp_rindex		Perl_pp_rindex
 #define pp_rmdir		Perl_pp_rmdir
+#define pp_root			Perl_pp_root
 #define pp_rv2av		Perl_pp_rv2av
 #define pp_rv2cv		Perl_pp_rv2cv
 #define pp_rv2gv		Perl_pp_rv2gv
@@ -2750,6 +2753,8 @@
 #ifdef PERL_CORE
 #define oopsCV(a)		Perl_oopsCV(aTHX_ a)
 #endif
+#define newROOTOP(a,b)		Perl_newROOTOP(aTHX_ a,b)
+#define rootop_ll_tmprefcnt()	Perl_rootop_ll_tmprefcnt(aTHX)
 #define op_free(a)		Perl_op_free(aTHX_ a)
 #define op_tmprefcnt(a)		Perl_op_tmprefcnt(aTHX_ a)
 #ifdef PERL_MAD
@@ -4282,6 +4287,7 @@
 #define pp_right_shift()	Perl_pp_right_shift(aTHX)
 #define pp_rindex()		Perl_pp_rindex(aTHX)
 #define pp_rmdir()		Perl_pp_rmdir(aTHX)
+#define pp_root()		Perl_pp_root(aTHX)
 #define pp_rv2av()		Perl_pp_rv2av(aTHX)
 #define pp_rv2cv()		Perl_pp_rv2cv(aTHX)
 #define pp_rv2gv()		Perl_pp_rv2gv(aTHX)

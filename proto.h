@@ -2105,6 +2105,13 @@ PERL_CALLCONV OP*	Perl_oopsCV(pTHX_ OP* o)
 #define PERL_ARGS_ASSERT_OOPSCV	\
 	assert(o)
 
+PERL_CALLCONV ROOTOP*	Perl_newROOTOP(pTHX_ OP* main, SV* location)
+			__attribute__nonnull__(pTHX_1)
+			__attribute__nonnull__(pTHX_2);
+#define PERL_ARGS_ASSERT_NEWROOTOP	\
+	assert(main); assert(location)
+
+PERL_CALLCONV void	Perl_rootop_ll_tmprefcnt(pTHX);
 PERL_CALLCONV void	Perl_op_free(pTHX_ OP* arg);
 PERL_CALLCONV void	Perl_op_tmprefcnt(pTHX_ OP* arg);
 #ifdef PERL_MAD

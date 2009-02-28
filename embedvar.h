@@ -229,6 +229,7 @@
 #define PL_rehash_seed		(vTHX->Irehash_seed)
 #define PL_rehash_seed_set	(vTHX->Irehash_seed_set)
 #define PL_restartop		(vTHX->Irestartop)
+#define PL_rootop_ll		(vTHX->Irootop_ll)
 #define PL_rs			(vTHX->Irs)
 #define PL_runops		(vTHX->Irunops)
 #define PL_savebegin		(vTHX->Isavebegin)
@@ -508,6 +509,7 @@
 #define PL_Irehash_seed		PL_rehash_seed
 #define PL_Irehash_seed_set	PL_rehash_seed_set
 #define PL_Irestartop		PL_restartop
+#define PL_Irootop_ll		PL_rootop_ll
 #define PL_Irs			PL_rs
 #define PL_Irunops		PL_runops
 #define PL_Isavebegin		PL_savebegin

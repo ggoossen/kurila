@@ -8792,6 +8792,7 @@ Perl_preg_tmprefcnt(pTHX_ REGEXP *rx)
 {
     dVAR;
     struct regexp *const r = (struct regexp *)SvANY(rx);
+    RXi_GET_DECL(r,ri);
 
     PERL_ARGS_ASSERT_PREGFREE2;
 
@@ -8811,6 +8812,38 @@ Perl_preg_tmprefcnt(pTHX_ REGEXP *rx)
     if (r->saved_copy)
         SvTMPREFCNT_inc(r->saved_copy);
 #endif
+
+    if (ri->data) {
+	int n = ri->data->count;
+	PAD* new_comppad = NULL;
+	PAD* old_comppad;
+	PADOFFSET refcnt;
+
+	while (--n >= 0) {
+          /* If you add a ->what type here, update the comment in regcomp.h */
+	    switch (ri->data->what[n]) {
+	    case 's':
+	    case 'S':
+	    case 'u':
+		SvTMPREFCNT_inc((SV*)ri->data->data[n]);
+		break;
+	    case 'f':
+		break;
+	    case 'p':
+		break;
+	    case 'o':
+		break;
+	    case 'n':
+	        break;
+            case 'T':	        
+                break;
+	    case 't':
+		break;
+	    default:
+		Perl_croak(aTHX_ "panic: regfree data code '%c'", ri->data->what[n]);
+	    }
+	}
+    }
 }
 
 /*  reg_temp_copy()

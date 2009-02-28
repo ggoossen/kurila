@@ -365,6 +365,8 @@ Perl_vnormal
 Perl_vstringify
 Perl_vcmp
 Perl_ninstr
+Perl_newROOTOP
+Perl_rootop_ll_tmprefcnt
 Perl_op_free
 Perl_op_tmprefcnt
 Perl_find_rundefsvoffset

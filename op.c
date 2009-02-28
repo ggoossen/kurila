@@ -283,6 +283,28 @@ Perl_Slab_Free(pTHX_ void *op)
 
 #define RETURN_UNLIMITED_NUMBER (PERL_INT_MAX / 2)
 
+ROOTOP*
+Perl_newROOTOP(pTHX_ OP *main, SV* location)
+{
+    ROOTOP* o;
+    optype type = OP_ROOT;
+
+    NewOp(1101, o, 1, ROOTOP);
+    o->op_type = type;
+    o->op_ppaddr = PL_ppaddr[type];
+    o->op_first = main;
+    o->op_flags = OPf_KIDS;
+    o->op_location = SvREFCNT_inc(location);
+
+    o->op_prev_root = NULL;
+    o->op_next_root = PL_rootop_ll;
+    if (PL_rootop_ll)
+	PL_rootop_ll->op_prev_root = o;
+    PL_rootop_ll = o;
+
+    return o;
+}
+
 STATIC OP *
 S_no_fh_allowed(pTHX_ OP *o)
 {
@@ -420,26 +442,15 @@ Perl_op_free(pTHX_ OP *o)
     }
 
     type = o->op_type;
-    if (o->op_private & OPpREFCOUNTED) {
-	switch (type) {
-	case OP_LEAVESUB:
-	case OP_LEAVEEVAL:
-	case OP_LEAVE:
-	case OP_SCOPE:
-	    {
-	    PADOFFSET refcnt;
-	    OP_REFCNT_LOCK;
-	    refcnt = OpREFCNT_dec(o);
-	    OP_REFCNT_UNLOCK;
-	    if (refcnt) {
-		/* Need to find and remove any pattern match ops from the list
-		   we maintain for reset().  */
-		return;
-	    }
-	    }
-	    break;
-	default:
-	    break;
+    if (type == OP_ROOT) {
+	PADOFFSET refcnt;
+	OP_REFCNT_LOCK;
+	refcnt = OpREFCNT_dec(o);
+	OP_REFCNT_UNLOCK;
+	if (refcnt) {
+	    /* Need to find and remove any pattern match ops from the list
+	       we maintain for reset().  */
+	    return;
 	}
     }
 
@@ -1037,9 +1048,7 @@ Perl_newPROG(pTHX_ OP *o)
 			       ((PL_in_eval & EVAL_KEEPERR)
 				? OPf_SPECIAL : 0), o, o->op_location);
 	PL_eval_start = linklist(PL_eval_root);
-	PL_eval_root->op_private |= OPpREFCOUNTED;
-	OpREFCNT_set(PL_eval_root, 1);
-	PL_eval_root->op_next = 0;
+	PL_eval_root = newROOTOP(PL_eval_root, o->op_location);
 	CALL_PEEP(PL_eval_start);
     }
     else {
@@ -1052,9 +1061,8 @@ Perl_newPROG(pTHX_ OP *o)
 	PL_main_root = scope(sawparens(scalarvoid(o)));
 	PL_curcop = &PL_compiling;
 	PL_main_start = LINKLIST(PL_main_root);
-	PL_main_root->op_private |= OPpREFCOUNTED;
-	OpREFCNT_set(PL_main_root, 1);
-	PL_main_root->op_next = 0;
+	PL_main_root->op_next = NULL;
+	PL_main_root = newROOTOP(PL_main_root, PL_main_root->op_location);
 	CALL_PEEP(PL_main_start);
 	CVcpNULL(PL_compcv);
 
@@ -3292,9 +3300,6 @@ Perl_cv_tmprefcnt(pTHX_ CV *cv)
 
     PERL_ARGS_ASSERT_CV_TMPREFCNT;
 
-    if (!CvISXSUB(cv) && CvROOT(cv)) {
-	op_tmprefcnt(CvROOT(cv));
-    }
     pad_tmprefcnt(cv);
 
     if (CvCONST(cv)) {
@@ -3604,10 +3609,9 @@ Perl_newSUB(pTHX_ I32 floor, OP *proto, OP *block)
     else
 	block->op_attached = 1;
     CvROOT(cv) = newUNOP(OP_LEAVESUB, 0, scalarseq(block), block->op_location);
-    CvROOT(cv)->op_private |= OPpREFCOUNTED;
-    OpREFCNT_set(CvROOT(cv), 1);
     CvSTART(cv) = LINKLIST(CvROOT(cv));
     CvROOT(cv)->op_next = 0;
+    CvROOT(cv) = newROOTOP(CvROOT(cv), block->op_location);
     CALL_PEEP(CvSTART(cv));
 
     /* now that optimizer has done its work, adjust pad values */
@@ -6151,6 +6155,16 @@ const_sv_xsub(pTHX_ CV* cv)
     EXTEND(sp, 1);
     ST(0) = (SV*)XSANY.any_ptr;
     XSRETURN(1);
+}
+
+void
+Perl_rootop_ll_tmprefcnt() {
+    ROOTOP* rootop;
+    rootop = PL_rootop_ll;
+    while (rootop) {
+	op_tmprefcnt(rootop);
+	rootop = rootop->op_next_root;
+    }
 }
 
 /*
