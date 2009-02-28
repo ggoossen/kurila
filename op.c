@@ -504,13 +504,7 @@ Perl_op_tmprefcnt(pTHX_ OP *o)
  retry:
     switch (o->op_type) {
     case OP_NULL:	/* Was holding old type, if any. */
-	if (PL_madskills && o->op_targ != OP_NULL) {
-	    o->op_type = (optype)o->op_targ;
-	    o->op_targ = 0;
-	    goto retry;
-	}
     case OP_ENTEREVAL:	/* Was holding hints. */
-	o->op_targ = 0;
 	break;
     default:
 	if (!(o->op_flags & OPf_REF)
@@ -537,13 +531,13 @@ Perl_op_tmprefcnt(pTHX_ OP *o)
 	break;
     case OP_SUBST:
 	op_tmprefcnt(cPMOPo->op_pmreplrootu.op_pmreplroot);
-	goto clear_pmop;
+	goto tmpref_pmop;
     case OP_PUSHRE:
 	SvTMPREFCNT_inc((SV*)cPMOPo->op_pmreplrootu.op_pmtargetgv);
 	/* FALL THROUGH */
     case OP_MATCH:
     case OP_QR:
-clear_pmop:
+tmpref_pmop:
 	ReTMPREFCNT_inc(PM_GETRE(cPMOPo));
 	break;
     }
@@ -2648,11 +2642,7 @@ Perl_newSTATEOP(pTHX_ OPFLAGS flags, char *label, OP *o, SV *location)
     cop->cop_seq = seq;
     cop->cop_warnings = DUP_WARNINGS(PL_curcop->cop_warnings);
     cop->cop_hints_hash = PL_curcop->cop_hints_hash;
-    if (cop->cop_hints_hash) {
-	HINTS_REFCNT_LOCK;
-	SvREFCNT_inc(cop->cop_hints_hash);
-	HINTS_REFCNT_UNLOCK;
-    }
+    SvREFCNT_inc(cop->cop_hints_hash);
 
     CopSTASH_set(cop, PL_curstash);
 
