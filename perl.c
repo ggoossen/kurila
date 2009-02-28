@@ -873,10 +873,10 @@ perl_destruct(pTHXx)
     nuke_stacks();
 
 #ifdef DEBUGGING
-    if (PL_sv_count != 0) {
-	PerlIO_printf(Perl_debug_log, "Scalars leaked: %ld\n", (long)PL_sv_count);
-	sv_report_used();
-    }
+/*     if (PL_sv_count != 0) { */
+/* 	PerlIO_printf(Perl_debug_log, "Scalars leaked: %ld\n", (long)PL_sv_count); */
+/* 	sv_report_used(); */
+/*     } */
 #endif
 
 #ifdef PERL_DEBUG_READONLY_OPS

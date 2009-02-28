@@ -414,6 +414,7 @@ texpr	:	/* NULL means true */
 			  (void)scan_num("1", &tmplval);
 			  $$ = tmplval.opval; }
 	|	expr
+			{ $$ = $1; }
 	;
 
 /* Inverted boolean expression */
@@ -443,6 +444,7 @@ label	:	/* empty */
 #endif
 			}
 	|	LABEL
+			{ $$ = $1; }
 	;
 
 /* Some kind of declaration - just hang on peg in the parse tree */
@@ -548,6 +550,7 @@ subname	:	WORD	{
 proto	:	/* NULL */
 			{ $$ = (OP*)NULL; }
 	|	THING
+			{ $$ = $1; }
 	;
 
 /* Subroutine body - either null or a block */
@@ -610,6 +613,7 @@ expr	:	expr ANDOP expr
                           APPEND_MADPROPS_PV("operator",$$,'>');
 			}
 	|	argexpr %prec PREC_LOW
+			{ $$ = $1; }
 	;
 
 /* Expressions are a list of terms joined by commas */
@@ -635,6 +639,7 @@ argexpr	:	argexpr ','
 			  $$ = append_elem(OP_LIST, $1, term);
 			}
 	|	term %prec PREC_LOW
+			{ $$ = $1; }
 	;
 
 /* List operators */
@@ -688,7 +693,9 @@ listop	:	term ARROW method '(' listexprcom ')' /* $foo->bar(list) */
 
 /* Names of methods. May use $object->$methodname */
 method :       METHOD
+			{ $$ = $1; }
        |       scalar
+			{ $$ = $1; }
        ;
 
 /* Some kind of subscripted expression */
@@ -1017,9 +1024,13 @@ term	:	'?' term
                             $$->op_flags |= OPf_OPTIONAL;
                         }
         |       termbinop
+			{ $$ = $1; }
 	|	termunop
+			{ $$ = $1; }
 	|	anonymous
+			{ $$ = $1; }
 	|	termdo
+			{ $$ = $1; }
 	|	term TERNARY_IF term TERNARY_ELSE term
                         { 
                             $$ = newCONDOP(0, $1, $3, $5, LOCATION($2));
@@ -1183,7 +1194,9 @@ term	:	'?' term
 			  TOKEN_GETMAD($4,$$,')');
 			}
 	|	WORD
+			{ $$ = $1; }
 	|	listop
+			{ $$ = $1; }
 	;
 
 /* "my" declarations, with optional attributes */

@@ -484,15 +484,7 @@ Perl_yyparse (pTHX)
     /* yyn is the number of a rule to reduce with.  */
     parser->yylen = yyr2[yyn];
 
-    /* If YYLEN is nonzero, implement the default value of the action:
-      "$$ = $1".
-
-      Otherwise, the following line sets YYVAL to garbage.
-      This behavior is undocumented and Bison
-      users should not rely upon it.  Assigning to YYVAL
-      unconditionally makes the parser a bit smaller, and it avoids a
-      GCC warning that YYVAL may be used uninitialized.  */
-    yyval = ps[1-parser->yylen].val;
+    yyval.opval = NULL;
 
     YY_STACK_PRINT(parser);
     YY_REDUCE_PRINT (yyn);
