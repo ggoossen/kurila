@@ -517,8 +517,7 @@ perl_destruct(pTHXx)
 	if (CvPADLIST(PL_main_cv)) {
 	    PAD_SET_CUR_NOSAVE(CvPADLIST(PL_main_cv), 1);
 	}
-	op_free(PL_main_root);
-	PL_main_root = NULL;
+	ROOTOPcpNULL(PL_main_root);
     }
     PL_main_start = NULL;
     CVcpNULL(PL_main_cv);
@@ -1239,8 +1238,7 @@ perl_parse(pTHXx_ XSINIT_t xsinit, int argc, char **argv, char **env)
     }
 
     if (PL_main_root) {
-	op_free(PL_main_root);
-	PL_main_root = NULL;
+	ROOTOPcpNULL(PL_main_root);
     }
     PL_main_start = NULL;
     CVcpNULL(PL_main_cv);

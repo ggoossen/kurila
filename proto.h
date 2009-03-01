@@ -162,6 +162,11 @@ PERL_INLINE_CALLCONV PERL_CONTEXT*	Perl_PushBlock(pTHX_ U8 t, SV** sp, U8 gimme)
 	assert(sp)
 
 PERL_INLINE_CALLCONV PERL_CONTEXT*	Perl_PopBlock(pTHX);
+PERL_INLINE_CALLCONV void	Perl_cx_free_eval(pTHX_ PERL_CONTEXT* cx)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_CX_FREE_EVAL	\
+	assert(cx)
+
 
 #  include "pp_proto.h"
 PERL_CALLCONV OP*	Perl_append_elem(pTHX_ I32 optype, OP* first, OP* last);
@@ -2113,6 +2118,12 @@ PERL_CALLCONV ROOTOP*	Perl_newROOTOP(pTHX_ OP* main, SV* location)
 
 PERL_CALLCONV void	Perl_rootop_ll_tmprefcnt(pTHX);
 PERL_CALLCONV void	Perl_op_free(pTHX_ OP* arg);
+PERL_INLINE_CALLCONV OP*	Perl_RootopOp(pTHX_ ROOTOP* o);
+PERL_INLINE_CALLCONV void	Perl_rootop_refcnt_dec(pTHX_ ROOTOP* o)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_ROOTOP_REFCNT_DEC	\
+	assert(o)
+
 PERL_CALLCONV void	Perl_op_tmprefcnt(pTHX_ OP* arg);
 #ifdef PERL_MAD
 PERL_CALLCONV OP*	Perl_package(pTHX_ OP* o)

@@ -9097,7 +9097,7 @@ Perl_refcnt_check(pTHX)
     HvTMPREFCNT_inc(PL_op_sequence);
     AvTMPREFCNT_inc(PL_destroyav);
     AvTMPREFCNT_inc(PL_preambleav);
-    HvTMPREFCNT_inc(PL_endav);
+    AvTMPREFCNT_inc(PL_endav);
 
     rootop_ll_tmprefcnt(aTHX);
 

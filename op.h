@@ -163,9 +163,6 @@ Deprecated.  Use C<GIMME_V> instead.
 /* Private for lvalues */
 #define OPpLVAL_INTRO	128	/* Lvalue must be localized or lvalue sub */
 
-/* Private for OP_LEAVE, OP_LEAVESUB, OP_LEAVESUBLV and OP_LEAVEWRITE */
-#define OPpREFCOUNTED		64	/* op_targ carries a refcount */
-
 /* Private for OP_MATCH and OP_SUBST{,CONST} */
 #define OPpRUNTIME		64	/* Pattern coming in on the stack */
 
@@ -413,6 +410,13 @@ struct rootop {
 #define cSVOPo_sv		cSVOPx_sv(o)
 #define kSVOP_sv		cSVOPx_sv(kid)
 
+#define ROOTOPcpNULL(rootop) STMT_START {	\
+	if (rootop) {				\
+	    rootop_refcnt_dec(rootop);		\
+	    rootop = NULL;			\
+	}					\
+    } STMT_END
+
 #ifndef PERL_CORE
 #  define Nullop ((OP*)NULL)
 #endif
@@ -473,6 +477,7 @@ struct rootop {
 #  define OP_REFCNT_UNLOCK		NOOP
 #  define OP_REFCNT_TERM		NOOP
 
+#define OpREFCNT(o)		((o)->op_targ)
 #define OpREFCNT_set(o,n)		((o)->op_targ = (n))
 #ifdef PERL_DEBUG_READONLY_OPS
 #  define OpREFCNT_inc(o)		Perl_op_refcnt_inc(aTHX_ o)

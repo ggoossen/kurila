@@ -473,9 +473,10 @@ Perl_save_padsv_and_mortalize(pTHX_ PADOFFSET off)
 void
 Perl_save_set_magicsv(pTHX_ SV* name)
 {
+    SV* sv;
     dVAR;
     SSCHECK(3);
-    SV* sv = sv_2mortal(newSV(0));
+    sv = sv_2mortal(newSV(0));
     PL_localizing = 1;
     magic_get(SvPVX_const(name), sv);
     SSPUSHPTR(SvREFCNT_inc_simple_NN(name));
@@ -1145,7 +1146,7 @@ Perl_scope_tmprefcnt(pTHX)
 	    break;
 	case SAVEt_BOOL:			/* bool reference */
 	    ptr = SSPOPPTR;
-	    (bool)SSPOPBOOL;
+	    (void)SSPOPBOOL;
 	    break;
 	case SAVEt_I32:				/* I32 reference */
 	    ptr = SSPOPPTR;
@@ -1154,7 +1155,7 @@ Perl_scope_tmprefcnt(pTHX)
 		const I32 val = SSPOPINT;
 	    }
 #else
-	    (I32)SSPOPINT;
+	    (void)SSPOPINT;
 #endif
 	    break;
 	case SAVEt_SPTR:			/* SV* reference */
@@ -1164,7 +1165,7 @@ Perl_scope_tmprefcnt(pTHX)
 	case SAVEt_VPTR:			/* random* reference */
 	case SAVEt_PPTR:			/* char* reference */
 	    ptr = SSPOPPTR;
-	    (char*)SSPOPPTR;
+	    (void)SSPOPPTR;
 	    break;
 	case SAVEt_GP:				/* scalar reference */
 	    ptr = SSPOPPTR;
@@ -1197,11 +1198,12 @@ Perl_scope_tmprefcnt(pTHX)
 	    ptr = SSPOPPTR;
 	    hv = (HV*)ptr;
 	    ptr = SSPOPPTR;
+	    (void)SSPOPINT;
 	    HvTMPREFCNT_inc(hv);
 	    break;
 	case SAVEt_DESTRUCTOR_X:
 	    ptr = SSPOPPTR;
-	    SSPOPDXPTR;
+	    (void)SSPOPDXPTR;
 	    break;
 	case SAVEt_REGCONTEXT:
 	case SAVEt_ALLOC:
@@ -1213,7 +1215,7 @@ Perl_scope_tmprefcnt(pTHX)
 	    break;
 	case SAVEt_STACK_CXPOS:         /* blk_oldsp on context stack */
 	    i = SSPOPINT;
-	    SSPOPINT;
+	    (void)SSPOPINT;
 	    break;
 	case SAVEt_AELEM:		/* array element */
 	    value = (SV*)SSPOPPTR;
@@ -1231,7 +1233,7 @@ Perl_scope_tmprefcnt(pTHX)
 	    SvTMPREFCNT_inc(value);
 	    break;
 	case SAVEt_OP:
-	    (OP*)SSPOPPTR;
+	    (void)SSPOPPTR;
 	    break;
 	case SAVEt_HINTS: {
 	    I32 hints;
@@ -1243,7 +1245,7 @@ Perl_scope_tmprefcnt(pTHX)
 	    break;
 	}
 	case SAVEt_COMPPAD:
-	    (PAD*)SSPOPPTR;
+	    (void)SSPOPPTR;
 	    break;
 	case SAVEt_PADSV_AND_MORTALIZE: {
 	    const PADOFFSET off = (PADOFFSET)SSPOPLONG;
@@ -1263,13 +1265,13 @@ Perl_scope_tmprefcnt(pTHX)
 	    break;
 	}
 	case SAVEt_SAVESWITCHSTACK: {
-	    AV* const t = (AV*)SSPOPPTR;
-	    AV* const f = (AV*)SSPOPPTR;
+	    (void)SSPOPPTR;
+	    (void)SSPOPPTR;
 	    break;
 	}
 	case SAVEt_SET_SVFLAGS: {
-	    const U32 val  = (U32)SSPOPINT;
-	    const U32 mask = (U32)SSPOPINT;
+	    (void)SSPOPINT;
+	    (void)SSPOPINT;
 	    sv = (SV*)SSPOPPTR;
 	    break;
 	}
@@ -1281,19 +1283,19 @@ Perl_scope_tmprefcnt(pTHX)
 	    goto tmp_restore_sv;
 	case SAVEt_LONG:			/* long reference */
 	    ptr = SSPOPPTR;
-	    (long)SSPOPLONG;
+	    (void)SSPOPLONG;
 	    break;
 	case SAVEt_I16:				/* I16 reference */
 	    ptr = SSPOPPTR;
-	    (I16)SSPOPINT;
+	    (void)SSPOPINT;
 	    break;
 	case SAVEt_I8:				/* I8 reference */
 	    ptr = SSPOPPTR;
-	    (I8)SSPOPINT;
+	    (void)SSPOPINT;
 	    break;
 	case SAVEt_IV:				/* IV reference */
 	    ptr = SSPOPPTR;
-	    (IV)SSPOPIV;
+	    (void)SSPOPIV;
 	    break;
 	case SAVEt_NSTAB:
 	    gv = (GV*)SSPOPPTR;
@@ -1301,19 +1303,13 @@ Perl_scope_tmprefcnt(pTHX)
 	    break;
 	case SAVEt_DESTRUCTOR:
 	    ptr = SSPOPPTR;
-	    SSPOPDPTR;
+	    (void)SSPOPDPTR;
 	    break;
 	case SAVEt_COMPILE_WARNINGS:
 	    ptr = SSPOPPTR;
 	    break;
 	case SAVEt_RE_STATE:
-	    {
-		const struct re_save_state *const state
-		    = (struct re_save_state *)
-		    (PL_savestack + PL_savestack_ix
-		     - SAVESTACK_ALLOC_FOR_RE_SAVE_STATE);
-		PL_savestack_ix -= SAVESTACK_ALLOC_FOR_RE_SAVE_STATE;
-	    }
+	    PL_savestack_ix -= SAVESTACK_ALLOC_FOR_RE_SAVE_STATE;
 	    break;
 	case SAVEt_PARSER:
 	    ptr = SSPOPPTR;
@@ -1434,18 +1430,18 @@ Perl_cx_tmprefcnt(pTHX_ PERL_CONTEXT *cx)
     case CXt_BLOCK:
     case CXt_LOOP_PLAIN:
     case CXt_LOOP_LAZYIV:
-	HvTMPREFCNT_inc(cx->blk_dynascope);
+	SvTMPREFCNT_inc(cx->blk_dynascope);
 	break;
     case CXt_LOOP_FOR:
 	AvTMPREFCNT_inc(cx->blk_loop.state_u.ary.ary);
-	HvTMPREFCNT_inc(cx->blk_dynascope);
+	SvTMPREFCNT_inc(cx->blk_dynascope);
 	break;
     case CXt_SUB:
-	HvTMPREFCNT_inc(cx->blk_dynascope);
+	SvTMPREFCNT_inc(cx->blk_dynascope);
 	CvTMPREFCNT_inc(cx->blk_sub.cv);
 	break;
     case CXt_EVAL:
-	HvTMPREFCNT_inc(cx->blk_dynascope);
+	SvTMPREFCNT_inc(cx->blk_dynascope);
 	SvTMPREFCNT_inc(cx->blk_eval.old_namesv);
 	break;
     case CXt_SUBST:

@@ -226,6 +226,7 @@ struct block_sub {
 		CopLINE((COP*)CvSTART((CV*)cx->blk_sub.cv)));		\
 									\
 	sv = (SV*)cx->blk_sub.cv;					\
+	CvDEPTH((CV*)sv) = cx->blk_sub.olddepth;			\
 	SvREFCNT_dec(sv);                                               \
     } STMT_END
 
@@ -234,7 +235,7 @@ struct block_eval {
     OP *	retop;	/* op to execute on exit from eval */
     /* Above here is the same for sub, format and eval.  */
     SV *	old_namesv;
-    OP *	old_eval_root;
+    ROOTOP *	old_eval_root;
     SV *	cur_text;
     CV *	cv;
     JMPENV *	cur_top_env; /* value of PL_top_env when eval CX created */
@@ -260,15 +261,7 @@ struct block_eval {
 	cx->blk_eval.cur_top_env = PL_top_env; 				\
     } STMT_END
 
-#define POPEVAL(cx)							\
-    STMT_START {							\
-	PL_in_eval = CxOLD_IN_EVAL(cx);					\
-	optype = CxOLD_OP_TYPE(cx);					\
-	op_free(PL_eval_root);                                    \
-	PL_eval_root = cx->blk_eval.old_eval_root;			\
-	if (cx->blk_eval.old_namesv)					\
-	    sv_2mortal(cx->blk_eval.old_namesv);			\
-    } STMT_END
+#define POPEVAL(cx) cx_free_eval(cx);
 
 /* loop context */
 struct block_loop {

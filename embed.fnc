@@ -103,6 +103,7 @@ Aip	|SV*	|LocationFilename	|NN SV *location
 
 Aip     |PERL_CONTEXT* |PushBlock  |U8 t|NN SV** sp|U8 gimme
 Aip     |PERL_CONTEXT* |PopBlock
+Aip     |void |cx_free_eval		|NN PERL_CONTEXT* cx
 
 #  include "pp_proto.h"
 p	|OP*	|append_elem	|I32 optype|NULLOK OP* first|NULLOK OP* last
@@ -589,6 +590,8 @@ pr	|OP*	|oopsCV		|NN OP* o
 Ap	|ROOTOP*	|newROOTOP	|NN OP* main|NN SV* location
 Ap	|void	|rootop_ll_tmprefcnt
 Ap	|void	|op_free	|NULLOK OP* arg
+Api	|OP*	|RootopOp	|NULLOK ROOTOP* o
+Api	|void	|rootop_refcnt_dec	|NN ROOTOP* o
 Ap	|void	|op_tmprefcnt	|NULLOK OP* arg
 #ifdef PERL_MAD
 p	|OP*	|package	|NN OP* o

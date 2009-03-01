@@ -3771,12 +3771,13 @@ PP(pp_enter_anonhash_assign)
 
     /* push remaining keys */
     {
+	register HE *entry;
 	PUTBACK;
 	(void)hv_iterinit(value);
-	register HE *entry;
 	while ((entry = hv_iternext(value))) {
+	    SV* sv;
 	    SPAGAIN;
-	    SV* const sv = hv_iterkeysv(entry);
+	    sv = hv_iterkeysv(entry);
 	    XPUSHs(hv_iterval(value,entry));
 	    XPUSHs(sv);
 	    PUTBACK;

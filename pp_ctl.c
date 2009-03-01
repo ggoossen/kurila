@@ -429,6 +429,7 @@ Perl_die_where(pTHX_ SV *msv)
 		PerlIO_write(Perl_error_log, message, msglen);
 		my_exit(1);
 	    }
+	    optype = CxOLD_OP_TYPE(cx);
 	    POPEVAL(cx);
 
 	    if (gimme == G_SCALAR)
@@ -847,12 +848,10 @@ PP(pp_return)
 {
     dVAR; dSP; dMARK;
     register PERL_CONTEXT *cx;
-    bool popsub2 = FALSE;
     bool clear_errsv = FALSE;
     I32 gimme;
     SV **newsp;
     PMOP *newpm;
-    I32 optype = 0;
     SV *sv;
     OP *retop;
 
@@ -885,28 +884,10 @@ PP(pp_return)
     }
 
     POPBLOCK(cx,newpm);
-    switch (CxTYPE(cx)) {
-    case CXt_SUB:
-	popsub2 = TRUE;
-	retop = cx->blk_sub.retop;
-	cxstack_ix++; /* preserve cx entry on stack for use by POPSUB */
-	break;
-    case CXt_EVAL:
-	if (!(PL_in_eval & EVAL_KEEPERR))
-	    clear_errsv = TRUE;
-	POPEVAL(cx);
-	retop = cx->blk_eval.retop;
-	if (CxTRYBLOCK(cx))
-	    break;
-	lex_end();
-	break;
-    default:
-	DIE(aTHX_ "panic: return");
-    }
 
     if (gimme == G_SCALAR) {
 	if (MARK < SP) {
-	    if (popsub2) {
+	    if (CxTYPE(cx) == CXt_SUB) {
 		if (cx->blk_sub.cv && CvDEPTH(cx->blk_sub.cv) > 1) {
 		    if (SvTEMP(TOPs)) {
 			*++newsp = SvREFCNT_inc(*SP);
@@ -931,7 +912,7 @@ PP(pp_return)
     }
     else if (gimme == G_ARRAY) {
 	while (++MARK <= SP) {
-	    *++newsp = (popsub2 && SvTEMP(*MARK))
+	    *++newsp = ((CxTYPE(cx) == CXt_SUB) && SvTEMP(*MARK))
 			? *MARK : sv_mortalcopy(*MARK);
 	}
     }
@@ -939,12 +920,23 @@ PP(pp_return)
 
     LEAVE;
     /* Stack values are safe: */
-    if (popsub2) {
-	cxstack_ix--;
-	POPSUB(cx,sv);	/* release CV and @_ ... */
+    switch (CxTYPE(cx)) {
+    case CXt_SUB:
+	retop = cx->blk_sub.retop;
+	POPSUB(cx,sv);
+	break;
+    case CXt_EVAL:
+	if (!(PL_in_eval & EVAL_KEEPERR))
+	    clear_errsv = TRUE;
+	POPEVAL(cx);
+	retop = cx->blk_eval.retop;
+	if (CxTRYBLOCK(cx))
+	    break;
+	lex_end();
+	break;
+    default:
+	DIE(aTHX_ "panic: return");
     }
-    else
-	sv = NULL;
     PL_curpm = newpm;	/* ... and pop $1 et al */
 
     if (clear_errsv)
@@ -1361,10 +1353,7 @@ S_doeval(pTHX_ int gimme, OP** startop, CV* outside, U32 seq)
 	const char *msg;
 
 	PL_op = saveop;
-	if (PL_eval_root) {
-	    op_free(PL_eval_root);
-	    PL_eval_root = NULL;
-	}
+	ROOTOPcpNULL(PL_eval_root);
 	SP = PL_stack_base + POPMARK;		/* pop original mark */
 	if (!startop) {
 	    POPBLOCK(cx,PL_curpm);
@@ -1419,13 +1408,13 @@ S_doeval(pTHX_ int gimme, OP** startop, CV* outside, U32 seq)
 	    && cUNOPx(PL_eval_root)->op_first->op_type == OP_LINESEQ
 	    && cLISTOPx(cUNOPx(PL_eval_root)->op_first)->op_last->op_type
 	    == OP_REQUIRE)
-	scalar(PL_eval_root);
+	scalar(PL_eval_root->op_first);
     else if ((gimme & G_WANT) == G_VOID)
-	scalarvoid(PL_eval_root);
+	scalarvoid(PL_eval_root->op_first);
     else if ((gimme & G_WANT) == G_ARRAY)
-	list(PL_eval_root);
+	list(PL_eval_root->op_first);
     else
-	scalar(PL_eval_root);
+	scalar(PL_eval_root->op_first);
 
     DEBUG_x(dump_eval());
 
@@ -1747,7 +1736,7 @@ PP(pp_require)
 	    }
 	}
     }
-    filename = sv_2mortal(newSVpv( tryrsfp ? tryname : name, 0));
+    filename = newSVpv( tryrsfp ? tryname : name, 0); /* temporary reference leak */
     if (!tryrsfp) {
 	if (PL_op->op_type == OP_REQUIRE) {
 	    const char *msgstr = name;
@@ -1833,13 +1822,15 @@ PP(pp_require)
     /* mark require as finished */
     if (!hook_sv) {
 	(void)hv_store(PL_includedhv,
-	    unixname, unixlen, newSVsv(filename), 0);
+	    unixname, unixlen, SvREFCNT_inc(filename), 0);
     } else {
 	SV** const svp = hv_fetch(PL_includedhv, unixname, unixlen, 0);
 	if ( ! ( svp && SvTRUE(*svp) ) )
 	    (void)hv_store(PL_includedhv,
 		unixname, unixlen, SvREFCNT_inc(hook_sv), 0 );
     }
+
+    SvREFCNT_dec(filename);
 
     return op;
 }

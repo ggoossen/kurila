@@ -295,6 +295,7 @@ Perl_newROOTOP(pTHX_ OP *main, SV* location)
     o->op_first = main;
     o->op_flags = OPf_KIDS;
     o->op_location = SvREFCNT_inc(location);
+    OpREFCNT_set(o, 1);
 
     o->op_prev_root = NULL;
     o->op_next_root = PL_rootop_ll;
@@ -444,14 +445,18 @@ Perl_op_free(pTHX_ OP *o)
     type = o->op_type;
     if (type == OP_ROOT) {
 	PADOFFSET refcnt;
-	OP_REFCNT_LOCK;
-	refcnt = OpREFCNT_dec(o);
-	OP_REFCNT_UNLOCK;
+	ROOTOP* rooto = (ROOTOP*)o;
+	refcnt = OpREFCNT(o);
 	if (refcnt) {
-	    /* Need to find and remove any pattern match ops from the list
-	       we maintain for reset().  */
-	    return;
+	    Perl_croak(aTHX_ "panic: Attempt to free referenced rootop");
 	}
+
+	if (rooto->op_next_root) 
+	    rooto->op_next_root->op_prev_root = rooto->op_prev_root;
+	if (rooto->op_prev_root)
+	    rooto->op_prev_root->op_next_root = rooto->op_next_root;
+	if (rooto == PL_rootop_ll)
+	    PL_rootop_ll = rooto->op_next_root;
     }
 
     if (o->op_flags & OPf_KIDS) {
@@ -512,7 +517,6 @@ Perl_op_tmprefcnt(pTHX_ OP *o)
 
     SvTMPREFCNT_inc(o->op_location);
 
- retry:
     switch (o->op_type) {
     case OP_NULL:	/* Was holding old type, if any. */
     case OP_ENTEREVAL:	/* Was holding hints. */
@@ -1042,27 +1046,30 @@ Perl_newPROG(pTHX_ OP *o)
     PERL_ARGS_ASSERT_NEWPROG;
 
     if (PL_in_eval) {
+	OP* opleave;
 	if (PL_eval_root)
 	    return;
-	PL_eval_root = newUNOP(OP_LEAVEEVAL,
+	opleave = newUNOP(OP_LEAVEEVAL,
 			       ((PL_in_eval & EVAL_KEEPERR)
 				? OPf_SPECIAL : 0), o, o->op_location);
-	PL_eval_start = linklist(PL_eval_root);
-	PL_eval_root = newROOTOP(PL_eval_root, o->op_location);
+	PL_eval_start = linklist(opleave);
+	opleave->op_next = NULL;
+	PL_eval_root = newROOTOP(opleave, o->op_location);
 	CALL_PEEP(PL_eval_start);
     }
     else {
+	OP* scopeop;
 	if (o->op_type == OP_STUB) {
 	    AVcpNULL(PL_comppad_name);
 	    CVcpNULL(PL_compcv);
 	    S_op_destroy(aTHX_ o);
 	    return;
 	}
-	PL_main_root = scope(sawparens(scalarvoid(o)));
+	scopeop = scope(sawparens(scalarvoid(o)));
 	PL_curcop = &PL_compiling;
-	PL_main_start = LINKLIST(PL_main_root);
-	PL_main_root->op_next = NULL;
-	PL_main_root = newROOTOP(PL_main_root, PL_main_root->op_location);
+	PL_main_start = LINKLIST(scopeop);
+	scopeop->op_next = NULL;
+	PL_main_root = newROOTOP(scopeop, scopeop->op_location);
 	CALL_PEEP(PL_main_start);
 	CVcpNULL(PL_compcv);
 
@@ -3269,14 +3276,8 @@ Perl_cv_undef(pTHX_ CV *cv)
     );
 
     if (!CvISXSUB(cv) && CvROOT(cv)) {
-	ENTER;
-
-	PAD_SAVE_SETNULLPAD();
-
-	op_free(CvROOT(cv));
-	CvROOT(cv) = NULL;
+	ROOTOPcpNULL(CvROOT(cv));
 	CvSTART(cv) = NULL;
-	LEAVE;
     }
     SvPOK_off((SV*)cv);		/* forget prototype */
 
@@ -3608,10 +3609,13 @@ Perl_newSUB(pTHX_ I32 floor, OP *proto, OP *block)
     }
     else
 	block->op_attached = 1;
-    CvROOT(cv) = newUNOP(OP_LEAVESUB, 0, scalarseq(block), block->op_location);
-    CvSTART(cv) = LINKLIST(CvROOT(cv));
-    CvROOT(cv)->op_next = 0;
-    CvROOT(cv) = newROOTOP(CvROOT(cv), block->op_location);
+    {
+	OP* leaveop;
+	leaveop = newUNOP(OP_LEAVESUB, 0, scalarseq(block), block->op_location);
+	CvSTART(cv) = LINKLIST(leaveop);
+	leaveop->op_next = 0;
+	CvROOT(cv) = newROOTOP(leaveop, block->op_location);
+    }
     CALL_PEEP(CvSTART(cv));
 
     /* now that optimizer has done its work, adjust pad values */
@@ -6162,7 +6166,7 @@ Perl_rootop_ll_tmprefcnt() {
     ROOTOP* rootop;
     rootop = PL_rootop_ll;
     while (rootop) {
-	op_tmprefcnt(rootop);
+	op_tmprefcnt((OP*)rootop);
 	rootop = rootop->op_next_root;
     }
 }

@@ -47,3 +47,11 @@ PERL_CONTEXT * Perl_PopBlock() {
             (long)cxstack_ix+1,PL_block_type[CxTYPE(cx)]) );
     return cx;
 }
+
+void Perl_cx_free_eval(PERL_CONTEXT* cx) {
+    PL_in_eval = CxOLD_IN_EVAL(cx);
+    ROOTOPcpNULL(PL_eval_root);
+    PL_eval_root = cx->blk_eval.old_eval_root;
+    if (cx->blk_eval.old_namesv)
+        sv_2mortal(cx->blk_eval.old_namesv);
+}

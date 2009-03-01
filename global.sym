@@ -48,6 +48,7 @@ Perl_SvNV
 Perl_LocationFilename
 Perl_PushBlock
 Perl_PopBlock
+Perl_cx_free_eval
 Perl_av_clear
 Perl_av_delete
 Perl_av_exists
@@ -368,6 +369,8 @@ Perl_ninstr
 Perl_newROOTOP
 Perl_rootop_ll_tmprefcnt
 Perl_op_free
+Perl_RootopOp
+Perl_rootop_refcnt_dec
 Perl_op_tmprefcnt
 Perl_find_rundefsvoffset
 Perl_pad_sv

@@ -91,7 +91,7 @@ Perl_dump_all(pTHX)
     dVAR;
     PerlIO_setlinebuf(Perl_debug_log);
     if (PL_main_root)
-	op_dump(PL_main_root);
+	op_dump(RootopOp(PL_main_root));
 /*     dump_packsubs(PL_defstash); */
 }
 
@@ -136,7 +136,7 @@ Perl_dump_sub(pTHX_ const GV *gv)
 	    PTR2UV(CvXSUB(GvCV(gv))),
 	    (int)CvXSUBANY(GvCV(gv)).any_i32);
     else if (CvROOT(GvCV(gv)))
-	op_dump(CvROOT(GvCV(gv)));
+	op_dump(RootopOp(CvROOT(GvCV(gv))));
     else
 	Perl_dump_indent(aTHX_ 0, Perl_debug_log, "<undef>\n");
 }
@@ -145,7 +145,7 @@ void
 Perl_dump_eval(pTHX)
 {
     dVAR;
-    op_dump(PL_eval_root);
+    op_dump((OP*)PL_eval_root);
 }
 
 
@@ -834,11 +834,6 @@ STATIC SV* S_dump_op_flags_private(pTHX_ const OP* o)
 	if (o->op_private & OPpTARGET_MY)
 	    sv_catpv(tmpsv, ",TARGET_MY");
     }
-    else if (optype == OP_LEAVESUB ||
-	     optype == OP_LEAVE) {
-	if (o->op_private & OPpREFCOUNTED)
-	    sv_catpv(tmpsv, ",REFCOUNTED");
-    }
     else if (optype == OP_REPEAT) {
 	if (o->op_private & OPpREPEAT_DOLIST)
 	    sv_catpv(tmpsv, ",DOLIST");
@@ -1088,9 +1083,9 @@ static void S_dump_op_rest (pTHX_ I32 level, PerlIO *file, const OP *o)
     case OP_LEAVEEVAL:
     case OP_LEAVESUB:
     case OP_SCOPE:
-	if (o->op_private & OPpREFCOUNTED)
-	    Perl_dump_indent(aTHX_ level, file, "REFCNT = %"UVuf"\n", (UV)o->op_targ);
 	break;
+    case OP_ROOT:
+	Perl_dump_indent(aTHX_ level, file, "REFCNT = %"UVuf"\n", (UV)o->op_targ);
     default:
 	break;
     }
@@ -1707,7 +1702,7 @@ Perl_do_sv_dump(pTHX_ I32 level, PerlIO *file, SV *sv, I32 nest, I32 maxnest, bo
 	    Perl_dump_indent(aTHX_ level, file, "  ROOT = 0x%"UVxf"\n",
 			     PTR2UV(CvROOT(sv)));
 	    if (CvROOT(sv) && dumpops) {
-		do_op_dump(level+1, file, CvROOT(sv));
+		do_op_dump(level+1, file, RootopOp(CvROOT(sv)));
 	    }
 	} else {
 	    SV * const constant = cv_const_sv((CV *)sv);
@@ -2589,8 +2584,6 @@ Perl_do_op_xmldump(pTHX_ I32 level, PerlIO *file, const OP *o)
     case OP_LEAVEEVAL:
     case OP_LEAVESUB:
     case OP_SCOPE:
-	if (o->op_private & OPpREFCOUNTED)
-	    S_xmldump_attr(aTHX_ level, file, "refcnt=\"%"UVuf"\"", (UV)o->op_targ);
 	break;
     default:
 	break;

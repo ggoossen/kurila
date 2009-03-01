@@ -70,6 +70,7 @@
 #define LocationFilename	Perl_LocationFilename
 #define PushBlock		Perl_PushBlock
 #define PopBlock		Perl_PopBlock
+#define cx_free_eval		Perl_cx_free_eval
 #ifdef PERL_CORE
 #define append_elem		Perl_append_elem
 #define append_list		Perl_append_list
@@ -597,6 +598,8 @@
 #define newROOTOP		Perl_newROOTOP
 #define rootop_ll_tmprefcnt	Perl_rootop_ll_tmprefcnt
 #define op_free			Perl_op_free
+#define RootopOp		Perl_RootopOp
+#define rootop_refcnt_dec	Perl_rootop_refcnt_dec
 #define op_tmprefcnt		Perl_op_tmprefcnt
 #ifdef PERL_MAD
 #ifdef PERL_CORE
@@ -2246,6 +2249,7 @@
 #define LocationFilename(a)	Perl_LocationFilename(aTHX_ a)
 #define PushBlock(a,b,c)	Perl_PushBlock(aTHX_ a,b,c)
 #define PopBlock()		Perl_PopBlock(aTHX)
+#define cx_free_eval(a)		Perl_cx_free_eval(aTHX_ a)
 #ifdef PERL_CORE
 #define append_elem(a,b,c)	Perl_append_elem(aTHX_ a,b,c)
 #define append_list(a,b,c)	Perl_append_list(aTHX_ a,b,c)
@@ -2756,6 +2760,8 @@
 #define newROOTOP(a,b)		Perl_newROOTOP(aTHX_ a,b)
 #define rootop_ll_tmprefcnt()	Perl_rootop_ll_tmprefcnt(aTHX)
 #define op_free(a)		Perl_op_free(aTHX_ a)
+#define RootopOp(a)		Perl_RootopOp(aTHX_ a)
+#define rootop_refcnt_dec(a)	Perl_rootop_refcnt_dec(aTHX_ a)
 #define op_tmprefcnt(a)		Perl_op_tmprefcnt(aTHX_ a)
 #ifdef PERL_MAD
 #ifdef PERL_CORE

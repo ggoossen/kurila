@@ -16,7 +16,7 @@ typedef U16 cv_flags_t;
 	ANY	xcv_xsubany;							\
     }		xcv_start_u;					    		\
     union {									\
-	OP *	xcv_root;							\
+	ROOTOP *	xcv_root;							\
 	void	(*xcv_xsub) (pTHX_ CV*);					\
     }		xcv_root_u;							\
     AV *	xcv_padlist;							\

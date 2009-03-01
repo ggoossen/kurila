@@ -5339,7 +5339,6 @@ S_reg(pTHX_ RExC_state_t *pRExC_state, I32 paren, I32 *flagp,U32 depth)
 		    ENTER;
 		    Perl_save_re_context(aTHX);
 		    rop = sv_compile_2op(sv, &sop, "re", &pad);
-		    sop->op_private |= OPpREFCOUNTED;
 		    /* re_dup will OpREFCNT_inc */
 		    OpREFCNT_set(sop, 1);
 		    LEAVE;
@@ -8815,9 +8814,6 @@ Perl_preg_tmprefcnt(pTHX_ REGEXP *rx)
 
     if (ri->data) {
 	int n = ri->data->count;
-	PAD* new_comppad = NULL;
-	PAD* old_comppad;
-	PADOFFSET refcnt;
 
 	while (--n >= 0) {
           /* If you add a ->what type here, update the comment in regcomp.h */
