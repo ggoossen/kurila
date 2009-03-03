@@ -4326,36 +4326,32 @@ Perl_call_destructors() {
     while (PL_destroyav) {
 	dSP;
 
-	SV** svp = av_fetch(PL_destroyav, 0, FALSE);
-	SV** destructor = av_fetch(PL_destroyav, 1, FALSE);
+	SV* sv = sv_2mortal(av_shift(PL_destroyav));
+	SV* destructor = sv_2mortal(av_shift(PL_destroyav));
+
+	if (av_len(PL_destroyav) == -1) 
+	    AVcpNULL(PL_destroyav);
 
 	ENTER;
 	SAVETMPS;
 	PUSHSTACKi(PERLSI_DESTROY);
 	EXTEND(SP, 2);
 	PUSHMARK(SP);
-	mPUSHs(newRV(*svp));
+	mPUSHs(newRV(sv));
 	PUTBACK;
-	call_sv(*destructor, G_DISCARD|G_EVAL|G_KEEPERR|G_VOID);
+	call_sv(destructor, G_DISCARD|G_EVAL|G_KEEPERR|G_VOID);
 		
 	POPSTACK;
 	SPAGAIN;
 	FREETMPS;
 	LEAVE;
 
-	if (SvREFCNT(*svp) == 1) {
-	    if (SvOBJECT(*svp)) {
-		HvREFCNT_dec(SvSTASH(*svp));	/* possibly of changed persuasion */
-		SvOBJECT_off(*svp);	/* Curse the object. */
-		if (SvTYPE(*svp) != SVt_PVIO)
-		    --PL_sv_objcount;	/* XXX Might want something more general */
-	    }
+	if (SvOBJECT(sv)) {
+	    HvREFCNT_dec(SvSTASH(sv));	/* possibly of changed persuasion */
+	    SvOBJECT_off(sv);	/* Curse the object. */
+	    if (SvTYPE(sv) != SVt_PVIO)
+		--PL_sv_objcount;	/* XXX Might want something more general */
 	}
-
-	SvREFCNT_dec(av_shift(PL_destroyav));
-	SvREFCNT_dec(av_shift(PL_destroyav));
-	if (av_len(PL_destroyav) == -1) 
-	    AVcpNULL(PL_destroyav);
     }
 }
 
