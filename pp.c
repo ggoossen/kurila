@@ -4696,11 +4696,6 @@ PP(pp_ref_eq)
 {
     dSP;
 
-    if (SvMAGICAL(TOPs))
-	mg_get(TOPs);
-    if (SvMAGICAL(TOPm1s))
-	mg_get(TOPm1s);
-
     if (! SvROK(TOPs))
 	DIE(aTHX_ "Not a reference");
     if (! SvROK(TOPm1s))
@@ -4714,11 +4709,6 @@ PP(pp_ref_eq)
 PP(pp_ref_ne)
 {
     dSP;
-
-    if (SvMAGICAL(TOPs))
-	mg_get(TOPs);
-    if (SvMAGICAL(TOPm1s))
-	mg_get(TOPm1s);
 
     if (! SvROK(TOPs))
 	DIE(aTHX_ "Not a reference");

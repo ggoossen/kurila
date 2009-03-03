@@ -1559,7 +1559,7 @@ PP(pp_sort)
 		else {
 		    if (!SvPOK(*p1)) {
 			(void)sv_2pv_flags(*p1, 0,
-			    SV_GMAGIC|SV_CONST_RETURN);
+			    SV_CONST_RETURN);
 		    }
 		}
 	    }

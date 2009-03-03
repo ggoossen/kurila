@@ -1733,7 +1733,7 @@ Perl_sv_2iv(pTHX_ register SV *const sv)
 =for apidoc sv_2uv_flags
 
 Return the unsigned integer value of an SV, doing any necessary string
-conversion.  If flags includes SV_GMAGIC, does an mg_get() first.
+conversion.
 Normally used via the C<SvUV(sv)> and C<SvUVx(sv)> macros.
 
 =cut
@@ -1748,8 +1748,6 @@ Perl_sv_2uv_flags(pTHX_ register SV *const sv, const I32 flags)
     if ((SvTYPE(sv) == SVt_PVGV && SvVALID(sv))) {
 	/* FBMs use the same flag bit as SVf_IVisUV, so must let them
 	   cache IVs just in case.  */
-	if (flags & SV_GMAGIC)
-	    mg_get(sv);
 	if (SvIOKp(sv))
 	    return SvUVX(sv);
 	if (SvNOKp(sv))
@@ -1897,7 +1895,6 @@ Perl_sv_2nv(pTHX_ register SV *const sv)
     if ((SvTYPE(sv) == SVt_PVGV && SvVALID(sv))) {
 	/* FBMs use the same flag bit as SVf_IVisUV, so must let them
 	   cache IVs just in case.  */
-	mg_get(sv);
 	if (SvNOKp(sv))
 	    return SvNVX(sv);
 	if ((SvPOKp(sv) && SvLEN(sv)) && !SvIOKp(sv)) {
@@ -2153,8 +2150,7 @@ S_uiv_2buf(char *const buf, const IV iv, UV uv, const int is_uv, char **const pe
 =for apidoc sv_2pv_flags
 
 Returns a pointer to the string value of an SV, and sets *lp to its length.
-If flags includes SV_GMAGIC, does an mg_get() first. Coerces sv to a string
-if necessary.
+Coerces sv to a string if necessary.
 Normally invoked via the C<SvPV_flags> macro. C<sv_2pv()> and C<sv_2pv_nomg>
 usually end up here too.
 
@@ -2289,7 +2285,7 @@ Perl_sv_2pv_flags(pTHX_ register SV *const sv, STRLEN *const lp, const I32 flags
 =for apidoc sv_copypv
 
 Copies a stringified representation of the source SV into the
-destination SV.  Automatically performs any necessary mg_get and
+destination SV.  Automatically performs any necessary 
 coercion of numeric values into strings.  Guaranteed to preserve
 UTF8 flag even from overloaded objects.  Similar in nature to
 sv_2pv[_flags] but operates directly on an SV instead of just the
@@ -2385,8 +2381,7 @@ C<dsv>.  The source SV may be destroyed if it is mortal, so don't use this
 function if the source SV needs to be reused. Does not handle 'set' magic.
 Loosely speaking, it performs a copy-by-value, obliterating any previous
 content of the destination.
-If the C<flags> parameter has the C<SV_GMAGIC> bit set, will C<mg_get> on
-C<ssv> if appropriate, else not. If the C<flags> parameter has the
+If the C<flags> parameter has the
 C<NOSTEAL> bit set then the buffers of temps will not be stolen. <sv_setsv>
 and C<sv_setsv_nomg> are implemented in terms of this function.
 
@@ -3441,8 +3436,7 @@ Handles 'get' magic, but not 'set' magic.  See C<sv_catpvn_mg>.
 Concatenates the string onto the end of the string which is in the SV.  The
 C<len> indicates number of bytes to copy.  If the SV has the UTF-8
 status set, then the bytes appended should be valid UTF-8.
-If C<flags> has C<SV_GMAGIC> bit set, will C<mg_get> on C<dsv> if
-appropriate, else not. C<sv_catpvn> and C<sv_catpvn_nomg> are implemented
+C<sv_catpvn> and C<sv_catpvn_nomg> are implemented
 in terms of this function.
 
 =cut
@@ -3478,8 +3472,7 @@ not 'set' magic.  See C<sv_catsv_mg>.
 =for apidoc sv_catsv_flags
 
 Concatenates the string from SV C<ssv> onto the end of the string in
-SV C<dsv>.  Modifies C<dsv> but not C<ssv>.  If C<flags> has C<SV_GMAGIC>
-bit set, will C<mg_get> on the SVs if appropriate, else not. C<sv_catsv>
+SV C<dsv>.  Modifies C<dsv> but not C<ssv>. C<sv_catsv>
 and C<sv_catsv_nomg> are implemented in terms of this function.
 
 =cut */
@@ -6237,10 +6230,9 @@ Perl_newSVsv(pTHX_ register SV *const old)
 	return NULL;
     }
     new_SV(sv);
-    /* SV_GMAGIC is the default for sv_setv()
-       SV_NOSTEAL prevents TEMP buffers being, well, stolen, and saves games
+    /* SV_NOSTEAL prevents TEMP buffers being, well, stolen, and saves games
        with SvTEMP_off and SvTEMP_on round a call to sv_setsv.  */
-    sv_setsv_flags(sv, old, SV_GMAGIC | SV_NOSTEAL);
+    sv_setsv_flags(sv, old, SV_NOSTEAL);
     return sv;
 }
 
@@ -6398,8 +6390,7 @@ can't cope with complex macro expressions. Always use the macro instead.
 =for apidoc sv_pvn_force_flags
 
 Get a sensible string out of the SV somehow.
-If C<flags> has C<SV_GMAGIC> bit set, will C<mg_get> on C<sv> if
-appropriate, else not. C<sv_pvn_force> and C<sv_pvn_force_nomg> are
+C<sv_pvn_force> and C<sv_pvn_force_nomg> are
 implemented in terms of this function.
 You normally want to use the various wrapper macros instead: see
 C<SvPV_force> and C<SvPV_force_nomg>

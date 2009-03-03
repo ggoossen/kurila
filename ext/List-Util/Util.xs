@@ -265,8 +265,6 @@ blessed(sv)
 PROTOTYPE: $
 CODE:
 {
-    if (SvMAGICAL(sv))
-	mg_get(sv);
     if(!sv_isobject(sv)) {
 	XSRETURN_UNDEF;
     }
@@ -281,8 +279,6 @@ reftype(sv)
 PROTOTYPE: $
 CODE:
 {
-    if (SvMAGICAL(sv))
-	mg_get(sv);
     if(!SvROK(sv)) {
 	XSRETURN_UNDEF;
     }
@@ -297,8 +293,6 @@ refaddr(sv)
 PROTOTYPE: $
 CODE:
 {
-    if (SvMAGICAL(sv))
-	mg_get(sv);
     if(!SvROK(sv)) {
 	XSRETURN_UNDEF;
     }

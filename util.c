@@ -5737,8 +5737,6 @@ Perl_get_re_arg(pTHX_ SV *sv) {
     SV    *tmpsv;
 
     if (sv) {
-        if (SvMAGICAL(sv))
-            mg_get(sv);
         if (SvROK(sv) &&
             (tmpsv = (SV*)SvRV(sv)) &&            /* assign deliberate */
             SvTYPE(tmpsv) == SVt_REGEXP)

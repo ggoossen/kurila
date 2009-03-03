@@ -157,7 +157,6 @@ PP(pp_concat)
     bool rcopied = FALSE;
 
     if (TARG == right && right != left) {
-	/* mg_get(right) may happen here ... */
 	rpv = SvPV_const(right, rlen);
 	right = newSVpvn_flags(rpv, rlen, SVs_TEMP);
 	rpv = SvPV_const(right, rlen);	/* no point setting UTF-8 here */
@@ -166,7 +165,7 @@ PP(pp_concat)
 
     if (TARG != left) {
         STRLEN llen;
-        const char* const lpv = SvPV_const(left, llen);	/* mg_get(left) may happen here */
+        const char* const lpv = SvPV_const(left, llen);
 	sv_setpvn(TARG, lpv, llen);
     }
     else { /* TARG == left */
@@ -179,7 +178,6 @@ PP(pp_concat)
 	(void)SvPV_nomg_const(left, llen);    /* Needed to set UTF8 flag */
     }
 
-    /* or mg_get(right) may happen here */
     if (!rcopied) {
 	rpv = SvPV_const(right, rlen);
     }

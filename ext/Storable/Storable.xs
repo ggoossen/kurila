@@ -5838,18 +5838,6 @@ static SV *dclone(pTHX_ SV *sv)
 		clean_context(aTHX_ cxt);
 
 	/*
-	 * Tied elements seem to need special handling.
-	 */
-
-	if ((SvTYPE(sv) == SVt_PVLV
-#if PERL_VERSION < 8
-	     || SvTYPE(sv) == SVt_PVMG
-#endif
-	     ) && SvRMAGICAL(sv) && mg_find(sv, 'p')) {
-		mg_get(sv);
-	}
-
-	/*
 	 * do_store() optimizes for dclone by not freeing its context, should
 	 * we need to allocate one because we're deep cloning from a hook.
 	 */

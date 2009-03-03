@@ -270,7 +270,6 @@ Perl_mg_copy
 Perl_mg_find
 Perl_mg_free
 Perl_mg_tmprefcnt
-Perl_mg_get
 Perl_mg_length
 Perl_mg_magical
 Perl_mg_set

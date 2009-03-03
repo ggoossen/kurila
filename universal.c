@@ -1008,8 +1008,6 @@ XS(XS_ref_address)
 
     {
 	SV* sv = ST(0);
-	if (SvMAGICAL(sv))
-	    mg_get(sv);
 	if(!SvROK(sv)) {
 	    XSRETURN_UNDEF;
 	}
@@ -1031,8 +1029,6 @@ XS(XS_ref_svtype)
     {
 	SV* sv = ST(0);
 	const char* type; 
-	if (SvMAGICAL(sv))
-	    mg_get(sv);
 	type = Ddesc(sv);
 	SP -= items;
 	mPUSHp(type, strlen(type));
@@ -1052,8 +1048,6 @@ XS(XS_ref_reftype)
     {
 	SV* sv = ST(0);
 	const char* type; 
-	if (SvMAGICAL(sv))
-	    mg_get(sv);
 	if(!SvROK(sv)) {
 	    XSRETURN_UNDEF;
 	}
@@ -1077,8 +1071,6 @@ XS(XS_iohandle_input_line_number)
 	SV* sv = ST(0);
         GV* gv;
         
-	if (SvMAGICAL(sv))
-	    mg_get(sv);
 	if (!SvROK(sv) || SvTYPE(SvRV(sv)) != SVt_PVGV) {
 	    XSRETURN_UNDEF;
 	}

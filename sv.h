@@ -1166,19 +1166,19 @@ in gv.h: */
 #define sv_pvn_force_nomg(sv, lp) sv_pvn_force_flags(sv, lp, 0)
 #define sv_catpvn_nomg(dsv, sstr, slen) sv_catpvn_flags(dsv, sstr, slen, 0)
 #define sv_setsv(dsv, ssv) \
-	sv_setsv_flags(dsv, ssv, SV_GMAGIC|SV_DO_COW_SVSETSV)
+	sv_setsv_flags(dsv, ssv, SV_DO_COW_SVSETSV)
 #define sv_setsv_nomg(dsv, ssv) sv_setsv_flags(dsv, ssv, SV_DO_COW_SVSETSV)
-#define sv_catsv(dsv, ssv) sv_catsv_flags(dsv, ssv, SV_GMAGIC)
+#define sv_catsv(dsv, ssv) sv_catsv_flags(dsv, ssv, 0)
 #define sv_catsv_nomg(dsv, ssv) sv_catsv_flags(dsv, ssv, 0)
-#define sv_catsv_mg(dsv, ssv) sv_catsv_flags(dsv, ssv, SV_GMAGIC|SV_SMAGIC)
-#define sv_catpvn(dsv, sstr, slen) sv_catpvn_flags(dsv, sstr, slen, SV_GMAGIC)
+#define sv_catsv_mg(dsv, ssv) sv_catsv_flags(dsv, ssv, SV_SMAGIC)
+#define sv_catpvn(dsv, sstr, slen) sv_catpvn_flags(dsv, sstr, slen, 0)
 #define sv_catpvn_mg(sv, sstr, slen) \
-	sv_catpvn_flags(sv, sstr, slen, SV_GMAGIC|SV_SMAGIC);
-#define sv_2pv(sv, lp) sv_2pv_flags(sv, lp, SV_GMAGIC)
+	sv_catpvn_flags(sv, sstr, slen, SV_SMAGIC);
+#define sv_2pv(sv, lp) sv_2pv_flags(sv, lp, 0)
 #define sv_2pv_nolen(sv) sv_2pv(sv, 0)
 #define sv_2pv_nomg(sv, lp) sv_2pv_flags(sv, lp, 0)
-#define sv_pvn_force(sv, lp) sv_pvn_force_flags(sv, lp, SV_GMAGIC)
-#define sv_2uv(sv) sv_2uv_flags(sv, SV_GMAGIC)
+#define sv_pvn_force(sv, lp) sv_pvn_force_flags(sv, lp, 0)
+#define sv_2uv(sv) sv_2uv_flags(sv, 0)
 /*
 =for apidoc Am|char*|SvPV_force|SV* sv|STRLEN len
 Like C<SvPV> but will force the SV into containing just a string
@@ -1251,9 +1251,9 @@ Like C<sv_catsv> but doesn't process magic.
 
 /* ----*/
 
-#define SvPV(sv, lp) SvPV_flags(sv, lp, SV_GMAGIC)
-#define SvPV_const(sv, lp) SvPV_flags_const(sv, lp, SV_GMAGIC)
-#define SvPV_mutable(sv, lp) SvPV_flags_mutable(sv, lp, SV_GMAGIC)
+#define SvPV(sv, lp) SvPV_flags(sv, lp, 0)
+#define SvPV_const(sv, lp) SvPV_flags_const(sv, lp, 0)
+#define SvPV_mutable(sv, lp) SvPV_flags_mutable(sv, lp, 0)
 
 #define SvPV_flags(sv, lp, flags) \
     ((SvFLAGS(sv) & (SVf_POK)) == SVf_POK \
@@ -1271,9 +1271,9 @@ Like C<sv_catsv> but doesn't process magic.
      ? ((lp = SvCUR(sv)), SvPVX_mutable(sv)) : \
      sv_2pv_flags(sv, &lp, flags|SV_MUTABLE_RETURN))
 
-#define SvPV_force(sv, lp) SvPV_force_flags(sv, lp, SV_GMAGIC)
-#define SvPV_force_nolen(sv) SvPV_force_flags_nolen(sv, SV_GMAGIC)
-#define SvPV_force_mutable(sv, lp) SvPV_force_flags_mutable(sv, lp, SV_GMAGIC)
+#define SvPV_force(sv, lp) SvPV_force_flags(sv, lp, 0)
+#define SvPV_force_nolen(sv) SvPV_force_flags_nolen(sv, 0)
+#define SvPV_force_mutable(sv, lp) SvPV_force_flags_mutable(sv, lp, 0)
 
 #define SvPV_force_nomg(sv, lp) SvPV_force_flags(sv, lp, 0)
 #define SvPV_force_nomg_nolen(sv) SvPV_force_flags_nolen(sv, 0)
@@ -1291,11 +1291,11 @@ Like C<sv_catsv> but doesn't process magic.
 
 #define SvPV_nolen(sv) \
     ((SvFLAGS(sv) & (SVf_POK)) == SVf_POK \
-     ? SvPVX_mutable(sv) : sv_2pv_flags(sv, 0, SV_GMAGIC))
+     ? SvPVX_mutable(sv) : sv_2pv_flags(sv, 0, 0))
 
 #define SvPV_nolen_const(sv) \
     ((SvFLAGS(sv) & (SVf_POK)) == SVf_POK \
-     ? SvPVX_const(sv) : sv_2pv_flags(sv, 0, SV_GMAGIC|SV_CONST_RETURN))
+     ? SvPVX_const(sv) : sv_2pv_flags(sv, 0, SV_CONST_RETURN))
 
 #define SvPV_nomg(sv, lp) SvPV_flags(sv, lp, 0)
 #define SvPV_nomg_const(sv, lp) SvPV_flags_const(sv, lp, 0)
@@ -1320,7 +1320,6 @@ Like C<sv_catsv> but doesn't process magic.
 
 /* flag values for sv_*_flags functions */
 #define SV_IMMEDIATE_UNREF	1
-#define SV_GMAGIC		2
 #define SV_COW_DROP_PV		4
 #define SV_NOSTEAL		16
 #define SV_CONST_RETURN		32
@@ -1457,7 +1456,7 @@ Returns a pointer to the character buffer.
 #define SvSetSV_nosteal_and(dst,src,finally) \
 	STMT_START {					\
 	    if ((dst) != (src)) {			\
-		sv_setsv_flags(dst, src, SV_GMAGIC | SV_NOSTEAL | SV_DO_COW_SVSETSV);	\
+		sv_setsv_flags(dst, src, SV_NOSTEAL | SV_DO_COW_SVSETSV);	\
 		finally;				\
 	    }						\
 	} STMT_END
