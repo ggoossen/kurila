@@ -1948,7 +1948,6 @@ PP(pp_leaveeval)
     register PERL_CONTEXT *cx;
     OP *retop;
     const U8 save_flags = PL_op -> op_flags;
-    I32 optype;
 
     POPBLOCK(cx,newpm);
 
