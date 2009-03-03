@@ -2111,10 +2111,9 @@ PERL_CALLCONV OP*	Perl_oopsCV(pTHX_ OP* o)
 	assert(o)
 
 PERL_CALLCONV ROOTOP*	Perl_newROOTOP(pTHX_ OP* main, SV* location)
-			__attribute__nonnull__(pTHX_1)
-			__attribute__nonnull__(pTHX_2);
+			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_NEWROOTOP	\
-	assert(main); assert(location)
+	assert(main)
 
 PERL_CALLCONV void	Perl_rootop_ll_tmprefcnt(pTHX);
 PERL_CALLCONV void	Perl_op_free(pTHX_ OP* arg);

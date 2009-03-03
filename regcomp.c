@@ -8942,7 +8942,6 @@ Perl_regfree_internal(pTHX_ REGEXP * const rx)
 	int n = ri->data->count;
 	PAD* new_comppad = NULL;
 	PAD* old_comppad;
-	PADOFFSET refcnt;
 
 	while (--n >= 0) {
           /* If you add a ->what type here, update the comment in regcomp.h */
