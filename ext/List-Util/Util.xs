@@ -118,15 +118,13 @@ CODE:
 
 
 
-#ifdef dMULTICALL
-
 void
 reduce(block,...)
     SV * block
 PROTOTYPE: &@
 CODE:
 {
-    dVAR; dMULTICALL;
+    dVAR;
     SV *ret = sv_newmortal();
     int index;
     GV *agv,*bgv,*gv;
@@ -138,19 +136,24 @@ CODE:
 	XSRETURN_UNDEF;
     }
     cv = sv_2cv(block, &gv, 0);
-    PUSH_MULTICALL(cv);
     agv = gv_fetchpv("a", TRUE, SVt_PV);
     bgv = gv_fetchpv("b", TRUE, SVt_PV);
+    ENTER;
     SAVESPTR(GvSV(agv));
     SAVESPTR(GvSV(bgv));
     SVcpREPLACE(GvSV(agv), ret);
     SvSetSV(ret, args[1]);
     for(index = 2 ; index < items ; index++) {
+        SV* res;
 	SVcpREPLACE(GvSV(bgv), args[index]);
-	MULTICALL;
-	SvSetSV(ret, *PL_stack_sp);
+        ENTER;
+        PUSHMARK(SP);
+        PUTBACK;
+        res = call_sv(block, G_SCALAR);
+	SvSetSV(ret, res);
+        LEAVE;
     }
-    POP_MULTICALL;
+    LEAVE;
     ST(0) = ret;
     XSRETURN(1);
 }
@@ -192,8 +195,6 @@ CODE:
     }
     XSRETURN_UNDEF;
 }
-
-#endif
 
 void
 shuffle(...)
