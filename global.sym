@@ -501,7 +501,6 @@ Perl_sv_2pvutf8
 Perl_sv_2pvbyte
 Perl_sv_pvn_nomg
 Perl_sv_2uv
-Perl_sv_2uv_flags
 Perl_sv_iv
 Perl_sv_uv
 Perl_sv_nv

@@ -1730,7 +1730,7 @@ Perl_sv_2iv(pTHX_ register SV *const sv)
 }
 
 /*
-=for apidoc sv_2uv_flags
+=for apidoc sv_2uv
 
 Return the unsigned integer value of an SV, doing any necessary string
 conversion.
@@ -1740,7 +1740,7 @@ Normally used via the C<SvUV(sv)> and C<SvUVx(sv)> macros.
 */
 
 UV
-Perl_sv_2uv_flags(pTHX_ register SV *const sv, const I32 flags)
+Perl_sv_2uv(pTHX_ register SV *const sv)
 {
     dVAR;
     if (!sv)

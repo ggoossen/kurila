@@ -2800,8 +2800,7 @@ PERL_CALLCONV char*	Perl_sv_pvn_nomg(pTHX_ SV* sv, STRLEN* lp)
 #define PERL_ARGS_ASSERT_SV_PVN_NOMG	\
 	assert(sv)
 
-/* PERL_CALLCONV UV	Perl_sv_2uv(pTHX_ SV *sv); */
-PERL_CALLCONV UV	Perl_sv_2uv_flags(pTHX_ SV *const sv, const I32 flags);
+PERL_CALLCONV UV	Perl_sv_2uv(pTHX_ SV *const sv);
 PERL_CALLCONV IV	Perl_sv_iv(pTHX_ SV* sv)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_SV_IV	\

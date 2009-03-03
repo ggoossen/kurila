@@ -90,16 +90,6 @@ Perl_sv_unref(pTHX_ SV *sv)
     sv_unref_flags(sv, 0);
 }
 
-/* sv_2uv() is now a macro using Perl_sv_2uv_flags();
- * this function provided for binary compatibility only
- */
-
-UV
-Perl_sv_2uv(pTHX_ register SV *sv)
-{
-    return sv_2uv_flags(sv, 0);
-}
-
 /* sv_2pv() is now a macro using Perl_sv_2pv_flags();
  * this function provided for binary compatibility only
  */

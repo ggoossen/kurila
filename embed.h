@@ -839,7 +839,7 @@
 #define sv_2pvutf8		Perl_sv_2pvutf8
 #define sv_2pvbyte		Perl_sv_2pvbyte
 #define sv_pvn_nomg		Perl_sv_pvn_nomg
-#define sv_2uv_flags		Perl_sv_2uv_flags
+#define sv_2uv			Perl_sv_2uv
 #define sv_iv			Perl_sv_iv
 #define sv_uv			Perl_sv_uv
 #define sv_nv			Perl_sv_nv
@@ -3006,7 +3006,7 @@
 #define sv_2pvutf8(a,b)		Perl_sv_2pvutf8(aTHX_ a,b)
 #define sv_2pvbyte(a,b)		Perl_sv_2pvbyte(aTHX_ a,b)
 #define sv_pvn_nomg(a,b)	Perl_sv_pvn_nomg(aTHX_ a,b)
-#define sv_2uv_flags(a,b)	Perl_sv_2uv_flags(aTHX_ a,b)
+#define sv_2uv(a)		Perl_sv_2uv(aTHX_ a)
 #define sv_iv(a)		Perl_sv_iv(aTHX_ a)
 #define sv_uv(a)		Perl_sv_uv(aTHX_ a)
 #define sv_nv(a)		Perl_sv_nv(aTHX_ a)
