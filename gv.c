@@ -1121,14 +1121,11 @@ Perl_gp_free(pTHX_ GV *gv)
 }
 
 void
-Perl_gp_tmprefcnt(pTHX_ GV *gv)
+Perl_gp_tmprefcnt(pTHX_ GP *gp)
 {
     dVAR;
-    GP* gp;
-    PERL_ARGS_ASSERT_GP_TMPREFCNT;
 
-    if (!gv || !isGV_with_GP(gv) || !(gp = GvGP(gv)))
-	return;
+    PERL_ARGS_ASSERT_GP_TMPREFCNT;
 
     SvTMPREFCNT_inc(gp->gp_sv);
     AvTMPREFCNT_inc(gp->gp_av);

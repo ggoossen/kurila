@@ -9012,9 +9012,8 @@ Perl_sv_tmprefcnt(pTHX_ SV *const sv)
 	    SvTMPREFCNT_inc(LvTARG(sv));
 	break;
     case SVt_PVGV:
-	if (isGV_with_GP(sv)) {
-	    gp_tmprefcnt((GV*)sv);
-	}
+	if (isGV_with_GP(sv))
+	    gp_tmprefcnt(GvGP(sv));
     case SVt_PVMG:
     case SVt_PVNV:
     case SVt_PVIV:

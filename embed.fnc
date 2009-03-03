@@ -291,7 +291,7 @@ p	|char*	|getenv_len	|NN const char *env_elem|NN unsigned long *len
 #endif
 pox	|void	|get_db_sub	|NULLOK SV **svp|NN CV *cv
 Ap	|void	|gp_free	|NULLOK GV* gv
-Ap	|void	|gp_tmprefcnt	|NN GV* gv
+Ap	|void	|gp_tmprefcnt	|NN GP* gp
 Ap	|GP*	|gp_ref		|NULLOK GP* gp
 Ap	|GV*	|gv_AVadd	|NN GV* gv
 Ap	|GV*	|gv_HVadd	|NN GV* gv

@@ -864,10 +864,10 @@ PERL_CALLCONV void	Perl_get_db_sub(pTHX_ SV **svp, CV *cv)
 	assert(cv)
 
 PERL_CALLCONV void	Perl_gp_free(pTHX_ GV* gv);
-PERL_CALLCONV void	Perl_gp_tmprefcnt(pTHX_ GV* gv)
+PERL_CALLCONV void	Perl_gp_tmprefcnt(pTHX_ GP* gp)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_GP_TMPREFCNT	\
-	assert(gv)
+	assert(gp)
 
 PERL_CALLCONV GP*	Perl_gp_ref(pTHX_ GP* gp);
 PERL_CALLCONV GV*	Perl_gv_AVadd(pTHX_ GV* gv)
