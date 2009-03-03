@@ -818,7 +818,7 @@ sub deparse_sub {
 	    }
 	}
 	else {
-	    $body = $self->deparse($cv->ROOT->first, 0);
+	    $body = $self->deparse($cv->ROOT->first->first, 0);
 	}
     }
     else {
@@ -1064,7 +1064,7 @@ sub scopeop {
 	}
     } else {
         if ($op->last->name eq "scope") {
-            $kid = $op->last->first->last;
+            $kid = $op->last->last;
         }
         else {
             $kid = $op->first;
@@ -3281,8 +3281,6 @@ sub pp_entersub {
 	}
     }
 }
-
-sub pp_enterwrite { unop(< @_, "write") }
 
 # escape things that cause interpolation in double quotes,
 # but not character escapes

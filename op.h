@@ -450,6 +450,7 @@ struct rootop {
 #define OA_BASEOP_OR_UNOP (11 << OCSHIFT)
 #define OA_FILESTATOP (12 << OCSHIFT)
 #define OA_LOOPEXOP (13 << OCSHIFT)
+#define OA_ROOTOP (14 << OCSHIFT)
 
 #define OASHIFT 13
 

@@ -43,7 +43,8 @@ typedef enum {
     OPc_PADOP,	/* 8 */
     OPc_PVOP,	/* 9 */
     OPc_LOOP,	/* 10 */
-    OPc_COP	/* 11 */
+    OPc_COP,	/* 11 */
+    OPc_ROOTOP	/* 12 */
 } opclass;
 
 static char *opclassnames[] = {
@@ -58,7 +59,8 @@ static char *opclassnames[] = {
     "B::PADOP",
     "B::PVOP",
     "B::LOOP",
-    "B::COP"
+    "B::COP",
+    "B::ROOTOP"
 };
 
 static const size_t opsizes[] = {
@@ -73,7 +75,8 @@ static const size_t opsizes[] = {
     sizeof(PADOP),
     sizeof(PVOP),
     sizeof(LOOP),
-    sizeof(COP)	
+    sizeof(COP),
+    sizeof(ROOTOP)	
 };
 
 static int walkoptree_debug = 0; /* Flag for walkoptree debug hook */
@@ -113,7 +116,7 @@ find_cv_by_root(OP* o) {
   OP* root = o;
   SV* key;
   SV* val;
-  SV* cached;
+  HE* cached;
 
   if(PL_compcv && SvTYPE(PL_compcv) == SVt_PVCV &&
         !PL_eval_root) {
@@ -131,9 +134,9 @@ find_cv_by_root(OP* o) {
 
   key = newSViv(PTR2IV(root));
   
-  cached = hv_fetch(root_cache, key, strlen(key), 0);
+  cached = hv_fetch_ent(root_cache, key, 0, 0);
   if(cached) {
-      return cached;
+      return HeVAL(cached);
   }
   
 
@@ -365,6 +368,8 @@ cc_opclass(pTHX_ const OP *o)
 	    return OPc_BASEOP;
 	else
 	    return OPc_PVOP;
+    case OA_ROOTOP:
+        return OPc_ROOTOP;
     }
     warn("can't determine class of operator %s, assuming BASEOP\n",
 	 PL_op_name[o->op_type]);
