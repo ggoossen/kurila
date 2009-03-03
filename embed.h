@@ -600,6 +600,7 @@
 #define op_free			Perl_op_free
 #define RootopOp		Perl_RootopOp
 #define rootop_refcnt_dec	Perl_rootop_refcnt_dec
+#define rootop_refcnt_inc	Perl_rootop_refcnt_inc
 #define op_tmprefcnt		Perl_op_tmprefcnt
 #ifdef PERL_MAD
 #ifdef PERL_CORE
@@ -2762,6 +2763,7 @@
 #define op_free(a)		Perl_op_free(aTHX_ a)
 #define RootopOp(a)		Perl_RootopOp(aTHX_ a)
 #define rootop_refcnt_dec(a)	Perl_rootop_refcnt_dec(aTHX_ a)
+#define rootop_refcnt_inc(a)	Perl_rootop_refcnt_inc(aTHX_ a)
 #define op_tmprefcnt(a)		Perl_op_tmprefcnt(aTHX_ a)
 #ifdef PERL_MAD
 #ifdef PERL_CORE

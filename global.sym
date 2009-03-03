@@ -371,6 +371,7 @@ Perl_rootop_ll_tmprefcnt
 Perl_op_free
 Perl_RootopOp
 Perl_rootop_refcnt_dec
+Perl_rootop_refcnt_inc
 Perl_op_tmprefcnt
 Perl_find_rundefsvoffset
 Perl_pad_sv

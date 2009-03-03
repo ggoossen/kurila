@@ -15,3 +15,8 @@ Perl_rootop_refcnt_dec(pTHX_ ROOTOP* o) {
         LEAVE;
     }
 }
+
+void
+Perl_rootop_refcnt_inc(pTHX_ ROOTOP* o) {
+    OpREFCNT_inc(o);
+}

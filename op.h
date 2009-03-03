@@ -411,9 +411,9 @@ struct rootop {
 #define kSVOP_sv		cSVOPx_sv(kid)
 
 #define ROOTOPcpNULL(rootop) STMT_START {	\
-	if (rootop) {				\
-	    rootop_refcnt_dec(rootop);		\
-	    rootop = NULL;			\
+	if ((rootop)) {				\
+	    rootop_refcnt_dec((rootop));	\
+	    (rootop) = NULL;			\
 	}					\
     } STMT_END
 

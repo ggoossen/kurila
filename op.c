@@ -1055,6 +1055,7 @@ Perl_newPROG(pTHX_ OP *o)
 	PL_eval_start = linklist(opleave);
 	opleave->op_next = NULL;
 	PL_eval_root = newROOTOP(opleave, o->op_location);
+	PL_eval_root->op_next = PL_eval_start;
 	CALL_PEEP(PL_eval_start);
     }
     else {

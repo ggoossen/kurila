@@ -5333,14 +5333,13 @@ S_reg(pTHX_ RExC_state_t *pRExC_state, I32 paren, I32 *flagp,U32 depth)
 		}
 		if (!SIZE_ONLY) {
 		    PAD *pad;
-		    OP_4tree *sop, *rop;
+		    OP *sop;
+		    ROOTOP *rop;
 		    SV * const sv = newSVpvn(s, RExC_parse - 1 - s);
 
 		    ENTER;
 		    Perl_save_re_context(aTHX);
-		    rop = sv_compile_2op(sv, &sop, "re", &pad);
-		    /* re_dup will OpREFCNT_inc */
-		    OpREFCNT_set(sop, 1);
+		    sop = sv_compile_2op(sv, &rop, "re", &pad);
 		    LEAVE;
 
 		    n = add_data(pRExC_state, 3, "nop");
@@ -8966,11 +8965,7 @@ Perl_regfree_internal(pTHX_ REGEXP * const rx)
 		    /* Watch out for global destruction's random ordering. */
 		    (SvTYPE(new_comppad) == SVt_PVAV) ? new_comppad : NULL
 		);
-		OP_REFCNT_LOCK;
-		refcnt = OpREFCNT_dec((OP_4tree*)ri->data->data[n]);
-		OP_REFCNT_UNLOCK;
-		if (!refcnt)
-                    op_free((OP_4tree*)ri->data->data[n]);
+		rootop_refcnt_dec((ROOTOP*)ri->data->data[n]); 
 
 		PAD_RESTORE_LOCAL(old_comppad);
 		SvREFCNT_dec((SV*)new_comppad);

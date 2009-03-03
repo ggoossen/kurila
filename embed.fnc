@@ -592,6 +592,7 @@ Ap	|void	|rootop_ll_tmprefcnt
 Ap	|void	|op_free	|NULLOK OP* arg
 Api	|OP*	|RootopOp	|NULLOK ROOTOP* o
 Api	|void	|rootop_refcnt_dec	|NN ROOTOP* o
+Api	|void	|rootop_refcnt_inc	|NN ROOTOP* o
 Ap	|void	|op_tmprefcnt	|NULLOK OP* arg
 #ifdef PERL_MAD
 p	|OP*	|package	|NN OP* o
@@ -811,7 +812,7 @@ Apd	|void	|call_destructors
 Apd	|void	|sv_clear	|NN SV *const sv
 p	|void	|sv_clear_body	|NN SV *const sv
 Apd	|I32	|sv_cmp		|NULLOK SV *const sv1|NULLOK SV *const sv2
-Ap	|OP*	|sv_compile_2op	|NN SV *sv|NN OP **startop \
+Ap	|OP*	|sv_compile_2op	|NN SV *sv|NN ROOTOP **rootopp \
 				|NN const char *code|NN PAD **padp
 Apd	|int	|getcwd_sv	|NN SV* sv
 Apd	|void	|sv_dec		|NULLOK SV *const sv
@@ -1227,7 +1228,7 @@ sR	|OP*	|docatch	|NULLOK OP *o
 sR	|I32	|dopoptoeval	|I32 startingblock
 sR	|I32	|dopoptolabel	|NN const char *label
 sR	|I32	|dopoptoloop	|I32 startingblock
-s	|bool	|doeval		|int gimme|NULLOK OP** startop|NULLOK CV* outside|U32 seq
+s	|bool	|doeval		|int gimme|NULLOK ROOTOP** rootopp|NULLOK CV* outside|U32 seq
 sR	|PerlIO *|check_type_and_open|NN const char *name
 #ifndef PERL_DISABLE_PMC
 sR	|PerlIO *|doopen_pm	|NN const char *name|const STRLEN namelen

@@ -3097,12 +3097,12 @@ S_regmatch(pTHX_ regmatch_info *reginfo, regnode *prog)
 		/* execute the code in the {...} */
 		dSP;
 		SV ** const before = SP;
-		OP_4tree * const oop = PL_op;
+		OP * const oop = PL_op;
 		COP * const ocurcop = PL_curcop;
 		PAD *old_comppad;
 	    
 		n = ARG(scan);
-		PL_op = (OP_4tree*)rexi->data->data[n];
+		PL_op = ((OP*)rexi->data->data[n])->op_next;
 		DEBUG_STATE_r( PerlIO_printf(Perl_debug_log, 
 		    "  re_eval 0x%"UVxf"\n", PTR2UV(PL_op)) );
 		PAD_SAVE_LOCAL(old_comppad, (PAD*)rexi->data->data[n + 2]);

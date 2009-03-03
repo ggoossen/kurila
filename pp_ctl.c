@@ -1155,7 +1155,7 @@ S_docatch(pTHX_ OP *o)
 }
 
 OP *
-Perl_sv_compile_2op(pTHX_ SV *sv, OP** startop, const char *code, PAD** padp)
+Perl_sv_compile_2op(pTHX_ SV *sv, ROOTOP** rootopp, const char *code, PAD** padp)
 /* sv Text to convert to OP tree. */
 /* startop op_free() this to undo. */
 /* code Short string id of the caller. */
@@ -1216,14 +1216,18 @@ Perl_sv_compile_2op(pTHX_ SV *sv, OP** startop, const char *code, PAD** padp)
     PUSHEVAL(cx, 0);
 
     if (runtime)
-	(void) doeval(G_SCALAR, startop, runcv, PL_curcop->cop_seq);
+	(void) doeval(G_SCALAR, rootopp, runcv, PL_curcop->cop_seq);
     else
-	(void) doeval(G_SCALAR, startop, PL_compcv, PL_cop_seqmax);
+	(void) doeval(G_SCALAR, rootopp, PL_compcv, PL_cop_seqmax);
+    rootop_refcnt_inc(*rootopp);
     POPBLOCK(cx,PL_curpm);
     POPEVAL(cx);
 
-    (*startop)->op_type = OP_NULL;
-    (*startop)->op_ppaddr = PL_ppaddr[OP_NULL];
+    /* remove "leaveeval" op */
+    assert((*rootopp)->op_first->op_type == OP_LEAVEEVAL);
+    (*rootopp)->op_first->op_type = OP_NULL;
+    (*rootopp)->op_first->op_ppaddr = PL_ppaddr[OP_NULL];
+
     lex_end();
     /* XXX DAPM do this properly one year */
     *padp = (AV*)SvREFCNT_inc_simple(PL_comppad);
@@ -1236,7 +1240,7 @@ Perl_sv_compile_2op(pTHX_ SV *sv, OP** startop, const char *code, PAD** padp)
     PERL_UNUSED_VAR(newsp);
     PERL_UNUSED_VAR(optype);
 
-    return PL_eval_start;
+    return (*rootopp)->op_next;
 }
 
 
@@ -1286,7 +1290,7 @@ Perl_find_runcv(pTHX_ U32 *db_seqp)
  */
 
 STATIC bool
-S_doeval(pTHX_ int gimme, OP** startop, CV* outside, U32 seq)
+S_doeval(pTHX_ int gimme, ROOTOP** rootopp, CV* outside, U32 seq)
 {
     dVAR; dSP;
     OP * const saveop = PL_op;
@@ -1355,8 +1359,9 @@ S_doeval(pTHX_ int gimme, OP** startop, CV* outside, U32 seq)
 	PL_op = saveop;
 	ROOTOPcpNULL(PL_eval_root);
 	SP = PL_stack_base + POPMARK;		/* pop original mark */
-	if (!startop) {
+	if (!rootopp) {
 	    POPBLOCK(cx,PL_curpm);
+	    optype = CxOLD_OP_TYPE(cx);
 	    POPEVAL(cx);
 	}
 	lex_end();
@@ -1370,7 +1375,7 @@ S_doeval(pTHX_ int gimme, OP** startop, CV* outside, U32 seq)
 	    Perl_croak(aTHX_ "%sCompilation failed in require",
 		       *msg ? msg : "Unknown error\n");
 	}
-	else if (startop) {
+	else if (rootopp) {
 	    POPBLOCK(cx,PL_curpm);
 	    POPEVAL(cx);
 	    Perl_croak(aTHX_ "%sCompilation failed in regexp",
@@ -1397,8 +1402,8 @@ S_doeval(pTHX_ int gimme, OP** startop, CV* outside, U32 seq)
 	PUTBACK;
 	return FALSE;
     }
-    if (startop) {
-	*startop = PL_eval_root;
+    if (rootopp) {
+	*rootopp = PL_eval_root;
     }
 
     /* Set the context for this new optree.
@@ -1970,6 +1975,7 @@ PP(pp_leaveeval)
 	}
     }
 
+    PL_op = NULL;
     POPEVAL(cx);
     retop = cx->blk_eval.retop;
 

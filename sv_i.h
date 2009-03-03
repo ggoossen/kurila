@@ -180,7 +180,7 @@ static __inline__ SV* inline_loc_desc(pTHX_ SV *loc) {
         SV ** loc1 = av_fetch((AV*)loc, 1, FALSE);
         SV ** loc2 = av_fetch((AV*)loc, 2, FALSE);
         Perl_sv_catpvf(aTHX_ str, "%s line %"IVdf" character %"IVdf".",
-            (loc0 && SvPVOK(*loc0)) ? SvPVX_const(*av_fetch((AV*)loc, 0, FALSE)) : "",
+            (loc0 && SvPVOK(*loc0)) ? SvPVX_const(*loc0) : "",
             (loc1 && SvPVOK(*loc1)) ? SvIV(*loc1) : -1,
             (loc2 && SvPVOK(*loc2)) ? SvIV(*loc2) : -1
             );

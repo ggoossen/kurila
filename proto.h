@@ -2124,6 +2124,11 @@ PERL_INLINE_CALLCONV void	Perl_rootop_refcnt_dec(pTHX_ ROOTOP* o)
 #define PERL_ARGS_ASSERT_ROOTOP_REFCNT_DEC	\
 	assert(o)
 
+PERL_INLINE_CALLCONV void	Perl_rootop_refcnt_inc(pTHX_ ROOTOP* o)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_ROOTOP_REFCNT_INC	\
+	assert(o)
+
 PERL_CALLCONV void	Perl_op_tmprefcnt(pTHX_ OP* arg);
 #ifdef PERL_MAD
 PERL_CALLCONV OP*	Perl_package(pTHX_ OP* o)
@@ -2894,13 +2899,13 @@ PERL_CALLCONV void	Perl_sv_clear_body(pTHX_ SV *const sv)
 	assert(sv)
 
 PERL_CALLCONV I32	Perl_sv_cmp(pTHX_ SV *const sv1, SV *const sv2);
-PERL_CALLCONV OP*	Perl_sv_compile_2op(pTHX_ SV *sv, OP **startop, const char *code, PAD **padp)
+PERL_CALLCONV OP*	Perl_sv_compile_2op(pTHX_ SV *sv, ROOTOP **rootopp, const char *code, PAD **padp)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2)
 			__attribute__nonnull__(pTHX_3)
 			__attribute__nonnull__(pTHX_4);
 #define PERL_ARGS_ASSERT_SV_COMPILE_2OP	\
-	assert(sv); assert(startop); assert(code); assert(padp)
+	assert(sv); assert(rootopp); assert(code); assert(padp)
 
 PERL_CALLCONV int	Perl_getcwd_sv(pTHX_ SV* sv)
 			__attribute__nonnull__(pTHX_1);
@@ -4373,7 +4378,7 @@ STATIC I32	S_dopoptolabel(pTHX_ const char *label)
 STATIC I32	S_dopoptoloop(pTHX_ I32 startingblock)
 			__attribute__warn_unused_result__;
 
-STATIC bool	S_doeval(pTHX_ int gimme, OP** startop, CV* outside, U32 seq);
+STATIC bool	S_doeval(pTHX_ int gimme, ROOTOP** rootopp, CV* outside, U32 seq);
 STATIC PerlIO *	S_check_type_and_open(pTHX_ const char *name)
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(pTHX_1);
