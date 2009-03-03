@@ -824,7 +824,7 @@
 #define sv_2bool		Perl_sv_2bool
 #define sv_2cv			Perl_sv_2cv
 #define sv_2io			Perl_sv_2io
-#define sv_2iv_flags		Perl_sv_2iv_flags
+#define sv_2iv			Perl_sv_2iv
 #define av_2mortal(a)		SvAv(Perl_sv_2mortal(aTHX_ AvSv(a)))
 #define hv_2mortal(a)		SvHv(Perl_sv_2mortal(aTHX_ HvSv(a)))
 #define cv_2mortal(a)		SvCv(Perl_sv_2mortal(aTHX_ CvSv(a)))
@@ -1088,7 +1088,13 @@
 #ifdef PERL_CORE
 #define hsplit			S_hsplit
 #define hfreeentries		S_hfreeentries
+#endif
+#ifndef PURIFY
+#ifdef PERL_CORE
 #define new_he			S_new_he
+#endif
+#endif /* ! PURIFY */
+#ifdef PERL_CORE
 #define save_hek_flags		S_save_hek_flags
 #define unshare_hek_or_pvn	S_unshare_hek_or_pvn
 #define share_hek_flags		S_share_hek_flags
@@ -2986,7 +2992,7 @@
 #define sv_2bool(a)		Perl_sv_2bool(aTHX_ a)
 #define sv_2cv(a,b,c)		Perl_sv_2cv(aTHX_ a,b,c)
 #define sv_2io(a)		Perl_sv_2io(aTHX_ a)
-#define sv_2iv_flags(a,b)	Perl_sv_2iv_flags(aTHX_ a,b)
+#define sv_2iv(a)		Perl_sv_2iv(aTHX_ a)
 #define sv_2mortal(a)		SvAv(Perl_sv_2mortal(aTHX_ AvSv(a)))
 #define sv_2mortal(a)		SvHv(Perl_sv_2mortal(aTHX_ HvSv(a)))
 #define sv_2mortal(a)		SvCv(Perl_sv_2mortal(aTHX_ CvSv(a)))
@@ -3243,7 +3249,13 @@
 #ifdef PERL_CORE
 #define hsplit(a)		S_hsplit(aTHX_ a)
 #define hfreeentries(a)		S_hfreeentries(aTHX_ a)
+#endif
+#ifndef PURIFY
+#ifdef PERL_CORE
 #define new_he()		S_new_he(aTHX)
+#endif
+#endif /* ! PURIFY */
+#ifdef PERL_CORE
 #define save_hek_flags		S_save_hek_flags
 #define unshare_hek_or_pvn(a,b,c,d)	S_unshare_hek_or_pvn(aTHX_ a,b,c,d)
 #define share_hek_flags(a,b,c,d)	S_share_hek_flags(aTHX_ a,b,c,d)

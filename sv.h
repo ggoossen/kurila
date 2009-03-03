@@ -1178,7 +1178,6 @@ in gv.h: */
 #define sv_2pv_nolen(sv) sv_2pv(sv, 0)
 #define sv_2pv_nomg(sv, lp) sv_2pv_flags(sv, lp, 0)
 #define sv_pvn_force(sv, lp) sv_pvn_force_flags(sv, lp, SV_GMAGIC)
-#define sv_2iv(sv) sv_2iv_flags(sv, SV_GMAGIC)
 #define sv_2uv(sv) sv_2uv_flags(sv, SV_GMAGIC)
 /*
 =for apidoc Am|char*|SvPV_force|SV* sv|STRLEN len

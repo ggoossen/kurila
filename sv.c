@@ -1654,17 +1654,17 @@ Perl_looks_like_number(pTHX_ SV *const sv)
 #endif /* NV_PRESERVES_UV */
 
 /*
-=for apidoc sv_2iv_flags
+=for apidoc sv_2iv
 
 Return the integer value of an SV, doing any necessary string
-conversion.  If flags includes SV_GMAGIC, does an mg_get() first.
+conversion.
 Normally used via the C<SvIV(sv)> function.
 
 =cut
 */
 
 IV
-Perl_sv_2iv_flags(pTHX_ register SV *const sv, const I32 flags)
+Perl_sv_2iv(pTHX_ register SV *const sv)
 {
     dVAR;
     if (!sv)

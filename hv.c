@@ -36,6 +36,8 @@ holds the key and hash value.
 static const char S_strtab_error[]
     = "Cannot modify shared string table in hv_%s";
 
+#ifndef PURIFY
+
 STATIC void
 S_more_he(pTHX)
 {
@@ -53,6 +55,8 @@ S_more_he(pTHX)
     }
     HeNEXT(he) = 0;
 }
+
+#endif /* ! PURIFY */
 
 #ifdef PURIFY
 

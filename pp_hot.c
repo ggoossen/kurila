@@ -1063,12 +1063,6 @@ PP(pp_leave)
     POPBLOCK(cx,newpm);
 
     gimme = OP_GIMME(PL_op, -1);
-    if (gimme == -1) {
-	if (cxstack_ix >= 0)
-	    gimme = cxstack[cxstack_ix].blk_gimme;
-	else
-	    gimme = G_SCALAR;
-    }
 
     if (gimme == G_VOID)
 	SP = newsp;
