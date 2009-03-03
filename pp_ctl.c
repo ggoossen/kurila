@@ -357,9 +357,11 @@ Perl_dounwind(pTHX_ I32 cxix)
 	    POPSUBST(cx);
 	    continue;  /* not break */
 	case CXt_SUB:
+	    LEAVE;
 	    POPSUB(cx,sv);
 	    break;
 	case CXt_EVAL:
+	    LEAVE;
 	    POPEVAL(cx);
 	    break;
 	case CXt_LOOP_LAZYIV:
