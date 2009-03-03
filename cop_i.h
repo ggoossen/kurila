@@ -16,7 +16,8 @@ PERL_CONTEXT * Perl_PushBlock(U8 t, SV** sp, U8 gimme) {
     cx->blk_dynascope       = PL_dynamicscope;
 
     new_dynascope = newHV();
-    (void)hv_stores( new_dynascope, "parent", newRV(PL_dynamicscope) );
+    if (PL_dynamicscope)
+        (void)hv_stores( new_dynascope, "parent", newRV(PL_dynamicscope) );
     (void)hv_stores( new_dynascope, "onleave", AvSv(newAV()) );
     PL_dynamicscope = HvSv(new_dynascope);
 

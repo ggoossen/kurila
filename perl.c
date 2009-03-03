@@ -807,6 +807,9 @@ perl_destruct(pTHXx)
     sys_intern_clear();
 #endif
 
+    if (PL_destroyav)
+	call_destructors();
+
     /* Destruct the global string table. */
     {
 	/* Yell and reset the HeVAL() slots that are still holding refcounts,
@@ -865,9 +868,6 @@ perl_destruct(pTHXx)
             SvFLAGS(PERL_DEBUG_PAD(i)) = 0;
         }
     }
-
-    if (PL_destroyav)
-	call_destructors();
 
     nuke_stacks();
 
