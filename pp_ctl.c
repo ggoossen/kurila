@@ -572,7 +572,14 @@ PP(pp_caller)
 	    AV * const padlist = CvPADLIST(cv);
 	    SV ** pad = av_fetch(padlist, cx->blk_sub.olddepth + 1, 0);
 	    SV ** args = av_fetch( SvAv(*pad), PAD_ARGS_INDEX, 0);
-	    mPUSHs(newSVsv( *args ) );
+	    if (CvFLAGS(cv) & CVf_BLOCK) {
+		AV* av = newAV();
+		av_push(av, newSVsv(*args));
+		mPUSHs(av);
+	    }
+	    else {
+		mPUSHs(newSVsv( *args ) );
+	    }
 	}
 	else
 	    PUSHs(&PL_sv_undef);
