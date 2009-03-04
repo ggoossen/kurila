@@ -1402,6 +1402,7 @@ PP(pp_entersub)
 	SAVECOMPPAD();
 	PAD_SET_CUR_NOSAVE(padlist, CvDEPTH(cv));
 	if (CvFLAGS(cv) & CVf_BLOCK) {
+	    SAVECLEARSV(PAD_SVl(PAD_ARGS_INDEX));
 	    CX_CURPAD_SAVE(cx->blk_sub);
 	    ++MARK;
 
@@ -1410,12 +1411,11 @@ PP(pp_entersub)
 		    items);
 
 	    if (items == 1) {
-		SVcpREPLACE( PAD_SVl(PAD_ARGS_INDEX), *MARK);
+		SVcpREPLACE( PAD_SVl(PAD_ARGS_INDEX), *MARK );
 		MARK++;
 	    }
 	    else
-		SVcpREPLACE( PAD_SVl(PAD_ARGS_INDEX),
-		    sv_2mortal(newSV(0)));
+		SVcpSTEAL( PAD_SVl(PAD_ARGS_INDEX), newSV(0) );
 	}
 	else if (hasargs) {
 	    AV* av;
