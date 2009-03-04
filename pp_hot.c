@@ -1213,6 +1213,7 @@ PP(pp_grepwhile)
     /* All done yet? */
     if ( av_len(src) == -1 ) {
 
+	FREETMPS;
 	LEAVE;					/* exit outer scope */
 	(void)POPMARK;				/* pop dst */
 	SP = PL_stack_base + POPMARK;		/* pop original mark */

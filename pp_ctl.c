@@ -56,13 +56,12 @@ PP(pp_grepstart)
 
     PL_stack_sp = PL_stack_base + *PL_markstack_ptr + 1;
 
-    src = sv_mortalcopy(POPs);
-    dst = sv_2mortal(AvSv(newAV()));
+    src = POPs;
     cv = POPs;
 
     if ( ! SvOK(src) ) {
 	(void)POPMARK;
-	XPUSHs(dst);
+	mXPUSHs(newAV());
 	RETURNOP(PL_op->op_next->op_next->op_next);
     }
     if ( ! SvAVOK(src) )
@@ -70,18 +69,21 @@ PP(pp_grepstart)
     
     if ( av_len(SvAv(src)) == -1 ) {
 	(void)POPMARK;
-	XPUSHs(dst);
+	mXPUSHs(newAV());
 	RETURNOP(PL_op->op_next->op_next->op_next);
     }
+
+    dst = sv_2mortal(AvSv(newAV()));
+
+    ENTER;					/* enter outer scope */
+    SAVETMPS;
+
+    src = sv_mortalcopy(src);
 
     PUSHMARK(SP);				/* push dst */
     XPUSHs(dst);                          /* push dst */
     XPUSHs(src);                          /* push dst */
     XPUSHs(cv);
-
-    ENTER;					/* enter outer scope */
-
-    SAVETMPS;
 
     srcitem = av_shift(SvAv(src));
 
@@ -114,6 +116,7 @@ PP(pp_mapwhile)
     /* All done yet? */
     if ( av_len(src) == -1 ) {
 
+	FREETMPS;
 	LEAVE;					/* exit outer scope */
 	(void)POPMARK;				/* pop dst */
 	SP = PL_stack_base + POPMARK;		/* pop original mark */
