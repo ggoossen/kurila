@@ -4319,14 +4319,15 @@ Perl_call_destructors() {
     while (PL_destroyav) {
 	dSP;
 
+	ENTER;
+	SAVETMPS;
+
 	SV* sv = sv_2mortal(av_shift(PL_destroyav));
 	SV* destructor = sv_2mortal(av_shift(PL_destroyav));
 
 	if (av_len(PL_destroyav) == -1) 
 	    AVcpNULL(PL_destroyav);
 
-	ENTER;
-	SAVETMPS;
 	PUSHSTACKi(PERLSI_DESTROY);
 	EXTEND(SP, 2);
 	PUSHMARK(SP);
@@ -4336,8 +4337,6 @@ Perl_call_destructors() {
 		
 	POPSTACK;
 	SPAGAIN;
-	FREETMPS;
-	LEAVE;
 
 	if (SvOBJECT(sv)) {
 	    HvREFCNT_dec(SvSTASH(sv));	/* possibly of changed persuasion */
@@ -4345,6 +4344,9 @@ Perl_call_destructors() {
 	    if (SvTYPE(sv) != SVt_PVIO)
 		--PL_sv_objcount;	/* XXX Might want something more general */
 	}
+
+	FREETMPS;
+	LEAVE;
     }
 }
 
