@@ -4316,17 +4316,17 @@ Perl_sv_clear_body(pTHX_ SV *const sv)
 
 void
 Perl_call_destructors() {
-    while (PL_destroyav) {
+    SV* destroyav = sv_2mortal(PL_destroyav);
+    PL_destroyav = NULL;
+
+    while (av_len(destroyav) != -1) {
 	dSP;
 
 	ENTER;
 	SAVETMPS;
 
-	SV* sv = sv_2mortal(av_shift(PL_destroyav));
-	SV* destructor = sv_2mortal(av_shift(PL_destroyav));
-
-	if (av_len(PL_destroyav) == -1) 
-	    AVcpNULL(PL_destroyav);
+	SV* sv = sv_2mortal(av_shift(destroyav));
+	SV* destructor = sv_2mortal(av_shift(destroyav));
 
 	PUSHSTACKi(PERLSI_DESTROY);
 	EXTEND(SP, 2);
