@@ -353,12 +353,13 @@ Perl_dounwind(pTHX_ I32 cxix)
         register PERL_CONTEXT *cx;
 	DEBUG_l(PerlIO_printf(Perl_debug_log, "Unwinding block %ld\n",
 		(long) cxstack_ix));
+	if (CxTYPE(&cxstack[cxstack_ix]) == CXt_SUBST) {
+	    POPSUBST(cx);
+	    continue;
+	}
 	cx = PopBlock();
 	/* Note: we don't need to restore the base context info till the end. */
 	switch (CxTYPE(cx)) {
-	case CXt_SUBST:
-	    POPSUBST(cx);
-	    continue;  /* not break */
 	case CXt_SUB:
 	    LEAVE;
 	    POPSUB(cx,sv);
