@@ -22,56 +22,60 @@ my $result = runperl( prog	=> 'print \*STDOUT, "foo"',
 
 my $refdump = <<'EO_DX_OUT';
 {
-1   TYPE = leave  ===> DONE
+1   TYPE = root  ===> DONE
     TARG = 1
     LOCATION = -e 1 1 
-    FLAGS = (VOID,KIDS,PARENS)
-    PRIVATE = (REFCOUNTED)
+    FLAGS = (UNKNOWN,KIDS)
     REFCNT = 1
     {
-2       TYPE = enter  ===> 3
+2       TYPE = leave  ===> DONE
         LOCATION = -e 1 1 
-    }
-    {
-3       TYPE = nextstate  ===> 4
-        LOCATION = -e 1 1 
-        FLAGS = (VOID)
-        PACKAGE = "main"
-    }
-    {
-10      TYPE = print  ===> 1
-        LOCATION = -e 1 1 
-        FLAGS = (VOID,KIDS)
+        FLAGS = (VOID,KIDS,PARENS)
         {
-4           TYPE = pushmark  ===> 5
-            LOCATION = -e 1 6 
-            FLAGS = (SCALAR)
+3           TYPE = enter  ===> 4
+            LOCATION = -e 1 1 
         }
         {
-8           TYPE = rv2gv  ===> 9
-            LOCATION = -e 1 6 
-            FLAGS = (SCALAR,KIDS,SPECIAL)
+4           TYPE = nextstate  ===> 5
+            LOCATION = -e 1 1 
+            FLAGS = (VOID)
+            PACKAGE = "main"
+        }
+        {
+11          TYPE = print  ===> 2
+            LOCATION = -e 1 1 
+            FLAGS = (VOID,KIDS)
             {
-7               TYPE = srefgen  ===> 8
+5               TYPE = pushmark  ===> 6
                 LOCATION = -e 1 6 
-                FLAGS = (SCALAR,KIDS)
+                FLAGS = (SCALAR)
+            }
+            {
+9               TYPE = rv2gv  ===> 10
+                LOCATION = -e 1 6 
+                FLAGS = (SCALAR,KIDS,SPECIAL)
                 {
-6                   TYPE = rv2gv  ===> 7
-                    LOCATION = -e 1 8 
-                    FLAGS = (SCALAR,KIDS,REF,MOD)
+8                   TYPE = srefgen  ===> 9
+                    LOCATION = -e 1 6 
+                    FLAGS = (SCALAR,KIDS)
                     {
-5                       TYPE = gv  ===> 6
+7                       TYPE = rv2gv  ===> 8
                         LOCATION = -e 1 8 
-                        FLAGS = (SCALAR)
+                        FLAGS = (SCALAR,KIDS,REF,MOD)
+                        {
+6                           TYPE = gv  ===> 7
+                            LOCATION = -e 1 8 
+                            FLAGS = (SCALAR)
+                        }
                     }
                 }
             }
-        }
-        {
-9           TYPE = const  ===> 10
-            LOCATION = -e 1 22 
-            FLAGS = (SCALAR)
-            SV = PV("foo"\0) [UTF8 "foo"]
+            {
+10              TYPE = const  ===> 11
+                LOCATION = -e 1 22 
+                FLAGS = (SCALAR)
+                SV = PV("foo"\0) [UTF8 "foo"]
+            }
         }
     }
 }

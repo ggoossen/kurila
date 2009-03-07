@@ -4,7 +4,7 @@ BEGIN {
     require './test.pl';
 }
 use warnings;
-plan( tests => 56 );
+plan( tests => 52 );
 
 our (@a, @b);
 
@@ -20,7 +20,7 @@ do {
 };
 
 sub Backwards { ($a cmp $b) +< 0 ?? 1 !! ($a cmp $b) +> 0 ?? -1 !! 0 }
-sub Backwards_stacked($$) { my@($x,$y) =  @_; ($x cmp $y) +< 0 ?? 1 !! ($x cmp $y) +> 0 ?? -1 !! 0 }
+sub Backwards_stacked($$) { my @($x,$y) =  @_; ($x cmp $y) +< 0 ?? 1 !! ($x cmp $y) +> 0 ?? -1 !! 0 }
 sub Backwards_other { ($a cmp $b) +< 0 ?? 1 !! ($a cmp $b) +> 0 ?? -1 !! 0 }
 
 my $upperfirst = ('A' cmp 'a') +< 0;
@@ -107,7 +107,7 @@ cmp_ok("$(join ' ',@b)",'eq','1 2 3 4','reverse then sort');
 
 
 sub twoface { no warnings 'redefine'; *twoface = sub { $a <+> $b }; &twoface( < @_ ) }
-try { @b = sort twoface @(4,1,3,2) };
+try { @b = sort \&twoface, @(4,1,3,2) }; die if $^EVAL_ERROR;
 cmp_ok("$(join ' ',@b)",'eq','1 2 3 4','redefine sort sub inside the sort sub');
 
 do {
@@ -119,16 +119,6 @@ do {
   cmp_ok("$(join ' ',@b)",'eq','4 3 2 1','sortname 4');
 };
 
-do {
-    local our $TODO = 'decide how sort gets its arguments';
-    my $sortsub = \&Backwards_stacked;
-    my $sortglobr = \*Backwards_stacked;
-    @b = sort $sortsub, @(4,1,3,2);
-    cmp_ok("$(join ' ',@b)",'eq','4 3 2 1','sortname 5');
-    @b = sort $sortglobr, @(4,1,3,2);
-    cmp_ok("$(join ' ',@b)",'eq','4 3 2 1','sortname 8');
-};
-
 our ($sortsub, $sortglob, $sortglobr);
 do {
   local $sortsub = \&Backwards;
@@ -137,16 +127,6 @@ do {
   cmp_ok("$(join ' ',@b)",'eq','4 3 2 1','sortname local 1');
   @b = sort $sortglobr, @(4,1,3,2);
   cmp_ok("$(join ' ',@b)",'eq','4 3 2 1','sortname local 4');
-};
-
-do {
-    local our $TODO = 'decide how sort gets its arguments';
-    local $sortsub = \&Backwards_stacked;
-    local $sortglobr = \*Backwards_stacked;
-    @b = sort $sortsub, @(4,1,3,2);
-    cmp_ok("$(join ' ',@b)",'eq','4 3 2 1','sortname local 5');
-    @b = sort $sortglobr, @(4,1,3,2);
-    cmp_ok("$(join ' ',@b)",'eq','4 3 2 1','sortname local 8');
 };
 
 ## exercise sort builtins... ($a <=> $b already tested)
