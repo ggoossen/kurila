@@ -4,7 +4,7 @@ use Config;
 
 use List::Util < qw(reduce min);
 use Test::More;
-plan tests => ($::PERL_ONLY ?? 18 !! 20);
+plan tests => 19;
 
 my $v = reduce {};
 
@@ -69,11 +69,6 @@ do { package Foo;
   $a = $b;
   main::is((List::Util::reduce {$a*$b}, ( <1..4)), 24, 'other package');
 };
-
-# Can we undefine a reduce sub while it's running?
-sub self_immolate {undef &self_immolate; 1}
-try { $v = reduce \&self_immolate, 1,2; };
-like($^EVAL_ERROR->{?description}, qr/^Can't undef active subroutine/, "undef active sub");
 
 # Redefining an active sub should not fail, but whether the
 # redefinition takes effect immediately depends on whether we're

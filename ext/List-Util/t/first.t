@@ -2,7 +2,7 @@
 
 use List::Util < qw(first);
 use Test::More;
-plan tests => 13;
+plan tests => 12;
 my $v;
 
 ok(defined &first,	'defined');
@@ -40,11 +40,6 @@ is($v, 12, 'return from loop');
 do { package Foo;
   main::is(List::Util::first({$_+>4},( <1..4,24)), 24, 'other package');
 };
-
-# Can we undefine a first sub while it's running?
-sub self_immolate {undef &self_immolate; 1}
-try { $v = first \&self_immolate, 1,2; };
-like($^EVAL_ERROR->{?description}, qr/^Can't undef active subroutine/, "undef active sub");
 
 # Redefining an active sub should not fail, but whether the
 # redefinition takes effect immediately depends on whether we're
