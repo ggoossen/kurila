@@ -2117,7 +2117,7 @@ sub pp_flop {
     my@($op, $cx) =  @_;
     my $flip = $op->first;
     my $type = ($flip->flags ^&^ OPf_SPECIAL) ?? "..." !! "..";
-    return $self->range( <$flip->first, $cx, $type);
+    return $self->range($flip->first, $cx, $type);
 }
 
 # one-line while/until is handled in pp_leave
@@ -2636,6 +2636,10 @@ sub loop_common {
 	}
 	$cont = "\cK";
 	$body = $self->deparse($body, 0);
+    }
+    if ( ! $head ) {
+        $head = "do ";
+        $cont = ";";
     }
     $body =~ s/;?$/;\n/;
 

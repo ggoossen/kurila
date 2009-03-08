@@ -367,7 +367,9 @@ my $lastnext;	# remembers op-chain, used to insert gotos
 
 my %opclass = %('OP' => "0", 'UNOP' => "1", 'BINOP' => "2", 'LOGOP' => "|",
 	       'LISTOP' => "@", 'PMOP' => "/", 'SVOP' => "\$", 'GVOP' => "*",
-	       'PVOP' => '"', 'LOOP' => "\{", 'COP' => ";", 'PADOP' => "#");
+	       'PVOP' => '"', 'LOOP' => "\{", 'COP' => ";", 'PADOP' => "#",
+                'ROOTOP' => '!',
+            );
 
 no warnings 'qw'; # "Possible attempt to put comments..."; use #7
 my @linenoise =
@@ -739,6 +741,9 @@ sub concise_op {
 	# targ holds the old type
 	%h{+exname} = "ex-" . substr(ppname(%h{?targ}), 3);
 	%h{+extarg} = "";
+    } elsif ($op->name =~ m/^root$/) {
+        my $refs = "ref" . (%h{?targ} != 1 ?? "s" !! "");
+        %h{+targarglife} = %h{+targarg} = "%h{?targ} $refs";
     } elsif ($op->name =~ m/^leave(sub(lv)?|write)?$/) {
 	# targ potentially holds a reference count
 	if ($op->private ^&^ 64) {
@@ -983,7 +988,7 @@ sub tree {
 # Remember, this needs to stay the last things in the module.
 
 # Why is this different for MacOS?  Does it matter?
-my $cop_seq_mnum = $^OS_NAME eq 'MacOS' ?? 14 !! 13;
+my $cop_seq_mnum = $^OS_NAME eq 'MacOS' ?? 12 !! 11;
 $cop_seq_base = svref_2object(eval 'sub{0;}')->START->cop_seq + $cop_seq_mnum;
 
 1;

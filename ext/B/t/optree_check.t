@@ -24,7 +24,7 @@ cmdline args in 'standard' way across all clients of OptreeCheck.
 
 our %gOpts;
 
-my $tests = 14 + 16 * %gOpts{?selftest};	# pass()s + $#tests
+my $tests = 12 + 16 * %gOpts{?selftest};	# pass()s + $#tests
 plan tests => $tests;
 
 SKIP: do {
@@ -120,21 +120,8 @@ checkOptree ( name	=> 'fixup nextstate (in reftext)',
 	      expect_nt => <<'EONT_EONT');
 # 1  <;> nextstate(main 54 optree_concise.t:84) v
 # 2  <0> padsv[$a:54,55] sM/LVINTRO
-# 3  <1> leavesub[1 ref] K/REFC,1
+# 3  <1> leavesub K/1
 EONT_EONT
-
-checkOptree ( name	=> 'fixup opcode args',
-	      bcopts	=> '-exec',
-	      #fail	=> 1, # uncomment to see real padsv args: [$a:491,492] 
-	      code	=> sub {my $a},
-	      expect_nt => <<'EONT_EONT');
-# 1  <;> nextstate(main 56 optree_concise.t:96) v
-# 2  <0> padsv[$a:56,57] sM/LVINTRO
-# 3  <1> leavesub[1 ref] K/REFC,1
-EONT_EONT
-
-#################################
-pass("CANONICAL B::Concise EXAMPLE");
 
 };
 

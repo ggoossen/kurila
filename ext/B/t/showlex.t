@@ -43,8 +43,8 @@ for my $newlex (@('', '-newlex')) {
 		     prog => 'my ($a,$b)', stderr => 1 );
     $na = padrep('$a',$newlex);
     $nb = padrep('$b',$newlex);
-    like ($out, qr/5: $na/ms, 'found $a in "my ($a,$b)"');
-    like ($out, qr/6: $nb/ms, 'found $b in "my ($a,$b)"');
+    like ($out, qr/4: $na/ms, 'found $a in "my ($a,$b)"');
+    like ($out, qr/5: $nb/ms, 'found $b in "my ($a,$b)"');
 
     print \*STDOUT, $out if $verbose;
 
