@@ -36,18 +36,12 @@ pass("OPTIONS IN CMDLINE MODE");
 checkOptree ( name => 'cmdline invoke -basic works',
 	      prog => 'my $f',
 	      #bcopts	=> '-basic', # default
-	      expect	=> <<'EOT', expect_nt => <<'EONT_EONT');
-# -  <> root[1 ref] K ->(end)
+	      expect_nt => <<'EOT');
+# -  <!> root[1 ref] K ->(end)
 # 4     <@> leave vKP ->(end)
 # 1        <0> enter ->2
 # 2        <;> nextstate(main -1 -e:1) v:{ ->3
 # 3        <0> padsv[$f:-1,0] vM/LVINTRO ->4
 EOT
-# -  <> root[1 ref] K ->(end)
-# 4     <@> leave vKP ->(end)
-# 1        <0> enter ->2
-# 2        <;> nextstate(main -1 -e:1) v:{ ->3
-# 3        <0> padsv[$f:-1,0] vM/LVINTRO ->4
-EONT_EONT
 
 }
