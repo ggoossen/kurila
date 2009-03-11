@@ -1,0 +1,89 @@
+=head1 NAME
+
+kurila118delta - what is new for Perl Kurila 1.18
+
+=head1 DESCRIPTION
+
+This document describes differences between Perl Kurila 1.17 and Perl Kurila 1.18
+
+=head1 Highlights In Perl Kurila 1.18
+
+On the path of making the syntax more consitent.
+
+=head1 Core Enhancements
+
+=head2 New operators C<+@+>, C<+%+>, C<@+:> and C<%+:>
+
+The operators C<+@+> and C<+%+> are binary operators which join two
+arrays respectively two hashes.  C<@+:> and C<%+:> are list
+operators to join an array of arrays respectively join an array of
+hashes.
+
+=head3 Rationale
+
+Expressive combining of array and hashes.
+
+=head2 C<{ ... }> generated a coderef
+
+C<{ ... }> generates a coderef. The sub has one optional argument
+which is assigned to C<$_>.
+
+=head3 Rationale
+
+Easy generation of coderefs.
+
+=head2 Removed C<goto>
+
+C<goto> is removed.
+
+=head3 Rationale
+
+C<goto> is bad.
+
+=head2 Comma after first argument
+
+Special handling of the first arugment in case of a filehandle or
+coderef has been removed. A comma is obligatory after the first
+argument.  As a consequence print must have a filehandle as the first
+argument.
+
+=head3 Rationale
+
+Consistent syntax function calls.
+
+=head2 No default filehandle
+
+The default filehandle is removed, function like print, eof must have
+a filehandle.
+
+=head3 Rationale
+
+Less global variables.
+
+=head1 KNOWN BUGS
+
+=head2 Documentation
+
+Documentation has not been updated for many of the changes for kurila.
+
+=head2 Self referential assignment problems
+
+Assigning some value to a part of itself behaves unexpected.
+
+=head2 Limited platform support
+
+Perl Kurila has only been tested/build for x86_64-linux-gnu-thread-multi platform.
+
+=head1 SEE ALSO
+
+The F<INSTALL> file for how to build Perl Kurila.
+
+The F<README> file for general stuff.
+
+The F<Artistic> and F<Copying> files for copyright information.
+
+=head1 HISTORY
+
+Written by Gerard Goossen <F<gerard@tty.nl>>.
+
+=cut
