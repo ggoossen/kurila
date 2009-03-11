@@ -91,18 +91,19 @@ things, Changing old design decisions, Readable, modifiable perl source
 
 =item SEE ALSO
 
-L<kurila117delta> What is new for Perl Kurila 1.17, L<kurila116delta> What
-is new for Perl Kurila 1.16, L<kurila115delta> What is new for Perl Kurila
-1.15, L<kurila114delta> What is new for Perl Kurila 1.14, L<kurila113delta>
-What is new for Perl Kurila 1.13, L<kurila112delta> What is new for Perl
-Kurila 1.12, L<kurila111delta> What is new for Perl Kurila 1.11,
-L<kurila110delta> What is new for Perl Kurila 1.10, L<kurila19delta> What
-is new for Perl Kurila 1.9, L<kurila18delta> What is new for Perl Kurila
-1.8, L<kurila17delta> What is new for Perl Kurila 1.7, L<kurila16delta>
-What is new for Perl Kurila 1.6, L<kurila15delta> What is new for Perl
-Kurila 1.5, L<kurila14delta> What is new for Perl Kurila 1.4,
-L<kurila13delta> What is new for Perl Kurila 1.3, L<kurila02delta> What is
-new for Perl Kurila 0.2, L<kurila01delta> What is new for Perl Kurila 0.1
+L<kurila118delta> What is new for Perl Kurila 1.18, L<kurila117delta> What
+is new for Perl Kurila 1.17, L<kurila116delta> What is new for Perl Kurila
+1.16, L<kurila115delta> What is new for Perl Kurila 1.15, L<kurila114delta>
+What is new for Perl Kurila 1.14, L<kurila113delta> What is new for Perl
+Kurila 1.13, L<kurila112delta> What is new for Perl Kurila 1.12,
+L<kurila111delta> What is new for Perl Kurila 1.11, L<kurila110delta> What
+is new for Perl Kurila 1.10, L<kurila19delta> What is new for Perl Kurila
+1.9, L<kurila18delta> What is new for Perl Kurila 1.8, L<kurila17delta>
+What is new for Perl Kurila 1.7, L<kurila16delta> What is new for Perl
+Kurila 1.6, L<kurila15delta> What is new for Perl Kurila 1.5,
+L<kurila14delta> What is new for Perl Kurila 1.4, L<kurila13delta> What is
+new for Perl Kurila 1.3, L<kurila02delta> What is new for Perl Kurila 0.2,
+L<kurila01delta> What is new for Perl Kurila 0.1
 
 =item AUTHOR
 
@@ -2653,9 +2654,9 @@ B<-0>[I<octal/hexadecimal>] X<-0> X<$/>, B<-a> X<-a> X<autosplit>, B<-C
 B<-d:>I<foo[=bar,baz]> X<-d> X<-dt>, B<-dt:>I<foo[=bar,baz]>,
 B<-D>I<letters> X<-D> X<DEBUGGING> X<-DDEBUGGING>, B<-D>I<number>, B<-e>
 I<commandline> X<-e>, B<-E> I<commandline> X<-E>, B<-f> X<-f>, B<-h> X<-h>,
-B<-i>[I<extension>] X<-i> X<in-place>, B<-I>I<directory> X<-I> X<@INC>,
-B<-l>[I<octnum>] X<-l> X<$/> X<$\>, B<-m>[B<->]I<module> X<-m> X<-M>,
-B<-M>[B<->]I<module>, B<-M>[B<->]I<'module ...'>,
+B<-i>[I<extension>] X<-i> X<in-place>, B<-I>I<directory> X<-I>
+X<$^INCLUDE_PATH>, B<-l>[I<octnum>] X<-l> X<$/> X<$\>, B<-m>[B<->]I<module>
+X<-m> X<-M>, B<-M>[B<->]I<module>, B<-M>[B<->]I<'module ...'>,
 B<-[mM]>[B<->]I<module=arg[,arg]...>, B<-n> X<-n>, B<-p> X<-p>, B<-S>
 X<-S>, B<-t> X<-t>, B<-T> X<-T>, B<-u> X<-u>, B<-U> X<-U>, B<-v> X<-v>,
 B<-V> X<-V>, B<-V:>I<configvar>, B<-w> X<-w>, B<-W> X<-W>, B<-X> X<-X>,
@@ -2862,16 +2863,16 @@ X<$EFFECTIVE_USER_ID>, $REAL_GROUP_ID, $^GID, $EFFECTIVE_GROUP_ID, $^EGID,
 $PROGRAM_NAME, $0 X<$0> X<$PROGRAM_NAME>, $COMPILING, $^C X<$^C>
 X<$COMPILING>, $DEBUGGING, $^D X<$^D> X<$DEBUGGING>, $^RE_DEBUG_FLAGS,
 $^RE_TRIE_MAXBUF, $SYSTEM_FD_MAX, $^F X<$^F> X<$SYSTEM_FD_MAX>, $^H, %^H,
-$INPLACE_EDIT, $^I X<$^I> X<$INPLACE_EDIT>, $^M X<$^M>, $OSNAME, $^O X<$^O>
-X<$OSNAME>, $^OPEN, $PERLDB, $^P X<$^P> X<$PERLDB>, 0x01, 0x02, 0x04, 0x08,
-0x10, 0x20, 0x40, 0x80, 0x100, 0x200, 0x400, $EXCEPTIONS_BEING_CAUGHT, $^S
-X<$^S> X<$EXCEPTIONS_BEING_CAUGHT>, $BASETIME, $^T X<$^T> X<$BASETIME>,
-$^UNICODE, $^UTF8CACHE, $^UTF8LOCALE, $PERL_VERSION, $^V X<$^V>
-X<$PERL_VERSION>, $^WARN_HOOK X<$^WARN_HOOK>, $^DIE_HOOK, $WARNING, $^W
-X<$^W> X<$WARNING>, $^WARNING_BITS, $^WIN32_SLOPPY_STAT, $EXECUTABLE_NAME,
-$^X X<$^X> X<$EXECUTABLE_NAME>, ARGV X<ARGV>, $ARGV X<$ARGV>, @ARGV
-X<@ARGV>, ARGVOUT X<ARGVOUT>, @F X<@F>, @INC X<@INC>, @ARG, @_ X<@_>
-X<@ARG>, %INC X<%INC>, %ENV, %ENV{expr} X<%ENV>, %SIG, %SIG{expr} X<%SIG>
+$^M X<$^M>, $OSNAME, $^O X<$^O> X<$OSNAME>, $^OPEN, $PERLDB, $^P X<$^P>
+X<$PERLDB>, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x100, 0x200,
+0x400, $EXCEPTIONS_BEING_CAUGHT, $^S X<$^S> X<$EXCEPTIONS_BEING_CAUGHT>,
+$BASETIME, $^T X<$^T> X<$BASETIME>, $^UNICODE, $^UTF8CACHE, $^UTF8LOCALE,
+$PERL_VERSION, $^V X<$^V> X<$PERL_VERSION>, $^WARN_HOOK X<$^WARN_HOOK>,
+$^DIE_HOOK, $WARNING, $^W X<$^W> X<$WARNING>, $^WARNING_BITS,
+$^WIN32_SLOPPY_STAT, $EXECUTABLE_NAME, $^X X<$^X> X<$EXECUTABLE_NAME>, ARGV
+X<ARGV>, $ARGV X<$ARGV>, @ARGV X<@ARGV>, ARGVOUT X<ARGVOUT>, @F X<@F>,
+$^INCLUDE_PATH X<$^INCLUDE_PATH>, @ARG, @_ X<@_> X<@ARG>, $^INCLUDED
+X<$^INCLUDED>, %ENV, %ENV{expr} X<%ENV>, %SIG, %SIG{expr} X<%SIG>
 
 =item Error Indicators
 X<error> X<exception>
@@ -4088,8 +4089,6 @@ chcp, dataset access, OS/390, z/OS iconv, locales
 
 =item Switches On the "#!" Line
 
-=item Taint mode and @INC
-
 =item Cleaning Up Your Path
 
 =item Security Bugs
@@ -4210,9 +4209,9 @@ Pod::Simple::PullParserToken, Pod::Simple::RTF, Pod::Simple::Search,
 Pod::Simple::SimpleTree, Pod::Simple::Subclassing, Pod::Simple::Text,
 Pod::Simple::TextContent, Pod::Simple::XMLOutStream, Pod::Text,
 Pod::Text::Color, Pod::Text::Overstrike, Pod::Text::Termcap, Pod::Usage,
-Safe, Scalar::Util, Search::Dict, SelectSaver, Socket, Storable, Symbol,
-Sys::Hostname, Sys::Syslog, Sys::Syslog::win32::Win32, Term::ANSIColor,
-Term::Cap, Term::ReadLine, Test, Test::Builder, Test::Builder::Module,
+Safe, Scalar::Util, Search::Dict, Socket, Storable, Symbol, Sys::Hostname,
+Sys::Syslog, Sys::Syslog::win32::Win32, Term::ANSIColor, Term::Cap,
+Term::ReadLine, Test, Test::Builder, Test::Builder::Module,
 Test::Builder::Tester, Test::Builder::Tester::Color, Test::More,
 Test::Simple, Test::Tutorial, Text::Abbrev, Text::ParseWords, Text::Tabs,
 Text::Wrap, Tie::Hash, Time::HiRes, Time::Local, Time::gmtime,
@@ -5297,8 +5296,6 @@ call_sv, call_pv, call_method, call_argv
 =item G_ARRAY
 
 =item G_DISCARD
-
-=item G_NOARGS
 
 =item G_EVAL
 
@@ -6429,6 +6426,48 @@ B<-V>
 
 =back
 
+=head2 kurila118delta - what is new for Perl Kurila 1.18
+
+=over 4
+
+=item DESCRIPTION
+
+=item Highlights In Perl Kurila 1.18
+
+=item Core Enhancements
+
+=over 4
+
+=item New operators C<+@+>, C<+%+>, C<@+:> and C<%+:>
+
+=item C<{ ... }> generated a coderef
+
+=item Removed C<goto>
+
+=item Comma after first argument
+
+=item No default filehandle
+
+=back
+
+=item KNOWN BUGS
+
+=over 4
+
+=item Documentation
+
+=item Self referential assignment problems
+
+=item Limited platform support
+
+=back
+
+=item SEE ALSO
+
+=item HISTORY
+
+=back
+
 =head2 kurila117delta - what is new for Perl Kurila 1.17
 
 =over 4
@@ -6443,7 +6482,7 @@ B<-V>
 
 =item Renaming special variables
 
-=item Removed 'get' magic
+=item Special variables are evaluated where declared.
 
 =item Removed 'tie'
 
@@ -10900,7 +10939,7 @@ This probably does nothing, This works only on 5.10+
 
 =back
 
-=head2 lib - manipulate @INC at compile time
+=head2 lib - manipulate $^INCLUDE_PATH at compile time
 
 =over 4
 
@@ -10910,11 +10949,11 @@ This probably does nothing, This works only on 5.10+
 
 =over 4
 
-=item Adding directories to @INC
+=item Adding directories to $^INCLUDE_PATH
 
-=item Deleting directories from @INC
+=item Deleting directories from $^INCLUDE_PATH
 
-=item Restoring original @INC
+=item Restoring original $^INCLUDE_PATH
 
 =back
 
@@ -14227,7 +14266,7 @@ errors()
 
 =back
 
-=head2 ExtUtils::testlib - add blib/* directories to @INC
+=head2 ExtUtils::testlib - add blib/* directories to $^INCLUDE_PATH
 
 =over 4
 
@@ -19755,10 +19794,10 @@ name space
 
 =item EXPECTED METHODS
 
-$class->PUSHED([$mode[,$fh]]), $obj->POPPED([$fh]),
-$obj->UTF8($bellowFlag,[$fh]), $obj->OPEN($path,$mode[,$fh]),
-$obj->BINMODE([,$fh]), $obj->FDOPEN($fd[,$fh]),
-$obj->SYSOPEN($path,$imode,$perm,[,$fh]), $obj->FILENO($fh),
+$class->PUSHED([$mode,[$fh]]), $obj->POPPED([$fh]),
+$obj->UTF8($bellowFlag,[$fh]), $obj->OPEN($path,$mode,[$fh]),
+$obj->BINMODE([$fh]), $obj->FDOPEN($fd,[$fh]),
+$obj->SYSOPEN($path,$imode,$perm,[$fh]), $obj->FILENO($fh),
 $obj->READ($buffer,$len,$fh), $obj->WRITE($buffer,$fh), $obj->FILL($fh),
 $obj->CLOSE($fh), $obj->SEEK($posn,$whence,$fh), $obj->TELL($fh),
 $obj->UNREAD($buffer,$fh), $obj->FLUSH($fh), $obj->SETLINEBUF($fh),
@@ -21150,11 +21189,11 @@ files
 
 $batchconv = Pod::Simple::HTMLBatch->new;, $batchconv->batch_convert(
 I<indirs>, I<outdir> );, $batchconv->batch_convert( undef    , ...);,
-$batchconv->batch_convert( q{@INC}, ...);, $batchconv->batch_convert(
-\@dirs , ...);, $batchconv->batch_convert( "somedir" , ...);,
-$batchconv->batch_convert( 'somedir:someother:also' , ...);,
-$batchconv->batch_convert( ... , undef );, $batchconv->batch_convert( ... ,
-'somedir' );
+$batchconv->batch_convert( q{$^INCLUDE_PATH}, ...);,
+$batchconv->batch_convert( \@dirs , ...);, $batchconv->batch_convert(
+"somedir" , ...);, $batchconv->batch_convert( 'somedir:someother:also' ,
+...);, $batchconv->batch_convert( ... , undef );,
+$batchconv->batch_convert( ... , 'somedir' );
 
 =over 4
 
@@ -21692,16 +21731,6 @@ set_prototype CODEREF, PROTOTYPE, tainted EXPR, weaken REF
 =back
 
 =head2 Search::Dict, look - search for key in dictionary file
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=back
-
-=head2 SelectSaver - save and restore selected file handle
 
 =over 4
 
@@ -23196,8 +23225,6 @@ don't all have manual pages yet:
 =item a2p
 
 =item dprofpp
-
-=item h2ph
 
 =item h2xs
 

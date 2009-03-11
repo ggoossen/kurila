@@ -35,7 +35,7 @@ $masterpodfile = File::Spec->catdir($Up, "pod.lst");
 
 do {
   my @files = keys %Targets;
-  my $filesopts = join(" | ", map { "--build-$_" } @( "all", < sort @files));
+  my $filesopts = join(" | ", map { "--build-$_" }, @( "all", < sort @files));
   my $showfiles;
   die <<__USAGE__
 $^PROGRAM_NAME: Usage: $^PROGRAM_NAME [--verbose] [--showfiles] $filesopts
@@ -43,14 +43,14 @@ __USAGE__
   unless (nelems @ARGV)
 	&& GetOptions (verbose => \$Verbose,
 		       showfiles => \$showfiles,
-		       < map { "build-$_", \%Build{+$_} } @( < @files, 'all'));
+		       < @+: map { @: "build-$_", \%Build{+$_} }, @( < @files, 'all'));
   # Set them all to true
   %Build{[@files]} = @files if (%Build{?all});
   if ($showfiles) {
       print
 	  join(" ",
-	       sort { lc $a cmp lc $b }
- map {
+	       sort { lc $a cmp lc $b },
+               map {
 		   my @($v, $d, $f) = File::Spec->splitpath($_);
 		   my @d;
 		   @d = defined $d ?? File::Spec->splitdir($d) !! @();
@@ -58,7 +58,7 @@ __USAGE__
 		   File::Spec->catfile((nelems @d)
 				       ?? ((nelems @d) == 1 && @d[0] eq '' ?? () !! < @d)
 				       !! "pod", $f);
-	       } %Targets{[ grep { $_ ne 'all' && %Build{$_} } keys %Build]}),
+	       }, %Targets{[ grep { $_ ne 'all' && %Build{$_} }, keys %Build]}),
           "\n";
       exit(0);
   }
@@ -72,16 +72,16 @@ __USAGE__
      );
 
 if ($Verbose) {
-  print "I'm building $_\n" foreach grep {%Build{$_}} keys %Build;
+  print "I'm building $_\n" foreach grep {%Build{$_}}, keys %Build;
 }
 
 chdir $FindBin::Bin or die "$^PROGRAM_NAME: Can't chdir $FindBin::Bin: $^OS_ERROR";
 
-open MASTER, "<", $masterpodfile or die "$^PROGRAM_NAME: Can't open $masterpodfile: $^OS_ERROR";
+open my $master, "<", $masterpodfile or die "$^PROGRAM_NAME: Can't open $masterpodfile: $^OS_ERROR";
 
 my ($delta_source, $delta_target);
 
-foreach (@( ~< *MASTER)) {
+foreach (@( ~< *$master)) {
   next if m/^\#/;
 
   # At least one upper case letter somewhere in the first group
@@ -144,7 +144,7 @@ if (defined $delta_source) {
   die "$^PROGRAM_NAME: delta target defined but not target";
 }
 
-close MASTER;
+close $master;
 
 # Sanity cross check
 do {
@@ -168,8 +168,8 @@ do {
   # Things we copy to won't be in MANIFEST
   %sources{[values %Copies]} = @();
 
-  open(MANI, "<", "../MANIFEST") || die "$^PROGRAM_NAME: opening ../MANIFEST failed: $^OS_ERROR";
-  while ( ~< *MANI) {
+  open(my $mani, "<", "../MANIFEST") || die "$^PROGRAM_NAME: opening ../MANIFEST failed: $^OS_ERROR";
+  while ( ~< *$mani) {
     if (m!^pod/([^.]+\.pod)\s+!i) {
       push @manipods, $1;
     } elsif (m!^README\.(\S+)\s+!i) {
@@ -177,13 +177,13 @@ do {
       push @manireadmes, "perl$1.pod";
     }
   }
-  close(MANI);
+  close($mani);
   %manipods{[ @manipods]} = @manipods;
   %manireadmes{[ @manireadmes]} = @manireadmes;
 
   my $in_perlpod;
-  open(PERLPOD, "<", "perl.pod") || die "$^PROGRAM_NAME: opening perl.pod failed: $^OS_ERROR\n";
-  while ( ~< *PERLPOD) {
+  open(my $perlpod, "<", "perl.pod") || die "$^PROGRAM_NAME: opening perl.pod failed: $^OS_ERROR\n";
+  while ( ~< *$perlpod) {
     $in_perlpod ||= m/^For ease of access/;
     $in_perlpod &&= ! m/^\(If you're intending /;
     if ($in_perlpod) {
@@ -192,7 +192,7 @@ do {
       }
     }
   }
-  close(PERLPOD);
+  close($perlpod);
   die "$^PROGRAM_NAME: could not find the pod listing of perl.pod\n"
     unless (nelems @perlpods);
   %perlpods{[@perlpods]} = @perlpods;
@@ -236,13 +236,13 @@ do {
       my $pod = $file;
       return if $pod =~ s/pm$/pod/ && -e $pod;
       die "$^PROGRAM_NAME: tut $File::Find::name" if $file =~ m/TUT/;
-      unless (open (F, "<", "$_\0")) {
+      unless (open (my $f, "<", "$_\0")) {
 	warn "$^PROGRAM_NAME: bogus <$file>: $^OS_ERROR";
 	system "ls", "-l", $file;
       }
       else {
 	my $line;
-	while ($line = ~< *F) {
+	while ($line = ~< *$f) {
 	  if ($line =~ m/^=head1\s+NAME\b/) {
 	    push @modpods, $file;
 	    #warn "GOOD $file\n";
@@ -284,8 +284,10 @@ sub path2modname {
     return $_;
 }
 
+my $out;
+
 sub output_kurilatoc {
-  open(OUT, ">", "kurilatoc.pod") || die "$^PROGRAM_NAME: creating kurilatoc.pod failed: $^OS_ERROR";
+  open($out, ">", "kurilatoc.pod") || die "$^PROGRAM_NAME: creating kurilatoc.pod failed: $^OS_ERROR";
 
   local $^INPUT_RECORD_SEPARATOR = '';
 
@@ -311,7 +313,7 @@ EOPOD2B
 #' make emacs happy
 
   # All the things in the master list that happen to be pod filenames
-  podset(< map {"$_->[1].pod"} grep {defined $_ && (nelems @$_) == 3 && !$_->[0]->{?toc_omit}} @Master);
+  podset(< map {"$_->[1].pod"}, grep {defined $_ && (nelems @$_) == 3 && !$_->[0]->{?toc_omit}}, @Master);
 
 
   ($_= <<"EOPOD2B") =~ s/^\t//gm && output($_);
@@ -346,7 +348,7 @@ EOPOD2B
 
 EOPOD2B
 
-  $_ .=  join "\n", map {"\t=item $_\n"} sort keys %Aux;
+  $_ .=  join "\n", map {"\t=item $_\n"}, sort keys %Aux;
   $_ .= <<"EOPOD2B" ;
 
 	=back
@@ -459,11 +461,11 @@ sub output ($) {
     for (split m/(\n)/, shift) {
 	if ($_ eq "\n") {
 	    if ($LINE) {
-		print OUT wrap('', '', $LINE);
+		print $out, wrap('', '', $LINE);
 		$LINE = '';
 	    }
 	    if (($NEWLINE) +< 2) {
-		print OUT;
+		print $out, $_;
 		$NEWLINE++;
 	    }
 	}
@@ -504,7 +506,7 @@ sub generate_perlpod {
   $maxlength += 2;
   $maxlength = ($maxlength + 3) ^&^ ^~^3;
   # sprintf gives $1.....$2 where ... are spaces:
-  return unexpand (< map {ref $_ ?? sprintf "\%-$($maxlength)s\%s\n", < @$_ !! $_}
+  return unexpand (< map {ref $_ ?? sprintf "\%-$($maxlength)s\%s\n", < @$_ !! $_},
  @output);
 }
 
@@ -513,39 +515,39 @@ sub generate_manifest {
   # Annyoingly unexpand doesn't consider it good form to replace a single
   # space before a tab with a tab
   # Annoyingly (2) it returns read only values.
-  my @temp = unexpand (< map {sprintf "\%-32s\%s\n", < @$_} @_);
-  map {s/ \t/\t\t/g; $_} @temp;
+  my @temp = unexpand (< map {sprintf "\%-32s\%s\n", < @$_}, @_);
+  map {s/ \t/\t\t/g; $_}, @temp;
 }
 sub generate_manifest_pod {
-  generate_manifest < map {\@("pod/$_.pod", %Pods{$_})}
- grep {!%Copies{"$_.pod"}} sort keys %Pods;
+  generate_manifest < map {\@("pod/$_.pod", %Pods{$_})},
+ grep {!%Copies{"$_.pod"}}, sort keys %Pods;
 }
 sub generate_manifest_readme {
-  generate_manifest < map {\@("README.$_", %Readmes{$_})} sort keys %Readmes;
+  generate_manifest < map {\@("README.$_", %Readmes{$_})}, sort keys %Readmes;
 }
 
 sub generate_roffitall {
-   @(< map ({"\t\$maindir/$_.1\t\\"}sort keys %Pods),
+   @(< map ({"\t\$maindir/$_.1\t\\"}, sort keys %Pods),
    "\t\t\\",
-   < map ({"\t\$maindir/$_.1\t\\"}sort keys %Aux),
+   < map ({"\t\$maindir/$_.1\t\\"}, sort keys %Aux),
    "\t\t\\",
-   < map ({"\t\$libdir/$_.3\t\\"}sort keys %Pragmata),
+   < map ({"\t\$libdir/$_.3\t\\"}, sort keys %Pragmata),
    "\t\t\\",
-   < map ({"\t\$libdir/$_.3\t\\"}sort keys %Modules),
+   < map ({"\t\$libdir/$_.3\t\\"}, sort keys %Modules),
   )
 }
 
 sub generate_descrip_mms_1 {
   local $Text::Wrap::columns = 150;
   my $count = 0;
-  my @lines = map {"pod" . $count++ . " = $_"}
-    split m/\n/, wrap('', '', join " ", map "[.lib.pods]$_.pod",
-		     sort @( < keys %Pods, < keys %Readmepods));
-  @lines, "pod = " . join ' ', map {"\$(pod$_)"} 0 .. $count - 1;
+  my @lines = map {"pod" . $count++ . " = $_"},
+    split m/\n/, wrap('', '', join " ", map { "[.lib.pods]$_.pod" },
+		     sort keys %Pods +@+ keys %Readmepods);
+  @lines, "pod = " . join ' ', map {"\$(pod$_)"}, 0 .. $count - 1;
 }
 
 sub generate_descrip_mms_2 {
-  map {sprintf <<'SNIP', $_, $_ eq 'perlvms' ?? 'vms' !! 'pod', $_}
+  map {sprintf <<'SNIP', $_, $_ eq 'perlvms' ?? 'vms' !! 'pod', $_},
 [.lib.pods]%s.pod : [.%s]%s.pod
 	@ If F$Search("[.lib]pods.dir").eqs."" Then Create/Directory [.lib.pods]
 	Copy/NoConfirm/Log $(MMS$SOURCE) [.lib.pods]
@@ -553,8 +555,8 @@ SNIP
    sort @( < keys %Pods, < keys %Readmepods);
 }
 
-sub generate_nmake_1 { map {sprintf "\tcopy ..\\README.\%-8s ..\\pod\\perl$_.pod\n", $_}
-    sort keys %Readmes, map {"\tcopy ..\\pod\\%Copies{$_} ..\\pod\\$_\n"} sort keys %Copies;
+sub generate_nmake_1 { map {sprintf "\tcopy ..\\README.\%-8s ..\\pod\\perl$_.pod\n", $_},
+    sort keys %Readmes, map {"\tcopy ..\\pod\\%Copies{$_} ..\\pod\\$_\n"}, sort keys %Copies;
 }
 
 # This doesn't have a trailing newline
@@ -563,7 +565,7 @@ sub generate_nmake_2 {
   local $Text::Wrap::columns = 76;
   my $line = wrap ("\t    ", "\t    ",
 		   join " ", sort @( < keys %Copies,
-				  < map {"perl$_.pod"} @( "vms", < keys %Readmes)));
+				  < map {"perl$_.pod"}, @( "vms", < keys %Readmes)));
   $line =~ s/$/ \\/mg;
   $line;
 }
@@ -572,7 +574,7 @@ sub generate_pod_mak {
   my $variable = shift;
   my @lines;
   my $line = join "\\\n", @( "\U$variable = ",
-    < map {"\t$_.$variable\t"} sort keys %Pods);
+    < map {"\t$_.$variable\t"}, sort keys %Pods);
   # Special case
   $line =~ s/.*kurilatoc.html.*\n//m;
   $line;
@@ -580,12 +582,12 @@ sub generate_pod_mak {
 
 sub do_manifest {
   my $name = shift;
-  my @manifest = grep {! m!^pod/[^.]+\.pod.*\n!}
- grep {! m!^README\.(\S+)! || %Ignore{$1}} @_;
+  my @manifest = grep {! m!^pod/[^.]+\.pod.*\n!},
+ grep {! m!^README\.(\S+)! || %Ignore{$1}}, @_;
   # Dictionary order - fold and handle non-word chars as nothing
-  map  { $_->[0] }
-  sort { $a->[1] cmp $b->[1] || $a->[0] cmp $b->[0] }
- map  { my $f = lc $_; $f =~ s/[^a-z0-9\s]//g; \@( $_, $f ) }
+  map  { $_->[0] },
+  sort { $a->[1] cmp $b->[1] || $a->[0] cmp $b->[0] },
+ map  { my $f = lc $_; $f =~ s/[^a-z0-9\s]//g; \@( $_, $f ) },
  @(    < @manifest, <
       &generate_manifest_pod(), <
 	&generate_manifest_readme());
@@ -696,26 +698,26 @@ while (my @(?$target, ?$name) = @: each %Targets) {
   next unless %Build{$target};
   $built++;
   if ($target eq "toc") {
-    print "Now processing $name\n" if $Verbose;
+    print\*STDOUT,  "Now processing $name\n" if $Verbose;
     &output_kurilatoc( < @_ );
-    print "Finished\n" if $Verbose;
+    print \*STDOUT, "Finished\n" if $Verbose;
     next;
   }
-  print "Now processing $name\n" if $Verbose;
-  open THING, "<", $name or die "Can't open $name: $^OS_ERROR";
-  my @orig = @( ~< *THING );
+  print\*STDOUT,  "Now processing $name\n" if $Verbose;
+  open my $thing, "<", $name or die "Can't open $name: $^OS_ERROR";
+  my @orig = @( ~< *$thing );
   my $orig = join '', @orig;
-  close THING;
+  close $thing;
   my @new = &{"do_$target"}($target, < @orig);
   my $new = join '', @new;
   if ($new eq $orig) {
-    print "Was not modified\n" if $Verbose;
+    print \*STDOUT, "Was not modified\n" if $Verbose;
     next;
   }
   rename $name, "$name.old" or die "$^PROGRAM_NAME: Can't rename $name to $name.old: $^OS_ERROR";
-  open THING, ">", "$name" or die "$^PROGRAM_NAME: Can't open $name for writing: $^OS_ERROR";
-  print THING $new or die "$^PROGRAM_NAME: print to $name failed: $^OS_ERROR";
-  close THING or die die "$^PROGRAM_NAME: close $name failed: $^OS_ERROR";
+  open my $thing, ">", "$name" or die "$^PROGRAM_NAME: Can't open $name for writing: $^OS_ERROR";
+  print $thing, $new or die "$^PROGRAM_NAME: print to $name failed: $^OS_ERROR";
+  close $thing or die die "$^PROGRAM_NAME: close $name failed: $^OS_ERROR";
 }
 
 warn "$^PROGRAM_NAME: was not instructed to build anything\n" unless $built;
