@@ -511,8 +511,8 @@ Perl_do_vop(pTHX_ I32 optype, SV *sv, SV *left, SV *right)
 
     if (sv != left || (optype != OP_BIT_AND && !SvOK(sv)))
 	sv_setpvn(sv, "", 0);	/* avoid undef warning on |= and ^= */
-    lsave = lc = SvPV_nomg_const(left, leftlen);
-    rsave = rc = SvPV_nomg_const(right, rightlen);
+    lsave = lc = SvPV_const(left, leftlen);
+    rsave = rc = SvPV_const(right, rightlen);
 
     /* This need to come after SvPV to ensure that string overloading has
        fired off.  */

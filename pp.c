@@ -2149,7 +2149,7 @@ PP(pp_complement)
 	register I32 anum;
 	STRLEN len;
 
-	(void)SvPV_nomg_const(sv,len); /* force check for uninit var */
+	(void)SvPV_const(sv,len); /* force check for uninit var */
 	sv_setsv_nomg(TARG, sv);
 	tmps = SvPV_force(TARG, len);
 	anum = len;
@@ -2914,7 +2914,7 @@ PP(pp_ucfirst)
     STRLEN tculen;
 
     if (SvOK(source)) {
-	s = SvPV_nomg_const(source, slen);
+	s = SvPV_const(source, slen);
     } else {
 	if (ckWARN(WARN_UNINITIALIZED))
 	    report_uninit(source);
@@ -3025,7 +3025,7 @@ PP(pp_uc)
 	   little games.  */
 
 	if (SvOK(source)) {
-	    s = SvPV_nomg_const(source, len);
+	    s = SvPV_const(source, len);
 	} else {
 	    if (ckWARN(WARN_UNINITIALIZED))
 		report_uninit(source);
@@ -3106,7 +3106,7 @@ PP(pp_lc)
 	   little games.  */
 
 	if (SvOK(source)) {
-	    s = SvPV_nomg_const(source, len);
+	    s = SvPV_const(source, len);
 	} else {
 	    if (ckWARN(WARN_UNINITIALIZED))
 		report_uninit(source);

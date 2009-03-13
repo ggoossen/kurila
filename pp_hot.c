@@ -175,7 +175,7 @@ PP(pp_concat)
 		report_uninit(right);
 	    sv_setpvn(left, "", 0);
 	}
-	(void)SvPV_nomg_const(left, llen);    /* Needed to set UTF8 flag */
+	(void)SvPV_const(left, llen);    /* Needed to set UTF8 flag */
     }
 
     if (!rcopied) {
