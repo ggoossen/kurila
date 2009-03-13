@@ -91,18 +91,19 @@ things, Changing old design decisions, Readable, modifiable perl source
 
 =item SEE ALSO
 
-L<kurila117delta> What is new for Perl Kurila 1.17, L<kurila116delta> What
-is new for Perl Kurila 1.16, L<kurila115delta> What is new for Perl Kurila
-1.15, L<kurila114delta> What is new for Perl Kurila 1.14, L<kurila113delta>
-What is new for Perl Kurila 1.13, L<kurila112delta> What is new for Perl
-Kurila 1.12, L<kurila111delta> What is new for Perl Kurila 1.11,
-L<kurila110delta> What is new for Perl Kurila 1.10, L<kurila19delta> What
-is new for Perl Kurila 1.9, L<kurila18delta> What is new for Perl Kurila
-1.8, L<kurila17delta> What is new for Perl Kurila 1.7, L<kurila16delta>
-What is new for Perl Kurila 1.6, L<kurila15delta> What is new for Perl
-Kurila 1.5, L<kurila14delta> What is new for Perl Kurila 1.4,
-L<kurila13delta> What is new for Perl Kurila 1.3, L<kurila02delta> What is
-new for Perl Kurila 0.2, L<kurila01delta> What is new for Perl Kurila 0.1
+L<kurila118delta> What is new for Perl Kurila 1.18, L<kurila117delta> What
+is new for Perl Kurila 1.17, L<kurila116delta> What is new for Perl Kurila
+1.16, L<kurila115delta> What is new for Perl Kurila 1.15, L<kurila114delta>
+What is new for Perl Kurila 1.14, L<kurila113delta> What is new for Perl
+Kurila 1.13, L<kurila112delta> What is new for Perl Kurila 1.12,
+L<kurila111delta> What is new for Perl Kurila 1.11, L<kurila110delta> What
+is new for Perl Kurila 1.10, L<kurila19delta> What is new for Perl Kurila
+1.9, L<kurila18delta> What is new for Perl Kurila 1.8, L<kurila17delta>
+What is new for Perl Kurila 1.7, L<kurila16delta> What is new for Perl
+Kurila 1.6, L<kurila15delta> What is new for Perl Kurila 1.5,
+L<kurila14delta> What is new for Perl Kurila 1.4, L<kurila13delta> What is
+new for Perl Kurila 1.3, L<kurila02delta> What is new for Perl Kurila 0.2,
+L<kurila01delta> What is new for Perl Kurila 0.1
 
 =item AUTHOR
 
@@ -2653,9 +2654,9 @@ B<-0>[I<octal/hexadecimal>] X<-0> X<$/>, B<-a> X<-a> X<autosplit>, B<-C
 B<-d:>I<foo[=bar,baz]> X<-d> X<-dt>, B<-dt:>I<foo[=bar,baz]>,
 B<-D>I<letters> X<-D> X<DEBUGGING> X<-DDEBUGGING>, B<-D>I<number>, B<-e>
 I<commandline> X<-e>, B<-E> I<commandline> X<-E>, B<-f> X<-f>, B<-h> X<-h>,
-B<-i>[I<extension>] X<-i> X<in-place>, B<-I>I<directory> X<-I> X<@INC>,
-B<-l>[I<octnum>] X<-l> X<$/> X<$\>, B<-m>[B<->]I<module> X<-m> X<-M>,
-B<-M>[B<->]I<module>, B<-M>[B<->]I<'module ...'>,
+B<-i>[I<extension>] X<-i> X<in-place>, B<-I>I<directory> X<-I>
+X<$^INCLUDE_PATH>, B<-l>[I<octnum>] X<-l> X<$/> X<$\>, B<-m>[B<->]I<module>
+X<-m> X<-M>, B<-M>[B<->]I<module>, B<-M>[B<->]I<'module ...'>,
 B<-[mM]>[B<->]I<module=arg[,arg]...>, B<-n> X<-n>, B<-p> X<-p>, B<-S>
 X<-S>, B<-t> X<-t>, B<-T> X<-T>, B<-u> X<-u>, B<-U> X<-U>, B<-v> X<-v>,
 B<-V> X<-V>, B<-V:>I<configvar>, B<-w> X<-w>, B<-W> X<-W>, B<-X> X<-X>,
@@ -2862,16 +2863,16 @@ X<$EFFECTIVE_USER_ID>, $REAL_GROUP_ID, $^GID, $EFFECTIVE_GROUP_ID, $^EGID,
 $PROGRAM_NAME, $0 X<$0> X<$PROGRAM_NAME>, $COMPILING, $^C X<$^C>
 X<$COMPILING>, $DEBUGGING, $^D X<$^D> X<$DEBUGGING>, $^RE_DEBUG_FLAGS,
 $^RE_TRIE_MAXBUF, $SYSTEM_FD_MAX, $^F X<$^F> X<$SYSTEM_FD_MAX>, $^H, %^H,
-$INPLACE_EDIT, $^I X<$^I> X<$INPLACE_EDIT>, $^M X<$^M>, $OSNAME, $^O X<$^O>
-X<$OSNAME>, $^OPEN, $PERLDB, $^P X<$^P> X<$PERLDB>, 0x01, 0x02, 0x04, 0x08,
-0x10, 0x20, 0x40, 0x80, 0x100, 0x200, 0x400, $EXCEPTIONS_BEING_CAUGHT, $^S
-X<$^S> X<$EXCEPTIONS_BEING_CAUGHT>, $BASETIME, $^T X<$^T> X<$BASETIME>,
-$^UNICODE, $^UTF8CACHE, $^UTF8LOCALE, $PERL_VERSION, $^V X<$^V>
-X<$PERL_VERSION>, $^WARN_HOOK X<$^WARN_HOOK>, $^DIE_HOOK, $WARNING, $^W
-X<$^W> X<$WARNING>, $^WARNING_BITS, $^WIN32_SLOPPY_STAT, $EXECUTABLE_NAME,
-$^X X<$^X> X<$EXECUTABLE_NAME>, ARGV X<ARGV>, $ARGV X<$ARGV>, @ARGV
-X<@ARGV>, ARGVOUT X<ARGVOUT>, @F X<@F>, @INC X<@INC>, @ARG, @_ X<@_>
-X<@ARG>, %INC X<%INC>, %ENV, %ENV{expr} X<%ENV>, %SIG, %SIG{expr} X<%SIG>
+$^M X<$^M>, $OSNAME, $^O X<$^O> X<$OSNAME>, $^OPEN, $PERLDB, $^P X<$^P>
+X<$PERLDB>, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x100, 0x200,
+0x400, $EXCEPTIONS_BEING_CAUGHT, $^S X<$^S> X<$EXCEPTIONS_BEING_CAUGHT>,
+$BASETIME, $^T X<$^T> X<$BASETIME>, $^UNICODE, $^UTF8CACHE, $^UTF8LOCALE,
+$PERL_VERSION, $^V X<$^V> X<$PERL_VERSION>, $^WARN_HOOK X<$^WARN_HOOK>,
+$^DIE_HOOK, $WARNING, $^W X<$^W> X<$WARNING>, $^WARNING_BITS,
+$^WIN32_SLOPPY_STAT, $EXECUTABLE_NAME, $^X X<$^X> X<$EXECUTABLE_NAME>, ARGV
+X<ARGV>, $ARGV X<$ARGV>, @ARGV X<@ARGV>, ARGVOUT X<ARGVOUT>, @F X<@F>,
+$^INCLUDE_PATH X<$^INCLUDE_PATH>, @ARG, @_ X<@_> X<@ARG>, $^INCLUDED
+X<$^INCLUDED>, %ENV, %ENV{expr} X<%ENV>, %SIG, %SIG{expr} X<%SIG>
 
 =item Error Indicators
 X<error> X<exception>
@@ -4088,8 +4089,6 @@ chcp, dataset access, OS/390, z/OS iconv, locales
 
 =item Switches On the "#!" Line
 
-=item Taint mode and @INC
-
 =item Cleaning Up Your Path
 
 =item Security Bugs
@@ -4210,9 +4209,9 @@ Pod::Simple::PullParserToken, Pod::Simple::RTF, Pod::Simple::Search,
 Pod::Simple::SimpleTree, Pod::Simple::Subclassing, Pod::Simple::Text,
 Pod::Simple::TextContent, Pod::Simple::XMLOutStream, Pod::Text,
 Pod::Text::Color, Pod::Text::Overstrike, Pod::Text::Termcap, Pod::Usage,
-Safe, Scalar::Util, Search::Dict, SelectSaver, Socket, Storable, Symbol,
-Sys::Hostname, Sys::Syslog, Sys::Syslog::win32::Win32, Term::ANSIColor,
-Term::Cap, Term::ReadLine, Test, Test::Builder, Test::Builder::Module,
+Safe, Scalar::Util, Search::Dict, Socket, Storable, Symbol, Sys::Hostname,
+Sys::Syslog, Sys::Syslog::win32::Win32, Term::ANSIColor, Term::Cap,
+Term::ReadLine, Test, Test::Builder, Test::Builder::Module,
 Test::Builder::Tester, Test::Builder::Tester::Color, Test::More,
 Test::Simple, Test::Tutorial, Text::Abbrev, Text::ParseWords, Text::Tabs,
 Text::Wrap, Tie::Hash, Time::HiRes, Time::Local, Time::gmtime,
@@ -5297,8 +5296,6 @@ call_sv, call_pv, call_method, call_argv
 =item G_ARRAY
 
 =item G_DISCARD
-
-=item G_NOARGS
 
 =item G_EVAL
 
@@ -6429,6 +6426,48 @@ B<-V>
 
 =back
 
+=head2 kurila118delta - what is new for Perl Kurila 1.18
+
+=over 4
+
+=item DESCRIPTION
+
+=item Highlights In Perl Kurila 1.18
+
+=item Core Enhancements
+
+=over 4
+
+=item New operators C<+@+>, C<+%+>, C<@+:> and C<%+:>
+
+=item C<{ ... }> generated a coderef
+
+=item Removed C<goto>
+
+=item Comma after first argument
+
+=item No default filehandle
+
+=back
+
+=item KNOWN BUGS
+
+=over 4
+
+=item Documentation
+
+=item Self referential assignment problems
+
+=item Limited platform support
+
+=back
+
+=item SEE ALSO
+
+=item HISTORY
+
+=back
+
 =head2 kurila117delta - what is new for Perl Kurila 1.17
 
 =over 4
@@ -6443,7 +6482,7 @@ B<-V>
 
 =item Renaming special variables
 
-=item Removed 'get' magic
+=item Special variables are evaluated where declared.
 
 =item Removed 'tie'
 
@@ -7179,6 +7218,46 @@ locale, the locale pramga has been removed
 =back
 
 =item THE KEEPERS OF THE RECORDS
+
+=back
+
+=head2 perldelta - what is new for perl v5.11.0
+
+=over 4
+
+=item DESCRIPTION
+
+=item Incompatible Changes
+
+=item Core Enhancements
+
+=item Modules and Pragmata
+
+=item Utility Changes
+
+=item Documentation
+
+=item Performance Enhancements
+
+=item Installation and Configuration Improvements
+
+=item Selected Bug Fixes
+
+=item New or Changed Diagnostics
+
+=item Changed Internals
+
+=item Known Problems
+
+=over 4
+
+=item Platform Specific Problems
+
+=back
+
+=item Reporting Bugs
+
+=item SEE ALSO
 
 =back
 
@@ -10549,6 +10628,1560 @@ a), b), c), d), a), b), c), d)
 
 =back
 
+=head2 perlaix, README.aix - Perl version 5 on IBM Unix (AIX) systems
+
+=over 4
+
+=item DESCRIPTION
+
+=over 4
+
+=item Compiling Perl 5 on AIX
+
+=item OS level
+
+=item Building Dynamic Extensions on AIX
+
+=item The IBM ANSI C Compiler
+
+=item The usenm option
+
+=item Using GNU's gcc for building perl
+
+=item Using Large Files with Perl
+
+=item Threaded Perl
+
+=item 64-bit Perl
+
+=item AIX 4.2 and extensions using C++ with statics
+
+=back
+
+=item AUTHOR
+
+=item DATE
+
+=back
+
+=head2 perlamiga - Perl under Amiga OS
+
+=over 4
+
+=item NOTE
+
+=item SYNOPSIS
+
+=back
+
+=over 4
+
+=item DESCRIPTION
+
+=over 4
+
+=item Prerequisites for Compiling Perl on AmigaOS
+
+B<Unix emulation for AmigaOS: ixemul.library>, B<Version of Amiga OS>
+
+=item Starting Perl programs under AmigaOS
+
+=item Shortcomings of Perl under AmigaOS
+
+=back
+
+=item INSTALLATION
+
+=item Accessing documentation
+
+=over 4
+
+=item Manpages for Perl on AmigaOS
+
+=item Perl HTML Documentation on AmigaOS
+
+=item Perl GNU Info Files on AmigaOS
+
+=item Perl LaTeX Documentation on AmigaOS
+
+=back
+
+=item BUILDING PERL ON AMIGAOS
+
+=over 4
+
+=item Build Prerequisites for Perl on AmigaOS
+
+=item Getting the Perl Source for AmigaOS
+
+=item Making Perl on AmigaOS
+
+=item Testing Perl on AmigaOS
+
+=item Installing the built Perl on AmigaOS
+
+=back
+
+=item PERL 5.8.0 BROKEN IN AMIGAOS
+
+=item AUTHORS
+
+=item SEE ALSO
+
+=back
+
+=head2 perlapollo, README.apollo - Perl version 5 on Apollo DomainOS
+
+=over 4
+
+=item DESCRIPTION
+
+=item AUTHOR
+
+=back
+
+=head2 perlbeos, README.beos - Perl version 5.8+ on BeOS
+
+=over 4
+
+=item DESCRIPTION
+
+=item BUILD AND INSTALL
+
+=over 4
+
+=item Requirements
+
+=item Configure
+
+=item Build
+
+=item Install
+
+=back
+
+=item KNOWN PROBLEMS
+
+=item CONTACT
+
+=back
+
+=head2 perlbs2000, README.BS2000 - building and installing Perl for BS2000.
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=over 4
+
+=item gzip on BS2000
+
+=item bison on BS2000
+
+=item Unpacking Perl Distribution on BS2000
+
+=item Compiling Perl on BS2000
+
+=item Testing Perl on BS2000
+
+=item Installing Perl on BS2000
+
+=item Using Perl in the Posix-Shell of BS2000
+
+=item Using Perl in "native" BS2000
+
+=item Floating point anomalies on BS2000
+
+=item Using PerlIO and different encodings on ASCII and EBCDIC partitions
+
+=back
+
+=item AUTHORS
+
+=item SEE ALSO
+
+=over 4
+
+=item Mailing list
+
+=back
+
+=item HISTORY
+
+=back
+
+=head2 perlce - Perl for WinCE
+
+=over 4
+
+=item Building Perl for WinCE
+
+=over 4
+
+=item DESCRIPTION
+
+=item General explanations on cross-compiling WinCE
+
+=item BUILD
+
+Microsoft Embedded Visual Tools, Microsoft Visual C++, Rainer Keuchel's
+celib-sources, Rainer Keuchel's console-sources, go to C<./win32>
+subdirectory, edit file C<./win32/ce-helpers/compile.bat>, run	 
+compile.bat, run    compile.bat dist
+
+=back
+
+=item Using Perl on WinCE
+
+=over 4
+
+=item DESCRIPTION
+
+=item LIMITATIONS
+
+=item ENVIRONMENT
+
+PERL5LIB, PATH, TMP, UNIXROOTPATH, ROWS/COLS, HOME, CONSOLEFONTSIZE
+
+=item REGISTRY
+
+=item XS
+
+=item BUGS
+
+=item INSTALLATION
+
+=back
+
+=item ACKNOWLEDGEMENTS
+
+=item History of WinCE port
+
+=item AUTHORS
+
+Rainer Keuchel <coyxc@rainer-keuchel.de>, Vadim Konovalov
+
+=back
+
+=head2 perlcygwin, README.cygwin - Perl for Cygwin
+
+=over 4
+
+=item SYNOPSIS
+
+=item PREREQUISITES FOR COMPILING PERL ON CYGWIN
+
+=over 4
+
+=item Cygwin = GNU+Cygnus+Windows (Don't leave UNIX without it)
+
+=item Cygwin Configuration
+
+C<PATH>, I<nroff>, Permissions
+
+=back
+
+=item CONFIGURE PERL ON CYGWIN
+
+=over 4
+
+=item Stripping Perl Binaries on Cygwin
+
+=item Optional Libraries for Perl on Cygwin
+
+C<-lcrypt>, C<-lgdbm_compat> (C<use GDBM_File>), C<-ldb> (C<use DB_File>),
+C<cygserver> (C<use IPC::SysV>), C<-lutil>
+
+=item Configure-time Options for Perl on Cygwin
+
+C<-Uusedl>, C<-Uusemymalloc>, C<-Uuseperlio>, C<-Dusemultiplicity>,
+C<-Duse64bitint>, C<-Duselongdouble>, C<-Dusethreads>, C<-Duselargefiles>,
+C<-Dmksymlinks>
+
+=item Suspicious Warnings on Cygwin
+
+Win9x and C<d_eofnblk>, Compiler/Preprocessor defines
+
+=back
+
+=item MAKE ON CYGWIN
+
+=item TEST ON CYGWIN
+
+=over 4
+
+=item File Permissions on Cygwin
+
+=item NDBM_File and ODBM_File do not work on FAT filesystems
+
+=item C<fork()> failures in io_* tests
+
+=back
+
+=item Specific features of the Cygwin port
+
+=over 4
+
+=item Script Portability on Cygwin
+
+Pathnames, Text/Binary, PerlIO, F<.exe>, Cygwin vs. Windows process ids,
+Cygwin vs. Windows errors, C<chown()>, Miscellaneous
+
+=item Prebuilt methods:
+
+C<Cwd::cwd>, C<Cygwin::pid_to_winpid>, C<Cygwin::winpid_to_pid>,
+C<Cygwin::win_to_posix_path>, C<Cygwin::posix_to_win_path>,
+C<Cygwin::mount_table()>, C<Cygwin::mount_flags>, C<Cygwin::is_binmount>
+
+=back
+
+=item INSTALL PERL ON CYGWIN
+
+=item MANIFEST ON CYGWIN
+
+Documentation, Build, Configure, Make, Install, Tests, Compiled Perl
+Source, Compiled Module Source, Perl Modules/Scripts, Perl Module Tests
+
+=item BUGS ON CYGWIN
+
+=item AUTHORS
+
+=item HISTORY
+
+=back
+
+=head2 perldgux - Perl under DG/UX.
+
+=over 4
+
+=item SYNOPSIS
+
+=back
+
+=over 4
+
+=item DESCRIPTION
+
+=item BUILDING PERL ON DG/UX
+
+=over 4
+
+=item Non-threaded Perl on DG/UX
+
+=item Threaded Perl on DG/UX
+
+=item Testing Perl on DG/UX
+
+=item Installing the built perl on DG/UX
+
+=back
+
+=item AUTHOR
+
+=item SEE ALSO
+
+=back
+
+=head2 perldos - Perl under DOS, W31, W95.
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=over 4
+
+=item Prerequisites for Compiling Perl on DOS
+
+DJGPP, Pthreads
+
+=item Shortcomings of Perl under DOS
+
+=item Building Perl on DOS
+
+=item Testing Perl on DOS
+
+=item Installation of Perl on DOS
+
+=back
+
+=item BUILDING AND INSTALLING MODULES ON DOS
+
+=over 4
+
+=item Building Prerequisites for Perl on DOS
+
+=item Unpacking CPAN Modules on DOS
+
+=item Building Non-XS Modules on DOS
+
+=item Building XS Modules on DOS
+
+=back
+
+=item AUTHOR
+
+=item SEE ALSO
+
+=back
+
+=head2 perlepoc, README.epoc - Perl for EPOC
+
+=over 4
+
+=item SYNOPSIS
+
+=item INTRODUCTION
+
+=item INSTALLING PERL ON EPOC
+
+=item STARTING PERL ON EPOC
+
+=over 4
+
+=item Editors on Epoc
+
+=item Features of Perl on Epoc
+
+=item Restrictions of Perl on Epoc
+
+=item Compiling Perl 5 on the EPOC cross compiling environment
+
+=back
+
+=item SUPPORT STATUS OF PERL ON EPOC
+
+=item AUTHOR
+
+=item LAST UPDATE
+
+=back
+
+=head2 perlfreebsd, README.freebsd - Perl version 5 on FreeBSD systems
+
+=over 4
+
+=item DESCRIPTION
+
+=over 4
+
+=item FreeBSD core dumps from readdir_r with ithreads
+
+=item $^X doesn't always contain a full path in FreeBSD
+
+=item Perl will no longer be part of "base FreeBSD"
+
+=back
+
+=item AUTHOR
+
+=back
+
+=head2 perlhpux, README.hpux - Perl version 5 on Hewlett-Packard Unix
+(HP-UX) systems
+
+=over 4
+
+=item DESCRIPTION
+
+=over 4
+
+=item Using perl as shipped with HP-UX
+
+=item Using perl from HP's porting centre
+
+=item Compiling Perl 5 on HP-UX
+
+=item PA-RISC
+
+=item Portability Between PA-RISC Versions
+
+=item PA-RISC 1.0
+
+=item PA-RISC 1.1
+
+=item PA-RISC 2.0
+
+=item Itanium Processor Family (IPF) and HP-UX
+
+=item Itanium, Itanium 2 & Madison 6
+
+=item Building Dynamic Extensions on HP-UX
+
+=item The HP ANSI C Compiler
+
+=item The GNU C Compiler
+
+=item Using Large Files with Perl on HP-UX
+
+=item Threaded Perl on HP-UX
+
+=item 64-bit Perl on HP-UX
+
+=item Oracle on HP-UX
+
+=item GDBM and Threads on HP-UX
+
+=item NFS filesystems and utime(2) on HP-UX
+
+=item HP-UX Kernel Parameters (maxdsiz) for Compiling Perl
+
+=back
+
+=item nss_delete core dump from op/pwent or op/grent
+
+=item Miscellaneous
+
+=item AUTHOR
+
+=item DATE
+
+=back
+
+=head2 perlhurd, README.hurd - Perl version 5 on Hurd
+
+=over 4
+
+=item DESCRIPTION
+
+=over 4
+
+=item Known Problems with Perl on Hurd 
+
+=back
+
+=item AUTHOR
+
+=back
+
+=head2 perlirix, README.irix - Perl version 5 on Irix systems
+
+=over 4
+
+=item DESCRIPTION
+
+=over 4
+
+=item Building 32-bit Perl in Irix
+
+=item Building 64-bit Perl in Irix
+
+=item About Compiler Versions of Irix
+
+=item Linker Problems in Irix
+
+=item Malloc in Irix
+
+=item Building with threads in Irix
+
+=item Irix 5.3
+
+=back
+
+=item AUTHOR
+
+=back
+
+=head2 perllinux, README.linux - Perl version 5 on Linux systems
+
+=over 4
+
+=item DESCRIPTION
+
+=over 4
+
+=item Experimental Support for Sun Studio Compilers for Linux OS
+
+=back
+
+=item AUTHOR
+
+=back
+
+=head2 perlmachten, README.machten - Perl version 5 on Power MachTen
+systems
+
+=over 4
+
+=item DESCRIPTION
+
+=over 4
+
+=item Perl version 5.8.x and greater not supported
+
+=item Compiling Perl 5.6.x on MachTen
+
+=item Failures during C<make test> on MachTen
+
+op/lexassign.t, pragma/warnings.t
+
+=item Building external modules on MachTen
+
+=back
+
+=item AUTHOR
+
+=item DATE
+
+=back
+
+=head2 perlmacos, README.macos - Perl under Mac OS (Classic)
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=item AUTHOR
+
+=item DATE
+
+=back
+
+=head2 perlmacosx, README.macosx - Perl under Mac OS X
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=over 4
+
+=item Installation Prefix
+
+=item SDK support
+
+=item Universal Binary support
+
+=item 64-bit PPC support
+
+=item libperl and Prebinding
+
+=item Updating Apple's Perl
+
+=item Known problems
+
+=item MacPerl
+
+=item Carbon
+
+=item Cocoa
+
+=back
+
+=item Starting From Scratch
+
+=item AUTHOR
+
+=item DATE
+
+=back
+
+=head2 perlmint, README.mint - Perl version 5 on Atari MiNT
+
+=over 4
+
+=item DESCRIPTION
+
+=item Known problems with Perl on MiNT
+
+=item AUTHOR
+
+=back
+
+=head2 perlmpeix, README.mpeix - Perl/iX for HP e3000 MPE
+
+=over 4
+
+=item SYNOPSIS
+
+=item NOTE
+
+=item Binary distribution from HP
+
+=item What's New in Perl for MPE/iX
+
+=item Welcome to Perl/iX
+
+=item System Requirements for Perl/iX
+
+=item How to Obtain Perl/iX
+
+=item Perl/iX Distribution Contents Highlights
+
+README, INSTALL, LIBSHP3K, PERL, .cpan/, lib/, man/,
+public_html/feedback.cgi, src/perl-5.6.0-mpe
+
+=item How to Compile Perl/iX
+
+ 4,  6
+
+=item Getting Started with Perl/iX
+
+=item MPE/iX Implementation Considerations
+
+=item Known Perl/iX Bugs Under Investigation
+
+=item Perl/iX To-Do List
+
+=item Perl/iX Change History
+
+=item AUTHOR
+
+=back
+
+=head2 perlnetware - Perl for NetWare
+
+=over 4
+
+=item DESCRIPTION
+
+=item BUILD
+
+=over 4
+
+=item Tools & SDK
+
+=item Setup
+
+SetNWBld.bat, Buildtype.bat
+
+=item Make
+
+=item Interpreter
+
+=item Extensions
+
+=back
+
+=item INSTALL
+
+=item BUILD NEW EXTENSIONS
+
+=item ACKNOWLEDGEMENTS
+
+=item AUTHORS
+
+=item DATE
+
+=back
+
+=head2 perlopenbsd, README.openbsd - Perl version 5 on OpenBSD systems
+
+=over 4
+
+=item DESCRIPTION
+
+=over 4
+
+=item OpenBSD core dumps from getprotobyname_r and getservbyname_r with
+ithreads
+
+=back
+
+=item AUTHOR
+
+=back
+
+=head2 perlos2 - Perl under OS/2, DOS, Win0.3*, Win0.95 and WinNT.
+
+=over 4
+
+=item SYNOPSIS
+
+=back
+
+=over 4
+
+=item DESCRIPTION
+
+=over 4
+
+=item Target
+
+=item Other OSes
+
+=item Prerequisites
+
+EMX, RSX, HPFS, pdksh
+
+=item Starting Perl programs under OS/2 (and DOS and...)
+
+=item Starting OS/2 (and DOS) programs under Perl
+
+=back
+
+=item Frequently asked questions
+
+=over 4
+
+=item "It does not work"
+
+=item I cannot run external programs
+
+=item I cannot embed perl into my program, or use F<perl.dll> from my
+program. 
+
+Is your program EMX-compiled with C<-Zmt -Zcrtdll>?, Did you use
+L<ExtUtils::Embed>?
+
+=item C<``> and pipe-C<open> do not work under DOS.
+
+=item Cannot start C<find.exe "pattern" file>
+
+=back
+
+=item INSTALLATION
+
+=over 4
+
+=item Automatic binary installation
+
+C<PERL_BADLANG>, C<PERL_BADFREE>, F<Config.pm>
+
+=item Manual binary installation
+
+Perl VIO and PM executables (dynamically linked), Perl_ VIO executable
+(statically linked), Executables for Perl utilities, Main Perl library,
+Additional Perl modules, Tools to compile Perl modules, Manpages for Perl
+and utilities, Manpages for Perl modules, Source for Perl documentation,
+Perl manual in F<.INF> format, Pdksh
+
+=item B<Warning>
+
+=back
+
+=item Accessing documentation
+
+=over 4
+
+=item OS/2 F<.INF> file
+
+=item Plain text
+
+=item Manpages
+
+=item HTML
+
+=item GNU C<info> files
+
+=item F<PDF> files
+
+=item C<LaTeX> docs
+
+=back
+
+=item BUILD
+
+=over 4
+
+=item The short story
+
+=item Prerequisites
+
+=item Getting perl source
+
+=item Application of the patches
+
+=item Hand-editing
+
+=item Making
+
+=item Testing
+
+A lot of C<bad free>, Process terminated by SIGTERM/SIGINT, F<op/fs.t>,
+F<op/stat.t>
+
+=item Installing the built perl
+
+=item C<a.out>-style build
+
+=back
+
+=item Building a binary distribution
+
+=item Building custom F<.EXE> files
+
+=over 4
+
+=item Making executables with a custom collection of statically loaded
+extensions
+
+=item Making executables with a custom search-paths
+
+=back
+
+=item Build FAQ
+
+=over 4
+
+=item Some C</> became C<\> in pdksh.
+
+=item C<'errno'> - unresolved external
+
+=item Problems with tr or sed
+
+=item Some problem (forget which ;-)
+
+=item Library ... not found
+
+=item Segfault in make
+
+=item op/sprintf test failure
+
+=back
+
+=item Specific (mis)features of OS/2 port
+
+=over 4
+
+=item C<setpriority>, C<getpriority>
+
+=item C<system()>
+
+=item C<extproc> on the first line
+
+=item Additional modules:
+
+=item Prebuilt methods:
+
+C<File::Copy::syscopy>, C<DynaLoader::mod2fname>,  C<Cwd::current_drive()>,
+ C<Cwd::sys_chdir(name)>,  C<Cwd::change_drive(name)>, 
+C<Cwd::sys_is_absolute(name)>,	C<Cwd::sys_is_rooted(name)>, 
+C<Cwd::sys_is_relative(name)>,	C<Cwd::sys_cwd(name)>, 
+C<Cwd::sys_abspath(name, dir)>,  C<Cwd::extLibpath([type])>, 
+C<Cwd::extLibpath_set( path [, type ] )>,
+C<OS2::Error(do_harderror,do_exception)>, C<OS2::Errors2Drive(drive)>,
+OS2::SysInfo(), OS2::BootDrive(), C<OS2::MorphPM(serve)>,
+C<OS2::UnMorphPM(serve)>, C<OS2::Serve_Messages(force)>,
+C<OS2::Process_Messages(force [, cnt])>, C<OS2::_control87(new,mask)>,
+OS2::get_control87(), C<OS2::set_control87_em(new=MCW_EM,mask=MCW_EM)>,
+C<OS2::DLLname([how [, \&xsub]])>
+
+=item Prebuilt variables:
+
+$OS2::emx_rev, $OS2::emx_env, $OS2::os_ver, $OS2::is_aout, $OS2::can_fork,
+$OS2::nsyserror
+
+=item Misfeatures
+
+=item Modifications
+
+C<popen>, C<tmpnam>, C<tmpfile>, C<ctermid>, C<stat>, C<mkdir>, C<rmdir>,
+C<flock>
+
+=item Identifying DLLs
+
+=item Centralized management of resources
+
+C<HAB>, C<HMQ>, Treating errors reported by OS/2 API,
+C<CheckOSError(expr)>, C<CheckWinError(expr)>, C<SaveWinError(expr)>,
+C<SaveCroakWinError(expr,die,name1,name2)>, C<WinError_2_Perl_rc>,
+C<FillWinError>, C<FillOSError(rc)>, Loading DLLs and ordinals in DLLs
+
+=back
+
+=item Perl flavors
+
+=over 4
+
+=item F<perl.exe>
+
+=item F<perl_.exe>
+
+=item F<perl__.exe>
+
+=item F<perl___.exe>
+
+=item Why strange names?
+
+=item Why dynamic linking?
+
+=item Why chimera build?
+
+=back
+
+=item ENVIRONMENT
+
+=over 4
+
+=item C<PERLLIB_PREFIX>
+
+=item C<PERL_BADLANG>
+
+=item C<PERL_BADFREE>
+
+=item C<PERL_SH_DIR>
+
+=item C<USE_PERL_FLOCK>
+
+=item C<TMP> or C<TEMP>
+
+=back
+
+=item Evolution
+
+=over 4
+
+=item Text-mode filehandles
+
+=item Priorities
+
+=item DLL name mangling: pre 5.6.2
+
+=item DLL name mangling: 5.6.2 and beyond
+
+Global DLLs, specific DLLs, C<BEGINLIBPATH> and C<ENDLIBPATH>, F<.> from
+C<LIBPATH>
+
+=item DLL forwarder generation
+
+=item Threading
+
+=item Calls to external programs
+
+=item Memory allocation
+
+=item Threads
+
+C<COND_WAIT>, F<os2.c>
+
+=back
+
+=item BUGS
+
+=back
+
+=over 4
+
+=item AUTHOR
+
+=item SEE ALSO
+
+=back
+
+=head2 perlos390, README.os390 - building and installing Perl for OS/390
+and z/OS
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=over 4
+
+=item Tools
+
+=item Unpacking Perl distribution on OS/390
+
+=item Setup and utilities for Perl on OS/390
+
+=item Configure Perl on OS/390
+
+=item Build, Test, Install Perl on OS/390
+
+=item Build Anomalies with Perl on OS/390
+
+=item Testing Anomalies with Perl on OS/390
+
+=item Installation Anomalies with Perl on OS/390
+
+=item Usage Hints for Perl on OS/390
+
+=item Floating Point Anomalies with Perl on OS/390
+
+=item Modules and Extensions for Perl on OS/390
+
+=back
+
+=item AUTHORS
+
+=item SEE ALSO
+
+=over 4
+
+=item Mailing list for Perl on OS/390
+
+=back
+
+=item HISTORY
+
+=back
+
+=head2 perlos400, README.os400 - Perl version 5 on OS/400
+
+=over 4
+
+=item DESCRIPTION
+
+=over 4
+
+=item Compiling Perl for OS/400 PASE
+
+=item Installing Perl in OS/400 PASE
+
+=item Using Perl in OS/400 PASE
+
+=item Known Problems
+
+=item Perl on ILE
+
+=back
+
+=item AUTHORS
+
+=back
+
+=head2 perlplan9 - Plan 9-specific documentation for Perl
+
+=over 4
+
+=item DESCRIPTION
+
+=over 4
+
+=item Invoking Perl
+
+=item What's in Plan 9 Perl
+
+=item What's not in Plan 9 Perl
+
+=item Perl5 Functions not currently supported in Plan 9 Perl
+
+=item Signals in Plan 9 Perl
+
+=back
+
+=item COMPILING AND INSTALLING PERL ON PLAN 9
+
+=over 4
+
+=item Installing Perl Documentation on Plan 9
+
+=back
+
+=item BUGS
+
+=item Revision date
+
+=item AUTHOR
+
+=back
+
+=head2 perlqnx, README.qnx - Perl version 5 on QNX
+
+=over 4
+
+=item DESCRIPTION
+
+=over 4
+
+=item Required Software for Compiling Perl on QNX4
+
+/bin/sh, ar, nm, cpp, make
+
+=item Outstanding Issues with Perl on QNX4
+
+=item QNX auxiliary files
+
+qnx/ar, qnx/cpp
+
+=item Outstanding issues with perl under QNX6
+
+=back
+
+=item AUTHOR
+
+=back
+
+=head2 perlriscos, README.riscos - Perl version 5 for RISC OS
+
+=over 4
+
+=item DESCRIPTION
+
+=item BUILD
+
+=item AUTHOR
+
+=back
+
+=head2 perlsolaris, README.solaris - Perl version 5 on Solaris systems
+
+=over 4
+
+=item DESCRIPTION
+
+=over 4
+
+=item Solaris Version Numbers.
+
+=back
+
+=item RESOURCES
+
+Solaris FAQ, Precompiled Binaries, Solaris Documentation
+
+=item SETTING UP
+
+=over 4
+
+=item File Extraction Problems on Solaris.
+
+=item Compiler and Related Tools on Solaris.
+
+=item Environment for Compiling perl on Solaris
+
+=back
+
+=item RUN CONFIGURE.
+
+=over 4
+
+=item 64-bit perl on Solaris.
+
+=item Threads in perl on Solaris.
+
+=item Malloc Issues with perl on Solaris.
+
+=back
+
+=item MAKE PROBLEMS.
+
+Dynamic Loading Problems With GNU as and GNU ld, ld.so.1: ./perl: fatal:
+relocation error:, dlopen: stub interception failed, #error "No
+DATAMODEL_NATIVE specified", sh: ar: not found
+
+=item MAKE TEST
+
+=over 4
+
+=item op/stat.t test 4 in Solaris
+
+=item nss_delete core dump from op/pwent or op/grent
+
+=back
+
+=item PREBUILT BINARIES OF PERL FOR SOLARIS.
+
+=item RUNTIME ISSUES FOR PERL ON SOLARIS.
+
+=over 4
+
+=item Limits on Numbers of Open Files on Solaris.
+
+=back
+
+=item SOLARIS-SPECIFIC MODULES.
+
+=item SOLARIS-SPECIFIC PROBLEMS WITH MODULES.
+
+=over 4
+
+=item Proc::ProcessTable on Solaris
+
+=item BSD::Resource on Solaris
+
+=item Net::SSLeay on Solaris
+
+=back
+
+=item SunOS 4.x
+
+=item AUTHOR
+
+=back
+
+=head2 perlsymbian, README.symbian - Perl version 5 on Symbian OS
+
+=over 4
+
+=item DESCRIPTION
+
+=over 4
+
+=item Compiling Perl on Symbian
+
+=item Compilation problems
+
+=item PerlApp
+
+=item sisify.pl
+
+=item Using Perl in Symbian
+
+=back
+
+=item TO DO
+
+=item WARNING
+
+=item NOTE
+
+=item AUTHOR
+
+=item COPYRIGHT
+
+=item LICENSE
+
+=item HISTORY
+
+=back
+
+=head2 perltru64, README.tru64 - Perl version 5 on Tru64 (formerly known as
+Digital UNIX formerly known as DEC OSF/1) systems
+
+=over 4
+
+=item DESCRIPTION
+
+=over 4
+
+=item Compiling Perl 5 on Tru64
+
+=item Using Large Files with Perl on Tru64
+
+=item Threaded Perl on Tru64
+
+=item Long Doubles on Tru64
+
+=item DB_File tests failing on Tru64
+
+=item 64-bit Perl on Tru64
+
+=item Warnings about floating-point overflow when compiling Perl on Tru64
+
+=back
+
+=item Testing Perl on Tru64
+
+=item ext/ODBM_File/odbm Test Failing With Static Builds
+
+=item Perl Fails Because Of Unresolved Symbol sockatmark
+
+=item AUTHOR
+
+=back
+
+=head2 perluts - Perl under UTS
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=item BUILDING PERL ON UTS
+
+=item Installing the built perl on UTS
+
+=item AUTHOR
+
+=back
+
+=head2 perlvmesa, README.vmesa - building and installing Perl for VM/ESA.
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=over 4
+
+=item Unpacking Perl Distribution on VM/ESA
+
+=item Setup Perl and utilities on VM/ESA
+
+=item Configure Perl on VM/ESA
+
+=item Testing Anomalies of Perl on VM/ESA
+
+=item Usage Hints for Perl on VM/ESA
+
+=back
+
+=item AUTHORS
+
+=item SEE ALSO
+
+=over 4
+
+=item Mailing list for Perl on VM/ESA
+
+=back
+
+=back
+
+=head2 perlvms - VMS-specific documentation for Perl
+
+=over 4
+
+=item DESCRIPTION
+
+=item Installation
+
+=item Organization of Perl Images
+
+=over 4
+
+=item Core Images
+
+=item Perl Extensions
+
+=item Installing static extensions
+
+=item Installing dynamic extensions
+
+=back
+
+=item File specifications
+
+=over 4
+
+=item Syntax
+
+=item Filename Case
+
+=item Symbolic Links
+
+=item Wildcard expansion
+
+=item Pipes
+
+=back
+
+=item PERL5LIB and PERLLIB
+
+=item The Perl Forked Debugger
+
+=item PERL_VMS_EXCEPTION_DEBUG
+
+=item Command line
+
+=over 4
+
+=item I/O redirection and backgrounding
+
+=item Command line switches
+
+-i, -S, -u
+
+=back
+
+=item Perl functions
+
+File tests, backticks, binmode FILEHANDLE, crypt PLAINTEXT, USER, die,
+dump, exec LIST, fork, getpwent, getpwnam, getpwuid, gmtime, kill, qx//,
+select (system call), stat EXPR, system LIST, time, times, unlink LIST,
+utime LIST, waitpid PID,FLAGS
+
+=item Perl variables
+
+%ENV, CRTL_ENV, CLISYM_[LOCAL], Any other string, $!, $^E, $?, $|
+
+=item Standard modules with VMS-specific differences
+
+=over 4
+
+=item SDBM_File
+
+=back
+
+=item Revision date
+
+=item AUTHOR
+
+=back
+
+=head2 perlvos, README.vos - Perl for Stratus VOS
+
+=over 4
+
+=item SYNOPSIS
+
+=item BUILDING PERL FOR VOS
+
+=item INSTALLING PERL IN VOS
+
+=item USING PERL IN VOS
+
+=over 4
+
+=item Restrictions of Perl on VOS
+
+=item Handling of underflow and overflow
+
+=back
+
+=item TEST STATUS
+
+=item SUPPORT STATUS
+
+=item AUTHOR
+
+=item LAST UPDATE
+
+=back
+
+=head2 perlwin32 - Perl under Windows
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=over 4
+
+=item Setting Up Perl on Win32
+
+Make, Command Shell, Borland C++, Microsoft Visual C++, Microsoft Visual
+C++ 2008 Express Edition, Microsoft Visual C++ 2005 Express Edition,
+Microsoft Visual C++ Toolkit 2003, Microsoft Platform SDK 64-bit Compiler,
+MinGW release 3 with gcc, MinGW release 1 with gcc
+
+=item Building
+
+=item Testing Perl on Win32
+
+=item Installation of Perl on Win32
+
+=item Usage Hints for Perl on Win32
+
+Environment Variables, File Globbing, Using perl from the command line,
+Building Extensions, Command-line Wildcard Expansion, Win32 Specific
+Extensions, Notes on 64-bit Windows
+
+=item Running Perl Scripts
+
+=item Miscellaneous Things
+
+=back
+
+=item BUGS AND CAVEATS
+
+=item ACKNOWLEDGEMENTS
+
+=item AUTHORS
+
+Gary Ng E<lt>71564.1743@CompuServe.COME<gt>, Gurusamy Sarathy
+E<lt>gsar@activestate.comE<gt>, Nick Ing-Simmons
+E<lt>nick@ing-simmons.netE<gt>, Jan Dubois E<lt>jand@activestate.comE<gt>,
+Steve Hay E<lt>steve.hay@uk.radan.comE<gt>
+
+=item SEE ALSO
+
+=item HISTORY
+
+=back
+
 =head1 PRAGMA DOCUMENTATION
 
 =head2 re - Perl pragma to alter regular expression behaviour
@@ -10900,7 +12533,7 @@ This probably does nothing, This works only on 5.10+
 
 =back
 
-=head2 lib - manipulate @INC at compile time
+=head2 lib - manipulate $^INCLUDE_PATH at compile time
 
 =over 4
 
@@ -10910,11 +12543,11 @@ This probably does nothing, This works only on 5.10+
 
 =over 4
 
-=item Adding directories to @INC
+=item Adding directories to $^INCLUDE_PATH
 
-=item Deleting directories from @INC
+=item Deleting directories from $^INCLUDE_PATH
 
-=item Restoring original @INC
+=item Restoring original $^INCLUDE_PATH
 
 =back
 
@@ -14154,6 +15787,18 @@ B<PERL_MM_MANIFEST_DEBUG>
 
 =back
 
+=head2 ExtUtils::Miniperl, writemain - write the C code for perlmain.c
+
+=over 4
+
+=item SYNOPSIS
+
+=item DESCRIPTION
+
+=item SEE ALSO
+
+=back
+
 =head2 ExtUtils::Mkbootstrap - make a bootstrap file for use by DynaLoader
 
 =over 4
@@ -14227,7 +15872,7 @@ errors()
 
 =back
 
-=head2 ExtUtils::testlib - add blib/* directories to @INC
+=head2 ExtUtils::testlib - add blib/* directories to $^INCLUDE_PATH
 
 =over 4
 
@@ -19755,10 +21400,10 @@ name space
 
 =item EXPECTED METHODS
 
-$class->PUSHED([$mode[,$fh]]), $obj->POPPED([$fh]),
-$obj->UTF8($bellowFlag,[$fh]), $obj->OPEN($path,$mode[,$fh]),
-$obj->BINMODE([,$fh]), $obj->FDOPEN($fd[,$fh]),
-$obj->SYSOPEN($path,$imode,$perm,[,$fh]), $obj->FILENO($fh),
+$class->PUSHED([$mode,[$fh]]), $obj->POPPED([$fh]),
+$obj->UTF8($bellowFlag,[$fh]), $obj->OPEN($path,$mode,[$fh]),
+$obj->BINMODE([$fh]), $obj->FDOPEN($fd,[$fh]),
+$obj->SYSOPEN($path,$imode,$perm,[$fh]), $obj->FILENO($fh),
 $obj->READ($buffer,$len,$fh), $obj->WRITE($buffer,$fh), $obj->FILL($fh),
 $obj->CLOSE($fh), $obj->SEEK($posn,$whence,$fh), $obj->TELL($fh),
 $obj->UNREAD($buffer,$fh), $obj->FLUSH($fh), $obj->SETLINEBUF($fh),
@@ -21150,11 +22795,11 @@ files
 
 $batchconv = Pod::Simple::HTMLBatch->new;, $batchconv->batch_convert(
 I<indirs>, I<outdir> );, $batchconv->batch_convert( undef    , ...);,
-$batchconv->batch_convert( q{@INC}, ...);, $batchconv->batch_convert(
-\@dirs , ...);, $batchconv->batch_convert( "somedir" , ...);,
-$batchconv->batch_convert( 'somedir:someother:also' , ...);,
-$batchconv->batch_convert( ... , undef );, $batchconv->batch_convert( ... ,
-'somedir' );
+$batchconv->batch_convert( q{$^INCLUDE_PATH}, ...);,
+$batchconv->batch_convert( \@dirs , ...);, $batchconv->batch_convert(
+"somedir" , ...);, $batchconv->batch_convert( 'somedir:someother:also' ,
+...);, $batchconv->batch_convert( ... , undef );,
+$batchconv->batch_convert( ... , 'somedir' );
 
 =over 4
 
@@ -21692,16 +23337,6 @@ set_prototype CODEREF, PROTOTYPE, tainted EXPR, weaken REF
 =back
 
 =head2 Search::Dict, look - search for key in dictionary file
-
-=over 4
-
-=item SYNOPSIS
-
-=item DESCRIPTION
-
-=back
-
-=head2 SelectSaver - save and restore selected file handle
 
 =over 4
 
@@ -23196,8 +24831,6 @@ don't all have manual pages yet:
 =item a2p
 
 =item dprofpp
-
-=item h2ph
 
 =item h2xs
 

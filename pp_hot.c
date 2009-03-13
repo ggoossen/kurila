@@ -1333,9 +1333,11 @@ PP(pp_entersub)
 	if (!SvROK(sv)) {
 	    const char *sym;
 	    STRLEN len;
-	    if (sv == &PL_sv_yes) {		/* unfound import, ignore */
+	    if (sv == &PL_sv_yes && PL_op->op_flags & OPf_SPECIAL) {	/* unfound import, ignore */
 		if (hasargs)
 		    SP = PL_stack_base + POPMARK;
+		if ( gimme != G_VOID )
+		    XPUSHs(&PL_sv_undef);
 		RETURN;
 	    }
 	    sym = SvPV_const(sv, len);

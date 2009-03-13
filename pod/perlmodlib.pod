@@ -105,7 +105,7 @@ Request less of something
 
 =item lib
 
-Manipulate @INC at compile time
+Manipulate $^INCLUDE_PATH at compile time
 
 =item mro
 
@@ -443,7 +443,7 @@ Converts Perl XS code into C code
 
 =item ExtUtils::testlib
 
-Add blib/* directories to @INC
+Add blib/* directories to $^INCLUDE_PATH
 
 =item Fatal
 
@@ -1004,10 +1004,6 @@ A selection of general-utility scalar subroutines
 =item Search::Dict
 
 Search for key in dictionary file
-
-=item SelectSaver
-
-Save and restore selected file handle
 
 =item Socket
 
