@@ -34,7 +34,7 @@ do {
     is( 0+$^CHILD_ERROR, 0, q(eof() doesn't segfault) );
 };
 
-open($try, ">", 'Io_argv1.tmp') or die "Can't open temp file: $^OS_ERROR";
+open($try, "<", 'Io_argv1.tmp') or die "Can't open temp file: $^OS_ERROR";
 close $try or die "Could not close: $^OS_ERROR";
 open($try, ">", 'Io_argv2.tmp') or die "Can't open temp file: $^OS_ERROR";
 close $try or die "Could not close: $^OS_ERROR";
@@ -42,7 +42,7 @@ close $try or die "Could not close: $^OS_ERROR";
 $^INPUT_RECORD_SEPARATOR = undef;
 my $i = 4;
 while ( ~< *ARGV) {
-    s/^/ok $i\n/;
+    s/^/ok $i - /;
     ++$i;
     print \*STDOUT, $_;
     next_test();
@@ -64,7 +64,7 @@ open \*STDIN, "<", 'Io_argv1.tmp' or die $^OS_ERROR;
 @ARGV = @();
 ok( !eof(\*STDIN),     'STDIN has something' );
 
-is( ~< *ARGV, "ok 4\n" );
+is( $(~< *ARGV), "a line\n" );
 
 open \*STDIN, '<', $devnull or die $^OS_ERROR;
 @ARGV = @( () );

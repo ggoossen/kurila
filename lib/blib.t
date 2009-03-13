@@ -70,7 +70,7 @@ elsif ($^OS_NAME ne 'MacOS')
 }
 
 
-ok( nelems(grep(m|\Q$blib_lib\E$|, $^INCLUDE_PATH[[0..1]]))  == 1,     "  $blib_lib in \@INC");
-ok( nelems(grep(m|\Q$blib_arch\E$|, $^INCLUDE_PATH[[0..1]])) == 1,     "  $blib_arch in \@INC");
+ok( nelems(grep({ m|\Q$blib_lib\E$| }, $^INCLUDE_PATH[[0..1]]))  == 1,     "  $blib_lib in \@INC");
+ok( nelems(grep({ m|\Q$blib_arch\E$| }, $^INCLUDE_PATH[[0..1]])) == 1,     "  $blib_arch in \@INC");
 
 END { _cleanup( < @blib_dirs ); }

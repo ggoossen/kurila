@@ -222,7 +222,7 @@ sub B::AV::debug {
     my @($av) =  @_;
     $av->B::SV::debug;
     my @array = $av->ARRAY;
-    print \*STDOUT, "\tARRAY\t\t(", join(", ", map("0x" . $$_, @array)), ")\n";
+    print \*STDOUT, "\tARRAY\t\t(", join(", ", map( {"0x" . $$_ }, @array)), ")\n";
     printf \*STDOUT, <<'EOT', scalar(nelems @array), < $av->MAX, < $av->OFF;
 	FILL		%d
 	MAX		%d

@@ -61,7 +61,7 @@ $Pod2man = "pod2man" .
 #
 # Option accessors...
 
-foreach my $subname ( map "opt_$_", split '', q{mhlvriFfXqnTdUL}) {
+foreach my $subname ( map { "opt_$_" }, split '', q{mhlvriFfXqnTdUL}) {
   *{Symbol::fetch_glob($subname)} = do{   sub () { shift->_elem($subname, < @_) } };
 }
 
@@ -346,7 +346,7 @@ sub init {
   );
 
   DEBUG +> 3 and printf \*STDOUT, "Formatter switches now: [\%s]\n",
-   join ' ', map "[$(join ' ',@$_)]", @{ $self->{'formatter_switches'} };
+   join ' ', map { "[$(join ' ',@$_)]" }, @{ $self->{'formatter_switches'} };
 
   $self->{+'translators'} = \@();
   $self->{+'extra_search_dirs'} = \@();
@@ -724,7 +724,7 @@ sub grand_search_init {
                 push(@searchdirs,'perl_root:[lib.pod]')  # installed pods
             }
             else {
-                push(@searchdirs, < grep(-d, split(config_value("path_sep"),
+                push(@searchdirs, < grep( {-d }, split(config_value("path_sep"),
                                                  env::var('PATH'))));
             }
         }
@@ -734,7 +734,7 @@ sub grand_search_init {
         }
         else {
             # no match, try recursive search
-            @searchdirs = grep(!m/^\.\z/s, $^INCLUDE_PATH);
+            @searchdirs = grep( {!m/^\.\z/s }, $^INCLUDE_PATH);
             @files= $self->searchfor(1,$page,< @searchdirs) if $self->opt_r;
             if ((nelems @files)) {
                 $self->aside( "Loosely found as $(join ' ',@files)\n" );
@@ -809,7 +809,7 @@ sub add_formatter_option { # $self->add_formatter_option('key' => 'value');
   push @{ $self->{'formatter_switches'} }, \ @_ if (nelems @_);
 
   DEBUG +> 3 and printf \*STDOUT, "Formatter switches now: [\%s]\n",
-   join ' ', map "[$(join ' ',@$_)]", @{ $self->{'formatter_switches'} };
+   join ' ', map { "[$(join ' ',@$_)]" }, @{ $self->{'formatter_switches'} };
   
   return;
 }
@@ -978,7 +978,7 @@ sub render_findings {
   my $file = $found_things->[0];
   
   DEBUG +> 3 and printf \*STDOUT, "Formatter switches now: [\%s]\n",
-   join ' ', map "[$(join ' ',@$_)]", @{ $self->{'formatter_switches'} };
+   join ' ', map { "[$(join ' ',@$_)]" }, @{ $self->{'formatter_switches'} };
 
   # Set formatter options:
   if( ref $formatter ) {
@@ -1059,7 +1059,7 @@ sub unlink_if_temp_file {
   return unless defined $file and length $file;
   
   my $temp_file_list = $self->{?'temp_file_list'} || return;
-  if(grep $_ eq $file, @$temp_file_list) {
+  if(grep { $_ eq $file }, @$temp_file_list) {
     $self->aside("Unlinking $file\n");
     unlink($file) or warn "Odd, couldn't unlink $file: $^OS_ERROR";
   } else {
@@ -1598,15 +1598,15 @@ sub searchfor {
 
 	if ($recurse) {
 	    opendir(my $d,$dir)	or die "Can't opendir $dir: $^OS_ERROR";
-	    my @newdirs = map < catfile($dir, $_), grep {
+	    my @newdirs = map { < catfile($dir, $_) }, grep {
 		not m/^\.\.?\z/s and
 		not m/^auto\z/s  and   # save time! don't search auto dirs
 		-d  catfile($dir, $_)
-	    } @( readdir $d);
+	    }, @( readdir $d);
 	    closedir($d)		or die "Can't closedir $dir: $^OS_ERROR";
 	    next unless (nelems @newdirs);
 	    # what a wicked map!
-	    @newdirs = map(@(s/\.dir\z//,$_)[1], @newdirs) if IS_VMS;
+	    @newdirs = map( {@(s/\.dir\z//,$_)[1] }, @newdirs) if IS_VMS;
 	    $self->aside( "Also looking in $(join ' ',@newdirs)\n" );
 	    push(@dirs,< @newdirs);
 	}

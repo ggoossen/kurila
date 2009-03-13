@@ -10,7 +10,7 @@ BEGIN {
    require "testcmp.pl";
    TestCompare->import();
    my $PARENTDIR = dirname $THISDIR;
-   push $^INCLUDE_PATH, < map { 'File::Spec'->catfile($_, 'lib') } @( ($PARENTDIR, $THISDIR));
+   push $^INCLUDE_PATH, < map { 'File::Spec'->catfile($_, 'lib') }, @( ($PARENTDIR, $THISDIR));
 }
 
 #use diagnostics;

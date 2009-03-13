@@ -19,7 +19,7 @@ my $a;
 my $Is_VMS = $^OS_NAME eq 'VMS';
 my $Is_MacOS = $^OS_NAME eq 'MacOS';
 
-my $path = join " ", map { qq["-I$_"] } $^INCLUDE_PATH;
+my $path = join " ", map { qq["-I$_"] }, $^INCLUDE_PATH;
 $path = '"-I../lib" "-Iperl_root:[lib]"' if $Is_VMS;   # gets too long otherwise
 my $redir = $Is_MacOS ?? "" !! "2>&1";
 
@@ -43,8 +43,8 @@ for my $newlex (@('', '-newlex')) {
 		     prog => 'my ($a,$b)', stderr => 1 );
     $na = padrep('$a',$newlex);
     $nb = padrep('$b',$newlex);
-    like ($out, qr/5: $na/ms, 'found $a in "my ($a,$b)"');
-    like ($out, qr/6: $nb/ms, 'found $b in "my ($a,$b)"');
+    like ($out, qr/4: $na/ms, 'found $a in "my ($a,$b)"');
+    like ($out, qr/5: $nb/ms, 'found $b in "my ($a,$b)"');
 
     print \*STDOUT, $out if $verbose;
 

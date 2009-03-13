@@ -219,7 +219,7 @@ elsif ((nelems @warnings) == (nelems @Expected_Warnings) + 1) {
 else {
     my $rule = " -" x 20;
     diag "/!\\ unexpected case: ", scalar nelems @warnings, " warnings\n$rule\n";
-    diag < map { "  $_" } @warnings;
+    diag < map { "  $_" }, @warnings;
     diag $rule, $^INPUT_RECORD_SEPARATOR;
 }
 

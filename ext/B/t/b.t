@@ -34,7 +34,7 @@ sub B::GV::find_syms {
     %main::Subs{+$symbol->STASH->NAME . '::' . $symbol->NAME}++;
 }
 
-my @syms = map { 'Testing::Symtable::'.$_ } qw(This That wibble moo car);
+my @syms = map { 'Testing::Symtable::'.$_ }, qw(This That wibble moo car);
 push @syms, "Testing::Symtable::Foo::yarrow";
 
 # Make sure we hit all the expected symbols.
@@ -43,7 +43,7 @@ do {
 };
 
 # Make sure we only hit them each once.
-ok( (!grep $_ != 1, values %Subs), '...and found once' );
+ok( (!grep { $_ != 1 }, values %Subs), '...and found once' );
 
 my $r = qr/foo/;
 my $obj = B::svref_2object($r);

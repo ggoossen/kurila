@@ -17,7 +17,7 @@ use Test::More tests => 3;
 
 # Having the CWD in $^INCLUDE_PATH masked a bug in finding hint files
 my $curdir = File::Spec->curdir;
-$^INCLUDE_PATH = grep { $_ ne $curdir && $_ ne '.' } $^INCLUDE_PATH;
+$^INCLUDE_PATH = grep { $_ ne $curdir && $_ ne '.' }, $^INCLUDE_PATH;
 
 mkdir('hints', 0777);
 (my $os = $^OS_NAME) =~ s/\./_/g;

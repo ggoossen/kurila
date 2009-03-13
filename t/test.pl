@@ -71,8 +71,8 @@ END {
 # messages
 sub _diag {
     return unless (nelems @_);
-    my @mess = map { m/^#/ ?? "$_\n" !! "# $_\n" }
- map { < split m/\n/ } @_;
+    my @mess = map { m/^#/ ?? "$_\n" !! "# $_\n" },
+    @+: map { split m/\n/ }, @_;
     my $func = $TODO ?? \&_print !! \&_print_stderr;
     $func->(< @mess);
 }

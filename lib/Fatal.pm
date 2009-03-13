@@ -50,7 +50,7 @@ sub write_invocation {
     }
     push @out, <<EOC;
 	\}
-	die "$name(\$(join ' ', map \{ dump::view(\$_) \} \@_): Do not expect to get \$(nelems(\@_)) arguments";
+	die "$name(\$(join ' ', map \{ dump::view(\$_) \}, \@_): Do not expect to get \$(nelems(\@_)) arguments";
 EOC
     return join '', @out;
   }
@@ -58,7 +58,7 @@ EOC
 
 sub one_invocation {
   my @($core, $call, $name, @< @argv) =  @_;
-  return qq{$call($(join ', ', @argv)) || die "Can't $name(\$(join ', ', map \{ dump::view(\$_) \} \@_))} . 
+  return qq{$call($(join ', ', @argv)) || die "Can't $name(\$(join ', ', map \{ dump::view(\$_) \}, \@_))} . 
     ($core ?? ': $^OS_ERROR' !! ', \$^OS_ERROR is \"$^OS_ERROR\"') . '"';
 }
 

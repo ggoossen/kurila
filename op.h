@@ -163,9 +163,6 @@ Deprecated.  Use C<GIMME_V> instead.
 /* Private for lvalues */
 #define OPpLVAL_INTRO	128	/* Lvalue must be localized or lvalue sub */
 
-/* Private for OP_LEAVE, OP_LEAVESUB, OP_LEAVESUBLV and OP_LEAVEWRITE */
-#define OPpREFCOUNTED		64	/* op_targ carries a refcount */
-
 /* Private for OP_MATCH and OP_SUBST{,CONST} */
 #define OPpRUNTIME		64	/* Pattern coming in on the stack */
 
@@ -178,6 +175,7 @@ Deprecated.  Use C<GIMME_V> instead.
 #define OPpDEREF_HV		64	/*   Want ref to HV. */
 #define OPpDEREF_SV		(32|64)	/*   Want ref to SV. */
   /* OP_ENTERSUB only */
+#define OPpENTERSUB_BLOCK       2       /* Accepts only one arguments which is assigned to my $_ */
 #define OPpENTERSUB_DB		16	/* Debug subroutine. */
 #define OPpENTERSUB_HASTARG	32	/* Called from OP tree. */
 #define OPpENTERSUB_NOMOD	64	/* Immune to mod() for :attrlist. */
@@ -247,9 +245,6 @@ Deprecated.  Use C<GIMME_V> instead.
 #define OPpFT_ACCESS		2	/* use filetest 'access' */
 #define OPpFT_STACKED		4	/* stacked filetest, as in "-f -x $f" */
 
-/* Private for OP_(MAP|GREP)(WHILE|START) */
-#define OPpGREP_LEX		2	/* iterate over lexical $_ */
-    
 /* Private for OP_ENTEREVAL */
 #define OPpEVAL_HAS_HH		2	/* Does it have a copy of %^H */
 
@@ -350,6 +345,13 @@ struct loop {
     OP *	op_lastop;
 };
 
+struct rootop {
+    BASEOP
+    OP *	op_first;
+    ROOTOP *	op_prev_root;
+    ROOTOP *	op_next_root;
+};
+
 #define cUNOPx(o)	((UNOP*)o)
 #define cBINOPx(o)	((BINOP*)o)
 #define cLISTOPx(o)	((LISTOP*)o)
@@ -408,6 +410,13 @@ struct loop {
 #define cSVOPo_sv		cSVOPx_sv(o)
 #define kSVOP_sv		cSVOPx_sv(kid)
 
+#define ROOTOPcpNULL(rootop) STMT_START {	\
+	if ((rootop)) {				\
+	    rootop_refcnt_dec((rootop));	\
+	    (rootop) = NULL;			\
+	}					\
+    } STMT_END
+
 #ifndef PERL_CORE
 #  define Nullop ((OP*)NULL)
 #endif
@@ -441,6 +450,7 @@ struct loop {
 #define OA_BASEOP_OR_UNOP (11 << OCSHIFT)
 #define OA_FILESTATOP (12 << OCSHIFT)
 #define OA_LOOPEXOP (13 << OCSHIFT)
+#define OA_ROOTOP (14 << OCSHIFT)
 
 #define OASHIFT 13
 
@@ -468,6 +478,7 @@ struct loop {
 #  define OP_REFCNT_UNLOCK		NOOP
 #  define OP_REFCNT_TERM		NOOP
 
+#define OpREFCNT(o)		((o)->op_targ)
 #define OpREFCNT_set(o,n)		((o)->op_targ = (n))
 #ifdef PERL_DEBUG_READONLY_OPS
 #  define OpREFCNT_inc(o)		Perl_op_refcnt_inc(aTHX_ o)
@@ -499,15 +510,11 @@ struct loop {
 #if defined(PL_OP_SLAB_ALLOC)
 #define NewOp(m,var,c,type)	\
 	(var = (type *) Perl_Slab_Alloc(aTHX_ c*sizeof(type)))
-#define NewOpSz(m,var,size)	\
-	(var = (OP *) Perl_Slab_Alloc(aTHX_ size))
 #define FreeOp(p) Perl_Slab_Free(aTHX_ p)
 #else
 #define NewOp(m, var, c, type)	\
 	(var = (MEM_WRAP_CHECK_(c,type) \
 	 (type*)PerlMemShared_calloc(c, sizeof(type))))
-#define NewOpSz(m, var, size)	\
-	(var = (OP*)PerlMemShared_calloc(1, size))
 #define FreeOp(p) PerlMemShared_free(p)
 #endif
 

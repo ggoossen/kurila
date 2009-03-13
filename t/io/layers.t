@@ -92,11 +92,11 @@ SKIP: do {
 		   $result[0] eq "unix" &&
 		   $result[1] eq "crlf";
 	}
-	if ($DOSISH && grep { $_ eq 'crlf' } $expected) {
+	if ($DOSISH && grep { $_ eq 'crlf' }, $expected) {
 	    # 5 tests potentially skipped because
 	    # DOSISH systems already have a CRLF layer
 	    # which will make new ones not stick.
-	    $expected = grep { $_ ne 'crlf' } $expected;
+	    $expected = grep { $_ ne 'crlf' }, $expected;
 	}
 	my $n = nelems $expected;
 	is(nelems($result), $n, "$id - layers == $n");

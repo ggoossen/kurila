@@ -162,89 +162,6 @@ S_is_container_magic(const MAGIC *mg)
 }
 
 /*
-=for apidoc mg_get
-
-Do magic after a value is retrieved from the SV.  See C<sv_magic>.
-
-=cut
-*/
-
-int
-Perl_mg_get(pTHX_ SV *sv)
-{
-    dVAR;
-    const I32 mgs_ix = SSNEW(sizeof(MGS));
-    const bool was_temp = (bool)SvTEMP(sv);
-    int have_new = 0;
-    MAGIC *newmg, *head, *cur, *mg;
-    /* guard against sv having being freed midway by holding a private
-       reference. */
-
-    PERL_ARGS_ASSERT_MG_GET;
-
-    /* sv_2mortal has this side effect of turning on the TEMP flag, which can
-       cause the SV's buffer to get stolen (and maybe other stuff).
-       So restore it.
-    */
-    sv_2mortal(SvREFCNT_inc_simple_NN(sv));
-    if (!was_temp) {
-	SvTEMP_off(sv);
-    }
-
-    save_magic(mgs_ix, sv);
-
-    /* We must call svt_get(sv, mg) for each valid entry in the linked
-       list of magic. svt_get() may delete the current entry, add new
-       magic to the head of the list, or upgrade the SV. AMS 20010810 */
-
-    newmg = cur = head = mg = SvMAGIC(sv);
-    while (mg) {
-	const MGVTBL * const vtbl = mg->mg_virtual;
-
-	if (!(mg->mg_flags & MGf_GSKIP) && vtbl && vtbl->svt_get) {
-	    CALL_FPTR(vtbl->svt_get)(aTHX_ sv, mg);
-
-	    /* guard against magic having been deleted - eg FETCH calling
-	     * untie */
-	    if (!SvMAGIC(sv))
-		break;
-
-	    /* Don't restore the flags for this entry if it was deleted. */
-	    if (mg->mg_flags & MGf_GSKIP)
-		(SSPTR(mgs_ix, MGS *))->mgs_flags = 0;
-	}
-
-	mg = mg->mg_moremagic;
-
-	if (have_new) {
-	    /* Have we finished with the new entries we saw? Start again
-	       where we left off (unless there are more new entries). */
-	    if (mg == head) {
-		have_new = 0;
-		mg   = cur;
-		head = newmg;
-	    }
-	}
-
-	/* Were any new entries added? */
-	if (!have_new && (newmg = SvMAGIC(sv)) != head) {
-	    have_new = 1;
-	    cur = mg;
-	    mg  = newmg;
-	}
-    }
-
-    restore_magic(INT2PTR(void *, (IV)mgs_ix));
-
-    if (SvREFCNT(sv) == 1) {
-	/* We hold the last reference to this SV, which implies that the
-	   SV was deleted as a side effect of the routines we called.  */
-	SvOK_off(sv);
-    }
-    return 0;
-}
-
-/*
 =for apidoc mg_set
 
 Do magic after a value is assigned to the SV.  See C<sv_magic>.
@@ -1777,8 +1694,7 @@ Perl_magic_set(pTHX_ const char* name, SV *sv)
 		    Perl_croak(aTHX_ "%s must be a hash not an %s", name, Ddesc(sv));
 		}
 		PL_hints |= HINT_LOCALIZE_HH;
-		HvREFCNT_dec(PL_compiling.cop_hints_hash);
-		PL_compiling.cop_hints_hash = SvHv(newSVsv(sv));
+		HVcpSTEAL(PL_compiling.cop_hints_hash, SvHv(newSVsv(sv)));
 		hv_sethv(PL_hinthv, SvHv(sv));
 		return;
 	    }
@@ -2384,77 +2300,6 @@ S_unwind_handler_stack(pTHX_ const void *p)
     if (flags & 64)
 	SvREFCNT_dec(PL_sig_sv);
 #endif
-}
-
-/*
-=for apidoc magic_sethint
-
-Triggered by a store to %^H, records the key/value pair to
-C<PL_compiling.cop_hints_hash>.  It is assumed that hints aren't storing
-anything that would need a deep copy.  Maybe we should warn if we find a
-reference.
-
-=cut
-*/
-int
-Perl_magic_sethint(pTHX_ SV *sv, MAGIC *mg)
-{
-    dVAR;
-    HV * new_hinthash;
-    if(!(mg->mg_len == HEf_SVKEY))
-	assert(mg->mg_len == HEf_SVKEY);
-
-    PERL_ARGS_ASSERT_MAGIC_SETHINT;
-
-    /* mg->mg_obj isn't being used.  If needed, it would be possible to store
-       an alternative leaf in there, with PL_compiling.cop_hints being used if
-       it's NULL. If needed for threads, the alternative could lock a mutex,
-       or take other more complex action.  */
-
-    /* Something changed in %^H, so it will need to be restored on scope exit.
-       Doing this here saves a lot of doing it manually in perl code (and
-       forgetting to do it, and consequent subtle errors.  */
-    PL_hints |= HINT_LOCALIZE_HH;
-
-    /* copy the hash, to preserve the old one */
-    new_hinthash = newHVhv(PL_compiling.cop_hints_hash);
-    HvREFCNT_dec(PL_compiling.cop_hints_hash);
-    PL_compiling.cop_hints_hash = new_hinthash;
-
-    (void)hv_store_ent(PL_compiling.cop_hints_hash, (SV *)mg->mg_ptr, newSVsv(sv), 0);
-    return 0;
-}
-
-/*
-=for apidoc magic_sethint
-
-Triggered by a delete from %^H, records the key to
-C<PL_compiling.cop_hints_hash>.
-
-=cut
-*/
-int
-Perl_magic_clearhint(pTHX_ SV *sv, MAGIC *mg)
-{
-    dVAR;
-    HV * new_hinthash;
-
-    PERL_ARGS_ASSERT_MAGIC_CLEARHINT;
-    PERL_UNUSED_ARG(sv);
-
-    assert(mg->mg_len == HEf_SVKEY);
-
-    PERL_UNUSED_ARG(sv);
-
-    PL_hints |= HINT_LOCALIZE_HH;
-
-    /* copy the hash, to preserve the old one */
-    new_hinthash = newHVhv(PL_compiling.cop_hints_hash);
-    HvREFCNT_dec(PL_compiling.cop_hints_hash);
-    PL_compiling.cop_hints_hash = new_hinthash;
-
-    (void)hv_delete_ent(PL_compiling.cop_hints_hash, (SV *)mg->mg_ptr, 0, 0);
-    return 0;
 }
 
 /*

@@ -427,7 +427,7 @@ sub viewSortKey
 sub visualizeSortKey
 {
     my $self = shift;
-    my $view = join " ", map sprintf("\%04X", $_), @( unpack(KEY_TEMPLATE, shift));
+    my $view = join " ", map { sprintf("\%04X", $_) }, @( unpack(KEY_TEMPLATE, shift));
 
     if ($self->{?UCA_Version} +<= 8) {
 	$view =~ s/ ?0000 ?/|/g;
@@ -582,7 +582,7 @@ sub getWt
     my $der  = $self->{?derivCode};
 
     return if !defined $u;
-    return map(_varCE($vbl, $_), @{ $map->{$u} })
+    return map( {_varCE($vbl, $_) }, @{ $map->{$u} })
 	if $map->{?$u};
 
     # JCPS must not be a contraction, then it's a code point.
@@ -590,7 +590,7 @@ sub getWt
 	my $hang = $self->{?overrideHangul};
 	my @hangulCE;
 	if ($hang) {
-	    @hangulCE = map(pack(VCE_TEMPLATE, < NON_VAR, < @$_), &$hang($u));
+	    @hangulCE = map( {pack(VCE_TEMPLATE, < NON_VAR, < @$_) }, &$hang($u));
 	}
 	elsif (!defined $hang) {
 	    @hangulCE = $der->($u);
@@ -620,23 +620,23 @@ sub getWt
 		}
 	    }
 
-	    @hangulCE = map({
-		    $map->{?$_} ?? < @{ $map->{?$_} } !! < $der->($_);
-		} @decH);
+	    @hangulCE = @+: map({
+		    $map->{?$_} ?? @{ $map->{?$_} } !! $der->($_);
+		}, @decH);
 	}
-	return map _varCE($vbl, $_), @hangulCE;
+	return map { _varCE($vbl, $_) }, @hangulCE;
     }
     elsif (_isUIdeo($u, $self->{?UCA_Version})) {
 	my $cjk  = $self->{?overrideCJK};
-	return map { _varCE($vbl, $_) }
+	return map { _varCE($vbl, $_) },
  @(	    $cjk
-		?? < map(pack(VCE_TEMPLATE, NON_VAR, < @$_), &$cjk($u))
+		?? < map( {pack(VCE_TEMPLATE, NON_VAR, < @$_) }, &$cjk($u))
 		!! defined $cjk && $self->{?UCA_Version} +<= 8 && $u +< 0x10000
 		    ?? _uideoCE_8($u)
 		    !! < $der->($u));
     }
     else {
-	return map { _varCE($vbl, $_) } $der->($u);
+	return map { _varCE($vbl, $_) }, $der->($u);
     }
 }
 
@@ -729,7 +729,7 @@ sub getSortKey
 	}
     }
 
-    return join LEVEL_SEP, map pack(KEY_TEMPLATE, < @$_), @ret;
+    return join LEVEL_SEP, map { pack(KEY_TEMPLATE, < @$_) }, @ret;
 }
 
 
@@ -745,9 +745,9 @@ sub ne  { @_[0]->getSortKey(@_[1]) ne  @_[0]->getSortKey(@_[2]) }
 ##
 sub sort {
     my $obj = shift;
-    return map { $_[1] }
-           sort { $a[0] cmp $b[0] }
-             map { @( $obj->getSortKey($_), $_) } @_;
+    return map { $_[1] },
+           sort { $a[0] cmp $b[0] },
+             map { @( $obj->getSortKey($_), $_) }, @_;
 }
 
 
@@ -822,7 +822,7 @@ sub getWtHangulTerm {
 ##
 ## "hhhh hhhh hhhh" to (dddd, dddd, dddd)
 ##
-sub _getHexArray { map hex, @( @_[0] =~ m/([0-9a-fA-F]+)/g) }
+sub _getHexArray { map { hex }, @( @_[0] =~ m/([0-9a-fA-F]+)/g) }
 
 #
 # $code *must* be in Hangul syllable.
@@ -871,7 +871,7 @@ sub _nonIgnorAtLevel($$)
     my $wt = shift;
     return if ! defined $wt;
     my $lv = shift;
-    return grep($wt->[$_-1] != 0, MinLevel..$lv) ?? TRUE !! FALSE;
+    return grep( {$wt->[$_-1] != 0 }, MinLevel..$lv) ?? TRUE !! FALSE;
 }
 
 ##
@@ -925,7 +925,7 @@ sub index
     if (! nelems @$subE) {
 	my $temp = $pos +<= 0 ?? 0 !! $len +<= $pos ?? $len !! $pos;
 	return $grob
-	    ?? map(\@($_, 0), $temp..$len)
+	    ?? map( {\@($_, 0) }, $temp..$len)
 	    !! @($temp,0);
     }
     $len +< $pos
@@ -937,7 +937,7 @@ sub index
     my(@strWt, @iniPos, @finPos, @subWt, @g_ret);
 
     my $last_is_variable;
-    for my $vwt ( map < $self->getWt($_), @$subE) {
+    for my $vwt ( @+: map { $self->getWt($_) }, @$subE) {
 	my @($var, @< @wt) = @: unpack(VCE_TEMPLATE, $vwt);
 	my $to_be_pushed = _nonIgnorAtLevel(\@wt,$lev);
 
@@ -1058,7 +1058,7 @@ sub gmatch
     my $self = shift;
     my $str  = shift;
     my $sub  = shift;
-    return map substr($str, $_->[0], $_->[1]),
+    return map { substr($str, $_->[0], $_->[1]) },
 		$self->index($str, $sub, 0, 'g');
 }
 

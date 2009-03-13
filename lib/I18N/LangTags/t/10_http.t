@@ -7,7 +7,7 @@ use env;
 use Test;
 BEGIN { plan tests => 87 };
 
-my @in = grep m/\S/, split m/\n/, q{
+my @in = grep { m/\S/ }, split m/\n/, q{
 
 [ sv      ]  sv
 [ en      ]  en

@@ -1121,20 +1121,17 @@ Perl_gp_free(pTHX_ GV *gv)
 }
 
 void
-Perl_gp_tmprefcnt(pTHX_ GV *gv)
+Perl_gp_tmprefcnt(pTHX_ GP *gp)
 {
     dVAR;
-    GP* gp;
+
     PERL_ARGS_ASSERT_GP_TMPREFCNT;
 
-    if (!gv || !isGV_with_GP(gv) || !(gp = GvGP(gv)))
-	return;
-
     SvTMPREFCNT_inc(gp->gp_sv);
-    SvTMPREFCNT_inc(gp->gp_av);
-    SvTMPREFCNT_inc(gp->gp_hv);
-    SvTMPREFCNT_inc(gp->gp_io);
-    SvTMPREFCNT_inc(gp->gp_cv);
+    AvTMPREFCNT_inc(gp->gp_av);
+    HvTMPREFCNT_inc(gp->gp_hv);
+    IoTMPREFCNT_inc(gp->gp_io);
+    CvTMPREFCNT_inc(gp->gp_cv);
 }
 
 /* Updates and caches the CV's */

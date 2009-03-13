@@ -79,7 +79,7 @@ package main;
 
 sub check_for_bonus_files {
   my $dir = shift;
-  my %expect = %( < map {($^OS_NAME eq 'VMS' ?? lc($_) !! $_), 1} @_ );
+  my %expect = %( < @+: map { @: ($^OS_NAME eq 'VMS' ?? lc($_) !! $_), 1}, @_ );
 
   my $fail;
   opendir my $dh, $dir or die "opendir '$dir': $^OS_ERROR";
@@ -464,7 +464,7 @@ EOT
 
   # Automatically compile the list of all the macro names, and make them
   # exported constants.
-  my @export_names = map {(ref $_) ?? $_->{name} !! $_} @items;
+  my @export_names = map {(ref $_) ?? $_->{name} !! $_}, @items;
 
   # Exporter::Heavy (currently) isn't able to export the last 3 of these:
   push @items, < @common_items;

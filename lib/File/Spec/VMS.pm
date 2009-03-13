@@ -88,7 +88,7 @@ cases (e.g. elements other than the first being absolute filespecs).
 sub catdir {
     my $self = shift;
     my $dir = pop;
-    my @dirs = @( < grep {defined() && length()} @_ );
+    my @dirs = grep {defined() && length()}, @_ ;
 
     my $rslt;
     if (@dirs) {
@@ -122,7 +122,7 @@ VMS-syntax file specification.
 sub catfile {
     my $self = shift;
     my $file = $self->canonpath(pop());
-    my @files = @(< grep {defined() && length()} @_);
+    my @files = @(< grep {defined() && length()}, @_);
 
     my $rslt;
     if (@files) {
@@ -317,7 +317,7 @@ Use VMS syntax when converting filespecs.
 sub abs2rel {
     my $self = shift;
     return vmspath(File::Spec::Unix::abs2rel( $self, < @_ ))
-        if grep m{/}, @_;
+        if grep { m{/} }, @_;
 
     my @($path,$base) = @_;
     $base = $self->_cwd() unless defined $base and length $base;
@@ -436,7 +436,7 @@ sub eliminate_macros {
     $self = \%() unless ref $self;
 
     if ($path =~ m/\s/) {
-      return join ' ', map { $self->eliminate_macros($_) } split m/\s+/, $path;
+      return join ' ', map { $self->eliminate_macros($_) }, split m/\s+/, $path;
     }
 
     my $npath = unixify($path);
@@ -475,7 +475,7 @@ sub fixpath {
 
     if ($path =~ m/\s/) {
       return join ' ',
-             map { $self->fixpath($_,$force_path) }
+             map { $self->fixpath($_,$force_path) },
 	     split m/\s+/, $path;
     }
 

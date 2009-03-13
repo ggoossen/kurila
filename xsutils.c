@@ -74,7 +74,6 @@ XS(XS_attributes__fetch_attrs)
     dVAR;
     dXSARGS;
     SV *rv, *sv;
-    cv_flags_t cvflags;
     PERL_UNUSED_ARG(cv);
 
     if (items != 1) {
@@ -90,13 +89,6 @@ usage:
     sv = SvRV(rv);
 
     switch (SvTYPE(sv)) {
-    case SVt_PVCV:
-	cvflags = CvFLAGS((CV*)sv);
-	if (cvflags & CVf_LOCKED)
-	    XPUSHs(newSVpvs_flags("locked", SVs_TEMP));
-	if (cvflags & CVf_METHOD)
-	    XPUSHs(newSVpvs_flags("method", SVs_TEMP));
-	break;
     case SVt_PVGV:
 	if (GvUNIQUE(sv))
 	    XPUSHs(newSVpvs_flags("unique", SVs_TEMP));

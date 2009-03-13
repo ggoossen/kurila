@@ -6,11 +6,11 @@ use warnings;
 our $VERSION     = "0.09";
 our @ISA         = qw(Exporter);
 my @XS_FUNCTIONS = qw(regmust);
-my %XS_FUNCTIONS = %( < map { $_ => 1 } @XS_FUNCTIONS );
+my %XS_FUNCTIONS = %( < @+: map { @: $_ => 1 }, @XS_FUNCTIONS );
 our @EXPORT_OK   = @(< @XS_FUNCTIONS, <
                     qw(is_regexp regexp_pattern
                        regname regnames regnames_count));
-our %EXPORT_OK = %( < map { $_ => 1 } @EXPORT_OK );
+our %EXPORT_OK = %( < @+: map { @: $_ => 1 }, @EXPORT_OK );
 
 # *** WARNING *** WARNING *** WARNING *** WARNING *** WARNING ***
 #
@@ -34,7 +34,7 @@ sub setcolor {
   my $terminal = Term::Cap->Tgetent(\%(OSPEED => 9600)); # Avoid warning.
   my $props = env::var('PERL_RE_TC') || 'md,me,so,se,us,ue';
   my @props = split m/,/, $props;
-  my $colors = join "\t", map {$terminal->Tputs($_,1)} @props;
+  my $colors = join "\t", map {$terminal->Tputs($_,1)}, @props;
 
   $colors =~ s/\0//g;
   env::set_var('PERL_RE_COLORS' => $colors);
@@ -150,7 +150,7 @@ sub bits {
 	    re->export_to_level(2, 're', $s);
 	} else {
 	    warn("Unknown \"re\" subpragma '$s' (known ones are: "
-                 . join(', ', map {qq('$_')} @( 'debug', 'debugcolor', < sort keys %bitmask))
+                 . join(', ', map {qq('$_')}, @( 'debug', 'debugcolor', < sort keys %bitmask))
                  . ")");
 	}
     }

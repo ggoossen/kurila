@@ -29,7 +29,7 @@ $sub->();
 
 # now build some regexes that should match the dumped ops
 my @($hex, $op) = @('\(0x[a-f0-9]+\)', '\s+\w+');
-my %ops = %( < map { $_ => qr/$_ $hex$op/ }
+my %ops = %( < @+: map { @: $_ => qr/$_ $hex$op/ },
 	qw ( OP	COP LOOP PMOP UNOP BINOP LOGOP LISTOP PVOP ) );
 
 # split up the output lines into individual ops (terse is, well, terse!)
@@ -83,7 +83,7 @@ sub bar {
 }
 
 # Schwern's example of finding an RV
-my $path = join " ", map { qq["-I$_"] } $^INCLUDE_PATH;
+my $path = join " ", map { qq["-I$_"] }, $^INCLUDE_PATH;
 $path = '-I::lib -MMac::err=unix' if $^OS_NAME eq 'MacOS';
 my $redir = $^OS_NAME eq 'MacOS' ?? '' !! "2>&1";
 my $items = qx{$^EXECUTABLE_NAME $path "-MO=Terse" -le "print \\*STDOUT, \\42" $redir};

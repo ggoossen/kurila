@@ -51,7 +51,7 @@ sub test_regexp ($$) {
 
 my $str;
 
-$str = join "", map chr($_), 0x20 .. 0x6F;
+$str = join "", map { chr($_) }, 0x20 .. 0x6F;
 
 # make sure it finds built-in class
 is(@($str =~ m/(\p{Letter}+)/)[0], 'ABCDEFGHIJKLMNOPQRSTUVWXYZ');
@@ -97,7 +97,7 @@ sub char_range {
 
     my $str;
 
-    $str = join "", map { chr $_ } $h1 .. (($h2 || $h1) + 1);
+    $str = join "", map { chr $_ }, $h1 .. (($h2 || $h1) + 1);
 
     return $str;
 }
@@ -114,7 +114,7 @@ while (my @(?$abbrev, ?$files) =@( each %utf8::PVA_abbr_map)) {
     );
 
     next unless -e $filename;
-    my @($h1, $h2) =  map hex, (split(m/\t/, (do $filename), 3))[[0..1]];
+    my @($h1, $h2) =  map { hex }, (split(m/\t/, (do $filename), 3))[[0..1]];
 
     my $str = char_range($h1, $h2);
 
@@ -135,7 +135,7 @@ for my $p (@('gc', 'sc')) {
     );
 
     next unless -e $filename;
-    my @($h1, $h2) =  map hex, (split(m/\t/, (do $filename), 3))[[0..1]];
+    my @($h1, $h2) =  map { hex }, (split(m/\t/, (do $filename), 3))[[0..1]];
 
     my $str = char_range($h1, $h2);
 
@@ -177,7 +177,7 @@ do {
 
     my $filename = 'File::Spec'->catfile($dirname, $leafname);
 
-    my @($h1, $h2) =  map hex, split(m/\t/, (do $filename), 3)[[0..1]];
+    my @($h1, $h2) =  map { hex }, split(m/\t/, (do $filename), 3)[[0..1]];
 
     my $str = char_range($h1, $h2);
 
@@ -193,7 +193,7 @@ do {
 };
 
 # test the blocks (InFoobar)
-for ( grep %utf8::Canonical{?$_} =~ m/^In/, keys %utf8::Canonical) {
+for ( grep { %utf8::Canonical{?$_} =~ m/^In/ }, keys %utf8::Canonical) {
   my $filename = 'File::Spec'->catfile(
     $updir => lib => unicore => lib => gc_sc => "%utf8::Canonical{?$_}.pl"
   );
@@ -202,7 +202,7 @@ for ( grep %utf8::Canonical{?$_} =~ m/^In/, keys %utf8::Canonical) {
 
   print \*STDOUT, "# In$_ $filename\n";
 
-  my @($h1, $h2) =  map hex, split(m/\t/, (do $filename), 3)[[0..1]];
+  my @($h1, $h2) =  map { hex }, split(m/\t/, (do $filename), 3)[[0..1]];
 
   my $str = char_range($h1, $h2);
 

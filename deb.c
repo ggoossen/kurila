@@ -58,10 +58,21 @@ Perl_vdeb(pTHX_ const char *pat, va_list *args)
 {
 #ifdef DEBUGGING
     dVAR;
-    const char* const file = "<fixme>";
+    const char* file = "<fixme>";
     const char* const display_file = file ? file : "<free>";
-    const long line = 0;
+    long line = 0;
 
+    if (PL_op) {
+	SV* loc = PL_op->op_location;
+	if (loc && SvAVOK(loc)) {
+	    SV ** loc0 = av_fetch((AV*)loc, 0, FALSE);
+	    SV ** loc1 = av_fetch((AV*)loc, 1, FALSE);
+	    if (SvPOK(*loc0))
+		file = SvPVX_const(*loc0);
+	    if (SvIOK(*loc1))
+		line = SvIV(*loc1);
+	}
+    }
     PERL_ARGS_ASSERT_VDEB;
 
     if (DEBUG_v_TEST)

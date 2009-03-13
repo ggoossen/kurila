@@ -23,8 +23,8 @@ sub new { return bless \%(), ref(@_[0]) || @_[0] }
 sub parse_from_file {
   my $self = shift;
   
-  my @options = map {; $_, $self->{?$_} }
- grep !m/^_/s,
+  my @options = @+: map { @: $_, $self->{?$_} },
+ grep { !m/^_/s },
         keys %$self
   ;
   

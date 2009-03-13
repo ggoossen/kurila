@@ -402,9 +402,8 @@ PP(pp_warn)
 	PUSHMARK(MARK);
 	XPUSHs(PL_op->op_location);
 	PUTBACK;
-	call_sv(PL_errorcreatehook, G_SCALAR);
+	tmpsv = call_sv(PL_errorcreatehook, G_SCALAR);
 	SPAGAIN;
-	tmpsv = POPs;
 	PUTBACK;
 	LEAVE;
     }
@@ -422,9 +421,8 @@ PP(pp_warn)
 	XPUSHs(sv_2mortal(newSVpvs("Warning: something's wrong")));
 	XPUSHs(PL_op->op_location);
 	PUTBACK;
-	call_sv(PL_errorcreatehook, G_SCALAR);
+	tmpsv = call_sv(PL_errorcreatehook, G_SCALAR);
 	SPAGAIN;
-	tmpsv = POPs;
 	PUTBACK;
 	LEAVE;
     }
@@ -446,9 +444,8 @@ PP(pp_die)
 	PUSHMARK(MARK);
 	XPUSHs(PL_op->op_location);
 	PUTBACK;
-	call_sv(PL_errorcreatehook, G_SCALAR);
+	tmpsv = call_sv(PL_errorcreatehook, G_SCALAR);
 	SPAGAIN;
-	tmpsv = POPs;
 	PUTBACK;
 	LEAVE;
     }
@@ -472,9 +469,8 @@ PP(pp_die)
 	XPUSHs(newSVpvs_flags("Died", SVs_TEMP));
 	XPUSHs(PL_op->op_location);
 	PUTBACK;
-	call_sv(PL_errorcreatehook, G_SCALAR);
+	tmpsv = call_sv(PL_errorcreatehook, G_SCALAR);
 	SPAGAIN;
-	tmpsv = POPs;
 	PUTBACK;
 	LEAVE;
     }

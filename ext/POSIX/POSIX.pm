@@ -19,14 +19,14 @@ my $loaded;
 sub import {
     load_imports() unless $loaded++;
     my $this = shift;
-    my @list = map { m/^\w+_h$/ ?? ":$_" !! $_ } @_;
+    my @list = map { m/^\w+_h$/ ?? ":$_" !! $_ }, @_;
     local $Exporter::ExportLevel = 1;
     Exporter::import($this,< @list);
 }
 
 XSLoader::load 'POSIX', $VERSION;
 
-my %NON_CONSTS = %(< map {($_,1)}
+my %NON_CONSTS = %(< @+: map {@($_,1)},
                   qw(S_ISBLK S_ISCHR S_ISDIR S_ISFIFO S_ISREG WEXITSTATUS
                      WIFEXITED WIFSIGNALED WIFSTOPPED WSTOPSIG WTERMSIG));
 
@@ -646,7 +646,7 @@ sub getgid {
 sub getgroups {
     usage "getgroups()" if (nelems @_) != 0;
     my %seen;
-    grep(!%seen{+$_}++, split(' ', $^EGID ));
+    grep( {!%seen{+$_}++ }, split(' ', $^EGID ));
 }
 
 sub getlogin {
@@ -866,7 +866,7 @@ sub load_imports {
 do {
   # De-duplicate the export list: 
   my %export;
-   %export{[ map {< @$_} values %EXPORT_TAGS]} = @();
+   %export{[ @+: map {@$_}, values %EXPORT_TAGS]} = @();
   # Doing the de-dup with a temporary hash has the advantage that the SVs in
   # @EXPORT are actually shared hash key sacalars, which will save some memory.
   push @EXPORT, < keys %export;

@@ -109,7 +109,7 @@ sub fileparse {
 
   my($dirpath, $basename);
 
-  if (grep { $type eq $_ } qw(MSDOS DOS MSWin32 Epoc)) {
+  if (grep { $type eq $_ }, qw(MSDOS DOS MSWin32 Epoc)) {
     @($dirpath,$basename) = @($fullname =~ m/^((?:.*[:\\\/])?)(.*)/s);
     $dirpath .= '.\' unless $dirpath =~ m/[\\\/]\z/;
   }
@@ -204,7 +204,7 @@ sub basename {
   # character present in string (after first stripping trailing slashes)
   _strip_trailing_sep($path);
 
-  my@($basename, $dirname, $suffix) =  fileparse( $path, < map("\Q$_\E", @_) );
+  my@($basename, $dirname, $suffix) =  fileparse( $path, < map( {"\Q$_\E" }, @_) );
 
   # From BSD basename(1)
   # The suffix is not stripped if it is identical to the remaining 
@@ -288,7 +288,7 @@ sub dirname {
 	}
 	$dirname .= ":" unless $dirname =~ m/:\z/;
     }
-    elsif (grep { $type eq $_ } qw(MSDOS DOS MSWin32 OS2)) { 
+    elsif (grep { $type eq $_ }, qw(MSDOS DOS MSWin32 OS2)) { 
         _strip_trailing_sep($dirname);
         unless( length($basename) ) {
 	    @($basename,$dirname, _) =  fileparse $dirname;
@@ -319,7 +319,7 @@ sub _strip_trailing_sep  {
     if ($type eq 'MacOS') {
         @_[0] =~ s/([^:]):\z/$1/s;
     }
-    elsif (grep { $type eq $_ } qw(MSDOS DOS MSWin32 OS2)) { 
+    elsif (grep { $type eq $_ }, qw(MSDOS DOS MSWin32 OS2)) { 
         @_[0] =~ s/([^:])[\\\/]*\z/$1/;
     }
     else {
@@ -371,7 +371,7 @@ sub fileparse_set_fstype {
         }
 
         $Fileparse_igncase = 
-          (grep $Fileparse_fstype eq $_, @Ignore_Case) ?? 1 !! 0;
+          (grep { $Fileparse_fstype eq $_ }, @Ignore_Case) ?? 1 !! 0;
     }
 
     return $old;

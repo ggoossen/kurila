@@ -90,26 +90,6 @@ Perl_sv_unref(pTHX_ SV *sv)
     sv_unref_flags(sv, 0);
 }
 
-/* sv_2iv() is now a macro using Perl_sv_2iv_flags();
- * this function provided for binary compatibility only
- */
-
-IV
-Perl_sv_2iv(pTHX_ register SV *sv)
-{
-    return sv_2iv_flags(sv, SV_GMAGIC);
-}
-
-/* sv_2uv() is now a macro using Perl_sv_2uv_flags();
- * this function provided for binary compatibility only
- */
-
-UV
-Perl_sv_2uv(pTHX_ register SV *sv)
-{
-    return sv_2uv_flags(sv, SV_GMAGIC);
-}
-
 /* sv_2pv() is now a macro using Perl_sv_2pv_flags();
  * this function provided for binary compatibility only
  */
@@ -117,7 +97,7 @@ Perl_sv_2uv(pTHX_ register SV *sv)
 char *
 Perl_sv_2pv(pTHX_ register SV *sv, STRLEN *lp)
 {
-    return sv_2pv_flags(sv, lp, SV_GMAGIC);
+    return sv_2pv_flags(sv, lp, 0);
 }
 
 /*
@@ -161,7 +141,7 @@ Perl_sv_setsv(pTHX_ SV *dstr, register SV *sstr)
 {
     PERL_ARGS_ASSERT_SV_SETSV;
 
-    sv_setsv_flags(dstr, sstr, SV_GMAGIC);
+    sv_setsv_flags(dstr, sstr, 0);
 }
 
 /* sv_catpvn() is now a macro using Perl_sv_catpvn_flags();
@@ -173,7 +153,7 @@ Perl_sv_catpvn(pTHX_ SV *dsv, const char* sstr, STRLEN slen)
 {
     PERL_ARGS_ASSERT_SV_CATPVN;
 
-    sv_catpvn_flags(dsv, sstr, slen, SV_GMAGIC);
+    sv_catpvn_flags(dsv, sstr, slen, 0);
 }
 
 /*
@@ -189,7 +169,7 @@ Perl_sv_catpvn_mg(pTHX_ register SV *sv, register const char *ptr, register STRL
 {
     PERL_ARGS_ASSERT_SV_CATPVN_MG;
 
-    sv_catpvn_flags(sv,ptr,len,SV_GMAGIC|SV_SMAGIC);
+    sv_catpvn_flags(sv,ptr,len,SV_SMAGIC);
 }
 
 /* sv_catsv() is now a macro using Perl_sv_catsv_flags();
@@ -201,7 +181,7 @@ Perl_sv_catsv(pTHX_ SV *dstr, register SV *sstr)
 {
     PERL_ARGS_ASSERT_SV_CATSV;
 
-    sv_catsv_flags(dstr, sstr, SV_GMAGIC);
+    sv_catsv_flags(dstr, sstr, 0);
 }
 
 /*
@@ -217,7 +197,7 @@ Perl_sv_catsv_mg(pTHX_ SV *dsv, register SV *ssv)
 {
     PERL_ARGS_ASSERT_SV_CATSV_MG;
 
-    sv_catsv_flags(dsv,ssv,SV_GMAGIC|SV_SMAGIC);
+    sv_catsv_flags(dsv,ssv,SV_SMAGIC);
 }
 
 /*
@@ -345,7 +325,7 @@ Perl_sv_pvn_force(pTHX_ SV *sv, STRLEN *lp)
 {
     PERL_ARGS_ASSERT_SV_PVN_FORCE;
 
-    return sv_pvn_force_flags(sv, lp, SV_GMAGIC);
+    return sv_pvn_force_flags(sv, lp, 0);
 }
 
 int

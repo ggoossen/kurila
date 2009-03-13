@@ -3,7 +3,7 @@
 use warnings;
 
 use feature ":5.10";
-use Test::More tests => 53;
+use Test::More tests => 52;
 
 use B::Deparse;
 my $deparse = B::Deparse->new();
@@ -75,17 +75,16 @@ TODO: do {
 my $Is_VMS = $^OS_NAME eq 'VMS';
 my $Is_MacOS = $^OS_NAME eq 'MacOS';
 
-my $path = join " ", map { qq["-I$_"] } $^INCLUDE_PATH;
+my $path = join " ", map { qq["-I$_"] }, $^INCLUDE_PATH;
 $path .= " -MMac::err=unix" if $Is_MacOS;
 my $redir = $Is_MacOS ?? "" !! "2>&1";
 
-$a = `$^EXECUTABLE_NAME $path "-MO=Deparse" -anlwi.bak -e 1 $redir`;
+$a = `$^EXECUTABLE_NAME $path "-MO=Deparse" -anlw -e 1 $redir`;
 $a =~ s/-e syntax OK\n//g;
 $a =~ s/.*possible typo.*\n//;	   # Remove warning line
 $a =~ s{\\340\\242}{\\s} if (ord("\\") == 224); # EBCDIC, cp 1047 or 037
 $a =~ s{\\274\\242}{\\s} if (ord("\\") == 188); # $^O eq 'posix-bc'
 $b = <<'EOF';
-BEGIN { $^INPLACE_EDIT = ".bak"; }
 BEGIN { $^WARNING = 1; }
 BEGIN { $^INPUT_RECORD_SEPARATOR = "\n"; $^OUTPUT_RECORD_SEPARATOR = "\n"; }
 LINE: while (defined($_ = ~< *ARGV)) {
@@ -148,7 +147,7 @@ __DATA__
 do {
     no warnings;
     '???';
-    2
+    2;
 };
 ####
 # 4
@@ -176,8 +175,8 @@ print *STDOUT, @main::x[1];
 my %x;
 %x{warn()};
 ####
-# 0 TODO
-my @($x, $y) = @('xx', 'yy');
+# 0
+@(my $x, my $y) = @('xx', 'yy');
 ####
 # 0 TODO range
 my @x = @( 1..10 );
@@ -197,6 +196,8 @@ s/x/$( 'y' )/;
 ####
 # 16 - various lypes of loop
 do { my $x };
+>>>>
+do { my $x; };
 ####
 # 17
 while (1) { my $k; }
@@ -245,26 +246,27 @@ print *STDOUT, reverse(sort(@x));
 ####
 # 30
 my @x;
-print *STDOUT, (sort {$b cmp $a} @x);
-####
-# 31
+print *STDOUT, (sort {$b cmp $a} , @x);
+>>>>
 my @x;
-print *STDOUT, reverse((sort {$b <+> $a} @x));
+print *STDOUT, sort(sub { $main::b cmp $main::a; } , @x);
 ####
 # 32
 print *STDOUT, $_ foreach (reverse @main::a);
 ####
 # 33 TODO range
-print *STDOUT, $_ foreach (reverse 1, 2..5);
+print *STDOUT, $_ foreach (reverse 2..5);
 ####
 # 34  (bug #38684)
 @main::ary = @(split(' ', 'foo', 0));
 ####
 # 35 (bug #40055)
 do { () }; 
+>>>>
+do { (); }; 
 ####
 # 36 (ibid.)
-do { my $x = 1; $x }; 
+do { my $x = 1; $x; }; 
 ####
 # 37 <20061012113037.GJ25805@c4.convolution.nl>
 my $f = sub {
@@ -295,7 +297,7 @@ my $bar;
 ####
 # 49 match
 do {
-    $main::a =~ m/foo/
+    $main::a =~ m/foo/;
 };
 ####
 # 51 Anonymous arrays and hashes, and references to them

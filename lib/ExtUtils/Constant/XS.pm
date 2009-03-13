@@ -90,7 +90,7 @@ sub assignment_clause_for_type {
   if (ref $typeset) {
     die "Type $type is aggregate, but only single value given"
       if (nelems @_) == 1;
-    return map {"$typeset->[$_]@_[$_];"} 0 .. ((nelems @$typeset)-1);
+    return map {"$typeset->[$_]@_[$_];"}, 0 .. ((nelems @$typeset)-1);
   } elsif (defined $typeset) {
     die "Aggregate value given for type $type"
       if (nelems @_) +> 1;

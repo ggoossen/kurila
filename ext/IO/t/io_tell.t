@@ -3,7 +3,7 @@
 our $tell_file;
 
 BEGIN {
-    unless(grep m/blib/, $^INCLUDE_PATH) {
+    unless(grep { m/blib/ }, $^INCLUDE_PATH) {
 	$tell_file = "TEST";
     }
     else {

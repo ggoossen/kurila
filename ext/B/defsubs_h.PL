@@ -20,8 +20,6 @@ foreach my $const (qw(
 		      CVf_CLONE
 		      CVf_CLONED
 		      CVf_CONST
-		      CVf_LOCKED
-		      CVf_METHOD
 		      CVf_NODEBUG
 		      CVf_UNIQUE
 		      GVf_IMPORTED_AV

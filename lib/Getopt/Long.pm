@@ -732,7 +732,7 @@ sub GetOptionsFromArray($@) {
 # A readable representation of what's in an optbl.
 sub OptCtl ($) {
     my @($v) =  @_;
-    my @v = map { defined($_) ?? ($_) !! ("<undef>") } @$v;
+    my @v = map { defined($_) ?? ($_) !! ("<undef>") }, @$v;
     "[".
       join(",", @(
 	   "\"@v[CTL_TYPE]\"",
@@ -938,12 +938,12 @@ sub FindOption ($$$$$) {
 	# Turn option name into pattern.
 	my $pat = quotemeta ($opt);
 	# Look up in option names.
-	my @hits = grep (m/^$pat/, @names);
+	my @hits = grep ( {m/^$pat/ }, @names);
 	print \*STDERR, ("=> ", scalar(nelems @hits), " hits ($(join ' ',@hits)) with \"$pat\" ",
 		      "out of ", scalar(nelems @names), "\n") if $debug;
 
 	# Check for ambiguous results.
-	unless ( ((nelems @hits) +<= 1) || (nelems grep ($_ eq $opt, @hits) == 1) ) {
+	unless ( ((nelems @hits) +<= 1) || (nelems grep ( {$_ eq $opt }, @hits) == 1) ) {
 	    # See if all matches are for the same option.
 	    my %hit;
 	    foreach (  @hits ) {

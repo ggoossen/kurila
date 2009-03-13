@@ -20,8 +20,9 @@ B::OP->bootstrap($VERSION);
 @B::LOOP::ISA = @( 'B::LISTOP' );
 @B::PMOP::ISA = @( 'B::LISTOP' );
 @B::COP::ISA = @( 'B::OP' );
+@B::ROOTOP::ISA = @( 'B::UNOP' );
 
-@B::optype = qw(OP UNOP BINOP LOGOP LISTOP PMOP SVOP PADOP PVOP LOOP COP);
+@B::optype = qw(OP UNOP BINOP LOGOP LISTOP PMOP SVOP PADOP PVOP LOOP COP ROOTOP);
 
 use constant OP_LIST    => 141;    # MUST FIX CONSTANTS.
 

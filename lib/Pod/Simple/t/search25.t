@@ -78,11 +78,11 @@ is $names, "squaa::Glunk|squaa::Vliff|squaa::Vliff|squaa::Vliff|squaa::Wowo";
 my %count;
 for(values %$where2name) { ++%count{+$_} };
 #print pretty(\%count), "\n\n";
-delete %count{[ grep %count{?$_} +< 2, keys %count ]};
+delete %count{[ grep { %count{?$_} +< 2 }, keys %count ]};
 my $shadowed = join "|", sort keys %count;
 is $shadowed, "squaa::Vliff";
 
-sub thar { print \*STDOUT, "# Seen @_[0] :\n", < map "#  \{$_\}\n", sort grep $where2name->{?$_} eq @_[0],keys %$where2name; return; }
+sub thar { print \*STDOUT, "# Seen @_[0] :\n", < map { "#  \{$_\}\n" }, sort grep { $where2name->{?$_} eq @_[0] },keys %$where2name; return; }
 
 is %count{?'squaa::Vliff'}, 3;
 thar 'squaa::Vliff';

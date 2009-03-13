@@ -46,7 +46,7 @@ sub parse_lines {             # Usage: $parser->parse_lines(@lines)
 
   DEBUG +> 5 and
    print \*STDOUT, "#  About to parse lines: ",
-     join(' ', map defined($_) ?? "[$_]" !! "EOF", @_), "\n";
+     join(' ', map { defined($_) ?? "[$_]" !! "EOF" }, @_), "\n";
 
   my $paras = ($self->{+'paras'} ||= \@());
    # paragraph buffer.  Because we need to defer processing of =over
@@ -143,7 +143,7 @@ sub parse_lines {             # Usage: $parser->parse_lines(@lines)
         }
       } else {
         DEBUG +> 5 and print \*STDOUT, "# It's a code-line.\n";
-        $code_handler->(< map $_, @( $line, $self->{?'line_count'}, $self))
+        $code_handler->(< map { $_ }, @( $line, $self->{?'line_count'}, $self))
          if $code_handler;
         # Note: this may cause code to be processed out of order relative
         #  to pods, but in order relative to cuts.
@@ -181,7 +181,7 @@ sub parse_lines {             # Usage: $parser->parse_lines(@lines)
       # ++$self->{'pod_para_count'};
       $self->_ponder_paragraph_buffer();
        # by now it's safe to consider the previous paragraph as done.
-      $cut_handler->(< map $_, @( $line, $self->{?'line_count'}, $self))
+      $cut_handler->(< map { $_ }, @( $line, $self->{?'line_count'}, $self))
        if $cut_handler;
 
       # TODO: add to docs: Note: this may cause cuts to be processed out
@@ -382,14 +382,14 @@ sub _gen_errata {
 
   my @out;
   
-  foreach my $line (sort {$a <+> $b} keys %{$self->{?'errata'}}) {
+  foreach my $line (sort {$a <+> $b}, keys %{$self->{?'errata'}}) {
     push @out,
       \@('=item', \%('start_line' => $m), "Around line $line:"),
-      < map( \@('~Para', \%('start_line' => $m, '~cooked' => 1),
+      < map( { \@('~Para', \%('start_line' => $m, '~cooked' => 1),
         #['~Top', {'start_line' => $m},
         $_
         #]
-        ), @{$self->{'errata'}->{$line}}
+        ) }, @{$self->{'errata'}->{$line}}
       )
     ;
   }
@@ -467,7 +467,7 @@ sub _ponder_paragraph_buffer {
     $starting_contentless =
      (
        !nelems @$curr_open  
-       and nelems @$paras and ! grep $_->[0] ne '~end', @$paras
+       and nelems @$paras and ! grep { $_->[0] ne '~end' }, @$paras
         # i.e., if the paras is all ~ends
      )
     ;
@@ -522,7 +522,7 @@ sub _ponder_paragraph_buffer {
 
     # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     #~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-    if(grep $_->[1]->{?'~ignore'}, @$curr_open) {
+    if(grep { $_->[1]->{?'~ignore'} }, @$curr_open) {
       DEBUG +> 1 and
        print \*STDOUT, "Skipping $para_type paragraph because in ignore mode.\n";
       next;
@@ -776,9 +776,9 @@ sub _ponder_paragraph_buffer {
         if(! nelems @$curr_open) {  # usual case
           DEBUG and print \*STDOUT, "Treating $para_type paragraph as such because stack is empty.\n";
         } else {
-          my @fors = grep $_->[0] eq '=for', @$curr_open;
+          my @fors = grep { $_->[0] eq '=for' }, @$curr_open;
           DEBUG +> 1 and print \*STDOUT, "Containing fors: ",
-            join(',', map $_->[1]->{?'target'}, @fors), "\n";
+            join(',', map { $_->[1]->{?'target'} }, @fors), "\n";
           
           if(! nelems @fors) {
             DEBUG and print \*STDOUT, "Treating $para_type paragraph as such because stack has no =for's\n";
@@ -839,7 +839,7 @@ sub _ponder_for {
   # Fake it out as a begin/end
   my $target;
 
-  if(grep $_->[1]->{?'~ignore'}, @$curr_open) {
+  if(grep { $_->[1]->{?'~ignore'} }, @$curr_open) {
     DEBUG +> 1 and print \*STDOUT, "Ignoring ignorable =for\n";
     return 1;
   }
@@ -952,7 +952,7 @@ sub _ponder_begin {
   DEBUG +> 1 and print \*STDOUT, " (Stack now: ", < $self->_dump_curr_open(), ")\n";
 
   push @$curr_open, $para;
-  if(!$dont_ignore or scalar grep $_->[1]->{?'~ignore'}, @$curr_open) {
+  if(!$dont_ignore or scalar grep { $_->[1]->{?'~ignore'} }, @$curr_open) {
     DEBUG +> 1 and print \*STDOUT, "Ignoring ignorable =begin\n";
   } else {
     $self->{+'content_seen'} ||= 1;
@@ -1015,7 +1015,7 @@ sub _ponder_end {
   }
 
   # Else it's okay to close...
-  if(grep $_->[1]->{?'~ignore'}, @$curr_open) {
+  if(grep { $_->[1]->{?'~ignore'} }, @$curr_open) {
     DEBUG +> 1 and print \*STDOUT, "Not firing any event for this =end $content because in an ignored region\n";
     # And that may be because of this to-be-closed =for region, or some
     #  other one, but it doesn't matter.
@@ -1041,7 +1041,7 @@ sub _ponder_doc_end {
     DEBUG +> 9 and print \*STDOUT, "Stack: ", < pretty($curr_open), "\n";
     unshift @$paras, < $self->_closers_for_all_curr_open;
     # Make sure there is exactly one ~end in the parastack, at the end:
-    @$paras = grep $_->[0] ne '~end', @$paras;
+    @$paras = grep { $_->[0] ne '~end' }, @$paras;
     push @$paras, $para, $para;
      # We need two -- once for the next cycle where we
      #  generate errata, and then another to be at the end
@@ -1158,7 +1158,7 @@ sub _ponder_back {
     );
   } else {
     DEBUG +> 1 and print \*STDOUT, "=back found without a matching =over.  Stack: (",
-        join(', ', map $_->[0], @$curr_open), ").\n";
+        join(', ', map { $_->[0] }, @$curr_open), ").\n";
     $self->whine(
       $para->[1]->{?'start_line'},
       '=back without =over'
@@ -1549,7 +1549,7 @@ sub _verbatim_format {
     
     DEBUG +> 6 and print \*STDOUT, "New version of the above line is these tokens (",
       scalar(nelems @new_line), "):",
-      < map( ref($_)??"<$(join ' ',@$_)> "!!"<$_>", @new_line ), "\n";
+      < map( { ref($_)??"<$(join ' ',@$_)> "!!"<$_>" }, @new_line ), "\n";
     $i--; # So the next line we scrutinize is the line before the one
           #  that we just went and formatted
   }
@@ -1811,7 +1811,7 @@ sub _dump_curr_open { # return a string representation of the stack
              ?? ( ($_->[1]->{?'~really'} || '=over')
                . ' ' . $_->[1]->{?'target'})
              !! $_->[0]
-        }
+        },
  @$curr_open
   ;
 }
@@ -1852,7 +1852,7 @@ sub pretty { # adopted from Class::Classless
       $x;
     } elsif(ref($_) eq 'HASH') {
       my $hr = $_;
-      $x = "\{" . join(", ", map(pretty($_) . '=>' . pretty($hr->{?$_}),
+      $x = "\{" . join(", ", map( {pretty($_) . '=>' . pretty($hr->{?$_}) },
             sort keys %$hr ) ) . "\}" ;
       $x;
     } elsif(!length($_)) { q{''} # empty string
@@ -1869,7 +1869,7 @@ sub pretty { # adopted from Class::Classless
          <$(%pretty_form{?$1} || '\\x['.sprintf("\%.2x", ord($1)) . ']')>g;
       qq{"$_"};
     }
-  } @stuff;
+  }, @stuff;
   # $out =~ s/\n */ /g if length($out) < 75;
   return $out;
 }

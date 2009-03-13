@@ -1292,9 +1292,8 @@ S_vdie_croak_common(pTHX_ SV* location, const char* pat, va_list* args)
 	    XPUSHs(location);
 
 	    PUTBACK;
-	    call_sv(PL_errorcreatehook, G_SCALAR);
+	    msv = call_sv(PL_errorcreatehook, G_SCALAR);
 	    SPAGAIN;
-	    msv = TOPs;
 	    PUTBACK;
 	    POPSTACK;
 	    LEAVE;
@@ -1436,9 +1435,8 @@ Perl_vwarn_at(pTHX_ SV* location, const char* pat, va_list *args)
 	    XPUSHs(location);
 
 	    PUTBACK;
-	    call_sv(PL_errorcreatehook, G_SCALAR);
+	    msv = call_sv(PL_errorcreatehook, G_SCALAR);
 	    SPAGAIN;
-	    msv = POPs;
 	    PUTBACK;
 	    POPSTACK;
 	    LEAVE;
@@ -3351,9 +3349,6 @@ Perl_get_vtbl(pTHX_ int vtbl_id)
     PERL_UNUSED_CONTEXT;
 
     switch(vtbl_id) {
-    case want_vtbl_hints:
-	result = &PL_vtbl_hints;
-	break;
     case want_vtbl_dbline:
 	result = &PL_vtbl_dbline;
 	break;
@@ -5742,8 +5737,6 @@ Perl_get_re_arg(pTHX_ SV *sv) {
     SV    *tmpsv;
 
     if (sv) {
-        if (SvMAGICAL(sv))
-            mg_get(sv);
         if (SvROK(sv) &&
             (tmpsv = (SV*)SvRV(sv)) &&            /* assign deliberate */
             SvTYPE(tmpsv) == SVt_REGEXP)

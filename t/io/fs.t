@@ -442,10 +442,10 @@ do {
     # Change 26011: Re: A surprising segfault
     # to make sure only that these obfuscated sentences will not crash.
 
-    map chmod(), @( ('')x68);
+    map { chmod() }, @( ('')x68);
     ok(1, "extend sp in pp_chmod");
 
-    map chown(), @( ('')x68);
+    map { chown() }, @( ('')x68);
     ok(1, "extend sp in pp_chown");
 };
 

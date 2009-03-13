@@ -21,5 +21,5 @@ is( 0+nelems @r,	0+nelems @in,	'arg count');
 
 isnt( "$(join ' ',@r)",	"$(join ' ',@in)",	'result different to args');
 
-my @s = sort { $a <+> $b } @r;
+my @s = sort { $a <+> $b }, @r;
 is( "$(join ' ',@in)",	"$(join ' ',@s)",	'values');

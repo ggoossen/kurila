@@ -3771,12 +3771,13 @@ PP(pp_enter_anonhash_assign)
 
     /* push remaining keys */
     {
+	register HE *entry;
 	PUTBACK;
 	(void)hv_iterinit(value);
-	register HE *entry;
 	while ((entry = hv_iternext(value))) {
+	    SV* sv;
 	    SPAGAIN;
-	    SV* const sv = hv_iterkeysv(entry);
+	    sv = hv_iterkeysv(entry);
 	    XPUSHs(hv_iterval(value,entry));
 	    XPUSHs(sv);
 	    PUTBACK;
@@ -4337,6 +4338,140 @@ PP(pp_reverse)
     RETURN;
 }
 
+PP(pp_arrayjoin)
+{
+    dVAR; dSP;
+    SV * const av = POPs;
+    SV ** ary;
+    SV ** end;
+    AV * newav = av_2mortal(newAV());
+
+    if ( ! SvAVOK(av) ) {
+	Perl_croak(aTHX_ "%s expected an ARRAY but got %s", OP_DESC(PL_op), Ddesc(av));
+    }
+
+    ary = AvARRAY(av);
+    end = ary + av_len(SvAv(av));
+    
+    if (ary) {
+	while (ary <= end) {
+	    register SV * const tmp = *ary;
+	    SV ** subary;
+	    I32 sublen;
+	    I32 i;
+	    if ( ! SvAVOK(tmp) ) {
+		Perl_croak(aTHX_ "%s expected an ARRAY but got %s",
+		    OP_DESC(PL_op), Ddesc(tmp));
+	    }
+	    subary = AvARRAY(SvAv(tmp));
+	    sublen = av_len(SvAv(tmp));
+	    for (i=0; i<=sublen; i++)
+		av_push(newav, newSVsv(subary[i])); 
+	    ary++;
+	}
+    }
+    PUSHs(AvSv(newav));
+    RETURN;
+}
+
+PP(pp_hashjoin)
+{
+    dVAR; dSP;
+    SV * const av = POPs;
+    SV ** ary;
+    SV ** end;
+    HV * newhv = hv_2mortal(newHV());
+
+    if ( ! SvAVOK(av) ) {
+	Perl_croak(aTHX_ "%s expected an ARRAY but got %s", OP_DESC(PL_op), Ddesc(av));
+    }
+
+    ary = AvARRAY(av);
+    end = ary + av_len(SvAv(av));
+    
+    if (ary) {
+	while (ary <= end) {
+	    register HV * tmp;
+	    register HE *entry;
+	    if ( ! SvHVOK(*ary) ) {
+		Perl_croak(aTHX_ "%s expected an ARRAY but got %s",
+		    OP_DESC(PL_op), Ddesc(*ary));
+	    }
+	    tmp = SvHv(*ary);
+	    (void)hv_iterinit(tmp);
+
+	    while ((entry = hv_iternext(tmp))) {
+		SV* val = newSVsv(HeVAL(entry));
+		hv_store(newhv, HeKEY(entry), HeKLEN(entry), val, HeHASH(entry));
+	    }
+	    ary++;
+	}
+    }
+    PUSHs(HvSv(newhv));
+    RETURN;
+}
+
+PP(pp_arrayconcat)
+{
+    dVAR; dSP;
+    dPOPTOPssrl;
+    SV ** ary;
+    I32 i;
+    I32 len;
+    AV *res;
+
+    if ( ! SvAVOK(right) ) {
+	Perl_croak(aTHX_ "%s expected an ARRAY but got %s",
+	    OP_DESC(PL_op), Ddesc(right));
+    }
+    if ( ! SvAVOK(left) ) {
+	Perl_croak(aTHX_ "%s expected an ARRAY but got %s",
+	    OP_DESC(PL_op), Ddesc(left));
+    }
+
+    res = SvAv(sv_2mortal(newSVsv(left)));
+    TOPs = AvSv(res);
+    
+    ary = AvARRAY(SvAv(right));
+    len = av_len(SvAv(right));
+    for (i=0; i<=len; i++)
+	av_push(res, newSVsv(ary[i])); 
+
+    RETURN;
+}
+
+PP(pp_hashconcat)
+{
+    dVAR; dSP;
+    dPOPTOPssrl;
+    HV* res;
+    register HV *right_hv;
+    register HE *entry;
+
+    if ( ! SvHVOK(right) ) {
+	Perl_croak(aTHX_ "%s expected a HASH but got %s",
+	    OP_DESC(PL_op), Ddesc(right));
+    }
+    if ( ! SvHVOK(left) ) {
+	Perl_croak(aTHX_ "%s expected a HASH but got %s",
+	    OP_DESC(PL_op), Ddesc(left));
+    }
+
+    res = SvHv(sv_2mortal(newSVsv(left)));
+    TOPs = HvSv(res);
+    right_hv = SvHv(right);
+
+    (void)hv_iterinit(right_hv);
+    
+    while ((entry = hv_iternext(right_hv))) {
+	SV* val = newSVsv(HeVAL(entry));
+	hv_store(res, HeKEY(entry), HeKLEN(entry), val, HeHASH(entry));
+    }
+
+    RETURN;
+}
+
+
 PP(pp_split)
 {
     dVAR; dSP;
@@ -4561,11 +4696,6 @@ PP(pp_ref_eq)
 {
     dSP;
 
-    if (SvMAGICAL(TOPs))
-	mg_get(TOPs);
-    if (SvMAGICAL(TOPm1s))
-	mg_get(TOPm1s);
-
     if (! SvROK(TOPs))
 	DIE(aTHX_ "Not a reference");
     if (! SvROK(TOPm1s))
@@ -4579,11 +4709,6 @@ PP(pp_ref_eq)
 PP(pp_ref_ne)
 {
     dSP;
-
-    if (SvMAGICAL(TOPs))
-	mg_get(TOPs);
-    if (SvMAGICAL(TOPm1s))
-	mg_get(TOPm1s);
 
     if (! SvROK(TOPs))
 	DIE(aTHX_ "Not a reference");

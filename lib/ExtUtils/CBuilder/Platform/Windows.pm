@@ -45,7 +45,7 @@ sub split_like_shell {
 sub arg_defines {
   my @($self, %< %args) =  @_;
   s/"/\\"/g foreach values %args;
-  return map qq{"-D$_=%args{?$_}"}, keys %args;
+  return map { qq{"-D$_=%args{?$_}"} }, keys %args;
 }
 
 sub compile {
@@ -164,7 +164,7 @@ sub link {
                                             %spec{?basename}  . '.base' );
 
   $self->add_to_cleanup(
-    < grep defined, @{\ %spec{[qw(manifest implib explib dbg_file def_file base_file map_file)]}}
+    < grep { defined }, @{\ %spec{[qw(manifest implib explib dbg_file def_file base_file map_file)]}}
   );
 
   foreach my $opt ( qw(output manifest implib explib dbg_file def_file map_file base_file) ) {
@@ -187,15 +187,15 @@ sub link {
   }
 
   %spec{+output} =~ s/'|"//g;
-  return grep defined, %spec{[qw[output manifest implib explib dbg_file def_file map_file base_file]]}
+  return grep { defined }, %spec{[qw[output manifest implib explib dbg_file def_file map_file base_file]]}
 }
 
 # canonize & quote paths
 sub normalize_filespecs {
   my @($self, @< @specs) =  @_;
-  foreach my $spec ( grep defined, @specs ) {
+  foreach my $spec ( grep { defined }, @specs ) {
     if ( ref $spec eq 'ARRAY') {
-      $self->normalize_filespecs( < map {\$_} grep defined, @$spec )
+      $self->normalize_filespecs( < map {\$_}, grep { defined }, @$spec )
     } elsif ( ref $spec eq 'SCALAR' ) {
       $$spec =~ s/"//g if $$spec;
       next unless $$spec;
@@ -257,7 +257,7 @@ sub format_compiler_cmd {
   %spec = %( < $self->write_compiler_script(< %spec) )
     if %spec{?use_scripts};
 
-  return \ grep {defined && length} @( (
+  return \ grep {defined && length}, @( (
     %spec{?cc},'-nologo','-c',
     < @{%spec{?includes}}      ,
     < @{%spec{?cflags}}        ,
@@ -281,8 +281,8 @@ sub write_compiler_script {
   open( my $scriptfh, ">$script" )
     or die( "Could not create script '$script': $^OS_ERROR" );
 
-  print $scriptfh, join( "\n", map { ref $_ ?? < @{$_} !! $_ }
- grep defined, @(
+  print $scriptfh, join( "\n", map { ref $_ ?? < @{$_} !! $_ },
+ grep { defined }, @(
     delete(
       %spec{[ <qw(includes cflags optimize defines perlinc) ]} ))
   );
@@ -315,7 +315,7 @@ sub format_linker_cmd {
 
   my @cmds; # Stores the series of commands needed to build the module.
 
-  push @cmds, \ grep {defined && length} @( (
+  push @cmds, \ grep {defined && length}, @( (
     %spec{?ld}               ,
     < @{%spec{?lddlflags}}     ,
     < @{%spec{?libpath}}       ,
@@ -353,8 +353,8 @@ sub write_linker_script {
   open( my $scriptfh, ">$script" )
     or die( "Could not create script '$script': $^OS_ERROR" );
 
-  print $scriptfh, join( "\n", map { ref $_ ?? < @{$_} !! $_ }
- grep defined, @(
+  print $scriptfh, join( "\n", map { ref $_ ?? < @{$_} !! $_ },
+ grep { defined }, @(
     delete(
       %spec{[ <qw(lddlflags libpath other_ldflags
                 startup objects libperl perllibs
@@ -384,7 +384,7 @@ sub format_compiler_cmd {
   %spec = %( < $self->write_compiler_script(< %spec) )
     if %spec{?use_scripts};
 
-  return \ grep {defined && length} @( (
+  return \ grep {defined && length}, @( (
     %spec{?cc}, '-c'         ,
     < @{%spec{?includes}}      ,
     < @{%spec{?cflags}}        ,
@@ -414,8 +414,8 @@ sub write_compiler_script {
   # backslash doesn't work, and any level of quotes are stripped. The
   # result is is a floating point number in the source file where a
   # string is expected. So we leave the macros on the command line.
-  print $scriptfh, join( "\n", map { ref $_ ?? < @{$_} !! $_ }
- grep defined, @(
+  print $scriptfh, join( "\n", map { ref $_ ?? < @{$_} !! $_ },
+ grep { defined }, @(
     delete(
       %spec{[ <qw(includes cflags optimize perlinc) ]} ))
   );
@@ -440,7 +440,7 @@ sub format_linker_cmd {
   %spec = %( < $self->write_linker_script(< %spec) )
     if %spec{?use_scripts};
 
-  return \ grep {defined && length} @( (
+  return \ grep {defined && length}, @( (
     %spec{?ld}               ,
     < @{%spec{?lddlflags}}     ,
     < @{%spec{?libpath}}       ,
@@ -474,8 +474,8 @@ sub write_linker_script {
   open( my $ld_scriptfh, ">$ld_script" )
     or die( "Could not create linker script '$ld_script': $^OS_ERROR" );
 
-  print $ld_scriptfh, join( " +\n", map { < @{$_} }
- grep defined, @(
+  print $ld_scriptfh, join( " +\n", map { < @{$_} },
+ grep { defined }, @(
     delete(
       %spec{[ <qw(lddlflags libpath other_ldflags startup objects) ]} ))
   );
@@ -515,7 +515,7 @@ sub format_compiler_cmd {
   # split off any -arguments included in cc
   my @cc = split m/ (?=-)/, %spec{?cc};
 
-  return \ grep {defined && length} @( (
+  return \ grep {defined && length}, @( (
     < @cc, '-c'               ,
     < @{%spec{?includes}}      ,
     < @{%spec{?cflags}}        ,
@@ -564,7 +564,7 @@ sub format_linker_cmd {
   # split off any -arguments included in ld
   my @ld = split m/ (?=-)/, %spec{?ld};
 
-  push @cmds, \ grep {defined && length} @( (
+  push @cmds, \ grep {defined && length}, @( (
     < @ld                       ,
     '-o', %spec{?output}       ,
     "-Wl,--base-file,%spec{?base_file}"   ,
@@ -586,7 +586,7 @@ sub format_linker_cmd {
                '--base-file'  , %spec{?base_file}
   );
 
-  push @cmds, \ grep {defined && length} @( (
+  push @cmds, \ grep {defined && length}, @( (
     < @ld                       ,
     '-o', %spec{?output}       ,
     "-Wl,--image-base,%spec{?image_base}" ,

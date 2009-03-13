@@ -30,7 +30,7 @@ if (not defined $where) {	# Try NIS.
 
             # Check to make sure we're really using NIS.
             if( open(my $nssw, "<", "/etc/nsswitch.conf" ) ) {
-                my@($group) =  grep m/^\s*group:/, @( ~< $nssw);
+                my@($group) =  grep { m/^\s*group:/ }, @( ~< $nssw);
 
                 # If there's no group line, assume it default to compat.
                 if( !$group || $group !~ m/(nis|compat)/ ) {

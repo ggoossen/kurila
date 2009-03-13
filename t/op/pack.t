@@ -58,7 +58,7 @@ sub is_valid_error
 }
 
 sub encode_list {
-  my @result = map { <_qq($_)} @_;
+  my @result = @+: map { _qq($_) }, @_;
   if ((nelems @result) == 1) {
     return @result;
   }
@@ -704,7 +704,7 @@ sub byteorder
   for my $value ( @_) {
     SKIP: do {
       my ($nat,$be,$le);
-      try { @($nat, $be, $le) = map { pack $format.$_, $value } @( '', '>', '<') };
+      try { @($nat, $be, $le) = map { pack $format.$_, $value }, @( '', '>', '<') };
       skip "cannot pack '$format' on this perl", 5
         if is_valid_error($^EVAL_ERROR);
 
@@ -761,7 +761,7 @@ SKIP: do {
   for my $format (qw(s i l j s! i! l! q)) {
     SKIP: do {
       my ($nat,$be,$le);
-      try { @($nat,$be,$le) = map { pack $format.$_, -1 } @( '', '>', '<') };
+      try { @($nat,$be,$le) = map { pack $format.$_, -1 }, @( '', '>', '<') };
       skip "cannot pack '$format' on this perl", 15
         if is_valid_error($^EVAL_ERROR);
 
@@ -794,7 +794,7 @@ SKIP: do {
       }
 
       for my $i (0 .. (nelems @val)-1) {
-        my @($nat,$be,$le) = try { map { pack $format.$_, @val[$i] } @( '', '>', '<') };
+        my @($nat,$be,$le) = try { map { pack $format.$_, @val[$i] }, @( '', '>', '<') };
         is($^EVAL_ERROR, '');
 
         SKIP: do {
@@ -1318,7 +1318,7 @@ do {  # Repeat count [SUBEXPR]
      push @codes, 'd';	# Keep the count the same
    }
 
-   push @codes, < map { m/^[silqjfdp]/i ?? ("$_<", "$_>") !! () } @codes;
+   push @codes, < @+: map { m/^[silqjfdp]/i ?? @("$_<", "$_>") !! @() }, @codes;
 
    my %val;
    %val{[ @codes]} =  map { 
@@ -1335,7 +1335,7 @@ do {  # Repeat count [SUBEXPR]
                                  $( m/ [pP]  /x )=> "try this buffer",
                              );
                             $v;
-			 } @codes;
+			 }, @codes;
    my @end = @(0x12345678, 0x23456781, 0x35465768, 0x15263748);
    my $end = "N4";
 
@@ -1442,7 +1442,7 @@ SKIP: do {
 
 # Maybe this knowledge needs to be "global" for all of pack.t
 # Or a "can checksum" which would effectively be all the number types"
-my %cant_checksum = %( < map {$_=> 1} qw(A Z u w) );
+my %cant_checksum = %( < @+: map { @: $_=> 1 }, qw(A Z u w) );
 # not a b B h H
 foreach my $template (qw(A Z c C s S i I l L n N v V q Q j J f d F D u U w)) {
   SKIP: do {
@@ -1591,7 +1591,7 @@ do {
          );
 
     for my $string (@($down, $up)) {
-        for my $format (sort {lc($a) cmp lc($b) || $a cmp $b } keys %expect) {
+        for my $format (sort {lc($a) cmp lc($b) || $a cmp $b }, keys %expect) {
           SKIP: do {
               my $expect = %expect{?$format};
               # unpack upgraded and downgraded string
@@ -1621,7 +1621,7 @@ do {
 
 do {
     # use utf8 neutrality, numbers
-    for (@( ( < map { \@($_, -2.68) } qw(s S i I l L j J f d F D q Q
+    for (@( ( < map { \@($_, -2.68) }, qw(s S i I l L j J f d F D q Q
                                    s! S! i! I! l! L! n! N! v! V!)),
           \@('C', 253), \@('u', "\x[f8f9fafbfcfdfeff0506]"),
           \@('U', 0x300), \@('a3', "abc"), \@('a0', ''),

@@ -19,9 +19,9 @@ our (
 $VERSION = '3.05';
 
 @Known_formatting_codes = qw(I B C L E F S X Z); 
-%Known_formatting_codes = %( < map(($_=>1), @Known_formatting_codes) );
+%Known_formatting_codes = %( < @+: map( {@($_=>1) }, @Known_formatting_codes) );
 @Known_directives       = qw(head1 head2 head3 head4 item over back); 
-%Known_directives       = %( < map(($_=>'Plain'), @Known_directives) );
+%Known_directives       = %( < @+: map( {@($_=>'Plain') }, @Known_directives) );
 $NL = $^INPUT_RECORD_SEPARATOR unless defined $NL;
 
 #-----------------------------------------------------------------------------
@@ -159,7 +159,7 @@ sub new {
   #Carp::croak(__PACKAGE__ . " is a virtual base class -- see perldoc "
   #  . __PACKAGE__ );
   return bless \%(
-    'accept_codes'      => \%( < map( ($_=>$_), @Known_formatting_codes ) ),
+    'accept_codes'      => \%( < @+: map( { @($_=>$_) }, @Known_formatting_codes ) ),
     'accept_directives' => \%( < %Known_directives ),
     'accept_targets'    => \%(),
   ), $class;
@@ -327,7 +327,7 @@ sub unaccept_codes { # remove some codes
     }
     
     die "But you must accept \"$new_code\" codes -- it's a builtin!"
-     if grep $new_code eq $_, @Known_formatting_codes;
+     if grep { $new_code eq $_ }, @Known_formatting_codes;
 
     delete $this->{'accept_codes'}->{$new_code};
 
@@ -663,9 +663,9 @@ sub _remap_sequences {
    $start_line || '[?]'
   ;
   DEBUG +> 3 and print \*STDOUT, " Map: ",
-    join('; ', map "$_=" . (
+    join('; ', map { "$_=" . (
         ref($map->{?$_}) ?? join(",", @{$map->{?$_}}) !! $map->{?$_}
-      ),
+      ) },
       sort keys %$map ),
     ("B~C~E~F~I~L~S~X~Z" eq join '~', sort keys %$map)
      ?? "  (all normal)\n" !! "\n"
@@ -691,7 +691,7 @@ sub _remap_sequences {
         } else  {
           print \*STDOUT, "   Code $was<> maps to ",
            ref($is)
-            ?? ( "tags ", < map("$_<", @$is), '...', < map('>', @$is), "\n" )
+            ?? ( "tags ", < map( {"$_<" }, @$is), '...', < map( {'>' }, @$is), "\n" )
             !! "tag $is<...>.\n";
         }
       }
@@ -785,7 +785,7 @@ sub _ponder_extend {
       return;
     }
     
-    if(grep $new_letter eq $_, @Known_formatting_codes) {
+    if(grep { $new_letter eq $_ }, @Known_formatting_codes) {
       DEBUG +> 2 and print \*STDOUT, " $new_letter isn't a good thing to extend, because known.\n";
       $self->whine(
         $para->[1]->{?'start_line'},
@@ -1111,8 +1111,8 @@ sub _treat_Ls {  # Process our dear dear friends, the L<...> sequences
 
           unshift @link_text, splice @ell_content, 0, $j;
             # leaving only things at J and after
-          @ell_content = grep ref($_)||length($_), @ell_content ;
-          $link_text   = \ grep ref($_)||length($_), @link_text;
+          @ell_content = grep { ref($_)||length($_) }, @ell_content ;
+          $link_text   = \ grep { ref($_)||length($_) }, @link_text;
           DEBUG +> 3 and printf \*STDOUT,
            "  So link text is \%s\n  and remaining ell content is \%s\n", <
             pretty($link_text), < pretty(< @ell_content);
@@ -1142,8 +1142,8 @@ sub _treat_Ls {  # Process our dear dear friends, the L<...> sequences
           push @section_name, splice @ell_content, 1+$j;
             # leaving only things before and including J
           
-          @ell_content  = grep ref($_)||length($_), @ell_content  ;
-          @section_name = grep ref($_)||length($_), @section_name ;
+          @ell_content  = grep { ref($_)||length($_) }, @ell_content  ;
+          @section_name = grep { ref($_)||length($_) }, @section_name ;
 
           # Turn L<.../"foo"> into L<.../foo>
           if((nelems @section_name)
@@ -1184,7 +1184,7 @@ sub _treat_Ls {  # Process our dear dear friends, the L<...> sequences
 
       # Turn L<Foo Bar> into L</Foo Bar>.
       if(!$section_name and !$link_text and nelems @ell_content
-         and grep !ref($_) && m/ /s, @ell_content
+         and grep { !ref($_) && m/ /s }, @ell_content
       ) {
         $section_name = \@(splice @ell_content);
         # That's support for the now-deprecated syntax.

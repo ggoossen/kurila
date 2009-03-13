@@ -53,9 +53,9 @@ while ((nelems @ARGV))
         $MakeTestScript = 1;
     } elsif ($arg eq '-makelist') {
         $MakeList = 1;        
-    } elsif ($arg eq '-C' && defined ($UseDir = shift)) {
+    } elsif ($arg eq '-C' && defined ($UseDir = shift @ARGV)) {
 	-d $UseDir or die "Unknown directory '$UseDir'";
-    } elsif ($arg eq '-L' && defined ($FileList = shift)) {
+    } elsif ($arg eq '-L' && defined ($FileList = shift @ARGV)) {
         -e $FileList or die "Filelist '$FileList' doesn't appear to exist!";
     } else {
         die "usage: $^PROGRAM_NAME [-v|-q|-w|-C dir|-L filelist] [-maketest] [-makelist]\n",
@@ -85,7 +85,7 @@ if ($FileList) {
             push @$list, $file;
         }
         my %dupe;
-        @$list = grep !%dupe{+$_ }++, @$list;
+        @$list = grep { !%dupe{+$_ }++ }, @$list;
     }
     close $fh;
     die "No input or output files in '$FileList'!"
@@ -143,7 +143,7 @@ if ($FileList) {
 }
 
 foreach my $lib (@('To', 'lib',
-		 < map { File::Spec->catdir("lib",$_)}
+		 < map { File::Spec->catdir("lib",$_)},
 		 qw(gc_sc dt bc hst ea jt lb nt ccc))) {
   next if -d $lib;
   mkdir $lib, 0755 or die "mkdir '$lib': $^OS_ERROR";
@@ -574,7 +574,7 @@ sub Table::Merge
         ($a->[RANGE_START] <+> $b->[RANGE_START])
           or
         ($b->[RANGE_END]   <+> $b->[RANGE_END])
-    } @Records;
+    }, @Records;
 
     my $New = Table->New();
 
@@ -1083,7 +1083,7 @@ sub UnicodeData_Txt()
     ## ...and any character with a decomposition that starts with either of
     ## those code points, but only if the decomposition does not have any
     ## combining character with the "ABOVE" canonical combining class.
-    for my $code (sort { $a <+> $b} keys %CodeToDeco)
+    for my $code (sort { $a <+> $b}, keys %CodeToDeco)
     {
         ## Need to ensure that all decomposition characters do not have
         ## a %HexCodeToComb in %AboveCombClasses.
@@ -1368,7 +1368,7 @@ sub Scripts_txt()
     my %Script;
     my $Scripts = Table->New();
 
-    for my $script (sort { $a->[0] <+> $b->[0] } @ScriptInfo)
+    for my $script (sort { $a->[0] <+> $b->[0] }, @ScriptInfo)
     {
         my @($first, $last, $name) =  @$script;
         $Scripts->Append($first, $name);
@@ -1479,7 +1479,7 @@ sub PropList_txt()
     my $Props = Table->New();
     my %Prop;
 
-    for my $prop (sort { $a->[0] <+> $b->[0] } @PropInfo)
+    for my $prop (sort { $a->[0] <+> $b->[0] }, @PropInfo)
     {
         my @($first, $last, $name) =  @$prop;
         $Props->Append($first, $name);
@@ -1776,7 +1776,7 @@ sub WriteAllMappings()
     {
         my %RawNameToFile; ## a per-$Type cache
 
-        for my $Name (sort {length $a <+> length $b} keys %{%TableInfo{?$Type}})
+        for my $Name (sort {length $a <+> length $b}, keys %{%TableInfo{?$Type}})
         {
             ## Note: $Name is already canonical
             my $Table   = %TableInfo{$Type}->{?$Name};
@@ -1879,7 +1879,7 @@ sub WriteAllMappings()
         }
 
         ## Register aliase info
-        for my $Name (sort {length $a <+> length $b} keys %{%AliasInfo{?$Type} || \%()})
+        for my $Name (sort {length $a <+> length $b}, keys %{%AliasInfo{?$Type} || \%()})
         {
             my $Alias    = %AliasInfo{$Type}->{?$Name};
             my $IsFuzzy  = %FuzzyNames{$Type}->{?$Alias};
@@ -1911,7 +1911,7 @@ sub WriteAllMappings()
                    "##\n",
                    "## '*' means name may be 'fuzzy'\n",
                    "##\n\n", <
-                   sort { substr($a,2) cmp substr($b, 2) } @( < @MAP,)
+                   sort { substr($a,2) cmp substr($b, 2) }, @( < @MAP,)
                   );
         WriteIfChanged('Properties', @OUT);
     };
@@ -2025,11 +2025,11 @@ sub SpecialCasing_txt()
 	     "\%utf8::ToSpec$case =\n\%(\n",
 	    );
 
-        for my $prop (sort { $a->[0] <+> $b->[0] } @{%CaseInfo{?$case}}) {
+        for my $prop (sort { $a->[0] <+> $b->[0] }, @{%CaseInfo{?$case}}) {
             my @($ix, $code, $to) =  @$prop;
             my $tostr =
-              join "", map { sprintf "\\x\{\%s\}", $_ } split ' ', $to;
-            push @OUT, sprintf qq["\%s" => "$tostr",\n], join("", map { sprintf "\\x[\%02X]", $_ } @( unpack("U0C*", pack("U", $ix))));
+              join "", map { sprintf "\\x\{\%s\}", $_ }, split ' ', $to;
+            push @OUT, sprintf qq["\%s" => "$tostr",\n], join("", map { sprintf "\\x[\%02X]", $_ }, @( unpack("U0C*", pack("U", $ix))));
 	    # Remove any single-character mappings for
 	    # the same character since we are going for
 	    # the special casing rules.
@@ -2088,10 +2088,10 @@ sub CaseFolding_txt()
 	 "#  The ke UTF-8 _bytes_, the value UTF-8 (speed hack)\n",
 	 "\%utf8::ToSpecFold =\n\%(\n",
 	);
-    for my $code (sort { $a <+> $b } keys %Fold) {
+    for my $code (sort { $a <+> $b }, keys %Fold) {
         my $foldstr =
-          join "", map { sprintf "\\x\{\%s\}", $_ } split ' ', %Fold{?$code};
-        push @OUT, sprintf qq["\%s" => "$foldstr",\n], join("", map { sprintf "\\x[\%02X]", $_ } @( unpack("U0C*", pack("U", $code))));
+          join "", map { sprintf "\\x\{\%s\}", $_ }, split ' ', %Fold{?$code};
+        push @OUT, sprintf qq["\%s" => "$foldstr",\n], join("", map { sprintf "\\x[\%02X]", $_ }, @( unpack("U0C*", pack("U", $code))));
     }
     push @OUT, (
                 ");\n\n",

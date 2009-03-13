@@ -196,6 +196,8 @@ PERLVAR(Imagicsvhv,		HV *)
 PERLVAR(Ihinthv,	HV *)
 PERLVAR(Iorigfilename,	char *)
 PERLVAR(Ierrorcreatehook,	SV *)
+PERLVARI(Idestroyav,	AV *, NULL)
+PERLVARI(Irootop_ll,	ROOTOP *, NULL)
 PERLVAR(Idiehook,	SV *)
 PERLVAR(Iwarnhook,	SV *)
 
@@ -311,9 +313,9 @@ PERLVARI(Iop_mask,	char *,	NULL)	/* masked operations for safe evals */
 
 /* current interpreter roots */
 PERLVAR(Imain_cv,	CV *)
-PERLVAR(Imain_root,	OP *)
+PERLVAR(Imain_root,	ROOTOP *)
 PERLVAR(Imain_start,	OP *)
-PERLVAR(Ieval_root,	OP *)
+PERLVAR(Ieval_root,	ROOTOP *)
 PERLVAR(Ieval_start,	OP *)
 
 /* runtime control stuff */

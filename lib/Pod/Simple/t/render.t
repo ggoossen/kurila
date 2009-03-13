@@ -77,7 +77,7 @@ foreach my $file (@(
   
   @out = map {
                join '', @( pack("U*", unpack("C*", $_))) # latin1 decode.
-             } @out; 
+             }, @out; 
 
   for ( @out) { s/\s+/ /g; s/^\s+//s; s/\s+$//s; }
 
@@ -92,7 +92,7 @@ foreach my $file (@(
   if($faily) {
     ++$outfile;
     
-    my @outnames = map $outfile . $_, qw(0 1);
+    my @outnames = map { $outfile . $_ }, qw(0 1);
     open(my $out2, ">", "@outnames[0].~out.txt") || die "Can't write-open @outnames[0].txt: $^OS_ERROR";
 
     foreach my $out ( @out) { push @outnames, @outnames[-1];  ++@outnames[-1] };

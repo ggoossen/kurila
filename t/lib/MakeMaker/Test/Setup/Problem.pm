@@ -17,7 +17,7 @@ WriteMakefile(
 END
 
              'Problem-Module/subdir/Makefile.PL'    => <<'END',
-printf \*STDOUT, "\$^INCLUDE_PATH \%s .\n", (grep { $_ eq '.' } $^INCLUDE_PATH) ?? "has" !! "doesn't have";
+printf \*STDOUT, "\$^INCLUDE_PATH \%s .\n", (grep { $_ eq '.' }, $^INCLUDE_PATH) ?? "has" !! "doesn't have";
 
 warn "I think I'm going to be sick\n";
 die "YYYAaaaakkk\n";

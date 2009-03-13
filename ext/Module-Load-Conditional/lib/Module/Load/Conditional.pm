@@ -445,7 +445,7 @@ sub can_load {
 
             map {
                 $CACHE->{+$mod}->{+$_} = $mod_data->{?$_}
-            } qw[version file uptodate];
+            }, qw[version file uptodate];
 
             push @load, $mod;
         }
@@ -514,12 +514,12 @@ sub requires {
         return undef;
     }
 
-    my $lib = join " ", map { qq["-I$_"] } $^INCLUDE_PATH;
+    my $lib = join " ", map { qq["-I$_"] }, $^INCLUDE_PATH;
     my $cmd = qq[$^EXECUTABLE_NAME $lib -M$who -e"print(join(qq[\\n],keys(\$^INCLUDED)))"];
 
-    return  sort grep { !m/^$who$/  }
- map  { chomp; s|/|::|g; $_ }
- grep { s|\.pm$||i; }
+    return  sort grep { !m/^$who$/  },
+ map  { chomp; s|/|::|g; $_ },
+ grep { s|\.pm$||i; },
  @(            `$cmd`);
 }
 

@@ -29,7 +29,7 @@ sub _handle_element_start { # self, tagname, attrhash
       # first event!  set to stack, and set as root.
   }
   DEBUG +> 3 and print \*STDOUT, "Stack is now: ",
-    join(">", map $_->[0], @{@_[0]->{'_currpos'}}), "\n";
+    join(">", map { $_->[0] }, @{@_[0]->{'_currpos'}}), "\n";
   return;
 }
 
@@ -37,7 +37,7 @@ sub _handle_element_end { # self, tagname
   DEBUG +> 2 and print \*STDOUT, "Handling @_[1] end-event\n";
   shift @{@_[0]->{'_currpos'}};
   DEBUG +> 3 and print \*STDOUT, "Stack is now: ",
-    join(">", map $_->[0], @{@_[0]->{'_currpos'}}), "\n";
+    join(">", map { $_->[0] }, @{@_[0]->{'_currpos'}}), "\n";
   return;
 }
 

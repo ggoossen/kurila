@@ -230,8 +230,8 @@ my $end_sym   = "\e(B"; # "\cO" respectively
 my @tree_decorations =
   @(\@("  ", "--", "+-", "|-", "| ", "`-", "-", 1),
    \@(" ", "-", "+", "+", "|", "`", "", 0),
-   \@("  ", < map("$start_sym$_$end_sym", @( "qq", "wq", "tq", "x ", "mq", "q")), 1),
-   \@(" ", < map("$start_sym$_$end_sym", @( "q", "w", "t", "x", "m")), "", 0),
+   \@("  ", < map( {"$start_sym$_$end_sym" }, @( "qq", "wq", "tq", "x ", "mq", "q")), 1),
+   \@(" ", < map( {"$start_sym$_$end_sym" }, @( "q", "w", "t", "x", "m")), "", 0),
   );
 
 my @render_packs; # collect -stash=<packages>
@@ -240,8 +240,8 @@ sub compileOpts {
     # set rendering state from options and args
     my (@options,@args);
     if ((nelems @_)) {
-	@options = grep { (! ref) && m/^-/ } @_;
-	@args = grep { (ref $_) || !m/^-/ } @_;
+	@options = grep { (! ref) && m/^-/ }, @_;
+	@args = grep { (ref $_) || !m/^-/ }, @_;
     }
     for my $o ( @options) {
 	# mode/order
@@ -367,7 +367,9 @@ my $lastnext;	# remembers op-chain, used to insert gotos
 
 my %opclass = %('OP' => "0", 'UNOP' => "1", 'BINOP' => "2", 'LOGOP' => "|",
 	       'LISTOP' => "@", 'PMOP' => "/", 'SVOP' => "\$", 'GVOP' => "*",
-	       'PVOP' => '"', 'LOOP' => "\{", 'COP' => ";", 'PADOP' => "#");
+	       'PVOP' => '"', 'LOOP' => "\{", 'COP' => ";", 'PADOP' => "#",
+                'ROOTOP' => '!',
+            );
 
 no warnings 'qw'; # "Possible attempt to put comments..."; use #7
 my @linenoise =
@@ -592,9 +594,9 @@ our %priv; # used to display each opcode's BASEOP.op_private values
 %priv{+$_}->{+16} = "OURINTR" for @( ("gvsv", "rv2sv", "rv2av", "rv2hv", "r2gv",
 	"enteriter"));
 %priv{+$_}->{+16} = "TARGMY"
-  for @( (< map(($_,"s$_"), @("chop", "chomp")),
-       < map(($_,"i_$_"), @( "postinc", "postdec", "multiply", "divide", "modulo",
-	   "add", "subtract", "negate")), "pow", "concat", "stringify",
+  for @( (< ( @+: map( {@($_,"s$_") }, @("chop", "chomp")) ),
+       < ( @+: map( {@($_,"i_$_") }, @( "postinc", "postdec", "multiply", "divide", "modulo",
+	   "add", "subtract", "negate"))), "pow", "concat", "stringify",
        "left_shift", "right_shift", "bit_and", "bit_xor", "bit_or",
        "complement", "atan2", "sin", "cos", "rand", "exp", "log", "sqrt",
        "int", "hex", "oct", "abs", "length", "index", "rindex", "sprintf",
@@ -648,7 +650,7 @@ our %hints; # used to display each COP's op_hints values
 sub _flags {
     my@($hash, $x) =  @_;
     my @s;
-    for my $flag (sort {$b <+> $a} keys %{$hash || \%()}) {
+    for my $flag (sort {$b <+> $a}, keys %{$hash || \%()}) {
 	if ($hash->{?$flag} and $x ^&^ $flag and $x +>= $flag) {
 	    $x -= $flag;
 	    push @s, $hash->{?$flag};
@@ -739,6 +741,9 @@ sub concise_op {
 	# targ holds the old type
 	%h{+exname} = "ex-" . substr(ppname(%h{?targ}), 3);
 	%h{+extarg} = "";
+    } elsif ($op->name =~ m/^root$/) {
+        my $refs = "ref" . (%h{?targ} != 1 ?? "s" !! "");
+        %h{+targarglife} = %h{+targarg} = "%h{?targ} $refs";
     } elsif ($op->name =~ m/^leave(sub(lv)?|write)?$/) {
 	# targ potentially holds a reference count
 	if ($op->private ^&^ 64) {
@@ -943,7 +948,7 @@ sub tree {
 	@lines[0] = $single . @lines[0];
     }
     return @("$name$lead" . shift @lines,
-           < map(" " x (length($name)+$size) . $_, @lines));
+           < map( {" " x (length($name)+$size) . $_ }, @lines));
 }
 
 # *** Warning: fragile kludge ahead ***
@@ -983,7 +988,7 @@ sub tree {
 # Remember, this needs to stay the last things in the module.
 
 # Why is this different for MacOS?  Does it matter?
-my $cop_seq_mnum = $^OS_NAME eq 'MacOS' ?? 14 !! 13;
+my $cop_seq_mnum = $^OS_NAME eq 'MacOS' ?? 12 !! 11;
 $cop_seq_base = svref_2object(eval 'sub{0;}')->START->cop_seq + $cop_seq_mnum;
 
 1;

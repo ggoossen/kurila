@@ -45,7 +45,7 @@ my %alias;
 # Format is "this function" => "does these op names"
 my @raw_alias = @(
 		 Perl_do_kv => \qw( keys values ),
-		 Perl_unimplemented_op => \qw(mapstart custom),
+		 Perl_unimplemented_op => \qw(mapstart custom root),
 		 # All the ops with a body of { return NORMAL; }
 		 Perl_pp_null => \qw(scalar regcmaybe lineseq scope),
 
@@ -324,6 +324,7 @@ my %opclass = %(
     '%',  11,		# baseop_or_unop
     '-',  12,		# filestatop
     '}',  13,		# loopexop
+    '!',  14,		# rootop
 );
 
 my %opflags = %(
@@ -410,7 +411,7 @@ sub gen_op_is_macro {
 	# get opnames whose numbers are lowest and highest
 	my @($first, @< @rest) =  sort {
 	    $op_is->{?$a} <+> $op_is->{?$b}
-	} keys %$op_is;
+	}, keys %$op_is;
 	
 	my $last = pop @rest;	# @rest slurped, get its last
 	die "Invalid range of ops: $first .. $last\n" unless $last;
@@ -426,7 +427,7 @@ sub gen_op_is_macro {
 	    print $on, ")\n\n";
 	}
 	else {
-	    print $on, join(" || \\\n\t ", map { "(op) == OP_" . uc() } sort keys %$op_is);
+	    print $on, join(" || \\\n\t ", map { "(op) == OP_" . uc() }, sort keys %$op_is);
 	    print $on, ")\n\n";
 	}
     }
@@ -813,6 +814,10 @@ shift		shift			ck_shift	s%	S?
 unshift		unshift			ck_lfun		ims@	S L
 sort		sort			ck_sort		dm@	C? L
 reverse		reverse			ck_fun		t@	S
+arrayjoin	array join (@+:)	ck_fun		t@	S
+hashjoin	hash join (%+:)		ck_fun		t@	S
+arrayconcat	array concat (+@+)	ck_null		t@	S S
+hashconcat	hash concat (+%+)	ck_null		t@	S S
 
 grepstart	grep			ck_grep		dm@	C L
 grepwhile	grep iterator		ck_null		dt|	
@@ -1077,3 +1082,4 @@ lock		lock			ck_rfun		s%	R
 compsub		compsub			ck_compsub		s%	S
 
 custom		unknown custom operator		ck_null		0
+root		refcounted root op		ck_null		!	

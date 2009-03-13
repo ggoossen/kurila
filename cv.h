@@ -16,7 +16,7 @@ typedef U16 cv_flags_t;
 	ANY	xcv_xsubany;							\
     }		xcv_start_u;					    		\
     union {									\
-	OP *	xcv_root;							\
+	ROOTOP *	xcv_root;							\
 	void	(*xcv_xsub) (pTHX_ CV*);					\
     }		xcv_root_u;							\
     AV *	xcv_padlist;							\
@@ -66,9 +66,7 @@ Null CV pointer.
 #define CvPADLIST(sv)	((XPVCV*)SvANY(sv))->xcv_padlist
 #define CvFLAGS(sv)	((XPVCV*)SvANY(sv))->xcv_flags
 
-#define CVf_METHOD	0x0001	/* CV is explicitly marked as a method */
-#define CVf_LOCKED	0x0002	/* CV locks itself or first arg on entry */
-
+#define CVf_BLOCK	0x0001	/* CV accept one argument which is assigned to $_ */
 #define CVf_CLONE	0x0020	/* anon CV uses external lexicals */
 #define CVf_CLONED	0x0040	/* a clone of one of those */
 #define CVf_ANON	0x0080	/* CvGV() can't be trusted */
@@ -78,9 +76,6 @@ Null CV pointer.
 				   (esp. useful for special XSUBs) */
 #define CVf_CONST	0x0400  /* inlinable sub */
 #define CVf_ISXSUB	0x0800	/* CV is an XSUB, not pure perl.  */
-
-/* This symbol for optimised communication between toke.c and op.c: */
-#define CVf_BUILTIN_ATTRS	(CVf_METHOD|CVf_LOCKED)
 
 #define CvCLONE(cv)		(CvFLAGS(cv) & CVf_CLONE)
 #define CvCLONE_on(cv)		(CvFLAGS(cv) |= CVf_CLONE)
@@ -101,14 +96,6 @@ Null CV pointer.
 #define CvNODEBUG(cv)		(CvFLAGS(cv) & CVf_NODEBUG)
 #define CvNODEBUG_on(cv)	(CvFLAGS(cv) |= CVf_NODEBUG)
 #define CvNODEBUG_off(cv)	(CvFLAGS(cv) &= ~CVf_NODEBUG)
-
-#define CvMETHOD(cv)		(CvFLAGS(cv) & CVf_METHOD)
-#define CvMETHOD_on(cv)		(CvFLAGS(cv) |= CVf_METHOD)
-#define CvMETHOD_off(cv)	(CvFLAGS(cv) &= ~CVf_METHOD)
-
-#define CvLOCKED(cv)		(CvFLAGS(cv) & CVf_LOCKED)
-#define CvLOCKED_on(cv)		(CvFLAGS(cv) |= CVf_LOCKED)
-#define CvLOCKED_off(cv)	(CvFLAGS(cv) &= ~CVf_LOCKED)
 
 #define CvEVAL(cv)		(CvUNIQUE(cv) && !SvFAKE(cv))
 #define CvEVAL_on(cv)		(CvUNIQUE_on(cv),SvFAKE_off(cv))

@@ -103,6 +103,7 @@
 #define PL_defoutgv		(vTHX->Idefoutgv)
 #define PL_defstash		(vTHX->Idefstash)
 #define PL_delaymagic		(vTHX->Idelaymagic)
+#define PL_destroyav		(vTHX->Idestroyav)
 #define PL_diehook		(vTHX->Idiehook)
 #define PL_dirty		(vTHX->Idirty)
 #define PL_doextract		(vTHX->Idoextract)
@@ -228,6 +229,7 @@
 #define PL_rehash_seed		(vTHX->Irehash_seed)
 #define PL_rehash_seed_set	(vTHX->Irehash_seed_set)
 #define PL_restartop		(vTHX->Irestartop)
+#define PL_rootop_ll		(vTHX->Irootop_ll)
 #define PL_rs			(vTHX->Irs)
 #define PL_runops		(vTHX->Irunops)
 #define PL_savebegin		(vTHX->Isavebegin)
@@ -381,6 +383,7 @@
 #define PL_Idefoutgv		PL_defoutgv
 #define PL_Idefstash		PL_defstash
 #define PL_Idelaymagic		PL_delaymagic
+#define PL_Idestroyav		PL_destroyav
 #define PL_Idiehook		PL_diehook
 #define PL_Idirty		PL_dirty
 #define PL_Idoextract		PL_doextract
@@ -506,6 +509,7 @@
 #define PL_Irehash_seed		PL_rehash_seed
 #define PL_Irehash_seed_set	PL_rehash_seed_set
 #define PL_Irestartop		PL_restartop
+#define PL_Irootop_ll		PL_rootop_ll
 #define PL_Irs			PL_rs
 #define PL_Irunops		PL_runops
 #define PL_Isavebegin		PL_savebegin

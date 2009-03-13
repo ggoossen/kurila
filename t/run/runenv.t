@@ -62,7 +62,7 @@ sub runperl {
       return @(1, '');                 # success
     }
   } else {                      # child
-      my $old = %:< map { $_ => env::var($_) } keys %$env;
+      my $old = %:< @+: map { @: $_ => env::var($_) }, keys %$env;
       push dynascope->{onleave}, sub {
           for (keys $old) {
               env::set_var($_, $old{$_});
@@ -123,34 +123,34 @@ tryrun(\%(PERL5OPT => '-w -w'),
     '');
 
 tryrun(\%(PERLLIB => "foobar$(config_value('path_sep'))42"),
-    \@('-e', 'print \*STDOUT, < grep { $_ eq "foobar" } $^INCLUDE_PATH'),
+    \@('-e', 'print \*STDOUT, < grep { $_ eq "foobar" }, $^INCLUDE_PATH'),
     'foobar',
     '');
 
 tryrun(\%(PERLLIB => "foobar$(config_value('path_sep'))42"),
-    \@('-e', 'print \*STDOUT, < grep { $_ eq "42" } $^INCLUDE_PATH'),
+    \@('-e', 'print \*STDOUT, < grep { $_ eq "42" }, $^INCLUDE_PATH'),
     '42',
     '');
 
 tryrun(\%(PERL5LIB => "foobar$(config_value('path_sep'))42"),
-    \@('-e', 'print \*STDOUT, < grep { $_ eq "foobar" } $^INCLUDE_PATH'),
+    \@('-e', 'print \*STDOUT, < grep { $_ eq "foobar" }, $^INCLUDE_PATH'),
     'foobar',
     '');
 
 tryrun(\%(PERL5LIB => "foobar$(config_value('path_sep'))42"),
-    \@('-e', 'print \*STDOUT, < grep { $_ eq "42" } $^INCLUDE_PATH'),
+    \@('-e', 'print \*STDOUT, < grep { $_ eq "42" }, $^INCLUDE_PATH'),
     '42',
     '');
 
 tryrun(\%(PERL5LIB => "foo",
      PERLLIB => "bar"),
-    \@('-e', 'print \*STDOUT, < grep { $_ eq "foo" } $^INCLUDE_PATH'),
+    \@('-e', 'print \*STDOUT, < grep { $_ eq "foo" }, $^INCLUDE_PATH'),
     'foo',
     '');
 
 tryrun(\%(PERL5LIB => "foo",
      PERLLIB => "bar"),
-    \@('-e', 'print \*STDOUT, < grep { $_ eq "bar" } $^INCLUDE_PATH'),
+    \@('-e', 'print \*STDOUT, < grep { $_ eq "bar" }, $^INCLUDE_PATH'),
     '',
     '');
 

@@ -87,8 +87,8 @@ sub showlex_main {
 }
 
 sub compile {
-    my @options = grep { ! ref && m/^-/ } @_;
-    my @args = grep { ref || !m/^-/ } @_;
+    my @options = grep { ! ref && m/^-/ }, @_;
+    my @args = grep { ref || !m/^-/ }, @_;
     for my $o ( @options) {
 	$newlex = 1 if $o eq "-newlex";
 	$nosp1  = 1 if $o eq "-nosp";

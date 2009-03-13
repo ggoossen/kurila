@@ -23,7 +23,7 @@ is_deeply( \(sort keys %Foo::FIELDS),
 sub show_fields {
     my@($base, $mask) =  @_;
     my $fields = \%{*{Symbol::fetch_glob($base.'::FIELDS')}};
-    return grep { (%fields::attr{$base}->[$fields->{?$_}] ^&^ $mask) == $mask} 
+    return grep { (%fields::attr{$base}->[$fields->{?$_}] ^&^ $mask) == $mask},
                 keys %$fields;
 }
 

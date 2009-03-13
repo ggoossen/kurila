@@ -197,30 +197,8 @@ Perl_pad_new(pTHX_ int flags, PAD* parent_padnames, PAD* parent_pad, IV parent_s
 	av_store(padname, PAD_FLAGS_INDEX, 
             newSViv( (flags & padnew_LATE) ? PADf_LATE : 0 ));
     }
-
-    if (flags & padnew_CLONE) {
-	/* XXX DAPM  I dont know why cv_clone needs it
-	 * doing differently yet - perhaps this separate branch can be
-	 * dispensed with eventually ???
-	 */
-
-        AV * const a0 = newAV();			/* will be @_ */
-	av_extend(a0, 0);
-	av_store(pad, 0, (SV*)a0);
-	AvREIFY_only(a0);
-    }
-    else {
-	{
-	    /* add @_ */
-	    SV * namesv = newSV_type(SVt_PVNV);
-	    sv_setpv(namesv, "@_");
-	    COP_SEQ_RANGE_LOW_set(namesv, 0);	/* min */
-	    COP_SEQ_RANGE_HIGH_set(namesv, PAD_MAX);		/* max */
-
-	    av_store(pad, PAD_ARGS_INDEX, AvSv(newAV()));
-	    av_store(padname, PAD_ARGS_INDEX, namesv);
-	}
-    }
+    
+    av_store(pad, PAD_ARGS_INDEX -1, &PL_sv_undef); /* make sure pad is filled to PAD_ARGS_INDEX */
 
     AvREAL_off(padlist);
     av_store(padlist, 0, (SV*)padname);
@@ -233,8 +211,8 @@ Perl_pad_new(pTHX_ int flags, PAD* parent_padnames, PAD* parent_pad, IV parent_s
     PL_curpad		= AvARRAY(PL_comppad);
 
     if (! (flags & padnew_CLONE)) {
-	PL_comppad_name_fill = 1;
-	PL_min_intro_pending = 0;
+	PL_comppad_name_fill = 0;
+	PL_min_intro_pending = -1;
 	PL_padix	     = 0;
 	PL_cv_has_eval	     = 0;
     }
@@ -325,7 +303,7 @@ Perl_pad_tmprefcnt(pTHX_ CV* cv)
      * children, or integrate this loop with general cleanup */
     ix = AvFILLp(padlist);
     while (ix >= 0) {
-	const SV* const sv = AvARRAY(padlist)[ix--];
+	SV* const sv = AvARRAY(padlist)[ix--];
 	SvTMPREFCNT_inc(sv);
     }
     SvTMPREFCNT_inc((SV*)CvPADLIST(cv));
@@ -374,7 +352,7 @@ Perl_pad_add_name(pTHX_ const char *name, GV* ourgv, bool fake)
 	COP_SEQ_RANGE_LOW_set(namesv, PAD_MAX);	/* min */
 	COP_SEQ_RANGE_HIGH_set(namesv, 0);		/* max */
 
-	if (!PL_min_intro_pending)
+	if (PL_min_intro_pending == -1)
 	    PL_min_intro_pending = offset;
 	PL_max_intro_pending = offset;
 	/* if it's not a simple scalar, replace with an AV or HV */
@@ -845,7 +823,7 @@ Perl_pad_block_start(pTHX_ int full)
 	PL_comppad_name_floor = 0;
     SAVEI32(PL_min_intro_pending);
     SAVEI32(PL_max_intro_pending);
-    PL_min_intro_pending = 0;
+    PL_min_intro_pending = -1;
     SAVEI32(PL_comppad_name_fill);
     SAVEI32(PL_padix_floor);
     PL_padix_floor = PL_padix;
@@ -869,7 +847,7 @@ Perl_intro_my(pTHX)
     I32 i;
 
     ASSERT_CURPAD_ACTIVE("intro_my");
-    if (! PL_min_intro_pending)
+    if (PL_min_intro_pending == -1)
 	return PL_cop_seqmax;
 
     svp = AvARRAY(PL_comppad_name);
@@ -887,7 +865,7 @@ Perl_intro_my(pTHX)
 	    );
 	}
     }
-    PL_min_intro_pending = 0;
+    PL_min_intro_pending = -1;
     PL_comppad_name_fill = PL_max_intro_pending; /* Needn't search higher */
     DEBUG_Xv(PerlIO_printf(Perl_debug_log,
 		"Pad intromy: seq -> %ld\n", (long)(PL_cop_seqmax+1)));
@@ -914,7 +892,7 @@ Perl_pad_leavemy(pTHX)
     PL_pad_reset_pending = FALSE;
 
     ASSERT_CURPAD_ACTIVE("pad_leavemy");
-    if (PL_min_intro_pending && PL_comppad_name_fill < PL_min_intro_pending) {
+    if (PL_min_intro_pending != -1 && PL_comppad_name_fill < PL_min_intro_pending) {
 	for (off = PL_max_intro_pending; off >= PL_min_intro_pending; off--) {
 	    const SV * const sv = svp[off];
 	    if (sv && sv != &PL_sv_undef

@@ -5333,15 +5333,13 @@ S_reg(pTHX_ RExC_state_t *pRExC_state, I32 paren, I32 *flagp,U32 depth)
 		}
 		if (!SIZE_ONLY) {
 		    PAD *pad;
-		    OP_4tree *sop, *rop;
+		    OP *sop;
+		    ROOTOP *rop;
 		    SV * const sv = newSVpvn(s, RExC_parse - 1 - s);
 
 		    ENTER;
 		    Perl_save_re_context(aTHX);
-		    rop = sv_compile_2op(sv, &sop, "re", &pad);
-		    sop->op_private |= OPpREFCOUNTED;
-		    /* re_dup will OpREFCNT_inc */
-		    OpREFCNT_set(sop, 1);
+		    sop = sv_compile_2op(sv, &rop, "re", &pad);
 		    LEAVE;
 
 		    n = add_data(pRExC_state, 3, "nop");
@@ -6236,7 +6234,6 @@ S_reg_namedseq(pTHX_ RExC_state_t *pRExC_state, UV *valuep)
             NULL;
         SV *cv= cvp ? *cvp : NULL;
         HE *he_str;
-        int count;
         /* create an SV with the name as argument */
         sv_name = newSVpvn(name, endbrace - name);
         
@@ -6273,12 +6270,8 @@ S_reg_namedseq(pTHX_ RExC_state_t *pRExC_state, UV *valuep)
             
             PUTBACK ;
             
-            count= call_sv(cv, G_SCALAR);
-            
-            if (count == 1) { /* XXXX is this right? dmq */
-                sv_str = POPs;
-                SvREFCNT_inc_simple_void(sv_str);
-            } 
+            sv_str = call_sv(cv, G_SCALAR);
+	    SvREFCNT_inc_simple_void(sv_str);
             
             SPAGAIN ;
             PUTBACK ;
@@ -8797,14 +8790,15 @@ Perl_preg_tmprefcnt(pTHX_ REGEXP *rx)
 {
     dVAR;
     struct regexp *const r = (struct regexp *)SvANY(rx);
+    RXi_GET_DECL(r,ri);
 
     PERL_ARGS_ASSERT_PREGFREE2;
 
     if (r->mother_re) {
-        SvTMPREFCNT_inc(r->mother_re);
+        ReTMPREFCNT_inc(r->mother_re);
     } else {
         if (RXp_PAREN_NAMES(r))
-            SvTMPREFCNT_inc(RXp_PAREN_NAMES(r));
+            HvTMPREFCNT_inc(RXp_PAREN_NAMES(r));
     }        
     if (r->substrs) {
         if (r->anchored_substr)
@@ -8816,6 +8810,35 @@ Perl_preg_tmprefcnt(pTHX_ REGEXP *rx)
     if (r->saved_copy)
         SvTMPREFCNT_inc(r->saved_copy);
 #endif
+
+    if (ri->data) {
+	int n = ri->data->count;
+
+	while (--n >= 0) {
+          /* If you add a ->what type here, update the comment in regcomp.h */
+	    switch (ri->data->what[n]) {
+	    case 's':
+	    case 'S':
+	    case 'u':
+		SvTMPREFCNT_inc((SV*)ri->data->data[n]);
+		break;
+	    case 'f':
+		break;
+	    case 'p':
+		break;
+	    case 'o':
+		break;
+	    case 'n':
+	        break;
+            case 'T':	        
+                break;
+	    case 't':
+		break;
+	    default:
+		Perl_croak(aTHX_ "panic: regfree data code '%c'", ri->data->what[n]);
+	    }
+	}
+    }
 }
 
 /*  reg_temp_copy()
@@ -8919,7 +8942,6 @@ Perl_regfree_internal(pTHX_ REGEXP * const rx)
 	int n = ri->data->count;
 	PAD* new_comppad = NULL;
 	PAD* old_comppad;
-	PADOFFSET refcnt;
 
 	while (--n >= 0) {
           /* If you add a ->what type here, update the comment in regcomp.h */
@@ -8942,11 +8964,7 @@ Perl_regfree_internal(pTHX_ REGEXP * const rx)
 		    /* Watch out for global destruction's random ordering. */
 		    (SvTYPE(new_comppad) == SVt_PVAV) ? new_comppad : NULL
 		);
-		OP_REFCNT_LOCK;
-		refcnt = OpREFCNT_dec((OP_4tree*)ri->data->data[n]);
-		OP_REFCNT_UNLOCK;
-		if (!refcnt)
-                    op_free((OP_4tree*)ri->data->data[n]);
+		rootop_refcnt_dec((ROOTOP*)ri->data->data[n]); 
 
 		PAD_RESTORE_LOCAL(old_comppad);
 		SvREFCNT_dec((SV*)new_comppad);

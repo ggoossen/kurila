@@ -73,28 +73,6 @@ into peep() to do that code's portion of the 3rd pass.  It has to be
 recursive, but it's recursive on basic blocks, not on tree nodes.
 */
 
-/* To implement user lexical pragmas, there needs to be a way at run time to
-   get the compile time state of %^H for that block.  Storing %^H in every
-   block (or even COP) would be very expensive, so a different approach is
-   taken.  The (running) state of %^H is serialised into a tree of HE-like
-   structs.  Stores into %^H are chained onto the current leaf as a struct
-   refcounted_he * with the key and the value.  Deletes from %^H are saved
-   with a value of PL_sv_placeholder.  The state of %^H at any point can be
-   turned back into a regular HV by walking back up the tree from that point's
-   leaf, ignoring any key you've already seen (placeholder or not), storing
-   the rest into the HV structure, then removing the placeholders. Hence
-   memory is only used to store the %^H deltas from the enclosing COP, rather
-   than the entire %^H on each COP.
-
-   To cause actions on %^H to write out the serialisation records, it has
-   magic type 'H'. This magic (itself) does nothing, but its presence causes
-   the values to gain magic type 'h', which has entries for set and clear.
-   C<Perl_magic_sethint> updates C<PL_compiling.cop_hints_hash> with a store
-   record, with deletes written by C<Perl_magic_clearhint>. C<SAVEHINTS>
-   saves the current C<PL_compiling.cop_hints_hash> on the save stack, so that
-   it will be correctly restored when any inner compiling scope is exited.
-*/
-
 #include "EXTERN.h"
 #define PERL_IN_OP_C
 #include "perl.h"
@@ -305,6 +283,29 @@ Perl_Slab_Free(pTHX_ void *op)
 
 #define RETURN_UNLIMITED_NUMBER (PERL_INT_MAX / 2)
 
+ROOTOP*
+Perl_newROOTOP(pTHX_ OP *main, SV* location)
+{
+    ROOTOP* o;
+    optype type = OP_ROOT;
+
+    NewOp(1101, o, 1, ROOTOP);
+    o->op_type = type;
+    o->op_ppaddr = PL_ppaddr[type];
+    o->op_first = main;
+    o->op_flags = OPf_KIDS;
+    o->op_location = SvREFCNT_inc(location);
+    OpREFCNT_set(o, 1);
+
+    o->op_prev_root = NULL;
+    o->op_next_root = PL_rootop_ll;
+    if (PL_rootop_ll)
+	PL_rootop_ll->op_prev_root = o;
+    PL_rootop_ll = o;
+
+    return o;
+}
+
 STATIC OP *
 S_no_fh_allowed(pTHX_ OP *o)
 {
@@ -442,27 +443,20 @@ Perl_op_free(pTHX_ OP *o)
     }
 
     type = o->op_type;
-    if (o->op_private & OPpREFCOUNTED) {
-	switch (type) {
-	case OP_LEAVESUB:
-	case OP_LEAVEEVAL:
-	case OP_LEAVE:
-	case OP_SCOPE:
-	    {
-	    PADOFFSET refcnt;
-	    OP_REFCNT_LOCK;
-	    refcnt = OpREFCNT_dec(o);
-	    OP_REFCNT_UNLOCK;
-	    if (refcnt) {
-		/* Need to find and remove any pattern match ops from the list
-		   we maintain for reset().  */
-		return;
-	    }
-	    }
-	    break;
-	default:
-	    break;
+    if (type == OP_ROOT) {
+	PADOFFSET refcnt;
+	ROOTOP* rooto = (ROOTOP*)o;
+	refcnt = OpREFCNT(o);
+	if (refcnt) {
+	    Perl_croak(aTHX_ "panic: Attempt to free referenced rootop");
 	}
+
+	if (rooto->op_next_root) 
+	    rooto->op_next_root->op_prev_root = rooto->op_prev_root;
+	if (rooto->op_prev_root)
+	    rooto->op_prev_root->op_next_root = rooto->op_next_root;
+	if (rooto == PL_rootop_ll)
+	    PL_rootop_ll = rooto->op_next_root;
     }
 
     if (o->op_flags & OPf_KIDS) {
@@ -506,8 +500,6 @@ Perl_op_tmprefcnt(pTHX_ OP *o)
 	return;
     }
 
-    return;
-
     type = o->op_type;
 
     if (o->op_flags & OPf_KIDS) {
@@ -520,19 +512,14 @@ Perl_op_tmprefcnt(pTHX_ OP *o)
 	type = (OPCODE)o->op_targ;
 
     if (type == OP_NEXTSTATE || type == OP_DBSTATE) {
-	SvTMPREFCNT_inc(((COP*)o)->cop_hints_hash);
+	HvTMPREFCNT_inc(((COP*)o)->cop_hints_hash);
     }
 
- retry:
+    SvTMPREFCNT_inc(o->op_location);
+
     switch (o->op_type) {
     case OP_NULL:	/* Was holding old type, if any. */
-	if (PL_madskills && o->op_targ != OP_NULL) {
-	    o->op_type = (optype)o->op_targ;
-	    o->op_targ = 0;
-	    goto retry;
-	}
     case OP_ENTEREVAL:	/* Was holding hints. */
-	o->op_targ = 0;
 	break;
     default:
 	if (!(o->op_flags & OPf_REF)
@@ -550,6 +537,7 @@ Perl_op_tmprefcnt(pTHX_ OP *o)
     case OP_METHOD_NAMED:
     case OP_CONST:
     case OP_HINTSEVAL:
+    case OP_MAGICSV:
 	SvTMPREFCNT_inc(cSVOPo->op_sv);
 	break;
     case OP_NEXT:
@@ -558,14 +546,14 @@ Perl_op_tmprefcnt(pTHX_ OP *o)
 	break;
     case OP_SUBST:
 	op_tmprefcnt(cPMOPo->op_pmreplrootu.op_pmreplroot);
-	goto clear_pmop;
+	goto tmpref_pmop;
     case OP_PUSHRE:
 	SvTMPREFCNT_inc((SV*)cPMOPo->op_pmreplrootu.op_pmtargetgv);
 	/* FALL THROUGH */
     case OP_MATCH:
     case OP_QR:
-clear_pmop:
-	SvTMPREFCNT_inc(PM_GETRE(cPMOPo));
+tmpref_pmop:
+	ReTMPREFCNT_inc(PM_GETRE(cPMOPo));
 	break;
     }
 }
@@ -620,6 +608,7 @@ Perl_op_clear(pTHX_ OP *o)
     case OP_METHOD_NAMED:
     case OP_CONST:
     case OP_HINTSEVAL:
+    case OP_MAGICSV:
 	SVcpNULL(cSVOPo->op_sv);
 	break;
     case OP_NEXT:
@@ -1057,30 +1046,31 @@ Perl_newPROG(pTHX_ OP *o)
     PERL_ARGS_ASSERT_NEWPROG;
 
     if (PL_in_eval) {
+	OP* opleave;
 	if (PL_eval_root)
-		return;
-	PL_eval_root = newUNOP(OP_LEAVEEVAL,
+	    return;
+	opleave = newUNOP(OP_LEAVEEVAL,
 			       ((PL_in_eval & EVAL_KEEPERR)
 				? OPf_SPECIAL : 0), o, o->op_location);
-	PL_eval_start = linklist(PL_eval_root);
-	PL_eval_root->op_private |= OPpREFCOUNTED;
-	OpREFCNT_set(PL_eval_root, 1);
-	PL_eval_root->op_next = 0;
+	PL_eval_start = linklist(opleave);
+	opleave->op_next = NULL;
+	PL_eval_root = newROOTOP(opleave, opleave->op_location);
+	PL_eval_root->op_next = PL_eval_start;
 	CALL_PEEP(PL_eval_start);
     }
     else {
+	OP* scopeop;
 	if (o->op_type == OP_STUB) {
 	    AVcpNULL(PL_comppad_name);
 	    CVcpNULL(PL_compcv);
 	    S_op_destroy(aTHX_ o);
 	    return;
 	}
-	PL_main_root = scope(sawparens(scalarvoid(o)));
+	scopeop = scope(sawparens(scalarvoid(o)));
 	PL_curcop = &PL_compiling;
-	PL_main_start = LINKLIST(PL_main_root);
-	PL_main_root->op_private |= OPpREFCOUNTED;
-	OpREFCNT_set(PL_main_root, 1);
-	PL_main_root->op_next = 0;
+	PL_main_start = LINKLIST(scopeop);
+	scopeop->op_next = NULL;
+	PL_main_root = newROOTOP(scopeop, scopeop->op_location);
 	CALL_PEEP(PL_main_start);
 	CVcpNULL(PL_compcv);
 
@@ -1348,7 +1338,8 @@ Perl_op_assign(pTHX_ OP** po, I32 optype)
 	copy_to_tmp->op_sibling = o_sibling;
 	*po = copy_to_tmp;
 
-	copyo = newSVOP(OP_MAGICSV, 0, cSVOPx_sv(o), newSVsv(o->op_location));
+	copyo = newSVOP(OP_MAGICSV, 0,
+	    SvREFCNT_inc_NN(cSVOPx_sv(o)), sv_mortalcopy(o->op_location));
 	copyo = assign(copyo, FALSE, &min_modcount, &max_modcount);
 
 	padop2 = newOP(OP_PADSV, 0, o->op_location);
@@ -1376,7 +1367,7 @@ Perl_op_assign(pTHX_ OP** po, I32 optype)
 	assert(oldassign->op_type == OP_SASSIGN);
 
 	copyo = newSVOP(oldassign->op_last->op_type, 0, cSVOPx_sv(oldassign->op_last), 
-	    newSVsv(oldassign->op_location));
+	    sv_mortalcopy(oldassign->op_location));
 	copyo = assign(copyo, FALSE, &min_modcount, &max_modcount);
 
 	padop2 = newOP(OP_PADSV, 0, oldassign->op_location);
@@ -2314,11 +2305,11 @@ Perl_package(pTHX_ OP *o)
     PERL_ARGS_ASSERT_PACKAGE;
 
     SAVESPTR(PL_curstash);
-    save_item(PL_curstname);
+    SAVESPTR(PL_curstname);
 
     HVcpREPLACE(PL_curstash, gv_stashsv(sv, GV_ADD));
 
-    sv_setsv(PL_curstname, sv);
+    SVcpSTEAL(PL_curstname, newSVsv(sv));
 
     PL_hints |= HINT_BLOCK_SCOPE;
     PL_parser->expect = XSTATE;
@@ -2340,7 +2331,7 @@ Perl_package(pTHX_ OP *o)
 #ifdef PERL_MAD
 OP*
 #else
-void
+CV*
 #endif
 Perl_utilize(pTHX_ int aver, I32 floor, OP *version, OP *idop, OP *arg)
 {
@@ -2348,6 +2339,7 @@ Perl_utilize(pTHX_ int aver, I32 floor, OP *version, OP *idop, OP *arg)
     OP *pack;
     OP *imop;
     OP *veop;
+    CV *cv;
 #ifdef PERL_MAD
     OP *pegop = newOP(OP_NULL,0, idop->op_location);
 #endif
@@ -2413,13 +2405,13 @@ Perl_utilize(pTHX_ int aver, I32 floor, OP *version, OP *idop, OP *arg)
 
     {
 	/* Fake up the BEGIN {}, which does its thing immediately. */
-	CV* cv = newSUB(floor,
+	cv = cv_2mortal(newSUB(floor,
 	    NULL,
 	    append_elem(OP_LINESEQ,
 		append_elem(OP_LINESEQ,
 		    newSTATEOP(0, NULL, newUNOP(OP_REQUIRE, 0, idop, idop->op_location), idop->op_location),
 		    newSTATEOP(0, NULL, veop, (veop ? veop : idop)->op_location)),
-		newSTATEOP(0, NULL, imop, (imop ? imop : idop)->op_location) ));
+		newSTATEOP(0, NULL, imop, (imop ? imop : idop)->op_location) )));
 	
 	SVcpSTEAL( SvLOCATION(CvSv(cv)), 
 	    idop->op_location ? newSVsv(idop->op_location) : AvSv(newAV()) );
@@ -2427,7 +2419,6 @@ Perl_utilize(pTHX_ int aver, I32 floor, OP *version, OP *idop, OP *arg)
 	    av_store(SvAv(SvLOCATION((SV*)cv)), LOC_NAME_INDEX, newSVpv("use", 0));
 	}
 
-	process_special_block(KEY_BEGIN, cv);
     }
 
     /* The "did you use incorrect case?" warning used to be here.
@@ -2451,6 +2442,7 @@ Perl_utilize(pTHX_ int aver, I32 floor, OP *version, OP *idop, OP *arg)
     PL_parser->expect = XSTATE;
     PL_cop_seqmax++; /* Purely for B::*'s benefit */
 
+    return cv;
 #ifdef PERL_MAD
     if (!PL_madskills) {
 	/* FIXME - don't allocate pegop if !PL_madskills */
@@ -2508,6 +2500,7 @@ Perl_vload_module(pTHX_ U32 flags, SV *name, SV *ver, va_list *args)
     dVAR;
     OP *veop, *imop;
     OP * const modname = newSVOP(OP_CONST, 0, name, NULL);
+    CV * cv;
 
     PERL_ARGS_ASSERT_VLOAD_MODULE;
 
@@ -2543,8 +2536,9 @@ Perl_vload_module(pTHX_ U32 flags, SV *name, SV *ver, va_list *args)
     SAVEVPTR(PL_curcop);
     lex_start(NULL, NULL, FALSE);
     SVcpREPLACE(PL_parser->lex_filename, newSVpv("fake begin block", 0));
-    utilize(!(flags & PERL_LOADMOD_DENY), start_subparse(0),
-	    veop, modname, imop);
+    cv = utilize(!(flags & PERL_LOADMOD_DENY), start_subparse(0),
+	veop, modname, imop);
+    process_special_block(KEY_BEGIN, cv);
     LEAVE;
 }
 
@@ -2671,11 +2665,7 @@ Perl_newSTATEOP(pTHX_ OPFLAGS flags, char *label, OP *o, SV *location)
     cop->cop_seq = seq;
     cop->cop_warnings = DUP_WARNINGS(PL_curcop->cop_warnings);
     cop->cop_hints_hash = PL_curcop->cop_hints_hash;
-    if (cop->cop_hints_hash) {
-	HINTS_REFCNT_LOCK;
-	SvREFCNT_inc(cop->cop_hints_hash);
-	HINTS_REFCNT_UNLOCK;
-    }
+    SvREFCNT_inc(cop->cop_hints_hash);
 
     CopSTASH_set(cop, PL_curstash);
 
@@ -3294,16 +3284,8 @@ Perl_cv_undef(pTHX_ CV *cv)
     );
 
     if (!CvISXSUB(cv) && CvROOT(cv)) {
-	if (SvTYPE(cv) == SVt_PVCV && CvDEPTH(cv))
-	    Perl_croak(aTHX_ "Can't undef active subroutine");
-	ENTER;
-
-	PAD_SAVE_SETNULLPAD();
-
-	op_free(CvROOT(cv));
-	CvROOT(cv) = NULL;
+	ROOTOPcpNULL(CvROOT(cv));
 	CvSTART(cv) = NULL;
-	LEAVE;
     }
     SvPOK_off((SV*)cv);		/* forget prototype */
 
@@ -3327,9 +3309,6 @@ Perl_cv_tmprefcnt(pTHX_ CV *cv)
 
     PERL_ARGS_ASSERT_CV_TMPREFCNT;
 
-    if (!CvISXSUB(cv) && CvROOT(cv)) {
-	op_tmprefcnt(CvROOT(cv));
-    }
     pad_tmprefcnt(cv);
 
     if (CvCONST(cv)) {
@@ -3594,7 +3573,6 @@ Perl_newSUB(pTHX_ I32 floor, OP *proto, OP *block)
     cv = NULL;
 
     if (!block || !ps || *ps
-	|| (CvFLAGS(PL_compcv) & CVf_BUILTIN_ATTRS)
 #ifdef PERL_MAD
 	|| block->op_type == OP_NULL
 #endif
@@ -3639,11 +3617,13 @@ Perl_newSUB(pTHX_ I32 floor, OP *proto, OP *block)
     }
     else
 	block->op_attached = 1;
-    CvROOT(cv) = newUNOP(OP_LEAVESUB, 0, scalarseq(block), block->op_location);
-    CvROOT(cv)->op_private |= OPpREFCOUNTED;
-    OpREFCNT_set(CvROOT(cv), 1);
-    CvSTART(cv) = LINKLIST(CvROOT(cv));
-    CvROOT(cv)->op_next = 0;
+    {
+	OP* leaveop;
+	leaveop = newUNOP(OP_LEAVESUB, 0, scalarseq(block), block->op_location);
+	CvSTART(cv) = LINKLIST(leaveop);
+	leaveop->op_next = 0;
+	CvROOT(cv) = newROOTOP(leaveop, block->op_location);
+    }
     CALL_PEEP(CvSTART(cv));
 
     /* now that optimizer has done its work, adjust pad values */
@@ -3696,9 +3676,8 @@ Perl_process_special_block(pTHX_ const I32 key, CV *const cv)
 		newSVpv("BEGIN", 0));
 	}
 
-	call_av = newAV();
-	av_2mortal(call_av);
-	av_push(call_av, CvSv(cv));
+	call_av = av_2mortal(newAV());
+	av_push(call_av, SvREFCNT_inc(CvSv(cv)));
 	call_list(oldscope, call_av);
 
 	PL_curcop = &PL_compiling;
@@ -3707,23 +3686,23 @@ Perl_process_special_block(pTHX_ const I32 key, CV *const cv)
         break;
     }
     case KEY_END:
-	Perl_av_create_and_unshift_one(aTHX_ &PL_endav, (SV*)cv);
+	Perl_av_create_and_unshift_one(aTHX_ &PL_endav, SvREFCNT_inc(CvSv(cv)));
 	break;
     case KEY_UNITCHECK:
 	/* It's never too late to run a unitcheck block */
-	Perl_av_create_and_unshift_one(aTHX_ &PL_unitcheckav, (SV*)cv);
+	Perl_av_create_and_unshift_one(aTHX_ &PL_unitcheckav, SvREFCNT_inc(CvSv(cv)));
 	break;
     case KEY_CHECK:
 	if (PL_main_start && ckWARN(WARN_VOID))
 	    Perl_warner(aTHX_ packWARN(WARN_VOID),
 		"Too late to run CHECK block");
-	Perl_av_create_and_unshift_one(aTHX_ &PL_checkav, (SV*)cv);
+	Perl_av_create_and_unshift_one(aTHX_ &PL_checkav, SvREFCNT_inc(CvSv(cv)));
 	break;
     case KEY_INIT:
 	if (PL_main_start && ckWARN(WARN_VOID))
 	    Perl_warner(aTHX_ packWARN(WARN_VOID),
 		"Too late to run INIT block");
-	Perl_av_create_and_push(aTHX_ &PL_initav, (SV*)cv);
+	Perl_av_create_and_push(aTHX_ &PL_initav, SvREFCNT_inc(cv));
 	break;
     default:
 	Perl_croak(aTHX_ "end");
@@ -4125,7 +4104,7 @@ Perl_ck_eval(pTHX_ OP *o)
     if ((PL_hints & HINT_LOCALIZE_HH) != 0 && PL_hinthv) {
 	/* Store a copy of %^H that pp_entereval can pick up. */
 	OP *hhop = newSVOP(OP_HINTSEVAL, 0,
-	    (SV*)Perl_hv_copy_hints_hv(aTHX_ PL_hinthv), o->op_location);
+	    newSVsv(HvSv(PL_hinthv)), o->op_location);
 	cUNOPo->op_first->op_sibling = hhop;
 	o->op_private |= OPpEVAL_HAS_HH;
     }
@@ -4489,13 +4468,7 @@ Perl_ck_fun(pTHX_ OP *o)
 		break;
 	    case OA_CVREF:
 		{
-		    OP * const newop = newUNOP(OP_NULL, 0, kid, kid->op_location);
-		    kid->op_sibling = 0;
-		    linklist(kid);
-		    newop->op_next = newop;
-		    kid = newop;
-		    kid->op_sibling = sibl;
-		    *tokid = kid;
+		    scalar(kid);
 		}
 		break;
 	    case OA_FILEREF:
@@ -4504,17 +4477,6 @@ Perl_ck_fun(pTHX_ OP *o)
 		    {
 			Perl_croak_at(aTHX_ kid->op_location,
 			    "%s not allowed as fileref", OP_DESC(kid));
-			OP * const newop = newGVOP(OP_GV, 0,
-						   gv_fetchsv(((SVOP*)kid)->op_sv, GV_ADD, SVt_PVIO), kid->op_location);
-			if (!(o->op_private & 1) && /* if not unop */
-			    kid == cLISTOPo->op_last)
-			    cLISTOPo->op_last = newop;
-#ifdef PERL_MAD
-			op_getmad(kid,newop,'K');
-#else
-			op_free(kid);
-#endif
-			kid = newop;
 		    }
 		    else if (kid->op_type == OP_READLINE) {
 			/* neophyte patrol: open(<FH>), close(<FH>) etc. */
@@ -4719,66 +4681,35 @@ Perl_ck_grep(pTHX_ OP *o)
 {
     dVAR;
     LOGOP *gwop = NULL;
+    UNOP* entersubop;
     OP *kid;
-    OP **tokid;
     const OPCODE type = o->op_type == OP_GREPSTART ? OP_GREPWHILE : OP_MAPWHILE;
-    PADOFFSET offset;
 
     PERL_ARGS_ASSERT_CK_GREP;
 
     o->op_ppaddr = PL_ppaddr[OP_GREPSTART];
     /* don't allocate gwop here, as we may leak it if PL_parser->error_count > 0 */
 
-    if (o->op_flags & OPf_STACKED) {
-	OP* k;
-	o = ck_sort(o);
-        kid = cLISTOPo->op_first->op_sibling;
-	if (!cUNOPx(kid)->op_next)
-	    Perl_croak(aTHX_ "panic: ck_grep");
-	for (k = cUNOPx(kid)->op_first; k; k = k->op_next) {
-	    kid = k;
-	}
-	NewOp(1101, gwop, 1, LOGOP);
-	kid->op_next = (OP*)gwop;
-	o->op_flags &= ~OPf_STACKED;
-    }
-    kid = cLISTOPo->op_first->op_sibling;
-    if (type == OP_MAPWHILE)
-	list(kid);
-    else
-	scalar(kid);
     o = ck_fun(o);
     if (PL_parser && PL_parser->error_count)
 	return o;
     kid = cLISTOPo->op_first->op_sibling;
-    if (kid->op_type != OP_NULL)
-	Perl_croak(aTHX_ "panic: ck_grep");
-    kid = kUNOP->op_first;
 
-    if (!gwop)
-	NewOp(1101, gwop, 1, LOGOP);
+    NewOp(11011, gwop, 1, LOGOP);
     gwop->op_type = type;
     gwop->op_ppaddr = PL_ppaddr[type];
-    gwop->op_first = listkids(o);
-    gwop->op_flags |= OPf_KIDS;
-    gwop->op_other = LINKLIST(kid);
-    gwop->op_location = SvREFCNT_inc(kid->op_location);
-    kid->op_next = (OP*)gwop;
-    offset = pad_findmy("$_");
-    if (offset == NOT_IN_PAD || PAD_COMPNAME_FLAGS_isOUR(offset)) {
-	o->op_private = gwop->op_private = 0;
-	gwop->op_targ = pad_alloc(type, SVs_PADTMP);
-    }
-    else {
-	o->op_private = gwop->op_private = OPpGREP_LEX;
-	gwop->op_targ = o->op_targ = offset;
-    }
+    gwop->op_location = SvREFCNT_inc(o->op_location);
 
-    kid = cLISTOPo->op_first->op_sibling;
-    if (!kid || !kid->op_sibling)
-	return too_few_arguments(o,OP_DESC(o));
-    for (tokid = &kid->op_sibling; *tokid; tokid = &((*tokid)->op_sibling))
-	*tokid = mod(*tokid, OP_GREPSTART);
+    NewOp(11011, entersubop, 1, UNOP);
+    entersubop->op_type = OP_ENTERSUB;
+    entersubop->op_flags = OPf_STACKED;
+    entersubop->op_ppaddr = PL_ppaddr[OP_ENTERSUB];
+    entersubop->op_location = SvREFCNT_inc(o->op_location);
+    
+    gwop->op_flags |= OPf_KIDS;
+    gwop->op_first = o;
+    gwop->op_other = (OP*)entersubop;
+    o->op_sibling = (OP*)entersubop;
 
     return (OP*)gwop;
 }
@@ -4917,10 +4848,9 @@ Perl_ck_compsub(pTHX_ OP *o)
     }
     PUTBACK;
 
-    call_sv(cSVOPx_sv(first), G_SCALAR);
+    sv = call_sv(cSVOPx_sv(first), G_SCALAR);
 
     SPAGAIN;
-    sv = POPs;
     newop = INT2PTR(OP*, SvIV(SvRV(sv)));
 
     if (!newop)
@@ -5219,6 +5149,8 @@ Perl_ck_shift(pTHX_ OP *o)
 
 	const PADOFFSET offset = pad_findmy("@_");
 	OP * const argop = newOP(OP_PADSV, 0, o->op_location);
+	if (offset == NOT_IN_PAD)
+	    Perl_croak_at(o->op_location, "shift requires lexical @_");
 	argop->op_targ = offset;
 
 #ifdef PERL_MAD
@@ -5241,7 +5173,7 @@ Perl_ck_sort(pTHX_ OP *o)
 
     PERL_ARGS_ASSERT_CK_SORT;
 
-    if (o->op_type == OP_SORT && (PL_hints & HINT_LOCALIZE_HH) != 0) {
+    if ((PL_hints & HINT_LOCALIZE_HH) != 0) {
 	HV * const hinthv = PL_hinthv;
 	if (hinthv) {
 	    SV ** const svp = hv_fetchs(hinthv, "sort", FALSE);
@@ -5255,8 +5187,7 @@ Perl_ck_sort(pTHX_ OP *o)
 	}
     }
 
-    if (o->op_type == OP_SORT && o->op_flags & OPf_STACKED)
-	simplify_sort(o);
+    simplify_sort(o);
     firstkid = cLISTOPo->op_first->op_sibling;		/* get past pushmark */
     if (o->op_flags & OPf_STACKED) {			/* may have been cleared */
 	OP *k = NULL;
@@ -6236,6 +6167,16 @@ const_sv_xsub(pTHX_ CV* cv)
     EXTEND(sp, 1);
     ST(0) = (SV*)XSANY.any_ptr;
     XSRETURN(1);
+}
+
+void
+Perl_rootop_ll_tmprefcnt() {
+    ROOTOP* rootop;
+    rootop = PL_rootop_ll;
+    while (rootop) {
+	op_tmprefcnt((OP*)rootop);
+	rootop = rootop->op_next_root;
+    }
 }
 
 /*

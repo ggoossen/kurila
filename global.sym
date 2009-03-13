@@ -41,12 +41,14 @@ Perl_SvCv
 Perl_SvPVX_const
 Perl_SvPVX_mutable
 Perl_SvREFCNT_dec
+Perl_SvTMPREFCNT_inc
 Perl_SvIV
 Perl_SvUV
 Perl_SvNV
 Perl_LocationFilename
 Perl_PushBlock
 Perl_PopBlock
+Perl_cx_free_eval
 Perl_av_clear
 Perl_av_delete
 Perl_av_exists
@@ -93,6 +95,7 @@ Perl_cv_const_sv
 Perl_cv_undef
 Perl_cv_tmprefcnt
 Perl_cx_dump
+Perl_cx_tmprefcnt
 Perl_filter_add
 Perl_filter_del
 Perl_filter_read
@@ -135,6 +138,7 @@ Perl_fbm_instr
 Perl_form
 Perl_vform
 Perl_free_tmps
+Perl_tmps_tmprefcnt
 Perl_gp_free
 Perl_gp_tmprefcnt
 Perl_gp_ref
@@ -241,6 +245,7 @@ Perl_is_utf8_punct
 Perl_is_utf8_xdigit
 Perl_is_utf8_mark
 Perl_leave_scope
+Perl_scope_tmprefcnt
 Perl_lex_end
 Perl_op_null
 Perl_op_clear
@@ -265,7 +270,6 @@ Perl_mg_copy
 Perl_mg_find
 Perl_mg_free
 Perl_mg_tmprefcnt
-Perl_mg_get
 Perl_mg_length
 Perl_mg_magical
 Perl_mg_set
@@ -361,7 +365,12 @@ Perl_vnormal
 Perl_vstringify
 Perl_vcmp
 Perl_ninstr
+Perl_newROOTOP
+Perl_rootop_ll_tmprefcnt
 Perl_op_free
+Perl_RootopOp
+Perl_rootop_refcnt_dec
+Perl_rootop_refcnt_inc
 Perl_op_tmprefcnt
 Perl_find_rundefsvoffset
 Perl_pad_sv
@@ -448,6 +457,7 @@ Perl_save_generic_pvref
 Perl_save_shared_pvref
 Perl_save_gp
 Perl_save_hash
+Perl_save_hints
 Perl_save_helem
 Perl_save_hptr
 Perl_save_I16
@@ -483,7 +493,6 @@ Perl_sv_2bool
 Perl_sv_2cv
 Perl_sv_2io
 Perl_sv_2iv
-Perl_sv_2iv_flags
 Perl_sv_2mortal
 Perl_sv_2nv
 Perl_sv_2pv
@@ -492,7 +501,6 @@ Perl_sv_2pvutf8
 Perl_sv_2pvbyte
 Perl_sv_pvn_nomg
 Perl_sv_2uv
-Perl_sv_2uv_flags
 Perl_sv_iv
 Perl_sv_uv
 Perl_sv_nv
@@ -507,6 +515,7 @@ Perl_sv_catpv
 Perl_sv_catpvn
 Perl_sv_catsv
 Perl_sv_chop
+Perl_call_destructors
 Perl_sv_clear
 Perl_sv_cmp
 Perl_sv_compile_2op

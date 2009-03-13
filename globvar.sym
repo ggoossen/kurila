@@ -47,7 +47,6 @@ vtbl_nkeys
 vtbl_regdata
 vtbl_regdatum
 vtbl_regexp
-vtbl_hints
 vtbl_substr
 vtbl_substr_utf8
 vtbl_utf8

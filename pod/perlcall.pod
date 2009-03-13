@@ -239,42 +239,6 @@ dispose of these temporaries explicitly and the section I<Using Perl to
 dispose of temporaries> discusses the specific circumstances where you
 can ignore the problem and let Perl deal with it for you.
 
-=head2 G_NOARGS
-
-Whenever a Perl subroutine is called using one of the I<call_*>
-functions, it is assumed by default that parameters are to be passed to
-the subroutine.  If you are not passing any parameters to the Perl
-subroutine, you can save a bit of time by setting this flag.  It has
-the effect of not creating the C<@_> array for the Perl subroutine.
-
-Although the functionality provided by this flag may seem
-straightforward, it should be used only if there is a good reason to do
-so.  The reason for being cautious is that even if you have specified
-the G_NOARGS flag, it is still possible for the Perl subroutine that
-has been called to think that you have passed it parameters.
-
-In fact, what can happen is that the Perl subroutine you have called
-can access the C<@_> array from a previous Perl subroutine.  This will
-occur when the code that is executing the I<call_*> function has
-itself been called from another Perl subroutine. The code below
-illustrates this
-
-    sub fred
-      { print "@_\n"  }
-
-    sub joe
-      { &fred }
-
-    &joe(1,2,3);
-
-This will print
-
-    1 2 3
-
-What has happened is that C<fred> accesses the C<@_> array which
-belongs to C<joe>.
-
-
 =head2 G_EVAL
 
 It is possible for the Perl subroutine you are calling to terminate

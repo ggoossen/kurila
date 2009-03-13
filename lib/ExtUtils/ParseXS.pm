@@ -690,14 +690,14 @@ sub process_para {
     $func_args = join(", ", @func_args);
      %args_match{[ @args]} =  @args_num;
 
-    $PPCODE = grep(m/^\s*PPCODE\s*:/, @line);
-    $CODE = grep(m/^\s*CODE\s*:/, @line);
+    $PPCODE = grep( {m/^\s*PPCODE\s*:/ }, @line);
+    $CODE = grep( {m/^\s*CODE\s*:/ }, @line);
     # Detect CODE: blocks which use ST(n)= or XST_m*(n,v)
     #   to set explicit return values.
     $EXPLICIT_RETURN = ($CODE &&
 			("$(join ' ', @line)" =~ m/(\bST\s*\([^;]*=) | (\bXST_m\w+\s*\()/x ));
-    $ALIAS  = grep(m/^\s*ALIAS\s*:/, @line);
-    $INTERFACE  = grep(m/^\s*INTERFACE\s*:/, @line);
+    $ALIAS  = grep( {m/^\s*ALIAS\s*:/ }, @line);
+    $INTERFACE  = grep( {m/^\s*INTERFACE\s*:/ }, @line);
 
     $xsreturn = 1 if $EXPLICIT_RETURN;
 
@@ -875,7 +875,7 @@ EOF
       process_keyword("POSTCALL|OUTPUT|ALIAS|ATTRS|PROTOTYPE");
       
       &generate_output(%var_types{?$_}, %args_match{?$_}, $_, $DoSetMagic)
-	for grep %in_out{?$_} =~ m/OUT$/, keys %in_out;
+	for grep { %in_out{?$_} =~ m/OUT$/ }, keys %in_out;
       
       # all OUTPUT done, so now push the return value on the stack
       if ($gotRETVAL && $RETVAL_code) {
@@ -988,7 +988,7 @@ EOF
 	push @proto_arg, "$s\@"
 	  if $ellipsis ;
 	
-	$proto = join ("", grep defined, @proto_arg);
+	$proto = join ("", grep { defined }, @proto_arg);
       }
       else {
 	# User has specified a prototype
@@ -1599,7 +1599,7 @@ sub ProtoString ($)
   }
 
 sub check_cpp {
-  my @cpp = grep(m/^\#\s*(?:if|e\w+)/, @line);
+  my @cpp = grep( {m/^\#\s*(?:if|e\w+)/ }, @line);
   if ((nelems @cpp)) {
     my ($cpplevel);
     for my $cpp ( @cpp) {

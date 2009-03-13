@@ -9,9 +9,9 @@ sub _pack_tags {
 }
 
 sub _unpack_tags {
-    return grep { defined and length }
- map  { < split ' ' }
- grep {defined} @_;
+    return grep { defined and length },
+      @+: map  { split ' ' },
+        grep {defined}, @_;
 }
 
 sub of {

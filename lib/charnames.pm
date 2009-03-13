@@ -198,7 +198,7 @@ sub import
 
   $^HINTS{+charnames_full} = delete %h{':full'};
   $^HINTS{+charnames_short} = delete %h{':short'};
-  $^HINTS{+charnames_scripts} = \ map uc, keys %h;
+  $^HINTS{+charnames_scripts} = \ map { uc }, keys %h;
 
   ##
   ## If utf8? warnings are enabled, and some scripts were given,

@@ -105,15 +105,8 @@ PerlIOVia_method(pTHX_ PerlIO * f, const char *method, CV ** save, int flags,
 	    /* FIXME: How should this work for OPEN etc? */
 	}
 	PUTBACK;
-	count = call_sv((SV *) cv, flags);
-	if (count) {
-	    SPAGAIN;
-	    result = POPs;
-	    PUTBACK;
-	}
-	else {
-	    result = &PL_sv_undef;
-	}
+	result = call_sv((SV *) cv, flags);
+        SPAGAIN;
 	LEAVE;
 	POPSTACK;
     }

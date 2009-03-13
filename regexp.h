@@ -194,8 +194,6 @@ typedef struct regexp_engine {
 Convenience macro to get the REGEXP from a SV. This is approximately
 equivalent to the following snippet:
 
-    if (SvMAGICAL(sv))
-        mg_get(sv);
     if (SvROK(sv) &&
         (tmpsv = (SV*)SvRV(sv)) &&
         SvTYPE(tmpsv) == SVt_PVMG &&

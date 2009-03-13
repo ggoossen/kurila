@@ -52,14 +52,14 @@ sub _init_optags {
     local($^INPUT_RECORD_SEPARATOR) = "\n=cut"; # skip to optags definition section
     ~< *DATA;
     $^INPUT_RECORD_SEPARATOR = "\n=";		# now read in 'pod section' chunks
-    while( ~< *DATA) {
-	next unless m/^item\s+(:\w+)/;
+    while(defined(my $line = ~< *DATA)) {
+	next unless $line =~ m/^item\s+(:\w+)/;
 	my $tag = $1;
 
 	# Split into lines, keep only indented lines
-	my @lines = grep { m/^\s/    } split(m/\n/);
+	my @lines = grep { m/^\s/    }, split(m/\n/, $line);
 	foreach ( @lines) { s/--.*//  } # delete comments
-	my @ops   = map  { < split ' ' } @lines; # get op words
+	my @ops   = @+: map  { split ' ' }, @lines; # get op words
 
 	foreach( @ops) {
 	    warn "$tag - $_ already tagged in %seen{?$_}\n" if %seen{?$_};
@@ -341,7 +341,7 @@ These memory related ops are not included in :base_core because they
 can easily be used to implement a resource attack (e.g., consume all
 available memory).
 
-    concat repeat join range
+    concat repeat join range arrayjoin hashjoin arrayconcat hashconcat
 
     anonarray enter_anonarray_assign anonhash enter_anonhash_assign anonscalar
 

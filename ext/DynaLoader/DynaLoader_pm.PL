@@ -121,7 +121,7 @@ if (env::var('PERL_BUILD_EXPAND_CONFIG_VARS')) {
 }
 else {
     print $out, <<'EOT';
-our @($dl_dlext, $dl_so, $dlsrc) = map { config_value($_) } qw(dlext so dlsrc);
+our @($dl_dlext, $dl_so, $dlsrc) = map { config_value($_) }, qw(dlext so dlsrc);
 EOT
 }
 
@@ -160,7 +160,7 @@ push(@dl_library_path, < split(' ', config_value('libpth')));
 EOT
 
 sub dquoted_comma_list {
-    join(", ", map {'"'.quotemeta($_).'"'} @_);
+    join(", ", map {'"'.quotemeta($_).'"'}, @_);
 }
 
 our @dl_library_path;
@@ -345,7 +345,7 @@ sub bootstrap {
 	push @dirs, $dir;
     }
     # last resort, let dl_findfile have a go in all known locations
-    @(?$file) = dl_findfile(< map("-L$_",@(<@dirs,<$^INCLUDE_PATH)), $modfname) unless $file;
+    @(?$file) = dl_findfile(< map({ "-L$_" } ,@(<@dirs,<$^INCLUDE_PATH)), $modfname) unless $file;
 
     die("Can't locate loadable object for module $module in \$^INCLUDE_PATH (\$^INCLUDE_PATH contains: $(join ' ', $^INCLUDE_PATH))")
 	unless $file;	# wording similar to error from 'require'
@@ -509,8 +509,8 @@ sub dl_findfile {
 	$dirsep = '\\';
 	if ($0 =~ /^([a-z]):/i) {
 	    my $drive = $1;
-	    @dirs = map { "$drive:$_" } @dirs;
-	    @dl_library_path = map { "$drive:$_" } @dl_library_path;
+	    @dirs = map { "$drive:$_" }, @dirs;
+	    @dl_library_path = map { "$drive:$_" }, @dl_library_path;
 	}
 	<</$^O-eq-symbian>>
         foreach my $dir (@(<@dirs, <@dl_library_path)) {

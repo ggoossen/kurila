@@ -44,8 +44,8 @@ IV Perl_SvIV(pTHX_ SV *sv) { return SvIOK(sv) ? SvIVX(sv) : sv_2iv(sv); }
 UV Perl_SvUV(pTHX_ SV *sv) { return SvIOK(sv) ? SvUVX(sv) : sv_2uv(sv); }
 NV Perl_SvNV(pTHX_ SV *sv) { return SvNOK(sv) ? SvNVX(sv) : sv_2nv(sv); }
 
-#define SvIV_nomg(sv) (SvIOK(sv) ? SvIVX(sv) : sv_2iv_flags(sv, 0))
-#define SvUV_nomg(sv) (SvIOK(sv) ? SvUVX(sv) : sv_2uv_flags(sv, 0))
+#define SvIV_nomg(sv) (SvIOK(sv) ? SvIVX(sv) : sv_2iv(sv))
+#define SvUV_nomg(sv) (SvIOK(sv) ? SvUVX(sv) : sv_2uv(sv))
 
 #define SvPVx_const(sv, lp) iiSvPVx_const(aTHX_ sv, lp)
 static __inline__ const char* iiSvPVx_const(pTHX_ SV *sv, STRLEN *lp) { return SvPV_const(sv, *lp); }
@@ -139,6 +139,7 @@ static __inline__ void inline_SVcpREPLACE(pTHX_ SV**sv_d, SV*sv_s) {
 
 #define SVcpSTEAL(sv_d, sv_s) { SvREFCNT_dec(sv_d); sv_d = sv_s; }
 #define AVcpSTEAL(sv_d, sv_s) { AvREFCNT_dec(sv_d); sv_d = sv_s; }
+#define HVcpSTEAL(sv_d, sv_s) { HvREFCNT_dec(sv_d); sv_d = sv_s; }
 #define CVcpSTEAL(sv_d, sv_s) { CvREFCNT_dec(sv_d); sv_d = sv_s; }
 
 
@@ -175,10 +176,13 @@ SV* LocationFilename(pTHX_ SV *location) {
 static __inline__ SV* inline_loc_desc(pTHX_ SV *loc) {
     SV * str = sv_2mortal(newSVpv("", 0));
     if (loc && SvAVOK(loc)) {
+        SV ** loc0 = av_fetch((AV*)loc, 0, FALSE);
+        SV ** loc1 = av_fetch((AV*)loc, 1, FALSE);
+        SV ** loc2 = av_fetch((AV*)loc, 2, FALSE);
         Perl_sv_catpvf(aTHX_ str, "%s line %"IVdf" character %"IVdf".",
-                       SvPVX_const(*av_fetch((AV*)loc, 0, FALSE)),
-                       SvIV(*av_fetch((AV*)loc, 1, FALSE)),
-                       SvIV(*av_fetch((AV*)loc, 2, FALSE))
+            (loc0 && SvPVOK(*loc0)) ? SvPVX_const(*loc0) : "",
+            (loc1 && SvPVOK(*loc1)) ? SvIV(*loc1) : -1,
+            (loc2 && SvPVOK(*loc2)) ? SvIV(*loc2) : -1
             );
     }
     return str;
@@ -227,5 +231,12 @@ void Perl_SvREFCNT_dec(pTHX_ SV *sv) {
         } else {
             sv_free(sv);
         }
+    }
+}
+
+void Perl_SvTMPREFCNT_inc(pTHX_ SV *sv) {
+    if (sv) {
+        assert(SvTYPE(sv) != SVTYPEMASK);
+        (SvTMPREFCNT(sv))++;
     }
 }

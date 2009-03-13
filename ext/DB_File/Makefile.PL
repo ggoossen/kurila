@@ -62,7 +62,7 @@ my @names = qw(
 	);
 
     # Check the constants above all appear in @EXPORT in DB_File.pm
-    my %names = %( < map { $_, 1} @names );
+    my %names = %( < @+: map { @: $_, 1}, @names );
     open my $f, "<", "DB_File.pm" or die "Cannot open DB_File.pm: $^OS_ERROR\n";
     while ( ~< $f)
     {

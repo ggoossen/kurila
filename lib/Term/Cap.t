@@ -19,7 +19,7 @@ END {
 use Test::More;
 
 # these names are hardcoded in Term::Cap
-my $files = join '', grep { -f $_ }
+my $files = join '', grep { -f $_ },
  @(	( $(env::var('HOME')) . '/.termcap', # we assume pretty UNIXy system anyway
 	  '/etc/termcap', 
 	  '/usr/share/misc/termcap' ));

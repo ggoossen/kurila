@@ -24,15 +24,10 @@
 #
 
 BEGIN {
-    if (ord("A") == 193) {
-	print "1..0 # Skip: EBCDIC\n"; # For now, until someone has time.
-	exit(0);
-    }
     require "./test.pl";
-    undef &skip;
 }
 
-skip_all "Unhappy on MacOS" if $^O eq 'MacOS';
+skip_all "Unhappy on MacOS" if $^OS_NAME eq 'MacOS';
 
 #
 # ./test.pl does real evilness by jumping to a label.
@@ -40,10 +35,10 @@ skip_all "Unhappy on MacOS" if $^O eq 'MacOS';
 #
 sub skip {
     my $why  = shift;
-    my $n    = (nelems @_) ? shift : 1;
+    my $n    = (nelems @_) ?? shift !! 1;
     for (1..$n) {
         my $test = curr_test;
-        print STDOUT "ok $test # skip: $why\n";
+        print \*STDOUT, "ok $test # skip: $why\n";
         next_test;
     }
 }

@@ -119,12 +119,12 @@ for (@(1,2,3)) {
 }
 is ($r, '123', 'Forwards for list');
 $r = '';
-for ( map {$_} @array) {
+for ( map {$_}, @array) {
     $r .= $_;
 }
 is ($r, 'ABC', 'Forwards for array via map');
 $r = '';
-for ( map {$_} @( 1,2,3)) {
+for ( map {$_}, @( 1,2,3)) {
     $r .= $_;
 }
 is ($r, '123', 'Forwards for list via map');
@@ -148,12 +148,12 @@ for (reverse @(1,2,3)) {
 }
 is ($r, '321', 'Reverse for list');
 $r = '';
-for (reverse map {$_} @array) {
+for (reverse map {$_}, @array) {
     $r .= $_;
 }
 is ($r, 'CBA', 'Reverse for array via map');
 $r = '';
-for (reverse map {$_} @(1,2,3)) {
+for (reverse map {$_}, @(1,2,3)) {
     $r .= $_;
 }
 is ($r, '321', 'Reverse for list via map');
@@ -178,12 +178,12 @@ for my $i (@(1,2,3)) {
 }
 is ($r, '123', 'Forwards for list with var');
 $r = '';
-for my $i ( map {$_} @array) {
+for my $i ( map {$_}, @array) {
     $r .= $i;
 }
 is ($r, 'ABC', 'Forwards for array via map with var');
 $r = '';
-for my $i ( map {$_} @( 1,2,3)) {
+for my $i ( map {$_}, @( 1,2,3)) {
     $r .= $i;
 }
 is ($r, '123', 'Forwards for list via map with var');

@@ -15,7 +15,7 @@ our @dl_resolve_using;
 
 sub Mkbootstrap {
     my@($baseext, @< @bsloadlibs)= @_;
-    @bsloadlibs = grep($_, @bsloadlibs); # strip empty libs
+    @bsloadlibs = grep( {$_ }, @bsloadlibs); # strip empty libs
 
     print \*STDOUT, "	bsloadlibs=$(join ' ',@bsloadlibs)\n" if $Verbose;
 
@@ -32,7 +32,7 @@ sub Mkbootstrap {
 	$_ = "$($baseext)_BS";
 	package DynaLoader; # execute code as if in DynaLoader
 	local our @($osname, $dlsrc) = @(undef, undef); # avoid warnings
-	@($osname, $dlsrc) =  map { config_value($_) } qw(osname dlsrc);
+	@($osname, $dlsrc) =  map { config_value($_) }, qw(osname dlsrc);
 	our $bscode = "";
 	unshift $^INCLUDE_PATH, ".";
 	require $_;

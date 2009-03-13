@@ -31,7 +31,7 @@ if ('PerlIO::Layer'->find( 'perlio')) {
 	if env::var('PERL_CORE_MINITEST');
 	skip("no PerlIO::scalar") unless config_value("extensions") =~ m!\bPerlIO/scalar\b!;
 	require PerlIO::scalar;
-	my $fcontents = join "", map {"$_\015\012"} 10..100000;
+	my $fcontents = join "", map {"$_\015\012"}, 10..100000;
 	open my $fh, "<:crlf", \$fcontents;
 	local $^INPUT_RECORD_SEPARATOR = "xxx";
 	local $_ = ~< $fh;
@@ -62,7 +62,7 @@ if ('PerlIO::Layer'->find( 'perlio')) {
 	    binmode($foo_fh);
 	    my $foo = scalar ~< *$foo_fh;
 	    close $foo_fh;
-	    print \*STDOUT, join(" ", @( "#", < map { sprintf('%02x', $_) } @( unpack("C*", $foo)))),
+	    print \*STDOUT, join(" ", @( "#", < map { sprintf('%02x', $_) }, @( unpack("C*", $foo)))),
 	    "\n";
 	    ok($foo =~ m/\x0d\x0a$/);
 	    ok($foo !~ m/\x0d\x0d/);

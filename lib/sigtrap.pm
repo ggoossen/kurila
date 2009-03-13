@@ -27,12 +27,12 @@ sub import {
                     signals::set_handler($_, $handler);
                 }
             } elsif ($_ eq 'normal-signals') {
-                unshift @_, < grep { signals::supported($_) } qw(HUP INT PIPE TERM);
+                unshift @_, < grep { signals::supported($_) }, qw(HUP INT PIPE TERM);
             } elsif ($_ eq 'error-signals') {
-                unshift @_, < grep { signals::supported($_) } qw(ABRT BUS EMT FPE ILL QUIT SEGV SYS TRAP);
+                unshift @_, < grep { signals::supported($_) }, qw(ABRT BUS EMT FPE ILL QUIT SEGV SYS TRAP);
             } elsif ($_ eq 'old-interface-signals') {
                 unshift @_,
-                  < grep { signals::supported($_) } qw(ABRT BUS EMT FPE ILL PIPE QUIT SEGV SYS TERM TRAP);
+                  < grep { signals::supported($_) }, qw(ABRT BUS EMT FPE ILL PIPE QUIT SEGV SYS TERM TRAP);
             } elsif ($_ eq 'stack-trace') {
                 $handler = \&handler_traceback;
             } elsif ($_ eq 'die') {

@@ -197,6 +197,10 @@ Perl_pp_shift
 Perl_pp_unshift
 Perl_pp_sort
 Perl_pp_reverse
+Perl_pp_arrayjoin
+Perl_pp_hashjoin
+Perl_pp_arrayconcat
+Perl_pp_hashconcat
 Perl_pp_grepstart
 Perl_pp_grepwhile
 Perl_pp_mapstart
@@ -387,5 +391,6 @@ Perl_pp_getlogin
 Perl_pp_syscall
 Perl_pp_lock
 Perl_pp_compsub
+Perl_pp_root
 
 # ex: set ro:

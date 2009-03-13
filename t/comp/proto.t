@@ -179,13 +179,13 @@ one_or_two_a((nelems @_),nelems @_);
 testing \&a_sub, '&';
 
 sub a_sub (&) {
-    print \*STDOUT, "# \@_ = (",join(",", map {dump::view($_)} @_),")\n";
+    print \*STDOUT, "# \@_ = (",join(",", map {dump::view($_)}, @_),")\n";
     &{@_[0]}( < @_ );
 }
 
 sub tmp_sub_1 { ok(1) }
 
-a_sub { ok(1) };
+a_sub { ok(1) },;
 a_sub \&tmp_sub_1;
 
 @array = @( \&tmp_sub_1 );
@@ -199,10 +199,10 @@ ok( $^EVAL_ERROR );
 testing \&sub_aref, '&\@';
 
 sub sub_aref (&\@) {
-    print \*STDOUT, "# \@_ = (",join(",", map {dump::view($_)} @_),")\n";
+    print \*STDOUT, "# \@_ = (",join(",", map {dump::view($_)}, @_),")\n";
     my@($sub,$array) =  @_;
     ok( (nelems @_) == 2 && (nelems @{$array}) == 4 );
-    print \*STDOUT, < map { &{$sub}($_) } @{$array}
+    print \*STDOUT, < map { &{$sub}($_) }, @{$array}
 }
 
 ##
@@ -212,10 +212,10 @@ sub sub_aref (&\@) {
 testing \&sub_array, '&@';
 
 sub sub_array (&@) {
-    print \*STDOUT, "# \@_ = (",join(",", map {dump::view($_)} @_),")\n";
+    print \*STDOUT, "# \@_ = (",join(",", map {dump::view($_)}, @_),")\n";
     ok((nelems @_) == 5);
     my $sub = shift;
-    print \*STDOUT, < map { &{$sub}($_) } @_
+    print \*STDOUT, < map { &{$sub}($_) }, @_
 }
 
 ##
@@ -225,7 +225,7 @@ sub sub_array (&@) {
 testing \&a_hash_ref, '\%';
 
 sub a_hash_ref (\%) {
-    print \*STDOUT, "# \@_ = (",join(",", map {dump::view($_)} @_),")\n";
+    print \*STDOUT, "# \@_ = (",join(",", map {dump::view($_)}, @_),")\n";
     ok( ref(@_[0]) && @_[0]->{?'a'} );
     @_[0]->{+'b'} = 2;
 }

@@ -27,6 +27,7 @@
 #include "EXTERN.h"
 #define PERL_IN_PERLY_C
 #include "perl.h"
+#include "keywords.h"
 
 typedef unsigned char yytype_uint8;
 typedef signed char yytype_int8;
@@ -483,15 +484,7 @@ Perl_yyparse (pTHX)
     /* yyn is the number of a rule to reduce with.  */
     parser->yylen = yyr2[yyn];
 
-    /* If YYLEN is nonzero, implement the default value of the action:
-      "$$ = $1".
-
-      Otherwise, the following line sets YYVAL to garbage.
-      This behavior is undocumented and Bison
-      users should not rely upon it.  Assigning to YYVAL
-      unconditionally makes the parser a bit smaller, and it avoids a
-      GCC warning that YYVAL may be used uninitialized.  */
-    yyval = ps[1-parser->yylen].val;
+    yyval.opval = NULL;
 
     YY_STACK_PRINT(parser);
     YY_REDUCE_PRINT (yyn);
@@ -690,6 +683,49 @@ Perl_yyparse (pTHX)
   yyreturn:
     LEAVE;	/* force parser stack cleanup before we return */
     return yyresult;
+}
+
+void
+Perl_parser_tmprefcnt(pTHX_  const yy_parser *parser)
+{
+    PERL_ARGS_ASSERT_PARSER_FREE;
+
+    SvTMPREFCNT_inc(parser->linestr);
+    SvTMPREFCNT_inc(parser->lex_filename);
+    SvTMPREFCNT_inc(parser->lex_stuff.str_sv);
+    SvTMPREFCNT_inc(parser->lex_repl.str_sv);
+    AvTMPREFCNT_inc(parser->rsfp_filters);
+    
+    if (parser->old_parser) {
+	parser_tmprefcnt(parser->old_parser);
+    }
+
+    {
+	yy_stack_frame *ps;
+	for (ps = parser->stack; ps <= parser->ps; ps++) {
+	    if (yy_type_tab[yystos[ps->state]] == toketype_opval && ps->val.opval) {
+		op_tmprefcnt(ps->val.opval);
+	    }
+	}
+
+	if (yy_type_tab[yytranslate[parser->yychar]] == toketype_opval && parser->yylval.opval) {
+	    op_tmprefcnt(parser->yylval.opval);
+	}
+
+#ifdef PERL_MAD
+	...;
+#else
+	{
+	    I32 i;
+	    for (i=0; i<parser->nexttoke; i++) {
+		if (yy_type_tab[yytranslate[parser->nexttype[i]]] == toketype_opval &&
+		    parser->nextval[i].opval ) {
+		    op_tmprefcnt(parser->nextval[i].opval);
+		}
+	    }
+	}
+#endif
+    }
 }
 
 /*

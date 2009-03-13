@@ -59,7 +59,7 @@ BEGIN {
     }
     is( $^INCLUDE_PATH[1], $Lib_Dir,          'lib adding at end of $^INCLUDE_PATH' );
     is( $^INCLUDE_PATH[0], $Arch_Dir,        '    auto/ dir in front of that' );
-    is( nelems(grep(m/^\Q$Lib_Dir\E$/,$^INCLUDE_PATH)), 1,   '    no duplicates' );
+    is( nelems(grep( {m/^\Q$Lib_Dir\E$/ },$^INCLUDE_PATH)), 1,   '    no duplicates' );
 
     # Yes, $^INCLUDED uses Unixy filepaths.
     # Not on Mac OS, it doesn't ... it never has, at least.
@@ -83,6 +83,6 @@ unlike( do { eval 'use lib config_value("installsitelib");'; $^EVAL_ERROR || '' 
 	qr/::Config is read-only/, 'lib handles readonly stuff' );
 
 BEGIN {
-    is( nelems(grep(m/stuff/,$^INCLUDE_PATH)), 0, 'no lib' );
+    is( nelems(grep( {m/stuff/ },$^INCLUDE_PATH)), 0, 'no lib' );
     ok( !do 'Yup.pm',           '   do() effected' );
 }

@@ -7,8 +7,6 @@
 #include <perl.h>
 #include <XSUB.h>
 
-#include "multicall.h"
-
 #ifdef SVf_IVisUV
 #  define slu_sv_value(sv) (SvIOK(sv)) ? (SvIOK_UV(sv)) ? (NV)(SvUVX(sv)) : (NV)(SvIVX(sv)) : (SvNV(sv))
 #else
@@ -120,15 +118,13 @@ CODE:
 
 
 
-#ifdef dMULTICALL
-
 void
 reduce(block,...)
     SV * block
 PROTOTYPE: &@
 CODE:
 {
-    dVAR; dMULTICALL;
+    dVAR;
     SV *ret = sv_newmortal();
     int index;
     GV *agv,*bgv,*gv;
@@ -140,19 +136,24 @@ CODE:
 	XSRETURN_UNDEF;
     }
     cv = sv_2cv(block, &gv, 0);
-    PUSH_MULTICALL(cv);
     agv = gv_fetchpv("a", TRUE, SVt_PV);
     bgv = gv_fetchpv("b", TRUE, SVt_PV);
+    ENTER;
     SAVESPTR(GvSV(agv));
     SAVESPTR(GvSV(bgv));
     SVcpREPLACE(GvSV(agv), ret);
     SvSetSV(ret, args[1]);
     for(index = 2 ; index < items ; index++) {
+        SV* res;
 	SVcpREPLACE(GvSV(bgv), args[index]);
-	MULTICALL;
-	SvSetSV(ret, *PL_stack_sp);
+        ENTER;
+        PUSHMARK(SP);
+        PUTBACK;
+        res = call_sv(block, G_SCALAR);
+	SvSetSV(ret, res);
+        LEAVE;
     }
-    POP_MULTICALL;
+    LEAVE;
     ST(0) = ret;
     XSRETURN(1);
 }
@@ -163,34 +164,37 @@ first(block,...)
 PROTOTYPE: &@
 CODE:
 {
-    dVAR; dMULTICALL;
+    dVAR;
     int index;
     GV *gv;
     I32 gimme = G_SCALAR;
-    SV **args = &PL_stack_base[ax];
-    CV *cv;
 
     if(items <= 1) {
 	XSRETURN_UNDEF;
     }
-    cv = sv_2cv(block, &gv, 0);
-    PUSH_MULTICALL(cv);
-    SAVESPTR(GvSV(PL_defgv));
+
+    block = sv_mortalcopy(block);
 
     for(index = 1 ; index < items ; index++) {
-	SVcpREPLACE(GvSV(PL_defgv), args[index]);
-	MULTICALL;
-	if (SvTRUE(*PL_stack_sp)) {
-	  POP_MULTICALL;
-	  ST(0) = ST(index);
-	  XSRETURN(1);
+        bool res;
+        SV** args = &ST(0);
+        ENTER;
+        SAVETMPS;
+        PUSHMARK(SP);
+        XPUSHs(args[index]);
+        PUTBACK;
+        res = SvTRUE( call_sv(block, G_SCALAR) );
+        SPAGAIN;
+        PUTBACK;
+        FREETMPS;
+        LEAVE;
+	if (res) {
+            ST(0) = ST(index);
+            XSRETURN(1);
 	}
     }
-    POP_MULTICALL;
     XSRETURN_UNDEF;
 }
-
-#endif
 
 void
 shuffle(...)
@@ -261,8 +265,6 @@ blessed(sv)
 PROTOTYPE: $
 CODE:
 {
-    if (SvMAGICAL(sv))
-	mg_get(sv);
     if(!sv_isobject(sv)) {
 	XSRETURN_UNDEF;
     }
@@ -277,8 +279,6 @@ reftype(sv)
 PROTOTYPE: $
 CODE:
 {
-    if (SvMAGICAL(sv))
-	mg_get(sv);
     if(!SvROK(sv)) {
 	XSRETURN_UNDEF;
     }
@@ -293,8 +293,6 @@ refaddr(sv)
 PROTOTYPE: $
 CODE:
 {
-    if (SvMAGICAL(sv))
-	mg_get(sv);
     if(!SvROK(sv)) {
 	XSRETURN_UNDEF;
     }

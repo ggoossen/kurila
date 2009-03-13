@@ -71,9 +71,9 @@
 %token <i_tkval> '{' '}' '[' ']' '-' '+' '$' '@' '%' '*' '&' ';'
 
 %token <opval> WORD METHOD THING PMFUNC PRIVATEVAR
-%token <opval> FUNC0SUB UNIOPSUB LSTOPSUB COMPSUB
+%token <opval> FUNC0SUB UNIOPSUB COMPSUB
 %token <p_tkval> LABEL
-%token <i_tkval> SUB ANONSUB PACKAGE USE
+%token <i_tkval> SUB ANONSUB BLOCKSUB PACKAGE USE
 %token <i_tkval> WHILE UNTIL IF UNLESS ELSE ELSIF CONTINUE FOR
 %token <i_tkval> LOOPEX DOTDOT
 %token <i_tkval> FUNC0 FUNC1 FUNC UNIOP LSTOP
@@ -85,8 +85,7 @@
 %token <i_tkval> SPECIALBLOCK
 
 %type <ionlyval> prog progstart remember mremember
-%type <ionlyval>  startsub startanonsub
-/* FIXME for MAD - are these two ival? */
+%type <ionlyval> startsub startanonsub startblocksub
 %type <ionlyval> mintro
 
 %type <opval> decl subrout mysubrout package use peg
@@ -108,7 +107,7 @@
 %left <i_tkval> OROP DOROP
 %left <i_tkval> ANDOP
 %right <i_tkval> NOTOP
-%nonassoc LSTOP LSTOPSUB
+%nonassoc LSTOP
 %left <i_tkval> ','
 %right <i_tkval> ASSIGNOP
 %right <i_tkval> TERNARY_IF TERNARY_ELSE
@@ -347,12 +346,12 @@ loop	:	label WHILE remember '(' texpr ')'
                                 OP* mydef;
                                 mydef = newOP(OP_PADSV, 0, NULL);
                                 mydef->op_targ = allocmy("$_");
-                                $$ = newUNOP(OP_DEFINED, 0,
+                                $<opval>$ = newUNOP(OP_DEFINED, 0,
                                     newASSIGNOP(0, mydef,
                                         0, $5, $5->op_location), $5->op_location );
                             }
                             else {
-                                $$ = $5;
+                                $<opval>$ = $5;
                             }
                         }
                     mintro mblock cont
@@ -405,7 +404,7 @@ loop	:	label WHILE remember '(' texpr ')'
 
 /* determine whether there are any new my declarations */
 mintro	:	/* NULL */
-			{ $$ = (PL_min_intro_pending &&
+			{ $$ = (PL_min_intro_pending != -1 &&
 			    PL_max_intro_pending >=  PL_min_intro_pending);
 			  intro_my(); }
 
@@ -415,6 +414,7 @@ texpr	:	/* NULL means true */
 			  (void)scan_num("1", &tmplval);
 			  $$ = tmplval.opval; }
 	|	expr
+			{ $$ = $1; }
 	;
 
 /* Inverted boolean expression */
@@ -443,6 +443,7 @@ label	:	/* empty */
 			  $$.location = NULL;
 			}
 	|	LABEL
+			{ $$ = $1; }
 	;
 
 /* Some kind of declaration - just hang on peg in the parse tree */
@@ -512,7 +513,9 @@ subrout	:	SUB startsub subname proto subbody
                             process_special_block(IVAL($1), new);
                             /* SvREFCNT_dec(new);  leak reference */
 #else
-                            CV* new = newSUB($2, NULL, $3);
+                            CV* new = cv_2mortal(newSUB($2, NULL, $3));
+                            $<opval>2 = NULL;
+                            $<opval>3 = NULL;
                             SVcpREPLACE(SvLOCATION(CvSv(new)), LOCATION($1));
                             process_special_block(IVAL($1), new);
                             $$ = (OP*)NULL;
@@ -531,6 +534,11 @@ startanonsub:	/* NULL */	/* start an anonymous subroutine scope */
 			}
 	;
 
+startblocksub:	/* NULL */	/* start an anonymous subroutine scope */
+			{ $$ = start_subparse(CVf_ANON|CVf_BLOCK);
+			}
+	;
+
 /* Name of a subroutine - must be a bareword, could be special */
 subname	:	WORD	{
 			  $$ = $1;
@@ -541,6 +549,7 @@ subname	:	WORD	{
 proto	:	/* NULL */
 			{ $$ = (OP*)NULL; }
 	|	THING
+			{ $$ = $1; }
 	;
 
 /* Subroutine body - either null or a block */
@@ -575,7 +584,11 @@ use	:	USE startsub THING WORD listexpr ';'
 				      AvFILLp(PL_parser->rsfp_filters) >= 0)
 			      APPEND_MADPROPS_PV("sourcefilter", $$, '!');
 #else
-			  utilize(IVAL($1), $2, $3, $4, $5);
+                          CV* cv = utilize(IVAL($1), $2, $3, $4, $5);
+                          $<opval>3 = NULL;
+                          $<opval>4 = NULL;
+                          $<opval>5 = NULL;
+                          process_special_block(KEY_BEGIN, cv);
 			  $$ = (OP*)NULL;
 #endif
 			}
@@ -599,6 +612,7 @@ expr	:	expr ANDOP expr
                           APPEND_MADPROPS_PV("operator",$$,'>');
 			}
 	|	argexpr %prec PREC_LOW
+			{ $$ = $1; }
 	;
 
 /* Expressions are a list of terms joined by commas */
@@ -624,24 +638,11 @@ argexpr	:	argexpr ','
 			  $$ = append_elem(OP_LIST, $1, term);
 			}
 	|	term %prec PREC_LOW
+			{ $$ = $1; }
 	;
 
 /* List operators */
-listop	:	LSTOP indirob argexpr /* map {...} @args or print $fh @args */
-			{ 
-                            $$ = convert(IVAL($1), OPf_STACKED,
-                                prepend_elem(OP_LIST, newGVREF(IVAL($1),$2, LOCATION($1)), $3), LOCATION($1) );
-                            TOKEN_GETMAD($1,$$,'o');
-			}
-	|	FUNC '(' indirob expr ')'      /* print ($fh @args */
-			{ $$ = convert(IVAL($1), OPf_STACKED,
-				prepend_elem(OP_LIST, newGVREF(IVAL($1),$3, LOCATION($1)), $4), LOCATION($1) );
-			  TOKEN_GETMAD($1,$$,'o');
-			  TOKEN_GETMAD($2,$$,'(');
-			  TOKEN_GETMAD($5,$$,')');
-                          APPEND_MADPROPS_PV("func", $$, '>');
-			}
-	|	term ARROW method '(' listexprcom ')' /* $foo->bar(list) */
+listop	:	term ARROW method '(' listexprcom ')' /* $foo->bar(list) */
 			{ $$ = convert(OP_ENTERSUB, OPf_STACKED,
 				append_elem(OP_LIST,
 				    prepend_elem(OP_LIST, scalar($1), $5),
@@ -687,21 +688,13 @@ listop	:	LSTOP indirob argexpr /* map {...} @args or print $fh @args */
                             TOKEN_GETMAD($4,$$,')');
                             APPEND_MADPROPS_PV("func", $$, '>');
 			}
-	|	LSTOPSUB startanonsub block /* sub f(&@);   f { foo } ... */
-			{
-                            $<opval>$ = newANONSUB($2, 0, scalar($3)); }
-		    listexpr		%prec LSTOP  /* ... @bar */
-			{ 
-                            $$ = newUNOP(OP_ENTERSUB, OPf_STACKED,
-                                append_elem(OP_LIST,
-                                    prepend_elem(OP_LIST, $<opval>4, $5), $1), $1->op_location);
-                            APPEND_MADPROPS_PV("listop", $$, '>');
-			}
 	;
 
 /* Names of methods. May use $object->$methodname */
 method :       METHOD
+			{ $$ = $1; }
        |       scalar
+			{ $$ = $1; }
        ;
 
 /* Some kind of subscripted expression */
@@ -982,14 +975,18 @@ termunop : '-' term %prec UMINUS                       /* -$x */
 
 /* Constructors for anonymous data */
 anonymous:
-	ANONSUB startanonsub proto block	%prec '('
+	BLOCKSUB startblocksub block	%prec '('
+			{
+                            $$ = newANONSUB($2, NULL, scalar($3));
+                            TOKEN_GETMAD($1,$$,'o');
+			}
+        |       ANONSUB startanonsub proto block	%prec '('
 			{
                             $$ = newANONSUB($2, $3, scalar($4));
                             TOKEN_GETMAD($1,$$,'o');
                             OP_GETMAD($3,$$,'s');
 			}
-
-    ;
+	;
 
 /* Things called with "do" */
 termdo	:       DO term	%prec UNIOP                     /* do $filename */
@@ -1026,9 +1023,13 @@ term	:	'?' term
                             $$->op_flags |= OPf_OPTIONAL;
                         }
         |       termbinop
+			{ $$ = $1; }
 	|	termunop
+			{ $$ = $1; }
 	|	anonymous
+			{ $$ = $1; }
 	|	termdo
+			{ $$ = $1; }
 	|	term TERNARY_IF term TERNARY_ELSE term
                         { 
                             $$ = newCONDOP(0, $1, $3, $5, LOCATION($2));
@@ -1192,7 +1193,9 @@ term	:	'?' term
 			  TOKEN_GETMAD($4,$$,')');
 			}
 	|	WORD
+			{ $$ = $1; }
 	|	listop
+			{ $$ = $1; }
 	;
 
 /* "my" declarations, with optional attributes */

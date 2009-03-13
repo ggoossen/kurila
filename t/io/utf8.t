@@ -159,7 +159,7 @@ close $f;
 unlink('a');
 
 open $f, ">:utf8", "a";
-my @a = map { chr(1 << ($_ << 2)) } 0..5; # 0x1, 0x10, .., 0x100000
+my @a = map { chr(1 << ($_ << 2)) }, 0..5; # 0x1, 0x10, .., 0x100000
 unshift @a, chr(0); # ... and a null byte in front just for fun
 print $f, < @a;
 close $f;

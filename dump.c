@@ -91,7 +91,7 @@ Perl_dump_all(pTHX)
     dVAR;
     PerlIO_setlinebuf(Perl_debug_log);
     if (PL_main_root)
-	op_dump(PL_main_root);
+	op_dump(RootopOp(PL_main_root));
 /*     dump_packsubs(PL_defstash); */
 }
 
@@ -136,7 +136,7 @@ Perl_dump_sub(pTHX_ const GV *gv)
 	    PTR2UV(CvXSUB(GvCV(gv))),
 	    (int)CvXSUBANY(GvCV(gv)).any_i32);
     else if (CvROOT(GvCV(gv)))
-	op_dump(CvROOT(GvCV(gv)));
+	op_dump(RootopOp(CvROOT(GvCV(gv))));
     else
 	Perl_dump_indent(aTHX_ 0, Perl_debug_log, "<undef>\n");
 }
@@ -145,7 +145,7 @@ void
 Perl_dump_eval(pTHX)
 {
     dVAR;
-    op_dump(PL_eval_root);
+    op_dump((OP*)PL_eval_root);
 }
 
 
@@ -834,11 +834,6 @@ STATIC SV* S_dump_op_flags_private(pTHX_ const OP* o)
 	if (o->op_private & OPpTARGET_MY)
 	    sv_catpv(tmpsv, ",TARGET_MY");
     }
-    else if (optype == OP_LEAVESUB ||
-	     optype == OP_LEAVE) {
-	if (o->op_private & OPpREFCOUNTED)
-	    sv_catpv(tmpsv, ",REFCOUNTED");
-    }
     else if (optype == OP_REPEAT) {
 	if (o->op_private & OPpREPEAT_DOLIST)
 	    sv_catpv(tmpsv, ",DOLIST");
@@ -1088,9 +1083,9 @@ static void S_dump_op_rest (pTHX_ I32 level, PerlIO *file, const OP *o)
     case OP_LEAVEEVAL:
     case OP_LEAVESUB:
     case OP_SCOPE:
-	if (o->op_private & OPpREFCOUNTED)
-	    Perl_dump_indent(aTHX_ level, file, "REFCNT = %"UVuf"\n", (UV)o->op_targ);
 	break;
+    case OP_ROOT:
+	Perl_dump_indent(aTHX_ level, file, "REFCNT = %"UVuf"\n", (UV)o->op_targ);
     default:
 	break;
     }
@@ -1143,14 +1138,11 @@ static const struct { const char type; const char *name; } magic_names[] = {
 	{ PERL_MAGIC_symtab,         "symtab(:)" },
 	{ PERL_MAGIC_backref,        "backref(<)" },
 	{ PERL_MAGIC_bm,             "bm(B)" },
-	{ PERL_MAGIC_hints,          "hints(H)" },
 	{ PERL_MAGIC_isa,            "isa(I)" },
 	{ PERL_MAGIC_dbfile,         "dbfile(L)" },
 	{ PERL_MAGIC_shared,         "shared(N)" },
-	{ PERL_MAGIC_hints,          "hints(H)" },
 	{ PERL_MAGIC_uvar,           "uvar(U)" },
 	{ PERL_MAGIC_regex_global,   "regex_global(g)" },
-	{ PERL_MAGIC_hintselem,      "hintselem(h)" },
 	{ PERL_MAGIC_isaelem,        "isaelem(i)" },
 	{ PERL_MAGIC_dbline,         "dbline(l)" },
 	{ PERL_MAGIC_shared_scalar,  "shared_scalar(n)" },
@@ -1174,15 +1166,13 @@ Perl_do_magic_dump(pTHX_ I32 level, PerlIO *file, const MAGIC *mg, I32 nest, I32
  	if (mg->mg_virtual) {
             const MGVTBL * const v = mg->mg_virtual;
  	    const char *s;
-            if (v == &PL_vtbl_hints)      s = "hints";
-            else if (v == &PL_vtbl_dbline)     s = "dbline";
+            if (v == &PL_vtbl_dbline)     s = "dbline";
             else if (v == &PL_vtbl_isa)        s = "isa";
             else if (v == &PL_vtbl_mglob)      s = "mglob";
             else if (v == &PL_vtbl_bm)         s = "bm";
             else if (v == &PL_vtbl_uvar)       s = "uvar";
 	    else if (v == &PL_vtbl_backref)    s = "backref";
 	    else if (v == &PL_vtbl_utf8)       s = "utf8";
-            else if (v == &PL_vtbl_hintselem)  s = "hintselem";
 	    else			       s = NULL;
 	    if (s)
 	        Perl_dump_indent(aTHX_ level, file, "    MG_VIRTUAL = &PL_vtbl_%s\n", s);
@@ -1392,8 +1382,6 @@ Perl_do_sv_dump(pTHX_ I32 level, PerlIO *file, SV *sv, I32 nest, I32 maxnest, bo
 	if (CvCLONED(sv))	sv_catpv(d, "CLONED,");
 	if (CvCONST(sv))	sv_catpv(d, "CONST,");
 	if (CvNODEBUG(sv))	sv_catpv(d, "NODEBUG,");
-	if (CvMETHOD(sv))	sv_catpv(d, "METHOD,");
-	if (CvLOCKED(sv))	sv_catpv(d, "LOCKED,");
 	break;
     case SVt_PVHV:
 	if (HvSHAREKEYS(sv))	sv_catpv(d, "SHAREKEYS,");
@@ -1714,7 +1702,7 @@ Perl_do_sv_dump(pTHX_ I32 level, PerlIO *file, SV *sv, I32 nest, I32 maxnest, bo
 	    Perl_dump_indent(aTHX_ level, file, "  ROOT = 0x%"UVxf"\n",
 			     PTR2UV(CvROOT(sv)));
 	    if (CvROOT(sv) && dumpops) {
-		do_op_dump(level+1, file, CvROOT(sv));
+		do_op_dump(level+1, file, RootopOp(CvROOT(sv)));
 	    }
 	} else {
 	    SV * const constant = cv_const_sv((CV *)sv);
@@ -1814,6 +1802,9 @@ Perl_runops_debug(pTHX)
 
     DEBUG_l(Perl_deb(aTHX_ "Entering new RUNOPS level\n"));
     do {
+	if (PL_destroyav)
+	    call_destructors();
+	DEBUG_R(refcnt_check(aTHX));
 	PERL_ASYNC_CHECK();
 	if (PL_debug) {
 	    if (PL_watchaddr && (*PL_watchaddr != PL_watchok))
@@ -1834,7 +1825,6 @@ Perl_runops_debug(pTHX)
 	    if (DEBUG_t_TEST_) debop(PL_op);
 	    if (DEBUG_P_TEST_) debprof(PL_op);
 	}
-	DEBUG_R(refcnt_check(aTHX));
     } while ((PL_op = CALL_FPTR(PL_op->op_ppaddr)(aTHX)));
     DEBUG_R(refcnt_check(aTHX));
     DEBUG_l(Perl_deb(aTHX_ "leaving RUNOPS level\n"));
@@ -2594,8 +2584,6 @@ Perl_do_op_xmldump(pTHX_ I32 level, PerlIO *file, const OP *o)
     case OP_LEAVEEVAL:
     case OP_LEAVESUB:
     case OP_SCOPE:
-	if (o->op_private & OPpREFCOUNTED)
-	    S_xmldump_attr(aTHX_ level, file, "refcnt=\"%"UVuf"\"", (UV)o->op_targ);
 	break;
     default:
 	break;

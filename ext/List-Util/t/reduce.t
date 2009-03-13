@@ -4,24 +4,24 @@ use Config;
 
 use List::Util < qw(reduce min);
 use Test::More;
-plan tests => ($::PERL_ONLY ?? 18 !! 20);
+plan tests => 19;
 
 my $v = reduce {};
 
 is( $v,	undef,	'no args');
 
-$v = reduce { $a / $b } 756,3,7,4;
+$v = reduce { $a / $b }, 756,3,7,4;
 is( $v,	9,	'4-arg divide');
 
-$v = reduce { $a / $b } 6;
+$v = reduce { $a / $b }, 6;
 is( $v,	6,	'one arg');
 
-my @a = map { rand } 0 .. 20;
-$v = reduce { $a +< $b ?? $a !! $b } < @a;
+my @a = map { rand }, 0 .. 20;
+$v = reduce { $a +< $b ?? $a !! $b }, < @a;
 is( $v,	min(< @a),	'min');
 
-@a = map { pack("C", int(rand(256))) } 0 .. 20;
-$v = reduce { $a . $b } < @a;
+@a = map { pack("C", int(rand(256))) }, 0 .. 20;
+$v = reduce { $a . $b }, < @a;
 is( $v,	join("", @a),	'concat');
 
 sub add {
@@ -29,14 +29,14 @@ sub add {
   return $aa + $bb;
 }
 
-$v = reduce { my $t="$a $b\n"; 0+add($a, $b) } 3, 2, 1;
+$v = reduce { my $t="$a $b\n"; 0+add($a, $b) }, 3, 2, 1;
 is( $v,	6,	'call sub');
 
 # Check that try{} inside the block works correctly
-$v = reduce { try { die }; $a + $b } 0,1,2,3,4;
+$v = reduce { try { die }; $a + $b }, 0,1,2,3,4;
 is( $v,	10,	'use eval{}');
 
-$v = !defined try { reduce { die if $b +> 2; $a + $b } 0,1,2,3,4 };
+$v = !defined try { reduce { die if $b +> 2; $a + $b }, 0,1,2,3,4 };
 ok($v, 'die');
 
 sub add2 { $a + $b }
@@ -44,36 +44,31 @@ sub add2 { $a + $b }
 $v = reduce \&add2, 1,2,3;
 is( $v,	6,	'sub reference');
 
-$v = reduce { add2() } 3,4,5;
+$v = reduce { add2() }, 3,4,5;
 is( $v, 12,	'call sub');
 
 
-$v = reduce { eval "$a + $b" } 1,2,3;
+$v = reduce { eval "$a + $b" }, 1,2,3;
 is( $v, 6, 'eval string');
 
 $a = 8; $b = 9;
-$v = reduce { $a * $b } 1,2,3;
+$v = reduce { $a * $b }, 1,2,3;
 is( $a, 8, 'restore $a');
 is( $b, 9, 'restore $b');
 
 # Can we leave the sub with 'return'?
-$v = reduce {return $a+$b} 2,4,6;
+$v = reduce {return $a+$b}, 2,4,6;
 is($v, 12, 'return');
 
 # ... even in a loop?
-$v = reduce {while(1) {return $a+$b} } 2,4,6;
+$v = reduce {while(1) {return $a+$b} }, 2,4,6;
 is($v, 12, 'return from loop');
 
 # Does it work from another package?
 do { package Foo;
   $a = $b;
-  main::is((List::Util::reduce {$a*$b} ( <1..4)), 24, 'other package');
+  main::is((List::Util::reduce {$a*$b}, ( <1..4)), 24, 'other package');
 };
-
-# Can we undefine a reduce sub while it's running?
-sub self_immolate {undef &self_immolate; 1}
-try { $v = reduce \&self_immolate, 1,2; };
-like($^EVAL_ERROR->{?description}, qr/^Can't undef active subroutine/, "undef active sub");
 
 # Redefining an active sub should not fail, but whether the
 # redefinition takes effect immediately depends on whether we're
@@ -105,13 +100,3 @@ SKIP: do {
     $v = reduce \&mult, < 1..6;
     is(&Internals::SvREFCNT(\&mult), $refcnt, "Refcount unchanged");
 };
-
-# The remainder of the tests are only relevant for the XS
-# implementation. The Perl-only implementation behaves differently
-# (and more flexibly) in a way that we can't emulate from XS.
-if (!$::PERL_ONLY) { SKIP: do {
-
-    $List::Util::REAL_MULTICALL ||= 0; # Avoid use only once
-    skip("Poor man's MULTICALL can't cope", 2)
-      if !$List::Util::REAL_MULTICALL;
-}; }

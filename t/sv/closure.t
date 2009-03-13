@@ -23,20 +23,20 @@ my $i = 1;
 sub foo { $i = shift if (nelems @_); $i }
 
 # no closure
-test { foo == 1 };
+test { foo == 1 },;
 foo(2);
-test { foo == 2 };
+test { foo == 2 },;
 
 # closure: lexical outside sub
 my $foo = sub {$i = shift if (nelems @_); $i };
 my $bar = sub {$i = shift if (nelems @_); $i };
-test {&$foo() == 2 };
+test {&$foo() == 2 },;
 &$foo(3);
-test {&$foo() == 3 };
+test {&$foo() == 3 },;
 # did the lexical change?
-test { foo == 3 and $i == 3};
+test { foo == 3 and $i == 3},;
 # did the second closure notice?
-test {&$bar() == 3 };
+test {&$bar() == 3 },;
 
 # closure: lexical inside sub
 sub bar {
@@ -46,10 +46,10 @@ sub bar {
 
 $foo = bar(4);
 $bar = bar(5);
-test {&$foo() == 4 };
+test {&$foo() == 4 },;
 &$foo(6);
-test {&$foo() == 6 };
-test {&$bar() == 5 };
+test {&$foo() == 6 },;
+test {&$bar() == 5 },;
 
 # nested closures
 sub bizz {
@@ -64,14 +64,14 @@ sub bizz {
 }
 $foo = bizz();
 $bar = bizz();
-test {&$foo() == 7 };
+test {&$foo() == 7 },;
 &$foo(8);
-test {&$foo() == 8 };
-test {&$bar() == 7 };
+test {&$foo() == 8 },;
+test {&$bar() == 7 },;
 
 $foo = bizz(9);
 $bar = bizz(10);
-test {&$foo(11)-1 == &$bar()};
+test {&$foo(11)-1 == &$bar()},;
 
 my @foo;
 for (qw(0 1 2 3 4)) {
@@ -85,7 +85,7 @@ test {
         &{@foo[2]}() == 2 and
           &{@foo[3]}() == 3 and
             &{@foo[4]}() == 4
-        };
+        },;
 
 for (0 .. 4) {
     &{@foo[$_]}(4-$_);
@@ -97,7 +97,7 @@ test {
         &{@foo[2]}() == 2 and
           &{@foo[3]}() == 1 and
             &{@foo[4]}() == 0
-        };
+        },;
 
 sub barf {
     my @foo;
@@ -115,7 +115,7 @@ test {
         &{@foo[2]}() == 2 and
           &{@foo[3]}() == 3 and
             &{@foo[4]}() == 4
-        };
+        },;
 
 for (0 .. 4) {
     &{@foo[$_]}(4-$_);
@@ -127,7 +127,7 @@ test {
         &{@foo[2]}() == 2 and
           &{@foo[3]}() == 1 and
             &{@foo[4]}() == 0
-        };
+        },;
 
 # test if closures get created in optimized for loops
 
@@ -142,7 +142,7 @@ test {
         &{%foo{?C}}('C') and
           &{%foo{?D}}('D') and
             &{%foo{?E}}('E')
-        };
+        },;
 
 for my $n (0..4) {
     @foo[$n] = sub { $n == @_[0] };
@@ -154,7 +154,7 @@ test {
         &{@foo[2]}(2) and
           &{@foo[3]}(3) and
             &{@foo[4]}(4)
-        };
+        },;
 
 for my $n (0..4) {
     @foo[$n] = sub {
@@ -169,13 +169,13 @@ test {
         @foo[2]->()->(2) and
           @foo[3]->()->(3) and
             @foo[4]->()->(4)
-        };
+        },;
 
 do {
     my $w;
     $w = sub {
 	my @($i) =  @_;
-	test { $i == 10 };
+	test { $i == 10 },;
 	sub { $w };
     };
     $w->(10);
@@ -502,7 +502,7 @@ do {
     our $some_var;
     BEGIN { our $vanishing_pad = sub { eval @_[0] } }
     $some_var = 123;
-    test { our $vanishing_pad->( '$some_var' ) == 123 };
+    test { our $vanishing_pad->( '$some_var' ) == 123 },;
 };
 
 our ($newvar, @a, $x);
@@ -514,7 +514,7 @@ sub deleteme { $a = sub { eval '$newvar' } }
 deleteme();
 *deleteme = sub {};             # delete the sub
 $newvar = 123;                  # realloc the SV of the freed CV
-test { $a->() == 123 };
+test { $a->() == 123 },;
 
 # ... and a further coredump variant - the fixup of the anon sub's
 # CvOUTSIDE pointer when the middle eval is freed, wasn't good enough to
@@ -527,7 +527,7 @@ $a = eval q(
     ]
 );
 @a = @( ('\1\1\1\1\1\1\1') x 100 ); # realloc recently-freed CVs
-test { $a->() == 123 };
+test { $a->() == 123 },;
 
 # this coredumped on <= 5.8.0 because evaling the closure caused
 # an SvFAKE to be added to the outer anon's pad, which was then grown.
@@ -539,14 +539,14 @@ sub {
     $a = \@( 99 );
     $x->();
 }->();
-test {1};
+test {1},;
 
 # [perl #17605] found that an empty block called in scalar context
 # can lead to stack corruption
 do {
     my $x = "foooobar";
     $x =~ s/o/$('')/g;
-    test { $x eq 'fbar' }
+    test { $x eq 'fbar' },
 };
 
 # DAPM 24-Nov-02
@@ -556,9 +556,9 @@ do {
 do {
     my $x = 1;
     sub fake {
-        test { sub {eval'$x'}->() == 1 };
-	do { $x;	test { sub {eval'$x'}->() == 1 } };
-        test { sub {eval'$x'}->() == 1 };
+        test { sub {eval'$x'}->() == 1 },;
+	do { $x;	test { sub {eval'$x'}->() == 1 }, };
+        test { sub {eval'$x'}->() == 1 },;
     }
 };
 fake();
@@ -571,7 +571,7 @@ do {
     sub tmp { sub { eval '$x' } }
     my $a = tmp();
     undef &tmp;
-    test { $a->() == 2 };
+    test { $a->() == 2 },;
 };
 
 # handy class: $x = Watch->new(\$foo,'bar')
@@ -594,7 +594,7 @@ sub linger {
 do {
     my $watch = '1';
     linger(\$watch);
-    test { $watch eq '12' }
+    test { $watch eq '12' },
 };
 
 # bugid 10085
@@ -607,7 +607,7 @@ sub linger2 {
 do {
     my $watch = '1';
     linger2(\$watch);
-    test { $watch eq '12' }
+    test { $watch eq '12' },
 };
 
 # bugid 16302 - named subs didn't capture lexicals on behalf of inner subs
@@ -616,7 +616,7 @@ do {
     my $x = 1;
     sub f16302 {
 	sub {
-	    test { defined $x and $x == 1 }
+	    test { defined $x and $x == 1 },
 	}->();
     }
 };
@@ -630,7 +630,7 @@ do {
     for my $x (@(7,11)) {
 	%a{+$x} = sub { $x=$x; sub { eval '$x' } };
     }
-    test { %a{?7}->()->() + %a{?11}->()->() == 18 };
+    test { %a{?7}->()->() + %a{?11}->()->() == 18 },;
 };
 
 do {
@@ -654,7 +654,7 @@ do {
 __EOF__
     close $t;
     my $got = runperl(progfile => $progfile);
-    test { chomp $got; $got eq "yxx" };
+    test { chomp $got; $got eq "yxx" },;
     END { 1 while unlink $progfile }
 };
 
@@ -665,7 +665,7 @@ do {
     my $got = runperl(stderr => 1, prog => 
                         'sub d {die} my $f; $f = sub {my $x=1; $f = 0; d}; try{$f->()}; print \*STDOUT, qq(ok\n)'
                     );
-    test { $got eq "ok\n" };
+    test { $got eq "ok\n" },;
 };
 
 # After newsub is redefined outside the BEGIN, it's CvOUTSIDE should point

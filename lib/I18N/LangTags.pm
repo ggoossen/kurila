@@ -20,7 +20,7 @@ require Exporter;
 
 $VERSION = "0.35";
 
-sub uniq { my %seen; return grep(!(%seen{+$_}++), @_); } # a util function
+sub uniq { my %seen; return grep( {!(%seen{+$_}++) }, @_); } # a util function
 
 
 =head1 NAME
@@ -143,7 +143,7 @@ sub extract_language_tags {
     ?? $1 !! ''
   ;
   
-  return grep(!m/^[ixIX]$/s, @( # 'i' and 'x' aren't good tags
+  return grep( {!m/^[ixIX]$/s }, @( # 'i' and 'x' aren't good tags
     $text =~ 
     m/
       \b
@@ -738,7 +738,7 @@ sub panic_languages {
     # push @out, super_languages($t); # nah, keep that separate
     push @out, < @{ %Panic{?lc $t} || next };
   }
-  return grep !%seen{+$_}++, @(  < @out, 'en');
+  return grep { !%seen{+$_}++ }, @(  < @out, 'en');
 }
 
 #---------------------------------------------------------------------------
@@ -793,7 +793,7 @@ as far as I'm concerned) you'd use implicate_supers.
 =cut
 
 sub implicate_supers {
-  my @languages = grep is_language_tag($_), @_;
+  my @languages = grep { is_language_tag($_) }, @_;
   my %seen_encoded;
   foreach my $lang ( @languages) {
     %seen_encoded{+I18N::LangTags::encode_language_tag($lang) } = 1
@@ -813,8 +813,8 @@ sub implicate_supers {
 }
 
 sub implicate_supers_strictly {
-  my @tags = grep is_language_tag($_), @_;
-  return uniq( < @_,   < map < super_languages($_), @_ );
+  my @tags = grep { is_language_tag($_) }, @_;
+  return uniq( < @_,   < @+: map { super_languages($_) }, @_ );
 }
 
 

@@ -193,15 +193,10 @@ struct block_sub {
 		CopFILE((COP*)CvSTART(cv)),				\
 		CopLINE((COP*)CvSTART(cv)));				\
 									\
-	cx->blk_sub.cv = cv;						\
+	cx->blk_sub.cv = CvREFCNT_inc(cv);				\
 	cx->blk_sub.olddepth = CvDEPTH(cv);				\
 	cx->cx_type |= (hasargs) ? CXp_HASARGS : 0;			\
-	cx->blk_sub.retop = NULL;					\
-	if (!CvDEPTH(cv)) {						\
-	    SvREFCNT_inc_simple_void_NN(cv);				\
-	    SvREFCNT_inc_simple_void_NN(cv);				\
-	    SAVEFREESV(cv);						\
-	}
+	cx->blk_sub.retop = NULL;
 
 
 #define PUSHSUB(cx)							\
@@ -231,14 +226,8 @@ struct block_sub {
 		CopLINE((COP*)CvSTART((CV*)cx->blk_sub.cv)));		\
 									\
 	sv = (SV*)cx->blk_sub.cv;					\
-	if (sv && (CvDEPTH((CV*)sv) = cx->blk_sub.olddepth))		\
-	    sv = NULL;						\
-    } STMT_END
-
-#define LEAVESUB(sv)							\
-    STMT_START {							\
-	if (sv)								\
-	    SvREFCNT_dec(sv);						\
+	CvDEPTH((CV*)sv) = cx->blk_sub.olddepth;			\
+	SvREFCNT_dec(sv);                                               \
     } STMT_END
 
 /* eval context */
@@ -246,7 +235,7 @@ struct block_eval {
     OP *	retop;	/* op to execute on exit from eval */
     /* Above here is the same for sub, format and eval.  */
     SV *	old_namesv;
-    OP *	old_eval_root;
+    ROOTOP *	old_eval_root;
     SV *	cur_text;
     CV *	cv;
     JMPENV *	cur_top_env; /* value of PL_top_env when eval CX created */
@@ -265,21 +254,14 @@ struct block_eval {
 	assert(!(PL_op->op_type & ~0x1FF));				\
 	cx->blk_u16 = (PL_in_eval & 0x7F) | ((U16)PL_op->op_type << 7);	\
 	cx->blk_eval.old_namesv = (n ? newSVpv(n,0) : NULL);		\
-	cx->blk_eval.old_eval_root = PL_eval_root;			\
+	cx->blk_eval.old_eval_root = OpREFCNT_inc(PL_eval_root);	\
 	cx->blk_eval.cur_text = PL_parser ? PL_parser->linestr : NULL;	\
 	cx->blk_eval.cv = NULL; /* set by doeval(), as applicable */	\
 	cx->blk_eval.retop = NULL;					\
 	cx->blk_eval.cur_top_env = PL_top_env; 				\
     } STMT_END
 
-#define POPEVAL(cx)							\
-    STMT_START {							\
-	PL_in_eval = CxOLD_IN_EVAL(cx);					\
-	optype = CxOLD_OP_TYPE(cx);					\
-	PL_eval_root = cx->blk_eval.old_eval_root;			\
-	if (cx->blk_eval.old_namesv)					\
-	    sv_2mortal(cx->blk_eval.old_namesv);			\
-    } STMT_END
+#define POPEVAL(cx) cx_free_eval(cx);
 
 /* loop context */
 struct block_loop {
@@ -491,7 +473,7 @@ struct context {
 #define CxFOREACHDEF(c)	((CxTYPE_is_LOOP(c) && CxTYPE(c) != CXt_LOOP_PLAIN) \
 			 && ((c)->cx_type & CXp_FOR_DEF))
 
-#define CXINC (cxstack_ix < cxstack_max ? ++cxstack_ix : (cxstack_ix = cxinc()))
+#define CXINC (cxstack_ix < cxstack_max ? ++cxstack_ix : (cxstack_ix = Perl_cxinc(aTHX)))
 
 /* 
 =head1 "Gimme" Values
@@ -629,70 +611,6 @@ typedef struct stackinfo PERL_SI;
 
 #define IN_PERL_COMPILETIME	(PL_curcop == &PL_compiling)
 #define IN_PERL_RUNTIME		(PL_curcop != &PL_compiling)
-
-/*
-=head1 Multicall Functions
-
-=for apidoc Ams||dMULTICALL
-Declare local variables for a multicall. See L<perlcall/Lightweight Callbacks>.
-
-=for apidoc Ams||PUSH_MULTICALL
-Opening bracket for a lightweight callback.
-See L<perlcall/Lightweight Callbacks>.
-
-=for apidoc Ams||MULTICALL
-Make a lightweight callback. See L<perlcall/Lightweight Callbacks>.
-
-=for apidoc Ams||POP_MULTICALL
-Closing bracket for a lightweight callback.
-See L<perlcall/Lightweight Callbacks>.
-
-=cut
-*/
-
-#define dMULTICALL \
-    SV **newsp;			/* set by POPBLOCK */			\
-    PERL_CONTEXT *cx;							\
-    CV *multicall_cv;							\
-    OP *multicall_cop;							\
-    bool multicall_oldcatch; 						\
-    U8 hasargs = 0		/* used by PUSHSUB */
-
-#define PUSH_MULTICALL(the_cv) \
-    STMT_START {							\
-	CV * const _nOnclAshIngNamE_ = the_cv;				\
-	CV * const cv = _nOnclAshIngNamE_;				\
-	AV * const padlist = CvPADLIST(cv);				\
-	ENTER;								\
- 	multicall_oldcatch = CATCH_GET;					\
-	SAVETMPS; SAVEVPTR(PL_op);					\
-	CATCH_SET(TRUE);						\
-	PUSHBLOCK(cx, CXt_SUB|CXp_MULTICALL, PL_stack_sp);		\
-	PUSHSUB(cx);							\
-	if (++CvDEPTH(cv) >= 2) {					\
-	    PERL_STACK_OVERFLOW_CHECK();				\
-	    Perl_pad_push(aTHX_ padlist, CvDEPTH(cv));			\
-	}								\
-	SAVECOMPPAD();							\
-	PAD_SET_CUR_NOSAVE(padlist, CvDEPTH(cv));			\
-	multicall_cv = cv;						\
-	multicall_cop = CvSTART(cv);					\
-    } STMT_END
-
-#define MULTICALL \
-    STMT_START {							\
-	PL_op = multicall_cop;						\
-	CALLRUNOPS(aTHX);						\
-    } STMT_END
-
-#define POP_MULTICALL \
-    STMT_START {							\
-	LEAVESUB(multicall_cv);						\
-	CvDEPTH(multicall_cv)--;					\
-	POPBLOCK(cx,PL_curpm);						\
-	CATCH_SET(multicall_oldcatch);					\
-	LEAVE;								\
-    } STMT_END
 
 /*
  * Local variables:

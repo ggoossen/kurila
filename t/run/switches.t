@@ -125,7 +125,7 @@ SKIP: do {
     open my $f, ">", "$filename" or skip( "Can't write temp file $filename: $^OS_ERROR",4 );
     print $f, <<'SWTESTPM';
 package swtest;
-sub import { print \*STDOUT, < map "<$_>", @_ }
+sub import { print \*STDOUT, < map { "<$_>" }, @_ }
 1;
 SWTESTPM
     close $f or die "Could not close: $^OS_ERROR";
@@ -210,7 +210,7 @@ do {
     like( $r, qr/^(?!.*(not found|UNKNOWN))./, 'perl -V:re got a result' );
 
     # make sure each line we got matches the re
-    ok( !( grep !m/^i\D+size=/, split m/^/, $r ), '-V:re correct' );
+    ok( !( grep { !m/^i\D+size=/ }, split qr/^/, $r ), '-V:re correct' );
 };
 
 # Tests for -v

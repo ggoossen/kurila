@@ -140,9 +140,9 @@ Sean M. Burke C<sburke@cpan.org>
 
 ###########################################################################
 
-sub self_and_super_versions { map {
-        $_ => (defined(${*{Symbol::fetch_glob("$_\::VERSION")}}) ?? ${*{Symbol::fetch_glob("$_\::VERSION")}} !! undef)
-      } self_and_super_path(@_[0])
+sub self_and_super_versions { @+: map {
+        @: $_ => (defined(${*{Symbol::fetch_glob("$_\::VERSION")}}) ?? ${*{Symbol::fetch_glob("$_\::VERSION")}} !! undef)
+      }, self_and_super_path(@_[0])
 }
 
 # Also consider magic like:
@@ -192,7 +192,7 @@ sub self_and_super_path {
            # Canonize the :: -> main::, ::foo -> main::foo thing.
            # Should I ever canonize the Foo'Bar = Foo::Bar thing? 
           %seen{+$c}++ ?? () !! $c;
-        }
+        },
  @{*{Symbol::fetch_glob("$current\::ISA")}}
     ;
     # I.e., if this class has any parents (at least, ones I've never seen

@@ -415,11 +415,13 @@ package FINALE;
 our ($ref3, $ref1);
 
 do {
-    $ref3 = bless \@("ok $test2\n");	# package destruction
-    my $ref2 = bless \@("ok $test1\n");	# lexical destruction
-    local $ref1 = bless \@("ok $test\n");	# dynamic destruction
+    $ref3 = bless \@("ok $test2 - Package destruction\n");	# package destruction
+    my $ref2 = bless \@("ok $test1 - Lexical destruction\n");	# lexical destruction
+    local $ref1 = bless \@("ok $test - Dynamic destruction\n");	# dynamic destruction
     1;					# flush any temp values on stack
 };
+
+print \*STDOUT, "not ok $test2 # TODO Package destruction\n";
 
 sub DESTROY {
     print \*STDOUT, @_[0]->[0];

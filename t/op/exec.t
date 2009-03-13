@@ -19,7 +19,7 @@ my $Is_Win32 = $^OS_NAME eq 'MSWin32';
 
 skip_all("Tests mostly usesless on MacOS") if $^OS_NAME eq 'MacOS';
 
-plan(tests => 22);
+plan(tests => 20);
 
 my $Perl = which_perl();
 
@@ -88,18 +88,6 @@ is( system(qq{$Perl -e "exit 0"}), 0,     'Explicit exit of 0' );
 my $exit_one = $Is_VMS ?? 4 << 8 !! 1 << 8;
 is( system(qq{$Perl "-I../lib" -e "use vmsish qw(hushed); exit 1"}), $exit_one,
     'Explicit exit of 1' );
-
-my $rc = system { "lskdfj" } "lskdfj";
-unless( ok($rc == 255 << 8 or $rc == -1 or $rc == 256 or $rc == 512) ) {
-    print \*STDOUT, "# \$rc == $rc\n";
-}
-
-unless ( ok( $^OS_ERROR == 2  or  $^OS_ERROR =~ m/\bno\b.*\bfile/i or  
-             $^OS_ERROR == 13 or  $^OS_ERROR =~ m/permission denied/i or
-             $^OS_ERROR == 22 or  $^OS_ERROR =~ m/invalid argument/i  ) ) {
-    printf \*STDOUT, "# \$! eq \%d, '\%s'\n", $^OS_ERROR, $^OS_ERROR;
-}
-
 
 is( `$Perl -le "print \\\\*STDOUT, 'ok'"`,   "ok\n",     'basic ``' );
 is( <<`END`,                    "ok\n",     '<<`HEREDOC`' );

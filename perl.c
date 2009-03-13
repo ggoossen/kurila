@@ -501,6 +501,9 @@ perl_destruct(pTHXx)
         return STATUS_EXIT;
     }
     
+    if (PL_destroyav)
+	call_destructors();
+
     /* We must account for everything.  */
 
     /* Destroy the main CV and syntax tree */
@@ -514,8 +517,7 @@ perl_destruct(pTHXx)
 	if (CvPADLIST(PL_main_cv)) {
 	    PAD_SET_CUR_NOSAVE(CvPADLIST(PL_main_cv), 1);
 	}
-	op_free(PL_main_root);
-	PL_main_root = NULL;
+	ROOTOPcpNULL(PL_main_root);
     }
     PL_main_start = NULL;
     CVcpNULL(PL_main_cv);
@@ -528,17 +530,8 @@ perl_destruct(pTHXx)
 
     PerlIO_destruct(aTHX);
 
-    if (PL_sv_objcount) {
-	/*
-	 * Try to destruct global references.  We do this first so that the
-	 * destructors and destructees still exist.  Some sv's might remain.
-	 * Non-referenced objects are on their own.
-	 */
-/* 	sv_clean_objs(); */
-/* 	PL_sv_objcount = 0; */
-	if (PL_defoutgv && !SvREFCNT(PL_defoutgv))
-	    PL_defoutgv = NULL; /* may have been freed */
-    }
+    if (PL_destroyav)
+	call_destructors();
 
     /* call exit list functions */
     while (PL_exitlistlen-- > 0)
@@ -588,8 +581,10 @@ perl_destruct(pTHXx)
     /* reset so print() ends up where we expect */
     setdefout(NULL);
 
-    SvREFCNT_dec((SV*) PL_stashcache);
-    PL_stashcache = NULL;
+    if (PL_destroyav)
+	call_destructors();
+
+    HVcpNULL(PL_stashcache);
 
     /* unhook hooks which will soon be, or use, destroyed data */
     SvREFCNT_dec(PL_errorcreatehook);
@@ -669,11 +664,12 @@ perl_destruct(pTHXx)
     PL_initav = NULL;
 
     /* shortcuts just get cleared */
-    PL_envhv = NULL;
+    HVcpNULL(PL_envhv);
     AVcpNULL(PL_includepathav);
     HVcpNULL(PL_includedhv);
     SVcpNULL(PL_errsv);
     HVcpNULL(PL_magicsvhv);
+    HVcpNULL(PL_hinthv);
     HvREFCNT_dec(PL_globalstash);
     PL_globalstash = NULL;
     PL_argvgv = NULL;
@@ -693,8 +689,7 @@ perl_destruct(pTHXx)
     AvREFCNT_dec(PL_argvout_stack);
     PL_argvout_stack = NULL;
 
-    HvREFCNT_dec(PL_modglobal);
-    PL_modglobal = NULL;
+    HVcpNULL(PL_modglobal);
     AvREFCNT_dec(PL_preambleav);
     PL_preambleav = NULL;
     SvREFCNT_dec(PL_subname);
@@ -754,12 +749,15 @@ perl_destruct(pTHXx)
     PL_utf8_idstart	= NULL;
     PL_utf8_idcont	= NULL;
 
+    /* Compiliation variables */
+    CVcpNULL(PL_compcv);
     if (!specialWARN(PL_compiling.cop_warnings))
 	PerlMemShared_free(PL_compiling.cop_warnings);
     PL_compiling.cop_warnings = NULL;
-    HvREFCNT_dec(PL_compiling.cop_hints_hash);
-    PL_compiling.cop_hints_hash = NULL;
+    HVcpNULL(PL_compiling.cop_hints_hash);
     CopSTASH_free(&PL_compiling);
+
+    SVcpNULL(PL_dynamicscope);
 
     /* Prepare to destruct main symbol table.  */
 
@@ -774,8 +772,7 @@ perl_destruct(pTHXx)
     SvREFCNT_dec(PL_errors);
     PL_errors = NULL;
 
-    HvREFCNT_dec(PL_isarev);
-    PL_isarev = NULL;
+    HVcpNULL(PL_isarev);
 
     FREETMPS;
     if (destruct_level >= 2 && ckWARN_d(WARN_INTERNAL)) {
@@ -809,6 +806,9 @@ perl_destruct(pTHXx)
 #ifdef HAVE_INTERP_INTERN
     sys_intern_clear();
 #endif
+
+    if (PL_destroyav)
+	call_destructors();
 
     /* Destruct the global string table. */
     {
@@ -872,10 +872,10 @@ perl_destruct(pTHXx)
     nuke_stacks();
 
 #ifdef DEBUGGING
-    if (PL_sv_count != 0) {
+/*     if (PL_sv_count != 0) { */
 /* 	PerlIO_printf(Perl_debug_log, "Scalars leaked: %ld\n", (long)PL_sv_count); */
 /* 	sv_report_used(); */
-    }
+/*     } */
 #endif
 
 #ifdef PERL_DEBUG_READONLY_OPS
@@ -1238,8 +1238,7 @@ perl_parse(pTHXx_ XSINIT_t xsinit, int argc, char **argv, char **env)
     }
 
     if (PL_main_root) {
-	op_free(PL_main_root);
-	PL_main_root = NULL;
+	ROOTOPcpNULL(PL_main_root);
     }
     PL_main_start = NULL;
     CVcpNULL(PL_main_cv);
@@ -1309,9 +1308,8 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 
     sv = newSVpvs("");		/* first used for -I flags */
     SAVEFREESV(sv);
-    init_main_stash();
 
-    DEBUG_R(refcnt_check());
+    init_main_stash();
 
     PL_isarev = newHV();
 
@@ -1495,8 +1493,8 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 #  endif
 #endif
 		    sv_catpvs(opts_prog,
-			"; our @env = map { \"$_=\\\"$(env::var($_))\\\"\" } "
-			"sort grep {m/^PERL/} env::keys; ");
+			"; our @env = map { \"$_=\\\"$(env::var($_))\\\"\" }, "
+			"sort grep {m/^PERL/}, env::keys; ");
 #ifdef __CYGWIN__
 		    sv_catpvs(opts_prog,
 			      "push @env, \"CYGWIN=\\\"$(env::var('CYGWIN'))\\\"\";");
@@ -2085,7 +2083,7 @@ Performs a callback to the specified Perl sub.  See L<perlcall>.
 =cut
 */
 
-I32
+SV*
 Perl_call_argv(pTHX_ const char *sub_name, I32 flags, register char **argv)
 
           		/* See G_* flags in cop.h */
@@ -2115,7 +2113,7 @@ Performs a callback to the specified Perl sub.  See L<perlcall>.
 =cut
 */
 
-I32
+SV*
 Perl_call_pv(pTHX_ const char *sub_name, I32 flags)
               		/* name of the subroutine */
           		/* See G_* flags in cop.h */
@@ -2134,7 +2132,7 @@ be on the stack.  See L<perlcall>.
 =cut
 */
 
-I32
+SV*
 Perl_call_method(pTHX_ const char *methname, I32 flags)
                		/* name of the subroutine */
           		/* See G_* flags in cop.h */
@@ -2154,7 +2152,7 @@ L<perlcall>.
 =cut
 */
 
-I32
+SV*
 Perl_call_sv(pTHX_ SV *sv, VOL I32 flags)
           		/* See G_* flags in cop.h */
 {
@@ -2162,7 +2160,7 @@ Perl_call_sv(pTHX_ SV *sv, VOL I32 flags)
     LOGOP myop;		/* fake syntax tree node */
     UNOP method_op;
     I32 oldmark;
-    VOL I32 retval = 0;
+    VOL SV* retval = &PL_sv_undef;
     I32 oldscope;
     bool oldcatch = CATCH_GET;
     int ret;
@@ -2171,14 +2169,13 @@ Perl_call_sv(pTHX_ SV *sv, VOL I32 flags)
 
     PERL_ARGS_ASSERT_CALL_SV;
 
+    DEBUG_R(refcnt_check());
+	    
+    assert( (flags & G_WANT) == G_SCALAR || (flags & G_DISCARD) );
     if (flags & G_DISCARD) {
 	ENTER;
 	SAVETMPS;
-    }
-    if (!(flags & G_WANT)) {
-	/* Backwards compatibility - as G_SCALAR was 0, it could be omitted.
-	 */
-	flags |= G_SCALAR;
+	flags |= G_VOID;
     }
 
     Zero(&myop, 1, LOGOP);
@@ -2216,7 +2213,9 @@ Perl_call_sv(pTHX_ SV *sv, VOL I32 flags)
     if (!(flags & G_EVAL)) {
 	CATCH_SET(TRUE);
 	CALL_BODY_SUB((OP*)&myop);
-	retval = PL_stack_sp - (PL_stack_base + oldmark);
+	if (PL_stack_sp - (PL_stack_base + oldmark) == 1)
+	    retval = *PL_stack_sp--;
+	assert(PL_stack_sp == (PL_stack_base + oldmark));
 	CATCH_SET(oldcatch);
     }
     else {
@@ -2231,7 +2230,9 @@ Perl_call_sv(pTHX_ SV *sv, VOL I32 flags)
 	case 0:
  redo_body:
 	    CALL_BODY_SUB((OP*)&myop);
-	    retval = PL_stack_sp - (PL_stack_base + oldmark);
+	    if (PL_stack_sp - (PL_stack_base + oldmark) == 1)
+		retval = *PL_stack_sp--;
+	    assert(PL_stack_sp == (PL_stack_base + oldmark));
 	    if (!(flags & G_KEEPERR))
 		sv_setpvn(ERRSV,"",0);
 	    break;
@@ -2253,12 +2254,6 @@ Perl_call_sv(pTHX_ SV *sv, VOL I32 flags)
 		goto redo_body;
 	    }
 	    PL_stack_sp = PL_stack_base + oldmark;
-	    if ((flags & G_WANT) == G_ARRAY)
-		retval = 0;
-	    else {
-		retval = 1;
-		*++PL_stack_sp = &PL_sv_undef;
-	    }
 	    break;
 	}
 
@@ -2268,13 +2263,13 @@ Perl_call_sv(pTHX_ SV *sv, VOL I32 flags)
     }
 
     if (flags & G_DISCARD) {
-	PL_stack_sp = PL_stack_base + oldmark;
-	retval = 0;
+	assert(PL_stack_sp == PL_stack_base + oldmark);
+	retval = NULL;
 	FREETMPS;
 	LEAVE;
     }
     PL_op = oldop;
-    return retval;
+    return (SV*)retval;
 }
 
 /* Eval a string. The G_EVAL flag is always assumed. */
@@ -4496,11 +4491,11 @@ Perl_call_list(pTHX_ I32 oldscope, AV *paramList)
 		PL_madskills |= 16384;
 #endif
 	    {
-		SV *old_diehook = PL_diehook;
-		PL_diehook = PERL_DIEHOOK_IGNORE;
+		SV *old_diehook = sv_2mortal(SvREFCNT_inc(PL_diehook));
+		SVcpREPLACE(PL_diehook, PERL_DIEHOOK_IGNORE);
 		PUSHMARK(PL_stack_sp);
-		call_sv((SV*)(cv), G_EVAL|G_DISCARD|G_VOID);
-		PL_diehook = old_diehook;
+		call_sv((SV*)(cv), G_EVAL|G_DISCARD);
+		SVcpREPLACE(PL_diehook, old_diehook);
 	    }
 #ifdef PERL_MAD
 	    if (PL_madskills)

@@ -16,16 +16,16 @@ env::set_var('SWUZ'    => 'KLORTHO HOOBOY'); ok env::var('SWUZ'), 'KLORTHO HOOBO
 env::set_var('MYORP', undef);
 env::set_var('SWUZ', undef);
 
-sub j { "[" . join(' ', map "\"$_\"", @_) . "]" ;}
+sub j { "[" . join(' ', map { "\"$_\"" }, @_) . "]" ;}
 
 sub show {
-  print \*STDOUT, "#  (Seeing \{", join(' ', map(dump::view($_), @_)), "\} at line ", @(caller)[2], ")\n";
+  print \*STDOUT, "#  (Seeing \{", join(' ', map( {dump::view($_) }, @_)), "\} at line ", @(caller)[2], ")\n";
   printenv();
   return @_[0] || '';
 }
 sub printenv {
   print \*STDOUT, "# ENV:\n";
-  foreach my $k (sort { $a cmp $b } env::keys()) {
+  foreach my $k (sort { $a cmp $b }, env::keys()) {
     my $p = env::var($k);  $p =~ s/\n/\n#/g;
     print \*STDOUT, "#   [$k] = [$p]\n"; }
   print \*STDOUT, "# [end of ENV]\n#\n";

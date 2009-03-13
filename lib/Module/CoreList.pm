@@ -105,8 +105,8 @@ sub first_release_raw {
 
     my @perls = @( $version
         ?? < grep { exists %version{$_}->{ $module } &&
-                        %version{$_}->{?$module } +>= $version } keys %version
-        !! < grep { exists %version{$_}->{ $module }             } keys %version );
+                        %version{$_}->{?$module } +>= $version }, keys %version
+        !! < grep { exists %version{$_}->{ $module }             }, keys %version );
 
     return @perls;
 }
@@ -114,13 +114,13 @@ sub first_release_raw {
 sub first_release_by_date {
     my @perls = &first_release_raw( < @_ );
     return unless (nelems @perls);
-    return (sort { %released{?$a} cmp %released{?$b} } @perls)[0];
+    return (sort { %released{?$a} cmp %released{?$b} }, @perls)[0];
 }
 
 sub first_release {
     my @perls = &first_release_raw( < @_ );
     return unless (nelems @perls);
-    return (sort { $a cmp $b } @perls)[0];
+    return (sort { $a cmp $b }, @perls)[0];
 }
 
 sub find_modules {
@@ -205,7 +205,7 @@ sub find_version {
     5.010000 => \@(perl => 32642),
 );
 
-for my $version ( sort { $a <+> $b } keys %released ) {
+for my $version ( sort { $a <+> $b }, keys %released ) {
     my $family = int ($version * 1000) / 1000;
     push @{ %families{ + $family }} , $version;
 }

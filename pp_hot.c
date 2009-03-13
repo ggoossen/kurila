@@ -157,7 +157,6 @@ PP(pp_concat)
     bool rcopied = FALSE;
 
     if (TARG == right && right != left) {
-	/* mg_get(right) may happen here ... */
 	rpv = SvPV_const(right, rlen);
 	right = newSVpvn_flags(rpv, rlen, SVs_TEMP);
 	rpv = SvPV_const(right, rlen);	/* no point setting UTF-8 here */
@@ -166,7 +165,7 @@ PP(pp_concat)
 
     if (TARG != left) {
         STRLEN llen;
-        const char* const lpv = SvPV_const(left, llen);	/* mg_get(left) may happen here */
+        const char* const lpv = SvPV_const(left, llen);
 	sv_setpvn(TARG, lpv, llen);
     }
     else { /* TARG == left */
@@ -179,7 +178,6 @@ PP(pp_concat)
 	(void)SvPV_nomg_const(left, llen);    /* Needed to set UTF8 flag */
     }
 
-    /* or mg_get(right) may happen here */
     if (!rcopied) {
 	rpv = SvPV_const(right, rlen);
     }
@@ -1063,12 +1061,6 @@ PP(pp_leave)
     POPBLOCK(cx,newpm);
 
     gimme = OP_GIMME(PL_op, -1);
-    if (gimme == -1) {
-	if (cxstack_ix >= 0)
-	    gimme = cxstack[cxstack_ix].blk_gimme;
-	else
-	    gimme = G_SCALAR;
-    }
 
     if (gimme == G_VOID)
 	SP = newsp;
@@ -1201,51 +1193,45 @@ PP(pp_iter)
 PP(pp_grepwhile)
 {
     dVAR; dSP;
-    SV** src;
+    const I32 gimme = GIMME_V;
+    SV* newitem;
+    AV* src;
+    SV* dst;
+    SV** cvp;
+    SV* value;
 
-    /* first, move source pointer to the next item in the source list */
-    SV** dst = PL_stack_base + (PL_markstack_ptr[0]) + 0;
-    src = PL_stack_base + PL_markstack_ptr[0] + 1;
+    newitem = POPs;
+    value = POPs;
+    cvp = SP;
+    src = SvAv(SP[-1]);
+    dst = SP[-2];
 
-    /* if there are new items, push them into the destination list */
-    if (SvTRUE(POPs)) {
-	/* copy the new items down to the destination list */
-	av_push((AV*)*dst, newSVsv(POPs));
+    if (SvTRUE(newitem)) {
+	av_push(SvAv(dst), SvREFCNT_inc(value));
     }
-    else {
-	/* discard item */
-	(void)POPs;
-    }
-
-    LEAVE;					/* exit inner scope */
 
     /* All done yet? */
-    if ( av_len(SvAv(*src)) == -1 ) {
-	const I32 gimme = GIMME_V;
+    if ( av_len(src) == -1 ) {
 
+	FREETMPS;
 	LEAVE;					/* exit outer scope */
 	(void)POPMARK;				/* pop dst */
 	SP = PL_stack_base + POPMARK;		/* pop original mark */
 	if (gimme != G_VOID) {
-	    PUSHs(*dst);
+	    PUSHs(dst);
 	}
 	RETURN;
     }
     else {
 	SV *srcitem;
 
-	ENTER;					/* enter inner scope */
-	SAVEVPTR(PL_curpm);
-
 	/* set $_ to the new source item */
-	srcitem = av_shift(SvAv(*src));
+	srcitem = av_shift(src);
 	XPUSHs(srcitem);
-	SvTEMP_off(srcitem);
-	if (PL_op->op_private & OPpGREP_LEX) {
-	    SVcpSTEAL(PAD_SVl(PL_op->op_targ), srcitem);
-	}
-	else
-	    SVcpSTEAL(DEFSV, srcitem);
+	PUSHMARK(SP);
+	mXPUSHs(srcitem);
+	XPUSHs(*cvp);
+	PUTBACK;
 
 	RETURNOP(cLOGOP->op_other);
     }
@@ -1317,7 +1303,6 @@ PP(pp_leavesub)
     POPSUB(cx,sv);	/* Stack values are safe: release CV and @_ ... */
     PL_curpm = newpm;	/* ... and pop $1 et al */
 
-    LEAVESUB(sv);
     return cx->blk_sub.retop;
 }
 
@@ -1416,7 +1401,23 @@ PP(pp_entersub)
 	}
 	SAVECOMPPAD();
 	PAD_SET_CUR_NOSAVE(padlist, CvDEPTH(cv));
-	if (hasargs) {
+	if (CvFLAGS(cv) & CVf_BLOCK) {
+	    SAVECLEARSV(PAD_SVl(PAD_ARGS_INDEX));
+	    CX_CURPAD_SAVE(cx->blk_sub);
+	    ++MARK;
+
+	    if (items > 1)
+		Perl_croak(aTHX_ "Too many arguments for block sub: %"IVdf"",
+		    items);
+
+	    if (items == 1) {
+		SVcpREPLACE( PAD_SVl(PAD_ARGS_INDEX), *MARK );
+		MARK++;
+	    }
+	    else
+		SVcpSTEAL( PAD_SVl(PAD_ARGS_INDEX), newSV(0) );
+	}
+	else if (hasargs) {
 	    AV* av;
 	    SV* avsv = PAD_SVl(PAD_ARGS_INDEX);
 	    sv_upgrade(avsv, SVt_PVAV);

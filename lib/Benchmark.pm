@@ -457,8 +457,8 @@ sub BEGIN {
 
 sub import {
     my $class = shift;
-    if (grep { $_ eq ":hireswallclock" } @_) {
-	@_ = grep { $_ ne ":hireswallclock" } @_;
+    if (grep { $_ eq ":hireswallclock" }, @_) {
+	@_ = grep { $_ ne ":hireswallclock" }, @_;
 	local $^WARNING=0;
 	*mytime = $hirestime if defined $hirestime;
     }
@@ -907,7 +907,7 @@ sub cmpthese{
     $style = "" unless defined $style;
 
     # Flatten in to an array of arrays with the name as the first field
-    my @vals = map{ \@( $_, < @{$results->{?$_}} ) } keys %$results;
+    my @vals = map{ \@( $_, < @{$results->{?$_}} ) }, keys %$results;
 
     for ( @vals) {
 	# The epsilon fudge here is to prevent div by 0.  Since clock
@@ -922,7 +922,7 @@ sub cmpthese{
     }
 
     # Sort by rate
-    @vals =sort { $a->[7] <+> $b->[7] } @vals;
+    @vals =sort { $a->[7] <+> $b->[7] }, @vals;
 
     # If more than half of the rates are greater than one...
     my $display_as_rate = (nelems @vals) ?? (@vals[((nelems @vals)-1)>>1]->[7] +> 1) !! 0;
@@ -933,11 +933,11 @@ sub cmpthese{
     my @top_row = @( 
         '', 
 	$display_as_rate ?? 'Rate' !! 's/iter', 
-	< map { $_->[0] } @vals 
+	< map { $_->[0] }, @vals 
     );
 
     push @rows, \@top_row;
-    @col_widths = map { length( $_ ) } @top_row;
+    @col_widths = map { length( $_ ) }, @top_row;
 
     # Build the data rows
     # We leave the last column in even though it never has any data.  Perhaps
@@ -1010,7 +1010,7 @@ sub cmpthese{
     # Equalize column widths in the chart as much as possible without
     # exceeding 80 characters.  This does not use or affect cols 0 or 1.
     my @sorted_width_refs = 
-       sort { $$a <+> $$b } map { \$_ } @col_widths[[2..((nelems @col_widths)-1)]];
+       sort { $$a <+> $$b }, map { \$_ }, @col_widths[[2..((nelems @col_widths)-1)]];
     my $max_width = ${@sorted_width_refs[-1]};
 
     my $total = (nelems @col_widths) - 1 ;
@@ -1032,7 +1032,7 @@ sub cmpthese{
     }
 
     # Dump the output
-    my $format = join( ' ', map { "\%$($_)s" } @col_widths ) . "\n";
+    my $format = join( ' ', map { "\%$($_)s" }, @col_widths ) . "\n";
     substr( $format, 1, 0, '-' );
     for (  @rows ) {
 	printf \*STDOUT, $format, < @$_;

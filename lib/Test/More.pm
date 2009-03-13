@@ -447,7 +447,7 @@ sub can_ok ($@) {
 
     my $ok = $tb->ok( !nelems @nok, $name );
 
-    $tb->diag(< map "    $class->can('$_') failed\n", @nok);
+    $tb->diag(< map { "    $class->can('$_') failed\n" }, @nok);
 
     return $ok;
 }
@@ -1171,7 +1171,7 @@ sub eq_array {
 sub _eq_array  {
     my@($a1, $a2) =  @_;
 
-    if( grep !_type($_) eq 'ARRAY', @( $a1, $a2) ) {
+    if( grep { !_type($_) eq 'ARRAY' }, @( $a1, $a2) ) {
         warn "eq_array passed a non-array ref";
         return 0;
     }
@@ -1290,7 +1290,7 @@ sub eq_hash {
 sub _eq_hash {
     my@($a1, $a2) =  @_;
 
-    if( grep !_type($_) eq 'HASH', @( $a1, $a2) ) {
+    if( grep { !_type($_) eq 'HASH' }, @( $a1, $a2) ) {
         warn "eq_hash passed a non-hash ref";
         return 0;
     }
@@ -1344,8 +1344,8 @@ sub eq_set  {
     return 0 unless (nelems @$a1) == nelems @$a2;
 
     return eq_array(
-           \ (sort { $a cmp $b } map { dump::view($_) } @$a1 ),
-           \ (sort { $a cmp $b } map { dump::view($_) } @$a2 ),
+           \ (sort { $a cmp $b }, map { dump::view($_) }, @$a1 ),
+           \ (sort { $a cmp $b }, map { dump::view($_) }, @$a2 ),
     );
 }
 

@@ -21,7 +21,7 @@ do {
 	is( @load[0]->[1], $IO::VERSION, '... with the current .pm version' );
 };
 
-my @default = map { "IO/$_.pm" } qw( Handle Seekable File Socket Dir );
+my @default = map { "IO/$_.pm" }, qw( Handle Seekable File Socket Dir );
 delete $^INCLUDED{[@default ]};
 
 my $warn = '' ;

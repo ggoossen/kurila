@@ -40,7 +40,7 @@ BEGIN
 
 # typeglob constants.
 for my $name (@( <qw|DEF_WBITS MAX_MEM_LEVEL MAX_WBITS OS_CODE|,
-              < grep { m/^Z_/ } @Compress::Raw::Zlib::EXPORT)) {
+              < grep { m/^Z_/ }, @Compress::Raw::Zlib::EXPORT)) {
     Symbol::fetch_glob($name)->* = \&{*{Symbol::fetch_glob("Compress::Raw::Zlib::$name")}};
 }
 

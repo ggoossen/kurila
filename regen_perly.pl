@@ -62,7 +62,7 @@ usage unless (nelems @ARGV)==0 && $y_file =~ m/\.y$/;
 # the test below to allow that version too. DAPM Feb 04.
 
 my $version = `$bison -V`;
-unless ($version =~ m/\b(1\.875[a-z]?|2\.[013])\b/) { die <<EOF; }
+unless ($version =~ m/\b(1\.875[a-z]?|2\.[0134])\b/) { die <<EOF; }
 
 You have the wrong version of bison in your path; currently 1.875
 2.0, 2.1 or 2.3 is required.  Try installing
@@ -152,6 +152,7 @@ sub extract {
 	switch \s* \( \s* \w+ \s* \) \s* { \s*
 	(
 	    case \s* \d+ \s* : \s*
+	    (?: \s* /\* [^*]*? \*/ \s* )*	# optional C-comments
 	    \#line [^\n]+"\Q$y_file\E"
 	    .*?
 	)
@@ -172,6 +173,8 @@ sub extract {
 
     # C<#line 188 "perlytmp.c"> gets picked up by make depend, so remove them.
     $actlines =~ s/^#line \d+ "\Q$tmpc_file\E".*$//gm;
+
+    $actlines =~ s{\n\/\* Line \d+ of yacc.c\s+\*\/\n}{}g;
 
     # convert yyvsp[nnn] into ps[nnn].val
 
@@ -257,7 +260,7 @@ sub make_type_tab {
 
     return 
 	  "\ntypedef enum \{\n\t"
-	. join(", ", map "toketype_$_", sort keys %types)
+	. join(", ", map { "toketype_$_" }, sort keys %types)
 	. "\n\} toketypes;\n\n"
 	. "/* type of each token/terminal */\n"
 	. "static const toketypes yy_type_tab[] =\n\{\n"

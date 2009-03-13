@@ -288,13 +288,14 @@ PPCODE:
     char op_mask_buf[OP_MASK_BUF_SIZE];
     GV *gv;
     HV *dummy_hv;
+    SV *res;
 
     ENTER;
 
     opmask_addlocal(aTHX_ mask, op_mask_buf);
 
     SAVESPTR(PL_endav);
-    SVcpSTEAL(PL_endav, (SV*)newAV()); /* ignore END blocks for now	*/
+    AVcpSTEAL(PL_endav, newAV()); /* ignore END blocks for now	*/
 
     SAVESPTR(PL_defstash);		/* save current default stash	*/
     /* the assignment to global defstash changes our sense of 'main'	*/
@@ -316,8 +317,9 @@ PPCODE:
     hv_clear(PL_stashcache);
 
     PUSHMARK(SP);
-    perl_call_sv(codesv, GIMME|G_EVAL|G_KEEPERR); /* use callers context */
+    res = perl_call_sv(codesv, GIMME|G_EVAL|G_KEEPERR); /* use callers context */
     SPAGAIN; /* for the PUTBACK added by xsubpp */
+    XPUSHs(res);
     LEAVE;
 
 
