@@ -1535,7 +1535,7 @@ Perl_assign(pTHX_ OP *o, bool partial, I32 *min_modcount, I32 *max_modcount)
 		OP* real_kid = kid;
 #ifdef PERL_MAD
 		if (real_kid->op_type == OP_NULL)
-		    reaL_kid = real_kid->op_first;
+		    real_kid = cUNOPx(real_kid)->op_first;
 #endif
 		if (real_kid->op_type != OP_CONST) {
 		    if ( real_kid->op_type != OP_ARRAYEXPAND

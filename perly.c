@@ -685,6 +685,7 @@ Perl_yyparse (pTHX)
     return yyresult;
 }
 
+#ifndef PERL_IN_MADLY_C
 void
 Perl_parser_tmprefcnt(pTHX_  const yy_parser *parser)
 {
@@ -712,9 +713,7 @@ Perl_parser_tmprefcnt(pTHX_  const yy_parser *parser)
 	    op_tmprefcnt(parser->yylval.opval);
 	}
 
-#ifdef PERL_MAD
-	...;
-#else
+#ifndef PERL_MAD
 	{
 	    I32 i;
 	    for (i=0; i<parser->nexttoke; i++) {
@@ -727,6 +726,7 @@ Perl_parser_tmprefcnt(pTHX_  const yy_parser *parser)
 #endif
     }
 }
+#endif /* PERL_IN_MADLY_C */
 
 /*
  * Local variables:

@@ -321,7 +321,7 @@ Perl_scalarvoid(pTHX_ OP *o)
 	o->op_type = OP_I_PREDEC;	/* pre-decrement is faster */
 	o->op_ppaddr = PL_ppaddr[OP_I_PREDEC];
 	break;
-#endif MAD
+#endif /* MAD */
 
     case OP_OR:
     case OP_AND:
