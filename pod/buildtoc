@@ -156,7 +156,7 @@ do {
   my (%sources);
 
   # Convert these to a list of filenames.
-  foreach (@( <keys %Pods, < keys %Readmepods)) {
+  foreach ((keys %Pods) +@+ (keys %Readmepods)) {
     %our_pods{+"$_.pod"}++;
   }
 
@@ -715,7 +715,7 @@ while (my @(?$target, ?$name) = @: each %Targets) {
     next;
   }
   rename $name, "$name.old" or die "$^PROGRAM_NAME: Can't rename $name to $name.old: $^OS_ERROR";
-  open my $thing, ">", "$name" or die "$^PROGRAM_NAME: Can't open $name for writing: $^OS_ERROR";
+  open $thing, ">", "$name" or die "$^PROGRAM_NAME: Can't open $name for writing: $^OS_ERROR";
   print $thing, $new or die "$^PROGRAM_NAME: print to $name failed: $^OS_ERROR";
   close $thing or die die "$^PROGRAM_NAME: close $name failed: $^OS_ERROR";
 }
