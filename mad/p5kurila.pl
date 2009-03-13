@@ -1336,6 +1336,34 @@ sub print_filehandle {
     return;
 }
 
+sub block_arg {
+    my $xml = shift;
+    for my $op (find_ops($xml, "mapstart"), find_ops($xml, "grepstart")) {
+        my ($scope) = map { $op->findnodes("op_null/op_null/$_") } qw|op_scope op_leave|;
+        if ($scope) {
+            set_madprop($scope, "curly_close", "},");
+        }
+        else {
+            my ($opnull) = $op->findnodes("op_null");
+            set_madprop($opnull, "wrap_open", " {");
+            set_madprop($opnull, "wrap_close", " }");
+        }
+    }
+    for my $op (find_ops($xml, "entersub")) {
+        my ($refgen) = $op->findnodes("op_null/op_srefgen");
+        next unless $refgen;
+        next if get_madprop($refgen, "operator");
+        my ($scope) = $op->findnodes("op_null/op_srefgen/op_anoncode/op_leavesub/op_lineseq");
+        next unless $scope;
+        set_madprop($scope, "curly_close", "},");
+    }
+    for my $op (find_ops($xml, "sort")) {
+        my ($scope) = map { $op->findnodes("op_null/$_") } qw|op_scope op_leave|;
+        next unless $scope;
+        set_madprop($scope, "curly_close", "},");
+    }
+}
+
 my $from; # floating point number with starting version of kurila.
 GetOptions("from=s" => \$from);
 $from =~ m/(\w+)[-]([\d.]+)$/ or die "invalid from: '$from'";
@@ -1443,8 +1471,9 @@ if ($from->{branch} ne "kurila" or $from->{v} < qv '1.17') {
     rename_magic_vars($twig);
 }
 
-rename_inc_vars($twig);
-print_filehandle($twig);
+#rename_inc_vars($twig);
+#print_filehandle($twig);
+block_arg($twig);
 
 #add_call_parens($twig);
 

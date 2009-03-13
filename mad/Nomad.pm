@@ -669,7 +669,7 @@ sub ast {
 	push @newkids, $kid->ast($self, @_);
     }
     if (@newkids) {
-	push @retval, uc $self->key(), "(", @newkids , ")";
+	push @retval, uc $self->key(), "(", @newkids, ")";
     }
     else {
 	push @retval, $self->madness('o ( )');
@@ -1544,6 +1544,10 @@ package PLXML::op_rv2gv;
 
 sub ast {
     my $self = shift;
+
+    if ($$self{mp}{X}) {
+        return $self->newtype->new(Kids => [$self->madness('X')]);
+    }
 
     my @newkids;
     push @newkids, $self->madness('dx d optional_assign ( * $');

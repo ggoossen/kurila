@@ -435,13 +435,12 @@ miexpr	:	iexpr
 /* Optional "MAIN:"-style loop labels */
 label	:	/* empty */
 			{
-#ifdef MAD
 			  $$.pval = NULL;
+#ifdef PERL_MAD
 			  $$.madtoken = newMADTOKEN(OP_NULL, 0);
-#else
+#endif
 			  $$.pval = NULL;
 			  $$.location = NULL;
-#endif
 			}
 	|	LABEL
 	;

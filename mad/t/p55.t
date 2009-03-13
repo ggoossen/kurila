@@ -115,6 +115,8 @@ use File::Find;
 
 our %failing = map { $_, 1 } qw|
 ../t/arch/64bitint.t
+../t/run/switchp.t
+../t/io/utf8.t
 |;
 
 my @files;
@@ -202,7 +204,7 @@ job system, though it's not on CPAN at the time of writing this.
 ########
 $^INCLUDE_PATH = @( qw(foo bar) );
 ########
-if (int(1.23) == 1) { print "1"; } else { print "2"; }
+if (int(1.23) == 1) { print \*STDOUT, "1"; } else { print \*STDOUT, "2"; }
 ########
 # TODO state; op_once
 state $x = 4;
@@ -228,11 +230,11 @@ my $msg = "ce ºtii tu, bã ?\n";
 (stat "abc")[2];
 ########
 while ( ~< *DATA) {
-      print $_;
+      print \*STDOUT, $_;
 }
 ########
 for (1..5) {
-    print $_;
+    print \*STDOUT, $_;
 }
 ########
 map { $_ } 1..5;
@@ -257,39 +259,32 @@ do {
 ########
 try { }
 ########
-binmode ':foo', $a;
-########
 # substitute with $(..)
 my $str = shift;
 $str =~ s{(foo)}{$(sprintf("=\%02X", ord($1)))}g;
 $str;
 ########
 SKIP: do {
-    print 1;
+    print \*STDOUT, 1;
 }
 ########
-print "arg";
+print \*STDOUT, "arg";
 SKIP: do {
-    print 1;
+    print \*STDOUT, 1;
 }
 ########
-print "arg";
+print \*STDOUT, "arg";
 SKIP: do {
-    print 1;
+    print \*STDOUT, 1;
 }    ;
 
 sub foo {
-    print "bar";
+    print \*STDOUT, "bar";
 }
-########
-print ;  ;
-########
-package main;
-print "arg";
 ########
 pos($a);
 ########
-LABEL: for (@: 1) { print "arg" }
+LABEL: for (@: 1) { warn "arg" }
 ########
 # optional assignment
 my @( ? $x) = qw();
@@ -330,3 +325,12 @@ for my $x ($a) {
 *F{IO} ;
 ########
 $^WARNING += 1;
+########
+for our $_ ($a) {
+    warn $_;
+}
+########
+# TODO
+foo(1, , 2);
+########
+my %( 1 => $v, ...) = $a;

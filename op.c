@@ -1541,11 +1541,18 @@ Perl_assign(pTHX_ OP *o, bool partial, I32 *min_modcount, I32 *max_modcount)
 	    OP* prev_kid = key_kid;
 	    for (kid = prev_kid->op_sibling; kid; kid = kid->op_sibling) {
 		OP* op_optional;
-		if (kid->op_type != OP_CONST) {
-		    if (kid->op_type != OP_ARRAYEXPAND && kid->op_type != OP_HASHEXPAND && kid->op_type != OP_DOTDOTDOT)
-			Perl_croak_at(aTHX_ kid->op_location, "hash keys must be constants in a %s assignment", OP_DESC(o));
-		    if (kid->op_sibling)
-			Perl_croak_at(aTHX_ kid->op_location, "%s must be the last item in %s assignment", OP_DESC(kid), OP_DESC(o));
+		OP* real_kid = kid;
+#ifdef PERL_MAD
+		if (real_kid->op_type == OP_NULL)
+		    reaL_kid = real_kid->op_first;
+#endif
+		if (real_kid->op_type != OP_CONST) {
+		    if ( real_kid->op_type != OP_ARRAYEXPAND
+			&& real_kid->op_type != OP_HASHEXPAND
+			&& real_kid->op_type != OP_DOTDOTDOT )
+			Perl_croak_at(aTHX_ real_kid->op_location, "hash key must be constant not a %s in a %s assignment", OP_DESC(real_kid), OP_DESC(o));
+		    if (real_kid->op_sibling)
+			Perl_croak_at(aTHX_ real_kid->op_location, "%s must be the last item in %s assignment", OP_DESC(real_kid), OP_DESC(o));
 		    prev_kid->op_sibling = NULL;
 		    subj_kid->op_sibling = kid;
 		    assign(kid, TRUE, &sub_min_modcount, &sub_max_modcount);
