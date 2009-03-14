@@ -89,6 +89,9 @@ package PLXML::unop;
 
 our @ISA = ('PLXML');
 
+package PLXML::rootop;
+
+our @ISA = ('PLXML');
 
 # New ops always go at the end, just before 'custom'
 
@@ -134,6 +137,12 @@ sub desc { 'null operation' }
 sub check { 'ck_null' }
 sub flags { '0' }
 sub args { '' }
+
+package PLXML::op_root;
+
+our @ISA = ('PLXML::rootop');
+
+sub key { 'root' }
 
 
 package PLXML::op_stub;
@@ -916,6 +925,19 @@ sub check { 'ck_concat' }
 sub flags { 'fsT2' }
 sub args { 'S S' }
 
+package PLXML::op_hashconcat;
+
+our @ISA = ('PLXML::binop');
+
+sub key { 'hashconcat' }
+sub args { 'S S' }
+
+package PLXML::op_arrayconcat;
+
+our @ISA = ('PLXML::binop');
+
+sub key { 'arrayconcat' }
+sub args { 'S S' }
 
 package PLXML::op_stringify;
 
@@ -1810,7 +1832,17 @@ sub check { 'ck_join' }
 sub flags { 'mst@' }
 sub args { 'S L' }
 
+package PLXML::op_hashjoin;
 
+our @ISA = ('PLXML::listop');
+
+sub key { 'hashjoin' }
+
+package PLXML::op_arrayjoin;
+
+our @ISA = ('PLXML::listop');
+
+sub key { 'arrayjoin' }
 
 # List operators.
 

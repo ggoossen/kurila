@@ -418,10 +418,6 @@ Perl_allocmy(pTHX_ const char *const name)
 static void
 S_op_destroy(pTHX_ OP *o)
 {
-    if (o->op_latefree) {
-	o->op_latefreed = 1;
-	return;
-    }
     SVcpNULL(o->op_location);
     FreeOp(o);
 }
@@ -436,11 +432,6 @@ Perl_op_free(pTHX_ OP *o)
 
     if (!o)
 	return;
-    if (o->op_latefreed) {
-	if (o->op_latefree)
-	    return;
-	goto do_free;
-    }
 
     type = o->op_type;
     if (type == OP_ROOT) {
@@ -480,11 +471,6 @@ Perl_op_free(pTHX_ OP *o)
     }
 
     op_clear(o);
-    if (o->op_latefree) {
-	o->op_latefreed = 1;
-	return;
-    }
-  do_free:
     FreeOp(o);
 }
 
@@ -496,9 +482,6 @@ Perl_op_tmprefcnt(pTHX_ OP *o)
 
     if (!o)
 	return;
-    if (o->op_latefreed) {
-	return;
-    }
 
     type = o->op_type;
 
@@ -1532,11 +1515,18 @@ Perl_assign(pTHX_ OP *o, bool partial, I32 *min_modcount, I32 *max_modcount)
 	    OP* prev_kid = key_kid;
 	    for (kid = prev_kid->op_sibling; kid; kid = kid->op_sibling) {
 		OP* op_optional;
-		if (kid->op_type != OP_CONST) {
-		    if (kid->op_type != OP_ARRAYEXPAND && kid->op_type != OP_HASHEXPAND && kid->op_type != OP_DOTDOTDOT)
-			Perl_croak_at(aTHX_ kid->op_location, "hash keys must be constants in a %s assignment", OP_DESC(o));
-		    if (kid->op_sibling)
-			Perl_croak_at(aTHX_ kid->op_location, "%s must be the last item in %s assignment", OP_DESC(kid), OP_DESC(o));
+		OP* real_kid = kid;
+#ifdef PERL_MAD
+		if (real_kid->op_type == OP_NULL)
+		    real_kid = cUNOPx(real_kid)->op_first;
+#endif
+		if (real_kid->op_type != OP_CONST) {
+		    if ( real_kid->op_type != OP_ARRAYEXPAND
+			&& real_kid->op_type != OP_HASHEXPAND
+			&& real_kid->op_type != OP_DOTDOTDOT )
+			Perl_croak_at(aTHX_ real_kid->op_location, "hash key must be constant not a %s in a %s assignment", OP_DESC(real_kid), OP_DESC(o));
+		    if (real_kid->op_sibling)
+			Perl_croak_at(aTHX_ real_kid->op_location, "%s must be the last item in %s assignment", OP_DESC(real_kid), OP_DESC(o));
 		    prev_kid->op_sibling = NULL;
 		    subj_kid->op_sibling = kid;
 		    assign(kid, TRUE, &sub_min_modcount, &sub_max_modcount);
@@ -1978,9 +1968,6 @@ Perl_newOP(pTHX_ I32 type, OPFLAGS flags, SV* location)
     o->op_type = (OPCODE)type;
     o->op_ppaddr = PL_ppaddr[type];
     o->op_flags = flags;
-    o->op_latefree = 0;
-    o->op_latefreed = 0;
-    o->op_attached = 0;
 
     o->op_location = SvREFCNT_inc(location);
 
@@ -2334,7 +2321,7 @@ Perl_utilize(pTHX_ int aver, I32 floor, OP *version, OP *idop, OP *arg)
     OP *veop;
     CV *cv;
 #ifdef PERL_MAD
-    OP *pegop = newOP(OP_NULL,0, idop->op_location);
+    OP *pegop = newSVOP(OP_NULL, 0, newSV(0), idop->op_location);
 #endif
 
     PERL_ARGS_ASSERT_UTILIZE;
@@ -2435,14 +2422,11 @@ Perl_utilize(pTHX_ int aver, I32 floor, OP *version, OP *idop, OP *arg)
     PL_parser->expect = XSTATE;
     PL_cop_seqmax++; /* Purely for B::*'s benefit */
 
-    return cv;
 #ifdef PERL_MAD
-    if (!PL_madskills) {
-	/* FIXME - don't allocate pegop if !PL_madskills */
-	op_free(pegop);
-	return NULL;
-    }
+    SVcpREPLACE(cSVOPx(pegop)->op_sv, CvSv(cv));
     return pegop;
+#else
+    return cv;
 #endif
 }
 
@@ -2529,8 +2513,16 @@ Perl_vload_module(pTHX_ U32 flags, SV *name, SV *ver, va_list *args)
     SAVEVPTR(PL_curcop);
     lex_start(NULL, NULL, FALSE);
     SVcpREPLACE(PL_parser->lex_filename, newSVpv("fake begin block", 0));
+#ifdef PERL_MAD
+    {
+	OP* op = utilize(!(flags & PERL_LOADMOD_DENY), start_subparse(0),
+	    veop, modname, imop);
+	cv = SvCv(cSVOPx(op)->op_sv);
+    }
+#else
     cv = utilize(!(flags & PERL_LOADMOD_DENY), start_subparse(0),
 	veop, modname, imop);
+#endif
     process_special_block(KEY_BEGIN, cv);
     LEAVE;
 }
@@ -3608,8 +3600,7 @@ Perl_newSUB(pTHX_ I32 floor, OP *proto, OP *block)
 #endif
 	block = newblock;
     }
-    else
-	block->op_attached = 1;
+
     {
 	OP* leaveop;
 	leaveop = newUNOP(OP_LEAVESUB, 0, scalarseq(block), block->op_location);

@@ -366,48 +366,47 @@ case 2:
   case 44:
 #line 437 "perly.y"
     {
-#ifdef MAD
 			  (yyval.p_tkval).pval = NULL;
+#ifdef PERL_MAD
 			  (yyval.p_tkval).madtoken = newMADTOKEN(OP_NULL, 0);
-#else
+#endif
 			  (yyval.p_tkval).pval = NULL;
 			  (yyval.p_tkval).location = NULL;
-#endif
 			;}
     break;
 
   case 45:
-#line 447 "perly.y"
+#line 446 "perly.y"
     { (yyval.p_tkval) = (ps[(1) - (1)].val.p_tkval); ;}
     break;
 
   case 46:
-#line 452 "perly.y"
+#line 451 "perly.y"
     { (yyval.opval) = (ps[(1) - (1)].val.opval); ;}
     break;
 
   case 47:
-#line 454 "perly.y"
+#line 453 "perly.y"
     { (yyval.opval) = (ps[(1) - (1)].val.opval); ;}
     break;
 
   case 48:
-#line 456 "perly.y"
+#line 455 "perly.y"
     { (yyval.opval) = (ps[(1) - (1)].val.opval); ;}
     break;
 
   case 49:
-#line 458 "perly.y"
+#line 457 "perly.y"
     { (yyval.opval) = (ps[(1) - (1)].val.opval); ;}
     break;
 
   case 50:
-#line 463 "perly.y"
+#line 462 "perly.y"
     { (yyval.opval) = (ps[(1) - (1)].val.opval); ;}
     break;
 
   case 51:
-#line 467 "perly.y"
+#line 466 "perly.y"
     {
                             (yyval.opval) = newOP(OP_NULL,0, LOCATION((ps[(1) - (1)].val.i_tkval)));
                             TOKEN_GETMAD((ps[(1) - (1)].val.i_tkval),(yyval.opval),'p');
@@ -416,7 +415,7 @@ case 2:
     break;
 
   case 52:
-#line 476 "perly.y"
+#line 475 "perly.y"
     { 
 #ifdef MAD
 			  (yyval.opval) = newMYSUB((ps[(2) - (5)].val.ionlyval), (ps[(3) - (5)].val.opval), (ps[(4) - (5)].val.opval), NULL, (ps[(5) - (5)].val.opval));
@@ -429,16 +428,17 @@ case 2:
     break;
 
   case 53:
-#line 489 "perly.y"
+#line 488 "perly.y"
     {
 #ifdef MAD
+                            CV* new;
                             (yyval.opval) = newOP(OP_NULL,0, LOCATION((ps[(1) - (5)].val.i_tkval)));
                             op_getmad((ps[(3) - (5)].val.opval),(yyval.opval),'n');
                             op_getmad((ps[(4) - (5)].val.opval),(yyval.opval),'s');
                             op_getmad((ps[(5) - (5)].val.opval),(yyval.opval),'&');
                             TOKEN_GETMAD((ps[(1) - (5)].val.i_tkval),(yyval.opval),'d');
                             APPEND_MADPROPS_PV("sub", (yyval.opval), '<');
-                            CV* new = newNAMEDSUB((ps[(2) - (5)].val.ionlyval), (ps[(3) - (5)].val.opval), (ps[(4) - (5)].val.opval), (ps[(5) - (5)].val.opval));
+                            new = newNAMEDSUB((ps[(2) - (5)].val.ionlyval), (ps[(3) - (5)].val.opval), (ps[(4) - (5)].val.opval), (ps[(5) - (5)].val.opval));
                             /* SvREFCNT_dec(new);  leak reference */
 #else
                             CV* new = newNAMEDSUB((ps[(2) - (5)].val.ionlyval), (ps[(3) - (5)].val.opval), (ps[(4) - (5)].val.opval), (ps[(5) - (5)].val.opval));
@@ -452,11 +452,12 @@ case 2:
 #line 506 "perly.y"
     {
 #ifdef MAD
+                            CV* new;
                             (yyval.opval) = newOP(OP_NULL,0, LOCATION((ps[(1) - (3)].val.i_tkval)));
                             op_getmad((ps[(3) - (3)].val.opval),(yyval.opval),'&');
                             TOKEN_GETMAD((ps[(1) - (3)].val.i_tkval),(yyval.opval),'d');
                             APPEND_MADPROPS_PV("sub", (yyval.opval), '<');
-                            CV* new = newSUB((ps[(2) - (3)].val.ionlyval), NULL, (ps[(3) - (3)].val.opval));
+                            new = newSUB((ps[(2) - (3)].val.ionlyval), NULL, (ps[(3) - (3)].val.opval));
                             SVcpREPLACE(SvLOCATION(CvSv(new)), LOCATION((ps[(1) - (3)].val.i_tkval)));
                             process_special_block(IVAL((ps[(1) - (3)].val.i_tkval)), new);
                             /* SvREFCNT_dec(new);  leak reference */
@@ -472,47 +473,47 @@ case 2:
     break;
 
   case 55:
-#line 528 "perly.y"
+#line 529 "perly.y"
     { (yyval.ionlyval) = start_subparse(0); 
                         ;}
     break;
 
   case 56:
-#line 534 "perly.y"
+#line 535 "perly.y"
     { (yyval.ionlyval) = start_subparse(CVf_ANON);
 			;}
     break;
 
   case 57:
-#line 539 "perly.y"
+#line 540 "perly.y"
     { (yyval.ionlyval) = start_subparse(CVf_ANON|CVf_BLOCK);
 			;}
     break;
 
   case 58:
-#line 544 "perly.y"
+#line 545 "perly.y"
     {
 			  (yyval.opval) = (ps[(1) - (1)].val.opval);
                         ;}
     break;
 
   case 59:
-#line 551 "perly.y"
+#line 552 "perly.y"
     { (yyval.opval) = (OP*)NULL; ;}
     break;
 
   case 60:
-#line 553 "perly.y"
+#line 554 "perly.y"
     { (yyval.opval) = (ps[(1) - (1)].val.opval); ;}
     break;
 
   case 61:
-#line 557 "perly.y"
+#line 558 "perly.y"
     { (yyval.opval) = (ps[(1) - (1)].val.opval); ;}
     break;
 
   case 62:
-#line 558 "perly.y"
+#line 559 "perly.y"
     {
                            (yyval.opval) = newOP(OP_NULL, 0, LOCATION((ps[(1) - (1)].val.i_tkval)) );
                            yyerror("forward subroutine declartion not allowed");
@@ -520,7 +521,7 @@ case 2:
     break;
 
   case 63:
-#line 565 "perly.y"
+#line 566 "perly.y"
     {
 #ifdef MAD
 			  (yyval.opval) = package((ps[(2) - (3)].val.opval));
@@ -535,23 +536,22 @@ case 2:
     break;
 
   case 64:
-#line 579 "perly.y"
+#line 580 "perly.y"
     { 
-#ifdef MAD
-			  (yyval.opval) = utilize(IVAL((ps[(1) - (6)].val.i_tkval)), (ps[(2) - (6)].val.ionlyval), (ps[(3) - (6)].val.opval), (ps[(4) - (6)].val.opval), (ps[(5) - (6)].val.opval));
-			  TOKEN_GETMAD((ps[(1) - (6)].val.i_tkval),(yyval.opval),'o');
-			  TOKEN_GETMAD((ps[(6) - (6)].val.i_tkval),(yyval.opval),';');
-			  if (PL_parser->rsfp_filters &&
-				      AvFILLp(PL_parser->rsfp_filters) >= 0)
-			      APPEND_MADPROPS_PV("sourcefilter", (yyval.opval), '!');
+                            CV* cv;
+#ifdef PERL_MAD
+                            (yyval.opval) = utilize(IVAL((ps[(1) - (6)].val.i_tkval)), (ps[(2) - (6)].val.ionlyval), (ps[(3) - (6)].val.opval), (ps[(4) - (6)].val.opval), (ps[(5) - (6)].val.opval));
+                            TOKEN_GETMAD((ps[(1) - (6)].val.i_tkval),(yyval.opval),'o');
+                            TOKEN_GETMAD((ps[(6) - (6)].val.i_tkval),(yyval.opval),';');
+                            cv = SvCv(cSVOPx((yyval.opval))->op_sv);
 #else
-                          CV* cv = utilize(IVAL((ps[(1) - (6)].val.i_tkval)), (ps[(2) - (6)].val.ionlyval), (ps[(3) - (6)].val.opval), (ps[(4) - (6)].val.opval), (ps[(5) - (6)].val.opval));
-                          (ps[(3) - (6)].val.opval) = NULL;
-                          (ps[(4) - (6)].val.opval) = NULL;
-                          (ps[(5) - (6)].val.opval) = NULL;
-                          process_special_block(KEY_BEGIN, cv);
-			  (yyval.opval) = (OP*)NULL;
+                            cv = utilize(IVAL((ps[(1) - (6)].val.i_tkval)), (ps[(2) - (6)].val.ionlyval), (ps[(3) - (6)].val.opval), (ps[(4) - (6)].val.opval), (ps[(5) - (6)].val.opval));
+                            (yyval.opval) = (OP*)NULL;
 #endif
+                            (ps[(3) - (6)].val.opval) = NULL;
+                            (ps[(4) - (6)].val.opval) = NULL;
+                            (ps[(5) - (6)].val.opval) = NULL;
+                            process_special_block(KEY_BEGIN, cv);
 			;}
     break;
 

@@ -150,6 +150,7 @@ package P5AST::padop_svop; 	@ISA = 'P5AST::baseop';
 package P5AST::pmop; 		@ISA = 'P5AST::baseop';
 package P5AST::pvop_svop; 	@ISA = 'P5AST::baseop';
 package P5AST::unop; 		@ISA = 'P5AST::baseop';
+package P5AST::rootop; 		@ISA = 'P5AST::baseop';
 
 # Nothing.
 
@@ -229,6 +230,8 @@ package P5AST::op_i_add; 	@ISA = 'P5AST::binop';
 package P5AST::op_subtract; 	@ISA = 'P5AST::binop';
 package P5AST::op_i_subtract; 	@ISA = 'P5AST::binop';
 package P5AST::op_concat; 	@ISA = 'P5AST::binop';
+package P5AST::op_hashconcat; 	@ISA = 'P5AST::binop';
+package P5AST::op_arrayconcat; 	@ISA = 'P5AST::binop';
 package P5AST::op_stringify; 	@ISA = 'P5AST::listop';
 package P5AST::op_left_shift; 	@ISA = 'P5AST::binop';
 package P5AST::op_right_shift; 	@ISA = 'P5AST::binop';
@@ -310,6 +313,8 @@ package P5AST::op_unpack; 	@ISA = 'P5AST::listop';
 package P5AST::op_pack; 	@ISA = 'P5AST::listop';
 package P5AST::op_split; 	@ISA = 'P5AST::listop';
 package P5AST::op_join; 	@ISA = 'P5AST::listop';
+package P5AST::op_hashjoin; 	@ISA = 'P5AST::listop';
+package P5AST::op_arrayjoin; 	@ISA = 'P5AST::listop';
 package P5AST::op_say; 	        @ISA = 'P5AST::listop';
 package P5AST::op_listfirst; 	@ISA = 'P5AST::listop';
 package P5AST::op_list; 	@ISA = 'P5AST::listop';
@@ -555,3 +560,4 @@ package P5AST::preplus;		@ISA = 'P5AST::baseop';
 package P5AST::doblock;		@ISA = 'P5AST::baseop';
 package P5AST::cfor;		@ISA = 'P5AST::baseop';
 package P5AST::pmop;		@ISA = 'P5AST::baseop';
+package P5AST::op_root;		@ISA = 'P5AST::rootop';

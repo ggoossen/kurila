@@ -298,11 +298,7 @@ S_clear_yystack(pTHX_  const yy_parser *parser)
 		PAD_RESTORE_LOCAL(ps->comppad);
 	    }
 	    YYDPRINTF ((Perl_debug_log, "(freeing op)\n"));
-#ifndef DISABLE_STACK_FREE
-	    ps->val.opval->op_latefree  = 0;
-	    if (!(ps->val.opval->op_attached && !ps->val.opval->op_latefreed))
-#endif
-		op_free(ps->val.opval);
+	    op_free(ps->val.opval);
 	}
 	ps--;
     }
@@ -363,13 +359,6 @@ Perl_yyparse (pTHX)
     DEBUG_R(refcnt_check());
 
     YYDPRINTF ((Perl_debug_log, "Entering state %d\n", yystate));
-
-#ifndef DISABLE_STACK_FREE
-    if (yy_type_tab[yystos[yystate]] == toketype_opval && ps->val.opval) {
-	ps->val.opval->op_latefree  = 1;
-	ps->val.opval->op_latefreed = 0;
-    }
-#endif
 
     parser->yylen = 0;
 
@@ -593,7 +582,6 @@ Perl_yyparse (pTHX)
 		    if (ps->comppad != PL_comppad) {
 			PAD_RESTORE_LOCAL(ps->comppad);
 		    }
-		    ps->val.opval->op_latefree  = 0;
 		    op_free(ps->val.opval);
 		}
 		YYPOPSTACK;
@@ -639,7 +627,6 @@ Perl_yyparse (pTHX)
 	    if (ps->comppad != PL_comppad) {
 		PAD_RESTORE_LOCAL(ps->comppad);
 	    }
-	    ps->val.opval->op_latefree  = 0;
 	    op_free(ps->val.opval);
 	}
 	YYPOPSTACK;
@@ -685,6 +672,7 @@ Perl_yyparse (pTHX)
     return yyresult;
 }
 
+#ifndef PERL_IN_MADLY_C
 void
 Perl_parser_tmprefcnt(pTHX_  const yy_parser *parser)
 {
@@ -712,9 +700,7 @@ Perl_parser_tmprefcnt(pTHX_  const yy_parser *parser)
 	    op_tmprefcnt(parser->yylval.opval);
 	}
 
-#ifdef PERL_MAD
-	...;
-#else
+#ifndef PERL_MAD
 	{
 	    I32 i;
 	    for (i=0; i<parser->nexttoke; i++) {
@@ -727,6 +713,7 @@ Perl_parser_tmprefcnt(pTHX_  const yy_parser *parser)
 #endif
     }
 }
+#endif /* PERL_IN_MADLY_C */
 
 /*
  * Local variables:

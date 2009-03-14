@@ -37,8 +37,9 @@ sub p5convert {
     is($output, $expected) or $TODO or die "failed test";
 }
 
-t_print();
+t_block_arg();
 die "END";
+t_print();
 t_rename_inc_vars();
 t_rename_magic_vars_2();
 t_rename_magic_vars();
@@ -1601,5 +1602,46 @@ print STDERR "something";
 print $a, "something";
 print $a ,"something";
 print \*STDERR, "something";
+END
+}
+
+sub t_block_arg {
+    p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
+map { $_ } $a;
+----
+map { $_ }, $a;
+====
+sub foo(&$) { }
+foo { $_ } $a;
+----
+sub foo(&$) { }
+foo { $_ }, $a;
+====
+grep { $_ } $a;
+----
+grep { $_ }, $a;
+====
+$a = sort { $_ } $a;
+----
+$a = sort { $_ }, $a;
+====
+mysort( sub { $_ }, $a);
+----
+mysort( sub { $_ }, $a);
+====
+map { my $x = $_; $x } $a;
+----
+map { my $x = $_; $x }, $a;
+====
+sub foo(&$) { }
+foo { my $x = $_; $x } $a;
+----
+sub foo(&$) { }
+foo { my $x = $_; $x }, $a;
+====
+grep m/x/, $a;
+----
+grep { m/x/ }, $a;
+====
 END
 }
