@@ -32,7 +32,7 @@ PerlIOScalar_pushed(pTHX_ PerlIO * f, const char *mode, SV * arg,
 	    }
 	    s->var = SvREFCNT_inc(SvRV(arg));
 	    if (!SvPOK(s->var) && SvOK(s->var))
-		(void)SvPV_const_nolen(s->var);
+		(void)SvPV_nolen_const(s->var);
 	}
 	else {
 	    s->var =
