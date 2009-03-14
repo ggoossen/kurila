@@ -297,7 +297,7 @@ invert_opset function.
 
 =item :base_core
 
-    null stub scalar pushmark const defined undef
+    root null stub scalar pushmark const defined undef
 
     rv2sv sassign logassign_assign dotdotdot placeholder
 
