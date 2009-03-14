@@ -1312,9 +1312,14 @@ PP(pp_entersub)
     GV *gv;
     register CV *cv;
     register PERL_CONTEXT *cx;
-    I32 gimme;
+    I32 gimme = GIMME_V;
     const bool hasargs = (PL_op->op_flags & OPf_STACKED) != 0;
     assert(hasargs);
+
+    /* subs are always in scalar context */
+    if (gimme == G_ARRAY) {
+	gimme= G_SCALAR;
+    }
 
     if (!sv)
 	DIE(aTHX_ "Not a CODE reference");
@@ -1364,13 +1369,6 @@ PP(pp_entersub)
     if (!CvROOT(cv) && !CvXSUB(cv)) {
 	DIE(aTHX_ "Undefined subroutine %s called",
 	    SvPVX_const(loc_desc(SvLOCATION(cv))));
-    }
-
-    gimme = GIMME_V;
-
-    /* subs are always in scalar context */
-    if (gimme == G_ARRAY) {
-	gimme= G_SCALAR;
     }
 
     if ((PL_op->op_private & OPpENTERSUB_DB) && GvCV(PL_DBsub) && !CvNODEBUG(cv)) {
