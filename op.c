@@ -4734,6 +4734,10 @@ Perl_ck_defined(pTHX_ OP *o)		/* 19990527 MJD */
 {
     PERL_ARGS_ASSERT_CK_DEFINED;
 
+    if (o->op_flags & OPf_KIDS) {
+	if (cUNOPo->op_first->op_type == OP_RV2CV)
+	    cUNOPo->op_first->op_flags |= OPf_SPECIAL;
+    }
     return ck_rfun(o);
 }
 

@@ -176,7 +176,7 @@ bp	|void	|cv_ckproto	|NN const CV* cv|NULLOK const GV* gv\
 				|NULLOK const char* p
 p	|void	|cv_ckproto_len	|NN const CV* cv|NULLOK const GV* gv\
 				|NULLOK const char* p|const STRLEN len
-pd	|CV*	|cv_clone	|NN CV* proto
+pd	|void	|cv_setcv	|NN CV* dst|NN CV* src
 ApdR	|SV*	|cv_const_sv	|NULLOK CV* cv
 pR	|SV*	|op_const_sv	|NULLOK const OP* o|NULLOK CV* cv
 Apd	|void	|cv_undef	|NN CV* cv

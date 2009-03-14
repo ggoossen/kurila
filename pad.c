@@ -1257,26 +1257,24 @@ any outer lexicals.
 =cut
 */
 
-CV *
-Perl_cv_clone(pTHX_ CV *proto)
+void Perl_cv_setcv(pTHX_ CV *dst, CV* src)
 {
     dVAR;
     I32 ix;
-    AV* const protopadlist = CvPADLIST(proto);
-    const AV* const protopad_name = (AV*)*av_fetch(protopadlist, 0, FALSE);
-    const AV* const protopad = (AV*)*av_fetch(protopadlist, 1, FALSE);
-    SV** const pname = AvARRAY(protopad_name);
-    SV** const ppad = AvARRAY(protopad);
-    const I32 fname = AvFILLp(protopad_name);
-    const I32 fpad = AvFILLp(protopad);
-    PAD* parent_padnames = PADLIST_PADNAMES(protopadlist);
+    AV* const srcpadlist = CvPADLIST(src);
+    const AV* const srcpad_name = (AV*)*av_fetch(srcpadlist, 0, FALSE);
+    const AV* const srcpad = (AV*)*av_fetch(srcpadlist, 1, FALSE);
+    SV** const pname = AvARRAY(srcpad_name);
+    SV** const ppad = AvARRAY(srcpad);
+    const I32 fname = AvFILLp(srcpad_name);
+    const I32 fpad = AvFILLp(srcpad);
+    PAD* parent_padnames = PADLIST_PADNAMES(srcpadlist);
     PAD* parent_pad = PL_comppad;
-    CV* cv;
     SV** outpad;
 
-    PERL_ARGS_ASSERT_CV_CLONE;
+    PERL_ARGS_ASSERT_CV_SETCV;
 
-    assert(!CvUNIQUE(proto));
+    assert(!CvUNIQUE(src));
 
     outpad = AvARRAY(parent_pad);
     assert(outpad == PL_curpad);
@@ -1284,20 +1282,19 @@ Perl_cv_clone(pTHX_ CV *proto)
     ENTER;
     SAVESPTR(PL_compcv);
 
-    CVcpSTEAL(PL_compcv, (CV*)newSV_type(SvTYPE(proto)));
-    cv = (CV*)SvREFCNT_inc(PL_compcv);
-    CvFLAGS(cv) = CvFLAGS(proto) & ~(CVf_CLONE);
-    CvCLONED_on(cv);
+    CVcpREPLACE(PL_compcv, dst);
+    CvFLAGS(dst) = CvFLAGS(src) & ~(CVf_CLONE);
+    CvCLONED_on(dst);
 
     OP_REFCNT_LOCK;
-    CvROOT(cv)		= OpREFCNT_inc(CvROOT(proto));
+    CvROOT(dst)		= OpREFCNT_inc(CvROOT(src));
     OP_REFCNT_UNLOCK;
-    CvSTART(cv)		= CvSTART(proto);
+    CvSTART(dst)		= CvSTART(src);
 
-    if (SvPOK(proto))
-	sv_setpvn((SV*)cv, SvPVX_const((SV*)proto), SvCUR(proto));
+    if (SvPOK(src))
+	sv_setpvn((SV*)dst, SvPVX_const((SV*)src), SvCUR(src));
 
-    CvPADLIST(cv) = pad_new(padnew_CLONE|padnew_SAVE,
+    CvPADLIST(dst) = pad_new(padnew_CLONE|padnew_SAVE,
         parent_padnames,
 	parent_pad,
 	0);
@@ -1352,29 +1349,29 @@ Perl_cv_clone(pTHX_ CV *proto)
 
     DEBUG_Xv(
 	PerlIO_printf(Perl_debug_log, "\nPad CV clone\n");
-	cv_dump(proto,	 "Proto");
-	cv_dump(cv,	 "To");
+	cv_dump(src,	 "Src");
+	cv_dump(dst,	 "To");
     );
 
     LEAVE;
 
-    if (CvCONST(cv)) {
+    if (CvCONST(dst)) {
 	/* Constant sub () { $x } closing over $x - see lib/constant.pm:
 	 * The prototype was marked as a candiate for const-ization,
 	 * so try to grab the current const value, and if successful,
 	 * turn into a const sub:
 	 */
-	SV* const const_sv = op_const_sv(CvSTART(cv), cv);
+	SV* const const_sv = op_const_sv(CvSTART(dst), dst);
 	if (const_sv) {
-	    CvREFCNT_dec(cv);
-	    cv = newCONSTSUB(NULL, const_sv);
+	    CvREFCNT_dec(dst);
+	    dst = newCONSTSUB(NULL, const_sv);
 	}
 	else {
-	    CvCONST_off(cv);
+	    CvCONST_off(dst);
 	}
     }
 
-    return cv;
+    return;
 }
 
 /*

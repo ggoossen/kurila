@@ -783,6 +783,9 @@ Perl_doref(pTHX_ OP *o, I32 type, bool set_op_ref)
 	}
 	break;
 
+    case OP_RV2CV:
+        o->op_flags |= OPf_SPECIAL;
+        break;
     case OP_RV2AV:
     case OP_RV2HV:
 	if (set_op_ref)

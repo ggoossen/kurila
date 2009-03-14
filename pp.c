@@ -292,7 +292,7 @@ PP(pp_rv2cv)
     CV *cv = sv_2cv(TOPs, &gv, flags);
     if (cv) {
 	if (CvCLONE(cv))
-	    cv = (CV*)sv_2mortal((SV*)cv_clone(cv));
+	    cv = SvCv(sv_mortalcopy(CvSv(cv)));
     }
     else if ((flags == (GV_ADD|GV_NOEXPAND)) && gv && SvROK(gv)) {
 	cv = (CV*)gv;
@@ -385,7 +385,7 @@ PP(pp_anoncode)
     CV* cv = (CV*)PAD_SV(PL_op->op_targ);
     if ( CvPADLIST(cv) && 
 	( SvIV(PADLIST_NAMESV(CvPADLIST(cv), PAD_FLAGS_INDEX)) & PADf_CLONE ) )
-	cv = (CV*)sv_2mortal((SV*)cv_clone(cv));
+	cv = SvCv(sv_mortalcopy(CvSv(cv)));
     EXTEND(SP,1);
     PUSHs((SV*)cv);
     RETURN;

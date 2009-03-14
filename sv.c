@@ -2666,18 +2666,9 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV* sstr, const I32 flags)
     sflags = SvFLAGS(sstr);
 
     if (dtype == SVt_PVCV) {
-	/* Assigning to a subroutine sets the prototype.  */
-	if (SvOK(sstr)) {
-	    STRLEN len;
-	    const char *const ptr = SvPV_const(sstr, len);
-
-            SvGROW(dstr, len + 1);
-            Copy(ptr, SvPVX_mutable(dstr), len + 1, char);
-            SvCUR_set(dstr, len);
-	    SvPOK_only(dstr);
-	} else {
-	    SvOK_off(dstr);
-	}
+	sv_clear_body(dstr);
+	sv_upgrade(dstr, SVt_PVCV);
+	cv_setcv(SvCv(dstr), SvCv(sstr));
     } else if (dtype == SVt_PVAV) {
 	int i;
 	int len = av_len( (AV*)sstr);

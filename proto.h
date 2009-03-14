@@ -455,10 +455,11 @@ PERL_CALLCONV void	Perl_cv_ckproto_len(pTHX_ const CV* cv, const GV* gv, const c
 #define PERL_ARGS_ASSERT_CV_CKPROTO_LEN	\
 	assert(cv)
 
-PERL_CALLCONV CV*	Perl_cv_clone(pTHX_ CV* proto)
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_CV_CLONE	\
-	assert(proto)
+PERL_CALLCONV void	Perl_cv_setcv(pTHX_ CV* dst, CV* src)
+			__attribute__nonnull__(pTHX_1)
+			__attribute__nonnull__(pTHX_2);
+#define PERL_ARGS_ASSERT_CV_SETCV	\
+	assert(dst); assert(src)
 
 PERL_CALLCONV SV*	Perl_cv_const_sv(pTHX_ CV* cv)
 			__attribute__warn_unused_result__;
