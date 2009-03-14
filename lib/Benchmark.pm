@@ -641,7 +641,7 @@ sub runloop {
 
     my ($subcode, $subref);
     if (ref $c eq 'CODE') {
-	$subcode = "sub \{ for (1 .. $n) \{ package $pack; &\$c; \} \}";
+	$subcode = "sub \{ for (1 .. $n) \{ package $pack; &\$c(); \} \}";
         $subref  = eval $subcode;
     }
     else {
@@ -683,21 +683,21 @@ sub timeit {
     if ($Do_Cache && exists %Cache{$cache_key} ) {
 	$wn = %Cache{?$cache_key};
     } else {
-	$wn = &runloop($n, ref( $code ) ?? sub { } !! '' );
+	$wn = runloop($n, ref( $code ) ?? sub { } !! '' );
 	# Can't let our baseline have any iterations, or they get subtracted
 	# out of the result.
 	$wn->[5] = 0;
 	%Cache{+$cache_key} = $wn;
     }
 
-    $wc = &runloop($n, $code);
+    $wc = runloop($n, $code);
 
     $wd = timediff($wc, $wn);
     timedebug("timeit: ",$wc);
     timedebug("      - ",$wn);
     timedebug("      = ",$wd);
 
-    $wd;
+    return $wd;
 }
 
 
