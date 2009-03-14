@@ -439,7 +439,7 @@ sub xlate {
     $name = "LOG_$name" unless $name =~ m/^LOG_/;
     $name = "Sys::Syslog::$name";
     # Can't have just try { &$name } || -1 because some LOG_XXX may be zero.
-    my $value = try { &{*{Symbol::fetch_glob($name)}} };
+    my $value = try { &{*{Symbol::fetch_glob($name)}} ( < @_ )};
     defined $value ?? $value !! -1;
 }
 

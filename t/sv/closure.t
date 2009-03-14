@@ -13,7 +13,7 @@ print \*STDOUT, "1..61\n";
 
 my $test = 1;
 sub test (&) {
-    my $ok = &{@_[0]};
+    my $ok = &{@_[0]}( < @_ );
     print \*STDOUT, $ok ?? "ok $test\n" !! "not ok $test\n";
     printf \*STDOUT, "# Failed at line \%d\n", @(caller)[2] unless $ok;
     $test++;

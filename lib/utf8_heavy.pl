@@ -73,7 +73,7 @@ sub SWASHNEW_real {
 	    if (defined $caller1 && $type =~ m/^(?:\w+)$/) {
 		my $prop = Symbol::fetch_glob("$($caller1)::$type");
 		if (exists &{*{$prop}}) {
-		    $list = &{*{$prop}};
+		    $list = &{*{$prop}}( < @_ );
 		    last GETFILE;
 		}
 	    }
@@ -152,7 +152,7 @@ sub SWASHNEW_real {
 		my $map = $caller0 . "::" . $type;
 
 		if (exists &{*{Symbol::fetch_glob($map)}}) {
-		    $list = &{*{Symbol::fetch_glob($map)}};
+		    $list = &{*{Symbol::fetch_glob($map)}}( < @_ );
 		    last GETFILE;
 		}
 	    }

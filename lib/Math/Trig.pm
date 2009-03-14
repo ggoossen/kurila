@@ -115,7 +115,7 @@ sub acos_real {
 sub asin_real {
     my $z = @_[0];
     return  &pip2( < @_ ) if @_[0] +>=  1;
-    return -&pip2 if @_[0] +<= -1;
+    return -&pip2( < @_ ) if @_[0] +<= -1;
     return CORE::atan2($z, CORE::sqrt(1-$z*$z));
 }
 
