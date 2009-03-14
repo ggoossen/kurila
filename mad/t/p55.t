@@ -175,7 +175,7 @@ __END__
 DATA
 ########
 # split with PUSHRE
-my @prgs = @( split "\n########\n", ~< DATA );
+my @prgs = @( split "\n########\n", ~< *DATA );
 ########
 # unless(eval { })
 unless (try { $a }) { $a = $b }
@@ -237,7 +237,7 @@ for (1..5) {
     print \*STDOUT, $_;
 }
 ########
-map { $_ } 1..5;
+map { $_ }, 1..5;
 ########
 $( 3 );
 ########
@@ -260,7 +260,7 @@ do {
 try { }
 ########
 # substitute with $(..)
-my $str = shift;
+my $str;
 $str =~ s{(foo)}{$(sprintf("=\%02X", ord($1)))}g;
 $str;
 ########
@@ -312,7 +312,7 @@ readpipe;
 # optional
 push $a, $_ unless $a{$_};
 ########
-# TODO ;; at end of for loop
+# ;; at end of for loop
 for my $x ($a) {
     do { 1 };;
 }
@@ -334,3 +334,7 @@ for our $_ ($a) {
 foo(1, , 2);
 ########
 my %( 1 => $v, ...) = $a;
+########
+%() +%+ @();
+########
+%+: @: %();

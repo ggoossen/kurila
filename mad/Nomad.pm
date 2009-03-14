@@ -2500,8 +2500,26 @@ sub astnull {
 
 package PLXML::op_grepstart;
 package PLXML::op_grepwhile;
+
+*ast = \&PLXML::op_mapwhile::ast;
+
 package PLXML::op_mapstart;
 package PLXML::op_mapwhile;
+
+sub ast {
+    my $self = shift;
+
+    my @newkids;
+    push @newkids, $self->madness('wrap_open o (');
+    my @kids = @{$$self{Kids}};
+    pop @kids;
+    for my $kid (@kids) {
+	push @newkids, $kid->ast($self, @_);
+    }
+    push @newkids, $self->madness(') wrap_close');
+    return $self->newtype->new(Kids => [@newkids]);
+}
+
 package PLXML::op_range;
 
 sub ast {
@@ -3212,6 +3230,13 @@ sub ast {
     my $self = shift;
     local $::curstate;		# eval {} has own statement sequence
     return $self->SUPER::ast(@_);
+}
+
+package PLXML::op_root;
+
+sub ast {
+    my $self = shift;
+    return $self->{'Kids'}[0]->ast(@_);
 }
 
 package PLXML::op_leaveeval;
