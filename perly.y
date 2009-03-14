@@ -487,13 +487,14 @@ mysubrout:	MYSUB startsub subname proto subbody
 subrout	:	SUB startsub subname proto subbody
 			{
 #ifdef MAD
+                            CV* new;
                             $$ = newOP(OP_NULL,0, LOCATION($1));
                             op_getmad($3,$$,'n');
                             op_getmad($4,$$,'s');
                             op_getmad($5,$$,'&');
                             TOKEN_GETMAD($1,$$,'d');
                             APPEND_MADPROPS_PV("sub", $$, '<');
-                            CV* new = newNAMEDSUB($2, $3, $4, $5);
+                            new = newNAMEDSUB($2, $3, $4, $5);
                             /* SvREFCNT_dec(new);  leak reference */
 #else
                             CV* new = newNAMEDSUB($2, $3, $4, $5);
@@ -504,11 +505,12 @@ subrout	:	SUB startsub subname proto subbody
         |       SPECIALBLOCK startsub subbody
                         {
 #ifdef MAD
+                            CV* new;
                             $$ = newOP(OP_NULL,0, LOCATION($1));
                             op_getmad($3,$$,'&');
                             TOKEN_GETMAD($1,$$,'d');
                             APPEND_MADPROPS_PV("sub", $$, '<');
-                            CV* new = newSUB($2, NULL, $3);
+                            new = newSUB($2, NULL, $3);
                             SVcpREPLACE(SvLOCATION(CvSv(new)), LOCATION($1));
                             process_special_block(IVAL($1), new);
                             /* SvREFCNT_dec(new);  leak reference */
@@ -576,21 +578,20 @@ package :	PACKAGE WORD ';'
 
 use	:	USE startsub THING WORD listexpr ';'
 			{ 
-#ifdef MAD
-			  $$ = utilize(IVAL($1), $2, $3, $4, $5);
-			  TOKEN_GETMAD($1,$$,'o');
-			  TOKEN_GETMAD($6,$$,';');
-			  if (PL_parser->rsfp_filters &&
-				      AvFILLp(PL_parser->rsfp_filters) >= 0)
-			      APPEND_MADPROPS_PV("sourcefilter", $$, '!');
+                            CV* cv;
+#ifdef PERL_MAD
+                            $$ = utilize(IVAL($1), $2, $3, $4, $5);
+                            TOKEN_GETMAD($1,$$,'o');
+                            TOKEN_GETMAD($6,$$,';');
+                            cv = SvCv(cSVOPx($$)->op_sv);
 #else
-                          CV* cv = utilize(IVAL($1), $2, $3, $4, $5);
-                          $<opval>3 = NULL;
-                          $<opval>4 = NULL;
-                          $<opval>5 = NULL;
-                          process_special_block(KEY_BEGIN, cv);
-			  $$ = (OP*)NULL;
+                            cv = utilize(IVAL($1), $2, $3, $4, $5);
+                            $$ = (OP*)NULL;
 #endif
+                            $<opval>3 = NULL;
+                            $<opval>4 = NULL;
+                            $<opval>5 = NULL;
+                            process_special_block(KEY_BEGIN, cv);
 			}
 	;
 

@@ -60,9 +60,6 @@ typedef PERL_BITFIELD16 optype;
     PADOFFSET	op_targ;		\
     PERL_BITFIELD16 op_type:9;		\
     PERL_BITFIELD16 op_opt:1;		\
-    PERL_BITFIELD16 op_latefree:1;	\
-    PERL_BITFIELD16 op_latefreed:1;	\
-    PERL_BITFIELD16 op_attached:1;	\
     PERL_BITFIELD16 op_spare:3;		\
     OPFLAGS		op_flags;		\
     U8		op_private;

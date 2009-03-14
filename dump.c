@@ -765,7 +765,7 @@ Perl_do_op_dump(pTHX_ I32 level, PerlIO *file, const OP *o)
 #ifdef DUMPADDR
     Perl_dump_indent(aTHX_ level, file, "ADDR = 0x%"UVxf" => 0x%"UVxf"\n", (UV)o, (UV)o->op_next);
 #endif
-    if (o->op_flags || o->op_latefree || o->op_latefreed || o->op_attached) {
+    if (o->op_flags) {
 
 	/* call the refactored bits */
 	SV * const tmpsv = S_dump_op_flags(aTHX_ o);
@@ -814,12 +814,6 @@ STATIC SV* S_dump_op_flags(pTHX_ const OP* o)
 	sv_catpv(tmpsv, ",ASSIGN_PART");
     if (o->op_flags & OPf_SPECIAL)
 	sv_catpv(tmpsv, ",SPECIAL");
-    if (o->op_latefree)
-	sv_catpv(tmpsv, ",LATEFREE");
-    if (o->op_latefreed)
-	sv_catpv(tmpsv, ",LATEFREED");
-    if (o->op_attached)
-	sv_catpv(tmpsv, ",ATTACHED");
     
     return tmpsv;
 }

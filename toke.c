@@ -9404,12 +9404,12 @@ S_scan_pat(pTHX_ char *start, I32 type)
     char *s;
     const char * const valid_flags =
 	(const char *)((type == OP_QR) ? QR_PAT_MODS : M_PAT_MODS);
-
-    PL_lex_stuff.flags = LEXf_INPAT;
-    s = scan_str(start,TRUE,FALSE, &PL_lex_stuff);
 #ifdef PERL_MAD
     char *modstart;
 #endif
+
+    PL_lex_stuff.flags = LEXf_INPAT;
+    s = scan_str(start,TRUE,FALSE, &PL_lex_stuff);
 
     PERL_ARGS_ASSERT_SCAN_PAT;
 
