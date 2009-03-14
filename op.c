@@ -4202,13 +4202,10 @@ Perl_ck_exists(pTHX_ OP *o)
     o = ck_fun(o);
     if (o->op_flags & OPf_KIDS) {
 	OP * const kid = cUNOPo->op_first;
-	if (kid->op_type == OP_ENTERSUB) {
-	    (void) ref(kid, o->op_type);
-	    if (kid->op_type != OP_RV2CV
-			&& !(PL_parser && PL_parser->error_count))
-		Perl_croak(aTHX_ "%s argument is not a subroutine name",
-			    OP_DESC(o));
+	if (kid->op_type == OP_RV2CV) {
+	    cUNOPo->op_first = ref(kid, o->op_type);
 	    o->op_private |= OPpEXISTS_SUB;
+	    return o;
 	}
 	else if (kid->op_type == OP_AELEM)
 	    o->op_flags |= OPf_SPECIAL;
@@ -4746,25 +4743,6 @@ Perl_ck_defined(pTHX_ OP *o)		/* 19990527 MJD */
 {
     PERL_ARGS_ASSERT_CK_DEFINED;
 
-    if ((o->op_flags & OPf_KIDS) && ckWARN2(WARN_DEPRECATED, WARN_SYNTAX)) {
-	switch (cUNOPo->op_first->op_type) {
-	case OP_RV2AV:
-	    /* This is needed for
-	       if (defined %stash::)
-	       to work.   Do not break Tk.
-	       */
-	    break;                      /* Globals via GV can be undef */
-	case OP_RV2HV:
-	    /* This is needed for
-	       if (defined %stash::)
-	       to work.   Do not break Tk.
-	       */
-	    break;                      /* Globals via GV can be undef */
-	default:
-	    /* no warning */
-	    break;
-	}
-    }
     return ck_rfun(o);
 }
 

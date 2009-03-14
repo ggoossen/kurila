@@ -1314,6 +1314,7 @@ PP(pp_entersub)
     register PERL_CONTEXT *cx;
     I32 gimme;
     const bool hasargs = (PL_op->op_flags & OPf_STACKED) != 0;
+    assert(hasargs);
 
     if (!sv)
 	DIE(aTHX_ "Not a CODE reference");

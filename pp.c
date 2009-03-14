@@ -3430,12 +3430,8 @@ PP(pp_exists)
     SV *sv;
 
     if (PL_op->op_private & OPpEXISTS_SUB) {
-	GV *gv;
 	SV * const cvsv = POPs;
-	CV * const cv = sv_2cv(cvsv, &gv, 0);
-	if (cv)
-	    RETPUSHYES;
-	if (gv && isGV(gv) && GvCV(gv) && !GvCVGEN(gv))
+	if (cvsv && SvOK(cvsv))
 	    RETPUSHYES;
 	RETPUSHNO;
     }

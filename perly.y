@@ -1071,8 +1071,9 @@ term	:	'?' term
 	|	THING	%prec '('
 			{ $$ = $1; }
 	|	amper                                /* &foo; */
-                        { $$ = newUNOP(OP_ENTERSUB, 0, scalar($1), $1->op_location);
-                              APPEND_MADPROPS_PV("amper", $$, '>');
+                        {
+                            $$ = $1;
+                            $$->op_flags |= OPf_SPECIAL;
                         }
 	|	amper '(' ')'                        /* &foo() */
 			{

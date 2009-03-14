@@ -61,7 +61,7 @@ PP(pp_grepstart)
 
     if ( ! SvOK(src) ) {
 	(void)POPMARK;
-	mXPUSHs(newAV());
+	mXPUSHs(AvSv(newAV()));
 	RETURNOP(PL_op->op_next->op_next->op_next);
     }
     if ( ! SvAVOK(src) )
@@ -69,7 +69,7 @@ PP(pp_grepstart)
     
     if ( av_len(SvAv(src)) == -1 ) {
 	(void)POPMARK;
-	mXPUSHs(newAV());
+	mXPUSHs(AvSv(newAV()));
 	RETURNOP(PL_op->op_next->op_next->op_next);
     }
 
@@ -576,7 +576,7 @@ PP(pp_caller)
 	    if (CvFLAGS(cv) & CVf_BLOCK) {
 		AV* av = newAV();
 		av_push(av, newSVsv(*args));
-		mPUSHs(av);
+		mPUSHs(AvSv(av));
 	    }
 	    else {
 		mPUSHs(newSVsv( *args ) );
