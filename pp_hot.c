@@ -1335,8 +1335,7 @@ PP(pp_entersub)
 	    const char *sym;
 	    STRLEN len;
 	    if (sv == &PL_sv_yes && PL_op->op_flags & OPf_SPECIAL) {	/* unfound import, ignore */
-		if (hasargs)
-		    SP = PL_stack_base + POPMARK;
+		SP = PL_stack_base + POPMARK;
 		if ( gimme != G_VOID )
 		    XPUSHs(&PL_sv_undef);
 		RETURN;
@@ -1420,7 +1419,7 @@ PP(pp_entersub)
 	    else
 		SVcpSTEAL( PAD_SVl(PAD_ARGS_INDEX), newSV(0) );
 	}
-	else if (hasargs) {
+	else {
 	    AV* av;
 	    SV* avsv = PAD_SVl(PAD_ARGS_INDEX);
 	    sv_upgrade(avsv, SVt_PVAV);
