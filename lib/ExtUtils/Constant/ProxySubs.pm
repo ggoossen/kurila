@@ -382,11 +382,11 @@ EXPLODE
 			   "Couldn't add key '$($package_sprintf_safe)::\%s'",
 			   value_for_notfound->name);
 	    \}
-            GV* notfoundgv = gv_fetchmethod(aTHX_  symbol_table, "constant_not_found");
-            if (!notfoundgv || ! GvCV(notfoundgv)) \{
+            CV* notfoundcv = gv_fetchmethod(aTHX_  symbol_table, "constant_not_found");
+            if (!notfoundcv) \{
 		Perl_croak(aTHX_ "'constant_not_found' could not be found");
             \}
-            sv_setsv((SV*)gv, sv_2mortal(newRV_inc((SV*)GvCV(notfoundgv))));
+            sv_setsv((SV*)gv, sv_2mortal(newRV_inc(CvSv(notfoundcv))));
 #ifndef SYMBIAN
 	    hv_store($($c_subname)_missing, value_for_notfound->name,
 			  value_for_notfound->namelen, &PL_sv_yes, 0);

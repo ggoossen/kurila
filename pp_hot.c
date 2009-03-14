@@ -1336,15 +1336,15 @@ PP(pp_entersub)
 	}
 	break;
     default:
+	if (sv == &PL_sv_yes && PL_op->op_flags & OPf_SPECIAL) {	/* unfound import, ignore */
+	    SP = PL_stack_base + POPMARK;
+	    if ( gimme != G_VOID )
+		XPUSHs(&PL_sv_undef);
+	    RETURN;
+	}
 	if (!SvROK(sv)) {
 	    const char *sym;
 	    STRLEN len;
-	    if (sv == &PL_sv_yes && PL_op->op_flags & OPf_SPECIAL) {	/* unfound import, ignore */
-		SP = PL_stack_base + POPMARK;
-		if ( gimme != G_VOID )
-		    XPUSHs(&PL_sv_undef);
-		RETURN;
-	    }
 	    sym = SvPV_const(sv, len);
 	    if (!sym)
 		DIE(aTHX_ PL_no_usym, "a subroutine");
@@ -1639,7 +1639,7 @@ S_method_common(pTHX_ SV* meth, U32* hashp)
 {
     dVAR;
     SV* ob;
-    GV* gv;
+    CV* cv;
     HV* stash;
     STRLEN namelen;
     const char* packname = NULL;
@@ -1699,7 +1699,7 @@ S_method_common(pTHX_ SV* meth, U32* hashp)
     if (hashp) {
 	const HE* const he = hv_fetch_ent(stash, meth, 0, *hashp);
 	if (he) {
-	    gv = (GV*)HeVAL(he);
+	    GV* gv = (GV*)HeVAL(he);
 	    if (isGV(gv) && GvCV(gv) &&
 		(!GvCVGEN(gv) || GvCVGEN(gv)
                   == (PL_sub_generation + HvMROMETA(stash)->cache_gen)))
@@ -1707,9 +1707,9 @@ S_method_common(pTHX_ SV* meth, U32* hashp)
 	}
     }
 
-    gv = gv_fetchmethod(stash ? stash : (HV*)packsv, name);
+    cv = gv_fetchmethod(stash ? stash : (HV*)packsv, name);
 
-    if (!gv) {
+    if (!cv) {
 	/* This code tries to figure out just what went wrong with
 	   gv_fetchmethod.  It therefore needs to duplicate a lot of
 	   the internals of that function.  We can't move it inside
@@ -1766,7 +1766,7 @@ S_method_common(pTHX_ SV* meth, U32* hashp)
 		       leaf, (int)packlen, packname, (int)packlen, packname);
 	}
     }
-    return isGV(gv) ? (SV*)GvCV(gv) : (SV*)gv;
+    return CvSv(cv);
 }
 
 /*

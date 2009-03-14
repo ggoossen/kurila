@@ -22,9 +22,9 @@ Perl_boot_core_error(pTHX)
     newXS("error::stacktrace", XS_error_stacktrace, file);
     newXS("error::write_to_stderr", XS_error_write_to_stderr, file);
 
-    PL_errorcreatehook = newRV_inc((SV*)GvCV(gv_fetchmethod(NULL, "error::create")));
-    PL_diehook = newRV_inc((SV*)GvCV(gv_fetchmethod(NULL, "error::write_to_stderr")));
-    PL_warnhook = newRV_inc((SV*)GvCV(gv_fetchmethod(NULL, "error::write_to_stderr")));
+    PL_errorcreatehook = newRV_inc(CvSv(gv_fetchmethod(NULL, "error::create")));
+    PL_diehook = newRV_inc(CvSv(gv_fetchmethod(NULL, "error::write_to_stderr")));
+    PL_warnhook = newRV_inc(CvSv(gv_fetchmethod(NULL, "error::write_to_stderr")));
 }
 
 STATIC

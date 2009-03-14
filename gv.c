@@ -320,7 +320,7 @@ obtained from the GV with the C<GvCV> macro.
 
 /* NOTE: No support for tied ISA */
 
-GV *
+CV *
 Perl_gv_fetchmeth(pTHX_ HV *stash, const char *name, STRLEN len, I32 level)
 {
     dVAR;
@@ -329,8 +329,6 @@ Perl_gv_fetchmeth(pTHX_ HV *stash, const char *name, STRLEN len, I32 level)
     SV** linear_svp;
     SV* linear_sv;
     HV* cstash;
-    GV* candidate = NULL;
-    CV* cand_cv = NULL;
     CV* old_cv;
     GV* topgv = NULL;
     const char *hvname;
@@ -345,7 +343,7 @@ Perl_gv_fetchmeth(pTHX_ HV *stash, const char *name, STRLEN len, I32 level)
     if (!stash) {
 	create = 0;  /* probably appropriate */
 	if(!(stash = gv_stashpvs("UNIVERSAL", 0)))
-	    return 0;
+	    return NULL;
     }
 
     assert(stash);
@@ -364,6 +362,7 @@ Perl_gv_fetchmeth(pTHX_ HV *stash, const char *name, STRLEN len, I32 level)
     /* check locally for a real method or a cache entry */
     gvp = (GV**)hv_fetch(stash, name, len, create);
     if(gvp) {
+	CV* cand_cv;
         topgv = *gvp;
         assert(topgv);
         if (SvTYPE(topgv) != SVt_PVGV)
@@ -371,7 +370,7 @@ Perl_gv_fetchmeth(pTHX_ HV *stash, const char *name, STRLEN len, I32 level)
         if ((cand_cv = GvCV(topgv))) {
             /* If genuine method or valid cache entry, use it */
             if (!GvCVGEN(topgv) || GvCVGEN(topgv) == topgen_cmp) {
-                return topgv;
+                return GvCV(topgv);
             }
             else {
                 /* stale cache entry, junk it and move on */
@@ -382,7 +381,7 @@ Perl_gv_fetchmeth(pTHX_ HV *stash, const char *name, STRLEN len, I32 level)
         }
         else if (GvCVGEN(topgv) == topgen_cmp) {
             /* cache indicates no such method definitively */
-            return 0;
+            return NULL;
         }
     }
 
@@ -400,6 +399,8 @@ Perl_gv_fetchmeth(pTHX_ HV *stash, const char *name, STRLEN len, I32 level)
     linear_svp = AvARRAY(linear_av) + 1; /* skip over self */
     items = AvFILLp(linear_av); /* no +1, to skip over self */
     while (items--) {
+	GV* candidate;
+	CV* cand_cv;
         linear_sv = *linear_svp++;
         assert(linear_sv);
         cstash = gv_stashsv(linear_sv, 0);
@@ -417,8 +418,10 @@ Perl_gv_fetchmeth(pTHX_ HV *stash, const char *name, STRLEN len, I32 level)
         if (!gvp) continue;
         candidate = *gvp;
         assert(candidate);
-        if (SvTYPE(candidate) != SVt_PVGV) gv_init(candidate, cstash, name, len, TRUE);
-        if (SvTYPE(candidate) == SVt_PVGV && (cand_cv = GvCV(candidate)) && !GvCVGEN(candidate)) {
+        if (SvTYPE(candidate) != SVt_PVGV)
+	    gv_init(candidate, cstash, name, len, TRUE);
+        if (SvTYPE(candidate) == SVt_PVGV && (cand_cv = GvCV(candidate))
+	    && !GvCVGEN(candidate)) {
             /*
              * Found real method, cache method in topgv if:
              *  1. topgv has no synonyms (else inheritance crosses wires)
@@ -430,22 +433,21 @@ Perl_gv_fetchmeth(pTHX_ HV *stash, const char *name, STRLEN len, I32 level)
                   GvCV(topgv) = cand_cv;
                   GvCVGEN(topgv) = topgen_cmp;
             }
-	    return candidate;
+	    return GvCV(candidate);
         }
     }
 
     /* Check UNIVERSAL without caching */
     if(level == 0 || level == -1) {
-        candidate = gv_fetchmeth(NULL, name, len, 1);
-        if(candidate) {
-            cand_cv = GvCV(candidate);
+        CV* cand_cv = gv_fetchmeth(NULL, name, len, 1);
+        if(cand_cv) {
             if (topgv && (GvREFCNT(topgv) == 1) && (CvROOT(cand_cv) || CvXSUB(cand_cv))) {
                   if ((old_cv = GvCV(topgv))) CvREFCNT_dec(old_cv);
                   SvREFCNT_inc_simple_void_NN(cand_cv);
                   GvCV(topgv) = cand_cv;
                   GvCVGEN(topgv) = topgen_cmp;
             }
-            return candidate;
+            return cand_cv;
         }
     }
 
@@ -454,7 +456,7 @@ Perl_gv_fetchmeth(pTHX_ HV *stash, const char *name, STRLEN len, I32 level)
         GvCVGEN(topgv) = topgen_cmp;
     }
 
-    return 0;
+    return NULL;
 }
 
 /*
@@ -514,13 +516,13 @@ S_gv_get_super_pkg(pTHX_ const char* name, I32 namelen)
    here.
 */
 
-GV *
+CV *
 Perl_gv_fetchmethod(pTHX_ HV *stash, const char *name)
 {
     dVAR;
     register const char *nend;
     const char *nsplit = NULL;
-    GV* gv;
+    CV* cv;
     HV* ostash = stash;
 
     PERL_ARGS_ASSERT_GV_FETCHMETHOD;
@@ -559,13 +561,13 @@ Perl_gv_fetchmethod(pTHX_ HV *stash, const char *name)
 	ostash = stash;
     }
 
-    gv = gv_fetchmeth(stash, name, nend - name, 0);
-    if (!gv) {
+    cv = gv_fetchmeth(stash, name, nend - name, 0);
+    if (!cv) {
 	if (strEQ(name,"import") || strEQ(name,"unimport"))
-	    gv = (GV*)&PL_sv_yes;
+	    cv = (CV*)&PL_sv_yes;
     }
 
-    return gv;
+    return cv;
 }
 
 /*

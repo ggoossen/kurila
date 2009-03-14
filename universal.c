@@ -291,9 +291,9 @@ XS(XS_UNIVERSAL_can)
     }
 
     if (pkg) {
-	GV * const gv = gv_fetchmethod(pkg, name);
-        if (gv && isGV(gv))
-	    rv = sv_2mortal(newRV((SV*)GvCV(gv)));
+	CV * const cv = gv_fetchmethod(pkg, name);
+        if (cv)
+	    rv = sv_2mortal(newRV(CvSv(cv)));
     }
 
     ST(0) = rv;

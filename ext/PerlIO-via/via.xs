@@ -43,12 +43,12 @@ typedef struct
 CV *
 PerlIOVia_fetchmethod(pTHX_ PerlIOVia * s, const char *method, CV ** save)
 {
-    GV *gv = gv_fetchmeth(s->stash, method, strlen(method), 0);
+    CV *cv = gv_fetchmeth(s->stash, method, strlen(method), 0);
 #if 0
     Perl_warn(aTHX_ "Lookup %s::%s => %p", HvNAME_get(s->stash), method, gv);
 #endif
-    if (gv) {
-	return *save = GvCV(gv);
+    if (cv) {
+	return *save = cv;
     }
     else {
 	return *save = (CV *) - 1;

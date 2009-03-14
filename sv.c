@@ -4364,12 +4364,12 @@ Perl_sv_clear(pTHX_ register SV *const sv)
 
     if (SvOBJECT(sv)) {
 	if (PL_defstash) {		/* Still have a symbol table? */
-	    GV* destructor = gv_fetchmethod(SvSTASH(sv), "DESTROY");
+	    CV* destructor = gv_fetchmethod(SvSTASH(sv), "DESTROY");
 	    if (destructor) {
 		if ( ! PL_destroyav )
 		    PL_destroyav = newAV();
 		av_push(PL_destroyav, SvREFCNT_inc(sv));
-		av_push(PL_destroyav, SvREFCNT_inc(GvCV(destructor)));
+		av_push(PL_destroyav, SvREFCNT_inc(CvSv(destructor)));
 		return;
 	    }
 	}
