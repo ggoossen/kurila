@@ -293,9 +293,6 @@ PP(pp_rv2cv)
     if (cv) {
 	if (CvCLONE(cv))
 	    cv = (CV*)sv_2mortal((SV*)cv_clone(cv));
-	if ((PL_op->op_private & OPpLVAL_INTRO)) {
-	    DIE(aTHX_ "Can't modify non-lvalue subroutine call");
-	}
     }
     else if ((flags == (GV_ADD|GV_NOEXPAND)) && gv && SvROK(gv)) {
 	cv = (CV*)gv;

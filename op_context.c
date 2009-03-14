@@ -540,11 +540,6 @@ Perl_mod(pTHX_ OP *o, I32 type)
 	if ((o->op_flags & OPf_PARENS) || PL_madskills)
 	    break;
 	goto nomod;
-    case OP_RV2CV:
-	if (type == OP_UNDEF || type == OP_SREFGEN) {
-	    break;
-	}
-	goto nomod;
     default:
       nomod:
 	/* grep, foreach, subcalls, refgen */
@@ -554,9 +549,7 @@ Perl_mod(pTHX_ OP *o, I32 type)
 		      "Can't modify %s in %s",
 		      (o->op_type == OP_NULL && (o->op_flags & OPf_SPECIAL)
 		       ? "do block"
-		       : (o->op_type == OP_ENTERSUB
-			  ? "non-lvalue subroutine call"
-			  : OP_DESC(o))),
+		       : OP_DESC(o)),
 		      type ? PL_op_desc[type] : "local");
 	return o;
 
@@ -603,6 +596,7 @@ Perl_mod(pTHX_ OP *o, I32 type)
     case OP_NEXTSTATE:
     case OP_DBSTATE:
 	break;
+    case OP_RV2CV:
     case OP_RV2AV:
     case OP_RV2HV:
     case OP_RV2SV:
