@@ -196,10 +196,10 @@ EXPECT
 use warnings 'recursion' ;
 $b = sub 
 { 
-    &$b if $a++ +< 200
+    &$b() if $a++ +< 200
 }  ;
 
-&$b ;
+&$b() ;
 EXPECT
 Deep recursion on subroutine "main::__ANON__" at - line 5 character 1.
     main::__ANON__ called at - line 5 character 1.
