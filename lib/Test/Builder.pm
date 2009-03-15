@@ -1156,9 +1156,9 @@ sub _print_diag {
     my $self = shift;
 
     local@($^OUTPUT_RECORD_SEPARATOR, $^OUTPUT_FIELD_SEPARATOR) = @(undef, '');
-    my $fh = $self->todo ?? $self->todo_output !! $self->output;
+    my $fh = $self->todo ?? $self->todo_output !! $self->failure_output;
     print $fh, < @_;
-}
+}    
 
 =item B<output>
 
