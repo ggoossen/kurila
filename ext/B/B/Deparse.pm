@@ -2819,10 +2819,8 @@ sub pp_rv2gv { maybe_local(< @_, rv2x(< @_, "*")) }
 # skip down to the old, ex-rv2cv
 sub pp_rv2cv {
     my @($self, $op, $cx) =  @_;
-    if (!null( <$op->first) && $op->first->name eq 'null' &&
-	$op->first->targ eq OP_LIST)
-    {
-	return $self->rv2x( <$op->first->first->sibling, $cx, "&")
+    if ($op->flags ^&^ OPf_SPECIAL) {
+	return $self->rv2x($op, $cx, "&")
     }
     else {
 	return $self->rv2x($op, $cx, "")
