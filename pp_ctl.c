@@ -1640,7 +1640,7 @@ PP(pp_require)
 		    if (svp)
 			tryname = SvPVX_const(*svp);
 
-		    if (SvROK(arg) && (SvTYPE(SvRV(arg)) <= SVt_PVLV)
+		    if (SvROK(arg) && (SvTYPE(SvRV(arg)) <= SVt_PVGV)
 			&& !isGV_with_GP(SvRV(arg))) {
 			filter_cache = SvRV(arg);
 			SvREFCNT_inc_simple_void_NN(filter_cache);

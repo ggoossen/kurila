@@ -176,14 +176,6 @@ sub B::PVNV::debug {
     printf \*STDOUT, "\txnv_nv\t\t\%s\n", < $sv->NV;
 }
 
-sub B::PVLV::debug {
-    my @($sv) =  @_;
-    $sv->B::PVNV::debug();
-    printf \*STDOUT, "\txlv_targoff\t\%d\n", < $sv->TARGOFF;
-    printf \*STDOUT, "\txlv_targlen\t\%u\n", < $sv->TARGLEN;
-    printf \*STDOUT, "\txlv_type\t\%s\n", < cstring(chr($sv->TYPE));
-}
-
 sub B::BM::debug {
     my @($sv) =  @_;
     $sv->B::PVNV::debug();

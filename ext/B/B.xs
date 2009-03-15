@@ -30,7 +30,6 @@ static const char* const svclassnames[] = {
     "B::PVMG",
     "B::REGEXP",
     "B::GV",
-    "B::PVLV",
     "B::AV",
     "B::HV",
     "B::CV",
@@ -218,7 +217,6 @@ typedef SV	*B__PV;
 typedef SV	*B__NV;
 typedef SV	*B__PVMG;
 typedef SV	*B__REGEXP;
-typedef SV	*B__PVLV;
 typedef SV	*B__BM;
 typedef SV	*B__RV;
 typedef SV	*B__FM;
@@ -704,24 +702,6 @@ MgPTR(mg)
 				    sv_newmortal(), (SV*)mg->mg_ptr);
 		}
 	}
-
-MODULE = B	PACKAGE = B::PVLV	PREFIX = Lv
-
-U32
-LvTARGOFF(sv)
-	B::PVLV	sv
-
-U32
-LvTARGLEN(sv)
-	B::PVLV	sv
-
-char
-LvTYPE(sv)
-	B::PVLV	sv
-
-B::SV
-LvTARG(sv)
-	B::PVLV sv
 
 MODULE = B	PACKAGE = B::BM		PREFIX = Bm
 

@@ -24,7 +24,6 @@ static char *svclassnames[] = {
     "B::PVMG",
     "B::REGEXP",
     "B::GV",
-    "B::PVLV",
     "B::AV",
     "B::HV",
     "B::CV",
@@ -565,7 +564,6 @@ typedef SV      *B__IV;
 typedef SV      *B__PV;
 typedef SV      *B__NV;
 typedef SV      *B__PVMG;
-typedef SV      *B__PVLV;
 typedef SV      *B__BM;
 typedef SV      *B__RV;
 typedef AV      *B__AV;

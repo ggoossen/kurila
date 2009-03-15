@@ -2349,7 +2349,6 @@ typedef struct xpviv XPVIV;
 typedef struct xpvuv XPVUV;
 typedef struct xpvnv XPVNV;
 typedef struct xpvmg XPVMG;
-typedef struct xpvlv XPVLV;
 typedef struct xpvav XPVAV;
 typedef struct xpvhv XPVHV;
 typedef struct xpvgv XPVGV;

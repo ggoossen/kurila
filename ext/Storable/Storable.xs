@@ -3254,7 +3254,6 @@ static int sv_type(pTHX_ SV *sv)
 		 */
 		return SvROK(sv) ? svis_REF : svis_SCALAR;
 	case SVt_PVMG:
-	case SVt_PVLV:		/* Workaround for perl5.004_04 "LVALUE" bug */
 		if (SvRMAGICAL(sv) && (mg_find(sv, 'p')))
 			return svis_TIED_ITEM;
 		/* FALL THROUGH */

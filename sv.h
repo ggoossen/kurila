@@ -67,11 +67,10 @@ typedef enum {
 	SVt_REGEXP,	/* 8 */
 	/* PVBM was here, before BIND replaced it.  */
 	SVt_PVGV,	/* 9 */
-	SVt_PVLV,	/* 10 */
-	SVt_PVAV,	/* 11 */
-	SVt_PVHV,	/* 12 */
-	SVt_PVCV,	/* 13 */
-	SVt_PVIO,	/* 14 */
+	SVt_PVAV,	/* 10 */
+	SVt_PVHV,	/* 11 */
+	SVt_PVCV,	/* 12 */
+	SVt_PVIO,	/* 13 */
 	SVt_LAST	/* keep last in enum. used to size arrays */
 } svtype;
 
@@ -364,10 +363,10 @@ perform the upgrade if necessary.  See C<svtype>.
 /* PVHV */
 #define SVphv_LAZYDEL	0x40000000  /* entry in xhv_eiter must be deleted */
 /* This is only set true on a PVGV when it's playing "PVBM", but is tested for
-   on any regular scalar (anything <= PVLV) */
+   on any regular scalar (anything <= PVGV) */
 #define SVpbm_VALID	0x40000000
 
-/* IV, PVIV, PVNV, PVMG, PVGV and (I assume) PVLV  */
+/* IV, PVIV, PVNV, PVMG, PVGV  */
 /* Presumably IVs aren't stored in pads */
 #define SVf_IVisUV	0x80000000  /* use XPVUV instead of XPVIV */
 /* PVAV */
@@ -1134,11 +1133,6 @@ in gv.h: */
 
 #endif
 
-#define LvTYPE(sv)	((XPVLV*)  SvANY(sv))->xlv_type
-#define LvTARG(sv)	((XPVLV*)  SvANY(sv))->xlv_targ
-#define LvTARGOFF(sv)	((XPVLV*)  SvANY(sv))->xlv_targoff
-#define LvTARGLEN(sv)	((XPVLV*)  SvANY(sv))->xlv_targlen
-
 #define IoIFP(sv)	((XPVIO*)  SvANY(sv))->xio_ifp
 #define IoOFP(sv)	((XPVIO*)  SvANY(sv))->xio_ofp
 #define IoDIRP(sv)	((XPVIO*)  SvANY(sv))->xio_dirp
@@ -1479,15 +1473,15 @@ Returns a pointer to the character buffer.
    where nested macros get confused. Been there, done that.  */
 #define isGV_with_GP(pwadak) \
 	(((SvFLAGS(pwadak) & (SVp_POK|SVpgv_GP)) == SVpgv_GP)	\
-	&& (SvTYPE(pwadak) == SVt_PVGV || SvTYPE(pwadak) == SVt_PVLV))
+	    && (SvTYPE(pwadak) == SVt_PVGV))
 #define isGV_with_GP_on(sv)	STMT_START {			       \
-	assert (SvTYPE(sv) == SVt_PVGV || SvTYPE(sv) == SVt_PVLV); \
+	assert (SvTYPE(sv) == SVt_PVGV); \
 	assert (!SvPOKp(sv));					       \
 	assert (!SvIOKp(sv));					       \
 	(SvFLAGS(sv) |= SVpgv_GP);				       \
     } STMT_END
 #define isGV_with_GP_off(sv)	STMT_START {			       \
-	assert (SvTYPE(sv) == SVt_PVGV || SvTYPE(sv) == SVt_PVLV); \
+	assert (SvTYPE(sv) == SVt_PVGV); \
 	assert (!SvPOKp(sv));					       \
 	assert (!SvIOKp(sv));					       \
 	(SvFLAGS(sv) &= ~SVpgv_GP);				       \
