@@ -44,7 +44,7 @@ for my $size (@( 16, 32, 64) ) {
 }
 
 my $IsTwosComplement = pack('i', -1) eq "\x[FF]" x config_value("intsize");
-diag "\$IsTwosComplement = $IsTwosComplement";
+info "\$IsTwosComplement = $IsTwosComplement";
 
 sub is_valid_error
 {
@@ -202,7 +202,7 @@ do {
 
 
 do {
-  diag "test exceptions";
+  info "test exceptions";
   my $x;
   dies_like( sub { $x = unpack 'w', pack 'C*', 0xff, 0xff},
              qr/^Unterminated compressed integer/);
@@ -343,7 +343,7 @@ do {
 
 };
 
-diag "test the 'p' template";
+info "test the 'p' template";
 
 # literals
 is(unpack("p",pack("p","foo")), "foo");
@@ -388,7 +388,7 @@ SKIP: do {
 #				 see #ifdef __osf__ in pp.c pp_unpack
 is((unpack("i",pack("i",-1))), -1);
 
-diag "test the pack lengths of s S i I l L n N v V + modifiers";
+info "test the pack lengths of s S i I l L n N v V + modifiers";
 
 my @lengths = @( <
   qw(s 2 S 2 i -4 I -4 l 4 L 4 n 2 N 4 v 2 V 4 n! 2 N! 4 v! 2 V! 4),
@@ -417,7 +417,7 @@ while (my @(?$base, ?$expect) =@( splice @lengths, 0, 2)) {
 }
 
 
-diag "test unpack-pack lengths";
+info "test unpack-pack lengths";
 
 my @templates = qw(c C W i I s S l L n N v V f d q Q);
 
@@ -510,12 +510,12 @@ foreach (@(
     my $got = $what eq 'u' ?? (unpack $template, $in) !! (pack $template, $in);
     unless (is($got, $out)) {
         my $un = $what eq 'u' ?? 'un' !! '';
-        diag "$($un)pack ('$template', "._qq($in).') gave '._qq($out).
+        info "$($un)pack ('$template', "._qq($in).') gave '._qq($out).
             ' not '._qq($got);
     }
 }
 
-diag "packing native shorts/ints/longs";
+info "packing native shorts/ints/longs";
 
 is(length(pack("s!", 0)), config_value("shortsize"));
 is(length(pack("i!", 0)), config_value("intsize"));
@@ -541,7 +541,7 @@ sub numbers_with_total {
       $total += $_;
     }
   }
-  diag "numbers test for $format";
+  info "numbers test for $format";
   foreach ( @_) {
     SKIP: do {
         my $out = try {unpack($format, pack($format, $_))};
@@ -625,7 +625,7 @@ sub numbers_with_total {
             } else {
                 my $text = ref $total ?? &$total($len) !! $total;
                 fail;
-                diag "For list (" . join (", ", @_) . ") (total $text)"
+                info "For list (" . join (", ", @_) . ") (total $text)"
                     . " packed with $format unpack '\%$_$format' gave $sum,"
                     . " expected $calc_sum";
             }
@@ -680,7 +680,7 @@ numbers_with_total ('Q', sub {
                     0, 1,9223372036854775807, 9223372036854775808,
                     18446744073709551615);
 
-diag "pack nvNV byteorders";
+info "pack nvNV byteorders";
 
 is(pack("n", 0xdead), "\x[dead]");
 is(pack("v", 0xdead), "\x[adde]");
@@ -695,12 +695,12 @@ SKIP: do {
   is(pack("V!", 0xdeadbeef), "\x[efbeadde]");
 };
 
-diag "test big-/little-endian conversion";
+info "test big-/little-endian conversion";
 
 sub byteorder
 {
   my $format = shift;
-  diag "byteorder test for $format";
+  info "byteorder test for $format";
   for my $value ( @_) {
     SKIP: do {
       my ($nat,$be,$le);
@@ -710,7 +710,7 @@ sub byteorder
 
       do {
         use warnings < qw(NONFATAL utf8);
-        diag "[$value][$nat][$be][$le][$^EVAL_ERROR]";
+        info "[$value][$nat][$be][$le][$^EVAL_ERROR]";
       };
 
       SKIP: do {
@@ -722,7 +722,7 @@ sub byteorder
       is($be, (join '', reverse( split m//, $le)));
       my @x = @( try { unpack "$format$format>$format<", $nat.$be.$le } );
 
-      diag "[$value][", join('][', @x), "][$^EVAL_ERROR]";
+      info "[$value][", join('][', @x), "][$^EVAL_ERROR]";
 
       is($^EVAL_ERROR, '');
       is(@x[0], @x[1]);
@@ -752,7 +752,7 @@ byteorder('F', -1, 0, 0.5, 42, 2**34);
 byteorder('d', -(2**34), -1, 0, 1, 2**34);
 byteorder('D', -(2**34), -1, 0, 1, 2**34);
 
-diag "test negative numbers";
+info "test negative numbers";
 
 SKIP: do {
   skip "platform is not using two's complement for negative integers", 120
@@ -1059,12 +1059,12 @@ do {
 };
 
 SKIP: do {
-  diag "group modifiers";
+  info "group modifiers";
 
   skip $no_endianness, 3 * 2 + 3 * 2 + 1 if $no_endianness;
 
   for my $t (qw{ (s<)< (sl>s)> (s(l(sl)<l)s)< }) {
-    diag "testing pattern '$t'";
+    info "testing pattern '$t'";
     try { ($_) = unpack($t, 'x'x18); };
     is($^EVAL_ERROR, '');
     try { $_ = pack($t, (0)x6); };
@@ -1072,7 +1072,7 @@ SKIP: do {
   }
 
   for my $t (qw{ (s<)> (sl>s)< (s(l(sl)<l)s)> }) {
-    diag "testing pattern '$t'";
+    info "testing pattern '$t'";
     try { @($_) = @: unpack($t, 'x'x18); };
     like($^EVAL_ERROR->{?description}, qr/Can't use '[<>]' in a group with different byte-order in unpack/);
     try { $_ = pack($t, (0)x6); };
@@ -1114,7 +1114,7 @@ do {
     $tbe =~ s/</>/g;
     for my $t (@($tbe, $tle)) {
       my $c = compress_template($t);
-      diag "'$t' -> '$c'";
+      info "'$t' -> '$c'";
       SKIP: do {
         my $p1 = try { pack $t, < @d };
         skip "cannot pack '$t' on this perl", 5 if is_valid_error($^EVAL_ERROR);
@@ -1355,7 +1355,7 @@ do {  # Repeat count [SUBEXPR]
 
            SKIP: do {
 	     my $junk1 = "$groupbegin $type$count $groupend";
-	      diag "junk1=$junk1";
+             info "junk1=$junk1";
 	     my $p = try { pack $junk1, < @list2 };
              skip "cannot pack '$type' on this perl", 12
                if is_valid_error($^EVAL_ERROR);
@@ -1364,7 +1364,7 @@ do {  # Repeat count [SUBEXPR]
 	     my $half = int( (length $p)/2 );
 	     for my $move (@('', "X$half", "X!$half", 'x1', 'x!8', "x$half")) {
 	       my $junk = "$junk1 $move";
-	       diag "junk='$junk', end='$end' list=($(join ', ', @list2))";
+	       info "junk='$junk', end='$end' list=($(join ', ', @list2))";
 	       $p = pack "$junk $end", < @list2, < @end;
 	       my @l = @( unpack "x[$junk] $end", $p );
 	       is(scalar nelems @l, scalar nelems @end);

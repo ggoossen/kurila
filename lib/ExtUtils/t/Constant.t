@@ -551,7 +551,7 @@ if (defined $notdef) {
 $test++;
 
 # not a macro
-my $notthere = try { &ExtTest::NOTTHERE; };
+my $notthere = try { ExtTest::NOTTHERE(); };
 if (defined $notthere) {
   print \*STDOUT, "not ok $test # \$notthere='$notthere'\n";
 } elsif ($^EVAL_ERROR->{description} !~ m/Undefined subroutine .*NOTTHERE called/) {
@@ -590,7 +590,7 @@ unless (defined $undef) {
 $test++;
 
 # invalid macro (chosen to look like a mix up between No and SW)
-$notdef = try { &ExtTest::So };
+$notdef = try { ExtTest::So() };
 if (defined $notdef) {
   print \*STDOUT, "not ok $test # \$notdef='$notdef'\n";
 } elsif ($^EVAL_ERROR->{description} !~ m/^Undefined subroutine .*So called/) {
@@ -601,7 +601,7 @@ if (defined $notdef) {
 $test++;
 
 # invalid defined macro
-$notdef = try { &ExtTest::EW };
+$notdef = try { ExtTest::EW() };
 if (defined $notdef) {
   print \*STDOUT, "not ok $test # \$notdef='$notdef'\n";
 } elsif ($^EVAL_ERROR->{description} !~ m/^Undefined subroutine .*EW called/) {

@@ -81,6 +81,12 @@ sub diag {
     _diag(< @_);
 }
 
+sub info {
+    my @mess = map { m/^#/ ?? "$_\n" !! "# $_\n" },
+      @+: map { split m/\n/ }, @_;
+    _print(< @mess);
+}
+
 sub skip_all {
     if ((nelems @_)) {
 	_print "1..0 # Skipped: $(join ' ',@_)\n";
