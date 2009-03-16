@@ -91,6 +91,7 @@ Aip	|SV*	|ReSv	|NULLOK REGEXP *re
 Aip	|AV*	|SvAv	|NN SV *sv
 Aip	|HV*	|SvHv	|NN SV *sv
 Aip	|CV*	|SvCv	|NN SV *sv
+Aip	|IO*	|SvIo	|NN SV *sv
 
 Aip	|const char*	|SvPVX_const	|NN SV *sv
 Aip	|char*	|SvPVX_mutable	|NN SV *sv
@@ -244,12 +245,9 @@ Ap	|void	|do_join	|NN SV *sv|NN SV *delim|NN SV *av
 p	|OP*	|do_kv
 p	|void	|bad_arg	|I32 n|NN const char* t|NN const char* name|NN SV *arg
 p	|void	|do_arg_check	|NN SV** base	
-Apmb	|bool	|do_open	|NN GV* gv|NN const char* name|I32 len|int as_raw \
+Apmb	|bool	|do_open	|NN IO* io|NN const char* name|I32 len|int as_raw \
 				|int rawmode|int rawperm|NULLOK PerlIO* supplied_fp
-Ap	|bool	|do_open9	|NN GV *gv|NN const char *name|I32 len|int as_raw \
-				|int rawmode|int rawperm|NULLOK PerlIO *supplied_fp \
-				|NN SV *svs|I32 num
-Ap	|bool	|do_openn	|NN GV *gv|NN const char *oname|I32 len|int as_raw \
+Ap	|bool	|do_openn	|NN IO* io|NN const char *oname|I32 len|int as_raw \
 				|int rawmode|int rawperm|NULLOK PerlIO *supplied_fp \
 				|NULLOK SV * const *svp|I32 num
 p	|bool	|do_print	|NULLOK SV* sv|NN PerlIO* fp
@@ -939,7 +937,7 @@ p	|I32	|wait4pid	|Pid_t pid|NN int* statusp|int flags
 p	|U32	|parse_unicode_opts|NN const char **popt
 Ap	|U32	|seed
 pR	|UV	|get_hash_seed
-p	|void	|report_evil_fh	|NULLOK const IO *io|I32 op
+p	|void	|report_evil_fh	|NULLOK IO *io|I32 op
 XEpd	|void	|report_uninit	|NULLOK SV* uninit_sv
 Afpd	|void	|warn		|NN const char* pat|...
 Afpd	|void	|warn_at	|NULLOK SV* location|NN const char* pat|...

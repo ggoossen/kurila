@@ -120,6 +120,12 @@ CV* Perl_SvCv(pTHX_ SV *sv) {
     return (CV*)sv;
 }
 
+IO* Perl_SvIo(pTHX_ SV *sv) {
+    PERL_ARGS_ASSERT_SVIO;
+    assert(SvIOOK(sv));
+    return (IO*)sv;
+}
+
 #define CvREFCNT_inc(cv) inline_CvREFCNT_inc(aTHX_ cv)
 static __inline__ CV* inline_CvREFCNT_inc(pTHX_ CV* cv) {
     return (CV*)SvREFCNT_inc((SV*)cv);

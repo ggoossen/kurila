@@ -739,7 +739,7 @@ Perl_do_readline(pTHX_ GV* gv)
 		    IoLINES(io) = 0;
 		    if (av_len(GvAVn(gv)) < 0) {
 			IoFLAGS(io) &= ~IOf_START;
-			do_openn(gv,"-",1,FALSE,O_RDONLY,0,NULL,NULL,0);
+			do_openn(io,"-",1,FALSE,O_RDONLY,0,NULL,NULL,0);
 			sv_setpvn(GvSVn(gv), "-", 1);
 			SvSETMAGIC(GvSV(gv));
 			fp = IoIFP(io);

@@ -3434,7 +3434,7 @@ Perl_my_fflush_all(pTHX)
 }
 
 void
-Perl_report_evil_fh(pTHX_ const IO *io, I32 op)
+Perl_report_evil_fh(pTHX_ IO *io, I32 op)
 {
     const char * const name = io ? SvPVX_const(SvNAME(IoSv(io))) : NULL;
 

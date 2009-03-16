@@ -59,12 +59,11 @@
 #include <signal.h>
 
 bool
-Perl_do_openn(pTHX_ GV *gv, register const char *oname, I32 len, int as_raw,
+Perl_do_openn(pTHX_ IO *io, register const char *oname, I32 len, int as_raw,
 	      int rawmode, int rawperm, PerlIO *supplied_fp, SV * const *svp,
 	      I32 num_svs)
 {
     dVAR;
-    register IO * const io = GvIOn(gv);
     PerlIO *saveifp = NULL;
     PerlIO *saveofp = NULL;
     int savefd = -1;
@@ -123,9 +122,7 @@ Perl_do_openn(pTHX_ GV *gv, register const char *oname, I32 len, int as_raw,
 	    result = PerlIO_close(IoIFP(io));
 	if (result == EOF && fd > PL_maxsysfd) {
 	    /* Why is this not Perl_warn*() call ? */
-	    PerlIO_printf(Perl_error_log,
-			  "Warning: unable to close filehandle %s properly.\n",
-			  GvENAME(gv));
+	    Perl_warn("unable to close filehandle properly.");
 	}
 	IoOFP(io) = IoIFP(io) = NULL;
     }
@@ -480,14 +477,12 @@ Perl_do_openn(pTHX_ GV *gv, register const char *oname, I32 len, int as_raw,
 	if ((IoTYPE(io) == IoTYPE_RDONLY) &&
 	    (fp == PerlIO_stdout() || fp == PerlIO_stderr())) {
 		Perl_warner(aTHX_ packWARN(WARN_IO),
-			    "Filehandle STD%s reopened as %s only for input",
-			    ((fp == PerlIO_stdout()) ? "OUT" : "ERR"),
-			    GvENAME(gv));
+			    "Filehandle STD%s reopened only for input",
+			    ((fp == PerlIO_stdout()) ? "OUT" : "ERR"));
 	}
 	else if ((IoTYPE(io) == IoTYPE_WRONLY) && fp == PerlIO_stdin()) {
 		Perl_warner(aTHX_ packWARN(WARN_IO),
-			    "Filehandle STDIN reopened as %s only for output",
-			    GvENAME(gv));
+			    "Filehandle STDIN reopened only for output");
 	}
     }
 
@@ -678,11 +673,11 @@ Perl_nextargv(pTHX_ register GV *gv)
 	SvSETMAGIC(GvSV(gv));
 	PL_oldname = SvPV_const(GvSV(gv), oldlen);
 	if (oldlen == 1 && *PL_oldname == '-') {
-	    if (do_openn(gv,"-", 1, FALSE, O_RDONLY,0,NULL,NULL,0)) {
+	    if (do_openn(GvIOn(gv),"-", 1, FALSE, O_RDONLY,0,NULL,NULL,0)) {
 		return IoIFP(GvIOp(gv));
 	    }
 	} else {
-	    if (do_openn(gv,"<", 1, FALSE, O_RDONLY,0,NULL,&sv,1)) {
+	    if (do_openn(GvIOn(gv),"<", 1, FALSE, O_RDONLY,0,NULL,&sv,1)) {
 		return IoIFP(GvIOp(gv));
 	    }
 	}

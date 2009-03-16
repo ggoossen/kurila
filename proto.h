@@ -122,6 +122,11 @@ PERL_INLINE_CALLCONV CV*	Perl_SvCv(pTHX_ SV *sv)
 #define PERL_ARGS_ASSERT_SVCV	\
 	assert(sv)
 
+PERL_INLINE_CALLCONV IO*	Perl_SvIo(pTHX_ SV *sv)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_SVIO	\
+	assert(sv)
+
 
 PERL_INLINE_CALLCONV const char*	Perl_SvPVX_const(pTHX_ SV *sv)
 			__attribute__nonnull__(pTHX_1);
@@ -709,24 +714,17 @@ PERL_CALLCONV void	Perl_do_arg_check(pTHX_ SV** base)
 #define PERL_ARGS_ASSERT_DO_ARG_CHECK	\
 	assert(base)
 
-/* PERL_CALLCONV bool	Perl_do_open(pTHX_ GV* gv, const char* name, I32 len, int as_raw, int rawmode, int rawperm, PerlIO* supplied_fp)
+/* PERL_CALLCONV bool	Perl_do_open(pTHX_ IO* io, const char* name, I32 len, int as_raw, int rawmode, int rawperm, PerlIO* supplied_fp)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2); */
 #define PERL_ARGS_ASSERT_DO_OPEN	\
-	assert(gv); assert(name)
+	assert(io); assert(name)
 
-PERL_CALLCONV bool	Perl_do_open9(pTHX_ GV *gv, const char *name, I32 len, int as_raw, int rawmode, int rawperm, PerlIO *supplied_fp, SV *svs, I32 num)
-			__attribute__nonnull__(pTHX_1)
-			__attribute__nonnull__(pTHX_2)
-			__attribute__nonnull__(pTHX_8);
-#define PERL_ARGS_ASSERT_DO_OPEN9	\
-	assert(gv); assert(name); assert(svs)
-
-PERL_CALLCONV bool	Perl_do_openn(pTHX_ GV *gv, const char *oname, I32 len, int as_raw, int rawmode, int rawperm, PerlIO *supplied_fp, SV * const *svp, I32 num)
+PERL_CALLCONV bool	Perl_do_openn(pTHX_ IO* io, const char *oname, I32 len, int as_raw, int rawmode, int rawperm, PerlIO *supplied_fp, SV * const *svp, I32 num)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2);
 #define PERL_ARGS_ASSERT_DO_OPENN	\
-	assert(gv); assert(oname)
+	assert(io); assert(oname)
 
 PERL_CALLCONV bool	Perl_do_print(pTHX_ SV* sv, PerlIO* fp)
 			__attribute__nonnull__(pTHX_2);
@@ -3386,7 +3384,7 @@ PERL_CALLCONV U32	Perl_seed(pTHX);
 PERL_CALLCONV UV	Perl_get_hash_seed(pTHX)
 			__attribute__warn_unused_result__;
 
-PERL_CALLCONV void	Perl_report_evil_fh(pTHX_ const IO *io, I32 op);
+PERL_CALLCONV void	Perl_report_evil_fh(pTHX_ IO *io, I32 op);
 PERL_CALLCONV void	Perl_report_uninit(pTHX_ SV* uninit_sv);
 PERL_CALLCONV void	Perl_warn(pTHX_ const char* pat, ...)
 			__attribute__format__(__printf__,pTHX_1,pTHX_2)

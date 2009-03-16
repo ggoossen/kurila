@@ -48,6 +48,7 @@
 #define SvAv			Perl_SvAv
 #define SvHv			Perl_SvHv
 #define SvCv			Perl_SvCv
+#define SvIo			Perl_SvIo
 #define SvPVX_const		Perl_SvPVX_const
 #define SvPVX_mutable		Perl_SvPVX_mutable
 #define AvREFCNT_dec(a)		Perl_SvREFCNT_dec(aTHX_ AvSv(a))
@@ -243,7 +244,6 @@
 #define bad_arg			Perl_bad_arg
 #define do_arg_check		Perl_do_arg_check
 #endif
-#define do_open9		Perl_do_open9
 #define do_openn		Perl_do_openn
 #ifdef PERL_CORE
 #define do_print		Perl_do_print
@@ -2233,6 +2233,7 @@
 #define SvAv(a)			Perl_SvAv(aTHX_ a)
 #define SvHv(a)			Perl_SvHv(aTHX_ a)
 #define SvCv(a)			Perl_SvCv(aTHX_ a)
+#define SvIo(a)			Perl_SvIo(aTHX_ a)
 #define SvPVX_const(a)		Perl_SvPVX_const(aTHX_ a)
 #define SvPVX_mutable(a)	Perl_SvPVX_mutable(aTHX_ a)
 #define AvREFCNT_dec(a)		Perl_SvREFCNT_dec(aTHX_ AvSv(a))
@@ -2411,7 +2412,6 @@
 #define bad_arg(a,b,c,d)	Perl_bad_arg(aTHX_ a,b,c,d)
 #define do_arg_check(a)		Perl_do_arg_check(aTHX_ a)
 #endif
-#define do_open9(a,b,c,d,e,f,g,h,i)	Perl_do_open9(aTHX_ a,b,c,d,e,f,g,h,i)
 #define do_openn(a,b,c,d,e,f,g,h,i)	Perl_do_openn(aTHX_ a,b,c,d,e,f,g,h,i)
 #ifdef PERL_CORE
 #define do_print(a,b)		Perl_do_print(aTHX_ a,b)
