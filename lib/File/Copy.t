@@ -78,8 +78,8 @@ for my $cross_partition_test (0..1) {
   is $foo, "ok\n", 'copy(fn, io): same contents';
   unlink "copy-$^PID" or die "unlink: $^OS_ERROR";
 
-  require FileHandle;
-  my $fh = FileHandle->new("copy-$^PID", ">") or die "Cannot open copy-$^PID:$^OS_ERROR";
+  require IO::File;
+  my $fh = IO::File->new("copy-$^PID", ">") or die "Cannot open copy-$^PID:$^OS_ERROR";
   binmode $fh or die;
   copy("file-$^PID",$fh);
   $fh->close;

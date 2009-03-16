@@ -2,7 +2,7 @@
 
 package ExtUtils::Embed;
 require Exporter;
-require FileHandle;
+require IO::File;
 use Config;
 use Getopt::Std;
 use File::Spec;
@@ -64,7 +64,7 @@ sub xsinit {
 	$fh = \*STDOUT;
     }
     else {
-	$fh = FileHandle->new("$file", ">");
+	$fh = IO::File->new("$file", ">");
     }
 
     push(@mods, < static_ext()) if defined $std;

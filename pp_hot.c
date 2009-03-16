@@ -658,16 +658,16 @@ PP(pp_print)
 
     if (!(io = GvIO(gv))) {
 	if (ckWARN2(WARN_UNOPENED,WARN_CLOSED))
-	    report_evil_fh(gv, io, PL_op->op_type);
+	    report_evil_fh(io, PL_op->op_type);
 	SETERRNO(EBADF,RMS_IFI);
 	goto just_say_no;
     }
     else if (!(fp = IoOFP(io))) {
 	if (ckWARN2(WARN_CLOSED, WARN_IO))  {
 	    if (IoIFP(io))
-		report_evil_fh(gv, io, OP_phoney_INPUT_ONLY);
+		report_evil_fh(io, OP_phoney_INPUT_ONLY);
 	    else if (ckWARN2(WARN_UNOPENED,WARN_CLOSED))
-		report_evil_fh(gv, io, PL_op->op_type);
+		report_evil_fh(io, PL_op->op_type);
 	}
 	SETERRNO(EBADF,IoIFP(io)?RMS_FAC:RMS_IFI);
 	goto just_say_no;
@@ -753,7 +753,7 @@ Perl_do_readline(pTHX_ GV* gv)
 	    }
 	}
 	else if (ckWARN(WARN_IO) && IoTYPE(io) == IoTYPE_WRONLY) {
-	    report_evil_fh(gv, io, OP_phoney_OUTPUT_ONLY);
+	    report_evil_fh(io, OP_phoney_OUTPUT_ONLY);
 	}
     }
     if (!fp) {
@@ -765,7 +765,7 @@ Perl_do_readline(pTHX_ GV* gv)
 			    "glob failed (can't start child: %s)",
 			    Strerror(errno));
 	    else
-		report_evil_fh(gv, io, PL_op->op_type);
+		report_evil_fh(io, PL_op->op_type);
 	}
 	if (gimme == G_SCALAR) {
 	    /* undef TARG, and push that undefined value */

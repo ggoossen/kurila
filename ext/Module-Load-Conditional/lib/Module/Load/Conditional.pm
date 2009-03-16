@@ -7,7 +7,7 @@ use Locale::Maketext::Simple Style  => 'gettext';
 
 use Carp        ();
 use File::Spec  ();
-use FileHandle  ();
+use IO::File ();
 use version <     qw[qv];
 
 use constant ON_VMS  => $^OS_NAME eq 'VMS';
@@ -217,7 +217,7 @@ sub check_install {
                 $filename = File::Spec->catfile($dir, $file);
                 next unless -e $filename;
     
-                $fh = FileHandle->new;
+                $fh = IO::File->new;
                 if (!$fh->open($filename)) {
                     warn < loc(q[Cannot open file '%1': %2], $file, $^OS_ERROR)
                             if $args->{?verbose};

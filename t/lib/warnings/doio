@@ -90,7 +90,7 @@ close \*fred ;
 no warnings 'unopened' ;
 close \*joe ;
 EXPECT
-close() on unopened filehandle fred at - line 3 character 1.
+close() on unopened filehandle at - line 3 character 1.
 ########
 # doio.c [Perl_do_tell Perl_do_seek Perl_do_sysseek Perl_my_stat]
 use warnings 'io' ;
@@ -125,11 +125,11 @@ seek() on closed filehandle STDIN at - line 5 character 6.
 sysseek() on closed filehandle STDIN at - line 6 character 6.
 -x on closed filehandle STDIN at - line 7 character 2.
 stat() on closed filehandle STDIN at - line 8 character 1.
-tell() on unopened filehandle fred at - line 10 character 1.
-seek() on unopened filehandle fred at - line 11 character 1.
-sysseek() on unopened filehandle fred at - line 12 character 1.
--x on unopened filehandle fred at - line 13 character 2.
-stat() on unopened filehandle fred at - line 14 character 1.
+tell() on unopened filehandle at - line 10 character 1.
+seek() on unopened filehandle at - line 11 character 1.
+sysseek() on unopened filehandle at - line 12 character 1.
+-x on unopened filehandle at - line 13 character 2.
+stat() on unopened filehandle at - line 14 character 1.
 ########
 # doio.c [Perl_do_print]
 use warnings 'uninitialized' ;

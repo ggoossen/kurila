@@ -69,10 +69,10 @@ close ($fh) or die $^OS_ERROR ;
 close ($foo) or die $^OS_ERROR ;
 unlink $file ;
 EXPECT
-Filehandle $fh opened only for input at - line 12 character 1.
-Filehandle $foo opened only for input at - line 14 character 1.
-Filehandle $fh opened only for input at - line 19 character 1.
-Filehandle $foo opened only for input at - line 20 character 1.
+Filehandle opened only for input at - line 12 character 1.
+Filehandle opened only for input at - line 14 character 1.
+Filehandle opened only for input at - line 19 character 1.
+Filehandle opened only for input at - line 20 character 1.
 ########
 # pp_hot.c [pp_print]
 use warnings 'closed' ;
@@ -102,7 +102,7 @@ my $fh = *STDOUT{IO};
 close \*STDOUT or die "Can't close STDOUT";
 print $fh, "Shouldn't print anything, but shouldn't SEGV either\n";
 EXPECT
-print() on closed filehandle at - line 7 character 1.
+print() on closed filehandle STDOUT at - line 7 character 1.
 ########
 # pp_hot.c [pp_print]
 package foo;
@@ -114,9 +114,9 @@ print $fh2, 42;
 open $bar::fh3, "<", "nonexistent";
 print $bar::fh3, 42;
 EXPECT
-print() on closed filehandle $fh1 at - line 5 character 1.
-print() on closed filehandle $fh2 at - line 7 character 1.
-print() on closed filehandle $fh3 at - line 9 character 1.
+print() on closed filehandle at - line 5 character 1.
+print() on closed filehandle at - line 7 character 1.
+print() on closed filehandle at - line 9 character 1.
 ########
 # pp_hot.c [Perl_do_readline]
 use warnings 'closed' ;
@@ -151,10 +151,10 @@ close ($fh) or die $^OS_ERROR ;
 close ($foo) or die $^OS_ERROR ;
 unlink $file ;
 EXPECT
-Filehandle $fh opened only for output at - line 5 character 8.
-Filehandle $foo opened only for output at - line 10 character 5.
-Filehandle $foo opened only for output at - line 14 character 5.
-Filehandle $fh opened only for output at - line 15 character 5.
+Filehandle opened only for output at - line 5 character 8.
+Filehandle opened only for output at - line 10 character 5.
+Filehandle opened only for output at - line 14 character 5.
+Filehandle opened only for output at - line 15 character 5.
 ########
 # pp_hot.c [Perl_sub_crush_depth]
 use warnings 'recursion' ;

@@ -939,7 +939,7 @@ p	|I32	|wait4pid	|Pid_t pid|NN int* statusp|int flags
 p	|U32	|parse_unicode_opts|NN const char **popt
 Ap	|U32	|seed
 pR	|UV	|get_hash_seed
-p	|void	|report_evil_fh	|NULLOK const GV *gv|NULLOK const IO *io|I32 op
+p	|void	|report_evil_fh	|NULLOK const IO *io|I32 op
 XEpd	|void	|report_uninit	|NULLOK SV* uninit_sv
 Afpd	|void	|warn		|NN const char* pat|...
 Afpd	|void	|warn_at	|NULLOK SV* location|NN const char* pat|...

@@ -9,6 +9,7 @@ require DynaLoader;
 require Exporter;
 package Storable;
 
+use IO::File;
 
 our @ISA = qw(Exporter DynaLoader);
 
@@ -22,7 +23,6 @@ our @EXPORT_OK = qw(
         file_magic read_magic
 );
 
-use FileHandle;
 our ($canonical, $forgive_me, $VERSION);
 
 $VERSION = '2.18';
@@ -114,7 +114,7 @@ EOM
 
 sub file_magic {
     my $file = shift;
-    my $fh = FileHandle->new();
+    my $fh = IO::File->new();
     open($fh, "<", "". $file) || die "Can't open '$file': $^OS_ERROR";
     binmode($fh);
     defined(sysread($fh, my $buf, 32)) || die "Can't read from '$file': $^OS_ERROR";
@@ -273,7 +273,7 @@ sub _store {
 # Returns undef if an I/O error occurred.
 #
 sub store_fd {
-	return _store_fd(\&pstore, < @_);
+    return _store_fd(\&pstore, < @_);
 }
 
 #

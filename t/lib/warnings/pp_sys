@@ -138,7 +138,7 @@ flock() on closed filehandle STDIN at - line 16 character 1.
 flock() on closed filehandle STDIN at - line 18 character 1.
 	(Are you trying to call flock() on dirhandle STDIN?)
  at - line 18 character 1.
-flock() on unopened filehandle FOO at - line 19 character 1.
+flock() on unopened filehandle at - line 19 character 1.
 Can't use an undefined value as a symbol reference at - line 20 character 7.
 ########
 # pp_sys.c [pp_prtf pp_send pp_bind pp_connect pp_listen pp_accept pp_shutdown pp_ssockopt ppp_getpeername]
@@ -273,7 +273,7 @@ EXPECT
 -T on unopened filehandle at - line 4 character 2.
 stat() on closed filehandle STDIN at - line 5 character 1.
 -T on unopened filehandle at - line 6 character 2.
-stat() on unopened filehandle POCUS at - line 7 character 1.
+stat() on unopened filehandle at - line 7 character 1.
 ########
 # pp_sys.c [pp_fttext]
 use warnings 'newline' ;
@@ -305,19 +305,19 @@ sysread(\*NONEXISTENT, $a, 10);
 read(\*NONEXISTENT, $a, 10);
 unlink $file ;
 EXPECT
-Filehandle $f opened only for output at - line 12 character 9.
-sysread() on closed filehandle $f at - line 17 character 1.
-read() on closed filehandle $f at - line 18 character 1.
-sysread() on unopened filehandle NONEXISTENT at - line 19 character 1.
-read() on unopened filehandle NONEXISTENT at - line 20 character 1.
+Filehandle opened only for output at - line 12 character 9.
+sysread() on closed filehandle at - line 17 character 1.
+read() on closed filehandle at - line 18 character 1.
+sysread() on unopened filehandle at - line 19 character 1.
+read() on unopened filehandle at - line 20 character 1.
 ########
 # pp_sys.c [pp_binmode]
 use warnings 'unopened' ;
 binmode(\*BLARG);
 $a = \*BLERG;binmode($a);
 EXPECT
-binmode() on unopened filehandle BLARG at - line 3 character 1.
-binmode() on unopened filehandle BLERG at - line 4 character 14.
+binmode() on unopened filehandle at - line 3 character 1.
+binmode() on unopened filehandle at - line 4 character 14.
 ########
 # pp_sys.c [pp_lstat]
 use warnings 'io';
@@ -362,10 +362,10 @@ chdir \*BAR;
 chdir $dh;
 chdir $fh;
 EXPECT
-chdir() on unopened filehandle FOO at - line 20 character 1.
-chdir() on closed filehandle BAR at - line 21 character 1.
-chdir() on unopened filehandle $dh at - line 22 character 1.
-chdir() on closed filehandle $fh at - line 23 character 1.
+chdir() on unopened filehandle at - line 20 character 1.
+chdir() on closed filehandle at - line 21 character 1.
+chdir() on unopened filehandle at - line 22 character 1.
+chdir() on closed filehandle at - line 23 character 1.
 ########
 # pp_sys.c [pp_open]
 use warnings;

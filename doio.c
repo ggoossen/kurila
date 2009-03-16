@@ -711,7 +711,7 @@ Perl_do_close(pTHX_ GV *gv, bool not_implicit)
     if (!io) {		/* never opened */
 	if (not_implicit) {
 	    if (ckWARN(WARN_UNOPENED)) /* no check for closed here */
-		report_evil_fh(gv, io, PL_op->op_type);
+		report_evil_fh(io, PL_op->op_type);
 	    SETERRNO(EBADF,SS_IVCHAN);
 	}
 	return FALSE;
@@ -776,7 +776,7 @@ Perl_do_eof(pTHX_ GV *gv)
     if (!io)
 	return TRUE;
     else if ((IoTYPE(io) == IoTYPE_WRONLY) && ckWARN(WARN_IO))
-	report_evil_fh(gv, io, OP_phoney_OUTPUT_ONLY);
+	report_evil_fh(io, OP_phoney_OUTPUT_ONLY);
 
     while (IoIFP(io)) {
         if (PerlIO_has_cntptr(IoIFP(io))) {	/* (the code works without this) */
@@ -827,7 +827,7 @@ Perl_do_tell(pTHX_ GV *gv)
 	return PerlIO_tell(fp);
     }
     if (ckWARN2(WARN_UNOPENED,WARN_CLOSED))
-	report_evil_fh(gv, io, PL_op->op_type);
+	report_evil_fh(io, PL_op->op_type);
     SETERRNO(EBADF,RMS_IFI);
     return (Off_t)-1;
 }
@@ -847,7 +847,7 @@ Perl_do_seek(pTHX_ GV *gv, Off_t pos, int whence)
 	return PerlIO_seek(fp, pos, whence) >= 0;
     }
     if (ckWARN2(WARN_UNOPENED,WARN_CLOSED))
-	report_evil_fh(gv, io, PL_op->op_type);
+	report_evil_fh(io, PL_op->op_type);
     SETERRNO(EBADF,RMS_IFI);
     return FALSE;
 }
@@ -864,7 +864,7 @@ Perl_do_sysseek(pTHX_ GV *gv, Off_t pos, int whence)
     if (gv && (io = GvIO(gv)) && (fp = IoIFP(io)))
 	return PerlLIO_lseek(PerlIO_fileno(fp), pos, whence);
     if (ckWARN2(WARN_UNOPENED,WARN_CLOSED))
-	report_evil_fh(gv, io, PL_op->op_type);
+	report_evil_fh(io, PL_op->op_type);
     SETERRNO(EBADF,RMS_IFI);
     return (Off_t)-1;
 }
@@ -1038,12 +1038,12 @@ Perl_my_stat(pTHX)
                 return (PL_laststatval = PerlLIO_fstat(my_dirfd(IoDIRP(io)), &PL_statcache));
             } else {
                 if (ckWARN2(WARN_UNOPENED,WARN_CLOSED))
-                    report_evil_fh(gv, io, PL_op->op_type);
+                    report_evil_fh(io, PL_op->op_type);
                 return (PL_laststatval = -1);
             }
 	} else {
             if (ckWARN2(WARN_UNOPENED,WARN_CLOSED))
-                report_evil_fh(gv, io, PL_op->op_type);
+                report_evil_fh(io, PL_op->op_type);
             return (PL_laststatval = -1);
         }
     }

@@ -3137,7 +3137,7 @@
 #define seed()			Perl_seed(aTHX)
 #ifdef PERL_CORE
 #define get_hash_seed()		Perl_get_hash_seed(aTHX)
-#define report_evil_fh(a,b,c)	Perl_report_evil_fh(aTHX_ a,b,c)
+#define report_evil_fh(a,b)	Perl_report_evil_fh(aTHX_ a,b)
 #endif
 #if defined(PERL_CORE) || defined(PERL_EXT)
 #define report_uninit(a)	Perl_report_uninit(aTHX_ a)

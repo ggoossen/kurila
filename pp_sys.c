@@ -668,7 +668,7 @@ PP(pp_binmode)
     EXTEND(SP, 1);
     if (!(io = GvIO(gv)) || !(fp = IoIFP(io))) {
 	if (ckWARN2(WARN_UNOPENED,WARN_CLOSED))
-	    report_evil_fh(gv, io, PL_op->op_type);
+	    report_evil_fh(io, PL_op->op_type);
 	SETERRNO(EBADF,RMS_IFI);
         RETPUSHUNDEF;
     }
@@ -877,7 +877,7 @@ PP(pp_getc)
     if (!gv || do_eof(gv)) { /* make sure we have fp with something */
 	if ((!io || (!IoIFP(io) && IoTYPE(io) != IoTYPE_WRONLY))
 	  && ckWARN2(WARN_UNOPENED,WARN_CLOSED))
-	    report_evil_fh(gv, io, PL_op->op_type);
+	    report_evil_fh(io, PL_op->op_type);
 	SETERRNO(EBADF,RMS_IFI);
 	RETPUSHUNDEF;
     }
@@ -911,16 +911,16 @@ PP(pp_prtf)
     sv = newSV(0);
     if (!(io = GvIO(gv))) {
 	if (ckWARN2(WARN_UNOPENED,WARN_CLOSED))
-	    report_evil_fh(gv, io, PL_op->op_type);
+	    report_evil_fh(io, PL_op->op_type);
 	SETERRNO(EBADF,RMS_IFI);
 	goto just_say_no;
     }
     else if (!(fp = IoOFP(io))) {
 	if (ckWARN2(WARN_CLOSED,WARN_IO))  {
 	    if (IoIFP(io))
-		report_evil_fh(gv, io, OP_phoney_INPUT_ONLY);
+		report_evil_fh(io, OP_phoney_INPUT_ONLY);
 	    else if (ckWARN(WARN_CLOSED))
-		report_evil_fh(gv, io, PL_op->op_type);
+		report_evil_fh(io, PL_op->op_type);
 	}
 	SETERRNO(EBADF,IoIFP(io)?RMS_FAC:RMS_IFI);
 	goto just_say_no;
@@ -1003,7 +1003,7 @@ PP(pp_sysread)
     io = GvIO(gv);
     if (!io || !IoIFP(io)) {
 	if (ckWARN2(WARN_UNOPENED,WARN_CLOSED))
-	    report_evil_fh(gv, io, PL_op->op_type);
+	    report_evil_fh(io, PL_op->op_type);
 	SETERRNO(EBADF,RMS_IFI);
 	goto say_undef;
     }
@@ -1116,7 +1116,7 @@ PP(pp_sysread)
     }
     if (count < 0) {
 	if ((IoTYPE(io) == IoTYPE_WRONLY) && ckWARN(WARN_IO))
-		report_evil_fh(gv, io, OP_phoney_OUTPUT_ONLY);
+		report_evil_fh(io, OP_phoney_OUTPUT_ONLY);
 	goto say_undef;
     }
     SvCUR_set(read_target, count+(buffer - SvPVX_const(read_target)));
@@ -1191,9 +1191,9 @@ PP(pp_send)
 	retval = -1;
 	if (ckWARN2(WARN_UNOPENED,WARN_CLOSED)) {
 	    if (io && IoIFP(io))
-		report_evil_fh(gv, io, OP_phoney_INPUT_ONLY);
+		report_evil_fh(io, OP_phoney_INPUT_ONLY);
 	    else
-		report_evil_fh(gv, io, PL_op->op_type);
+		report_evil_fh(io, PL_op->op_type);
 	}
 	SETERRNO(EBADF,RMS_IFI);
 	goto say_undef;
@@ -1510,7 +1510,7 @@ PP(pp_ioctl)
 
     if (!io || !argsv || !IoIFP(io)) {
 	if (ckWARN2(WARN_UNOPENED,WARN_CLOSED))
-	    report_evil_fh(gv, io, PL_op->op_type);
+	    report_evil_fh(io, PL_op->op_type);
 	SETERRNO(EBADF,RMS_IFI);	/* well, sort of... */
 	RETPUSHUNDEF;
     }
@@ -1596,7 +1596,7 @@ PP(pp_flock)
     }
     else {
 	if (ckWARN2(WARN_UNOPENED,WARN_CLOSED))
-	    report_evil_fh(gv, io, PL_op->op_type);
+	    report_evil_fh(io, PL_op->op_type);
 	value = 0;
 	SETERRNO(EBADF,RMS_IFI);
     }
@@ -1622,7 +1622,7 @@ PP(pp_socket)
 
     if (!gv || !io) {
 	if (ckWARN2(WARN_UNOPENED,WARN_CLOSED))
-	    report_evil_fh(gv, io, PL_op->op_type);
+	    report_evil_fh(io, PL_op->op_type);
 	if (io && IoIFP(io))
 	    do_close(gv, FALSE);
 	SETERRNO(EBADF,LIB_INVARG);
@@ -1674,9 +1674,9 @@ PP(pp_sockpair)
     if (!gv1 || !gv2 || !io1 || !io2) {
 	if (ckWARN2(WARN_UNOPENED,WARN_CLOSED)) {
 	    if (!gv1 || !io1)
-		report_evil_fh(gv1, io1, PL_op->op_type);
+		report_evil_fh(io1, PL_op->op_type);
 	    if (!gv2 || !io2)
-		report_evil_fh(gv1, io2, PL_op->op_type);
+		report_evil_fh(io2, PL_op->op_type);
 	}
 	if (io1 && IoIFP(io1))
 	    do_close(gv1, FALSE);
@@ -1740,7 +1740,7 @@ PP(pp_bind)
 
 nuts:
     if (ckWARN(WARN_CLOSED))
-	report_evil_fh(gv, io, PL_op->op_type);
+	report_evil_fh(io, PL_op->op_type);
     SETERRNO(EBADF,SS_IVCHAN);
     RETPUSHUNDEF;
 #else
@@ -1769,7 +1769,7 @@ PP(pp_connect)
 
 nuts:
     if (ckWARN(WARN_CLOSED))
-	report_evil_fh(gv, io, PL_op->op_type);
+	report_evil_fh(io, PL_op->op_type);
     SETERRNO(EBADF,SS_IVCHAN);
     RETPUSHUNDEF;
 #else
@@ -1795,7 +1795,7 @@ PP(pp_listen)
 
 nuts:
     if (ckWARN(WARN_CLOSED))
-	report_evil_fh(gv, io, PL_op->op_type);
+	report_evil_fh(io, PL_op->op_type);
     SETERRNO(EBADF,SS_IVCHAN);
     RETPUSHUNDEF;
 #else
@@ -1871,7 +1871,7 @@ PP(pp_accept)
 
 nuts:
     if (ckWARN(WARN_CLOSED))
-	report_evil_fh(ggv, ggv ? GvIO(ggv) : 0, PL_op->op_type);
+	report_evil_fh(ggv ? GvIO(ggv) : 0, PL_op->op_type);
     SETERRNO(EBADF,SS_IVCHAN);
 
 badexit:
@@ -1898,7 +1898,7 @@ PP(pp_shutdown)
 
 nuts:
     if (ckWARN(WARN_CLOSED))
-	report_evil_fh(gv, io, PL_op->op_type);
+	report_evil_fh(io, PL_op->op_type);
     SETERRNO(EBADF,SS_IVCHAN);
     RETPUSHUNDEF;
 #else
@@ -1973,7 +1973,7 @@ PP(pp_ssockopt)
 
 nuts:
     if (ckWARN(WARN_CLOSED))
-	report_evil_fh(gv, io, optype);
+	report_evil_fh(io, optype);
     SETERRNO(EBADF,SS_IVCHAN);
 nuts2:
     RETPUSHUNDEF;
@@ -2037,7 +2037,7 @@ PP(pp_getpeername)
 
 nuts:
     if (ckWARN(WARN_CLOSED))
-	report_evil_fh(gv, io, optype);
+	report_evil_fh(io, optype);
     SETERRNO(EBADF,SS_IVCHAN);
 nuts2:
     RETPUSHUNDEF;
@@ -2094,7 +2094,7 @@ PP(pp_stat)
 
 	if (PL_laststatval < 0) {
 	    if (ckWARN2(WARN_UNOPENED,WARN_CLOSED))
-		report_evil_fh(gv, GvIO(gv), PL_op->op_type);
+		report_evil_fh(GvIO(gv), PL_op->op_type);
 	    max = 0;
 	}
     }
@@ -2558,7 +2558,7 @@ PP(pp_fttext)
 	else {
 	    if (ckWARN2(WARN_UNOPENED,WARN_CLOSED)) {
 		gv = cGVOP_gv;
-		report_evil_fh(gv, GvIO(gv), PL_op->op_type);
+		report_evil_fh(GvIO(gv), PL_op->op_type);
 	    }
 	    SETERRNO(EBADF,RMS_IFI);
 	    RETPUSHUNDEF;
@@ -2698,14 +2698,14 @@ PP(pp_chdir)
 	    }
 	    else {
 		if (ckWARN2(WARN_UNOPENED,WARN_CLOSED))
-		    report_evil_fh(gv, io, PL_op->op_type);
+		    report_evil_fh(io, PL_op->op_type);
 		SETERRNO(EBADF, RMS_IFI);
 		PUSHi(0);
 	    }
         }
 	else {
 	    if (ckWARN2(WARN_UNOPENED,WARN_CLOSED))
-		report_evil_fh(gv, io, PL_op->op_type);
+		report_evil_fh(io, PL_op->op_type);
 	    SETERRNO(EBADF,RMS_IFI);
 	    PUSHi(0);
 	}
