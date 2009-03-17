@@ -612,7 +612,7 @@ if ($have_ualarm) {
 if ($^OS_NAME =~ m/^(cygwin|MSWin)/) {
     diag "$^OS_NAME: timestamps may not be good enough";
     skip 38;
-} elsif (&Time::HiRes::d_hires_stat( < @_ )) {
+} elsif (Time::HiRes::d_hires_stat( < @_ )) {
     my @stat;
     my @atime;
     my @mtime;
