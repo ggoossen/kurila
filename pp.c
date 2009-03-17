@@ -103,7 +103,7 @@ PP(pp_rv2gv)
 		    }
 		    else {
 			const char * const name = CopSTASHPV(PL_curcop);
-			gv = newGVgen(name);
+			gv = GvREFCNT_inc(newGVgen(name));
 		    }
 		    prepare_SV_for_RV(sv);
 		    SvRV_set(sv, (SV*)gv);
