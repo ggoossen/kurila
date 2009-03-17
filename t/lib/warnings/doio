@@ -246,7 +246,7 @@ open \*FH1, "<", "TEST"; close \*FH1;
 no warnings 'io' ;
 open \*FH2, "<", "TEST"; close \*FH2;
 EXPECT
-Filehandle STDOUT reopened as FH1 only for input at - line 14 character 1.
+Filehandle STDOUT reopened only for input at - line 14 character 1.
 ########
 # doio.c [Perl_do_openn]
 use Config;
@@ -266,5 +266,5 @@ no warnings 'io' ;
 open my $fh2, ">", "doiowarn.tmp"; close $fh2;
 unlink "doiowarn.tmp";
 EXPECT
-Filehandle STDIN reopened as $fh1 only for output at - line 14 character 1.
+Filehandle STDIN reopened only for output at - line 14 character 1.
 ########
