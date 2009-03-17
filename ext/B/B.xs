@@ -541,7 +541,7 @@ PARENT_FAKELEX_FLAGS(sv)
 
 MODULE = B	PACKAGE = B::PV		PREFIX = Sv
 
-char*
+const char*
 SvPVX_const(sv)
 	B::PV	sv
 
@@ -613,7 +613,7 @@ SV*
 precomp(sv)
 	B::REGEXP	sv
     CODE:
-	RETVAL = newSVpvn( RX_PRECOMP(sv), RX_PRELEN(sv) );
+	RETVAL = newSVpvn( RX_PRECOMP(SvRe(sv)), RX_PRELEN(SvRe(sv)) );
     OUTPUT:
         RETVAL
 
@@ -721,9 +721,9 @@ void
 BmTABLE(sv)
 	B::BM	sv
 	STRLEN	len = NO_INIT
-	char *	str = NO_INIT
+	const char *	str = NO_INIT
     CODE:
-	str = SvPV(sv, len);
+	str = SvPV_const(sv, len);
 	/* Boyer-Moore table is just after string and its safety-margin \0 */
 	ST(0) = sv_2mortal(newSVpvn(str + len + PERL_FBM_TABLE_OFFSET, 256));
 

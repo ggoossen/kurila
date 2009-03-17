@@ -127,9 +127,9 @@ print \*STDOUT, "# we seem to have sparse files...\n";
 env::set_var('LC_ALL' => "C");
 
 my $r = system '../perl', '-e', <<'EOF';
-open($big, ">", "big");
+open(my $big, ">", "big");
 seek($big, 5_000_000_000, 0);
-print $big "big";
+print $big, "big";
 exit 0;
 EOF
 
@@ -239,12 +239,12 @@ print \*STDOUT, "ok 11\n";
 offset('tell($big)', 5_000_000_000);
 print \*STDOUT, "ok 12\n";
 
-my $big;
+my $big_str;
 
-fail unless read($big, $big, 3) == 3;
+fail unless read($big, $big_str, 3) == 3;
 print \*STDOUT, "ok 13\n";
 
-fail unless $big eq "big";
+fail unless $big_str eq "big";
 print \*STDOUT, "ok 14\n";
 
 # 705_032_704 = (I32)5_000_000_000

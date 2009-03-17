@@ -127,6 +127,11 @@ PERL_INLINE_CALLCONV IO*	Perl_SvIo(pTHX_ SV *sv)
 #define PERL_ARGS_ASSERT_SVIO	\
 	assert(sv)
 
+PERL_INLINE_CALLCONV REGEXP*	Perl_SvRe(pTHX_ SV *sv)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_SVRE	\
+	assert(sv)
+
 
 PERL_INLINE_CALLCONV const char*	Perl_SvPVX_const(pTHX_ SV *sv)
 			__attribute__nonnull__(pTHX_1);

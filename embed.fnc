@@ -92,6 +92,7 @@ Aip	|AV*	|SvAv	|NN SV *sv
 Aip	|HV*	|SvHv	|NN SV *sv
 Aip	|CV*	|SvCv	|NN SV *sv
 Aip	|IO*	|SvIo	|NN SV *sv
+Aip	|REGEXP*	|SvRe	|NN SV *sv
 
 Aip	|const char*	|SvPVX_const	|NN SV *sv
 Aip	|char*	|SvPVX_mutable	|NN SV *sv
