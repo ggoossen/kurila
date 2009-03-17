@@ -1887,6 +1887,9 @@ Perl_sv_2nv(pTHX_ register SV *const sv)
     dVAR;
     if (!sv)
 	return 0.0;
+    if ( SvOK(sv) && ! SvPVOK(sv) ) {
+	Perl_croak(aTHX_ "%s used as a number", Ddesc(sv));
+    }
     if ((SvTYPE(sv) == SVt_PVGV && SvVALID(sv))) {
 	/* FBMs use the same flag bit as SVf_IVisUV, so must let them
 	   cache IVs just in case.  */
