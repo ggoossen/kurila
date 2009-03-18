@@ -16,7 +16,7 @@ use Test::Builder::Module;
              $TODO
              plan
              can_ok  isa_ok
-             diag
+             diag info
              BAIL_OUT
             );
 
@@ -920,6 +920,21 @@ sub diag {
     $tb->diag(< @_);
 }
 
+=item B<diag>
+
+  diag(@informational_message);
+
+Prints an informational message which is guaranteed not to interfere with
+test output.  Like C<print> @informational_message is simply concatenated
+together.
+
+=cut
+
+sub info {
+    my $tb = Test::More->builder;
+
+    $tb->info(< @_);
+}
 
 =back
 

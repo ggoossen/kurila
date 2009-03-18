@@ -1106,6 +1106,39 @@ sub diag {
     return 0;
 }
 
+=item B<info>
+
+    $Test->info(@msgs);
+
+Prints out the given @msgs.  Like C<print>, arguments are simply
+appended together.
+
+=cut
+
+sub info {
+    my@($self, @< @msgs) =  @_;
+
+    return unless (nelems @msgs);
+
+    # Prevent printing headers when compiling (i.e. -c)
+    return if $^COMPILING;
+
+    # Smash args together like print does.
+    # Convert undef to 'undef' so its readable.
+    my $msg = join '', map { defined($_) ?? $_ !! 'undef' }, @msgs;
+
+    # Escape each line with a #.
+    $msg =~ s/^/# /gm;
+
+    # Stick a newline on the end if it needs it.
+    $msg .= "\n" unless $msg =~ m/\n\Z/;
+
+    local $Level = $Level + 1;
+    $self->_print($msg);
+
+    return 0;
+}
+
 =begin _private
 
 =item B<_print>
