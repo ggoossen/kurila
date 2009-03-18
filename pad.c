@@ -1261,14 +1261,6 @@ void Perl_cv_setcv(pTHX_ CV *dst, CV* src)
 {
     dVAR;
     I32 ix;
-    AV* const srcpadlist = CvPADLIST(src);
-    const AV* const srcpad_name = (AV*)*av_fetch(srcpadlist, 0, FALSE);
-    const AV* const srcpad = (AV*)*av_fetch(srcpadlist, 1, FALSE);
-    SV** const pname = AvARRAY(srcpad_name);
-    SV** const ppad = AvARRAY(srcpad);
-    const I32 fname = AvFILLp(srcpad_name);
-    const I32 fpad = AvFILLp(srcpad);
-    PAD* parent_padnames = PADLIST_PADNAMES(srcpadlist);
     PAD* parent_pad = PL_comppad;
     SV** outpad;
 
@@ -1286,65 +1278,80 @@ void Perl_cv_setcv(pTHX_ CV *dst, CV* src)
     CvFLAGS(dst) = CvFLAGS(src) & ~(CVf_CLONE);
     CvCLONED_on(dst);
 
-    OP_REFCNT_LOCK;
-    CvROOT(dst)		= OpREFCNT_inc(CvROOT(src));
-    OP_REFCNT_UNLOCK;
-    CvSTART(dst)		= CvSTART(src);
+    if (CvISXSUB(src)) {
+	CvXSUB(dst) = CvXSUB(src);
+	CvXSUBANY(dst) = CvXSUBANY(src);
+    }
+    else {
+	AV* const srcpadlist = CvPADLIST(src);
+	const AV* const srcpad_name = (AV*)*av_fetch(srcpadlist, 0, FALSE);
+	const AV* const srcpad = (AV*)*av_fetch(srcpadlist, 1, FALSE);
+	SV** const pname = AvARRAY(srcpad_name);
+	SV** const ppad = AvARRAY(srcpad);
+	const I32 fname = AvFILLp(srcpad_name);
+	const I32 fpad = AvFILLp(srcpad);
+	PAD* parent_padnames = PADLIST_PADNAMES(srcpadlist);
 
-    if (SvPOK(src))
-	sv_setpvn((SV*)dst, SvPVX_const((SV*)src), SvCUR(src));
+	OP_REFCNT_LOCK;
+	CvROOT(dst)		= OpREFCNT_inc(CvROOT(src));
+	OP_REFCNT_UNLOCK;
+	CvSTART(dst)		= CvSTART(src);
 
-    CvPADLIST(dst) = pad_new(padnew_CLONE|padnew_SAVE,
-        parent_padnames,
-	parent_pad,
-	0);
+	if (SvPOK(src))
+	    sv_setpvn((SV*)dst, SvPVX_const((SV*)src), SvCUR(src));
 
-    av_fill(PL_comppad, fpad);
-    for (ix = fname; ix >= PAD_NAME_START_INDEX; ix--)
-	av_store(PL_comppad_name, ix, SvREFCNT_inc(pname[ix]));
+	CvPADLIST(dst) = pad_new(padnew_CLONE|padnew_SAVE,
+	    parent_padnames,
+	    parent_pad,
+	    0);
 
-    PL_curpad = AvARRAY(PL_comppad);
+	av_fill(PL_comppad, fpad);
+	for (ix = fname; ix >= PAD_NAME_START_INDEX; ix--)
+	    av_store(PL_comppad_name, ix, SvREFCNT_inc(pname[ix]));
 
-    for (ix = fpad; ix >= PAD_NAME_START_INDEX; ix--) {
-	SV* const namesv = (ix <= fname) ? pname[ix] : NULL;
-	SV *sv = NULL;
-	if (namesv && namesv != &PL_sv_undef) { /* lexical */
-	    if (SvFAKE(namesv)) {   /* lexical from outside? */
-		sv = outpad[PARENT_PAD_INDEX(namesv)];
-		assert(sv);
-		/* formats may have an inactive parent,
-		   while my $x if $false can leave an active var marked as
-		   stale. And state vars are always available */
-		if (SvPADSTALE(sv)) {
-		    if (ckWARN(WARN_CLOSURE))
-			Perl_warner(aTHX_ packWARN(WARN_CLOSURE),
-			    "Variable \"%s\" is not available", SvPVX_const(namesv));
-		    sv = NULL;
+	PL_curpad = AvARRAY(PL_comppad);
+
+	for (ix = fpad; ix >= PAD_NAME_START_INDEX; ix--) {
+	    SV* const namesv = (ix <= fname) ? pname[ix] : NULL;
+	    SV *sv = NULL;
+	    if (namesv && namesv != &PL_sv_undef) { /* lexical */
+		if (SvFAKE(namesv)) {   /* lexical from outside? */
+		    sv = outpad[PARENT_PAD_INDEX(namesv)];
+		    assert(sv);
+		    /* formats may have an inactive parent,
+		       while my $x if $false can leave an active var marked as
+		       stale. And state vars are always available */
+		    if (SvPADSTALE(sv)) {
+			if (ckWARN(WARN_CLOSURE))
+			    Perl_warner(aTHX_ packWARN(WARN_CLOSURE),
+				"Variable \"%s\" is not available", SvPVX_const(namesv));
+			sv = NULL;
+		    }
+		    else 
+			SvREFCNT_inc_simple_void_NN(sv);
 		}
-		else 
-		    SvREFCNT_inc_simple_void_NN(sv);
+		if (!sv) {
+		    const char sigil = SvPVX_const(namesv)[0];
+		    if (sigil == '&')
+			sv = SvREFCNT_inc(ppad[ix]);
+		    else if (sigil == '@')
+			sv = (SV*)newAV();
+		    else if (sigil == '%')
+			sv = (SV*)newHV();
+		    else
+			sv = newSV(0);
+		    SvPADMY_on(sv);
+		}
 	    }
-	    if (!sv) {
-                const char sigil = SvPVX_const(namesv)[0];
-                if (sigil == '&')
-		    sv = SvREFCNT_inc(ppad[ix]);
-                else if (sigil == '@')
-		    sv = (SV*)newAV();
-                else if (sigil == '%')
-		    sv = (SV*)newHV();
-		else
-		    sv = newSV(0);
-		SvPADMY_on(sv);
+	    else if (IS_PADGV(ppad[ix]) || IS_PADCONST(ppad[ix])) {
+		sv = SvREFCNT_inc_NN(ppad[ix]);
 	    }
+	    else {
+		sv = newSV(0);
+		SvPADTMP_on(sv);
+	    }
+	    PL_curpad[ix] = sv;
 	}
-	else if (IS_PADGV(ppad[ix]) || IS_PADCONST(ppad[ix])) {
-	    sv = SvREFCNT_inc_NN(ppad[ix]);
-	}
-	else {
-	    sv = newSV(0);
-	    SvPADTMP_on(sv);
-	}
-	PL_curpad[ix] = sv;
     }
 
     DEBUG_Xv(
