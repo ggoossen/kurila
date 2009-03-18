@@ -607,7 +607,11 @@ PERL_CALLCONV void	Perl_do_chop(pTHX_ SV *astr, SV *sv)
 #define PERL_ARGS_ASSERT_DO_CHOP	\
 	assert(astr); assert(sv)
 
-PERL_CALLCONV bool	Perl_do_close(pTHX_ GV* gv, bool not_implicit);
+PERL_CALLCONV bool	Perl_do_close(pTHX_ GV* gv, bool not_implicit)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_DO_CLOSE	\
+	assert(gv)
+
 PERL_CALLCONV bool	Perl_do_eof(pTHX_ GV* gv)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_DO_EOF	\

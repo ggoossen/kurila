@@ -695,9 +695,9 @@ Perl_do_close(pTHX_ GV *gv, bool not_implicit)
     bool retval;
     IO *io;
 
-    if (!gv)
-	gv = PL_argvgv;
-    if (!gv || SvTYPE(gv) != SVt_PVGV) {
+    PERL_ARGS_ASSERT_DO_CLOSE;
+
+    if (SvTYPE(gv) != SVt_PVGV) {
 	if (not_implicit)
 	    SETERRNO(EBADF,SS_IVCHAN);
 	return FALSE;
