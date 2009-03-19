@@ -670,7 +670,7 @@ T_OPAQUEPTR_OUT_struct( test )
   av_push(res, newSViv(test->a));
   av_push(res, newSViv(test->b));
   av_push(res, newSVnv(test->c));
-  mXPUSHs(AvSv(res));
+  mXPUSHs(avTsv(res));
 
 
 =item T_OPAQUE

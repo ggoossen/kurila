@@ -691,13 +691,13 @@ S_pad_findlex(pTHX_ const char *name, PAD *padnames, PAD* pad, U32 seq)
         parent_pad = *av_fetch(padnames, PAD_PARENTPAD_INDEX, 0);
         parent_seq = *av_fetch(padnames, PAD_PARENTSEQ_INDEX, 0);
 
-	offset = pad_findlex(name, SvAv(*parent_padnames), SvAv(parent_pad), SvIV(parent_seq));
+	offset = pad_findlex(name, svTav(*parent_padnames), svTav(parent_pad), SvIV(parent_seq));
 	if ((PADOFFSET)offset == NOT_IN_PAD)
 	    return NOT_IN_PAD;
 
 	{
 	    /* found in an outer CV. Add appropriate fake entry to this pad */
-	    SV ** out_name_sv = av_fetch(SvAv(*parent_padnames), offset, 0);
+	    SV ** out_name_sv = av_fetch(svTav(*parent_padnames), offset, 0);
 
 	    SV *new_namesv;
 	    AV *  const ocomppad_name = PL_comppad_name;
@@ -727,7 +727,7 @@ S_pad_findlex(pTHX_ const char *name, PAD *padnames, PAD* pad, U32 seq)
 		SvIV_set(padflags, SvIV(padflags) | PADf_CLONE);
 	    }
 	    else {
-		SV ** out_sv = av_fetch(SvAv(parent_pad), offset, 0);
+		SV ** out_sv = av_fetch(svTav(parent_pad), offset, 0);
 		av_store(PL_comppad, new_offset, SvREFCNT_inc(*out_sv));
 		DEBUG_Xv(PerlIO_printf(Perl_debug_log,
 			"Pad findlex padnames=0x%"UVxf" pad=0x%"UVxf" saved captured sv 0x%"UVxf" at offset %ld\n",
@@ -1460,7 +1460,7 @@ Perl_pad_savelex(pTHX_ PAD *padnames, PAD* pad, U32 seq)
 
     while (parent_padnamesref && SvAVOK(*parent_padnamesref)) {
 	I32 offset;
-	AV* parent_padnames = SvAv(*parent_padnamesref);
+	AV* parent_padnames = svTav(*parent_padnamesref);
 	for (offset = av_len(parent_padnames);
 	     offset >= PAD_NAME_START_INDEX;
 	     offset--) {

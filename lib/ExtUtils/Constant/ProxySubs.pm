@@ -386,7 +386,7 @@ EXPLODE
             if (!notfoundcv) \{
 		Perl_croak(aTHX_ "'constant_not_found' could not be found");
             \}
-            sv_setsv((SV*)gv, sv_2mortal(newRV_inc(CvSv(notfoundcv))));
+            sv_setsv((SV*)gv, sv_2mortal(newRV_inc(cvTsv(notfoundcv))));
 #ifndef SYMBIAN
 	    hv_store($($c_subname)_missing, value_for_notfound->name,
 			  value_for_notfound->namelen, &PL_sv_yes, 0);

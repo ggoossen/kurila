@@ -18,8 +18,8 @@ PERL_CONTEXT * Perl_PushBlock(U8 t, SV** sp, U8 gimme) {
     new_dynascope = newHV();
     if (PL_dynamicscope)
         (void)hv_stores( new_dynascope, "parent", newRV(PL_dynamicscope) );
-    (void)hv_stores( new_dynascope, "onleave", AvSv(newAV()) );
-    PL_dynamicscope = HvSv(new_dynascope);
+    (void)hv_stores( new_dynascope, "onleave", avTsv(newAV()) );
+    PL_dynamicscope = hvTsv(new_dynascope);
 
     DEBUG_l( PerlIO_printf(Perl_debug_log, "Entering block %ld, type %s\n",
             (long)cxstack_ix, PL_block_type[CxTYPE(cx)]); );
@@ -28,9 +28,9 @@ PERL_CONTEXT * Perl_PushBlock(U8 t, SV** sp, U8 gimme) {
 
 PERL_CONTEXT * Perl_PopBlock() {
     PERL_CONTEXT * cx;
-    SV** onleave_ref = hv_fetchs(SvHv(PL_dynamicscope), "onleave", 0);
+    SV** onleave_ref = hv_fetchs(svThv(PL_dynamicscope), "onleave", 0);
     if (onleave_ref && SvAVOK(*onleave_ref)) {
-        AV* onleave = SvAv(*onleave_ref);
+        AV* onleave = svTav(*onleave_ref);
         while (av_len(onleave) >= 0) {
             SV* onleave_item = av_pop(onleave);
             PUSHMARK(PL_stack_sp);

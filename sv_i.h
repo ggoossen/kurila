@@ -94,40 +94,40 @@ static __inline__ AV* inline_av_mortalcopy(pTHX_ AV *av) {
 }
 
 /* XV to SV conversion "macros" */
-SV* Perl_AvSv(pTHX_ AV *av) { return (SV*)av; }
-SV* Perl_HvSv(pTHX_ HV *hv) { return (SV*)hv; }
-SV* Perl_CvSv(pTHX_ CV *cv) { return (SV*)cv; }
-SV* Perl_GvSv(pTHX_ GV *gv) { return (SV*)gv; }
-SV* Perl_ReSv(pTHX_ REGEXP *re) { return (SV*)re; }
-SV* Perl_IoSv(pTHX_ struct io *io) { return (SV*)io; }
+SV* Perl_avTsv(pTHX_ AV *av) { return (SV*)av; }
+SV* Perl_hvTsv(pTHX_ HV *hv) { return (SV*)hv; }
+SV* Perl_cvTsv(pTHX_ CV *cv) { return (SV*)cv; }
+SV* Perl_gvTsv(pTHX_ GV *gv) { return (SV*)gv; }
+SV* Perl_reTsv(pTHX_ REGEXP *re) { return (SV*)re; }
+SV* Perl_ioTsv(pTHX_ struct io *io) { return (SV*)io; }
 
 
-AV* Perl_SvAv(pTHX_ SV *sv) {
-    PERL_ARGS_ASSERT_SVAV;
+AV* Perl_svTav(pTHX_ SV *sv) {
+    PERL_ARGS_ASSERT_SVTAV;
     assert(SvAVOK(sv));
     return (AV*)sv;
 }
 
-HV* Perl_SvHv(pTHX_ SV *sv) {
-    PERL_ARGS_ASSERT_SVHV;
+HV* Perl_svThv(pTHX_ SV *sv) {
+    PERL_ARGS_ASSERT_SVTHV;
     assert(SvHVOK(sv));
     return (HV*)sv;
 }
 
-CV* Perl_SvCv(pTHX_ SV *sv) {
-    PERL_ARGS_ASSERT_SVCV;
+CV* Perl_svTcv(pTHX_ SV *sv) {
+    PERL_ARGS_ASSERT_SVTCV;
     assert(SvCVOK(sv));
     return (CV*)sv;
 }
 
-IO* Perl_SvIo(pTHX_ SV *sv) {
-    PERL_ARGS_ASSERT_SVIO;
+IO* Perl_svTio(pTHX_ SV *sv) {
+    PERL_ARGS_ASSERT_SVTIO;
     assert(SvIOOK(sv));
     return (IO*)sv;
 }
 
-REGEXP* Perl_SvRe(pTHX_ SV *sv) {
-    PERL_ARGS_ASSERT_SVRE;
+REGEXP* Perl_svTre(pTHX_ SV *sv) {
+    PERL_ARGS_ASSERT_SVTRE;
     assert(SvTYPE(sv) == SVt_REGEXP);
     return (REGEXP*)sv;
 }
@@ -177,7 +177,7 @@ SV* LocationFilename(pTHX_ SV *location) {
     SV** fn;
     if ( ! location || ! SvAVOK(location) )
         return NULL;
-    fn = av_fetch(SvAv(location), 0, 0);
+    fn = av_fetch(svTav(location), 0, 0);
     if ( ! fn )
         return NULL;
     return *fn;

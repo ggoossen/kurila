@@ -132,7 +132,7 @@ XS(XS_Internals_hv_clear_placehold)
 	SV * const sv = SvRV(ST(0));
         if (!SvHVOK(sv))
             Perl_croak(aTHX_ "argument to hv_clear_placeholders must be an HASH not a %s", Ddesc(sv));
-	hv_clear_placeholders(SvHv(sv));
+	hv_clear_placeholders(svThv(sv));
 	XSRETURN(0);
     }
 }

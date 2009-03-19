@@ -39,32 +39,32 @@
 #endif
 #define get_context		Perl_get_context
 #define set_context		Perl_set_context
-#define HvSv			Perl_HvSv
-#define AvSv			Perl_AvSv
-#define CvSv			Perl_CvSv
-#define GvSv			Perl_GvSv
-#define IoSv			Perl_IoSv
-#define ReSv			Perl_ReSv
-#define SvAv			Perl_SvAv
-#define SvHv			Perl_SvHv
-#define SvCv			Perl_SvCv
-#define SvIo			Perl_SvIo
-#define SvRe			Perl_SvRe
+#define hvTsv			Perl_hvTsv
+#define avTsv			Perl_avTsv
+#define cvTsv			Perl_cvTsv
+#define gvTsv			Perl_gvTsv
+#define ioTsv			Perl_ioTsv
+#define reTsv			Perl_reTsv
+#define svTav			Perl_svTav
+#define svThv			Perl_svThv
+#define svTcv			Perl_svTcv
+#define svTio			Perl_svTio
+#define svTre			Perl_svTre
 #define SvPVX_const		Perl_SvPVX_const
 #define SvPVX_mutable		Perl_SvPVX_mutable
-#define AvREFCNT_dec(a)		Perl_SvREFCNT_dec(aTHX_ AvSv(a))
-#define HvREFCNT_dec(a)		Perl_SvREFCNT_dec(aTHX_ HvSv(a))
-#define CvREFCNT_dec(a)		Perl_SvREFCNT_dec(aTHX_ CvSv(a))
-#define GvREFCNT_dec(a)		Perl_SvREFCNT_dec(aTHX_ GvSv(a))
-#define IoREFCNT_dec(a)		Perl_SvREFCNT_dec(aTHX_ IoSv(a))
-#define ReREFCNT_dec(a)		Perl_SvREFCNT_dec(aTHX_ ReSv(a))
+#define AvREFCNT_dec(a)		Perl_SvREFCNT_dec(aTHX_ avTsv(a))
+#define HvREFCNT_dec(a)		Perl_SvREFCNT_dec(aTHX_ hvTsv(a))
+#define CvREFCNT_dec(a)		Perl_SvREFCNT_dec(aTHX_ cvTsv(a))
+#define GvREFCNT_dec(a)		Perl_SvREFCNT_dec(aTHX_ gvTsv(a))
+#define IoREFCNT_dec(a)		Perl_SvREFCNT_dec(aTHX_ ioTsv(a))
+#define ReREFCNT_dec(a)		Perl_SvREFCNT_dec(aTHX_ reTsv(a))
 #define SvREFCNT_dec		Perl_SvREFCNT_dec
-#define AvTMPREFCNT_inc(a)		Perl_SvTMPREFCNT_inc(aTHX_ AvSv(a))
-#define HvTMPREFCNT_inc(a)		Perl_SvTMPREFCNT_inc(aTHX_ HvSv(a))
-#define CvTMPREFCNT_inc(a)		Perl_SvTMPREFCNT_inc(aTHX_ CvSv(a))
-#define GvTMPREFCNT_inc(a)		Perl_SvTMPREFCNT_inc(aTHX_ GvSv(a))
-#define IoTMPREFCNT_inc(a)		Perl_SvTMPREFCNT_inc(aTHX_ IoSv(a))
-#define ReTMPREFCNT_inc(a)		Perl_SvTMPREFCNT_inc(aTHX_ ReSv(a))
+#define AvTMPREFCNT_inc(a)		Perl_SvTMPREFCNT_inc(aTHX_ avTsv(a))
+#define HvTMPREFCNT_inc(a)		Perl_SvTMPREFCNT_inc(aTHX_ hvTsv(a))
+#define CvTMPREFCNT_inc(a)		Perl_SvTMPREFCNT_inc(aTHX_ cvTsv(a))
+#define GvTMPREFCNT_inc(a)		Perl_SvTMPREFCNT_inc(aTHX_ gvTsv(a))
+#define IoTMPREFCNT_inc(a)		Perl_SvTMPREFCNT_inc(aTHX_ ioTsv(a))
+#define ReTMPREFCNT_inc(a)		Perl_SvTMPREFCNT_inc(aTHX_ reTsv(a))
 #define SvTMPREFCNT_inc		Perl_SvTMPREFCNT_inc
 #define SvIV			Perl_SvIV
 #define SvUV			Perl_SvUV
@@ -825,12 +825,12 @@
 #define sv_2cv			Perl_sv_2cv
 #define sv_2io			Perl_sv_2io
 #define sv_2iv			Perl_sv_2iv
-#define av_2mortal(a)		SvAv(Perl_sv_2mortal(aTHX_ AvSv(a)))
-#define hv_2mortal(a)		SvHv(Perl_sv_2mortal(aTHX_ HvSv(a)))
-#define cv_2mortal(a)		SvCv(Perl_sv_2mortal(aTHX_ CvSv(a)))
-#define gv_2mortal(a)		SvGv(Perl_sv_2mortal(aTHX_ GvSv(a)))
-#define io_2mortal(a)		SvIo(Perl_sv_2mortal(aTHX_ IoSv(a)))
-#define re_2mortal(a)		SvRe(Perl_sv_2mortal(aTHX_ ReSv(a)))
+#define av_2mortal(a)		svTav(Perl_sv_2mortal(aTHX_ avTsv(a)))
+#define hv_2mortal(a)		svThv(Perl_sv_2mortal(aTHX_ hvTsv(a)))
+#define cv_2mortal(a)		svTcv(Perl_sv_2mortal(aTHX_ cvTsv(a)))
+#define gv_2mortal(a)		svTgv(Perl_sv_2mortal(aTHX_ gvTsv(a)))
+#define io_2mortal(a)		svTio(Perl_sv_2mortal(aTHX_ ioTsv(a)))
+#define re_2mortal(a)		svTre(Perl_sv_2mortal(aTHX_ reTsv(a)))
 #define sv_2mortal		Perl_sv_2mortal
 #define sv_2nv			Perl_sv_2nv
 #ifdef PERL_CORE
@@ -2225,32 +2225,32 @@
 #endif
 #define get_context		Perl_get_context
 #define set_context		Perl_set_context
-#define HvSv(a)			Perl_HvSv(aTHX_ a)
-#define AvSv(a)			Perl_AvSv(aTHX_ a)
-#define CvSv(a)			Perl_CvSv(aTHX_ a)
-#define GvSv(a)			Perl_GvSv(aTHX_ a)
-#define IoSv(a)			Perl_IoSv(aTHX_ a)
-#define ReSv(a)			Perl_ReSv(aTHX_ a)
-#define SvAv(a)			Perl_SvAv(aTHX_ a)
-#define SvHv(a)			Perl_SvHv(aTHX_ a)
-#define SvCv(a)			Perl_SvCv(aTHX_ a)
-#define SvIo(a)			Perl_SvIo(aTHX_ a)
-#define SvRe(a)			Perl_SvRe(aTHX_ a)
+#define hvTsv(a)		Perl_hvTsv(aTHX_ a)
+#define avTsv(a)		Perl_avTsv(aTHX_ a)
+#define cvTsv(a)		Perl_cvTsv(aTHX_ a)
+#define gvTsv(a)		Perl_gvTsv(aTHX_ a)
+#define ioTsv(a)		Perl_ioTsv(aTHX_ a)
+#define reTsv(a)		Perl_reTsv(aTHX_ a)
+#define svTav(a)		Perl_svTav(aTHX_ a)
+#define svThv(a)		Perl_svThv(aTHX_ a)
+#define svTcv(a)		Perl_svTcv(aTHX_ a)
+#define svTio(a)		Perl_svTio(aTHX_ a)
+#define svTre(a)		Perl_svTre(aTHX_ a)
 #define SvPVX_const(a)		Perl_SvPVX_const(aTHX_ a)
 #define SvPVX_mutable(a)	Perl_SvPVX_mutable(aTHX_ a)
-#define AvREFCNT_dec(a)		Perl_SvREFCNT_dec(aTHX_ AvSv(a))
-#define HvREFCNT_dec(a)		Perl_SvREFCNT_dec(aTHX_ HvSv(a))
-#define CvREFCNT_dec(a)		Perl_SvREFCNT_dec(aTHX_ CvSv(a))
-#define GvREFCNT_dec(a)		Perl_SvREFCNT_dec(aTHX_ GvSv(a))
-#define IoREFCNT_dec(a)		Perl_SvREFCNT_dec(aTHX_ IoSv(a))
-#define ReREFCNT_dec(a)		Perl_SvREFCNT_dec(aTHX_ ReSv(a))
+#define AvREFCNT_dec(a)		Perl_SvREFCNT_dec(aTHX_ avTsv(a))
+#define HvREFCNT_dec(a)		Perl_SvREFCNT_dec(aTHX_ hvTsv(a))
+#define CvREFCNT_dec(a)		Perl_SvREFCNT_dec(aTHX_ cvTsv(a))
+#define GvREFCNT_dec(a)		Perl_SvREFCNT_dec(aTHX_ gvTsv(a))
+#define IoREFCNT_dec(a)		Perl_SvREFCNT_dec(aTHX_ ioTsv(a))
+#define ReREFCNT_dec(a)		Perl_SvREFCNT_dec(aTHX_ reTsv(a))
 #define SvREFCNT_dec(a)		Perl_SvREFCNT_dec(aTHX_ a)
-#define AvTMPREFCNT_inc(a)		Perl_SvTMPREFCNT_inc(aTHX_ AvSv(a))
-#define HvTMPREFCNT_inc(a)		Perl_SvTMPREFCNT_inc(aTHX_ HvSv(a))
-#define CvTMPREFCNT_inc(a)		Perl_SvTMPREFCNT_inc(aTHX_ CvSv(a))
-#define GvTMPREFCNT_inc(a)		Perl_SvTMPREFCNT_inc(aTHX_ GvSv(a))
-#define IoTMPREFCNT_inc(a)		Perl_SvTMPREFCNT_inc(aTHX_ IoSv(a))
-#define ReTMPREFCNT_inc(a)		Perl_SvTMPREFCNT_inc(aTHX_ ReSv(a))
+#define AvTMPREFCNT_inc(a)		Perl_SvTMPREFCNT_inc(aTHX_ avTsv(a))
+#define HvTMPREFCNT_inc(a)		Perl_SvTMPREFCNT_inc(aTHX_ hvTsv(a))
+#define CvTMPREFCNT_inc(a)		Perl_SvTMPREFCNT_inc(aTHX_ cvTsv(a))
+#define GvTMPREFCNT_inc(a)		Perl_SvTMPREFCNT_inc(aTHX_ gvTsv(a))
+#define IoTMPREFCNT_inc(a)		Perl_SvTMPREFCNT_inc(aTHX_ ioTsv(a))
+#define ReTMPREFCNT_inc(a)		Perl_SvTMPREFCNT_inc(aTHX_ reTsv(a))
 #define SvTMPREFCNT_inc(a)	Perl_SvTMPREFCNT_inc(aTHX_ a)
 #define SvIV(a)			Perl_SvIV(aTHX_ a)
 #define SvUV(a)			Perl_SvUV(aTHX_ a)
@@ -2993,12 +2993,12 @@
 #define sv_2cv(a,b,c)		Perl_sv_2cv(aTHX_ a,b,c)
 #define sv_2io(a)		Perl_sv_2io(aTHX_ a)
 #define sv_2iv(a)		Perl_sv_2iv(aTHX_ a)
-#define sv_2mortal(a)		SvAv(Perl_sv_2mortal(aTHX_ AvSv(a)))
-#define sv_2mortal(a)		SvHv(Perl_sv_2mortal(aTHX_ HvSv(a)))
-#define sv_2mortal(a)		SvCv(Perl_sv_2mortal(aTHX_ CvSv(a)))
-#define sv_2mortal(a)		SvGv(Perl_sv_2mortal(aTHX_ GvSv(a)))
-#define sv_2mortal(a)		SvIo(Perl_sv_2mortal(aTHX_ IoSv(a)))
-#define sv_2mortal(a)		SvRe(Perl_sv_2mortal(aTHX_ ReSv(a)))
+#define sv_2mortal(a)		svTav(Perl_sv_2mortal(aTHX_ avTsv(a)))
+#define sv_2mortal(a)		svThv(Perl_sv_2mortal(aTHX_ hvTsv(a)))
+#define sv_2mortal(a)		svTcv(Perl_sv_2mortal(aTHX_ cvTsv(a)))
+#define sv_2mortal(a)		svTgv(Perl_sv_2mortal(aTHX_ gvTsv(a)))
+#define sv_2mortal(a)		svTio(Perl_sv_2mortal(aTHX_ ioTsv(a)))
+#define sv_2mortal(a)		svTre(Perl_sv_2mortal(aTHX_ reTsv(a)))
 #define sv_2mortal(a)		Perl_sv_2mortal(aTHX_ a)
 #define sv_2nv(a)		Perl_sv_2nv(aTHX_ a)
 #ifdef PERL_CORE

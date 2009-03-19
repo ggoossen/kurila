@@ -1191,11 +1191,11 @@ PP(pp_grepwhile)
     newitem = POPs;
     value = POPs;
     cvp = SP;
-    src = SvAv(SP[-1]);
+    src = svTav(SP[-1]);
     dst = SP[-2];
 
     if (SvTRUE(newitem)) {
-	av_push(SvAv(dst), SvREFCNT_inc(value));
+	av_push(svTav(dst), SvREFCNT_inc(value));
     }
 
     /* All done yet? */
@@ -1409,7 +1409,7 @@ PP(pp_entersub)
 	    AV* av;
 	    SV* avsv = PAD_SVl(PAD_ARGS_INDEX);
 	    sv_upgrade(avsv, SVt_PVAV);
-	    av = SvAv(avsv);
+	    av = svTav(avsv);
 	    SAVECLEARSV(PAD_SVl(PAD_ARGS_INDEX));
 	    AvREAL_on(av);
 	    CX_CURPAD_SAVE(cx->blk_sub);
@@ -1501,7 +1501,7 @@ Perl_sub_crush_depth(pTHX_ CV *cv)
 
     loc = SvLOCATION((SV*)cv);
     if (loc && SvAVOK(loc)) {
-	name = av_fetch(SvAv(loc), 3, FALSE);
+	name = av_fetch(svTav(loc), 3, FALSE);
     }
     Perl_warner(aTHX_ packWARN(WARN_RECURSION), 
 	"Deep recursion on subroutine \"%s\"",
@@ -1754,7 +1754,7 @@ S_method_common(pTHX_ SV* meth, U32* hashp)
 		       leaf, (int)packlen, packname, (int)packlen, packname);
 	}
     }
-    return CvSv(cv);
+    return cvTsv(cv);
 }
 
 /*

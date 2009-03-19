@@ -2662,7 +2662,7 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV* sstr, const I32 flags)
     if (dtype == SVt_PVCV) {
 	sv_clear_body(dstr);
 	sv_upgrade(dstr, SVt_PVCV);
-	cv_setcv(SvCv(dstr), SvCv(sstr));
+	cv_setcv(svTcv(dstr), svTcv(sstr));
     } else if (dtype == SVt_PVAV) {
 	int i;
 	int len = av_len( (AV*)sstr);
@@ -4345,7 +4345,7 @@ Perl_sv_clear(pTHX_ register SV *const sv)
 		if ( ! PL_destroyav )
 		    PL_destroyav = newAV();
 		av_push(PL_destroyav, SvREFCNT_inc(sv));
-		av_push(PL_destroyav, SvREFCNT_inc(CvSv(destructor)));
+		av_push(PL_destroyav, SvREFCNT_inc(cvTsv(destructor)));
 		return;
 	    }
 	}

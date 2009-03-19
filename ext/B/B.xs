@@ -613,7 +613,7 @@ SV*
 precomp(sv)
 	B::REGEXP	sv
     CODE:
-	RETVAL = newSVpvn( RX_PRECOMP(SvRe(sv)), RX_PRELEN(SvRe(sv)) );
+	RETVAL = newSVpvn( RX_PRECOMP(svTre(sv)), RX_PRELEN(svTre(sv)) );
     OUTPUT:
         RETVAL
 

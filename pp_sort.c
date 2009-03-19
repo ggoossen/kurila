@@ -1531,7 +1531,7 @@ PP(pp_sort)
 	Perl_croak(aTHX_ "%s expected ARRAY but got %s", 
 	    OP_DESC(PL_op), Ddesc(TOPs));
     }
-    av = SvAv(sv_mortalcopy(POPs));
+    av = svTav(sv_mortalcopy(POPs));
     p1 = p2 = AvARRAY(av);
     max = AvFILL(av) + 1;
 
@@ -1652,7 +1652,7 @@ PP(pp_sort)
     
     LEAVE;
     PL_stack_sp = ORIGMARK;
-    *++PL_stack_sp = AvSv(av);
+    *++PL_stack_sp = avTsv(av);
     return nextop;
 }
 

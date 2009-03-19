@@ -423,7 +423,7 @@ perl_construct(pTHXx)
     PL_hints = DEFAULT_HINTS;
 
     PL_compiling.cop_hints_hash = newHV();
-    PL_dynamicscope = HvSv(newHV());
+    PL_dynamicscope = hvTsv(newHV());
 
     ENTER;
 }
@@ -3973,8 +3973,8 @@ S_init_predump_symbols(pTHX)
     PL_stdingv = gv_fetchpvs("STDIN", GV_ADD|GV_NOTQUAL, SVt_PVIO);
     GvMULTI_on(PL_stdingv);
     io = GvIOp(PL_stdingv);
-    SVcpREPLACE(SvLOCATION(io), AvSv(newAV()));
-    av_store(SvAv(SvLOCATION(io)),
+    SVcpREPLACE(SvLOCATION(io), avTsv(newAV()));
+    av_store(svTav(SvLOCATION(io)),
 	LOC_NAME_INDEX, newSVpv("STDIN", 0));
     IoTYPE(io) = IoTYPE_RDONLY;
     IoIFP(io) = PerlIO_stdin();
@@ -3985,8 +3985,8 @@ S_init_predump_symbols(pTHX)
     tmpgv = gv_fetchpvs("STDOUT", GV_ADD|GV_NOTQUAL, SVt_PVIO);
     GvMULTI_on(tmpgv);
     io = GvIOp(tmpgv);
-    SVcpREPLACE(SvLOCATION(io), AvSv(newAV()));
-    av_store(SvAv(SvLOCATION(io)),
+    SVcpREPLACE(SvLOCATION(io), avTsv(newAV()));
+    av_store(svTav(SvLOCATION(io)),
 	LOC_NAME_INDEX, newSVpv("STDOUT", 0));
     IoTYPE(io) = IoTYPE_WRONLY;
     IoOFP(io) = IoIFP(io) = PerlIO_stdout();

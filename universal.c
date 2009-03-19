@@ -293,7 +293,7 @@ XS(XS_UNIVERSAL_can)
     if (pkg) {
 	CV * const cv = gv_fetchmethod(pkg, name);
         if (cv)
-	    rv = sv_2mortal(newRV(CvSv(cv)));
+	    rv = sv_2mortal(newRV(cvTsv(cv)));
     }
 
     ST(0) = rv;

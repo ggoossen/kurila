@@ -82,17 +82,17 @@ END_EXTERN_C
 
 /* functions with flag 'n' should come before here */
 START_EXTERN_C
-Aip	|SV*	|HvSv	|NULLOK HV *hv
-Aip	|SV*	|AvSv	|NULLOK AV *av
-Aip	|SV*	|CvSv	|NULLOK CV *cv
-Aip	|SV*	|GvSv	|NULLOK GV *gv
-Aip	|SV*	|IoSv	|NULLOK struct io *io
-Aip	|SV*	|ReSv	|NULLOK REGEXP *re
-Aip	|AV*	|SvAv	|NN SV *sv
-Aip	|HV*	|SvHv	|NN SV *sv
-Aip	|CV*	|SvCv	|NN SV *sv
-Aip	|IO*	|SvIo	|NN SV *sv
-Aip	|REGEXP*	|SvRe	|NN SV *sv
+Aip	|SV*	|hvTsv	|NULLOK HV *hv
+Aip	|SV*	|avTsv	|NULLOK AV *av
+Aip	|SV*	|cvTsv	|NULLOK CV *cv
+Aip	|SV*	|gvTsv	|NULLOK GV *gv
+Aip	|SV*	|ioTsv	|NULLOK struct io *io
+Aip	|SV*	|reTsv	|NULLOK REGEXP *re
+Aip	|AV*	|svTav	|NN SV *sv
+Aip	|HV*	|svThv	|NN SV *sv
+Aip	|CV*	|svTcv	|NN SV *sv
+Aip	|IO*	|svTio	|NN SV *sv
+Aip	|REGEXP*	|svTre	|NN SV *sv
 
 Aip	|const char*	|SvPVX_const	|NN SV *sv
 Aip	|char*	|SvPVX_mutable	|NN SV *sv

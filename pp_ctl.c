@@ -50,7 +50,7 @@ PP(pp_grepstart)
 
     if (PL_stack_base + *PL_markstack_ptr == SP) {
 	(void)POPMARK;
-	mXPUSHs(AvSv(newAV()));
+	mXPUSHs(avTsv(newAV()));
 	RETURNOP(PL_op->op_next->op_next->op_next);
     }
 
@@ -61,19 +61,19 @@ PP(pp_grepstart)
 
     if ( ! SvOK(src) ) {
 	(void)POPMARK;
-	mXPUSHs(AvSv(newAV()));
+	mXPUSHs(avTsv(newAV()));
 	RETURNOP(PL_op->op_next->op_next->op_next);
     }
     if ( ! SvAVOK(src) )
 	Perl_croak(aTHX_ "%s expected an array but got %s", OP_DESC(PL_op), Ddesc(src));
     
-    if ( av_len(SvAv(src)) == -1 ) {
+    if ( av_len(svTav(src)) == -1 ) {
 	(void)POPMARK;
-	mXPUSHs(AvSv(newAV()));
+	mXPUSHs(avTsv(newAV()));
 	RETURNOP(PL_op->op_next->op_next->op_next);
     }
 
-    dst = sv_2mortal(AvSv(newAV()));
+    dst = sv_2mortal(avTsv(newAV()));
 
     ENTER;					/* enter outer scope */
     SAVETMPS;
@@ -85,7 +85,7 @@ PP(pp_grepstart)
     XPUSHs(src);                          /* push dst */
     XPUSHs(cv);
 
-    srcitem = av_shift(SvAv(src));
+    srcitem = av_shift(svTav(src));
 
     if (PL_op->op_type == OP_GREPSTART)
 	XPUSHs(srcitem);
@@ -108,10 +108,10 @@ PP(pp_mapwhile)
 
     newitem = POPs;
     cvp = SP;
-    src = SvAv(SP[-1]);
+    src = svTav(SP[-1]);
     dst = SP[-2];
 
-    av_push(SvAv(dst), SvTEMP(newitem) ? SvREFCNT_inc(newitem) : newSVsv(newitem));
+    av_push(svTav(dst), SvTEMP(newitem) ? SvREFCNT_inc(newitem) : newSVsv(newitem));
 
     /* All done yet? */
     if ( av_len(src) == -1 ) {
@@ -187,7 +187,7 @@ PP(pp_flop)
 	}
     }
 
-    XPUSHs(AvSv(res));
+    XPUSHs(avTsv(res));
     RETURN;
 }
 
@@ -566,17 +566,17 @@ PP(pp_caller)
 	CV* cv = cx->blk_sub.cv;
 	SV** name = NULL;
 	if (SvLOCATION(cv) && SvAVOK(SvLOCATION(cv)))
-	    name = av_fetch(SvAv(SvLOCATION(cv)), 3, FALSE);
+	    name = av_fetch(svTav(SvLOCATION(cv)), 3, FALSE);
 	mPUSHs( name ? newSVsv(*name) : &PL_sv_undef );
 
 	if (CxHASARGS(cx)) {
 	    AV * const padlist = CvPADLIST(cv);
 	    SV ** pad = av_fetch(padlist, cx->blk_sub.olddepth + 1, 0);
-	    SV ** args = av_fetch( SvAv(*pad), PAD_ARGS_INDEX, 0);
+	    SV ** args = av_fetch( svTav(*pad), PAD_ARGS_INDEX, 0);
 	    if (CvFLAGS(cv) & CVf_BLOCK) {
 		AV* av = newAV();
 		av_push(av, newSVsv(*args));
-		mPUSHs(AvSv(av));
+		mPUSHs(avTsv(av));
 	    }
 	    else {
 		mPUSHs(newSVsv( *args ) );
@@ -1224,7 +1224,7 @@ Perl_sv_compile_2op(pTHX_ SV *sv, ROOTOP** rootopp, const char *code, PAD** padp
     PL_op = &dummy;
     PL_op->op_type = OP_ENTEREVAL;
     PL_op->op_flags = 0;			/* Avoid uninit warning. */
-    PL_op->op_location = oldop ? newSVsv(oldop->op_location) : AvSv(newAV());
+    PL_op->op_location = oldop ? newSVsv(oldop->op_location) : avTsv(newAV());
     PUSHBLOCK(cx, CXt_EVAL|(IN_PERL_COMPILETIME ? 0 : CXp_REAL), SP);
     PUSHEVAL(cx, 0);
 
@@ -1331,7 +1331,7 @@ S_doeval(pTHX_ int gimme, ROOTOP** rootopp, CV* outside, U32 seq)
     if (outside) {
 	CvPADLIST(PL_compcv) = pad_new(padnew_SAVE, 
 	    PADLIST_PADNAMES(CvPADLIST(outside)),
-	    SvAv(AvARRAY(CvPADLIST(outside))[CvDEPTH(outside) ? CvDEPTH(outside) : 1]),
+	    svTav(AvARRAY(CvPADLIST(outside))[CvDEPTH(outside) ? CvDEPTH(outside) : 1]),
 	    seq);
     }
     else {

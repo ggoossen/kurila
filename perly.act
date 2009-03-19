@@ -458,14 +458,14 @@ case 2:
                             TOKEN_GETMAD((ps[(1) - (3)].val.i_tkval),(yyval.opval),'d');
                             APPEND_MADPROPS_PV("sub", (yyval.opval), '<');
                             new = newSUB((ps[(2) - (3)].val.ionlyval), NULL, (ps[(3) - (3)].val.opval));
-                            SVcpREPLACE(SvLOCATION(CvSv(new)), LOCATION((ps[(1) - (3)].val.i_tkval)));
+                            SVcpREPLACE(SvLOCATION(cvTsv(new)), LOCATION((ps[(1) - (3)].val.i_tkval)));
                             process_special_block(IVAL((ps[(1) - (3)].val.i_tkval)), new);
                             /* SvREFCNT_dec(new);  leak reference */
 #else
                             CV* new = cv_2mortal(newSUB((ps[(2) - (3)].val.ionlyval), NULL, (ps[(3) - (3)].val.opval)));
                             (ps[(2) - (3)].val.opval) = NULL;
                             (ps[(3) - (3)].val.opval) = NULL;
-                            SVcpREPLACE(SvLOCATION(CvSv(new)), LOCATION((ps[(1) - (3)].val.i_tkval)));
+                            SVcpREPLACE(SvLOCATION(cvTsv(new)), LOCATION((ps[(1) - (3)].val.i_tkval)));
                             process_special_block(IVAL((ps[(1) - (3)].val.i_tkval)), new);
                             (yyval.opval) = (OP*)NULL;
 #endif
@@ -543,7 +543,7 @@ case 2:
                             (yyval.opval) = utilize(IVAL((ps[(1) - (6)].val.i_tkval)), (ps[(2) - (6)].val.ionlyval), (ps[(3) - (6)].val.opval), (ps[(4) - (6)].val.opval), (ps[(5) - (6)].val.opval));
                             TOKEN_GETMAD((ps[(1) - (6)].val.i_tkval),(yyval.opval),'o');
                             TOKEN_GETMAD((ps[(6) - (6)].val.i_tkval),(yyval.opval),';');
-                            cv = SvCv(cSVOPx((yyval.opval))->op_sv);
+                            cv = svTcv(cSVOPx((yyval.opval))->op_sv);
 #else
                             cv = utilize(IVAL((ps[(1) - (6)].val.i_tkval)), (ps[(2) - (6)].val.ionlyval), (ps[(3) - (6)].val.opval), (ps[(4) - (6)].val.opval), (ps[(5) - (6)].val.opval));
                             (yyval.opval) = (OP*)NULL;

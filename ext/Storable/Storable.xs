@@ -1581,7 +1581,7 @@ static SV *pkg_fetchmeth(
 
 	cv = gv_fetchmethod(pkg, method);
 	if (cv) {
-		sv = newRV(CvSv(cv));
+		sv = newRV(cvTsv(cv));
 		TRACEME(("%s->%s: 0x%"UVxf, hvname, method, PTR2UV(sv)));
 	} else {
 		sv = newSVsv(&PL_sv_undef);
@@ -4097,7 +4097,7 @@ static SV *retrieve_hook(pTHX_ stcxt_t *cxt, const char *cname)
 	attach = gv_fetchmethod(SvSTASH(sv), "STORABLE_attach");
 	if (attach) {
 	    SV* attached;
-	    SV* attach_hook = newRV(CvSv(attach));
+	    SV* attach_hook = newRV(cvTsv(attach));
 
 	    if (av)
 	        CROAK(("STORABLE_attach called with unexpected references"));

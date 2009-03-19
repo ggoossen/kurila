@@ -737,7 +737,7 @@ EOF
     if ($ALIAS)
       { print $output_fh, Q(<<"EOF") if $cond }
 #    if ($cond)
-#       Perl_croak(aTHX_ "Usage: \%s(\%s)", SvPVX_const(SvNAME(CvSv(cv))), "$report_args");
+#       Perl_croak(aTHX_ "Usage: \%s(\%s)", SvPVX_const(SvNAME(cvTsv(cv))), "$report_args");
 EOF
     else
       { print $output_fh, Q(<<"EOF") if $cond }
@@ -1031,7 +1031,7 @@ EOF
     else {
       push(@InitFileCode,
 	   "        CV* CV_$Full_func_name = $($newXS)(\"$pname\", XS_$Full_func_name, file$proto);\n"
-         . "        sv_setiv(*av_fetch(SvAv(SvLOCATION(CV_$Full_func_name)), 1, TRUE), $begin_lineno);\n");
+         . "        sv_setiv(*av_fetch(svTav(SvLOCATION(CV_$Full_func_name)), 1, TRUE), $begin_lineno);\n");
       if ($pname =~ m/::(BEGIN|INIT|UNITCHECK|CHECK|END)$/) {
           my $keyword = $1;
           push @InitFileCode,

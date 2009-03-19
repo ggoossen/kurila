@@ -1239,7 +1239,7 @@ S_curlocation(pTHX_ const char* location)
     av_push(res, newSVsv(PL_parser->lex_filename));
     av_push(res, newSViv(PL_parser->lex_line_number));
     av_push(res, newSViv((location - PL_linestart + PL_parser->lex_charoffset) + 1));
-    return AvSv(res);
+    return avTsv(res);
 }
 
 STATIC char *
@@ -5264,7 +5264,7 @@ Perl_yylex(pTHX)
 		    }
 		}
 		start_force(PL_curforce);
-		NEXTVAL_NEXTTOKE.opval = newSVOP(OP_CONST, 0, AvSv(av), S_curlocation(PL_bufptr));
+		NEXTVAL_NEXTTOKE.opval = newSVOP(OP_CONST, 0, avTsv(av), S_curlocation(PL_bufptr));
 		force_next(THING);
 	    }
 	    SVcpNULL(PL_lex_stuff.str_sv);

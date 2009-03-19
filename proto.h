@@ -101,35 +101,35 @@ END_EXTERN_C
 
 /* functions with flag 'n' should come before here */
 START_EXTERN_C
-PERL_INLINE_CALLCONV SV*	Perl_HvSv(pTHX_ HV *hv);
-PERL_INLINE_CALLCONV SV*	Perl_AvSv(pTHX_ AV *av);
-PERL_INLINE_CALLCONV SV*	Perl_CvSv(pTHX_ CV *cv);
-PERL_INLINE_CALLCONV SV*	Perl_GvSv(pTHX_ GV *gv);
-PERL_INLINE_CALLCONV SV*	Perl_IoSv(pTHX_ struct io *io);
-PERL_INLINE_CALLCONV SV*	Perl_ReSv(pTHX_ REGEXP *re);
-PERL_INLINE_CALLCONV AV*	Perl_SvAv(pTHX_ SV *sv)
+PERL_INLINE_CALLCONV SV*	Perl_hvTsv(pTHX_ HV *hv);
+PERL_INLINE_CALLCONV SV*	Perl_avTsv(pTHX_ AV *av);
+PERL_INLINE_CALLCONV SV*	Perl_cvTsv(pTHX_ CV *cv);
+PERL_INLINE_CALLCONV SV*	Perl_gvTsv(pTHX_ GV *gv);
+PERL_INLINE_CALLCONV SV*	Perl_ioTsv(pTHX_ struct io *io);
+PERL_INLINE_CALLCONV SV*	Perl_reTsv(pTHX_ REGEXP *re);
+PERL_INLINE_CALLCONV AV*	Perl_svTav(pTHX_ SV *sv)
 			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_SVAV	\
+#define PERL_ARGS_ASSERT_SVTAV	\
 	assert(sv)
 
-PERL_INLINE_CALLCONV HV*	Perl_SvHv(pTHX_ SV *sv)
+PERL_INLINE_CALLCONV HV*	Perl_svThv(pTHX_ SV *sv)
 			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_SVHV	\
+#define PERL_ARGS_ASSERT_SVTHV	\
 	assert(sv)
 
-PERL_INLINE_CALLCONV CV*	Perl_SvCv(pTHX_ SV *sv)
+PERL_INLINE_CALLCONV CV*	Perl_svTcv(pTHX_ SV *sv)
 			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_SVCV	\
+#define PERL_ARGS_ASSERT_SVTCV	\
 	assert(sv)
 
-PERL_INLINE_CALLCONV IO*	Perl_SvIo(pTHX_ SV *sv)
+PERL_INLINE_CALLCONV IO*	Perl_svTio(pTHX_ SV *sv)
 			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_SVIO	\
+#define PERL_ARGS_ASSERT_SVTIO	\
 	assert(sv)
 
-PERL_INLINE_CALLCONV REGEXP*	Perl_SvRe(pTHX_ SV *sv)
+PERL_INLINE_CALLCONV REGEXP*	Perl_svTre(pTHX_ SV *sv)
 			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_SVRE	\
+#define PERL_ARGS_ASSERT_SVTRE	\
 	assert(sv)
 
 

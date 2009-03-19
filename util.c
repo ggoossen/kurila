@@ -1240,10 +1240,10 @@ Perl_vdie_common(pTHX_ SV *msv, bool warn)
     }
 
     if ( SvCVOK(oldhook) ) {
-	cv = SvCv(oldhook);
+	cv = svTcv(oldhook);
     }
     else if ( SvROK(oldhook) && SvRV(oldhook) && SvCVOK(SvRV(oldhook)) ) {
-	cv = SvCv(SvRV(oldhook));
+	cv = svTcv(SvRV(oldhook));
     }
 
     if (cv && !CvDEPTH(cv) && (CvROOT(cv) || CvXSUB(cv))) {
@@ -1320,7 +1320,7 @@ Perl_vdie(pTHX_ const char* pat, va_list *args)
 	av_push(locav, newSViv(PL_parser->lex_line_number));
 	av_push(locav, newSViv((PL_parser->bufptr - PL_parser->linestart +
 		    PL_parser->lex_charoffset) + 1));
-	location = AvSv(locav);
+	location = avTsv(locav);
     }
     msv = vdie_croak_common(location, pat, args);
     die_where(msv);
@@ -3436,7 +3436,7 @@ Perl_my_fflush_all(pTHX)
 void
 Perl_report_evil_fh(pTHX_ IO *io, I32 op)
 {
-    const char * const name = io ? SvPVX_const(SvNAME(IoSv(io))) : NULL;
+    const char * const name = io ? SvPVX_const(SvNAME(ioTsv(io))) : NULL;
 
     if (op == OP_phoney_OUTPUT_ONLY || op == OP_phoney_INPUT_ONLY) {
 	if (ckWARN(WARN_IO)) {

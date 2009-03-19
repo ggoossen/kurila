@@ -511,14 +511,14 @@ subrout	:	SUB startsub subname proto subbody
                             TOKEN_GETMAD($1,$$,'d');
                             APPEND_MADPROPS_PV("sub", $$, '<');
                             new = newSUB($2, NULL, $3);
-                            SVcpREPLACE(SvLOCATION(CvSv(new)), LOCATION($1));
+                            SVcpREPLACE(SvLOCATION(cvTsv(new)), LOCATION($1));
                             process_special_block(IVAL($1), new);
                             /* SvREFCNT_dec(new);  leak reference */
 #else
                             CV* new = cv_2mortal(newSUB($2, NULL, $3));
                             $<opval>2 = NULL;
                             $<opval>3 = NULL;
-                            SVcpREPLACE(SvLOCATION(CvSv(new)), LOCATION($1));
+                            SVcpREPLACE(SvLOCATION(cvTsv(new)), LOCATION($1));
                             process_special_block(IVAL($1), new);
                             $$ = (OP*)NULL;
 #endif
@@ -583,7 +583,7 @@ use	:	USE startsub THING WORD listexpr ';'
                             $$ = utilize(IVAL($1), $2, $3, $4, $5);
                             TOKEN_GETMAD($1,$$,'o');
                             TOKEN_GETMAD($6,$$,';');
-                            cv = SvCv(cSVOPx($$)->op_sv);
+                            cv = svTcv(cSVOPx($$)->op_sv);
 #else
                             cv = utilize(IVAL($1), $2, $3, $4, $5);
                             $$ = (OP*)NULL;

@@ -810,18 +810,18 @@ Perl_magic_get(pTHX_ const char* name, SV* sv)
 	    }
 
 	    if (strEQ(remaining, "HINTS")) {
-		sv_setsv(sv, HvSv(PL_hinthv));
+		sv_setsv(sv, hvTsv(PL_hinthv));
 		return;
 	    }
 	    break;
 
 	case 'I':
 	    if (strEQ(remaining, "INCLUDE_PATH")) {
-		sv_setsv(sv, AvSv(PL_includepathav));
+		sv_setsv(sv, avTsv(PL_includepathav));
 		break;
 	    }
 	    if (strEQ(remaining, "INCLUDED")) {
-		sv_setsv(sv, HvSv(PL_includedhv));
+		sv_setsv(sv, hvTsv(PL_includedhv));
 		break;
 	    }
 	    if (strEQ(remaining, "INPUT_RECORD_SEPARATOR")) {
@@ -1694,8 +1694,8 @@ Perl_magic_set(pTHX_ const char* name, SV *sv)
 		    Perl_croak(aTHX_ "%s must be a hash not an %s", name, Ddesc(sv));
 		}
 		PL_hints |= HINT_LOCALIZE_HH;
-		HVcpSTEAL(PL_compiling.cop_hints_hash, SvHv(newSVsv(sv)));
-		hv_sethv(PL_hinthv, SvHv(sv));
+		HVcpSTEAL(PL_compiling.cop_hints_hash, svThv(newSVsv(sv)));
+		hv_sethv(PL_hinthv, svThv(sv));
 		return;
 	    }
 	    break;
@@ -1709,7 +1709,7 @@ Perl_magic_set(pTHX_ const char* name, SV *sv)
 		if ( ! SvAVOK(sv) ) {
 		    Perl_croak(aTHX_ "%s must be an ARRAY not a %s", name, Ddesc(sv));
 		}
-		sv_setsv(AvSv(PL_includepathav), sv);
+		sv_setsv(avTsv(PL_includepathav), sv);
 		break;
 	    }
 	    
@@ -1721,7 +1721,7 @@ Perl_magic_set(pTHX_ const char* name, SV *sv)
 		if ( ! SvHVOK(sv) ) {
 		    Perl_croak(aTHX_ "%s must be a HASH not a %s", name, Ddesc(sv));
 		}
-		sv_setsv(HvSv(PL_includedhv), sv);
+		sv_setsv(hvTsv(PL_includedhv), sv);
 		break;
 	    }
 
