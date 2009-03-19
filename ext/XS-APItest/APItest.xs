@@ -623,16 +623,17 @@ call_sv(sv, flags, ...)
     I32 flags
     PREINIT:
 	I32 i;
+        SV* res;
     PPCODE:
 	for (i=0; i<items-2; i++)
 	    ST(i) = ST(i+2); /* pop first two args */
 	PUSHMARK(SP);
 	SP += items - 2;
 	PUTBACK;
-	i = call_sv(sv, flags);
+	res = call_sv(sv, flags);
 	SPAGAIN;
 	EXTEND(SP, 1);
-	PUSHs(sv_2mortal(newSViv(i)));
+	PUSHs(sv_2mortal(newSVsv(res)));
 
 void
 call_pv(subname, flags, ...)
@@ -640,16 +641,17 @@ call_pv(subname, flags, ...)
     I32 flags
     PREINIT:
 	I32 i;
+        SV* res;
     PPCODE:
 	for (i=0; i<items-2; i++)
 	    ST(i) = ST(i+2); /* pop first two args */
 	PUSHMARK(SP);
 	SP += items - 2;
 	PUTBACK;
-	i = call_pv(subname, flags);
+	res = call_pv(subname, flags);
 	SPAGAIN;
 	EXTEND(SP, 1);
-	PUSHs(sv_2mortal(newSViv(i)));
+	PUSHs(sv_2mortal(newSVsv(res)));
 
 void
 call_method(methname, flags, ...)
@@ -657,16 +659,17 @@ call_method(methname, flags, ...)
     I32 flags
     PREINIT:
 	I32 i;
+        SV* res;
     PPCODE:
 	for (i=0; i<items-2; i++)
 	    ST(i) = ST(i+2); /* pop first two args */
 	PUSHMARK(SP);
 	SP += items - 2;
 	PUTBACK;
-	i = call_method(methname, flags);
+	res = call_method(methname, flags);
 	SPAGAIN;
 	EXTEND(SP, 1);
-	PUSHs(sv_2mortal(newSViv(i)));
+	PUSHs(sv_2mortal(newSVsv(res)));
 
 void
 eval_sv(sv, flags)

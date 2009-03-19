@@ -200,7 +200,7 @@ push_failed:
 PerlIO *
 PerlIOVia_open(pTHX_ PerlIO_funcs * self, PerlIO_list_t * layers,
 	       IV n, const char *mode, int fd, int imode, int perm,
-	       PerlIO * f, int narg, SV ** args)
+	       PerlIO * f, int narg, SV *const* args)
 {
     if (!f) {
 	f = PerlIO_push(aTHX_ PerlIO_allocate(aTHX), self, mode,
