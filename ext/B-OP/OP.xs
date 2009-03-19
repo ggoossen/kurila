@@ -504,14 +504,6 @@ typedef MAGIC   *B__MAGIC;
 
 MODULE = B::OP    PACKAGE = B::OP         PREFIX = OP_
 
-B::CV
-OP_find_cv(o)
-        B::OP   o
-    CODE:
-        RETVAL = (CV*)SvRV(find_cv_by_root((OP*)o));
-    OUTPUT:
-        RETVAL
-
 void
 OP_set_next(o, next)
         B::OP           o
