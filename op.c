@@ -3612,7 +3612,7 @@ Perl_newSUB(pTHX_ I32 floor, OP *proto, OP *block)
 
     if (CvCLONE(cv)) {
 	assert(!CvCONST(cv));
-	if (proto && proto->op_type == OP_NULL && op_const_sv(block, cv))
+	if (proto && proto->op_type == OP_STUB && op_const_sv(block, cv))
 	    CvCONST_on(cv);
     }
 
