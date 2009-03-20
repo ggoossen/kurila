@@ -1378,10 +1378,8 @@ Perl_assign(pTHX_ OP *o, bool partial, I32 *min_modcount, I32 *max_modcount)
     PERL_ARGS_ASSERT_ASSIGN;
 
     switch (o->op_type) {
-#ifdef PERL_MAD
     case OP_STUB:
 	break;
-#endif /* PERL_MAD */
 
     case OP_LISTFIRST:
 	assert(cBINOPo->op_first->op_sibling);
@@ -1429,7 +1427,7 @@ Perl_assign(pTHX_ OP *o, bool partial, I32 *min_modcount, I32 *max_modcount)
 	break;
 
     case OP_NULL:
-	assign(cBINOPo->op_first, partial, min_modcount, max_modcount);
+	assign(cUNOPo->op_first, partial, min_modcount, max_modcount);
 	break;
 
     case OP_COND_EXPR:
@@ -3538,26 +3536,12 @@ CV *
 Perl_newSUB(pTHX_ I32 floor, OP *proto, OP *block)
 {
     dVAR;
-    const char *ps;
-    STRLEN ps_len;
     register CV *cv = NULL;
     SV *const_sv;
 
-    if (proto) {
-	assert(proto->op_type == OP_CONST);
-	ps = SvPV_const(((SVOP*)proto)->op_sv, ps_len);
-    }
-    else
-	ps = NULL;
-
-    if (!PL_madskills) {
-	if (proto)
-	    SAVEFREEOP(proto);
-    }
-
     cv = NULL;
 
-    if (!block || !ps || *ps
+    if (!block || !proto
 #ifdef PERL_MAD
 	|| block->op_type == OP_NULL
 #endif
@@ -3578,9 +3562,6 @@ Perl_newSUB(pTHX_ I32 floor, OP *proto, OP *block)
 
     cv = PL_compcv;
     SVcpSTEAL(SvLOCATION(cv), newSVsv(PL_curcop->op_location));
-
-    if (ps)
-	sv_setpvn((SV*)cv, ps, ps_len);
 
     if (PL_parser && PL_parser->error_count) {
 	op_free(block);
@@ -3603,7 +3584,22 @@ Perl_newSUB(pTHX_ I32 floor, OP *proto, OP *block)
 
     {
 	OP* leaveop;
-	leaveop = newUNOP(OP_LEAVESUB, 0, scalarseq(block), block->op_location);
+	OP* proto_block;
+	if (proto) {
+	    OP* fake_proto = newASSIGNOP(OPf_STACKED,
+		newANONARRAY(proto, proto->op_location),
+		0,
+		newOP( OP_ANONARRAY, OPf_SPECIAL, proto->op_location ),
+		proto->op_location);
+	    proto_block = append_list(OP_LINESEQ, (LISTOP*)fake_proto, (LISTOP*)block);
+	    CvFLAGS(cv) |= CVf_PROTO;
+	}
+	else {
+	    proto_block = block;
+	}
+	   
+	leaveop = newUNOP(OP_LEAVESUB, 0,
+	    scalarseq(proto_block), block->op_location);
 	CvSTART(cv) = LINKLIST(leaveop);
 	leaveop->op_next = 0;
 	CvROOT(cv) = newROOTOP(leaveop, block->op_location);
@@ -3616,7 +3612,7 @@ Perl_newSUB(pTHX_ I32 floor, OP *proto, OP *block)
 
     if (CvCLONE(cv)) {
 	assert(!CvCONST(cv));
-	if (ps && !*ps && op_const_sv(block, cv))
+	if (proto && proto->op_type == OP_NULL && op_const_sv(block, cv))
 	    CvCONST_on(cv);
     }
 
@@ -4359,6 +4355,8 @@ Perl_ck_anonarray(pTHX_ OP*o)
     dVAR;
     register OP *kid;
     PERL_ARGS_ASSERT_CK_ANONARRAY;
+    if (o->op_flags & OPf_SPECIAL)
+	return o;
     for( kid = cLISTOPo->op_first ; kid ; kid = kid->op_sibling ) {
 	list(kid);
     }

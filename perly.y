@@ -87,6 +87,7 @@
 %type <ionlyval> prog progstart remember mremember
 %type <ionlyval> startsub startanonsub startblocksub
 %type <ionlyval> mintro
+%type <i_tkval> startproto
 
 %type <opval> decl subrout mysubrout package use peg
 
@@ -547,11 +548,25 @@ subname	:	WORD	{
                         }
 	;
 
+startproto :    '('
+			{ 
+                            PL_parser->in_my = KEY_my;
+                            $$ = $1;
+                        }
+
 /* Subroutine prototype */
 proto	:	/* NULL */
 			{ $$ = (OP*)NULL; }
-	|	THING
-			{ $$ = $1; }
+	|	startproto ')'
+			{ 
+                            $$ = newOP(OP_STUB, 0, LOCATION($1) );
+                            PL_parser->in_my = FALSE;
+                        }
+	|	startproto expr mintro ')'
+			{ 
+                            $$ = $2;
+                            PL_parser->in_my = FALSE;
+                        }
 	;
 
 /* Subroutine body - either null or a block */

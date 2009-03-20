@@ -1677,12 +1677,6 @@ Perl_do_sv_dump(pTHX_ I32 level, PerlIO *file, SV *sv, I32 nest, I32 maxnest, bo
 	}
 	break;
     case SVt_PVCV:
-	if (SvPOK(sv)) {
-	    STRLEN len;
-	    const char *const proto =  SvPV_const(sv, len);
-	    Perl_dump_indent(aTHX_ level, file, "  PROTOTYPE = \"%.*s\"\n",
-			     (int) len, proto);
-	}
 	if (!CvISXSUB(sv)) {
 	    if (CvSTART(sv)) {
 		Perl_dump_indent(aTHX_ level, file,

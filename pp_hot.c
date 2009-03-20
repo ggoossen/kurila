@@ -1405,6 +1405,10 @@ PP(pp_entersub)
 	    else
 		SVcpSTEAL( PAD_SVl(PAD_ARGS_INDEX), newSV(0) );
 	}
+	else if ( CvFLAGS(cv) & CVf_PROTO) {
+	    PUSHMARK(MARK);
+	    CX_CURPAD_SAVE(cx->blk_sub);
+	}
 	else {
 	    AV* av;
 	    SV* avsv = PAD_SVl(PAD_ARGS_INDEX);

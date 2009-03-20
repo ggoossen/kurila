@@ -171,11 +171,7 @@ sub force_unlink {
 ## write the lines to the file only if the contents have not changed.
 ## Filename can be given as an arrayref of directory names
 ##
-sub WriteIfChanged($$)
-{
-    my $file  = shift;
-    my $lines = shift;
-
+sub WriteIfChanged($file, $lines) {
     $file = File::Spec->catfile(< @$file) if ref $file;
 
     my $TextToWrite = join '', $lines;
@@ -226,9 +222,8 @@ my %CanonicalToOrig;
 ## into
 ##    OldItalic
 ##
-sub CanonicalName($)
+sub CanonicalName($orig)
 {
-    my $orig = shift;
     my $name = lc $orig;
     $name =~ s/(?<![a-z])(\w)/$(ucfirst($1))/g;
     $name =~ s/[-_\s]+//g;
@@ -329,14 +324,10 @@ sub Build_Aliases()
 ## Table->New constructor is called), but there are times when it needs to
 ## be done after-the-fact...)
 ##
-sub New_Prop($$$<)
+sub New_Prop($Type, $Name, $Table, %< %Args)
 {
-    my $Type = shift; ## "Is" or "In";
-    my $Name = shift;
-    my $Table = shift;
-
-    ## remaining args are optional key/val
-    my %Args = %( < @_ );
+    ## $Type "Is" or "In";
+    ## %Args are optional key/val
 
     my $Fuzzy = delete %Args{Fuzzy};
     my $Desc  = delete %Args{Desc}; # description
@@ -410,11 +401,8 @@ sub Table::Max
 ## Replaces the codepoints in the Table with those in the Table given
 ## as an arg. (NOTE: this is not a "deep copy").
 ##
-sub Table::Replace($$)
+sub Table::Replace($Table, $New)
 {
-    my $Table = shift; #self
-    my $New   = shift;
-
     @$Table = @$New;
 }
 
@@ -636,9 +624,8 @@ sub Table::Write
 
 ## This used only for making the test script.
 ## helper function
-sub IsUsable($)
+sub IsUsable($code)
 {
-    my $code = shift;
     return 0 if $code +<= 0x0000;                       ## don't use null
     return 0 if $code +>= $LastUnicodeCodepoint;        ## keep in range
     return 0 if ($code +>= 0xD800 and $code +<= 0xDFFF); ## no surrogates

@@ -5551,56 +5551,11 @@ Perl_yylex(pTHX)
 		    have_name = FALSE;
 		}
 
-		/* Look for a prototype */
-		if (*s == '(') {
-		    char *p;
-		    bool bad_proto = FALSE;
-		    const bool warnsyntax = ckWARN(WARN_SYNTAX);
-
-		    PL_lex_stuff.flags = LEXf_PROTOTYPE;
-		    s = scan_str(s,TRUE,FALSE, &PL_lex_stuff);
-		    if (!s)
-			Perl_croak(aTHX_ "Prototype not terminated");
-		    /* strip spaces and check for bad characters */
-		    d = SvPVX_mutable(PL_lex_stuff.str_sv);
-		    tmp = 0;
-		    for (p = d; *p; ++p) {
-			if (!isSPACE(*p)) {
-			    d[tmp++] = *p;
-			    if (warnsyntax && !strchr("$@%*;[]&\\_", *p))
-				bad_proto = TRUE;
-			}
-		    }
-		    d[tmp] = '\0';
-		    if (bad_proto)
-			Perl_warner(aTHX_ packWARN(WARN_SYNTAX),
-				    "Illegal character in prototype for %"SVf" : %s",
-				    SVfARG(PL_subname), d);
-		    SvCUR_set(PL_lex_stuff.str_sv, tmp);
-		    have_proto = TRUE;
-
-#ifdef PERL_MAD
-		    start_force(0);
-		    CURMAD('q', PL_thisopen);
-		    CURMAD('_', tmpwhite);
-		    CURMAD('=', PL_thisstuff);
-		    CURMAD('Q', PL_thisclose);
-		    NEXTVAL_NEXTTOKE.opval =
-			(OP*)newSVOP(OP_CONST, 0, PL_lex_stuff.str_sv, S_curlocation(PL_bufptr));
-		    PL_lex_stuff.str_sv = NULL;
-		    force_next(THING);
-
-		    s = SKIPSPACE2(s,tmpwhite);
-#else
-		    s = skipspace(s);
-#endif
-		}
-		else
-		    have_proto = FALSE;
+		have_proto = FALSE;
 
 		if (*s == ':' && s[1] != ':')
 		    PL_expect = attrful;
-		else if (*s != '{' && key == KEY_sub) {
+		else if (*s != '{' && *s != '(' && key == KEY_sub) {
 		    if (!have_name)
 			yyerror("Illegal declaration of anonymous subroutine");
 		    else if (*s != ';')
