@@ -2,7 +2,7 @@
 
 BEGIN { require './test.pl'; }
 
-plan 5;
+plan 6;
 
 sub foo($x) {
     return $x;
@@ -23,8 +23,15 @@ is($r1, 'depth1');
 is($r2, 'depth2');
 
 sub emptyproto() {
-    return 'foo';
+    'foo';
 }
 
 is( emptyproto(), 'foo' );
 is( emptyproto, 'foo' );
+
+BEGIN {
+    my $x = 'foo';
+    *baz = sub () { $x };
+}
+
+is( baz, 'foo' );

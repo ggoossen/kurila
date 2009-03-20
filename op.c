@@ -3391,6 +3391,12 @@ Perl_op_const_sv(pTHX_ const OP *o, CV *cv)
     if (!o)
 	return NULL;
 
+    if (o->op_type == OP_ROOT && cLISTOPo->op_first)
+	o = cLISTOPo->op_first;
+
+    if (o->op_type == OP_LEAVESUB && cLISTOPo->op_first)
+	o = cLISTOPo->op_first;
+
     if (o->op_type == OP_LINESEQ && cLISTOPo->op_first)
 	o = cLISTOPo->op_first->op_sibling;
 
@@ -3541,7 +3547,7 @@ Perl_newSUB(pTHX_ I32 floor, OP *proto, OP *block)
 
     cv = NULL;
 
-    if (!block || !proto
+    if (!block || !proto || proto->op_type != OP_STUB
 #ifdef PERL_MAD
 	|| block->op_type == OP_NULL
 #endif
@@ -3610,7 +3616,7 @@ Perl_newSUB(pTHX_ I32 floor, OP *proto, OP *block)
 
     pad_tidy(CvCLONE(cv) ? padtidy_SUBCLONE : padtidy_SUB);
 
-    if (CvCLONE(cv)) {
+    if (CvANON(cv)) {
 	assert(!CvCONST(cv));
 	if (proto && proto->op_type == OP_STUB && op_const_sv(block, cv))
 	    CvCONST_on(cv);
