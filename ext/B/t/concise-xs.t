@@ -136,7 +136,7 @@ my $testpkgs = \%(
 		  end_av dowarn diehook defstash curstash
 		  cstring comppadlist check_av cchar cast_I32 bootstrap
 		  sub_generation address
-                  set_main_start set_main_root fudge unitcheck_av),
+                  fudge unitcheck_av),
     ),
 
     'B::Deparse' => \%( dflt => 'perl',	# 235 functions
