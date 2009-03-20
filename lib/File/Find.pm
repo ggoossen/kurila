@@ -428,8 +428,7 @@ our ($wanted_callback, $avoid_nlink, $bydepth, $no_chdir, $follow,
     $follow_skip, $full_check, $untaint, $untaint_skip, $untaint_pat,
     $pre_process, $post_process, $dangling_symlinks);
 
-sub contract_name {
-    my @($cdir,$fn) = @_;
+sub contract_name($cdir,$fn) {
 
     return substr($cdir,0,rindex($cdir,'/')) if $fn eq $File::Find::current_dir;
 
@@ -447,8 +446,7 @@ sub contract_name {
 }
 
 # return the absolute name of a directory or file
-sub contract_name_Mac {
-    my @($cdir,$fn) = @_;
+sub contract_name_Mac($cdir,$fn) {
     my $abs_name;
 
     if ($fn =~ m/^(:+)(.*)$/) { # valid pathname starting with a ':'
@@ -493,8 +491,7 @@ sub contract_name_Mac {
     }
 }
 
-sub PathCombine($$) {
-    my @($Base,$Name) = @_;
+sub PathCombine($$)($Base,$Name) {
     my $AbsName;
 
     if ($Is_MacOS) {
@@ -528,8 +525,7 @@ sub PathCombine($$) {
     return $AbsName;
 }
 
-sub Follow_SymLink($) {
-    my @($AbsName) = @_;
+sub Follow_SymLink($)($AbsName) {
 
     my ($NewName,$DEV, $INO);
     @($DEV, $INO, ...) = @: lstat $AbsName;
@@ -764,8 +760,7 @@ sub _find_opt {
 # preconditions:
 #  chdir (if not no_chdir) to dir
 
-sub _find_dir($$$) {
-    my @($wanted, $p_dir, $nlink) = @_;
+sub _find_dir($$$)($wanted, $p_dir, $nlink) {
     my @($CdLvl,$Level) = @(0,0);
     my @Stack;
     my @filenames;
@@ -1035,8 +1030,7 @@ sub _find_dir($$$) {
 # preconditions:
 #  chdir (if not no_chdir) to dir
 
-sub _find_dir_symlnk($$$) {
-    my @($wanted, $dir_loc, $p_dir) = @_; # $dir_loc is the absolute directory
+sub _find_dir_symlnk($$$)($wanted, $dir_loc, $p_dir) { # $dir_loc is the absolute directory
     my @Stack;
     my @filenames;
     my $new_loc;

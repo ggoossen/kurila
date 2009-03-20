@@ -5,8 +5,7 @@ our ($mycnt);
 
 my $why = "zero != one";
 
-sub myfail {
-    my @($f) =  @_;
+sub myfail($f) {
     ok((nelems @$f), 1);
 
     my $t = @$f[0];

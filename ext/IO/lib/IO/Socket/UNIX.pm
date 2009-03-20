@@ -22,8 +22,7 @@ sub new {
     return $class->SUPER::new(< @_);
 }
 
-sub configure {
-    my @($sock,$arg) =  @_;
+sub configure($sock,$arg) {
     my ($bport,$cport);
 
     my $type = $arg->{?Type} || SOCK_STREAM;

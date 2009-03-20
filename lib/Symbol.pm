@@ -126,8 +126,7 @@ sub geniosym () {
 
 sub ungensym ($) {}
 
-sub qualify ($;$) {
-    my @($name, ? $pkg) =  @_;
+sub qualify ($;$)($name, ? $pkg) {
     ref \$name eq "GLOB" and Carp::confess("glob..." . ref $name);
     if (!ref($name) && index($name, '::') == -1 && index($name, "'") == -1) {
 	# Global names: special character, "^xyz", or other. 

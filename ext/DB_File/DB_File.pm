@@ -159,9 +159,8 @@ else
 # Preloaded methods go here.  Autoload methods go after __END__, and are
 # processed by the autosplit program.
 
-sub new
-{
-    my @($class, $filename, ?$flags, ?$mode, ?$hash_info) = @_ ;
+sub new($class, $filename, ?$flags, ?$mode, ?$hash_info)
+{ 
 
     $flags //= O_CREAT()^|^O_RDWR();
     $mode //= 0666;
@@ -195,8 +194,7 @@ sub clear
     }
 }
 
-sub iterate {
-    my @($self, $callback) = @_;
+sub iterate($self, $callback) {
 
     my ($key, $value);
     my $status = $self->seq($key, $value, R_FIRST());

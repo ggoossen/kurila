@@ -76,8 +76,7 @@ sub checkorder {
 
 # Verify that the two array refs reference identical arrays
 
-sub checkequal {
-    my @($aref, $bref) =  @_;
+sub checkequal($aref, $bref) {
     my $status = '';
 
     if (nelems(@$aref) != nelems(@$bref)) {
@@ -95,8 +94,7 @@ sub checkequal {
 
 # Test sort on arrays of various sizes (set up in @TestSizes)
 
-sub main {
-    my @($dothesort, $expect_unstable) =  @_;
+sub main($dothesort, $expect_unstable) {
     my ($unsorted, @sorted, $status);
     my $unstable_num = 0;
 

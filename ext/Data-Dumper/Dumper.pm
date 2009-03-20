@@ -43,8 +43,7 @@ our $Deparse    //= 0;
 # names must have leading $ sign stripped. begin the name with *
 # to cause output of arrays and hashes rather than refs.
 #
-sub new {
-  my@($c, $v, ?$n) =  @_;
+sub new($c, $v, ?$n) {
 
   die "Usage:  PACKAGE->new(ARRAYREF, [ARRAYREF])" 
     unless (defined($v) && (ref($v) eq 'ARRAY'));
@@ -96,8 +95,7 @@ do {
 #
 # add-to or query the table of already seen references
 #
-sub Seen {
-  my@($s, $g) =  @_;
+sub Seen($s, $g) {
   if (defined($g) && (ref($g) eq 'HASH'))  {
     init_refaddr_format();
     my($k, $v, $id);
@@ -129,8 +127,7 @@ sub Seen {
 #
 # set or query the values to be dumped
 #
-sub Values {
-  my@($s, $v) =  @_;
+sub Values($s, $v) {
   if (defined($v) && (ref($v) eq 'ARRAY'))  {
     $s->{+todump} = \ @$v;        # make a copy
     return $s;
@@ -143,8 +140,7 @@ sub Values {
 #
 # set or query the names of the values to be dumped
 #
-sub Names {
-  my@($s, $n) =  @_;
+sub Names($s, $n) {
   if (defined($n) && (ref($n) eq 'ARRAY'))  {
     $s->{+names} = \ @$n;         # make a copy
     return $s;
@@ -528,8 +524,7 @@ sub Reset {
   return $s;
 }
 
-sub Indent {
-  my@($s, $v) =  @_;
+sub Indent($s, $v) {
   if (defined($v)) {
     if ($v == 0) {
       $s->{+xpad} = "";
@@ -547,73 +542,59 @@ sub Indent {
   }
 }
 
-sub Pair {
-    my@($s, ?$v) =  @_;
+sub Pair($s, ?$v) {
     defined($v) ?? do { ($s->{+pair} = $v); return $s} !! $s->{?pair};
 }
 
-sub Pad {
-  my@($s, $v) =  @_;
+sub Pad($s, $v) {
   defined($v) ?? do { ($s->{+pad} = $v); return $s} !! $s->{?pad};
 }
 
-sub Varname {
-  my@($s, $v) =  @_;
+sub Varname($s, $v) {
   defined($v) ?? do {($s->{+varname} = $v); return $s} !! $s->{?varname};
 }
 
-sub Purity {
-  my@($s, $v) =  @_;
+sub Purity($s, $v) {
   defined($v) ?? do {($s->{+purity} = $v); return $s} !! $s->{?purity};
 }
 
-sub Useqq {
-  my@($s, $v) =  @_;
+sub Useqq($s, $v) {
   defined($v) ?? do {($s->{+useqq} = $v); return $s} !! $s->{?useqq};
 }
 
-sub Terse {
-  my@($s, $v) =  @_;
+sub Terse($s, $v) {
   defined($v) ?? do {($s->{+terse} = $v); return $s} !! $s->{?terse};
 }
 
-sub Freezer {
-  my@($s, $v) =  @_;
+sub Freezer($s, $v) {
   defined($v) ?? do {($s->{+freezer} = $v); return $s} !! $s->{?freezer};
 }
 
-sub Toaster {
-  my@($s, $v) =  @_;
+sub Toaster($s, $v) {
   defined($v) ?? do {($s->{+toaster} = $v); return $s} !! $s->{?toaster};
 }
 
-sub Deepcopy {
-  my@($s, $v) =  @_;
+sub Deepcopy($s, $v) {
   defined($v) ?? do {($s->{+deepcopy} = $v); return $s} !! $s->{?deepcopy};
 }
 
-sub Quotekeys {
-  my@($s, $v) =  @_;
+sub Quotekeys($s, $v) {
   defined($v) ?? do {($s->{+quotekeys} = $v); return $s} !! $s->{?quotekeys};
 }
 
-sub Bless {
-  my@($s, $v) =  @_;
+sub Bless($s, $v) {
   defined($v) ?? do {($s->{+'bless'} = $v); return $s} !! $s->{?'bless'};
 }
 
-sub Maxdepth {
-  my@($s, $v) =  @_;
+sub Maxdepth($s, $v) {
   defined($v) ?? do {($s->{+'maxdepth'} = $v); return $s} !! $s->{?'maxdepth'};
 }
 
-sub Sortkeys {
-  my@($s, $v) =  @_;
+sub Sortkeys($s, $v) {
   defined($v) ?? do {($s->{+'sortkeys'} = $v); return $s} !! $s->{?'sortkeys'};
 }
 
-sub Deparse {
-  my@($s, $v) =  @_;
+sub Deparse($s, $v) {
   defined($v) ?? do {($s->{+'deparse'} = $v); return $s} !! $s->{?'deparse'};
 }
 

@@ -14,8 +14,7 @@ sub _printop {
   return sprintf "0x\%x \%s \%s", ${$op}, ${$op} ?? class($op) !! '', $addr;
 }
 
-sub B::OP::debug {
-    my @($op) =  @_;
+sub B::OP::debug($op) {
     printf \*STDOUT, <<'EOT', class($op), $$op, $op->ppaddr, _printop($op->next), _printop($op->sibling), $op->targ, $op->type;
 %s (0x%lx)
 	op_ppaddr	%s
@@ -33,20 +32,17 @@ EOT
 EOT
 }
 
-sub B::UNOP::debug {
-    my @($op) =  @_;
+sub B::UNOP::debug($op) {
     $op->B::OP::debug();
     printf \*STDOUT, "\top_first\t\%s\n", _printop($op->first);
 }
 
-sub B::BINOP::debug {
-    my @($op) =  @_;
+sub B::BINOP::debug($op) {
     $op->B::UNOP::debug();
     printf \*STDOUT, "\top_last \t\%s\n", _printop($op->last);
 }
 
-sub B::LOOP::debug {
-    my @($op) =  @_;
+sub B::LOOP::debug($op) {
     $op->B::BINOP::debug();
     printf \*STDOUT, <<'EOT', < _printop($op->redoop), _printop($op->nextop), _printop($op->lastop);
 	op_redoop	%s
@@ -55,20 +51,17 @@ sub B::LOOP::debug {
 EOT
 }
 
-sub B::LOGOP::debug {
-    my @($op) =  @_;
+sub B::LOGOP::debug($op) {
     $op->B::UNOP::debug();
     printf \*STDOUT, "\top_other\t\%s\n", _printop($op->other);
 }
 
-sub B::LISTOP::debug {
-    my @($op) =  @_;
+sub B::LISTOP::debug($op) {
     $op->B::BINOP::debug();
     printf \*STDOUT, "\top_children\t\%d\n", $op->children;
 }
 
-sub B::PMOP::debug {
-    my @($op) =  @_;
+sub B::PMOP::debug($op) {
     $op->B::LISTOP::debug();
     printf \*STDOUT, "\top_pmreplroot\t0x\%x\n", ${$op->pmreplroot};
     printf \*STDOUT, "\top_pmreplstart\t0x\%x\n", ${$op->pmreplstart};
@@ -79,8 +72,7 @@ sub B::PMOP::debug {
     $op->pmreplroot->debug;
 }
 
-sub B::COP::debug {
-    my @($op) =  @_;
+sub B::COP::debug($op) {
     $op->B::OP::debug();
     my $cop_io = class($op->io) eq 'SPECIAL' ?? '' !! $op->io->as_string;
     printf \*STDOUT, <<'EOT', $op->label, $op->stashpv, $op->cop_seq, ${$op->warnings}, cstring($cop_io);
@@ -92,27 +84,23 @@ sub B::COP::debug {
 EOT
 }
 
-sub B::SVOP::debug {
-    my @($op) =  @_;
+sub B::SVOP::debug($op) {
     $op->B::OP::debug();
     printf \*STDOUT, "\top_sv\t\t0x\%x\n", ${$op->sv};
     $op->sv->debug;
 }
 
-sub B::PVOP::debug {
-    my @($op) =  @_;
+sub B::PVOP::debug($op) {
     $op->B::OP::debug();
     printf \*STDOUT, "\top_pv\t\t\%s\n", < cstring( <$op->pv);
 }
 
-sub B::PADOP::debug {
-    my @($op) =  @_;
+sub B::PADOP::debug($op) {
     $op->B::OP::debug();
     printf \*STDOUT, "\top_padix\t\%ld\n", < $op->padix;
 }
 
-sub B::NULL::debug {
-    my @($sv) =  @_;
+sub B::NULL::debug($sv) {
     if ($$sv == ${sv_undef()}) {
 	print \*STDOUT, "&sv_undef\n";
     } else {
@@ -120,8 +108,7 @@ sub B::NULL::debug {
     }
 }
 
-sub B::SV::debug {
-    my @($sv) =  @_;
+sub B::SV::debug($sv) {
     if (!$$sv) {
 	print \*STDOUT, < class($sv), " = NULL\n";
 	return;
@@ -133,8 +120,7 @@ sub B::SV::debug {
 EOT
 }
 
-sub B::RV::debug {
-    my @($rv) =  @_;
+sub B::RV::debug($rv) {
     B::SV::debug($rv);
     printf \*STDOUT, <<'EOT', ${$rv->RV};
 	RV		0x%x
@@ -142,8 +128,7 @@ EOT
     $rv->RV->debug;
 }
 
-sub B::PV::debug {
-    my @($sv) =  @_;
+sub B::PV::debug($sv) {
     $sv->B::SV::debug();
     my $pv = $sv->PV();
     printf \*STDOUT, <<'EOT', < cstring($pv), length($pv);
@@ -152,40 +137,34 @@ sub B::PV::debug {
 EOT
 }
 
-sub B::IV::debug {
-    my @($sv) =  @_;
+sub B::IV::debug($sv) {
     $sv->B::SV::debug();
     printf \*STDOUT, "\txiv_iv\t\t\%d\n", < $sv->IV;
 }
 
-sub B::NV::debug {
-    my @($sv) =  @_;
+sub B::NV::debug($sv) {
     $sv->B::IV::debug();
     printf \*STDOUT, "\txnv_nv\t\t\%s\n", < $sv->NV;
 }
 
-sub B::PVIV::debug {
-    my @($sv) =  @_;
+sub B::PVIV::debug($sv) {
     $sv->B::PV::debug();
     printf \*STDOUT, "\txiv_iv\t\t\%d\n", < $sv->IV;
 }
 
-sub B::PVNV::debug {
-    my @($sv) =  @_;
+sub B::PVNV::debug($sv) {
     $sv->B::PVIV::debug();
     printf \*STDOUT, "\txnv_nv\t\t\%s\n", < $sv->NV;
 }
 
-sub B::BM::debug {
-    my @($sv) =  @_;
+sub B::BM::debug($sv) {
     $sv->B::PVNV::debug();
     printf \*STDOUT, "\txbm_useful\t\%d\n", < $sv->USEFUL;
     printf \*STDOUT, "\txbm_previous\t\%u\n", < $sv->PREVIOUS;
     printf \*STDOUT, "\txbm_rare\t\%s\n", < cstring(chr($sv->RARE));
 }
 
-sub B::CV::debug {
-    my @($sv) =  @_;
+sub B::CV::debug($sv) {
     $sv->B::PVNV::debug();
     my @($stash) =  $sv->STASH;
     my @($start) =  $sv->START;
@@ -210,8 +189,7 @@ EOT
     $padlist->debug if $padlist;
 }
 
-sub B::AV::debug {
-    my @($av) =  @_;
+sub B::AV::debug($av) {
     $av->B::SV::debug;
     my @array = $av->ARRAY;
     print \*STDOUT, "\tARRAY\t\t(", join(", ", map( {"0x" . $$_ }, @array)), ")\n";
@@ -222,8 +200,7 @@ sub B::AV::debug {
 EOT
 }
 
-sub B::GV::debug {
-    my @($gv) =  @_;
+sub B::GV::debug($gv) {
     if (%done_gv{+$$gv}++) {
 	printf \*STDOUT, "GV \%s::\%s\n", < $gv->STASH->NAME, < $gv->SAFENAME;
 	return;

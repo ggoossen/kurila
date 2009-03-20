@@ -20,8 +20,7 @@ sub ext {
   else                    { return &_unix_os2_ext( < @_ ); }
 }
 
-sub _unix_os2_ext {
-    my @($self,$potential_libs, ?$verbose, ?$give_libs) =  @_;
+sub _unix_os2_ext($self,$potential_libs, ?$verbose, ?$give_libs) {
     $verbose ||= 0;
 
     if ($^OS_NAME =~ 'os2' and config_value("perllibs")) { 
@@ -213,11 +212,10 @@ sub _unix_os2_ext {
     }
 }
 
-sub _win32_ext {
+sub _win32_ext($self, $potential_libs, $verbose, $give_libs) {
 
     require Text::ParseWords;
 
-    my@($self, $potential_libs, $verbose, $give_libs) =  @_;
     $verbose ||= 0;
 
     # If user did not supply a list, we punt.
@@ -371,8 +369,7 @@ sub _win32_ext {
 }
 
 
-sub _vms_ext {
-  my@($self, $potential_libs, $verbose, $give_libs) =  @_;
+sub _vms_ext($self, $potential_libs, $verbose, $give_libs) {
   $verbose ||= 0;
 
   my(@crtls,$crtlstr);

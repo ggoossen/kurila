@@ -125,8 +125,7 @@ sub file_magic {
     return read_magic($buf, $file);
 }
 
-sub read_magic {
-    my@($buf, ?$file) =  @_;
+sub read_magic($buf, ?$file) {
     my %info;
 
     my $buflen = length($buf);
@@ -386,8 +385,7 @@ sub _retrieve {
 #
 # Same as retrieve, but perform from an already opened file descriptor instead.
 #
-sub fd_retrieve {
-	my @($file) =  @_;
+sub fd_retrieve($file) {
 	my $fd = fileno($file);
 	logcroak "not a valid file descriptor" unless defined $fd;
 	my $self;
@@ -404,8 +402,7 @@ sub fd_retrieve {
 # Recreate objects in memory from an existing frozen image created
 # by freeze.  If the frozen image passed is undef, return undef.
 #
-sub thaw {
-	my @($frozen) =  @_;
+sub thaw($frozen) {
 	return undef unless defined $frozen;
 	my $self;
 	my $da = $^EVAL_ERROR;							# Could be from exception handler

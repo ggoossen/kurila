@@ -158,8 +158,7 @@ If an argument has been given, it is pushed on the list of items.
 =cut
 
 # The individual =items of this list
-sub item {
-    my @($self, ?$item) =  @_;
+sub item($self, ?$item) {
     if(defined $item) {
         push(@{$self->{_items}}, $item);
         return $item;
@@ -603,8 +602,7 @@ sub link {
     $link;
 }
 
-sub _invalid_link {
-    my @($msg) =  @_;
+sub _invalid_link($msg) {
     # this sets @_
     #try { die "$msg\n" };
     #chomp $@;
@@ -650,8 +648,7 @@ list of all cache elements.
 
 =cut
 
-sub item {
-    my @($self,%< %param) =  @_;
+sub item($self,%< %param) {
     if(%param) {
         my $item = Pod::Cache::Item->new(< %param);
         push(@$self, $item);
@@ -672,8 +669,7 @@ not found.
 
 =cut
 
-sub find_page {
-    my @($self,$page) =  @_;
+sub find_page($self,$page) {
     foreach( @$self) {
         if($_->page() eq $page) {
             return $_;
@@ -772,8 +768,7 @@ unique id for the C<find_node> method to work correctly.
 =cut
 
 # The POD nodes
-sub nodes {
-    my @($self,@< @nodes) =  @_;
+sub nodes($self,@< @nodes) {
     if((nelems @nodes)) {
         push(@{$self->{nodes}}, < @nodes);
         return @nodes;
@@ -791,8 +786,7 @@ stored in the node array) or undef if not found.
 
 =cut
 
-sub find_node {
-    my @($self,$node) =  @_;
+sub find_node($self,$node) {
     my @search;
     push(@search, < @{$self->{?nodes}}) if($self->{?nodes});
     push(@search, < @{$self->{?idx}}) if($self->{?idx});
@@ -818,8 +812,7 @@ unique id.
 =cut
 
 # The POD index entries
-sub idx {
-    my @($self,@< @idx) =  @_;
+sub idx($self,@< @idx) {
     if((nelems @idx)) {
         push(@{$self->{idx}}, < @idx);
         return @idx;

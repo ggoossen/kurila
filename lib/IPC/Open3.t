@@ -18,8 +18,7 @@ use IPC::Open3;
 
 my $perl = $^EXECUTABLE_NAME;
 
-sub ok {
-    my @($n, $result, ?$info) =  @_;
+sub ok($n, $result, ?$info) {
     if ($result) {
 	print \*STDOUT, "ok $n\n";
     }

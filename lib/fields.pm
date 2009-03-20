@@ -113,8 +113,7 @@ sub new {
     return $self;
 }
 
-sub _accessible_keys {
-    my @($class) =  @_;
+sub _accessible_keys($class) {
     return  @( <
         keys %{*{Symbol::fetch_glob($class.'::FIELDS')}},
         < @+: map( { _accessible_keys($_) }, @{*{Symbol::fetch_glob($class.'::ISA')}}),

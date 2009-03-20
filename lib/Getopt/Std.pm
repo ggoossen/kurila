@@ -88,8 +88,7 @@ our ($OUTPUT_HELP_VERSION, $STANDARD_HELP_VERSION);
 # Usage:
 #	getopt('oDI');  # -o, -D & -I take arg.  Sets opt_* as a side effect.
 
-sub getopt (;$$) {
-    my @($argumentative, ?$hash) =  @_;
+sub getopt (;$$)($argumentative, ?$hash) {
     $argumentative = '' if !defined $argumentative;
     my ($first,$rest);
     local $_;
@@ -218,8 +217,7 @@ EOH
 #   getopts('a:bc');	# -a takes arg. -b & -c not. Sets opt_* as a
 #			#  side effect.
 
-sub getopts ($;$) {
-    my @($argumentative, ?$hash) =  @_;
+sub getopts ($;$)($argumentative, ?$hash) {
     my (@args,$first,$rest,$exit);
     my $errs = 0;
     local $_;

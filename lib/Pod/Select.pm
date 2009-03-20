@@ -492,8 +492,7 @@ for processing; otherwise a false value is returned.
 
 =cut
 
-sub is_selected {
-    my @($self, $paragraph) =  @_;
+sub is_selected($self, $paragraph) {
     local $_;
     local *myData = $self;
 
@@ -576,8 +575,7 @@ filenames are given).
 
 =cut 
 
-sub podselect {
-    my@(@argv) = @_;
+sub podselect(@argv) {
     my %defaults = %( () );
     my $pod_parser = Pod::Select->new(< %defaults);
     my $num_inputs = 0;
@@ -661,8 +659,7 @@ each invalid regex.
 
 =cut
 
-sub _compile_section_spec {
-    my @($section_spec) =  @_;
+sub _compile_section_spec($section_spec) {
     my (@regexs, $negated);
 
     ## Compile the spec into a list of regexs

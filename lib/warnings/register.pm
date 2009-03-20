@@ -23,9 +23,8 @@ usage.
 
 require warnings;
 
-sub mkMask
+sub mkMask($bit)
 {
-    my @($bit) =  @_;
     my $mask = "";
 
     vec($mask, $bit, 1 => 1);

@@ -404,8 +404,7 @@ gen_op_is_macro( \%OP_IS_SOCKET, 'OP_IS_SOCKET');
 gen_op_is_macro( \%OP_IS_FILETEST, 'OP_IS_FILETEST');
 gen_op_is_macro( \%OP_IS_FT_ACCESS, 'OP_IS_FILETEST_ACCESS');
 
-sub gen_op_is_macro {
-    my @($op_is, $macname) =  @_;
+sub gen_op_is_macro($op_is, $macname) {
     if (%$op_is) {
 	
 	# get opnames whose numbers are lowest and highest
@@ -498,8 +497,7 @@ END {
 }
 
 ###########################################################################
-sub tab {
-    my @($l, $t) =  @_;
+sub tab($l, $t) {
     $t .= "\t" x ($l - (length($t) + 1) / 8);
     $t;
 }

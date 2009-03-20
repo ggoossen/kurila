@@ -30,8 +30,7 @@ sub safer_unlink {
   return $cnt;
 }
 
-sub safer_rename_silent {
-  my @($from, $to) =  @_;
+sub safer_rename_silent($from, $to) {
 
   # Some dosish systems can't rename over an existing file:
   safer_unlink $to;
@@ -39,8 +38,7 @@ sub safer_rename_silent {
   rename $from, $to;
 }
 
-sub rename_if_different {
-  my @($from, $to) =  @_;
+sub rename_if_different($from, $to) {
 
   if (compare($from, $to) == 0) {
       warn "no changes between '$from' & '$to'\n";

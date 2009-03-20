@@ -215,8 +215,7 @@ sub extract {
 # by the __DEFAULT__ comment  next to the appropriate union member in
 # perly.y
 
-sub make_type_tab {
-    my @($y_file, $tablines) =  @_;
+sub make_type_tab($y_file, $tablines) {
     my %tokens;
     my %types;
     my $default_token;

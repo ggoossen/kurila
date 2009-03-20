@@ -983,9 +983,9 @@ Process basic pod commands.
 
 =cut
 
-sub command {
+sub command($command, $paragraph, $line_num, $parobj) {
   my $self = shift;
-  my @($command, $paragraph, $line_num, $parobj) =  @_;
+
 
   # return if we dont care
   return if $command eq 'pod';
@@ -1103,9 +1103,9 @@ Verbatim text
 
 =cut
 
-sub verbatim {
+sub verbatim($paragraph, $line_num, $parobj) {
   my $self = shift;
-  my @($paragraph, $line_num, $parobj) =  @_;
+
 
   # Expand paragraph unless in =begin block
   if ($self->{?_dont_modify_any_para}) {
@@ -1145,9 +1145,9 @@ Plain text paragraph.
 
 =cut
 
-sub textblock {
+sub textblock($paragraph, $line_num, $parobj) {
   my $self = shift;
-  my @($paragraph, $line_num, $parobj) =  @_;
+
 
   # print Dumper($self);
 
@@ -1218,10 +1218,9 @@ Interior sequence expansion
 
 =cut
 
-sub interior_sequence {
+sub interior_sequence($seq_command, $seq_argument, $pod_seq) {
   my $self = shift;
 
-  my @($seq_command, $seq_argument, $pod_seq) =  @_;
 
   if ($seq_command eq 'B') {
     return "\\textbf\{$seq_argument\}";

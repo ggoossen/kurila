@@ -31,8 +31,7 @@ sub fill_protos {
   return @out1;
 }
 
-sub write_invocation {
-  my @($core, $call, $name, @< @argvs) =  @_;
+sub write_invocation($core, $call, $name, @< @argvs) {
   if ((nelems @argvs) == 1) {		# No optional arguments
     my @argv = @{@argvs[0]};
     shift @argv;
@@ -56,14 +55,12 @@ EOC
   }
 }
 
-sub one_invocation {
-  my @($core, $call, $name, @< @argv) =  @_;
+sub one_invocation($core, $call, $name, @< @argv) {
   return qq{$call($(join ', ', @argv)) || die "Can't $name(\$(join ', ', map \{ dump::view(\$_) \}, \@_))} . 
     ($core ?? ': $^OS_ERROR' !! ', \$^OS_ERROR is \"$^OS_ERROR\"') . '"';
 }
 
-sub _make_fatal {
-    my@($sub, $pkg) =  @_;
+sub _make_fatal($sub, $pkg) {
     my($name, $code, $sref, $real_proto, $proto, $core, $call);
     my $ini = $sub;
 

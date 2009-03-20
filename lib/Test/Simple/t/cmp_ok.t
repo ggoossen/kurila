@@ -20,8 +20,7 @@ require Test::Builder;
 my $TB = Test::Builder->create;
 $TB->level(0);
 
-sub try_cmp_ok {
-    my@($left, $cmp, $right) =  @_;
+sub try_cmp_ok($left, $cmp, $right) {
     
     my %expect;
     %expect{+ok}    = eval "\$left $cmp \$right";

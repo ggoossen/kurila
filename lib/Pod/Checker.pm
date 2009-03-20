@@ -497,8 +497,7 @@ my %ENTITIES = %(
 ## Function definitions begin here
 ##---------------------------------
 
-sub podchecker( $ ; $ % ) {
-    my @($infile, $outfile, %< %options) =  @_;
+sub podchecker( $ ; $ % )($infile, $outfile, %< %options) {
     local $_;
 
     ## Set defaults
@@ -677,8 +676,7 @@ collapsed to a single blank.
 
 =cut
 
-sub node {
-    my @($self, ?$text) =  @_;
+sub node($self, ?$text) {
     if(defined $text) {
         $text =~ s/\s+$//s; # strip trailing whitespace
         $text =~ s/\s+/ /gs; # collapse whitespace
@@ -702,8 +700,7 @@ of whitespace is collapsed to a single blank.
 =cut
 
 # set/return index entries of current POD
-sub idx {
-    my @($self,?$text) =  @_;
+sub idx($self,?$text) {
     if(defined $text) {
         $text =~ s/\s+$//s; # strip trailing whitespace
         $text =~ s/\s+/ /gs; # collapse whitespace
@@ -801,8 +798,7 @@ sub end_pod {
 }
 
 # check a POD command directive
-sub command { 
-    my @($self, $cmd, $paragraph, $line_num, $pod_para) =  @_;
+sub command($self, $cmd, $paragraph, $line_num, $pod_para) {
     my @($file, $line) =  $pod_para->file_line;
     ## Check the command syntax
     my $arg; # this will hold the command argument
@@ -1030,9 +1026,8 @@ sub command {
     }
 }
 
-sub _open_list
+sub _open_list($self,$indent,$line,$file)
 {
-    my @($self,$indent,$line,$file) =  @_;
     my $list = Pod::List->new(
            indent => $indent,
            start => $line,
@@ -1042,9 +1037,8 @@ sub _open_list
     $list;
 }
 
-sub _close_list
+sub _close_list($self,$line,$file)
 {
-    my @($self,$line,$file) =  @_;
     my $list = shift(@{$self->{_list_stack}});
     if(defined $self->{?_list_item_contents} &&
       $self->{?_list_item_contents} == 0) {
@@ -1057,16 +1051,14 @@ sub _close_list
 }
 
 # process a block of some text
-sub interpolate_and_check {
-    my @($self, $paragraph, $line, $file) =  @_;
+sub interpolate_and_check($self, $paragraph, $line, $file) {
     ## Check the interior sequences in the command-text
     # and return the text
     $self->_check_ptree( 
         $self->parse_text($paragraph,$line), $line, $file, '');
 }
 
-sub _check_ptree {
-    my @($self,$ptree,$line,$file,$nestlist) =  @_;
+sub _check_ptree($self,$ptree,$line,$file,$nestlist) {
     local($_);
     my $text = '';
     # process each node in the parse tree
@@ -1204,9 +1196,7 @@ sub _check_ptree {
 }
 
 # process a block of verbatim text
-sub verbatim { 
-    ## Nothing particular to check
-    my @($self, $paragraph, $line_num, $pod_para) =  @_;
+sub verbatim($self, $paragraph, $line_num, $pod_para) {
 
     $self->_preproc_par($paragraph);
 
@@ -1219,8 +1209,7 @@ sub verbatim {
 }
 
 # process a block of regular text
-sub textblock { 
-    my @($self, $paragraph, $line_num, $pod_para) =  @_;
+sub textblock($self, $paragraph, $line_num, $pod_para) {
     my @($file, $line) =  $pod_para->file_line;
 
     $self->_preproc_par($paragraph);

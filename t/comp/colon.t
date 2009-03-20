@@ -11,8 +11,7 @@
 
 $_ = '';	# to avoid undef warning on m// etc.
 
-sub ok {
-    my@($test,$ok) =  @_;
+sub ok($test,$ok) {
     print \*STDOUT, "not " unless $ok;
     print \*STDOUT, "ok $test\n";
 }

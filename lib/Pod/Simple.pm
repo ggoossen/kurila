@@ -171,18 +171,15 @@ sub new {
 
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-sub _handle_element_start {     # OVERRIDE IN DERIVED CLASS
-  my@($self, $element_name, $attr_hash_r) =  @_;
+sub _handle_element_start($self, $element_name, $attr_hash_r) {
   return;
 }
 
-sub _handle_element_end {       # OVERRIDE IN DERIVED CLASS
-  my@($self, $element_name) =  @_;
+sub _handle_element_end($self, $element_name) {
   return;
 }
 
-sub _handle_text          {     # OVERRIDE IN DERIVED CLASS
-  my@($self, $text) =  @_;
+sub _handle_text($self, $text)          {
   return;
 }
 
@@ -359,8 +356,7 @@ sub parse_string_document {
   return $self;
 }
 
-sub _init_fh_source {
-  my@($self, $source) =  @_;
+sub _init_fh_source($self, $source) {
 
   #DEBUG > 1 and print "Declaring $source as :raw for starters\n";
   #$self->_apply_binmode($source, ':raw');
@@ -414,11 +410,7 @@ sub parse_file {
 
 #:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.
 
-sub parse_from_file {
-  # An emulation of Pod::Parser's interface, for the sake of Perldoc.
-  # Basically just a wrapper around parse_file.
-
-  my @($self, ?$source, ?$to) =  @_;
+sub parse_from_file($self, ?$source, ?$to) {
   $self = $self->new unless ref($self); # so we tolerate being a class method
   
   if(!defined $source)             { $source = *STDIN{IO}
@@ -472,14 +464,12 @@ sub scream {    # like whine, but not suppressable
   return $self->_complain_errata(< @_);
 }
 
-sub _complain_warn {
-  my@($self,$line,$complaint) =  @_;
+sub _complain_warn($self,$line,$complaint) {
   return printf \*STDERR, "\%s around line \%s: \%s\n",
     $self->{?'source_filename'} || 'Pod input', $line, $complaint;
 }
 
-sub _complain_errata {
-  my@($self,$line,$complaint) =  @_;
+sub _complain_errata($self,$line,$complaint) {
   if( $self->{?'no_errata_section'} ) {
     DEBUG +> 9 and print \*STDOUT, "Discarding erratum (at line $line) $complaint\n because no_errata_section is on.\n";
   } else {
@@ -492,9 +482,7 @@ sub _complain_errata {
 
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-sub _get_initial_item_type {
-  # A hack-wrapper here for when you have like "=over\n\n=item 456\n\n"
-  my@($self, $para) =  @_;
+sub _get_initial_item_type($self, $para) {
   return $para->[1]->{?'~type'}  if $para->[1]->{?'~type'};
 
   return $para->[1]->{+'~type'} = 'text'
@@ -505,8 +493,7 @@ sub _get_initial_item_type {
 
 
 
-sub _get_item_type {       # mutates the item!!
-  my@($self, $para) =  @_;
+sub _get_item_type($self, $para) {
   return $para->[1]->{?'~type'} if $para->[1]->{?'~type'};
 
 
@@ -585,8 +572,7 @@ sub _make_treelet {
 
 #:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.
 
-sub _wrap_up {
-  my@($self, @< @stack) =  @_;
+sub _wrap_up($self, @< @stack) {
   my $nixx  = $self->{?'nix_X_codes'};
   my $merge = $self->{?'merge_text' };
   return unless $nixx or $merge;
@@ -747,12 +733,7 @@ sub _remap_sequences {
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-sub _ponder_extend {
-
-  # "Go to an extreme, move back to a more comfortable place"
-  #  -- /Oblique Strategies/,  Brian Eno and Peter Schmidt
-  
-  my@($self, $para) =  @_;
+sub _ponder_extend($self, $para) {
   my $content = join ' ', @( splice @$para, 2);
   $content =~ s/^\s+//s;
   $content =~ s/\s+$//s;
@@ -872,8 +853,7 @@ sub _ponder_extend {
 
 #:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.
 
-sub _treat_Zs {  # Nix Z<...>'s
-  my@($self,@< @stack) =  @_;
+sub _treat_Zs($self,@< @stack) {
 
   my($treelet);
   my $start_line = @stack[0]->[1]->{?'start_line'};
@@ -970,17 +950,7 @@ sub _treat_Zs {  # Nix Z<...>'s
 # Note, however, that formatting codes and Z<>'s can occur in any and all
 # parts of an L<...> (i.e., in name, section, text, and url).
 
-sub _treat_Ls {  # Process our dear dear friends, the L<...> sequences
-
-  # L<name>
-  # L<name/"sec"> or L<name/sec>
-  # L</"sec"> or L</sec> or L<"sec">
-  # L<text|name>
-  # L<text|name/"sec"> or L<text|name/sec>
-  # L<text|/"sec"> or L<text|/sec> or L<text|"sec">
-  # L<scheme:...>
-
-  my@($self,@< @stack) =  @_;
+sub _treat_Ls($self,@< @stack) {
 
   my($treelet);
   my $start_line = @stack[0]->[1]->{?'start_line'};
@@ -1249,8 +1219,7 @@ sub _treat_Ls {  # Process our dear dear friends, the L<...> sequences
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-sub _treat_Es {
-  my@($self,@< @stack) =  @_;
+sub _treat_Es($self,@< @stack) {
 
   my($i, $treelet, $content, $replacer, $charnum);
   my $start_line = @stack[0]->[1]->{?'start_line'};
@@ -1338,8 +1307,7 @@ sub _treat_Es {
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-sub _treat_Ss {
-  my@($self,$treelet) =  @_;
+sub _treat_Ss($self,$treelet) {
   
   _change_S_to_nbsp($treelet,0) if $self->{?'nbsp_for_S'};
 
@@ -1352,9 +1320,7 @@ sub _treat_Ss {
 }
 
 
-sub _change_S_to_nbsp { #  a recursive function
-  # Sanely assumes that the top node in the excursion won't be an S node.
-  my@($treelet, $in_s) =  @_;
+sub _change_S_to_nbsp($treelet, $in_s) {
   
   my $is_s = ('S' eq $treelet->[0]);
   $in_s ||= $is_s; # So in_s is on either by this being an S element,
@@ -1408,8 +1374,7 @@ sub _accessorize {  # A simple-minded method-maker
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #=============================================================================
 
-sub filter {
-  my@($class, $source) =  @_;
+sub filter($class, $source) {
   my $new = $class->new;
   $new->output_fh(*STDOUT{IO});
   

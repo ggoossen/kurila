@@ -484,8 +484,7 @@ package Test::Builder::Tester::Tie;
 ##
 # add line(s) to be expected
 
-sub new {
-    my @($class, $type) = @_;
+sub new($class, $type) {
 
     my $self = bless \%( got => '', type => $type ), $class;
     open my $fh, '>', \$self->{+'got'} or die "$^OS_ERROR";
@@ -510,9 +509,8 @@ sub expect
 }
 
 
-sub _translate_Failed_check
+sub _translate_Failed_check($self, $check)
 {
-    my @($self, $check) = @_;
 
     if( $check =~ m/\A(.*)#     (Failed .*test) \((.*?) at line (\d+)\)\Z(?!\n)/ ) {
         $check = "/\Q$1\E#\\s+\Q$2\E.*?\\n?.*?\Qat $3\E line \Q$4\E.*\\n?/";

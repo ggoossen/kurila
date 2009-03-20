@@ -3,8 +3,7 @@
 print \*STDOUT, "1..65\n";
 
 my $test = 0;
-sub ok ($$) {
-    my @($ok, $name) =  @_;
+sub ok ($$)($ok, $name) {
     ++$test;
     print \*STDOUT, $ok ?? "ok $test - $name\n" !! "not ok $test - $name\n";
 }

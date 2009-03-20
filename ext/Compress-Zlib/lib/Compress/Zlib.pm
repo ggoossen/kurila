@@ -97,9 +97,8 @@ sub _save_gzerr
     _set_gzerr($value) ;
 }
 
-sub gzopen($$)
-{
-    my @($file, $mode) =  @_ ;
+sub gzopen($$)($file, $mode)
+{ 
 
     my $gz ;
     my %defOpts = %(Level    => Z_DEFAULT_COMPRESSION(),

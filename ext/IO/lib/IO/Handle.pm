@@ -302,8 +302,7 @@ sub new_from_fd {
 ## Open and close.
 ##
 
-sub _open_mode_string {
-    my @($mode) =  @_;
+sub _open_mode_string($mode) {
     $mode =~ m/^\+?(<|>>?)$/
       or $mode =~ s/^r(\+?)$/$1</
       or $mode =~ s/^w(\+?)$/$1>/

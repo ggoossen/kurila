@@ -115,8 +115,7 @@ sub muse {
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-sub batch_convert {
-  my@($self, $dirs, $outdir) =  @_;
+sub batch_convert($self, $dirs, $outdir) {
   $self ||= __PACKAGE__; # tolerate being called as an optionless function
   $self = $self->new unless ref $self; # tolerate being used as a class method
 
@@ -141,8 +140,7 @@ sub batch_convert {
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-sub _batch_convert_main {
-  my@($self, $dirs, $outdir) =  @_;
+sub _batch_convert_main($self, $dirs, $outdir) {
   # $dirs is either false, or an arrayref.    
   # $outdir is a pathspec.
   
@@ -194,8 +192,7 @@ sub _batch_convert_main {
 }
 
 
-sub _do_all_batch_conversions {
-  my@($self, $mod2path, $outdir) =  @_;
+sub _do_all_batch_conversions($self, $mod2path, $outdir) {
   $self->{+"__batch_conv_page_count"} = 0;
 
   foreach my $module (sort {lc($a) cmp lc($b)}, keys %$mod2path) {
@@ -206,8 +203,7 @@ sub _do_all_batch_conversions {
   return;
 }
 
-sub _batch_convert_finish {
-  my@($self, $outdir) =  @_;
+sub _batch_convert_finish($self, $outdir) {
   $self->write_contents_file($outdir);
   $self->muse("Done with batch conversion.  %$self{?'__batch_conv_page_count'} files done.");
   $self->muse( "= ", scalar(localtime) );
@@ -217,8 +213,7 @@ sub _batch_convert_finish {
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-sub _do_one_batch_conversion {
-  my@($self, $module, $mod2path, $outdir, ?$outfile) =  @_;
+sub _do_one_batch_conversion($self, $module, $mod2path, $outdir, ?$outfile) {
 
   my $retval;
   my $total    = nkeys %$mod2path;
@@ -282,8 +277,7 @@ sub filespecsys { @_[0]->{?'_filespecsys'} || 'File::Spec' }
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-sub note_for_contents_file {
-  my@($self, $namelets, $infile, $outfile) =  @_;
+sub note_for_contents_file($self, $namelets, $infile, $outfile) {
 
   # I think the infile and outfile parts are never used. -- SMB
   # But it's handy to have them around for debugging.
@@ -301,8 +295,7 @@ sub note_for_contents_file {
 
 #_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 
-sub write_contents_file {
-  my@($self, $outdir) =  @_;
+sub write_contents_file($self, $outdir) {
   my $outfile  = $self->_contents_filespec($outdir) || return;
 
   $self->muse("Preparing list of modules for ToC");
@@ -327,8 +320,7 @@ sub write_contents_file {
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-sub _write_contents_start {
-  my@($self, $Contents, $outfile) =  @_;
+sub _write_contents_start($self, $Contents, $outfile) {
   my $starter = $self->contents_page_start || '';
   
   do {
@@ -353,8 +345,7 @@ sub _write_contents_start {
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-sub _write_contents_middle {
-  my@($self, $Contents, $outfile, $toplevel2submodules, $toplevel_form_freq) =  @_;
+sub _write_contents_middle($self, $Contents, $outfile, $toplevel2submodules, $toplevel_form_freq) {
 
   foreach my $t (sort keys %$toplevel2submodules) {
     my @downlines = sort {$a->[-1] cmp $b->[-1]},
@@ -378,8 +369,7 @@ sub _write_contents_middle {
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-sub _write_contents_end {
-  my@($self, $Contents, $outfile) =  @_;
+sub _write_contents_end($self, $Contents, $outfile) {
   unless(
     print $Contents, "</dl>\n",
       $self->contents_page_end || '',
@@ -392,8 +382,7 @@ sub _write_contents_end {
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-sub _prep_contents_breakdown {
-  my@($self) =  @_;
+sub _prep_contents_breakdown($self) {
   my $contents = $self->_contents;
   my %toplevel; # maps  lctoplevelbit => [all submodules]
   my %toplevel_form_freq; # ends up being  'foo' => 'Foo'
@@ -426,8 +415,7 @@ sub _prep_contents_breakdown {
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-sub _contents_filespec {
-  my@($self, $outdir) =  @_;
+sub _contents_filespec($self, $outdir) {
   my $outfile = $self->contents_file;
   return unless $outfile;
   return $self->filespecsys->catfile( $outdir, $outfile );
@@ -435,8 +423,7 @@ sub _contents_filespec {
 
 #_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 
-sub makepath {
-  my@($self, $outdir, $namelets) =  @_;
+sub makepath($self, $outdir, $namelets) {
   return unless (nelems @$namelets) +> 1;
   for my $i (0 .. ((nelems @$namelets) - 2)) {
     my $dir = $self->filespecsys->catdir( $outdir, < @$namelets[[0 .. $i]] );
@@ -454,9 +441,9 @@ sub makepath {
 
 #_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 
-sub batch_mode_page_object_init {
+sub batch_mode_page_object_init($page, $module, $infile, $outfile, $depth) {
   my $self = shift;
-  my@($page, $module, $infile, $outfile, $depth) =  @_;
+
   
   # TODO: any further options to percolate onto this new object here?
 
@@ -475,10 +462,10 @@ sub batch_mode_page_object_init {
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-sub add_header_backlink {
+sub add_header_backlink($page, $module, $infile, $outfile, $depth) {
   my $self = shift;
   return if $self->no_contents_links;
-  my@($page, $module, $infile, $outfile, $depth) =  @_;
+
   $page->html_header_after_title( join '', @(
     $page->html_header_after_title || '',
 
@@ -491,10 +478,10 @@ sub add_header_backlink {
   return;
 }
 
-sub add_footer_backlink {
+sub add_footer_backlink($page, $module, $infile, $outfile, $depth) {
   my $self = shift;
   return if $self->no_contents_links;
-  my@($page, $module, $infile, $outfile, $depth) =  @_;
+
   $page->html_footer( join '', @(
     qq[<p class="backlinkbottom"><b><a name="___bottom" href="],
     $self->url_up_to_contents($depth),
@@ -507,16 +494,14 @@ sub add_footer_backlink {
   return;
 }
 
-sub url_up_to_contents {
-  my@($self, $depth) =  @_;
+sub url_up_to_contents($self, $depth) {
   --$depth;
   return join '/', @( ('..') x $depth, esc($self->contents_file));
 }
 
 #_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 
-sub find_all_pods {
-  my@($self, $dirs) =  @_;
+sub find_all_pods($self, $dirs) {
   # You can override find_all_pods in a subclass if you want to
   #  do extra filtering or whatnot.  But for the moment, we just
   #  pass to modnames2paths:
@@ -525,8 +510,7 @@ sub find_all_pods {
 
 #_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 
-sub modnames2paths { # return a hashref mapping modulenames => paths
-  my@($self, $dirs) =  @_;
+sub modnames2paths($self, $dirs) {
 
   my $m2p;
   do {
@@ -559,9 +543,7 @@ sub modnames2paths { # return a hashref mapping modulenames => paths
 
 #===========================================================================
 
-sub _wopen {
-  # this is abstracted out so that the daemon class can override it
-  my@($self, $outpath) =  @_;
+sub _wopen($self, $outpath) {
   require Symbol;
   my $out_fh = Symbol::gensym();
   DEBUG +> 5 and print \*STDOUT, "Write-opening to $outpath\n";
@@ -572,8 +554,7 @@ sub _wopen {
 
 #==========================================================================
 
-sub add_css {
-  my@($self, $url, $is_default, $name, $content_type, $media, $_code) =  @_;
+sub add_css($self, $url, $is_default, $name, $content_type, $media, $_code) {
   return unless $url;
   unless($name) {
     # cook up a reasonable name based on the URL
@@ -594,8 +575,7 @@ sub add_css {
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-sub _spray_css {
-  my@($self, $outdir) =  @_;
+sub _spray_css($self, $outdir) {
 
   return unless $self->css_flurry();
   $self->_gen_css_wad();
@@ -626,8 +606,7 @@ sub _spray_css {
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-sub _css_wad_to_markup {
-  my@($self, $depth) =  @_;
+sub _css_wad_to_markup($self, $depth) {
   
   my @css  = @{ $self->_css_wad || return '' };
   return '' unless (nelems @css);
@@ -654,10 +633,7 @@ sub _css_wad_to_markup {
 }
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-sub _maybe_uplink {
-  # if the given URL looks relative, return the given uplink string --
-  # otherwise return emptystring
-  my@($self, $url, $uplink) =  @_;
+sub _maybe_uplink($self, $url, $uplink) {
   ($url =~ m{^\./} or $url !~ m{[/\:]} )
     ?? $uplink
     !! ''
@@ -750,8 +726,7 @@ sub _color_negate {
 
 #===========================================================================
 
-sub add_javascript {
-  my@($self, $url, $content_type, $_code) =  @_;
+sub add_javascript($self, $url, $content_type, $_code) {
   return unless $url;
   push  @{ $self->_javascript_wad }, \@(
     $url, $content_type || 'text/javascript', $_code
@@ -759,8 +734,7 @@ sub add_javascript {
   return;
 }
 
-sub _spray_javascript {
-  my@($self, $outdir) =  @_;
+sub _spray_javascript($self, $outdir) {
   return unless $self->javascript_flurry();
   $self->_gen_javascript_wad();
 
@@ -796,8 +770,7 @@ sub _gen_javascript_wad {
   return;
 }
 
-sub _javascript_wad_to_markup {
-  my@($self, $depth) =  @_;
+sub _javascript_wad_to_markup($self, $depth) {
   
   my @scripts  = @{ $self->_javascript_wad || return '' };
   return '' unless (nelems @scripts);

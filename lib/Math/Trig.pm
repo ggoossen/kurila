@@ -50,8 +50,7 @@ my @pi = qw(pi pi2 pi4 pip2 pip4);
 	        'great_circle' => \ @greatcircle,
 	        'pi'     => \ @pi);
 
-sub tan {
-    my @($z) =  @_;
+sub tan($z) {
     my $cz = cos($z);
     die "Division by zero in tan($z)" if $cz == 0;
     return sin($z) / $cz;
@@ -119,8 +118,7 @@ sub asin_real {
     return CORE::atan2($z, CORE::sqrt(1-$z*$z));
 }
 
-sub cartesian_to_spherical {
-    my @( $x, $y, $z ) =  @_;
+sub cartesian_to_spherical( $x, $y, $z) {
 
     my $rho = sqrt( $x * $x + $y * $y + $z * $z );
 
@@ -129,8 +127,7 @@ sub cartesian_to_spherical {
              $rho ?? acos_real( $z / $rho ) !! 0 );
 }
 
-sub spherical_to_cartesian {
-    my @( $rho, $theta, $phi ) =  @_;
+sub spherical_to_cartesian( $rho, $theta, $phi) {
 
     return  @( $rho * cos( $theta ) * sin( $phi ),
              $rho * sin( $theta ) * sin( $phi ),
@@ -143,14 +140,12 @@ sub spherical_to_cylindrical {
     return  @( sqrt( $x * $x + $y * $y ), @_[1], $z );
 }
 
-sub cartesian_to_cylindrical {
-    my @( $x, $y, $z ) =  @_;
+sub cartesian_to_cylindrical( $x, $y, $z) {
 
     return  @( sqrt( $x * $x + $y * $y ), atan2( $y, $x ), $z );
 }
 
-sub cylindrical_to_cartesian {
-    my @( $rho, $theta, $z ) =  @_;
+sub cylindrical_to_cartesian( $rho, $theta, $z) {
 
     return  @( $rho * cos( $theta ), $rho * sin( $theta ), $z );
 }
@@ -159,8 +154,7 @@ sub cylindrical_to_spherical {
     return cartesian_to_spherical( < cylindrical_to_cartesian( < @_ ) );
 }
 
-sub great_circle_distance {
-    my @( $theta0, $phi0, $theta1, $phi1, ?$rho ) =  @_;
+sub great_circle_distance( $theta0, $phi0, $theta1, $phi1, ?$rho) {
 
     $rho = 1 unless defined $rho; # Default to the unit sphere.
 
@@ -192,8 +186,7 @@ sub great_circle_direction {
 
 *great_circle_bearing = \&great_circle_direction;
 
-sub great_circle_waypoint {
-    my @( $theta0, $phi0, $theta1, $phi1, $point ) =  @_;
+sub great_circle_waypoint( $theta0, $phi0, $theta1, $phi1, $point) {
 
     $point = 0.5 unless defined $point;
 
@@ -225,8 +218,7 @@ sub great_circle_midpoint {
     great_circle_waypoint( <@_[[0..3]], 0.5);
 }
 
-sub great_circle_destination {
-    my @( $theta0, $phi0, $dir0, $dst ) =  @_;
+sub great_circle_destination( $theta0, $phi0, $dir0, $dst) {
 
     my $lat0 = pip2 - $phi0;
 

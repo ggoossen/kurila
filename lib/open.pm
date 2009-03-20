@@ -10,23 +10,7 @@ sub _get_encname {
     return;
 }
 
-sub _drop_oldenc {
-    # If by the time we arrive here there already is at the top of the
-    # perlio layer stack an encoding identical to what we would like
-    # to push via this open pragma, we will pop away the old encoding
-    # (+utf8) so that we can push ourselves in place (this is easier
-    # than ignoring pushing ourselves because of the way how $^OPEN
-    # works).  So we are looking for something like
-    #
-    #   stdio encoding(xxx) utf8
-    #
-    # in the existing layer stack, and in the new stack chunk for
-    #
-    #   :encoding(xxx)
-    #
-    # If we find a match, we pop the old stack (once, since
-    # the utf8 is just a flag on the encoding layer)
-    my @($h, @< @new) =  @_;
+sub _drop_oldenc($h, @< @new) {
     return unless (nelems @new) +>= 1 && @new[-1] =~ m/^:encoding\(.+\)$/;
     my @old = PerlIO::get_layers($h);
     return unless (nelems @old) +>= 3 &&
@@ -46,8 +30,7 @@ sub _drop_oldenc {
     }
 }
 
-sub import {
-    my @($class,@< @args) =  @_;
+sub import($class,@< @args) {
     die("open: needs explicit list of PerlIO layers") unless (nelems @args);
     my $std;
     my @($in,$out) =  split(m/\0/,($^OPEN || "\0"), -1);

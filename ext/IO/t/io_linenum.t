@@ -15,9 +15,8 @@ BEGIN { plan tests => 12 }
 
 use IO::File;
 
-sub lineno
+sub lineno($f)
 {
-  my @($f) =  @_;
   my $l;
   $l .= $f->input_line_number;
   $l;

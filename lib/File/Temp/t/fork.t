@@ -91,8 +91,7 @@ unlink($filename);   # Cleanup
 
 
 # Local ok sub handles explicit number
-sub myok {
-  my @($count, $test, $msg) =  @_;
+sub myok($count, $test, $msg) {
 
   if ($test) {
     print \*STDOUT, "ok $count - $msg\n";

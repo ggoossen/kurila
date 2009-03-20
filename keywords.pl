@@ -40,8 +40,7 @@ safer_close($kw);
 rename_if_different("keywords.h-new", "keywords.h");
 
 ###########################################################################
-sub tab {
-    my @($l, $t) =  @_;
+sub tab($l, $t) {
     $t .= "\t" x ($l - (length($t) + 1) / 8);
     $t;
 }

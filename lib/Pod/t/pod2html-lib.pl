@@ -3,8 +3,7 @@ require Pod::Html;
 use Config < qw(config_value);
 use File::Spec::Functions;
 
-sub convert_n_test {
-    my@($podfile, $testname) =  @_;
+sub convert_n_test($podfile, $testname) {
 
     my $cwd = Cwd::cwd();
     my $base_dir = catdir $cwd, updir(), "lib", "Pod";

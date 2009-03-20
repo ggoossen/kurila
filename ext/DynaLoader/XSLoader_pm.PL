@@ -1,8 +1,7 @@
 
 use Config;
 
-sub to_string {
-    my @($value) =  @_;
+sub to_string($value) {
     $value =~ s/\\/\\\\/g;
     $value =~ s/'/\\'/g;
     return "'$value'";

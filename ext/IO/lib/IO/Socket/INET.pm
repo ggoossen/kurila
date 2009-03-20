@@ -68,8 +68,7 @@ sub _get_proto_name {
     return @proto[0];
 }
 
-sub _sock_info {
-  my@($addr,$port,$proto) =  @_;
+sub _sock_info($addr,$port,$proto) {
   my $origport = $port;
   my @serv = @( () );
 
@@ -121,8 +120,7 @@ sub _error {
     return undef;
 }
 
-sub _get_addr {
-    my@($sock,$addr_str, $multi) =  @_;
+sub _get_addr($sock,$addr_str, $multi) {
     my @addr;
     if ($multi && $addr_str !~ m/^\d+(?:\.\d+){3}$/) {
 	@(_, _, _, _, @< @addr) = @: gethostbyname($addr_str);
@@ -133,8 +131,7 @@ sub _get_addr {
     @addr;
 }
 
-sub configure {
-    my@($sock,$arg) =  @_;
+sub configure($sock,$arg) {
     my($lport,$rport,$laddr,$raddr,$proto,$type);
 
 

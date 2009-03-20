@@ -9,8 +9,7 @@ BEGIN {
 
 # Can't use Test::Simple/More, they depend on Exporter.
 my $test;
-sub ok ($;$) {
-    my@($ok, $name) =  @_;
+sub ok ($;$)($ok, $name) {
 
     # You have to do it this way or VMS will get confused.
     printf \*STDOUT, "\%sok \%d\%s\n", ($ok ?? '' !! 'not '), $test,

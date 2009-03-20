@@ -91,8 +91,7 @@ package name.
 
 =cut
 
-sub guess_name {
-    my@($self) =  @_;
+sub guess_name($self) {
     my($defname,$defpm,@pm,%xs);
     local *PM;
 
@@ -143,8 +142,7 @@ invoke Perl images.
 
 =cut
 
-sub find_perl {
-    my@($self, $ver, $names, $dirs, $trace) =  @_;
+sub find_perl($self, $ver, $names, $dirs, $trace) {
     my($vmsfile,@sdirs,@snames,@cand);
     my($rslt);
     my@($inabs) = 0;
@@ -248,8 +246,7 @@ with or without the F<.Exe>-equivalent suffix.
 
 =cut
 
-sub maybe_command {
-    my@($self,$file) =  @_;
+sub maybe_command($self,$file) {
     return $file if -x $file && ! -d _;
     my@(@dirs) =@( @(''));
     my@(@exts) =@( @('',%Config{?'exe_ext'},'.exe','.com'));
@@ -326,8 +323,7 @@ under VMS.
 
 =cut
 
-sub perl_script {
-    my@($self,$file) =  @_;
+sub perl_script($self,$file) {
     return $file if -r $file && ! -d _;
     return "$file.com" if -r "$file.com";
     return "$file.pl" if -r "$file.pl";
@@ -341,8 +337,7 @@ Use as separator a character which is legal in a VMS-syntax file name.
 
 =cut
 
-sub replace_manpage_separator {
-    my@($self,$man) =  @_;
+sub replace_manpage_separator($self,$man) {
     $man = unixify($man);
     $man =~ s#/+#__#g;
     $man;
@@ -435,8 +430,7 @@ target needs to be updated.
 
 =cut
 
-sub init_others {
-    my@($self) =  @_;
+sub init_others($self) {
 
     $self->{+NOOP}               = 'Continue';
     $self->{+NOECHO}             ||= '@ ';
@@ -565,8 +559,7 @@ comma-separated.
 
 =cut
 
-sub constants {
-    my@($self) =  @_;
+sub constants($self) {
 
     # Be kind about case for pollution
     for ( @ARGV) { $_ = uc($_) if m/POLLUTE/i; }
@@ -656,8 +649,7 @@ instance of this qualifier on the command line.
 
 =cut
 
-sub cflags {
-    my@($self,$libperl) =  @_;
+sub cflags($self,$libperl) {
     my@($quals) = $self->{?CCFLAGS} || %Config{?'ccflags'};
     my@($definestr,$undefstr,$flagoptstr) = @('','','');
     my@($incstr) = '/Include=($(PERL_INC)';
@@ -755,8 +747,7 @@ command line a bit differently than MM_Unix method.
 
 =cut
 
-sub const_cccmd {
-    my@($self,$libperl) =  @_;
+sub const_cccmd($self,$libperl) {
     my(@m);
 
     return $self->{?CONST_CCCMD} if $self->{?CONST_CCCMD};
@@ -794,8 +785,7 @@ Also keep around the old $(SAY) macro in case somebody's using it.
 
 =cut
 
-sub tools_other {
-    my@($self) =  @_;
+sub tools_other($self) {
 
     # XXX Are these necessary?  Does anyone override them?  They're longer
     # than just typing the literal string.
@@ -833,8 +823,7 @@ VMSish defaults for some values.
 
 =cut
 
-sub init_dist {
-    my@($self) =  @_;
+sub init_dist($self) {
     $self->{+ZIPFLAGS}     ||= '-Vu';
     $self->{+COMPRESS}     ||= 'gzip';
     $self->{+SUFFIX}       ||= '-gz';
@@ -853,8 +842,7 @@ $(PERL_INC) have been pulled into $(CCCMD).  Also use MM[SK] macros.
 
 =cut
 
-sub c_o {
-    my@($self) =  @_;
+sub c_o($self) {
     return '' unless $self->needs_linking();
     '
 .c$(OBJ_EXT) :
@@ -875,8 +863,7 @@ Use MM[SK] macros.
 
 =cut
 
-sub xs_c {
-    my@($self) =  @_;
+sub xs_c($self) {
     return '' unless $self->needs_linking();
     '
 .xs.c :
@@ -890,8 +877,7 @@ Use MM[SK] macros, and VMS command line for C compiler.
 
 =cut
 
-sub xs_o {	# many makes are too dumb to use xs_c then c_o
-    my@($self) =  @_;
+sub xs_o($self) {
     return '' unless $self->needs_linking();
     '
 .xs$(OBJ_EXT) :
@@ -909,8 +895,7 @@ libraries to which it should be linked.
 
 =cut
 
-sub dlsyms {
-    my@($self,%< %attribs) =  @_;
+sub dlsyms($self,%< %attribs) {
 
     return '' unless $self->needs_linking();
 
@@ -992,8 +977,7 @@ Use VMS Link command.
 
 =cut
 
-sub dynamic_lib {
-    my@($self, %< %attribs) =  @_;
+sub dynamic_lib($self, %< %attribs) {
     return '' unless $self->needs_linking(); #might be because of a subdir
 
     return '' unless $self->has_link_code();
@@ -1024,8 +1008,7 @@ Use VMS commands to manipulate object library.
 
 =cut
 
-sub static_lib {
-    my@($self) =  @_;
+sub static_lib($self) {
     return '' unless $self->needs_linking();
 
     return '
@@ -1136,8 +1119,7 @@ VMS-style command line quoting in a few cases.
 
 =cut
 
-sub install {
-    my@($self, %< %attribs) =  @_;
+sub install($self, %< %attribs) {
     my(@m);
 
     push @m, q[
@@ -1258,8 +1240,7 @@ we have to rebuild Config.pm, use MM[SK] to do it.
 
 =cut
 
-sub perldepend {
-    my@($self) =  @_;
+sub perldepend($self) {
     my(@m);
 
     push @m, '
@@ -1330,8 +1311,7 @@ Consequently, it hasn't really been tested, and may well be incomplete.
 
 our %olbs;  # needs to be localized
 
-sub makeaperl {
-    my@($self, %< %attribs) =  @_;
+sub makeaperl($self, %< %attribs) {
     my@($makefilename, $searchdirs, $static, $extra, $perlinc, $target, $tmpdir, $libperl) =  
       %attribs{[qw(MAKE DIRS STAT EXTRA INCL TARGET TMP LIBPERL)]};
     my(@m);
@@ -1573,8 +1553,7 @@ part of a filespec.
 
 =cut
 
-sub maketext_filter {
-    my@($self, $text) =  @_;
+sub maketext_filter($self, $text) {
 
     $text =~ s/^([^\s:=]+)(:+\s)/$1 $2/mg;
     return $text;
@@ -1597,8 +1576,7 @@ used instead.
 
 =cut
 
-sub prefixify {
-    my@($self, $var, $sprefix, $rprefix, $default) =  @_;
+sub prefixify($self, $var, $sprefix, $rprefix, $default) {
 
     # Translate $(PERLPREFIX) to a real path.
     $rprefix = $self->eliminate_macros($rprefix);
@@ -1645,8 +1623,7 @@ sub prefixify {
 }
 
 
-sub _prefixify_default {
-    my@($self, $rprefix, $default) =  @_;
+sub _prefixify_default($self, $rprefix, $default) {
 
     print \*STDERR, "  cannot prefix, using default.\n" if $Verbose +>= 2;
 
@@ -1662,8 +1639,7 @@ sub _prefixify_default {
     return $self->_catprefix($rprefix, $default);
 }
 
-sub _catprefix {
-    my@($self, $rprefix, $default) =  @_;
+sub _catprefix($self, $rprefix, $default) {
 
     my@($rvol, $rdirs) =  $self->splitpath($rprefix);
     if( $rvol ) {
@@ -1682,8 +1658,7 @@ sub _catprefix {
 
 =cut
 
-sub cd {
-    my@($self, $dir, @< @cmds) =  @_;
+sub cd($self, $dir, @< @cmds) {
 
     $dir = vmspath($dir);
 
@@ -1708,8 +1683,7 @@ MAKE_FRAG
 
 =cut
 
-sub oneliner {
-    my@($self, $cmd, $switches) =  @_;
+sub oneliner($self, $cmd, $switches) {
     $switches = \@() unless defined $switches;
 
     # Strip leading and trailing newlines
@@ -1733,8 +1707,7 @@ native Write command instead.  Besides, its faster.
 
 =cut
 
-sub echo {
-    my@($self, $text, $file, $appending) =  @_;
+sub echo($self, $text, $file, $appending) {
     $appending ||= 0;
 
     my $opencmd = $appending ?? 'Open/Append' !! 'Open/Write';
@@ -1751,8 +1724,7 @@ sub echo {
 
 =cut
 
-sub quote_literal {
-    my@($self, $text) =  @_;
+sub quote_literal($self, $text) {
 
     # I believe this is all we should need.
     $text =~ s{"}{""}g;
@@ -1764,8 +1736,7 @@ sub quote_literal {
 
 =cut
 
-sub escape_newlines {
-    my@($self, $text) =  @_;
+sub escape_newlines($self, $text) {
 
     $text =~ s{\n}{-\n}g;
 
@@ -1816,8 +1787,7 @@ File::Spec::VMS is deprecated.
 
 =cut
 
-sub eliminate_macros {
-    my@($self,$path) =  @_;
+sub eliminate_macros($self,$path) {
     return '' unless $path;
     $self = \%() unless ref $self;
 
@@ -1877,8 +1847,7 @@ File::Spec::VMS is deprecated.
 
 =cut
 
-sub fixpath {
-    my@($self,$path,$force_path) =  @_;
+sub fixpath($self,$path,$force_path) {
     return '' unless $path;
     $self = bless \%(), $self unless ref $self;
     my($fixedpath,$prefix,$name);

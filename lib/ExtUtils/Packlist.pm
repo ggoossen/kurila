@@ -47,9 +47,8 @@ sub __find_relocations
     qr/^($alternations)/o;
 }
 
-sub new($$)
+sub new($$)($class, ?$packfile)
 {
-    my @($class, ?$packfile) =  @_;
     $class = ref($class) || $class;
 
     my $self = \%( packfile => $packfile,
@@ -62,9 +61,8 @@ sub new($$)
     return $self;
 }
 
-sub read($;$)
+sub read($;$)($self, ?$packfile)
 {
-    my @($self, ?$packfile) =  @_;
 
     if (defined($packfile)) { $self->{packfile} = $packfile; }
     else { $packfile = $self->{packfile}; }
@@ -99,9 +97,8 @@ sub read($;$)
     close($fh);
 }
 
-sub write($;$)
+sub write($;$)($self, ?$packfile)
   {
-    my @($self, ?$packfile) =  @_;
     if (defined($packfile)) { $self->{packfile} = $packfile; }
     else { $packfile = $self->{packfile}; }
     die("No packlist filename specified") if (! defined($packfile));
@@ -140,9 +137,8 @@ sub write($;$)
     close($fh);
 }
 
-sub validate($;$)
+sub validate($;$)($self, ?$remove)
   {
-    my @($self, ?$remove) =  @_;
     my @missing;
     foreach my $key (sort(keys($self->{data}))) {
         if (! -e $key) {
@@ -153,9 +149,8 @@ sub validate($;$)
     return @(@missing);
 }
 
-sub packlist_file($)
+sub packlist_file($)($self)
   {
-    my @($self) =  @_;
     return @($self->{?packfile});
 }
 

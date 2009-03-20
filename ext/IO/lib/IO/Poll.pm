@@ -68,8 +68,7 @@ sub mask {
 }
 
 
-sub poll {
-    my@($self,$timeout) =  @_;
+sub poll($self,$timeout) {
 
     $self->[1] = \%();
 

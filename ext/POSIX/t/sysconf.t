@@ -50,8 +50,7 @@ my $r;
 
 my $TTY = "/dev/tty";
 
-sub _check_and_report {
-    my @($eval_status, $return_val, $description) =  @_;
+sub _check_and_report($eval_status, $return_val, $description) {
     my $success = defined($return_val) || $^OS_ERROR == 0;
     is( $eval_status, '', $description );
     SKIP: do {

@@ -82,13 +82,11 @@ set_style_standard("concise");
 my $curcv;
 my $cop_seq_base;
 
-sub set_style {
-    @($format, $gotofmt, $treefmt) =  @_;
+sub set_style($format, $gotofmt, $treefmt) {;
     #warn "set_style: deprecated, use set_style_standard instead\n"; # someday
 }
 
-sub add_style {
-    my @($newstyle,@< @args) =  @_;
+sub add_style($newstyle,@< @args) {
     die "style '$newstyle' already exists, choose a new name\n"
 	if exists %style{$newstyle};
     die "expecting 3 style-format args\n" unless (nelems @args) == 3;
@@ -138,8 +136,7 @@ sub concise_subref {
     concise_cv_obj($order, $codeobj, $name);
 }
 
-sub concise_stashref {
-    my@($order, $h) =  @_;
+sub concise_stashref($order, $h) {
     foreach my $k (sort keys %$h) {
 	next unless defined $h->{?$k};
 	my $s = \($h->{+$k});
@@ -209,8 +206,7 @@ sub concise_main {
     }
 }
 
-sub concise_specials {
-    my@($name, $order, @< @cv_s) =  @_;
+sub concise_specials($name, $order, @< @cv_s) {
     my $i = 1;
     if ($name eq "BEGIN") {
 	splice(@cv_s, 0, 8); # skip 7 BEGIN blocks in this file. NOW 8 ??
@@ -391,8 +387,7 @@ my @linenoise =
 
 my $chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-sub op_flags { # common flags (see BASOP.op_flags in op.h)
-    my@($x) =  @_;
+sub op_flags($x) {
     my(@v);
     push @v, "v" if ($x ^&^ 3) == 1;
     push @v, "s" if ($x ^&^ 3) == 2;
@@ -425,14 +420,12 @@ sub reset_sequence {
     $lastnext = 0;
 }
 
-sub seq {
-    my@($op) =  @_;
+sub seq($op) {
     return "-" if not exists %sequence_num{$$op};
     return base_n(%sequence_num{?$$op});
 }
 
-sub walk_topdown {
-    my@($op, $sub, $level) =  @_;
+sub walk_topdown($op, $sub, $level) {
     $sub->($op, $level);
     if ($op->flags ^&^ OPf_KIDS) {
 	my $kid = $op->first;
@@ -451,8 +444,7 @@ sub walk_topdown {
     }
 }
 
-sub walklines {
-    my@($ar, $level) =  @_;
+sub walklines($ar, $level) {
     for my $l ( @$ar) {
 	if (ref($l) eq "ARRAY") {
 	    walklines($l, $level + 1);
@@ -462,8 +454,7 @@ sub walklines {
     }
 }
 
-sub walk_exec {
-    my@($top, ?$level) =  @_;
+sub walk_exec($top, ?$level) {
     my %opsseen;
     my @lines;
     my @todo = @(\@($top, \@lines));
@@ -493,8 +484,7 @@ sub walk_exec {
 }
 
 # The structure of this routine is purposely modeled after op.c's peep()
-sub sequence {
-    my@($op) =  @_;
+sub sequence($op) {
     my $oldop = 0;
     return if class($op) eq "NULL" or exists %sequence_num{$$op};
     while ($$op) {
@@ -530,8 +520,7 @@ sub sequence {
     }
 }
 
-sub fmt_line {    # generate text-line for op.
-    my@($hr, $op, $text, $level) =  @_;
+sub fmt_line($hr, $op, $text, $level) {
 
     $_->($hr, $op, \$text, \$level, $stylename) for  @callbacks;
 
@@ -647,8 +636,7 @@ our %hints; # used to display each COP's op_hints values
  # filetest access, UTF-8
 %hints{[@(4194304,8388608)]} = @('X', 'U');
 
-sub _flags {
-    my@($hash, $x) =  @_;
+sub _flags($hash, $x) {
     my @s;
     for my $flag (sort {$b <+> $a}, keys %{$hash || \%()}) {
 	if ($hash->{?$flag} and $x ^&^ $flag and $x +>= $flag) {
@@ -660,18 +648,15 @@ sub _flags {
     return join(",", @s);
 }
 
-sub private_flags {
-    my@($name, $x) =  @_;
+sub private_flags($name, $x) {
     _flags(%priv{?$name}, $x);
 }
 
-sub hints_flags {
-    my@($x) =  @_;
+sub hints_flags($x) {
     _flags(\%hints, $x);
 }
 
-sub concise_sv {
-    my@($sv, $hr, ?$preferpv) =  @_;
+sub concise_sv($sv, $hr, ?$preferpv) {
     $hr->{+svclass} = class($sv);
     $hr->{+svclass} = "UV"
       if $hr->{?svclass} eq "IV" and $sv->FLAGS ^&^ SVf_IVisUV;
@@ -729,8 +714,7 @@ sub fill_srclines {
     %srclines{+$fullnm} = \@l;
 }
 
-sub concise_op {
-    my @($op, $level, $format) =  @_;
+sub concise_op($op, $level, $format) {
     my %h;
     %h{+exname} = %h{+name} = $op->name;
     %h{+NAME} = uc %h{?name};
@@ -873,8 +857,7 @@ sub concise_op {
     return fmt_line(\%h, $op, $format, $level);
 }
 
-sub B::OP::concise {
-    my@($op, $level) =  @_;
+sub B::OP::concise($op, $level) {
     if ($order eq "exec" and $lastnext and $$lastnext != $$op) {
 	# insert a 'goto' line
 	my $synth = \%("seq" => seq($lastnext), "class" => class($lastnext),
@@ -888,8 +871,7 @@ sub B::OP::concise {
 }
 
 # B::OP::terse (see Terse.pm) now just calls this
-sub b_terse {
-    my@($op, $level) =  @_;
+sub b_terse($op, $level) {
 
     # This isn't necessarily right, but there's no easy way to get
     # from an OP to the right CV. This is a limitation of the

@@ -177,13 +177,11 @@ my %MK = %(
     E     => '$(F)', F=>'p $(G) q', G => 'HHHHH',	# short->long
     DIR => '$(UNDEFINEDNAME)/xxx',
 );
-sub var { 
-    my@($var,$level) =  @_;
+sub var($var,$level) {
     return "\$($var)" unless exists %MK{$var};
     return exp_vars(%MK{?$var}, $level+1); # can recurse
 }
-sub exp_vars { 
-    my@($str,$level) =  @_;
+sub exp_vars($str,$level) {
     $str =~ s/\$\((\w+)\)/$(var($1, $level+1))/g; # can recurse
     #warn "exp_vars $level = '$str'\n";
     $str;

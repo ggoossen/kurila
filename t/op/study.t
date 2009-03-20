@@ -2,8 +2,7 @@
 
 our $Ok_Level = 0;
 my $test = 1;
-sub ok ($;$) {
-    my@($ok, ?$name) =  @_;
+sub ok ($;$)($ok, ?$name) {
 
     local $_;
 
@@ -17,8 +16,7 @@ sub ok ($;$) {
     return $ok;
 }
 
-sub nok ($;$) {
-    my@($nok, ?$name) =  @_;
+sub nok ($;$)($nok, ?$name) {
     local $Ok_Level = 1;
     ok( !$nok, $name );
 }

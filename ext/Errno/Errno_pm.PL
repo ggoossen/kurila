@@ -38,8 +38,7 @@ else {
 write_errno_pm();
 unlink "errno.c" if -f "errno.c";
 
-sub process_file {
-    my@($file) =  @_;
+sub process_file($file) {
 
     # for win32 perl under cygwin, we need to get a windows pathname
     if ($^OS_NAME eq 'MSWin32' && config_value("cc") =~ m/\B-mno-cygwin\b/ &&

@@ -53,8 +53,7 @@ ok( $x->_out( \&accept_N,  "=pod\n\nB<pieF<zorch>N<foo>I<pling>>\n"),
 
 print \*STDOUT, "# Tests of nonacceptance...\n";
 
-sub starts_with {
-  my@($large, $small) =  @_;
+sub starts_with($large, $small) {
   print(\*STDOUT, "# supahstring is undef\n"),
    return '' unless defined $large;
   print(\*STDOUT, "# supahstring $large is smaller than target-starter $small\n"),

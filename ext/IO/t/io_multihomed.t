@@ -29,9 +29,8 @@ our @ISA=qw(IO::Socket::INET);
 
 use Socket < qw(inet_aton inet_ntoa unpack_sockaddr_in);
 
-sub _get_addr
+sub _get_addr($sock,$addr_str, $multi)
 {
-    my@($sock,$addr_str, $multi) =  @_;
     #print "_get_addr($sock, $addr_str, $multi)\n";
 
     print \*STDOUT, "not " unless $multi;

@@ -270,8 +270,7 @@ unless (%opts{?a}) {
 }
 ############
 
-sub test_pkg {
-    my @($pkg, $fntypes) =  @_;
+sub test_pkg($pkg, $fntypes) {
     require_ok($pkg);
 
     # build %stash: keys are func-names, vals filled in below
@@ -308,8 +307,7 @@ sub test_pkg {
     }
 }
 
-sub checkXS {
-    my @($func_name, $want) =  @_;
+sub checkXS($func_name, $want) {
 
     croak "unknown type $want: $func_name\n"
 	unless defined %matchers{?$want};
@@ -326,8 +324,7 @@ sub checkXS {
     $res;
 }
 
-sub render {
-    my @($func_name) =  @_;
+sub render($func_name) {
 
     B::Concise::reset_sequence();
     B::Concise::walk_output(\my $buf);

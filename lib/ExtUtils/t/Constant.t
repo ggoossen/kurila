@@ -94,8 +94,7 @@ sub check_for_bonus_files {
   ok( ! $fail );
 }
 
-sub build_and_run {
-  my @($tests, $expect, $files) =  @_;
+sub build_and_run($tests, $expect, $files) {
   my $core = env::var('PERL_CORE') ?? ' PERL_CORE=1' !! '';
   my @perlout = @( `$runperl Makefile.PL $core` );
   if ($^CHILD_ERROR) {
@@ -265,9 +264,8 @@ sub MANIFEST {
   return @files;
 }
 
-sub write_and_run_extension {
-  my @($name, $items, $export_names, $package, $header, $testfile, $num_tests,
-      $wc_args) =  @_;
+sub write_and_run_extension($name, $items, $export_names, $package, $header, $testfile, $num_tests,
+      $wc_args) {
 
   my $c = '';
   open my $c_fh, '>>', \$c or die;
@@ -388,8 +386,7 @@ sub start_tests {
   $dummytest += $before_tests;
   $here = $dummytest;
 }
-sub end_tests {
-  my @($name, $items, $export_names, $header, $testfile, ?$args) =  @_;
+sub end_tests($name, $items, $export_names, $header, $testfile, ?$args) {
   push @tests, \@($name, $items, $export_names, $package, $header, $testfile,
                $dummytest - $here, $args);
   $dummytest += $after_tests;
@@ -680,8 +677,7 @@ $dummytest+=18;
 }
 
 # XXX I think that I should merge this into the utf8 test above.
-sub explict_call_constant {
-  my @($string, $expect) =  @_;
+sub explict_call_constant($string, $expect) {
   # This does assume simple strings suitable for ''
   my $test_body = <<"EOT";
 do \{

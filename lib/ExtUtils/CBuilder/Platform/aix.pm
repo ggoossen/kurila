@@ -9,8 +9,7 @@ $VERSION = '0.22';
 
 sub need_prelink { 1 }
 
-sub link {
-  my @($self, %< %args) =  @_;
+sub link($self, %< %args) {
   my $cf = $self->{?config};
 
   (my $baseext = %args{?module_name}) =~ s/.*:://;

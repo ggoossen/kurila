@@ -96,8 +96,7 @@ do {
 
 # A lot of tests to check that reversed for works.
 my $test = 15;
-sub is {
-    my @($got, $expected, $name) =  @_;
+sub is($got, $expected, $name) {
     ++$test;
     if ($got eq $expected) {
 	print \*STDOUT, "ok $test # $name\n";

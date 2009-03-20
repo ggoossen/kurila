@@ -36,8 +36,7 @@ close $fh;
 
 plan(tests => nelems(@op));
 
-sub testop {
-    my @($op, $opname, $code) =  @_;
+sub testop($op, $opname, $code) {
     pass("$op : skipped") and return if $code =~ m/^SKIP/;
     my $c = Safe->new();
     $c->deny_only($op);

@@ -318,8 +318,7 @@ my @extvars = qw(sv_undef sv_yes sv_no na dowarn
 		 ppaddr
                 );
 
-sub readsyms (\%$) {
-    my @($syms, $file) =  @_;
+sub readsyms (\%$)($syms, $file) {
     local ($_);
     my $fh;
     open($fh, "<", "$file")
@@ -339,8 +338,7 @@ sub readsyms (\%$) {
 # Perl_pp_* and Perl_ck_* are in pp.sym
 readsyms my %ppsym, 'pp.sym';
 
-sub readvars(\%$$@) {
-    my @($syms, $file,$pre,?$keep_pre) =  @_;
+sub readvars(\%$$@)($syms, $file,$pre,?$keep_pre) {
     local ($_);
     open(my $fh, "<", "$file")
 	or die "embed.pl: Can't open $file: $^OS_ERROR\n";
@@ -363,30 +361,25 @@ my %globvar;
 readvars %intrp,  'intrpvar.h','I';
 readvars %globvar, 'perlvars.h','G';
 
-sub undefine ($) {
-    my @($sym) =  @_;
+sub undefine ($)($sym) {
     "#undef  $sym\n";
 }
 
-sub hide ($$) {
-    my @($from, $to) =  @_;
+sub hide ($$)($from, $to) {
     my $t = int(length($from) / 8);
     "#define $from" . "\t" x ($t +< 3 ?? 3 - $t !! 1) . "$to\n";
 }
 
-sub bincompat_var ($$) {
-    my @($pfx, $sym) =  @_;
+sub bincompat_var ($$)($pfx, $sym) {
     my $arg = ($pfx eq 'G' ?? 'NULL' !! 'aTHX');
     undefine("PL_$sym") . hide("PL_$sym", "(*Perl_$($pfx)$($sym)_ptr($arg))");
 }
 
-sub multon ($$$) {
-    my @($sym,$pre,$ptr) =  @_;
+sub multon ($$$)($sym,$pre,$ptr) {
     hide("PL_$sym", "($ptr$pre$sym)");
 }
 
-sub multoff ($$) {
-    my @($sym,$pre) =  @_;
+sub multoff ($$)($sym,$pre) {
     return hide("PL_$pre$sym", "PL_$sym");
 }
 

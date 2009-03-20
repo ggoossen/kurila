@@ -64,8 +64,7 @@ sub macro_from_item {
   1;
 }
 
-sub macro_to_ifdef {
-    my @($self, $macro) =  @_;
+sub macro_to_ifdef($self, $macro) {
     if (ref $macro) {
 	return $macro->[0];
     }
@@ -75,8 +74,7 @@ sub macro_to_ifdef {
     return "";
 }
 
-sub macro_to_endif {
-    my @($self, $macro) =  @_;
+sub macro_to_endif($self, $macro) {
 
     if (ref $macro) {
 	return $macro->[1];
@@ -109,10 +107,7 @@ the front of I<name>).
 
 =cut
 
-sub memEQ_clause {
-#    if (memEQ(name, "thingy", 6)) {
-  # Which could actually be a character comparison or even ""
-  my @($self, $args) =  @_;
+sub memEQ_clause($self, $args) {
   my @($name, $checked_at, $indent) =  %{$args}{[qw(name checked_at indent)]};
   $indent = ' ' x ($indent || 4);
   my $front_chop;
@@ -201,8 +196,7 @@ I<default_types> and the I<ITEM>s.
 
 =cut
 
-sub dump_names {
-  my @($self, $args, @< @items) =  @_;
+sub dump_names($self, $args, @< @items) {
   my @($default_type, $what, $indent, $declare_types)
     =  %{$args}{[qw(default_type what indent declare_types)]};
   $indent = ' ' x ($indent || 0);
@@ -333,15 +327,7 @@ of spaces to indent, defaulting to 6.
 
 =cut
 
-sub return_clause {
-
-##ifdef thingy
-#      *iv_return = thingy;
-#      return PERL_constant_ISIV;
-##else
-#      return PERL_constant_NOTDEF;
-##endif
-  my @($self, $args, $item) =  @_;
+sub return_clause($self, $args, $item) {
   my $indent = $args->{?indent};
 
   my @($name, $value, $default, $pre, $post, $def_pre, $def_post, $type)
@@ -384,9 +370,7 @@ sub return_clause {
   return $clause;
 }
 
-sub match_clause {
-  # $offset defined if we have checked an offset.
-  my @($self, $args, $item) =  @_;
+sub match_clause($self, $args, $item) {
   my @($offset, $indent) =  %{$args}{[qw(checked_at indent)]};
   $indent = ' ' x ($indent || 4);
   my $body = '';
@@ -430,8 +414,7 @@ each call).
 
 =cut
 
-sub switch_clause {
-  my @($self, $args, $namelen, $items, @< @items) =  @_;
+sub switch_clause($self, $args, $namelen, $items, @< @items) {
   my @($indent, $comment) =  %{$args}{[qw(indent comment)]};
   $indent = ' ' x ($indent || 2);
 
@@ -765,8 +748,7 @@ example C<constant_5> for names 5 characters long.  The default I<breakout> is
 # As you can see it now performs this function during recursion by being a
 # scalar reference.
 
-sub C_constant {
-  my @($self, $args, @< @items) =  @_;
+sub C_constant($self, $args, @< @items) {
   my @($package, $subname, $default_type, $what, $indent, $breakout) = 
     %{$args}{[qw(package subname default_type types indent breakout)]};
   $package ||= 'Foo';

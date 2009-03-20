@@ -68,8 +68,7 @@ print \*STDOUT, $a + 1 == 2     ?? "ok 18\n" !! "not ok 18 #" . $a + 1 . "\n";
 $a = -1.; "$a";
 print \*STDOUT, $a + 1 == 0     ?? "ok 19\n" !! "not ok 19 #" . $a + 1 . "\n";
 
-sub ok { # Can't assume too much of floating point numbers.
-    my @($a, $b, $c) =  @_;
+sub ok($a, $b, $c) {
     abs($a - $b) +<= $c;
 }
 

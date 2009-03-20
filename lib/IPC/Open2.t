@@ -19,8 +19,7 @@ use IPC::Open2;
 
 my $perl = './perl';
 
-sub ok {
-    my @($n, $result, ?$info) =  @_;
+sub ok($n, $result, ?$info) {
     if ($result) {
 	print \*STDOUT, "ok $n\n";
     }

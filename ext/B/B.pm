@@ -77,8 +77,7 @@ sub B::GV::SAFENAME {
   return $name;
 }
 
-sub B::IV::int_value {
-  my @($self) =  @_;
+sub B::IV::int_value($self) {
   return  ($self->FLAGS() ^&^ SVf_IVisUV()) ?? $self->UVX !! $self->IV;
 }
 
@@ -90,8 +89,7 @@ my $debug;
 my $op_count = 0;
 my @parents = @( () );
 
-sub debug {
-    my @($class, $value) =  @_;
+sub debug($class, $value) {
     $debug = $value;
     walkoptree_debug($value);
 }
@@ -111,8 +109,7 @@ sub peekop {
     return sprintf("\%s (0x\%x) \%s", < class($op), $$op, < $op->name);
 }
 
-sub walkoptree_slow {
-    my@($op, $method, $level) =  @_;
+sub walkoptree_slow($op, $method, $level) {
     $op_count++; # just for statistics
     $level ||= 0;
     warn(sprintf("walkoptree: \%d. \%s\n", $level, < peekop($op))) if $debug;
@@ -155,8 +152,7 @@ sub clearsym {
     %symtable = %( () );
 }
 
-sub savesym {
-    my @($obj, $value) =  @_;
+sub savesym($obj, $value) {
 #    warn(sprintf("savesym: sym_%x => %s\n", $$obj, $value)); # debug
     %symtable{+sprintf("sym_\%x", $$obj)} = $value;
 }
@@ -166,8 +162,7 @@ sub objsym {
     return %symtable{?sprintf("sym_\%x", $$obj)};
 }
 
-sub walkoptree_exec {
-    my @($op, $method, $level) =  @_;
+sub walkoptree_exec($op, $method, $level) {
     $level ||= 0;
     my ($sym, $ppname);
     my $prefix = "    " x $level;
@@ -219,8 +214,7 @@ sub walkoptree_exec {
     }
 }
 
-sub walksymtable {
-    my @($symref, $method, $recurse, $prefix) =  @_;
+sub walksymtable($symref, $method, $recurse, $prefix) {
     my $sym;
     my $ref;
     my $fullname;
@@ -244,16 +238,14 @@ do {
     my $output_fh;
     my %sections;
 
-    sub new {
-	my @($class, $section, $symtable, $default) =  @_;
+    sub new($class, $section, $symtable, $default) {
 	$output_fh ||= FileHandle->new_tmpfile;
 	my $obj = bless \@(-1, $section, $symtable, $default), $class;
 	%sections{+$section} = $obj;
 	return $obj;
     }
 
-    sub get {
-	my @($class, $section) =  @_;
+    sub get($class, $section) {
 	return %sections{?$section};
     }
 
@@ -285,8 +277,7 @@ do {
 	return $section->[3];
     }
 
-    sub output {
-	my @($section, $fh, $format) =  @_;
+    sub output($section, $fh, $format) {
 	my $name = $section->name;
 	my $sym = $section->symtable || \%();
 	my $default = $section->default;

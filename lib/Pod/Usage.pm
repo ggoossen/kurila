@@ -587,8 +587,7 @@ sub seq_i { return @_[1] }
 # This overrides the Pod::Text method to do something very akin to what
 # Pod::Select did as well as the work done below by preprocess_paragraph.
 # Note that the below is very, very specific to Pod::Text.
-sub _handle_element_end {
-    my @($self, $element) =  @_;
+sub _handle_element_end($self, $element) {
     if ($element eq 'head1') {
         %$self{+USAGE_HEAD1} = %$self{PENDING}->[-1]->[1];
         if ($self->{USAGE_OPTIONS}->{?verbose} +< 2) {

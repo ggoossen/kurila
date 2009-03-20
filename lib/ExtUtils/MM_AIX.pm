@@ -32,8 +32,7 @@ Define DL_FUNCS and DL_VARS and write the *.exp files.
 
 =cut
 
-sub dlsyms {
-    my@($self,%< %attribs) =  @_;
+sub dlsyms($self,%< %attribs) {
 
     return '' unless $self->needs_linking();
 

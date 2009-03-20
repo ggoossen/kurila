@@ -98,8 +98,7 @@ sub begin_input {
    @_[0]->{+_INFILE} = VMS::Filespec::unixify(@_[0]->{?_INFILE}) if $^OS_NAME eq 'VMS';
 }
 
-sub podinc2plaintext( $ $ ) {
-    my @($infile, $outfile) =  @_;
+sub podinc2plaintext( $ $ )($infile, $outfile) {
     local $_;
     my $text_parser = $MYPKG->new;
     $text_parser->parse_from_file($infile, $outfile);

@@ -38,8 +38,7 @@ actually traverse the filesystem cleaning up paths like this.
 
 =cut
 
-sub canonpath {
-    my @($self,?$path) =  @_;
+sub canonpath($self,?$path) {
     return unless defined $path;
     
     # Handle POSIX-style node names beginning with double slash (qnx, nto)
@@ -194,8 +193,7 @@ L<File::Spec::VMS/file_name_is_absolute>).
 
 =cut
 
-sub file_name_is_absolute {
-    my @($self,$file) =  @_;
+sub file_name_is_absolute($self,$file) {
     return scalar($file =~ m:^/:s);
 }
 
@@ -243,8 +241,7 @@ The results can be passed to L</catpath()> to get back a path equivalent to
 
 =cut
 
-sub splitpath {
-    my @($self,$path, ?$nofile) =  @_;
+sub splitpath($self,$path, ?$nofile) {
 
     my @($volume,$directory,$file) = @('','','');
 
@@ -299,8 +296,7 @@ inserted if needed (though if the directory portion doesn't start with
 
 =cut
 
-sub catpath {
-    my @($self,$volume,$directory,$file) =  @_;
+sub catpath($self,$volume,$directory,$file) {
 
     if ( $directory ne ''                && 
          $file ne ''                     && 
@@ -344,8 +340,7 @@ Based on code written by Shigio Yamaguchi.
 
 =cut
 
-sub abs2rel {
-    my @($self,$path,?$base) =  @_;
+sub abs2rel($self,$path,?$base) {
     $base = $self->_cwd() unless defined $base and length $base;
 
     @($path, $base) =  map { $self->canonpath($_) }, @( $path, $base);
@@ -426,8 +421,7 @@ Based on code written by Shigio Yamaguchi.
 
 =cut
 
-sub rel2abs {
-    my @($self,$path,?$base ) =  @_;
+sub rel2abs($self,$path,?$base) {
 
     # Clean up $path
     if ( ! $self->file_name_is_absolute( $path ) ) {
@@ -474,8 +468,7 @@ sub _cwd {
 
 
 # Internal method to reduce xx\..\yy -> yy
-sub _collapse {
-    my@($fs, $path) =  @_;
+sub _collapse($fs, $path) {
 
     my $updir  = $fs->updir;
     my $curdir = $fs->curdir;

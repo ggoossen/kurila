@@ -23,8 +23,7 @@ __PACKAGE__->_accessorize(
 #
 #  And here is how we implement a pull-parser on top of a push-parser...
 
-sub filter {
-  my@($self, $source) =  @_;
+sub filter($self, $source) {
   $self = $self->new unless ref $self;
 
   $source = *STDIN{IO} unless defined $source;
@@ -43,8 +42,7 @@ sub parse_string_document {
   $this->run;
 }
 
-sub parse_file {
-  my@($this, $filename) =  @_;
+sub parse_file($this, $filename) {
   $this->set_source($filename);
   $this->run;
 }

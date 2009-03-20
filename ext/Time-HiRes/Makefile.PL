@@ -38,8 +38,7 @@ use File::Spec;
 # without changing it, and then I'd always forget to change it before a
 # release. Sorry, Edward :)
 
-sub try_compile_and_link {
-    my @($c, %< %args) =  @_;
+sub try_compile_and_link($c, %< %args) {
 
     my $ok = 0;
     my $tmp = "tmp$^PID";
@@ -175,8 +174,7 @@ EOM
     return 0;
 }
 
-sub has_x {
-    my @($x, %< %args) =  @_;
+sub has_x($x, %< %args) {
 
     return 1 if
     try_compile_and_link(<<EOM, < %args);
@@ -230,8 +228,7 @@ int main(int argc, char** argv) \{
 EOM
 }
 
-sub has_include {
-    my @($inc) =  @_;
+sub has_include($inc) {
     return 1 if
     try_compile_and_link(<<EOM);
 #include "EXTERN.h"
@@ -319,8 +316,7 @@ int main(int argc, char** argv)
 EOM
 }
 
-sub DEFINE {
-    my @($def, ?$val) =  @_;
+sub DEFINE($def, ?$val) {
     my $define = defined $val ?? "$def=$val" !! $def ;
     unless ($DEFINE =~ m/(?:^| )-D\Q$define\E(?: |$)/) {
 	$DEFINE .= " -D$define";

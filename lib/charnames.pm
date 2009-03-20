@@ -51,9 +51,8 @@ sub alias (@)
    %alias3{[keys %$alias]} =  values %$alias;
 } # alias
 
-sub alias_file ($)
+sub alias_file ($)($arg)
 {
-  my @($arg) =  @_;
   my $file;
   if (-f $arg && File::Spec->file_name_is_absolute ($arg)) {
     $file = $arg;

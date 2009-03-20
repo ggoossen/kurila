@@ -7,8 +7,7 @@ use Test::More tests => 2;
 use Data::Dumper;
 
 do {
-    sub iterate_hash {
-	my @($h) =  @_;
+    sub iterate_hash($h) {
 	my $count = 0;
 	$count++ while each %$h;
 	return $count;

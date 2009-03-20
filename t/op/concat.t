@@ -2,8 +2,7 @@
 
 # This ok() function is specially written to avoid any concatenation.
 my $test = 1;
-sub ok {
-    my @($ok, ?$name) =  @_;
+sub ok($ok, ?$name) {
 
     printf \*STDOUT, "\%sok \%d - \%s\n", ($ok ?? "" !! "not "), $test, $name;
 

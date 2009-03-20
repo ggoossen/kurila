@@ -160,8 +160,7 @@ do {
 
 # see if eval '', s///e, and heredocs mix
 
-sub T {
-    my @($where, $num) =  @_;
+sub T($where, $num) {
     my @($p,$f,$l) =@( caller);
     print \*STDOUT, "# $p:$f:$l vs /$where/\nnot " unless "$p:$f:$l" =~ m/$where/;
     print \*STDOUT, "ok $num\n";

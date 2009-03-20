@@ -52,9 +52,8 @@ sub exists
 }
 
 
-sub _fileno
+sub _fileno($self, $f)
 {
- my@($self, $f) =  @_;
  return unless defined $f;
  $f = $f->[0] if ref($f) eq 'ARRAY';
  return fileno($f) if ref $f;
@@ -156,9 +155,8 @@ sub as_string  # for debugging
  $str;
 }
 
-sub _max
+sub _max($a,$b,$c)
 {
- my@($a,$b,$c) =  @_;
  $a +> $b
     ?? $a +> $c
         ?? $a

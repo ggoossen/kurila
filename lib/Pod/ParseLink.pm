@@ -40,8 +40,7 @@ $VERSION = 1.06;
 ##############################################################################
 
 # Parse the name and section portion of a link into a name and section.
-sub _parse_section {
-    my @($link) =  @_;
+sub _parse_section($link) {
     $link =~ s/^\s+//;
     $link =~ s/\s+$//;
 
@@ -65,8 +64,7 @@ sub _parse_section {
 }
 
 # Infer link text from the page and section.
-sub _infer_text {
-    my @($page, $section) =  @_;
+sub _infer_text($page, $section) {
     my $inferred;
     if ($page && !$section) {
         $inferred = $page;
@@ -81,8 +79,7 @@ sub _infer_text {
 # Given the contents of an L<> formatting code, parse it into the link text,
 # the possibly inferred link text, the name or URL, the section, and the type
 # of link (pod, man, or url).
-sub parselink {
-    my @($link) =  @_;
+sub parselink($link) {
     $link =~ s/\s+/ /g;
     if ($link =~ m/\A\w+:[^:\s]\S*\Z/) {
         return  @(undef, $link, $link, undef, 'url');

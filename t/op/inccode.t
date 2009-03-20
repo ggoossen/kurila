@@ -35,8 +35,7 @@ sub get_temp_fh {
 
 END { 1 while unlink < @tempfiles }
 
-sub fooinc {
-    my @($self, $filename) =  @_;
+sub fooinc($self, $filename) {
     if (substr($filename,0,3) eq 'Foo') {
 	return get_temp_fh($filename);
     }
@@ -74,8 +73,7 @@ cmp_ok( $^INCLUDED{?'Foo2.pl'}, '\==', \&fooinc,     '  val Foo2.pl is correct i
 pop $^INCLUDE_PATH;
 
 
-sub fooinc2 {
-    my @($self, $filename) =  @_;
+sub fooinc2($self, $filename) {
     if (substr($filename, 0, length($self->[1])) eq $self->[1]) {
 	return get_temp_fh($filename);
     }
@@ -112,8 +110,7 @@ cmp_ok( $^INCLUDED{?'Bar2.pl'}, '\==', $arrayref,   '  val Bar2.pl is correct in
 
 pop $^INCLUDE_PATH;
 
-sub FooLoader::INC {
-    my @($self, $filename) =  @_;
+sub FooLoader::INC($self, $filename) {
     if (substr($filename,0,4) eq 'Quux') {
 	return get_temp_fh($filename);
     }

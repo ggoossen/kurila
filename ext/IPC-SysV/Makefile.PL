@@ -5,10 +5,10 @@ use ExtUtils::MakeMaker;
 
 #--- MY package
 
-sub MY::libscan
+sub MY::libscan($self, $path)
 {
   package MY;
-  my@($self, $path) =  @_;
+
   return $path if $self->SUPER::libscan($path) and
                   $path !~ m! [~%]$
                             | \.(cache\.cm|swp|orig|rej)$

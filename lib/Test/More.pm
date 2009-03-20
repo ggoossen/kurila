@@ -217,8 +217,7 @@ This is the same as Test::Simple's ok() routine.
 
 =cut
 
-sub ok ($;$) {
-    my@($test, ?$name) =  @_;
+sub ok ($;$)($test, ?$name) {
     my $tb = Test::More->builder;
 
     $tb->ok($test, $name);
@@ -419,8 +418,7 @@ as one test.  If you desire otherwise, use:
 
 =cut
 
-sub can_ok ($@) {
-    my@($proto, @< @methods) =  @_;
+sub can_ok ($@)($proto, @< @methods) {
     my $class = ref $proto || $proto;
     my $tb = Test::More->builder;
 
@@ -481,8 +479,7 @@ you'd like them to be more specific, you can supply an $object_name
 
 =cut
 
-sub isa_ok ($$;$) {
-    my@($object, $class, ?$obj_name) =  @_;
+sub isa_ok ($$;$)($object, $class, ?$obj_name) {
     my $tb = Test::More->builder;
 
     my $diag;
@@ -612,8 +609,7 @@ because the notion of "compile-time" is relative.  Instead, you want:
 
 =cut
 
-sub use_ok ($;@) {
-    my@($module, @< @imports) =  @_;
+sub use_ok ($;@)($module, @< @imports) {
     @imports = @( () ) unless (nelems @imports);
     my $tb = Test::More->builder;
 
@@ -669,8 +665,7 @@ sub _eval {
 
 =cut
 
-sub dies_like {
-    my @($coderef, $like, ?$name) =  @_;
+sub dies_like($coderef, $like, ?$name) {
 
     my $tb = Test::More->builder;
 
@@ -999,8 +994,7 @@ use TODO.  Read on.
 =cut
 
 #'#
-sub skip {
-    my@($why, ?$how_many) =  @_;
+sub skip($why, ?$how_many) {
     my $tb = Test::More->builder;
 
     unless( defined $how_many ) {
@@ -1085,8 +1079,7 @@ interpret them as passing.
 
 =cut
 
-sub todo_skip {
-    my@($why, ?$how_many) =  @_;
+sub todo_skip($why, ?$how_many) {
     my $tb = Test::More->builder;
 
     unless( defined $how_many ) {
@@ -1183,8 +1176,7 @@ sub eq_array {
     _deep_check(< @_);
 }
 
-sub _eq_array  {
-    my@($a1, $a2) =  @_;
+sub _eq_array($a1, $a2)  {
 
     if( grep { !_type($_) eq 'ARRAY' }, @( $a1, $a2) ) {
         warn "eq_array passed a non-array ref";
@@ -1209,8 +1201,7 @@ sub _eq_array  {
     return $ok;
 }
 
-sub _deep_check {
-    my@($e1, $e2) =  @_;
+sub _deep_check($e1, $e2) {
     my $tb = Test::More->builder;
 
     my $ok = 0;
@@ -1277,8 +1268,7 @@ sub _deep_check {
 }
 
 
-sub _whoa {
-    my@($check, $desc) =  @_;
+sub _whoa($check, $desc) {
     if( $check ) {
         die <<WHOA;
 WHOA!  $desc
@@ -1302,8 +1292,7 @@ sub eq_hash {
     return _deep_check(< @_);
 }
 
-sub _eq_hash {
-    my@($a1, $a2) =  @_;
+sub _eq_hash($a1, $a2) {
 
     if( grep { !_type($_) eq 'HASH' }, @( $a1, $a2) ) {
         warn "eq_hash passed a non-hash ref";
@@ -1354,8 +1343,7 @@ Test::Deep contains much better set comparison functions.
 
 =cut
 
-sub eq_set  {
-    my @($a1, $a2, ?$name) =  @_;
+sub eq_set($a1, $a2, ?$name)  {
     return 0 unless (nelems @$a1) == nelems @$a2;
 
     return eq_array(

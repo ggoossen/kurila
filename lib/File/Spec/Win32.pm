@@ -104,9 +104,7 @@ volume, 1 if it's absolute with no volume, 0 otherwise.
 
 =cut
 
-sub file_name_is_absolute {
-
-    my @($self,$file) =  @_;
+sub file_name_is_absolute($self,$file) {
 
     if ($file =~ m{^($VOL_RX)}o) {
       my $vol = $1;
@@ -203,8 +201,7 @@ The results can be passed to L</catpath> to get back a path equivalent to
 
 =cut
 
-sub splitpath {
-    my @($self,$path, ?$nofile) =  @_;
+sub splitpath($self,$path, ?$nofile) {
     my @($volume,$directory,$file) = @('','','');
     if ( $nofile ) {
         $path =~ 
@@ -249,8 +246,7 @@ Yields:
 
 =cut
 
-sub splitdir {
-    my @($self,$directories) =  @_ ;
+sub splitdir($self,$directories) { 
     #
     # split() likes to forget about trailing null fields, so here we
     # check to be sure that there will not be any before handling the
@@ -279,8 +275,7 @@ the $volume become significant.
 
 =cut
 
-sub catpath {
-    my @($self,$volume,$directory,$file) =  @_;
+sub catpath($self,$volume,$directory,$file) {
 
     # If it's UNC, make sure the glue separator is there, reusing
     # whatever separator is first in the $volume
@@ -312,8 +307,7 @@ sub _same {
   lc(@_[1]) eq lc(@_[2]);
 }
 
-sub rel2abs {
-    my @($self,$path,?$base ) =  @_;
+sub rel2abs($self,$path,?$base) {
 
     my $is_abs = $self->file_name_is_absolute($path);
 

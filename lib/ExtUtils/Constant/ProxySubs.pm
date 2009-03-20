@@ -86,8 +86,7 @@ while (my @(?$type, ?$value) =@( each %XS_TypeSet)) {
 }
 %type_num_args{+''} = 0;
 
-sub partition_names {
-    my @($self, $default_type, @< @items) =  @_;
+sub partition_names($self, $default_type, @< @items) {
     my (%found, @notfound, @trouble);
 
     while (my $item = shift @items) {
@@ -120,8 +119,7 @@ sub partition_names {
     return @(\%found, \@notfound, \@trouble);
 }
 
-sub boottime_iterator {
-    my @($self, $type, $iterator, $hash, $subname) =  @_;
+sub boottime_iterator($self, $type, $iterator, $hash, $subname) {
     my $extractor = %type_from_struct{?$type};
     die "Can't find extractor code for type $type"
 	unless defined $extractor;
@@ -140,8 +138,7 @@ sub boottime_iterator {
 EOBOOT
 }
 
-sub name_len_value_macro {
-    my @($self, $item) =  @_;
+sub name_len_value_macro($self, $item) {
     my $name = $item->{?name};
     my $value = $item->{?value};
     $value = $item->{?name} unless defined $value;

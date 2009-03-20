@@ -129,8 +129,7 @@ sub _choke(@) {
 }
 
 
-sub _chmod($$;$) {
-    my @( $mode, $item, ?$verbose )=  @_;
+sub _chmod($$;$)( $mode, $item, ?$verbose) {
     $verbose ||= 0;
     if (chmod $mode, $item) {
         print \*STDOUT, "chmod($mode, $item)\n" if $verbose +> 1;
@@ -165,8 +164,7 @@ If $moan is true then returns 0 on error and warns instead of dies.
 
 
 
-sub _move_file_at_boot { #XXX OS-SPECIFIC
-    my @( $file, $target, $moan  )=  @_;
+sub _move_file_at_boot( $file, $target, $moan) {
     Carp::confess("Panic: Can't _move_file_at_boot on this platform!")
          unless $CanMoveAtBoot;
 
@@ -242,8 +240,7 @@ On failure throws a fatal error.
 
 
 
-sub _unlink_or_rename { #XXX OS-SPECIFIC
-    my @( $file, $tryhard, $installing )=  @_;
+sub _unlink_or_rename( $file, $tryhard, $installing) {
 
     _chmod( 0666, $file );
     unlink $file
@@ -294,8 +291,7 @@ Handles loading the INSTALL.SKIP file. Returns an array of patterns to use.
 
 
 
-sub _get_install_skip {
-    my @( $skip, $verbose )=  @_;
+sub _get_install_skip( $skip, $verbose) {
     if (env::var('EU_INSTALL_IGNORE_SKIP')) {
         print \*STDOUT, "EU_INSTALL_IGNORE_SKIP is set, ignore skipfile settings\n"
             if $verbose+>2;
@@ -438,8 +434,7 @@ writable.
 
 =cut
 
-sub _mkpath {
-    my @($dir,$show,$mode,?$verbose,?$dry_run)=  @_;
+sub _mkpath($dir,$show,$mode,?$verbose,?$dry_run) {
     if ( $verbose && $verbose +> 1 && ! -d $dir) {
         $show= 1;
         printf \*STDOUT, "mkpath(\%s,\%d,\%#o)\n", $dir, $show, $mode;
@@ -483,8 +478,7 @@ Dies if the copy fails.
 =cut
 
 
-sub _copy {
-    my @( $from, $to, $verbose, $dry_run)=  @_;
+sub _copy( $from, $to, $verbose, $dry_run) {
     if ($verbose && $verbose+>1) {
         printf \*STDOUT, "copy(\%s,\%s)\n", $from, $to;
     }
@@ -508,8 +502,7 @@ Dies if the copy fails.
 
 =cut
 
-sub _symlink {
-    my @( $old, $new, ?$verbose, ?$nonono)= @_;
+sub _symlink( $old, $new, ?$verbose, ?$nonono) {
     if ($verbose && $verbose+>1) {
         printf \*STDOUT, "symlink(\%s,\%s)\n", $old, $new;
     }
@@ -532,8 +525,7 @@ dies on error.
 
 =cut
 
-sub _chdir {
-    my @($dir)=  @_;
+sub _chdir($dir) {
     my $ret = cwd();
     chdir $dir
         or _choke("Couldn't chdir to '$dir': $^OS_ERROR");
@@ -846,8 +838,7 @@ Handles converting $MUST_REBOOT to a die for instance.
 
 =cut
 
-sub _do_cleanup {
-    my @($verbose) =  @_;
+sub _do_cleanup($verbose) {
     if ($MUST_REBOOT) {
         die < _estr "Operation not completed! ",
             "You must reboot to complete the installation.",
@@ -906,8 +897,7 @@ reboot. A wrapper for _unlink_or_rename().
 =cut
 
 
-sub forceunlink {
-    my @( $file, ?$tryhard )=  @_; #XXX OS-SPECIFIC
+sub forceunlink( $file, ?$tryhard) { #XXX OS-SPECIFIC
     _unlink_or_rename( $file, $tryhard, not("installing") );
 }
 
@@ -922,8 +912,7 @@ Returns 0 if there is not.
 
 =cut
 
-sub directory_not_empty ($) {
-  my@($dir) =  @_;
+sub directory_not_empty ($)($dir) {
   my $files = 0;
   find(sub {
            return if $_ eq ".exists";
@@ -998,8 +987,7 @@ without actually doing it.  Default is false.
 
 =cut
 
-sub uninstall {
-    my@($fil,$verbose,$dry_run) =  @_;
+sub uninstall($fil,$verbose,$dry_run) {
     $verbose ||= 0;
     $dry_run  ||= 0;
 
@@ -1037,8 +1025,7 @@ removed and values of the source files they would shadow.
 
 =cut
 
-sub inc_uninstall {
-    my@($filepath,$libdir,$verbose,$dry_run,$ignore,$results) =  @_;
+sub inc_uninstall($filepath,$libdir,$verbose,$dry_run,$ignore,$results) {
     $ignore||="";
     my $file = (File::Spec->splitpath($filepath))[2];
     my %seen_dir = %( () );
@@ -1120,8 +1107,7 @@ Filter $src using $cmd into $dest.
 
 =cut
 
-sub run_filter {
-    my @($cmd, $src, $dest) =  @_;
+sub run_filter($cmd, $src, $dest) {
     my ($cmd_fh, $src_fh);
     open($cmd_fh, '|-', "$cmd >$dest") || die "Cannot fork: $^OS_ERROR";
     open($src_fh, "<", $src)           || die "Cannot open $src: $^OS_ERROR";
@@ -1154,8 +1140,7 @@ be prepended as a directory to each installed file (and directory).
 
 =cut
 
-sub pm_to_blib {
-    my@($fromto,$autodir, ?$pm_filter) =  @_;
+sub pm_to_blib($fromto,$autodir, ?$pm_filter) {
 
     _mkpath($autodir,0,0755);
     while(my@(?$from, ?$to) =@( each %$fromto)) {
@@ -1199,8 +1184,7 @@ package ExtUtils::Install::Warn;
 
 sub new { bless \%(), shift }
 
-sub add {
-    my@($self,$file,$targetfile) =  @_;
+sub add($self,$file,$targetfile) {
     push @{$self->{$file}}, $targetfile;
 }
 

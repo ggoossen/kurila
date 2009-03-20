@@ -10,8 +10,7 @@ print \*STDOUT, "1..26\n";
 
 my $test = 1;
 
-sub _ok {
-    my @($type, $got, $expected, ?$name) =  @_;
+sub _ok($type, $got, $expected, ?$name) {
 
     my $result;
     if ($type eq 'is') {

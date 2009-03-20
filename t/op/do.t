@@ -3,8 +3,7 @@
 our (@x, @y, $result, $x, $y, @t, $u);
 
 my $test = 1;
-sub ok {
-    my@($ok, ?$name) =  @_;
+sub ok($ok, ?$name) {
 
     # You have to do it this way or VMS will get confused.
     printf \*STDOUT, "\%s \%d\%s\n", $ok ?? "ok" !! "not ok", 

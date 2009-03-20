@@ -300,8 +300,7 @@ sub parse_command_line {
 }
 
 
-sub create_index {
-    my@($html, $dir) =  @_;
+sub create_index($html, $dir) {
     (my $pod = $dir) =~ s,^.*/,,;
     my(@files, @filedata, @index);
     my($lcp1,$lcp2);
@@ -359,8 +358,7 @@ sub create_index {
 }
 
 
-sub split_on_head {
-    my@($podroot, $htmldir, $splitdirs, $ignore, @< @splithead) =  @_;
+sub split_on_head($podroot, $htmldir, $splitdirs, $ignore, @< @splithead) {
     my($dirname, $filename);
 
     # split the files specified in @splithead on =head[1-6] pod directives
@@ -382,8 +380,7 @@ sub split_on_head {
 }
 
 
-sub split_on_item {
-    my@($podroot, $splitdirs, $ignore, @< @splititem) =  @_;
+sub split_on_item($podroot, $splitdirs, $ignore, @< @splititem) {
     my($pwd, $dirname, $filename);
 
     print \*STDOUT, "splitting files by item.\n" if $verbose &&( (nelems @splititem)-1) +>= 0;
@@ -423,8 +420,7 @@ sub split_on_item {
 #  where a new file is started each time a =head[1-6] pod directive
 #  is encountered in the input file.
 #
-sub splitpod {
-    my@($pod, $poddir, $htmldir, $splitdirs) =  @_;
+sub splitpod($pod, $poddir, $htmldir, $splitdirs) {
     my(@poddata, @filedata, @heads);
     my($file, $i, $j, $prevsec, $section, $nextsec);
 
@@ -511,8 +507,7 @@ sub splitpod {
 # installdir - takes care of converting the .pod and .pm files in the
 #  current directory to .html files and then installing those.
 #
-sub installdir {
-    my@($dir, $recurse, $podroot, $splitdirs, $ignore) =  @_;
+sub installdir($dir, $recurse, $podroot, $splitdirs, $ignore) {
     my(@dirlist, @podlist, @pmlist, $doindex);
 
     @dirlist = @( () );	# directories to recurse on
@@ -576,8 +571,7 @@ sub installdir {
 # runpod2html - invokes pod2html to convert a .pod or .pm file to a .html
 #  file.
 #
-sub runpod2html {
-    my@($pod, $doindex) =  @_;
+sub runpod2html($pod, $doindex) {
     my($html, $i, $dir, @dirs);
 
     $html = $pod;

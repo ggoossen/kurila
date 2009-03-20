@@ -5,8 +5,7 @@ print \*STDOUT, q(1..41
 
 # This is() function is written to avoid ""
 my $test = 1;
-sub is {
-    my @($left, $right, ?$msg) =  @_;
+sub is($left, $right, ?$msg) {
 
     if ($left eq $right) {
       printf \*STDOUT, 'ok %d

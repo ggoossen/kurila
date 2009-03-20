@@ -12,8 +12,7 @@ use File::Spec::Functions < qw(catfile catdir);
 
 sub need_prelink { 0 }
 
-sub arg_defines {
-  my @($self, %< %args) =  @_;
+sub arg_defines($self, %< %args) {
 
   s/"/""/g foreach values %args;
 
@@ -34,8 +33,7 @@ sub arg_defines {
           . ')');
 }
 
-sub arg_include_dirs {
-  my @($self, @< @dirs) =  @_;
+sub arg_include_dirs($self, @< @dirs) {
 
   # VMS can only have one include list, add the one from config.
   if ($self->{config}->{+ccflags} =~ s{/inc[^=]+(?:=)+(?:\()?([^\/\)]*)} {}i) {
@@ -46,8 +44,7 @@ sub arg_include_dirs {
   return  @('/include=(' . join(',', @dirs) . ')');
 }
 
-sub _do_link {
-  my @($self, $type, %< %args) =  @_;
+sub _do_link($self, $type, %< %args) {
   
   my $objects = delete %args{objects};
   $objects = \@($objects) unless ref $objects;
@@ -87,24 +84,20 @@ sub _do_link {
 
 sub arg_nolink { return; }
 
-sub arg_object_file {
-  my @($self, $file) =  @_;
+sub arg_object_file($self, $file) {
   return "/obj=$file";
 }
 
-sub arg_exec_file {
-  my @($self, $file) =  @_;
+sub arg_exec_file($self, $file) {
   return  @("/exe=$file");
 }
 
-sub arg_share_object_file {
-  my @($self, $file) =  @_;
+sub arg_share_object_file($self, $file) {
   return  @("$self->{config}->{?lddlflags}=$file");
 }
 
 
-sub lib_file {
-  my @($self, $dl_file) =  @_;
+sub lib_file($self, $dl_file) {
   $dl_file =~ s/\.[^.]+$//;
   $dl_file =~ s/"//g;
   $dl_file = $dl_file .= '.' . $self->{config}->{?dlext};
@@ -121,8 +114,7 @@ sub lib_file {
 # The following is reproduced almost verbatim from ExtUtils::Liblist::Kid::_vms_ext.
 # We can't just call that because it's tied up with the MakeMaker object hierarchy.
 
-sub _liblist_ext {
-  my@($self, $potential_libs,$verbose,$give_libs) =  @_;
+sub _liblist_ext($self, $potential_libs,$verbose,$give_libs) {
   $verbose ||= 0;
 
   my(@crtls,$crtlstr);

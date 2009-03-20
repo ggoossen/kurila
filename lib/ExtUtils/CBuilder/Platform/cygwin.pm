@@ -15,8 +15,7 @@ sub link_executable {
   return $self->SUPER::link_executable(< @_);
 }
 
-sub link {
-  my @($self, %< %args) =  @_;
+sub link($self, %< %args) {
 
   %args{+extra_linker_flags} = \@( <
     File::Spec->catdir( <$self->perl_inc(), 'libperl.dll.a'), <

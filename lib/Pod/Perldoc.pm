@@ -71,8 +71,7 @@ sub opt_q_with { shift->_elem('opt_q', < @_) }
 sub opt_d_with { shift->_elem('opt_d', < @_) }
 sub opt_L_with { shift->_elem('opt_L', < @_) }
 
-sub opt_w_with { # Specify an option for the formatter subclass
-  my@($self, $value) =  @_;
+sub opt_w_with($self, $value) {
   if($value =~ m/^([-_a-zA-Z][-_a-zA-Z0-9]*)(?:[=\:](.*?))?$/s) {
     my $option = $1;
     my $option_value = defined($2) ?? $2 !! "TRUE";
@@ -84,8 +83,7 @@ sub opt_w_with { # Specify an option for the formatter subclass
   return;
 }
 
-sub opt_M_with { # specify formatter class name(s)
-  my@($self, $classes) =  @_;
+sub opt_M_with($self, $classes) {
   return unless defined $classes and length $classes;
   DEBUG +> 4 and print \*STDOUT, "Considering new formatter classes -M$classes\n";
   my @classes_to_add;
@@ -142,8 +140,7 @@ sub opt_n_with {
   $self->_elem('opt_n', < @_);
 }
 
-sub opt_o_with { # "o" for output format
-  my@($self, $rest) =  @_;
+sub opt_o_with($self, $rest) {
   return unless defined $rest and length $rest;
   if($rest =~ m/^(\w+)$/s) {
     $rest = $1; #untaint
@@ -542,8 +539,7 @@ sub formatter_sanity_check {
 
 #..........................................................................
 
-sub render_and_page {
-    my@($self, $found_list) =  @_;
+sub render_and_page($self, $found_list) {
     
     $self->maybe_generate_dynamic_pod($found_list);
 
@@ -681,8 +677,7 @@ sub options_sanity {
 
 #..........................................................................
 
-sub grand_search_init {
-    my@($self, $pages, @< @found) =  @_;
+sub grand_search_init($self, $pages, @< @found) {
 
     foreach my $page ( @$pages) {
         if ($self->{?'podidx'} && open(my $podidx, $self->{?'podidx'})) {
@@ -763,8 +758,7 @@ sub grand_search_init {
 
 #..........................................................................
 
-sub maybe_generate_dynamic_pod {
-    my@($self, $found_things) =  @_;
+sub maybe_generate_dynamic_pod($self, $found_things) {
     my @dynamic_pod;
     
     $self->search_perlfunc($found_things, \@dynamic_pod)  if  $self->opt_f;
@@ -849,8 +843,7 @@ sub add_translator { # $self->add_translator($lang);
 
 #..........................................................................
 
-sub search_perlfunc {
-    my@($self, $found_things, $pod) =  @_;
+sub search_perlfunc($self, $found_things, $pod) {
 
     DEBUG +> 2 and print \*STDOUT, "Search: $(join ' ',@$found_things)\n";
 
@@ -910,8 +903,7 @@ sub search_perlfunc {
 
 #..........................................................................
 
-sub search_perlfaqs {
-    my@( $self, $found_things, $pod) =  @_;
+sub search_perlfaqs( $self, $found_things, $pod) {
 
     my $found = 0;
     my %found_in;
@@ -952,10 +944,7 @@ EOD
 
 #..........................................................................
 
-sub render_findings {
-  # Return the filename to open
-
-  my@($self, $found_things) =  @_;
+sub render_findings($self, $found_things) {
 
   my $formatter_class = $self->{?'formatter_class'}
    || die "No formatter class set!?";
@@ -1049,13 +1038,7 @@ sub render_findings {
 
 #..........................................................................
 
-sub unlink_if_temp_file {
-  # Unlink the specified file IFF it's in the list of temp files.
-  # Really only used in the case of -f / -q things when we can
-  #  throw away the dynamically generated source pod file once
-  #  we've formatted it.
-  #
-  my@($self, $file) =  @_;
+sub unlink_if_temp_file($self, $file) {
   return unless defined $file and length $file;
   
   my $temp_file_list = $self->{?'temp_file_list'} || return;
@@ -1121,8 +1104,7 @@ sub MSWin_temp_cleanup {
 
 #  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
 
-sub MSWin_perldoc_tempfile {
-  my@($self, $suffix, $infix) =  @_;
+sub MSWin_perldoc_tempfile($self, $suffix, $infix) {
 
   my $tempdir = env::var('TEMP');
   return unless defined $tempdir and length $tempdir
@@ -1189,9 +1171,7 @@ sub after_rendering_MSWin32  {
 #..........................................................................
 
 
-sub minus_f_nocase {   # i.e., do like -f, but without regard to case
-
-     my@($self, $dir, $file) =  @_;
+sub minus_f_nocase($self, $dir, $file) {
      my $path = catfile($dir,$file);
      return $path if -f $path and -r _;
 
@@ -1293,8 +1273,7 @@ sub pagers_guessing {
 
 #..........................................................................
 
-sub page_module_file {
-    my@($self, @< @found) =  @_;
+sub page_module_file($self, @< @found) {
 
     # Security note:
     # Don't ever just pass this off to anything like MSWin's "start.exe",
@@ -1362,8 +1341,7 @@ sub page_module_file {
 
 #..........................................................................
 
-sub check_file {
-    my@($self, $dir, $file) =  @_;
+sub check_file($self, $dir, $file) {
     
     unless( ref $self ) {
       # Should never get called:
@@ -1400,8 +1378,7 @@ sub check_file {
 
 #..........................................................................
 
-sub containspod {
-    my@($self, $file, $readit) =  @_;
+sub containspod($self, $file, $readit) {
     return 1 if !$readit && $file =~ m/\.pod\z/i;
 
 
@@ -1529,8 +1506,7 @@ sub new_tempfile {    # $self->new_tempfile( [$suffix, [$infix] ] )
 
 #..........................................................................
 
-sub page {  # apply a pager to the output file
-    my @($self, $output, $output_to_stdout, @< @pagers) =  @_;
+sub page($self, $output, $output_to_stdout, @< @pagers) {
     if ($output_to_stdout) {
         $self->aside("Sending unpaged output to STDOUT.\n");
 	open(my $tmpfh, "<", $output)  or  die "Can't open $output: $^OS_ERROR"; # XXX 5.6ism
@@ -1565,8 +1541,7 @@ sub page {  # apply a pager to the output file
 
 #..........................................................................
 
-sub searchfor {
-    my@($self, $recurse,$s,@< @dirs) =  @_;
+sub searchfor($self, $recurse,$s,@< @dirs) {
     $s =~ s!::!/!g;
     $s = VMS::Filespec::unixify($s) if IS_VMS;
     return $s if -f $s && $self->containspod($s);
@@ -1633,8 +1608,7 @@ do {
 
 #..........................................................................
 
-sub tweak_found_pathnames {
-  my@($self, $found) =  @_;
+sub tweak_found_pathnames($self, $found) {
   if (IS_MSWin32) {
     foreach ( @$found) { s,/,\\,g }
   }

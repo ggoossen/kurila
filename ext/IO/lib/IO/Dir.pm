@@ -34,8 +34,7 @@ sub new {
     bless $dh, $class;
 }
 
-sub DESTROY {
-    my @($dh) =  @_;
+sub DESTROY($dh) {;
     no warnings 'io';
     closedir($dh);
 }

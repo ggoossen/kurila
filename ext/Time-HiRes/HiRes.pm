@@ -46,9 +46,7 @@ Time::HiRes->bootstrap();
 
 # Preloaded methods go here.
 
-sub tv_interval {
-    # probably could have been done in C
-    my @($a, ?$b) =  @_;
+sub tv_interval($a, ?$b) {
     $b = \@( < gettimeofday() ) unless defined($b);
     (@{$b}[0] - @{$a}[0]) + ((@{$b}[1] - @{$a}[1]) / 1_000_000);
 }

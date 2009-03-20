@@ -258,8 +258,7 @@ method with the command paragraph).
 
 =cut
 
-sub command {
-    my @($self, $cmd, $text, $line_num, $pod_para)  =  @_;
+sub command($self, $cmd, $text, $line_num, $pod_para) {
     ## Just treat this like a textblock
     $self->textblock( $pod_para->raw_text(), $line_num, $pod_para);
 }
@@ -297,8 +296,7 @@ The base class implementation of this method simply prints the textblock
 
 =cut
 
-sub verbatim {
-    my @($self, $text, $line_num, $pod_para) =  @_;
+sub verbatim($self, $text, $line_num, $pod_para) {
     my $out_fh = $self->{?_OUTPUT};
     print $out_fh, $text;
 }
@@ -343,8 +341,7 @@ as it occurred in the input stream).
 
 =cut
 
-sub textblock {
-    my @($self, $text, $line_num, $pod_para) =  @_;
+sub textblock($self, $text, $line_num, $pod_para) {
     my $out_fh = $self->{?_OUTPUT};
     print $out_fh, $self->interpolate($text, $line_num);
 }
@@ -379,8 +376,7 @@ in the input) to the caller.
 
 =cut
 
-sub interior_sequence {
-    my @($self, $seq_cmd, $seq_arg, $pod_seq) =  @_;
+sub interior_sequence($self, $seq_cmd, $seq_arg, $pod_seq) {
     ## Just return the raw text of the interior sequence
     return  $pod_seq->raw_text();
 }
@@ -573,8 +569,7 @@ The base class implementation of this method returns the given text.
 
 =cut
 
-sub preprocess_line {
-    my @($self, $text, $line_num) =  @_;
+sub preprocess_line($self, $text, $line_num) {
     return  $text;
 }
 
@@ -613,8 +608,7 @@ The base class implementation of this method returns the given text.
 
 =cut
 
-sub preprocess_paragraph {
-    my @($self, $text, $line_num) =  @_;
+sub preprocess_paragraph($self, $text, $line_num) {
     return  $text;
 }
 
@@ -881,8 +875,7 @@ some alternate order, use B<parse_text> instead.
 
 =cut
 
-sub interpolate {
-    my@($self, $text, ?$line_num) =  @_;
+sub interpolate($self, $text, ?$line_num) {
     my %parse_opts = %( expand_seq => 'interior_sequence' );
     my $ptree = $self->parse_text( \%parse_opts, $text, $line_num );
     return  join "", $ptree->children();
@@ -907,8 +900,7 @@ dynamic lookup; Hence subclasses may I<not> override it!
 
 =cut
 
-sub parse_paragraph {
-    my @($self, $text, $line_num) =  @_;
+sub parse_paragraph($self, $text, $line_num) {
     local *myData = $self;  ## alias to avoid deref-ing overhead
     local *myOpts = (%myData{+_PARSEOPTS} ||= \%());  ## get parse-options
     local $_;
@@ -1511,8 +1503,7 @@ and C<OUTPUT> instance data members to determine their new values.
 
 =cut
 
-sub _push_input_stream {
-    my @($self, $in_fh, $out_fh) =  @_;
+sub _push_input_stream($self, $in_fh, $out_fh) {
     local *myData = $self;
 
     ## Initialize stuff for the entire document if this is *not*
@@ -1569,8 +1560,7 @@ the new top of the input stream stack.
 
 =cut
 
-sub _pop_input_stream {
-    my @($self) =  @_;
+sub _pop_input_stream($self) {
     local *myData = $self;
     local *input_stack = %myData{?_INPUT_STREAMS};
 

@@ -115,8 +115,7 @@ if ($^EVAL_ERROR->message =~ m/^This is an expected error/) {
     print \*STDOUT, "not ok $i\n";
 }
 
-sub write_file_not_thing {
-    my @($file, $thing, $test) =  @_;
+sub write_file_not_thing($file, $thing, $test) {
     write_file($file, <<"EOT");
     print "not ok $test - from file\n";
     die "The $thing file should not be loaded";

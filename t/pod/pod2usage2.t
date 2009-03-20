@@ -36,9 +36,8 @@ sub getoutput
   exit 0;
 }
 
-sub compare
+sub compare($left,$right)
 {
-  my @($left,$right) =  @_;
   $left  =~ s/^#\s+/#/gm;
   $right =~ s/^#\s+/#/gm;
   $left  =~ s/\s+/ /gm;

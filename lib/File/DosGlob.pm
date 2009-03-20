@@ -305,8 +305,7 @@ sub _un_escape {
 my %iter;
 my %entries;
 
-sub glob {
-    my@($pat,$cxix) =  @_;
+sub glob($pat,$cxix) {
     my @pat;
 
     # glob without args defaults to $_

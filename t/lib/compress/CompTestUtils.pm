@@ -99,9 +99,8 @@ sub touch
     foreach ( @_) { writeFile($_, '') }
 }
 
-sub writeFile
-{
-    my@($filename, @< @strings) =  @_ ;
+sub writeFile($filename, @< @strings)
+{ 
     1 while unlink $filename ;
     open (my $fh, ">", "$filename") 
         or croak "Cannot open $filename: $^OS_ERROR\n" ;
@@ -197,9 +196,8 @@ EOM
     return $hdr ;
 }
 
-sub cmpFile
-{
-    my @($filename, $uue) =  @_ ;
+sub cmpFile($filename, $uue)
+{ 
     return readFile($filename) eq unpack("u", $uue) ;
 }
 

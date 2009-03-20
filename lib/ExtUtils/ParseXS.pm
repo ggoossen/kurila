@@ -1122,9 +1122,8 @@ sub merge_section {
     return $in;
   }
 
-sub process_keyword($)
-  {
-    my@($pattern) =  @_ ;
+sub process_keyword($)($pattern)
+  { 
     my $kwd ;
 
     &{*{Symbol::fetch_glob("$($kwd)_handler")}}()
@@ -1293,9 +1292,8 @@ sub PREINIT_handler() { print_section() }
 sub POSTCALL_handler() { print_section() }
 sub INIT_handler()    { print_section() }
 
-sub GetAliases
-  {
-    my @($line) =  @_ ;
+sub GetAliases($line)
+  { 
     my $orig = $line ;
     my ($alias) ;
     my ($value) ;
@@ -1572,9 +1570,8 @@ EOF
     return 1 ;
   }
 
-sub ValidProtoString ($)
-  {
-    my@($string) =  @_ ;
+sub ValidProtoString ($)($string)
+  { 
 
     if ( $string =~ m/^$proto_re+$/ ) {
       return $string ;
@@ -1583,17 +1580,15 @@ sub ValidProtoString ($)
     return 0 ;
   }
 
-sub C_string ($)
-  {
-    my@($string) =  @_ ;
+sub C_string ($)($string)
+  { 
 
     $string =~ s[\\][\\\\]g ;
     $string ;
   }
 
-sub ProtoString ($)
-  {
-    my @($type) =  @_ ;
+sub ProtoString ($)($type)
+  { 
 
     %proto_letter{?$type} or "\$" ;
   }
@@ -1619,8 +1614,7 @@ sub check_cpp {
 }
 
 
-sub Q {
-  my@($text) =  @_;
+sub Q($text) {
   $text =~ s/^#//gm;
   $text =~ s/\[\[/\{/g;
   $text =~ s/\]\]/\}/g;
@@ -1687,9 +1681,9 @@ sub fetch_para {
   1;
 }
 
-sub output_init {
+sub output_init($type, $num, $var, $init, $name_printed) {
   local ($type, $num, $var, $init, $name_printed);
-  @($type, $num, $var, $init, $name_printed) =  @_;
+
   local ($arg) = "ST(" . ($num - 1) . ")";
 
   if (  $init =~ m/^=/  ) {
@@ -1743,8 +1737,8 @@ sub evalqq {
     return $ex;
 }
 
-sub generate_init {
-  local@($type, $num, $var, ...) = @_;
+sub generate_init
+  local($type, $num, $var, ...) {
   local($arg) = "ST(" . ($num - 1) . ")";
   local($argoff) = $num - 1;
   local($ntype);
@@ -1819,8 +1813,8 @@ sub generate_init {
   }
 }
 
-sub generate_output {
-  local@($type, $num, $var, $do_setmagic, ?$do_push) =  @_;
+sub generate_output
+  local($type, $num, $var, $do_setmagic, ?$do_push) {
   local($arg) = "ST(" . ($num - ($num != 0)) . ")";
   local($argoff) = $num - 1;
   local($ntype);
@@ -1892,8 +1886,7 @@ sub generate_output {
   }
 }
 
-sub map_type {
-  my @($type, ?$varname) =  @_;
+sub map_type($type, ?$varname) {
   
   # C++ has :: in types too so skip this
   $type =~ s/:/_/g unless $hiertype;
@@ -1917,8 +1910,7 @@ our ($SECTION_END_MARKER);
 
 our $cfile;
 
-sub PUSHED {
-  my @($class, $mode, $fh) =  @_;
+sub PUSHED($class, $mode, $fh) {
   my $mcfile = $cfile;
   $mcfile =~ s/\\/\\\\/g;
   $SECTION_END_MARKER = qq{#line --- "$mcfile"};
@@ -1929,8 +1921,7 @@ sub PUSHED {
                  ), $class;
 }
 
-sub WRITE {
-    my @($self,$buf,$fh) = @_;
+sub WRITE($self,$buf,$fh) {
     my $length = 0;
     $self->{+buffer} .= $buf;
     while ($self->{+buffer} =~ s/^([^\n]*\n)//) {
@@ -1943,8 +1934,7 @@ sub WRITE {
     return $length;
 }
 
-sub FLUSH {
-    my @($self,$fh) = @_;
+sub FLUSH($self,$fh) {
     print $fh, $self->{?buffer} or return -1;
     $self->{+buffer} = '';
     return 0;

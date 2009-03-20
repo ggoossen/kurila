@@ -260,9 +260,7 @@ sub GetOptionsFromString($@) {
     return $ret;
 }
 
-sub GetOptionsFromArray($@) {
-
-    my @($argv, @< @optionlist) =  @_;	# local copy of the option descriptions
+sub GetOptionsFromArray($@)($argv, @< @optionlist) {	# local copy of the option descriptions
     my $argend = '--';		# option list terminator
     my %opctl = %( () );		# table of option specs
     my $pkg = $caller || @(caller)[0];	# current context
@@ -730,8 +728,7 @@ sub GetOptionsFromArray($@) {
 }
 
 # A readable representation of what's in an optbl.
-sub OptCtl ($) {
-    my @($v) =  @_;
+sub OptCtl ($)($v) {
     my @v = map { defined($_) ?? ($_) !! ("<undef>") }, @$v;
     "[".
       join(",", @(
@@ -747,8 +744,7 @@ sub OptCtl ($) {
 }
 
 # Parse an option specification and fill the tables.
-sub ParseOptionSpec ($$) {
-    my @($opt, $opctl) =  @_;
+sub ParseOptionSpec ($$)($opt, $opctl) {
 
     # Match option spec.
     if ( $opt !~ m;^
@@ -869,13 +865,7 @@ sub ParseOptionSpec ($$) {
 }
 
 # Option lookup.
-sub FindOption ($$$$$) {
-
-    # returns (1, $opt, $ctl, $arg, $key) if okay,
-    # returns (1, undef) if option in error,
-    # returns (0) otherwise.
-
-    my @($argv, $prefix, $argend, $opt, $opctl) =  @_;
+sub FindOption ($$$$$)($argv, $prefix, $argend, $opt, $opctl) {
 
     print \*STDERR, ("=> find \"$opt\"\n") if $debug;
 
@@ -1199,8 +1189,7 @@ sub FindOption ($$$$$) {
     return  @(1, $opt, $ctl, $arg, $key);
 }
 
-sub ValidValue ($$$$$) {
-    my @($ctl, $arg, $mand, $argend, $prefix) =  @_;
+sub ValidValue ($$$$$)($ctl, $arg, $mand, $argend, $prefix) {
 
     if ( $ctl->[CTL_DEST] == CTL_DEST_HASH ) {
 	return 0 unless $arg =~ m/[^=]+=(.*)/;
@@ -1448,8 +1437,7 @@ sub VERSION {
 
 package Getopt::Long::CallBack;
 
-sub new {
-    my @($pkg, %< %atts) =  @_;
+sub new($pkg, %< %atts) {
     bless \%( < %atts ), $pkg;
 }
 

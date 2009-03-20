@@ -149,8 +149,7 @@ cmp_ok(0, '||', 1,          '       ||');
 # Piers pointed out sometimes people override isa().
 do {
     package Wibble;
-    sub isa {
-        my@($self, $class) =  @_;
+    sub isa($self, $class) {
         return 1 if $class eq 'Wibblemeister';
     }
     sub new { bless \%() }

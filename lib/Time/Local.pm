@@ -84,8 +84,7 @@ sub _timegm {
     return $sec + ( SECS_PER_DAY * &_daygm( < @_ ) );
 }
 
-sub timegm {
-    my @( $sec, $min, $hour, $mday, $month, $year, ... ) =  @_;
+sub timegm( $sec, $min, $hour, $mday, $month, $year, ...) {
 
     if ( $year +>= 1000 ) {
         $year -= 1900;

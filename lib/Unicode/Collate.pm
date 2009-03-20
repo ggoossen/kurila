@@ -799,8 +799,7 @@ sub _uideoCE_8 {
     return pack(VCE_TEMPLATE, NON_VAR, $u, Min2Wt, Min3Wt, $u);
 }
 
-sub _isUIdeo {
-    my @($u, $uca_vers) =  @_;
+sub _isUIdeo($u, $uca_vers) {
     return (
 	(CJK_UidIni +<= $u &&
 	    ($uca_vers +>= 14 ?? ( $u +<= CJK_UidF41) !! ($u +<= CJK_UidFin)))

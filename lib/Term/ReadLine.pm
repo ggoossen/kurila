@@ -268,8 +268,7 @@ sub new {
   return $ret;
 }
 
-sub newTTY {
-  my @($self, $in, $out) =  @_;
+sub newTTY($self, $in, $out) {
   $self->[0] = $in;
   $self->[1] = $out;
   iohandle::output_autoflush($out, 1);

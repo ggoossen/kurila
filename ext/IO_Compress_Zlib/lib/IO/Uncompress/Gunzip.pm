@@ -120,9 +120,8 @@ sub isGzipMagic
     return $id1 == GZIP_ID1 && $id2 == GZIP_ID2 ;
 }
 
-sub _readFullGzipHeader($)
-{
-    my @($self) =  @_ ;
+sub _readFullGzipHeader($)($self)
+{ 
     my $magic = '' ;
 
     $self->smartReadExact(\$magic, GZIP_ID_SIZE);
@@ -142,9 +141,8 @@ sub _readFullGzipHeader($)
     return $status ;
 }
 
-sub _readGzipHeader($)
-{
-    my @($self, $magic) =  @_ ;
+sub _readGzipHeader($)($self, $magic)
+{ 
     my ($HeaderCRC) ;
     my $buffer = '' ;
 
