@@ -3569,6 +3569,9 @@ Perl_newSUB(pTHX_ I32 floor, OP *proto, OP *block)
     cv = PL_compcv;
     SVcpSTEAL(SvLOCATION(cv), newSVsv(PL_curcop->op_location));
 
+    CvN_MINARGS(cv) = 0;
+    CvN_MAXARGS(cv) = -1;
+
     if (PL_parser && PL_parser->error_count) {
 	op_free(block);
 	block = NULL;
@@ -3592,11 +3595,18 @@ Perl_newSUB(pTHX_ I32 floor, OP *proto, OP *block)
 	OP* leaveop;
 	OP* proto_block;
 	if (proto) {
-	    OP* fake_proto = newASSIGNOP(OPf_STACKED,
-		newANONARRAY(proto, proto->op_location),
-		0,
-		newOP( OP_ANONARRAY, OPf_SPECIAL, proto->op_location ),
-		proto->op_location);
+	    I32 min_modcount = 0;
+	    I32 max_modcount = 0;
+	    OP* kid;
+	    LISTOP* list = cLISTOPx(convert(OP_LIST, 0, proto, proto->op_location));
+	    OP* pushmark = list->op_first;
+	    OP* fake_proto = cLISTOPx(proto);
+	    list->op_first = pushmark->op_sibling;
+	    op_free(pushmark);
+	    for (kid = list->op_first; kid; kid = kid->op_sibling)
+		assign(kid, TRUE, &min_modcount, &max_modcount);
+	    CvN_MINARGS(cv) = min_modcount;
+	    CvN_MAXARGS(cv) = max_modcount;
 	    proto_block = append_list(OP_LINESEQ, (LISTOP*)fake_proto, (LISTOP*)block);
 	    CvFLAGS(cv) |= CVf_PROTO;
 	}

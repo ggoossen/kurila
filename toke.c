@@ -4578,16 +4578,10 @@ Perl_yylex(pTHX)
 		    PL_last_lop = PL_oldbufptr;
 		    PL_last_lop_op = OP_ENTERSUB;
 		    /* Is there a prototype? */
-		    if (SvPOK(cv)) {
-			STRLEN protolen;
-			const char *proto = SvPV_const((SV*)cv, protolen);
-			if (!protolen)
-			    TERM(FUNC0SUB);
-			if ((*proto == '$' || *proto == '_') && proto[1] == '\0')
-			    OPERATOR(UNIOPSUB);
-			while (*proto == ';')
-			    proto++;
-		    }
+		    if (CvN_MINARGS(cv) == 0 && CvN_MAXARGS(cv) == 0)
+			TERM(FUNC0SUB);
+		    if (CvN_MINARGS(cv) == 1 && CvN_MAXARGS(cv) == 1)
+			OPERATOR(UNIOPSUB);
 #ifdef PERL_MAD
 		    if (PL_madskills) {
 			PL_nextwhite = PL_thiswhite;

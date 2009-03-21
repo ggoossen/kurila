@@ -2,7 +2,7 @@
 
 BEGIN { require './test.pl'; }
 
-plan 7;
+plan 9;
 
 sub foo($x) {
     return $x;
@@ -23,11 +23,11 @@ is($r1, 'depth1');
 is($r2, 'depth2');
 
 sub emptyproto() {
-    'foo';
+    return 'foo';
 }
 
 is( emptyproto(), 'foo' );
-is( emptyproto, 'foo' );
+is( emptyproto . 'bar', 'foobar' );
 
 BEGIN {
     my $x = 11;
@@ -38,3 +38,11 @@ is( baz + 1, 12 );
 
 my $sub = sub ($x) { ++$x };
 is($sub->(4), 5);
+
+sub threeargs($x, $y, $z) {
+    return 1;
+}
+dies_like( { threeargs(1, 2) },
+           qr/Missing required assignment value/ );
+dies_like( { threeargs(1, 2, 3, 4) },
+           qr/Too many arguments for subroutine 'main::threeargs'/ );

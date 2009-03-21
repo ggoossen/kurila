@@ -20,6 +20,8 @@ typedef U16 cv_flags_t;
 	void	(*xcv_xsub) (pTHX_ CV*);					\
     }		xcv_root_u;							\
     AV *	xcv_padlist;							\
+    I32         xcv_n_minargs;						\
+    I32         xcv_n_maxargs;						\
     cv_flags_t	xcv_flags
 
 struct xpvcv {
@@ -65,6 +67,8 @@ Null CV pointer.
 #endif
 #define CvPADLIST(sv)	((XPVCV*)SvANY(sv))->xcv_padlist
 #define CvFLAGS(sv)	((XPVCV*)SvANY(sv))->xcv_flags
+#define CvN_MINARGS(sv)	((XPVCV*)SvANY(sv))->xcv_n_minargs
+#define CvN_MAXARGS(sv)	((XPVCV*)SvANY(sv))->xcv_n_maxargs
 
 #define CVf_BLOCK	0x0001	/* CV accept one argument which is assigned to $_ */
 #define CVf_CLONE	0x0020	/* anon CV uses external lexicals */
