@@ -2265,8 +2265,7 @@ all entries in the directory that match the regular expression.
 
 =cut
 
-sub lsdir($dir, ?$regex) {
-    my $self = shift;
+sub lsdir($self, $dir, ?$regex) {
 
     my(@ls);
     my $dh = DirHandle->new();

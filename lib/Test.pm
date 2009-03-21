@@ -344,7 +344,7 @@ problems.  See L</BUGS and CAVEATS>.
 #   "feature" that can't be removed due to compatibility.>>
 #
 
-sub ok ($;$$) {
+sub ok {
     die "ok: plan before you test!" if !$planned;
 
     local($^OUTPUT_RECORD_SEPARATOR,$^OUTPUT_FIELD_SEPARATOR);   # guard against -l and other things that screw with
@@ -667,7 +667,7 @@ That is, both are like this:
 
 =cut
 
-sub skip ($;$$$) {
+sub skip {
     local($^OUTPUT_RECORD_SEPARATOR, $^OUTPUT_FIELD_SEPARATOR);   # guard against -l and other things that screw with
                      # print
 

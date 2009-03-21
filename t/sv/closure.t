@@ -12,8 +12,8 @@ require './test.pl'; # for runperl()
 print \*STDOUT, "1..61\n";
 
 my $test = 1;
-sub test (&) {
-    my $ok = &{@_[0]}( < @_ );
+sub test($sub, @< @args) {
+    my $ok = $sub->( < @args );
     print \*STDOUT, $ok ?? "ok $test\n" !! "not ok $test\n";
     printf \*STDOUT, "# Failed at line \%d\n", @(caller)[2] unless $ok;
     $test++;
@@ -258,8 +258,8 @@ END_MARK_TWO
 
 do \{
     my \$test = $test;
-    sub test (&) \{
-      my \$ok = &\{\@_[0]\}();
+    sub test (\$sub) \{
+      my \$ok = \$sub->();
       print \*STDOUT, \$ok ?? "ok \$test\n" !! "not ok \$test\n";
       printf \*STDOUT, "# Failed at line \\\%d\n", @(caller)[2] unless \$ok;
       \$test++;

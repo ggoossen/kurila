@@ -2,7 +2,7 @@
 
 our $Ok_Level = 0;
 my $test = 1;
-sub ok ($;$)($ok, ?$name) {
+sub ok($ok, ?$name) {
 
     local $_;
 
@@ -16,7 +16,7 @@ sub ok ($;$)($ok, ?$name) {
     return $ok;
 }
 
-sub nok ($;$)($nok, ?$name) {
+sub nok($nok, ?$name) {
     local $Ok_Level = 1;
     ok( !$nok, $name );
 }
@@ -25,9 +25,7 @@ use Config;
 use signals;
 
 my $have_alarm = config_value('d_alarm');
-sub alarm_ok (&) {
-    my $test = shift;
-
+sub alarm_ok($test) {
     signals::temp_set_handler("ALRM" => sub { die "timeout\n" });
     
     my $match;
@@ -57,35 +55,35 @@ $_ = '123';
 study;
 ok(m/^([0-9][0-9]*)/);
 
-nok($x =~ m/^xxx/);
-nok($x !~ m/^abc/);
+nok($: $x =~ m/^xxx/);
+nok($: $x !~ m/^abc/);
 
-ok($x =~ m/def/);
-nok($x !~ m/def/);
+ok($: $x =~ m/def/);
+nok($: $x !~ m/def/);
 
 study($x);
 ok($x !~ m/.def/);
-nok($x =~ m/.def/);
+nok($: $x =~ m/.def/);
 
-ok($x =~ m/\ndef/);
-nok($x !~ m/\ndef/);
+ok($: $x =~ m/\ndef/);
+nok($: $x !~ m/\ndef/);
 
 $_ = 'aaabbbccc';
 study;
 ok(m/(a*b*)(c*)/ && $1 eq 'aaabbb' && $2 eq 'ccc');
 ok(m/(a+b+c+)/ && $1 eq 'aaabbbccc');
 
-nok(m/a+b?c+/);
+nok($: m/a+b?c+/);
 
 $_ = 'aaabccc';
 study;
-ok(m/a+b?c+/);
-ok(m/a*b+c*/);
+ok($: m/a+b?c+/);
+ok($: m/a*b+c*/);
 
 $_ = 'aaaccc';
 study;
-ok(m/a*b?c*/);
-nok(m/a*b+c*/);
+ok($: m/a*b?c*/);
+nok($: m/a*b+c*/);
 
 $_ = 'abcdef';
 study;

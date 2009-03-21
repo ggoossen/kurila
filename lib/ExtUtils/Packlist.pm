@@ -47,7 +47,7 @@ sub __find_relocations
     qr/^($alternations)/o;
 }
 
-sub new($$)($class, ?$packfile)
+sub new($class, ?$packfile)
 {
     $class = ref($class) || $class;
 
@@ -61,7 +61,7 @@ sub new($$)($class, ?$packfile)
     return $self;
 }
 
-sub read($;$)($self, ?$packfile)
+sub read($self, ?$packfile)
 {
 
     if (defined($packfile)) { $self->{packfile} = $packfile; }
@@ -97,7 +97,7 @@ sub read($;$)($self, ?$packfile)
     close($fh);
 }
 
-sub write($;$)($self, ?$packfile)
+sub write($self, ?$packfile)
   {
     if (defined($packfile)) { $self->{packfile} = $packfile; }
     else { $packfile = $self->{packfile}; }
@@ -137,7 +137,7 @@ sub write($;$)($self, ?$packfile)
     close($fh);
 }
 
-sub validate($;$)($self, ?$remove)
+sub validate($self, ?$remove)
   {
     my @missing;
     foreach my $key (sort(keys($self->{data}))) {
@@ -149,7 +149,7 @@ sub validate($;$)($self, ?$remove)
     return @(@missing);
 }
 
-sub packlist_file($)($self)
+sub packlist_file($self)
   {
     return @($self->{?packfile});
 }

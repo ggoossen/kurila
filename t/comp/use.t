@@ -49,13 +49,13 @@ sub _ok($type, $got, $expected, ?$name) {
     $result;
 }
 
-sub like ($$;$) {
+sub like {
     _ok ('like', < @_);
 }
-sub is ($$;$) {
+sub is {
     _ok ('is', < @_);
 }
-sub isnt ($$;$) {
+sub isnt {
     _ok ('isnt', < @_);
 }
 

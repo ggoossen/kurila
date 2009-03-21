@@ -217,7 +217,7 @@ This is the same as Test::Simple's ok() routine.
 
 =cut
 
-sub ok ($;$)($test, ?$name) {
+sub ok($test, ?$name) {
     my $tb = Test::More->builder;
 
     $tb->ok($test, $name);
@@ -283,16 +283,16 @@ function which is an alias of isnt().
 
 =cut
 
-sub is ($$;$) {
+sub is($lhs, $rhs, ?$msg) {
     my $tb = Test::More->builder;
 
-    $tb->is_eq(< @_);
+    $tb->is_eq($lhs, $rhs, $msg);
 }
 
-sub isnt ($$;$) {
+sub isnt($lhs, $rhs, ?$msg) {
     my $tb = Test::More->builder;
 
-    $tb->isnt_eq(< @_);
+    $tb->isnt_eq($lhs, $rhs, $msg);
 }
 
 
@@ -326,10 +326,10 @@ diagnostics on failure.
 
 =cut
 
-sub like ($$;$) {
+sub like($got, $expected, ?$name) {
     my $tb = Test::More->builder;
 
-    $tb->like(< @_);
+    $tb->like($got, $expected, $name);
 }
 
 
@@ -342,10 +342,10 @@ given pattern.
 
 =cut
 
-sub unlike ($$;$) {
+sub unlike($got, $expected, ?$name) {
     my $tb = Test::More->builder;
 
-    $tb->unlike(< @_);
+    $tb->unlike($got, $expected, $name);
 }
 
 
@@ -382,7 +382,7 @@ is()'s use of C<eq> will interfere:
 
 =cut
 
-sub cmp_ok($$$;$) {
+sub cmp_ok {
     my $tb = Test::More->builder;
 
     $tb->cmp_ok(< @_);
@@ -418,7 +418,7 @@ as one test.  If you desire otherwise, use:
 
 =cut
 
-sub can_ok ($@)($proto, @< @methods) {
+sub can_ok($proto, @< @methods) {
     my $class = ref $proto || $proto;
     my $tb = Test::More->builder;
 
@@ -479,7 +479,7 @@ you'd like them to be more specific, you can supply an $object_name
 
 =cut
 
-sub isa_ok ($$;$)($object, $class, ?$obj_name) {
+sub isa_ok($object, $class, ?$obj_name) {
     my $tb = Test::More->builder;
 
     my $diag;
@@ -548,12 +548,12 @@ Use these very, very, very sparingly.
 
 =cut
 
-sub pass (;$) {
+sub pass {
     my $tb = Test::More->builder;
     $tb->ok(1, < @_);
 }
 
-sub fail (;$) {
+sub fail {
     my $tb = Test::More->builder;
     $tb->ok(0, < @_);
 }
@@ -609,7 +609,7 @@ because the notion of "compile-time" is relative.  Instead, you want:
 
 =cut
 
-sub use_ok ($;@)($module, @< @imports) {
+sub use_ok($module, @< @imports) {
     @imports = @( () ) unless (nelems @imports);
     my $tb = Test::More->builder;
 
@@ -686,8 +686,7 @@ Like use_ok(), except it requires the $module or $file.
 
 =cut
 
-sub require_ok ($) {
-    my@($module) =@( shift);
+sub require_ok ($module) {
     my $tb = Test::More->builder;
 
     my $pack = caller;

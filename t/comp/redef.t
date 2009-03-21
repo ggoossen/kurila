@@ -8,8 +8,8 @@ BEGIN {
     $^WARN_HOOK = sub { $warn .= @_[0]->message }
 }
 
-sub ok ($$) { 
-    print \*STDOUT, @_[1] ?? "ok " !! "not ok ", @_[0], "\n";
+sub ok($nr, $ok) { 
+    print \*STDOUT, $ok ?? "ok " !! "not ok ", $nr, "\n";
 }
 
 print \*STDOUT, "1..1\n";

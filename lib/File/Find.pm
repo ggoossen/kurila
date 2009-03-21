@@ -491,7 +491,7 @@ sub contract_name_Mac($cdir,$fn) {
     }
 }
 
-sub PathCombine($$)($Base,$Name) {
+sub PathCombine($Base,$Name) {
     my $AbsName;
 
     if ($Is_MacOS) {
@@ -525,7 +525,7 @@ sub PathCombine($$)($Base,$Name) {
     return $AbsName;
 }
 
-sub Follow_SymLink($)($AbsName) {
+sub Follow_SymLink($AbsName) {
 
     my ($NewName,$DEV, $INO);
     @($DEV, $INO, ...) = @: lstat $AbsName;
@@ -760,7 +760,7 @@ sub _find_opt {
 # preconditions:
 #  chdir (if not no_chdir) to dir
 
-sub _find_dir($$$)($wanted, $p_dir, $nlink) {
+sub _find_dir($wanted, $p_dir, $nlink) {
     my @($CdLvl,$Level) = @(0,0);
     my @Stack;
     my @filenames;
@@ -1030,7 +1030,7 @@ sub _find_dir($$$)($wanted, $p_dir, $nlink) {
 # preconditions:
 #  chdir (if not no_chdir) to dir
 
-sub _find_dir_symlnk($$$)($wanted, $dir_loc, $p_dir) { # $dir_loc is the absolute directory
+sub _find_dir_symlnk($wanted, $dir_loc, $p_dir) { # $dir_loc is the absolute directory
     my @Stack;
     my @filenames;
     my $new_loc;

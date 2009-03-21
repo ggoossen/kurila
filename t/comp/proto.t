@@ -15,9 +15,8 @@ BEGIN { require "./test.pl" }
 
 plan tests => 60;
 
-sub testing (&$) {
-    my $p = prototype(shift);
-    my $c = shift;
+sub testing($sub, $c) {
+    my $p = prototype($sub);
     my $what = defined $c ?? '(' . $p . ')' !! 'no prototype';   
     print \*STDOUT, '#' x 25,"\n";
     print \*STDOUT, '# Testing ',$what,"\n";

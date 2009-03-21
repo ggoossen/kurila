@@ -63,10 +63,10 @@ sub test_invalid_decl {
 }
 
 test_invalid_decl('sub;');
-test_invalid_decl('sub ($) ;');
+test_invalid_decl('sub ($s) ;', " # TODO ");
 test_invalid_decl('do { my $x = sub }');
-test_invalid_decl('sub ($) && 1');
-test_invalid_decl('sub ($) : lvalue;',' # TODO');
+test_invalid_decl('sub ($s) && 1', " # TODO ");
+test_invalid_decl('sub ($s) : lvalue;',' # TODO');
 
 eval "sub #foo\n\{print \\*STDOUT, 1\}";
 is $^EVAL_ERROR, '', "No error"

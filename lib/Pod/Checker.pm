@@ -497,7 +497,7 @@ my %ENTITIES = %(
 ## Function definitions begin here
 ##---------------------------------
 
-sub podchecker( $ ; $ % )($infile, $outfile, %< %options) {
+sub podchecker($infile, $outfile, %< %options) {
     local $_;
 
     ## Set defaults

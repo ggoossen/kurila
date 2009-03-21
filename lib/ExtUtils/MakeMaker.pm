@@ -132,7 +132,7 @@ sub _format_att {
 }
 
 
-sub prompt ($;$)($mess, ?$def) {
+sub prompt($mess, ?$def) {
     die("prompt function called without an argument") 
         unless defined $mess;
 
@@ -847,8 +847,7 @@ sub mv_all_methods {
 #    }
 }
 
-sub skipcheck($section) {
-    my@($self) =@( shift);
+sub skipcheck($self, $section) {
 
     if ($section eq 'dynamic') {
         print \*STDOUT, "Warning (non-fatal): Target 'dynamic' depends on targets ",

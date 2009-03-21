@@ -43,7 +43,7 @@ otherwise.
 
 ##--------------------------------------------------------------------------
 
-sub testcmp( $ $ ; $) {
+sub testcmp {
    my %opts = %( ref(@_[0]) eq 'HASH' ?? < %{shift()} !! () );
    my @($file1, $file2) =  @_;
    my @($fh1, $fh2) = @($file1, $file2);

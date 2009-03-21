@@ -111,25 +111,25 @@ my $INSTALL_ROOT = env::var('PERL_INSTALL_ROOT');
 my $Curdir = File::Spec->curdir;
 my $Updir  = File::Spec->updir;
 
-sub _estr(@) {
-    return join "\n", @('!' x 72,< @_,'!' x 72,'');
+sub _estr(@mess) {
+    return join "\n", @('!' x 72,< @mess,'!' x 72,'');
 }
 
 do {my %warned;
-sub _warnonce(@) {
+sub _warnonce(@mess) {
     my $first=shift;
-    my $msg=_estr "WARNING: $first",< @_;
+    my $msg=_estr "WARNING: $first",< @mess;
     warn $msg unless %warned{+$msg}++;
 }};
 
-sub _choke(@) {
+sub _choke(@mess) {
     my $first=shift;
-    my $msg=_estr "ERROR: $first",< @_;
+    my $msg=_estr "ERROR: $first",< @mess;
     die($msg);
 }
 
 
-sub _chmod($$;$)( $mode, $item, ?$verbose) {
+sub _chmod( $mode, $item, ?$verbose) {
     $verbose ||= 0;
     if (chmod $mode, $item) {
         print \*STDOUT, "chmod($mode, $item)\n" if $verbose +> 1;
@@ -912,7 +912,7 @@ Returns 0 if there is not.
 
 =cut
 
-sub directory_not_empty ($)($dir) {
+sub directory_not_empty($dir) {
   my $files = 0;
   find(sub {
            return if $_ eq ".exists";

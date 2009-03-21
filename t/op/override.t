@@ -15,8 +15,10 @@ BEGIN { package Foo; *main::getlogin = sub { "kilroy"; } }
 
 is( getlogin, "kilroy" );
 
-my $t = 42;
-BEGIN { *CORE::GLOBAL::time = sub () { $t; } }
+BEGIN {
+    my $t = 42;
+    *CORE::GLOBAL::time = sub () { $t; };
+}
 
 is( 45, time + 3 );
 
@@ -58,15 +60,15 @@ our $fh;
 do {
     local our $TODO = "overrie readline";
     $r = 11;
-    BEGIN { *CORE::GLOBAL::readline = sub (;*) { ++$r }; }
-    is( (~< *FH)	, 12 );
+    BEGIN { *CORE::GLOBAL::readline = sub (_) { ++$r }; }
+    is( ($: ~< *FH)	, 12 );
 if (0) {
-    is( (~< $fh)	, 13 );
+    is( ($: ~< $fh)	, 13 );
     my $pad_fh;
-    is( (~< $pad_fh)	, 14 );
+    is( ($: ~< $pad_fh)	, 14 );
 
     # Non-global readline() override
-    BEGIN { *Rgs::readline = sub (;*) { --$r }; }
+    BEGIN { *Rgs::readline = sub (_) { --$r }; }
     do {
         package Rgs;
         ::is( (~< *FH)	, 13 );
@@ -77,12 +79,12 @@ if (0) {
 };
 
 # Global readpipe() override
-BEGIN { *CORE::GLOBAL::readpipe = sub ($) { "@_[0] " . --$r }; }
+BEGIN { *CORE::GLOBAL::readpipe = sub ($v) { "$v " . --$r }; }
 is( `rm`,	    "rm 10", '``' );
 is( qx/cp/,	    "cp 9", 'qx' );
 
 # Non-global readpipe() override
-BEGIN { *Rgs::readpipe = sub ($) { ++$r . " @_[0]" }; }
+BEGIN { *Rgs::readpipe = sub ($v) { ++$r . " $v" }; }
 do {
     package Rgs;
     main::is( `rm`,		  "10 rm", '``' );

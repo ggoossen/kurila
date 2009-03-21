@@ -172,7 +172,7 @@ sub fail () {
     $fail++;
 }
 
-sub offset ($$)($offset_will_be, $offset_want) {
+sub offset($offset_will_be, $offset_want) {
     my $offset_is = eval $offset_will_be;
     unless ($offset_is == $offset_want) {
         print \*STDOUT, "# bad offset $offset_is, want $offset_want\n";

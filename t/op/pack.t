@@ -66,8 +66,7 @@ sub encode_list {
 }
 
 
-sub list_eq ($$) {
-  my @($l, $r) =  @_;
+sub list_eq($l, $r) {
   return 0 unless (nelems @$l) == nelems @$r;
   for my $i (0..(nelems @$l) -1) {
     if (defined $l->[$i]) {

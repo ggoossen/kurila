@@ -1122,7 +1122,7 @@ sub merge_section {
     return $in;
   }
 
-sub process_keyword($)($pattern)
+sub process_keyword($pattern)
   { 
     my $kwd ;
 
@@ -1570,7 +1570,7 @@ EOF
     return 1 ;
   }
 
-sub ValidProtoString ($)($string)
+sub ValidProtoString($string)
   { 
 
     if ( $string =~ m/^$proto_re+$/ ) {
@@ -1580,14 +1580,14 @@ sub ValidProtoString ($)($string)
     return 0 ;
   }
 
-sub C_string ($)($string)
+sub C_string($string)
   { 
 
     $string =~ s[\\][\\\\]g ;
     $string ;
   }
 
-sub ProtoString ($)($type)
+sub ProtoString($type)
   { 
 
     %proto_letter{?$type} or "\$" ;
@@ -1681,8 +1681,9 @@ sub fetch_para {
   1;
 }
 
-sub output_init($type, $num, $var, $init, $name_printed) {
+sub output_init {
   local ($type, $num, $var, $init, $name_printed);
+  @($type, $num, $var, $init, $name_printed) = @_;
 
   local ($arg) = "ST(" . ($num - 1) . ")";
 
@@ -1737,8 +1738,8 @@ sub evalqq {
     return $ex;
 }
 
-sub generate_init
-  local($type, $num, $var, ...) {
+sub generate_init {
+  local@($type, $num, $var, ...) = @_;
   local($arg) = "ST(" . ($num - 1) . ")";
   local($argoff) = $num - 1;
   local($ntype);
@@ -1813,8 +1814,8 @@ sub generate_init
   }
 }
 
-sub generate_output
-  local($type, $num, $var, $do_setmagic, ?$do_push) {
+sub generate_output {
+  local@($type, $num, $var, $do_setmagic, ?$do_push) = @_;
   local($arg) = "ST(" . ($num - ($num != 0)) . ")";
   local($argoff) = $num - 1;
   local($ntype);
