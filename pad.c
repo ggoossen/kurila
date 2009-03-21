@@ -1041,16 +1041,12 @@ Perl_pad_tidy(pTHX_ padtidy_type type)
 
     if (PL_cv_has_eval || PL_perldb) {
 
-/*         const CV *cv; */
-/* 	for (cv = PL_compcv ;cv; cv = CvOUTSIDE(cv)) { */
-/* 	    if (cv != PL_compcv && CvCOMPILED(cv)) */
-/* 		break; /\* no need to mark already-compiled code *\/ */
-/* 	    if (CvANON(cv)) { */
-/* 		DEBUG_Xv(PerlIO_printf(Perl_debug_log, */
-/* 		    "Pad clone on cv=0x%"UVxf"\n", PTR2UV(cv))); */
-/* 		CvCLONE_on(cv); */
-/* 	    } */
-/* 	} */
+        const CV *cv = PL_compcv;
+	if (CvANON(cv)) {
+	    DEBUG_Xv(PerlIO_printf(Perl_debug_log,
+		    "Pad clone on cv=0x%"UVxf"\n", PTR2UV(cv)));
+	    CvCLONE_on(cv);
+	}
     }
 
     /* extend curpad to match namepad */
@@ -1368,7 +1364,7 @@ void Perl_cv_setcv(pTHX_ CV *dst, CV* src)
 	 * so try to grab the current const value, and if successful,
 	 * turn into a const sub:
 	 */
-	SV* const const_sv = op_const_sv(CvSTART(dst), dst);
+	SV* const const_sv = op_const_sv(RootopOp(CvROOT(dst)), dst);
 	if (const_sv) {
 	    CvREFCNT_dec(dst);
 	    dst = newCONSTSUB(NULL, const_sv);

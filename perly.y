@@ -561,11 +561,13 @@ proto	:	/* NULL */
 			{ 
                             $$ = newOP(OP_STUB, 0, LOCATION($1) );
                             PL_parser->in_my = FALSE;
+                            PL_parser->expect = XBLOCK;
                         }
 	|	startproto expr mintro ')'
 			{ 
                             $$ = $2;
                             PL_parser->in_my = FALSE;
+                            PL_parser->expect = XBLOCK;
                         }
 	;
 
