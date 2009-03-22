@@ -43,6 +43,6 @@ sub threeargs($x, $y, $z) {
     return 1;
 }
 dies_like( { threeargs(1, 2) },
-           qr/Missing required assignment value/ );
+           qr/Not enough arguments for main::threeargs/ );
 dies_like( { threeargs(1, 2, 3, 4) },
-           qr/Too many arguments for subroutine 'main::threeargs'/ );
+           qr/Too many arguments for main::threeargs/ );
