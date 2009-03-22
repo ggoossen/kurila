@@ -1411,6 +1411,7 @@ PP(pp_entersub)
 		Perl_croak_at(aTHX_ SvLOCATION(cv),
 		    "Too many arguments for subroutine '%s'",
 		    SvPVX_const(loc_name(SvLOCATION(cv))));
+	    CX_CURPAD_SAVE(cx->blk_sub);
 	    ++MARK;
 	    for (i=0; i<items/2; i++) {
 		SV* sv = MARK[i];
@@ -1418,7 +1419,6 @@ PP(pp_entersub)
 		MARK[items-i-1] = sv;
 	    }
 	    PUSHMARK(MARK-1);
-	    CX_CURPAD_SAVE(cx->blk_sub);
 	}
 	else if ( CvFLAGS(cv) & CVf_DEFARGS) {
 	    AV* av;

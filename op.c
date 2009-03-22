@@ -3594,20 +3594,26 @@ Perl_newSUB(pTHX_ I32 floor, OP *proto, OP *block)
     {
 	OP* leaveop;
 	OP* proto_block;
-	if (proto) {
+	if (proto && proto->op_type == OP_STUB) {
+	    CvN_MINARGS(cv) = 0;
+	    CvN_MAXARGS(cv) = 0;
+	    CvFLAGS(cv) |= CVf_PROTO;
+	    proto_block = block;
+	    op_free(proto);
+	}
+	else if (proto) {
 	    I32 min_modcount = 0;
 	    I32 max_modcount = 0;
 	    OP* kid;
-	    LISTOP* list = cLISTOPx(convert(OP_LIST, 0, proto, proto->op_location));
+	    LISTOP* list = cLISTOPx(my(convert(OP_LIST, 0, proto, proto->op_location)));
 	    OP* pushmark = list->op_first;
-	    OP* fake_proto = proto;
 	    list->op_first = pushmark->op_sibling;
 	    op_free(pushmark);
 	    for (kid = list->op_first; kid; kid = kid->op_sibling)
 		assign(kid, TRUE, &min_modcount, &max_modcount);
 	    CvN_MINARGS(cv) = min_modcount;
 	    CvN_MAXARGS(cv) = max_modcount;
-	    proto_block = append_list(OP_LINESEQ, (LISTOP*)fake_proto, (LISTOP*)block);
+	    proto_block = append_list(OP_LINESEQ, list, (LISTOP*)block);
 	    CvFLAGS(cv) |= CVf_PROTO;
 	}
 	else {
