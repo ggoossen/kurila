@@ -25,7 +25,7 @@ struct 'Net::servent' => \@(
    proto	=> '$',
 );
 
-sub populate (@) {
+sub populate {
     return unless (nelems @_);
     my $sob = new();
     $s_name 	 =    $sob->[0]     	     = @_[0];
@@ -36,11 +36,11 @@ sub populate (@) {
 }
 
 sub getservent    (   ) { populate(CORE::getservent()) }
-sub getservbyname ($;$) { populate(CORE::getservbyname(shift,shift||'tcp')) }
-sub getservbyport ($;$) { populate(CORE::getservbyport(shift,shift||'tcp')) }
+sub getservbyname ($name, ?$proto) { populate(CORE::getservbyname($name,$proto||'tcp')) }
+sub getservbyport ($port, ?$proto) { populate(CORE::getservbyport($port,$proto||'tcp')) }
 
-sub getserv ($;$) {
-    return &{'getservby' . (@_[0]=~m/^\d+$/ ?? 'port' !! 'name')}(< @_);
+sub getserv ($serv, ?$proto) {
+    return &{'getservby' . ($serv=~m/^\d+$/ ?? 'port' !! 'name')}($serv, $proto);
 }
 
 1;

@@ -1,6 +1,6 @@
 #!perl -w
 
-use Test < qw(plan ok);
+use Test::More;
 plan tests => 5;
 
 do {
@@ -36,17 +36,17 @@ binmode($fh);
 print $fh, "foo\0\n";
 close($fh) || die "Can't write '$file': $^OS_ERROR";
 
-ok(digest_file($file, "Foo"), "0005");
+is(digest_file($file, "Foo"), "0005");
 
 if (ord('A') == 193) { # EBCDIC.
-    ok(digest_file_hex($file, "Foo"), "f0f0f0f5");
-    ok(digest_file_base64($file, "Foo"), "8PDw9Q");
+    is(digest_file_hex($file, "Foo"), "f0f0f0f5");
+    is(digest_file_base64($file, "Foo"), "8PDw9Q");
 } else {
-    ok(digest_file_hex($file, "Foo"), "30303035");
-    ok(digest_file_base64($file, "Foo"), "MDAwNQ");
+    is(digest_file_hex($file, "Foo"), "30303035");
+    is(digest_file_base64($file, "Foo"), "MDAwNQ");
 }
 
 unlink($file) || warn "Can't unlink '$file': $^OS_ERROR";
 
-ok(try { digest_file("not-there.txt", "Foo") }, undef);
+is(($: try { digest_file("not-there.txt", "Foo") }), undef);
 ok($^EVAL_ERROR);

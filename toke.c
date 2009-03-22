@@ -3411,12 +3411,22 @@ Perl_yylex(pTHX)
 
     case '*':
 	if (PL_expect != XOPERATOR) {
-	    s = scan_ident(s, PL_bufend, PL_tokenbuf, sizeof PL_tokenbuf, TRUE);
-	    PL_expect = XOPERATOR;
-	    force_ident(PL_tokenbuf, '*');
-	    if (!*PL_tokenbuf)
+	    if (s[1] == '{' || s[1] == '$') {
+		s++;
 		PREREF('*');
-	    TERM('*');
+	    }
+	    if (isIDFIRST_lazy_if(s+1,UTF)
+		|| (s[1] >= '0' && s[1] <= '9')
+		|| s[1] == '^' || s[1] == ':') {
+		s = scan_ident(s, PL_bufend, PL_tokenbuf, sizeof PL_tokenbuf, TRUE);
+		PL_expect = XOPERATOR;
+		force_ident(PL_tokenbuf, '*');
+		if (!*PL_tokenbuf)
+		    Perl_croak(aTHX_ "Invalid identifier");
+		TERM('*');
+	    }
+
+	    Perl_croak(aTHX_ "Unknown term '*'");
 	}
 	s++;
 	if (*s == '*') {
@@ -4044,17 +4054,29 @@ Perl_yylex(pTHX)
 	    OPERATOR(ARRAYEXPAND);
 	}
 
-	PL_tokenbuf[0] = '@';
-	s = scan_ident(s, PL_bufend, PL_tokenbuf + 1, sizeof PL_tokenbuf - 1, FALSE);
-	if (!PL_tokenbuf[1]) {
+	if (s[1] == '{' || s[1] == '$') {
+	    s++;
 	    PREREF('@');
 	}
-	if (PL_lex_state == LEX_NORMAL)
-	    s = SKIPSPACE1(s);
-	TERM(S_pending_ident(begin_s));
+
+	if (isIDFIRST_lazy_if(s+1,UTF)
+	    || (s[1] >= '0' && s[1] <= '9')
+	    || s[1] == '^' || s[1] == ':') {
+	    PL_tokenbuf[0] = '@';
+	    s = scan_ident(s, PL_bufend, PL_tokenbuf + 1, sizeof PL_tokenbuf - 1, FALSE);
+	    if (!PL_tokenbuf[1]) {
+		Perl_croak(aTHX_ "Invalid identifier");
+	    }
+	    if (PL_lex_state == LEX_NORMAL)
+		s = SKIPSPACE1(s);
+	    TERM(S_pending_ident(begin_s));
+	}
+
+	s++;
+	Perl_croak(aTHX_ "Unknown operator '@'");
     }
 
-     case '/':			/* may be division, defined-or */
+    case '/':			/* may be division, defined-or */
 	if (PL_expect == XTERMORDORDOR && s[1] == '/') {
 	    s += 2;
 	    AOPERATOR(DORDOR);

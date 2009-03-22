@@ -15,7 +15,7 @@ ok 1;
 use Pod::Simple::XMLOutStream;
 print \*STDOUT, "# Pod::Simple version $Pod::Simple::VERSION\n";
 my $x = 'Pod::Simple::XMLOutStream';
-sub e ($$) { $x->_duo(< @_) }
+sub e ($x, $y) { $x->_duo($x, $y) }
 
 $Pod::Simple::XMLOutStream::ATTR_PAD   = ' ';
 $Pod::Simple::XMLOutStream::SORT_ATTRS = 1; # for predictably testable output

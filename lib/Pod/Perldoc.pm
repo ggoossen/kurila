@@ -62,7 +62,7 @@ $Pod2man = "pod2man" .
 # Option accessors...
 
 foreach my $subname ( map { "opt_$_" }, split '', q{mhlvriFfXqnTdUL}) {
-  *{Symbol::fetch_glob($subname)} = do{   sub () { shift->_elem($subname, < @_) } };
+  *{Symbol::fetch_glob($subname)} = do{   sub { shift->_elem($subname, < @_) } };
 }
 
 # And these are so that GetOptsOO knows they take options:

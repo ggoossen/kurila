@@ -47,10 +47,10 @@ our ($qr, $skip_amp, $qr_embed); # set by our callers
 my $tests_fh;
 
 BEGIN {
-    $iters = shift || 1;	# Poor man performance suite, 10000 is OK.
+    $iters = shift(@ARGV) || 1;	# Poor man performance suite, 10000 is OK.
 
     # Do this open before any chdir
-    $file = shift;
+    $file = shift(@ARGV);
     if (defined $file) {
 	open $tests_fh, "<", $file or die "Can't open $file";
     }

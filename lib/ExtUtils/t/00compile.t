@@ -25,7 +25,7 @@ foreach my $file ( @modules) {
     # they're already loaded.  This avoids recompilation warnings.
     local $^INCLUDE_PATH = $^INCLUDE_PATH;
     unshift $^INCLUDE_PATH, ".";
-    ok try { require($file); 1 } or diag "require $file failed.\n$($^EVAL_ERROR->message)";
+    ok($: try { require($file); 1 }) or diag "require $file failed.\n$($^EVAL_ERROR->message)";
 
     SKIP: do {
         skip "Test::Pod not installed", 1 unless $Has_Test_Pod;

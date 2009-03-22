@@ -460,10 +460,8 @@ The padded $string is returned.
 
 =cut
 
-sub Tpad( $string, $cnt, $FH)
+sub Tpad( $self, $string, $cnt, $FH)
 {    ## public
-    my $self = shift;
-
     my ( $decr, $ms );
 
     if ( defined $string && $string =~ m/(^[\d.]+)(\*?)(.*)$/ )
@@ -512,10 +510,8 @@ The appropriate string for the capability will be returned.
 
 =cut
 
-sub Tputs( $cap, $cnt, $FH)
+sub Tputs( $self, $cap, $cnt, $FH)
 {    ## public
-    my $self = shift;
-
     my $string;
 
     $cnt = 0 unless $cnt;
@@ -587,10 +583,8 @@ The output string will be returned.
 
 =cut
 
-sub Tgoto( $cap, $code, $tmp, $FH)
+sub Tgoto( $self, $cap, $code, $tmp, $FH)
 {    ## public
-    my $self = shift;
-
     my $string = $self->{?'_' . $cap };
     my $result = '';
     my $after  = '';

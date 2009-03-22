@@ -247,7 +247,7 @@ sub GetOptions(@< @args) {
     return GetOptionsFromArray(\@ARGV, < @args);
 }
 
-sub GetOptionsFromString($string, @args) {
+sub GetOptionsFromString($string, @< @args) {
     require Text::ParseWords;
     my $args = \ Text::ParseWords::shellwords($string);
     $caller ||= @(caller)[0];	# current context
@@ -1336,7 +1336,7 @@ sub Configure (@< @options) {
 }
 
 # Deprecated name.
-sub config (@args) {
+sub config (@< @args) {
     Configure (< @args);
 }
 
@@ -1348,7 +1348,7 @@ sub config (@args) {
 #  - a string (lead in message)
 #  - a hash with options. See Pod::Usage for details.
 #
-sub VersionMessage(@args) {
+sub VersionMessage(@< @args) {
     # Massage args.
     my $pa = setup_pa_args("version", < @args);
 

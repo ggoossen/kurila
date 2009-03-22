@@ -86,9 +86,9 @@ Default: 1
 
 =cut
 
-sub case_tolerant () {
+sub case_tolerant(?$drive) {
   try { require Win32API::File; } or return 1;
-  my $drive = shift || "C:";
+  $drive ||= "C:";
   my $osFsType = "\0"x256;
   my $osVolName = "\0"x256;
   my $ouFsFlags = 0;
@@ -368,7 +368,7 @@ implementation of these methods, not the semantics.
 =cut
 
 
-sub _canon_cat(@)				# @path -> path
+sub _canon_cat				# @path -> path
 {
     my $first  = shift;
     my $volume = $first =~ s{ \A ([A-Za-z]:) ([\\/]?) }{}x	# drive letter

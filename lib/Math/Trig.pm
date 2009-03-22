@@ -73,32 +73,32 @@ sub _GR  () { pi2/400 }
 # Truncating remainder.
 #
 
-sub _remt ($$) {
+sub _remt ($v, $p) {
     # Oh yes, POSIX::fmod() would be faster. Possibly. If it is available.
-    @_[0] - @_[1] * int(@_[0] / @_[1]);
+    $v - $p * int($v / $p);
 }
 
 #
 # Angle conversions.
 #
 
-sub rad2rad($)     { _remt(@_[0], pi2) }
+sub rad2rad($v)     { _remt($v, pi2) }
 
-sub deg2deg($)     { _remt(@_[0], 360) }
+sub deg2deg($v)     { _remt($v, 360) }
 
-sub grad2grad($)   { _remt(@_[0], 400) }
+sub grad2grad($v)   { _remt($v, 400) }
 
-sub rad2deg ($;$)  { my $d = _RD * @_[0]; @_[?1] ?? $d !! deg2deg($d) }
+sub rad2deg ($v, ?$wrap)  { my $d = _RD * $v; $wrap ?? $d !! deg2deg($d) }
 
-sub deg2rad ($;$)  { my $d = _DR * @_[0]; @_[?1] ?? $d !! rad2rad($d) }
+sub deg2rad ($v, ?$wrap)  { my $d = _DR * $v; $wrap ?? $d !! rad2rad($d) }
 
-sub grad2deg ($;$) { my $d = _GD * @_[0]; @_[?1] ?? $d !! deg2deg($d) }
+sub grad2deg ($v, ?$wrap) { my $d = _GD * $v; $wrap ?? $d !! deg2deg($d) }
 
-sub deg2grad ($;$) { my $d = _DG * @_[0]; @_[?1] ?? $d !! grad2grad($d) }
+sub deg2grad ($v, ?$wrap) { my $d = _DG * $v; $wrap ?? $d !! grad2grad($d) }
 
-sub rad2grad ($;$) { my $d = _RG * @_[0]; @_[?1] ?? $d !! grad2grad($d) }
+sub rad2grad ($v, ?$wrap) { my $d = _RG * $v; $wrap ?? $d !! grad2grad($d) }
 
-sub grad2rad ($;$) { my $d = _GR * @_[0]; @_[?1] ?? $d !! rad2rad($d) }
+sub grad2rad ($v, ?$wrap) { my $d = _GR * $v; $wrap ?? $d !! rad2rad($d) }
 
 #
 # acos and asin functions which always return a real number

@@ -1409,7 +1409,11 @@ PP(pp_entersub)
 	    int i;
 	    if (CvN_MAXARGS(cv) != -1 && items > CvN_MAXARGS(cv))
 		Perl_croak_at(aTHX_ SvLOCATION(cv),
-		    "Too many arguments for subroutine '%s'",
+		    "Too many arguments for %s",
+		    SvPVX_const(loc_name(SvLOCATION(cv))));
+	    if (items < CvN_MINARGS(cv))
+		Perl_croak_at(aTHX_ SvLOCATION(cv),
+		    "Not enough arguments for %s",
 		    SvPVX_const(loc_name(SvLOCATION(cv))));
 	    CX_CURPAD_SAVE(cx->blk_sub);
 	    ++MARK;

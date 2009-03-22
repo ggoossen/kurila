@@ -36,7 +36,7 @@ eval q{ "\c" };
 like( $^EVAL_ERROR->{?description}, qr/^Missing control char name in \\c/, q("\c" string) );
 
 eval q{ qq(foo$) };
-like( $^EVAL_ERROR->{?description}, qr/Unknown operator '$'/, q($ at end of "" string) );
+like( $^EVAL_ERROR->{?description}, qr/Unknown operator '\$'/, q($ at end of "" string) );
 
 # two tests for memory corruption problems in the said variables
 # (used to dump core or produce strange results)
@@ -115,7 +115,7 @@ do {
     like($^EVAL_ERROR->{?description}, qr/'>' is reserved for hashes/, "readline operator as prototype");
 
     eval q{ $s = sub <> {} };
-    like($^EVAL_ERROR->{?description}, qr/Illegal declaration of anonymous subroutine/, "readline operator as prototype");
+    like($^EVAL_ERROR->{?description}, qr/'>' is reserved for hashes/, "readline operator as prototype");
 
     eval q{ sub _ __FILE__ {} };
     like($^EVAL_ERROR->{?description}, qr/Illegal declaration of subroutine main::_/, "__FILE__ as prototype");

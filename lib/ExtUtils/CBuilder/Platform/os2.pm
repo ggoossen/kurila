@@ -22,9 +22,7 @@ sub prelink {
   return  @(@res, $libname);
 }
 
-sub _do_link($how, %< %args) {
-  my $self = shift;
-
+sub _do_link($self, $how, %< %args) {
   if ($how eq 'lib_file'
       and (defined %args{?module_name} and length %args{?module_name})) {
 

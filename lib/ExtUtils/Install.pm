@@ -116,14 +116,12 @@ sub _estr(@mess) {
 }
 
 do {my %warned;
-sub _warnonce(@mess) {
-    my $first=shift;
+sub _warnonce($first, @mess) {
     my $msg=_estr "WARNING: $first",< @mess;
     warn $msg unless %warned{+$msg}++;
 }};
 
-sub _choke(@mess) {
-    my $first=shift;
+sub _choke($first, @mess) {
     my $msg=_estr "ERROR: $first",< @mess;
     die($msg);
 }

@@ -9,7 +9,7 @@ BEGIN {
 use Fatal < qw(open close);
 
 my $i = 1;
-try { open *FOO, '<', 'lkjqweriuapofukndajsdlfjnvcvn' };
+try { open \*FOO, '<', 'lkjqweriuapofukndajsdlfjnvcvn' };
 print \*STDOUT, "not " unless $^EVAL_ERROR->{?description} =~ m/^Can't open/;
 print \*STDOUT, "ok $i\n"; ++$i;
 

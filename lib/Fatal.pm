@@ -90,7 +90,7 @@ sub _make_fatal($sub, $pkg) {
       $proto = '@';
     }
     $code = <<EOS;
-sub$real_proto \{
+sub \{
 	local(\$^OS_ERROR) = (0);
 EOS
     my @protos = fill_protos($proto);

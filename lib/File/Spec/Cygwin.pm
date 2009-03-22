@@ -108,11 +108,10 @@ Default: 1
 
 =cut
 
-sub case_tolerant () {
+sub case_tolerant(?$drive) {
   return 1 unless $^OS_NAME eq 'cygwin'
     and defined &Cygwin::mount_flags;
 
-  my $drive = shift;
   if (! $drive) {
       my @flags = split(m/,/, Cygwin::mount_flags('/cygwin'));
       my $prefix = pop(@flags);

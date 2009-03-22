@@ -64,10 +64,8 @@ our %formNorm = %(
     FCD  => \&FCD,	FCC => \&FCC,
 );
 
-sub normalize($$)
+sub normalize($form, $str)
 {
-    my $form = shift;
-    my $str = shift;
     if (exists %formNorm{$form}) {
 	return %formNorm{?$form}->($str);
     }
@@ -87,10 +85,8 @@ our %formCheck = %(
     FCD  => \&checkFCD, 	FCC => \&checkFCC,
 );
 
-sub check($$)
+sub check($form, $str)
 {
-    my $form = shift;
-    my $str = shift;
     if (exists %formCheck{$form}) {
 	return %formCheck{?$form}->($str);
     }
