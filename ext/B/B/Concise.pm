@@ -82,7 +82,10 @@ set_style_standard("concise");
 my $curcv;
 my $cop_seq_base;
 
-sub set_style($format, $gotofmt, $treefmt) {;
+sub set_style($my_format, $my_gotofmt, $my_treefmt) {
+    $format = $my_format;
+    $gotofmt = $my_gotofmt;
+    $treefmt = $my_treefmt;
     #warn "set_style: deprecated, use set_style_standard instead\n"; # someday
 }
 
@@ -467,7 +470,7 @@ sub walk_exec($top, ?$level) {
 		my $ar = \@();
 		push @$targ, $ar;
 		push @todo, \@($op->other, $ar);
-	    } elsif ($name eq "subst" and $ {$op->pmreplstart}) {
+	    } elsif ($name eq "subst" and ${$op->pmreplstart}) {
 		my $ar = \@();
 		push @$targ, $ar;
 		push @todo, \@($op->pmreplstart, $ar);
@@ -491,7 +494,7 @@ sub sequence($op) {
 	last if exists %sequence_num{$$op};
 	my $name = $op->name;
 	if ($name =~ m/^(null|scalar|lineseq|scope)$/) {
-	    next if $oldop and $ {$op->next};
+	    next if $oldop and ${$op->next};
 	} else {
 	    %sequence_num{+$$op} = $seq_max++;
 	    if (class($op) eq "LOGOP") {
@@ -508,7 +511,7 @@ sub sequence($op) {
 		my $lastop = $op->lastop;
 		$lastop = $lastop->next while $lastop->name eq "null";
 		sequence($lastop);
-	    } elsif ($name eq "subst" and $ {$op->pmreplstart}) {
+	    } elsif ($name eq "subst" and ${$op->pmreplstart}) {
 		my $replstart = $op->pmreplstart;
 		$replstart = $replstart->next while $replstart->name eq "null";
 		sequence($replstart);
@@ -782,7 +785,7 @@ sub concise_op($op, $level, $format) {
 	    # ithreads)
 	    my $gv = ( <( <$curcv->PADLIST->ARRAY)[[1]]->ARRAY)[[$pmreplroot]];
 	    %h{+arg} = "($precomp => \@" . $gv->NAME . ")";
-	} elsif ($ {$op->pmreplstart}) {
+	} elsif (${$op->pmreplstart}) {
 	    undef $lastnext;
 	    $pmreplstart = "replstart->" . seq($op->pmreplstart);
 	    %h{+arg} = "(" . join(" ", @( $precomp, $pmreplstart)) . ")";
@@ -834,10 +837,10 @@ sub concise_op($op, $level, $format) {
     %h{+label} = %labels{?$$op};
     %h{+next} = $op->next;
     %h{+next} = (class(%h{?next}) eq "NULL") ?? "(end)" !! seq(%h{?next});
-    %h{+nextaddr} = sprintf("\%#x", $ {$op->next});
-    %h{+sibaddr} = sprintf("\%#x", $ {$op->sibling});
-    %h{+firstaddr} = sprintf("\%#x", $ {$op->first}) if $op->can("first");
-    %h{+lastaddr} = sprintf("\%#x", $ {$op->last}) if $op->can("last");
+    %h{+nextaddr} = sprintf("\%#x", ${$op->next});
+    %h{+sibaddr} = sprintf("\%#x", ${$op->sibling});
+    %h{+firstaddr} = sprintf("\%#x", ${$op->first}) if $op->can("first");
+    %h{+lastaddr} = sprintf("\%#x", ${$op->last}) if $op->can("last");
 
     %h{+classsym} = %opclass{?%h{?class}};
     %h{+flagval} = $op->flags;

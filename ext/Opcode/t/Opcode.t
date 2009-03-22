@@ -24,7 +24,7 @@ my @empty_l = opset_to_ops(empty_opset);
 is((nelems @empty_l), 0);
 
 my @full_l1  = opset_to_ops(full_opset);
-is((nelems @full_l1), opcodes());
+is((nelems @full_l1), $: opcodes());
 my @full_l2 = @full_l1;	# = opcodes();	# XXX to be fixed
 is("$(join ' ',@full_l1)", "$(join ' ',@full_l2)");
 
@@ -44,13 +44,13 @@ ok( try { opset(':_tst_') } );
 # --- opdesc and opcodes
 
 is( opdesc("gv"), "glob value" );
-ok( opcodes() );
+ok( $: opcodes() );
 
 # --- invert_opset
 
 $s1 = opset( <qw(fileno padsv));
 @o2 = opset_to_ops(invert_opset($s1));
-is((nelems @o2), opcodes-2);
+is((nelems @o2), opcodes()-2);
 
 # --- opmask
 

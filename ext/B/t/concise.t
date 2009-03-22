@@ -185,7 +185,7 @@ SKIP: do {
 	is(scalar nelems @lines, 4,
 	   "'sub defd_empty \{\}' seen as 4 liner");
 
-	is(1, $res =~ m/leavesub/ && $res =~ m/(next|db)state/,
+	is(1, ($: $res =~ m/leavesub/ && $res =~ m/(next|db)state/),
 	   "'sub defd_empty \{\}' seen as 2 ops: leavesub,nextstate");
 
 	do {

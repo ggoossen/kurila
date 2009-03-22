@@ -9,7 +9,7 @@ use File::Spec;
 use POSIX;
 use Scalar::Util < qw(looks_like_number);
 
-sub check(@) { grep { eval "&$_;1" or $^EVAL_ERROR->{?description}!~m/vendor has not defined POSIX macro/ }, @_
+sub check { grep { eval "&$_;1" or $^EVAL_ERROR->{?description}!~m/vendor has not defined POSIX macro/ }, @_
 }       
 
 my @path_consts = check < qw(

@@ -569,7 +569,7 @@ sub mkEvalErr
 {
     my $string = shift ;
 
-    return "/$string\\s+at /" ;
+    return "/$string/" ;
 }
 
 sub dumpObj

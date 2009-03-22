@@ -458,7 +458,7 @@ sub input_record_separator {
 
 sub input_line_number {
     ref(@_[0]) or die 'usage: $io->input_line_number';
-    my $fh = qualify(@_[0], caller);
+    my $fh = qualify(@_[0], $: caller);
     my $prev = iohandle::input_line_number($fh);
     iohandle::input_line_number($fh, @_[1]) if (nelems @_) +> 1;
     return $prev;

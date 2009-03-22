@@ -97,7 +97,7 @@ sub _save_gzerr
     _set_gzerr($value) ;
 }
 
-sub gzopen($$)($file, $mode)
+sub gzopen($file, $mode)
 { 
 
     my $gz ;
@@ -118,7 +118,7 @@ sub gzopen($$)($file, $mode)
     my @params = @( () ) ;
 
     croak "gzopen: file parameter is not a filehandle or filename"
-        unless isaFilehandle $file || isaFilename $file  || 
+        unless isaFilehandle($file) || isaFilename($file)  || 
                (ref $file && ref $file eq 'SCALAR');
 
     croak "gzopen: invalid mode"
@@ -261,7 +261,7 @@ sub Compress::Zlib::gzFile::gzerror
 }
 
 
-sub compress($;$)
+sub compress
 {
     my @($x, $output, $err, $in) =@('', '', '', '') ;
 
@@ -288,7 +288,7 @@ sub compress($;$)
 
 }
 
-sub uncompress($)
+sub uncompress
 {
     my @($x, $output, $err, $in) =@('', '', '', '') ;
 
@@ -310,7 +310,7 @@ sub uncompress($)
 }
 
 
-sub deflateInit(@)
+sub deflateInit
 {
     my $got = ParseParameters(0,
                 \%(
@@ -344,7 +344,7 @@ sub deflateInit(@)
     return $x;
 }
 
-sub inflateInit(@)
+sub inflateInit
 {
     my $got = ParseParameters(0,
                 \%(
@@ -412,7 +412,7 @@ package Compress::Zlib ;
 
 use IO::Compress::Gzip::Constants v2.006 ;
 
-sub memGzip($)
+sub memGzip
 {
   my $out;
 
@@ -426,10 +426,8 @@ sub memGzip($)
 }
 
 
-sub _removeGzipHeader($)
+sub _removeGzipHeader($string)
 {
-    my $string = shift ;
-
     return Z_DATA_ERROR() 
         if length($$string) +< GZIP_MIN_HEADER_SIZE ;
 
@@ -485,7 +483,7 @@ sub _removeGzipHeader($)
 }
 
 
-sub memGunzip($)
+sub memGunzip
 {
     # if the buffer isn't a reference, make it one
     my $string = (ref @_[0] ?? @_[0] !! \@_[0]);

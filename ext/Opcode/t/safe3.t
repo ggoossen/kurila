@@ -10,7 +10,7 @@ use Safe;
 my $safe = Safe->new();
 $safe->deny('add');
 
-my $masksize = ceil( Opcode::opcodes / 8 );
+my $masksize = ceil( Opcode::opcodes() / 8 );
 # Attempt to change the opmask from within the safe compartment
 $safe->reval( qq{\@_[1] = qq/\0/ x } . $masksize );
 

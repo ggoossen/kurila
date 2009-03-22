@@ -120,7 +120,7 @@ sub isGzipMagic
     return $id1 == GZIP_ID1 && $id2 == GZIP_ID2 ;
 }
 
-sub _readFullGzipHeader($)($self)
+sub _readFullGzipHeader($self)
 { 
     my $magic = '' ;
 
@@ -141,7 +141,7 @@ sub _readFullGzipHeader($)($self)
     return $status ;
 }
 
-sub _readGzipHeader($)($self, $magic)
+sub _readGzipHeader($self, $magic)
 { 
     my ($HeaderCRC) ;
     my $buffer = '' ;

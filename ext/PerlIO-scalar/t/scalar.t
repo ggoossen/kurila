@@ -30,7 +30,7 @@ is($var, "bbb\n");
 $var = "foo\nbar\n";
 ok(seek($fh,0,SEEK_SET));
 ok(!eof($fh));
-is( ~< $fh, "foo\n");
+is(($: ~< $fh), "foo\n");
 ok(close $fh, $^OS_ERROR);
 
 # Test that semantics are similar to normal file-based I/O
@@ -84,8 +84,8 @@ print $fh, "xxx\n";
 open my $dup,'+<&',$fh;
 print $dup, "yyy\n";
 seek($dup,0,SEEK_SET);
-is( ~< $dup, "xxx\n");
-is( ~< $dup, "yyy\n");
+is(($: ~< $dup), "xxx\n");
+is(($: ~< $dup), "yyy\n");
 close($fh);
 close($dup);
 

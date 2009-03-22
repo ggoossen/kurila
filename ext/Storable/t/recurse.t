@@ -34,10 +34,7 @@ sub STORABLE_freeze {
 	return @(freeze(\@x), $self);
 }
 
-sub STORABLE_thaw($x, $obj) {
-	my $self = shift;
-	my $cloning = shift;
-
+sub STORABLE_thaw($self, $cloning, $x, $obj) {
 	die "STORABLE_thaw #1" unless $obj \== $self;
 	my $len = length $x;
 	my $a = thaw $x;
@@ -53,16 +50,12 @@ package OBJ_SYNC;
 
 sub make { bless \%(), shift }
 
-sub STORABLE_freeze($cloning) {
-	my $self = shift;
-
+sub STORABLE_freeze($self, $cloning) {
 	return if $cloning;
 	return @("", \@x, $self);
 }
 
-sub STORABLE_thaw($cloning, $undef, $a, $obj) {
-	my $self = shift;
-
+sub STORABLE_thaw($self, $cloning, $undef, $a, $obj) {
 	die "STORABLE_thaw #1" unless $obj \== $self;
 	die "STORABLE_thaw #2" unless ref $a eq 'ARRAY' || @$a != 2;
 	$self->{+ok} = $self;
@@ -72,8 +65,8 @@ package OBJ_SYNC2;
 
 use Storable < qw(dclone);
 
-sub make($ext) {
-	my $self = bless \%(), shift;
+sub make($class, $ext) {
+	my $self = bless \%(), $class;
 
 	$self->{+sync} = OBJ_SYNC->make;
 	$self->{+ext} = $ext;
@@ -88,9 +81,7 @@ sub STORABLE_freeze {
 	return @("", \@($t, $self->{?ext}), $r, $self, $r->{?ext});
 }
 
-sub STORABLE_thaw($cloning, $undef, $a, $r, $obj, $ext) {
-	my $self = shift;
-
+sub STORABLE_thaw($self, $cloning, $undef, $a, $r, $obj, $ext) {
 	die "STORABLE_thaw #1" unless $obj \== $self;
 	die "STORABLE_thaw #2" unless ref $a eq 'ARRAY';
 	die "STORABLE_thaw #3" unless ref $r eq 'HASH';
@@ -116,10 +107,7 @@ sub STORABLE_freeze {
 	return @("no", $self);
 }
 
-sub STORABLE_thaw($x, $obj) {
-	my $self = shift;
-	my $cloning = shift;
-
+sub STORABLE_thaw($self, $cloning, $x, $obj) {
 	die "STORABLE_thaw #1" unless $obj \== $self;
 	$self->[+0] = thaw($x) if $x ne "no";
 	$recursed--;
@@ -235,8 +223,8 @@ sub make {
 
 package CLASS_2;
 
-sub make($o) {
-	my $self = bless \%(), shift;
+sub make($class, $o) {
+	my $self = bless \%(), $class;
 
 	$self->{+c1} = CLASS_1->make();
 	$self->{+o} = $o;

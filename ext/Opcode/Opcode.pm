@@ -27,13 +27,12 @@ _init_optags();
 
 sub ops_to_opset { opset(< @_) }	# alias for old name
 
-sub opset_to_hex ($) {
-    return "(invalid opset)" unless verify_opset(@_[0]);
-    unpack("h*",@_[0]);
+sub opset_to_hex ($v) {
+    return "(invalid opset)" unless verify_opset($v);
+    unpack("h*",$v);
 }
 
-sub opdump (;$) {
-	my $pat = shift;
+sub opdump (?$pat) {
     # handy utility: perl -MOpcode=opdump -e 'opdump File'
     foreach( opset_to_ops( <full_opset())) {
         my $op = sprintf "  \%12s  \%s\n", $_, < opdesc($_);

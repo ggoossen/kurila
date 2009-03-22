@@ -36,11 +36,8 @@ $matchMetaRE = '[' . quotemeta($metachars) . ']';
 
 %wildCount = %( < @+: map { @: $_ => 1 }, qw/ * ? . { ( [ / );           
 
-sub globmap ($$;)
+sub globmap($inputGlob, $outputGlob)
 {
-    my $inputGlob = shift ;
-    my $outputGlob = shift ;
-
     my $obj = File::GlobMapper->new($inputGlob, $outputGlob, < @_)
         or croak "globmap: $Error" ;
     return $obj->getFileMap();
