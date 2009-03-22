@@ -516,7 +516,8 @@ subrout	:	SUB startsub subname proto subbody
                             process_special_block(IVAL($1), new);
                             /* SvREFCNT_dec(new);  leak reference */
 #else
-                            CV* new = cv_2mortal(newSUB($2, NULL, $3));
+                            CV* new = cv_2mortal(newSUB($2,
+                                    newOP(OP_STUB, 0, LOCATION($1)), $3));
                             $<opval>2 = NULL;
                             $<opval>3 = NULL;
                             SVcpREPLACE(SvLOCATION(cvTsv(new)), LOCATION($1));
@@ -556,7 +557,12 @@ startproto :    '('
 
 /* Subroutine prototype */
 proto	:	/* NULL */
-			{ $$ = (OP*)NULL; }
+			{
+                            pad_add_name("@_", NULL, FALSE);
+                            CvFLAGS(PL_compcv) |= CVf_DEFARGS;
+                            intro_my();
+                            $$ = (OP*)NULL; 
+                        }
 	|	startproto ')'
 			{ 
                             $$ = newOP(OP_STUB, 0, LOCATION($1) );

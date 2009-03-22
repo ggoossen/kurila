@@ -1408,7 +1408,8 @@ PP(pp_entersub)
 	else if ( CvFLAGS(cv) & CVf_PROTO) {
 	    int i;
 	    if (CvN_MAXARGS(cv) != -1 && items > CvN_MAXARGS(cv))
-		Perl_croak(aTHX_ "Too many arguments for subroutine '%s'",
+		Perl_croak_at(aTHX_ SvLOCATION(cv),
+		    "Too many arguments for subroutine '%s'",
 		    SvPVX_const(loc_name(SvLOCATION(cv))));
 	    ++MARK;
 	    for (i=0; i<items/2; i++) {
@@ -1419,7 +1420,7 @@ PP(pp_entersub)
 	    PUSHMARK(MARK-1);
 	    CX_CURPAD_SAVE(cx->blk_sub);
 	}
-	else {
+	else if ( CvFLAGS(cv) & CVf_DEFARGS) {
 	    AV* av;
 	    SV* avsv = PAD_SVl(PAD_ARGS_INDEX);
 	    sv_upgrade(avsv, SVt_PVAV);

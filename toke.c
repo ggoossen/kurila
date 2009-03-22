@@ -3968,7 +3968,7 @@ Perl_yylex(pTHX)
 	if (*s++ == '>')
 	    SHop(OP_RIGHT_SHIFT);
 	
-	yyerror("'>' is reserved for hashes");
+	Perl_croak(aTHX_ "'>' is reserved for hashes");
 
     case '$': {
 	const char* begin_s = s;
@@ -3990,66 +3990,32 @@ Perl_yylex(pTHX)
 	    OPERATOR(ANONSCALAR);
 	}
 
-	PL_tokenbuf[0] = '$';
-	s = scan_ident(s, PL_bufend, PL_tokenbuf + 1,
-		       sizeof PL_tokenbuf - 1, FALSE);
-	if (PL_expect == XOPERATOR)
-	    no_op("Scalar", s);
-	if (!PL_tokenbuf[1]) {
-	    if (s == PL_bufend)
-		yyerror("Final $ should be \\$ or $name");
+	if (s[1] == '{' || s[1] == '$') {
+	    s++;
 	    PREREF('$');
 	}
 
-	d = s;
-	{
-	    const char tmp = *s;
-	    if (PL_lex_state == LEX_NORMAL)
-		s = SKIPSPACE1(s);
+	if (isIDFIRST_lazy_if(s+1,UTF)
+	    || (s[1] >= '0' && s[1] <= '9')
+	    || s[1] == '^' || s[1] == ':') {
+	    PL_tokenbuf[0] = '$';
+	    s = scan_ident(s, PL_bufend, PL_tokenbuf + 1,
+		sizeof PL_tokenbuf - 1, FALSE);
+	    if (PL_expect == XOPERATOR)
+		no_op("Scalar", s);
 
-	    PL_expect = XOPERATOR;
-	    if (PL_lex_state == LEX_NORMAL && isSPACE((char)tmp)) {
-		const bool islop = (PL_last_lop == PL_oldoldbufptr);
-		if (!islop || PL_last_lop_op == OP_GREPSTART)
-		    PL_expect = XOPERATOR;
-		else if (strchr("$@\"'`q", *s))
-		    PL_expect = XTERM;		/* e.g. print $fh "foo" */
-		else if (strchr("&*<%", *s) && isIDFIRST_lazy_if(s+1,UTF))
-		    PL_expect = XTERM;		/* e.g. print $fh &sub */
-		else if (isIDFIRST_lazy_if(s,UTF)) {
-		    char tmpbuf[sizeof PL_tokenbuf];
-		    int t2;
-		    scan_word(s, tmpbuf, sizeof tmpbuf, TRUE, &len);
-		    if ((t2 = keyword(tmpbuf, len))) {
-			/* binary operators exclude handle interpretations */
-			switch (t2) {
-			case -KEY_x:
-			case -KEY_eq:
-			case -KEY_ne:
-			case -KEY_cmp:
-			    break;
-			default:
-			    PL_expect = XTERM;	/* e.g. print $fh length() */
-			    break;
-			}
-		    }
-		    else {
-			PL_expect = XTERM;	/* e.g. print $fh subr() */
-		    }
-		}
-		else if (isDIGIT(*s))
-		    PL_expect = XTERM;		/* e.g. print $fh 3 */
-		else if (*s == '.' && isDIGIT(s[1]))
-		    PL_expect = XTERM;		/* e.g. print $fh .3 */
-		else if ((*s == '-' || *s == '+')
-			 && !isSPACE(s[1]) && s[1] != '=')
-		    PL_expect = XTERM;		/* e.g. print $fh -1 */
-		else if (*s == '<' && s[1] == '<' && !isSPACE(s[2])
-			 && s[2] != '=')
-		    PL_expect = XTERM;		/* print $fh <<"EOF" */
+	    d = s;
+	    {
+		if (PL_lex_state == LEX_NORMAL)
+		    s = SKIPSPACE1(s);
+		
+		PL_expect = XOPERATOR;
 	    }
+	    TOKEN(S_pending_ident(begin_s));
 	}
-	TOKEN(S_pending_ident(begin_s));
+
+	s++;
+	Perl_croak(aTHX_ "Unknown operator '$'");
     }
 
     case '@': {
@@ -4578,9 +4544,9 @@ Perl_yylex(pTHX)
 		    PL_last_lop = PL_oldbufptr;
 		    PL_last_lop_op = OP_ENTERSUB;
 		    /* Is there a prototype? */
-		    if (CvN_MINARGS(cv) == 0 && CvN_MAXARGS(cv) == 0)
+		    if ((CvN_MINARGS(cv) == 0) && (CvN_MAXARGS(cv) == 0))
 			TERM(FUNC0SUB);
-		    if (CvN_MINARGS(cv) == 1 && CvN_MAXARGS(cv) == 1)
+		    if ((CvN_MINARGS(cv) == 1) && (CvN_MAXARGS(cv) == 1))
 			OPERATOR(UNIOPSUB);
 #ifdef PERL_MAD
 		    if (PL_madskills) {
@@ -10382,11 +10348,10 @@ Perl_start_subparse(pTHX_ U32 flags)
 	outsidecv ? PADLIST_PADNAMES(CvPADLIST(outsidecv)) : NULL, 
 	outsidecv ? PADLIST_BASEPAD(CvPADLIST(outsidecv)) : NULL, 
 	PL_cop_seqmax);
-    if (flags & CVf_BLOCK)
+    if (flags & CVf_BLOCK) {
 	pad_add_name("$_", NULL, FALSE);
-    else
-	pad_add_name("@_", NULL, FALSE);
-    intro_my();
+	intro_my();
+    }
 
     return oldsavestack_ix;
 }

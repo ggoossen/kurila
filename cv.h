@@ -81,6 +81,7 @@ Null CV pointer.
 #define CVf_CONST	0x0400  /* inlinable sub */
 #define CVf_ISXSUB	0x0800	/* CV is an XSUB, not pure perl.  */
 #define CVf_PROTO	0x1000	/* CV has an prototype */
+#define CVf_DEFARGS	0x2000	/* arguments are passed to @_ */
 
 #define CvCLONE(cv)		(CvFLAGS(cv) & CVf_CLONE)
 #define CvCLONE_on(cv)		(CvFLAGS(cv) |= CVf_CLONE)

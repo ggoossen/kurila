@@ -3600,7 +3600,7 @@ Perl_newSUB(pTHX_ I32 floor, OP *proto, OP *block)
 	    OP* kid;
 	    LISTOP* list = cLISTOPx(convert(OP_LIST, 0, proto, proto->op_location));
 	    OP* pushmark = list->op_first;
-	    OP* fake_proto = cLISTOPx(proto);
+	    OP* fake_proto = proto;
 	    list->op_first = pushmark->op_sibling;
 	    op_free(pushmark);
 	    for (kid = list->op_first; kid; kid = kid->op_sibling)
@@ -3841,6 +3841,8 @@ Perl_newXS(pTHX_ const char *name, XSUBADDR_t subaddr, const char *filename)
 
     CvISXSUB_on(cv);
     CvXSUB(cv) = subaddr;
+    CvN_MINARGS(cv) = 0;
+    CvN_MAXARGS(cv) = -1;
 
     if ( ! name)
 	CvANON_on(cv);

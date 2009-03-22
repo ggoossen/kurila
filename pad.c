@@ -1273,6 +1273,8 @@ void Perl_cv_setcv(pTHX_ CV *dst, CV* src)
     CVcpREPLACE(PL_compcv, dst);
     CvFLAGS(dst) = CvFLAGS(src) & ~(CVf_CLONE);
     CvCLONED_on(dst);
+    CvN_MINARGS(dst) = CvN_MINARGS(src);
+    CvN_MAXARGS(dst) = CvN_MAXARGS(src);
 
     if (CvISXSUB(src)) {
 	CvXSUB(dst) = CvXSUB(src);
