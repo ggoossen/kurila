@@ -186,10 +186,8 @@ It calls C<die> on failure.
 
 =cut
 
-sub Tgetent($self)
+sub Tgetent($class, $self)
 {    ## public -- static method
-    my $class = shift;
-
 
     $self = \%() unless defined $self;
     bless $self, $class;

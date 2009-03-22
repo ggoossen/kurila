@@ -240,7 +240,7 @@ my %std_literal = %(
 	hjust	=> \&jhorlit,
 );
 
-sub update(\%\%;$)($old, $new, $croak) {
+sub update($old, $new, $croak) {
 	my @bad;
 	for my $opt (keys %$new) {
 		my $std = %std_opt{?$opt};
@@ -311,9 +311,9 @@ sub jleft {
 	die "Internal error in &form."
  }
 
- sub joverflow (\%\%) {
-	@_[0]{+overflow} = 1;
-	%{@_[1]} = %( () );
+ sub joverflow($x, $y) {
+	$x{+overflow} = 1;
+	%{$y} = %( () );
 	return \&jfatal;
  }
 
@@ -471,8 +471,7 @@ sub fldvals {
 our $nestedbraces;
 $nestedbraces = qr/ \{ (?: (?> ((?!\{|\}).)+ ) | (??{ $nestedbraces }) )* \} /sx;
 
-sub segment ($\@\%$\%) {
-	my @($format, $args, $opts, $fldcnt, $argcache) =  @_;
+sub segment($format, $args, $opts, $fldcnt, $argcache) {
 	my $width =
 		defined $opts->{page}->{?width} ?? $opts->{page}->{?width} !! length($format);
 	my $userdef = join("|", @{$opts->{field}->{?from}}) || qr/(?!)/;
@@ -882,7 +881,7 @@ sub resolve_overflows($formatters,$prevformatters) {
 	}
 }
 
-sub make_cols($$\@\%$)($formatters,$prevformatters,$parts, $opts, $maxheight) {
+sub make_cols($formatters,$prevformatters,$parts, $opts, $maxheight) {
 	my (@bullets, @max, @min);
 	for my $f ( @$formatters) {
 		if    ($f->{?isbullet}) 				{ push @bullets, $f }
@@ -1044,8 +1043,8 @@ sub make_underline($under, $prevline, $nextline) {
 	return \@(\%( < %std_literal, width => length($nextline), src => \$nextline ));
 }
 
-sub linecount($) {
-	return (nelems @(m/(\n)/g)) + (m/[^\n]\z/??1!!0) for  @_;
+sub linecount($v) {
+	return (nelems @(m/(\n)/g)) + (m/[^\n]\z/??1!!0) for @: $v;
 }
 
 use warnings::register;
@@ -1240,7 +1239,7 @@ sub slice($structure, @< @indices) {
 
 sub vals { return ref eq 'HASH' ?? values %$_ !! < @$_ for @( @_[0]) }
 
-sub drill (\[@%];@)($structure, @< @indices) {
+sub drill($structure, @< @indices) {
     return $structure unless (nelems @indices);
     my $index = shift @indices;
     my @section = (nelems @$index) ?? slice($structure,< @$index) !! vals($structure);

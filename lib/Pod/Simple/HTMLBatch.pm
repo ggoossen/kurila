@@ -441,10 +441,7 @@ sub makepath($self, $outdir, $namelets) {
 
 #_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 
-sub batch_mode_page_object_init($page, $module, $infile, $outfile, $depth) {
-  my $self = shift;
-
-  
+sub batch_mode_page_object_init($self, $page, $module, $infile, $outfile, $depth) {
   # TODO: any further options to percolate onto this new object here?
 
   $page->default_title($module);
@@ -462,8 +459,7 @@ sub batch_mode_page_object_init($page, $module, $infile, $outfile, $depth) {
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-sub add_header_backlink($page, $module, $infile, $outfile, $depth) {
-  my $self = shift;
+sub add_header_backlink($self, $page, $module, $infile, $outfile, $depth) {
   return if $self->no_contents_links;
 
   $page->html_header_after_title( join '', @(
@@ -478,8 +474,7 @@ sub add_header_backlink($page, $module, $infile, $outfile, $depth) {
   return;
 }
 
-sub add_footer_backlink($page, $module, $infile, $outfile, $depth) {
-  my $self = shift;
+sub add_footer_backlink($self, $page, $module, $infile, $outfile, $depth) {
   return if $self->no_contents_links;
 
   $page->html_footer( join '', @(

@@ -26,7 +26,7 @@ struct 'User::grent' => \@(
     members => '@',
 );
 
-sub populate (@) {
+sub populate {
     return unless (nelems @_);
     my $gob = new();
     @($gr_name, $gr_passwd, $gr_gid) =  @$gob[[@(0,1,2)]] =  @_[[@(0,1,2)]];
@@ -35,9 +35,9 @@ sub populate (@) {
 } 
 
 sub getgrent ( ) { populate(CORE::getgrent()) } 
-sub getgrnam ($) { populate(CORE::getgrnam(shift)) } 
-sub getgrgid ($) { populate(CORE::getgrgid(shift)) } 
-sub getgr    ($) { (@_[0] =~ m/^\d+/) ?? &getgrgid( < @_ ) !! &getgrnam( < @_ ) } 
+sub getgrnam ($v) { populate(CORE::getgrnam($v)) } 
+sub getgrgid ($v) { populate(CORE::getgrgid($v)) } 
+sub getgr    ($v) { ($v =~ m/^\d+/) ?? &getgrgid($v) !! &getgrnam($v) } 
 
 1;
 __END__

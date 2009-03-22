@@ -99,8 +99,7 @@ print \*STDOUT, "ok 25\n";
 our $x = join(':',&ary2( < @_ ));
 print \*STDOUT, $x eq '1:2:3' ?? "ok 26\n" !! "not ok 26 $x\n";
 
-sub somesub
-    local($num,$P,$F,$L) {
+sub somesub($num,$P,$F,$L) {
     our @($p,$f,$l) =@( caller);
     print \*STDOUT, "$p:$f:$l" eq "$P:$F:$L" ?? "ok $num\n" !! "not ok $num $p:$f:$l ne $P:$F:$L\n";
 }

@@ -32,8 +32,7 @@ sub export_fail {
   < @_;
 }
 
-sub openhandle ($) {
-  my $fh = shift;
+sub openhandle($fh) {
   my $rt = reftype($fh) || '';
 
   return defined(fileno($fh)) ?? $fh !! undef

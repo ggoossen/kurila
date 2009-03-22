@@ -328,7 +328,7 @@ sub init_globals {
 #
 # clean_data: global clean-up of pod data
 #
-sub clean_data($)( $dataref){
+sub clean_data($dataref) {
     for my $i ( 0..(nelems @{$dataref})-1 ) {
 	@{$dataref}[$i] =~ s/\s+\Z//;
 
@@ -1116,7 +1116,7 @@ sub process_head($tag, $heading, $hasindex) {
 #
 my $EmittedItem;
 
-sub emit_item_tag($$$)( $otext, $text, $compact){
+sub emit_item_tag( $otext, $text, $compact){
     my $item = fragment_id( depod($text) , "generate");
     Carp::confess("Undefined fragment '$text' (".depod($text).") from fragment_id() in emit_item_tag() in $Podfile")
         if !defined $item;
@@ -1409,13 +1409,11 @@ sub process_pre( $text) {
 # pure_text/inIS_text: differ with respect to automatic C<> recognition.
 # we don't want this to happen within IS
 #
-sub pure_text($){
-    my $text = shift();
+sub pure_text($text) {
     process_puretext( $text, 1 );
 }
 
-sub inIS_text($){
-    my $text = shift();
+sub inIS_text($text) {
     process_puretext( $text, 0 );
 }
 
@@ -1504,8 +1502,8 @@ sub process_puretext($text, $notinIS) {
 # converted to html commands.
 #
 
-sub pattern ($) { @_[0] ?? '\s+'.('>' x (@_[0] + 1)) !! '>' }
-sub closing ($) { local($_) = shift; (defined && s/\s+\z//) ?? length !! 0 }
+sub pattern ($v) { $v ?? '\s+'.('>' x ($v + 1)) !! '>' }
+sub closing ($_) { (defined && s/\s+\z//) ?? length($_) !! 0 }
 
 sub process_text( $tref) {
     return if $Ignore;
@@ -1531,7 +1529,7 @@ sub process_text_rfc_links {
     $text;
 }
 
-sub process_text1($$;$$)( $lev, $rstr, ?$func, ?$closing){
+sub process_text1( $lev, $rstr, ?$func, ?$closing){
     my $res = '';
 
     unless (defined $func) {
@@ -1732,7 +1730,7 @@ sub process_text1($$;$$)( $lev, $rstr, ?$func, ?$closing){
 #
 # go_ahead: extract text of an IS (can be nested)
 #
-sub go_ahead($$$)( $rstr, $func, $closing){
+sub go_ahead( $rstr, $func, $closing){
     my $res = '';
     my @closing = @($closing);
     while( $$rstr =~
@@ -1757,7 +1755,7 @@ sub go_ahead($$$)( $rstr, $func, $closing){
 # emit_C - output result of C<text>
 #    $text is the depod-ed text
 #
-sub emit_C($;$$)( $text, ?$nocode, ?$args){
+sub emit_C( $text, ?$nocode, ?$args){
     $args = '' unless defined $args;
     my $res;
     my@( $url, $fid ) =  coderef( undef(), $text );
@@ -1807,7 +1805,7 @@ sub dosify($str) {
 #
 # page_sect - make a URL from the text of a L<>
 #
-sub page_sect($$)( $page, $section) {
+sub page_sect( $page, $section) {
     my( $linktext, $page83, $link);	# work strings
 
     # check if we know that this is a section in this page
@@ -1936,7 +1934,7 @@ sub relativize_url($dest,$source) {
 #
 # coderef - make URL from the text of a C<>
 #
-sub coderef($$)( $page, $item){
+sub coderef( $page, $item){
     my( $url );
 
     my $fid = fragment_id( $item );
@@ -2055,18 +2053,18 @@ my %E2c;
 %E2c{+verbar} = '|';
 %E2c{+amp}    = '&'; # in Tk's pods
 
-sub depod($){
+sub depod($v){
     my $string;
-    if( ref( @_[0] ) ){
-	$string =  ${@_[0]};
-        ${@_[0]} = depod1( \$string );
+    if( ref( $v ) ){
+	$string =  ${$v};
+        ${$v} = depod1( \$string );
     } else {
-	$string =  @_[0];
+	$string =  $v;
         depod1( \$string );
     }
 }
 
-sub depod1($;$$)( $rstr, ?$func, ?$closing){
+sub depod1( $rstr, ?$func, ?$closing){
   my $res = '';
   return $res unless defined $$rstr;
   if( ! defined( $func ) ){
@@ -2195,7 +2193,7 @@ sub fragment_id {
 # make_URL_href - generate HTML href from URL
 # Special treatment for CGI queries.
 #
-sub make_URL_href($)( $url){
+sub make_URL_href($url){
     if( $url !~
         s{^(http:[-\w/#~:.+=&%@!]+)(\?.*)$}{<a href="$1$2">$1</a>}i ){
         $url = "<a href=\"$url\">$url</a>";

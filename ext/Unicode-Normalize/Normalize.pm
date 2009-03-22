@@ -52,8 +52,7 @@ sub unpack_U {
 ## normalization forms
 ##
 
-sub FCD ($) {
-    my $str = shift;
+sub FCD ($str) {
     return checkFCD($str) ?? $str !! NFD($str);
 }
 

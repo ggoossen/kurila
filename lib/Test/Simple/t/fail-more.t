@@ -26,16 +26,15 @@ require Test::Builder;
 my $TB = Test::Builder->create;
 $TB->plan(tests => 16);
 
-sub like ($$;$) {
+sub like {
     $TB->like(< @_);
 }
 
-sub is ($$;$) {
+sub is {
     $TB->is_eq(< @_);
 }
 
-sub main::err_ok ($) {
-    my@($expect) =  @_;
+sub main::err_ok($expect) {
     my $got = $$err;
     $$err = "";
 

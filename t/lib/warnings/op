@@ -295,6 +295,7 @@ Useless use of a constant in void context at - line 3 character 6.
 Useless use of a constant in void context at - line 4 character 1.
 Useless use of a constant in void context at - line 5 character 4.
 Useless use of a constant in void context at - line 6 character 2.
+Useless use of a constant in void context at - line 8 character 1.
 ########
 --FILE-- abc
 

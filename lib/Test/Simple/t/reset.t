@@ -51,7 +51,7 @@ $tb->reset;
 
 my $test_num = 2;   # since we already printed 1
 # Utility testing functions.
-sub ok ($;$)($test, $name) {
+sub ok($test, $name) {
     my $ok = '';
     $ok .= "not " unless $test;
     $ok .= "ok $test_num";

@@ -125,7 +125,7 @@ print $output, CCODE->($curr_test+4);
 $TB->current_test($curr_test+4);
 
 eval q{ CCODE->{foo} };
-like($^EVAL_ERROR->{?description}, qr/^Expected a HASH ref but got a CODE ref/);
+like($^EVAL_ERROR->{?description}, qr/^Constant is not a HASH reference/);
 
 
 # Allow leading underscore
@@ -140,9 +140,8 @@ like $^EVAL_ERROR->{?description}, qr/begins with '__'/;
 
 # Check on declared() and %declared. This sub should be EXACTLY the
 # same as the one quoted in the docs!
-sub declared ($) {
+sub declared($name) {
     use constant v1.01;              # don't omit this!
-    my $name = shift;
     $name =~ s/^::/main::/;
     my $pkg = caller;
     my $full_name = $name =~ m/::/ ?? $name !! "$($pkg)::$name";

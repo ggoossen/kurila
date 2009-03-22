@@ -865,11 +865,9 @@ sub getHST {
 ##
 ## bool _nonIgnorAtLevel(arrayref weights, int level)
 ##
-sub _nonIgnorAtLevel($$)
+sub _nonIgnorAtLevel($wt, $lv)
 {
-    my $wt = shift;
     return if ! defined $wt;
-    my $lv = shift;
     return grep( {$wt->[$_-1] != 0 }, MinLevel..$lv) ?? TRUE !! FALSE;
 }
 
@@ -881,12 +879,8 @@ sub _nonIgnorAtLevel($$)
 ## * comparison of graphemes vs graphemes.
 ##   @$source >= @$substr must be true (check it before call this);
 ##
-sub _eqArray($$$)
+sub _eqArray($source, $substr, $lev)
 {
-    my $source = shift;
-    my $substr = shift;
-    my $lev = shift;
-
     for my $g (0..(nelems @$substr)-1){
 	# Do the $g'th graphemes have the same number of AV weigths?
 	return if (nelems @{ $source->[$g] }) != nelems @{ $substr->[$g] };

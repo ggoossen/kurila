@@ -1217,7 +1217,7 @@ sub _deep_check($e1, $e2) {
         if( %Refs_Seen{?ref::address($e1)} ) {
             return %Refs_Seen{?ref::address($e1)} eq ref::address($e2);
         }
-        %Refs_Seen{+ref::address $e1} = ref::address $e2;
+        %Refs_Seen{+ref::address($e1)} = ref::address($e2);
 
         if (_dne($e1) or _dne($e2)) {
             $ok = _dne($e1) && _dne($e2);

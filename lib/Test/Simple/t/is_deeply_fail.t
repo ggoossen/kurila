@@ -28,11 +28,11 @@ my $TB = Test::Builder->create;
 $TB->plan(tests => 66);
 
 # Utility testing functions.
-sub ok ($;$) {
-    return $TB->ok(< @_);
+sub ok($ok, ?$name) {
+    return $TB->ok($ok, $name);
 }
 
-sub is ($$;$)($this, $that, $name) {
+sub is($this, $that, $name) {
 
     my $ok = $TB->is_eq($$this, $that, $name);
 
@@ -41,7 +41,7 @@ sub is ($$;$)($this, $that, $name) {
     return $ok;
 }
 
-sub like ($$;$)($this, $regex, ?$name) {
+sub like($this, $regex, ?$name) {
     $regex = "/$regex/" if !ref $regex and $regex !~ m{^/.*/$}s;
 
     my $ok = $TB->like($$this, $regex, $name);
