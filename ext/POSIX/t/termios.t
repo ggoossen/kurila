@@ -28,7 +28,7 @@ isa_ok( $termios, "POSIX::Termios", "\tchecking the type of the object" );
 # testing getattr()
 
 SKIP: do {
-    -t *STDIN or skip("STDIN not a tty", 2);
+    -t $^STDIN or skip("STDIN not a tty", 2);
     $r = try { $termios->getattr(0) };
     is( $^EVAL_ERROR, '', "calling getattr(0)" );
     ok( defined $r, "\tchecking if the returned value is defined: $r" );

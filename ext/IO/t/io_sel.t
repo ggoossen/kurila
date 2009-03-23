@@ -7,7 +7,7 @@ print \*STDOUT, "1..22\n";
 
 use IO::Select v1.09;
 
-my $sel = IO::Select->new(\*STDIN);
+my $sel = IO::Select->new($^STDIN);
 $sel->add(4, 5) == 2 or print \*STDOUT, "not ";
 print \*STDOUT, "ok 1\n";
 
@@ -19,10 +19,10 @@ print \*STDOUT, "not " unless $sel->count == 4 && (nelems @handles) == 4;
 print \*STDOUT, "ok 3\n";
 #print $sel->as_string, "\n";
 
-$sel->remove(\*STDIN) == 1 or print \*STDOUT, "not ";
+$sel->remove($^STDIN) == 1 or print \*STDOUT, "not ";
 print \*STDOUT, "ok 4\n",
 ;
-$sel->remove(\*STDIN, 5, 6) == 1  # two of there are not present
+$sel->remove($^STDIN, 5, 6) == 1  # two of there are not present
   or print \*STDOUT, "not ";
 print \*STDOUT, "ok 5\n";
 
@@ -71,7 +71,7 @@ $fd = $w->[0];
 print $fd, "ok 15\n";
 
 # Test new exists() method
-$sel->exists(\*STDIN) and print \*STDOUT, "not ";
+$sel->exists($^STDIN) and print \*STDOUT, "not ";
 print \*STDOUT, "ok 16\n";
 
 ($sel->exists(0) || $sel->exists(\@(\*STDERR))) and print \*STDOUT, "not ";

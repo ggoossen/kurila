@@ -191,7 +191,7 @@ sub perllocal_install {
 
     # VMS feeds args as a piped file on STDIN since it usually can't
     # fit all the args on a single command line.
-    my @mod_info = @( $Is_VMS ?? < split m/\|/, ~< *STDIN
+    my @mod_info = @( $Is_VMS ?? < split m/\|/, ~< $^STDIN
                            !! < @ARGV );
 
     my $pod;

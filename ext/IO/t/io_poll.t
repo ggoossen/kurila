@@ -74,10 +74,10 @@ print \*STDOUT, "not "
     if $poll->handles;
 print \*STDOUT, "ok 9\n";
 
-my $stdin = \*STDIN;
+my $stdin = $^STDIN;
 $poll->mask($stdin => POLLIN);
 $poll->remove($stdin);
-close \*STDIN;
+close $^STDIN;
 print \*STDOUT, "not "
     if $poll->poll(0.1);
 print \*STDOUT, "ok 10\n";

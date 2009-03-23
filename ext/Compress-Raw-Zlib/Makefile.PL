@@ -41,7 +41,7 @@ by hand by running 'make install' under the directory
 EOM
 
     print \*STDOUT, "Do you want to continue? [Y/N]: " ;
-    my $answer = ~< \*STDIN ;
+    my $answer = ~< $^STDIN ;
 
     if ($answer =~ m/^yes|y/i)
     {

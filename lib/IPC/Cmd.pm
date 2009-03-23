@@ -427,11 +427,11 @@ sub _open3_run {
     ### some hoops to do it :(
     my $selector = IO::Select->new(
                         (IS_WIN32 ?? \*STDERR !! $kiderror), 
-                        \*STDIN,   
+                        $^STDIN,   
                         (IS_WIN32 ?? \*STDOUT !! $kidout)     
                     );              
 
-    (\*STDOUT)->autoflush(1);   (\*STDERR)->autoflush(1);   (\*STDIN)->autoflush(1);
+    (\*STDOUT)->autoflush(1);   (\*STDERR)->autoflush(1);   ($^STDIN)->autoflush(1);
     $kidout->autoflush(1)   if UNIVERSAL::can($kidout,   'autoflush');
     $kiderror->autoflush(1) if UNIVERSAL::can($kiderror, 'autoflush');
 
@@ -579,7 +579,7 @@ do {   use File::Spec;
     my %Map = %(
         STDOUT => \@( <qw|>&|, \*STDOUT, Symbol::gensym() ),
         STDERR => \@( <qw|>&|, \*STDERR, Symbol::gensym() ),
-        STDIN  => \@( <qw|<&|, \*STDIN,  Symbol::gensym() ),
+        STDIN  => \@( <qw|<&|, $^STDIN,  Symbol::gensym() ),
     );
 
     ### dups FDs and stores them in a cache
