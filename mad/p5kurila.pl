@@ -1364,6 +1364,42 @@ sub block_arg {
     }
 }
 
+sub must_haveargs {
+    my $xml = shift;
+    for my $op (find_ops($xml, "entersub")) {
+        next if $op->att('flags') =~ m/\bSTACKED\b/;
+        set_madprop($op, 'round_open', "( &lt; \@_ ");
+        set_madprop($op, 'round_close', ")");
+    }
+}
+
+sub make_prototype {
+    my $xml = shift;
+    for my $amp ($xml->findnodes(q{//mad_op[@key="ampersand"]})) {
+        my @args = $amp->findnodes(q{.//madprops/mad_value[@val='@_']});
+        next if @args > 1;
+        if (@args) {
+            my $arg_op = $args[0]->parent->parent;
+            if (($arg_op->parent->tag eq "op_sassign")
+                  and $arg_op->pos == 2
+                    and $arg_op->parent->child(2)->tag eq "op_anonarray") {
+                my $new_prototype = $arg_op->parent->child(2);
+                set_madprop($new_prototype, 'square_open', '(', wsbefore => '');
+                set_madprop($new_prototype, 'square_close', ')', wsbefore => '');
+                del_madprop($new_prototype, 'defintion');
+                my $pt = $amp->parent->insert_new_elt("mad_op",
+                                                      { key => 'prototype' });
+                $new_prototype->move($pt);
+                if ($arg_op->parent->next_sibling->tag eq "op_nextstate") {
+                    set_madprop($arg_op->parent->next_sibling,
+                                'semicolon', '');
+                }
+                $arg_op->parent->delete();
+            }
+        }
+    }
+}
+
 my $from; # floating point number with starting version of kurila.
 GetOptions("from=s" => \$from);
 $from =~ m/(\w+)[-]([\d.]+)$/ or die "invalid from: '$from'";
@@ -1471,9 +1507,15 @@ if ($from->{branch} ne "kurila" or $from->{v} < qv '1.17') {
     rename_magic_vars($twig);
 }
 
-#rename_inc_vars($twig);
-#print_filehandle($twig);
-block_arg($twig);
+if ($from->{branch} ne "kurila" or $from->{v} < qv '1.17') {
+    rename_inc_vars($twig);
+    print_filehandle($twig);
+    block_arg($twig);
+}
+
+#must_haveargs($twig);
+
+make_prototype($twig);
 
 #add_call_parens($twig);
 

@@ -19,8 +19,8 @@ use Fatal qw|open close|;
 
 use Convert;
 
-my $from = 'kurila-1.17';
-my $to = 'kurila-1.17';
+my $from = 'kurila-1.18';
+my $to = 'kurila-1.18';
 
 sub p5convert {
     my ($input, $expected) = @_;
@@ -37,8 +37,10 @@ sub p5convert {
     is($output, $expected) or $TODO or die "failed test";
 }
 
-t_block_arg();
+t_prototype();
 die "END";
+t_must_haveargs();
+t_block_arg();
 t_print();
 t_rename_inc_vars();
 t_rename_magic_vars_2();
@@ -1643,5 +1645,48 @@ grep m/x/, $a;
 ----
 grep { m/x/ }, $a;
 ====
+END
+}
+
+sub t_must_haveargs {
+    p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
+&{$a};
+&{$a}();
+----
+&{$a}( < @_ );
+&{$a}();
+====
+\&{$a};
+----
+\&{$a};
+====
+sub foo { }
+&foo;
+----
+sub foo { }
+&foo;
+END
+}
+
+sub t_prototype {
+    p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
+sub foo {
+    my @($x, $y) = @_;
+    return 3;
+}
+sub bar {
+    3;
+    my @($z) = @_;
+    return 3;
+}
+----
+sub foo($x, $y) {
+    return 3;
+}
+sub bar($z) {
+    3;
+
+    return 3;
+}
 END
 }
