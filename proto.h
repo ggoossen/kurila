@@ -1508,12 +1508,6 @@ PERL_CALLCONV int	Perl_magic_getuvar(pTHX_ SV* sv, MAGIC* mg)
 #define PERL_ARGS_ASSERT_MAGIC_GETUVAR	\
 	assert(sv); assert(mg)
 
-PERL_CALLCONV U32	Perl_magic_len(pTHX_ SV* sv, MAGIC* mg)
-			__attribute__nonnull__(pTHX_1)
-			__attribute__nonnull__(pTHX_2);
-#define PERL_ARGS_ASSERT_MAGIC_LEN	\
-	assert(sv); assert(mg)
-
 PERL_CALLCONV U32	Perl_magic_regdata_cnt(pTHX_ SV* sv, MAGIC* mg)
 			__attribute__nonnull__(pTHX_1)
 			__attribute__nonnull__(pTHX_2);
@@ -3032,6 +3026,18 @@ PERL_CALLCONV void	Perl_sv_vsetpvf(pTHX_ SV *const sv, const char *const pat, va
 			__attribute__nonnull__(pTHX_2);
 #define PERL_ARGS_ASSERT_SV_VSETPVF	\
 	assert(sv); assert(pat)
+
+PERL_CALLCONV void	Perl_sv_setrv(pTHX_ SV *const sv, SV* dst)
+			__attribute__nonnull__(pTHX_1)
+			__attribute__nonnull__(pTHX_2);
+#define PERL_ARGS_ASSERT_SV_SETRV	\
+	assert(sv); assert(dst)
+
+PERL_CALLCONV void	Perl_sv_setrv_mg(pTHX_ SV *const sv, SV* dst)
+			__attribute__nonnull__(pTHX_1)
+			__attribute__nonnull__(pTHX_2);
+#define PERL_ARGS_ASSERT_SV_SETRV_MG	\
+	assert(sv); assert(dst)
 
 PERL_CALLCONV void	Perl_sv_setiv(pTHX_ SV *const sv, const IV num)
 			__attribute__nonnull__(pTHX_1);

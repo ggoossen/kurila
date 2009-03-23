@@ -7,7 +7,7 @@ BEGIN {
 use Config;
 use File::Spec;
 
-plan tests => 107;
+plan tests => 106;
 
 my $Perl = which_perl();
 
@@ -335,11 +335,6 @@ SKIP: do {
         close($tty_fh);
     };
     ok(! -t *TTY,    '!-t on closed TTY filehandle');
-
-    do {
-        local our $TODO = 'STDIN not a tty when output is to pipe' if $Is_VMS;
-        ok(-t,          '-t on STDIN');
-    };
 };
 
 my $Null = File::Spec->devnull;

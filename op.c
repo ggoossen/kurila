@@ -4360,10 +4360,7 @@ Perl_ck_ftst(pTHX_ OP *o)
     }
     else {
 	OP* const oldo = o;
-	if (type == OP_FTTTY)
-	    o = newGVOP(type, OPf_REF, PL_stdingv, oldo->op_location);
-	else
-	    o = newUNOP(type, 0, newDEFSVOP(o->op_location), oldo->op_location);
+	o = newUNOP(type, 0, newDEFSVOP(o->op_location), oldo->op_location);
 #ifdef PERL_MAD
 	op_getmad(oldo,o,'O');
 #else

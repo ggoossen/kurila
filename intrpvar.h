@@ -243,7 +243,7 @@ PERLVAR(Istatusvalue_posix,I32)
 #endif
 
 /* shortcuts to various I/O objects */
-PERLVAR(Istdingv,	GV *)
+PERLVAR(Istdinio,	IO *)
 PERLVAR(Istderrgv,	GV *)
 PERLVAR(Idefgv,		GV *)
 PERLVAR(Iargvgv,	GV *)

@@ -674,7 +674,8 @@ perl_destruct(pTHXx)
     PL_globalstash = NULL;
     PL_argvgv = NULL;
     PL_argvoutgv = NULL;
-    PL_stdingv = NULL;
+    IoREFCNT_dec(PL_stdinio);
+    PL_stdinio = NULL;
     PL_stderrgv = NULL;
     PL_DBgv = NULL;
     PL_DBline = NULL;
@@ -1705,7 +1706,7 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 	    /* Turn on UTF-8-ness on STDIN, STDOUT, STDERR
 	     * and the default open disciplines. */
 	    if ((PL_unicode & PERL_UNICODE_STDIN_FLAG) &&
-		PL_stdingv  && (io = GvIO(PL_stdingv)) &&
+		(io = PL_stdinio) &&
 		(fp = IoIFP(io)))
 		PerlIO_binmode(aTHX_ fp, IoTYPE(io), 0, ":utf8");
 	    if ((PL_unicode & PERL_UNICODE_STDOUT_FLAG) &&
@@ -3970,9 +3971,7 @@ S_init_predump_symbols(pTHX)
     GV *tmpgv;
     IO *io;
 
-    PL_stdingv = gv_fetchpvs("STDIN", GV_ADD|GV_NOTQUAL, SVt_PVIO);
-    GvMULTI_on(PL_stdingv);
-    io = GvIOp(PL_stdingv);
+    io = PL_stdinio = newIO();
     SVcpREPLACE(SvLOCATION(io), avTsv(newAV()));
     av_store(svTav(SvLOCATION(io)),
 	LOC_NAME_INDEX, newSVpv("STDIN", 0));

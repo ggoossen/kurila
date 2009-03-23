@@ -872,7 +872,7 @@ PP(pp_getc)
 {
     dVAR; dSP; dTARGET;
     IO *io = NULL;
-    GV * const gv = (MAXARG==0) ? PL_stdingv : (GV*)POPs;
+    GV * const gv = (GV*)POPs;
 
     if (!gv || do_eof(gv)) { /* make sure we have fp with something */
 	if ((!io || (!IoIFP(io) && IoTYPE(io) != IoTYPE_WRONLY))

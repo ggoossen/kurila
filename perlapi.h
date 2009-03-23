@@ -564,8 +564,8 @@ END_EXTERN_C
 #define PL_statusvalue_vms	(*Perl_Istatusvalue_vms_ptr(aTHX))
 #undef  PL_stderrgv
 #define PL_stderrgv		(*Perl_Istderrgv_ptr(aTHX))
-#undef  PL_stdingv
-#define PL_stdingv		(*Perl_Istdingv_ptr(aTHX))
+#undef  PL_stdinio
+#define PL_stdinio		(*Perl_Istdinio_ptr(aTHX))
 #undef  PL_strtab
 #define PL_strtab		(*Perl_Istrtab_ptr(aTHX))
 #undef  PL_sub_generation

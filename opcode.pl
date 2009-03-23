@@ -878,7 +878,7 @@ binmode		binmode			ck_fun		s@	F S?
 
 select		select system call	ck_fun	t@	S S S S
 
-getc		getc			ck_eof		st%	F?
+getc		getc			ck_eof		st%	F
 read		read			ck_fun		imst@	F R S S?
 
 prtf		printf			ck_fun	ims@	F L

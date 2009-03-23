@@ -72,7 +72,7 @@ foreach undef
 fork ()
 format unknown
 formline unknown
-getc (;*)
+getc (*)
 getgrent ()
 getgrgid ($)
 getgrnam ($)

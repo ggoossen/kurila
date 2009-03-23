@@ -445,7 +445,6 @@
 #define is_magicsv		Perl_is_magicsv
 #define magic_get		Perl_magic_get
 #define magic_getuvar		Perl_magic_getuvar
-#define magic_len		Perl_magic_len
 #define magic_regdata_cnt	Perl_magic_regdata_cnt
 #define magic_regdatum_get	Perl_magic_regdatum_get
 #define magic_regdatum_set	Perl_magic_regdatum_set
@@ -902,6 +901,8 @@
 #define sv_report_used		Perl_sv_report_used
 #define sv_setpvf		Perl_sv_setpvf
 #define sv_vsetpvf		Perl_sv_vsetpvf
+#define sv_setrv		Perl_sv_setrv
+#define sv_setrv_mg		Perl_sv_setrv_mg
 #define sv_setiv		Perl_sv_setiv
 #define sv_setpviv		Perl_sv_setpviv
 #define sv_setuv		Perl_sv_setuv
@@ -2622,7 +2623,6 @@
 #define is_magicsv(a)		Perl_is_magicsv(aTHX_ a)
 #define magic_get(a,b)		Perl_magic_get(aTHX_ a,b)
 #define magic_getuvar(a,b)	Perl_magic_getuvar(aTHX_ a,b)
-#define magic_len(a,b)		Perl_magic_len(aTHX_ a,b)
 #define magic_regdata_cnt(a,b)	Perl_magic_regdata_cnt(aTHX_ a,b)
 #define magic_regdatum_get(a,b)	Perl_magic_regdatum_get(aTHX_ a,b)
 #define magic_regdatum_set(a,b)	Perl_magic_regdatum_set(aTHX_ a,b)
@@ -3074,6 +3074,8 @@
 #define sv_replace(a,b)		Perl_sv_replace(aTHX_ a,b)
 #define sv_report_used()	Perl_sv_report_used(aTHX)
 #define sv_vsetpvf(a,b,c)	Perl_sv_vsetpvf(aTHX_ a,b,c)
+#define sv_setrv(a,b)		Perl_sv_setrv(aTHX_ a,b)
+#define sv_setrv_mg(a,b)	Perl_sv_setrv_mg(aTHX_ a,b)
 #define sv_setiv(a,b)		Perl_sv_setiv(aTHX_ a,b)
 #define sv_setpviv(a,b)		Perl_sv_setpviv(aTHX_ a,b)
 #define sv_setuv(a,b)		Perl_sv_setuv(aTHX_ a,b)

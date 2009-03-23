@@ -798,6 +798,10 @@ Perl_magic_get(pTHX_ const char* name, SV* sv)
 		sv_setiv(sv, (IV)PL_maxsysfd);
 		break;
 	    }
+	    if (strEQ(remaining, "STDIN")) {
+		sv_setrv(sv, SvREFCNT_inc(ioTsv(PL_stdinio)));
+		break;
+	    }
 	    break;
 
 	case 'U':
@@ -1278,6 +1282,8 @@ Perl_is_magicsv(pTHX_ const char* name)
 	    break;
 	case 'S':
 	    if (strEQ(name2, "SYSTEM_FD_MAX"))
+		return 1;
+	    if (strEQ(name2, "STDIN"))
 		return 1;
 	    break;
 	case 'U':	/* $^UNICODE, $^UTF8LOCALE, $^UTF8CACHE */
@@ -1788,6 +1794,10 @@ Perl_magic_set(pTHX_ const char* name, SV *sv)
 	case 'S':
 	    if (strEQ(remaining, "SYSTEM_FD_MAX")) {
 		PL_maxsysfd = SvIV(sv);
+		break;
+	    }
+	    if (strEQ(remaining, "STDIN")) {
+		SvRV_set(sv, ioTsv(PL_stdinio));
 		break;
 	    }
 	    break;

@@ -187,7 +187,7 @@ XS(XS_Internals_set_hint_hash)
 {
     dVAR;
     dXSARGS;
-    const SV* hv;
+    SV* hv;
     if (!SvROK(ST(0)))
 	Perl_croak(aTHX_ "Internals::set_hint_hash $hashref");
     hv = SvRV(ST(0));

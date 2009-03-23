@@ -552,6 +552,8 @@ Perl_sv_replace
 Perl_sv_report_used
 Perl_sv_setpvf
 Perl_sv_vsetpvf
+Perl_sv_setrv
+Perl_sv_setrv_mg
 Perl_sv_setiv
 Perl_sv_setpviv
 Perl_sv_setuv
