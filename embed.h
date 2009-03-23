@@ -483,7 +483,6 @@
 #define mg_tmprefcnt		Perl_mg_tmprefcnt
 #define mg_magical		Perl_mg_magical
 #define mg_set			Perl_mg_set
-#define mg_size			Perl_mg_size
 #define mini_mktime		Perl_mini_mktime
 #if defined(PERL_CORE) || defined(PERL_EXT)
 #define mod			Perl_mod
@@ -2660,7 +2659,6 @@
 #define mg_tmprefcnt(a)		Perl_mg_tmprefcnt(aTHX_ a)
 #define mg_magical(a)		Perl_mg_magical(aTHX_ a)
 #define mg_set(a)		Perl_mg_set(aTHX_ a)
-#define mg_size(a)		Perl_mg_size(aTHX_ a)
 #define mini_mktime(a)		Perl_mini_mktime(aTHX_ a)
 #if defined(PERL_CORE) || defined(PERL_EXT)
 #define mod(a,b)		Perl_mod(aTHX_ a,b)

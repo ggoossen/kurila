@@ -275,7 +275,6 @@ Perl_mg_free
 Perl_mg_tmprefcnt
 Perl_mg_magical
 Perl_mg_set
-Perl_mg_size
 Perl_mini_mktime
 Perl_mod
 Perl_moreswitches

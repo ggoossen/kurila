@@ -1655,11 +1655,6 @@ PERL_CALLCONV int	Perl_mg_set(pTHX_ SV* sv)
 #define PERL_ARGS_ASSERT_MG_SET	\
 	assert(sv)
 
-PERL_CALLCONV I32	Perl_mg_size(pTHX_ SV* sv)
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_MG_SIZE	\
-	assert(sv)
-
 PERL_CALLCONV void	Perl_mini_mktime(pTHX_ struct tm *ptm)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_MINI_MKTIME	\

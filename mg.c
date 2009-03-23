@@ -198,38 +198,6 @@ Perl_mg_set(pTHX_ SV *sv)
     return 0;
 }
 
-I32
-Perl_mg_size(pTHX_ SV *sv)
-{
-    MAGIC* mg;
-
-    PERL_ARGS_ASSERT_MG_SIZE;
-
-    for (mg = SvMAGIC(sv); mg; mg = mg->mg_moremagic) {
-        const MGVTBL* const vtbl = mg->mg_virtual;
-	if (vtbl && vtbl->svt_len) {
-            const I32 mgs_ix = SSNEW(sizeof(MGS));
-            I32 len;
-	    save_magic(mgs_ix, sv);
-	    /* omit MGf_GSKIP -- not changed here */
-	    len = CALL_FPTR(vtbl->svt_len)(aTHX_ sv, mg);
-	    restore_magic(INT2PTR(void*, (IV)mgs_ix));
-	    return len;
-	}
-    }
-
-    switch(SvTYPE(sv)) {
-	case SVt_PVAV:
-	    return AvFILLp((AV *) sv); /* Fallback to non-tied array */
-	case SVt_PVHV:
-	    /* FIXME */
-	default:
-	    Perl_croak(aTHX_ "Size magic not implemented");
-	    break;
-    }
-    return 0;
-}
-
 /*
 =for apidoc mg_clear
 
