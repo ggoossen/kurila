@@ -439,7 +439,6 @@ p	|int	|magic_clearisa	|NN SV* sv|NN MAGIC* mg
 p	|bool	|is_magicsv	|NN const char* name
 p	|void	|magic_get	|NN const char* name|NN SV* sv
 p	|int	|magic_getuvar	|NN SV* sv|NN MAGIC* mg
-p	|U32	|magic_len	|NN SV* sv|NN MAGIC* mg
 p	|U32	|magic_regdata_cnt|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_regdatum_get|NN SV* sv|NN MAGIC* mg
 pr	|int	|magic_regdatum_set|NN SV* sv|NN MAGIC* mg
