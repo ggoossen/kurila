@@ -198,47 +198,6 @@ Perl_mg_set(pTHX_ SV *sv)
     return 0;
 }
 
-/*
-=for apidoc mg_length
-
-Report on the SV's length.  See C<sv_magic>.
-
-=cut
-*/
-
-U32
-Perl_mg_length(pTHX_ SV *sv)
-{
-    dVAR;
-    MAGIC* mg;
-    STRLEN len;
-
-    PERL_ARGS_ASSERT_MG_LENGTH;
-
-    for (mg = SvMAGIC(sv); mg; mg = mg->mg_moremagic) {
-        const MGVTBL * const vtbl = mg->mg_virtual;
-	if (vtbl && vtbl->svt_len) {
-            const I32 mgs_ix = SSNEW(sizeof(MGS));
-	    save_magic(mgs_ix, sv);
-	    /* omit MGf_GSKIP -- not changed here */
-	    len = CALL_FPTR(vtbl->svt_len)(aTHX_ sv, mg);
-	    restore_magic(INT2PTR(void*, (IV)mgs_ix));
-	    return len;
-	}
-    }
-
-    {
-	/* You can't know whether it's UTF-8 until you get the string again...
-	 */
-        const char *s = SvPV_const(sv, len);
-
-	if (IN_CODEPOINTS) {
-	    len = utf8_length(s, s + len);
-	}
-    }
-    return len;
-}
-
 I32
 Perl_mg_size(pTHX_ SV *sv)
 {

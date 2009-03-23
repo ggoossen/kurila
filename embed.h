@@ -481,7 +481,6 @@
 #define mg_find			Perl_mg_find
 #define mg_free			Perl_mg_free
 #define mg_tmprefcnt		Perl_mg_tmprefcnt
-#define mg_length		Perl_mg_length
 #define mg_magical		Perl_mg_magical
 #define mg_set			Perl_mg_set
 #define mg_size			Perl_mg_size
@@ -2659,7 +2658,6 @@
 #define mg_find(a,b)		Perl_mg_find(aTHX_ a,b)
 #define mg_free(a)		Perl_mg_free(aTHX_ a)
 #define mg_tmprefcnt(a)		Perl_mg_tmprefcnt(aTHX_ a)
-#define mg_length(a)		Perl_mg_length(aTHX_ a)
 #define mg_magical(a)		Perl_mg_magical(aTHX_ a)
 #define mg_set(a)		Perl_mg_set(aTHX_ a)
 #define mg_size(a)		Perl_mg_size(aTHX_ a)

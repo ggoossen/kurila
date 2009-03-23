@@ -1645,11 +1645,6 @@ PERL_CALLCONV void	Perl_mg_tmprefcnt(pTHX_ SV* sv)
 #define PERL_ARGS_ASSERT_MG_TMPREFCNT	\
 	assert(sv)
 
-PERL_CALLCONV U32	Perl_mg_length(pTHX_ SV* sv)
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_MG_LENGTH	\
-	assert(sv)
-
 PERL_CALLCONV void	Perl_mg_magical(pTHX_ SV* sv)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_MG_MAGICAL	\
