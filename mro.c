@@ -130,11 +130,11 @@ S_mro_get_linear_isa_c3(pTHX_ HV* stash, I32 level)
 		else {
 		    /* recursion */
 		    AV* const isa_lin = mro_get_linear_isa_c3(isa_item_stash, level + 1);
-		    av_push(seqs, SvREFCNT_inc_simple_NN((SV*)isa_lin));
+		    av_push(seqs, SvREFCNT_inc_NN((SV*)isa_lin));
 		}
 	    }
         }
-        av_push(seqs, SvREFCNT_inc_simple_NN((SV*)isa));
+        av_push(seqs, SvREFCNT_inc_NN((SV*)isa));
 
         /* This builds "heads", which as an array of integer array
            indices, one per seq, which point at the virtual "head"

@@ -91,12 +91,14 @@ Aip	|SV*	|reTsv	|NULLOK REGEXP *re
 Aip	|AV*	|svTav	|NN SV *sv
 Aip	|HV*	|svThv	|NN SV *sv
 Aip	|CV*	|svTcv	|NN SV *sv
+Aip	|GV*	|svTgv	|NN SV *sv
 Aip	|IO*	|svTio	|NN SV *sv
 Aip	|REGEXP*	|svTre	|NN SV *sv
 
 Aip	|const char*	|SvPVX_const	|NN SV *sv
 Aip	|char*	|SvPVX_mutable	|NN SV *sv
 AipS	|void	|SvREFCNT_dec	|NULLOK SV *sv
+AipS	|SV*	|SvREFCNT_inc	|NULLOK SV *sv
 AipS	|void	|SvTMPREFCNT_inc	|NULLOK SV *sv
 Aip	|IV	|SvIV	|NN SV *sv
 Aip	|UV	|SvUV	|NN SV *sv

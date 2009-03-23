@@ -650,7 +650,7 @@ Perl_lex_start(pTHX_ SV *line, PerlIO *rsfp, bool new_filter)
     parser->expect = XSTATE;
     parser->rsfp = rsfp;
     parser->rsfp_filters = (new_filter || !oparser) ? newAV()
-		: (AV*)SvREFCNT_inc(oparser->rsfp_filters);
+		: AvREFCNT_inc(oparser->rsfp_filters);
 
     Newx(parser->lex_brackstack, 120, char);
     Newx(parser->lex_casestack, 12, char);
@@ -4546,7 +4546,7 @@ Perl_yylex(pTHX)
 		    if ((sv = cv_const_sv(cv))) {
 		  its_constant:
 			SvREFCNT_dec(((SVOP*)pl_yylval.opval)->op_sv);
-			((SVOP*)pl_yylval.opval)->op_sv = SvREFCNT_inc_simple(sv);
+			((SVOP*)pl_yylval.opval)->op_sv = SvREFCNT_inc(sv);
 			pl_yylval.opval->op_private = 0;
 			TOKEN(WORD);
 		    }
@@ -9167,10 +9167,10 @@ S_new_constant(pTHX_ const char *s, STRLEN len, const char *key, STRLEN keylen,
     if (!PL_in_eval && SvTRUE(ERRSV)) {
  	sv_catpvs(ERRSV, "Propagated");
 	yyerror(SvPV_nolen_const(ERRSV)); /* Duplicates the message inside eval */
-	res = SvREFCNT_inc_simple(sv);
+	res = SvREFCNT_inc(sv);
     }
     else {
-	SvREFCNT_inc_simple_void(res);
+	SvREFCNT_inc_void(res);
     }
 
     PUTBACK ;

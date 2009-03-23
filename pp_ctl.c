@@ -1243,7 +1243,7 @@ Perl_sv_compile_2op(pTHX_ SV *sv, ROOTOP** rootopp, const char *code, PAD** padp
 
     lex_end();
     /* XXX DAPM do this properly one year */
-    *padp = (AV*)SvREFCNT_inc_simple(PL_comppad);
+    *padp = AvREFCNT_inc(PL_comppad);
     LEAVE;
     if (IN_PERL_COMPILETIME)
 	CopHINTS_set(&PL_compiling, PL_hints);
@@ -1643,7 +1643,7 @@ PP(pp_require)
 		    if (SvROK(arg) && (SvTYPE(SvRV(arg)) <= SVt_PVGV)
 			&& !isGV_with_GP(SvRV(arg))) {
 			filter_cache = SvRV(arg);
-			SvREFCNT_inc_simple_void_NN(filter_cache);
+			SvREFCNT_inc_void_NN(filter_cache);
 		    }
 
 		    if (SvROK(arg) && SvTYPE(SvRV(arg)) == SVt_PVGV) {
@@ -1668,7 +1668,7 @@ PP(pp_require)
 
 		    if (SvROK(arg) && SvTYPE(SvRV(arg)) == SVt_PVCV) {
 			filter_sub = arg;
-			SvREFCNT_inc_simple_void_NN(filter_sub);
+			SvREFCNT_inc_void_NN(filter_sub);
 		    }
 
 		    if (!tryrsfp && (filter_cache || filter_sub)) {
@@ -1917,7 +1917,7 @@ PP(pp_entereval)
     PL_compiling.cop_warnings = DUP_WARNINGS(PL_curcop->cop_warnings);
     if (PL_curcop->cop_hints_hash) {
 	HINTS_REFCNT_LOCK;
-	SvREFCNT_inc(PL_curcop->cop_hints_hash);
+	HvREFCNT_inc(PL_curcop->cop_hints_hash);
 	HINTS_REFCNT_UNLOCK;
     }
     if (PL_compiling.cop_hints_hash) {

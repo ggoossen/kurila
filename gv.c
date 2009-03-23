@@ -429,7 +429,7 @@ Perl_gv_fetchmeth(pTHX_ HV *stash, const char *name, STRLEN len, I32 level)
              */
             if (topgv && (GvREFCNT(topgv) == 1) && (CvROOT(cand_cv) || CvXSUB(cand_cv))) {
                   if ((old_cv = GvCV(topgv))) CvREFCNT_dec(old_cv);
-                  SvREFCNT_inc_simple_void_NN(cand_cv);
+                  SvREFCNT_inc_void_NN(cand_cv);
                   GvCV(topgv) = cand_cv;
                   GvCVGEN(topgv) = topgen_cmp;
             }
@@ -443,7 +443,7 @@ Perl_gv_fetchmeth(pTHX_ HV *stash, const char *name, STRLEN len, I32 level)
         if(cand_cv) {
             if (topgv && (GvREFCNT(topgv) == 1) && (CvROOT(cand_cv) || CvXSUB(cand_cv))) {
                   if ((old_cv = GvCV(topgv))) CvREFCNT_dec(old_cv);
-                  SvREFCNT_inc_simple_void_NN(cand_cv);
+                  SvREFCNT_inc_void_NN(cand_cv);
                   GvCV(topgv) = cand_cv;
                   GvCVGEN(topgv) = topgen_cmp;
             }
@@ -1009,7 +1009,7 @@ Perl_newIO(pTHX)
     /* Clear the stashcache because a new IO could overrule a package name */
     hv_clear(PL_stashcache);
     iogv = gv_fetchpvs("IO::Handle::", GV_ADD, SVt_PVHV);
-    SvSTASH_set(io, (HV*)SvREFCNT_inc(GvHV(iogv)));
+    SvSTASH_set(io, HvREFCNT_inc(GvHV(iogv)));
     return io;
 }
 

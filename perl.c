@@ -3030,7 +3030,7 @@ S_init_main_stash(pTHX)
     PL_magicsvhv = newHV();
     PL_hinthv = newHV(); /* ^HINTS */
     PL_defgv = gv_fetchpvs("_", GV_ADD|GV_NOTQUAL, SVt_PVAV);
-    SvREFCNT_inc_simple_void(PL_defgv);
+    SvREFCNT_inc_void(PL_defgv);
     PL_errsv = newSV(0);
     (void)Perl_form(aTHX_ "%240s","");	/* Preallocate temp - for immediate signals. */
     sv_grow(ERRSV, 240);	/* Preallocate - for immediate signals. */
@@ -3980,7 +3980,7 @@ S_init_predump_symbols(pTHX)
     IoIFP(io) = PerlIO_stdin();
     tmpgv = gv_fetchpvs("stdin", GV_ADD|GV_NOTQUAL, SVt_PV);
     GvMULTI_on(tmpgv);
-    GvIOp(tmpgv) = (IO*)SvREFCNT_inc_simple(io);
+    GvIOp(tmpgv) = IoREFCNT_inc(io);
 
     tmpgv = gv_fetchpvs("STDOUT", GV_ADD|GV_NOTQUAL, SVt_PVIO);
     GvMULTI_on(tmpgv);
@@ -3993,7 +3993,7 @@ S_init_predump_symbols(pTHX)
     setdefout(tmpgv);
     tmpgv = gv_fetchpvs("stdout", GV_ADD|GV_NOTQUAL, SVt_PV);
     GvMULTI_on(tmpgv);
-    GvIOp(tmpgv) = (IO*)SvREFCNT_inc_simple(io);
+    GvIOp(tmpgv) = IoREFCNT_inc(io);
 
     PL_stderrgv = gv_fetchpvs("STDERR", GV_ADD|GV_NOTQUAL, SVt_PVIO);
     GvMULTI_on(PL_stderrgv);
@@ -4002,7 +4002,7 @@ S_init_predump_symbols(pTHX)
     IoOFP(io) = IoIFP(io) = PerlIO_stderr();
     tmpgv = gv_fetchpvs("stderr", GV_ADD|GV_NOTQUAL, SVt_PV);
     GvMULTI_on(tmpgv);
-    GvIOp(tmpgv) = (IO*)SvREFCNT_inc_simple(io);
+    GvIOp(tmpgv) = IoREFCNT_inc(io);
 
     PL_statname = newSV(0);		/* last filename we did stat on */
 

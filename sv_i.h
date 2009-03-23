@@ -120,6 +120,12 @@ CV* Perl_svTcv(pTHX_ SV *sv) {
     return (CV*)sv;
 }
 
+GV* Perl_svTgv(pTHX_ SV *sv) {
+    PERL_ARGS_ASSERT_SVTGV;
+    assert(SvTYPE(sv) == SVt_PVGV);
+    return (GV*)sv;
+}
+
 IO* Perl_svTio(pTHX_ SV *sv) {
     PERL_ARGS_ASSERT_SVTIO;
     assert(SvIOOK(sv));
@@ -132,16 +138,12 @@ REGEXP* Perl_svTre(pTHX_ SV *sv) {
     return (REGEXP*)sv;
 }
 
-#define CvREFCNT_inc(cv) inline_CvREFCNT_inc(aTHX_ cv)
-static __inline__ CV* inline_CvREFCNT_inc(pTHX_ CV* cv) {
-    return (CV*)SvREFCNT_inc((SV*)cv);
-}
-
-#define SVcpREPLACE(sv_d, sv_s) inline_SVcpREPLACE(&sv_d, sv_s)
-static __inline__ void inline_SVcpREPLACE(pTHX_ SV**sv_d, SV*sv_s) {
-  SvREFCNT_inc(sv_s);
-  SvREFCNT_dec(*sv_d);
-  *sv_d = sv_s;
+SV* SvREFCNT_inc(pTHX_ SV* sv) {
+    if (sv) {
+        assert(SvTYPE(sv) != SVTYPEMASK);
+        (SvREFCNT(sv))++;
+    }
+    return sv;
 }
 
 #define SVcpNULL(sv) { SvREFCNT_dec(sv); sv = NULL; }
@@ -155,6 +157,12 @@ static __inline__ void inline_SVcpREPLACE(pTHX_ SV**sv_d, SV*sv_s) {
 #define CVcpSTEAL(sv_d, sv_s) { CvREFCNT_dec(sv_d); sv_d = sv_s; }
 
 
+#define SVcpREPLACE(sv_d, sv_s) inline_SVcpREPLACE(&sv_d, sv_s)
+static __inline__ void inline_SVcpREPLACE(pTHX_ SV**sv_d, SV*sv_s) {
+  SvREFCNT_inc(sv_s);
+  SvREFCNT_dec(*sv_d);
+  *sv_d = sv_s;
+}
 #define XVcpREPLACE(XV) \
     static __inline__ void inline_cpREPLACE_##XV( XV **sv_d, XV *sv_s) { \
         inline_SVcpREPLACE(aTHX_ (SV**)sv_d, (SV*)sv_s);                \

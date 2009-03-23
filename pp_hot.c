@@ -1169,7 +1169,7 @@ PP(pp_iter)
     }
 
     SvTEMP_off(sv);
-    SvREFCNT_inc_simple_void_NN(sv);
+    SvREFCNT_inc_void_NN(sv);
 
     oldsv = *itersvp;
     *itersvp = sv;

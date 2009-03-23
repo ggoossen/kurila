@@ -193,7 +193,7 @@ XS(XS_Internals_set_hint_hash)
     hv = SvRV(ST(0));
     if (items == 1 && SvTYPE(hv) == SVt_PVHV) {
 	HvREFCNT_dec(PL_compiling.cop_hints_hash);
-	PL_compiling.cop_hints_hash = (HV*)SvREFCNT_inc(hv);
+	PL_compiling.cop_hints_hash = HvREFCNT_inc(hv);
     }
 }
 

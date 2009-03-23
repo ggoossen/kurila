@@ -191,8 +191,8 @@ Perl_pad_new(pTHX_ int flags, PAD* parent_padnames, PAD* parent_pad, IV parent_s
 
     {
 	/* add parent_pad */
-	av_store(padname, PAD_PARENTPADNAMES_INDEX, SvREFCNT_inc(parent_padnames));
-	av_store(padname, PAD_PARENTPAD_INDEX, SvREFCNT_inc(parent_pad));
+	av_store(padname, PAD_PARENTPADNAMES_INDEX, SvREFCNT_inc(avTsv(parent_padnames)));
+	av_store(padname, PAD_PARENTPAD_INDEX, SvREFCNT_inc(avTsv(parent_pad)));
 	av_store(padname, PAD_PARENTSEQ_INDEX, newSViv(parent_seq));
 	av_store(padname, PAD_FLAGS_INDEX, 
             newSViv( (flags & padnew_LATE) ? PADf_LATE : 0 ));
@@ -1326,7 +1326,7 @@ void Perl_cv_setcv(pTHX_ CV *dst, CV* src)
 			sv = NULL;
 		    }
 		    else 
-			SvREFCNT_inc_simple_void_NN(sv);
+			SvREFCNT_inc_void_NN(sv);
 		}
 		if (!sv) {
 		    const char sigil = SvPVX_const(namesv)[0];

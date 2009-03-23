@@ -193,25 +193,6 @@ value, and you know that I<sv> is not NULL.  The macro doesn't need
 to return a meaningful value, or check for NULLness, so it's smaller
 and faster.
 
-=for apidoc Am|SV*|SvREFCNT_inc_simple|SV* sv
-Same as SvREFCNT_inc, but can only be used with expressions without side
-effects.  Since we don't have to store a temporary value, it's faster.
-
-=for apidoc Am|SV*|SvREFCNT_inc_simple_NN|SV* sv
-Same as SvREFCNT_inc_simple, but can only be used if you know I<sv>
-is not NULL.  Since we don't have to check the NULLness, it's faster
-and smaller.
-
-=for apidoc Am|void|SvREFCNT_inc_simple_void|SV* sv
-Same as SvREFCNT_inc_simple, but can only be used if you don't need the
-return value.  The macro doesn't need to return a meaningful value.
-
-=for apidoc Am|void|SvREFCNT_inc_simple_void_NN|SV* sv
-Same as SvREFCNT_inc, but can only be used if you don't need the return
-value, and you know that I<sv> is not NULL.  The macro doesn't need
-to return a meaningful value, or check for NULLness, so it's smaller
-and faster.
-
 =for apidoc Am|void|SvREFCNT_dec|SV* sv
 Decrements the reference count of the given SV.
 
@@ -232,21 +213,6 @@ perform the upgrade if necessary.  See C<svtype>.
 #define SvTMPREFCNT(sv)	(sv)->sv_tmprefcnt
 
 #if defined(__GNUC__) && !defined(PERL_GCC_BRACE_GROUPS_FORBIDDEN)
-#  define SvREFCNT_inc(sv)		\
-    ({					\
-	SV * const _sv = (SV*)(sv);	\
-	if (_sv) {				\
-	    assert(SvTYPE(_sv) != SVTYPEMASK);	\
-	     (SvREFCNT(_sv))++;		\
-        }  \
-	_sv;				\
-    })
-#  define SvREFCNT_inc_simple(sv)	\
-    ({					\
-	if (sv)				\
-	     (SvREFCNT(sv))++;		\
-	(SV *)(sv);				\
-    })
 #  define SvREFCNT_inc_NN(sv)		\
     ({					\
 	SV * const _sv = (SV*)(sv);	\
@@ -260,10 +226,6 @@ perform the upgrade if necessary.  See C<svtype>.
 	    (void)(SvREFCNT(_sv)++);	\
     })
 #else
-#  define SvREFCNT_inc(sv)	\
-	((PL_Sv=(SV*)(sv)) ? (++(SvREFCNT(PL_Sv)),PL_Sv) : NULL)
-#  define SvREFCNT_inc_simple(sv) \
-	((sv) ? (SvREFCNT(sv)++,(SV*)(sv)) : NULL)
 #  define SvREFCNT_inc_NN(sv) \
 	(PL_Sv=(SV*)(sv),++(SvREFCNT(PL_Sv)),PL_Sv)
 #  define SvREFCNT_inc_void(sv) \
@@ -271,10 +233,7 @@ perform the upgrade if necessary.  See C<svtype>.
 #endif
 
 /* These guys don't need the curly blocks */
-#define SvREFCNT_inc_simple_void(sv)	STMT_START { if (sv) SvREFCNT(sv)++; } STMT_END
-#define SvREFCNT_inc_simple_NN(sv)	(++(SvREFCNT(sv)),(SV*)(sv))
 #define SvREFCNT_inc_void_NN(sv)	(void)(++SvREFCNT((SV*)(sv)))
-#define SvREFCNT_inc_simple_void_NN(sv)	(void)(++SvREFCNT((SV*)(sv)))
 
 #define SVTYPEMASK	0xff
 #define SvTYPE(sv)	((svtype)((sv)->sv_flags & SVTYPEMASK))

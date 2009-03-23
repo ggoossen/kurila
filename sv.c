@@ -3609,7 +3609,7 @@ Perl_sv_magicext(pTHX_ SV *const sv, SV *const obj, const int how,
 	mg->mg_obj = obj;
     }
     else {
-	mg->mg_obj = SvREFCNT_inc_simple(obj);
+	mg->mg_obj = SvREFCNT_inc(obj);
 	mg->mg_flags |= MGf_REFCOUNTED;
     }
 
@@ -3619,7 +3619,7 @@ Perl_sv_magicext(pTHX_ SV *const sv, SV *const obj, const int how,
 	if (namlen > 0)
 	    mg->mg_ptr = savepvn(name, namlen);
 	else if (namlen == HEf_SVKEY)
-	    mg->mg_ptr = (char*)SvREFCNT_inc_simple_NN((SV*)name);
+	    mg->mg_ptr = (char*)SvREFCNT_inc_NN((SV*)name);
 	else
 	    mg->mg_ptr = (char *) name;
     }
@@ -6185,7 +6185,7 @@ Perl_newRV(pTHX_ SV *const sv)
 
     PERL_ARGS_ASSERT_NEWRV;
 
-    return newRV_noinc(SvREFCNT_inc_simple_NN(sv));
+    return newRV_noinc(SvREFCNT_inc_NN(sv));
 }
 
 /*
@@ -6736,7 +6736,7 @@ Perl_sv_bless(pTHX_ SV *const sv, HV *const stash)
     if (SvTYPE(tmpRef) != SVt_PVIO)
 	++PL_sv_objcount;
     SvUPGRADE(tmpRef, SVt_PVMG);
-    SvSTASH_set(tmpRef, (HV*)SvREFCNT_inc_simple(stash));
+    SvSTASH_set(tmpRef, HvREFCNT_inc(stash));
 
     if(SvSMAGICAL(tmpRef))
         if(mg_find(tmpRef, PERL_MAGIC_ext) || mg_find(tmpRef, PERL_MAGIC_uvar))

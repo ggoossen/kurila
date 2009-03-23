@@ -582,7 +582,7 @@ PP(pp_study)
 	SvSCREAM_off(PL_lastscream);
 	SvREFCNT_dec(PL_lastscream);
     }
-    PL_lastscream = SvREFCNT_inc_simple(sv);
+    PL_lastscream = SvREFCNT_inc(sv);
 
     s = (unsigned char*)(SvPV(sv, len));
     pos = len;

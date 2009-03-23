@@ -436,19 +436,6 @@ and check for NULL.
 #define REXEC_IGNOREPOS	0x08		/* \G matches at start. */
 #define REXEC_NOT_FIRST	0x10		/* This is another iteration of //g. */
 
-#if defined(__GNUC__) && !defined(PERL_GCC_BRACE_GROUPS_FORBIDDEN)
-#  define ReREFCNT_inc(re)						\
-    ({									\
-	/* This is here to generate a casting warning if incorrect.  */	\
-	REGEXP *const zwapp = (re);					\
-	assert(SvTYPE(zwapp) == SVt_REGEXP);				\
-	SvREFCNT_inc(zwapp);						\
-	zwapp;								\
-    })
-#else
-#  define ReREFCNT_inc(re)	((REGEXP *) SvREFCNT_inc(re))
-#endif
-
 /* FIXME for plugins. */
 
 #define FBMcf_TAIL_DOLLAR	1

@@ -122,6 +122,11 @@ PERL_INLINE_CALLCONV CV*	Perl_svTcv(pTHX_ SV *sv)
 #define PERL_ARGS_ASSERT_SVTCV	\
 	assert(sv)
 
+PERL_INLINE_CALLCONV GV*	Perl_svTgv(pTHX_ SV *sv)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_SVTGV	\
+	assert(sv)
+
 PERL_INLINE_CALLCONV IO*	Perl_svTio(pTHX_ SV *sv)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_SVTIO	\
@@ -144,6 +149,7 @@ PERL_INLINE_CALLCONV char*	Perl_SvPVX_mutable(pTHX_ SV *sv)
 	assert(sv)
 
 PERL_INLINE_CALLCONV void	Perl_SvREFCNT_dec(pTHX_ SV *sv);
+PERL_INLINE_CALLCONV SV*	Perl_SvREFCNT_inc(pTHX_ SV *sv);
 PERL_INLINE_CALLCONV void	Perl_SvTMPREFCNT_inc(pTHX_ SV *sv);
 PERL_INLINE_CALLCONV IV	Perl_SvIV(pTHX_ SV *sv)
 			__attribute__nonnull__(pTHX_1);

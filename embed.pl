@@ -21,10 +21,8 @@ my $SPLINT = 0; # Turn true for experimental splint support http://www.splint.or
 # implicit interpreter context argument.
 #
 
-sub do_not_edit ($)
+sub do_not_edit($file)
 {
-    my $file = shift;
-
     my $years = '1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007';
 
     $years =~ s/1999,/1999,\n  / if length $years +> 40;
@@ -74,12 +72,9 @@ open my $in, '<', "embed.fnc" or die $^OS_ERROR;
 
 # walk table providing an array of components in each line to
 # subroutine, printing the result
-sub walk_table (&@) {
-    my $function = shift;
-    my $filename = shift || '-';
-    my $leader = shift;
-    defined $leader or $leader = do_not_edit ($filename);
-    my $trailer = shift;
+sub walk_table ($function, ?$filename, ?$leader, ?$trailer) {
+    $filename //= '-';
+    $leader //= do_not_edit($filename);
     my $F;
     if (ref $filename) {	# filehandle
 	$F = $filename;
@@ -318,7 +313,7 @@ my @extvars = qw(sv_undef sv_yes sv_no na dowarn
 		 ppaddr
                 );
 
-sub readsyms (\%$)($syms, $file) {
+sub readsyms($syms, $file) {
     local ($_);
     my $fh;
     open($fh, "<", "$file")
@@ -328,17 +323,17 @@ sub readsyms (\%$)($syms, $file) {
 	if (m/^\s*(\S+)\s*$/) {
 	    my $sym = $1;
 	    warn "duplicate symbol $sym while processing $file line $(iohandle::input_line_number(\*FILE)).\n"
-		if exists %$syms{$sym};
-	    %$syms{+$sym} = 1;
+		if exists $syms->{$sym};
+	    $syms->{+$sym} = 1;
 	}
     }
     close($fh);
 }
 
 # Perl_pp_* and Perl_ck_* are in pp.sym
-readsyms my %ppsym, 'pp.sym';
+readsyms \my %ppsym, 'pp.sym';
 
-sub readvars(\%$$@)($syms, $file,$pre,?$keep_pre) {
+sub readvars($syms, $file,$pre,?$keep_pre) {
     local ($_);
     open(my $fh, "<", "$file")
 	or die "embed.pl: Can't open $file: $^OS_ERROR\n";
@@ -358,28 +353,28 @@ sub readvars(\%$$@)($syms, $file,$pre,?$keep_pre) {
 my %intrp;
 my %globvar;
 
-readvars %intrp,  'intrpvar.h','I';
-readvars %globvar, 'perlvars.h','G';
+readvars \%intrp,  'intrpvar.h','I';
+readvars \%globvar, 'perlvars.h','G';
 
-sub undefine ($)($sym) {
+sub undefine($sym) {
     "#undef  $sym\n";
 }
 
-sub hide ($$)($from, $to) {
+sub hide($from, $to) {
     my $t = int(length($from) / 8);
     "#define $from" . "\t" x ($t +< 3 ?? 3 - $t !! 1) . "$to\n";
 }
 
-sub bincompat_var ($$)($pfx, $sym) {
+sub bincompat_var($pfx, $sym) {
     my $arg = ($pfx eq 'G' ?? 'NULL' !! 'aTHX');
     undefine("PL_$sym") . hide("PL_$sym", "(*Perl_$($pfx)$($sym)_ptr($arg))");
 }
 
-sub multon ($$$)($sym,$pre,$ptr) {
+sub multon($sym,$pre,$ptr) {
     hide("PL_$sym", "($ptr$pre$sym)");
 }
 
-sub multoff ($$)($sym,$pre) {
+sub multoff($sym,$pre) {
     return hide("PL_$pre$sym", "PL_$sym");
 }
 

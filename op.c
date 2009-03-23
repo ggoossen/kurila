@@ -1163,7 +1163,7 @@ Perl_fold_constants(pTHX_ register OP *o)
 	if (o->op_targ && sv == PAD_SV(o->op_targ))	/* grab pad temp? */
 	    pad_swipe(o->op_targ,  FALSE);
 	else if (SvTEMP(sv)) {			/* grab mortal temp? */
-	    SvREFCNT_inc_simple_void(sv);
+	    SvREFCNT_inc_void(sv);
 	    SvTEMP_off(sv);
 	}
 	break;
@@ -2245,7 +2245,7 @@ Perl_newGVOP(pTHX_ I32 type, OPFLAGS flags, GV *gv, SV *location)
 
     PERL_ARGS_ASSERT_NEWGVOP;
 
-    return newSVOP(type, flags, SvREFCNT_inc_simple_NN(gv), location);
+    return newSVOP(type, flags, SvREFCNT_inc_NN(gv), location);
 }
 
 OP *
@@ -2648,7 +2648,7 @@ Perl_newSTATEOP(pTHX_ OPFLAGS flags, char *label, OP *o, SV *location)
     cop->cop_seq = seq;
     cop->cop_warnings = DUP_WARNINGS(PL_curcop->cop_warnings);
     cop->cop_hints_hash = PL_curcop->cop_hints_hash;
-    SvREFCNT_inc(cop->cop_hints_hash);
+    HvREFCNT_inc(cop->cop_hints_hash);
 
     CopSTASH_set(cop, PL_curstash);
 
@@ -3557,7 +3557,7 @@ Perl_newSUB(pTHX_ I32 floor, OP *proto, OP *block)
 	const_sv = op_const_sv(block, NULL);
 
     if (const_sv) {
-	SvREFCNT_inc_simple_void_NN(const_sv);
+	SvREFCNT_inc_void_NN(const_sv);
 	cv = newCONSTSUB(NULL, const_sv);
 	if (PL_madskills)
 	    goto install_block;
@@ -3639,7 +3639,7 @@ Perl_newSUB(pTHX_ I32 floor, OP *proto, OP *block)
     }
 
   done:
-    SvREFCNT_inc(cv);
+    CvREFCNT_inc(cv);
     LEAVE_SCOPE(floor);
     return cv;
 }
@@ -3704,7 +3704,7 @@ Perl_process_special_block(pTHX_ const I32 key, CV *const cv)
 	if (PL_main_start && ckWARN(WARN_VOID))
 	    Perl_warner(aTHX_ packWARN(WARN_VOID),
 		"Too late to run INIT block");
-	Perl_av_create_and_push(aTHX_ &PL_initav, SvREFCNT_inc(cv));
+	Perl_av_create_and_push(aTHX_ &PL_initav, SvREFCNT_inc(cvTsv(cv)));
 	break;
     default:
 	Perl_croak(aTHX_ "end");
@@ -4318,7 +4318,7 @@ Perl_ck_rvconst(pTHX_ register OP *o)
 	if (gv) {
 	    kid->op_type = OP_GV;
 	    SvREFCNT_dec(kid->op_sv);
-	    kid->op_sv = SvREFCNT_inc_simple_NN(gv);
+	    kid->op_sv = SvREFCNT_inc_NN(gvTsv(gv));
 	    kid->op_private = 0;
 	    kid->op_ppaddr = PL_ppaddr[OP_GV];
 	}

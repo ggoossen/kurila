@@ -48,6 +48,7 @@
 #define svTav			Perl_svTav
 #define svThv			Perl_svThv
 #define svTcv			Perl_svTcv
+#define svTgv			Perl_svTgv
 #define svTio			Perl_svTio
 #define svTre			Perl_svTre
 #define SvPVX_const		Perl_SvPVX_const
@@ -59,6 +60,13 @@
 #define IoREFCNT_dec(a)		Perl_SvREFCNT_dec(aTHX_ ioTsv(a))
 #define ReREFCNT_dec(a)		Perl_SvREFCNT_dec(aTHX_ reTsv(a))
 #define SvREFCNT_dec		Perl_SvREFCNT_dec
+#define AvREFCNT_inc(a)		svTav(Perl_SvREFCNT_inc(aTHX_ avTsv(a)))
+#define HvREFCNT_inc(a)		svThv(Perl_SvREFCNT_inc(aTHX_ hvTsv(a)))
+#define CvREFCNT_inc(a)		svTcv(Perl_SvREFCNT_inc(aTHX_ cvTsv(a)))
+#define GvREFCNT_inc(a)		svTgv(Perl_SvREFCNT_inc(aTHX_ gvTsv(a)))
+#define IoREFCNT_inc(a)		svTio(Perl_SvREFCNT_inc(aTHX_ ioTsv(a)))
+#define ReREFCNT_inc(a)		svTre(Perl_SvREFCNT_inc(aTHX_ reTsv(a)))
+#define SvREFCNT_inc		Perl_SvREFCNT_inc
 #define AvTMPREFCNT_inc(a)		Perl_SvTMPREFCNT_inc(aTHX_ avTsv(a))
 #define HvTMPREFCNT_inc(a)		Perl_SvTMPREFCNT_inc(aTHX_ hvTsv(a))
 #define CvTMPREFCNT_inc(a)		Perl_SvTMPREFCNT_inc(aTHX_ cvTsv(a))
@@ -2234,6 +2242,7 @@
 #define svTav(a)		Perl_svTav(aTHX_ a)
 #define svThv(a)		Perl_svThv(aTHX_ a)
 #define svTcv(a)		Perl_svTcv(aTHX_ a)
+#define svTgv(a)		Perl_svTgv(aTHX_ a)
 #define svTio(a)		Perl_svTio(aTHX_ a)
 #define svTre(a)		Perl_svTre(aTHX_ a)
 #define SvPVX_const(a)		Perl_SvPVX_const(aTHX_ a)
@@ -2245,6 +2254,13 @@
 #define IoREFCNT_dec(a)		Perl_SvREFCNT_dec(aTHX_ ioTsv(a))
 #define ReREFCNT_dec(a)		Perl_SvREFCNT_dec(aTHX_ reTsv(a))
 #define SvREFCNT_dec(a)		Perl_SvREFCNT_dec(aTHX_ a)
+#define AvREFCNT_inc(a)		svTav(Perl_SvREFCNT_inc(aTHX_ avTsv(a)))
+#define HvREFCNT_inc(a)		svThv(Perl_SvREFCNT_inc(aTHX_ hvTsv(a)))
+#define CvREFCNT_inc(a)		svTcv(Perl_SvREFCNT_inc(aTHX_ cvTsv(a)))
+#define GvREFCNT_inc(a)		svTgv(Perl_SvREFCNT_inc(aTHX_ gvTsv(a)))
+#define IoREFCNT_inc(a)		svTio(Perl_SvREFCNT_inc(aTHX_ ioTsv(a)))
+#define ReREFCNT_inc(a)		svTre(Perl_SvREFCNT_inc(aTHX_ reTsv(a)))
+#define SvREFCNT_inc(a)		Perl_SvREFCNT_inc(aTHX_ a)
 #define AvTMPREFCNT_inc(a)		Perl_SvTMPREFCNT_inc(aTHX_ avTsv(a))
 #define HvTMPREFCNT_inc(a)		Perl_SvTMPREFCNT_inc(aTHX_ hvTsv(a))
 #define CvTMPREFCNT_inc(a)		Perl_SvTMPREFCNT_inc(aTHX_ cvTsv(a))

@@ -38,11 +38,13 @@ Perl_reTsv
 Perl_svTav
 Perl_svThv
 Perl_svTcv
+Perl_svTgv
 Perl_svTio
 Perl_svTre
 Perl_SvPVX_const
 Perl_SvPVX_mutable
 Perl_SvREFCNT_dec
+Perl_SvREFCNT_inc
 Perl_SvTMPREFCNT_inc
 Perl_SvIV
 Perl_SvUV

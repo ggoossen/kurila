@@ -91,9 +91,6 @@ Return the SV from the GV.
 
 #define GvAV(gv)	(GvGP(gv)->gp_av)
 
-/* This macro is deprecated.  Do not use! */
-#define GvREFCNT_inc(gv) ((GV*)SvREFCNT_inc(gv))	/* DO NOT USE */
-
 #define INLINE1(ret, name, arg1) static __inline__ ret ii##name(pTHX_ arg1)
 INLINE1(AV*, GvAVn, GV *gv) {
     if (GvGP(gv)->gp_av) {
