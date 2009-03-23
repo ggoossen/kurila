@@ -3699,28 +3699,6 @@ struct ufuncs {
     IV uf_index;
 };
 
-/* In pre-5.7-Perls the PERL_MAGIC_uvar magic didn't get the thread context.
- * XS code wanting to be backward compatible can do something
- * like the following:
-
-#ifndef PERL_MG_UFUNC
-#define PERL_MG_UFUNC(name,ix,sv) I32 name(IV ix, SV *sv)
-#endif
-
-static PERL_MG_UFUNC(foo_get, index, val)
-{
-    sv_setsv(val, ...);
-    return TRUE;
-}
-
--- Doug MacEachern
-
-*/
-
-#ifndef PERL_MG_UFUNC
-#define PERL_MG_UFUNC(name,ix,sv) I32 name(pTHX_ IV ix, SV *sv)
-#endif
-
 /* Fix these up for __STDC__ */
 #ifndef DONT_DECLARE_STD
 char *mktemp (char*);
