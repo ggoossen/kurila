@@ -491,11 +491,10 @@ subrout	:	SUB startsub subname proto subbody
                             CV* new;
                             $$ = newOP(OP_NULL,0, LOCATION($1));
                             op_getmad($3,$$,'n');
-                            op_getmad($4,$$,'s');
-                            op_getmad($5,$$,'&');
                             TOKEN_GETMAD($1,$$,'d');
                             APPEND_MADPROPS_PV("sub", $$, '<');
                             new = newNAMEDSUB($2, $3, $4, $5);
+                            op_getmad(CvROOT(new),$$,'&');
                             /* SvREFCNT_dec(new);  leak reference */
 #else
                             CV* new = newNAMEDSUB($2, $3, $4, $5);
@@ -568,12 +567,16 @@ proto	:	/* NULL */
                             $$ = newOP(OP_STUB, 0, LOCATION($1) );
                             PL_parser->in_my = FALSE;
                             PL_parser->expect = XBLOCK;
+                            TOKEN_GETMAD($1,$$,'(');
+                            TOKEN_GETMAD($2,$$,')');
                         }
 	|	startproto expr mintro ')'
 			{ 
                             $$ = $2;
                             PL_parser->in_my = FALSE;
                             PL_parser->expect = XBLOCK;
+                            TOKEN_GETMAD($1,$$,'(');
+                            TOKEN_GETMAD($4,$$,')');
                         }
 	;
 
@@ -1008,7 +1011,6 @@ anonymous:
 			{
                             $$ = newANONSUB($2, $3, scalar($4));
                             TOKEN_GETMAD($1,$$,'o');
-                            OP_GETMAD($3,$$,'s');
 			}
 	;
 

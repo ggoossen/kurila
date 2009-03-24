@@ -140,7 +140,7 @@ my $x = pi;
 ########
 -OS_Code => $a
 ########
-sub ok($$) { }
+sub ok($ok, $name) { }
 #BEGIN { ok(1, 2, ); }
 #######
 #
@@ -184,7 +184,7 @@ unless (try { $a }) { $a = $b }
 local our $TODO
 ########
 # 'my' inside prototyped subcall
-sub ok($;$) { }
+sub ok($ok, ?$name) { }
 ok my $x = "foobar";
 ########
 # TODO do not execute CHECK block
@@ -338,3 +338,9 @@ my %( 1 => $v, ...) = $a;
 %() +%+ @();
 ########
 %+: @: %();
+########
+sub ok($ok, ?$name) { return "$ok - $name"; }
+########
+my $sub = sub ($x) { ++$x; };
+########
+my %(aap => $aap, noot => $noot) = %();

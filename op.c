@@ -782,8 +782,13 @@ S_my_kid(pTHX_ OP *o, OP **imopsp)
     }
     else if (type == OP_ANONHASH) {
         OP *kid;
-	for (kid = cLISTOPo->op_first; kid; kid = kid->op_sibling) {
-	    if (kid->op_type == OP_CONST) {
+	for (kid = cLISTOPo->op_first->op_sibling; kid; kid = kid->op_sibling) {
+	    if (kid->op_type == OP_CONST
+#ifdef PERL_MAD
+		|| (kid->op_type == OP_NULL 
+		    && cLISTOPx(kid)->op_first->op_type == OP_CONST)
+#endif
+		) {
 		kid = kid->op_sibling;
 		if ( ! kid )
 		    break;
@@ -3594,6 +3599,7 @@ Perl_newSUB(pTHX_ I32 floor, OP *proto, OP *block)
     {
 	OP* leaveop;
 	OP* proto_block;
+#ifndef PERL_MAD
 	if (proto && proto->op_type == OP_STUB) {
 	    CvN_MINARGS(cv) = 0;
 	    CvN_MAXARGS(cv) = 0;
@@ -3601,7 +3607,9 @@ Perl_newSUB(pTHX_ I32 floor, OP *proto, OP *block)
 	    proto_block = block;
 	    op_free(proto);
 	}
-	else if (proto) {
+	else
+#endif
+        if (proto) {
 	    I32 min_modcount = 0;
 	    I32 max_modcount = 0;
 	    OP* kid;
@@ -3613,6 +3621,9 @@ Perl_newSUB(pTHX_ I32 floor, OP *proto, OP *block)
 		assign(kid, TRUE, &min_modcount, &max_modcount);
 	    CvN_MINARGS(cv) = min_modcount;
 	    CvN_MAXARGS(cv) = max_modcount;
+#ifdef PERL_MAD
+	    block = newUNOP(OP_NULL, 0, block, block->op_location);
+#endif
 	    proto_block = append_list(OP_LINESEQ, list, (LISTOP*)block);
 	    CvFLAGS(cv) |= CVf_PROTO;
 	}
