@@ -22,7 +22,7 @@ print \*STDOUT, "# Pod::Escapes version $Pod::Escapes::VERSION\n",
 # Presumably that's the library being used
 
 
-sub e ($$) { Pod::Simple::DumpAsXML->_duo(< @_) }
+sub e ($x, $y) { Pod::Simple::DumpAsXML->_duo($x, $y) }
 
 &ok( < e "", "" );
 &ok( < e "\n", "", );

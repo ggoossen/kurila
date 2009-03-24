@@ -203,8 +203,7 @@ values through this.
 
 =cut
 
-sub _to_value {
-    my @($v) =  @_;
+sub _to_value($v) {
     return ref $v eq 'CODE' ?? $v->() !! $v;
 }
 
@@ -345,7 +344,7 @@ problems.  See L</BUGS and CAVEATS>.
 #   "feature" that can't be removed due to compatibility.>>
 #
 
-sub ok ($;$$) {
+sub ok {
     die "ok: plan before you test!" if !$planned;
 
     local($^OUTPUT_RECORD_SEPARATOR,$^OUTPUT_FIELD_SEPARATOR);   # guard against -l and other things that screw with
@@ -409,8 +408,7 @@ sub ok ($;$$) {
 }
 
 
-sub _complain {
-    my@($result, $expected, $detail) =  @_;
+sub _complain($result, $expected, $detail) {
     %$detail{+expected} = $expected if defined $expected;
 
     # Get the user's diagnostic, protecting against multi-line
@@ -474,8 +472,7 @@ EOT
 
 
 
-sub _diff_complain_external {
-    my@($result, $expected, $detail, $prefix) =  @_;
+sub _diff_complain_external($result, $expected, $detail, $prefix) {
     my $diff = env::var('PERL_TEST_DIFF') || die "WHAAAA?";
 
     require File::Temp;
@@ -670,7 +667,7 @@ That is, both are like this:
 
 =cut
 
-sub skip ($;$$$) {
+sub skip {
     local($^OUTPUT_RECORD_SEPARATOR, $^OUTPUT_FIELD_SEPARATOR);   # guard against -l and other things that screw with
                      # print
 

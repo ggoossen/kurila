@@ -62,8 +62,7 @@ do {
 };
 
 # use Data::Dumper; $Data::Dumper::Useqq = 1; print Dumper \%tests;
-sub thaw_hash {
-  my @($name, $expected) =  @_;
+sub thaw_hash($name, $expected) {
   my $hash = try {thaw %tests{?$name}};
   is ($^EVAL_ERROR, '', "Thawed $name without error?");
   isa_ok ($hash, 'HASH');
@@ -73,8 +72,7 @@ sub thaw_hash {
   $hash;
 }
 
-sub thaw_scalar {
-  my @($name, $expected, ?$bug) =  @_;
+sub thaw_scalar($name, $expected, ?$bug) {
   my $scalar = try {thaw %tests{?$name}};
   is ($^EVAL_ERROR, '', "Thawed $name without error?");
   isa_ok ($scalar, 'SCALAR', "Thawed $name?");
@@ -82,8 +80,7 @@ sub thaw_scalar {
   $scalar;
 }
 
-sub thaw_fail {
-  my @($name, $expected) =  @_;
+sub thaw_fail($name, $expected) {
   my $thing = try {thaw %tests{?$name}};
   is ($thing, undef, "Thawed $name failed as expected?");
   like ($^EVAL_ERROR->{?description}, $expected, "Error as predicted?");

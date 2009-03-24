@@ -76,8 +76,7 @@ sub checkorder {
 
 # Verify that the two array refs reference identical arrays
 
-sub checkequal {
-    my @($aref, $bref) =  @_;
+sub checkequal($aref, $bref) {
     my $status = '';
 
     if (nelems(@$aref) != nelems(@$bref)) {
@@ -95,8 +94,7 @@ sub checkequal {
 
 # Test sort on arrays of various sizes (set up in @TestSizes)
 
-sub main {
-    my @($dothesort, $expect_unstable) =  @_;
+sub main($dothesort, $expect_unstable) {
     my ($unsorted, @sorted, $status);
     my $unstable_num = 0;
 
@@ -130,27 +128,27 @@ sub main {
 }
 
 # Test with no pragma still loaded -- stability expected (this is a mergesort)
-main(sub {sort {&{@_[0]}}, @{@_[1]} }, 0);
+main(sub {sort {&{@_[0]}( < @_ )}, @{@_[1]} }, 0);
 
 do {
     use sort < qw(_qsort);
     my $sort_current; BEGIN { $sort_current = sort::current(); }
     is($sort_current, 'quicksort', 'sort::current for _qsort');
-    main(sub {sort {&{@_[0]}}, @{@_[1]} }, 1);
+    main(sub {sort {&{@_[0]}( < @_ )}, @{@_[1]} }, 1);
 };
 
 do {
     use sort < qw(_mergesort);
     my $sort_current; BEGIN { $sort_current = sort::current(); }
     is($sort_current, 'mergesort', 'sort::current for _mergesort');
-    main(sub {sort {&{@_[0]}}, @{@_[1]} }, 0);
+    main(sub {sort {&{@_[0]}( < @_ )}, @{@_[1]} }, 0);
 };
 
 do {
     use sort < qw(_qsort stable);
     my $sort_current; BEGIN { $sort_current = sort::current(); }
     is($sort_current, 'quicksort stable', 'sort::current for _qsort stable');
-    main(sub {sort {&{@_[0]}}, @{@_[1]} }, 0);
+    main(sub {sort {&{@_[0]}( < @_ )}, @{@_[1]} }, 0);
 };
 
 # Tests added to check "defaults" subpragma, and "no sort"
@@ -160,7 +158,7 @@ do {
     no sort < qw(_qsort);
     my $sort_current; BEGIN { $sort_current = sort::current(); }
     is($sort_current, 'stable', 'sort::current after no _qsort');
-    main(sub {sort {&{@_[0]}}, @{@_[1]} }, 0);
+    main(sub {sort {&{@_[0]}( < @_ )}, @{@_[1]} }, 0);
 };
 
 do {
@@ -174,5 +172,5 @@ do {
     use sort < qw(defaults stable);
     my $sort_current; BEGIN { $sort_current = sort::current(); }
     is($sort_current, 'stable', 'sort::current after defaults stable');
-    main(sub {sort {&{@_[0]}}, @{@_[1]} }, 0);
+    main(sub {sort {&{@_[0]}( < @_ )}, @{@_[1]} }, 0);
 };

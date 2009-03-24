@@ -791,10 +791,6 @@ static const struct body_details bodies_by_type[] = {
     { sizeof(XPVGV), sizeof(XPVGV), 0, SVt_PVGV, TRUE, HADNV,
       HASARENA, FIT_ARENA(0, sizeof(XPVGV)) },
     
-    /* 64 */
-    { sizeof(XPVLV), sizeof(XPVLV), 0, SVt_PVLV, TRUE, HADNV,
-      HASARENA, FIT_ARENA(0, sizeof(XPVLV)) },
-
     { sizeof(xpvav_allocated),
       copy_length(XPVAV, xmg_stash)
       - relative_STRUCT_OFFSET(xpvav_allocated, XPVAV, xav_fill),
@@ -1179,7 +1175,6 @@ Perl_sv_upgrade(pTHX_ register SV *const sv, svtype new_type)
     case SVt_PVIO:
     case SVt_PVGV:
     case SVt_PVCV:
-    case SVt_PVLV:
     case SVt_REGEXP:
     case SVt_PVMG:
     case SVt_PVNV:
@@ -1892,6 +1887,9 @@ Perl_sv_2nv(pTHX_ register SV *const sv)
     dVAR;
     if (!sv)
 	return 0.0;
+    if ( SvOK(sv) && ! SvPVOK(sv) ) {
+	Perl_croak(aTHX_ "%s used as a number", Ddesc(sv));
+    }
     if ((SvTYPE(sv) == SVt_PVGV && SvVALID(sv))) {
 	/* FBMs use the same flag bit as SVf_IVisUV, so must let them
 	   cache IVs just in case.  */
@@ -2644,7 +2642,6 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV* sstr, const I32 flags)
 	break;
 
 	/* case SVt_BIND: */
-    case SVt_PVLV:
     case SVt_PVGV:
 	if (isGV_with_GP(sstr) && dtype <= SVt_PVGV) {
 	    Perl_croak(aTHX_ "glob to glob assignment have been removed");
@@ -2654,10 +2651,7 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV* sstr, const I32 flags)
 	/*FALLTHROUGH*/
 
     case SVt_PVMG:
-	if (stype == SVt_PVLV)
-	    SvUPGRADE(dstr, SVt_PVNV);
-	else
-	    SvUPGRADE(dstr, (svtype)stype);
+	SvUPGRADE(dstr, (svtype)stype);
     }
  end_of_first_switch:
 
@@ -2666,18 +2660,9 @@ Perl_sv_setsv_flags(pTHX_ SV *dstr, register SV* sstr, const I32 flags)
     sflags = SvFLAGS(sstr);
 
     if (dtype == SVt_PVCV) {
-	/* Assigning to a subroutine sets the prototype.  */
-	if (SvOK(sstr)) {
-	    STRLEN len;
-	    const char *const ptr = SvPV_const(sstr, len);
-
-            SvGROW(dstr, len + 1);
-            Copy(ptr, SvPVX_mutable(dstr), len + 1, char);
-            SvCUR_set(dstr, len);
-	    SvPOK_only(dstr);
-	} else {
-	    SvOK_off(dstr);
-	}
+	sv_clear_body(dstr);
+	sv_upgrade(dstr, SVt_PVCV);
+	cv_setcv(svTcv(dstr), svTcv(sstr));
     } else if (dtype == SVt_PVAV) {
 	int i;
 	int len = av_len( (AV*)sstr);
@@ -3624,7 +3609,7 @@ Perl_sv_magicext(pTHX_ SV *const sv, SV *const obj, const int how,
 	mg->mg_obj = obj;
     }
     else {
-	mg->mg_obj = SvREFCNT_inc_simple(obj);
+	mg->mg_obj = SvREFCNT_inc(obj);
 	mg->mg_flags |= MGf_REFCOUNTED;
     }
 
@@ -3634,7 +3619,7 @@ Perl_sv_magicext(pTHX_ SV *const sv, SV *const obj, const int how,
 	if (namlen > 0)
 	    mg->mg_ptr = savepvn(name, namlen);
 	else if (namlen == HEf_SVKEY)
-	    mg->mg_ptr = (char*)SvREFCNT_inc_simple_NN((SV*)name);
+	    mg->mg_ptr = (char*)SvREFCNT_inc_NN((SV*)name);
 	else
 	    mg->mg_ptr = (char *) name;
     }
@@ -3958,8 +3943,7 @@ Perl_sv_kill_backrefs(pTHX_ SV *const sv, AV *const av)
 		    SvOK_off(referrer);
 		    SvWEAKREF_off(referrer);
 		    SvSETMAGIC(referrer);
-		} else if (SvTYPE(referrer) == SVt_PVGV ||
-			   SvTYPE(referrer) == SVt_PVLV) {
+		} else if (SvTYPE(referrer) == SVt_PVGV) {
 		    /* You lookin' at me?  */
 		    assert(GvSTASH(referrer));
 		    assert(GvSTASH(referrer) == (HV*)sv);
@@ -4230,14 +4214,6 @@ Perl_sv_clear_body(pTHX_ SV *const sv)
 	}
 	av_undef((AV*)sv);
 	break;
-    case SVt_PVLV:
-	if (LvTYPE(sv) == 'T') { /* for tie: return HE to pool */
-	    SvREFCNT_dec(HeKEY_sv((HE*)LvTARG(sv)));
-	    HeNEXT((HE*)LvTARG(sv)) = PL_hv_fetch_ent_mh;
-	    PL_hv_fetch_ent_mh = (HE*)LvTARG(sv);
-	}
-	else if (LvTYPE(sv) != 't') /* unless tie: unrefcnted fake SV**  */
-	    SvREFCNT_dec(LvTARG(sv));
     case SVt_PVGV:
 	if (isGV_with_GP(sv)) {
             if(GvCVu((GV*)sv) && (stash = GvSTASH((GV*)sv)) && HvNAME_get(stash))
@@ -4364,12 +4340,12 @@ Perl_sv_clear(pTHX_ register SV *const sv)
 
     if (SvOBJECT(sv)) {
 	if (PL_defstash) {		/* Still have a symbol table? */
-	    GV* destructor = gv_fetchmethod(SvSTASH(sv), "DESTROY");
+	    CV* destructor = gv_fetchmethod(SvSTASH(sv), "DESTROY");
 	    if (destructor) {
 		if ( ! PL_destroyav )
 		    PL_destroyav = newAV();
 		av_push(PL_destroyav, SvREFCNT_inc(sv));
-		av_push(PL_destroyav, SvREFCNT_inc(GvCV(destructor)));
+		av_push(PL_destroyav, SvREFCNT_inc(cvTsv(destructor)));
 		return;
 	    }
 	}
@@ -6209,7 +6185,7 @@ Perl_newRV(pTHX_ SV *const sv)
 
     PERL_ARGS_ASSERT_NEWRV;
 
-    return newRV_noinc(SvREFCNT_inc_simple_NN(sv));
+    return newRV_noinc(SvREFCNT_inc_NN(sv));
 }
 
 /*
@@ -6429,7 +6405,7 @@ Perl_sv_pvn_force_flags(pTHX_ SV *const sv, STRLEN *const lp, const I32 flags)
 	    else
 		Perl_croak(aTHX_ "Can't coerce readonly %s to string", ref);
 	}
-	if ((SvTYPE(sv) > SVt_PVLV)
+	if ((SvTYPE(sv) > SVt_PVGV)
 	    || isGV_with_GP(sv))
 	    Perl_croak(aTHX_ "Can't coerce %s to string in %s", sv_reftype(sv,0),
 		OP_NAME(PL_op));
@@ -6488,11 +6464,6 @@ Perl_sv_reftype(pTHX_ const SV *const sv, const int ob)
 				else
 				    return "SCALAR";
 
-	case SVt_PVLV:		return (char *)  (SvROK(sv) ? "REF"
-				/* tied lvalues should appear to be
-				 * scalars for backwards compatitbility */
-				: (LvTYPE(sv) == 't' || LvTYPE(sv) == 'T')
-				    ? "SCALAR" : "LVALUE");
 	case SVt_PVAV:		return "ARRAY";
 	case SVt_PVHV:		return "HASH";
 	case SVt_PVCV:		return "CODE";
@@ -6765,7 +6736,7 @@ Perl_sv_bless(pTHX_ SV *const sv, HV *const stash)
     if (SvTYPE(tmpRef) != SVt_PVIO)
 	++PL_sv_objcount;
     SvUPGRADE(tmpRef, SVt_PVMG);
-    SvSTASH_set(tmpRef, (HV*)SvREFCNT_inc_simple(stash));
+    SvSTASH_set(tmpRef, HvREFCNT_inc(stash));
 
     if(SvSMAGICAL(tmpRef))
         if(mg_find(tmpRef, PERL_MAGIC_ext) || mg_find(tmpRef, PERL_MAGIC_uvar))
@@ -9011,10 +8982,6 @@ Perl_sv_tmprefcnt(pTHX_ SV *const sv)
 	break;
     case SVt_PVAV:
 	av_tmprefcnt((AV*)sv);
-	break;
-    case SVt_PVLV:
-	if (LvTYPE(sv) != 't' && LvTYPE(sv) != 'T') /* unless tie: unrefcnted fake SV**  */
-	    SvTMPREFCNT_inc(LvTARG(sv));
 	break;
     case SVt_PVGV:
 	if (isGV_with_GP(sv))

@@ -242,8 +242,7 @@ on this.
 
 =cut
 
-sub check {
-    my @($utmpl, $href, ?$verbose) =  @_;
+sub check($utmpl, $href, ?$verbose) {
 
     ### did we get the arguments we need? ###
     return if !$utmpl or !$href;

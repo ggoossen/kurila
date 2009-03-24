@@ -384,7 +384,7 @@ plan tests => 31 + 2 * nelems @tests;
 
 my $file = "xx-$^PID.pst";
 
-is(try { Storable::file_magic($file) }, undef, "empty file give undef");
+is(($: try { Storable::file_magic($file) }), undef, "empty file give undef");
 like($^EVAL_ERROR->{?description}, qq{/^Can't open '\Q$file\E':/}, "...and croaks");
 is(Storable::file_magic(__FILE__), undef, "not an image");
 

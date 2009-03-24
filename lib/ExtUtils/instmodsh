@@ -46,8 +46,7 @@ my %Module_Commands = %(
                        h => \&module_help,
                       );
 
-sub do_module($) {
-    my @($module) =  @_;
+sub do_module($)($module) {
 
     print(\*STDOUT, $Module_Help);
     MODULE_CMD: while (1) {
@@ -71,8 +70,7 @@ sub do_module($) {
 }
 
 
-sub list_installed {
-    my@($reply, $module) =  @_;
+sub list_installed($reply, $module) {
 
     my $class = ( <split(' ', $reply))[[1]];
     $class = 'all' unless $class;
@@ -88,8 +86,7 @@ sub list_installed {
 };
 
 
-sub list_directories {
-    my@($reply, $module) =  @_;
+sub list_directories($reply, $module) {
 
     my $class = ( <split(' ', $reply))[[1]];
     $class = 'all' unless $class;
@@ -105,8 +102,7 @@ sub list_directories {
 }
 
 
-sub create_archive {
-    my@($reply, $module) =  @_;
+sub create_archive($reply, $module) {
 
     my $file = ( <split(' ', $reply))[[1]];
 
@@ -127,8 +123,7 @@ sub create_archive {
 }
 
 
-sub validate_packlist {
-    my@($reply, $module) =  @_;
+sub validate_packlist($reply, $module) {
 
     if (my @missing = $Inst->validate($module)) {
         print(\*STDOUT, "Files missing from $module are:\n   ",

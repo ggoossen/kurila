@@ -230,8 +230,7 @@ sub pod_find
     %pods;
 }
 
-sub _check_for_duplicates {
-    my @($file, $name, $names_ref, $pods_ref) =  @_;
+sub _check_for_duplicates($file, $name, $names_ref, $pods_ref) {
     if(%$names_ref{?$name}) {
         warn "Duplicate POD found (shadowing?): $name ($file)\n";
         warn "    Already seen in ",
@@ -243,8 +242,7 @@ sub _check_for_duplicates {
     %$pods_ref{+$file} = $name;
 }
 
-sub _check_and_extract_name {
-    my @($file, $verbose, $root_rx) =  @_;
+sub _check_and_extract_name($file, $verbose, $root_rx) {
 
     # check extension or executable flag
     # this involves testing the .bat extension on Win32!
@@ -288,8 +286,7 @@ F<.bat>, F<.cmd> on Win32 and OS/2, or F<.com> on VMS, respectively.
 
 # basic simplification of the POD name:
 # basename & strip extension
-sub simplify_name {
-    my @($str) =  @_;
+sub simplify_name($str) {
     # remove all path components
     if ($^OS_NAME eq 'MacOS') {
         $str =~ s/^.*://s;

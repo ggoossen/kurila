@@ -27,11 +27,11 @@ if ($^OS_NAME eq 'unicos') { # See lib/Math/Complex.pm and t/lib/complex.t.
     $eps = 1e-10;
 }
 
-sub near ($$;$) {
-    my $e = defined @_[?2] ?? @_[2] !! $eps;
-    my $d = @_[1] ?? abs(@_[0]/@_[1] - 1) !! abs(@_[0]);
-    print \*STDOUT, "# near? @_[0] @_[1] : $d : $e\n";
-    @_[1] ?? ($d +< $e) !! abs(@_[0]) +< $e;
+sub near ($v, $w, ?$e) {
+    $e //= $eps;
+    my $d = $w ?? abs($v/$w - 1) !! abs($v);
+    print \*STDOUT, "# near? $v $w : $d : $e\n";
+    $w ?? ($d +< $e) !! abs($v) +< $e;
 }
 
 print \*STDOUT, "# Sanity checks\n";

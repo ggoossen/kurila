@@ -33,8 +33,7 @@ sub import {
     }
 }
 
-sub new {
-    my @($class,%< %arg) =  @_;
+sub new($class,%< %arg) {
     my $sock = $class->SUPER::new();
 
     $sock->autoflush(1);
@@ -47,13 +46,11 @@ sub new {
 
 my @domain2pkg;
 
-sub register_domain {
-    my@($p,$d) =  @_;
+sub register_domain($p,$d) {
     @domain2pkg[+$d] = $p;
 }
 
-sub configure {
-    my @($sock,$arg) =  @_;
+sub configure($sock,$arg) {
     my $domain = delete $arg->{Domain};
 
     die 'IO::Socket: Cannot configure a generic socket'
@@ -200,8 +197,7 @@ sub bind {
 			      !! undef;
 }
 
-sub listen {
-    my @($sock,?$queue) =  @_;
+sub listen($sock,?$queue) {
     $queue = 5
 	unless $queue && $queue +> 0;
 

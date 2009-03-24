@@ -382,9 +382,7 @@ BEGIN {
 EXPECT
 inner
 ########
-sub pipe_to_fork ($$) {
-    my $parent = shift;
-    my $child = shift;
+sub pipe_to_fork ($parent, $child) {
     pipe($child, $parent) or die;
     my $pid = fork();
     die "fork() failed: $^OS_ERROR" unless defined $pid;
@@ -408,9 +406,7 @@ else {
     exit;
 }
 
-sub pipe_from_fork ($$) {
-    my $parent = shift;
-    my $child = shift;
+sub pipe_from_fork ($parent, $child) {
     pipe($parent, $child) or die;
     my $pid = fork();
     die "fork() failed: $^OS_ERROR" unless defined $pid;

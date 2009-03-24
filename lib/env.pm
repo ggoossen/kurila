@@ -1,14 +1,12 @@
 package env;
 
-sub temp_set_var {
-    my @($key, $value) = @_;
+sub temp_set_var($key, $value) {
     push dynascope->{parent}->{onleave}, make_restore_var($key);
     set_var($key, $value);
     return;
 }
 
-sub make_restore_var {
-    my @($key) = @_;
+sub make_restore_var($key) {
     my $old_value = env::var($key);
     my $restore_var = sub {
         set_var($key, $old_value);

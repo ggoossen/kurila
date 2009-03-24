@@ -103,7 +103,7 @@ PP(pp_rv2gv)
 		    }
 		    else {
 			const char * const name = CopSTASHPV(PL_curcop);
-			gv = newGVgen(name);
+			gv = GvREFCNT_inc(newGVgen(name));
 		    }
 		    prepare_SV_for_RV(sv);
 		    SvRV_set(sv, (SV*)gv);
@@ -292,10 +292,7 @@ PP(pp_rv2cv)
     CV *cv = sv_2cv(TOPs, &gv, flags);
     if (cv) {
 	if (CvCLONE(cv))
-	    cv = (CV*)sv_2mortal((SV*)cv_clone(cv));
-	if ((PL_op->op_private & OPpLVAL_INTRO)) {
-	    DIE(aTHX_ "Can't modify non-lvalue subroutine call");
-	}
+	    cv = svTcv(sv_mortalcopy(cvTsv(cv)));
     }
     else if ((flags == (GV_ADD|GV_NOEXPAND)) && gv && SvROK(gv)) {
 	cv = (CV*)gv;
@@ -388,7 +385,7 @@ PP(pp_anoncode)
     CV* cv = (CV*)PAD_SV(PL_op->op_targ);
     if ( CvPADLIST(cv) && 
 	( SvIV(PADLIST_NAMESV(CvPADLIST(cv), PAD_FLAGS_INDEX)) & PADf_CLONE ) )
-	cv = (CV*)sv_2mortal((SV*)cv_clone(cv));
+	cv = svTcv(sv_mortalcopy(cvTsv(cv)));
     EXTEND(SP,1);
     PUSHs((SV*)cv);
     RETURN;
@@ -585,7 +582,7 @@ PP(pp_study)
 	SvSCREAM_off(PL_lastscream);
 	SvREFCNT_dec(PL_lastscream);
     }
-    PL_lastscream = SvREFCNT_inc_simple(sv);
+    PL_lastscream = SvREFCNT_inc(sv);
 
     s = (unsigned char*)(SvPV(sv, len));
     pos = len;
@@ -713,7 +710,7 @@ PP(pp_undef)
 PP(pp_predec)
 {
     dVAR; dSP;
-    if (SvTYPE(TOPs) >= SVt_PVGV && SvTYPE(TOPs) != SVt_PVLV)
+    if (SvTYPE(TOPs) >= SVt_PVGV)
 	DIE(aTHX_ PL_no_modify);
     if (!SvREADONLY(TOPs) && SvIOK_notUV(TOPs) && !SvNOK(TOPs) && !SvPOK(TOPs)
         && SvIVX(TOPs) != IV_MIN)
@@ -752,7 +749,7 @@ PP(pp_postinc)
 PP(pp_postdec)
 {
     dVAR; dSP; dTARGET;
-    if (SvTYPE(TOPs) >= SVt_PVGV && SvTYPE(TOPs) != SVt_PVLV)
+    if (SvTYPE(TOPs) >= SVt_PVGV)
 	DIE(aTHX_ PL_no_modify);
     sv_setsv(TARG, TOPs);
     if (!SvREADONLY(TOPs) && SvIOK_notUV(TOPs) && !SvNOK(TOPs) && !SvPOK(TOPs)
@@ -1338,7 +1335,7 @@ PP(pp_repeat)
     else
 	 count = SvIV(sv);
     if (SvAVOK(TOPs)) {
-	AV* src = SvAv(POPs);
+	AV* src = svTav(POPs);
 	AV* dst = av_2mortal(newAV());
 	const IV len = av_len(src);
 	IV i;
@@ -1347,7 +1344,7 @@ PP(pp_repeat)
 		av_push(dst, newSVsv(*av_fetch(src, i, 0)));
 	    }
 	}
-	PUSHs(AvSv(dst));
+	PUSHs(avTsv(dst));
     }
     else {	/* Note: mark already snarfed by pp_list */
 	SV * const tmpstr = POPs;
@@ -2149,7 +2146,7 @@ PP(pp_complement)
 	register I32 anum;
 	STRLEN len;
 
-	(void)SvPV_nomg_const(sv,len); /* force check for uninit var */
+	(void)SvPV_const(sv,len); /* force check for uninit var */
 	sv_setsv_nomg(TARG, sv);
 	tmps = SvPV_force(TARG, len);
 	anum = len;
@@ -2914,7 +2911,7 @@ PP(pp_ucfirst)
     STRLEN tculen;
 
     if (SvOK(source)) {
-	s = SvPV_nomg_const(source, slen);
+	s = SvPV_const(source, slen);
     } else {
 	if (ckWARN(WARN_UNINITIALIZED))
 	    report_uninit(source);
@@ -3025,7 +3022,7 @@ PP(pp_uc)
 	   little games.  */
 
 	if (SvOK(source)) {
-	    s = SvPV_nomg_const(source, len);
+	    s = SvPV_const(source, len);
 	} else {
 	    if (ckWARN(WARN_UNINITIALIZED))
 		report_uninit(source);
@@ -3106,7 +3103,7 @@ PP(pp_lc)
 	   little games.  */
 
 	if (SvOK(source)) {
-	    s = SvPV_nomg_const(source, len);
+	    s = SvPV_const(source, len);
 	} else {
 	    if (ckWARN(WARN_UNINITIALIZED))
 		report_uninit(source);
@@ -3256,13 +3253,13 @@ PP(pp_aslice)
 	SV* svsrc = POPs;
 	if ( ! SvAVOK(svsrc) )
 	    Perl_croak(aTHX_ "source must be the ARRAY not %s", Ddesc(svsrc));
-	src = SvAv(svsrc);
+	src = svTav(svsrc);
     }
 
     slice = av_mortalcopy(slice);
 
     if ( ! ( op_flags & OPf_ASSIGN_PART ) )
-	XPUSHs(AvSv(slice));
+	XPUSHs(avTsv(slice));
 
     sliceitem = AvARRAY(slice);
 
@@ -3371,7 +3368,7 @@ PP(pp_delete)
 	if ( ! SvAVOK(slice) )
 	    Perl_croak(aTHX_ "slice expected an array as slice index, but got %s", Ddesc(slice));
 
-	slicecopy = av_mortalcopy(SvAv(slice));
+	slicecopy = av_mortalcopy(svTav(slice));
 	items = AvARRAY(slicecopy);
 	avlen = av_len(slicecopy);
 
@@ -3382,7 +3379,7 @@ PP(pp_delete)
 		Perl_croak(aTHX_ "array slice expected an array but got a %s", Ddesc(sv));
 
 	    for (i = 0; i <= avlen; i++) {
-		SV * const delsv = av_delete(SvAv(sv), SvIV(items[i]), 0);
+		SV * const delsv = av_delete(svTav(sv), SvIV(items[i]), 0);
 		SVcpREPLACE(items[i], delsv ? delsv : &PL_sv_undef );
 	    }
 	}
@@ -3392,13 +3389,13 @@ PP(pp_delete)
 		Perl_croak(aTHX_ "hash slice expected an array but got a %s", Ddesc(sv));
 
 	    for (i = 0; i <= avlen; i++) {
-		SV * const delsv = hv_delete_ent(SvHv(sv), items[i], 0, 0);
+		SV * const delsv = hv_delete_ent(svThv(sv), items[i], 0, 0);
 		SVcpREPLACE(items[i], delsv ? delsv : &PL_sv_undef );
 	    }
 	}
 
 	if ( ! discard)
-	    XPUSHs(AvSv(slicecopy));
+	    XPUSHs(avTsv(slicecopy));
     }
     else {
 	SV *keysv = POPs;
@@ -3430,12 +3427,8 @@ PP(pp_exists)
     SV *sv;
 
     if (PL_op->op_private & OPpEXISTS_SUB) {
-	GV *gv;
 	SV * const cvsv = POPs;
-	CV * const cv = sv_2cv(cvsv, &gv, 0);
-	if (cv)
-	    RETPUSHYES;
-	if (gv && isGV(gv) && GvCV(gv) && !GvCVGEN(gv))
+	if (cvsv && SvOK(cvsv))
 	    RETPUSHYES;
 	RETPUSHNO;
     }
@@ -3474,7 +3467,7 @@ PP(pp_hslice)
 	Perl_croak(aTHX_ "Not a HASH");
 
     if ( ! SvAVOK(slice) )
-	Perl_croak(aTHX_ "%s expected an ARRAY but got %s", OP_DESC(PL_op), Ddesc(AvSv(slice)));
+	Perl_croak(aTHX_ "%s expected an ARRAY but got %s", OP_DESC(PL_op), Ddesc(avTsv(slice)));
 
     if (op_flags & OPf_ASSIGN) {
 	SV* newv;
@@ -3497,7 +3490,7 @@ PP(pp_hslice)
 	if ( ! SvAVOK(newv))
 	    Perl_croak(aTHX_ "Value of hash slice must be ARRAY not %s",
 		Ddesc(newv));
-	newav = SvAv(newv);
+	newav = svTav(newv);
 
 	if ( ! partial) {
 	    ret = av_2mortal(newAV());
@@ -3538,12 +3531,12 @@ PP(pp_hslice)
 	    sliceitem++;
 	}
 	if ( ! partial)
-	    XPUSHs(AvSv(ret));
+	    XPUSHs(avTsv(ret));
 	RETURN;
     }
 
     slice = av_mortalcopy(slice);
-    XPUSHs(AvSv(slice));
+    XPUSHs(avTsv(slice));
 
     sliceitem = AvARRAY(slice);
     if (!sliceitem)
@@ -3692,7 +3685,7 @@ PP(pp_enter_anonarray_assign)
 	Perl_croak(aTHX_ "Expected ARRAY but got %s", Ddesc(sv));
     if ( ! ( PL_op->op_flags & OPf_ASSIGN_PART ) )
 	XPUSHs(sv_mortalcopy(sv));
-    av = SvAv(sv);
+    av = svTav(sv);
     len = av_len(av);
     PUSHMARK(SP);
     for (i = len; i >= 0; i--) {
@@ -3754,7 +3747,7 @@ PP(pp_enter_anonhash_assign)
 	Perl_croak(aTHX_ "%s expects a HASH but got %s", OP_DESC(PL_op), Ddesc(value_sv));
     if ( ! ( PL_op->op_flags & OPf_ASSIGN_PART ) )
 	*MARK = sv_mortalcopy(value_sv);
-    value = SvHv(sv_mortalcopy(value_sv));
+    value = svThv(sv_mortalcopy(value_sv));
     for (key = SP; key > MARK; key -= 2) {
 	SV *elem_value = hv_delete_ent(value, *key, FALSE, 0);
 	bool is_optional = (key[-1] == &PL_sv_yes);
@@ -3848,7 +3841,7 @@ PP(pp_enter_arrayexpand_assign)
     }
 
     PUSHMARK(SP);
-    XPUSHs(AvSv(av));
+    XPUSHs(avTsv(av));
 
     RETURN;
 }
@@ -3858,7 +3851,7 @@ PP(pp_enter_hashexpand_assign)
     dSP;
     const I32 gimme = GIMME_V;
     SV** base = PL_stack_base + TOPMARK;
-    HV* hv = SvHv(sv_2mortal(HvSv(newHV())));
+    HV* hv = svThv(sv_2mortal(hvTsv(newHV())));
     IV duplicates = 0;
     
     while (SP > base) {	/* gobble up all the rest */
@@ -3879,7 +3872,7 @@ PP(pp_enter_hashexpand_assign)
     }
 
     PUSHMARK(SP);
-    XPUSHs(HvSv(hv));
+    XPUSHs(hvTsv(hv));
 
     RETURN;
 }
@@ -4253,7 +4246,7 @@ PP(pp_push)
 
     if ( ! SvAVOK(ary) ) {
 	Perl_croak(aTHX_ "First argument to %s must be an ARRAY not %s", 
-	    OP_DESC(PL_op), Ddesc(AvSv(ary)));
+	    OP_DESC(PL_op), Ddesc(avTsv(ary)));
     }
 
     {
@@ -4325,7 +4318,7 @@ PP(pp_reverse)
     }
 
     ary = AvARRAY(av);
-    end = ary + av_len(SvAv(av));
+    end = ary + av_len(svTav(av));
     
     if (ary) {
 	while (ary < end) {
@@ -4351,7 +4344,7 @@ PP(pp_arrayjoin)
     }
 
     ary = AvARRAY(av);
-    end = ary + av_len(SvAv(av));
+    end = ary + av_len(svTav(av));
     
     if (ary) {
 	while (ary <= end) {
@@ -4363,14 +4356,14 @@ PP(pp_arrayjoin)
 		Perl_croak(aTHX_ "%s expected an ARRAY but got %s",
 		    OP_DESC(PL_op), Ddesc(tmp));
 	    }
-	    subary = AvARRAY(SvAv(tmp));
-	    sublen = av_len(SvAv(tmp));
+	    subary = AvARRAY(svTav(tmp));
+	    sublen = av_len(svTav(tmp));
 	    for (i=0; i<=sublen; i++)
 		av_push(newav, newSVsv(subary[i])); 
 	    ary++;
 	}
     }
-    PUSHs(AvSv(newav));
+    PUSHs(avTsv(newav));
     RETURN;
 }
 
@@ -4387,7 +4380,7 @@ PP(pp_hashjoin)
     }
 
     ary = AvARRAY(av);
-    end = ary + av_len(SvAv(av));
+    end = ary + av_len(svTav(av));
     
     if (ary) {
 	while (ary <= end) {
@@ -4397,7 +4390,7 @@ PP(pp_hashjoin)
 		Perl_croak(aTHX_ "%s expected an ARRAY but got %s",
 		    OP_DESC(PL_op), Ddesc(*ary));
 	    }
-	    tmp = SvHv(*ary);
+	    tmp = svThv(*ary);
 	    (void)hv_iterinit(tmp);
 
 	    while ((entry = hv_iternext(tmp))) {
@@ -4407,7 +4400,7 @@ PP(pp_hashjoin)
 	    ary++;
 	}
     }
-    PUSHs(HvSv(newhv));
+    PUSHs(hvTsv(newhv));
     RETURN;
 }
 
@@ -4429,11 +4422,11 @@ PP(pp_arrayconcat)
 	    OP_DESC(PL_op), Ddesc(left));
     }
 
-    res = SvAv(sv_2mortal(newSVsv(left)));
-    TOPs = AvSv(res);
+    res = svTav(sv_2mortal(newSVsv(left)));
+    TOPs = avTsv(res);
     
-    ary = AvARRAY(SvAv(right));
-    len = av_len(SvAv(right));
+    ary = AvARRAY(svTav(right));
+    len = av_len(svTav(right));
     for (i=0; i<=len; i++)
 	av_push(res, newSVsv(ary[i])); 
 
@@ -4457,9 +4450,9 @@ PP(pp_hashconcat)
 	    OP_DESC(PL_op), Ddesc(left));
     }
 
-    res = SvHv(sv_2mortal(newSVsv(left)));
-    TOPs = HvSv(res);
-    right_hv = SvHv(right);
+    res = svThv(sv_2mortal(newSVsv(left)));
+    TOPs = hvTsv(res);
+    right_hv = svThv(right);
 
     (void)hv_iterinit(right_hv);
     
@@ -4496,11 +4489,7 @@ PP(pp_split)
     U32 make_mortal = 0;
     bool multiline = 0;
 
-#ifdef DEBUGGING
-    Copy(&LvTARGOFF(POPs), &pm, 1, PMOP*);
-#else
     pm = (PMOP*)POPs;
-#endif
     if (!pm || !s)
 	DIE(aTHX_ "panic: pp_split");
     rx = PM_GETRE(pm);
@@ -4673,7 +4662,7 @@ PP(pp_split)
     PUTBACK;
     LEAVE_SCOPE(oldsave); /* may undo an earlier SWITCHSTACK */
     SPAGAIN;
-    XPUSHs(AvSv(av));
+    XPUSHs(avTsv(av));
     RETURN;
 }
 

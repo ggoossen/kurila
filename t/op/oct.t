@@ -6,8 +6,7 @@ print \*STDOUT, "1..71\n";
 
 my $test = 1;
 
-sub test ($$$) {
-  my @($act, $string, $value) =  @_;
+sub test($act, $string, $value) {
   my $result;
   if ($act eq 'oct') {
     $result = oct $string;

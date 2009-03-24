@@ -128,7 +128,7 @@ sub pw_has {
     return $cando;
 }
 
-sub _populate (@) {
+sub _populate {
     return unless (nelems @_);
     my $pwob = new();
 
@@ -169,10 +169,10 @@ sub _populate (@) {
     return $pwob;
 }
 
-sub getpwent ( ) { _populate(CORE::getpwent()) }
-sub getpwnam ($) { _populate(CORE::getpwnam(shift)) }
-sub getpwuid ($) { _populate(CORE::getpwuid(shift)) }
-sub getpw    ($) { (@_[0] =~ m/^\d+\z/s) ?? &getpwuid( < @_ ) !! &getpwnam( < @_ ) }
+sub getpwent () { _populate(CORE::getpwent()) }
+sub getpwnam ($v) { _populate(CORE::getpwnam($v)) }
+sub getpwuid ($v) { _populate(CORE::getpwuid($v)) }
+sub getpw    ($v) { ($v =~ m/^\d+\z/s) ?? &getpwuid($v) !! &getpwnam($v) }
 
 _feature_init();
 

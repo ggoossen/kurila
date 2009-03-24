@@ -2,25 +2,25 @@
 
 print \*STDOUT, "1..145\n";
 
-sub tryok ($$) {
-   print(\*STDOUT,  (@_[1] ?? "ok" !! "not ok"), " @_[0]\n" );
+sub tryok($nr, $ok) {
+   print(\*STDOUT,  ($ok ?? "ok" !! "not ok"), " $nr\n" );
 }
-sub tryeq ($$$) {
-  if (@_[1] == @_[2]) {
-    print \*STDOUT, "ok @_[0]\n";
+sub tryeq ($nr, $got, $expected) {
+  if ($got == $expected) {
+    print \*STDOUT, "ok $nr\n";
   } else {
-    print \*STDOUT, "not ok @_[0] # @_[1] != @_[2]\n";
+    print \*STDOUT, "not ok $nr # $got != $expected\n";
   }
 }
-sub tryeq_sloppy ($$$) {
-  if (@_[1] == @_[2]) {
-    print \*STDOUT, "ok @_[0]\n";
+sub tryeq_sloppy ($nr, $got, $expected) {
+  if ($got == $expected) {
+    print \*STDOUT, "ok $nr\n";
   } else {
-    my $error = abs (@_[1] - @_[2]) / @_[1];
+    my $error = abs ($got - $expected) / $expected;
     if ($error +< 1e-9) {
-      print \*STDOUT, "ok @_[0] # @_[1] is close to @_[2], \$^O eq $^OS_NAME\n";
+      print \*STDOUT, "ok $nr # $got is close to $expected, \$^O eq $^OS_NAME\n";
     } else {
-      print \*STDOUT, "not ok @_[0] # @_[1] != @_[2]\n";
+      print \*STDOUT, "not ok $nr # $got != $expected\n";
     }
   }
 }

@@ -177,8 +177,7 @@ returns the definition of the CCCMD macro which uses these parts.
 
 #'
 
-sub cflags {
-    my@($self, ?$libperl) =  @_;
+sub cflags($self, ?$libperl) {
     return $self->{?CFLAGS} if $self->{?CFLAGS};
     return '' unless $self->needs_linking();
 
@@ -282,8 +281,7 @@ definition in CONST_CCCMD.
 
 =cut
 
-sub const_cccmd {
-    my @($self,?$libperl)=  @_;
+sub const_cccmd($self,?$libperl) {
     return $self->{?CONST_CCCMD} if $self->{?CONST_CCCMD};
     return '' unless $self->needs_linking();
     return $self->{+CONST_CCCMD} =
@@ -361,8 +359,7 @@ Prints out macros for lots of constants.
 
 =cut
 
-sub constants {
-    my@($self) =  @_;
+sub constants($self) {
     my @m = @( () );
 
     $self->{+DFSEP} = '$(DIRFILESEP)';  # alias for internal use
@@ -482,8 +479,7 @@ Same as macro for the depend attribute.
 
 =cut
 
-sub depend {
-    my@($self,%< %attribs) =  @_;
+sub depend($self,%< %attribs) {
     my(@m,$key,$val);
     while (@(?$key,?$val) =@( each %attribs)){
 	last unless defined $key;
@@ -595,8 +591,7 @@ init_dist.
 
 =cut
 
-sub dist {
-    my@($self, %< %attribs) =  @_;
+sub dist($self, %< %attribs) {
 
     my $make = '';
     foreach my $key (qw( 
@@ -850,8 +845,7 @@ Defines targets for bootstrap files.
 
 =cut
 
-sub dynamic_bs {
-    my@($self, %< %attribs) =  @_;
+sub dynamic_bs($self, %< %attribs) {
     return '
 BOOTSTRAP =
 ' unless $self->has_link_code();
@@ -885,8 +879,7 @@ Defines how to produce the *.so (or equivalent) files.
 
 =cut
 
-sub dynamic_lib {
-    my@($self, %< %attribs) =  @_;
+sub dynamic_lib($self, %< %attribs) {
     return '' unless $self->needs_linking(); #might be because of a subdir
 
     return '' unless $self->has_link_code;
@@ -966,8 +959,7 @@ Deprecated method. Use libscan instead.
 
 =cut
 
-sub exescan {
-    my@($self,$path) =  @_;
+sub exescan($self,$path) {
     $path;
 }
 
@@ -978,8 +970,7 @@ L<ExtUtils::Liblist> for details.
 
 =cut
 
-sub extliblist {
-    my@($self,$libs) =  @_;
+sub extliblist($self,$libs) {
     require ExtUtils::Liblist;
     $self->ext($libs, $Verbose);
 }
@@ -990,8 +981,7 @@ Finds the executables PERL and FULLPERL
 
 =cut
 
-sub find_perl {
-    my@($self, $ver, $names, $dirs, $trace) =  @_;
+sub find_perl($self, $ver, $names, $dirs, $trace) {
 
     if ($trace +>= 2){
         print \*STDOUT, "Looking for perl $ver by these names:
@@ -1070,8 +1060,7 @@ Inserts the sharpbang or equivalent magic number to a set of @files.
 
 =cut
 
-sub fixin {    # stolen from the pink Camel book, more or less
-    my @( $self, @< @files ) =  @_;
+sub fixin( $self, @< @files) {
 
     my @($does_shbang) = @: %Config{?'sharpbang'} =~ m/^\s*\#\!/;
     for my $file ( @files) {
@@ -1169,8 +1158,7 @@ eval 'exec $interpreter $arg -S \$0 \$\{1+"\$\@"\}'
 }
 
 
-sub _rename {
-    my@($old, $new) =  @_;
+sub _rename($old, $new) {
 
     foreach my $file (@($old, $new)) {
         if( %Is{?VMS} and basename($file) !~ m/\./ ) {
@@ -1208,8 +1196,7 @@ NAME attribute.
 
 # ';
 
-sub guess_name {
-    my@($self) =  @_;
+sub guess_name($self) {;
     use Cwd 'cwd';
     my $name = basename( <cwd());
     $name =~ s|[\-_][\d\.\-]+\z||;  # this is new with MM 5.00, we
@@ -1247,8 +1234,7 @@ Called by init_main.
 
 =cut
 
-sub init_dirscan {	# --- File and Directory Lists (.xs .pm .pod etc)
-    my@($self) =  @_;
+sub init_dirscan($self) {
     my(%dir, %xs, %c, %h, %pl_files, %pm);
 
     my %ignore = %( <@+: map {@( $_ => 1 )}, qw(Makefile.PL Build.PL test.pl t) );
@@ -1330,8 +1316,7 @@ sub init_MANPODS {
 }
 
 
-sub _has_pod {
-    my@($self, $file) =  @_;
+sub _has_pod($self, $file) {
 
     my $ispod=0;
     if (open( my $fh, '<', $file )) {
@@ -1357,8 +1342,7 @@ Initializes MAN1PODS from the list of EXE_FILES.
 
 =cut
 
-sub init_MAN1PODS {
-    my@($self) =  @_;
+sub init_MAN1PODS($self) {
 
     if ( exists $self->{EXE_FILES} ) {
 	foreach my $name ( @{$self->{EXE_FILES}}) {
@@ -1540,8 +1524,7 @@ VERSION_SYM, XS_VERSION.
 
 =cut
 
-sub init_main {
-    my@($self) =  @_;
+sub init_main($self) {
 
     # --- Initialize Module Name and Paths
 
@@ -2079,8 +2062,7 @@ Defines the install target.
 
 =cut
 
-sub install {
-    my@($self, %< %attribs) =  @_;
+sub install($self, %< %attribs) {
     my(@m);
 
     push @m, q{
@@ -2266,8 +2248,7 @@ Defines the linkext target which in turn defines the LINKTYPE.
 
 =cut
 
-sub linkext {
-    my@($self, %< %attribs) =  @_;
+sub linkext($self, %< %attribs) {
     # LINKTYPE => static or dynamic or ''
     my $linktype = defined %attribs{?LINKTYPE} ??
       %attribs{?LINKTYPE} !! '$(LINKTYPE)';
@@ -2284,9 +2265,8 @@ all entries in the directory that match the regular expression.
 
 =cut
 
-sub lsdir {
-    my $self = shift;
-    my @($dir, ?$regex) =  @_;
+sub lsdir($self, $dir, ?$regex) {
+
     my(@ls);
     my $dh = DirHandle->new();
     $dh->open($dir || ".") or return ();
@@ -2303,8 +2283,7 @@ into the Makefile.
 
 =cut
 
-sub macro {
-    my@($self,%< %attribs) =  @_;
+sub macro($self,%< %attribs) {
     my(@m,$key,$val);
     while (@(?$key,?$val) =@( each %attribs)){
 	last unless defined $key;
@@ -2324,8 +2303,7 @@ DynaLoader_pure_p1_c0_032.a are automatically ignored to avoid link errors.)
 
 =cut
 
-sub makeaperl {
-    my@($self, %< %attribs) =  @_;
+sub makeaperl($self, %< %attribs) {
     my@($makefilename, $searchdirs, $static, $extra, $perlinc, $target, $tmp, $libperl) = 
 	%attribs{[qw(MAKE DIRS STAT EXTRA INCL TARGET TMP LIBPERL)]};
     my(@m);
@@ -2601,8 +2579,7 @@ Returns true, if the argument is likely to be a command.
 
 =cut
 
-sub maybe_command {
-    my@($self,$file) =  @_;
+sub maybe_command($self,$file) {
     return $file if -x $file && ! -d $file;
     return;
 }
@@ -2642,8 +2619,7 @@ parse a file and return what you think is the ABSTRACT
 
 =cut
 
-sub parse_abstract {
-    my@($self,$parsefile) =  @_;
+sub parse_abstract($self,$parsefile) {
     my $result;
 
     local $^INPUT_RECORD_SEPARATOR = "\n";
@@ -2679,8 +2655,7 @@ parse_version() will try to C<use version> before checking for C<$VERSION> so th
 
 =cut
 
-sub parse_version {
-    my@($self,$parsefile) =  @_;
+sub parse_version($self,$parsefile) {
     my $result;
 
     local $^INPUT_RECORD_SEPARATOR = "\n";
@@ -2766,8 +2741,7 @@ any ordinary, readable file.
 
 =cut
 
-sub perl_script {
-    my@($self,$file) =  @_;
+sub perl_script($self,$file) {
     return $file if -r $file && -f _;
     return;
 }
@@ -2947,8 +2921,7 @@ for a binary distribution.
 
 =cut
 
-sub ppd {
-    my@($self) =  @_;
+sub ppd($self) {
 
     my $pack_ver = join ",", @( < split(m/\./, $self->{?VERSION}), < $: @(0)x4)[[0..3]];
 
@@ -3046,8 +3019,7 @@ simply use '/home/foo/man/man1'.
 
 =cut
 
-sub prefixify {
-    my@($self,$var,$sprefix,$rprefix,$default) =  @_;
+sub prefixify($self,$var,$sprefix,$rprefix,$default) {
 
     my $path = $self->{?uc $var} || 
                %Config_Override{?lc $var} || %Config{?lc $var} || '';
@@ -3153,8 +3125,7 @@ safe for a man page file name.  Returns the replacement.
 
 =cut
 
-sub replace_manpage_separator {
-    my@($self,$man) =  @_;
+sub replace_manpage_separator($self,$man) {
 
     $man =~ s,/+,::,g;
     return $man;
@@ -3165,8 +3136,7 @@ sub replace_manpage_separator {
 
 =cut
 
-sub cd {
-    my@($self, $dir, @< @cmds) =  @_;
+sub cd($self, $dir, @< @cmds) {
 
     # No leading tab and no trailing newline makes for easier embedding
     my $make_frag = join "\n\t", map { "cd $dir && $_" }, @cmds;
@@ -3178,8 +3148,7 @@ sub cd {
 
 =cut
 
-sub oneliner {
-    my@($self, $cmd, ?$switches) =  @_;
+sub oneliner($self, $cmd, ?$switches) {
     $switches = \@() unless defined $switches;
 
     # Strip leading and trailing newlines
@@ -3200,8 +3169,7 @@ sub oneliner {
 
 =cut
 
-sub quote_literal {
-    my@($self, $text) =  @_;
+sub quote_literal($self, $text) {
 
     # I think all we have to quote is single quotes and I think
     # this is a safe way to do it.
@@ -3215,8 +3183,7 @@ sub quote_literal {
 
 =cut
 
-sub escape_newlines {
-    my@($self, $text) =  @_;
+sub escape_newlines($self, $text) {
 
     $text =~ s{\n}{\\\n}g;
 
@@ -3270,8 +3237,7 @@ Defines how to produce the *.a (or equivalent) files.
 
 =cut
 
-sub static_lib {
-    my@($self) =  @_;
+sub static_lib($self) {
     return '' unless $self->has_link_code;
 
     my(@m);
@@ -3315,8 +3281,7 @@ Calls makeaperl.
 
 =cut
 
-sub staticmake {
-    my@($self, %< %attribs) =  @_;
+sub staticmake($self, %< %attribs) {
     my(@static);
 
     my@(@searchdirs)=@(@($self->{?PERL_ARCHLIB}, $self->{?SITEARCHEXP},  $self->{?INST_ARCHLIB}));
@@ -3357,8 +3322,7 @@ Helper subroutine for subdirs
 
 =cut
 
-sub subdir_x {
-    my@($self, $subdir) =  @_;
+sub subdir_x($self, $subdir) {
 
     my $subdir_cmd = $self->cd($subdir, 
       '$(MAKE) $(USEMAKEFILE) $(FIRST_MAKEFILE) all $(PASTHRU)'
@@ -3406,10 +3370,7 @@ Defines the test targets.
 
 =cut
 
-sub test {
-# --- Test and Installation Sections ---
-
-    my@($self, %< %attribs) =  @_;
+sub test($self, %< %attribs) {
     my $tests = %attribs{?TESTS} || '';
     if (!$tests && -d 't') {
         $tests = $self->find_tests;
@@ -3483,8 +3444,7 @@ PERL_DL_NONLAZY set for tests.
 
 =cut
 
-sub test_via_harness {
-    my@($self, $perl, $tests) =  @_;
+sub test_via_harness($self, $perl, $tests) {
     return $self->SUPER::test_via_harness("PERL_DL_NONLAZY=1 $perl", $tests);
 }
 
@@ -3494,8 +3454,7 @@ Again, the PERL_DL_NONLAZY thing.
 
 =cut
 
-sub test_via_script {
-    my@($self, $perl, $script) =  @_;
+sub test_via_script($self, $perl, $script) {
     return $self->SUPER::test_via_script("PERL_DL_NONLAZY=1 $perl", $script);
 }
 
@@ -3657,9 +3616,7 @@ Obsolete, deprecated method. Not used since Version 5.21.
 
 =cut
 
-sub writedoc {
-# --- perllocal.pod section ---
-    my@($self,$what,$name,@< @attribs)=  @_;
+sub writedoc($self,$what,$name,@< @attribs) {
     my $time = localtime;
     print \*STDOUT, "=head2 $time: $what C<$name>\n\n=over 4\n\n=item *\n\n";
     print \*STDOUT, join "\n\n=item *\n\n", map( {"C<$_>" }, @attribs);

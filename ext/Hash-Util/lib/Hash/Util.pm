@@ -120,10 +120,9 @@ Both routines return a reference to the hash operated on.
 
 =cut
 
-sub lock_ref_keys {
-    my@($hash, @< @keys) =  @_;
+sub lock_ref_keys($hash, @< @keys) {
 
-    Internals::hv_clear_placeholders %$hash;
+    Internals::hv_clear_placeholders(%$hash);
     if( (nelems @keys) ) {
         my %keys = %( < @+: map { @($_ => 1) }, @keys );
         my %original_keys = %( < @+: map { @($_ => 1) }, keys %$hash );
@@ -135,7 +134,7 @@ sub lock_ref_keys {
         foreach my $k ( @keys) {
             $hash->{+$k} = undef unless exists $hash->{$k};
         }
-        Internals::HvRESTRICTED %$hash, 1;
+        Internals::HvRESTRICTED(%$hash, 1);
 
         foreach my $k ( @keys) {
             delete $hash->{$k} unless %original_keys{?$k};
@@ -155,8 +154,8 @@ sub unlock_ref_keys {
     return $hash;
 }
 
-sub   lock_keys (\%;@) {   lock_ref_keys(< @_) }
-sub unlock_keys (\%)   { unlock_ref_keys(< @_) }
+sub   lock_keys {   lock_ref_keys(< @_) }
+sub unlock_keys { unlock_ref_keys(< @_) }
 
 =item B<lock_keys_plus>
 
@@ -173,8 +172,7 @@ Returns a reference to %hash
 =cut
 
 
-sub lock_ref_keys_plus {
-    my @($hash,@< @keys)= @_;
+sub lock_ref_keys_plus($hash,@< @keys) {
     my @delete;
     Internals::hv_clear_placeholders(%$hash);
     foreach my $key ( @keys) {
@@ -188,7 +186,7 @@ sub lock_ref_keys_plus {
     return $hash
 }
 
-sub lock_keys_plus(\%;@) { lock_ref_keys_plus(< @_) }
+sub lock_keys_plus { lock_ref_keys_plus(< @_) }
 
 
 =item B<lock_value>
@@ -208,25 +206,23 @@ Returns a reference to the %hash.
 
 =cut
 
-sub lock_ref_value {
-    my@($hash, $key) =  @_;
+sub lock_ref_value($hash, $key) {
     # I'm doubtful about this warning, as it seems not to be true.
     # Marking a value in the hash as RO is useful, regardless
     # of the status of the hash itself.
     warn "Cannot usefully lock values in an unlocked hash"
       if !Internals::HvRESTRICTED(%$hash) && warnings::enabled;
-    Internals::SvREADONLY $hash->{?$key}, 1;
+    Internals::SvREADONLY($hash->{?$key}, 1);
     return $hash
 }
 
-sub unlock_ref_value {
-    my@($hash, $key) =  @_;
-    Internals::SvREADONLY $hash->{?$key}, 0;
+sub unlock_ref_value($hash, $key) {
+    Internals::SvREADONLY($hash->{?$key}, 0);
     return $hash
 }
 
-sub   lock_value (\%$) {   lock_ref_value(< @_) }
-sub unlock_value (\%$) { unlock_ref_value(< @_) }
+sub   lock_value {   lock_ref_value(< @_) }
+sub unlock_value { unlock_ref_value(< @_) }
 
 
 =item B<lock_hash>
@@ -272,8 +268,8 @@ sub unlock_hashref {
     return $hash;
 }
 
-sub   lock_hash (\%) {   lock_hashref(< @_) }
-sub unlock_hash (\%) { unlock_hashref(< @_) }
+sub   lock_hash {   lock_hashref(< @_) }
+sub unlock_hash { unlock_hashref(< @_) }
 
 =item B<lock_hash_recurse>
 
@@ -325,8 +321,8 @@ sub unlock_hashref_recurse {
     return $hash;
 }
 
-sub   lock_hash_recurse (\%) {   lock_hashref_recurse(< @_) }
-sub unlock_hash_recurse (\%) { unlock_hashref_recurse(< @_) }
+sub   lock_hash_recurse($hashref) {   lock_hashref_recurse($hashref) }
+sub unlock_hash_recurse($hashref) { unlock_hashref_recurse($hashref) }
 
 
 =item B<hash_unlocked>
@@ -342,7 +338,7 @@ sub hashref_unlocked {
     return Internals::HvRESTRICTED($hash)
 }
 
-sub hash_unlocked(\%) { hashref_unlocked(< @_) }
+sub hash_unlocked($hashref) { hashref_unlocked($hashref) }
 
 =for demerphqs_editor
 sub legal_ref_keys{}
@@ -351,8 +347,8 @@ sub all_keys{}
 
 =cut
 
-sub legal_keys(\%) { legal_ref_keys(< @_)  }
-sub hidden_keys(\%){ hidden_ref_keys(< @_) }
+sub legal_keys($hashref) { legal_ref_keys($hashref)  }
+sub hidden_keys($hashref){ hidden_ref_keys($hashref) }
 
 =item B<legal_keys>
 

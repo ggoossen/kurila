@@ -1240,10 +1240,10 @@ Perl_vdie_common(pTHX_ SV *msv, bool warn)
     }
 
     if ( SvCVOK(oldhook) ) {
-	cv = SvCv(oldhook);
+	cv = svTcv(oldhook);
     }
     else if ( SvROK(oldhook) && SvRV(oldhook) && SvCVOK(SvRV(oldhook)) ) {
-	cv = SvCv(SvRV(oldhook));
+	cv = svTcv(SvRV(oldhook));
     }
 
     if (cv && !CvDEPTH(cv) && (CvROOT(cv) || CvXSUB(cv))) {
@@ -1320,7 +1320,7 @@ Perl_vdie(pTHX_ const char* pat, va_list *args)
 	av_push(locav, newSViv(PL_parser->lex_line_number));
 	av_push(locav, newSViv((PL_parser->bufptr - PL_parser->linestart +
 		    PL_parser->lex_charoffset) + 1));
-	location = AvSv(locav);
+	location = avTsv(locav);
     }
     msv = vdie_croak_common(location, pat, args);
     die_where(msv);
@@ -3434,9 +3434,9 @@ Perl_my_fflush_all(pTHX)
 }
 
 void
-Perl_report_evil_fh(pTHX_ const GV *gv, const IO *io, I32 op)
+Perl_report_evil_fh(pTHX_ IO *io, I32 op)
 {
-    const char * const name = gv && isGV(gv) ? GvENAME(gv) : NULL;
+    const char * const name = io ? SvPVX_const(SvNAME(ioTsv(io))) : NULL;
 
     if (op == OP_phoney_OUTPUT_ONLY || op == OP_phoney_INPUT_ONLY) {
 	if (ckWARN(WARN_IO)) {
@@ -3455,7 +3455,7 @@ Perl_report_evil_fh(pTHX_ const GV *gv, const IO *io, I32 op)
         const char *vile;
 	I32   warn_type;
 
-	if (gv && io && IoTYPE(io) == IoTYPE_CLOSED) {
+	if (io && IoTYPE(io) == IoTYPE_CLOSED) {
 	    vile = "closed";
 	    warn_type = WARN_CLOSED;
 	}
@@ -3475,7 +3475,7 @@ Perl_report_evil_fh(pTHX_ const GV *gv, const IO *io, I32 op)
 	    const char * const type =
 		(const char *)
 		(OP_IS_SOCKET(op) ||
-		 (gv && io && IoTYPE(io) == IoTYPE_SOCKET) ?
+		 (io && IoTYPE(io) == IoTYPE_SOCKET) ?
 		 "socket" : "filehandle");
 	    if (name && *name) {
 		Perl_warner(aTHX_ packWARN(warn_type),
@@ -3490,7 +3490,7 @@ Perl_report_evil_fh(pTHX_ const GV *gv, const IO *io, I32 op)
 	    else {
 		Perl_warner(aTHX_ packWARN(warn_type),
 			    "%s%s on %s %s", func, pars, vile, type);
-		if (gv && io && IoDIRP(io) && !(IoFLAGS(io) & IOf_FAKE_DIRP))
+		if (io && IoDIRP(io) && !(IoFLAGS(io) & IOf_FAKE_DIRP))
 		    Perl_warner(
 			aTHX_ packWARN(warn_type),
 			"\t(Are you trying to call %s%s on dirhandle?)\n",

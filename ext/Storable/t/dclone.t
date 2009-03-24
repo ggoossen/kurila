@@ -71,8 +71,7 @@ print \*STDOUT, "ok 9\n";
 
 # [ID 20020221.007] SEGV in Storable with empty string scalar object
 package TestString;
-sub new {
-    my @($type, $string) =  @_;
+sub new($type, $string) {
     return bless(\$string, $type);
 }
 package main;

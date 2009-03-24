@@ -89,8 +89,7 @@ denote the same location as the original $path.
 =cut
 
 
-sub fileparse {
-  my @($fullname, @< @suffices) =  @_;
+sub fileparse($fullname, @< @suffices) {
 
   unless (defined $fullname) {
       die("fileparse(): need a valid pathname");

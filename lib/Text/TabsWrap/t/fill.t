@@ -93,9 +93,8 @@ while ((nelems @tests)) {
 	$tn++;
 }
 
-sub write_file
+sub write_file($f, @< @data)
 {
-	my @($f, @< @data) =  @_;
 
 	open(my $fh, ">", "$f") || die "open >$f: $^OS_ERROR";
 	(print $fh, < @data) || die "write $f: $^OS_ERROR";

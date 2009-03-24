@@ -129,8 +129,7 @@ do {
 my $out = "";
 open my $out_fh, '>>', \$out or die;
 
-sub do_with_out {
-    my @($sub) = @_;
+sub do_with_out($sub) {
     open my $real_stdout, ">&", \*STDOUT;
     close \*STDOUT;
     *STDOUT = *$out_fh{IO};
@@ -256,11 +255,9 @@ my $graph_dissassembly =
     \n[ \t]*(\w+)[ \t]+([0-9.]+(?:/s)?)[ \t]+(-+)[ \t]+(-?\d+%)[ \t]*
     \n[ \t]*(\w+)[ \t]+([0-9.]+(?:/s)?)[ \t]+(-?\d+%)[ \t]+(-+)[ \t]*$!xm;
 
-sub check_graph_consistency {
-    my @(	$ratetext, $slowc, $fastc,
+sub check_graph_consistency(	$ratetext, $slowc, $fastc,
         $slowr, $slowratet, $slowslow, $slowfastt,
-        $fastr, $fastratet, $fastslowt, $fastfast)
-        =  @_;
+        $fastr, $fastratet, $fastslowt, $fastfast) {
     my $all_passed = 1;
     $all_passed
       ^&^= is ($slowc, $slowr, "left col tag should be top row tag");
@@ -320,8 +317,7 @@ sub check_graph_consistency {
     return $all_passed;
 }
 
-sub check_graph_vs_output {
-    my @($chart, $got) =  @_;
+sub check_graph_vs_output($chart, $got) {
     my @(	$ratetext, $slowc, $fastc,
         $slowr, $slowratet, $slowslow, $slowfastt,
         $fastr, $fastratet, $fastslowt, $fastfast)
@@ -341,8 +337,7 @@ sub check_graph_vs_output {
     }
 }
 
-sub check_graph {
-    my @($title, $row1, $row2) =  @_;
+sub check_graph($title, $row1, $row2) {
     is (nelems @$title, 4, "Four entries in title row");
     is (nelems @$row1, 4, "Four entries in first row");
     is (nelems @$row2, 4, "Four entries in second row");

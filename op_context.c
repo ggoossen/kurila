@@ -540,20 +540,6 @@ Perl_mod(pTHX_ OP *o, I32 type)
 	if ((o->op_flags & OPf_PARENS) || PL_madskills)
 	    break;
 	goto nomod;
-    case OP_ENTERSUB:
-	if ((type == OP_UNDEF || type == OP_SREFGEN) &&
-	    !(o->op_flags & OPf_STACKED)) {
-	    o->op_type = OP_RV2CV;              /* entersub => rv2cv */
-	    /* The default is to set op_private to the number of children,
-	       which for a UNOP such as RV2CV is always 1. And w're using
-	       the bit for a flag in RV2CV, so we need it clear.  */
-	    o->op_private &= ~1;
-	    o->op_ppaddr = PL_ppaddr[OP_RV2CV];
-	    assert(cUNOPo->op_first->op_type == OP_NULL);
-	    op_null(((LISTOP*)cUNOPo->op_first)->op_first);/* disable pushmark */
-	    break;
-	}
-	goto nomod;
     default:
       nomod:
 	/* grep, foreach, subcalls, refgen */
@@ -563,9 +549,7 @@ Perl_mod(pTHX_ OP *o, I32 type)
 		      "Can't modify %s in %s",
 		      (o->op_type == OP_NULL && (o->op_flags & OPf_SPECIAL)
 		       ? "do block"
-		       : (o->op_type == OP_ENTERSUB
-			  ? "non-lvalue subroutine call"
-			  : OP_DESC(o))),
+		       : OP_DESC(o)),
 		      type ? PL_op_desc[type] : "local");
 	return o;
 
@@ -612,6 +596,7 @@ Perl_mod(pTHX_ OP *o, I32 type)
     case OP_NEXTSTATE:
     case OP_DBSTATE:
 	break;
+    case OP_RV2CV:
     case OP_RV2AV:
     case OP_RV2HV:
     case OP_RV2SV:
@@ -779,17 +764,7 @@ Perl_doref(pTHX_ OP *o, I32 type, bool set_op_ref)
 
     switch (o->op_type) {
     case OP_ENTERSUB:
-	if ((type == OP_EXISTS || type == OP_DEFINED || type == OP_LOCK) &&
-	    !(o->op_flags & OPf_STACKED)) {
-	    o->op_type = OP_RV2CV;             /* entersub => rv2cv */
-	    o->op_ppaddr = PL_ppaddr[OP_RV2CV];
-	    assert(cUNOPo->op_first->op_type == OP_NULL);
-	    op_null(((LISTOP*)cUNOPo->op_first)->op_first);	/* disable pushmark */
-	    o->op_flags |= OPf_SPECIAL;
-	    o->op_private &= ~1;
-	}
 	break;
-
     case OP_COND_EXPR:
 	for (kid = cUNOPo->op_first->op_sibling; kid; kid = kid->op_sibling)
 	    doref(kid, type, set_op_ref);
@@ -808,6 +783,9 @@ Perl_doref(pTHX_ OP *o, I32 type, bool set_op_ref)
 	}
 	break;
 
+    case OP_RV2CV:
+        o->op_flags |= OPf_SPECIAL;
+        break;
     case OP_RV2AV:
     case OP_RV2HV:
 	if (set_op_ref)

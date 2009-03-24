@@ -24,7 +24,6 @@ static char *svclassnames[] = {
     "B::PVMG",
     "B::REGEXP",
     "B::GV",
-    "B::PVLV",
     "B::AV",
     "B::HV",
     "B::CV",
@@ -109,88 +108,6 @@ set_active_sub(SV *sv)
     svp = AvARRAY(padlist);
     my_current_pad = AvARRAY((AV*)svp[1]);
 }
-
-static SV *
-find_cv_by_root(OP* o) {
-  dTHX;
-  OP* root = o;
-  SV* key;
-  SV* val;
-  HE* cached;
-
-  if(PL_compcv && SvTYPE(PL_compcv) == SVt_PVCV &&
-        !PL_eval_root) {
-    if(SvROK(PL_compcv))
-       sv_dump(SvRV(PL_compcv));
-    return newRV((SV*)PL_compcv);
-  }     
-
-
-  if(!root_cache)
-    root_cache = newHV();
-
-  while(root->op_next)
-    root = root->op_next;
-
-  key = newSViv(PTR2IV(root));
-  
-  cached = hv_fetch_ent(root_cache, key, 0, 0);
-  if(cached) {
-      return HeVAL(cached);
-  }
-  
-
-  if(PL_main_root == root) {
-    /* Special case, this is the main root */
-      cached = newRV((SV*)PL_main_cv);
-      hv_store_ent(root_cache, key, cached, 0);
-  } else if(PL_eval_root == root && PL_compcv) { 
-    SV* tmpcv = (SV*)NEWSV(1104,0);
-    sv_upgrade((SV *)tmpcv, SVt_PVCV);
-    CvPADLIST(tmpcv) = CvPADLIST(PL_compcv);
-    SvREFCNT_inc(CvPADLIST(tmpcv));
-    CvROOT(tmpcv) = root;
-    OP_REFCNT_LOCK;
-    OpREFCNT_inc(root);
-    OP_REFCNT_UNLOCK;
-    cached = newRV((SV*)tmpcv);
-    hv_store_ent(root_cache, key, cached, 0);
-  } else {
-    /* Need to walk the symbol table, yay */
-    CV* cv = 0;
-    SV* sva;
-    SV* sv;
-    register SV* svend;
-
-    for (sva = PL_sv_arenaroot; sva; sva = (SV*)SvANY(sva)) {
-      svend = &sva[SvREFCNT(sva)];
-      for (sv = sva + 1; sv < svend; ++sv) {
-        if (SvTYPE(sv) != SVTYPEMASK && SvREFCNT(sv)) {
-          if(SvTYPE(sv) == SVt_PVCV &&
-             CvROOT(sv) == root
-             ) {
-            cv = (CV*) sv;
-          } else if(SvTYPE(sv) == SVt_PVGV && GvGP(sv) &&
-                    GvCV(sv) && !CvXSUB(GvCV(sv)) &&
-                    CvROOT(GvCV(sv)) == root)
-                     {
-            cv = (CV*) GvCV(sv);
-          }
-        }
-      }
-    }
-
-    if(!cv) {
-      Perl_die(aTHX_ "I am sorry but we couldn't find this root!\n");
-    }
-
-    cached = newRV((SV*)cv);
-    hv_store_ent(root_cache, key, cached, 0);
-  }
-
-  return cached;
-}
-
 
 static SV *
 make_sv_object(pTHX_ SV *arg, SV *sv)
@@ -565,7 +482,6 @@ typedef SV      *B__IV;
 typedef SV      *B__PV;
 typedef SV      *B__NV;
 typedef SV      *B__PVMG;
-typedef SV      *B__PVLV;
 typedef SV      *B__BM;
 typedef SV      *B__RV;
 typedef AV      *B__AV;
@@ -587,14 +503,6 @@ typedef MAGIC   *B__MAGIC;
 #define OP_spare(o)	o->op_spare
 
 MODULE = B::OP    PACKAGE = B::OP         PREFIX = OP_
-
-B::CV
-OP_find_cv(o)
-        B::OP   o
-    CODE:
-        RETVAL = (CV*)SvRV(find_cv_by_root((OP*)o));
-    OUTPUT:
-        RETVAL
 
 void
 OP_set_next(o, next)
@@ -655,7 +563,7 @@ void
 OP_clean(o)
     B::OP o
     CODE:
-        if (o == PL_main_root)
+        if (o == RootopOp(PL_main_root))
             o->op_next = Nullop;
 
 void
@@ -1039,12 +947,10 @@ SVOP_set_sv(o, ...)
     PREINIT:
         SV *sv;
     CODE:
-        GEN_PAD;
         if (items > 1) {
             sv = newSVsv(ST(1));
             cSVOPx(o)->op_sv = sv;
         }
-        OLD_PAD;
 
 void
 SVOP_new(class, type, flags, sv, location)
@@ -1516,7 +1422,7 @@ B::OP
 CvROOT(cv)
 	B::CV	cv
     CODE:
-	RETVAL = CvISXSUB(cv) ? NULL : CvROOT(cv);
+	RETVAL = CvISXSUB(cv) ? NULL : RootopOp(CvROOT(cv));
     OUTPUT:
 	RETVAL
 
@@ -1531,7 +1437,7 @@ Cvnewsub_simple(class, name, block)
     CODE:
         o = newSVOP(OP_CONST, 0, name, NULL);
         mycv = newNAMEDSUB(start_subparse(0), o, Nullop, block);
-        /*op_free(o); */
+        /* op_free(o); */
         RETVAL = mycv;
     OUTPUT:
         RETVAL
@@ -1570,28 +1476,7 @@ B_fudge()
         SSCHECK(2);
         SSPUSHPTR((SV*)PL_comppad);  
         SSPUSHINT(SAVEt_COMPPAD);
-
-B::OP
-B_set_main_root(...)
-    PROTOTYPE: ;$
-    CODE:
-        if (items > 0)
-            PL_main_root = SVtoO(ST(0));
-        RETVAL = PL_main_root;
-    OUTPUT:
-        RETVAL
     
-B::OP
-B_set_main_start(...)
-    PROTOTYPE: ;$
-    CODE:
-        if (items > 0)
-            PL_main_start = SVtoO(ST(0));
-        RETVAL = PL_main_start;
-    OUTPUT:
-        RETVAL
-
-
 MODULE = B::PAD    PACKAGE = B::PAD     PREFIX = B_PAD_
 
 int

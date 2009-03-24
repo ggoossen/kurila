@@ -291,9 +291,9 @@ XS(XS_UNIVERSAL_can)
     }
 
     if (pkg) {
-	GV * const gv = gv_fetchmethod(pkg, name);
-        if (gv && isGV(gv))
-	    rv = sv_2mortal(newRV((SV*)GvCV(gv)));
+	CV * const cv = gv_fetchmethod(pkg, name);
+        if (cv)
+	    rv = sv_2mortal(newRV(cvTsv(cv)));
     }
 
     ST(0) = rv;
@@ -492,7 +492,7 @@ XS(XS_PerlIO_get_layers)
 			 the name and flags, so we can just take a reference
 			 and "steal" it when we free the AV below.  */
 		      av_push(retav, namok
-			      ? SvREFCNT_inc_simple_NN(*namsvp)
+			      ? SvREFCNT_inc_NN(*namsvp)
 			      : &PL_sv_undef);
 		      av_push(retav, argok
 			      ? newSVpvn_flags(SvPVX_const(*argsvp),
@@ -500,7 +500,7 @@ XS(XS_PerlIO_get_layers)
 					       0)
 			      : &PL_sv_undef);
 		      av_push(retav, namok
-			      ? SvREFCNT_inc_simple_NN(*flgsvp)
+			      ? SvREFCNT_inc_NN(*flgsvp)
 			      : &PL_sv_undef);
 		  }
 		  else {
@@ -509,7 +509,7 @@ XS(XS_PerlIO_get_layers)
 						  SVfARG(*namsvp),
 						  SVfARG(*argsvp)));
 		       else if (namok)
-			   av_push(retav, SvREFCNT_inc_simple_NN(*namsvp));
+			   av_push(retav, SvREFCNT_inc_NN(*namsvp));
 		       else
 			   av_push(retav, &PL_sv_undef);
 		       if (flgok) {

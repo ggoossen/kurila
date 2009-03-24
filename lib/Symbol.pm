@@ -124,10 +124,9 @@ sub geniosym () {
     *$sym{IO};
 }
 
-sub ungensym ($) {}
+sub ungensym(_) {}
 
-sub qualify ($;$) {
-    my @($name, ? $pkg) =  @_;
+sub qualify($name, ? $pkg) {
     ref \$name eq "GLOB" and Carp::confess("glob..." . ref $name);
     if (!ref($name) && index($name, '::') == -1 && index($name, "'") == -1) {
 	# Global names: special character, "^xyz", or other. 
@@ -142,15 +141,14 @@ sub qualify ($;$) {
     $name;
 }
 
-sub qualify_to_ref ($) {
-    return \*{ Symbol::fetch_glob( qualify @_[0], (nelems @_) +> 1 ?? @_[1] !! caller ) };
+sub qualify_to_ref($name, ?$package) {
+    return \*{ Symbol::fetch_glob( qualify $name, (defined $package) ?? $package !! scalar(caller) ) };
 }
 
 #
 # of Safe.pm lineage
 #
-sub delete_package ($) {
-    my $pkg = shift;
+sub delete_package($pkg) {
 
     # expand to full symbol table name if needed
 

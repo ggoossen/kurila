@@ -81,6 +81,12 @@ sub diag {
     _diag(< @_);
 }
 
+sub info {
+    my @mess = map { m/^#/ ?? "$_\n" !! "# $_\n" },
+      @+: map { split m/\n/ }, @_;
+    _print(< @mess);
+}
+
 sub skip_all {
     if ((nelems @_)) {
 	_print "1..0 # Skipped: $(join ' ',@_)\n";
@@ -124,8 +130,7 @@ sub _where {
 }
 
 # DON'T use this for matches. Use like() instead.
-sub ok ($@) {
-    my @($pass, ?$name, @< @mess) =  @_;
+sub ok ($pass, ?$name, @< @mess) {
     _ok($pass, _where(), $name, < @mess);
 }
 
@@ -150,8 +155,7 @@ sub display {
     return dump::view(@_[0]);
 }
 
-sub is ($$@) {
-    my @($got, $expected, ?$name, @< @mess) =  @_;
+sub is ($got, $expected, ?$name, @< @mess) {
 
     my $pass;
     if( !defined $got || !defined $expected ) {
@@ -173,9 +177,7 @@ sub is ($$@) {
     _ok($pass, _where(), $name, < @mess);
 }
 
-sub isnt ($$@) {
-    my @($got, $isnt, ?$name, @< @mess) =  @_;
-
+sub isnt ($got, $isnt, ?$name, @< @mess) {
     my $pass;
     if( !defined $got || !defined $isnt ) {
         # undef only matches undef
@@ -195,9 +197,7 @@ sub isnt ($$@) {
     _ok($pass, _where(), $name, < @mess);
 }
 
-sub cmp_ok ($$$@) {
-    my@($got, $type, $expected, ?$name, @< @mess) =  @_;
-
+sub cmp_ok ($got, $type, $expected, ?$name, @< @mess) {
     my $pass;
     do {
         local $^WARNING = 0;
@@ -229,8 +229,7 @@ sub cmp_ok ($$$@) {
 # otherwise $range is a fractional error.
 # Here $range must be numeric, >= 0
 # Non numeric ranges might be a useful future extension. (eg %)
-sub within ($$$@) {
-    my @($got, $expected, $range, $name, @< @mess) =  @_;
+sub within ($got, $expected, $range, $name, @< @mess) {
     my $pass;
     if (!defined $got or !defined $expected or !defined $range) {
         # This is a fail, but doesn't need extra diagnostics
@@ -262,11 +261,10 @@ sub within ($$$@) {
 
 # Note: this isn't quite as fancy as Test::More::like().
 
-sub like   ($$@) { like_yn (0,< @_) }; # 0 for -
-sub unlike ($$@) { like_yn (1,< @_) }; # 1 for un-
+sub like   (@< @a) { like_yn (0,< @a) }; # 0 for -
+sub unlike (@< @a) { like_yn (1,< @a) }; # 1 for un-
 
-sub like_yn ($$$@) {
-    my @($flip, $got, $expected, ?$name, @< @mess) =  @_;
+sub like_yn ($flip, $got, $expected, ?$name, @< @mess) {
     my $pass;
     $pass = $got =~ m/$expected/ if !$flip;
     $pass = $got !~ m/$expected/ if $flip;
@@ -363,16 +361,14 @@ sub eq_hash {
   !$fail;
 }
 
-sub require_ok ($) {
-    my @($require) =  @_;
+sub require_ok ($require) {
     eval <<REQUIRE_OK;
 require $require;
 REQUIRE_OK
     _ok(!$^EVAL_ERROR, _where(), "require $require");
 }
 
-sub use_ok ($) {
-    my @($use) =  @_;
+sub use_ok ($use) {
     eval <<USE_OK;
 use $use;
 USE_OK
@@ -673,8 +669,7 @@ sub fresh_perl_like {
 		$runperl_args, $name);
 }
 
-sub can_ok ($@) {
-    my@($proto, @< @methods) =  @_;
+sub can_ok ($proto, @< @methods) {
     my $class = ref $proto || $proto;
 
     unless( nelems @methods ) {
@@ -695,9 +690,7 @@ sub can_ok ($@) {
     _ok( !nelems @nok, _where(), $name );
 }
 
-sub isa_ok ($$;$) {
-    my@($object, $class, ?$obj_name) =  @_;
-
+sub isa_ok ($object, $class, ?$obj_name) {
     my $diag;
     $obj_name = 'The object' unless defined $obj_name;
     my $name = "$obj_name isa $class";
@@ -735,8 +728,7 @@ WHOA
     _ok( !$diag, _where(), $name );
 }
 
-sub dies_not(&;$) {
-    my @($e, ?$name) =  @_;
+sub dies_not ($e, ?$name) {
     local $Level = 2;
     if (try { $e->(); 1; }) {
         return ok(1, $name);
@@ -745,8 +737,7 @@ sub dies_not(&;$) {
     return ok(0, $name);
 }
 
-sub dies_like(&$;$) {
-    my @($e, $qr, ?$name) =  @_;
+sub dies_like ($e, $qr, ?$name) {
     if (try { $e->(); 1; }) {
         local $Level = 2;
         diag "didn't die";
@@ -756,8 +747,7 @@ sub dies_like(&$;$) {
     return like_yn(0, $err, $qr );
 }
 
-sub eval_dies_like($$;$) {
-    my @($e, $qr, ?$name) =  @_;
+sub eval_dies_like ($e, $qr, ?$name) {
   TODO:
     do {
         todo_skip("Compile time abortion are known to leak memory", 1) if env::var('PERL_VALGRIND');

@@ -31,8 +31,7 @@ my %isa_scan = %( () );
 
 ###########################################################################
 
-sub quant {
-  my@($handle, $num, @< @forms) =  @_;
+sub quant($handle, $num, @< @forms) {
 
   return $num if (nelems @forms) == 0; # what should this mean?
   return @forms[2] if (nelems @forms) +> 2 and $num == 0; # special zeroth case
@@ -44,9 +43,7 @@ sub quant {
 }
 
 
-sub numerate {
- # return this lexical item in a form appropriate to this number
-  my@($handle, $num, @< @forms) =  @_;
+sub numerate($handle, $num, @< @forms) {
   my $s = ($num == 1);
 
   return '' unless (nelems @forms);
@@ -78,9 +75,9 @@ sub numf {
   return $num;
 }
 
-sub sprintf {
+sub sprintf($handle, $format, @< @params) {
   no integer;
-  my@($handle, $format, @< @params) =  @_;
+
   return CORE::sprintf($format, < @params);
     # "CORE::" is there to avoid confusion with myself!
 }
@@ -113,8 +110,7 @@ sub fallback_language_classes { return () }
 
 #--------------------------------------------------------------------------
 
-sub fail_with { # an actual attribute method!
-  my@($handle, @< @params) =  @_;
+sub fail_with($handle, @< @params) {
   return unless ref($handle);
   $handle->{+'fail'} = @params[0] if (nelems @params);
   return $handle->{?'fail'};
@@ -244,11 +240,7 @@ sub maketext {
 
 ###########################################################################
 
-sub get_handle {  # This is a constructor and, yes, it CAN FAIL.
-  # Its class argument has to be the base class for the current
-  # application's l10n files.
-
-  my@($base_class, @< @languages) =  @_;
+sub get_handle($base_class, @< @languages) {
   $base_class = ref($base_class) || $base_class;
    # Complain if they use __PACKAGE__ as a project base class?
   
@@ -278,8 +270,7 @@ sub get_handle {  # This is a constructor and, yes, it CAN FAIL.
 
 ###########################################################################
 
-sub _langtag_munging {
-  my@($base_class, @< @languages) =  @_;
+sub _langtag_munging($base_class, @< @languages) {
 
   # We have all these DEBUG statements because otherwise it's hard as hell
   # to diagnose ifwhen something goes wrong.
@@ -334,8 +325,7 @@ sub _ambient_langprefs {
 
 ###########################################################################
 
-sub _add_supers {
-  my@($base_class, @< @languages) =  @_;
+sub _add_supers($base_class, @< @languages) {
 
   if(!$MATCH_SUPERS) {
     # Nothing

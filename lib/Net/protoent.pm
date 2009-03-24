@@ -24,7 +24,7 @@ struct 'Net::protoent' => \@(
    proto	=> '$',
 );
 
-sub populate (@) {
+sub populate {
     return unless (nelems @_);
     my $pob = new();
     $p_name 	 =    $pob->[0]     	     = @_[0];
@@ -34,10 +34,10 @@ sub populate (@) {
 } 
 
 sub getprotoent      ( )  { populate(CORE::getprotoent()) } 
-sub getprotobyname   ($)  { populate(CORE::getprotobyname(shift)) } 
-sub getprotobynumber ($)  { populate(CORE::getprotobynumber(shift)) } 
+sub getprotobyname   ($name)  { populate(CORE::getprotobyname($name)) } 
+sub getprotobynumber ($number)  { populate(CORE::getprotobynumber($number)) } 
 
-sub getproto ($;$) {
+sub getproto {
     return &{'getprotoby' . (@_[0]=~m/^\d+$/ ?? 'number' !! 'name')}(< @_);
 }
 

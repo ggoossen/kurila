@@ -32,7 +32,7 @@ PerlIOScalar_pushed(pTHX_ PerlIO * f, const char *mode, SV * arg,
 	    }
 	    s->var = SvREFCNT_inc(SvRV(arg));
 	    if (!SvPOK(s->var) && SvOK(s->var))
-		(void)SvPV_nomg_const_nolen(s->var);
+		(void)SvPV_nolen_const(s->var);
 	}
 	else {
 	    s->var =
@@ -230,7 +230,7 @@ PerlIOScalar_set_ptrcnt(pTHX_ PerlIO * f, STDCHAR * ptr, SSize_t cnt)
 PerlIO *
 PerlIOScalar_open(pTHX_ PerlIO_funcs * self, PerlIO_list_t * layers, IV n,
 		  const char *mode, int fd, int imode, int perm,
-		  PerlIO * f, int narg, SV ** args)
+		  PerlIO * f, int narg, SV *const* args)
 {
     SV *arg = (narg > 0) ? *args : PerlIOArg;
     if (SvROK(arg) || SvPOK(arg)) {

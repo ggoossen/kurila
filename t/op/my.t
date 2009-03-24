@@ -4,8 +4,7 @@ print \*STDOUT, "1..34\n";
 
 our ($a, $b, $c, $d, $x, $y, @b, @c, %d, $k);
 
-sub foo {
-    my@($a, $b) =  @_;
+sub foo($a, $b) {
     my $c;
     my $d;
     $c = "ok 3\n";
@@ -27,8 +26,7 @@ print \*STDOUT, $a,$b,$c,$d,$x,$y;
 
 # same thing, only with arrays and associative arrays
 
-sub foo2 {
-    my@($a, @< @b) =  @_;
+sub foo2($a, @< @b) {
     my(@c, %d);
     @c = @( "ok 13\n" );
     %d{+''} = "ok 14\n";

@@ -36,8 +36,7 @@ Define TO_UNIX to convert OS2 linefeeds to Unix style.
 
 =cut
 
-sub init_dist {
-    my@($self) =  @_;
+sub init_dist($self) {
 
     $self->{+TO_UNIX} ||= <<'MAKE_TEXT';
 $(NOECHO) $(TEST_F) tmp.zip && $(RM_F) tmp.zip; $(ZIP) -ll -mr tmp.zip $(DISTVNAME) && unzip -o tmp.zip && $(RM_F) tmp.zip
@@ -46,8 +45,7 @@ MAKE_TEXT
     $self->SUPER::init_dist;
 }
 
-sub dlsyms {
-    my@($self,%< %attribs) =  @_;
+sub dlsyms($self,%< %attribs) {
 
     my@($funcs) = %attribs{?DL_FUNCS} || $self->{?DL_FUNCS} || \%();
     my@($vars)  = %attribs{?DL_VARS} || $self->{?DL_VARS} || \@();
@@ -89,8 +87,7 @@ $self->{?BASEEXT}.def: Makefile.PL
     join('', @m);
 }
 
-sub static_lib {
-    my@($self) =  @_;
+sub static_lib($self) {
     my $old = $self->ExtUtils::MM_Unix::static_lib();
     return $old unless $self->{?IMPORTS} && %{$self->{?IMPORTS}};
     
@@ -103,14 +100,12 @@ EOC
     return join "\n\n". '', @chunks;
 }
 
-sub replace_manpage_separator {
-    my@($self,$man) =  @_;
+sub replace_manpage_separator($self,$man) {
     $man =~ s,/+,.,g;
     $man;
 }
 
-sub maybe_command {
-    my@($self,$file) =  @_;
+sub maybe_command($self,$file) {
     $file =~ s,[/\\]+,/,g;
     return $file if -x $file && ! -d _;
     return "$file.exe" if -x "$file.exe" && ! -d _;

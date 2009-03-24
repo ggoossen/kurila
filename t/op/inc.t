@@ -4,8 +4,7 @@ print \*STDOUT, "1..51\n";
 
 my $test = 1;
 
-sub ok {
-  my @($pass, ?$err) =  @_;
+sub ok($pass, ?$err) {
   if ($pass) {
     print \*STDOUT, "ok $test\n";
     $test = $test + 1; # Would be doubleplusbad to use ++ in the ++ test.
@@ -83,8 +82,7 @@ ok (!defined($a--), "postdec undef returns undef");
 
 # Verify that shared hash keys become unshared.
 
-sub check_same {
-  my @($orig, $suspect) =  @_;
+sub check_same($orig, $suspect) {
   my $fail;
   while (my @(?$key, ?$value) =@( each %$suspect)) {
     if (exists $orig->{$key}) {

@@ -25,10 +25,9 @@ sub A::B::Intersection {
 END
 }
 
-sub test_regexp ($$) {
+sub test_regexp($str, $blk) {
   # test that given string consists of N-1 chars matching $qr1, and 1
   # char matching $qr2
-  my @($str, $blk) = @_;
 
   # constructing these objects here makes the last test loop go much faster
   my $qr1 = qr/(\p{$blk}+)/;

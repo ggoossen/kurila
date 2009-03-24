@@ -211,8 +211,7 @@ my %Val_Message = %(
     'B' => "is not a binary file."
 );
 
-sub valmess {
-    my @($disposition, $test, $file) =  @_;
+sub valmess($disposition, $test, $file) {
     my $ferror;
 
     if ($test =~ m/ ^ (!?) -(\w) \s* $ /x) {

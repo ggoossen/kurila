@@ -39,7 +39,7 @@ Perl_av_reify(pTHX_ AV *av)
 	SV * const sv = AvARRAY(av)[--key];
 	assert(sv);
 	if (sv != &PL_sv_undef)
-	    SvREFCNT_inc_simple_void_NN(sv);
+	    SvREFCNT_inc_void_NN(sv);
     }
     key = AvARRAY(av) - AvALLOC(av);
     while (key)

@@ -1724,7 +1724,7 @@ UV
 Perl_swash_fetch(pTHX_ SV *swash, const char *ptr, bool do_utf8)
 {
     dVAR;
-    HV* const hv = SvHv(SvRV(swash));
+    HV* const hv = svThv(SvRV(swash));
     U32 klen;
     U32 off;
     STRLEN slen;

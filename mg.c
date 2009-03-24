@@ -199,79 +199,6 @@ Perl_mg_set(pTHX_ SV *sv)
 }
 
 /*
-=for apidoc mg_length
-
-Report on the SV's length.  See C<sv_magic>.
-
-=cut
-*/
-
-U32
-Perl_mg_length(pTHX_ SV *sv)
-{
-    dVAR;
-    MAGIC* mg;
-    STRLEN len;
-
-    PERL_ARGS_ASSERT_MG_LENGTH;
-
-    for (mg = SvMAGIC(sv); mg; mg = mg->mg_moremagic) {
-        const MGVTBL * const vtbl = mg->mg_virtual;
-	if (vtbl && vtbl->svt_len) {
-            const I32 mgs_ix = SSNEW(sizeof(MGS));
-	    save_magic(mgs_ix, sv);
-	    /* omit MGf_GSKIP -- not changed here */
-	    len = CALL_FPTR(vtbl->svt_len)(aTHX_ sv, mg);
-	    restore_magic(INT2PTR(void*, (IV)mgs_ix));
-	    return len;
-	}
-    }
-
-    {
-	/* You can't know whether it's UTF-8 until you get the string again...
-	 */
-        const char *s = SvPV_const(sv, len);
-
-	if (IN_CODEPOINTS) {
-	    len = utf8_length(s, s + len);
-	}
-    }
-    return len;
-}
-
-I32
-Perl_mg_size(pTHX_ SV *sv)
-{
-    MAGIC* mg;
-
-    PERL_ARGS_ASSERT_MG_SIZE;
-
-    for (mg = SvMAGIC(sv); mg; mg = mg->mg_moremagic) {
-        const MGVTBL* const vtbl = mg->mg_virtual;
-	if (vtbl && vtbl->svt_len) {
-            const I32 mgs_ix = SSNEW(sizeof(MGS));
-            I32 len;
-	    save_magic(mgs_ix, sv);
-	    /* omit MGf_GSKIP -- not changed here */
-	    len = CALL_FPTR(vtbl->svt_len)(aTHX_ sv, mg);
-	    restore_magic(INT2PTR(void*, (IV)mgs_ix));
-	    return len;
-	}
-    }
-
-    switch(SvTYPE(sv)) {
-	case SVt_PVAV:
-	    return AvFILLp((AV *) sv); /* Fallback to non-tied array */
-	case SVt_PVHV:
-	    /* FIXME */
-	default:
-	    Perl_croak(aTHX_ "Size magic not implemented");
-	    break;
-    }
-    return 0;
-}
-
-/*
 =for apidoc mg_clear
 
 Clear something magical that the SV represents.  See C<sv_magic>.
@@ -533,78 +460,6 @@ Perl_magic_regdatum_set(pTHX_ SV *sv, MAGIC *mg)
     NORETURN_FUNCTION_END;
 }
 
-U32
-Perl_magic_len(pTHX_ SV *sv, MAGIC *mg)
-{
-    dVAR;
-    register I32 paren;
-    register I32 i;
-    register const REGEXP * rx;
-    const char * const remaining = mg->mg_ptr + 1;
-
-    PERL_ARGS_ASSERT_MAGIC_LEN;
-
-    switch (*mg->mg_ptr) {
-    case '^':		
-	switch(*remaining) {
-	case 'L':
-	    if (strEQ(remaining, "LAST_SUBMATCH_RESULT")) {
-		/* ^N */
-		if (PL_curpm && (rx = PM_GETRE(PL_curpm))) {
-		    paren = RX_LASTCLOSEPAREN(rx);
-		    if (paren)
-			goto getparen;
-		}
-		return 0;
-	    }
-	    break;
-	case 'M':
-	    if (strEQ(remaining, "MATCH")) {
-		/* $^MATCH */
-		paren = RX_BUFF_IDX_FULLMATCH;
-		goto maybegetparen;
-	    }
-	    break;
-	case 'P':
-	    if (strEQ(remaining, "PREMATCH")) {
-		/* $^PREMATCH */
-		paren = RX_BUFF_IDX_PREMATCH;
-		goto maybegetparen;
-	    } else if (strEQ(remaining, "POSTMATCH")) {
-		/* $^POSTMATCH */
-		paren = RX_BUFF_IDX_POSTMATCH;
-		goto maybegetparen;
-	    }
-	    break;
-	}
-	break;
-
-    case '1': case '2': case '3': case '4':
-    case '5': case '6': case '7': case '8': case '9':
-      paren = atoi(mg->mg_ptr);
-    maybegetparen:
-	if (PL_curpm && (rx = PM_GETRE(PL_curpm))) {
-      getparen:
-        i = CALLREG_NUMBUF_LENGTH((REGEXP * const)rx, sv, paren);
-
-		if (i < 0)
-		    Perl_croak(aTHX_ "panic: magic_len: %"IVdf, (IV)i);
-		return i;
-	} else {
-		if (ckWARN(WARN_UNINITIALIZED))
-		    report_uninit(sv);
-		return 0;
-	}
-    }
-/*     magic_get(sv,mg); */
-    if (!SvPOK(sv) && SvNIOK(sv)) {
-	sv_2pv(sv, 0);
-    }
-    if (SvPOK(sv))
-	return SvCUR(sv);
-    return 0;
-}
-
 #define SvRTRIM(sv) STMT_START { \
     if (SvPOK(sv)) { \
         STRLEN len = SvCUR(sv); \
@@ -810,18 +665,18 @@ Perl_magic_get(pTHX_ const char* name, SV* sv)
 	    }
 
 	    if (strEQ(remaining, "HINTS")) {
-		sv_setsv(sv, HvSv(PL_hinthv));
+		sv_setsv(sv, hvTsv(PL_hinthv));
 		return;
 	    }
 	    break;
 
 	case 'I':
 	    if (strEQ(remaining, "INCLUDE_PATH")) {
-		sv_setsv(sv, AvSv(PL_includepathav));
+		sv_setsv(sv, avTsv(PL_includepathav));
 		break;
 	    }
 	    if (strEQ(remaining, "INCLUDED")) {
-		sv_setsv(sv, HvSv(PL_includedhv));
+		sv_setsv(sv, hvTsv(PL_includedhv));
 		break;
 	    }
 	    if (strEQ(remaining, "INPUT_RECORD_SEPARATOR")) {
@@ -1694,8 +1549,8 @@ Perl_magic_set(pTHX_ const char* name, SV *sv)
 		    Perl_croak(aTHX_ "%s must be a hash not an %s", name, Ddesc(sv));
 		}
 		PL_hints |= HINT_LOCALIZE_HH;
-		HVcpSTEAL(PL_compiling.cop_hints_hash, SvHv(newSVsv(sv)));
-		hv_sethv(PL_hinthv, SvHv(sv));
+		HVcpSTEAL(PL_compiling.cop_hints_hash, svThv(newSVsv(sv)));
+		hv_sethv(PL_hinthv, svThv(sv));
 		return;
 	    }
 	    break;
@@ -1709,7 +1564,7 @@ Perl_magic_set(pTHX_ const char* name, SV *sv)
 		if ( ! SvAVOK(sv) ) {
 		    Perl_croak(aTHX_ "%s must be an ARRAY not a %s", name, Ddesc(sv));
 		}
-		sv_setsv(AvSv(PL_includepathav), sv);
+		sv_setsv(avTsv(PL_includepathav), sv);
 		break;
 	    }
 	    
@@ -1721,7 +1576,7 @@ Perl_magic_set(pTHX_ const char* name, SV *sv)
 		if ( ! SvHVOK(sv) ) {
 		    Perl_croak(aTHX_ "%s must be a HASH not a %s", name, Ddesc(sv));
 		}
-		sv_setsv(HvSv(PL_includedhv), sv);
+		sv_setsv(hvTsv(PL_includedhv), sv);
 		break;
 	    }
 

@@ -30,7 +30,6 @@ static const char* const svclassnames[] = {
     "B::PVMG",
     "B::REGEXP",
     "B::GV",
-    "B::PVLV",
     "B::AV",
     "B::HV",
     "B::CV",
@@ -218,7 +217,6 @@ typedef SV	*B__PV;
 typedef SV	*B__NV;
 typedef SV	*B__PVMG;
 typedef SV	*B__REGEXP;
-typedef SV	*B__PVLV;
 typedef SV	*B__BM;
 typedef SV	*B__RV;
 typedef SV	*B__FM;
@@ -543,7 +541,7 @@ PARENT_FAKELEX_FLAGS(sv)
 
 MODULE = B	PACKAGE = B::PV		PREFIX = Sv
 
-char*
+const char*
 SvPVX_const(sv)
 	B::PV	sv
 
@@ -615,7 +613,7 @@ SV*
 precomp(sv)
 	B::REGEXP	sv
     CODE:
-	RETVAL = newSVpvn( RX_PRECOMP(sv), RX_PRELEN(sv) );
+	RETVAL = newSVpvn( RX_PRECOMP(svTre(sv)), RX_PRELEN(svTre(sv)) );
     OUTPUT:
         RETVAL
 
@@ -705,24 +703,6 @@ MgPTR(mg)
 		}
 	}
 
-MODULE = B	PACKAGE = B::PVLV	PREFIX = Lv
-
-U32
-LvTARGOFF(sv)
-	B::PVLV	sv
-
-U32
-LvTARGLEN(sv)
-	B::PVLV	sv
-
-char
-LvTYPE(sv)
-	B::PVLV	sv
-
-B::SV
-LvTARG(sv)
-	B::PVLV sv
-
 MODULE = B	PACKAGE = B::BM		PREFIX = Bm
 
 I32
@@ -741,9 +721,9 @@ void
 BmTABLE(sv)
 	B::BM	sv
 	STRLEN	len = NO_INIT
-	char *	str = NO_INIT
+	const char *	str = NO_INIT
     CODE:
-	str = SvPV(sv, len);
+	str = SvPV_const(sv, len);
 	/* Boyer-Moore table is just after string and its safety-margin \0 */
 	ST(0) = sv_2mortal(newSVpvn(str + len + PERL_FBM_TABLE_OFFSET, 256));
 

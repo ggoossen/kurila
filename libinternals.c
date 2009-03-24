@@ -132,7 +132,7 @@ XS(XS_Internals_hv_clear_placehold)
 	SV * const sv = SvRV(ST(0));
         if (!SvHVOK(sv))
             Perl_croak(aTHX_ "argument to hv_clear_placeholders must be an HASH not a %s", Ddesc(sv));
-	hv_clear_placeholders(SvHv(sv));
+	hv_clear_placeholders(svThv(sv));
 	XSRETURN(0);
     }
 }
@@ -191,9 +191,9 @@ XS(XS_Internals_set_hint_hash)
     if (!SvROK(ST(0)))
 	Perl_croak(aTHX_ "Internals::set_hint_hash $hashref");
     hv = SvRV(ST(0));
-    if (items == 1 && SvTYPE(hv) == SVt_PVHV) {
+    if (items == 1 && SvHVOK(hv)) {
 	HvREFCNT_dec(PL_compiling.cop_hints_hash);
-	PL_compiling.cop_hints_hash = (HV*)SvREFCNT_inc(hv);
+	PL_compiling.cop_hints_hash = HvREFCNT_inc(svThv(hv));
     }
 }
 

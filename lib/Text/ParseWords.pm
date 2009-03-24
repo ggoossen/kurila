@@ -26,8 +26,7 @@ sub shellwords {
 
 
 
-sub quotewords {
-    my@($delim, $keep, @< @lines) =  @_;
+sub quotewords($delim, $keep, @< @lines) {
     my(@words, @allwords);
 
     foreach my $line ( @lines) {
@@ -40,8 +39,7 @@ sub quotewords {
 
 
 
-sub nested_quotewords {
-    my@($delim, $keep, @< @lines) =  @_;
+sub nested_quotewords($delim, $keep, @< @lines) {
     my(@allwords);
 
     for my $i (0 .. nelems(@lines) -1) {
@@ -53,8 +51,7 @@ sub nested_quotewords {
 
 
 
-sub parse_line {
-    my@($delimiter, $keep, $line) =  @_;
+sub parse_line($delimiter, $keep, $line) {
     my($word, @pieces);
 
     no warnings 'uninitialized';	# we will be testing undef strings

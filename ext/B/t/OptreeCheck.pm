@@ -481,9 +481,7 @@ sub newTestCases {
     return $tc;
 }
 
-sub label {
-    # may help get/keep test output consistent
-    my @($tc) =  @_;
+sub label($tc) {
     return $tc->{?name} if $tc->{?name};
 
     my $buf = (ref $tc->{?bcopts}) 
@@ -658,10 +656,7 @@ The regex is anchored by default, but can be suppressed with
 # needless complexity due to 'too much info' from B::Concise v.60
 my $announce = 'B::Concise::compile\(CODE\(0x[0-9a-f]+\)\)';;
 
-sub mkCheckRex {
-    # converts expected text into Regexp which should match against
-    # unaltered version.  also adjusts threaded => non-threaded
-    my @($tc, $want) =  @_;
+sub mkCheckRex($tc, $want) {
     eval "no re 'debug'";
 
     my $str = $tc->{?expect} || $tc->{?expect_nt};	# standard bias
@@ -967,8 +962,7 @@ EONT_EONT
     return $testcode;
 }
 
-sub OptreeCheck::gentest {
-    my @($code,$opts) =  @_;
+sub OptreeCheck::gentest($code,$opts) {
     my $rendering = getRendering(\%(code => $code));
     my $testcode = OptreeCheck::wrap($code);
     return unless $testcode;

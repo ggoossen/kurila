@@ -75,8 +75,7 @@ my $CASEFOLDFH;
 my $CASESPECFH;
 my $NAMEDSEQFH;
 
-sub openunicode {
-    my @($rfh, @< @path) =  @_;
+sub openunicode($rfh, @< @path) {
     my $f;
     unless (defined $$rfh) {
 	for my $d ( $^INCLUDE_PATH) {
@@ -249,8 +248,7 @@ sub charinfo {
     return;
 }
 
-sub _search { # Binary search in a [[lo,hi,prop],[...],...] table.
-    my @($table, $lo, $hi, $code) =  @_;
+sub _search($table, $lo, $hi, $code) {
 
     return if $lo +> $hi;
 
@@ -269,8 +267,7 @@ sub _search { # Binary search in a [[lo,hi,prop],[...],...] table.
     }
 }
 
-sub charinrange {
-    my @($range, $arg) =  @_;
+sub charinrange($range, $arg) {
     my $code = _getcode($arg);
     croak __PACKAGE__, "::charinrange: unknown code '$arg'"
 	unless defined $code;

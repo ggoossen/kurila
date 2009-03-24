@@ -14,8 +14,7 @@ sub reset {
     $self->new(< @_);  # ugly
 }
 
-sub addfile {
-    my @($self, $handle) =  @_;
+sub addfile($self, $handle) {
 
     my $n;
     my $buf = "";

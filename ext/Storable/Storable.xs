@@ -1569,7 +1569,7 @@ static SV *pkg_fetchmeth(
 	HV *pkg,
 	const char *method)
 {
-	GV *gv;
+	CV *cv;
 	SV *sv;
 	const char *hvname = HvNAME_get(pkg);
 
@@ -1579,9 +1579,9 @@ static SV *pkg_fetchmeth(
 	 * in the Perl core.
 	 */
 
-	gv = gv_fetchmethod(pkg, method);
-	if (gv && isGV(gv)) {
-		sv = newRV((SV*) GvCV(gv));
+	cv = gv_fetchmethod(pkg, method);
+	if (cv) {
+		sv = newRV(cvTsv(cv));
 		TRACEME(("%s->%s: 0x%"UVxf, hvname, method, PTR2UV(sv)));
 	} else {
 		sv = newSVsv(&PL_sv_undef);
@@ -1742,7 +1742,7 @@ static AV *array_call(
 {
 	dSP;
 	int count;
-	AV *av;
+	SV *res;
 	int i;
 
 	TRACEME(("array_call (cloning=%d)", cloning));
@@ -1755,14 +1755,14 @@ static AV *array_call(
 	XPUSHs(sv_2mortal(newSViv(cloning)));		/* Cloning flag */
 	PUTBACK;
 
-	av = SvREFCNT_inc( perl_call_sv(hook, G_SCALAR) );		/* Go back to Perl code */
+	res = SvREFCNT_inc( perl_call_sv(hook, G_SCALAR) );		/* Go back to Perl code */
 
 	SPAGAIN;
 	PUTBACK;
 	FREETMPS;
 	LEAVE;
 
-	return av;
+	return (AV*)res;
 }
 
 /*
@@ -2798,8 +2798,8 @@ static int store_hook(
 	/* We can't use pkg_can here because it only caches one method per
 	 * package */
 	{ 
-	    GV* gv = gv_fetchmethod(pkg, "STORABLE_attach");
-	    if (gv && isGV(gv)) {
+	    CV* cv = gv_fetchmethod(pkg, "STORABLE_attach");
+	    if (cv) {
 	        if (count > 1)
 	            CROAK(("Freeze cannot return references if %s class is using STORABLE_attach", classname));
 	        goto check_done;
@@ -3254,7 +3254,6 @@ static int sv_type(pTHX_ SV *sv)
 		 */
 		return SvROK(sv) ? svis_REF : svis_SCALAR;
 	case SVt_PVMG:
-	case SVt_PVLV:		/* Workaround for perl5.004_04 "LVALUE" bug */
 		if (SvRMAGICAL(sv) && (mg_find(sv, 'p')))
 			return svis_TIED_ITEM;
 		/* FALL THROUGH */
@@ -3868,7 +3867,7 @@ static SV *retrieve_hook(pTHX_ stcxt_t *cxt, const char *cname)
 	SV *hook;
 	SV *sv;
 	SV *rv;
-	GV *attach;
+	CV *attach;
 	int obj_type;
 	int clone = cxt->optype & ST_CLONE;
 	char mtype = '\0';
@@ -4096,9 +4095,9 @@ static SV *retrieve_hook(pTHX_ stcxt_t *cxt, const char *cname)
 	/* Handle attach case; again can't use pkg_can because it only
 	 * caches one method */
 	attach = gv_fetchmethod(SvSTASH(sv), "STORABLE_attach");
-	if (attach && isGV(attach)) {
+	if (attach) {
 	    SV* attached;
-	    SV* attach_hook = newRV((SV*) GvCV(attach));
+	    SV* attach_hook = newRV(cvTsv(attach));
 
 	    if (av)
 	        CROAK(("STORABLE_attach called with unexpected references"));

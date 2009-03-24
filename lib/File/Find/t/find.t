@@ -99,15 +99,15 @@ END {
     cleanup();
 }
 
-sub Check($) {
+sub Check($ok) {
     $case++;
-    if (@_[0]) { print \*STDOUT, "ok $case\n"; }
+    if ($ok) { print \*STDOUT, "ok $case\n"; }
     else       { print \*STDOUT, "not ok $case\n"; }
 }
 
-sub CheckDie($) {
+sub CheckDie($ok) {
     $case++;
-    if (@_[0]) { print \*STDOUT, "ok $case\n"; }
+    if ($ok) { print \*STDOUT, "ok $case\n"; }
     else { print \*STDOUT, "not ok $case\n $^OS_ERROR\n"; exit 0; }
 }
 
@@ -115,8 +115,8 @@ sub touch {
     CheckDie( open(my $T,'>',@_[0]) );
 }
 
-sub MkDir($$) {
-    CheckDie( mkdir(@_[0],@_[1]) );
+sub MkDir($dir, $mode) {
+    CheckDie( mkdir($dir, $mode) );
 }
 
 sub wanted_File_Dir {

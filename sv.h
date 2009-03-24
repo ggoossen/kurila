@@ -67,11 +67,10 @@ typedef enum {
 	SVt_REGEXP,	/* 8 */
 	/* PVBM was here, before BIND replaced it.  */
 	SVt_PVGV,	/* 9 */
-	SVt_PVLV,	/* 10 */
-	SVt_PVAV,	/* 11 */
-	SVt_PVHV,	/* 12 */
-	SVt_PVCV,	/* 13 */
-	SVt_PVIO,	/* 14 */
+	SVt_PVAV,	/* 10 */
+	SVt_PVHV,	/* 11 */
+	SVt_PVCV,	/* 12 */
+	SVt_PVIO,	/* 13 */
 	SVt_LAST	/* keep last in enum. used to size arrays */
 } svtype;
 
@@ -194,25 +193,6 @@ value, and you know that I<sv> is not NULL.  The macro doesn't need
 to return a meaningful value, or check for NULLness, so it's smaller
 and faster.
 
-=for apidoc Am|SV*|SvREFCNT_inc_simple|SV* sv
-Same as SvREFCNT_inc, but can only be used with expressions without side
-effects.  Since we don't have to store a temporary value, it's faster.
-
-=for apidoc Am|SV*|SvREFCNT_inc_simple_NN|SV* sv
-Same as SvREFCNT_inc_simple, but can only be used if you know I<sv>
-is not NULL.  Since we don't have to check the NULLness, it's faster
-and smaller.
-
-=for apidoc Am|void|SvREFCNT_inc_simple_void|SV* sv
-Same as SvREFCNT_inc_simple, but can only be used if you don't need the
-return value.  The macro doesn't need to return a meaningful value.
-
-=for apidoc Am|void|SvREFCNT_inc_simple_void_NN|SV* sv
-Same as SvREFCNT_inc, but can only be used if you don't need the return
-value, and you know that I<sv> is not NULL.  The macro doesn't need
-to return a meaningful value, or check for NULLness, so it's smaller
-and faster.
-
 =for apidoc Am|void|SvREFCNT_dec|SV* sv
 Decrements the reference count of the given SV.
 
@@ -233,21 +213,6 @@ perform the upgrade if necessary.  See C<svtype>.
 #define SvTMPREFCNT(sv)	(sv)->sv_tmprefcnt
 
 #if defined(__GNUC__) && !defined(PERL_GCC_BRACE_GROUPS_FORBIDDEN)
-#  define SvREFCNT_inc(sv)		\
-    ({					\
-	SV * const _sv = (SV*)(sv);	\
-	if (_sv) {				\
-	    assert(SvTYPE(_sv) != SVTYPEMASK);	\
-	     (SvREFCNT(_sv))++;		\
-        }  \
-	_sv;				\
-    })
-#  define SvREFCNT_inc_simple(sv)	\
-    ({					\
-	if (sv)				\
-	     (SvREFCNT(sv))++;		\
-	(SV *)(sv);				\
-    })
 #  define SvREFCNT_inc_NN(sv)		\
     ({					\
 	SV * const _sv = (SV*)(sv);	\
@@ -261,10 +226,6 @@ perform the upgrade if necessary.  See C<svtype>.
 	    (void)(SvREFCNT(_sv)++);	\
     })
 #else
-#  define SvREFCNT_inc(sv)	\
-	((PL_Sv=(SV*)(sv)) ? (++(SvREFCNT(PL_Sv)),PL_Sv) : NULL)
-#  define SvREFCNT_inc_simple(sv) \
-	((sv) ? (SvREFCNT(sv)++,(SV*)(sv)) : NULL)
 #  define SvREFCNT_inc_NN(sv) \
 	(PL_Sv=(SV*)(sv),++(SvREFCNT(PL_Sv)),PL_Sv)
 #  define SvREFCNT_inc_void(sv) \
@@ -272,10 +233,7 @@ perform the upgrade if necessary.  See C<svtype>.
 #endif
 
 /* These guys don't need the curly blocks */
-#define SvREFCNT_inc_simple_void(sv)	STMT_START { if (sv) SvREFCNT(sv)++; } STMT_END
-#define SvREFCNT_inc_simple_NN(sv)	(++(SvREFCNT(sv)),(SV*)(sv))
 #define SvREFCNT_inc_void_NN(sv)	(void)(++SvREFCNT((SV*)(sv)))
-#define SvREFCNT_inc_simple_void_NN(sv)	(void)(++SvREFCNT((SV*)(sv)))
 
 #define SVTYPEMASK	0xff
 #define SvTYPE(sv)	((svtype)((sv)->sv_flags & SVTYPEMASK))
@@ -364,10 +322,10 @@ perform the upgrade if necessary.  See C<svtype>.
 /* PVHV */
 #define SVphv_LAZYDEL	0x40000000  /* entry in xhv_eiter must be deleted */
 /* This is only set true on a PVGV when it's playing "PVBM", but is tested for
-   on any regular scalar (anything <= PVLV) */
+   on any regular scalar (anything <= PVGV) */
 #define SVpbm_VALID	0x40000000
 
-/* IV, PVIV, PVNV, PVMG, PVGV and (I assume) PVLV  */
+/* IV, PVIV, PVNV, PVMG, PVGV  */
 /* Presumably IVs aren't stored in pads */
 #define SVf_IVisUV	0x80000000  /* use XPVUV instead of XPVIV */
 /* PVAV */
@@ -1134,11 +1092,6 @@ in gv.h: */
 
 #endif
 
-#define LvTYPE(sv)	((XPVLV*)  SvANY(sv))->xlv_type
-#define LvTARG(sv)	((XPVLV*)  SvANY(sv))->xlv_targ
-#define LvTARGOFF(sv)	((XPVLV*)  SvANY(sv))->xlv_targoff
-#define LvTARGLEN(sv)	((XPVLV*)  SvANY(sv))->xlv_targlen
-
 #define IoIFP(sv)	((XPVIO*)  SvANY(sv))->xio_ifp
 #define IoOFP(sv)	((XPVIO*)  SvANY(sv))->xio_ofp
 #define IoDIRP(sv)	((XPVIO*)  SvANY(sv))->xio_dirp
@@ -1199,9 +1152,6 @@ C<SvPVx> for a version which guarantees to evaluate sv only once.
 A version of C<SvPV> which guarantees to evaluate C<sv> only once.
 Only use this if C<sv> is an expression with side effects, otherwise use the
 more efficient C<SvPVX>.
-
-=for apidoc Am|char*|SvPV_nomg|SV* sv|STRLEN len
-Like C<SvPV> but doesn't process magic.
 
 =for apidoc Am|char*|SvPV_nolen|SV* sv
 Returns a pointer to the string in the SV, or a stringified form of
@@ -1295,10 +1245,6 @@ Like C<sv_catsv> but doesn't process magic.
 #define SvPV_nolen_const(sv) \
     ((SvFLAGS(sv) & (SVf_POK)) == SVf_POK \
      ? SvPVX_const(sv) : sv_2pv_flags(sv, 0, SV_CONST_RETURN))
-
-#define SvPV_nomg(sv, lp) SvPV_flags(sv, lp, 0)
-#define SvPV_nomg_const(sv, lp) SvPV_flags_const(sv, lp, 0)
-#define SvPV_nomg_const_nolen(sv) SvPV_flags_const_nolen(sv, 0)
 
 /* ----*/
 
@@ -1486,15 +1432,15 @@ Returns a pointer to the character buffer.
    where nested macros get confused. Been there, done that.  */
 #define isGV_with_GP(pwadak) \
 	(((SvFLAGS(pwadak) & (SVp_POK|SVpgv_GP)) == SVpgv_GP)	\
-	&& (SvTYPE(pwadak) == SVt_PVGV || SvTYPE(pwadak) == SVt_PVLV))
+	    && (SvTYPE(pwadak) == SVt_PVGV))
 #define isGV_with_GP_on(sv)	STMT_START {			       \
-	assert (SvTYPE(sv) == SVt_PVGV || SvTYPE(sv) == SVt_PVLV); \
+	assert (SvTYPE(sv) == SVt_PVGV); \
 	assert (!SvPOKp(sv));					       \
 	assert (!SvIOKp(sv));					       \
 	(SvFLAGS(sv) |= SVpgv_GP);				       \
     } STMT_END
 #define isGV_with_GP_off(sv)	STMT_START {			       \
-	assert (SvTYPE(sv) == SVt_PVGV || SvTYPE(sv) == SVt_PVLV); \
+	assert (SvTYPE(sv) == SVt_PVGV); \
 	assert (!SvPOKp(sv));					       \
 	assert (!SvIOKp(sv));					       \
 	(SvFLAGS(sv) &= ~SVpgv_GP);				       \

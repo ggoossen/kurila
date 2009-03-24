@@ -16,7 +16,7 @@ ok 1;
 use Pod::Simple::DumpAsXML;
 use Pod::Simple::XMLOutStream;
 print \*STDOUT, "# Pod::Simple version $Pod::Simple::VERSION\n";
-sub e ($$) { Pod::Simple::DumpAsXML->_duo(< @_) }
+sub e ($x, $y) { Pod::Simple::DumpAsXML->_duo($x, $y) }
 
 my $x = 'Pod::Simple::XMLOutStream';
 sub accept_N { @_[0]->accept_codes('N') }
@@ -53,8 +53,7 @@ ok( $x->_out( \&accept_N,  "=pod\n\nB<pieF<zorch>N<foo>I<pling>>\n"),
 
 print \*STDOUT, "# Tests of nonacceptance...\n";
 
-sub starts_with {
-  my@($large, $small) =  @_;
+sub starts_with($large, $small) {
   print(\*STDOUT, "# supahstring is undef\n"),
    return '' unless defined $large;
   print(\*STDOUT, "# supahstring $large is smaller than target-starter $small\n"),

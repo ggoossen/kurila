@@ -9,7 +9,7 @@ use File::Spec;
 use POSIX;
 use Scalar::Util < qw(looks_like_number);
 
-sub check(@) { grep { eval "&$_;1" or $^EVAL_ERROR->{?description}!~m/vendor has not defined POSIX macro/ }, @_
+sub check { grep { eval "&$_;1" or $^EVAL_ERROR->{?description}!~m/vendor has not defined POSIX macro/ }, @_
 }       
 
 my @path_consts = check < qw(
@@ -50,8 +50,7 @@ my $r;
 
 my $TTY = "/dev/tty";
 
-sub _check_and_report {
-    my @($eval_status, $return_val, $description) =  @_;
+sub _check_and_report($eval_status, $return_val, $description) {
     my $success = defined($return_val) || $^OS_ERROR == 0;
     is( $eval_status, '', $description );
     SKIP: do {

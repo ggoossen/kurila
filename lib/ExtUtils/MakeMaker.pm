@@ -100,8 +100,7 @@ my %Special_Sigs = %(
  %Att_Sigs{[keys %Special_Sigs]} = values %Special_Sigs;
 
 
-sub _verify_att {
-    my@($att) =  @_;
+sub _verify_att($att) {
 
     while( my @(?$key, ?$val) = @( each %$att) ) {
         my $sig = %Att_Sigs{?$key};
@@ -133,8 +132,7 @@ sub _format_att {
 }
 
 
-sub prompt ($;$) {  ## no critic
-    my@($mess, ?$def) =  @_;
+sub prompt($mess, ?$def) {
     die("prompt function called without an argument") 
         unless defined $mess;
 
@@ -164,8 +162,7 @@ sub prompt ($;$) {  ## no critic
     return (!defined $ans || $ans eq '') ?? $def !! $ans;
 }
 
-sub eval_in_subdirs {
-    my@($self) =  @_;
+sub eval_in_subdirs($self) {;
     use Cwd < qw(cwd abs_path);
     my $pwd = cwd() || die "Can't figure out your cwd!";
 
@@ -181,8 +178,7 @@ sub eval_in_subdirs {
     die $^EVAL_ERROR if $^EVAL_ERROR;
 }
 
-sub eval_in_x {
-    my@($self,$dir) =  @_;
+sub eval_in_x($self,$dir) {
     chdir $dir or warn("Couldn't change to directory $dir: $^OS_ERROR");
 
     do {
@@ -675,8 +671,7 @@ sub check_manifest {
     }
 }
 
-sub parse_args{
-    my@($self, @< @args) =  @_;
+sub parse_args($self, @< @args){
     foreach ( @args) {
         unless (m/(.*?)=(.*)/) {
             ++$Verbose if m/^verb/;
@@ -745,8 +740,7 @@ sub parse_args{
     $^OUTPUT_AUTOFLUSH = 1 if $Verbose;
 }
 
-sub check_hints {
-    my@($self) =  @_;
+sub check_hints($self) {
     # We allow extension-specific hints files.
 
     require File::Spec;
@@ -853,9 +847,8 @@ sub mv_all_methods {
 #    }
 }
 
-sub skipcheck {
-    my@($self) =@( shift);
-    my@($section) =  @_;
+sub skipcheck($self, $section) {
+
     if ($section eq 'dynamic') {
         print \*STDOUT, "Warning (non-fatal): Target 'dynamic' depends on targets ",
         "in skipped section 'dynamic_bs'\n"
@@ -912,8 +905,7 @@ sub flush {
 
 
 # This is a rename for OS's where the target must be unlinked first.
-sub _rename {
-    my@($src, $dest) =  @_;
+sub _rename($src, $dest) {
     chmod 0666, $dest;
     unlink $dest;
     return rename $src, $dest;
@@ -947,8 +939,7 @@ sub mksymlists {
 END
 }
 
-sub neatvalue {
-    my@($v) =  @_;
+sub neatvalue($v) {
     return "undef" unless defined $v;
     my@($t) =@( ref $v);
     return "q[$v]" unless $t;
@@ -971,8 +962,7 @@ sub neatvalue {
     return '\%( '.join(', ', @m)." )";
 }
 
-sub selfdocument {
-    my@($self) =  @_;
+sub selfdocument($self) {
     my(@m);
     if ($Verbose){
         push @m, "\n# Full list of MakeMaker attribute values:";

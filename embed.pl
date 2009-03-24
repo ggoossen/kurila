@@ -21,10 +21,8 @@ my $SPLINT = 0; # Turn true for experimental splint support http://www.splint.or
 # implicit interpreter context argument.
 #
 
-sub do_not_edit ($)
+sub do_not_edit($file)
 {
-    my $file = shift;
-
     my $years = '1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007';
 
     $years =~ s/1999,/1999,\n  / if length $years +> 40;
@@ -74,12 +72,9 @@ open my $in, '<', "embed.fnc" or die $^OS_ERROR;
 
 # walk table providing an array of components in each line to
 # subroutine, printing the result
-sub walk_table (&@) {
-    my $function = shift;
-    my $filename = shift || '-';
-    my $leader = shift;
-    defined $leader or $leader = do_not_edit ($filename);
-    my $trailer = shift;
+sub walk_table ($function, ?$filename, ?$leader, ?$trailer) {
+    $filename //= '-';
+    $leader //= do_not_edit($filename);
     my $F;
     if (ref $filename) {	# filehandle
 	$F = $filename;
@@ -318,8 +313,7 @@ my @extvars = qw(sv_undef sv_yes sv_no na dowarn
 		 ppaddr
                 );
 
-sub readsyms (\%$) {
-    my @($syms, $file) =  @_;
+sub readsyms($syms, $file) {
     local ($_);
     my $fh;
     open($fh, "<", "$file")
@@ -329,18 +323,17 @@ sub readsyms (\%$) {
 	if (m/^\s*(\S+)\s*$/) {
 	    my $sym = $1;
 	    warn "duplicate symbol $sym while processing $file line $(iohandle::input_line_number(\*FILE)).\n"
-		if exists %$syms{$sym};
-	    %$syms{+$sym} = 1;
+		if exists $syms->{$sym};
+	    $syms->{+$sym} = 1;
 	}
     }
     close($fh);
 }
 
 # Perl_pp_* and Perl_ck_* are in pp.sym
-readsyms my %ppsym, 'pp.sym';
+readsyms \my %ppsym, 'pp.sym';
 
-sub readvars(\%$$@) {
-    my @($syms, $file,$pre,?$keep_pre) =  @_;
+sub readvars($syms, $file,$pre,?$keep_pre) {
     local ($_);
     open(my $fh, "<", "$file")
 	or die "embed.pl: Can't open $file: $^OS_ERROR\n";
@@ -360,33 +353,28 @@ sub readvars(\%$$@) {
 my %intrp;
 my %globvar;
 
-readvars %intrp,  'intrpvar.h','I';
-readvars %globvar, 'perlvars.h','G';
+readvars \%intrp,  'intrpvar.h','I';
+readvars \%globvar, 'perlvars.h','G';
 
-sub undefine ($) {
-    my @($sym) =  @_;
+sub undefine($sym) {
     "#undef  $sym\n";
 }
 
-sub hide ($$) {
-    my @($from, $to) =  @_;
+sub hide($from, $to) {
     my $t = int(length($from) / 8);
     "#define $from" . "\t" x ($t +< 3 ?? 3 - $t !! 1) . "$to\n";
 }
 
-sub bincompat_var ($$) {
-    my @($pfx, $sym) =  @_;
+sub bincompat_var($pfx, $sym) {
     my $arg = ($pfx eq 'G' ?? 'NULL' !! 'aTHX');
     undefine("PL_$sym") . hide("PL_$sym", "(*Perl_$($pfx)$($sym)_ptr($arg))");
 }
 
-sub multon ($$$) {
-    my @($sym,$pre,$ptr) =  @_;
+sub multon($sym,$pre,$ptr) {
     hide("PL_$sym", "($ptr$pre$sym)");
 }
 
-sub multoff ($$) {
-    my @($sym,$pre) =  @_;
+sub multoff($sym,$pre) {
     return hide("PL_$pre$sym", "PL_$sym");
 }
 
@@ -442,8 +430,8 @@ walk_table sub {
                     $xvname =~ s/^Sv/$xv/;
                     $xvname =~ s/^sv/$(lc $xv)/;
                     my $ret_convert = $retval =~ m/SV/;
-                    my $call = "Perl_" . $func . "(aTHX_ " . $xv . "Sv" . "($a1)$alist)";
-                    print $em, "#define $xvname(" . $a1 . $alist . ")\t\t" . ($ret_convert ?? "Sv" . $xv . "($call)" !! $call ) . "\n";
+                    my $call = "Perl_" . $func . "(aTHX_ " . "$(lc $xv)Tsv" . "($a1)$alist)";
+                    print $em, "#define $xvname(" . $a1 . $alist . ")\t\t" . ($ret_convert ?? "svT$(lc $xv)" . "($call)" !! $call ) . "\n";
                 }
             }
 	}
@@ -528,8 +516,8 @@ walk_table sub {
                     my $a1 = @az[0];
                     (my $xvname = $func) =~ s/^Sv/$xv/;
                     my $ret_convert = $retval =~ m/SV/;
-                   my $call = "Perl_" . $func . "(aTHX_ " . $xv . "Sv" . "($a1)$alist)";
-                    print $em, "#define $xvname(" . $a1 . $alist . ")\t\t" . ($ret_convert ?? "Sv" . $xv . "($call)" !! $call ) . "\n";
+                   my $call = "Perl_" . $func . "(aTHX_ " . lc($xv) . "Tsv" . "($a1)$alist)";
+                    print $em, "#define $xvname(" . $a1 . $alist . ")\t\t" . ($ret_convert ?? "svT" . lc($xv) . "($call)" !! $call ) . "\n";
                 }
             }
 	}

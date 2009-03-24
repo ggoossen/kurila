@@ -86,8 +86,7 @@ while (my @(?$type, ?$value) =@( each %XS_TypeSet)) {
 }
 %type_num_args{+''} = 0;
 
-sub partition_names {
-    my @($self, $default_type, @< @items) =  @_;
+sub partition_names($self, $default_type, @< @items) {
     my (%found, @notfound, @trouble);
 
     while (my $item = shift @items) {
@@ -120,8 +119,7 @@ sub partition_names {
     return @(\%found, \@notfound, \@trouble);
 }
 
-sub boottime_iterator {
-    my @($self, $type, $iterator, $hash, $subname) =  @_;
+sub boottime_iterator($self, $type, $iterator, $hash, $subname) {
     my $extractor = %type_from_struct{?$type};
     die "Can't find extractor code for type $type"
 	unless defined $extractor;
@@ -140,8 +138,7 @@ sub boottime_iterator {
 EOBOOT
 }
 
-sub name_len_value_macro {
-    my @($self, $item) =  @_;
+sub name_len_value_macro($self, $item) {
     my $name = $item->{?name};
     my $value = $item->{?value};
     $value = $item->{?name} unless defined $value;
@@ -382,11 +379,11 @@ EXPLODE
 			   "Couldn't add key '$($package_sprintf_safe)::\%s'",
 			   value_for_notfound->name);
 	    \}
-            GV* notfoundgv = gv_fetchmethod(aTHX_  symbol_table, "constant_not_found");
-            if (!notfoundgv || ! GvCV(notfoundgv)) \{
+            CV* notfoundcv = gv_fetchmethod(aTHX_  symbol_table, "constant_not_found");
+            if (!notfoundcv) \{
 		Perl_croak(aTHX_ "'constant_not_found' could not be found");
             \}
-            sv_setsv((SV*)gv, sv_2mortal(newRV_inc((SV*)GvCV(notfoundgv))));
+            sv_setsv((SV*)gv, sv_2mortal(newRV_inc(cvTsv(notfoundcv))));
 #ifndef SYMBIAN
 	    hv_store($($c_subname)_missing, value_for_notfound->name,
 			  value_for_notfound->namelen, &PL_sv_yes, 0);

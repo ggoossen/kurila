@@ -40,15 +40,13 @@ do {
 
 	package My::GoodFreeze;
 
-	sub STORABLE_freeze {
-		my @($self, $clone) =  @_;
+	sub STORABLE_freeze($self, $clone) {
 		
 		# Illegally include a reference in this return
 		return  @('');
 	}
 
-	sub STORABLE_attach {
-		my @($class, $clone, $string) =  @_;
+	sub STORABLE_attach($class, $clone, $string) {
 		return bless \%( ), 'My::GoodFreeze';
 	}
 };
@@ -67,15 +65,13 @@ do {
 
 	package My::BadFreeze;
 
-	sub STORABLE_freeze {
-		my @($self, $clone) =  @_;
+	sub STORABLE_freeze($self, $clone) {
 		
 		# Illegally include a reference in this return
 		return  @('', \@());
 	}
 
-	sub STORABLE_attach {
-		my @($class, $clone, $string) =  @_;
+	sub STORABLE_attach($class, $clone, $string) {
 		return bless \%( ), 'My::BadFreeze';
 	}
 };
@@ -108,14 +104,12 @@ do {
 
 	package My::GoodThaw;
 
-	sub STORABLE_freeze {
-		my @($self, $clone) =  @_;
+	sub STORABLE_freeze($self, $clone) {
 
 		return  @('');
 	}
 
-	sub STORABLE_attach {
-		my @($class, $clone, $string) =  @_;
+	sub STORABLE_attach($class, $clone, $string) {
 		return bless \%( 'foo' => 'bar' ), 'My::GoodThaw';
 	}
 };
@@ -149,16 +143,14 @@ do {
 
 	package My::BadThaw;
 
-	sub STORABLE_freeze {
-		my @($self, $clone) =  @_;
+	sub STORABLE_freeze($self, $clone) {
 
 		return  @('', \@());
 	}
 
 	# Start with no STORABLE_attach method so we can get a
 	# frozen object-containing-a-reference into the freeze string.
-	sub STORABLE_thaw {
-		my @($class, $clone, $string) =  @_;
+	sub STORABLE_thaw($class, $clone, $string) {
 		return bless \%( 'foo' => 'bar' ), 'My::BadThaw';
 	}
 };
@@ -187,13 +179,11 @@ do {
 
 	package My::GoodAttach;
 
-	sub STORABLE_freeze {
-		my @($self, $cloning) =  @_;
+	sub STORABLE_freeze($self, $cloning) {
 		return  @('');
 	}
 
-	sub STORABLE_attach {
-		my @($class, $cloning, $string) =  @_;
+	sub STORABLE_attach($class, $cloning, $string) {
 
 		return bless \%( ), 'My::GoodAttach::Subclass';
 	}
@@ -242,13 +232,11 @@ do {
 	
 	package My::BadAttach;
 
-	sub STORABLE_freeze {
-		my @($self, $cloning) =  @_;
+	sub STORABLE_freeze($self, $cloning) {
 		return  @('');
 	}
 
-	sub STORABLE_attach {
-		my @($class, $cloning, $string) =  @_;
+	sub STORABLE_attach($class, $cloning, $string) {
 
 		return $returnvalue;
 	}

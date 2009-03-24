@@ -9,6 +9,7 @@ require DynaLoader;
 require Exporter;
 package Storable;
 
+use IO::File;
 
 our @ISA = qw(Exporter DynaLoader);
 
@@ -22,7 +23,6 @@ our @EXPORT_OK = qw(
         file_magic read_magic
 );
 
-use FileHandle;
 our ($canonical, $forgive_me, $VERSION);
 
 $VERSION = '2.18';
@@ -114,7 +114,7 @@ EOM
 
 sub file_magic {
     my $file = shift;
-    my $fh = FileHandle->new();
+    my $fh = IO::File->new();
     open($fh, "<", "". $file) || die "Can't open '$file': $^OS_ERROR";
     binmode($fh);
     defined(sysread($fh, my $buf, 32)) || die "Can't read from '$file': $^OS_ERROR";
@@ -125,8 +125,7 @@ sub file_magic {
     return read_magic($buf, $file);
 }
 
-sub read_magic {
-    my@($buf, ?$file) =  @_;
+sub read_magic($buf, ?$file) {
     my %info;
 
     my $buflen = length($buf);
@@ -273,7 +272,7 @@ sub _store {
 # Returns undef if an I/O error occurred.
 #
 sub store_fd {
-	return _store_fd(\&pstore, < @_);
+    return _store_fd(\&pstore, < @_);
 }
 
 #
@@ -386,8 +385,7 @@ sub _retrieve {
 #
 # Same as retrieve, but perform from an already opened file descriptor instead.
 #
-sub fd_retrieve {
-	my @($file) =  @_;
+sub fd_retrieve($file) {
 	my $fd = fileno($file);
 	logcroak "not a valid file descriptor" unless defined $fd;
 	my $self;
@@ -404,8 +402,7 @@ sub fd_retrieve {
 # Recreate objects in memory from an existing frozen image created
 # by freeze.  If the frozen image passed is undef, return undef.
 #
-sub thaw {
-	my @($frozen) =  @_;
+sub thaw($frozen) {
 	return undef unless defined $frozen;
 	my $self;
 	my $da = $^EVAL_ERROR;							# Could be from exception handler

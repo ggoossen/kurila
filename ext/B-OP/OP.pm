@@ -49,8 +49,7 @@ sub linklist {
     return $o->next;
 }
 
-sub append_elem {
-    my @( $class, $type, $first, $last ) =  @_;
+sub append_elem( $class, $type, $first, $last) {
     return $last  unless $first and $$first;
     return $first unless $last  and $$last;
 
@@ -72,8 +71,7 @@ sub append_elem {
     return $first;
 }
 
-sub prepend_elem {
-    my @( $class, $type, $first, $last ) =  @_;
+sub prepend_elem( $class, $type, $first, $last) {
     if ( $last->type() != $type ) {
         return B::LISTOP->new( $type, 0, $first, $last );
     }

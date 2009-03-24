@@ -5,7 +5,7 @@ our (@ISA, @EXPORT, $MYPKG);
 use Exporter;
 use File::Basename;
 use File::Spec;
-use FileHandle;
+use IO::File;
 
 @ISA = qw(Exporter);
 @EXPORT = qw(&testcmp);
@@ -43,15 +43,15 @@ otherwise.
 
 ##--------------------------------------------------------------------------
 
-sub testcmp( $ $ ; $) {
+sub testcmp {
    my %opts = %( ref(@_[0]) eq 'HASH' ?? < %{shift()} !! () );
    my @($file1, $file2) =  @_;
    my @($fh1, $fh2) = @($file1, $file2);
    unless (ref $fh1) {
-      $fh1 = FileHandle->new($file1, "r") or die "Can't open $file1: $^OS_ERROR";
+      $fh1 = IO::File->new($file1, "r") or die "Can't open $file1: $^OS_ERROR";
    }
    unless (ref $fh2) {
-      $fh2 = FileHandle->new($file2, "r") or die "Can't open $file2: $^OS_ERROR";
+      $fh2 = IO::File->new($file2, "r") or die "Can't open $file2: $^OS_ERROR";
    }
   
    my $cmplines = %opts{?'cmplines'} || undef;

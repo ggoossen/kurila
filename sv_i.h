@@ -94,42 +94,56 @@ static __inline__ AV* inline_av_mortalcopy(pTHX_ AV *av) {
 }
 
 /* XV to SV conversion "macros" */
-SV* Perl_AvSv(pTHX_ AV *av) { return (SV*)av; }
-SV* Perl_HvSv(pTHX_ HV *hv) { return (SV*)hv; }
-SV* Perl_CvSv(pTHX_ CV *cv) { return (SV*)cv; }
-SV* Perl_GvSv(pTHX_ GV *gv) { return (SV*)gv; }
-SV* Perl_ReSv(pTHX_ REGEXP *re) { return (SV*)re; }
-SV* Perl_IoSv(pTHX_ struct io *io) { return (SV*)io; }
+SV* Perl_avTsv(pTHX_ AV *av) { return (SV*)av; }
+SV* Perl_hvTsv(pTHX_ HV *hv) { return (SV*)hv; }
+SV* Perl_cvTsv(pTHX_ CV *cv) { return (SV*)cv; }
+SV* Perl_gvTsv(pTHX_ GV *gv) { return (SV*)gv; }
+SV* Perl_reTsv(pTHX_ REGEXP *re) { return (SV*)re; }
+SV* Perl_ioTsv(pTHX_ struct io *io) { return (SV*)io; }
 
 
-AV* Perl_SvAv(pTHX_ SV *sv) {
-    PERL_ARGS_ASSERT_SVAV;
+AV* Perl_svTav(pTHX_ SV *sv) {
+    PERL_ARGS_ASSERT_SVTAV;
     assert(SvAVOK(sv));
     return (AV*)sv;
 }
 
-HV* Perl_SvHv(pTHX_ SV *sv) {
-    PERL_ARGS_ASSERT_SVHV;
+HV* Perl_svThv(pTHX_ SV *sv) {
+    PERL_ARGS_ASSERT_SVTHV;
     assert(SvHVOK(sv));
     return (HV*)sv;
 }
 
-CV* Perl_SvCv(pTHX_ SV *sv) {
-    PERL_ARGS_ASSERT_SVCV;
+CV* Perl_svTcv(pTHX_ SV *sv) {
+    PERL_ARGS_ASSERT_SVTCV;
     assert(SvCVOK(sv));
     return (CV*)sv;
 }
 
-#define CvREFCNT_inc(cv) inline_CvREFCNT_inc(aTHX_ cv)
-static __inline__ CV* inline_CvREFCNT_inc(pTHX_ CV* cv) {
-    return (CV*)SvREFCNT_inc((SV*)cv);
+GV* Perl_svTgv(pTHX_ SV *sv) {
+    PERL_ARGS_ASSERT_SVTGV;
+    assert(SvTYPE(sv) == SVt_PVGV);
+    return (GV*)sv;
 }
 
-#define SVcpREPLACE(sv_d, sv_s) inline_SVcpREPLACE(&sv_d, sv_s)
-static __inline__ void inline_SVcpREPLACE(pTHX_ SV**sv_d, SV*sv_s) {
-  SvREFCNT_inc(sv_s);
-  SvREFCNT_dec(*sv_d);
-  *sv_d = sv_s;
+IO* Perl_svTio(pTHX_ SV *sv) {
+    PERL_ARGS_ASSERT_SVTIO;
+    assert(SvIOOK(sv));
+    return (IO*)sv;
+}
+
+REGEXP* Perl_svTre(pTHX_ SV *sv) {
+    PERL_ARGS_ASSERT_SVTRE;
+    assert(SvTYPE(sv) == SVt_REGEXP);
+    return (REGEXP*)sv;
+}
+
+SV* SvREFCNT_inc(pTHX_ SV* sv) {
+    if (sv) {
+        assert(SvTYPE(sv) != SVTYPEMASK);
+        (SvREFCNT(sv))++;
+    }
+    return sv;
 }
 
 #define SVcpNULL(sv) { SvREFCNT_dec(sv); sv = NULL; }
@@ -143,6 +157,12 @@ static __inline__ void inline_SVcpREPLACE(pTHX_ SV**sv_d, SV*sv_s) {
 #define CVcpSTEAL(sv_d, sv_s) { CvREFCNT_dec(sv_d); sv_d = sv_s; }
 
 
+#define SVcpREPLACE(sv_d, sv_s) inline_SVcpREPLACE(&sv_d, sv_s)
+static __inline__ void inline_SVcpREPLACE(pTHX_ SV**sv_d, SV*sv_s) {
+  SvREFCNT_inc(sv_s);
+  SvREFCNT_dec(*sv_d);
+  *sv_d = sv_s;
+}
 #define XVcpREPLACE(XV) \
     static __inline__ void inline_cpREPLACE_##XV( XV **sv_d, XV *sv_s) { \
         inline_SVcpREPLACE(aTHX_ (SV**)sv_d, (SV*)sv_s);                \
@@ -165,7 +185,7 @@ SV* LocationFilename(pTHX_ SV *location) {
     SV** fn;
     if ( ! location || ! SvAVOK(location) )
         return NULL;
-    fn = av_fetch(SvAv(location), 0, 0);
+    fn = av_fetch(svTav(location), 0, 0);
     if ( ! fn )
         return NULL;
     return *fn;

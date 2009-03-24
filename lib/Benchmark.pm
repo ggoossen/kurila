@@ -546,8 +546,7 @@ sub iters { @_[0]->[5] ; }
 usage: $result_diff = timediff($result1, $result2);
 USAGE
 
-sub timediff {
-    my@($a, $b) =  @_;
+sub timediff($a, $b) {
 
     die usage unless ref $a and ref $b;
 
@@ -564,8 +563,7 @@ sub timediff {
 usage: $sum = timesum($result1, $result2);
 USAGE
 
-sub timesum {
-    my@($a, $b) =  @_;
+sub timesum($a, $b) {
 
     die usage unless ref $a and ref $b;
 
@@ -581,8 +579,7 @@ sub timesum {
 usage: $formatted_result = timestr($result1);
 USAGE
 
-sub timestr {
-    my@($tr, ?$style, ?$f) =  @_;
+sub timestr($tr, ?$style, ?$f) {
 
     die usage unless ref $tr;
 
@@ -612,8 +609,7 @@ sub timestr {
     $s;
 }
 
-sub timedebug {
-    my@($msg, $t) =  @_;
+sub timedebug($msg, $t) {
     print \*STDERR, "$msg",timestr($t),"\n" if $Debug;
 }
 
@@ -623,8 +619,7 @@ sub timedebug {
 usage: runloop($number, [$string | $coderef])
 USAGE
 
-sub runloop {
-    my@($n, $c) =  @_;
+sub runloop($n, $c) {
 
     $n+=0; # force numeric now, so garbage won't creep into the eval
     die "negative loopcount $n" if $n+<0;
@@ -641,7 +636,7 @@ sub runloop {
 
     my ($subcode, $subref);
     if (ref $c eq 'CODE') {
-	$subcode = "sub \{ for (1 .. $n) \{ package $pack; &\$c; \} \}";
+	$subcode = "sub \{ for (1 .. $n) \{ package $pack; &\$c(); \} \}";
         $subref  = eval $subcode;
     }
     else {
@@ -671,8 +666,7 @@ usage: $result = timeit($count, 'code' );        or
        $result = timeit($count, sub { code } );
 USAGE
 
-sub timeit {
-    my@($n, $code) =  @_;
+sub timeit($n, $code) {
     my($wn, $wc, $wd);
 
     die usage unless defined $code and
@@ -683,21 +677,21 @@ sub timeit {
     if ($Do_Cache && exists %Cache{$cache_key} ) {
 	$wn = %Cache{?$cache_key};
     } else {
-	$wn = &runloop($n, ref( $code ) ?? sub { } !! '' );
+	$wn = runloop($n, ref( $code ) ?? sub { } !! '' );
 	# Can't let our baseline have any iterations, or they get subtracted
 	# out of the result.
 	$wn->[5] = 0;
 	%Cache{+$cache_key} = $wn;
     }
 
-    $wc = &runloop($n, $code);
+    $wc = runloop($n, $code);
 
     $wd = timediff($wc, $wn);
     timedebug("timeit: ",$wc);
     timedebug("      - ",$wn);
     timedebug("      = ",$wd);
 
-    $wd;
+    return $wd;
 }
 
 
@@ -810,8 +804,7 @@ usage: $result = timethis($time, 'code' );        or
        $result = timethis($time, sub { code } );
 USAGE
 
-sub timethis{
-    my@($n, $code, ?$title, ?$style) =  @_;
+sub timethis($n, $code, ?$title, ?$style){
     my($t, $forn);
 
     die usage unless defined $code and
@@ -850,8 +843,7 @@ usage: timethese($count, { Name1 => 'code1', ... });        or
        timethese($count, { Name1 => sub { code1 }, ... });
 USAGE
 
-sub timethese{
-    my@($n, $alt, ?$style) =  @_;
+sub timethese($n, $alt, ?$style){
     die usage unless ref $alt eq 'HASH';
 
     my @names = sort keys %$alt;

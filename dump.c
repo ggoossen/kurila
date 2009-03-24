@@ -38,7 +38,6 @@ static const char* const svtypenames[SVt_LAST] = {
     "PVMG",
     "REGEXP",
     "PVGV",
-    "PVLV",
     "PVAV",
     "PVHV",
     "PVCV",
@@ -57,7 +56,6 @@ static const char* const svshorttypenames[SVt_LAST] = {
     "PVMG",
     "REGEXP",
     "GV",
-    "PVLV",
     "AV",
     "HV",
     "CV",
@@ -1384,7 +1382,6 @@ Perl_do_sv_dump(pTHX_ I32 level, PerlIO *file, SV *sv, I32 nest, I32 maxnest, bo
 	if (flags & SVphv_CLONEABLE) sv_catpv(d, "CLONEABLE,");
 	break;
     case SVt_PVGV:
-    case SVt_PVLV:
 	if (isGV_with_GP(sv)) {
 	    if (GvINTRO(sv))	sv_catpv(d, "INTRO,");
 	    if (GvMULTI(sv))	sv_catpv(d, "MULTI,");
@@ -1504,7 +1501,7 @@ Perl_do_sv_dump(pTHX_ I32 level, PerlIO *file, SV *sv, I32 nest, I32 maxnest, bo
 	SvREFCNT_dec(d);
 	return;
     }
-    if (type <= SVt_PVLV && !isGV_with_GP(sv)) {
+    if (type <= SVt_PVGV && !isGV_with_GP(sv)) {
 	if (SvPVX_const(sv)) {
 	    STRLEN delta;
 	    if (SvOOK(sv)) {
@@ -1680,12 +1677,6 @@ Perl_do_sv_dump(pTHX_ I32 level, PerlIO *file, SV *sv, I32 nest, I32 maxnest, bo
 	}
 	break;
     case SVt_PVCV:
-	if (SvPOK(sv)) {
-	    STRLEN len;
-	    const char *const proto =  SvPV_const(sv, len);
-	    Perl_dump_indent(aTHX_ level, file, "  PROTOTYPE = \"%.*s\"\n",
-			     (int) len, proto);
-	}
 	if (!CvISXSUB(sv)) {
 	    if (CvSTART(sv)) {
 		Perl_dump_indent(aTHX_ level, file,
@@ -1722,16 +1713,6 @@ Perl_do_sv_dump(pTHX_ I32 level, PerlIO *file, SV *sv, I32 nest, I32 maxnest, bo
 	}
 	break;
     case SVt_PVGV:
-    case SVt_PVLV:
-	if (type == SVt_PVLV) {
-	    Perl_dump_indent(aTHX_ level, file, "  TYPE = %c\n", LvTYPE(sv));
-	    Perl_dump_indent(aTHX_ level, file, "  TARGOFF = %"IVdf"\n", (IV)LvTARGOFF(sv));
-	    Perl_dump_indent(aTHX_ level, file, "  TARGLEN = %"IVdf"\n", (IV)LvTARGLEN(sv));
-	    Perl_dump_indent(aTHX_ level, file, "  TARG = 0x%"UVxf"\n", PTR2UV(LvTARG(sv)));
-	    if (LvTYPE(sv) != 't' && LvTYPE(sv) != 'T')
-		do_sv_dump(level+1, file, LvTARG(sv), nest+1, maxnest,
-		    dumpops, pvlim);
-	}
 	if (SvVALID(sv)) {
 	    Perl_dump_indent(aTHX_ level, file, "  FLAGS = %u\n", (U8)BmFLAGS(sv));
 	    Perl_dump_indent(aTHX_ level, file, "  RARE = %u\n", (U8)BmRARE(sv));
@@ -2265,9 +2246,6 @@ Perl_sv_xmlpeek(pTHX_ SV *sv)
 	break;
     case SVt_PVMG:
 	sv_catpv(t, " PVMG=\"");
-	break;
-    case SVt_PVLV:
-	sv_catpv(t, " PVLV=\"");
 	break;
     case SVt_PVAV:
 	sv_catpv(t, " AV=\"");

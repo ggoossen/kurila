@@ -56,12 +56,8 @@ sub hasEncode()
     return $HAS_ENCODE;
 }
 
-sub getEncoding($$$)
+sub getEncoding($obj, $class, $want_encoding)
 {
-    my $obj = shift;
-    my $class = shift ;
-    my $want_encoding = shift ;
-
     $obj->croakError("$class: Encode module needed to use -Encode")
         if ! hasEncode();
 
@@ -78,15 +74,13 @@ $needBinmode = ($^OS_NAME eq 'MSWin32' ||
                     (eval ' $^UNICODE || $^UTF8LOCALE '))
                     ?? 1 !! 1 ;
 
-sub setBinModeInput($)
+sub setBinModeInput($handle)
 {
-    my $handle = shift ;
-
     binmode $handle 
         if  $needBinmode;
 }
 
-sub isaFilehandle($)
+sub isaFilehandle
 {
     return  (defined @_[0] and 
                (UNIVERSAL::isa(@_[0],'GLOB')
@@ -95,7 +89,7 @@ sub isaFilehandle($)
            )
 }
 
-sub isaFilename($)
+sub isaFilename
 {
     return  (defined @_[0] and 
                ! ref @_[0]    and 
@@ -122,7 +116,7 @@ use constant WANT_UNDEF => 4 ;
 #use constant WANT_HASH  => 8 ;
 use constant WANT_HASH  => 0 ;
 
-sub whatIsInput($;$)
+sub whatIsInput
 {
     my $got = whatIs(< @_);
     
@@ -137,7 +131,7 @@ sub whatIsInput($;$)
     return $got;
 }
 
-sub whatIsOutput($;$)
+sub whatIsOutput
 {
     my $got = whatIs(< @_);
     
@@ -151,7 +145,7 @@ sub whatIsOutput($;$)
     return $got;
 }
 
-sub whatIs ($;$)
+sub whatIs
 {
     return 'handle' if isaFilehandle(@_[0]);
 

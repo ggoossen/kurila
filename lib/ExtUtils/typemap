@@ -62,28 +62,28 @@ T_SVREF
 	    $var = (SV*)SvRV($arg);
 	else
 	    Perl_croak(aTHX_ \"\%s: \%s is not a reference\",
-			$( $ALIAS ?? q[SvPVX_const(SvNAME(cv))] !! qq[\"$pname\"] ),
+			$( $ALIAS ?? q[SvPVX_const(SvNAME(cvTsv(cv)))] !! qq[\"$pname\"] ),
 			\"$var\")
 T_AVREF
 	if (SvROK($arg) && SvTYPE(SvRV($arg))==SVt_PVAV)
 	    $var = (AV*)SvRV($arg);
 	else
 	    Perl_croak(aTHX_ \"\%s: \%s is not an array reference\",
-			$($ALIAS ?? q[SvPVX_const(SvNAME(cv))] !! qq[\"$pname\"] ),
+			$($ALIAS ?? q[SvPVX_const(SvNAME(cvTsv(cv)))] !! qq[\"$pname\"] ),
 			\"$var\")
 T_HVREF
 	if (SvROK($arg) && SvTYPE(SvRV($arg))==SVt_PVHV)
 	    $var = (HV*)SvRV($arg);
 	else
 	    Perl_croak(aTHX_ \"\%s: \%s is not a hash reference\",
-			$($ALIAS ?? q[SvPVX_const(SvNAME(cv))] !! qq[\"$pname\"] ),
+			$($ALIAS ?? q[SvPVX_const(SvNAME(cvTsv(cv)))] !! qq[\"$pname\"] ),
 			\"$var\")
 T_CVREF
 	if (SvROK($arg) && SvTYPE(SvRV($arg))==SVt_PVCV)
 	    $var = (CV*)SvRV($arg);
 	else
 	    Perl_croak(aTHX_ \"\%s: \%s is not a code reference\",
-			$($ALIAS ?? q[SvPVX_const(SvNAME(cv))] !! qq[\"$pname\"] ),
+			$($ALIAS ?? q[SvPVX_const(SvNAME(cvTsv(cv)))] !! qq[\"$pname\"] ),
 			\"$var\")
 T_SYSRET
 	$var NOT IMPLEMENTED
@@ -128,7 +128,7 @@ T_PTRREF
 	\}
 	else
 	    Perl_croak(aTHX_ \"\%s: \%s is not a reference\",
-			$($ALIAS ?? q[SvPVX_const(SvNAME(cv))] !! qq[\"$pname\"]),
+			$($ALIAS ?? q[SvPVX_const(SvNAME(cvTsv(cv)))] !! qq[\"$pname\"]),
 			\"$var\")
 T_REF_IV_REF
 	if (sv_isa($arg, \"$($ntype)\")) \{
@@ -137,7 +137,7 @@ T_REF_IV_REF
 	\}
 	else
 	    Perl_croak(aTHX_ \"\%s: \%s is not of type \%s\",
-			$($ALIAS ?? q[SvPVX_const(SvNAME(cv))] !! qq[\"$pname\"]),
+			$($ALIAS ?? q[SvPVX_const(SvNAME(cvTsv(cv)))] !! qq[\"$pname\"]),
 			\"$var\", \"$ntype\")
 T_REF_IV_PTR
 	if (sv_isa($arg, \"$($ntype)\")) \{
@@ -146,7 +146,7 @@ T_REF_IV_PTR
 	\}
 	else
 	    Perl_croak(aTHX_ \"\%s: \%s is not of type \%s\",
-			$($ALIAS ?? q[SvPVX_const(SvNAME(cv))] !! qq[\"$pname\"]),
+			$($ALIAS ?? q[SvPVX_const(SvNAME(cvTsv(cv)))] !! qq[\"$pname\"]),
 			\"$var\", \"$ntype\")
 T_PTROBJ
 	if (sv_derived_from($arg, \"$($ntype)\")) \{
@@ -155,7 +155,7 @@ T_PTROBJ
 	\}
 	else
 	    Perl_croak(aTHX_ \"\%s: \%s is not of type \%s\",
-			$($ALIAS ?? q[SvPVX_const(SvNAME(cv))] !! qq[\"$pname\"]),
+			$($ALIAS ?? q[SvPVX_const(SvNAME(cvTsv(cv)))] !! qq[\"$pname\"]),
 			\"$var\", \"$ntype\")
 T_PTRDESC
 	if (sv_isa($arg, \"$($ntype)\")) \{
@@ -165,7 +165,7 @@ T_PTRDESC
 	\}
 	else
 	    Perl_croak(aTHX_ \"\%s: \%s is not of type \%s\",
-			$($ALIAS ?? q[SvPVX_const(SvNAME(cv))] !! qq[\"$pname\"]),
+			$($ALIAS ?? q[SvPVX_const(SvNAME(cvTsv(cv)))] !! qq[\"$pname\"]),
 			\"$var\", \"$ntype\")
 T_REFREF
 	if (SvROK($arg)) \{
@@ -174,7 +174,7 @@ T_REFREF
 	\}
 	else
 	    Perl_croak(aTHX_ \"\%s: \%s is not a reference\",
-			$($ALIAS ?? q[SvPVX_const(SvNAME(cv))] !! qq[\"$pname\"]),
+			$($ALIAS ?? q[SvPVX_const(SvNAME(cvTsv(cv)))] !! qq[\"$pname\"]),
 			\"$var\")
 T_REFOBJ
 	if (sv_isa($arg, \"$($ntype)\")) \{
@@ -183,7 +183,7 @@ T_REFOBJ
 	\}
 	else
 	    Perl_croak(aTHX_ \"\%s: \%s is not of type \%s\",
-			$($ALIAS ?? q[SvPVX_const(SvNAME(cv))] !! qq[\"$pname\"]),
+			$($ALIAS ?? q[SvPVX_const(SvNAME(cvTsv(cv)))] !! qq[\"$pname\"]),
 			\"$var\", \"$ntype\")
 T_OPAQUE
 	$var = *($type *)SvPV_nolen($arg)
@@ -301,13 +301,13 @@ T_ARRAY
                 av_push(av_$var, tmp_$var);
 	DO_ARRAY_ELEM
 	    \}
-            ST(0) = AvSv(av_$var);
+            ST(0) = avTsv(av_$var);
         \}
 T_STDIO
 	\{
 	    GV *gv = newGVgen("$Package");
 	    PerlIO *fp = PerlIO_importFILE($var,0);
-	    if ( fp && do_open(gv, "+<&", 3, FALSE, 0, 0, fp) )
+	    if ( fp && do_open(GvIOn(gv), "+<&", 3, FALSE, 0, 0, fp) )
 		sv_setsv($arg, sv_bless(newRV((SV*)gv), gv_stashpv("$Package",1)));
 	    else
 		$arg = &PL_sv_undef;
@@ -315,7 +315,7 @@ T_STDIO
 T_IN
 	\{
 	    GV *gv = newGVgen("$Package");
-	    if ( do_open(gv, "<&", 2, FALSE, 0, 0, $var) )
+	    if ( do_open(GvIOn(gv), "<&", 2, FALSE, 0, 0, $var) )
 		sv_setsv($arg, sv_bless(newRV((SV*)gv), gv_stashpv("$Package",1)));
 	    else
 		$arg = &PL_sv_undef;
@@ -323,7 +323,7 @@ T_IN
 T_INOUT
 	\{
 	    GV *gv = newGVgen("$Package");
-	    if ( do_open(gv, "+<&", 3, FALSE, 0, 0, $var) )
+	    if ( do_open(GvIOn(gv), "+<&", 3, FALSE, 0, 0, $var) )
 		sv_setsv($arg, sv_bless(newRV((SV*)gv), gv_stashpv("$Package",1)));
 	    else
 		$arg = &PL_sv_undef;
@@ -331,7 +331,8 @@ T_INOUT
 T_OUT
 	\{
 	    GV *gv = newGVgen("$Package");
-	    if ( do_open(gv, "+>&", 3, FALSE, 0, 0, $var) )
+	    if ( do_open(GvIOn(gv), "+>&", 3, FALSE, 0, 0, $var) )
+
 		sv_setsv($arg, sv_bless(newRV((SV*)gv), gv_stashpv("$Package",1)));
 	    else
 		$arg = &PL_sv_undef;

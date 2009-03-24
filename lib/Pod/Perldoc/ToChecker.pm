@@ -18,8 +18,7 @@ sub is_pageable        { 1 }
 sub write_with_binmode { 0 }
 sub output_extension   { 'txt' }
 
-sub if_zero_length {
-  my@( $self, $file, $tmp, $tmpfd ) =  @_;
+sub if_zero_length( $self, $file, $tmp, $tmpfd) {
   print \*STDOUT, "No Pod errors in $file\n";
 }
 

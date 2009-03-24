@@ -27,7 +27,7 @@ no warnings 'redefine';
 
 package version::Bad;
 use base 'version';
-sub new { my@($self,$n)= @_;  bless \$n, $self }
+sub new($self,$n) {  bless \$n, $self }
 
 package main;
 my $testobj = version::Empty->new(1.002_003);

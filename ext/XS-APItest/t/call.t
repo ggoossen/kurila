@@ -6,23 +6,13 @@
 use TestInit;
 use Config;
 
-BEGIN {
-    print \*STDOUT, "1..0 # TODO Skip: Adjust for kurila\n";
-    exit 0;
-}
-
 use warnings;
 
-# Test::More doesn't have fresh_perl_is() yet
-# use Test::More tests => 240;
+use Test::More;
 
-BEGIN {
-    require './test.pl';
-    plan(184);
-    use_ok('XS::APItest')
-};
+use XS::APItest;
 
-local our $TODO = 1;
+plan skip_all => "Figure out what this should do";
 
 #########################
 
@@ -30,7 +20,7 @@ sub f {
     shift;
     unshift @_, 'b';
     pop @_;
-    defined wantarray ? wantarray ? (@_, 'x') :  'y' : 'z';
+    'x';
 }
 
 sub d {
@@ -46,7 +36,7 @@ sub Foo::meth {
     shift;
     unshift @_, 'b';
     pop @_;
-    defined wantarray ? wantarray ? (@_, 'x') :  'y' : 'z';
+    'x';
 }
 
 sub Foo::d {
@@ -54,79 +44,70 @@ sub Foo::d {
     die "its_dead_jim\n";
 }
 
-for my $test (
+do {
+    local our $TODO = 1;
+    is(eval_sv('q{x}', G_SCALAR), q{x}, "eval_sv G_SCALAR");
+};
+
+for my $test ( @:
     # flags      args           expected         description
-    \@( G_VOID,    \@( ),           \@( qw(z 1) ),     '0 args, G_VOID' ),
-    \@( G_VOID,    \@( qw(a p q) ), \@( qw(z 1) ),     '3 args, G_VOID' ),
-    \@( G_SCALAR,  \@( ),           \@( qw(y 1) ),     '0 args, G_SCALAR' ),
-    \@( G_SCALAR,  \@( qw(a p q) ), \@( qw(y 1) ),     '3 args, G_SCALAR' ),
-    \@( G_ARRAY,   \@( ),           \@( qw(x 1) ),     '0 args, G_ARRAY' ),
-    \@( G_ARRAY,   \@( qw(a p q) ), \@( qw(b p x 3) ), '3 args, G_ARRAY' ),
-    \@( G_DISCARD, \@( ),           \@( qw(0) ),       '0 args, G_DISCARD' ),
-    \@( G_DISCARD, \@( qw(a p q) ), \@( qw(0) ),       '3 args, G_DISCARD' ),
+    \@( G_SCALAR,  \@( ),           'x',     '0 args, G_SCALAR' ),
+    \@( G_SCALAR,  \qw(a p q), 'x',     '3 args, G_SCALAR' ),
+    \@( G_DISCARD, \@( ),           undef,       '0 args, G_DISCARD' ),
+    \@( G_DISCARD, \qw(a p q), undef,       '3 args, G_DISCARD' ),
 )
 {
-    my ($flags, $args, $expected, $description) = < @$test;
+    my @($flags, $args, $expected, $description) = @$test;
 
-    ok(eq_array( \@( < call_sv(\&f, $flags, < @$args) ), $expected),
+    is(call_sv(\&f, $flags, < @$args), $expected,
 	"$description call_sv(\\&f)");
 
-    ok(eq_array( \@( < call_sv(*f,  $flags, < @$args) ), $expected),
+    is(call_sv(*f,  $flags, < @$args), $expected,
 	"$description call_sv(*f)");
 
-    ok(eq_array( \@( < call_pv('f', $flags, < @$args) ), $expected),
+    is(call_pv('f', $flags, < @$args), $expected,
 	"$description call_pv('f')");
 
-    ok(eq_array( \@( < eval_sv('f(' . join(',',map"'$_'",< @$args) . ')', $flags) ),
-	$expected), "$description eval_sv('f(args)')");
-
-    ok(eq_array( \@( < call_method('meth', $flags, $obj, < @$args) ), $expected),
+    is(call_method('meth', $flags, $obj, < @$args), $expected,
 	"$description call_method('meth')");
 
     my $returnval = ((($flags ^&^ G_WANT) == G_ARRAY) || ($flags ^&^ G_DISCARD))
-	? \@(0) : \@( undef, 1 );
-    for my $keep (0, G_KEEPERR) {
-	my $desc = $description . ($keep ? ' G_KEEPERR' : '');
-	my $exp_err = $keep ? "before\n\t(in cleanup) its_dead_jim\n"
-			    : "its_dead_jim\n";
+	?? \@(0) !! \@( undef, 1 );
+    for my $keep (@: 0, G_KEEPERR) {
+        local our $TODO = $keep;
+	my $desc = $description . ($keep ?? ' G_KEEPERR' !! '');
+	my $exp_err = $keep ?? "before\n\t(in cleanup) its_dead_jim\n"
+			    !! "its_dead_jim\n";
 
-	$@ = "before\n";
-	ok(eq_array( \@( < call_pv('d', $flags^|^G_EVAL^|^$keep, < @$args) ), 
-		    $returnval),
-		    "$desc G_EVAL call_pv('d')");
-	is($@->{description}, $exp_err, "$desc G_EVAL call_pv('d') - \$@");
+	$^EVAL_ERROR = "before\n";
+	is(call_pv('d', $flags^|^G_EVAL^|^$keep, < @$args),
+           undef,
+           "$desc G_EVAL call_pv('d')");
+	is($^EVAL_ERROR->{description}, $exp_err,
+           "$desc G_EVAL call_pv('d') - \$@");
 
-	$@ = "before\n";
-	ok(eq_array( \@( < eval_sv('d()', $flags^|^$keep) ),
-		    $returnval),
-		    "$desc eval_sv('d()')");
-	is($@->{description}, $exp_err, "$desc eval_sv('d()') - \$@");
+# 	$^EVAL_ERROR = "before\n";
+# 	is(eval_sv('d()', $flags^|^$keep),
+# 		    $returnval,
+# 		    "$desc eval_sv('d()')");
+# 	is($^EVAL_ERROR->{description}, $exp_err, "$desc eval_sv('d()') - \$@");
 
-	$@ = "before\n";
-	ok(eq_array( \@( < call_method('d', $flags^|^G_EVAL^|^$keep, $obj, < @$args) ),
-		    $returnval),
-		    "$desc G_EVAL call_method('d')");
-	is($@->{description}, $exp_err, "$desc G_EVAL call_method('d') - \$@");
+	$^EVAL_ERROR = "before\n";
+	is(call_method('d', $flags^|^G_EVAL^|^$keep, $obj, < @$args),
+           undef,
+           "$desc G_EVAL call_method('d')");
+	is($^EVAL_ERROR->{description}, $exp_err, "$desc G_EVAL call_method('d') - \$@");
     }
 
-    ok(eq_array( \@( < sub { call_pv('f', $flags^|^G_NOARGS, "bad") }->(< @$args) ),
-	$expected), "$description G_NOARGS call_pv('f')");
-
-    ok(eq_array( \@( < sub { eval_sv('f(@_)', $flags^|^G_NOARGS) }->(< @$args) ),
-	$expected), "$description G_NOARGS eval_sv('f({join ' ', <@_})')");
-
-    # XXX call_method(G_NOARGS) isn't tested: I'm assuming
-    # it's not a sensible combination. DAPM.
-
-    ok(eq_array( \@( try { < call_pv('d', $flags, < @$args) }, $@->{description} ),
+    ok(eq_array( \@( try { < call_pv('d', $flags, < @$args) }, $^EVAL_ERROR->{description} ),
 	\@( "its_dead_jim\n" )), "$description eval \{ call_pv('d') \}");
 
-    ok(eq_array( \@( try { < eval_sv('d', $flags), $@ && < $@->message }, $@ && < $@->message ),
+    ok(eq_array( \@( try { < eval_sv('d', $flags), $^EVAL_ERROR && < $^EVAL_ERROR->message }, $^EVAL_ERROR && $^EVAL_ERROR->message ),
 	\@( < @$returnval,
 		"its_dead_jim\n", '' )),
 	"$description eval \{ eval_sv('d') \}");
 
-    ok(eq_array( \@( try { < call_method('d', $flags, $obj, < @$args) }, $@->{description} ),
+    ok(eq_array( \@( try { < call_method('d', $flags, $obj, < @$args) }, $^EVAL_ERROR->{description} ),
 	\@( "its_dead_jim\n" )), "$description eval \{ call_method('d') \}");
 
 };
@@ -134,25 +115,7 @@ for my $test (
 is(eval_pv('f()', 0), 'y', "eval_pv('f()', 0)");
 is(eval_pv('f(qw(a b c))', 0), 'y', "eval_pv('f(qw(a b c))', 0)");
 is(eval_pv('d()', 0), undef, "eval_pv('d()', 0)");
-is($@->{description}, "its_dead_jim\n", "eval_pv('d()', 0) - \$@");
+is($^EVAL_ERROR->{description}, "its_dead_jim\n", "eval_pv('d()', 0) - \$^EVAL_ERROR");
 is(try { eval_pv('d()', 1) } , undef, "eval \{ eval_pv('d()', 1) \}");
-is($@->{description}, "its_dead_jim\n", "eval \{ eval_pv('d()', 1) \} - \$@");
-
-# DAPM 9-Aug-04. A taint test in eval_sv() could die after setting up
-# a new jump level but before pushing an eval context, leading to
-# stack corruption
-
-fresh_perl_is(<<'EOF', "x=2", \%( switches => \@('-T') ), 'eval_sv() taint');
-use XS::APItest;
-
-my $x = 0;
-sub f {
-    try { my @a = ($^X . "x" , eval_sv(q(die "inner\n"), 0)) ; };
-    $x++;
-    $a <+> $b;
-}
-
-try { my @a = sort f 2, 1;  $x++};
-print "x=$x\n";
-EOF
+is($^EVAL_ERROR->{description}, "its_dead_jim\n", "eval \{ eval_pv('d()', 1) \} - \$^EVAL_ERROR");
 

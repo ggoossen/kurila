@@ -85,8 +85,7 @@ sub _do_install {
     }
 }
 
-sub _load_unload {
-    my @($on)=  @_;
+sub _load_unload($on) {
     if ($on) {
         _do_install();        
         if ( ! $installed ) {

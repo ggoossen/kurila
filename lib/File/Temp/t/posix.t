@@ -6,7 +6,7 @@ use Test;
 BEGIN { plan tests => 6}
 
 use File::Temp < qw/ :POSIX unlink0 /;
-use FileHandle;
+use IO::File;
 ok(1);
 
 # TMPNAM list context

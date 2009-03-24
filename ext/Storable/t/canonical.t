@@ -12,8 +12,7 @@ our ($debugging, $verbose);
 
 print \*STDOUT, "1..8\n";
 
-sub ok {
-    my@($testno, $ok) =  @_;
+sub ok($testno, $ok) {
     print \*STDOUT, "not " unless $ok;
     print \*STDOUT, "ok $testno\n";
 }

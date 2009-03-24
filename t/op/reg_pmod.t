@@ -18,7 +18,7 @@ plan tests => 4 * (nelems @tests) + 2;
 my $W = "";
 
 $^WARN_HOOK = sub { $W.=join("", @_); };
-sub _u($$) { "@_[0] is ".(defined @_[1] ?? "'@_[1]'" !! "undef") }
+sub _u($x, $y) { "$x is ".(defined $y ?? "'$y'" !! "undef") }
 
 $_ = '123-456-789';
 foreach my $test ( @tests) {

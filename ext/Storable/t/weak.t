@@ -56,8 +56,8 @@ my @tests = @(
   isa_ok($clone,'ARRAY');
   isa_ok($clone->[0],'HASH');
   isa_ok($clone->[1],'HASH');
-  ok(!isweak $clone->[0], "Element 0 isn't weak");
-  ok(isweak $clone->[1], "Element 1 is weak");
+  ok(!isweak($clone->[0]), "Element 0 isn't weak");
+  ok(isweak($clone->[1]), "Element 1 is weak");
 }
 ),
 # The weak reference needs to hang around long enough for other stuff to
@@ -68,8 +68,8 @@ my @tests = @(
   isa_ok($clone,'ARRAY');
   isa_ok($clone->[0],'HASH');
   isa_ok($clone->[1],'HASH');
-  ok(isweak $clone->[0], "Element 0 is weak");
-  ok(!isweak $clone->[1], "Element 1 isn't weak");
+  ok(isweak($clone->[0]), "Element 0 is weak");
+  ok(!isweak($clone->[1]), "Element 1 isn't weak");
 }
 ),
 \@($w,
@@ -79,7 +79,7 @@ my @tests = @(
   if ($what eq 'nothing') {
     # We're the original, so we're still a weakref to a hash
     isa_ok($clone->[0],'HASH');
-    ok(isweak $clone->[0], "Element 0 is weak");
+    ok(isweak($clone->[0]), "Element 0 is weak");
   } else {
     is($clone->[0],undef);
   }

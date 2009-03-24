@@ -3063,7 +3063,7 @@ extern const double _double_constants[];
 				    "Attempt to pack pointer to temporary value");
 		    }
 		    if (SvPOK(fromstr) || SvNIOK(fromstr))
-			aptr = SvPV_nomg_const_nolen(fromstr);
+			aptr = SvPV_nolen_const(fromstr);
 		    else
 			aptr = SvPV_force_flags_nolen(fromstr, 0);
 		}

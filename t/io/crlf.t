@@ -73,8 +73,7 @@ else {
     skip_all("No perlio, so no :crlf");
 }
 
-sub count_chars {
-    my@($text, $chars) =  @_;
+sub count_chars($text, $chars) {
     my $seen = 0;
     $seen++ while $text =~ m/$chars/g;
     return $seen;

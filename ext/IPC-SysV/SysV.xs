@@ -221,7 +221,7 @@ BOOT:
     HV *stash = gv_stashpvn("IPC::SysV", 9, GV_ADD);
     ENTER;
     SAVESPTR(PL_curstash);
-    SVcpREPLACE(PL_curstash, stash);
+    HVcpREPLACE(PL_curstash, stash);
     /*
      * constant subs for IPC::SysV
      */

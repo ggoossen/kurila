@@ -17,7 +17,7 @@ use Pod::Simple;
 use Pod::Simple::DumpAsXML;
 use Pod::Simple::XMLOutStream;
 print \*STDOUT, "# Pod::Simple version $Pod::Simple::VERSION\n";
-sub e ($$) { Pod::Simple::DumpAsXML->_duo(< @_) }
+sub e ($x, $y) { Pod::Simple::DumpAsXML->_duo($x, $y) }
 
 &ok( < e "", "" );
 &ok( < e "\n", "", );

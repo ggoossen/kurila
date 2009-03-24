@@ -46,8 +46,7 @@ this and tell you from where the C<PACKAGE> has been loaded already.
 
 =cut
 
-sub mark_as_loaded (*) {
-    my $pm      = shift;
+sub mark_as_loaded ($pm) {
     my $file    = __PACKAGE__->_pm_to_file( $pm ) or return;
     my $who     = @(caller)[1];
     
@@ -72,8 +71,7 @@ this and tell you the C<PACKAGE> has been unloaded already.
 
 =cut
 
-sub mark_as_unloaded (*) { 
-    my $pm      = shift;
+sub mark_as_unloaded ($pm) {
     my $file    = __PACKAGE__->_pm_to_file( $pm ) or return;
 
     unless( defined is_loaded( $pm ) ) {
@@ -96,8 +94,7 @@ from where it is said to be loaded on success.
 
 =cut
 
-sub is_loaded (*) { 
-    my $pm      = shift;
+sub is_loaded ($pm) { 
     my $file    = __PACKAGE__->_pm_to_file( $pm ) or return;
 
     return $^INCLUDED{?$file} if exists $^INCLUDED{$file};

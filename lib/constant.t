@@ -140,9 +140,8 @@ like $^EVAL_ERROR->{?description}, qr/begins with '__'/;
 
 # Check on declared() and %declared. This sub should be EXACTLY the
 # same as the one quoted in the docs!
-sub declared ($) {
+sub declared($name) {
     use constant v1.01;              # don't omit this!
-    my $name = shift;
     $name =~ s/^::/main::/;
     my $pkg = caller;
     my $full_name = $name =~ m/::/ ?? $name !! "$($pkg)::$name";

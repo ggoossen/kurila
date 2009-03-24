@@ -57,8 +57,7 @@ sub Mksymlists {
 }
 
 
-sub _write_aix {
-    my@($data) =  @_;
+sub _write_aix($data) {
 
     rename "$data->{?FILE}.exp", "$data->{?FILE}.exp_old";
 
@@ -70,8 +69,7 @@ sub _write_aix {
 }
 
 
-sub _write_os2 {
-    my@($data) =  @_;
+sub _write_os2($data) {
     require Config;
     my $threaded = "";
 
@@ -112,8 +110,7 @@ sub _write_os2 {
     close $def;
 }
 
-sub _write_win32 {
-    my@($data) =  @_;
+sub _write_win32($data) {
 
     require Config;
     if (not $data->{?DLBASE}) {
@@ -157,8 +154,7 @@ sub _write_win32 {
 }
 
 
-sub _write_vms {
-    my@($data) =  @_;
+sub _write_vms($data) {
 
     require Config; # a reminder for once we do $^O
     require ExtUtils::XSSymSet;

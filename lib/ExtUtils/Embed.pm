@@ -2,7 +2,7 @@
 
 package ExtUtils::Embed;
 require Exporter;
-require FileHandle;
+require IO::File;
 use Config;
 use Getopt::Std;
 use File::Spec;
@@ -64,7 +64,7 @@ sub xsinit {
 	$fh = \*STDOUT;
     }
     else {
-	$fh = FileHandle->new("$file", ">");
+	$fh = IO::File->new("$file", ">");
     }
 
     push(@mods, < static_ext()) if defined $std;
@@ -88,8 +88,7 @@ sub xsi_header {
 EOF
 }    
 
-sub xsi_protos {
-    my@(@exts) = @_;
+sub xsi_protos(@exts) {
     my(@retval,%seen);
     my $boot_proto = "pTHX_ CV* cv";
     foreach my $_ ( @exts){
@@ -104,8 +103,7 @@ sub xsi_protos {
     return join '', @retval;
 }
 
-sub xsi_body {
-    my@(@exts) = @_;
+sub xsi_body(@exts) {
     my($pname,@retval,%seen);
     my@($dl) =  canon('/','DynaLoader');
     push(@retval, "\tchar *file = __FILE__;\n");
@@ -269,8 +267,7 @@ sub ccopts {
    ccflags . perl_inc;
 }
 
-sub canon {
-    my@($as, @< @ext) =  @_;
+sub canon($as, @< @ext) {
     foreach( @ext) {
        # might be X::Y or lib/auto/X/Y/Y.a
        next if s!::!/!g;

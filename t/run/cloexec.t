@@ -100,7 +100,7 @@ sub test_not_inherited {
     # at least not on Tru64.
     # cmp_ok( $rc, '!=', 0,
     #     "child return code=$rc (non-zero means cannot inherit fd=$expected_fd)" );
-    cmp_ok( $out =~ m/(\n)/g, '==', 1,
+    cmp_ok( nelems(@: $out =~ m/(\n)/g), '==', 1,
         "child stdout: has 1 newline (rc=$rc, should be non-zero)" );
     is( $out, "childfd=$expected_fd\n", 'child stdout: fd' );
 }

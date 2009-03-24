@@ -9,14 +9,13 @@ BEGIN {
 
 # Can't use Test::Simple/More, they depend on Exporter.
 my $test;
-sub ok ($;$) {
-    my@($ok, $name) =  @_;
+sub ok($ok, $name) {
 
     # You have to do it this way or VMS will get confused.
     printf \*STDOUT, "\%sok \%d\%s\n", ($ok ?? '' !! 'not '), $test,
       (defined $name ?? " - $name" !! '');
 
-    printf \*STDOUT, "# Failed test at line \%d\n", (caller)[[2]] unless $ok;
+    printf \*STDOUT, "# Failed test at line \%d\n", @(caller)[2] unless $ok;
     
     $test++;
     return $ok;
@@ -111,7 +110,7 @@ main::ok ( $got eq 'lifejacket', 'and that it gave the correct result')
 # Testing->import is called.
 main::ok( eval "defined &is",
       "Import a subroutine where exporter must create the typeglob" );
-$got = eval "&is";
+$got = eval "&is()";
 main::ok ( $^EVAL_ERROR eq "", 'check we can call the imported autoloaded subroutine')
   or chomp ($^EVAL_ERROR), print \*STDERR, "# \$\@ is $^EVAL_ERROR\n";
 main::ok ( $got eq 'Is', 'and that it gave the correct result')

@@ -105,8 +105,7 @@ test might be run multiple times in the same process.
 
 our ($Level);
 
-sub reset {
-    my @($self) =  @_;
+sub reset($self) {
 
     # We leave this a global because it has to be localized and localizing
     # hash keys is just asking for pain.  Also, it was documented.
@@ -159,8 +158,7 @@ If you call plan(), don't call any of the other methods below.
 
 =cut
 
-sub plan {
-    my @($self, $cmd, ?$arg) =  @_;
+sub plan($self, $cmd, ?$arg) {
 
     local $Level = $Level + 1;
 
@@ -262,8 +260,7 @@ Skips all the tests, using the given $reason.  Exits immediately with 0.
 
 =cut
 
-sub skip_all {
-    my@($self, $reason) =  @_;
+sub skip_all($self, $reason) {
 
     my $out = "1..0";
     $out .= " # Skip $reason" if $reason;
@@ -289,8 +286,7 @@ the last one will be honored.
 
 =cut
 
-sub exported_to {
-    my @($self, ?$pack) =  @_;
+sub exported_to($self, ?$pack) {
 
     if( defined $pack ) {
         $self->{+Exported_To} = $pack;
@@ -319,8 +315,7 @@ like Test::Simple's ok().
 
 =cut
 
-sub ok {
-    my @($self, $test, ?$name) =  @_;
+sub ok($self, $test, ?$name) {
 
     # $test might contain an object which we don't want to accidentally
     # store, so we turn it into a boolean.
@@ -397,16 +392,14 @@ ERR
     return $test ?? 1 !! 0;
 }
 
-sub _is_object {
-    my@($self, $thing) =  @_;
+sub _is_object($self, $thing) {
 
     return $self->_try(sub { ref $thing && $thing->isa('UNIVERSAL') }) ?? 1 !! 0;
 }
 
 
 # This is a hack to detect a dualvar such as $!
-sub _is_dualvar {
-    my@($self, $val) =  @_;
+sub _is_dualvar($self, $val) {
 
     local $^WARNING = 0;
     my $numval = $val+0;
@@ -431,8 +424,7 @@ numeric version.
 
 =cut
 
-sub is_eq {
-    my@($self, $got, $expect, ?$name) =  @_;
+sub is_eq($self, $got, $expect, ?$name) {
     local $Level = $Level + 1;
 
     if( !defined $got || !defined $expect ) {
@@ -455,8 +447,7 @@ sub is_eq {
     return $self->cmp_ok($got, 'eq', $expect, $name);
 }
 
-sub is_num {
-    my@($self, $got, $expect, ?$name) =  @_;
+sub is_num($self, $got, $expect, ?$name) {
     local $Level = $Level + 1;
 
     if( !defined $got || !defined $expect ) {
@@ -471,8 +462,7 @@ sub is_num {
     return $self->cmp_ok($got, '==', $expect, $name);
 }
 
-sub _is_diag {
-    my@($self, $got, $type, $expect) =  @_;
+sub _is_diag($self, $got, $type, $expect) {
 
     local $Level = $Level + 1;
     return $self->diag(sprintf <<DIAGNOSTIC, dump::view($got), dump::view($expect));
@@ -498,8 +488,7 @@ the numeric version.
 
 =cut
 
-sub isnt_eq {
-    my@($self, $got, $dont_expect, ?$name) =  @_;
+sub isnt_eq($self, $got, $dont_expect, ?$name) {
     local $Level = $Level + 1;
 
     if( !defined $got || !defined $dont_expect ) {
@@ -522,8 +511,7 @@ sub isnt_eq {
     return $self->cmp_ok($got, 'ne', $dont_expect, $name);
 }
 
-sub isnt_num {
-    my@($self, $got, $dont_expect, $name) =  @_;
+sub isnt_num($self, $got, $dont_expect, $name) {
     local $Level = $Level + 1;
 
     if( !defined $got || !defined $dont_expect ) {
@@ -558,15 +546,13 @@ given $regex.
 
 =cut
 
-sub like {
-    my@($self, $this, $regex, ?$name) =  @_;
+sub like($self, $this, $regex, ?$name) {
 
     local $Level = $Level + 1;
     $self->_regex_ok($this, $regex, '=~', $name);
 }
 
-sub unlike {
-    my@($self, $this, $regex, ?$name) =  @_;
+sub unlike($self, $this, $regex, ?$name) {
 
     local $Level = $Level + 1;
     $self->_regex_ok($this, $regex, '!~', $name);
@@ -587,8 +573,7 @@ Works just like Test::More's cmp_ok().
 my %numeric_cmps = %( < @+: map { @($_, 1) }, 
  @(                       ("<",  "<=", ">",  ">=", "==", "!=", "<=>")) );
 
-sub cmp_ok {
-    my@($self, $got, $type, $expect, ?$name) =  @_;
+sub cmp_ok($self, $got, $type, $expect, ?$name) {
 
     my $test;
     do {
@@ -617,8 +602,7 @@ $code" . "\$got $type \$expect;";
     return $ok;
 }
 
-sub _cmp_diag {
-    my@($self, $got, $type, $expect) =  @_;
+sub _cmp_diag($self, $got, $type, $expect) {
     
     $got    = dump::view($got);
     $expect = dump::view($expect);
@@ -664,8 +648,7 @@ It will exit with 255.
 
 =cut
 
-sub BAIL_OUT {
-    my@($self, $reason) =  @_;
+sub BAIL_OUT($self, $reason) {
 
     $self->{+Bailed_Out} = 1;
     $self->_print("Bail out!  $reason");
@@ -689,8 +672,7 @@ Skips the current test, reporting $why.
 
 =cut
 
-sub skip {
-    my@($self, $why) =  @_;
+sub skip($self, $why) {
     $why ||= '';
 
     $self->_plan_check;
@@ -730,8 +712,7 @@ to
 
 =cut
 
-sub todo_skip {
-    my @($self, $why) =  @_;
+sub todo_skip($self, $why) {
     $why ||= '';
 
     $self->_plan_check;
@@ -809,8 +790,7 @@ could be written as:
 =cut
 
 
-sub maybe_regex {
-    my @($self, $regex) =  @_;
+sub maybe_regex($self, $regex) {
     my $usable_regex = undef;
 
     return $usable_regex unless defined $regex;
@@ -844,8 +824,7 @@ sub _is_qr {
 }
 
 
-sub _regex_ok {
-    my@($self, $this, $regex, $cmp, $name) =  @_;
+sub _regex_ok($self, $this, $regex, $cmp, $name) {
 
     my $ok = 0;
     my $usable_regex = $self->maybe_regex($regex);
@@ -895,8 +874,7 @@ It is suggested you use this in place of eval BLOCK.
 
 =cut
 
-sub _try {
-    my @($self, $code) =  @_;
+sub _try($self, $code) {
     
     local $^OS_ERROR;               # eval can mess up $!
     local $^EVAL_ERROR;               # don't set $@ in the test
@@ -961,8 +939,7 @@ To be polite to other functions wrapping your own you usually want to increment 
 
 =cut
 
-sub level {
-    my@($self, ?$level) =  @_;
+sub level($self, ?$level) {
 
     if( defined $level ) {
         $Level = $level;
@@ -994,8 +971,7 @@ Defaults to on.
 
 =cut
 
-sub use_numbers {
-    my@($self, ?$use_nums) =  @_;
+sub use_numbers($self, ?$use_nums) {
 
     if( defined $use_nums ) {
         $self->{+Use_Nums} = $use_nums;
@@ -1081,8 +1057,7 @@ Mark Fowler <mark@twoshortplanks.com>
 
 =cut
 
-sub diag {
-    my@($self, @< @msgs) =  @_;
+sub diag($self, @< @msgs) {
 
     return if $self->no_diag;
     return unless (nelems @msgs);
@@ -1106,6 +1081,38 @@ sub diag {
     return 0;
 }
 
+=item B<info>
+
+    $Test->info(@msgs);
+
+Prints out the given @msgs.  Like C<print>, arguments are simply
+appended together.
+
+=cut
+
+sub info($self, @< @msgs) {
+
+    return unless (nelems @msgs);
+
+    # Prevent printing headers when compiling (i.e. -c)
+    return if $^COMPILING;
+
+    # Smash args together like print does.
+    # Convert undef to 'undef' so its readable.
+    my $msg = join '', map { defined($_) ?? $_ !! 'undef' }, @msgs;
+
+    # Escape each line with a #.
+    $msg =~ s/^/# /gm;
+
+    # Stick a newline on the end if it needs it.
+    $msg .= "\n" unless $msg =~ m/\n\Z/;
+
+    local $Level = $Level + 1;
+    $self->_print($msg);
+
+    return 0;
+}
+
 =begin _private
 
 =item B<_print>
@@ -1118,8 +1125,7 @@ Prints to the output() filehandle.
 
 =cut
 
-sub _print {
-    my@($self, @< @msgs) =  @_;
+sub _print($self, @< @msgs) {
 
     # Prevent printing headers when only compiling.  Mostly for when
     # tests are deparsed with B::Deparse
@@ -1189,8 +1195,7 @@ Defaults to STDOUT.
 
 =cut
 
-sub output {
-    my@($self, ?$fh) =  @_;
+sub output($self, ?$fh) {
 
     if( defined $fh ) {
         $self->{+Out_FH} = $self->_new_fh($fh);
@@ -1198,8 +1203,7 @@ sub output {
     return $self->{?Out_FH};
 }
 
-sub failure_output {
-    my@($self, ?$fh) =  @_;
+sub failure_output($self, ?$fh) {
 
     if( defined $fh ) {
         $self->{+Fail_FH} = $self->_new_fh($fh);
@@ -1207,8 +1211,7 @@ sub failure_output {
     return $self->{?Fail_FH};
 }
 
-sub todo_output {
-    my@($self, ?$fh) =  @_;
+sub todo_output($self, ?$fh) {
 
     if( defined $fh ) {
         $self->{+Todo_FH} = $self->_new_fh($fh);
@@ -1235,8 +1238,7 @@ sub _new_fh {
 }
 
 
-sub _autoflush {
-    my @($fh) = @_;
+sub _autoflush($fh) {
     iohandle::output_autoflush($fh, 1);
     return;
 }
@@ -1276,8 +1278,7 @@ sub _open_testhandles {
 }
 
 
-sub _copy_io_layers {
-    my@($self, $src, $dest) =  @_;
+sub _copy_io_layers($self, $src, $dest) {
     
     $self->_try(sub {
         require PerlIO;
@@ -1317,8 +1318,7 @@ can erase history if you really want to.
 
 =cut
 
-sub current_test {
-    my@($self, ?$num) =  @_;
+sub current_test($self, ?$num) {
 
     lock($self->{?Curr_Test});
     if( defined $num ) {
@@ -1443,8 +1443,7 @@ what $pack to use.
 
 =cut
 
-sub todo {
-    my @($self, ?$package) =  @_;
+sub todo($self, ?$package) {
 
     return $self->{?TODO} if defined $self->{?TODO};
 
@@ -1467,8 +1466,7 @@ C<$height> will be added to the level().
 
 =cut
 
-sub caller {
-    my@($self, ?$height) =  @_;
+sub caller($self, ?$height) {
     $height ||= 0;
 
     my @caller = @( CORE::caller($self->level + $height + 1) );
@@ -1514,8 +1512,7 @@ a note to contact the author.
 
 =cut
 
-sub _whoa {
-    my @($self, $check, $desc) =  @_;
+sub _whoa($self, $check, $desc) {
     if( $check ) {
         local $Level = $Level + 1;
         die(<<"WHOA");

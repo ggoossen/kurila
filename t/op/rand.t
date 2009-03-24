@@ -26,10 +26,10 @@ my $reps = 15000;	# How many times to try rand each time.
 			# May be changed, but should be over 500.
 			# The more the better! (But slower.)
 
-sub bits ($) {
+sub bits($b) {
     # Takes a small integer and returns the number of one-bits in it.
     my $total;
-    my $bits = sprintf '%o', @_[0];
+    my $bits = sprintf '%o', $b;
     while (length $bits) {
 	$total += @(0,1,1,2,1,2,2,3)[chop $bits];	# Oct to bits
     }

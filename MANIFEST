@@ -338,7 +338,6 @@ ext/List-Util/t/max.t		List::Util
 ext/List-Util/t/minstr.t	List::Util
 ext/List-Util/t/min.t		List::Util
 ext/List-Util/t/openhan.t	Scalar::Util
-ext/List-Util/t/proto.t		Scalar::Util
 ext/List-Util/t/readonly.t	Scalar::Util
 ext/List-Util/t/reduce.t	List::Util
 ext/List-Util/t/refaddr.t	Scalar::Util
@@ -602,7 +601,6 @@ ext/Unicode-Normalize/t/func.t	Unicode::Normalize
 ext/Unicode-Normalize/t/illegal.t	Unicode::Normalize
 ext/Unicode-Normalize/t/norm.t	Unicode::Normalize
 ext/Unicode-Normalize/t/null.t	Unicode::Normalize
-ext/Unicode-Normalize/t/proto.t	Unicode::Normalize
 ext/Unicode-Normalize/t/split.t	Unicode::Normalize
 ext/Unicode-Normalize/t/test.t	Unicode::Normalize
 ext/util/make_ext		Used by Makefile to execute extension Makefiles
@@ -972,8 +970,6 @@ lib/File/Fetch/t/01_File-Fetch.t	File::Fetch tests
 lib/File/Find.pm		Routines to do a find
 lib/File/Find/t/find.t		See if File::Find works
 lib/File/GlobPP.pm		Pure perl glob
-lib/FileHandle.pm		Backward-compatible front end to IO extension
-lib/FileHandle.t		See if FileHandle works
 lib/File/Path.pm		Do things like `mkdir -p' and `rm -r'
 lib/File/Path.t			See if File::Path works
 lib/File/Spec/Cygwin.pm		portable operations on Cygwin file names
@@ -2102,12 +2098,10 @@ t/comp/opsubs.t			See if q() etc. are not parsed as functions
 t/comp/our.t			Tests for our declaration
 t/comp/package.t		See if packages work
 t/comp/parser.t			See if the parser works in edge cases
-t/comp/proto.t			See if function prototypes work
 t/comp/redef.t			See if we get correct warnings on redefined subs
 t/comp/require.t		See if require works
 t/comp/script.t			See if script invocation works
 t/comp/term.t			See if more terms work
-t/comp/uproto.t			See if the _ prototype works
 t/comp/use.t			See if pragmata work
 t/comp/utf.t			See if UTFs work
 thread.h			Threading header
@@ -2432,6 +2426,7 @@ t/run/switchx.t			Test the -x switch
 t/sv/alarm.t			See if alarm works
 t/sv/anonsub.t			See if anonymous subroutines work
 t/sv/blocksub.t			See if anonymous block subroutines work
+t/sv/code.t			See if code copying works
 t/sv/args.t			See if operations on @_ work
 t/sv/array.t			See if array operations work
 t/sv/object.t			See if objects work

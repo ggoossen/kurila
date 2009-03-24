@@ -18,32 +18,32 @@ sub unimport {
 
 BEGIN { bytes::import() }
 
-sub length (_) {
-    return CORE::length(@_[0]);
+sub length ($s) {
+    return CORE::length($s);
 }
 
-sub substr ($$;$$) {
+sub substr {
     return
 	(nelems @_) == 2 ?? CORE::substr(@_[0], @_[1]) !!
 	(nelems @_) == 3 ?? CORE::substr(@_[0], @_[1], @_[2]) !!
 	          CORE::substr(@_[0], @_[1], @_[2], @_[3]) ;
 }
 
-sub ord (_) {
-    return CORE::ord(@_[0]);
+sub ord($s) {
+    return CORE::ord($s);
 }
 
-sub chr (_) {
-    return CORE::chr(@_[0]);
+sub chr($s) {
+    return CORE::chr($s);
 }
 
-sub index ($$;$) {
+sub index {
     return
 	(nelems @_) == 2 ?? CORE::index(@_[0], @_[1]) !!
 	          CORE::index(@_[0], @_[1], @_[2]) ;
 }
 
-sub rindex ($$;$) {
+sub rindex {
     return
 	(nelems @_) == 2 ?? CORE::rindex(@_[0], @_[1]) !!
 	          CORE::rindex(@_[0], @_[1], @_[2]) ;

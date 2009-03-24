@@ -82,19 +82,23 @@ END_EXTERN_C
 
 /* functions with flag 'n' should come before here */
 START_EXTERN_C
-Aip	|SV*	|HvSv	|NULLOK HV *hv
-Aip	|SV*	|AvSv	|NULLOK AV *av
-Aip	|SV*	|CvSv	|NULLOK CV *cv
-Aip	|SV*	|GvSv	|NULLOK GV *gv
-Aip	|SV*	|IoSv	|NULLOK struct io *io
-Aip	|SV*	|ReSv	|NULLOK REGEXP *re
-Aip	|AV*	|SvAv	|NN SV *sv
-Aip	|HV*	|SvHv	|NN SV *sv
-Aip	|CV*	|SvCv	|NN SV *sv
+Aip	|SV*	|hvTsv	|NULLOK HV *hv
+Aip	|SV*	|avTsv	|NULLOK AV *av
+Aip	|SV*	|cvTsv	|NULLOK CV *cv
+Aip	|SV*	|gvTsv	|NULLOK GV *gv
+Aip	|SV*	|ioTsv	|NULLOK struct io *io
+Aip	|SV*	|reTsv	|NULLOK REGEXP *re
+Aip	|AV*	|svTav	|NN SV *sv
+Aip	|HV*	|svThv	|NN SV *sv
+Aip	|CV*	|svTcv	|NN SV *sv
+Aip	|GV*	|svTgv	|NN SV *sv
+Aip	|IO*	|svTio	|NN SV *sv
+Aip	|REGEXP*	|svTre	|NN SV *sv
 
 Aip	|const char*	|SvPVX_const	|NN SV *sv
 Aip	|char*	|SvPVX_mutable	|NN SV *sv
 AipS	|void	|SvREFCNT_dec	|NULLOK SV *sv
+AipS	|SV*	|SvREFCNT_inc	|NULLOK SV *sv
 AipS	|void	|SvTMPREFCNT_inc	|NULLOK SV *sv
 Aip	|IV	|SvIV	|NN SV *sv
 Aip	|UV	|SvUV	|NN SV *sv
@@ -176,7 +180,7 @@ bp	|void	|cv_ckproto	|NN const CV* cv|NULLOK const GV* gv\
 				|NULLOK const char* p
 p	|void	|cv_ckproto_len	|NN const CV* cv|NULLOK const GV* gv\
 				|NULLOK const char* p|const STRLEN len
-pd	|CV*	|cv_clone	|NN CV* proto
+pd	|void	|cv_setcv	|NN CV* dst|NN CV* src
 ApdR	|SV*	|cv_const_sv	|NULLOK CV* cv
 pR	|SV*	|op_const_sv	|NULLOK const OP* o|NULLOK CV* cv
 Apd	|void	|cv_undef	|NN CV* cv
@@ -211,7 +215,7 @@ pmb	|bool	|do_aexec	|NULLOK SV* really|NN SV* const * mark|NN SV* const * sp
 p	|bool	|do_aexec5	|NULLOK SV* really|NN SV* const * mark|NN SV* const * sp|int fd|int do_report
 Ap	|int	|do_binmode	|NN PerlIO *fp|int iotype|int mode
 p	|void	|do_chop	|NN SV *astr|NN SV *sv
-Ap	|bool	|do_close	|NULLOK GV* gv|bool not_implicit
+Ap	|bool	|do_close	|NN GV* gv|bool not_implicit
 p	|bool	|do_eof		|NN GV* gv
 
 #ifdef PERL_DEFAULT_DO_EXEC3_IMPLEMENTATION
@@ -244,12 +248,9 @@ Ap	|void	|do_join	|NN SV *sv|NN SV *delim|NN SV *av
 p	|OP*	|do_kv
 p	|void	|bad_arg	|I32 n|NN const char* t|NN const char* name|NN SV *arg
 p	|void	|do_arg_check	|NN SV** base	
-Apmb	|bool	|do_open	|NN GV* gv|NN const char* name|I32 len|int as_raw \
+Apmb	|bool	|do_open	|NN IO* io|NN const char* name|I32 len|int as_raw \
 				|int rawmode|int rawperm|NULLOK PerlIO* supplied_fp
-Ap	|bool	|do_open9	|NN GV *gv|NN const char *name|I32 len|int as_raw \
-				|int rawmode|int rawperm|NULLOK PerlIO *supplied_fp \
-				|NN SV *svs|I32 num
-Ap	|bool	|do_openn	|NN GV *gv|NN const char *oname|I32 len|int as_raw \
+Ap	|bool	|do_openn	|NN IO* io|NN const char *oname|I32 len|int as_raw \
 				|int rawmode|int rawperm|NULLOK PerlIO *supplied_fp \
 				|NULLOK SV * const *svp|I32 num
 p	|bool	|do_print	|NULLOK SV* sv|NN PerlIO* fp
@@ -301,8 +302,8 @@ Ap	|void	|gv_efullname3	|NN SV* sv|NN const GV* gv|NULLOK const char* prefix
 Ap	|GV*	|gv_fetchfile	|NN const char* name
 Ap	|GV*	|gv_fetchfile_flags|NN const char *const name|const STRLEN len\
 				|const U32 flags
-Apd	|GV*	|gv_fetchmeth	|NULLOK HV* stash|NN const char* name|STRLEN len|I32 level
-Apdb	|GV*	|gv_fetchmethod	|NULLOK HV* stash|NN const char* name
+Apd	|CV*	|gv_fetchmeth	|NULLOK HV* stash|NN const char* name|STRLEN len|I32 level
+Apd	|CV*	|gv_fetchmethod	|NULLOK HV* stash|NN const char* name
 Ap	|GV*	|gv_fetchpv	|NN const char* nambeg|I32 add|const svtype sv_type
 Ap	|void	|gv_fullname3	|NN SV* sv|NN const GV* gv|NULLOK const char* prefix
 pMox	|GP *	|newGP		|NN GV *const gv
@@ -438,7 +439,6 @@ p	|int	|magic_clearisa	|NN SV* sv|NN MAGIC* mg
 p	|bool	|is_magicsv	|NN const char* name
 p	|void	|magic_get	|NN const char* name|NN SV* sv
 p	|int	|magic_getuvar	|NN SV* sv|NN MAGIC* mg
-p	|U32	|magic_len	|NN SV* sv|NN MAGIC* mg
 p	|U32	|magic_regdata_cnt|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_regdatum_get|NN SV* sv|NN MAGIC* mg
 pr	|int	|magic_regdatum_set|NN SV* sv|NN MAGIC* mg
@@ -466,10 +466,8 @@ pd	|void	|mg_localize	|NN SV* sv|NN SV* nsv
 ApdR	|MAGIC*	|mg_find	|NULLOK const SV* sv|int type
 Apd	|int	|mg_free	|NN SV* sv
 Apd	|void	|mg_tmprefcnt	|NN SV* sv
-Apd	|U32	|mg_length	|NN SV* sv
 Apd	|void	|mg_magical	|NN SV* sv
 Apd	|int	|mg_set		|NN SV* sv
-Ap	|I32	|mg_size	|NN SV* sv
 Ap	|void	|mini_mktime	|NN struct tm *ptm
 EXp	|OP*	|mod		|NULLOK OP* o|I32 type
 p	|OP*	|assign		|NN OP* o|bool partial|NN I32 *min_modcount|NN I32 *max_modcount
@@ -939,7 +937,7 @@ p	|I32	|wait4pid	|Pid_t pid|NN int* statusp|int flags
 p	|U32	|parse_unicode_opts|NN const char **popt
 Ap	|U32	|seed
 pR	|UV	|get_hash_seed
-p	|void	|report_evil_fh	|NULLOK const GV *gv|NULLOK const IO *io|I32 op
+p	|void	|report_evil_fh	|NULLOK IO *io|I32 op
 XEpd	|void	|report_uninit	|NULLOK SV* uninit_sv
 Afpd	|void	|warn		|NN const char* pat|...
 Afpd	|void	|warn_at	|NULLOK SV* location|NN const char* pat|...

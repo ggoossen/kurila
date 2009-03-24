@@ -24,8 +24,7 @@ is( $v,	min(< @a),	'min');
 $v = reduce { $a . $b }, < @a;
 is( $v,	join("", @a),	'concat');
 
-sub add {
-  my@($aa, $bb) =  @_;
+sub add($aa, $bb) {
   return $aa + $bb;
 }
 

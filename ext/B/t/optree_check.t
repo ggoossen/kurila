@@ -88,7 +88,7 @@ if (1) {
 		      expect	=> '',
 		      expect_nt	=> '');
     };
-    like($^EVAL_ERROR->{?description}, m/no '\w+' golden-sample found/, "empty expectations prevented");
+    like($^EVAL_ERROR->{?description}, qr/no '\w+' golden-sample found/, "empty expectations prevented");
     
     $^EVAL_ERROR='';
     try {
@@ -99,7 +99,7 @@ if (1) {
 		      expect_nt	=> "\n",
 		      expect	=> "\n");
     };
-    like($^EVAL_ERROR->{?description}, m/no '\w+' golden-sample found/,
+    like($^EVAL_ERROR->{?description}, qr/no reftext found for expect_nt/,
 	 "just whitespace expectations prevented");
 }
     

@@ -195,7 +195,7 @@ Perl_save_scalar(pTHX_ GV *gv)
     PL_localizing = 1;
     PL_localizing = 0;
     SSCHECK(3);
-    SSPUSHPTR(SvREFCNT_inc_simple(gv));
+    SSPUSHPTR(GvREFCNT_inc(gv));
     SSPUSHPTR(SvREFCNT_inc(*sptr));
     SSPUSHINT(SAVEt_SV);
     return save_scalar_at(sptr);
@@ -272,7 +272,7 @@ Perl_save_gp(pTHX_ GV *gv, I32 empty)
     PERL_ARGS_ASSERT_SAVE_GP;
 
     SSGROW(3);
-    SSPUSHPTR(SvREFCNT_inc(gv));
+    SSPUSHPTR(GvREFCNT_inc(gv));
     SSPUSHPTR(GvGP(gv));
     SSPUSHINT(SAVEt_GP);
 
@@ -464,7 +464,7 @@ Perl_save_padsv_and_mortalize(pTHX_ PADOFFSET off)
     dVAR;
     SSCHECK(4);
     ASSERT_CURPAD_ACTIVE("save_padsv");
-    SSPUSHPTR(SvREFCNT_inc_simple_NN(PL_curpad[off]));
+    SSPUSHPTR(SvREFCNT_inc_NN(PL_curpad[off]));
     SSPUSHPTR(PL_comppad);
     SSPUSHLONG((long)off);
     SSPUSHINT(SAVEt_PADSV_AND_MORTALIZE);
@@ -479,8 +479,8 @@ Perl_save_set_magicsv(pTHX_ SV* name)
     sv = sv_2mortal(newSV(0));
     PL_localizing = 1;
     magic_get(SvPVX_const(name), sv);
-    SSPUSHPTR(SvREFCNT_inc_simple_NN(name));
-    SSPUSHPTR(SvREFCNT_inc_simple_NN(sv));
+    SSPUSHPTR(SvREFCNT_inc_NN(name));
+    SSPUSHPTR(SvREFCNT_inc_NN(sv));
     SSPUSHINT(SAVEt_SET_MAGICSV);
     magic_set(SvPVX_const(name), sv_2mortal(newSV(0)));
     PL_localizing = 0;
@@ -563,7 +563,7 @@ Perl_save_delete(pTHX_ HV *hv, char *key, I32 klen)
     SSCHECK(4);
     SSPUSHINT(klen);
     SSPUSHPTR(key);
-    SSPUSHPTR(SvREFCNT_inc_simple(hv));
+    SSPUSHPTR(HvREFCNT_inc(hv));
     SSPUSHINT(SAVEt_DELETE);
 }
 
@@ -599,7 +599,7 @@ Perl_save_aelem(pTHX_ AV *av, I32 idx, SV **sptr)
     PERL_ARGS_ASSERT_SAVE_AELEM;
 
     SSCHECK(4);
-    SSPUSHPTR(SvREFCNT_inc_simple(av));
+    SSPUSHPTR(AvREFCNT_inc(av));
     SSPUSHINT(idx);
     SSPUSHPTR(SvREFCNT_inc(*sptr));
     SSPUSHINT(SAVEt_AELEM);
@@ -619,7 +619,7 @@ Perl_save_helem(pTHX_ HV *hv, SV *key, SV **sptr)
     PERL_ARGS_ASSERT_SAVE_HELEM;
 
     SSCHECK(4);
-    SSPUSHPTR(SvREFCNT_inc_simple(hv));
+    SSPUSHPTR(HvREFCNT_inc(hv));
     SSPUSHPTR(newSVsv(key));
     SSPUSHPTR(SvREFCNT_inc(*sptr));
     SSPUSHINT(SAVEt_HELEM);
@@ -856,7 +856,9 @@ Perl_leave_scope(pTHX_ I32 base)
 		    hv_clear((HV*)sv);
 		    break;
 		case SVt_PVCV:
-		    Perl_croak(aTHX_ "panic: leave_scope pad code");
+		    SvREFCNT_dec(sv);
+		    *(SV**)ptr = newSV(0);
+		    break;
 		default:
 		    SvOK_off(sv);
 		    break;

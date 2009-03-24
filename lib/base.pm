@@ -98,8 +98,7 @@ ERROR
 }
 
 
-sub inherit_fields {
-    my@($derived, $base) =  @_;
+sub inherit_fields($derived, $base) {
 
     return SUCCESS unless $base;
 

@@ -20,7 +20,7 @@ do {
 };
 
 sub Backwards { ($a cmp $b) +< 0 ?? 1 !! ($a cmp $b) +> 0 ?? -1 !! 0 }
-sub Backwards_stacked($$) { my @($x,$y) =  @_; ($x cmp $y) +< 0 ?? 1 !! ($x cmp $y) +> 0 ?? -1 !! 0 }
+sub Backwards_stacked($x, $y) { ($x cmp $y) +< 0 ?? 1 !! ($x cmp $y) +> 0 ?? -1 !! 0 }
 sub Backwards_other { ($a cmp $b) +< 0 ?? 1 !! ($a cmp $b) +> 0 ?? -1 !! 0 }
 
 my $upperfirst = ('A' cmp 'a') +< 0;

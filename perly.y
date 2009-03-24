@@ -87,6 +87,7 @@
 %type <ionlyval> prog progstart remember mremember
 %type <ionlyval> startsub startanonsub startblocksub
 %type <ionlyval> mintro
+%type <i_tkval> startproto
 
 %type <opval> decl subrout mysubrout package use peg
 
@@ -511,14 +512,15 @@ subrout	:	SUB startsub subname proto subbody
                             TOKEN_GETMAD($1,$$,'d');
                             APPEND_MADPROPS_PV("sub", $$, '<');
                             new = newSUB($2, NULL, $3);
-                            SVcpREPLACE(SvLOCATION(CvSv(new)), LOCATION($1));
+                            SVcpREPLACE(SvLOCATION(cvTsv(new)), LOCATION($1));
                             process_special_block(IVAL($1), new);
                             /* SvREFCNT_dec(new);  leak reference */
 #else
-                            CV* new = cv_2mortal(newSUB($2, NULL, $3));
+                            CV* new = cv_2mortal(newSUB($2,
+                                    newOP(OP_STUB, 0, LOCATION($1)), $3));
                             $<opval>2 = NULL;
                             $<opval>3 = NULL;
-                            SVcpREPLACE(SvLOCATION(CvSv(new)), LOCATION($1));
+                            SVcpREPLACE(SvLOCATION(cvTsv(new)), LOCATION($1));
                             process_special_block(IVAL($1), new);
                             $$ = (OP*)NULL;
 #endif
@@ -547,11 +549,32 @@ subname	:	WORD	{
                         }
 	;
 
+startproto :    '('
+			{ 
+                            PL_parser->in_my = KEY_my;
+                            $$ = $1;
+                        }
+
 /* Subroutine prototype */
 proto	:	/* NULL */
-			{ $$ = (OP*)NULL; }
-	|	THING
-			{ $$ = $1; }
+			{
+                            pad_add_name("@_", NULL, FALSE);
+                            CvFLAGS(PL_compcv) |= CVf_DEFARGS;
+                            intro_my();
+                            $$ = (OP*)NULL; 
+                        }
+	|	startproto ')'
+			{ 
+                            $$ = newOP(OP_STUB, 0, LOCATION($1) );
+                            PL_parser->in_my = FALSE;
+                            PL_parser->expect = XBLOCK;
+                        }
+	|	startproto expr mintro ')'
+			{ 
+                            $$ = $2;
+                            PL_parser->in_my = FALSE;
+                            PL_parser->expect = XBLOCK;
+                        }
 	;
 
 /* Subroutine body - either null or a block */
@@ -583,7 +606,7 @@ use	:	USE startsub THING WORD listexpr ';'
                             $$ = utilize(IVAL($1), $2, $3, $4, $5);
                             TOKEN_GETMAD($1,$$,'o');
                             TOKEN_GETMAD($6,$$,';');
-                            cv = SvCv(cSVOPx($$)->op_sv);
+                            cv = svTcv(cSVOPx($$)->op_sv);
 #else
                             cv = utilize(IVAL($1), $2, $3, $4, $5);
                             $$ = (OP*)NULL;
@@ -1071,8 +1094,9 @@ term	:	'?' term
 	|	THING	%prec '('
 			{ $$ = $1; }
 	|	amper                                /* &foo; */
-                        { $$ = newUNOP(OP_ENTERSUB, 0, scalar($1), $1->op_location);
-                              APPEND_MADPROPS_PV("amper", $$, '>');
+                        {
+                            $$ = $1;
+                            $$->op_flags |= OPf_SPECIAL;
                         }
 	|	amper '(' ')'                        /* &foo() */
 			{

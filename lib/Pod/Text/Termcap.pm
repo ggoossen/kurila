@@ -37,8 +37,7 @@ $VERSION = 2.03;
 
 # In the initialization method, grab our terminal characteristics as well as
 # do all the stuff we normally do.
-sub new {
-    my @($self, @< @args) =  @_;
+sub new($self, @< @args) {
     my ($ospeed, $term, $termios);
     $self = $self->SUPER::new (< @args);
 
@@ -59,7 +58,7 @@ sub new {
     }
 
     # Fall back on the ANSI escape sequences if Term::Cap doesn't work.
-    try { $term = Term::Cap->Tgetent( \%( TERM => undef, OSPEED => $ospeed )) };
+    $term = Term::Cap->Tgetent( \%( TERM => undef, OSPEED => $ospeed ));
     %$self{+BOLD} = %$term{?_md} || "\e[1m";
     %$self{+UNDL} = %$term{?_us} || "\e[4m";
     %$self{+NORM} = %$term{?_me} || "\e[m";
@@ -73,15 +72,13 @@ sub new {
 }
 
 # Make level one headings bold.
-sub cmd_head1 {
-    my @($self, $attrs, $text) =  @_;
+sub cmd_head1($self, $attrs, $text) {
     $text =~ s/\s+$//;
     $self->SUPER::cmd_head1 ($attrs, "%$self{?BOLD}$text%$self{?NORM}");
 }
 
 # Make level two headings bold.
-sub cmd_head2 {
-    my @($self, $attrs, $text) =  @_;
+sub cmd_head2($self, $attrs, $text) {
     $text =~ s/\s+$//;
     $self->SUPER::cmd_head2 ($attrs, "%$self{?BOLD}$text%$self{?NORM}");
 }
@@ -91,8 +88,7 @@ sub cmd_b { my $self = shift; return "%$self{?BOLD}@_[1]%$self{?NORM}" }
 sub cmd_i { my $self = shift; return "%$self{?UNDL}@_[1]%$self{?NORM}" }
 
 # Output any included code in bold.
-sub output_code {
-    my @($self, $code) =  @_;
+sub output_code($self, $code) {
     $self->output (%$self{?BOLD} . $code . %$self{NORM});
 }
 

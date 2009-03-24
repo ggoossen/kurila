@@ -42,8 +42,7 @@ Generates Foo__Bar.3 style man page names
 
 =cut
 
-sub replace_manpage_separator {
-    my@($self, $man) =  @_;
+sub replace_manpage_separator($self, $man) {
 
     $man =~ s,/+,__,g;
     return $man;

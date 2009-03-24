@@ -12,8 +12,8 @@ require './test.pl'; # for runperl()
 print \*STDOUT, "1..61\n";
 
 my $test = 1;
-sub test (&) {
-    my $ok = &{@_[0]};
+sub test($sub, @< @args) {
+    my $ok = $sub->( < @args );
     print \*STDOUT, $ok ?? "ok $test\n" !! "not ok $test\n";
     printf \*STDOUT, "# Failed at line \%d\n", @(caller)[2] unless $ok;
     $test++;
@@ -258,8 +258,8 @@ END_MARK_TWO
 
 do \{
     my \$test = $test;
-    sub test (&) \{
-      my \$ok = &\{\@_[0]\};
+    sub test (\$sub) \{
+      my \$ok = \$sub->();
       print \*STDOUT, \$ok ?? "ok \$test\n" !! "not ok \$test\n";
       printf \*STDOUT, "# Failed at line \\\%d\n", @(caller)[2] unless \$ok;
       \$test++;
@@ -370,12 +370,12 @@ END
 
                 # We may need to do something with the sub we just made...
                 $code .= "undef \$outer;\n" if $undef_outer;
-                $code .= "&inner_sub;\n" if $call_inner;
+                $code .= "&inner_sub(< @_);\n" if $call_inner;
                 if ($call_outer) {
                     if ($where_declared eq 'in_named') {
-                        $code .= "&outer;\n\n";
+                        $code .= "&outer(< \@_);\n\n";
                     } elsif ($where_declared eq 'in_anon') {
-                        $code .= "&\$outer;\n\n"
+                        $code .= "&\$outer(< \@_);\n\n"
                     }
                 }
 
@@ -413,9 +413,9 @@ END
 
                     # Here's the test:
                     if ($inner_type eq 'anon') {
-                        $code .= "test \{ our \$anon_$test; &\$anon_$test == $expected \};\n"
+                        $code .= "test \{ our \$anon_$test; &\$anon_$test() == $expected \};\n"
                     } else {
-                        $code .= "test \{ &named_$test == $expected \};\n"
+                        $code .= "test \{ &named_$test() == $expected \};\n"
                     }
                     $test++;
                 }

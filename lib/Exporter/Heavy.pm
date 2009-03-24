@@ -19,8 +19,7 @@ No user-serviceable parts inside.
 #  because Carp requires Exporter, and something has to give.
 #
 
-sub _rebuild_cache {
-    my @($pkg, $exports, $cache) = @_;
+sub _rebuild_cache($pkg, $exports, $cache) {
     s/^&// foreach  @$exports;
     $cache->{[ @$exports]} = @(1) x nelems @$exports;
     my $ok = \@{*{Symbol::fetch_glob("$($pkg)::EXPORT_OK")}};
@@ -30,9 +29,7 @@ sub _rebuild_cache {
     }
 }
 
-sub export {
-
-    my @($pkg, $callpkg, @< @imports) = @_;
+sub export($pkg, $callpkg, @< @imports) {
     my ($type, $cache_is_current, $oops);
     my @($exports, $export_cache) = @(\@{*{Symbol::fetch_glob("$($pkg)::EXPORT")}},
                                       %Exporter::Cache{+$pkg} ||= \%());
@@ -187,8 +184,7 @@ sub export_to_level
 
 # Utility functions
 
-sub _push_tags {
-    my @($pkg, $var, $syms) = @_;
+sub _push_tags($pkg, $var, $syms) {
     my @nontag = @( () );
     my $export_tags = \%{*{Symbol::fetch_glob("$($pkg)::EXPORT_TAGS")}};
     push(@{*{Symbol::fetch_glob("$($pkg)::$var")}},
@@ -201,8 +197,7 @@ sub _push_tags {
     }
 }
 
-sub require_version {
-    my @($self, $wanted) = @_;
+sub require_version($self, $wanted) {
     my $pkg = ref $self || $self;
     return $pkg->VERSION($wanted);
 }

@@ -33,8 +33,7 @@ if ($^OS_NAME eq 'MacOS') {
 		if $^EVAL_ERROR && $^WARNING;
 }
 
-sub _catname {
-    my@($from, $to) =  @_;
+sub _catname($from, $to) {
     if (not defined &basename) {
 	require File::Basename;
 	File::Basename->import('basename');

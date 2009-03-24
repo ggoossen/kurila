@@ -20,6 +20,8 @@ typedef U16 cv_flags_t;
 	void	(*xcv_xsub) (pTHX_ CV*);					\
     }		xcv_root_u;							\
     AV *	xcv_padlist;							\
+    I32         xcv_n_minargs;						\
+    I32         xcv_n_maxargs;						\
     cv_flags_t	xcv_flags
 
 struct xpvcv {
@@ -65,6 +67,8 @@ Null CV pointer.
 #endif
 #define CvPADLIST(sv)	((XPVCV*)SvANY(sv))->xcv_padlist
 #define CvFLAGS(sv)	((XPVCV*)SvANY(sv))->xcv_flags
+#define CvN_MINARGS(sv)	((XPVCV*)SvANY(sv))->xcv_n_minargs
+#define CvN_MAXARGS(sv)	((XPVCV*)SvANY(sv))->xcv_n_maxargs
 
 #define CVf_BLOCK	0x0001	/* CV accept one argument which is assigned to $_ */
 #define CVf_CLONE	0x0020	/* anon CV uses external lexicals */
@@ -76,6 +80,8 @@ Null CV pointer.
 				   (esp. useful for special XSUBs) */
 #define CVf_CONST	0x0400  /* inlinable sub */
 #define CVf_ISXSUB	0x0800	/* CV is an XSUB, not pure perl.  */
+#define CVf_PROTO	0x1000	/* CV has an prototype */
+#define CVf_DEFARGS	0x2000	/* arguments are passed to @_ */
 
 #define CvCLONE(cv)		(CvFLAGS(cv) & CVf_CLONE)
 #define CvCLONE_on(cv)		(CvFLAGS(cv) |= CVf_CLONE)

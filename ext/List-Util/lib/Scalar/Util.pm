@@ -11,7 +11,7 @@ require Exporter;
 require List::Util; # List::Util loads the XS
 
 @ISA       = qw(Exporter);
-@EXPORT_OK = qw(blessed dualvar reftype weaken isweak tainted readonly openhandle refaddr isvstring looks_like_number set_prototype);
+@EXPORT_OK = qw(blessed dualvar reftype weaken isweak tainted readonly openhandle refaddr isvstring looks_like_number);
 $VERSION    = "1.19";
 $VERSION   = eval $VERSION;
 
@@ -24,7 +24,7 @@ sub export_fail {
     require Carp;
     Carp::croak("Vstrings are not implemented in the version of perl");
   }
-  if (grep { m/^(dualvar|set_prototype)$/ }, @_ ) {
+  if (grep { m/^(dualvar)$/ }, @_ ) {
     require Carp;
     Carp::croak("$1 is only avaliable with the XS version");
   }
@@ -32,8 +32,7 @@ sub export_fail {
   < @_;
 }
 
-sub openhandle ($) {
-  my $fh = shift;
+sub openhandle($fh) {
   my $rt = reftype($fh) || '';
 
   return defined(fileno($fh)) ?? $fh !! undef
@@ -52,7 +51,7 @@ sub openhandle ($) {
 eval <<'ESQ' unless defined &dualvar;
 
 our @EXPORT_FAIL;
-push @EXPORT_FAIL, qw(weaken isweak dualvar isvstring set_prototype);
+push @EXPORT_FAIL, qw(weaken isweak dualvar isvstring);
 
 # The code beyond here is only used if the XS is not installed
 
@@ -151,7 +150,7 @@ Scalar::Util - A selection of general-utility scalar subroutines
 =head1 SYNOPSIS
 
     use Scalar::Util qw(blessed dualvar isweak readonly refaddr reftype tainted
-                        weaken isvstring looks_like_number set_prototype);
+                        weaken isvstring looks_like_number);
 
 =head1 DESCRIPTION
 
@@ -257,13 +256,6 @@ is returned. Otherwise C<undef> is returned.
 
     $obj  = bless {}, "Foo";
     $type = reftype $obj;               # HASH
-
-=item set_prototype CODEREF, PROTOTYPE
-
-Sets the prototype of the given function, or deletes it if PROTOTYPE is
-undef. Returns the CODEREF.
-
-    set_prototype \&foo, '$$';
 
 =item tainted EXPR
 

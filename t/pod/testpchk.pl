@@ -23,12 +23,11 @@ use Exporter;
 @EXPORT = qw(&testpodchecker);
 $MYPKG = try { (caller)[[0]] };
 
-sub stripname( $ ) {
-   local $_ = shift;
+sub stripname($_) {
    return m/(\w[.\w]*)\s*$/ ?? $1 !! $_;
 }
 
-sub msgcmp( $ $ ) {
+sub msgcmp {
    ## filter out platform-dependent aspects of error messages
    my $lines = @_;
    for ($lines) {
@@ -40,8 +39,7 @@ sub msgcmp( $ $ ) {
    return $lines[0] ne $lines[1];
 }
 
-sub testpodcheck( @ ) {
-   my %args = %( < @_ );
+sub testpodcheck( %< %args) {
    my $infile  = %args{'In'}  || die "No input file given!";
    my $outfile = %args{'Out'} || die "No output file given!";
    my $cmpfile = %args{'Cmp'} || die "No compare-result file given!";
@@ -72,7 +70,7 @@ sub testpodcheck( @ ) {
    return  $different;
 }
 
-sub testpodchecker( @ ) {
+sub testpodchecker {
    my %opts = %( (ref @_[0] eq 'HASH') ?? < %{shift()} !! () );
    my @testpods = @_;
    my @($testname, $testdir) = @("", "");

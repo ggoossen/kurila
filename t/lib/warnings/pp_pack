@@ -24,9 +24,9 @@ Invalid type ',' in pack at - line 5 character 9.
 # pp_pack.c
 use warnings 'pack' ;
 sub foo { my $a = "a"; return $a . $a++ . $a++ }
-my $a = pack("p", &foo) ;
+my $a = pack("p", foo() );
 no warnings 'pack' ;
-my $b = pack("p", &foo) ;
+my $b = pack("p", foo() );
 EXPECT
 Attempt to pack pointer to temporary value at - line 4 character 9.
 ########

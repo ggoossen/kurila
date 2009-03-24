@@ -102,8 +102,7 @@ locale setting is used.  Implies a true value for C<Decode>.
 
 =cut
 
-sub import {
-    my @($class, %< %args) =  @_;
+sub import($class, %< %args) {
 
     %args{+Class}    ||= caller;
     %args{+Style}    ||= 'maketext';
@@ -264,8 +263,7 @@ sub _unescape {
     }, split(m/,/, @_[0]));
 }
 
-sub auto_path {
-    my @($self, $calldir) =  @_;
+sub auto_path($self, $calldir) {
     $calldir =~ s#::#/#g;
     my $path = $^INCLUDED{?$calldir . '.pm'} or return;
 

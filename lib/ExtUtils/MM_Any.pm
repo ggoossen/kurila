@@ -132,8 +132,7 @@ pairs of arguments.  This makes things like this safe:
 
 =cut
 
-sub split_command {
-    my@($self, $cmd, @< @args) =  @_;
+sub split_command($self, $cmd, @< @args) {
 
     my @cmds = @( () );
     return @cmds unless (nelems @args);
@@ -173,8 +172,7 @@ sub split_command {
 }
 
 
-sub _expand_macros {
-    my@($self, $cmd) =  @_;
+sub _expand_macros($self, $cmd) {
 
     $cmd =~ s{\$\((\w+)\)}{$(
         defined $self->{?$1} ?? $self->{?$1} !! "\$($1)"
@@ -198,8 +196,7 @@ overwritten.
 
 =cut
 
-sub echo {
-    my@($self, $text, $file, ?$appending) =  @_;
+sub echo($self, $text, $file, ?$appending) {
     $appending ||= 0;
 
     my @cmds = map { '$(NOECHO) $(ECHO) '.$self->quote_literal($_) }, 
@@ -431,10 +428,7 @@ Defines the clean target.
 
 =cut
 
-sub clean {
-# --- Cleanup and Distribution Sections ---
-
-    my@($self, %< %attribs) =  @_;
+sub clean($self, %< %attribs) {
     my @m;
     push(@m, q|
 # Delete temporary files but do not touch installed files. We don't delete
@@ -555,8 +549,7 @@ than a '/' to seperate the directory from the file.
 
 =cut
 
-sub dir_target {
-    my@($self, @< @dirs) =  @_;
+sub dir_target($self, @< @dirs) {
 
     my $make = '';
     foreach my $dir ( @dirs) {
@@ -814,8 +807,7 @@ Defines the realclean target.
 
 =cut
 
-sub realclean {
-    my@($self, %< %attribs) =  @_;
+sub realclean($self, %< %attribs) {
 
     my @dirs  = qw($(DISTVNAME));
     my @files = qw($(FIRST_MAKEFILE) $(MAKEFILE_OLD));
@@ -1600,8 +1592,7 @@ Used on the t/*.t files.
 
 =cut
 
-sub test_via_harness {
-    my@($self, $perl, $tests) =  @_;
+sub test_via_harness($self, $perl, $tests) {
 
     return qq{\t$perl "-MExtUtils::Command::MM" }.
            qq{"-e" "test_harness(\$(TEST_VERBOSE), '\$(INST_LIB)', '\$(INST_ARCHLIB)')" $tests\n};
@@ -1620,8 +1611,7 @@ formatting.
 
 =cut
 
-sub test_via_script {
-    my@($self, $perl, $script) =  @_;
+sub test_via_script($self, $perl, $script) {
     return qq{\t$perl "-I\$(INST_LIB)" "-I\$(INST_ARCHLIB)" $script\n};
 }
 
@@ -1715,8 +1705,7 @@ installation.
 
 =cut
 
-sub libscan {
-    my@($self,$path) =  @_;
+sub libscan($self,$path) {
     my@($dirs,$file) =  ($self->splitpath($path))[[1..2]];
     return '' if grep { m/^(?:RCS|CVS|SCCS|\.svn|_darcs)$/ }, @( < 
                      $self->splitdir($dirs), $file);

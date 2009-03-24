@@ -241,18 +241,17 @@ use constant PAT_XINT  =>
   ")";
 use constant PAT_FLOAT => "[-+]?[0-9._]+(\.[0-9_]+)?([eE][-+]?[0-9_]+)?";
 
-sub GetOptions(@) {
+sub GetOptions(@< @args) {
     local $caller = $caller;
     $caller ||= @(caller)[0];
-    return GetOptionsFromArray(\@ARGV, < @_);
+    return GetOptionsFromArray(\@ARGV, < @args);
 }
 
-sub GetOptionsFromString($@) {
-    my @($string) =@( shift);
+sub GetOptionsFromString($string, @< @args) {
     require Text::ParseWords;
     my $args = \ Text::ParseWords::shellwords($string);
     $caller ||= @(caller)[0];	# current context
-    my $ret = GetOptionsFromArray($args, < @_);
+    my $ret = GetOptionsFromArray($args, < @args);
     if ( (nelems @$args) ) {
         $ret = 0;
         warn("GetOptionsFromString: Excess data \"$(join ' ',@$args)\" in string \"$string\"\n");
@@ -260,9 +259,7 @@ sub GetOptionsFromString($@) {
     return $ret;
 }
 
-sub GetOptionsFromArray($@) {
-
-    my @($argv, @< @optionlist) =  @_;	# local copy of the option descriptions
+sub GetOptionsFromArray($argv, @< @optionlist) {	# local copy of the option descriptions
     my $argend = '--';		# option list terminator
     my %opctl = %( () );		# table of option specs
     my $pkg = $caller || @(caller)[0];	# current context
@@ -730,8 +727,7 @@ sub GetOptionsFromArray($@) {
 }
 
 # A readable representation of what's in an optbl.
-sub OptCtl ($) {
-    my @($v) =  @_;
+sub OptCtl($v) {
     my @v = map { defined($_) ?? ($_) !! ("<undef>") }, @$v;
     "[".
       join(",", @(
@@ -747,8 +743,7 @@ sub OptCtl ($) {
 }
 
 # Parse an option specification and fill the tables.
-sub ParseOptionSpec ($$) {
-    my @($opt, $opctl) =  @_;
+sub ParseOptionSpec($opt, $opctl) {
 
     # Match option spec.
     if ( $opt !~ m;^
@@ -869,13 +864,7 @@ sub ParseOptionSpec ($$) {
 }
 
 # Option lookup.
-sub FindOption ($$$$$) {
-
-    # returns (1, $opt, $ctl, $arg, $key) if okay,
-    # returns (1, undef) if option in error,
-    # returns (0) otherwise.
-
-    my @($argv, $prefix, $argend, $opt, $opctl) =  @_;
+sub FindOption($argv, $prefix, $argend, $opt, $opctl) {
 
     print \*STDERR, ("=> find \"$opt\"\n") if $debug;
 
@@ -1199,8 +1188,7 @@ sub FindOption ($$$$$) {
     return  @(1, $opt, $ctl, $arg, $key);
 }
 
-sub ValidValue ($$$$$) {
-    my @($ctl, $arg, $mand, $argend, $prefix) =  @_;
+sub ValidValue($ctl, $arg, $mand, $argend, $prefix) {
 
     if ( $ctl->[CTL_DEST] == CTL_DEST_HASH ) {
 	return 0 unless $arg =~ m/[^=]+=(.*)/;
@@ -1239,9 +1227,7 @@ sub ValidValue ($$$$$) {
 }
 
 # Getopt::Long Configuration.
-sub Configure (@) {
-    my @options = @_;
-
+sub Configure (@< @options) {
     my $prevconfig =
       \@( $error, $debug, $major_version, $minor_version,
           $autoabbrev, $getopt_compat, $ignorecase, $bundling, $order,
@@ -1350,8 +1336,8 @@ sub Configure (@) {
 }
 
 # Deprecated name.
-sub config (@) {
-    Configure (< @_);
+sub config (@< @args) {
+    Configure (< @args);
 }
 
 # Issue a standard message for --version.
@@ -1362,9 +1348,9 @@ sub config (@) {
 #  - a string (lead in message)
 #  - a hash with options. See Pod::Usage for details.
 #
-sub VersionMessage(@) {
+sub VersionMessage(@< @args) {
     # Massage args.
-    my $pa = setup_pa_args("version", < @_);
+    my $pa = setup_pa_args("version", < @args);
 
     my $v = $main::VERSION;
     my $fh = $pa->{?output} ||
@@ -1390,7 +1376,7 @@ sub VersionMessage(@) {
 #  - a string (lead in message)
 #  - a hash with options. See Pod::Usage for details.
 #
-sub HelpMessage(@) {
+sub HelpMessage(@args) {
     try {
 	require Pod::Usage;
 	Pod::Usage->import;
@@ -1398,25 +1384,23 @@ sub HelpMessage(@) {
     } || die("Cannot provide help: cannot load Pod::Usage\n");
 
     # Note that pod2usage will issue a warning if -exitval => NOEXIT.
-    pod2usage( <setup_pa_args("help", < @_));
+    pod2usage( <setup_pa_args("help", < @args));
 
 }
 
 # Helper routine to set up a normalized hash ref to be used as
 # argument to pod2usage.
-sub setup_pa_args($@) {
-    my $tag = shift;		# who's calling
-
+sub setup_pa_args($tag, @args) {
     # If called by direct binding to an option, it will get the option
     # name and value as arguments. Remove these, if so.
-    @_ = @( () ) if (nelems @_) == 2 && @_[0] eq $tag;
+    @args = @( () ) if (nelems @args) == 2 && @args[0] eq $tag;
 
     my $pa;
-    if ( (nelems @_) +> 1 ) {
-	$pa = \%( < @_ );
+    if ( (nelems @args) +> 1 ) {
+	$pa = \%( < @args );
     }
     else {
-	$pa = shift || \%();
+	$pa = shift(@args) || \%();
     }
 
     # At this point, $pa can be a number (exit value), string
@@ -1448,8 +1432,7 @@ sub VERSION {
 
 package Getopt::Long::CallBack;
 
-sub new {
-    my @($pkg, %< %atts) =  @_;
+sub new($pkg, %< %atts) {
     bless \%( < %atts ), $pkg;
 }
 

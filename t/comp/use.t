@@ -10,8 +10,7 @@ print \*STDOUT, "1..26\n";
 
 my $test = 1;
 
-sub _ok {
-    my @($type, $got, $expected, ?$name) =  @_;
+sub _ok($type, $got, $expected, ?$name) {
 
     my $result;
     if ($type eq 'is') {
@@ -50,13 +49,13 @@ sub _ok {
     $result;
 }
 
-sub like ($$;$) {
+sub like {
     _ok ('like', < @_);
 }
-sub is ($$;$) {
+sub is {
     _ok ('is', < @_);
 }
-sub isnt ($$;$) {
+sub isnt {
     _ok ('isnt', < @_);
 }
 

@@ -227,8 +227,7 @@ file.
 
 =cut
 
-sub skipcheck {
-    my @(?$p) =  @_;
+sub skipcheck(?$p) {
     my $found = manifind();
     my $matches = _maniskip();
 
@@ -269,8 +268,7 @@ sub _check_files {
 }
 
 
-sub _check_manifest {
-    my @(?$p) =  @_;
+sub _check_manifest(?$p) {
     my $read = maniread() || \%();
     my $found = manifind($p);
     my $skip  = _maniskip();
@@ -302,8 +300,7 @@ start with C<#> in the C<MANIFEST> file are discarded.
 
 =cut
 
-sub maniread {
-    my @(?$mfile) =  @_;
+sub maniread(?$mfile) {
     $mfile ||= $MANIFEST;
     my $read = \%();
     my $m;
@@ -463,8 +460,7 @@ default.
 
 =cut
 
-sub manicopy {
-    my@($read,$target,$how)= @_;
+sub manicopy($read,$target,$how) {
     die "manicopy() called without target argument" unless defined $target;
     $how ||= 'cp';
     require File::Path;
@@ -492,8 +488,7 @@ sub manicopy {
     }
 }
 
-sub cp_if_diff {
-    my@($from, $to, $how)= @_;
+sub cp_if_diff($from, $to, $how) {
     -f $from or warn "$^PROGRAM_NAME: $from not found";
     my $diff = 0;
     my ($f, $t);
@@ -521,8 +516,7 @@ sub cp_if_diff {
     }
 }
 
-sub cp {
-    my @($srcFile, $dstFile) =  @_;
+sub cp($srcFile, $dstFile) {
     my @($access,$mod) =  @(stat $srcFile)[[8..9]];
 
     copy($srcFile,$dstFile);
@@ -546,8 +540,7 @@ sub ln {
 # 1) Strip off all group and world permissions.
 # 2) Let everyone read it.
 # 3) If the owner can execute it, everyone can.
-sub _manicopy_chmod {
-    my@($srcFile, $dstFile) =  @_;
+sub _manicopy_chmod($srcFile, $dstFile) {
 
     my $perm = 0444 ^|^ @(stat $srcFile)[2] ^&^ 0700;
     chmod( $perm ^|^ ( $perm ^&^ 0100 ?? 0111 !! 0 ), $dstFile );
@@ -555,8 +548,7 @@ sub _manicopy_chmod {
 
 # Files that are often modified in the distdir.  Don't hard link them.
 my @Exceptions = qw(MANIFEST META.yml SIGNATURE);
-sub best {
-    my @($srcFile, $dstFile) =  @_;
+sub best($srcFile, $dstFile) {
 
     my $is_exception = grep { $srcFile =~ m/$_/ }, @Exceptions;
     if ($is_exception or ! config_value("d_link") or -l $srcFile) {
@@ -566,8 +558,7 @@ sub best {
     }
 }
 
-sub _macify {
-    my@($file) =  @_;
+sub _macify($file) {
 
     return $file unless $Is_MacOS;
 
@@ -580,8 +571,7 @@ sub _macify {
     $file;
 }
 
-sub _maccat {
-    my@($f1, $f2) =  @_;
+sub _maccat($f1, $f2) {
 
     return "$f1/$f2" unless $Is_MacOS;
 
@@ -590,8 +580,7 @@ sub _maccat {
     return $f1;
 }
 
-sub _unmacify {
-    my@($file) =  @_;
+sub _unmacify($file) {
 
     return $file unless $Is_MacOS;
 

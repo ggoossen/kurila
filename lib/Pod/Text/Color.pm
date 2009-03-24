@@ -35,15 +35,13 @@ $VERSION = 2.03;
 ##############################################################################
 
 # Make level one headings bold.
-sub cmd_head1 {
-    my @($self, $attrs, $text) =  @_;
+sub cmd_head1($self, $attrs, $text) {
     $text =~ s/\s+$//;
     $self->SUPER::cmd_head1 ($attrs, colored ($text, 'bold'));
 }
 
 # Make level two headings bold.
-sub cmd_head2 {
-    my @($self, $attrs, $text) =  @_;
+sub cmd_head2($self, $attrs, $text) {
     $text =~ s/\s+$//;
     $self->SUPER::cmd_head2 ($attrs, colored ($text, 'bold'));
 }
@@ -54,8 +52,7 @@ sub cmd_f { return colored (@_[2], 'cyan')   }
 sub cmd_i { return colored (@_[2], 'yellow') }
 
 # Output any included code in green.
-sub output_code {
-    my @($self, $code) =  @_;
+sub output_code($self, $code) {
     $code = colored ($code, 'green');
     $self->output ($code);
 }

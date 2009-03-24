@@ -175,7 +175,7 @@ PP(pp_concat)
 		report_uninit(right);
 	    sv_setpvn(left, "", 0);
 	}
-	(void)SvPV_nomg_const(left, llen);    /* Needed to set UTF8 flag */
+	(void)SvPV_const(left, llen);    /* Needed to set UTF8 flag */
     }
 
     if (!rcopied) {
@@ -640,19 +640,7 @@ PP(pp_join)
 PP(pp_pushre)
 {
     dVAR; dSP;
-#ifdef DEBUGGING
-    /*
-     * We ass_u_me that LvTARGOFF() comes first, and that two STRLENs
-     * will be enough to hold an OP*.
-     */
-    SV* const sv = sv_newmortal();
-    sv_upgrade(sv, SVt_PVLV);
-    LvTYPE(sv) = '/';
-    Copy(&PL_op, &LvTARGOFF(sv), 1, OP*);
-    XPUSHs(sv);
-#else
     XPUSHs((SV*)PL_op);
-#endif
     RETURN;
 }
 
@@ -670,16 +658,16 @@ PP(pp_print)
 
     if (!(io = GvIO(gv))) {
 	if (ckWARN2(WARN_UNOPENED,WARN_CLOSED))
-	    report_evil_fh(gv, io, PL_op->op_type);
+	    report_evil_fh(io, PL_op->op_type);
 	SETERRNO(EBADF,RMS_IFI);
 	goto just_say_no;
     }
     else if (!(fp = IoOFP(io))) {
 	if (ckWARN2(WARN_CLOSED, WARN_IO))  {
 	    if (IoIFP(io))
-		report_evil_fh(gv, io, OP_phoney_INPUT_ONLY);
+		report_evil_fh(io, OP_phoney_INPUT_ONLY);
 	    else if (ckWARN2(WARN_UNOPENED,WARN_CLOSED))
-		report_evil_fh(gv, io, PL_op->op_type);
+		report_evil_fh(io, PL_op->op_type);
 	}
 	SETERRNO(EBADF,IoIFP(io)?RMS_FAC:RMS_IFI);
 	goto just_say_no;
@@ -751,7 +739,7 @@ Perl_do_readline(pTHX_ GV* gv)
 		    IoLINES(io) = 0;
 		    if (av_len(GvAVn(gv)) < 0) {
 			IoFLAGS(io) &= ~IOf_START;
-			do_openn(gv,"-",1,FALSE,O_RDONLY,0,NULL,NULL,0);
+			do_openn(io,"-",1,FALSE,O_RDONLY,0,NULL,NULL,0);
 			sv_setpvn(GvSVn(gv), "-", 1);
 			SvSETMAGIC(GvSV(gv));
 			fp = IoIFP(io);
@@ -765,7 +753,7 @@ Perl_do_readline(pTHX_ GV* gv)
 	    }
 	}
 	else if (ckWARN(WARN_IO) && IoTYPE(io) == IoTYPE_WRONLY) {
-	    report_evil_fh(gv, io, OP_phoney_OUTPUT_ONLY);
+	    report_evil_fh(io, OP_phoney_OUTPUT_ONLY);
 	}
     }
     if (!fp) {
@@ -777,7 +765,7 @@ Perl_do_readline(pTHX_ GV* gv)
 			    "glob failed (can't start child: %s)",
 			    Strerror(errno));
 	    else
-		report_evil_fh(gv, io, PL_op->op_type);
+		report_evil_fh(io, PL_op->op_type);
 	}
 	if (gimme == G_SCALAR) {
 	    /* undef TARG, and push that undefined value */
@@ -1181,7 +1169,7 @@ PP(pp_iter)
     }
 
     SvTEMP_off(sv);
-    SvREFCNT_inc_simple_void_NN(sv);
+    SvREFCNT_inc_void_NN(sv);
 
     oldsv = *itersvp;
     *itersvp = sv;
@@ -1203,11 +1191,11 @@ PP(pp_grepwhile)
     newitem = POPs;
     value = POPs;
     cvp = SP;
-    src = SvAv(SP[-1]);
+    src = svTav(SP[-1]);
     dst = SP[-2];
 
     if (SvTRUE(newitem)) {
-	av_push(SvAv(dst), SvREFCNT_inc(value));
+	av_push(svTav(dst), SvREFCNT_inc(value));
     }
 
     /* All done yet? */
@@ -1312,8 +1300,14 @@ PP(pp_entersub)
     GV *gv;
     register CV *cv;
     register PERL_CONTEXT *cx;
-    I32 gimme;
+    I32 gimme = GIMME_V;
     const bool hasargs = (PL_op->op_flags & OPf_STACKED) != 0;
+    assert(hasargs);
+
+    /* subs are always in scalar context */
+    if (gimme == G_ARRAY) {
+	gimme= G_SCALAR;
+    }
 
     if (!sv)
 	DIE(aTHX_ "Not a CODE reference");
@@ -1330,16 +1324,15 @@ PP(pp_entersub)
 	}
 	break;
     default:
+	if (sv == &PL_sv_yes && PL_op->op_flags & OPf_SPECIAL) {	/* unfound import, ignore */
+	    SP = PL_stack_base + POPMARK;
+	    if ( gimme != G_VOID )
+		XPUSHs(&PL_sv_undef);
+	    RETURN;
+	}
 	if (!SvROK(sv)) {
 	    const char *sym;
 	    STRLEN len;
-	    if (sv == &PL_sv_yes && PL_op->op_flags & OPf_SPECIAL) {	/* unfound import, ignore */
-		if (hasargs)
-		    SP = PL_stack_base + POPMARK;
-		if ( gimme != G_VOID )
-		    XPUSHs(&PL_sv_undef);
-		RETURN;
-	    }
 	    sym = SvPV_const(sv, len);
 	    if (!sym)
 		DIE(aTHX_ PL_no_usym, "a subroutine");
@@ -1364,13 +1357,6 @@ PP(pp_entersub)
     if (!CvROOT(cv) && !CvXSUB(cv)) {
 	DIE(aTHX_ "Undefined subroutine %s called",
 	    SvPVX_const(loc_desc(SvLOCATION(cv))));
-    }
-
-    gimme = GIMME_V;
-
-    /* subs are always in scalar context */
-    if (gimme == G_ARRAY) {
-	gimme= G_SCALAR;
     }
 
     if ((PL_op->op_private & OPpENTERSUB_DB) && GvCV(PL_DBsub) && !CvNODEBUG(cv)) {
@@ -1419,11 +1405,30 @@ PP(pp_entersub)
 	    else
 		SVcpSTEAL( PAD_SVl(PAD_ARGS_INDEX), newSV(0) );
 	}
-	else if (hasargs) {
+	else if ( CvFLAGS(cv) & CVf_PROTO) {
+	    int i;
+	    if (CvN_MAXARGS(cv) != -1 && items > CvN_MAXARGS(cv))
+		Perl_croak_at(aTHX_ SvLOCATION(cv),
+		    "Too many arguments for %s",
+		    SvPVX_const(loc_name(SvLOCATION(cv))));
+	    if (items < CvN_MINARGS(cv))
+		Perl_croak_at(aTHX_ SvLOCATION(cv),
+		    "Not enough arguments for %s",
+		    SvPVX_const(loc_name(SvLOCATION(cv))));
+	    CX_CURPAD_SAVE(cx->blk_sub);
+	    ++MARK;
+	    for (i=0; i<items/2; i++) {
+		SV* sv = MARK[i];
+		MARK[i] = MARK[items-i-1];
+		MARK[items-i-1] = sv;
+	    }
+	    PUSHMARK(MARK-1);
+	}
+	else if ( CvFLAGS(cv) & CVf_DEFARGS) {
 	    AV* av;
 	    SV* avsv = PAD_SVl(PAD_ARGS_INDEX);
 	    sv_upgrade(avsv, SVt_PVAV);
-	    av = SvAv(avsv);
+	    av = svTav(avsv);
 	    SAVECLEARSV(PAD_SVl(PAD_ARGS_INDEX));
 	    AvREAL_on(av);
 	    CX_CURPAD_SAVE(cx->blk_sub);
@@ -1515,7 +1520,7 @@ Perl_sub_crush_depth(pTHX_ CV *cv)
 
     loc = SvLOCATION((SV*)cv);
     if (loc && SvAVOK(loc)) {
-	name = av_fetch(SvAv(loc), 3, FALSE);
+	name = av_fetch(svTav(loc), 3, FALSE);
     }
     Perl_warner(aTHX_ packWARN(WARN_RECURSION), 
 	"Deep recursion on subroutine \"%s\"",
@@ -1641,7 +1646,7 @@ S_method_common(pTHX_ SV* meth, U32* hashp)
 {
     dVAR;
     SV* ob;
-    GV* gv;
+    CV* cv;
     HV* stash;
     STRLEN namelen;
     const char* packname = NULL;
@@ -1701,7 +1706,7 @@ S_method_common(pTHX_ SV* meth, U32* hashp)
     if (hashp) {
 	const HE* const he = hv_fetch_ent(stash, meth, 0, *hashp);
 	if (he) {
-	    gv = (GV*)HeVAL(he);
+	    GV* gv = (GV*)HeVAL(he);
 	    if (isGV(gv) && GvCV(gv) &&
 		(!GvCVGEN(gv) || GvCVGEN(gv)
                   == (PL_sub_generation + HvMROMETA(stash)->cache_gen)))
@@ -1709,9 +1714,9 @@ S_method_common(pTHX_ SV* meth, U32* hashp)
 	}
     }
 
-    gv = gv_fetchmethod(stash ? stash : (HV*)packsv, name);
+    cv = gv_fetchmethod(stash ? stash : (HV*)packsv, name);
 
-    if (!gv) {
+    if (!cv) {
 	/* This code tries to figure out just what went wrong with
 	   gv_fetchmethod.  It therefore needs to duplicate a lot of
 	   the internals of that function.  We can't move it inside
@@ -1768,7 +1773,7 @@ S_method_common(pTHX_ SV* meth, U32* hashp)
 		       leaf, (int)packlen, packname, (int)packlen, packname);
 	}
     }
-    return isGV(gv) ? (SV*)GvCV(gv) : (SV*)gv;
+    return cvTsv(cv);
 }
 
 /*

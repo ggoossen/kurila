@@ -10,8 +10,8 @@ sub import {
     *{Symbol::fetch_glob("$($who)::load")} = \&load;
 }
 
-sub load (*;@)  {
-    my $mod = shift or return;
+sub load ($mod, @< @args)  {
+    $mod or return;
     my $who = _who();
 
     if( _is_file( $mod ) ) {
@@ -27,7 +27,7 @@ sub load (*;@)  {
             die $err if $err;
         };
     }
-    __PACKAGE__->_export_to_level(1, $mod, < @_) if (nelems @_);
+    __PACKAGE__->_export_to_level(1, $mod, < @args) if @args;
 }
 
 ### 5.004's Exporter doesn't have export_to_level.

@@ -6,9 +6,9 @@ use Test;
 BEGIN { plan tests => 7};
 use Pod::Simple::HTML;
 
-sub x ($) { Pod::Simple::HTML->_out(
+sub x ($v) { Pod::Simple::HTML->_out(
   sub{  @_[0]->bare_output(1)  },
-  "=pod\n\n@_[0]",
+  "=pod\n\n$v",
 ) }
 
 ok 1;

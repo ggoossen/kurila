@@ -44,8 +44,7 @@ sub init {
 
 #--------------------------------------------------------------------------
 
-sub survey {
-  my@($self, @< @search_dirs) =  @_;
+sub survey($self, @< @search_dirs) {
   $self = $self->new unless ref $self; # tolerate being a class method
 
   $self->_expand_inc( \@search_dirs );
@@ -218,8 +217,7 @@ sub _make_search_callback {
 
 #==========================================================================
 
-sub _path2modname {
-  my@($self, $file, $shortname, $modname_bits) =  @_;
+sub _path2modname($self, $file, $shortname, $modname_bits) {
 
   # this code simplifies the POD name for Perl modules:
   # * remove "site_perl"
@@ -357,13 +355,12 @@ sub _recurse_dir {
 
 #==========================================================================
 
-sub run {
+sub run($file, $name) {
   # A function, useful in one-liners
 
   my $self = __PACKAGE__->new;
   $self->limit_glob(@ARGV[0]) if (nelems @ARGV);
   $self->callback( sub {
-    my@($file, $name) =  @_;
     my $version = '';
      
     # Yes, I know we won't catch the version in like a File/Thing.pm
@@ -419,8 +416,7 @@ sub run {
 
 #==========================================================================
 
-sub simplify_name {
-  my@($self, $str) =  @_;
+sub simplify_name($self, $str) {
     
   # Remove all path components
   #                             XXX Why not just use basename()? -- SMB
@@ -450,8 +446,7 @@ sub _simplify_base {   # Internal method only
 
 #==========================================================================
 
-sub _expand_inc {
-  my@($self, $search_dirs) =  @_;
+sub _expand_inc($self, $search_dirs) {
   
   return unless $self->{?'inc'};
 
@@ -469,9 +464,9 @@ sub _expand_inc {
 
 #==========================================================================
 
-sub _mac_whammy { # Tolerate '.', './some_dir' and '(../)+some_dir' on Mac OS
+sub _mac_whammy(_,@< @them) { # Tolerate '.', './some_dir' and '(../)+some_dir' on Mac OS
   my @them;
-  @(_,@< @them) =  @_;
+
   for my $_ ( @them) {
     if ( $_ eq '.' ) {
       $_ = ':';
@@ -513,8 +508,7 @@ sub _limit_glob_to_limit_re {
 
 # contribution mostly from Tim Jenness <t.jenness@jach.hawaii.edu>
 
-sub find {
-  my@($self, $pod, @< @search_dirs) =  @_;
+sub find($self, $pod, @< @search_dirs) {
   $self = $self->new unless ref $self; # tolerate being a class method
 
   # Check usage
@@ -583,8 +577,7 @@ sub find {
 
 #==========================================================================
 
-sub contains_pod {
-  my@($self, $file) =  @_;
+sub contains_pod($self, $file) {
   my $verbose = $self->{?'verbose'};
 
   # check for one line of POD

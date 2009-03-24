@@ -45,8 +45,7 @@ sub cleanup {
   }
 }
 
-sub object_file {
-  my @($self, $filename) =  @_;
+sub object_file($self, $filename) {
 
   # File name, minus the suffix
   (my $file_base = $filename) =~ s/\.[^.]+$//;
@@ -60,28 +59,23 @@ sub arg_include_dirs {
 
 sub arg_nolink { '-c' }
 
-sub arg_object_file {
-  my @($self, $file) =  @_;
+sub arg_object_file($self, $file) {
   return  @('-o', $file);
 }
 
-sub arg_share_object_file {
-  my @($self, $file) =  @_;
+sub arg_share_object_file($self, $file) {
   return  @(< $self->split_like_shell($self->{config}->{lddlflags}), '-o', $file);
 }
 
-sub arg_exec_file {
-  my @($self, $file) =  @_;
+sub arg_exec_file($self, $file) {
   return  @('-o', $file);
 }
 
-sub arg_defines {
-  my @($self, %< %args) =  @_;
+sub arg_defines($self, %< %args) {
   return map { "-D$_=%args{?$_}" }, keys %args;
 }
 
-sub compile {
-  my @($self, %< %args) =  @_;
+sub compile($self, %< %args) {
   die "Missing 'source' argument to compile()" unless defined %args{?source};
   
   my $cf = $self->{?config}; # For convenience
@@ -112,8 +106,7 @@ sub compile {
   return %args{?object_file};
 }
 
-sub have_compiler {
-  my @($self) =  @_;
+sub have_compiler($self) {
   return $self->{?have_compiler} if defined $self->{?have_compiler};
   
   my $tmpfile = File::Spec->catfile(File::Spec->tmpdir, 'compilet.c');
@@ -137,16 +130,14 @@ sub have_compiler {
   return $result;
 }
 
-sub lib_file {
-  my @($self, $dl_file) =  @_;
+sub lib_file($self, $dl_file) {
   $dl_file =~ s/\.[^.]+$//;
   $dl_file =~ s/"//g;
   return "$dl_file.$self->{config}->{?dlext}";
 }
 
 
-sub exe_file {
-  my @($self, $dl_file) =  @_;
+sub exe_file($self, $dl_file) {
   $dl_file =~ s/\.[^.]+$//;
   $dl_file =~ s/"//g;
   return "$dl_file$self->{config}->{?_exe}";
@@ -156,8 +147,7 @@ sub need_prelink { 0 }
 
 sub extra_link_args_after_prelink { return }
 
-sub prelink {
-  my @($self, %< %args) =  @_;
+sub prelink($self, %< %args) {
   
   (%args{+dl_file} = %args{?dl_name}) =~ s/.*::// unless %args{?dl_file};
   
@@ -177,18 +167,15 @@ sub prelink {
   return grep { -e }, map { "%args{?dl_file}.$_" }, qw(ext def opt);
 }
 
-sub link {
-  my @($self, %< %args) =  @_;
+sub link($self, %< %args) {
   return $self->_do_link('lib_file', lddl => 1, < %args);
 }
 
-sub link_executable {
-  my @($self, %< %args) =  @_;
+sub link_executable($self, %< %args) {
   return $self->_do_link('exe_file', lddl => 0, < %args);
 }
 
-sub _do_link {
-  my @($self, $type, %< %args) =  @_;
+sub _do_link($self, $type, %< %args) {
 
   my $cf = $self->{?config}; # For convenience
   
@@ -216,14 +203,12 @@ sub _do_link {
 }
 
 
-sub do_system {
-  my @($self, @< @cmd) =  @_;
+sub do_system($self, @< @cmd) {
   print \*STDOUT, "$(join ' ',@cmd)\n" if !$self->{?quiet};
   return !system(< @cmd);
 }
 
-sub split_like_shell {
-  my @($self, $string) =  @_;
+sub split_like_shell($self, $string) {
   
   return () unless defined($string);
   return @$string if UNIVERSAL::isa($string, 'ARRAY');

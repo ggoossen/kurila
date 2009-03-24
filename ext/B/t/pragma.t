@@ -69,8 +69,7 @@ exit;
 
 our $COP;
 
-sub find_op_cop {
-    my @( $sub, $op ) =  @_;
+sub find_op_cop( $sub, $op) {
     my $cv = svref_2object($sub);
     local $COP;
 
@@ -81,8 +80,7 @@ sub find_op_cop {
     return $COP;
 }
 
-sub _find_op_cop {
-    my @( $op, $name ) =  @_;
+sub _find_op_cop( $op, $name) {
 
     # Fail on B::NULL or whatever.
     return 0 if not $op or $op->isa("B::NULL");

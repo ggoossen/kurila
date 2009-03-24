@@ -34,18 +34,15 @@ for my $name (keys %NON_CONSTS) {
     *{Symbol::fetch_glob($name)} = sub { int_macro_int($name, @_[?0]) };
 }
 
-sub usage {
-    my @($mess) =  @_;
+sub usage($mess) {
     die "Usage: POSIX::$mess";
 }
 
-sub redef {
-    my @($mess) =  @_;
+sub redef($mess) {
     die "Use method $mess instead";
 }
 
-sub unimpl {
-    my @($mess) =  @_;
+sub unimpl($mess) {
     $mess =~ s/xxx//;
     die "Unimplemented: POSIX::$mess";
 }

@@ -45,10 +45,9 @@ PERL_CALLCONV void Perl_sv_catsv_mg(pTHX_ SV *dsv, register SV *ssv);
 PERL_CALLCONV char * Perl_sv_pv(pTHX_ SV *sv);
 PERL_CALLCONV char * Perl_sv_pvn_force(pTHX_ SV *sv, STRLEN *lp);
 PERL_CALLCONV NV Perl_huge(void);
-PERL_CALLCONV GV * Perl_gv_fetchmethod(pTHX_ HV *stash, const char *name);
 PERL_CALLCONV HE * Perl_hv_iternext(pTHX_ HV *hv);
 PERL_CALLCONV void Perl_hv_magic(pTHX_ HV *hv, GV *gv, int how);
-PERL_CALLCONV bool Perl_do_open(pTHX_ GV *gv, register const char *name, I32 len, int as_raw, int rawmode, int rawperm, PerlIO *supplied_fp);
+PERL_CALLCONV bool Perl_do_open(pTHX_ IO *io, register const char *name, I32 len, int as_raw, int rawmode, int rawperm, PerlIO *supplied_fp);
 PERL_CALLCONV bool Perl_do_aexec(pTHX_ SV *really, register SV **mark, register SV **sp);
 PERL_CALLCONV bool Perl_do_exec(pTHX_ const char *cmd);
 PERL_CALLCONV char * Perl_uvuni_to_utf8(pTHX_ char *d, UV uv);
@@ -415,26 +414,13 @@ Perl_av_fake(pTHX_ register I32 size, register SV **strp)
 }
 
 bool
-Perl_do_open(pTHX_ GV *gv, register const char *name, I32 len, int as_raw,
+Perl_do_open(pTHX_ IO *io, register const char *name, I32 len, int as_raw,
 	     int rawmode, int rawperm, PerlIO *supplied_fp)
 {
     PERL_ARGS_ASSERT_DO_OPEN;
 
-    return do_openn(gv, name, len, as_raw, rawmode, rawperm,
+    return do_openn(io, name, len, as_raw, rawmode, rawperm,
 		    supplied_fp, (SV **) NULL, 0);
-}
-
-bool
-Perl_do_open9(pTHX_ GV *gv, register const char *name, I32 len, int 
-as_raw,
-              int rawmode, int rawperm, PerlIO *supplied_fp, SV *svs,
-              I32 num_svs)
-{
-    PERL_ARGS_ASSERT_DO_OPEN9;
-
-    PERL_UNUSED_ARG(num_svs);
-    return do_openn(gv, name, len, as_raw, rawmode, rawperm,
-                    supplied_fp, &svs, 1);
 }
 
 int

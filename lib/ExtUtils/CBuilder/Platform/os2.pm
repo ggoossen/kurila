@@ -22,9 +22,7 @@ sub prelink {
   return  @(@res, $libname);
 }
 
-sub _do_link {
-  my $self = shift;
-  my @($how, %< %args) =  @_;
+sub _do_link($self, $how, %< %args) {
   if ($how eq 'lib_file'
       and (defined %args{?module_name} and length %args{?module_name})) {
 
@@ -51,9 +49,7 @@ sub _do_link {
   return $self->SUPER::_do_link($how, < %args);
 }
 
-sub extra_link_args_after_prelink {
-  # Add .DEF file to the link line
-  my @($self, %< %args) =  @_;
+sub extra_link_args_after_prelink($self, %< %args) {
 
   my @DEF = grep { m/\.def$/i }, @{%args{prelink_res}};
   die "More than one .def files created by `prelink' stage" if (nelems @DEF) +> 1;

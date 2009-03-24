@@ -36,8 +36,7 @@ and then File::Spec::Unix canonpath() is called on the result.
 
 =cut
 
-sub canonpath {
-    my@($self,?$path) =  @_;
+sub canonpath($self,?$path) {
     return unless defined $path;
 
     $path =~ s|\\|/|g;
@@ -73,8 +72,7 @@ and if not, File::Spec::Unix file_name_is_absolute() is called.
 =cut
 
 
-sub file_name_is_absolute {
-    my @($self,$file) =  @_;
+sub file_name_is_absolute($self,$file) {
     return 1 if $file =~ m{^([a-z]:)?[\\/]}is; # C:/test
     return $self->SUPER::file_name_is_absolute($file);
 }
@@ -110,11 +108,10 @@ Default: 1
 
 =cut
 
-sub case_tolerant () {
+sub case_tolerant(?$drive) {
   return 1 unless $^OS_NAME eq 'cygwin'
     and defined &Cygwin::mount_flags;
 
-  my $drive = shift;
   if (! $drive) {
       my @flags = split(m/,/, Cygwin::mount_flags('/cygwin'));
       my $prefix = pop(@flags);

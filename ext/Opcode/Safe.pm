@@ -79,8 +79,7 @@ my $default_share = \qw[
     &Symbol::fetch_glob
 ];
 
-sub new {
-    my@($class, ?$root, ?$mask) =  @_;
+sub new($class, ?$root, ?$mask) {
     my $obj = \%();
     bless $obj, $class;
 
@@ -116,8 +115,7 @@ sub DESTROY {
     $obj->erase('DESTROY') if $obj->{?Erase};
 }
 
-sub erase {
-    my @($obj, $action) =  @_;
+sub erase($obj, $action) {
     my $pkg = $obj->root();
     my ($stem, $leaf);
 
@@ -209,8 +207,7 @@ sub dump_mask {
 
 
 
-sub share {
-    my@($obj, @< @vars) =  @_;
+sub share($obj, @< @vars) {
     $obj->share_from(scalar(caller), \@vars);
 }
 
@@ -261,22 +258,19 @@ sub share_forget {
     delete shift->{Shares};
 }
 
-sub varglob {
-    my @($obj, $var) =  @_;
+sub varglob($obj, $var) {
     return Symbol::fetch_glob($obj->root()."::$var");
 }
 
 
-sub reval {
-    my @($obj, $expr, ?$strict) =  @_;
+sub reval($obj, $expr, ?$strict) {
     my $root = $obj->{?Root};
 
     my $evalsub = lexless_anon_sub($root,$strict, $expr);
     return Opcode::_safe_call_sv($root, $obj->{?Mask}, $evalsub);
 }
 
-sub rdo {
-    my @($obj, $file) =  @_;
+sub rdo($obj, $file) {
     my $root = $obj->{?Root};
 
     my $evalsub = eval

@@ -1,7 +1,6 @@
 use Config;
 
-sub to_string {
-    my @($value) =  @_;
+sub to_string($value) {
     $value =~ s/\\/\\\\/g;
     $value =~ s/'/\\'/g;
     return "'$value'";
@@ -30,8 +29,7 @@ sub to_string {
 # The $^O tests test both for $^O and for $Config{osname}.
 # The latter is better for some for cross-compilation setups.
 #
-sub _expansion {
-    my @($op, $os, $expr) =  @_;
+sub _expansion($op, $os, $expr) {
     if ($op ne 'eq' and $op ne 'ne') {die "wrong eq-ne arg"};
     if ($expr =~ m[^(.*?)<<\|\$\^O-$op-$os>>(.*?)$]s) {
         my @($if,$el) = @($1,$2);

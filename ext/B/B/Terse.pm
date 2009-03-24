@@ -6,8 +6,7 @@ use B < qw(class @specialsv_name);
 use B::Concise < qw(concise_subref set_style_standard);
 use Carp;
 
-sub terse {
-    my @($order, ?$subref) =  @_;
+sub terse($order, ?$subref) {
     set_style_standard("terse");
     if ($order eq "exec") {
 	concise_subref('exec', $subref);

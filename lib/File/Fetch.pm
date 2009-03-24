@@ -1,6 +1,6 @@
 package File::Fetch;
 
-use FileHandle;
+use IO::File;
 use File::Copy;
 use File::Spec;
 use File::Spec::Unix;
@@ -658,7 +658,7 @@ sub _ftp_fetch {
     ### see if we have a ftp binary ###
     if( my $ftp = can_run('ftp') ) {
 
-        my $fh = FileHandle->new;
+        my $fh = IO::File->new;
 
         signals::temp_set_handler(CHLD => 'IGNORE');
 
@@ -708,7 +708,7 @@ sub _lynx_fetch {
         }            
 
         ### write to the output file ourselves, since lynx ass_u_mes to much
-        my $local = FileHandle->new(">$to")
+        my $local = IO::File->new(">", "$to")
                         or return $self->_error( <loc(
                             "Could not open '\%1' for writing: \%2",$to,$^OS_ERROR));
 

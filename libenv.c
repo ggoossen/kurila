@@ -92,7 +92,7 @@ XS(XS_env_keys)
         HV* hv = PL_envhv;
         register HE *entry;
         AV* res = newAV();
-        mXPUSHs(AvSv(res));
+        mXPUSHs(avTsv(res));
 
         (void)hv_iterinit(hv);	/* always reset iterator regardless */
         while ((entry = hv_iternext(hv))) {

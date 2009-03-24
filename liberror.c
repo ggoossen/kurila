@@ -22,9 +22,9 @@ Perl_boot_core_error(pTHX)
     newXS("error::stacktrace", XS_error_stacktrace, file);
     newXS("error::write_to_stderr", XS_error_write_to_stderr, file);
 
-    PL_errorcreatehook = newRV_inc((SV*)GvCV(gv_fetchmethod(NULL, "error::create")));
-    PL_diehook = newRV_inc((SV*)GvCV(gv_fetchmethod(NULL, "error::write_to_stderr")));
-    PL_warnhook = newRV_inc((SV*)GvCV(gv_fetchmethod(NULL, "error::write_to_stderr")));
+    PL_errorcreatehook = newRV_inc(cvTsv(gv_fetchmethod(NULL, "error::create")));
+    PL_diehook = newRV_inc(cvTsv(gv_fetchmethod(NULL, "error::write_to_stderr")));
+    PL_warnhook = newRV_inc(cvTsv(gv_fetchmethod(NULL, "error::write_to_stderr")));
 }
 
 STATIC
@@ -39,7 +39,7 @@ AV* S_context_info(pTHX_ const PERL_CONTEXT *cx) {
     else
 	av_push(av, newSVpv(stashname, 0));
     if (cx->blk_oldop->op_location) {
-	sv_setsv(AvSv(av), cx->blk_oldop->op_location);
+	sv_setsv(avTsv(av), cx->blk_oldop->op_location);
     } else {
 	av_push(av, newSVpv("unknown location", 0));
     }
@@ -49,7 +49,7 @@ AV* S_context_info(pTHX_ const PERL_CONTEXT *cx) {
 	CV* cv = cx->blk_sub.cv;
 	SV** name = NULL;
 	if (SvLOCATION(cv) && SvAVOK(SvLOCATION(cv)))
-	    name = av_fetch(SvAv(SvLOCATION(cv)), 3, FALSE);
+	    name = av_fetch(svTav(SvLOCATION(cv)), 3, FALSE);
 	av_push(av, name ? newSVsv(*name) : &PL_sv_undef );
     }
     else {
@@ -171,7 +171,7 @@ XS(XS_error_create)
 	    SV *sv = sv_newmortal();
 	    sv_setpvn(sv,"",0);
 	    if ( items >= 2 ) {
-		if (location && SvAVOK(location) && av_len(SvAv(location)) >= 2) {
+		if (location && SvAVOK(location) && av_len(svTav(location)) >= 2) {
                     SV* loc_0 = *av_fetch((AV*)location, 0, FALSE);
                     SV* loc_1 = *av_fetch((AV*)location, 1, FALSE);
                     SV* loc_2 = *av_fetch((AV*)location, 2, FALSE);

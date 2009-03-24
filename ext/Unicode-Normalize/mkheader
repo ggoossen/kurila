@@ -74,9 +74,9 @@ sub decomposeHangul {
     my $VIndex = int(($SIndex % NCount) / TCount);
     my $TIndex =      $SIndex % TCount;
     my @ret = @(
-       LBase + $LIndex,
-       VBase + $VIndex,
-      $TIndex ?? (TBase + $TIndex) !! (),
+       LBase() + $LIndex,
+       VBase() + $VIndex,
+      $TIndex ?? (TBase() + $TIndex) !! (),
     );
     return @ret;
 }

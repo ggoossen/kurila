@@ -135,9 +135,8 @@ sub bits
 }
 
 
-sub _readDeflateHeader
-{
-    my @($self, $buffer) =  @_ ;
+sub _readDeflateHeader($self, $buffer)
+{ 
 
 #    if (! $buffer) {
 #        $self->smartReadExact(\$buffer, ZLIB_HEADER_SIZE);

@@ -126,8 +126,7 @@ sub platform_constants {
 
 =cut
 
-sub const_cccmd {
-    my@($self,$libperl)= @_;
+sub const_cccmd($self,$libperl) {
     return $self->{?CONST_CCCMD} if $self->{?CONST_CCCMD};
     return '' unless $self->needs_linking();
     return $self->{+CONST_CCCMD} = <<'MAKE_FRAG';
@@ -143,8 +142,7 @@ MAKE_FRAG
 
 =cut
 
-sub static_lib {
-    my@($self) =  @_;
+sub static_lib($self) {
 
     return '' unless $self->has_link_code;
 
@@ -190,8 +188,7 @@ Defines how to produce the *.so (or equivalent) files.
 
 =cut
 
-sub dynamic_lib {
-    my@($self, %< %attribs) =  @_;
+sub dynamic_lib($self, %< %attribs) {
     return '' unless $self->needs_linking(); #might be because of a subdir
 
     return '' unless $self->has_link_code;

@@ -29,8 +29,7 @@ sub pattern {
 	return @_[0] ?? qr/(?=)/ !! qr/(?!)/;
 }
 
-sub code {
-	my @($newval, $name ) =  @_;
+sub code($newval, $name) {
 	my $type = ref($newval) || "'$newval'";
 	die "Value for '$name' option must be code reference (not $type)"
 			unless $type eq 'CODE';
@@ -42,8 +41,7 @@ my %std_one = %(
 	'_' => '{_[{1}[_}',
 );
 
-sub one_char {
-	my @($newval, _, $opts ) =  @_;
+sub one_char($newval, _, $opts) {
 	$newval = \@( $newval ) unless ref $newval eq 'ARRAY';
 	for ( @$newval) {
 		die "Value for 'single' option must be single character (not '$_')"
@@ -67,8 +65,7 @@ sub pos_integer {
 	return @_[0];
 }
 
-sub strings_or_undef {
-	my @($val, $name) =  @_;
+sub strings_or_undef($val, $name) {
 	my $type = ref $val;
 	if (!defined $val) { $val = \@() }
 	elsif (!$type)     { $val = \@( "$val" ) }
@@ -97,8 +94,7 @@ sub height_vals {
 
 my %nothing = %( < @+: map {@:$_=>sub{""}}, qw(first even odd other) );
 
-sub std_body {
-	my @($rows, $fill, $opt) =  @_;
+sub std_body($rows, $fill, $opt) {
 	join("", @( < @$rows, < @$fill));
 }
 my %std_body = %(other =>\&std_body);
@@ -125,8 +121,7 @@ sub form_body {
 	}
 }
 
-sub hashify {
-	my @($what, $val, $default_undef, $default_val) =  @_;
+sub hashify($what, $val, $default_undef, $default_val) {
 	if (!defined $val) {
 		return \%( other => $default_undef );
 	}
@@ -179,8 +174,7 @@ sub filehandle {
 	return @_[0];
 }
 
-sub user_def {
-	my @($spec, $name, $opts) =  @_;
+sub user_def($spec, $name, $opts) {
 	my $type = ref $spec;
 	die "Value of 'field' option must be an array of pairs or a hash (not ",
 		  $type||"'$spec'", ")"
@@ -246,8 +240,7 @@ my %std_literal = %(
 	hjust	=> \&jhorlit,
 );
 
-sub update(\%\%;$) {
-	my @($old, $new, $croak) =  @_;
+sub update($old, $new, $croak) {
 	my @bad;
 	for my $opt (keys %$new) {
 		my $std = %std_opt{?$opt};
@@ -261,8 +254,7 @@ sub update(\%\%;$) {
 
 # Horizontal justifiers
 
-sub fillpat {
-	my @($pos, $fill, $len) =  @_;
+sub fillpat($pos, $fill, $len) {
 	return "" if $len +< 0;
 	return substr($fill x (($pos+$len)/length($fill)+1), $pos, $len);
 }
@@ -319,9 +311,9 @@ sub jleft {
 	die "Internal error in &form."
  }
 
- sub joverflow (\%\%) {
-	@_[0]{+overflow} = 1;
-	%{@_[1]} = %( () );
+ sub joverflow($x, $y) {
+	$x{+overflow} = 1;
+	%{$y} = %( () );
 	return \&jfatal;
  }
 
@@ -427,27 +419,23 @@ sub jleft {
 
 # Vertical justifiers
 
-sub jverlit {
-	my @($height, $above, $below, $column) =  @_;
+sub jverlit($height, $above, $below, $column) {
 	push @$column, ($column->[0]||"") while (nelems @$column) +< $height;
 }
 
-sub jmiddle {
-	my @($height, $above, $below, $column) =  @_;
+sub jmiddle($height, $above, $below, $column) {
 	my $add = int(($height-nelems @$column)/2);
 	splice @$column, 0, 0, ($above)x$add;
 	$add = $height-nelems @$column;
 	push @$column, ($below)x$add;
 }
 
-sub jbottom {
-	my @($height, $above, $below, $column) =  @_;
+sub jbottom($height, $above, $below, $column) {
 	my $pre = $height-nelems @$column;
 	splice @$column, 0, 0, ($above)x$pre;
 }
 
-sub jtop {
-	my @($height, $above, $below, $column) =  @_;
+sub jtop($height, $above, $below, $column) {
 	my $post = $height-nelems @$column;
 	push @$column, ($below)x$post;
 }
@@ -457,8 +445,7 @@ my $precurrpat  = qr/^(\{)   ([^]0>[<,']+?)  ([]>,'0])/x;
 my $incurrpat   = qr/([]>0]) ([^]0>[<,'. ]+?) ([[<0])  /x;
 my $postcurrpat = qr/([[<0]) ([^]0>[<]+)     (\}$)     /x;
 
-sub perl6_match {
-	my @($str, $pat) =  @_;
+sub perl6_match($str, $pat) {;
 	use re 'eval';
 	if (my @vals = @( $str =~ m/($pat)/ )) {
 		unshift @vals, $1;
@@ -484,8 +471,7 @@ sub fldvals {
 our $nestedbraces;
 $nestedbraces = qr/ \{ (?: (?> ((?!\{|\}).)+ ) | (??{ $nestedbraces }) )* \} /sx;
 
-sub segment ($\@\%$\%) {
-	my @($format, $args, $opts, $fldcnt, $argcache) =  @_;
+sub segment($format, $args, $opts, $fldcnt, $argcache) {
 	my $width =
 		defined $opts->{page}->{?width} ?? $opts->{page}->{?width} !! length($format);
 	my $userdef = join("|", @{$opts->{field}->{?from}}) || qr/(?!)/;
@@ -814,8 +800,7 @@ sub make_col {
 
 my $count = 0;
 
-sub balance_cols {
-	my @($group, $opts, $maxheight) =  @_;
+sub balance_cols($group, $opts, $maxheight) {
 	my @($first, $src) = @($group->[0], $group->[0]{?src});
 	if ((nelems @$group)+<=1) {
 		$first->{+formcol} = make_col($first,$opts,$maxheight);
@@ -865,8 +850,7 @@ sub delineate_overflows {
 	}
 }
 
-sub resolve_overflows {
-	my @($formatters,$prevformatters) =  @_;
+sub resolve_overflows($formatters,$prevformatters) {
 	FORMATTER: for my $fld ( @$formatters) {
 		next unless $fld->{?overflow};
 		my $left  = $fld->{?pos};
@@ -897,8 +881,7 @@ sub resolve_overflows {
 	}
 }
 
-sub make_cols($$\@\%$) {
-	my @($formatters,$prevformatters,$parts, $opts, $maxheight) =  @_;
+sub make_cols($formatters,$prevformatters,$parts, $opts, $maxheight) {
 	my (@bullets, @max, @min);
 	for my $f ( @$formatters) {
 		if    ($f->{?isbullet}) 				{ push @bullets, $f }
@@ -1045,8 +1028,7 @@ sub make_cols($$\@\%$) {
 	return 0;
 }
 
-sub make_underline {
-	my @($under, $prevline, $nextline) =  @_;
+sub make_underline($under, $prevline, $nextline) {
 	$under =~ s/(\n*)\z//;
 	my $trail = "$1"^|^"\n";
 	for my $l (@($nextline, $prevline)) {
@@ -1061,8 +1043,8 @@ sub make_underline {
 	return \@(\%( < %std_literal, width => length($nextline), src => \$nextline ));
 }
 
-sub linecount($) {
-	return (nelems @(m/(\n)/g)) + (m/[^\n]\z/??1!!0) for  @_;
+sub linecount($v) {
+	return (nelems @(m/(\n)/g)) + (m/[^\n]\z/??1!!0) for @: $v;
 }
 
 use warnings::register;
@@ -1185,8 +1167,7 @@ sub form {
     return $text;
 }
 
-sub make_page {
-		my @($section, $sect_opts, $bodylen) =  @_;
+sub make_page($section, $sect_opts, $bodylen) {
 		my (@text, $more);
 		my ($prevformatters, $formatters);
 		while ((nelems @text) +< $bodylen && nelems @{$section->{?formatters}}) {
@@ -1230,8 +1211,7 @@ sub make_page {
 
 # Extract perpendicular cross-sections from an AoA, AoH, HoA, HoH, AoHoA, etc.
 
-sub section {
-    my @($structure, @< @index) =  @_;
+sub section($structure, @< @index) {
     $structure = \ values %$structure if ref $structure eq 'HASH';
     my @section;
     for my $row (  @$structure ) {
@@ -1253,15 +1233,13 @@ sub section {
     return < @section;
 }
 
-sub slice {
-    my @($structure, @< @indices) =  @_;
+sub slice($structure, @< @indices) {
 	return ref eq 'HASH' ?? < $_->{[ @indices]} !! < $_->[[@(@indices)]] for @( $structure);
 }
 
 sub vals { return ref eq 'HASH' ?? values %$_ !! < @$_ for @( @_[0]) }
 
-sub drill (\[@%];@) {
-    my @($structure, @< @indices) =  @_;
+sub drill($structure, @< @indices) {
     return $structure unless (nelems @indices);
     my $index = shift @indices;
     my @section = (nelems @$index) ?? slice($structure,< @$index) !! vals($structure);
@@ -1276,20 +1254,17 @@ sub break_lit {
     return  @(${@_[0]},0,0);
 }
 
-sub break_bullet {
-	my @($src) =  @_;
+sub break_bullet($src) {
 	my $next = pop @$src || "";
     return  @($next,(nelems @$src)+>0,0);
 }
 
-sub break_verbatim {
-    my @($str,$rem) =  @_;
+sub break_verbatim($str,$rem) {
     $$str =~ m/ \G ([^\n\r]*) (?:\r|\n|\z) /gcx or return  @("",0);
     return  @(substr("$1",0,$rem), $$str =~ m/ \G (?=.) /sgcx ?? 1 !! 0,0);
 }
 
-sub break_nl {
-	my @($str) =  @_;
+sub break_nl($str) {
     if ($$str =~ m/\G [^\S\n\r]* ([^\n\r]*?) [^\S\r\n]* (?:\r|$)/gcxm)  {
         return  @("$1", $$str =~ m/\G(?=.*\S)/sgc??1!!0, 1);
     }

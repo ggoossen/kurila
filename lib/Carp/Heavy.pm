@@ -164,8 +164,7 @@ sub longmess_heavy {
 
 # Returns a full stack backtrace starting from where it is
 # told.
-sub ret_backtrace {
-  my @($i, @< @error) =  @_;
+sub ret_backtrace($i, @< @error) {
   my $mess;
   my $err = join '', @error;
   $i++;
@@ -186,8 +185,7 @@ sub ret_backtrace {
   return $mess;
 }
 
-sub ret_summary {
-  my @($i, @< @error) =  @_;
+sub ret_summary($i, @< @error) {
   my $err = join '', @error;
   $i++;
 

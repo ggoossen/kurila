@@ -59,12 +59,11 @@
 #include <signal.h>
 
 bool
-Perl_do_openn(pTHX_ GV *gv, register const char *oname, I32 len, int as_raw,
+Perl_do_openn(pTHX_ IO *io, register const char *oname, I32 len, int as_raw,
 	      int rawmode, int rawperm, PerlIO *supplied_fp, SV * const *svp,
 	      I32 num_svs)
 {
     dVAR;
-    register IO * const io = GvIOn(gv);
     PerlIO *saveifp = NULL;
     PerlIO *saveofp = NULL;
     int savefd = -1;
@@ -123,9 +122,7 @@ Perl_do_openn(pTHX_ GV *gv, register const char *oname, I32 len, int as_raw,
 	    result = PerlIO_close(IoIFP(io));
 	if (result == EOF && fd > PL_maxsysfd) {
 	    /* Why is this not Perl_warn*() call ? */
-	    PerlIO_printf(Perl_error_log,
-			  "Warning: unable to close filehandle %s properly.\n",
-			  GvENAME(gv));
+	    Perl_warn("unable to close filehandle properly.");
 	}
 	IoOFP(io) = IoIFP(io) = NULL;
     }
@@ -480,14 +477,12 @@ Perl_do_openn(pTHX_ GV *gv, register const char *oname, I32 len, int as_raw,
 	if ((IoTYPE(io) == IoTYPE_RDONLY) &&
 	    (fp == PerlIO_stdout() || fp == PerlIO_stderr())) {
 		Perl_warner(aTHX_ packWARN(WARN_IO),
-			    "Filehandle STD%s reopened as %s only for input",
-			    ((fp == PerlIO_stdout()) ? "OUT" : "ERR"),
-			    GvENAME(gv));
+			    "Filehandle STD%s reopened only for input",
+			    ((fp == PerlIO_stdout()) ? "OUT" : "ERR"));
 	}
 	else if ((IoTYPE(io) == IoTYPE_WRONLY) && fp == PerlIO_stdin()) {
 		Perl_warner(aTHX_ packWARN(WARN_IO),
-			    "Filehandle STDIN reopened as %s only for output",
-			    GvENAME(gv));
+			    "Filehandle STDIN reopened only for output");
 	}
     }
 
@@ -678,11 +673,11 @@ Perl_nextargv(pTHX_ register GV *gv)
 	SvSETMAGIC(GvSV(gv));
 	PL_oldname = SvPV_const(GvSV(gv), oldlen);
 	if (oldlen == 1 && *PL_oldname == '-') {
-	    if (do_openn(gv,"-", 1, FALSE, O_RDONLY,0,NULL,NULL,0)) {
+	    if (do_openn(GvIOn(gv),"-", 1, FALSE, O_RDONLY,0,NULL,NULL,0)) {
 		return IoIFP(GvIOp(gv));
 	    }
 	} else {
-	    if (do_openn(gv,"<", 1, FALSE, O_RDONLY,0,NULL,&sv,1)) {
+	    if (do_openn(GvIOn(gv),"<", 1, FALSE, O_RDONLY,0,NULL,&sv,1)) {
 		return IoIFP(GvIOp(gv));
 	    }
 	}
@@ -700,9 +695,9 @@ Perl_do_close(pTHX_ GV *gv, bool not_implicit)
     bool retval;
     IO *io;
 
-    if (!gv)
-	gv = PL_argvgv;
-    if (!gv || SvTYPE(gv) != SVt_PVGV) {
+    PERL_ARGS_ASSERT_DO_CLOSE;
+
+    if (SvTYPE(gv) != SVt_PVGV) {
 	if (not_implicit)
 	    SETERRNO(EBADF,SS_IVCHAN);
 	return FALSE;
@@ -711,7 +706,7 @@ Perl_do_close(pTHX_ GV *gv, bool not_implicit)
     if (!io) {		/* never opened */
 	if (not_implicit) {
 	    if (ckWARN(WARN_UNOPENED)) /* no check for closed here */
-		report_evil_fh(gv, io, PL_op->op_type);
+		report_evil_fh(io, PL_op->op_type);
 	    SETERRNO(EBADF,SS_IVCHAN);
 	}
 	return FALSE;
@@ -776,7 +771,7 @@ Perl_do_eof(pTHX_ GV *gv)
     if (!io)
 	return TRUE;
     else if ((IoTYPE(io) == IoTYPE_WRONLY) && ckWARN(WARN_IO))
-	report_evil_fh(gv, io, OP_phoney_OUTPUT_ONLY);
+	report_evil_fh(io, OP_phoney_OUTPUT_ONLY);
 
     while (IoIFP(io)) {
         if (PerlIO_has_cntptr(IoIFP(io))) {	/* (the code works without this) */
@@ -827,7 +822,7 @@ Perl_do_tell(pTHX_ GV *gv)
 	return PerlIO_tell(fp);
     }
     if (ckWARN2(WARN_UNOPENED,WARN_CLOSED))
-	report_evil_fh(gv, io, PL_op->op_type);
+	report_evil_fh(io, PL_op->op_type);
     SETERRNO(EBADF,RMS_IFI);
     return (Off_t)-1;
 }
@@ -847,7 +842,7 @@ Perl_do_seek(pTHX_ GV *gv, Off_t pos, int whence)
 	return PerlIO_seek(fp, pos, whence) >= 0;
     }
     if (ckWARN2(WARN_UNOPENED,WARN_CLOSED))
-	report_evil_fh(gv, io, PL_op->op_type);
+	report_evil_fh(io, PL_op->op_type);
     SETERRNO(EBADF,RMS_IFI);
     return FALSE;
 }
@@ -864,7 +859,7 @@ Perl_do_sysseek(pTHX_ GV *gv, Off_t pos, int whence)
     if (gv && (io = GvIO(gv)) && (fp = IoIFP(io)))
 	return PerlLIO_lseek(PerlIO_fileno(fp), pos, whence);
     if (ckWARN2(WARN_UNOPENED,WARN_CLOSED))
-	report_evil_fh(gv, io, PL_op->op_type);
+	report_evil_fh(io, PL_op->op_type);
     SETERRNO(EBADF,RMS_IFI);
     return (Off_t)-1;
 }
@@ -1038,12 +1033,12 @@ Perl_my_stat(pTHX)
                 return (PL_laststatval = PerlLIO_fstat(my_dirfd(IoDIRP(io)), &PL_statcache));
             } else {
                 if (ckWARN2(WARN_UNOPENED,WARN_CLOSED))
-                    report_evil_fh(gv, io, PL_op->op_type);
+                    report_evil_fh(io, PL_op->op_type);
                 return (PL_laststatval = -1);
             }
 	} else {
             if (ckWARN2(WARN_UNOPENED,WARN_CLOSED))
-                report_evil_fh(gv, io, PL_op->op_type);
+                report_evil_fh(io, PL_op->op_type);
             return (PL_laststatval = -1);
         }
     }

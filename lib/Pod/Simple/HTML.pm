@@ -198,8 +198,7 @@ sub new {
   return $new;
 }
 
-sub batch_mode_page_object_init {
-  my@($self, $batchconvobj, $module, $infile, $outfile, $depth) =  @_;
+sub batch_mode_page_object_init($self, $batchconvobj, $module, $infile, $outfile, $depth) {
   DEBUG and print \*STDOUT, "Initting $self\n  for $module\n",
     "  in $infile\n  out $outfile\n  depth $depth\n";
   $self->batch_mode(1);
@@ -277,8 +276,7 @@ sub do_beginning {
   return 1;
 }
 
-sub _add_top_anchor {
-  my@($self, $text_r) =  @_;
+sub _add_top_anchor($self, $text_r) {
   unless($$text_r and $$text_r =~ m/name=['"]___top['"]/) { # a hack
     $$text_r .= "<a name='___top' class='dummyTopAnchor' ></a>\n";
   }
@@ -535,8 +533,7 @@ sub _do_middle_main_loop {
 ###########################################################################
 #
 
-sub do_link {
-  my@($self, $token) =  @_;
+sub do_link($self, $token) {
   my $type = $token->attr('type');
   if(!defined $type) {
     $self->whine("Typeless L!?", < $token->attr('start_line'));
@@ -558,9 +555,7 @@ sub do_man_link { return undef }
  #  pages somewhere URL-accessible.
 
 
-sub do_pod_link {
-  # And now things get really messy...
-  my@($self, $link) =  @_;
+sub do_pod_link($self, $link) {
   my $to = $link->attr('to');
   my $section = $link->attr('section');
   return undef unless(  # should never happen
@@ -627,15 +622,13 @@ sub do_pod_link {
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-sub section_escape {
-  my@($self, $section) =  @_;
+sub section_escape($self, $section) {
   return $self->section_url_escape(
     $self->section_name_tidy($section)
   );
 }
 
-sub section_name_tidy {
-  my@($self, $section) =  @_;
+sub section_name_tidy($self, $section) {
   $section =~ s/ /_/g;
   $section =~ s/\x[00]-\x[1F]\x[80]-\x[9F]//g; # drop crazy characters
   $section = $self->unicode_escape_url($section);
@@ -646,8 +639,7 @@ sub section_name_tidy {
 sub section_url_escape  { shift->general_url_escape(< @_) }
 sub pagepath_url_escape { shift->general_url_escape(< @_) }
 
-sub general_url_escape {
-  my@($self, $string) =  @_;
+sub general_url_escape($self, $string) {
  
   $string =~ s/([^\x[00]-\x[FF]])/$(
      join '', map { sprintf('%%%02X',$_) }, @( unpack 'C*', $1)
@@ -681,8 +673,7 @@ sub resolve_pod_page_link {
   ;
 }
 
-sub resolve_pod_page_link_singleton_mode {
-  my@($self, $it) =  @_;
+sub resolve_pod_page_link_singleton_mode($self, $it) {
   return undef unless defined $it and length $it;
   my $url = $self->pagepath_url_escape($it);
   
@@ -693,8 +684,7 @@ sub resolve_pod_page_link_singleton_mode {
   return $self->perldoc_url_prefix . $url . $self->perldoc_url_postfix;
 }
 
-sub resolve_pod_page_link_batch_mode {
-  my@($self, $to) =  @_;
+sub resolve_pod_page_link_batch_mode($self, $to) {
   DEBUG +> 1 and print \*STDOUT, " During batch mode, resolving $to ...\n";
   my @path = grep { length($_) }, split m/::/s, $to, -1;
   unless( nelems @path ) { # sanity
@@ -708,8 +698,7 @@ sub resolve_pod_page_link_batch_mode {
   return $out;
 }
 
-sub batch_mode_rectify_path {
-  my@($self, $pathbits) =  @_;
+sub batch_mode_rectify_path($self, $pathbits) {
   my $level = $self->batch_mode_current_level;
   $level--; # how many levels up to go to get to the root
   if($level +< 1) {
@@ -768,8 +757,7 @@ sub linearize_tokens {  # self, tokens
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-sub unicode_escape_url {
-  my@($self, $string) =  @_;
+sub unicode_escape_url($self, $string) {
   $string =~ s/([^\x[00]-\x[FF]])/$('('.ord($1).')')/g;
     #  Turn char 1234 into "(1234)"
   return $string;

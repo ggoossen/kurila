@@ -516,8 +516,7 @@ sub cmd_name {
 ## Private subroutine to set the parent pointer of all the given
 ## children that are interior-sequences to be $self
 
-sub _set_child2parent_links {
-   my @($self, @< @children) =  @_;
+sub _set_child2parent_links($self, @< @children) {
    ## Make sure any sequences know who their parent is
    for ( @children) {
       next  unless (ref  and  ref ne 'SCALAR');

@@ -33,7 +33,7 @@ struct 'File::stat' => \ @+: map { @: $_ => '$' }, qw{
 	 atime mtime ctime blksize blocks
      };
 
-sub populate (@) {
+sub populate {
     return unless (nelems @_);
     my $stob = new();
     @$stob = @(
@@ -43,10 +43,9 @@ sub populate (@) {
     return $stob;
 } 
 
-sub lstat ($)  { populate(CORE::lstat(shift)) }
+sub lstat ($f)  { populate(CORE::lstat($f)) }
 
-sub stat ($) {
-    my $arg = shift;
+sub stat ($arg) {
     my $st = populate(CORE::stat $arg);
     return $st if $st;
 	my $fh;

@@ -35,7 +35,7 @@ local *FOO;
       sub { 6*7 },
       $blessed_code,            # blessed code reference
       \&Another::Package::foo,  # code in another package
-      sub ($$;$) { 0 },         # prototypes
+      sub ($x, $y) { 0 },         # prototypes
       sub { print \*STDOUT, "test\n" },
       \&Test::ok,               # large scalar
      ),

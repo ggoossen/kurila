@@ -50,8 +50,7 @@ my @pi = qw(pi pi2 pi4 pip2 pip4);
 	        'great_circle' => \ @greatcircle,
 	        'pi'     => \ @pi);
 
-sub tan {
-    my @($z) =  @_;
+sub tan($z) {
     my $cz = cos($z);
     die "Division by zero in tan($z)" if $cz == 0;
     return sin($z) / $cz;
@@ -74,32 +73,32 @@ sub _GR  () { pi2/400 }
 # Truncating remainder.
 #
 
-sub _remt ($$) {
+sub _remt ($v, $p) {
     # Oh yes, POSIX::fmod() would be faster. Possibly. If it is available.
-    @_[0] - @_[1] * int(@_[0] / @_[1]);
+    $v - $p * int($v / $p);
 }
 
 #
 # Angle conversions.
 #
 
-sub rad2rad($)     { _remt(@_[0], pi2) }
+sub rad2rad($v)     { _remt($v, pi2) }
 
-sub deg2deg($)     { _remt(@_[0], 360) }
+sub deg2deg($v)     { _remt($v, 360) }
 
-sub grad2grad($)   { _remt(@_[0], 400) }
+sub grad2grad($v)   { _remt($v, 400) }
 
-sub rad2deg ($;$)  { my $d = _RD * @_[0]; @_[?1] ?? $d !! deg2deg($d) }
+sub rad2deg ($v, ?$wrap)  { my $d = _RD * $v; $wrap ?? $d !! deg2deg($d) }
 
-sub deg2rad ($;$)  { my $d = _DR * @_[0]; @_[?1] ?? $d !! rad2rad($d) }
+sub deg2rad ($v, ?$wrap)  { my $d = _DR * $v; $wrap ?? $d !! rad2rad($d) }
 
-sub grad2deg ($;$) { my $d = _GD * @_[0]; @_[?1] ?? $d !! deg2deg($d) }
+sub grad2deg ($v, ?$wrap) { my $d = _GD * $v; $wrap ?? $d !! deg2deg($d) }
 
-sub deg2grad ($;$) { my $d = _DG * @_[0]; @_[?1] ?? $d !! grad2grad($d) }
+sub deg2grad ($v, ?$wrap) { my $d = _DG * $v; $wrap ?? $d !! grad2grad($d) }
 
-sub rad2grad ($;$) { my $d = _RG * @_[0]; @_[?1] ?? $d !! grad2grad($d) }
+sub rad2grad ($v, ?$wrap) { my $d = _RG * $v; $wrap ?? $d !! grad2grad($d) }
 
-sub grad2rad ($;$) { my $d = _GR * @_[0]; @_[?1] ?? $d !! rad2rad($d) }
+sub grad2rad ($v, ?$wrap) { my $d = _GR * $v; $wrap ?? $d !! rad2rad($d) }
 
 #
 # acos and asin functions which always return a real number
@@ -115,12 +114,11 @@ sub acos_real {
 sub asin_real {
     my $z = @_[0];
     return  &pip2( < @_ ) if @_[0] +>=  1;
-    return -&pip2 if @_[0] +<= -1;
+    return -&pip2( < @_ ) if @_[0] +<= -1;
     return CORE::atan2($z, CORE::sqrt(1-$z*$z));
 }
 
-sub cartesian_to_spherical {
-    my @( $x, $y, $z ) =  @_;
+sub cartesian_to_spherical( $x, $y, $z) {
 
     my $rho = sqrt( $x * $x + $y * $y + $z * $z );
 
@@ -129,8 +127,7 @@ sub cartesian_to_spherical {
              $rho ?? acos_real( $z / $rho ) !! 0 );
 }
 
-sub spherical_to_cartesian {
-    my @( $rho, $theta, $phi ) =  @_;
+sub spherical_to_cartesian( $rho, $theta, $phi) {
 
     return  @( $rho * cos( $theta ) * sin( $phi ),
              $rho * sin( $theta ) * sin( $phi ),
@@ -143,14 +140,12 @@ sub spherical_to_cylindrical {
     return  @( sqrt( $x * $x + $y * $y ), @_[1], $z );
 }
 
-sub cartesian_to_cylindrical {
-    my @( $x, $y, $z ) =  @_;
+sub cartesian_to_cylindrical( $x, $y, $z) {
 
     return  @( sqrt( $x * $x + $y * $y ), atan2( $y, $x ), $z );
 }
 
-sub cylindrical_to_cartesian {
-    my @( $rho, $theta, $z ) =  @_;
+sub cylindrical_to_cartesian( $rho, $theta, $z) {
 
     return  @( $rho * cos( $theta ), $rho * sin( $theta ), $z );
 }
@@ -159,8 +154,7 @@ sub cylindrical_to_spherical {
     return cartesian_to_spherical( < cylindrical_to_cartesian( < @_ ) );
 }
 
-sub great_circle_distance {
-    my @( $theta0, $phi0, $theta1, $phi1, ?$rho ) =  @_;
+sub great_circle_distance( $theta0, $phi0, $theta1, $phi1, ?$rho) {
 
     $rho = 1 unless defined $rho; # Default to the unit sphere.
 
@@ -192,8 +186,7 @@ sub great_circle_direction {
 
 *great_circle_bearing = \&great_circle_direction;
 
-sub great_circle_waypoint {
-    my @( $theta0, $phi0, $theta1, $phi1, $point ) =  @_;
+sub great_circle_waypoint( $theta0, $phi0, $theta1, $phi1, $point) {
 
     $point = 0.5 unless defined $point;
 
@@ -225,8 +218,7 @@ sub great_circle_midpoint {
     great_circle_waypoint( <@_[[0..3]], 0.5);
 }
 
-sub great_circle_destination {
-    my @( $theta0, $phi0, $dir0, $dst ) =  @_;
+sub great_circle_destination( $theta0, $phi0, $dir0, $dst) {
 
     my $lat0 = pip2 - $phi0;
 

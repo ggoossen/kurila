@@ -32,7 +32,7 @@ BEGIN {
 env::set_var('TERMCAP' => 'co=76:do=^J');
 env::set_var('COLUMNS' => 76);
 
-sub catfile(@) { 'File::Spec'->catfile(< @_); }
+sub catfile(@< @args) { 'File::Spec'->catfile(< @args); }
 
 my $INSTDIR = abs_path(dirname $^PROGRAM_NAME);
 $INSTDIR = VMS::Filespec::unixpath($INSTDIR) if $^OS_NAME eq 'VMS';
@@ -98,15 +98,13 @@ sub begin_input {
    @_[0]->{+_INFILE} = VMS::Filespec::unixify(@_[0]->{?_INFILE}) if $^OS_NAME eq 'VMS';
 }
 
-sub podinc2plaintext( $ $ ) {
-    my @($infile, $outfile) =  @_;
+sub podinc2plaintext($infile, $outfile) {
     local $_;
     my $text_parser = $MYPKG->new;
     $text_parser->parse_from_file($infile, $outfile);
 }
 
-sub testpodinc2plaintext( @ ) {
-   my %args = %( < @_ );
+sub testpodinc2plaintext( %< %args ) {
    my $infile  = %args{?'In'}  || die "No input file given!";
    my $outfile = %args{?'Out'} || die "No output file given!";
    my $cmpfile = %args{?'Cmp'} || die "No compare-result file given!";
@@ -132,7 +130,7 @@ sub testpodinc2plaintext( @ ) {
    return  $different;
 }
 
-sub testpodplaintext( @ ) {
+sub testpodplaintext {
    my %opts = %( (ref @_[0] eq 'HASH') ?? < %{shift()} !! () );
    my @testpods = @_;
    my @($testname, $testdir) = @("", "");

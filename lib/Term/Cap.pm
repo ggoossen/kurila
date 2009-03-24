@@ -186,10 +186,8 @@ It calls C<die> on failure.
 
 =cut
 
-sub Tgetent
+sub Tgetent($class, $self)
 {    ## public -- static method
-    my $class = shift;
-    my @($self) =  @_;
 
     $self = \%() unless defined $self;
     bless $self, $class;
@@ -462,10 +460,8 @@ The padded $string is returned.
 
 =cut
 
-sub Tpad
+sub Tpad( $self, $string, $cnt, $FH)
 {    ## public
-    my $self = shift;
-    my @( $string, $cnt, $FH ) =  @_;
     my ( $decr, $ms );
 
     if ( defined $string && $string =~ m/(^[\d.]+)(\*?)(.*)$/ )
@@ -514,10 +510,8 @@ The appropriate string for the capability will be returned.
 
 =cut
 
-sub Tputs
+sub Tputs( $self, $cap, $cnt, $FH)
 {    ## public
-    my $self = shift;
-    my @( $cap, $cnt, $FH ) =  @_;
     my $string;
 
     $cnt = 0 unless $cnt;
@@ -589,10 +583,8 @@ The output string will be returned.
 
 =cut
 
-sub Tgoto
+sub Tgoto( $self, $cap, $code, $tmp, $FH)
 {    ## public
-    my $self = shift;
-    my @( $cap, $code, $tmp, $FH ) =  @_;
     my $string = $self->{?'_' . $cap };
     my $result = '';
     my $after  = '';

@@ -4,7 +4,7 @@
 # (including weird syntax errors)
 
 BEGIN { require "./test.pl"; }
-plan( tests => 77 );
+plan( tests => 76 );
 
 # Bug 20010528.007
 eval q/"\x{"/;
@@ -36,7 +36,7 @@ eval q{ "\c" };
 like( $^EVAL_ERROR->{?description}, qr/^Missing control char name in \\c/, q("\c" string) );
 
 eval q{ qq(foo$) };
-like( $^EVAL_ERROR->{?description}, qr/Final \$ should be \\\$ or \$name/, q($ at end of "" string) );
+like( $^EVAL_ERROR->{?description}, qr/Unknown operator '\$'/, q($ at end of "" string) );
 
 # two tests for memory corruption problems in the said variables
 # (used to dump core or produce strange results)
@@ -76,9 +76,6 @@ $($a)\{ $($a)[ $(join ' ', @b)\{
 {$a}{
 };
 
-eval q{ sub a(;; &) { } a { } };
-is($^EVAL_ERROR, '', "';&' sub prototype confuses the lexer");
-
 # Bug #21575
 # ensure that the second print statement works, by playing a bit
 # with the test output.
@@ -115,10 +112,10 @@ do {
 # [perl #2738] perl segfautls on input
 do {
     eval q{ sub _ <> {} };
-    like($^EVAL_ERROR->{?description}, qr/Illegal declaration of subroutine main::_/, "readline operator as prototype");
+    like($^EVAL_ERROR->{?description}, qr/'>' is reserved for hashes/, "readline operator as prototype");
 
     eval q{ $s = sub <> {} };
-    like($^EVAL_ERROR->{?description}, qr/Illegal declaration of anonymous subroutine/, "readline operator as prototype");
+    like($^EVAL_ERROR->{?description}, qr/'>' is reserved for hashes/, "readline operator as prototype");
 
     eval q{ sub _ __FILE__ {} };
     like($^EVAL_ERROR->{?description}, qr/Illegal declaration of subroutine main::_/, "__FILE__ as prototype");
@@ -189,8 +186,7 @@ like($^EVAL_ERROR->stacktrace, qr/BEGIN/, 'BEGIN 7' );
 # More awkward tests for #line. Keep these at the end, as they will screw
 # with sane line reporting for any other test failures
 
-sub check ($$$) {
-    my @($file, $line, $name) =   @_;
+sub check($file, $line, $name) {
     my @(_, $got_file, $got_line) =@( caller);
     like ($got_file, $file, "file of $name");
     is ($got_line, $line, "line of $name");

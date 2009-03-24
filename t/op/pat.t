@@ -779,7 +779,7 @@ ok( "$(join ' ',@space1)" eq "cr ff lf spc tab vt" );
 ok( "$(join ' ',@space2)" eq "spc tab" );
 
 # bugid 20001021.005 - this caused a SEGV
-ok( undef =~ m/^([^\/]*)(.*)$/ );
+ok($: undef =~ m/^([^\/]*)(.*)$/ );
 
 # unicode.
 do {
@@ -1712,19 +1712,19 @@ do {
     use charnames ':full';
 
     local $TODO = "sharp S case folding";
-    ok("\N{LATIN SMALL LETTER SHARP S}" =~ m/\N{LATIN SMALL LETTER SHARP S}/);
-    ok("\N{LATIN SMALL LETTER SHARP S}" =~ m/\N{LATIN SMALL LETTER SHARP S}/i);
+    ok($: "\N{LATIN SMALL LETTER SHARP S}" =~ m/\N{LATIN SMALL LETTER SHARP S}/);
+    ok($: "\N{LATIN SMALL LETTER SHARP S}" =~ m/\N{LATIN SMALL LETTER SHARP S}/i);
 
-    ok("\N{LATIN SMALL LETTER SHARP S}" =~ m/[\N{LATIN SMALL LETTER SHARP S}]/);
-    ok("\N{LATIN SMALL LETTER SHARP S}" =~ m/[\N{LATIN SMALL LETTER SHARP S}]/i);
+    ok($: "\N{LATIN SMALL LETTER SHARP S}" =~ m/[\N{LATIN SMALL LETTER SHARP S}]/);
+    ok($: "\N{LATIN SMALL LETTER SHARP S}" =~ m/[\N{LATIN SMALL LETTER SHARP S}]/i);
 
-    ok("ss" =~ m/\N{LATIN SMALL LETTER SHARP S}/i);
-    ok("SS" =~ m/\N{LATIN SMALL LETTER SHARP S}/i);
-    ok("ss" =~ m/[\N{LATIN SMALL LETTER SHARP S}]/i);
-    ok("SS" =~ m/[\N{LATIN SMALL LETTER SHARP S}]/i);
+    ok($: "ss" =~ m/\N{LATIN SMALL LETTER SHARP S}/i);
+    ok($: "SS" =~ m/\N{LATIN SMALL LETTER SHARP S}/i);
+    ok($: "ss" =~ m/[\N{LATIN SMALL LETTER SHARP S}]/i);
+    ok($: "SS" =~ m/[\N{LATIN SMALL LETTER SHARP S}]/i);
 
-    ok("\N{LATIN SMALL LETTER SHARP S}" =~ m/ss/i);
-    ok("\N{LATIN SMALL LETTER SHARP S}" =~ m/SS/i);
+    ok($: "\N{LATIN SMALL LETTER SHARP S}" =~ m/ss/i);
+    ok($: "\N{LATIN SMALL LETTER SHARP S}" =~ m/SS/i);
 };
 
 do {
@@ -2186,9 +2186,9 @@ do {
 };
 
 # bug #22354
-sub func ($) {
-    ok( "a\nb" !~ m/^b/, @_[0] );
-    ok( "a\nb" =~ m/^b/m, "@_[0] - with /m" );
+sub func($name) {
+    ok( "a\nb" !~ m/^b/, $name );
+    ok( "a\nb" =~ m/^b/m, "$name - with /m" );
 }
 func "standalone";
 $_ = "x"; s/x/$(func "in subst")/;
@@ -3220,7 +3220,7 @@ do {
 # Test counter is at bottom of file. Put new tests above here.
 #-------------------------------------------------------------------
 
-ok(("a" x (2**15 - 10)) =~ m/^()(a|bb)*$/, "Recursive stack cracker: #24274")
+ok(($: ("a" x (2**15 - 10)) =~ m/^()(a|bb)*$/), "Recursive stack cracker: #24274")
     or print \*STDOUT, "# Unexpected outcome: should pass or crash perl\n";
 
 ok((q(a)x 100) =~ m/^(??{'(.)'x 100})/, 

@@ -37,8 +37,7 @@ On Mac OS, there's nothing to be done. Returns what it's given.
 
 =cut
 
-sub canonpath {
-    my @($self,?$path) =  @_;
+sub canonpath($self,?$path) {
     return $path;
 }
 
@@ -406,8 +405,7 @@ E.g.
 
 =cut
 
-sub file_name_is_absolute {
-    my @($self,$file) =  @_;
+sub file_name_is_absolute($self,$file) {
     if ($file =~ m/:/) {
 	return ! ($file =~ m/^:/s);
     } elsif ( $file eq '' ) {
@@ -456,8 +454,7 @@ The results can be passed to C<catpath()> to get back a path equivalent to
 
 =cut
 
-sub splitpath {
-    my @($self,$path, ?$nofile) =  @_;
+sub splitpath($self,$path, ?$nofile) {
     my ($volume,$directory,$file);
 
     if ( $nofile ) {
@@ -524,8 +521,7 @@ yields:
 
 =cut
 
-sub splitdir {
-	my @($self, ?$path) =  @_;
+sub splitdir($self, ?$path) {
 	my @result = @( () );
 	my ($head, $sep, $tail, $volume, $directories);
 
@@ -576,8 +572,7 @@ resulting path will have a trailing ':'.
 
 =cut
 
-sub catpath {
-    my @($self,$volume,$directory,$file) =  @_;
+sub catpath($self,$volume,$directory,$file) {
 
     if ( (! $volume) && (! $directory) ) {
 	$file =~ s/^:// if $file;
@@ -653,8 +648,7 @@ sub _resolve_updirs {
 }
 
 
-sub abs2rel {
-    my@($self,$path,$base) =  @_;
+sub abs2rel($self,$path,$base) {
 
     # Clean up $path
     if ( ! $self->file_name_is_absolute( $path ) ) {
@@ -725,8 +719,7 @@ Based on code written by Shigio Yamaguchi.
 
 =cut
 
-sub rel2abs {
-    my @($self,$path,?$base) =  @_;
+sub rel2abs($self,$path,?$base) {
 
     if ( ! $self->file_name_is_absolute($path) ) {
         # Figure out the effective $base and clean it up.

@@ -28,8 +28,7 @@ local %Subs = %( () );
 B::walksymtable(\%Testing::Symtable::, 'find_syms', sub { @_[0] =~ m/Foo/ },
                 'Testing::Symtable::');
 
-sub B::GV::find_syms {
-    my@($symbol) =  @_;
+sub B::GV::find_syms($symbol) {
 
     %main::Subs{+$symbol->STASH->NAME . '::' . $symbol->NAME}++;
 }

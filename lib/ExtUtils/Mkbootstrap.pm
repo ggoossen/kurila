@@ -13,8 +13,7 @@ our $Verbose = 0;
 our @dl_resolve_using;
 
 
-sub Mkbootstrap {
-    my@($baseext, @< @bsloadlibs)= @_;
+sub Mkbootstrap($baseext, @< @bsloadlibs) {
     @bsloadlibs = grep( {$_ }, @bsloadlibs); # strip empty libs
 
     print \*STDOUT, "	bsloadlibs=$(join ' ',@bsloadlibs)\n" if $Verbose;

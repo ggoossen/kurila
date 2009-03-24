@@ -38,8 +38,7 @@ my $set_out = '';
 $set_out = "binmode \\*STDOUT, ':crlf'"
     if defined  $main::use_crlf && $main::use_crlf == 1;
 
-sub testread ($$$$$$$) {
-  my @($fh, $str, $read_c, $how_r, $write_c, $how_w, $why) =  @_;
+sub testread($fh, $str, $read_c, $how_r, $write_c, $how_w, $why) {
   my $buf = '';
   if ($how_r eq 'readline_all') {
     $buf .= $_ while ~< $fh;
@@ -62,8 +61,7 @@ sub testread ($$$$$$$) {
   is($buf, $str, "content with wrc=$write_c, rdc=$read_c, $how_w, $how_r, $why");
 }
 
-sub testpipe ($$$$$$) {
-  my @($str, $write_c, $read_c, $how_w, $how_r, $why) =  @_;
+sub testpipe($str, $write_c, $read_c, $how_w, $how_r, $why) {
   (my $quoted = $str) =~ s/\n/\\n/g;;
   my $fh;
   if ($how_w eq 'print') {	# AUTOFLUSH???
@@ -84,8 +82,7 @@ sub testpipe ($$$$$$) {
   testread($fh, $str, $read_c, $how_r, $write_c, $how_w, "pipe$why");
 }
 
-sub testfile ($$$$$$) {
-  my @($str, $write_c, $read_c, $how_w, $how_r, $why) =  @_;
+sub testfile($str, $write_c, $read_c, $how_w, $how_r, $why) {
   my @data = grep { length }, split m/(.{1,$write_c})/s, $str;
 
   open my $fh, '>', 'io_io.tmp' or die;

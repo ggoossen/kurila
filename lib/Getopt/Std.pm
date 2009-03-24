@@ -88,8 +88,7 @@ our ($OUTPUT_HELP_VERSION, $STANDARD_HELP_VERSION);
 # Usage:
 #	getopt('oDI');  # -o, -D & -I take arg.  Sets opt_* as a side effect.
 
-sub getopt (;$$) {
-    my @($argumentative, ?$hash) =  @_;
+sub getopt($argumentative, ?$hash) {
     $argumentative = '' if !defined $argumentative;
     my ($first,$rest);
     local $_;
@@ -154,10 +153,9 @@ sub try_exit () {
 EOM
 }
 
-sub version_mess ($;$) {
-    my $args = shift;
+sub version_mess ($args, ?$mess) {
     my $h = output_h;
-    if ((nelems @_) and defined &main::VERSION_MESSAGE) {
+    if ($mess and defined &main::VERSION_MESSAGE) {
 	main::VERSION_MESSAGE($h, __PACKAGE__, $VERSION, $args);
     } else {
 	my $v = $main::VERSION;
@@ -172,14 +170,14 @@ EOH
     }
 }
 
-sub help_mess ($;$) {
+sub help_mess {
     my $args = shift;
     my $h = output_h;
     if ((nelems @_) and defined &main::HELP_MESSAGE) {
 	main::HELP_MESSAGE($h, __PACKAGE__, $VERSION, $args);
     } else {
-	my @(@witharg) =@( @($args =~ m/(\S)\s*:/g));
-	my @(@rest) =@( @($args =~ m/([^\s:])(?!\s*:)/g));
+	my @witharg = @($args =~ m/(\S)\s*:/g);
+	my @rest = @($args =~ m/([^\s:])(?!\s*:)/g);
 	my @($help, $arg) = @('', '');
 	if ((nelems @witharg)) {
 	    $help .= "\n\tWith arguments: -" . join " -", @witharg;
@@ -218,8 +216,7 @@ EOH
 #   getopts('a:bc');	# -a takes arg. -b & -c not. Sets opt_* as a
 #			#  side effect.
 
-sub getopts ($;$) {
-    my @($argumentative, ?$hash) =  @_;
+sub getopts($argumentative, ?$hash) {
     my (@args,$first,$rest,$exit);
     my $errs = 0;
     local $_;

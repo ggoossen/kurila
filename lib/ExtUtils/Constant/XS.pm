@@ -76,8 +76,7 @@ sub header {
   return join '', @lines;
 }
 
-sub valid_type {
-  my @($self, $type) =  @_;
+sub valid_type($self, $type) {
   return exists %XS_TypeSet{$type};
 }
 
@@ -99,8 +98,7 @@ sub assignment_clause_for_type {
   return ();
 }
 
-sub return_statement_for_type {
-  my @($self, $type) =  @_;
+sub return_statement_for_type($self, $type) {
   # In the future may pass in an options hash
   $type = $type->{?type} if ref $type;
   "return PERL_constant_IS$type;";
@@ -120,15 +118,13 @@ sub default_type {
   'IV';
 }
 
-sub macro_from_name {
-  my @($self, $item) =  @_;
+sub macro_from_name($self, $item) {
   my $macro = $item->{?name};
   $macro = $item->{?value} unless defined $macro;
   $macro;
 }
 
-sub macro_from_item {
-  my @($self, $item) =  @_;
+sub macro_from_item($self, $item) {
   my $macro = $item->{?macro};
   $macro = $self->macro_from_name($item) unless defined $macro;
   $macro;
@@ -139,8 +135,7 @@ sub memEQ {
   "memEQ";
 }
 
-sub params {
-  my @($self, $what) =  @_;
+sub params($self, $what) {
   foreach (sort keys %$what) {
     warn "ExtUtils::Constant doesn't know how to handle values of type $_" unless defined %XS_Constant{?$_};
   }
@@ -166,8 +161,7 @@ sub namelen_param_definition {
   'STRLEN ' . @_[0] -> namelen_param;
 }
 
-sub C_constant_other_params_defintion {
-  my @($self, $params) =  @_;
+sub C_constant_other_params_defintion($self, $params) {
   my $body = '';
   $body .= ", IV *iv_return" if $params->{?IV};
   $body .= ", NV *nv_return" if $params->{?NV};
@@ -176,8 +170,7 @@ sub C_constant_other_params_defintion {
   $body;
 }
 
-sub C_constant_other_params {
-  my @($self, $params) =  @_;
+sub C_constant_other_params($self, $params) {
   my $body = '';
   $body .= ", iv_return" if $params->{?IV};
   $body .= ", nv_return" if $params->{?NV};
@@ -186,8 +179,7 @@ sub C_constant_other_params {
   $body;
 }
 
-sub dogfood {
-  my @($self, $args, @< @items) =  @_;
+sub dogfood($self, $args, @< @items) {
   my @($package, $subname, $default_type, $what, $indent, $breakout) = 
     %{$args}{[qw(package subname default_type what indent breakout)]};
   my $result = <<"EOT";

@@ -15,8 +15,7 @@ sub case_tolerant {
     return 1;
 }
 
-sub file_name_is_absolute {
-    my @($self,$file) =  @_;
+sub file_name_is_absolute($self,$file) {
     return scalar($file =~ m{^([a-z]:)?[\\/]}is);
 }
 
@@ -51,8 +50,7 @@ sub catdir {
     return $self->canonpath(join('', @args));
 }
 
-sub canonpath {
-    my @($self,?$path) =  @_;
+sub canonpath($self,?$path) {
     return unless defined $path;
 
     $path =~ s/^([a-z]:)/$(lc($1))/s;
@@ -68,8 +66,7 @@ sub canonpath {
 }
 
 
-sub splitpath {
-    my @($self,$path, ?$nofile) =  @_;
+sub splitpath($self,$path, ?$nofile) {
     my @($volume,$directory,$file) = @('','','');
     if ( $nofile ) {
         $path =~ 
@@ -97,14 +94,12 @@ sub splitpath {
 }
 
 
-sub splitdir {
-    my @($self,$directories) =  @_ ;
+sub splitdir($self,$directories) { 
     split m|[\\/]|, $directories, -1;
 }
 
 
-sub catpath {
-    my @($self,$volume,$directory,$file) =  @_;
+sub catpath($self,$volume,$directory,$file) {
 
     # If it's UNC, make sure the glue separator is there, reusing
     # whatever separator is first in the $volume
@@ -132,8 +127,7 @@ sub catpath {
 }
 
 
-sub abs2rel {
-    my@($self,$path,$base) =  @_;
+sub abs2rel($self,$path,$base) {
 
     # Clean up $path
     if ( ! $self->file_name_is_absolute( $path ) ) {
@@ -195,8 +189,7 @@ sub abs2rel {
 }
 
 
-sub rel2abs {
-    my @($self,$path,?$base ) =  @_;
+sub rel2abs($self,$path,?$base) {
 
     if ( ! $self->file_name_is_absolute( $path ) ) {
 

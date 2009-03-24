@@ -41,8 +41,7 @@ sub os_flavor {
 
 =cut
 
-sub replace_manpage_separator {
-    my@($self, $man) =  @_;
+sub replace_manpage_separator($self, $man) {
 
     $man =~ s,/+,.,g;
     return $man;

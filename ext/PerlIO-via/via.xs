@@ -43,12 +43,12 @@ typedef struct
 CV *
 PerlIOVia_fetchmethod(pTHX_ PerlIOVia * s, const char *method, CV ** save)
 {
-    GV *gv = gv_fetchmeth(s->stash, method, strlen(method), 0);
+    CV *cv = gv_fetchmeth(s->stash, method, strlen(method), 0);
 #if 0
     Perl_warn(aTHX_ "Lookup %s::%s => %p", HvNAME_get(s->stash), method, gv);
 #endif
-    if (gv) {
-	return *save = GvCV(gv);
+    if (cv) {
+	return *save = cv;
     }
     else {
 	return *save = (CV *) - 1;
@@ -200,7 +200,7 @@ push_failed:
 PerlIO *
 PerlIOVia_open(pTHX_ PerlIO_funcs * self, PerlIO_list_t * layers,
 	       IV n, const char *mode, int fd, int imode, int perm,
-	       PerlIO * f, int narg, SV ** args)
+	       PerlIO * f, int narg, SV *const* args)
 {
     if (!f) {
 	f = PerlIO_push(aTHX_ PerlIO_allocate(aTHX), self, mode,

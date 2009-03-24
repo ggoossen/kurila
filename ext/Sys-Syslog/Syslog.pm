@@ -122,8 +122,7 @@ $sock_timeout = 0.25 if $^OS_NAME =~ m/darwin/;
 my $err_sub = %options{?nofatal} ?? \&warnings::warnif !! sub { die shift; };
 
 
-sub openlog {
-    @(?$ident, ?my $logopt, ?$facility) =  @_;
+sub openlog(?$ident, ?my $logopt, ?$facility) {
 
     # default values
     $ident    ||= basename($^PROGRAM_NAME) || getlogin() || getpwuid($^UID) || 'syslog';
@@ -372,8 +371,7 @@ sub syslog {
     return 0;
 }
 
-sub _syslog_send_console {
-    my @($buf) =  @_;
+sub _syslog_send_console($buf) {
     chop($buf); # delete the NUL from the end
     # The console print is a method which could block
     # so we do it in a child process and always return success
@@ -401,8 +399,7 @@ sub _syslog_send_console {
     }
 }
 
-sub _syslog_send_stream {
-    my @($buf) =  @_;
+sub _syslog_send_stream($buf) {
     # XXX: this only works if the OS stream implementation makes a write 
     # look like a putmsg() with simple header. For instance it works on 
     # Solaris 8 but not Solaris 7.
@@ -410,19 +407,16 @@ sub _syslog_send_stream {
     return syswrite($syslogfh, $buf, length($buf));
 }
 
-sub _syslog_send_pipe {
-    my @($buf) =  @_;
+sub _syslog_send_pipe($buf) {
     return print $syslogfh, $buf;
 }
 
-sub _syslog_send_socket {
-    my @($buf, ...) =  @_;
+sub _syslog_send_socket($buf, ...) {
     return syswrite($syslogfh, $buf, length($buf));
     #return send($syslogfh, $buf, 0);
 }
 
-sub _syslog_send_native {
-    my @($buf, $numpri, ...) =  @_;
+sub _syslog_send_native($buf, $numpri, ...) {
     syslog_xs($numpri, $buf);
     return 1;
 }
@@ -439,7 +433,7 @@ sub xlate {
     $name = "LOG_$name" unless $name =~ m/^LOG_/;
     $name = "Sys::Syslog::$name";
     # Can't have just try { &$name } || -1 because some LOG_XXX may be zero.
-    my $value = try { &{*{Symbol::fetch_glob($name)}} };
+    my $value = try { &{*{Symbol::fetch_glob($name)}} ( < @_ )};
     defined $value ?? $value !! -1;
 }
 
@@ -479,8 +473,7 @@ sub connect_log {
     }
 }
 
-sub connect_tcp {
-    my @($errs) =  @_;
+sub connect_tcp($errs) {
 
     my $tcp = getprotobyname('tcp');
     if (!defined $tcp) {
@@ -527,8 +520,7 @@ sub connect_tcp {
     return 1;
 }
 
-sub connect_udp {
-    my @($errs) =  @_;
+sub connect_udp($errs) {
 
     my $udp = getprotobyname('udp');
     if (!defined $udp) {
@@ -576,8 +568,7 @@ sub connect_udp {
     return 1;
 }
 
-sub connect_stream {
-    my @($errs) =  @_;
+sub connect_stream($errs) {
     # might want syslog_path to be variable based on syslog.h (if only
     # it were in there!)
     $syslog_path = '/dev/conslog' unless defined $syslog_path; 
@@ -593,8 +584,7 @@ sub connect_stream {
     return 1;
 }
 
-sub connect_pipe {
-    my @($errs) =  @_;
+sub connect_pipe($errs) {
 
     $syslog_path ||= _PATH_LOG() || "/dev/log";
 
@@ -613,8 +603,7 @@ sub connect_pipe {
     return 1;
 }
 
-sub connect_unix {
-    my @($errs) =  @_;
+sub connect_unix($errs) {
 
     $syslog_path ||= _PATH_LOG() if length _PATH_LOG();
 
@@ -654,8 +643,7 @@ sub connect_unix {
     return 1;
 }
 
-sub connect_native {
-    my @($errs) =  @_;
+sub connect_native($errs) {
     my $logopt = 0;
 
     # reconstruct the numeric equivalent of the options
@@ -674,8 +662,7 @@ sub connect_native {
     return 1;
 }
 
-sub connect_eventlog {
-    my @($errs) =  @_;
+sub connect_eventlog($errs) {
 
     $syslog_xobj = Sys::Syslog::Win32::_install();
     $syslog_send = \&Sys::Syslog::Win32::_syslog_send;
@@ -683,8 +670,7 @@ sub connect_eventlog {
     return 1;
 }
 
-sub connect_console {
-    my @($errs) =  @_;
+sub connect_console($errs) {
     if (!-w '/dev/console') {
 	push @$errs, "console is not writable";
 	return 0;

@@ -53,8 +53,7 @@ do {
     }
 };
 
-sub nok ($$$$$$$) {
-  my @($left, $threeway, $right, $result, $i, $j, $boolean) =  @_;
+sub nok($left, $threeway, $right, $result, $i, $j, $boolean) {
   $result = defined $result ?? "'$result'" !! 'undef';
   fail("($left <=> $right) gives: $result \$i=$i \$j=$j, $boolean disagrees");
 }

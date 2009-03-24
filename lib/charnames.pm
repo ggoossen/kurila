@@ -44,16 +44,15 @@ my %alias3 = %( (
 	    ) );
 my $txt;
 
-sub alias (@)
+sub alias
 {
   (nelems @_) or return %alias3;
   my $alias = ref @_[0] ?? @_[0] !! \%( < @_ );
    %alias3{[keys %$alias]} =  values %$alias;
 } # alias
 
-sub alias_file ($)
+sub alias_file($arg)
 {
-  my @($arg) =  @_;
   my $file;
   if (-f $arg && File::Spec->file_name_is_absolute ($arg)) {
     $file = $arg;

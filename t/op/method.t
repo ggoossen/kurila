@@ -62,7 +62,7 @@ do {
     is(A->d, "B::d1");	# Update hash table;
     undef &B::d;
     dies_like( sub { A->d },
-               m/Undefined subroutine/ );
+               qr/Undefined subroutine/ );
 };
 
 is(A->d, "D::d");		# Back to previous state
