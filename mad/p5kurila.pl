@@ -1400,6 +1400,18 @@ sub make_prototype {
     }
 }
 
+sub mg_stdin {
+    my $xml = shift;
+    for my $op (find_ops($xml, "rv2gv")) {
+        if ((get_madprop($op, "star") || '') eq "*STDIN") {
+            set_madprop($op, "star", '$^STDIN');
+            if ($op->parent->tag eq "op_srefgen") {
+                set_madprop($op->parent, "operator", '');
+            }
+        }
+    }
+}
+
 my $from; # floating point number with starting version of kurila.
 GetOptions("from=s" => \$from);
 $from =~ m/(\w+)[-]([\d.]+)$/ or die "invalid from: '$from'";
@@ -1515,7 +1527,8 @@ if ($from->{branch} ne "kurila" or $from->{v} < qv '1.17') {
 
 #must_haveargs($twig);
 
-make_prototype($twig);
+#make_prototype($twig);
+mg_stdin($twig);
 
 #add_call_parens($twig);
 

@@ -37,8 +37,9 @@ sub p5convert {
     is($output, $expected) or $TODO or die "failed test";
 }
 
-t_prototype();
+t_stdin();
 die "END";
+t_prototype();
 t_must_haveargs();
 t_block_arg();
 t_print();
@@ -1688,5 +1689,15 @@ sub bar($z) {
 
     return 3;
 }
+END
+}
+
+sub t_stdin {
+    p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
+my $x = ~< *STDIN;
+my $y = ~< \*STDIN;
+----
+my $x = ~< $^STDIN;
+my $y = ~< $^STDIN;
 END
 }
