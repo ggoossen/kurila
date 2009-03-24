@@ -1514,9 +1514,12 @@ Perl_assign(pTHX_ OP *o, bool partial, I32 *min_modcount, I32 *max_modcount)
 	    OP* enter = newOP(OP_ENTER_ANONHASH_ASSIGN,
 		partial ? (OPf_ASSIGN_PART | OPf_ASSIGN_PART) : OPf_ASSIGN,
 		o->op_location);
-	    OP* subj_kid = enter;
-	    OP* prev_kid = key_kid;
-	    for (kid = prev_kid->op_sibling; kid; kid = kid->op_sibling) {
+	    OP* value_kid = enter;
+	    OP* prev_kid = value_kid;
+	    enter->op_sibling = key_kid->op_sibling;
+	    key_kid->op_sibling = enter;
+	    o->op_next = key_kid;
+	    for (kid = prev_kid->op_sibling; kid; kid = prev_kid->op_sibling) {
 		OP* op_optional;
 		OP* real_kid = kid;
 #ifdef PERL_MAD
@@ -1530,30 +1533,32 @@ Perl_assign(pTHX_ OP *o, bool partial, I32 *min_modcount, I32 *max_modcount)
 			Perl_croak_at(aTHX_ real_kid->op_location, "hash key must be constant not a %s in a %s assignment", OP_DESC(real_kid), OP_DESC(o));
 		    if (real_kid->op_sibling)
 			Perl_croak_at(aTHX_ real_kid->op_location, "%s must be the last item in %s assignment", OP_DESC(real_kid), OP_DESC(o));
-		    prev_kid->op_sibling = NULL;
-		    subj_kid->op_sibling = kid;
 		    assign(kid, TRUE, &sub_min_modcount, &sub_max_modcount);
+		    value_kid->op_next = LINKLIST(kid);
+		    value_kid = kid;
 		    break;
 		}
 		assign(kid->op_sibling, TRUE, &sub_min_modcount, &sub_max_modcount);
 
-		/* remove kid->op_sibling from the list and add it the the list of subj_kid */
-		subj_kid->op_sibling = kid->op_sibling;
-		kid->op_sibling = kid->op_sibling->op_sibling;
-		subj_kid = subj_kid->op_sibling;
-		subj_kid->op_sibling = NULL;
-
 		/* Add optional op */
 		op_optional = newSVOP(OP_CONST, 0,
 		    (kid->op_flags & OPf_OPTIONAL) ? &PL_sv_yes : &PL_sv_no,
-		    o->op_location
-		    );
+		    o->op_location);
+		assert(prev_kid->op_sibling == kid);
 		prev_kid->op_sibling = op_optional;
 		op_optional->op_sibling = kid;
-		
-		prev_kid = kid;
+		op_optional->op_next = LINKLIST(kid);
+
+		/* remove kid->op_sibling from the list and add it the the list of subj_kid */
+		value_kid->op_next = LINKLIST(kid->op_sibling);
+		value_kid = kid->op_sibling;
+		key_kid->op_next = op_optional;
+		key_kid = kid;
+
+		prev_kid = kid->op_sibling;
 	    }
-	    prev_kid->op_sibling = enter;
+	    key_kid->op_next = enter;
+	    value_kid->op_next = o;
 	}
 	break;
 

@@ -1,7 +1,7 @@
 #!./perl
 
 BEGIN { require "./test.pl"; }
-plan( tests => 14 );
+plan( tests => 15 );
 
 my $x = \ %( aap => 'noot', Mies => 'Wim' );
 is $x->{?aap}, 'noot', "anon hash ref construction";
@@ -26,6 +26,9 @@ do {
     %( aap => $aap, Mies => $mies ) = $h;
     is( $aap, "noot" );
     is( $mies, "Wim" );
+
+    %( aap => @($aap) ) = %: aap => @: "noot";
+    is( $aap, "noot" );
 
     # with an expansion
     my $rest;
