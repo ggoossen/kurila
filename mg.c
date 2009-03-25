@@ -749,8 +749,8 @@ Perl_magic_get(pTHX_ const char* name, SV* sv)
 
 	    if (strEQ(remaining, "OUTPUT_AUTOFLUSH")) {
 		/* $^OUTPUT_AUTOFLUSH */
-		if (GvIOp(PL_defoutgv))
-		    sv_setiv(sv, (IV)(IoFLAGS(GvIOp(PL_defoutgv)) & IOf_FLUSH) != 0 );
+		if (SvOK(PL_stdoutio))
+		    sv_setiv(sv, (IV)(IoFLAGS(PL_stdoutio) & IOf_FLUSH) != 0 );
 		break;
 	    }
 
@@ -800,6 +800,14 @@ Perl_magic_get(pTHX_ const char* name, SV* sv)
 	    }
 	    if (strEQ(remaining, "STDIN")) {
 		sv_setrv(sv, SvREFCNT_inc(ioTsv(PL_stdinio)));
+		break;
+	    }
+	    if (strEQ(remaining, "STDOUT")) {
+		sv_setrv(sv, SvREFCNT_inc(ioTsv(PL_stdoutio)));
+		break;
+	    }
+	    if (strEQ(remaining, "STDERR")) {
+		sv_setrv(sv, SvREFCNT_inc(ioTsv(PL_stderrio)));
 		break;
 	    }
 	    break;
@@ -1285,6 +1293,10 @@ Perl_is_magicsv(pTHX_ const char* name)
 		return 1;
 	    if (strEQ(name2, "STDIN"))
 		return 1;
+	    if (strEQ(name2, "STDOUT"))
+		return 1;
+	    if (strEQ(name2, "STDERR"))
+		return 1;
 	    break;
 	case 'U':	/* $^UNICODE, $^UTF8LOCALE, $^UTF8CACHE */
 	    if (strEQ(name2, "UID"))
@@ -1653,7 +1665,7 @@ Perl_magic_set(pTHX_ const char* name, SV *sv)
 
 	    if (strEQ(remaining, "OUTPUT_AUTOFLUSH")) {
 		/* $^OUTPUT_AUTOFLUSH */
-		IO * const io = GvIOp(PL_defoutgv);
+		IO * const io = PL_stdoutio;
 		if(!io)
 		    break;
 		if ((SvIV(sv)) == 0)
@@ -1798,6 +1810,14 @@ Perl_magic_set(pTHX_ const char* name, SV *sv)
 	    }
 	    if (strEQ(remaining, "STDIN")) {
 		SvRV_set(sv, ioTsv(PL_stdinio));
+		break;
+	    }
+	    if (strEQ(remaining, "STDOUT")) {
+		SvRV_set(sv, ioTsv(PL_stdoutio));
+		break;
+	    }
+	    if (strEQ(remaining, "STDERR")) {
+		SvRV_set(sv, ioTsv(PL_stderrio));
 		break;
 	    }
 	    break;

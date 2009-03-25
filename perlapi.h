@@ -562,10 +562,12 @@ END_EXTERN_C
 #define PL_statusvalue_posix	(*Perl_Istatusvalue_posix_ptr(aTHX))
 #undef  PL_statusvalue_vms
 #define PL_statusvalue_vms	(*Perl_Istatusvalue_vms_ptr(aTHX))
-#undef  PL_stderrgv
-#define PL_stderrgv		(*Perl_Istderrgv_ptr(aTHX))
+#undef  PL_stderrio
+#define PL_stderrio		(*Perl_Istderrio_ptr(aTHX))
 #undef  PL_stdinio
 #define PL_stdinio		(*Perl_Istdinio_ptr(aTHX))
+#undef  PL_stdoutio
+#define PL_stdoutio		(*Perl_Istdoutio_ptr(aTHX))
 #undef  PL_strtab
 #define PL_strtab		(*Perl_Istrtab_ptr(aTHX))
 #undef  PL_sub_generation

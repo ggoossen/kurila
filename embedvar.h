@@ -263,8 +263,9 @@
 #define PL_statusvalue		(vTHX->Istatusvalue)
 #define PL_statusvalue_posix	(vTHX->Istatusvalue_posix)
 #define PL_statusvalue_vms	(vTHX->Istatusvalue_vms)
-#define PL_stderrgv		(vTHX->Istderrgv)
+#define PL_stderrio		(vTHX->Istderrio)
 #define PL_stdinio		(vTHX->Istdinio)
+#define PL_stdoutio		(vTHX->Istdoutio)
 #define PL_strtab		(vTHX->Istrtab)
 #define PL_sub_generation	(vTHX->Isub_generation)
 #define PL_subline		(vTHX->Isubline)
@@ -543,8 +544,9 @@
 #define PL_Istatusvalue		PL_statusvalue
 #define PL_Istatusvalue_posix	PL_statusvalue_posix
 #define PL_Istatusvalue_vms	PL_statusvalue_vms
-#define PL_Istderrgv		PL_stderrgv
+#define PL_Istderrio		PL_stderrio
 #define PL_Istdinio		PL_stdinio
+#define PL_Istdoutio		PL_stdoutio
 #define PL_Istrtab		PL_strtab
 #define PL_Isub_generation	PL_sub_generation
 #define PL_Isubline		PL_subline

@@ -9075,12 +9075,14 @@ Perl_refcnt_check(pTHX)
     SvTMPREFCNT_inc(PL_errsv);
     HvTMPREFCNT_inc(PL_isarev);
     SvTMPREFCNT_inc(PL_statname);
-    GvTMPREFCNT_inc(PL_defoutgv);
     HvTMPREFCNT_inc(PL_envhv);
     HvTMPREFCNT_inc(PL_op_sequence);
     AvTMPREFCNT_inc(PL_destroyav);
     AvTMPREFCNT_inc(PL_preambleav);
     AvTMPREFCNT_inc(PL_endav);
+    SvTMPREFCNT_inc(PL_stdinio);
+    SvTMPREFCNT_inc(PL_stdoutio);
+    SvTMPREFCNT_inc(PL_stderrio);
 
     rootop_ll_tmprefcnt(aTHX);
 

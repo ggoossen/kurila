@@ -3453,11 +3453,10 @@ Gid_t getegid (void);
 #endif
 
 #ifndef Perl_error_log
-#  define Perl_error_log	(PL_stderrgv			\
-				 && isGV(PL_stderrgv)		\
-				 && GvIOp(PL_stderrgv)          \
-				 && IoOFP(GvIOp(PL_stderrgv))	\
-				 ? IoOFP(GvIOp(PL_stderrgv))	\
+#  define Perl_error_log	(PL_stderrio			\
+				 && SvIOOK(PL_stderrio)          \
+				 && IoOFP(PL_stderrio)	\
+				 ? IoOFP(PL_stderrio)	\
 				 : PerlIO_stderr())
 #endif
 

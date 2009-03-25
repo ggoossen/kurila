@@ -2729,7 +2729,6 @@ PERL_CALLCONV I32	Perl_setenv_getix(pTHX_ const char* nam)
 	assert(nam)
 
 #endif
-PERL_CALLCONV void	Perl_setdefout(pTHX_ GV* gv);
 PERL_CALLCONV HEK*	Perl_share_hek(pTHX_ const char* str, I32 len, U32 hash)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_SHARE_HEK	\

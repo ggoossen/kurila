@@ -578,9 +578,6 @@ perl_destruct(pTHXx)
         return STATUS_EXIT;
     }
 
-    /* reset so print() ends up where we expect */
-    setdefout(NULL);
-
     if (PL_destroyav)
 	call_destructors();
 
@@ -676,7 +673,10 @@ perl_destruct(pTHXx)
     PL_argvoutgv = NULL;
     IoREFCNT_dec(PL_stdinio);
     PL_stdinio = NULL;
-    PL_stderrgv = NULL;
+    IoREFCNT_dec(PL_stdoutio);
+    PL_stdoutio = NULL;
+    IoREFCNT_dec(PL_stderrio);
+    PL_stderrio = NULL;
     PL_DBgv = NULL;
     PL_DBline = NULL;
     PL_DBsub = NULL;
@@ -1709,12 +1709,8 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 		(io = PL_stdinio) &&
 		(fp = IoIFP(io)))
 		PerlIO_binmode(aTHX_ fp, IoTYPE(io), 0, ":utf8");
-	    if ((PL_unicode & PERL_UNICODE_STDOUT_FLAG) &&
-		PL_defoutgv && (io = GvIO(PL_defoutgv)) &&
-		(fp = IoOFP(io)))
-		PerlIO_binmode(aTHX_ fp, IoTYPE(io), 0, ":utf8");
 	    if ((PL_unicode & PERL_UNICODE_STDERR_FLAG) &&
-		PL_stderrgv && (io = GvIO(PL_stderrgv)) &&
+		(io = PL_stderrio) &&
 		(fp = IoOFP(io)))
 		PerlIO_binmode(aTHX_ fp, IoTYPE(io), 0, ":utf8");
 	    if ((PL_unicode & PERL_UNICODE_INOUT_FLAG) &&
@@ -3968,40 +3964,28 @@ STATIC void
 S_init_predump_symbols(pTHX)
 {
     dVAR;
-    GV *tmpgv;
     IO *io;
 
-    io = PL_stdinio = newIO();
+    PL_stdinio = newIO();
+    io = PL_stdinio;
     SVcpREPLACE(SvLOCATION(io), avTsv(newAV()));
     av_store(svTav(SvLOCATION(io)),
 	LOC_NAME_INDEX, newSVpv("STDIN", 0));
     IoTYPE(io) = IoTYPE_RDONLY;
     IoIFP(io) = PerlIO_stdin();
-    tmpgv = gv_fetchpvs("stdin", GV_ADD|GV_NOTQUAL, SVt_PV);
-    GvMULTI_on(tmpgv);
-    GvIOp(tmpgv) = IoREFCNT_inc(io);
 
-    tmpgv = gv_fetchpvs("STDOUT", GV_ADD|GV_NOTQUAL, SVt_PVIO);
-    GvMULTI_on(tmpgv);
-    io = GvIOp(tmpgv);
+    PL_stdoutio = newIO();
+    io = PL_stdoutio;
     SVcpREPLACE(SvLOCATION(io), avTsv(newAV()));
     av_store(svTav(SvLOCATION(io)),
 	LOC_NAME_INDEX, newSVpv("STDOUT", 0));
     IoTYPE(io) = IoTYPE_WRONLY;
     IoOFP(io) = IoIFP(io) = PerlIO_stdout();
-    setdefout(tmpgv);
-    tmpgv = gv_fetchpvs("stdout", GV_ADD|GV_NOTQUAL, SVt_PV);
-    GvMULTI_on(tmpgv);
-    GvIOp(tmpgv) = IoREFCNT_inc(io);
 
-    PL_stderrgv = gv_fetchpvs("STDERR", GV_ADD|GV_NOTQUAL, SVt_PVIO);
-    GvMULTI_on(PL_stderrgv);
-    io = GvIOp(PL_stderrgv);
+    PL_stderrio = newIO();
+    io = PL_stderrio;
     IoTYPE(io) = IoTYPE_WRONLY;
     IoOFP(io) = IoIFP(io) = PerlIO_stderr();
-    tmpgv = gv_fetchpvs("stderr", GV_ADD|GV_NOTQUAL, SVt_PV);
-    GvMULTI_on(tmpgv);
-    GvIOp(tmpgv) = IoREFCNT_inc(io);
 
     PL_statname = newSV(0);		/* last filename we did stat on */
 

@@ -485,7 +485,6 @@ Perl_scan_num
 Perl_scan_oct
 Perl_parse_escape
 Perl_screaminstr
-Perl_setdefout
 Perl_share_hek
 Perl_csighandler
 Perl_stack_grow

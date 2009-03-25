@@ -529,7 +529,7 @@ PP(pp_open)
 PP(pp_close)
 {
     dVAR; dSP;
-    GV * const gv = (MAXARG == 0) ? PL_defoutgv : (GV*)POPs;
+    GV * const gv = (GV*)POPs;
 
     EXTEND(SP, 1);
     PUSHs(boolSV(do_close(gv, TRUE)));
@@ -856,16 +856,6 @@ PP(pp_select)
 #else
     DIE(aTHX_ "select not implemented");
 #endif
-}
-
-void
-Perl_setdefout(pTHX_ GV *gv)
-{
-    dVAR;
-    SvREFCNT_inc_void(gv);
-    if (PL_defoutgv)
-	GvREFCNT_dec(PL_defoutgv);
-    PL_defoutgv = gv;
 }
 
 PP(pp_getc)

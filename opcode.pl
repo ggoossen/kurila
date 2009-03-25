@@ -869,7 +869,7 @@ method_named	method with known name	ck_null		d$
 # I/O.
 
 open		open			ck_open		ismt@	F S? L
-close		close			ck_fun		is%	F?
+close		close			ck_fun		is%	F
 pipe_op		pipe			ck_fun		is@	F F
 
 fileno		fileno			ck_fun		ist%	F
