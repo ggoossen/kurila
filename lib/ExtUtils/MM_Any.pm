@@ -1273,7 +1273,7 @@ sub init_INSTALL_from_PREFIX {
         my@($s, $t, $d, $style) =  %{$layout}{[qw(s t d style)]};
         my $r = '$('.%type2prefix{?$t}.')';
 
-        print \*STDERR, "Prefixing $var\n" if $Verbose +>= 2;
+        print $^STDERR, "Prefixing $var\n" if $Verbose +>= 2;
 
         my $installvar = "install$var";
         my $Installvar = uc $installvar;
@@ -1282,7 +1282,7 @@ sub init_INSTALL_from_PREFIX {
         $d = "$style/$d" if $style;
         $self->prefixify($installvar, $s, $r, $d);
 
-        print \*STDERR, "  $Installvar == $self->{?$Installvar}\n" 
+        print $^STDERR, "  $Installvar == $self->{?$Installvar}\n" 
           if $Verbose +>= 2;
     }
 

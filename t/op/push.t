@@ -14,14 +14,14 @@ our @tests = split(m/\n/, <<EOF);
 -4,			4 5 6 7,	0 1 2 3
 EOF
 
-print \*STDOUT, "1..", 2 + nelems @tests, "\n";
+print $^STDOUT, "1..", 2 + nelems @tests, "\n";
 die "blech" unless (nelems @tests);
 
 our @x = @(1,2,3);
 push(@x,< @x);
-if (join(':', @x) eq '1:2:3:1:2:3') {print \*STDOUT, "ok 1\n";} else {print \*STDOUT, "not ok 1\n";}
+if (join(':', @x) eq '1:2:3:1:2:3') {print $^STDOUT, "ok 1\n";} else {print $^STDOUT, "not ok 1\n";}
 push(@x,4);
-if (join(':', @x) eq '1:2:3:1:2:3:4') {print \*STDOUT, "ok 2\n";} else {print \*STDOUT, "not ok 2\n";}
+if (join(':', @x) eq '1:2:3:1:2:3:4') {print $^STDOUT, "ok 2\n";} else {print $^STDOUT, "not ok 2\n";}
 
 our $test = 3;
 foreach my $line ( @tests) {
@@ -39,10 +39,10 @@ foreach my $line ( @tests) {
     }
     if (join(':', @got) eq join(':', @get) &&
 	join(':', @x) eq join(':', @leave)) {
-	print \*STDOUT, "ok ",$test++,"\n";
+	print $^STDOUT, "ok ",$test++,"\n";
     }
     else {
-	print \*STDOUT, "not ok ",$test++," got: $(join ' ',@got) == $(join ' ',@get) left: $(join ' ',@x) == $(join ' ',@leave)\n";
+	print $^STDOUT, "not ok ",$test++," got: $(join ' ',@got) == $(join ' ',@get) left: $(join ' ',@x) == $(join ' ',@leave)\n";
     }
 }
 

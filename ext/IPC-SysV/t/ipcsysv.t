@@ -127,7 +127,7 @@ EOM
         $test6bad = 1;
     }
     if ($test6bad && $test2bad) {
-    print \*STDOUT, <<EOM;
+    print $^STDOUT, <<EOM;
 This failure was to be expected because the subtest #2 failed.
 EOM
      }

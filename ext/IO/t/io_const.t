@@ -1,7 +1,7 @@
 
 use IO::Handle;
 
-print \*STDOUT, "1..6\n";
+print $^STDOUT, "1..6\n";
 my $i = 1;
 foreach (qw(SEEK_SET SEEK_CUR SEEK_END     _IOFBF    _IOLBF    _IONBF)) {
     my $d1 = defined(&{*{Symbol::fetch_glob("IO::Handle::" . $_)}}) ?? 1 !! 0;
@@ -9,7 +9,7 @@ foreach (qw(SEEK_SET SEEK_CUR SEEK_END     _IOFBF    _IOLBF    _IONBF)) {
     my $v2 = IO::Handle::constant($_);
     my $d2 = defined($v2);
 
-    print \*STDOUT, "not "
+    print $^STDOUT, "not "
 	if($d1 != $d2 || ($d1 && ($v1 != $v2)));
-    print \*STDOUT, "ok ",$i++,"\n";
+    print $^STDOUT, "ok ",$i++,"\n";
 }

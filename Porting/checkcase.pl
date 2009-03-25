@@ -18,9 +18,9 @@ my $failed;
 
 foreach (values %files) {
     if ((nelems @$_) +> 1) {
-	print \*STDOUT, join(", ", @$_), "\n";
+	print $^STDOUT, join(", ", @$_), "\n";
 	$failed++;
     }
 }
 
-print \*STDOUT, "no similarly named files found\n" unless $failed;
+print $^STDOUT, "no similarly named files found\n" unless $failed;

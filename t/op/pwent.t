@@ -5,7 +5,7 @@ our (%Config, $where);
 BEGIN {
     try {my @n = @( getpwuid 0 ); setpwent()};
     if ($^EVAL_ERROR && $^EVAL_ERROR->{?description} =~ m/(The \w+ function is unimplemented)/) {
-	print \*STDOUT, "1..0 # Skip: $1\n";
+	print $^STDOUT, "1..0 # Skip: $1\n";
 	exit 0;
     }
     try { require Config; Config->import; };
@@ -66,14 +66,14 @@ BEGIN {
     }
 
     if ($reason) {	# Give up.
-	print \*STDOUT, "1..0 # Skip: $reason\n";
+	print $^STDOUT, "1..0 # Skip: $reason\n";
 	exit 0;
     }
 }
 
 # By now the PW filehandle should be open and full of juicy password entries.
 
-print \*STDOUT, "1..2\n";
+print $^STDOUT, "1..2\n";
 
 # Go through at most this many users.
 # (note that the first entry has been read away by now)
@@ -84,7 +84,7 @@ my $tst = 1;
 my %perfect;
 my %seen;
 
-print \*STDOUT, "# where $where\n";
+print $^STDOUT, "# where $where\n";
 
 setpwent();
 
@@ -138,12 +138,12 @@ while ( ~< *PW) {
 
 endpwent();
 
-print \*STDOUT, "# max = $max, n = $n, perfect = ", nelems(keys %perfect), "\n";
+print $^STDOUT, "# max = $max, n = $n, perfect = ", nelems(keys %perfect), "\n";
 
 my $not;
 if ( ! %perfect && $n) {
     $max++;
-    print \*STDOUT, <<EOEX;
+    print $^STDOUT, <<EOEX;
 #
 # The failure of op/pwent test is not necessarily serious.
 # It may fail due to local password administration conventions.
@@ -157,14 +157,14 @@ if ( ! %perfect && $n) {
 # matches at all, it suspects something is wrong.
 # 
 EOEX
-    print \*STDOUT, "not ";
+    print $^STDOUT, "not ";
     $not = 1;
 } else {
     $not = 0;
 }
-print \*STDOUT, "ok ", $tst++;
-print \*STDOUT, "\t# (not necessarily serious: run t/op/pwent.t by itself)" if $not;
-print \*STDOUT, "\n";
+print $^STDOUT, "ok ", $tst++;
+print $^STDOUT, "\t# (not necessarily serious: run t/op/pwent.t by itself)" if $not;
+print $^STDOUT, "\n";
 
 # Test both the scalar and list contexts.
 
@@ -188,5 +188,5 @@ for (1..$max) {
 }
 endpwent();
 
-print \*STDOUT, "not " unless "$(join ' ',@pw1)" eq "$(join ' ',@pw2)";
-print \*STDOUT, "ok ", $tst++, "\n";
+print $^STDOUT, "not " unless "$(join ' ',@pw1)" eq "$(join ' ',@pw2)";
+print $^STDOUT, "ok ", $tst++, "\n";

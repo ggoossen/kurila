@@ -31,8 +31,8 @@ $r ^|^= ok(undef, 1);
 ok($r); # (failure==success :-)
 
 close $f;
-$TESTOUT = *STDOUT{IO};
-$TESTERR = *STDERR{IO};
+$TESTOUT = $^STDOUT{IO};
+$TESTERR = $^STDERR{IO};
 $ntest = 1;
 
 open $f, "<", "fails";

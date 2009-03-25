@@ -9,7 +9,7 @@ use Config;
 
 BEGIN {
     unless (config_value('d_fork')) {
-        print \*STDOUT, "1..0 # Skip: no fork\n";
+        print $^STDOUT, "1..0 # Skip: no fork\n";
         exit 0;
     }
 }
@@ -69,8 +69,8 @@ sub runperl {
           }
       };
       env::set_var($_ => $env->{$_}) for keys %$env;
-      open \*STDOUT, ">", $STDOUT or exit $FAILURE_CODE;
-      open \*STDERR, ">", $STDERR or it_didnt_work();
+      open $^STDOUT, ">", $STDOUT or exit $FAILURE_CODE;
+      open $^STDERR, ">", $STDERR or it_didnt_work();
       do { exec $PERL, < @$args };
       it_didnt_work();
   }
@@ -78,7 +78,7 @@ sub runperl {
 
 
 sub it_didnt_work {
-    print \*STDOUT, "IWHCWJIHCI\cNHJWCJQWKJQJWCQW\n";
+    print $^STDOUT, "IWHCWJIHCI\cNHJWCJQWKJQJWCQW\n";
     exit $FAILURE_CODE;
 }
 

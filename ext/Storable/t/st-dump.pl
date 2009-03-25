@@ -13,14 +13,14 @@
 sub num_equal($num, $left, $right, $name) {
         my $ok = ((defined $left) ?? $left == $right !! undef);
         unless (ok ($num, $ok, $name)) {
-          print \*STDOUT, "# Expected $right\n";
+          print $^STDOUT, "# Expected $right\n";
           if (!defined $left) {
-            print \*STDOUT, "# Got undef\n";
+            print $^STDOUT, "# Got undef\n";
           } elsif ($left !~ m/[^0-9]/) {
-            print \*STDOUT, "# Got $left\n";
+            print $^STDOUT, "# Got $left\n";
           } else {
             $left =~ s/([^-a-zA-Z0-9_+])/$(sprintf "\\\%03o", ord $1)/g;
-            print \*STDOUT, "# Got \"$left\"\n";
+            print $^STDOUT, "# Got \"$left\"\n";
           }
         }
         $ok;

@@ -23,7 +23,7 @@ do {
         my $filename = shift ;
 	my $fh = gensym ;
 	open ($fh, ">", "$filename") || die "Cannot open $filename: $^OS_ERROR" ;
-	my $real_stdout = \*STDOUT;
+	my $real_stdout = $^STDOUT;
 	return bless \@($fh, $real_stdout ) ;
 
     }
@@ -367,7 +367,7 @@ do {
     }
 
     ok $warned eq '' 
-      or print \*STDOUT, "# Caught warning [$warned]\n" ;
+      or print $^STDOUT, "# Caught warning [$warned]\n" ;
 
     # db-put with substr of value
     $warned = '';
@@ -380,7 +380,7 @@ do {
     }
 
     ok $warned eq '' 
-      or print \*STDOUT, "# Caught warning [$warned]\n" ;
+      or print $^STDOUT, "# Caught warning [$warned]\n" ;
 
     # via the tied hash is not a problem, but check anyway
     # substr of key
@@ -394,7 +394,7 @@ do {
     }
 
     ok $warned eq '' 
-      or print \*STDOUT, "# Caught warning [$warned]\n" ;
+      or print $^STDOUT, "# Caught warning [$warned]\n" ;
 
     # via the tied hash is not a problem, but check anyway
     # substr of value
@@ -408,7 +408,7 @@ do {
     }
 
     ok $warned eq '' 
-      or print \*STDOUT, "# Caught warning [$warned]\n" ;
+      or print $^STDOUT, "# Caught warning [$warned]\n" ;
 
     my %bad = %( () ) ;
     $key = '';
@@ -430,8 +430,8 @@ do {
     ok nkeys %bad == 0 ;
     ok nkeys %remember == 0 ;
 
-    print \*STDOUT, "# missing -- $key=>$value\n" while @(?$key, ?$value) =@( each %remember);
-    print \*STDOUT, "# bad     -- $key=>$value\n" while @(?$key, ?$value) =@( each %bad);
+    print $^STDOUT, "# missing -- $key=>$value\n" while @(?$key, ?$value) =@( each %remember);
+    print $^STDOUT, "# bad     -- $key=>$value\n" while @(?$key, ?$value) =@( each %bad);
 
     # Make sure this fix does not break code to handle an undef key
     # Berkeley DB undef key is broken between versions 2.3.16 and 3.1
@@ -439,16 +439,16 @@ do {
     $warned = '';
     %h->put(undef, $value) ;
     ok $warned eq '' 
-      or print \*STDOUT, "# Caught warning [$warned]\n" ;
+      or print $^STDOUT, "# Caught warning [$warned]\n" ;
     $warned = '';
 
     my $no_NULL = ($DB_File::db_ver +>= 2.003016 && $DB_File::db_ver +< 3.001) ;
-    print \*STDOUT, "# db_ver $DB_File::db_ver\n";
+    print $^STDOUT, "# db_ver $DB_File::db_ver\n";
     $value = '' ;
     %h->get(undef, $value) ;
-    ok $no_NULL || $value eq 'fred' or print \*STDOUT, "# got [$value]\n" ;
+    ok $no_NULL || $value eq 'fred' or print $^STDOUT, "# got [$value]\n" ;
     ok $warned eq '' 
-      or print \*STDOUT, "# Caught warning [$warned]\n" ;
+      or print $^STDOUT, "# Caught warning [$warned]\n" ;
     $warned = '';
 
     undef %h;

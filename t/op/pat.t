@@ -894,8 +894,8 @@ SKIP: do {
                     sort map { sprintf("\%06x", ord($_))." $_" }, keys %s) {
 	my $class = %s{?$char};
 	my $code  = sprintf("\%06x", ord($char));
-	printf \*STDOUT, "#\n# 0x$code  $char\n#\n";
-	print \*STDOUT, "# IsAlpha\n";
+	printf $^STDOUT, "#\n# 0x$code  $char\n#\n";
+	print $^STDOUT, "# IsAlpha\n";
 	if ($class =~ m/^[LM]/) {
 	    ok( $char =~ m/\p{IsAlpha}/ );
 	    ok( not $char =~ m/\P{IsAlpha}/ );
@@ -903,7 +903,7 @@ SKIP: do {
 	    ok( not $char =~ m/\p{IsAlpha}/ );
 	    ok( $char =~ m/\P{IsAlpha}/ );
 	}
-	print \*STDOUT, "# IsAlnum\n";
+	print $^STDOUT, "# IsAlnum\n";
 	if ($class =~ m/^[LMN]/ && $char ne "_") {
 	    ok( $char =~ m/\p{IsAlnum}/);
 	    ok( not $char =~ m/\P{IsAlnum}/);
@@ -911,7 +911,7 @@ SKIP: do {
 	    ok( not $char =~ m/\p{IsAlnum}/);
 	    ok( $char =~ m/\P{IsAlnum}/);
 	}
-	print \*STDOUT, "# IsASCII\n";
+	print $^STDOUT, "# IsASCII\n";
         if (($code cmp '00007f') +<= 0) {
             ok( $char =~ m/\p{IsASCII}/);
             ok( not $char =~ m/\P{IsASCII}/);
@@ -919,7 +919,7 @@ SKIP: do {
             ok( not $char =~ m/\p{IsASCII}/);
             ok( $char =~ m/\P{IsASCII}/);
         }
-	print \*STDOUT, "# IsCntrl\n";
+	print $^STDOUT, "# IsCntrl\n";
 	if ($class =~ m/^C/) {
 	    ok( $char =~ m/\p{IsCntrl}/);
 	    ok( not $char =~ m/\P{IsCntrl}/);
@@ -927,7 +927,7 @@ SKIP: do {
 	    ok( not $char =~ m/\p{IsCntrl}/);
 	    ok( $char =~ m/\P{IsCntrl}/);
 	}
-	print \*STDOUT, "# IsBlank\n";
+	print $^STDOUT, "# IsBlank\n";
 	if ($class =~ m/^Z[lp]/ || $char eq " ") {
 	    ok( $char =~ m/\p{IsBlank}/);
 	    ok( not $char =~ m/\P{IsBlank}/);
@@ -935,7 +935,7 @@ SKIP: do {
 	    ok( not $char =~ m/\p{IsBlank}/);
 	    ok( $char =~ m/\P{IsBlank}/);
 	}
-	print \*STDOUT, "# IsDigit\n";
+	print $^STDOUT, "# IsDigit\n";
 	if ($class =~ m/^Nd$/) {
 	    ok( $char =~ m/\p{IsDigit}/);
 	    ok( not $char =~ m/\P{IsDigit}/);
@@ -943,7 +943,7 @@ SKIP: do {
 	    ok( not $char =~ m/\p{IsDigit}/);
 	    ok( $char =~ m/\P{IsDigit}/);
 	}
-	print \*STDOUT, "# IsGraph\n";
+	print $^STDOUT, "# IsGraph\n";
 	if ($class =~ m/^([LMNPS])|Co/) {
 	    ok( $char =~ m/\p{IsGraph}/);
 	    ok( not $char =~ m/\P{IsGraph}/);
@@ -951,7 +951,7 @@ SKIP: do {
 	    ok( not $char =~ m/\p{IsGraph}/);
 	    ok( $char =~ m/\P{IsGraph}/);
 	}
-	print \*STDOUT, "# IsLower\n";
+	print $^STDOUT, "# IsLower\n";
 	if ($class =~ m/^Ll$/) {
 	    ok( $char =~ m/\p{IsLower}/);
 	    ok( not $char =~ m/\P{IsLower}/);
@@ -959,7 +959,7 @@ SKIP: do {
 	    ok( not $char =~ m/\p{IsLower}/);
 	    ok( $char =~ m/\P{IsLower}/);
 	}
-	print \*STDOUT, "# IsPrint\n";
+	print $^STDOUT, "# IsPrint\n";
 	if ($class =~ m/^([LMNPS])|Co|Zs/) {
 	    ok( $char =~ m/\p{IsPrint}/);
 	    ok( not $char =~ m/\P{IsPrint}/);
@@ -967,7 +967,7 @@ SKIP: do {
 	    ok( not $char =~ m/\p{IsPrint}/);
 	    ok( $char =~ m/\P{IsPrint}/);
 	}
-	print \*STDOUT, "# IsPunct\n";
+	print $^STDOUT, "# IsPunct\n";
 	if ($class =~ m/^P/ || $char eq "_") {
 	    ok( $char =~ m/\p{IsPunct}/);
 	    ok( not $char =~ m/\P{IsPunct}/);
@@ -975,7 +975,7 @@ SKIP: do {
 	    ok( not $char =~ m/\p{IsPunct}/);
 	    ok( $char =~ m/\P{IsPunct}/);
 	}
-	print \*STDOUT, "# IsSpace\n";
+	print $^STDOUT, "# IsSpace\n";
 	if ($class =~ m/^Z/ || ($code =~ m/^(0009|000A|000B|000C|000D)$/)) {
 	    ok( $char =~ m/\p{IsSpace}/);
 	    ok( not $char =~ m/\P{IsSpace}/);
@@ -983,7 +983,7 @@ SKIP: do {
 	    ok( not $char =~ m/\p{IsSpace}/);
 	    ok( $char =~ m/\P{IsSpace}/);
 	}
-	print \*STDOUT, "# IsUpper\n";
+	print $^STDOUT, "# IsUpper\n";
 	if ($class =~ m/^L[ut]/) {
 	    ok( $char =~ m/\p{IsUpper}/);
 	    ok( not $char =~ m/\P{IsUpper}/);
@@ -991,7 +991,7 @@ SKIP: do {
 	    ok( not $char =~ m/\p{IsUpper}/);
 	    ok( $char =~ m/\P{IsUpper}/);
 	}
-	print \*STDOUT, "# IsWord\n";
+	print $^STDOUT, "# IsWord\n";
 	if ($class =~ m/^[LMN]/ || $char eq "_") {
 	    ok( $char =~ m/\p{IsWord}/);
 	    ok( not $char =~ m/\P{IsWord}/);
@@ -1363,7 +1363,7 @@ do {
     $x = "\x[09]" . "_b";
     ok ($x =~ m/^\x9_b$/, "\\x9_b isn't to be treated as \\x9b");
 
-    print \*STDOUT, "# and now again in [] ranges\n";
+    print $^STDOUT, "# and now again in [] ranges\n";
 
     $x = "\x[4e]" . "E";
     ok ($x =~ m/^[\x[4E]E]{2}$/, "Check only 2 bytes of hex are matched.");
@@ -1395,7 +1395,7 @@ do {
     ok( $x =~ m/.*?\200/ );
 };
 
-print \*STDOUT, "# some Unicode properties\n";
+print $^STDOUT, "# some Unicode properties\n";
 
 do {
     # Dashes, underbars, case.
@@ -1466,7 +1466,7 @@ do {
 };
 
 do {
-    print \*STDOUT, "# the basic character classes and Unicode \n";
+    print $^STDOUT, "# the basic character classes and Unicode \n";
 
     # 0100;LATIN CAPITAL LETTER A WITH MACRON;Lu;0;L;0041 0304;;;;N;LATIN CAPITAL LETTER A MACRON;;;0101;
     ok( "\x{0100}" =~ m/\w/ );
@@ -1479,7 +1479,7 @@ do {
 };
 
 do {
-    print \*STDOUT, "# folding matches and Unicode\n";
+    print $^STDOUT, "# folding matches and Unicode\n";
 
     ok( "a\x{100}" =~ m/A/i );
     ok( "A\x{100}" =~ m/a/i );
@@ -1508,7 +1508,7 @@ do {
 
     use utf8;
 
-    print \*STDOUT, "# LATIN LETTER A WITH GRAVE\n";
+    print $^STDOUT, "# LATIN LETTER A WITH GRAVE\n";
     my $lower = "\N{LATIN SMALL LETTER A WITH GRAVE}";
     my $UPPER = "\N{LATIN CAPITAL LETTER A WITH GRAVE}";
 
@@ -1517,7 +1517,7 @@ do {
     ok( $lower =~ m/[$UPPER]/i );
     ok( $UPPER =~ m/[$lower]/i );
 
-    print \*STDOUT, "# GREEK LETTER ALPHA WITH VRACHY\n";
+    print $^STDOUT, "# GREEK LETTER ALPHA WITH VRACHY\n";
 
     $lower = "\N{GREEK CAPITAL LETTER ALPHA WITH VRACHY}";
     $UPPER = "\N{GREEK SMALL LETTER ALPHA WITH VRACHY}";
@@ -1527,7 +1527,7 @@ do {
     ok( $lower =~ m/[$UPPER]/i );
     ok( $UPPER =~ m/[$lower]/i );
 
-    print \*STDOUT, "# LATIN LETTER Y WITH DIAERESIS\n";
+    print $^STDOUT, "# LATIN LETTER Y WITH DIAERESIS\n";
 
     $lower = "\N{LATIN CAPITAL LETTER Y WITH DIAERESIS}";
     $UPPER = "\N{LATIN SMALL LETTER Y WITH DIAERESIS}";
@@ -1541,7 +1541,7 @@ do {
     use warnings;
     use charnames ':full';
     
-    print \*STDOUT, "# GREEK CAPITAL LETTER SIGMA vs COMBINING GREEK PERISPOMENI\n";
+    print $^STDOUT, "# GREEK CAPITAL LETTER SIGMA vs COMBINING GREEK PERISPOMENI\n";
 
     my $SIGMA = "\N{GREEK CAPITAL LETTER SIGMA}";
     my $char  = "\N{COMBINING GREEK PERISPOMENI}";
@@ -1551,7 +1551,7 @@ do {
 };
 
 do {
-    print \*STDOUT, "# \\X\n";
+    print $^STDOUT, "# \\X\n";
 
     use charnames ':full';
 
@@ -1567,14 +1567,14 @@ do {
 };
 
 do {
-    print \*STDOUT, "#\\C and \\X\n";
+    print $^STDOUT, "#\\C and \\X\n";
 
     ok( "!abc!" =~ m/a\Cc/ );
     ok( "!abc!" =~ m/a\Xc/ );
 };
 
 do {
-    print \*STDOUT, "# FINAL SIGMA\n";
+    print $^STDOUT, "# FINAL SIGMA\n";
 
     my $SIGMA = "\x{03A3}"; # CAPITAL
     my $Sigma = "\x{03C2}"; # SMALL FINAL
@@ -1606,7 +1606,7 @@ do {
 };
 
 do {
-    print \*STDOUT, "# parlez-vous?\n";
+    print $^STDOUT, "# parlez-vous?\n";
 
     use charnames ':full';
 
@@ -1663,7 +1663,7 @@ do {
 };
 
 do {
-    print \*STDOUT, "# Does lingering (and useless) UTF8 flag mess up /i matching?\n";
+    print $^STDOUT, "# Does lingering (and useless) UTF8 flag mess up /i matching?\n";
 
     do {
 	my $regex  = "ABcde";
@@ -1689,7 +1689,7 @@ do {
 };
 
 do {
-    print \*STDOUT, "# more SIGMAs\n";
+    print $^STDOUT, "# more SIGMAs\n";
 
     my $SIGMA = "\x{03A3}"; # CAPITAL
     my $Sigma = "\x{03C2}"; # SMALL FINAL
@@ -1707,7 +1707,7 @@ do {
 };
 
 do {
-    print \*STDOUT, "# LATIN SMALL LETTER SHARP S\n";
+    print $^STDOUT, "# LATIN SMALL LETTER SHARP S\n";
 
     use charnames ':full';
 
@@ -1728,7 +1728,7 @@ do {
 };
 
 do {
-    print \*STDOUT, "# more whitespace: U+0085, U+2028, U+2029\n";
+    print $^STDOUT, "# more whitespace: U+0085, U+2028, U+2029\n";
 
     # U+0085 needs to be forced to be Unicode, the \x{100} does that.
     ok( "<\x{100}\x{0085}>" =~ m/<\x{100}\s>/ );
@@ -1737,7 +1737,7 @@ do {
 };
 
 do {
-    print \*STDOUT, "# . with /s should work on characters, as opposed to bytes\n";
+    print $^STDOUT, "# . with /s should work on characters, as opposed to bytes\n";
 
     my $s = "\x{e4}\x{100}";
 
@@ -1769,7 +1769,7 @@ do {
 };
 
 do {
-    print \*STDOUT, "# Unicode lookbehind\n";
+    print $^STDOUT, "# Unicode lookbehind\n";
 
     local $TODO = "variable length lookbehehind";
     ok(0) for 851 .. 854;
@@ -1780,7 +1780,7 @@ do {
 };
 
 do {
-    print \*STDOUT, "# UTF-8 hash keys and /\$/\n";
+    print $^STDOUT, "# UTF-8 hash keys and /\$/\n";
     # http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2002-01/msg01327.html
 
     my $u = "a\x{100}";
@@ -1795,7 +1795,7 @@ do {
 };
 
 do {
-    print \*STDOUT, "# [ID 20020124.005]\n";
+    print $^STDOUT, "# [ID 20020124.005]\n";
     # Fixed by #14795.
     for my $char (@("a", "\x{df}", "\x{100}")){
 	$x = "$char b $char";
@@ -1808,14 +1808,14 @@ do {
 };
 
 do {
-    print \*STDOUT, "# SEGV in s/// and UTF-8\n";
+    print $^STDOUT, "# SEGV in s/// and UTF-8\n";
     my $s = "s#\x{100}" x 4;
     $s =~ s/[^\w]/ /g;
     ok( $s eq "s \x{100}" x 4 );
 };
 
 do {
-    print \*STDOUT, "# UTF-8 bug (maybe alreayd known?)\n";
+    print $^STDOUT, "# UTF-8 bug (maybe alreayd known?)\n";
     my $u;
 
     $u = "foo";
@@ -1831,7 +1831,7 @@ do {
 };
 
 do {
-    print \*STDOUT, "# UTF-8 bug with s///\n";
+    print $^STDOUT, "# UTF-8 bug with s///\n";
     # check utf8/non-utf8 mixtures
     # try to force all float/anchored check combinations
     my $c = "\x{100}";
@@ -1862,7 +1862,7 @@ do {
 };
 
 do {
-    print \*STDOUT, "# qr/.../x\n";
+    print $^STDOUT, "# qr/.../x\n";
 
     my $R = qr/ A B C # D E/x;
 
@@ -1872,13 +1872,13 @@ do {
 };
 
 do {
-    print \*STDOUT, "# illegal Unicode properties\n";
+    print $^STDOUT, "# illegal Unicode properties\n";
 
     ok( not eval qq* "a" =~ m/\pq / *      ); die if $^EVAL_ERROR;
     ok( not eval qq* "a" =~ m/\p\{qrst\} / * ); die if $^EVAL_ERROR;
 };
 
-print \*STDOUT, "# user-defined character properties\n";
+print $^STDOUT, "# user-defined character properties\n";
 
 sub InKana1 {
     return <<'END';
@@ -1937,7 +1937,7 @@ ok( "d" =~ m/\p{InConsonant}/ );
 ok( "e" =~ m/\P{InConsonant}/ );
 
 if (!env::var('PERL_SKIP_PSYCHO_TEST')){
-    print \*STDOUT, "# [ID 20020630.002] utf8 regex only matches 32k\n";
+    print $^STDOUT, "# [ID 20020630.002] utf8 regex only matches 32k\n";
     for (@(\@( 'byte', "\x{ff}" ), \@( 'utf8', "\x{1ff}" ))) {
 	my@($type, $char) =  @$_;
 	for my $len (@(32000, 32768, 33000)) {
@@ -1978,7 +1978,7 @@ ok("$x$x" =~ m/^$x(??{$x})\z/ ,
 
 }; # no re 'eval'
 
-print \*STDOUT, "# more user-defined character properties\n";
+print $^STDOUT, "# more user-defined character properties\n";
 
 sub IsSyriac1 {
     return <<'END';
@@ -2000,7 +2000,7 @@ END
 ok("\x{0712}" =~ m/\p{Syriac1}/, '\x{0712}, \p{Syriac1}');
 ok("\x{072F}" =~ m/\P{Syriac1}/, '\x{072F}, \p{Syriac1}');
 
-print \*STDOUT, "# user-defined character properties may lack \\n at the end\n";
+print $^STDOUT, "# user-defined character properties may lack \\n at the end\n";
 sub InGreekSmall   { return "03B1\t03C9" }
 sub InGreekCapital { return "0391\t03A9\n-03A2" }
 
@@ -2022,7 +2022,7 @@ ok("-" =~ m/\p{AsciiHexAndDash}/, "'-' is AsciiHexAndDash");
 ok("A" =~ m/\p{AsciiHexAndDash}/, "'A' is AsciiHexAndDash");
 
 do {
-    print \*STDOUT, "# Change #18179\n";
+    print $^STDOUT, "# Change #18179\n";
     # previously failed with "panic: end_shift
     my $s = "\x{100}" x 5;
     my $ok = $s =~ m/(\x{100}{4})/;
@@ -2031,7 +2031,7 @@ do {
 };
 
 do {
-    print \*STDOUT, "# [perl #15763]\n";
+    print $^STDOUT, "# [perl #15763]\n";
 
     $a = "x\x{100}";
     chop $a; # but leaves the UTF-8 flag
@@ -2368,7 +2368,7 @@ ok(("foba  ba$($s)pxySS$s$s" =~ qr/(b(?:a${\$s}t|a${\$s}f|a${\$s}p)[xy]+$s*)/i)
 };
 
 
-print \*STDOUT, "# set PERL_SKIP_PSYCHO_TEST to skip this test\n";
+print $^STDOUT, "# set PERL_SKIP_PSYCHO_TEST to skip this test\n";
 if (!env::var('PERL_SKIP_PSYCHO_TEST')){
     my @normal=qw(these are some normal words);
     use utf8;
@@ -2398,7 +2398,7 @@ do {
     
     my $aeek = bless \%(), 'wooosh';
     try {$aeek->gloople() =~ m/(.)/g;}; die if $^EVAL_ERROR;
-    ok($^EVAL_ERROR eq "", "//g match against return value of sub") or print \*STDOUT, "# $^EVAL_ERROR\n";
+    ok($^EVAL_ERROR eq "", "//g match against return value of sub") or print $^STDOUT, "# $^EVAL_ERROR\n";
 };
 
 do {
@@ -2407,7 +2407,7 @@ do {
     }
     try {gloople() =~ m/(.)/g;}; die if $^EVAL_ERROR;
     ok($^EVAL_ERROR eq "", "# 26410 didn't affect sub calls for some reason")
-	or print \*STDOUT, "# $^EVAL_ERROR\n";
+	or print $^STDOUT, "# $^EVAL_ERROR\n";
 };
 
 # [perl #37836] Simple Regex causes SEGV when run on specific data
@@ -2547,7 +2547,7 @@ EOFTEST
         
 };
 do {
-    print \*STDOUT, "# MORE LATIN SMALL LETTER SHARP S\n";
+    print $^STDOUT, "# MORE LATIN SMALL LETTER SHARP S\n";
 
     use charnames ':full';
 
@@ -2615,7 +2615,7 @@ SKIP:do {
 if (env::var('PERL_SKIP_PSYCHO_TEST')){
   ok( 1, "Skip: No psycho tests");
 } else {    
-  print \*STDOUT, "# set PERL_SKIP_PSYCHO_TEST to skip this test\n";
+  print $^STDOUT, "# set PERL_SKIP_PSYCHO_TEST to skip this test\n";
   my $r = qr/^
   	    (?:
   		( (?:a|z+)+ )
@@ -3221,11 +3221,11 @@ do {
 #-------------------------------------------------------------------
 
 ok(($: ("a" x (2**15 - 10)) =~ m/^()(a|bb)*$/), "Recursive stack cracker: #24274")
-    or print \*STDOUT, "# Unexpected outcome: should pass or crash perl\n";
+    or print $^STDOUT, "# Unexpected outcome: should pass or crash perl\n";
 
 ok((q(a)x 100) =~ m/^(??{'(.)'x 100})/, 
         "Regexp /^(??\{'(.)'x 100\})/ crashes older perls")
-    or print \*STDOUT, "# Unexpected outcome: should pass or crash perl\n";
+    or print $^STDOUT, "# Unexpected outcome: should pass or crash perl\n";
 
 eval_dies_like( 'm/\k/',
                 qr/\QSequence \k... not terminated in regex;\E/);

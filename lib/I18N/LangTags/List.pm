@@ -21,7 +21,7 @@ do {
       $name =~ s/\s*[;\.]*\s*$//g;
       next unless $name;
       ++$count;
-      print \*STDOUT, "<$tag> <$name>\n" if $Debug;
+      print $^STDOUT, "<$tag> <$name>\n" if $Debug;
       $last_name = %Name{+$tag} = $name;
       %Is_Disrec{+$tag} = 1 if $disrec;
     } elsif (m/[Ff]ormerly \"([-a-z0-9]+)\"/) {
@@ -49,23 +49,23 @@ sub name {
   
   my $subform = '';
   my $name = '';
-  print \*STDOUT, "Input: \{$tag\}\n" if $Debug;
+  print $^STDOUT, "Input: \{$tag\}\n" if $Debug;
   while(length $tag) {
     last if $name = %Name{?$tag};
     last if $name = %Name{?$alt};
     if($tag =~ s/(-[a-z0-9]+)$//s) {
-      print \*STDOUT, "Shaving off: $1 leaving $tag\n" if $Debug;
+      print $^STDOUT, "Shaving off: $1 leaving $tag\n" if $Debug;
       $subform = "$1$subform";
        # and loop around again
        
-      $alt =~ s/(-[a-z0-9]+)$//s && $Debug && print \*STDOUT, " alt -> $alt\n";
+      $alt =~ s/(-[a-z0-9]+)$//s && $Debug && print $^STDOUT, " alt -> $alt\n";
     } else {
       # we're trying to pull a subform off a primary tag. TILT!
-      print \*STDOUT, "Aborting on: \{$name\}\{$subform\}\n" if $Debug;
+      print $^STDOUT, "Aborting on: \{$name\}\{$subform\}\n" if $Debug;
       last;
     }
   }
-  print \*STDOUT, "Output: \{$name\}\{$subform\}\n" if $Debug;
+  print $^STDOUT, "Output: \{$name\}\{$subform\}\n" if $Debug;
   
   return unless $name;   # Failure
   return $name unless $subform;   # Exact match

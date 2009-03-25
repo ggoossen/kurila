@@ -202,7 +202,7 @@ sub permit_only {
 
 sub dump_mask {
     my $obj = shift;
-    print \*STDOUT, < opset_to_hex($obj->{?Mask}),"\n";
+    print $^STDOUT, < opset_to_hex($obj->{?Mask}),"\n";
 }
 
 

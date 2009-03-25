@@ -181,7 +181,7 @@ do {
     my $str = char_range($h1, $h2);
 
     for my $x (@('gc', 'General Category')) {
-      print \*STDOUT, "# $filename $x $_, %utf8::PA_reverse{?$_}\n";
+      print $^STDOUT, "# $filename $x $_, %utf8::PA_reverse{?$_}\n";
       for my $y (@($_, %utf8::PA_reverse{?$_})) {
 	is($str =~ m/(\p{$x: $y}+)/ && $1, substr($str, 0, -1));
 	is($str =~ m/(\P{$x= $y}+)/ && $1, substr($str, -1));
@@ -199,7 +199,7 @@ for ( grep { %utf8::Canonical{?$_} =~ m/^In/ }, keys %utf8::Canonical) {
 
   next unless -e $filename;
 
-  print \*STDOUT, "# In$_ $filename\n";
+  print $^STDOUT, "# In$_ $filename\n";
 
   my @($h1, $h2) =  map { hex }, split(m/\t/, (do $filename), 3)[[0..1]];
 

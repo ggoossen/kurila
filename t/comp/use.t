@@ -4,7 +4,7 @@ BEGIN {
     $^INCLUDED{+"feature.pm"} = 1; # so we don't attempt to load feature.pm
 }
 
-print \*STDOUT, "1..26\n";
+print $^STDOUT, "1..26\n";
 
 # Can't require test.pl, as we're testing the use/require mechanism here.
 
@@ -24,25 +24,25 @@ sub _ok($type, $got, $expected, ?$name) {
     }
     if ($result) {
 	if ($name) {
-	    print \*STDOUT, "ok $test - $name\n";
+	    print $^STDOUT, "ok $test - $name\n";
 	} else {
-	    print \*STDOUT, "ok $test\n";
+	    print $^STDOUT, "ok $test\n";
 	}
     } else {
 	if ($name) {
-	    print \*STDOUT, "not ok $test - $name\n";
+	    print $^STDOUT, "not ok $test - $name\n";
 	} else {
-	    print \*STDOUT, "not ok $test\n";
+	    print $^STDOUT, "not ok $test\n";
 	}
 	my @caller = @( caller(2) );
-	print \*STDOUT, "# Failed test at @caller[1] line @caller[2]\n";
-	print \*STDOUT, "# Got      '$got'\n";
+	print $^STDOUT, "# Failed test at @caller[1] line @caller[2]\n";
+	print $^STDOUT, "# Got      '$got'\n";
 	if ($type eq 'is') {
-	    print \*STDOUT, "# Expected '$expected'\n";
+	    print $^STDOUT, "# Expected '$expected'\n";
 	} elsif ($type eq 'isnt') {
-	    print \*STDOUT, "# Expected not '$expected'\n";
+	    print $^STDOUT, "# Expected not '$expected'\n";
 	} elsif ($type eq 'like') {
-	    print \*STDOUT, "# Expected $expected\n";
+	    print $^STDOUT, "# Expected $expected\n";
 	}
     }
     $test = $test + 1;

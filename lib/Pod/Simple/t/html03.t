@@ -22,6 +22,6 @@ ok( x(qq{This is a paragraph}) =~ m{<title></title>}i );
 ok( x(qq{=head1 Prok\n\nThis is a paragraph}) =~ m{<title>Prok</title>}i );
 ok( x(qq{=head1 NAME\n\nProk -- stuff\n\nThis}), q{/<title>Prok</title>/} );
 
-print \*STDOUT, "# And one for the road...\n";
+print $^STDOUT, "# And one for the road...\n";
 ok 1;
 

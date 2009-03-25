@@ -8,7 +8,7 @@ ok 1;
 
 use Pod::Simple::DumpAsXML;
 use Pod::Simple::XMLOutStream;
-print \*STDOUT, "# Pod::Simple version $Pod::Simple::VERSION\n";
+print $^STDOUT, "# Pod::Simple version $Pod::Simple::VERSION\n";
 
 do {
 my @output_lines = split m/[\cm\cj]+/, Pod::Simple::XMLOutStream->_out( q{
@@ -26,7 +26,7 @@ my @output_lines = split m/[\cm\cj]+/, Pod::Simple::XMLOutStream->_out( q{
 
 if(grep { m/Unknown directive/i }, @output_lines ) {
   ok 0;
-  print \*STDOUT, "# I saw an Unknown directive warning here! :\n",
+  print $^STDOUT, "# I saw an Unknown directive warning here! :\n",
     < map( {"#==> $_\n" }, @output_lines), "#\n#\n";
 } else {
   ok 1;
@@ -35,7 +35,7 @@ if(grep { m/Unknown directive/i }, @output_lines ) {
 };
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-print \*STDOUT, "# Now a control group, to make sure that =fishbladder DOES\n",
+print $^STDOUT, "# Now a control group, to make sure that =fishbladder DOES\n",
       "#  cause an 'unknown directive' error...\n";
       
 do {
@@ -56,7 +56,7 @@ if(grep { m/Unknown directive/i }, @output_lines ) {
   ok 1;
 } else {
   ok 0;
-  print \*STDOUT, "# But I didn't see an Unknows directive warning here! :\n",
+  print $^STDOUT, "# But I didn't see an Unknows directive warning here! :\n",
     < map( {"#==> $_\n" }, @output_lines), "#\n#\n";
 }
 
@@ -64,6 +64,6 @@ if(grep { m/Unknown directive/i }, @output_lines ) {
 
 
 
-print \*STDOUT, "#\n# And one for the road...\n";
+print $^STDOUT, "#\n# And one for the road...\n";
 ok 1;
 

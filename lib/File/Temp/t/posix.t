@@ -13,7 +13,7 @@ ok(1);
 # Not strict posix behaviour
 my@($fh, $tmpnam) =  tmpnam();
 
-print \*STDOUT, "# TMPNAM: in list context: $(dump::view($fh)) $tmpnam\n";
+print $^STDOUT, "# TMPNAM: in list context: $(dump::view($fh)) $tmpnam\n";
 
 # File is opened - make sure it exists
 ok( (-e $tmpnam ));
@@ -32,13 +32,13 @@ $fh = tmpfile();
 
 if (defined $fh) {
   ok( $fh );
-  print \*STDOUT, "# TMPFILE: tmpfile got FH $(dump::view($fh))\n";
+  print $^STDOUT, "# TMPFILE: tmpfile got FH $(dump::view($fh))\n";
 
   $fh->autoflush(1);
 
   # print something to it
   my $original = "Hello a test\n";
-  print \*STDOUT, "# TMPFILE: Wrote line: $original";
+  print $^STDOUT, "# TMPFILE: Wrote line: $original";
   print $fh, $original
     or die "Error printing to tempfile\n";
 
@@ -48,7 +48,7 @@ if (defined $fh) {
   # Read from it
   my $line = ~< $fh;
 
-  print \*STDOUT, "# TMPFILE: Read line: $line";
+  print $^STDOUT, "# TMPFILE: Read line: $line";
   ok( $original, $line);
 
   close($fh);

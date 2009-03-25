@@ -36,7 +36,7 @@ sub is_cmd { $^PROGRAM_NAME eq '-e' }
 sub my_return {
     my $val = shift;
     if(is_cmd) {
-	print \*STDOUT, $val;
+	print $^STDOUT, $val;
     }
     else {
 	return $val;
@@ -61,7 +61,7 @@ sub xsinit {
     $std = 1 unless scalar nelems @mods;
 
     if ($file eq "STDOUT") {
-	$fh = \*STDOUT;
+	$fh = $^STDOUT;
     }
     else {
 	$fh = IO::File->new("$file", ">");
@@ -194,13 +194,13 @@ sub ldopts {
     push(@mods, < static_ext()) if $std;
 
     my(@ns,$root,$sub,$extra,$archive,@archives);
-    print \*STDERR, "Searching ($(join ' ',@path)) for archives\n" if $Verbose;
+    print $^STDERR, "Searching ($(join ' ',@path)) for archives\n" if $Verbose;
     foreach my $mod ( @mods) {
 	@ns = split(m/::|\/|\\/, $mod);
 	$sub = @ns[-1];
 	$root = File::Spec->catdir(< @ns);
 	
-	print \*STDERR, "searching for '$($sub)$($lib_ext)'\n" if $Verbose;
+	print $^STDERR, "searching for '$($sub)$($lib_ext)'\n" if $Verbose;
 	foreach ( @path) {
 	    next unless -e ($archive = File::Spec->catdir($_,"auto",$root,"$sub$lib_ext"));
 	    push @archives, $archive;
@@ -237,11 +237,11 @@ sub ldopts {
 	MM->ext(join ' ', @( "-L$lpath", $libperl, < @potential_libs));
 
     my $ld_or_bs = $bsloadlibs || $ldloadlibs;
-    print \*STDERR, "bs: $bsloadlibs ** ld: $ldloadlibs" if $Verbose;
+    print $^STDERR, "bs: $bsloadlibs ** ld: $ldloadlibs" if $Verbose;
     my $ccdlflags = _ccdlflags();
     my $ldflags   = _ldflags();
     my $linkage = "$ccdlflags $ldflags $(join ' ',@archives) $ld_or_bs";
-    print \*STDERR, "ldopts: '$linkage'\n" if $Verbose;
+    print $^STDERR, "ldopts: '$linkage'\n" if $Verbose;
 
     return $linkage if scalar nelems @_;
     my_return("$linkage\n");

@@ -60,7 +60,7 @@ sub casetest {
 	( (nelems(%simple)/2) +
           (nelems(%$spec)/2) +
           (nelems(%none)/2) ) * nelems @funcs;
-    print \*STDOUT, "1..$tests\n";
+    print $^STDOUT, "1..$tests\n";
 
     my $test = 1;
 
@@ -70,7 +70,7 @@ sub casetest {
 	foreach my $func ( @funcs) {
 	    my $d = $func->($c);
 	    my $e = unidump($d);
-	    print \*STDOUT, $d eq pack("U0U", hex %simple{?$i}) ??
+	    print $^STDOUT, $d eq pack("U0U", hex %simple{?$i}) ??
 		"ok $test # $i -> $w\n" !! "not ok $test # $i -> $e ($w)" . sprintf('%x', ord($d)) . "\n";
 		$test++;
 	}
@@ -131,7 +131,7 @@ sub casetest {
 		# pack/unpack U has been EBCDICified, too, it would
 		# just undo our remapping.
 	    }
-	    print \*STDOUT, $w eq $e ??
+	    print $^STDOUT, $w eq $e ??
 		"ok $test # $i -> $w\n" !! "not ok $test # $h -> $e ($w)\n";
 		$test++;
 	}
@@ -143,7 +143,7 @@ sub casetest {
 	foreach my $func ( @funcs) {
 	    my $d = $func->($c);
 	    my $e = unidump($d);
-	    print \*STDOUT, $d eq $c ??
+	    print $^STDOUT, $d eq $c ??
 		"ok $test # $i -> $w\n" !! "not ok $test # $i -> $e ($w)\n";
 		$test++;
 	}

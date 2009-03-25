@@ -157,7 +157,7 @@ foreach ( @processes) {
                      "$process $copy1 (sign)");
 
       unless ($bit and $sign) {
-        printf \*STDOUT, "# Passed in \%s  (\%#x, \%i)\n# got back '\%s' (\%#x, \%i)\n",
+        printf $^STDOUT, "# Passed in \%s  (\%#x, \%i)\n# got back '\%s' (\%#x, \%i)\n",
           $copy1, $copy1, $copy1, $copy_s1, $copy_s1, $copy_s1;
         # use Devel::Peek; Dump $number; Dump $copy1; Dump $copy_s1;
       }

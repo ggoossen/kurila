@@ -6,7 +6,7 @@ BEGIN {
        # open2/3 supported on win32 (but not Borland due to CRT bugs)
        && (($^OS_NAME ne 'MSWin32' && $^OS_NAME ne 'NetWare') || config_value('cc') =~ m/^bcc/i))
     {
-	print \*STDOUT, "1..0\n";
+	print $^STDOUT, "1..0\n";
 	exit 0;
     }
     # make warnings fatal
@@ -20,11 +20,11 @@ my $perl = $^EXECUTABLE_NAME;
 
 sub ok($n, $result, ?$info) {
     if ($result) {
-	print \*STDOUT, "ok $n\n";
+	print $^STDOUT, "ok $n\n";
     }
     else {
-	print \*STDOUT, "not ok $n\n";
-	print \*STDOUT, "# $info\n" if $info;
+	print $^STDOUT, "not ok $n\n";
+	print $^STDOUT, "# $info\n" if $info;
     }
 }
 
@@ -41,10 +41,10 @@ sub cmd_line {
 }
 
 my ($pid, $reaped_pid);
-(\*STDOUT)->autoflush;
-(\*STDERR)->autoflush;
+($^STDOUT)->autoflush;
+($^STDERR)->autoflush;
 
-print \*STDOUT, "1..22\n";
+print $^STDOUT, "1..22\n";
 
 # basic
 ok 1, $pid = open3 \*WRITE, \*READ, \*ERROR, $perl, '-e', cmd_line(<<'EOF');
@@ -69,9 +69,9 @@ $pid = open3 \*WRITE, \*READ, \*READ, $perl, '-e', cmd_line(<<'EOF');
     print \*STDERR, scalar ~< *STDIN;
 EOF
 print \*WRITE, "ok 10\n";
-print \*STDOUT, scalar ~< *READ;
+print $^STDOUT, scalar ~< *READ;
 print \*WRITE, "ok 11\n";
-print \*STDOUT, scalar ~< *READ;
+print $^STDOUT, scalar ~< *READ;
 waitpid $pid, 0;
 
 # read and error together, error empty
@@ -81,9 +81,9 @@ $pid = open3 \*WRITE, \*READ, '', $perl, '-e', cmd_line(<<'EOF');
     print \*STDERR, scalar ~< *STDIN;
 EOF
 print \*WRITE, "ok 12\n";
-print \*STDOUT, scalar ~< *READ;
+print $^STDOUT, scalar ~< *READ;
 print \*WRITE, "ok 13\n";
-print \*STDOUT, scalar ~< *READ;
+print $^STDOUT, scalar ~< *READ;
 waitpid $pid, 0;
 
 # dup writer
@@ -93,7 +93,7 @@ $pid = open3 '<&PIPE_READ', \*READ, undef,
 close \*PIPE_READ;
 print \*PIPE_WRITE ,"ok 15\n";
 close \*PIPE_WRITE;
-print \*STDOUT, scalar ~< *READ;
+print $^STDOUT, scalar ~< *READ;
 waitpid $pid, 0;
 
 # dup reader
@@ -136,8 +136,8 @@ my $cmd = 'print(\*STDOUT, scalar(~< *STDIN))';
 $cmd = config_value('sh') =~ m/sh/ ?? "'$cmd'" !! cmd_line($cmd);
 try{$pid = open3 'WRITE', '>&STDOUT', 'ERROR', "$perl -e " . $cmd; };
 if ($^EVAL_ERROR) {
-	print \*STDOUT, "error $($^EVAL_ERROR->message)\n";
-	print \*STDOUT, "not ok 22\n";
+	print $^STDOUT, "error $($^EVAL_ERROR->message)\n";
+	print $^STDOUT, "not ok 22\n";
 }
 else {
 	print \*WRITE, "ok 22\n";

@@ -585,12 +585,12 @@ sub compile {
 	my $self = B::Deparse->new(< @args);
 	# First deparse command-line args
 	if ($^WARNING) { # deparse -w
-	    print \*STDOUT, qq(BEGIN \{ \$^W = $^WARNING; \}\n);
+	    print $^STDOUT, qq(BEGIN \{ \$^W = $^WARNING; \}\n);
 	}
 	if ($^INPUT_RECORD_SEPARATOR ne "\n" or defined $O::savebackslash) { # deparse -l and -0
 	    my $fs = perlstring($^INPUT_RECORD_SEPARATOR) || 'undef';
 	    my $bs = perlstring($O::savebackslash) || 'undef';
-	    print \*STDOUT, qq(BEGIN \{ \$^INPUT_RECORD_SEPARATOR = $fs; \$^OUTPUT_RECORD_SEPARATOR = $bs; \}\n);
+	    print $^STDOUT, qq(BEGIN \{ \$^INPUT_RECORD_SEPARATOR = $fs; \$^OUTPUT_RECORD_SEPARATOR = $bs; \}\n);
 	}
 	my @BEGINs  = @( B::begin_av->isa("B::AV") ?? < B::begin_av->ARRAY !! () );
 	my @UNITCHECKs = @( B::unitcheck_av->isa("B::AV")
@@ -605,25 +605,25 @@ sub compile {
 	$self->stash_subs();
 	$self->{+'curcv'} = main_cv;
 	$self->{+'curcvlex'} = undef;
-	print \*STDOUT, < $self->print_protos;
+	print $^STDOUT, < $self->print_protos;
 	@{$self->{'subs_todo'}} =
 	  sort {$a->[0] <+> $b->[0]}, @{$self->{?'subs_todo'}};
-	print \*STDOUT, $self->indent($self->deparse_root(main_root)), "\n"
+	print $^STDOUT, $self->indent($self->deparse_root(main_root)), "\n"
 	  unless null main_root;
 	my @text;
 	while (scalar(nelems @{$self->{?'subs_todo'}})) {
 	    push @text, < $self->next_todo;
 	}
-	print \*STDOUT, < $self->indent(join("", @text)), "\n" if (nelems @text);
+	print $^STDOUT, < $self->indent(join("", @text)), "\n" if (nelems @text);
 
 	# Print __DATA__ section, if necessary
 	my $laststash = defined $self->{?'curcop'}
 	    ?? $self->{'curcop'}->stash->NAME !! $self->{?'curstash'};
 	if (defined *{Symbol::fetch_glob($laststash."::DATA")}{IO}) {
-	    print \*STDOUT, "package $laststash;\n"
+	    print $^STDOUT, "package $laststash;\n"
 		unless $laststash eq $self->{?'curstash'};
-	    print \*STDOUT, "__DATA__\n";
-	    print \*STDOUT, readline(*{Symbol::fetch_glob($laststash."::DATA")});
+	    print $^STDOUT, "__DATA__\n";
+	    print $^STDOUT, readline(*{Symbol::fetch_glob($laststash."::DATA")});
 	}
     }
 }
@@ -1087,8 +1087,8 @@ sub deparse_root {
         $kid = $kid->sibling;
     }
     $self->walk_lineseq($op, \@kids,
-			sub { print \*STDOUT, $self->indent(@_[0].';');
-			      print \*STDOUT, "\n" unless @_[1] ==( (nelems @kids)-1);
+			sub { print $^STDOUT, $self->indent(@_[0].';');
+			      print $^STDOUT, "\n" unless @_[1] ==( (nelems @kids)-1);
 			  });
 }
 

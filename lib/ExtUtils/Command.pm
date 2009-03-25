@@ -74,7 +74,7 @@ Concatenates all files mentioned on command line to STDOUT.
 sub cat ()
 {
     expand_wildcards();
-    print \*STDOUT, $_ while ( ~< *ARGV);
+    print $^STDOUT, $_ while ( ~< *ARGV);
 }
 
 =item eqtime

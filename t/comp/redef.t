@@ -9,10 +9,10 @@ BEGIN {
 }
 
 sub ok($nr, $ok) { 
-    print \*STDOUT, $ok ?? "ok " !! "not ok ", $nr, "\n";
+    print $^STDOUT, $ok ?? "ok " !! "not ok ", $nr, "\n";
 }
 
-print \*STDOUT, "1..1\n";
+print $^STDOUT, "1..1\n";
 
 my $NEWPROTO = 'Prototype mismatch:';
 

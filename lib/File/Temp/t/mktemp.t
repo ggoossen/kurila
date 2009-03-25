@@ -21,7 +21,7 @@ my $template = File::Spec->catfile(File::Spec->tmpdir, 'wowserXXXX');
 
 @(my $fh, $template) =  mkstemp($template);
 
-print \*STDOUT, "# MKSTEMP: FH is $(dump::view($fh)) File is $template fileno=".fileno($fh)."\n";
+print $^STDOUT, "# MKSTEMP: FH is $(dump::view($fh)) File is $template fileno=".fileno($fh)."\n";
 # Check if the file exists
 ok( (-e $template) );
 
@@ -67,7 +67,7 @@ my $suffix = ".dat";
 
 @($fh, my $fname) =  mkstemps($template, $suffix);
 
-print \*STDOUT, "# MKSTEMPS: File is $template -> $fname fileno=".fileno($fh)."\n";
+print $^STDOUT, "# MKSTEMPS: File is $template -> $fname fileno=".fileno($fh)."\n";
 # Check if the file exists
 ok( (-e $fname) );
 
@@ -88,7 +88,7 @@ $template = File::Spec->catdir(File::Spec->tmpdir, 'tmpdirXXXXXX');
 
 my $tmpdir = mkdtemp($template);
 
-print \*STDOUT, "# MKDTEMP: Name is $tmpdir from template $template\n";
+print $^STDOUT, "# MKDTEMP: Name is $tmpdir from template $template\n";
 
 ok( (-d $tmpdir ) );
 
@@ -102,7 +102,7 @@ $template = File::Spec->catfile(File::Spec->tmpdir, 'mytestXXXXXX');
 
 my $tmpfile = mktemp($template);
 
-print \*STDOUT, "# MKTEMP: Tempfile is $template -> $tmpfile\n";
+print $^STDOUT, "# MKTEMP: Tempfile is $template -> $tmpfile\n";
 
 # Okay if template no longer has XXXXX in
 

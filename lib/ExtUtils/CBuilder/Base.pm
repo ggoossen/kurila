@@ -204,7 +204,7 @@ sub _do_link($self, $type, %< %args) {
 
 
 sub do_system($self, @< @cmd) {
-  print \*STDOUT, "$(join ' ',@cmd)\n" if !$self->{?quiet};
+  print $^STDOUT, "$(join ' ',@cmd)\n" if !$self->{?quiet};
   return !system(< @cmd);
 }
 

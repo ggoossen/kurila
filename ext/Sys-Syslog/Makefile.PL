@@ -18,7 +18,7 @@ my (@extra_params, @extra_prereqs);
 my $use_eventlog = eval "use Win32::EventLog; 1";
 
 if ($use_eventlog) {
-    print \*STDOUT, " * Win32::EventLog detected.\n";
+    print $^STDOUT, " * Win32::EventLog detected.\n";
     my $name = "PerlLog";
 
     push @extra_prereqs, "Win32::TieRegistry" => 0, "Win32::EventLog" => 0;
@@ -43,7 +43,7 @@ if ($use_eventlog) {
     }
 }
 elsif ($^OS_NAME =~ m/Win32/) {
-    print \*STDOUT, <<"NOTICE"
+    print $^STDOUT, <<"NOTICE"
  *** You're running on a Win32 system,  but you lack the Win32::EventLog\a
  *** module, part of the libwin32 distribution. Although Sys::Syslog can 
  *** be used without Win32::EventLog, it won't be very useful except for 

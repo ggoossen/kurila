@@ -7,7 +7,7 @@ BEGIN {
     $^INCLUDE_PATH = @( '../lib' );
     require './test.pl';
     unless ($has_perlio = PerlIO::Layer->find( 'perlio')) {
-	print \*STDOUT, <<EOF;
+	print $^STDOUT, <<EOF;
 # Since you don't have perlio you might get failures with UTF-8 locales.
 EOF
     }
@@ -91,7 +91,7 @@ do {
     local our $TODO = "use utf8; passed to eval";
     use utf8;
     my $w = 0;
-    local $^WARN_HOOK = sub { print \*STDOUT, "#(@_[0])\n"; $w++ };
+    local $^WARN_HOOK = sub { print $^STDOUT, "#(@_[0])\n"; $w++ };
     my $x = eval q/"\\/ . "\x{100}" . q/"/;
    
     ok($w == 0 && $x eq "\x{100}");

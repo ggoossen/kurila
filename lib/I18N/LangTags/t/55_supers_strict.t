@@ -6,7 +6,7 @@ use I18N::LangTags < qw(implicate_supers_strictly);
 use Test;
 BEGIN { plan tests => 19 };
 
-print \*STDOUT, "#\n# Testing strict (non-tight) insertion of super-ordinate language tags...\n#\n";
+print $^STDOUT, "#\n# Testing strict (non-tight) insertion of super-ordinate language tags...\n#\n";
 
 my @in = grep { m/\S/ }, split m/[\n\r]/, q{
  NIX => NIX
@@ -63,16 +63,16 @@ foreach my $in ( @in) {
   if( (nelems @out) == nelems @should
       and lc( join "\e", @out ) eq lc( join "\e", @should )
   ) {
-    print \*STDOUT, "#     Happily got [$(join ' ',@out)] from [$in]\n";
+    print $^STDOUT, "#     Happily got [$(join ' ',@out)] from [$in]\n";
     ok 1;
   } else {
     ok 0;
-    print \*STDOUT, "#!!Got:         [$(join ' ',@out)]\n",
+    print $^STDOUT, "#!!Got:         [$(join ' ',@out)]\n",
           "#!! but wanted: [$(join ' ',@should)]\n",
           "#!! from \"$in\"\n#\n";
   }
 }
 
-print \*STDOUT, "#\n#\n# Bye-bye!\n";
+print $^STDOUT, "#\n#\n# Bye-bye!\n";
 ok 1;
 

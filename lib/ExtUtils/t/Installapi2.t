@@ -39,8 +39,8 @@ env::temp_set_var('EU_ALWAYS_COPY', undef);
 chdir 'Big-Dummy';
 
 my $stdout = '';
-close \*STDOUT;
-open \*STDOUT, '>>', \$stdout or die;
+close $^STDOUT;
+open $^STDOUT, '>>', \$stdout or die;
 pm_to_blib( \%( 'lib/Big/Dummy.pm' => 'blib/lib/Big/Dummy.pm' ),
             'blib/lib/auto'
           );

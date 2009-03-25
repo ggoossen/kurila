@@ -50,7 +50,7 @@ for ( @prgs){
     $results =~ s/\n%[A-Z]+-[SIWEF]-.*$// if $Is_VMS;  # clip off DCL status msg
     $expected =~ s/\n+$//;
     if ($results ne $expected) {
-       print \*STDERR, "PROG: $switch\n$prog\n";
+       print $^STDERR, "PROG: $switch\n$prog\n";
     }
     is($results, $expected);
 }

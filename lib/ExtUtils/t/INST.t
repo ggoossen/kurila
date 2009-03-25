@@ -42,8 +42,8 @@ ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
   diag("chdir failed: $^OS_ERROR");
 
 my $stdout = '';
-close \*STDOUT;
-open \*STDOUT, '>>', \$stdout or die;
+close $^STDOUT;
+open $^STDOUT, '>>', \$stdout or die;
 my $mm = WriteMakefile(
     NAME          => 'Big::Dummy',
     VERSION_FROM  => 'lib/Big/Dummy.pm',

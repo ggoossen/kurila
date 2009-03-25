@@ -4,15 +4,15 @@
 my $test = 1;
 sub ok($ok, ?$name) {
 
-    printf \*STDOUT, "\%sok \%d - \%s\n", ($ok ?? "" !! "not "), $test, $name;
+    printf $^STDOUT, "\%sok \%d - \%s\n", ($ok ?? "" !! "not "), $test, $name;
 
-    printf \*STDOUT, "# Failed test at line \%d\n", (caller)[[2]] unless $ok;
+    printf $^STDOUT, "# Failed test at line \%d\n", (caller)[[2]] unless $ok;
 
     $test++;
     return $ok;
 }
 
-print \*STDOUT, q(1..22
+print $^STDOUT, q(1..22
 );
 
 do {

@@ -80,24 +80,24 @@ sub inherit {
 sub _dump  # sometimes useful for debugging
 {
     for my $pkg (sort keys %attr) {
-        print \*STDOUT, "\n$pkg";
+        print $^STDOUT, "\n$pkg";
         if ((nelems @{*{Symbol::fetch_glob("$pkg\::ISA")}})) {
-            print \*STDOUT, " (", join(", ", @{*{Symbol::fetch_glob("$pkg\::ISA")}}), ")";
+            print $^STDOUT, " (", join(", ", @{*{Symbol::fetch_glob("$pkg\::ISA")}}), ")";
         }
-        print \*STDOUT, "\n";
+        print $^STDOUT, "\n";
         my $fields = \%{*{Symbol::fetch_glob("$pkg\::FIELDS")}};
         for my $f (sort {$fields->{?$a} <+> $fields->{?$b}}, keys %$fields) {
             my $no = $fields->{?$f};
-            print \*STDOUT, "   $no: $f";
+            print $^STDOUT, "   $no: $f";
             my $fattr = %attr{$pkg}->[$no];
             if (defined $fattr) {
                 my @a;
                 push(@a, "public")    if $fattr ^&^ PUBLIC;
                 push(@a, "private")   if $fattr ^&^ PRIVATE;
                 push(@a, "inherited") if $fattr ^&^ INHERITED;
-                print \*STDOUT, "\t(", join(", ", @a), ")";
+                print $^STDOUT, "\t(", join(", ", @a), ")";
             }
-            print \*STDOUT, "\n";
+            print $^STDOUT, "\n";
         }
     }
 }

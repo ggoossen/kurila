@@ -41,7 +41,7 @@ foreach my $source_type ( @keys) {
 	$vars->{+source} = %types{?$source_type};
 	# The assignment can potentially trigger assertion failures, so it's
 	# useful to have the diagnostics about what was attempted printed first
-	print \*STDOUT, "# Assigning $source_type to $dest_type\n";
+	print $^STDOUT, "# Assigning $source_type to $dest_type\n";
 	$vars->{+dest} = $vars->{?source};
 	cmp_ok($vars->{?dest}, ((ref $vars->{?source}) ?? '\==' !! 'eq'), $vars->{?source});
     }

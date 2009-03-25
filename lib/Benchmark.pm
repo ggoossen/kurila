@@ -532,7 +532,7 @@ sub disablecache  {
 # --- Functions to process the 'time' data type
 
 sub new { my @t = @( mytime, times, (nelems @_) == 2 ?? @_[1] !! 0);
-	  print \*STDERR, "new=$(join ' ',@t)\n" if $Debug;
+	  print $^STDERR, "new=$(join ' ',@t)\n" if $Debug;
 	  bless \@t; }
 
 sub cpu_p { my@($r,$pu,$ps,$cu,$cs, ...) =  @{@_[0]}; $pu+$ps         ; }
@@ -610,7 +610,7 @@ sub timestr($tr, ?$style, ?$f) {
 }
 
 sub timedebug($msg, $t) {
-    print \*STDERR, "$msg",timestr($t),"\n" if $Debug;
+    print $^STDERR, "$msg",timestr($t),"\n" if $Debug;
 }
 
 # --- Functions implementing low-level support for timing loops
@@ -644,7 +644,7 @@ sub runloop($n, $c) {
         $subref  = _doeval($subcode);
     }
     die "runloop unable to compile '$c': $($^EVAL_ERROR->message)\ncode: $subcode\n" if $^EVAL_ERROR;
-    print \*STDERR, "runloop $n '$subcode'\n" if $Debug;
+    print $^STDERR, "runloop $n '$subcode'\n" if $Debug;
 
     # Wait for the user timer to tick.  This makes the error range more like 
     # -0.01, +0.  If we don't wait, then it's more like -0.01, +0.01.  This
@@ -672,7 +672,7 @@ sub timeit($n, $code) {
     die usage unless defined $code and
                      (!ref $code or ref $code eq 'CODE');
 
-    printf \*STDERR, "timeit $n $code\n" if $Debug;
+    printf $^STDERR, "timeit $n $code\n" if $Debug;
     my $cache_key = $n . ( ref( $code ) ?? 'c' !! 's' );
     if ($Do_Cache && exists %Cache{$cache_key} ) {
 	$wn = %Cache{?$cache_key};
@@ -822,15 +822,15 @@ sub timethis($n, $code, ?$title, ?$style){
     }
     local $^OUTPUT_AUTOFLUSH = 1;
     $style = "" unless defined $style;
-    printf(\*STDOUT, "\%10s: ", $title) unless $style eq 'none';
-    print \*STDOUT, timestr($t, $style, $Default_Format),"\n" unless $style eq 'none';
+    printf($^STDOUT, "\%10s: ", $title) unless $style eq 'none';
+    print $^STDOUT, timestr($t, $style, $Default_Format),"\n" unless $style eq 'none';
 
     $n = $forn if defined $forn;
 
     # A conservative warning to spot very silly tests.
     # Don't assume that your benchmark is ok simply because
     # you don't get this warning!
-    print \*STDOUT, "            (warning: too few iterations for a reliable count)\n"
+    print $^STDOUT, "            (warning: too few iterations for a reliable count)\n"
 	if     $n +< $Min_Count
 	    || ($t->real +< 1 && $n +< 1000)
 	    || $t->cpu_a +< $Min_CPU;
@@ -848,20 +848,20 @@ sub timethese($n, $alt, ?$style){
 
     my @names = sort keys %$alt;
     $style = "" unless defined $style;
-    print \*STDOUT, "Benchmark: " unless $style eq 'none';
+    print $^STDOUT, "Benchmark: " unless $style eq 'none';
     if ( $n +> 0 ) {
 	die "non-integer loopcount $n, stopped" if int($n)+<$n;
-	print \*STDOUT, "timing $n iterations of" unless $style eq 'none';
+	print $^STDOUT, "timing $n iterations of" unless $style eq 'none';
     } else {
-	print \*STDOUT, "running" unless $style eq 'none';
+	print $^STDOUT, "running" unless $style eq 'none';
     }
-    print \*STDOUT, " ", join(', ', @names) unless $style eq 'none';
+    print $^STDOUT, " ", join(', ', @names) unless $style eq 'none';
     unless ( $n +> 0 ) {
 	my $for = n_to_for( $n );
-	print \*STDOUT, ", each" if $n +> 1 && $style ne 'none';
-	print \*STDOUT, " for at least $for CPU seconds" unless $style eq 'none';
+	print $^STDOUT, ", each" if $n +> 1 && $style ne 'none';
+	print $^STDOUT, " for at least $for CPU seconds" unless $style eq 'none';
     }
-    print \*STDOUT, "...\n" unless $style eq 'none';
+    print $^STDOUT, "...\n" unless $style eq 'none';
 
     # we could save the results in an array and produce a summary here
     # sum, min, max, avg etc etc
@@ -1027,7 +1027,7 @@ sub cmpthese{
     my $format = join( ' ', map { "\%$($_)s" }, @col_widths ) . "\n";
     substr( $format, 1, 0, '-' );
     for (  @rows ) {
-	printf \*STDOUT, $format, < @$_;
+	printf $^STDOUT, $format, < @$_;
     }
 
     return \@rows ;

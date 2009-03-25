@@ -19,7 +19,7 @@ $SORT_ATTRS = 0 unless defined $SORT_ATTRS;
 sub new {
   my $self = shift;
   my $new = $self->SUPER::new(< @_);
-  $new->{+'output_fh'} ||= *STDOUT{IO};
+  $new->{+'output_fh'} ||= $^STDOUT{IO};
   #$new->accept_codes('VerbatimFormatted');
   return $new;
 }
@@ -29,7 +29,7 @@ sub new {
 sub _handle_element_start {
   # ($self, $element_name, $attr_hash_r)
   my $fh = @_[0]->{?'output_fh'};
-  DEBUG and print \*STDOUT, "++ @_[1]\n";
+  DEBUG and print $^STDOUT, "++ @_[1]\n";
   print $fh, "<", @_[1];
   foreach my $key (sort keys %{@_[2]}) {
       unless($key =~ m/^~/s) {
@@ -47,7 +47,7 @@ sub _handle_element_start {
 }
 
 sub _handle_text {
-  DEBUG and print \*STDOUT, "== \"@_[1]\"\n";
+  DEBUG and print $^STDOUT, "== \"@_[1]\"\n";
   if(length @_[1]) {
     my $text = @_[1];
     _xml_escape($text);
@@ -57,7 +57,7 @@ sub _handle_text {
 }
 
 sub _handle_element_end {
-  DEBUG and print \*STDOUT, "-- @_[1]\n";
+  DEBUG and print $^STDOUT, "-- @_[1]\n";
   print @_[0]->{?'output_fh'} ,"</", @_[1], ">";
   return;
 }

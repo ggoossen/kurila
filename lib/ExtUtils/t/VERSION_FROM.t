@@ -29,8 +29,8 @@ close $mpl;
 END { unlink 'Version' }
 
 my $stdout = '';
-close \*STDOUT;
-open \*STDOUT, '>>', \$stdout or die;
+close $^STDOUT;
+open $^STDOUT, '>>', \$stdout or die;
 my $mm = WriteMakefile(
     NAME         => 'Version',
     VERSION_FROM => 'Version'

@@ -10,11 +10,11 @@
 use Storable < qw(freeze thaw dclone);
 our ($debugging, $verbose);
 
-print \*STDOUT, "1..8\n";
+print $^STDOUT, "1..8\n";
 
 sub ok($testno, $ok) {
-    print \*STDOUT, "not " unless $ok;
-    print \*STDOUT, "ok $testno\n";
+    print $^STDOUT, "not " unless $ok;
+    print $^STDOUT, "ok $testno\n";
 }
 
 
@@ -77,7 +77,7 @@ for my $i (0 .. $hashsize -1) {
 }
 
 
-print \*STDERR, < Data::Dumper::Dumper(\%a1) if ($verbose and $gotdd);
+print $^STDERR, < Data::Dumper::Dumper(\%a1) if ($verbose and $gotdd);
 
 
 # Copy the hash, element by element in order of the keys

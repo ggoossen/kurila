@@ -6,15 +6,15 @@ BEGIN {
 	require warnings;
     };
     if ($^EVAL_ERROR) {
-	print \*STDOUT, "1..0\n";
-	print \*STDOUT, $^EVAL_ERROR;
+	print $^STDOUT, "1..0\n";
+	print $^STDOUT, $^EVAL_ERROR;
 	exit;
     }
 }
 
 use MIME::Base64 < qw(decode_base64);
 
-print \*STDOUT, "1..1\n";
+print $^STDOUT, "1..1\n";
 
 use warnings;
 
@@ -46,10 +46,10 @@ $a = do {
 warn;
 
 for ( @warn) {
-    print \*STDOUT, "# $_";
+    print $^STDOUT, "# $_";
 }
 
-print \*STDOUT, "not " unless join("", @warn) eq <<"EOT"; print \*STDOUT, "ok 1\n";
+print $^STDOUT, "not " unless join("", @warn) eq <<"EOT"; print $^STDOUT, "ok 1\n";
 Warning: something's wrong
 Premature end of base64 data
 Premature padding of base64 data

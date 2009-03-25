@@ -91,24 +91,24 @@ pod2usage(-verbose=>2) if %Opts{?man};
 
 if(exists %Opts{v} ){
     if( !%Opts{?v} ) {
-        print \*STDOUT, "\nModule::CoreList has info on the following perl versions:\n";
-        print \*STDOUT, "$_\n" for sort keys %Module::CoreList::version;
-        print \*STDOUT, "\n";
+        print $^STDOUT, "\nModule::CoreList has info on the following perl versions:\n";
+        print $^STDOUT, "$_\n" for sort keys %Module::CoreList::version;
+        print $^STDOUT, "\n";
         exit 0;
     }
 
     %Opts{+v} = numify_version( %Opts{?v} );
     my $version_hash = Module::CoreList->find_version(%Opts{v});
     if( !$version_hash ) {
-        print \*STDOUT, "\nModule::CoreList has no info on perl v%Opts{?v}\n\n";
+        print $^STDOUT, "\nModule::CoreList has no info on perl v%Opts{?v}\n\n";
         exit 1;
     }
 
     if ( !nelems @ARGV ) {
-	print \*STDOUT, "\nThe following modules were in perl v%Opts{?v} CORE\n";
-	print \*STDOUT, "$_ ", $version_hash->{?$_} || " ","\n"
+	print $^STDOUT, "\nThe following modules were in perl v%Opts{?v} CORE\n";
+	print $^STDOUT, "$_ ", $version_hash->{?$_} || " ","\n"
 	for sort keys %$version_hash;
-	print \*STDOUT, "\n";
+	print $^STDOUT, "\n";
 	exit 0;
     }
 }
@@ -143,7 +143,7 @@ while ((nelems @ARGV)) {
 		module_version($_, $ver) for  @mod;
 	    } else {
 		$ver ^|^= '';
-		print \*STDOUT, "\n$mod $ver has no match in CORE (or so I think)\n";
+		print $^STDOUT, "\n$mod $ver has no match in CORE (or so I think)\n";
 	    }
 
 	}
@@ -157,7 +157,7 @@ sub module_version {
     if ( %Opts{?v} ) {
 	my $version_hash = Module::CoreList->find_version(%Opts{v});
 	if ($version_hash) {
-	    print \*STDOUT, $mod, " ", $version_hash->{?$mod} || 'undef', "\n";
+	    print $^STDOUT, $mod, " ", $version_hash->{?$mod} || 'undef', "\n";
 	    return;
 	}
 	else { die "Shouldn't happen" }
@@ -177,19 +177,19 @@ sub module_version {
         $msg .= " was not in CORE (or so I think)";
     }
 
-    print \*STDOUT, "\n",$msg,"\n";
+    print $^STDOUT, "\n",$msg,"\n";
 
     if(defined $ret and exists %Opts{a} and %Opts{?a}){
         for my $v(
             sort keys %Module::CoreList::version ){
 
-            printf \*STDOUT, "  \%-10s \%-10s\n",
+            printf $^STDOUT, "  \%-10s \%-10s\n",
                 $v,
                 %Module::CoreList::version{$v}->{?$mod}
                     || 'undef'
                     if exists %Module::CoreList::version{$v}->{$mod};
         }
-        print \*STDOUT, "\n";
+        print $^STDOUT, "\n";
     }
 }
 

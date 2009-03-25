@@ -35,7 +35,7 @@ if (env::var('PERL_BUILD_EXPAND_CONFIG_VARS')) {
  
 open my $out,">", "$file" or die "Can't create $file: $^OS_ERROR";
  
-print \*STDOUT, "Extracting $file (with variable substitutions)\n";
+print $^STDOUT, "Extracting $file (with variable substitutions)\n";
  
 # In this section, perl variables will be expanded during extraction.
 # You can use %Config{...} to use Configure variables.

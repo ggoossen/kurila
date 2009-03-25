@@ -94,7 +94,7 @@ is_deeply(\@a, \@('a', 'b'));
 @a = grep { !m/(,v$|~$|\.(pm|ori?g|rej)$)/ }, @a;
 @a = grep { !m/test.pl/ }, @a if $^OS_NAME eq 'VMS';
 
-print \*STDOUT, "# $(join ' ',@a)\n";
+print $^STDOUT, "# $(join ' ',@a)\n";
 
 is_deeply(\@a, \@(($^OS_NAME eq 'VMS'?? 'test.' !! 'TEST'), 'a', 'b'));
 
@@ -125,13 +125,13 @@ for ( @f_names) {
 my $pat = "*.pl";
 
 my @g_names = bsd_glob($pat, 0);
-print \*STDOUT, "# f_names = $(join ' ',@f_names)\n";
-print \*STDOUT, "# g_names = $(join ' ',@g_names)\n";
+print $^STDOUT, "# f_names = $(join ' ',@f_names)\n";
+print $^STDOUT, "# g_names = $(join ' ',@g_names)\n";
 is_deeply(\@g_names, \@f_names);
 
 my @g_alpha = bsd_glob($pat);
-print \*STDOUT, "# f_alpha = $(join ' ',@f_alpha)\n";
-print \*STDOUT, "# g_alpha = $(join ' ',@g_alpha)\n";
+print $^STDOUT, "# f_alpha = $(join ' ',@f_alpha)\n";
+print $^STDOUT, "# g_alpha = $(join ' ',@g_alpha)\n";
 is_deeply(\@g_alpha, \@f_alpha);
 
 unlink < @f_names;

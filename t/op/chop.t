@@ -27,78 +27,78 @@ is (join('', @bar), 'hi there!');
 
 $_ = "foo\n\n";
 $got = chomp();
-ok ($got == 1) or print \*STDOUT, "# got $got\n";
+ok ($got == 1) or print $^STDOUT, "# got $got\n";
 is ($_, "foo\n");
 
 $_ = "foo\n";
 $got = chomp();
-ok ($got == 1) or print \*STDOUT, "# got $got\n";
+ok ($got == 1) or print $^STDOUT, "# got $got\n";
 is ($_, "foo");
 
 $_ = "foo";
 $got = chomp();
-ok ($got == 0) or print \*STDOUT, "# got $got\n";
+ok ($got == 0) or print $^STDOUT, "# got $got\n";
 is ($_, "foo");
 
 $_ = "foo";
 $^INPUT_RECORD_SEPARATOR = "oo";
 $got = chomp();
-ok ($got == 2) or print \*STDOUT, "# got $got\n";
+ok ($got == 2) or print $^STDOUT, "# got $got\n";
 is ($_, "f");
 
 $_ = "bar";
 $^INPUT_RECORD_SEPARATOR = "oo";
 $got = chomp();
-ok ($got == 0) or print \*STDOUT, "# got $got\n";
+ok ($got == 0) or print $^STDOUT, "# got $got\n";
 is ($_, "bar");
 
 $_ = "f\n\n\n\n\n";
 $^INPUT_RECORD_SEPARATOR = "";
 $got = chomp();
-ok ($got == 5) or print \*STDOUT, "# got $got\n";
+ok ($got == 5) or print $^STDOUT, "# got $got\n";
 is ($_, "f");
 
 $_ = "f\n\n";
 $^INPUT_RECORD_SEPARATOR = "";
 $got = chomp();
-ok ($got == 2) or print \*STDOUT, "# got $got\n";
+ok ($got == 2) or print $^STDOUT, "# got $got\n";
 is ($_, "f");
 
 $_ = "f\n";
 $^INPUT_RECORD_SEPARATOR = "";
 $got = chomp();
-ok ($got == 1) or print \*STDOUT, "# got $got\n";
+ok ($got == 1) or print $^STDOUT, "# got $got\n";
 is ($_, "f");
 
 $_ = "f";
 $^INPUT_RECORD_SEPARATOR = "";
 $got = chomp();
-ok ($got == 0) or print \*STDOUT, "# got $got\n";
+ok ($got == 0) or print $^STDOUT, "# got $got\n";
 is ($_, "f");
 
 $_ = "xx";
 $^INPUT_RECORD_SEPARATOR = "xx";
 $got = chomp();
-ok ($got == 2) or print \*STDOUT, "# got $got\n";
+ok ($got == 2) or print $^STDOUT, "# got $got\n";
 is ($_, "");
 
 $_ = "axx";
 $^INPUT_RECORD_SEPARATOR = "xx";
 $got = chomp();
-ok ($got == 2) or print \*STDOUT, "# got $got\n";
+ok ($got == 2) or print $^STDOUT, "# got $got\n";
 is ($_, "a");
 
 $_ = "axx";
 $^INPUT_RECORD_SEPARATOR = "yy";
 $got = chomp();
-ok ($got == 0) or print \*STDOUT, "# got $got\n";
+ok ($got == 0) or print $^STDOUT, "# got $got\n";
 is ($_, "axx");
 
 # This case once mistakenly behaved like paragraph mode.
 $_ = "ab\n";
 $^INPUT_RECORD_SEPARATOR = \3;
 $got = chomp();
-ok ($got == 0) or print \*STDOUT, "# got $got\n";
+ok ($got == 0) or print $^STDOUT, "# got $got\n";
 is ($_, "ab\n");
 
 # Go Unicode.

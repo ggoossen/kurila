@@ -8,34 +8,34 @@ use Config;
 no warnings 'once';
 
 my $test = 1;
-print \*STDOUT, "1..29\n";
-print \*STDOUT, "ok 1\n";
+print $^STDOUT, "1..29\n";
+print $^STDOUT, "ok 1\n";
 
-open(my $dupout, ">&", \*STDOUT);
-open(my $duperr, ">&", \*STDERR);
+open(my $dupout, ">&", $^STDOUT);
+open(my $duperr, ">&", $^STDERR);
 
-open(\*STDOUT, ">","Io.dup")  || die "Can't open stdout";
-open(\*STDERR, ">&", \*STDOUT) || die "Can't open stderr";
+open($^STDOUT, ">","Io.dup")  || die "Can't open stdout";
+open($^STDERR, ">&", $^STDOUT) || die "Can't open stderr";
 
-iohandle::output_autoflush(\*STDERR, 1);
-iohandle::output_autoflush(\*STDOUT, 1);
+iohandle::output_autoflush($^STDERR, 1);
+iohandle::output_autoflush($^STDOUT, 1);
 
-print \*STDOUT, "ok 2\n";
-print \*STDERR, "ok 3\n";
+print $^STDOUT, "ok 2\n";
+print $^STDERR, "ok 3\n";
 
 # Since some systems don't have echo, we use Perl.
 my $echo = qq{$^EXECUTABLE_NAME -le "print \\\\*STDOUT, q(ok \%d)"};
 
 my $cmd = sprintf $echo, 4;
-print \*STDOUT, `$cmd`;
+print $^STDOUT, `$cmd`;
 
 $cmd = sprintf "$echo 1>&2", 5;
 $cmd = sprintf $echo, 5 if $^OS_NAME eq 'MacOS';  # don't know if we can do this ...
-print \*STDOUT, `$cmd`;
+print $^STDOUT, `$cmd`;
 
 # KNOWN BUG system() does not honor STDOUT redirections on VMS.
 if( $^OS_NAME eq 'VMS' ) {
-    print \*STDOUT, "not ok $_ # TODO system() not honoring STDOUT redirect on VMS\n"
+    print $^STDOUT, "not ok $_ # TODO system() not honoring STDOUT redirect on VMS\n"
       for 6..7;
 }
 else {
@@ -48,18 +48,18 @@ else {
     }
 }
 
-close(\*STDOUT) or die "Could not close: $^OS_ERROR";
-close(\*STDERR) or die "Could not close: $^OS_ERROR";
+close($^STDOUT) or die "Could not close: $^OS_ERROR";
+close($^STDERR) or die "Could not close: $^OS_ERROR";
 
-open(\*STDOUT, ">&", $dupout) or die "Could not open: $^OS_ERROR";
-open(\*STDERR, ">&", $duperr) or die "Could not open: $^OS_ERROR";
+open($^STDOUT, ">&", $dupout) or die "Could not open: $^OS_ERROR";
+open($^STDERR, ">&", $duperr) or die "Could not open: $^OS_ERROR";
 
-if (($^OS_NAME eq 'MSWin32') || ($^OS_NAME eq 'NetWare') || ($^OS_NAME eq 'VMS')) { print \*STDOUT, `type Io.dup` }
+if (($^OS_NAME eq 'MSWin32') || ($^OS_NAME eq 'NetWare') || ($^OS_NAME eq 'VMS')) { print $^STDOUT, `type Io.dup` }
 elsif ($^OS_NAME eq 'MacOS') { system 'catenate Io.dup' }
 else                   { system 'cat Io.dup' }
 unlink 'Io.dup';
 
-print \*STDOUT, "ok 8\n";
+print $^STDOUT, "ok 8\n";
 
 open(my $f,">&",1) or die "Cannot dup to numeric 1: $^OS_ERROR";
 print $f, "ok 9\n";
@@ -91,20 +91,20 @@ curr_test(13);
 SKIP: do {
     skip("need perlio", 14) unless config_value("useperlio");
     
-    ok(open($f, ">&", \*STDOUT));
-    isnt(fileno($f), fileno(\*STDOUT));
+    ok(open($f, ">&", $^STDOUT));
+    isnt(fileno($f), fileno($^STDOUT));
     close $f;
 
-    ok(open($f, "<&=", \*STDIN)) or _diag $^OS_ERROR;
-    is(fileno($f), fileno(\*STDIN));
+    ok(open($f, "<&=", $^STDIN)) or _diag $^OS_ERROR;
+    is(fileno($f), fileno($^STDIN));
     close $f;
 
-    ok(open($f, ">&=", \*STDOUT));
-    is(fileno($f), fileno(\*STDOUT));
+    ok(open($f, ">&=", $^STDOUT));
+    is(fileno($f), fileno($^STDOUT));
     close $f;
 
-    ok(open($f, ">&=", \*STDERR));
-    is(fileno($f), fileno(\*STDERR));
+    ok(open($f, ">&=", $^STDERR));
+    is(fileno($f), fileno($^STDERR));
     close $f;
 
     open(my $gfh, ">", "dup$^PID") or die;

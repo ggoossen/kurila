@@ -22,7 +22,7 @@ $file .= '.com' if $^OS_NAME eq 'VMS';
 # Create output file.
 open my $out,">", "$file" or die "Can't create $file: $^OS_ERROR";
 
-print \*STDOUT, "Extracting $file (with variable substitutions)\n";
+print $^STDOUT, "Extracting $file (with variable substitutions)\n";
 
 # In this section, perl variables will be expanded during extraction.
 # You can use $Config{...} to use Configure variables.

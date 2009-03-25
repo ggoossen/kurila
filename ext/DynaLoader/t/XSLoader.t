@@ -6,7 +6,7 @@ use Config;
 BEGIN {
     eval "use Test::More";
     if ($^EVAL_ERROR) {
-        print \*STDOUT, "1..0 # Skip: Test::More not available\n";
+        print $^STDOUT, "1..0 # Skip: Test::More not available\n";
         die "Test::More not available\n";
     }
 
