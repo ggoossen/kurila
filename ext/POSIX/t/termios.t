@@ -35,14 +35,14 @@ SKIP: do {
 };
 
 SKIP: do {
-    -t *STDOUT or skip("STDOUT not a tty", 2);
+    -t $^STDOUT or skip("STDOUT not a tty", 2);
     $r = try { $termios->getattr(1) };
     is( $^EVAL_ERROR, '', "calling getattr(1)" );
     ok( defined $r, "\tchecking if the returned value is defined: $r" );
 };
 
 SKIP: do {
-    -t *STDERR or skip("STDERR not a tty", 2);
+    -t $^STDERR or skip("STDERR not a tty", 2);
     $r = try { $termios->getattr(2) };
     is( $^EVAL_ERROR, '', "calling getattr(2)" );
     ok( defined $r, "\tchecking if the returned value is defined: $r" );
