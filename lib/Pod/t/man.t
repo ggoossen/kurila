@@ -12,14 +12,14 @@ use TestInit;
 
 BEGIN {
     $^OUTPUT_AUTOFLUSH = 1;
-    print \*STDOUT, "1..43\n";
+    print $^STDOUT, "1..43\n";
 }
 
 use Pod::Man;
 use charnames ':full';
 use utf8;
 
-print \*STDOUT, "ok 1\n";
+print $^STDOUT, "ok 1\n";
 
 my $parser = Pod::Man->new or die "Cannot create parser\n";
 my $n = 2;
@@ -75,10 +75,10 @@ sub test_outtmp {
     };
     close $out;
     if ($output eq $expected) {
-        print \*STDOUT, "ok $n\n";
+        print $^STDOUT, "ok $n\n";
     } else {
-        print \*STDOUT, "not ok $n\n";
-        print \*STDOUT, "$msg\nEXPECTED:\n$expected\nOUTPUT:\n$output\n";
+        print $^STDOUT, "not ok $n\n";
+        print $^STDOUT, "$msg\nEXPECTED:\n$expected\nOUTPUT:\n$output\n";
     }
     $n++;
 }

@@ -6,7 +6,7 @@ sub hashes($match,$opts) {
 	return '{I{'.length($match).'}I}';
 }
 
-print \*STDOUT, < form
+print $^STDOUT, < form
 	\%(field=>\@(qr/(#+)/=>\&hashes)),
 	"[###|###############################]",
 	\@(1,2,3), \qw[First Second Last];

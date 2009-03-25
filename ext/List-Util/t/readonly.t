@@ -24,7 +24,7 @@ $var = \2;
 ok( !readonly($var),	'reference to constant');
 ok( readonly($$var),	'de-reference to constant');
 
-ok( !readonly(*STDOUT),	'glob');
+ok( !readonly($^STDOUT),	'glob');
 
 sub tryreadonly
 {

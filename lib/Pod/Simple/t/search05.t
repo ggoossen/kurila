@@ -9,12 +9,12 @@ use Pod::Simple::Search;
 use Test;
 BEGIN { plan tests => 15 }
 
-print \*STDOUT, "# Some basic sanity tests...\n";
+print $^STDOUT, "# Some basic sanity tests...\n";
 
 my $x = Pod::Simple::Search->new;
 die "Couldn't make an object!?" unless ok defined $x;
-print \*STDOUT, "# New object: $(dump::view($x))\n";
-print \*STDOUT, "# Version: ", $x->VERSION, "\n";
+print $^STDOUT, "# New object: $(dump::view($x))\n";
+print $^STDOUT, "# Version: ", $x->VERSION, "\n";
 ok defined $x->can('callback');
 ok defined $x->can('dir_prefix');
 ok defined $x->can('inc');
@@ -29,11 +29,11 @@ ok defined $x->can('contains_pod');
 ok defined $x->can('find');
 ok defined $x->can('simplify_name');
 
-print \*STDOUT, "# Testing state dumping...\n";
-print \*STDOUT, $x->_state_as_string;
+print $^STDOUT, "# Testing state dumping...\n";
+print $^STDOUT, $x->_state_as_string;
 $x->inc("I\nLike  Pie!\t!!");
-print \*STDOUT, $x->_state_as_string;
+print $^STDOUT, $x->_state_as_string;
 
-print \*STDOUT, "# bye\n";
+print $^STDOUT, "# bye\n";
 ok 1;
 

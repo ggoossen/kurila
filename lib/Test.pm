@@ -23,8 +23,8 @@ our @EXPORT    = qw(&plan &ok &skip);
 our @EXPORT_OK = qw($ntest $TESTOUT $TESTERR);
 
 $^OUTPUT_AUTOFLUSH=1;
-our $TESTOUT = *STDOUT{IO};
-our $TESTERR = *STDERR{IO};
+our $TESTOUT = $^STDOUT{IO};
+our $TESTERR = $^STDERR{IO};
 
 # Use of this variable is strongly discouraged.  It is set mainly to
 # help test coverage analyzers know which test is running.

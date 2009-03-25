@@ -67,7 +67,7 @@ push @Expected_Details, \%( 'ok'      => 1,
                           reason    => 'i need both'
                         );
 
-for ($start_test..$Test->current_test) { print \*STDOUT, "ok $_\n" }
+for ($start_test..$Test->current_test) { print $^STDOUT, "ok $_\n" }
 $Test->output($out_fh);
 $Test->todo_output($todo_fh);
 
@@ -80,7 +80,7 @@ push @Expected_Details, \%( 'ok'      => 1,
                         );
 
 $Test->current_test(6);
-print \*STDOUT, "ok 6 - current_test incremented\n";
+print $^STDOUT, "ok 6 - current_test incremented\n";
 push @Expected_Details, \%( 'ok'      => 1,
                           actual_ok => undef,
                           name      => undef,

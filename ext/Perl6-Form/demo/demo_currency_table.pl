@@ -15,7 +15,7 @@ my %format = %(
 );
 
 while (my@($style, $format) =@( each %format)) {
-	print \*STDOUT, < form
+	print $^STDOUT, < form
 		"$style:\n\n",
 		"    $format",
 		\@amounts,

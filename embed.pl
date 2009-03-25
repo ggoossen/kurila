@@ -132,7 +132,7 @@ sub munge_c_files () {
 	    }
 	    $repl;
           })}g;
-	print \*STDOUT, $_;
+	print $^STDOUT, $_;
 	close *ARGV if eof;	# restart $.
     }
     exit;

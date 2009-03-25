@@ -4,7 +4,7 @@ BEGIN { plan tests => 22 };
 BEGIN { ok 1 }
 use I18N::LangTags (':ALL');
 
-print \*STDOUT, "#  Loaded from ", $^INCLUDED{?'I18N/LangTags.pm'} || "??", "\n";
+print $^STDOUT, "#  Loaded from ", $^INCLUDED{?'I18N/LangTags.pm'} || "??", "\n";
 
 ok lc locale2language_tag('en'),    'en';
 ok lc locale2language_tag('en_US'),    'en-us';
@@ -31,5 +31,5 @@ ok lc locale2language_tag('zh_TW'),         'zh-tw';
 ok lc locale2language_tag('zh_TW.euctw'),   'zh-tw';
 ok lc locale2language_tag('zh_TW.utf8'),    'zh-tw';
 
-print \*STDOUT, "# So there!\n";
+print $^STDOUT, "# So there!\n";
 ok 1;

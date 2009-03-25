@@ -66,7 +66,7 @@ sub pod2html {
 #--------------------------------------------------------------------------
 
 sub bad_opts     { die < _help_message();         }
-sub help_message { print \*STDOUT, < _help_message() }
+sub help_message { print $^STDOUT, < _help_message() }
 
 #--------------------------------------------------------------------------
 

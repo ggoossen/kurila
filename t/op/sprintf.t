@@ -50,7 +50,7 @@ while ( ~< *DATA) {
     push @tests, \@($template, $evalData, $result, $comment, $data);
 }
 
-print \*STDOUT, '1..', scalar nelems @tests, "\n";
+print $^STDOUT, '1..', scalar nelems @tests, "\n";
 
 $^WARN_HOOK = sub {
     if (@_[0]->{?description} =~ m/^Invalid conversion/) {
@@ -103,14 +103,14 @@ for my  $i (1 .. nelems(@tests)) {
     }
 
     if ($x eq ">$result<") {
-        print \*STDOUT, "ok $i\n";
+        print $^STDOUT, "ok $i\n";
     }
     elsif ($skip) {
-	print \*STDOUT, "ok $i # skip $comment\n";
+	print $^STDOUT, "ok $i # skip $comment\n";
     }
     elsif ($y eq ">$result<")	# Some C libraries always give
     {				# three-digit exponent
-		print(\*STDOUT, "ok $i # >$result< $x three-digit exponent accepted\n");
+		print($^STDOUT, "ok $i # >$result< $x three-digit exponent accepted\n");
     }
 	elsif ($result =~ m/[-+]\d{3}$/ &&
 		   # Suppress tests with modulo of exponent >= 100 on platforms
@@ -118,12 +118,12 @@ for my  $i (1 .. nelems(@tests)) {
 		   ((!try {require POSIX}) || # Costly: only do this if we must!
 			(length(&POSIX::DBL_MAX( < @_ )) - rindex(&POSIX::DBL_MAX( < @_ ), '+')) == 3))
 	{
-		print(\*STDOUT, "ok $i # >$template< >$data< >$result<",
+		print($^STDOUT, "ok $i # >$template< >$data< >$result<",
 			  " Suppressed: exponent out of range?\n");
 	}
     else {
 	$y = ($x eq $y ?? "" !! " => $y");
-	print(\*STDOUT, "not ok $i >$template< >$data< >$result< $x$y",
+	print($^STDOUT, "not ok $i >$template< >$data< >$result< $x$y",
 	    $comment ?? " # $comment\n" !! "\n");
     }
 }

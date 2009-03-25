@@ -61,7 +61,7 @@ sub parse_from_file {
          # no temp file, just a pipe!
 
   # Thanks to Brendan O'Dea for contributing the following block
-  if('Pod::Perldoc::IS_Linux' and -t *STDOUT
+  if('Pod::Perldoc::IS_Linux' and -t $^STDOUT
     and my @($cols) = `stty -a` =~ m/\bcolumns\s+(\d+)/
   ) {
     my $c = $cols * 39 / 40;
@@ -82,7 +82,7 @@ sub parse_from_file {
   
   defined(&Pod::Perldoc::DEBUG)
    and Pod::Perldoc::DEBUG()
-   and print \*STDOUT, "About to run $command\n";
+   and print $^STDOUT, "About to run $command\n";
   ;
   
   my $rslt = `$command`;
@@ -92,18 +92,18 @@ sub parse_from_file {
   if( $self->{?'__filter_nroff'} ) {
     defined(&Pod::Perldoc::DEBUG)
      and &Pod::Perldoc::DEBUG()
-     and print \*STDOUT, "filter_nroff is set, so filtering...\n";
+     and print $^STDOUT, "filter_nroff is set, so filtering...\n";
     $rslt = $self->___Do_filter_nroff($rslt);
   } else {
     defined(&Pod::Perldoc::DEBUG)
      and Pod::Perldoc::DEBUG()
-     and print \*STDOUT, "filter_nroff isn't set, so not filtering.\n";
+     and print $^STDOUT, "filter_nroff isn't set, so not filtering.\n";
   }
 
   if (($err = $^CHILD_ERROR)) {
     defined(&Pod::Perldoc::DEBUG)
      and Pod::Perldoc::DEBUG()
-     and print \*STDOUT, "Nonzero exit ($^CHILD_ERROR) while running $command.\n",
+     and print $^STDOUT, "Nonzero exit ($^CHILD_ERROR) while running $command.\n",
                "Falling back to Pod::Perldoc::ToPod\n ",
     ;
     # A desperate fallthru:

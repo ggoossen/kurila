@@ -133,7 +133,7 @@ package main;
 # $Storable::DEBUGME = 1;
 foreach my $count (1..3) {
   foreach my $immortal (keys %::immortals) {
-    print \*STDOUT, "# $immortal x $count\n";
+    print $^STDOUT, "# $immortal x $count\n";
     my $i =  RETURNS_IMMORTALS->make ($immortal, $count);
 
     my $f = freeze ($i);

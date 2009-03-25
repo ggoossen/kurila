@@ -27,7 +27,7 @@ require Pod::Simple::XMLOutStream; ok 1;
 
 sub e ($x, $y) { Pod::Simple::DumpAsXML->_duo($x, $y) }
 
-print \*STDOUT, "# Simple identity tests...\n";
+print $^STDOUT, "# Simple identity tests...\n";
 
 &ok( < e "", "" );
 &ok( < e "\n", "", );
@@ -35,7 +35,7 @@ print \*STDOUT, "# Simple identity tests...\n";
 &ok( < e "puppies\n\n\n\n", "", );
 
 
-print \*STDOUT, "# Contentful identity tests...\n";
+print $^STDOUT, "# Contentful identity tests...\n";
 
 &ok( < e "=pod\n\nFoo\n",         "=pod\n\nFoo\n"         );
 &ok( < e "=pod\n\n\n\nFoo\n\n\n", "=pod\n\n\n\nFoo\n\n\n" );
@@ -57,7 +57,7 @@ print \*STDOUT, "# Contentful identity tests...\n";
 &ok( < e "=head1 Foo\n\n=cut\n",  "\n\n\n\n=head1 Foo\n"  );
 
 
-print \*STDOUT, "# Simple XMLification tests...\n";
+print $^STDOUT, "# Simple XMLification tests...\n";
 
 ok( Pod::Simple::XMLOutStream->_out("\n\n\nprint \$^T;\n\n\n"),
     qq{<Document\ncontentless="1"></Document>}
@@ -87,8 +87,8 @@ ok( Pod::Simple::XMLOutStream->_out("=head1 Chacha\n\nFoo\n"),
 );
 
 
-print \*STDOUT, "# Wrapping up... one for the road...\n";
+print $^STDOUT, "# Wrapping up... one for the road...\n";
 ok 1;
-print \*STDOUT, "# --- Done with ", __FILE__, " --- \n";
+print $^STDOUT, "# --- Done with ", __FILE__, " --- \n";
 
 

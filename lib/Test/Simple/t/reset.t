@@ -57,7 +57,7 @@ sub ok($test, $name) {
     $ok .= "ok $test_num";
     $ok .= " - $name" if defined $name;
     $ok .= "\n";
-    print \*STDOUT, $ok;
+    print $^STDOUT, $ok;
     $test_num++;
 
     return $test;

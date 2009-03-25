@@ -1,7 +1,7 @@
 
 BEGIN {
     unless ("A" eq pack('U', 0x41)) {
-	print \*STDOUT, "1..0 # Unicode::Normalize " .
+	print $^STDOUT, "1..0 # Unicode::Normalize " .
 	    "cannot stringify a Unicode code point\n";
 	exit 0;
     }

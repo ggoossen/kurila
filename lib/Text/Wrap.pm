@@ -76,14 +76,14 @@ sub wrap($ip, $xp, @< @t)
 	}
 	$r .= $remainder;
 
-	print \*STDOUT, "-----------$r---------\n" if $debug;
+	print $^STDOUT, "-----------$r---------\n" if $debug;
 
-	print \*STDOUT, "Finish up with '$lead'\n" if $debug;
+	print $^STDOUT, "Finish up with '$lead'\n" if $debug;
 
 	$r .= $lead . substr($t, pos($t), length($t)-pos($t))
 		if pos($t) ne length($t);
 
-	print \*STDOUT, "-----------$r---------\n" if $debug;;
+	print $^STDOUT, "-----------$r---------\n" if $debug;;
 
 	return $r;
 }

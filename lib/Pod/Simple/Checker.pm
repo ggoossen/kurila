@@ -26,7 +26,7 @@ sub any_errata_seen {  # read-only accessor
 sub new {
   my $self = shift;
   my $new = $self->SUPER::new(< @_);
-  $new->{+'output_fh'} ||= *STDOUT{IO};
+  $new->{+'output_fh'} ||= $^STDOUT{IO};
   $new->nix_X_codes(1);
   $new->nbsp_for_S(1);
   $new->{+'Thispara'} = '';

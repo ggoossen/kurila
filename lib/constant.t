@@ -5,7 +5,7 @@ our (@warnings, $fagwoosh, $putt, $kloong);
 BEGIN {				# ...and save 'em for later
     $^WARN_HOOK = sub { push @warnings, @_[0]->{?description} }
 }
-END { print \*STDERR, < @warnings }
+END { print $^STDERR, < @warnings }
 
 
 use Test::More tests => 88;

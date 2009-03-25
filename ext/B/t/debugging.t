@@ -11,13 +11,13 @@ BEGIN {
     # skip all tests unless perl was compiled with -DDEBUGGING
     require Config;
     if (Config::config_value('ccflags') !~ m/-DDEBUGGING /) {
-        print \*STDOUT, "1..0 # Skip -- Perl built w/o -DEBUGGING\n";
+        print $^STDOUT, "1..0 # Skip -- Perl built w/o -DEBUGGING\n";
         exit 0;
     }
     # require 'test.pl'; # now done by OptreeCheck
 }
 
-print \*STDOUT, "1..0 # Skip -- TODO for kurila\n";
+print $^STDOUT, "1..0 # Skip -- TODO for kurila\n";
 exit 0;
 
 use OptreeCheck;

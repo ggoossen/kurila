@@ -43,7 +43,7 @@ sub convert_n_test($podfile, $testname) {
 	    close $tmpfile;
 	    my $diffopt = $^OS_NAME eq 'linux' ?? 'u' !! 'c';
 	    open my $diff, "-|", "diff -$diffopt $expectfile $outfile" or die $^OS_ERROR;
-	    print \*STDOUT, "# $_" while ~< $diff;
+	    print $^STDOUT, "# $_" while ~< $diff;
 	    close $diff;
 	    unlink $expectfile;
 	}

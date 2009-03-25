@@ -201,7 +201,7 @@ sub user_def($spec, $name, $opts) {
 }
 
 my %std_opt = %(
-	out  	=> \%( set => \&filehandle,		def => \*STDOUT,			),
+	out  	=> \%( set => \&filehandle,		def => $^STDOUT,			),
 	ws    	=> \%( set => \&pattern,			def => undef,				),
 	fill 	=> \%( set => \&defined_or_space,	def => " ",					),
 	lfill 	=> \%( set => \&defined_or_space,	def => undef,				),

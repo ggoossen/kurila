@@ -2,11 +2,11 @@
 use Test;
 BEGIN { plan tests => 4; }
 use Locale::Maketext v1.01;
-print \*STDOUT, "# Hi there...\n";
+print $^STDOUT, "# Hi there...\n";
 ok 1;
 
 
-print \*STDOUT, "# --- Making sure that get_handle works with utf8 ---\n";
+print $^STDOUT, "# --- Making sure that get_handle works with utf8 ---\n";
 use utf8;
 
 # declare some classes...
@@ -28,11 +28,11 @@ do {
 };
 
 my $lh;
-print \*STDOUT, "# Basic sanity:\n";
+print $^STDOUT, "# Basic sanity:\n";
 ok defined( $lh = Woozle->get_handle('eu-mt') ) && ref($lh);
 ok $lh && $lh->maketext('d2', 7), chr(1000)."hum 14".chr(2000)   ;
 
 
-print \*STDOUT, "# Byebye!\n";
+print $^STDOUT, "# Byebye!\n";
 ok 1;
 

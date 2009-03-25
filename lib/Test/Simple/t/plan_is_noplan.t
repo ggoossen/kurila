@@ -11,7 +11,7 @@ BEGIN {
 # Can't use Test.pm, that's a 5.005 thing.
 package My::Test;
 
-print \*STDOUT, "1..2\n";
+print $^STDOUT, "1..2\n";
 
 my $test_num = 1;
 # Utility testing functions.
@@ -21,7 +21,7 @@ sub ok($test, ?$name) {
     $ok .= "ok $test_num";
     $ok .= " - $name" if defined $name;
     $ok .= "\n";
-    print \*STDOUT, $ok;
+    print $^STDOUT, $ok;
     $test_num++;
 }
 

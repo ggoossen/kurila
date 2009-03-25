@@ -21,12 +21,12 @@ my $fflushall = defined config_value("fflushall") ?? config_value("fflushall") e
 my $d_fork = defined config_value("d_fork") ?? config_value("d_fork") eq 'define' ?? 1 !! 0 !! 0;
 
 if ($useperlio || $fflushNULL || $d_sfio) {
-    print \*STDOUT, "1..7\n";
+    print $^STDOUT, "1..7\n";
 } else {
     if ($fflushall) {
-	print \*STDOUT, "1..7\n";
+	print $^STDOUT, "1..7\n";
     } else {
-	print \*STDOUT, "1..0 # Skip: fflush(NULL) or equivalent not available\n";
+	print $^STDOUT, "1..0 # Skip: fflush(NULL) or equivalent not available\n";
         exit;
     }
 }
@@ -50,8 +50,8 @@ sub file_eq {
     chomp(my $line = ~< $in);
     close $in;
 
-    print \*STDOUT, "# got $line\n";
-    print \*STDOUT, "# expected $val\n";
+    print $^STDOUT, "# got $line\n";
+    print $^STDOUT, "# expected $val\n";
     return $line eq $val;
 }
 
@@ -73,7 +73,7 @@ $^OUTPUT_AUTOFLUSH = 0; # we want buffered output
 
 # Test flush on fork/exec
 if (!$d_fork) {
-    print \*STDOUT, "ok 1 # skipped: no fork\n";
+    print $^STDOUT, "ok 1 # skipped: no fork\n";
 } else {
     my $f = "ff-fork-$^PID";
     open my $out, ">", "$f" or die "open $f: $^OS_ERROR";
@@ -87,7 +87,7 @@ if (!$d_fork) {
 	# Kid
 	print $out, "r";
 	my $command = qq{$runperl "ff-prog" "$f" "l"};
-	print \*STDOUT, "# $command\n";
+	print $^STDOUT, "# $command\n";
 	exec $command or die $^OS_ERROR;
 	exit;
     } else {
@@ -95,7 +95,7 @@ if (!$d_fork) {
 	die "fork: $^OS_ERROR";
     }
 
-    print \*STDOUT, file_eq($f, "Perl") ?? "ok 1\n" !! "not ok 1\n";
+    print $^STDOUT, file_eq($f, "Perl") ?? "ok 1\n" !! "not ok 1\n";
     push @delete, $f;
 }
 
@@ -123,9 +123,9 @@ for (qw(system qx popen)) {
     open my $out, ">", "$f" or die "open $f: $^OS_ERROR";
     print $out, "Pe";
     close $out or die "close $f: $^OS_ERROR";;
-    print \*STDOUT, "# $command\n";
+    print $^STDOUT, "# $command\n";
     $code->($command);
-    print \*STDOUT, file_eq($f, "Perl") ?? "ok $t\n" !! "not ok $t\n";
+    print $^STDOUT, file_eq($f, "Perl") ?? "ok $t\n" !! "not ok $t\n";
     push @delete, $f;
     ++$t;
 }
@@ -134,11 +134,11 @@ my $cmd = _create_runperl(
 			  switches => \@('-l'),
 			  prog =>
 			  sprintf('print \*STDOUT, qq[ok $_] for (%d..%d)', $t, $t+2));
-print \*STDOUT, "# cmd = '$cmd'\n";
+print $^STDOUT, "# cmd = '$cmd'\n";
 open my $CMD, '-|', "$cmd" or die "Can't open pipe to '$cmd': $^OS_ERROR";
 while ( ~< $CMD) {
     system("$runperl -e 0");
-    print \*STDOUT, $_;
+    print $^STDOUT, $_;
 }
 close $CMD;
 $t += 3;

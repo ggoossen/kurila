@@ -44,13 +44,13 @@ my $i = 4;
 while ( ~< *ARGV) {
     s/^/ok $i - /;
     ++$i;
-    print \*STDOUT, $_;
+    print $^STDOUT, $_;
     next_test();
 }
 open($try, "<", 'Io_argv1.tmp') or die "Can't open temp file: $^OS_ERROR";
-print \*STDOUT, $_ while ~< *$try;
+print $^STDOUT, $_ while ~< *$try;
 open($try, "<", 'Io_argv2.tmp') or die "Can't open temp file: $^OS_ERROR";
-print \*STDOUT, $_ while ~< *$try;
+print $^STDOUT, $_ while ~< *$try;
 close $try or die "Could not close: $^OS_ERROR";
 
 ok( eof $try );
@@ -60,13 +60,13 @@ do {
     ok( eof \*NEVEROPENED,    'eof() true on unopened filehandle' );
 };
 
-open \*STDIN, "<", 'Io_argv1.tmp' or die $^OS_ERROR;
+open $^STDIN, "<", 'Io_argv1.tmp' or die $^OS_ERROR;
 @ARGV = @();
-ok( !eof(\*STDIN),     'STDIN has something' );
+ok( !eof($^STDIN),     'STDIN has something' );
 
 is( $(~< *ARGV), "a line\n" );
 
-open \*STDIN, '<', $devnull or die $^OS_ERROR;
+open $^STDIN, '<', $devnull or die $^OS_ERROR;
 @ARGV = @( () );
 ok( eof(),      'eof() true with empty @ARGV' );
 

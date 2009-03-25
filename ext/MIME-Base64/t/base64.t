@@ -1,9 +1,9 @@
 
 use MIME::Base64;
 
-print \*STDOUT, "1..283\n";
+print $^STDOUT, "1..283\n";
 
-print \*STDOUT, "# Testing MIME::Base64-", $MIME::Base64::VERSION, "\n";
+print $^STDOUT, "# Testing MIME::Base64-", $MIME::Base64::VERSION, "\n";
 
 BEGIN {
  if (ord('A') == 0x41) {
@@ -24,12 +24,12 @@ encodeTest();
 decodeTest();
 
 # This used to generate a warning
-print \*STDOUT, "not " unless decode_base64(encode_base64("foo")) eq "foo";
-print \*STDOUT, "ok ", $testno++, "\n";
+print $^STDOUT, "not " unless decode_base64(encode_base64("foo")) eq "foo";
+print $^STDOUT, "ok ", $testno++, "\n";
 
 sub encodeTest
 {
-    print \*STDOUT, "# encode test\n";
+    print $^STDOUT, "# encode test\n";
 
     my @encode_tests = @(
 	# All values
@@ -319,25 +319,25 @@ sub encodeTest
 
 	my $encoded = encode_base64($plain, '');
 	if ($encoded ne $expected) {
-	    print \*STDOUT, "test $testno ($plain): expected $expected, got $encoded\n";
-            print \*STDOUT, "not ";
+	    print $^STDOUT, "test $testno ($plain): expected $expected, got $encoded\n";
+            print $^STDOUT, "not ";
 	}
 	my $decoded = decode_base64($encoded);
 	if ($decoded ne $plain) {
-	    print \*STDOUT, "test $testno ($encoded): expected $plain, got $decoded\n";
-            print \*STDOUT, "not ";
+	    print $^STDOUT, "test $testno ($encoded): expected $plain, got $decoded\n";
+            print $^STDOUT, "not ";
 	}
 
-	print \*STDOUT, "ok $testno\n";
+	print $^STDOUT, "ok $testno\n";
 	$testno++;
     }
 }
 
 sub decodeTest
 {
-    print \*STDOUT, "# decode test\n";
+    print $^STDOUT, "# decode test\n";
 
-    local $^WARN_HOOK = sub { print \*STDOUT, @_[0] };  # avoid warnings on stderr
+    local $^WARN_HOOK = sub { print $^STDOUT, @_[0] };  # avoid warnings on stderr
 
     my @decode_tests = @(
 	\@('YWE='   => ASCII('aa')),
@@ -364,7 +364,7 @@ sub decodeTest
 	if ($decoded ne $expected) {
 	    die "test $testno ($encoded): expected $expected, got $decoded\n";
 	}
-	print \*STDOUT, "ok $testno\n";
+	print $^STDOUT, "ok $testno\n";
 	$testno++;
     }
 }

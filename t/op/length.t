@@ -84,7 +84,7 @@ my $warnings = 0;
 
 $^WARN_HOOK = sub {
     $warnings++;
-    print \*STDERR, shift->message;
+    print $^STDERR, shift->message;
 };
 
 is(length(undef), undef, "Length of literal undef");

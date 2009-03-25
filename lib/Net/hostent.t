@@ -20,7 +20,7 @@ BEGIN { use_ok 'Net::hostent' }
 
 # Remind me to add this to Test::More.
 sub DIE {
-    print \*STDOUT, "# $(join ' ',@_)\n";
+    print $^STDOUT, "# $(join ' ',@_)\n";
     exit 1;
 }
 
@@ -50,7 +50,7 @@ SKIP: do {
     skip "Windows will return the machine name instead of 'localhost'", 2
       if $^OS_NAME eq 'MSWin32' or $^OS_NAME eq 'NetWare' or $^OS_NAME eq 'cygwin';
 
-    print \*STDOUT, "# name = " . $h->name . ", aliases = " . join (",", @{$h->aliases}) . "\n";
+    print $^STDOUT, "# name = " . $h->name . ", aliases = " . join (",", @{$h->aliases}) . "\n";
 
     my $in_alias;
     unless ($h->name =~ m/^localhost(?:\..+)?$/i) {
@@ -81,6 +81,6 @@ SKIP: do {
     }
     else {
         ok( !$in_alias );
-        print \*STDOUT, "# " . $h->name . " " . join (",", @{$h->aliases}) . "\n";
+        print $^STDOUT, "# " . $h->name . " " . join (",", @{$h->aliases}) . "\n";
     }
 };

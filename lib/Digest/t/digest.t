@@ -1,4 +1,4 @@
-print \*STDOUT, "1..2\n";
+print $^STDOUT, "1..2\n";
 
 use Digest;
 
@@ -21,12 +21,12 @@ do {
 
 my $d;
 $d = Digest->new("Dummy");
-print \*STDOUT, "not " unless $d->digest eq "ooo";
-print \*STDOUT, "ok 1\n";
+print $^STDOUT, "not " unless $d->digest eq "ooo";
+print $^STDOUT, "ok 1\n";
 
 %Digest::MMAP{+"Dummy-24"} = \@(\@("NotThere"), "NotThereEither", \@("Digest::Dummy", 24));
 $d = Digest->new("Dummy-24");
-print \*STDOUT, "not " unless $d->digest eq "24";
-print \*STDOUT, "ok 2\n";
+print $^STDOUT, "not " unless $d->digest eq "24";
+print $^STDOUT, "ok 2\n";
 
 

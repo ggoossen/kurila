@@ -150,7 +150,7 @@ foreach my $prefix ( @values) {
 	foreach my $dot ( @values) {
 	    my $result = sprintf $format, $dot, $vector;
 	    is (length $result, 8)
-		or print \*STDOUT, "# ", join (',', map {ord $_}, @( $prefix, $dot, $vector)),
+		or print $^STDOUT, "# ", join (',', map {ord $_}, @( $prefix, $dot, $vector)),
 		  "\n";
 	}
     }

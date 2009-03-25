@@ -21,7 +21,7 @@ my $ivtype = config_value("ivtype");
 
 # I don't know if the VMS folks ever supported long long on 5.6.x
 if ($ivtype and $ivtype eq 'long long' and $^OS_NAME !~ m/^MSWin/) {
-  print \*STDOUT, <<'EOM';
+  print $^STDOUT, <<'EOM';
 
 You appear to have a perl configured to use 64 bit integers in its scalar
 variables.  If you have existing data written with an earlier version of

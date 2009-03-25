@@ -22,7 +22,7 @@ BEGIN {
 use Storable < qw(lock_store lock_retrieve);
 
 unless (Storable::CAN_FLOCK()) {
-    print \*STDOUT, "1..0 # Skip: fcntl/flock emulation broken on this platform\n";
+    print $^STDOUT, "1..0 # Skip: fcntl/flock emulation broken on this platform\n";
     exit 0;
 }
 

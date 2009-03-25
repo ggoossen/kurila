@@ -140,8 +140,8 @@ sub getopt($argumentative, ?$hash) {
 
 sub output_h () {
   return $OUTPUT_HELP_VERSION if defined $OUTPUT_HELP_VERSION;
-  return \*STDOUT if $STANDARD_HELP_VERSION;
-  return \*STDERR;
+  return $^STDOUT if $STANDARD_HELP_VERSION;
+  return $^STDERR;
 }
 
 sub try_exit () {

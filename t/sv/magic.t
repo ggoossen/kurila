@@ -203,7 +203,7 @@ else {
               my $ps = @(`ps -o command= -p $^PID`)[-1];
               return if $^CHILD_ERROR;
               chomp $ps;
-              printf \*STDOUT, "# 0[\%s]ps[\%s]\n", $^PROGRAM_NAME, $ps;
+              printf $^STDOUT, "# 0[\%s]ps[\%s]\n", $^PROGRAM_NAME, $ps;
               $ps;
             };
             my $ps = $mydollarzero->("x");

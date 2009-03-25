@@ -33,8 +33,8 @@ close $hintfh;
 use ExtUtils::MakeMaker;
 
 my $out;
-close \*STDERR;
-open \*STDERR, '>>', \$out or die;
+close $^STDERR;
+open $^STDERR, '>>', \$out or die;
 my $mm = bless \%(), 'ExtUtils::MakeMaker';
 $mm->check_hints;
 is( $mm->{+CCFLAGS}, 'basset hounds got long ears' );

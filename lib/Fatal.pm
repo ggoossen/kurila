@@ -68,7 +68,7 @@ sub _make_fatal($sub, $pkg) {
     $name = $sub;
     $name =~ s/.*::// or $name =~ s/^&//;
     $sub = Symbol::fetch_glob($sub);
-    print \*STDOUT, "# _make_fatal: sub=$sub pkg=$pkg name=$name\n" if $Debug;
+    print $^STDOUT, "# _make_fatal: sub=$sub pkg=$pkg name=$name\n" if $Debug;
     die "Bad subroutine name for Fatal: $name" unless $name =~ m/^\w+$/;
     if (defined(&$sub)) {	# user subroutine
 	$sref = \&$sub;
@@ -96,7 +96,7 @@ EOS
     my @protos = fill_protos($proto);
     $code .= write_invocation($core, $call, $name, < @protos);
     $code .= "\}\n";
-    print \*STDOUT, $code if $Debug;
+    print $^STDOUT, $code if $Debug;
     do {
       $code = eval("package $pkg; $code");
       die if $^EVAL_ERROR;
