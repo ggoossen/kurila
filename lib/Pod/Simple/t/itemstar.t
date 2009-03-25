@@ -15,18 +15,18 @@ ok 1;
 
 use Pod::Simple::DumpAsXML;
 use Pod::Simple::XMLOutStream;
-print \*STDOUT, "# Pod::Simple version $Pod::Simple::VERSION\n";
+print $^STDOUT, "# Pod::Simple version $Pod::Simple::VERSION\n";
 sub e { Pod::Simple::DumpAsXML->_duo(< @_) }
 
 my $x = 'Pod::Simple::XMLOutStream';
 
-print \*STDOUT, "##### Tests for '=item * Foo' tolerance via class $x\n";
+print $^STDOUT, "##### Tests for '=item * Foo' tolerance via class $x\n";
 
 $Pod::Simple::XMLOutStream::ATTR_PAD   = ' ';
 $Pod::Simple::XMLOutStream::SORT_ATTRS = 1; # for predictably testable output
 
 
-print \*STDOUT, "#\n# Tests for simple =item *'s\n";
+print $^STDOUT, "#\n# Tests for simple =item *'s\n";
 ok( $x->_out("\n=over\n\n=item * Stuff\n\n=item * Bar I<baz>!\n\n=back\n\n"),
     '<Document><over-bullet indent="4"><item-bullet>Stuff</item-bullet><item-bullet>Bar <I>baz</I>!</item-bullet></over-bullet></Document>'
 );
@@ -43,8 +43,8 @@ ok( $x->_out("\n=over\n\n=item * Stuff I<things\num> hoo!\n=cut\nStuff\n\n=item 
 
 
 
-print \*STDOUT, "# Wrapping up... one for the road...\n";
+print $^STDOUT, "# Wrapping up... one for the road...\n";
 ok 1;
-print \*STDOUT, "# --- Done with ", __FILE__, " --- \n";
+print $^STDOUT, "# --- Done with ", __FILE__, " --- \n";
 
 

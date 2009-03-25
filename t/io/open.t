@@ -213,15 +213,15 @@ do {
 
 # other dupping techniques
 do {
-    ok( open(my $stdout, ">&", \*STDOUT),       'dup \*STDOUT into lexical fh');
-    ok( open(\*STDOUT,     ">&", $stdout),        'restore dupped STDOUT from lexical fh');
+    ok( open(my $stdout, ">&", $^STDOUT),       'dup \*STDOUT into lexical fh');
+    ok( open($^STDOUT,     ">&", $stdout),        'restore dupped STDOUT from lexical fh');
 
     do {
 	ok( open(my $stdout, ">&", 'STDOUT'),         'dup STDOUT into lexical fh');
     };
 
     # used to try to open a file [perl #17830]
-    ok( open(my $stdin,  "<&", fileno \*STDIN),   'dup fileno(STDIN) into lexical fh') or _diag $^OS_ERROR;
+    ok( open(my $stdin,  "<&", fileno $^STDIN),   'dup fileno(STDIN) into lexical fh') or _diag $^OS_ERROR;
 };
 
 SKIP: do {

@@ -9,7 +9,7 @@ use Pod::Simple::Search;
 use Test;
 BEGIN { plan tests => 7 }
 
-print \*STDOUT, "# ", __FILE__,
+print $^STDOUT, "# ", __FILE__,
  ": Testing the surveying of the current directory...\n";
 
 my $x = Pod::Simple::Search->new;
@@ -20,7 +20,7 @@ $x->inc(0);
 use File::Spec;
 use Cwd;
 my $cwd = cwd();
-print \*STDOUT, "# CWD: $cwd\n";
+print $^STDOUT, "# CWD: $cwd\n";
 
 sub source_path {
     my $file = shift;
@@ -42,10 +42,10 @@ if(     -e ($here = source_path('testlib1'))) {
 } else {
   die "Can't find the test corpus";
 }
-print \*STDOUT, "# OK, found the test corpus as $here\n";
+print $^STDOUT, "# OK, found the test corpus as $here\n";
 ok 1;
 
-print \*STDOUT, $x->_state_as_string;
+print $^STDOUT, $x->_state_as_string;
 #$x->verbose(12);
 
 use Pod::Simple;
@@ -56,7 +56,7 @@ my@($name2where, $where2name) = @($x->survey('.'), $x->path2name);
 my $p = pretty( $where2name, $name2where )."\n";
 $p =~ s/, +/,\n/g;
 $p =~ s/^/#  /mg;
-print \*STDOUT, $p;
+print $^STDOUT, $p;
 
 do {
 my $names = join "|", sort values %$where2name;

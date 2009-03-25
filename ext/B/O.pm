@@ -11,9 +11,9 @@ sub import($class, @< @options) {
     my @($quiet, $veryquiet) = @(0, 0);
     if (@options[0] eq '-q' || @options[0] eq '-qq') {
 	$quiet = 1;
-	open ($saveout, ">&", \*STDOUT);
-	close \*STDOUT;
-	open (\*STDOUT, ">", \$O::BEGIN_output);
+	open ($saveout, ">&", $^STDOUT);
+	close $^STDOUT;
+	open ($^STDOUT, ">", \$O::BEGIN_output);
 	if (@options[0] eq '-qq') {
 	    $veryquiet = 1;
 	}

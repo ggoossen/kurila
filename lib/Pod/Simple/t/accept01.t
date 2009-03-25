@@ -15,13 +15,13 @@ ok 1;
 
 use Pod::Simple::DumpAsXML;
 use Pod::Simple::XMLOutStream;
-print \*STDOUT, "# Pod::Simple version $Pod::Simple::VERSION\n";
+print $^STDOUT, "# Pod::Simple version $Pod::Simple::VERSION\n";
 sub e ($x, $y) { Pod::Simple::DumpAsXML->_duo($x, $y) }
 
 my $x = 'Pod::Simple::XMLOutStream';
 sub accept_N { @_[0]->accept_codes('N') }
 
-print \*STDOUT, "# Some sanity tests...\n";
+print $^STDOUT, "# Some sanity tests...\n";
 ok( $x->_out( "=pod\n\nI like pie.\n"), # without acceptor
   '<Document><Para>I like pie.</Para></Document>'
 );
@@ -35,7 +35,7 @@ ok( $x->_out( \&accept_N,  "=pod\n\nB<foo\t>\n"),
   '<Document><Para><B>foo </B></Para></Document>'
 );
 
-print \*STDOUT, "# Some real tests...\n";
+print $^STDOUT, "# Some real tests...\n";
 
 ok( $x->_out( \&accept_N,  "=pod\n\nN<foo\t>\n"),
   '<Document><Para><N>foo </N></Para></Document>'
@@ -51,18 +51,18 @@ ok( $x->_out( \&accept_N,  "=pod\n\nB<pieF<zorch>N<foo>I<pling>>\n"),
   '<Document><Para><B>pie<F>zorch</F><N>foo</N><I>pling</I></B></Para></Document>'
 );
 
-print \*STDOUT, "# Tests of nonacceptance...\n";
+print $^STDOUT, "# Tests of nonacceptance...\n";
 
 sub starts_with($large, $small) {
-  print(\*STDOUT, "# supahstring is undef\n"),
+  print($^STDOUT, "# supahstring is undef\n"),
    return '' unless defined $large;
-  print(\*STDOUT, "# supahstring $large is smaller than target-starter $small\n"),
+  print($^STDOUT, "# supahstring $large is smaller than target-starter $small\n"),
    return '' if length($large) +< length($small);
   if( substr($large, 0, length($small)) eq $small ) {
     #print "# Supahstring $large\n#  indeed starts with $small\n";
     return 1;
   } else {
-    print \*STDOUT, "# Supahstring $large\n#  !starts w/ $small\n";
+    print $^STDOUT, "# Supahstring $large\n#  !starts w/ $small\n";
     return '';
   }
 }
@@ -87,7 +87,7 @@ ok( starts_with( $x->_out( "=pod\n\nB<pieF<zorch>N<C<foo>>I<pling>>\n"), # !muto
 
 
 
-print \*STDOUT, "# Wrapping up... one for the road...\n";
+print $^STDOUT, "# Wrapping up... one for the road...\n";
 ok 1;
-print \*STDOUT, "# --- Done with ", __FILE__, " --- \n";
+print $^STDOUT, "# --- Done with ", __FILE__, " --- \n";
 

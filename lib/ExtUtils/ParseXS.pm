@@ -85,7 +85,7 @@ sub process_file {
 	   inout => 1,
 	   argtypes => 1,
 	   typemap => \@(),
-	   output => \*STDOUT,
+	   output => $^STDOUT,
 	   csuffix => '.c',
 	   < %args,
 	  );
@@ -1557,7 +1557,7 @@ sub PopFile()
 
     if ($isPipe and $^CHILD_ERROR ) {
       -- $lastline_no ;
-      print \*STDERR, "Error reading from pipe '$ThisFile': $^OS_ERROR in $filename, line $lastline_no\n"  ;
+      print $^STDERR, "Error reading from pipe '$ThisFile': $^OS_ERROR in $filename, line $lastline_no\n"  ;
       exit 1 ;
     }
 
@@ -1602,7 +1602,7 @@ sub check_cpp {
 	$cpplevel++;
       } elsif (!$cpplevel) {
 	Warn("Warning: #else/elif/endif without #if in this function");
-	print \*STDERR, "    (precede it with a blank line if the matching #if is outside the function)\n"
+	print $^STDERR, "    (precede it with a blank line if the matching #if is outside the function)\n"
 	  if @XSStack[-1]->{?type} eq 'if';
 	return;
       } elsif ($cpp =~ m/^\#\s*endif/) {
@@ -1716,7 +1716,7 @@ sub Warn
     # work out the line number
     my $line_no = @line_no[(nelems @line_no) - (nelems @line) -1] ;
 
-    print \*STDERR, "$(join ' ',@_) in $filename, line $line_no\n" ;
+    print $^STDERR, "$(join ' ',@_) in $filename, line $line_no\n" ;
   }
 
 sub blurt

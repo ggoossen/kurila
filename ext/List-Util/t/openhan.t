@@ -7,10 +7,10 @@ use Scalar::Util < qw(openhandle);
 
 ok(defined &openhandle, 'defined');
 
-my $fh = \*STDERR;
+my $fh = $^STDERR;
 is(openhandle($fh), $fh, 'STDERR');
 
-is(fileno(openhandle(\*STDERR)), fileno(\*STDERR), 'fileno(STDERR)');
+is(fileno(openhandle($^STDERR)), fileno($^STDERR), 'fileno(STDERR)');
 
 is(openhandle(\*CLOSED), undef, 'closed');
 

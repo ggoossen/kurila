@@ -9,13 +9,13 @@
 use Config;
 require './test.pl'; # for runperl()
 
-print \*STDOUT, "1..61\n";
+print $^STDOUT, "1..61\n";
 
 my $test = 1;
 sub test($sub, @< @args) {
     my $ok = $sub->( < @args );
-    print \*STDOUT, $ok ?? "ok $test\n" !! "not ok $test\n";
-    printf \*STDOUT, "# Failed at line \%d\n", @(caller)[2] unless $ok;
+    print $^STDOUT, $ok ?? "ok $test\n" !! "not ok $test\n";
+    printf $^STDOUT, "# Failed at line \%d\n", @(caller)[2] unless $ok;
     $test++;
 }
 
@@ -231,7 +231,7 @@ do {
 
                 $code = "# This is a test script built by t/op/closure.t\n\n";
 
-                print \*STDOUT, <<"DEBUG_INFO" if $debugging;
+                print $^STDOUT, <<"DEBUG_INFO" if $debugging;
 # inner_type:     $inner_type 
 # where_declared: $where_declared 
 # within:         $within
@@ -423,7 +423,7 @@ END
                 if (config_value('d_fork') and $^OS_NAME ne 'VMS' and $^OS_NAME ne 'MSWin32' and $^OS_NAME ne 'NetWare') {
                     # Fork off a new perl to run the tests.
                     # (This is so we can catch spurious warnings.)
-                    $^OUTPUT_AUTOFLUSH = 1; print \*STDOUT, ""; $^OUTPUT_AUTOFLUSH = 0; # flush output before forking
+                    $^OUTPUT_AUTOFLUSH = 1; print $^STDOUT, ""; $^OUTPUT_AUTOFLUSH = 0; # flush output before forking
                     pipe my $read, my $write or die "Can't make pipe: $^OS_ERROR";
                     pipe my $read2, my $write2 or die "Can't make second pipe: $^OS_ERROR";
                     die "Can't fork: $^OS_ERROR" unless defined($pid = open my $perl_fh, "|-", '-');
@@ -432,8 +432,8 @@ END
                         # through the extra pipe.
                         close $read;
                         close $read2;
-                        open \*STDOUT, ">&", \*$write  or die "Can't redirect STDOUT: $^OS_ERROR";
-                        open \*STDERR, ">&", \*$write2 or die "Can't redirect STDERR: $^OS_ERROR";
+                        open $^STDOUT, ">&", \*$write  or die "Can't redirect STDOUT: $^OS_ERROR";
+                        open $^STDERR, ">&", \*$write2 or die "Can't redirect STDERR: $^OS_ERROR";
                         exec which_perl(), '-w', '-MTestInit', '-'
                           or die "Can't exec perl: $^OS_ERROR";
                     } else {
@@ -470,26 +470,26 @@ END
                         do { local $^INPUT_RECORD_SEPARATOR; open my $in_fh, "<", $outfile; $output = ~< $in_fh; close $in_fh };
                     }
                     if ($^CHILD_ERROR) {
-                        printf \*STDOUT, "not ok: exited with error code \%04X\n", $^CHILD_ERROR;
+                        printf $^STDOUT, "not ok: exited with error code \%04X\n", $^CHILD_ERROR;
                         $debugging or do { 1 while unlink < @tmpfiles };
                         exit;
                     }
                     do { local $^INPUT_RECORD_SEPARATOR; open my $in_fh, "<", $errfile; $errors = ~< $in_fh; close $in_fh };
                     1 while unlink < @tmpfiles;
                 }
-                print \*STDOUT, $output;
-                print \*STDERR, $errors;
+                print $^STDOUT, $output;
+                print $^STDERR, $errors;
                 if ($debugging && ($errors || $^CHILD_ERROR || ($output =~ m/not ok/))) {
                     my $lnum = 0;
                     for my $line (split '\n', $code) {
-                        printf \*STDOUT, "\%3d:  \%s\n", ++$lnum, $line;
+                        printf $^STDOUT, "\%3d:  \%s\n", ++$lnum, $line;
                     }
                 }
                 if ($^CHILD_ERROR) {
-                    printf \*STDOUT, "not ok: exited with error code \%04X\n", $^CHILD_ERROR;
+                    printf $^STDOUT, "not ok: exited with error code \%04X\n", $^CHILD_ERROR;
                     diag("command:\n$code");
                 }
-                print \*STDOUT, '#', "-" x 30, "\n" if $debugging;
+                print $^STDOUT, '#', "-" x 30, "\n" if $debugging;
 
             }                   # End of foreach $within
         }                       # End of foreach $where_declared
@@ -681,7 +681,7 @@ do {
 	$x = bless \%(), 'X';
     };
     # test { $flag == 1 };
-    print \*STDOUT, "not ok $test # TODO cleanup sub freeing\n";
+    print $^STDOUT, "not ok $test # TODO cleanup sub freeing\n";
     $test++;
 };
 

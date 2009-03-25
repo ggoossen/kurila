@@ -4,13 +4,13 @@ use Config;
 
 BEGIN {
     if (not config_value('d_readdir')) {
-	print \*STDOUT, "1..0 # Skip: readdir() not available\n";
+	print $^STDOUT, "1..0 # Skip: readdir() not available\n";
 	exit 0;
     }
 }
 
-iohandle::output_autoflush(\*STDERR, 1);
-iohandle::output_autoflush(\*STDOUT, 1);
+iohandle::output_autoflush($^STDERR, 1);
+iohandle::output_autoflush($^STDOUT, 1);
 
 use IO::Dir < qw(DIR_UNLINK);
 
@@ -19,10 +19,10 @@ my $tcount = 0;
 sub ok {
   $tcount++;
   my $not = @_[0] ?? '' !! 'not ';
-  print \*STDOUT, "$($not)ok $tcount\n";
+  print $^STDOUT, "$($not)ok $tcount\n";
 }
 
-print \*STDOUT, "1..5\n";
+print $^STDOUT, "1..5\n";
 
 my $DIR = $^OS_NAME eq 'MacOS' ?? ":" !! ".";
 

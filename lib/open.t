@@ -93,13 +93,13 @@ EOE
 		ord($b)                  == ord($_) &&
 		systell($f)               == ($a += bytes::length($b))
 		) {
-	    print \*STDOUT, '# ord($_)           == ', ord($_), "\n";
-	    print \*STDOUT, '# ord($b)           == ', ord($b), "\n";
-	    print \*STDOUT, '# length($b)        == ', length($b), "\n";
-	    print \*STDOUT, '# bytes::length($b) == ', bytes::length($b), "\n";
-	    print \*STDOUT, '# systell($f)        == ', systell($f), "\n";
-	    print \*STDOUT, '# $a                == ', $a, "\n";
-	    print \*STDOUT, '# $c                == ', $c, "\n";
+	    print $^STDOUT, '# ord($_)           == ', ord($_), "\n";
+	    print $^STDOUT, '# ord($b)           == ', ord($b), "\n";
+	    print $^STDOUT, '# length($b)        == ', length($b), "\n";
+	    print $^STDOUT, '# bytes::length($b) == ', bytes::length($b), "\n";
+	    print $^STDOUT, '# systell($f)        == ', systell($f), "\n";
+	    print $^STDOUT, '# $a                == ', $a, "\n";
+	    print $^STDOUT, '# $c                == ', $c, "\n";
 	    last;
 	}
 	$ok++;
@@ -109,11 +109,11 @@ EOE
        "on :utf8 streams sysread() should work on characters, not bytes");
 
     sub diagnostics {
-	print \*STDOUT, '# ord($_)           == ', ord($_), "\n";
-	print \*STDOUT, '# bytes::length($_) == ', bytes::length($_), "\n";
-	print \*STDOUT, '# systell(G)        == ', systell('G'), "\n";
-	print \*STDOUT, '# $a                == ', $a, "\n";
-	print \*STDOUT, '# $c                == ', $c, "\n";
+	print $^STDOUT, '# ord($_)           == ', ord($_), "\n";
+	print $^STDOUT, '# bytes::length($_) == ', bytes::length($_), "\n";
+	print $^STDOUT, '# systell(G)        == ', systell('G'), "\n";
+	print $^STDOUT, '# $a                == ', $a, "\n";
+	print $^STDOUT, '# $c                == ', $c, "\n";
     }
 
 
@@ -136,7 +136,7 @@ EOE
 	# syswrite() on should work on characters, not bytes
 	open $g, ">:utf8", "b";
 
-	print \*STDOUT, "# $key\n";
+	print $^STDOUT, "# $key\n";
 	$ok = $a = 0;
 	for (@a) {
 	    unless (
@@ -161,13 +161,13 @@ EOE
 		    ord($b)                  == ord($_) &&
 		    systell($g)               == ($a += bytes::length($_))
 		   ) {
-		print \*STDOUT, '# ord($_)           == ', ord($_), "\n";
-		print \*STDOUT, '# ord($b)           == ', ord($b), "\n";
-		print \*STDOUT, '# length($b)        == ', length($b), "\n";
-		print \*STDOUT, '# bytes::length($b) == ', bytes::length($b), "\n";
-		print \*STDOUT, '# systell($g)        == ', systell($g), "\n";
-		print \*STDOUT, '# $a                == ', $a, "\n";
-		print \*STDOUT, '# $c                == ', $c, "\n";
+		print $^STDOUT, '# ord($_)           == ', ord($_), "\n";
+		print $^STDOUT, '# ord($b)           == ', ord($b), "\n";
+		print $^STDOUT, '# length($b)        == ', length($b), "\n";
+		print $^STDOUT, '# bytes::length($b) == ', bytes::length($b), "\n";
+		print $^STDOUT, '# systell($g)        == ', systell($g), "\n";
+		print $^STDOUT, '# $a                == ', $a, "\n";
+		print $^STDOUT, '# $c                == ', $c, "\n";
 		last;
 	    }
 	    $ok++;

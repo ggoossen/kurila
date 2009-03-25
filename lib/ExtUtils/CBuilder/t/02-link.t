@@ -12,7 +12,7 @@ BEGIN {
 use Test;
 BEGIN { 
   if ($^OS_NAME eq 'MSWin32') {
-    print \*STDOUT, "1..0 # Skipped: link_executable() is not implemented yet on Win32\n";
+    print $^STDOUT, "1..0 # Skipped: link_executable() is not implemented yet on Win32\n";
     exit;
   }
   if ($^OS_NAME eq 'VMS') {

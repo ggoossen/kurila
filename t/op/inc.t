@@ -1,16 +1,16 @@
 #!./perl -w
 
-print \*STDOUT, "1..51\n";
+print $^STDOUT, "1..51\n";
 
 my $test = 1;
 
 sub ok($pass, ?$err) {
   if ($pass) {
-    print \*STDOUT, "ok $test\n";
+    print $^STDOUT, "ok $test\n";
     $test = $test + 1; # Would be doubleplusbad to use ++ in the ++ test.
     return 1;
   } else {
-      printf \*STDOUT, "not ok $test # line \%d\n", @(caller)[2];
+      printf $^STDOUT, "not ok $test # line \%d\n", @(caller)[2];
   }
   $test = $test + 1;
   return;
@@ -87,17 +87,17 @@ sub check_same($orig, $suspect) {
   while (my @(?$key, ?$value) =@( each %$suspect)) {
     if (exists $orig->{$key}) {
       if ($orig->{?$key} ne $value) {
-        print \*STDOUT, "# key '$key' was '$orig->{?$key}' now '$value'\n";
+        print $^STDOUT, "# key '$key' was '$orig->{?$key}' now '$value'\n";
         $fail = 1;
       }
     } else {
-      print \*STDOUT, "# key '$key' is '$orig->{?$key}', unexpect.\n";
+      print $^STDOUT, "# key '$key' is '$orig->{?$key}', unexpect.\n";
       $fail = 1;
     }
   }
   foreach (keys %$orig) {
     next if (exists $suspect->{$_});
-    print \*STDOUT, "# key '$_' was '$orig->{?$_}' now missing\n";
+    print $^STDOUT, "# key '$_' was '$orig->{?$_}' now missing\n";
     $fail = 1;
   }
   ok (!$fail);
@@ -195,7 +195,7 @@ sub check_some_code {
     my @warnings;
     local $^WARN_HOOK = sub {push @warnings, @_[0]->message};
 
-    print \*STDOUT, "# checking $action under $warn_line\n";
+    print $^STDOUT, "# checking $action under $warn_line\n";
     my $code = <<"EOC";
 $warn_line
 my \$i = \$start;
@@ -208,16 +208,16 @@ EOC
 
     if ($warn) {
 	unless (ok (scalar nelems @warnings == 2, scalar nelems @warnings)) {
-	    print \*STDERR, "# $_" foreach  @warnings;
+	    print $^STDERR, "# $_" foreach  @warnings;
 	}
 	foreach ( @warnings) {
 	    unless (ok (m/Lost precision when incrementing \d+/, $_)) {
-		print \*STDERR, "# $_"
+		print $^STDERR, "# $_"
 	    }
 	}
     } else {
 	unless (ok (scalar nelems @warnings == 0)) {
-	    print \*STDERR, "# $(join ' ',@$_)" foreach  @warnings;
+	    print $^STDERR, "# $(join ' ',@$_)" foreach  @warnings;
 	}
     }
 }
@@ -235,10 +235,10 @@ for my $n (47..113) {
 	$start_p = $uv_max - 1;
 	# whereas IV_MIN is -(2**$something), so subtract 2
 	$start_n = -$h_uv_max + 2;
-	print \*STDOUT, "# Mantissa overflows at 2**$n ($power_of_2)\n";
-	print \*STDOUT, "# But max UV ($uv_max) is greater so testing that\n";
+	print $^STDOUT, "# Mantissa overflows at 2**$n ($power_of_2)\n";
+	print $^STDOUT, "# But max UV ($uv_max) is greater so testing that\n";
     } else {
-	print \*STDOUT, "# Testing 2**$n ($power_of_2) which overflows the mantissa\n";
+	print $^STDOUT, "# Testing 2**$n ($power_of_2) which overflows the mantissa\n";
 	$start_p = int($power_of_2 - 2);
 	$start_n = -$start_p;
 	my $check = $power_of_2 - 2;

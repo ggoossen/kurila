@@ -21,7 +21,7 @@ sub SWASHNEW_real {
     my @($class, $type, $list, $minbits, $none) =  @_;
     local $^DEBUGGING = 0 if $^DEBUGGING;
 
-    print \*STDERR, "SWASHNEW $(join ' ',@_)\n" if DEBUG;
+    print $^STDERR, "SWASHNEW $(join ' ',@_)\n" if DEBUG;
 
     ##
     ## Get the list of codepoints for the type.
@@ -60,7 +60,7 @@ sub SWASHNEW_real {
         $type =~ s/^\s+//;
         $type =~ s/\s+$//;
 
-        print \*STDERR, "type = $type\n" if DEBUG;
+        print $^STDERR, "type = $type\n" if DEBUG;
 
       GETFILE:
         do {
@@ -132,7 +132,7 @@ sub SWASHNEW_real {
             ##
             my $canonical = lc $type;
             $canonical =~ s/(?<=[a-z\d])(?:\s+|[-_])(?=[a-z\d])//g;
-            print \*STDERR, "canonical = $canonical\n" if DEBUG;
+            print $^STDERR, "canonical = $canonical\n" if DEBUG;
 
             require "unicore/Canonical.pl";
 	    do { no warnings "uninitialized";
@@ -178,7 +178,7 @@ sub SWASHNEW_real {
         };
 
 	if (defined $file) {
-	    print \*STDERR, "found it (file='$file')\n" if DEBUG;
+	    print $^STDERR, "found it (file='$file')\n" if DEBUG;
 
 	    ##
 	    ## If we reach here, it was due to a 'last GETFILE' above
@@ -189,7 +189,7 @@ sub SWASHNEW_real {
 	    ##
 	    my $found = %Cache{?$class . "," . $file};
 	    if ($found and ref($found) eq $class) {
-		print \*STDERR, "Returning cached '$file' for \\p\{$type\}\n" if DEBUG;
+		print $^STDERR, "Returning cached '$file' for \\p\{$type\}\n" if DEBUG;
 		return $found;
 	    }
 
@@ -240,7 +240,7 @@ sub SWASHNEW_real {
 	while ($x =~ m/^([^0-9a-fA-F\n])(.*)/mg) {
 	    my $char = $1;
 	    my $name = $2;
-	    print \*STDERR, "$1 => $2\n" if DEBUG;
+	    print $^STDERR, "$1 => $2\n" if DEBUG;
 	    if ($char =~ m/[-+!&]/) {
 		my @($c,?$t) =  split(m/::/, $name, 2);	# bogus use of ::, really
 		my $subobj;
@@ -260,7 +260,7 @@ sub SWASHNEW_real {
 	}
     };
 
-    print \*STDERR, "CLASS = $class, TYPE => $type, BITS => $bits, NONE => $none\nEXTRAS =>\n$extras\nLIST =>\n$list\n" if DEBUG;
+    print $^STDERR, "CLASS = $class, TYPE => $type, BITS => $bits, NONE => $none\nEXTRAS =>\n$extras\nLIST =>\n$list\n" if DEBUG;
 
     my $SWASH = bless \%(
 	TYPE => $type,

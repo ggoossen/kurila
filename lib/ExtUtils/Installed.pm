@@ -202,7 +202,7 @@ sub _module_name($file, $orig_module) {
         close $packfh;
     }
 
-    print \*STDERR, "Couldn't figure out the package name for $file\n"
+    print $^STDERR, "Couldn't figure out the package name for $file\n"
       unless $module;
 
     return $module;

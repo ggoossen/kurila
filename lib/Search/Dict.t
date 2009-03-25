@@ -5,7 +5,7 @@ BEGIN {
     $^INCLUDE_PATH = @( '../lib' );
 }
 
-print \*STDOUT, "1..4\n";
+print $^STDOUT, "1..4\n";
 
 
 my $DICT = <<EOT;
@@ -47,25 +47,25 @@ print $dict_fh, $DICT;
 
 my $pos = look $dict_fh, "Ababa";
 chomp(my $word = ~< $dict_fh);
-print \*STDOUT, "not " if $pos +< 0 || $word ne "Ababa";
-print \*STDOUT, "ok 1\n";
+print $^STDOUT, "not " if $pos +< 0 || $word ne "Ababa";
+print $^STDOUT, "ok 1\n";
 
 $pos = look $dict_fh, "foo";
 chomp($word = ~< $dict_fh);
 
-print \*STDOUT, "not " if $pos != length($DICT);  # will search to end of file
-print \*STDOUT, "ok 2\n";
+print $^STDOUT, "not " if $pos != length($DICT);  # will search to end of file
+print $^STDOUT, "ok 2\n";
 
 my $pos = look $dict_fh, "abash";
 chomp($word = ~< $dict_fh);
-print \*STDOUT, "not " if $pos +< 0 || $word ne "abash";
-print \*STDOUT, "ok 3\n";
+print $^STDOUT, "not " if $pos +< 0 || $word ne "abash";
+print $^STDOUT, "ok 3\n";
 
 $pos = look $dict_fh, "aarhus", 1, 1;
 chomp($word = ~< $dict_fh);
 
-print \*STDOUT, "not " if $pos +< 0 || $word ne "Aarhus";
-print \*STDOUT, "ok 4\n";
+print $^STDOUT, "not " if $pos +< 0 || $word ne "Aarhus";
+print $^STDOUT, "ok 4\n";
 
 close $dict_fh or die "cannot close";
 unlink "dict-$^PID";

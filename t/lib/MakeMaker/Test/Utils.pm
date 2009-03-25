@@ -298,13 +298,13 @@ sub have_compiler {
 
     # ExtUtils::CBuilder prints its compilation lines to the screen.
     # Shut it up.
-    local *STDOUT = *STDOUT;
-    local *STDERR = *STDERR;
+    local $^STDOUT = $^STDOUT;
+    local $^STDERR = $^STDERR;
 
     my $buffer;
     open my $fh, '>', \$buffer;
-    *STDOUT = *{$fh}{IO};
-    *STDERR = *{$fh}{IO};
+    $^STDOUT = *{$fh}{IO};
+    $^STDERR = *{$fh}{IO};
 
     try {
 	require ExtUtils::CBuilder;

@@ -723,7 +723,7 @@ sub _is_verysafe {
   require POSIX;
 
   my $path = shift;
-  print \*STDOUT, "_is_verysafe testing $path\n" if $DEBUG;
+  print $^STDOUT, "_is_verysafe testing $path\n" if $DEBUG;
   return 1 if $^OS_NAME eq 'VMS';  # owner delete control at file level
 
   my $err_ref = shift;
@@ -771,7 +771,7 @@ sub _is_verysafe {
 				  ''
 				  );
 
-    print \*STDOUT, "TESTING DIR $dir\n" if $DEBUG;
+    print $^STDOUT, "TESTING DIR $dir\n" if $DEBUG;
 
     # Check the directory
     return 0 unless _is_safe($dir,$err_ref);
@@ -1017,7 +1017,7 @@ sub new {
   # Open the file and retain file handle and file name
   my @($fh, $path) =  tempfile( < @template, < %args );
 
-  print \*STDOUT, "Tmp: $fh - $path\n" if $DEBUG;
+  print $^STDOUT, "Tmp: $fh - $path\n" if $DEBUG;
 
   # Store the filename in the scalar slot
   ${*$fh} = $path;
@@ -1149,7 +1149,7 @@ will not be removed.
 sub DESTROY {
   my $self = shift;
   if (%{*$self}{?UNLINK} && !$KEEP_ALL) {
-    print \*STDOUT, "# --------->   Unlinking $self\n" if $DEBUG;
+    print $^STDOUT, "# --------->   Unlinking $self\n" if $DEBUG;
 
     # only delete if this process created it
     return unless exists %FILES_CREATED_BY_OBJECT{+$^PID}->{$self->filename};
@@ -1918,7 +1918,7 @@ sub unlink0 {
     # Stat the filehandle
     my @fh = @( stat $fh );
 
-    print \*STDOUT, "Link count = @fh[3] \n" if $DEBUG;
+    print $^STDOUT, "Link count = @fh[3] \n" if $DEBUG;
 
     # Make sure that the link count is zero
     # - Cygwin provides deferred unlinking, however,
@@ -2017,7 +2017,7 @@ sub cmpstat {
 
   # Now compare each entry explicitly by number
   for ( @okstat) {
-    print \*STDOUT, "Comparing: $_ : @fh[$_] and @path[$_]\n" if $DEBUG;
+    print $^STDOUT, "Comparing: $_ : @fh[$_] and @path[$_]\n" if $DEBUG;
     # Use eq rather than == since rdev, blksize, and blocks (6, 11,
     # and 12) will be '' on platforms that do not support them.  This
     # is fine since we are only comparing integers.

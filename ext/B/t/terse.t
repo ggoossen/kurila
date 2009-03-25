@@ -23,7 +23,7 @@ ok( defined &$sub, 'valid subref back from compile()' );
 # and point it at a real sub and hope the returned ops look alright
 my $out = "";
 open my $ouf_fh, '>>', \$out or die;
-*STDOUT = *$ouf_fh{IO};
+$^STDOUT = *$ouf_fh{IO};
 $sub = B::Terse::compile('', 'bar');
 $sub->();
 

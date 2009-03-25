@@ -49,7 +49,7 @@ my $parser = Pod::Man->new( < %options);
 my @files;
 do {
     @files = splice (@ARGV, 0, 2);
-    print \*STDOUT, "  @files[1]\n" if $verbose;
+    print $^STDOUT, "  @files[1]\n" if $verbose;
     $parser->parse_from_file (@files);
 } while (@ARGV);
 

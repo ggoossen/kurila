@@ -4,7 +4,7 @@
 
 use Text::Wrap < qw(wrap $columns $huge $break);
 
-print \*STDOUT, "1..1\n";
+print $^STDOUT, "1..1\n";
 
 $huge='overflow';
 $Text::Wrap::columns=9;
@@ -17,8 +17,8 @@ $a=wrap('','',
 if ($^EVAL_ERROR) {
 	my $e = $^EVAL_ERROR;
 	$e =~ s/^/# /gm;
-	print \*STDOUT, $e;
+	print $^STDOUT, $e;
 }
-print \*STDOUT, $^EVAL_ERROR ?? "not ok 1\n" !! "ok 1\n";
+print $^STDOUT, $^EVAL_ERROR ?? "not ok 1\n" !! "ok 1\n";
 
 

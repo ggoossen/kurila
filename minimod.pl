@@ -14,7 +14,7 @@
 BEGIN { unshift $^INCLUDE_PATH, "lib" }
 
 
-print \*STDOUT, <<'END';
+print $^STDOUT, <<'END';
 # This File keeps the contents of miniperlmain.c.
 #
 # It was generated automatically by minimod.PL from the contents
@@ -35,20 +35,20 @@ END
 open my $mini, "<", "miniperlmain.c";
 while ( ~< $mini) {
     last if m/Do not delete this line--writemain depends on it/;
-    print \*STDOUT,;
+    print $^STDOUT,;
 }
 
-print \*STDOUT, <<'END';
+print $^STDOUT, <<'END';
 EOF!HEAD
 $tail=<<'EOF!TAIL';
 END
 
 while ( ~< $mini) {
-    print \*STDOUT, unless m/dXSUB_SYS/;
+    print $^STDOUT, unless m/dXSUB_SYS/;
 }
 close $mini;
 
-print \*STDOUT, <<'END';
+print $^STDOUT, <<'END';
 EOF!TAIL
 
 sub writemain{

@@ -223,37 +223,37 @@ sub _open3 {
 	# If she wants to dup the kid's stderr onto her stdout I need to
 	# save a copy of her stdout before I put something else there.
 	if (Symbol::glob_name($dad_rdr->*) ne Symbol::glob_name($dad_err->*) && $dup_err
-		&& xfileno($dad_err) == fileno(\*STDOUT)) {
+		&& xfileno($dad_err) == fileno($^STDOUT)) {
 	    my $tmp = gensym;
 	    xopen($tmp, ">&", $dad_err);
 	    $dad_err = $tmp;
 	}
 
 	if ($dup_wtr) {
-	    xopen \*STDIN,  "<&", $dad_wtr if fileno(\*STDIN) != xfileno($dad_wtr);
+	    xopen $^STDIN,  "<&", $dad_wtr if fileno($^STDIN) != xfileno($dad_wtr);
 	} else {
 	    xclose $dad_wtr;
-	    xopen \*STDIN,  "<&=", fileno $kid_rdr;
+	    xopen $^STDIN,  "<&=", fileno $kid_rdr;
 	}
 	if ($dup_rdr) {
-	    xopen \*STDOUT, ">&", $dad_rdr if fileno(\*STDOUT) != xfileno($dad_rdr);
+	    xopen $^STDOUT, ">&", $dad_rdr if fileno($^STDOUT) != xfileno($dad_rdr);
 	} else {
 	    xclose $dad_rdr;
-	    xopen \*STDOUT, ">&=", $kid_wtr;
+	    xopen $^STDOUT, ">&=", $kid_wtr;
 	}
 	if (Symbol::glob_name($dad_rdr->*) ne Symbol::glob_name($dad_err->*)) {
 	    if ($dup_err) {
 		# I have to use a fileno here because in this one case
 		# I'm doing a dup but the filehandle might be a reference
 		# (from the special case above).
-		xopen \*STDERR, ">&", xfileno($dad_err)
-		    if fileno(\*STDERR) != xfileno($dad_err);
+		xopen $^STDERR, ">&", xfileno($dad_err)
+		    if fileno($^STDERR) != xfileno($dad_err);
 	    } else {
 		xclose $dad_err;
-		xopen \*STDERR, ">&=", fileno $kid_err;
+		xopen $^STDERR, ">&=", fileno $kid_err;
 	    }
 	} else {
-	    xopen \*STDERR, ">&", \*STDOUT if fileno(\*STDERR) != fileno(\*STDOUT);
+	    xopen $^STDERR, ">&", $^STDOUT if fileno($^STDERR) != fileno($^STDOUT);
 	}
 	return 0 if (@cmd[0] eq '-');
 	exec < @cmd or do {
@@ -292,13 +292,13 @@ sub _open3 {
 	$kidpid = try {
 	    spawn_with_handles( \@( \%( mode => 'r',
 				    open_as => $kid_rdr,
-				    handle => \*STDIN ),
+				    handle => $^STDIN ),
 				  \%( mode => 'w',
 				    open_as => $kid_wtr,
-				    handle => \*STDOUT ),
+				    handle => $^STDOUT ),
 				  \%( mode => 'w',
 				    open_as => $kid_err,
-				    handle => \*STDERR ),
+				    handle => $^STDERR ),
 				), \@close, < @cmd);
 	};
 	die "$Me: $^EVAL_ERROR" if $^EVAL_ERROR;

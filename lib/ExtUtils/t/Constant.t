@@ -159,11 +159,11 @@ sub build_and_run($tests, $expect, $files) {
 
   if (open my $outputfh, "<", "$output") {
     local $^INPUT_RECORD_SEPARATOR; # Slurp it - faster.
-    print \*STDOUT, ~< *$outputfh;
-    close $outputfh or print \*STDOUT, "# Close $output failed: $^OS_ERROR\n";
+    print $^STDOUT, ~< *$outputfh;
+    close $outputfh or print $^STDOUT, "# Close $output failed: $^OS_ERROR\n";
   } else {
     # Harness will report missing test results at this point.
-    print \*STDOUT, "# Open <$output failed: $^OS_ERROR\n";
+    print $^STDOUT, "# Open <$output failed: $^OS_ERROR\n";
   }
 
   my $tb = Test::Builder->new();
@@ -762,5 +762,5 @@ write_and_run_extension < @$_ foreach  @tests;
 C_constant ($package, undef, undef, undef, undef, undef, chr 255);
 pass;
 
-print \*STDERR, "# You were running with \$keep_files set to $keep_files\n"
+print $^STDERR, "# You were running with \$keep_files set to $keep_files\n"
   if $keep_files;

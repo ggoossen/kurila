@@ -45,8 +45,8 @@ Mkbootstrap('fakeboot');
 ok( !( -f 'fakeboot.bso' ), 'Mkbootstrap should not backup an empty file' );
 
 my $out = '';
-close \*STDOUT;
-open \*STDOUT, '>>', \$out or die;
+close $^STDOUT;
+open $^STDOUT, '>>', \$out or die;
 
 # with $Verbose set, it should print status messages about libraries
 $ExtUtils::Mkbootstrap::Verbose = 1;

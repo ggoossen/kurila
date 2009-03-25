@@ -12,7 +12,7 @@ BEGIN { *DEBUG = \&Pod::Simple::DEBUG unless defined &DEBUG }
 sub new {
   my $self = shift;
   my $new = $self->SUPER::new(< @_);
-  $new->{+'output_fh'} ||= *STDOUT{IO};
+  $new->{+'output_fh'} ||= $^STDOUT{IO};
   $new->accept_codes('VerbatimFormatted');
   return $new;
 }
@@ -23,7 +23,7 @@ sub _handle_element_start {
   # ($self, $element_name, $attr_hash_r)
   my $fh = @_[0]->{?'output_fh'};
   my($key, $value);
-  DEBUG and print \*STDOUT, "++ @_[1]\n";
+  DEBUG and print $^STDOUT, "++ @_[1]\n";
   
   print $fh,   '  ' x (@_[0]->{?'indent'} || 0),  "++", @_[1], "\n";
   @_[0]->{+'indent'}++;
@@ -40,7 +40,7 @@ sub _handle_element_start {
 }
 
 sub _handle_text {
-  DEBUG and print \*STDOUT, "== \"@_[1]\"\n";
+  DEBUG and print $^STDOUT, "== \"@_[1]\"\n";
   
   if(length @_[1]) {
     my $indent = '  ' x @_[0]->{?'indent'};
@@ -61,7 +61,7 @@ sub _handle_text {
 }
 
 sub _handle_element_end {
-  DEBUG and print \*STDOUT, "-- @_[1]\n";
+  DEBUG and print $^STDOUT, "-- @_[1]\n";
   print @_[0]->{?'output_fh'}
    ,'  ' x --@_[0]->{+'indent'}, "--", @_[1], "\n";
   return;

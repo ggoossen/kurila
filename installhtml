@@ -227,7 +227,7 @@ foreach my $dir ( @podpath) {
 
 # now go through and create master indices for each pod we split
 foreach my $dir ( @splititem) {
-    print \*STDOUT, "creating index $htmldir/$dir.html\n" if $verbose;
+    print $^STDOUT, "creating index $htmldir/$dir.html\n" if $verbose;
     create_index("$htmldir/$dir.html", "$htmldir/$dir");
 }
 
@@ -240,7 +240,7 @@ foreach my $dir ( @splithead) {
     # now go through and truncate after the index
     $dir =~ m/^(.*?)(\.pod|\.pm)?$/sm;
     my $file = "$htmldir/$1";
-    print \*STDOUT, "creating index $file.html\n" if $verbose;
+    print $^STDOUT, "creating index $file.html\n" if $verbose;
 
     # read in everything until what would have been the first =head
     # directive, patching the index as we go.
@@ -362,7 +362,7 @@ sub split_on_head($podroot, $htmldir, $splitdirs, $ignore, @< @splithead) {
     my($dirname, $filename);
 
     # split the files specified in @splithead on =head[1-6] pod directives
-    print \*STDOUT, "splitting files by head.\n" if $verbose &&( (nelems @splithead)-1) +>= 0;
+    print $^STDOUT, "splitting files by head.\n" if $verbose &&( (nelems @splithead)-1) +>= 0;
     foreach my $pod ( @splithead) {
 	# figure out the directory name and filename
 	$pod      =~ s,^([^/]*)$,/$1,;
@@ -383,7 +383,7 @@ sub split_on_head($podroot, $htmldir, $splitdirs, $ignore, @< @splithead) {
 sub split_on_item($podroot, $splitdirs, $ignore, @< @splititem) {
     my($pwd, $dirname, $filename);
 
-    print \*STDOUT, "splitting files by item.\n" if $verbose &&( (nelems @splititem)-1) +>= 0;
+    print $^STDOUT, "splitting files by item.\n" if $verbose &&( (nelems @splititem)-1) +>= 0;
     $pwd = getcwd();
     my $splitter = File::Spec->rel2abs("$splitpod/splitpod", $pwd);
     my $perl = File::Spec->rel2abs($^EXECUTABLE_NAME, $pwd);
@@ -424,7 +424,7 @@ sub splitpod($pod, $poddir, $htmldir, $splitdirs) {
     my(@poddata, @filedata, @heads);
     my($file, $i, $j, $prevsec, $section, $nextsec);
 
-    print \*STDOUT, "splitting $pod\n" if $verbose;
+    print $^STDOUT, "splitting $pod\n" if $verbose;
 
     # read the file in paragraphs
     $^INPUT_RECORD_SEPARATOR = "";
@@ -485,7 +485,7 @@ sub splitpod($pod, $poddir, $htmldir, $splitdirs) {
 	$file = "$dir/" . anchorify($section) . ".pod";
 
 	# create the new .pod file
-	print \*STDOUT, "\tcreating $poddir/$file\n" if $verbose;
+	print $^STDOUT, "\tcreating $poddir/$file\n" if $verbose;
 	open(my $splitout_fh, ">", "$poddir/$file") ||
 	    die "$^PROGRAM_NAME: error opening $poddir/$file for output: $^OS_ERROR\n";
 	@poddata[$i] =~ s,L<([^<>]*)>,$(
@@ -549,7 +549,7 @@ sub installdir($dir, $recurse, $podroot, $splitdirs, $ignore) {
 
 	# check if a .pm files exists too
 	if (grep( { $_ eq $pod }, @pmlist)) {
-	    print  \*STDOUT, "$^PROGRAM_NAME: Warning both '$podroot/$pod.pod' and "
+	    print  $^STDOUT, "$^PROGRAM_NAME: Warning both '$podroot/$pod.pod' and "
 		. "'$podroot/$pod.pm' exist, using pod\n";
 	    push(@ignore, "$pod.pm");
 	}
@@ -589,7 +589,7 @@ sub runpod2html($pod, $doindex) {
     }
 
     # invoke pod2html
-    print \*STDOUT, "$podroot/$pod => $htmldir/$html\n" if $verbose;
+    print $^STDOUT, "$podroot/$pod => $htmldir/$html\n" if $verbose;
     Pod::Html::pod2html(
         "--htmldir=$htmldir",
 	"--htmlroot=$htmlroot",

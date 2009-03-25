@@ -33,7 +33,7 @@ ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
 do {
     my $stdout = \$( '' );
     open my $stdout_fh, '>>', $stdout or die;
-    *STDOUT = *{$stdout_fh}{IO};
+    $^STDOUT = *{$stdout_fh}{IO};
     my $warnings = '';
     local $^WARN_HOOK = sub {
         $warnings .= @_[0]->description;

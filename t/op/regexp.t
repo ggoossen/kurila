@@ -84,22 +84,22 @@ $nulnul = "\0" x 2;
 $OP = $qr ?? 'qr' !! 'm';
 
 $^OUTPUT_AUTOFLUSH = 1;
-printf \*STDOUT, "1..\%d\n# $iters iterations\n", scalar nelems @tests;
+printf $^STDOUT, "1..\%d\n# $iters iterations\n", scalar nelems @tests;
 
 my $test;
 TEST:
 foreach ( @tests) {
     $test++;
     if (!m/\S/ || m/^\s*#/ || m/^__END__$/) {
-        print \*STDOUT, "ok $test # (Blank line or comment)\n";
-        if (m/#/) { print \*STDOUT, $_ };
+        print $^STDOUT, "ok $test # (Blank line or comment)\n";
+        if (m/#/) { print $^STDOUT, $_ };
         next;
     }
     chomp;
     s/\\n/\n/g;
     my @($pat, $subject, $result, $repl, $expect, ?$reason) =  split(m/\t/,$_,6);
     if ($result =~ m/c/ and env::var('PERL_VALGRIND')) {
-        print \*STDOUT, "ok $test # TODO fix memory leak with compilation error\n";
+        print $^STDOUT, "ok $test # TODO fix memory leak with compilation error\n";
         next;
     }
     $reason = '' unless defined $reason;
@@ -169,39 +169,39 @@ EOFCODE
 	};
 	my $err = $^EVAL_ERROR;
 	if ($result eq 'c') {
-	    if ($err->{?description} !~ m!^\Q$expect!) { print \*STDOUT, "not ok $test (compile) $input => `$err'\n"; next TEST }
+	    if ($err->{?description} !~ m!^\Q$expect!) { print $^STDOUT, "not ok $test (compile) $input => `$err'\n"; next TEST }
 	    last;  # no need to study a syntax error
 	}
 	elsif ( $skip ) {
-	    print \*STDOUT, "ok $test # skipped", length($reason) ?? " $reason" !! '', "\n";
+	    print $^STDOUT, "ok $test # skipped", length($reason) ?? " $reason" !! '', "\n";
 	    next TEST;
 	}
 	elsif ( $todo ) {
-	    print \*STDOUT, "not ok $test # todo", length($reason) ?? " - $reason" !! '', "\n";
+	    print $^STDOUT, "not ok $test # todo", length($reason) ?? " - $reason" !! '', "\n";
 	    next TEST;
 	}
 	elsif ($err) {
-	    print \*STDOUT, "not ok $test $input => error: '$($^EVAL_ERROR->message)'\n$(dump::view($code))\n"; next TEST;
+	    print $^STDOUT, "not ok $test $input => error: '$($^EVAL_ERROR->message)'\n$(dump::view($code))\n"; next TEST;
 	}
 	elsif ($result =~ m/^n/) {
-	    if ($match) { print \*STDOUT, "not ok $test ($study) $input => false positive\n"; next TEST }
+	    if ($match) { print $^STDOUT, "not ok $test ($study) $input => false positive\n"; next TEST }
 	}
 	else {
 	    if (!$match || $got ne $expect) {
 	        try { require Data::Dumper };
 		if ($^EVAL_ERROR) {
-		    print \*STDOUT, "not ok $test ($study) $input => `$got', match=$match\n$code\n";
+		    print $^STDOUT, "not ok $test ($study) $input => `$got', match=$match\n$code\n";
 		}
 		else { # better diagnostics
 		    my $s = 'Data::Dumper'->new(\@($subject),\@('subject'))->Useqq(1)->Dump;
 		    my $g = 'Data::Dumper'->new(\@($got),\@('got'))->Useqq(1)->Dump;
-		    print \*STDOUT, "not ok $test ($study) $input => `$got', match=$match\n$s\n$g\n$code\n";
+		    print $^STDOUT, "not ok $test ($study) $input => `$got', match=$match\n$s\n$g\n$code\n";
 		}
 		next TEST;
 	    }
 	}
     }
-    print \*STDOUT, "ok $test\n";
+    print $^STDOUT, "ok $test\n";
 }
 
 1;

@@ -175,7 +175,7 @@ sub new {
   $new->accept_targets( 'html', 'HTML' );
   $new->accept_codes('VerbatimFormatted');
   $new->accept_codes(< @_to_accept);
-  DEBUG +> 2 and print \*STDOUT, "To accept: ", join(' ', @_to_accept), "\n";
+  DEBUG +> 2 and print $^STDOUT, "To accept: ", join(' ', @_to_accept), "\n";
 
   $new->perldoc_url_prefix(  $Perldoc_URL_Prefix  );
   $new->perldoc_url_postfix( $Perldoc_URL_Postfix );
@@ -199,7 +199,7 @@ sub new {
 }
 
 sub batch_mode_page_object_init($self, $batchconvobj, $module, $infile, $outfile, $depth) {
-  DEBUG and print \*STDOUT, "Initting $self\n  for $module\n",
+  DEBUG and print $^STDOUT, "Initting $self\n  for $module\n",
     "  in $infile\n  out $outfile\n  depth $depth\n";
   $self->batch_mode(1);
   $self->batch_mode_current_level($depth);
@@ -222,12 +222,12 @@ sub do_beginning {
   
   if(defined $self->force_title) {
     $title = $self->force_title;
-    DEBUG and print \*STDOUT, "Forcing title to be $title\n";
+    DEBUG and print $^STDOUT, "Forcing title to be $title\n";
   } else {
     # Actually try looking for the title in the document:
     $title = $self->get_short_title();
     unless($self->content_seen) {
-      DEBUG and print \*STDOUT, "No content seen in search for title.\n";
+      DEBUG and print $^STDOUT, "No content seen in search for title.\n";
       return;
     }
     $self->{+'Title'} = $title;
@@ -237,7 +237,7 @@ sub do_beginning {
     } else {
       $title = $self->default_title;    
       $title = '' unless defined $title;
-      DEBUG and print \*STDOUT, "Title defaults to $title\n";
+      DEBUG and print $^STDOUT, "Title defaults to $title\n";
     }
   }
 
@@ -272,7 +272,7 @@ sub do_beginning {
     $after,
   ;
 
-  DEBUG and print \*STDOUT, "Returning from do_beginning...\n";
+  DEBUG and print $^STDOUT, "Returning from do_beginning...\n";
   return 1;
 }
 
@@ -334,9 +334,9 @@ sub do_middle {
     my $index = $self->index_as_html();
     if( $$out =~ s/$sneakytag/$index/s ) {
       # Expected case
-      DEBUG and print \*STDOUT, "Inserted ", length($index), " bytes of index HTML into $out.\n";
+      DEBUG and print $^STDOUT, "Inserted ", length($index), " bytes of index HTML into $out.\n";
     } else {
-      DEBUG and print \*STDOUT, "Odd, couldn't find where to insert the index in the output!\n";
+      DEBUG and print $^STDOUT, "Odd, couldn't find where to insert the index in the output!\n";
       # I don't think this should ever happen.
     }
     return 1;
@@ -462,7 +462,7 @@ sub _do_middle_main_loop {
         if(defined $name) {
           my $esc = esc( $self->section_name_tidy( $name ) );
           print $fh, qq[name="$esc"];
-          DEBUG and print \*STDOUT, "Linearized ", scalar(nelems @to_unget),
+          DEBUG and print $^STDOUT, "Linearized ", scalar(nelems @to_unget),
            " tokens as \"$name\".\n";
           push @{ $self->{+'PSHTML_index_points'} }, \@($tagname, $name)
            if %ToIndex{?$tagname };
@@ -470,7 +470,7 @@ sub _do_middle_main_loop {
             #  just their content), but ahwell.
            
         } else {  # ludicrously long, so nevermind
-          DEBUG and print \*STDOUT, "Linearized ", scalar(nelems @to_unget),
+          DEBUG and print $^STDOUT, "Linearized ", scalar(nelems @to_unget),
            " tokens, but it was too long, so nevermind.\n";
         }
         print $fh, "\n>";
@@ -483,7 +483,7 @@ sub _do_middle_main_loop {
           $self->unget_token($next);
           next;
         }
-        DEBUG and print \*STDOUT, "    raw text ", < $next->text, "\n";
+        DEBUG and print $^STDOUT, "    raw text ", < $next->text, "\n";
         printf $fh, "\n" . $next->text . "\n";
         next;
        
@@ -566,18 +566,18 @@ sub do_pod_link($self, $link) {
   $section = $self->section_escape($section)
    if defined $section and length($section .= ''); # (stringify)
 
-  DEBUG and printf \*STDOUT, "Resolving \"\%s\" \"\%s\"...\n",
+  DEBUG and printf $^STDOUT, "Resolving \"\%s\" \"\%s\"...\n",
    $to || "(nil)",  $section || "(nil)";
    
   do {
     # An early hack:
     my $complete_url = $self->resolve_pod_link_by_table($to, $section);
     if( $complete_url ) {
-      DEBUG +> 1 and print \*STDOUT, "resolve_pod_link_by_table(T,S) gives ",
+      DEBUG +> 1 and print $^STDOUT, "resolve_pod_link_by_table(T,S) gives ",
         $complete_url, "\n  (Returning that.)\n";
       return $complete_url;
     } else {
-      DEBUG +> 4 and print \*STDOUT, " resolve_pod_link_by_table(T,S)", 
+      DEBUG +> 4 and print $^STDOUT, " resolve_pod_link_by_table(T,S)", 
        " didn't return anything interesting.\n";
     }
   };
@@ -587,15 +587,15 @@ sub do_pod_link($self, $link) {
     my $there = $self->resolve_pod_link_by_table($to);
     if(defined $there and length $there) {
       DEBUG +> 1
-       and print \*STDOUT, "resolve_pod_link_by_table(T) gives $there\n";
+       and print $^STDOUT, "resolve_pod_link_by_table(T) gives $there\n";
     } else {
       $there = 
         $self->resolve_pod_page_link($to, $section);
          # (I pass it the section value, but I don't see a
          #  particular reason it'd use it.)
-      DEBUG +> 1 and print \*STDOUT, "resolve_pod_page_link gives ", $to || "(nil)", "\n";
+      DEBUG +> 1 and print $^STDOUT, "resolve_pod_page_link gives ", $to || "(nil)", "\n";
       unless( defined $there and length $there ) {
-        DEBUG and print \*STDOUT, "Can't resolve $to\n";
+        DEBUG and print $^STDOUT, "Can't resolve $to\n";
         return undef;
       }
       # resolve_pod_page_link returning undef is how it
@@ -610,12 +610,12 @@ sub do_pod_link($self, $link) {
   $out .= "#" . $section if defined $section and length $section;
   
   unless(length $out) { # sanity check
-    DEBUG and printf \*STDOUT, "Oddly, couldn't resolve \"\%s\" \"\%s\"...\n",
+    DEBUG and printf $^STDOUT, "Oddly, couldn't resolve \"\%s\" \"\%s\"...\n",
      $to || "(nil)",  $section || "(nil)";
     return undef;
   }
 
-  DEBUG and print \*STDOUT, "Resolved to $out\n";
+  DEBUG and print $^STDOUT, "Resolved to $out\n";
   return $out;  
 }
 
@@ -685,16 +685,16 @@ sub resolve_pod_page_link_singleton_mode($self, $it) {
 }
 
 sub resolve_pod_page_link_batch_mode($self, $to) {
-  DEBUG +> 1 and print \*STDOUT, " During batch mode, resolving $to ...\n";
+  DEBUG +> 1 and print $^STDOUT, " During batch mode, resolving $to ...\n";
   my @path = grep { length($_) }, split m/::/s, $to, -1;
   unless( nelems @path ) { # sanity
-    DEBUG and print \*STDOUT, "Very odd!  Splitting $to gives (nil)!\n";
+    DEBUG and print $^STDOUT, "Very odd!  Splitting $to gives (nil)!\n";
     return undef;
   }
   $self->batch_mode_rectify_path(\@path);
   my $out = join('/', map { < $self->pagepath_url_escape($_) }, @path)
     . $HTML_EXTENSION;
-  DEBUG +> 1 and print \*STDOUT, " => $out\n";
+  DEBUG +> 1 and print $^STDOUT, " => $out\n";
   return $out;
 }
 

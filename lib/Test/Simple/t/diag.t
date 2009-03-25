@@ -44,7 +44,7 @@ do {
     $Test->failure_output($fakeout);
     $ret = diag("# foo");
 };
-$Test->failure_output(\*STDERR);
+$Test->failure_output($^STDERR);
 is( $output, "# # foo\n", "diag() adds # even if there's one already" );
 ok( !$ret,  'diag returns false' );
 
@@ -55,7 +55,7 @@ do {
     $Test->failure_output($fakeout);
     diag( <qw(one two));
 };
-$Test->failure_output(\*STDERR);
+$Test->failure_output($^STDERR);
 is( $output, <<'DIAG' );
 # onetwo
 DIAG

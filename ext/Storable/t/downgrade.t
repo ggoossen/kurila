@@ -132,7 +132,7 @@ sub test_newkey {
 thaw_hash ('Hash with utf8 flag but no utf8 keys', \%R_HASH);
 
 if (eval "use Hash::Util; 1") {
-  print \*STDOUT, "# We have Hash::Util, so test that the restricted hashes in <DATA> are valid\n";
+  print $^STDOUT, "# We have Hash::Util, so test that the restricted hashes in <DATA> are valid\n";
   for my $downgrade (@(0, 1, undef, "cheese")) {
     local $TODO = 1;
     $Storable::downgrade_restricted = $downgrade;
@@ -149,7 +149,7 @@ if (eval "use Hash::Util; 1") {
     test_placeholder ($hash);
   }
 } else {
-  print \*STDOUT, "# We don't have Hash::Util, so test that the restricted hashes downgrade\n";
+  print $^STDOUT, "# We don't have Hash::Util, so test that the restricted hashes downgrade\n";
   my $hash = thaw_hash ('Locked hash', \%R_HASH);
   test_newkey ($hash);
   $hash = thaw_hash ('Locked hash placeholder', \%R_HASH);
@@ -167,14 +167,14 @@ if (eval "use Hash::Util; 1") {
 
 do {
   use utf8;
-  print \*STDOUT, "# We have utf8 scalars, so test that the utf8 scalars in <DATA> are valid\n";
+  print $^STDOUT, "# We have utf8 scalars, so test that the utf8 scalars in <DATA> are valid\n";
   thaw_scalar ('Short 8 bit utf8 data', "\x{DF}", 1);
   thaw_scalar ('Long 8 bit utf8 data', "\x{DF}" x 256, 1);
   thaw_scalar ('Short 24 bit utf8 data', chr 0xC0FFEE);
   thaw_scalar ('Long 24 bit utf8 data', chr (0xC0FFEE) x 256);
 };
 
-print \*STDOUT, "# We have utf8 hashes, so test that the utf8 hashes in <DATA> are valid\n";
+print $^STDOUT, "# We have utf8 hashes, so test that the utf8 hashes in <DATA> are valid\n";
 thaw_fail ('Hash with utf8 keys', qr/WASUTF8 flag not supported/ );
 
 __END__

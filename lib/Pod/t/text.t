@@ -12,13 +12,13 @@ use TestInit;
 
 BEGIN {
     $^OUTPUT_AUTOFLUSH = 1;
-    print \*STDOUT, "1..4\n";
+    print $^STDOUT, "1..4\n";
 }
 
 use Pod::Text;
 use Pod::Simple;
 
-print \*STDOUT, "ok 1\n";
+print $^STDOUT, "ok 1\n";
 
 my $parser = Pod::Text->new or die "Cannot create parser\n";
 my $n = 2;
@@ -47,12 +47,12 @@ while ( ~< *DATA) {
         $expected .= $_;
     }
     if ($output eq $expected) {
-        print \*STDOUT, "ok $n\n";
+        print $^STDOUT, "ok $n\n";
     } elsif ($n == 4 && $Pod::Simple::VERSION +< 3.06) {
-        print \*STDOUT, "ok $n # skip Pod::Simple S<> parsing bug\n";
+        print $^STDOUT, "ok $n # skip Pod::Simple S<> parsing bug\n";
     } else {
-        print \*STDOUT, "not ok $n\n";
-        print \*STDOUT, "Expected\n========\n$expected\nOutput\n======\n$output\n";
+        print $^STDOUT, "not ok $n\n";
+        print $^STDOUT, "Expected\n========\n$expected\nOutput\n======\n$output\n";
     }
     $n++;
 }

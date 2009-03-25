@@ -75,21 +75,21 @@ sub survey($self, @< @search_dirs) {
         < grep { length($_) }, split '[\/:]+', $self->{?'dir_prefix'}
       );
       $modname_prefix = \ grep { length($_) }, split m{[:/\\]}, $self->{?'dir_prefix'};
-      $verbose and print \*STDOUT, "Appending \"$self->{?'dir_prefix'}\" to $try, ",
+      $verbose and print $^STDOUT, "Appending \"$self->{?'dir_prefix'}\" to $try, ",
         "giving $start_in (= $(join ' ',@$modname_prefix))\n";
     } else {
       $start_in = $try;
     }
 
     if( $self->{'_dirs_visited'}->{?$start_in} ) {
-      $verbose and print \*STDOUT, "Directory '$start_in' already seen, skipping.\n";
+      $verbose and print $^STDOUT, "Directory '$start_in' already seen, skipping.\n";
       next;
     } else {
       $self->{'_dirs_visited'}->{+$start_in} = 1;
     }
   
     unless(-e $start_in) {
-      $verbose and print \*STDOUT, "Skipping non-existent $start_in\n";
+      $verbose and print $^STDOUT, "Skipping non-existent $start_in\n";
       next;
     }
 
@@ -97,18 +97,18 @@ sub survey($self, @< @search_dirs) {
     
     if(-d $start_in) {
       # Normal case:
-      $verbose and print \*STDOUT, "Beginning excursion under $start_in\n";
+      $verbose and print $^STDOUT, "Beginning excursion under $start_in\n";
       $self->_recurse_dir( $start_in, $closure, $modname_prefix );
-      $verbose and print \*STDOUT, "Back from excursion under $start_in\n\n";
+      $verbose and print $^STDOUT, "Back from excursion under $start_in\n\n";
         
     } elsif(-f _) {
       # A excursion consisting of just one file!
       $_ = basename($start_in);
-      $verbose and print \*STDOUT, "Pondering $start_in ($_)\n";
+      $verbose and print $^STDOUT, "Pondering $start_in ($_)\n";
       $closure->($start_in, $_, 0, \@());
         
     } else {
-      $verbose and print \*STDOUT, "Skipping mysterious $start_in\n";
+      $verbose and print $^STDOUT, "Skipping mysterious $start_in\n";
     }
   }
   $self->progress and $self->progress->done(
@@ -134,17 +134,17 @@ sub _make_search_callback {
     if($isdir) { # this never gets called on the startdir itself, just subdirs
 
       if( $self->{'_dirs_visited'}->{?$file} ) {
-        $verbose and print \*STDOUT, "Directory '$file' already seen, skipping.\n";
+        $verbose and print $^STDOUT, "Directory '$file' already seen, skipping.\n";
         return 'PRUNE';
       }
 
-      print \*STDOUT, "Looking in dir $file\n" if $verbose;
+      print $^STDOUT, "Looking in dir $file\n" if $verbose;
 
       unless ($laborious) { # $laborious overrides pruning
         if( m/^([A-Za-z][a-zA-Z0-9_]*)\z/s ) {
-          $verbose and print \*STDOUT, "$_ is a well-named module subdir.  Looking....\n";
+          $verbose and print $^STDOUT, "$_ is a well-named module subdir.  Looking....\n";
         } else {
-          $verbose and print \*STDOUT, "$_ is a fishy directory name.  Skipping.\n";
+          $verbose and print $^STDOUT, "$_ is a fishy directory name.  Skipping.\n";
           return 'PRUNE';
         }
       } # end unless $laborious
@@ -160,27 +160,27 @@ sub _make_search_callback {
         m/\.(pod|pm|plx?)\z/i || -x _ and -T _
          # Note that the cheapest operation (the RE) is run first.
       ) {
-        $verbose +> 1 and print \*STDOUT, " Brushing off uninteresting $file\n";
+        $verbose +> 1 and print $^STDOUT, " Brushing off uninteresting $file\n";
         return;
       }
     } else {
       unless( m/^[-_a-zA-Z0-9]+\.(?:pod|pm|plx?)\z/is ) {
-        $verbose +> 1 and print \*STDOUT, " Brushing off oddly-named $file\n";
+        $verbose +> 1 and print $^STDOUT, " Brushing off oddly-named $file\n";
         return;
       }
     }
 
-    $verbose and print \*STDOUT, "Considering item $file\n";
+    $verbose and print $^STDOUT, "Considering item $file\n";
     my $name = $self->_path2modname( $file, $shortname, $modname_bits );
-    $verbose +> 0.01 and print \*STDOUT, " Nominating $file as $name\n";
+    $verbose +> 0.01 and print $^STDOUT, " Nominating $file as $name\n";
         
     if($limit_re and $name !~ m/$limit_re/i) {
-      $verbose and print \*STDOUT, "Shunning $name as not matching $limit_re\n";
+      $verbose and print $^STDOUT, "Shunning $name as not matching $limit_re\n";
       return;
     }
 
     if( !$shadows and $name2path->{?$name} ) {
-      $verbose and print \*STDOUT, "Not worth considering $file ",
+      $verbose and print $^STDOUT, "Not worth considering $file ",
         "-- already saw $name as ",
         join(' ', grep( {$path2name->{?$_} eq $name }, keys %$path2name)), "\n";
       return;
@@ -198,14 +198,14 @@ sub _make_search_callback {
 
     # Or finally take note of it:
     if( $name2path->{?$name} ) {
-      $verbose and print \*STDOUT,
+      $verbose and print $^STDOUT,
        "Duplicate POD found (shadowing?): $name ($file)\n",
        "    Already seen in ",
        join(' ', grep( {$path2name->{?$_} eq $name }, keys %$path2name)), "\n";
     } else {
       $name2path->{+$name} = $file; # Noting just the first occurrence
     }
-    $verbose and print \*STDOUT, "  Noting $name = $file\n";
+    $verbose and print $^STDOUT, "  Noting $name = $file\n";
     if( $callback ) {
       local $_ = $_; # insulate from changes, just in case
       $callback->($file, $name);
@@ -262,9 +262,9 @@ sub _path2modname($self, $file, $shortname, $modname_bits) {
             # substitute case-preserved version of name
             my $podname = $2;
             my $prefix = $1 || '';
-            $verbose and print \*STDOUT, "Attempting case restore of '$name' from '$prefix$podname'\n";
+            $verbose and print $^STDOUT, "Attempting case restore of '$name' from '$prefix$podname'\n";
             unless ($name =~ s/$prefix$podname/$prefix$podname/i) {
-              $verbose and print \*STDOUT, "Attempting case restore of '$name' from '$podname'\n";
+              $verbose and print $^STDOUT, "Attempting case restore of '$name' from '$podname'\n";
               $name =~ s/$podname/$podname/i;
             }
             last;
@@ -294,17 +294,17 @@ sub _recurse_dir {
   $recursor = sub {
     my@($dir_long, $dir_bare) =  @_;
     if( (nelems @$modname_bits) +>= 10 ) {
-      $verbose and print \*STDOUT, "Too deep! [$(join ' ',@$modname_bits)]\n";
+      $verbose and print $^STDOUT, "Too deep! [$(join ' ',@$modname_bits)]\n";
       return;
     }
 
     unless(-d $dir_long) {
-      $verbose +> 2 and print \*STDOUT, "But it's not a dir! $dir_long\n";
+      $verbose +> 2 and print $^STDOUT, "But it's not a dir! $dir_long\n";
       return;
     }
     my $indir;
     unless( opendir($indir, $dir_long) ) {
-      $verbose +> 2 and print \*STDOUT, "Can't opendir $dir_long : $^OS_ERROR\n";
+      $verbose +> 2 and print $^STDOUT, "Can't opendir $dir_long : $^OS_ERROR\n";
       closedir($indir);
       return
     }
@@ -319,7 +319,7 @@ sub _recurse_dir {
       $i_full = File::Spec->catfile( $dir_long, $i );
 
       if(!-r $i_full) {
-        $verbose and print \*STDOUT, "Skipping unreadable $i_full\n";
+        $verbose and print $^STDOUT, "Skipping unreadable $i_full\n";
        
       } elsif(-f $i_full) {
         $_ = $i;
@@ -331,13 +331,13 @@ sub _recurse_dir {
         my $rv = $callback->( $i_full, $i, 1, $modname_bits ) || '';
 
         if($rv eq 'PRUNE') {
-          $verbose +> 1 and print \*STDOUT, "OK, pruning";
+          $verbose +> 1 and print $^STDOUT, "OK, pruning";
         } else {
           # Otherwise, recurse into it
           $recursor->( File::Spec->catdir($dir_long, $i) , $i);
         }
       } else {
-        $verbose +> 1 and print \*STDOUT, "Skipping oddity $i_full\n";
+        $verbose +> 1 and print $^STDOUT, "Skipping oddity $i_full\n";
       }
     }
     pop @$modname_bits;
@@ -370,9 +370,9 @@ sub run($file, $name) {
     my $inpod;
     if($file =~ m/\.pod$/i) {
       # Don't bother looking for $VERSION in .pod files
-      DEBUG and print \*STDOUT, "Not looking for \$VERSION in .pod $file\n";
+      DEBUG and print $^STDOUT, "Not looking for \$VERSION in .pod $file\n";
     } elsif( !open($inpod, "<", $file) ) {
-      DEBUG and print \*STDOUT, "Couldn't open $file: $^OS_ERROR\n";
+      DEBUG and print $^STDOUT, "Couldn't open $file: $^OS_ERROR\n";
       close($inpod);
     } else {
       # Sane case: file is readable
@@ -380,7 +380,7 @@ sub run($file, $name) {
       while( ~< $inpod) {
         last if $lines++ +> $MAX_VERSION_WITHIN; # some degree of sanity
         if( s/^\s*\$VERSION\s*=\s*//s and m/\d/ ) {
-          DEBUG and print \*STDOUT, "Found version line (#$lines): $_";
+          DEBUG and print $^STDOUT, "Found version line (#$lines): $_";
           s/\s*\#.*//s;
           s/\;\s*$//s;
           s/\s+$//s;
@@ -400,13 +400,13 @@ sub run($file, $name) {
            if m{\$Name:\s*([^\$]+)\$}s 
           ;
           $version = $_;
-          DEBUG and print \*STDOUT, "Noting $version as version\n";
+          DEBUG and print $^STDOUT, "Noting $version as version\n";
           last;
         }
       }
       close($inpod);
     }
-    print \*STDOUT, "$name\t$version\t$file\n";
+    print $^STDOUT, "$name\t$version\t$file\n";
     return;
     # End of callback!
   });
@@ -490,7 +490,7 @@ sub _limit_glob_to_limit_re {
   $limit_re =~ s/\\\*/.*?/g;  # glob "*" => ".*?"
   $limit_re =~ s/\.\*\?\$$//s; # final glob "*" => ".*?$" => ""
 
-  $self->{?'verbose'} and print \*STDOUT, "Turning limit_glob $limit_glob into re $limit_re\n";
+  $self->{?'verbose'} and print $^STDOUT, "Turning limit_glob $limit_glob into re $limit_re\n";
 
   # A common optimization:
   if(!exists($self->{'dir_prefix'})
@@ -498,7 +498,7 @@ sub _limit_glob_to_limit_re {
     # Optimize for sane and common cases (but not things like "*::File")
   ) {
     $self->{+'dir_prefix'} = join "::", @( $limit_glob =~ m/^(?:\w+::)+/sg);
-    $self->{?'verbose'} and print \*STDOUT, " and setting dir_prefix to $self->{?'dir_prefix'}\n";
+    $self->{?'verbose'} and print $^STDOUT, " and setting dir_prefix to $self->{?'dir_prefix'}\n";
   }
 
   return $limit_re;
@@ -519,7 +519,7 @@ sub find($self, $pod, @< @search_dirs) {
 
   # Split on :: and then join the name together using File::Spec
   my @parts = split m/::/, $pod;
-  $verbose and print \*STDOUT, "Chomping \{$pod\} => \{$(join ' ',@parts)\}\n";
+  $verbose and print $^STDOUT, "Chomping \{$pod\} => \{$(join ' ',@parts)\}\n";
 
   #@search_dirs = File::Spec->curdir unless @search_dirs;
   
@@ -549,24 +549,24 @@ sub find($self, $pod, @< @search_dirs) {
     next if %seen_dir{?$dir};
     %seen_dir{+$dir} = 1;
     unless(-d $dir) {
-      print \*STDOUT, "Directory $dir does not exist\n" if $verbose;
+      print $^STDOUT, "Directory $dir does not exist\n" if $verbose;
       next Dir;
     }
 
-    print \*STDOUT, "Looking in directory $dir\n" if $verbose;
+    print $^STDOUT, "Looking in directory $dir\n" if $verbose;
     my $fullname = File::Spec->catfile( $dir, < @parts );
-    print \*STDOUT, "Filename is now $fullname\n" if $verbose;
+    print $^STDOUT, "Filename is now $fullname\n" if $verbose;
 
     foreach my $ext (@('', '.pod', '.pm', '.pl')) {   # possible extensions
       my $fullext = $fullname . $ext;
       if( -f $fullext  and  $self->contains_pod( $fullext ) ){
-        print \*STDOUT, "FOUND: $fullext\n" if $verbose;
+        print $^STDOUT, "FOUND: $fullext\n" if $verbose;
         return $fullext;
       }
     }
     my $subdir = File::Spec->catdir($dir,'pod');
     if(-d $subdir) {  # slip in the ./pod dir too
-      $verbose and print \*STDOUT, "Noticing $subdir and stopping there...\n";
+      $verbose and print $^STDOUT, "Noticing $subdir and stopping there...\n";
       $dir = $subdir;
       redo Dir;
     }
@@ -581,10 +581,10 @@ sub contains_pod($self, $file) {
   my $verbose = $self->{?'verbose'};
 
   # check for one line of POD
-  $verbose +> 1 and print \*STDOUT, " Scanning $file for pod...\n";
+  $verbose +> 1 and print $^STDOUT, " Scanning $file for pod...\n";
   my $maybepod;
   unless( open($maybepod, "<","$file") ) {
-    print \*STDOUT, "Error: $file is unreadable: $^OS_ERROR\n";
+    print $^STDOUT, "Error: $file is unreadable: $^OS_ERROR\n";
     return undef;
   }
 
@@ -596,12 +596,12 @@ sub contains_pod($self, $file) {
     if(m/^=(head\d|pod|over|item)\b/s) {
       close($maybepod) || die "Bizarre error closing $file: $^OS_ERROR\nAborting";
       chomp;
-      $verbose +> 1 and print \*STDOUT, "  Found some pod ($_) in $file\n";
+      $verbose +> 1 and print $^STDOUT, "  Found some pod ($_) in $file\n";
       return 1;
     }
   }
   close($maybepod) || die "Bizarre error closing $file: $^OS_ERROR\nAborting";
-  $verbose +> 1 and print \*STDOUT, "  No POD in $file, skipping.\n";
+  $verbose +> 1 and print $^STDOUT, "  No POD in $file, skipping.\n";
   return 0;
 }
 

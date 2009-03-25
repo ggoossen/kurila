@@ -15,7 +15,7 @@ ok 1;
 
 use Pod::Simple::DumpAsXML;
 use Pod::Simple::XMLOutStream;
-print \*STDOUT, "# Pod::Simple version $Pod::Simple::VERSION\n";
+print $^STDOUT, "# Pod::Simple version $Pod::Simple::VERSION\n";
 sub e ($x, $y) { Pod::Simple::DumpAsXML->_duo($x, $y) }
 
 ok( Pod::Simple::XMLOutStream->_out("=head1 =head1"),
@@ -42,7 +42,7 @@ ok( Pod::Simple::XMLOutStream->_out("\n=head1 =head1\n\n"),
 &ok( <e "\n=pod\n\nCha\tcha  cha\n\n" , "\n=pod\n\nCha cha cha\n\n");
 &ok( <e "\n=pod\n\nCha\ncha  cha\n\n" , "\n=pod\n\nCha cha cha\n\n");
 
-print \*STDOUT, "# Wrapping up... one for the road...\n";
+print $^STDOUT, "# Wrapping up... one for the road...\n";
 ok 1;
-print \*STDOUT, "# --- Done with ", __FILE__, " --- \n";
+print $^STDOUT, "# --- Done with ", __FILE__, " --- \n";
 

@@ -12,12 +12,12 @@ use TestInit;
 
 BEGIN {
     $^OUTPUT_AUTOFLUSH = 1;
-    print \*STDOUT, "1..5\n";
+    print $^STDOUT, "1..5\n";
 }
 
 use Pod::Text;
 
-print \*STDOUT, "ok 1\n";
+print $^STDOUT, "ok 1\n";
 
 my $n = 2;
 while ( ~< *DATA) {
@@ -52,10 +52,10 @@ while ( ~< *DATA) {
         $expected .= $_;
     }
     if ($output eq $expected) {
-        print \*STDOUT, "ok $n\n";
+        print $^STDOUT, "ok $n\n";
     } else {
-        print \*STDOUT, "not ok $n\n";
-        print \*STDOUT, "Expected\n========\n$expected\nOutput\n======\n$output\n";
+        print $^STDOUT, "not ok $n\n";
+        print $^STDOUT, "Expected\n========\n$expected\nOutput\n======\n$output\n";
     }
     $n++;
 }

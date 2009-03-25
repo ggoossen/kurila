@@ -108,7 +108,7 @@ sub new {
 sub muse {
   my $self = shift;
   if($self->verbose) {
-    print \*STDOUT, 'T+', int(time() - $self->{?'_batch_start_time'}), "s: ", < @_, "\n";
+    print $^STDOUT, 'T+', int(time() - $self->{?'_batch_start_time'}), "s: ", < @_, "\n";
   }
   return 1;
 }
@@ -264,7 +264,7 @@ sub _do_one_batch_conversion($self, $module, $mod2path, $outdir, ?$outfile) {
   $self->batch_mode_page_object_kill($page, $module, $infile, $outfile, $depth)
    if $self->can('batch_mode_page_object_kill');
     
-  DEBUG +> 4 and printf \*STDOUT, "\%s \%sb < $infile \%s \%sb\n",
+  DEBUG +> 4 and printf $^STDOUT, "\%s \%sb < $infile \%s \%sb\n",
      $outfile, -s $outfile, $infile, -s $infile
   ;
 
@@ -288,7 +288,7 @@ sub note_for_contents_file($self, $namelets, $infile, $outfile) {
      \@( join("::", @$namelets), $infile, $outfile, $namelets )
      #            0               1         2         3
     ;
-    DEBUG +> 3 and print \*STDOUT, "Noting  <@$c[[@(-1)]]\n";
+    DEBUG +> 3 and print $^STDOUT, "Noting  <@$c[[@(-1)]]\n";
   }
   return;
 }
@@ -431,7 +431,7 @@ sub makepath($self, $outdir, $namelets) {
       die "$dir exists but not as a directory!?" unless -d $dir;
       next;
     }
-    DEBUG +> 3 and print \*STDOUT, "  Making $dir\n";
+    DEBUG +> 3 and print $^STDOUT, "  Making $dir\n";
     mkdir $dir, 0777
      or die "Can't mkdir $dir: $^OS_ERROR\nAborting"
     ;
@@ -510,7 +510,7 @@ sub modnames2paths($self, $dirs) {
   my $m2p;
   do {
     my $search = $SEARCH_CLASS->new;
-    DEBUG and print \*STDOUT, "Searching via $search\n";
+    DEBUG and print $^STDOUT, "Searching via $search\n";
     $search->verbose(1) if DEBUG +> 10;
     $search->progress( < $self->progress->copy->goal(0) ) if $self->progress;
     $search->shadows(0);  # don't bother noting shadowed files
@@ -522,13 +522,13 @@ sub modnames2paths($self, $dirs) {
 
   $self->muse("That's odd... no modules found!") unless %$m2p;
   if( DEBUG +> 4 ) {
-    print \*STDOUT, "Modules found (name => path):\n";
+    print $^STDOUT, "Modules found (name => path):\n";
     foreach my $m (sort {lc($a) cmp lc($b)}, keys %$m2p) {
-      print \*STDOUT, "  $m  %$m2p{?$m}\n";
+      print $^STDOUT, "  $m  %$m2p{?$m}\n";
     }
-    print \*STDOUT, "(total ",     nkeys %$m2p, ")\n\n";
+    print $^STDOUT, "(total ",     nkeys %$m2p, ")\n\n";
   } elsif( DEBUG ) {
-    print \*STDOUT,      "Found ", nkeys %$m2p, " modules.\n";
+    print $^STDOUT,      "Found ", nkeys %$m2p, " modules.\n";
   }
   $self->muse( "Found ", nkeys %$m2p, " modules." );
   
@@ -541,7 +541,7 @@ sub modnames2paths($self, $dirs) {
 sub _wopen($self, $outpath) {
   require Symbol;
   my $out_fh = Symbol::gensym();
-  DEBUG +> 5 and print \*STDOUT, "Write-opening to $outpath\n";
+  DEBUG +> 5 and print $^STDOUT, "Write-opening to $outpath\n";
   return $out_fh if open($out_fh, ">", "$outpath");
   require Carp;  
   Carp::croak("Can't write-open $outpath: $^OS_ERROR");
@@ -581,9 +581,9 @@ sub _spray_css($self, $outdir) {
     my $outfile;
     if( ref($chunk->[-1]) and $url =~ m{^(_[-a-z0-9_]+\.css$)} ) {
       $outfile = $self->filespecsys->catfile( $outdir, $1 );
-      DEBUG +> 5 and print \*STDOUT, "Noting @$chunk[0] as a file I'll create.\n";
+      DEBUG +> 5 and print $^STDOUT, "Noting @$chunk[0] as a file I'll create.\n";
     } else {
-      DEBUG +> 5 and print \*STDOUT, "OK, noting @$chunk[0] as an external CSS.\n";
+      DEBUG +> 5 and print $^STDOUT, "OK, noting @$chunk[0] as an external CSS.\n";
       # Requires no further attention.
       next;
     }
@@ -593,7 +593,7 @@ sub _spray_css($self, $outdir) {
     print $Cssout, ${$chunk->[-1]}
      or warn "Couldn't print to $outfile: $^OS_ERROR\nAbort writing to $outfile at all";
     close($Cssout);
-    DEBUG +> 5 and print \*STDOUT, "Wrote $outfile\n";
+    DEBUG +> 5 and print $^STDOUT, "Wrote $outfile\n";
   }
 
   return;
@@ -740,9 +740,9 @@ sub _spray_javascript($self, $outdir) {
     
     if( ref($script->[-1]) and $url =~ m{^(_[-a-z0-9_]+\.js$)} ) {
       $outfile = $self->filespecsys->catfile( $outdir, $1 );
-      DEBUG +> 5 and print \*STDOUT, "Noting @$script[0] as a file I'll create.\n";
+      DEBUG +> 5 and print $^STDOUT, "Noting @$script[0] as a file I'll create.\n";
     } else {
-      DEBUG +> 5 and print \*STDOUT, "OK, noting @$script[0] as an external JavaScript.\n";
+      DEBUG +> 5 and print $^STDOUT, "OK, noting @$script[0] as an external JavaScript.\n";
       next;
     }
     
@@ -752,7 +752,7 @@ sub _spray_javascript($self, $outdir) {
     print $Jsout, ${$script->[-1]}
      or warn "Couldn't print to $outfile: $^OS_ERROR\nAbort writing to $outfile at all";
     close($Jsout);
-    DEBUG +> 5 and print \*STDOUT, "Wrote $outfile\n";
+    DEBUG +> 5 and print $^STDOUT, "Wrote $outfile\n";
   }
 
   return;

@@ -183,7 +183,7 @@ sub self_and_super_path {
   my $current;
   while((nelems @in_stack)) {
     next unless defined($current = shift @in_stack) && length($current);
-    print \*STDOUT, "At $current\n" if $Debug;
+    print $^STDOUT, "At $current\n" if $Debug;
     push @out, $current;
     unshift @in_stack,
       < map

@@ -122,7 +122,7 @@ close $h_fh;
 chmod 0444, $h_file;
 unlink $tmph_file;
 
-print \*STDOUT, "rebuilt:  $h_file $tab_file $act_file\n";
+print $^STDOUT, "rebuilt:  $h_file $tab_file $act_file\n";
 
 exit 0;
 

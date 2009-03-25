@@ -12,7 +12,7 @@ use TestInit;
 
 BEGIN {
     $^OUTPUT_AUTOFLUSH = 1;
-    print \*STDOUT, "1..2\n";
+    print $^STDOUT, "1..2\n";
 }
 
 # Hard-code a few values to try to get reproducible results.
@@ -22,7 +22,7 @@ env::set_var('TERMCAP' => 'xterm:co=80:do=^J:md=\E[1m:us=\E[4m:me=\E[m');
 
 use Pod::Text::Termcap;
 
-print \*STDOUT, "ok 1\n";
+print $^STDOUT, "ok 1\n";
 
 my $parser = Pod::Text::Termcap->new or die "Cannot create parser\n";
 my $n = 2;
@@ -51,10 +51,10 @@ while ( ~< *DATA) {
         $expected .= $_;
     }
     if ($output eq $expected) {
-        print \*STDOUT, "ok $n\n";
+        print $^STDOUT, "ok $n\n";
     } else {
-        print \*STDOUT, "not ok $n\n";
-        print \*STDOUT, "Expected\n========\n$expected\nOutput\n======\n$output\n";
+        print $^STDOUT, "not ok $n\n";
+        print $^STDOUT, "Expected\n========\n$expected\nOutput\n======\n$output\n";
     }
     $n++;
 }

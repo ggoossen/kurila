@@ -9,7 +9,7 @@ use Pod::Simple::Search;
 use Test;
 BEGIN { plan tests => 4 }
 
-print \*STDOUT, "# ", __FILE__,
+print $^STDOUT, "# ", __FILE__,
  ": Testing limit_glob ...\n";
 
 my $x = Pod::Simple::Search->new;
@@ -21,7 +21,7 @@ $x->shadows(1);
 use File::Spec;
 use Cwd;
 my $cwd = cwd();
-print \*STDOUT, "# CWD: $cwd\n";
+print $^STDOUT, "# CWD: $cwd\n";
 
 sub source_path {
     my $file = shift;
@@ -51,17 +51,17 @@ if(        -e ($here1 = source_path(   'testlib1'      ))) {
 } else {
   die "Can't find the test corpora";
 }
-print \*STDOUT, "# OK, found the test corpora\n#  as $here1\n# and $here2\n# and $here3\n#\n";
+print $^STDOUT, "# OK, found the test corpora\n#  as $here1\n# and $here2\n# and $here3\n#\n";
 ok 1;
 
-print \*STDOUT, $x->_state_as_string;
+print $^STDOUT, $x->_state_as_string;
 #$x->verbose(12);
 
 use Pod::Simple;
 *pretty = \&Pod::Simple::BlackBox::pretty;
 
 my $glob = '*z?k*';
-print \*STDOUT, "# Limiting to $glob\n";
+print $^STDOUT, "# Limiting to $glob\n";
 $x->limit_glob($glob);
 
 my $name2where = $x->survey($here1, $here2, $here3);
@@ -73,7 +73,7 @@ ok $names, "perlzuk|zikzik";
 };
 
 
-print \*STDOUT, "# OK, bye from ", __FILE__, "\n";
+print $^STDOUT, "# OK, bye from ", __FILE__, "\n";
 ok 1;
 
 __END__

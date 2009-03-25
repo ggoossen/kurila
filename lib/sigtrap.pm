@@ -23,7 +23,7 @@ sub import {
                 $saw_sig++;
                 unless ($untrapped and signals::handler($_)
                           and signals::handler($_) ne 'DEFAULT') {
-                    print \*STDOUT, "Installing handler $(dump::view($handler)) for $_\n" if $Verbose;
+                    print $^STDOUT, "Installing handler $(dump::view($handler)) for $_\n" if $Verbose;
                     signals::set_handler($_, $handler);
                 }
             } elsif ($_ eq 'normal-signals') {
@@ -68,14 +68,14 @@ sub handler_traceback {
     our $panic;
     signals::set_handler('ABRT', 'DEFAULT');
     kill 'ABRT', $^PID if $panic++;
-    syswrite(\*STDERR, 'Caught a SIG', 12);
-    syswrite(\*STDERR, @_[0], length(@_[0]));
-    syswrite(\*STDERR, ' at ', 4);
+    syswrite($^STDERR, 'Caught a SIG', 12);
+    syswrite($^STDERR, @_[0], length(@_[0]));
+    syswrite($^STDERR, ' at ', 4);
     our @($pack,$file,$line) =@( caller);
-    syswrite(\*STDERR, $file, length($file));
-    syswrite(\*STDERR, ' line ', 6);
-    syswrite(\*STDERR, $line, length($line));
-    syswrite(\*STDERR, "\n", 1);
+    syswrite($^STDERR, $file, length($file));
+    syswrite($^STDERR, ' line ', 6);
+    syswrite($^STDERR, $line, length($line));
+    syswrite($^STDERR, "\n", 1);
 
     # Now go for broke.
     my $i = 1;
@@ -102,7 +102,7 @@ sub handler_traceback {
 	}
 	$f = "file `$f'" unless $f eq '-e';
 	my $mess = "$w$s$a called from $f line $l\n";
-	syswrite(\*STDERR, $mess, length($mess));
+	syswrite($^STDERR, $mess, length($mess));
 
         $i++;
     }

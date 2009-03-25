@@ -72,7 +72,7 @@ do {
     is(hint_fetch('thikoosh'), "SKREECH");
 };
 
-print \*STDOUT, "# which now works inside evals\n";
+print $^STDOUT, "# which now works inside evals\n";
 
 do {
     BEGIN {
