@@ -201,9 +201,18 @@ sub _open3 {
     $dad_err ||= $dad_rdr;
 
 
-    $dup_wtr = (ref \$dad_wtr eq "SCALAR" and $dad_wtr =~ s/^[<>]&//);
-    $dup_rdr = (ref \$dad_rdr eq "SCALAR" and $dad_rdr =~ s/^[<>]&//);
-    $dup_err = (ref \$dad_err eq "SCALAR" and $dad_err =~ s/^[<>]&//);
+    $dup_wtr = (ref \$dad_wtr eq "ARRAY" and $dad_wtr[0] =~ s/^[<>]&//);
+    if ($dup_wtr) {
+        $dad_wtr = $dad_wtr[1];
+    }
+    $dup_rdr = (ref \$dad_rdr eq "ARRAY" and $dad_rdr[0] =~ s/^[<>]&//);
+    if ($dup_rdr) {
+        $dad_rdr = $dad_rdr[1];
+    }
+    $dup_err = (ref \$dad_err eq "ARRAY" and $dad_err[0] =~ s/^[<>]&//);
+    if ($dup_err) {
+        $dad_err = $dad_err[1];
+    }
 
     # force unqualified filehandles into caller's package
     $dad_wtr = \*{Symbol::fetch_glob(qualify $dad_wtr, $package)} unless ref \$dad_wtr ne "SCALAR" or fh_is_fd($dad_wtr);
@@ -216,13 +225,13 @@ sub _open3 {
 
     xpipe $kid_rdr, $dad_wtr if !$dup_wtr;
     xpipe $dad_rdr, $kid_wtr if !$dup_rdr;
-    xpipe $dad_err, $kid_err if !$dup_err && Symbol::glob_name(*$dad_err) ne Symbol::glob_name(*$dad_rdr);
+    xpipe $dad_err, $kid_err if !$dup_err && ($dad_err \!= $dad_rdr);
 
     $kidpid = $do_spawn ?? -1 !! xfork;
     if ($kidpid == 0) {		# Kid
 	# If she wants to dup the kid's stderr onto her stdout I need to
 	# save a copy of her stdout before I put something else there.
-	if (Symbol::glob_name($dad_rdr->*) ne Symbol::glob_name($dad_err->*) && $dup_err
+	if (($dad_rdr \!= $dad_err) && $dup_err
 		&& xfileno($dad_err) == fileno($^STDOUT)) {
 	    my $tmp = gensym;
 	    xopen($tmp, ">&", $dad_err);
@@ -241,7 +250,7 @@ sub _open3 {
 	    xclose $dad_rdr;
 	    xopen $^STDOUT, ">&=", $kid_wtr;
 	}
-	if (Symbol::glob_name($dad_rdr->*) ne Symbol::glob_name($dad_err->*)) {
+	if ($dad_rdr \!= $dad_err) {
 	    if ($dup_err) {
 		# I have to use a fileno here because in this one case
 		# I'm doing a dup but the filehandle might be a reference
@@ -306,7 +315,7 @@ sub _open3 {
 
     xclose $kid_rdr if !$dup_wtr;
     xclose $kid_wtr if !$dup_rdr;
-    xclose $kid_err if !$dup_err && Symbol::glob_name($dad_rdr->*) ne Symbol::glob_name($dad_err->*);
+    xclose $kid_err if !$dup_err && $dad_rdr \!= $dad_err;
     # If the write handle is a dup give it away entirely, close my copy
     # of it.
     xclose $dad_wtr if $dup_wtr;

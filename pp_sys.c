@@ -598,19 +598,31 @@ badexit:
 PP(pp_fileno)
 {
     dVAR; dSP; dTARGET;
-    GV *gv;
+    SV *sv;
     IO *io;
     PerlIO *fp;
 
     if (MAXARG < 1)
 	RETPUSHUNDEF;
-    gv = (GV*)POPs;
+    sv = POPs;
 
-    if (!gv || !(io = GvIO(gv)) || !(fp = IoIFP(io))) {
+    if (SvRVOK(sv))
+	sv = SvRV(sv);
+
+    if (SvTYPE(sv) == SVt_PVGV) {
+	io = GvIOn(svTgv(sv));
+    }
+    else if (SvIOOK(sv)) {
+	io = svTio(sv);
+    }
+    else 
+	io = NULL;
+
+    if (!io || !(fp = IoIFP(io))) {
 	/* Can't do this because people seem to do things like
 	   defined(fileno($foo)) to check whether $foo is a valid fh.
 	  if (ckWARN2(WARN_UNOPENED,WARN_CLOSED))
-	      report_evil_fh(gv, io, PL_op->op_type);
+	      report_evil_fh(io, PL_op->op_type);
 	    */
 	RETPUSHUNDEF;
     }

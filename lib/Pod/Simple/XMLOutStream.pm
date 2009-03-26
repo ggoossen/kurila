@@ -19,7 +19,7 @@ $SORT_ATTRS = 0 unless defined $SORT_ATTRS;
 sub new {
   my $self = shift;
   my $new = $self->SUPER::new(< @_);
-  $new->{+'output_fh'} ||= $^STDOUT{IO};
+  $new->{+'output_fh'} ||= $^STDOUT;
   #$new->accept_codes('VerbatimFormatted');
   return $new;
 }

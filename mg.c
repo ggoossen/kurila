@@ -1809,21 +1809,45 @@ Perl_magic_set(pTHX_ const char* name, SV *sv)
 		break;
 	    }
 	    if (strEQ(remaining, "STDIN")) {
-		SvRV_set(sv, ioTsv(PL_stdinio));
+		if (!SvOK(sv)) {
+		    IOcpSTEAL(PL_stdinio, newIO());
+		    break;
+		}
+		if (!SvRVOK(sv))
+		    Perl_croak(aTHX_ "$^%s must be an IO ref not %s",
+			remaining, Ddesc(sv));
+		if (! SvIOOK(SvRV(sv)))
+		    Perl_croak(aTHX_ "$^%s must be an IO ref not a %s ref",
+			remaining, Ddesc(SvRV(sv)));
+		IOcpREPLACE(PL_stdinio, svTio(SvRV(sv)));
 		break;
 	    }
 	    if (strEQ(remaining, "STDOUT")) {
+		if (!SvOK(sv)) {
+		    IOcpSTEAL(PL_stdoutio, newIO());
+		    break;
+		}
 		if (!SvRVOK(sv))
-		    Perl_croak(aTHX_ "$^STDOUT must be an IO ref not %s",
-			Ddesc(sv));
+		    Perl_croak(aTHX_ "$^%s must be an IO ref not %s",
+			remaining, Ddesc(sv));
 		if (! SvIOOK(SvRV(sv)))
-		    Perl_croak(aTHX_ "$^STDOUT must be an IO ref not a %s ref",
-			Ddesc(SvRV(sv)));
+		    Perl_croak(aTHX_ "$^%s must be an IO ref not a %s ref",
+			remaining, Ddesc(SvRV(sv)));
 		IOcpREPLACE(PL_stdoutio, svTio(SvRV(sv)));
 		break;
 	    }
 	    if (strEQ(remaining, "STDERR")) {
-		SvRV_set(sv, ioTsv(PL_stderrio));
+		if (!SvOK(sv)) {
+		    IOcpSTEAL(PL_stderrio, newIO());
+		    break;
+		}
+		if (!SvRVOK(sv))
+		    Perl_croak(aTHX_ "$^%s must be an IO ref not %s",
+			remaining, Ddesc(sv));
+		if (! SvIOOK(SvRV(sv)))
+		    Perl_croak(aTHX_ "$^%s must be an IO ref not a %s ref",
+			remaining, Ddesc(SvRV(sv)));
+		IOcpREPLACE(PL_stderrio, svTio(SvRV(sv)));
 		break;
 	    }
 	    break;

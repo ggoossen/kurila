@@ -13,7 +13,7 @@ $VERSION = '2.02';
 sub new {
   my $self = shift;
   my $new = $self->SUPER::new(< @_);
-  $new->{+'output_fh'} ||= $^STDOUT{IO};
+  $new->{+'output_fh'} ||= $^STDOUT;
   $new->nix_X_codes(1);
   return $new;
 }

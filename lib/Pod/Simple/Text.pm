@@ -21,7 +21,7 @@ $Text::Wrap::huge = 'overflow';
 sub new {
   my $self = shift;
   my $new = $self->SUPER::new(< @_);
-  $new->{+'output_fh'} ||= $^STDOUT{IO};
+  $new->{+'output_fh'} ||= $^STDOUT;
   $new->accept_target_as_text( <qw( text plaintext plain ));
   $new->nix_X_codes(1);
   $new->nbsp_for_S(1);
