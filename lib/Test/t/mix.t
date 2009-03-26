@@ -26,8 +26,8 @@ ok(1);
 skip(1,0);
 
 close $f;
-$TESTOUT = $^STDOUT{IO};
-$TESTERR = $^STDERR{IO};
+$TESTOUT = $^STDOUT;
+$TESTERR = $^STDERR;
 $ntest = 1;
 
 open $f, "<", "mix";

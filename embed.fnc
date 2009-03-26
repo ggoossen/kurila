@@ -88,6 +88,12 @@ Aip	|SV*	|cvTsv	|NULLOK CV *cv
 Aip	|SV*	|gvTsv	|NULLOK GV *gv
 Aip	|SV*	|ioTsv	|NULLOK struct io *io
 Aip	|SV*	|reTsv	|NULLOK REGEXP *re
+Aip	|SV**	|avpTsvp	|NULLOK AV **avp
+Aip	|SV**	|hvpTsvp	|NULLOK HV **hvp
+Aip	|SV**	|cvpTsvp	|NULLOK CV **cvp
+Aip	|SV**	|gvpTsvp	|NULLOK GV **gvp
+Aip	|SV**	|iopTsvp	|NULLOK struct io **iop
+Aip	|SV**	|repTsvp	|NULLOK REGEXP **rep
 Aip	|AV*	|svTav	|NN SV *sv
 Aip	|HV*	|svThv	|NN SV *sv
 Aip	|CV*	|svTcv	|NN SV *sv
@@ -97,9 +103,10 @@ Aip	|REGEXP*	|svTre	|NN SV *sv
 
 Aip	|const char*	|SvPVX_const	|NN SV *sv
 Aip	|char*	|SvPVX_mutable	|NN SV *sv
-AipS	|void	|SvREFCNT_dec	|NULLOK SV *sv
-AipS	|SV*	|SvREFCNT_inc	|NULLOK SV *sv
-AipS	|void	|SvTMPREFCNT_inc	|NULLOK SV *sv
+AipS	|void	|SvREFCNT_dec	|NULLOK XV *sv
+AipS	|SV*	|SvREFCNT_inc	|NULLOK XV *sv
+AipS	|void	|SvTMPREFCNT_inc	|NULLOK XV *sv
+AipS	|void	|sv_cp_replace	|NN XV **sv_d|NULLOK XV *sv_s
 Aip	|IV	|SvIV	|NN SV *sv
 Aip	|UV	|SvUV	|NN SV *sv
 Aip	|NV	|SvNV	|NN SV *sv
@@ -778,7 +785,7 @@ Apd	|bool	|sv_2bool	|NN SV *const sv
 Apd	|CV*	|sv_2cv		|NULLOK SV* sv|NN GV **const gvp|const I32 lref
 Apd	|IO*	|sv_2io		|NN SV *const sv
 Apd	|IV	|sv_2iv		|NULLOK SV *const sv
-ApdS	|SV*	|sv_2mortal	|NN SV *const sv
+ApdS	|SV*	|sv_2mortal	|NN XV *const sv
 Apd	|NV	|sv_2nv		|NULLOK SV *const sv
 pMd	|SV*	|sv_2num	|NN SV *const sv
 Amb	|char*	|sv_2pv		|NULLOK SV *sv|NULLOK STRLEN *lp

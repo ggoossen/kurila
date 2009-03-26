@@ -45,6 +45,12 @@
 #define gvTsv			Perl_gvTsv
 #define ioTsv			Perl_ioTsv
 #define reTsv			Perl_reTsv
+#define avpTsvp			Perl_avpTsvp
+#define hvpTsvp			Perl_hvpTsvp
+#define cvpTsvp			Perl_cvpTsvp
+#define gvpTsvp			Perl_gvpTsvp
+#define iopTsvp			Perl_iopTsvp
+#define repTsvp			Perl_repTsvp
 #define svTav			Perl_svTav
 #define svThv			Perl_svThv
 #define svTcv			Perl_svTcv
@@ -74,6 +80,13 @@
 #define IoTMPREFCNT_inc(a)		Perl_SvTMPREFCNT_inc(aTHX_ ioTsv(a))
 #define ReTMPREFCNT_inc(a)		Perl_SvTMPREFCNT_inc(aTHX_ reTsv(a))
 #define SvTMPREFCNT_inc		Perl_SvTMPREFCNT_inc
+#define av_cp_replace(a,b)		Perl_sv_cp_replace(aTHX_ avpTsvp(a),avTsv(b))
+#define hv_cp_replace(a,b)		Perl_sv_cp_replace(aTHX_ hvpTsvp(a),hvTsv(b))
+#define cv_cp_replace(a,b)		Perl_sv_cp_replace(aTHX_ cvpTsvp(a),cvTsv(b))
+#define gv_cp_replace(a,b)		Perl_sv_cp_replace(aTHX_ gvpTsvp(a),gvTsv(b))
+#define io_cp_replace(a,b)		Perl_sv_cp_replace(aTHX_ iopTsvp(a),ioTsv(b))
+#define re_cp_replace(a,b)		Perl_sv_cp_replace(aTHX_ repTsvp(a),reTsv(b))
+#define sv_cp_replace		Perl_sv_cp_replace
 #define SvIV			Perl_SvIV
 #define SvUV			Perl_SvUV
 #define SvNV			Perl_SvNV
@@ -2236,6 +2249,12 @@
 #define gvTsv(a)		Perl_gvTsv(aTHX_ a)
 #define ioTsv(a)		Perl_ioTsv(aTHX_ a)
 #define reTsv(a)		Perl_reTsv(aTHX_ a)
+#define avpTsvp(a)		Perl_avpTsvp(aTHX_ a)
+#define hvpTsvp(a)		Perl_hvpTsvp(aTHX_ a)
+#define cvpTsvp(a)		Perl_cvpTsvp(aTHX_ a)
+#define gvpTsvp(a)		Perl_gvpTsvp(aTHX_ a)
+#define iopTsvp(a)		Perl_iopTsvp(aTHX_ a)
+#define repTsvp(a)		Perl_repTsvp(aTHX_ a)
 #define svTav(a)		Perl_svTav(aTHX_ a)
 #define svThv(a)		Perl_svThv(aTHX_ a)
 #define svTcv(a)		Perl_svTcv(aTHX_ a)
@@ -2265,6 +2284,13 @@
 #define IoTMPREFCNT_inc(a)		Perl_SvTMPREFCNT_inc(aTHX_ ioTsv(a))
 #define ReTMPREFCNT_inc(a)		Perl_SvTMPREFCNT_inc(aTHX_ reTsv(a))
 #define SvTMPREFCNT_inc(a)	Perl_SvTMPREFCNT_inc(aTHX_ a)
+#define av_cp_replace(a,b)		Perl_sv_cp_replace(aTHX_ avpTsvp(a),avTsv(b))
+#define hv_cp_replace(a,b)		Perl_sv_cp_replace(aTHX_ hvpTsvp(a),hvTsv(b))
+#define cv_cp_replace(a,b)		Perl_sv_cp_replace(aTHX_ cvpTsvp(a),cvTsv(b))
+#define gv_cp_replace(a,b)		Perl_sv_cp_replace(aTHX_ gvpTsvp(a),gvTsv(b))
+#define io_cp_replace(a,b)		Perl_sv_cp_replace(aTHX_ iopTsvp(a),ioTsv(b))
+#define re_cp_replace(a,b)		Perl_sv_cp_replace(aTHX_ repTsvp(a),reTsv(b))
+#define sv_cp_replace(a,b)	Perl_sv_cp_replace(aTHX_ a,b)
 #define SvIV(a)			Perl_SvIV(aTHX_ a)
 #define SvUV(a)			Perl_SvUV(aTHX_ a)
 #define SvNV(a)			Perl_SvNV(aTHX_ a)
@@ -3001,12 +3027,12 @@
 #define sv_2cv(a,b,c)		Perl_sv_2cv(aTHX_ a,b,c)
 #define sv_2io(a)		Perl_sv_2io(aTHX_ a)
 #define sv_2iv(a)		Perl_sv_2iv(aTHX_ a)
-#define sv_2mortal(a)		svTav(Perl_sv_2mortal(aTHX_ avTsv(a)))
-#define sv_2mortal(a)		svThv(Perl_sv_2mortal(aTHX_ hvTsv(a)))
-#define sv_2mortal(a)		svTcv(Perl_sv_2mortal(aTHX_ cvTsv(a)))
-#define sv_2mortal(a)		svTgv(Perl_sv_2mortal(aTHX_ gvTsv(a)))
-#define sv_2mortal(a)		svTio(Perl_sv_2mortal(aTHX_ ioTsv(a)))
-#define sv_2mortal(a)		svTre(Perl_sv_2mortal(aTHX_ reTsv(a)))
+#define av_2mortal(a)		svTav(Perl_sv_2mortal(aTHX_ avTsv(a)))
+#define hv_2mortal(a)		svThv(Perl_sv_2mortal(aTHX_ hvTsv(a)))
+#define cv_2mortal(a)		svTcv(Perl_sv_2mortal(aTHX_ cvTsv(a)))
+#define gv_2mortal(a)		svTgv(Perl_sv_2mortal(aTHX_ gvTsv(a)))
+#define io_2mortal(a)		svTio(Perl_sv_2mortal(aTHX_ ioTsv(a)))
+#define re_2mortal(a)		svTre(Perl_sv_2mortal(aTHX_ reTsv(a)))
 #define sv_2mortal(a)		Perl_sv_2mortal(aTHX_ a)
 #define sv_2nv(a)		Perl_sv_2nv(aTHX_ a)
 #ifdef PERL_CORE

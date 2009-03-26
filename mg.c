@@ -1813,7 +1813,13 @@ Perl_magic_set(pTHX_ const char* name, SV *sv)
 		break;
 	    }
 	    if (strEQ(remaining, "STDOUT")) {
-		SvRV_set(sv, ioTsv(PL_stdoutio));
+		if (!SvRVOK(sv))
+		    Perl_croak(aTHX_ "$^STDOUT must be an IO ref not %s",
+			Ddesc(sv));
+		if (! SvIOOK(SvRV(sv)))
+		    Perl_croak(aTHX_ "$^STDOUT must be an IO ref not a %s ref",
+			Ddesc(SvRV(sv)));
+		IOcpREPLACE(PL_stdoutio, svTio(SvRV(sv)));
 		break;
 	    }
 	    if (strEQ(remaining, "STDERR")) {

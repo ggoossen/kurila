@@ -270,8 +270,8 @@ stat($^STDIN);
 -T \*HOCUS;
 stat(\*POCUS);
 EXPECT
--T on unopened filehandle at - line 4 character 2.
-stat() on closed filehandle STDIN at - line 5 character 1.
+-T on closed filehandle STDIN at - line 4 character 2.
+stat() on unopened filehandle at - line 5 character 1.
 -T on unopened filehandle at - line 6 character 2.
 stat() on unopened filehandle at - line 7 character 1.
 ########

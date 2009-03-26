@@ -2494,22 +2494,23 @@ PP(pp_fttext)
 
     STACKED_FTEST_CHECK;
 
-    if (PL_op->op_flags & OPf_REF)
-	io = GvIO(cGVOP_gv);
-    else if (isGV(TOPs))
-	io = gv_io(svTgv(POPs));
-    else if (SvROK(TOPs) && isGV(SvRV(TOPs)))
-	io = gv_io(svTgv(SvRV(POPs)));
-    else if (SvROK(TOPs) && SvIOOK(SvRV(TOPs)))
-	io = svTio(SvRV(POPs));
-    else
-	io = NULL;
+    if (! SvPVOK(TOPs)) {
+	if (PL_op->op_flags & OPf_REF)
+	    io = GvIO(cGVOP_gv);
+	else if (isGV(TOPs))
+	    io = gv_io(svTgv(POPs));
+	else if (SvROK(TOPs) && isGV(SvRV(TOPs)))
+	    io = gv_io(svTgv(SvRV(POPs)));
+	else if (SvROK(TOPs) && SvIOOK(SvRV(TOPs)))
+	    io = svTio(SvRV(POPs));
+	else 
+	    Perl_croak(aTHX_ "%s expected a filehandle but got %s",
+		OP_DESC(PL_op), Ddesc(TOPs));
 
-    if (io) {
 	EXTEND(SP, 1);
 	PL_laststatval = -1;
 	sv_setpvn(PL_statname, "", 0);
-	if (IoIFP(io)) {
+	if (io && IoIFP(io)) {
 	    if (! PerlIO_has_base(IoIFP(io)))
 		DIE(aTHX_ "-T and -B not implemented on filehandles");
 	    PL_laststatval = PerlLIO_fstat(PerlIO_fileno(IoIFP(io)), &PL_statcache);
