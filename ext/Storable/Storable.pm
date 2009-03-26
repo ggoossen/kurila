@@ -482,7 +482,7 @@ The file descriptor you supply must be already opened, for read
 if you're going to retrieve and for write if you wish to store.
 
 	store_fd(\%table, $^STDOUT) || die "can't store to stdout\n";
-	$hashref = fd_retrieve(*STDIN);
+	$hashref = fd_retrieve($^STDIN);
 
 You can also store data in network order to allow easy sharing across
 multiple platforms, or when storing on a socket known to be remotely

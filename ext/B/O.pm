@@ -52,7 +52,7 @@ sub import($class, @< @options) {
 	    local @($^OUTPUT_RECORD_SEPARATOR,$^OUTPUT_FIELD_SEPARATOR) = @(undef,'');
 	    &$compilesub();
 
-	    close \*STDERR if $veryquiet;
+	    close $^STDERR if $veryquiet;
 	}
     ];
     die $^EVAL_ERROR if $^EVAL_ERROR;

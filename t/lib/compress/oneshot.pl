@@ -472,7 +472,7 @@ sub run
                     my $lex = LexFile->new(my $in_file, my $out_file) ;
                     writeFile($in_file, $buffer);
 
-                       open(SAVEIN, "<&", \*STDIN);
+                       open(SAVEIN, "<&", $^STDIN);
                     my $dummy = fileno SAVEIN ;
                     ok open(STDIN, "<", "$in_file"), "  redirect STDIN";
 
@@ -1185,7 +1185,7 @@ sub run
                 my $lex = LexFile->new(my $in_file) ;
                 writeFile($in_file, $comp);
 
-                open(SAVEIN, "<&", \*STDIN);
+                open(SAVEIN, "<&", $^STDIN);
                 my $dummy = fileno SAVEIN ;
                 ok open(STDIN, "<", "$in_file"), "  redirect STDIN";
 
@@ -1232,7 +1232,7 @@ sub run
             is $buff, $appended, "  Appended data ok";
         }
 
-        for my $stdin ('-', *STDIN) # , \*STDIN)
+        for my $stdin ('-', $^TDIN) # , \*STDIN)
         {
             title "$TopType - From stdin to Buffer content, InputLength" ;
 
@@ -1242,7 +1242,7 @@ sub run
             my $len_appended = length $appended;
             writeFile($in_file, $comp . $appended ) ;
 
-               open(SAVEIN, "<&", \*STDIN);
+               open(SAVEIN, "<&", $^STDIN);
             my $dummy = fileno SAVEIN ;
             ok open(STDIN, "<", "$in_file"), "  redirect STDIN";
 

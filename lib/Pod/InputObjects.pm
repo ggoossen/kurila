@@ -112,8 +112,8 @@ methods/attributes:
         my $pod_input1 = Pod::InputSource->new(handle => $filehandle);
         my $pod_input2 = new Pod::InputSource(handle => $filehandle,
                                               name   => $name);
-        my $pod_input3 = new Pod::InputSource(handle => \*STDIN);
-        my $pod_input4 = Pod::InputSource->new(handle => \*STDIN,
+        my $pod_input3 = new Pod::InputSource(handle => $^STDIN);
+        my $pod_input4 = Pod::InputSource->new(handle => $^STDIN,
                                                name => "(STDIN)");
 
 This is a class method that constructs a C<Pod::InputSource> object and

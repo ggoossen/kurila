@@ -2062,7 +2062,6 @@ PP(pp_stat)
       do_fstat:
 	if (gv != PL_defgv) {
 	    PL_laststype = OP_STAT;
-	    PL_statgv = gv;
 	    sv_setpvn(PL_statname, "", 0);
             if(gv) {
                 io = GvIO(gv);
@@ -2105,7 +2104,6 @@ PP(pp_stat)
         }
         
 	sv_setpv(PL_statname, SvPV_nolen_const(sv));
-	PL_statgv = NULL;
 	PL_laststype = PL_op->op_type;
 	if (PL_op->op_type == OP_LSTAT)
 	    PL_laststatval = PerlLIO_lstat(SvPV_nolen_const(PL_statname), &PL_statcache);
@@ -2440,22 +2438,25 @@ PP(pp_fttty)
     dVAR;
     dSP;
     int fd;
-    GV *gv;
+    IO *io;
     SV *tmpsv = NULL;
 
     STACKED_FTEST_CHECK;
 
     if (PL_op->op_flags & OPf_REF)
-	gv = cGVOP_gv;
+	io = GvIO(cGVOP_gv);
     else if (isGV(TOPs))
-	gv = (GV*)POPs;
+	io = GvIO(svTgv(POPs));
     else if (SvROK(TOPs) && isGV(SvRV(TOPs)))
-	gv = (GV*)SvRV(POPs);
+	io = GvIO(svTgv(SvRV(POPs)));
+    else if (SvROK(TOPs) && SvIOOK(SvRV(TOPs)))
+	io = svTio(SvRV(POPs));
     else
-	gv = gv_fetchsv(tmpsv = POPs, 0, SVt_PVIO);
+	Perl_croak(aTHX "%s expected a io not a %s",
+	    OP_DESC(PL_op), Ddesc(TOPs));
 
-    if (GvIO(gv) && IoIFP(GvIOp(gv)))
-	fd = PerlIO_fileno(IoIFP(GvIOp(gv)));
+    if (io && IoIFP(io))
+	fd = PerlIO_fileno(IoIFP(io));
     else if (tmpsv && SvOK(tmpsv)) {
 	const char *tmps = SvPV_nolen_const(tmpsv);
 	if (isDIGIT(*tmps))
@@ -2489,37 +2490,26 @@ PP(pp_fttext)
     register STDCHAR *s;
     register IO *io;
     register SV *sv;
-    GV *gv;
     PerlIO *fp;
 
     STACKED_FTEST_CHECK;
 
     if (PL_op->op_flags & OPf_REF)
-	gv = cGVOP_gv;
+	io = GvIO(cGVOP_gv);
     else if (isGV(TOPs))
-	gv = (GV*)POPs;
+	io = gv_io(svTgv(POPs));
     else if (SvROK(TOPs) && isGV(SvRV(TOPs)))
-	gv = (GV*)SvRV(POPs);
+	io = gv_io(svTgv(SvRV(POPs)));
+    else if (SvROK(TOPs) && SvIOOK(SvRV(TOPs)))
+	io = svTio(SvRV(POPs));
     else
-	gv = NULL;
+	io = NULL;
 
-    if (gv) {
+    if (io) {
 	EXTEND(SP, 1);
-	if (gv == PL_defgv) {
-	    if (PL_statgv)
-		io = GvIO(PL_statgv);
-	    else {
-		sv = PL_statname;
-		goto really_filename;
-	    }
-	}
-	else {
-	    PL_statgv = gv;
-	    PL_laststatval = -1;
-	    sv_setpvn(PL_statname, "", 0);
-	    io = GvIO(PL_statgv);
-	}
-	if (io && IoIFP(io)) {
+	PL_laststatval = -1;
+	sv_setpvn(PL_statname, "", 0);
+	if (IoIFP(io)) {
 	    if (! PerlIO_has_base(IoIFP(io)))
 		DIE(aTHX_ "-T and -B not implemented on filehandles");
 	    PL_laststatval = PerlLIO_fstat(PerlIO_fileno(IoIFP(io)), &PL_statcache);
@@ -2546,8 +2536,7 @@ PP(pp_fttext)
 	}
 	else {
 	    if (ckWARN2(WARN_UNOPENED,WARN_CLOSED)) {
-		gv = cGVOP_gv;
-		report_evil_fh(GvIO(gv), PL_op->op_type);
+		report_evil_fh(io, PL_op->op_type);
 	    }
 	    SETERRNO(EBADF,RMS_IFI);
 	    RETPUSHUNDEF;
@@ -2555,8 +2544,6 @@ PP(pp_fttext)
     }
     else {
 	sv = POPs;
-      really_filename:
-	PL_statgv = NULL;
 	PL_laststype = OP_STAT;
 	sv_setpv(PL_statname, SvPV_nolen_const(sv));
 	if (!(fp = PerlIO_open(SvPVX_const(PL_statname), "r"))) {

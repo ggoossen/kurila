@@ -65,7 +65,7 @@ Pod::Parser - base class for creating POD filters and translators
     ## Create a parser object and have it parse file whose name was
     ## given on the command-line (use STDIN if no files were given).
     $parser = new MyParser();
-    $parser->parse_from_filehandle(\*STDIN)  if (@ARGV == 0);
+    $parser->parse_from_filehandle($^STDIN)  if (@ARGV == 0);
     for (@ARGV) { $parser->parse_from_file($_); }
 
 =head1 REQUIRES

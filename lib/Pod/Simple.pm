@@ -413,13 +413,13 @@ sub parse_file {
 sub parse_from_file($self, ?$source, ?$to) {
   $self = $self->new unless ref($self); # so we tolerate being a class method
   
-  if(!defined $source)             { $source = *STDIN{IO}
+  if(!defined $source)             { $source = $^STDIN{IO}
   } elsif(ref(\$source) eq 'GLOB') { # stet
   } elsif(ref($source)           ) { # stet
   } elsif(!length $source
      or $source eq '-' or $source =~ m/^<&(STDIN|0)$/i
   ) { 
-    $source = *STDIN{IO};
+    $source = $^STDIN{IO};
   }
 
   if(!defined $to) {             $self->output_fh( $^STDOUT   );
@@ -465,7 +465,7 @@ sub scream {    # like whine, but not suppressable
 }
 
 sub _complain_warn($self,$line,$complaint) {
-  return printf \*STDERR, "\%s around line \%s: \%s\n",
+  return printf $^STDERR, "\%s around line \%s: \%s\n",
     $self->{?'source_filename'} || 'Pod input', $line, $complaint;
 }
 

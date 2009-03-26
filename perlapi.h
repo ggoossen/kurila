@@ -236,8 +236,6 @@ END_EXTERN_C
 #define PL_def_layerlist	(*Perl_Idef_layerlist_ptr(aTHX))
 #undef  PL_defgv
 #define PL_defgv		(*Perl_Idefgv_ptr(aTHX))
-#undef  PL_defoutgv
-#define PL_defoutgv		(*Perl_Idefoutgv_ptr(aTHX))
 #undef  PL_defstash
 #define PL_defstash		(*Perl_Idefstash_ptr(aTHX))
 #undef  PL_delaymagic
@@ -552,8 +550,6 @@ END_EXTERN_C
 #define PL_statbuf		(*Perl_Istatbuf_ptr(aTHX))
 #undef  PL_statcache
 #define PL_statcache		(*Perl_Istatcache_ptr(aTHX))
-#undef  PL_statgv
-#define PL_statgv		(*Perl_Istatgv_ptr(aTHX))
 #undef  PL_statname
 #define PL_statname		(*Perl_Istatname_ptr(aTHX))
 #undef  PL_statusvalue

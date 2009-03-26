@@ -35,7 +35,7 @@ BEGIN {print $^STDOUT, ":b1"}
 END {print $^STDOUT, ":e1"}
 BEGIN {print $^STDOUT, ":b2"}
 do {
-    BEGIN {BEGIN {print $^STDOUT, ":b3"}; print \*STDOUT, ":b4"}
+    BEGIN {BEGIN {print $^STDOUT, ":b3"}; print $^STDOUT, ":b4"}
 };
 CHECK {print $^STDOUT, ":c1"}
 INIT {print $^STDOUT, ":i1"}

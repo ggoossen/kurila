@@ -8,7 +8,7 @@ my $Perl = which_perl();
 
 print $^STDOUT, "1..3\n";
 
-our $x = `$Perl -le "print $^STDOUT, 'ok';"`;
+our $x = `$Perl -le "print \\\$^STDOUT, 'ok';"`;
 
 if ($x eq "ok\n") {print $^STDOUT, "ok 1\n";} else {print $^STDOUT, "not ok 1\n";}
 

@@ -305,6 +305,7 @@
 #define gv_AVadd		Perl_gv_AVadd
 #define gv_HVadd		Perl_gv_HVadd
 #define gv_IOadd		Perl_gv_IOadd
+#define gv_io			Perl_gv_io
 #define gv_check		Perl_gv_check
 #define gv_efullname3		Perl_gv_efullname3
 #define gv_fetchfile		Perl_gv_fetchfile
@@ -2479,6 +2480,7 @@
 #define gv_AVadd(a)		Perl_gv_AVadd(aTHX_ a)
 #define gv_HVadd(a)		Perl_gv_HVadd(aTHX_ a)
 #define gv_IOadd(a)		Perl_gv_IOadd(aTHX_ a)
+#define gv_io(a)		Perl_gv_io(aTHX_ a)
 #define gv_check(a)		Perl_gv_check(aTHX_ a)
 #define gv_efullname3(a,b,c)	Perl_gv_efullname3(aTHX_ a,b,c)
 #define gv_fetchfile(a)		Perl_gv_fetchfile(aTHX_ a)

@@ -983,7 +983,7 @@ For example:
 	print $fh "her um well a hmmm\n";
     }
 
-    $rec = get_rec(\*STDIN);
+    $rec = get_rec($^STDIN);
     sub get_rec {
 	my $fh = shift;
 	return scalar <$fh>;

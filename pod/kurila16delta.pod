@@ -65,7 +65,7 @@ Makes it more explicit that a version check is done.
 
 There is a new function C<Symbol::glob_name($glob)> which returns the name
 of the glob. Symbol::glob_name returns the name fully qualified, but without a leading '*'.
-For example: C< Symbol::glob_name(*STDERR) eq "main::STDERR" >
+For example: C< Symbol::glob_name($^STDERR) eq "main::STDERR" >
 
 =head3 Rationale
 

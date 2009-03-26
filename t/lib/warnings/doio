@@ -94,12 +94,12 @@ close() on unopened filehandle at - line 3 character 1.
 ########
 # doio.c [Perl_do_tell Perl_do_seek Perl_do_sysseek Perl_my_stat]
 use warnings 'io' ;
-close \*STDIN ;
-tell(\*STDIN);
-$a = seek(\*STDIN,1,1);
-$a = sysseek(\*STDIN,1,1);
--x \*STDIN ;
-stat(\*STDIN) ;
+close $^STDIN ;
+tell($^STDIN);
+$a = seek($^STDIN,1,1);
+$a = sysseek($^STDIN,1,1);
+-x $^STDIN ;
+stat($^STDIN) ;
 $a = \*fred;
 tell($a);
 seek($a,1,1);
@@ -107,12 +107,12 @@ sysseek($a,1,1);
 -x $a; # ok
 stat($a); # ok
 no warnings 'io' ;
-close \*STDIN ;
-tell(\*STDIN);
-$a = seek(\*STDIN,1,1);
-$a = sysseek(\*STDIN,1,1);
--x \*STDIN ;
-stat(\*STDIN) ;
+close $^STDIN ;
+tell($^STDIN);
+$a = seek($^STDIN,1,1);
+$a = sysseek($^STDIN,1,1);
+-x $^STDIN ;
+stat($^STDIN) ;
 $a = \*fred;
 tell($a);
 seek($a,1,1);
@@ -124,7 +124,7 @@ tell() on closed filehandle STDIN at - line 4 character 1.
 seek() on closed filehandle STDIN at - line 5 character 6.
 sysseek() on closed filehandle STDIN at - line 6 character 6.
 -x on closed filehandle STDIN at - line 7 character 2.
-stat() on closed filehandle STDIN at - line 8 character 1.
+stat() on unopened filehandle at - line 8 character 1.
 tell() on unopened filehandle at - line 10 character 1.
 seek() on unopened filehandle at - line 11 character 1.
 sysseek() on unopened filehandle at - line 12 character 1.
@@ -260,11 +260,11 @@ EOM
     }
 }
 use warnings 'io' ;
-close \*STDIN;
+close $^STDIN;
 open my $fh1, ">", "doiowarn.tmp"; close $fh1;
 no warnings 'io' ;
 open my $fh2, ">", "doiowarn.tmp"; close $fh2;
 unlink "doiowarn.tmp";
 EXPECT
-Filehandle STDIN reopened nly for output at - line 14 character 1.
+Filehandle STDIN reopened only for output at - line 14 character 1.
 ########

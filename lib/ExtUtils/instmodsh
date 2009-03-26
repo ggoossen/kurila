@@ -52,7 +52,7 @@ sub do_module($)($module) {
     MODULE_CMD: while (1) {
         print($^STDOUT, "$module cmd? ");
 
-        my $reply = ~< *STDIN; chomp($reply);
+        my $reply = ~< $^STDIN; chomp($reply);
         my@($cmd) = $reply =~ m/^(\w)\b/;
 
         last if $cmd eq 'q';
@@ -154,7 +154,7 @@ print($^STDOUT, $help);
 while (1)
    {
    print($^STDOUT, "cmd? ");
-   my $reply = ~< *STDIN; chomp($reply);
+   my $reply = ~< $^STDIN; chomp($reply);
    CASE:
       do {
       $reply eq 'l' and do

@@ -220,7 +220,7 @@ caller				# caller
 '???'                           # warn
 'faked'				# die
 open my $blah, "<", "non-existent"	# open
-fileno \*STDERR			# fileno
+fileno $^STDERR			# fileno
 umask 0				# umask
 select undef,undef,undef,0	# select
 getc($op_fh)				# getc

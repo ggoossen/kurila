@@ -632,7 +632,7 @@ enhancements/changes have been made to the C<gzopen> interface:
 =item 1
 
 If you want to to open either STDIN or STDOUT with C<gzopen>, you can now
-optionally use the special filename "C<->" as a synonym for C<\*STDIN> and
+optionally use the special filename "C<->" as a synonym for C<$^STDIN> and
 C<$^STDOUT>.
 
 =item 2 

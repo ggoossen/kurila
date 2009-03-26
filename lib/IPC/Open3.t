@@ -49,8 +49,8 @@ print $^STDOUT, "1..22\n";
 # basic
 ok 1, $pid = open3 \*WRITE, \*READ, \*ERROR, $perl, '-e', cmd_line(<<'EOF');
     $^OUTPUT_AUTOFLUSH = 1;
-    print $^STDOUT, scalar ~< *STDIN;
-    print \*STDERR, "hi error\n";
+    print $^STDOUT, scalar ~< $^STDIN;
+    print $^STDERR, "hi error\n";
 EOF
 ok 2, print \*WRITE, "hi kid\n";
 ok 3, (~< *READ) =~ m/^hi kid\r?\n$/;
@@ -65,8 +65,8 @@ ok 9, $^CHILD_ERROR == 0, $^CHILD_ERROR;
 # read and error together, both named
 $pid = open3 \*WRITE, \*READ, \*READ, $perl, '-e', cmd_line(<<'EOF');
     $^OUTPUT_AUTOFLUSH = 1;
-    print $^STDOUT, scalar ~< *STDIN;
-    print \*STDERR, scalar ~< *STDIN;
+    print $^STDOUT, scalar ~< $^STDIN;
+    print $^STDERR, scalar ~< $^STDIN;
 EOF
 print \*WRITE, "ok 10\n";
 print $^STDOUT, scalar ~< *READ;
@@ -77,8 +77,8 @@ waitpid $pid, 0;
 # read and error together, error empty
 $pid = open3 \*WRITE, \*READ, '', $perl, '-e', cmd_line(<<'EOF');
     $^OUTPUT_AUTOFLUSH = 1;
-    print $^STDOUT, scalar ~< *STDIN;
-    print \*STDERR, scalar ~< *STDIN;
+    print $^STDOUT, scalar ~< $^STDIN;
+    print $^STDERR, scalar ~< $^STDIN;
 EOF
 print \*WRITE, "ok 12\n";
 print $^STDOUT, scalar ~< *READ;
@@ -89,7 +89,7 @@ waitpid $pid, 0;
 # dup writer
 ok 14, pipe *PIPE_READ, *PIPE_WRITE;
 $pid = open3 '<&PIPE_READ', \*READ, undef,
-		    $perl, '-e', cmd_line('print $^STDOUT, scalar ~< *STDIN');
+		    $perl, '-e', cmd_line('print $^STDOUT, scalar ~< $^STDIN');
 close \*PIPE_READ;
 print \*PIPE_WRITE ,"ok 15\n";
 close \*PIPE_WRITE;
@@ -98,7 +98,7 @@ waitpid $pid, 0;
 
 # dup reader
 $pid = open3 'WRITE', '>&STDOUT', 'ERROR',
-		    $perl, '-e', cmd_line('print $^STDOUT, scalar ~< *STDIN');
+		    $perl, '-e', cmd_line('print $^STDOUT, scalar ~< $^STDIN');
 print \*WRITE, "ok 16\n";
 waitpid $pid, 0;
 
@@ -106,15 +106,15 @@ waitpid $pid, 0;
 # stdout but putting stdout somewhere else, is a good case because it
 # used not to work.
 $pid = open3 'WRITE', 'READ', '>&STDOUT',
-		    $perl, '-e', cmd_line('print \*STDERR, scalar ~< *STDIN');
+		    $perl, '-e', cmd_line('print $^STDERR, scalar ~< $^STDIN');
 print \*WRITE, "ok 17\n";
 waitpid $pid, 0;
 
 # dup reader and error together, both named
 $pid = open3 'WRITE', '>&STDOUT', '>&STDOUT', $perl, '-e', cmd_line(<<'EOF');
     $^OUTPUT_AUTOFLUSH = 1;
-    print $^STDOUT, scalar ~< *STDIN;
-    print \*STDERR, scalar ~< *STDIN;
+    print $^STDOUT, scalar ~< $^STDIN;
+    print $^STDERR, scalar ~< $^STDIN;
 EOF
 print \*WRITE, "ok 18\n";
 print \*WRITE, "ok 19\n";
@@ -123,8 +123,8 @@ waitpid $pid, 0;
 # dup reader and error together, error empty
 $pid = open3 'WRITE', '>&STDOUT', '', $perl, '-e', cmd_line(<<'EOF');
     $^OUTPUT_AUTOFLUSH = 1;
-    print $^STDOUT, scalar ~< *STDIN;
-    print \*STDERR, scalar ~< *STDIN;
+    print $^STDOUT, scalar ~< $^STDIN;
+    print $^STDERR, scalar ~< $^STDIN;
 EOF
 print \*WRITE, "ok 20\n";
 print \*WRITE, "ok 21\n";
@@ -132,7 +132,7 @@ waitpid $pid, 0;
 
 # command line in single parameter variant of open3
 # for understanding of Config{'sh'} test see exec description in camel book
-my $cmd = 'print($^STDOUT, scalar(~< *STDIN))';
+my $cmd = 'print($^STDOUT, scalar(~< $^STDIN))';
 $cmd = config_value('sh') =~ m/sh/ ?? "'$cmd'" !! cmd_line($cmd);
 try{$pid = open3 'WRITE', '>&STDOUT', 'ERROR', "$perl -e " . $cmd; };
 if ($^EVAL_ERROR) {

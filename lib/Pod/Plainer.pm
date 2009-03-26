@@ -38,7 +38,7 @@ Pod::Plainer - Perl extension for converting Pod to old style Pod.
   use Pod::Plainer;
 
   my $parser = Pod::Plainer -> new ();
-  $parser -> parse_from_filehandle(\*STDIN);
+  $parser -> parse_from_filehandle($^STDIN);
 
 =head1 DESCRIPTION
 

@@ -899,6 +899,12 @@ PERL_CALLCONV GV*	Perl_gv_IOadd(pTHX_ GV* gv)
 #define PERL_ARGS_ASSERT_GV_IOADD	\
 	assert(gv)
 
+PERL_INLINE_CALLCONV IO*	Perl_gv_io(pTHX_ GV* gv)
+			__attribute__pure__
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_GV_IO	\
+	assert(gv)
+
 PERL_CALLCONV void	Perl_gv_check(pTHX_ const HV* stash)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_GV_CHECK	\

@@ -219,8 +219,8 @@ L<perlapi/looks_like_number>.
 Returns FH if FH may be used as a filehandle and is open, or FH is a tied
 handle. Otherwise C<undef> is returned.
 
-    $fh = openhandle(*STDIN);		# \*STDIN
-    $fh = openhandle(\*STDIN);		# \*STDIN
+    $fh = openhandle($^STDIN);		# \*STDIN
+    $fh = openhandle($^STDIN);		# \*STDIN
     $fh = openhandle(*NOTOPEN);		# undef
     $fh = openhandle("scalar");		# undef
     

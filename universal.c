@@ -1073,22 +1073,26 @@ XS(XS_iohandle_input_line_number)
 
     {
 	SV* sv = ST(0);
-        GV* gv;
-        
-	if (!SvROK(sv) || SvTYPE(SvRV(sv)) != SVt_PVGV) {
-	    XSRETURN_UNDEF;
-	}
-        gv = (GV*)(SvRV(sv));
+        IO* io;
 
-	if ( ! GvIO(gv) ) {
-	    XSRETURN_UNDEF;
-        }
+	if (SvROK(sv))
+	    sv = SvRV(sv);
+
+	if (SvTYPE(sv) == SVt_PVGV) {
+	    io = GvIOn(svTgv(sv));
+	}
+	else if (SvIOOK(sv)) {
+	    io = svTio(sv);
+	}
+	else {
+	    Perl_croak(aTHX_ "iohandle::input_line_number expected a filehandle not %s", Ddesc(sv));
+	}
 
         if ( items == 2 ) {
-            IoLINES(GvIOp(gv)) = SvIV(ST(1));
+            IoLINES(io) = SvIV(ST(1));
         }
 
-        XSRETURN_IV((IV)IoLINES(GvIOp(gv)));
+        XSRETURN_IV((IV)IoLINES(io));
     }
 }
 
@@ -1103,19 +1107,22 @@ XS(XS_iohandle_output_autoflush)
 
     {
 	SV* sv = ST(0);
-        GV* gv;
+        IO* io;
         
-	if (!SvROK(sv) || SvTYPE(SvRV(sv)) != SVt_PVGV) {
-	    XSRETURN_UNDEF;
-	}
-        gv = (GV*)(SvRV(sv));
+	if (SvROK(sv))
+	    sv = SvRV(sv);
 
-	if ( ! GvIO(gv) ) {
-	    gv_IOadd(gv);
-        }
+	if (SvTYPE(sv) == SVt_PVGV) {
+	    io = GvIOn(svTgv(sv));
+	}
+	else if (SvIOOK(sv)) {
+	    io = svTio(sv);
+	}
+	else {
+	    Perl_croak(aTHX_ "autoflush expected a filehandle not %s", Ddesc(sv));
+	}
 
         if ( items == 2 ) {
-	    IO * const io = GvIOp(gv);
 	    if (SvTRUE(ST(1))) {
 		if (!(IoFLAGS(io) & IOf_FLUSH)) {
 		    PerlIO *ofp = IoOFP(io);
@@ -1129,7 +1136,7 @@ XS(XS_iohandle_output_autoflush)
 	    }
         }
 	
-	if (IoFLAGS(GvIOp(gv)) & IOf_FLUSH) 
+	if (IoFLAGS(io) & IOf_FLUSH) 
 	    XSRETURN_YES;
 	else
 	    XSRETURN_NO;

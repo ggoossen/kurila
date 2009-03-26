@@ -1601,7 +1601,7 @@ print STDERR "something";
 ----
 print $a, "something";
 print $a ,"something";
-print \*STDERR, "something";
+print $^STDERR, "something";
 END
 }
 

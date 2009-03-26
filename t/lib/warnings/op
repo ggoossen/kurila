@@ -207,8 +207,8 @@ SKIPPED
 EOM
     exit 
 } }
-getsockname \*STDIN ;	# OP_GETSOCKNAME
-getpeername \*STDIN ;	# OP_GETPEERNAME
+getsockname $^STDIN ;	# OP_GETSOCKNAME
+getpeername $^STDIN ;	# OP_GETPEERNAME
 gethostbyname 1 ;	# OP_GHBYNAME
 gethostbyaddr 1,2;	# OP_GHBYADDR
 gethostent ;		# OP_GHOSTENT
@@ -223,8 +223,8 @@ getservbyport 1,2;	# OP_GSBYPORT
 getservent ;		# OP_GSERVENT
 
 no warnings 'void' ;
-getsockname \*STDIN ;	# OP_GETSOCKNAME
-getpeername \*STDIN ;	# OP_GETPEERNAME
+getsockname $^STDIN ;	# OP_GETSOCKNAME
+getpeername $^STDIN ;	# OP_GETPEERNAME
 gethostbyname 1 ;	# OP_GHBYNAME
 gethostbyaddr 1,2;	# OP_GHBYADDR
 gethostent ;		# OP_GHOSTENT

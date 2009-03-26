@@ -100,7 +100,6 @@
 #define PL_debug_pad		(vTHX->Idebug_pad)
 #define PL_def_layerlist	(vTHX->Idef_layerlist)
 #define PL_defgv		(vTHX->Idefgv)
-#define PL_defoutgv		(vTHX->Idefoutgv)
 #define PL_defstash		(vTHX->Idefstash)
 #define PL_delaymagic		(vTHX->Idelaymagic)
 #define PL_destroyav		(vTHX->Idestroyav)
@@ -258,7 +257,6 @@
 #define PL_stashcache		(vTHX->Istashcache)
 #define PL_statbuf		(vTHX->Istatbuf)
 #define PL_statcache		(vTHX->Istatcache)
-#define PL_statgv		(vTHX->Istatgv)
 #define PL_statname		(vTHX->Istatname)
 #define PL_statusvalue		(vTHX->Istatusvalue)
 #define PL_statusvalue_posix	(vTHX->Istatusvalue_posix)
@@ -381,7 +379,6 @@
 #define PL_Idebug_pad		PL_debug_pad
 #define PL_Idef_layerlist	PL_def_layerlist
 #define PL_Idefgv		PL_defgv
-#define PL_Idefoutgv		PL_defoutgv
 #define PL_Idefstash		PL_defstash
 #define PL_Idelaymagic		PL_delaymagic
 #define PL_Idestroyav		PL_destroyav
@@ -539,7 +536,6 @@
 #define PL_Istashcache		PL_stashcache
 #define PL_Istatbuf		PL_statbuf
 #define PL_Istatcache		PL_statcache
-#define PL_Istatgv		PL_statgv
 #define PL_Istatname		PL_statname
 #define PL_Istatusvalue		PL_statusvalue
 #define PL_Istatusvalue_posix	PL_statusvalue_posix

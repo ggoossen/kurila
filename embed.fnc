@@ -297,6 +297,7 @@ Ap	|GP*	|gp_ref		|NULLOK GP* gp
 Ap	|GV*	|gv_AVadd	|NN GV* gv
 Ap	|GV*	|gv_HVadd	|NN GV* gv
 Ap	|GV*	|gv_IOadd	|NN GV* gv
+ApPi	|IO*	|gv_io	|NN GV* gv
 Ap	|void	|gv_check	|NN const HV* stash
 Ap	|void	|gv_efullname3	|NN SV* sv|NN const GV* gv|NULLOK const char* prefix
 Ap	|GV*	|gv_fetchfile	|NN const char* name

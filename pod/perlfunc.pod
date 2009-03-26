@@ -3129,7 +3129,7 @@ C<STDERR> using various methods:
 
     #!/usr/bin/perl
     open my $oldout, ">&" \*STDOUT"     or die "Can't dup STDOUT: $!";
-    open OLDERR,     ">&", \*STDERR or die "Can't dup STDERR: $!";
+    open OLDERR,     ">&", $^STDERR or die "Can't dup STDERR: $!";
 
     open STDOUT, '>', "foo.out" or die "Can't redirect STDOUT: $!";
     open STDERR, ">&", \*STDOUT"     or die "Can't dup STDOUT: $!";
@@ -4137,7 +4137,7 @@ operator, but you can use it directly.  The C<< <EXPR> >>
 operator is discussed in more detail in L<perlop/"I/O Operators">.
 
     $line = <STDIN>;
-    $line = readline(*STDIN);		# same thing
+    $line = readline($^STDIN);		# same thing
 
 If readline encounters an operating system error, C<$!> will be set with the
 corresponding error message.  It can be helpful to check C<$!> when you are

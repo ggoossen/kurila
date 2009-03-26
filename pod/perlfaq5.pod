@@ -443,7 +443,7 @@ a filehandle.  Functions like C<print>, C<open>, C<seek>, or
 the C<< <FH> >> diamond operator will accept either a named filehandle
 or a scalar variable containing one:
 
-	($ifh, $ofh, $efh) = (*STDIN, *STDOUT, *STDERR);
+	($ifh, $ofh, $efh) = ($^STDIN, *STDOUT,$^STDERR);
 	print $ofh "Type it: ";
 	$got = <$ifh>
 	print $efh "What was that: $got";
@@ -477,7 +477,7 @@ built-ins like C<print>, C<printf>, or the diamond operator.  Using
 something other than a simple scalar variable as a filehandle is
 illegal and won't even compile:
 
-	@fd = (*STDIN, *STDOUT, *STDERR);
+	@fd = ($^STDIN, *STDOUT, $^STDERR);
 	print $fd[1] "Type it: ";                           # WRONG
 	$got = <$fd[0]>                                     # WRONG
 	print $fd[2] "What was that: $got";                 # WRONG

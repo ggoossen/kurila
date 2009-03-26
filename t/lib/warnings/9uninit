@@ -206,9 +206,9 @@ my ($m1, $m2);
 our ($g1, @ga);
 
 print $^STDOUT, @ga[?1000];
-print \*STDERR, @ga[?1000];
-print \*STDERR, $m1, $g1, @ga[?1],$m2;
-print \*STDERR, "", @ga[?1],"";
+print $^STDERR, @ga[?1000];
+print $^STDERR, $m1, $g1, @ga[?1],$m2;
+print $^STDERR, "", @ga[?1],"";
 EXPECT
 Use of uninitialized value @main::ga[1000] in print at - line 5 character 1.
 Use of uninitialized value @main::ga[1000] in print at - line 6 character 1.

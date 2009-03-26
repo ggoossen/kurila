@@ -36,7 +36,7 @@ print $^STDOUT, "not " unless $^EVAL_ERROR;
 print $^STDOUT, "ok ",$i++,"\n";
 
 # interaction with pod (see the eof)
-write_file('bleah.pm', "print $^STDOUT, 'ok $i\n'; 1;\n");
+write_file('bleah.pm', "print \$^STDOUT, 'ok $i\n'; 1;\n");
 require "bleah.pm";
 $i++;
 delete $^INCLUDED{'bleah.pm'};
@@ -186,7 +186,7 @@ print $^STDOUT, "ok ", ++$i, " circular require\n";
 require utf8;
 my $utf8 = utf8::chr(0xFEFF);
 
-$i++; do_require(qq($($utf8)print $^STDOUT, "ok $i\n"; 1;\n));
+$i++; do_require(qq($($utf8)print \$^STDOUT, "ok $i\n"; 1;\n));
 
 END {
     foreach my $file ( @fjles_to_delete) {

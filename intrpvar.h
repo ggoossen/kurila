@@ -84,7 +84,6 @@ PERLVAR(Ina,		STRLEN)		/* for use in SvPV when length is
 /* stat stuff */
 PERLVAR(Istatbuf,	Stat_t)
 PERLVAR(Istatcache,	Stat_t)		/* _ */
-PERLVAR(Istatgv,	GV *)
 PERLVARI(Istatname,	SV *,	NULL)
 
 #ifdef HAS_TIMES

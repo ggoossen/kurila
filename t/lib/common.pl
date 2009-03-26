@@ -128,7 +128,7 @@ for ( @prgs){
     open my $test, ">", "$tmpfile" or die "Cannot open >$tmpfile: $^OS_ERROR";
     print $test, q{
         BEGIN {
-            open(\*STDERR, ">&", $^STDOUT)
+            open($^STDERR, ">&", $^STDOUT)
               or die "Can't dup STDOUT->STDERR: $^OS_ERROR;";
         }
     };

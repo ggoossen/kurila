@@ -25,15 +25,15 @@ Pod::Checker, podchecker() - check pod documents for syntax errors
   $syntax_okay = podchecker($filepath, $outputpath, %options);
 
   my $checker = new Pod::Checker %options;
-  $checker->parse_from_file($filepath, \*STDERR);
+  $checker->parse_from_file($filepath, $^STDERR);
 
 =head1 OPTIONS/ARGUMENTS
 
 C<$filepath> is the input POD to read and C<$outputpath> is
 where to write POD syntax error messages. Either argument may be a scalar
 indicating a file-path, or else a reference to an open filehandle.
-If unspecified, the input-file it defaults to C<\*STDIN>, and
-the output-file defaults to C<\*STDERR>.
+If unspecified, the input-file it defaults to C<$^STDIN>, and
+the output-file defaults to C<$^STDERR>.
 
 =head2 podchecker()
 

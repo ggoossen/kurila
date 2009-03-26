@@ -634,7 +634,6 @@ perl_destruct(pTHXx)
     HVcpNULL(PL_op_sequence);
 
     SVcpNULL(PL_statname);
-    PL_statgv = NULL;
 
     /* defgv, aka *_ should be taken care of elsewhere */
 

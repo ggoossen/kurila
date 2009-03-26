@@ -1411,7 +1411,7 @@ Pod::Man - Convert POD data to formatted *roff input
     my $parser = Pod::Man->new (release => $VERSION, section => 8);
 
     # Read POD from STDIN and write to STDOUT.
-    $parser->parse_file (\*STDIN);
+    $parser->parse_file ($^STDIN);
 
     # Read POD from file.pod and write to file.1.
     $parser->parse_from_file ('file.pod', 'file.1');

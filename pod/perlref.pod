@@ -164,7 +164,7 @@ known as foo).
     $arrayref  = *ARGV{ARRAY};
     $hashref   = *ENV{HASH};
     $coderef   = *handler{CODE};
-    $ioref     = *STDIN{IO};
+    $ioref     = $^STDIN{IO};
     $globref   = *foo{GLOB};
 
 All of these are self-explanatory except for C<*foo{IO}>.  It returns
@@ -198,8 +198,8 @@ below, there's no risk of that happening.
 	print $fh "her um well a hmmm\n";
     }
 
-    $rec = get_rec(*STDIN);	# pass the whole glob
-    $rec = get_rec(*STDIN{IO}); # pass both file and dir handles
+    $rec = get_rec($^STDIN);	# pass the whole glob
+    $rec = get_rec($^STDIN{IO}); # pass both file and dir handles
 
     sub get_rec {
 	my $fh = shift;

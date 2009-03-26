@@ -9080,9 +9080,9 @@ Perl_refcnt_check(pTHX)
     AvTMPREFCNT_inc(PL_destroyav);
     AvTMPREFCNT_inc(PL_preambleav);
     AvTMPREFCNT_inc(PL_endav);
-    SvTMPREFCNT_inc(PL_stdinio);
-    SvTMPREFCNT_inc(PL_stdoutio);
-    SvTMPREFCNT_inc(PL_stderrio);
+    IoTMPREFCNT_inc(PL_stdinio);
+    IoTMPREFCNT_inc(PL_stdoutio);
+    IoTMPREFCNT_inc(PL_stderrio);
 
     rootop_ll_tmprefcnt(aTHX);
 

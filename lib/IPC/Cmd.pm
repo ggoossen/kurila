@@ -527,7 +527,7 @@ sub _ipc_run {
                     }, split( m/\s*([<>|&])\s*/, $cmd );
     }
  
-    ### if there's a pipe in the command, *STDIN needs to 
+    ### if there's a pipe in the command, $^STDIN needs to 
     ### be inserted *BEFORE* the pipe, to work on win32
     ### this also works on *nix, so we should do it when possible
     ### this should *also* work on multiple pipes in the command
@@ -539,15 +539,15 @@ sub _ipc_run {
     #         ### only add STDIN the first time..
     #         my $i;
     #         @command = map { ($_ eq '|' && not $i++) 
-    #                             ? ( \*STDIN, $_ ) 
+    #                             ? ( $^STDIN, $_ ) 
     #                             : $_ 
     #                         } @command; 
     #     } else {
-    #         push @command, \*STDIN;
+    #         push @command, $^STDIN;
     #     }
   
  
-    # \*STDIN is already included in the @command, see a few lines up
+    # $^STDIN is already included in the @command, see a few lines up
     return IPC::Run::run(   < @command, 
                             fileno($^STDOUT).'>',
                             $_out_handler,
