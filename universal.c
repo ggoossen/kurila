@@ -418,7 +418,6 @@ XS(XS_PerlIO_get_layers)
 #ifdef USE_PERLIO
     {
 	SV *	sv;
-	GV *	gv;
 	IO *	io;
 	bool	input = TRUE;
 	bool	details = FALSE;
@@ -462,16 +461,21 @@ XS(XS_PerlIO_get_layers)
 	}
 
 	sv = POPs;
-	gv = (GV*)sv;
 
-	if (!isGV(sv)) {
-	     if (SvROK(sv) && isGV(SvRV(sv)))
-		  gv = (GV*)SvRV(sv);
-	     else if (SvPOKp(sv))
-		  gv = gv_fetchsv(sv, 0, SVt_PVIO);
+	if (SvRVOK(sv))
+	    sv = SvRV(sv);
+
+	if (SvTYPE(sv) == SVt_PVGV) {
+	    io = GvIO(svTgv(sv));
+	}
+	else if (SvIOOK(sv)) {
+	    io = svTio(sv);
+	}
+	else {
+	    Perl_croak(aTHX_ "Expected a io handle but got %s", Ddesc(sv));
 	}
 
-	if (gv && (io = GvIO(gv))) {
+	if (io) {
 	     AV* const av = PerlIO_get_layers(aTHX_ input ?
 					IoIFP(io) : IoOFP(io));
 	     I32 i;
