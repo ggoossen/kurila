@@ -338,7 +338,7 @@ EOM
     {
       title "Outout to stdout via '-'" ;
 
-      open(SAVEOUT, ">&", \*STDOUT);
+      open(SAVEOUT, ">&", $^STDOUT);
       my $dummy = fileno SAVEOUT;
       open STDOUT, ">", "$name" ;
 

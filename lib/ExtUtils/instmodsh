@@ -48,9 +48,9 @@ my %Module_Commands = %(
 
 sub do_module($)($module) {
 
-    print(\*STDOUT, $Module_Help);
+    print($^STDOUT, $Module_Help);
     MODULE_CMD: while (1) {
-        print(\*STDOUT, "$module cmd? ");
+        print($^STDOUT, "$module cmd? ");
 
         my $reply = ~< *STDIN; chomp($reply);
         my@($cmd) = $reply =~ m/^(\w)\b/;
@@ -77,11 +77,11 @@ sub list_installed($reply, $module) {
 
     my @files;
     if (try { @files = $Inst->files($module, $class); }) {
-        print(\*STDOUT, "$class files in $module are:\n   ",
+        print($^STDOUT, "$class files in $module are:\n   ",
               join("\n   ", @files), "\n");
     }
     else { 
-        print(\*STDOUT, $^EVAL_ERROR); 
+        print($^STDOUT, $^EVAL_ERROR); 
     }
 };
 
@@ -93,11 +93,11 @@ sub list_directories($reply, $module) {
 
     my @dirs;
     if (try { @dirs = $Inst->directories($module, $class); }) {
-        print(\*STDOUT, "$class directories in $module are:\n   ",
+        print($^STDOUT, "$class directories in $module are:\n   ",
               join("\n   ", @dirs), "\n");
     }
     else { 
-        print(\*STDOUT, $^EVAL_ERROR); 
+        print($^STDOUT, $^EVAL_ERROR); 
     }
 }
 
@@ -107,7 +107,7 @@ sub create_archive($reply, $module) {
     my $file = ( <split(' ', $reply))[[1]];
 
     if( !(defined $file and length $file) ) {
-        print \*STDOUT, "No tar file specified\n";
+        print $^STDOUT, "No tar file specified\n";
     }
     elsif( try { require Archive::Tar } ) {
         Archive::Tar->create_archive($file, 0, < $Inst->files($module));
@@ -118,7 +118,7 @@ sub create_archive($reply, $module) {
         for my $f ( @rest) {
             system('tar', 'rvf', $file, $f);
         }
-        print \*STDOUT, "Can't use tar\n" if $^CHILD_ERROR;
+        print $^STDOUT, "Can't use tar\n" if $^CHILD_ERROR;
     }
 }
 
@@ -126,16 +126,16 @@ sub create_archive($reply, $module) {
 sub validate_packlist($reply, $module) {
 
     if (my @missing = $Inst->validate($module)) {
-        print(\*STDOUT, "Files missing from $module are:\n   ",
+        print($^STDOUT, "Files missing from $module are:\n   ",
               join("\n   ", @missing), "\n");
     }
     else {
-        print(\*STDOUT, "$module has no missing files\n");
+        print($^STDOUT, "$module has no missing files\n");
     }
 }
 
 sub module_help {
-    print \*STDOUT, $Module_Help;
+    print $^STDOUT, $Module_Help;
 }
 
 
@@ -150,16 +150,16 @@ Available commands are:
    m <module>   - Select a module
    q            - Quit the program
 EOF
-print(\*STDOUT, $help);
+print($^STDOUT, $help);
 while (1)
    {
-   print(\*STDOUT, "cmd? ");
+   print($^STDOUT, "cmd? ");
    my $reply = ~< *STDIN; chomp($reply);
    CASE:
       do {
       $reply eq 'l' and do
          {
-         print(\*STDOUT, "Installed modules are:\n   ", join("\n   ", @Modules), "\n");
+         print($^STDOUT, "Installed modules are:\n   ", join("\n   ", @Modules), "\n");
          last CASE;
          };
       $reply =~ m/^m\s+/ and do
@@ -172,7 +172,7 @@ while (1)
          exit(0);
          };
       # Default
-         print(\*STDOUT, $help);
+         print($^STDOUT, $help);
       };
    }
 }

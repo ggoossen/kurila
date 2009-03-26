@@ -957,10 +957,10 @@ S_skipspace(pTHX_ register char *s)
 	    if (PL_minus_p) {
 #ifdef PERL_MAD
 		sv_catpvs(PL_linestr,
-			 ";}continue{print \\*STDOUT, $_ or die qq(-p destination: $^OS_ERROR\\n);}");
+			 ";}continue{print $^STDOUT, $_ or die qq(-p destination: $^OS_ERROR\\n);}");
 #else
 		sv_setpvs(PL_linestr,
-			 ";}continue{print \\*STDOUT, $_ or die qq(-p destination: $^OS_ERROR\\n);}");
+			 ";}continue{print $^STDOUT, $_ or die qq(-p destination: $^OS_ERROR\\n);}");
 #endif
 		PL_minus_n = PL_minus_p = 0;
 	    }
@@ -2890,7 +2890,7 @@ Perl_yylex(pTHX)
 			PL_faketokens = 1;
 #endif
 		    if (PL_minus_p)
-			sv_setpvs(PL_linestr, ";}continue{print \\*STDOUT, $_;}");
+			sv_setpvs(PL_linestr, ";}continue{print $^STDOUT, $_;}");
 		    else
 			sv_setpvs(PL_linestr, ";}");
 		    PL_oldoldbufptr = PL_oldbufptr = s = PL_linestart = SvPVX_mutable(PL_linestr);

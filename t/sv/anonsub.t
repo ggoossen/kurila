@@ -68,13 +68,13 @@ test_invalid_decl('do { my $x = sub }');
 test_invalid_decl('sub ($s) && 1', " # TODO ");
 test_invalid_decl('sub ($s) : lvalue;',' # TODO');
 
-eval "sub #foo\n\{print \\*STDOUT, 1\}";
+eval "sub #foo\n\{print \$^STDOUT, 1\}";
 is $^EVAL_ERROR, '', "No error"
 
 __END__
 sub X {
     my $n = "ok 1\n";
-    sub { print \*STDOUT, $n };
+    sub { print $^STDOUT, $n };
 }
 my $x = X();
 undef &X;
@@ -86,7 +86,7 @@ sub X {
     my $n = "ok 1\n";
     sub {
         my $dummy = $n;	# eval can't close on $n without internal reference
-	eval 'print \*STDOUT, $n';
+	eval 'print $^STDOUT, $n';
 	die $^EVAL_ERROR if $^EVAL_ERROR;
     };
 }
@@ -98,7 +98,7 @@ ok 1
 ########
 sub X {
     my $n = "ok 1\n";
-    eval 'sub { print \*STDOUT, $n }';
+    eval 'sub { print $^STDOUT, $n }';
 }
 my $x = X();
 die $^EVAL_ERROR if $^EVAL_ERROR;
@@ -107,6 +107,6 @@ $x->();
 EXPECT
 ok 1
 ########
-print \*STDOUT, sub { return "ok 1\n" } -> ();
+print $^STDOUT, sub { return "ok 1\n" } -> ();
 EXPECT
 ok 1

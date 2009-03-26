@@ -593,12 +593,12 @@ sub config_vars {
 	# all config-vars are by definition \w only, any \W means regex
 	if ($qry =~ m/\W/) {
 	    my @matches = @(<config_re($qry));
-	    print \*STDOUT, < map { "$_$lnend" }, @matches || @("$qry: not found")		if !$notag;
-	    print \*STDOUT, < map { s/\w+=//; "$_$lnend" }, @matches || @("$qry: not found")	if  $notag;
+	    print $^STDOUT, < map { "$_$lnend" }, @matches || @("$qry: not found")		if !$notag;
+	    print $^STDOUT, < map { s/\w+=//; "$_$lnend" }, @matches || @("$qry: not found")	if  $notag;
 	} else {
 	    my $v = config_value($qry);
 	    $v = 'undef' unless defined $v;
-	    print \*STDOUT, "$($prfx)'$($v)'$lnend";
+	    print $^STDOUT, "$($prfx)'$($v)'$lnend";
 	}
     }
 }

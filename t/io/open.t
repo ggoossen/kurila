@@ -12,7 +12,7 @@ my $Is_MacOS = $^OS_NAME eq 'MacOS';
 
 our ($f);
 
-plan tests => 98;
+plan tests => 97;
 
 my $Perl = which_perl();
 
@@ -77,7 +77,7 @@ SKIP: do {
     skip "open -| busted and noisy on VMS", 3 if $Is_VMS;
 
     ok( open(my $f, '-|', <<EOC),     'open -|' );
-    $Perl -e "print \\\\*STDOUT, qq(a row\\n); print  \\\\*STDOUT,qq(another row\\n)"
+    $Perl -e "print \\\$^STDOUT, qq(a row\\n); print  \\\$^STDOUT,qq(another row\\n)"
 EOC
 
     my @rows = @( ~< $f );
@@ -170,7 +170,7 @@ SKIP: do {
     skip "open -| busted and noisy on VMS", 3 if $Is_VMS;
 
     ok( open(local $f, '-|', <<EOC),  'open local $f, "-|", ...' );
-    $Perl -e "print \\\\*STDOUT, qq(a row\\n); print \\\\*STDOUT, qq(another row\\n)"
+    $Perl -e "print \\\$^STDOUT, qq(a row\\n); print \\\$^STDOUT, qq(another row\\n)"
 EOC
     my @rows = @( ~< $f );
 
@@ -204,7 +204,7 @@ like( $^EVAL_ERROR->message, qr/Bad filehandle:\s+afile/,          '       right
 
 do {
     for (1..2) {
-	ok( open(my $f, "-|", qq{$Perl -le "print \\\\*STDOUT, 'ok'"}), 'open -|');
+	ok( open(my $f, "-|", qq{$Perl -le "print \\\$^STDOUT, 'ok'"}), 'open -|');
 	is( scalar ~< $f, "ok\n", '       readline');
 	ok( close $f,            '       close' );
     }
@@ -213,12 +213,8 @@ do {
 
 # other dupping techniques
 do {
-    ok( open(my $stdout, ">&", $^STDOUT),       'dup \*STDOUT into lexical fh');
+    ok( open(my $stdout, ">&", $^STDOUT),       'dup $^STDOUT into lexical fh');
     ok( open($^STDOUT,     ">&", $stdout),        'restore dupped STDOUT from lexical fh');
-
-    do {
-	ok( open(my $stdout, ">&", 'STDOUT'),         'dup STDOUT into lexical fh');
-    };
 
     # used to try to open a file [perl #17830]
     ok( open(my $stdin,  "<&", fileno $^STDIN),   'dup fileno(STDIN) into lexical fh') or _diag $^OS_ERROR;
@@ -283,7 +279,7 @@ fresh_perl_like('open m', qr/^Search pattern not terminated at/,
 	\%( stderr => 1 ), 'open m test');
 
 fresh_perl_is(
-    'sub f { open(my $fh, "<", "xxx"); $fh = "f"; } f; f;print \*STDOUT, "ok"',
+    'sub f { open(my $fh, "<", "xxx"); $fh = "f"; } f; f;print $^STDOUT, "ok"',
     'ok', \%( stderr => 1 ),
     '#29102: Crash on assignment to lexical filehandle');
 

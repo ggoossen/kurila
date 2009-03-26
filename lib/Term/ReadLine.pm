@@ -8,7 +8,7 @@ If no real package is found, substitutes stubs instead of basic functions.
   use Term::ReadLine;
   my $term = new Term::ReadLine 'Simple Perl calc';
   my $prompt = "Enter your arithmetic expression: ";
-  my $OUT = $term->OUT || \*STDOUT;
+  my $OUT = $term->OUT || $^STDOUT;
   while ( defined ($_ = $term->readline($prompt)) ) {
     my $res = eval($_);
     warn $@ if $@;

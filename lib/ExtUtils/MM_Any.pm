@@ -787,7 +787,7 @@ sub distmeta_target {
 
     my $add_meta = $self->oneliner(<<'CODE', \@('-MExtUtils::Manifest=maniadd'));
 try { maniadd(\%(q{META.yml} => q{Module meta-data (added by MakeMaker)})) } 
-    or print \*STDOUT, "Could not add META.yml to MANIFEST: $${'@'}\n"
+    or print $^STDOUT, "Could not add META.yml to MANIFEST: $${'@'}\n"
 CODE
 
     my $add_meta_to_distdir = $self->cd('$(DISTVNAME)', $add_meta);
@@ -925,7 +925,7 @@ sub distsignature_target {
 
     my $add_sign = $self->oneliner(<<'CODE', \@('-MExtUtils::Manifest=maniadd'));
 try { maniadd(\%(q{SIGNATURE} => q{Public-key signature (added by MakeMaker)})) } 
-    or print \*STDOUT, "Could not add SIGNATURE to MANIFEST: $${'@'}\n"
+    or print $^STDOUT, "Could not add SIGNATURE to MANIFEST: $${'@'}\n"
 CODE
 
     my $sign_dist        = $self->cd('$(DISTVNAME)' => 'cpansign -s');

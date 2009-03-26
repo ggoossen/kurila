@@ -1462,7 +1462,7 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 
 		    sv_catpv(opts_prog, PL_bincompat_options);
 		    /* Terminate the qw(, and then wrap at 76 columns.  */
-		    sv_catpvs(opts_prog, "); s/(?=.{53})(.{1,53}) /$1\\n                        /mg;print \\*STDOUT, Config::myconfig(),");
+		    sv_catpvs(opts_prog, "); s/(?=.{53})(.{1,53}) /$1\\n                        /mg;print $^STDOUT, Config::myconfig(),");
 #ifdef VMS
 		    sv_catpvs(opts_prog,"\"\\nCharacteristics of this PERLSHR image: \\n");
 #else
@@ -1501,8 +1501,8 @@ S_parse_body(pTHX_ char **env, XSINIT_t xsinit)
 			      "push @env, \"CYGWIN=\\\"$(env::var('CYGWIN'))\\\"\";");
 #endif
 		    sv_catpvs(opts_prog, 
-			      "print \\*STDOUT, \"  env:\\n    $(join '\\n', @env)\\n\" if @env;"
-			      "print \\*STDOUT, \"  \\$^INCLUDE_PATH:\\n    $(join '\\n', $^INCLUDE_PATH)\\n\";");
+			      "print $^STDOUT, \"  env:\\n    $(join '\\n', @env)\\n\" if @env;"
+			      "print $^STDOUT, \"  \\$^INCLUDE_PATH:\\n    $(join '\\n', $^INCLUDE_PATH)\\n\";");
 		}
 		else {
 		    ++s;

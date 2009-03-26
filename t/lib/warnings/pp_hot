@@ -7,7 +7,7 @@
     print STDIN "abc" ;
 
   Filehandle %s opened only for output		[pp_print]
-    $a = ~< *STDOUT ;
+    $a = ~< $^STDOUT ;
 
   print() on closed filehandle %s		[pp_print]
     close STDIN ; print STDIN "abc" ;
@@ -98,8 +98,8 @@ print() on closed filehandle STDIN at - line 6 character 1.
 # [ID 20020425.012] from Dave Steiner <steiner@bakerst.rutgers.edu>
 # This goes segv on 5.7.3
 use warnings 'closed' ;
-my $fh = *STDOUT{IO};
-close \*STDOUT or die "Can't close STDOUT";
+my $fh = $^STDOUT{IO};
+close $^STDOUT or die "Can't close STDOUT";
 print $fh, "Shouldn't print anything, but shouldn't SEGV either\n";
 EXPECT
 print() on closed filehandle STDOUT at - line 7 character 1.
@@ -165,7 +165,7 @@ sub fred
 do {
   local $^WARN_HOOK = sub {
     if (@_[0]->message =~ m/^Deep recursion on subroutine "main::fred"/) {
-        print \*STDOUT, "ok\n";
+        print $^STDOUT, "ok\n";
         exit 0;
     }
   };
@@ -183,7 +183,7 @@ sub fred
 do {
   local $^WARN_HOOK = sub {
     if (@_[0]->message =~ m/^Deep recursion on subroutine "main::fred"/) {
-        print \*STDOUT, "ok\n";
+        print $^STDOUT, "ok\n";
         exit 0;
     }
   };

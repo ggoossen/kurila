@@ -28,8 +28,8 @@ sub import($class, @< @options) {
 
 	CHECK {
 	    if ($quiet) {
-		close \*STDOUT;
-		open (\*STDOUT, ">&", \*$saveout);
+		close $^STDOUT;
+		open ($^STDOUT, ">&", \*$saveout);
 		close $saveout;
 	    }
 

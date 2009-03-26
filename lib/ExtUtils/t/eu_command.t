@@ -39,8 +39,8 @@ do {
     # concatenate this file with itself
     # be extra careful the regex doesn't match itself
     my $out = '';
-    close \*STDOUT;
-    open \*STDOUT, '>>', \$out or die;
+    close $^STDOUT;
+    open $^STDOUT, '>>', \$out or die;
     my $self = $^PROGRAM_NAME;
     unless (-f $self) {
         my @($vol, $dirs, $file) =  File::Spec->splitpath($self);

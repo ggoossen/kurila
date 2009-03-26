@@ -36,7 +36,7 @@ print $^STDOUT, "not " unless $^EVAL_ERROR;
 print $^STDOUT, "ok ",$i++,"\n";
 
 # interaction with pod (see the eof)
-write_file('bleah.pm', "print \*STDOUT, 'ok $i\n'; 1;\n");
+write_file('bleah.pm', "print $^STDOUT, 'ok $i\n'; 1;\n");
 require "bleah.pm";
 $i++;
 delete $^INCLUDED{'bleah.pm'};
@@ -134,18 +134,18 @@ do {
     if ($ccflags =~ m/(?:^|\s)-DPERL_DISABLE_PMC\b/) {
 	print $^STDOUT, "# .pmc files are ignored, so test that\n";
 	write_file_not_thing('krunch.pmc', '.pmc', $pmc_older);
-	write_file('urkkk.pm', qq(print \\*STDOUT, "ok $simple\n"));
+	write_file('urkkk.pm', qq(print \$^STDOUT, "ok $simple\n"));
 	write_file('whap.pmc', qq(die "This is not an expected error"));
 
 	print $^STDOUT, "# Sleeping for 2 seconds before creating some more files\n";
 	sleep 2;
 
-	write_file('krunch.pm', qq(print \\*STDOUT, "ok $pmc_older\n"));
+	write_file('krunch.pm', qq(print \$^STDOUT, "ok $pmc_older\n"));
 	write_file_not_thing('urkkk.pmc', '.pmc', $simple);
 	write_file('whap.pm', qq(die "This is an expected error"));
     } else {
 	print $^STDOUT, "# .pmc files should be loaded, so test that\n";
-	write_file('krunch.pmc', qq(print \\*STDOUT, "ok $pmc_older\n";));
+	write_file('krunch.pmc', qq(print \$^STDOUT, "ok $pmc_older\n";));
 	write_file_not_thing('urkkk.pm', '.pm', $simple);
 	write_file('whap.pmc', qq(die "This is an expected error"));
 
@@ -153,7 +153,7 @@ do {
 	sleep 2;
 
 	write_file_not_thing('krunch.pm', '.pm', $pmc_older);
-	write_file('urkkk.pmc', qq(print \\*STDOUT, "ok $simple\n";));
+	write_file('urkkk.pmc', qq(print \$^STDOUT, "ok $simple\n";));
 	write_file_not_thing('whap.pm', '.pm', $pmc_dies);
     }
     require urkkk;
@@ -186,7 +186,7 @@ print $^STDOUT, "ok ", ++$i, " circular require\n";
 require utf8;
 my $utf8 = utf8::chr(0xFEFF);
 
-$i++; do_require(qq($($utf8)print \*STDOUT, "ok $i\n"; 1;\n));
+$i++; do_require(qq($($utf8)print $^STDOUT, "ok $i\n"; 1;\n));
 
 END {
     foreach my $file ( @fjles_to_delete) {

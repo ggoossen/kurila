@@ -33,19 +33,19 @@ Can't "last" outside a loop block at - line 3 character 15.
     main::__ANON__ called at - line 3 character 8.
 ########
 sub warnhook {
-  print \*STDOUT, "WARNHOOK\n";
+  print $^STDOUT, "WARNHOOK\n";
   eval('die("foooo\n")');
 }
 $^WARN_HOOK = \&warnhook;
 warn("dfsds\n");
-print \*STDOUT, "END\n";
+print $^STDOUT, "END\n";
 EXPECT
 WARNHOOK
 END
 ########
 our @a = @(3, 2, 1);
 @a = sort { eval('die("no way")') ;  $a <+> $b}, @a;
-print \*STDOUT, join(", ", @a)."\n";
+print $^STDOUT, join(", ", @a)."\n";
 EXPECT
 1, 2, 3
 ########
@@ -63,6 +63,6 @@ foo:
 do {
   @a = sort { exit(0) }, @a;
 };
-END { print \*STDOUT, "foobar\n" }
+END { print $^STDOUT, "foobar\n" }
 EXPECT
 foobar

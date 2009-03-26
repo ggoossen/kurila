@@ -205,7 +205,7 @@ use warnings 'uninitialized';
 my ($m1, $m2);
 our ($g1, @ga);
 
-print \*STDOUT, @ga[?1000];
+print $^STDOUT, @ga[?1000];
 print \*STDERR, @ga[?1000];
 print \*STDERR, $m1, $g1, @ga[?1],$m2;
 print \*STDERR, "", @ga[?1],"";

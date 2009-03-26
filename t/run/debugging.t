@@ -15,7 +15,7 @@ BEGIN {
 
 plan(tests => 1);
 
-my $result = runperl( prog	=> 'print \*STDOUT, "foo"',
+my $result = runperl( prog	=> 'print $^STDOUT, "foo"',
 		       args	=> \@( '-Dx' ),
 		       stderr	=> 1,
 		       );
@@ -42,36 +42,26 @@ my $refdump = <<'EO_DX_OUT';
             PACKAGE = "main"
         }
         {
-11          TYPE = print  ===> 2
+9           TYPE = print  ===> 2
             LOCATION = -e 1 1 
             FLAGS = (VOID,KIDS)
             {
 5               TYPE = pushmark  ===> 6
-                LOCATION = -e 1 6 
+                LOCATION = -e 1 7 
                 FLAGS = (SCALAR)
             }
             {
-9               TYPE = rv2gv  ===> 10
-                LOCATION = -e 1 6 
+7               TYPE = rv2gv  ===> 8
+                LOCATION = -e 1 7 
                 FLAGS = (SCALAR,KIDS,SPECIAL)
                 {
-8                   TYPE = srefgen  ===> 9
-                    LOCATION = -e 1 6 
-                    FLAGS = (SCALAR,KIDS)
-                    {
-7                       TYPE = rv2gv  ===> 8
-                        LOCATION = -e 1 8 
-                        FLAGS = (SCALAR,KIDS,REF,MOD)
-                        {
-6                           TYPE = gv  ===> 7
-                            LOCATION = -e 1 8 
-                            FLAGS = (SCALAR)
-                        }
-                    }
+6                   TYPE = magicsv  ===> 7
+                    LOCATION = -e 1 7 
+                    FLAGS = (SCALAR)
                 }
             }
             {
-10              TYPE = const  ===> 11
+8               TYPE = const  ===> 9
                 LOCATION = -e 1 22 
                 FLAGS = (SCALAR)
                 SV = PV("foo"\0) [UTF8 "foo"]

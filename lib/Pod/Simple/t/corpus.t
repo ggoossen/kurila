@@ -1,7 +1,7 @@
 BEGIN {
     use Config;
     if (Config::config_value('extensions') !~ m/\bEncode\b/) {
-      print \*STDOUT, "1..0 # Skip: Encode was not built\n";
+      print $^STDOUT, "1..0 # Skip: Encode was not built\n";
       exit 0;
     }
 }

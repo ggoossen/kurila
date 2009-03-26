@@ -99,7 +99,7 @@ use warnings 'void' ;
 use Config ;
 BEGIN {
     if ( ! config_value("d_getppid")) {
-        print \*STDOUT, <<EOM ;
+        print $^STDOUT, <<EOM ;
 SKIPPED
 # getppid not present
 EOM
@@ -117,7 +117,7 @@ use warnings 'void' ;
 use Config ;
 BEGIN {
     if ( ! config_value("d_getpgrp")) {
-        print \*STDOUT, <<EOM ;
+        print $^STDOUT, <<EOM ;
 SKIPPED
 # getpgrp not present
 EOM
@@ -135,7 +135,7 @@ use warnings 'void' ;
 use Config ;
 BEGIN {
     if ( ! config_value("d_times")) {
-        print \*STDOUT, <<EOM ;
+        print $^STDOUT, <<EOM ;
 SKIPPED
 # times not present
 EOM
@@ -153,7 +153,7 @@ use warnings 'void' ;
 use Config ;
 BEGIN {
     if ( ! config_value("d_getprior") or $^OS_NAME eq 'os2') { # Locks before fixpak22
-        print \*STDOUT, <<EOM ;
+        print $^STDOUT, <<EOM ;
 SKIPPED
 # getpriority not present
 EOM
@@ -171,7 +171,7 @@ use warnings 'void' ;
 use Config ;
 BEGIN {
     if ( ! config_value("d_getlogin")) {
-        print \*STDOUT, <<EOM ;
+        print $^STDOUT, <<EOM ;
 SKIPPED
 # getlogin not present
 EOM
@@ -188,7 +188,7 @@ Useless use of getlogin in void context at - line 13 character 1.
 use warnings 'void' ;
 use Config ; BEGIN {
 if ( ! config_value("d_socket")) {
-    print \*STDOUT, <<EOM ;
+    print $^STDOUT, <<EOM ;
 SKIPPED
 # getsockname not present
 # getpeername not present
@@ -282,8 +282,8 @@ use warnings 'void' ;
 2 + 2; # optimized to OP_CONST
 use constant U => undef;
 U;
-5 || print \*STDOUT, "bad\n";	# test OPpCONST_SHORTCIRCUIT
-print \*STDOUT, "boo\n" if U;	# test OPpCONST_SHORTCIRCUIT
+5 || print $^STDOUT, "bad\n";	# test OPpCONST_SHORTCIRCUIT
+print $^STDOUT, "boo\n" if U;	# test OPpCONST_SHORTCIRCUIT
 
 no warnings 'void' ;
 "abc"; # OP_CONST
@@ -377,7 +377,7 @@ Constant subroutine main::fred redefined at - line 4 character 1.
 # op.c
 BEGIN {
     if ($^OS_NAME eq 'MacOS') {
-	print \*STDOUT, <<EOM;
+	print $^STDOUT, <<EOM;
 SKIPPED
 # no exec on Mac OS
 EOM
@@ -395,7 +395,7 @@ Statement unlikely to be reached at - line 12 character 1.
 # op.c
 BEGIN {
     if ($^OS_NAME eq 'MacOS') {
-	print \*STDOUT, <<EOM;
+	print $^STDOUT, <<EOM;
 SKIPPED
 # no exec on Mac OS
 EOM
@@ -411,11 +411,11 @@ EXPECT
 # op.c [Perl_newATTRSUB]
 --FILE-- abc.pm
 use warnings 'void' ;
-BEGIN { $^OUTPUT_AUTOFLUSH = 1; print \*STDOUT, "in begin\n"; }
-CHECK { print \*STDOUT, "in check\n"; }
-INIT { print \*STDOUT, "in init\n"; }
-END { print \*STDOUT, "in end\n"; }
-print \*STDOUT, "in mainline\n";
+BEGIN { $^OUTPUT_AUTOFLUSH = 1; print $^STDOUT, "in begin\n"; }
+CHECK { print $^STDOUT, "in check\n"; }
+INIT { print $^STDOUT, "in init\n"; }
+END { print $^STDOUT, "in end\n"; }
+print $^STDOUT, "in mainline\n";
 1;
 --FILE--
 use abc;
@@ -446,11 +446,11 @@ in end
 # op.c [Perl_newATTRSUB]
 --FILE-- abc.pm
 no warnings 'void' ;
-BEGIN { $^OUTPUT_AUTOFLUSH = 1; print \*STDOUT, "in begin\n"; }
-CHECK { print \*STDOUT, "in check\n"; }
-INIT { print \*STDOUT, "in init\n"; }
-END { print \*STDOUT, "in end\n"; }
-print \*STDOUT, "in mainline\n";
+BEGIN { $^OUTPUT_AUTOFLUSH = 1; print $^STDOUT, "in begin\n"; }
+CHECK { print $^STDOUT, "in check\n"; }
+INIT { print $^STDOUT, "in init\n"; }
+END { print $^STDOUT, "in end\n"; }
+print $^STDOUT, "in mainline\n";
 1;
 --FILE--
 require abc;

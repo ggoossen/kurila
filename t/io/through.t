@@ -35,7 +35,7 @@ $c += 6;	# Tests with sleep()...
 print $^STDOUT, "1..$c\n";
 
 my $set_out = '';
-$set_out = "binmode \\*STDOUT, ':crlf'"
+$set_out = "binmode \$^STDOUT, ':crlf'"
     if defined  $main::use_crlf && $main::use_crlf == 1;
 
 sub testread($fh, $str, $read_c, $how_r, $write_c, $how_w, $why) {
@@ -66,13 +66,13 @@ sub testpipe($str, $write_c, $read_c, $how_w, $how_r, $why) {
   my $fh;
   if ($how_w eq 'print') {	# AUTOFLUSH???
     # Should be shell-neutral:
-    open $fh, '-|', qq[$Perl -we "$set_out;print \\\\*STDOUT, \\\$_ for grep \{ length \}, split m/(.\{1,$write_c\})/s, qq($quoted)"] or die "open: $^OS_ERROR";
+    open $fh, '-|', qq[$Perl -we "$set_out;print \\\$^STDOUT, \\\$_ for grep \{ length \}, split m/(.\{1,$write_c\})/s, qq($quoted)"] or die "open: $^OS_ERROR";
   } elsif ($how_w eq 'print/flush') {
     # shell-neutral and miniperl-enabled autoflush? qq(\x24) eq '$'
-    open $fh, '-|', qq[$Perl -we "$set_out;eval qq(\\x24^OUTPUT_AUTOFLUSH = 1) or die;print \\\\*STDOUT, \\\$_ for grep \{ length \}, split m/(.\{1,$write_c\})/s, qq($quoted) "] or die "open: $^OS_ERROR";
+    open $fh, '-|', qq[$Perl -we "$set_out;eval qq(\\x24^OUTPUT_AUTOFLUSH = 1) or die;print \\\$^STDOUT, \\\$_ for grep \{ length \}, split m/(.\{1,$write_c\})/s, qq($quoted) "] or die "open: $^OS_ERROR";
   } elsif ($how_w eq 'syswrite') {
     ### How to protect \$_
-    my $cmd = qq[$Perl -we "$set_out;eval qq(sub w \\\{syswrite \\*STDOUT, \\x[24]_\\\} 1) or die; w() for grep \{ length \}, split m/(.\{1,$write_c\})/s, qq($quoted)"];
+    my $cmd = qq[$Perl -we "$set_out;eval qq(sub w \\\{syswrite \\\\\\\$^STDOUT, \\x[24]_\\\} 1) or die; w() for grep \{ length \}, split m/(.\{1,$write_c\})/s, qq($quoted)"];
     open $fh, '-|', $cmd or die "open '$cmd': $^OS_ERROR";
   } else {
     die "Unrecognized write: '$how_w'";
@@ -107,7 +107,7 @@ sub testfile($str, $write_c, $read_c, $how_w, $how_r, $why) {
 }
 
 # shell-neutral and miniperl-enabled autoflush? qq(\x24) eq '$'
-open my $fh, '-|', qq[$Perl -we "eval qq(\\x24^OUTPUT_AUTOFLUSH = 1) or die; binmode \\\\*STDOUT; sleep 1, print \\\\*STDOUT, \\\$_ for split m//, qq(a\nb\n\nc\n\n\n)"] or die "open: $^OS_ERROR";
+open my $fh, '-|', qq[$Perl -we "eval qq(\\x24^OUTPUT_AUTOFLUSH = 1) or die; binmode \\\$^STDOUT; sleep 1, print \\\$^STDOUT, \\\$_ for split m//, qq(a\nb\n\nc\n\n\n)"] or die "open: $^OS_ERROR";
 ok(1, 'open pipe');
 binmode $fh, q(:crlf);
 ok(1, 'binmode');

@@ -38,7 +38,7 @@ chop undef
 chown (@)
 chr (_)
 chroot (_)
-close (;*)
+close (*)
 closedir (*)
 cmp unknown
 connect (*$)

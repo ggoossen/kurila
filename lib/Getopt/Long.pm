@@ -2400,7 +2400,7 @@ terminating the invoking process.
 
 A reference to a filehandle, or the pathname of a file to which the
 usage message should be written. The default is C<\*STDERR> unless the
-exit value is less than 2 (in which case the default is C<\*STDOUT>).
+exit value is less than 2 (in which case the default is C<$^STDOUT>).
 
 =back
 
