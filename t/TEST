@@ -182,7 +182,7 @@ if ($::deparse) {
 elsif ($::with_utf16) {
     for my $e (@(0, 1)) {
 	for my $b (@(0, 1)) {
-	    print \*STDERR, "# ENDIAN $e BOM $b\n";
+	    print $^STDERR, "# ENDIAN $e BOM $b\n";
 	    my @UARGV;
 	    for my $a ( @ARGV) {
 		my $u = $a . "." . ($e ?? "l" !! "b") . "e" . ($b ?? "b" !! "");
@@ -535,16 +535,16 @@ EOT
     else {
 	my $pct = $tested_files ?? sprintf( "%.2f", ($tested_files - $::bad_files) / $tested_files * 100) !! "0.00";
 	my $s = $::bad_files == 1 ?? "" !! "s";
-	print \*STDERR, "Failed $::bad_files test$s out of $tested_files, $pct% okay.\n";
+	print $^STDERR, "Failed $::bad_files test$s out of $tested_files, $pct% okay.\n";
 	for my $test (sort grep { %failed_tests{$_} }, keys %failed_tests) {
 	    print $^STDOUT, "\t$test\n";
 	}
-	print \*STDERR, <<'SHRDLU_1';
+	print $^STDERR, <<'SHRDLU_1';
 ### Since not all tests were successful, you may want to run some of
 ### them individually and examine any diagnostic messages they produce.
 ### See the INSTALL document's section on "make test".
 SHRDLU_1
-	print \*STDERR, <<'SHRDLU_2' if $good_files / $total_files +> 0.8;
+	print $^STDERR, <<'SHRDLU_2' if $good_files / $total_files +> 0.8;
 ### You have a good chance to get more information by running
 ###   ./perl harness
 ### in the 't' directory since most (>=80%) of the tests succeeded.
@@ -552,24 +552,24 @@ SHRDLU_2
 	if (try {require Config; Config->import; 1}) {
 	    if (Config::config_value('usedl')
                 && (my $p = Config::config_value('ldlibpthname')) ) {
-		print \*STDERR, <<SHRDLU_3;
+		print $^STDERR, <<SHRDLU_3;
 ### You may have to set your dynamic library search path,
 ### $p, to point to the build directory:
 SHRDLU_3
 		if (defined env::var($p) && env::var($p) ne '') {
-		    print \*STDERR, <<SHRDLU_4a;
+		    print $^STDERR, <<SHRDLU_4a;
 ###   setenv $p `pwd`:\$$p; cd t; ./perl harness
 ###   $p=`pwd`:\$$p; export $p; cd t; ./perl harness
 ###   export $p=`pwd`:\$$p; cd t; ./perl harness
 SHRDLU_4a
 		} else {
-		    print \*STDERR, <<SHRDLU_4b;
+		    print $^STDERR, <<SHRDLU_4b;
 ###   setenv $p `pwd`; cd t; ./perl harness
 ###   $p=`pwd`; export $p; cd t; ./perl harness
 ###   export $p=`pwd`; cd t; ./perl harness
 SHRDLU_4b
 		}
-		print \*STDERR, <<SHRDLU_5;
+		print $^STDERR, <<SHRDLU_5;
 ### for csh-style shells, like tcsh; or for traditional/modern
 ### Bourne-style shells, like bash, ksh, and zsh, respectively.
 SHRDLU_5
