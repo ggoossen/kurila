@@ -1403,10 +1403,12 @@ sub make_prototype {
 sub mg_stdin {
     my $xml = shift;
     for my $op (find_ops($xml, "rv2gv")) {
-        if ((get_madprop($op, "star") || '') eq "*STDIN") {
-            set_madprop($op, "star", '$^STDIN');
-            if ($op->parent->tag eq "op_srefgen") {
-                set_madprop($op->parent, "operator", '');
+        for my $name (qw[STDIN STDOUT STDERR]) {
+            if ((get_madprop($op, "star") || '') eq "*" . $name) {
+                set_madprop($op, "star", '$^' . $name);
+                if ($op->parent->tag eq "op_srefgen") {
+                    set_madprop($op->parent, "operator", '');
+                }
             }
         }
     }

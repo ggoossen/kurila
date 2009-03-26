@@ -1124,6 +1124,9 @@ Perl_fold_constants(pTHX_ register OP *o)
 	o->op_ppaddr = PL_ppaddr[type = ++(o->op_type)];
     }
 
+    if (PL_madskills)
+	goto nope;
+
     if (!(PL_opargs[type] & OA_FOLDCONST))
 	goto nope;
 
@@ -5440,10 +5443,6 @@ Perl_ck_subr(pTHX_ OP *o)
 	namesv = av_fetch(svTav(SvLOCATION(cv)), 3, 0);
     while (o2 != cvop) {
 	OP* o3;
-	if (PL_madskills && o2->op_type == OP_STUB) {
-	    o2 = o2->op_sibling;
-	    continue;
-	}
 	if (PL_madskills && o2->op_type == OP_NULL)
 	    o3 = ((UNOP*)o2)->op_first;
 	else
