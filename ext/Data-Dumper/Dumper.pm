@@ -513,7 +513,7 @@ sub DumperX {
 
 sub Dumpf { return Data::Dumper->Dump(< @_) }
 
-sub Dumpp { print \*STDOUT, < Data::Dumper->Dump(< @_) }
+sub Dumpp { print $^STDOUT, < Data::Dumper->Dump(< @_) }
 
 #
 # reset the "seen" cache 

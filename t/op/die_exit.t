@@ -6,7 +6,7 @@
 #
 
 if ($^OS_NAME eq 'mpeix') {
-    print \*STDOUT, "1..0 # Skip: broken on MPE/iX\n";
+    print $^STDOUT, "1..0 # Skip: broken on MPE/iX\n";
     exit 0;
 }
 
@@ -41,7 +41,7 @@ my $max = nkeys %tests;
 plan(tests => $max);
 
 # Dump any error messages from the dying processes off to a temp file.
-open(\*STDERR, ">", "die_exit.err") or die "Can't open temp error file:  $^OS_ERROR";
+open($^STDERR, ">", "die_exit.err") or die "Can't open temp error file:  $^OS_ERROR";
 
 foreach my $test (1 .. $max) {
     my @($bang, $query, ?$code) =  @{%tests{?$test}};
@@ -58,10 +58,10 @@ foreach my $test (1 .. $max) {
     # the severity bits, which boils down to 4.  See L<perlvms/$?>.
     $bang = 4 if $^OS_NAME eq 'VMS';
 
-    printf \*STDOUT, "# 0x\%04x  0x\%04x  0x\%04x\n", $exit, $bang, $query;
+    printf $^STDOUT, "# 0x\%04x  0x\%04x  0x\%04x\n", $exit, $bang, $query;
     is($exit, (($bang || ($query >> 8) || 255) << 8));
 }
     
-close \*STDERR;
+close $^STDERR;
 END { 1 while unlink 'die_exit.err' }
 

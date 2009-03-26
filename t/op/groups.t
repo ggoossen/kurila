@@ -8,7 +8,7 @@ env::set_var('LANGUAGE' => 'C'); # GNU locale extension
 BEGIN {
     require Config;
     if ($^EVAL_ERROR) {
-	print \*STDOUT, "1..0 # Skip: no Config\n";
+	print $^STDOUT, "1..0 # Skip: no Config\n";
     } else {
 	Config->import;
     }
@@ -17,12 +17,12 @@ BEGIN {
 our ($groups, $pwgid, $pwgnam, %seen, @gr, $group, $gr1, $gr2, %basegroup);
 
 sub quit {
-    print \*STDOUT, "1..0 # Skip: no `id` or `groups`\n";
+    print $^STDOUT, "1..0 # Skip: no `id` or `groups`\n";
     exit 0;
 }
 
 unless (try { getgrgid(0); 1 }) {
-    print \*STDOUT, "1..0 # Skip: getgrgid() not implemented\n";
+    print $^STDOUT, "1..0 # Skip: getgrgid() not implemented\n";
     exit 0;
 }
 
@@ -67,7 +67,7 @@ GROUPS: do {
     if (($groups = `groups 2>/dev/null`) ne '') {
 	# may not reflect all groups in some places, so do a sanity check
 	if (-d '/afs') {
-	    print \*STDOUT, <<EOM;
+	    print $^STDOUT, <<EOM;
 # These test results *may* be bogus, as you appear to have AFS,
 # and I can't find a working 'id' in your PATH (which I have set
 # to '$(env::var('PATH'))').
@@ -85,7 +85,7 @@ EOM
 
 chomp($groups);
 
-print \*STDOUT, "# groups = $groups\n";
+print $^STDOUT, "# groups = $groups\n";
 
 # Remember that group names can contain whitespace, '-', et cetera.
 # That is: do not \w, do not \S.
@@ -104,22 +104,22 @@ if ($groups =~ m/groups=(.+)( [ug]id=|$)/) {
 	    push @g1, ($1 || $2);
 	}
 	else {
-	    print \*STDOUT, "# ignoring group entry [$_]\n";
+	    print $^STDOUT, "# ignoring group entry [$_]\n";
 	}
     }
-    print \*STDOUT, "# groups=$gr\n";
-    print \*STDOUT, "# g0 = $(join ' ',@g0)\n";
-    print \*STDOUT, "# g1 = $(join ' ',@g1)\n";
+    print $^STDOUT, "# groups=$gr\n";
+    print $^STDOUT, "# g0 = $(join ' ',@g0)\n";
+    print $^STDOUT, "# g1 = $(join ' ',@g1)\n";
     $groups = "$(join ' ',@g1)";
 }
 
-print \*STDOUT, "1..2\n";
+print $^STDOUT, "1..2\n";
 
 $pwgid = $^GID + 0;
 ($pwgnam) = getgrgid($pwgid);
 %seen{+$pwgid}++;
 
-print \*STDOUT, "# pwgid = $pwgid, pwgnam = $pwgnam\n";
+print $^STDOUT, "# pwgid = $pwgid, pwgnam = $pwgnam\n";
 
 for (split(' ', $^GID)) {
     ($group) = getgrgid($_);
@@ -132,7 +132,7 @@ for (split(' ', $^GID)) {
     }
 }
 
-print \*STDOUT, "# gr = $(join ' ',@gr)\n";
+print $^STDOUT, "# gr = $(join ' ',@gr)\n";
 
 my %did;
 if ($^OS_NAME =~ m/^(?:uwin|cygwin|interix|solaris)$/) {
@@ -152,7 +152,7 @@ $gr2 = join(' ', grep( {!%basegroup{+$_}++ }, sort split(' ',$groups)));
 
 my $ok1 = 0;
 if ($gr1 eq $gr2 || ($gr1 eq '' && $gr2 eq $pwgid)) {
-    print \*STDOUT, "ok 1\n";
+    print $^STDOUT, "ok 1\n";
     $ok1++;
 }
 elsif (config_value("myuname") =~ m/^cygwin_nt/i) { # basegroup on CYGWIN_NT has id = 0.
@@ -160,21 +160,21 @@ elsif (config_value("myuname") =~ m/^cygwin_nt/i) { # basegroup on CYGWIN_NT has
     %basegroup = %( $pwgid => 1, $pwgnam => 1 );
     $gr2 = join(' ', grep( {!%basegroup{+$_}++ }, sort split(' ',$groups)));
     if ($gr1 eq $gr2 || ($gr1 eq '' && $gr2 eq $pwgid)) {
-	print \*STDOUT, "ok 1 # This Cygwin behaves like Unix (Win2k?)\n";
+	print $^STDOUT, "ok 1 # This Cygwin behaves like Unix (Win2k?)\n";
 	$ok1++;
     }
 }
 unless ($ok1) {
-    print \*STDOUT, "#gr1 is <$gr1>\n";
-    print \*STDOUT, "#gr2 is <$gr2>\n";
-    print \*STDOUT, "not ok 1\n";
+    print $^STDOUT, "#gr1 is <$gr1>\n";
+    print $^STDOUT, "#gr2 is <$gr2>\n";
+    print $^STDOUT, "not ok 1\n";
 }
 
 # multiple 0's indicate GROUPSTYPE is currently long but should be short
 
 if ($pwgid == 0 || %seen{?0} +< 2) {
-    print \*STDOUT, "ok 2\n";
+    print $^STDOUT, "ok 2\n";
 }
 else {
-    print \*STDOUT, "not ok 2 (groupstype should be type short, not long)\n";
+    print $^STDOUT, "not ok 2 (groupstype should be type short, not long)\n";
 }

@@ -13,7 +13,7 @@ chdir 't';
 
 
 # Can't use Test.pm, that's a 5.005 thing.
-print \*STDOUT, "1..5\n";
+print $^STDOUT, "1..5\n";
 
 my $test_num = 1;
 # Utility testing functions.
@@ -23,7 +23,7 @@ sub ok($test, ?$name) {
     $ok .= "ok $test_num";
     $ok .= " - $name" if defined $name;
     $ok .= "\n";
-    print \*STDOUT, $ok;
+    print $^STDOUT, $ok;
     $test_num++;
 
     return $test;
@@ -77,7 +77,7 @@ $Test->ok(1, "ok, like\nok");
 $Test->skip("wibble\nmoof");
 $Test->todo_skip("todo\nskip\n");
 
-ok( $output eq <<OUTPUT ) || print \*STDERR, $output;
+ok( $output eq <<OUTPUT ) || print $^STDERR, $output;
 1..5
 ok 1 - ok
 ok 2 - ok

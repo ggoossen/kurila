@@ -3,7 +3,7 @@
 # Tests to make sure the regexp engine doesn't run into limits too soon.
 #
 
-print \*STDOUT, "1..13\n";
+print $^STDOUT, "1..13\n";
 
 my $email = qr {
     (?(DEFINE)
@@ -75,7 +75,7 @@ sub run_tests {
     while (~< *DATA) {
 	chomp;
 	next if m/^#/;
-	print \*STDOUT, m/^$email$/ ?? "ok " !! "not ok ", ++ $count, "\n";
+	print $^STDOUT, m/^$email$/ ?? "ok " !! "not ok ", ++ $count, "\n";
     }
 }
 

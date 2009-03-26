@@ -1,20 +1,20 @@
 #!./perl
 
-print \*STDOUT, "1..7\n";
+print $^STDOUT, "1..7\n";
 
 # This is() function is written to avoid ""
 my $test = 1;
 sub is($left, $right, ?$msg) {
 
     if ($left eq $right) {
-      printf \*STDOUT, 'ok %d
+      printf $^STDOUT, 'ok %d
 ', $test++;
       return 1;
     }
-    printf \*STDOUT, q(not ok %d - got %s expected %s
+    printf $^STDOUT, q(not ok %d - got %s expected %s
 ), $test++, $left, $right;
 
-    printf \*STDOUT, q(# Failed test at line %d
+    printf $^STDOUT, q(# Failed test at line %d
 ), (caller)[[2]];
 
     return 0;

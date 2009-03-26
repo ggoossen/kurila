@@ -211,16 +211,16 @@ for ( @prgs) {
     my $pfx = ($res =~ s/^PREFIX\n//);
     my $rexp = qr{^$exp};
     if ($res =~ s/^SKIPPED\n//) {
-	print \*STDOUT, "$res\n";
+	print $^STDOUT, "$res\n";
 	}
     elsif (($pfx and $res !~ m/^\Q$exp/) or
 	  (!$pfx and $res !~ $rexp)) {
-        print \*STDERR,
+        print $^STDERR,
 	    "PROG:\n$prog\n",
 	    "FILE:\n$fil",
 	    "EXPECTED:\n$exp\n",
 	    "GOT:\n$res\n";
-        print \*STDOUT, "not ";
+        print $^STDOUT, "not ";
 	}
     ok 1;
     1 while unlink $tmpfile;

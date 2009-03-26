@@ -10,9 +10,9 @@ BEGIN {
 }
 
 $Locale::Maketext::GUTSPATH = '';
-Locale::Maketext::DEBUG and print \*STDOUT, "Requiring Locale::Maketext::Guts...\n";
+Locale::Maketext::DEBUG and print $^STDOUT, "Requiring Locale::Maketext::Guts...\n";
 require Locale::Maketext::Guts;
-Locale::Maketext::DEBUG and print \*STDOUT, "Loaded Locale::Maketext::Guts fine\n";
+Locale::Maketext::DEBUG and print $^STDOUT, "Loaded Locale::Maketext::Guts fine\n";
 
 1;
 

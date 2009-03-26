@@ -34,9 +34,9 @@ ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
   diag("chdir failed: $^OS_ERROR");
 
 do {
-    close *STDOUT;
+    close $^STDOUT;
     my $stdout = '';
-    open *STDOUT, '>>', \$stdout or die;
+    open $^STDOUT, '>>', \$stdout or die;
     my $warnings = '';
     local $^WARN_HOOK = sub {
         $warnings .= @_[0]->{description};

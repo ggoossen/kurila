@@ -46,7 +46,7 @@ for my $newlex (@('', '-newlex')) {
     like ($out, qr/4: $na/ms, 'found $a in "my ($a,$b)"');
     like ($out, qr/5: $nb/ms, 'found $b in "my ($a,$b)"');
 
-    print \*STDOUT, $out if $verbose;
+    print $^STDOUT, $out if $verbose;
 
 SKIP: do {
     skip "no perlio in this build", 5
@@ -63,7 +63,7 @@ SKIP: do {
        'found $foo in "sub { my ($foo,$bar) }"');
     like ($buf, qr/$($start_index+2): $nb/ms, 'found $bar in "sub { my ($foo,$bar) }"');
 
-    print \*STDOUT, $buf if $verbose;
+    print $^STDOUT, $buf if $verbose;
 
     $ak = B::Showlex::walk_output (\$buf);
 
@@ -78,7 +78,7 @@ SKIP: do {
     like ($buf, qr/$($start_index+2): $nb/ms, 'found @arr    in "'. $src .'"');
     like ($buf, qr/$($start_index+3): $nc/ms, 'found %hash   in "'. $src .'"');
 
-    print \*STDOUT, $buf if $verbose;
+    print $^STDOUT, $buf if $verbose;
 
     # fibonacci function under test
     my $asub = sub {
@@ -96,7 +96,7 @@ SKIP: do {
     };
     $walker = B::Showlex::compile($asub, $newlex, "-nosp");
     $walker->();
-    print \*STDOUT, $buf if $verbose;
+    print $^STDOUT, $buf if $verbose;
 
     $walker = B::Concise::compile($asub, '-exec');
     $walker->();

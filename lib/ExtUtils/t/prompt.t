@@ -27,7 +27,7 @@ like( $^EVAL_ERROR->{description}, qr/^prompt function called without an argumen
 
 my $stdout = \$( '' );
 open my $stdout_fh, '>>', $stdout or die;
-*STDOUT = *$stdout_fh{IO};
+$^STDOUT = *$stdout_fh{IO};
 
 
 env::set_var('PERL_MM_USE_DEFAULT' => 1);
@@ -46,12 +46,12 @@ $$stdout = '';
 
 do {
     env::set_var('PERL_MM_USE_DEFAULT' => 0);
-    close \*STDIN;
+    close $^STDIN;
     my $stdin = '';
     open my $stdin_fh, '<', \$stdin or die;
-    *STDIN = *$stdin_fh{IO};
+    $^STDIN = *$stdin_fh{IO};
     $stdin .= "From STDIN";
-    ok( !-t *STDIN,      'STDIN not a tty' );
+    ok( !-t $^STDIN,      'STDIN not a tty' );
 
     is( prompt("Foo?", 'Bar!'), 'From STDIN',     'from STDIN' );
     like( $$stdout,  qr/^Foo\? \[Bar!\]\s*$/,      '  question' );

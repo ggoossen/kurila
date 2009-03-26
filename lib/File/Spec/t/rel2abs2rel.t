@@ -39,11 +39,11 @@ sub safe_rel {
 # `$perl -le "print 'ok'"`. And, for portability, we can't use fork().
 sub sayok{
     my $perl = shift;
-    open(my $stdoutdup, ">&", \*STDOUT);
-    open(\*STDOUT, ">", "rel2abs2rel$^PID.tmp")
+    open(my $stdoutdup, ">&", $^STDOUT);
+    open($^STDOUT, ">", "rel2abs2rel$^PID.tmp")
         or die "Can't open scratch file rel2abs2rel$^PID.tmp -- $^OS_ERROR\n";
     system($perl, "rel2abs2rel$^PID.pl");
-    open(\*STDOUT, ">&", \*$stdoutdup);
+    open($^STDOUT, ">&", \*$stdoutdup);
     close($stdoutdup);
 
     open(my $f, "<", "rel2abs2rel$^PID.tmp");
@@ -53,7 +53,7 @@ sub sayok{
     return $output;
 }
 
-print \*STDOUT, "# Checking manipulations of \$^X=$^EXECUTABLE_NAME\n";
+print $^STDOUT, "# Checking manipulations of \$^X=$^EXECUTABLE_NAME\n";
 
 my $perl = safe_rel($^EXECUTABLE_NAME);
 is( sayok($perl), "ok\n",   "`$perl rel2abs2rel$^PID.pl` works" );

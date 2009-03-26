@@ -266,7 +266,7 @@ sub write_compiler_script($self, %< %spec) {
                                     %spec{?basename} . '.ccs' );
 
   $self->add_to_cleanup($script);
-  print \*STDOUT, "Generating script '$script'\n" if !$self->{?quiet};
+  print $^STDOUT, "Generating script '$script'\n" if !$self->{?quiet};
 
   open( my $scriptfh, ">$script" )
     or die( "Could not create script '$script': $^OS_ERROR" );
@@ -336,7 +336,7 @@ sub write_linker_script($self, %< %spec) {
 
   $self->add_to_cleanup($script);
 
-  print \*STDOUT, "Generating script '$script'\n" if !$self->{?quiet};
+  print $^STDOUT, "Generating script '$script'\n" if !$self->{?quiet};
 
   open( my $scriptfh, ">$script" )
     or die( "Could not create script '$script': $^OS_ERROR" );
@@ -390,7 +390,7 @@ sub write_compiler_script($self, %< %spec) {
 
   $self->add_to_cleanup($script);
 
-  print \*STDOUT, "Generating script '$script'\n" if !$self->{?quiet};
+  print $^STDOUT, "Generating script '$script'\n" if !$self->{?quiet};
 
   open( my $scriptfh, ">$script" )
     or die( "Could not create script '$script': $^OS_ERROR" );
@@ -452,7 +452,7 @@ sub write_linker_script($self, %< %spec) {
 
   $self->add_to_cleanup($ld_script, $ld_libs);
 
-  print \*STDOUT, "Generating scripts '$ld_script' and '$ld_libs'.\n" if !$self->{?quiet};
+  print $^STDOUT, "Generating scripts '$ld_script' and '$ld_libs'.\n" if !$self->{?quiet};
 
   # Script 1: contains options & names of object files.
   open( my $ld_scriptfh, ">$ld_script" )
@@ -593,7 +593,7 @@ sub write_linker_script($self, %< %spec) {
 
   $self->add_to_cleanup($script);
 
-  print \*STDOUT, "Generating script '$script'\n" if !$self->{?quiet};
+  print $^STDOUT, "Generating script '$script'\n" if !$self->{?quiet};
 
   open( my $scriptfh, ">$script" )
     or die( "Could not create script '$script': $^OS_ERROR" );

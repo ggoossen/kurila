@@ -156,14 +156,14 @@ do {
   my $vmsval = @vmslocal[5] * 31536000 + @vmslocal[7] * 86400 +
             @vmslocal[2] * 3600     + @vmslocal[1] * 60 + @vmslocal[0];
   ok(abs($vmsval - $utcval + $offset) +<= 10, "(localtime) UTC: $utcval  VMS: $vmsval");
-  print \*STDOUT, "# UTC: $(join ' ',@utclocal)\n# VMS: $(join ' ',@vmslocal)\n";
+  print $^STDOUT, "# UTC: $(join ' ',@utclocal)\n# VMS: $(join ' ',@vmslocal)\n";
 
   $utcval = @utcgmtime[5] * 31536000 + @utcgmtime[7] * 86400 +
             @utcgmtime[2] * 3600     + @utcgmtime[1] * 60 + @utcgmtime[0];
   $vmsval = @vmsgmtime[5] * 31536000 + @vmsgmtime[7] * 86400 +
             @vmsgmtime[2] * 3600     + @vmsgmtime[1] * 60 + @vmsgmtime[0];
   ok(abs($vmsval - $utcval + $offset) +<= 10, "(gmtime) UTC: $utcval  VMS: $vmsval");
-  print \*STDOUT, "# UTC: $(join ' ',@utcgmtime)\n# VMS: $(join ' ',@vmsgmtime)\n";
+  print $^STDOUT, "# UTC: $(join ' ',@utcgmtime)\n# VMS: $(join ' ',@vmsgmtime)\n";
 
   ok(abs($utcmtime - $vmsmtime + $offset) +<= 10,"(stat) UTC: $utcmtime  VMS: $vmsmtime");
 };

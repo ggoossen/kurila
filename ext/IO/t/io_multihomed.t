@@ -9,14 +9,14 @@ BEGIN {
         $reason = 'no fork';
     }
     if ($reason) {
-	print \*STDOUT, "1..0 # Skip: $reason\n";
+	print $^STDOUT, "1..0 # Skip: $reason\n";
 	exit 0;
     }
 }
 
 $^OUTPUT_AUTOFLUSH = 1;
 
-print \*STDOUT, "1..8\n";
+print $^STDOUT, "1..8\n";
 
 try {
     signals::set_handler(ALRM => sub { die; });
@@ -33,8 +33,8 @@ sub _get_addr($sock,$addr_str, $multi)
 {
     #print "_get_addr($sock, $addr_str, $multi)\n";
 
-    print \*STDOUT, "not " unless $multi;
-    print \*STDOUT, "ok 2\n";
+    print $^STDOUT, "not " unless $multi;
+    print $^STDOUT, "ok 2\n";
 
      @(
      # private IP-addresses which I hope does not work anywhere :-)
@@ -52,11 +52,11 @@ sub connect
 	$addr = inet_ntoa($addr);
 	#print "connect($self, $port, $addr)\n";
 	if($addr eq "10.250.230.10") {
-	    print \*STDOUT, "ok 3\n";
+	    print $^STDOUT, "ok 3\n";
 	    return 0;
 	}
 	if($addr eq "10.250.230.12") {
-	    print \*STDOUT, "ok 4\n";
+	    print $^STDOUT, "ok 4\n";
 	    return 0;
 	}
     }
@@ -74,23 +74,23 @@ my $listen = IO::Socket::INET->new(Listen => 2,
 				Timeout => 5,
 			       ) or die "$^OS_ERROR";
 
-print \*STDOUT, "ok 1\n";
+print $^STDOUT, "ok 1\n";
 
 my $port = $listen->sockport;
 
 if(my $pid = fork()) {
 
     my $sock = $listen->accept() or die "$^OS_ERROR";
-    print \*STDOUT, "ok 5\n";
+    print $^STDOUT, "ok 5\n";
 
-    print \*STDOUT, $sock->getline();
+    print $^STDOUT, $sock->getline();
     print $sock, "ok 7\n";
 
     waitpid($pid,0);
 
     $sock->close;
 
-    print \*STDOUT, "ok 8\n";
+    print $^STDOUT, "ok 8\n";
 
 } elsif(defined $pid) {
 
@@ -103,7 +103,7 @@ if(my $pid = fork()) {
 
     print $sock, "ok 6\n";
     sleep(1); # race condition
-    print \*STDOUT, $sock->getline();
+    print $^STDOUT, $sock->getline();
 
     $sock->close;
 

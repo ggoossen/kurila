@@ -51,7 +51,7 @@ DONE
 $^OUTPUT_AUTOFLUSH = 1;
 
 my $numtests = scalar(nelems @tests) / 2;
-print \*STDOUT, "1..$numtests\n";
+print $^STDOUT, "1..$numtests\n";
 
 use Text::Wrap;
 
@@ -68,7 +68,7 @@ while ((nelems @tests)) {
 	my $back = fill('    ', ' ', $in);
 
 	if ($back eq $out) {
-		print \*STDOUT, "ok $tn\n";
+		print $^STDOUT, "ok $tn\n";
 	} elsif ($rerun) {
 		my $oi = $in;
 		write_file("#o", $back);
@@ -77,18 +77,18 @@ while ((nelems @tests)) {
 			s/\t/^I\t/gs;
 			s/\n/\$\n/gs;
 		}
-		print \*STDOUT, "------------ input ------------\n";
-		print \*STDOUT, $in;
-		print \*STDOUT, "\n------------ output -----------\n";
-		print \*STDOUT, $back;
-		print \*STDOUT, "\n------------ expected ---------\n";
-		print \*STDOUT, $out;
-		print \*STDOUT, "\n-------------------------------\n";
+		print $^STDOUT, "------------ input ------------\n";
+		print $^STDOUT, $in;
+		print $^STDOUT, "\n------------ output -----------\n";
+		print $^STDOUT, $back;
+		print $^STDOUT, "\n------------ expected ---------\n";
+		print $^STDOUT, $out;
+		print $^STDOUT, "\n-------------------------------\n";
 		$Text::Wrap::debug = 1;
 		fill('    ', ' ', $oi);
 		exit(1);
 	} else {
-		print \*STDOUT, "not ok $tn\n";
+		print $^STDOUT, "not ok $tn\n";
 	}
 	$tn++;
 }

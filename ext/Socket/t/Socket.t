@@ -32,12 +32,12 @@ if (socket(my $t, PF_INET, SOCK_STREAM, IPPROTO_TCP)) {
   do {
       if ( not ($has_echo && defined $localhost && connect($t,pack_sockaddr_in(7,$localhost)) ) ) {
 
-          print \*STDOUT, "# You're allowed to fail tests 2 and 3 if\n";
-          print \*STDOUT, "# the echo service has been disabled or if your\n";
-          print \*STDOUT, "# gethostbyname() cannot resolve your localhost.\n";
-          print \*STDOUT, "# 'Connection refused' indicates disabled echo service.\n";
-          print \*STDOUT, "# 'Interrupted system call' indicates a hanging echo service.\n";
-          print \*STDOUT, "# Error: $^OS_ERROR\n";
+          print $^STDOUT, "# You're allowed to fail tests 2 and 3 if\n";
+          print $^STDOUT, "# the echo service has been disabled or if your\n";
+          print $^STDOUT, "# gethostbyname() cannot resolve your localhost.\n";
+          print $^STDOUT, "# 'Connection refused' indicates disabled echo service.\n";
+          print $^STDOUT, "# 'Interrupted system call' indicates a hanging echo service.\n";
+          print $^STDOUT, "# Error: $^OS_ERROR\n";
           skip "failed something", 2;
       }
 
@@ -45,7 +45,7 @@ if (socket(my $t, PF_INET, SOCK_STREAM, IPPROTO_TCP)) {
 
         ok 2;
 
-	print \*STDOUT, "# Connected to " .
+	print $^STDOUT, "# Connected to " .
 		inet_ntoa(( <unpack_sockaddr_in(getpeername($t)))[[1]])."\n";
 
 	arm(5);
@@ -66,7 +66,7 @@ if (socket(my $t, PF_INET, SOCK_STREAM, IPPROTO_TCP)) {
   };
 }
 else {
-	print \*STDOUT, "# Error: $^OS_ERROR\n";
+	print $^STDOUT, "# Error: $^OS_ERROR\n";
         ok 0;
 }
 
@@ -78,10 +78,10 @@ if( socket(my $s, PF_INET,SOCK_STREAM, IPPROTO_TCP) ){
   SKIP:
     do {
         if ( not ($has_echo && connect($s,pack_sockaddr_in(7,INADDR_LOOPBACK)) ) ){
-            print \*STDOUT, "# You're allowed to fail tests 5 and 6 if\n";
-            print \*STDOUT, "# the echo service has been disabled.\n";
-            print \*STDOUT, "# 'Interrupted system call' indicates a hanging echo service.\n";
-            print \*STDOUT, "# Error: $^OS_ERROR\n";
+            print $^STDOUT, "# You're allowed to fail tests 5 and 6 if\n";
+            print $^STDOUT, "# the echo service has been disabled.\n";
+            print $^STDOUT, "# 'Interrupted system call' indicates a hanging echo service.\n";
+            print $^STDOUT, "# Error: $^OS_ERROR\n";
             skip "echo skipped", 2;
         }
 
@@ -89,7 +89,7 @@ if( socket(my $s, PF_INET,SOCK_STREAM, IPPROTO_TCP) ){
 
         ok 1;
 
-	print \*STDOUT, "# Connected to " .
+	print $^STDOUT, "# Connected to " .
 		inet_ntoa(( <unpack_sockaddr_in(getpeername($s)))[[1]])."\n";
 
 	arm(5);
@@ -110,7 +110,7 @@ if( socket(my $s, PF_INET,SOCK_STREAM, IPPROTO_TCP) ){
     };
 }
 else {
-	print \*STDOUT, "# Error: $^OS_ERROR\n";
+	print $^STDOUT, "# Error: $^OS_ERROR\n";
         ok 0;
 }
 

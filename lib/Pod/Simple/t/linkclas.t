@@ -27,12 +27,12 @@ my $treelet = Pod::Simple::LinkSection->new($bare_treelet);
 is ref($bare_treelet), 'ARRAY';
 is ref($treelet), 'Pod::Simple::LinkSection';
 
-print \*STDOUT, "# Testing stringification...\n";
+print $^STDOUT, "# Testing stringification...\n";
 
 is $treelet->stringify, 'abc';  # explicit
 
 
-print \*STDOUT, "# Testing non-coreferentiality...\n";
+print $^STDOUT, "# Testing non-coreferentiality...\n";
 do {
   my @stack = @($bare_treelet);
   my $this;
@@ -55,7 +55,7 @@ do {
 };
 
 
-print \*STDOUT, "# Byebye...\n";
+print $^STDOUT, "# Byebye...\n";
 ok 1;
-print \*STDOUT, "# --- Done with ", __FILE__, " --- \n";
+print $^STDOUT, "# --- Done with ", __FILE__, " --- \n";
 

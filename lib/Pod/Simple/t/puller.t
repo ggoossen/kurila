@@ -15,8 +15,8 @@ sub pump_it_up {
   $p->set_source( \( @_[0] ) );
   my(@t, $t);
   while($t = $p->get_token) { push @t, $t }
-  print \*STDOUT, "# Count of tokens: ", scalar(nelems @t), "\n";
-  print \*STDOUT, "#  I.e., \{", join("\n#       + ", map { ref($_) . ": " . $_->dump }, @t), "\} \n";
+  print $^STDOUT, "# Count of tokens: ", scalar(nelems @t), "\n";
+  print $^STDOUT, "#  I.e., \{", join("\n#       + ", map { ref($_) . ": " . $_->dump }, @t), "\} \n";
   return @t;
 }
 
@@ -106,7 +106,7 @@ if(
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 do {
-print \*STDOUT, "# Testing unget_token\n";
+print $^STDOUT, "# Testing unget_token\n";
 
 my $p = Pod::Simple::PullParser->new;
 $p->set_source( \qq{\nBzorch\n\n=pod\n\nLala\n\n\=cut\n} );
@@ -116,7 +116,7 @@ my $t;
 $t = $p->get_token;
 ok $t && $t->type, 'start';
 ok $t && $t->tagname, 'Document';
-print \*STDOUT, "# ungetting ($(dump::view($t))).\n";
+print $^STDOUT, "# ungetting ($(dump::view($t))).\n";
 $p->unget_token($t);
 ok 1;
 
@@ -130,7 +130,7 @@ ok $t && $t->type, 'start';
 ok $t && $t->tagname, 'Para';
 push @to_save, $t;
 
-print \*STDOUT, "# ungetting ($(dump::view(\@to_save)).\n";
+print $^STDOUT, "# ungetting ($(dump::view(\@to_save)).\n";
 $p->unget_token(< @to_save);
 splice @to_save;
 
@@ -151,14 +151,14 @@ ok 1;
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 do {
-print \*STDOUT, "# Testing pullparsing from an arrayref\n";
+print $^STDOUT, "# Testing pullparsing from an arrayref\n";
 my $p = Pod::Simple::PullParser->new;
 ok 1;
 $p->set_source( \@('','Bzorch', '','=pod', '', 'Lala', 'zaza', '', '=cut') );
 ok 1;
 my( @t, $t );
 while($t = $p->get_token) {
-  print \*STDOUT, "# Got a token: ", $t->dump, "\n#\n";
+  print $^STDOUT, "# Got a token: ", $t->dump, "\n#\n";
   push @t, $t;
 }
 ok scalar(nelems @t), 5; # count of tokens
@@ -179,7 +179,7 @@ ok @t[4]->tagname, 'Document';
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 do {
-print \*STDOUT, "# Testing pullparsing from an arrayref with terminal newlines\n";
+print $^STDOUT, "# Testing pullparsing from an arrayref with terminal newlines\n";
 my $p = Pod::Simple::PullParser->new;
 ok 1;
 $p->set_source( \ map { "$_\n" }, @(
@@ -187,7 +187,7 @@ $p->set_source( \ map { "$_\n" }, @(
 ok 1;
 my( @t, $t );
 while($t = $p->get_token) {
-  print \*STDOUT, "# Got a token: ", $t->dump, "\n#\n";
+  print $^STDOUT, "# Got a token: ", $t->dump, "\n#\n";
   push @t, $t;
 }
 ok scalar(nelems @t), 5; # count of tokens
@@ -209,7 +209,7 @@ ok @t[4]->tagname, 'Document';
 
 END { unlink "temp.pod" }
 do {
-print \*STDOUT, "# Testing pullparsing from a file\n";
+print $^STDOUT, "# Testing pullparsing from a file\n";
 my $p = Pod::Simple::PullParser->new;
 ok 1;
 open(my $out, ">", "temp.pod") || die "Can't write-open temp.pod: $^OS_ERROR";
@@ -225,9 +225,9 @@ $p->set_source("temp.pod");
 
 my( @t, $t );
 while($t = $p->get_token) {
-  print \*STDOUT, "# Got a token: ", $t->dump, "\n#\n";
+  print $^STDOUT, "# Got a token: ", $t->dump, "\n#\n";
   push @t, $t;
-  print \*STDOUT, "#  That's token number ", scalar(nelems @t), "\n";
+  print $^STDOUT, "#  That's token number ", scalar(nelems @t), "\n";
 }
 ok scalar(nelems @t), 5; # count of tokens
 ok @t[0]->type, 'start';
@@ -247,7 +247,7 @@ ok @t[4]->tagname, 'Document';
 # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
 do {
-print \*STDOUT, "# Testing pullparsing from a glob\n";
+print $^STDOUT, "# Testing pullparsing from a glob\n";
 my $p = Pod::Simple::PullParser->new;
 ok 1;
 open(my $in, "<", "temp.pod") || die "Can't read-open temp.pod: $^OS_ERROR";
@@ -255,9 +255,9 @@ $p->set_source(\*$in);
 
 my( @t, $t );
 while($t = $p->get_token) {
-  print \*STDOUT, "# Got a token: ", $t->dump, "\n#\n";
+  print $^STDOUT, "# Got a token: ", $t->dump, "\n#\n";
   push @t, $t;
-  print \*STDOUT, "#  That's token number ", scalar(nelems @t), "\n";
+  print $^STDOUT, "#  That's token number ", scalar(nelems @t), "\n";
 }
 ok scalar(nelems @t), 5; # count of tokens
 ok @t[0]->type, 'start';
@@ -278,7 +278,7 @@ close($in);
 # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
 do {
-print \*STDOUT, "# Testing pullparsing from a globref\n";
+print $^STDOUT, "# Testing pullparsing from a globref\n";
 my $p = Pod::Simple::PullParser->new;
 ok 1;
 open(my $in, "<", "temp.pod") || die "Can't read-open temp.pod: $^OS_ERROR";
@@ -286,9 +286,9 @@ $p->set_source(\*$in);
 
 my( @t, $t );
 while($t = $p->get_token) {
-  print \*STDOUT, "# Got a token: ", $t->dump, "\n#\n";
+  print $^STDOUT, "# Got a token: ", $t->dump, "\n#\n";
   push @t, $t;
-  print \*STDOUT, "#  That's token number ", scalar(nelems @t), "\n";
+  print $^STDOUT, "#  That's token number ", scalar(nelems @t), "\n";
 }
 ok scalar(nelems @t), 5; # count of tokens
 ok @t[0]->type, 'start';
@@ -309,7 +309,7 @@ close($in);
 # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
 do {
-print \*STDOUT, "# Testing pullparsing from a filehandle\n";
+print $^STDOUT, "# Testing pullparsing from a filehandle\n";
 my $p = Pod::Simple::PullParser->new;
 ok 1;
 open(my $in, "<", "temp.pod") || die "Can't read-open temp.pod: $^OS_ERROR";
@@ -317,9 +317,9 @@ $p->set_source($in);
 
 my( @t, $t );
 while($t = $p->get_token) {
-  print \*STDOUT, "# Got a token: ", $t->dump, "\n#\n";
+  print $^STDOUT, "# Got a token: ", $t->dump, "\n#\n";
   push @t, $t;
-  print \*STDOUT, "#  That's token number ", scalar(nelems @t), "\n";
+  print $^STDOUT, "#  That's token number ", scalar(nelems @t), "\n";
 }
 ok scalar(nelems @t), 5; # count of tokens
 ok @t[0]->type, 'start';
@@ -342,9 +342,9 @@ close($in);
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-print \*STDOUT, "# Wrapping up... one for the road...\n";
+print $^STDOUT, "# Wrapping up... one for the road...\n";
 ok 1;
-print \*STDOUT, "# --- Done with ", __FILE__, " --- \n";
+print $^STDOUT, "# --- Done with ", __FILE__, " --- \n";
 
 __END__
 

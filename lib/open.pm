@@ -61,16 +61,16 @@ sub import($class,@< @args) {
 	    }
 	}
 	if ($type eq 'IN') {
-	    _drop_oldenc(\*STDIN, < @val);
+	    _drop_oldenc($^STDIN, < @val);
 	    $in  = join(' ', @val);
 	}
 	elsif ($type eq 'OUT') {
-	    _drop_oldenc(\*STDOUT, < @val);
+	    _drop_oldenc($^STDOUT, < @val);
 	    $out = join(' ', @val);
 	}
 	elsif ($type eq 'IO') {
-	    _drop_oldenc(\*STDIN,  < @val);
-	    _drop_oldenc(\*STDOUT, < @val);
+	    _drop_oldenc($^STDIN,  < @val);
+	    _drop_oldenc($^STDOUT, < @val);
 	    $in = $out = join(' ', @val);
 	}
 	else {
@@ -81,18 +81,18 @@ sub import($class,@< @args) {
     if ($std) {
 	if ($in) {
 	    if ($in =~ m/:utf8\b/) {
-		    binmode(\*STDIN,  ":utf8");
+		    binmode($^STDIN,  ":utf8");
 		} elsif ($in =~ m/(\w+\(.+\))/) {
-		    binmode(\*STDIN,  ":$1");
+		    binmode($^STDIN,  ":$1");
 		}
 	}
 	if ($out) {
 	    if ($out =~ m/:utf8\b/) {
-		binmode(\*STDOUT,  ":utf8");
-		binmode(\*STDERR,  ":utf8");
+		binmode($^STDOUT,  ":utf8");
+		binmode($^STDERR,  ":utf8");
 	    } elsif ($out =~ m/(\w+\(.+\))/) {
-		binmode(\*STDOUT,  ":$1");
-		binmode(\*STDERR,  ":$1");
+		binmode($^STDOUT,  ":$1");
+		binmode($^STDERR,  ":$1");
 	    }
 	}
     }

@@ -17,7 +17,7 @@ our $VERSION = "1.01";
 
 sub new($class,$delay) {
   my $self = bless \%('quiet_until' => 1),  ref($class) || $class;
-  $self->to(*STDOUT{IO});
+  $self->to($^STDOUT{IO});
   $self->delay(defined($delay) ?? $delay !! 5);
   return $self;
 }

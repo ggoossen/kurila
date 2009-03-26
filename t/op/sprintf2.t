@@ -49,7 +49,7 @@ fresh_perl_is(
 for (@(int(^~^0/2+1), ^~^0, "9999999999999999999")) {
     dies_like( sub {sprintf "\%$($_)d", 0},
                qr/^Integer overflow in format string for sprintf/, "overflow in sprintf");
-    dies_like( sub {printf \*STDOUT, "\%$($_)d\n", 0},
+    dies_like( sub {printf $^STDOUT, "\%$($_)d\n", 0},
                qr/^Integer overflow in format string for prtf/, "overflow in printf");
 }
 

@@ -14,7 +14,7 @@ ok(!defined(fileno($a)));
 
 do {
     my $b = \*SYM001;
-    ok(open($b, ">&", \*STDOUT));
+    ok(open($b, ">&", $^STDOUT));
     ok(defined *{$b});
     ok(close $b);
 };

@@ -64,7 +64,7 @@ $pwd_cmd =~ s=\\=/=g if ($^OS_NAME eq 'dos');
 SKIP: do {
     skip "No native pwd command found to test against", 4 unless $pwd_cmd;
 
-    print \*STDOUT, "# native pwd = '$pwd_cmd'\n";
+    print $^STDOUT, "# native pwd = '$pwd_cmd'\n";
 
     my %local_env_keys = %:< @+: map { @: $_, env::var($_) }, qw[PATH IFS CDPATH ENV BASH_ENV];
     push dynascope->{onleave}, sub {
@@ -134,7 +134,7 @@ my $updir = File::Spec->updir;
 
 for (1..nelems @test_dirs) {
   Cwd::chdir $updir;
-  print \*STDOUT, "#$(env::var('PWD'))\n";
+  print $^STDOUT, "#$(env::var('PWD'))\n";
 }
 
 rmtree(@test_dirs[0], 0, 0);

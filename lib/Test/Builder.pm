@@ -1253,9 +1253,9 @@ sub _dup_stdhandles {
     # Set everything to unbuffered else plain prints to STDOUT will
     # come out in the wrong order from our own prints.
     _autoflush($Testout);
-    _autoflush(\*STDOUT);
+    _autoflush($^STDOUT);
     _autoflush($Testerr);
-    _autoflush(\*STDERR);
+    _autoflush($^STDERR);
 
     $self->output        ($Testout);
     $self->failure_output($Testerr);
@@ -1271,8 +1271,8 @@ sub _open_testhandles {
     
     # We dup STDOUT and STDERR so people can change them in their
     # test suites while still getting normal test output.
-    open($Testout, ">&", \*STDOUT) or die "Can't dup STDOUT:  $^OS_ERROR";
-    open($Testerr, ">&", \*STDERR) or die "Can't dup STDERR:  $^OS_ERROR";
+    open($Testout, ">&", $^STDOUT) or die "Can't dup STDOUT:  $^OS_ERROR";
+    open($Testerr, ">&", $^STDERR) or die "Can't dup STDERR:  $^OS_ERROR";
 
     $Opened_Testhandles = 1;
 }

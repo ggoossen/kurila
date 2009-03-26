@@ -2,7 +2,7 @@
 
 BEGIN {
     unless ('PerlIO::Layer'->find('perlio')) {
-	print \*STDOUT, "1..0 # Skip: not perlio\n";
+	print $^STDOUT, "1..0 # Skip: not perlio\n";
 	exit 0;
     }
 }
@@ -175,13 +175,13 @@ for ( @a) {
             length($b)           == 1  &&
             ord($b)              == ord($_) &&
             tell($f)              == ($a += bytes::length($b))) {
-        print \*STDOUT, '# ord($_)           == ', ord($_), "\n";
-        print \*STDOUT, '# ord($b)           == ', ord($b), "\n";
-        print \*STDOUT, '# length($b)        == ', length($b), "\n";
-        print \*STDOUT, '# bytes::length($b) == ', < bytes::length($b), "\n";
-        print \*STDOUT, '# tell($f)           == ', tell($f), "\n";
-        print \*STDOUT, '# $a                == ', $a, "\n";
-        print \*STDOUT, '# $c                == ', $c, "\n";
+        print $^STDOUT, '# ord($_)           == ', ord($_), "\n";
+        print $^STDOUT, '# ord($b)           == ', ord($b), "\n";
+        print $^STDOUT, '# length($b)        == ', length($b), "\n";
+        print $^STDOUT, '# bytes::length($b) == ', < bytes::length($b), "\n";
+        print $^STDOUT, '# tell($f)           == ', tell($f), "\n";
+        print $^STDOUT, '# $a                == ', $a, "\n";
+        print $^STDOUT, '# $c                == ', $c, "\n";
 	$failed++;
         last;
     }

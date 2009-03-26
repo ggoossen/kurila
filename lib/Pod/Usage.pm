@@ -492,7 +492,7 @@ sub pod2usage {
 
     ## Default the output file
     %opts{+"output"} = (lc(%opts{?"exitval"}) eq "noexit" ||
-                        %opts{?"exitval"} +< 2) ?? \*STDOUT !! \*STDERR
+                        %opts{?"exitval"} +< 2) ?? $^STDOUT !! $^STDERR
             unless (defined %opts{?"output"});
     ## Default the input file
     %opts{+"input"} = $^PROGRAM_NAME  unless (defined %opts{?"input"});
@@ -534,7 +534,7 @@ sub pod2usage {
     if ( !%opts{?"noperldoc"}
              and  %opts{?"verbose"} +>= 2 
              and  !ref(%opts{?"input"})
-             and  %opts{?"output"} \== \*STDOUT )
+             and  %opts{?"output"} \== $^STDOUT )
     {
        ## spit out the entire PODs. Might as well invoke perldoc
        my $progpath = File::Spec->catfile(config_value('scriptdir'), "perldoc");

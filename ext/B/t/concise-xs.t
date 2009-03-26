@@ -97,7 +97,7 @@ Looking at ../foo2, you'll see 34 occurrences of the following error:
 BEGIN {
     require Config;
     unless (Config::config_value("useperlio")) {
-        print \*STDOUT, "1..0 # Skip -- Perl configured without perlio\n";
+        print $^STDOUT, "1..0 # Skip -- Perl configured without perlio\n";
         exit 0;
     }
 }
@@ -345,7 +345,7 @@ sub corecheck {
     }
     my $mods = %Module::CoreList::version{?'5.009002'};
     $mods = \ sort keys %$mods;
-    print \*STDOUT, < Dumper($mods);
+    print $^STDOUT, < Dumper($mods);
 
     foreach my $pkgnm ( @$mods) {
 	test_pkg($pkgnm);
@@ -355,11 +355,11 @@ sub corecheck {
 END {
     if (%opts{?c}) {
 	$Data::Dumper::Indent = 1;
-	print \*STDOUT, "Corrections: ", < Dumper(\%report);
+	print $^STDOUT, "Corrections: ", < Dumper(\%report);
 
 	foreach my $pkg (sort keys %report) {
 	    for my $type (keys %matchers) {
-		print \*STDOUT, "$pkg: $type: $(join ' ',@{%report{$pkg}->{?$type}})\n"
+		print $^STDOUT, "$pkg: $type: $(join ' ',@{%report{$pkg}->{?$type}})\n"
 		    if (nelems @{%report{$pkg}->{?$type}});
 	    }
 	}

@@ -94,11 +94,11 @@ our @TESTS = @(
 use TestInit;
 
 BEGIN {
-    print \*STDOUT, "1..25\n";
+    print $^STDOUT, "1..25\n";
 }
 
 use Pod::ParseLink;
-print \*STDOUT, "ok 1\n";
+print $^STDOUT, "ok 1\n";
 
 # Used for reporting test failures.
 my @names = qw(text inferred name section type);
@@ -115,13 +115,13 @@ for ( @TESTS) {
         unless ((!defined (@results[$_]) && !defined (@expected[$_]))
                 || (defined (@results[$_]) && defined (@expected[$_])
                     && @results[$_] eq @expected[$_])) {
-            print \*STDOUT, "not ok $n\n" if $okay;
-            print \*STDOUT, "# Incorrect @names[$_]:\n";
-            print \*STDOUT, "#   expected: @expected[$_]\n";
-            print \*STDOUT, "#       seen: @results[$_]\n";
+            print $^STDOUT, "not ok $n\n" if $okay;
+            print $^STDOUT, "# Incorrect @names[$_]:\n";
+            print $^STDOUT, "#   expected: @expected[$_]\n";
+            print $^STDOUT, "#       seen: @results[$_]\n";
             $okay = 0;
         }
     }
-    print \*STDOUT, "ok $n\n" if $okay;
+    print $^STDOUT, "ok $n\n" if $okay;
     $n++;
 }

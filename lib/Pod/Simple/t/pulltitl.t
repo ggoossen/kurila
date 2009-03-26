@@ -17,7 +17,7 @@ ok 1;
 ###########################################################################
 
 do {
-print \*STDOUT, "# Testing another set, at line ", __LINE__, "\n";
+print $^STDOUT, "# Testing another set, at line ", __LINE__, "\n";
 
 my $p = Pod::Simple::PullParser->new;
 $p->set_source( \qq{\n=head1 NAME\n\nBzorch\n\n=pod\n\nLala\n\n\=cut\n} );
@@ -42,7 +42,7 @@ ok( $t && $t->type eq 'text' && $t->text, 'NAME' );
 ###########################################################################
 
 do {
-print \*STDOUT, "# Testing another set, at line ", __LINE__, "\n";
+print $^STDOUT, "# Testing another set, at line ", __LINE__, "\n";
 
 my $p = Pod::Simple::PullParser->new;
 $p->set_source( \qq{\n=head1 NE<65>ME\n\nBzorch\n\n=pod\n\nLala\n\n\=cut\n} );
@@ -67,7 +67,7 @@ ok( $t && $t->type, 'text');
 ###########################################################################
 
 do {
-print \*STDOUT, "# Testing another set, at line ", __LINE__, "\n";
+print $^STDOUT, "# Testing another set, at line ", __LINE__, "\n";
 
 do {
 my $p = Pod::Simple::PullParser->new;
@@ -99,7 +99,7 @@ ok( $t && $t->type eq 'text' && $t->text, 'NAME' );
 ###########################################################################
 
 do {
-print \*STDOUT, "# Testing another set, at line ", __LINE__, "\n";
+print $^STDOUT, "# Testing another set, at line ", __LINE__, "\n";
 
 my $p = Pod::Simple::PullParser->new;
 $p->set_source( \qq{\n=head1 Bzorch lala\n\n=pod\n\nLala\n\n\=cut\n} );
@@ -124,7 +124,7 @@ ok( $t && $t->type eq 'text' && $t->text, 'Bzorch lala' );
 ###########################################################################
 
 do {
-print \*STDOUT, "# Testing another set, at line ", __LINE__, "\n";
+print $^STDOUT, "# Testing another set, at line ", __LINE__, "\n";
 
 my $p = Pod::Simple::PullParser->new;
 $p->set_source( \qq{\n=head1 Bzorch - I<thing> lala\n\n=pod\n\nLala\n\n\=cut\n} );
@@ -148,7 +148,7 @@ ok( $t && $t->type eq 'text' && $t->text, 'Bzorch - ' );
 ###########################################################################
 
 do {
-print \*STDOUT, "# Testing another set, at line ", __LINE__, "\n";
+print $^STDOUT, "# Testing another set, at line ", __LINE__, "\n";
 
 my $p = Pod::Simple::PullParser->new;
 $p->set_source( \qq{\n=head1 Nombre (NAME)\n\nBzorch - I<thing> lala\n\n=pod\n\nGrunk\n\n\=cut\n} );
@@ -167,7 +167,7 @@ ok( $t && $t->type eq 'start' && $t->tagname, 'Document' );
 ###########################################################################
 
 do {
-print \*STDOUT, "# Testing another set, at line ", __LINE__, "\n";
+print $^STDOUT, "# Testing another set, at line ", __LINE__, "\n";
 
 my $p = Pod::Simple::PullParser->new;
 $p->set_source( \qq{\N{BYTE ORDER MARK}\n=head1 ëÏÇÄÂÁ ÞÉÔÁÌÁ (NAME)\n\nëÏÇÄÂÁ ÞÉÔÁÌÁ ÔÂÙ ÍÕÞÉÔÅÌØÎÙÂÅ ÓÔÒÏËÉ -- Fet's I<"When you were> reading\n\n=pod\n\nGrunk\n\n\=cut\n} );
@@ -184,7 +184,7 @@ ok( $t && $t->type eq 'start' && $t->tagname, 'Document' );
 ###########################################################################
 
 do {
-print \*STDOUT, "# Testing another set, at line ", __LINE__, "\n";
+print $^STDOUT, "# Testing another set, at line ", __LINE__, "\n";
 
 my $p = Pod::Simple::PullParser->new;
 $p->set_source( \qq{\N{BYTE ORDER MARK}\n=head1 (NAME) ëÏÇÄÂÁ ÞÉÔÁÌÁ\n\nëÏÇÄÂÁ ÞÉÔÁÌÁ ÔÂÙ ÍÕÞÉÔÅÌØÎÙÂÅ ÓÔÒÏËÉ -- Fet's I<"When you were> reading\n\n=pod\n\nGrunk\n\n\=cut\n} );
@@ -201,7 +201,7 @@ ok( $t && $t->type eq 'start' && $t->tagname, 'Document' );
 ###########################################################################
 
 do {
-print \*STDOUT, "# Testing another set, at line ", __LINE__, "\n";
+print $^STDOUT, "# Testing another set, at line ", __LINE__, "\n";
 
 my $p = Pod::Simple::PullParser->new;
 $p->set_source( \qq{\N{BYTE ORDER MARK}\n=head1 (DESCRIPTION) ëÏÇÄÂÁ ÞÉÔÁÌÁ\n\nëÏÇÄÂÁ ÞÉÔÁÌÁ ÔÂÙ ÍÕÞÉÔÅÌØÎÙÂÅ ÓÔÒÏËÉ -- Fet's I<"When you were> reading\n\n=pod\n\nGrunk\n\n\=cut\n} );
@@ -218,7 +218,7 @@ ok( $t && $t->type eq 'start' && $t->tagname, 'Document' );
 ###########################################################################
 
 do {
-print \*STDOUT, "# Testing another set, at line ", __LINE__, "\n";
+print $^STDOUT, "# Testing another set, at line ", __LINE__, "\n";
 
 my $p = Pod::Simple::PullParser->new;
 $p->set_source( \qq{\N{BYTE ORDER MARK}\n=head1 (DESCRIPTION) ëÏÇÄÂÁ ÞÉÔÁÌÁ\n\nëÏÇÄÂÁ ÞÉÔÁÌÁ ÔÂÙ ÍÕÞÉÔÅÌØÎÙÂÅ ÓÔÒÏËÉ -- Fet's I<"When you were> reading\n\n=pod\n\nGrunk\n\n\=cut\n} );
@@ -236,7 +236,7 @@ ok( $t && $t->type eq 'start' && $t->tagname, 'Document' );
 ###########################################################################
 
 do {
-print \*STDOUT, "# Testing another set, at line ", __LINE__, "\n";
+print $^STDOUT, "# Testing another set, at line ", __LINE__, "\n";
 
 my $p = Pod::Simple::PullParser->new;
 $p->set_source( \qq{\N{BYTE ORDER MARK}\n=head1 NAME\n\nThingy\n\n=head1 (DESCRIPTION) ëÏÇÄÂÁ ÞÉÔÁÌÁ\n\nëÏÇÄÂÁ ÞÉÔÁÌÁ ÔÂÙ ÍÕÞÉÔÅÌØÎÙÂÅ ÓÔÒÏËÉ -- Fet's I<"When you were> reading\n\n=pod\n\nGrunk\n\n\=cut\n} );
@@ -254,7 +254,7 @@ ok( $t && $t->type eq 'start' && $t->tagname, 'Document' );
 ###########################################################################
 
 do {
-print \*STDOUT, "# Testing another set, at line ", __LINE__, "\n";
+print $^STDOUT, "# Testing another set, at line ", __LINE__, "\n";
 
 my $p = Pod::Simple::PullParser->new;
 $p->set_source( \qq{\N{BYTE ORDER MARK}\n=head1 NAME\n\nThingy\n\n=head1 (DESCRIPTION) ëÏÇÄÂÁ ÞÉÔÁÌÁ\n\nëÏÇÄÂÁ ÞÉÔÁÌÁ ÔÂÙ ÍÕÞÉÔÅÌØÎÙÂÅ ÓÔÒÏËÉ -- Fet's I<"When you were> reading\n\n=pod\n\nGrunk\n\n\=cut\n} );
@@ -272,7 +272,7 @@ ok( $t && $t->type eq 'start' && $t->tagname, 'Document' );
 ###########################################################################
 
 do {
-print \*STDOUT, "# Testing another set, at line ", __LINE__, "\n";
+print $^STDOUT, "# Testing another set, at line ", __LINE__, "\n";
 
 my $p = Pod::Simple::PullParser->new;
 $p->set_source( \qq{\N{BYTE ORDER MARK}\n=head1 (NAME) ÷ÄÁÌÂÉ ÐÅÒÅÂÄ\n\nThingy\n\n=head1 (DESCRIPTION) ëÏÇÄÂÁ ÞÉÔÁÌÁ\n\nëÏÇÄÂÁ ÞÉÔÁÌÁ ÔÂÙ ÍÕÞÉÔÅÌØÎÙÂÅ ÓÔÒÏËÉ -- Fet's I<"When you were> reading\n\n=pod\n\nGrunk\n\n\=cut\n} );
@@ -290,7 +290,7 @@ ok( $t && $t->type eq 'start' && $t->tagname, 'Document' );
 ###########################################################################
 
 do {
-print \*STDOUT, "# Testing another set, at line ", __LINE__, "\n";
+print $^STDOUT, "# Testing another set, at line ", __LINE__, "\n";
 
 my $p = Pod::Simple::PullParser->new;
 $p->set_source( \qq{\N{BYTE ORDER MARK}
@@ -324,7 +324,7 @@ ok( $t && $t->type eq 'start' && $t->tagname, 'Document' );
 ###########################################################################
 
 do {
-print \*STDOUT, "# Testing another set, at line ", __LINE__, "\n";
+print $^STDOUT, "# Testing another set, at line ", __LINE__, "\n";
 
 my $p = Pod::Simple::PullParser->new;
 $p->set_source( \qq{\N{BYTE ORDER MARK}
@@ -374,9 +374,9 @@ ok( $t && $t->type eq 'start' && $t->tagname, 'Document' );
 ###########################################################################
 
 
-print \*STDOUT, "# Wrapping up... one for the road...\n";
+print $^STDOUT, "# Wrapping up... one for the road...\n";
 ok 1;
-print \*STDOUT, "# --- Done with ", __FILE__, " --- \n";
+print $^STDOUT, "# --- Done with ", __FILE__, " --- \n";
 
 __END__
 

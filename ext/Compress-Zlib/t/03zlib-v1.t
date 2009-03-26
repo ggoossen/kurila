@@ -56,11 +56,11 @@ my $fil;
 
 try { compress(\@(1)); };
 ok $^EVAL_ERROR->{?description} =~ m#not a scalar reference#
-    or print \*STDOUT, "# $^EVAL_ERROR\n" ;;
+    or print $^STDOUT, "# $^EVAL_ERROR\n" ;;
 
 try { uncompress(\@(1)); };
 ok $^EVAL_ERROR->{?description} =~ m#not a scalar reference#
-    or print \*STDOUT, "# $^EVAL_ERROR\n" ;
+    or print $^STDOUT, "# $^EVAL_ERROR\n" ;
 
 $hello = "hello mum" ;
 my $keep_hello = $hello ;
@@ -614,7 +614,7 @@ do {
 
     try { gzopen(\@(), 0) ; }  ;
     ok $^EVAL_ERROR->{?description} =~ m/^gzopen: file parameter is not a filehandle or filename at/
-	or print \*STDOUT, "# $^EVAL_ERROR\n" ;
+	or print $^STDOUT, "# $^EVAL_ERROR\n" ;
 
 #    my $x = Symbol::gensym() ;
 #    try { gzopen($x, 0) ; }  ;

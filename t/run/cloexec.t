@@ -90,11 +90,11 @@ sub test_not_inherited {
     ok( -f $tmpfile2, "tmpfile '$tmpfile2' exists" );
     my $cmd = qq{$Perl -e $quote$Child_prog$quote $expected_fd};
     # Expect 'Bad file descriptor' or similar to be written to STDERR.
-    my $saverr; open $saverr, ">&", \*STDERR;  # save original STDERR
-    open \*STDERR, ">", "$tmperr" or die "open '$tmperr': $^OS_ERROR";
+    my $saverr; open $saverr, ">&", $^STDERR;  # save original STDERR
+    open $^STDERR, ">", "$tmperr" or die "open '$tmperr': $^OS_ERROR";
     my $out = `$cmd`;
     my $rc  = $^CHILD_ERROR >> 8;
-    open \*STDERR, ">&", $saverr or die "error: restore STDERR: $^OS_ERROR";
+    open $^STDERR, ">&", $saverr or die "error: restore STDERR: $^OS_ERROR";
     close $saverr or die "error: close SAVERR: $^OS_ERROR";
     # XXX: it seems one cannot rely on a non-zero return code,
     # at least not on Tru64.
@@ -120,7 +120,7 @@ sub test_inherited {
     is( @lines[1], "tmpfile1 line 1\n",      'child stdout: line 1' );
 }
 
-$^SYSTEM_FD_MAX == 2 or print \*STDERR, "# warning: \$^F is $^SYSTEM_FD_MAX (not 2)\n";
+$^SYSTEM_FD_MAX == 2 or print $^STDERR, "# warning: \$^F is $^SYSTEM_FD_MAX (not 2)\n";
 
 # Should not be able to inherit > $^F in the default case.
 open my $fhparent2, "<", "$tmpfile2" or die "open '$tmpfile2': $^OS_ERROR";

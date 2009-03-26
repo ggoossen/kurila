@@ -909,7 +909,7 @@ ENDOFTAIL
 
 close(*GLOS) if %Opts{?glossary};
 close($config_pod);
-print \*STDOUT, "written $Config_POD\n";
+print $^STDOUT, "written $Config_POD\n";
 
 my $orig_config_txt = "";
 my $orig_heavy_txt = "";
@@ -927,8 +927,8 @@ if ($orig_config_txt ne $config_txt or $orig_heavy_txt ne $heavy_txt) {
     print $config_heavy_fh, $heavy_txt;
     close($config_heavy_fh);
     close($config_fh);
-    print \*STDOUT, "updated $Config_PM\n";
-    print \*STDOUT, "updated $Config_heavy\n";
+    print $^STDOUT, "updated $Config_PM\n";
+    print $^STDOUT, "updated $Config_heavy\n";
 }
 
 
@@ -957,7 +957,7 @@ EOS
   $cross =~ s/\*\*\*replace-marker\*\*\*/%Opts{?cross}/g;
   print $cross_fh, $cross;
   close $cross_fh;
-  print \*STDOUT, "written lib/Cross.pm\n";
+  print $^STDOUT, "written lib/Cross.pm\n";
   unshift($^INCLUDE_PATH,"xlib/%Opts{?cross}");
 }
 

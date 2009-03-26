@@ -53,7 +53,7 @@ do {
         my $filename = shift ;
 	my $fh = gensym ;
 	open ($fh, ">", "$filename") || die "Cannot open $filename: $^OS_ERROR" ;
-	my $real_stdout = \*STDOUT;
+	my $real_stdout = $^STDOUT;
 	return bless \@($fh, $real_stdout ) ;
 
     }

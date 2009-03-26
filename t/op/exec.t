@@ -102,7 +102,7 @@ do {
 TODO: do {
     my $tnum = curr_test();
     if( $^OS_NAME =~ m/Win32/ ) {
-        print \*STDOUT, "not ok $tnum - exec failure doesn't terminate process " .
+        print $^STDOUT, "not ok $tnum - exec failure doesn't terminate process " .
               "# TODO Win32 exec failure waits for user input\n";
         next_test();
         last TODO;
