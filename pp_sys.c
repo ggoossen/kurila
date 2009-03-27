@@ -2062,12 +2062,7 @@ PP(pp_stat)
     if (PL_op->op_flags & OPf_REF) {
 	gv = cGVOP_gv;
 	if (PL_op->op_type == OP_LSTAT) {
-	    if (gv != PL_defgv) {
-	    do_fstat_warning_check:
-		if (ckWARN(WARN_IO))
-		    Perl_warner(aTHX_ packWARN(WARN_IO),
-			"lstat() on filehandle %s", gv ? GvENAME(gv) : "");
-	    } else if (PL_laststype != OP_LSTAT)
+	    if (PL_laststype != OP_LSTAT)
 		Perl_croak(aTHX_ "The stat preceding lstat() wasn't an lstat");
 	}
 
@@ -2106,12 +2101,12 @@ PP(pp_stat)
 	} else if(SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVGV) {
             gv = (GV*)SvRV(sv);
             if (PL_op->op_type == OP_LSTAT)
-                goto do_fstat_warning_check;
+                goto do_fstat;
             goto do_fstat;
         } else if (SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVIO) { 
             io = (IO*)SvRV(sv);
             if (PL_op->op_type == OP_LSTAT)
-                goto do_fstat_warning_check;
+                goto do_fstat;
             goto do_fstat_have_io; 
         }
         
@@ -2456,11 +2451,11 @@ PP(pp_fttty)
     STACKED_FTEST_CHECK;
 
     if (PL_op->op_flags & OPf_REF)
-	io = GvIO(cGVOP_gv);
+	io = gv_io(cGVOP_gv);
     else if (isGV(TOPs))
-	io = GvIO(svTgv(POPs));
+	io = gv_io(svTgv(POPs));
     else if (SvROK(TOPs) && isGV(SvRV(TOPs)))
-	io = GvIO(svTgv(SvRV(POPs)));
+	io = gv_io(svTgv(SvRV(POPs)));
     else if (SvROK(TOPs) && SvIOOK(SvRV(TOPs)))
 	io = svTio(SvRV(POPs));
     else
@@ -2506,10 +2501,8 @@ PP(pp_fttext)
 
     STACKED_FTEST_CHECK;
 
-    if (! SvPVOK(TOPs)) {
-	if (PL_op->op_flags & OPf_REF)
-	    io = GvIO(cGVOP_gv);
-	else if (isGV(TOPs))
+    if (! SvPVOK(TOPs) ) {
+	if (isGV(TOPs))
 	    io = gv_io(svTgv(POPs));
 	else if (SvROK(TOPs) && isGV(SvRV(TOPs)))
 	    io = gv_io(svTgv(SvRV(POPs)));
