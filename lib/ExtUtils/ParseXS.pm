@@ -1035,7 +1035,7 @@ EOF
       if ($pname =~ m/::(BEGIN|INIT|UNITCHECK|CHECK|END)$/) {
           my $keyword = $1;
           push @InitFileCode,
-            "        SvREFCNT_inc(CV_$Full_func_name);\n";
+            "        CvREFCNT_inc(CV_$Full_func_name);\n";
           push @InitFileCode,
             "        process_special_block(Perl_keyword(aTHX_ STR_WITH_LEN(\"$keyword\")), CV_$Full_func_name);\n";
       }
