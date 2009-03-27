@@ -63,12 +63,12 @@ __END__
 package B::success;
 
 $^OUTPUT_AUTOFLUSH = 1;
-print \*STDOUT, "Compiling!\n";
+print $^STDOUT, "Compiling!\n";
 
 sub compile {
 	return 'fail' if (@_[0] eq 'fail');
-	print \*STDOUT, "(@_[0]) <@_[1]>\n";
-	return sub { print \*STDOUT, "[$O::BEGIN_output]\n" };
+	print $^STDOUT, "(@_[0]) <@_[1]>\n";
+	return sub { print $^STDOUT, "[$O::BEGIN_output]\n" };
 }
 
 1;

@@ -126,7 +126,7 @@ sub walk_output { # updates $walkHandle
     }
     my $iotype = ref $handle;
     die "expecting argument/object that can print\n"
-	unless $iotype eq 'GLOB' or $iotype and $handle->can('print');
+	unless $iotype eq 'GLOB' or $iotype and $handle->can('print') or $iotype eq "IO::Handle";
     $walkHandle = $handle;
 }
 

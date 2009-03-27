@@ -72,8 +72,8 @@ SKIP: do {
         unless Config::config_value("useperlio");
 
     foreach my $foo (@($^STDOUT, $^STDERR)) {
-	try {  walk_output($foo) };
-	is ($^EVAL_ERROR, '', "walk_output() accepts STD* " . ref $foo);
+	walk_output($foo);
+	pass("walk_output() accepts STD* " . ref $foo);
     }
 
     # now test a ref to scalar

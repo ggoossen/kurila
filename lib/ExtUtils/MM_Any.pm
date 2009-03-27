@@ -574,8 +574,7 @@ before tar-ing (or shar-ing).
 
 =cut
 
-sub distdir {
-    my@($self) =@( shift);
+sub distdir($self) {
 
     my $meta_target = $self->{?NO_META} ?? '' !! 'distmeta';
     my $sign_target = !$self->{?SIGN}   ?? '' !! 'distsignature';
@@ -712,8 +711,7 @@ possible.
 
 =cut
 
-sub metafile_target {
-    my $self = shift;
+sub metafile_target($self) {
 
     return <<'MAKE_FRAG' if $self->{?NO_META};
 metafile :
@@ -787,7 +785,7 @@ sub distmeta_target {
 
     my $add_meta = $self->oneliner(<<'CODE', \@('-MExtUtils::Manifest=maniadd'));
 try { maniadd(\%(q{META.yml} => q{Module meta-data (added by MakeMaker)})) } 
-    or print $^STDOUT, "Could not add META.yml to MANIFEST: $${'@'}\n"
+    or print $$^STDOUT, "Could not add META.yml to MANIFEST: $${'@'}\n"
 CODE
 
     my $add_meta_to_distdir = $self->cd('$(DISTVNAME)', $add_meta);
@@ -925,7 +923,7 @@ sub distsignature_target {
 
     my $add_sign = $self->oneliner(<<'CODE', \@('-MExtUtils::Manifest=maniadd'));
 try { maniadd(\%(q{SIGNATURE} => q{Public-key signature (added by MakeMaker)})) } 
-    or print $^STDOUT, "Could not add SIGNATURE to MANIFEST: $${'@'}\n"
+    or print $$^STDOUT, "Could not add SIGNATURE to MANIFEST: $${'@'}\n"
 CODE
 
     my $sign_dist        = $self->cd('$(DISTVNAME)' => 'cpansign -s');

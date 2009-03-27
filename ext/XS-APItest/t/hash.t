@@ -4,7 +4,7 @@ use TestInit;
 use Config;
 
 BEGIN {
-    print \*STDOUT, "1..0 # TODO Skip: Fix for kurila\n";
+    print $^STDOUT, "1..0 # TODO Skip: Fix for kurila\n";
     exit 0;
 }
 

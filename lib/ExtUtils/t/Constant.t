@@ -645,16 +645,16 @@ EOT
 $test_body .= <<"EOT";
 my \$rfc1149 = RFC1149;
 if (\$rfc1149 ne "$parent_rfc1149") \{
-  print $^STDOUT, "not ok \$test # '\$rfc1149' ne '$parent_rfc1149'\n";
+  print \$^STDOUT, "not ok \$test # '\$rfc1149' ne '$parent_rfc1149'\n";
 \} else \{
-  print $^STDOUT, "ok \$test\n";
+  print \$^STDOUT, "ok \$test\n";
 \}
 \$test++;
 
 if (\$rfc1149 != 1149) \{
-  printf $^STDOUT, "not ok \$test # \\\%d != 1149\n", \$rfc1149;
+  printf \$^STDOUT, "not ok \$test # \\\%d != 1149\n", \$rfc1149;
 \} else \{
-  print $^STDOUT, "ok \$test\n";
+  print \$^STDOUT, "ok \$test\n";
 \}
 \$test++;
 
@@ -698,9 +698,9 @@ EOT
     # Error expected.
     $test_body .= <<"EOT";
   if (\$error) \{
-    print $^STDOUT, "ok $dummytest # error='\$error' (as expected)\n";
+    print \$^STDOUT, "ok $dummytest # error='\$error' (as expected)\n";
   \} else \{
-    print $^STDOUT, "not ok $dummytest # expected error, got no error and '\$got'\n";
+    print \$^STDOUT, "not ok $dummytest # expected error, got no error and '\$got'\n";
   \}
 EOT
   }
@@ -723,9 +723,9 @@ sub simple {
     $test_body .= <<"EOT";
 \$value = $thisname;
 if (\$value == $counter) \{
-  print $^STDOUT, "ok $dummytest\n";
+  print \$^STDOUT, "ok $dummytest\n";
 \} else \{
-  print $^STDOUT, "not ok $dummytest # $thisname gave \$value\n";
+  print \$^STDOUT, "not ok $dummytest # $thisname gave \$value\n";
 \}
 EOT
     ++$dummytest;

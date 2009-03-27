@@ -23,7 +23,7 @@ ok( defined &$sub, 'valid subref back from compile()' );
 # and point it at a real sub and hope the returned ops look alright
 my $out = "";
 open my $ouf_fh, '>>', \$out or die;
-$^STDOUT = *$ouf_fh{IO};
+B::Concise::walk_output($ouf_fh);
 $sub = B::Terse::compile('', 'bar');
 $sub->();
 
@@ -86,7 +86,7 @@ sub bar {
 my $path = join " ", map { qq["-I$_"] }, $^INCLUDE_PATH;
 $path = '-I::lib -MMac::err=unix' if $^OS_NAME eq 'MacOS';
 my $redir = $^OS_NAME eq 'MacOS' ?? '' !! "2>&1";
-my $items = qx{$^EXECUTABLE_NAME $path "-MO=Terse" -le "print \\*STDOUT, \\42" $redir};
+my $items = qx{$^EXECUTABLE_NAME $path "-MO=Terse" -le "print \$^STDOUT, \\42" $redir};
 like( $items, qr/IV $hex \\42/, 'RV (but now stored in an IV)' );
 
 package TieOut;

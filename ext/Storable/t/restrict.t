@@ -7,7 +7,7 @@
 #
 
 BEGIN {
-    print \*STDOUT, "1..0 # Skip: Fix restricted hash\n";
+    print $^STDOUT, "1..0 # Skip: Fix restricted hash\n";
     exit;
 
     chdir('t') if -d 't';
