@@ -26,7 +26,7 @@ is($Vec, "\x[baddacab]");
 is(vec($Vec, 0, 32), 3135089835);
 
 # ensure vec() handles numericalness correctly
-$foo = $bar = $baz = 0;
+$foo = $: $bar = $: $baz = 0;
 vec(($foo = 0),0,1, 1);
 vec(($bar = 0),1,1, 1);
 $baz = $foo ^|^ $bar;

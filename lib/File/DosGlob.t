@@ -12,9 +12,9 @@ use File::DosGlob 'glob';
 # test if $_ takes as the default
 my $expected;
 if ($^OS_NAME eq 'MacOS') {
-    $expected = $_ = ":op:a*.t";
+    $expected = $: $_ = ":op:a*.t";
 } else {
-    $expected = $_ = "op/a*.t";
+    $expected = $: $_ = "op/a*.t";
 }
 my @r = glob;
 print $^STDOUT, "not " if $_ ne $expected;

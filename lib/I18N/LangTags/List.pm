@@ -22,7 +22,7 @@ do {
       next unless $name;
       ++$count;
       print $^STDOUT, "<$tag> <$name>\n" if $Debug;
-      $last_name = %Name{+$tag} = $name;
+      $last_name = $: %Name{+$tag} = $name;
       %Is_Disrec{+$tag} = 1 if $disrec;
     } elsif (m/[Ff]ormerly \"([-a-z0-9]+)\"/) {
       %Name{+$1} = "$last_name (old tag)" if $last_name;

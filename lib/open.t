@@ -85,7 +85,7 @@ EOE
     my $c;
 
     open $f, "<:utf8", "a";
-    $ok = $a = 0;
+    $ok = $: $a = 0;
     for (@a) {
         unless (
 		($c = sysread($f, $b, 1)) == 1  &&
@@ -137,7 +137,7 @@ EOE
 	open $g, ">:utf8", "b";
 
 	print $^STDOUT, "# $key\n";
-	$ok = $a = 0;
+	$ok = $: $a = 0;
 	for (@a) {
 	    unless (
 		    ($c = %actions{?$key}->($_)) == 1 &&
@@ -153,7 +153,7 @@ EOE
 	   "on :utf8 streams syswrite() should work on characters, not bytes");
 
 	open $g, "<:utf8", "b";
-	$ok = $a = 0;
+	$ok = $: $a = 0;
 	for (@a) {
 	    unless (
 		    ($c = sysread($g, $b, 1)) == 1 &&

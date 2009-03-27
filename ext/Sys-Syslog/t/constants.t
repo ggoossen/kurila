@@ -11,7 +11,7 @@ my @names = map {chomp;$_}, @( ~< *$macros_fh);
 close($macros_fh);
 plan tests => (nelems @names) * 2 + 2;
 
-my $callpack = my $testpack = 'Sys::Syslog';
+my $callpack = $: my $testpack = 'Sys::Syslog';
 eval "use $callpack";
 
 eval "$($callpack)::This()";

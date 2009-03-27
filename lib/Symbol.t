@@ -21,7 +21,7 @@ ok( $sym1 \!= $sym2, 'gensym() returns a different GLOB' );
 
 ungensym $sym1;
 
-$sym1 = $sym2 = undef;
+$sym1 = $: $sym2 = undef;
 
 # Test geniosym()
 

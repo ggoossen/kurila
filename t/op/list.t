@@ -24,7 +24,7 @@ cmp_ok("$a;$b;$c",'eq','111;222;333','trio rotate');
 @($a, $b) = @($b, $a);
 cmp_ok("$a-$b",'eq','222-111','duo swap');
 
-@($a, $b) = @($b, $a) = @($a, $b);
+@($a, $b) = $: @($b, $a) = @($a, $b);
 cmp_ok("$a-$b",'eq','222-111','duo swap swap');
 
 @($a, @b[+1], %c{+2}, $d) = @(1, 2, 3, 4);
@@ -44,10 +44,10 @@ cmp_ok($b,'==',2,'short list 2 defined');
 ok(!defined($c),'short list 3 undef');
 ok(!defined($d),'short list 4 undef');
 
-@foo =  @bar = @(1);
+@foo = $: @bar = @(1);
 cmp_ok(join(':', @(< @foo,< @bar)),'eq','1:1','list reassign');
 
-@foo = @bar = @(2,3);
+@foo = $: @bar = @(2,3);
 cmp_ok(join(':', @(join('+', @foo),join('-', @bar))),'eq','2+3:2-3','long list reassign');
 
 @foo = @( () );

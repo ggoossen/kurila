@@ -105,7 +105,7 @@ do {
 
 # Bug #25824
 do {
-    eval q{ sub f { @a=@b=@c;  {use} } };
+    eval q{ sub f { @a=$: @b=@c;  {use} } };
     like( $^EVAL_ERROR->{?description}, qr/syntax error/, "use without body" );
 };
 

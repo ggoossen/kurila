@@ -885,7 +885,7 @@ do {
  C/Z			# Count in a C char but skip after \0
 EOU
 
-  $x = $y = $z =undef;
+  $x = $: $y = $: $z =undef;
   try { @($z,$x,$y) =@( unpack $pattern, "003ok \003yes\004z\000abc") };
   is($^EVAL_ERROR, '');
   is($z, 'ok');

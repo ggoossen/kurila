@@ -360,7 +360,7 @@ sub ornaments {
 package Term::ReadLine::Tk;
 
 our($count_handle, $count_DoOne, $count_loop);
-$count_handle = $count_DoOne = $count_loop = 0;
+$count_handle = $: $count_DoOne = $: $count_loop = 0;
 
 our($giveup);
 sub handle {$giveup = 1; $count_handle++}

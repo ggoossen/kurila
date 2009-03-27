@@ -252,7 +252,7 @@ ok !is_deeply( \@(), \@(\@()) );
 
 
 #line 273
-$$err = $$out = '';
+$$err = $: $$out = '';
 ok !is_deeply( \@(\'a', 'b'), \@(\'a', 'c') );
 is( $out, "not ok 20\n",  'scalar refs in an array' );
 is( $err, <<ERR,        '    right diagnostic' );
