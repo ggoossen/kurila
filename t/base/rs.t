@@ -110,7 +110,7 @@ if ($^OS_NAME eq 'VMS') {
   print $createfile, '$ CLOSE YOW', "\n";
   print $createfile, "\$EXIT\n";
   close $createfile;
-  $throwaway = `\@\[\]foo`, "\n";
+  ($throwaway = `\@\[\]foo`), "\n";
   open(my $tempfile, ">", "./foo.bar") or print $^STDOUT, "# open failed $^OS_ERROR $^EXTENDED_OS_ERROR\n";
   print $tempfile, "foo\nfoobar\nbaz\n";
   close $tempfile;

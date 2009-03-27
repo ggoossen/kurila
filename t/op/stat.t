@@ -290,7 +290,8 @@ ok(! -S $Curdir,    '!-S cwd');
 
 SKIP: do {
     my($cnt, $uid);
-    $cnt = $uid = 0;
+    $cnt = 0;
+    $uid = 0;
 
     # Find a set of directories that's very likely to have setuid files
     # but not likely to be *all* setuid files.

@@ -265,12 +265,12 @@ sub cflags($self, ?$libperl) {
     $self->{+CCFLAGS}  = quote_paren($self->{?CCFLAGS});
     $self->{+OPTIMIZE} = quote_paren($self->{?OPTIMIZE});
 
-    return $self->{+CFLAGS} = qq{
+    return ($self->{+CFLAGS} = qq{
 CCFLAGS = $self->{?CCFLAGS}
 OPTIMIZE = $self->{?OPTIMIZE}
 PERLTYPE = $self->{?PERLTYPE}
 MPOLLUTE = $pollute
-};
+});
 
 }
 
@@ -284,11 +284,11 @@ definition in CONST_CCCMD.
 sub const_cccmd($self,?$libperl) {
     return $self->{?CONST_CCCMD} if $self->{?CONST_CCCMD};
     return '' unless $self->needs_linking();
-    return $self->{+CONST_CCCMD} =
+    return ($self->{+CONST_CCCMD} =
 	q{CCCMD = $(CC) -c $(PASTHRU_INC) $(INC) \
 	$(CCFLAGS) $(OPTIMIZE) \
 	$(PERLTYPE) $(MPOLLUTE) $(DEFINE_VERSION) \
-	$(XS_DEFINE_VERSION)};
+	$(XS_DEFINE_VERSION)});
 }
 
 =item const_config (o)
@@ -1221,7 +1221,7 @@ sub has_link_code {
 	$self->{+HAS_LINK_CODE} = 1;
 	return 1;
     }
-    return $self->{+HAS_LINK_CODE} = 0;
+    return ($self->{+HAS_LINK_CODE} = 0);
 }
 
 
@@ -1637,7 +1637,9 @@ from the perl source tree.
 	    # uninstalled Perl outside of Perl build tree
 	    my $lib;
 	    for my $dir ( $^INCLUDE_PATH) {
-	      $lib = $dir, last if -e $self->catdir($dir, "Config.pm");
+                next unless -e $self->catdir($dir, "Config.pm");
+                $lib = $dir;
+                last;
 	    }
 	    if ($lib) {
               # Win32 puts its header files in /perl/src/lib/CORE.
@@ -2609,7 +2611,7 @@ sub needs_linking {
 	    return 1;
 	}
     }
-    return $self->{+NEEDS_LINKING} = 0;
+    return ($self->{+NEEDS_LINKING} = 0);
 }
 
 
@@ -3040,7 +3042,7 @@ sub prefixify($self,$var,$sprefix,$rprefix,$default) {
     }
 
     print $^STDOUT, "    now $path\n" if $Verbose +>= 2;
-    return $self->{+uc $var} = $path;
+    return ($self->{+uc $var} = $path);
 }
 
 

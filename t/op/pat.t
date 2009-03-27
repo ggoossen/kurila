@@ -177,7 +177,7 @@ my $pat7 = 'ghi';
 my $pat8 = '\w*ghi';
 my $pat9 = 'ghi$';
 
-my $t1=my $t2=my $t3=my $t4=my $t5=my $t6=my $t7=my $t8=my $t9=0;
+my @($t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9) = (@: 0) x 9;
 
 for my $iter (1..5) {
     $t1++ if m/$pat1/o;
@@ -352,7 +352,7 @@ ok( "abc" =~ m/^(??{"a"})b/ );
 my $matched;
 $matched = qr/\((?:(?>[^()]+)|(??{$matched}))*\)/;
 
-@ans = @ans1 = @();
+@ans = (@ans1 = @());
 push(@ans, $res), push(@ans1, $^MATCH) while $res = m/$matched/gp;
 
 ok( "$(join ' ',@ans)" eq "1 1 1" );

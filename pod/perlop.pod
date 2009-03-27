@@ -48,9 +48,8 @@ values only, not array values.
     left	|| //
     nonassoc	..
     right	?:
-    left	, =>
+    left	, => = += -= *= etc.
     nonassoc	list operators (rightward)
-    right	= += -= *= etc.
     right	not
     left	and
     left	or xor

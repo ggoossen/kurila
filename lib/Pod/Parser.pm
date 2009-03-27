@@ -1340,10 +1340,9 @@ sub parseopts {
    return %myOpts  if ((nelems @_) == 0);
    if ((nelems @_) == 1) {
       local $_ = shift;
-      return  ref($_)  ??  %myData{+_PARSEOPTS} = $_  !!  %myOpts{?$_};
+      return  ref($_)  ??  (%myData{+_PARSEOPTS} = $_)  !!  %myOpts{?$_};
    }
-   my @newOpts = @(< %myOpts, < @_);
-   %myData{+_PARSEOPTS} = \%( < @newOpts );
+   %myData{+_PARSEOPTS} = \( %myOpts +%+ %:< @_ );
 }
 
 ##---------------------------------------------------------------------------

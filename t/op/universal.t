@@ -62,7 +62,7 @@ ok $a->isa("HASH");
 
 ok $a->can("eat");
 ok ! $a->can("sleep");
-ok my $ref = $a->can("drink");        # returns a coderef
+ok(my $ref = $a->can("drink"));        # returns a coderef
 is $a->?$ref("tea"), "drinking tea"; # ... which works
 
 ok (!Cedric->isa('Programmer'));

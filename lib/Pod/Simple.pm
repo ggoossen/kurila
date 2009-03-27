@@ -140,9 +140,7 @@ sub output_string {
   DEBUG +> 4 and print $^STDOUT, "# Output string set to $x ($$x)\n";
   $this->{+'output_fh'} = undef;
   open $this->{+'output_fh'}, '>>', $x or die "Failed opening filehandle $^OS_ERROR";
-  return
-    $this->{+'output_string'} = @_[0];
-    #${ ${ $this->{'output_fh'} } };
+  return ($this->{+'output_string'} = @_[0]);
 }
 
 sub abandon_output_string { @_[0]->abandon_output_fh; delete @_[0]->{'output_string'} }
@@ -485,7 +483,7 @@ sub _complain_errata($self,$line,$complaint) {
 sub _get_initial_item_type($self, $para) {
   return $para->[1]->{?'~type'}  if $para->[1]->{?'~type'};
 
-  return $para->[1]->{+'~type'} = 'text'
+  return ($para->[1]->{+'~type'} = 'text')
    if join("\n", @{$para}[[2 .. (nelems @$para)-1]]) =~ m/^\s*(\d+)\.?\s*$/s and $1 ne '1';
   # Else fall thru to the general case:
   return $self->_get_item_type($para);
@@ -505,7 +503,7 @@ sub _get_item_type($self, $para) {
     # Like: "=item *", "=item   *   ", "=item"
     splice @$para, 2; # so it ends up just being ['=item', { attrhash } ]
     $para->[1]->{+'~orig_content'} = $content;
-    return $para->[1]->{+'~type'} = 'bullet';
+    return ($para->[1]->{+'~type'} = 'bullet');
 
   } elsif($content =~ m/^\s*\*\s+(.+)/s) {  # tolerance
   
@@ -514,7 +512,7 @@ sub _get_item_type($self, $para) {
     $para->[1]->{+'~_freaky_para_hack'} = $1;
     DEBUG +> 2 and print $^STDOUT, " Tolerating @$para[2] as =item *\\n\\n$1\n";
     splice @$para, 2; # so it ends up just being ['=item', { attrhash } ]
-    return $para->[1]->{+'~type'} = 'bullet';
+    return ($para->[1]->{+'~type'} = 'bullet');
 
   } elsif($content =~ m/^\s*(\d+)\.?\s*$/s) {
     # Like: "=item 1.", "=item    123412"
@@ -523,11 +521,11 @@ sub _get_item_type($self, $para) {
     $para->[1]->{+'number'} = $1;  # Yes, stores the number there!
 
     splice @$para, 2; # so it ends up just being ['=item', { attrhash } ]
-    return $para->[1]->{+'~type'} = 'number';
+    return ($para->[1]->{+'~type'} = 'number');
     
   } else {
     # It's anything else.
-    return $para->[1]->{+'~type'} = 'text';
+    return ($para->[1]->{+'~type'} = 'text');
 
   }
 }

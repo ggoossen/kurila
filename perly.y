@@ -95,7 +95,6 @@
 
 %type <opval> block dblock mblock lineseq line loop cond else
 %type <opval> expr term subscripted scalar star amper sideff
-%type <opval> assignexpr
 %type <opval> argexpr texpr iexpr mexpr miexpr
 %type <opval> listexpr listexprcom indirob listop method
 %type <opval> subname proto subbody cont my_scalar
@@ -639,22 +638,18 @@ expr	:	expr ANDOP expr
 			  TOKEN_GETMAD($2,$$,'o');
                           APPEND_MADPROPS_PV("operator",$$,'>');
 			}
-	|	assignexpr %prec PREC_LOW
-			{ $$ = $1; }
-	;
-
-assignexpr :     assignexpr ASSIGNOP assignexpr
-                        { 
-                            $$ = newASSIGNOP(OPf_STACKED, $1, IVAL($2), $3, LOCATION($2));
-                            TOKEN_GETMAD($2,$$,'o');
-                            APPEND_MADPROPS_PV("operator",$$,'>');
-			}
 	|	argexpr %prec PREC_LOW
 			{ $$ = $1; }
 	;
 
 /* Expressions are a list of terms joined by commas */
-argexpr	:	argexpr ','
+argexpr	:       argexpr ASSIGNOP term
+                        { 
+                            $$ = newASSIGNOP(OPf_STACKED, $1, IVAL($2), $3, LOCATION($2));
+                            TOKEN_GETMAD($2,$$,'o');
+                            APPEND_MADPROPS_PV("operator",$$,'>');
+			}
+	|       argexpr ','
 			{
 #ifdef MAD
 			  OP* op = newNULLLIST(NULL);

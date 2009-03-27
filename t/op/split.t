@@ -115,7 +115,7 @@ $_ = join ':', split m/^/, "ab\ncd\nef\n";
 is($_, "ab\n:cd\n:ef\n");
 
 # see if @a = @b = split(...) optimization works
-@list1 = @list2 = split ('p',"a p b c p");
+@list1 = (@list2 = split ('p',"a p b c p"));
 ok((nelems @list1) == nelems @list2 &&
    "$(join ' ',@list1)" eq "$(join ' ',@list2)" &&
    (nelems @list1) == 2 &&

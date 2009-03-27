@@ -427,7 +427,7 @@ is(substr($x, 2, 1), "\x{100}");
 is(substr($x, 3, 1), "\x{FF}");
 is(substr($x, 4, 1), "\x{F3}");
 
-substr($x = "ab", 0, 0, "\x{100}\x{200}");
+substr(($x = "ab"), 0, 0, "\x{100}\x{200}");
 is($x, "\x{100}\x{200}ab");
 
 substr($x = "\x{100}\x{200}", 0, 0, "ab");
