@@ -16,7 +16,7 @@ can_ok( __PACKAGE__,    $_ ) for  @Funcs;
 my $Have_IPC_Run    = $Class->can_use_ipc_run;
 my $Have_IPC_Open3  = $Class->can_use_ipc_open3;
 
-$IPC::Cmd::VERBOSE  = $IPC::Cmd::VERBOSE = $Verbose;
+$IPC::Cmd::VERBOSE  = $: $IPC::Cmd::VERBOSE = $Verbose;
 
 ### run tests in various configurations, based on what modules we have
 my @Prefs = @( 
@@ -45,8 +45,8 @@ do {   ### list of commands and regexes matching output ###
         diag( "Running config: IPC::Run: $pref->[0] IPC::Open3: $pref->[1]" )
             if $Verbose;
 
-        $IPC::Cmd::USE_IPC_RUN    = $IPC::Cmd::USE_IPC_RUN      = $pref->[0];
-        $IPC::Cmd::USE_IPC_OPEN3  = $IPC::Cmd::USE_IPC_OPEN3    = $pref->[1];
+        $IPC::Cmd::USE_IPC_RUN    = $: $IPC::Cmd::USE_IPC_RUN      = $pref->[0];
+        $IPC::Cmd::USE_IPC_OPEN3  = $: $IPC::Cmd::USE_IPC_OPEN3    = $pref->[1];
 
         ### for each command
         for my $aref (  @$map ) {
@@ -119,8 +119,8 @@ do {   ### list of commands and regexes matching output ###
         diag( "Running config: IPC::Run: $pref->[0] IPC::Open3: $pref->[1]" )
             if $Verbose;
 
-        $IPC::Cmd::USE_IPC_RUN    = $IPC::Cmd::USE_IPC_RUN      = $pref->[0];
-        $IPC::Cmd::USE_IPC_OPEN3  = $IPC::Cmd::USE_IPC_OPEN3    = $pref->[1];
+        $IPC::Cmd::USE_IPC_RUN    = $: $IPC::Cmd::USE_IPC_RUN      = $pref->[0];
+        $IPC::Cmd::USE_IPC_OPEN3  = $: $IPC::Cmd::USE_IPC_OPEN3    = $pref->[1];
 
         ### for each command
         for my $aref (  @$map ) {
@@ -185,8 +185,8 @@ do {   ### for each configuarion
         diag( "Running config: IPC::Run: $pref->[0] IPC::Open3: $pref->[1]" )
             if $Verbose;
 
-        $IPC::Cmd::USE_IPC_RUN    = $IPC::Cmd::USE_IPC_RUN      = $pref->[0];
-        $IPC::Cmd::USE_IPC_OPEN3  = $IPC::Cmd::USE_IPC_OPEN3    = $pref->[1];
+        $IPC::Cmd::USE_IPC_RUN    = $: $IPC::Cmd::USE_IPC_RUN      = $pref->[0];
+        $IPC::Cmd::USE_IPC_OPEN3  = $: $IPC::Cmd::USE_IPC_OPEN3    = $pref->[1];
 
         my $ok = run( command => "$^EXECUTABLE_NAME -ledie" );
         ok( !$ok[0],               "Failure caught" );

@@ -451,7 +451,7 @@ sub GetOptionsFromArray($argv, @< @optionlist) {	# local copy of the option desc
     }
     if ( defined($auto_help) ?? $auto_help !! ($requested_version +>= 2.3203) ) {
 	if ( !defined(%opctl{?help}) && !defined(%opctl{?'?'}) ) {
-	    %opctl{+help} = %opctl{+'?'} = \@('','help',0, <CTL_DEST_CODE,undef);
+	    %opctl{+help} = $: %opctl{+'?'} = \@('','help',0, <CTL_DEST_CODE,undef);
 	    %linkage{+help} = \&HelpMessage;
 	}
 	$auto_help = 1;
@@ -526,7 +526,7 @@ sub GetOptionsFromArray($argv, @< @optionlist) {	# local copy of the option desc
 					  " to ARRAY\n")
 			      if $debug;
 			    my $t = %linkage{?$opt};
-			    $$t = %linkage{+$opt} = \@();
+			    $$t = $: %linkage{+$opt} = \@();
 			    print $^STDERR, ("=> push(\@\{\$L\{$opt\}, \"$arg\")\n")
 			      if $debug;
 			    push (@{%linkage{$opt}}, $arg);
@@ -536,7 +536,7 @@ sub GetOptionsFromArray($argv, @< @optionlist) {	# local copy of the option desc
 					  " to HASH\n")
 			      if $debug;
 			    my $t = %linkage{?$opt};
-			    $$t = %linkage{+$opt} = \%();
+			    $$t = $: %linkage{+$opt} = \%();
 			    print $^STDERR, ("=> \$\$L\{$opt\}->\{$key\} = \"$arg\"\n")
 			      if $debug;
 			    %linkage{$opt}->{+$key} = $arg;

@@ -14,7 +14,7 @@ use_ok( 'Module::Load::Conditional' );
 
 ### stupid stupid warnings ###
 do {   $Module::Load::Conditional::VERBOSE =   
-    $Module::Load::Conditional::VERBOSE = 0;
+    $: $Module::Load::Conditional::VERBOSE = 0;
 
     *can_load       = \&Module::Load::Conditional::can_load;
     *check_install  = \&Module::Load::Conditional::check_install;

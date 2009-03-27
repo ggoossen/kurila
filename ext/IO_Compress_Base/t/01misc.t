@@ -10,6 +10,8 @@ use lib < qw(t t/compress);
 use warnings;
 use bytes;
 
+use IO::Compress::Base::Common;
+
 use Test::More ; 
 use CompTestUtils;
 
@@ -19,10 +21,9 @@ BEGIN {
     $extra = 1
         if try { require Test::NoWarnings ;  Test::NoWarnings->import(); 1 };
 
-    plan tests => 78 + $extra ;
+    plan tests => 77 + $extra ;
 
     use_ok('Scalar::Util');
-    use_ok('IO::Compress::Base::Common');
 }
 
 

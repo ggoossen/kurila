@@ -98,7 +98,7 @@ do {
 cmp_ok(abs(PI - 3.1416), '+<', 0.0001);
 is Other::PI, 3.141;
 
-use constant E2BIG => $^OS_ERROR = 7;
+use constant E2BIG => $: $^OS_ERROR = 7;
 cmp_ok E2BIG, '==', 7;
 # This is something like "Arg list too long", but the actual message
 # text may vary, so we can't test much better than this.

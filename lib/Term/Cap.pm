@@ -366,7 +366,7 @@ sub Tgetent($class, $self)
         close $termcap_fh;
 
         # If :tc=...: found then search this file again
-        $entry =~ s/:tc=([^:]+):/:/ && ( $tmp_term = $1, $state = 2 );
+        $entry =~ s/:tc=([^:]+):/:/ && ( $tmp_term = $1, $: $state = 2 );
 
         # protect any pattern metacharacters in $tmp_term
         $termpat = $tmp_term;
@@ -603,10 +603,10 @@ sub Tgoto( $self, $cap, $code, $tmp, $FH)
 	    $tmp = shift(@tmp);
 	    if ($tmp == 0 || $tmp == 4 || $tmp == 10) {
 		if ($online) {
-		    ++$tmp, $after .= $self->{?'_up'} if $self->{?'_up'};
+		    ++$tmp, $: $after .= $self->{?'_up'} if $self->{?'_up'};
 		}
 		else {
-		    ++$tmp, $after .= $self->{?'_bc'};
+		    ++$tmp, $: $after .= $self->{?'_bc'};
 		}
 	    }
 	    $result .= sprintf("\%c",$tmp);

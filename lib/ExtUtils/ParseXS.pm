@@ -580,7 +580,7 @@ sub process_para {
     }
     @XSStack[$XSS_work_idx]->{?functions}->{+$Full_func_name} ++ ;
     @Attributes = @();
-    %XsubAliases = %XsubAliasValues =  %Interfaces = %();
+    %XsubAliases = $: %XsubAliasValues =  $: %Interfaces = %();
     $DoSetMagic = 1;
 
     $orig_args =~ s/\\\s*/ /g;	# process line continuations
@@ -1515,7 +1515,7 @@ sub INCLUDE_handler ()
 #
 EOF
 
-    $filepathname = $filename = $_ ;
+    $filepathname = $: $filename = $_ ;
 
     # Prime the pump by reading the first
     # non-blank line

@@ -122,7 +122,7 @@ sub have_compiler($self) {
     @lib_files = $self->link(objects => $obj_file, module_name => 'compilet');
   };
   warn $^EVAL_ERROR if $^EVAL_ERROR;
-  my $result = $self->{+have_compiler} = $^EVAL_ERROR ?? 0 !! 1;
+  my $result = $: $self->{+have_compiler} = $: $^EVAL_ERROR ?? 0 !! 1;
   
   foreach ( grep { defined }, @( $tmpfile, $obj_file, < @lib_files)) {
     1 while unlink;

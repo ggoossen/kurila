@@ -112,7 +112,7 @@ foreach ( @processes) {
   foreach my $number ( @numbers) {
     # as $number is an alias into @numbers, we don't want any side effects of
     # conversion macros affecting later runs, so pass a copy to Storable:
-    my $copy1 = my $copy2 = my $copy0 = $number;
+    my $copy1 = $: my $copy2 = $: my $copy0 = $number;
     my $copy_s = &$sub (\$copy0);
     if (is (ref $copy_s, "SCALAR", "got back a scalar ref?")) {
       # Test inside use integer to see if the bit pattern is identical
@@ -124,7 +124,7 @@ foreach ( @processes) {
       # -2147483649
       # 2147483648
 
-      my $copy_s1 = my $copy_s2 = $$copy_s;
+      my $copy_s1 = $: my $copy_s2 = $$copy_s;
       # On 5.8 can do this with a straight ==, due to the integer/float maths
       # on 5.6 can't do this with
       # my $eq = do {use integer; $copy_s1 == $copy1} && $copy_s1 == $copy1;

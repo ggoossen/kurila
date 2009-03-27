@@ -130,8 +130,8 @@ sub init
  if($^PROGRAM_NAME eq '-e' || $^PROGRAM_NAME eq '-')
   {
    # perl invoked with -e or script is on C<STDIN>
-   $Script = $RealScript = $^PROGRAM_NAME;
-   $Bin    = $RealBin    = cwd2();
+   $Script = $: $RealScript = $^PROGRAM_NAME;
+   $Bin    = $: $RealBin    = cwd2();
    $Bin = VMS::Filespec::unixify($Bin) if $^OS_NAME eq 'VMS';
   }
  else

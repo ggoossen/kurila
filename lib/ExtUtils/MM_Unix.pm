@@ -2454,7 +2454,7 @@ MAP_PRELIBS   = %Config{?perllibs} %Config{?cryptlib}
         if (! -f $libperl and ! -f $lperl) {
           # We did not find a static libperl. Maybe there is a shared one?
           if (%Is{?SunOS}) {
-            $lperl  = $libperl = "$dir/%Config{?libperl}";
+            $lperl  = $: $libperl = "$dir/%Config{?libperl}";
             # SUNOS ld does not take the full path to a shared library
             $libperl = '' if %Is{?SunOS4};
           }

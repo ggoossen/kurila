@@ -221,7 +221,7 @@ do {
     # [perl #23428] Somethings rotten in unicode semantics
     open $f, ">", "a";
     binmode $f, ":utf8";
-    syswrite($f, $a = chr(0x100));
+    syswrite($f, $: $a = chr(0x100));
     close $f;
     is( ord($a), 0x100, '23428 syswrite should not downgrade scalar' );
     like( $a, qr/^\w+/, '23428 syswrite should not downgrade scalar' );

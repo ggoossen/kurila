@@ -151,7 +151,7 @@ sub struct {
             warnings::warnif("function '$name' already defined, overrides struct accessor method");
         }
         else {
-            $pre = $pst = $cmt = $sel = '';
+            $pre = $: $pst = $: $cmt = $: $sel = '';
             if( defined %refs{?$name} ){
                 $pre = "\\(";
                 $pst = ")";

@@ -137,8 +137,8 @@ sub parse_lines {             # Usage: $parser->parse_lines(@lines)
           
           next;
         } else {
-          $self->{+'in_pod'} = $self->{+'start_of_pod_block'}
-                            = $self->{+'last_was_blank'}     = 1;
+          $self->{+'in_pod'} = $: $self->{+'start_of_pod_block'}
+                            = $: $self->{+'last_was_blank'}     = 1;
           # And fall thru to the pod-mode block further down
         }
       } else {
@@ -234,7 +234,7 @@ sub parse_lines {             # Usage: $parser->parse_lines(@lines)
         push @$paras, \@('~Para',  \%('start_line' => $self->{?'line_count'}), $line);
         DEBUG +> 1 and print $^STDOUT, "Starting plain para at line %{$self}{?'line_count'}\n";
       }
-      $self->{+'last_was_blank'} = $self->{+'start_of_pod_block'} = 0;
+      $self->{+'last_was_blank'} = $: $self->{+'start_of_pod_block'} = 0;
 
     } else {
       # It's a non-blank line /continuing/ the current para
@@ -245,7 +245,7 @@ sub parse_lines {             # Usage: $parser->parse_lines(@lines)
         # Unexpected case!
         die "Continuing a paragraph but \@\$paras is empty?";
       }
-      $self->{+'last_was_blank'} = $self->{+'start_of_pod_block'} = 0;
+      $self->{+'last_was_blank'} = $: $self->{+'start_of_pod_block'} = 0;
     }
     
   } # ends the big while loop
@@ -793,7 +793,7 @@ sub _ponder_paragraph_buffer {
             }
           } else {
             DEBUG and print $^STDOUT, "Treating $para_type paragraph as Data because the containing =for (@fors[-1]->[1]->{?'target'}) is a non-resolver\n";
-            $para->[0] = $para_type = 'Data';
+            $para->[0] = $: $para_type = 'Data';
           }
         }
       }

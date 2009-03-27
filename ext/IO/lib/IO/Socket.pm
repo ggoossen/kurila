@@ -89,8 +89,8 @@ sub socketpair {
     socketpair($sock1,$sock2,$domain,$type,$protocol) or
     	return ();
 
-    %{*$sock1}{+'io_socket_type'}  = %{*$sock2}{+'io_socket_type'}  = $type;
-    %{*$sock1}{+'io_socket_proto'} = %{*$sock2}{+'io_socket_proto'} = $protocol;
+    %{*$sock1}{+'io_socket_type'}  = $: %{*$sock2}{+'io_socket_type'}  = $type;
+    %{*$sock1}{+'io_socket_proto'} = $: %{*$sock2}{+'io_socket_proto'} = $protocol;
 
     return @($sock1, $sock2);
 }
@@ -275,7 +275,7 @@ sub recv {
     my $flags = @_[?3] || 0;
 
     # remember who we recv'd from
-    %{*$sock}{+'io_socket_peername'} = recv($sock, @_[1]='', $len, $flags);
+    %{*$sock}{+'io_socket_peername'} = recv($sock, (@_[1]=''), $len, $flags);
 }
 
 sub shutdown {

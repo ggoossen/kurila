@@ -659,7 +659,7 @@ sub check_manifest {
     print $^STDOUT, "Checking if your kit is complete...\n";
     require ExtUtils::Manifest;
     # avoid warning
-    $ExtUtils::Manifest::Quiet = $ExtUtils::Manifest::Quiet = 1;
+    $ExtUtils::Manifest::Quiet = $: $ExtUtils::Manifest::Quiet = 1;
     my @missed = ExtUtils::Manifest::manicheck();
     if ((nelems @missed)) {
         print $^STDOUT, "Warning: the following files are missing in your kit:\n";
@@ -687,7 +687,7 @@ sub parse_args($self, @< @args){
         }
 
         # Remember the original args passed it.  It will be useful later.
-        $self->{ARGS}->{+uc $name} = $self->{+uc $name} = $value;
+        $self->{ARGS}->{+uc $name} = $: $self->{+uc $name} = $value;
     }
 
     # catch old-style 'potential_libs' and inform user how to 'upgrade'

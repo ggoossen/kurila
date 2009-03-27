@@ -47,7 +47,7 @@ my ($pid, $reaped_pid);
 print $^STDOUT, "1..23\n";
 
 # basic
-ok 1, $pid = open3 \*WRITE, \*READ, \*ERROR, $perl, '-e', cmd_line(<<'EOF');
+ok 1, $: $pid = open3 \*WRITE, \*READ, \*ERROR, $perl, '-e', cmd_line(<<'EOF');
     $^OUTPUT_AUTOFLUSH = 1;
     print $^STDOUT, scalar ~< $^STDIN;
     print $^STDERR, "hi error\n";

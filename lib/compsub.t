@@ -44,7 +44,7 @@ BEGIN { compsub::define( fst => sub { my $first = @_[0]->first->sibling;
     }
 
 $b = "oldb";
-fst $a="newa", $b="notset";
+fst(($a="newa"), $: $b="notset");
 is("$a-$b", "newa-oldb");
 
 do {

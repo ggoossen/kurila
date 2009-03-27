@@ -155,9 +155,9 @@ sub init_quotes {
 
     %$self{+quotes} ||= '"';
     if (%$self{?quotes} eq 'none') {
-        %$self{+LQUOTE} = %$self{+RQUOTE} = '';
+        %$self{+LQUOTE} = $: %$self{+RQUOTE} = '';
     } elsif (length (%$self{?quotes}) == 1) {
-        %$self{+LQUOTE} = %$self{+RQUOTE} = %$self{?quotes};
+        %$self{+LQUOTE} = $: %$self{+RQUOTE} = %$self{?quotes};
     } elsif (%$self{?quotes} =~ m/^(.)(.)$/
              || %$self{?quotes} =~ m/^(..)(..)$/) {
         %$self{+LQUOTE} = $1;
