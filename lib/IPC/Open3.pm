@@ -205,14 +205,17 @@ sub _open3 {
     if ($dup_wtr) {
         $dad_wtr = $dad_wtr[1];
     }
+    ref::svtype($dad_wtr) eq "SCALAR" and die "scalar can not be used as filehandle";
     $dup_rdr = (ref \$dad_rdr eq "ARRAY" and $dad_rdr[0] =~ s/^[<>]&//);
     if ($dup_rdr) {
         $dad_rdr = $dad_rdr[1];
     }
+    ref::svtype($dad_rdr) eq "SCALAR" and die "scalar can not be used as filehandle";
     $dup_err = (ref \$dad_err eq "ARRAY" and $dad_err[0] =~ s/^[<>]&//);
     if ($dup_err) {
         $dad_err = $dad_err[1];
     }
+    ref::svtype($dad_err) eq "SCALAR" and die "scalar can not be used as filehandle";
 
     # force unqualified filehandles into caller's package
     $dad_wtr = \*{Symbol::fetch_glob(qualify $dad_wtr, $package)} unless ref \$dad_wtr ne "SCALAR" or fh_is_fd($dad_wtr);
