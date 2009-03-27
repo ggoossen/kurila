@@ -2085,6 +2085,7 @@ t/cmd/mod.t			See if statement modifiers work
 t/cmd/subval.t			See if subroutine values work
 t/cmd/switch.t			See if switch optimizations work
 t/cmd/while.t			See if while loops work
+t/comp/arguments.t			See if passing arguments to subs work
 t/comp/blocks.t			See if BEGIN and friends work
 t/comp/bproto.t			See if builtins conform to their prototypes
 t/comp/cmdopt.t			See if command optimization works

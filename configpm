@@ -624,7 +624,9 @@ ENDOFSET
     my $dll;
     if (open my $fh, '<', $f) {
 	while ( ~< $fh) {
-	    $dll = $1, last if m/^PERL_DLL_BASE\s*=\s*(\S*)\s*$/;
+            next unless m/^PERL_DLL_BASE\s*=\s*(\S*)\s*$/;
+	    $dll = $1;
+            last;
 	}
     }
     $config_txt .= <<ENDOFSET if $dll;

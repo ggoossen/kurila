@@ -2,7 +2,7 @@
 
 BEGIN { require './test.pl'; }
 
-plan 9;
+plan 11;
 
 sub foo($x) {
     return $x;
