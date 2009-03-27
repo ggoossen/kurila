@@ -40,12 +40,9 @@ my %Tests = %(
              'extras.plx'               => @(2,      4),
              'too_few.plx'              => @(255,    4),
              'too_few_fail.plx'         => @(2,      4),
-             'death.plx'                => @(255,    4),
-             'last_minute_death.plx'    => @(255,    4),
              'pre_plan_death.plx'       => @('not zero',    'not zero'),
              'death_in_eval.plx'        => @(0,      0),
              'require.plx'              => @(0,      0),
-             'death_with_handler.plx'   => @(255,    4),
              'exit.plx'                 => @(1,      4),
             );
 

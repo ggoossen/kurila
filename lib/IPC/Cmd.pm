@@ -416,9 +416,9 @@ sub _open3_run {
     
 
     my $pid = IPC::Open3::open3(
-                    '<&STDIN',
-                    (IS_WIN32 ?? '>&STDOUT' !! $kidout),
-                    (IS_WIN32 ?? '>&STDERR' !! $kiderror),
+                    (@: '<&', $^STDIN),
+                    (IS_WIN32 ?? (@: '>&', $^STDOUT) !! $kidout),
+                    (IS_WIN32 ?? (@: '>&', $^STDERR) !! $kiderror),
                     $cmd
                 );
 
@@ -429,7 +429,7 @@ sub _open3_run {
                         (IS_WIN32 ?? $^STDERR !! $kiderror), 
                         $^STDIN,   
                         (IS_WIN32 ?? $^STDOUT !! $kidout)     
-                    );              
+                    );
 
     ($^STDOUT)->autoflush(1);   ($^STDERR)->autoflush(1);   ($^STDIN)->autoflush(1);
     $kidout->autoflush(1)   if UNIVERSAL::can($kidout,   'autoflush');

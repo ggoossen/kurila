@@ -7,7 +7,7 @@ push $^INCLUDE_PATH, 't/lib';
 require Test::Simple::Catch;
 my @($out, $err) = Test::Simple::Catch::caught();
 
-close STDERR;
+close $^STDERR;
 die "Knife?";
 
 Test::Simple->import(tests => 3);
