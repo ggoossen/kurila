@@ -44,7 +44,7 @@ my ($pid, $reaped_pid);
 ($^STDOUT)->autoflush;
 ($^STDERR)->autoflush;
 
-print $^STDOUT, "1..22\n";
+print $^STDOUT, "1..23\n";
 
 # basic
 ok 1, $pid = open3 \*WRITE, \*READ, \*ERROR, $perl, '-e', cmd_line(<<'EOF');
@@ -105,13 +105,13 @@ waitpid $pid, 0;
 # dup error:  This particular case, duping stderr onto the existing
 # stdout but putting stdout somewhere else, is a good case because it
 # used not to work.
-$pid = open3 'WRITE', 'READ', (@: '>&', $^STDOUT),
+$pid = open3 \*WRITE, \*READ, (@: '>&', $^STDOUT),
 		    $perl, '-e', cmd_line('print $^STDERR, scalar ~< $^STDIN');
 print \*WRITE, "ok 17\n";
 waitpid $pid, 0;
 
 # dup reader and error together, both named
-$pid = open3 'WRITE', (@: '>&', $^STDOUT), (@: '>&', $^STDOUT), $perl, '-e', cmd_line(<<'EOF');
+$pid = open3 \*WRITE, (@: '>&', $^STDOUT), (@: '>&', $^STDOUT), $perl, '-e', cmd_line(<<'EOF');
     $^OUTPUT_AUTOFLUSH = 1;
     print $^STDOUT, scalar ~< $^STDIN;
     print $^STDERR, scalar ~< $^STDIN;
@@ -121,7 +121,7 @@ print \*WRITE, "ok 19\n";
 waitpid $pid, 0;
 
 # dup reader and error together, error empty
-$pid = open3 'WRITE', (@: '>&', $^STDOUT), '', $perl, '-e', cmd_line(<<'EOF');
+$pid = open3 \*WRITE, (@: '>&', $^STDOUT), '', $perl, '-e', cmd_line(<<'EOF');
     $^OUTPUT_AUTOFLUSH = 1;
     print $^STDOUT, scalar ~< $^STDIN;
     print $^STDERR, scalar ~< $^STDIN;
@@ -134,7 +134,7 @@ waitpid $pid, 0;
 # for understanding of Config{'sh'} test see exec description in camel book
 my $cmd = 'print($^STDOUT, scalar(~< $^STDIN))';
 $cmd = config_value('sh') =~ m/sh/ ?? "'$cmd'" !! cmd_line($cmd);
-try{$pid = open3 'WRITE', (@: '>&', $^STDOUT), 'ERROR', "$perl -e " . $cmd; };
+try{$pid = open3 \*WRITE, (@: '>&', $^STDOUT), \*ERROR, "$perl -e " . $cmd; };
 if ($^EVAL_ERROR) {
 	print $^STDOUT, "error $($^EVAL_ERROR->message)\n";
 	print $^STDOUT, "not ok 22\n";
@@ -142,4 +142,8 @@ if ($^EVAL_ERROR) {
 else {
 	print \*WRITE, "ok 22\n";
 	waitpid $pid, 0;
-}        
+}
+
+try { open3('WRITE', 'READ', 'ERROR', "$perl -e 1") };
+ok( 23, ($: $^EVAL_ERROR->{description} =~ m/PLAINVALUE can not be used as a filehandle/),
+    "PLAINVALUE can not be used as a filehandle"  );
