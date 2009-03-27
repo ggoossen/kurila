@@ -2580,12 +2580,6 @@ Perl_newASSIGNOP(pTHX_ OPFLAGS flags, OP *left, I32 optype, OP *right, SV *locat
     if (optype) {
 	bool is_logassign = (optype == OP_ANDASSIGN || optype == OP_ORASSIGN || optype == OP_DORASSIGN);
 
-	if ( left->op_type == OP_SASSIGN || left->op_type == OP_ANDASSIGN
-	    || left->op_type == OP_ORASSIGN || left->op_type == OP_DORASSIGN ) {
-	    Perl_croak_at(aTHX_ left->op_location, "Can't do %s to %s", 
-		PL_op_desc[optype], OP_DESC(left));
-	}
-
 	if (is_logassign) {
 	    OP* new_left = left;
 	    OP* finish_assign = op_assign(&new_left, optype);
