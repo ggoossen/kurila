@@ -166,7 +166,7 @@ my %archpms = %(
 
 if ($^OS_NAME eq 'dos') {
     push(@scripts,'djgpp/fixpmain');
-    %archpms{config} = $: %archpms{filehand} = 1;
+    %archpms{config} = %archpms{filehand} = 1;
 }
 
 if ((-e "testcompile") && (defined(env::var('COMPILE')))) {
@@ -390,7 +390,7 @@ my @corefiles;
 if ($Is_VMS) {  # We did core file selection during build
     my $coredir = "lib/$(config_value('archname'))/$ver/CORE";
     $coredir =~ s/[.]/_/g;
-    map { s|^$coredir/||i }, $: @corefiles = glob("$coredir/*.*");
+    map { s|^$coredir/||i }, (@corefiles = glob("$coredir/*.*"));
 }
 else {
     # [als] hard-coded 'libperl' name... not good!
