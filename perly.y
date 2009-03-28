@@ -1143,7 +1143,7 @@ term	:	'?' term
 			{ $$ = newLOOPEX(IVAL($1),$2);
 			  TOKEN_GETMAD($1,$$,'o');
 			}
-	|	NOTOP argexpr                        /* not $foo */
+	|	NOTOP assignexpr                        /* not $foo */
                         { $$ = newUNOP(OP_NOT, 0, scalar($2), LOCATION($1));
 			  TOKEN_GETMAD($1,$$,'o');
 			}

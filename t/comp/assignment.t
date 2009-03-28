@@ -4,7 +4,7 @@ BEGIN {
     require './test.pl';
 }
 
-plan( tests => 5 );
+plan( tests => 6 );
 
 my ($x, $y, $z);
 $x = ($y = 3);
@@ -19,3 +19,6 @@ is( $x, 21 );
 sub foo($y, $z) { $y + $z }
 $x = foo 21, 44;
 is( $x, 65 );
+
+$y = 109;
+is( (not $x = 109), '' );
