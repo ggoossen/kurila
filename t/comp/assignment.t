@@ -4,8 +4,14 @@ BEGIN {
     require './test.pl';
 }
 
-plan( tests => 1 );
+plan( tests => 4 );
 
-my ($a, $b, $c);
-$a = $: $b = 3;
-is( $a, 3);
+my ($x, $y, $z);
+$x = ($y = 3);
+is( $x, 3);
+is( $y, 3);
+
+$y = 8;
+$x = $y += 13;
+is( $y, 21 );
+is( $x, 21 );

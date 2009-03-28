@@ -759,7 +759,7 @@ sub eval_dies_like ($e, $qr, ?$name) {
             diag "didn't die";
             return ok(0, $name);
         }
-        return like_yn(0, $err->{?description}, $qr );
+        return like_yn(0, $err->{description}, $qr, $name );
     };
 }
 

@@ -2583,6 +2583,7 @@ Perl_newASSIGNOP(pTHX_ OPFLAGS flags, OP *left, I32 optype, OP *right, SV *locat
 	if (is_logassign) {
 	    OP* new_left = left;
 	    OP* finish_assign = op_assign(&new_left, optype);
+
 	    if (finish_assign) {
 		o = newBINOP(OP_SASSIGN, 0, scalar(right),
 		    newOP(OP_LOGASSIGN_ASSIGN, 0, location), location);
