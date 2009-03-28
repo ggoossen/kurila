@@ -445,7 +445,7 @@ sub _dump {
             }
         }
         while (@(?$k, ?$v) = ! $sortkeys ?? @(each %$rval) !!
-               (nelems @$keys) ?? @($key = shift(@$keys), $rval->{?$key}) !!
+               (nelems @$keys) ?? @(($key = shift(@$keys)), $rval->{?$key}) !!
                @() ) {
             my $nk = $s->_dump($k, "");
             $nk = $1 if !$s->{?quotekeys} and $nk =~ m/^[\"\']([A-Za-z_]\w*)[\"\']$/;

@@ -20,7 +20,7 @@ my $Is_OS2     = $^OS_NAME eq 'os2';
 my $Is_UWin    = $^OS_NAME eq 'uwin';
 my $Is_OS390   = $^OS_NAME eq 'os390';
 
-ok( my $testfd = open("TEST", O_RDONLY, 0),        'O_RDONLY with open' );
+ok( (my $testfd = open("TEST", O_RDONLY, 0)),        'O_RDONLY with open' );
 read($testfd, my $buffer, 4) if $testfd +> 2;
 is( $buffer, "#!./",                      '    with read' );
 
@@ -42,8 +42,8 @@ SKIP: do {
     our @fds = POSIX::pipe();
     ok( @fds[0] +> $testfd,      'POSIX::pipe' );
 
-    CORE::open(my $reader = \*READER, "<&=", @fds[0]);
-    CORE::open(my $writer = \*WRITER, ">&=", @fds[1]);
+    CORE::open((my $reader = \*READER), "<&=", @fds[0]);
+    CORE::open((my $writer = \*WRITER), ">&=", @fds[1]);
     print $writer, "ok 6\n";
     close $writer;
     print $^STDOUT, ~< $reader;

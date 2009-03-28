@@ -24,7 +24,7 @@ sub fill_protos {
     push(@out, $1 . "\{\@_[$n]\}"), next if $proto =~ s/^\s*\\([\@%\$\&])//;
     push(@out, "\@_[$n]"), next if $proto =~ s/^\s*([_*\$&])//;
     push(@out, " < \@_[[ $n..nelems(\@_)-1]]"), last if $proto =~ s/^\s*(;\s*)?\@//;
-    $seen_semi = 1, $n--, next if $proto =~ s/^\s*;//; # XXXX ????
+    ($seen_semi = 1), $n--, next if $proto =~ s/^\s*;//; # XXXX ????
     die "Unknown prototype letters: \"$proto\"";
   }
   push(@out1,\@($n+1,< @out));

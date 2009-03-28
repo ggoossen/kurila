@@ -612,7 +612,7 @@ sub _accessorize {  # A simple-minded method-maker
   foreach my $attrname ( @_) {
     *{Symbol::fetch_glob(caller() . '::' . $attrname)} = sub {
       
-      $Carp::CarpLevel = 1,  Carp::croak(
+      ($Carp::CarpLevel = 1),  Carp::croak(
        "Accessor usage: \$obj->$attrname() or \$obj->$attrname(\$new_value)"
       ) unless ((nelems @_) == 1 or (nelems @_) == 2) and ref @_[0];
 

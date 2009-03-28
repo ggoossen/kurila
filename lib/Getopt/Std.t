@@ -23,7 +23,7 @@ ok( !defined %opt{?l},		'option -l not set' );
 ok( !defined $opt_i,		'$opt_i still undefined' );
 
 # Then we try the getopts
-$opt_o = $: $opt_i = $: $opt_f = undef;
+$opt_o = $opt_i = $opt_f = undef;
 @ARGV = qw(-foi -i file);
 
 ok( getopts('oif:'),		'getopts succeeded (1)' );

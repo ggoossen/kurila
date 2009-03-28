@@ -192,11 +192,11 @@ sub Validator::new
 
     local $Carp::CarpLevel = 1;
 
-    my $inType    = $: %data{+inType}    = whatIsInput(@_[0], WANT_EXT^|^WANT_HASH);
-    my $outType   = $: %data{+outType}   = whatIsOutput(@_[1], WANT_EXT^|^WANT_HASH);
+    my $inType    = %data{+inType}    = whatIsInput(@_[0], WANT_EXT^|^WANT_HASH);
+    my $outType   = %data{+outType}   = whatIsOutput(@_[1], WANT_EXT^|^WANT_HASH);
 
-    my $oneInput  = $: %data{+oneInput}  = oneTarget($inType);
-    my $oneOutput = $: %data{+oneOutput} = oneTarget($outType);
+    my $oneInput  = %data{+oneInput}  = oneTarget($inType);
+    my $oneOutput = %data{+oneOutput} = oneTarget($outType);
 
     if (! $inType)
     {
@@ -231,7 +231,7 @@ sub Validator::new
     if ($inType eq 'fileglob' && $outType eq 'fileglob')
     {
         %data{+GlobMap} = 1 ;
-        %data{+inType} = $: %data{+outType} = 'filename';
+        %data{+inType} = %data{+outType} = 'filename';
         my $mapper = File::GlobMapper->new(@_[0], @_[1]);
         if ( ! $mapper )
         {
@@ -807,7 +807,7 @@ sub newUnpack_V32
 sub reset
 {
     my $self = shift;
-    $self->[HIGH] = $: $self->[LOW] = 0;
+    $self->[HIGH] = $self->[LOW] = 0;
 }
 
 sub clone

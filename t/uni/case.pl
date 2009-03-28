@@ -138,7 +138,7 @@ sub casetest {
     }
 
     for my $i (sort { $a <+> $b }, keys %none) {
-	my $w = $: $i = sprintf "\%04X", $i;
+	my $w = $i = sprintf "\%04X", $i;
 	my $c = pack "U0U", hex $i;
 	foreach my $func ( @funcs) {
 	    my $d = $func->($c);

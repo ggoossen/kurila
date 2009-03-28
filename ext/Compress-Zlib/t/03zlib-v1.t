@@ -232,7 +232,7 @@ title 'deflate/inflate - larger buffer';
 # ==============================
 
 
-ok $x = deflateInit() ;
+ok($x = deflateInit());
  
 ok (@(@($X, $status) =  $x->deflate($contents))[?1] == Z_OK) ;
 
@@ -244,7 +244,7 @@ $Y .= $X ;
  
  
  
-ok $k = inflateInit() ;
+ok($k = inflateInit());
  
 @($Z, $status) =  $k->inflate($Y) ;
  
@@ -255,8 +255,8 @@ title 'deflate/inflate - preset dictionary';
 # ===================================
 
 my $dictionary = "hello" ;
-ok $x = deflateInit(\%(Level => Z_BEST_COMPRESSION,
-			 Dictionary => $dictionary)) ;
+ok($x = deflateInit(\%(Level => Z_BEST_COMPRESSION,
+			 Dictionary => $dictionary)));
  
 my $dictID = $x->dict_adler() ;
 
@@ -267,7 +267,7 @@ ok $status == Z_OK ;
 $X .= $Y ;
 $x = 0 ;
  
-ok $k = inflateInit(Dictionary => $dictionary) ;
+ok($k = inflateInit(Dictionary => $dictionary));
  
 @($Z, $status) =  $k->inflate($X);
 ok $status == Z_STREAM_END ;
@@ -293,7 +293,7 @@ title 'inflate - check remaining buffer after Z_STREAM_END';
 # ===================================================
  
 do {
-    ok $x = deflateInit(Level => Z_BEST_COMPRESSION ) ;
+    ok($x = deflateInit(Level => Z_BEST_COMPRESSION ));
  
     @($X, $status) =  $x->deflate($hello) ;
     ok $status == Z_OK ;
@@ -302,7 +302,7 @@ do {
     $X .= $Y ;
     $x = 0 ;
  
-    ok $k = inflateInit()  ;
+    ok($k = inflateInit());
  
     my $first = substr($X, 0, 2) ;
     my $last  = substr($X, 2) ;
@@ -343,7 +343,7 @@ EOM
     close $fh ;
 
     # uncompress with gzopen
-    ok my $fil = gzopen($name, "rb") ;
+    ok(my $fil = gzopen($name, "rb"));
  
     is $fil->gzread($uncomp, 0), 0 ;
     ok (($x = $fil->gzread($uncomp)) == $len) ;
@@ -371,7 +371,7 @@ EOM
     close $fh ;
 
     # uncompress with gzopen
-    ok $fil = gzopen($name, "rb") ;
+    ok($fil = gzopen($name, "rb"));
  
     ok (($x = $fil->gzread($uncomp)) == $len) ;
  
@@ -488,19 +488,19 @@ do {
     $data .= "\r\nabd\r\n";
 
     my $fil;
-    ok $fil = gzopen($name, "wb") ;
+    ok($fil = gzopen($name, "wb"));
     is $fil->gzwrite($data), length $data ;
     ok ! $fil->gzclose();
 
     my $input;
-    ok $fil = gzopen($name, "rb") ;
+    ok($fil = gzopen($name, "rb"));
     is $fil->gzread($input), length $data ;
     ok ! $fil->gzclose();
     ok $input eq $data;
 
     title "Check all bytes can be handled - transparent mode";
     writeFile($name, $data);
-    ok $fil = gzopen($name, "rb") ;
+    ok($fil = gzopen($name, "rb"));
     is $fil->gzread($input), length $data ;
     ok ! $fil->gzclose();
     ok $input eq $data;
@@ -516,7 +516,7 @@ text
 
 EOM
 
-    ok $fil = gzopen($name, "wb") ;
+    ok($fil = gzopen($name, "wb"));
 
     ok $fil->gzwrite($buffer) == length $buffer ;
 
@@ -655,10 +655,10 @@ do {
     foreach (1 .. 20000)
       { $contents .= chr int rand 256 }
 
-    ok my $compressed = Compress::Zlib::memGzip(\$contents) ;
+    ok(my $compressed = Compress::Zlib::memGzip(\$contents));
 
     ok length $compressed +> 4096 ;
-    ok my $out = Compress::Zlib::memGunzip(\$compressed) ;
+    ok(my $out = Compress::Zlib::memGunzip(\$compressed));
      
     ok $contents eq $out ;
     is length $out, length $contents ;
@@ -675,7 +675,7 @@ some text
 EOM
 
     my $good ;
-    ok my $x = IO::Compress::Gzip->new( \$good, Append => 1, HeaderCRC => 1) ;
+    ok(my $x = IO::Compress::Gzip->new( \$good, Append => 1, HeaderCRC => 1));
     ok $x->write($string) ;
     ok  $x->close ;
 
@@ -721,8 +721,8 @@ some text
 EOM
 
     my $truncated ;
-    ok  my $x = IO::Compress::Gzip->new( \$truncated, Append => 1, HeaderCRC => 1, Strict => 0,
-				ExtraField => "hello" x 10)  ;
+    ok(my $x = IO::Compress::Gzip->new( \$truncated, Append => 1, HeaderCRC => 1, Strict => 0,
+				ExtraField => "hello" x 10));
     ok  $x->write($string) ;
     ok  $x->close ;
 
@@ -742,7 +742,7 @@ some text
 EOM
 
     my $truncated ;
-    ok  my $x = IO::Compress::Gzip->new( \$truncated, Append => 1, Name => $Name);
+    ok( my $x = IO::Compress::Gzip->new( \$truncated, Append => 1, Name => $Name));
     ok  $x->write($string) ;
     ok  $x->close ;
 
@@ -760,7 +760,7 @@ some text
 EOM
 
     my $truncated ;
-    ok  my $x = IO::Compress::Gzip->new( \$truncated, Comment => $Comment);
+    ok( my $x = IO::Compress::Gzip->new( \$truncated, Comment => $Comment));
     ok  $x->write($string) ;
     ok  $x->close ;
 
@@ -776,7 +776,7 @@ some text
 EOM
 
     my $truncated ;
-    ok  my $x = IO::Compress::Gzip->new( \$truncated, HeaderCRC => 1);
+    ok( my $x = IO::Compress::Gzip->new( \$truncated, HeaderCRC => 1));
     ok  $x->write($string) ;
     ok  $x->close ;
 
@@ -792,19 +792,19 @@ some text
 EOM
 
     my $buffer ;
-    ok  my $x = IO::Compress::Gzip->new( \$buffer, 
+    ok( my $x = IO::Compress::Gzip->new( \$buffer, 
                              Append     => 1,
                              Strict     => 0,
                              HeaderCRC  => 1,
                              Name       => "Fred",
                              ExtraField => "Extra",
-                             Comment    => 'Comment');
+                             Comment    => 'Comment'));
     ok  $x->write($string) ;
     ok  $x->close ;
 
     ok defined $buffer ;
 
-    ok my $got = Compress::Zlib::memGunzip($buffer) 
+    ok(my $got = Compress::Zlib::memGunzip($buffer)) 
         or diag "gzerrno is $gzerrno" ;
     is $got, $string ;
 };
@@ -818,7 +818,7 @@ some text
 EOM
 
     my $good ;
-    ok  my $x = IO::Compress::Gzip->new( \$good, Append => 1) ;
+    ok( my $x = IO::Compress::Gzip->new( \$good, Append => 1));
     ok  $x->write($string) ;
     ok  $x->close ;
 
@@ -830,7 +830,7 @@ EOM
 
         substr($buffer, $trim, undef, '');
 
-        ok my $u = Compress::Zlib::memGunzip(\$buffer) ;
+        ok(my $u = Compress::Zlib::memGunzip(\$buffer));
         ok $u eq $string;
 
     }

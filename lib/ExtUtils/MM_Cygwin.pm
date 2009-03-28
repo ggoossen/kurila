@@ -51,11 +51,11 @@ sub cflags($self,$libperl) {
     };
     $self->{+CCFLAGS} .= " -DUSEIMPORTLIB" if (%Config{?useshrplib} eq 'true');
 
-    return $self->{+CFLAGS} = qq{
+    return ($self->{+CFLAGS} = qq{
 CCFLAGS = $self->{?CCFLAGS}
 OPTIMIZE = $self->{?OPTIMIZE}
 PERLTYPE = $self->{?PERLTYPE}
-};
+});
 
 }
 

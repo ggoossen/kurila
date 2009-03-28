@@ -97,9 +97,9 @@ sub new {
     # Figure out what quotes we'll be using for C<> text.
     %$self{+opt_quotes} ||= '"';
     if (%$self{?opt_quotes} eq 'none') {
-        %$self{+LQUOTE} = $: %$self{+RQUOTE} = '';
+        %$self{+LQUOTE} = %$self{+RQUOTE} = '';
     } elsif (length (%$self{?opt_quotes}) == 1) {
-        %$self{+LQUOTE} = $: %$self{+RQUOTE} = %$self{?opt_quotes};
+        %$self{+LQUOTE} = %$self{+RQUOTE} = %$self{?opt_quotes};
     } elsif (%$self{?opt_quotes} =~ m/^(.)(.)$/
              || %$self{?opt_quotes} =~ m/^(..)(..)$/) {
         %$self{+LQUOTE} = $1;

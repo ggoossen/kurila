@@ -183,14 +183,14 @@ sub maketext {
       print $^STDOUT, "  Found \"$phrase\" in $h_r\n" if DEBUG;
       unless(ref($value = $h_r->{?$phrase})) {
         # Nonref means it's not yet compiled.  Compile and replace.
-        $value = $: $h_r->{+$phrase} = $handle->_compile($value);
+        $value = $h_r->{+$phrase} = $handle->_compile($value);
       }
       last;
     } elsif($phrase !~ m/^_/s and $h_r->{?'_AUTO'}) {
       # it's an auto lex, and this is an autoable key!
       print $^STDOUT, "  Automaking \"$phrase\" into $h_r\n" if DEBUG;
       
-      $value = $: $h_r->{+$phrase} = $handle->_compile($phrase);
+      $value = $h_r->{+$phrase} = $handle->_compile($phrase);
       last;
     }
     print $^STDOUT, "  Not found in $h_r, nor automakable\n" if DEBUG +> 1;
@@ -380,10 +380,10 @@ sub _try_use {   # Basically a wrapper around "require Modulename"
   };
   if($^EVAL_ERROR) {
     print $^STDOUT, "Error using $module \: $^EVAL_ERROR\n" if DEBUG +> 1;
-    return %tried{+$module} = 0;
+    return (%tried{+$module} = 0);
   } else {
     print $^STDOUT, " OK, $module is used\n" if DEBUG;
-    return %tried{+$module} = 1;
+    return (%tried{+$module} = 1);
   }
 }
 

@@ -42,7 +42,7 @@ do {
     my($off, $shouldbe);	# Problems with randbits
     my($dev, $bits);		# Number of one bits
     my $randbits = config_value('randbits');
-    $max = $: $min = rand(1);
+    $max = $min = rand(1);
     for (1..$reps) {
 	my $n = rand(1);
 	if ($n +< 0.0 or $n +>= 1.0) {
@@ -203,7 +203,7 @@ DIAG
 # Now, let's see whether rand accepts its argument
 do {
     my($max, $min);
-    $max = $: $min = rand(100);
+    $max = $min = rand(100);
     for (1..$reps) {
 	my $n = rand(100);
 	$max = $n if $n +> $max;

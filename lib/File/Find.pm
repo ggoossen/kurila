@@ -988,7 +988,7 @@ sub _find_dir($wanted, $p_dir, $nlink) {
 	    }
 
 	    if ( $nlink == -2 ) {
-		$name = $: $dir = $p_dir; # $File::Find::name / dir
+		$name = $dir = $p_dir; # $File::Find::name / dir
                 $_ = $File::Find::current_dir;
 		$post_process->();		# End-of-directory processing
 	    }

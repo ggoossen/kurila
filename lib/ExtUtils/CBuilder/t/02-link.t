@@ -42,7 +42,7 @@ ok -e $source_file;
 
 # Compile
 my $object_file;
-ok $object_file = $b->compile(source => $source_file);
+ok($object_file = $b->compile(source => $source_file));
 
 # Link
 my ($exe_file, @temps);

@@ -666,7 +666,7 @@ sub _remap_sequences {
       
       DEBUG +> 4 and print $^STDOUT, "  Noting child $i : $treelet->[$i]->[0]<...>\n";
       
-      $is = $: $treelet->[$i]->[0] = $map->{?$was = $treelet->[$i]->[0] };
+      $is = $treelet->[$i]->[0] = $map->{?$was = $treelet->[$i]->[0] };
       if( DEBUG +> 3 ) {
         if(!defined $is) {
           print $^STDOUT, "   Code $was<> is UNKNOWN!\n";
@@ -682,7 +682,7 @@ sub _remap_sequences {
       
       if(!defined $is) {
         $self->whine($start_line, "Deleting unknown formatting code $was<>");
-        $is = $: $treelet->[$i]->[0] = '1';  # But saving the children!
+        $is = $treelet->[$i]->[0] = '1';  # But saving the children!
         # I could also insert a leading "$was<" and tailing ">" as
         # children of this node, but something about that seems icky.
       }

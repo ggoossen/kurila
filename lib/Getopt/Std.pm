@@ -201,7 +201,7 @@ EOH
 	if ( defined $^PROGRAM_NAME and $^PROGRAM_NAME ne '-e' and -f $^PROGRAM_NAME and -r $^PROGRAM_NAME
 	     and open my $script, '<', $^PROGRAM_NAME ) {
 	    while ( ~< $script) {
-		$has_pod = 1, last if m/^=(pod|head1)/;
+		($has_pod = 1), last if m/^=(pod|head1)/;
 	    }
 	}
 	print $h, <<EOH if $has_pod;

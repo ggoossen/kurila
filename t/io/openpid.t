@@ -45,14 +45,14 @@ our ($pid3, $pid4);
 our ($from_pid1, $from_pid2, $kill_cnt);
 
 # start the processes
-ok( my $pid1 = open(my $fh1, "-|", "$cmd1"), 'first process started');
-ok( my $pid2 = open(my $fh2, "-|", "$cmd2"), '    second' );
+ok( (my $pid1 = open(my $fh1, "-|", "$cmd1")), 'first process started');
+ok( (my $pid2 = open(my $fh2, "-|", "$cmd2")), '    second' );
 my $fh3;
 do {
     no warnings 'once';
-    ok( $pid3 = open($fh3, "|-", "$cmd3"), '    third'  );
+    ok( ($pid3 = open($fh3, "|-", "$cmd3")), '    third'  );
 };
-ok( $pid4 = open(my $fh4, "|-", "$cmd4"), '    fourth' );
+ok( ($pid4 = open(my $fh4, "|-", "$cmd4")), '    fourth' );
 
 print $^STDOUT, "# pids were $pid1, $pid2, $pid3, $pid4\n";
 

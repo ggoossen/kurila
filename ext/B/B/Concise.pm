@@ -582,7 +582,7 @@ our %priv; # used to display each opcode's BASEOP.op_private values
  %{%priv{+"entersub"}}{[@(16,32,64)]} = @("DBG","TARG","NOMOD");
  %{%priv{+$_}}{[@(4,8,128)]} = @("INARGS","AMPER","NO()") for @( ("entersub", "rv2cv"));
 %priv{+"gv"}->{+32} = "EARLYCV";
-%priv{+"aelem"}->{+16} = $: %priv{"helem"}->{+16} = "LVDEFER";
+%priv{+"aelem"}->{+16} = %priv{"helem"}->{+16} = "LVDEFER";
 %priv{+$_}->{+16} = "OURINTR" for @( ("gvsv", "rv2sv", "rv2av", "rv2hv", "r2gv",
 	"enteriter"));
 %priv{+$_}->{+16} = "TARGMY"
@@ -599,7 +599,7 @@ our %priv; # used to display each opcode's BASEOP.op_private values
        "setpriority", "time", "sleep"));
 %priv{+$_}->{+4} = "REVERSED" for @( ("enteriter", "iter"));
  %{%priv{+"const"}}{[@(4,8,16,32,64,128)]} = @("SHORT","STRICT","ENTERED",'$[',"BARE","WARN");
-%priv{+"flip"}->{+64} = $: %priv{+"flop"}->{+64} = "LINENUM";
+%priv{+"flip"}->{+64} = %priv{+"flop"}->{+64} = "LINENUM";
 %priv{+"list"}->{+64} = "GUESSED";
 %priv{+"delete"}->{+64} = "SLICE";
 %priv{+"exists"}->{+64} = "SUB";
@@ -696,7 +696,7 @@ sub concise_sv($sv, $hr, ?$preferpv) {
 
 	$hr->{+svval} = 'undef' unless defined $hr->{?svval};
 	my $out = $hr->{?svclass};
-	return $out .= " $hr->{?svval}" ; 
+	return ($out .= " $hr->{?svval}");
     }
 }
 
@@ -719,10 +719,10 @@ sub fill_srclines {
 
 sub concise_op($op, $level, $format) {
     my %h;
-    %h{+exname} = $: %h{+name} = $op->name;
+    %h{+exname} = %h{+name} = $op->name;
     %h{+NAME} = uc %h{?name};
     %h{+class} = class($op);
-    %h{+extarg} = $: %h{+targ} = $op->targ;
+    %h{+extarg} = %h{+targ} = $op->targ;
     %h{+extarg} = "" unless %h{?extarg};
     if (%h{?name} eq "null" and %h{?targ}) {
 	# targ holds the old type
@@ -730,12 +730,12 @@ sub concise_op($op, $level, $format) {
 	%h{+extarg} = "";
     } elsif ($op->name =~ m/^root$/) {
         my $refs = "ref" . (%h{?targ} != 1 ?? "s" !! "");
-        %h{+targarglife} = $: %h{+targarg} = "%h{?targ} $refs";
+        %h{+targarglife} = %h{+targarg} = "%h{?targ} $refs";
     } elsif ($op->name =~ m/^leave(sub(lv)?|write)?$/) {
 	# targ potentially holds a reference count
 	if ($op->private ^&^ 64) {
 	    my $refs = "ref" . (%h{?targ} != 1 ?? "s" !! "");
-	    %h{+targarglife} = $: %h{+targarg} = "%h{?targ} $refs";
+	    %h{+targarglife} = %h{+targarg} = "%h{?targ} $refs";
 	}
     } elsif (%h{?targ}) {
 	my $padname = (($curcv->PADLIST->ARRAY)[0]->ARRAY)[%h{?targ}];
@@ -760,11 +760,11 @@ sub concise_op($op, $level, $format) {
 		%h{+targarglife} = "%h{?targarg}:$intro,$finish";
 	    }
 	} else {
-	    %h{+targarglife} = $: %h{+targarg} = "t" . %h{?targ};
+	    %h{+targarglife} = %h{+targarg} = "t" . %h{?targ};
 	}
     }
     %h{+arg} = "";
-    %h{+svclass} = $: %h{+svaddr} = $: %h{+svval} = "";
+    %h{+svclass} = %h{+svaddr} = %h{+svval} = "";
     if (%h{?class} eq "PMOP") {
 	my $precomp = $op->precomp;
 	if (defined $precomp) {
@@ -825,13 +825,13 @@ sub concise_op($op, $level, $format) {
 	    if (%h{?class} eq "PADOP" or !${$op->sv}) {
 		my $sv = $curcv->PADLIST->ARRAY[1]->ARRAY[$idx];
 		%h{+arg} = "[" . concise_sv($sv, \%h, $preferpv) . "]";
-		%h{+targarglife} = $: %h{+targarg} = "";
+		%h{+targarglife} = %h{+targarg} = "";
 	    } else {
 		%h{+arg} = "(" . concise_sv($op->sv, \%h, $preferpv) . ")";
 	    }
 	}
     }
-    %h{+seq} = $: %h{+hyphseq} = seq($op);
+    %h{+seq} = %h{+hyphseq} = seq($op);
     %h{+seq} = "" if %h{?seq} eq "-";
     %h{+opt} = $op->opt;
     %h{+label} = %labels{?$$op};
@@ -851,7 +851,7 @@ sub concise_op($op, $level, $format) {
       %h{+hintsval} = $op->hints;
       %h{+hints} = hints_flags(%h{?hintsval});
     } else {
-      %h{+hintsval} = $: %h{+hints} = '';
+      %h{+hintsval} = %h{+hints} = '';
     }
     %h{+addr} = sprintf("\%#x", $$op);
     %h{+typenum} = $op->type;

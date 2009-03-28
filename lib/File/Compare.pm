@@ -99,7 +99,7 @@ sub compare {
 	}
 
 	my ($fr,$tr,$fbuf,$tbuf);
-	$fbuf = $: $tbuf = '';
+	$fbuf = $tbuf = '';
 	while(defined($fr = read($from_fh,$fbuf,$size)) && $fr +> 0) {
 	    unless (defined($tr = read($to_fh,$tbuf,$fr)) && $tbuf eq $fbuf) {
 		return $fail_inner->();

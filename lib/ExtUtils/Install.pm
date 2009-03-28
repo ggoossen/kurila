@@ -111,13 +111,13 @@ my $INSTALL_ROOT = env::var('PERL_INSTALL_ROOT');
 my $Curdir = File::Spec->curdir;
 my $Updir  = File::Spec->updir;
 
-sub _estr(@mess) {
+sub _estr(@< @mess) {
     return join "\n", @('!' x 72,< @mess,'!' x 72,'');
 }
 
 do {my %warned;
 sub _warnonce($first, @mess) {
-    my $msg=_estr "WARNING: $first",< @mess;
+    my $msg=_estr("WARNING: $first",< @mess);
     warn $msg unless %warned{+$msg}++;
 }};
 

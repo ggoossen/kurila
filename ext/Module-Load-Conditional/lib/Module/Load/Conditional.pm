@@ -174,7 +174,7 @@ sub check_install {
 
     ### check the inc hash if we're allowed to
     if( $CHECK_INC_HASH ) {
-        $filename = $: $href->{+'file'} = 
+        $filename = $href->{+'file'} = 
             $^INCLUDED{?$file_inc } if defined $^INCLUDED{?$file_inc };
 
         ### find the version by inspecting the package

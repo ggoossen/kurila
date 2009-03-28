@@ -11,9 +11,9 @@ dies_like(sub { my $x = \2; $$x = ~< *FH; },
 
 do {
   open my $a_fh,"+>", "a"; $a = 3;
-  is($a .= (~< $a_fh), 3, '#21628 - $a .= ~< $a_fh , A eof');
+  is(($a .= (~< $a_fh)), 3, '#21628 - $a .= ~< $a_fh , A eof');
   close $a_fh; $a = 4;
-  is($a .= (~< $a_fh), 4, '#21628 - $a .= ~< $a_fh , A closed');
+  is(($a .= (~< $a_fh)), 4, '#21628 - $a .= ~< $a_fh , A closed');
   unlink "a";
 };
 

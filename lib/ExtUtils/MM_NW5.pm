@@ -129,7 +129,7 @@ sub platform_constants {
 sub const_cccmd($self,$libperl) {
     return $self->{?CONST_CCCMD} if $self->{?CONST_CCCMD};
     return '' unless $self->needs_linking();
-    return $self->{+CONST_CCCMD} = <<'MAKE_FRAG';
+    return ($self->{+CONST_CCCMD} = <<'MAKE_FRAG');
 CCCMD = $(CC) $(CCFLAGS) $(INC) $(OPTIMIZE) \
 	$(PERLTYPE) $(MPOLLUTE) -o $@ \
 	-DVERSION=\"$(VERSION)\" -DXS_VERSION=\"$(XS_VERSION)\"

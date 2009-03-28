@@ -2342,13 +2342,13 @@ sub pp_list($self, $op, $cx) {
 	}
 	if ($lop->name =~ m/^pad[ash]v$/) {
             # my()
-            ($local = "", last) if $local =~ m/^(?:local|our|state)$/;
+            ($local = ""), last if $local =~ m/^(?:local|our|state)$/;
             $local = "my";
 	} elsif ($lop->name =~ m/^(gv|rv2)[ash]v$/
 			&& $lop->private ^&^ OPpOUR_INTRO
 		or $lop->name eq "null" && $lop->first->name eq "gvsv"
 			&& $lop->first->private ^&^ OPpOUR_INTRO) { # our()
-	    ($local = "", last) if $local =~ m/^(?:my|local|state)$/;
+	    ($local = ""), last if $local =~ m/^(?:my|local|state)$/;
 	    $local = "our";
 	} elsif ($lop->name ne "undef"
 		# specifically avoid the "reverse sort" optimisation,
@@ -2356,7 +2356,7 @@ sub pp_list($self, $op, $cx) {
 		&& !($lop->name eq 'sort' && ($lop->flags ^&^ OPpSORT_REVERSE)))
 	{
 	    # local()
-	    ($local = "", last) if $local =~ m/^(?:my|our|state)$/;
+	    ($local = ""), last if $local =~ m/^(?:my|our|state)$/;
 	    $local = "local";
 	}
     } continue {

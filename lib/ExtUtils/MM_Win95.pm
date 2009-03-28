@@ -88,7 +88,7 @@ of 2K.  So we go for a more conservative value of 1K.
 sub max_exec_len {
     my $self = shift;
 
-    return $self->{+_MAX_EXEC_LEN} ||= 1024;
+    return ($self->{+_MAX_EXEC_LEN} ||= 1024);
 }
 
 

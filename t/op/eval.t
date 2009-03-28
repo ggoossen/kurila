@@ -218,7 +218,7 @@ do {
 # DAPM Nov-2002. Perl should now capture the full lexical context during
 # evals.
 
-$::zzz = $: $::zzz = 0;
+$::zzz = $::zzz = 0;
 my $zzz = 1;
 
 eval q{

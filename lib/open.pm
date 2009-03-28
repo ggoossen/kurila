@@ -71,7 +71,7 @@ sub import($class,@< @args) {
 	elsif ($type eq 'IO') {
 	    _drop_oldenc($^STDIN,  < @val);
 	    _drop_oldenc($^STDOUT, < @val);
-	    $in = $: $out = join(' ', @val);
+	    $in = $out = join(' ', @val);
 	}
 	else {
 	    die "Unknown PerlIO layer class '$type'";

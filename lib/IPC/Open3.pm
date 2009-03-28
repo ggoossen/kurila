@@ -189,8 +189,8 @@ sub _open3 {
     # tchrist 5-Mar-00
 
     unless (try  {
-	$dad_wtr = $: @_[1] = gensym unless defined $dad_wtr;
-	$dad_rdr = $: @_[2] = gensym unless defined $dad_rdr;
+	$dad_wtr = @_[1] = gensym unless defined $dad_wtr;
+	$dad_rdr = @_[2] = gensym unless defined $dad_rdr;
 	1; }) 
     {
 	# must strip crud for die to add back, or looks ugly

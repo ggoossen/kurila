@@ -5,7 +5,7 @@ plan( tests => 9 );
 
 our (@oops, @ops, %files, $not, @glops, $x);
 
-@oops = $: @ops = glob("op/*");
+@oops = @ops = glob("op/*");
 
 if ($^OS_NAME eq 'MSWin32') {
   map { %files{+lc($_)}++ }, @( glob( <"op/*"));
@@ -16,7 +16,7 @@ elsif ($^OS_NAME eq 'VMS') {
   map { s/;.*$//; delete %files{lc($_)}; }, split m/[\n]/, `directory/noheading/notrailing/versions=1 [.op]`,
 }
 elsif ($^OS_NAME eq 'MacOS') {
-  @oops = $: @ops = glob ":op:*";
+  @oops = @ops = glob ":op:*";
   map { %files{+$_}++ }, glob(":op:*");
   map { delete %files{$_} }, split m/[\s\n]/, `echo :op:\x[c5]`;
 }
@@ -40,7 +40,7 @@ cmp_ok("$(join ' ',@glops)",'eq',"$(join ' ',@oops)",'glob operator 2');
 do {
     my $f = 0;
     my $ok = 1;
-    $ok = 0, undef $f while $x = $f||$f;
+    ($ok = 0), undef $f while $x = $f||$f;
     ok($ok,'test definedness with LOGOP');
 };
 

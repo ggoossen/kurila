@@ -168,7 +168,7 @@ do {
 		my @bee = @( my @bee = qw(foo bar burbl blah) );
 		is((join ' ',@bee), "foo bar burbl blah");		# 57
 		do {
-		    my @bim = $: my @bee = qw(foo bar);
+		    my @bim = my @bee = qw(foo bar);
 		    is((join ' ',@bee), "foo bar");			# 58
 		    is((join ' ',@bim), "foo bar");			# 59
 		};
@@ -192,10 +192,10 @@ do {
 	    our @bee = @('XXX',< @bee,'YYY');
 	    is((join ' ',@bee), "XXX bar burbl blah YYY");
 	    do {
-		our @bee = $: our @bee = qw(foo bar burbl blah);
+		our @bee = our @bee = qw(foo bar burbl blah);
 		is((join ' ',@bee), "foo bar burbl blah");
 		do {
-		    our @bim = $: our @bee = qw(foo bar);
+		    our @bim = our @bee = qw(foo bar);
 		    is((join ' ',@bee), "foo bar");
 		    is((join ' ',@bim), "foo bar");
 		};

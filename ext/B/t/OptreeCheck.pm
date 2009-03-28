@@ -490,7 +490,7 @@ sub label($tc) {
     foreach (qw( note prog code )) {
 	$buf .= " $_: $tc->{?$_}" if $tc->{?$_} and not ref $tc->{?$_};
     }
-    return $tc->{+name} = $buf;
+    return ($tc->{+name} = $buf);
 }
 
 #################

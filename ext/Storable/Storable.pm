@@ -84,10 +84,10 @@ my $CAN_FLOCK;
 sub CAN_FLOCK {
 	return $CAN_FLOCK if defined $CAN_FLOCK;
 	require Config;
-	return $CAN_FLOCK =
+	return ($CAN_FLOCK =
 		Config::config_value('d_flock') ||
 		Config::config_value('d_fcntl_can_lock') ||
-		Config::config_value('d_lockf');
+		Config::config_value('d_lockf'));
 }
 
 sub show_file_magic {

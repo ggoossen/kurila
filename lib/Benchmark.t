@@ -200,7 +200,7 @@ do {
     is ($got, '', "format 'none' should suppress output");
 };
 
-$foo = $: $bar = $: $baz = 0;
+$foo = $bar = $baz = 0;
 $out = "";
 $got = do_with_out({ timethese($iterations, \%( Foo => sub {++$foo}, Bar => '++$main::bar',
                                 Baz => sub {++$baz} )) });
@@ -230,7 +230,7 @@ my $code_to_test =  \%( Foo => sub {$foo+=fib($ballast-2)},
 # Keep these for later.
 my $results;
 do {
-    $foo = $: $bar = 0;
+    $foo = $bar = 0;
     $out = "";
     my $start = times;
     $results = do_with_out({ timethese(-0.1, $code_to_test, 'none') });
@@ -387,7 +387,7 @@ do {
 };
 
 do {
-    $foo = $: $bar = 0;
+    $foo = $bar = 0;
     $out = "";
     my $chart = do_with_out({ cmpthese( 10, $code_to_test, 'nop' ) });
     ok ($foo +> 0, "Foo code was run");
@@ -406,7 +406,7 @@ do {
 };
 
 do {
-    $foo = $: $bar = 0;
+    $foo = $bar = 0;
     $out = "";
     my $chart = do_with_out({ cmpthese( 10, $code_to_test, 'none' ) });
     ok ($foo +> 0, "Foo code was run");
@@ -425,7 +425,7 @@ do {
 };
 
 do {
-    $foo = $: $bar = 0;
+    $foo = $bar = 0;
     $out = "";
     my $chart = do_with_out({ cmpthese( $results ) });
     is ($foo, 0, "Foo code was not run");
@@ -438,7 +438,7 @@ do {
 };
 
 do {
-    $foo = $: $bar = 0;
+    $foo = $bar = 0;
     $out = "";
     my $chart = do_with_out({ cmpthese( $results, 'none' ) });
     is ($foo, 0, "Foo code was not run");

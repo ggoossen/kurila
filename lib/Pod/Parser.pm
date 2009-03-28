@@ -820,7 +820,7 @@ sub parse_text {
                     $ldelim = @seq_stack[-1]->ldelim;
                     $rdelim = @seq_stack[-1]->rdelim;
                 } else {
-                    $cmd = $: $ldelim = $: $rdelim = '';
+                    $cmd = $ldelim = $rdelim = '';
                 }
             }
         }
@@ -1524,7 +1524,7 @@ sub _push_input_stream($self, $in_fh, $out_fh) {
     $in_fh            = $^STDIN      unless (defined  $in_fh);
     %myData{+_INFILE}  = '(unknown)'  unless (defined  %myData{?_INFILE});
     %myData{+_INPUT}   = $in_fh;
-    my $input_top     = $: %myData{+_TOP_STREAM}
+    my $input_top     = %myData{+_TOP_STREAM}
                       = Pod::InputSource->new(
                             name        => %myData{?_INFILE},
                             handle      => $in_fh,
@@ -1575,7 +1575,7 @@ sub _pop_input_stream($self) {
     ## Dont forget to reset the input indicators
     my $input_top = undef;
     if ((nelems @input_stack) +> 0) {
-       $input_top = $: %myData{+_TOP_STREAM} = @input_stack[-1];
+       $input_top = %myData{+_TOP_STREAM} = @input_stack[-1];
        %myData{+_INFILE}  = $input_top->name();
        %myData{+_INPUT}   = $input_top->handle();
     } else {

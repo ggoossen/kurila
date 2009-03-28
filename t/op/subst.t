@@ -280,7 +280,7 @@ ok( $_ eq '.aaa' && $snum == 1 );
 
 eval q% ($_ = "x") =~ s/(.)/$("$1 ")/ %;
 ok( $_ eq "x " and !length $^EVAL_ERROR );
-$x = $: $x = 'interp';
+$x = $x = 'interp';
 eval q% ($_ = "x") =~ s/x(($x)*)/$(eval "$1")/ %;
 ok( $_ eq '' and !length $^EVAL_ERROR );
 
@@ -294,7 +294,7 @@ ok( $_ eq "C B" && $snum == 12 );
 do {
     use utf8;
     my $s = "H\303\266he";
-    my $l = $: my $r = $s;
+    my $l = my $r = $s;
     $l =~ s/[^\w]//g;
     $r =~ s/[^\w\.]//g;
     is($l, $r, "use utf8 \\w");
@@ -302,7 +302,7 @@ do {
 
 use utf8;
 
-my $pv1 = $: my $pv2  = "Andreas J. K\303\266nig";
+my $pv1 = my $pv2  = "Andreas J. K\303\266nig";
 $pv1 =~ s/A/\x{100}/;
 substr($pv2,0,1, "\x{100}");
 is($pv1, $pv2);

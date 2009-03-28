@@ -139,7 +139,7 @@ sub openlog(?$ident, ?my $logopt, ?$facility) {
 }
 
 sub closelog {
-    $facility = $: $ident = '';
+    $facility = $ident = '';
     disconnect_log();
 } 
 

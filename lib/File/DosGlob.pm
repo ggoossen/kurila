@@ -159,7 +159,7 @@ sub doglob_Mac {
 	$tmp_tail =~ s/(\\*)([*?])/$($2 x ((length($1) + 1) % 2))/g;
 	
 	unless ($tmp_tail =~ m/[*?]/) { # if there are wildcards ...
-	    $not_esc_head = $: $head = '' if $head eq ':';
+	    $not_esc_head = $head = '' if $head eq ':';
 	    my $not_esc_tail = $_;
 	    # unescape $head and $tail for file operations
 	    $not_esc_tail =~ s/\\([*?\\])/$1/g;

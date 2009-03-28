@@ -110,7 +110,7 @@ sub guess_name($self) {
         %xs = %( < @+: map { s/.xs$//; @($_,1) }, @( glob( <'*.xs')) );  ## no critic
         if (keys %xs) { 
             foreach my $pm ( @pm) { 
-                $defpm = $pm, last if exists %xs{$pm}; 
+                ($defpm = $pm), last if exists %xs{$pm}; 
             } 
         }
       }
@@ -732,11 +732,11 @@ sub cflags($self,$libperl) {
 	}
     }
 
-    return $self->{+CFLAGS} = qq{
+    return ($self->{+CFLAGS} = qq{
 CCFLAGS = $self->{?CCFLAGS}
 OPTIMIZE = $self->{?OPTIMIZE}
 PERLTYPE = $self->{?PERLTYPE}
-};
+});
 }
 
 =item const_cccmd (override)
@@ -1619,7 +1619,7 @@ sub prefixify($self, $var, $sprefix, $rprefix, $default) {
     }
 
     print $^STDOUT, "    now $path\n" if $Verbose +>= 2;
-    return $self->{+uc $var} = $path;
+    return ($self->{+uc $var} = $path);
 }
 
 
@@ -1752,7 +1752,7 @@ sub escape_newlines($self, $text) {
 sub max_exec_len {
     my $self = shift;
 
-    return $self->{+_MAX_EXEC_LEN} ||= 256;
+    return ($self->{+_MAX_EXEC_LEN} ||= 256);
 }
 
 =item init_linker

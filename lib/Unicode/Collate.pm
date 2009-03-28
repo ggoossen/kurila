@@ -191,7 +191,7 @@ sub checkCollator {
 
     $self->{+variable} ||= $self->{?alternate} || $self->{?variableTable} ||
 				$self->{?alternateTable} || 'shifted';
-    $self->{+variable} = $: $self->{+alternate} = lc($self->{?variable});
+    $self->{+variable} = $self->{+alternate} = lc($self->{?variable});
     exists %VariableOK{ $self->{?variable} }
 	or die "$PACKAGE unknown variable parameter name: $self->{?variable}";
 

@@ -176,7 +176,7 @@ some text
 EOM
 
     my $x;
-    ok $x = IO::Compress::Gzip->new( $name, < %opts) 
+    ok($x = IO::Compress::Gzip->new( $name, < %opts))
         or diag "GzipError is $IO::Compress::Gzip::GzipError" ;
     ok $x->write($string) ;
     ok $x->close ;
@@ -184,10 +184,10 @@ EOM
     #is GZreadFile($name), $string ;
 
     my $gunz;
-    ok $gunz = IO::Uncompress::Gunzip->new( $name, Strict => 0)
+    ok($gunz = IO::Uncompress::Gunzip->new( $name, Strict => 0))
         or diag "GunzipError is $IO::Uncompress::Gunzip::GunzipError" ;
     my $hdr;
-    ok $hdr = $gunz->getHeaderInfo();
+    ok($hdr = $gunz->getHeaderInfo());
     my $uncomp ;
     ok $gunz->read($uncomp) ;
     ok $uncomp eq $string;

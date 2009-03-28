@@ -19,7 +19,7 @@ $Data::Dumper::Indent = 0;
 $Data::Dumper::Terse = 1;
 $Data::Dumper::Sortkeys = 1;
 
-$want_colon = $: $want_comma = $WANT;
+$want_colon = $want_comma = $WANT;
 $want_colon =~ s/=>/:/g;
 $want_comma =~ s/ => /,/g;
 

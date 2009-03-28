@@ -57,9 +57,9 @@ sub make {
 package main;
 
 our $foo = FOO->make;
-ok our $f2 = $foo->freeze;
+ok(our $f2 = $foo->freeze);
 
-ok our $f3 = $foo->nfreeze;
+ok(our $f3 = $foo->nfreeze);
 
 our $root3 = thaw($f3);
 ok defined $root3;
