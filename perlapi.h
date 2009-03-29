@@ -550,6 +550,8 @@ END_EXTERN_C
 #define PL_statbuf		(*Perl_Istatbuf_ptr(aTHX))
 #undef  PL_statcache
 #define PL_statcache		(*Perl_Istatcache_ptr(aTHX))
+#undef  PL_statio
+#define PL_statio		(*Perl_Istatio_ptr(aTHX))
 #undef  PL_statname
 #define PL_statname		(*Perl_Istatname_ptr(aTHX))
 #undef  PL_statusvalue

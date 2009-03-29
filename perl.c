@@ -758,6 +758,7 @@ perl_destruct(pTHXx)
     CopSTASH_free(&PL_compiling);
 
     SVcpNULL(PL_dynamicscope);
+    IOcpNULL(PL_statio);
 
     /* Prepare to destruct main symbol table.  */
 

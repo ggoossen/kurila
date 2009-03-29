@@ -2069,6 +2069,7 @@ PP(pp_stat)
       do_fstat:
 	if (gv != PL_defgv) {
 	    PL_laststype = OP_STAT;
+	    IOcpREPLACE(PL_statio, gv_io(gv));
 	    sv_setpvn(PL_statname, "", 0);
             if(gv) {
                 io = GvIO(gv);
@@ -2111,6 +2112,7 @@ PP(pp_stat)
         }
         
 	sv_setpv(PL_statname, SvPV_nolen_const(sv));
+	IOcpNULL(PL_statio);
 	PL_laststype = PL_op->op_type;
 	if (PL_op->op_type == OP_LSTAT)
 	    PL_laststatval = PerlLIO_lstat(SvPV_nolen_const(PL_statname), &PL_statcache);
@@ -2451,7 +2453,7 @@ PP(pp_fttty)
     STACKED_FTEST_CHECK;
 
     if (PL_op->op_flags & OPf_REF)
-	io = gv_io(cGVOP_gv);
+	io = PL_statio;
     else if (isGV(TOPs))
 	io = gv_io(svTgv(POPs));
     else if (SvROK(TOPs) && isGV(SvRV(TOPs)))
@@ -2495,25 +2497,34 @@ PP(pp_fttext)
     I32 odd = 0;
     STDCHAR tbuf[512];
     register STDCHAR *s;
-    register IO *io;
+    register IO *io = NULL;
     register SV *sv;
     PerlIO *fp;
 
     STACKED_FTEST_CHECK;
 
-    if (! SvPVOK(TOPs) ) {
-	if (isGV(TOPs))
-	    io = gv_io(svTgv(POPs));
-	else if (SvROK(TOPs) && isGV(SvRV(TOPs)))
-	    io = gv_io(svTgv(SvRV(POPs)));
-	else if (SvROK(TOPs) && SvIOOK(SvRV(TOPs)))
-	    io = svTio(SvRV(POPs));
-	else 
-	    Perl_croak(aTHX_ "%s expected a filehandle but got %s",
-		OP_DESC(PL_op), Ddesc(TOPs));
+    if (PL_op->op_flags & OPf_REF) {
+	io = PL_statio;
+	if (! io)
+	    goto really_filename;
+    }
+
+    if (io || ! SvPVOK(TOPs) ) {
+	if ( ! io ) {
+	    if (isGV(TOPs))
+		io = gv_io(svTgv(POPs));
+	    else if (SvROK(TOPs) && isGV(SvRV(TOPs)))
+		io = gv_io(svTgv(SvRV(POPs)));
+	    else if (SvROK(TOPs) && SvIOOK(SvRV(TOPs)))
+		io = svTio(SvRV(POPs));
+	    else 
+		Perl_croak(aTHX_ "%s expected a filehandle but got %s",
+		    OP_DESC(PL_op), Ddesc(TOPs));
+	}
 
 	EXTEND(SP, 1);
 	PL_laststatval = -1;
+	IOcpREPLACE(PL_statio, io);
 	sv_setpvn(PL_statname, "", 0);
 	if (io && IoIFP(io)) {
 	    if (! PerlIO_has_base(IoIFP(io)))
@@ -2550,8 +2561,10 @@ PP(pp_fttext)
     }
     else {
 	sv = POPs;
-	PL_laststype = OP_STAT;
+	IOcpNULL(PL_statio);
 	sv_setpv(PL_statname, SvPV_nolen_const(sv));
+      really_filename:
+	PL_laststype = OP_STAT;
 	if (!(fp = PerlIO_open(SvPVX_const(PL_statname), "r"))) {
 	    if (ckWARN(WARN_NEWLINE) && strchr(SvPV_nolen_const(PL_statname),
 					       '\n'))

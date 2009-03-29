@@ -257,6 +257,7 @@
 #define PL_stashcache		(vTHX->Istashcache)
 #define PL_statbuf		(vTHX->Istatbuf)
 #define PL_statcache		(vTHX->Istatcache)
+#define PL_statio		(vTHX->Istatio)
 #define PL_statname		(vTHX->Istatname)
 #define PL_statusvalue		(vTHX->Istatusvalue)
 #define PL_statusvalue_posix	(vTHX->Istatusvalue_posix)
@@ -536,6 +537,7 @@
 #define PL_Istashcache		PL_stashcache
 #define PL_Istatbuf		PL_statbuf
 #define PL_Istatcache		PL_statcache
+#define PL_Istatio		PL_statio
 #define PL_Istatname		PL_statname
 #define PL_Istatusvalue		PL_statusvalue
 #define PL_Istatusvalue_posix	PL_statusvalue_posix
