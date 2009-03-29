@@ -124,7 +124,7 @@ tell() on closed filehandle STDIN at - line 4 character 1.
 seek() on closed filehandle STDIN at - line 5 character 6.
 sysseek() on closed filehandle STDIN at - line 6 character 6.
 -x on closed filehandle STDIN at - line 7 character 2.
-stat() on unopened filehandle at - line 8 character 1.
+stat() on closed filehandle STDIN at - line 8 character 1.
 tell() on unopened filehandle at - line 10 character 1.
 seek() on unopened filehandle at - line 11 character 1.
 sysseek() on unopened filehandle at - line 12 character 1.

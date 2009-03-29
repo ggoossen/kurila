@@ -2054,74 +2054,70 @@ PP(pp_stat)
 {
     dVAR;
     dSP;
-    GV *gv = NULL;
     IO *io;
     I32 gimme;
     I32 max = 13;
 
-    if (PL_op->op_flags & OPf_REF) {
-	gv = cGVOP_gv;
-	if (PL_op->op_type == OP_LSTAT) {
-	    if (PL_laststype != OP_LSTAT)
-		Perl_croak(aTHX_ "The stat preceding lstat() wasn't an lstat");
-	}
-
-      do_fstat:
-	if (gv != PL_defgv) {
-	    PL_laststype = OP_STAT;
-	    IOcpREPLACE(PL_statio, gv_io(gv));
-	    sv_setpvn(PL_statname, "", 0);
-            if(gv) {
-                io = GvIO(gv);
-                do_fstat_have_io:
-                if (io) {
-                    if (IoIFP(io)) {
-                        PL_laststatval = 
-                            PerlLIO_fstat(PerlIO_fileno(IoIFP(io)), &PL_statcache);   
-                    } else if (IoDIRP(io)) {
-                        PL_laststatval =
-                            PerlLIO_fstat(my_dirfd(IoDIRP(io)), &PL_statcache);
-                    } else {
-                        PL_laststatval = -1;
-                    }
-	        }
-            }
-        }
-
-	if (PL_laststatval < 0) {
-	    if (ckWARN2(WARN_UNOPENED,WARN_CLOSED))
-		report_evil_fh(GvIO(gv), PL_op->op_type);
-	    max = 0;
-	}
+    if ( PL_op->op_flags & OPf_REF) {
+	if (PL_op->op_type == OP_LSTAT && PL_laststype != OP_LSTAT)
+	    Perl_croak(aTHX_ "The stat preceding lstat() wasn't an lstat");
     }
     else {
-	SV* const sv = POPs;
-	if (SvTYPE(sv) == SVt_PVGV) {
-	    gv = (GV*)sv;
-	    goto do_fstat;
-	} else if(SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVGV) {
-            gv = (GV*)SvRV(sv);
-            if (PL_op->op_type == OP_LSTAT)
-                goto do_fstat;
-            goto do_fstat;
-        } else if (SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVIO) { 
-            io = (IO*)SvRV(sv);
-            if (PL_op->op_type == OP_LSTAT)
-                goto do_fstat;
-            goto do_fstat_have_io; 
-        }
+	if (0) {
+	  do_fstat:
+	    if (PL_op->op_type == OP_LSTAT) {
+		if (ckWARN(WARN_IO))
+		    Perl_warner(aTHX_ packWARN(WARN_IO),
+			"lstat() on filehandle %s",
+			io ? SvPVX_const(loc_desc(ioTsv(io))) : "");
+	    }
+
+	    PL_laststype = OP_STAT;
+	    IOcpREPLACE(PL_statio, io);
+	    sv_setpvn(PL_statname, "", 0);
+	    if (io) {
+		if (IoIFP(io)) {
+		    PL_laststatval = 
+			PerlLIO_fstat(PerlIO_fileno(IoIFP(io)), &PL_statcache);   
+		} else if (IoDIRP(io)) {
+		    PL_laststatval =
+			PerlLIO_fstat(my_dirfd(IoDIRP(io)), &PL_statcache);
+		} else {
+		    PL_laststatval = -1;
+		}
+	    }
+
+	    if (PL_laststatval < 0) {
+		if (ckWARN2(WARN_UNOPENED,WARN_CLOSED))
+		    report_evil_fh(io, PL_op->op_type);
+		max = 0;
+	    }
+	}
+	else {
+	    SV* const sv = POPs;
+	    if (SvTYPE(sv) == SVt_PVGV) {
+		io = gv_io(svTgv(sv));
+		goto do_fstat;
+	    } else if(SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVGV) {
+		io = gv_io(svTgv(SvRV(sv)));
+		goto do_fstat;
+	    } else if (SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVIO) { 
+		io = (IO*)SvRV(sv);
+		goto do_fstat; 
+	    }
         
-	sv_setpv(PL_statname, SvPV_nolen_const(sv));
-	IOcpNULL(PL_statio);
-	PL_laststype = PL_op->op_type;
-	if (PL_op->op_type == OP_LSTAT)
-	    PL_laststatval = PerlLIO_lstat(SvPV_nolen_const(PL_statname), &PL_statcache);
-	else
-	    PL_laststatval = PerlLIO_stat(SvPV_nolen_const(PL_statname), &PL_statcache);
-	if (PL_laststatval < 0) {
-	    if (ckWARN(WARN_NEWLINE) && strchr(SvPV_nolen_const(PL_statname), '\n'))
-		Perl_warner(aTHX_ packWARN(WARN_NEWLINE), PL_warn_nl, "stat");
-	    max = 0;
+	    sv_setpv(PL_statname, SvPV_nolen_const(sv));
+	    IOcpNULL(PL_statio);
+	    PL_laststype = PL_op->op_type;
+	    if (PL_op->op_type == OP_LSTAT)
+		PL_laststatval = PerlLIO_lstat(SvPV_nolen_const(PL_statname), &PL_statcache);
+	    else
+		PL_laststatval = PerlLIO_stat(SvPV_nolen_const(PL_statname), &PL_statcache);
+	    if (PL_laststatval < 0) {
+		if (ckWARN(WARN_NEWLINE) && strchr(SvPV_nolen_const(PL_statname), '\n'))
+		    Perl_warner(aTHX_ packWARN(WARN_NEWLINE), PL_warn_nl, "stat");
+		max = 0;
+	    }
 	}
     }
 
