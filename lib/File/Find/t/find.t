@@ -301,7 +301,6 @@ sub file_path_name {
 }
 
 
-
 MkDir( dir_path('for_find'), 0770 );
 CheckDie(chdir( dir_path('for_find')));
 MkDir( dir_path('fa'), 0770 );
