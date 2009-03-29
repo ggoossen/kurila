@@ -271,7 +271,7 @@ stat($^STDIN);
 stat(\*POCUS);
 EXPECT
 -T on closed filehandle STDIN at - line 4 character 2.
-stat() on unopened filehandle at - line 5 character 1.
+stat() on closed filehandle STDIN at - line 5 character 1.
 -T on unopened filehandle at - line 6 character 2.
 stat() on unopened filehandle at - line 7 character 1.
 ########
@@ -327,7 +327,7 @@ no warnings 'io';
 lstat $fh;
 close $fh;
 EXPECT
-lstat() on filehandle $fh at - line 4 character 1.
+lstat() on filehandle  at - line 4 character 1.
 ########
 # pp_sys.c [pp_sselect]
 use warnings 'misc';

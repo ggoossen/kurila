@@ -115,7 +115,7 @@ no warnings 'deprecated' ;
 $a = <<;
 
 EXPECT
-Use of bare << to mean <<"" is deprecated at - line 3 character 5.
+Use of bare << to mean <<"" is deprecated at - line 3 character 6.
 ########
 # toke.c
 use warnings 'syntax' ;
@@ -255,26 +255,26 @@ $a = 1__23; print $^STDOUT, "$a\n";
 $a = 12.3__4; print $^STDOUT, "$a\n";
 $a = 12.34e1__2; printf($^STDOUT, "%.0f\n", $a);
 EXPECT
-Misplaced _ in number at - line 6 character 5.
-Misplaced _ in number at - line 11 character 5.
+Misplaced _ in number at - line 6 character 6.
+Misplaced _ in number at - line 11 character 6.
 Misplaced _ in number at - line 16 character 7.
-Misplaced _ in number at - line 17 character 5.
-Misplaced _ in number at - line 20 character 5.
-Misplaced _ in number at - line 21 character 5.
-Misplaced _ in number at - line 24 character 5.
+Misplaced _ in number at - line 17 character 6.
+Misplaced _ in number at - line 20 character 6.
+Misplaced _ in number at - line 21 character 6.
+Misplaced _ in number at - line 24 character 6.
 Misplaced _ in number at - line 25 character 7.
 Misplaced _ in number at - line 28 character 7.
-Misplaced _ in number at - line 29 character 5.
-Misplaced _ in number at - line 31 character 5.
-Misplaced _ in number at - line 32 character 5.
-Misplaced _ in number at - line 33 character 5.
-Misplaced _ in number at - line 35 character 5.
-Misplaced _ in number at - line 36 character 5.
-Misplaced _ in number at - line 37 character 5.
-Misplaced _ in number at - line 39 character 5.
-Misplaced _ in number at - line 40 character 5.
-Misplaced _ in number at - line 41 character 5.
-Misplaced _ in number at - line 42 character 5.
+Misplaced _ in number at - line 29 character 6.
+Misplaced _ in number at - line 31 character 6.
+Misplaced _ in number at - line 32 character 6.
+Misplaced _ in number at - line 33 character 6.
+Misplaced _ in number at - line 35 character 6.
+Misplaced _ in number at - line 36 character 6.
+Misplaced _ in number at - line 37 character 6.
+Misplaced _ in number at - line 39 character 6.
+Misplaced _ in number at - line 40 character 6.
+Misplaced _ in number at - line 41 character 6.
+Misplaced _ in number at - line 42 character 6.
 
 123
 123
@@ -380,7 +380,7 @@ yelp at foo line 30 character 18.
 # toke.c
 my $a = rand - 4 ;
 EXPECT
-Warning: Use of "rand" without parentheses is ambiguous at - line 2 character 13.
+Warning: Use of "rand" without parentheses is ambiguous at - line 2 character 14.
 ########
 # toke.c
 $^WARNING = 0 ;
@@ -393,9 +393,9 @@ do {
 };
 $a = rand - 4 ;
 EXPECT
-Warning: Use of "rand" without parentheses is ambiguous at - line 3 character 13.
-Warning: Use of "rand" without parentheses is ambiguous at - line 8 character 14.
-Warning: Use of "rand" without parentheses is ambiguous at - line 10 character 10.
+Warning: Use of "rand" without parentheses is ambiguous at - line 3 character 14.
+Warning: Use of "rand" without parentheses is ambiguous at - line 8 character 15.
+Warning: Use of "rand" without parentheses is ambiguous at - line 10 character 11.
 ########
 # toke.c
 sub fred {};
@@ -462,9 +462,9 @@ no warnings 'portable' ;
    $a =  0037777777777 ;
    $a =  0047777777777 ;
 EXPECT
-Binary number > 0b11111111111111111111111111111111 non-portable at - line 5 character 8.
-Hexadecimal number > 0xffffffff non-portable at - line 8 character 8.
-Octal number > 037777777777 non-portable at - line 11 character 8.
+Binary number > 0b11111111111111111111111111111111 non-portable at - line 5 character 10.
+Hexadecimal number > 0xffffffff non-portable at - line 8 character 10.
+Octal number > 037777777777 non-portable at - line 11 character 10.
 ########
 # toke.c
 use warnings 'overflow' ;
@@ -488,9 +488,9 @@ no warnings 'overflow' ;
    $a =  0037777777777 ;
    $a =  002000000000000000000000;
 EXPECT
-Integer overflow in binary number at - line 5 character 8.
-Integer overflow in hexadecimal number at - line 8 character 8.
-Integer overflow in octal number at - line 11 character 8.
+Integer overflow in binary number at - line 5 character 10.
+Integer overflow in hexadecimal number at - line 8 character 10.
+Integer overflow in octal number at - line 11 character 10.
 ########
 # toke.c
 # 20020328 mjd-perl-patch+@plover.com at behest of jfriedl@yahoo.com
@@ -534,7 +534,7 @@ EXPECT
 Number found where operator expected at (eval 1) line 1, near "5 6"
  at (eval 1) line 1 character 4.
     (eval) called at - line 3 character 1.
-	(Missing operator before  6?)
+	(Missing operator before 6?)
  at (eval 1) line 1 character 4.
     (eval) called at - line 3 character 1.
 ########
