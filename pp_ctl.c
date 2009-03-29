@@ -898,8 +898,7 @@ PP(pp_return)
 
     POPBLOCK(cx,newpm);
 
-    assert(gimme != G_ARRAY);
-    if (gimme == G_SCALAR) {
+    if (gimme != G_VOID) {
 	if (PL_op->op_flags & OPf_STACKED) {
 	    if (CxTYPE(cx) == CXt_SUB) {
 		if (cx->blk_sub.cv && CvDEPTH(cx->blk_sub.cv) > 1) {
