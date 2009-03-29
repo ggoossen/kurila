@@ -67,7 +67,7 @@ Perl_vdeb(pTHX_ const char *pat, va_list *args)
 	if (loc && SvAVOK(loc)) {
 	    SV ** loc0 = av_fetch((AV*)loc, 0, FALSE);
 	    SV ** loc1 = av_fetch((AV*)loc, 1, FALSE);
-	    if (SvPOK(*loc0))
+	    if (SvPVOK(*loc0))
 		file = SvPVX_const(*loc0);
 	    if (SvIOK(*loc1))
 		line = SvIV(*loc1);

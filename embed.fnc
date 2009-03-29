@@ -525,6 +525,7 @@ Apa	|OP*	|newFOROP	|OPFLAGS flags|NULLOK char* label \
 				|NULLOK OP* sv|NN OP* expr|NULLOK OP* block|NULLOK OP* cont|NULLOK SV* location
 Apa	|OP*	|newLOGOP	|I32 optype|OPFLAGS flags|NN OP *first|NN OP *other|NULLOK SV* location
 Apa	|OP*	|newLOOPEX	|I32 type|NN OP* label
+Apa	|OP*	|newPRIVATEVAROP	|NN const char* varname|NULLOK SV* location
 Apa	|OP*	|newLOOPOP	|OPFLAGS flags|I32 debuggable|NULLOK OP* expr|NULLOK OP* block|bool once|NULLOK SV* location
 Apa	|OP*	|newNULLLIST	|NULLOK SV *location
 Apa	|OP*	|newOP		|I32 optype|OPFLAGS flags|NULLOK SV* location

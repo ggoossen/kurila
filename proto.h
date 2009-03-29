@@ -1823,6 +1823,13 @@ PERL_CALLCONV OP*	Perl_newLOOPEX(pTHX_ I32 type, OP* label)
 #define PERL_ARGS_ASSERT_NEWLOOPEX	\
 	assert(label)
 
+PERL_CALLCONV OP*	Perl_newPRIVATEVAROP(pTHX_ const char* varname, SV* location)
+			__attribute__malloc__
+			__attribute__warn_unused_result__
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_NEWPRIVATEVAROP	\
+	assert(varname)
+
 PERL_CALLCONV OP*	Perl_newLOOPOP(pTHX_ OPFLAGS flags, I32 debuggable, OP* expr, OP* block, bool once, SV* location)
 			__attribute__malloc__
 			__attribute__warn_unused_result__;
@@ -4046,12 +4053,6 @@ PERL_CALLCONV OP*	Perl_ck_require(pTHX_ OP *o)
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_CK_REQUIRE	\
-	assert(o)
-
-PERL_CALLCONV OP*	Perl_ck_return(pTHX_ OP *o)
-			__attribute__warn_unused_result__
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_CK_RETURN	\
 	assert(o)
 
 PERL_CALLCONV OP*	Perl_ck_rfun(pTHX_ OP *o)

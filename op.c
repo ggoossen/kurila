@@ -3255,6 +3255,110 @@ Perl_newLOOPEX(pTHX_ I32 type, OP *label)
     return o;
 }
 
+OP*
+Perl_newPRIVATEVAROP(pTHX_ const char* varname, SV* location) {
+    PADOFFSET tmp = 0;
+    GV* gv;
+    OP* gvop;
+    const STRLEN varname_len = strlen(varname);
+    /* All routes through this function want to know if there is a colon.  */
+    const char *const has_colon = (const char*) memchr (varname, ':', varname_len);
+    OP* o;
+
+    /* if we're in a my(), we can't allow dynamics here.
+       if it's a legal name, the OP is a PADANY.
+    */
+    if (PL_parser->in_my) {
+        if (PL_parser->in_my == KEY_our) {	/* "our" is merely analogous to "my" */
+            if (has_colon)
+                yyerror(Perl_form(aTHX_ "No package name allowed for "
+                                  "variable %s in \"our\"",
+                                  varname));
+            tmp = allocmy(varname);
+        }
+        else {
+            if (has_colon)
+                yyerror(Perl_form(aTHX_ PL_no_myglob,
+			    PL_parser->in_my == KEY_my ? "my" : "state", varname));
+
+            o = newOP(OP_PADSV, 0, location);
+            o->op_targ = allocmy(varname);
+            return o;
+        }
+    }
+
+    /*
+       build the ops for accesses to a my() variable.
+
+       Deny my($a) or my($b) in a sort block, *if* $a or $b is
+       then used in a comparison.  This catches most, but not
+       all cases.  For instance, it catches
+           sort { my($a); $a <=> $b }
+       but not
+           sort { my($a); $a < $b ? -1 : $a == $b ? 0 : 1; }
+       (although why you'd do that is anyone's guess).
+    */
+
+    if (!has_colon) {
+	if (!PL_parser->in_my)
+	    tmp = pad_findmy(varname);
+        if (tmp != NOT_IN_PAD) {
+            /* might be an "our" variable" */
+            if (PAD_COMPNAME_FLAGS_isOUR(tmp)) {
+                /* build ops for a bareword */
+		GV *  const ourgv = PAD_COMPNAME_OURGV(tmp);
+		OP * gvop = (OP*)newGVOP(OP_GV, 0, ourgv, location);
+		o = newUNOP(
+		    (*varname == '%' ? OP_RV2HV : *varname == '@' ? OP_RV2AV : OP_RV2SV),
+			0, gvop, location);
+                return o;
+            }
+
+            o = newOP(OP_PADSV, 0, location);
+            o->op_targ = tmp;
+            return o;
+        }
+    }
+
+    if (varname[1] == '^'
+	|| ( varname[1] >= '0' && varname[1] <= '9' ) ) {
+	if ( ! is_magicsv(&varname[1]) ) {
+	    Perl_croak(aTHX_ "unknown magical variable %s", varname);
+	}
+	o = newSVOP(OP_MAGICSV, 0,
+	    newSVpvn(varname+1, varname_len-1),
+	    location);
+	return o;
+    }
+
+    /* build ops for a global variable */
+    gv = gv_fetchpvn_flags(
+	    varname + 1, varname_len - 1,
+	    /* If the identifier refers to a stash, don't autovivify it.
+	     * Change 24660 had the side effect of causing symbol table
+	     * hashes to always be defined, even if they were freshly
+	     * created and the only reference in the entire program was
+	     * the single statement with the defined %foo::bar:: test.
+	     * It appears that all code in the wild doing this actually
+	     * wants to know whether sub-packages have been loaded, so
+	     * by avoiding auto-vivifying symbol tables, we ensure that
+	     * defined %foo::bar:: continues to be false, and the existing
+	     * tests still give the expected answers, even though what
+	     * they're actually testing has now changed subtly.
+	     */
+	    (PL_in_eval ? (GV_ADDMULTI | GV_ADDINEVAL) : GV_ADD),
+	    ((varname[0] == '$') ? SVt_PV
+	     : (varname[0] == '@') ? SVt_PVAV
+	     : SVt_PVHV));
+    if ( ! gv )
+	Perl_croak(aTHX_ "variable %s does not exist", varname);
+    gvop = (OP*)newGVOP(OP_GV, 0, gv, location);
+    o = newUNOP(
+	(*varname == '%' ? OP_RV2HV : *varname == '@' ? OP_RV2AV : OP_RV2SV),
+	    0, gvop, location);
+    return o;
+}
+
 /*
 =for apidoc cv_undef
 

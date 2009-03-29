@@ -316,6 +316,7 @@ Perl_newCONSTSUB
 Perl_newFOROP
 Perl_newLOGOP
 Perl_newLOOPEX
+Perl_newPRIVATEVAROP
 Perl_newLOOPOP
 Perl_newNULLLIST
 Perl_newOP

@@ -362,6 +362,9 @@ Perl_yyparse (pTHX)
 
     parser->yylen = 0;
 
+    yyval.opval = NULL;
+    yyval.i_tkval.location = NULL;
+
     {
 	size_t size = ps - parser->stack + 1;
 
@@ -474,6 +477,7 @@ Perl_yyparse (pTHX)
     parser->yylen = yyr2[yyn];
 
     yyval.opval = NULL;
+    yyval.i_tkval.location = NULL;
 
     YY_STACK_PRINT(parser);
     YY_REDUCE_PRINT (yyn);
