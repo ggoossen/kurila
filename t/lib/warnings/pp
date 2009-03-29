@@ -38,8 +38,8 @@ use warnings 'uninitialized' ;
 no warnings 'uninitialized' ;
 *y = *{ undef() };
 EXPECT
-Use of uninitialized value in ref-to-glob cast at - line 3 character 5.
-Can't use string ("") as a symbol ref while "strict refs" in use at - line 3 character 5.
+Use of uninitialized value in ref-to-glob cast at - line 3 character 6.
+Can't use string ("") as a symbol ref while "strict refs" in use at - line 3 character 6.
 ########
 # pp.c
 use warnings 'misc' ;

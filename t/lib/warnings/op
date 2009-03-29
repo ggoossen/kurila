@@ -92,7 +92,7 @@ for (@{\@(0)}) { "$_" }		# check warning isn't duplicated
 no warnings 'void' ;
 for (@{\@(0)}) { "$_" }		# check warning isn't duplicated
 EXPECT
-Useless use of string in void context at - line 3 character 17.
+Useless use of string in void context at - line 3 character 18.
 ########
 # op.c
 use warnings 'void' ;
@@ -293,8 +293,8 @@ no warnings 'void' ;
 EXPECT
 Useless use of a constant in void context at - line 3 character 6.
 Useless use of a constant in void context at - line 4 character 1.
-Useless use of a constant in void context at - line 5 character 4.
-Useless use of a constant in void context at - line 6 character 2.
+Useless use of a constant in void context at - line 5 character 5.
+Useless use of a constant in void context at - line 6 character 3.
 ########
 --FILE-- abc
 
@@ -356,7 +356,7 @@ sub fred {}
 no warnings 'redefine' ;
 sub fred {}
 EXPECT
-Subroutine fred redefined at - line 5 character 1.
+Subroutine fred redefined at - line 4 character 1.
 ########
 # op.c
 use warnings 'redefine' ;
@@ -365,7 +365,7 @@ sub fred () { 1 }
 no warnings 'redefine' ;
 sub fred () { 1 }
 EXPECT
-Constant subroutine fred redefined at - line 5 character 1.
+Constant subroutine fred redefined at - line 4 character 1.
 ########
 # op.c
 no warnings 'redefine' ;
@@ -428,15 +428,15 @@ in mainline
 in check
 in init
 in begin
-Too late to run CHECK block at abc.pm line 4 character 1.
+Too late to run CHECK block at abc.pm line 3 character 40.
     (require) called at - line 3 character 1.
-Too late to run INIT block at abc.pm line 5 character 1.
+Too late to run INIT block at abc.pm line 4 character 38.
     (require) called at - line 3 character 1.
 in mainline
 in begin
-Too late to run CHECK block at abc.pm line 4 character 1.
+Too late to run CHECK block at abc.pm line 3 character 40.
     (eval) called at - line 4 character 1.
-Too late to run INIT block at abc.pm line 5 character 1.
+Too late to run INIT block at abc.pm line 4 character 38.
     (eval) called at - line 4 character 1.
 in mainline
 in end

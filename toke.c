@@ -2785,6 +2785,7 @@ Perl_yylex(pTHX)
     PL_oldbufptr = s;
 
   retry:
+    PL_bufptr = s;
 #ifdef PERL_MAD
     if (PL_thistoken) {
 	sv_free(PL_thistoken);

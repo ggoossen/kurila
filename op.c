@@ -3632,7 +3632,9 @@ Perl_newNAMEDSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *block)
 
     if (GvCV(gv)) {
 	if (ckWARN(WARN_REDEFINE)) {
-	    Perl_warner(aTHX_ packWARN(WARN_REDEFINE),
+	    Perl_warner_at(aTHX_ 
+		SvLOCATION(cv),
+		packWARN(WARN_REDEFINE),
 		CvCONST(cv)
 		? "Constant subroutine %s redefined"
 		: "Subroutine %s redefined",
