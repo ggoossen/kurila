@@ -106,6 +106,7 @@
 %nonassoc <i_tkval> PREC_LOW
 %nonassoc LOOPEX
 
+%right <i_tkval> RETURNOP
 %left <i_tkval> OROP DOROP
 %left <i_tkval> ANDOP
 %right <i_tkval> NOTOP
@@ -1141,6 +1142,14 @@ term	:	'?' term
 			}
 	|	LOOPEX term
 			{ $$ = newLOOPEX(IVAL($1),$2);
+			  TOKEN_GETMAD($1,$$,'o');
+			}
+	|	RETURNOP expr                        /* return $foo */
+                        { $$ = newUNOP(OP_RETURN, OPf_STACKED, scalar($2), LOCATION($1));
+			  TOKEN_GETMAD($1,$$,'o');
+			}
+	|	RETURNOP
+                        { $$ = newOP(OP_RETURN, 0, LOCATION($1));
 			  TOKEN_GETMAD($1,$$,'o');
 			}
 	|	NOTOP assignexpr                        /* not $foo */

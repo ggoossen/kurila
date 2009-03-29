@@ -859,7 +859,7 @@ PP(pp_leaveloop)
 
 PP(pp_return)
 {
-    dVAR; dSP; dMARK;
+    dVAR; dSP;
     register PERL_CONTEXT *cx;
     bool clear_errsv = FALSE;
     I32 gimme;
@@ -898,8 +898,9 @@ PP(pp_return)
 
     POPBLOCK(cx,newpm);
 
+    assert(gimme != G_ARRAY);
     if (gimme == G_SCALAR) {
-	if (MARK < SP) {
+	if (PL_op->op_flags & OPf_STACKED) {
 	    if (CxTYPE(cx) == CXt_SUB) {
 		if (cx->blk_sub.cv && CvDEPTH(cx->blk_sub.cv) > 1) {
 		    if (SvTEMP(TOPs)) {
@@ -920,13 +921,8 @@ PP(pp_return)
 	    else
 		*++newsp = sv_mortalcopy(*SP);
 	}
-	else
+	else {
 	    *++newsp = &PL_sv_undef;
-    }
-    else if (gimme == G_ARRAY) {
-	while (++MARK <= SP) {
-	    *++newsp = ((CxTYPE(cx) == CXt_SUB) && SvTEMP(*MARK))
-			? *MARK : sv_mortalcopy(*MARK);
 	}
     }
     PL_stack_sp = newsp;

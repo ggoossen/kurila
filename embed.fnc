@@ -1129,7 +1129,6 @@ pR	|OP*	|ck_open	|NN OP *o
 pR	|OP*	|ck_readline	|NN OP *o
 pR	|OP*	|ck_repeat	|NN OP *o
 pR	|OP*	|ck_require	|NN OP *o
-pR	|OP*	|ck_return	|NN OP *o
 pR	|OP*	|ck_rfun	|NN OP *o
 pR	|OP*	|ck_rvconst	|NN OP *o
 pR	|OP*	|ck_sassign	|NN OP *o

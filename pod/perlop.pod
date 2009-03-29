@@ -54,6 +54,7 @@ values only, not array values.
     right	not
     left	and
     left	or xor
+    right	return
 
 In the following sections, these operators are covered in precedence order.
 

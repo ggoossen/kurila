@@ -1327,7 +1327,7 @@ EXT Perl_check_t PL_check[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* iter */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* enterloop */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* leaveloop */
-	MEMBER_TO_FPTR(Perl_ck_return),	/* return */
+	MEMBER_TO_FPTR(Perl_ck_null),	/* return */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* last */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* next */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* redo */
@@ -1690,7 +1690,7 @@ EXTCONST U32 PL_opargs[] = {
 	0x00000000,	/* iter */
 	0x00001240,	/* enterloop */
 	0x00000400,	/* leaveloop */
-	0x00012841,	/* return */
+	0x00012240,	/* return */
 	0x00001a44,	/* last */
 	0x00001a44,	/* next */
 	0x00001a44,	/* redo */

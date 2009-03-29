@@ -859,7 +859,7 @@ enteriter	foreach loop entry	ck_null		d{
 iter		foreach loop iterator	ck_null		0	
 enterloop	loop entry		ck_null		d{	
 leaveloop	loop exit		ck_null		2	
-return		return			ck_return	dm@	S?
+return		return			ck_null		d1	S?
 last		last			ck_null		ds}	
 next		next			ck_null		ds}	
 redo		redo			ck_null		ds}	

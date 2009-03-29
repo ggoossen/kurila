@@ -33,7 +33,6 @@ Perl_ck_open
 Perl_ck_readline
 Perl_ck_repeat
 Perl_ck_require
-Perl_ck_return
 Perl_ck_rfun
 Perl_ck_rvconst
 Perl_ck_sassign

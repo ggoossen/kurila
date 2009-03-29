@@ -5127,16 +5127,6 @@ Perl_ck_require(pTHX_ OP *o)
 }
 
 OP *
-Perl_ck_return(pTHX_ OP *o)
-{
-    dVAR;
-
-    PERL_ARGS_ASSERT_CK_RETURN;
-
-    return ck_fun(o);
-}
-
-OP *
 Perl_ck_shift(pTHX_ OP *o)
 {
     dVAR;

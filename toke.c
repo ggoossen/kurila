@@ -246,7 +246,7 @@ static const char* const lex_state_names[] = {
 	}
 
 /* grandfather return to old style */
-#define OLDLOP(f) SETCURLOCATION( return(pl_yylval.i_tkval.ival=f,PL_expect = XTERM,PL_bufptr = s,(int)LSTOP); )
+#define RETURNop(f) SETCURLOCATION( return(pl_yylval.i_tkval.ival=f,PL_expect = XTERM,PL_bufptr = s,(int)RETURNOP); )
 
 #ifdef DEBUGGING
 
@@ -5274,7 +5274,7 @@ Perl_yylex(pTHX)
 	    TERM(sublex_start(pl_yylval.i_tkval.ival, NULL));
 
 	case KEY_return:
-	    OLDLOP(OP_RETURN);
+	    RETURNop(RETURNOP);
 
 	case KEY_require:
 	    s = SKIPSPACE1(s);
