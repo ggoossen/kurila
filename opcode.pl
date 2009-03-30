@@ -628,7 +628,7 @@ prototype	subroutine prototype	ck_null		s%	S
 srefgen		single ref constructor	ck_null		fs1	S
 ref		reference-type operator	ck_fun		stu%	S?
 bless		bless			ck_fun		s@	S S?
-anonscalar	anonymous scalar ($())	ck_fun		1	S
+anonscalar	anonymous scalar ($())	ck_fun		s1	S
 
 # Pushy I/O.
 
@@ -793,8 +793,8 @@ list		list			ck_null		m@	L
 lslice		list slice		ck_null		2	H L L
 enter_anonarray_assign	anonymous array assignment (@())	ck_null	0	
 enter_anonhash_assign	anonymous hash assignment (%())	ck_null	0	
-anonarray	anonymous array (@())	ck_anonarray	m@	L
-anonhash	anonymous hash (%())	ck_fun		m@	L
+anonarray	anonymous array (@())	ck_anonarray	ms@	L
+anonhash	anonymous hash (%())	ck_fun		ms@	L
 listlast	listlast		ck_null		ms@	L
 listfirst	listfirst		ck_null		ms@	L
 
@@ -803,7 +803,7 @@ arrayexpand	array expand			ck_fun		1	S
 enter_arrayexpand_assign	array expand assignment			ck_null		0	
 hashexpand	hash expand			ck_fun		1	S
 enter_hashexpand_assign	hash expand assignment			ck_null		0	
-nelems		numer of elements	ck_fun		t1	S
+nelems		numer of elements	ck_fun		ts1	S
 
 splice		splice			ck_fun		m@	A S? S? L
 push		push			ck_lfun		ims@	S L
@@ -811,16 +811,16 @@ pop		pop			ck_shift	s%	S?
 shift		shift			ck_shift	s%	S?
 unshift		unshift			ck_lfun		ims@	S L
 sort		sort			ck_sort		dm@	C? L
-reverse		reverse			ck_fun		t@	S
-arrayjoin	array join (@+:)	ck_fun		t@	S
-hashjoin	hash join (%+:)		ck_fun		t@	S
-arrayconcat	array concat (+@+)	ck_null		t@	S S
-hashconcat	hash concat (+%+)	ck_null		t@	S S
+reverse		reverse			ck_fun		ts@	S
+arrayjoin	array join (@+:)	ck_fun		ts@	S
+hashjoin	hash join (%+:)		ck_fun		ts@	S
+arrayconcat	array concat (+@+)	ck_null		ts@	S S
+hashconcat	hash concat (+%+)	ck_null		ts@	S S
 
-grepstart	grep			ck_grep		dm@	C L
+grepstart	grep			ck_grep		dms@	C L
 grepwhile	grep iterator		ck_null		dt|	
 
-mapstart	map			ck_grep		dm@	C L
+mapstart	map			ck_grep		dms@	C L
 mapwhile	map iterator		ck_null		dt|
 
 # Range stuff.
@@ -840,8 +840,8 @@ andassign	logical and assignment (&&=)	ck_null		s|
 orassign	logical or assignment (||=)	ck_null		s|	
 dorassign	defined or assignment (//=)	ck_null		s|
 
-method		method lookup		ck_method	d1
-entersub	subroutine entry	ck_subr		dmt1	L
+method		method lookup		ck_method	ds1
+entersub	subroutine entry	ck_subr		dmts1	L
 leavesub	subroutine exit		ck_null		1	
 caller		caller			ck_fun		t%	S?
 warn		warn			ck_fun		imst@	L
@@ -864,7 +864,7 @@ last		last			ck_null		ds}
 next		next			ck_null		ds}	
 redo		redo			ck_null		ds}	
 exit		exit			ck_exit		ds%	S?
-method_named	method with known name	ck_null		d$
+method_named	method with known name	ck_null		ds$
 
 # I/O.
 
