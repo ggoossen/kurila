@@ -20,8 +20,8 @@ typedef U16 cv_flags_t;
 	void	(*xcv_xsub) (pTHX_ CV*);					\
     }		xcv_root_u;							\
     AV *	xcv_padlist;							\
-    I32         xcv_n_minargs;						\
-    I32         xcv_n_maxargs;						\
+    I32         xcv_n_minargs;	/* minium number of argument (excl. rhs) */     \
+    I32         xcv_n_maxargs;	/* maximum number of argument (-1 for no-limit) (excl. rhs) */     \
     cv_flags_t	xcv_flags
 
 struct xpvcv {

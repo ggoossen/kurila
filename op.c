@@ -3734,8 +3734,8 @@ Perl_newSUB(pTHX_ I32 floor, OP *proto, OP *block)
 	    op_free(pushmark);
 	    for (kid = list->op_first; kid; kid = kid->op_sibling)
 		assign(kid, TRUE, &min_modcount, &max_modcount);
-	    CvN_MINARGS(cv) = min_modcount;
-	    CvN_MAXARGS(cv) = max_modcount;
+	    CvN_MINARGS(cv) = min_modcount - ( cv_assignarg_flag(cv) ? 1 : 0 );
+	    CvN_MAXARGS(cv) = max_modcount - ( cv_assignarg_flag(cv) ? 1 : 0 );
 #ifdef PERL_MAD
 	    block = newUNOP(OP_NULL, 0, block, block->op_location);
 #endif
@@ -5488,13 +5488,11 @@ Perl_ck_subr(pTHX_ OP *o)
 	     ? cUNOPo : ((UNOP*)cUNOPo->op_first))->op_first;
     OP *o2 = prev->op_sibling;
     OP *cvop;
-    const char *proto = NULL;
-    const char *proto_end = NULL;
+    I32 n_minargs = 0;
+    I32 n_maxargs = -1;
     CV *cv = NULL;
-    int optional = 0;
     I32 arg = 0;
-    I32 contextclass = 0;
-    const char *e = NULL;
+    bool variable_args = 0;
     bool delete_op = 0;
     SV** namesv;
 
@@ -5513,11 +5511,8 @@ Perl_ck_subr(pTHX_ OP *o)
 	    if (!cv)
 		tmpop->op_private |= OPpEARLY_CV;
 	    else {
-		if (SvPOK(cv)) {
-		    STRLEN len;
-		    proto = SvPV((SV*)cv, len);
-		    proto_end = proto + len;
-		}
+		n_minargs = CvN_MINARGS(cv);
+		n_maxargs = CvN_MAXARGS(cv);
 	    }
 	}
     }
@@ -5544,192 +5539,21 @@ Perl_ck_subr(pTHX_ OP *o)
 	    o3 = ((UNOP*)o2)->op_first;
 	else
 	    o3 = o2;
-	if (proto) {
-	    if (proto >= proto_end)
-		return too_many_arguments(o, 
-		    namesv ? SvPVX_const(*namesv) : "subroutine");
-
-	    switch (*proto) {
-	    case ';':
-		optional = 1;
-		proto++;
-		continue;
-	    case '_':
-		/* _ must be at the end */
-		if (proto[1] && proto[1] != ';')
-		    goto oops;
-	    case '$':
-	    case '%':
-		proto++;
-		arg++;
-		scalar(o2);
-		break;
-	    case '@':
-            case '<':
-		if (proto[1])
-		    goto oops;
-		list(o2);
-                break;
-	    case '&':
-		proto++;
-		arg++;
-		if (o3->op_type != OP_SREFGEN && o3->op_type != OP_UNDEF)
-		    bad_type(arg,
-			arg == 1 ? "block or sub {}" : "sub {}",
-			"subroutine", o3);
-		break;
-	    case '*':
-		/* '*' allows any scalar type, including bareword */
-		proto++;
-		arg++;
-		if (o3->op_type == OP_RV2GV)
-		    goto wrapref;	/* autoconvert GLOB -> GLOBref */
-		else if (o3->op_type == OP_CONST)
-		    o3->op_private &= ~OPpCONST_STRICT;
-		else if (o3->op_type == OP_ENTERSUB) {
-		    /* accidental subroutine, revert to bareword */
-		    OP *gvop = ((UNOP*)o3)->op_first;
-		    if (gvop && gvop->op_type == OP_NULL) {
-			gvop = ((UNOP*)gvop)->op_first;
-			if (gvop) {
-			    for (; gvop->op_sibling; gvop = gvop->op_sibling)
-				;
-			    if (gvop &&
-				(gvop->op_private & OPpENTERSUB_NOPAREN) &&
-				(gvop = ((UNOP*)gvop)->op_first) &&
-				gvop->op_type == OP_GV)
-			    {
-				GV * const gv = cGVOPx_gv(gvop);
-				OP * const sibling = o2->op_sibling;
-				SV * const n = newSVpvs("");
-#ifdef PERL_MAD
-				OP * const oldo2 = o2;
-#else
-				op_free(o2);
-#endif
-				gv_fullname3(n, gv, "");
-				o2 = newSVOP(OP_CONST, 0, n, o->op_location);
-				op_getmad(oldo2,o2,'O');
-				prev->op_sibling = o2;
-				o2->op_sibling = sibling;
-			    }
-			}
-		    }
-		}
-		scalar(o2);
-		break;
-	    case '[': case ']':
-		 goto oops;
-		 break;
-	    case '\\':
-		proto++;
-		arg++;
-#ifdef PERL_MAD
-	        addmad(newMADsv('c', newSVpvn(proto-1, 2)), &o3->op_madprop, 0);
-#endif
-	    again:
-		switch (*proto++) {
-		case '[':
-		     if (contextclass++ == 0) {
-		          e = strchr(proto, ']');
-			  if (!e || e == proto)
-			       goto oops;
-		     }
-		     else
-			  goto oops;
-		     goto again;
-		     break;
-		case ']':
-		     if (contextclass) {
-		         const char *p = proto;
-			 const char *const end = proto;
-			 contextclass = 0;
-			 while (*--p != '[');
-			 bad_type(arg, Perl_form(aTHX_ "one of %.*s",
-						 (int)(end - p), p),
-				  "subroutine", o3);
-		     } else
-			  goto oops;
-		     break;
-		case '*':
-		     if (o3->op_type == OP_RV2GV)
-			  goto wrapref;
-		     if (!contextclass)
-			  bad_type(arg, "symbol", "subroutine", o3);
-		     break;
-		case '&':
-		     if (o3->op_type == OP_ENTERSUB)
-			  goto wrapref;
-		     if (!contextclass)
-			  bad_type(arg, "subroutine entry", "subroutine",
-				   o3);
-		     break;
-		case '$':
-		    if (o3->op_type == OP_RV2SV ||
-			o3->op_type == OP_PADSV ||
-			o3->op_type == OP_HELEM ||
-			o3->op_type == OP_AELEM)
-			 goto wrapref;
-		    if (!contextclass)
-			bad_type(arg, "scalar", "subroutine", o3);
-		     break;
-		case '@':
-		    if (o3->op_type == OP_RV2AV ||
-			o3->op_type == OP_PADSV)
-			 goto wrapref;
-		    if (!contextclass)
-			bad_type(arg, "array", "subroutine", o3);
-		    break;
-		case '%':
-		    if (o3->op_type == OP_RV2HV ||
-			o3->op_type == OP_PADSV)
-			 goto wrapref;
-		    if (!contextclass)
-			 bad_type(arg, "hash", "subroutine", o3);
-		    break;
-		wrapref:
-		    {
-			OP* const kid = o2;
-			OP* const sib = kid->op_sibling;
-			kid->op_sibling = 0;
-			o2 = newUNOP(OP_SREFGEN, 0, kid, kid->op_location);
-			o2->op_sibling = sib;
-			prev->op_sibling = o2;
-		    }
-		    if (contextclass && e) {
-			 proto = e + 1;
-			 contextclass = 0;
-		    }
-		    break;
-		default: goto oops;
-		}
-		if (contextclass)
-		     goto again;
-		break;
-	    case ' ':
-		proto++;
-		continue;
-	    default:
-	      oops:
-		Perl_croak(aTHX_ "Malformed prototype for %s: %"SVf,
-		    (namesv ? SvPVX_const(*namesv) : "subroutine"), SVfARG(cv));
-	    }
-	}
+	if (PL_opargs[o3->op_type] & OA_RETSCALAR)
+	    arg++;
 	else
-	    list(o2);
+	    variable_args = 1;
+	if ( n_maxargs != -1 && arg > n_maxargs )
+	    return too_many_arguments(o, 
+		namesv ? SvPVX_const(*namesv) : "subroutine");
+	list(o2);
 	prev->op_sibling = o2 = mod(o2, OP_ENTERSUB);
 	prev = o2;
 	o2 = o2->op_sibling;
     } /* while */
-    if (o2 == cvop && proto && *proto == '_') {
-	/* generate an access to $_ */
-	o2 = newDEFSVOP(o->op_location);
-	o2->op_sibling = prev->op_sibling;
-	prev->op_sibling = o2; /* instead of cvop */
-    }
-    if (proto && !optional && proto_end > proto &&
-	(*proto != '<' && *proto != '@' && *proto != ';' && *proto != '_')) {
-	return too_few_arguments(o, namesv ? SvPVX_const(*namesv) : "subroutine" );
+    if (arg < n_minargs && ! variable_args) {
+	return too_few_arguments(o, 
+	    namesv ? SvPVX_const(*namesv) : "subroutine");
     }
     if(delete_op) {
 #ifdef PERL_MAD

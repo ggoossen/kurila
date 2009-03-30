@@ -1418,8 +1418,6 @@ PP(pp_entersub)
 	}
 	else if ( CvFLAGS(cv) & CVf_PROTO) {
 	    int i;
-	    if (is_assignment)
-		items++;
 	    if (CvN_MAXARGS(cv) != -1 && items > CvN_MAXARGS(cv))
 		Perl_croak_at(aTHX_ SvLOCATION(cv),
 		    "Too many arguments for %s",
@@ -1447,6 +1445,7 @@ PP(pp_entersub)
 		    rhs = MARK[-1];
 		}
 		XPUSHs(rhs);
+		items++;
 	    }
 
 	    /* reverse items on the stack */

@@ -2,7 +2,7 @@
 
 BEGIN { require './test.pl'; }
 
-plan 16;
+plan 18;
 
 sub foo($x) {
     return $x;
@@ -42,10 +42,18 @@ is($sub->(4), 5);
 sub threeargs($x, $y, $z) {
     return 1;
 }
-dies_like( { threeargs(1, 2) },
-           qr/Not enough arguments for main::threeargs/ );
-dies_like( { threeargs(1, 2, 3, 4) },
-           qr/Too many arguments for main::threeargs/ );
+dies_like( { &threeargs(1, 2) },
+           qr/Not enough arguments for main::threeargs/,
+           "runtime min argument check" );
+dies_like( { &threeargs(1, 2, 3, 4) },
+           qr/Too many arguments for main::threeargs/,
+           "runtime max argument check" );
+eval_dies_like( 'sub { main::threeargs(1, 2) }',
+           qr/Not enough arguments for main::threeargs/,
+           "compile-time min argument check" );
+eval_dies_like( 'sub { threeargs(1, 2, 3, 4) }',
+           qr/Too many arguments for main::threeargs/,
+           "compile-time min argument check" );
 
 my $args;
 sub assign($x, $y = $z) {
@@ -69,7 +77,7 @@ do {
     # assignee prototype checking
     dies_like( { assign("aap", "noot") },
                qr/main::assign must be an assignee/ );
-    dies_like( { threeargs("aap", "noot") = "mies" },
+    dies_like( { threeargs("aap", "noot", "mies") = "wim" },
                qr/main::threeargs can not be an assignee/ );
 };
 
