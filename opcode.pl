@@ -840,8 +840,8 @@ andassign	logical and assignment (&&=)	ck_null		s|
 orassign	logical or assignment (||=)	ck_null		s|	
 dorassign	defined or assignment (//=)	ck_null		s|
 
-method		method lookup		ck_method	ds1
-entersub	subroutine entry	ck_subr		dmts1	L
+method		method lookup		ck_method	d1
+entersub	subroutine entry	ck_subr		dmt1	L
 leavesub	subroutine exit		ck_null		1	
 caller		caller			ck_fun		t%	S?
 warn		warn			ck_fun		imst@	L
@@ -864,7 +864,7 @@ last		last			ck_null		ds}
 next		next			ck_null		ds}	
 redo		redo			ck_null		ds}	
 exit		exit			ck_exit		ds%	S?
-method_named	method with known name	ck_null		ds$
+method_named	method with known name	ck_null		d$
 
 # I/O.
 

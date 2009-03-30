@@ -460,7 +460,7 @@ The padded $string is returned.
 
 =cut
 
-sub Tpad( $self, $string, $cnt, $FH)
+sub Tpad( $self, $string, $cnt, ?$FH)
 {    ## public
     my ( $decr, $ms );
 

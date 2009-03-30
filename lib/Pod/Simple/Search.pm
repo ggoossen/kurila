@@ -355,7 +355,7 @@ sub _recurse_dir {
 
 #==========================================================================
 
-sub run($file, $name) {
+sub run(?$file, ?$name) {
   # A function, useful in one-liners
 
   my $self = __PACKAGE__->new;

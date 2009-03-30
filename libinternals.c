@@ -39,8 +39,11 @@ XS(XS_Internals_SvREADONLY)	/* This is dangerous stuff. */
 {
     dVAR;
     dXSARGS;
-    SV * const sv = SvRV(ST(0));
+    SV* sv = ST(0);
     PERL_UNUSED_ARG(cv);
+    if (!SvRVOK(sv))
+        Perl_croak(aTHX_ "argument to HvRESTRICTED must be a HASH REF not a %s", Ddesc(ST(0)));
+    sv = SvRV(sv);
 
     if (items == 1) {
 	 if (SvREADONLY(sv))
@@ -66,8 +69,11 @@ XS(XS_Internals_HvRESTRICTED)	/* This is dangerous stuff. */
 {
     dVAR;
     dXSARGS;
-    SV * const sv = SvRV(ST(0));
+    SV* sv = ST(0);
     PERL_UNUSED_ARG(cv);
+    if (!SvRVOK(sv))
+        Perl_croak(aTHX_ "argument to HvRESTRICTED must be a HASH REF not a %s", Ddesc(ST(0)));
+    sv = SvRV(sv);
 
     if ( ! SvHVOK(sv) )
         Perl_croak(aTHX_ "HvRESTRICTED expected a hash but got a %s", Ddesc(sv));
@@ -94,7 +100,7 @@ XS(XS_Internals_peek)	/* This is dangerous stuff. */
 {
     dVAR;
     dXSARGS;
-    SV * const sv = SvRV(ST(0));
+    SV * const sv = ST(0);
     PERL_UNUSED_ARG(cv);
 
     if (items == 1) {
@@ -107,8 +113,11 @@ XS(XS_Internals_SvREFCNT)	/* This is dangerous stuff. */
 {
     dVAR;
     dXSARGS;
-    SV * const sv = SvRV(ST(0));
+    SV* sv = ST(0);
     PERL_UNUSED_ARG(cv);
+    if (!SvRVOK(sv))
+        Perl_croak(aTHX_ "argument to SvREFCNT must be a REF not a %s", Ddesc(ST(0)));
+    sv = SvRV(sv);
 
     if (items == 1)
 	 XSRETURN_IV(SvREFCNT(sv)); /* Minus the ref created for us. */
@@ -129,7 +138,10 @@ XS(XS_Internals_hv_clear_placehold)
     if (items != 1)
 	Perl_croak(aTHX_ "Usage: UNIVERSAL::hv_clear_placeholders(hv)");
     else {
-	SV * const sv = SvRV(ST(0));
+        SV* sv = ST(0);
+        if (!SvRVOK(sv))
+            Perl_croak(aTHX_ "argument to hv_clear_placeholders must be a HASH REF not a %s", Ddesc(ST(0)));
+	sv = SvRV(sv);
         if (!SvHVOK(sv))
             Perl_croak(aTHX_ "argument to hv_clear_placeholders must be an HASH not a %s", Ddesc(sv));
 	hv_clear_placeholders(svThv(sv));

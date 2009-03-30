@@ -962,7 +962,7 @@ EONT_EONT
     return $testcode;
 }
 
-sub OptreeCheck::gentest($code,$opts) {
+sub OptreeCheck::gentest($code, ?$opts) {
     my $rendering = getRendering(\%(code => $code));
     my $testcode = OptreeCheck::wrap($code);
     return unless $testcode;

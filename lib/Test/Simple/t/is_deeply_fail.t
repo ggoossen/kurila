@@ -32,7 +32,7 @@ sub ok($ok, ?$name) {
     return $TB->ok($ok, $name);
 }
 
-sub is($this, $that, $name) {
+sub is($this, $that, ?$name) {
 
     my $ok = $TB->is_eq($$this, $that, $name);
 

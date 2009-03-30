@@ -116,12 +116,12 @@ sub _estr(@< @mess) {
 }
 
 do {my %warned;
-sub _warnonce($first, @mess) {
+sub _warnonce($first, @< @mess) {
     my $msg=_estr("WARNING: $first",< @mess);
     warn $msg unless %warned{+$msg}++;
 }};
 
-sub _choke($first, @mess) {
+sub _choke($first, @< @mess) {
     my $msg=_estr "ERROR: $first",< @mess;
     die($msg);
 }
@@ -162,8 +162,8 @@ If $moan is true then returns 0 on error and warns instead of dies.
 
 
 
-sub _move_file_at_boot( $file, $target, $moan) {
-    Carp::confess("Panic: Can't _move_file_at_boot on this platform!")
+sub _move_file_at_boot( $file, $target, ?$moan) {
+    die("Panic: Can't _move_file_at_boot on this platform!")
          unless $CanMoveAtBoot;
 
     my $descr= ref $target
