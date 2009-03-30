@@ -2,7 +2,7 @@
 
 BEGIN { require './test.pl'; }
 
-plan 9;
+plan 16;
 
 sub foo($x) {
     return $x;
@@ -46,3 +46,30 @@ dies_like( { threeargs(1, 2) },
            qr/Not enough arguments for main::threeargs/ );
 dies_like( { threeargs(1, 2, 3, 4) },
            qr/Too many arguments for main::threeargs/ );
+
+my $args;
+sub assign($x, $y = $z) {
+    $args = "$x,$y=$z";
+    return $args;
+}
+
+is( (assign("aap", "noot") = "mies"), "aap,noot=mies" );
+is( $args, "aap,noot=mies" );
+
+do {
+    # assignment inside another assignment
+    $args = undef;
+    @: my $before, assign("aap", "noot"), my $after = qw[before mies after];
+    is( $args, "aap,noot=mies" );
+    is( $before, "before" );
+    is( $after, "after" );
+};
+
+do {
+    # assignee prototype checking
+    dies_like( { assign("aap", "noot") },
+               qr/main::assign must be an assignee/ );
+    dies_like( { threeargs("aap", "noot") = "mies" },
+               qr/main::threeargs can not be an assignee/ );
+};
+

@@ -1301,7 +1301,8 @@ PP(pp_entersub)
     register CV *cv;
     register PERL_CONTEXT *cx;
     I32 gimme = GIMME_V;
-    const bool hasargs = (PL_op->op_flags & OPf_STACKED) != 0;
+    const OPFLAGS op_flags = PL_op->op_flags;
+    const bool hasargs = (op_flags & OPf_STACKED) != 0;
     assert(hasargs);
 
     /* subs are always in scalar context */
@@ -1374,7 +1375,8 @@ PP(pp_entersub)
 	dMARK;
 	register I32 items = SP - MARK;
 	AV* const padlist = CvPADLIST(cv);
-	PUSHBLOCK(cx, CXt_SUB, MARK);
+	const bool is_assignment = (op_flags & OPf_ASSIGN) ? 1 : 0;
+	PUSHBLOCK(cx, CXt_SUB, is_assignment ? MARK - 1 : MARK );
 	PUSHSUB(cx);
 	cx->blk_sub.retop = PL_op->op_next;
 	CvDEPTH(cv)++;
@@ -1389,6 +1391,15 @@ PP(pp_entersub)
 	}
 	SAVECOMPPAD();
 	PAD_SET_CUR_NOSAVE(padlist, CvDEPTH(cv));
+
+	if ( is_assignment != cv_assignarg_flag(cv) ) {
+	    if (is_assignment)
+		Perl_croak(aTHX_ "%s can not be an assignee",
+		    SvPVX_const(loc_name(SvLOCATION(cv))));
+	    else
+		Perl_croak(aTHX_ "%s must be an assignee",
+		    SvPVX_const(loc_name(SvLOCATION(cv))));
+	}
 	if (CvFLAGS(cv) & CVf_BLOCK) {
 	    SAVECLEARSV(PAD_SVl(PAD_ARGS_INDEX));
 	    CX_CURPAD_SAVE(cx->blk_sub);
@@ -1407,6 +1418,8 @@ PP(pp_entersub)
 	}
 	else if ( CvFLAGS(cv) & CVf_PROTO) {
 	    int i;
+	    if (is_assignment)
+		items++;
 	    if (CvN_MAXARGS(cv) != -1 && items > CvN_MAXARGS(cv))
 		Perl_croak_at(aTHX_ SvLOCATION(cv),
 		    "Too many arguments for %s",
@@ -1416,13 +1429,33 @@ PP(pp_entersub)
 		    "Not enough arguments for %s",
 		    SvPVX_const(loc_name(SvLOCATION(cv))));
 	    CX_CURPAD_SAVE(cx->blk_sub);
+
 	    ++MARK;
+	    PUSHMARK(MARK-1);
+
+	    if (is_assignment) {
+		SV* rhs;
+		if (op_flags & OPf_ASSIGN_PART) {
+		    if (PL_stack_base + TOPMARK >= MARK) {
+			Perl_croak(aTHX_ "Missing required assignment value");
+			rhs = &PL_sv_undef;
+		    } 
+		    else
+			rhs = MARK[-1];
+		}
+		else {
+		    rhs = MARK[-1];
+		}
+		XPUSHs(rhs);
+	    }
+
+	    /* reverse items on the stack */
 	    for (i=0; i<items/2; i++) {
 		SV* sv = MARK[i];
 		MARK[i] = MARK[items-i-1];
 		MARK[items-i-1] = sv;
 	    }
-	    PUSHMARK(MARK-1);
+
 	}
 	else if ( CvFLAGS(cv) & CVf_DEFARGS) {
 	    AV* av;
@@ -1458,6 +1491,7 @@ PP(pp_entersub)
 		MARK++;
 	    }
 	}
+
 	/* warning must come *after* we fully set up the context
 	 * stuff so that __WARN__ handlers can safely dounwind()
 	 * if they want to

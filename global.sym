@@ -103,6 +103,7 @@ Perl_fprintf_nocontext
 Perl_printf_nocontext
 Perl_cv_ckproto
 Perl_cv_const_sv
+Perl_cv_assignarg_flag
 Perl_cv_undef
 Perl_cv_tmprefcnt
 Perl_cx_dump
@@ -379,6 +380,7 @@ Perl_newROOTOP
 Perl_rootop_ll_tmprefcnt
 Perl_op_free
 Perl_RootopOp
+Perl_opTlistop
 Perl_rootop_refcnt_dec
 Perl_rootop_refcnt_inc
 Perl_op_tmprefcnt

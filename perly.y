@@ -99,7 +99,7 @@
 %type <opval> assignexpr
 %type <opval> argexpr texpr iexpr mexpr miexpr
 %type <opval> listexpr listexprcom indirob listop method
-%type <opval> subname proto subbody cont my_scalar
+%type <opval> subname protoassign proto subbody cont my_scalar
 %type <opval> myattrterm myterm
 %type <opval> termbinop termunop anonymous termdo
 %type <p_tkval> label
@@ -554,6 +554,16 @@ startproto :    '('
                             $$ = $1;
                         }
 
+protoassign :   /* NULL */
+			{ 
+                            $$ = NULL;
+                        }
+        |      ASSIGNOP term 
+			{ 
+                            CvFLAGS(PL_compcv) |= CVf_ASSIGNARG;
+                            $$ = $2;
+                        }
+
 /* Subroutine prototype */
 proto	:	/* NULL */
 			{
@@ -564,15 +574,17 @@ proto	:	/* NULL */
                         }
 	|	startproto ')'
 			{ 
+                            CvFLAGS(PL_compcv) |= CVf_PROTO;
                             $$ = newOP(OP_STUB, 0, LOCATION($1) );
                             PL_parser->in_my = FALSE;
                             PL_parser->expect = XBLOCK;
                             TOKEN_GETMAD($1,$$,'(');
                             TOKEN_GETMAD($2,$$,')');
                         }
-	|	startproto expr mintro ')'
+	|	startproto argexpr protoassign mintro ')'
 			{ 
-                            $$ = $2;
+                            CvFLAGS(PL_compcv) |= CVf_PROTO;
+                            $$ = append_list(OP_LIST, opTlistop($2), opTlistop($3));
                             PL_parser->in_my = FALSE;
                             PL_parser->expect = XBLOCK;
                             TOKEN_GETMAD($1,$$,'(');

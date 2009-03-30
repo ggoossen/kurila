@@ -80,8 +80,9 @@ Null CV pointer.
 				   (esp. useful for special XSUBs) */
 #define CVf_CONST	0x0400  /* inlinable sub */
 #define CVf_ISXSUB	0x0800	/* CV is an XSUB, not pure perl.  */
-#define CVf_PROTO	0x1000	/* CV has an prototype */
+#define CVf_PROTO	0x1000	/* arguments are passed to prototype variables */
 #define CVf_DEFARGS	0x2000	/* arguments are passed to @_ */
+#define CVf_ASSIGNARG	0x4000	/* last argument should be the rhs of an assignment (only used in combination with CVf_PROTO */
 
 #define CvCLONE(cv)		(CvFLAGS(cv) & CVf_CLONE)
 #define CvCLONE_on(cv)		(CvFLAGS(cv) |= CVf_CLONE)
@@ -109,6 +110,7 @@ Null CV pointer.
 
 /* BEGIN|CHECK|INIT|UNITCHECK|END */
 static __inline__ U32 CvSPECIAL(CV *cv) { return CvUNIQUE(cv) && SvFAKE(cv); }
+
 #define CvSPECIAL_on(cv)	(CvUNIQUE_on(cv),SvFAKE_on(cv))
 #define CvSPECIAL_off(cv)	(CvUNIQUE_off(cv),SvFAKE_off(cv))
 

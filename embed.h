@@ -180,6 +180,7 @@
 #ifdef PERL_CORE
 #define op_const_sv		Perl_op_const_sv
 #endif
+#define cv_assignarg_flag	Perl_cv_assignarg_flag
 #define cv_undef		Perl_cv_undef
 #define cv_tmprefcnt		Perl_cv_tmprefcnt
 #define cx_dump			Perl_cx_dump
@@ -619,6 +620,7 @@
 #define rootop_ll_tmprefcnt	Perl_rootop_ll_tmprefcnt
 #define op_free			Perl_op_free
 #define RootopOp		Perl_RootopOp
+#define opTlistop		Perl_opTlistop
 #define rootop_refcnt_dec	Perl_rootop_refcnt_dec
 #define rootop_refcnt_inc	Perl_rootop_refcnt_inc
 #define op_tmprefcnt		Perl_op_tmprefcnt
@@ -2366,6 +2368,7 @@
 #ifdef PERL_CORE
 #define op_const_sv(a,b)	Perl_op_const_sv(aTHX_ a,b)
 #endif
+#define cv_assignarg_flag(a)	Perl_cv_assignarg_flag(aTHX_ a)
 #define cv_undef(a)		Perl_cv_undef(aTHX_ a)
 #define cv_tmprefcnt(a)		Perl_cv_tmprefcnt(aTHX_ a)
 #define cx_dump(a)		Perl_cx_dump(aTHX_ a)
@@ -2805,6 +2808,7 @@
 #define rootop_ll_tmprefcnt()	Perl_rootop_ll_tmprefcnt(aTHX)
 #define op_free(a)		Perl_op_free(aTHX_ a)
 #define RootopOp(a)		Perl_RootopOp(aTHX_ a)
+#define opTlistop(a)		Perl_opTlistop(aTHX_ a)
 #define rootop_refcnt_dec(a)	Perl_rootop_refcnt_dec(aTHX_ a)
 #define rootop_refcnt_inc(a)	Perl_rootop_refcnt_inc(aTHX_ a)
 #define op_tmprefcnt(a)		Perl_op_tmprefcnt(aTHX_ a)

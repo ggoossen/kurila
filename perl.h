@@ -4636,6 +4636,7 @@ START_EXTERN_C
 
 #include "gv.h"
 #include "gv_i.h"
+#include "cv_i.h"
 #include "sv_i.h"
 #include "hv_i.h"
 #include "cop_i.h"

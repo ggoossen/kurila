@@ -1412,9 +1412,12 @@ Perl_assign(pTHX_ OP *o, bool partial, I32 *min_modcount, I32 *max_modcount)
     case OP_AELEM:
     case OP_HSLICE:
     case OP_ASLICE:
+    case OP_ENTERSUB:
 	o->op_flags |= OPf_ASSIGN;
-	if (partial)
+	if (partial) {
 	    o->op_flags |= OPf_ASSIGN_PART;
+	    o->op_flags = (o->op_flags & ~OPf_WANT) | OPf_WANT_VOID;
+	}
 	(*max_modcount)++;
 	if ( ! (o->op_flags & OPf_OPTIONAL) )
 	    (*min_modcount)++;
@@ -3716,7 +3719,6 @@ Perl_newSUB(pTHX_ I32 floor, OP *proto, OP *block)
 	if (proto && proto->op_type == OP_STUB) {
 	    CvN_MINARGS(cv) = 0;
 	    CvN_MAXARGS(cv) = 0;
-	    CvFLAGS(cv) |= CVf_PROTO;
 	    proto_block = block;
 	    op_free(proto);
 	}
@@ -3738,7 +3740,6 @@ Perl_newSUB(pTHX_ I32 floor, OP *proto, OP *block)
 	    block = newUNOP(OP_NULL, 0, block, block->op_location);
 #endif
 	    proto_block = append_list(OP_LINESEQ, list, (LISTOP*)block);
-	    CvFLAGS(cv) |= CVf_PROTO;
 	}
 	else {
 	    proto_block = block;

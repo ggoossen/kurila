@@ -190,6 +190,7 @@ p	|void	|cv_ckproto_len	|NN const CV* cv|NULLOK const GV* gv\
 pd	|void	|cv_setcv	|NN CV* dst|NN CV* src
 ApdR	|SV*	|cv_const_sv	|NULLOK CV* cv
 pR	|SV*	|op_const_sv	|NULLOK const OP* o|NULLOK CV* cv
+Api	|bool	|cv_assignarg_flag	|NN CV* cv
 Apd	|void	|cv_undef	|NN CV* cv
 Apd	|void	|cv_tmprefcnt	|NN CV* cv
 Ap	|void	|cx_dump	|NN PERL_CONTEXT* cx
@@ -597,6 +598,7 @@ Ap	|ROOTOP*	|newROOTOP	|NN OP* main|NULLOK SV* location
 Ap	|void	|rootop_ll_tmprefcnt
 Ap	|void	|op_free	|NULLOK OP* arg
 Api	|OP*	|RootopOp	|NULLOK ROOTOP* o
+Api	|LISTOP*	|opTlistop	|NULLOK OP* o
 Api	|void	|rootop_refcnt_dec	|NN ROOTOP* o
 Api	|void	|rootop_refcnt_inc	|NN ROOTOP* o
 Ap	|void	|op_tmprefcnt	|NULLOK OP* arg
