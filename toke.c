@@ -2368,7 +2368,6 @@ Perl_madlex(pTHX)
     case METHOD:
     case THING:
     case PMFUNC:
-    case PRIVATEVAR:
     case FUNC0SUB:
     case UNIOPSUB:
 	if (pl_yylval.opval)
@@ -3779,6 +3778,17 @@ Perl_yylex(pTHX)
 	    PL_expect &= XENUMMASK;
 	    PL_bufptr = s;
 	    return yylex();		/* ignore fake brackets */
+	}
+
+#ifdef PERL_MAD
+       PL_initialwhite = PL_thiswhite;
+#endif
+	if (PL_lex_state == LEX_INTERPEND) {
+	    start_force(PL_curforce);
+	    if (PL_madskills) {
+		CURMAD('_', PL_thiswhite);
+	    }
+	    force_next(';');
 	}
 
 	start_force(-1);
