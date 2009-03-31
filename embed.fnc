@@ -88,6 +88,12 @@ Aip	|SV*	|cvTsv	|NULLOK CV *cv
 Aip	|SV*	|gvTsv	|NULLOK GV *gv
 Aip	|SV*	|ioTsv	|NULLOK struct io *io
 Aip	|SV*	|reTsv	|NULLOK REGEXP *re
+Aip	|SV**	|avpTsvp	|NULLOK AV **avp
+Aip	|SV**	|hvpTsvp	|NULLOK HV **hvp
+Aip	|SV**	|cvpTsvp	|NULLOK CV **cvp
+Aip	|SV**	|gvpTsvp	|NULLOK GV **gvp
+Aip	|SV**	|iopTsvp	|NULLOK struct io **iop
+Aip	|SV**	|repTsvp	|NULLOK REGEXP **rep
 Aip	|AV*	|svTav	|NN SV *sv
 Aip	|HV*	|svThv	|NN SV *sv
 Aip	|CV*	|svTcv	|NN SV *sv
@@ -97,9 +103,10 @@ Aip	|REGEXP*	|svTre	|NN SV *sv
 
 Aip	|const char*	|SvPVX_const	|NN SV *sv
 Aip	|char*	|SvPVX_mutable	|NN SV *sv
-AipS	|void	|SvREFCNT_dec	|NULLOK SV *sv
-AipS	|SV*	|SvREFCNT_inc	|NULLOK SV *sv
-AipS	|void	|SvTMPREFCNT_inc	|NULLOK SV *sv
+AipS	|void	|SvREFCNT_dec	|NULLOK XV *sv
+AipS	|SV*	|SvREFCNT_inc	|NULLOK XV *sv
+AipS	|void	|SvTMPREFCNT_inc	|NULLOK XV *sv
+AipS	|void	|sv_cp_replace	|NN XV **sv_d|NULLOK XV *sv_s
 Aip	|IV	|SvIV	|NN SV *sv
 Aip	|UV	|SvUV	|NN SV *sv
 Aip	|NV	|SvNV	|NN SV *sv
@@ -183,6 +190,7 @@ p	|void	|cv_ckproto_len	|NN const CV* cv|NULLOK const GV* gv\
 pd	|void	|cv_setcv	|NN CV* dst|NN CV* src
 ApdR	|SV*	|cv_const_sv	|NULLOK CV* cv
 pR	|SV*	|op_const_sv	|NULLOK const OP* o|NULLOK CV* cv
+Api	|bool	|cv_assignarg_flag	|NN CV* cv
 Apd	|void	|cv_undef	|NN CV* cv
 Apd	|void	|cv_tmprefcnt	|NN CV* cv
 Ap	|void	|cx_dump	|NN PERL_CONTEXT* cx
@@ -297,6 +305,7 @@ Ap	|GP*	|gp_ref		|NULLOK GP* gp
 Ap	|GV*	|gv_AVadd	|NN GV* gv
 Ap	|GV*	|gv_HVadd	|NN GV* gv
 Ap	|GV*	|gv_IOadd	|NN GV* gv
+ApPi	|IO*	|gv_io	|NN GV* gv
 Ap	|void	|gv_check	|NN const HV* stash
 Ap	|void	|gv_efullname3	|NN SV* sv|NN const GV* gv|NULLOK const char* prefix
 Ap	|GV*	|gv_fetchfile	|NN const char* name
@@ -517,6 +526,7 @@ Apa	|OP*	|newFOROP	|OPFLAGS flags|NULLOK char* label \
 				|NULLOK OP* sv|NN OP* expr|NULLOK OP* block|NULLOK OP* cont|NULLOK SV* location
 Apa	|OP*	|newLOGOP	|I32 optype|OPFLAGS flags|NN OP *first|NN OP *other|NULLOK SV* location
 Apa	|OP*	|newLOOPEX	|I32 type|NN OP* label
+Apa	|OP*	|newPRIVATEVAROP	|NN const char* varname|NULLOK SV* location
 Apa	|OP*	|newLOOPOP	|OPFLAGS flags|I32 debuggable|NULLOK OP* expr|NULLOK OP* block|bool once|NULLOK SV* location
 Apa	|OP*	|newNULLLIST	|NULLOK SV *location
 Apa	|OP*	|newOP		|I32 optype|OPFLAGS flags|NULLOK SV* location
@@ -588,6 +598,7 @@ Ap	|ROOTOP*	|newROOTOP	|NN OP* main|NULLOK SV* location
 Ap	|void	|rootop_ll_tmprefcnt
 Ap	|void	|op_free	|NULLOK OP* arg
 Api	|OP*	|RootopOp	|NULLOK ROOTOP* o
+Api	|LISTOP*	|opTlistop	|NULLOK OP* o
 Api	|void	|rootop_refcnt_dec	|NN ROOTOP* o
 Api	|void	|rootop_refcnt_inc	|NN ROOTOP* o
 Ap	|void	|op_tmprefcnt	|NULLOK OP* arg
@@ -762,7 +773,6 @@ Ap	|char*	|screaminstr	|NN SV *bigstr|NN SV *littlestr|I32 start_shift \
 #if !defined(VMS)
 p	|I32	|setenv_getix	|NN const char* nam
 #endif
-EXp	|void	|setdefout	|NULLOK GV* gv
 Ap	|HEK*	|share_hek	|NN const char* str|I32 len|U32 hash
 #if defined(HAS_SIGACTION) && defined(SA_SIGINFO)
 np	|Signal_t |sighandler	|int sig|NULLOK siginfo_t *info|NULLOK void *uap
@@ -778,7 +788,7 @@ Apd	|bool	|sv_2bool	|NN SV *const sv
 Apd	|CV*	|sv_2cv		|NULLOK SV* sv|NN GV **const gvp|const I32 lref
 Apd	|IO*	|sv_2io		|NN SV *const sv
 Apd	|IV	|sv_2iv		|NULLOK SV *const sv
-ApdS	|SV*	|sv_2mortal	|NN SV *const sv
+ApdS	|SV*	|sv_2mortal	|NN XV *const sv
 Apd	|NV	|sv_2nv		|NULLOK SV *const sv
 pMd	|SV*	|sv_2num	|NN SV *const sv
 Amb	|char*	|sv_2pv		|NULLOK SV *sv|NULLOK STRLEN *lp
@@ -846,6 +856,8 @@ Apd	|void	|sv_replace	|NN SV *const sv|NN SV *const nsv
 Apd	|void	|sv_report_used
 Afpd	|void	|sv_setpvf	|NN SV *const sv|NN const char *const pat|...
 Apd	|void	|sv_vsetpvf	|NN SV *const sv|NN const char *const pat|NULLOK va_list *const args
+Apd	|void	|sv_setrv	|NN SV *const sv|NN SV* dst
+Apd	|void	|sv_setrv_mg	|NN SV *const sv|NN SV* dst
 Apd	|void	|sv_setiv	|NN SV *const sv|const IV num
 Apdb	|void	|sv_setpviv	|NN SV *const sv|const IV num
 Apd	|void	|sv_setuv	|NN SV *const sv|const UV num
@@ -1120,7 +1132,6 @@ pR	|OP*	|ck_open	|NN OP *o
 pR	|OP*	|ck_readline	|NN OP *o
 pR	|OP*	|ck_repeat	|NN OP *o
 pR	|OP*	|ck_require	|NN OP *o
-pR	|OP*	|ck_return	|NN OP *o
 pR	|OP*	|ck_rfun	|NN OP *o
 pR	|OP*	|ck_rvconst	|NN OP *o
 pR	|OP*	|ck_sassign	|NN OP *o

@@ -44,7 +44,7 @@ cmp_ok($b,'==',2,'short list 2 defined');
 ok(!defined($c),'short list 3 undef');
 ok(!defined($d),'short list 4 undef');
 
-@foo =  @bar = @(1);
+@foo = @bar = @(1);
 cmp_ok(join(':', @(< @foo,< @bar)),'eq','1:1','list reassign');
 
 @foo = @bar = @(2,3);

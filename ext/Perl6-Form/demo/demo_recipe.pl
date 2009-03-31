@@ -37,7 +37,7 @@ EOHOW
 						$method;
 
 
-    print \*STDOUT, < form 
+    print $^STDOUT, < form 
         '=================[ {||||||||||||||||||||||||||} ]=================',
 									  $recipe,
         '                                                                  ',

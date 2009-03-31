@@ -236,8 +236,6 @@ END_EXTERN_C
 #define PL_def_layerlist	(*Perl_Idef_layerlist_ptr(aTHX))
 #undef  PL_defgv
 #define PL_defgv		(*Perl_Idefgv_ptr(aTHX))
-#undef  PL_defoutgv
-#define PL_defoutgv		(*Perl_Idefoutgv_ptr(aTHX))
 #undef  PL_defstash
 #define PL_defstash		(*Perl_Idefstash_ptr(aTHX))
 #undef  PL_delaymagic
@@ -552,8 +550,8 @@ END_EXTERN_C
 #define PL_statbuf		(*Perl_Istatbuf_ptr(aTHX))
 #undef  PL_statcache
 #define PL_statcache		(*Perl_Istatcache_ptr(aTHX))
-#undef  PL_statgv
-#define PL_statgv		(*Perl_Istatgv_ptr(aTHX))
+#undef  PL_statio
+#define PL_statio		(*Perl_Istatio_ptr(aTHX))
 #undef  PL_statname
 #define PL_statname		(*Perl_Istatname_ptr(aTHX))
 #undef  PL_statusvalue
@@ -562,10 +560,12 @@ END_EXTERN_C
 #define PL_statusvalue_posix	(*Perl_Istatusvalue_posix_ptr(aTHX))
 #undef  PL_statusvalue_vms
 #define PL_statusvalue_vms	(*Perl_Istatusvalue_vms_ptr(aTHX))
-#undef  PL_stderrgv
-#define PL_stderrgv		(*Perl_Istderrgv_ptr(aTHX))
-#undef  PL_stdingv
-#define PL_stdingv		(*Perl_Istdingv_ptr(aTHX))
+#undef  PL_stderrio
+#define PL_stderrio		(*Perl_Istderrio_ptr(aTHX))
+#undef  PL_stdinio
+#define PL_stdinio		(*Perl_Istdinio_ptr(aTHX))
+#undef  PL_stdoutio
+#define PL_stdoutio		(*Perl_Istdoutio_ptr(aTHX))
 #undef  PL_strtab
 #define PL_strtab		(*Perl_Istrtab_ptr(aTHX))
 #undef  PL_sub_generation

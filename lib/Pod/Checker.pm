@@ -25,15 +25,15 @@ Pod::Checker, podchecker() - check pod documents for syntax errors
   $syntax_okay = podchecker($filepath, $outputpath, %options);
 
   my $checker = new Pod::Checker %options;
-  $checker->parse_from_file($filepath, \*STDERR);
+  $checker->parse_from_file($filepath, $^STDERR);
 
 =head1 OPTIONS/ARGUMENTS
 
 C<$filepath> is the input POD to read and C<$outputpath> is
 where to write POD syntax error messages. Either argument may be a scalar
 indicating a file-path, or else a reference to an open filehandle.
-If unspecified, the input-file it defaults to C<\*STDIN>, and
-the output-file defaults to C<\*STDERR>.
+If unspecified, the input-file it defaults to C<$^STDIN>, and
+the output-file defaults to C<$^STDERR>.
 
 =head2 podchecker()
 
@@ -501,8 +501,8 @@ sub podchecker($infile, $outfile, %< %options) {
     local $_;
 
     ## Set defaults
-    $infile  ||= \*STDIN;
-    $outfile ||= \*STDERR;
+    $infile  ||= $^STDIN;
+    $outfile ||= $^STDERR;
 
     ## Now create a pod checker
     my $checker = Pod::Checker->new(< %options);
@@ -621,7 +621,7 @@ sub poderror {
     ++($self->{+_NUM_WARNINGS})
         if(!%opts || (%opts{?severity} && %opts{?severity} eq 'WARNING'));
     unless($self->{?quiet}) {
-      my $out_fh = $self->output_handle() || \*STDERR;
+      my $out_fh = $self->output_handle() || $^STDERR;
       print $out_fh, ($severity, $msg, $line, $file, "\n")
         if($self->{?warnings} || !%opts || %opts{?severity} ne 'WARNING');
     }

@@ -593,12 +593,12 @@ sub config_vars {
 	# all config-vars are by definition \w only, any \W means regex
 	if ($qry =~ m/\W/) {
 	    my @matches = @(<config_re($qry));
-	    print \*STDOUT, < map { "$_$lnend" }, @matches || @("$qry: not found")		if !$notag;
-	    print \*STDOUT, < map { s/\w+=//; "$_$lnend" }, @matches || @("$qry: not found")	if  $notag;
+	    print $^STDOUT, < map { "$_$lnend" }, @matches || @("$qry: not found")		if !$notag;
+	    print $^STDOUT, < map { s/\w+=//; "$_$lnend" }, @matches || @("$qry: not found")	if  $notag;
 	} else {
 	    my $v = config_value($qry);
 	    $v = 'undef' unless defined $v;
-	    print \*STDOUT, "$($prfx)'$($v)'$lnend";
+	    print $^STDOUT, "$($prfx)'$($v)'$lnend";
 	}
     }
 }
@@ -624,7 +624,9 @@ ENDOFSET
     my $dll;
     if (open my $fh, '<', $f) {
 	while ( ~< $fh) {
-	    $dll = $1, last if m/^PERL_DLL_BASE\s*=\s*(\S*)\s*$/;
+            next unless m/^PERL_DLL_BASE\s*=\s*(\S*)\s*$/;
+	    $dll = $1;
+            last;
 	}
     }
     $config_txt .= <<ENDOFSET if $dll;
@@ -909,7 +911,7 @@ ENDOFTAIL
 
 close(*GLOS) if %Opts{?glossary};
 close($config_pod);
-print \*STDOUT, "written $Config_POD\n";
+print $^STDOUT, "written $Config_POD\n";
 
 my $orig_config_txt = "";
 my $orig_heavy_txt = "";
@@ -927,8 +929,8 @@ if ($orig_config_txt ne $config_txt or $orig_heavy_txt ne $heavy_txt) {
     print $config_heavy_fh, $heavy_txt;
     close($config_heavy_fh);
     close($config_fh);
-    print \*STDOUT, "updated $Config_PM\n";
-    print \*STDOUT, "updated $Config_heavy\n";
+    print $^STDOUT, "updated $Config_PM\n";
+    print $^STDOUT, "updated $Config_heavy\n";
 }
 
 
@@ -957,7 +959,7 @@ EOS
   $cross =~ s/\*\*\*replace-marker\*\*\*/%Opts{?cross}/g;
   print $cross_fh, $cross;
   close $cross_fh;
-  print \*STDOUT, "written lib/Cross.pm\n";
+  print $^STDOUT, "written lib/Cross.pm\n";
   unshift($^INCLUDE_PATH,"xlib/%Opts{?cross}");
 }
 

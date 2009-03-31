@@ -108,11 +108,11 @@ sub init
   $vv_print = $vv_size = 0; ## running totals.
 
   ## set default options, in case the rc file wants them
-  $opt{'TTY'}= 1 if -t *STDOUT;
+  $opt{'TTY'}= 1 if -t $^STDOUT;
   
   ## want to know this for debugging message stuff
-  $STDERR_IS_TTY = -t *STDERR ? 1 : 0;
-  $STDERR_SCREWS_STDOUT = ($STDERR_IS_TTY && -t *STDOUT) ? 1 : 0;
+  $STDERR_IS_TTY = -t $^STDERR ? 1 : 0;
+  $STDERR_SCREWS_STDOUT = ($STDERR_IS_TTY && -t $^STDOUT) ? 1 : 0;
 
   $0 =~ s,.*/,,;  ## clean up $0 for any diagnostics we'll be printing.
 }

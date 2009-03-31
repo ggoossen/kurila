@@ -109,7 +109,7 @@ sub add_callback {
 
 # output handle, used with all Concise-output printing
 our $walkHandle;	# public for your convenience
-BEGIN { $walkHandle = \*STDOUT }
+BEGIN { $walkHandle = $^STDOUT }
 
 sub walk_output { # updates $walkHandle
     my $handle = shift;
@@ -126,7 +126,7 @@ sub walk_output { # updates $walkHandle
     }
     my $iotype = ref $handle;
     die "expecting argument/object that can print\n"
-	unless $iotype eq 'GLOB' or $iotype and $handle->can('print');
+	unless $iotype eq 'GLOB' or $iotype and $handle->can('print') or $iotype eq "IO::Handle";
     $walkHandle = $handle;
 }
 
@@ -145,7 +145,7 @@ sub concise_stashref($order, $h) {
 	my $s = \($h->{+$k});
 	my $coderef = *$s{CODE} or next;
 	reset_sequence();
-	print \*STDOUT, "FUNC: *", Symbol::glob_name(*$s), "\n";
+	print $^STDOUT, "FUNC: *", Symbol::glob_name(*$s), "\n";
 	my $codeobj = svref_2object($coderef);
 	next unless ref $codeobj eq 'B::CV';
 	try { concise_cv_obj($order, $codeobj, $k) };
@@ -696,7 +696,7 @@ sub concise_sv($sv, $hr, ?$preferpv) {
 
 	$hr->{+svval} = 'undef' unless defined $hr->{?svval};
 	my $out = $hr->{?svclass};
-	return $out .= " $hr->{?svval}" ; 
+	return ($out .= " $hr->{?svval}");
     }
 }
 
@@ -891,11 +891,11 @@ sub b_terse($op, $level) {
 	# insert a 'goto'
 	my $h = \%("seq" => seq($lastnext), "class" => class($lastnext),
 		 "addr" => sprintf("\%#x", $$lastnext));
-	print \*STDOUT, # $walkHandle
+	print $^STDOUT, # $walkHandle
 	    fmt_line($h, $op, %style{"terse"}->[1], $level+1);
     }
     $lastnext = $op->next;
-    print \*STDOUT, # $walkHandle 
+    print $^STDOUT, # $walkHandle 
 	concise_op($op, $level, %style{"terse"}->[0]);
 }
 

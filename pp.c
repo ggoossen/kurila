@@ -4740,6 +4740,7 @@ PP(pp_placeholder)
     dSP;
     OPFLAGS op_flags = PL_op->op_flags;
     SV* sv;
+    I32 gimme = GIMME_V;
     if ( ! ( op_flags & OPf_ASSIGN ) )
 	DIE(aTHX_ "%s must be part of an assignment", OP_DESC(PL_op));
     if (op_flags & OPf_ASSIGN_PART) {
@@ -4751,8 +4752,9 @@ PP(pp_placeholder)
 	    SP--;
 	RETURN;
     }
+    if ( gimme != G_VOID )
+	DIE(aTHX_ "%s must be used in void context", OP_DESC(PL_op));
     sv = POPs;
-    XPUSHs(sv_mortalcopy(sv));
     RETURN;
 }
 

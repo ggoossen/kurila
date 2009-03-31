@@ -119,7 +119,7 @@ my $hv_ref = B::svref_2object(\$hv);
 is(ref $hv_ref, "$RV_class",
    "Test $RV_class return from svref_2object - hash");
 
-local *gv = *STDOUT{IO};
+local *gv = $^STDOUT;
 my $gv_ref = B::svref_2object(\*gv);
 is(ref $gv_ref, "B::GV", "Test B::GV return from svref_2object");
 ok(! $gv_ref->is_empty(), "Test is_empty()");

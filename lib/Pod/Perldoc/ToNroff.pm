@@ -36,7 +36,7 @@ sub parse_from_file {
   
   defined(&Pod::Perldoc::DEBUG)
    and Pod::Perldoc::DEBUG()
-   and print \*STDOUT, "About to call new Pod::Man ",
+   and print $^STDOUT, "About to call new Pod::Man ",
     $Pod::Man::VERSION ?? "(v$Pod::Man::VERSION) " !! '',
     "with options: ",
     (nelems @options) ?? "[$(join ' ',@options)]" !! "(nil)", "\n";

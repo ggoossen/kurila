@@ -118,7 +118,7 @@ sub testpodinc2plaintext( %< %args ) {
       return  $msg;
    }
 
-   print \*STDOUT, "# Running testpodinc2plaintext for '$testname'...\n";
+   print $^STDOUT, "# Running testpodinc2plaintext for '$testname'...\n";
    ## Compare the output against the expected result
    podinc2plaintext($infile, $outfile);
    if ( testcmp($outfile, $cmpfile) ) {
@@ -140,7 +140,7 @@ sub testpodplaintext {
    my $failed = 0;
    local $_;
 
-   print \*STDOUT, "1..", scalar nelems @testpods, "\n"  unless (%opts{?'xrgen'});
+   print $^STDOUT, "1..", scalar nelems @testpods, "\n"  unless (%opts{?'xrgen'});
 
    for my $podfile ( @testpods) {
       @($testname, $_, ...) = fileparse($podfile);
@@ -152,12 +152,12 @@ sub testpodplaintext {
       if (%opts{?'xrgen'}) {
           if (%opts{?'force'} or ! -e $cmpfile) {
              ## Create the comparison file
-             print \*STDOUT, "# Creating expected result for \"$testname\"" .
+             print $^STDOUT, "# Creating expected result for \"$testname\"" .
                    " pod2plaintext test ...\n";
              podinc2plaintext($podfile, $cmpfile);
           }
           else {
-             print \*STDOUT, "# File $cmpfile already exists" .
+             print $^STDOUT, "# File $cmpfile already exists" .
                    " (use 'force' to regenerate it).\n";
           }
           next;
@@ -169,14 +169,14 @@ sub testpodplaintext {
                         Cmp => $cmpfile;
       if ($failmsg) {
           ++$failed;
-          print \*STDOUT, "#\tFAILED. ($failmsg)\n";
-	  print \*STDOUT, "not ok ", $failed+$passes, "\n";
+          print $^STDOUT, "#\tFAILED. ($failmsg)\n";
+	  print $^STDOUT, "not ok ", $failed+$passes, "\n";
       }
       else {
           ++$passes;
           unlink($outfile);
-          print \*STDOUT, "#\tPASSED.\n";
-	  print \*STDOUT, "ok ", $failed+$passes, "\n";
+          print $^STDOUT, "#\tPASSED.\n";
+	  print $^STDOUT, "ok ", $failed+$passes, "\n";
       }
    }
    return  $passes;

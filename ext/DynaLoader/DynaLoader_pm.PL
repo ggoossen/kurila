@@ -254,8 +254,8 @@ boot_DynaLoader('DynaLoader') if defined(&boot_DynaLoader) &&
                                 !defined(&dl_error);
 
 if ($dl_debug) {
-    print \*STDERR, "DynaLoader.pm loaded ($^INCLUDE_PATH, @dl_library_path)\n";
-    print \*STDERR, "DynaLoader not linked into this perl\n"
+    print $^STDERR, "DynaLoader.pm loaded ($^INCLUDE_PATH, @dl_library_path)\n";
+    print $^STDERR, "DynaLoader not linked into this perl\n"
 	    unless defined(&boot_DynaLoader);
 }
 
@@ -313,7 +313,7 @@ sub bootstrap {
 
     my $modpname = join(<<$^O-eq-MacOS>>':'<<|$^O-eq-MacOS>>'/'<</$^O-eq-MacOS>>,@modparts);
 
-    print \*STDERR, "DynaLoader::bootstrap for $module ",
+    print $^STDERR, "DynaLoader::bootstrap for $module ",
 		       <<$^O-eq-MacOS>> "(:auto:$modpname:$modfname.$dl_dlext)\n" 
 		       <<|$^O-eq-MacOS>>"(auto/$modpname/$modfname.$dl_dlext)\n"<</$^O-eq-MacOS>>
 	if $dl_debug;
@@ -359,7 +359,7 @@ sub bootstrap {
     my $bs = $file;
     $bs =~ s/(\.\w+)?(;\d*)?$/\.bs/; # look for .bs 'beside' the library
     if (-s $bs) { # only read file if it's not empty
-        print \*STDERR, "BS: $bs ($^OS_NAME, $dlsrc)\n" if $dl_debug;
+        print $^STDERR, "BS: $bs ($^OS_NAME, $dlsrc)\n" if $dl_debug;
         try { do $bs; };
         warn "$bs: $^EVAL_ERROR\n" if $^EVAL_ERROR;
     }
@@ -427,7 +427,7 @@ sub dl_findfile {
     #my $dl_ext= <<=to_string(config_value('dlext'))>>; # config_value('dlext') suffix for perl extensions
     #my $dl_so = <<=to_string(config_value('so'))>>; # config_value('so') suffix for shared libraries
 
-    print \*STDERR, "dl_findfile(@args)\n" if $dl_debug;
+    print $^STDERR, "dl_findfile(@args)\n" if $dl_debug;
 
     # accumulate directories but process files as they appear
     arg: foreach(@args) {
@@ -468,7 +468,7 @@ sub dl_findfile {
 		$dir =~ s/:$//;
             	foreach $name (@names) {
 	    	    my($file) = "$dir:$name";
-                    print \*STDERR, " checking in $dir for $name\n" if $dl_debug;
+                    print $^STDERR, " checking in $dir for $name\n" if $dl_debug;
 		    if (-f $file) {
                     	push(@found, $file);
                     	next arg; # no need to look any further
@@ -518,7 +518,7 @@ sub dl_findfile {
 	    <</$^O-eq-VMS>>
             foreach my $name (@names) {
 		my($file) = "$dir$dirsep$name";
-                print \*STDERR, " checking in $dir for $name\n" if $dl_debug;
+                print $^STDERR, " checking in $dir for $name\n" if $dl_debug;
 		$file = ($do_expand) ?? dl_expandspec($file) !! (-f $file && $file);
 		#$file = _check_file($file);
 		if ($file) {
@@ -530,9 +530,9 @@ sub dl_findfile {
     }
     if ($dl_debug) {
         foreach(@dirs) {
-            print \*STDERR, " dl_findfile ignored non-existent directory: $_\n" unless -d $_;
+            print $^STDERR, " dl_findfile ignored non-existent directory: $_\n" unless -d $_;
         }
-        print \*STDERR, "dl_findfile found: @found\n";
+        print $^STDERR, "dl_findfile found: @found\n";
     }
     @found;
 }
@@ -560,7 +560,7 @@ sub dl_expandspec {
     <<|$^O-eq-VMS>>
 	return undef unless -f $file;
     <</$^O-eq-VMS>>
-    print \*STDERR, "dl_expandspec($spec) => $file\n" if $dl_debug;
+    print $^STDERR, "dl_expandspec($spec) => $file\n" if $dl_debug;
     $file;
 }
 

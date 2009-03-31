@@ -1762,23 +1762,23 @@ and if we can.
             # read/write on in, or just read, or read on STDIN.
             open( IN,      "+<", "$i" )
               || open( IN, "<", "$i" )
-              || open( IN, "<&", \*STDIN );
+              || open( IN, "<&", $^STDIN );
 
             # read/write/create/clobber out, or write/create/clobber out,
             # or merge with STDERR, or merge with STDOUT.
                  open( OUT, "+>", "$o" )
               || open( OUT, ">", "$o" )
-              || open( OUT, ">&", \*STDERR )
+              || open( OUT, ">&", $^STDERR )
               || open( OUT, ">&", \*STDOUT );    # so we don't dongle stdout
 
         } ## end if ($console)
         elsif ( not defined $console ) {
 
             # No console. Open STDIN.
-            open( IN, "<&", \*STDIN );
+            open( IN, "<&", $^STDIN );
 
             # merge with STDERR, or with STDOUT.
-            open( OUT, ">&",      \*STDERR )
+            open( OUT, ">&",      $^STDERR )
               || open( OUT, ">&", \*STDOUT );    # so we don't dongle stdout
             $console = 'STDIN/OUT';
         } ## end elsif (not defined $console)
@@ -5887,7 +5887,7 @@ sub system {
 
     # We save, change, then restore STDIN and STDOUT to avoid fork() since
     # some non-Unix systems can do system() but have problems with fork().
-    open( SAVEIN, "<&",  \*STDIN )  || &warn("Can't save STDIN");
+    open( SAVEIN, "<&",  $^STDIN )  || &warn("Can't save STDIN");
     open( SAVEOUT, ">&", \*STDOUT ) || &warn("Can't save STDOUT");
     open( STDIN, "<&",   \*IN )     || &warn("Can't redirect STDIN");
     open( STDOUT, ">&",  \*OUT )    || &warn("Can't redirect STDOUT");
@@ -6608,7 +6608,7 @@ sub parse_options {
           && defined $val;
 
         # Not initialization - echo the value we set it to.
-        dump_option($option) unless $OUT \== \*STDERR;
+        dump_option($option) unless $OUT \== $^STDERR;
     } ## end while (length)
 } ## end sub parse_options
 
@@ -8007,8 +8007,8 @@ That we want no return values and no subroutine entry/exit trace.
 # The following BEGIN is very handy if debugger goes havoc, debugging debugger?
 
 BEGIN {    # This does not compile, alas. (XXX eh?)
-    $IN  = \*STDIN;     # For bugs before DB::OUT has been opened
-    $OUT = \*STDERR;    # For errors before DB::OUT has been opened
+    $IN  = $^STDIN;     # For bugs before DB::OUT has been opened
+    $OUT = $^STDERR;    # For errors before DB::OUT has been opened
 
     # Define characters used by command parsing.
     $sh       = '!';      # Shell escape (does not work)

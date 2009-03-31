@@ -4,8 +4,8 @@ __END__
 -W
 # lint: check runtime $^WARNING is zapped
 $^WARNING = 0 ;
-close \*STDIN ;
-print \*STDIN, "abc" ;
+close $^STDIN ;
+print $^STDIN, "abc" ;
 EXPECT
 print() on closed filehandle STDIN at - line 5 character 1.
 ########
@@ -13,8 +13,8 @@ print() on closed filehandle STDIN at - line 5 character 1.
 # lint: check runtime $^WARNING is zapped
 do {
   $^WARNING = 0 ;
-  close \*STDIN ;
-  print \*STDIN, "abc" ;
+  close $^STDIN ;
+  print $^STDIN, "abc" ;
 };
 EXPECT
 print() on closed filehandle STDIN at - line 6 character 3.
@@ -23,8 +23,8 @@ print() on closed filehandle STDIN at - line 6 character 3.
 # lint: check "no warnings" is zapped
 do {
   no warnings ;
-  close \*STDIN ;
-  print \*STDIN, "abc" ;
+  close $^STDIN ;
+  print $^STDIN, "abc" ;
 };
 EXPECT
 print() on closed filehandle STDIN at - line 6 character 3.
@@ -33,8 +33,8 @@ print() on closed filehandle STDIN at - line 6 character 3.
 # lint: check combination of -w and -W
 do {
   $^WARNING = 0 ;
-  close \*STDIN ;
-  print \*STDIN, "abc" ;
+  close $^STDIN ;
+  print $^STDIN, "abc" ;
 };
 EXPECT
 print() on closed filehandle STDIN at - line 6 character 3.
@@ -45,7 +45,7 @@ do {
     no warnings ;
     eval '
         my $b ; chop $b ;
-    '; print \*STDERR, $^EVAL_ERROR ;
+    '; print $^STDERR, $^EVAL_ERROR ;
     my $b ; chop $b ;
 };
 EXPECT
@@ -61,7 +61,7 @@ do {
     eval q[ 
         use warnings 'uninitialized' ;
         my $b ; chop $b ;
-    ]; print \*STDERR, $^EVAL_ERROR;
+    ]; print $^STDERR, $^EVAL_ERROR;
     my $b ; chop $b ;
 };
 EXPECT
@@ -76,7 +76,7 @@ do {
     use warnings 'uninitialized' ;
     eval '
         my $b ; chop $b ;
-    '; print \*STDERR, $^EVAL_ERROR ;
+    '; print $^STDERR, $^EVAL_ERROR ;
     my $b ; chop $b ;
 };
 EXPECT
@@ -92,7 +92,7 @@ do {
     eval '
         no warnings ;
         my $b ; chop $b ;
-    '; print \*STDERR, $^EVAL_ERROR ;
+    '; print $^STDERR, $^EVAL_ERROR ;
     my $b ; chop $b ;
 };
 EXPECT

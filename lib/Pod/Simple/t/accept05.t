@@ -14,7 +14,7 @@ ok 1;
 
 use Pod::Simple::DumpAsXML;
 use Pod::Simple::XMLOutStream;
-print \*STDOUT, "# Pod::Simple version $Pod::Simple::VERSION\n";
+print $^STDOUT, "# Pod::Simple version $Pod::Simple::VERSION\n";
 sub e ($x, $y) { Pod::Simple::DumpAsXML->_duo($x, $y) }
 
 my $x = 'Pod::Simple::XMLOutStream';
@@ -31,7 +31,7 @@ sub accept_zing_superduperprok {
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-print \*STDOUT, "# Some sanity tests...\n";
+print $^STDOUT, "# Some sanity tests...\n";
 ok( $x->_out( "=pod\n\nI like pie.\n"),
   '<Document><Para>I like pie.</Para></Document>'
 );
@@ -49,9 +49,9 @@ ok( $x->_out( "=extend N C,F,I Y,W\n\nI like pie.\n"),
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-print \*STDOUT, "## OK, actually trying to use an extended code...\n";
+print $^STDOUT, "## OK, actually trying to use an extended code...\n";
 
-print \*STDOUT, "# extending but not accepted (so hitting fallback)\n";
+print $^STDOUT, "# extending but not accepted (so hitting fallback)\n";
 
 ok( $x->_out( "=extend N B Y,W\n\nI N<like> pie.\n"),
   '<Document><Para>I <B>like</B> pie.</Para></Document>'
@@ -65,7 +65,7 @@ ok( $x->_out( "=extend N C,B,I Y,W\n\nI N<like> pie.\n"),
 
 
 
-print \*STDOUT, "# extending to one-letter accepted (not hitting fallback)\n";
+print $^STDOUT, "# extending to one-letter accepted (not hitting fallback)\n";
 
 ok( $x->_out( \&accept_Q, "=extend N B Y,Q,A,bzroch\n\nI N<like> pie.\n"),
   '<Document><Para>I <Q>like</Q> pie.</Para></Document>'
@@ -79,7 +79,7 @@ ok( $x->_out( \&accept_Q, "=extend N C,B,I Y,Q,A,bzroch\n\nI N<like> pie.\n"),
 
 
 
-print \*STDOUT, "# extending to many-letter accepted (not hitting fallback)\n";
+print $^STDOUT, "# extending to many-letter accepted (not hitting fallback)\n";
 
 ok( $x->_out( \&accept_prok, "=extend N B Y,prok,A,bzroch\n\nI N<like> pie.\n"),
   '<Document><Para>I <prok>like</prok> pie.</Para></Document>'
@@ -93,7 +93,7 @@ ok( $x->_out( \&accept_prok, "=extend N C,B,I Y,prok,A,bzroch\n\nI N<like> pie.\
 
 
 
-print \*STDOUT, "# extending to :-containing, many-letter accepted (not hitting fallback)\n";
+print $^STDOUT, "# extending to :-containing, many-letter accepted (not hitting fallback)\n";
 
 ok( $x->_out( \&accept_zing_prok, "=extend N B Y,zing:prok,A,bzroch\n\nI N<like> pie.\n"),
   '<Document><Para>I <zing:prok>like</zing:prok> pie.</Para></Document>'
@@ -108,7 +108,7 @@ ok( $x->_out( \&accept_zing_prok, "=extend N C,B,I Y,zing:prok,A,bzroch\n\nI N<l
 
 
 
-print \*STDOUT, "# extending to _:-0-9-containing, many-letter accepted (not hitting fallback)\n";
+print $^STDOUT, "# extending to _:-0-9-containing, many-letter accepted (not hitting fallback)\n";
 
 ok( $x->_out( \&accept_zing_superprok, "=extend N B Y,z.i_ng:Prok-12,A,bzroch\n\nI N<like> pie.\n"),
   '<Document><Para>I <z.i_ng:Prok-12>like</z.i_ng:Prok-12> pie.</Para></Document>'
@@ -122,7 +122,7 @@ ok( $x->_out( \&accept_zing_superprok, "=extend N C,B,I Y,z.i_ng:Prok-12,A,bzroc
 
 
 
-print \*STDOUT, "#\n# Testing acceptance order\n";
+print $^STDOUT, "#\n# Testing acceptance order\n";
 
 ok( $x->_out( \&accept_zing_superduperprok, "=extend N B Y,z.i_ng:Prok-12,A,bzroch\n\nI N<like> pie.\n"),
   '<Document><Para>I <z.i_ng:Prok-12>like</z.i_ng:Prok-12> pie.</Para></Document>'
@@ -136,7 +136,7 @@ ok( $x->_out( \&accept_zing_superduperprok, "=extend N C,B,I Y,z.i_ng:Prok-12,A,
 
 
 
-print \*STDOUT, "# Wrapping up... one for the road...\n";
+print $^STDOUT, "# Wrapping up... one for the road...\n";
 ok 1;
-print \*STDOUT, "# --- Done with ", __FILE__, " --- \n";
+print $^STDOUT, "# --- Done with ", __FILE__, " --- \n";
 

@@ -15,7 +15,7 @@ ok(nelems(config_keys) +> 500, "Config has more than 500 entries");
 
 my @($first) = @: Config::config_sh() =~ m/^(\S+)=/m;
 die "Can't find first entry in Config::config_sh()" unless defined $first;
-print \*STDOUT, "# First entry is '$first'\n";
+print $^STDOUT, "# First entry is '$first'\n";
 
 # It happens that the we know what the first key should be. This is somewhat
 # cheating, but there was briefly a bug where the key got a bonus newline.
@@ -73,7 +73,7 @@ my ($out1, $out2);
 do {
     my $out = \$("");
     open my $fakeout, '>>', $out or die;
-    local *STDOUT = *$fakeout{IO};
+    local $^STDOUT = *$fakeout{IO};
 
     Config::config_vars('cc');	# non-regex test of essential cfg-var
     $out1 = $$out;
@@ -134,7 +134,7 @@ foreach my $pain (@($first, < @virtual)) {
 my @($path, $ver, @< @orig_inc)
   =  split m/\n/,
     runperl (nolib=>1,
-	     prog=>'print \*STDOUT, qq{$^EXECUTABLE_NAME\n$^PERL_VERSION\n}; print \*STDOUT, qq{$_\n} while $_ = shift $^INCLUDE_PATH');
+	     prog=>'print $^STDOUT, qq{$^EXECUTABLE_NAME\n$^PERL_VERSION\n}; print $^STDOUT, qq{$_\n} while $_ = shift $^INCLUDE_PATH');
 
 die "This perl is $^PERL_VERSION at $^EXECUTABLE_NAME; other perl is $ver (at $path) "
   . '- failed to find this perl' unless $^PERL_VERSION eq $ver;

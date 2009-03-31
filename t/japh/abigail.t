@@ -38,7 +38,7 @@ sub skip {
     my $n    = (nelems @_) ?? shift !! 1;
     for (1..$n) {
         my $test = curr_test;
-        print \*STDOUT, "ok $test # skip: $why\n";
+        print $^STDOUT, "ok $test # skip: $why\n";
         next_test;
     }
 }

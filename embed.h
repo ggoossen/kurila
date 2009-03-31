@@ -45,6 +45,12 @@
 #define gvTsv			Perl_gvTsv
 #define ioTsv			Perl_ioTsv
 #define reTsv			Perl_reTsv
+#define avpTsvp			Perl_avpTsvp
+#define hvpTsvp			Perl_hvpTsvp
+#define cvpTsvp			Perl_cvpTsvp
+#define gvpTsvp			Perl_gvpTsvp
+#define iopTsvp			Perl_iopTsvp
+#define repTsvp			Perl_repTsvp
 #define svTav			Perl_svTav
 #define svThv			Perl_svThv
 #define svTcv			Perl_svTcv
@@ -74,6 +80,13 @@
 #define IoTMPREFCNT_inc(a)		Perl_SvTMPREFCNT_inc(aTHX_ ioTsv(a))
 #define ReTMPREFCNT_inc(a)		Perl_SvTMPREFCNT_inc(aTHX_ reTsv(a))
 #define SvTMPREFCNT_inc		Perl_SvTMPREFCNT_inc
+#define av_cp_replace(a,b)		Perl_sv_cp_replace(aTHX_ avpTsvp(a),avTsv(b))
+#define hv_cp_replace(a,b)		Perl_sv_cp_replace(aTHX_ hvpTsvp(a),hvTsv(b))
+#define cv_cp_replace(a,b)		Perl_sv_cp_replace(aTHX_ cvpTsvp(a),cvTsv(b))
+#define gv_cp_replace(a,b)		Perl_sv_cp_replace(aTHX_ gvpTsvp(a),gvTsv(b))
+#define io_cp_replace(a,b)		Perl_sv_cp_replace(aTHX_ iopTsvp(a),ioTsv(b))
+#define re_cp_replace(a,b)		Perl_sv_cp_replace(aTHX_ repTsvp(a),reTsv(b))
+#define sv_cp_replace		Perl_sv_cp_replace
 #define SvIV			Perl_SvIV
 #define SvUV			Perl_SvUV
 #define SvNV			Perl_SvNV
@@ -167,6 +180,7 @@
 #ifdef PERL_CORE
 #define op_const_sv		Perl_op_const_sv
 #endif
+#define cv_assignarg_flag	Perl_cv_assignarg_flag
 #define cv_undef		Perl_cv_undef
 #define cv_tmprefcnt		Perl_cv_tmprefcnt
 #define cx_dump			Perl_cx_dump
@@ -305,6 +319,7 @@
 #define gv_AVadd		Perl_gv_AVadd
 #define gv_HVadd		Perl_gv_HVadd
 #define gv_IOadd		Perl_gv_IOadd
+#define gv_io			Perl_gv_io
 #define gv_check		Perl_gv_check
 #define gv_efullname3		Perl_gv_efullname3
 #define gv_fetchfile		Perl_gv_fetchfile
@@ -445,7 +460,6 @@
 #define is_magicsv		Perl_is_magicsv
 #define magic_get		Perl_magic_get
 #define magic_getuvar		Perl_magic_getuvar
-#define magic_len		Perl_magic_len
 #define magic_regdata_cnt	Perl_magic_regdata_cnt
 #define magic_regdatum_get	Perl_magic_regdatum_get
 #define magic_regdatum_set	Perl_magic_regdatum_set
@@ -539,6 +553,7 @@
 #define newFOROP		Perl_newFOROP
 #define newLOGOP		Perl_newLOGOP
 #define newLOOPEX		Perl_newLOOPEX
+#define newPRIVATEVAROP		Perl_newPRIVATEVAROP
 #define newLOOPOP		Perl_newLOOPOP
 #define newNULLLIST		Perl_newNULLLIST
 #define newOP			Perl_newOP
@@ -605,6 +620,7 @@
 #define rootop_ll_tmprefcnt	Perl_rootop_ll_tmprefcnt
 #define op_free			Perl_op_free
 #define RootopOp		Perl_RootopOp
+#define opTlistop		Perl_opTlistop
 #define rootop_refcnt_dec	Perl_rootop_refcnt_dec
 #define rootop_refcnt_inc	Perl_rootop_refcnt_inc
 #define op_tmprefcnt		Perl_op_tmprefcnt
@@ -807,9 +823,6 @@
 #define setenv_getix		Perl_setenv_getix
 #endif
 #endif
-#if defined(PERL_CORE) || defined(PERL_EXT)
-#define setdefout		Perl_setdefout
-#endif
 #define share_hek		Perl_share_hek
 #if defined(HAS_SIGACTION) && defined(SA_SIGINFO)
 #ifdef PERL_CORE
@@ -902,6 +915,8 @@
 #define sv_report_used		Perl_sv_report_used
 #define sv_setpvf		Perl_sv_setpvf
 #define sv_vsetpvf		Perl_sv_vsetpvf
+#define sv_setrv		Perl_sv_setrv
+#define sv_setrv_mg		Perl_sv_setrv_mg
 #define sv_setiv		Perl_sv_setiv
 #define sv_setpviv		Perl_sv_setpviv
 #define sv_setuv		Perl_sv_setuv
@@ -1145,7 +1160,6 @@
 #define ck_readline		Perl_ck_readline
 #define ck_repeat		Perl_ck_repeat
 #define ck_require		Perl_ck_require
-#define ck_return		Perl_ck_return
 #define ck_rfun			Perl_ck_rfun
 #define ck_rvconst		Perl_ck_rvconst
 #define ck_sassign		Perl_ck_sassign
@@ -1858,7 +1872,6 @@
 #define ck_readline		Perl_ck_readline
 #define ck_repeat		Perl_ck_repeat
 #define ck_require		Perl_ck_require
-#define ck_return		Perl_ck_return
 #define ck_rfun			Perl_ck_rfun
 #define ck_rvconst		Perl_ck_rvconst
 #define ck_sassign		Perl_ck_sassign
@@ -2237,6 +2250,12 @@
 #define gvTsv(a)		Perl_gvTsv(aTHX_ a)
 #define ioTsv(a)		Perl_ioTsv(aTHX_ a)
 #define reTsv(a)		Perl_reTsv(aTHX_ a)
+#define avpTsvp(a)		Perl_avpTsvp(aTHX_ a)
+#define hvpTsvp(a)		Perl_hvpTsvp(aTHX_ a)
+#define cvpTsvp(a)		Perl_cvpTsvp(aTHX_ a)
+#define gvpTsvp(a)		Perl_gvpTsvp(aTHX_ a)
+#define iopTsvp(a)		Perl_iopTsvp(aTHX_ a)
+#define repTsvp(a)		Perl_repTsvp(aTHX_ a)
 #define svTav(a)		Perl_svTav(aTHX_ a)
 #define svThv(a)		Perl_svThv(aTHX_ a)
 #define svTcv(a)		Perl_svTcv(aTHX_ a)
@@ -2266,6 +2285,13 @@
 #define IoTMPREFCNT_inc(a)		Perl_SvTMPREFCNT_inc(aTHX_ ioTsv(a))
 #define ReTMPREFCNT_inc(a)		Perl_SvTMPREFCNT_inc(aTHX_ reTsv(a))
 #define SvTMPREFCNT_inc(a)	Perl_SvTMPREFCNT_inc(aTHX_ a)
+#define av_cp_replace(a,b)		Perl_sv_cp_replace(aTHX_ avpTsvp(a),avTsv(b))
+#define hv_cp_replace(a,b)		Perl_sv_cp_replace(aTHX_ hvpTsvp(a),hvTsv(b))
+#define cv_cp_replace(a,b)		Perl_sv_cp_replace(aTHX_ cvpTsvp(a),cvTsv(b))
+#define gv_cp_replace(a,b)		Perl_sv_cp_replace(aTHX_ gvpTsvp(a),gvTsv(b))
+#define io_cp_replace(a,b)		Perl_sv_cp_replace(aTHX_ iopTsvp(a),ioTsv(b))
+#define re_cp_replace(a,b)		Perl_sv_cp_replace(aTHX_ repTsvp(a),reTsv(b))
+#define sv_cp_replace(a,b)	Perl_sv_cp_replace(aTHX_ a,b)
 #define SvIV(a)			Perl_SvIV(aTHX_ a)
 #define SvUV(a)			Perl_SvUV(aTHX_ a)
 #define SvNV(a)			Perl_SvNV(aTHX_ a)
@@ -2342,6 +2368,7 @@
 #ifdef PERL_CORE
 #define op_const_sv(a,b)	Perl_op_const_sv(aTHX_ a,b)
 #endif
+#define cv_assignarg_flag(a)	Perl_cv_assignarg_flag(aTHX_ a)
 #define cv_undef(a)		Perl_cv_undef(aTHX_ a)
 #define cv_tmprefcnt(a)		Perl_cv_tmprefcnt(aTHX_ a)
 #define cx_dump(a)		Perl_cx_dump(aTHX_ a)
@@ -2481,6 +2508,7 @@
 #define gv_AVadd(a)		Perl_gv_AVadd(aTHX_ a)
 #define gv_HVadd(a)		Perl_gv_HVadd(aTHX_ a)
 #define gv_IOadd(a)		Perl_gv_IOadd(aTHX_ a)
+#define gv_io(a)		Perl_gv_io(aTHX_ a)
 #define gv_check(a)		Perl_gv_check(aTHX_ a)
 #define gv_efullname3(a,b,c)	Perl_gv_efullname3(aTHX_ a,b,c)
 #define gv_fetchfile(a)		Perl_gv_fetchfile(aTHX_ a)
@@ -2622,7 +2650,6 @@
 #define is_magicsv(a)		Perl_is_magicsv(aTHX_ a)
 #define magic_get(a,b)		Perl_magic_get(aTHX_ a,b)
 #define magic_getuvar(a,b)	Perl_magic_getuvar(aTHX_ a,b)
-#define magic_len(a,b)		Perl_magic_len(aTHX_ a,b)
 #define magic_regdata_cnt(a,b)	Perl_magic_regdata_cnt(aTHX_ a,b)
 #define magic_regdatum_get(a,b)	Perl_magic_regdatum_get(aTHX_ a,b)
 #define magic_regdatum_set(a,b)	Perl_magic_regdatum_set(aTHX_ a,b)
@@ -2715,6 +2742,7 @@
 #define newFOROP(a,b,c,d,e,f,g)	Perl_newFOROP(aTHX_ a,b,c,d,e,f,g)
 #define newLOGOP(a,b,c,d,e)	Perl_newLOGOP(aTHX_ a,b,c,d,e)
 #define newLOOPEX(a,b)		Perl_newLOOPEX(aTHX_ a,b)
+#define newPRIVATEVAROP(a,b)	Perl_newPRIVATEVAROP(aTHX_ a,b)
 #define newLOOPOP(a,b,c,d,e,f)	Perl_newLOOPOP(aTHX_ a,b,c,d,e,f)
 #define newNULLLIST(a)		Perl_newNULLLIST(aTHX_ a)
 #define newOP(a,b,c)		Perl_newOP(aTHX_ a,b,c)
@@ -2780,6 +2808,7 @@
 #define rootop_ll_tmprefcnt()	Perl_rootop_ll_tmprefcnt(aTHX)
 #define op_free(a)		Perl_op_free(aTHX_ a)
 #define RootopOp(a)		Perl_RootopOp(aTHX_ a)
+#define opTlistop(a)		Perl_opTlistop(aTHX_ a)
 #define rootop_refcnt_dec(a)	Perl_rootop_refcnt_dec(aTHX_ a)
 #define rootop_refcnt_inc(a)	Perl_rootop_refcnt_inc(aTHX_ a)
 #define op_tmprefcnt(a)		Perl_op_tmprefcnt(aTHX_ a)
@@ -2981,9 +3010,6 @@
 #define setenv_getix(a)		Perl_setenv_getix(aTHX_ a)
 #endif
 #endif
-#if defined(PERL_CORE) || defined(PERL_EXT)
-#define setdefout(a)		Perl_setdefout(aTHX_ a)
-#endif
 #define share_hek(a,b,c)	Perl_share_hek(aTHX_ a,b,c)
 #if defined(HAS_SIGACTION) && defined(SA_SIGINFO)
 #ifdef PERL_CORE
@@ -3005,12 +3031,12 @@
 #define sv_2cv(a,b,c)		Perl_sv_2cv(aTHX_ a,b,c)
 #define sv_2io(a)		Perl_sv_2io(aTHX_ a)
 #define sv_2iv(a)		Perl_sv_2iv(aTHX_ a)
-#define sv_2mortal(a)		svTav(Perl_sv_2mortal(aTHX_ avTsv(a)))
-#define sv_2mortal(a)		svThv(Perl_sv_2mortal(aTHX_ hvTsv(a)))
-#define sv_2mortal(a)		svTcv(Perl_sv_2mortal(aTHX_ cvTsv(a)))
-#define sv_2mortal(a)		svTgv(Perl_sv_2mortal(aTHX_ gvTsv(a)))
-#define sv_2mortal(a)		svTio(Perl_sv_2mortal(aTHX_ ioTsv(a)))
-#define sv_2mortal(a)		svTre(Perl_sv_2mortal(aTHX_ reTsv(a)))
+#define av_2mortal(a)		svTav(Perl_sv_2mortal(aTHX_ avTsv(a)))
+#define hv_2mortal(a)		svThv(Perl_sv_2mortal(aTHX_ hvTsv(a)))
+#define cv_2mortal(a)		svTcv(Perl_sv_2mortal(aTHX_ cvTsv(a)))
+#define gv_2mortal(a)		svTgv(Perl_sv_2mortal(aTHX_ gvTsv(a)))
+#define io_2mortal(a)		svTio(Perl_sv_2mortal(aTHX_ ioTsv(a)))
+#define re_2mortal(a)		svTre(Perl_sv_2mortal(aTHX_ reTsv(a)))
 #define sv_2mortal(a)		Perl_sv_2mortal(aTHX_ a)
 #define sv_2nv(a)		Perl_sv_2nv(aTHX_ a)
 #ifdef PERL_CORE
@@ -3074,6 +3100,8 @@
 #define sv_replace(a,b)		Perl_sv_replace(aTHX_ a,b)
 #define sv_report_used()	Perl_sv_report_used(aTHX)
 #define sv_vsetpvf(a,b,c)	Perl_sv_vsetpvf(aTHX_ a,b,c)
+#define sv_setrv(a,b)		Perl_sv_setrv(aTHX_ a,b)
+#define sv_setrv_mg(a,b)	Perl_sv_setrv_mg(aTHX_ a,b)
 #define sv_setiv(a,b)		Perl_sv_setiv(aTHX_ a,b)
 #define sv_setpviv(a,b)		Perl_sv_setpviv(aTHX_ a,b)
 #define sv_setuv(a,b)		Perl_sv_setuv(aTHX_ a,b)
@@ -3312,7 +3340,6 @@
 #define ck_readline(a)		Perl_ck_readline(aTHX_ a)
 #define ck_repeat(a)		Perl_ck_repeat(aTHX_ a)
 #define ck_require(a)		Perl_ck_require(aTHX_ a)
-#define ck_return(a)		Perl_ck_return(aTHX_ a)
 #define ck_rfun(a)		Perl_ck_rfun(aTHX_ a)
 #define ck_rvconst(a)		Perl_ck_rvconst(aTHX_ a)
 #define ck_sassign(a)		Perl_ck_sassign(aTHX_ a)
@@ -4040,7 +4067,6 @@
 #define ck_readline(a)		Perl_ck_readline(aTHX_ a)
 #define ck_repeat(a)		Perl_ck_repeat(aTHX_ a)
 #define ck_require(a)		Perl_ck_require(aTHX_ a)
-#define ck_return(a)		Perl_ck_return(aTHX_ a)
 #define ck_rfun(a)		Perl_ck_rfun(aTHX_ a)
 #define ck_rvconst(a)		Perl_ck_rvconst(aTHX_ a)
 #define ck_sassign(a)		Perl_ck_sassign(aTHX_ a)

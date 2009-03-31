@@ -20,8 +20,8 @@ ok(0,1,"need more tuits");
 ok(1,1);
 
 close $f;
-$TESTOUT = *STDOUT{IO};
-$TESTERR = *STDERR{IO};
+$TESTOUT = $^STDOUT;
+$TESTERR = $^STDERR;
 $ntest = 1;
 
 open $f, "<", "todo";
@@ -50,5 +50,5 @@ sub commentless {
   return $in;
 }
 
-print \*STDOUT, "1..1\n";
+print $^STDOUT, "1..1\n";
 ok( commentless($out), commentless($expect) );

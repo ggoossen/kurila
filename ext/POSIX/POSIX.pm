@@ -287,22 +287,22 @@ sub getc {
 
 sub getchar {
     usage "getchar()" if (nelems @_) != 0;
-    CORE::getc(\*STDIN);
+    CORE::getc($^STDIN);
 }
 
 sub gets {
     usage "gets()" if (nelems @_) != 0;
-    scalar ~< *STDIN;
+    scalar ~< $^STDIN;
 }
 
 sub perror {
-    print \*STDERR, "$(join ' ',@_): " if (nelems @_);
-    print \*STDERR, $^OS_ERROR,"\n";
+    print $^STDERR, "$(join ' ',@_): " if (nelems @_);
+    print $^STDERR, $^OS_ERROR,"\n";
 }
 
 sub printf {
     usage "printf(pattern, args...)" if (nelems @_) +< 1;
-    CORE::printf \*STDOUT, < @_;
+    CORE::printf $^STDOUT, < @_;
 }
 
 sub putc {

@@ -52,7 +52,7 @@ my %want =
     
 my @want = sort keys %want;
 
-print \*STDOUT, "1..", scalar nelems @want, "\n";
+print $^STDOUT, "1..", scalar nelems @want, "\n";
     
 for my $i (1..nelems @want) {
     my $try = @want[$i-1];
@@ -60,12 +60,12 @@ for my $i (1..nelems @want) {
     unless ($^EVAL_ERROR) {
 	my $got = langinfo( <&$try( < @_ ));
 	if (ref %want{?$try} && $got =~ %want{?$try} || $got eq %want{?$try}) {
-	    print \*STDOUT, qq[ok $i - $try is "$got"\n];
+	    print $^STDOUT, qq[ok $i - $try is "$got"\n];
 	} else {
-	    print \*STDOUT, qq[not ok $i - $try is "$got" not "%want{?$try}"\n];
+	    print $^STDOUT, qq[not ok $i - $try is "$got" not "%want{?$try}"\n];
 	}
     } else {
-	print \*STDOUT, qq[ok $i - Skip: $try not defined\n];
+	print $^STDOUT, qq[ok $i - Skip: $try not defined\n];
     }
 }
 

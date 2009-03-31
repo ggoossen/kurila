@@ -35,6 +35,12 @@ Perl_cvTsv
 Perl_gvTsv
 Perl_ioTsv
 Perl_reTsv
+Perl_avpTsvp
+Perl_hvpTsvp
+Perl_cvpTsvp
+Perl_gvpTsvp
+Perl_iopTsvp
+Perl_repTsvp
 Perl_svTav
 Perl_svThv
 Perl_svTcv
@@ -46,6 +52,7 @@ Perl_SvPVX_mutable
 Perl_SvREFCNT_dec
 Perl_SvREFCNT_inc
 Perl_SvTMPREFCNT_inc
+Perl_sv_cp_replace
 Perl_SvIV
 Perl_SvUV
 Perl_SvNV
@@ -96,6 +103,7 @@ Perl_fprintf_nocontext
 Perl_printf_nocontext
 Perl_cv_ckproto
 Perl_cv_const_sv
+Perl_cv_assignarg_flag
 Perl_cv_undef
 Perl_cv_tmprefcnt
 Perl_cx_dump
@@ -148,6 +156,7 @@ Perl_gp_ref
 Perl_gv_AVadd
 Perl_gv_HVadd
 Perl_gv_IOadd
+Perl_gv_io
 Perl_gv_check
 Perl_gv_efullname3
 Perl_gv_fetchfile
@@ -308,6 +317,7 @@ Perl_newCONSTSUB
 Perl_newFOROP
 Perl_newLOGOP
 Perl_newLOOPEX
+Perl_newPRIVATEVAROP
 Perl_newLOOPOP
 Perl_newNULLLIST
 Perl_newOP
@@ -370,6 +380,7 @@ Perl_newROOTOP
 Perl_rootop_ll_tmprefcnt
 Perl_op_free
 Perl_RootopOp
+Perl_opTlistop
 Perl_rootop_refcnt_dec
 Perl_rootop_refcnt_inc
 Perl_op_tmprefcnt
@@ -485,7 +496,6 @@ Perl_scan_num
 Perl_scan_oct
 Perl_parse_escape
 Perl_screaminstr
-Perl_setdefout
 Perl_share_hek
 Perl_csighandler
 Perl_stack_grow
@@ -552,6 +562,8 @@ Perl_sv_replace
 Perl_sv_report_used
 Perl_sv_setpvf
 Perl_sv_vsetpvf
+Perl_sv_setrv
+Perl_sv_setrv_mg
 Perl_sv_setiv
 Perl_sv_setpviv
 Perl_sv_setuv

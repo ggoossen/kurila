@@ -80,8 +80,8 @@ $($a)\{ $($a)[ $(join ' ', @b)\{
 # ensure that the second print statement works, by playing a bit
 # with the test output.
 my %data = %( foo => "\n" );
-print \*STDOUT, "#";
-print(\*STDOUT, 
+print $^STDOUT, "#";
+print($^STDOUT, 
 %data{?foo});
 pass();
 

@@ -30,30 +30,30 @@ do {
 	$y = \$x;
 	$z = \$x;
 };
-print \*STDOUT, "# START\n";
+print $^STDOUT, "# START\n";
 Dump($y); Dump($z);
 
 ok( ref($y) and ref($z));
 
-print \*STDOUT, "# WEAK:\n";
+print $^STDOUT, "# WEAK:\n";
 weaken($y);
 Dump($y); Dump($z);
 
 ok( ref($y) and ref($z));
 
-print \*STDOUT, "# UNDZ:\n";
+print $^STDOUT, "# UNDZ:\n";
 undef($z);
 Dump($y); Dump($z);
 
 ok( not (defined($y) and defined($z)) );
 
-print \*STDOUT, "# UNDY:\n";
+print $^STDOUT, "# UNDY:\n";
 undef($y);
 Dump($y); Dump($z);
 
 ok( not (defined($y) and defined($z)) );
 
-print \*STDOUT, "# FIN:\n";
+print $^STDOUT, "# FIN:\n";
 Dump($y); Dump($z);
 
 
@@ -61,7 +61,7 @@ Dump($y); Dump($z);
 # Case 2: one reference, which is weakened
 #
 
-print \*STDOUT, "# CASE 2:\n";
+print $^STDOUT, "# CASE 2:\n";
 
 do {
 	my $x = "foo";
@@ -69,14 +69,14 @@ do {
 };
 
 ok( ref($y) );
-print \*STDOUT, "# BW: \n";
+print $^STDOUT, "# BW: \n";
 Dump($y);
 weaken($y);
-print \*STDOUT, "# AW: \n";
+print $^STDOUT, "# AW: \n";
 Dump($y);
 ok( not defined $y  );
 
-print \*STDOUT, "# EXITBLOCK\n";
+print $^STDOUT, "# EXITBLOCK\n";
 }
 
 # 
@@ -91,20 +91,20 @@ do {
 	Dump($y);
 	$y->{+Flag} = \$flag;
 	weaken($y->{?Self});
-	print \*STDOUT, "# WKED\n";
+	print $^STDOUT, "# WKED\n";
 	ok( ref($y) );
-	print \*STDOUT, "# VALS: HASH ", dump::view($y),"   SELF ", dump::view(\$y->{+Self}),"  Y ", dump::view(\$y), 
+	print $^STDOUT, "# VALS: HASH ", dump::view($y),"   SELF ", dump::view(\$y->{+Self}),"  Y ", dump::view(\$y), 
 		"    FLAG: ", dump::view(\$y->{+Flag}),"\n";
-	print \*STDOUT, "# VPRINT\n";
+	print $^STDOUT, "# VPRINT\n";
 };
-print \*STDOUT, "# OUT $flag\n";
+print $^STDOUT, "# OUT $flag\n";
 ok( $flag == 1 );
 
-print \*STDOUT, "# AFTER\n";
+print $^STDOUT, "# AFTER\n";
 
 undef $flag;
 
-print \*STDOUT, "# FLAGU\n";
+print $^STDOUT, "# FLAGU\n";
 
 #
 # Case 4: a more complicated circular structure
@@ -133,7 +133,7 @@ do {
 	$z = \$x;
 };
 
-print \*STDOUT, "# CASE5\n";
+print $^STDOUT, "# CASE5\n";
 Dump($y);
 
 weaken($y);
@@ -171,20 +171,20 @@ SKIP: do {
     skip("Test does not work with MAD", 5) if config_value("mad");
 
     $a = eval '\"hello"';
-    ok(ref($a)) or print \*STDOUT, "# didn't get a ref from eval\n";
+    ok(ref($a)) or print $^STDOUT, "# didn't get a ref from eval\n";
     $b = $a;
     try{weaken($b)};
     # we didn't die
-    ok($^EVAL_ERROR eq "") or print \*STDOUT, "# died with $^EVAL_ERROR\n";
+    ok($^EVAL_ERROR eq "") or print $^STDOUT, "# died with $^EVAL_ERROR\n";
     ok(isweak($b));
-    ok($$b eq "hello") or print \*STDOUT, "# b is '$$b'\n";
+    ok($$b eq "hello") or print $^STDOUT, "# b is '$$b'\n";
     $a="";
-    ok(not $b) or print \*STDOUT, "# b didn't go away\n";
+    ok(not $b) or print $^STDOUT, "# b didn't go away\n";
 };
 
 package Dest;
 
 sub DESTROY {
-	print \*STDOUT, "# INCFLAG\n";
+	print $^STDOUT, "# INCFLAG\n";
 	${@_[0]->{Flag}} ++;
 }

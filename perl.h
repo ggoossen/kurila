@@ -3453,11 +3453,10 @@ Gid_t getegid (void);
 #endif
 
 #ifndef Perl_error_log
-#  define Perl_error_log	(PL_stderrgv			\
-				 && isGV(PL_stderrgv)		\
-				 && GvIOp(PL_stderrgv)          \
-				 && IoOFP(GvIOp(PL_stderrgv))	\
-				 ? IoOFP(GvIOp(PL_stderrgv))	\
+#  define Perl_error_log	(PL_stderrio			\
+				 && SvIOOK(PL_stderrio)          \
+				 && IoOFP(PL_stderrio)	\
+				 ? IoOFP(PL_stderrio)	\
 				 : PerlIO_stderr())
 #endif
 
@@ -4636,6 +4635,8 @@ END_EXTERN_C
 START_EXTERN_C
 
 #include "gv.h"
+#include "gv_i.h"
+#include "cv_i.h"
 #include "sv_i.h"
 #include "hv_i.h"
 #include "cop_i.h"

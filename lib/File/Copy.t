@@ -49,10 +49,10 @@ for my $cross_partition_test (0..1) {
 
   is $foo, "ok\n", 'copy(fn, fn): same contents';
 
-  print(\*STDOUT, "# next test checks copying to STDOUT\n");
-  binmode \*STDOUT unless $^OS_NAME eq 'VMS'; # Copy::copy works in binary mode
+  print($^STDOUT, "# next test checks copying to STDOUT\n");
+  binmode $^STDOUT unless $^OS_NAME eq 'VMS'; # Copy::copy works in binary mode
   # This outputs "ok" so its a test.
-  copy "copy-$^PID", \*STDOUT;
+  copy "copy-$^PID", $^STDOUT;
   $TB->current_test($TB->current_test + 1);
   unlink "copy-$^PID" or die "unlink: $^OS_ERROR";
 

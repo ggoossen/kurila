@@ -5,14 +5,14 @@ my $PERLIO;
 BEGIN {
     require './test.pl';
     unless ('PerlIO::Layer'->find('perlio')) {
-	print \*STDOUT, "1..0 # Skip: not perlio\n";
+	print $^STDOUT, "1..0 # Skip: not perlio\n";
 	exit 0;
     }
     # Makes testing easier.
     env::set_var('PERLIO' => 'stdio') if defined env::var('PERLIO') && env::var('PERLIO') eq '';
     if (defined env::var('PERLIO') && env::var('PERLIO') !~ m/^(stdio|perlio|mmap)$/) {
 	# We are not prepared for anything else.
-	print \*STDOUT, "1..0 # PERLIO='$(env::var('PERLIO'))' unknown\n";
+	print $^STDOUT, "1..0 # PERLIO='$(env::var('PERLIO'))' unknown\n";
 	exit 0;
     }
     $PERLIO = defined env::var('PERLIO') ?? env::var('PERLIO') !! "(undef)";
@@ -43,7 +43,7 @@ sub PerlIO::F_UTF8 () { 0x00008000 } # from perliol.h
 
 plan tests => $NTEST;
 
-print \*STDOUT, <<__EOH__;
+print $^STDOUT, <<__EOH__;
 # PERLIO        = $PERLIO
 # DOSISH        = $DOSISH
 # NONSTDIO      = $NONSTDIO
@@ -112,7 +112,7 @@ SKIP: do {
 	}
     }
 
-    check(PerlIO::get_layers(\*STDIN),
+    check(PerlIO::get_layers($^STDIN),
 	  $UTF8_STDIN ?? @( "stdio", "utf8" ) !! @( "stdio" ),
 	  "STDIN");
 

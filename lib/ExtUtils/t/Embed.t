@@ -9,7 +9,7 @@ print $fh, ~< *DATA;
 close($fh);
 
 $^OUTPUT_AUTOFLUSH = 1;
-print \*STDOUT, "1..9\n";
+print $^STDOUT, "1..9\n";
 my $cc = config_value('cc');
 my $cl  = ($^OS_NAME eq 'MSWin32' && $cc eq 'cl');
 my $borl  = ($^OS_NAME eq 'MSWin32' && $cc eq 'bcc32');
@@ -83,7 +83,7 @@ if ($^OS_NAME eq 'VMS') {
    } else { # Not MSWin32 or OS/390 (z/OS) dynamic.
     push(@cmd,"-L$lib",'-lperl');
     local $^WARN_HOOK = sub {
-	print \*STDERR, @_[0]->message unless @_[0]->message =~ m/No library found for .*perl/
+	print $^STDERR, @_[0]->message unless @_[0]->message =~ m/No library found for .*perl/
     };
     push(@cmd, '-Zlinker', '/PM:VIO')	# Otherwise puts a warning to STDOUT!
 	if $^OS_NAME eq 'os2' and config_value('ldflags') =~ m/(?<!\S)-Zomf\b/;
@@ -125,22 +125,22 @@ my $status;
 # On OS/2 the linker will always emit an empty line to STDOUT; filter these
 my $cmd = join ' ', @cmd;
 chomp($cmd); # where is the newline coming from? ldopts()?
-print \*STDOUT, "# $cmd\n";
+print $^STDOUT, "# $cmd\n";
 my @out = @( `$cmd` );
 $status = $^CHILD_ERROR;
-print \*STDOUT, "# $_\n" foreach  @out;
+print $^STDOUT, "# $_\n" foreach  @out;
 
 if ($^OS_NAME eq 'VMS' && !$status) {
-  print \*STDOUT, "# $(join ' ',@cmd2)\n";
+  print $^STDOUT, "# $(join ' ',@cmd2)\n";
   $status = system(join(' ', @cmd2)); 
 }
-print (\*STDOUT, ($status?? 'not '!! '')."ok 1\n");
+print ($^STDOUT, ($status?? 'not '!! '')."ok 1\n");
 
 my $embed_test = File::Spec->catfile(File::Spec->curdir, $exe);
 $embed_test = "run/nodebug $exe" if $^OS_NAME eq 'VMS';
-print \*STDOUT, "# embed_test = $embed_test\n";
+print $^STDOUT, "# embed_test = $embed_test\n";
 $status = system($embed_test);
-print (\*STDOUT, ($status?? 'not '!!'')."ok 9 # system returned $status\n");
+print ($^STDOUT, ($status?? 'not '!!'')."ok 9 # system returned $status\n");
 unlink($exe,"embed_test.c",$obj);
 unlink("$exe.manifest") if $cl and config_value('ccversion') =~ m/^(\d+)/ and $1 +>= 14;
 unlink("$exe" . config_value("exe_ext")) if $skip_exe;
@@ -158,7 +158,7 @@ __END__
 
 #define my_puts(a) if(puts(a) < 0) exit(666)
 
-static const char * cmds [] = { "perl", "-e", "$^OUTPUT_AUTOFLUSH=1; print \*STDOUT, qq[ok 5\\n]", NULL };
+static const char * cmds [] = { "perl", "-e", "$^OUTPUT_AUTOFLUSH=1; print $^STDOUT, qq[ok 5\\n]", NULL };
 
 #ifdef PERL_GLOBAL_STRUCT_PRIVATE
 static struct perl_vars *my_plvarsp;

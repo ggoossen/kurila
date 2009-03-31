@@ -29,7 +29,7 @@ foreach my $file (@(
 
   unless(-e source_path($file)) {
     ok 0;
-    print \*STDOUT, "# But $file doesn't exist!!\n";
+    print $^STDOUT, "# But $file doesn't exist!!\n";
     next;
   }
 
@@ -56,7 +56,7 @@ foreach my $file (@(
       for ($strings) { s/[ ]//g; };
       $strings[0] eq $strings[1];
     }){
-      print \*STDOUT, "# Differ only in whitespace.\n";
+      print $^STDOUT, "# Differ only in whitespace.\n";
       ok 1;
       next;
     } else {
@@ -64,18 +64,18 @@ foreach my $file (@(
       my $x = $strings[0] ^^^ $strings[1];
       $x =~ m/^(\x00*)/s or die;
       my $at = length($1);
-      print \*STDOUT, "# Difference at byte $at...\n";
+      print $^STDOUT, "# Difference at byte $at...\n";
       if($at +> 10) {
         $at -= 5;
       }
       do {
-        print \*STDOUT, "# ", substr($strings[0],$at,20), "\n";
-        print \*STDOUT, "# ", substr($strings[1],$at,20), "\n";
-        print \*STDOUT, "#      ^...";
+        print $^STDOUT, "# ", substr($strings[0],$at,20), "\n";
+        print $^STDOUT, "# ", substr($strings[1],$at,20), "\n";
+        print $^STDOUT, "#      ^...";
       };
     
       ok 0;
-      printf \*STDOUT, "# Unequal lengths \%s and \%s\n", length($strings[0]), length($strings[1]);
+      printf $^STDOUT, "# Unequal lengths \%s and \%s\n", length($strings[0]), length($strings[1]);
       next;
     }
   }

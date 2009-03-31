@@ -29,8 +29,10 @@ sub import {
 
   local $_;
   if ($args and not %$export_cache) {
-    s/^&//, $export_cache->{+$_} = 1
-      foreach @( (< @$exports, < @{*{Symbol::fetch_glob("$pkg\::EXPORT_OK")}}));
+      foreach (@$exports +@+  @{*{Symbol::fetch_glob("$pkg\::EXPORT_OK")}}) {
+          s/^&//;
+          $export_cache->{+$_} = 1;
+      }
   }
   my $heavy;
   # Try very hard not to use {} and hence have to  enter scope on the foreach

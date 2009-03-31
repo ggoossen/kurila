@@ -507,7 +507,7 @@ nmake 1.50 limits command length to 2048 characters.
 sub max_exec_len {
     my $self = shift;
 
-    return $self->{+_MAX_EXEC_LEN} ||= 2 * 1024;
+    return ($self->{+_MAX_EXEC_LEN} ||= 2 * 1024);
 }
 
 
@@ -540,11 +540,11 @@ sub cflags($self,$libperl) {
     };
     $self->{+CCFLAGS} .= " -DPERLDLL" if ($self->{?LINKTYPE} eq 'static');
 
-    return $self->{+CFLAGS} = qq{
+    return ($self->{+CFLAGS} = qq{
 CCFLAGS = $self->{?CCFLAGS}
 OPTIMIZE = $self->{?OPTIMIZE}
 PERLTYPE = $self->{?PERLTYPE}
-};
+});
 
 }
 

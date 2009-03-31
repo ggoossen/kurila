@@ -8,7 +8,7 @@ BEGIN {
 
 my @c;
 
-print \*STDOUT, "# Tests with caller(0)\n";
+print $^STDOUT, "# Tests with caller(0)\n";
 
 @c = @( caller(0) );
 ok( (!nelems @c), "caller(0) in main program" );
@@ -32,7 +32,7 @@ my $fooref = \(delete %main::{foo});
 is( @c[3], "main::foo", "unknown subroutine name" );
 ok( defined @c[4], "args true with unknown sub" );
 
-print \*STDOUT, "# Tests with caller(1)\n";
+print $^STDOUT, "# Tests with caller(1)\n";
 
 sub f { @c = @( caller(1) ) }
 
@@ -145,7 +145,7 @@ $i = eval $debugger_test;
 is( $i, 11, 'do not skip over eval even if $^P had been on at some point' );
 is( eval 'pb()', 'main::pb', 'actually return the right function name even if $^P had been on at some point' );
 
-print \*STDOUT, "# caller can now return the compile time state of \%^H\n";
+print $^STDOUT, "# caller can now return the compile time state of \%^H\n";
 
 sub hint_exists {
     my $key = shift;

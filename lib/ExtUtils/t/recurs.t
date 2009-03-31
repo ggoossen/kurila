@@ -113,7 +113,7 @@ close $makefh;
 
 do {
     # Quiet "make test" failure noise
-    close *STDERR;
+    close $^STDERR;
 
     my $test_out = run("$make test");
     isnt $^CHILD_ERROR, 0, 'test failure in a subdir causes make to fail';

@@ -4,7 +4,7 @@
 BEGIN {
     if (not env::var('PERL_CORE')) {
 	# this won't work outside of the core, so exit
-        print \*STDOUT, "1..0\n"; exit 0;
+        print $^STDOUT, "1..0\n"; exit 0;
     }
 }
 use Config;

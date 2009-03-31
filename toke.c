@@ -246,7 +246,7 @@ static const char* const lex_state_names[] = {
 	}
 
 /* grandfather return to old style */
-#define OLDLOP(f) SETCURLOCATION( return(pl_yylval.i_tkval.ival=f,PL_expect = XTERM,PL_bufptr = s,(int)LSTOP); )
+#define RETURNop(f) SETCURLOCATION( return(pl_yylval.i_tkval.ival=f,PL_expect = XTERM,PL_bufptr = s,(int)RETURNOP); )
 
 #ifdef DEBUGGING
 
@@ -957,10 +957,10 @@ S_skipspace(pTHX_ register char *s)
 	    if (PL_minus_p) {
 #ifdef PERL_MAD
 		sv_catpvs(PL_linestr,
-			 ";}continue{print \\*STDOUT, $_ or die qq(-p destination: $^OS_ERROR\\n);}");
+			 ";}continue{print $^STDOUT, $_ or die qq(-p destination: $^OS_ERROR\\n);}");
 #else
 		sv_setpvs(PL_linestr,
-			 ";}continue{print \\*STDOUT, $_ or die qq(-p destination: $^OS_ERROR\\n);}");
+			 ";}continue{print $^STDOUT, $_ or die qq(-p destination: $^OS_ERROR\\n);}");
 #endif
 		PL_minus_n = PL_minus_p = 0;
 	    }
@@ -2785,6 +2785,7 @@ Perl_yylex(pTHX)
     PL_oldbufptr = s;
 
   retry:
+    PL_bufptr = s;
 #ifdef PERL_MAD
     if (PL_thistoken) {
 	sv_free(PL_thistoken);
@@ -2890,7 +2891,7 @@ Perl_yylex(pTHX)
 			PL_faketokens = 1;
 #endif
 		    if (PL_minus_p)
-			sv_setpvs(PL_linestr, ";}continue{print \\*STDOUT, $_;}");
+			sv_setpvs(PL_linestr, ";}continue{print $^STDOUT, $_;}");
 		    else
 			sv_setpvs(PL_linestr, ";}");
 		    PL_oldoldbufptr = PL_oldbufptr = s = PL_linestart = SvPVX_mutable(PL_linestr);
@@ -3780,42 +3781,6 @@ Perl_yylex(pTHX)
 	    return yylex();		/* ignore fake brackets */
 	}
 
-#ifdef PERL_MAD
-	PL_initialwhite = PL_thiswhite;
-#endif
-	if (PL_lex_state == LEX_INTERPEND) {
-	    start_force(PL_curforce);
-	    if (PL_madskills) {
-		CURMAD('_', PL_thiswhite);
-	    }
-	    force_next(';');
-	}
-	else {
-#ifdef PERL_MAD
-	    PL_thiswhite = NULL;
-#endif
-	    s = SKIPSPACE1(s);
-	    start_force(PL_curforce);
-	    d = scan_word(s, PL_tokenbuf, sizeof PL_tokenbuf, FALSE, &len);
-	    if (len == 4 && strEQ(PL_tokenbuf, "else")) {
-		curmad('X', newSVpvs("else"));
-		force_next(ELSE);
-		s = d;
-	    }
-	    else if (len == 5 && strEQ(PL_tokenbuf, "elsif")) {
-		curmad('X', newSVpvs("elsif"));
-		force_next(ELSIF);
-		s = d;
-	    }
-	    else if (len == 8 && strEQ(PL_tokenbuf, "continue")) {
-		curmad('X', newSVpvs("continue"));
-		force_next(CONTINUE);
-		s = d;
-	    }
-	    else
-		force_next(';');
-	}
-	    
 	start_force(-1);
 	curmad('X', newSVpvs("}"));
 	CURMAD('_', PL_initialwhite);
@@ -5274,7 +5239,7 @@ Perl_yylex(pTHX)
 	    TERM(sublex_start(pl_yylval.i_tkval.ival, NULL));
 
 	case KEY_return:
-	    OLDLOP(OP_RETURN);
+	    RETURNop(RETURNOP);
 
 	case KEY_require:
 	    s = SKIPSPACE1(s);
@@ -5702,128 +5667,7 @@ Perl_yylex(pTHX)
 static int
 S_pending_ident(pTHX_ const char* begin_s)
 {
-    dVAR;
-    register char *d;
-    PADOFFSET tmp = 0;
-    GV* gv;
-    OP* gvop;
-    const STRLEN tokenbuf_len = strlen(PL_tokenbuf);
-    /* All routes through this function want to know if there is a colon.  */
-    const char *const has_colon = (const char*) memchr (PL_tokenbuf, ':', tokenbuf_len);
-
-    /* PL_realtokenstart = realtokenend = PL_bufptr - SvPVX_mutable(PL_linestr); */
-    DEBUG_T({ PerlIO_printf(Perl_debug_log,
-          "### Pending identifier '%s'\n", PL_tokenbuf); });
-
-    /* if we're in a my(), we can't allow dynamics here.
-       if it's a legal name, the OP is a PADANY.
-    */
-    if (PL_in_my) {
-        if (PL_in_my == KEY_our) {	/* "our" is merely analogous to "my" */
-            if (has_colon)
-                yyerror(Perl_form(aTHX_ "No package name allowed for "
-                                  "variable %s in \"our\"",
-                                  PL_tokenbuf));
-            tmp = allocmy(PL_tokenbuf);
-        }
-        else {
-            if (has_colon)
-                yyerror(Perl_form(aTHX_ PL_no_myglob,
-			    PL_in_my == KEY_my ? "my" : "state", PL_tokenbuf));
-
-            pl_yylval.opval = newOP(OP_PADSV, 0, S_curlocation(begin_s));
-            pl_yylval.opval->op_targ = allocmy(PL_tokenbuf);
-            return PRIVATEVAR;
-        }
-    }
-
-    /*
-       build the ops for accesses to a my() variable.
-
-       Deny my($a) or my($b) in a sort block, *if* $a or $b is
-       then used in a comparison.  This catches most, but not
-       all cases.  For instance, it catches
-           sort { my($a); $a <=> $b }
-       but not
-           sort { my($a); $a < $b ? -1 : $a == $b ? 0 : 1; }
-       (although why you'd do that is anyone's guess).
-    */
-
-    if (!has_colon) {
-	if (!PL_in_my)
-	    tmp = pad_findmy(PL_tokenbuf);
-        if (tmp != NOT_IN_PAD) {
-            /* might be an "our" variable" */
-            if (PAD_COMPNAME_FLAGS_isOUR(tmp)) {
-                /* build ops for a bareword */
-		GV *  const ourgv = PAD_COMPNAME_OURGV(tmp);
-		OP * gvop = (OP*)newGVOP(OP_GV, 0, ourgv, S_curlocation(begin_s));
-		pl_yylval.opval = newUNOP(
-		    (*PL_tokenbuf == '%' ? OP_RV2HV : *PL_tokenbuf == '@' ? OP_RV2AV : OP_RV2SV),
-			0, gvop, S_curlocation(begin_s));
-                return PRIVATEVAR;
-            }
-
-            /* if it's a sort block and they're naming $a or $b */
-            if (PL_last_lop_op == OP_SORT &&
-                PL_tokenbuf[0] == '$' &&
-                (PL_tokenbuf[1] == 'a' || PL_tokenbuf[1] == 'b')
-                && !PL_tokenbuf[2])
-            {
-                for (d = PL_in_eval ? PL_oldoldbufptr : PL_linestart;
-                     d < PL_bufend && *d != '\n';
-                     d++)
-                {
-                    if (strnEQ(d,"<=>",3) || strnEQ(d,"cmp",3)) {
-                        Perl_croak(aTHX_ "Can't use \"my %s\" in sort comparison",
-                              PL_tokenbuf);
-                    }
-                }
-            }
-
-            pl_yylval.opval = newOP(OP_PADSV, 0, S_curlocation(begin_s));
-            pl_yylval.opval->op_targ = tmp;
-            return PRIVATEVAR;
-        }
-    }
-
-    if (PL_tokenbuf[1] == '^'
-	|| ( PL_tokenbuf[1] >= '0' && PL_tokenbuf[1] <= '9' ) ) {
-	if ( ! is_magicsv(&PL_tokenbuf[1]) ) {
-	    Perl_croak(aTHX_ "unknown magical variable %s", PL_tokenbuf);
-	}
-	pl_yylval.opval = newSVOP(OP_MAGICSV, 0,
-	    newSVpvn(PL_tokenbuf+1, tokenbuf_len-1),
-	    S_curlocation(begin_s));
-	return PRIVATEVAR;
-    }
-
-    /* build ops for a global variable */
-    gv = gv_fetchpvn_flags(
-	    PL_tokenbuf + 1, tokenbuf_len - 1,
-	    /* If the identifier refers to a stash, don't autovivify it.
-	     * Change 24660 had the side effect of causing symbol table
-	     * hashes to always be defined, even if they were freshly
-	     * created and the only reference in the entire program was
-	     * the single statement with the defined %foo::bar:: test.
-	     * It appears that all code in the wild doing this actually
-	     * wants to know whether sub-packages have been loaded, so
-	     * by avoiding auto-vivifying symbol tables, we ensure that
-	     * defined %foo::bar:: continues to be false, and the existing
-	     * tests still give the expected answers, even though what
-	     * they're actually testing has now changed subtly.
-	     */
-	    (PL_in_eval ? (GV_ADDMULTI | GV_ADDINEVAL) : GV_ADD),
-	    ((PL_tokenbuf[0] == '$') ? SVt_PV
-	     : (PL_tokenbuf[0] == '@') ? SVt_PVAV
-	     : SVt_PVHV));
-    if ( ! gv )
-	Perl_croak(aTHX_ "variable %s does not exist", PL_tokenbuf);
-    gvop = (OP*)newGVOP(OP_GV, 0, gv, S_curlocation(begin_s));
-    pl_yylval.opval = newUNOP(
-	(*PL_tokenbuf == '%' ? OP_RV2HV : *PL_tokenbuf == '@' ? OP_RV2AV : OP_RV2SV),
-	    0, gvop, S_curlocation(begin_s));
-
+    pl_yylval.i_tkval.location = S_curlocation(begin_s);
     return PRIVATEVAR;
 }
 

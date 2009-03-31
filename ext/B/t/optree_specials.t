@@ -378,7 +378,7 @@ EOT_EOT
 EONT_EONT
 
 
-# perl "-I../lib" -MO=Concise,BEGIN,CHECK,INIT,END,-exec -e '$a=$b && print q/foo/'
+# perl "-I../lib" -MO=Concise,BEGIN,CHECK,INIT,END,-exec -e '($a=$b) && print q/foo/'
 
 
 

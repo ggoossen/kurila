@@ -65,7 +65,7 @@ Pod::Parser - base class for creating POD filters and translators
     ## Create a parser object and have it parse file whose name was
     ## given on the command-line (use STDIN if no files were given).
     $parser = new MyParser();
-    $parser->parse_from_filehandle(\*STDIN)  if (@ARGV == 0);
+    $parser->parse_from_filehandle($^STDIN)  if (@ARGV == 0);
     for (@ARGV) { $parser->parse_from_file($_); }
 
 =head1 REQUIRES
@@ -1027,7 +1027,7 @@ sub parse_from_filehandle {
     my $self = shift;
     my %opts = %( (ref @_[0] eq 'HASH') ?? < %{ shift() } !! () );
     my @($in_fh, ?$out_fh) =  @_;
-    $in_fh = \*STDIN  unless ($in_fh);
+    $in_fh = $^STDIN  unless ($in_fh);
     local *myData = $self;  ## alias to avoid deref-ing overhead
     local *myOpts = (%myData{+_PARSEOPTS} ||= \%());  ## get parse-options
     local $_;
@@ -1160,7 +1160,7 @@ sub parse_from_file {
         ## Not a filename, just a string implying STDIN
         $infile ||= '-';
         %myData{+_INFILE} = "<standard input>";
-        $in_fh = \*STDIN;
+        $in_fh = $^STDIN;
     }
     else {
         ## We have a filename, open it for reading
@@ -1207,13 +1207,13 @@ sub parse_from_file {
             ## Not a filename, just a string implying STDOUT
             $outfile ||= '-';
             %myData{+_OUTFILE} = "<standard output>";
-            $out_fh  = \*STDOUT;
+            $out_fh  = $^STDOUT;
         }
     }
     elsif ($outfile =~ m/^>&(STDERR|2)$/i) {
         ## Not a filename, just a string implying STDERR
         %myData{+_OUTFILE} = "<standard error>";
-        $out_fh  = \*STDERR;
+        $out_fh  = $^STDERR;
     }
     else {
         ## We have a filename, open it for writing
@@ -1340,10 +1340,9 @@ sub parseopts {
    return %myOpts  if ((nelems @_) == 0);
    if ((nelems @_) == 1) {
       local $_ = shift;
-      return  ref($_)  ??  %myData{+_PARSEOPTS} = $_  !!  %myOpts{?$_};
+      return  ref($_)  ??  (%myData{+_PARSEOPTS} = $_)  !!  %myOpts{?$_};
    }
-   my @newOpts = @(< %myOpts, < @_);
-   %myData{+_PARSEOPTS} = \%( < @newOpts );
+   %myData{+_PARSEOPTS} = \( %myOpts +%+ %:< @_ );
 }
 
 ##---------------------------------------------------------------------------
@@ -1514,7 +1513,7 @@ sub _push_input_stream($self, $in_fh, $out_fh) {
     ## beginning of the entire document (but *not* if this is an included
     ## file).
     unless (defined  %myData{?_TOP_STREAM}) {
-        $out_fh  = \*STDOUT  unless (defined $out_fh);
+        $out_fh  = $^STDOUT  unless (defined $out_fh);
         %myData{+_CUTTING}       = 1;   ## current "cutting" state
         %myData{+_INPUT_STREAMS} = \@();  ## stack of all input streams
     }
@@ -1522,7 +1521,7 @@ sub _push_input_stream($self, $in_fh, $out_fh) {
     ## Initialize input indicators
     %myData{+_OUTFILE} = '(unknown)'  unless (defined  %myData{?_OUTFILE});
     %myData{+_OUTPUT}  = $out_fh      if (defined  $out_fh);
-    $in_fh            = \*STDIN      unless (defined  $in_fh);
+    $in_fh            = $^STDIN      unless (defined  $in_fh);
     %myData{+_INFILE}  = '(unknown)'  unless (defined  %myData{?_INFILE});
     %myData{+_INPUT}   = $in_fh;
     my $input_top     = %myData{+_TOP_STREAM}

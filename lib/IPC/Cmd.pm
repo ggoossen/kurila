@@ -306,7 +306,7 @@ sub run {
         return;
     };        
 
-    print \*STDOUT, < loc("Running [\%1]...\n", (ref $cmd ?? "$(join ' ',@$cmd)" !! $cmd)) if $verbose;
+    print $^STDOUT, < loc("Running [\%1]...\n", (ref $cmd ?? "$(join ' ',@$cmd)" !! $cmd)) if $verbose;
 
     ### did the user pass us a buffer to fill or not? if so, set this
     ### flag so we know what is expected of us
@@ -322,7 +322,7 @@ sub run {
         my $buf = shift;
         return unless defined $buf;
         
-        print \*STDOUT, $buf if $verbose;
+        print $^STDOUT, $buf if $verbose;
         push @buffer,   $buf;
         push @buff_out, $buf;
     };
@@ -332,7 +332,7 @@ sub run {
         my $buf = shift;
         return unless defined $buf;
         
-        print \*STDERR, $buf if $verbose;
+        print $^STDERR, $buf if $verbose;
         push @buffer,   $buf;
         push @buff_err, $buf;
     };
@@ -416,9 +416,9 @@ sub _open3_run {
     
 
     my $pid = IPC::Open3::open3(
-                    '<&STDIN',
-                    (IS_WIN32 ?? '>&STDOUT' !! $kidout),
-                    (IS_WIN32 ?? '>&STDERR' !! $kiderror),
+                    (@: '<&', $^STDIN),
+                    (IS_WIN32 ?? (@: '>&', $^STDOUT) !! $kidout),
+                    (IS_WIN32 ?? (@: '>&', $^STDERR) !! $kiderror),
                     $cmd
                 );
 
@@ -426,12 +426,12 @@ sub _open3_run {
     ### we never get the input.. so jump through
     ### some hoops to do it :(
     my $selector = IO::Select->new(
-                        (IS_WIN32 ?? \*STDERR !! $kiderror), 
-                        \*STDIN,   
-                        (IS_WIN32 ?? \*STDOUT !! $kidout)     
-                    );              
+                        (IS_WIN32 ?? $^STDERR !! $kiderror), 
+                        $^STDIN,   
+                        (IS_WIN32 ?? $^STDOUT !! $kidout)     
+                    );
 
-    (\*STDOUT)->autoflush(1);   (\*STDERR)->autoflush(1);   (\*STDIN)->autoflush(1);
+    ($^STDOUT)->autoflush(1);   ($^STDERR)->autoflush(1);   ($^STDIN)->autoflush(1);
     $kidout->autoflush(1)   if UNIVERSAL::can($kidout,   'autoflush');
     $kiderror->autoflush(1) if UNIVERSAL::can($kiderror, 'autoflush');
 
@@ -527,7 +527,7 @@ sub _ipc_run {
                     }, split( m/\s*([<>|&])\s*/, $cmd );
     }
  
-    ### if there's a pipe in the command, *STDIN needs to 
+    ### if there's a pipe in the command, $^STDIN needs to 
     ### be inserted *BEFORE* the pipe, to work on win32
     ### this also works on *nix, so we should do it when possible
     ### this should *also* work on multiple pipes in the command
@@ -539,19 +539,19 @@ sub _ipc_run {
     #         ### only add STDIN the first time..
     #         my $i;
     #         @command = map { ($_ eq '|' && not $i++) 
-    #                             ? ( \*STDIN, $_ ) 
+    #                             ? ( $^STDIN, $_ ) 
     #                             : $_ 
     #                         } @command; 
     #     } else {
-    #         push @command, \*STDIN;
+    #         push @command, $^STDIN;
     #     }
   
  
-    # \*STDIN is already included in the @command, see a few lines up
+    # $^STDIN is already included in the @command, see a few lines up
     return IPC::Run::run(   < @command, 
-                            fileno(\*STDOUT).'>',
+                            fileno($^STDOUT).'>',
                             $_out_handler,
-                            fileno(\*STDERR).'>',
+                            fileno($^STDERR).'>',
                             $_err_handler
                         );
 }
@@ -577,9 +577,9 @@ do {   use File::Spec;
     use Symbol;
 
     my %Map = %(
-        STDOUT => \@( <qw|>&|, \*STDOUT, Symbol::gensym() ),
-        STDERR => \@( <qw|>&|, \*STDERR, Symbol::gensym() ),
-        STDIN  => \@( <qw|<&|, \*STDIN,  Symbol::gensym() ),
+        STDOUT => \@( <qw|>&|, $^STDOUT, Symbol::gensym() ),
+        STDERR => \@( <qw|>&|, $^STDERR, Symbol::gensym() ),
+        STDIN  => \@( <qw|<&|, $^STDIN,  Symbol::gensym() ),
     );
 
     ### dups FDs and stores them in a cache

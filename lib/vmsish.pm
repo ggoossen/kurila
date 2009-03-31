@@ -118,8 +118,8 @@ sub bits {
     foreach my $sememe ( @_) {
 	# Those hints are defined in vms/vmsish.h :
 	# HINT_M_VMSISH_STATUS and HINT_M_VMSISH_TIME
-        $bits ^|^= 0x40000000, next if $sememe eq 'status' || $sememe eq '$?';
-	$bits ^|^= 0x80000000, next if $sememe eq 'time';
+        ($bits ^|^= 0x40000000), next if $sememe eq 'status' || $sememe eq '$?';
+	($bits ^|^= 0x80000000), next if $sememe eq 'time';
     }
     $bits;
 }

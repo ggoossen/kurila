@@ -235,7 +235,7 @@ IO::Select - OO interface to the select system call
 
     $s = IO::Select->new();
 
-    $s->add(\*STDIN);
+    $s->add($^STDIN);
     $s->add($some_handle);
 
     @ready = $s->can_read($timeout);

@@ -7,7 +7,7 @@ BEGIN {
 use Config;
 use File::Spec;
 
-plan tests => 107;
+plan tests => 106;
 
 my $Perl = which_perl();
 
@@ -112,7 +112,7 @@ SKIP: do {
 
         if( !ok($mtime, 'hard link mtime') ||
             !isnt($mtime, $ctime, 'hard link ctime != mtime') ) {
-            print \*STDERR, <<DIAG;
+            print $^STDERR, <<DIAG;
 # Check if you are on a tmpfs of some sort.  Building in /tmp sometimes
 # has this problem.  Building on the ClearCase VOBS filesystem may also
 # cause this failure.
@@ -290,7 +290,8 @@ ok(! -S $Curdir,    '!-S cwd');
 
 SKIP: do {
     my($cnt, $uid);
-    $cnt = $uid = 0;
+    $cnt = 0;
+    $uid = 0;
 
     # Find a set of directories that's very likely to have setuid files
     # but not likely to be *all* setuid files.
@@ -335,11 +336,6 @@ SKIP: do {
         close($tty_fh);
     };
     ok(! -t *TTY,    '!-t on closed TTY filehandle');
-
-    do {
-        local our $TODO = 'STDIN not a tty when output is to pipe' if $Is_VMS;
-        ok(-t,          '-t on STDIN');
-    };
 };
 
 my $Null = File::Spec->devnull;
@@ -412,7 +408,7 @@ $_ = $tmpfile;
 ok(-f,      'bare -f   uses $_');
 ok(-f(),    '     -f() "');
 
-unlink $tmpfile or print \*STDOUT, "# unlink failed: $^OS_ERROR\n";
+unlink $tmpfile or print $^STDOUT, "# unlink failed: $^OS_ERROR\n";
 
 # bug id 20011101.069
 my @r = @( stat($Curdir) );
@@ -447,19 +443,19 @@ SKIP: do {
     dies_like(sub { -l _ },
               qr/^The stat preceding -l _ wasn't an lstat/,
               '-l _ croaks after -T _' );
-    unlink $linkname or print \*STDOUT, "# unlink $linkname failed: $^OS_ERROR\n";
+    unlink $linkname or print $^STDOUT, "# unlink $linkname failed: $^OS_ERROR\n";
 };
 
-print \*STDOUT, "# Zzz...\n";
+print $^STDOUT, "# Zzz...\n";
 sleep(3);
 my $f = 'tstamp.tmp';
 unlink $f;
 ok (open(my $s, ">", "$f"), 'can create tmp file');
 close $s or die;
 my @a = @( stat $f );
-print \*STDOUT, "# time=$^BASETIME, stat=($(join ' ',@a))\n";
+print $^STDOUT, "# time=$^BASETIME, stat=($(join ' ',@a))\n";
 my @b = @(-M _, -A _, -C _);
-print \*STDOUT, "# -MAC=($(join ' ',@b))\n";
+print $^STDOUT, "# -MAC=($(join ' ',@b))\n";
 ok( (-M _) +< 0, 'negative -M works');
 ok( (-A _) +< 0, 'negative -A works');
 ok( (-C _) +< 0, 'negative -C works');

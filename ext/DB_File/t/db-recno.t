@@ -13,8 +13,8 @@ sub ok
     my $no = shift ;
     my $result = shift ;
 
-    print \*STDOUT, "not " unless $result ;
-    print \*STDOUT, "ok $no\n" ;
+    print $^STDOUT, "not " unless $result ;
+    print $^STDOUT, "ok $no\n" ;
 
     return $result ;
 }
@@ -29,7 +29,7 @@ do {
         my $filename = shift ;
 	my $fh = gensym ;
 	open ($fh, ">", "$filename") || die "Cannot open $filename: $^OS_ERROR" ;
-	my $real_stdout = \*STDOUT;
+	my $real_stdout = $^STDOUT;
 	return bless \@($fh, $real_stdout ) ;
 
     }
@@ -62,7 +62,7 @@ sub docat_del
 sub bad_one
 {
     unless ($bad_ones++) {
-	print \*STDERR, <<EOM ;
+	print $^STDERR, <<EOM ;
 #
 # Some older versions of Berkeley DB version 1 will fail db-recno
 # tests 61, 63, 64 and 65.
@@ -71,14 +71,14 @@ EOM
 	    && config_value("db_version_major") == 1
 	    && config_value("db_version_minor") == 0
 	    && config_value("db_version_patch") == 0) {
-	    print \*STDERR, <<EOM ;
+	    print $^STDERR, <<EOM ;
 #
 # For example Mac OS X 10.2 (or earlier) has such an old
 # version of Berkeley DB.
 EOM
 	}
 
-	print \*STDERR, <<EOM ;
+	print $^STDERR, <<EOM ;
 #
 # You can safely ignore the errors if you're never going to use the
 # broken functionality (recno databases with a modified bval). 
@@ -111,7 +111,7 @@ BEGIN
 }
 
 my $total_tests = 14 ;
-print \*STDOUT, "1..$total_tests\n";   
+print $^STDOUT, "1..$total_tests\n";   
 
 $Dfile = "recno.tmp";
 unlink $Dfile ;

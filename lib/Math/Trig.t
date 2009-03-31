@@ -30,11 +30,11 @@ if ($^OS_NAME eq 'unicos') { # See lib/Math/Complex.pm and t/lib/complex.t.
 sub near ($v, $w, ?$e) {
     $e //= $eps;
     my $d = $w ?? abs($v/$w - 1) !! abs($v);
-    print \*STDOUT, "# near? $v $w : $d : $e\n";
+    print $^STDOUT, "# near? $v $w : $d : $e\n";
     $w ?? ($d +< $e) !! abs($v) +< $e;
 }
 
-print \*STDOUT, "# Sanity checks\n";
+print $^STDOUT, "# Sanity checks\n";
 
 ok(near(sin(1), 0.841470984807897));
 ok(near(cos(1), 0.54030230586814));
@@ -247,7 +247,7 @@ do {
 # E.g. netbsd-alpha core dumps on Inf arith without this.
 signals::temp_set_handler(FPE => undef);
 
-print \*STDOUT, "# great_circle_distance with small angles\n";
+print $^STDOUT, "# great_circle_distance with small angles\n";
 
 for my $e (qw(1e-2 1e-3 1e-4 1e-5)) {
     # Can't assume == 0 because of floating point fuzz,

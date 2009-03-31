@@ -140,8 +140,8 @@ sub getopt($argumentative, ?$hash) {
 
 sub output_h () {
   return $OUTPUT_HELP_VERSION if defined $OUTPUT_HELP_VERSION;
-  return \*STDOUT if $STANDARD_HELP_VERSION;
-  return \*STDERR;
+  return $^STDOUT if $STANDARD_HELP_VERSION;
+  return $^STDERR;
 }
 
 sub try_exit () {
@@ -201,7 +201,7 @@ EOH
 	if ( defined $^PROGRAM_NAME and $^PROGRAM_NAME ne '-e' and -f $^PROGRAM_NAME and -r $^PROGRAM_NAME
 	     and open my $script, '<', $^PROGRAM_NAME ) {
 	    while ( ~< $script) {
-		$has_pod = 1, last if m/^=(pod|head1)/;
+		($has_pod = 1), last if m/^=(pod|head1)/;
 	    }
 	}
 	print $h, <<EOH if $has_pod;

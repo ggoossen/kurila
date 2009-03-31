@@ -26,8 +26,8 @@ ok(1);
 skip(1,0);
 
 close $f;
-$TESTOUT = *STDOUT{IO};
-$TESTERR = *STDERR{IO};
+$TESTOUT = $^STDOUT;
+$TESTERR = $^STDERR;
 $ntest = 1;
 
 open $f, "<", "mix";
@@ -53,5 +53,5 @@ sub commentless {
 }
 
 
-print \*STDOUT, "1..1\n";
+print $^STDOUT, "1..1\n";
 ok( commentless($out), commentless($expect) );

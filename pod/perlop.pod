@@ -48,12 +48,13 @@ values only, not array values.
     left	|| //
     nonassoc	..
     right	?:
-    right	= += -= *= etc.
     left	, =>
     nonassoc	list operators (rightward)
+    right	= += -= *= etc.
     right	not
     left	and
     left	or xor
+    right	return
 
 In the following sections, these operators are covered in precedence order.
 
@@ -1853,17 +1854,17 @@ to happen.
 
 The following lines are equivalent:
 
-    while (defined($_ = ~< *STDIN)) { print; }
-    while ($_ = ~< *STDIN>) { print; }
-    while (~< *STDIN) { print; }
-    for (;~< *STDIN;) { print; }
-    print while defined($_ = ~< *STDIN);
-    print while ($_ = ~< *STDIN);
-    print while ~< *STDIN;
+    while (defined($_ = ~< $^STDIN)) { print; }
+    while ($_ = ~< $^STDIN>) { print; }
+    while (~< $^STDIN) { print; }
+    for (;~< $^STDIN;) { print; }
+    print while defined($_ = ~< $^STDIN);
+    print while ($_ = ~< $^STDIN);
+    print while ~< $^STDIN;
 
 This also behaves similarly, but avoids $_ :
 
-    while (my $line = ~< *STDIN) { print $line }
+    while (my $line = ~< $^STDIN) { print $line }
 
 In these loop constructs, the assigned value (whether assignment
 is automatic or explicit) is then tested to see whether it is
@@ -1872,8 +1873,8 @@ value that would be treated as false by Perl, for example a "" or
 a "0" with no trailing newline.  If you really mean for such values
 to terminate the loop, they should be tested for explicitly:
 
-    while (($_ = ~< *STDIN) ne '0') { ... }
-    while (~< *STDIN) { last unless $_; ... }
+    while (($_ = ~< $^STDIN) ne '0') { ... }
+    while (~< $^STDIN) { last unless $_; ... }
 
 In other boolean contexts, C<< ~< *I<filehandle> >> without an
 explicit C<defined> test or comparison elicit a warning if the

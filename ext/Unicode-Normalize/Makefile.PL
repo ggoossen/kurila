@@ -3,7 +3,7 @@ use ExtUtils::MakeMaker;
 my $clean = \%();
 
 if (-f "Normalize.xs") {
-    print \*STDERR, "Making header files for XS...\n";
+    print $^STDERR, "Making header files for XS...\n";
 
     do 'mkheader' or die $^EVAL_ERROR || "mkheader: $^OS_ERROR";
 

@@ -16,7 +16,7 @@ BEGIN {			# Remap I/O to the parent's window
  $separate_session = $ENV{OS2_PROCESS_TEST_SEPARATE_SESSION};
  propagate_INC, return unless $separate_session; # done by the parent
  my @fn = split " ", $ENV{NEW_FD};
- my @fh = (*STDOUT, *STDERR);
+ my @fh = (*STDOUT, $^STDERR);
  my @how = qw( > > );
  # warn $_ for @fn;
  open $fh[$_], "$how[$_]&=$fn[$_]"

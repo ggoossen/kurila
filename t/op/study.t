@@ -7,10 +7,10 @@ sub ok($ok, ?$name) {
     local $_;
 
     # You have to do it this way or VMS will get confused.
-    printf \*STDOUT, "\%s $test\%s\n", $ok   ?? 'ok' !! 'not ok',
+    printf $^STDOUT, "\%s $test\%s\n", $ok   ?? 'ok' !! 'not ok',
                            $name ?? " - $name" !! '';
 
-    printf \*STDOUT, "# Failed test at line \%d\n", @(caller($Ok_Level))[2] unless $ok;
+    printf $^STDOUT, "# Failed test at line \%d\n", @(caller($Ok_Level))[2] unless $ok;
 
     $test++;
     return $ok;
@@ -40,7 +40,7 @@ sub alarm_ok($test) {
 }
 
 
-print \*STDOUT, "1..26\n";
+print $^STDOUT, "1..26\n";
 
 my $x = "abc\ndef\n";
 study($x);
@@ -100,7 +100,7 @@ ok("ab\ncd\n" =~ m/^cd/m);
 if ($^OS_NAME eq 'os390' or $^OS_NAME eq 'posix-bc' or $^OS_NAME eq 'MacOS') {
     # Even with the alarm() OS/390 and BS2000 can't manage these tests
     # (Perl just goes into a busy loop, luckily an interruptable one)
-    for (25..26) { print \*STDOUT, "not ok $_ # TODO compiler bug?\n" }
+    for (25..26) { print $^STDOUT, "not ok $_ # TODO compiler bug?\n" }
     $test += 2;
 } else {
     # [ID 20010618.006] tests 25..26 may loop

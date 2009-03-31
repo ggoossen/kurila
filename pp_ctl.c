@@ -859,7 +859,7 @@ PP(pp_leaveloop)
 
 PP(pp_return)
 {
-    dVAR; dSP; dMARK;
+    dVAR; dSP;
     register PERL_CONTEXT *cx;
     bool clear_errsv = FALSE;
     I32 gimme;
@@ -898,8 +898,8 @@ PP(pp_return)
 
     POPBLOCK(cx,newpm);
 
-    if (gimme == G_SCALAR) {
-	if (MARK < SP) {
+    if (gimme != G_VOID) {
+	if (PL_op->op_flags & OPf_STACKED) {
 	    if (CxTYPE(cx) == CXt_SUB) {
 		if (cx->blk_sub.cv && CvDEPTH(cx->blk_sub.cv) > 1) {
 		    if (SvTEMP(TOPs)) {
@@ -920,13 +920,8 @@ PP(pp_return)
 	    else
 		*++newsp = sv_mortalcopy(*SP);
 	}
-	else
+	else {
 	    *++newsp = &PL_sv_undef;
-    }
-    else if (gimme == G_ARRAY) {
-	while (++MARK <= SP) {
-	    *++newsp = ((CxTYPE(cx) == CXt_SUB) && SvTEMP(*MARK))
-			? *MARK : sv_mortalcopy(*MARK);
 	}
     }
     PL_stack_sp = newsp;
@@ -1224,7 +1219,7 @@ Perl_sv_compile_2op(pTHX_ SV *sv, ROOTOP** rootopp, const char *code, PAD** padp
     PL_op = &dummy;
     PL_op->op_type = OP_ENTEREVAL;
     PL_op->op_flags = 0;			/* Avoid uninit warning. */
-    PL_op->op_location = oldop ? newSVsv(oldop->op_location) : avTsv(newAV());
+    PL_op->op_location = SvLOCATION(sv);
     PUSHBLOCK(cx, CXt_EVAL|(IN_PERL_COMPILETIME ? 0 : CXp_REAL), SP);
     PUSHEVAL(cx, 0);
 

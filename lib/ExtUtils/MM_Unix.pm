@@ -215,7 +215,7 @@ sub cflags($self, ?$libperl) {
     ( $name = $self->{?NAME} . "_cflags" ) =~ s/:/_/g ;
     if ($prog = %Config{?$name}) {
 	# Expand hints for this extension via the shell
-	print \*STDOUT, "Processing $name hint:\n" if $Verbose;
+	print $^STDOUT, "Processing $name hint:\n" if $Verbose;
 	my@(@o)=@( @(`cc=\"%cflags{cc}\"
 	  ccflags=\"%cflags{ccflags}\"
 	  optimize=\"%cflags{optimize}\"
@@ -232,9 +232,9 @@ sub cflags($self, ?$libperl) {
 	    chomp $line;
 	    if ($line =~ m/(.*?)=\s*(.*)\s*$/){
 		%cflags{+$1} = $2;
-		print \*STDOUT, "	$1 = $2\n" if $Verbose;
+		print $^STDOUT, "	$1 = $2\n" if $Verbose;
 	    } else {
-		print \*STDOUT, "Unrecognised result from hint: '$line'\n";
+		print $^STDOUT, "Unrecognised result from hint: '$line'\n";
 	    }
 	}
     }
@@ -265,12 +265,12 @@ sub cflags($self, ?$libperl) {
     $self->{+CCFLAGS}  = quote_paren($self->{?CCFLAGS});
     $self->{+OPTIMIZE} = quote_paren($self->{?OPTIMIZE});
 
-    return $self->{+CFLAGS} = qq{
+    return ($self->{+CFLAGS} = qq{
 CCFLAGS = $self->{?CCFLAGS}
 OPTIMIZE = $self->{?OPTIMIZE}
 PERLTYPE = $self->{?PERLTYPE}
 MPOLLUTE = $pollute
-};
+});
 
 }
 
@@ -284,11 +284,11 @@ definition in CONST_CCCMD.
 sub const_cccmd($self,?$libperl) {
     return $self->{?CONST_CCCMD} if $self->{?CONST_CCCMD};
     return '' unless $self->needs_linking();
-    return $self->{+CONST_CCCMD} =
+    return ($self->{+CONST_CCCMD} =
 	q{CCCMD = $(CC) -c $(PASTHRU_INC) $(INC) \
 	$(CCFLAGS) $(OPTIMIZE) \
 	$(PERLTYPE) $(MPOLLUTE) $(DEFINE_VERSION) \
-	$(XS_DEFINE_VERSION)};
+	$(XS_DEFINE_VERSION)});
 }
 
 =item const_config (o)
@@ -649,8 +649,8 @@ sub dist_ci {
 ci :
 	$(PERLRUN) "-MExtUtils::Manifest=maniread" \\
 	  -e "@all = keys %{ maniread() };" \\
-	  -e "print(\\*STDOUT, qq{Executing $(CI) @all\n}); system(qq{$(CI) @all});" \\
-	  -e "print(\\*STDOUT, qq{Executing $(RCS_LABEL) ...\n}); system(qq{$(RCS_LABEL) @all});"
+	  -e "print(\$$^STDOUT, qq{Executing $(CI) @all\n}); system(qq{$(CI) @all});" \\
+	  -e "print(\$$^STDOUT, qq{Executing $(RCS_LABEL) ...\n}); system(qq{$(RCS_LABEL) @all});"
 };
 }
 
@@ -693,7 +693,7 @@ sub dist_target {
     my@($self) =@( shift);
 
     my $date_check = $self->oneliner(<<'CODE', \@('-l'));
-print \*STDOUT, 'Warning: Makefile possibly out of date with $(VERSION_FROM)'
+print $$^STDOUT, 'Warning: Makefile possibly out of date with $(VERSION_FROM)'
     if -e '$(VERSION_FROM)' and -M '$(VERSION_FROM)' +< -M '$(FIRST_MAKEFILE)';
 CODE
 
@@ -984,7 +984,7 @@ Finds the executables PERL and FULLPERL
 sub find_perl($self, $ver, $names, $dirs, $trace) {
 
     if ($trace +>= 2){
-        print \*STDOUT, "Looking for perl $ver by these names:
+        print $^STDOUT, "Looking for perl $ver by these names:
 $(join ' ',@$names)
 in these dirs:
 $(join ' ',@$dirs)
@@ -994,7 +994,7 @@ $(join ' ',@$dirs)
     my $stderr_duped = 0;
     my $stderr_copy;
     unless (%Is{?BSD}) {
-        if( open($stderr_copy, '>&', \*STDERR) ) {
+        if( open($stderr_copy, '>&', $^STDERR) ) {
             $stderr_duped = 1;
         }
         else {
@@ -1017,11 +1017,11 @@ WARNING
             } else {                                            # foo/bar
                 $abs = $self->catfile($Curdir, $name);
             }
-            print \*STDOUT, "Checking $abs\n" if ($trace +>= 2);
+            print $^STDOUT, "Checking $abs\n" if ($trace +>= 2);
             next unless $self->maybe_command($abs);
-            print \*STDOUT, "Executing $abs\n" if ($trace +>= 2);
+            print $^STDOUT, "Executing $abs\n" if ($trace +>= 2);
 
-            my $version_check = qq{$abs -le "\$^PERL_VERSION =~ m/^\Q$ver\E/; print \\\\*STDOUT, qq\{VER_OK\}"};
+            my $version_check = qq{$abs -le "\$^PERL_VERSION =~ m/^\Q$ver\E/; print \$^STDOUT, qq\{VER_OK\}"};
             $version_check = "%Config{?run} $version_check"
                 if defined %Config{?run} and length %Config{?run};
 
@@ -1034,20 +1034,20 @@ WARNING
             if (%Is{?BSD}) {
                 $val = `$version_check 2>&1`;
             } else {
-                close \*STDERR if $stderr_duped;
+                close $^STDERR if $stderr_duped;
                 $val = `$version_check`;
-                open \*STDERR, '>&', $stderr_copy if $stderr_duped;
+                open $^STDERR, '>&', $stderr_copy if $stderr_duped;
             }
 
             if ($val =~ m/^VER_OK/m) {
-                print \*STDOUT, "Using PERL=$abs\n" if $trace;
+                print $^STDOUT, "Using PERL=$abs\n" if $trace;
                 return $abs;
             } elsif ($trace +>= 2) {
-                print \*STDOUT, "Result: '$val' ".($^CHILD_ERROR >> 8)."\n";
+                print $^STDOUT, "Result: '$val' ".($^CHILD_ERROR >> 8)."\n";
             }
         }
     }
-    print \*STDOUT, "Unable to find a perl $ver (by these names: $(join ' ',@$names), in these dirs: $(join ' ',@$dirs))\n";
+    print $^STDOUT, "Unable to find a perl $ver (by these names: $(join ' ',@$names), in these dirs: $(join ' ',@$dirs))\n";
     0; # false and not empty
 }
 
@@ -1104,7 +1104,7 @@ sub fixin( $self, @< @files) {
 
         my $shb = "";
         if ($interpreter) {
-            print \*STDOUT, "Changing sharpbang in $file to $interpreter"
+            print $^STDOUT, "Changing sharpbang in $file to $interpreter"
                 if $Verbose;
 
             # this is probably value-free on DOSISH platforms
@@ -1202,7 +1202,7 @@ sub guess_name($self) {;
     $name =~ s|[\-_][\d\.\-]+\z||;  # this is new with MM 5.00, we
                                     # strip minus or underline
                                     # followed by a float or some such
-    print \*STDOUT, "Warning: Guessing NAME [$name] from current directory name.\n";
+    print $^STDOUT, "Warning: Guessing NAME [$name] from current directory name.\n";
     $name;
 }
 
@@ -1221,7 +1221,7 @@ sub has_link_code {
 	$self->{+HAS_LINK_CODE} = 1;
 	return 1;
     }
-    return $self->{+HAS_LINK_CODE} = 0;
+    return ($self->{+HAS_LINK_CODE} = 0);
 }
 
 
@@ -1466,7 +1466,7 @@ sub init_PM {
     return if $self->{?PM} and $self->{ARGS}->{?PM};
 
     if ((nelems @{$self->{?PMLIBDIRS}})){
-	print \*STDOUT, "Searching PMLIBDIRS: $(join ' ',@{$self->{?PMLIBDIRS}})\n"
+	print $^STDOUT, "Searching PMLIBDIRS: $(join ' ',@{$self->{?PMLIBDIRS}})\n"
 	    if ($Verbose +>= 2);
 	require File::Find;
         File::Find::find(sub {
@@ -1492,7 +1492,7 @@ sub init_PM {
 	    my $inst = $self->catfile($prefix,$striplibpath);
 	    local($_) = $inst; # for backwards compatibility
 	    $inst = $self->libscan($inst);
-	    print \*STDOUT, "libscan($path) => '$inst'\n" if ($Verbose +>= 2);
+	    print $^STDOUT, "libscan($path) => '$inst'\n" if ($Verbose +>= 2);
 	    return unless $inst;
 	    $self->{PM}->{+$path} = $inst;
 	}, < @{$self->{PMLIBDIRS}});
@@ -1637,7 +1637,9 @@ from the perl source tree.
 	    # uninstalled Perl outside of Perl build tree
 	    my $lib;
 	    for my $dir ( $^INCLUDE_PATH) {
-	      $lib = $dir, last if -e $self->catdir($dir, "Config.pm");
+                next unless -e $self->catdir($dir, "Config.pm");
+                $lib = $dir;
+                last;
 	    }
 	    if ($lib) {
               # Win32 puts its header files in /perl/src/lib/CORE.
@@ -1649,7 +1651,7 @@ from the perl source tree.
 		$self->{+PERL_ARCHLIB}	   = $lib;
 		$self->{+PERL_INC}	   = $inc;
 		$self->{+UNINSTALLED_PERL}  = 1;
-		print \*STDOUT, <<EOP;
+		print $^STDOUT, <<EOP;
 ... Detected uninstalled Perl.  Trying to continue.
 EOP
 	      }
@@ -1668,7 +1670,7 @@ EOP
     $self->{+MAN3EXT} ||= %Config{?man3ext};
 
     # Get some stuff out of %Config if we haven't yet done so
-    print \*STDOUT, "CONFIG must be an array ref\n"
+    print $^STDOUT, "CONFIG must be an array ref\n"
         if ($self->{?CONFIG} and ref $self->{?CONFIG} ne 'ARRAY');
     $self->{+CONFIG} = \@() unless (ref $self->{?CONFIG});
     push(@{$self->{CONFIG}}, < @ExtUtils::MakeMaker::Get_from_Config);
@@ -1676,7 +1678,7 @@ EOP
     my(%once_only);
     foreach my $m ( @{$self->{CONFIG}}){
         next if %once_only{?$m};
-        print \*STDOUT, "CONFIG key '$m' does not exist in Config.pm\n"
+        print $^STDOUT, "CONFIG key '$m' does not exist in Config.pm\n"
                 unless exists %Config{$m};
         $self->{+uc $m} ||= %Config{?$m};
         %once_only{+$m} = 1;
@@ -1863,11 +1865,11 @@ sub init_lib2arch {
             $self->prefixify($Arch,$ilib,$self->{$Lib});
 
             unless (-d $self->{?$Arch}) {
-                print \*STDOUT, "Directory $self->{?$Arch} not found\n" 
+                print $^STDOUT, "Directory $self->{?$Arch} not found\n" 
                   if $Verbose;
                 $self->{+$Arch} = $self->{?$Lib};
             }
-            print \*STDOUT, "Defaulting $Arch to $self->{?$Arch}\n" if $Verbose;
+            print $^STDOUT, "Defaulting $Arch to $self->{?$Arch}\n" if $Verbose;
         }
     }
 }
@@ -2201,7 +2203,7 @@ sub installbin {
 
 	local($_) = $path; # for backwards compatibility
 	my $to = $self->libscan($path);
-	print \*STDOUT, "libscan($from) => '$to'\n" if ($Verbose +>=2);
+	print $^STDOUT, "libscan($from) => '$to'\n" if ($Verbose +>=2);
 
         $to = vmsify($to) if %Is{?VMS};
 	%fromto{+$from} = $to;
@@ -2458,7 +2460,7 @@ MAP_PRELIBS   = %Config{?perllibs} %Config{?cryptlib}
           }
         }
 
-	print \*STDOUT, "Warning: $libperl not found
+	print $^STDOUT, "Warning: $libperl not found
     If you're going to build a static perl binary, make sure perl is installed
     otherwise ignore this warning\n"
 		unless (-f $lperl || defined($self->{?PERL_SRC}));
@@ -2609,7 +2611,7 @@ sub needs_linking {
 	    return 1;
 	}
     }
-    return $self->{+NEEDS_LINKING} = 0;
+    return ($self->{+NEEDS_LINKING} = 0);
 }
 
 
@@ -3026,21 +3028,21 @@ sub prefixify($self,$var,$sprefix,$rprefix,$default) {
 
     $rprefix .= '/' if $sprefix =~ m|/$|;
 
-    print \*STDERR, "  prefixify $var => $path\n" if $Verbose +>= 2;
-    print \*STDERR, "    from $sprefix to $rprefix\n" if $Verbose +>= 2;
+    print $^STDERR, "  prefixify $var => $path\n" if $Verbose +>= 2;
+    print $^STDERR, "    from $sprefix to $rprefix\n" if $Verbose +>= 2;
 
     if( $self->{+ARGS}->{?PREFIX} && $self->file_name_is_absolute($path) && 
         $path !~ s{^\Q$sprefix\E\b}{$rprefix}s ) 
     {
 
-        print \*STDERR, "    cannot prefix, using default.\n" if $Verbose +>= 2;
-        print \*STDERR, "    no default!\n" if !$default && $Verbose +>= 2;
+        print $^STDERR, "    cannot prefix, using default.\n" if $Verbose +>= 2;
+        print $^STDERR, "    no default!\n" if !$default && $Verbose +>= 2;
 
         $path = $self->catdir($rprefix, $default) if $default;
     }
 
-    print \*STDOUT, "    now $path\n" if $Verbose +>= 2;
-    return $self->{+uc $var} = $path;
+    print $^STDOUT, "    now $path\n" if $Verbose +>= 2;
+    return ($self->{+uc $var} = $path);
 }
 
 
@@ -3618,9 +3620,9 @@ Obsolete, deprecated method. Not used since Version 5.21.
 
 sub writedoc($self,$what,$name,@< @attribs) {
     my $time = localtime;
-    print \*STDOUT, "=head2 $time: $what C<$name>\n\n=over 4\n\n=item *\n\n";
-    print \*STDOUT, join "\n\n=item *\n\n", map( {"C<$_>" }, @attribs);
-    print \*STDOUT, "\n\n=back\n\n";
+    print $^STDOUT, "=head2 $time: $what C<$name>\n\n=over 4\n\n=item *\n\n";
+    print $^STDOUT, join "\n\n=item *\n\n", map( {"C<$_>" }, @attribs);
+    print $^STDOUT, "\n\n=back\n\n";
 }
 
 =item xs_c (o)

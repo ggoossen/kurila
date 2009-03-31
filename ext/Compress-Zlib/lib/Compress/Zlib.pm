@@ -632,8 +632,8 @@ enhancements/changes have been made to the C<gzopen> interface:
 =item 1
 
 If you want to to open either STDIN or STDOUT with C<gzopen>, you can now
-optionally use the special filename "C<->" as a synonym for C<\*STDIN> and
-C<\*STDOUT>.
+optionally use the special filename "C<->" as a synonym for C<$^STDIN> and
+C<$^STDOUT>.
 
 =item 2 
 
@@ -908,7 +908,7 @@ standard output.
     
     binmode STDOUT;  # gzopen only sets it on the fd
     
-    my $gz = gzopen(\*STDOUT, "wb")
+    my $gz = gzopen($^STDOUT, "wb")
           or die "Cannot open stdout: $gzerrno\n" ;
     
     while (<>) {

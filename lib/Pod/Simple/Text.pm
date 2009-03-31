@@ -21,7 +21,7 @@ $Text::Wrap::huge = 'overflow';
 sub new {
   my $self = shift;
   my $new = $self->SUPER::new(< @_);
-  $new->{+'output_fh'} ||= *STDOUT{IO};
+  $new->{+'output_fh'} ||= $^STDOUT;
   $new->accept_target_as_text( <qw( text plaintext plain ));
   $new->nix_X_codes(1);
   $new->nbsp_for_S(1);
@@ -74,7 +74,7 @@ sub emit_par {
    # Yes, 'STRING' x NEGATIVE gives '', same as 'STRING' x 0
 
   $self->{+'Thispara'} =~ s/\x{AD}//g if Pod::Simple::ASCII;
-  my $out = Text::Wrap::wrap($indent, $indent, $self->{+'Thispara'} .= "\n");
+  my $out = Text::Wrap::wrap($indent, $indent, ($self->{+'Thispara'} .= "\n"));
 
   $out =~ s/\x{A0}/ /g if Pod::Simple::ASCII;
   print $self->{?'output_fh'} ,$out, "\n";

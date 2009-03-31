@@ -15,8 +15,8 @@ skip('skipping stones is more fun', sub { $skipped = 0 });
 
 close $f;
 
-$TESTOUT = *STDOUT{IO};
-$TESTERR = *STDERR{IO};
+$TESTOUT = $^STDOUT;
+$TESTERR = $^STDERR;
 $ntest = 1;
 open $f, "<", "skips" or die "open skips: $^OS_ERROR";
 

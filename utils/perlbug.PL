@@ -56,7 +56,7 @@ close($patch_level) or die "Error closing patchlevel.h: $^OS_ERROR";
 # append a list of individual differences to the bug report.
 
 
-print \*STDOUT, "Extracting $file (with variable substitutions)\n";
+print $^STDOUT, "Extracting $file (with variable substitutions)\n";
 
 # In this section, perl variables will be expanded during extraction.
 # You can use $Config{...} to use Configure variables.

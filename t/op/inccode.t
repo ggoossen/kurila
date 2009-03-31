@@ -250,13 +250,13 @@ if ($can_fork) {
 	my $count = $1;
 	# Lets force some fun with odd sized reads.
 	$^OUTPUT_AUTOFLUSH = 1;
-	print \*STDOUT, 'push @main::bbblplast, ';
-	print \*STDOUT, "$count;\n";
+	print $^STDOUT, 'push @main::bbblplast, ';
+	print $^STDOUT, "$count;\n";
 	if ($count--) {
-	    print \*STDOUT, "use BBBLPLAST$count;\n";
+	    print $^STDOUT, "use BBBLPLAST$count;\n";
 	}
-        print \*STDOUT, "pass('In @_[1]');";
-	print \*STDOUT, '"Truth"';
+        print $^STDOUT, "pass('In @_[1]');";
+	print $^STDOUT, '"Truth"';
 	POSIX::_exit(0);
 	die "Can't get here: $^OS_ERROR";
     };

@@ -226,7 +226,7 @@ check_utime_result();
 
 utime undef, undef, 'b';
 @($atime,$mtime) =  @(stat 'b')[[8..9]];
-print \*STDOUT, "# utime undef, undef --> $atime, $mtime\n";
+print $^STDOUT, "# utime undef, undef --> $atime, $mtime\n";
 isnt($atime, 500000000, 'atime');
 isnt($mtime, 500000000 + $delta, 'mtime');
 
@@ -253,18 +253,18 @@ sub check_utime_result {
 	skip "filesystem atime/mtime granularity too low", 2
 	    unless $accurate_timestamps;
 
-	print \*STDOUT, "# atime - $atime  mtime - $mtime  delta - $delta\n";
+	print $^STDOUT, "# atime - $atime  mtime - $mtime  delta - $delta\n";
 	if($atime == 500000000 && $mtime == 500000000 + $delta) {
 	    pass('atime');
 	    pass('mtime');
 	}
 	else {
 	    if ($^OS_NAME =~ m/\blinux\b/i) {
-		print \*STDOUT, "# Maybe stat() cannot get the correct atime, ".
+		print $^STDOUT, "# Maybe stat() cannot get the correct atime, ".
 		    "as happens via NFS on linux?\n";
 		$foo = (utime 400000000,500000000 + 2*$delta,'b');
 		my @($new_atime, $new_mtime) =  @(stat('b'))[[8..9]];
-		print \*STDOUT, "# newatime - $new_atime  nemtime - $new_mtime\n";
+		print $^STDOUT, "# newatime - $new_atime  nemtime - $new_mtime\n";
 		if ($new_atime == $atime && $new_mtime - $mtime == $delta) {
 		    pass("atime - accounted for possible NFS/glibc2.2 bug on linux");
 		    pass("mtime - accounted for possible NFS/glibc2.2 bug on linux");
@@ -430,7 +430,7 @@ if ($^OS_NAME eq 'VMS') {
     # must have delete access to rename a directory
     `set file tmp.dir/protection=o:d`;
     ok(rename('tmp.dir', 'tmp1.dir'), "rename on directories") ||
-      print \*STDOUT, "# errno: $^OS_ERROR\n";
+      print $^STDOUT, "# errno: $^OS_ERROR\n";
 }
 else {
     ok(rename('tmp', 'tmp1'), "rename on directories");

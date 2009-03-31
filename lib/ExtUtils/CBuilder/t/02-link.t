@@ -12,7 +12,7 @@ BEGIN {
 use Test;
 BEGIN { 
   if ($^OS_NAME eq 'MSWin32') {
-    print \*STDOUT, "1..0 # Skipped: link_executable() is not implemented yet on Win32\n";
+    print $^STDOUT, "1..0 # Skipped: link_executable() is not implemented yet on Win32\n";
     exit;
   }
   if ($^OS_NAME eq 'VMS') {
@@ -42,7 +42,7 @@ ok -e $source_file;
 
 # Compile
 my $object_file;
-ok $object_file = $b->compile(source => $source_file);
+ok($object_file = $b->compile(source => $source_file));
 
 # Link
 my ($exe_file, @temps);

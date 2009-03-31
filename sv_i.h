@@ -101,6 +101,12 @@ SV* Perl_gvTsv(pTHX_ GV *gv) { return (SV*)gv; }
 SV* Perl_reTsv(pTHX_ REGEXP *re) { return (SV*)re; }
 SV* Perl_ioTsv(pTHX_ struct io *io) { return (SV*)io; }
 
+SV** Perl_avpTsvp(pTHX_ AV **avp) { return (SV**)avp; }
+SV** Perl_hvpTsvp(pTHX_ HV **hvp) { return (SV**)hvp; }
+SV** Perl_cvpTsvp(pTHX_ CV **cvp) { return (SV**)cvp; }
+SV** Perl_gvpTsvp(pTHX_ GV **gvp) { return (SV**)gvp; }
+SV** Perl_repTsvp(pTHX_ REGEXP **rep) { return (SV**)rep; }
+SV** Perl_iopTsvp(pTHX_ struct io **iop) { return (SV**)iop; }
 
 AV* Perl_svTav(pTHX_ SV *sv) {
     PERL_ARGS_ASSERT_SVTAV;
@@ -150,34 +156,28 @@ SV* SvREFCNT_inc(pTHX_ SV* sv) {
 #define AVcpNULL(sv) { AvREFCNT_dec(sv); sv = NULL; }
 #define HVcpNULL(sv) { HvREFCNT_dec(sv); sv = NULL; }
 #define CVcpNULL(sv) { CvREFCNT_dec(sv); sv = NULL; }
+#define IOcpNULL(sv) { IoREFCNT_dec(sv); sv = NULL; }
 
 #define SVcpSTEAL(sv_d, sv_s) { SvREFCNT_dec(sv_d); sv_d = sv_s; }
 #define AVcpSTEAL(sv_d, sv_s) { AvREFCNT_dec(sv_d); sv_d = sv_s; }
 #define HVcpSTEAL(sv_d, sv_s) { HvREFCNT_dec(sv_d); sv_d = sv_s; }
 #define CVcpSTEAL(sv_d, sv_s) { CvREFCNT_dec(sv_d); sv_d = sv_s; }
+#define IOcpSTEAL(sv_d, sv_s) { IoREFCNT_dec(sv_d); sv_d = sv_s; }
 
 
-#define SVcpREPLACE(sv_d, sv_s) inline_SVcpREPLACE(&sv_d, sv_s)
-static __inline__ void inline_SVcpREPLACE(pTHX_ SV**sv_d, SV*sv_s) {
+void 
+sv_cp_replace(pTHX_ SV** sv_d, SV* sv_s) {
   SvREFCNT_inc(sv_s);
   SvREFCNT_dec(*sv_d);
   *sv_d = sv_s;
 }
-#define XVcpREPLACE(XV) \
-    static __inline__ void inline_cpREPLACE_##XV( XV **sv_d, XV *sv_s) { \
-        inline_SVcpREPLACE(aTHX_ (SV**)sv_d, (SV*)sv_s);                \
-    }
-#define call_XVcpREPLACE(XV, sv_d, sv_s) inline_cpREPLACE_##XV(&sv_d, sv_s)
 
-
-XVcpREPLACE(HV)
-#define HVcpREPLACE(sv_d, sv_s) call_XVcpREPLACE(HV, sv_d, sv_s)
-XVcpREPLACE(GV)
-#define GVcpREPLACE(sv_d, sv_s) call_XVcpREPLACE(GV, sv_d, sv_s)
-XVcpREPLACE(AV)
-#define AVcpREPLACE(sv_d, sv_s) call_XVcpREPLACE(AV, sv_d, sv_s)
-XVcpREPLACE(CV)
-#define CVcpREPLACE(sv_d, sv_s) call_XVcpREPLACE(CV, sv_d, sv_s)
+#define SVcpREPLACE(sv_d, sv_s) sv_cp_replace(&sv_d, sv_s)
+#define HVcpREPLACE(sv_d, sv_s) hv_cp_replace(&sv_d, sv_s)
+#define GVcpREPLACE(sv_d, sv_s) gv_cp_replace(&sv_d, sv_s)
+#define AVcpREPLACE(sv_d, sv_s) av_cp_replace(&sv_d, sv_s)
+#define CVcpREPLACE(sv_d, sv_s) cv_cp_replace(&sv_d, sv_s)
+#define IOcpREPLACE(sv_d, sv_s) io_cp_replace(&sv_d, sv_s)
 
 
 /* Location retrieval */

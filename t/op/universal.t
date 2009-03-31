@@ -62,7 +62,7 @@ ok $a->isa("HASH");
 
 ok $a->can("eat");
 ok ! $a->can("sleep");
-ok my $ref = $a->can("drink");        # returns a coderef
+ok(my $ref = $a->can("drink"));        # returns a coderef
 is $a->?$ref("tea"), "drinking tea"; # ... which works
 
 ok (!Cedric->isa('Programmer'));
@@ -167,7 +167,7 @@ is $^EVAL_ERROR, '';
 
 
 # This segfaulted in a blead.
-fresh_perl_is('package Foo; Foo->VERSION;  print \*STDOUT, "ok"', 'ok');
+fresh_perl_is('package Foo; Foo->VERSION;  print $^STDOUT, "ok"', 'ok');
 
 package Foo;
 

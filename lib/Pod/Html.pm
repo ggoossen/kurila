@@ -1270,7 +1270,7 @@ sub process_for($whom, $text) {
     } elsif ($whom =~ m/^illustration$/i) {
         1 while chomp $text;
 	for my $ext (qw[.png .gif .jpeg .jpg .tga .pcl .bmp]) {
-	  $text .= $ext, last if -r "$text$ext";
+	  ($text .= $ext), last if -r "$text$ext";
 	}
         print $html_fh, qq{<p align="center"><img src="$text" alt="$text illustration" /></p>};
     }

@@ -1327,7 +1327,7 @@ EXT Perl_check_t PL_check[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* iter */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* enterloop */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* leaveloop */
-	MEMBER_TO_FPTR(Perl_ck_return),	/* return */
+	MEMBER_TO_FPTR(Perl_ck_null),	/* return */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* last */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* next */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* redo */
@@ -1518,7 +1518,7 @@ EXTCONST U32 PL_opargs[] = {
 	0x00002206,	/* srefgen */
 	0x0001368c,	/* ref */
 	0x00122804,	/* bless */
-	0x00002200,	/* anonscalar */
+	0x00002204,	/* anonscalar */
 	0x00013688,	/* backtick */
 	0x00012808,	/* glob */
 	0x0001d608,	/* readline */
@@ -1636,8 +1636,8 @@ EXTCONST U32 PL_opargs[] = {
 	0x00448400,	/* lslice */
 	0x00000000,	/* enter_anonarray_assign */
 	0x00000000,	/* enter_anonhash_assign */
-	0x00004801,	/* anonarray */
-	0x00004801,	/* anonhash */
+	0x00004805,	/* anonarray */
+	0x00004805,	/* anonhash */
 	0x00004805,	/* listlast */
 	0x00004805,	/* listfirst */
 	0x00002200,	/* expand */
@@ -1645,21 +1645,21 @@ EXTCONST U32 PL_opargs[] = {
 	0x00000000,	/* enter_arrayexpand_assign */
 	0x00002200,	/* hashexpand */
 	0x00000000,	/* enter_hashexpand_assign */
-	0x00002208,	/* nelems */
+	0x0000220c,	/* nelems */
 	0x05326801,	/* splice */
 	0x00042815,	/* push */
 	0x00013604,	/* pop */
 	0x00013604,	/* shift */
 	0x00042815,	/* unshift */
 	0x0005a841,	/* sort */
-	0x00002808,	/* reverse */
-	0x00002808,	/* arrayjoin */
-	0x00002808,	/* hashjoin */
-	0x00022808,	/* arrayconcat */
-	0x00022808,	/* hashconcat */
-	0x0004a841,	/* grepstart */
+	0x0000280c,	/* reverse */
+	0x0000280c,	/* arrayjoin */
+	0x0000280c,	/* hashjoin */
+	0x0002280c,	/* arrayconcat */
+	0x0002280c,	/* hashconcat */
+	0x0004a845,	/* grepstart */
 	0x00000648,	/* grepwhile */
-	0x0004a841,	/* mapstart */
+	0x0004a845,	/* mapstart */
 	0x00000648,	/* mapwhile */
 	0x00022600,	/* range */
 	0x00022200,	/* flip */
@@ -1690,20 +1690,20 @@ EXTCONST U32 PL_opargs[] = {
 	0x00000000,	/* iter */
 	0x00001240,	/* enterloop */
 	0x00000400,	/* leaveloop */
-	0x00012841,	/* return */
+	0x00013640,	/* return */
 	0x00001a44,	/* last */
 	0x00001a44,	/* next */
 	0x00001a44,	/* redo */
 	0x00013644,	/* exit */
 	0x00000c40,	/* method_named */
 	0x0052c81d,	/* open */
-	0x0001d614,	/* close */
+	0x0000d614,	/* close */
 	0x000cc814,	/* pipe_op */
 	0x0000d61c,	/* fileno */
 	0x0001361c,	/* umask */
 	0x0012c804,	/* binmode */
 	0x02222808,	/* select */
-	0x0001d60c,	/* getc */
+	0x0000d60c,	/* getc */
 	0x122ec81d,	/* read */
 	0x0004c815,	/* prtf */
 	0x0004c815,	/* print */

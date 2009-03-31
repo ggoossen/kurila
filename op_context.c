@@ -605,11 +605,12 @@ Perl_mod(pTHX_ OP *o, I32 type)
 	/* FALL THROUGH */
     case OP_GV:
 	PL_hints |= HINT_BLOCK_SCOPE;
+        break;
     case OP_SASSIGN:
     case OP_ANDASSIGN:
     case OP_ORASSIGN:
     case OP_DORASSIGN:
-	break;
+        break;
 
     case OP_AELEMFAST:
 	localize = -1;

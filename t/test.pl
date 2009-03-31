@@ -31,12 +31,12 @@ $NO_ENDING = 0;
 # Use this instead of print to avoid interference while testing globals.
 sub _print {
     local@($^OUTPUT_RECORD_SEPARATOR, $^OUTPUT_FIELD_SEPARATOR) = @(undef, '');
-    print \*STDOUT, < @_;
+    print $^STDOUT, < @_;
 }
 
 sub _print_stderr {
     local@($^OUTPUT_RECORD_SEPARATOR, $^OUTPUT_FIELD_SEPARATOR) = @(undef, '');
-    print \*STDERR, < @_;
+    print $^STDERR, < @_;
 }
 
 sub plan {
@@ -459,14 +459,14 @@ sub _create_runperl { # Create the string to qx in runperl().
 	%args{+stdin} =~ s/\r/\\r/g;
 
 	if ($is_mswin || $is_netware || $is_vms) {
-	    $runperl = qq{$^EXECUTABLE_NAME -e "print \\*STDOUT, qq(} .
+	    $runperl = qq{$^EXECUTABLE_NAME -e "print \\\$^STDOUT, qq(} .
 		%args{?stdin} . q{)" | } . $runperl;
 	}
 	elsif ($is_macos) {
 	    # MacOS can only do two processes under MPW at once;
 	    # the test itself is one; we can't do two more, so
 	    # write to temp file
-	    my $stdin = qq{$^EXECUTABLE_NAME -e 'print \*STDOUT, qq(} . %args{?stdin} . qq{)' > teststdin; };
+	    my $stdin = qq{$^EXECUTABLE_NAME -e 'print \$^STDOUT, qq(} . %args{?stdin} . qq{)' > teststdin; };
 	    if (%args{?verbose}) {
 		my $stdindisplay = $stdin;
 		$stdindisplay =~ s/\n/\n\#/g;
@@ -476,7 +476,7 @@ sub _create_runperl { # Create the string to qx in runperl().
 	    $runperl .= q{ < teststdin };
 	}
 	else {
-	    $runperl = qq{$^EXECUTABLE_NAME -e 'print *STDOUT, qq(} .
+	    $runperl = qq{$^EXECUTABLE_NAME -e 'print \$^STDOUT, qq(} .
 		%args{?stdin} . q{)' | } . $runperl;
 	}
     }
@@ -759,7 +759,7 @@ sub eval_dies_like ($e, $qr, ?$name) {
             diag "didn't die";
             return ok(0, $name);
         }
-        return like_yn(0, $err->{?description}, $qr );
+        return like_yn(0, $err->{description}, $qr, $name );
     };
 }
 

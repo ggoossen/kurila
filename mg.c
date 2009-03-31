@@ -749,8 +749,8 @@ Perl_magic_get(pTHX_ const char* name, SV* sv)
 
 	    if (strEQ(remaining, "OUTPUT_AUTOFLUSH")) {
 		/* $^OUTPUT_AUTOFLUSH */
-		if (GvIOp(PL_defoutgv))
-		    sv_setiv(sv, (IV)(IoFLAGS(GvIOp(PL_defoutgv)) & IOf_FLUSH) != 0 );
+		if (SvOK(PL_stdoutio))
+		    sv_setiv(sv, (IV)(IoFLAGS(PL_stdoutio) & IOf_FLUSH) != 0 );
 		break;
 	    }
 
@@ -796,6 +796,18 @@ Perl_magic_get(pTHX_ const char* name, SV* sv)
 	case 'S':
 	    if (strEQ(remaining, "SYSTEM_FD_MAX")) {
 		sv_setiv(sv, (IV)PL_maxsysfd);
+		break;
+	    }
+	    if (strEQ(remaining, "STDIN")) {
+		sv_setrv(sv, SvREFCNT_inc(ioTsv(PL_stdinio)));
+		break;
+	    }
+	    if (strEQ(remaining, "STDOUT")) {
+		sv_setrv(sv, SvREFCNT_inc(ioTsv(PL_stdoutio)));
+		break;
+	    }
+	    if (strEQ(remaining, "STDERR")) {
+		sv_setrv(sv, SvREFCNT_inc(ioTsv(PL_stderrio)));
 		break;
 	    }
 	    break;
@@ -1279,6 +1291,12 @@ Perl_is_magicsv(pTHX_ const char* name)
 	case 'S':
 	    if (strEQ(name2, "SYSTEM_FD_MAX"))
 		return 1;
+	    if (strEQ(name2, "STDIN"))
+		return 1;
+	    if (strEQ(name2, "STDOUT"))
+		return 1;
+	    if (strEQ(name2, "STDERR"))
+		return 1;
 	    break;
 	case 'U':	/* $^UNICODE, $^UTF8LOCALE, $^UTF8CACHE */
 	    if (strEQ(name2, "UID"))
@@ -1647,7 +1665,7 @@ Perl_magic_set(pTHX_ const char* name, SV *sv)
 
 	    if (strEQ(remaining, "OUTPUT_AUTOFLUSH")) {
 		/* $^OUTPUT_AUTOFLUSH */
-		IO * const io = GvIOp(PL_defoutgv);
+		IO * const io = PL_stdoutio;
 		if(!io)
 		    break;
 		if ((SvIV(sv)) == 0)
@@ -1788,6 +1806,48 @@ Perl_magic_set(pTHX_ const char* name, SV *sv)
 	case 'S':
 	    if (strEQ(remaining, "SYSTEM_FD_MAX")) {
 		PL_maxsysfd = SvIV(sv);
+		break;
+	    }
+	    if (strEQ(remaining, "STDIN")) {
+		if (!SvOK(sv)) {
+		    IOcpSTEAL(PL_stdinio, newIO());
+		    break;
+		}
+		if (!SvRVOK(sv))
+		    Perl_croak(aTHX_ "$^%s must be an IO ref not %s",
+			remaining, Ddesc(sv));
+		if (! SvIOOK(SvRV(sv)))
+		    Perl_croak(aTHX_ "$^%s must be an IO ref not a %s ref",
+			remaining, Ddesc(SvRV(sv)));
+		IOcpREPLACE(PL_stdinio, svTio(SvRV(sv)));
+		break;
+	    }
+	    if (strEQ(remaining, "STDOUT")) {
+		if (!SvOK(sv)) {
+		    IOcpSTEAL(PL_stdoutio, newIO());
+		    break;
+		}
+		if (!SvRVOK(sv))
+		    Perl_croak(aTHX_ "$^%s must be an IO ref not %s",
+			remaining, Ddesc(sv));
+		if (! SvIOOK(SvRV(sv)))
+		    Perl_croak(aTHX_ "$^%s must be an IO ref not a %s ref",
+			remaining, Ddesc(SvRV(sv)));
+		IOcpREPLACE(PL_stdoutio, svTio(SvRV(sv)));
+		break;
+	    }
+	    if (strEQ(remaining, "STDERR")) {
+		if (!SvOK(sv)) {
+		    IOcpSTEAL(PL_stderrio, newIO());
+		    break;
+		}
+		if (!SvRVOK(sv))
+		    Perl_croak(aTHX_ "$^%s must be an IO ref not %s",
+			remaining, Ddesc(sv));
+		if (! SvIOOK(SvRV(sv)))
+		    Perl_croak(aTHX_ "$^%s must be an IO ref not a %s ref",
+			remaining, Ddesc(SvRV(sv)));
+		IOcpREPLACE(PL_stderrio, svTio(SvRV(sv)));
 		break;
 	    }
 	    break;

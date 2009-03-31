@@ -338,7 +338,7 @@ EOM
     {
       title "Outout to stdout via '-'" ;
 
-      open(SAVEOUT, ">&", \*STDOUT);
+      open(SAVEOUT, ">&", $^STDOUT);
       my $dummy = fileno SAVEOUT;
       open STDOUT, ">", "$name" ;
 
@@ -360,7 +360,7 @@ EOM
       my $uncomp ;
       my $stdinFileno = fileno(STDIN);
       # open below doesn't return 1 sometines on XP
-         open(SAVEIN, "<&", \*STDIN);
+         open(SAVEIN, "<&", $^STDIN);
       ok open(STDIN, "<", "$name"), "  redirect STDIN";
       my $dummy = fileno SAVEIN;
       $x = $UncompressClass->new( '-', Append => 1, Transparent => 0)

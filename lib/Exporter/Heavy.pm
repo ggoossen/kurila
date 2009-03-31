@@ -32,7 +32,7 @@ sub _rebuild_cache($pkg, $exports, $cache) {
 sub export($pkg, $callpkg, @< @imports) {
     my ($type, $cache_is_current, $oops);
     my @($exports, $export_cache) = @(\@{*{Symbol::fetch_glob("$($pkg)::EXPORT")}},
-                                      %Exporter::Cache{+$pkg} ||= \%());
+                                      (%Exporter::Cache{+$pkg} ||= \%()));
 
     if ((nelems @imports)) {
 	if (!%$export_cache) {
@@ -130,7 +130,7 @@ sub export($pkg, $callpkg, @< @imports) {
     }
 
     my @($fail, $fail_cache) = @(\@{*{Symbol::fetch_glob("$($pkg)::EXPORT_FAIL")}},
-                                 %Exporter::FailCache{+$pkg} ||= \%());
+                                 (%Exporter::FailCache{+$pkg} ||= \%()));
 
     if ((nelems @$fail)) {
 	if (!%$fail_cache) {
@@ -160,7 +160,7 @@ sub export($pkg, $callpkg, @< @imports) {
 
     foreach my $sym ( @imports) {
 	# shortcut for the common case of no type character
-	(*{Symbol::fetch_glob("$($callpkg)::$sym")} = \&{*{Symbol::fetch_glob("$($pkg)::$sym")}}, next)
+	(*{Symbol::fetch_glob("$($callpkg)::$sym")} = \&{*{Symbol::fetch_glob("$($pkg)::$sym")}} and next)
 	    unless $sym =~ s/^(\W)//;
 	$type = $1;
 	no warnings 'once';

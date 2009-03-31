@@ -35,7 +35,7 @@ Pod::Select, podselect() - extract selected sections of POD from input
 
     ## Select the "DESCRIPTION" section of the PODs from STDIN and write
     ## the result to STDERR.
-    podselect({-output => ">&STDERR", -sections => ["DESCRIPTION"]}, \*STDIN);
+    podselect({-output => ">&STDERR", -sections => ["DESCRIPTION"]}, $^STDIN);
 
 or
 
@@ -57,7 +57,7 @@ or
     ## STDIN and write the result to STDERR.
     $parser->select("DESCRIPTION");
     $parser->add_selection("SEE ALSO");
-    $parser->parse_from_filehandle(\*STDIN, \*STDERR);
+    $parser->parse_from_filehandle($^STDIN, $^STDERR);
 
 =head1 REQUIRES
 

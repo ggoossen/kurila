@@ -54,13 +54,13 @@ foreach my $foo (@("string", \@(), \%())) {
 # test accessor mode when arg undefd or 0
 foreach my $foo (@(undef, 0)) {
     my $handle = walk_output($foo);
-    is ($handle, \*STDOUT, "walk_output set to STDOUT (default)");
+    is ($handle, $^STDOUT, "walk_output set to STDOUT (default)");
 }
 
 do {   # any object that can print should be ok for walk_output
     package Hugo;
     sub new { my $foo = bless \%() };
-    sub print { CORE::print \*STDOUT, < @_ }
+    sub print { CORE::print $^STDOUT, < @_ }
 };
 my $foo = Hugo->new();	# suggested this API fix
 try {  walk_output($foo) };
@@ -71,9 +71,9 @@ SKIP: do {
     skip("no perlio in this build", 4)
         unless Config::config_value("useperlio");
 
-    foreach my $foo (@(\*STDOUT, \*STDERR)) {
-	try {  walk_output($foo) };
-	is ($^EVAL_ERROR, '', "walk_output() accepts STD* " . ref $foo);
+    foreach my $foo (@($^STDOUT, $^STDERR)) {
+	walk_output($foo);
+	pass("walk_output() accepts STD* " . ref $foo);
     }
 
     # now test a ref to scalar
@@ -191,7 +191,7 @@ SKIP: do {
 	do {
 	    package Bar;
 	    our $AUTOLOAD = 'garbage';
-	    sub AUTOLOAD { print \*STDOUT, "# in AUTOLOAD body: $AUTOLOAD\n" }
+	    sub AUTOLOAD { print $^STDOUT, "# in AUTOLOAD body: $AUTOLOAD\n" }
 	};
 	@($res,$err) =  render('-basic', 'Bar::auto_func');
 	like ($res, qr/unknown function \(Bar::auto_func\)/,

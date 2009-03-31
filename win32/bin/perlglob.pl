@@ -4,8 +4,8 @@ $^OUTPUT_AUTOFLUSH = 1;
 while ((nelems @ARGV)) {
     my $arg = shift;
     my @m = File::DosGlob::doglob(1,$arg);
-    print (\*STDOUT, (nelems @m) ?? join("\0", sort @m) !! $arg);
-    print \*STDOUT, "\0" if (nelems @ARGV);
+    print ($^STDOUT, (nelems @m) ?? join("\0", sort @m) !! $arg);
+    print $^STDOUT, "\0" if (nelems @ARGV);
 }
 __END__
 

@@ -1024,7 +1024,6 @@ Perl_my_stat(pTHX)
 	io = GvIO(gv);
         do_fstat_have_io:
         PL_laststype = OP_STAT;
-        PL_statgv = gv;
         sv_setpvn(PL_statname, "", 0);
         if(io) {
 	    if (IoIFP(io)) {
@@ -1065,7 +1064,6 @@ Perl_my_stat(pTHX)
         }
 
 	s = SvPV_const(sv, len);
-	PL_statgv = NULL;
 	sv_setpvn(PL_statname, s, len);
 	s = SvPVX_const(PL_statname);		/* s now NUL-terminated */
 	PL_laststype = OP_STAT;
@@ -1098,7 +1096,6 @@ Perl_my_lstat(pTHX)
 	Perl_croak(aTHX_ no_prev_lstat);
 
     PL_laststype = OP_LSTAT;
-    PL_statgv = NULL;
     sv = POPs;
     PUTBACK;
     file = SvPV_nolen_const(sv);

@@ -17,7 +17,7 @@ use B::Concise ();
 
 
 # borrowed from B::Concise
-our $walkHandle = \*STDOUT;
+our $walkHandle = $^STDOUT;
 
 sub walk_output { # updates $walkHandle
     $walkHandle = B::Concise::walk_output(< @_);

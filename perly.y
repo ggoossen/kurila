@@ -70,7 +70,8 @@
 
 %token <i_tkval> '{' '}' '[' ']' '-' '+' '$' '@' '%' '*' '&' ';'
 
-%token <opval> WORD METHOD THING PMFUNC PRIVATEVAR
+%token <opval> WORD METHOD THING PMFUNC
+%token <i_tkval> PRIVATEVAR
 %token <opval> FUNC0SUB UNIOPSUB COMPSUB
 %token <p_tkval> LABEL
 %token <i_tkval> SUB ANONSUB BLOCKSUB PACKAGE USE
@@ -95,9 +96,10 @@
 
 %type <opval> block dblock mblock lineseq line loop cond else
 %type <opval> expr term subscripted scalar star amper sideff
+%type <opval> assignexpr
 %type <opval> argexpr texpr iexpr mexpr miexpr
 %type <opval> listexpr listexprcom indirob listop method
-%type <opval> subname proto subbody cont my_scalar
+%type <opval> subname protoassign proto subbody cont my_scalar
 %type <opval> myattrterm myterm
 %type <opval> termbinop termunop anonymous termdo
 %type <p_tkval> label
@@ -105,6 +107,7 @@
 %nonassoc <i_tkval> PREC_LOW
 %nonassoc LOOPEX
 
+%right <i_tkval> RETURNOP
 %left <i_tkval> OROP DOROP
 %left <i_tkval> ANDOP
 %right <i_tkval> NOTOP
@@ -149,12 +152,11 @@ prog	:	progstart
 	;
 
 /* An ordinary block */
-block	:	'{' remember lineseq '}' ';'
+block	:	'{' remember lineseq '}'
 			{
                             $$ = block_end($2, $3);
                             TOKEN_GETMAD($1,$$,'{');
                             TOKEN_GETMAD($4,$$,'}');
-                            TOKEN_GETMAD($5,$$,'u');
 			}
 	;
 
@@ -283,10 +285,9 @@ sideff	:	error
 /* else and elsif blocks */
 else	:	/* NULL */
 			{ $$ = (OP*)NULL; }
-	|	ELSE mblock ';'
+	|	ELSE mblock
 			{ ($2)->op_flags |= OPf_PARENS; $$ = scope($2);
 			  TOKEN_GETMAD($1,$$,'o');
-			  TOKEN_GETMAD($3,$$,'u');
 			}
 	|	ELSIF '(' mexpr ')' mblock else
 			{ 
@@ -321,15 +322,14 @@ cond	:	IF '(' remember mexpr ')' mblock else
 	;
 
 /* Continue blocks */
-cont	:	';'     /* NULL */
+cont	:	/* NULL */
 			{
                             $$ = (OP*)NULL;
 #ifdef PERL_MAD
                             if (PL_madskills) {
                                 /* FIXME produces different results in "do" blocks */
-                                $$ = newOP(OP_NULL,0, LOCATION($1));
+                                $$ = newOP(OP_NULL,0, NULL);
                                 APPEND_MADPROPS_PV("value", $$, '>');
-                                TOKEN_GETMAD($1,$$,'X');
                             }
 #endif /* PERL_MAD */
                         }
@@ -554,6 +554,16 @@ startproto :    '('
                             $$ = $1;
                         }
 
+protoassign :   /* NULL */
+			{ 
+                            $$ = NULL;
+                        }
+        |      ASSIGNOP term 
+			{ 
+                            CvFLAGS(PL_compcv) |= CVf_ASSIGNARG;
+                            $$ = $2;
+                        }
+
 /* Subroutine prototype */
 proto	:	/* NULL */
 			{
@@ -564,15 +574,17 @@ proto	:	/* NULL */
                         }
 	|	startproto ')'
 			{ 
+                            CvFLAGS(PL_compcv) |= CVf_PROTO;
                             $$ = newOP(OP_STUB, 0, LOCATION($1) );
                             PL_parser->in_my = FALSE;
                             PL_parser->expect = XBLOCK;
                             TOKEN_GETMAD($1,$$,'(');
                             TOKEN_GETMAD($2,$$,')');
                         }
-	|	startproto expr mintro ')'
+	|	startproto argexpr protoassign mintro ')'
 			{ 
-                            $$ = $2;
+                            CvFLAGS(PL_compcv) |= CVf_PROTO;
+                            $$ = append_list(OP_LIST, opTlistop($2), opTlistop($3));
                             PL_parser->in_my = FALSE;
                             PL_parser->expect = XBLOCK;
                             TOKEN_GETMAD($1,$$,'(');
@@ -638,12 +650,22 @@ expr	:	expr ANDOP expr
 			  TOKEN_GETMAD($2,$$,'o');
                           APPEND_MADPROPS_PV("operator",$$,'>');
 			}
+	|	assignexpr %prec PREC_LOW
+			{ $$ = $1; }
+	;
+
+assignexpr	:       argexpr ASSIGNOP assignexpr
+                        { 
+                            $$ = newASSIGNOP(OPf_STACKED, $1, IVAL($2), $3, LOCATION($2));
+                            TOKEN_GETMAD($2,$$,'o');
+                            APPEND_MADPROPS_PV("operator",$$,'>');
+			}
 	|	argexpr %prec PREC_LOW
 			{ $$ = $1; }
 	;
 
 /* Expressions are a list of terms joined by commas */
-argexpr	:	argexpr ','
+argexpr	:       argexpr ','
 			{
 #ifdef MAD
 			  OP* op = newNULLLIST(NULL);
@@ -725,7 +747,7 @@ method :       METHOD
        ;
 
 /* Some kind of subscripted expression */
-subscripted:    star '{' expr ';' '}' ';'       /* *main::{something} like *STDOUT{IO} */
+subscripted:    star '{' expr ';' '}'       /* *main::{something} like *STDOUT{IO} */
                         /* In this and all the hash accessors, ';' is
                          * provided by the tokeniser */
 			{
@@ -734,7 +756,6 @@ subscripted:    star '{' expr ';' '}' ';'       /* *main::{something} like *STDO
 			  TOKEN_GETMAD($2,$$,'{');
 			  TOKEN_GETMAD($4,$$,';');
 			  TOKEN_GETMAD($5,$$,'}');
-			  TOKEN_GETMAD($6,$$,'u');
 			}
         |       term DEREFARY                /* somearef->@ */
                         {
@@ -778,7 +799,7 @@ subscripted:    star '{' expr ';' '}' ';'       /* *main::{something} like *STDO
                             TOKEN_GETMAD($3,$$,'[');
                             TOKEN_GETMAD($5,$$,']');
 			}
-	|	term ARROW HSLICE expr ']' ';' '}' ';'   /* someref->{[bar();]} */
+	|	term ARROW HSLICE expr ']' ';' '}'   /* someref->{[bar();]} */
 			{ $$ = newLISTOP(OP_HSLICE, 0,
                                     scalar($4),
                                     ref(newHVREF($1, LOCATION($2)), OP_HSLICE), LOCATION($3));
@@ -788,7 +809,6 @@ subscripted:    star '{' expr ';' '}' ';'       /* *main::{something} like *STDO
 			  TOKEN_GETMAD($5,$$,'j');
 			  TOKEN_GETMAD($6,$$,';');
 			  TOKEN_GETMAD($7,$$,'}');
-			  TOKEN_GETMAD($8,$$,'u');
 			}
 	|	term ARROW ASLICE expr ']' ']'                     /* someref->[[...]] */
 			{ $$ = newLISTOP(OP_ASLICE, 0,
@@ -799,7 +819,7 @@ subscripted:    star '{' expr ';' '}' ';'       /* *main::{something} like *STDO
 			  TOKEN_GETMAD($5,$$,'j');
 			  TOKEN_GETMAD($6,$$,']');
 			}
-	|	term HSLICE expr ']' ';' '}' ';'    /* %foo{[bar();]} */
+	|	term HSLICE expr ']' ';' '}'    /* %foo{[bar();]} */
 			{ $$ = newLISTOP(OP_HSLICE, 0,
 					scalar($3),
 					ref($1, OP_HSLICE), LOCATION($2));
@@ -808,7 +828,6 @@ subscripted:    star '{' expr ';' '}' ';'       /* *main::{something} like *STDO
 			  TOKEN_GETMAD($4,$$,'j');
 			  TOKEN_GETMAD($5,$$,';');
 			  TOKEN_GETMAD($6,$$,'}');
-			  TOKEN_GETMAD($7,$$,'u');
 			}
 	|	term ASLICE expr ']' ']'    /* foo[[bar()]] */
 			{ $$ = newLISTOP(OP_ASLICE, 0,
@@ -819,7 +838,7 @@ subscripted:    star '{' expr ';' '}' ';'       /* *main::{something} like *STDO
 			  TOKEN_GETMAD($4,$$,'j');
 			  TOKEN_GETMAD($5,$$,']');
 			}
-	|	term '{' expr ';' '}' ';'   /* %foo{bar} or %foo{bar();} */
+	|	term '{' expr ';' '}'   /* %foo{bar} or %foo{bar();} */
                         { 
                             $$ = newBINOP(OP_HELEM, 0, $1, scalar($3),
                                 LOCATION($2));
@@ -831,9 +850,8 @@ subscripted:    star '{' expr ';' '}' ';'       /* *main::{something} like *STDO
                             TOKEN_GETMAD($2,$$,'{');
                             TOKEN_GETMAD($4,$$,';');
                             TOKEN_GETMAD($5,$$,'}');
-                            TOKEN_GETMAD($6,$$,'u');
 			}
-	|	term ARROW '{' expr ';' '}' ';' /* somehref->{bar();} */
+	|	term ARROW '{' expr ';' '}' /* somehref->{bar();} */
                         {
                             $$ = newBINOP(OP_HELEM, 0,
                                 ref(newHVREF($1, LOCATION($2)),OP_RV2HV),
@@ -844,7 +862,6 @@ subscripted:    star '{' expr ';' '}' ';'       /* *main::{something} like *STDO
                             TOKEN_GETMAD($3,$$,'{');
                             TOKEN_GETMAD($5,$$,';');
                             TOKEN_GETMAD($6,$$,'}');
-                            TOKEN_GETMAD($7,$$,'u');
 			}
 	|	term ARROW '(' ')'          /* $subref->() */
 			{ $$ = newUNOP(OP_ENTERSUB, OPf_STACKED,
@@ -864,13 +881,7 @@ subscripted:    star '{' expr ';' '}' ';'       /* *main::{something} like *STDO
     ;
 
 /* Binary operators between terms */
-termbinop:	term ASSIGNOP term                     /* $x = $y */
-                        { 
-                            $$ = newASSIGNOP(OPf_STACKED, $1, IVAL($2), $3, LOCATION($2));
-                            TOKEN_GETMAD($2,$$,'o');
-                            APPEND_MADPROPS_PV("operator",$$,'>');
-			}
-	|	term POWOP term                        /* $x ** $y */
+termbinop:	term POWOP term                        /* $x ** $y */
                         { $$ = newBINOP(IVAL($2), 0, scalar($1), scalar($3), LOCATION($2));
 			  TOKEN_GETMAD($2,$$,'o');
                           APPEND_MADPROPS_PV("operator",$$,'>');
@@ -1138,7 +1149,15 @@ term	:	'?' term
 			{ $$ = newLOOPEX(IVAL($1),$2);
 			  TOKEN_GETMAD($1,$$,'o');
 			}
-	|	NOTOP argexpr                        /* not $foo */
+	|	RETURNOP expr                        /* return $foo */
+                        { $$ = newUNOP(OP_RETURN, OPf_STACKED, scalar($2), LOCATION($1));
+			  TOKEN_GETMAD($1,$$,'o');
+			}
+	|	RETURNOP
+                        { $$ = newOP(OP_RETURN, 0, LOCATION($1));
+			  TOKEN_GETMAD($1,$$,'o');
+			}
+	|	NOTOP assignexpr                        /* not $foo */
                         { $$ = newUNOP(OP_NOT, 0, scalar($2), LOCATION($1));
 			  TOKEN_GETMAD($1,$$,'o');
 			}
@@ -1295,7 +1314,9 @@ amper	:	'&' indirob
 
 
 scalar  :	PRIVATEVAR
-			{ $$ = $1; }
+			{ 
+                            $$ = newPRIVATEVAROP(PL_parser->tokenbuf, LOCATION($1));
+                        }
 	|	'$' indirob
 			{ 
                             $$ = newSVREF($2, LOCATION($1));

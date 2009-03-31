@@ -111,17 +111,17 @@ my $INSTALL_ROOT = env::var('PERL_INSTALL_ROOT');
 my $Curdir = File::Spec->curdir;
 my $Updir  = File::Spec->updir;
 
-sub _estr(@mess) {
+sub _estr(@< @mess) {
     return join "\n", @('!' x 72,< @mess,'!' x 72,'');
 }
 
 do {my %warned;
-sub _warnonce($first, @mess) {
-    my $msg=_estr "WARNING: $first",< @mess;
+sub _warnonce($first, @< @mess) {
+    my $msg=_estr("WARNING: $first",< @mess);
     warn $msg unless %warned{+$msg}++;
 }};
 
-sub _choke($first, @mess) {
+sub _choke($first, @< @mess) {
     my $msg=_estr "ERROR: $first",< @mess;
     die($msg);
 }
@@ -130,7 +130,7 @@ sub _choke($first, @mess) {
 sub _chmod( $mode, $item, ?$verbose) {
     $verbose ||= 0;
     if (chmod $mode, $item) {
-        print \*STDOUT, "chmod($mode, $item)\n" if $verbose +> 1;
+        print $^STDOUT, "chmod($mode, $item)\n" if $verbose +> 1;
     } else {
         my $err="$^OS_ERROR";
         _warnonce "WARNING: Failed chmod($mode, $item): $err\n"
@@ -162,8 +162,8 @@ If $moan is true then returns 0 on error and warns instead of dies.
 
 
 
-sub _move_file_at_boot( $file, $target, $moan) {
-    Carp::confess("Panic: Can't _move_file_at_boot on this platform!")
+sub _move_file_at_boot( $file, $target, ?$moan) {
+    die("Panic: Can't _move_file_at_boot on this platform!")
          unless $CanMoveAtBoot;
 
     my $descr= ref $target
@@ -291,16 +291,16 @@ Handles loading the INSTALL.SKIP file. Returns an array of patterns to use.
 
 sub _get_install_skip( $skip, $verbose) {
     if (env::var('EU_INSTALL_IGNORE_SKIP')) {
-        print \*STDOUT, "EU_INSTALL_IGNORE_SKIP is set, ignore skipfile settings\n"
+        print $^STDOUT, "EU_INSTALL_IGNORE_SKIP is set, ignore skipfile settings\n"
             if $verbose+>2;
         return \@();
     }
     if ( ! defined $skip ) {
-        print \*STDOUT, "Looking for install skip list\n"
+        print $^STDOUT, "Looking for install skip list\n"
             if $verbose+>2;
         for my $file (@( 'INSTALL.SKIP', env::var('EU_INSTALL_SITE_SKIPFILE')) ) {
             next unless $file;
-            print \*STDOUT, "\tChecking for $file\n"
+            print $^STDOUT, "\tChecking for $file\n"
                 if $verbose+>2;
             if (-e $file) {
                 $skip= $file;
@@ -309,14 +309,14 @@ sub _get_install_skip( $skip, $verbose) {
         }
     }
     if ($skip && !ref $skip) {
-        print \*STDOUT, "Reading skip patterns from '$skip'.\n"
+        print $^STDOUT, "Reading skip patterns from '$skip'.\n"
             if $verbose;
         if (open my $fh, "<",$skip ) {
             my @patterns;
             while ( ~< $fh) {
                 chomp;
                 next if m/^\s*(?:#|$)/;
-                print \*STDOUT, "\tSkip pattern: $_\n" if $verbose+>3;
+                print $^STDOUT, "\tSkip pattern: $_\n" if $verbose+>3;
                 push @patterns, $_;
             }
             $skip= \@patterns;
@@ -325,10 +325,10 @@ sub _get_install_skip( $skip, $verbose) {
             $skip=\@();
         }
     } elsif ( UNIVERSAL::isa($skip,'ARRAY') ) {
-        print \*STDOUT, "Using array for skip list\n"
+        print $^STDOUT, "Using array for skip list\n"
             if $verbose+>2;
     } elsif ($verbose) {
-        print \*STDOUT, "No skip list found.\n"
+        print $^STDOUT, "No skip list found.\n"
             if $verbose+>1;
         $skip= \@();
     }
@@ -435,7 +435,7 @@ writable.
 sub _mkpath($dir,$show,$mode,?$verbose,?$dry_run) {
     if ( $verbose && $verbose +> 1 && ! -d $dir) {
         $show= 1;
-        printf \*STDOUT, "mkpath(\%s,\%d,\%#o)\n", $dir, $show, $mode;
+        printf $^STDOUT, "mkpath(\%s,\%d,\%#o)\n", $dir, $show, $mode;
     }
     if (!$dry_run) {
         if ( ! try { File::Path::mkpath($dir,$show,$mode); 1 } ) {
@@ -456,7 +456,7 @@ sub _mkpath($dir,$show,$mode,?$verbose,?$dry_run) {
             _choke < @msg;
         }
     } elsif ($show and $dry_run) {
-        print \*STDOUT, "$_\n" for  @make;
+        print $^STDOUT, "$_\n" for  @make;
     }
     
 }
@@ -478,7 +478,7 @@ Dies if the copy fails.
 
 sub _copy( $from, $to, $verbose, $dry_run) {
     if ($verbose && $verbose+>1) {
-        printf \*STDOUT, "copy(\%s,\%s)\n", $from, $to;
+        printf $^STDOUT, "copy(\%s,\%s)\n", $from, $to;
     }
     if (!$dry_run) {
         File::Copy::copy($from,$to)
@@ -502,7 +502,7 @@ Dies if the copy fails.
 
 sub _symlink( $old, $new, ?$verbose, ?$nonono) {
     if ($verbose && $verbose+>1) {
-        printf \*STDOUT, "symlink(\%s,\%s)\n", $old, $new;
+        printf $^STDOUT, "symlink(\%s,\%s)\n", $old, $new;
     }
     if (!$nonono) {
         $old = File::Spec->rel2abs( $old );
@@ -709,7 +709,7 @@ sub install { #XXX OS-SPECIFIC
             directory_not_empty($blib_arch)
         ){
             $targetroot = install_rooted_dir(%from_to{?$blib_arch});
-            print \*STDOUT, "Files found in $blib_arch: installing files in $blib_lib into architecture dependent library tree\n";
+            print $^STDOUT, "Files found in $blib_arch: installing files in $blib_lib into architecture dependent library tree\n";
         }
 
         next unless -d $source;
@@ -732,7 +732,7 @@ sub install { #XXX OS-SPECIFIC
 
             for my $pat ( @{$skip || \@()}) {
                 if ( $sourcefile=~m/$pat/ ) {
-                    print \*STDOUT, "Skipping $targetfile (filtered)\n"
+                    print $^STDOUT, "Skipping $targetfile (filtered)\n"
                         if $verbose+>1;
                     $result->{install_filtered}->{+$sourcefile} = $pat;
                     return;
@@ -775,16 +775,16 @@ sub install { #XXX OS-SPECIFIC
         if ($diff) {
             try {
                 if (-f $targetfile) {
-                    print \*STDOUT, "_unlink_or_rename($targetfile)\n" if $verbose+>1;
+                    print $^STDOUT, "_unlink_or_rename($targetfile)\n" if $verbose+>1;
                     $targetfile= _unlink_or_rename( $targetfile, 'tryhard', 'install' )
                       unless $dry_run;
                 } elsif ( ! -d $targetdir ) {
                     _mkpath( $targetdir, 0, 0755, $verbose, $dry_run );
                 }
-                print \*STDOUT, "Installing $targetfile\n";
+                print $^STDOUT, "Installing $targetfile\n";
                 _copy( $sourcefile, $targetfile, $verbose, $dry_run, );
                 #XXX OS-SPECIFIC
-                print \*STDOUT, "utime($atime,$mtime,$targetfile)\n" if $verbose+>1;
+                print $^STDOUT, "utime($atime,$mtime,$targetfile)\n" if $verbose+>1;
                 utime($atime,$mtime + $Is_VMS,$targetfile) unless $dry_run+>1;
 
 
@@ -800,7 +800,7 @@ sub install { #XXX OS-SPECIFIC
             };
         } else {
             $result->{+install_unchanged}->{+$targetfile} = $sourcefile;
-            print \*STDOUT, "Skipping $targetfile (unchanged)\n" if $verbose;
+            print $^STDOUT, "Skipping $targetfile (unchanged)\n" if $verbose;
         }
 
         if ( $uninstall_shadows ) {
@@ -817,7 +817,7 @@ sub install { #XXX OS-SPECIFIC
     if (%pack{?'write'}) {
         $dir = install_rooted_dir(dirname(%pack{?'write'}));
         _mkpath( $dir, 0, 0755, $verbose, $dry_run );
-        print \*STDOUT, "Writing %pack{?'write'}\n";
+        print $^STDOUT, "Writing %pack{?'write'}\n";
         $packlist->write(install_rooted_file(%pack{?'write'})) unless $dry_run;
     }
 
@@ -996,10 +996,10 @@ sub uninstall($fil,$verbose,$dry_run) {
     my $packlist = ExtUtils::Packlist->new($fil);
     foreach (sort(keys($packlist->{data}))) {
         chomp;
-        print \*STDOUT, "unlink $_\n" if $verbose;
+        print $^STDOUT, "unlink $_\n" if $verbose;
         forceunlink($_,'tryhard') unless $dry_run;
     }
-    print \*STDOUT, "unlink $fil\n" if $verbose;
+    print $^STDOUT, "unlink $fil\n" if $verbose;
     forceunlink($fil, 'tryhard') unless $dry_run;
     _do_cleanup($verbose);
 }
@@ -1057,7 +1057,7 @@ sub inc_uninstall($filepath,$libdir,$verbose,$dry_run,$ignore,$results) {
         } else {
             $diff++;
         }
-        print \*STDOUT, "#$file and $targetfile differ\n" if $diff && $verbose +> 1;
+        print $^STDOUT, "#$file and $targetfile differ\n" if $diff && $verbose +> 1;
 
         if (!$diff or $targetfile eq $ignore) {
             $seen_ours = 1;
@@ -1075,7 +1075,7 @@ sub inc_uninstall($filepath,$libdir,$verbose,$dry_run,$ignore,$results) {
             }
             # if not verbose, we just say nothing
         } else {
-            print \*STDOUT, "Unlinking $targetfile (shadowing?)\n" if $verbose;
+            print $^STDOUT, "Unlinking $targetfile (shadowing?)\n" if $verbose;
             try {
                 die "Fake die for testing" 
                     if $ExtUtils::Install::Testing and
@@ -1143,7 +1143,7 @@ sub pm_to_blib($fromto,$autodir, ?$pm_filter) {
     _mkpath($autodir,0,0755);
     while(my@(?$from, ?$to) =@( each %$fromto)) {
         if( -f $to && -s $from == -s $to && -M $to +< -M $from ) {
-            print \*STDOUT, "Skip $to (unchanged)\n";
+            print $^STDOUT, "Skip $to (unchanged)\n";
             next;
         }
 
@@ -1156,7 +1156,7 @@ sub pm_to_blib($fromto,$autodir, ?$pm_filter) {
                              $from =~ m/\.pm$/;
 
         if (!$need_filtering && 0 == compare($from,$to)) {
-            print \*STDOUT, "Skip $to (unchanged)\n";
+            print $^STDOUT, "Skip $to (unchanged)\n";
             next;
         }
         if (-f $to or -l $to){
@@ -1167,10 +1167,10 @@ sub pm_to_blib($fromto,$autodir, ?$pm_filter) {
         }
         if ($need_filtering) {
             run_filter($pm_filter, $from, $to);
-            print \*STDOUT, "$pm_filter <$from >$to\n";
+            print $^STDOUT, "$pm_filter <$from >$to\n";
         } else {
             _symlink( $from, $to );
-            print \*STDOUT, "symlink $from $to\n";
+            print $^STDOUT, "symlink $from $to\n";
         }
 #         my($mode,$atime,$mtime) = (stat $from)[2,8,9];
 #         utime($atime,$mtime+$Is_VMS,$to);
@@ -1192,9 +1192,9 @@ sub DESTROY {
         my($i,$plural);
         foreach my $file (sort keys %$self) {
             $plural = (nelems @{$self->{?$file}}) +> 1 ?? "s" !! "";
-            print \*STDOUT, "## Differing version$plural of $file found. You might like to\n";
+            print $^STDOUT, "## Differing version$plural of $file found. You might like to\n";
             for (0..(nelems @{$self->{?$file}})-1) {
-                print \*STDOUT, "rm ", $self->{$file}->[$_], "\n";
+                print $^STDOUT, "rm ", $self->{$file}->[$_], "\n";
                 $i++;
             }
         }
@@ -1202,7 +1202,7 @@ sub DESTROY {
         my $inst = (_invokant() eq 'ExtUtils::MakeMaker')
                  ?? ( config_value("make") || 'make' ).' install UNINST=1'
                  !! './Build install uninst=1';
-        print \*STDOUT, "## Running '$inst' will unlink $plural for you.\n";
+        print $^STDOUT, "## Running '$inst' will unlink $plural for you.\n";
     }
 }
 

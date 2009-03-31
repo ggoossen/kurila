@@ -11,12 +11,12 @@ BEGIN {
 }
 
 unless( try { require File::Spec } ) {
-    print \*STDOUT, "1..0 # Skip Need File::Spec to run this test\n";
+    print $^STDOUT, "1..0 # Skip Need File::Spec to run this test\n";
     exit 0;
 }
 
 if( $^OS_NAME eq 'MacOS' ) {
-    print \*STDOUT, "1..0 # Skip exit status broken on Mac OS\n";
+    print $^STDOUT, "1..0 # Skip exit status broken on Mac OS\n";
     exit 0;
 }
 
@@ -29,7 +29,7 @@ package main;
 
 my $IsVMS = $^OS_NAME eq 'VMS';
 
-print \*STDOUT, "# Ahh!  I see you're running VMS.\n" if $IsVMS;
+print $^STDOUT, "# Ahh!  I see you're running VMS.\n" if $IsVMS;
 
 my %Tests = %(
              #                      Everyone Else   VMS
@@ -40,12 +40,9 @@ my %Tests = %(
              'extras.plx'               => @(2,      4),
              'too_few.plx'              => @(255,    4),
              'too_few_fail.plx'         => @(2,      4),
-             'death.plx'                => @(255,    4),
-             'last_minute_death.plx'    => @(255,    4),
              'pre_plan_death.plx'       => @('not zero',    'not zero'),
              'death_in_eval.plx'        => @(0,      0),
              'require.plx'              => @(0,      0),
-             'death_with_handler.plx'   => @(255,    4),
              'exit.plx'                 => @(1,      4),
             );
 

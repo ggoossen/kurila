@@ -24,7 +24,7 @@ sub fill_protos {
     push(@out, $1 . "\{\@_[$n]\}"), next if $proto =~ s/^\s*\\([\@%\$\&])//;
     push(@out, "\@_[$n]"), next if $proto =~ s/^\s*([_*\$&])//;
     push(@out, " < \@_[[ $n..nelems(\@_)-1]]"), last if $proto =~ s/^\s*(;\s*)?\@//;
-    $seen_semi = 1, $n--, next if $proto =~ s/^\s*;//; # XXXX ????
+    ($seen_semi = 1), $n--, next if $proto =~ s/^\s*;//; # XXXX ????
     die "Unknown prototype letters: \"$proto\"";
   }
   push(@out1,\@($n+1,< @out));
@@ -68,7 +68,7 @@ sub _make_fatal($sub, $pkg) {
     $name = $sub;
     $name =~ s/.*::// or $name =~ s/^&//;
     $sub = Symbol::fetch_glob($sub);
-    print \*STDOUT, "# _make_fatal: sub=$sub pkg=$pkg name=$name\n" if $Debug;
+    print $^STDOUT, "# _make_fatal: sub=$sub pkg=$pkg name=$name\n" if $Debug;
     die "Bad subroutine name for Fatal: $name" unless $name =~ m/^\w+$/;
     if (defined(&$sub)) {	# user subroutine
 	$sref = \&$sub;
@@ -96,7 +96,7 @@ EOS
     my @protos = fill_protos($proto);
     $code .= write_invocation($core, $call, $name, < @protos);
     $code .= "\}\n";
-    print \*STDOUT, $code if $Debug;
+    print $^STDOUT, $code if $Debug;
     do {
       $code = eval("package $pkg; $code");
       die if $^EVAL_ERROR;

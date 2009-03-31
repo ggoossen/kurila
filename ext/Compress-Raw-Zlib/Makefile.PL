@@ -25,7 +25,7 @@ my $USE_PPPORT_H = (env::var('PERL_CORE')) ?? '' !! '-DUSE_PPPORT_H';
 if ($^OS_NAME =~ m/cygwin/i and $ExtUtils::Install::VERSION +< 1.39 
         and not (env::var('PERL_MM_USE_DEFAULT') or env::var('PERL_CORE')))
 {
-    print \*STDOUT, <<EOM ;
+    print $^STDOUT, <<EOM ;
 
 I see you are running Cygwin.
 
@@ -40,16 +40,16 @@ by hand by running 'make install' under the directory
 
 EOM
 
-    print \*STDOUT, "Do you want to continue? [Y/N]: " ;
-    my $answer = ~< \*STDIN ;
+    print $^STDOUT, "Do you want to continue? [Y/N]: " ;
+    my $answer = ~< $^STDIN ;
 
     if ($answer =~ m/^yes|y/i)
     {
-	print \*STDOUT, "continuing...\n" 
+	print $^STDOUT, "continuing...\n" 
     }
     else
     {
-	print \*STDOUT, "exiting...\n" ;
+	print $^STDOUT, "exiting...\n" ;
 	exit 1 ;
     }
 
@@ -171,7 +171,7 @@ sub ParseCONFIG
     my %Parsed = %( < %ValidOption ) ;
     my $CONFIG = 'config.in' ;
 
-    print \*STDOUT, "Parsing $CONFIG...\n" ;
+    print $^STDOUT, "Parsing $CONFIG...\n" ;
 
     open(my $f, "<", "$CONFIG") or die "Cannot open file $CONFIG: $^OS_ERROR\n" ;
     while (~< $f) {
@@ -191,7 +191,7 @@ sub ParseCONFIG
     }
     close $f ;
 
-    print \*STDOUT, "Unknown keys in $CONFIG ignored [$(join ' ',@badkey)]\n"
+    print $^STDOUT, "Unknown keys in $CONFIG ignored [$(join ' ',@badkey)]\n"
 	if (nelems @badkey) ;
 
     # check parsed values
@@ -231,7 +231,7 @@ sub ParseCONFIG
 
 
 	# write the Makefile
-	print \*STDOUT, "Building Zlib enabled\n" ;
+	print $^STDOUT, "Building Zlib enabled\n" ;
     }
 
     $GZIP_OS_CODE = defined env::var('GZIP_OS_CODE') 
@@ -244,14 +244,14 @@ sub ParseCONFIG
 
     if (uc $GZIP_OS_CODE eq 'AUTO_DETECT')
     {
-        print \*STDOUT, "Auto Detect Gzip OS Code..\n" ;
+        print $^STDOUT, "Auto Detect Gzip OS Code..\n" ;
         $GZIP_OS_CODE = getOSCode() ;
     }
     
     my $name = getOSname($GZIP_OS_CODE);
-    print \*STDOUT, "Setting Gzip OS Code to $GZIP_OS_CODE [$name]\n" ;
+    print $^STDOUT, "Setting Gzip OS Code to $GZIP_OS_CODE [$name]\n" ;
 
-    print \*STDOUT, <<EOM if 0 ;
+    print $^STDOUT, <<EOM if 0 ;
     INCLUDE         [$ZLIB_INCLUDE]
     LIB             [$ZLIB_LIB]
     GZIP_OS_CODE    [$GZIP_OS_CODE]
@@ -260,7 +260,7 @@ sub ParseCONFIG
 
 EOM
 
-    print \*STDOUT, "Looks Good.\n" ;
+    print $^STDOUT, "Looks Good.\n" ;
 
 }
 

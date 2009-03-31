@@ -11,7 +11,7 @@ BEGIN {
     }
 
     if (config_value('byteorder') ne "1234") {
-	print \*STDOUT, "1..0 # Skip: Test only works for 32 bit little-ending machines\n";
+	print $^STDOUT, "1..0 # Skip: Test only works for 32 bit little-ending machines\n";
 	exit 0;
     }
 }

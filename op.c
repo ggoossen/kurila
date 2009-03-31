@@ -1415,9 +1415,12 @@ Perl_assign(pTHX_ OP *o, bool partial, I32 *min_modcount, I32 *max_modcount)
     case OP_AELEM:
     case OP_HSLICE:
     case OP_ASLICE:
+    case OP_ENTERSUB:
 	o->op_flags |= OPf_ASSIGN;
-	if (partial)
+	if (partial) {
 	    o->op_flags |= OPf_ASSIGN_PART;
+	    o->op_flags = (o->op_flags & ~OPf_WANT) | OPf_WANT_VOID;
+	}
 	(*max_modcount)++;
 	if ( ! (o->op_flags & OPf_OPTIONAL) )
 	    (*min_modcount)++;
@@ -2582,9 +2585,11 @@ Perl_newASSIGNOP(pTHX_ OPFLAGS flags, OP *left, I32 optype, OP *right, SV *locat
 
     if (optype) {
 	bool is_logassign = (optype == OP_ANDASSIGN || optype == OP_ORASSIGN || optype == OP_DORASSIGN);
+
 	if (is_logassign) {
 	    OP* new_left = left;
 	    OP* finish_assign = op_assign(&new_left, optype);
+
 	    if (finish_assign) {
 		o = newBINOP(OP_SASSIGN, 0, scalar(right),
 		    newOP(OP_LOGASSIGN_ASSIGN, 0, location), location);
@@ -3256,6 +3261,110 @@ Perl_newLOOPEX(pTHX_ I32 type, OP *label)
     return o;
 }
 
+OP*
+Perl_newPRIVATEVAROP(pTHX_ const char* varname, SV* location) {
+    PADOFFSET tmp = 0;
+    GV* gv;
+    OP* gvop;
+    const STRLEN varname_len = strlen(varname);
+    /* All routes through this function want to know if there is a colon.  */
+    const char *const has_colon = (const char*) memchr (varname, ':', varname_len);
+    OP* o;
+
+    /* if we're in a my(), we can't allow dynamics here.
+       if it's a legal name, the OP is a PADANY.
+    */
+    if (PL_parser->in_my) {
+        if (PL_parser->in_my == KEY_our) {	/* "our" is merely analogous to "my" */
+            if (has_colon)
+                yyerror(Perl_form(aTHX_ "No package name allowed for "
+                                  "variable %s in \"our\"",
+                                  varname));
+            tmp = allocmy(varname);
+        }
+        else {
+            if (has_colon)
+                yyerror(Perl_form(aTHX_ PL_no_myglob,
+			    PL_parser->in_my == KEY_my ? "my" : "state", varname));
+
+            o = newOP(OP_PADSV, 0, location);
+            o->op_targ = allocmy(varname);
+            return o;
+        }
+    }
+
+    /*
+       build the ops for accesses to a my() variable.
+
+       Deny my($a) or my($b) in a sort block, *if* $a or $b is
+       then used in a comparison.  This catches most, but not
+       all cases.  For instance, it catches
+           sort { my($a); $a <=> $b }
+       but not
+           sort { my($a); $a < $b ? -1 : $a == $b ? 0 : 1; }
+       (although why you'd do that is anyone's guess).
+    */
+
+    if (!has_colon) {
+	if (!PL_parser->in_my)
+	    tmp = pad_findmy(varname);
+        if (tmp != NOT_IN_PAD) {
+            /* might be an "our" variable" */
+            if (PAD_COMPNAME_FLAGS_isOUR(tmp)) {
+                /* build ops for a bareword */
+		GV *  const ourgv = PAD_COMPNAME_OURGV(tmp);
+		OP * gvop = (OP*)newGVOP(OP_GV, 0, ourgv, location);
+		o = newUNOP(
+		    (*varname == '%' ? OP_RV2HV : *varname == '@' ? OP_RV2AV : OP_RV2SV),
+			0, gvop, location);
+                return o;
+            }
+
+            o = newOP(OP_PADSV, 0, location);
+            o->op_targ = tmp;
+            return o;
+        }
+    }
+
+    if (varname[1] == '^'
+	|| ( varname[1] >= '0' && varname[1] <= '9' ) ) {
+	if ( ! is_magicsv(&varname[1]) ) {
+	    Perl_croak(aTHX_ "unknown magical variable %s", varname);
+	}
+	o = newSVOP(OP_MAGICSV, 0,
+	    newSVpvn(varname+1, varname_len-1),
+	    location);
+	return o;
+    }
+
+    /* build ops for a global variable */
+    gv = gv_fetchpvn_flags(
+	    varname + 1, varname_len - 1,
+	    /* If the identifier refers to a stash, don't autovivify it.
+	     * Change 24660 had the side effect of causing symbol table
+	     * hashes to always be defined, even if they were freshly
+	     * created and the only reference in the entire program was
+	     * the single statement with the defined %foo::bar:: test.
+	     * It appears that all code in the wild doing this actually
+	     * wants to know whether sub-packages have been loaded, so
+	     * by avoiding auto-vivifying symbol tables, we ensure that
+	     * defined %foo::bar:: continues to be false, and the existing
+	     * tests still give the expected answers, even though what
+	     * they're actually testing has now changed subtly.
+	     */
+	    (PL_in_eval ? (GV_ADDMULTI | GV_ADDINEVAL) : GV_ADD),
+	    ((varname[0] == '$') ? SVt_PV
+	     : (varname[0] == '@') ? SVt_PVAV
+	     : SVt_PVHV));
+    if ( ! gv )
+	Perl_croak(aTHX_ "variable %s does not exist", varname);
+    gvop = (OP*)newGVOP(OP_GV, 0, gv, location);
+    o = newUNOP(
+	(*varname == '%' ? OP_RV2HV : *varname == '@' ? OP_RV2AV : OP_RV2SV),
+	    0, gvop, location);
+    return o;
+}
+
 /*
 =for apidoc cv_undef
 
@@ -3529,7 +3638,9 @@ Perl_newNAMEDSUB(pTHX_ I32 floor, OP *o, OP *proto, OP *block)
 
     if (GvCV(gv)) {
 	if (ckWARN(WARN_REDEFINE)) {
-	    Perl_warner(aTHX_ packWARN(WARN_REDEFINE),
+	    Perl_warner_at(aTHX_ 
+		SvLOCATION(cv),
+		packWARN(WARN_REDEFINE),
 		CvCONST(cv)
 		? "Constant subroutine %s redefined"
 		: "Subroutine %s redefined",
@@ -3611,7 +3722,6 @@ Perl_newSUB(pTHX_ I32 floor, OP *proto, OP *block)
 	if (proto && proto->op_type == OP_STUB) {
 	    CvN_MINARGS(cv) = 0;
 	    CvN_MAXARGS(cv) = 0;
-	    CvFLAGS(cv) |= CVf_PROTO;
 	    proto_block = block;
 	    op_free(proto);
 	}
@@ -3627,13 +3737,12 @@ Perl_newSUB(pTHX_ I32 floor, OP *proto, OP *block)
 	    op_free(pushmark);
 	    for (kid = list->op_first; kid; kid = kid->op_sibling)
 		assign(kid, TRUE, &min_modcount, &max_modcount);
-	    CvN_MINARGS(cv) = min_modcount;
-	    CvN_MAXARGS(cv) = max_modcount;
+	    CvN_MINARGS(cv) = min_modcount - ( cv_assignarg_flag(cv) ? 1 : 0 );
+	    CvN_MAXARGS(cv) = max_modcount - ( cv_assignarg_flag(cv) ? 1 : 0 );
 #ifdef PERL_MAD
 	    block = newUNOP(OP_NULL, 0, block, block->op_location);
 #endif
 	    proto_block = append_list(OP_LINESEQ, list, (LISTOP*)block);
-	    CvFLAGS(cv) |= CVf_PROTO;
 	}
 	else {
 	    proto_block = block;
@@ -4379,10 +4488,7 @@ Perl_ck_ftst(pTHX_ OP *o)
     }
     else {
 	OP* const oldo = o;
-	if (type == OP_FTTTY)
-	    o = newGVOP(type, OPf_REF, PL_stdingv, oldo->op_location);
-	else
-	    o = newUNOP(type, 0, newDEFSVOP(o->op_location), oldo->op_location);
+	o = newUNOP(type, 0, newDEFSVOP(o->op_location), oldo->op_location);
 #ifdef PERL_MAD
 	op_getmad(oldo,o,'O');
 #else
@@ -5131,16 +5237,6 @@ Perl_ck_require(pTHX_ OP *o)
 }
 
 OP *
-Perl_ck_return(pTHX_ OP *o)
-{
-    dVAR;
-
-    PERL_ARGS_ASSERT_CK_RETURN;
-
-    return ck_fun(o);
-}
-
-OP *
 Perl_ck_shift(pTHX_ OP *o)
 {
     dVAR;
@@ -5395,13 +5491,11 @@ Perl_ck_subr(pTHX_ OP *o)
 	     ? cUNOPo : ((UNOP*)cUNOPo->op_first))->op_first;
     OP *o2 = prev->op_sibling;
     OP *cvop;
-    const char *proto = NULL;
-    const char *proto_end = NULL;
+    I32 n_minargs = 0;
+    I32 n_maxargs = -1;
     CV *cv = NULL;
-    int optional = 0;
     I32 arg = 0;
-    I32 contextclass = 0;
-    const char *e = NULL;
+    bool variable_args = 0;
     bool delete_op = 0;
     SV** namesv;
 
@@ -5420,11 +5514,8 @@ Perl_ck_subr(pTHX_ OP *o)
 	    if (!cv)
 		tmpop->op_private |= OPpEARLY_CV;
 	    else {
-		if (SvPOK(cv)) {
-		    STRLEN len;
-		    proto = SvPV((SV*)cv, len);
-		    proto_end = proto + len;
-		}
+		n_minargs = CvN_MINARGS(cv);
+		n_maxargs = CvN_MAXARGS(cv);
 	    }
 	}
     }
@@ -5447,192 +5538,21 @@ Perl_ck_subr(pTHX_ OP *o)
 	    o3 = ((UNOP*)o2)->op_first;
 	else
 	    o3 = o2;
-	if (proto) {
-	    if (proto >= proto_end)
-		return too_many_arguments(o, 
-		    namesv ? SvPVX_const(*namesv) : "subroutine");
-
-	    switch (*proto) {
-	    case ';':
-		optional = 1;
-		proto++;
-		continue;
-	    case '_':
-		/* _ must be at the end */
-		if (proto[1] && proto[1] != ';')
-		    goto oops;
-	    case '$':
-	    case '%':
-		proto++;
-		arg++;
-		scalar(o2);
-		break;
-	    case '@':
-            case '<':
-		if (proto[1])
-		    goto oops;
-		list(o2);
-                break;
-	    case '&':
-		proto++;
-		arg++;
-		if (o3->op_type != OP_SREFGEN && o3->op_type != OP_UNDEF)
-		    bad_type(arg,
-			arg == 1 ? "block or sub {}" : "sub {}",
-			"subroutine", o3);
-		break;
-	    case '*':
-		/* '*' allows any scalar type, including bareword */
-		proto++;
-		arg++;
-		if (o3->op_type == OP_RV2GV)
-		    goto wrapref;	/* autoconvert GLOB -> GLOBref */
-		else if (o3->op_type == OP_CONST)
-		    o3->op_private &= ~OPpCONST_STRICT;
-		else if (o3->op_type == OP_ENTERSUB) {
-		    /* accidental subroutine, revert to bareword */
-		    OP *gvop = ((UNOP*)o3)->op_first;
-		    if (gvop && gvop->op_type == OP_NULL) {
-			gvop = ((UNOP*)gvop)->op_first;
-			if (gvop) {
-			    for (; gvop->op_sibling; gvop = gvop->op_sibling)
-				;
-			    if (gvop &&
-				(gvop->op_private & OPpENTERSUB_NOPAREN) &&
-				(gvop = ((UNOP*)gvop)->op_first) &&
-				gvop->op_type == OP_GV)
-			    {
-				GV * const gv = cGVOPx_gv(gvop);
-				OP * const sibling = o2->op_sibling;
-				SV * const n = newSVpvs("");
-#ifdef PERL_MAD
-				OP * const oldo2 = o2;
-#else
-				op_free(o2);
-#endif
-				gv_fullname3(n, gv, "");
-				o2 = newSVOP(OP_CONST, 0, n, o->op_location);
-				op_getmad(oldo2,o2,'O');
-				prev->op_sibling = o2;
-				o2->op_sibling = sibling;
-			    }
-			}
-		    }
-		}
-		scalar(o2);
-		break;
-	    case '[': case ']':
-		 goto oops;
-		 break;
-	    case '\\':
-		proto++;
-		arg++;
-#ifdef PERL_MAD
-	        addmad(newMADsv('c', newSVpvn(proto-1, 2)), &o3->op_madprop, 0);
-#endif
-	    again:
-		switch (*proto++) {
-		case '[':
-		     if (contextclass++ == 0) {
-		          e = strchr(proto, ']');
-			  if (!e || e == proto)
-			       goto oops;
-		     }
-		     else
-			  goto oops;
-		     goto again;
-		     break;
-		case ']':
-		     if (contextclass) {
-		         const char *p = proto;
-			 const char *const end = proto;
-			 contextclass = 0;
-			 while (*--p != '[');
-			 bad_type(arg, Perl_form(aTHX_ "one of %.*s",
-						 (int)(end - p), p),
-				  "subroutine", o3);
-		     } else
-			  goto oops;
-		     break;
-		case '*':
-		     if (o3->op_type == OP_RV2GV)
-			  goto wrapref;
-		     if (!contextclass)
-			  bad_type(arg, "symbol", "subroutine", o3);
-		     break;
-		case '&':
-		     if (o3->op_type == OP_ENTERSUB)
-			  goto wrapref;
-		     if (!contextclass)
-			  bad_type(arg, "subroutine entry", "subroutine",
-				   o3);
-		     break;
-		case '$':
-		    if (o3->op_type == OP_RV2SV ||
-			o3->op_type == OP_PADSV ||
-			o3->op_type == OP_HELEM ||
-			o3->op_type == OP_AELEM)
-			 goto wrapref;
-		    if (!contextclass)
-			bad_type(arg, "scalar", "subroutine", o3);
-		     break;
-		case '@':
-		    if (o3->op_type == OP_RV2AV ||
-			o3->op_type == OP_PADSV)
-			 goto wrapref;
-		    if (!contextclass)
-			bad_type(arg, "array", "subroutine", o3);
-		    break;
-		case '%':
-		    if (o3->op_type == OP_RV2HV ||
-			o3->op_type == OP_PADSV)
-			 goto wrapref;
-		    if (!contextclass)
-			 bad_type(arg, "hash", "subroutine", o3);
-		    break;
-		wrapref:
-		    {
-			OP* const kid = o2;
-			OP* const sib = kid->op_sibling;
-			kid->op_sibling = 0;
-			o2 = newUNOP(OP_SREFGEN, 0, kid, kid->op_location);
-			o2->op_sibling = sib;
-			prev->op_sibling = o2;
-		    }
-		    if (contextclass && e) {
-			 proto = e + 1;
-			 contextclass = 0;
-		    }
-		    break;
-		default: goto oops;
-		}
-		if (contextclass)
-		     goto again;
-		break;
-	    case ' ':
-		proto++;
-		continue;
-	    default:
-	      oops:
-		Perl_croak(aTHX_ "Malformed prototype for %s: %"SVf,
-		    (namesv ? SvPVX_const(*namesv) : "subroutine"), SVfARG(cv));
-	    }
-	}
+	if (PL_opargs[o3->op_type] & OA_RETSCALAR)
+	    arg++;
 	else
-	    list(o2);
+	    variable_args = 1;
+	if ( n_maxargs != -1 && arg > n_maxargs )
+	    return too_many_arguments(o, 
+		namesv ? SvPVX_const(*namesv) : "subroutine");
+	list(o2);
 	prev->op_sibling = o2 = mod(o2, OP_ENTERSUB);
 	prev = o2;
 	o2 = o2->op_sibling;
     } /* while */
-    if (o2 == cvop && proto && *proto == '_') {
-	/* generate an access to $_ */
-	o2 = newDEFSVOP(o->op_location);
-	o2->op_sibling = prev->op_sibling;
-	prev->op_sibling = o2; /* instead of cvop */
-    }
-    if (proto && !optional && proto_end > proto &&
-	(*proto != '<' && *proto != '@' && *proto != ';' && *proto != '_')) {
-	return too_few_arguments(o, namesv ? SvPVX_const(*namesv) : "subroutine" );
+    if (arg < n_minargs && ! variable_args) {
+	return too_few_arguments(o, 
+	    namesv ? SvPVX_const(*namesv) : "subroutine");
     }
     if(delete_op) {
 #ifdef PERL_MAD

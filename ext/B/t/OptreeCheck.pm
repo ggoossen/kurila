@@ -374,7 +374,7 @@ our %msgs # announce cross-testing.
 #######
 sub getCmdLine {	# import assistant
     # offer help
-    print(\*STDOUT, qq{\n$^PROGRAM_NAME accepts args to update these state-vars:
+    print($^STDOUT, qq{\n$^PROGRAM_NAME accepts args to update these state-vars:
 	     turn on a flag by typing its name,
 	     select a value from list by typing name=val.\n    }, <
 	  mydumper(\%gOpts))
@@ -414,7 +414,7 @@ sub getCmdLine {	# import assistant
 	    grep { s/$opt=(.*)/$(%gOpts{+$opt}=$1)/ }, @ARGV;
 	}
      }
-    print(\*STDOUT, "$^PROGRAM_NAME heres current state:\n", < mydumper(\%gOpts))
+    print($^STDOUT, "$^PROGRAM_NAME heres current state:\n", < mydumper(\%gOpts))
 	if %gOpts{?help} or %gOpts{?dump};
 
     exit if %gOpts{?help};
@@ -428,7 +428,7 @@ sub checkOptree {
     my $tc = newTestCases(< @_);	# ctor
     my ($rendering);
 
-    print \*STDOUT, "checkOptree args: ", <mydumper($tc) if $tc->{?dump};
+    print $^STDOUT, "checkOptree args: ", <mydumper($tc) if $tc->{?dump};
     SKIP: do {
 	skip("$tc->{?skip} $tc->{?name}", 1) if $tc->{?skip};
 
@@ -490,7 +490,7 @@ sub label($tc) {
     foreach (qw( note prog code )) {
 	$buf .= " $_: $tc->{?$_}" if $tc->{?$_} and not ref $tc->{?$_};
     }
-    return $tc->{+name} = $buf;
+    return ($tc->{+name} = $buf);
 }
 
 #################
@@ -546,11 +546,11 @@ sub getRendering {
     # separate banner, other stuff whose printing order isnt guaranteed
     if ($tc->{?strip}) {
 	$rendering =~ s/(B::Concise::compile.*?\n)//;
-	print \*STDOUT, "stripped from rendering <$1>\n" if $1 and $tc->{?stripv};
+	print $^STDOUT, "stripped from rendering <$1>\n" if $1 and $tc->{?stripv};
 
 	#while ($rendering =~ s/^(.*?(-e) line \d+\.)\n//g) {
 	while ($rendering =~ s/^(.*?(-e|\(eval \d+\).*?) line \d+\.)\n//g) {
-	    print \*STDOUT, "stripped <$1> $2\n" if $tc->{?stripv};
+	    print $^STDOUT, "stripped <$1> $2\n" if $tc->{?stripv};
 	    push @errs, $1;
 	}
 	$rendering =~ s/-e syntax OK\n//;
@@ -610,7 +610,7 @@ sub diag_or_fail {
 
 	if    (%gOpts{?report} eq 'diag')	{ _diag ($report) }
 	elsif (%gOpts{?report} eq 'fail')	{ fail  ($report) }
-	else					{ print (\*STDOUT, $report) }
+	else					{ print ($^STDOUT, $report) }
 	next unless %gOpts{?errcont}; # skip block
     }
 }
@@ -901,11 +901,11 @@ sub mydumper {
 
     eval "require Data::Dumper"
 	or do{
-	    print \*STDOUT, "Sorry, Data::Dumper is not available\n";
-	    print \*STDOUT, "half hearted attempt:\n";
+	    print $^STDOUT, "Sorry, Data::Dumper is not available\n";
+	    print $^STDOUT, "half hearted attempt:\n";
 	    foreach my $it ( @_) {
 		if (ref $it eq 'HASH') {
-		    print \*STDOUT, " $_ => $it->{?$_}\n" foreach sort keys %$it;
+		    print $^STDOUT, " $_ => $it->{?$_}\n" foreach sort keys %$it;
 		}
 	    }
 	    return;
@@ -962,7 +962,7 @@ EONT_EONT
     return $testcode;
 }
 
-sub OptreeCheck::gentest($code,$opts) {
+sub OptreeCheck::gentest($code, ?$opts) {
     my $rendering = getRendering(\%(code => $code));
     my $testcode = OptreeCheck::wrap($code);
     return unless $testcode;
@@ -998,10 +998,10 @@ sub OptreeCheck::processExamples {
 	open (my $fh, "<", $file) or die "cant open $file: $^OS_ERROR\n";
 	$^INPUT_RECORD_SEPARATOR = "";
 	my @chunks = @( ~< $fh );
-	print \*STDOUT, < preamble (scalar nelems @chunks);
+	print $^STDOUT, < preamble (scalar nelems @chunks);
 	foreach my $t ( @chunks) {
-	    print \*STDOUT, "\n\n=for gentest\n\n# chunk: $t=cut\n\n";
-	    print \*STDOUT, < OptreeCheck::gentest ($t);
+	    print $^STDOUT, "\n\n=for gentest\n\n# chunk: $t=cut\n\n";
+	    print $^STDOUT, < OptreeCheck::gentest ($t);
 	}
     }
 }

@@ -110,7 +110,7 @@ sub guess_name($self) {
         %xs = %( < @+: map { s/.xs$//; @($_,1) }, @( glob( <'*.xs')) );  ## no critic
         if (keys %xs) { 
             foreach my $pm ( @pm) { 
-                $defpm = $pm, last if exists %xs{$pm}; 
+                ($defpm = $pm), last if exists %xs{$pm}; 
             } 
         }
       }
@@ -122,13 +122,13 @@ sub guess_name($self) {
                 last;
             }
         }
-        print \*STDOUT, "Warning (non-fatal): Couldn't find package name in $($defpm).pm;\n\t",
+        print $^STDOUT, "Warning (non-fatal): Couldn't find package name in $($defpm).pm;\n\t",
                      "defaulting package name to $defname\n"
             if eof($pm);
         close $pm;
     }
     else {
-        print \*STDOUT, "Warning (non-fatal): Couldn't find $($defpm).pm;\n\t",
+        print $^STDOUT, "Warning (non-fatal): Couldn't find $($defpm).pm;\n\t",
                      "defaulting package name to $defname\n";
     }
     $defname =~ s#[\d.\-_]+$##;
@@ -177,10 +177,10 @@ sub find_perl($self, $ver, $names, $dirs, $trace) {
     # Image names containing Perl version use '_' instead of '.' under VMS
     s/\.(\d+)$/_$1/ for  @snames;
     if ($trace +>= 2){
-        print \*STDOUT, "Looking for perl $ver by these names:\n";
-        print \*STDOUT, "\t$(join ' ',@snames),\n";
-        print \*STDOUT, "in these dirs:\n";
-        print \*STDOUT, "\t$(join ' ',@sdirs)\n";
+        print $^STDOUT, "Looking for perl $ver by these names:\n";
+        print $^STDOUT, "\t$(join ' ',@snames),\n";
+        print $^STDOUT, "in these dirs:\n";
+        print $^STDOUT, "\t$(join ' ',@sdirs)\n";
     }
     foreach my $dir ( @sdirs){
         next unless defined $dir; # $self->{PERL_SRC} may be undefined
@@ -201,7 +201,7 @@ sub find_perl($self, $ver, $names, $dirs, $trace) {
         }
     }
     foreach my $name ( @cand) {
-        print \*STDOUT, "Checking $name\n" if $trace +>= 2;
+        print $^STDOUT, "Checking $name\n" if $trace +>= 2;
         # If it looks like a potential command, try it without the MCR
         if ($name =~ m/^[\w\-\$]+$/) {
             open(my $tcf, ">", "temp_mmvms.com") 
@@ -212,13 +212,13 @@ sub find_perl($self, $ver, $names, $dirs, $trace) {
             $rslt = `\@temp_mmvms.com` ;
             unlink('temp_mmvms.com');
             if ($rslt =~ m/VER_OK/) {
-                print \*STDOUT, "Using PERL=$name\n" if $trace;
+                print $^STDOUT, "Using PERL=$name\n" if $trace;
                 return $name;
             }
         }
         next unless $vmsfile = $self->maybe_command($name);
         $vmsfile =~ s/;[\d\-]*$//;  # Clip off version number; we can use a newer version as well
-        print \*STDOUT, "Executing $vmsfile\n" if ($trace +>= 2);
+        print $^STDOUT, "Executing $vmsfile\n" if ($trace +>= 2);
         open(my $tcf, '>', "temp_mmvms.com")
                 or die('unable to open temp file');
         print $tcf, "\$ set message/nofacil/nosever/noident/notext\n";
@@ -227,11 +227,11 @@ sub find_perl($self, $ver, $names, $dirs, $trace) {
         $rslt = `\@temp_mmvms.com`;
         unlink('temp_mmvms.com');
         if ($rslt =~ m/VER_OK/) {
-            print \*STDOUT, "Using PERL=MCR $vmsfile\n" if $trace;
+            print $^STDOUT, "Using PERL=MCR $vmsfile\n" if $trace;
             return "MCR $vmsfile";
         }
     }
-    print \*STDOUT, "Unable to find a perl $ver (by these names: $(join ' ',@$names), in these dirs: $(join ' ',@$dirs))\n";
+    print $^STDOUT, "Unable to find a perl $ver (by these names: $(join ' ',@$names), in these dirs: $(join ' ',@$dirs))\n";
     0; # false and not empty
 }
 
@@ -656,7 +656,7 @@ sub cflags($self,$libperl) {
     my($name,$sys,@m);
 
     ( $name = $self->{?NAME} . "_cflags" ) =~ s/:/_/g ;
-    print \*STDOUT, "Unix shell script ".%Config{?"$self->{?'BASEEXT'}_cflags"}.
+    print $^STDOUT, "Unix shell script ".%Config{?"$self->{?'BASEEXT'}_cflags"}.
          " required to modify CC command for $self->{?'BASEEXT'}\n"
     if (%Config{?$name});
 
@@ -732,11 +732,11 @@ sub cflags($self,$libperl) {
 	}
     }
 
-    return $self->{+CFLAGS} = qq{
+    return ($self->{+CFLAGS} = qq{
 CCFLAGS = $self->{?CCFLAGS}
 OPTIMIZE = $self->{?OPTIMIZE}
 PERLTYPE = $self->{?PERLTYPE}
-};
+});
 }
 
 =item const_cccmd (override)
@@ -1457,7 +1457,7 @@ $(MAP_TARGET) :: $(MAKE_APERL_FILE)
     push @optlibs, < grep { !m/PerlShr/i }, split ' ', $self->ext()[2];
     if ($libperl) {
 	unless (-f $libperl || -f ($libperl = $self->catfile(%Config{?'installarchlib'},'CORE',$libperl))) {
-	    print \*STDOUT, "Warning: $libperl not found\n";
+	    print $^STDOUT, "Warning: $libperl not found\n";
 	    undef $libperl;
 	}
     }
@@ -1466,7 +1466,7 @@ $(MAP_TARGET) :: $(MAKE_APERL_FILE)
 	    $libperl = $self->catfile($self->{?PERL_SRC},"libperl$self->{LIB_EXT}");
 	} elsif (-f ($libperl = $self->catfile(%Config{?'installarchlib'},'CORE',"libperl$self->{LIB_EXT}")) ) {
 	} else {
-	    print \*STDOUT, "Warning: $libperl not found
+	    print $^STDOUT, "Warning: $libperl not found
     If you're going to build a static perl binary, make sure perl is installed
     otherwise ignore this warning\n";
 	}
@@ -1592,23 +1592,23 @@ sub prefixify($self, $var, $sprefix, $rprefix, $default) {
                %Config{?lc $var} || %Config{?lc $var_no_install};
 
     if( !$path ) {
-        print \*STDERR, "  no Config found for $var.\n" if $Verbose +>= 2;
+        print $^STDERR, "  no Config found for $var.\n" if $Verbose +>= 2;
         $path = $self->_prefixify_default($rprefix, $default);
     }
     elsif( !$self->{ARGS}->{?PREFIX} || !$self->file_name_is_absolute($path) ) {
         # do nothing if there's no prefix or if its relative
     }
     elsif( $sprefix eq $rprefix ) {
-        print \*STDERR, "  no new prefix.\n" if $Verbose +>= 2;
+        print $^STDERR, "  no new prefix.\n" if $Verbose +>= 2;
     }
     else {
 
-        print \*STDERR, "  prefixify $var => $path\n"     if $Verbose +>= 2;
-        print \*STDERR, "    from $sprefix to $rprefix\n" if $Verbose +>= 2;
+        print $^STDERR, "  prefixify $var => $path\n"     if $Verbose +>= 2;
+        print $^STDERR, "    from $sprefix to $rprefix\n" if $Verbose +>= 2;
 
         my@($path_vol, $path_dirs) =  $self->splitpath( $path );
         if( $path_vol eq %Config{?vms_prefix}.':' ) {
-            print \*STDERR, "  %Config{?vms_prefix}: seen\n" if $Verbose +>= 2;
+            print $^STDERR, "  %Config{?vms_prefix}: seen\n" if $Verbose +>= 2;
 
             $path_dirs =~ s{^\[}{\[.} unless $path_dirs =~ m{^\[\.};
             $path = $self->_catprefix($rprefix, $path_dirs);
@@ -1618,21 +1618,21 @@ sub prefixify($self, $var, $sprefix, $rprefix, $default) {
         }
     }
 
-    print \*STDOUT, "    now $path\n" if $Verbose +>= 2;
-    return $self->{+uc $var} = $path;
+    print $^STDOUT, "    now $path\n" if $Verbose +>= 2;
+    return ($self->{+uc $var} = $path);
 }
 
 
 sub _prefixify_default($self, $rprefix, $default) {
 
-    print \*STDERR, "  cannot prefix, using default.\n" if $Verbose +>= 2;
+    print $^STDERR, "  cannot prefix, using default.\n" if $Verbose +>= 2;
 
     if( !$default ) {
-        print \*STDERR, "No default!\n" if $Verbose +>= 1;
+        print $^STDERR, "No default!\n" if $Verbose +>= 1;
         return;
     }
     if( !$rprefix ) {
-        print \*STDERR, "No replacement prefix!\n" if $Verbose +>= 1;
+        print $^STDERR, "No replacement prefix!\n" if $Verbose +>= 1;
         return '';
     }
 
@@ -1752,7 +1752,7 @@ sub escape_newlines($self, $text) {
 sub max_exec_len {
     my $self = shift;
 
-    return $self->{+_MAX_EXEC_LEN} ||= 256;
+    return ($self->{+_MAX_EXEC_LEN} ||= 256);
 }
 
 =item init_linker
@@ -1811,7 +1811,7 @@ sub eliminate_macros($self,$path) {
                     $macro = join ' ', @{$self->{?$macro}};
                 }
                 else {
-                    print \*STDOUT, "Note: can't expand macro \$($macro) containing ",ref($self->{?$macro}),
+                    print $^STDOUT, "Note: can't expand macro \$($macro) containing ",ref($self->{?$macro}),
                           "\n\t(using MMK-specific deferred substitutuon; MMS will break)\n";
                     $macro = "\cB$macro\cB";
                     $complex = 1;

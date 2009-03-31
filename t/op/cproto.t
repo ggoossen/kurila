@@ -38,7 +38,7 @@ chop undef
 chown (@)
 chr (_)
 chroot (_)
-close (;*)
+close (*)
 closedir (*)
 cmp unknown
 connect (*$)
@@ -72,7 +72,7 @@ foreach undef
 fork ()
 format unknown
 formline unknown
-getc (;*)
+getc (*)
 getgrent ()
 getgrgid ($)
 getgrnam ($)

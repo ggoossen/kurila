@@ -10,7 +10,7 @@ if (-e 'arch.txt') {
 }
 if ($got ne $arch) {
     if (-e "Errno.pm") {
-        print \*STDOUT, "Removing old 'Errno.pm'\n";
+        print $^STDOUT, "Removing old 'Errno.pm'\n";
         unlink "Errno.pm" 
             or die "Failed to remove out of date 'Errno.pm': $^OS_ERROR";
     }

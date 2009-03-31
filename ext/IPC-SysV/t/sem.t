@@ -46,7 +46,7 @@ if (!$sem) {
 
 pass('acquired a semaphore');
 
-ok(my $st = $sem->stat,'stat it');
+ok((my $st = $sem->stat),'stat it');
 
 ok($sem->setall( < $: @(0) x 10),'set all');
 

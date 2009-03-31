@@ -169,7 +169,7 @@ sub walkoptree_exec($op, $method, $level) {
     while ($$op) {
 	$sym = objsym($op);
 	if (defined($sym)) {
-	    print \*STDOUT, $prefix, "goto $sym\n";
+	    print $^STDOUT, $prefix, "goto $sym\n";
 	    return;
 	}
 	savesym($op, sprintf("\%s (0x\%lx)", < class($op), $$op));
@@ -178,35 +178,35 @@ sub walkoptree_exec($op, $method, $level) {
 	if ($ppname =~
 	    m/^(d?or(assign)?|and(assign)?|mapwhile|grepwhile|entertry|range|cond_expr)$/)
 	{
-	    print \*STDOUT, $prefix, uc($1), " => \{\n";
+	    print $^STDOUT, $prefix, uc($1), " => \{\n";
 	    walkoptree_exec( <$op->other, $method, $level + 1);
-	    print \*STDOUT, $prefix, "\}\n";
+	    print $^STDOUT, $prefix, "\}\n";
 	} elsif ($ppname eq "match" || $ppname eq "subst") {
 	    my $pmreplstart = $op->pmreplstart;
 	    if ($$pmreplstart) {
-		print \*STDOUT, $prefix, "PMREPLSTART => \{\n";
+		print $^STDOUT, $prefix, "PMREPLSTART => \{\n";
 		walkoptree_exec($pmreplstart, $method, $level + 1);
-		print \*STDOUT, $prefix, "\}\n";
+		print $^STDOUT, $prefix, "\}\n";
 	    }
 	} elsif ($ppname eq "substcont") {
-	    print \*STDOUT, $prefix, "SUBSTCONT => \{\n";
+	    print $^STDOUT, $prefix, "SUBSTCONT => \{\n";
 	    walkoptree_exec( <$op->other->pmreplstart, $method, $level + 1);
-	    print \*STDOUT, $prefix, "\}\n";
+	    print $^STDOUT, $prefix, "\}\n";
 	    $op = $op->other;
 	} elsif ($ppname eq "enterloop") {
-	    print \*STDOUT, $prefix, "REDO => \{\n";
+	    print $^STDOUT, $prefix, "REDO => \{\n";
 	    walkoptree_exec( <$op->redoop, $method, $level + 1);
-	    print \*STDOUT, $prefix, "\}\n", $prefix, "NEXT => \{\n";
+	    print $^STDOUT, $prefix, "\}\n", $prefix, "NEXT => \{\n";
 	    walkoptree_exec( <$op->nextop, $method, $level + 1);
-	    print \*STDOUT, $prefix, "\}\n", $prefix, "LAST => \{\n";
+	    print $^STDOUT, $prefix, "\}\n", $prefix, "LAST => \{\n";
 	    walkoptree_exec( <$op->lastop,  $method, $level + 1);
-	    print \*STDOUT, $prefix, "\}\n";
+	    print $^STDOUT, $prefix, "\}\n";
 	} elsif ($ppname eq "subst") {
 	    my $replstart = $op->pmreplstart;
 	    if ($$replstart) {
-		print \*STDOUT, $prefix, "SUBST => \{\n";
+		print $^STDOUT, $prefix, "SUBST => \{\n";
 		walkoptree_exec($replstart, $method, $level + 1);
-		print \*STDOUT, $prefix, "\}\n";
+		print $^STDOUT, $prefix, "\}\n";
 	    }
 	}
 

@@ -6,14 +6,14 @@ use Config;
 
 BEGIN {
     unless (config_value('d_fork') or config_value('d_pseudofork')) {
-	print \*STDOUT, "1..0 # Skip: no fork\n";
+	print $^STDOUT, "1..0 # Skip: no fork\n";
 	exit 0;
     }
     env::set_var('PERL5LIB' => "../lib");
 }
 
 if ($^OS_NAME eq 'mpeix') {
-    print \*STDOUT, "1..0 # Skip: fork/status problems on MPE/iX\n";
+    print $^STDOUT, "1..0 # Skip: fork/status problems on MPE/iX\n";
     exit 0;
 }
 
@@ -23,7 +23,7 @@ our (@prgs, $tmpfile, $CAT, $status, $i);
 
 $^INPUT_RECORD_SEPARATOR = undef;
 @prgs = split "\n########\n", ~< *DATA;
-print \*STDOUT, "1..", scalar nelems @prgs, "\n";
+print $^STDOUT, "1..", scalar nelems @prgs, "\n";
 
 $tmpfile = "forktmp000";
 1 while -f ++$tmpfile;
@@ -31,9 +31,9 @@ my $test_fh;
 END { close $test_fh; unlink $tmpfile if $tmpfile; }
 
 $CAT = (($^OS_NAME eq 'MSWin32') 
-          ?? '.\perl -e "print \\*STDOUT, ~< *ARGV"'
+          ?? '.\perl -e "print \$^STDOUT, ~< *ARGV"'
           !! (($^OS_NAME eq 'NetWare')
-          ?? 'perl -e "print \\*STDOUT, ~< *ARGV"'
+          ?? 'perl -e "print \$^STDOUT, ~< *ARGV"'
           !! 'cat'));
 
 for ( @prgs){
@@ -69,12 +69,12 @@ for ( @prgs){
 	if $^OS_NAME eq 'os2';
     my @results = sort split m/\n/, $results;
     if ( "$(join ' ',@results)" ne "$(join ' ',@expected)" ) {
-	print \*STDERR, "PROG: $switch\n$prog\n";
-	print \*STDERR, "EXPECTED:\n$expected\n";
-	print \*STDERR, "GOT:\n$results\n";
-	print \*STDOUT, "not ";
+	print $^STDERR, "PROG: $switch\n$prog\n";
+	print $^STDERR, "EXPECTED:\n$expected\n";
+	print $^STDERR, "GOT:\n$results\n";
+	print $^STDOUT, "not ";
     }
-    print \*STDOUT, "ok ", ++$i, "\n";
+    print $^STDOUT, "ok ", ++$i, "\n";
 }
 
 __END__
@@ -82,15 +82,15 @@ $^OUTPUT_AUTOFLUSH = 1;
 if (my $cid = fork) {
     sleep 1;
     if (my $result = (kill 9, $cid)) {
-	print \*STDOUT, "ok 2\n";
+	print $^STDOUT, "ok 2\n";
     }
     else {
-	print \*STDOUT, "not ok 2 $result\n";
+	print $^STDOUT, "not ok 2 $result\n";
     }
     sleep 1 if $^OS_NAME eq 'MSWin32';	# avoid WinNT race bug
 }
 else {
-    print \*STDOUT, "ok 1\n";
+    print $^STDOUT, "ok 1\n";
     sleep 10;
 }
 EXPECT
@@ -100,15 +100,15 @@ ok 2
 $^OUTPUT_AUTOFLUSH = 1;
 if (my $cid = fork) {
     sleep 1;
-    print \*STDOUT, "not " unless kill 'INT', $cid;
-    print \*STDOUT, "ok 2\n";
+    print $^STDOUT, "not " unless kill 'INT', $cid;
+    print $^STDOUT, "ok 2\n";
 }
 else {
     # XXX On Windows the default signal handler kills the
     # XXX whole process, not just the thread (pseudo-process)
     use signals;
     signals::set_handler(INT => sub { exit });
-    print \*STDOUT, "ok 1\n";
+    print $^STDOUT, "ok 1\n";
     sleep 5;
     die;
 }
@@ -119,18 +119,18 @@ ok 2
 $^OUTPUT_AUTOFLUSH = 1;
 our $i;
 sub forkit {
-    print \*STDOUT, "iteration $i start\n";
+    print $^STDOUT, "iteration $i start\n";
     my $x = fork;
     if (defined $x) {
 	if ($x) {
-	    print \*STDOUT, "iteration $i parent\n";
+	    print $^STDOUT, "iteration $i parent\n";
 	}
 	else {
-	    print \*STDOUT, "iteration $i child\n";
+	    print $^STDOUT, "iteration $i child\n";
 	}
     }
     else {
-	print \*STDOUT, "pid $^PID failed to fork\n";
+	print $^STDOUT, "pid $^PID failed to fork\n";
     }
 }
 while ($i++ +< 3) { do { forkit(); }; }
@@ -159,16 +159,16 @@ iteration 3 child
 ########
 $^OUTPUT_AUTOFLUSH = 1;
 fork()
- ?? (print(\*STDOUT, "parent\n"),sleep(1))
- !! (print(\*STDOUT, "child\n"),exit) ;
+ ?? (print($^STDOUT, "parent\n"),sleep(1))
+ !! (print($^STDOUT, "child\n"),exit) ;
 EXPECT
 parent
 child
 ########
 $^OUTPUT_AUTOFLUSH = 1;
 fork()
- ?? (print(\*STDOUT, "parent\n"),exit)
- !! (print(\*STDOUT, "child\n"),sleep(1)) ;
+ ?? (print($^STDOUT, "parent\n"),exit)
+ !! (print($^STDOUT, "child\n"),sleep(1)) ;
 EXPECT
 parent
 child
@@ -177,15 +177,15 @@ $^OUTPUT_AUTOFLUSH = 1;
 my @a = 1..3;
 for (@a) {
     if (fork) {
-	print \*STDOUT, "parent $_\n";
+	print $^STDOUT, "parent $_\n";
 	$_ = "[$_]";
     }
     else {
-	print \*STDOUT, "child $_\n";
+	print $^STDOUT, "child $_\n";
 	$_ = "-$_-";
     }
 }
-print \*STDOUT, "$(join ' ', @a)\n";
+print $^STDOUT, "$(join ' ', @a)\n";
 EXPECT
 parent 1
 child 1
@@ -213,14 +213,14 @@ child 3
 $^OUTPUT_AUTOFLUSH = 1;
 foreach my $c (@(1,2,3)) {
     if (fork) {
-	print \*STDOUT, "parent $c\n";
+	print $^STDOUT, "parent $c\n";
     }
     else {
-	print \*STDOUT, "child $c\n";
+	print $^STDOUT, "child $c\n";
 	exit;
     }
 }
-while (wait() != -1) { print \*STDOUT, "waited\n" }
+while (wait() != -1) { print $^STDOUT, "waited\n" }
 EXPECT
 child 1
 child 2
@@ -236,8 +236,8 @@ use Config;
 $^OUTPUT_AUTOFLUSH = 1;
 $^OUTPUT_RECORD_SEPARATOR = "\n";
 fork()
- ?? print(\*STDOUT, config_value('osname') eq $^OS_NAME)
- !! print(\*STDOUT, config_value('osname') eq $^OS_NAME) ;
+ ?? print($^STDOUT, config_value('osname') eq $^OS_NAME)
+ !! print($^STDOUT, config_value('osname') eq $^OS_NAME) ;
 EXPECT
 1
 1
@@ -245,8 +245,8 @@ EXPECT
 $^OUTPUT_AUTOFLUSH = 1;
 $^OUTPUT_RECORD_SEPARATOR = "\n";
 fork()
- ?? do { require Config; print(\*STDOUT, Config::config_value("osname") eq $^OS_NAME); }
- !! do { require Config; print(\*STDOUT, Config::config_value("osname") eq $^OS_NAME); }
+ ?? do { require Config; print($^STDOUT, Config::config_value("osname") eq $^OS_NAME); }
+ !! do { require Config; print($^STDOUT, Config::config_value("osname") eq $^OS_NAME); }
 EXPECT
 1
 1
@@ -260,7 +260,7 @@ if (fork) {
     $dir = "f$^PID.tst";
     mkdir $dir, 0755;
     chdir $dir;
-    print \*STDOUT, cwd() =~ m/\Q$dir/i ?? "ok 1 parent" !! "not ok 1 parent";
+    print $^STDOUT, cwd() =~ m/\Q$dir/i ?? "ok 1 parent" !! "not ok 1 parent";
     chdir "..";
     rmdir $dir;
 }
@@ -269,7 +269,7 @@ else {
     $dir = "f$^PID.tst";
     mkdir $dir, 0755;
     chdir $dir;
-    print \*STDOUT, cwd() =~ m/\Q$dir/i ?? "ok 1 child" !! "not ok 1 child";
+    print $^STDOUT, cwd() =~ m/\Q$dir/i ?? "ok 1 child" !! "not ok 1 child";
     chdir "..";
     rmdir $dir;
 }
@@ -281,22 +281,22 @@ $^OUTPUT_AUTOFLUSH = 1;
 $^OUTPUT_RECORD_SEPARATOR = "\n";
 my $getenv;
 if ($^OS_NAME eq 'MSWin32' || $^OS_NAME eq 'NetWare') {
-    $getenv = qq[$^EXECUTABLE_NAME -e "print \\\\*STDOUT, \$(env::var(q[TST]))"];
+    $getenv = qq[$^EXECUTABLE_NAME -e "print \\\$^STDOUT, \$(env::var(q[TST]))"];
 }
 else {
-    $getenv = qq[$^EXECUTABLE_NAME -e 'print \\*STDOUT, \$(env::var(q[TST]))'];
+    $getenv = qq[$^EXECUTABLE_NAME -e 'print \$^STDOUT, \$(env::var(q[TST]))'];
 }
 env::set_var(TST => 'foo');
 if (fork) {
     sleep 1;
-    print \*STDOUT, "parent before: " . `$getenv`;
+    print $^STDOUT, "parent before: " . `$getenv`;
     env::set_var(TST => 'bar');
-    print \*STDOUT, "parent after: " . `$getenv`;
+    print $^STDOUT, "parent after: " . `$getenv`;
 }
 else {
-    print \*STDOUT, "child before: " . `$getenv`;
+    print $^STDOUT, "child before: " . `$getenv`;
     env::set_var(TST => 'baz');
-    print \*STDOUT, "child after: " . `$getenv`;
+    print $^STDOUT, "child after: " . `$getenv`;
 }
 EXPECT
 child before: foo
@@ -308,7 +308,7 @@ $^OUTPUT_AUTOFLUSH = 1;
 $^OUTPUT_RECORD_SEPARATOR = "\n";
 if (my $pid = fork) {
     waitpid($pid,0);
-    print \*STDOUT, "parent got $^CHILD_ERROR"
+    print $^STDOUT, "parent got $^CHILD_ERROR"
 }
 else {
     exit(42);
@@ -321,7 +321,7 @@ $^OUTPUT_RECORD_SEPARATOR = "\n";
 my $echo = 'echo';
 if (my $pid = fork) {
     waitpid($pid,0);
-    print \*STDOUT, "parent got $^CHILD_ERROR"
+    print $^STDOUT, "parent got $^CHILD_ERROR"
 }
 else {
     exec("$echo foo");
@@ -342,11 +342,11 @@ child died at - line 5 character 14.
 ########
 if (my $pid = fork) {
     try { die "parent died" };
-    print \*STDOUT, $^EVAL_ERROR->message;
+    print $^STDOUT, $^EVAL_ERROR->message;
 }
 else {
     sleep 1; try { die "child died" };
-    print \*STDOUT, $^EVAL_ERROR->message;
+    print $^STDOUT, $^EVAL_ERROR->message;
 }
 EXPECT
 parent died at - line 2 character 11.
@@ -357,11 +357,11 @@ child died at - line 6 character 20.
 my $pid;
 if (eval q{$pid = fork}) {
     eval q{ die "parent died" };
-    print \*STDOUT, $^EVAL_ERROR->message;
+    print $^STDOUT, $^EVAL_ERROR->message;
 }
 else {
     sleep 1; eval q{ die "child died" };
-    print \*STDOUT, $^EVAL_ERROR->message;
+    print $^STDOUT, $^EVAL_ERROR->message;
 }
 EXPECT
 parent died at (eval 2) line 1 character 2.
@@ -372,7 +372,7 @@ child died at (eval 2) line 1 character 2.
 BEGIN {
     $^OUTPUT_AUTOFLUSH = 1;
     fork and exit;
-    print \*STDOUT, "inner\n";
+    print $^STDOUT, "inner\n";
 }
 # XXX In emulated fork(), the child will not execute anything after
 # the BEGIN block, due to difficulties in recreating the parse stacks
@@ -401,7 +401,7 @@ if (pipe_to_fork($parent, $child)) {
 }
 else {
     # child
-    while (~< $child) { print \*STDOUT, $_; }
+    while (~< $child) { print $^STDOUT, $_; }
     close $child;
     exit;
 }
@@ -416,7 +416,7 @@ sub pipe_from_fork ($parent, $child) {
 
 if (pipe_from_fork($parent, $child)) {
     # parent
-    while (~< $parent) { print \*STDOUT, $_; }
+    while (~< $parent) { print $^STDOUT, $_; }
     close $parent;
 }
 else {
@@ -431,19 +431,19 @@ pipe_to_fork
 ########
 $^OUTPUT_AUTOFLUSH=1;
 if (my $pid = fork()) {
-    print \*STDOUT, "forked first kid\n";
-    print \*STDOUT, "waitpid() returned ok\n" if waitpid($pid,0) == $pid;
+    print $^STDOUT, "forked first kid\n";
+    print $^STDOUT, "waitpid() returned ok\n" if waitpid($pid,0) == $pid;
 }
 else {
-    print \*STDOUT, "first child\n";
+    print $^STDOUT, "first child\n";
     exit(0);
 }
 if (my $pid = fork()) {
-    print \*STDOUT, "forked second kid\n";
-    print \*STDOUT, "wait() returned ok\n" if wait() == $pid;
+    print $^STDOUT, "forked second kid\n";
+    print $^STDOUT, "wait() returned ok\n" if wait() == $pid;
 }
 else {
-    print \*STDOUT, "second child\n";
+    print $^STDOUT, "second child\n";
     exit(0);
 }
 EXPECT
@@ -467,7 +467,7 @@ if ($pid == 0) {
     close $wtr;
     chomp(my $rand_child  = ~< $rdr);
     close $rdr;
-    print \*STDOUT, $rand_child ne $rand_parent, "\n";
+    print $^STDOUT, $rand_child ne $rand_parent, "\n";
 }
 EXPECT
 1

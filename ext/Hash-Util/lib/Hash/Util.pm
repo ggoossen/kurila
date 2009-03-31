@@ -121,8 +121,7 @@ Both routines return a reference to the hash operated on.
 =cut
 
 sub lock_ref_keys($hash, @< @keys) {
-
-    Internals::hv_clear_placeholders(%$hash);
+    Internals::hv_clear_placeholders(\%$hash);
     if( (nelems @keys) ) {
         my %keys = %( < @+: map { @($_ => 1) }, @keys );
         my %original_keys = %( < @+: map { @($_ => 1) }, keys %$hash );
@@ -134,7 +133,7 @@ sub lock_ref_keys($hash, @< @keys) {
         foreach my $k ( @keys) {
             $hash->{+$k} = undef unless exists $hash->{$k};
         }
-        Internals::HvRESTRICTED(%$hash, 1);
+        Internals::HvRESTRICTED(\%$hash, 1);
 
         foreach my $k ( @keys) {
             delete $hash->{$k} unless %original_keys{?$k};

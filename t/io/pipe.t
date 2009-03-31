@@ -34,16 +34,16 @@ SKIP: do {
     if (open($pipe, "-|", "-")) {
 	while( ~< $pipe) {
 	    s/^not //;
-	    print \*STDOUT, $_;
+	    print $^STDOUT, $_;
 	}
 	close $pipe;        # avoid zombies
     }
     else {
-	printf \*STDOUT, "not ok \%d - open -|\n", curr_test();
+	printf $^STDOUT, "not ok \%d - open -|\n", curr_test();
         next_test();
         my $tnum = curr_test;
         next_test();
-	exec $Perl, '-le', "print \\*STDOUT, q\{not ok $tnum -     again\}";
+	exec $Perl, '-le', "print \$^STDOUT, q\{not ok $tnum -     again\}";
     }
 
     # This has to be *outside* the fork
@@ -60,11 +60,11 @@ SKIP: do {
 	} else {
 	    s/^(not ok \d+ -) .*/$1 expect '$(join ' ',@r)', got '$(join ' ',@r1)'\n/s;
 	}
-	print \*STDOUT, $_;
+	print $^STDOUT, $_;
 	close $pipe;        # avoid zombies
     }
     else {
-	printf \*STDOUT, "not ok \%d - $raw", curr_test();
+	printf $^STDOUT, "not ok \%d - $raw", curr_test();
         exec $Perl, '-e0';	# Do not run END()...
     }
 
@@ -76,7 +76,7 @@ SKIP: do {
 	close $pipe;        # avoid zombies
     }
     else {
-	$_ = join '', @( ~< *STDIN);
+	$_ = join '', @( ~< $^STDIN);
 	(my $raw1 = $_) =~ s/not ok \d+ - //;
 	my @r  = map { ord }, split m//, $raw;
 	my @r1 = map { ord }, split m//, $raw1;
@@ -85,7 +85,7 @@ SKIP: do {
 	} else {
 	    s/^(not ok \d+ -) .*/$1 expect '$(join ' ',@r)', got '$(join ' ',@r1)'\n/s;
 	}
-	print \*STDOUT, $_;
+	print $^STDOUT, $_;
         exec $Perl, '-e0';	# Do not run END()...
     }
 
@@ -102,7 +102,7 @@ SKIP: do {
             while( ~< $reader) {
                 s/^not //;
                 s/([A-Z])/$(lc($1))/g;
-                print \*STDOUT, $_;
+                print $^STDOUT, $_;
             }
             close $reader;     # avoid zombies
         }
@@ -112,12 +112,12 @@ SKIP: do {
             printf $writer, "not ok \%d - pipe & fork\n", curr_test;
             next_test;
 
-            open(\*STDOUT, ">&", $writer) || die "Can't dup WRITER to STDOUT";
+            open($^STDOUT, ">&", $writer) || die "Can't dup WRITER to STDOUT";
             close $writer;
             
             my $tnum = curr_test;
             next_test;
-            exec $Perl, '-le', "print \\*STDOUT, q\{not ok $tnum -     with fh dup \}";
+            exec $Perl, '-le', "print \$^STDOUT, q\{not ok $tnum -     with fh dup \}";
         }
 
         # This has to be done *outside* the fork.
@@ -133,7 +133,7 @@ signals::set_handler('PIPE' => \&broken_pipe);
 
 sub broken_pipe {
     signals::set_handler('PIPE' => 'IGNORE');       # loop preventer
-    printf \*STDOUT, "ok \%d - SIGPIPE\n", curr_test;
+    printf $^STDOUT, "ok \%d - SIGPIPE\n", curr_test;
 }
 
 printf $writer, "not ok \%d - SIGPIPE\n", curr_test;

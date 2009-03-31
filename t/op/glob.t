@@ -40,7 +40,7 @@ cmp_ok("$(join ' ',@glops)",'eq',"$(join ' ',@oops)",'glob operator 2');
 do {
     my $f = 0;
     my $ok = 1;
-    $ok = 0, undef $f while $x = $f||$f;
+    ($ok = 0), undef $f while $x = $f||$f;
     ok($ok,'test definedness with LOGOP');
 };
 

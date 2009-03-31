@@ -27,8 +27,8 @@ is(vec($Vec, 0, 32), 3135089835);
 
 # ensure vec() handles numericalness correctly
 $foo = $bar = $baz = 0;
-vec($foo = 0,0,1, 1);
-vec($bar = 0,1,1, 1);
+vec(($foo = 0),0,1, 1);
+vec(($bar = 0),1,1, 1);
 $baz = $foo ^|^ $bar;
 ok($foo eq "1" && $foo == 1);
 ok($bar eq "2" && $bar == 2);

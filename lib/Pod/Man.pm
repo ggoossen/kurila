@@ -216,7 +216,7 @@ sub init_page($self) {
 # Add a block of text to the contents of the current node, formatting it
 # according to the current formatting instructions as we do.
 sub _handle_text($self, $text) {
-    DEBUG +> 3 and print \*STDOUT, "== $text\n";
+    DEBUG +> 3 and print $^STDOUT, "== $text\n";
     my $tag = %$self{PENDING}->[-1];
     @$tag[2] .= $self->format_text (@$tag[1], $text);
 }
@@ -234,7 +234,7 @@ sub method_for_element($self, $element) {
 # element method, and create a new tree into which we'll collect blocks of
 # text and nested elements.  Otherwise, if start_element is defined, call it.
 sub _handle_element_start($self, $element, $attrs) {
-    DEBUG +> 3 and print \*STDOUT, "++ $element (<", join ('> <', %$attrs), ">)\n";
+    DEBUG +> 3 and print $^STDOUT, "++ $element (<", join ('> <', %$attrs), ">)\n";
     my $method = $self->method_for_element ($element);
 
     # If we have a command handler, we need to accumulate the contents of the
@@ -242,7 +242,7 @@ sub _handle_element_start($self, $element, $attrs) {
     # <Para> so that IN_NAME isn't still set for the first heading after the
     # NAME heading.
     if ($self->can ("cmd_$method")) {
-        DEBUG +> 2 and print \*STDOUT, "<$element> starts saving a tag\n";
+        DEBUG +> 2 and print $^STDOUT, "<$element> starts saving a tag\n";
         %$self{+IN_NAME} = 0 if ($element ne 'Para');
 
         # How we're going to format embedded text blocks depends on the tag
@@ -252,12 +252,12 @@ sub _handle_element_start($self, $element, $attrs) {
         my $formatting = %$self{PENDING}->[-1]->[?1];
         $formatting = $self->formatting ($formatting, $element);
         push (@{ %$self{PENDING} }, \@( $attrs, $formatting, '' ));
-        DEBUG +> 4 and print \*STDOUT, "Pending: [", < pretty (%$self{?PENDING}), "]\n";
+        DEBUG +> 4 and print $^STDOUT, "Pending: [", < pretty (%$self{?PENDING}), "]\n";
     } elsif ($self->can ("start_$method")) {
         my $method = 'start_' . $method;
         $self->?$method ($attrs, '');
     } else {
-        DEBUG +> 2 and print \*STDOUT, "No $method start method, skipping\n";
+        DEBUG +> 2 and print $^STDOUT, "No $method start method, skipping\n";
     }
 }
 
@@ -265,16 +265,16 @@ sub _handle_element_start($self, $element, $attrs) {
 # this is where we pass along the tree that we built.  Otherwise, if we have
 # an end_ method for the element, call that.
 sub _handle_element_end($self, $element) {
-    DEBUG +> 3 and print \*STDOUT, "-- $element\n";
+    DEBUG +> 3 and print $^STDOUT, "-- $element\n";
     my $method = $self->method_for_element ($element);
 
     # If we have a command handler, pull off the pending text and pass it to
     # the handler along with the saved attribute hash.
     if ($self->can ("cmd_$method")) {
-        DEBUG +> 2 and print \*STDOUT, "</$element> stops saving a tag\n";
+        DEBUG +> 2 and print $^STDOUT, "</$element> stops saving a tag\n";
         my $tag = pop @{ %$self{PENDING} };
-        DEBUG +> 4 and print \*STDOUT, "Popped: [", < pretty ($tag), "]\n";
-        DEBUG +> 4 and print \*STDOUT, "Pending: [", < pretty (%$self{?PENDING}), "]\n";
+        DEBUG +> 4 and print $^STDOUT, "Popped: [", < pretty ($tag), "]\n";
+        DEBUG +> 4 and print $^STDOUT, "Pending: [", < pretty (%$self{?PENDING}), "]\n";
         my $method = 'cmd_' . $method;
         my $text = $self->?$method (@$tag[0], @$tag[2]);
         if (defined $text) {
@@ -288,7 +288,7 @@ sub _handle_element_end($self, $element) {
         my $method = 'end_' . $method;
         $self->?$method ();
     } else {
-        DEBUG +> 2 and print \*STDOUT, "No $method end method, skipping\n";
+        DEBUG +> 2 and print $^STDOUT, "No $method end method, skipping\n";
     }
 }
 
@@ -413,7 +413,7 @@ sub quote_literal {
 sub guesswork {
     my $self = shift;
     local $_ = shift;
-    DEBUG +> 5 and print \*STDOUT, "   Guesswork called on [$_]\n";
+    DEBUG +> 5 and print $^STDOUT, "   Guesswork called on [$_]\n";
 
     # By the time we reach this point, all hypens will be escaped by adding a
     # backslash.  We want to undo that escaping if they're part of regular
@@ -521,7 +521,7 @@ sub guesswork {
     }
 
     # Done.
-    DEBUG +> 5 and print \*STDOUT, "   Guesswork returning [$_]\n";
+    DEBUG +> 5 and print $^STDOUT, "   Guesswork returning [$_]\n";
     return $_;
 }
 
@@ -705,7 +705,7 @@ sub output($self, @< @text) {
 # as setting up our basic macros in a preamble and building the page title.
 sub start_document($self, $attrs, _) {
     if (%$attrs{?contentless} && !%$self{?ALWAYS_EMIT_SOMETHING}) {
-        DEBUG and print \*STDOUT, "Document is contentless\n";
+        DEBUG and print $^STDOUT, "Document is contentless\n";
         %$self{+CONTENTLESS} = 1;
         return;
     }
@@ -1051,7 +1051,7 @@ sub cmd_l($self, $attrs, $text) {
 sub over_common_start($self, $type, $attrs, _) {
     my $line = %$attrs{?start_line};
     my $indent = %$attrs{?indent};
-    DEBUG +> 3 and print \*STDOUT, " Starting =over $type (line $line, indent ",
+    DEBUG +> 3 and print $^STDOUT, " Starting =over $type (line $line, indent ",
         ($indent || '?'), "\n";
 
     # Find the indentation level.
@@ -1084,7 +1084,7 @@ sub over_common_start($self, $type, $attrs, _) {
 # circumstance.  If we're still inside an indentation, we need to emit another
 # .RE and then a new .RS to unconfuse *roff.
 sub over_common_end($self) {
-    DEBUG +> 3 and print \*STDOUT, " Ending =over\n";
+    DEBUG +> 3 and print $^STDOUT, " Ending =over\n";
     %$self{+INDENT} = pop @{ %$self{INDENTS} };
     pop @{ %$self{ITEMTYPES} };
 
@@ -1122,7 +1122,7 @@ sub end_over_block  { @_[0]->over_common_end }
 # turned into spaces since *roff can't handle them embedded.
 sub item_common($self, $type, $attrs, $text) {
     my $line = %$attrs{?start_line};
-    DEBUG +> 3 and print \*STDOUT, "  $type item (line $line): $text\n";
+    DEBUG +> 3 and print $^STDOUT, "  $type item (line $line): $text\n";
 
     # Clean up the text.  We want to end up with two variables, one ($text)
     # which contains any body text after taking out the item portion, and
@@ -1411,7 +1411,7 @@ Pod::Man - Convert POD data to formatted *roff input
     my $parser = Pod::Man->new (release => $VERSION, section => 8);
 
     # Read POD from STDIN and write to STDOUT.
-    $parser->parse_file (\*STDIN);
+    $parser->parse_file ($^STDIN);
 
     # Read POD from file.pod and write to file.1.
     $parser->parse_from_file ('file.pod', 'file.1');

@@ -1,18 +1,18 @@
 BEGIN {
     use Config;
     unless (config_value('d_fork')) {
-	print \*STDOUT, "1..0 # Skip: no fork\n";
+	print $^STDOUT, "1..0 # Skip: no fork\n";
 	exit 0;
     }
     eval 'use POSIX qw(sys_wait_h)';
     if ($^EVAL_ERROR) {
         die if $^EVAL_ERROR->message != m/sys_wait_h/;
-	print \*STDOUT, "1..0 # Skip: no POSIX sys_wait_h\n";
+	print $^STDOUT, "1..0 # Skip: no POSIX sys_wait_h\n";
 	exit 0;
     }
     eval 'use Time::HiRes qw(time)';
     if ($^EVAL_ERROR) {
-	print \*STDOUT, "1..0 # Skip: no Time::HiRes\n";
+	print $^STDOUT, "1..0 # Skip: no Time::HiRes\n";
 	exit 0;
     }
 }
@@ -21,7 +21,7 @@ use warnings;
 
 $| = 1;
 
-print \*STDOUT, "1..1\n";
+print $^STDOUT, "1..1\n";
 
 sub NEG1_PROHIBITED () { 0x01 }
 sub NEG1_REQUIRED   () { 0x02 }

@@ -26,13 +26,13 @@ sub getoutput
     close($in);
     my $exit = $^CHILD_ERROR>>8;
     s/^/#/ for  @out;
-    print \*STDOUT, "#EXIT=$exit OUTPUT=+++#$(join '',@out)#+++\n";
+    print $^STDOUT, "#EXIT=$exit OUTPUT=+++#$(join '',@out)#+++\n";
     return @($exit, join("", @out));
   }
   # child
-  open(\*STDERR, ">&", \*STDOUT);
+  open($^STDERR, ">&", $^STDOUT);
   &$code( < @_ );
-  print \*STDOUT, "--NORMAL-RETURN--\n";
+  print $^STDOUT, "--NORMAL-RETURN--\n";
   exit 0;
 }
 

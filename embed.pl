@@ -132,7 +132,7 @@ sub munge_c_files () {
 	    }
 	    $repl;
           })}g;
-	print \*STDOUT, $_;
+	print $^STDOUT, $_;
 	close *ARGV if eof;	# restart $.
     }
     exit;
@@ -184,6 +184,11 @@ sub write_protos {
         my $xv_macros = $func =~ m/Xv/;
         if ($xv_macros) {
             $func =~ s/Xv/Sv/;
+        }
+        if ($flags =~ m/S/) {
+            for (@args) {
+                s/\bXV\b/SV/;
+            }
         }
 	$ret .= "$retval\t$func(";
 	if ( $has_context ) {
@@ -406,6 +411,30 @@ END
 # by tracking state and merging foo and bar into one block.
 my $ifdef_state = '';
 
+sub write_xv_defines($retval, $func, @args) {
+    for my $xv (qw[Av Hv Cv Gv Io Re]) {
+        my $i = 0;
+        my @arglist = map {
+            my $n = @az[$i++];
+            if ($_ =~ m/XV\s*([*]+)/) {
+                my $p = 'p' x (length($1)-1);
+                @: $n, "$(lc $xv)$($p)Tsv$p($n)";
+            }
+            else {
+                @: $n, $n;
+            }
+        }, @args;
+        my $dlist = join(",", map { $_[0] }, @arglist);
+        my $alist = join(",", map { $_[1] }, @arglist);
+        my $xvname = $func;
+        $xvname =~ s/^Sv/$xv/;
+        $xvname =~ s/^sv/$(lc $xv)/;
+        my $ret_convert = $retval =~ m/SV/;
+        my $call = "Perl_" . $func . "(aTHX_ $alist)";
+        print $em, "#define $xvname($dlist)\t\t" . ($ret_convert ?? "svT$(lc $xv)" . "($call)" !! $call ) . "\n";
+    }
+}
+
 walk_table sub {
     my $ret = "";
     my $new_ifdef_state = '';
@@ -423,16 +452,7 @@ walk_table sub {
 		$ret .= hide($func,"Perl_$func");
 	    }
             if ($flags =~ m/S/) {
-                for my $xv (qw|Av Hv Cv Gv Io Re|) {
-                    my $alist = join(",", @: '', < @az[[1..nelems(@args)-1]]);
-                    my $a1 = @az[0];
-                    my $xvname = $func;
-                    $xvname =~ s/^Sv/$xv/;
-                    $xvname =~ s/^sv/$(lc $xv)/;
-                    my $ret_convert = $retval =~ m/SV/;
-                    my $call = "Perl_" . $func . "(aTHX_ " . "$(lc $xv)Tsv" . "($a1)$alist)";
-                    print $em, "#define $xvname(" . $a1 . $alist . ")\t\t" . ($ret_convert ?? "svT$(lc $xv)" . "($call)" !! $call ) . "\n";
-                }
+                write_xv_defines($retval, $func, @args);
             }
 	}
 	if ($ret ne '' && $flags !~ m/A/) {
@@ -511,14 +531,7 @@ walk_table sub {
 		$ret .= $alist . ")\n";
 	    }
             if ($flags =~ m/S/) {
-                for my $xv (qw|Av Hv Cv Gv Io Re|) {
-                    my $alist = join(",", @: '', < @az[[1..nelems(@args)-1]]);
-                    my $a1 = @az[0];
-                    (my $xvname = $func) =~ s/^Sv/$xv/;
-                    my $ret_convert = $retval =~ m/SV/;
-                   my $call = "Perl_" . $func . "(aTHX_ " . lc($xv) . "Tsv" . "($a1)$alist)";
-                    print $em, "#define $xvname(" . $a1 . $alist . ")\t\t" . ($ret_convert ?? "svT" . lc($xv) . "($call)" !! $call ) . "\n";
-                }
+                write_xv_defines($retval, $func, @args);
             }
 	}
 	unless ($flags =~ m/A/) {

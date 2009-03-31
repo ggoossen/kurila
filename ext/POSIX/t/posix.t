@@ -20,7 +20,7 @@ my $Is_OS2     = $^OS_NAME eq 'os2';
 my $Is_UWin    = $^OS_NAME eq 'uwin';
 my $Is_OS390   = $^OS_NAME eq 'os390';
 
-ok( my $testfd = open("TEST", O_RDONLY, 0),        'O_RDONLY with open' );
+ok( (my $testfd = open("TEST", O_RDONLY, 0)),        'O_RDONLY with open' );
 read($testfd, my $buffer, 4) if $testfd +> 2;
 is( $buffer, "#!./",                      '    with read' );
 
@@ -42,11 +42,11 @@ SKIP: do {
     our @fds = POSIX::pipe();
     ok( @fds[0] +> $testfd,      'POSIX::pipe' );
 
-    CORE::open(my $reader = \*READER, "<&=", @fds[0]);
-    CORE::open(my $writer = \*WRITER, ">&=", @fds[1]);
+    CORE::open((my $reader = \*READER), "<&=", @fds[0]);
+    CORE::open((my $writer = \*WRITER), ">&=", @fds[1]);
     print $writer, "ok 6\n";
     close $writer;
-    print \*STDOUT, ~< $reader;
+    print $^STDOUT, ~< $reader;
     close $reader;
     next_test();
 };
@@ -79,24 +79,24 @@ SKIP: do {
 	if (!$todo) { 
 	  kill 'HUP', $^PID; 
 	} else {
-	  print \*STDOUT, "not ok 9 - sigaction SIGHUP ",$why_todo,"\n";
-	  print \*STDOUT, "not ok 10 - sig mask delayed SIGINT ",$why_todo,"\n";
+	  print $^STDOUT, "not ok 9 - sigaction SIGHUP ",$why_todo,"\n";
+	  print $^STDOUT, "not ok 10 - sig mask delayed SIGINT ",$why_todo,"\n";
 	}
 	sleep 1;
 
 	$todo = 1 if ($^OS_NAME eq 'freebsd')
 		  || ($^OS_NAME eq 'darwin' && config_value('osvers') +<= v6.6);
-	printf \*STDOUT, "\%s 11 - masked SIGINT received \%s\n",
+	printf $^STDOUT, "\%s 11 - masked SIGINT received \%s\n",
 	    $sigint_called ?? "ok" !! "not ok",
 	    $todo ?? $why_todo !! '';
 
-	print \*STDOUT, "ok 12 - signal masks successful\n";
+	print $^STDOUT, "ok 12 - signal masks successful\n";
 	
 	sub SigHUP {
-	    print \*STDOUT, "ok 9 - sigaction SIGHUP\n";
+	    print $^STDOUT, "ok 9 - sigaction SIGHUP\n";
 	    kill 'INT', $^PID;
 	    sleep 2;
-	    print \*STDOUT, "ok 10 - sig mask delayed SIGINT\n";
+	    print $^STDOUT, "ok 10 - sig mask delayed SIGINT\n";
 	}
 
         sub SigINT {
@@ -166,7 +166,7 @@ ok( &POSIX::acos(1.0) == 0.0,   'dynamic loading' );
 # didn't detect it.  If this fails, try adding
 # -DSTRUCT_TM_HASZONE to your cflags when compiling ext/POSIX/POSIX.c.
 # See ext/POSIX/hints/sunos_4.pl and ext/POSIX/hints/linux.pl 
-print \*STDOUT, POSIX::strftime('ok 21 # %H:%M, on %m/%d/%y' . "\n", localtime());
+print $^STDOUT, POSIX::strftime('ok 21 # %H:%M, on %m/%d/%y' . "\n", localtime());
 next_test();
 
 # If that worked, validate the mini_mktime() routine's normalisation of
@@ -214,7 +214,7 @@ do {
 SKIP: do {
   skip("no kill() support on Mac OS", 1) if $Is_MacOS;
   is (eval "kill 0", 0, "check we have CORE::kill")
-    or print \*STDOUT, "\$\@ is " . _qq($^EVAL_ERROR) . "\n";
+    or print $^STDOUT, "\$\@ is " . _qq($^EVAL_ERROR) . "\n";
 };
 
 # Check that we can import the POSIX kill routine
@@ -273,11 +273,11 @@ unlike( $^EVAL_ERROR, qr/Can't use string .* as a symbol ref/, "Can import autol
 # Check that output is not flushed by _exit. This test should be last
 # in the file, and is not counted in the total number of tests.
 if ($^OS_NAME eq 'vos') {
- print \*STDOUT, "# TODO - hit VOS bug posix-885 - _exit flushes output buffers.\n";
+ print $^STDOUT, "# TODO - hit VOS bug posix-885 - _exit flushes output buffers.\n";
 } else {
  $^OUTPUT_AUTOFLUSH = 0;
  # The following line assumes buffered output, which may be not true:
- print \*STDOUT, '@#!*$@(!@#$' unless ($Is_MacOS || $Is_OS2 || $Is_UWin || $Is_OS390 ||
+ print $^STDOUT, '@#!*$@(!@#$' unless ($Is_MacOS || $Is_OS2 || $Is_UWin || $Is_OS390 ||
                             $Is_VMS ||
 			    (defined env::var('PERLIO') &&
 			     env::var('PERLIO') eq 'unix' &&

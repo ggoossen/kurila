@@ -56,7 +56,7 @@ my $x = 1 + @a[?0] ; # a
 no warnings 'uninitialized' ;
 $x = 1 + @b[?0] ; # a
 EXPECT
-Use of uninitialized value @main::a[0] in integer addition (+) at - line 4 character 10.
+Use of uninitialized value @main::a[0] in integer addition (+) at - line 4 character 11.
 ########
 # sv.c
 use integer ;
@@ -75,7 +75,7 @@ no warnings 'uninitialized' ;
 my $Y = 1 ; our @b;
 $x = 1 ^|^ @b[?$Y] ;
 EXPECT
-Use of uninitialized value within @main::a in bitwise or (^|^) at - line 4 character 10.
+Use of uninitialized value within @main::a in bitwise or (^|^) at - line 4 character 11.
 ########
 # sv.c
 use warnings 'uninitialized' ;
@@ -85,7 +85,7 @@ no warnings 'uninitialized' ;
 my $Y = 1 ; our @b;
 $x = 1 ^&^ @b[?$Y] ;
 EXPECT
-Use of uninitialized value within @main::a in bitwise and (^&^) at - line 4 character 10.
+Use of uninitialized value within @main::a in bitwise and (^&^) at - line 4 character 11.
 ########
 # sv.c
 use warnings 'uninitialized' ;
@@ -95,7 +95,7 @@ no warnings 'uninitialized' ;
 my $Y = 1 ;  our @b;
 $x = ^~^@b[?$Y] ;
 EXPECT
-Use of uninitialized value within @main::a in 1's complement (^~^) at - line 4 character 8.
+Use of uninitialized value within @main::a in 1's complement (^~^) at - line 4 character 9.
 ########
 # sv.c
 use warnings 'uninitialized' ;
@@ -111,7 +111,7 @@ my $x = 1 + @a[?0] ; # e
 no warnings 'uninitialized' ;
 $x = 1 + @b[?0] ; # e
 EXPECT
-Use of uninitialized value @main::a[0] in addition (+) at - line 3 character 10.
+Use of uninitialized value @main::a[0] in addition (+) at - line 3 character 11.
 ########
 # sv.c
 use warnings 'uninitialized' ;
@@ -154,7 +154,7 @@ my $x = 1 + "def" ;
 no warnings 'numeric' ;
 my $z = 1 + "def" ;
 EXPECT
-Argument "def" isn't numeric in addition (+) at - line 3 character 10.
+Argument "def" isn't numeric in addition (+) at - line 3 character 11.
 ########
 # sv.c
 use warnings 'numeric' ;
@@ -163,7 +163,7 @@ my $x = 1 + $a ;
 no warnings 'numeric' ;
 my $y = 1 + $a ;
 EXPECT
-Argument "def" isn't numeric in addition (+) at - line 4 character 10.
+Argument "def" isn't numeric in addition (+) at - line 4 character 11.
 ########
 # sv.c
 use warnings 'numeric' ; use integer ;
@@ -172,7 +172,7 @@ my $x = 1 + $a ;
 no warnings 'numeric' ;
 my $z = 1 + $a ;
 EXPECT
-Argument "def" isn't numeric in integer addition (+) at - line 4 character 10.
+Argument "def" isn't numeric in integer addition (+) at - line 4 character 11.
 ########
 # sv.c
 use warnings 'numeric' ;
@@ -180,7 +180,7 @@ my $x = 1 ^&^ "def" ;
 no warnings 'numeric' ;
 my $z = 1 ^&^ "def" ;
 EXPECT
-Argument "def" isn't numeric in bitwise and (^&^) at - line 3 character 10.
+Argument "def" isn't numeric in bitwise and (^&^) at - line 3 character 11.
 ########
 # sv.c
 use warnings 'numeric' ;
@@ -197,7 +197,7 @@ my $x = 1 + $a ;
 no warnings 'numeric' ;
 my $z = 1 + $a ;
 EXPECT
-Argument "d\x{0}f" isn't numeric in addition (+) at - line 4 character 10.
+Argument "d\x{0}f" isn't numeric in addition (+) at - line 4 character 11.
 ########
 # sv.c
 use warnings 'redefine' ;
@@ -249,7 +249,7 @@ $a = "\x{100}\x{200}" * 42;
 no warnings 'numeric' ;
 $a = "\x{100}\x{200}" * 42;
 EXPECT
-Argument "\x{100}\x{200}" isn't numeric in multiplication (*) at - line 4 character 22.
+Argument "\x{100}\x{200}" isn't numeric in multiplication (*) at - line 4 character 23.
 ########
 # TODO numeric negation.
 # sv.c

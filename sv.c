@@ -1354,6 +1354,31 @@ Perl_sv_grow(pTHX_ register SV *const sv, register STRLEN newlen)
 /*
 =for apidoc sv_setiv
 
+Makes the sv a reference to the dst sv.
+Does not increment the reference count of dst.
+Does not handle 'set' magic.  See also C<sv_setrv_mg>.
+
+=cut
+*/
+
+void
+Perl_sv_setrv(pTHX_ register SV *const sv, SV* dst)
+{
+    prepare_SV_for_RV(sv);
+    SvROK_on(sv);
+    SvRV_set(sv, dst);
+}
+
+void
+Perl_sv_setrv_mg(pTHX_ register SV *const sv, SV* dst)
+{
+    sv_setrv(sv, dst);
+    SvSETMAGIC(sv);
+}
+
+/*
+=for apidoc sv_setiv
+
 Copies an integer into the given SV, upgrading first if necessary.
 Does not handle 'set' magic.  See also C<sv_setiv_mg>.
 
@@ -9050,12 +9075,14 @@ Perl_refcnt_check(pTHX)
     SvTMPREFCNT_inc(PL_errsv);
     HvTMPREFCNT_inc(PL_isarev);
     SvTMPREFCNT_inc(PL_statname);
-    GvTMPREFCNT_inc(PL_defoutgv);
     HvTMPREFCNT_inc(PL_envhv);
     HvTMPREFCNT_inc(PL_op_sequence);
     AvTMPREFCNT_inc(PL_destroyav);
     AvTMPREFCNT_inc(PL_preambleav);
     AvTMPREFCNT_inc(PL_endav);
+    IoTMPREFCNT_inc(PL_stdinio);
+    IoTMPREFCNT_inc(PL_stdoutio);
+    IoTMPREFCNT_inc(PL_stderrio);
 
     rootop_ll_tmprefcnt(aTHX);
 

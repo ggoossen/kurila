@@ -84,14 +84,14 @@ my $CAN_FLOCK;
 sub CAN_FLOCK {
 	return $CAN_FLOCK if defined $CAN_FLOCK;
 	require Config;
-	return $CAN_FLOCK =
+	return ($CAN_FLOCK =
 		Config::config_value('d_flock') ||
 		Config::config_value('d_fcntl_can_lock') ||
-		Config::config_value('d_lockf');
+		Config::config_value('d_lockf'));
 }
 
 sub show_file_magic {
-    print \*STDOUT, <<EOM;
+    print $^STDOUT, <<EOM;
 #
 # To recognize the data files of the Perl module Storable,
 # the following lines need to be added to the local magic(5) file,
@@ -432,8 +432,8 @@ Storable - persistence for Perl data structures
  $hashref = retrieve('file');	# There is NO nretrieve()
 
  # Storing to and retrieving from an already opened file
- store_fd \@array, \*STDOUT;
- nstore_fd \%table, \*STDOUT;
+ store_fd \@array, $^STDOUT;
+ nstore_fd \%table, $^STDOUT;
  $aryref = fd_retrieve(\*SOCKET);
  $hashref = fd_retrieve(\*SOCKET);
 
@@ -481,8 +481,8 @@ so you will have to do that explicitly if you need those routines.
 The file descriptor you supply must be already opened, for read
 if you're going to retrieve and for write if you wish to store.
 
-	store_fd(\%table, *STDOUT) || die "can't store to stdout\n";
-	$hashref = fd_retrieve(*STDIN);
+	store_fd(\%table, $^STDOUT) || die "can't store to stdout\n";
+	$hashref = fd_retrieve($^STDIN);
 
 You can also store data in network order to allow easy sharing across
 multiple platforms, or when storing on a socket known to be remotely

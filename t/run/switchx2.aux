@@ -21,12 +21,12 @@ if [[ -z $FOO ]]; then echo 'not ok 1'; fi
 # These lines get executed
 my $test = @ARGV[0];
 if (-f 'switchx.t') {
-    print(\*STDOUT, "ok $test");
+    print($^STDOUT, "ok $test");
 }
 $test++;
-print \*STDOUT, "ok $test";
+print $^STDOUT, "ok $test";
 
 __END__
 
 # This is ignored
-print \*STDOUT, "not ok $test";
+print $^STDOUT, "not ok $test";

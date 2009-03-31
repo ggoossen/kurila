@@ -140,7 +140,7 @@ sub pod2man {
 	return;
     }
 
-    print \*STDOUT, "installing from $poddir\n" if %opts{verbose};
+    print $^STDOUT, "installing from $poddir\n" if %opts{verbose};
 
     mkpath($mandir, %opts{verbose}, 0777) unless %opts{notify};  # In File::Path
     # Make a list of all the .pm and .pod files in the directory.  We avoid
@@ -215,7 +215,7 @@ sub pod2man {
                                   );
 	my $xmanpage = $manpage;
 	$xmanpage =~ s/^\Q%opts{'destdir'}\E// if %opts{'destdir'};
-        print \*STDOUT, "  $xmanpage\n";
+        print $^STDOUT, "  $xmanpage\n";
 	if (!%opts{notify} && $parser->parse_from_file($pod, $tmp)) {
             if (-s $tmp) {
                 if (rename($tmp, $manpage)) {
@@ -229,7 +229,7 @@ sub pod2man {
 }
 
 $packlist->write() unless %opts{notify};
-print \*STDOUT, "  Installation complete\n" if %opts{verbose};
+print $^STDOUT, "  Installation complete\n" if %opts{verbose};
 
 exit 0;
 
@@ -243,7 +243,7 @@ sub unlink {
     foreach my $name (@names) {
 	next unless -e $name;
 	chmod 0777, $name if $^OS_NAME eq 'os2';
-	print \*STDOUT, "  unlink $name\n" if %opts{verbose};
+	print $^STDOUT, "  unlink $name\n" if %opts{verbose};
 	( CORE::unlink($name) and ++$cnt 
 	    or warn "Couldn't unlink $name: $^OS_ERROR\n" ) unless %opts{notify};
     }
@@ -254,7 +254,7 @@ sub link {
     my @($from,$to) = @_;
     my($success) = 0;
 
-    print \*STDOUT, "  ln $from $to\n" if %opts{verbose};
+    print $^STDOUT, "  ln $from $to\n" if %opts{verbose};
     try {
         CORE::link($from, $to)
             ?? $success++
@@ -290,7 +290,7 @@ sub rename {
 sub chmod {
     my @($mode,$name) = @_;
 
-    printf \*STDOUT, "  chmod \%o \%s\n", $mode, $name if %opts{verbose};
+    printf $^STDOUT, "  chmod \%o \%s\n", $mode, $name if %opts{verbose};
     CORE::chmod($mode,$name) || warn sprintf("Couldn't chmod \%o \%s: $^OS_ERROR\n",$mode,$name)
 	unless %opts{notify};
 }

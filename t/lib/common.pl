@@ -24,7 +24,7 @@ my @prgs = @( () ) ;
 my @w_files = @( () ) ;
 
 if ((nelems @ARGV))
-  { print \*STDOUT, "ARGV = [$(join ' ',@ARGV)]\n" ;
+  { print $^STDOUT, "ARGV = [$(join ' ',@ARGV)]\n" ;
     if ($Is_MacOS) {
       @w_files = map { s#^#:lib:$pragma_name:#; $_ }, @ARGV
     } else {
@@ -68,7 +68,7 @@ my $file;
 for ( @prgs){
     unless (m/\n/)
      {
-      print \*STDOUT, "# From $_\n";
+      print $^STDOUT, "# From $_\n";
       $file = $_;
 
       if ($got_files) {
@@ -128,7 +128,7 @@ for ( @prgs){
     open my $test, ">", "$tmpfile" or die "Cannot open >$tmpfile: $^OS_ERROR";
     print $test, q{
         BEGIN {
-            open(\*STDERR, ">&", \*STDOUT)
+            open($^STDERR, ">&", $^STDOUT)
               or die "Can't dup STDOUT->STDERR: $^OS_ERROR;";
         }
     };
@@ -182,7 +182,7 @@ for ( @prgs){
         if $option_regex + $option_random +> 1;
     my $ok = 0;
     if ($results =~ s/^SKIPPED\n//) {
-	print \*STDOUT, "$results\n" ;
+	print $^STDOUT, "$results\n" ;
 	$ok = 1;
     }
     elsif ($option_random) {
@@ -233,10 +233,10 @@ sub print_err_line {
 		   "GOT:\n$results\n";
     if ($todo) {
 	$err_line =~ s/^/# /mg;
-	print \*STDOUT, $err_line;  # Harness can't filter it out from STDERR.
+	print $^STDOUT, $err_line;  # Harness can't filter it out from STDERR.
     }
     else {
-	print \*STDERR, $err_line;
+	print $^STDERR, $err_line;
     }
 
     return 1;

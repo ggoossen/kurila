@@ -45,20 +45,20 @@ my $max_uv2 = sprintf "\%u", $max_uv1 ** 6; # 6 is an arbitrary number here
 my $big_iv = do {use integer; $max_uv1 * 16}; # 16 is an arbitrary number here
 my $max_uv_less3 = $max_uv1 - 3;
 
-print \*STDOUT, "# max_uv1 = $max_uv1, max_uv2 = $max_uv2, big_iv = $big_iv\n";
-print \*STDOUT, "# max_uv_less3 = $max_uv_less3\n";
+print $^STDOUT, "# max_uv1 = $max_uv1, max_uv2 = $max_uv2, big_iv = $big_iv\n";
+print $^STDOUT, "# max_uv_less3 = $max_uv_less3\n";
 if ($max_uv1 ne $max_uv2 or $big_iv +> $max_uv1 or $max_uv1 == $max_uv_less3) {
-  print \*STDOUT, "1..0 # skipped: unsigned perl arithmetic is not sane";
+  print $^STDOUT, "1..0 # skipped: unsigned perl arithmetic is not sane";
   try { require Config; Config->import };
   our (%Config);
   if (%Config{?d_quad} eq 'define') {
-      print \*STDOUT, " (common in 64-bit platforms)";
+      print $^STDOUT, " (common in 64-bit platforms)";
   }
-  print \*STDOUT, "\n";
+  print $^STDOUT, "\n";
   exit 0;
 }
 if ($max_uv_less3 =~ s/[^0-9]//g) {
-  print \*STDOUT, "1..0 # skipped: this perl stringifies large unsigned integers using E notation\n";
+  print $^STDOUT, "1..0 # skipped: this perl stringifies large unsigned integers using E notation\n";
   exit 0;
 }
 
@@ -86,7 +86,7 @@ my @list = @(1, $yet_smaller_than_iv, $smaller_than_iv, $max_iv, $max_iv + 1,
 unshift @list, ( <reverse map { -$_ }, @list), 0; # 15 elts
 @list = map { "$_" }, @list; # Normalize
 
-print \*STDOUT, "# $(join ' ',@list)\n";
+print $^STDOUT, "# $(join ' ',@list)\n";
 
 # need to special case ++ for max_uv, as ++ "magic" on a string gives
 # another string, whereas ++ magic on a string used as a number gives
@@ -193,13 +193,13 @@ for my $num_chain (1..$max_chain) {
 	    push @ans, $inpt;
 	  }
 	  if (@ans[0] ne @ans[1]) {
-	    print \*STDOUT, "# '@ans[0]' ne '@ans[1]',\t$num\t=> $(join ' ', @opnames[[@($first,< @{@curops[0]},$last)]]) vs $(join ' ', @opnames[[@($first,< @{@curops[1]},$last)]])\n";
+	    print $^STDOUT, "# '@ans[0]' ne '@ans[1]',\t$num\t=> $(join ' ', @opnames[[@($first,< @{@curops[0]},$last)]]) vs $(join ' ', @opnames[[@($first,< @{@curops[1]},$last)]])\n";
 	    # XXX ought to check that "+" was in the list of opnames
 	    if (((@ans[0] eq $max_uv_pp) and (@ans[1] eq $max_uv_p1))
 		or ((@ans[1] eq $max_uv_pp) and (@ans[0] eq $max_uv_p1))) {
 	      # string ++ versus numeric ++. Tolerate this little
 	      # bit of insanity
-	      print \*STDOUT, "# ok, as string ++ of max_uv is \"$max_uv_pp\", numeric is $max_uv_p1\n"
+	      print $^STDOUT, "# ok, as string ++ of max_uv is \"$max_uv_pp\", numeric is $max_uv_p1\n"
 	    } elsif (@opnames[$last] eq 'I' and @ans[1] eq "-1"
 		     and @ans[0] eq $max_uv_p1_as_iv) {
               # Max UV plus 1 is NV. This NV may stringify in E notation.
@@ -213,11 +213,11 @@ for my $num_chain (1..$max_chain) {
               # But each step of conversion is correct. So it's not an error.
               # (Only shows up for 64 bit UVs and NVs with 64 bit mantissas,
               #  and on Crays (64 bit integers, 48 bit mantissas) IIRC)
-	      print \*STDOUT, "# ok, \"$max_uv_p1\" correctly converts to IV \"$max_uv_p1_as_iv\"\n";
+	      print $^STDOUT, "# ok, \"$max_uv_p1\" correctly converts to IV \"$max_uv_p1_as_iv\"\n";
 	    } elsif (@opnames[$last] eq 'U' and @ans[1] eq ^~^0
 		     and @ans[0] eq $max_uv_p1_as_uv) {
               # as aboce
-	      print \*STDOUT, "# ok, \"$max_uv_p1\" correctly converts to UV \"$max_uv_p1_as_uv\"\n";
+	      print $^STDOUT, "# ok, \"$max_uv_p1\" correctly converts to UV \"$max_uv_p1_as_uv\"\n";
 	    } elsif (grep {m/^N$/}, @opnames[[@{@curops[0]}]]
 		     and @ans[0] == @ans[1] and @ans[0] +<= ^~^0
                      # First must be in E notation (ie not just digits) and
@@ -231,7 +231,7 @@ for my $num_chain (1..$max_chain) {
                      # I can't remember why there isn't symmetry in this
                      # exception, ie why only the first ops are tested for 'N'
                      and @ans[0] != m/^-?\d+$/ and @ans[1] !~ m/^-?\d+$/) {
-	      print \*STDOUT, "# ok, numerically equal - notation changed due to adding zero\n";
+	      print $^STDOUT, "# ok, numerically equal - notation changed due to adding zero\n";
 	    } else {
 	      $nok++,
 	    }

@@ -1,7 +1,7 @@
 #!./perl -n
 
 BEGIN {
-    print \*STDOUT, "1..2\n";
+    print $^STDOUT, "1..2\n";
     push @ARGV, 'run/switchp.aux';
 }
-print \*STDOUT, $_;
+print $^STDOUT, $_;

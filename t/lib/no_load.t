@@ -18,7 +18,7 @@ my @TESTS = @(
 my $count = 0;
 $count += (nelems @$_) - 1 for  @TESTS;
 
-print \*STDOUT, "1..$count\n";
+print $^STDOUT, "1..$count\n";
 
 foreach my $test ( @TESTS) {
     my @($exclude, @< @modules) =  @$test;
@@ -26,7 +26,7 @@ foreach my $test ( @TESTS) {
     foreach my $module ( @modules) {
         my $prog = <<"        --";
             use $module;
-            print \\*STDOUT, exists \$^INCLUDED \{'$exclude.pm'\} ?? "not ok" !! "ok";
+            print \$^STDOUT, exists \$^INCLUDED \{'$exclude.pm'\} ?? "not ok" !! "ok";
         --
         fresh_perl_is ($prog, "ok", "", "$module does not load $exclude");
     }

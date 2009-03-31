@@ -45,7 +45,7 @@ is Compress::Zlib::zlib_version, ZLIB_VERSION,
 my $name = "test.gz" ;
 my ($x, $uncomp) ;
 
-ok my $fil = gzopen($name, "wb") ;
+ok(my $fil = gzopen($name, "wb"));
 
 is $gzerrno, 0, 'gzerrno is 0';
 is $fil->gzerror(), 0, "gzerror() returned 0";
@@ -61,7 +61,7 @@ is $gzerrno, 0, 'gzerrno is 0';
 
 ok ! $fil->gzclose ;
 
-ok $fil = gzopen($name, "rb") ;
+ok($fil = gzopen($name, "rb"));
 
 is $gzerrno, 0, 'gzerrno is 0';
 is $fil->gztell(), 0;
@@ -81,7 +81,7 @@ ok $hello eq $uncomp ;
 my $number = 7603 ;
 my $num_len = 4 ;
 
-ok $fil = gzopen($name, "wb") ;
+ok($fil = gzopen($name, "wb"));
 
 is $gzerrno, 0;
 
@@ -95,7 +95,7 @@ ok ! $fil->gzclose ;
 
 cmp_ok $gzerrno, '==', 0;
 
-ok $fil = gzopen($name, "rb") ;
+ok($fil = gzopen($name, "rb"));
 
 ok (($x = $fil->gzread($uncomp)) == $num_len) ;
 
@@ -105,7 +105,7 @@ ok $gzerrno == 0 || $gzerrno == Z_STREAM_END;
 ok ! $fil->gzclose ;
 
 ok $gzerrno == 0
-    or print \*STDOUT, "# gzerrno is $gzerrno\n" ;
+    or print $^STDOUT, "# gzerrno is $gzerrno\n" ;
 
 1 while unlink $name ;
 
@@ -118,7 +118,7 @@ ok $number eq $uncomp ;
 my $text = 'text' ;
 my $file = "$text.gz" ;
 
-ok my $f = gzopen($file, "wb") ;
+ok(my $f = gzopen($file, "wb"));
 
 # generate a long random string
 my $contents = '' ;
@@ -131,14 +131,14 @@ ok $f->gzwrite($contents) == $len ;
 
 ok ! $f->gzclose ;
 
-ok $f = gzopen($file, "rb") ;
+ok($f = gzopen($file, "rb"));
  
 my $uncompressed ;
 is $f->gzread($uncompressed, $len), $len ;
 
 ok $contents eq $uncompressed 
 
-    or print \*STDOUT, "# Length orig $len" . 
+    or print $^STDOUT, "# Length orig $len" . 
              ", Length uncompressed " . length($uncompressed) . "\n" ;
 
 ok ! $f->gzclose ;
@@ -162,12 +162,12 @@ EOM
 
 $text = join("", @text) ;
 
-ok $fil = gzopen($name, "wb") ;
+ok($fil = gzopen($name, "wb"));
 ok $fil->gzwrite($text) == length $text ;
 ok ! $fil->gzclose ;
 
 # now try to read it back in
-ok $fil = gzopen($name, "rb") ;
+ok($fil = gzopen($name, "rb"));
 my $line = '';
 for my $i (0 .. nelems(@text) -2)
 {
@@ -189,12 +189,12 @@ ok ! $fil->gzclose ;
 my $line1 = ("abcdefghijklmnopq" x 2000) . "\n" ;
 my $line2 = "second line\n" ;
 $text = $line1 . $line2 ;
-ok $fil = gzopen($name, "wb") ;
+ok($fil = gzopen($name, "wb"));
 ok $fil->gzwrite($text) == length $text ;
 ok ! $fil->gzclose ;
 
 # now try to read it back in
-ok $fil = gzopen($name, "rb") ;
+ok($fil = gzopen($name, "rb"));
 my $i = 0 ;
 my @got = @();
 while ($fil->gzreadline($line) +> 0) {
@@ -215,12 +215,12 @@ $line1 = "hello hello, I'm back again\n" ;
 $line2 = "there is no end in sight" ;
 
 $text = $line1 . $line2 ;
-ok $fil = gzopen($name, "wb") ;
+ok($fil = gzopen($name, "wb"));
 ok $fil->gzwrite($text) == length $text ;
 ok ! $fil->gzclose ;
 
 # now try to read it back in
-ok $fil = gzopen($name, "rb") ;
+ok($fil = gzopen($name, "rb"));
 @got = @() ; $i = 0 ;
 while ($fil->gzreadline($line) +> 0) {
     @got[+$i] = $line ;    
@@ -248,13 +248,13 @@ do {
     
     $text = $line1 . $line2 . $line3 ;
     my $fil;
-    ok $fil = gzopen($name, "wb"), ' gzopen for write ok' ;
+    ok(($fil = gzopen($name, "wb")), ' gzopen for write ok');
     is $fil->gzwrite($text), length $text, '    gzwrite ok' ;
     is $fil->gztell(), length $text, '    gztell ok' ;
     ok ! $fil->gzclose, '  gzclose ok' ;
     
     # now try to read it back in
-    ok $fil = gzopen($name, "rb"), '  gzopen for read ok' ;
+    ok(($fil = gzopen($name, "rb")), '  gzopen for read ok');
     cmp_ok $fil->gzreadline($line), '+>', 0, '    gzreadline' ;
     is $fil->gztell(), length $line1, '    gztell ok' ;
     is $line, $line1, '    got expected line' ;
@@ -278,18 +278,18 @@ do {
     ok $f;
 
     my $fil;
-    ok $fil = gzopen($f, "wb") ;
+    ok($fil = gzopen($f, "wb"));
 
     ok $fil->gzwrite($hello) == $len ;
 
     ok ! $fil->gzclose ;
 
     $f = IO::File->new( "$name", "<") ;
-    ok $fil = gzopen($name, "rb") ;
+    ok($fil = gzopen($name, "rb"));
 
     my $uncmomp;
     ok (($x = $fil->gzread($uncomp)) == $len) 
-        or print \*STDOUT, "# length $x, expected $len\n" ;
+        or print $^STDOUT, "# length $x, expected $len\n" ;
 
     ok ! $fil->gzclose ;
 
@@ -330,7 +330,7 @@ do {
 
     my $lex = LexFile->new( my $name) ;
     my $fil;
-    ok $fil = gzopen($name, "wb"), '  gzopen for writing' ;
+    ok(($fil = gzopen($name, "wb")), '  gzopen for writing');
     is $fil->gzread(), Z_STREAM_ERROR, "    gzread returns Z_STREAM_ERROR" ;
     ok ! $fil->gzclose, "  gzclose ok" ;
 };
@@ -341,11 +341,11 @@ do {
     my $lex = LexFile->new( my $name) ;
     my $test = "hello" ;
     my $fil;
-    ok $fil = gzopen($name, "wb"), "  gzopen for writing" ;
+    ok(($fil = gzopen($name, "wb")), "  gzopen for writing");
     is $fil->gzwrite($text), length $text, "    gzwrite ok" ;
     ok ! $fil->gzclose, "  gzclose ok" ;
 
-    ok $fil = gzopen($name, "rb"), "  gzopen for reading" ;
+    ok(($fil = gzopen($name, "rb")), "  gzopen for reading");
     is $fil->gzwrite(), Z_STREAM_ERROR, "  gzwrite returns Z_STREAM_ERROR" ;
 };
 
@@ -444,7 +444,7 @@ do {
     my $a = gzopen($name, "w");
 
     ok ! $a->gzerror() 
-        or print \*STDOUT, "# gzerrno is $Compress::Zlib::gzerrno \n" ;
+        or print $^STDOUT, "# gzerrno is $Compress::Zlib::gzerrno \n" ;
     try { $a->gzseek(-1, 10) ; };
     like $^EVAL_ERROR->{?description}, mkErr("seek: unknown value, 10, for whence parameter");
 

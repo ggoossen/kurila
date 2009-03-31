@@ -17,12 +17,12 @@ $runme = $^EXECUTABLE_NAME;
 %h = %( <1..6);
 $aref = \@a;
 $href = \%h;
-open my $op_fh, '-|', qq{$runme -le "print \\\\*STDOUT, 'aaa Ok ok' for 1..100"};
+open my $op_fh, '-|', qq{$runme -le "print \\\$^STDOUT, 'aaa Ok ok' for 1..100"};
 $chopit = 'aaaaaa';
 @chopar =113 .. 119;
 $posstr = '123456';
 $cstr = 'aBcD.eF';
-pos $posstr = 3;
+pos($posstr = 3);
 $nn = $n = 2;
 sub subb {"in s"}
 
@@ -141,7 +141,7 @@ ok 1;
 __END__
 ref $xref			# ref
 ref $cstr			# ref nonref
-`$runme -e "print \\\\*STDOUT, qq[1\\n]"`				# backtick skip(MSWin32)
+`$runme -e "print \\\$^STDOUT, qq[1\\n]"`				# backtick skip(MSWin32)
 `$undefed`			# backtick undef skip(MSWin32)
 ~< $op_fh				# readline
 'faked'				# rcatline
@@ -220,7 +220,7 @@ caller				# caller
 '???'                           # warn
 'faked'				# die
 open my $blah, "<", "non-existent"	# open
-fileno \*STDERR			# fileno
+fileno $^STDERR			# fileno
 umask 0				# umask
 select undef,undef,undef,0	# select
 getc($op_fh)				# getc
@@ -248,7 +248,7 @@ utime 'non-existent'		# utime
 rename 'non-existent', 'non-existent1'	# rename
 link 'non-existent', 'non-existent1' # link
 '???'				# symlink
-readlink 'non-existent', 'non-existent1' # readlink
+readlink 'non-existent' # readlink
 '???'				# mkdir
 '???'				# rmdir
 '???'				# telldir

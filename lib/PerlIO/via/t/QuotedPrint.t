@@ -1,11 +1,11 @@
 BEGIN {				# Magic Perl CORE pragma
     unless (PerlIO::Layer->find( 'perlio')) {
-        print \*STDOUT, "1..0 # Skip: PerlIO not used\n";
+        print $^STDOUT, "1..0 # Skip: PerlIO not used\n";
         exit 0;
     }
     require Config;
     if ((Config::config_value('extensions') !~ m!\bPerlIO/via\b!) ){
-        print \*STDOUT, "1..0 # Skip -- Perl configured without PerlIO::via module\n";
+        print $^STDOUT, "1..0 # Skip -- Perl configured without PerlIO::via module\n";
         exit 0;
     }
 }

@@ -284,7 +284,7 @@ SKIP: do {
 	$new_version = "aaa"->VERSION;
 	is($new_version, '0.58', "Called as class method");
 
-	eval "print \\*STDOUT, Completely::Unknown::Module->VERSION";
+	eval "print \$^STDOUT, Completely::Unknown::Module->VERSION";
         unlike($^EVAL_ERROR, qr/$error_regex/,
                "Don't freak if the module doesn't even exist");
 
@@ -325,7 +325,7 @@ SKIP: do {
 	eval "use lib '.'; use yyy v3;";
 	like ($^EVAL_ERROR->{?description}, qr/$error_regex/,
 	    'Replacement handles modules without VERSION'); 
-	eval "use lib '.'; use yyy; print \\*STDOUT, yyy->VERSION";
+	eval "use lib '.'; use yyy; print \$^STDOUT, yyy->VERSION";
 	unlike ($^EVAL_ERROR, qr/$error_regex/,
 	    'Replacement handles modules without VERSION'); 
 	unlink 'yyy.pm';
@@ -338,7 +338,7 @@ SKIP: do {
 	eval "use lib '.'; use zzz v3;";
 	like ($^EVAL_ERROR->{?description}, qr/$error_regex/,
 	    'Replacement handles modules without VERSION'); 
-	eval "use lib '.'; use zzz; print \\*STDOUT, zzz->VERSION";
+	eval "use lib '.'; use zzz; print \$^STDOUT, zzz->VERSION";
 	unlike ($^EVAL_ERROR, qr/$error_regex/,
 	    'Replacement handles modules without VERSION'); 
 	unlink 'zzz.pm';

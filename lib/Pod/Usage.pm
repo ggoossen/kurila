@@ -23,7 +23,7 @@ Pod::Usage, pod2usage() - print a usage message from embedded pod documentation
   my $message_text  = "This text precedes the usage message.";
   my $exit_status   = 2;          ## The exit status to use
   my $verbose_level = 0;          ## The verbose level to use
-  my $filehandle    = \*STDERR;   ## The filehandle to write to
+  my $filehandle    = $^STDERR;   ## The filehandle to write to
 
   pod2usage($message_text);
 
@@ -107,8 +107,8 @@ when verbose is set to 99, e.g. C<"NAME|SYNOPSIS|DESCRIPTION|VERSION">.
 =item C<output>
 
 A reference to a filehandle, or the pathname of a file to which the
-usage message should be written. The default is C<\*STDERR> unless the
-exit value is less than 2 (in which case the default is C<\*STDOUT>).
+usage message should be written. The default is C<$^STDERR> unless the
+exit value is less than 2 (in which case the default is C<$^STDOUT>).
 
 =item C<input>
 
@@ -267,13 +267,13 @@ Each of the following invocations of C<pod2usage()> will print just the
 
     pod2usage(exitval => 2);
 
-    pod2usage({exitval => 2, output => \*STDERR});
+    pod2usage({exitval => 2, output => $^STDERR});
 
-    pod2usage({verbose => 0, output  => \*STDERR});
+    pod2usage({verbose => 0, output  => $^STDERR});
 
     pod2usage(exitval => 2, verbose => 0);
 
-    pod2usage(exitval => 2, verbose => 0, output => \*STDERR);
+    pod2usage(exitval => 2, verbose => 0, output => $^STDERR);
 
 Each of the following invocations of C<pod2usage()> will print a message
 of "Syntax error." (followed by a newline) to C<STDERR>, immediately
@@ -286,16 +286,16 @@ will exit with a status of 2:
 
     pod2usage(msg  => "Syntax error.", exitval => 2);
 
-    pod2usage({msg => "Syntax error.", exitval => 2, output => \*STDERR});
+    pod2usage({msg => "Syntax error.", exitval => 2, output => $^STDERR});
 
-    pod2usage({msg => "Syntax error.", verbose => 0, output => \*STDERR});
+    pod2usage({msg => "Syntax error.", verbose => 0, output => $^STDERR});
 
     pod2usage(msg  => "Syntax error.", exitval => 2, verbose => 0);
 
     pod2usage(message => "Syntax error.",
               exitval => 2,
               verbose => 0,
-              output  => \*STDERR);
+              output  => $^STDERR);
 
 Each of the following invocations of C<pod2usage()> will print the
 "SYNOPSIS" section and any "OPTIONS" and/or "ARGUMENTS" sections to
@@ -307,24 +307,24 @@ C<STDOUT> and will exit with a status of 1:
 
     pod2usage(exitval => 1);
 
-    pod2usage({exitval => 1, output => \*STDOUT});
+    pod2usage({exitval => 1, output => $^STDOUT});
 
-    pod2usage({verbose => 1, output => \*STDOUT});
+    pod2usage({verbose => 1, output => $^STDOUT});
 
     pod2usage(exitval => 1, verbose => 1);
 
-    pod2usage(exitval => 1, verbose => 1, output => \*STDOUT});
+    pod2usage(exitval => 1, verbose => 1, output => $^STDOUT});
 
 Each of the following invocations of C<pod2usage()> will print the
 entire manual page to C<STDOUT> and will exit with a status of 1:
 
     pod2usage(verbose  => 2);
 
-    pod2usage({verbose => 2, output => \*STDOUT});
+    pod2usage({verbose => 2, output => $^STDOUT});
 
     pod2usage(exitval  => 1, verbose => 2);
 
-    pod2usage({exitval => 1, verbose => 2, output => \*STDOUT});
+    pod2usage({exitval => 1, verbose => 2, output => $^STDOUT});
 
 =head2 Recommended Use
 
@@ -492,7 +492,7 @@ sub pod2usage {
 
     ## Default the output file
     %opts{+"output"} = (lc(%opts{?"exitval"}) eq "noexit" ||
-                        %opts{?"exitval"} +< 2) ?? \*STDOUT !! \*STDERR
+                        %opts{?"exitval"} +< 2) ?? $^STDOUT !! $^STDERR
             unless (defined %opts{?"output"});
     ## Default the input file
     %opts{+"input"} = $^PROGRAM_NAME  unless (defined %opts{?"input"});
@@ -534,7 +534,7 @@ sub pod2usage {
     if ( !%opts{?"noperldoc"}
              and  %opts{?"verbose"} +>= 2 
              and  !ref(%opts{?"input"})
-             and  %opts{?"output"} \== \*STDOUT )
+             and  %opts{?"output"} \== $^STDOUT )
     {
        ## spit out the entire PODs. Might as well invoke perldoc
        my $progpath = File::Spec->catfile(config_value('scriptdir'), "perldoc");

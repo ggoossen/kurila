@@ -44,7 +44,7 @@ sub _compile {
        $
      )>xgs
     ) {
-      print \*STDOUT, "  \"$1\"\n" if DEBUG +> 2;
+      print $^STDOUT, "  \"$1\"\n" if DEBUG +> 2;
 
       if($1 eq '[' or $1 eq '') {       # "[" or end
         # Whether this is "[" or end, force processing of any
@@ -57,7 +57,7 @@ sub _compile {
           }
         } else {
           if($1 eq '') {
-            print \*STDOUT, "   [end-string]\n" if DEBUG +> 2;
+            print $^STDOUT, "   [end-string]\n" if DEBUG +> 2;
           } else {
             $in_group = 1;
           }
@@ -89,12 +89,12 @@ sub _compile {
         if($in_group) {
           $in_group = 0;
           
-          print \*STDOUT, "   --Closing group [@c[-1]]\n" if DEBUG +> 2;
+          print $^STDOUT, "   --Closing group [@c[-1]]\n" if DEBUG +> 2;
           
           # And now process the group...
           
           if(!length(@c[-1]) or @c[-1] =~ m/^\s+$/s) {
-            DEBUG +> 2 and print \*STDOUT, "   -- (Ignoring)\n";
+            DEBUG +> 2 and print $^STDOUT, "   -- (Ignoring)\n";
             @c[-1] = ''; # reset out chink
             next;
           }
@@ -233,9 +233,9 @@ sub _compile {
   }
 
   die "Last chunk isn't null??" if (nelems @c) and length @c[-1]; # sanity
-  print \*STDOUT, scalar(nelems @c), " chunks under closure\n" if DEBUG;
+  print $^STDOUT, scalar(nelems @c), " chunks under closure\n" if DEBUG;
   if((nelems @code) == 0) { # not possible?
-    print \*STDOUT, "Empty code\n" if DEBUG;
+    print $^STDOUT, "Empty code\n" if DEBUG;
     return \'';
   } elsif((nelems @code) +> 1) { # most cases, presumably!
     unshift @code, "join '',@(\n";
@@ -243,7 +243,7 @@ sub _compile {
   unshift @code, "sub \{\n";
   push @code, ")\}\n";
 
-  print \*STDOUT, < @code if DEBUG;
+  print $^STDOUT, < @code if DEBUG;
   my $sub = eval(join '', @code);
   die "$($^EVAL_ERROR->message) while evalling" . join('', @code) if $^EVAL_ERROR; # Should be impossible.
   return $sub;

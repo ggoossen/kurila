@@ -84,7 +84,7 @@ PERLVAR(Ina,		STRLEN)		/* for use in SvPV when length is
 /* stat stuff */
 PERLVAR(Istatbuf,	Stat_t)
 PERLVAR(Istatcache,	Stat_t)		/* _ */
-PERLVAR(Istatgv,	GV *)
+PERLVAR(Istatio,	IO*)
 PERLVARI(Istatname,	SV *,	NULL)
 
 #ifdef HAS_TIMES
@@ -108,7 +108,6 @@ The output field separator - C<$,> in Perl space.
 
 PERLVAR(Irs,		SV *)		/* input record separator $/ */
 PERLVAR(Iofs_sv,	SV *)		/* output field separator $, */
-PERLVAR(Idefoutgv,	GV *)		/* default FH for output */
 
 /* Stashes */
 PERLVAR(Idefstash,	HV *)		/* main symbol table */
@@ -243,8 +242,9 @@ PERLVAR(Istatusvalue_posix,I32)
 #endif
 
 /* shortcuts to various I/O objects */
-PERLVAR(Istdingv,	GV *)
-PERLVAR(Istderrgv,	GV *)
+PERLVAR(Istdinio,	IO *)
+PERLVAR(Istdoutio,	IO *)
+PERLVAR(Istderrio,	IO *)
 PERLVAR(Idefgv,		GV *)
 PERLVAR(Iargvgv,	GV *)
 PERLVAR(Iargvoutgv,	GV *)

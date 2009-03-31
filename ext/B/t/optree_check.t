@@ -43,7 +43,7 @@ checkOptree ( name	=> "bare minimum opcode search",
 
 checkOptree ( name	=> "found print opcode",
 	      bcopts	=> '-exec',
-	      code	=> sub {print \*STDOUT, 1},
+	      code	=> sub {print $^STDOUT, 1},
 	      noanchors	=> 1, # unanchored match
 	      expect	=> 'print',
 	      expect_nt	=> 'leavesub');
@@ -51,7 +51,7 @@ checkOptree ( name	=> "found print opcode",
 checkOptree ( name	=> 'test skip itself',
 	      skip	=> 'this is skip-reason',
 	      bcopts	=> '-exec',
-	      code	=> sub {print \*STDOUT, 1},
+	      code	=> sub {print $^STDOUT, 1},
 	      expect	=> 'dont-care, skipping',
 	      expect_nt	=> 'this insures failure');
 
@@ -62,7 +62,7 @@ checkOptree ( name	=> 'test skip itself',
 checkOptree ( name	=> 'test todo itself',
 	      todo	=> "your excuse here ;-)",
 	      bcopts	=> '-exec',
-	      code	=> sub {print \*STDOUT, 1},
+	      code	=> sub {print $^STDOUT, 1},
 	      noanchors	=> 1, # unanchored match
 	      expect	=> 'print',
 	      expect_nt	=> 'print') if 0;
@@ -70,7 +70,7 @@ checkOptree ( name	=> 'test todo itself',
 checkOptree ( name	=> 'impossible match, remove skip to see failure',
 	      todo	=> "see! it breaks!",
 	      skip	=> 'skip the failure',
-	      code	=> sub {print \*STDOUT, 1},
+	      code	=> sub {print $^STDOUT, 1},
 	      expect	=> 'look out ! Boy Wonder',
 	      expect_nt	=> 'holy near earth asteroid Batman !');
 
@@ -84,7 +84,7 @@ if (1) {
     try {
 	checkOptree ( name	=> 'test against empty expectations',
 		      bcopts	=> '-exec',
-		      code	=> sub {print \*STDOUT, 1},
+		      code	=> sub {print $^STDOUT, 1},
 		      expect	=> '',
 		      expect_nt	=> '');
     };

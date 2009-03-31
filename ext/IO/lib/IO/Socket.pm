@@ -275,7 +275,7 @@ sub recv {
     my $flags = @_[?3] || 0;
 
     # remember who we recv'd from
-    %{*$sock}{+'io_socket_peername'} = recv($sock, @_[1]='', $len, $flags);
+    %{*$sock}{+'io_socket_peername'} = recv($sock, (@_[1]=''), $len, $flags);
 }
 
 sub shutdown {
