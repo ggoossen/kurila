@@ -3742,9 +3742,6 @@ Perl_yylex(pTHX)
 	}
 	TOKEN('{');
     case '}': {
-#ifdef PERL_MAD
-	SV* PL_initialwhite;
-#endif
 	s++;
 	if (PL_lex_brackets <= 0)
 	    yyerror("Unmatched right curly bracket");
@@ -3780,20 +3777,9 @@ Perl_yylex(pTHX)
 	    return yylex();		/* ignore fake brackets */
 	}
 
-#ifdef PERL_MAD
-       PL_initialwhite = PL_thiswhite;
-#endif
-	if (PL_lex_state == LEX_INTERPEND) {
-	    start_force(PL_curforce);
-	    if (PL_madskills) {
-		CURMAD('_', PL_thiswhite);
-	    }
-	    force_next(';');
-	}
-
 	start_force(-1);
 	curmad('X', newSVpvs("}"));
-	CURMAD('_', PL_initialwhite);
+	CURMAD('_', PL_thiswhite);
 	force_next('}');
 #ifdef PERL_MAD
 	PL_thistoken = newSVpvs("");
