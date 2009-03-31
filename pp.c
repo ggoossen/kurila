@@ -116,8 +116,6 @@ PP(pp_rv2gv)
 	    DIE(aTHX_ PL_no_symref_sv, sv, "a symbol");
 	}
     }
-    if (PL_op->op_private & OPpLVAL_INTRO)
-	save_gp((GV*)sv, !(PL_op->op_flags & OPf_SPECIAL));
     if (op_flags & OPf_ASSIGN) {
 	if (op_flags & OPf_ASSIGN_PART) {
 	    SV* src;
@@ -3509,7 +3507,7 @@ PP(pp_hslice)
 		HE* he = hv_fetch_ent(hv, keysv, 0, 0);
 		SV** svp = he ? &HeVAL(he) : NULL;
 		if (HvNAME_get(hv) && isGV(*svp))
-		    save_gp((GV*)*svp, !(PL_op->op_flags & OPf_SPECIAL));
+		    Perl_croak(aTHX_ "can't localize glob");
 		else {
 		    if (svp)
 			save_helem(hv, keysv, svp);
@@ -3563,7 +3561,7 @@ PP(pp_hslice)
             }
             if (localizing) {
 		if (HvNAME_get(hv) && isGV(*svp))
-		    save_gp((GV*)*svp, !(PL_op->op_flags & OPf_SPECIAL));
+		    Perl_croak(aTHX_ "can't localize glob");
 		else {
 		    if (preeminent)
 			save_helem(hv, keysv, svp);

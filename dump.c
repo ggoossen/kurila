@@ -897,7 +897,7 @@ STATIC SV* S_dump_op_flags_private(pTHX_ const OP* o)
     }
     else if (optype == OP_RV2CV) {
 	if (o->op_private & OPpLVAL_INTRO)
-	    sv_catpv(tmpsv, ",INTRO");
+	    sv_catpv(tmpsv, ",LVAL_INTRO");
     }
     else if (optype == OP_GV) {
 	if (o->op_private & OPpEARLY_CV)
@@ -950,7 +950,7 @@ STATIC SV* S_dump_op_flags_private(pTHX_ const OP* o)
 	    sv_catpv(tmpsv, ",FT_STACKED");
     }
     if (o->op_flags & OPf_MOD && o->op_private & OPpLVAL_INTRO)
-	sv_catpv(tmpsv, ",INTRO");
+	sv_catpv(tmpsv, ",LVAL_INTRO");
     
     return tmpsv;
 }

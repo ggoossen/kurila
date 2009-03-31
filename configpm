@@ -454,8 +454,7 @@ sub myconfig {
     $summary_expanded;
 }
 
-local *_ = \my $a;
-$_ = <<'!END!';
+my $_ = <<'!END!';
 EOT
 
 $heavy_txt .= join('', sort @v_others) . "!END!\n";

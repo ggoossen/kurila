@@ -2585,11 +2585,6 @@ PERL_CALLCONV void	Perl_save_shared_pvref(pTHX_ char** str)
 #define PERL_ARGS_ASSERT_SAVE_SHARED_PVREF	\
 	assert(str)
 
-PERL_CALLCONV void	Perl_save_gp(pTHX_ GV* gv, I32 empty)
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_SAVE_GP	\
-	assert(gv)
-
 PERL_CALLCONV HV*	Perl_save_hash(pTHX_ GV* gv)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_SAVE_HASH	\
@@ -4870,14 +4865,6 @@ STATIC SV*	S_pm_description(pTHX_ const PMOP *pm)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_PM_DESCRIPTION	\
 	assert(pm)
-
-#endif
-
-#if defined(PERL_IN_SCOPE_C) || defined(PERL_DECL_PROT)
-STATIC SV*	S_save_scalar_at(pTHX_ SV **sptr)
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_SAVE_SCALAR_AT	\
-	assert(sptr)
 
 #endif
 

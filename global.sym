@@ -467,7 +467,6 @@ Perl_save_freepv
 Perl_save_generic_svref
 Perl_save_generic_pvref
 Perl_save_shared_pvref
-Perl_save_gp
 Perl_save_hash
 Perl_save_hints
 Perl_save_helem

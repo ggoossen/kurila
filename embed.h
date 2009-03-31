@@ -773,7 +773,6 @@
 #define save_generic_svref	Perl_save_generic_svref
 #define save_generic_pvref	Perl_save_generic_pvref
 #define save_shared_pvref	Perl_save_shared_pvref
-#define save_gp			Perl_save_gp
 #define save_hash		Perl_save_hash
 #define save_hints		Perl_save_hints
 #define save_helem		Perl_save_helem
@@ -1382,11 +1381,6 @@
 #define sequence_tail		S_sequence_tail
 #define sequence_num		S_sequence_num
 #define pm_description		S_pm_description
-#endif
-#endif
-#if defined(PERL_IN_SCOPE_C) || defined(PERL_DECL_PROT)
-#ifdef PERL_CORE
-#define save_scalar_at		S_save_scalar_at
 #endif
 #endif
 #if defined(PERL_IN_GV_C) || defined(PERL_IN_SV_C) || defined(PERL_IN_PAD_C) || defined(PERL_DECL_PROT)
@@ -2960,7 +2954,6 @@
 #define save_generic_svref(a)	Perl_save_generic_svref(aTHX_ a)
 #define save_generic_pvref(a)	Perl_save_generic_pvref(aTHX_ a)
 #define save_shared_pvref(a)	Perl_save_shared_pvref(aTHX_ a)
-#define save_gp(a,b)		Perl_save_gp(aTHX_ a,b)
 #define save_hash(a)		Perl_save_hash(aTHX_ a)
 #define save_hints()		Perl_save_hints(aTHX)
 #define save_helem(a,b,c)	Perl_save_helem(aTHX_ a,b,c)
@@ -3569,11 +3562,6 @@
 #define sequence_tail(a)	S_sequence_tail(aTHX_ a)
 #define sequence_num(a)		S_sequence_num(aTHX_ a)
 #define pm_description(a)	S_pm_description(aTHX_ a)
-#endif
-#endif
-#if defined(PERL_IN_SCOPE_C) || defined(PERL_DECL_PROT)
-#ifdef PERL_CORE
-#define save_scalar_at(a)	S_save_scalar_at(aTHX_ a)
 #endif
 #endif
 #if defined(PERL_IN_GV_C) || defined(PERL_IN_SV_C) || defined(PERL_IN_PAD_C) || defined(PERL_DECL_PROT)

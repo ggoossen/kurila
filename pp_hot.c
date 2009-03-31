@@ -968,9 +968,7 @@ PP(pp_helem)
 
     if (PL_op->op_private & OPpLVAL_INTRO) {
 	/* does the element we're localizing already exist? */
-	preeminent = /* can we determine whether it exists? */
-	    (    !SvRMAGICAL(hv)
-	    ) ? hv_exists_ent(hv, keysv, 0) : 1;
+	preeminent = hv_exists_ent(hv, keysv, 0);
     }
     he = hv_fetch_ent(hv, keysv, 0, hash);
     svp = he ? &HeVAL(he) : NULL;
@@ -994,7 +992,7 @@ PP(pp_helem)
 
     if (PL_op->op_private & OPpLVAL_INTRO) {
 	if (HvNAME_get(hv) && isGV(*svp))
-	    save_gp((GV*)*svp, !(PL_op->op_flags & OPf_SPECIAL));
+	    Perl_croak(aTHX_ "can't localize a glob");
 	else {
 	    if (!preeminent) {
 		STRLEN keylen;

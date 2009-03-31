@@ -730,7 +730,6 @@ Ap	|void	|save_freepv	|NULLOK char* pv
 Ap	|void	|save_generic_svref|NN SV** sptr
 Ap	|void	|save_generic_pvref|NN char** str
 Ap	|void	|save_shared_pvref|NN char** str
-Ap	|void	|save_gp	|NN GV* gv|I32 empty
 Ap	|HV*	|save_hash	|NN GV* gv
 Api	|void	|save_hints
 Ap	|void	|save_helem	|NN HV *hv|NN SV *key|NN SV **sptr
@@ -1383,10 +1382,6 @@ s	|void	|sequence	|NULLOK const OP *o
 s	|void	|sequence_tail	|NULLOK const OP *o
 s	|UV	|sequence_num	|NULLOK const OP *o
 s	|SV*	|pm_description	|NN const PMOP *pm
-#endif
-
-#if defined(PERL_IN_SCOPE_C) || defined(PERL_DECL_PROT)
-s	|SV*	|save_scalar_at	|NN SV **sptr
 #endif
 
 #if defined(PERL_IN_GV_C) || defined(PERL_IN_SV_C) || defined(PERL_IN_PAD_C) || defined(PERL_DECL_PROT)

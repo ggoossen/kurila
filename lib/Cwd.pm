@@ -387,7 +387,6 @@ sub _perl_getcwd
 sub fastcwd_ {
     my($odev, $oino, $cdev, $cino, $tdev, $tino);
     my(@path, $path);
-    local(*DIR);
 
     my@($orig_cdev, $orig_cino) = stat@('.');
     @($cdev, $cino) = @($orig_cdev, $orig_cino);
