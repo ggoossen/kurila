@@ -588,7 +588,7 @@ proto	:	/* NULL */
                             PL_parser->in_my = FALSE;
                             PL_parser->expect = XBLOCK;
                             TOKEN_GETMAD($1,$$,'(');
-                            TOKEN_GETMAD($4,$$,')');
+                            TOKEN_GETMAD($5,$$,')');
                         }
 	;
 
@@ -1316,6 +1316,7 @@ amper	:	'&' indirob
 scalar  :	PRIVATEVAR
 			{ 
                             $$ = newPRIVATEVAROP(PL_parser->tokenbuf, LOCATION($1));
+                            TOKEN_GETMAD($1,$$,'X');
                         }
 	|	'$' indirob
 			{ 

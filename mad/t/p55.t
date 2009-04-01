@@ -116,7 +116,6 @@ use File::Find;
 our %failing = map { $_, 1 } qw|
 ../t/arch/64bitint.t
 ../t/run/switchp.t
-../t/io/utf8.t
 |;
 
 my @files;
@@ -330,7 +329,6 @@ for our $_ ($a) {
     warn $_;
 }
 ########
-# TODO
 foo(1, , 2);
 ########
 my %( 1 => $v, ...) = $a;
@@ -344,3 +342,9 @@ sub ok($ok, ?$name) { return "$ok - $name"; }
 my $sub = sub ($x) { ++$x; };
 ########
 my %(aap => $aap, noot => $noot) = %();
+########
+sub (_) { 1 };
+########
+$^EVAL_ERROR =~ s/(?<=value attempted) at .*//s;
+########
+sub (?$foo) { $foo };

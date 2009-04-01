@@ -1491,7 +1491,7 @@ package PLXML::op_padsv;
 sub ast {
     my $self = shift;
     my @args;
-    push @args, $self->madness('optional_assign dx d ( X $ @ % )');
+    push @args, $self->madness('dx d ( optional_assign X $ @ % )');
 
     return $self->newtype->new(Kids => [@args]);
 }
@@ -1834,7 +1834,7 @@ sub ast {
     my @rfirst = $self->madness('z');
     my @rlast = $self->madness('Z');
     my @mods = $self->madness('m');
-    if ($rfirst[-1]->uni ne $llast[-1]->uni) {
+    if (not (@rfirst and @rlast and $rfirst[-1]->uni eq $llast[-1]->uni)) {
 	push @newkids, @rfirst;
     }
     # remove the fake '\n' if /e and '#' in replacement.
@@ -1939,7 +1939,7 @@ package PLXML::op_placeholder;
 
 sub ast {
     my $self = shift;
-    my @newkids = $self->madness('optional_assign X');
+    my @newkids = $self->madness('( optional_assign X )');
     return $self->newtype->new(Kids => [@newkids]);
 }
 
@@ -2396,8 +2396,13 @@ package PLXML::op_listfirst;
 sub ast {
     my $self = shift;
     my $mainop = $self->{Kids}->[1];
-    $mainop->{mp} = $self->{mp};
-    my @kids = ( $mainop->ast($self, @_) );
+    for (keys %{$self->{mp}}) {
+        if (exists($mainop->{mp}{$_})) {
+            die "exists $_";
+        }
+        $mainop->{mp}{$_} = $self->{mp}{$_};
+    }
+    my @kids = ( $mainop->ast(@_) );
     return $self->newtype->new(Kids => [@kids]);
 }
 

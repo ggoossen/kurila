@@ -2368,7 +2368,6 @@ Perl_madlex(pTHX)
     case METHOD:
     case THING:
     case PMFUNC:
-    case PRIVATEVAR:
     case FUNC0SUB:
     case UNIOPSUB:
 	if (pl_yylval.opval)
@@ -3743,9 +3742,6 @@ Perl_yylex(pTHX)
 	}
 	TOKEN('{');
     case '}': {
-#ifdef PERL_MAD
-	SV* PL_initialwhite;
-#endif
 	s++;
 	if (PL_lex_brackets <= 0)
 	    yyerror("Unmatched right curly bracket");
@@ -3783,7 +3779,7 @@ Perl_yylex(pTHX)
 
 	start_force(-1);
 	curmad('X', newSVpvs("}"));
-	CURMAD('_', PL_initialwhite);
+	CURMAD('_', PL_thiswhite);
 	force_next('}');
 #ifdef PERL_MAD
 	PL_thistoken = newSVpvs("");
