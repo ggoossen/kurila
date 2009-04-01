@@ -249,6 +249,35 @@ Perl_save_set_svflags(pTHX_ SV* sv, U32 mask, U32 val)
     SSPUSHINT(SAVEt_SET_SVFLAGS);
 }
 
+void
+Perl_save_gp(pTHX_ GV *gv, I32 empty)
+{
+    dVAR;
+
+    PERL_ARGS_ASSERT_SAVE_GP;
+
+    SSGROW(3);
+    SSPUSHPTR(GvREFCNT_inc(gv));
+    SSPUSHPTR(GvGP(gv));
+    SSPUSHINT(SAVEt_GP);
+
+    if (empty) {
+	GP *gp = Perl_newGP(aTHX_ gv);
+
+	if (GvCVu(gv))
+            mro_method_changed_in(GvSTASH(gv)); /* taking a method out of circulation ("local")*/
+	if (GvIOp(gv) && (IoFLAGS(GvIOp(gv)) & IOf_ARGV)) {
+	    gp->gp_io = newIO();
+	    IoFLAGS(gp->gp_io) |= IOf_ARGV|IOf_START;
+	}
+	GvGP(gv) = gp;
+    }
+    else {
+	gp_ref(GvGP(gv));
+	GvINTRO_on(gv);
+    }
+}
+
 AV *
 Perl_save_ary(pTHX_ GV *gv)
 {

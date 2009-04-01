@@ -587,7 +587,7 @@ Perl_mod(pTHX_ OP *o, I32 type)
 /* 	if (scalar_mod_type(o, type)) */
 /* 	    goto nomod; */
 	doref(cUNOPo->op_first, o->op_type, TRUE);
-	localize = -1;
+	localize = 1;
 	break;
     case OP_ASLICE:
     case OP_HSLICE:

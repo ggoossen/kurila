@@ -730,6 +730,7 @@ Ap	|void	|save_freepv	|NULLOK char* pv
 Ap	|void	|save_generic_svref|NN SV** sptr
 Ap	|void	|save_generic_pvref|NN char** str
 Ap	|void	|save_shared_pvref|NN char** str
+Ap      |void   |save_gp        |NN GV* gv|I32 empty
 Ap	|HV*	|save_hash	|NN GV* gv
 Api	|void	|save_hints
 Ap	|void	|save_helem	|NN HV *hv|NN SV *key|NN SV **sptr
