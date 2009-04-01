@@ -2585,6 +2585,11 @@ PERL_CALLCONV void	Perl_save_shared_pvref(pTHX_ char** str)
 #define PERL_ARGS_ASSERT_SAVE_SHARED_PVREF	\
 	assert(str)
 
+PERL_CALLCONV void	Perl_save_gp(pTHX_ GV* gv, I32 empty)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_SAVE_GP	\
+	assert(gv)
+
 PERL_CALLCONV HV*	Perl_save_hash(pTHX_ GV* gv)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_SAVE_HASH	\

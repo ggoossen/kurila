@@ -77,7 +77,7 @@ my_system("$bison -d -o $tmpc_file $y_file");
 
 open my $ctmpfile, "<", $tmpc_file or die "Can't open $tmpc_file: $^OS_ERROR\n";
 my $clines;
-do { local $^INPUT_RECORD_SEPARATOR; $clines = ~< $ctmpfile; };
+do { local $^INPUT_RECORD_SEPARATOR = undef; $clines = ~< $ctmpfile; };
 die "failed to read $tmpc_file: length mismatch\n"
     unless length $clines == -s $tmpc_file;
 close $ctmpfile;

@@ -57,7 +57,7 @@ sub survey($self, @< @search_dirs) {
   $self->limit_re( $self->_limit_glob_to_limit_re ) if $self->{?'limit_glob'};
   my $cwd = cwd();
   my $verbose  = $self->verbose;
-  local $_; # don't clobber the caller's $_ !
+  local $_ = undef; # don't clobber the caller's $_ !
 
   foreach my $try ( @search_dirs) {
     unless( File::Spec->file_name_is_absolute($try) ) {
@@ -344,7 +344,7 @@ sub _recurse_dir {
     return;
   };;
 
-  local $_;
+  local $_ = undef;
   $recursor->($startdir, '');
 
   undef $recursor;  # allow it to be GC'd
@@ -591,7 +591,7 @@ sub contains_pod($self, $file) {
   sleep($SLEEPY - 1) if $SLEEPY;
    # avoid totally hogging the processor on OSs with poor process control
   
-  local $_;
+  local $_ = undef;
   while( ~< $maybepod ) {
     if(m/^=(head\d|pod|over|item)\b/s) {
       close($maybepod) || die "Bizarre error closing $file: $^OS_ERROR\nAborting";

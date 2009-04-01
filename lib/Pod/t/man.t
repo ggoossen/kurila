@@ -70,7 +70,7 @@ sub test_outtmp {
     while ( ~< $out) { last if m/^\.nh/ }
     my $output;
     do {
-        local $^INPUT_RECORD_SEPARATOR;
+        local $^INPUT_RECORD_SEPARATOR = undef;
         $output = ~< $out;
     };
     close $out;

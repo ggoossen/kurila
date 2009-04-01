@@ -876,8 +876,8 @@ It is suggested you use this in place of eval BLOCK.
 
 sub _try($self, $code) {
     
-    local $^OS_ERROR;               # eval can mess up $!
-    local $^EVAL_ERROR;               # don't set $@ in the test
+    local $^OS_ERROR = undef;               # eval can mess up $!
+    local $^EVAL_ERROR = undef;               # don't set $@ in the test
     my $return = try { $code->() };
     
     return $return;

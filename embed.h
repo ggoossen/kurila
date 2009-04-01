@@ -773,6 +773,7 @@
 #define save_generic_svref	Perl_save_generic_svref
 #define save_generic_pvref	Perl_save_generic_pvref
 #define save_shared_pvref	Perl_save_shared_pvref
+#define save_gp			Perl_save_gp
 #define save_hash		Perl_save_hash
 #define save_hints		Perl_save_hints
 #define save_helem		Perl_save_helem
@@ -2954,6 +2955,7 @@
 #define save_generic_svref(a)	Perl_save_generic_svref(aTHX_ a)
 #define save_generic_pvref(a)	Perl_save_generic_pvref(aTHX_ a)
 #define save_shared_pvref(a)	Perl_save_shared_pvref(aTHX_ a)
+#define save_gp(a,b)		Perl_save_gp(aTHX_ a,b)
 #define save_hash(a)		Perl_save_hash(aTHX_ a)
 #define save_hints()		Perl_save_hints(aTHX)
 #define save_helem(a,b,c)	Perl_save_helem(aTHX_ a,b,c)

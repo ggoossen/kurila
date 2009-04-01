@@ -262,7 +262,7 @@ sub _code2codeset
 do {
     my   ($alpha2, $alpha3, $numeric);
     my   (@countries);
-    local $_;
+    local $_ = undef;
 
 
     while ( ~< *DATA)

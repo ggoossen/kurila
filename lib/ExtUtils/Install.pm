@@ -678,7 +678,6 @@ sub install { #XXX OS-SPECIFIC
     my(%pack, $dir, %warned);
     my $packlist = ExtUtils::Packlist->new();
 
-    local(*DIR);
     for (qw/read write/) {
         %pack{+$_}=%from_to{?$_};
         delete %from_to{$_};

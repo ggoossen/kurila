@@ -26,7 +26,7 @@ sub handle_file {
 
     open my $fh, "<", $file
         or do { warn "Could not open input file $file: $^OS_ERROR"; exit 0 };
-    my $str = do { local $^INPUT_RECORD_SEPARATOR; ~< $fh };
+    my $str = do { local $^INPUT_RECORD_SEPARATOR = undef; ~< $fh };
 
     ### unpack?
     my $outstr;

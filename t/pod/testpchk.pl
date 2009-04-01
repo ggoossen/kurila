@@ -78,7 +78,7 @@ sub testpodchecker {
    my @($outfile, $errfile) = @("", "");
    my $passes = 0;
    my $failed = 0;
-   local $_;
+   local $_ = undef;
 
    print $^STDOUT, "1..", nelems @testpods, "\n"  unless (%opts{?'xrgen'});
 

@@ -266,17 +266,16 @@ reference to the object itself as an implicit first parameter.
 ## 
 ## =end _PRIVATE_
 
-our (%myData, @section_headings);
+our (@section_headings);
 
 sub _init_headings {
     my $self = shift;
-    local *myData = $self;
 
     ## Initialize current section heading titles if necessary
-    unless (defined %myData{?_SECTION_HEADINGS}) {
-        local *section_headings = %myData{+_SECTION_HEADINGS} = \@();
+    unless (defined %$self{?_SECTION_HEADINGS}) {
+        my $section_headings = %$self{+_SECTION_HEADINGS} = \@();
         for my $i (0..$MAX_HEADING_LEVEL-1) {
-            @section_headings[+$i] = '';
+            @$section_headings[+$i] = '';
         }
     }
 }
@@ -336,8 +335,7 @@ our (@selected_sections);
 sub select {
     my $self = shift;
     my @sections = @_;
-    local *myData = $self;
-    local $_;
+    local $_ = undef;
 
 ### NEED TO DISCERN A SECTION-SPEC FROM A RANGE-SPEC (look for m{^/.+/$}?)
 
@@ -356,18 +354,18 @@ sub select {
 
     ## Reset the set of sections to use
     unless ((nelems @sections) +> 0) {
-        delete %myData{_SELECTED_SECTIONS}  unless ($add);
+        delete %$self{_SELECTED_SECTIONS}  unless ($add);
         return;
     }
-    %myData{+_SELECTED_SECTIONS} = \@()
-        unless ($add  &&  exists %myData{_SELECTED_SECTIONS});
-    local *selected_sections = %myData{?_SELECTED_SECTIONS};
+    %$self{+_SELECTED_SECTIONS} = \@()
+        unless ($add  &&  exists %$self{_SELECTED_SECTIONS});
+    my $selected_sections = %$self{?_SELECTED_SECTIONS};
 
     ## Compile each spec
     for my $spec ( @sections) {
         if ( defined($_ = &_compile_section_spec($spec)) ) {
             ## Store them in our sections array
-            push(@selected_sections, $_);
+            push(@$selected_sections, $_);
         }
         else {
             warn "Ignoring section spec \"$spec\"!\n";
@@ -438,11 +436,10 @@ This method should I<not> normally be overridden by subclasses.
 sub match_section {
     my $self = shift;
     my @headings = @_;
-    local *myData = $self;
 
     ## Return true if no restrictions were explicitly specified
-    my $selections = (exists %myData{_SELECTED_SECTIONS})
-                       ??  %myData{?_SELECTED_SECTIONS}  !!  undef;
+    my $selections = (exists %$self{_SELECTED_SECTIONS})
+                       ??  %$self{?_SELECTED_SECTIONS}  !!  undef;
     return  1  unless ((defined $selections) && ((nelems @{$selections}) +> 0));
 
     ## Default any unspecified sections to the current one
@@ -493,10 +490,9 @@ for processing; otherwise a false value is returned.
 =cut
 
 sub is_selected($self, $paragraph) {
-    local $_;
-    local *myData = $self;
+    local $_ = undef;
 
-    $self->_init_headings()  unless (defined %myData{?_SECTION_HEADINGS});
+    $self->_init_headings()  unless (defined %$self{?_SECTION_HEADINGS});
 
     ## Keep track of current sections levels and headings
     $_ = $paragraph;
@@ -506,10 +502,10 @@ sub is_selected($self, $paragraph) {
         my @($level, $heading) = @($2, $3);
         $level = 1 + (length($1) / 3)  if ((! length $level) || (length $1));
         ## Reset the current section heading at this level
-        %myData{_SECTION_HEADINGS}->[$level - 1] = $heading;
+        %$self{_SECTION_HEADINGS}->[$level - 1] = $heading;
         ## Reset subsection headings of this one to empty
         for my $i ($level .. $MAX_HEADING_LEVEL -1) {
-            %myData{_SECTION_HEADINGS}->[$i] = '';
+            %$self{_SECTION_HEADINGS}->[$i] = '';
         }
     }
 
@@ -581,7 +577,7 @@ sub podselect(@argv) {
     my $num_inputs = 0;
     my $output = ">&STDOUT";
     my %opts;
-    local $_;
+    local $_ = undef;
     for ( @argv) {
         if (ref($_)) {
         next unless (ref($_) eq 'HASH');

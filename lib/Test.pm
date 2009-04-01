@@ -489,7 +489,7 @@ sub _diff_complain_external($result, $expected, $detail, $prefix) {
         my $diff_cmd = "$diff $exp_filename $got_filename";
         print $TESTERR, "#\n# $prefix $diff_cmd\n";
         if (open(my $diff_fh, "$diff_cmd |")) {
-            local $_;
+            local $_ = undef;
             while ( ~< $diff_fh) {
                 print $TESTERR, "# $prefix $_";
             }

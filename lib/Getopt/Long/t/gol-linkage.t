@@ -48,7 +48,7 @@ print ($^STDOUT, !(exists %lnk{bar})   ?? "" !! "not ", "ok 28\n");
 do {
     my $errors;
     %lnk = %( () );
-    local $^WARN_HOOK= sub { $errors.= @_[0]->{?description} };
+    local $^WARN_HOOK = sub { $errors.= @_[0]->{?description} };
 
     @ARGV = qw(/Foo=-baR);
     Getopt::Long::Configure ("default","bundling","ignore_case_always",

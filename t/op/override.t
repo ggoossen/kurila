@@ -4,7 +4,7 @@ BEGIN {
     require './test.pl';
 }
 
-plan tests => 17;
+plan tests => 16;
 
 #
 # This file tries to test builtin override using CORE::GLOBAL
@@ -42,14 +42,6 @@ is( $r, "Foo.pm" );
 
 eval "use Foo::Bar";
 is( $r, join($dirsep, @( "Foo", "Bar.pm")) );
-
-# localizing *CORE::GLOBAL::foo should revert to finding CORE::foo
-do {
-    local(*CORE::GLOBAL::require);
-    $r = '';
-    eval "require NoNeXiSt;";
-    ok( ! ( $r or $^EVAL_ERROR->{?description} !~ m/^Can't locate NoNeXiSt/i ) );
-};
 
 #
 # readline() has special behaviour too
@@ -112,7 +104,8 @@ do {
 };
 
 do {
-    local *CORE::GLOBAL::require = sub {
+    local &{*CORE::GLOBAL::require};
+    *CORE::GLOBAL::require = sub {
         CORE::require(@_[0]);
     }        ;
     require Text::ParseWords;

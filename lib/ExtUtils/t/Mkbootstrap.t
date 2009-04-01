@@ -108,7 +108,7 @@ SKIP: do {
 SKIP: do {
 	skip("cannot read .bs file: $^OS_ERROR", 2) unless $file_is_ready;
 
-	my $file = do { local $^INPUT_RECORD_SEPARATOR; ~< *$in };
+	my $file = do { local $^INPUT_RECORD_SEPARATOR = undef; ~< *$in };
 
 	# filename should be in header
 	like( $file, qr/# dasboot DynaLoader/, 'file should have boilerplate' );
@@ -127,7 +127,7 @@ SKIP: do {
 	close $outfh;
 
 	# if $DynaLoader::bscode is set, write its contents to the file
-    local $DynaLoader::bscode;
+    local $DynaLoader::bscode = undef;
 	$DynaLoader::bscode = 'Wall';
 	$ExtUtils::Mkbootstrap::Verbose = 0;
 	
@@ -141,7 +141,7 @@ SKIP: do {
 SKIP: do {
 	skip("cannot open dasboot.bs for reading: $^OS_ERROR", 3) unless $file_is_ready;
 
-	my $file = do { local $^INPUT_RECORD_SEPARATOR; ~< *$in };
+	my $file = do { local $^INPUT_RECORD_SEPARATOR = undef; ~< *$in };
 	is( $out, "Writing dasboot.bs\n", 'should hush without Verbose set' );
 
 	# and find our hidden tribute to a fine example

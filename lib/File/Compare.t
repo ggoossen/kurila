@@ -83,7 +83,7 @@ try {
       or die "Could not open '$filename ' for writing: $^OS_ERROR";
   binmode($tfhSP);
   do {
-    local $^INPUT_RECORD_SEPARATOR; #slurp
+    local $^INPUT_RECORD_SEPARATOR = undef; #slurp
     my $fh;
     open($fh, "<",'README');
     binmode($fh);

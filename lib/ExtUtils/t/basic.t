@@ -83,7 +83,7 @@ my $ppd_out = run("$make ppd");
 is( $^CHILD_ERROR, 0,                      '  exited normally' ) || diag $ppd_out;
 ok( open(my $ppd, "<", 'Big-Dummy.ppd'), '  .ppd file generated' );
 my $ppd_html;
-do { local $^INPUT_RECORD_SEPARATOR; $ppd_html = ~< *$ppd };
+do { local $^INPUT_RECORD_SEPARATOR = undef; $ppd_html = ~< *$ppd };
 close $ppd;
 like( $ppd_html, qr{^<SOFTPKG NAME="Big-Dummy" VERSION="0,01,0,0">}m, 
                                                            '  <SOFTPKG>' );
@@ -192,8 +192,8 @@ SKIP: do {
 
     ok( open(my $perllocalfh, "<", %files{?'perllocal.pod'} ) ) || 
         diag("Can't open %files{?'perllocal.pod'}: $^OS_ERROR");
-    do { local $^INPUT_RECORD_SEPARATOR;
-      unlike( ~< *$perllocalfh, qr/other/, 'DESTDIR should not appear in perllocal');
+    do { local $^INPUT_RECORD_SEPARATOR = undef;
+      unlike( ($: ~< *$perllocalfh), qr/other/, 'DESTDIR should not appear in perllocal');
     };
     close $perllocalfh;
 

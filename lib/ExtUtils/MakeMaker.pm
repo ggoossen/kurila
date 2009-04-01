@@ -141,8 +141,8 @@ sub prompt($mess, ?$def) {
     my $dispdef = defined $def ?? "[$def] " !! " ";
     $def = defined $def ?? $def !! "";
 
-    local $^OUTPUT_AUTOFLUSH=1;
-    local $^OUTPUT_RECORD_SEPARATOR;
+    local $^OUTPUT_AUTOFLUSH = 1;
+    local $^OUTPUT_RECORD_SEPARATOR = undef;
     print $^STDOUT, "$mess $dispdef";
 
     my $ans;

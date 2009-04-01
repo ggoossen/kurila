@@ -24,7 +24,6 @@ my @testsubs = @(
     sub { eval 'sub MCTest::Base::foo(_, $x) { return $x+3 }'; is('MCTest::Derived'->foo(0), 3); },
     sub { eval 'sub MCTest::Base::foo(_, $x) { 4 }'; is('MCTest::Derived'->foo(0), 4); },
     sub { *MCTest::Base::foo = sub { @_[1]+5 }; is('MCTest::Derived'->foo(0), 5); },
-    sub { local *MCTest::Base::foo = sub { @_[1]+6 }; is('MCTest::Derived'->foo(0), 6); },
     sub { is('MCTest::Derived'->foo(0), 5); },
     sub { *ASDF::asdf = sub { @_[1]+9 }; *MCTest::Base::foo = \&ASDF::asdf; is('MCTest::Derived'->foo(0), 9); },
     sub { undef *MCTest::Base::foo; try { 'MCTest::Derived'->foo(0) }; like($^EVAL_ERROR->{?description}, qr/locate object method/); },

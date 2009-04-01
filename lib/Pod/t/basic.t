@@ -81,7 +81,7 @@ for my $translator (sort keys %translators) {
         open (my $tmp, "<", 'out.tmp') or die "Cannot open out.tmp: $^OS_ERROR\n";
         open (my $output_fh, ">", "out.%translators{?$translator}")
             or die "Cannot create out.%translators{?$translator}: $^OS_ERROR\n";
-        local $_;
+        local $_ = undef;
         while ( ~< $tmp) { last if m/^\.nh/ }
         print $output_fh, $_ while ~< $tmp;
         close $output_fh;
@@ -92,7 +92,7 @@ for my $translator (sort keys %translators) {
             or die "Cannot rename out.tmp: $^OS_ERROR\n";
     }
     do {
-        local $^INPUT_RECORD_SEPARATOR;
+        local $^INPUT_RECORD_SEPARATOR = undef;
         open (my $master_fh, "<", source_path ("basic.%translators{?$translator}"))
             or die "Cannot open basic.%translators{?$translator}: $^OS_ERROR\n";
         open (my $output_fh, "<", "out.%translators{?$translator}")

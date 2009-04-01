@@ -683,7 +683,7 @@ sub grand_search_init($self, $pages, @< @found) {
         if ($self->{?'podidx'} && open(my $podidx, $self->{?'podidx'})) {
             my $searchfor = catfile < split '::', $page;
             $self->aside( "Searching for '$searchfor' in $self->{?'podidx'}\n" );
-            local $_;
+            local $_ = undef;
             while ( ~< *$podidx) {
                 chomp;
                 push(@found, $_) if m,/$searchfor(?:\.(?:pod|pm))?\z,i;
@@ -865,7 +865,7 @@ sub search_perlfunc($self, $found_things, $pod) {
     }
 
     # Skip introduction
-    local $_;
+    local $_ = undef;
     while ( ~< *$pfunc) {
         last if m/^=head2 $re/;
     }
@@ -917,7 +917,7 @@ Did you mean \\Q$search_key ?
 
 EOD
 
-    local $_;
+    local $_ = undef;
     foreach my $file ( @$found_things) {
         die "invalid file spec: $^OS_ERROR" if $file =~ m/[<>|]/;
         open(my $infaq, "<", $file)  # XXX 5.6ism
@@ -1289,7 +1289,7 @@ sub page_module_file($self, @< @found) {
 
     if ($self->{?'output_to_stdout'}) {
         $self->aside("Sending unpaged output to STDOUT.\n");
-	local $_;
+	local $_ = undef;
 	my $any_error = 0;
         foreach my $output ( @found) {
             my $tmpfh;
@@ -1510,7 +1510,7 @@ sub page($self, $output, $output_to_stdout, @< @pagers) {
     if ($output_to_stdout) {
         $self->aside("Sending unpaged output to STDOUT.\n");
 	open(my $tmpfh, "<", $output)  or  die "Can't open $output: $^OS_ERROR"; # XXX 5.6ism
-	local $_;
+	local $_ = undef;
 	while ( ~< *$tmpfh) {
 	    print $^STDOUT, or die "Can't print to stdout: $^OS_ERROR";
 	} 
@@ -1631,7 +1631,7 @@ sub am_taint_checking {
 sub is_tainted { # just a function
     my $arg  = shift;
     my $nada = substr($arg, 0, 0);  # zero-length!
-    local $^EVAL_ERROR;  # preserve the caller's version of $@
+    local $^EVAL_ERROR = undef;  # preserve the caller's version of $@
     try { eval "# $nada" };
     return length($^EVAL_ERROR) != 0;
 }

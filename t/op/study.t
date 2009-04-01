@@ -4,7 +4,7 @@ our $Ok_Level = 0;
 my $test = 1;
 sub ok($ok, ?$name) {
 
-    local $_;
+    local $_ = undef;
 
     # You have to do it this way or VMS will get confused.
     printf $^STDOUT, "\%s $test\%s\n", $ok   ?? 'ok' !! 'not ok',

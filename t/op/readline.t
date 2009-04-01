@@ -70,7 +70,7 @@ SKIP: do {
   close $f;
 
   $^OS_ERROR=0;
-  do { local $^INPUT_RECORD_SEPARATOR;
+  do { local $^INPUT_RECORD_SEPARATOR = undef;
     open $f, "<", 'File::Spec'->curdir and $_= ~< $f;
     ok( $^OS_ERROR==$err && !defined($_) => 'readline( DIRECTORY ) slurp mode' );
     close $f;

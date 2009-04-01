@@ -265,7 +265,7 @@ do {
     my $sclr = \1;
 
     local $Storable::Deparse = 1;
-    local $Storable::Eval    = 1;
+    local $Storable::Eval     = 1;
 
     for my $sub (@($short_sub, $long_sub)) {
 	my $res;

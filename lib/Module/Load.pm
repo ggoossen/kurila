@@ -42,7 +42,7 @@ sub _export_to_level {
 }
 
 sub _to_file{
-    local $_    = shift;
+    local $_ = shift;
     my $pm      = shift || '';
 
     my @parts = split m/::/;

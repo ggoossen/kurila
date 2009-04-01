@@ -333,7 +333,7 @@ sub check($utmpl, $href, ?$verbose) {
         ### check if we have an allow handler, to validate against ###
         ### allow() will report its own errors ###
         if( exists %tmpl{'allow'} and not do {
-                local $_ERROR_STRING;
+                local $_ERROR_STRING = undef;
                 allow( %args{?$key}, %tmpl{?'allow'} )
             }         
         ) {
@@ -420,7 +420,7 @@ sub allow {
 
     ### it's a regexp ###
     if( ref @_[1] eq 'Regexp' ) {
-        local $^WARNING;  # silence warnings if $val is undef #
+        local $^WARNING = undef;  # silence warnings if $val is undef #
         return if @_[0] !~ m/@_[1]/;
 
     ### it's a sub ###

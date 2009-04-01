@@ -31,7 +31,7 @@ if ($use_eventlog) {
         # read the uuencoded data
         open(my $uu, "<", '' . File::Spec->catfile("win32", "$name\_dll.uu"))
             or die "fatal: Can't read file '$name\_dll.uu': $^OS_ERROR";
-        my $uudata = do { local $^INPUT_RECORD_SEPARATOR; ~< *UU };
+        my $uudata = do { local $^INPUT_RECORD_SEPARATOR = undef; ~< *UU };
         close($uu);
 
         # write the DLL

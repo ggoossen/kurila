@@ -152,11 +152,9 @@ sub command {
 # Called for a verbatim paragraph.  Gets the paragraph, the line number, and
 # a Pod::Paragraph object.  Just output it verbatim, but with tabs converted
 # to spaces.
-sub verbatim {
-    my $self = shift;
+sub verbatim($self, $_, _, ?_) {
     return if %$self{?EXCLUDE};
     $self->item if defined %$self{?ITEM};
-    local $_ = shift;
     return if m/^\s*$/;
     s/^(\s*\S+)/$((' ' x %$self{?MARGIN}) . $1)/gm;
     $self->output ($_);
@@ -164,12 +162,9 @@ sub verbatim {
 
 # Called for a regular text block.  Gets the paragraph, the line number, and
 # a Pod::Paragraph object.  Perform interpolation and output the results.
-sub textblock {
-    my $self = shift;
+sub textblock($self, $_, $line, _) {
     return if %$self{?EXCLUDE};
-    $self->output (@_[0]), return if %$self{?VERBATIM};
-    local $_ = shift;
-    my $line = shift;
+    $self->output ($_), return if %$self{?VERBATIM};
 
     # Perform a little magic to collapse multiple L<> references.  This is
     # here mostly for backwards-compatibility.  We'll just rewrite the whole
@@ -196,7 +191,7 @@ sub textblock {
           )+
         )
     } {$( do {
-        local $_ = $1;
+        my $_ = $1;
         s%L</([^>]+)>%$1%g;
         my @items = split m/(?:,?\s+(?:and\s+)?)/;
         my $string = "the ";

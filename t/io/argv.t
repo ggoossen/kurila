@@ -80,7 +80,7 @@ close \*ARGV or die $^OS_ERROR;
 ok( eof(),      'eof() true after closing ARGV' );
 
 do {
-    local $^INPUT_RECORD_SEPARATOR;
+    local $^INPUT_RECORD_SEPARATOR = undef;
     open my $f, "<", 'Io_argv1.tmp' or die "Could not open Io_argv1.tmp: $^OS_ERROR";
     ~< *$f;	# set $. = 1
     is( ($: ~< *$f), undef );

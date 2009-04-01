@@ -116,6 +116,9 @@ PP(pp_rv2gv)
 	    DIE(aTHX_ PL_no_symref_sv, sv, "a symbol");
 	}
     }
+
+    if (PL_op->op_private & OPpLVAL_INTRO)
+       save_gp((GV*)sv, !(PL_op->op_flags & OPf_SPECIAL));
     if (op_flags & OPf_ASSIGN) {
 	if (op_flags & OPf_ASSIGN_PART) {
 	    SV* src;

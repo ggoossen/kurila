@@ -327,7 +327,7 @@ sub init {
     my $hints = File::Spec->catfile("hints", "$^OS_NAME.pl");
     if (-f $hints) {
 	print $^STDOUT, "Using hints $hints...\n";
-	local $self;
+	local $self = undef;
 	do $hints;
 	if (exists $self->{LIBS}) {
 	    $LIBS = $self->{?LIBS};
@@ -764,7 +764,7 @@ sub doConstants {
     } else {
 	foreach my $file (@('const-c.inc', 'const-xs.inc')) {
 	    my $fallback = File::Spec->catfile('fallback', $file);
-	    local $^INPUT_RECORD_SEPARATOR;
+	    local $^INPUT_RECORD_SEPARATOR = undef;
 	    open my $in, "<", "$fallback" or die "Can't open $fallback: $^OS_ERROR";
 	    open my $out, ">", "$file" or die "Can't open $file: $^OS_ERROR";
 	    print $out, ~< $in or die $^OS_ERROR;

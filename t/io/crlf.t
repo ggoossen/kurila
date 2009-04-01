@@ -16,13 +16,13 @@ if ('PerlIO::Layer'->find( 'perlio')) {
     ok(open($foo,"<:crlf",$file));
 
     my $text;
-    do { local $^INPUT_RECORD_SEPARATOR; $text = ~< *$foo };
+    do { local $^INPUT_RECORD_SEPARATOR = undef; $text = ~< *$foo };
     is(count_chars($text, "\015\012"), 0);
     is(count_chars($text, "\n"), 2000);
 
     binmode($foo);
     seek($foo,0,0);
-    do { local $^INPUT_RECORD_SEPARATOR; $text = ~< *$foo };
+    do { local $^INPUT_RECORD_SEPARATOR = undef; $text = ~< *$foo };
     is(count_chars($text, "\015\012"), 2000);
 
     SKIP:

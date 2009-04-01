@@ -27,7 +27,7 @@ my $max_iv_p1 = $max_uv ^^^ ($max_uv >> 1);
 my $lots_of_9C = do {
   my $temp = sprintf "\%#x", ^~^0;
   $temp =~ s/ff/9c/g;
-  local $^WARNING;
+  local $^WARNING = undef;
   eval $temp;
 };
 

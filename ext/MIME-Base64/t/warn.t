@@ -12,9 +12,8 @@ BEGIN {
     }
 }
 
+use Test::More tests => 1;
 use MIME::Base64 < qw(decode_base64);
-
-print $^STDOUT, "1..1\n";
 
 use warnings;
 
@@ -36,11 +35,11 @@ $a = do {
 };
 warn;
 $a = do {
-    local $^WARNING;
+    local $^WARNING = 0;
     decode_base64("aa");
 };
 $a = do {
-    local $^WARNING;
+    local $^WARNING = 0;
     decode_base64("a===");
 };
 warn;
@@ -49,7 +48,7 @@ for ( @warn) {
     print $^STDOUT, "# $_";
 }
 
-print $^STDOUT, "not " unless join("", @warn) eq <<"EOT"; print $^STDOUT, "ok 1\n";
+is(join("", @warn), <<"EOT");
 Warning: something's wrong
 Premature end of base64 data
 Premature padding of base64 data

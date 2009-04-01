@@ -91,7 +91,6 @@ sub mkmanifest {
     my $manimiss = 0;
     my $read = (-r 'MANIFEST' && maniread()) or $manimiss++;
     $read = \%() if $manimiss;
-    local *M;
     my $bakbase = $MANIFEST;
     $bakbase =~ s/\./_/g if $Is_VMS; # avoid double dots
     rename $MANIFEST, "$bakbase.bak" unless $manimiss;
@@ -99,7 +98,7 @@ sub mkmanifest {
     my $skip = _maniskip();
     my $found = manifind();
     my($key,$val,%all);
-    %all = %(< %$found, < %$read);
+    %all = %$found +%+ %$read;
     %all{+$MANIFEST} = ($Is_VMS ?? "$MANIFEST\t\t" !! '') . 'This list of files'
         if $manimiss; # add new MANIFEST to known file list
     foreach my $file ( _sort < keys %all) {
@@ -308,7 +307,7 @@ sub maniread(?$mfile) {
         warn "Problem opening $mfile: $^OS_ERROR";
         return $read;
     }
-    local $_;
+    local $_ = undef;
     while ( ~< $m){
         chomp;
         next if m/^\s*#/;
@@ -494,7 +493,7 @@ sub cp_if_diff($from, $to, $how) {
     my ($f, $t);
     open($f, "<","$from\0") or die "Can't read $from: $^OS_ERROR\n";
     if (open($t, "<","$to\0")) {
-        local $_;
+        local $_ = undef;
 	while ( ~< $f) { $diff++,last if $_ ne ~< $t; }
 	$diff++ unless eof($t);
 	close $t;

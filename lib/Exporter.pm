@@ -27,7 +27,7 @@ sub import {
   my $export_cache = (%Cache{+$pkg} ||= \%());
   my $args = (nelems @_) or @_ = @$exports;
 
-  local $_;
+  local $_ = undef;
   if ($args and not %$export_cache) {
       foreach (@$exports +@+  @{*{Symbol::fetch_glob("$pkg\::EXPORT_OK")}}) {
           s/^&//;

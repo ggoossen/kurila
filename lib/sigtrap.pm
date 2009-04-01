@@ -14,7 +14,7 @@ sub import {
     my $handler = \&handler_traceback;
     my $saw_sig = 0;
     my $untrapped = 0;
-    local $_;
+    local $_ = undef;
 
     {
         while ((nelems @_)) {

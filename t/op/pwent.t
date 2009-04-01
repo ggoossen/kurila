@@ -107,7 +107,7 @@ while ( ~< *PW) {
 	next;
     }
     if ($n == $max) {
-	local $^INPUT_RECORD_SEPARATOR;
+	local $^INPUT_RECORD_SEPARATOR = undef;
 	my $junk = ~< *PW;
 	last;
     }

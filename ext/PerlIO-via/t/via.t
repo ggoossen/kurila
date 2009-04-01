@@ -27,7 +27,7 @@ ok( (print $fh, $a), "print to output file");
 ok( close($fh), 'close output file');
 
 ok( open($fh,"<via(PerlIO::via::QuotedPrint)", $tmp), 'open QuotedPrint for input');
-do { local $^INPUT_RECORD_SEPARATOR; $b = ~< $fh };
+do { local $^INPUT_RECORD_SEPARATOR = undef; $b = ~< $fh };
 ok( close($fh), "close input file");
 
 is($a, $b, 'compare original data with filtered version');

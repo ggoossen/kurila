@@ -273,7 +273,7 @@ sub test_diag
     _start_testing() unless $testing;
 
     # expect the same thing, but prepended with "#     "
-    local $_;
+    local $_ = undef;
     $err->expect(< map {"# $_"}, @_)
 }
 
@@ -355,7 +355,7 @@ sub test_test
       # print out the diagnostic information about why this
       # test failed
 
-      local $_;
+      local $_ = undef;
 
       $t->diag(< map {"$_\n"}, @( $out->complaint))
 	unless %args{?skip_out} || $out->check;

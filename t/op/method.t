@@ -8,7 +8,7 @@ BEGIN {
     require "./test.pl";
 }
 
-plan tests => 55;
+plan tests => 50;
 
 @A::ISA = @( 'B' );
 @B::ISA = @( 'C' );
@@ -56,17 +56,6 @@ do {
 };
 is(A->d, "D::d");
 
-do {
-    local *B::d;
-    eval 'sub B::d {"B::d1"}';	# Import now.
-    is(A->d, "B::d1");	# Update hash table;
-    undef &B::d;
-    dies_like( sub { A->d },
-               qr/Undefined subroutine/ );
-};
-
-is(A->d, "D::d");		# Back to previous state
-
 eval 'sub B::d {"B::d2"}';	# Import now.
 is(A->d, "B::d2");		# Update hash table;
 
@@ -89,12 +78,6 @@ eval 'sub B::d {"B::d4"}';	# Import now.
 is(A->d, "B::d4");		# Update hash table;
 
 delete %B::{d};			# Should work without any help too
-is(A->d, "C::d");
-
-do {
-    local *C::d;
-    is(try { A->d } || "nope", "nope");
-};
 is(A->d, "C::d");
 
 # test that failed subroutine calls don't affect method calls

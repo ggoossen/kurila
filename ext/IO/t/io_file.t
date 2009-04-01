@@ -31,7 +31,7 @@ if( $^OS_NAME =~ m/MSWin32/ ) {
     isa_ok( $fh,                $Class );
     ok( < $fh->open($File),       "   Opened '$File'" );
     
-    my $cont = do { local $^INPUT_RECORD_SEPARATOR; ~< $fh };
+    my $cont = do { local $^INPUT_RECORD_SEPARATOR = undef; ~< $fh };
     unlike( $cont, qr/$Expect/, "   Content match fails without binmode" );
 }    
 
@@ -42,7 +42,7 @@ do {   my $fh = $Class->new;
     ok( $fh->open($File),       "   Opened '$File' $^OS_ERROR" );
     ok( $fh->binmode,           "   binmode enabled" );
     
-    my $cont = do { local $^INPUT_RECORD_SEPARATOR; ~< $fh };
+    my $cont = do { local $^INPUT_RECORD_SEPARATOR = undef; ~< $fh };
     like( $cont, qr/$Expect/,   "   Content match passes with binmode" );
 };
     

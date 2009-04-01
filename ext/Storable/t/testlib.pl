@@ -11,7 +11,7 @@ use Storable < qw (store retrieve freeze thaw nstore nfreeze);
 
 sub slurp {
   my $file = shift;
-  local ($^INPUT_RECORD_SEPARATOR);
+  local $^INPUT_RECORD_SEPARATOR = undef;
   open my $fh, "<", "$file" or die "Can't open '$file': $^OS_ERROR";
   binmode $fh;
   my $contents = ~< *$fh;

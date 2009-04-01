@@ -17,7 +17,7 @@ sub import {
 	require Carp;
 	Carp::croak("sort pragma requires arguments");
     }
-    local $_;
+    local $_ = undef;
     $^HINTS{+sort} //= 0;
     while ($_ = shift(@_)) {
 	if (m/^_q(?:uick)?sort$/) {
@@ -41,7 +41,7 @@ sub unimport {
     if ((nelems @_) == 0) {
 	die("sort pragma requires arguments");
     }
-    local $_;
+    local $_ = undef;
     no warnings 'uninitialized';	# bitops would warn
     while ($_ = shift(@_)) {
 	if (m/^_q(?:uick)?sort$/) {

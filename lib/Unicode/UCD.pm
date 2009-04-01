@@ -306,7 +306,7 @@ my %BLOCKS;
 sub _charblocks {
     unless (nelems @BLOCKS) {
 	if (openunicode(\$BLOCKSFH, "Blocks.txt")) {
-	    local $_;
+	    local $_ = undef;
 	    while ( ~< $BLOCKSFH) {
 		if (m/^([0-9A-F]+)\.\.([0-9A-F]+);\s+(.+)/) {
 		    my @($lo, $hi) = @(hex($1), hex($2));
@@ -368,7 +368,7 @@ my %SCRIPTS;
 sub _charscripts {
     unless (nelems @SCRIPTS) {
 	if (openunicode(\$SCRIPTSFH, "Scripts.txt")) {
-	    local $_;
+	    local $_ = undef;
 	    while ( ~< $SCRIPTSFH) {
 		if (m/^([0-9A-F]+)(?:\.\.([0-9A-F]+))?\s+;\s+(\w+)/) {
 		    my @($lo, $hi) = @(hex($1), $2 ?? hex($2) !! hex($1));
@@ -616,7 +616,7 @@ my %COMPEXCL;
 sub _compexcl {
     unless (%COMPEXCL) {
 	if (openunicode(\$COMPEXCLFH, "CompositionExclusions.txt")) {
-	    local $_;
+	    local $_ = undef;
 	    while ( ~< $COMPEXCLFH) {
 		if (m/^([0-9A-F]+)\s+\#\s+/) {
 		    my $code = hex($1);
@@ -687,7 +687,7 @@ my %CASEFOLD;
 sub _casefold {
     unless (%CASEFOLD) {
 	if (openunicode(\$CASEFOLDFH, "CaseFolding.txt")) {
-	    local $_;
+	    local $_ = undef;
 	    while ( ~< $CASEFOLDFH) {
 		if (m/^([0-9A-F]+); ([CFSI]); ([0-9A-F]+(?: [0-9A-F]+)*);/) {
 		    my $code = hex($1);
@@ -768,7 +768,7 @@ my %CASESPEC;
 sub _casespec {
     unless (%CASESPEC) {
 	if (openunicode(\$CASESPECFH, "SpecialCasing.txt")) {
-	    local $_;
+	    local $_ = undef;
 	    while ( ~< $CASESPECFH) {
 		if (m/^([0-9A-F]+); ([0-9A-F]+(?: [0-9A-F]+)*)?; ([0-9A-F]+(?: [0-9A-F]+)*)?; ([0-9A-F]+(?: [0-9A-F]+)*)?; (\w+(?: \w+)*)?/) {
 		    my @($hexcode, $lower, $title, $upper, $condition) =

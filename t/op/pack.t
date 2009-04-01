@@ -305,7 +305,7 @@ do {
     skip("Couldn't generate infinity - got error '$^EVAL_ERROR'", 1)
       unless defined $inf and $inf == $inf / 2 and $inf + 1 == $inf;
 
-    local our $TODO;
+    local our $TODO = undef;
     $TODO = "VOS needs a fix for posix-1022 to pass this test."
       if ($^OS_NAME eq 'vos');
 
@@ -1750,7 +1750,7 @@ do {
 };
 do {
     use utf8;
-    local our $TODO;
+    local our $TODO = undef;
     $TODO = "find out what pack('A*') is supposed to do";
 
     # unpack("A*", $unicode) strips general unicode spaces

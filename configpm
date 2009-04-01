@@ -915,7 +915,7 @@ print $^STDOUT, "written $Config_POD\n";
 my $orig_config_txt = "";
 my $orig_heavy_txt = "";
 do {
-    local $^INPUT_RECORD_SEPARATOR;
+    local $^INPUT_RECORD_SEPARATOR = undef;
     my $fh;
     $orig_config_txt = ~< $fh if open $fh, "<", $Config_PM;
     $orig_heavy_txt  = ~< $fh if open $fh, "<", $Config_heavy;
