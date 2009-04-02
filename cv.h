@@ -83,6 +83,7 @@ Null CV pointer.
 #define CVf_PROTO	0x1000	/* arguments are passed to prototype variables */
 #define CVf_DEFARGS	0x2000	/* arguments are passed to @_ */
 #define CVf_ASSIGNARG	0x4000	/* last argument should be the rhs of an assignment (only used in combination with CVf_PROTO */
+#define CVf_OPTASSIGNARG	0x8000	/* last argument should be the rhs of an assignment (only used in combination with CVf_PROTO */
 
 #define CvCLONE(cv)		(CvFLAGS(cv) & CVf_CLONE)
 #define CvCLONE_on(cv)		(CvFLAGS(cv) |= CVf_CLONE)

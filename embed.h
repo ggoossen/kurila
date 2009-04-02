@@ -181,6 +181,7 @@
 #define op_const_sv		Perl_op_const_sv
 #endif
 #define cv_assignarg_flag	Perl_cv_assignarg_flag
+#define cv_optassignarg_flag	Perl_cv_optassignarg_flag
 #define cv_undef		Perl_cv_undef
 #define cv_tmprefcnt		Perl_cv_tmprefcnt
 #define cx_dump			Perl_cx_dump
@@ -2364,6 +2365,7 @@
 #define op_const_sv(a,b)	Perl_op_const_sv(aTHX_ a,b)
 #endif
 #define cv_assignarg_flag(a)	Perl_cv_assignarg_flag(aTHX_ a)
+#define cv_optassignarg_flag(a)	Perl_cv_optassignarg_flag(aTHX_ a)
 #define cv_undef(a)		Perl_cv_undef(aTHX_ a)
 #define cv_tmprefcnt(a)		Perl_cv_tmprefcnt(aTHX_ a)
 #define cx_dump(a)		Perl_cx_dump(aTHX_ a)

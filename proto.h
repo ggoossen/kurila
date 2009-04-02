@@ -499,6 +499,11 @@ PERL_INLINE_CALLCONV bool	Perl_cv_assignarg_flag(pTHX_ CV* cv)
 #define PERL_ARGS_ASSERT_CV_ASSIGNARG_FLAG	\
 	assert(cv)
 
+PERL_INLINE_CALLCONV bool	Perl_cv_optassignarg_flag(pTHX_ CV* cv)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_CV_OPTASSIGNARG_FLAG	\
+	assert(cv)
+
 PERL_CALLCONV void	Perl_cv_undef(pTHX_ CV* cv)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_CV_UNDEF	\

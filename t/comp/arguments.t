@@ -2,7 +2,7 @@
 
 BEGIN { require './test.pl'; }
 
-plan 18;
+plan 20;
 
 sub foo($x) {
     return $x;
@@ -81,3 +81,10 @@ do {
                qr/main::threeargs can not be an assignee/ );
 };
 
+sub opt_assign($x, $y ?= $z) {
+    $args = "$x,$y=$(dump::view($z))";
+    return $args;
+}
+
+is( (opt_assign("aap", "noot") = "mies"), "aap,noot='mies'" );
+is( opt_assign("aap", "noot"), 'aap,noot=undef' );

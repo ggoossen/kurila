@@ -563,6 +563,12 @@ protoassign :   /* NULL */
                             CvFLAGS(PL_compcv) |= CVf_ASSIGNARG;
                             $$ = $2;
                         }
+        |      '?' ASSIGNOP term 
+			{ 
+                            CvFLAGS(PL_compcv) |= CVf_OPTASSIGNARG;
+                            $$ = $3;
+                            $$->op_flags |= OPf_OPTIONAL;
+                        }
 
 /* Subroutine prototype */
 proto	:	/* NULL */

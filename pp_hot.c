@@ -1390,7 +1390,8 @@ PP(pp_entersub)
 	SAVECOMPPAD();
 	PAD_SET_CUR_NOSAVE(padlist, CvDEPTH(cv));
 
-	if ( is_assignment != cv_assignarg_flag(cv) ) {
+	if ( ! cv_optassignarg_flag(cv) 
+	    && ( is_assignment != cv_assignarg_flag(cv) ) ) {
 	    if (is_assignment)
 		Perl_croak(aTHX_ "%s can not be an assignee",
 		    SvPVX_const(loc_name(SvLOCATION(cv))));

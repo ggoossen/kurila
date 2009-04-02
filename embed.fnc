@@ -191,6 +191,7 @@ pd	|void	|cv_setcv	|NN CV* dst|NN CV* src
 ApdR	|SV*	|cv_const_sv	|NULLOK CV* cv
 pR	|SV*	|op_const_sv	|NULLOK const OP* o|NULLOK CV* cv
 Api	|bool	|cv_assignarg_flag	|NN CV* cv
+Api	|bool	|cv_optassignarg_flag	|NN CV* cv
 Apd	|void	|cv_undef	|NN CV* cv
 Apd	|void	|cv_tmprefcnt	|NN CV* cv
 Ap	|void	|cx_dump	|NN PERL_CONTEXT* cx

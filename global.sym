@@ -104,6 +104,7 @@ Perl_printf_nocontext
 Perl_cv_ckproto
 Perl_cv_const_sv
 Perl_cv_assignarg_flag
+Perl_cv_optassignarg_flag
 Perl_cv_undef
 Perl_cv_tmprefcnt
 Perl_cx_dump

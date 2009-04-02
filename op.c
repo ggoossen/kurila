@@ -3737,8 +3737,8 @@ Perl_newSUB(pTHX_ I32 floor, OP *proto, OP *block)
 	    op_free(pushmark);
 	    for (kid = list->op_first; kid; kid = kid->op_sibling)
 		assign(kid, TRUE, &min_modcount, &max_modcount);
-	    CvN_MINARGS(cv) = min_modcount - ( cv_assignarg_flag(cv) ? 1 : 0 );
-	    CvN_MAXARGS(cv) = max_modcount - ( cv_assignarg_flag(cv) ? 1 : 0 );
+	    CvN_MINARGS(cv) = min_modcount - ( cv_assignarg_flag(cv) || cv_optassignarg_flag(cv) ? 1 : 0 );
+	    CvN_MAXARGS(cv) = max_modcount - ( cv_assignarg_flag(cv) || cv_optassignarg_flag(cv) ? 1 : 0 );
 #ifdef PERL_MAD
 	    block = newUNOP(OP_NULL, 0, block, block->op_location);
 #endif
