@@ -196,13 +196,10 @@ Deprecated.  Use C<GIMME_V> instead.
 #define OPpITER_DEF		8	/* for $_ or for my $_ */
 
 /* Private for OP_CONST */
-#define	OPpCONST_NOVER		2	/* no 6; */
 #define	OPpCONST_SHORTCIRCUIT	4	/* eg the constant 5 in (5 || foo) */
 #define	OPpCONST_STRICT		8	/* bearword subject to strict 'subs' */
 #define OPpCONST_ENTERED	16	/* Has been entered as symbol. */
-#define OPpCONST_NOTUSED	32	/* Was OPpCONST_ARYBASE: Was a $[ translated to constant. */
 #define OPpCONST_BARE		64	/* Was a bare word (filehandle?). */
-#define OPpCONST_WARNING	128	/* Was a $^W translated to constant. */
 
 /* Private for OP_FLIP/FLOP */
 #define OPpFLIP_LINENUM		64	/* Range arg potentially a line num. */

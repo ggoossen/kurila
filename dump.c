@@ -876,8 +876,6 @@ STATIC SV* S_dump_op_flags_private(pTHX_ const OP* o)
 	    sv_catpv(tmpsv, ",BARE");
 	if (o->op_private & OPpCONST_STRICT)
 	    sv_catpv(tmpsv, ",STRICT");
-	if (o->op_private & OPpCONST_WARNING)
-	    sv_catpv(tmpsv, ",WARNING");
 	if (o->op_private & OPpCONST_ENTERED)
 	    sv_catpv(tmpsv, ",ENTERED");
     }
