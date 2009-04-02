@@ -194,8 +194,6 @@ Perl_scalarvoid(pTHX_ OP *o)
     case OP_SORT:
     case OP_REVERSE:
     case OP_RANGE:
-    case OP_FLIP:
-    case OP_FLOP:
     case OP_CALLER:
     case OP_FILENO:
     case OP_EOF:
@@ -412,7 +410,6 @@ Perl_list(pTHX_ OP *o)
     o->op_flags = (o->op_flags & ~OPf_WANT) | OPf_WANT_LIST;
 
     switch (o->op_type) {
-    case OP_FLOP:
     case OP_REPEAT:
 	list(cBINOPo->op_first);
 	break;
@@ -429,10 +426,6 @@ Perl_list(pTHX_ OP *o)
     case OP_NULL:
 	if (!(o->op_flags & OPf_KIDS))
 	    break;
-	if (!o->op_next && cUNOPo->op_first->op_type == OP_FLOP) {
-	    list(cBINOPo->op_first);
-	    return gen_constant_list(o);
-	}
     case OP_LIST:
 	listkids(o);
 	break;

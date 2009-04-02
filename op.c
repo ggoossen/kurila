@@ -2897,55 +2897,7 @@ Perl_newCONDOP(pTHX_ OPFLAGS flags, OP *first, OP *trueop, OP *falseop, SV *loca
 }
 
 OP *
-Perl_newRANGE(pTHX_ OPFLAGS flags, OP *left, OP *right)
-{
-    dVAR;
-    LOGOP *range;
-    OP *flip;
-    OP *flop;
-    OP *leftstart;
-    OP *o;
-
-    PERL_ARGS_ASSERT_NEWRANGE;
-
-    NewOp(1101, range, 1, LOGOP);
-
-    range->op_type = OP_RANGE;
-    range->op_ppaddr = PL_ppaddr[OP_RANGE];
-    range->op_first = left;
-    range->op_flags = OPf_KIDS;
-    leftstart = LINKLIST(left);
-    range->op_other = LINKLIST(right);
-    range->op_private = (U8)(1 | (flags >> 8));
-    range->op_location = SvREFCNT_inc(left->op_location);
-
-    left->op_sibling = right;
-
-    range->op_next = (OP*)range;
-    flip = newUNOP(OP_FLIP, flags, (OP*)range, range->op_location);
-    flop = newUNOP(OP_FLOP, 0, flip, range->op_location);
-    o = newUNOP(OP_NULL, 0, flop, range->op_location);
-    linklist(flop);
-    range->op_next = leftstart;
-
-    left->op_next = flip;
-    right->op_next = flop;
-
-    range->op_targ = pad_alloc(OP_RANGE, SVs_PADMY);
-    flip->op_targ = pad_alloc(OP_RANGE, SVs_PADMY);
-
-    flip->op_private =  left->op_type == OP_CONST ? OPpFLIP_LINENUM : 0;
-    flop->op_private = right->op_type == OP_CONST ? OPpFLIP_LINENUM : 0;
-
-    flip->op_next = o;
-    if (!flip->op_private || !flop->op_private)
-	linklist(o);		/* blow off optimizer unless constant */
-
-    return o;
-}
-
-OP *
-    Perl_newLOOPOP(pTHX_ OPFLAGS flags, I32 debuggable, OP *expr, OP *block, bool once, SV *location)
+Perl_newLOOPOP(pTHX_ OPFLAGS flags, I32 debuggable, OP *expr, OP *block, bool once, SV *location)
 {
     dVAR;
     OP* listop;
@@ -3176,14 +3128,13 @@ Perl_newFOROP(pTHX_ OPFLAGS flags, char *label, OP *sv, OP *expr, OP *block, OP 
     }
     else if (expr->op_type == OP_NULL &&
              (expr->op_flags & OPf_KIDS) &&
-             ((BINOP*)expr)->op_first->op_type == OP_FLOP)
+             ((BINOP*)expr)->op_first->op_type == OP_RANGE)
     {
 	/* Basically turn for($x..$y) into the same as for($x,$y), but we
 	 * set the SPECIAL flag to indicate that these values are to be
 	 * treated as min/max values by 'pp_iterinit'.
 	 */
-	const UNOP* const flip = (UNOP*)((UNOP*)((BINOP*)expr)->op_first)->op_first;
-	LOGOP* const range = (LOGOP*) flip->op_first;
+	BINOP* const range = (BINOP*)((UNOP*)((BINOP*)expr)->op_first)->op_first;
 	OP* const left  = range->op_first;
 	OP* const right = left->op_sibling;
 	LISTOP* listop;
@@ -3193,7 +3144,6 @@ Perl_newFOROP(pTHX_ OPFLAGS flags, char *label, OP *sv, OP *expr, OP *block, OP 
 
 	listop = (LISTOP*)newLISTOP(OP_LIST, 0, left, right, location);
 	listop->op_first->op_next = range->op_next;
-	left->op_next = range->op_other;
 	right->op_next = (OP*)listop;
 	listop->op_next = listop->op_first;
 
@@ -5802,7 +5752,6 @@ Perl_peep(pTHX_ register OP *o)
 	case OP_ORASSIGN:
 	case OP_DORASSIGN:
 	case OP_COND_EXPR:
-	case OP_RANGE:
 	    while (cLOGOP->op_other->op_type == OP_NULL)
 		cLOGOP->op_other = cLOGOP->op_other->op_next;
 	    peep(cLOGOP->op_other); /* Recursive calls are not replaced by fptr calls */

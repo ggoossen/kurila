@@ -198,8 +198,6 @@ EXTCONST char* const PL_op_name[] = {
 	"mapstart",
 	"mapwhile",
 	"range",
-	"flip",
-	"flop",
 	"and",
 	"or",
 	"xor",
@@ -557,9 +555,7 @@ EXTCONST char* const PL_op_desc[] = {
 	"grep iterator",
 	"map",
 	"map iterator",
-	"flipflop",
-	"range (or flip)",
-	"range (or flop)",
+	"range",
 	"logical and (&&)",
 	"logical or (||)",
 	"logical xor",
@@ -930,8 +926,6 @@ EXT Perl_ppaddr_t PL_ppaddr[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_unimplemented_op),	/* Perl_pp_mapstart */
 	MEMBER_TO_FPTR(Perl_pp_mapwhile),
 	MEMBER_TO_FPTR(Perl_pp_range),
-	MEMBER_TO_FPTR(Perl_pp_flip),
-	MEMBER_TO_FPTR(Perl_pp_flop),
 	MEMBER_TO_FPTR(Perl_pp_and),
 	MEMBER_TO_FPTR(Perl_pp_or),
 	MEMBER_TO_FPTR(Perl_pp_xor),
@@ -1299,8 +1293,6 @@ EXT Perl_check_t PL_check[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_ck_grep),	/* mapstart */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* mapwhile */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* range */
-	MEMBER_TO_FPTR(Perl_ck_null),	/* flip */
-	MEMBER_TO_FPTR(Perl_ck_null),	/* flop */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* and */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* or */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* xor */
@@ -1661,9 +1653,7 @@ EXTCONST U32 PL_opargs[] = {
 	0x00000648,	/* grepwhile */
 	0x0004a845,	/* mapstart */
 	0x00000648,	/* mapwhile */
-	0x00022600,	/* range */
-	0x00022200,	/* flip */
-	0x00000200,	/* flop */
+	0x00022400,	/* range */
 	0x00000600,	/* and */
 	0x00000600,	/* or */
 	0x00022406,	/* xor */

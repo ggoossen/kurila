@@ -559,7 +559,6 @@
 #define newNULLLIST		Perl_newNULLLIST
 #define newOP			Perl_newOP
 #define newPROG			Perl_newPROG
-#define newRANGE		Perl_newRANGE
 #define newSLICEOP		Perl_newSLICEOP
 #define newSTATEOP		Perl_newSTATEOP
 #define newSUB			Perl_newSUB
@@ -1958,9 +1957,7 @@
 #define pp_expand		Perl_pp_expand
 #define pp_fcntl		Perl_pp_fcntl
 #define pp_fileno		Perl_pp_fileno
-#define pp_flip			Perl_pp_flip
 #define pp_flock		Perl_pp_flock
-#define pp_flop			Perl_pp_flop
 #define pp_fork			Perl_pp_fork
 #define pp_ftatime		Perl_pp_ftatime
 #define pp_ftbinary		Perl_pp_ftbinary
@@ -2744,7 +2741,6 @@
 #define newNULLLIST(a)		Perl_newNULLLIST(aTHX_ a)
 #define newOP(a,b,c)		Perl_newOP(aTHX_ a,b,c)
 #define newPROG(a)		Perl_newPROG(aTHX_ a)
-#define newRANGE(a,b,c)		Perl_newRANGE(aTHX_ a,b,c)
 #define newSLICEOP(a,b,c)	Perl_newSLICEOP(aTHX_ a,b,c)
 #define newSTATEOP(a,b,c,d)	Perl_newSTATEOP(aTHX_ a,b,c,d)
 #define newSUB(a,b,c)		Perl_newSUB(aTHX_ a,b,c)
@@ -4149,9 +4145,7 @@
 #define pp_expand()		Perl_pp_expand(aTHX)
 #define pp_fcntl()		Perl_pp_fcntl(aTHX)
 #define pp_fileno()		Perl_pp_fileno(aTHX)
-#define pp_flip()		Perl_pp_flip(aTHX)
 #define pp_flock()		Perl_pp_flock(aTHX)
-#define pp_flop()		Perl_pp_flop(aTHX)
 #define pp_fork()		Perl_pp_fork(aTHX)
 #define pp_ftatime()		Perl_pp_ftatime(aTHX)
 #define pp_ftbinary()		Perl_pp_ftbinary(aTHX)

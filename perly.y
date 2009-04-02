@@ -931,15 +931,9 @@ termbinop:	term POWOP term                        /* $x ** $y */
 			}
 	|	term DOTDOT term                       /* $x..$y, $x...$y */
 			{
-			  $$ = newRANGE(IVAL($2), scalar($1), scalar($3));
-			  DO_MAD({
-			      UNOP *op;
-			      op = (UNOP*)$$;
-			      op = (UNOP*)op->op_first;	/* get to flop */
-			      op = (UNOP*)op->op_first;	/* get to flip */
-			      op = (UNOP*)op->op_first;	/* get to range */
-			      TOKEN_GETMAD($2,(OP*)op,'o');
-			    })
+                            $$ = newBINOP(OP_RANGE, 0, scalar($1), scalar($3), LOCATION($2));
+                            TOKEN_GETMAD($2,$$,'o');
+                            APPEND_MADPROPS_PV("operator",$$,'>');
 			}
 	|	term ANDAND term                       /* $x && $y */
 			{ $$ = newLOGOP(OP_AND, 0, $1, $3, LOCATION($2));

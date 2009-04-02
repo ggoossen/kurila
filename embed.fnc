@@ -532,7 +532,6 @@ Apa	|OP*	|newLOOPOP	|OPFLAGS flags|I32 debuggable|NULLOK OP* expr|NULLOK OP* blo
 Apa	|OP*	|newNULLLIST	|NULLOK SV *location
 Apa	|OP*	|newOP		|I32 optype|OPFLAGS flags|NULLOK SV* location
 Ap	|void	|newPROG	|NN OP* o
-Apa	|OP*	|newRANGE	|OPFLAGS flags|NN OP* left|NN OP* right
 Apa	|OP*	|newSLICEOP	|OPFLAGS flags|NULLOK OP* subscript|NULLOK OP* listop
 Apa	|OP*	|newSTATEOP	|OPFLAGS flags|NULLOK char* label|NULLOK OP* o|NULLOK SV* location
 Ap	|CV*	|newSUB		|I32 floor|NULLOK OP* proto|NULLOK OP* block

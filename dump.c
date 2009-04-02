@@ -879,14 +879,6 @@ STATIC SV* S_dump_op_flags_private(pTHX_ const OP* o)
 	if (o->op_private & OPpCONST_ENTERED)
 	    sv_catpv(tmpsv, ",ENTERED");
     }
-    else if (optype == OP_FLIP) {
-	if (o->op_private & OPpFLIP_LINENUM)
-	    sv_catpv(tmpsv, ",LINENUM");
-    }
-    else if (optype == OP_FLOP) {
-	if (o->op_private & OPpFLIP_LINENUM)
-	    sv_catpv(tmpsv, ",LINENUM");
-    }
     else if (optype == OP_RV2CV) {
 	if (o->op_private & OPpLVAL_INTRO)
 	    sv_catpv(tmpsv, ",LVAL_INTRO");

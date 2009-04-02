@@ -1857,14 +1857,6 @@ PERL_CALLCONV void	Perl_newPROG(pTHX_ OP* o)
 #define PERL_ARGS_ASSERT_NEWPROG	\
 	assert(o)
 
-PERL_CALLCONV OP*	Perl_newRANGE(pTHX_ OPFLAGS flags, OP* left, OP* right)
-			__attribute__malloc__
-			__attribute__warn_unused_result__
-			__attribute__nonnull__(pTHX_2)
-			__attribute__nonnull__(pTHX_3);
-#define PERL_ARGS_ASSERT_NEWRANGE	\
-	assert(left); assert(right)
-
 PERL_CALLCONV OP*	Perl_newSLICEOP(pTHX_ OPFLAGS flags, OP* subscript, OP* listop)
 			__attribute__malloc__
 			__attribute__warn_unused_result__;

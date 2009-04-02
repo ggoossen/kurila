@@ -323,7 +323,6 @@ Perl_newLOOPOP
 Perl_newNULLLIST
 Perl_newOP
 Perl_newPROG
-Perl_newRANGE
 Perl_newSLICEOP
 Perl_newSTATEOP
 Perl_newSUB

@@ -143,20 +143,6 @@ PP(pp_mapwhile)
 
 PP(pp_range)
 {
-    dVAR;
-    return NORMAL;
-}
-
-PP(pp_flip)
-{
-    dVAR;
-    dSP;
-
-    RETURNOP(((LOGOP*)cUNOP->op_first)->op_other);
-}
-
-PP(pp_flop)
-{
     dVAR; dSP;
 
     AV* res = av_2mortal(newAV());
