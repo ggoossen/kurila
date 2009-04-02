@@ -844,8 +844,6 @@ STATIC SV* S_dump_op_flags_private(pTHX_ const OP* o)
 		sv_catpv(tmpsv, ",AMPER");
 	    if (o->op_private & OPpENTERSUB_DB)
 		sv_catpv(tmpsv, ",DB");
-	    if (o->op_private & OPpENTERSUB_HASTARG)
-		sv_catpv(tmpsv, ",HASTARG");
 	    if (o->op_private & OPpENTERSUB_NOPAREN)
 		sv_catpv(tmpsv, ",NOPAREN");
 	    if (o->op_private & OPpENTERSUB_INARGS)

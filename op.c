@@ -5501,7 +5501,6 @@ Perl_ck_subr(pTHX_ OP *o)
 
     PERL_ARGS_ASSERT_CK_SUBR;
 
-    o->op_private |= OPpENTERSUB_HASTARG;
     for (cvop = o2; cvop->op_sibling; cvop = cvop->op_sibling) ;
     if (cvop->op_type == OP_RV2CV) {
 	SVOP* tmpop;
