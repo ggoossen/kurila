@@ -173,10 +173,8 @@ Deprecated.  Use C<GIMME_V> instead.
 #define OPpDEREF_SV		(32|64)	/*   Want ref to SV. */
   /* OP_ENTERSUB only */
 #define OPpENTERSUB_DB		16	/* Debug subroutine. */
-#define OPpENTERSUB_NOMOD	64	/* Immune to mod() for :attrlist. */
   /* OP_ENTERSUB and OP_RV2CV only */
 #define OPpENTERSUB_AMPER	8	/* Used & form to call. */
-#define OPpENTERSUB_NOPAREN	128	/* bare sub call (without parens) */
 #define OPpENTERSUB_INARGS	4	/* Lval used as arg to a sub. */
   /* OP_GV only */
 #define OPpEARLY_CV		32	/* foo() called before sub foo was parsed */
