@@ -1504,21 +1504,6 @@ PP(pp_entersub)
 
 	PUTBACK;
 
-	if (!hasargs) {
-	    /* Need to copy @_ to stack. Alternative may be to
-	     * switch stack to @_, and copy return values
-	     * back. This would allow popping @_ in XSUB, e.g.. XXXX */
-	    AV * const av = GvAV(PL_defgv);
-	    const I32 items = AvFILLp(av) + 1;   /* @_ is not tieable */
-
-	    if (items) {
-		/* Mark is at the end of the stack. */
-		EXTEND(SP, items);
-		Copy(AvARRAY(av), SP + 1, items, SV*);
-		SP += items;
-		PUTBACK ;		
-	    }
-	}
 	/* We assume first XSUB in &DB::sub is the called one. */
 	if (PL_curcopdb) {
 	    SAVEVPTR(PL_curcop);
