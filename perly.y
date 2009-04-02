@@ -277,7 +277,7 @@ sideff	:	error
 			}
 	|	expr FOR expr
 			{ $$ = newFOROP(0, NULL,
-					(OP*)NULL, $3, $1, (OP*)NULL, LOCATION($2));
+                                (OP*)NULL, scalar($3), $1, (OP*)NULL, LOCATION($2));
 			  TOKEN_GETMAD($2,((LISTOP*)$$)->op_first->op_sibling,'w');
 			}
 	;
@@ -384,7 +384,7 @@ loop	:	label WHILE remember '(' texpr ')'
 			{ OP *innerop;
 			  $$ = block_end($4,
                               innerop = newFOROP(0, PVAL($1),
-                                  $5, $7, $9, $10, LOCATION($2)));
+                                  $5, scalar($7), $9, $10, LOCATION($2)));
 			  TOKEN_GETMAD($1,((LISTOP*)innerop)->op_first->op_sibling,'L');
 			  TOKEN_GETMAD($2,((LISTOP*)innerop)->op_first->op_sibling,'W');
 			  TOKEN_GETMAD($3,((LISTOP*)innerop)->op_first->op_sibling,'d');
@@ -395,7 +395,7 @@ loop	:	label WHILE remember '(' texpr ')'
 			{ OP *innerop;
 			  $$ = block_end($3,
 			     innerop = newFOROP(0, PVAL($1),
-                                 $4, $6, $8, $9, LOCATION($2)));
+                                 $4, scalar($6), $8, $9, LOCATION($2)));
 			  TOKEN_GETMAD($1,((LISTOP*)innerop)->op_first->op_sibling,'L');
 			  TOKEN_GETMAD($2,((LISTOP*)innerop)->op_first->op_sibling,'W');
 			  TOKEN_GETMAD($5,((LISTOP*)innerop)->op_first->op_sibling,'(');

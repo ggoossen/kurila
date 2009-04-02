@@ -696,7 +696,7 @@ PP(pp_dbstate)
 
 PP(pp_enteriter)
 {
-    dVAR; dSP; dMARK;
+    dVAR; dSP;
     register PERL_CONTEXT *cx;
     const I32 gimme = GIMME_V;
     SV **svp;
@@ -727,7 +727,7 @@ PP(pp_enteriter)
     ENTER;
 
     PUSHBLOCK(cx, cxtype, SP);
-    PUSHLOOP_FOR(cx, svp, MARK, 0);
+    PUSHLOOP_FOR(cx, svp, SP-1, 0);
     if (PL_op->op_flags & OPf_SPECIAL) {
 	SV * const right = POPs;
 	dPOPss;

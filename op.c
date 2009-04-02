@@ -3123,29 +3123,23 @@ Perl_newFOROP(pTHX_ OPFLAGS flags, char *label, OP *sv, OP *expr, OP *block, OP 
 	|| expr->op_type == OP_PADSV || expr->op_type == OP_ASLICE
 	|| expr->op_type == OP_VALUES ) {
 	expr->op_flags |= OPf_SPECIAL;
-	expr = mod(force_list(expr), OP_GREPSTART);
+	expr = mod(expr, OP_GREPSTART);
 	iterflags |= OPf_STACKED;
     }
-    else if (expr->op_type == OP_NULL &&
-             (expr->op_flags & OPf_KIDS) &&
-             ((BINOP*)expr)->op_first->op_type == OP_RANGE)
+    else if (expr->op_type == OP_RANGE)
     {
 	/* Basically turn for($x..$y) into the same as for($x,$y), but we
 	 * set the SPECIAL flag to indicate that these values are to be
 	 * treated as min/max values by 'pp_iterinit'.
 	 */
-	BINOP* const range = (BINOP*)((UNOP*)((BINOP*)expr)->op_first)->op_first;
+	BINOP* const range = (BINOP*)expr;
 	OP* const left  = range->op_first;
-	OP* const right = left->op_sibling;
+	OP* const right = range->op_last;
 	LISTOP* listop;
 
-	range->op_flags &= ~OPf_KIDS;
-	range->op_first = NULL;
-
 	listop = (LISTOP*)newLISTOP(OP_LIST, 0, left, right, location);
-	listop->op_first->op_next = range->op_next;
-	right->op_next = (OP*)listop;
-	listop->op_next = listop->op_first;
+	range->op_first = NULL;
+	range->op_last = NULL;
 
 #ifdef PERL_MAD
 	op_getmad(expr,(OP*)listop,'O');
@@ -3157,7 +3151,7 @@ Perl_newFOROP(pTHX_ OPFLAGS flags, char *label, OP *sv, OP *expr, OP *block, OP 
 	iterflags |= OPf_SPECIAL;
     }
     else {
-        expr = mod(force_list(expr), OP_GREPSTART);
+        expr = mod(expr, OP_GREPSTART);
     }
 
     loop = (LOOP*)list(convert(OP_ENTERITER, iterflags,
