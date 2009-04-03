@@ -144,7 +144,8 @@ is a lexical $_ in scope.
 	dSP; dAXMARK; dITEMS
 #endif
 
-#define dXSTARG SV * const targ = PAD_SV(PL_op->op_targ)
+#define dXSTARG SV * const targ = ((PL_op->op_private & OPpENTERSUB_HASTARG) \
+			     ? PAD_SV(PL_op->op_targ) : sv_newmortal())
 
 /* Should be used before final PUSHi etc. if not in PPCODE section. */
 #define XSprePUSH (sp = PL_stack_base + ax - 1)

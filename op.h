@@ -172,7 +172,9 @@ Deprecated.  Use C<GIMME_V> instead.
 #define OPpDEREF_HV		64	/*   Want ref to HV. */
 #define OPpDEREF_SV		(32|64)	/*   Want ref to SV. */
   /* OP_ENTERSUB only */
+#define OPpENTERSUB_BLOCK       2       /* Accepts only one arguments which is assigned to my $_ */
 #define OPpENTERSUB_DB		16	/* Debug subroutine. */
+#define OPpENTERSUB_HASTARG	32	/* Called from OP tree. */
   /* OP_ENTERSUB and OP_RV2CV only */
 #define OPpENTERSUB_AMPER	8	/* Used & form to call. */
 #define OPpENTERSUB_INARGS	4	/* Lval used as arg to a sub. */
