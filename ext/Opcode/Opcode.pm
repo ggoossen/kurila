@@ -324,7 +324,7 @@ invert_opset function.
     arrayexpand enter_arrayexpand_assign enter_hashexpand_assign
     hashexpand expand nelems
 
-    cond_expr flip flop andassign orassign dorassign and or dor xor
+    cond_expr andassign orassign dorassign and or dor xor
 
     warn die lineseq nextstate scope enter leave
 
