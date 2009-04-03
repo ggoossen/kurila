@@ -240,8 +240,8 @@ package ExtUtils::CBuilder::Platform::Windows::MSVC;
 
 sub format_compiler_cmd($self, %< %spec) {
 
-  foreach my $path (  @{ %spec{?includes} || \@() },
-                     < @{ %spec{?perlinc}  || \@() } ) {
+    foreach my $path (  @{ %spec{?includes} || \@() }
+                        +@+ @{ %spec{?perlinc}  || \@() } ) {
     $path = '-I' . $path;
   }
 
@@ -363,8 +363,8 @@ package ExtUtils::CBuilder::Platform::Windows::BCC;
 
 sub format_compiler_cmd($self, %< %spec) {
 
-  foreach my $path (  @{ %spec{?includes} || \@() },
-                     < @{ %spec{?perlinc}  || \@() } ) {
+    foreach my $path (  @{ %spec{?includes} || \@() }
+                        +@+ @{ %spec{?perlinc}  || \@() } ) {
     $path = '-I' . $path;
   }
 
@@ -490,8 +490,8 @@ package ExtUtils::CBuilder::Platform::Windows::GCC;
 
 sub format_compiler_cmd($self, %< %spec) {
 
-  foreach my $path (  @{ %spec{?includes} || \@() },
-                     < @{ %spec{?perlinc}  || \@() } ) {
+    foreach my $path (  @{ %spec{?includes} || \@() }
+                        +@+ @{ %spec{?perlinc}  || \@() } ) {
     $path = '-I' . $path;
   }
 

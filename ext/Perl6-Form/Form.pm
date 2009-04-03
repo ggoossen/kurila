@@ -1009,7 +1009,7 @@ sub make_cols($formatters,$prevformatters,$parts, $opts, $maxheight) {
 			$maxheight -= $minimaxheight||0;
 		}
 	}
-	for my $g ( @maxgroups, < @mingroups) {
+	for my $g ( @maxgroups +@+ @mingroups) {
 		my $text = $g->[-1]{?src};
 		next if substr($$text,pos($$text)||0) =~ m/\S/;
 		for (1..nelems @$g) {

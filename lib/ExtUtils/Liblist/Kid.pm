@@ -321,7 +321,7 @@ sub _win32_ext($self, $potential_libs, $verbose, $give_libs) {
             }
 
             my $found_lib = 0;
-            foreach my $thispth ( @searchpath, < @libpath){
+            foreach my $thispth ( @searchpath +@+ @libpath){
                 unless (-f ($fullname="$thispth\\$_")) {
                     warn "'$thislib' not found as '$fullname'\n" if $verbose;
                     next;

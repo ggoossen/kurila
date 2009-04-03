@@ -32,10 +32,10 @@ sub do_thread {
     is(my_cxt_getint(), 4321, "new int value (child)");
 
     is(my_cxt_getsv($_), "initial_clone", "initial sv value (child)$_")
-	    foreach '', ' (context arg)';
+	    foreach @: '', ' (context arg)';
     my_cxt_setsv("dcba");
     is(my_cxt_getsv($_),  "dcba", "new SV value (child)$_")
-	    foreach '', ' (context arg)';
+	    foreach @: '', ' (context arg)';
 }
 
 SKIP: do {

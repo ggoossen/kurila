@@ -132,14 +132,14 @@ ok !defined uncompress (\$compr) ;
 # ==============================
 
 $hello = "I am a HAL 9000 computer" ;
-my @hello = @( split('', $hello) );
+my @hello = split('', $hello);
 my ($err, $X, $status);
  
 ok($x = deflateInit( \%(Bufsize => 1) ) );
 ok $x ;
  
 my $Answer = '';
-foreach (<@hello)
+foreach (@hello)
 {
     @($X, $status) =  $x->deflate($_) ;
     last unless $status == Z_OK ;
@@ -153,7 +153,7 @@ ok    (@(@($X, $status) =  $x->flush())[?1] == Z_OK ) ;
 $Answer .= $X ;
  
  
-my @Answer = @( split('', $Answer) );
+my @Answer = split('', $Answer);
  
 my $k;
 ok ($k = inflateInit( \%(Bufsize => 1)) ) ;
@@ -161,7 +161,7 @@ ok $k ;
  
 my $GOT = '';
 my $Z;
-foreach (< @Answer)
+foreach (@Answer)
 {
     @($Z, $status) =  $k->inflate($_) ;
     $GOT .= $Z ;
@@ -201,7 +201,7 @@ ok $x->total_in() == length $hello ;
 ok $x->total_out() == length $Answer ;
 
  
-@Answer = @( split('', $Answer) );
+@Answer = split('', $Answer);
  
 ok ($k = inflateInit( \%(Bufsize => 1)) ) ;
 ok $k ;
@@ -211,7 +211,7 @@ ok $k->total_in() == 0 ;
 ok $k->total_out() == 0 ;
  
 $GOT = '';
-foreach ( < @Answer)
+foreach (@Answer)
 {
     @($Z, $status) =  $k->inflate($_) ;
     $GOT .= $Z ;
@@ -536,13 +536,13 @@ do {
     # =================
     
     $hello = "Test test test test test";
-    @hello = @( split('', $hello) );
+    @hello = split('', $hello);
      
     ok ($x = deflateInit( Bufsize => 1, WindowBits => -MAX_WBITS() ) ) ;
     ok $x ;
      
     $Answer = '';
-    foreach ( < @hello)
+    foreach (@hello)
     {
         @($X, $status) =  $x->deflate($_) ;
         last unless $status == Z_OK ;

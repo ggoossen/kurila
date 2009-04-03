@@ -56,7 +56,7 @@ if ($WARNINGS_ON_BOOTSTRAP) {
     XS::APItest->bootstrap( $VERSION);
 } else {
     # More CHECK and INIT blocks that could warn:
-    local $^WARNING = undef;
+    local $^WARNING = 0;
     XS::APItest->bootstrap( $VERSION);
 }
 

@@ -585,7 +585,7 @@ sub compile {
 	my $self = B::Deparse->new(< @args);
 	# First deparse command-line args
 	if ($^WARNING) { # deparse -w
-	    print $^STDOUT, qq(BEGIN \{ \$^W = $^WARNING; \}\n);
+	    print $^STDOUT, qq(BEGIN \{ \$^WARNING = $^WARNING; \}\n);
 	}
 	if ($^INPUT_RECORD_SEPARATOR ne "\n" or defined $O::savebackslash) { # deparse -l and -0
 	    my $fs = perlstring($^INPUT_RECORD_SEPARATOR) || 'undef';
@@ -2031,10 +2031,8 @@ sub range($self, $op, $cx, $type) {
     return $self->maybe_parens("$left $type $right", $cx, 9);
 }
 
-sub pp_flop($self, $op, $cx) {
-    my $flip = $op->first;
-    my $type = ($flip->flags ^&^ OPf_SPECIAL) ?? "..." !! "..";
-    return $self->range($flip->first, $cx, $type);
+sub pp_range($self, $op, $cx) {
+    return $self->range($op, $cx, "..");
 }
 
 # one-line while/until is handled in pp_leave
@@ -2455,11 +2453,10 @@ sub loop_common($self, $op, $cx, $init) {
 	if ($ary->name eq 'null' and $enter->private ^&^ OPpITER_REVERSED) {
 	    # "reverse" was optimised away
 	    $ary = listop($self, $ary->first->sibling, 1, 'reverse');
-	} elsif ($enter->flags ^&^ OPf_SPECIAL
-	    and not null $ary->first->sibling->sibling)
+	} elsif ($enter->flags ^&^ OPf_SPECIAL)
 	{
-	    $ary = $self->deparse($ary->first->sibling, 9) . " .. " .
-	      $self->deparse($ary->first->sibling->sibling, 9);
+	    $ary = $self->deparse($ary->first, 9) . " .. " .
+	      $self->deparse($ary->first->sibling, 9);
 	} else {
 	    $ary = $self->deparse($ary, 1);
 	}
