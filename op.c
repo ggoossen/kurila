@@ -920,9 +920,9 @@ Perl_bind_match(pTHX_ I32 type, OP *left, OP *right)
 
     ismatchop = rtype == OP_MATCH ||
          	rtype == OP_SUBST;
-    if (ismatchop && right->op_private & OPpTARGET_MY) {
+    if (ismatchop && right->op_flags & OPf_TARGET_MY) {
 	right->op_targ = 0;
-	right->op_private &= ~OPpTARGET_MY;
+	right->op_flags &= ~OPf_TARGET_MY;
     }
     if (!(right->op_flags & OPf_STACKED) && ismatchop) {
 	OP *newleft;
@@ -1282,7 +1282,8 @@ Perl_convert(pTHX_ I32 type, OPFLAGS flags, OP *o, SV *location)
 /*
 =for apidoc op_assign
 
-op_assign modified the OP C<*o> to be assignable, and returns the OP which finishes the assignment.
+op_assign modified the OP C<*o> to be assignable, and returns the OP
+which finishes the assignment.
 
 =cut
 */
@@ -4072,7 +4073,7 @@ Perl_ck_concat(pTHX_ OP *o)
     PERL_ARGS_ASSERT_CK_CONCAT;
     PERL_UNUSED_CONTEXT;
 
-    if (kid->op_type == OP_CONCAT && !(kid->op_private & OPpTARGET_MY) &&
+    if (kid->op_type == OP_CONCAT && !(kid->op_flags & OPf_TARGET_MY) &&
 	    !(kUNOP->op_first->op_flags & OPf_MOD))
         o->op_flags |= OPf_STACKED;
     return o;
@@ -4937,7 +4938,7 @@ Perl_ck_sassign(pTHX_ OP *o)
     if ((PL_opargs[kid->op_type] & OA_TARGLEX)
 	&& !(kid->op_flags & OPf_STACKED)
 	/* Cannot steal the second time! */
-	&& !(kid->op_private & OPpTARGET_MY)
+	&& !(kid->op_flags & OPf_TARGET_MY)
 	/* Keep the full thing for madskills */
 	&& !PL_madskills
 	)
@@ -4956,7 +4957,7 @@ Perl_ck_sassign(pTHX_ OP *o)
 /* 	    op_free(o->op_sibling); */
 	    op_free(o);
 	    op_free(kkid);
-	    kid->op_private |= OPpTARGET_MY;	/* Used for context settings */
+	    kid->op_flags |= OPf_TARGET_MY;	/* Used for context settings */
 	    return kid;
 	}
     }
@@ -4974,7 +4975,7 @@ Perl_ck_match(pTHX_ OP *o)
 	const PADOFFSET offset = pad_findmy("$_");
 	if (offset != NOT_IN_PAD && !(PAD_COMPNAME_FLAGS_isOUR(offset))) {
 	    o->op_targ = offset;
-	    o->op_private |= OPpTARGET_MY;
+	    o->op_flags |= OPf_TARGET_MY;
 	}
     }
     if (o->op_type == OP_MATCH || o->op_type == OP_QR)
@@ -5623,14 +5624,14 @@ Perl_peep(pTHX_ register OP *o)
 
 	case OP_CONCAT:
 	    if (o->op_next && o->op_next->op_type == OP_STRINGIFY) {
-		if (o->op_next->op_private & OPpTARGET_MY) {
+		if (o->op_next->op_flags & OPf_TARGET_MY) {
 		    if (o->op_flags & OPf_STACKED) /* chained concats */
 			break; /* ignore_optimization */
 		    else {
 			/* assert(PL_opargs[o->op_type] & OA_TARGLEX); */
 			o->op_targ = o->op_next->op_targ;
 			o->op_next->op_targ = 0;
-			o->op_private |= OPpTARGET_MY;
+			o->op_flags |= OPf_TARGET_MY;
 		    }
 		}
 		op_null(o->op_next);

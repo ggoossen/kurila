@@ -25,7 +25,7 @@ PP(pp_match)
 
     if (PL_op->op_flags & OPf_STACKED)
 	TARG = POPs;
-    else if (PL_op->op_private & OPpTARGET_MY)
+    else if (PL_op->op_flags & OPf_TARGET_MY)
 	GETTARGET;
     else {
 	TARG = DEFSV;
@@ -299,7 +299,7 @@ PP(pp_subst)
     register SV *dstr = (pm->op_pmflags & PMf_CONST) ? POPs : NULL;
     if (PL_op->op_flags & OPf_STACKED)
 	TARG = POPs;
-    else if (PL_op->op_private & OPpTARGET_MY)
+    else if (PL_op->op_flags & OPf_TARGET_MY)
 	GETTARGET;
     else {
 	TARG = DEFSV;

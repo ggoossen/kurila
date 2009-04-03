@@ -140,8 +140,10 @@ Deprecated.  Use C<GIMME_V> instead.
                                    "pop_assing_part" and without pusing
                                    onto the stack */
 #define OPf_OPTIONAL      0x400   /*  assignment is optional, flags
-						  should be passed to "pop_assign_part"
-					       */
+				      should be passed to "pop_assign_part"
+				  */
+#define OPf_TARGET_MY	0x800	/* Target is PADMY. (for ops with TARGLEX */
+
 
 /* old names; don't use in new code, but don't break them, either */
 #define OPf_LIST	OPf_WANT_LIST
@@ -188,10 +190,6 @@ Deprecated.  Use C<GIMME_V> instead.
 #define OPpOUR_INTRO		16	/* Variable was in an our() */
   /* OP_PADSV only */
   /* for OP_RV2?V, lower bits carry hints (currently only HINT_STRICT_REFS) */
-
-/* Private for OPs with TARGLEX */
-  /* (lower bits may carry MAXARG) */
-#define OPpTARGET_MY		16	/* Target is PADMY. */
 
 /* Private for OP_ENTERITER and OP_ITER */
 #define OPpITER_REVERSED	4	/* for (reverse ...) */

@@ -12,7 +12,7 @@ use B < qw(class main_root main_start main_cv svref_2object opnumber perlstring
 	 OPf_WANT OPf_WANT_VOID OPf_WANT_SCALAR OPf_WANT_LIST
 	 OPf_KIDS OPf_REF OPf_STACKED OPf_SPECIAL OPf_MOD
 	 OPpLVAL_INTRO OPpOUR_INTRO OPpENTERSUB_AMPER OPpSLICE OPpCONST_BARE
-	 OPpTARGET_MY
+	 OPf_TARGET_MY
 	 OPpEXISTS_SUB OPpSORT_NUMERIC OPpSORT_INTEGER
 	 OPpSORT_REVERSE OPpSORT_DESCEND OPpITER_REVERSED
 	 SVf_IOK SVf_NOK SVf_ROK SVf_POK SVpad_OUR SVf_FAKE SVs_RMG SVs_SMG
@@ -83,7 +83,7 @@ use warnings ();
 # - added support for Hugo's new OP_SETSTATE (like nextstate)
 # Changes between 0.58 and 0.59
 # - added support for Chip's OP_METHOD_NAMED
-# - added support for Ilya's OPpTARGET_MY optimization
+# - added support for Ilya's OPf_TARGET_MY optimization
 # - elided arrows before `()' subscripts when possible
 # Changes between 0.59 and 0.60
 # - support for method attribues was added
@@ -951,7 +951,7 @@ sub maybe_local($self, $op, $cx, $text) {
 }
 
 sub maybe_targmy($self, $op, $cx, $func, @< @args) {
-    if ($op->private ^&^ OPpTARGET_MY) {
+    if ($op->flags ^&^ OPf_TARGET_MY) {
 	my $var = $self->padname( <$op->targ);
 	my $val = $func->($self, $op, 7, < @args);
 	return $self->maybe_parens("$var = $val", $cx, 7);

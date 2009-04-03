@@ -823,7 +823,7 @@ STATIC SV* S_dump_op_flags_private(pTHX_ const OP* o)
     PERL_ARGS_ASSERT_DUMP_OP_FLAGS_PRIVATE;
 
     if (PL_opargs[optype] & OA_TARGLEX) {
-	if (o->op_private & OPpTARGET_MY)
+	if (o->op_flags & OPf_TARGET_MY)
 	    sv_catpv(tmpsv, ",TARGET_MY");
     }
     else if (optype == OP_REPEAT) {

@@ -151,7 +151,7 @@ Perl_scalarvoid(pTHX_ OP *o)
 	return o;
     }
 
-    if ((o->op_private & OPpTARGET_MY)
+    if ((o->op_flags & OPf_TARGET_MY)
 	&& (PL_opargs[o->op_type] & OA_TARGLEX))/* OPp share the meaning */
     {
 	return scalar(o);			/* As if inside SASSIGN */
@@ -401,7 +401,7 @@ Perl_list(pTHX_ OP *o)
 	return o;
     }
 
-    if ((o->op_private & OPpTARGET_MY)
+    if ((o->op_flags & OPf_TARGET_MY)
 	&& (PL_opargs[o->op_type] & OA_TARGLEX))/* OPp share the meaning */
     {
 	return o;				/* As if inside SASSIGN */
@@ -519,7 +519,7 @@ Perl_mod(pTHX_ OP *o, I32 type)
     if (!o || (PL_parser && PL_parser->error_count))
 	return o;
 
-    if ((o->op_private & OPpTARGET_MY)
+    if ((o->op_flags & OPf_TARGET_MY)
 	&& (PL_opargs[o->op_type] & OA_TARGLEX))/* OPp share the meaning */
     {
 	return o;
