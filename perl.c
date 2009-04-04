@@ -2161,6 +2161,7 @@ Perl_call_sv(pTHX_ SV *sv, VOL I32 flags)
     I32 oldscope;
     bool oldcatch = CATCH_GET;
     int ret;
+    int stack_offset = 0;
     OP* const oldop = PL_op;
     dJMPENV;
 
@@ -2199,6 +2200,7 @@ Perl_call_sv(pTHX_ SV *sv, VOL I32 flags)
 
     if (flags & G_ASSIGNMENT) {
 	PL_op->op_flags |= OPf_ASSIGN;
+	--stack_offset;
     }
 
     if (flags & G_METHOD) {
@@ -2214,9 +2216,9 @@ Perl_call_sv(pTHX_ SV *sv, VOL I32 flags)
     if (!(flags & G_EVAL)) {
 	CATCH_SET(TRUE);
 	CALL_BODY_SUB((OP*)&myop);
-	if (PL_stack_sp - (PL_stack_base + oldmark) == 1)
+	if (PL_stack_sp - (PL_stack_base + oldmark + stack_offset) == 1)
 	    retval = *PL_stack_sp--;
-	assert(PL_stack_sp == (PL_stack_base + oldmark - (flags & G_ASSIGNMENT ? 1 : 0)));
+	assert(PL_stack_sp == (PL_stack_base + oldmark + stack_offset));
 	CATCH_SET(oldcatch);
     }
     else {
@@ -2264,7 +2266,7 @@ Perl_call_sv(pTHX_ SV *sv, VOL I32 flags)
     }
 
     if (flags & G_DISCARD) {
-	assert(PL_stack_sp == (PL_stack_base + oldmark - (flags & G_ASSIGNMENT ? 1 : 0)));
+	assert(PL_stack_sp == (PL_stack_base + oldmark + stack_offset));
 	retval = NULL;
 	FREETMPS;
 	LEAVE;

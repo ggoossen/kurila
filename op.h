@@ -183,6 +183,7 @@ Deprecated.  Use C<GIMME_V> instead.
 #define OPpENTERSUB_INARGS	4	/* Lval used as arg to a sub. */
 #define OPpENTERSUB_SAVEARGS    128     /* Save the arguments in the targ */
 #define OPpENTERSUB_TARGARGS    64      /* Use the save argument in targ */
+#define OPpENTERSUB_SAVE_DISCARD  2   /* Discard the value returned */
 
   /* OP_GV only */
 #define OPpEARLY_CV		32	/* foo() called before sub foo was parsed */

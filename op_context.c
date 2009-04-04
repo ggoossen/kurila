@@ -654,6 +654,7 @@ Perl_mod(pTHX_ OP *o, I32 type)
             &(cUNOPo->op_first),
             type == OP_NULL ? o->op_type : type
             );
+
 	localize = 1;
         break;
     case OP_ENTERSUB:

@@ -830,6 +830,10 @@ STATIC SV* S_dump_op_flags_private(pTHX_ const OP* o)
 	if (o->op_private & OPpREPEAT_DOLIST)
 	    sv_catpv(tmpsv, ",DOLIST");
     }
+    if (optype == OP_ENTERSUB_SAVE) {
+	if (o->op_private & OPpENTERSUB_SAVE_DISCARD)
+	    sv_catpv(tmpsv, ",DISCARD");
+    }
     else if (optype == OP_ENTERSUB ||
 	     optype == OP_RV2SV ||
 	     optype == OP_GVSV ||

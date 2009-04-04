@@ -1298,7 +1298,9 @@ PP(pp_entersub_save)
     AV* args = svTav(PAD_SVl(PL_op->op_targ));
     SV* new_value = TOPs;
     save_call_sv(args, new_value);
-    return NORMAL;
+    if (PL_op->op_private & OPpENTERSUB_SAVE_DISCARD)
+	SP--;
+    RETURN;
 }
 
 PP(pp_entersub_targargs)
@@ -1333,6 +1335,7 @@ PP(pp_entersub)
     I32 gimme = GIMME_V;
     const OPFLAGS op_flags = PL_op->op_flags;
     const bool hasargs = (op_flags & OPf_STACKED) != 0;
+    const bool is_assignment = (op_flags & OPf_ASSIGN) != 0;
     assert(hasargs);
 
     /* subs are always in scalar context */
@@ -1416,7 +1419,6 @@ PP(pp_entersub)
 	dMARK;
 	register I32 items = SP - MARK;
 	AV* const padlist = CvPADLIST(cv);
-	const bool is_assignment = (op_flags & OPf_ASSIGN) ? 1 : 0;
 	PUSHBLOCK(cx, CXt_SUB, is_assignment ? MARK - 1 : MARK );
 	PUSHSUB(cx);
 	cx->blk_sub.retop = PL_op->op_next;
@@ -1544,6 +1546,9 @@ PP(pp_entersub)
     }
     else {
 	I32 markix = TOPMARK;
+
+	if (is_assignment)
+	    --markix;
 
 	PUTBACK;
 

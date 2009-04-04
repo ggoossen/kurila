@@ -15,54 +15,8 @@ Perl_boot_core_signals(pTHX)
     static const char file[] = __FILE__;
 
     /* Make it findable via fetchmethod */
-    newXS("signals::handler", XS_signals_handler, file);
-    newXS("signals::set_handler", XS_signals_set_handler, file);
+    newXSproto("signals::handler", XS_signals_handler, file, "$?=$");
     newXS("signals::supported", XS_signals_supported, file);
-}
-
-XS(XS_signals_handler)
-{
-    dVAR;
-    dXSARGS;
-    PERL_UNUSED_ARG(cv);
-    if (items != 1)
-	Perl_croak(aTHX_ "Usage: signals::handler(signalname)");
-    {
-        SV* namesv = POPs;
-        SV* sv;
-        /* Are we fetching a signal entry? */
-        const I32 i = whichsig(SvPV_nolen_const(namesv));
-
-        sv = newSV(0);
-        mXPUSHs(sv);
-        if (i <= 0) {
-            Perl_croak(aTHX_ "No such signal: SIG%s", SvPV_nolen_const(namesv));
-        }
-        if (!PL_psig_ptr) {
-            Newxz(PL_psig_ptr,  SIG_SIZE, SV*);
-            Newxz(PL_psig_name, SIG_SIZE, SV*);
-            Newxz(PL_psig_pend, SIG_SIZE, int);
-        }
-        if(PL_psig_ptr[i])
-            sv_setsv(sv,sv_2mortal(newRV_inc(PL_psig_ptr[i])));
-        else {
-            Sighandler_t sigstate = rsignal_state(i);
-#ifdef FAKE_PERSISTENT_SIGNAL_HANDLERS
-            if (PL_sig_handlers_initted && PL_sig_ignoring[i])
-                sigstate = SIG_IGN;
-#endif
-#ifdef FAKE_DEFAULT_SIGNAL_HANDLERS
-            if (PL_sig_handlers_initted && PL_sig_defaulting[i])
-                sigstate = SIG_DFL;
-#endif
-            /* cache state so we don't fetch it again */
-            if(sigstate == (Sighandler_t) SIG_IGN)
-                sv_setpvs(sv,"IGNORE");
-            else
-                sv_setsv(sv,&PL_sv_undef);
-        }
-    }
-    XSRETURN(1);
 }
 
 #ifdef HAS_SIGPROCMASK
@@ -74,10 +28,9 @@ restore_sigmask(pTHX_ SV *save_sv)
 }
 #endif
 
-XS(XS_signals_set_handler)
+void
+S_signals_set_handler(SV* handlersv, SV* namesv)
 {
-    dVAR;
-    dXSARGS;
     I32 i;
     /* Need to be careful with SvREFCNT_dec(), because that can have side
      * effects (due to closures). We must make sure that the new disposition
@@ -88,19 +41,10 @@ XS(XS_signals_set_handler)
     const char *s;
     bool set_to_ignore = FALSE;
     bool set_to_default = FALSE;
-    SV* namesv;
-    SV* handlersv;
 #ifdef HAS_SIGPROCMASK
     sigset_t set, save;
     SV* save_sv;
 #endif
-
-    PERL_UNUSED_ARG(cv);
-    if (items != 2)
-	Perl_croak(aTHX_ "Usage: signals::set_handler(signalname, $handler)");
-
-    handlersv = POPs;
-    namesv = POPs;
 
     if ( SvROK(handlersv) ) {
 	if ( SvTYPE(SvRV(handlersv)) != SVt_PVCV )
@@ -160,7 +104,7 @@ XS(XS_signals_set_handler)
 #endif
         if(to_dec)
             SvREFCNT_dec(to_dec);
-        XSRETURN(0);
+        return;
     }
     if (set_to_ignore) {
 #ifdef FAKE_PERSISTENT_SIGNAL_HANDLERS
@@ -184,7 +128,56 @@ XS(XS_signals_set_handler)
 #endif
     if(to_dec)
         SvREFCNT_dec(to_dec);
-    XSRETURN(0);
+}
+
+XS(XS_signals_handler)
+{
+    dVAR;
+    dXSARGS;
+    SV* namesv = POPs;
+    PERL_UNUSED_ARG(cv);
+    assert(items == 1);
+
+    if (PL_op->op_flags & OPf_ASSIGN) {
+        SV* handlersv = POPs;
+        S_signals_set_handler(handlersv, namesv);
+    }
+
+    {
+        SV* sv;
+        /* Are we fetching a signal entry? */
+        const I32 i = whichsig(SvPV_nolen_const(namesv));
+
+        sv = newSV(0);
+        mXPUSHs(sv);
+        if (i <= 0) {
+            Perl_croak(aTHX_ "No such signal: SIG%s", SvPV_nolen_const(namesv));
+        }
+        if (!PL_psig_ptr) {
+            Newxz(PL_psig_ptr,  SIG_SIZE, SV*);
+            Newxz(PL_psig_name, SIG_SIZE, SV*);
+            Newxz(PL_psig_pend, SIG_SIZE, int);
+        }
+        if(PL_psig_ptr[i])
+            sv_setsv(sv,sv_2mortal(newRV_inc(PL_psig_ptr[i])));
+        else {
+            Sighandler_t sigstate = rsignal_state(i);
+#ifdef FAKE_PERSISTENT_SIGNAL_HANDLERS
+            if (PL_sig_handlers_initted && PL_sig_ignoring[i])
+                sigstate = SIG_IGN;
+#endif
+#ifdef FAKE_DEFAULT_SIGNAL_HANDLERS
+            if (PL_sig_handlers_initted && PL_sig_defaulting[i])
+                sigstate = SIG_DFL;
+#endif
+            /* cache state so we don't fetch it again */
+            if(sigstate == (Sighandler_t) SIG_IGN)
+                sv_setpvs(sv,"IGNORE");
+            else
+                sv_setsv(sv,&PL_sv_undef);
+        }
+    }
+    XSRETURN(1);
 }
 
 XS(XS_signals_supported)

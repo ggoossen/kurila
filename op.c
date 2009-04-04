@@ -1483,6 +1483,22 @@ Perl_assign(pTHX_ OP *o, bool partial, I32 *min_modcount, I32 *max_modcount)
 	o = mod(o, o->op_type);
 	break;
 
+    case OP_ENTERSUB_SAVE: {
+	OP* saveo = o;
+	saveo->op_private |= OPpENTERSUB_SAVE_DISCARD;
+	o = newUNOP(OP_ENTERSUB_TARGARGS, 0, saveo, saveo->op_location);
+	o->op_targ = saveo->op_targ;
+	o->op_flags |= OPf_ASSIGN | OPf_STACKED;
+	if (partial) {
+	    o->op_flags |= OPf_ASSIGN_PART;
+	    o->op_flags = (o->op_flags & ~OPf_WANT) | OPf_WANT_VOID;
+	}
+	(*max_modcount)++;
+	if ( ! (o->op_flags & OPf_OPTIONAL) )
+	    (*min_modcount)++;
+	break;
+    }
+
     case OP_ENTERSUB_TARGARGS:
 	o->op_flags |= OPf_ASSIGN;
 	if (partial) {
@@ -3902,43 +3918,35 @@ Perl_newXS_flags(pTHX_ const char *name, XSUBADDR_t subaddr,
 		 U32 flags)
 {
     CV *cv = newXS(name, subaddr, filename);
+    I32 n_minargs = 0;
+    I32 n_maxargs = -1;
 
     PERL_ARGS_ASSERT_NEWXS_FLAGS;
 
-    if (flags & XS_DYNAMIC_FILENAME) {
-	/* We need to "make arrangements" (ie cheat) to ensure that the
-	   filename lasts as long as the PVCV we just created, but also doesn't
-	   leak  */
-	STRLEN filename_len = strlen(filename);
-	STRLEN proto_and_file_len = filename_len;
-	char *proto_and_file;
-	STRLEN proto_len;
-
-	if (proto) {
-	    proto_len = strlen(proto);
-	    proto_and_file_len += proto_len;
-
-	    Newx(proto_and_file, proto_and_file_len + 1, char);
-	    Copy(proto, proto_and_file, proto_len, char);
-	    Copy(filename, proto_and_file + proto_len, filename_len + 1, char);
-	} else {
-	    proto_len = 0;
-	    proto_and_file = savepvn(filename, filename_len);
+    if (proto) {
+	const char* proto_i = proto;
+	while (*proto_i && *proto_i != ';' && *proto_i != '=' && *proto_i != '?') {
+	    n_minargs++;
+	    proto_i++;
 	}
-
-	/* This gets free()d.  :-)  */
-	sv_usepvn_flags((SV*)cv, proto_and_file, proto_and_file_len,
-			SV_HAS_TRAILING_NUL);
-	if (proto) {
-	    /* This gives us the correct prototype, rather than one with the
-	       file name appended.  */
-	    SvCUR_set(cv, proto_len);
-	} else {
-	    SvPOK_off(cv);
+	n_maxargs = n_minargs;
+	if (*proto_i == ';') {
+	    proto_i++;
+	    while (*proto_i && *proto_i != '=' && *proto_i != '?') {
+		n_maxargs++;
+		proto_i++;
+	    }
 	}
-    } else {
-	sv_setpv((SV *)cv, proto);
+	if (*proto_i == '?' && proto_i[1] == '=') {
+	    CvFLAGS(cv) |= CVf_OPTASSIGNARG;
+	}
+	if (proto_i[0] == '=') {
+	    CvFLAGS(cv) |= CVf_ASSIGNARG;
+	}
+	CvN_MINARGS(cv) = n_minargs;
+	CvN_MAXARGS(cv) = n_maxargs;
     }
+
     return cv;
 }
 
