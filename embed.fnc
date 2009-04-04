@@ -747,6 +747,7 @@ Ap	|void	|save_mortalizesv|NN SV* sv
 Ap	|void	|save_nogv	|NN GV* gv
 p	|void	|save_op
 Ap	|SV*	|save_scalar	|NN GV* gv
+Ap	|void	|save_call_sv	|NN SV* cv|NN AV* args|NN SV* new_value
 Ap	|void	|save_pptr	|NN char** pptr
 Ap	|void	|save_vptr	|NN void *ptr
 Ap	|void	|save_re_context

@@ -792,6 +792,7 @@
 #define save_op			Perl_save_op
 #endif
 #define save_scalar		Perl_save_scalar
+#define save_call_sv		Perl_save_call_sv
 #define save_pptr		Perl_save_pptr
 #define save_vptr		Perl_save_vptr
 #define save_re_context		Perl_save_re_context
@@ -1944,6 +1945,8 @@
 #define pp_enteriter		Perl_pp_enteriter
 #define pp_enterloop		Perl_pp_enterloop
 #define pp_entersub		Perl_pp_entersub
+#define pp_entersub_save	Perl_pp_entersub_save
+#define pp_entersub_targargs	Perl_pp_entersub_targargs
 #define pp_entertry		Perl_pp_entertry
 #define pp_eof			Perl_pp_eof
 #define pp_eprotoent		Perl_pp_eprotoent
@@ -2972,6 +2975,7 @@
 #define save_op()		Perl_save_op(aTHX)
 #endif
 #define save_scalar(a)		Perl_save_scalar(aTHX_ a)
+#define save_call_sv(a,b,c)	Perl_save_call_sv(aTHX_ a,b,c)
 #define save_pptr(a)		Perl_save_pptr(aTHX_ a)
 #define save_vptr(a)		Perl_save_vptr(aTHX_ a)
 #define save_re_context()	Perl_save_re_context(aTHX)
@@ -4132,6 +4136,8 @@
 #define pp_enteriter()		Perl_pp_enteriter(aTHX)
 #define pp_enterloop()		Perl_pp_enterloop(aTHX)
 #define pp_entersub()		Perl_pp_entersub(aTHX)
+#define pp_entersub_save()	Perl_pp_entersub_save(aTHX)
+#define pp_entersub_targargs()	Perl_pp_entersub_targargs(aTHX)
 #define pp_entertry()		Perl_pp_entertry(aTHX)
 #define pp_eof()		Perl_pp_eof(aTHX)
 #define pp_eprotoent()		Perl_pp_eprotoent(aTHX)

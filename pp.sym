@@ -216,6 +216,7 @@ Perl_pp_dorassign
 Perl_pp_method
 Perl_pp_entersub
 Perl_pp_entersub_targargs
+Perl_pp_entersub_save
 Perl_pp_leavesub
 Perl_pp_caller
 Perl_pp_warn

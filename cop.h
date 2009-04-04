@@ -518,6 +518,7 @@ L<perlcall>.
 #define G_METHOD      128       /* Calling method. */
 #define G_FAKINGEVAL  256	/* Faking an eval context for call_sv or
 				   fold_constants. */
+#define G_ASSIGNMENT  512	/* Call is an assignment */
 
 /* flag bits for PL_in_eval */
 #define EVAL_NULL	0	/* not in an eval */

@@ -2197,6 +2197,10 @@ Perl_call_sv(pTHX_ SV *sv, VOL I32 flags)
 	  && !(flags & G_NODEBUG))
 	PL_op->op_private |= OPpENTERSUB_DB;
 
+    if (flags & G_ASSIGNMENT) {
+	PL_op->op_flags |= OPf_ASSIGN;
+    }
+
     if (flags & G_METHOD) {
 	Zero(&method_op, 1, UNOP);
 	method_op.op_next = PL_op;
@@ -2212,7 +2216,7 @@ Perl_call_sv(pTHX_ SV *sv, VOL I32 flags)
 	CALL_BODY_SUB((OP*)&myop);
 	if (PL_stack_sp - (PL_stack_base + oldmark) == 1)
 	    retval = *PL_stack_sp--;
-	assert(PL_stack_sp == (PL_stack_base + oldmark));
+	assert(PL_stack_sp == (PL_stack_base + oldmark - (flags & G_ASSIGNMENT ? 1 : 0)));
 	CATCH_SET(oldcatch);
     }
     else {
@@ -2260,7 +2264,7 @@ Perl_call_sv(pTHX_ SV *sv, VOL I32 flags)
     }
 
     if (flags & G_DISCARD) {
-	assert(PL_stack_sp == PL_stack_base + oldmark);
+	assert(PL_stack_sp == (PL_stack_base + oldmark - (flags & G_ASSIGNMENT ? 1 : 0)));
 	retval = NULL;
 	FREETMPS;
 	LEAVE;

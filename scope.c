@@ -186,6 +186,20 @@ Perl_save_scalar(pTHX_ GV *gv)
     return *sptr;
 }
 
+void
+Perl_save_call_sv(pTHX_ SV *cv, AV* args, SV* new_value)
+{
+    dVAR;
+
+    PERL_ARGS_ASSERT_SAVE_CALL_SV;
+
+    SSCHECK(4);
+    SSPUSHPTR(SvREFCNT_inc(cv));
+    SSPUSHPTR(AvREFCNT_inc(args));
+    SSPUSHPTR(newSVsv(new_value));
+    SSPUSHINT(SAVEt_CALLSV);
+}
+
 /* Like save_sptr(), but also SvREFCNT_dec()s the new value.  Can be used to
  * restore a global SV to its prior contents, freeing new value. */
 void
@@ -958,6 +972,28 @@ Perl_leave_scope(pTHX_ I32 base)
 	    PL_localizing = 2;
 	    magic_set(SvPVX_const(name), value);
 	    PL_localizing = 0;
+	    break;
+	}
+	case SAVEt_CALLSV: {
+	    dSP;
+	    SV* new_value = sv_2mortal((SV*)SSPOPPTR);
+	    AV* args = av_2mortal((AV*)SSPOPPTR);
+	    SV* cv = sv_2mortal((SV*)SSPOPPTR);
+	    const I32 maxarg = av_len(args) + 1;
+	    
+	    ENTER;
+	    PUSHSTACK;
+	    PL_localizing = 2;
+	    XPUSHs(new_value);
+	    PUSHMARK(SP);
+	    EXTEND(SP, maxarg);
+	    Copy(AvARRAY(av), SP+1, maxarg, SV*);
+	    SP += maxarg;
+	    PUTBACK;
+	    call_sv(cv, G_DISCARD | G_ASSIGNMENT );
+	    PL_localizing = 0;
+	    POPSTACK;
+	    LEAVE;
 	    break;
 	}
 	case SAVEt_SAVESWITCHSTACK:

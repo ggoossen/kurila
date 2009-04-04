@@ -2,7 +2,7 @@
 
 BEGIN { require './test.pl'; }
 
-plan 26;
+plan 28;
 
 sub foo($x) {
     return $x;
@@ -105,3 +105,11 @@ is( join("*", (varsub = qw(aap noot mies))), "aap*noot*mies" );
 is( join("*", $var), "aap*noot*mies" );
 is( push(varsub, "wim"), 4 );
 is( join("*", $var), "aap*noot*mies*wim" );
+
+varsub = "aap";
+do {
+    local varsub;
+    varsub = "noot";
+    is(varsub, "noot");
+};
+is(varsub, "aap");

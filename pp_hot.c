@@ -1292,6 +1292,16 @@ PP(pp_leavesub)
     return cx->blk_sub.retop;
 }
 
+PP(pp_entersub_save)
+{
+    dSP;
+    AV* args = svTav(PAD_SVl(PL_op->op_targ));
+    SV* cv = av_pop(args);
+    SV* new_value = TOPs;
+    save_call_sv(cv, args, new_value);
+    return NORMAL;
+}
+
 PP(pp_entersub_targargs)
 {
     dSP;

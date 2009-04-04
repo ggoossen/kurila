@@ -483,6 +483,7 @@ Perl_save_long
 Perl_save_mortalizesv
 Perl_save_nogv
 Perl_save_scalar
+Perl_save_call_sv
 Perl_save_pptr
 Perl_save_vptr
 Perl_save_re_context

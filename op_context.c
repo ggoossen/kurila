@@ -648,6 +648,18 @@ Perl_mod(pTHX_ OP *o, I32 type)
 	localize = 1;
 	break;
 
+    case OP_ENTERSUB:
+        if ( ! type ) {
+            /* add localize opcode */
+            const PADOFFSET po = pad_alloc(OP_SASSIGN, SVs_PADTMP);
+            o->op_targ = po;
+            o->op_private |= OPpENTERSUB_SAVEARGS;
+            o = newUNOP(OP_ENTERSUB_SAVE, 0, scalar(o), o->op_location);
+            o->op_targ = po;
+        }
+	localize = 1;
+        break;
+
     case OP_SCOPE:
     case OP_LEAVE:
     case OP_ENTER:

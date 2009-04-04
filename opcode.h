@@ -209,6 +209,7 @@ EXTCONST char* const PL_op_name[] = {
 	"method",
 	"entersub",
 	"entersub_targargs",
+	"entersub_save",
 	"leavesub",
 	"caller",
 	"warn",
@@ -568,6 +569,7 @@ EXTCONST char* const PL_op_desc[] = {
 	"method lookup",
 	"subroutine entry",
 	"subroutine entry using saved args",
+	"subroutine entry saving value",
 	"subroutine exit",
 	"caller",
 	"warn",
@@ -939,6 +941,7 @@ EXT Perl_ppaddr_t PL_ppaddr[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_pp_method),
 	MEMBER_TO_FPTR(Perl_pp_entersub),
 	MEMBER_TO_FPTR(Perl_pp_entersub_targargs),
+	MEMBER_TO_FPTR(Perl_pp_entersub_save),
 	MEMBER_TO_FPTR(Perl_pp_leavesub),
 	MEMBER_TO_FPTR(Perl_pp_caller),
 	MEMBER_TO_FPTR(Perl_pp_warn),
@@ -1307,6 +1310,7 @@ EXT Perl_check_t PL_check[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_ck_method),	/* method */
 	MEMBER_TO_FPTR(Perl_ck_subr),	/* entersub */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* entersub_targargs */
+	MEMBER_TO_FPTR(Perl_ck_null),	/* entersub_save */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* leavesub */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* caller */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* warn */
@@ -1669,6 +1673,7 @@ EXTCONST U32 PL_opargs[] = {
 	0x00000240,	/* method */
 	0x00004249,	/* entersub */
 	0x00004240,	/* entersub_targargs */
+	0x00004240,	/* entersub_save */
 	0x00000200,	/* leavesub */
 	0x00013608,	/* caller */
 	0x0000481d,	/* warn */
