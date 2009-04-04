@@ -1292,6 +1292,27 @@ PP(pp_leavesub)
     return cx->blk_sub.retop;
 }
 
+PP(pp_entersub_targargs)
+{
+    dSP;
+    SV* cv;
+    SV* args = PAD_SVl(PL_op->op_targ);
+    if ( ! SvAVOK(args) )
+	DIE("interneal error: args is expected to be an array");
+    PUSHMARK(SP);
+    {
+	AV *const av = svTav(args);
+	const I32 maxarg = av_len(av);
+	EXTEND(SP, maxarg);
+	Copy(AvARRAY(av), SP+1, maxarg, SV*);
+	SP += maxarg;
+	cv = AvARRAY(av)[maxarg];
+    }
+    PUSHs(cv);
+    PUTBACK;
+    return pp_entersub();
+}
+
 PP(pp_entersub)
 {
     dVAR; dSP; dPOPss;
@@ -1306,6 +1327,17 @@ PP(pp_entersub)
     /* subs are always in scalar context */
     if (gimme == G_ARRAY) {
 	gimme= G_SCALAR;
+    }
+    
+    if (PL_op->op_private & OPpENTERSUB_SAVEARGS) {
+	/* save argument to 'op_targ' */
+	AV* args = newAV();
+	SV** mark;
+	SAVECLEARSV(PAD_SVl(PL_op->op_targ));
+	PAD_SVl(PL_op->op_targ) = avTsv(args);
+	for (mark=PL_stack_base+TOPMARK+1; mark <= SP; mark++)
+	    av_push(args, newSVsv(*mark));
+	av_push(args, SvREFCNT_inc(sv));
     }
 
     if (!sv)

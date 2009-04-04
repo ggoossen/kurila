@@ -3916,17 +3916,7 @@ PP(pp_arrayexpand)
 	    const I32 maxarg = AvFILL(av) + 1;
 	    (void)POPs;			/* XXXX May be optimized away? */
 	    EXTEND(SP, maxarg);
-	    if (SvRMAGICAL(av)) {
-		U32 i;
-		for (i=0; i < (U32)maxarg; i++) {
-		    SV ** const svp = av_fetch(av, i, FALSE);
-		    /* See note in pp_helem, and bug id #27839 */
-		    SP[i+1] = svp ? *svp : &PL_sv_undef;
-		}
-	    }
-	    else {
-		Copy(AvARRAY(av), SP+1, maxarg, SV*);
-	    }
+	    Copy(AvARRAY(av), SP+1, maxarg, SV*);
 	    SP += maxarg;
 	}
     }

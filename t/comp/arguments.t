@@ -2,7 +2,7 @@
 
 BEGIN { require './test.pl'; }
 
-plan 20;
+plan 26;
 
 sub foo($x) {
     return $x;
@@ -88,3 +88,20 @@ sub opt_assign($x, $y ?= $z) {
 
 is( (opt_assign("aap", "noot") = "mies"), "aap,noot='mies'" );
 is( opt_assign("aap", "noot"), 'aap,noot=undef' );
+
+is( (opt_assign("aap", "noot") .= "mies"), "aap,noot='aap,noot=undefmies'" );
+is( $args, "aap,noot='aap,noot=undefmies'" );
+
+my $var;
+
+sub varsub(?= $x) {
+    if (defined $x) {
+        $var = $x;
+    }
+    return $: $var;
+}
+
+is( join("*", (varsub = qw(aap noot mies))), "aap*noot*mies" );
+is( join("*", $var), "aap*noot*mies" );
+is( push(varsub, "wim"), 4 );
+is( join("*", $var), "aap*noot*mies*wim" );

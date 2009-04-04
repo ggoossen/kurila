@@ -578,14 +578,16 @@ proto	:	/* NULL */
                             intro_my();
                             $$ = (OP*)NULL; 
                         }
-	|	startproto ')'
+	|	startproto protoassign mintro ')'
 			{ 
                             CvFLAGS(PL_compcv) |= CVf_PROTO;
-                            $$ = newOP(OP_STUB, 0, LOCATION($1) );
+                            $$ = append_list(OP_LIST, NULL, opTlistop($2));
+                            if (! $$)
+                                $$ = newOP(OP_STUB, 0, LOCATION($1) );
                             PL_parser->in_my = FALSE;
                             PL_parser->expect = XBLOCK;
                             TOKEN_GETMAD($1,$$,'(');
-                            TOKEN_GETMAD($2,$$,')');
+                            TOKEN_GETMAD($4,$$,')');
                         }
 	|	startproto argexpr protoassign mintro ')'
 			{ 
@@ -701,7 +703,8 @@ listop	:	term ARROW method '(' listexprcom ')' /* $foo->bar(list) */
 			{ $$ = convert(OP_ENTERSUB, OPf_STACKED,
 				append_elem(OP_LIST,
 				    prepend_elem(OP_LIST, scalar($1), $5),
-				    newUNOP(OP_METHOD, 0, $3, $3->op_location)), $3->op_location);
+				    newUNOP(OP_METHOD, 0, $3, $3->op_location)),
+                                $3->op_location);
 			  TOKEN_GETMAD($2,$$,'A');
 			  TOKEN_GETMAD($4,$$,'(');
 			  TOKEN_GETMAD($6,$$,')');

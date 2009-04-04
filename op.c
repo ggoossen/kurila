@@ -1348,6 +1348,61 @@ Perl_op_assign(pTHX_ OP** po, I32 optype)
     
 	return copy_from_tmp;
     }
+    case OP_ENTERSUB:
+    {
+	I32 min_modcount = 0;
+	I32 max_modcount = 0;
+	OP* copyo;
+	OP* padop;
+	OP* padop2;
+	OP* copy_to_tmp;
+	OP* copy_from_tmp;
+	OP* o_sibling;
+
+	const PADOFFSET tmppo = pad_alloc(OP_SASSIGN, SVs_PADTMP);
+	const PADOFFSET argspo = pad_alloc(OP_SASSIGN, SVs_PADTMP);
+
+	padop = newOP(OP_PADSV, OPf_MOD | OPf_ASSIGN, o->op_location);
+	padop->op_private |= OPpLVAL_INTRO;
+	padop->op_targ = tmppo;
+
+	o->op_private |= OPpENTERSUB_SAVEARGS;
+	o->op_targ = argspo;
+
+	o_sibling = o->op_sibling;
+	o->op_sibling = NULL;
+	copy_to_tmp =
+	    newBINOP(
+		OP_SASSIGN,
+		    0,
+		    scalar(o), 
+		    scalar(padop),
+		    o->op_location
+		);
+	copy_to_tmp->op_sibling = o_sibling;
+	*po = copy_to_tmp;
+
+	copyo = newOP(OP_ENTERSUB_TARGARGS, 0,
+	    sv_mortalcopy(o->op_location));
+	copyo->op_targ = argspo;
+	copyo->op_private = o->op_private;
+	copyo->op_flags = o->op_flags;
+	copyo = assign(copyo, FALSE, &min_modcount, &max_modcount);
+
+	padop2 = newOP(OP_PADSV, 0, o->op_location);
+	padop2->op_targ = tmppo;
+
+	copy_from_tmp =
+	    newBINOP(
+		OP_SASSIGN,
+		    0,
+		    padop2,
+		    copyo,
+		    o->op_location
+		);
+    
+	return copy_from_tmp;
+    }
     case OP_LISTFIRST:
     {
 	/* LISTFIRST is only generated as part of C<op_assign> finish_assign op. */
@@ -1426,6 +1481,17 @@ Perl_assign(pTHX_ OP *o, bool partial, I32 *min_modcount, I32 *max_modcount)
 	if ( ! (o->op_flags & OPf_OPTIONAL) )
 	    (*min_modcount)++;
 	o = mod(o, o->op_type);
+	break;
+
+    case OP_ENTERSUB_TARGARGS:
+	o->op_flags |= OPf_ASSIGN;
+	if (partial) {
+	    o->op_flags |= OPf_ASSIGN_PART;
+	    o->op_flags = (o->op_flags & ~OPf_WANT) | OPf_WANT_VOID;
+	}
+	(*max_modcount)++;
+	if ( ! (o->op_flags & OPf_OPTIONAL) )
+	    (*min_modcount)++;
 	break;
 
     case OP_DOTDOTDOT:
@@ -2594,7 +2660,7 @@ Perl_newASSIGNOP(pTHX_ OPFLAGS flags, OP *left, I32 optype, OP *right, SV *locat
 	    if (finish_assign) {
 		o = newBINOP(OP_SASSIGN, 0, scalar(right),
 		    newOP(OP_LOGASSIGN_ASSIGN, 0, location), location);
-		o = append_elem(OP_LISTFIRST, o, finish_assign);
+		o = append_elem(OP_LISTLAST, o, finish_assign);
 		return newLOGOP(optype, 0, scalar(new_left), o, location);
 	    }
 	    else {
@@ -2609,7 +2675,7 @@ Perl_newASSIGNOP(pTHX_ OPFLAGS flags, OP *left, I32 optype, OP *right, SV *locat
 	    o = newBINOP(optype, OPf_STACKED,
 		mod(new_left, optype), scalar(right), location);
 	    if (finish_assign) {
-		o = append_elem(OP_LISTFIRST, o, finish_assign);
+		o = append_elem(OP_LISTLAST, o, finish_assign);
 	    }
 	    return o;
 	}
