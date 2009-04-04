@@ -187,14 +187,13 @@ Perl_save_scalar(pTHX_ GV *gv)
 }
 
 void
-Perl_save_call_sv(pTHX_ SV *cv, AV* args, SV* new_value)
+Perl_save_call_sv(pTHX_ AV* args, SV* new_value)
 {
     dVAR;
 
     PERL_ARGS_ASSERT_SAVE_CALL_SV;
 
     SSCHECK(4);
-    SSPUSHPTR(SvREFCNT_inc(cv));
     SSPUSHPTR(AvREFCNT_inc(args));
     SSPUSHPTR(newSVsv(new_value));
     SSPUSHINT(SAVEt_CALLSV);
@@ -978,17 +977,19 @@ Perl_leave_scope(pTHX_ I32 base)
 	    dSP;
 	    SV* new_value = sv_2mortal((SV*)SSPOPPTR);
 	    AV* args = av_2mortal((AV*)SSPOPPTR);
-	    SV* cv = sv_2mortal((SV*)SSPOPPTR);
-	    const I32 maxarg = av_len(args) + 1;
+	    const I32 maxarg = av_len(args);
+	    SV* cv = AvARRAY(args)[maxarg];
 	    
 	    ENTER;
 	    PUSHSTACK;
 	    PL_localizing = 2;
 	    XPUSHs(new_value);
 	    PUSHMARK(SP);
-	    EXTEND(SP, maxarg);
-	    Copy(AvARRAY(av), SP+1, maxarg, SV*);
-	    SP += maxarg;
+	    if (maxarg) {
+		EXTEND(SP, maxarg);
+		Copy(AvARRAY(args), SP+1, maxarg, SV*);
+		SP += maxarg;
+	    }
 	    PUTBACK;
 	    call_sv(cv, G_DISCARD | G_ASSIGNMENT );
 	    PL_localizing = 0;

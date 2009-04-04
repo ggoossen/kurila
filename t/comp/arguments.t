@@ -2,7 +2,7 @@
 
 BEGIN { require './test.pl'; }
 
-plan 28;
+plan 30;
 
 sub foo($x) {
     return $x;
@@ -111,5 +111,10 @@ do {
     local varsub;
     varsub = "noot";
     is(varsub, "noot");
+};
+is(varsub, "aap");
+do {
+    local varsub .= "mies";
+    is(varsub, "aapmies");
 };
 is(varsub, "aap");

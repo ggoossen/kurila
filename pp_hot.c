@@ -1296,9 +1296,8 @@ PP(pp_entersub_save)
 {
     dSP;
     AV* args = svTav(PAD_SVl(PL_op->op_targ));
-    SV* cv = av_pop(args);
     SV* new_value = TOPs;
-    save_call_sv(cv, args, new_value);
+    save_call_sv(args, new_value);
     return NORMAL;
 }
 
@@ -1313,9 +1312,11 @@ PP(pp_entersub_targargs)
     {
 	AV *const av = svTav(args);
 	const I32 maxarg = av_len(av);
-	EXTEND(SP, maxarg);
-	Copy(AvARRAY(av), SP+1, maxarg, SV*);
-	SP += maxarg;
+	if (maxarg) {
+	    EXTEND(SP, maxarg);
+	    Copy(AvARRAY(av), SP+1, maxarg, SV*);
+	    SP += maxarg;
+	}
 	cv = AvARRAY(av)[maxarg];
     }
     PUSHs(cv);

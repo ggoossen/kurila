@@ -2975,7 +2975,7 @@
 #define save_op()		Perl_save_op(aTHX)
 #endif
 #define save_scalar(a)		Perl_save_scalar(aTHX_ a)
-#define save_call_sv(a,b,c)	Perl_save_call_sv(aTHX_ a,b,c)
+#define save_call_sv(a,b)	Perl_save_call_sv(aTHX_ a,b)
 #define save_pptr(a)		Perl_save_pptr(aTHX_ a)
 #define save_vptr(a)		Perl_save_vptr(aTHX_ a)
 #define save_re_context()	Perl_save_re_context(aTHX)

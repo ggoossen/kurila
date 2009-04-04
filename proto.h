@@ -2661,12 +2661,11 @@ PERL_CALLCONV SV*	Perl_save_scalar(pTHX_ GV* gv)
 #define PERL_ARGS_ASSERT_SAVE_SCALAR	\
 	assert(gv)
 
-PERL_CALLCONV void	Perl_save_call_sv(pTHX_ SV* cv, AV* args, SV* new_value)
+PERL_CALLCONV void	Perl_save_call_sv(pTHX_ AV* args, SV* new_value)
 			__attribute__nonnull__(pTHX_1)
-			__attribute__nonnull__(pTHX_2)
-			__attribute__nonnull__(pTHX_3);
+			__attribute__nonnull__(pTHX_2);
 #define PERL_ARGS_ASSERT_SAVE_CALL_SV	\
-	assert(cv); assert(args); assert(new_value)
+	assert(args); assert(new_value)
 
 PERL_CALLCONV void	Perl_save_pptr(pTHX_ char** pptr)
 			__attribute__nonnull__(pTHX_1);

@@ -840,7 +840,7 @@ dorassign	defined or assignment (//=)	ck_null		s|
 
 method		method lookup		ck_method	d1
 entersub	subroutine entry	ck_subr		dmt1	L
-entersub_targargs	subroutine entry using saved args	ck_null		d1	L
+entersub_targargs	subroutine entry using saved args	ck_null		d0	L
 entersub_save	subroutine entry saving value	ck_null		d1	L
 leavesub	subroutine exit		ck_null		1	
 caller		caller			ck_fun		t%	S?

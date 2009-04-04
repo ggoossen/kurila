@@ -648,6 +648,14 @@ Perl_mod(pTHX_ OP *o, I32 type)
 	localize = 1;
 	break;
 
+    case OP_ENTERSUB_SAVE:
+        o = op_mod_assign(
+            o,
+            &(cUNOPo->op_first),
+            type == OP_NULL ? o->op_type : type
+            );
+	localize = 1;
+        break;
     case OP_ENTERSUB:
         if ( ! type ) {
             /* add localize opcode */

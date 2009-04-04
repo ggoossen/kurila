@@ -1349,6 +1349,7 @@ Perl_op_assign(pTHX_ OP** po, I32 optype)
 	return copy_from_tmp;
     }
     case OP_ENTERSUB:
+    case OP_ENTERSUB_SAVE:
     {
 	I32 min_modcount = 0;
 	I32 max_modcount = 0;
@@ -1358,9 +1359,10 @@ Perl_op_assign(pTHX_ OP** po, I32 optype)
 	OP* copy_to_tmp;
 	OP* copy_from_tmp;
 	OP* o_sibling;
+	const bool existingpo = o->op_type == OP_ENTERSUB_SAVE;
 
 	const PADOFFSET tmppo = pad_alloc(OP_SASSIGN, SVs_PADTMP);
-	const PADOFFSET argspo = pad_alloc(OP_SASSIGN, SVs_PADTMP);
+	const PADOFFSET argspo = existingpo ? o->op_targ : pad_alloc(OP_SASSIGN, SVs_PADTMP);
 
 	padop = newOP(OP_PADSV, OPf_MOD | OPf_ASSIGN, o->op_location);
 	padop->op_private |= OPpLVAL_INTRO;
@@ -1382,11 +1384,9 @@ Perl_op_assign(pTHX_ OP** po, I32 optype)
 	copy_to_tmp->op_sibling = o_sibling;
 	*po = copy_to_tmp;
 
-	copyo = newOP(OP_ENTERSUB_TARGARGS, 0,
-	    sv_mortalcopy(o->op_location));
+	copyo = newOP(OP_ENTERSUB_TARGARGS, 0, o->op_location);
 	copyo->op_targ = argspo;
-	copyo->op_private = o->op_private;
-	copyo->op_flags = o->op_flags;
+	copyo->op_flags = OPf_STACKED;
 	copyo = assign(copyo, FALSE, &min_modcount, &max_modcount);
 
 	padop2 = newOP(OP_PADSV, 0, o->op_location);
