@@ -281,7 +281,6 @@ use warnings 'void' ;
 "x" . "y"; # optimized to OP_CONST
 2 + 2; # optimized to OP_CONST
 use constant U => undef;
-U;
 5 || print $^STDOUT, "bad\n";	# test OPpCONST_SHORTCIRCUIT
 print $^STDOUT, "boo\n" if U;	# test OPpCONST_SHORTCIRCUIT
 
