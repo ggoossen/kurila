@@ -3926,15 +3926,20 @@ Perl_newXS_flags(pTHX_ const char *name, XSUBADDR_t subaddr,
     if (proto) {
 	const char* proto_i = proto;
 	while (*proto_i && *proto_i != ';' && *proto_i != '=' && *proto_i != '?') {
-	    n_minargs++;
-	    proto_i++;
+	    if (*proto_i != '\\')
+		++n_minargs;
+	    if (*proto_i == '[') {
+		while (*proto_i && *proto_i != ']')
+		    ++proto_i;
+	    }
+	    ++proto_i;
 	}
 	n_maxargs = n_minargs;
 	if (*proto_i == ';') {
-	    proto_i++;
+	    ++proto_i;
 	    while (*proto_i && *proto_i != '=' && *proto_i != '?') {
-		n_maxargs++;
-		proto_i++;
+		++n_maxargs;
+		++proto_i;
 	    }
 	}
 	if (*proto_i == '?' && proto_i[1] == '=') {
