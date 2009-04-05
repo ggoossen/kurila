@@ -1318,10 +1318,10 @@ can erase history if you really want to.
 
 =cut
 
-sub current_test($self, ?$num) {
+sub current_test($self ?= $num) {
 
     lock($self->{?Curr_Test});
-    if( defined $num ) {
+    if( $^is_assignment ) {
         unless( $self->{?Have_Plan} ) {
             die("Can't change the current test number without a plan!");
         }

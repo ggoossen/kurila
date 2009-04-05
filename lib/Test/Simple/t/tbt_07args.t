@@ -46,7 +46,7 @@ sub start_testing
 
     # remeber that we're testing
     $testing_num = $t->current_test;
-    $t->current_test(0);
+    $t->current_test = 0;
 }
 
 # each test test is actually two tests.  This is bad and wrong
@@ -65,7 +65,7 @@ sub my_test_test
   env::set_var('HARNESS_ACTIVE' => $original_harness_env);
 
   # reset the number of tests
-  $t->current_test($testing_num);
+  $t->current_test = $testing_num;
 
   # check we got the same values
   my $got;

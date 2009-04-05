@@ -79,7 +79,7 @@ push @Expected_Details, \%( 'ok'      => 1,
                           reason    => '',
                         );
 
-$Test->current_test(6);
+$Test->current_test = 6;
 print $^STDOUT, "ok 6 - current_test incremented\n";
 push @Expected_Details, \%( 'ok'      => 1,
                           actual_ok => undef,
@@ -99,9 +99,9 @@ is_deeply( \@details, \@Expected_Details );
 # This test has to come last because it thrashes the test details.
 do {
     my $curr_test = $Test->current_test;
-    $Test->current_test(4);
+    $Test->current_test = 4;
     my @details = $Test->details();
 
-    $Test->current_test($curr_test);
+    $Test->current_test = $curr_test;
     $Test->is_num( scalar nelems @details, 4 );
 };
