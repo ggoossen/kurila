@@ -9,7 +9,7 @@ BEGIN {
   }
 }
 
-use Test;
+use Test::More;
 BEGIN { plan tests => 11 }
 
 use ExtUtils::CBuilder;
@@ -35,7 +35,7 @@ ok -e $source_file;
 my $object_file = $b->object_file($source_file);
 ok 1;
 
-ok $object_file, $b->compile(source => $source_file);
+is $object_file, $b->compile(source => $source_file);
 
 my $lib_file = $b->lib_file($object_file);
 ok 1;
@@ -43,7 +43,7 @@ ok 1;
 my @($lib, @< @temps) =  $b->link(objects => $object_file,
                              module_name => 'compilet');
 $lib =~ s/"|'//g;
-ok $lib_file, $lib;
+is $lib_file, $lib;
 
 for (@($source_file, $object_file, $lib_file)) {
   s/"|'//g;
@@ -52,12 +52,12 @@ for (@($source_file, $object_file, $lib_file)) {
 
 my @words = $b->split_like_shell(' foo bar');
 if ($^OS_NAME eq 'MSWin32') {
-  ok (nelems @words), 1;
-  ok @words[0], ' foo bar';
+  is((nelems @words), 1);
+  is @words[0], ' foo bar';
   skip 'No splitting in split_like_shell() on Win32';
 }
 else {
-  ok nelems(@words), 2;
-  ok @words[0], 'foo';
-  ok @words[1], 'bar';
+  is nelems(@words), 2;
+  is @words[0], 'foo';
+  is @words[1], 'bar';
 }

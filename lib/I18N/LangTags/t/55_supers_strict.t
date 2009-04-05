@@ -3,7 +3,7 @@
 #sub I18N::LangTags::Detect::DEBUG () {10}
 use I18N::LangTags < qw(implicate_supers_strictly);
 
-use Test;
+use Test::More;
 BEGIN { plan tests => 19 };
 
 print $^STDOUT, "#\n# Testing strict (non-tight) insertion of super-ordinate language tags...\n#\n";

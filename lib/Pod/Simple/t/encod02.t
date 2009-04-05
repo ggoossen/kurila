@@ -1,5 +1,5 @@
 
-use Test;
+use Test::More;
 BEGIN { plan tests => 4 };
 
 #use Pod::Simple::Debug (5);

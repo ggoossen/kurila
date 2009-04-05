@@ -1,4 +1,4 @@
-use Test;
+use Test::More;
 use Cwd qw(cwd);
 use Win32;
 
@@ -43,7 +43,7 @@ ok(-f Win32::GetANSIPathName($file));
 ok(opendir(my $dh, Win32::GetANSIPathName($dir)));
 while ($_ = readdir($dh)) {
     next if /^\./;
-    ok($file, Win32::GetLongPathName("$dir\\$_"));
+    is($file, Win32::GetLongPathName("$dir\\$_"));
 }
 closedir($dh);
 
@@ -51,7 +51,7 @@ closedir($dh);
 my $full = Win32::GetFullPathName($dir);
 my $long = Win32::GetLongPathName($full);
 
-ok($long, Win32::GetLongPathName($home)."\\$dir");
+is($long, Win32::GetLongPathName($home)."\\$dir");
 
 # We can Win32::SetCwd() into the Unicode directory
 ok(Win32::SetCwd($dir));
@@ -63,9 +63,9 @@ my $subdir = cwd();
 # change back to home directory to make sure relative paths
 # in $^INCLUDE_PATH continue to work
 ok(chdir($home));
-ok(Win32::GetCwd(), $home);
+is(Win32::GetCwd(), $home);
 
-ok(Win32::GetLongPathName($w32dir), $long);
+is(Win32::GetLongPathName($w32dir), $long);
 
 # cwd() on Cygwin returns a mapped path that we need to translate
 # back to a Windows path. Invoking `cygpath` on $subdir doesn't work.
@@ -73,8 +73,8 @@ if ($^O eq "cygwin") {
     $subdir = Cygwin::posix_to_win_path($subdir, 1);
 }
 $subdir =~ s,/,\\,g;
-ok(Win32::GetLongPathName($subdir), $long);
+is(Win32::GetLongPathName($subdir), $long);
 
 # We can chdir() into the Unicode directory if we use the ANSI name
 ok(chdir(Win32::GetANSIPathName($dir)));
-ok(Win32::GetLongPathName(Win32::GetCwd()), $long);
+is(Win32::GetLongPathName(Win32::GetCwd()), $long);

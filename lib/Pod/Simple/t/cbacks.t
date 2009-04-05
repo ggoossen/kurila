@@ -5,7 +5,7 @@ BEGIN {
     }
 }
 
-use Test;
+use Test::More;
 BEGIN { plan tests => 8 };
 
 my $d;
@@ -37,7 +37,7 @@ while((nelems @from)) {
   print $^STDOUT, "#Testing via class $x, version ", $x->VERSION(), "\n";
   my $p = $x->new;
   my($got, $exp);
-  ok scalar($got = $x->_out(
+  is scalar($got = $x->_out(
     # Mutor:
     sub {
      @_[0]->code_handler(sub { $more .= @_[1] . ":" . @_[0] . "\n"       } );

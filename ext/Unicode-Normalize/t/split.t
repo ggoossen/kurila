@@ -8,7 +8,7 @@ BEGIN {
 
 #########################
 
-use Test;
+use Test::More;
 
 use warnings;
 BEGIN { plan tests => 14 };
@@ -33,24 +33,24 @@ our $unproc;  # the last starter and after
 #       $concat = $processed . normalize($form, $unprocessed.$unnormalized);
 
 @($proc, $unproc) = splitOnLastStarter("");
-ok($proc,   "");
-ok($unproc, "");
+is($proc,   "");
+is($unproc, "");
 
 @($proc, $unproc) = splitOnLastStarter("A");
-ok($proc,   "");
-ok($unproc, "A");
+is($proc,   "");
+is($unproc, "A");
 
 @($proc, $unproc) = splitOnLastStarter(_pack_U(0x41, 0x300, 0x327, 0x42));
-ok($proc,   _pack_U(0x41, 0x300, 0x327));
-ok($unproc, "B");
+is($proc,   _pack_U(0x41, 0x300, 0x327));
+is($unproc, "B");
 
 @($proc, $unproc) = splitOnLastStarter(_pack_U(0x4E00, 0x41, 0x301));
-ok($proc,   _pack_U(0x4E00));
-ok($unproc, _pack_U(0x41, 0x301));
+is($proc,   _pack_U(0x4E00));
+is($unproc, _pack_U(0x41, 0x301));
 
 @($proc, $unproc) = splitOnLastStarter(_pack_U(0x302, 0x301, 0x300));
-ok($proc,   "");
-ok($unproc, _pack_U(0x302, 0x301, 0x300));
+is($proc,   "");
+is($unproc, _pack_U(0x302, 0x301, 0x300));
 
 our $ka_grave = _pack_U(0x41, 0, 0x42, 0x304B, 0x300);
 our $dakuten  = _pack_U(0x3099);

@@ -5,7 +5,7 @@
 # Test a simple open in the cwd and tmpdir foreach of the
 # security levels
 
-use Test;
+use Test::More;
 BEGIN { plan tests => 13 }
 
 use File::Spec;
@@ -97,11 +97,12 @@ sub test_security {
       ok( (-e $fname1) );
       push(@files, $fname1); # store for end block
   } elsif (File::Temp->safe_level() != File::Temp::STANDARD) {
-      my $skip2 = "Skip: " . File::Spec->tmpdir() . " possibly insecure:  $($^EVAL_ERROR && $^EVAL_ERROR->message).  " .
-	 "See INSTALL under 'make test'";
-      skip($skip2, 1);
-      # plus we need an end block so the tests come out in the right order
-      eval q{ END { skip($skip2,1); } 1; } || die;
+    SKIP:
+      do {
+          my $skip2 = "Skip: " . File::Spec->tmpdir() . " possibly insecure:  $($^EVAL_ERROR && $^EVAL_ERROR->message).  " .
+            "See INSTALL under 'make test'";
+          skip($skip2, 2);
+      };
   } else {
       ok(0);
   }

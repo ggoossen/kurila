@@ -1,6 +1,6 @@
 #!perl -w
 
-use Test < qw(plan ok);
+use Test::More;
 plan tests => 12;
 
 do {
@@ -31,26 +31,26 @@ do {
 };
 
 my $ctx = LenDigest->new;
-ok($ctx->digest, "X0000");
+is($ctx->digest, "X0000");
 
 my $EBCDIC = ord('A') == 193;
 
 if ($EBCDIC) {
-    ok($ctx->hexdigest, "e7f0f0f0f0");
-    ok($ctx->b64digest, "5/Dw8PA");
+    is($ctx->hexdigest, "e7f0f0f0f0");
+    is($ctx->b64digest, "5/Dw8PA");
 } else {
-    ok($ctx->hexdigest, "5830303030");
-    ok($ctx->b64digest, "WDAwMDA");
+    is($ctx->hexdigest, "5830303030");
+    is($ctx->b64digest, "WDAwMDA");
 }
 
 $ctx->add("foo");
-ok($ctx->digest, "f0003");
+is($ctx->digest, "f0003");
 
 $ctx->add("foo");
-ok($ctx->hexdigest, $EBCDIC ?? "86f0f0f0f3" !! "6630303033");
+is($ctx->hexdigest, $EBCDIC ?? "86f0f0f0f3" !! "6630303033");
 
 $ctx->add("foo");
-ok($ctx->b64digest, $EBCDIC ?? "hvDw8PM" !! "ZjAwMDM");
+is($ctx->b64digest, $EBCDIC ?? "hvDw8PM" !! "ZjAwMDM");
 
 open(my $fh, ">", "xxtest$^PID") || die;
 binmode($fh);
@@ -62,7 +62,7 @@ $ctx->addfile(\*$fh);
 close($fh);
 unlink("xxtest$^PID") || warn;
 
-ok($ctx->digest, "a0301");
+is($ctx->digest, "a0301");
 
 try {
     $ctx->add_bits("1010");
@@ -70,7 +70,7 @@ try {
 ok($^EVAL_ERROR->{?description} =~ m/^Number of bits must be multiple of 8/);
 
 $ctx->add_bits($EBCDIC ?? "11100100" !! "01010101");
-ok($ctx->digest, "U0001");
+is($ctx->digest, "U0001");
 
 try {
     $ctx->add_bits("abc", 12);
@@ -78,7 +78,7 @@ try {
 ok($^EVAL_ERROR->{?description} =~ m/^Number of bits must be multiple of 8/);
 
 $ctx->add_bits("abc", 16);
-ok($ctx->digest, "a0002");
+is($ctx->digest, "a0002");
 
 $ctx->add_bits("abc", 32);
-ok($ctx->digest, "a0003");
+is($ctx->digest, "a0003");

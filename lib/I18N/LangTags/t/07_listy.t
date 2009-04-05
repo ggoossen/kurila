@@ -1,11 +1,11 @@
 
  # Time-stamp: "2003-10-10 17:37:34 ADT"
-use Test;
+use Test::More;
 BEGIN { plan tests => 17 };
 BEGIN { ok 1 }
 use I18N::LangTags::List;
 
-ok  I18N::LangTags::List::name('fr'), 'French';
+is  I18N::LangTags::List::name('fr'), 'French';
 ok  I18N::LangTags::List::name('fr-fr');
 ok !I18N::LangTags::List::name('El Zorcho');
 ok !I18N::LangTags::List::name();

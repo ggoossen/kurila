@@ -1,5 +1,5 @@
 
-use Test;
+use Test::More;
 BEGIN { plan tests => 31 };
 
 #use Pod::Simple::Debug (6);
@@ -11,8 +11,8 @@ use Pod::Simple::XMLOutStream;
 print $^STDOUT, "# Pod::Simple version $Pod::Simple::VERSION\n";
 sub e { Pod::Simple::DumpAsXML->_duo(< @_) }
 
-&ok( < e "", "" );
-&ok( < e "\n", "", );
+is( < e "", "" );
+is( < e "\n", "", );
 
 
 

@@ -13,7 +13,7 @@ BEGIN {
 
 $^OUTPUT_AUTOFLUSH = 1;
 
-use Test;
+use Test::More;
 
 BEGIN {
   plan tests => 4;
@@ -72,13 +72,13 @@ if ($^OS_NAME eq 'VMS') {
     foreach( @compare) {
         $count += grep {m/$_/}, @result;
     }
-    ok($count/(((nelems @result)-1)+1)-1,((nelems @compare)-1));
+    is($count/(((nelems @result)-1)+1)-1,((nelems @compare)-1));
 }
 elsif ('File::Spec'->case_tolerant || $^OS_NAME eq 'dos') {
-    ok(lc $result,lc $compare);
+    is(lc $result,lc $compare);
 }
 else {
-    ok($result,$compare);
+    is($result,$compare);
 }
 
 print $^STDOUT, "### searching for File::Find\n";
@@ -91,13 +91,13 @@ if ($^OS_NAME eq 'VMS') { # privlib is perl_root:[lib] OK but not under mms
     $compare = "lib.File]Find.pm";
     $result =~ s/perl_root:\[\-?\.?//i;
     $result =~ s/\[\-?\.?//i; # needed under `mms test`
-    ok($result,$compare);
+    is($result,$compare);
 }
 else {
     $compare = env::var('PERL_CORE') ??
       'File::Spec'->catfile( 'File::Spec'->updir, 'lib','File','Find.pm')
       !! 'File::Spec'->catfile(Config::config_value("privlib"),"File","Find.pm");
-    ok(_canon($result),_canon($compare));
+    is(_canon($result),_canon($compare));
 }
 
 # Search for a documentation pod rather than a module
@@ -113,7 +113,7 @@ print $^STDOUT, "### found $result\n";
 $compare = 'File::Spec'->catfile(
     env::var('PERL_CORE') ?? () !! < qw(t),
     'pod', 'testpods', 'lib', 'Pod' ,'Stuff.pm');
-ok(_canon($result),_canon($compare));
+is(_canon($result),_canon($compare));
 
 # make the path as generic as possible
 sub _canon

@@ -2,7 +2,7 @@
 # Test for File::Temp - POSIX functions
 
 
-use Test;
+use Test::More;
 BEGIN { plan tests => 6}
 
 use File::Temp < qw/ :POSIX unlink0 /;
@@ -49,7 +49,7 @@ if (defined $fh) {
   my $line = ~< $fh;
 
   print $^STDOUT, "# TMPFILE: Read line: $line";
-  ok( $original, $line);
+  is( $original, $line);
 
   close($fh);
 

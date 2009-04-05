@@ -6,7 +6,7 @@ BEGIN {
 }
 
 use Pod::Simple::Search;
-use Test;
+use Test::More;
 BEGIN { plan tests => 4 }
 
 print $^STDOUT, "# ", __FILE__,
@@ -69,7 +69,7 @@ my $where2name = $x->path2name;
 
 do {
 my $names = join "|", sort values %$where2name;
-ok $names, "perlzuk|zikzik";
+is $names, "perlzuk|zikzik";
 };
 
 

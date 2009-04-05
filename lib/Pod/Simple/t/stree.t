@@ -1,6 +1,6 @@
 
 
-use Test;
+use Test::More;
 BEGIN { plan tests => 33 };
 
 #use Pod::Simple::Debug (6);
@@ -23,8 +23,8 @@ sub x {
 ok 1;
 
 print $^STDOUT, "# a bit of meta-testing...\n";
-&ok( deq( 1,     1     ));
-&ok(!deq( 2,     1     ));
+ok( deq( 1,     1     ));
+ok(!deq( 2,     1     ));
 
 &ok( deq( undef, undef ));
 &ok(!deq( undef, 1     ));

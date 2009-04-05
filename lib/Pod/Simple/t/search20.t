@@ -6,7 +6,7 @@ BEGIN {
 }
 
 use Pod::Simple::Search;
-use Test;
+use Test::More;
 BEGIN { plan tests => 7 }
 
 print $^STDOUT, "# ", __FILE__,
@@ -66,23 +66,25 @@ $p =~ s/, +/,\n/g;
 $p =~ s/^/#  /mg;
 print $^STDOUT, $p;
 
+SKIP:
 do {
-my $names = join "|", sort values %$where2name;
-skip $^OS_NAME eq 'VMS' ?? '-- case may or may not be preserved' !! 0, 
-     $names, 
-     "Blorm|Suzzle|Zonk::Pronk|hinkhonk::Glunk|hinkhonk::Vliff|perlflif|perlthng|perlzuk|squaa|squaa::Glunk|squaa::Vliff|squaa::Wowo|zikzik";
+    my $names = join "|", sort values %$where2name;
+    skip '-- case may or may not be preserved', 1 if $^OS_NAME eq 'VMS';
+    is($names,
+       "Blorm|Suzzle|Zonk::Pronk|hinkhonk::Glunk|hinkhonk::Vliff|perlflif|perlthng|perlzuk|squaa|squaa::Glunk|squaa::Vliff|squaa::Wowo|zikzik");
 };
 
+SKIP:
 do {
-my $names = join "|", sort keys %$name2where;
-skip $^OS_NAME eq 'VMS' ?? '-- case may or may not be preserved' !! 0, 
-     $names, 
-     "Blorm|Suzzle|Zonk::Pronk|hinkhonk::Glunk|hinkhonk::Vliff|perlflif|perlthng|perlzuk|squaa|squaa::Glunk|squaa::Vliff|squaa::Wowo|zikzik";
+    my $names = join "|", sort keys %$name2where;
+    skip '-- case may or may not be preserved', 1 if $^OS_NAME eq 'VMS';
+    is($names,
+       "Blorm|Suzzle|Zonk::Pronk|hinkhonk::Glunk|hinkhonk::Vliff|perlflif|perlthng|perlzuk|squaa|squaa::Glunk|squaa::Vliff|squaa::Wowo|zikzik");
 };
 
-ok( ($name2where->{?'squaa'} || 'huh???'), '/squaa\.pm$/');
+like( ($name2where->{?'squaa'} || 'huh???'), '/squaa\.pm$/');
 
-ok nelems(grep( { m/squaa\.pm/ }, keys %$where2name) ), 1;
+is nelems(grep( { m/squaa\.pm/ }, keys %$where2name) ), 1;
 
 ok 1;
 

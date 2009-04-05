@@ -10,7 +10,7 @@ BEGIN {
 
 use Unicode::Normalize < qw(:all);
 
-use Test;
+use Test::More;
 
 use warnings;
 

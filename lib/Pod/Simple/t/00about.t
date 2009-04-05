@@ -4,7 +4,7 @@
 # Summary of, well, things.
 
 
-use Test;
+use Test::More;
 my @modules;
 BEGIN {
   @modules = qw(

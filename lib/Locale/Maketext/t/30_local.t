@@ -1,5 +1,5 @@
 
-use Test;
+use Test::More;
 BEGIN { plan tests => 4; }
 use Locale::Maketext;
 print $^STDOUT, "# Hi there...\n";
@@ -23,7 +23,7 @@ ok defined( $lh = Woozle->new() ) && ref($lh);
 
 print $^STDOUT, "# Make sure \$@ is localized...\n";
 $^EVAL_ERROR = 'foo';
-ok $lh && $lh->maketext('Eval error: [_1]', $^EVAL_ERROR), "Eval error: foo";
+is $lh && $lh->maketext('Eval error: [_1]', $^EVAL_ERROR), "Eval error: foo";
 
 print $^STDOUT, "# Byebye!\n";
 ok 1;

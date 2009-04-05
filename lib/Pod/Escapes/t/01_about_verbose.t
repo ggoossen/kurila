@@ -9,7 +9,7 @@ BEGIN {
 
 # Summary of, well, things.
 
-use Test;
+use Test::More;
 BEGIN {plan tests => 2};
 
 ok 1;

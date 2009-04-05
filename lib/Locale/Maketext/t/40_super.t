@@ -3,7 +3,7 @@
 #sub Locale::Maketext::DEBUG () {10}
 use Locale::Maketext;
 
-use Test;
+use Test::More;
 BEGIN { plan tests => 19 };
 
 print $^STDOUT, "#\n# Testing non-tight insertion of super-ordinate language tags...\n#\n";

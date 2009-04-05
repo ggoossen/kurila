@@ -1958,7 +1958,7 @@ if ( $old_test )
   my $test_mod = 'Test';
 
   print EX <<_END_;
-use Test;
+use Test::More;
 BEGIN \{ plan tests => $tests \};
 use $module;
 ok(1); # If we made it this far, we're ok.

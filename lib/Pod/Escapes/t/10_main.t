@@ -7,7 +7,7 @@ BEGIN {
 
 # Time-stamp: "2004-05-07 15:43:11 ADT"
 
-use Test;
+use Test::More;
 use utf8;
 
 my @them;
@@ -39,36 +39,36 @@ foreach my $quotie (qw( \n \r \cm \cj \t \f \b \a \e )) {
 print $^STDOUT, "#\n#------------------------\n#\n";
 
 print $^STDOUT, "# 'A' tests...\n";
-ok e2char('65'), 'A';
-ok e2char('x41'), 'A';
-ok e2char('x041'), 'A';
-ok e2char('x0041'), 'A';
-ok e2char('x00041'), 'A';
-ok e2char('0101'), 'A';
-ok e2char('00101'), 'A';
-ok e2char('000101'), 'A';
-ok e2char('0000101'), 'A';
+is e2char('65'), 'A';
+is e2char('x41'), 'A';
+is e2char('x041'), 'A';
+is e2char('x0041'), 'A';
+is e2char('x00041'), 'A';
+is e2char('0101'), 'A';
+is e2char('00101'), 'A';
+is e2char('000101'), 'A';
+is e2char('0000101'), 'A';
 
 print $^STDOUT, "# '<' tests...\n";
-ok e2char('lt'), '<';
-ok e2char('60'), '<';
-ok e2char('074'), '<';
-ok e2char('0074'), '<';
-ok e2char('00074'), '<';
-ok e2char('000074'), '<';
+is e2char('lt'), '<';
+is e2char('60'), '<';
+is e2char('074'), '<';
+is e2char('0074'), '<';
+is e2char('00074'), '<';
+is e2char('000074'), '<';
 
-ok e2char('x3c'), '<';
-ok e2char('x3C'), '<';
-ok e2char('x03c'), '<';
-ok e2char('x003c'), '<';
-ok e2char('x0003c'), '<';
-ok e2char('x00003c'), '<';
-ok e2char('0x3c'), '<';
-ok e2char('0x3C'), '<';
-ok e2char('0x03c'), '<';
-ok e2char('0x003c'), '<';
-ok e2char('0x0003c'), '<';
-ok e2char('0x00003c'), '<';
+is e2char('x3c'), '<';
+is e2char('x3C'), '<';
+is e2char('x03c'), '<';
+is e2char('x003c'), '<';
+is e2char('x0003c'), '<';
+is e2char('x00003c'), '<';
+is e2char('0x3c'), '<';
+is e2char('0x3C'), '<';
+is e2char('0x03c'), '<';
+is e2char('0x003c'), '<';
+is e2char('0x0003c'), '<';
+is e2char('0x00003c'), '<';
 
 ok e2char('65') ne e2char('lt');
 
@@ -78,10 +78,10 @@ ok defined e2char('eacute');
 print $^STDOUT, "#    eacute is <", e2char('eacute'), "> which is code ",
       ord(e2char('eacute')), "\n";
 
-ok e2char('eacute'), e2char('233');
-ok e2char('eacute'), e2char('0351');
-ok e2char('eacute'), e2char('xe9');
-ok e2char('eacute'), e2char('xE9');
+is e2char('eacute'), e2char('233');
+is e2char('eacute'), e2char('0351');
+is e2char('eacute'), e2char('xe9');
+is e2char('eacute'), e2char('xE9');
 
 print $^STDOUT, "# pi tests...\n";
 ok defined e2char('pi');
@@ -89,15 +89,15 @@ ok defined e2char('pi');
 print $^STDOUT, "#    pi is <", e2char('pi'), "> which is code ",
       ord(e2char('pi')), "\n";
 
-ok e2char('pi'), e2char('960');
-ok e2char('pi'), e2char('01700');
-ok e2char('pi'), e2char('001700');
-ok e2char('pi'), e2char('0001700');
-ok e2char('pi'), e2char('x3c0');
-ok e2char('pi'), e2char('x3C0');
-ok e2char('pi'), e2char('x03C0');
-ok e2char('pi'), e2char('x003C0');
-ok e2char('pi'), e2char('x0003C0');
+is e2char('pi'), e2char('960');
+is e2char('pi'), e2char('01700');
+is e2char('pi'), e2char('001700');
+is e2char('pi'), e2char('0001700');
+is e2char('pi'), e2char('x3c0');
+is e2char('pi'), e2char('x3C0');
+is e2char('pi'), e2char('x03C0');
+is e2char('pi'), e2char('x003C0');
+is e2char('pi'), e2char('x0003C0');
 
 
 print $^STDOUT, "# various hash tests...\n";
