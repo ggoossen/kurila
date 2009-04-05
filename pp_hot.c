@@ -1444,6 +1444,7 @@ PP(pp_entersub)
 		Perl_croak(aTHX_ "%s must be an assignee",
 		    SvPVX_const(loc_name(SvLOCATION(cv))));
 	}
+
 	if (CvFLAGS(cv) & CVf_BLOCK) {
 	    SAVECLEARSV(PAD_SVl(PAD_ARGS_INDEX));
 	    CX_CURPAD_SAVE(cx->blk_sub);
@@ -1477,6 +1478,10 @@ PP(pp_entersub)
 
 	    if (is_assignment) {
 		SV* rhs;
+		if (cv_optassignarg_flag(cv)) {
+		    XPUSHs(&PL_sv_yes);
+		    ++items;
+		}
 		if (op_flags & OPf_ASSIGN_PART) {
 		    if (PL_stack_base + TOPMARK >= MARK) {
 			Perl_croak(aTHX_ "Missing required assignment value");
@@ -1489,7 +1494,7 @@ PP(pp_entersub)
 		    rhs = MARK[-1];
 		}
 		XPUSHs(rhs);
-		items++;
+		++items;
 	    }
 
 	    /* reverse items on the stack */

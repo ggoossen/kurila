@@ -95,7 +95,7 @@ is( $args, "aap,noot='aap,noot=undefmies'" );
 my $var;
 
 sub varsub(?= $x) {
-    if (defined $x) {
+    if ($^is_assignment) {
         $var = $x;
     }
     return $: $var;

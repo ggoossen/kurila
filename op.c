@@ -366,22 +366,6 @@ Perl_allocmy(pTHX_ const char *const name)
 
     PERL_ARGS_ASSERT_ALLOCMY;
 
-    /* complain about "my $<special_var>" etc etc */
-    if (*name &&
-	!(is_our ||
-	  isALPHA(name[1]) ||
-	  (USE_UTF8_IN_NAMES && UTF8_IS_START(name[1])) ||
-	  (name[1] == '_' && (*name == '$' || name[2]))))
-    {
-	/* name[2] is true if strlen(name) > 2  */
-	if (!isPRINT(name[1]) || strchr("\t\n\r\f", name[1])) {
-	    yyerror(Perl_form(aTHX_ "Can't use global %c^%c%s in \"my\"",
-		    name[0], toCTRL(name[1]), name + 2));
-	} else {
-	    yyerror(Perl_form(aTHX_ "Can't use global %s in \"my\"",name));
-	}
-    }
-
     /* check for duplicate declaration */
     pad_check_dup(name, is_our, (PL_curstash ? PL_curstash : PL_defstash));
 
@@ -3757,6 +3741,7 @@ Perl_newSUB(pTHX_ I32 floor, OP *proto, OP *block)
         if (proto) {
 	    I32 min_modcount = 0;
 	    I32 max_modcount = 0;
+	    I32 arg_mod = cv_assignarg_flag(cv) ? 1 : cv_optassignarg_flag(cv) ? 2 : 0;
 	    OP* kid;
 	    LISTOP* list = cLISTOPx(my(convert(OP_LIST, 0, proto, proto->op_location)));
 	    OP* pushmark = list->op_first;
@@ -3764,8 +3749,8 @@ Perl_newSUB(pTHX_ I32 floor, OP *proto, OP *block)
 	    op_free(pushmark);
 	    for (kid = list->op_first; kid; kid = kid->op_sibling)
 		assign(kid, TRUE, &min_modcount, &max_modcount);
-	    CvN_MINARGS(cv) = min_modcount - ( cv_assignarg_flag(cv) || cv_optassignarg_flag(cv) ? 1 : 0 );
-	    CvN_MAXARGS(cv) = max_modcount - ( cv_assignarg_flag(cv) || cv_optassignarg_flag(cv) ? 1 : 0 );
+	    CvN_MINARGS(cv) = min_modcount - arg_mod;
+	    CvN_MAXARGS(cv) = max_modcount - arg_mod;
 #ifdef PERL_MAD
 	    block = newUNOP(OP_NULL, 0, block, block->op_location);
 #endif

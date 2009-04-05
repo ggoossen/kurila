@@ -88,7 +88,8 @@
 %type <ionlyval> prog progstart remember mremember
 %type <ionlyval> startsub startanonsub startblocksub
 %type <ionlyval> mintro
-%type <i_tkval> startproto
+%type <i_tkval> startproto endproto
+%type <opval> optassign protoargs
 
 %type <opval> decl subrout mysubrout package use peg
 
@@ -550,9 +551,19 @@ subname	:	WORD	{
 
 startproto :    '('
 			{ 
+                            CvFLAGS(PL_compcv) |= CVf_PROTO;
                             PL_parser->in_my = KEY_my;
                             $$ = $1;
                         }
+	;
+
+endproto :    ')'
+			{ 
+                            $$ = $1;
+                            PL_parser->in_my = FALSE;
+                            PL_parser->expect = XBLOCK;
+                        }
+	;
 
 protoassign :   /* NULL */
 			{ 
@@ -563,12 +574,37 @@ protoassign :   /* NULL */
                             CvFLAGS(PL_compcv) |= CVf_ASSIGNARG;
                             $$ = $2;
                         }
-        |      '?' ASSIGNOP term 
+	;
+
+optassign : '?' ASSIGNOP
 			{ 
                             CvFLAGS(PL_compcv) |= CVf_OPTASSIGNARG;
-                            $$ = $3;
+                            $$ = newOP(OP_PADSV, 0, LOCATION($1));
+                            $$->op_targ = allocmy("$^is_assignment");
                             $$->op_flags |= OPf_OPTIONAL;
                         }
+        ;
+
+protoargs :     protoassign
+			{ 
+                            $$ = append_elem(OP_LIST, $1, NULL);
+                        }
+        |       argexpr protoassign
+			{ 
+                            $$ = append_elem(OP_LIST, $1, $2);
+                        }
+        |       optassign term
+			{ 
+                            $2->op_flags |= OPf_OPTIONAL;
+                            $$ = append_elem(OP_LIST, $1, $2);
+                        }
+        |       argexpr optassign term
+			{ 
+                            $$ = append_elem(OP_LIST, $1, $2);
+                            $3->op_flags |= OPf_OPTIONAL;
+                            $$ = append_elem(OP_LIST, $$, $3);
+                        }
+        ;
 
 /* Subroutine prototype */
 proto	:	/* NULL */
@@ -578,25 +614,14 @@ proto	:	/* NULL */
                             intro_my();
                             $$ = (OP*)NULL; 
                         }
-	|	startproto protoassign mintro ')'
+	|	startproto protoargs mintro endproto
 			{ 
-                            CvFLAGS(PL_compcv) |= CVf_PROTO;
-                            $$ = append_list(OP_LIST, NULL, opTlistop($2));
+                            $$ = $2;
                             if (! $$)
                                 $$ = newOP(OP_STUB, 0, LOCATION($1) );
-                            PL_parser->in_my = FALSE;
-                            PL_parser->expect = XBLOCK;
+
                             TOKEN_GETMAD($1,$$,'(');
                             TOKEN_GETMAD($4,$$,')');
-                        }
-	|	startproto argexpr protoassign mintro ')'
-			{ 
-                            CvFLAGS(PL_compcv) |= CVf_PROTO;
-                            $$ = append_list(OP_LIST, opTlistop($2), opTlistop($3));
-                            PL_parser->in_my = FALSE;
-                            PL_parser->expect = XBLOCK;
-                            TOKEN_GETMAD($1,$$,'(');
-                            TOKEN_GETMAD($5,$$,')');
                         }
 	;
 
