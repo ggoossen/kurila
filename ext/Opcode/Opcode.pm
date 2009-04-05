@@ -330,7 +330,7 @@ invert_opset function.
 
     rv2cv anoncode prototype
 
-    entersub leavesub return method method_named -- XXX loops via recursion?
+    entersub entersub_save entersub_targargs leavesub return method method_named -- XXX loops via recursion?
 
     leaveeval -- needed for Safe to operate, is safe without entereval
 
