@@ -92,7 +92,7 @@ my $x=defined sigaction(SIGKILL, $newaction, $oldaction);
 kill 'HUP', $^PID;
 ok(!$x && $ok, "signal mask gets restored after early return");
 
-signals::set_handler( HUP => sub {} );
+signals::handler("HUP") = sub {};
 sigaction(SIGHUP, $newaction, $oldaction);
 is(ref($oldaction->{?HANDLER}), 'CODE');
 
@@ -152,7 +152,7 @@ do {
 # for this one, use the accessor instead of the attribute
 
 # standard signal handling via %SIG is safe
-signals::set_handler( HUP => \&foo );
+signals::handler("HUP") = \&foo ;
 $oldaction = POSIX::SigAction->new;
 sigaction(SIGHUP, undef, $oldaction);
 ok($oldaction->safe, "SIGHUP is safe");

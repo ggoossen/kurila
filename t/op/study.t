@@ -26,7 +26,7 @@ use signals;
 
 my $have_alarm = config_value('d_alarm');
 sub alarm_ok($test) {
-    signals::temp_set_handler("ALRM" => sub { die "timeout\n" });
+    local signals::handler("ALRM") = sub { die "timeout\n" };
     
     my $match;
     try { 

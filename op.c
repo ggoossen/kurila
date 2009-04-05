@@ -3918,30 +3918,40 @@ Perl_newXS_flags(pTHX_ const char *name, XSUBADDR_t subaddr,
 		 U32 flags)
 {
     CV *cv = newXS(name, subaddr, filename);
-    I32 n_minargs = 0;
-    I32 n_maxargs = -1;
 
     PERL_ARGS_ASSERT_NEWXS_FLAGS;
 
     if (proto) {
 	const char* proto_i = proto;
-	while (*proto_i && *proto_i != ';' && *proto_i != '=' && *proto_i != '?') {
-	    if (*proto_i != '\\')
-		++n_minargs;
+	I32 n_minargs = 0;
+	I32 n_maxargs = 0;
+	while (*proto_i && *proto_i != ';' && *proto_i != '=' && *proto_i != '?' && *proto_i != '@') {
+	    if (*proto_i == '\\')
+		++proto_i;
 	    if (*proto_i == '[') {
 		while (*proto_i && *proto_i != ']')
 		    ++proto_i;
 	    }
+	    ++n_minargs;
 	    ++proto_i;
 	}
 	n_maxargs = n_minargs;
 	if (*proto_i == ';') {
 	    ++proto_i;
-	    while (*proto_i && *proto_i != '=' && *proto_i != '?') {
+	    while (*proto_i && *proto_i != ';' && *proto_i != '=' && *proto_i != '?' && *proto_i != '@') {
+		if (*proto_i == '\\')
+		    ++proto_i;
+		if (*proto_i == '[') {
+		    while (*proto_i && *proto_i != ']')
+			++proto_i;
+		}
 		++n_maxargs;
 		++proto_i;
 	    }
 	}
+	if (*proto_i == '@')
+	    n_maxargs = -1;
+	    
 	if (*proto_i == '?' && proto_i[1] == '=') {
 	    CvFLAGS(cv) |= CVf_OPTASSIGNARG;
 	}

@@ -107,7 +107,7 @@ else {
     # XXX On Windows the default signal handler kills the
     # XXX whole process, not just the thread (pseudo-process)
     use signals;
-    signals::set_handler(INT => sub { exit });
+    signals::handler("INT") = sub { exit };
     print $^STDOUT, "ok 1\n";
     sleep 5;
     die;

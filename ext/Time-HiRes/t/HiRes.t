@@ -175,7 +175,7 @@ unless ($have_ualarm && $have_alarm) {
 }
 else {
     my $tick = 0;
-    signals::temp_set_handler(ALRM => sub { $tick++ });
+    local signals::handler("ALRM") = sub { $tick++ };
 
     my $one = time; $tick = 0; ualarm(10_000); while ($tick == 0) { }
     my $two = time; $tick = 0; ualarm(10_000); while ($tick == 0) { }
@@ -251,7 +251,7 @@ unless (   defined &Time::HiRes::gettimeofday
 	    or die "Error setting SIGALRM handler with sigaction: $^OS_ERROR\n";
     } else {
 	diag "# SIG tick\n";
-	signals::set_handler(ALRM => "tick");
+	signals::handler("ALRM") = "tick";
     }
 
     # On VMS timers can not interrupt select.
@@ -322,10 +322,10 @@ do{
     my $i = 3;
     my $r = \@( <Time::HiRes::gettimeofday());
 
-    signals::set_handler(VTALRM => sub {
+    signals::handler("VTALRM") = sub {
 	$i ?? $i-- !! setitimer(&ITIMER_VIRTUAL( < @_ ), 0);
 	info "Tick! $i " . Time::HiRes::tv_interval($r);
-    });
+    };
 
     info "setitimer: ", join(" ", setitimer(ITIMER_VIRTUAL, 0.5, 0.4));
 
@@ -343,7 +343,7 @@ do{
     $virt = getitimer(&ITIMER_VIRTUAL( < @_ ));
     ok( not defined $virt );
 
-    signals::set_handler(VTALRM => 'DEFAULT');
+    signals::handler("VTALRM") = 'DEFAULT';
 };
 
 SKIP:
@@ -490,12 +490,12 @@ if ($have_ualarm) {
     my $A = 2; # Number of alarms we will handle before disarming.
                # (We may well get $A + 1 alarms.)
 
-    signals::set_handler(ALRM => sub {
+    signals::handler("ALRM") = sub {
 	$a++;
 	info "Alarm $a - " . time();
 	alarm(0) if $a +>= $A; # Disarm the alarm.
 	$Delay->(2); # Try burning CPU at least for 2T seconds.
-    });
+    };
 
     use Time::HiRes < qw(alarm); 
     alarm($T, $T);  # Arm the alarm.
@@ -590,7 +590,7 @@ if ($have_ualarm) {
                  \@(37, 4_300_000))) {
 	my @($i, $n) = @$t;
 	my $alarmed = 0;
-	signals::temp_set_handler( ALRM => sub { $alarmed++ } );
+	local signals::handler("ALRM") = sub { $alarmed++ };
 	my $t0 = Time::HiRes::time();
 	diag "t0 = $t0";
 	diag "ualarm($n)";

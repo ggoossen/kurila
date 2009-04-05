@@ -19,7 +19,7 @@ $^OUTPUT_AUTOFLUSH = 1;
 print $^STDOUT, "1..8\n";
 
 try {
-    signals::set_handler(ALRM => sub { die; });
+    signals::handler("ALRM") = sub { die; };
     alarm 60;
 };
 

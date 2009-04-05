@@ -24,7 +24,7 @@ do {
       $child = fork;
       die "Fork failed" unless defined $child;
       if (!$child) {
-        signals::set_handler(INT => sub {exit 0}); # You have 60 seconds. Your time starts now.
+        signals::handler("INT") = sub {exit 0}; # You have 60 seconds. Your time starts now.
         my $must_finish_by = time + 60;
         my $remaining;
         while (($remaining = $must_finish_by - time) +> 0) {
@@ -71,7 +71,7 @@ if( ! config_value('d_alarm') ) {
 }
 
 # But we'll install an alarm handler in case any of the races below fail.
-signals::set_handler(ALRM => sub {die "Unexpected alarm during testing"});
+signals::handler("ALRM") = sub {die "Unexpected alarm during testing"};
 
 ok (socketpair (my $left, my $right, AF_UNIX, SOCK_STREAM, PF_UNSPEC),
     'socketpair ($left, $right, AF_UNIX, SOCK_STREAM, PF_UNSPEC)')
@@ -110,7 +110,7 @@ ok (shutdown($left, SHUT_WR), "shutdown left for writing");
 # Calls. Hence the child process minder.
 SKIP: do {
   skip "SCO Unixware / OSR have a bug with shutdown",2 if $^OS_NAME =~ m/^(?:svr|sco)/;
-  signals::temp_set_handler(ALRM => sub { warn "EOF on right took over 3 seconds" });
+  local signals::handler("ALRM") = sub { warn "EOF on right took over 3 seconds" };
   local $TODO = "Known problems with unix sockets on $^OS_NAME"
       if $^OS_NAME eq 'hpux'   || $^OS_NAME eq 'super-ux';
   alarm 3;
@@ -123,10 +123,10 @@ SKIP: do {
 };
 
 my $err = $^OS_ERROR;
-signals::set_handler(PIPE => 'IGNORE');
+signals::handler("PIPE") = 'IGNORE';
 do {
-  signals::temp_set_handler(ALRM =>
-    sub { warn "syswrite to left didn't fail within 3 seconds" });
+  local signals::handler("ALRM")
+    = sub { warn "syswrite to left didn't fail within 3 seconds" };
   alarm 3;
   # Split the system call from the is() - is() does IO so
   # (say) a flush may do a seek which on a pipe may disturb errno
@@ -209,7 +209,7 @@ SKIP: do {
   skip "$^OS_NAME does length 0 udp reads", 2 if ($^OS_NAME eq 'os390');
 
   my $alarmed = 0;
-  signals::temp_set_handler(ALRM => sub { $alarmed = 1; });
+  local signals::handler("ALRM") = sub { $alarmed = 1; };
   print $^STDOUT, "# Approximate forever as 3 seconds. Wait 'forever'...\n";
   alarm 3;
   undef $buffer;

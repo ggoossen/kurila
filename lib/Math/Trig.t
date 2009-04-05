@@ -245,7 +245,7 @@ do {
 };
 
 # E.g. netbsd-alpha core dumps on Inf arith without this.
-signals::temp_set_handler(FPE => undef);
+local signals::handler("FPE") = undef;
 
 print $^STDOUT, "# great_circle_distance with small angles\n";
 

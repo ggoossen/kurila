@@ -126,13 +126,13 @@ do {
     is(join(":", @foo), '-1:0');
 };
 do {
-    local $1 = undef;
+    local $1;
     "2" =~ m/(.+)/;
     @foo= @(() ); push @foo, $_ for undef..$1;
     is(join(":", @foo), '0:1:2');
 };
 do {
-    local $1 = undef;
+    local $1;
     "-2" =~ m/(.+)/;
     @foo= @(() ); push @foo, $_ for $1..undef;
     is(join(":", @foo), '-2:-1:0');

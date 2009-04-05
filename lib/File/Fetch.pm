@@ -660,7 +660,7 @@ sub _ftp_fetch {
 
         my $fh = IO::File->new;
 
-        signals::temp_set_handler(CHLD => 'IGNORE');
+        local signals::handler("CHLD") = 'IGNORE';
 
         unless ($fh->open("|$ftp -n")) {
             return $self->_error( <loc("\%1 creation failed: \%2", $ftp, $^OS_ERROR));

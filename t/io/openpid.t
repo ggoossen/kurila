@@ -21,8 +21,8 @@ plan tests => 10;
 use Config;
 use signals;
 $^OUTPUT_AUTOFLUSH = 1;
-signals::set_handler(PIPE => 'IGNORE');
-signals::set_handler(HUP => 'IGNORE') if $^OS_NAME eq 'interix';
+signals::handler("PIPE") = 'IGNORE';
+signals::handler("HUP") = 'IGNORE' if $^OS_NAME eq 'interix';
 
 my $perl = which_perl();
 $perl .= qq[ "-I../lib"];

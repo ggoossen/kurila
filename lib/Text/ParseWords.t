@@ -114,7 +114,7 @@ is($result, "");
 $result = join('|',shellwords(" aa \\  \\ bb ", " \\  ", "cc dd ee\\ "));
 is($result, "aa| | bb| |cc|dd|ee ");
 
-signals::set_handler(ALRM => sub {die "Timeout!"});
+signals::handler("ALRM") = sub {die "Timeout!"};
 alarm(3);
 @words = @( Text::ParseWords::old_shellwords("foo\\") );
 is((nelems @words), 1);
