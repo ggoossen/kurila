@@ -3750,7 +3750,7 @@ Perl_newSUB(pTHX_ I32 floor, OP *proto, OP *block)
 	    for (kid = list->op_first; kid; kid = kid->op_sibling)
 		assign(kid, TRUE, &min_modcount, &max_modcount);
 	    CvN_MINARGS(cv) = min_modcount - arg_mod;
-	    CvN_MAXARGS(cv) = max_modcount - arg_mod;
+	    CvN_MAXARGS(cv) = max_modcount == -1 ? -1 : max_modcount - arg_mod;
 #ifdef PERL_MAD
 	    block = newUNOP(OP_NULL, 0, block, block->op_location);
 #endif
@@ -3903,6 +3903,7 @@ Perl_newXS_flags(pTHX_ const char *name, XSUBADDR_t subaddr,
 		 U32 flags)
 {
     CV *cv = newXS(name, subaddr, filename);
+    PERL_UNUSED_ARG(flags);
 
     PERL_ARGS_ASSERT_NEWXS_FLAGS;
 

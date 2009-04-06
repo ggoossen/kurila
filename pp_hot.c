@@ -1476,6 +1476,13 @@ PP(pp_entersub)
 	    ++MARK;
 	    PUSHMARK(MARK-1);
 
+	    /* reverse items on the stack */
+	    for (i=0; i<items/2; i++) {
+		SV* sv = MARK[i];
+		MARK[i] = MARK[items-i-1];
+		MARK[items-i-1] = sv;
+	    }
+
 	    if (is_assignment) {
 		SV* rhs;
 		if (cv_optassignarg_flag(cv)) {
@@ -1496,14 +1503,12 @@ PP(pp_entersub)
 		XPUSHs(rhs);
 		++items;
 	    }
-
-	    /* reverse items on the stack */
-	    for (i=0; i<items/2; i++) {
-		SV* sv = MARK[i];
-		MARK[i] = MARK[items-i-1];
-		MARK[items-i-1] = sv;
+	    else if (cv_optassignarg_flag(cv)) {
+		XPUSHs(&PL_sv_no);
+		++items;
+		XPUSHs(&PL_sv_undef);
+		++items;
 	    }
-
 	}
 	else if ( CvFLAGS(cv) & CVf_DEFARGS) {
 	    AV* av;

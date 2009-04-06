@@ -581,7 +581,6 @@ optassign : '?' ASSIGNOP
                             CvFLAGS(PL_compcv) |= CVf_OPTASSIGNARG;
                             $$ = newOP(OP_PADSV, 0, LOCATION($1));
                             $$->op_targ = allocmy("$^is_assignment");
-                            $$->op_flags |= OPf_OPTIONAL;
                         }
         ;
 
@@ -591,18 +590,16 @@ protoargs :     protoassign
                         }
         |       argexpr protoassign
 			{ 
-                            $$ = append_elem(OP_LIST, $1, $2);
+                            $$ = prepend_elem(OP_LIST, $2, $1);
                         }
         |       optassign term
 			{ 
-                            $2->op_flags |= OPf_OPTIONAL;
-                            $$ = append_elem(OP_LIST, $1, $2);
+                            $$ = append_elem(OP_LIST, $2, $1);
                         }
         |       argexpr optassign term
 			{ 
-                            $$ = append_elem(OP_LIST, $1, $2);
-                            $3->op_flags |= OPf_OPTIONAL;
-                            $$ = append_elem(OP_LIST, $$, $3);
+                            $$ = prepend_elem(OP_LIST, $2, $1);
+                            $$ = prepend_elem(OP_LIST, $3, $$);
                         }
         ;
 

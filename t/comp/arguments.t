@@ -2,7 +2,7 @@
 
 BEGIN { require './test.pl'; }
 
-plan 32;
+plan 33;
 
 sub foo($x) {
     return $x;
@@ -124,3 +124,10 @@ do {
     is(varsub, "mies");
 };
 is(varsub, "aap");
+
+sub varargsassign(@< $x ?= $y) {
+    return join("*", $x) . " y: $y";
+}
+
+is( (varargsassign("aap", "noot") = "mies"),
+    "aap*noot y: mies" );
