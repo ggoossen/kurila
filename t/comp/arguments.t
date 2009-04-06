@@ -2,7 +2,7 @@
 
 BEGIN { require './test.pl'; }
 
-plan 33;
+plan 36;
 
 sub foo($x) {
     return $x;
@@ -125,9 +125,15 @@ do {
 };
 is(varsub, "aap");
 
+my $varassign;
 sub varargsassign(@< $x ?= $y) {
-    return join("*", $x) . " y: $y";
+    return $varassign = join("*", $x) . "=$y";
 }
 
 is( (varargsassign("aap", "noot") = "mies"),
-    "aap*noot y: mies" );
+    "aap*noot=mies" );
+
+(@: my $before, varargsassign("wim", "zus"), my $after) = @: "before", "jet", "after";
+is( $varassign, "wim*zus=jet" );
+is( $before, "before" );
+is( $after, "after" );
