@@ -53,7 +53,7 @@ for my $cross_partition_test (0..1) {
   binmode $^STDOUT unless $^OS_NAME eq 'VMS'; # Copy::copy works in binary mode
   # This outputs "ok" so its a test.
   copy "copy-$^PID", $^STDOUT;
-  $TB->current_test($TB->current_test + 1);
+  $TB->current_test++;
   unlink "copy-$^PID" or die "unlink: $^OS_ERROR";
 
   open($f, "<","file-$^PID");

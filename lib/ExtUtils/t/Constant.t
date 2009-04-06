@@ -167,7 +167,7 @@ sub build_and_run($tests, $expect, $files) {
   }
 
   my $tb = Test::Builder->new();
-  $tb->current_test($tb->current_test + $tests);
+  $tb->current_test += $tests;
 
   if ($^CHILD_ERROR) {
       fail("$maketest failed: $^CHILD_ERROR");
