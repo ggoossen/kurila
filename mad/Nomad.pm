@@ -1481,7 +1481,7 @@ package PLXML::op_magicsv;
 sub ast {
     my $self = shift;
     my @args;
-    push @args, $self->madness('optional_assign dx d ( X )');
+    push @args, $self->madness('wrap_open optional_assign dx d ( X ) wrap_close');
 
     return $self->newtype->new(Kids => [@args]);
 }
@@ -1563,7 +1563,7 @@ package PLXML::op_rv2sv;
 
 sub astnull {
     my $self = shift;
-    return P5AST::op_rv2sv->new(Kids => [$self->madness('O o optional_assign dx d ( X $ ) : a')]);
+    return P5AST::op_rv2sv->new(Kids => [$self->madness('wrap_open O o optional_assign dx d ( X $ ) : a wrap_close')]);
 }
 
 sub ast {

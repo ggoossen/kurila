@@ -1414,6 +1414,15 @@ sub mg_stdin {
     }
 }
 
+sub local_undef {
+    my $xml = shift;
+    for my $op (find_ops($xml, "null"), find_ops($xml, "magicsv")) {
+        next unless ($op->att('flags') || '') !~ m/\bASSIGN\b/;
+        next unless get_madprop($op, 'local');
+        set_madprop($op, 'wrap_close', ' = undef');
+    }
+}
+
 my $from; # floating point number with starting version of kurila.
 GetOptions("from=s" => \$from);
 $from =~ m/(\w+)[-]([\d.]+)$/ or die "invalid from: '$from'";
@@ -1531,6 +1540,7 @@ if ($from->{branch} ne "kurila" or $from->{v} < qv '1.17') {
 
 #make_prototype($twig);
 mg_stdin($twig);
+local_undef($twig);
 
 #add_call_parens($twig);
 

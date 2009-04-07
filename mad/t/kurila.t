@@ -37,8 +37,9 @@ sub p5convert {
     is($output, $expected) or $TODO or die "failed test";
 }
 
-t_stdin();
+t_local();
 die "END";
+t_stdin();
 t_prototype();
 t_must_haveargs();
 t_block_arg();
@@ -1699,5 +1700,25 @@ my $y = ~< \*STDIN;
 ----
 my $x = ~< $^STDIN;
 my $y = ~< $^STDIN;
+END
+}
+
+sub t_local {
+    p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
+local $a;
+local $a = 3;
+1;
+----
+local $a = undef;
+local $a = 3;
+1;
+====
+local $^INPUT_RECORD_SEPARATOR;
+local $^INPUT_RECORD_SEPARATOR = 3;
+2;
+----
+local $^INPUT_RECORD_SEPARATOR = undef;
+local $^INPUT_RECORD_SEPARATOR = 3;
+2;
 END
 }
