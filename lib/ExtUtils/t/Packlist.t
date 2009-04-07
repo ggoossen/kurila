@@ -32,7 +32,7 @@ SKIP: do {
 # and more read() tests
 SKIP: do {
     open my $in, "<", "eplist" or die;
-    my $file = do { local $^INPUT_RECORD_SEPARATOR; ~< $in };
+    my $file = do { local $^INPUT_RECORD_SEPARATOR = undef; ~< $in };
     close $in;
 
     like( $file, qr/single\n/, 'key with value should be available' );

@@ -324,13 +324,13 @@ invert_opset function.
     arrayexpand enter_arrayexpand_assign enter_hashexpand_assign
     hashexpand expand nelems
 
-    cond_expr flip flop andassign orassign dorassign and or dor xor
+    cond_expr andassign orassign dorassign and or dor xor
 
     warn die lineseq nextstate scope enter leave
 
     rv2cv anoncode prototype
 
-    entersub leavesub return method method_named -- XXX loops via recursion?
+    entersub entersub_save entersub_targargs leavesub return method method_named -- XXX loops via recursion?
 
     leaveeval -- needed for Safe to operate, is safe without entereval
 

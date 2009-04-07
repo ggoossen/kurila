@@ -71,7 +71,7 @@ our $COP;
 
 sub find_op_cop( $sub, $op) {
     my $cv = svref_2object($sub);
-    local $COP;
+    local $COP = undef;
 
     if ( not _find_op_cop( $cv->ROOT, $op ) ) {
         $COP = undef;

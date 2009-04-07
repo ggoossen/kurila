@@ -29,7 +29,7 @@ for ( @MANIFEST) {
      my ($name, $thing);
      my $foundit=0;
      do {
-	 local $^INPUT_RECORD_SEPARATOR="";
+	 local $^INPUT_RECORD_SEPARATOR ="";
 	 while ( ~< *$mod) {
 	     next unless m/^=head1 NAME/;
 	     $foundit++;

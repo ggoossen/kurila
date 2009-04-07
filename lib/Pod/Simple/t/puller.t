@@ -1,5 +1,5 @@
 
-use Test;
+use Test::More;
 BEGIN { plan tests => 136 };
 
 #use Pod::Simple::Debug (5);
@@ -27,25 +27,25 @@ my @t;
 @t = pump_it_up(qq{\n\nProk\n\n=head1 Things\n\n=cut\n\nBzorch\n\n});
 
 if(not(
-  ok nelems( grep { ref $_ and $_->can('type') }, @t), 5
+  is nelems( grep { ref $_ and $_->can('type') }, @t), 5
 )) {
-  ok 0,1, "Wrong token count. Failing subsequent tests.\n";
+  is 0,1, "Wrong token count. Failing subsequent tests.\n";
   for ( 1 .. 12 ) {ok 0}
 } else {
-  ok @t[0]->type, 'start';
-  ok @t[1]->type, 'start';
-  ok @t[2]->type, 'text';
-  ok @t[3]->type, 'end';
-  ok @t[4]->type, 'end';
+  is @t[0]->type, 'start';
+  is @t[1]->type, 'start';
+  is @t[2]->type, 'text';
+  is @t[3]->type, 'end';
+  is @t[4]->type, 'end';
 
-  ok @t[0]->tagname, 'Document';
-  ok @t[1]->tagname, 'head1';
-  ok @t[2]->text,    'Things';
-  ok @t[3]->tagname, 'head1';
-  ok @t[4]->tagname, 'Document';
+  is @t[0]->tagname, 'Document';
+  is @t[1]->tagname, 'head1';
+  is @t[2]->text,    'Things';
+  is @t[3]->tagname, 'head1';
+  is @t[4]->tagname, 'Document';
 
-  ok @t[0]->attr('start_line'), '5';
-  ok @t[1]->attr('start_line'), '5';
+  is @t[0]->attr('start_line'), '5';
+  is @t[1]->attr('start_line'), '5';
 }
 
 
@@ -57,50 +57,50 @@ if(not(
 );
 
 if(
-  not( ok nelems( grep { ref $_ and $_->can('type') }, @t) => 16 )
+  not( is nelems( grep { ref $_ and $_->can('type') }, @t) => 16 )
 ) {
-  ok 0,1, "Wrong token count. Failing subsequent tests.\n";
+  is 0,1, "Wrong token count. Failing subsequent tests.\n";
   for ( 1 .. 32 ) {ok 0}
 } else {
-  ok @t[ 0]->type, 'start';
-  ok @t[ 1]->type, 'start';
-  ok @t[ 2]->type, 'start';
-  ok @t[ 3]->type, 'text';
-  ok @t[ 4]->type, 'start';
-  ok @t[ 5]->type, 'text';
-  ok @t[ 6]->type, 'end';
-  ok @t[ 7]->type, 'end';
+  is @t[ 0]->type, 'start';
+  is @t[ 1]->type, 'start';
+  is @t[ 2]->type, 'start';
+  is @t[ 3]->type, 'text';
+  is @t[ 4]->type, 'start';
+  is @t[ 5]->type, 'text';
+  is @t[ 6]->type, 'end';
+  is @t[ 7]->type, 'end';
 
-  ok @t[ 8]->type, 'start';
-  ok @t[ 9]->type, 'text';
-  ok @t[10]->type, 'start';
-  ok @t[11]->type, 'text';
-  ok @t[12]->type, 'end';
-  ok @t[13]->type, 'end';
-  ok @t[14]->type, 'end';
-  ok @t[15]->type, 'end';
+  is @t[ 8]->type, 'start';
+  is @t[ 9]->type, 'text';
+  is @t[10]->type, 'start';
+  is @t[11]->type, 'text';
+  is @t[12]->type, 'end';
+  is @t[13]->type, 'end';
+  is @t[14]->type, 'end';
+  is @t[15]->type, 'end';
 
 
 
-  ok @t[ 0]->tagname, 'Document';
-  ok @t[ 1]->tagname, 'over-bullet';
-  ok @t[ 2]->tagname, 'item-bullet';
-  ok @t[ 3]->text, 'Stuff ';
-  ok @t[ 4]->tagname, 'L';
-  ok @t[ 5]->text, 'HTML::TokeParser';
-  ok @t[ 6]->tagname, 'L';
-  ok @t[ 7]->tagname, 'item-bullet';
+  is @t[ 0]->tagname, 'Document';
+  is @t[ 1]->tagname, 'over-bullet';
+  is @t[ 2]->tagname, 'item-bullet';
+  is @t[ 3]->text, 'Stuff ';
+  is @t[ 4]->tagname, 'L';
+  is @t[ 5]->text, 'HTML::TokeParser';
+  is @t[ 6]->tagname, 'L';
+  is @t[ 7]->tagname, 'item-bullet';
 
-  ok @t[ 8]->tagname, 'item-bullet';
-  ok @t[ 9]->text, 'Things ';
-  ok @t[10]->tagname, 'I';
-  ok @t[11]->text, 'like that';
-  ok @t[12]->tagname, 'I';
-  ok @t[13]->tagname, 'item-bullet';
-  ok @t[14]->tagname, 'over-bullet';
-  ok @t[15]->tagname, 'Document';
+  is @t[ 8]->tagname, 'item-bullet';
+  is @t[ 9]->text, 'Things ';
+  is @t[10]->tagname, 'I';
+  is @t[11]->text, 'like that';
+  is @t[12]->tagname, 'I';
+  is @t[13]->tagname, 'item-bullet';
+  is @t[14]->tagname, 'over-bullet';
+  is @t[15]->tagname, 'Document';
 
-  ok @t[4]->attr("type"), "pod";
+  is @t[4]->attr("type"), "pod";
 }
 
 

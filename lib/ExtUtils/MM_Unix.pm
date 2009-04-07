@@ -1130,8 +1130,8 @@ eval 'exec $interpreter $arg -S \$0 \$\{1+"\$\@"\}'
         };
 
         # Print out the new #! line (or equivalent).
-        local $^OUTPUT_RECORD_SEPARATOR;
-        local $^INPUT_RECORD_SEPARATOR;
+        local $^OUTPUT_RECORD_SEPARATOR = undef;
+        local $^INPUT_RECORD_SEPARATOR = undef;
         print $fixout, $shb, ~< $fixin;
         close $fixin;
         close $fixout;
@@ -2661,7 +2661,7 @@ sub parse_version($self,$parsefile) {
     my $result;
 
     local $^INPUT_RECORD_SEPARATOR = "\n";
-    local $_;
+    local $_ = undef;
     open(my $fh, '<', $parsefile) or die "Could not open '$parsefile': $^OS_ERROR";
     my $inpod = 0;
     while (~< $fh) {

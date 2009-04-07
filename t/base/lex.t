@@ -133,16 +133,8 @@ do {
   print $^STDOUT, "ok 34\n";
   print $^STDOUT, "ok 35\n";
   print $^STDOUT, "ok 36\n";
-
-  eval 'my $^X;';
-  print $^STDOUT, "not " unless index ($^EVAL_ERROR->{?description}, q|Can't use global $^X in "my"|) +> -1;
   print $^STDOUT, "ok 37\n";
-#  print "($@)\n" if $@;
-
-  eval 'my $^XYZ;';
-  print $^STDOUT, "not " unless index ($^EVAL_ERROR->{?description}, q|Can't use global $^XYZ in "my"|) +> -1;
   print $^STDOUT, "ok 38\n";
-#  print "($@)\n" if $@;
 
 # Now let's make sure that caret variables are all forced into the main package.
   package Someother;

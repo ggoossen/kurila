@@ -5,7 +5,7 @@ BEGIN {
     }
 }
 
-use Test;
+use Test::More;
 BEGIN { plan tests => 18 };
 
 #use Pod::Simple::Debug (5);
@@ -19,31 +19,31 @@ sub e ($x, $y) { Pod::Simple::DumpAsXML->_duo($x, $y) }
 
 print $^STDOUT, "# With weird leading whitespace...\n";
 # With weird whitespace
-ok( Pod::Simple::XMLOutStream->_out("=pod\n\nI<foo>\n"),
+is( Pod::Simple::XMLOutStream->_out("=pod\n\nI<foo>\n"),
  '<Document><Para><I>foo</I></Para></Document>'
 );
-ok( Pod::Simple::XMLOutStream->_out("=pod\n\nB< foo>\n"),
+is( Pod::Simple::XMLOutStream->_out("=pod\n\nB< foo>\n"),
  '<Document><Para><B> foo</B></Para></Document>'
 );
-ok( Pod::Simple::XMLOutStream->_out("=pod\n\nB<\tfoo>\n"),
+is( Pod::Simple::XMLOutStream->_out("=pod\n\nB<\tfoo>\n"),
  '<Document><Para><B> foo</B></Para></Document>'
 );
-ok( Pod::Simple::XMLOutStream->_out("=pod\n\nB<\nfoo>\n"),
+is( Pod::Simple::XMLOutStream->_out("=pod\n\nB<\nfoo>\n"),
  '<Document><Para><B> foo</B></Para></Document>'
 );
-ok( Pod::Simple::XMLOutStream->_out("=pod\n\nB<foo>\n"),
+is( Pod::Simple::XMLOutStream->_out("=pod\n\nB<foo>\n"),
  '<Document><Para><B>foo</B></Para></Document>'
 );
-ok( Pod::Simple::XMLOutStream->_out("=pod\n\nB<foo\t>\n"),
+is( Pod::Simple::XMLOutStream->_out("=pod\n\nB<foo\t>\n"),
  '<Document><Para><B>foo </B></Para></Document>'
 );
-ok( Pod::Simple::XMLOutStream->_out("=pod\n\nB<foo\n>\n"),
+is( Pod::Simple::XMLOutStream->_out("=pod\n\nB<foo\n>\n"),
  '<Document><Para><B>foo </B></Para></Document>'
 );
 
 
 print $^STDOUT, "#\n# Tests for wedges outside of formatting codes...\n";
-&ok( Pod::Simple::XMLOutStream->_out("=pod\n\nX < 3 and N > 19\n"),
+is( Pod::Simple::XMLOutStream->_out("=pod\n\nX < 3 and N > 19\n"),
      Pod::Simple::XMLOutStream->_out("=pod\n\nX E<lt> 3 and N E<gt> 19\n")
 );
 

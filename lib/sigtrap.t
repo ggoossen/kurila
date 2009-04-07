@@ -22,7 +22,7 @@ like( $^EVAL_ERROR->{?description}, qr/^No argument specified/, 'send handler wi
 
 my @normal =qw( HUP INT PIPE TERM );
 for (@normal) {
-    signals::set_handler($_, 'DEFAULT');
+    signals::handler($_) = 'DEFAULT';
 }
 sigtrap->import('normal-signals');
 for (@normal) {

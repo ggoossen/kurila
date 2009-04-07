@@ -3,7 +3,7 @@
 BEGIN {
     require './test.pl';
 }
-plan tests => 76;
+plan tests => 73;
 
 our (@c, @b, @a, $a, $b, $c, $d, $e, $x, $y, %d, %h, $m);
 
@@ -190,17 +190,8 @@ do {
 	};
 	main::ok(f1() eq "f1", "localised sub restored");
 	do {
-		local %Other::{+"f1"} = sub { "h1" };
-		main::ok(f1() eq "h1", "localised sub via stash");
-	};
-	main::ok(f1() eq "f1", "localised sub restored");
-	do {
-		local %Other::{[qw/ f1 f2 /]} = @: sub { "j1" }, sub { "j2" } ;
-                local $main::TODO = 1;
-                main::ok(0);
-                main::ok(0);
-		#main::ok(f1() eq "j1", "localised sub via stash slice");
-		#main::ok(f2() eq "j2", "localised sub via stash slice");
+            main::eval_dies_like( 'local %Other::{+"f1"} = sub { "h1" }',
+                                  qr/can't localize a glob/, "localised sub via stash" );
 	};
 	main::ok(f1() eq "f1", "localised sub restored");
 	main::ok(f2() eq "f2", "localised sub restored");

@@ -22,7 +22,7 @@ sub convert_n_test($podfile, $testname) {
 
     my ($expect, $result);
     do {
-	local $^INPUT_RECORD_SEPARATOR;
+	local $^INPUT_RECORD_SEPARATOR = undef;
 	# expected
 	$expect = ~< *DATA;
 	$expect =~ s/\[PERLADMIN\]/$(config_value('perladmin'))/;

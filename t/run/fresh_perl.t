@@ -137,7 +137,7 @@ EXPECT
 # used to attach defelem magic to all immortal values,
 # which made restore of local $_ fail.
 foo(2+>1);
-sub foo { bar() for @_;  }
+sub foo { bar() for $: @_;  }
 sub bar { local $_; }
 print $^STDOUT, "ok\n";
 EXPECT
@@ -221,22 +221,6 @@ sub DESTROY { print $^STDOUT, "destroyed\n" };
 package main;
 *c = X->aclosure;
 EXPECT
-destroyed
-########
-# TODO
-package X;
-sub any { bless \%() }
-my $f = "FH000"; # just to thwart any future optimisations
-sub afh { select select *{Symbol::fetch_glob(++$f)};
-          my $r = *{Symbol::fetch_glob($f)}{IO}; delete Symbol::stash('X')->{$f}; bless $r }
-sub DESTROY { print $^STDOUT, "destroyed\n" }
-package main;
-print $^STDOUT, "start\n";
-our $x = X->any(); # to bump sv_objcount. IO objs aren't counted??
-*f = X->afh();
-EXPECT
-start
-destroyed
 destroyed
 ########
 # TODO fix trace back of "call_sv"

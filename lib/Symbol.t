@@ -38,7 +38,7 @@ cmp_ok( $sym1, '\==', *FOO{IO}, 'assigns into glob OK' );
 is( $FOO, 'Eymascalar', 'leaves scalar alone' );
 
 do {
-    local $^WARNING=1;		# 5.005 compat.
+    local $^WARNING = 1;		# 5.005 compat.
     my $warn;
     local $^WARN_HOOK = sub { $warn .= @_[0]->{?description} };
     readline *FOOBAR;

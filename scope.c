@@ -169,21 +169,6 @@ Perl_tmps_tmprefcnt(pTHX)
     }
 }
 
-STATIC SV *
-S_save_scalar_at(pTHX_ SV **sptr)
-{
-    dVAR;
-    SV * const osv = *sptr;
-    register SV * const sv = *sptr = newSV(0);
-
-    PERL_ARGS_ASSERT_SAVE_SCALAR_AT;
-
-    if (SvTYPE(osv) >= SVt_PVMG && SvMAGIC(osv) && SvTYPE(osv) != SVt_PVGV) {
-	mg_localize(osv, sv);
-    }
-    return sv;
-}
-
 SV *
 Perl_save_scalar(pTHX_ GV *gv)
 {
@@ -196,9 +181,22 @@ Perl_save_scalar(pTHX_ GV *gv)
     PL_localizing = 0;
     SSCHECK(3);
     SSPUSHPTR(GvREFCNT_inc(gv));
-    SSPUSHPTR(SvREFCNT_inc(*sptr));
+    SSPUSHPTR(newSVsv(*sptr));
     SSPUSHINT(SAVEt_SV);
-    return save_scalar_at(sptr);
+    return *sptr;
+}
+
+void
+Perl_save_call_sv(pTHX_ AV* args, SV* new_value)
+{
+    dVAR;
+
+    PERL_ARGS_ASSERT_SAVE_CALL_SV;
+
+    SSCHECK(4);
+    SSPUSHPTR(AvREFCNT_inc(args));
+    SSPUSHPTR(newSVsv(new_value));
+    SSPUSHINT(SAVEt_CALLSV);
 }
 
 /* Like save_sptr(), but also SvREFCNT_dec()s the new value.  Can be used to
@@ -298,7 +296,6 @@ Perl_save_ary(pTHX_ GV *gv)
 {
     dVAR;
     AV * const oav = GvAVn(gv);
-    AV *av;
 
     PERL_ARGS_ASSERT_SAVE_ARY;
 
@@ -306,34 +303,24 @@ Perl_save_ary(pTHX_ GV *gv)
 	av_reify(oav);
     SSCHECK(3);
     SSPUSHPTR(gv);
-    SSPUSHPTR(oav);
+    SSPUSHPTR(newSVsv(avTsv(oav)));
     SSPUSHINT(SAVEt_AV);
-
-    GvAV(gv) = NULL;
-    av = GvAVn(gv);
-    if (SvMAGIC(oav))
-	mg_localize((SV*)oav, (SV*)av);
-    return av;
+    return oav;
 }
 
 HV *
 Perl_save_hash(pTHX_ GV *gv)
 {
     dVAR;
-    HV *ohv, *hv;
+    HV *ohv = GvHVn(gv);
 
     PERL_ARGS_ASSERT_SAVE_HASH;
 
     SSCHECK(3);
     SSPUSHPTR(gv);
-    SSPUSHPTR(ohv = GvHVn(gv));
+    SSPUSHPTR(newSVsv(hvTsv(ohv)));
     SSPUSHINT(SAVEt_HV);
-
-    GvHV(gv) = NULL;
-    hv = GvHVn(gv);
-    if (SvMAGIC(ohv))
-	mg_localize((SV*)ohv, (SV*)hv);
-    return hv;
+    return ohv;
 }
 
 void
@@ -482,7 +469,6 @@ Perl_save_set_magicsv(pTHX_ SV* name)
     SSPUSHPTR(SvREFCNT_inc_NN(name));
     SSPUSHPTR(SvREFCNT_inc_NN(sv));
     SSPUSHINT(SAVEt_SET_MAGICSV);
-    magic_set(SvPVX_const(name), sv_2mortal(newSV(0)));
     PL_localizing = 0;
 }
 
@@ -601,12 +587,11 @@ Perl_save_aelem(pTHX_ AV *av, I32 idx, SV **sptr)
     SSCHECK(4);
     SSPUSHPTR(AvREFCNT_inc(av));
     SSPUSHINT(idx);
-    SSPUSHPTR(SvREFCNT_inc(*sptr));
+    SSPUSHPTR(newSVsv(*sptr));
     SSPUSHINT(SAVEt_AELEM);
     /* if it gets reified later, the restore will have the wrong refcnt */
     if (!AvREAL(av) && AvREIFY(av))
 	SvREFCNT_inc_void(*sptr);
-    save_scalar_at(sptr);
     sv = *sptr;
 }
 
@@ -621,9 +606,8 @@ Perl_save_helem(pTHX_ HV *hv, SV *key, SV **sptr)
     SSCHECK(4);
     SSPUSHPTR(HvREFCNT_inc(hv));
     SSPUSHPTR(newSVsv(key));
-    SSPUSHPTR(SvREFCNT_inc(*sptr));
+    SSPUSHPTR(newSVsv(*sptr));
     SSPUSHINT(SAVEt_HELEM);
-    save_scalar_at(sptr);
     sv = *sptr;
 }
 
@@ -636,9 +620,9 @@ Perl_save_svref(pTHX_ SV **sptr)
 
     SSCHECK(3);
     SSPUSHPTR(sptr);
-    SSPUSHPTR(SvREFCNT_inc(*sptr));
+    SSPUSHPTR(newSVsv(*sptr));
     SSPUSHINT(SAVEt_SVREF);
-    return save_scalar_at(sptr);
+    return *sptr;
 }
 
 void
@@ -698,10 +682,8 @@ Perl_leave_scope(pTHX_ I32 base)
 	    av = (AV*)gv; /* what to refcnt_dec */
 	restore_sv:
 	    sv = *(SV**)ptr;
-	    *(SV**)ptr = value;
-	    SvREFCNT_dec(sv);
 	    PL_localizing = 2;
-	    SvSETMAGIC(value);
+	    sv_setsv(*(SV**)ptr, value);
 	    PL_localizing = 0;
 	    SvREFCNT_dec(value);
 	    if (av) /* actually an av, hv or gv */
@@ -738,28 +720,18 @@ Perl_leave_scope(pTHX_ I32 base)
 	case SAVEt_AV:				/* array reference */
 	    av = (AV*)SSPOPPTR;
 	    gv = (GV*)SSPOPPTR;
-	    if (GvAV(gv)) {
-		AvREFCNT_dec(GvAV(gv));
-	    }
-	    GvAV(gv) = av;
-	    if (SvMAGICAL(av)) {
-		PL_localizing = 2;
-		SvSETMAGIC((SV*)av);
-		PL_localizing = 0;
-	    }
+	    PL_localizing = 2;
+	    sv_setsv(avTsv(GvAV(gv)), avTsv(av));
+	    PL_localizing = 0;
+	    AvREFCNT_dec(av);
 	    break;
 	case SAVEt_HV:				/* hash reference */
 	    hv = (HV*)SSPOPPTR;
 	    gv = (GV*)SSPOPPTR;
-	    if (GvHV(gv)) {
-		HvREFCNT_dec(GvHV(gv));
-	    }
-	    GvHV(gv) = hv;
-	    if (SvMAGICAL(hv)) {
-		PL_localizing = 2;
-		SvSETMAGIC((SV*)hv);
-		PL_localizing = 0;
-	    }
+	    PL_localizing = 2;
+	    sv_setsv(hvTsv(GvHV(gv)), hvTsv(hv));
+	    PL_localizing = 0;
+	    HvREFCNT_dec(hv);
 	    break;
 	case SAVEt_INT:				/* int reference */
 	    ptr = SSPOPPTR;
@@ -999,6 +971,30 @@ Perl_leave_scope(pTHX_ I32 base)
 	    PL_localizing = 2;
 	    magic_set(SvPVX_const(name), value);
 	    PL_localizing = 0;
+	    break;
+	}
+	case SAVEt_CALLSV: {
+	    dSP;
+	    SV* new_value = sv_2mortal((SV*)SSPOPPTR);
+	    AV* args = av_2mortal((AV*)SSPOPPTR);
+	    const I32 maxarg = av_len(args);
+	    SV* cv = AvARRAY(args)[maxarg];
+	    
+	    ENTER;
+	    PUSHSTACK;
+	    PL_localizing = 2;
+	    XPUSHs(new_value);
+	    PUSHMARK(SP);
+	    if (maxarg) {
+		EXTEND(SP, maxarg);
+		Copy(AvARRAY(args), SP+1, maxarg, SV*);
+		SP += maxarg;
+	    }
+	    PUTBACK;
+	    call_sv(cv, G_DISCARD | G_ASSIGNMENT );
+	    PL_localizing = 0;
+	    POPSTACK;
+	    LEAVE;
 	    break;
 	}
 	case SAVEt_SAVESWITCHSTACK:

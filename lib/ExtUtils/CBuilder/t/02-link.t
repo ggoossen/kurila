@@ -9,7 +9,7 @@ BEGIN {
   }
 }
 
-use Test;
+use Test::More;
 BEGIN { 
   if ($^OS_NAME eq 'MSWin32') {
     print $^STDOUT, "1..0 # Skipped: link_executable() is not implemented yet on Win32\n";
@@ -58,7 +58,7 @@ if ($^OS_NAME eq 'os2') {		# Analogue of LDLOADPATH...
 }
 
 # Try the executable
-ok my_system($exe_file), 11;
+is my_system($exe_file), 11;
 
 # Clean up
 for (@($source_file, $object_file, $exe_file)) {

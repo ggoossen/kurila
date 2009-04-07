@@ -2111,8 +2111,8 @@ if ( $FileList and $MakeList ) {
 EOFHEADER
     my @input=@("version",glob( <'*.txt'));
     print $ofh, "$_\n" for 
-         @input,
-        "\n=================================\n",
+      @input
+        +@+ @:"\n=================================\n",
         "# Output files:\n",
         # special files
         "Properties";

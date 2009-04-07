@@ -259,7 +259,7 @@ sub move {
     @($tosz1,$tomt1) =  @(stat($to))[[@:7,9]];  # just in case rename did something
 
     do {
-        local $^EVAL_ERROR;
+        local $^EVAL_ERROR = undef;
         try {
             copy($from,$to) or die;
             my@($atime, $mtime) =  @(stat($from))[[8..9]];

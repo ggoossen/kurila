@@ -58,7 +58,7 @@ do {
 
 ### the version may contain an _, which means perl will warn about 'not
 ### numeric' -- turn off that warning here.
-do {   local $^WARNING;
+do {   local $^WARNING = undef;
     my $rv = check_install(
                         module  => 'Module::Load::Conditional',
                         version => $Module::Load::Conditional::VERSION + 1,

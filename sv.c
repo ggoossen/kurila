@@ -8831,7 +8831,7 @@ S_find_uninit_var(pTHX_ OP* obase, SV* uninit_sv, bool match)
     case OP_SUBST:
     case OP_MATCH:
 	if ( !(obase->op_flags & OPf_STACKED)) {
-	    if (uninit_sv == ((obase->op_private & OPpTARGET_MY)
+	    if (uninit_sv == ((obase->op_flags & OPf_TARGET_MY)
 				 ? PAD_SVl(obase->op_targ)
 				 : DEFSV))
 	    {

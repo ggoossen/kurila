@@ -198,8 +198,6 @@ EXTCONST char* const PL_op_name[] = {
 	"mapstart",
 	"mapwhile",
 	"range",
-	"flip",
-	"flop",
 	"and",
 	"or",
 	"xor",
@@ -210,6 +208,8 @@ EXTCONST char* const PL_op_name[] = {
 	"dorassign",
 	"method",
 	"entersub",
+	"entersub_targargs",
+	"entersub_save",
 	"leavesub",
 	"caller",
 	"warn",
@@ -557,9 +557,7 @@ EXTCONST char* const PL_op_desc[] = {
 	"grep iterator",
 	"map",
 	"map iterator",
-	"flipflop",
-	"range (or flip)",
-	"range (or flop)",
+	"range",
 	"logical and (&&)",
 	"logical or (||)",
 	"logical xor",
@@ -570,6 +568,8 @@ EXTCONST char* const PL_op_desc[] = {
 	"defined or assignment (//=)",
 	"method lookup",
 	"subroutine entry",
+	"subroutine entry using saved args",
+	"subroutine entry saving value",
 	"subroutine exit",
 	"caller",
 	"warn",
@@ -930,8 +930,6 @@ EXT Perl_ppaddr_t PL_ppaddr[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_unimplemented_op),	/* Perl_pp_mapstart */
 	MEMBER_TO_FPTR(Perl_pp_mapwhile),
 	MEMBER_TO_FPTR(Perl_pp_range),
-	MEMBER_TO_FPTR(Perl_pp_flip),
-	MEMBER_TO_FPTR(Perl_pp_flop),
 	MEMBER_TO_FPTR(Perl_pp_and),
 	MEMBER_TO_FPTR(Perl_pp_or),
 	MEMBER_TO_FPTR(Perl_pp_xor),
@@ -942,6 +940,8 @@ EXT Perl_ppaddr_t PL_ppaddr[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_pp_defined),	/* Perl_pp_dorassign */
 	MEMBER_TO_FPTR(Perl_pp_method),
 	MEMBER_TO_FPTR(Perl_pp_entersub),
+	MEMBER_TO_FPTR(Perl_pp_entersub_targargs),
+	MEMBER_TO_FPTR(Perl_pp_entersub_save),
 	MEMBER_TO_FPTR(Perl_pp_leavesub),
 	MEMBER_TO_FPTR(Perl_pp_caller),
 	MEMBER_TO_FPTR(Perl_pp_warn),
@@ -1299,8 +1299,6 @@ EXT Perl_check_t PL_check[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_ck_grep),	/* mapstart */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* mapwhile */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* range */
-	MEMBER_TO_FPTR(Perl_ck_null),	/* flip */
-	MEMBER_TO_FPTR(Perl_ck_null),	/* flop */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* and */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* or */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* xor */
@@ -1311,6 +1309,8 @@ EXT Perl_check_t PL_check[] /* or perlvars.h */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* dorassign */
 	MEMBER_TO_FPTR(Perl_ck_method),	/* method */
 	MEMBER_TO_FPTR(Perl_ck_subr),	/* entersub */
+	MEMBER_TO_FPTR(Perl_ck_null),	/* entersub_targargs */
+	MEMBER_TO_FPTR(Perl_ck_null),	/* entersub_save */
 	MEMBER_TO_FPTR(Perl_ck_null),	/* leavesub */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* caller */
 	MEMBER_TO_FPTR(Perl_ck_fun),	/* warn */
@@ -1661,9 +1661,7 @@ EXTCONST U32 PL_opargs[] = {
 	0x00000648,	/* grepwhile */
 	0x0004a845,	/* mapstart */
 	0x00000648,	/* mapwhile */
-	0x00022600,	/* range */
-	0x00022200,	/* flip */
-	0x00000200,	/* flop */
+	0x00022400,	/* range */
 	0x00000600,	/* and */
 	0x00000600,	/* or */
 	0x00022406,	/* xor */
@@ -1674,6 +1672,8 @@ EXTCONST U32 PL_opargs[] = {
 	0x00000604,	/* dorassign */
 	0x00000240,	/* method */
 	0x00004249,	/* entersub */
+	0x00005640,	/* entersub_targargs */
+	0x00004240,	/* entersub_save */
 	0x00000200,	/* leavesub */
 	0x00013608,	/* caller */
 	0x0000481d,	/* warn */

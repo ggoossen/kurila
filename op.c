@@ -366,22 +366,6 @@ Perl_allocmy(pTHX_ const char *const name)
 
     PERL_ARGS_ASSERT_ALLOCMY;
 
-    /* complain about "my $<special_var>" etc etc */
-    if (*name &&
-	!(is_our ||
-	  isALPHA(name[1]) ||
-	  (USE_UTF8_IN_NAMES && UTF8_IS_START(name[1])) ||
-	  (name[1] == '_' && (*name == '$' || name[2]))))
-    {
-	/* name[2] is true if strlen(name) > 2  */
-	if (!isPRINT(name[1]) || strchr("\t\n\r\f", name[1])) {
-	    yyerror(Perl_form(aTHX_ "Can't use global %c^%c%s in \"my\"",
-		    name[0], toCTRL(name[1]), name + 2));
-	} else {
-	    yyerror(Perl_form(aTHX_ "Can't use global %s in \"my\"",name));
-	}
-    }
-
     /* check for duplicate declaration */
     pad_check_dup(name, is_our, (PL_curstash ? PL_curstash : PL_defstash));
 
@@ -920,9 +904,9 @@ Perl_bind_match(pTHX_ I32 type, OP *left, OP *right)
 
     ismatchop = rtype == OP_MATCH ||
          	rtype == OP_SUBST;
-    if (ismatchop && right->op_private & OPpTARGET_MY) {
+    if (ismatchop && right->op_flags & OPf_TARGET_MY) {
 	right->op_targ = 0;
-	right->op_private &= ~OPpTARGET_MY;
+	right->op_flags &= ~OPf_TARGET_MY;
     }
     if (!(right->op_flags & OPf_STACKED) && ismatchop) {
 	OP *newleft;
@@ -1282,7 +1266,8 @@ Perl_convert(pTHX_ I32 type, OPFLAGS flags, OP *o, SV *location)
 /*
 =for apidoc op_assign
 
-op_assign modified the OP C<*o> to be assignable, and returns the OP which finishes the assignment.
+op_assign modified the OP C<*o> to be assignable, and returns the OP
+which finishes the assignment.
 
 =cut
 */
@@ -1335,6 +1320,61 @@ Perl_op_assign(pTHX_ OP** po, I32 optype)
 
 	padop2 = newOP(OP_PADSV, 0, o->op_location);
 	padop2->op_targ = tmpsv;
+
+	copy_from_tmp =
+	    newBINOP(
+		OP_SASSIGN,
+		    0,
+		    padop2,
+		    copyo,
+		    o->op_location
+		);
+    
+	return copy_from_tmp;
+    }
+    case OP_ENTERSUB:
+    case OP_ENTERSUB_SAVE:
+    {
+	I32 min_modcount = 0;
+	I32 max_modcount = 0;
+	OP* copyo;
+	OP* padop;
+	OP* padop2;
+	OP* copy_to_tmp;
+	OP* copy_from_tmp;
+	OP* o_sibling;
+	const bool existingpo = o->op_type == OP_ENTERSUB_SAVE;
+
+	const PADOFFSET tmppo = pad_alloc(OP_SASSIGN, SVs_PADTMP);
+	const PADOFFSET argspo = existingpo ? o->op_targ : pad_alloc(OP_SASSIGN, SVs_PADTMP);
+
+	padop = newOP(OP_PADSV, OPf_MOD | OPf_ASSIGN, o->op_location);
+	padop->op_private |= OPpLVAL_INTRO;
+	padop->op_targ = tmppo;
+
+	o->op_private |= OPpENTERSUB_SAVEARGS;
+	o->op_targ = argspo;
+
+	o_sibling = o->op_sibling;
+	o->op_sibling = NULL;
+	copy_to_tmp =
+	    newBINOP(
+		OP_SASSIGN,
+		    0,
+		    scalar(o), 
+		    scalar(padop),
+		    o->op_location
+		);
+	copy_to_tmp->op_sibling = o_sibling;
+	*po = copy_to_tmp;
+
+	copyo = newOP(OP_ENTERSUB_TARGARGS, 0, o->op_location);
+	copyo->op_targ = argspo;
+	copyo->op_flags = OPf_STACKED;
+	copyo = assign(copyo, FALSE, &min_modcount, &max_modcount);
+
+	padop2 = newOP(OP_PADSV, 0, o->op_location);
+	padop2->op_targ = tmppo;
 
 	copy_from_tmp =
 	    newBINOP(
@@ -1425,6 +1465,33 @@ Perl_assign(pTHX_ OP *o, bool partial, I32 *min_modcount, I32 *max_modcount)
 	if ( ! (o->op_flags & OPf_OPTIONAL) )
 	    (*min_modcount)++;
 	o = mod(o, o->op_type);
+	break;
+
+    case OP_ENTERSUB_SAVE: {
+	OP* saveo = o;
+	saveo->op_private |= OPpENTERSUB_SAVE_DISCARD;
+	o = newUNOP(OP_ENTERSUB_TARGARGS, 0, saveo, saveo->op_location);
+	o->op_targ = saveo->op_targ;
+	o->op_flags |= OPf_ASSIGN | OPf_STACKED;
+	if (partial) {
+	    o->op_flags |= OPf_ASSIGN_PART;
+	    o->op_flags = (o->op_flags & ~OPf_WANT) | OPf_WANT_VOID;
+	}
+	(*max_modcount)++;
+	if ( ! (o->op_flags & OPf_OPTIONAL) )
+	    (*min_modcount)++;
+	break;
+    }
+
+    case OP_ENTERSUB_TARGARGS:
+	o->op_flags |= OPf_ASSIGN;
+	if (partial) {
+	    o->op_flags |= OPf_ASSIGN_PART;
+	    o->op_flags = (o->op_flags & ~OPf_WANT) | OPf_WANT_VOID;
+	}
+	(*max_modcount)++;
+	if ( ! (o->op_flags & OPf_OPTIONAL) )
+	    (*min_modcount)++;
 	break;
 
     case OP_DOTDOTDOT:
@@ -2593,7 +2660,7 @@ Perl_newASSIGNOP(pTHX_ OPFLAGS flags, OP *left, I32 optype, OP *right, SV *locat
 	    if (finish_assign) {
 		o = newBINOP(OP_SASSIGN, 0, scalar(right),
 		    newOP(OP_LOGASSIGN_ASSIGN, 0, location), location);
-		o = append_elem(OP_LISTFIRST, o, finish_assign);
+		o = append_elem(OP_LISTLAST, o, finish_assign);
 		return newLOGOP(optype, 0, scalar(new_left), o, location);
 	    }
 	    else {
@@ -2608,7 +2675,7 @@ Perl_newASSIGNOP(pTHX_ OPFLAGS flags, OP *left, I32 optype, OP *right, SV *locat
 	    o = newBINOP(optype, OPf_STACKED,
 		mod(new_left, optype), scalar(right), location);
 	    if (finish_assign) {
-		o = append_elem(OP_LISTFIRST, o, finish_assign);
+		o = append_elem(OP_LISTLAST, o, finish_assign);
 	    }
 	    return o;
 	}
@@ -2897,55 +2964,7 @@ Perl_newCONDOP(pTHX_ OPFLAGS flags, OP *first, OP *trueop, OP *falseop, SV *loca
 }
 
 OP *
-Perl_newRANGE(pTHX_ OPFLAGS flags, OP *left, OP *right)
-{
-    dVAR;
-    LOGOP *range;
-    OP *flip;
-    OP *flop;
-    OP *leftstart;
-    OP *o;
-
-    PERL_ARGS_ASSERT_NEWRANGE;
-
-    NewOp(1101, range, 1, LOGOP);
-
-    range->op_type = OP_RANGE;
-    range->op_ppaddr = PL_ppaddr[OP_RANGE];
-    range->op_first = left;
-    range->op_flags = OPf_KIDS;
-    leftstart = LINKLIST(left);
-    range->op_other = LINKLIST(right);
-    range->op_private = (U8)(1 | (flags >> 8));
-    range->op_location = SvREFCNT_inc(left->op_location);
-
-    left->op_sibling = right;
-
-    range->op_next = (OP*)range;
-    flip = newUNOP(OP_FLIP, flags, (OP*)range, range->op_location);
-    flop = newUNOP(OP_FLOP, 0, flip, range->op_location);
-    o = newUNOP(OP_NULL, 0, flop, range->op_location);
-    linklist(flop);
-    range->op_next = leftstart;
-
-    left->op_next = flip;
-    right->op_next = flop;
-
-    range->op_targ = pad_alloc(OP_RANGE, SVs_PADMY);
-    flip->op_targ = pad_alloc(OP_RANGE, SVs_PADMY);
-
-    flip->op_private =  left->op_type == OP_CONST ? OPpFLIP_LINENUM : 0;
-    flop->op_private = right->op_type == OP_CONST ? OPpFLIP_LINENUM : 0;
-
-    flip->op_next = o;
-    if (!flip->op_private || !flop->op_private)
-	linklist(o);		/* blow off optimizer unless constant */
-
-    return o;
-}
-
-OP *
-    Perl_newLOOPOP(pTHX_ OPFLAGS flags, I32 debuggable, OP *expr, OP *block, bool once, SV *location)
+Perl_newLOOPOP(pTHX_ OPFLAGS flags, I32 debuggable, OP *expr, OP *block, bool once, SV *location)
 {
     dVAR;
     OP* listop;
@@ -3171,31 +3190,23 @@ Perl_newFOROP(pTHX_ OPFLAGS flags, char *label, OP *sv, OP *expr, OP *block, OP 
 	|| expr->op_type == OP_PADSV || expr->op_type == OP_ASLICE
 	|| expr->op_type == OP_VALUES ) {
 	expr->op_flags |= OPf_SPECIAL;
-	expr = mod(force_list(expr), OP_GREPSTART);
+	expr = mod(expr, OP_GREPSTART);
 	iterflags |= OPf_STACKED;
     }
-    else if (expr->op_type == OP_NULL &&
-             (expr->op_flags & OPf_KIDS) &&
-             ((BINOP*)expr)->op_first->op_type == OP_FLOP)
+    else if (expr->op_type == OP_RANGE)
     {
 	/* Basically turn for($x..$y) into the same as for($x,$y), but we
 	 * set the SPECIAL flag to indicate that these values are to be
 	 * treated as min/max values by 'pp_iterinit'.
 	 */
-	const UNOP* const flip = (UNOP*)((UNOP*)((BINOP*)expr)->op_first)->op_first;
-	LOGOP* const range = (LOGOP*) flip->op_first;
+	BINOP* const range = (BINOP*)expr;
 	OP* const left  = range->op_first;
-	OP* const right = left->op_sibling;
+	OP* const right = range->op_last;
 	LISTOP* listop;
 
-	range->op_flags &= ~OPf_KIDS;
-	range->op_first = NULL;
-
 	listop = (LISTOP*)newLISTOP(OP_LIST, 0, left, right, location);
-	listop->op_first->op_next = range->op_next;
-	left->op_next = range->op_other;
-	right->op_next = (OP*)listop;
-	listop->op_next = listop->op_first;
+	range->op_first = NULL;
+	range->op_last = NULL;
 
 #ifdef PERL_MAD
 	op_getmad(expr,(OP*)listop,'O');
@@ -3207,7 +3218,7 @@ Perl_newFOROP(pTHX_ OPFLAGS flags, char *label, OP *sv, OP *expr, OP *block, OP 
 	iterflags |= OPf_SPECIAL;
     }
     else {
-        expr = mod(force_list(expr), OP_GREPSTART);
+        expr = mod(expr, OP_GREPSTART);
     }
 
     loop = (LOOP*)list(convert(OP_ENTERITER, iterflags,
@@ -3730,6 +3741,7 @@ Perl_newSUB(pTHX_ I32 floor, OP *proto, OP *block)
         if (proto) {
 	    I32 min_modcount = 0;
 	    I32 max_modcount = 0;
+	    I32 arg_mod = cv_assignarg_flag(cv) ? 1 : cv_optassignarg_flag(cv) ? 2 : 0;
 	    OP* kid;
 	    LISTOP* list = cLISTOPx(my(convert(OP_LIST, 0, proto, proto->op_location)));
 	    OP* pushmark = list->op_first;
@@ -3737,8 +3749,8 @@ Perl_newSUB(pTHX_ I32 floor, OP *proto, OP *block)
 	    op_free(pushmark);
 	    for (kid = list->op_first; kid; kid = kid->op_sibling)
 		assign(kid, TRUE, &min_modcount, &max_modcount);
-	    CvN_MINARGS(cv) = min_modcount - ( cv_assignarg_flag(cv) ? 1 : 0 );
-	    CvN_MAXARGS(cv) = max_modcount - ( cv_assignarg_flag(cv) ? 1 : 0 );
+	    CvN_MINARGS(cv) = min_modcount - arg_mod;
+	    CvN_MAXARGS(cv) = max_modcount == -1 ? -1 : max_modcount - arg_mod;
 #ifdef PERL_MAD
 	    block = newUNOP(OP_NULL, 0, block, block->op_location);
 #endif
@@ -3891,43 +3903,51 @@ Perl_newXS_flags(pTHX_ const char *name, XSUBADDR_t subaddr,
 		 U32 flags)
 {
     CV *cv = newXS(name, subaddr, filename);
+    PERL_UNUSED_ARG(flags);
 
     PERL_ARGS_ASSERT_NEWXS_FLAGS;
 
-    if (flags & XS_DYNAMIC_FILENAME) {
-	/* We need to "make arrangements" (ie cheat) to ensure that the
-	   filename lasts as long as the PVCV we just created, but also doesn't
-	   leak  */
-	STRLEN filename_len = strlen(filename);
-	STRLEN proto_and_file_len = filename_len;
-	char *proto_and_file;
-	STRLEN proto_len;
-
-	if (proto) {
-	    proto_len = strlen(proto);
-	    proto_and_file_len += proto_len;
-
-	    Newx(proto_and_file, proto_and_file_len + 1, char);
-	    Copy(proto, proto_and_file, proto_len, char);
-	    Copy(filename, proto_and_file + proto_len, filename_len + 1, char);
-	} else {
-	    proto_len = 0;
-	    proto_and_file = savepvn(filename, filename_len);
+    if (proto) {
+	const char* proto_i = proto;
+	I32 n_minargs = 0;
+	I32 n_maxargs = 0;
+	while (*proto_i && *proto_i != ';' && *proto_i != '=' && *proto_i != '?' && *proto_i != '@') {
+	    if (*proto_i == '\\')
+		++proto_i;
+	    if (*proto_i == '[') {
+		while (*proto_i && *proto_i != ']')
+		    ++proto_i;
+	    }
+	    ++n_minargs;
+	    ++proto_i;
 	}
-
-	/* This gets free()d.  :-)  */
-	sv_usepvn_flags((SV*)cv, proto_and_file, proto_and_file_len,
-			SV_HAS_TRAILING_NUL);
-	if (proto) {
-	    /* This gives us the correct prototype, rather than one with the
-	       file name appended.  */
-	    SvCUR_set(cv, proto_len);
-	} else {
-	    SvPOK_off(cv);
+	n_maxargs = n_minargs;
+	if (*proto_i == ';') {
+	    ++proto_i;
+	    while (*proto_i && *proto_i != ';' && *proto_i != '=' && *proto_i != '?' && *proto_i != '@') {
+		if (*proto_i == '\\')
+		    ++proto_i;
+		if (*proto_i == '[') {
+		    while (*proto_i && *proto_i != ']')
+			++proto_i;
+		}
+		++n_maxargs;
+		++proto_i;
+	    }
 	}
-    } else {
-	sv_setpv((SV *)cv, proto);
+	if (*proto_i == '@')
+	    n_maxargs = -1;
+	    
+	if (*proto_i == '?' && proto_i[1] == '=') {
+	    CvFLAGS(cv) |= CVf_OPTASSIGNARG;
+	}
+	if (proto_i[0] == '=') {
+	    CvFLAGS(cv) |= CVf_ASSIGNARG;
+	}
+	CvN_MINARGS(cv) = n_minargs;
+	CvN_MAXARGS(cv) = n_maxargs;
     }
+
     return cv;
 }
 
@@ -4128,7 +4148,7 @@ Perl_ck_concat(pTHX_ OP *o)
     PERL_ARGS_ASSERT_CK_CONCAT;
     PERL_UNUSED_CONTEXT;
 
-    if (kid->op_type == OP_CONCAT && !(kid->op_private & OPpTARGET_MY) &&
+    if (kid->op_type == OP_CONCAT && !(kid->op_flags & OPf_TARGET_MY) &&
 	    !(kUNOP->op_first->op_flags & OPf_MOD))
         o->op_flags |= OPf_STACKED;
     return o;
@@ -4993,7 +5013,7 @@ Perl_ck_sassign(pTHX_ OP *o)
     if ((PL_opargs[kid->op_type] & OA_TARGLEX)
 	&& !(kid->op_flags & OPf_STACKED)
 	/* Cannot steal the second time! */
-	&& !(kid->op_private & OPpTARGET_MY)
+	&& !(kid->op_flags & OPf_TARGET_MY)
 	/* Keep the full thing for madskills */
 	&& !PL_madskills
 	)
@@ -5012,7 +5032,7 @@ Perl_ck_sassign(pTHX_ OP *o)
 /* 	    op_free(o->op_sibling); */
 	    op_free(o);
 	    op_free(kkid);
-	    kid->op_private |= OPpTARGET_MY;	/* Used for context settings */
+	    kid->op_flags |= OPf_TARGET_MY;	/* Used for context settings */
 	    return kid;
 	}
     }
@@ -5030,7 +5050,7 @@ Perl_ck_match(pTHX_ OP *o)
 	const PADOFFSET offset = pad_findmy("$_");
 	if (offset != NOT_IN_PAD && !(PAD_COMPNAME_FLAGS_isOUR(offset))) {
 	    o->op_targ = offset;
-	    o->op_private |= OPpTARGET_MY;
+	    o->op_flags |= OPf_TARGET_MY;
 	}
     }
     if (o->op_type == OP_MATCH || o->op_type == OP_QR)
@@ -5679,14 +5699,14 @@ Perl_peep(pTHX_ register OP *o)
 
 	case OP_CONCAT:
 	    if (o->op_next && o->op_next->op_type == OP_STRINGIFY) {
-		if (o->op_next->op_private & OPpTARGET_MY) {
+		if (o->op_next->op_flags & OPf_TARGET_MY) {
 		    if (o->op_flags & OPf_STACKED) /* chained concats */
 			break; /* ignore_optimization */
 		    else {
 			/* assert(PL_opargs[o->op_type] & OA_TARGLEX); */
 			o->op_targ = o->op_next->op_targ;
 			o->op_next->op_targ = 0;
-			o->op_private |= OPpTARGET_MY;
+			o->op_flags |= OPf_TARGET_MY;
 		    }
 		}
 		op_null(o->op_next);
@@ -5803,7 +5823,6 @@ Perl_peep(pTHX_ register OP *o)
 	case OP_ORASSIGN:
 	case OP_DORASSIGN:
 	case OP_COND_EXPR:
-	case OP_RANGE:
 	    while (cLOGOP->op_other->op_type == OP_NULL)
 		cLOGOP->op_other = cLOGOP->op_other->op_next;
 	    peep(cLOGOP->op_other); /* Recursive calls are not replaced by fptr calls */

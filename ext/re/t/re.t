@@ -35,7 +35,7 @@ like( $warn, qr/Unknown "re" subpragma/,
 	'... should warn about unknown subpragma' );
 ok( re::bits(0, 'eval')  ^&^ 0x00200000, '... should set eval bits' );
 
-local $^HINT_BITS;
+local $^HINT_BITS = undef;
 
 # import
 re->import('eval');

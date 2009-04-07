@@ -69,7 +69,7 @@ foreach my $file (@(
   print $^STDOUT, "# Reading $precooked...\n";
   open(my $in, "<", $precooked) or die "Can't read-open $precooked: $^OS_ERROR";
   do {
-    local $^INPUT_RECORD_SEPARATOR;
+    local $^INPUT_RECORD_SEPARATOR = undef;
     push @out, ~< $in;
   };
   close($in);

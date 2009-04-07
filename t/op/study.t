@@ -4,7 +4,7 @@ our $Ok_Level = 0;
 my $test = 1;
 sub ok($ok, ?$name) {
 
-    local $_;
+    local $_ = undef;
 
     # You have to do it this way or VMS will get confused.
     printf $^STDOUT, "\%s $test\%s\n", $ok   ?? 'ok' !! 'not ok',
@@ -26,7 +26,7 @@ use signals;
 
 my $have_alarm = config_value('d_alarm');
 sub alarm_ok($test) {
-    signals::temp_set_handler("ALRM" => sub { die "timeout\n" });
+    local signals::handler("ALRM") = sub { die "timeout\n" };
     
     my $match;
     try { 

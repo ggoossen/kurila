@@ -74,7 +74,7 @@ is length(MESS), 8;
 
 use constant TRAILING	=> '12 cats';
 do {
-    local $^WARNING;
+    local $^WARNING = 0;
     cmp_ok TRAILING, '==', 12;
 };
 is TRAILING, '12 cats';
@@ -122,10 +122,10 @@ print $output, CHASH->{?foo};
 print $output, CARRAY->[1];
 print $output, CCODE->($curr_test+4);
 
-$TB->current_test($curr_test+4);
+$TB->current_test += 4;
 
 eval q{ CCODE->{foo} };
-like($^EVAL_ERROR->{?description}, qr/^Expected a HASH ref but got a CODE ref/);
+like($^EVAL_ERROR->{?description}, qr/^Expected a HASH ref but got a CODE ref|Constant is not a HASH reference/);
 
 
 # Allow leading underscore

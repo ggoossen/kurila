@@ -99,7 +99,7 @@ sub begin_input {
 }
 
 sub podinc2plaintext($infile, $outfile) {
-    local $_;
+    local $_ = undef;
     my $text_parser = $MYPKG->new;
     $text_parser->parse_from_file($infile, $outfile);
 }
@@ -138,7 +138,7 @@ sub testpodplaintext {
    my @($outfile, $errfile) = @("", "");
    my $passes = 0;
    my $failed = 0;
-   local $_;
+   local $_ = undef;
 
    print $^STDOUT, "1..", scalar nelems @testpods, "\n"  unless (%opts{?'xrgen'});
 

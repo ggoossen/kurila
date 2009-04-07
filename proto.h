@@ -499,6 +499,11 @@ PERL_INLINE_CALLCONV bool	Perl_cv_assignarg_flag(pTHX_ CV* cv)
 #define PERL_ARGS_ASSERT_CV_ASSIGNARG_FLAG	\
 	assert(cv)
 
+PERL_INLINE_CALLCONV bool	Perl_cv_optassignarg_flag(pTHX_ CV* cv)
+			__attribute__nonnull__(pTHX_1);
+#define PERL_ARGS_ASSERT_CV_OPTASSIGNARG_FLAG	\
+	assert(cv)
+
 PERL_CALLCONV void	Perl_cv_undef(pTHX_ CV* cv)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_CV_UNDEF	\
@@ -1852,14 +1857,6 @@ PERL_CALLCONV void	Perl_newPROG(pTHX_ OP* o)
 #define PERL_ARGS_ASSERT_NEWPROG	\
 	assert(o)
 
-PERL_CALLCONV OP*	Perl_newRANGE(pTHX_ OPFLAGS flags, OP* left, OP* right)
-			__attribute__malloc__
-			__attribute__warn_unused_result__
-			__attribute__nonnull__(pTHX_2)
-			__attribute__nonnull__(pTHX_3);
-#define PERL_ARGS_ASSERT_NEWRANGE	\
-	assert(left); assert(right)
-
 PERL_CALLCONV OP*	Perl_newSLICEOP(pTHX_ OPFLAGS flags, OP* subscript, OP* listop)
 			__attribute__malloc__
 			__attribute__warn_unused_result__;
@@ -2663,6 +2660,12 @@ PERL_CALLCONV SV*	Perl_save_scalar(pTHX_ GV* gv)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_SAVE_SCALAR	\
 	assert(gv)
+
+PERL_CALLCONV void	Perl_save_call_sv(pTHX_ AV* args, SV* new_value)
+			__attribute__nonnull__(pTHX_1)
+			__attribute__nonnull__(pTHX_2);
+#define PERL_ARGS_ASSERT_SAVE_CALL_SV	\
+	assert(args); assert(new_value)
 
 PERL_CALLCONV void	Perl_save_pptr(pTHX_ char** pptr)
 			__attribute__nonnull__(pTHX_1);
@@ -4870,14 +4873,6 @@ STATIC SV*	S_pm_description(pTHX_ const PMOP *pm)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_PM_DESCRIPTION	\
 	assert(pm)
-
-#endif
-
-#if defined(PERL_IN_SCOPE_C) || defined(PERL_DECL_PROT)
-STATIC SV*	S_save_scalar_at(pTHX_ SV **sptr)
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_SAVE_SCALAR_AT	\
-	assert(sptr)
 
 #endif
 

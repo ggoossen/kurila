@@ -116,8 +116,9 @@ PP(pp_rv2gv)
 	    DIE(aTHX_ PL_no_symref_sv, sv, "a symbol");
 	}
     }
+
     if (PL_op->op_private & OPpLVAL_INTRO)
-	save_gp((GV*)sv, !(PL_op->op_flags & OPf_SPECIAL));
+       save_gp((GV*)sv, !(PL_op->op_flags & OPf_SPECIAL));
     if (op_flags & OPf_ASSIGN) {
 	if (op_flags & OPf_ASSIGN_PART) {
 	    SV* src;
@@ -3509,7 +3510,7 @@ PP(pp_hslice)
 		HE* he = hv_fetch_ent(hv, keysv, 0, 0);
 		SV** svp = he ? &HeVAL(he) : NULL;
 		if (HvNAME_get(hv) && isGV(*svp))
-		    save_gp((GV*)*svp, !(PL_op->op_flags & OPf_SPECIAL));
+		    Perl_croak(aTHX_ "can't localize glob");
 		else {
 		    if (svp)
 			save_helem(hv, keysv, svp);
@@ -3563,7 +3564,7 @@ PP(pp_hslice)
             }
             if (localizing) {
 		if (HvNAME_get(hv) && isGV(*svp))
-		    save_gp((GV*)*svp, !(PL_op->op_flags & OPf_SPECIAL));
+		    Perl_croak(aTHX_ "can't localize glob");
 		else {
 		    if (preeminent)
 			save_helem(hv, keysv, svp);
@@ -3915,17 +3916,7 @@ PP(pp_arrayexpand)
 	    const I32 maxarg = AvFILL(av) + 1;
 	    (void)POPs;			/* XXXX May be optimized away? */
 	    EXTEND(SP, maxarg);
-	    if (SvRMAGICAL(av)) {
-		U32 i;
-		for (i=0; i < (U32)maxarg; i++) {
-		    SV ** const svp = av_fetch(av, i, FALSE);
-		    /* See note in pp_helem, and bug id #27839 */
-		    SP[i+1] = svp ? *svp : &PL_sv_undef;
-		}
-	    }
-	    else {
-		Copy(AvARRAY(av), SP+1, maxarg, SV*);
-	    }
+	    Copy(AvARRAY(av), SP+1, maxarg, SV*);
 	    SP += maxarg;
 	}
     }

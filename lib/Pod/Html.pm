@@ -344,7 +344,7 @@ sub clean_data($dataref) {
 sub pod2html {
     local(@ARGV) = @_;
     local($^INPUT_RECORD_SEPARATOR);
-    local $_;
+    local $_ = undef;
 
     init_globals();
 
@@ -778,7 +778,7 @@ sub cache_key($dircache, $itemcache, $podpath, $podroot, $recurse) {
 #
 sub load_cache($dircache, $itemcache, $podpath, $podroot) {
     my($tests);
-    local $_;
+    local $_ = undef;
 
     $tests = 0;
 
@@ -951,7 +951,7 @@ sub scan_podpath($podroot, $recurse, $append) {
 #
 sub scan_dir($dir, $recurse) {
     my($t, @subdirs, @pods, $pod, $dirname, @dirs);
-    local $_;
+    local $_ = undef;
 
     @subdirs = @( () );
     @pods = @( () );
@@ -1059,7 +1059,7 @@ sub scan_headings($sections, @< @data) {
 #
 sub scan_items( $itemref, $pod, @< @poddata) {
     my( $item);
-    local $_;
+    local $_ = undef;
 
     $pod =~ s/\.pod\z//;
     $pod .= ".html" if $pod;

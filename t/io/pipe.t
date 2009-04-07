@@ -129,10 +129,10 @@ wait;				# Collect from $pid
 pipe(my $reader, my $writer) || die "Can't open pipe";
 close $reader;
 
-signals::set_handler('PIPE' => \&broken_pipe);
+signals::handler('PIPE') = \&broken_pipe;
 
 sub broken_pipe {
-    signals::set_handler('PIPE' => 'IGNORE');       # loop preventer
+    signals::handler('PIPE') = 'IGNORE';       # loop preventer
     printf $^STDOUT, "ok \%d - SIGPIPE\n", curr_test;
 }
 
@@ -159,7 +159,7 @@ SKIP: do {
           if config_value('d_sfio') || $^OS_NAME eq 'machten' || $^OS_NAME eq 'beos' || 
              $^OS_NAME eq 'posix-bc';
 
-        signals::temp_set_handler(PIPE => 'IGNORE');
+        local signals::handler("PIPE") = 'IGNORE';
         open my $nil, '|-', qq{$Perl -e "exit 0"} or die "open failed: $^OS_ERROR";
         sleep 5;
         if (print $nil, 'foo') {
@@ -191,7 +191,7 @@ SKIP: do {
                 exit 37;
             }
             my $pipe = open my $fh, "-|", "sleep 2;exit 13" or die "Open: $^OS_ERROR\n";
-            signals::set_handler(ALRM => sub { return });
+            signals::handler("ALRM") = sub { return };
             alarm(1);
             is( close $fh, '',   'close failure for... umm, something' );
             is( $^CHILD_ERROR, 13*256,     '       status' );
@@ -231,7 +231,7 @@ SKIP: do {
 
   my $child = 0;
   try {
-    signals::temp_set_handler(ALRM => sub { die; });
+    local signals::handler("ALRM") = sub { die; };
     alarm 2;
     $child = wait;
     alarm 0;

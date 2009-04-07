@@ -823,12 +823,16 @@ STATIC SV* S_dump_op_flags_private(pTHX_ const OP* o)
     PERL_ARGS_ASSERT_DUMP_OP_FLAGS_PRIVATE;
 
     if (PL_opargs[optype] & OA_TARGLEX) {
-	if (o->op_private & OPpTARGET_MY)
+	if (o->op_flags & OPf_TARGET_MY)
 	    sv_catpv(tmpsv, ",TARGET_MY");
     }
     else if (optype == OP_REPEAT) {
 	if (o->op_private & OPpREPEAT_DOLIST)
 	    sv_catpv(tmpsv, ",DOLIST");
+    }
+    if (optype == OP_ENTERSUB_SAVE) {
+	if (o->op_private & OPpENTERSUB_SAVE_DISCARD)
+	    sv_catpv(tmpsv, ",DISCARD");
     }
     else if (optype == OP_ENTERSUB ||
 	     optype == OP_RV2SV ||
@@ -846,12 +850,8 @@ STATIC SV* S_dump_op_flags_private(pTHX_ const OP* o)
 		sv_catpv(tmpsv, ",DB");
 	    if (o->op_private & OPpENTERSUB_HASTARG)
 		sv_catpv(tmpsv, ",HASTARG");
-	    if (o->op_private & OPpENTERSUB_NOPAREN)
-		sv_catpv(tmpsv, ",NOPAREN");
 	    if (o->op_private & OPpENTERSUB_INARGS)
 		sv_catpv(tmpsv, ",INARGS");
-	    if (o->op_private & OPpENTERSUB_NOMOD)
-		sv_catpv(tmpsv, ",NOMOD");
 	}
 	else {
 	    switch (o->op_private & OPpDEREF) {
@@ -882,22 +882,12 @@ STATIC SV* S_dump_op_flags_private(pTHX_ const OP* o)
 	    sv_catpv(tmpsv, ",BARE");
 	if (o->op_private & OPpCONST_STRICT)
 	    sv_catpv(tmpsv, ",STRICT");
-	if (o->op_private & OPpCONST_WARNING)
-	    sv_catpv(tmpsv, ",WARNING");
 	if (o->op_private & OPpCONST_ENTERED)
 	    sv_catpv(tmpsv, ",ENTERED");
     }
-    else if (optype == OP_FLIP) {
-	if (o->op_private & OPpFLIP_LINENUM)
-	    sv_catpv(tmpsv, ",LINENUM");
-    }
-    else if (optype == OP_FLOP) {
-	if (o->op_private & OPpFLIP_LINENUM)
-	    sv_catpv(tmpsv, ",LINENUM");
-    }
     else if (optype == OP_RV2CV) {
 	if (o->op_private & OPpLVAL_INTRO)
-	    sv_catpv(tmpsv, ",INTRO");
+	    sv_catpv(tmpsv, ",LVAL_INTRO");
     }
     else if (optype == OP_GV) {
 	if (o->op_private & OPpEARLY_CV)
@@ -950,7 +940,7 @@ STATIC SV* S_dump_op_flags_private(pTHX_ const OP* o)
 	    sv_catpv(tmpsv, ",FT_STACKED");
     }
     if (o->op_flags & OPf_MOD && o->op_private & OPpLVAL_INTRO)
-	sv_catpv(tmpsv, ",INTRO");
+	sv_catpv(tmpsv, ",LVAL_INTRO");
     
     return tmpsv;
 }

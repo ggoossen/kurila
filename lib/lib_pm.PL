@@ -50,7 +50,7 @@ $useConfig
 
 my \$archname         = $Config_archname;
 my \$version          = $Config_version;
-my \@inc_version_list = \@( $Config_inc_version_list );
+my \@inc_version_list = $Config_inc_version_list;
 
 !GROK!THIS!
 print $out, <<'!NO!SUBS!';
@@ -83,7 +83,7 @@ sub import {
 	}
 	unshift($^INCLUDE_PATH, $path);
 	# Add any previous version directories we found at configure time
-	foreach my $incver (< @inc_version_list)
+	foreach my $incver (@inc_version_list)
 	{
 	    my $dir = $Is_MacOS
 		?? File::Spec->catdir( $path, $incver )

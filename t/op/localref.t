@@ -6,9 +6,9 @@ plan( tests => 54 );
 our ($aaa, $x, @aa, %aa, $aa);
 
 $aa = 1;
-do { local $aa;     $aa = 2; is($aa,2); };
+do { local $aa = undef;     $aa = 2; is($aa,2); };
 is($aa,1);
-do { local $aa;   $aa = 3; is($aa,3); };
+do { local $aa = undef;   $aa = 3; is($aa,3); };
 is($aa,1);
 do { local ${*{Symbol::fetch_glob("aa")}}; $aa = 4; is($aa,4); };
 is($aa,1);

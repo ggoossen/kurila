@@ -42,7 +42,7 @@ XS(XS_Internals_SvREADONLY)	/* This is dangerous stuff. */
     SV* sv = ST(0);
     PERL_UNUSED_ARG(cv);
     if (!SvRVOK(sv))
-        Perl_croak(aTHX_ "argument to HvRESTRICTED must be a HASH REF not a %s", Ddesc(ST(0)));
+        Perl_croak(aTHX_ "argument to SvREADONLY must be a HASH REF not a %s", Ddesc(ST(0)));
     sv = SvRV(sv);
 
     if (items == 1) {

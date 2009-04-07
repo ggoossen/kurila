@@ -194,7 +194,7 @@ sub Tgetent($class, $self)
 
     my ( $term, $cap, $search, $max, $tmp_term, $TERMCAP );
     local ( $termpat, $state, $first, $entry );    # used inside eval
-    local $_;
+    local $_ = undef;
 
     # Compute PADDING factor from OSPEED (to be used by Tpad)
     if ( !$self->{?OSPEED} )

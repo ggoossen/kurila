@@ -51,8 +51,6 @@ isa_ok(\42, 'SCALAR');
 # can_ok() & isa_ok should call can() & isa() on the given object, not 
 # just class, in case of custom can()
 do {
-       local *Foo::can;
-       local *Foo::isa;
        *Foo::can = sub { @_[0]->[0] };
        *Foo::isa = sub { @_[0]->[0] };
        my $foo = bless(\@(0), 'Foo');

@@ -191,6 +191,7 @@ pd	|void	|cv_setcv	|NN CV* dst|NN CV* src
 ApdR	|SV*	|cv_const_sv	|NULLOK CV* cv
 pR	|SV*	|op_const_sv	|NULLOK const OP* o|NULLOK CV* cv
 Api	|bool	|cv_assignarg_flag	|NN CV* cv
+Api	|bool	|cv_optassignarg_flag	|NN CV* cv
 Apd	|void	|cv_undef	|NN CV* cv
 Apd	|void	|cv_tmprefcnt	|NN CV* cv
 Ap	|void	|cx_dump	|NN PERL_CONTEXT* cx
@@ -531,7 +532,6 @@ Apa	|OP*	|newLOOPOP	|OPFLAGS flags|I32 debuggable|NULLOK OP* expr|NULLOK OP* blo
 Apa	|OP*	|newNULLLIST	|NULLOK SV *location
 Apa	|OP*	|newOP		|I32 optype|OPFLAGS flags|NULLOK SV* location
 Ap	|void	|newPROG	|NN OP* o
-Apa	|OP*	|newRANGE	|OPFLAGS flags|NN OP* left|NN OP* right
 Apa	|OP*	|newSLICEOP	|OPFLAGS flags|NULLOK OP* subscript|NULLOK OP* listop
 Apa	|OP*	|newSTATEOP	|OPFLAGS flags|NULLOK char* label|NULLOK OP* o|NULLOK SV* location
 Ap	|CV*	|newSUB		|I32 floor|NULLOK OP* proto|NULLOK OP* block
@@ -730,7 +730,7 @@ Ap	|void	|save_freepv	|NULLOK char* pv
 Ap	|void	|save_generic_svref|NN SV** sptr
 Ap	|void	|save_generic_pvref|NN char** str
 Ap	|void	|save_shared_pvref|NN char** str
-Ap	|void	|save_gp	|NN GV* gv|I32 empty
+Ap      |void   |save_gp        |NN GV* gv|I32 empty
 Ap	|HV*	|save_hash	|NN GV* gv
 Api	|void	|save_hints
 Ap	|void	|save_helem	|NN HV *hv|NN SV *key|NN SV **sptr
@@ -747,6 +747,7 @@ Ap	|void	|save_mortalizesv|NN SV* sv
 Ap	|void	|save_nogv	|NN GV* gv
 p	|void	|save_op
 Ap	|SV*	|save_scalar	|NN GV* gv
+Ap	|void	|save_call_sv	|NN AV* args|NN SV* new_value
 Ap	|void	|save_pptr	|NN char** pptr
 Ap	|void	|save_vptr	|NN void *ptr
 Ap	|void	|save_re_context
@@ -1383,10 +1384,6 @@ s	|void	|sequence	|NULLOK const OP *o
 s	|void	|sequence_tail	|NULLOK const OP *o
 s	|UV	|sequence_num	|NULLOK const OP *o
 s	|SV*	|pm_description	|NN const PMOP *pm
-#endif
-
-#if defined(PERL_IN_SCOPE_C) || defined(PERL_DECL_PROT)
-s	|SV*	|save_scalar_at	|NN SV **sptr
 #endif
 
 #if defined(PERL_IN_GV_C) || defined(PERL_IN_SV_C) || defined(PERL_IN_PAD_C) || defined(PERL_DECL_PROT)

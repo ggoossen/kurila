@@ -1386,11 +1386,11 @@ sigaction(sig, optaction, oldaction = 0)
 		    croak("Can't supply an action without a HANDLER");
 
                 ENTER;
+                XPUSHs(*svp);
                 PUSHMARK(SP);
                 mXPUSHs(newSVpv(PL_sig_name[sig], 0));
-                XPUSHs(*svp);
                 PUTBACK;
-                call_pv("signals::set_handler", G_VOID|G_DISCARD);
+                call_pv("signals::handler", G_VOID|G_DISCARD|G_ASSIGNMENT);
                 LEAVE;
 
 		/* And here again we duplicate -- DEFAULT/IGNORE checking. */

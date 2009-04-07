@@ -54,7 +54,7 @@ is( $stat->blksize, @stat[11], "IO block size in position 11" );
 
 is( $stat->blocks, @stat[12], "number of blocks in position 12" );
 
-local $^OS_ERROR;
+local $^OS_ERROR = undef;
 $stat = stat '/notafile';
 isnt( $^OS_ERROR, '', 'should populate $!, given invalid file' );
 

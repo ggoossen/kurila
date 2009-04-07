@@ -50,7 +50,7 @@ sub stat ($arg) {
     return $st if $st;
 	my $fh;
     do {
-		local $^OS_ERROR;
+		local $^OS_ERROR = undef;
 		require Symbol;
                 my @($pkg) = caller@();
 		$fh = \*{ Symbol::fetch_glob( $pkg . "::" . $arg) };

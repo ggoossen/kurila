@@ -4,7 +4,7 @@
 use File::Spec;
 use lib File::Spec->catfile('t', 'lib');
 use Test::More;
-local $^OUTPUT_AUTOFLUSH=1;
+local $^OUTPUT_AUTOFLUSH =1;
 
 my @platforms = qw(Cygwin Epoc Mac OS2 Unix VMS Win32);
 my $tests_per_platform = 10;

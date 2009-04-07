@@ -88,7 +88,8 @@
 %type <ionlyval> prog progstart remember mremember
 %type <ionlyval> startsub startanonsub startblocksub
 %type <ionlyval> mintro
-%type <i_tkval> startproto
+%type <i_tkval> startproto endproto
+%type <opval> optassign protoargs
 
 %type <opval> decl subrout mysubrout package use peg
 
@@ -277,7 +278,7 @@ sideff	:	error
 			}
 	|	expr FOR expr
 			{ $$ = newFOROP(0, NULL,
-					(OP*)NULL, $3, $1, (OP*)NULL, LOCATION($2));
+                                (OP*)NULL, scalar($3), $1, (OP*)NULL, LOCATION($2));
 			  TOKEN_GETMAD($2,((LISTOP*)$$)->op_first->op_sibling,'w');
 			}
 	;
@@ -384,7 +385,7 @@ loop	:	label WHILE remember '(' texpr ')'
 			{ OP *innerop;
 			  $$ = block_end($4,
                               innerop = newFOROP(0, PVAL($1),
-                                  $5, $7, $9, $10, LOCATION($2)));
+                                  $5, scalar($7), $9, $10, LOCATION($2)));
 			  TOKEN_GETMAD($1,((LISTOP*)innerop)->op_first->op_sibling,'L');
 			  TOKEN_GETMAD($2,((LISTOP*)innerop)->op_first->op_sibling,'W');
 			  TOKEN_GETMAD($3,((LISTOP*)innerop)->op_first->op_sibling,'d');
@@ -395,7 +396,7 @@ loop	:	label WHILE remember '(' texpr ')'
 			{ OP *innerop;
 			  $$ = block_end($3,
 			     innerop = newFOROP(0, PVAL($1),
-                                 $4, $6, $8, $9, LOCATION($2)));
+                                 $4, scalar($6), $8, $9, LOCATION($2)));
 			  TOKEN_GETMAD($1,((LISTOP*)innerop)->op_first->op_sibling,'L');
 			  TOKEN_GETMAD($2,((LISTOP*)innerop)->op_first->op_sibling,'W');
 			  TOKEN_GETMAD($5,((LISTOP*)innerop)->op_first->op_sibling,'(');
@@ -550,9 +551,19 @@ subname	:	WORD	{
 
 startproto :    '('
 			{ 
+                            CvFLAGS(PL_compcv) |= CVf_PROTO;
                             PL_parser->in_my = KEY_my;
                             $$ = $1;
                         }
+	;
+
+endproto :    ')'
+			{ 
+                            $$ = $1;
+                            PL_parser->in_my = FALSE;
+                            PL_parser->expect = XBLOCK;
+                        }
+	;
 
 protoassign :   /* NULL */
 			{ 
@@ -563,6 +574,34 @@ protoassign :   /* NULL */
                             CvFLAGS(PL_compcv) |= CVf_ASSIGNARG;
                             $$ = $2;
                         }
+	;
+
+optassign : '?' ASSIGNOP
+			{ 
+                            CvFLAGS(PL_compcv) |= CVf_OPTASSIGNARG;
+                            $$ = newOP(OP_PADSV, 0, LOCATION($1));
+                            $$->op_targ = allocmy("$^is_assignment");
+                        }
+        ;
+
+protoargs :     protoassign
+			{ 
+                            $$ = append_elem(OP_LIST, $1, NULL);
+                        }
+        |       argexpr protoassign
+			{ 
+                            $$ = prepend_elem(OP_LIST, $2, $1);
+                        }
+        |       optassign term
+			{ 
+                            $$ = append_elem(OP_LIST, $2, $1);
+                        }
+        |       argexpr optassign term
+			{ 
+                            $$ = prepend_elem(OP_LIST, $2, $1);
+                            $$ = prepend_elem(OP_LIST, $3, $$);
+                        }
+        ;
 
 /* Subroutine prototype */
 proto	:	/* NULL */
@@ -572,23 +611,14 @@ proto	:	/* NULL */
                             intro_my();
                             $$ = (OP*)NULL; 
                         }
-	|	startproto ')'
+	|	startproto protoargs mintro endproto
 			{ 
-                            CvFLAGS(PL_compcv) |= CVf_PROTO;
-                            $$ = newOP(OP_STUB, 0, LOCATION($1) );
-                            PL_parser->in_my = FALSE;
-                            PL_parser->expect = XBLOCK;
+                            $$ = $2;
+                            if (! $$)
+                                $$ = newOP(OP_STUB, 0, LOCATION($1) );
+
                             TOKEN_GETMAD($1,$$,'(');
-                            TOKEN_GETMAD($2,$$,')');
-                        }
-	|	startproto argexpr protoassign mintro ')'
-			{ 
-                            CvFLAGS(PL_compcv) |= CVf_PROTO;
-                            $$ = append_list(OP_LIST, opTlistop($2), opTlistop($3));
-                            PL_parser->in_my = FALSE;
-                            PL_parser->expect = XBLOCK;
-                            TOKEN_GETMAD($1,$$,'(');
-                            TOKEN_GETMAD($5,$$,')');
+                            TOKEN_GETMAD($4,$$,')');
                         }
 	;
 
@@ -695,7 +725,8 @@ listop	:	term ARROW method '(' listexprcom ')' /* $foo->bar(list) */
 			{ $$ = convert(OP_ENTERSUB, OPf_STACKED,
 				append_elem(OP_LIST,
 				    prepend_elem(OP_LIST, scalar($1), $5),
-				    newUNOP(OP_METHOD, 0, $3, $3->op_location)), $3->op_location);
+				    newUNOP(OP_METHOD, 0, $3, $3->op_location)),
+                                $3->op_location);
 			  TOKEN_GETMAD($2,$$,'A');
 			  TOKEN_GETMAD($4,$$,'(');
 			  TOKEN_GETMAD($6,$$,')');
@@ -925,15 +956,9 @@ termbinop:	term POWOP term                        /* $x ** $y */
 			}
 	|	term DOTDOT term                       /* $x..$y, $x...$y */
 			{
-			  $$ = newRANGE(IVAL($2), scalar($1), scalar($3));
-			  DO_MAD({
-			      UNOP *op;
-			      op = (UNOP*)$$;
-			      op = (UNOP*)op->op_first;	/* get to flop */
-			      op = (UNOP*)op->op_first;	/* get to flip */
-			      op = (UNOP*)op->op_first;	/* get to range */
-			      TOKEN_GETMAD($2,(OP*)op,'o');
-			    })
+                            $$ = newBINOP(OP_RANGE, 0, scalar($1), scalar($3), LOCATION($2));
+                            TOKEN_GETMAD($2,$$,'o');
+                            APPEND_MADPROPS_PV("operator",$$,'>');
 			}
 	|	term ANDAND term                       /* $x && $y */
 			{ $$ = newLOGOP(OP_AND, 0, $1, $3, LOCATION($2));

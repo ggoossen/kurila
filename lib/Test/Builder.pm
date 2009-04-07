@@ -876,8 +876,8 @@ It is suggested you use this in place of eval BLOCK.
 
 sub _try($self, $code) {
     
-    local $^OS_ERROR;               # eval can mess up $!
-    local $^EVAL_ERROR;               # don't set $@ in the test
+    local $^OS_ERROR = undef;               # eval can mess up $!
+    local $^EVAL_ERROR = undef;               # don't set $@ in the test
     my $return = try { $code->() };
     
     return $return;
@@ -1318,10 +1318,10 @@ can erase history if you really want to.
 
 =cut
 
-sub current_test($self, ?$num) {
+sub current_test($self ?= $num) {
 
     lock($self->{?Curr_Test});
-    if( defined $num ) {
+    if( $^is_assignment ) {
         unless( $self->{?Have_Plan} ) {
             die("Can't change the current test number without a plan!");
         }

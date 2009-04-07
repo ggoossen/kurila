@@ -34,8 +34,7 @@ characters.
 =cut
 
 # Hopefully make a happy C identifier.
-sub C_stringify {
-  local $_ = shift;
+sub C_stringify($_) {
   return unless defined $_;
   # grr 5.6.1
   die "Wide character in '$_' intended as a C identifier"
@@ -67,8 +66,7 @@ string passed suitable for a perl "" string.
 =cut
 
 # Hopefully make a happy perl identifier.
-sub perl_stringify {
-  local $_ = shift;
+sub perl_stringify($_) {
   return unless defined $_;
   s/\\/\\\\/g;
   s/([\"\'])/\\$1/g;	# Grr. fix perl mode.

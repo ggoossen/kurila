@@ -158,7 +158,7 @@ sub all_script_names
 do {
     my   ($alpha2, $alpha3, $numeric);
     my    $script;
-    local $_;
+    local $_ = undef;
 
 
     while ( ~< *DATA)

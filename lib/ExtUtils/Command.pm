@@ -300,7 +300,7 @@ sub dos2unix {
         return unless -r _;
         return if -B _;
 
-        local $^OUTPUT_RECORD_SEPARATOR;
+        local $^OUTPUT_RECORD_SEPARATOR = undef;
 
 	my $orig = $_;
 	my $temp = '.dos2unix_tmp';

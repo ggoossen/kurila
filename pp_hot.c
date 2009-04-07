@@ -968,9 +968,7 @@ PP(pp_helem)
 
     if (PL_op->op_private & OPpLVAL_INTRO) {
 	/* does the element we're localizing already exist? */
-	preeminent = /* can we determine whether it exists? */
-	    (    !SvRMAGICAL(hv)
-	    ) ? hv_exists_ent(hv, keysv, 0) : 1;
+	preeminent = hv_exists_ent(hv, keysv, 0);
     }
     he = hv_fetch_ent(hv, keysv, 0, hash);
     svp = he ? &HeVAL(he) : NULL;
@@ -994,7 +992,7 @@ PP(pp_helem)
 
     if (PL_op->op_private & OPpLVAL_INTRO) {
 	if (HvNAME_get(hv) && isGV(*svp))
-	    save_gp((GV*)*svp, !(PL_op->op_flags & OPf_SPECIAL));
+	    Perl_croak(aTHX_ "can't localize a glob");
 	else {
 	    if (!preeminent) {
 		STRLEN keylen;
@@ -1294,6 +1292,40 @@ PP(pp_leavesub)
     return cx->blk_sub.retop;
 }
 
+PP(pp_entersub_save)
+{
+    dSP;
+    AV* args = svTav(PAD_SVl(PL_op->op_targ));
+    SV* new_value = TOPs;
+    save_call_sv(args, new_value);
+    if (PL_op->op_private & OPpENTERSUB_SAVE_DISCARD)
+	SP--;
+    RETURN;
+}
+
+PP(pp_entersub_targargs)
+{
+    dSP;
+    SV* cv;
+    SV* args = PAD_SVl(PL_op->op_targ);
+    if ( ! SvAVOK(args) )
+	DIE("interneal error: args is expected to be an array");
+    PUSHMARK(SP);
+    {
+	AV *const av = svTav(args);
+	const I32 maxarg = av_len(av);
+	if (maxarg) {
+	    EXTEND(SP, maxarg);
+	    Copy(AvARRAY(av), SP+1, maxarg, SV*);
+	    SP += maxarg;
+	}
+	cv = AvARRAY(av)[maxarg];
+    }
+    PUSHs(cv);
+    PUTBACK;
+    return pp_entersub();
+}
+
 PP(pp_entersub)
 {
     dVAR; dSP; dPOPss;
@@ -1303,11 +1335,23 @@ PP(pp_entersub)
     I32 gimme = GIMME_V;
     const OPFLAGS op_flags = PL_op->op_flags;
     const bool hasargs = (op_flags & OPf_STACKED) != 0;
+    const bool is_assignment = (op_flags & OPf_ASSIGN) != 0;
     assert(hasargs);
 
     /* subs are always in scalar context */
     if (gimme == G_ARRAY) {
 	gimme= G_SCALAR;
+    }
+    
+    if (PL_op->op_private & OPpENTERSUB_SAVEARGS) {
+	/* save argument to 'op_targ' */
+	AV* args = newAV();
+	SV** mark;
+	SAVECLEARSV(PAD_SVl(PL_op->op_targ));
+	PAD_SVl(PL_op->op_targ) = avTsv(args);
+	for (mark=PL_stack_base+TOPMARK+1; mark <= SP; mark++)
+	    av_push(args, newSVsv(*mark));
+	av_push(args, SvREFCNT_inc(sv));
     }
 
     if (!sv)
@@ -1375,7 +1419,6 @@ PP(pp_entersub)
 	dMARK;
 	register I32 items = SP - MARK;
 	AV* const padlist = CvPADLIST(cv);
-	const bool is_assignment = (op_flags & OPf_ASSIGN) ? 1 : 0;
 	PUSHBLOCK(cx, CXt_SUB, is_assignment ? MARK - 1 : MARK );
 	PUSHSUB(cx);
 	cx->blk_sub.retop = PL_op->op_next;
@@ -1392,7 +1435,8 @@ PP(pp_entersub)
 	SAVECOMPPAD();
 	PAD_SET_CUR_NOSAVE(padlist, CvDEPTH(cv));
 
-	if ( is_assignment != cv_assignarg_flag(cv) ) {
+	if ( ! cv_optassignarg_flag(cv) 
+	    && ( is_assignment != cv_assignarg_flag(cv) ) ) {
 	    if (is_assignment)
 		Perl_croak(aTHX_ "%s can not be an assignee",
 		    SvPVX_const(loc_name(SvLOCATION(cv))));
@@ -1400,6 +1444,7 @@ PP(pp_entersub)
 		Perl_croak(aTHX_ "%s must be an assignee",
 		    SvPVX_const(loc_name(SvLOCATION(cv))));
 	}
+
 	if (CvFLAGS(cv) & CVf_BLOCK) {
 	    SAVECLEARSV(PAD_SVl(PAD_ARGS_INDEX));
 	    CX_CURPAD_SAVE(cx->blk_sub);
@@ -1431,8 +1476,19 @@ PP(pp_entersub)
 	    ++MARK;
 	    PUSHMARK(MARK-1);
 
+	    /* reverse items on the stack */
+	    for (i=0; i<items/2; i++) {
+		SV* sv = MARK[i];
+		MARK[i] = MARK[items-i-1];
+		MARK[items-i-1] = sv;
+	    }
+
 	    if (is_assignment) {
 		SV* rhs;
+		if (cv_optassignarg_flag(cv)) {
+		    XPUSHs(&PL_sv_yes);
+		    ++items;
+		}
 		if (op_flags & OPf_ASSIGN_PART) {
 		    if (PL_stack_base + TOPMARK >= MARK) {
 			Perl_croak(aTHX_ "Missing required assignment value");
@@ -1445,16 +1501,14 @@ PP(pp_entersub)
 		    rhs = MARK[-1];
 		}
 		XPUSHs(rhs);
-		items++;
+		++items;
 	    }
-
-	    /* reverse items on the stack */
-	    for (i=0; i<items/2; i++) {
-		SV* sv = MARK[i];
-		MARK[i] = MARK[items-i-1];
-		MARK[items-i-1] = sv;
+	    else if (cv_optassignarg_flag(cv)) {
+		XPUSHs(&PL_sv_no);
+		++items;
+		XPUSHs(&PL_sv_undef);
+		++items;
 	    }
-
 	}
 	else if ( CvFLAGS(cv) & CVf_DEFARGS) {
 	    AV* av;
@@ -1503,23 +1557,11 @@ PP(pp_entersub)
     else {
 	I32 markix = TOPMARK;
 
+	if (is_assignment)
+	    --markix;
+
 	PUTBACK;
 
-	if (!hasargs) {
-	    /* Need to copy @_ to stack. Alternative may be to
-	     * switch stack to @_, and copy return values
-	     * back. This would allow popping @_ in XSUB, e.g.. XXXX */
-	    AV * const av = GvAV(PL_defgv);
-	    const I32 items = AvFILLp(av) + 1;   /* @_ is not tieable */
-
-	    if (items) {
-		/* Mark is at the end of the stack. */
-		EXTEND(SP, items);
-		Copy(AvARRAY(av), SP + 1, items, SV*);
-		SP += items;
-		PUTBACK ;		
-	    }
-	}
 	/* We assume first XSUB in &DB::sub is the called one. */
 	if (PL_curcopdb) {
 	    SAVEVPTR(PL_curcop);

@@ -70,7 +70,7 @@ my @loopies = @(
 
 foreach my $loopy ( @loopies) {
     try {
-        signals::temp_set_handler(ALRM => sub { die "ALRMTimeout" });
+        local signals::handler("ALRM") = sub { die "ALRMTimeout" };
         alarm(3);
         $loopy->();
         mro::get_linear_isa('K', 'c3');
@@ -84,7 +84,7 @@ foreach my $loopy ( @loopies) {
             ok(1, "Graceful exception thrown");
         }
         else {
-            ok(0, "Unrecognized exception: $err");
+            ok(0, "Unrecognized exception: $($err->message)");
         }
     }
     else {

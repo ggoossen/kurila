@@ -1,6 +1,6 @@
 
  # Time-stamp: "2004-03-30 17:52:14 AST"
-use Test;
+use Test::More;
 BEGIN { plan tests => 64 };
 BEGIN { ok 1 }
 use I18N::LangTags (':ALL');

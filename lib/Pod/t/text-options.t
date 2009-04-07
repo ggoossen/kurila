@@ -41,7 +41,7 @@ while ( ~< *DATA) {
     open ($tmp, "<", 'out.tmp') or die "Cannot open out.tmp: $^OS_ERROR\n";
     my $output;
     do {
-        local $^INPUT_RECORD_SEPARATOR;
+        local $^INPUT_RECORD_SEPARATOR = undef;
         $output = ~< $tmp;
     };
     close $tmp;

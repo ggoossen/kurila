@@ -1,5 +1,5 @@
 
-use Test;
+use Test::More;
 BEGIN { plan tests => 4; }
 use Locale::Maketext v1.01;
 print $^STDOUT, "# Hi there...\n";
@@ -30,7 +30,7 @@ do {
 my $lh;
 print $^STDOUT, "# Basic sanity:\n";
 ok defined( $lh = Woozle->get_handle('eu-mt') ) && ref($lh);
-ok $lh && $lh->maketext('d2', 7), chr(1000)."hum 14".chr(2000)   ;
+is $lh && $lh->maketext('d2', 7), chr(1000)."hum 14".chr(2000)   ;
 
 
 print $^STDOUT, "# Byebye!\n";

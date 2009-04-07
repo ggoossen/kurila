@@ -104,6 +104,7 @@ Perl_printf_nocontext
 Perl_cv_ckproto
 Perl_cv_const_sv
 Perl_cv_assignarg_flag
+Perl_cv_optassignarg_flag
 Perl_cv_undef
 Perl_cv_tmprefcnt
 Perl_cx_dump
@@ -322,7 +323,6 @@ Perl_newLOOPOP
 Perl_newNULLLIST
 Perl_newOP
 Perl_newPROG
-Perl_newRANGE
 Perl_newSLICEOP
 Perl_newSTATEOP
 Perl_newSUB
@@ -483,6 +483,7 @@ Perl_save_long
 Perl_save_mortalizesv
 Perl_save_nogv
 Perl_save_scalar
+Perl_save_call_sv
 Perl_save_pptr
 Perl_save_vptr
 Perl_save_re_context

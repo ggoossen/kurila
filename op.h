@@ -140,8 +140,10 @@ Deprecated.  Use C<GIMME_V> instead.
                                    "pop_assing_part" and without pusing
                                    onto the stack */
 #define OPf_OPTIONAL      0x400   /*  assignment is optional, flags
-						  should be passed to "pop_assign_part"
-					       */
+				      should be passed to "pop_assign_part"
+				  */
+#define OPf_TARGET_MY	0x800	/* Target is PADMY. (for ops with TARGLEX */
+
 
 /* old names; don't use in new code, but don't break them, either */
 #define OPf_LIST	OPf_WANT_LIST
@@ -171,15 +173,18 @@ Deprecated.  Use C<GIMME_V> instead.
 #define OPpDEREF_AV		32	/*   Want ref to AV. */
 #define OPpDEREF_HV		64	/*   Want ref to HV. */
 #define OPpDEREF_SV		(32|64)	/*   Want ref to SV. */
+
   /* OP_ENTERSUB only */
 #define OPpENTERSUB_BLOCK       2       /* Accepts only one arguments which is assigned to my $_ */
 #define OPpENTERSUB_DB		16	/* Debug subroutine. */
 #define OPpENTERSUB_HASTARG	32	/* Called from OP tree. */
-#define OPpENTERSUB_NOMOD	64	/* Immune to mod() for :attrlist. */
   /* OP_ENTERSUB and OP_RV2CV only */
 #define OPpENTERSUB_AMPER	8	/* Used & form to call. */
-#define OPpENTERSUB_NOPAREN	128	/* bare sub call (without parens) */
 #define OPpENTERSUB_INARGS	4	/* Lval used as arg to a sub. */
+#define OPpENTERSUB_SAVEARGS    128     /* Save the arguments in the targ */
+#define OPpENTERSUB_TARGARGS    64      /* Use the save argument in targ */
+#define OPpENTERSUB_SAVE_DISCARD  2   /* Discard the value returned */
+
   /* OP_GV only */
 #define OPpEARLY_CV		32	/* foo() called before sub foo was parsed */
 /* Private for OP_HELEM and OP_AELEM */
@@ -191,22 +196,15 @@ Deprecated.  Use C<GIMME_V> instead.
   /* OP_PADSV only */
   /* for OP_RV2?V, lower bits carry hints (currently only HINT_STRICT_REFS) */
 
-/* Private for OPs with TARGLEX */
-  /* (lower bits may carry MAXARG) */
-#define OPpTARGET_MY		16	/* Target is PADMY. */
-
 /* Private for OP_ENTERITER and OP_ITER */
 #define OPpITER_REVERSED	4	/* for (reverse ...) */
 #define OPpITER_DEF		8	/* for $_ or for my $_ */
 
 /* Private for OP_CONST */
-#define	OPpCONST_NOVER		2	/* no 6; */
 #define	OPpCONST_SHORTCIRCUIT	4	/* eg the constant 5 in (5 || foo) */
 #define	OPpCONST_STRICT		8	/* bearword subject to strict 'subs' */
 #define OPpCONST_ENTERED	16	/* Has been entered as symbol. */
-#define OPpCONST_NOTUSED	32	/* Was OPpCONST_ARYBASE: Was a $[ translated to constant. */
 #define OPpCONST_BARE		64	/* Was a bare word (filehandle?). */
-#define OPpCONST_WARNING	128	/* Was a $^W translated to constant. */
 
 /* Private for OP_FLIP/FLOP */
 #define OPpFLIP_LINENUM		64	/* Range arg potentially a line num. */

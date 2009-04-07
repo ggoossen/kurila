@@ -396,7 +396,7 @@ And of course a very basic test:
 
   t/cool.t:
   --------
-  use Test;
+  use Test::More;
   BEGIN { plan tests => 1 };
   use Cool::Foo;
   use Cool::Bar;

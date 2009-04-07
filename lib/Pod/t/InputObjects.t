@@ -8,8 +8,8 @@ use_ok( 'Pod::InputObjects' );
 
 
 do { # test package Pod::InputSource
-    local *FH;
-    my $p_is = Pod::InputSource->new( handle => \*FH );
+    my $fh;
+    my $p_is = Pod::InputSource->new( handle => $fh );
 
     isa_ok( $p_is, 'Pod::InputSource', 'Pod::InputSource constructor' );
 
@@ -17,7 +17,7 @@ do { # test package Pod::InputSource
     is( $p_is->name( 'test' ), 'test', 'set Pod::InputSource->name( test )' );
     is( $p_is->filename, 'test', 'Pod::InputSource->filename() alias' );
 
-    is( $p_is->handle, \*FH, 'Pod::InputSource->handle()' );
+    is( $p_is->handle, $fh, 'Pod::InputSource->handle()' );
 
     is( $p_is->was_cutting(), 0, 'Pod::InputSource->was_cutting()' );
     is( $p_is->was_cutting( 1 ), 1, 'set Pod::InputSource->was_cutting( 1 )' );

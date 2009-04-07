@@ -133,12 +133,12 @@ sub _write_win32($data) {
     # so this is only to cover the case when the extension DLL may be
     # linked to directly from C. GSAR 97-07-10
     if (Config::config_value('cc') =~ m/^bcc/i) {
-        for ( @{$data->{DL_VARS}}, < @{$data->{FUNCLIST}}) {
+        for ( @{$data->{DL_VARS}} +@+ @{$data->{FUNCLIST}}) {
             push @syms, "_$_", "$_ = _$_";
         }
     }
     else {
-        for ( @{$data->{DL_VARS}}, < @{$data->{FUNCLIST}}) {
+        for ( @{$data->{DL_VARS}} +@+ @{$data->{FUNCLIST}}) {
             push @syms, "$_", "_$_ = $_";
         }
     }

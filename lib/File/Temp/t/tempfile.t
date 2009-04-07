@@ -2,7 +2,7 @@
 # Test for File::Temp - tempfile function
 
 
-use Test;
+use Test::More;
 BEGIN { plan tests => 22}
 use File::Spec;
 
@@ -132,18 +132,16 @@ push( @still_there, $tempfile); # check at END
 # Tempfile croaks on error so we need an eval
 $fh = try { tempfile( 'ftmpXXXXX', DIR => < File::Spec->tmpdir ) };
 
-if ($fh) {
+SKIP:
+do {
+  skip "Skip Failed probably due to NFS", 2 if not $fh;
 
   # print something to it to make sure something is there
   ok( print $fh, "Test\n" );
 
   # Close it - can not check it is gone since we dont know the name
   ok( close($fh) );
-
-} else {
-  skip "Skip Failed probably due to NFS", 1;
-  skip "Skip Failed probably due to NFS", 1;
-}
+};
 
 # Now END block will execute to test the removal of directories
 print $^STDOUT, "# End of tests. Execute END blocks\n";

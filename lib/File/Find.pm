@@ -581,7 +581,7 @@ sub _find_opt {
 	$follow_skip, $full_check, $untaint, $untaint_skip, $untaint_pat,
 	$pre_process, $post_process, $dangling_symlinks);
     local($dir, $name, $fullname, $prune);
-    local *_ = \my $a;
+    local $_ = undef;
 
     my $cwd            = $wanted->{?bydepth} ?? Cwd::fastcwd() !! Cwd::getcwd();
     if ($Is_VMS) {
@@ -791,7 +791,7 @@ sub _find_dir($wanted, $p_dir, $nlink) {
 	$dir_pref= ( $p_dir eq '/' ?? '/' !! "$p_dir/" );
     }
 
-    local ($dir, $name, $prune, *DIR);
+    local ($dir, $name, $prune);
 
     unless ( $no_chdir || ($p_dir eq $File::Find::current_dir)) {
 	my $udir = $p_dir;
@@ -1052,7 +1052,7 @@ sub _find_dir_symlnk($wanted, $dir_loc, $p_dir) { # $dir_loc is the absolute dir
 	$loc_pref = ( $dir_loc eq '/' ?? '/' !! "$dir_loc/" );
     }
 
-    local ($dir, $name, $fullname, $prune, *DIR);
+    local ($dir, $name, $fullname, $prune);
 
     unless ($no_chdir) {
 	# untaint the topdir

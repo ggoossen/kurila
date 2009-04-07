@@ -320,7 +320,7 @@ main::is($refcnt, &Internals::SvREFCNT(\&foo), "sort sub refcnt");
 my $fail_msg = q(Modification of a read-only value attempted);
 # Sorting a read-only array in-place shouldn't be allowed
 my @readonly =1..10;
-Internals::SvREADONLY(@readonly, 1);
+Internals::SvREADONLY(\@readonly, 1);
 try { @readonly = sort @readonly; };
 main::cmp_ok(substr($^EVAL_ERROR->{?description},0,length($fail_msg)),'eq',$fail_msg,'in-place sort of read-only array');
 

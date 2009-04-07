@@ -442,7 +442,7 @@ END
                         close $write2;
                         print $perl_fh, $code;
                         close $perl_fh;
-                        do { local $^INPUT_RECORD_SEPARATOR;
+                        do { local $^INPUT_RECORD_SEPARATOR = undef;
                              $output = join '', @( ~< $read);
                              $errors = join '', @( ~< $read2); };
                         close $read;
@@ -461,20 +461,20 @@ END
                         # this process, and then foul our pipe back to parent by
                         # redirecting output in the child.
                         open my $perl_fh, "-", "$cmd" or die "Can't open pipe: $^OS_ERROR\n";
-                        do { local $^INPUT_RECORD_SEPARATOR; $output = join '', @( ~< $perl_fh) };
+                        do { local $^INPUT_RECORD_SEPARATOR = undef; $output = join '', @( ~< $perl_fh) };
                         close $perl_fh;
                     } else {
                         my $outfile = "tout$^PID";  $outfile++ while -e $outfile;
                         push @tmpfiles, $outfile;
                         system "$cmd >$outfile";
-                        do { local $^INPUT_RECORD_SEPARATOR; open my $in_fh, "<", $outfile; $output = ~< $in_fh; close $in_fh };
+                        do { local $^INPUT_RECORD_SEPARATOR = undef; open my $in_fh, "<", $outfile; $output = ~< $in_fh; close $in_fh };
                     }
                     if ($^CHILD_ERROR) {
                         printf $^STDOUT, "not ok: exited with error code \%04X\n", $^CHILD_ERROR;
                         $debugging or do { 1 while unlink < @tmpfiles };
                         exit;
                     }
-                    do { local $^INPUT_RECORD_SEPARATOR; open my $in_fh, "<", $errfile; $errors = ~< $in_fh; close $in_fh };
+                    do { local $^INPUT_RECORD_SEPARATOR = undef; open my $in_fh, "<", $errfile; $errors = ~< $in_fh; close $in_fh };
                     1 while unlink < @tmpfiles;
                 }
                 print $^STDOUT, $output;

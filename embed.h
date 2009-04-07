@@ -181,6 +181,7 @@
 #define op_const_sv		Perl_op_const_sv
 #endif
 #define cv_assignarg_flag	Perl_cv_assignarg_flag
+#define cv_optassignarg_flag	Perl_cv_optassignarg_flag
 #define cv_undef		Perl_cv_undef
 #define cv_tmprefcnt		Perl_cv_tmprefcnt
 #define cx_dump			Perl_cx_dump
@@ -558,7 +559,6 @@
 #define newNULLLIST		Perl_newNULLLIST
 #define newOP			Perl_newOP
 #define newPROG			Perl_newPROG
-#define newRANGE		Perl_newRANGE
 #define newSLICEOP		Perl_newSLICEOP
 #define newSTATEOP		Perl_newSTATEOP
 #define newSUB			Perl_newSUB
@@ -792,6 +792,7 @@
 #define save_op			Perl_save_op
 #endif
 #define save_scalar		Perl_save_scalar
+#define save_call_sv		Perl_save_call_sv
 #define save_pptr		Perl_save_pptr
 #define save_vptr		Perl_save_vptr
 #define save_re_context		Perl_save_re_context
@@ -1384,11 +1385,6 @@
 #define pm_description		S_pm_description
 #endif
 #endif
-#if defined(PERL_IN_SCOPE_C) || defined(PERL_DECL_PROT)
-#ifdef PERL_CORE
-#define save_scalar_at		S_save_scalar_at
-#endif
-#endif
 #if defined(PERL_IN_GV_C) || defined(PERL_IN_SV_C) || defined(PERL_IN_PAD_C) || defined(PERL_DECL_PROT)
 #endif
 #if defined(PERL_IN_HV_C) || defined(PERL_IN_MG_C) || defined(PERL_IN_SV_C) || defined(PERL_DECL_PROT)
@@ -1949,6 +1945,8 @@
 #define pp_enteriter		Perl_pp_enteriter
 #define pp_enterloop		Perl_pp_enterloop
 #define pp_entersub		Perl_pp_entersub
+#define pp_entersub_save	Perl_pp_entersub_save
+#define pp_entersub_targargs	Perl_pp_entersub_targargs
 #define pp_entertry		Perl_pp_entertry
 #define pp_eof			Perl_pp_eof
 #define pp_eprotoent		Perl_pp_eprotoent
@@ -1962,9 +1960,7 @@
 #define pp_expand		Perl_pp_expand
 #define pp_fcntl		Perl_pp_fcntl
 #define pp_fileno		Perl_pp_fileno
-#define pp_flip			Perl_pp_flip
 #define pp_flock		Perl_pp_flock
-#define pp_flop			Perl_pp_flop
 #define pp_fork			Perl_pp_fork
 #define pp_ftatime		Perl_pp_ftatime
 #define pp_ftbinary		Perl_pp_ftbinary
@@ -2369,6 +2365,7 @@
 #define op_const_sv(a,b)	Perl_op_const_sv(aTHX_ a,b)
 #endif
 #define cv_assignarg_flag(a)	Perl_cv_assignarg_flag(aTHX_ a)
+#define cv_optassignarg_flag(a)	Perl_cv_optassignarg_flag(aTHX_ a)
 #define cv_undef(a)		Perl_cv_undef(aTHX_ a)
 #define cv_tmprefcnt(a)		Perl_cv_tmprefcnt(aTHX_ a)
 #define cx_dump(a)		Perl_cx_dump(aTHX_ a)
@@ -2747,7 +2744,6 @@
 #define newNULLLIST(a)		Perl_newNULLLIST(aTHX_ a)
 #define newOP(a,b,c)		Perl_newOP(aTHX_ a,b,c)
 #define newPROG(a)		Perl_newPROG(aTHX_ a)
-#define newRANGE(a,b,c)		Perl_newRANGE(aTHX_ a,b,c)
 #define newSLICEOP(a,b,c)	Perl_newSLICEOP(aTHX_ a,b,c)
 #define newSTATEOP(a,b,c,d)	Perl_newSTATEOP(aTHX_ a,b,c,d)
 #define newSUB(a,b,c)		Perl_newSUB(aTHX_ a,b,c)
@@ -2979,6 +2975,7 @@
 #define save_op()		Perl_save_op(aTHX)
 #endif
 #define save_scalar(a)		Perl_save_scalar(aTHX_ a)
+#define save_call_sv(a,b)	Perl_save_call_sv(aTHX_ a,b)
 #define save_pptr(a)		Perl_save_pptr(aTHX_ a)
 #define save_vptr(a)		Perl_save_vptr(aTHX_ a)
 #define save_re_context()	Perl_save_re_context(aTHX)
@@ -3571,11 +3568,6 @@
 #define pm_description(a)	S_pm_description(aTHX_ a)
 #endif
 #endif
-#if defined(PERL_IN_SCOPE_C) || defined(PERL_DECL_PROT)
-#ifdef PERL_CORE
-#define save_scalar_at(a)	S_save_scalar_at(aTHX_ a)
-#endif
-#endif
 #if defined(PERL_IN_GV_C) || defined(PERL_IN_SV_C) || defined(PERL_IN_PAD_C) || defined(PERL_DECL_PROT)
 #ifdef PERL_CORE
 #endif
@@ -4144,6 +4136,8 @@
 #define pp_enteriter()		Perl_pp_enteriter(aTHX)
 #define pp_enterloop()		Perl_pp_enterloop(aTHX)
 #define pp_entersub()		Perl_pp_entersub(aTHX)
+#define pp_entersub_save()	Perl_pp_entersub_save(aTHX)
+#define pp_entersub_targargs()	Perl_pp_entersub_targargs(aTHX)
 #define pp_entertry()		Perl_pp_entertry(aTHX)
 #define pp_eof()		Perl_pp_eof(aTHX)
 #define pp_eprotoent()		Perl_pp_eprotoent(aTHX)
@@ -4157,9 +4151,7 @@
 #define pp_expand()		Perl_pp_expand(aTHX)
 #define pp_fcntl()		Perl_pp_fcntl(aTHX)
 #define pp_fileno()		Perl_pp_fileno(aTHX)
-#define pp_flip()		Perl_pp_flip(aTHX)
 #define pp_flock()		Perl_pp_flock(aTHX)
-#define pp_flop()		Perl_pp_flop(aTHX)
 #define pp_fork()		Perl_pp_fork(aTHX)
 #define pp_ftatime()		Perl_pp_ftatime(aTHX)
 #define pp_ftbinary()		Perl_pp_ftbinary(aTHX)

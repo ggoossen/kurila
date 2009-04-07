@@ -825,9 +825,7 @@ mapwhile	map iterator		ck_null		dt|
 
 # Range stuff.
 
-range		flipflop		ck_null		|	S S
-flip		range (or flip)		ck_null		1	S S
-flop		range (or flop)		ck_null		1
+range		range		ck_null		2	S S
 
 # Control.
 
@@ -842,6 +840,8 @@ dorassign	defined or assignment (//=)	ck_null		s|
 
 method		method lookup		ck_method	d1
 entersub	subroutine entry	ck_subr		dmt1	L
+entersub_targargs	subroutine entry using saved args	ck_null		d%	L
+entersub_save	subroutine entry saving value	ck_null		d1	L
 leavesub	subroutine exit		ck_null		1	
 caller		caller			ck_fun		t%	S?
 warn		warn			ck_fun		imst@	L

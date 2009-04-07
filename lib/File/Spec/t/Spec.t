@@ -713,10 +713,10 @@ do {
     # Some funky stuff to override Cwd::getdcwd() for testing purposes,
     # in the limited scope of the rel2abs() method.
     if ($Cwd::VERSION) {  # Avoid a 'used only once' warning
-	local $^WARNING;
+	local $^WARNING = undef;
 	*rel2abs = sub {
 	    my $self = shift;
-	    local $^WARNING;
+	    local $^WARNING = undef;
 	    local *Cwd::getdcwd = sub {
 	      return 'D:\alpha\beta' if @_[0] eq 'D:';
 	      return 'C:\one\two'    if @_[0] eq 'C:';

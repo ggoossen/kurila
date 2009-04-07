@@ -563,7 +563,7 @@ sub GetOptionsFromArray($argv, @< @optionlist) {	# local copy of the option desc
 				      ", \"$arg\")\n")
 			    if $debug;
 			my $eval_error = do {
-			    local $^EVAL_ERROR;
+			    local $^EVAL_ERROR = undef;
 			    try {
 				&{%linkage{?$opt}}
 				  (Getopt::Long::CallBack->new
@@ -682,7 +682,7 @@ sub GetOptionsFromArray($argv, @< @optionlist) {	# local copy of the option desc
 		print $^STDERR, ("=> &L\{$tryopt\}(\"$tryopt\")\n")
 		  if $debug;
 		my $eval_error = do {
-		    local $^EVAL_ERROR;
+		    local $^EVAL_ERROR = undef;
 		    try { &$cb ($tryopt) };
 		    $^EVAL_ERROR;
 		};

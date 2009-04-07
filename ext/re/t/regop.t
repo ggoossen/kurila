@@ -25,7 +25,7 @@ foreach my $testout (  @tests ) {
     my $diaged;
 
     while ((nelems @strs)) {
-        local $_= shift @strs;
+        local $_ = shift @strs;
         last if !$_
              or m/^---/;
         next if m/^\s*#/;

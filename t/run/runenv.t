@@ -32,7 +32,6 @@ env::set_var('PERL5OPT', undef);
 # supplied $stdout and $stderr argument strings exactly.
 # second element is an explanation of the failure
 sub runperl {
-  local *F;
   my @($env, $args, $stdout, $stderr) =  @_;
 
   unshift @$args, '-I../lib';
@@ -50,9 +49,9 @@ sub runperl {
     return  @(0, "Failure in child.\n") if ($^CHILD_ERROR>>8) == $FAILURE_CODE;
 
     open my $f, "<", $STDOUT or return  @(0, "Couldn't read $STDOUT file");
-    do { local $^INPUT_RECORD_SEPARATOR; $actual_stdout = ~< $f };
+    do { local $^INPUT_RECORD_SEPARATOR = undef; $actual_stdout = ~< $f };
     open $f, "<", $STDERR or return  @(0, "Couldn't read $STDERR file");
-    do { local $^INPUT_RECORD_SEPARATOR; $actual_stderr = ~< $f };
+    do { local $^INPUT_RECORD_SEPARATOR = undef; $actual_stderr = ~< $f };
 
     if ($actual_stdout ne $stdout) {
       return  @(0, "Stdout mismatch: expected:\n[$stdout]\nsaw:\n[$actual_stdout]");
@@ -62,7 +61,7 @@ sub runperl {
       return @(1, '');                 # success
     }
   } else {                      # child
-      my $old = %:< @+: map { @: $_ => env::var($_) }, keys %$env;
+      my $old = %+: map { %: $_ => env::var($_) }, keys %$env;
       push dynascope->{onleave}, sub {
           for (keys $old) {
               env::set_var($_, $old{$_});

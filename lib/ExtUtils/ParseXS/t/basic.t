@@ -9,7 +9,7 @@ BEGIN {
   }
 }
 
-use Test;
+use Test::More;
 BEGIN { plan tests => 9 };
 use DynaLoader;
 use ExtUtils::ParseXS < qw(process_file);
@@ -24,13 +24,13 @@ chdir 't' or die "Can't chdir to t/, $^OS_ERROR";
 my $out = "";
 open my $fh, '>', \$out or die;
 process_file( filename => 'XSTest.xs', output => $fh, prototypes => 1 );
-ok $out, '/is_even/', "Test that output contains some text";
+like $out, '/is_even/', "Test that output contains some text";
 
 my $source_file = 'XSTest.c';
 
 # Try sending to file
 process_file(filename => 'XSTest.xs', output => $source_file, prototypes => 0);
-ok -e $source_file, 1, "Create an output file";
+is -e $source_file, 1, "Create an output file";
 
 # TEST doesn't like extraneous output
 my $quiet = env::var('PERL_CORE') && !env::var('HARNESS_ACTIVE');
@@ -42,11 +42,11 @@ if ($b->have_compiler) {
 
   my $obj_file = $b->compile( source => $source_file );
   ok $obj_file;
-  ok -e $obj_file, 1, "Make sure $obj_file exists";
+  is -e $obj_file, 1, "Make sure $obj_file exists";
 
   my @($lib_file) = $b->link( objects => $obj_file, module_name => $module );
   ok $lib_file;
-  ok -e $lib_file, 1, "Make sure $lib_file exists";
+  is -e $lib_file, 1, "Make sure $lib_file exists";
 
   require XSTest;
   ok  XSTest::is_even(8);

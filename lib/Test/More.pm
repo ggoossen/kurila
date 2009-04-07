@@ -493,7 +493,7 @@ sub isa_ok($object, $class, ?$obj_name) {
     }
     else {
         # We can't use UNIVERSAL::isa because we want to honor isa() overrides
-        local $^EVAL_ERROR;
+        local $^EVAL_ERROR = undef;
         my $rslt = try { $object->isa($class) };
         if( $^EVAL_ERROR ) {
             if( $^EVAL_ERROR->message =~ m/^Can't call method "isa" on unblessed reference/ ) {

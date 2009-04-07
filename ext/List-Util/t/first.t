@@ -45,7 +45,7 @@ do { package Foo;
 # redefinition takes effect immediately depends on whether we're
 # running the Perl or XS implementation.
 
-sub self_updating { local $^WARNING; *self_updating = sub{1} ;1}
+sub self_updating { local $^WARNING = undef; *self_updating = sub{1} ;1}
 try { $v = first \&self_updating, 1,2; };
 is($^EVAL_ERROR, '', 'redefine self');
 

@@ -1,7 +1,7 @@
 
 # Time-stamp: "2004-03-30 17:46:17 AST"
 
-use Test;
+use Test::More;
 BEGIN { plan tests => 26 };
 print $^STDOUT, "#\n# Testing normal (tight) insertion of super-ordinate language tags...\n#\n";
 

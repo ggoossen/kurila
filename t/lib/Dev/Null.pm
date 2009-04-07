@@ -8,7 +8,7 @@ sub PRINTF { }
 
 sub TIEHANDLE {
     my $class = shift;
-    my $fh = do { local *HANDLE; \*HANDLE };
+    open my $fh;
     return bless $fh, $class;
 }
 sub READ     { }

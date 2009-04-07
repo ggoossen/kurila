@@ -74,7 +74,7 @@ pod2html("--title=eol", "--infile=$^PID.in", "--outfile=$^PID.o3");
 
 # --- now test ---
 
-local $^INPUT_RECORD_SEPARATOR;
+local $^INPUT_RECORD_SEPARATOR = undef;
 
 open($in, "<", "$^PID.o1") or die "$^PID.o1: $^OS_ERROR";
 my $cksum1 = unpack("\%32C*", ~< $in);

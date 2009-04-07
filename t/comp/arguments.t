@@ -2,7 +2,7 @@
 
 BEGIN { require './test.pl'; }
 
-plan 18;
+plan 36;
 
 sub foo($x) {
     return $x;
@@ -81,3 +81,59 @@ do {
                qr/main::threeargs can not be an assignee/ );
 };
 
+sub opt_assign($x, $y ?= $z) {
+    $args = "$x,$y=$(dump::view($z))";
+    return $args;
+}
+
+is( (opt_assign("aap", "noot") = "mies"), "aap,noot='mies'" );
+is( opt_assign("aap", "noot"), 'aap,noot=undef' );
+
+is( (opt_assign("aap", "noot") .= "mies"), "aap,noot='aap,noot=undefmies'" );
+is( $args, "aap,noot='aap,noot=undefmies'" );
+
+my $var;
+
+sub varsub(?= $x) {
+    if ($^is_assignment) {
+        $var = $x;
+    }
+    return $: $var;
+}
+
+is( join("*", (varsub = qw(aap noot mies))), "aap*noot*mies" );
+is( join("*", $var), "aap*noot*mies" );
+is( push(varsub, "wim"), 4 );
+is( join("*", $var), "aap*noot*mies*wim" );
+
+varsub = "aap";
+do {
+    local varsub;
+    varsub = "noot";
+    is(varsub, "noot");
+};
+is(varsub, "aap");
+do {
+    local varsub .= "mies";
+    is(varsub, "aapmies");
+};
+is(varsub, "aap");
+
+do {
+    local varsub = "mies";
+    is(varsub, "mies");
+};
+is(varsub, "aap");
+
+my $varassign;
+sub varargsassign(@< $x ?= $y) {
+    return $varassign = join("*", $x) . "=$y";
+}
+
+is( (varargsassign("aap", "noot") = "mies"),
+    "aap*noot=mies" );
+
+(@: my $before, varargsassign("wim", "zus"), my $after) = @: "before", "jet", "after";
+is( $varassign, "wim*zus=jet" );
+is( $before, "before" );
+is( $after, "after" );

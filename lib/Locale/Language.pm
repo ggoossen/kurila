@@ -105,7 +105,7 @@ sub all_language_names
 do {
     my    $code;
     my    $language;
-    local $_;
+    local $_ = undef;
 
 
     while ( ~< *DATA)

@@ -20,7 +20,7 @@ while( ~< *DATA ) {
     $parser->parse_from_filehandle($in, $out);
 
     open $out, '<', $output or die $^OS_ERROR;
-    my $returned; do { local $^INPUT_RECORD_SEPARATOR; $returned = ~< $out; };
+    my $returned; do { local $^INPUT_RECORD_SEPARATOR = undef; $returned = ~< $out; };
     
     unless( $returned eq $expected ) {
        print $^STDOUT, < map { s/^/\#/mg; $_; },

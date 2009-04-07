@@ -106,7 +106,7 @@ sub all_currency_names
 do {
     my    $code;
     my    $currency;
-    local $_;
+    local $_ = undef;
 
 
     while ( ~< *DATA)

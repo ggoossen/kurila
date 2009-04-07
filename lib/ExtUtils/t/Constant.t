@@ -158,7 +158,7 @@ sub build_and_run($tests, $expect, $files) {
   @makeout = @( `$maketest` );
 
   if (open my $outputfh, "<", "$output") {
-    local $^INPUT_RECORD_SEPARATOR; # Slurp it - faster.
+    local $^INPUT_RECORD_SEPARATOR = undef; # Slurp it - faster.
     print $^STDOUT, ~< *$outputfh;
     close $outputfh or print $^STDOUT, "# Close $output failed: $^OS_ERROR\n";
   } else {
@@ -167,7 +167,7 @@ sub build_and_run($tests, $expect, $files) {
   }
 
   my $tb = Test::Builder->new();
-  $tb->current_test($tb->current_test + $tests);
+  $tb->current_test += $tests;
 
   if ($^CHILD_ERROR) {
       fail("$maketest failed: $^CHILD_ERROR");

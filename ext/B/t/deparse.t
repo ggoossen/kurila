@@ -3,7 +3,7 @@
 use warnings;
 
 use feature ":5.10";
-use Test::More tests => 52;
+use Test::More tests => 50;
 
 use B::Deparse;
 my $deparse = B::Deparse->new();
@@ -178,8 +178,7 @@ my %x;
 # 0
 @(my $x, my $y) = @('xx', 'yy');
 ####
-# 0 TODO range
-my @x = @( 1..10 );
+my @x = @(1 .. 10);
 ####
 # 13
 my $foo;
@@ -199,10 +198,10 @@ do { my $x };
 >>>>
 do { my $x; };
 ####
-# 17
+# 17 while loop
 while (1) { my $k; }
 ####
-# 18
+# 18 postfix for loop
 my ($x,@a);
 $x=1 for @a;
 >>>>
@@ -213,30 +212,19 @@ $x = 1 foreach (@a);
 my $i;
 while ($i) { my $z = 1; } continue { $i = 99; }
 ####
-# 23
-foreach my $i (1, 2) {
-    my $z = 1;
-}
-####
-# 25
-my $i;
-foreach my $i (1, 2) {
-    my $z = 1;
-}
-####
-# 26
-foreach my $i (1, 2) {
+# 23 with my
+foreach my $i (@(1, 2)) {
     my $z = 1;
 }
 ####
 # 27
-foreach our $i (1, 2) {
+foreach our $i (1) {
     my $z = 1;
 }
 ####
 # 28
 my $i;
-foreach our $i (1, 2) {
+foreach our $i (1) {
     my $z = 1;
 }
 ####
@@ -255,7 +243,7 @@ print *STDOUT, sort(sub { $main::b cmp $main::a; } , @x);
 print *STDOUT, $_ foreach (reverse @main::a);
 ####
 # 33 TODO range
-print *STDOUT, $_ foreach (reverse 2..5);
+print *STDOUT, $_ foreach (reverse 2 .. 5);
 ####
 # 34  (bug #38684)
 @main::ary = @(split(' ', 'foo', 0));

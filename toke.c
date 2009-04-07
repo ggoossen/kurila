@@ -4523,7 +4523,6 @@ Perl_yylex(pTHX)
 
 		    op_free(pl_yylval.opval);
 		    pl_yylval.opval = newCVREF(0, newGVOP(OP_GV, 0, gv, S_curlocation(PL_bufptr)), S_curlocation(PL_bufptr));
-		    pl_yylval.opval->op_private |= OPpENTERSUB_NOPAREN;
 		    PL_last_lop = PL_oldbufptr;
 		    PL_last_lop_op = OP_ENTERSUB;
 		    /* Is there a prototype? */

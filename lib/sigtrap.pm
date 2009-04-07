@@ -14,7 +14,7 @@ sub import {
     my $handler = \&handler_traceback;
     my $saw_sig = 0;
     my $untrapped = 0;
-    local $_;
+    local $_ = undef;
 
     {
         while ((nelems @_)) {
@@ -24,7 +24,7 @@ sub import {
                 unless ($untrapped and signals::handler($_)
                           and signals::handler($_) ne 'DEFAULT') {
                     print $^STDOUT, "Installing handler $(dump::view($handler)) for $_\n" if $Verbose;
-                    signals::set_handler($_, $handler);
+                    signals::handler($_) = $handler;
                 }
             } elsif ($_ eq 'normal-signals') {
                 unshift @_, < grep { signals::supported($_) }, qw(HUP INT PIPE TERM);
@@ -66,7 +66,7 @@ sub handler_die {
 
 sub handler_traceback {
     our $panic;
-    signals::set_handler('ABRT', 'DEFAULT');
+    signals::handler('ABRT') = 'DEFAULT';
     kill 'ABRT', $^PID if $panic++;
     syswrite($^STDERR, 'Caught a SIG', 12);
     syswrite($^STDERR, @_[0], length(@_[0]));

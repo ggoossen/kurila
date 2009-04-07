@@ -12,7 +12,7 @@ use B < qw(class main_root main_start main_cv svref_2object opnumber perlstring
 	 OPf_WANT OPf_WANT_VOID OPf_WANT_SCALAR OPf_WANT_LIST
 	 OPf_KIDS OPf_REF OPf_STACKED OPf_SPECIAL OPf_MOD
 	 OPpLVAL_INTRO OPpOUR_INTRO OPpENTERSUB_AMPER OPpSLICE OPpCONST_BARE
-	 OPpTARGET_MY
+	 OPf_TARGET_MY
 	 OPpEXISTS_SUB OPpSORT_NUMERIC OPpSORT_INTEGER
 	 OPpSORT_REVERSE OPpSORT_DESCEND OPpITER_REVERSED
 	 SVf_IOK SVf_NOK SVf_ROK SVf_POK SVpad_OUR SVf_FAKE SVs_RMG SVs_SMG
@@ -83,7 +83,7 @@ use warnings ();
 # - added support for Hugo's new OP_SETSTATE (like nextstate)
 # Changes between 0.58 and 0.59
 # - added support for Chip's OP_METHOD_NAMED
-# - added support for Ilya's OPpTARGET_MY optimization
+# - added support for Ilya's OPf_TARGET_MY optimization
 # - elided arrows before `()' subscripts when possible
 # Changes between 0.59 and 0.60
 # - support for method attribues was added
@@ -585,7 +585,7 @@ sub compile {
 	my $self = B::Deparse->new(< @args);
 	# First deparse command-line args
 	if ($^WARNING) { # deparse -w
-	    print $^STDOUT, qq(BEGIN \{ \$^W = $^WARNING; \}\n);
+	    print $^STDOUT, qq(BEGIN \{ \$^WARNING = $^WARNING; \}\n);
 	}
 	if ($^INPUT_RECORD_SEPARATOR ne "\n" or defined $O::savebackslash) { # deparse -l and -0
 	    my $fs = perlstring($^INPUT_RECORD_SEPARATOR) || 'undef';
@@ -951,7 +951,7 @@ sub maybe_local($self, $op, $cx, $text) {
 }
 
 sub maybe_targmy($self, $op, $cx, $func, @< @args) {
-    if ($op->private ^&^ OPpTARGET_MY) {
+    if ($op->flags ^&^ OPf_TARGET_MY) {
 	my $var = $self->padname( <$op->targ);
 	my $val = $func->($self, $op, 7, < @args);
 	return $self->maybe_parens("$var = $val", $cx, 7);
@@ -2031,10 +2031,8 @@ sub range($self, $op, $cx, $type) {
     return $self->maybe_parens("$left $type $right", $cx, 9);
 }
 
-sub pp_flop($self, $op, $cx) {
-    my $flip = $op->first;
-    my $type = ($flip->flags ^&^ OPf_SPECIAL) ?? "..." !! "..";
-    return $self->range($flip->first, $cx, $type);
+sub pp_range($self, $op, $cx) {
+    return $self->range($op, $cx, "..");
 }
 
 # one-line while/until is handled in pp_leave
@@ -2455,11 +2453,10 @@ sub loop_common($self, $op, $cx, $init) {
 	if ($ary->name eq 'null' and $enter->private ^&^ OPpITER_REVERSED) {
 	    # "reverse" was optimised away
 	    $ary = listop($self, $ary->first->sibling, 1, 'reverse');
-	} elsif ($enter->flags ^&^ OPf_SPECIAL
-	    and not null $ary->first->sibling->sibling)
+	} elsif ($enter->flags ^&^ OPf_SPECIAL)
 	{
-	    $ary = $self->deparse($ary->first->sibling, 9) . " .. " .
-	      $self->deparse($ary->first->sibling->sibling, 9);
+	    $ary = $self->deparse($ary->first, 9) . " .. " .
+	      $self->deparse($ary->first->sibling, 9);
 	} else {
 	    $ary = $self->deparse($ary, 1);
 	}

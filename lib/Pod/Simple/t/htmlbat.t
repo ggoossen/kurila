@@ -4,7 +4,7 @@
 
 #sub Pod::Simple::HTMLBatch::DEBUG () {5};
 
-use Test;
+use Test::More;
 BEGIN { plan tests => 8 }
 
 require Pod::Simple::HTMLBatch;;

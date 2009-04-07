@@ -498,7 +498,7 @@ my %ENTITIES = %(
 ##---------------------------------
 
 sub podchecker($infile, $outfile, %< %options) {
-    local $_;
+    local $_ = undef;
 
     ## Set defaults
     $infile  ||= $^STDIN;

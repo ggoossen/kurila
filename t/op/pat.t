@@ -2079,7 +2079,7 @@ do {
 };
 
 do {
-    local $^OUTPUT_RECORD_SEPARATOR;
+    local $^OUTPUT_RECORD_SEPARATOR = undef;
     $_ = 'aaaaaaaaaa';
     chop $_; $^OUTPUT_RECORD_SEPARATOR="\n";
     ok(m/[^\s]+/, "m/[^\s]/ utf8");
@@ -2508,7 +2508,7 @@ do {
       return sub {
         my @($code) =  @_;
         my $warning;
-        local $^WARN_HOOK;
+        local $^WARN_HOOK = undef;
         undef $^EVAL_ERROR;
         eval 'BEGIN { use warnings; $^WARN_HOOK = sub { $warning = @_[0]->message }; }' . "\n"
           . $code; die if $^EVAL_ERROR;
@@ -2592,7 +2592,7 @@ SKIP:do {
         <<stuff1>and<stuff2>><<<<right>>>>
     );
 
-    local $_='<<<stuff1>and<stuff2>><<<<right>>>>>';
+    local $_ = '<<<stuff1>and<stuff2>><<<<right>>>>>';
     ok(m/^(<((?:(?>[^<>]+)|(?1))*)>(?{push @stack, $2 }))$/,
         "Recursion should match");
     ok((nelems @stack)==nelems @expect)
@@ -2734,14 +2734,14 @@ do {   # Test the (*PRUNE) pattern
     $count = 0;
     'aaab'=~m/a+b?(*PRUNE)(?{$count++})(*FAIL)/;
     is($count,3,"expect 3 with (*PRUNE)");
-    local $_='aaab';
+    local $_ = 'aaab';
     $count=0;
     1 while m/.(*PRUNE)(?{$count++})(*FAIL)/g;
     is($count,4,"/.(*PRUNE)/");
     $count = 0;
     'aaab'=~m/a+b?(??{'(*PRUNE)'})(?{$count++})(*FAIL)/;
     is($count,3,"expect 3 with (*PRUNE)");
-    local $_='aaab';
+    local $_ = 'aaab';
     $count=0;
     1 while m/.(??{'(*PRUNE)'})(?{$count++})(*FAIL)/g;
     is($count,4,"/.(*PRUNE)/");
@@ -2750,7 +2750,7 @@ do {   # Test the (*SKIP) pattern
     our $count = 0;
     'aaab'=~m/a+b?(*SKIP)(?{$count++})(*FAIL)/;
     is($count,1,"expect 1 with (*SKIP)");
-    local $_='aaab';
+    local $_ = 'aaab';
     $count=0;
     1 while m/.(*SKIP)(?{$count++})(*FAIL)/g;
     is($count,4,"/.(*SKIP)/");
@@ -2765,7 +2765,7 @@ do {   # Test the (*SKIP) pattern
     our $count = 0;
     'aaab'=~m/a+b?(*MARK:foo)(*SKIP)(?{$count++})(*FAIL)/;
     is($count,1,"expect 1 with (*SKIP)");
-    local $_='aaab';
+    local $_ = 'aaab';
     $count=0;
     1 while m/.(*MARK:foo)(*SKIP)(?{$count++})(*FAIL)/g;
     is($count,4,"/.(*SKIP)/");
@@ -2780,7 +2780,7 @@ do {   # Test the (*SKIP) pattern
     our $count = 0;
     'aaab'=~m/a*(*MARK:a)b?(*MARK:b)(*SKIP:a)(?{$count++})(*FAIL)/;
     is($count,3,"expect 3 with *MARK:a)b?(*MARK:b)(*SKIP:a)");
-    local $_='aaabaaab';
+    local $_ = 'aaabaaab';
     $count=0;
     our @res= @(() );
     1 while m/(a*(*MARK:a)b?)(*MARK:x)(*SKIP:a)(?{$count++; push @res,$1})(*FAIL)/g;
@@ -2791,7 +2791,7 @@ do {   # Test the (*COMMIT) pattern
     our $count = 0;
     'aaabaaab'=~m/a+b?(*COMMIT)(?{$count++})(*FAIL)/;
     is($count,1,"expect 1 with (*COMMIT)");
-    local $_='aaab';
+    local $_ = 'aaab';
     $count=0;
     1 while m/.(*COMMIT)(?{$count++})(*FAIL)/g;
     is($count,1,"/.(*COMMIT)/");
@@ -2874,7 +2874,7 @@ do {
 do {
     local $Message = "Relative Recursion";
     my $parens=qr/(\((?:[^()]++|(?-1))*+\))/;
-    local $_='foo((2*3)+4-3) + bar(2*(3+4)-1*(2-3))';
+    local $_ ='foo((2*3)+4-3) + bar(2*(3+4)-1*(2-3))';
     my @($all,$one,$two)=@('','','');
     if (m/foo $parens \s* \+ \s* bar $parens/xp) {
        $all=$^MATCH;
@@ -2888,14 +2888,14 @@ do {
 };
 do {
     my $spaces="      ";
-    local $_=join 'bar', @($spaces,$spaces);
+    local $_ =join 'bar', @($spaces,$spaces);
     our $count=0;
     s/(?>\s+bar)(?{$count++})//g;
     is($_,$spaces,"SUSPEND final string");
     is($count,1,"Optimiser should have prevented more than one match");
 };
 do {
-    local $Message="RT 22395";
+    local $Message ="RT 22395";
     local $TODO = 'Should be L+1 not L*(L+3)/2 (L=$l)';
     our $count;
     for my $l (@(10,100,1000)) {
@@ -2923,7 +2923,7 @@ do {
 };
 do {
     # RT#6893
-    local $_= qq(A\nB\nC\n); 
+    local $_ = qq(A\nB\nC\n); 
     my @res;
     while (m#(\G|\n)([^\n]*)\n#gsx) 
     { 
@@ -3087,7 +3087,7 @@ do {
     use warnings;
     local $Message = "ASCII pattern that really is utf8";
     my @w;
-    local $^WARN_HOOK=sub{push @w,"$(join ' ',@_)"};
+    local $^WARN_HOOK =sub{push @w,"$(join ' ',@_)"};
     my $c=qq(\x{DF}); 
     ok($c=~m/$c|\x{100}/);
     ok((nelems @w)==0);
@@ -3105,7 +3105,7 @@ do {
 };
 do {
     local $Message = "HORIZWS";
-    local $_="\t \r\n \n \t".chr(11)."\n";
+    local $_ ="\t \r\n \n \t".chr(11)."\n";
     s/\H/H/g;
     s/\h/h/g;
     is($_,"\t \r\n \n \t".chr(11)."\n");
@@ -3173,13 +3173,13 @@ do {
 };
 
 do {
-    local $_;
+    local $_ = undef;
     ($_ = 'abc')=~m/(abc)/g;
     $_ = '123'; 
     is("$1",'abc',"/g leads to unsafe match vars: $1");
 };
 do {
-    local $Message='Message-ID: <20070818091501.7eff4831@r2d2>';
+    local $Message ='Message-ID: <20070818091501.7eff4831@r2d2>';
     my $str= "";
     for(0..5){
         my @x;

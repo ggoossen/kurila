@@ -205,8 +205,6 @@ Perl_pp_grepwhile
 Perl_pp_mapstart
 Perl_pp_mapwhile
 Perl_pp_range
-Perl_pp_flip
-Perl_pp_flop
 Perl_pp_and
 Perl_pp_or
 Perl_pp_xor
@@ -217,6 +215,8 @@ Perl_pp_orassign
 Perl_pp_dorassign
 Perl_pp_method
 Perl_pp_entersub
+Perl_pp_entersub_targargs
+Perl_pp_entersub_save
 Perl_pp_leavesub
 Perl_pp_caller
 Perl_pp_warn

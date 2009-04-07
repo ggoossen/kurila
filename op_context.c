@@ -102,7 +102,7 @@ Perl_scalar(pTHX_ OP *o)
 	PL_curcop = &PL_compiling;
 	break;
     case OP_LIST:
-	yyerror(Perl_form(aTHX_ "%s may not be used in scalar context", PL_op_desc[o->op_type]));
+	Perl_croak_at(aTHX_ o->op_location, "%s may not be used in scalar context", PL_op_desc[o->op_type]);
 	break;
     case OP_ANONARRAY:
 	break;
@@ -151,7 +151,7 @@ Perl_scalarvoid(pTHX_ OP *o)
 	return o;
     }
 
-    if ((o->op_private & OPpTARGET_MY)
+    if ((o->op_flags & OPf_TARGET_MY)
 	&& (PL_opargs[o->op_type] & OA_TARGLEX))/* OPp share the meaning */
     {
 	return scalar(o);			/* As if inside SASSIGN */
@@ -194,8 +194,6 @@ Perl_scalarvoid(pTHX_ OP *o)
     case OP_SORT:
     case OP_REVERSE:
     case OP_RANGE:
-    case OP_FLIP:
-    case OP_FLOP:
     case OP_CALLER:
     case OP_FILENO:
     case OP_EOF:
@@ -403,7 +401,7 @@ Perl_list(pTHX_ OP *o)
 	return o;
     }
 
-    if ((o->op_private & OPpTARGET_MY)
+    if ((o->op_flags & OPf_TARGET_MY)
 	&& (PL_opargs[o->op_type] & OA_TARGLEX))/* OPp share the meaning */
     {
 	return o;				/* As if inside SASSIGN */
@@ -412,7 +410,6 @@ Perl_list(pTHX_ OP *o)
     o->op_flags = (o->op_flags & ~OPf_WANT) | OPf_WANT_LIST;
 
     switch (o->op_type) {
-    case OP_FLOP:
     case OP_REPEAT:
 	list(cBINOPo->op_first);
 	break;
@@ -429,10 +426,6 @@ Perl_list(pTHX_ OP *o)
     case OP_NULL:
 	if (!(o->op_flags & OPf_KIDS))
 	    break;
-	if (!o->op_next && cUNOPo->op_first->op_type == OP_FLOP) {
-	    list(cBINOPo->op_first);
-	    return gen_constant_list(o);
-	}
     case OP_LIST:
 	listkids(o);
 	break;
@@ -526,7 +519,7 @@ Perl_mod(pTHX_ OP *o, I32 type)
     if (!o || (PL_parser && PL_parser->error_count))
 	return o;
 
-    if ((o->op_private & OPpTARGET_MY)
+    if ((o->op_flags & OPf_TARGET_MY)
 	&& (PL_opargs[o->op_type] & OA_TARGLEX))/* OPp share the meaning */
     {
 	return o;
@@ -654,6 +647,27 @@ Perl_mod(pTHX_ OP *o, I32 type)
             );
 	localize = 1;
 	break;
+
+    case OP_ENTERSUB_SAVE:
+        o = op_mod_assign(
+            o,
+            &(cUNOPo->op_first),
+            type == OP_NULL ? o->op_type : type
+            );
+
+	localize = 1;
+        break;
+    case OP_ENTERSUB:
+        if ( ! type ) {
+            /* add localize opcode */
+            const PADOFFSET po = pad_alloc(OP_SASSIGN, SVs_PADTMP);
+            o->op_targ = po;
+            o->op_private |= OPpENTERSUB_SAVEARGS;
+            o = newUNOP(OP_ENTERSUB_SAVE, 0, scalar(o), o->op_location);
+            o->op_targ = po;
+        }
+	localize = 1;
+        break;
 
     case OP_SCOPE:
     case OP_LEAVE:

@@ -4,7 +4,7 @@
 # Use STANDARD safe level for these tests
 
 
-use Test;
+use Test::More;
 BEGIN { plan tests => 9 }
 
 use File::Spec;
@@ -39,7 +39,7 @@ ok(seek( $fh, 0, 0));
 my $line = ~< $fh;
 
 # compare with previous string
-ok($string, $line);
+is($string, $line);
 
 # Tidy up
 # This test fails on Windows NT since it seems that the size returned by 

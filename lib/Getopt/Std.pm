@@ -91,7 +91,7 @@ our ($OUTPUT_HELP_VERSION, $STANDARD_HELP_VERSION);
 sub getopt($argumentative, ?$hash) {
     $argumentative = '' if !defined $argumentative;
     my ($first,$rest);
-    local $_;
+    local $_ = undef;
     local @EXPORT;
 
     while ((nelems @ARGV) && ($_ = @ARGV[0]) =~ m/^-(.)(.*)/) {
@@ -219,7 +219,7 @@ EOH
 sub getopts($argumentative, ?$hash) {
     my (@args,$first,$rest,$exit);
     my $errs = 0;
-    local $_;
+    local $_ = undef;
     local @EXPORT;
 
     @args = split( m/ */, $argumentative );

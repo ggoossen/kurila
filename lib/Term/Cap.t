@@ -32,8 +32,7 @@ else {
 
 use_ok( 'Term::Cap' );
 
-local (*TCOUT, *OUT);
-open \*OUT, ">>", \(my $out);
+open my $out_fh, ">>", \(my $out);
 my $writable = 1;
 
 if (open(my $tcout, ">", "tcout")) {
@@ -75,12 +74,12 @@ is( $t->Tpad('x'), 'x', 'Tpad() should return strings verbatim with no match' );
 is( $t->Tpad( '1*a', 2 ), 'apcpc', 'Tpad() should pad paddable strings' );
 
 $t->{+PADDING} = 2;
-is( $t->Tpad( '1*a', 3, *OUT ), 'apcpc', 'Tpad() should perform pad math' );
+is( $t->Tpad( '1*a', 3, $out_fh ), 'apcpc', 'Tpad() should perform pad math' );
 is( $out->read(), 'apcpc', 'Tpad() should write to filehandle when passed' );
 
 is( $t->Tputs('PADDING'), 2, 'Tputs() should return existing value' );
 is( $t->Tputs('pc', 2), 'pc', 'Tputs() should delegate to Tpad()' );
-$t->Tputs('pc', 1, *OUT);
+$t->Tputs('pc', 1, $out_fh);
 is( $t->{?pc}, 'pc', 'Tputs() should cache pc value when asked' );
 is( $out->read(), 'pc', 'Tputs() should write to filehandle when passed' );
 
@@ -164,7 +163,7 @@ do {
    skip("QNX's termcap database does not contain an entry for dumb terminals",
         1) if $^OS_NAME eq 'nto';
 
-   local $^OS_NAME;
+   local $^OS_NAME = undef;
    push dynascope->{onleave}, env::make_restore();
    env::set_var('TERM', undef);
    $^OS_NAME = 'Win32';
@@ -175,7 +174,7 @@ do {
 
 # Tgoto has comments on the expected formats
 $t->{+_test} = "a\%d";
-is( $t->Tgoto('test', '', 1, *OUT), 'a1', 'Tgoto() should handle %d code' );
+is( $t->Tgoto('test', '', 1, $out_fh), 'a1', 'Tgoto() should handle %d code' );
 is( $out->read(), 'a1', 'Tgoto() should print to filehandle if passed' );
 
 $t->{+_test} = "a\%.";

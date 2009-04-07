@@ -125,7 +125,7 @@ sub old_shellwords {
     #	@words = old_shellwords();	# defaults to $_ (and clobbers it)
 
     no warnings 'uninitialized';	# we will be testing undef strings
-    local *_ = \join('', @_) if (nelems @_);
+    my $_ = join('', @_) if (nelems @_);
     my (@words, $snippet);
 
     s/\A\s+//;

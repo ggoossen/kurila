@@ -67,7 +67,7 @@ SKIP: do {
 	my $mask   = POSIX::SigSet->new( &SIGINT( < @_ ));
 	my $action = POSIX::SigAction->new( \&main::SigHUP, $mask, 0);
 	sigaction(&SIGHUP( < @_ ), $action);
-	signals::set_handler('INT' => \&SigINT);
+	signals::handler('INT') = \&SigINT;
 
 	# At least OpenBSD/i386 3.3 is okay, as is NetBSD 1.5.
 	# But not NetBSD 1.6 & 1.6.1: the test makes perl crash.

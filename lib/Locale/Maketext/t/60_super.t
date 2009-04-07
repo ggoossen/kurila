@@ -1,5 +1,5 @@
 
-use Test;
+use Test::More;
 
 # use a BEGIN block so we print our plan before MyModule is loaded
 BEGIN { plan tests => 3 }
@@ -27,6 +27,6 @@ env::set_var('HTTP_ACCEPT_LANGUAGE' => 'en-US, zh-TW');
 
 my $x = Whunk::L10N->get_handle;
 print $^STDOUT, "# LH object: $(dump::view($x))\n";
-ok $x->maketext('hello'), "HI AND STUFF!";
+is $x->maketext('hello'), "HI AND STUFF!";
 print $^STDOUT, "# OK bye\n";
 ok 1;

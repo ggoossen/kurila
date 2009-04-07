@@ -2,7 +2,7 @@
 
 package Foo;
 
-use Test;
+use Test::More;
 
 plan tests => 7;
 

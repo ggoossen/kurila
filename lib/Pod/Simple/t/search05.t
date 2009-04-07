@@ -6,7 +6,7 @@ BEGIN {
 }
 
 use Pod::Simple::Search;
-use Test;
+use Test::More;
 BEGIN { plan tests => 15 }
 
 print $^STDOUT, "# Some basic sanity tests...\n";

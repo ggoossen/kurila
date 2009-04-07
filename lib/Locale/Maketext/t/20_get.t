@@ -1,5 +1,5 @@
 
-use Test;
+use Test::More;
 BEGIN { plan tests => 11; }
 use Locale::Maketext v1.01;
 print $^STDOUT, "# Hi there...\n";
@@ -28,16 +28,16 @@ do {
 my $lh;
 print $^STDOUT, "# Basic sanity:\n";
 ok defined( $lh = Woozle->get_handle('eu-mt') ) && ref($lh);
-ok $lh && $lh->maketext('d2', 7), "hum 14"      ;
+is $lh && $lh->maketext('d2', 7), "hum 14"      ;
 
 
 
 print $^STDOUT, "# Make sure we can assign to ENV entries\n",
       "# (Otherwise we can't run the subsequent tests)...\n";
 env::set_var('MYORP'   => 'Zing');
-ok env::var('MYORP'), 'Zing';
+is env::var('MYORP'), 'Zing';
 env::set_var('SWUZ'   => 'KLORTHO HOOBOY');
-ok env::var('SWUZ'), 'KLORTHO HOOBOY';
+is env::var('SWUZ'), 'KLORTHO HOOBOY';
 
 env::set_var('MYORP', undef);
 env::set_var('SWUZ', undef);

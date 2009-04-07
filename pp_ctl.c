@@ -143,20 +143,6 @@ PP(pp_mapwhile)
 
 PP(pp_range)
 {
-    dVAR;
-    return NORMAL;
-}
-
-PP(pp_flip)
-{
-    dVAR;
-    dSP;
-
-    RETURNOP(((LOGOP*)cUNOP->op_first)->op_other);
-}
-
-PP(pp_flop)
-{
     dVAR; dSP;
 
     AV* res = av_2mortal(newAV());
@@ -710,7 +696,7 @@ PP(pp_dbstate)
 
 PP(pp_enteriter)
 {
-    dVAR; dSP; dMARK;
+    dVAR; dSP;
     register PERL_CONTEXT *cx;
     const I32 gimme = GIMME_V;
     SV **svp;
@@ -741,7 +727,7 @@ PP(pp_enteriter)
     ENTER;
 
     PUSHBLOCK(cx, cxtype, SP);
-    PUSHLOOP_FOR(cx, svp, MARK, 0);
+    PUSHLOOP_FOR(cx, svp, SP-1, 0);
     if (PL_op->op_flags & OPf_SPECIAL) {
 	SV * const right = POPs;
 	dPOPss;

@@ -2,33 +2,13 @@
 
 require './test.pl';
 
-plan(100);
+plan(95);
 
 our ($bar, $foo, $baz, $FOO, $BAR, $BAZ, @ary, @ref,
      @a, @b, @c, @d, $ref, $object, @foo, @bar, @baz,
      $refref, $x, %whatever, @spring, %spring2,
      $subref, $subrefref, $anonhash, $anonhash2, $object2, $THIS,
      @ARGS, $string);
-
-# Test glob operations.
-
-$bar = "one";
-$baz = "three";
-$foo = "four";
-do {
-    local(*foo) = 'baz';
-    is ($foo, 'three');
-};
-is ($foo, 'four');
-
-$foo = "global";
-do {
-    local(*foo);
-    is ($foo, undef);
-    $foo = "local";
-    is ($foo, 'local');
-};
-is ($foo, 'global');
 
 # Test real references.
 
@@ -216,12 +196,6 @@ do {
 print $^STDOUT, "# left block\n";
 curr_test($test + 3);
 
-# another glob test
-
-
-$foo = "garbage";
-do { local(*bar) = "foo" };
-$bar = "glob 3";
 
 our $var = "glob 4";
 $_   = \$var;
@@ -416,8 +390,8 @@ our ($ref3, $ref1);
 
 do {
     $ref3 = bless \@("ok $test2 - Package destruction\n");	# package destruction
-    my $ref2 = bless \@("ok $test1 - Lexical destruction\n");	# lexical destruction
-    local $ref1 = bless \@("ok $test - Dynamic destruction\n");	# dynamic destruction
+    my $ref2 = bless \@("ok $test - Lexical destruction\n");	# lexical destruction
+    local $ref1 = bless \@("ok $test1 - Dynamic destruction\n");	# dynamic destruction
     1;					# flush any temp values on stack
 };
 

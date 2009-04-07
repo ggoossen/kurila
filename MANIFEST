@@ -1378,7 +1378,6 @@ lib/Test/Builder.pm		For writing new test libraries
 lib/Test/Builder/Tester/Color.pm	Turn on color in Test::Builder::Tester
 lib/Test/Builder/Tester.pm	For testing Test::Builder based classes
 lib/Test/More.pm		More utilities for writing tests
-lib/Test.pm			A simple framework for writing test scripts
 lib/Test/Simple/Changes		Test::Simple changes
 lib/Test/Simple.pm		Basic utility for writing tests
 lib/Test/Simple/README		Test::Simple README
@@ -1445,14 +1444,6 @@ lib/Test/Simple/t/try.t		Test::More test
 lib/Test/Simple/t/undef.t	Test::More test, undefs don't cause warnings
 lib/Test/Simple/t/useing.t	Test::More test, compile test
 lib/Test/Simple/t/use_ok.t	Test::More test, use_ok()
-lib/Test/t/fail.t		See if Test works
-lib/Test/t/mix.t		See if Test works
-lib/Test/t/multiline.t		See if Test works
-lib/Test/t/onfail.t		See if Test works
-lib/Test/t/qr.t			See if Test works
-lib/Test/t/skip.t		See if Test works
-lib/Test/t/success.t		See if Test works
-lib/Test/t/todo.t		See if Test works
 lib/Test/Tutorial.pod		A tutorial on writing tests
 lib/Text/Abbrev.pm		An abbreviation table builder
 lib/Text/Abbrev.t		Test Text::Abbrev

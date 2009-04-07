@@ -31,7 +31,7 @@ open ($out, "<", 'out.tmp') or die "Cannot open out.tmp: $^OS_ERROR\n";
 while ( ~< $out) { last if m/^\.nh/ }
 my $output;
 do {
-    local $^INPUT_RECORD_SEPARATOR;
+    local $^INPUT_RECORD_SEPARATOR = undef;
     $output = ~< $out;
 };
 close $out;
@@ -49,7 +49,7 @@ $parser->parse_from_file (\%( cutting => 0 ), 'tmp.pod', $out);
 close $out;
 open ($out, "<", 'out.tmp') or die "Cannot open out.tmp: $^OS_ERROR\n";
 do {
-    local $^INPUT_RECORD_SEPARATOR;
+    local $^INPUT_RECORD_SEPARATOR = undef;
     $output = ~< $out;
 };
 close $out;

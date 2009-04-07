@@ -1,5 +1,5 @@
 
-use Test;
+use Test::More;
 # Time-stamp: "2004-07-01 14:33:50 ADT"
 BEGIN { plan tests => 12; }
 use I18N::LangTags::Detect v1.01;
@@ -10,8 +10,8 @@ print $^STDOUT, "# Using I18N::LangTags::Detect v$I18N::LangTags::Detect::VERSIO
 
 print $^STDOUT, "# Make sure we can assign to ENV entries\n",
       "# (Otherwise we can't run the subsequent tests)...\n";
-env::set_var('MYORP'   => 'Zing');          ok env::var('MYORP'), 'Zing';
-env::set_var('SWUZ'    => 'KLORTHO HOOBOY'); ok env::var('SWUZ'), 'KLORTHO HOOBOY';
+env::set_var('MYORP'   => 'Zing');          is env::var('MYORP'), 'Zing';
+env::set_var('SWUZ'    => 'KLORTHO HOOBOY'); is env::var('SWUZ'), 'KLORTHO HOOBOY';
 
 env::set_var('MYORP', undef);
 env::set_var('SWUZ', undef);
@@ -40,7 +40,7 @@ env::set_var('LANGUAGE'       => 'Eu-MT');
 env::set_var('LC_ALL'         => '');
 env::set_var('LC_MESSAGES'    => '');
 env::set_var('LANG'           => '');
-ok show( j <      I18N::LangTags::Detect::detect()), q{["eu-mt"]};
+is show( j <      I18N::LangTags::Detect::detect()), q{["eu-mt"]};
 
 
 print $^STDOUT, "# Test LC_ALL...\n";
@@ -50,7 +50,7 @@ env::set_var('LC_ALL'         => 'Eu-MT');
 env::set_var('LC_MESSAGES'    => '');
 env::set_var('LANG'           => '');
 
-ok show( j <      I18N::LangTags::Detect::detect()), q{["eu-mt"]};
+is show( j <      I18N::LangTags::Detect::detect()), q{["eu-mt"]};
 
 print $^STDOUT, "# Test LC_MESSAGES...\n";
 env::set_var('REQUEST_METHOD' => '');
@@ -59,7 +59,7 @@ env::set_var('LC_ALL'         => '');
 env::set_var('LC_MESSAGES'    => 'Eu-MT');
 env::set_var('LANG'           => '');
 
-ok show( j <      I18N::LangTags::Detect::detect()), q{["eu-mt"]};
+is show( j <      I18N::LangTags::Detect::detect()), q{["eu-mt"]};
 
 
 print $^STDOUT, "# Test LANG...\n";
@@ -69,7 +69,7 @@ env::set_var('LC_ALL'         => '');
 env::set_var('LC_MESSAGES'    => '');
 env::set_var('LANG'           => 'Eu_MT');
 
-ok show( j <      I18N::LangTags::Detect::detect()), q{["eu-mt"]};
+is show( j <      I18N::LangTags::Detect::detect()), q{["eu-mt"]};
 
 
 
@@ -80,7 +80,7 @@ env::set_var('LC_ALL' => '');
 env::set_var('LC_MESSAGES' => '');
 env::set_var('LANG'     => 'Eu_MT');
 
-ok show( j <      I18N::LangTags::Detect::detect()), q{["eu-mt"]};
+is show( j <      I18N::LangTags::Detect::detect()), q{["eu-mt"]};
 
 
 
@@ -88,14 +88,14 @@ ok show( j <      I18N::LangTags::Detect::detect()), q{["eu-mt"]};
 print $^STDOUT, "# Test HTTP_ACCEPT_LANGUAGE...\n";
 env::set_var('REQUEST_METHOD'       => 'GET');
 env::set_var('HTTP_ACCEPT_LANGUAGE' => 'eu-MT');
-ok show( j <      I18N::LangTags::Detect::detect()), q{["eu-mt"]};
+is show( j <      I18N::LangTags::Detect::detect()), q{["eu-mt"]};
 
 
 env::set_var('HTTP_ACCEPT_LANGUAGE' => 'x-plorp, zaz, eu-MT, i-klung');
-ok show( j <      I18N::LangTags::Detect::detect()), qq{["x-plorp" "i-plorp" "zaz" "eu-mt" "i-klung" "x-klung"]};
+is show( j <      I18N::LangTags::Detect::detect()), qq{["x-plorp" "i-plorp" "zaz" "eu-mt" "i-klung" "x-klung"]};
 
 env::set_var('HTTP_ACCEPT_LANGUAGE' => 'x-plorp, zaz, eU-Mt, i-klung');
-ok show( j <      I18N::LangTags::Detect::detect()), qq{["x-plorp" "i-plorp" "zaz" "eu-mt" "i-klung" "x-klung"]};
+is show( j <      I18N::LangTags::Detect::detect()), qq{["x-plorp" "i-plorp" "zaz" "eu-mt" "i-klung" "x-klung"]};
 
 
 

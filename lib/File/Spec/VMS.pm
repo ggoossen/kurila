@@ -338,7 +338,8 @@ sub abs2rel {
     my @($base_volume, $base_directories, $base_file) = $self->splitpath($base);
     return $path unless lc($path_volume) eq lc($base_volume);
 
-    for ($path, $base) { $_ = $self->rel2abs($_) }
+    $path = $self->rel2abs($path);
+    $base = $self->rel2abs($base);
 
     # Now, remove all leading components that are the same
     my @pathchunks = $self->splitdir( $path_directories );

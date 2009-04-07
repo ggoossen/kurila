@@ -55,7 +55,7 @@ unless (defined $listen) {
     try { require File::Temp };
     unless ($^EVAL_ERROR) {
 	File::Temp->import( 'mktemp');
-	for my $TMPDIR (env::var('TMPDIR'), "/tmp") {
+	for my $TMPDIR (@: env::var('TMPDIR'), "/tmp") {
 	    if (defined $TMPDIR && -d $TMPDIR && -w $TMPDIR) {
 		$PATH = mktemp("$TMPDIR/sXXXXXXXX");
 		last if $listen = IO::Socket::UNIX->new(Local => $PATH,

@@ -1,4 +1,4 @@
-use Test;
+use Test::More;
 use Win32;
 
 plan tests => 1;

@@ -9,7 +9,7 @@ BEGIN {
 
 #########################
 
-use Test;
+use Test::More;
 
 use warnings;
 BEGIN { plan tests => 37 };
@@ -20,45 +20,45 @@ sub answer { defined @_[0] ?? @_[0] ?? "YES" !! "NO" !! "MAYBE" }
 
 #########################
 
-ok(NFD ("\x{304C}\x{FF76}"), "\x{304B}\x{3099}\x{FF76}");
-ok(NFC ("\x{304C}\x{FF76}"), "\x{304C}\x{FF76}");
-ok(NFKD("\x{304C}\x{FF76}"), "\x{304B}\x{3099}\x{30AB}");
-ok(NFKC("\x{304C}\x{FF76}"), "\x{304C}\x{30AB}");
+is(NFD ("\x{304C}\x{FF76}"), "\x{304B}\x{3099}\x{FF76}");
+is(NFC ("\x{304C}\x{FF76}"), "\x{304C}\x{FF76}");
+is(NFKD("\x{304C}\x{FF76}"), "\x{304B}\x{3099}\x{30AB}");
+is(NFKC("\x{304C}\x{FF76}"), "\x{304C}\x{30AB}");
 
-ok(answer(checkNFD ("\x{304C}")), "NO");
-ok(answer(checkNFC ("\x{304C}")), "YES");
-ok(answer(checkNFKD("\x{304C}")), "NO");
-ok(answer(checkNFKC("\x{304C}")), "YES");
-ok(answer(checkNFD ("\x{FF76}")), "YES");
-ok(answer(checkNFC ("\x{FF76}")), "YES");
-ok(answer(checkNFKD("\x{FF76}")), "NO");
-ok(answer(checkNFKC("\x{FF76}")), "NO");
+is(answer(checkNFD ("\x{304C}")), "NO");
+is(answer(checkNFC ("\x{304C}")), "YES");
+is(answer(checkNFKD("\x{304C}")), "NO");
+is(answer(checkNFKC("\x{304C}")), "YES");
+is(answer(checkNFD ("\x{FF76}")), "YES");
+is(answer(checkNFC ("\x{FF76}")), "YES");
+is(answer(checkNFKD("\x{FF76}")), "NO");
+is(answer(checkNFKC("\x{FF76}")), "NO");
 
-ok(normalize('D', "\x{304C}\x{FF76}"), "\x{304B}\x{3099}\x{FF76}");
-ok(normalize('C', "\x{304C}\x{FF76}"), "\x{304C}\x{FF76}");
-ok(normalize('KD',"\x{304C}\x{FF76}"), "\x{304B}\x{3099}\x{30AB}");
-ok(normalize('KC',"\x{304C}\x{FF76}"), "\x{304C}\x{30AB}");
+is(normalize('D', "\x{304C}\x{FF76}"), "\x{304B}\x{3099}\x{FF76}");
+is(normalize('C', "\x{304C}\x{FF76}"), "\x{304C}\x{FF76}");
+is(normalize('KD',"\x{304C}\x{FF76}"), "\x{304B}\x{3099}\x{30AB}");
+is(normalize('KC',"\x{304C}\x{FF76}"), "\x{304C}\x{30AB}");
 
-ok(answer(check('D', "\x{304C}")), "NO");
-ok(answer(check('C', "\x{304C}")), "YES");
-ok(answer(check('KD',"\x{304C}")), "NO");
-ok(answer(check('KC',"\x{304C}")), "YES");
-ok(answer(check('D' ,"\x{FF76}")), "YES");
-ok(answer(check('C' ,"\x{FF76}")), "YES");
-ok(answer(check('KD',"\x{FF76}")), "NO");
-ok(answer(check('KC',"\x{FF76}")), "NO");
+is(answer(check('D', "\x{304C}")), "NO");
+is(answer(check('C', "\x{304C}")), "YES");
+is(answer(check('KD',"\x{304C}")), "NO");
+is(answer(check('KC',"\x{304C}")), "YES");
+is(answer(check('D' ,"\x{FF76}")), "YES");
+is(answer(check('C' ,"\x{FF76}")), "YES");
+is(answer(check('KD',"\x{FF76}")), "NO");
+is(answer(check('KC',"\x{FF76}")), "NO");
 
-ok(normalize('NFD', "\x{304C}\x{FF76}"), "\x{304B}\x{3099}\x{FF76}");
-ok(normalize('NFC', "\x{304C}\x{FF76}"), "\x{304C}\x{FF76}");
-ok(normalize('NFKD',"\x{304C}\x{FF76}"), "\x{304B}\x{3099}\x{30AB}");
-ok(normalize('NFKC',"\x{304C}\x{FF76}"), "\x{304C}\x{30AB}");
+is(normalize('NFD', "\x{304C}\x{FF76}"), "\x{304B}\x{3099}\x{FF76}");
+is(normalize('NFC', "\x{304C}\x{FF76}"), "\x{304C}\x{FF76}");
+is(normalize('NFKD',"\x{304C}\x{FF76}"), "\x{304B}\x{3099}\x{30AB}");
+is(normalize('NFKC',"\x{304C}\x{FF76}"), "\x{304C}\x{30AB}");
 
-ok(answer(check('NFD', "\x{304C}")), "NO");
-ok(answer(check('NFC', "\x{304C}")), "YES");
-ok(answer(check('NFKD',"\x{304C}")), "NO");
-ok(answer(check('NFKC',"\x{304C}")), "YES");
-ok(answer(check('NFD' ,"\x{FF76}")), "YES");
-ok(answer(check('NFC' ,"\x{FF76}")), "YES");
-ok(answer(check('NFKD',"\x{FF76}")), "NO");
-ok(answer(check('NFKC',"\x{FF76}")), "NO");
+is(answer(check('NFD', "\x{304C}")), "NO");
+is(answer(check('NFC', "\x{304C}")), "YES");
+is(answer(check('NFKD',"\x{304C}")), "NO");
+is(answer(check('NFKC',"\x{304C}")), "YES");
+is(answer(check('NFD' ,"\x{FF76}")), "YES");
+is(answer(check('NFC' ,"\x{FF76}")), "YES");
+is(answer(check('NFKD',"\x{FF76}")), "NO");
+is(answer(check('NFKC',"\x{FF76}")), "NO");
 

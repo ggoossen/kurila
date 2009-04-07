@@ -4,7 +4,7 @@
 use I18N::LangTags::Detect;
 use env;
 
-use Test;
+use Test::More;
 BEGIN { plan tests => 87 };
 
 my @in = grep { m/\S/ }, split m/\n/, q{

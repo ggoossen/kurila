@@ -1,6 +1,6 @@
-use Test;
+use Test::More;
 use Win32;
 
 plan tests => 1;
 
-ok(Win32::ExpandEnvironmentStrings("%WINDIR%"), $ENV{WINDIR});
+is(Win32::ExpandEnvironmentStrings("%WINDIR%"), $ENV{WINDIR});

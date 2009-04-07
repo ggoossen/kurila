@@ -454,8 +454,7 @@ sub myconfig {
     $summary_expanded;
 }
 
-local *_ = \my $a;
-$_ = <<'!END!';
+my $_ = <<'!END!';
 EOT
 
 $heavy_txt .= join('', sort @v_others) . "!END!\n";
@@ -669,9 +668,9 @@ my $fast_config = join '', map { "    $_,\n" }, sort values %Common;
 # &launcher for some reason (eg it got truncated)
 $config_txt .= sprintf <<'ENDOFTIE', $fast_config;
 
-my @heavy_subs = @(qw|myconfig fetch_string FIRSTKEY NEXTKEY EXISTS STORE config_sh config_re
-                     config_vars|);
-for my $name (< @heavy_subs) {
+my @heavy_subs = qw|myconfig fetch_string FIRSTKEY NEXTKEY EXISTS STORE config_sh config_re
+                     config_vars|;
+for my $name (@heavy_subs) {
     Symbol::fetch_glob("Config::$name")->* =
        sub { require 'Config_heavy.pl';
              return Symbol::fetch_glob("Config::$name")->*->(< @_);
@@ -916,7 +915,7 @@ print $^STDOUT, "written $Config_POD\n";
 my $orig_config_txt = "";
 my $orig_heavy_txt = "";
 do {
-    local $^INPUT_RECORD_SEPARATOR;
+    local $^INPUT_RECORD_SEPARATOR = undef;
     my $fh;
     $orig_config_txt = ~< $fh if open $fh, "<", $Config_PM;
     $orig_heavy_txt  = ~< $fh if open $fh, "<", $Config_heavy;

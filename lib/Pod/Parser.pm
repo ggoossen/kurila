@@ -206,7 +206,7 @@ use Exporter;
 @ISA = qw(Exporter);
 
 ## These "variables" are used as local "glob aliases" for performance
-our (%myData, %myOpts, @input_stack);
+our (@input_stack);
 
 #############################################################################
 
@@ -901,21 +901,20 @@ dynamic lookup; Hence subclasses may I<not> override it!
 =cut
 
 sub parse_paragraph($self, $text, $line_num) {
-    local *myData = $self;  ## alias to avoid deref-ing overhead
-    local *myOpts = (%myData{+_PARSEOPTS} ||= \%());  ## get parse-options
-    local $_;
+    my %myOpts = %$self{+_PARSEOPTS} || %();  ## get parse-options
+    local $_ = undef;
 
     ## See if we want to preprocess nonPOD paragraphs as well as POD ones.
     my $wantNonPods = %myOpts{?'want_nonPODs'};
 
     ## Update cutting status
-    %myData{+_CUTTING} = 0 if $text =~ m/^={1,2}\S/;
+    %$self{+_CUTTING} = 0 if $text =~ m/^={1,2}\S/;
 
     ## Perform any desired preprocessing if we wanted it this early
     $wantNonPods  and  $text = $self->preprocess_paragraph($text, $line_num);
 
     ## Ignore up until next POD directive if we are cutting
-    return if %myData{?_CUTTING};
+    return if %$self{?_CUTTING};
 
     ## Now we know this is block of text in a POD section!
 
@@ -929,8 +928,8 @@ sub parse_paragraph($self, $text, $line_num) {
     ##-----------------------------------------------------------------
 
     ## Ignore this block if it isnt in one of the selected sections
-    if (exists %myData{_SELECTED_SECTIONS}) {
-        $self->is_selected($text)  or  return  @(%myData{+_CUTTING} = 1);
+    if (exists %$self{_SELECTED_SECTIONS}) {
+        $self->is_selected($text)  or  return  @(%$self{+_CUTTING} = 1);
     }
 
     ## If we havent already, perform any desired preprocessing and
@@ -938,7 +937,7 @@ sub parse_paragraph($self, $text, $line_num) {
     unless ($wantNonPods) {
        $text = $self->preprocess_paragraph($text, $line_num);
        return 1  unless ((defined $text) and (length $text));
-       return 1  if (%myData{?_CUTTING});
+       return 1  if (%$self{?_CUTTING});
     }
 
     ## Look for one of the three types of paragraphs
@@ -954,7 +953,7 @@ sub parse_paragraph($self, $text, $line_num) {
         ## If this is a "cut" directive then we dont need to do anything
         ## except return to "cutting" mode.
         if ($cmd eq 'cut') {
-           %myData{+_CUTTING} = 1;
+           %$self{+_CUTTING} = 1;
            return  unless %myOpts{?'process_cut_cmd'};
         }
     }
@@ -964,10 +963,10 @@ sub parse_paragraph($self, $text, $line_num) {
           text      => $text,
           prefix    => $pfx,
           separator => $sep,
-          file      => %myData{?_INFILE},
+          file      => %$self{?_INFILE},
           line      => $line_num);
     # ## Invoke appropriate callbacks
-    # if (exists $myData{_CALLBACKS}) {
+    # if (exists $$self{_CALLBACKS}) {
     #    ## Look through the callback list, invoke callbacks,
     #    ## then see if we need to do the default actions
     #    ## (invoke_callbacks will return true if we do).
@@ -1028,9 +1027,8 @@ sub parse_from_filehandle {
     my %opts = %( (ref @_[0] eq 'HASH') ?? < %{ shift() } !! () );
     my @($in_fh, ?$out_fh) =  @_;
     $in_fh = $^STDIN  unless ($in_fh);
-    local *myData = $self;  ## alias to avoid deref-ing overhead
-    local *myOpts = (%myData{+_PARSEOPTS} ||= \%());  ## get parse-options
-    local $_;
+    my %myOpts = %$self{+_PARSEOPTS} || %();  ## get parse-options
+    local $_ = undef;
 
     ## Put this stream at the top of the stack and do beginning-of-input
     ## processing. NOTE that $in_fh might be reset during this process.
@@ -1067,7 +1065,7 @@ sub parse_from_filehandle {
                                      && (length $paragraph));
 
         ## Issue a warning about any non-empty blank lines
-        if (length($1) +> 0 and %myOpts{?'warnings'} and ! %myData{?_CUTTING}) {
+        if (length($1) +> 0 and %myOpts{?'warnings'} and ! %$self{?_CUTTING}) {
             my $errorsub = $self->errorsub();
             my $file = $self->input_file();
             my $errmsg = "*** WARNING: line containing nothing but whitespace".
@@ -1141,8 +1139,6 @@ sub parse_from_file {
     my @($infile, ?$outfile) =  @_;
     my ($in_fh,  $out_fh);
     my @($close_input, $close_output) = @(0, 0);
-    local *myData = $self;
-    local *_;
 
     ## Is $infile a filename or a (possibly implied) filehandle
     if (defined $infile && ref $infile) {
@@ -1151,7 +1147,7 @@ sub parse_from_file {
         }
         ## Must be a filehandle-ref (or else assume its a ref to an object
         ## that supports the common IO read operations).
-        %myData{+_INFILE} = ${$infile};
+        %$self{+_INFILE} = ${$infile};
         $in_fh = $infile;
     }
     elsif (!defined($infile) || !length($infile) || ($infile eq '-')
@@ -1159,12 +1155,12 @@ sub parse_from_file {
     {
         ## Not a filename, just a string implying STDIN
         $infile ||= '-';
-        %myData{+_INFILE} = "<standard input>";
+        %$self{+_INFILE} = "<standard input>";
         $in_fh = $^STDIN;
     }
     else {
         ## We have a filename, open it for reading
-        %myData{+_INFILE} = $infile;
+        %$self{+_INFILE} = $infile;
         open($in_fh, "<", "$infile")  or
              die "Can't open $infile for reading: $^OS_ERROR\n";
         $close_input = 1;
@@ -1186,38 +1182,38 @@ sub parse_from_file {
 #           # NOTE: IO::String isn't a part of the perl distribution,
 #           #       so probably we shouldn't support this case...
 #           require IO::String;
-#           $myData{_OUTFILE} = "$outfile";
+#           $$self{_OUTFILE} = "$outfile";
 #           $out_fh = IO::String->new($outfile);
             die "Output to SCALAR reference not supported!\n";
         }
         else {
             ## Must be a filehandle-ref (or else assume its a ref to an
             ## object that supports the common IO write operations).
-            %myData{+_OUTFILE} = $outfile;
+            %$self{+_OUTFILE} = $outfile;
             $out_fh = $outfile;
         }
     }
     elsif (!defined($outfile) || !length($outfile) || ($outfile eq '-')
         || ($outfile =~ m/^>&?(?:STDOUT|1)$/i))
     {
-        if (defined %myData{?_TOP_STREAM}) {
-            $out_fh = %myData{?_OUTPUT};
+        if (defined %$self{?_TOP_STREAM}) {
+            $out_fh = %$self{?_OUTPUT};
         }
         else {
             ## Not a filename, just a string implying STDOUT
             $outfile ||= '-';
-            %myData{+_OUTFILE} = "<standard output>";
+            %$self{+_OUTFILE} = "<standard output>";
             $out_fh  = $^STDOUT;
         }
     }
     elsif ($outfile =~ m/^>&(STDERR|2)$/i) {
         ## Not a filename, just a string implying STDERR
-        %myData{+_OUTFILE} = "<standard error>";
+        %$self{+_OUTFILE} = "<standard error>";
         $out_fh  = $^STDERR;
     }
     else {
         ## We have a filename, open it for writing
-        %myData{+_OUTFILE} = $outfile;
+        %$self{+_OUTFILE} = $outfile;
         (-d $outfile) and die "$outfile is a directory, not POD input!\n";
         open($out_fh, ">", "$outfile")  or
              die "Can't open $outfile for writing: $^OS_ERROR\n";
@@ -1335,14 +1331,14 @@ parse-option currently recognized.
 =cut
 
 sub parseopts {
-   local *myData = shift;
-   local *myOpts = (%myData{+_PARSEOPTS} ||= \%());
-   return %myOpts  if ((nelems @_) == 0);
-   if ((nelems @_) == 1) {
-      local $_ = shift;
-      return  ref($_)  ??  (%myData{+_PARSEOPTS} = $_)  !!  %myOpts{?$_};
-   }
-   %myData{+_PARSEOPTS} = \( %myOpts +%+ %:< @_ );
+    my $self = shift;
+    my %myOpts = %$self{+_PARSEOPTS} || %();
+    return %myOpts  if ((nelems @_) == 0);
+    if ((nelems @_) == 1) {
+        my $_ = shift;
+        return  ref($_)  ??  (%$self{+_PARSEOPTS} = $_)  !!  %myOpts{?$_};
+    }
+    %$self{+_PARSEOPTS} = %myOpts +%+ %:< @_;
 }
 
 ##---------------------------------------------------------------------------
@@ -1503,7 +1499,6 @@ and C<OUTPUT> instance data members to determine their new values.
 =cut
 
 sub _push_input_stream($self, $in_fh, $out_fh) {
-    local *myData = $self;
 
     ## Initialize stuff for the entire document if this is *not*
     ## an included file.
@@ -1512,29 +1507,29 @@ sub _push_input_stream($self, $in_fh, $out_fh) {
     ## filehandle. We only want to use a default value if this is the
     ## beginning of the entire document (but *not* if this is an included
     ## file).
-    unless (defined  %myData{?_TOP_STREAM}) {
+    unless (defined  %$self{?_TOP_STREAM}) {
         $out_fh  = $^STDOUT  unless (defined $out_fh);
-        %myData{+_CUTTING}       = 1;   ## current "cutting" state
-        %myData{+_INPUT_STREAMS} = \@();  ## stack of all input streams
+        %$self{+_CUTTING}       = 1;   ## current "cutting" state
+        %$self{+_INPUT_STREAMS} = \@();  ## stack of all input streams
     }
 
     ## Initialize input indicators
-    %myData{+_OUTFILE} = '(unknown)'  unless (defined  %myData{?_OUTFILE});
-    %myData{+_OUTPUT}  = $out_fh      if (defined  $out_fh);
+    %$self{+_OUTFILE} = '(unknown)'  unless (defined  %$self{?_OUTFILE});
+    %$self{+_OUTPUT}  = $out_fh      if (defined  $out_fh);
     $in_fh            = $^STDIN      unless (defined  $in_fh);
-    %myData{+_INFILE}  = '(unknown)'  unless (defined  %myData{?_INFILE});
-    %myData{+_INPUT}   = $in_fh;
-    my $input_top     = %myData{+_TOP_STREAM}
+    %$self{+_INFILE}  = '(unknown)'  unless (defined  %$self{?_INFILE});
+    %$self{+_INPUT}   = $in_fh;
+    my $input_top     = %$self{+_TOP_STREAM}
                       = Pod::InputSource->new(
-                            name        => %myData{?_INFILE},
+                            name        => %$self{?_INFILE},
                             handle      => $in_fh,
-                            was_cutting => %myData{_CUTTING}
+                            was_cutting => %$self{_CUTTING}
 );
-    local *input_stack = %myData{?_INPUT_STREAMS};
-    push(@input_stack, $input_top);
+    my $input_stack = %$self{?_INPUT_STREAMS};
+    push(@$input_stack, $input_top);
 
     ## Perform beginning-of-document and/or beginning-of-input processing
-    $self->begin_pod()  if ((nelems @input_stack) == 1);
+    $self->begin_pod()  if (nelems @$input_stack) == 1;
     $self->begin_input();
 
     return  $input_top;
@@ -1560,27 +1555,26 @@ the new top of the input stream stack.
 =cut
 
 sub _pop_input_stream($self) {
-    local *myData = $self;
-    local *input_stack = %myData{?_INPUT_STREAMS};
+    my $input_stack = %$self{?_INPUT_STREAMS};
 
     ## Perform end-of-input and/or end-of-document processing
-    $self->end_input()  if ((nelems @input_stack) +> 0);
-    $self->end_pod()    if ((nelems @input_stack) == 1);
+    $self->end_input()  if ((nelems @$input_stack) +> 0);
+    $self->end_pod()    if ((nelems @$input_stack) == 1);
 
     ## Restore cutting state to whatever it was before we started
     ## parsing this file.
-    my $old_top = pop(@input_stack);
-    %myData{+_CUTTING} = $old_top->was_cutting();
+    my $old_top = pop(@$input_stack);
+    %$self{+_CUTTING} = $old_top->was_cutting();
 
     ## Dont forget to reset the input indicators
     my $input_top = undef;
-    if ((nelems @input_stack) +> 0) {
-       $input_top = %myData{+_TOP_STREAM} = @input_stack[-1];
-       %myData{+_INFILE}  = $input_top->name();
-       %myData{+_INPUT}   = $input_top->handle();
+    if ((nelems @$input_stack) +> 0) {
+       $input_top = %$self{+_TOP_STREAM} = @$input_stack[-1];
+       %$self{+_INFILE}  = $input_top->name();
+       %$self{+_INPUT}   = $input_top->handle();
     } else {
-       delete %myData{_TOP_STREAM};
-       delete %myData{_INPUT_STREAMS};
+       delete %$self{_TOP_STREAM};
+       delete %$self{_INPUT_STREAMS};
     }
 
     return  $input_top;

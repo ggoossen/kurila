@@ -40,7 +40,7 @@ while ( ~< *DATA) {
     while ( ~< $out) { last if m/^\.nh/ }
     my $output;
     do {
-        local $^INPUT_RECORD_SEPARATOR;
+        local $^INPUT_RECORD_SEPARATOR = undef;
         $output = ~< $out;
     };
     close $out;
@@ -63,7 +63,7 @@ while ( ~< *DATA) {
     close $out;
     open ($out, "<", 'out.tmp') or die "Cannot open out.tmp: $^OS_ERROR\n";
     do {
-        local $^INPUT_RECORD_SEPARATOR;
+        local $^INPUT_RECORD_SEPARATOR = undef;
         $output = ~< $out;
     };
     close $out;

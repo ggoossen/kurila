@@ -822,18 +822,15 @@ the current one.
 
 =cut
 
-our (@ptree);  ## an alias used for performance reasons
-
 sub prepend {
    my $self = shift;
-   local *ptree = $self;
    for ( @_) {
       next  unless length;
-      if ((nelems @ptree)  and  !(ref @ptree[0])  and  !(ref $_)) {
-         @ptree[0] = $_ . @ptree[0];
+      if ((nelems @$self)  and  !(ref @$self[0])  and  !(ref $_)) {
+         @$self[0] = $_ . @$self[0];
       }
       else {
-         unshift @ptree, $_;
+         unshift @$self, $_;
       }
    }
 }
@@ -852,20 +849,19 @@ the current one.
 
 sub append {
    my $self = shift;
-   local *ptree = $self;
-   my $can_append = (nelems @ptree) && !(ref @ptree[-1]);
+   my $can_append = (nelems @$self) && !(ref @$self[-1]);
    for ( @_) {
       if (ref) {
-         push @ptree, $_;
+         push @$self, $_;
       }
       elsif(!length) {
          next;
       }
       elsif ($can_append) {
-         @ptree[-1] .= $_;
+         @$self[-1] .= $_;
       }
       else {
-         push @ptree, $_;
+         push @$self, $_;
       }
    }
 }
@@ -894,8 +890,7 @@ sub raw_text {
 
 sub _unset_child2parent_links {
    my $self = shift;
-   local *ptree = $self;
-   for ( @ptree) {
+   for ( @$self) {
        next  unless (defined and  ref  and  ref ne 'SCALAR');
        $_->_unset_child2parent_links()
            if UNIVERSAL::isa($_, 'Pod::InteriorSequence');
