@@ -41,7 +41,7 @@ do {
     is(dirname('arma:virumque.cano'), 'arma:');
 
     do {
-        env::temp_set_var('DEFAULT' => '') unless defined env::var('DEFAULT');
+        local env::var('DEFAULT' ) = '' unless defined env::var('DEFAULT');
         is(dirname('virumque.cano'), env::var('DEFAULT'));
         is(dirname('arma/'), '.');
     };

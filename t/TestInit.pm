@@ -22,7 +22,7 @@ BEGIN {
     $^INCLUDE_PATH = @('../lib');
 }
 
-env::set_var('PERL_CORE' => 1);
+env::var('PERL_CORE' ) = 1;
 
 $^PROGRAM_NAME =~ s/\.dp$//; # for the test.deparse make target
 

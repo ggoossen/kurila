@@ -25,7 +25,7 @@ my $ld_exeext = ($^OS_NAME eq 'cygwin' ||
                 (($^OS_NAME eq 'vos') ?? config_value("exe_ext") !! '');
 
 unless(env::var('PERL_CORE')) {
-    env::set_var('PERL_CORE' => 1) if grep { $_ eq 'PERL_CORE=1' }, @ARGV;
+    env::var('PERL_CORE' ) = 1 if grep { $_ eq 'PERL_CORE=1' }, @ARGV;
 }
 
 use File::Spec;

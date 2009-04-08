@@ -111,12 +111,12 @@ sub perl_lib {
     $lib = 'File::Spec'->rel2abs($lib);
     my @libs = @($lib);
     push @libs, env::var('PERL5LIB') if defined env::var('PERL5LIB');
-    env::set_var('PERL5LIB' => join(config_value("path_sep"), @libs));
+    env::var('PERL5LIB' ) = join(config_value("path_sep"), @libs);
     unshift $^INCLUDE_PATH, $lib;
 }
 
 END {
-    env::set_var('PERL5LIB' => $old5lib);
+    env::var('PERL5LIB' ) = $old5lib;
 }
 
 

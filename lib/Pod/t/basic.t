@@ -39,9 +39,9 @@ sub source_path {
 print $^STDOUT, "ok 1\n";
 
 # Hard-code a few values to try to get reproducible results.
-env::set_var('COLUMNS' => 80);
-env::set_var('TERM' => 'xterm');
-env::set_var('TERMCAP' => 'xterm:co=80:do=^J:md=\E[1m:us=\E[4m:me=\E[m');
+env::var('COLUMNS' ) = 80;
+env::var('TERM' ) = 'xterm';
+env::var('TERMCAP' ) = 'xterm:co=80:do=^J:md=\E[1m:us=\E[4m:me=\E[m';
 
 # Map of translators to file extensions to find the formatted output to
 # compare against.

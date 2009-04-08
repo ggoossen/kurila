@@ -98,7 +98,7 @@ sub varsub(?= $x) {
     if ($^is_assignment) {
         $var = $x;
     }
-    return $: $var;
+    return $var;
 }
 
 is( join("*", (varsub = qw(aap noot mies))), "aap*noot*mies" );

@@ -19,7 +19,7 @@ package main;
 use Test::More tests => 14;
 
 BEGIN {
-    env::set_var('PERL_RL' => 'Mock'); # test against our instrumented class
+    env::var('PERL_RL' ) = 'Mock'; # test against our instrumented class
 }
 use Term::ReadLine;
 

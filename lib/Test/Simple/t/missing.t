@@ -28,7 +28,7 @@ require Test::Simple;
 
 require Test::Simple::Catch;
 my@($out, $err) =  Test::Simple::Catch::caught();
-env::temp_set_var('HARNESS_ACTIVE' => 0);
+local env::var('HARNESS_ACTIVE' ) = 0;
 
 Test::Simple->import(tests => 5);
 

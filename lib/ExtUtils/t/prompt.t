@@ -30,7 +30,7 @@ open my $stdout_fh, '>>', $stdout or die;
 $^STDOUT = *$stdout_fh{IO};
 
 
-env::set_var('PERL_MM_USE_DEFAULT' => 1);
+env::var('PERL_MM_USE_DEFAULT' ) = 1;
 is( prompt("Foo?"), '',     'no default' );
 like( $$stdout,  qr/^Foo\?\s*\n$/,      '  question' );
 $$stdout = '';
@@ -45,7 +45,7 @@ $$stdout = '';
 
 
 do {
-    env::set_var('PERL_MM_USE_DEFAULT' => 0);
+    env::var('PERL_MM_USE_DEFAULT' ) = 0;
     close $^STDIN;
     my $stdin = '';
     open my $stdin_fh, '<', \$stdin or die;

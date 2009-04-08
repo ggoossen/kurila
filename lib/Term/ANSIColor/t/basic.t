@@ -8,7 +8,7 @@
 ##############################################################################
 
 BEGIN { $^OUTPUT_AUTOFLUSH = 1; print $^STDOUT, "1..16\n" }
-env::set_var('ANSI_COLORS_DISABLED', undef);
+env::var('ANSI_COLORS_DISABLED') = undef;
 use Term::ANSIColor < qw(:constants color colored uncolor);
 print $^STDOUT, "ok 1\n";
 
@@ -84,7 +84,7 @@ if (join ('|', @names) eq 'bold|on_green|clear') {
 }
 
 # Test ANSI_COLORS_DISABLED.
-env::set_var('ANSI_COLORS_DISABLED' => 1);
+env::var('ANSI_COLORS_DISABLED' ) = 1;
 if (color ('blue') eq '') {
     print $^STDOUT, "ok 10\n";
 } else {
@@ -100,7 +100,7 @@ if (GREEN 'testing' eq 'testing') {
 } else {
     print $^STDOUT, "not ok 12\n";
 }
-env::set_var('ANSI_COLORS_DISABLED', undef);
+env::var('ANSI_COLORS_DISABLED') = undef;
 
 # Make sure DARK is exported.  This was omitted in versions prior to 1.07.
 if (DARK "testing" eq "\e[2mtesting\e[0m") {

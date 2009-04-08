@@ -159,14 +159,14 @@ sub clean_env {
 
         unless ($IsMacOS) { # ENV on MacOS is "special" :-)
             # On VMS, %ENV is many layered.
-            env::set_var($env, undef) while defined env::var($env);
+            env::var($env) = undef while defined env::var($env);
         }
     }
 
     # The following means we won't really be testing for non-existence,
     # but in Perl we can only delete from the process table, not the job 
     # table.
-    env::set_var('SYS$LOGIN' => '') if $IsVMS;
+    env::var('SYS$LOGIN' ) = '' if $IsVMS;
 }
 
 END {
@@ -174,12 +174,12 @@ END {
  
     # Restore the environment for VMS (and doesn't hurt for anyone else)
     for my $key (@magic_envs) {
-        env::set_var($key, %Saved_Env{$key});
+        env::var($key) = %Saved_Env{$key};
     }
 
     # On VMS this must be deleted or process table is wrong on exit
     # when this script is run interactively.
-    env::set_var('SYS$LOGIN', undef) if $IsVMS;
+    env::var('SYS$LOGIN') = undef if $IsVMS;
 }
 
 
@@ -188,7 +188,7 @@ foreach my $key ( @magic_envs) {
     no warnings 'uninitialized';
 
     clean_env;
-    env::set_var($key => catdir $Cwd, ($IsVMS ?? 'OP' !! 'op'));
+    env::var($key ) = catdir $Cwd, ($IsVMS ?? 'OP' !! 'op');
 
     check_env($key);
 }

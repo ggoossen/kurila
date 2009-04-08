@@ -1,6 +1,6 @@
 #!../miniperl
 
-env::set_var('LC_ALL' => 'C');
+env::var('LC_ALL' ) = 'C';
 
 open (my $out, ">", "perlmodlib.pod") or die $^OS_ERROR;
 my (@pragma, @mod, @MANIFEST);

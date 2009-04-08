@@ -29,7 +29,7 @@ my $Is_VMS = $^OS_NAME eq 'VMS';
 my $perl = which_perl();
 
 # GNV logical interferes with testing
-env::set_var('bin' => '[.bin]') if $Is_VMS;
+env::var('bin' ) = '[.bin]' if $Is_VMS;
 
 chdir 't';
 

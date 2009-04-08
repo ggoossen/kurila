@@ -68,9 +68,9 @@ SKIP: do {
 
     my %local_env_keys = %:< @+: map { @: $_, env::var($_) }, qw[PATH IFS CDPATH ENV BASH_ENV];
     push dynascope->{onleave}, sub {
-        env::set_var($_, %local_env_keys{$_}) for keys %local_env_keys;
+        env::var($_) = %local_env_keys{$_} for keys %local_env_keys;
     };
-    env::set_var($_, undef) for keys %local_env_keys;
+    env::var($_) = undef for keys %local_env_keys;
     my @($pwd_cmd_untainted) = @: $pwd_cmd =~ m/^(.+)$/; # Untaint.
     chomp(my $start = `$pwd_cmd_untainted`);
 
@@ -95,7 +95,7 @@ SKIP: do {
 	# Admittedly fixing this in the Cwd module would be better
 	# long-term solution but deleting $ENV{PWD} should not be
 	# done light-heartedly. --jhi
-	env::set_var('PWD') if $^OS_NAME eq 'darwin';
+	env::var('PWD' if $^OS_NAME eq 'darwin';
 
 	my $cwd        = cwd;
 	my $getcwd     = getcwd;

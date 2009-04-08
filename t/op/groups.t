@@ -1,9 +1,9 @@
 #!./perl
 
-env::set_var('PATH' => "/bin:/usr/bin:/usr/xpg4/bin:/usr/ucb" .
-    defined env::var('PATH') ?? ":$(env::var('PATH'))" !! "" );
-env::set_var('LC_ALL' => "C"); # so that external utilities speak English
-env::set_var('LANGUAGE' => 'C'); # GNU locale extension
+env::var('PATH' ) = "/bin:/usr/bin:/usr/xpg4/bin:/usr/ucb" .
+    defined env::var('PATH') ?? ":$(env::var('PATH'))" !! "" ;
+env::var('LC_ALL' ) = "C"; # so that external utilities speak English
+env::var('LANGUAGE' ) = 'C'; # GNU locale extension
 
 BEGIN {
     require Config;

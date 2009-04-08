@@ -14,7 +14,7 @@ BEGIN {
 require Test::Simple::Catch;
 use env;
 my@($out, $err) =  Test::Simple::Catch::caught();
-env::temp_set_var('HARNESS_ACTIVE' => 0);
+local env::var('HARNESS_ACTIVE' ) = 0;
 
 require Test::Builder;
 my $TB = Test::Builder->create;
