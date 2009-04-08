@@ -286,16 +286,16 @@ if ($^OS_NAME eq 'MSWin32' || $^OS_NAME eq 'NetWare') {
 else {
     $getenv = qq[$^EXECUTABLE_NAME -e 'print \$^STDOUT, \$(env::var(q[TST]))'];
 }
-env::set_var(TST => 'foo');
+env::var("TST") = 'foo';
 if (fork) {
     sleep 1;
     print $^STDOUT, "parent before: " . `$getenv`;
-    env::set_var(TST => 'bar');
+    env::var("TST") = 'bar';
     print $^STDOUT, "parent after: " . `$getenv`;
 }
 else {
     print $^STDOUT, "child before: " . `$getenv`;
-    env::set_var(TST => 'baz');
+    env::var("TST") = 'baz';
     print $^STDOUT, "child after: " . `$getenv`;
 }
 EXPECT

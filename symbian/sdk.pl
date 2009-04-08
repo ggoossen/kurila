@@ -12,19 +12,19 @@ if (env::var('PATH') =~ m!\\Symbian\\(.+?)\\(.+?)\\Epoc32\\gcc\\bin!i) {
     $SDK_NAME = $2;
     $WIN = ($SDK_NAME =~ m!_CW!i || $SDK_NAME eq '8.1a') ??
 	'winscw' !! 'wins';
-    env::set_var('WIN' => $WIN);
+    env::var('WIN') = $WIN;
     if ($SDK_NAME =~ m!Series60_v20!) {
 	$SDK_VARIANT = 'S60';
 	$SDK_VERSION = '2.0';
-        env::set_var('S60SDK' => '2.0');
+        env::var('S60SDK') = '2.0';
     } elsif ($SDK_NAME =~ m!Series60_v21!) {
 	$SDK_VARIANT = 'S60';
 	$SDK_VERSION = '2.1';
-        env::set_var('S60SDK' => '2.1');
+        env::var('S60SDK') = '2.1';
     } elsif ($SDK_NAME =~ m!S60_2nd_FP2!) {
 	$SDK_VARIANT = 'S60';
 	$SDK_VERSION = '2.6';
-        env::set_var('S60SDK' => '2.6');
+        env::var('S60SDK') = '2.6';
     } elsif ($SDK_NAME =~ m!S60_2nd_FP3!) {
 	$SDK_VARIANT = 'S60';
 	$SDK_VERSION = '2.8';

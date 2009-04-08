@@ -16,7 +16,7 @@ sub getcwd {
     $_ = `cd`;
     chomp;
     s:\\:/:g ;
-    env::set_var('PWD' => $_);
+    env::var('PWD') = $_;
     return $_;
 }
 
