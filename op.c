@@ -3753,6 +3753,10 @@ Perl_newSUB(pTHX_ I32 floor, OP *proto, OP *block)
 	    CvN_MAXARGS(cv) = max_modcount == -1 ? -1 : max_modcount - arg_mod;
 #ifdef PERL_MAD
 	    block = newUNOP(OP_NULL, 0, block, block->op_location);
+	    if (cv_optassignarg_flag(cv))
+		append_madprops_pv("optassignarg", list, 'J');
+	    else if (cv_assignarg_flag(cv))
+		append_madprops_pv("assignarg", list, 'J');
 #endif
 	    proto_block = append_list(OP_LINESEQ, list, (LISTOP*)block);
 	}

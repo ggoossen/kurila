@@ -317,6 +317,7 @@ package P5AST::op_hashjoin; 	@ISA = 'P5AST::listop';
 package P5AST::op_arrayjoin; 	@ISA = 'P5AST::listop';
 package P5AST::op_say; 	        @ISA = 'P5AST::listop';
 package P5AST::op_listfirst; 	@ISA = 'P5AST::listop';
+package P5AST::op_listlast; 	@ISA = 'P5AST::listop';
 package P5AST::op_list; 	@ISA = 'P5AST::listop';
 package P5AST::op_lslice; 	@ISA = 'P5AST::binop';
 package P5AST::op_anonlist; 	@ISA = 'P5AST::listop';

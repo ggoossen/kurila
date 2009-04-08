@@ -573,6 +573,7 @@ protoassign :   /* NULL */
 			{ 
                             CvFLAGS(PL_compcv) |= CVf_ASSIGNARG;
                             $$ = $2;
+                            TOKEN_GETMAD($1,$$,'o');
                         }
 	;
 
@@ -581,6 +582,8 @@ optassign : '?' ASSIGNOP
                             CvFLAGS(PL_compcv) |= CVf_OPTASSIGNARG;
                             $$ = newOP(OP_PADSV, 0, LOCATION($1));
                             $$->op_targ = allocmy("$^is_assignment");
+                            TOKEN_GETMAD($1,$$,'H');
+                            TOKEN_GETMAD($2,$$,'o');
                         }
         ;
 

@@ -1093,7 +1093,7 @@ BEGIN {
 	'sub' => sub {			# subroutine
 	    my $self = shift;
 	    my @newkids;
-            push @newkids, $self->madness('d n s prototype a : { & } fake_semicolon ;');
+            push @newkids, $self->madness('d n s prototyped a : { & } fake_semicolon ;');
 	    $::curstate = 0;
 	    return P5AST::sub->new(Kids => [@newkids])
 	},
@@ -1491,7 +1491,7 @@ package PLXML::op_padsv;
 sub ast {
     my $self = shift;
     my @args;
-    push @args, $self->madness('dx d ( optional_assign X $ @ % )');
+    push @args, $self->madness('dx d ( optional_assign o X $ @ % )');
 
     return $self->newtype->new(Kids => [@args]);
 }
@@ -2406,6 +2406,21 @@ sub ast {
     return $self->newtype->new(Kids => [@kids]);
 }
 
+package PLXML::op_listlast;
+
+sub ast {
+    my $self = shift;
+    my $mainop = $self->{Kids}->[1];
+    for (keys %{$self->{mp}}) {
+        if (exists($mainop->{mp}{$_})) {
+            die "exists $_";
+        }
+        $mainop->{mp}{$_} = $self->{mp}{$_};
+    }
+    my @kids = ( $mainop->ast(@_) );
+    return $self->newtype->new(Kids => [@kids]);
+}
+
 package PLXML::op_list;
 
 sub astnull {
@@ -2445,7 +2460,16 @@ sub ast {
     push @retval, $self->madness('dx d (');
 
     my @newkids;
-    for my $kid (@{$$self{Kids}}) {
+    my @kids = @{$self->{Kids}};
+    if ($self->{mp}{prototype_type}) {
+        my $last_kid = pop @kids;
+        if ($self->{mp}{prototype_type} eq 'optassignarg') {
+            my $assign_kid = pop @kids;
+            unshift @kids, $assign_kid;
+        }
+        unshift @kids, $last_kid;
+    }
+    for my $kid (@kids) {
 	push @newkids, $kid->ast($self, @_);
     }
     my $x = "";
@@ -3006,7 +3030,7 @@ sub ast {
 	    if (exists $$range{mp}{O}) {	# deeply buried .. operator
 		PLXML::prepreproc($$range{mp}{O});
 		push @retval,
-		  $$range{mp}{'O'}{Kids}[0]{Kids}[0]{Kids}[0]{Kids}[0]->madness('o')
+		  $$range{mp}{'O'}{Kids}[0]->madness('o')
 	    }
 	    else {
 		push @retval, '..';		# XXX missing whitespace

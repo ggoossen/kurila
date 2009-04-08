@@ -2361,6 +2361,7 @@ static struct { const char slot; const char* name; } const slotnames[] =
     { 'G', "endsection" },
     { 'H', "optional_assign" },
     { 'I', "if" },
+    { 'J', "prototype_type" },
     { 'K', "key" },
     { 'L', "label" },
     { 'O', "replacedoperator" },

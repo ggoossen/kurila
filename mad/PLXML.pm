@@ -1850,6 +1850,10 @@ package PLXML::op_listfirst;
 
 our @ISA = ('PLXML::listop');
 
+package PLXML::op_listlast;
+
+our @ISA = ('PLXML::listop');
+
 package PLXML::op_list;
 
 our @ISA = ('PLXML::listop');

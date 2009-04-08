@@ -348,3 +348,6 @@ sub (_) { 1 };
 $^EVAL_ERROR =~ s/(?<=value attempted) at .*//s;
 ########
 sub (?$foo) { $foo };
+########
+sub foo($x ?= $y) { }
+foo(33) == 44;
