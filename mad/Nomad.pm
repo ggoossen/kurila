@@ -1614,7 +1614,7 @@ sub ast {
     my $self = shift;
 
     my @newkids;
-    push @newkids, $self->madness('&');
+    push @newkids, $self->madness('dx d &');
     if (@{$$self{Kids}}) {
 	push @newkids, $$self{Kids}[0]->ast();
     }
@@ -2462,12 +2462,12 @@ sub ast {
     my @newkids;
     my @kids = @{$self->{Kids}};
     if ($self->{mp}{prototype_type}) {
-        my $last_kid = pop @kids;
+        my $first_kid = shift @kids;
         if ($self->{mp}{prototype_type} eq 'optassignarg') {
-            my $assign_kid = pop @kids;
-            unshift @kids, $assign_kid;
+            my $assign_kid = shift @kids;
+            push @kids, $assign_kid;
         }
-        unshift @kids, $last_kid;
+        push @kids, $first_kid;
     }
     for my $kid (@kids) {
 	push @newkids, $kid->ast($self, @_);
@@ -2651,6 +2651,14 @@ package PLXML::op_cond_expr;
 package PLXML::op_andassign;
 package PLXML::op_orassign;
 package PLXML::op_method;
+package PLXML::op_entersub_save;
+
+sub ast {
+    my $self = shift;
+    my @kids = map { $_->ast() } @{$self->{Kids}};
+    return $self->newtype->new(Kids => [$self->madness('dx d'), @kids]);
+}
+
 package PLXML::op_entersub;
 
 sub ast {
@@ -2801,8 +2809,9 @@ sub lineseq {
 	my $thing = $kid->ast($self, @_);
 	next unless defined $thing;
         if ( $::version_from->{branch} eq 'kurila' and $::version_from->{'v'} > v1.14 ) {
-            if ($kid->{mp}{U} or $kid->{mp}{n} or $kid->{mp}{'&'} or
-                  ( ($kid->{mp}{null_type} || '') =~ m/^(peg|package|.*statement)$/ )
+            if ($kid->{mp}{U} or $kid->{mp}{n} 
+                  or ($kid->{mp}{'&'} and not $kid->{mp}{'local'})
+                  or ( ($kid->{mp}{null_type} || '') =~ m/^(peg|package|.*statement)$/ )
               ) {
                 push @newstuff, $thing;
             }

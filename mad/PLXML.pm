@@ -2156,6 +2156,14 @@ sub flags { 'd1' }
 sub args { '' }
 
 
+package PLXML::op_entersub_targargs;
+
+our @ISA = ('PLXML::unop');
+
+package PLXML::op_entersub_save;
+
+our @ISA = ('PLXML::unop');
+
 package PLXML::op_entersub;
 
 our @ISA = ('PLXML::unop');

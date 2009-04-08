@@ -115,7 +115,6 @@ use File::Find;
 
 our %failing = map { $_, 1 } qw|
 ../t/arch/64bitint.t
-../t/run/switchp.t
 |;
 
 my @files;
@@ -349,5 +348,13 @@ $^EVAL_ERROR =~ s/(?<=value attempted) at .*//s;
 ########
 sub (?$foo) { $foo };
 ########
-sub foo($x ?= $y) { }
-foo(33) == 44;
+sub foo($x, $y ?= $z) { }
+foo(33, 55) == 44;
+########
+sub foo(?= $y) { }
+local foo == 44;
+########
+sub foo($x, $y = $z) { }
+foo(33, 55) == 44;
+########
+local &{"foo"};
