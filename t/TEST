@@ -9,7 +9,7 @@ $^OUTPUT_AUTOFLUSH = 1;
 
 # Let tests know they're running in the perl core.  Useful for modules
 # which live dual lives on CPAN.
-env::set_var('PERL_CORE' => 1);
+env::var('PERL_CORE') = 1;
 
 # remove empty elements due to insertion of empty symbols via "''p1'" syntax
 @ARGV = grep( {$_ }, @ARGV) if $^OS_NAME eq 'VMS';
@@ -58,9 +58,9 @@ if (env::var("PERL_3LOG")) { # Tru64 third(1) tool, see perlhack
 }
 
 # check leakage for embedders
-env::set_var("PERL_DESTRUCT_LEVEL" => 2) unless defined env::var("PERL_DESTRUCT_LEVEL");
+env::var("PERL_DESTRUCT_LEVEL") = 2 unless defined env::var("PERL_DESTRUCT_LEVEL");
 
-env::set_var("EMXSHELL" => 'sh');        # For OS/2
+env::var("EMXSHELL") = 'sh';        # For OS/2
 
 # Roll your own File::Find!
 use TestInit;

@@ -20,8 +20,7 @@ Perl_boot_core_env(pTHX)
     static const char file[] = __FILE__;
 
     /* Make it findable via fetchmethod */
-    newXS("env::var", XS_env_var, file);
-    newXS("env::set_var", XS_env_set_var, file);
+    newXSproto("env::var", XS_env_var, file, "$?=$");
     newXS("env::keys", XS_env_keys, file);
 }
 
@@ -29,12 +28,38 @@ XS(XS_env_var)
 {
     dVAR;
     dXSARGS;
+    SV* key;
     PERL_UNUSED_ARG(cv);
-    if (items != 1)
-	Perl_croak(aTHX_ "Usage: env::var(name)");
+    assert(items == 1);
+
+    key = POPs;
+
+    if (PL_op->op_flags & OPf_ASSIGN) {
+        SV* valuesv = sv_mortalcopy(POPs);
+
+        const char* ptr;
+        STRLEN klen;
+        const char* s = NULL;
+        STRLEN len;
+
+        ptr = SvPV_const(key, klen);
+        
+        if ( SvOK(valuesv) ) {
+            s = SvPV_const(valuesv, len);
+        }
+
+        my_setenv(ptr, s);
+
+        if (SvOK(valuesv)) {
+            hv_store_ent(PL_envhv, key, SvREFCNT_inc(valuesv), 0);
+        }
+        else {
+            (void)hv_delete_ent(PL_envhv, key, G_DISCARD, 0);
+        }
+    }
+
     {
         SV* sv;
-        SV* key = POPs;
 
         HE* he = hv_fetch_ent(PL_envhv, key, FALSE, 0);
         if (he) { 
@@ -46,39 +71,6 @@ XS(XS_env_var)
         mXPUSHs(sv);
     }
     XSRETURN(1);
-}
-
-XS(XS_env_set_var)
-{
-    dVAR;
-    dXSARGS;
-    PERL_UNUSED_ARG(cv);
-    if (items != 2)
-	Perl_croak(aTHX_ "Usage: env::set_var(key, value)");
-    {
-        SV* value = sv_mortalcopy(POPs);
-        SV* key = POPs;
-        const char* ptr;
-        STRLEN klen;
-        const char* s = NULL;
-        STRLEN len;
-
-        ptr = SvPV_const(key, klen);
-        
-        if ( SvOK(value) ) {
-            s = SvPV_const(value, len);
-        }
-
-        my_setenv(ptr, s);
-
-        if (SvOK(value)) {
-            hv_store_ent(PL_envhv, key, SvREFCNT_inc(value), 0);
-        }
-        else {
-            (void)hv_delete_ent(PL_envhv, key, G_DISCARD, 0);
-        }
-    }
-    XSRETURN(0);
 }
 
 XS(XS_env_keys)

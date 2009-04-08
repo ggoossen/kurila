@@ -693,7 +693,7 @@ sub _win32_cwd {
     }
     my $pwd = env::var('PWD');
     $pwd =~ s:\\:/:g ;
-    env::var(PWD ) = $pwd;
+    env::var("PWD") = $pwd;
     return env::var('PWD');
 }
 
