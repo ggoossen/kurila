@@ -4369,8 +4369,8 @@ Perl_ck_exists(pTHX_ OP *o)
 	else if (kid->op_type == OP_AELEM)
 	    o->op_flags |= OPf_SPECIAL;
 	else if (kid->op_type != OP_HELEM)
-	    Perl_croak(aTHX_ "%s argument is not a HASH or ARRAY element",
-		        OP_DESC(o));
+	    yyerror(Perl_form(aTHX_ "%s argument is not a HASH or ARRAY element",
+		    OP_DESC(o)));
 	op_null(kid);
     }
     return o;
@@ -5273,7 +5273,7 @@ Perl_ck_shift(pTHX_ OP *o)
 	const PADOFFSET offset = pad_findmy("@_");
 	OP * const argop = newOP(OP_PADSV, 0, o->op_location);
 	if (offset == NOT_IN_PAD)
-	    Perl_croak_at(o->op_location, "shift requires lexical @_");
+	    yyerror_at(o->op_location, "shift requires lexical @_");
 	argop->op_targ = offset;
 
 #ifdef PERL_MAD

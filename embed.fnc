@@ -963,6 +963,7 @@ p	|void	|watch		|NN char** addr
 Ap	|I32	|whichsig	|NN const char* sig
 p	|void	|write_to_stderr|NN const char* message|int msglen
 p	|int	|yyerror	|NN const char *const s
+p	|void	|yyerror_at	|NN SV* location|NN const char *const s
 EXp	|int	|yylex
 p	|int	|yyparse
 p	|void	|parser_free	|NN const yy_parser *parser

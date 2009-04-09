@@ -1014,6 +1014,7 @@
 #ifdef PERL_CORE
 #define write_to_stderr		Perl_write_to_stderr
 #define yyerror			Perl_yyerror
+#define yyerror_at		Perl_yyerror_at
 #endif
 #if defined(PERL_CORE) || defined(PERL_EXT)
 #define yylex			Perl_yylex
@@ -3191,6 +3192,7 @@
 #ifdef PERL_CORE
 #define write_to_stderr(a,b)	Perl_write_to_stderr(aTHX_ a,b)
 #define yyerror(a)		Perl_yyerror(aTHX_ a)
+#define yyerror_at(a,b)		Perl_yyerror_at(aTHX_ a,b)
 #endif
 #if defined(PERL_CORE) || defined(PERL_EXT)
 #define yylex()			Perl_yylex(aTHX)

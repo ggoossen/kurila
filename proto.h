@@ -3488,6 +3488,12 @@ PERL_CALLCONV int	Perl_yyerror(pTHX_ const char *const s)
 #define PERL_ARGS_ASSERT_YYERROR	\
 	assert(s)
 
+PERL_CALLCONV void	Perl_yyerror_at(pTHX_ SV* location, const char *const s)
+			__attribute__nonnull__(pTHX_1)
+			__attribute__nonnull__(pTHX_2);
+#define PERL_ARGS_ASSERT_YYERROR_AT	\
+	assert(location); assert(s)
+
 PERL_CALLCONV int	Perl_yylex(pTHX);
 PERL_CALLCONV int	Perl_yyparse(pTHX);
 PERL_CALLCONV void	Perl_parser_free(pTHX_ const yy_parser *parser)
