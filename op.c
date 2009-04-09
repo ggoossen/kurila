@@ -5272,9 +5272,11 @@ Perl_ck_shift(pTHX_ OP *o)
 
 	const PADOFFSET offset = pad_findmy("@_");
 	OP * const argop = newOP(OP_PADSV, 0, o->op_location);
-	if (offset == NOT_IN_PAD)
-	    yyerror_at(o->op_location, "shift requires lexical @_");
 	argop->op_targ = offset;
+	if (offset == NOT_IN_PAD) {
+	    yyerror_at(o->op_location, "shift requires lexical @_");
+	    argop->op_targ = 0;
+	}
 
 #ifdef PERL_MAD
 	o = newUNOP(type, 0, scalar(argop), argop->op_location);
