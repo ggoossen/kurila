@@ -95,7 +95,7 @@ SKIP: do {
 	# Admittedly fixing this in the Cwd module would be better
 	# long-term solution but deleting $ENV{PWD} should not be
 	# done light-heartedly. --jhi
-	env::var('PWD' if $^OS_NAME eq 'darwin';
+	env::var('PWD') = undef if $^OS_NAME eq 'darwin';
 
 	my $cwd        = cwd;
 	my $getcwd     = getcwd;
