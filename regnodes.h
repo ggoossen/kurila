@@ -545,7 +545,7 @@ EXTCONST char * const PL_reg_name[] = {
 EXTCONST char * PL_reg_extflags_name[];
 #else
 EXTCONST char * const PL_reg_extflags_name[] = {
-	/* Bits in extflags defined: 10111110001111111111011100111111 */
+	/* Bits in extflags defined: 00011110011111111111011100111111 */
 	"ANCH_BOL",         /* 0x00000001 */
 	"ANCH_MBOL",        /* 0x00000002 */
 	"ANCH_SBOL",        /* 0x00000004 */
@@ -567,17 +567,17 @@ EXTCONST char * const PL_reg_extflags_name[] = {
 	"LOOKBEHIND_SEEN",  /* 0x00040000 */
 	"EVAL_SEEN",        /* 0x00080000 */
 	"CANY_SEEN",        /* 0x00100000 */
-	"CHECK_ALL",        /* 0x00200000 */
-	"UNUSED_BIT_22",    /* 0x00400000 */
+	"NOSCAN",           /* 0x00200000 */
+	"CHECK_ALL",        /* 0x00400000 */
 	"UNUSED_BIT_23",    /* 0x00800000 */
 	"UNUSED_BIT_24",    /* 0x01000000 */
 	"USE_INTUIT_NOML",  /* 0x02000000 */
 	"USE_INTUIT_ML",    /* 0x04000000 */
 	"INTUIT_TAIL",      /* 0x08000000 */
 	"COPY_DONE",        /* 0x10000000 */
-	"UNUSED",     /* 0x20000000 */
+	"UNUSED_BIT_29",    /* 0x20000000 */
 	"UNUSED_BIT_30",    /* 0x40000000 */
-	"UNUSED",          /* 0x80000000 */
+	"UNUSED_BIT_31",    /* 0x80000000 */
 };
 #endif /* DOINIT */
 

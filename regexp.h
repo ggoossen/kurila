@@ -311,8 +311,8 @@ and check for NULL.
 #define RXf_CANY_SEEN   	0x00100000
 
 /* Special */
-#define RXf_NOSCAN      	0x00100000
-#define RXf_CHECK_ALL   	0x00200000
+#define RXf_NOSCAN      	0x00200000
+#define RXf_CHECK_ALL   	0x00400000
 
 /* Intuit related */
 #define RXf_USE_INTUIT_NOML	0x02000000
