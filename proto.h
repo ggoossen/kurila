@@ -177,11 +177,7 @@ PERL_INLINE_CALLCONV NV	Perl_SvNV(pTHX_ SV *sv)
 #define PERL_ARGS_ASSERT_SVNV	\
 	assert(sv)
 
-PERL_INLINE_CALLCONV SV*	Perl_LocationFilename(pTHX_ SV *location)
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_LOCATIONFILENAME	\
-	assert(location)
-
+PERL_INLINE_CALLCONV SV*	Perl_LocationFilename(pTHX_ SV *location);
 
 PERL_INLINE_CALLCONV PERL_CONTEXT*	Perl_PushBlock(pTHX_ U8 t, SV** sp, U8 gimme)
 			__attribute__nonnull__(pTHX_2);
@@ -4088,12 +4084,6 @@ PERL_CALLCONV OP*	Perl_ck_sassign(pTHX_ OP *o)
 #define PERL_ARGS_ASSERT_CK_SASSIGN	\
 	assert(o)
 
-PERL_CALLCONV OP*	Perl_ck_select(pTHX_ OP *o)
-			__attribute__warn_unused_result__
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_CK_SELECT	\
-	assert(o)
-
 PERL_CALLCONV OP*	Perl_ck_shift(pTHX_ OP *o)
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(pTHX_1);
@@ -4104,12 +4094,6 @@ PERL_CALLCONV OP*	Perl_ck_sort(pTHX_ OP *o)
 			__attribute__warn_unused_result__
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_CK_SORT	\
-	assert(o)
-
-PERL_CALLCONV OP*	Perl_ck_spair(pTHX_ OP *o)
-			__attribute__warn_unused_result__
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_CK_SPAIR	\
 	assert(o)
 
 PERL_CALLCONV OP*	Perl_ck_split(pTHX_ OP *o)

@@ -1423,6 +1423,7 @@ Perl_cx_dump(pTHX_ PERL_CONTEXT *cx)
 void
 Perl_cx_tmprefcnt(pTHX_ PERL_CONTEXT *cx)
 {
+    PERL_ARGS_ASSERT_CX_TMPREFCNT;
     switch (CxTYPE(cx)) {
     case CXt_NULL:
     case CXt_BLOCK:

@@ -1165,10 +1165,8 @@
 #define ck_rfun			Perl_ck_rfun
 #define ck_rvconst		Perl_ck_rvconst
 #define ck_sassign		Perl_ck_sassign
-#define ck_select		Perl_ck_select
 #define ck_shift		Perl_ck_shift
 #define ck_sort			Perl_ck_sort
-#define ck_spair		Perl_ck_spair
 #define ck_split		Perl_ck_split
 #define ck_subr			Perl_ck_subr
 #define ck_substr		Perl_ck_substr
@@ -3342,10 +3340,8 @@
 #define ck_rfun(a)		Perl_ck_rfun(aTHX_ a)
 #define ck_rvconst(a)		Perl_ck_rvconst(aTHX_ a)
 #define ck_sassign(a)		Perl_ck_sassign(aTHX_ a)
-#define ck_select(a)		Perl_ck_select(aTHX_ a)
 #define ck_shift(a)		Perl_ck_shift(aTHX_ a)
 #define ck_sort(a)		Perl_ck_sort(aTHX_ a)
-#define ck_spair(a)		Perl_ck_spair(aTHX_ a)
 #define ck_split(a)		Perl_ck_split(aTHX_ a)
 #define ck_subr(a)		Perl_ck_subr(aTHX_ a)
 #define ck_substr(a)		Perl_ck_substr(aTHX_ a)

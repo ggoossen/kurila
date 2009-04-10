@@ -110,7 +110,7 @@ AipS	|void	|sv_cp_replace	|NN XV **sv_d|NULLOK XV *sv_s
 Aip	|IV	|SvIV	|NN SV *sv
 Aip	|UV	|SvUV	|NN SV *sv
 Aip	|NV	|SvNV	|NN SV *sv
-Aip	|SV*	|LocationFilename	|NN SV *location
+Aip	|SV*	|LocationFilename	|NULLOK SV *location
 
 Aip     |PERL_CONTEXT* |PushBlock  |U8 t|NN SV** sp|U8 gimme
 Aip     |PERL_CONTEXT* |PopBlock
@@ -1137,10 +1137,8 @@ pR	|OP*	|ck_require	|NN OP *o
 pR	|OP*	|ck_rfun	|NN OP *o
 pR	|OP*	|ck_rvconst	|NN OP *o
 pR	|OP*	|ck_sassign	|NN OP *o
-pR	|OP*	|ck_select	|NN OP *o
 pR	|OP*	|ck_shift	|NN OP *o
 pR	|OP*	|ck_sort	|NN OP *o
-pR	|OP*	|ck_spair	|NN OP *o
 pR	|OP*	|ck_split	|NN OP *o
 pR	|OP*	|ck_subr	|NN OP *o
 pR	|OP*	|ck_substr	|NN OP *o

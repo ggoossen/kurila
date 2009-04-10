@@ -1176,6 +1176,7 @@ Perl_magic_setutf8(pTHX_ SV *sv, MAGIC *mg)
 bool
 Perl_is_magicsv(pTHX_ const char* name)
 {
+    PERL_ARGS_ASSERT_IS_MAGICSV;
     switch(name[0]) {
     case '^': {
 	const char* name2 = name + 1;

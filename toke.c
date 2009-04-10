@@ -1236,6 +1236,9 @@ STATIC SV*
 S_curlocation(pTHX_ const char* location)
 {
     AV* res = av_2mortal(newAV());
+
+    PERL_ARGS_ASSERT_CURLOCATION;
+
     av_push(res, newSVsv(PL_parser->lex_filename));
     av_push(res, newSViv(PL_parser->lex_line_number));
     av_push(res, newSViv((location - PL_linestart + PL_parser->lex_charoffset) + 1));

@@ -181,7 +181,9 @@ sv_cp_replace(pTHX_ SV** sv_d, SV* sv_s) {
 
 
 /* Location retrieval */
-SV* LocationFilename(pTHX_ SV *location) {
+SV* 
+Perl_LocationFilename(pTHX_ SV *location)
+{
     SV** fn;
     if ( ! location || ! SvAVOK(location) )
         return NULL;
