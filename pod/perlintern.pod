@@ -18,68 +18,6 @@ format but are not marked as part of the Perl API. In other words,
 B<they are not for use in extensions>!
 
 
-=head1 CV reference counts and CvOUTSIDE
-
-=over 8
-
-=item CvWEAKOUTSIDE
-X<CvWEAKOUTSIDE>
-
-Each CV has a pointer, C<CvOUTSIDE()>, to its lexically enclosing
-CV (if any). Because pointers to anonymous sub prototypes are
-stored in C<&> pad slots, it is a possible to get a circular reference,
-with the parent pointing to the child and vice-versa. To avoid the
-ensuing memory leak, we do not increment the reference count of the CV
-pointed to by C<CvOUTSIDE> in the I<one specific instance> that the parent
-has a C<&> pad slot pointing back to us. In this case, we set the
-C<CvWEAKOUTSIDE> flag in the child. This allows us to determine under what
-circumstances we should decrement the refcount of the parent when freeing
-the child.
-
-There is a further complication with non-closure anonymous subs (i.e. those
-that do not refer to any lexicals outside that sub). In this case, the
-anonymous prototype is shared rather than being cloned. This has the
-consequence that the parent may be freed while there are still active
-children, eg
-
-    BEGIN { $a = sub { eval '$x' } }
-
-In this case, the BEGIN is freed immediately after execution since there
-are no active references to it: the anon sub prototype has
-C<CvWEAKOUTSIDE> set since it's not a closure, and $a points to the same
-CV, so it doesn't contribute to BEGIN's refcount either.  When $a is
-executed, the C<eval '$x'> causes the chain of C<CvOUTSIDE>s to be followed,
-and the freed BEGIN is accessed.
-
-To avoid this, whenever a CV and its associated pad is freed, any
-C<&> entries in the pad are explicitly removed from the pad, and if the
-refcount of the pointed-to anon sub is still positive, then that
-child's C<CvOUTSIDE> is set to point to its grandparent. This will only
-occur in the single specific case of a non-closure anon prototype
-having one or more active references (such as C<$a> above).
-
-One other thing to consider is that a CV may be merely undefined
-rather than freed, eg C<undef &foo>. In this case, its refcount may
-not have reached zero, but we still delete its pad and its C<CvROOT> etc.
-Since various children may still have their C<CvOUTSIDE> pointing at this
-undefined CV, we keep its own C<CvOUTSIDE> for the time being, so that
-the chain of lexical scopes is unbroken. For example, the following
-should print 123:
-
-    my $x = 123;
-    sub tmp { sub { eval '$x' } }
-    my $a = tmp();
-    undef &tmp;
-    print  $a->();
-
-	bool	CvWEAKOUTSIDE(CV *cv)
-
-=for hackers
-Found in file cv.h
-
-
-=back
-
 =head1 Functions in file pad.h
 
 
@@ -159,13 +97,13 @@ ling pad (lvalue) to C<gen>.  Note that C<SvUV_set> is hijacked for this purpose
 =for hackers
 Found in file pad.h
 
-=item PAD_COMPNAME_OURSTASH
-X<PAD_COMPNAME_OURSTASH>
+=item PAD_COMPNAME_OURGV
+X<PAD_COMPNAME_OURGV>
 
-Return the stash associated with an C<our> variable.
+Return the gv associated with an C<our> variable.
 Assumes the slot entry is a valid C<our> lexical.
 
-	HV *	PAD_COMPNAME_OURSTASH(PADOFFSET po)
+	HV *	PAD_COMPNAME_OURGV(PADOFFSET po)
 
 =for hackers
 Found in file pad.h
@@ -330,40 +268,9 @@ Found in file pad.h
 
 =back
 
-=head1 IO Functions
-
-=over 8
-
-=item start_glob
-X<start_glob>
-
-Function called by C<do_readline> to spawn a glob (or do the glob inside
-perl on VMS). This code used to be inline, but now perl uses C<File::Glob>
-this glob starter is only used by miniperl during the build process.
-Moving it away shrinks pp_hot.c; shrinking pp_hot.c helps speed perl up.
-
-	PerlIO*	start_glob(SV *tmpglob, IO *io)
-
-=for hackers
-Found in file doio.c
-
-
-=back
-
 =head1 Magical Functions
 
 =over 8
-
-=item magic_sethint
-X<magic_sethint>
-
-Triggered by a delete from %^H, records the key to
-C<PL_compiling.cop_hints_hash>.
-
-	int	magic_sethint(SV* sv, MAGIC* mg)
-
-=for hackers
-Found in file mg.c
 
 =item mg_localize
 X<mg_localize>
@@ -473,7 +380,7 @@ xlow+1..xhigh inclusive in the NV union is a range of cop_seq numbers for
 which the name is valid.  For typed lexicals name SV is SVt_PVMG and SvSTASH
 points at the type.  For C<our> lexicals, the type is also SVt_PVMG, with the
 SvOURSTASH slot pointing at the stash of the associated global (so that
-duplicate C<our> declarations in the same package can be detected).  SvUVX is
+duplicate C<our> declarations in the same package can be detected). SvUVX is
 sometimes hijacked to store the generation number during compilation.
 
 If SvFAKE is set on the name SV, then that slot in the frame AV is
@@ -502,18 +409,6 @@ to be generated in evals, such as
 For state vars, SVf_PADSTALE is overloaded to mean 'not yet initialised'
 
 	AV *	CvPADLIST(CV *cv)
-
-=for hackers
-Found in file pad.c
-
-=item cv_clone
-X<cv_clone>
-
-Clone a CV: make a new CV which points to the same code etc, but which
-has a newly-created pad built by copying the prototype pad and capturing
-any outer lexicals.
-
-	CV*	cv_clone(CV* proto)
 
 =for hackers
 Found in file pad.c
@@ -563,12 +458,11 @@ X<pad_add_name>
 
 Create a new name and associated PADMY SV in the current pad; return the
 offset.
-If C<ourstash> is valid, it's an our lexical, set the name's
-SvOURSTASH to that value
+If C<ourgv> is valid, it's an our lexical, set the SvOURGV to that value
 
 If fake, it means we're cloning an existing entry
 
-	PADOFFSET	pad_add_name(const char *name, HV* ourstash, bool clone, bool state)
+	PADOFFSET	pad_add_name(const char *name, GV* ourgv, bool clone)
 
 =for hackers
 Found in file pad.c
@@ -629,7 +523,7 @@ then comes back down, adding fake entries as it goes. It has to be this way
 because fake namesvs in anon protoypes have to store in xlow the index into
 the parent pad.
 
-	PADOFFSET	pad_findlex(const char *name, const CV* cv, U32 seq, int warn, SV** out_capture, SV** out_name_sv, int *out_flags)
+	PADOFFSET	pad_findlex(const char *name, PAD* padnames, PAD* pad, U32 seq)
 
 =for hackers
 Found in file pad.c
@@ -644,18 +538,6 @@ then a fake entry is added to the current pad.
 Returns the offset in the current pad, or NOT_IN_PAD on failure.
 
 	PADOFFSET	pad_findmy(const char* name)
-
-=for hackers
-Found in file pad.c
-
-=item pad_fixup_inner_anons
-X<pad_fixup_inner_anons>
-
-For any anon CVs in the pad, change CvOUTSIDE of that CV from
-old_cv to new_cv if necessary. Needed when a newly-compiled CV has to be
-moved to a pre-existing CV struct.
-
-	void	pad_fixup_inner_anons(PADLIST *padlist, CV *old_cv, CV *new_cv)
 
 =for hackers
 Found in file pad.c
@@ -692,7 +574,7 @@ can be OR'ed together:
     padnew_SAVE		save old globals
     padnew_SAVESUB	also save extra stuff for start of sub
 
-	PADLIST*	pad_new(int flags)
+	PADLIST*	pad_new(int flags, PAD *parent_padnames, PAD *parent_pad, IV parent_seq)
 
 =for hackers
 Found in file pad.c
@@ -827,16 +709,6 @@ The C variable which corresponds to Perl's $^W warning variable.
 =for hackers
 Found in file intrpvar.h
 
-=item PL_last_in_gv
-X<PL_last_in_gv>
-
-The GV which was last used for a filehandle input operation. (C<< <FH> >>)
-
-	GV*	PL_last_in_gv
-
-=for hackers
-Found in file intrpvar.h
-
 =item PL_ofs_sv
 X<PL_ofs_sv>
 
@@ -891,28 +763,6 @@ Given a chunk of memory, link it to the head of the list of arenas,
 and split it into a list of free SVs.
 
 	void	sv_add_arena(char *const ptr, const U32 size, const U32 flags)
-
-=for hackers
-Found in file sv.c
-
-=item sv_clean_all
-X<sv_clean_all>
-
-Decrement the refcnt of each remaining SV, possibly triggering a
-cleanup. This function may have to be called multiple times to free
-SVs which are in complex self-referential hierarchies.
-
-	I32	sv_clean_all()
-
-=for hackers
-Found in file sv.c
-
-=item sv_clean_objs
-X<sv_clean_objs>
-
-Attempt to destroy all objects not yet freed
-
-	void	sv_clean_objs()
 
 =for hackers
 Found in file sv.c
