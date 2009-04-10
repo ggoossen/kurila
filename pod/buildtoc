@@ -457,8 +457,8 @@ sub nl {
 my $NEWLINE = 0;	# how many newlines have we seen recently
 my $LINE;		# what remains to be printed
 
-sub output ($) {
-    for (split m/(\n)/, shift) {
+sub output($str) {
+    for (split m/(\n)/, $str) {
 	if ($_ eq "\n") {
 	    if ($LINE) {
 		print $out, wrap('', '', $LINE);
