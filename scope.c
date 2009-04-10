@@ -462,6 +462,7 @@ Perl_save_set_magicsv(pTHX_ SV* name)
 {
     SV* sv;
     dVAR;
+    PERL_ARGS_ASSERT_SAVE_SET_MAGICSV;
     SSCHECK(3);
     sv = sv_2mortal(newSV(0));
     PL_localizing = 1;

@@ -40,9 +40,21 @@ static __inline__ const char* inlineDdesc(pTHX_ SV *sv) {
 
 
 /* Let us hope that bitmaps for UV and IV are the same */
-IV Perl_SvIV(pTHX_ SV *sv) { return SvIOK(sv) ? SvIVX(sv) : sv_2iv(sv); }
-UV Perl_SvUV(pTHX_ SV *sv) { return SvIOK(sv) ? SvUVX(sv) : sv_2uv(sv); }
-NV Perl_SvNV(pTHX_ SV *sv) { return SvNOK(sv) ? SvNVX(sv) : sv_2nv(sv); }
+IV
+Perl_SvIV(pTHX_ SV *sv) {
+    PERL_ARGS_ASSERT_SVIV;
+    return SvIOK(sv) ? SvIVX(sv) : sv_2iv(sv);
+}
+UV
+Perl_SvUV(pTHX_ SV *sv) {
+    PERL_ARGS_ASSERT_SVUV;
+    return SvIOK(sv) ? SvUVX(sv) : sv_2uv(sv);
+}
+NV
+Perl_SvNV(pTHX_ SV *sv) {
+    PERL_ARGS_ASSERT_SVNV;
+    return SvNOK(sv) ? SvNVX(sv) : sv_2nv(sv);
+}
 
 #define SvIV_nomg(sv) (SvIOK(sv) ? SvIVX(sv) : sv_2iv(sv))
 #define SvUV_nomg(sv) (SvIOK(sv) ? SvUVX(sv) : sv_2uv(sv))
@@ -166,10 +178,11 @@ SV* SvREFCNT_inc(pTHX_ SV* sv) {
 
 
 void 
-sv_cp_replace(pTHX_ SV** sv_d, SV* sv_s) {
-  SvREFCNT_inc(sv_s);
-  SvREFCNT_dec(*sv_d);
-  *sv_d = sv_s;
+Perl_sv_cp_replace(pTHX_ SV** sv_d, SV* sv_s) {
+    PERL_ARGS_ASSERT_SV_CP_REPLACE;
+    SvREFCNT_inc(sv_s);
+    SvREFCNT_dec(*sv_d);
+    *sv_d = sv_s;
 }
 
 #define SVcpREPLACE(sv_d, sv_s) sv_cp_replace(&sv_d, sv_s)
@@ -230,6 +243,7 @@ static __inline__ SV* inline_SvNAME(pTHX_ SV *sv) {
 }
 
 const char* Perl_SvPVX_const(pTHX_ SV *sv) {
+    PERL_ARGS_ASSERT_SVPVX_CONST;
     assert(SvTYPE(sv) >= SVt_PV);
     assert(SvTYPE(sv) != SVt_PVAV);
     assert(SvTYPE(sv) != SVt_PVHV);
@@ -238,6 +252,7 @@ const char* Perl_SvPVX_const(pTHX_ SV *sv) {
 }
 
 char* Perl_SvPVX_mutable(pTHX_ SV *sv) {
+    PERL_ARGS_ASSERT_SVPVX_MUTABLE;
     assert(SvTYPE(sv) >= SVt_PV);
     assert(SvTYPE(sv) != SVt_PVAV);
     assert(SvTYPE(sv) != SVt_PVHV);

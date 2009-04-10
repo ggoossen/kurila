@@ -3,6 +3,7 @@
 PERL_CONTEXT * Perl_PushBlock(U8 t, SV** sp, U8 gimme) {
     PERL_CONTEXT *cx;
     HV *new_dynascope;
+    PERL_ARGS_ASSERT_PUSHBLOCK;
     CXINC;
     cx = &cxstack[cxstack_ix];
     cx->cx_type		= t;

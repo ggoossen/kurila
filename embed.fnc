@@ -462,7 +462,6 @@ p	|int	|magic_setmglob	|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_setregexp|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_setuvar	|NN SV* sv|NN MAGIC* mg
 p	|int	|magic_setutf8	|NN SV* sv|NN MAGIC* mg
-p	|void	|magicname	|NN const char* sym|NULLOK const char* name|I32 namlen
 Ap	|void	|markstack_grow
 Afp	|SV*	|mess		|NN const char* pat|...
 Ap	|SV*	|vmess		|NN const char* pat|NULLOK va_list* args
@@ -873,12 +872,9 @@ Apd	|SV*	|sv_setref_pvn	|NN SV *const rv|NULLOK const char *const classname \
 Apd	|void	|sv_setpv	|NN SV *const sv|NULLOK const char *const ptr
 Apd	|void	|sv_setpvn	|NN SV *const sv|NULLOK const char *const ptr|const STRLEN len
 Amdb	|void	|sv_setsv	|NN SV *dstr|NULLOK SV *sstr
-Amdb	|void	|sv_taint	|NN SV* sv
-ApdR	|bool	|sv_tainted	|NN SV *const sv
 Apd	|int	|sv_unmagic	|NN SV *const sv|const int type
 Apdmb	|void	|sv_unref	|NN SV* sv
 Apd	|void	|sv_unref_flags	|NN SV *const ref|const U32 flags
-Apd	|void	|sv_untaint	|NN SV *const sv
 Apd	|void	|sv_upgrade	|NN SV *const sv|svtype new_type
 Apdmb	|void	|sv_usepvn	|NN SV* sv|NULLOK char* ptr|STRLEN len
 Apd	|void	|sv_usepvn_flags|NN SV *const sv|NULLOK char* ptr|const STRLEN len\
@@ -891,8 +887,6 @@ Apd	|void	|sv_vsetpvfn	|NN SV *const sv|NN const char *const pat|const STRLEN pa
 				|const I32 svmax|NULLOK bool *const maybe_tainted
 Ap	|SV*	|swash_init	|NN const char* pkg|NN const char* name|NN SV* listsv|I32 minbits|I32 none
 Ap	|UV	|swash_fetch	|NN SV *swash|NN const char *ptr|bool do_utf8
-Ap	|void	|taint_env
-Ap	|void	|taint_proper	|NULLOK const char* f|NN const char* s
 Apd	|UV	|to_utf8_case	|NN const char *p|NN char* ustrp|NULLOK STRLEN *lenp \
 				|NN SV **swashp|NN const char *normal|NN const char *special
 Apd	|UV	|to_utf8_lower	|NN const char *p|NN char* ustrp|NULLOK STRLEN *lenp
@@ -953,8 +947,6 @@ pR	|UV	|get_hash_seed
 p	|void	|report_evil_fh	|NULLOK IO *io|I32 op
 XEpd	|void	|report_uninit	|NULLOK SV* uninit_sv
 Afpd	|void	|warn		|NN const char* pat|...
-Afpd	|void	|warn_at	|NULLOK SV* location|NN const char* pat|...
-Ap	|void	|vwarn		|NN const char* pat|NULLOK va_list* args
 Afp	|void	|warner		|U32 err|NN const char* pat|...
 Afp	|void	|warner_at	|NULLOK SV* location|U32 err|NN const char* pat|...
 Ap	|void	|vwarner	|U32 err|NN const char* pat|NULLOK va_list* args
@@ -1686,8 +1678,6 @@ np	|void	|my_swabn	|NN void* ptr|int n
 
 Ap	|GV*	|gv_fetchpvn_flags|NN const char* name|STRLEN len|I32 flags|const svtype sv_type
 Ap	|GV*	|gv_fetchsv|NN SV *name|I32 flags|const svtype sv_type
-
-ApR	|bool	|stashpv_hvname_match|NN const COP *c|NN const HV *hv
 
 #ifdef PERL_DONT_CREATE_GVSV
 Ap	|GV*	|gv_SVadd	|NN GV* gv

@@ -8791,6 +8791,7 @@ Perl_preg_tmprefcnt(pTHX_ REGEXP *rx)
     dVAR;
     struct regexp *const r = (struct regexp *)SvANY(rx);
     RXi_GET_DECL(r,ri);
+    PERL_ARGS_ASSERT_PREG_TMPREFCNT;
 
     PERL_ARGS_ASSERT_PREGFREE2;
 

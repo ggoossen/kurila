@@ -680,7 +680,7 @@ Perl_yyparse (pTHX)
 void
 Perl_parser_tmprefcnt(pTHX_  const yy_parser *parser)
 {
-    PERL_ARGS_ASSERT_PARSER_FREE;
+    PERL_ARGS_ASSERT_PARSER_TMPREFCNT;
 
     SvTMPREFCNT_inc(parser->linestr);
     SvTMPREFCNT_inc(parser->lex_filename);

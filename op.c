@@ -289,6 +289,8 @@ Perl_newROOTOP(pTHX_ OP *main, SV* location)
     ROOTOP* o;
     optype type = OP_ROOT;
 
+    PERL_ARGS_ASSERT_NEWROOTOP;
+
     NewOp(1101, o, 1, ROOTOP);
     o->op_type = type;
     o->op_ppaddr = PL_ppaddr[type];
@@ -855,6 +857,7 @@ Perl_op_mod_assign(pTHX_ OP *operator, OP **operandp, I32 optype)
     OP* finish_assign;
     OP* operator_sibling;
     OP* o;
+    PERL_ARGS_ASSERT_OP_MOD_ASSIGN;
 
     if (optype == OP_ENTERSUB) {
 	*operandp = mod(*operandp, optype);
@@ -1275,6 +1278,7 @@ OP *
 Perl_op_assign(pTHX_ OP** po, I32 optype)
 {
     OP* o = *po;
+    PERL_ARGS_ASSERT_OP_ASSIGN;
 
     switch (o->op_type) {
     case OP_NULL:
@@ -3281,6 +3285,8 @@ Perl_newPRIVATEVAROP(pTHX_ const char* varname, SV* location) {
     /* All routes through this function want to know if there is a colon.  */
     const char *const has_colon = (const char*) memchr (varname, ':', varname_len);
     OP* o;
+
+    PERL_ARGS_ASSERT_NEWPRIVATEVAROP;
 
     /* if we're in a my(), we can't allow dynamics here.
        if it's a legal name, the OP is a PADANY.

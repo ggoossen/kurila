@@ -1600,11 +1600,6 @@ PERL_CALLCONV int	Perl_magic_setutf8(pTHX_ SV* sv, MAGIC* mg)
 #define PERL_ARGS_ASSERT_MAGIC_SETUTF8	\
 	assert(sv); assert(mg)
 
-PERL_CALLCONV void	Perl_magicname(pTHX_ const char* sym, const char* name, I32 namlen)
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_MAGICNAME	\
-	assert(sym)
-
 PERL_CALLCONV void	Perl_markstack_grow(pTHX);
 PERL_CALLCONV SV*	Perl_mess(pTHX_ const char* pat, ...)
 			__attribute__format__(__printf__,pTHX_1,pTHX_2)
@@ -3128,17 +3123,6 @@ PERL_CALLCONV void	Perl_sv_setpvn(pTHX_ SV *const sv, const char *const ptr, con
 #define PERL_ARGS_ASSERT_SV_SETSV	\
 	assert(dstr)
 
-/* PERL_CALLCONV void	Perl_sv_taint(pTHX_ SV* sv)
-			__attribute__nonnull__(pTHX_1); */
-#define PERL_ARGS_ASSERT_SV_TAINT	\
-	assert(sv)
-
-PERL_CALLCONV bool	Perl_sv_tainted(pTHX_ SV *const sv)
-			__attribute__warn_unused_result__
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_SV_TAINTED	\
-	assert(sv)
-
 PERL_CALLCONV int	Perl_sv_unmagic(pTHX_ SV *const sv, const int type)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_SV_UNMAGIC	\
@@ -3153,11 +3137,6 @@ PERL_CALLCONV void	Perl_sv_unref_flags(pTHX_ SV *const ref, const U32 flags)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_SV_UNREF_FLAGS	\
 	assert(ref)
-
-PERL_CALLCONV void	Perl_sv_untaint(pTHX_ SV *const sv)
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_SV_UNTAINT	\
-	assert(sv)
 
 PERL_CALLCONV void	Perl_sv_upgrade(pTHX_ SV *const sv, svtype new_type)
 			__attribute__nonnull__(pTHX_1);
@@ -3198,12 +3177,6 @@ PERL_CALLCONV UV	Perl_swash_fetch(pTHX_ SV *swash, const char *ptr, bool do_utf8
 			__attribute__nonnull__(pTHX_2);
 #define PERL_ARGS_ASSERT_SWASH_FETCH	\
 	assert(swash); assert(ptr)
-
-PERL_CALLCONV void	Perl_taint_env(pTHX);
-PERL_CALLCONV void	Perl_taint_proper(pTHX_ const char* f, const char* s)
-			__attribute__nonnull__(pTHX_2);
-#define PERL_ARGS_ASSERT_TAINT_PROPER	\
-	assert(s)
 
 PERL_CALLCONV UV	Perl_to_utf8_case(pTHX_ const char *p, char* ustrp, STRLEN *lenp, SV **swashp, const char *normal, const char *special)
 			__attribute__nonnull__(pTHX_1)
@@ -3429,17 +3402,6 @@ PERL_CALLCONV void	Perl_warn(pTHX_ const char* pat, ...)
 			__attribute__format__(__printf__,pTHX_1,pTHX_2)
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_WARN	\
-	assert(pat)
-
-PERL_CALLCONV void	Perl_warn_at(pTHX_ SV* location, const char* pat, ...)
-			__attribute__format__(__printf__,pTHX_2,pTHX_3)
-			__attribute__nonnull__(pTHX_2);
-#define PERL_ARGS_ASSERT_WARN_AT	\
-	assert(pat)
-
-PERL_CALLCONV void	Perl_vwarn(pTHX_ const char* pat, va_list* args)
-			__attribute__nonnull__(pTHX_1);
-#define PERL_ARGS_ASSERT_VWARN	\
 	assert(pat)
 
 PERL_CALLCONV void	Perl_warner(pTHX_ U32 err, const char* pat, ...)
@@ -5594,14 +5556,6 @@ PERL_CALLCONV GV*	Perl_gv_fetchsv(pTHX_ SV *name, I32 flags, const svtype sv_typ
 			__attribute__nonnull__(pTHX_1);
 #define PERL_ARGS_ASSERT_GV_FETCHSV	\
 	assert(name)
-
-
-PERL_CALLCONV bool	Perl_stashpv_hvname_match(pTHX_ const COP *c, const HV *hv)
-			__attribute__warn_unused_result__
-			__attribute__nonnull__(pTHX_1)
-			__attribute__nonnull__(pTHX_2);
-#define PERL_ARGS_ASSERT_STASHPV_HVNAME_MATCH	\
-	assert(c); assert(hv)
 
 
 #ifdef PERL_DONT_CREATE_GVSV

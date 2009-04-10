@@ -577,12 +577,9 @@ Perl_sv_setref_pvn
 Perl_sv_setpv
 Perl_sv_setpvn
 Perl_sv_setsv
-Perl_sv_taint
-Perl_sv_tainted
 Perl_sv_unmagic
 Perl_sv_unref
 Perl_sv_unref_flags
-Perl_sv_untaint
 Perl_sv_upgrade
 Perl_sv_usepvn
 Perl_sv_usepvn_flags
@@ -590,8 +587,6 @@ Perl_sv_vcatpvfn
 Perl_sv_vsetpvfn
 Perl_swash_init
 Perl_swash_fetch
-Perl_taint_env
-Perl_taint_proper
 Perl_to_utf8_case
 Perl_to_utf8_lower
 Perl_to_utf8_upper
@@ -622,8 +617,6 @@ Perl_sv_uni_display
 Perl_seed
 Perl_report_uninit
 Perl_warn
-Perl_warn_at
-Perl_vwarn
 Perl_warner
 Perl_warner_at
 Perl_vwarner
@@ -747,7 +740,6 @@ Perl_hv_placeholders_get
 Perl_hv_placeholders_set
 Perl_gv_fetchpvn_flags
 Perl_gv_fetchsv
-Perl_stashpv_hvname_match
 Perl_gv_SVadd
 Perl_ckwarn
 Perl_ckwarn_d

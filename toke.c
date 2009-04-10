@@ -10244,6 +10244,7 @@ Perl_yyerror_at(pTHX_ SV* location, const char *const s)
 {
     const char* where = SvPVX_const(loc_desc(location));
     SV* msg = sv_2mortal(newSVpv(s, 0));
+    PERL_ARGS_ASSERT_YYERROR_AT;
     Perl_sv_catpvf(aTHX_ msg, " at %s\n", where);
     if (PL_in_eval & EVAL_WARNONLY) {
 	if (ckWARN_d(WARN_SYNTAX))

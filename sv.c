@@ -1364,6 +1364,7 @@ Does not handle 'set' magic.  See also C<sv_setrv_mg>.
 void
 Perl_sv_setrv(pTHX_ register SV *const sv, SV* dst)
 {
+    PERL_ARGS_ASSERT_SV_SETRV;
     prepare_SV_for_RV(sv);
     SvROK_on(sv);
     SvRV_set(sv, dst);
@@ -1372,6 +1373,7 @@ Perl_sv_setrv(pTHX_ register SV *const sv, SV* dst)
 void
 Perl_sv_setrv_mg(pTHX_ register SV *const sv, SV* dst)
 {
+    PERL_ARGS_ASSERT_SV_SETRV_MG;
     sv_setrv(sv, dst);
     SvSETMAGIC(sv);
 }
@@ -4184,7 +4186,7 @@ Perl_sv_clear_body(pTHX_ SV *const sv)
     const struct body_details *const sv_type_details
 	= bodies_by_type + type;
     HV *stash;
-
+    PERL_ARGS_ASSERT_SV_CLEAR_BODY;
 
     if (type <= SVt_IV) {
 	/* See the comment in sv.h about the collusion between this early
@@ -8964,6 +8966,7 @@ Perl_sv_tmprefcnt(pTHX_ SV *const sv)
 {
     dVAR;
     const U32 type = SvTYPE(sv);
+    PERL_ARGS_ASSERT_PERL_SV_TMPREFCNT;
 
     if (sv == (SV*)PL_strtab)
 	return;
