@@ -15,7 +15,7 @@ my (@enums, @names);
 while ( ~< *DATA) {
   next if m/^#/;
   next if m/^$/;
-  my @($enum, $name) = m/^(\S+)\s+(\S+)/ or die "Can't parse $_";
+  my @($enum, $name) = @: m/^(\S+)\s+(\S+)/ or die "Can't parse $_";
   push @enums, $enum;
   push @names, $name;
 }
@@ -24,9 +24,8 @@ safer_unlink ('overload.h', 'overload.c');
 my $c = safer_open("overload.c");
 my $h = safer_open("overload.h");
 
-sub print_header {
-  my $file = shift;
-  print \*STDOUT, <<"EOF";
+sub print_header($fh, $file) {
+  print $fh, <<"EOF";
 /* -*- buffer-read-only: t -*-
  *
  *    $file
@@ -43,19 +42,17 @@ sub print_header {
 EOF
 }
 
-select $c;
-print_header('overload.c');
+print_header($c, 'overload.c');
 
-select $h;
-print_header('overload.h');
-print \*STDOUT, <<'EOF';
+print_header($h, 'overload.h');
+print $h, <<'EOF';
 
 enum {
 EOF
 
-print \*STDOUT, "    $($_)_amg,\n", foreach  @enums;
+print $h, "    $($_)_amg,\n", foreach  @enums;
 
-print \*STDOUT, <<'EOF';
+print $h, <<'EOF';
     max_amg_code
     /* Do not leave a trailing comma here.  C9X allows it, C89 doesn't. */
 };
@@ -78,7 +75,7 @@ char * const PL_AMG_names[NofAMmeth] = {
 EOF
 
 my $last = pop @names;
-print $c, "    \"$_\",\n" foreach map { s/(["\\"])/\\$1/g; $_ } @names;
+print $c, "    \"$_\",\n" foreach map { s/(["\\"])/\\$1/g; $_ }, @names;
 
 print $c, <<"EOT";
     "$last"

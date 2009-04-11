@@ -98,7 +98,8 @@ sub valueWalk
 	    if !ref $v || ref $v ne 'ARRAY' ;
 
 	my @($ver, $rest) =  @{ $v } ;
-	push @{%v_list{$ver}}, $k;
+        %v_list{+$ver} //= @: ;
+	push %v_list{+$ver}, $k;
 	
 	if (ref $rest)
 	  { valueWalk ($rest) }
@@ -110,8 +111,8 @@ sub valueWalk
 sub orderValues
 {
     my $index = 0;
-    foreach my $ver ( sort { $a <+> $b } keys %v_list ) {
-        foreach my $name (  @{ %v_list{$ver} } ) {
+    foreach my $ver ( sort { $a <+> $b }, keys %v_list ) {
+        foreach my $name ( %v_list{$ver} ) {
 	    %ValueToName{+$index } = \@( uc $name, $ver ) ;
 	    %NameToValue{+uc $name } = $index ++ ;
         }
@@ -133,7 +134,7 @@ sub walk
 	#$Value{$index} = uc $k ;
 	die "Can't find key '$k'"
 	    if ! defined %NameToValue{?uc $k} ;
-        push @{ %list{$k} }, %NameToValue{?uc $k} ;
+        push @{ %list{+$k} }, %NameToValue{?uc $k} ;
 	die "Value associated with key '$k' is not an ARRAY reference"
 	    if !ref $v || ref $v ne 'ARRAY' ;
 	
@@ -156,8 +157,8 @@ sub mkRange
     my @out = @a ;
 
     for my $i (1..nelems(@a)-1) {
-      	@out[$i] = ".."
-          if @a[$i] == @a[$i - 1] + 1 && @a[$i] + 1 == @a[$i + 1] ;
+      	@out[+$i] = ".."
+          if @a[$i] == @a[$i - 1] + 1 && @a[$i] + 1 == @a[?$i + 1] ;
     }
 
     my $out = join(",",@out);
@@ -173,7 +174,7 @@ sub printTree
     my $prefix = shift ;
     my ($k, $v) ;
 
-    my $max = ( <sort {$a <+> $b} map { length $_ }, keys %$tre)[[-1]] ;
+    my $max = (sort {$a <+> $b}, map { length $_ }, keys %$tre)[-1] ;
     my @keys = sort keys %$tre ;
 
     while ($k = shift @keys) {
@@ -286,7 +287,7 @@ $index *= 2 ;
 my $warn_size = int($index / 8) + ($index % 8 != 0) ;
 
 my $last_ver = 0;
-foreach my $k (sort { $a <+> $b } keys %ValueToName) {
+foreach my $k (sort { $a <+> $b }, keys %ValueToName) {
     my @($name, $version) =  @{ %ValueToName{?$k} };
     print $warn, "\n/* Warnings Categories added in Perl $version */\n\n"
         if $last_ver != $version ;
@@ -357,7 +358,7 @@ while ( ~< *DATA) {
 
 $last_ver = 0;
 print $pm, "our \%Offsets = \%(\n" ;
-foreach my $k (sort { $a <+> $b } keys %ValueToName) {
+foreach my $k (sort { $a <+> $b }, keys %ValueToName) {
     my @($name, $version) =  @{ %ValueToName{?$k} };
     $name = lc $name;
     $k *= 2 ;
@@ -376,7 +377,7 @@ print $pm, "our \%Bits = %(\n" ;
 foreach my $k (sort keys  %list) {
 
     my $v = %list{?$k} ;
-    my @list = sort { $a <+> $b } @$v;
+    my @list = sort { $a <+> $b }, @$v;
 
     print $pm, tab(4, "    '$k'"), '=> "',
 		# mkHex($warn_size, @list),
@@ -390,7 +391,7 @@ print $pm, "our \%DeadBits = %(\n" ;
 foreach my $k (sort keys  %list) {
 
     my $v = %list{?$k} ;
-    my @list = sort { $a <+> $b } @$v;
+    my @list = sort { $a <+> $b }, @$v;
 
     print $pm, tab(4, "    '$k'"), '=> "',
 		# mkHex($warn_size, @list),
@@ -425,7 +426,7 @@ our $VERSION = '1.06';
 # see also strict.pm.
 my $pkg = __PACKAGE__;
 unless ( __FILE__ =~ m/(^|[\/\\])\Q$pkg\E\.pmc?$/ ) {
-    my (undef, $f, $l) = caller;
+    my @(_, $f, $l) = @: caller;
     die("Incorrect use of pragma '$(__PACKAGE__)' at $f line $l.\n");
 }
 
@@ -576,7 +577,7 @@ sub bits
 	    $fatal = 0;
 	    $no_fatal = 1;
 	}
-	elsif ($catmask = %Bits{$word}) {
+	elsif ($catmask = %Bits{?$word}) {
 	    $mask ^|^= $catmask ;
 	    $mask ^|^= %DeadBits{$word} if $fatal ;
 	    $mask ^&^= ^~^(%DeadBits{$word}^|^$All) if $no_fatal ;
@@ -614,7 +615,7 @@ sub import
 	    $fatal = 0;
 	    $no_fatal = 1;
 	}
-	elsif ($catmask = %Bits{$word}) {
+	elsif ($catmask = %Bits{?$word}) {
 	    $mask ^|^= $catmask ;
 	    $mask ^|^= %DeadBits{$word} if $fatal ;
 	    $mask ^&^= ^~^(%DeadBits{$word}^|^$All) if $no_fatal ;
@@ -644,7 +645,7 @@ sub unimport
 	if ($word eq 'FATAL') {
 	    next; 
 	}
-	elsif ($catmask = %Bits{$word}) {
+	elsif ($catmask = %Bits{?$word}) {
 	    $mask ^&^= ^~^($catmask ^|^ %DeadBits{$word} ^|^ $All);
 	}
 	else
@@ -654,7 +655,7 @@ sub unimport
     $^WARNING_BITS = $mask ;
 }
 
-my %builtin_type; < %builtin_type{[qw(SCALAR ARRAY HASH CODE REF GLOB LVALUE Regexp)]} = ();
+my %builtin_type; %builtin_type{[qw(SCALAR ARRAY HASH CODE REF GLOB LVALUE Regexp)]} = @();
 
 sub __chk
 {
@@ -671,13 +672,13 @@ sub __chk
 	    $category = $type;
             $isobj = 1 ;
         }
-        $offset = %Offsets{$category};
+        $offset = %Offsets{?$category};
         die("Unknown warnings category '$category'")
 	    unless defined $offset;
     }
     else {
         $category = @(caller(1))[0] ;
-        $offset = %Offsets{$category};
+        $offset = %Offsets{?$category};
         die("package '$category' not registered for warnings")
 	    unless defined $offset ;
     }
@@ -705,7 +706,7 @@ sub enabled
     die("Usage: warnings::enabled([category])")
 	unless nelems(@_) == 1 || nelems(@_) == 0 ;
 
-    my ($callers_bitmask, $offset, $i) = < __chk(< @_) ;
+    my @($callers_bitmask, $offset, $i) = __chk(< @_) ;
 
     return 0 unless defined $callers_bitmask ;
     return vec($callers_bitmask, $offset, 1) ||
@@ -719,7 +720,7 @@ sub warn
 	unless nelems(@_) == 2 || nelems(@_) == 1 ;
 
     my $message = pop ;
-    my ($callers_bitmask, $offset, $i) = < __chk(<@_) ;
+    my @($callers_bitmask, $offset, $i) = __chk(<@_) ;
     die($message)
 	if vec($callers_bitmask, $offset+1, 1) ||
 	   vec($callers_bitmask, %Offsets{'all'}+1, 1) ;
@@ -732,7 +733,7 @@ sub warnif
 	unless nelems(@_) == 2 || nelems(@_) == 1 ;
 
     my $message = pop ;
-    my ($callers_bitmask, $offset, $i) = <__chk(<@_) ;
+    my @($callers_bitmask, $offset, $i) = __chk(<@_) ;
 
     return
         unless defined $callers_bitmask &&

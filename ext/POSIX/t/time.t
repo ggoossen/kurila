@@ -9,7 +9,7 @@ use Test::More tests => 9;
 # go to UTC to avoid DST issues around the world when testing.  SUS3 says that
 # null should get you UTC, but some environments want the explicit names.
 # Those with a working tzset() should be able to use the TZ below.
-env::set_var('TZ' => "UTC0UTC");
+env::var('TZ' ) = "UTC0UTC";
 
 SKIP: do {
     # It looks like POSIX.xs claims that only VMS and Mac OS traditional

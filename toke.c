@@ -1236,6 +1236,9 @@ STATIC SV*
 S_curlocation(pTHX_ const char* location)
 {
     AV* res = av_2mortal(newAV());
+
+    PERL_ARGS_ASSERT_CURLOCATION;
+
     av_push(res, newSVsv(PL_parser->lex_filename));
     av_push(res, newSViv(PL_parser->lex_line_number));
     av_push(res, newSViv((location - PL_linestart + PL_parser->lex_charoffset) + 1));
@@ -10234,6 +10237,30 @@ Perl_yywarn(pTHX_ const char *const s)
     yyerror(s);
     PL_in_eval &= ~EVAL_WARNONLY;
     return 0;
+}
+
+void
+Perl_yyerror_at(pTHX_ SV* location, const char *const s)
+{
+    const char* where = SvPVX_const(loc_desc(location));
+    SV* msg = sv_2mortal(newSVpv(s, 0));
+    PERL_ARGS_ASSERT_YYERROR_AT;
+    Perl_sv_catpvf(aTHX_ msg, " at %s\n", where);
+    if (PL_in_eval & EVAL_WARNONLY) {
+	if (ckWARN_d(WARN_SYNTAX))
+	    Perl_warner(aTHX_ packWARN(WARN_SYNTAX), "%"SVf, SVfARG(msg));
+    }
+    else
+	qerror(msg);
+    if (PL_error_count >= 10) {
+	if (PL_in_eval && SvCUR(ERRSV))
+	    Perl_croak(aTHX_ "%"SVf"%s has too many errors.\n",
+		SVfARG(ERRSV), SvPV_nolen_const(PL_parser->lex_filename));
+	else
+	    Perl_croak(aTHX_ "%s has too many errors.\n",
+		SvPV_nolen_const(PL_parser->lex_filename));
+    }
+    PL_in_my = 0;
 }
 
 int

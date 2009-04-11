@@ -19,7 +19,7 @@ use MakeMaker::Test::Setup::Recurs;
 
 # 'make disttest' sets a bunch of environment variables which interfere
 # with our testing.
-env::set_var($_, undef) for qw(PREFIX LIB MAKEFLAGS);
+env::var($_) = undef for qw(PREFIX LIB MAKEFLAGS);
 
 my $perl = which_perl();
 my $Is_VMS = $^OS_NAME eq 'VMS';

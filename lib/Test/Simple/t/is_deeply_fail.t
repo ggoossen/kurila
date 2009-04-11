@@ -17,7 +17,7 @@ require Test::Simple::Catch;
 my@($out, $err) =  Test::Simple::Catch::caught();
 Test::Builder->new->no_header(1);
 Test::Builder->new->no_ending(1);
-env::temp_set_var('HARNESS_ACTIVE' => 0);
+local env::var('HARNESS_ACTIVE' ) = 0;
 
 
 # Can't use Test.pm, that's a 5.005 thing.

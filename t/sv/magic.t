@@ -32,7 +32,7 @@ my $PERL = env::var('PERL')
        $Is_MSWin32            ?? '.\perl' !!
        './perl');
 
-eval 'env::set_var("FOO" => "hi there");';	# check that ENV is inited inside eval
+eval 'env::var("FOO") = "hi there";';	# check that ENV is inited inside eval
 # cmd.exe will echo 'variable=value' but 4nt will echo just the value
 # -- Nikola Knezevic
 if ($Is_MSWin32)  { ok `set FOO` =~ m/^(?:FOO=)?hi there$/; }
@@ -172,17 +172,17 @@ else {
 	} else {
 	    my $PATH = env::var('PATH');
 	    my $PDL = env::var('PERL_DESTRUCT_LEVEL') || 0;
-	    env::set_var('foo' => "bar");
+	    env::var('foo' ) = "bar";
             for (env::keys()) {
-                env::set_var($_, undef);
+                env::var($_) = undef;
             }
-	    env::set_var('PATH' => $PATH);
-	    env::set_var('PERL_DESTRUCT_LEVEL' => $PDL || 0);
+	    env::var('PATH' ) = $PATH;
+	    env::var('PERL_DESTRUCT_LEVEL' ) = $PDL || 0;
 	    ok ($Is_MSWin32 ?? (`set foo 2>NUL` eq "")
 			    !! (`echo \$foo` eq "\n") );
 	}
 
-	env::set_var('__NoNeSuCh' => "foo");
+	env::var('__NoNeSuCh' ) = "foo";
 	$^PROGRAM_NAME = "bar";
 # cmd.exe will echo 'variable=value' but 4nt will echo just the value
 # -- Nikola Knezevic
@@ -238,13 +238,13 @@ SKIP: do {
     # when perl is compiled with -DENV_IS_CASELESS)
     skip('no caseless %ENV support', 3) unless $Is_MSWin32 || $Is_NetWare;
     for (env::keys()) {
-        env::set_var($_, undef);
+        env::var($_) = undef;
     }
-    env::set_var('Foo' => 'bar');
-    env::set_var('fOo' => 'baz');
+    env::var('Foo' ) = 'bar';
+    env::var('fOo' ) = 'baz';
     ok (nelems(env::keys()) == 1);
     ok defined(env::var('FOo'));
-    env::set_var('foO', undef);
+    env::var('foO') = undef;
     ok (nelems(env::keys()) == 0);
 };
 

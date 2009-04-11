@@ -6,11 +6,11 @@ require_ok( 're' );
 
 # setcolor
 $^INCLUDED{+'Term/Cap.pm' } = 1;
-env::temp_set_var('PERL_RE_TC', undef);
+local env::var('PERL_RE_TC') = undef;
 re::setcolor();
 is( env::var('PERL_RE_COLORS'), "md\tme\tso\tse\tus\tue", 
 	'setcolor() should provide default colors' );
-env::set_var('PERL_RE_TC' => 'su,n,ny');
+env::var('PERL_RE_TC' ) = 'su,n,ny';
 re::setcolor();
 is( env::var('PERL_RE_COLORS'), "su\tn\tny", '... or use %ENV{PERL_RE_COLORS}' );
 
@@ -23,7 +23,7 @@ local $^WARN_HOOK = sub {
 #try { re::bits(1) };
 #like( $warn, qr/Useless use/, 'bits() should warn with no args' );
 
-env::set_var('PERL_RE_COLORS', undef);
+env::var('PERL_RE_COLORS') = undef;
 re::bits(0, 'debug');
 is( env::var('PERL_RE_COLORS'), undef,
 	"... should not set regex colors given 'debug'" );

@@ -262,7 +262,7 @@ sub Tgetent($class, $self)
     {
 
         # last resort--fake up a termcap from terminfo
-        env::temp_set_var('TERM' => $term);
+        local env::var('TERM' ) = $term;
 
         if ( $^OS_NAME eq 'VMS' )
         {

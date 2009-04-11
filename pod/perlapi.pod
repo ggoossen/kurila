@@ -80,15 +80,6 @@ L<perlcall>.
 =for hackers
 Found in file cop.h
 
-=item G_NOARGS
-X<G_NOARGS>
-
-Indicates that no arguments are being sent to a callback.  See
-L<perlcall>.
-
-=for hackers
-Found in file cop.h
-
 =item G_SCALAR
 X<G_SCALAR>
 
@@ -390,7 +381,7 @@ Performs a callback to the specified Perl sub.  See L<perlcall>.
 
 NOTE: the perl_ form of this function is deprecated.
 
-	I32	call_argv(const char* sub_name, I32 flags, char** argv)
+	SV*	call_argv(const char* sub_name, I32 flags, char** argv)
 
 =for hackers
 Found in file perl.c
@@ -403,7 +394,7 @@ be on the stack.  See L<perlcall>.
 
 NOTE: the perl_ form of this function is deprecated.
 
-	I32	call_method(const char* methname, I32 flags)
+	SV*	call_method(const char* methname, I32 flags)
 
 =for hackers
 Found in file perl.c
@@ -415,7 +406,7 @@ Performs a callback to the specified Perl sub.  See L<perlcall>.
 
 NOTE: the perl_ form of this function is deprecated.
 
-	I32	call_pv(const char* sub_name, I32 flags)
+	SV*	call_pv(const char* sub_name, I32 flags)
 
 =for hackers
 Found in file perl.c
@@ -428,7 +419,7 @@ L<perlcall>.
 
 NOTE: the perl_ form of this function is deprecated.
 
-	I32	call_sv(SV* sv, VOL I32 flags)
+	SV*	call_sv(SV* sv, VOL I32 flags)
 
 =for hackers
 Found in file perl.c
@@ -594,65 +585,9 @@ Found in file handy.h
 
 =back
 
-=head1 Cloning an interpreter
-
-=over 8
-
-=item perl_clone
-X<perl_clone>
-
-Create and return a new interpreter by cloning the current one.
-
-perl_clone takes these flags as parameters:
-
-CLONEf_COPY_STACKS - is used to, well, copy the stacks also,
-without it we only clone the data and zero the stacks,
-with it we copy the stacks and the new perl interpreter is
-ready to run at the exact same point as the previous one.
-The pseudo-fork code uses COPY_STACKS while the
-threads->create doesn't.
-
-CLONEf_KEEP_PTR_TABLE
-perl_clone keeps a ptr_table with the pointer of the old
-variable as a key and the new variable as a value,
-this allows it to check if something has been cloned and not
-clone it again but rather just use the value and increase the
-refcount. If KEEP_PTR_TABLE is not set then perl_clone will kill
-the ptr_table using the function
-C<ptr_table_free(PL_ptr_table); PL_ptr_table = NULL;>,
-reason to keep it around is if you want to dup some of your own
-variable who are outside the graph perl scans, example of this
-code is in threads.xs create
-
-CLONEf_CLONE_HOST
-This is a win32 thing, it is ignored on unix, it tells perls
-win32host code (which is c++) to clone itself, this is needed on
-win32 if you want to run two threads at the same time,
-if you just want to do some stuff in a separate perl interpreter
-and then throw it away and return to the original one,
-you don't need to do anything.
-
-	PerlInterpreter*	perl_clone(PerlInterpreter *proto_perl, UV flags)
-
-=for hackers
-Found in file sv.c
-
-
-=back
-
 =head1 CV Manipulation Functions
 
 =over 8
-
-=item CvSTASH
-X<CvSTASH>
-
-Returns the stash of the CV.
-
-	HV*	CvSTASH(CV* cv)
-
-=for hackers
-Found in file cv.h
 
 =item get_cv
 X<get_cv>
@@ -827,7 +762,7 @@ len > cur and pv[cur] is "\0".
 
 Note that the final string may be up to 7 chars longer than pvlim.
 
-	char*	pv_display(SV *dsv, const char *pv, STRLEN cur, STRLEN len, STRLEN pvlim)
+	const char*	pv_display(SV *dsv, const char *pv, STRLEN cur, STRLEN len, STRLEN pvlim)
 
 =for hackers
 Found in file dump.c
@@ -874,7 +809,7 @@ Returns a pointer to the escaped text as held by dsv.
 
 NOTE: the perl_ form of this function is deprecated.
 
-	char*	pv_escape(SV *dsv, char const * const str, const STRLEN count, const STRLEN max, STRLEN * const escaped, const U32 flags)
+	const char*	pv_escape(SV *dsv, char const * const str, const STRLEN count, const STRLEN max, STRLEN * const escaped, const U32 flags)
 
 =for hackers
 Found in file dump.c
@@ -907,7 +842,7 @@ Returns a pointer to the prettified text as held by dsv.
            
 NOTE: the perl_ form of this function is deprecated.
 
-	char*	pv_pretty(SV *dsv, char const * const str, const STRLEN count, const STRLEN max, char const * const start_color, char const * const end_color, const U32 flags)
+	const char*	pv_pretty(SV *dsv, char const * const str, const STRLEN count, const STRLEN max, char const * const start_color, char const * const end_color, const U32 flags)
 
 =for hackers
 Found in file dump.c
@@ -1044,15 +979,6 @@ cope with complex macro expressions. Always use the macro instead.
 =for hackers
 Found in file mathoms.c
 
-=item sv_taint
-X<sv_taint>
-
-Taint an SV. Use C<SvTAINTED_on> instead.
-	void	sv_taint(SV* sv)
-
-=for hackers
-Found in file mathoms.c
-
 =item sv_unref
 X<sv_unref>
 
@@ -1179,19 +1105,6 @@ Return the SV from the GV.
 =for hackers
 Found in file gv.h
 
-=item gv_const_sv
-X<gv_const_sv>
-
-If C<gv> is a typeglob whose subroutine entry is a constant sub eligible for
-inlining, or C<gv> is a placeholder reference that would be promoted to such
-a typeglob, then returns the value returned by the sub.  Otherwise, returns
-NULL.
-
-	SV*	gv_const_sv(GV* gv)
-
-=for hackers
-Found in file gv.c
-
 =item gv_fetchmeth
 X<gv_fetchmeth>
 
@@ -1210,7 +1123,7 @@ visible to Perl code.  So when calling C<call_sv>, you should not use
 the GV directly; instead, you should use the method's CV, which can be
 obtained from the GV with the C<GvCV> macro.
 
-	GV*	gv_fetchmeth(HV* stash, const char* name, STRLEN len, I32 level)
+	CV*	gv_fetchmeth(HV* stash, const char* name, STRLEN len, I32 level)
 
 =for hackers
 Found in file gv.c
@@ -1228,7 +1141,7 @@ C<level==0>.  C<name> should be writable if contains C<':'> or C<'
 ''>. The warning against passing the GV returned by C<gv_fetchmeth> to
 C<call_sv> apply equally to these functions.
 
-	GV*	gv_fetchmethod(HV* stash, const char* name)
+	CV*	gv_fetchmethod(HV* stash, const char* name)
 
 =for hackers
 Found in file gv.c
@@ -1466,7 +1379,7 @@ Found in file hv.h
 X<HvNAME>
 
 Returns the package name of a stash, or NULL if C<stash> isn't a stash.
-See C<SvSTASH>, C<CvSTASH>.
+See C<SvSTASH>.
 
 	char*	HvNAME(HV* stash)
 
@@ -1723,34 +1636,6 @@ Evaluates the hash in scalar context and returns the result. Handles magic when 
 =for hackers
 Found in file hv.c
 
-=item hv_store
-X<hv_store>
-
-Stores an SV in a hash.  The hash key is specified as C<key> and C<klen> is
-the length of the key.  The C<hash> parameter is the precomputed hash
-value; if it is zero then Perl will compute it.  The return value will be
-NULL if the operation failed or if the value did not need to be actually
-stored within the hash (as in the case of tied hashes).  Otherwise it can
-be dereferenced to get the original C<SV*>.  Note that the caller is
-responsible for suitably incrementing the reference count of C<val> before
-the call, and decrementing it if the function returned NULL.  Effectively
-a successful hv_store takes ownership of one reference to C<val>.  This is
-usually what you want; a newly created SV has a reference count of one, so
-if all your code does is create SVs then store them in a hash, hv_store
-will own the only reference to the new SV, and your code doesn't need to do
-anything further to tidy up.  hv_store is not implemented as a call to
-hv_store_ent, and does not create a temporary SV for the key, so if your
-key data is not already in SV form then use hv_store in preference to
-hv_store_ent.
-
-See L<perlguts/"Understanding the Magic of Tied Hashes and Arrays"> for more
-information on how to use this function on tied hashes.
-
-	SV**	hv_store(HV *hv, const char *key, I32 klen, SV *val, U32 hash)
-
-=for hackers
-Found in file hv.c
-
 =item hv_stores
 X<hv_stores>
 
@@ -1761,37 +1646,6 @@ and omits the hash parameter.
 
 =for hackers
 Found in file handy.h
-
-=item hv_store_ent
-X<hv_store_ent>
-
-Stores C<val> in a hash.  The hash key is specified as C<key>.  The C<hash>
-parameter is the precomputed hash value; if it is zero then Perl will
-compute it.  The return value is the new hash entry so created.  It will be
-NULL if the operation failed or if the value did not need to be actually
-stored within the hash (as in the case of tied hashes).  Otherwise the
-contents of the return value can be accessed using the C<He?> macros
-described here.  Note that the caller is responsible for suitably
-incrementing the reference count of C<val> before the call, and
-decrementing it if the function returned NULL.  Effectively a successful
-hv_store_ent takes ownership of one reference to C<val>.  This is
-usually what you want; a newly created SV has a reference count of one, so
-if all your code does is create SVs then store them in a hash, hv_store
-will own the only reference to the new SV, and your code doesn't need to do
-anything further to tidy up.  Note that hv_store_ent only reads the C<key>;
-unlike C<val> it does not take ownership of it, so maintaining the correct
-reference count on C<key> is entirely the caller's responsibility.  hv_store
-is not implemented as a call to hv_store_ent, and does not create a temporary
-SV for the key, so if your key data is not already in SV form then use
-hv_store in preference to hv_store_ent.
-
-See L<perlguts/"Understanding the Magic of Tied Hashes and Arrays"> for more
-information on how to use this function on tied hashes.
-
-	HE*	hv_store_ent(HV *hv, SV *key, SV *val, U32 hash)
-
-=for hackers
-Found in file hv.c
 
 =item hv_undef
 X<hv_undef>
@@ -1860,26 +1714,6 @@ Free any magic storage used by the SV.  See C<sv_magic>.
 =for hackers
 Found in file mg.c
 
-=item mg_get
-X<mg_get>
-
-Do magic after a value is retrieved from the SV.  See C<sv_magic>.
-
-	int	mg_get(SV* sv)
-
-=for hackers
-Found in file mg.c
-
-=item mg_length
-X<mg_length>
-
-Report on the SV's length.  See C<sv_magic>.
-
-	U32	mg_length(SV* sv)
-
-=for hackers
-Found in file mg.c
-
 =item mg_magical
 X<mg_magical>
 
@@ -1899,17 +1733,6 @@ Do magic after a value is assigned to the SV.  See C<sv_magic>.
 
 =for hackers
 Found in file mg.c
-
-=item SvGETMAGIC
-X<SvGETMAGIC>
-
-Invokes C<mg_get> on an SV if it has 'get' magic.  This macro evaluates its
-argument more than once.
-
-	void	SvGETMAGIC(SV* sv)
-
-=for hackers
-Found in file sv.h
 
 =item SvLOCK
 X<SvLOCK>
@@ -2655,55 +2478,6 @@ Found in file mro.c
 
 =back
 
-=head1 Multicall Functions
-
-=over 8
-
-=item dMULTICALL
-X<dMULTICALL>
-
-Declare local variables for a multicall. See L<perlcall/Lightweight Callbacks>.
-
-		dMULTICALL;
-
-=for hackers
-Found in file cop.h
-
-=item MULTICALL
-X<MULTICALL>
-
-Make a lightweight callback. See L<perlcall/Lightweight Callbacks>.
-
-		MULTICALL;
-
-=for hackers
-Found in file cop.h
-
-=item POP_MULTICALL
-X<POP_MULTICALL>
-
-Closing bracket for a lightweight callback.
-See L<perlcall/Lightweight Callbacks>.
-
-		POP_MULTICALL;
-
-=for hackers
-Found in file cop.h
-
-=item PUSH_MULTICALL
-X<PUSH_MULTICALL>
-
-Opening bracket for a lightweight callback.
-See L<perlcall/Lightweight Callbacks>.
-
-		PUSH_MULTICALL;
-
-=for hackers
-Found in file cop.h
-
-
-=back
-
 =head1 Numeric functions
 
 =over 8
@@ -2917,7 +2691,7 @@ X<newCONSTSUB>
 Creates a constant sub equivalent to Perl C<sub FOO () { 123 }> which is
 eligible for inlining at compile-time.
 
-	CV*	newCONSTSUB(HV* stash, const char* name, SV* sv)
+	CV*	newCONSTSUB(const char* name, SV* sv)
 
 =for hackers
 Found in file op.c
@@ -3028,8 +2802,6 @@ X<SvRX>
 Convenience macro to get the REGEXP from a SV. This is approximately
 equivalent to the following snippet:
 
-    if (SvMAGICAL(sv))
-        mg_get(sv);
     if (SvROK(sv) &&
         (tmpsv = (SV*)SvRV(sv)) &&
         SvTYPE(tmpsv) == SVt_PVMG &&
@@ -3316,16 +3088,6 @@ X<POPn>
 Pops a double off the stack.
 
 	NV	POPn
-
-=for hackers
-Found in file pp.h
-
-=item POPp
-X<POPp>
-
-Pops a string off the stack. Deprecated. New code should use POPpx.
-
-	char*	POPp
 
 =for hackers
 Found in file pp.h
@@ -3850,20 +3612,6 @@ See C<SvCUR>.  Access the character as *(SvEND(sv)).
 =for hackers
 Found in file sv.h
 
-=item SvGAMAGIC
-X<SvGAMAGIC>
-
-Returns true if the SV has get magic or overloading. If either is true then
-the scalar is active data, and has the potential to return a new value every
-time it is accessed. Hence you must be careful to only read it once per user
-logical operation and work with that returned value. If neither is true then
-the scalar's value cannot change unless written to.
-
-	char*	SvGAMAGIC(SV* sv)
-
-=for hackers
-Found in file sv.h
-
 =item SvGROW
 X<SvGROW>
 
@@ -4335,16 +4083,6 @@ stringified form becoming C<SvPOK>.  Handles 'get' magic.
 =for hackers
 Found in file sv.h
 
-=item SvPV_nomg
-X<SvPV_nomg>
-
-Like C<SvPV> but doesn't process magic.
-
-	char*	SvPV_nomg(SV* sv, STRLEN len)
-
-=for hackers
-Found in file sv.h
-
 =item SvPV_set
 X<SvPV_set>
 
@@ -4396,53 +4134,6 @@ is not NULL.  Since we don't have to check the NULLness, it's faster
 and smaller.
 
 	SV*	SvREFCNT_inc_NN(SV* sv)
-
-=for hackers
-Found in file sv.h
-
-=item SvREFCNT_inc_simple
-X<SvREFCNT_inc_simple>
-
-Same as SvREFCNT_inc, but can only be used with expressions without side
-effects.  Since we don't have to store a temporary value, it's faster.
-
-	SV*	SvREFCNT_inc_simple(SV* sv)
-
-=for hackers
-Found in file sv.h
-
-=item SvREFCNT_inc_simple_NN
-X<SvREFCNT_inc_simple_NN>
-
-Same as SvREFCNT_inc_simple, but can only be used if you know I<sv>
-is not NULL.  Since we don't have to check the NULLness, it's faster
-and smaller.
-
-	SV*	SvREFCNT_inc_simple_NN(SV* sv)
-
-=for hackers
-Found in file sv.h
-
-=item SvREFCNT_inc_simple_void
-X<SvREFCNT_inc_simple_void>
-
-Same as SvREFCNT_inc_simple, but can only be used if you don't need the
-return value.  The macro doesn't need to return a meaningful value.
-
-	void	SvREFCNT_inc_simple_void(SV* sv)
-
-=for hackers
-Found in file sv.h
-
-=item SvREFCNT_inc_simple_void_NN
-X<SvREFCNT_inc_simple_void_NN>
-
-Same as SvREFCNT_inc, but can only be used if you don't need the return
-value, and you know that I<sv> is not NULL.  The macro doesn't need
-to return a meaningful value, or check for NULLness, so it's smaller
-and faster.
-
-	void	SvREFCNT_inc_simple_void_NN(SV* sv)
 
 =for hackers
 Found in file sv.h
@@ -4537,52 +4228,6 @@ X<SvSTASH_set>
 Set the value of the STASH pointer in sv to val.  See C<SvIV_set>.
 
 	void	SvSTASH_set(SV* sv, HV* val)
-
-=for hackers
-Found in file sv.h
-
-=item SvTAINT
-X<SvTAINT>
-
-Taints an SV if tainting is enabled.
-
-	void	SvTAINT(SV* sv)
-
-=for hackers
-Found in file sv.h
-
-=item SvTAINTED
-X<SvTAINTED>
-
-Checks to see if an SV is tainted. Returns TRUE if it is, FALSE if
-not.
-
-	bool	SvTAINTED(SV* sv)
-
-=for hackers
-Found in file sv.h
-
-=item SvTAINTED_off
-X<SvTAINTED_off>
-
-Untaints an SV. Be I<very> careful with this routine, as it short-circuits
-some of Perl's fundamental security features. XS module authors should not
-use this function unless they fully understand all the implications of
-unconditionally untainting the value. Untainting should be done in the
-standard perl fashion, via a carefully crafted regexp, rather than directly
-untainting variables.
-
-	void	SvTAINTED_off(SV* sv)
-
-=for hackers
-Found in file sv.h
-
-=item SvTAINTED_on
-X<SvTAINTED_on>
-
-Marks an SV as tainted if tainting is enabled.
-
-	void	SvTAINTED_on(SV* sv)
 
 =for hackers
 Found in file sv.h
@@ -4977,10 +4622,10 @@ Found in file sv.c
 X<sv_2cv>
 
 Using various gambits, try to get a CV from an SV; in addition, try if
-possible to set C<*st> and C<*gvp> to the stash and GV associated with it.
+possible to set C<*gvp> to the GV associated with it.
 The flags in C<lref> are passed to sv_fetchsv.
 
-	CV*	sv_2cv(SV* sv, HV **const st, GV **const gvp, const I32 lref)
+	CV*	sv_2cv(SV* sv, GV **const gvp, const I32 lref)
 
 =for hackers
 Found in file sv.c
@@ -4997,14 +4642,14 @@ named after the PV if we're a string.
 =for hackers
 Found in file sv.c
 
-=item sv_2iv_flags
-X<sv_2iv_flags>
+=item sv_2iv
+X<sv_2iv>
 
 Return the integer value of an SV, doing any necessary string
-conversion.  If flags includes SV_GMAGIC, does an mg_get() first.
+conversion.
 Normally used via the C<SvIV(sv)> function.
 
-	IV	sv_2iv_flags(SV *const sv, const I32 flags)
+	IV	sv_2iv(SV *const sv)
 
 =for hackers
 Found in file sv.c
@@ -5018,7 +4663,7 @@ statement boundaries.  SvTEMP() is turned on which means that the SV's
 string buffer can be "stolen" if this SV is copied. See also C<sv_newmortal>
 and C<sv_mortalcopy>.
 
-	SV*	sv_2mortal(SV *const sv)
+	SV*	sv_2mortal(XV *const sv)
 
 =for hackers
 Found in file sv.c
@@ -5039,8 +4684,7 @@ Found in file sv.c
 X<sv_2pv_flags>
 
 Returns a pointer to the string value of an SV, and sets *lp to its length.
-If flags includes SV_GMAGIC, does an mg_get() first. Coerces sv to a string
-if necessary.
+Coerces sv to a string if necessary.
 Normally invoked via the C<SvPV_flags> macro. C<sv_2pv()> and C<sv_2pv_nomg>
 usually end up here too.
 
@@ -5049,14 +4693,14 @@ usually end up here too.
 =for hackers
 Found in file sv.c
 
-=item sv_2uv_flags
-X<sv_2uv_flags>
+=item sv_2uv
+X<sv_2uv>
 
 Return the unsigned integer value of an SV, doing any necessary string
-conversion.  If flags includes SV_GMAGIC, does an mg_get() first.
+conversion.
 Normally used via the C<SvUV(sv)> and C<SvUVx(sv)> macros.
 
-	UV	sv_2uv_flags(SV *const sv, const I32 flags)
+	UV	sv_2uv(SV *const sv)
 
 =for hackers
 Found in file sv.c
@@ -5141,8 +4785,7 @@ X<sv_catpvn_flags>
 Concatenates the string onto the end of the string which is in the SV.  The
 C<len> indicates number of bytes to copy.  If the SV has the UTF-8
 status set, then the bytes appended should be valid UTF-8.
-If C<flags> has C<SV_GMAGIC> bit set, will C<mg_get> on C<dsv> if
-appropriate, else not. C<sv_catpvn> and C<sv_catpvn_nomg> are implemented
+C<sv_catpvn> and C<sv_catpvn_nomg> are implemented
 in terms of this function.
 
 	void	sv_catpvn_flags(SV *const dstr, const char *sstr, const STRLEN len, const I32 flags)
@@ -5186,8 +4829,7 @@ Found in file sv.c
 X<sv_catsv_flags>
 
 Concatenates the string from SV C<ssv> onto the end of the string in
-SV C<dsv>.  Modifies C<dsv> but not C<ssv>.  If C<flags> has C<SV_GMAGIC>
-bit set, will C<mg_get> on the SVs if appropriate, else not. C<sv_catsv>
+SV C<dsv>.  Modifies C<dsv> but not C<ssv>. C<sv_catsv>
 and C<sv_catsv_nomg> are implemented in terms of this function.
 
 	void	sv_catsv_flags(SV *const dsv, SV *const ssv, const I32 flags)
@@ -5232,36 +4874,9 @@ X<sv_cmp>
 Compares the strings in two SVs.  Returns -1, 0, or 1 indicating whether the
 string in C<sv1> is less than, equal to, or greater than the string in
 C<sv2>. Is UTF-8 and 'use bytes' aware, handles get magic, and will
-coerce its args to strings if necessary.  See also C<sv_cmp_locale>.
+coerce its args to strings if necessary.
 
 	I32	sv_cmp(SV *const sv1, SV *const sv2)
-
-=for hackers
-Found in file sv.c
-
-=item sv_cmp_locale
-X<sv_cmp_locale>
-
-Compares the strings in two SVs in a locale-aware manner. Is UTF-8 and
-'use bytes' aware, handles get magic, and will coerce its args to strings
-if necessary.  See also C<sv_cmp>.
-
-	I32	sv_cmp_locale(SV *const sv1, SV *const sv2)
-
-=for hackers
-Found in file sv.c
-
-=item sv_collxfrm
-X<sv_collxfrm>
-
-Add Collate Transform magic to an SV if it doesn't already have it.
-
-Any scalar variable may carry PERL_MAGIC_collxfrm magic that contains the
-scalar data of the variable, but transformed to such a format that a normal
-memory comparison can be used to compare the data according to the locale
-settings.
-
-	char*	sv_collxfrm(SV *const sv, STRLEN *const nxp)
 
 =for hackers
 Found in file sv.c
@@ -5270,7 +4885,7 @@ Found in file sv.c
 X<sv_copypv>
 
 Copies a stringified representation of the source SV into the
-destination SV.  Automatically performs any necessary mg_get and
+destination SV.  Automatically performs any necessary 
 coercion of numeric values into strings.  Guaranteed to preserve
 UTF8 flag even from overloaded objects.  Similar in nature to
 sv_2pv[_flags] but operates directly on an SV instead of just the
@@ -5545,8 +5160,7 @@ Found in file sv.c
 X<sv_pvn_force_flags>
 
 Get a sensible string out of the SV somehow.
-If C<flags> has C<SV_GMAGIC> bit set, will C<mg_get> on C<sv> if
-appropriate, else not. C<sv_pvn_force> and C<sv_pvn_force_nomg> are
+C<sv_pvn_force> and C<sv_pvn_force_nomg> are
 implemented in terms of this function.
 You normally want to use the various wrapper macros instead: see
 C<SvPV_force> and C<SvPV_force_nomg>
@@ -5837,8 +5451,7 @@ C<dsv>.  The source SV may be destroyed if it is mortal, so don't use this
 function if the source SV needs to be reused. Does not handle 'set' magic.
 Loosely speaking, it performs a copy-by-value, obliterating any previous
 content of the destination.
-If the C<flags> parameter has the C<SV_GMAGIC> bit set, will C<mg_get> on
-C<ssv> if appropriate, else not. If the C<flags> parameter has the
+If the C<flags> parameter has the
 C<NOSTEAL> bit set then the buffers of temps will not be stolen. <sv_setsv>
 and C<sv_setsv_nomg> are implemented in terms of this function.
 
@@ -5885,15 +5498,6 @@ Like C<sv_setuv>, but also handles 'set' magic.
 =for hackers
 Found in file sv.c
 
-=item sv_tainted
-X<sv_tainted>
-
-Test an SV for taintedness. Use C<SvTAINTED> instead.
-	bool	sv_tainted(SV *const sv)
-
-=for hackers
-Found in file sv.c
-
 =item sv_true
 X<sv_true>
 
@@ -5928,15 +5532,6 @@ different from one or the reference being a readonly SV).
 See C<SvROK_off>.
 
 	void	sv_unref_flags(SV *const ref, const U32 flags)
-
-=for hackers
-Found in file sv.c
-
-=item sv_untaint
-X<sv_untaint>
-
-Untaint an SV. Use C<SvTAINTED_off> instead.
-	void	sv_untaint(SV *const sv)
 
 =for hackers
 Found in file sv.c
@@ -6200,24 +5795,6 @@ The pointer to the PV of the dsv is returned.
 
 =for hackers
 Found in file utf8.c
-
-=item sv_cat_decode
-X<sv_cat_decode>
-
-The encoding is assumed to be an Encode object, the PV of the ssv is
-assumed to be octets in that encoding and decoding the input starts
-from the position which (PV + *offset) pointed to.  The dsv will be
-concatenated the decoded UTF-8 string from ssv.  Decoding will terminate
-when the string tstr appears in decoding output or the input ends on
-the PV of the ssv. The value which the offset points will be modified
-to the last input position on the ssv.
-
-Returns TRUE if the terminator was found, else returns FALSE.
-
-	bool	sv_cat_decode(SV* dsv, SV *encoding, SV *ssv, int *offset, char* tstr, int tlen)
-
-=for hackers
-Found in file sv.c
 
 =item sv_recode_to_utf8
 X<sv_recode_to_utf8>

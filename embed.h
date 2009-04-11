@@ -478,7 +478,6 @@
 #define magic_setregexp		Perl_magic_setregexp
 #define magic_setuvar		Perl_magic_setuvar
 #define magic_setutf8		Perl_magic_setutf8
-#define magicname		Perl_magicname
 #endif
 #define markstack_grow		Perl_markstack_grow
 #define mess			Perl_mess
@@ -929,18 +928,14 @@
 #define sv_setref_pvn		Perl_sv_setref_pvn
 #define sv_setpv		Perl_sv_setpv
 #define sv_setpvn		Perl_sv_setpvn
-#define sv_tainted		Perl_sv_tainted
 #define sv_unmagic		Perl_sv_unmagic
 #define sv_unref_flags		Perl_sv_unref_flags
-#define sv_untaint		Perl_sv_untaint
 #define sv_upgrade		Perl_sv_upgrade
 #define sv_usepvn_flags		Perl_sv_usepvn_flags
 #define sv_vcatpvfn		Perl_sv_vcatpvfn
 #define sv_vsetpvfn		Perl_sv_vsetpvfn
 #define swash_init		Perl_swash_init
 #define swash_fetch		Perl_swash_fetch
-#define taint_env		Perl_taint_env
-#define taint_proper		Perl_taint_proper
 #define to_utf8_case		Perl_to_utf8_case
 #define to_utf8_lower		Perl_to_utf8_lower
 #define to_utf8_upper		Perl_to_utf8_upper
@@ -1001,8 +996,6 @@
 #define report_uninit		Perl_report_uninit
 #endif
 #define warn			Perl_warn
-#define warn_at			Perl_warn_at
-#define vwarn			Perl_vwarn
 #define warner			Perl_warner
 #define warner_at		Perl_warner_at
 #define vwarner			Perl_vwarner
@@ -1014,6 +1007,7 @@
 #ifdef PERL_CORE
 #define write_to_stderr		Perl_write_to_stderr
 #define yyerror			Perl_yyerror
+#define yyerror_at		Perl_yyerror_at
 #endif
 #if defined(PERL_CORE) || defined(PERL_EXT)
 #define yylex			Perl_yylex
@@ -1164,10 +1158,8 @@
 #define ck_rfun			Perl_ck_rfun
 #define ck_rvconst		Perl_ck_rvconst
 #define ck_sassign		Perl_ck_sassign
-#define ck_select		Perl_ck_select
 #define ck_shift		Perl_ck_shift
 #define ck_sort			Perl_ck_sort
-#define ck_spair		Perl_ck_spair
 #define ck_split		Perl_ck_split
 #define ck_subr			Perl_ck_subr
 #define ck_substr		Perl_ck_substr
@@ -1729,7 +1721,6 @@
 #endif
 #define gv_fetchpvn_flags	Perl_gv_fetchpvn_flags
 #define gv_fetchsv		Perl_gv_fetchsv
-#define stashpv_hvname_match	Perl_stashpv_hvname_match
 #ifdef PERL_DONT_CREATE_GVSV
 #define gv_SVadd		Perl_gv_SVadd
 #endif
@@ -2664,7 +2655,6 @@
 #define magic_setregexp(a,b)	Perl_magic_setregexp(aTHX_ a,b)
 #define magic_setuvar(a,b)	Perl_magic_setuvar(aTHX_ a,b)
 #define magic_setutf8(a,b)	Perl_magic_setutf8(aTHX_ a,b)
-#define magicname(a,b,c)	Perl_magicname(aTHX_ a,b,c)
 #endif
 #define markstack_grow()	Perl_markstack_grow(aTHX)
 #define vmess(a,b)		Perl_vmess(aTHX_ a,b)
@@ -3110,18 +3100,14 @@
 #define sv_setref_pvn(a,b,c,d)	Perl_sv_setref_pvn(aTHX_ a,b,c,d)
 #define sv_setpv(a,b)		Perl_sv_setpv(aTHX_ a,b)
 #define sv_setpvn(a,b,c)	Perl_sv_setpvn(aTHX_ a,b,c)
-#define sv_tainted(a)		Perl_sv_tainted(aTHX_ a)
 #define sv_unmagic(a,b)		Perl_sv_unmagic(aTHX_ a,b)
 #define sv_unref_flags(a,b)	Perl_sv_unref_flags(aTHX_ a,b)
-#define sv_untaint(a)		Perl_sv_untaint(aTHX_ a)
 #define sv_upgrade(a,b)		Perl_sv_upgrade(aTHX_ a,b)
 #define sv_usepvn_flags(a,b,c,d)	Perl_sv_usepvn_flags(aTHX_ a,b,c,d)
 #define sv_vcatpvfn(a,b,c,d,e,f,g)	Perl_sv_vcatpvfn(aTHX_ a,b,c,d,e,f,g)
 #define sv_vsetpvfn(a,b,c,d,e,f,g)	Perl_sv_vsetpvfn(aTHX_ a,b,c,d,e,f,g)
 #define swash_init(a,b,c,d,e)	Perl_swash_init(aTHX_ a,b,c,d,e)
 #define swash_fetch(a,b,c)	Perl_swash_fetch(aTHX_ a,b,c)
-#define taint_env()		Perl_taint_env(aTHX)
-#define taint_proper(a,b)	Perl_taint_proper(aTHX_ a,b)
 #define to_utf8_case(a,b,c,d,e,f)	Perl_to_utf8_case(aTHX_ a,b,c,d,e,f)
 #define to_utf8_lower(a,b,c)	Perl_to_utf8_lower(aTHX_ a,b,c)
 #define to_utf8_upper(a,b,c)	Perl_to_utf8_upper(aTHX_ a,b,c)
@@ -3181,7 +3167,6 @@
 #if defined(PERL_CORE) || defined(PERL_EXT)
 #define report_uninit(a)	Perl_report_uninit(aTHX_ a)
 #endif
-#define vwarn(a,b)		Perl_vwarn(aTHX_ a,b)
 #define vwarner(a,b,c)		Perl_vwarner(aTHX_ a,b,c)
 #define vwarner_at(a,b,c,d)	Perl_vwarner_at(aTHX_ a,b,c,d)
 #ifdef PERL_CORE
@@ -3191,6 +3176,7 @@
 #ifdef PERL_CORE
 #define write_to_stderr(a,b)	Perl_write_to_stderr(aTHX_ a,b)
 #define yyerror(a)		Perl_yyerror(aTHX_ a)
+#define yyerror_at(a,b)		Perl_yyerror_at(aTHX_ a,b)
 #endif
 #if defined(PERL_CORE) || defined(PERL_EXT)
 #define yylex()			Perl_yylex(aTHX)
@@ -3340,10 +3326,8 @@
 #define ck_rfun(a)		Perl_ck_rfun(aTHX_ a)
 #define ck_rvconst(a)		Perl_ck_rvconst(aTHX_ a)
 #define ck_sassign(a)		Perl_ck_sassign(aTHX_ a)
-#define ck_select(a)		Perl_ck_select(aTHX_ a)
 #define ck_shift(a)		Perl_ck_shift(aTHX_ a)
 #define ck_sort(a)		Perl_ck_sort(aTHX_ a)
-#define ck_spair(a)		Perl_ck_spair(aTHX_ a)
 #define ck_split(a)		Perl_ck_split(aTHX_ a)
 #define ck_subr(a)		Perl_ck_subr(aTHX_ a)
 #define ck_substr(a)		Perl_ck_substr(aTHX_ a)
@@ -3918,7 +3902,6 @@
 #endif
 #define gv_fetchpvn_flags(a,b,c,d)	Perl_gv_fetchpvn_flags(aTHX_ a,b,c,d)
 #define gv_fetchsv(a,b,c)	Perl_gv_fetchsv(aTHX_ a,b,c)
-#define stashpv_hvname_match(a,b)	Perl_stashpv_hvname_match(aTHX_ a,b)
 #ifdef PERL_DONT_CREATE_GVSV
 #define gv_SVadd(a)		Perl_gv_SVadd(aTHX_ a)
 #endif

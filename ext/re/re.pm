@@ -37,7 +37,7 @@ sub setcolor {
   my $colors = join "\t", map {$terminal->Tputs($_,1)}, @props;
 
   $colors =~ s/\0//g;
-  env::set_var('PERL_RE_COLORS' => $colors);
+  env::var('PERL_RE_COLORS' ) = $colors;
  };
  if ($^EVAL_ERROR) {
      die $^EVAL_ERROR;

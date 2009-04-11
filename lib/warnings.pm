@@ -12,7 +12,7 @@ our $VERSION = '1.06';
 # see also strict.pm.
 my $pkg = __PACKAGE__;
 unless ( __FILE__ =~ m/(^|[\/\\])\Q$pkg\E\.pmc?$/ ) {
-    my @($xxx, $f, $l) =@( caller);
+    my @(_, $f, $l) = @: caller;
     die("Incorrect use of pragma '$(__PACKAGE__)' at $f line $l.\n");
 }
 
@@ -299,7 +299,7 @@ our $NONE     = "\0\0\0\0\0\0\0\0\0\0\0\0";
 our $LAST_BIT = 94 ;
 our $BYTES    = 12 ;
 
-our $All = "" ; vec($All, %Offsets{?'all'}, 2 => 3);
+our $All = "" ; vec($All, %Offsets{'all'}, 2 => 3);
 
 sub bits
 {
@@ -323,8 +323,8 @@ sub bits
 	}
 	elsif ($catmask = %Bits{?$word}) {
 	    $mask ^|^= $catmask ;
-	    $mask ^|^= %DeadBits{?$word} if $fatal ;
-	    $mask ^&^= ^~^(%DeadBits{?$word}^|^$All) if $no_fatal ;
+	    $mask ^|^= %DeadBits{$word} if $fatal ;
+	    $mask ^&^= ^~^(%DeadBits{$word}^|^$All) if $no_fatal ;
 	}
 	else
           { die("Unknown warnings category '$word'")}
@@ -343,9 +343,9 @@ sub import
 
     my $mask = $^WARNING_BITS ;
 
-    if (vec($mask, %Offsets{?'all'}, 1)) {
-        $mask ^|^= %Bits{?'all'} ;
-        $mask ^|^= %DeadBits{?'all'} if vec($mask, %Offsets{?'all'}+1, 1);
+    if (vec($mask, %Offsets{'all'}, 1)) {
+        $mask ^|^= %Bits{'all'} ;
+        $mask ^|^= %DeadBits{'all'} if vec($mask, %Offsets{'all'}+1, 1);
     }
     
     push @_, 'all' unless @_;
@@ -361,8 +361,8 @@ sub import
 	}
 	elsif ($catmask = %Bits{?$word}) {
 	    $mask ^|^= $catmask ;
-	    $mask ^|^= %DeadBits{?$word} if $fatal ;
-	    $mask ^&^= ^~^(%DeadBits{?$word}^|^$All) if $no_fatal ;
+	    $mask ^|^= %DeadBits{$word} if $fatal ;
+	    $mask ^&^= ^~^(%DeadBits{$word}^|^$All) if $no_fatal ;
 	}
 	else
           { die("Unknown warnings category '$word'")}
@@ -378,9 +378,9 @@ sub unimport
     my $catmask ;
     my $mask = $^WARNING_BITS ;
 
-    if (vec($mask, %Offsets{?'all'}, 1)) {
-        $mask ^|^= %Bits{?'all'} ;
-        $mask ^|^= %DeadBits{?'all'} if vec($mask, %Offsets{?'all'}+1, 1);
+    if (vec($mask, %Offsets{'all'}, 1)) {
+        $mask ^|^= %Bits{'all'} ;
+        $mask ^|^= %DeadBits{'all'} if vec($mask, %Offsets{'all'}+1, 1);
     }
 
     push @_, 'all' unless @_;
@@ -390,7 +390,7 @@ sub unimport
 	    next; 
 	}
 	elsif ($catmask = %Bits{?$word}) {
-	    $mask ^&^= ^~^($catmask ^|^ %DeadBits{?$word} ^|^ $All);
+	    $mask ^&^= ^~^($catmask ^|^ %DeadBits{$word} ^|^ $All);
 	}
 	else
           { die("Unknown warnings category '$word'")}
@@ -399,7 +399,7 @@ sub unimport
     $^WARNING_BITS = $mask ;
 }
 
-my %builtin_type;  %builtin_type{[qw(SCALAR ARRAY HASH CODE REF GLOB LVALUE Regexp)]} = @();
+my %builtin_type; %builtin_type{[qw(SCALAR ARRAY HASH CODE REF GLOB LVALUE Regexp)]} = @();
 
 sub __chk
 {
@@ -450,11 +450,11 @@ sub enabled
     die("Usage: warnings::enabled([category])")
 	unless nelems(@_) == 1 || nelems(@_) == 0 ;
 
-    my @($callers_bitmask, $offset, $i) =  __chk(< @_) ;
+    my @($callers_bitmask, $offset, $i) = __chk(< @_) ;
 
     return 0 unless defined $callers_bitmask ;
     return vec($callers_bitmask, $offset, 1) ||
-           vec($callers_bitmask, %Offsets{?'all'}, 1) ;
+           vec($callers_bitmask, %Offsets{'all'}, 1) ;
 }
 
 
@@ -464,10 +464,10 @@ sub warn
 	unless nelems(@_) == 2 || nelems(@_) == 1 ;
 
     my $message = pop ;
-    my @($callers_bitmask, $offset, $i) =  __chk(<@_) ;
+    my @($callers_bitmask, $offset, $i) = __chk(<@_) ;
     die($message)
 	if vec($callers_bitmask, $offset+1, 1) ||
-	   vec($callers_bitmask, %Offsets{?'all'}+1, 1) ;
+	   vec($callers_bitmask, %Offsets{'all'}+1, 1) ;
     CORE::warn($message) ;
 }
 
@@ -482,11 +482,11 @@ sub warnif
     return
         unless defined $callers_bitmask &&
             	(vec($callers_bitmask, $offset, 1) ||
-            	vec($callers_bitmask, %Offsets{?'all'}, 1)) ;
+            	vec($callers_bitmask, %Offsets{'all'}, 1)) ;
 
     die($message)
 	if vec($callers_bitmask, $offset+1, 1) ||
-	   vec($callers_bitmask, %Offsets{?'all'}+1, 1) ;
+	   vec($callers_bitmask, %Offsets{'all'}+1, 1) ;
 
     CORE::warn($message) ;
 }

@@ -9,7 +9,7 @@ BEGIN {
 	exit 0;
     }
     # Makes testing easier.
-    env::set_var('PERLIO' => 'stdio') if defined env::var('PERLIO') && env::var('PERLIO') eq '';
+    env::var('PERLIO' ) = 'stdio' if defined env::var('PERLIO') && env::var('PERLIO') eq '';
     if (defined env::var('PERLIO') && env::var('PERLIO') !~ m/^(stdio|perlio|mmap)$/) {
 	# We are not prepared for anything else.
 	print $^STDOUT, "1..0 # PERLIO='$(env::var('PERLIO'))' unknown\n";

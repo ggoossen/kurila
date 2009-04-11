@@ -1414,8 +1414,6 @@ Perl_vwarn_at(pTHX_ SV* location, const char* pat, va_list *args)
 {
     SV* msv;
 
-    PERL_ARGS_ASSERT_VWARN;
-
     {
 	dSP;
 	msv = vmess(pat, args);
@@ -1505,7 +1503,7 @@ void
 Perl_warner_at(pTHX_ SV* location, U32  err, const char* pat,...)
 {
     va_list args;
-    PERL_ARGS_ASSERT_WARNER;
+    PERL_ARGS_ASSERT_WARNER_AT;
     va_start(args, pat);
     vwarner_at(location, err, pat, &args);
     va_end(args);
@@ -1515,6 +1513,7 @@ void
 Perl_vwarner(pTHX_ U32  err, const char* pat, va_list* args)
 {
     SV* location;
+    PERL_ARGS_ASSERT_VWARNER;
     if (PL_op) {
 	location = PL_op->op_location;
     }
@@ -1536,7 +1535,7 @@ void
 Perl_vwarner_at(pTHX_ SV* location, U32  err, const char* pat, va_list* args)
 {
     dVAR;
-    PERL_ARGS_ASSERT_VWARNER;
+    PERL_ARGS_ASSERT_VWARNER_AT;
     if (PL_warnhook == PERL_WARNHOOK_FATAL || ckDEAD(err)) {
 	SV* msv;
 	msv = vdie_croak_common(location, pat, args);

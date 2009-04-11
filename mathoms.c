@@ -31,7 +31,6 @@
 
 PERL_CALLCONV OP * Perl_ref(pTHX_ OP *o, I32 type);
 PERL_CALLCONV void Perl_sv_unref(pTHX_ SV *sv);
-PERL_CALLCONV void Perl_sv_taint(pTHX_ SV *sv);
 PERL_CALLCONV IV Perl_sv_2iv(pTHX_ register SV *sv);
 PERL_CALLCONV UV Perl_sv_2uv(pTHX_ register SV *sv);
 PERL_CALLCONV char * Perl_sv_2pv(pTHX_ register SV *sv, STRLEN *lp);

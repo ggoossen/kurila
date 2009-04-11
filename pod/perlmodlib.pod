@@ -537,10 +537,6 @@ Return name and handle of a temporary file safely
 
 By-name interface to Perl's built-in stat() functions
 
-=item FileHandle
-
-Supply object methods for filehandles
-
 =item FindBin
 
 Locate directory of original perl script
@@ -1040,10 +1036,6 @@ Perl termcap interface
 =item Term::ReadLine
 
 Perl interface to various C<readline> packages.
-
-=item Test
-
-Provides a simple framework for writing test scripts
 
 =item Test::Builder
 

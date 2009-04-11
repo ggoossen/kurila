@@ -65,17 +65,17 @@ foreach my $in ( @in) {
 
   if($in eq 'NIX') { $in = ''; @should = @( () ); }
 
-  env::temp_set_var('HTTP_ACCEPT_LANGUAGE', undef);
+  local env::var('HTTP_ACCEPT_LANGUAGE') = undef;
   
   foreach my $modus (@(
     sub {
       print $^STDOUT, "# Testing with arg...\n";
-      env::set_var('HTTP_ACCEPT_LANGUAGE' => 'PLORK');
+      env::var('HTTP_ACCEPT_LANGUAGE' ) = 'PLORK';
       return @(@_[0]);
     },
     sub {
       print $^STDOUT, "# Testing wath HTTP_ACCEPT_LANGUAGE...\n";
-      env::set_var('HTTP_ACCEPT_LANGUAGE' => @_[0]);
+      env::var('HTTP_ACCEPT_LANGUAGE' ) = @_[0];
      return();
     },)
   ) {

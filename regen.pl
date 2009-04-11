@@ -32,11 +32,11 @@ sub do_cksum {
     my $pl = shift;
     my %cksum;
     for my $f ( @{ %gen{$pl} }) {
-	local *FH;
-	if (open(FH, "<", $f)) {
+        my $fh;
+	if (open($fh, "<", $f)) {
 	    local $^INPUT_RECORD_SEPARATOR;
-	    %cksum{+$f} = unpack("\%32C*", ~< *FH);
-	    close FH;
+	    %cksum{+$f} = unpack("\%32C*", ~< $fh);
+	    close $fh;
 	} else {
 	    warn "$^PROGRAM_NAME: $f: $^OS_ERROR\n";
 	}
@@ -46,7 +46,7 @@ sub do_cksum {
 
 foreach my $pl (qw (keywords.pl opcode.pl embed.pl
 		    regcomp.pl warnings.pl autodoc.pl reentr.pl)) {
-  print "$^EXECUTABLE_NAME $pl\n";
+  print $^STDOUT, "$^EXECUTABLE_NAME $pl\n";
   my %cksum0;
   %cksum0 = %( < do_cksum($pl) ) unless $pl eq 'warnings.pl'; # the files were removed
   system "$^EXECUTABLE_NAME $pl";
@@ -59,5 +59,5 @@ foreach my $pl (qw (keywords.pl opcode.pl embed.pl
 	     !defined(%cksum1{?$f}) ||
 	     %cksum0{?$f} ne %cksum1{?$f};
   }
-  print "Changed: $(join ' ',@chg)\n" if (nelems @chg);
+  print $^STDOUT, "Changed: $(join ' ',@chg)\n" if (nelems @chg);
 }

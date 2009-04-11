@@ -29,8 +29,8 @@ BEGIN {
  
 ## Hardcode settings for TERMCAP and COLUMNS so we can try to get
 ## reproducible results between environments
-env::set_var('TERMCAP' => 'co=76:do=^J');
-env::set_var('COLUMNS' => 76);
+env::var('TERMCAP' ) = 'co=76:do=^J';
+env::var('COLUMNS' ) = 76;
 
 sub catfile(@< @args) { 'File::Spec'->catfile(< @args); }
 

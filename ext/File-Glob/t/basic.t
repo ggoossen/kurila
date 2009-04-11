@@ -7,8 +7,8 @@ BEGIN {use_ok('File::Glob', ':glob')};
 use Cwd ();
 
 # look for the contents of the current directory
-env::set_var('PATH' => "/bin");
-env::set_var($_, undef) for qw(BASH_ENV CDPATH ENV IFS);
+env::var('PATH' ) = "/bin";
+env::var($_) = undef for qw(BASH_ENV CDPATH ENV IFS);
 my @correct = @( () );
 if (opendir(my $d, $^OS_NAME eq "MacOS" ?? ":" !! ".")) {
    @correct = grep { !m/^\./ }, sort @( readdir($d));
@@ -99,7 +99,7 @@ print $^STDOUT, "# $(join ' ',@a)\n";
 is_deeply(\@a, \@(($^OS_NAME eq 'VMS'?? 'test.' !! 'TEST'), 'a', 'b'));
 
 # "~" should expand to $ENV{HOME}
-env::set_var('HOME' => "sweet home");
+env::var('HOME' ) = "sweet home";
 @a = bsd_glob('~', GLOB_TILDE ^|^ GLOB_NOMAGIC);
 SKIP: do {
     skip $^OS_NAME, 1 if $^OS_NAME eq "MacOS";

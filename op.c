@@ -289,6 +289,8 @@ Perl_newROOTOP(pTHX_ OP *main, SV* location)
     ROOTOP* o;
     optype type = OP_ROOT;
 
+    PERL_ARGS_ASSERT_NEWROOTOP;
+
     NewOp(1101, o, 1, ROOTOP);
     o->op_type = type;
     o->op_ppaddr = PL_ppaddr[type];
@@ -855,6 +857,7 @@ Perl_op_mod_assign(pTHX_ OP *operator, OP **operandp, I32 optype)
     OP* finish_assign;
     OP* operator_sibling;
     OP* o;
+    PERL_ARGS_ASSERT_OP_MOD_ASSIGN;
 
     if (optype == OP_ENTERSUB) {
 	*operandp = mod(*operandp, optype);
@@ -1275,6 +1278,7 @@ OP *
 Perl_op_assign(pTHX_ OP** po, I32 optype)
 {
     OP* o = *po;
+    PERL_ARGS_ASSERT_OP_ASSIGN;
 
     switch (o->op_type) {
     case OP_NULL:
@@ -3282,6 +3286,8 @@ Perl_newPRIVATEVAROP(pTHX_ const char* varname, SV* location) {
     const char *const has_colon = (const char*) memchr (varname, ':', varname_len);
     OP* o;
 
+    PERL_ARGS_ASSERT_NEWPRIVATEVAROP;
+
     /* if we're in a my(), we can't allow dynamics here.
        if it's a legal name, the OP is a PADANY.
     */
@@ -4373,8 +4379,8 @@ Perl_ck_exists(pTHX_ OP *o)
 	else if (kid->op_type == OP_AELEM)
 	    o->op_flags |= OPf_SPECIAL;
 	else if (kid->op_type != OP_HELEM)
-	    Perl_croak(aTHX_ "%s argument is not a HASH or ARRAY element",
-		        OP_DESC(o));
+	    yyerror(Perl_form(aTHX_ "%s argument is not a HASH or ARRAY element",
+		    OP_DESC(o)));
 	op_null(kid);
     }
     return o;
@@ -5276,9 +5282,11 @@ Perl_ck_shift(pTHX_ OP *o)
 
 	const PADOFFSET offset = pad_findmy("@_");
 	OP * const argop = newOP(OP_PADSV, 0, o->op_location);
-	if (offset == NOT_IN_PAD)
-	    Perl_croak_at(o->op_location, "shift requires lexical @_");
 	argop->op_targ = offset;
+	if (offset == NOT_IN_PAD) {
+	    yyerror_at(o->op_location, "shift requires lexical @_");
+	    argop->op_targ = 0;
+	}
 
 #ifdef PERL_MAD
 	o = newUNOP(type, 0, scalar(argop), argop->op_location);

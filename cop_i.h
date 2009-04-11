@@ -3,6 +3,7 @@
 PERL_CONTEXT * Perl_PushBlock(U8 t, SV** sp, U8 gimme) {
     PERL_CONTEXT *cx;
     HV *new_dynascope;
+    PERL_ARGS_ASSERT_PUSHBLOCK;
     CXINC;
     cx = &cxstack[cxstack_ix];
     cx->cx_type		= t;
@@ -50,6 +51,7 @@ PERL_CONTEXT * Perl_PopBlock() {
 }
 
 void Perl_cx_free_eval(PERL_CONTEXT* cx) {
+    PERL_ARGS_ASSERT_CX_FREE_EVAL;
     PL_in_eval = CxOLD_IN_EVAL(cx);
     ROOTOPcpNULL(PL_eval_root);
     PL_eval_root = cx->blk_eval.old_eval_root;

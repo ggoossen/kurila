@@ -313,11 +313,11 @@ sub _backtick_pwd {
     push dynascope->{onleave},
       sub {
           for (@localize) {
-              env::set_var($_, shift $oldvalue);
+              env::var($_) = shift $oldvalue;
           }
       };
     for (@localize) {
-        env::set_var($_, undef);
+        env::var($_) = undef;
     }
     
     my $cwd = `$pwd_cmd`;
@@ -436,20 +436,20 @@ sub chdir_init {
 	my@($dd,$di, ...) = @: stat('.');
 	my@($pd,$pi, ...) = @: stat(env::var('PWD'));
 	if (!defined $dd or !defined $pd or $di != $pi or $dd != $pd) {
-	    env::set_var('PWD' => cwd());
+	    env::var('PWD' ) = cwd();
 	}
     }
     else {
 	my $wd = cwd();
 	$wd = Win32::GetFullPathName($wd) if $^OS_NAME eq 'MSWin32';
-	env::set_var('PWD' => $wd);
+	env::var('PWD' ) = $wd;
     }
     # Strip an automounter prefix (where /tmp_mnt/foo/bar == /foo/bar)
     if ($^OS_NAME ne 'MSWin32' and env::var('PWD') =~ m|(/[^/]+(/[^/]+/[^/]+))(.*)|s) {
 	my@(?$pd,?$pi, ...) = @: stat($2);
 	my@(?$dd,?$di, ...) = @: stat($1);
 	if (defined $pd and defined $dd and $di == $pi and $dd == $pd) {
-	    env::set_var('PWD' => "$2$3");
+	    env::var('PWD' ) = "$2$3";
 	}
     }
     $chdir_init = 1;
@@ -468,20 +468,20 @@ sub chdir {
     return 0 unless CORE::chdir $newdir;
 
     if ($^OS_NAME eq 'VMS') {
-	return env::set_var('PWD' => env::var('DEFAULT'))
+	return env::var('PWD' ) = env::var('DEFAULT')
     }
     elsif ($^OS_NAME eq 'MacOS') {
-	return env::set_var('PWD' => cwd());
+	return env::var('PWD' ) = cwd();
     }
     elsif ($^OS_NAME eq 'MSWin32') {
-	env::set_var('PWD' => $newpwd);
+	env::var('PWD' ) = $newpwd;
 	return 1;
     }
 
     if (ref $newdir eq 'GLOB') { # in case a file/dir handle is passed in
-	env::set_var('PWD' => cwd());
+	env::var('PWD' ) = cwd();
     } elsif ($newdir =~ m#^/#s) {
-	env::set_var('PWD' => $newdir);
+	env::var('PWD' ) = $newdir;
     } else {
 	my @curdir = split(m#/#,env::var('PWD'));
 	@curdir = @('') unless (nelems @curdir);
@@ -490,7 +490,7 @@ sub chdir {
 	    pop(@curdir),next if $component eq '..';
 	    push(@curdir,$component);
 	}
-	env::set_var('PWD' => join('/', @curdir) || '/');
+	env::var('PWD' ) = join('/', @curdir) || '/';
     }
     1;
 }
@@ -573,7 +573,7 @@ sub _perl_abs_path
 
 my $Curdir;
 sub fast_abs_path {
-     env::temp_set_var('PWD' => env::var('PWD') || ''); # Guard against clobberage
+     local env::var('PWD' ) = env::var('PWD') || ''; # Guard against clobberage
     my $cwd = getcwd();
     require File::Spec;
     my $path = (nelems @_) ?? shift !! ($Curdir ||= File::Spec->curdir);
@@ -678,22 +678,22 @@ sub _os2_cwd {
     my $pwd = `cmd /c cd`;
     chomp($pwd);
     $pwd =~ s:\\:/:g ;
-    env::set_var('PWD' => $pwd);
+    env::var('PWD' ) = $pwd;
     return env::var('PWD');
 }
 
 sub _win32_cwd {
     if (defined &DynaLoader::boot_DynaLoader) {
-	env::set_var('PWD' => Win32::GetCwd());
+	env::var('PWD' ) = Win32::GetCwd();
     }
     else { # miniperl
         my $pwd = `cd`;
         chomp($pwd);
-	env::set_var('PWD' => $pwd);
+	env::var('PWD' ) = $pwd;
     }
     my $pwd = env::var('PWD');
     $pwd =~ s:\\:/:g ;
-    env::set_var(PWD => $pwd);
+    env::var("PWD") = $pwd;
     return env::var('PWD');
 }
 
@@ -704,27 +704,27 @@ sub _dos_cwd {
         my $pwd = `command /c cd`;
         chomp $pwd;
         $pwd =~ s:\\:/:g ;
-        env::set_var('PWD' => $pwd);
+        env::var('PWD' ) = $pwd;
     } else {
-        env::set_var('PWD' => Dos::GetCwd());
+        env::var('PWD' ) = Dos::GetCwd();
     }
     return env::var('PWD');
 }
 
 sub _qnx_cwd {
-    env::temp_set_var('PATH' => '');
-    env::temp_set_var('CDPATH' => '');
-    env::temp_set_var('ENV' => '');
+    local env::var('PATH' ) = '';
+    local env::var('CDPATH' ) = '';
+    local env::var('ENV' ) = '';
     my $pwd = `/usr/bin/fullpath -t`;
     chomp($pwd);
-    env::set_var('PWD' => $pwd);
+    env::var('PWD' ) = $pwd;
     return env::var('PWD');
 }
 
 sub _qnx_abs_path {
-    env::temp_set_var('PATH' => '');
-    env::temp_set_var('CDPATH' => '');
-    env::temp_set_var('ENV' => '');
+    local env::var('PATH' ) = '';
+    local env::var('CDPATH' ) = '';
+    local env::var('ENV' ) = '';
     my $path = (nelems @_) ?? shift !! '.';
 
     my $rpfh;
@@ -737,7 +737,7 @@ sub _qnx_abs_path {
 }
 
 sub _epoc_cwd {
-    env::set_var('PWD' => EPOC::getcwd());
+    env::var('PWD' ) = EPOC::getcwd();
     return env::var('PWD');
 }
 

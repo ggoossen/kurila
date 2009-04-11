@@ -43,7 +43,7 @@ if (open(my $tcout, ">", "tcout")) {
 }
 
 # termcap_path -- the names are hardcoded in Term::Cap
-env::set_var('TERMCAP' => '');
+env::var('TERMCAP' ) = '';
 my $path = join '', Term::Cap::termcap_path();
 is( $path, $files, 'termcap_path() should find default files' );
 
@@ -51,12 +51,12 @@ SKIP: do {
 	# this is ugly, but -f $0 really *ought* to work
 	skip("-f $file fails, some tests difficult now", 2) unless -f $file;
 
-	env::set_var('TERMCAP' => $file);
-        env::set_var('TERMPATH' => $file);
+	env::var('TERMCAP' ) = $file;
+        env::var('TERMPATH' ) = $file;
 	ok( grep($file, Term::Cap::termcap_path()), 
 		'termcap_path() should find file from $ENV{TERMCAP}' );
 
-	env::set_var('TERMCAP' => '/');
+	env::var('TERMCAP' ) = '/';
 	ok( grep($file, Term::Cap::termcap_path()), 
 		'termcap_path() should find file from $ENV{TERMPATH}' );
 };
@@ -95,7 +95,7 @@ local $^WARN_HOOK = sub {
 };
 
 # test the first few features by forcing Tgetent() to croak (line 156)
-env::set_var('TERM', undef);
+env::var('TERM') = undef;
 my $vals = \%();
 try { local $^WARNING = 1; $t = Term::Cap->Tgetent($vals) };
 like( $^EVAL_ERROR->{?description}, qr/TERM not set/, 'Tgetent() should croaks without TERM' );
@@ -119,9 +119,9 @@ SKIP: do {
         skip('Tgetent() bad termcap test, since using a fixed termcap',1)
               if $^OS_NAME eq 'VMS';
         # now see if lines 177 or 180 will fail
-        env::set_var('TERM' => 'foo');
-        env::set_var('TERMPATH' => '!');
-        env::set_var('TERMCAP' => '');
+        env::var('TERM' ) = 'foo';
+        env::var('TERMPATH' ) = '!';
+        env::var('TERMCAP' ) = '';
         try { $t = Term::Cap->Tgetent($vals) };
         isnt( $^EVAL_ERROR, '', 'Tgetent() should catch bad termcap file' );
 };
@@ -131,19 +131,19 @@ SKIP: do {
 
 	# it won't find the termtype in this fake file, so it should croak
 	$vals->{+TERM} = 'quux';
-	env::set_var('TERMPATH' => 'tcout');
+	env::var('TERMPATH' ) = 'tcout';
 	try { $t = Term::Cap->Tgetent($vals) };
 	like( $^EVAL_ERROR->{?description}, qr/failed termcap/, 'Tgetent() should die with bad termcap' );
 
 	# it shouldn't try to read one file more than 32(!) times
 	# see __END__ for a really awful termcap example
-	env::set_var('TERMPATH' => join(' ', @( ('tcout') x 33)));
+	env::var('TERMPATH' ) = join(' ', @( ('tcout') x 33));
 	$vals->{+TERM} = 'bar';
 	try { $t = Term::Cap->Tgetent($vals) };
 	like( $^EVAL_ERROR->{?description}, qr/failed termcap loop/, 'Tgetent() should catch deep recursion');
 
 	# now let it read a fake termcap file, and see if it sets properties 
-	env::set_var('TERMPATH' => 'tcout');
+	env::var('TERMPATH' ) = 'tcout';
 	$vals->{+TERM} = 'baz';
 	$t = Term::Cap->Tgetent($vals);
 	is( $t->{?_f1}, 1, 'Tgetent() should set a single field correctly' );
@@ -165,7 +165,7 @@ do {
 
    local $^OS_NAME = undef;
    push dynascope->{onleave}, env::make_restore();
-   env::set_var('TERM', undef);
+   env::var('TERM') = undef;
    $^OS_NAME = 'Win32';
 
    my $foo = Term::Cap->Tgetent();

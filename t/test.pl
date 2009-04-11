@@ -554,7 +554,7 @@ sub which_perl {
 	warn "which_perl: cannot find $Perl from $^EXECUTABLE_NAME" unless -f $Perl;
 
 	# For subcommands to use.
-	env::set_var('PERLEXE' => $Perl);
+	env::var('PERLEXE' ) = $Perl;
     }
     return $Perl;
 }

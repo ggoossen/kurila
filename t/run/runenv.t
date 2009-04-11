@@ -23,9 +23,9 @@ my $STDERR = './results-1';
 my $PERL = env::var('PERL') || './perl';
 my $FAILURE_CODE = 119;
 
-env::set_var('PERLLIB', undef);
-env::set_var('PERL5LIB', undef);
-env::set_var('PERL5OPT', undef);
+env::var('PERLLIB') = undef;
+env::var('PERL5LIB') = undef;
+env::var('PERL5OPT') = undef;
 
 # Run perl with specified environment and arguments returns a list.
 # First element is true if Perl's stdout and stderr match the
@@ -38,9 +38,9 @@ sub runperl {
 
   $stdout = '' unless defined $stdout;
   $stderr = '' unless defined $stderr;
-  env::temp_set_var('PERLLIB', undef);
-  env::temp_set_var('PERL5LIB', undef);
-  env::temp_set_var('PERL5OPT', undef);
+  local env::var('PERLLIB') = undef;
+  local env::var('PERL5LIB') = undef;
+  local env::var('PERL5OPT') = undef;
   my $pid = fork;
   return  @(0, "Couldn't fork: $^OS_ERROR") unless defined $pid;   # failure
   if ($pid) {                   # parent
@@ -64,10 +64,10 @@ sub runperl {
       my $old = %+: map { %: $_ => env::var($_) }, keys %$env;
       push dynascope->{onleave}, sub {
           for (keys $old) {
-              env::set_var($_, $old{$_});
+              env::var($_) = $old{$_};
           }
       };
-      env::set_var($_ => $env->{$_}) for keys %$env;
+      env::var($_ ) = $env->{$_} for keys %$env;
       open $^STDOUT, ">", $STDOUT or exit $FAILURE_CODE;
       open $^STDERR, ">", $STDERR or it_didnt_work();
       do { exec $PERL, < @$args };
