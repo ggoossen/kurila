@@ -1423,6 +1423,21 @@ sub local_undef {
     }
 }
 
+sub env_sub {
+    my $xml = shift;
+    for my $op (find_ops($xml, "entersub")) {
+        my $op_method = $op->child(-1) && $op->child(-1)->child(-1);
+        my $op_gv = $op_method && $op_method->child(-1);
+        next unless $op_gv and get_madprop($op_gv, 'value');
+        next unless get_madprop($op_gv, 'value') =~ m/^env::((?:temp_)?)set_var$/;
+        my $is_temp = $1;
+        set_madprop($op_gv, 'value' => ($is_temp ? 'local ' : '') . 'env::var');
+        set_madprop($op, 'round_close', '');
+        my $arg = $op->child(-1)->child(2);
+        set_madprop($arg, comma => ') =');
+    }
+}
+
 my $from; # floating point number with starting version of kurila.
 GetOptions("from=s" => \$from);
 $from =~ m/(\w+)[-]([\d.]+)$/ or die "invalid from: '$from'";
@@ -1539,8 +1554,9 @@ if ($from->{branch} ne "kurila" or $from->{v} < qv '1.17') {
 #must_haveargs($twig);
 
 #make_prototype($twig);
-mg_stdin($twig);
-local_undef($twig);
+#mg_stdin($twig);
+#local_undef($twig);
+env_sub($twig);
 
 #add_call_parens($twig);
 

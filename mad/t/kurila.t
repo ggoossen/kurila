@@ -37,8 +37,9 @@ sub p5convert {
     is($output, $expected) or $TODO or die "failed test";
 }
 
-t_local();
+t_env_sub();
 die "END";
+t_local();
 t_stdin();
 t_prototype();
 t_must_haveargs();
@@ -1720,5 +1721,17 @@ local $^INPUT_RECORD_SEPARATOR = 3;
 local $^INPUT_RECORD_SEPARATOR = undef;
 local $^INPUT_RECORD_SEPARATOR = 3;
 2;
+END
+}
+
+sub t_env_sub {
+    p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
+env::set_var('key', 'value');
+----
+env::var('key') = 'value';
+====
+env::temp_set_var('key', 'value');
+----
+local env::var('key') = 'value';
 END
 }
