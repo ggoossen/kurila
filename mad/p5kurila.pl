@@ -1438,6 +1438,61 @@ sub env_sub {
     }
 }
 
+sub indent {
+    my $xml = shift;
+
+    my %done;
+    my $indent_level = -1;
+    my $cont = 0;
+
+    my $opsub;
+    $opsub = sub {
+        my $op = shift;
+
+        my $new_level;
+        if ($op->tag =~ m/^op_(leave|leavesub)$/) {
+            $new_level = 1;
+        }
+
+        if ($op->tag eq 'op_nextstate') {
+            $cont = 0;
+        }
+        my $is_binop = (get_madprop($op, "null_type") || '') eq "operator";
+
+        if ($is_binop) {
+            $done{$op->child(1)}++;
+            $opsub->($op->child(1));
+        }
+        my $madprop = $op->child(0);
+        if ($madprop and $madprop->tag eq 'madprops') {
+            for my $madv ($madprop->children) {
+                for my $wsname (qw[wsbefore wsafter]) {
+                    my $ws = $madv->att($wsname);
+                    if ($ws and $ws =~ m/&#xA;/) {
+                        $ws =~ s/&#xA;\s*/ '&#xA;' . (' ' x (4*($indent_level+$cont)) ) /ge;
+                        $madv->set_att($wsname, $ws);
+                        $cont = 1;
+                    }
+                }
+            }
+        }
+        if ($new_level) {
+            ++$indent_level;
+        }
+
+        for my $child ($op->children) {
+            next if $done{$child};
+            $opsub->($child);
+        }
+
+        if ($new_level) {
+            --$indent_level;
+        }
+    };
+
+    $opsub->($xml->root);
+}
+
 my $from; # floating point number with starting version of kurila.
 GetOptions("from=s" => \$from);
 $from =~ m/(\w+)[-]([\d.]+)$/ or die "invalid from: '$from'";
@@ -1553,10 +1608,14 @@ if ($from->{branch} ne "kurila" or $from->{v} < qv '1.17') {
 
 #must_haveargs($twig);
 
-#make_prototype($twig);
-#mg_stdin($twig);
-#local_undef($twig);
-env_sub($twig);
+if ($from->{branch} ne "kurila" or $from->{v} < qv '1.18') {
+    make_prototype($twig);
+    mg_stdin($twig);
+    local_undef($twig);
+    env_sub($twig);
+}
+
+indent($twig);
 
 #add_call_parens($twig);
 

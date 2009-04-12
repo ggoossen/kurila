@@ -2416,21 +2416,6 @@ Perl_madlex(pTHX)
     case ';':
 	if (PL_faketokens)
 	    break;
-	if (PL_bufptr > PL_oldbufptr && PL_bufptr[-1] == optype) {
-	    s = PL_bufptr;
-	    while (s < PL_bufend && (*s == ' ' || *s == '\t'))
-		s++;
-	    if (*s == '\n' || *s == '#') {
-		while (s < PL_bufend && *s != '\n')
-		    s++;
-		if (s < PL_bufend)
-		    s++;
-		PL_thiswhite = newSVpvn(PL_bufptr, s - PL_bufptr);
-		addmad(newMADsv('#', PL_thiswhite), &PL_thismad, 0);
-		PL_thiswhite = 0;
-		PL_bufptr = s;
-	    }
-	}
 	break;
 
     /* pval */

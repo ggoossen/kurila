@@ -34,11 +34,14 @@ sub p5convert {
                                   switches => "-I../lib",
                                   dumpcommand => "$ENV{madpath}/perl",
                                  );
+    $output =~ s/\s+$//;
+    $expected =~ s/\s+$//;
     is($output, $expected) or $TODO or die "failed test";
 }
 
-t_env_sub();
+t_indent();
 die "END";
+t_env_sub();
 t_local();
 t_stdin();
 t_prototype();
@@ -1733,5 +1736,37 @@ env::var('key') = 'value';
 env::temp_set_var('key', 'value');
 ----
 local env::var('key') = 'value';
+END
+}
+
+sub t_indent {
+    p5convert( split(m/^\-{4}.*\n/m, $_, 2)) for split(m/^={4}\n/m, <<'END');
+1;
+"aa"
++
+"bb";
+"cc"
++
+"dd";
+1;
+----
+1;
+"aa"
+    +
+    "bb";
+"cc"
+    +
+    "dd";
+1;
+====
+1;
+$a
+and $b;
+1;
+----
+1;
+$a
+    and $b;
+1;
 END
 }
