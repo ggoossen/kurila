@@ -191,7 +191,7 @@ static const char* const lex_state_names[] = {
 #   define REPORT(retval) (retval)
 #endif
 
-#define SETCURLOCATION(x) { pl_yylval.i_tkval.location = S_curlocation(PL_bufptr); x }
+#define SETCURLOCATION(x) { x }
 
 #define TOKEN(retval) SETCURLOCATION( return ( PL_bufptr = s, REPORT(retval)); )
 #define OPERATOR(retval) SETCURLOCATION( return (PL_expect = XTERM, PL_bufptr = s, REPORT(retval)); )
@@ -2342,6 +2342,9 @@ Perl_madlex(pTHX)
 	}
 	else if (PL_thisopen) {
 	    curmad('<', newSVpv("quote", 0), NULL);
+	    while (start < PL_bufend && isSPACE(*start)) {
+		start++;
+	    }
 	    CURMAD('q', PL_thisopen, S_curlocation(start));
 	    if (PL_thistoken)
 		sv_free(PL_thistoken);
@@ -2785,6 +2788,7 @@ Perl_yylex(pTHX)
 	PL_thistoken = 0;
     }
     PL_realtokenstart = s - SvPVX_mutable(PL_linestr);	/* assume but undo on ws */
+    pl_yylval.i_tkval.location = S_curlocation(PL_bufptr);
 #endif
     switch (*s) {
     default:
@@ -5656,7 +5660,6 @@ Perl_yylex(pTHX)
 static int
 S_pending_ident(pTHX_ const char* begin_s)
 {
-    pl_yylval.i_tkval.location = S_curlocation(begin_s);
     return PRIVATEVAR;
 }
 

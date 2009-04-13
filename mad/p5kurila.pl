@@ -1486,6 +1486,8 @@ sub indent {
     $opsub = sub {
         my $op = shift;
 
+        $done{$op}++;
+
         my $new_indent_level;
         my $restore_cont;
         my $old_cont;
@@ -1502,6 +1504,34 @@ sub indent {
         my $is_modif = $null_type eq "modif";
         my $is_subdef = (get_madprop($op, 'null_type_first')||'') eq "sub";
 
+        my %done_mad;
+
+        my $wsreplace = sub {
+                my $madv = shift;
+
+                return if $done_mad{$madv};
+                $done_mad{$madv} = 1;
+                for my $wsname (qw[wsbefore wsafter]) {
+                    my $ws = $madv->att($wsname);
+                    if ($ws and $ws =~ m/&#xA;/) {
+                        my $ws_indent = $indent_level + $cont;
+                        if ($madv->tag eq "mad_label") {
+                            $ws_indent -= 2;
+                        }
+                        $ws =~ s/&#xA;(\s|&#x9;)*/ '&#xA;' . (' ' x $ws_indent) /ge;
+                        $ws =~ s/&#xA;(\s|&#x9;)+&#xA;/&#xA;&#xA;/g for 1..2;
+                        $madv->set_att($wsname, $ws);
+                        if (not ($op->tag =~ m/^op_(scope|leavescope|leave)$/
+                                   or $madv->tag =~ m/^mad_(peg|curly_open|curly_close)$/
+                                     or $is_subdef
+                                       or get_madprop($op, "while")
+                                   ) ) {
+                            $cont ||= 4;
+                        }
+                    }
+                }
+        };
+
         if ($op->tag =~ m/^op_(nextstate|enterloop)$/
               or $null_type eq "use"
                 or $is_subdef) {
@@ -1509,33 +1539,48 @@ sub indent {
         }
 
         if ($op->tag eq "op_sassign") {
-            $done{$op->child(-1)}++;
             $opsub->($op->child(-1));
         }
-        elsif ( ($is_binop and $op->tag ne "op_range")
+        elsif ( ($is_binop and $op->tag !~ m/^op_(range|srefgen)$/)
                or $op->tag =~ m/^op_(helem|aelem)$/) {
-            if ($op->tag eq "op_null") {
-                $done{$op->child(-1)->child(-2)}++;
-                $opsub->($op->child(-1)->child(-2));
+            my $child_off = $op->child(0)->tag eq "madprops";
+            if ($op->children_count == 1+$child_off) {
+                if ($op->child(-1)->child(-2)) {
+                    $opsub->($op->child(-1)->child(-2));
+                }
             }
             else {
-                $done{$op->child(1)}++;
-                $opsub->($op->child(1));
+                $opsub->($op->child(0+$child_off));
             }
         }
         if ($op->tag eq "op_listfirst") {
-            $done{$op->child(2)}++;
             $opsub->($op->child(2));
         }
 
         if ($null_type eq "if") {
-            $done{$op->child(-1)->child(0)}++;
+            my ($madif) = $op->findnodes("madprops/mad_if");
+            $wsreplace->($madif);
             $opsub->($op->child(-1)->child(0));
+            $cont = 0;
+        }
+
+        if ($null_type eq "?") {
+            $opsub->($op->child(1));
+        }
+
+        if ((get_madprop($op, 'round_open') || '') =~ m/[(]$/ and $null_type eq "(" ) {
+            my ($madx) = $op->findnodes("madprops/mad_round_open");
+            $wsreplace->($madx);
+            my ($linenr, $charoffset) = first_token($op->child(1));
+            if ($linenr) {
+                $old_cont = $cont;
+                $restore_cont = 1;
+                $cont = $charoffset - $indent_level - 1;
+            }
         }
 
         if ($is_entersub) {
             if ($op->child(-1) and $op->child(-1)->child(-1)) {
-                $done{$op->child(-1)->child(-1)}++;
                 $opsub->($op->child(-1)->child(-1));
                 if ($op->child(-1)->child(1)) {
                     my ($linenr, $charoffset) = first_token($op->child(-1)->child(1));
@@ -1549,27 +1594,23 @@ sub indent {
         }
 
         if ($is_modif) {
-            $done{$op->child(-1)->child(-1)}++;
             $opsub->($op->child(-1)->child(-1));
         }
 
         my $madprop = $op->child(0);
         if ($madprop and $madprop->tag eq 'madprops') {
             for my $madv (sort { $a->tag cmp $b->tag } $madprop->children) {
-                for my $wsname (qw[wsbefore wsafter]) {
-                    my $ws = $madv->att($wsname);
-                    if ($ws and $ws =~ m/&#xA;/) {
-                        $ws =~ s/&#xA;(\s|&#x9;)*/ '&#xA;' . (' ' x ($indent_level+$cont)) /ge;
-                        $ws =~ s/&#xA;(\s|&#x9;)+&#xA;/&#xA;&#xA;/g;
-                        $madv->set_att($wsname, $ws);
-                        if (not ($op->tag =~ m/^op_(scope|leavescope|leave)$/
-                                   or $madv->tag =~ m/^mad_(peg|curly_open|curly_close)$/
-                                     or $is_subdef
-                                       or get_madprop($op, "while")
-                                         or $null_type eq "if") ) {
-                            $cont ||= 4;
-                        }
-                    }
+                $wsreplace->($madv);
+            }
+        }
+
+        if ( $op->tag eq "op_anonarray") {
+            if ($op->child(2)) {
+                my ($linenr, $charoffset) = first_token($op->child(2));
+                if ($linenr) {
+                    $old_cont = $cont;
+                    $restore_cont = 1;
+                    $cont = $charoffset - $indent_level - 1;
                 }
             }
         }

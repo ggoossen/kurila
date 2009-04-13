@@ -1960,11 +1960,77 @@ sub show_bits
 }
 ====
 warn "xx";
- my $has_dirfd = ($a
+my $has_dirfd = ($a
   || $b);
 ----
 warn "xx";
 my $has_dirfd = ($a
-    || $b);
+                 || $b);
+====
+do {
+ SKIP: do {
+ 2;
+};
+};
+----
+do {
+  SKIP: do {
+        2;
+    };
+};
+====
+do {
+ SKIP:
+ do {
+ 2;
+};
+};
+----
+do {
+  SKIP:
+    do {
+        2;
+    };
+};
+====
+warn "yy";
+if ($a
+|| $b)
+{
+pass();
+}
+----
+warn "yy";
+if ($a
+    || $b)
+{
+    pass();
+}
+====
+@('aa',
+'noot');
+----
+@('aa',
+  'noot');
+====
+( "aap"
+ . "mies" );
+----
+( "aap"
+  . "mies" );
+====
+warn "xx";
+ my @($a) = "aap";
+----
+warn "xx";
+my @($a) = "aap";
+====
+warn "yy";
+@: 'aa',
+ 'noot';
+----
+warn "yy";
+@: 'aa',
+   'noot';
 END
 }
