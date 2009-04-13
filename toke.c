@@ -101,10 +101,10 @@ static I32 utf16rev_textfilter(pTHX_ int idx, SV *sv, int maxlen);
 #endif
 
 #ifdef PERL_MAD
-#  define CURMAD(slot,sv) if (PL_madskills) { curmad(slot,sv); sv = 0; }
+#  define CURMAD(slot,sv,location) if (PL_madskills) { curmad(slot,sv,location); sv = 0; }
 #  define NEXTVAL_NEXTTOKE PL_nexttoke[PL_curforce].next_val
 #else
-#  define CURMAD(slot,sv)
+#  define CURMAD(slot,sv,location)
 #  define NEXTVAL_NEXTTOKE PL_nextval[PL_nexttoke]
 #endif
 
@@ -1142,15 +1142,17 @@ S_start_force(pTHX_ int where)
     PL_curforce = where;
     if (PL_nextwhite) {
 	if (PL_madskills)
-	    curmad('^', newSVpvs(""));
-	CURMAD('_', PL_nextwhite);
+	    curmad('^', newSVpvs(""), NULL);
+	CURMAD('_', PL_nextwhite, NULL);
     }
 }
 
 STATIC void
-S_curmad(pTHX_ char slot, SV *sv)
+S_curmad(pTHX_ char slot, SV *sv, SV* location)
 {
     MADPROP **where;
+    IV linenr;
+    IV charoffset;
 
     if (!sv)
 	return;
@@ -1162,6 +1164,9 @@ S_curmad(pTHX_ char slot, SV *sv)
     if (PL_faketokens)
 	sv_setpvn(sv, "", 0);
 
+    linenr = location ? SvIV(*av_fetch(svTav(location), 1, FALSE)) : 0;
+    charoffset = location ? SvIV(*av_fetch(svTav(location), 2, FALSE)) : 0;
+
     /* keep a slot open for the head of the list? */
     if (slot != '_' && *where && (*where)->mad_key == '^') {
 	(*where)->mad_key = slot;
@@ -1169,7 +1174,7 @@ S_curmad(pTHX_ char slot, SV *sv)
 	(*where)->mad_val = (void*)sv;
     }
     else
-	addmad(newMADsv(slot, sv), where, 0);
+	addmad(newMADsv(slot, sv, linenr, charoffset), where, 0);
 }
 #else
 #  define start_force(where)    NOOP
@@ -1265,7 +1270,7 @@ S_force_word(pTHX_ register char *start, int token, int check_keyword, int allow
 	    return start;
 	start_force(PL_curforce);
 	if (PL_madskills)
-	    curmad('X', newSVpvn(start,s-start));
+	    curmad('X', newSVpvn(start,s-start), NULL);
 	if (token == METHOD) {
 	    s = SKIPSPACE1(s);
 	    if (*s == '(')
@@ -1275,7 +1280,7 @@ S_force_word(pTHX_ register char *start, int token, int check_keyword, int allow
 	    }
 	}
 	if (PL_madskills)
-	    curmad('g', newSVpvs( "forced" ));
+	    curmad('g', newSVpvs( "forced" ), NULL);
 	NEXTVAL_NEXTTOKE.opval
 	    = (OP*)newSVOP(OP_CONST,0,
 			   newSVpvn(PL_tokenbuf, len), S_curlocation(PL_bufptr));
@@ -1362,7 +1367,7 @@ S_force_version(pTHX_ char *s)
 	PL_nextwhite = 0;
 	s = SvPVX_mutable(PL_linestr) + startoff;
     } else {
-	curmad('X', newSVpvn(d,s-d));
+	curmad('X', newSVpvn(d,s-d), NULL);
     }
 #endif
     force_next(THING);
@@ -2284,6 +2289,7 @@ Perl_madlex(pTHX)
 {
     int optype;
     char *s = PL_bufptr;
+    char *start = PL_bufptr;
 
     /* make sure PL_thiswhite is initialized */
     PL_thiswhite = 0;
@@ -2312,12 +2318,12 @@ Perl_madlex(pTHX)
 	    }
 	}
 	if (PL_thismad)	/* install head */
-	    CURMAD('X', PL_thistoken);
+	    CURMAD('X', PL_thistoken, NULL);
     }
 
     /* last whitespace of a sublex? */
     if (optype == ')' && PL_endwhite) {
-	CURMAD('X', PL_endwhite);
+	CURMAD('X', PL_endwhite, NULL);
     }
 
     if (!PL_thismad) {
@@ -2335,30 +2341,30 @@ Perl_madlex(pTHX)
 	    PL_thiswhite = 0;
 	}
 	else if (PL_thisopen) {
-	    curmad('<', newSVpv("quote", 0));
-	    CURMAD('q', PL_thisopen);
+	    curmad('<', newSVpv("quote", 0), NULL);
+	    CURMAD('q', PL_thisopen, S_curlocation(start));
 	    if (PL_thistoken)
 		sv_free(PL_thistoken);
 	    PL_thistoken = 0;
 	}
 	else {
 	    /* Store actual token text as madprop X */
-	    CURMAD('X', PL_thistoken);
+	    CURMAD('X', PL_thistoken, NULL);
 	}
 
 	if (PL_thiswhite) {
 	    /* add preceding whitespace as madprop _ */
-	    CURMAD('_', PL_thiswhite);
+	    CURMAD('_', PL_thiswhite, NULL);
 	}
 
 	if (PL_thisstuff) {
 	    /* add quoted material as madprop = */
-	    CURMAD('=', PL_thisstuff);
+	    CURMAD('=', PL_thisstuff, NULL);
 	}
 
 	if (PL_thisclose) {
 	    /* add terminating quote as madprop Q */
-	    CURMAD('Q', PL_thisclose);
+	    CURMAD('Q', PL_thisclose, NULL);
 	}
     }
 
@@ -2382,7 +2388,7 @@ Perl_madlex(pTHX)
     case 0:
 	optype = PEG;
 	if (PL_endwhite) {
-	    addmad(newMADsv('G', PL_endwhite), &PL_thismad, 0);
+	    addmad(newMADsv('G', PL_endwhite, 0, 0), &PL_thismad, 0);
 	    PL_endwhite = 0;
 	}
 	break;
@@ -2400,7 +2406,7 @@ Perl_madlex(pTHX)
 		s++;
 	    if (*s == '}') {
 		PL_thiswhite = newSVpvn(PL_bufptr, ++s - PL_bufptr);
-		addmad(newMADsv('#', PL_thiswhite), &PL_thismad, 0);
+		addmad(newMADsv('#', PL_thiswhite, 0, 0), &PL_thismad, 0);
 		PL_thiswhite = 0;
 		PL_bufptr = s - 1;
 		break;	/* don't bother looking for trailing comment */
@@ -2648,7 +2654,7 @@ Perl_yylex(pTHX)
 		    /* replace the space with the character we want to escape
 		     */
 		    SvPVX_mutable(tmpsv)[1] = *s;
-		    curmad('_', tmpsv);
+		    curmad('_', tmpsv, NULL);
 		}
 		PL_bufptr = s + 1;
 	    }
@@ -2737,7 +2743,7 @@ Perl_yylex(pTHX)
 	if (s != PL_bufptr) {
 	    start_force(PL_curforce);
 	    if (PL_madskills) {
-		curmad('X', newSVpvn(PL_bufptr,s-PL_bufptr));
+		curmad('X', newSVpvn(PL_bufptr,s-PL_bufptr), NULL);
 	    }
 	    NEXTVAL_NEXTTOKE = pl_yylval;
 	    PL_expect = XTERM;
@@ -3614,7 +3620,7 @@ Perl_yylex(pTHX)
 	    if (attrs) {
 		start_force(PL_curforce);
 		NEXTVAL_NEXTTOKE.opval = attrs;
-		CURMAD('_', PL_nextwhite);
+		CURMAD('_', PL_nextwhite, NULL);
 		force_next(THING);
 	    }
 #ifdef PERL_MAD
@@ -3766,8 +3772,8 @@ Perl_yylex(pTHX)
 	}
 
 	start_force(-1);
-	curmad('X', newSVpvs("}"));
-	CURMAD('_', PL_thiswhite);
+	curmad('X', newSVpvs("}"), NULL);
+	CURMAD('_', PL_thiswhite, NULL);
 	force_next('}');
 #ifdef PERL_MAD
 	PL_thistoken = newSVpvs("");
@@ -4454,9 +4460,9 @@ Perl_yylex(pTHX)
 			if (*d == ')' && (sv = cv_const_sv(cv))) {
 #ifdef PERL_MAD
 			    if (PL_madskills) {
-				curmad('X', PL_thistoken);
-				curmad('_', PL_thiswhite);
-				curmad('h', newSVpvn(s, d-s+1));
+				curmad('X', PL_thistoken, NULL);
+				curmad('_', PL_thiswhite, NULL);
+				curmad('h', newSVpvn(s, d-s+1), NULL);
 			    }
 #endif
 			    s = d + 1;
@@ -4475,7 +4481,7 @@ Perl_yylex(pTHX)
 #ifdef PERL_MAD
 		    if (PL_madskills) {
 			PL_nextwhite = nextPL_nextwhite;
-			curmad('X', PL_thistoken);
+			curmad('X', PL_thistoken, NULL);
 			PL_thistoken = newSVpvs("");
 		    }
 #endif
@@ -4530,7 +4536,7 @@ Perl_yylex(pTHX)
 #ifdef PERL_MAD
 		    if (PL_madskills) {
 			PL_nextwhite = nextPL_nextwhite;
-			curmad('X', PL_thistoken);
+			curmad('X', PL_thistoken, NULL);
 			PL_thistoken = newSVpvs("");
 		    }
 #endif
@@ -5462,8 +5468,8 @@ Perl_yylex(pTHX)
 #ifdef PERL_MAD
 
 		    start_force(0);
-		    CURMAD('X', nametoke);
-		    CURMAD('_', tmpwhite);
+		    CURMAD('X', nametoke, NULL);
+		    CURMAD('_', tmpwhite, NULL);
 		    (void) force_word(PL_oldbufptr + tboffset, WORD,
 				      FALSE, TRUE, TRUE);
 
@@ -5496,8 +5502,8 @@ Perl_yylex(pTHX)
 		start_force(0);
 		if (tmpwhite) {
 		    if (PL_madskills)
-			curmad('^', newSVpvs(""));
-		    CURMAD('_', tmpwhite);
+			curmad('^', newSVpvs(""), NULL);
+		    CURMAD('_', tmpwhite, NULL);
 		}
 		force_next(0);
 
@@ -9196,7 +9202,7 @@ S_scan_pat(pTHX_ char *start, I32 type)
 #ifdef PERL_MAD
     if (PL_madskills && modstart != s) {
 	SV* tmptoken = newSVpvn(modstart, s - modstart);
-	append_madprops(newMADPROP('m', MAD_SV, tmptoken, 0), (OP*)pm, 0);
+	append_madprops(newMADPROP('m', MAD_SV, tmptoken, 0, 0, 0), (OP*)pm, 0);
     }
 #endif
     /* issue a warning if /c is specified,but /g is not */
@@ -9237,9 +9243,9 @@ S_scan_subst(pTHX_ char *start)
 	s--;
 #ifdef PERL_MAD
     if (PL_madskills) {
-	CURMAD('q', PL_thisopen);
-	CURMAD('_', PL_thiswhite);
-	CURMAD('Q', PL_thisclose);
+	CURMAD('q', PL_thisopen, S_curlocation(start));
+	CURMAD('_', PL_thiswhite, NULL);
+	CURMAD('Q', PL_thisclose, NULL);
 	PL_realtokenstart = s - SvPVX_mutable(PL_linestr);
     }
 #endif
@@ -9259,9 +9265,9 @@ S_scan_subst(pTHX_ char *start)
 
 #ifdef PERL_MAD
     if (PL_madskills) {
-	CURMAD('z', PL_thisopen);
-	CURMAD('R', PL_thisstuff);
-	CURMAD('Z', PL_thisclose);
+	CURMAD('z', PL_thisopen, NULL);
+	CURMAD('R', PL_thisstuff, NULL);
+	CURMAD('Z', PL_thisclose, NULL);
     }
     modstart = s;
 #endif
@@ -9279,7 +9285,7 @@ S_scan_subst(pTHX_ char *start)
 #ifdef PERL_MAD
     if (PL_madskills) {
 	if (modstart != s)
-	    curmad('m', newSVpvn(modstart, s - modstart));
+	    curmad('m', newSVpvn(modstart, s - modstart), NULL);
 	append_madprops(PL_thismad, (OP*)pm, 0);
 	PL_thismad = 0;
     }

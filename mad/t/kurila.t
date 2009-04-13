@@ -1762,11 +1762,123 @@ sub t_indent {
 1;
 $a
 and $b;
-1;
 ----
 1;
 $a
     and $b;
-1;
+====
+do {
+3;
+};
+----
+do {
+    3;
+};
+====
+foobar("aap",
+ "noot");
+----
+foobar("aap",
+       "noot");
+====
+foobar('aap',
+  qr/help/,
+ "noot");
+----
+foobar('aap',
+       qr/help/,
+       "noot");
+====
+BEGIN {
+ require "./test.pl";
+}
+----
+BEGIN {
+    require "./test.pl";
+}
+====
+sub foox { }
+foox(sub { @_ },
+ 'arg');
+----
+sub foox { }
+foox(sub { @_ },
+     'arg');
+====
+do {
+  foo(1,2);
+
+  "noot";
+};
+----
+do {
+    foo(1,2);
+
+    "noot";
+};
+====
+BEGIN { require "./test.pl"; }
+do {
+  1;
+}
+----
+BEGIN { require "./test.pl"; }
+do {
+    1;
+}
+====
+use constant foo => 33;
+foo
+----
+use constant foo => 33;
+foo
+====
+baz();
+----
+baz();
+====
+warn "help";
+
+sub foo($x) {
+  warn $x;
+}
+----
+warn "help";
+
+sub foo($x) {
+    warn $x;
+}
+====
+warn "x";
+if ($a) {
+ $a;
+} else {
+ $a+1;
+}
+----
+warn "x";
+if ($a) {
+    $a;
+} else {
+    $a+1;
+}
+====
+warn "y";
+ my $vms_no_ieee = 1 unless defined(config_value('useieee'));
+----
+warn "y";
+my $vms_no_ieee = 1 unless defined(config_value('useieee'));
+====
+warn "z";
+while($a) {
+  "aap";
+  "noot";
+}
+----
+warn "z";
+while($a) {
+    "aap";
+    "noot";
+}
 END
 }

@@ -187,6 +187,14 @@ sub rename_madprop {
     del_madprop($op, $oldkey);
 }
 
+sub madprops {
+    my ($op) = @_;
+    assert($op);
+    my (@madsv) = $op->findnodes(qq|madprops/*|);
+    my (@keys) = map { $_->tag =~ m/^mad_(.*)/; $1 } @madsv;
+    return @keys;
+}
+
 sub make_glob_sub {
     my $twig = shift;
     for my $op_glob ($twig->findnodes(q|//op_null[@was="glob"]|)) {
@@ -1438,46 +1446,105 @@ sub env_sub {
     }
 }
 
+sub first_token {
+    my ($op) = @_;
+    my ($linenr, $charoffset);
+
+    for my $mk (madprops($op)) {
+        my $this_linenr = get_madprop($op, $mk, "linenr");
+        my $this_charoffset = get_madprop($op, $mk, "charoffset");
+        next if not $this_linenr;
+        if ( (not $linenr)
+               or ($this_linenr < $linenr)
+               or ($this_linenr == $linenr and $this_charoffset < $charoffset) ) {
+            $linenr = $this_linenr;
+            $charoffset = $this_charoffset;
+        }
+    }
+
+    for my $child ($op->children) {
+        my ($this_linenr, $this_charoffset) = first_token($child);
+        next if not $this_linenr;
+        if ( (not $linenr)
+               or ($this_linenr < $linenr)
+               or ($this_linenr == $linenr and $this_charoffset < $charoffset) ) {
+            $linenr = $this_linenr;
+            $charoffset = $this_charoffset;
+        }
+    }
+    return $linenr, $charoffset;
+}
+
 sub indent {
     my $xml = shift;
 
     my %done;
-    my $indent_level = -1;
+    my $indent_level = 0;
     my $cont = 0;
 
     my $opsub;
     $opsub = sub {
         my $op = shift;
 
-        my $new_level;
-        if ($op->tag =~ m/^op_(leave|leavesub)$/) {
-            $new_level = 1;
+        my $new_indent_level;
+        my $old_cont;
+        if (get_madprop($op, 'curly_open')) {
+            $new_indent_level = $indent_level + 4 + $cont;
+            $old_cont = $cont;
+            $cont = 0;
         }
 
-        if ($op->tag eq 'op_nextstate') {
+        if ($op->tag =~ m/^op_(nextstate|enterloop)$/) {
             $cont = 0;
         }
         my $is_binop = (get_madprop($op, "null_type") || '') eq "operator";
+        my $is_entersub = ($op->tag eq "op_entersub");
+        my $is_modif = (get_madprop($op, 'null_type')||'') eq "modif";
 
         if ($is_binop) {
             $done{$op->child(1)}++;
             $opsub->($op->child(1));
         }
+
+        if ($is_entersub) {
+            if ($op->child(-1)->child(-1)) {
+                $done{$op->child(-1)->child(-1)}++;
+                $opsub->($op->child(-1)->child(-1));
+                if ($op->child(-1)->child(1)) {
+                    my ($linenr, $charoffset) = first_token($op->child(-1)->child(1));
+                    $cont = $charoffset - $indent_level - 1 if $linenr;
+                }
+            }
+        }
+
+        if ($is_modif) {
+            $done{$op->child(-1)->child(-1)}++;
+            $opsub->($op->child(-1)->child(-1));
+        }
+
         my $madprop = $op->child(0);
         if ($madprop and $madprop->tag eq 'madprops') {
             for my $madv ($madprop->children) {
                 for my $wsname (qw[wsbefore wsafter]) {
                     my $ws = $madv->att($wsname);
                     if ($ws and $ws =~ m/&#xA;/) {
-                        $ws =~ s/&#xA;\s*/ '&#xA;' . (' ' x (4*($indent_level+$cont)) ) /ge;
+                        $ws =~ s/&#xA;\s*/ '&#xA;' . (' ' x ($indent_level+$cont)) /ge;
+                        $ws =~ s/&#xA;\s+&#xA;/&#xA;&#xA;/g;
                         $madv->set_att($wsname, $ws);
-                        $cont = 1;
+                        if (not ($op->tag =~ m/^op_(scope|leavescope|leave)$/
+                                   or $madv->tag eq "mad_defintion"
+                                     or (get_madprop($op, 'null_type')||'') eq "if") ) {
+                            $cont ||= 4;
+                        }
                     }
                 }
             }
         }
-        if ($new_level) {
-            ++$indent_level;
+
+        my $old_indent_level;
+        if ($new_indent_level) {
+            $old_indent_level = $indent_level;
+            $indent_level = $new_indent_level;
         }
 
         for my $child ($op->children) {
@@ -1485,8 +1552,9 @@ sub indent {
             $opsub->($child);
         }
 
-        if ($new_level) {
-            --$indent_level;
+        if ($new_indent_level) {
+            $indent_level = $old_indent_level;
+            $cont = $old_cont;
         }
     };
 

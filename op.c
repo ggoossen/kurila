@@ -1771,12 +1771,17 @@ Perl_token_free(pTHX_ MADTOKEN* tk)
 }
 
 void
-Perl_token_getmad(pTHX_ MADTOKEN* tk, OP* o, char slot)
+Perl_token_getmad(pTHX_ MADTOKEN* tk, OP* o, char slot, SV* location)
 {
     MADPROP* mp;
     MADPROP* tm;
+    IV linenr;
+    IV charoffset;
 
     PERL_ARGS_ASSERT_TOKEN_GETMAD;
+
+    linenr = location ? SvIV(*(av_fetch(svTav(location), 1, FALSE))) : 0;
+    charoffset = location ? SvIV(*(av_fetch(svTav(location), 2, FALSE))) : 0;
 
     if (tk->tk_type != 12345) {
 	Perl_warner(aTHX_ packWARN(WARN_MISC),
@@ -1786,6 +1791,9 @@ Perl_token_getmad(pTHX_ MADTOKEN* tk, OP* o, char slot)
     tm = tk->tk_mad;
     if (!tm)
 	return;
+
+    tm->mad_linenr = linenr;
+    tm->mad_charoffset = charoffset;
 
     /* faked up qw list? */
     if (slot == '(' &&
@@ -1802,7 +1810,7 @@ Perl_token_getmad(pTHX_ MADTOKEN* tk, OP* o, char slot)
 		    (o->op_type == OP_CONST ||
 		     o->op_type == OP_GV) )
 		{
-		    token_getmad(tk,(OP*)mp->mad_val,slot);
+		    token_getmad(tk, (OP*)mp->mad_val,slot, location);
 		    return;
 		}
 		if (!mp->mad_next)
@@ -1848,10 +1856,10 @@ Perl_op_getmad_weak(pTHX_ OP* from, OP* o, char slot)
 		    break;
 		mp = mp->mad_next;
 	    }
-	    mp->mad_next = newMADPROP(slot,MAD_OP,from,0);
+	    mp->mad_next = newMADPROP(slot,MAD_OP,from,0,0,0);
 	}
 	else {
-	    o->op_madprop = newMADPROP(slot,MAD_OP,from,0);
+	    o->op_madprop = newMADPROP(slot,MAD_OP,from,0,0,0);
 	}
     }
 }
@@ -1878,10 +1886,10 @@ Perl_op_getmad(pTHX_ OP* from, OP* o, char slot)
 		    break;
 		mp = mp->mad_next;
 	    }
-	    mp->mad_next = newMADPROP(slot,MAD_OP,from,1);
+	    mp->mad_next = newMADPROP(slot,MAD_OP,from,1,0,0);
 	}
 	else {
-	    o->op_madprop = newMADPROP(slot,MAD_OP,from,1);
+	    o->op_madprop = newMADPROP(slot,MAD_OP,from,1,0,0);
 	}
     }
     else {
@@ -1921,7 +1929,7 @@ void
 Perl_append_madprops_pv(pTHX_ const char* v, OP* o, char slot)
 {
     PERL_ARGS_ASSERT_APPEND_MADPROPS_PV;
-    append_madprops(newMADsv(slot, newSVpv(v, 0)), o, slot);
+    append_madprops(newMADsv(slot, newSVpv(v, 0), 0, 0), o, slot);
 }
 
 void
@@ -1946,15 +1954,15 @@ Perl_addmad(pTHX_ MADPROP* tm, MADPROP** root, char slot)
 }
 
 MADPROP *
-Perl_newMADsv(pTHX_ char key, SV* sv)
+Perl_newMADsv(pTHX_ char key, SV* sv, IV linenr, IV charoffset)
 {
     PERL_ARGS_ASSERT_NEWMADSV;
 
-    return newMADPROP(key, MAD_SV, sv, 0);
+    return newMADPROP(key, MAD_SV, sv, 0, linenr, charoffset);
 }
 
 MADPROP *
-Perl_newMADPROP(pTHX_ char key, char type, const void* val, I32 vlen)
+Perl_newMADPROP(pTHX_ char key, char type, const void* val, I32 vlen, IV linenr, IV charoffset)
 {
     MADPROP *mp;
     Newxz(mp, 1, MADPROP);
@@ -1963,6 +1971,8 @@ Perl_newMADPROP(pTHX_ char key, char type, const void* val, I32 vlen)
     mp->mad_vlen = vlen;
     mp->mad_type = type;
     mp->mad_val = val;
+    mp->mad_linenr = linenr;
+    mp->mad_charoffset = charoffset;
 /*    PerlIO_printf(PerlIO_stderr(), "NEW  mp = %0x\n", mp);  */
     return mp;
 }
@@ -4598,7 +4608,7 @@ Perl_ck_fun(pTHX_ OP *o)
 
 		scalar(kid);
 #ifdef PERL_MAD
-		addmad(newMADsv('c', newSVpvn("$", 1)), &kid->op_madprop, 0);
+		addmad(newMADsv('c', newSVpvn("$", 1), 0, 0), &kid->op_madprop, 0);
 #endif
 		break;
 	    case OA_LIST:
@@ -4612,7 +4622,7 @@ Perl_ck_fun(pTHX_ OP *o)
 	    case OA_AVREF:
 		*tokid = kid = mod(kid, type);
 #ifdef PERL_MAD
-		addmad(newMADsv('c', newSVpvn("@", 1)), &kid->op_madprop, 0);
+		addmad(newMADsv('c', newSVpvn("@", 1), 0, 0), &kid->op_madprop, 0);
 #endif
 		break;
 	    case OA_HVREF:
@@ -4621,7 +4631,7 @@ Perl_ck_fun(pTHX_ OP *o)
 		    bad_type(numargs, "hash", PL_op_desc[type], kid);
 		*tokid = kid = mod(kid, type);
 #ifdef PERL_MAD
-		addmad(newMADsv('c', newSVpvn("%", 1)), &kid->op_madprop, 0);
+		addmad(newMADsv('c', newSVpvn("%", 1), 0, 0), &kid->op_madprop, 0);
 #endif
 		break;
 	    case OA_CVREF:
