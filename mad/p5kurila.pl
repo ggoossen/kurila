@@ -1487,32 +1487,40 @@ sub indent {
         my $op = shift;
 
         my $new_indent_level;
+        my $restore_cont;
         my $old_cont;
         if (get_madprop($op, 'curly_open')) {
             $new_indent_level = $indent_level + 4 + $cont;
+            $restore_cont = 1;
             $old_cont = $cont;
             $cont = 0;
         }
 
-        if ($op->tag =~ m/^op_(nextstate|enterloop)$/) {
+        if ($op->tag =~ m/^op_(nextstate|enterloop)$/
+              or (get_madprop($op, 'null_type_first')||'') eq "sub") {
             $cont = 0;
         }
         my $is_binop = (get_madprop($op, "null_type") || '') eq "operator";
         my $is_entersub = ($op->tag eq "op_entersub");
         my $is_modif = (get_madprop($op, 'null_type')||'') eq "modif";
 
-        if ($is_binop) {
+        if ( ($is_binop and $op->tag ne "op_range")
+               or $op->tag =~ m/^op_(helem|aelem)$/ ) {
             $done{$op->child(1)}++;
             $opsub->($op->child(1));
         }
 
         if ($is_entersub) {
-            if ($op->child(-1)->child(-1)) {
+            if ($op->child(-1) and $op->child(-1)->child(-1)) {
                 $done{$op->child(-1)->child(-1)}++;
                 $opsub->($op->child(-1)->child(-1));
                 if ($op->child(-1)->child(1)) {
                     my ($linenr, $charoffset) = first_token($op->child(-1)->child(1));
-                    $cont = $charoffset - $indent_level - 1 if $linenr;
+                    if ($linenr) {
+                        $old_cont = $cont;
+                        $restore_cont = 1;
+                        $cont = $charoffset - $indent_level - 1;
+                    }
                 }
             }
         }
@@ -1532,8 +1540,9 @@ sub indent {
                         $ws =~ s/&#xA;\s+&#xA;/&#xA;&#xA;/g;
                         $madv->set_att($wsname, $ws);
                         if (not ($op->tag =~ m/^op_(scope|leavescope|leave)$/
-                                   or $madv->tag eq "mad_defintion"
-                                     or (get_madprop($op, 'null_type')||'') eq "if") ) {
+                                   or $madv->tag =~ m/^mad_(defintion|peg)$/
+                                     or get_madprop($op, "while")
+                                       or (get_madprop($op, 'null_type')||'') eq "if") ) {
                             $cont ||= 4;
                         }
                     }
@@ -1554,6 +1563,8 @@ sub indent {
 
         if ($new_indent_level) {
             $indent_level = $old_indent_level;
+        }
+        if ($restore_cont) {
             $cont = $old_cont;
         }
     };
@@ -1668,7 +1679,7 @@ if ($from->{branch} ne "kurila" or $from->{v} < qv '1.17') {
     rename_magic_vars($twig);
 }
 
-if ($from->{branch} ne "kurila" or $from->{v} < qv '1.17') {
+if ($from->{branch} ne "kurila" or $from->{v} < qv '1.18') {
     rename_inc_vars($twig);
     print_filehandle($twig);
     block_arg($twig);
@@ -1676,7 +1687,7 @@ if ($from->{branch} ne "kurila" or $from->{v} < qv '1.17') {
 
 #must_haveargs($twig);
 
-if ($from->{branch} ne "kurila" or $from->{v} < qv '1.18') {
+if ($from->{branch} ne "kurila" or $from->{v} < qv '1.19') {
     make_prototype($twig);
     mg_stdin($twig);
     local_undef($twig);

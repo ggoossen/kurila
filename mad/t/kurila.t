@@ -1880,5 +1880,61 @@ while($a) {
     "aap";
     "noot";
 }
+====
+#!./perl
+BEGIN {
+        require './test.pl';
+}
+----
+#!./perl
+BEGIN {
+    require './test.pl';
+}
+====
+my $warn;
+$^WARN_HOOK = sub { print $^STDOUT, $warn; $warn .= @_[0]->{?description} . "\n" };
+  sub tiex { }
+----
+my $warn;
+$^WARN_HOOK = sub { print $^STDOUT, $warn; $warn .= @_[0]->{?description} . "\n" };
+sub tiex { }
+====
+sub tiex { }
+for my $tie (@("")) {
+  do { 1 };
+}
+----
+sub tiex { }
+for my $tie (@("")) {
+    do { 1 };
+}
+====
+my %x;
+%x{+0} = 100;
+----
+my %x;
+%x{+0} = 100;
+====
+if (foo("aap") eq "noot") {
+  $a;
+}
+----
+if (foo("aap") eq "noot") {
+    $a;
+}
+====
+#!./perl
+
+BEGIN {
+    require './test.pl';
+}
+
+sub expected {
+    my@($object, $package, $type) =  @_;
+    my $r = qr/^\Q$package\E=(\w+)\(0x([0-9a-f]+)\)$/;
+    if (dump::view($object) =~ $r) {
+	is($1, $type);
+    }
+}
 END
 }
