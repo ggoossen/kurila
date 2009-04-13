@@ -1496,18 +1496,41 @@ sub indent {
             $cont = 0;
         }
 
+        my $null_type = get_madprop($op, 'null_type') || '';
+        my $is_binop = $null_type eq "operator";
+        my $is_entersub = ($op->tag eq "op_entersub");
+        my $is_modif = $null_type eq "modif";
+        my $is_subdef = (get_madprop($op, 'null_type_first')||'') eq "sub";
+
         if ($op->tag =~ m/^op_(nextstate|enterloop)$/
-              or (get_madprop($op, 'null_type_first')||'') eq "sub") {
+              or $null_type eq "use"
+                or $is_subdef) {
             $cont = 0;
         }
-        my $is_binop = (get_madprop($op, "null_type") || '') eq "operator";
-        my $is_entersub = ($op->tag eq "op_entersub");
-        my $is_modif = (get_madprop($op, 'null_type')||'') eq "modif";
 
-        if ( ($is_binop and $op->tag ne "op_range")
-               or $op->tag =~ m/^op_(helem|aelem)$/ ) {
-            $done{$op->child(1)}++;
-            $opsub->($op->child(1));
+        if ($op->tag eq "op_sassign") {
+            $done{$op->child(-1)}++;
+            $opsub->($op->child(-1));
+        }
+        elsif ( ($is_binop and $op->tag ne "op_range")
+               or $op->tag =~ m/^op_(helem|aelem)$/) {
+            if ($op->tag eq "op_null") {
+                $done{$op->child(-1)->child(-2)}++;
+                $opsub->($op->child(-1)->child(-2));
+            }
+            else {
+                $done{$op->child(1)}++;
+                $opsub->($op->child(1));
+            }
+        }
+        if ($op->tag eq "op_listfirst") {
+            $done{$op->child(2)}++;
+            $opsub->($op->child(2));
+        }
+
+        if ($null_type eq "if") {
+            $done{$op->child(-1)->child(0)}++;
+            $opsub->($op->child(-1)->child(0));
         }
 
         if ($is_entersub) {
@@ -1532,17 +1555,18 @@ sub indent {
 
         my $madprop = $op->child(0);
         if ($madprop and $madprop->tag eq 'madprops') {
-            for my $madv ($madprop->children) {
+            for my $madv (sort { $a->tag cmp $b->tag } $madprop->children) {
                 for my $wsname (qw[wsbefore wsafter]) {
                     my $ws = $madv->att($wsname);
                     if ($ws and $ws =~ m/&#xA;/) {
-                        $ws =~ s/&#xA;\s*/ '&#xA;' . (' ' x ($indent_level+$cont)) /ge;
-                        $ws =~ s/&#xA;\s+&#xA;/&#xA;&#xA;/g;
+                        $ws =~ s/&#xA;(\s|&#x9;)*/ '&#xA;' . (' ' x ($indent_level+$cont)) /ge;
+                        $ws =~ s/&#xA;(\s|&#x9;)+&#xA;/&#xA;&#xA;/g;
                         $madv->set_att($wsname, $ws);
                         if (not ($op->tag =~ m/^op_(scope|leavescope|leave)$/
-                                   or $madv->tag =~ m/^mad_(defintion|peg)$/
-                                     or get_madprop($op, "while")
-                                       or (get_madprop($op, 'null_type')||'') eq "if") ) {
+                                   or $madv->tag =~ m/^mad_(peg|curly_open|curly_close)$/
+                                     or $is_subdef
+                                       or get_madprop($op, "while")
+                                         or $null_type eq "if") ) {
                             $cont ||= 4;
                         }
                     }

@@ -1923,18 +1923,48 @@ if (foo("aap") eq "noot") {
     $a;
 }
 ====
-#!./perl
-
-BEGIN {
-    require './test.pl';
+# tab
+	foo($1);
+----
+# tab
+foo($1);
+====
+do {
+ local $^WARN_HOOK = sub { push $a, @_[0]->message };
+ use warnings;
+};
+----
+do {
+    local $^WARN_HOOK = sub { push $a, @_[0]->message };
+    use warnings;
+};
+====
+do {
+ $^HINTS{+doot} = 1;
+};
+----
+do {
+    $^HINTS{+doot} = 1;
+};
+====
+sub show_bits
+ {
+  my $out = '';
+  return $out;
+ }
+----
+sub show_bits
+{
+    my $out = '';
+    return $out;
 }
-
-sub expected {
-    my@($object, $package, $type) =  @_;
-    my $r = qr/^\Q$package\E=(\w+)\(0x([0-9a-f]+)\)$/;
-    if (dump::view($object) =~ $r) {
-	is($1, $type);
-    }
-}
+====
+warn "xx";
+ my $has_dirfd = ($a
+  || $b);
+----
+warn "xx";
+my $has_dirfd = ($a
+    || $b);
 END
 }
