@@ -1488,12 +1488,16 @@ sub indent {
 
         $done{$op}++;
 
+        my $old_indent_level;
         my $new_indent_level;
-        my $restore_cont;
         my $old_cont;
-        if (get_madprop($op, 'curly_open')) {
+
+        my $new_block = defined get_madprop($op, 'curly_open');
+
+        if ($new_block) {
+            $old_indent_level = $indent_level;
             $new_indent_level = $indent_level + 4 + $cont;
-            $restore_cont = 1;
+            $indent_level = $indent_level + $cont;
             $old_cont = $cont;
             $cont = 0;
         }
@@ -1531,6 +1535,10 @@ sub indent {
                     }
                 }
         };
+
+        if ($new_block) {
+            $cont = 0;
+        }
 
         if ($op->tag =~ m/^op_(nextstate|enterloop)$/
               or $null_type eq "use"
@@ -1574,7 +1582,6 @@ sub indent {
             my ($linenr, $charoffset) = first_token($op->child(1));
             if ($linenr) {
                 $old_cont = $cont;
-                $restore_cont = 1;
                 $cont = $charoffset - $indent_level - 1;
             }
         }
@@ -1586,7 +1593,6 @@ sub indent {
                     my ($linenr, $charoffset) = first_token($op->child(-1)->child(1));
                     if ($linenr) {
                         $old_cont = $cont;
-                        $restore_cont = 1;
                         $cont = $charoffset - $indent_level - 1;
                     }
                 }
@@ -1596,10 +1602,15 @@ sub indent {
         if ($is_modif) {
             $opsub->($op->child(-1)->child(-1));
         }
+        if (get_madprop($op, "whilepost")) {
+            $opsub->($op->child(-1));
+        }
 
+        # replace items of op mad properties.
         my $madprop = $op->child(0);
         if ($madprop and $madprop->tag eq 'madprops') {
             for my $madv (sort { $a->tag cmp $b->tag } $madprop->children) {
+                next if $madv->tag eq "mad_peg";
                 $wsreplace->($madv);
             }
         }
@@ -1609,27 +1620,26 @@ sub indent {
                 my ($linenr, $charoffset) = first_token($op->child(2));
                 if ($linenr) {
                     $old_cont = $cont;
-                    $restore_cont = 1;
                     $cont = $charoffset - $indent_level - 1;
                 }
             }
         }
 
-        my $old_indent_level;
         if ($new_indent_level) {
-            $old_indent_level = $indent_level;
+            $old_indent_level //= $indent_level;
             $indent_level = $new_indent_level;
         }
 
+        # recurse to children.
         for my $child ($op->children) {
             next if $done{$child};
             $opsub->($child);
         }
 
-        if ($new_indent_level) {
+        if (defined $old_indent_level) {
             $indent_level = $old_indent_level;
         }
-        if ($restore_cont) {
+        if (defined $old_cont) {
             $cont = $old_cont;
         }
     };

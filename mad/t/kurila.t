@@ -2032,5 +2032,60 @@ warn "yy";
 warn "yy";
 @: 'aa',
    'noot';
+====
+warn "yy";
+foo( "mies",
+ sub {
+ "aap";
+ "zus";
+ }, 'noot');
+----
+warn "yy";
+foo( "mies",
+     sub {
+         "aap";
+         "zus";
+     }, 'noot');
+====
+warn "yy";
+ "aap"
+ for $a;
+----
+warn "yy";
+"aap"
+    for $a;
+====
+"aap";
+foo( "noot",
+  "mies",
+  {
+ "zus";
+ },
+);
+----
+"aap";
+foo( "noot",
+     "mies",
+     {
+         "zus";
+     },
+     );
+====
+"aap";
+push $a,
+  "noot";
+----
+"aap";
+push $a,
+    "noot";
+====
+do {
+  for (qw[a b c]) {
+   my @args;
+   my @argslist = map {
+   "noot";
+  }, @args;
+  }
+};
 END
 }
