@@ -18,9 +18,9 @@ Test::Simple - Basic utilities for writing tests.
 
 =head1 SYNOPSIS
 
-  use Test::Simple tests => 1;
+use Test::Simple tests => 1;
 
-  ok( $foo eq $bar, 'foo is bar' );
+ok( $foo eq $bar, 'foo is bar' );
 
 
 =head1 DESCRIPTION
@@ -41,7 +41,7 @@ plan to run.  This is in case something goes horribly wrong during the
 test and your test program aborts, or skips a test or whatever.  You
 do this like so:
 
-    use Test::Simple tests => 23;
+use Test::Simple tests => 23;
 
 You must have a plan.
 
@@ -50,8 +50,8 @@ You must have a plan.
 
 =item B<ok>
 
-  ok( $foo eq $bar, $name );
-  ok( $foo eq $bar );
+ok( $foo eq $bar, $name );
+ok( $foo eq $bar );
 
 ok() is given an expression (in this case C<$foo eq $bar>).  If it's
 true, the test passed.  If it's false, it didn't.  That's about it.
@@ -59,8 +59,8 @@ true, the test passed.  If it's false, it didn't.  That's about it.
 ok() prints out either "ok" or "not ok" along with a test number (it
 keeps track of that for you).
 
-  # This produces "ok 1 - Hell not yet frozen over" (or not ok)
-  ok( get_temperature($hell) > 0, 'Hell not yet frozen over' );
+# This produces "ok 1 - Hell not yet frozen over" (or not ok)
+ok( get_temperature($hell) > 0, 'Hell not yet frozen over' );
 
 If you provide a $name, that will be printed along with the "ok/not
 ok" to make it easier to find your test when if fails (just search for
@@ -69,7 +69,7 @@ what your test is for.  It's highly recommended you use test names.
 
 All tests are run in scalar context.  So this:
 
-    ok( @stuff, 'I have some stuff' );
+ok( @stuff, 'I have some stuff' );
 
 will do what you mean (fail if stuff is empty)
 
@@ -97,9 +97,9 @@ considered a failure and will exit with 255.
 
 So the exit codes are...
 
-    0                   all tests successful
-    255                 test died or all passed but wrong # of tests run
-    any other number    how many failed (including missing or extras)
+0                   all tests successful
+255                 test died or all passed but wrong # of tests run
+any other number    how many failed (including missing or extras)
 
 If you fail more than 254 tests, it will be reported as 254.
 
@@ -112,33 +112,33 @@ recommended you look at L<Test::More>.
 
 Here's an example of a simple .t file for the fictional Film module.
 
-    use Test::Simple tests => 5;
+use Test::Simple tests => 5;
 
-    use Film;  # What you're testing.
+use Film;  # What you're testing.
 
-    my $btaste = Film->new({ Title    => 'Bad Taste',
-                             Director => 'Peter Jackson',
-                             Rating   => 'R',
-                             NumExplodingSheep => 1
-                           });
-    ok( defined($btaste) && ref $btaste eq 'Film,     'new() works' );
+my $btaste = Film->new({ Title    => 'Bad Taste',
+Director => 'Peter Jackson',
+Rating   => 'R',
+NumExplodingSheep => 1
+});
+ok( defined($btaste) && ref $btaste eq 'Film,     'new() works' );
 
-    ok( $btaste->Title      eq 'Bad Taste',     'Title() get'    );
-    ok( $btaste->Director   eq 'Peter Jackson', 'Director() get' );
-    ok( $btaste->Rating     eq 'R',             'Rating() get'   );
-    ok( $btaste->NumExplodingSheep == 1,        'NumExplodingSheep() get' );
+ok( $btaste->Title      eq 'Bad Taste',     'Title() get'    );
+ok( $btaste->Director   eq 'Peter Jackson', 'Director() get' );
+ok( $btaste->Rating     eq 'R',             'Rating() get'   );
+ok( $btaste->NumExplodingSheep == 1,        'NumExplodingSheep() get' );
 
 It will produce output like this:
 
-    1..5
-    ok 1 - new() works
-    ok 2 - Title() get
-    ok 3 - Director() get
-    not ok 4 - Rating() get
-    #   Failed test 'Rating() get'
-    #   in t/film.t at line 14.
-    ok 5 - NumExplodingSheep() get
-    # Looks like you failed 1 tests of 5
+1..5
+ok 1 - new() works
+ok 2 - Title() get
+ok 3 - Director() get
+not ok 4 - Rating() get
+#   Failed test 'Rating() get'
+#   in t/film.t at line 14.
+ok 5 - NumExplodingSheep() get
+# Looks like you failed 1 tests of 5
 
 Indicating the Film::Rating() method is broken.
 
@@ -154,8 +154,8 @@ Because VMS's exit codes are much, much different than the rest of the
 universe, and perl does horrible mangling to them that gets in my way,
 it works like this on VMS.
 
-    0     SS$_NORMAL        all tests successful
-    4     SS$_ABORT         something went wrong
+0     SS$_NORMAL        all tests successful
+4     SS$_ABORT         something went wrong
 
 Unfortunately, I can't differentiate any further.
 

@@ -14,8 +14,8 @@ ExtUtils::MM - OS adjusted ExtUtils::MakeMaker subclass
 
 =head1 SYNOPSIS
 
-  require ExtUtils::MM;
-  my $mm = MM->new(...);
+require ExtUtils::MM;
+my $mm = MM->new(...);
 
 =head1 DESCRIPTION
 
@@ -44,7 +44,7 @@ sub _is_win95 {
     # miniperl might not have the Win32 functions available and we need
     # to run in miniperl.
     return defined &Win32::IsWin95 ?? Win32::IsWin95() 
-                                   !! ! defined env::var('SYSTEMROOT'); 
+        !! ! defined env::var('SYSTEMROOT'); 
 }
 
 my %Is = %( () );

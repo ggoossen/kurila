@@ -83,7 +83,7 @@ do {
     ok(near($x, 1));
     ok(near($y, 1));
     ok(near($z, 1));
-       
+
     @($r,$t,$f) =  cartesian_to_spherical(1,1,0);
 
     ok(near($r, sqrt(2)));
@@ -147,8 +147,8 @@ do {
 
     ok(near(great_circle_direction(0, 0, 0, pi/2), pi));
 
-# Retired test: Relies on atan2(0, 0), which is not portable.
-#	ok(near(great_circle_direction(0, 0, pi, pi), -pi()/2));
+    # Retired test: Relies on atan2(0, 0), which is not portable.
+    #	ok(near(great_circle_direction(0, 0, pi, pi), -pi()/2));
 
     my @London  = @(deg2rad(  -0.167), deg2rad(90 - 51.3));
     my @Tokyo   = @(deg2rad( 139.5),   deg2rad(90 - 35.7));
@@ -156,21 +156,21 @@ do {
     my @Paris   = @(deg2rad (  2.333), deg2rad(90 - 48.867));
 
     ok(near(rad2deg(great_circle_direction(< @London, < @Tokyo)),
-	    31.791945393073));
+            31.791945393073));
 
     ok(near(rad2deg(great_circle_direction(< @Tokyo, < @London)),
-	    336.069766430326));
+            336.069766430326));
 
     ok(near(rad2deg(great_circle_direction(< @Berlin, < @Paris)),
-	    246.800348034667));
-    
+            246.800348034667));
+
     ok(near(rad2deg(great_circle_direction(< @Paris, < @Berlin)),
-	    58.2079877553156));
+            58.2079877553156));
 
     use Math::Trig 'great_circle_bearing';
 
     ok(near(rad2deg(great_circle_bearing(< @Paris, < @Berlin)),
-	    58.2079877553156));
+            58.2079877553156));
 
     use Math::Trig 'great_circle_waypoint';
     use Math::Trig 'great_circle_midpoint';

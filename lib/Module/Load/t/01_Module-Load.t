@@ -50,10 +50,10 @@ do {
 ### Test importing functions ###
 do {   my $mod     = 'TestModule';
     my @funcs   = qw[func1 func2];
-    
+
     try { load $mod, < @funcs };
     is( $^EVAL_ERROR, '', qq[Loaded exporter module '$mod'] );
-    
+
     for my $func ( @funcs) {
         ok( $mod->can($func),           "$mod -> can( $func )" );
         ok( __PACKAGE__->can($func),    "we -> can ( $func )"  ); 

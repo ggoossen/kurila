@@ -56,25 +56,25 @@ my %OSTYPES = %( < qw(
 # We only use this once - don't waste a symbol table entry on it.
 # More importantly, don't make it an inheritable method.
 my $load = sub {
-  my $mod = shift;
-  eval "use $mod";
-  die $^EVAL_ERROR if $^EVAL_ERROR;
-  @ISA = @($mod);
-};
+        my $mod = shift;
+        eval "use $mod";
+        die $^EVAL_ERROR if $^EVAL_ERROR;
+        @ISA = @($mod);
+    };
 
 do {
-  my @package = split m/::/, __PACKAGE__;
-  
-  if (grep {-e File::Spec->catfile($_, < @package, 'Platform', $^OS_NAME) . '.pm'}, $^INCLUDE_PATH) {
-    $load->(__PACKAGE__ . "::Platform::$^OS_NAME");
-    
-  } elsif (exists %OSTYPES{$^OS_NAME} and
-	   grep {-e File::Spec->catfile($_, < @package, 'Platform', %OSTYPES{$^OS_NAME}) . '.pm'}, $^INCLUDE_PATH) {
-    $load->(__PACKAGE__ . "::Platform::%OSTYPES{?$^OS_NAME}");
-    
-  } else {
-    $load->(__PACKAGE__ . "::Base");
-  }
+    my @package = split m/::/, __PACKAGE__;
+
+    if (grep {-e File::Spec->catfile($_, < @package, 'Platform', $^OS_NAME) . '.pm'}, $^INCLUDE_PATH) {
+        $load->(__PACKAGE__ . "::Platform::$^OS_NAME");
+
+    } elsif (exists %OSTYPES{$^OS_NAME} and
+    grep {-e File::Spec->catfile($_, < @package, 'Platform', %OSTYPES{$^OS_NAME}) . '.pm'}, $^INCLUDE_PATH) {
+        $load->(__PACKAGE__ . "::Platform::%OSTYPES{?$^OS_NAME}");
+
+    } else {
+        $load->(__PACKAGE__ . "::Base");
+    }
 };
 
 sub os_type { %OSTYPES{?$^OS_NAME} }

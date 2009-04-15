@@ -29,17 +29,17 @@ I18N::LangTags - functions for dealing with RFC3066-style language tags
 
 =head1 SYNOPSIS
 
-  use I18N::LangTags();
+use I18N::LangTags();
 
 ...or specify whichever of those functions you want to import, like so:
 
-  use I18N::LangTags qw(implicate_supers similarity_language_tag);
+use I18N::LangTags qw(implicate_supers similarity_language_tag);
 
 All the exportable functions are listed below -- you're free to import
 only some, or none at all.  By default, none are imported.  If you
 say:
 
-    use I18N::LangTags qw(:ALL)
+use I18N::LangTags qw(:ALL)
 
 ...then all are exported.  (This saves you from having to use
 something less obvious like C<use I18N::LangTags qw(/./)>.)
@@ -69,42 +69,42 @@ of how to correctly use language tags.
 
 Returns true iff $lang1 is a formally valid language tag.
 
-   is_language_tag("fr")            is TRUE
-   is_language_tag("x-jicarilla")   is FALSE
-       (Subtags can be 8 chars long at most -- 'jicarilla' is 9)
+is_language_tag("fr")            is TRUE
+is_language_tag("x-jicarilla")   is FALSE
+(Subtags can be 8 chars long at most -- 'jicarilla' is 9)
 
-   is_language_tag("sgn-US")    is TRUE
-       (That's American Sign Language)
+is_language_tag("sgn-US")    is TRUE
+(That's American Sign Language)
 
-   is_language_tag("i-Klikitat")    is TRUE
-       (True without regard to the fact noone has actually
-        registered Klikitat -- it's a formally valid tag)
+is_language_tag("i-Klikitat")    is TRUE
+(True without regard to the fact noone has actually
+registered Klikitat -- it's a formally valid tag)
 
-   is_language_tag("fr-patois")     is TRUE
-       (Formally valid -- altho descriptively weak!)
+is_language_tag("fr-patois")     is TRUE
+(Formally valid -- altho descriptively weak!)
 
-   is_language_tag("Spanish")       is FALSE
-   is_language_tag("french-patois") is FALSE
-       (No good -- first subtag has to match
-        /^([xXiI]|[a-zA-Z]{2,3})$/ -- see RFC3066)
+is_language_tag("Spanish")       is FALSE
+is_language_tag("french-patois") is FALSE
+(No good -- first subtag has to match
+/^([xXiI]|[a-zA-Z]{2,3})$/ -- see RFC3066)
 
-   is_language_tag("x-borg-prot2532") is TRUE
-       (Yes, subtags can contain digits, as of RFC3066)
+is_language_tag("x-borg-prot2532") is TRUE
+(Yes, subtags can contain digits, as of RFC3066)
 
 =cut
 
 sub is_language_tag {
 
-  ## Changes in the language tagging standards may have to be reflected here.
+    ## Changes in the language tagging standards may have to be reflected here.
 
-  my $tag = lc(@_[0]);
+    my $tag = lc(@_[0]);
 
-  return 0 if $tag eq "i" or $tag eq "x";
-  # Bad degenerate cases that the following
-  #  regexp would erroneously let pass
+    return 0 if $tag eq "i" or $tag eq "x";
+    # Bad degenerate cases that the following
+    #  regexp would erroneously let pass
 
-  return $tag =~ 
-    m/^(?:  # First subtag
+    return $tag =~ 
+        m/^(?:  # First subtag
          [xi] | [a-z]{2,3}
       )
       (?:  # Subtags thereafter
@@ -122,12 +122,12 @@ Returns a list of whatever looks like formally valid language tags
 in $whatever.  Not very smart, so don't get too creative with
 what you want to feed it.
 
-  extract_language_tags("fr, fr-ca, i-mingo")
-    returns:   ('fr', 'fr-ca', 'i-mingo')
+extract_language_tags("fr, fr-ca, i-mingo")
+returns:   ('fr', 'fr-ca', 'i-mingo')
 
-  extract_language_tags("It's like this: I'm in fr -- French!")
-    returns:   ('It', 'in', 'fr')
-  (So don't just feed it any old thing.)
+extract_language_tags("It's like this: I'm in fr -- French!")
+returns:   ('It', 'in', 'fr')
+(So don't just feed it any old thing.)
 
 The output is untainted.  If you don't know what tainting is,
 don't worry about it.
@@ -136,16 +136,16 @@ don't worry about it.
 
 sub extract_language_tags {
 
-  ## Changes in the language tagging standards may have to be reflected here.
+    ## Changes in the language tagging standards may have to be reflected here.
 
-  my@($text) =
-    @_[0] =~ m/(.+)/  # to make for an untainted result
-    ?? $1 !! ''
-  ;
-  
-  return grep( {!m/^[ixIX]$/s }, @( # 'i' and 'x' aren't good tags
-    $text =~ 
-    m/
+    my@($text) =
+        @_[0] =~ m/(.+)/  # to make for an untainted result
+        ?? $1 !! ''
+    ;
+
+        return grep( {!m/^[ixIX]$/s }, @( # 'i' and 'x' aren't good tags
+        $text =~ 
+        m/
       \b
       (?:  # First subtag
          [iIxX] | [a-zA-Z]{2,3}
@@ -156,7 +156,7 @@ sub extract_language_tags {
       )*
       \b
     /xsg)
-  );
+        );
 }
 
 ###########################################################################
@@ -166,16 +166,16 @@ sub extract_language_tags {
 Returns true iff $lang1 and $lang2 are acceptable variant tags
 representing the same language-form.
 
-   same_language_tag('x-kadara', 'i-kadara')  is TRUE
-      (The x/i- alternation doesn't matter)
-   same_language_tag('X-KADARA', 'i-kadara')  is TRUE
-      (...and neither does case)
-   same_language_tag('en',       'en-US')     is FALSE
-      (all-English is not the SAME as US English)
-   same_language_tag('x-kadara', 'x-kadar')   is FALSE
-      (these are totally unrelated tags)
-   same_language_tag('no-bok',    'nb')       is TRUE
-      (no-bok is a legacy tag for nb (Norwegian Bokmal))
+same_language_tag('x-kadara', 'i-kadara')  is TRUE
+(The x/i- alternation doesn't matter)
+same_language_tag('X-KADARA', 'i-kadara')  is TRUE
+(...and neither does case)
+same_language_tag('en',       'en-US')     is FALSE
+(all-English is not the SAME as US English)
+same_language_tag('x-kadara', 'x-kadar')   is FALSE
+(these are totally unrelated tags)
+same_language_tag('no-bok',    'nb')       is TRUE
+(no-bok is a legacy tag for nb (Norwegian Bokmal))
 
 C<same_language_tag> works by just seeing whether
 C<encode_language_tag($lang1)> is the same as
@@ -187,13 +187,13 @@ reasons.)
 =cut
 
 sub same_language_tag {
-  my $el1 = &encode_language_tag(@_[0]);
-  return 0 unless defined $el1;
-   # this avoids the problem of
-   # encode_language_tag($lang1) eq and encode_language_tag($lang2)
-   # being true if $lang1 and $lang2 are both undef
+    my $el1 = &encode_language_tag(@_[0]);
+    return 0 unless defined $el1;
+    # this avoids the problem of
+    # encode_language_tag($lang1) eq and encode_language_tag($lang2)
+    # being true if $lang1 and $lang2 are both undef
 
-  return $el1 eq &encode_language_tag(@_[1]) ?? 1 !! 0;
+    return $el1 eq &encode_language_tag(@_[1]) ?? 1 !! 0;
 }
 
 ###########################################################################
@@ -205,52 +205,52 @@ tags $lang1 and $lang2 (the order of which does not matter), where
 similarity is the number of common elements on the left,
 without regard to case and to x/i- alternation.
 
-   similarity_language_tag('fr', 'fr-ca')           is 1
-      (one element in common)
-   similarity_language_tag('fr-ca', 'fr-FR')        is 1
-      (one element in common)
+similarity_language_tag('fr', 'fr-ca')           is 1
+(one element in common)
+similarity_language_tag('fr-ca', 'fr-FR')        is 1
+(one element in common)
 
-   similarity_language_tag('fr-CA-joual',
-                           'fr-CA-PEI')             is 2
-   similarity_language_tag('fr-CA-joual', 'fr-CA')  is 2
-      (two elements in common)
+similarity_language_tag('fr-CA-joual',
+'fr-CA-PEI')             is 2
+similarity_language_tag('fr-CA-joual', 'fr-CA')  is 2
+(two elements in common)
 
-   similarity_language_tag('x-kadara', 'i-kadara')  is 1
-      (x/i- doesn't matter)
+similarity_language_tag('x-kadara', 'i-kadara')  is 1
+(x/i- doesn't matter)
 
-   similarity_language_tag('en',       'x-kadar')   is 0
-   similarity_language_tag('x-kadara', 'x-kadar')   is 0
-      (unrelated tags -- no similarity)
+similarity_language_tag('en',       'x-kadar')   is 0
+similarity_language_tag('x-kadara', 'x-kadar')   is 0
+(unrelated tags -- no similarity)
 
-   similarity_language_tag('i-cree-syllabic',
-                           'i-cherokee-syllabic')   is 0
-      (no B<leftmost> elements in common!)
+similarity_language_tag('i-cree-syllabic',
+'i-cherokee-syllabic')   is 0
+(no B<leftmost> elements in common!)
 
 =cut
 
 sub similarity_language_tag {
-  my $lang1 = &encode_language_tag(@_[0]);
-  my $lang2 = &encode_language_tag(@_[1]);
-   # And encode_language_tag takes care of the whole
-   #  no-nyn==nn, i-hakka==zh-hakka, etc, things
-   
-  # NB: (i-sil-...)?  (i-sgn-...)?
+    my $lang1 = &encode_language_tag(@_[0]);
+    my $lang2 = &encode_language_tag(@_[1]);
+    # And encode_language_tag takes care of the whole
+    #  no-nyn==nn, i-hakka==zh-hakka, etc, things
 
-  return undef if !defined($lang1) and !defined($lang2);
-  return 0 if !defined($lang1) or !defined($lang2);
+    # NB: (i-sil-...)?  (i-sgn-...)?
 
-  my @l1_subtags = split('-', $lang1);
-  my @l2_subtags = split('-', $lang2);
-  my $similarity = 0;
+    return undef if !defined($lang1) and !defined($lang2);
+    return 0 if !defined($lang1) or !defined($lang2);
 
-  while((nelems @l1_subtags) and nelems @l2_subtags) {
-    if(shift(@l1_subtags) eq shift(@l2_subtags)) {
-      ++$similarity;
-    } else {
-      last;
-    } 
-  }
-  return $similarity;
+    my @l1_subtags = split('-', $lang1);
+    my @l2_subtags = split('-', $lang2);
+    my $similarity = 0;
+
+    while((nelems @l1_subtags) and nelems @l2_subtags) {
+        if(shift(@l1_subtags) eq shift(@l2_subtags)) {
+            ++$similarity;
+        } else {
+            last;
+        } 
+    }
+    return $similarity;
 }
 
 ###########################################################################
@@ -262,47 +262,47 @@ language tag $lang2.
 
 B<Get the order right!  It doesn't work the other way around!>
 
-   is_dialect_of('en-US', 'en')            is TRUE
-     (American English IS a dialect of all-English)
+is_dialect_of('en-US', 'en')            is TRUE
+(American English IS a dialect of all-English)
 
-   is_dialect_of('fr-CA-joual', 'fr-CA')   is TRUE
-   is_dialect_of('fr-CA-joual', 'fr')      is TRUE
-     (Joual is a dialect of (a dialect of) French)
+is_dialect_of('fr-CA-joual', 'fr-CA')   is TRUE
+is_dialect_of('fr-CA-joual', 'fr')      is TRUE
+(Joual is a dialect of (a dialect of) French)
 
-   is_dialect_of('en', 'en-US')            is FALSE
-     (all-English is a NOT dialect of American English)
+is_dialect_of('en', 'en-US')            is FALSE
+(all-English is a NOT dialect of American English)
 
-   is_dialect_of('fr', 'en-CA')            is FALSE
+is_dialect_of('fr', 'en-CA')            is FALSE
 
-   is_dialect_of('en',    'en'   )         is TRUE
-   is_dialect_of('en-US', 'en-US')         is TRUE
-     (B<Note:> these are degenerate cases)
+is_dialect_of('en',    'en'   )         is TRUE
+is_dialect_of('en-US', 'en-US')         is TRUE
+(B<Note:> these are degenerate cases)
 
-   is_dialect_of('i-mingo-tom', 'x-Mingo') is TRUE
-     (the x/i thing doesn't matter, nor does case)
+is_dialect_of('i-mingo-tom', 'x-Mingo') is TRUE
+(the x/i thing doesn't matter, nor does case)
 
-   is_dialect_of('nn', 'no')               is TRUE
-     (because 'nn' (New Norse) is aliased to 'no-nyn',
-      as a special legacy case, and 'no-nyn' is a
-      subform of 'no' (Norwegian))
+is_dialect_of('nn', 'no')               is TRUE
+(because 'nn' (New Norse) is aliased to 'no-nyn',
+as a special legacy case, and 'no-nyn' is a
+subform of 'no' (Norwegian))
 
 =cut
 
 sub is_dialect_of {
 
-  my $lang1 = &encode_language_tag(@_[0]);
-  my $lang2 = &encode_language_tag(@_[1]);
+    my $lang1 = &encode_language_tag(@_[0]);
+    my $lang2 = &encode_language_tag(@_[1]);
 
-  return undef if !defined($lang1) and !defined($lang2);
-  return 0 if !defined($lang1) or !defined($lang2);
+    return undef if !defined($lang1) and !defined($lang2);
+    return 0 if !defined($lang1) or !defined($lang2);
 
-  return 1 if $lang1 eq $lang2;
-  return 0 if length($lang1) +< length($lang2);
+    return 1 if $lang1 eq $lang2;
+    return 0 if length($lang1) +< length($lang2);
 
-  $lang1 .= '-';
-  $lang2 .= '-';
-  return
-    (substr($lang1, 0, length($lang2)) eq $lang2) ?? 1 !! 0;
+    $lang1 .= '-';
+    $lang2 .= '-';
+    return
+        (substr($lang1, 0, length($lang2)) eq $lang2) ?? 1 !! 0;
 }
 
 ###########################################################################
@@ -313,14 +313,14 @@ Returns a list of language tags that are superordinate tags to $lang1
 -- it gets this by removing subtags from the end of $lang1 until
 nothing (or just "i" or "x") is left.
 
-   super_languages("fr-CA-joual")  is  ("fr-CA", "fr")
+super_languages("fr-CA-joual")  is  ("fr-CA", "fr")
 
-   super_languages("en-AU")  is  ("en")
+super_languages("en-AU")  is  ("en")
 
-   super_languages("en")  is  empty-list, ()
+super_languages("en")  is  empty-list, ()
 
-   super_languages("i-cherokee")  is  empty-list, ()
-    ...not ("i"), which would be illegal as well as pointless.
+super_languages("i-cherokee")  is  empty-list, ()
+...not ("i"), which would be illegal as well as pointless.
 
 If $lang1 is not a valid language tag, returns empty-list in
 a list context, undef in a scalar context.
@@ -339,29 +339,29 @@ carefully.
 =cut 
 
 sub super_languages {
-  my $lang1 = @_[0];
-  return() unless defined($lang1) && &is_language_tag($lang1);
+    my $lang1 = @_[0];
+    return() unless defined($lang1) && &is_language_tag($lang1);
 
-  # a hack for those annoying new (2001) tags:
-  $lang1 =~ s/^nb\b/no-bok/i; # yes, backwards
-  $lang1 =~ s/^nn\b/no-nyn/i; # yes, backwards
-  $lang1 =~ s/^[ix](-hakka\b)/zh$1/i; # goes the right way
-   # i-hakka-bork-bjork-bjark => zh-hakka-bork-bjork-bjark
+    # a hack for those annoying new (2001) tags:
+    $lang1 =~ s/^nb\b/no-bok/i; # yes, backwards
+    $lang1 =~ s/^nn\b/no-nyn/i; # yes, backwards
+    $lang1 =~ s/^[ix](-hakka\b)/zh$1/i; # goes the right way
+    # i-hakka-bork-bjork-bjark => zh-hakka-bork-bjork-bjark
 
-  my @l1_subtags = split('-', $lang1);
+    my @l1_subtags = split('-', $lang1);
 
-  ## Changes in the language tagging standards may have to be reflected here.
+    ## Changes in the language tagging standards may have to be reflected here.
 
-  # NB: (i-sil-...)?
+    # NB: (i-sil-...)?
 
-  my @supers = @( () );
-  foreach my $bit ( @l1_subtags) {
-    push @supers, 
-      scalar(nelems @supers) ?? (@supers[-1] . '-' . $bit) !! $bit;
-  }
-  pop @supers if (nelems @supers);
-  shift @supers if (nelems @supers) && @supers[0] =~ m<^[iIxX]$>s;
-  return reverse @supers;
+    my @supers = @( () );
+    foreach my $bit ( @l1_subtags) {
+        push @supers, 
+            scalar(nelems @supers) ?? (@supers[-1] . '-' . $bit) !! $bit;
+    }
+    pop @supers if (nelems @supers);
+    shift @supers if (nelems @supers) && @supers[0] =~ m<^[iIxX]$>s;
+    return reverse @supers;
 }
 
 ###########################################################################
@@ -373,17 +373,17 @@ and maps it to a language tag.  If it's not mappable (as with,
 notably, "C" and "POSIX"), this returns empty-list in a list context,
 or undef in a scalar context.
 
-   locale2language_tag("en") is "en"
+locale2language_tag("en") is "en"
 
-   locale2language_tag("en_US") is "en-US"
+locale2language_tag("en_US") is "en-US"
 
-   locale2language_tag("en_US.ISO8859-1") is "en-US"
+locale2language_tag("en_US.ISO8859-1") is "en-US"
 
-   locale2language_tag("C") is undef or ()
+locale2language_tag("C") is undef or ()
 
-   locale2language_tag("POSIX") is undef or ()
+locale2language_tag("POSIX") is undef or ()
 
-   locale2language_tag("POSIX") is undef or ()
+locale2language_tag("POSIX") is undef or ()
 
 I'm not totally sure that locale names map satisfactorily to language
 tags.  Think REAL hard about how you use this.  YOU HAVE BEEN WARNED.
@@ -394,20 +394,20 @@ don't worry about it.
 =cut 
 
 sub locale2language_tag {
-  my $lang =
-    @_[0] =~ m/(.+)/  # to make for an untainted result
-    ?? $1 !! ''
-  ;
+    my $lang =
+        @_[0] =~ m/(.+)/  # to make for an untainted result
+        ?? $1 !! ''
+    ;
 
-  return $lang if &is_language_tag($lang); # like "en"
+        return $lang if &is_language_tag($lang); # like "en"
 
-  $lang =~ s<_><->g;  # "en_US" -> en-US
-  $lang =~ s<(?:[\.\@][-_a-zA-Z0-9]+)+$><>s;  # "en_US.ISO8859-1" -> en-US
-   # it_IT.utf8@euro => it-IT
+    $lang =~ s<_><->g;  # "en_US" -> en-US
+    $lang =~ s<(?:[\.\@][-_a-zA-Z0-9]+)+$><>s;  # "en_US.ISO8859-1" -> en-US
+    # it_IT.utf8@euro => it-IT
 
-  return $lang if &is_language_tag($lang);
+    return $lang if &is_language_tag($lang);
 
-  return;
+    return;
 }
 
 ###########################################################################
@@ -444,35 +444,35 @@ C<same_language_tag>, but consider this situation:
 You have a data file that expresses greetings in different languages.
 Its format is "[language tag]=[how to say 'Hello']", like:
 
-          en-US=Hiho
-          fr=Bonjour
-          i-mingo=Hau'
+en-US=Hiho
+fr=Bonjour
+i-mingo=Hau'
 
 And suppose you write a program that reads that file and then runs as
 a daemon, answering client requests that specify a language tag and
 then expect the string that says how to greet in that language.  So an
 interaction looks like:
 
-          greeting-client asks:    fr
-          greeting-server answers: Bonjour
+greeting-client asks:    fr
+greeting-server answers: Bonjour
 
 So far so good.  But suppose the way you're implementing this is:
 
-          my %greetings;
-          die unless open(IN, "<in.dat");
-          while(<IN>) {
-            chomp;
-            next unless /^([^=]+)=(.+)/s;
-            my($lang, $expr) = ($1, $2);
-            $greetings{$lang} = $expr;
-          }
-          close(IN);
+my %greetings;
+die unless open(IN, "<in.dat");
+while(<IN>) {
+chomp;
+next unless /^([^=]+)=(.+)/s;
+my($lang, $expr) = ($1, $2);
+$greetings{$lang} = $expr;
+}
+close(IN);
 
 at which point %greetings has the contents:
 
-          "en-US"   => "Hiho"
-          "fr"      => "Bonjour"
-          "i-mingo" => "Hau'"
+"en-US"   => "Hiho"
+"fr"      => "Bonjour"
+"i-mingo" => "Hau'"
 
 And suppose then that you answer client requests for language $wanted
 by just looking up $greetings{$wanted}.
@@ -487,75 +487,75 @@ lookup in %greetings fails.  That's the Wrong Thing.
 
 You could instead do lookups on $wanted with:
 
-          use I18N::LangTags qw(same_language_tag);
-          my $response = '';
-          foreach my $l2 (keys %greetings) {
-            if(same_language_tag($wanted, $l2)) {
-              $response = $greetings{$l2};
-              last;
-            }
-          }
+use I18N::LangTags qw(same_language_tag);
+my $response = '';
+foreach my $l2 (keys %greetings) {
+if(same_language_tag($wanted, $l2)) {
+$response = $greetings{$l2};
+last;
+}
+}
 
 But that's rather inefficient.  A better way to do it is to start your
 program with:
 
-          use I18N::LangTags qw(encode_language_tag);
-          my %greetings;
-          die unless open(IN, "<in.dat");
-          while(<IN>) {
-            chomp;
-            next unless /^([^=]+)=(.+)/s;
-            my($lang, $expr) = ($1, $2);
-            $greetings{
-                        encode_language_tag($lang)
-                      } = $expr;
-          }
-          close(IN);
+use I18N::LangTags qw(encode_language_tag);
+my %greetings;
+die unless open(IN, "<in.dat");
+while(<IN>) {
+chomp;
+next unless /^([^=]+)=(.+)/s;
+my($lang, $expr) = ($1, $2);
+$greetings{
+encode_language_tag($lang)
+} = $expr;
+}
+close(IN);
 
 and then just answer client requests for language $wanted by just
 looking up
 
-          $greetings{encode_language_tag($wanted)}
+$greetings{encode_language_tag($wanted)}
 
 And that does the Right Thing.
 
 =cut
 
 sub encode_language_tag {
-  # Only similarity_language_tag() is allowed to analyse encodings!
+    # Only similarity_language_tag() is allowed to analyse encodings!
 
-  ## Changes in the language tagging standards may have to be reflected here.
+    ## Changes in the language tagging standards may have to be reflected here.
 
-  my $tag = @_[0] || return undef;
-  return undef unless &is_language_tag($tag);
+    my $tag = @_[0] || return undef;
+    return undef unless &is_language_tag($tag);
 
-  # For the moment, these legacy variances are few enough that
-  #  we can just handle them here with regexps.
-  $tag =~ s/^iw\b/he/i; # Hebrew
-  $tag =~ s/^in\b/id/i; # Indonesian
-  $tag =~ s/^cre\b/cr/i; # Cree
-  $tag =~ s/^jw\b/jv/i; # Javanese
-  $tag =~ s/^[ix]-lux\b/lb/i;  # Luxemburger
-  $tag =~ s/^[ix]-navajo\b/nv/i;  # Navajo
-  $tag =~ s/^ji\b/yi/i;  # Yiddish
-  # SMB 2003 -- Hm.  There's a bunch of new XXX->YY variances now,
-  #  but maybe they're all so obscure I can ignore them.   "Obscure"
-  #  meaning either that the language is obscure, and/or that the
-  #  XXX form was extant so briefly that it's unlikely it was ever
-  #  used.  I hope.
-  #
-  # These go FROM the simplex to complex form, to get
-  #  similarity-comparison right.  And that's okay, since
-  #  similarity_language_tag is the only thing that
-  #  analyzes our output.
-  $tag =~ s/^[ix]-hakka\b/zh-hakka/i;  # Hakka
-  $tag =~ s/^nb\b/no-bok/i;  # BACKWARDS for Bokmal
-  $tag =~ s/^nn\b/no-nyn/i;  # BACKWARDS for Nynorsk
+    # For the moment, these legacy variances are few enough that
+    #  we can just handle them here with regexps.
+    $tag =~ s/^iw\b/he/i; # Hebrew
+    $tag =~ s/^in\b/id/i; # Indonesian
+    $tag =~ s/^cre\b/cr/i; # Cree
+    $tag =~ s/^jw\b/jv/i; # Javanese
+    $tag =~ s/^[ix]-lux\b/lb/i;  # Luxemburger
+    $tag =~ s/^[ix]-navajo\b/nv/i;  # Navajo
+    $tag =~ s/^ji\b/yi/i;  # Yiddish
+    # SMB 2003 -- Hm.  There's a bunch of new XXX->YY variances now,
+    #  but maybe they're all so obscure I can ignore them.   "Obscure"
+    #  meaning either that the language is obscure, and/or that the
+    #  XXX form was extant so briefly that it's unlikely it was ever
+    #  used.  I hope.
+    #
+    # These go FROM the simplex to complex form, to get
+    #  similarity-comparison right.  And that's okay, since
+    #  similarity_language_tag is the only thing that
+    #  analyzes our output.
+    $tag =~ s/^[ix]-hakka\b/zh-hakka/i;  # Hakka
+    $tag =~ s/^nb\b/no-bok/i;  # BACKWARDS for Bokmal
+    $tag =~ s/^nn\b/no-nyn/i;  # BACKWARDS for Nynorsk
 
-  $tag =~ s/^[xiXI]-//s;
-   # Just lop off any leading "x/i-"
+    $tag =~ s/^[xiXI]-//s;
+    # Just lop off any leading "x/i-"
 
-  return "~" . uc($tag);
+    return "~" . uc($tag);
 }
 
 #--------------------------------------------------------------------------
@@ -578,16 +578,16 @@ tag ("ar") exists.
 
 Examples:
 
-          alternate_language_tags('no-bok')       is ('nb')
-          alternate_language_tags('nb')           is ('no-bok')
-          alternate_language_tags('he')           is ('iw')
-          alternate_language_tags('iw')           is ('he')
-          alternate_language_tags('i-hakka')      is ('zh-hakka', 'x-hakka')
-          alternate_language_tags('zh-hakka')     is ('i-hakka', 'x-hakka')
-          alternate_language_tags('en')           is ()
-          alternate_language_tags('x-mingo-tom')  is ('i-mingo-tom')
-          alternate_language_tags('x-klikitat')   is ('i-klikitat')
-          alternate_language_tags('i-klikitat')   is ('x-klikitat')
+alternate_language_tags('no-bok')       is ('nb')
+alternate_language_tags('nb')           is ('no-bok')
+alternate_language_tags('he')           is ('iw')
+alternate_language_tags('iw')           is ('he')
+alternate_language_tags('i-hakka')      is ('zh-hakka', 'x-hakka')
+alternate_language_tags('zh-hakka')     is ('i-hakka', 'x-hakka')
+alternate_language_tags('en')           is ()
+alternate_language_tags('x-mingo-tom')  is ('i-mingo-tom')
+alternate_language_tags('x-klikitat')   is ('i-klikitat')
+alternate_language_tags('i-klikitat')   is ('x-klikitat')
 
 This function returns empty-list if given anything other than a formally
 valid language tag.
@@ -596,106 +596,106 @@ valid language tag.
 
 my %alt = %( < qw( i x   x i   I X   X I ) );
 sub alternate_language_tags {
-  my $tag = @_[0];
-  return() unless &is_language_tag($tag);
+    my $tag = @_[0];
+    return() unless &is_language_tag($tag);
 
-  my @em; # push 'em real goood!
+    my @em; # push 'em real goood!
 
-  # For the moment, these legacy variances are few enough that
-  #  we can just handle them here with regexps.
-  
-  if(     $tag =~ m/^[ix]-hakka\b(.*)/i) {push @em, "zh-hakka$1";
-  } elsif($tag =~ m/^zh-hakka\b(.*)/i) {  push @em, "x-hakka$1", "i-hakka$1";
+    # For the moment, these legacy variances are few enough that
+    #  we can just handle them here with regexps.
 
-  } elsif($tag =~ m/^he\b(.*)/i) { push @em, "iw$1";
-  } elsif($tag =~ m/^iw\b(.*)/i) { push @em, "he$1";
+    if(     $tag =~ m/^[ix]-hakka\b(.*)/i) {push @em, "zh-hakka$1";
+    } elsif($tag =~ m/^zh-hakka\b(.*)/i) {  push @em, "x-hakka$1", "i-hakka$1";
 
-  } elsif($tag =~ m/^in\b(.*)/i) { push @em, "id$1";
-  } elsif($tag =~ m/^id\b(.*)/i) { push @em, "in$1";
+    } elsif($tag =~ m/^he\b(.*)/i) { push @em, "iw$1";
+    } elsif($tag =~ m/^iw\b(.*)/i) { push @em, "he$1";
 
-  } elsif($tag =~ m/^[ix]-lux\b(.*)/i) { push @em, "lb$1";
-  } elsif($tag =~ m/^lb\b(.*)/i) {       push @em, "i-lux$1", "x-lux$1";
+    } elsif($tag =~ m/^in\b(.*)/i) { push @em, "id$1";
+    } elsif($tag =~ m/^id\b(.*)/i) { push @em, "in$1";
 
-  } elsif($tag =~ m/^[ix]-navajo\b(.*)/i) { push @em, "nv$1";
-  } elsif($tag =~ m/^nv\b(.*)/i) {          push @em, "i-navajo$1", "x-navajo$1";
+    } elsif($tag =~ m/^[ix]-lux\b(.*)/i) { push @em, "lb$1";
+    } elsif($tag =~ m/^lb\b(.*)/i) {       push @em, "i-lux$1", "x-lux$1";
 
-  } elsif($tag =~ m/^yi\b(.*)/i) { push @em, "ji$1";
-  } elsif($tag =~ m/^ji\b(.*)/i) { push @em, "yi$1";
+    } elsif($tag =~ m/^[ix]-navajo\b(.*)/i) { push @em, "nv$1";
+    } elsif($tag =~ m/^nv\b(.*)/i) {          push @em, "i-navajo$1", "x-navajo$1";
 
-  } elsif($tag =~ m/^nb\b(.*)/i) {     push @em, "no-bok$1";
-  } elsif($tag =~ m/^no-bok\b(.*)/i) { push @em, "nb$1";
-  
-  } elsif($tag =~ m/^nn\b(.*)/i) {     push @em, "no-nyn$1";
-  } elsif($tag =~ m/^no-nyn\b(.*)/i) { push @em, "nn$1";
-  }
+    } elsif($tag =~ m/^yi\b(.*)/i) { push @em, "ji$1";
+    } elsif($tag =~ m/^ji\b(.*)/i) { push @em, "yi$1";
 
-  push @em, %alt{?$1} . $2 if $tag =~ m/^([XIxi])(-.+)/;
-  return @em;
+    } elsif($tag =~ m/^nb\b(.*)/i) {     push @em, "no-bok$1";
+    } elsif($tag =~ m/^no-bok\b(.*)/i) { push @em, "nb$1";
+
+    } elsif($tag =~ m/^nn\b(.*)/i) {     push @em, "no-nyn$1";
+    } elsif($tag =~ m/^no-nyn\b(.*)/i) { push @em, "nn$1";
+    }
+
+    push @em, %alt{?$1} . $2 if $tag =~ m/^([XIxi])(-.+)/;
+    return @em;
 }
 
 ###########################################################################
 
 do {
-  # Init %Panic...
-  
-  my @panic = @(  # MUST all be lowercase!
-   # Only large ("national") languages make it in this list.
-   #  If you, as a user, are so bizarre that the /only/ language
-   #  you claim to accept is Galician, then no, we won't do you
-   #  the favor of providing Catalan as a panic-fallback for
-   #  you.  Because if I start trying to add "little languages" in
-   #  here, I'll just go crazy.
+    # Init %Panic...
 
-   # Scandinavian lgs.  All based on opinion and hearsay.
-   'sv' => \qw(nb no da nn),
-   'da' => \qw(nb no sv nn), # I guess
-   \qw(no nn nb), \qw(no nn nb sv da),
-   'is' => \qw(da sv no nb nn),
-   'fo' => \qw(da is no nb nn sv), # I guess
-   
-   # I think this is about the extent of tolerable intelligibility
-   #  among large modern Romance languages.
-   'pt' => \qw(es ca it fr), # Portuguese, Spanish, Catalan, Italian, French
-   'ca' => \qw(es pt it fr),
-   'es' => \qw(ca it fr pt),
-   'it' => \qw(es fr ca pt),
-   'fr' => \qw(es it ca pt),
-   
-   # Also assume that speakers of the main Indian languages prefer
-   #  to read/hear Hindi over English
-   \qw(
+    my @panic = @(  # MUST all be lowercase!
+# Only large ("national") languages make it in this list.
+#  If you, as a user, are so bizarre that the /only/ language
+#  you claim to accept is Galician, then no, we won't do you
+#  the favor of providing Catalan as a panic-fallback for
+#  you.  Because if I start trying to add "little languages" in
+#  here, I'll just go crazy.
+
+# Scandinavian lgs.  All based on opinion and hearsay.
+'sv' => \qw(nb no da nn),
+'da' => \qw(nb no sv nn), # I guess
+\qw(no nn nb), \qw(no nn nb sv da),
+'is' => \qw(da sv no nb nn),
+'fo' => \qw(da is no nb nn sv), # I guess
+
+# I think this is about the extent of tolerable intelligibility
+#  among large modern Romance languages.
+'pt' => \qw(es ca it fr), # Portuguese, Spanish, Catalan, Italian, French
+'ca' => \qw(es pt it fr),
+'es' => \qw(ca it fr pt),
+'it' => \qw(es fr ca pt),
+'fr' => \qw(es it ca pt),
+
+# Also assume that speakers of the main Indian languages prefer
+#  to read/hear Hindi over English
+\qw(
      as bn gu kn ks kok ml mni mr ne or pa sa sd te ta ur
    ) => 'hi',
-    # Assamese, Bengali, Gujarati, [Hindi,] Kannada (Kanarese), Kashmiri,
-    # Konkani, Malayalam, Meithei (Manipuri), Marathi, Nepali, Oriya,
-    # Punjabi, Sanskrit, Sindhi, Telugu, Tamil, and Urdu.
-   'hi' => \qw(bn pa as or),
-   # I welcome finer data for the other Indian languages.
-   #  E.g., what should Oriya's list be, besides just Hindi?
-   
-   # And the panic languages for English is, of course, nil!
+# Assamese, Bengali, Gujarati, [Hindi,] Kannada (Kanarese), Kashmiri,
+# Konkani, Malayalam, Meithei (Manipuri), Marathi, Nepali, Oriya,
+# Punjabi, Sanskrit, Sindhi, Telugu, Tamil, and Urdu.
+'hi' => \qw(bn pa as or),
+# I welcome finer data for the other Indian languages.
+#  E.g., what should Oriya's list be, besides just Hindi?
 
-   # My guesses at Slavic intelligibility:
-   < (@(\qw(ru be uk)) x 2),  # Russian, Belarusian, Ukranian
-   'sr' => 'hr', 'hr' => 'sr', # Serb + Croat
-   'cs' => 'sk', 'sk' => 'cs', # Czech + Slovak
+# And the panic languages for English is, of course, nil!
 
-   'ms' => 'id', 'id' => 'ms', # Malay + Indonesian
+# My guesses at Slavic intelligibility:
+< (@(\qw(ru be uk)) x 2),  # Russian, Belarusian, Ukranian
+'sr' => 'hr', 'hr' => 'sr', # Serb + Croat
+'cs' => 'sk', 'sk' => 'cs', # Czech + Slovak
 
-   'et' => 'fi', 'fi' => 'et', # Estonian + Finnish
+'ms' => 'id', 'id' => 'ms', # Malay + Indonesian
 
-   #?? 'lo' => 'th', 'th' => 'lo', # Lao + Thai
+'et' => 'fi', 'fi' => 'et', # Estonian + Finnish
 
-  );
-  my($k,$v);
-  while((nelems @panic)) {
-    @($k,$v) = @: splice(@panic,0,2);
-    foreach my $k (@(ref($k) ?? < @$k !! $k)) {
-      foreach my $v (@(ref($v) ?? < @$v !! $v)) {
-        push @{%Panic{+$k} ||= \@()}, $v unless $k eq $v;
-      }
+        #?? 'lo' => 'th', 'th' => 'lo', # Lao + Thai
+
+        );
+    my($k,$v);
+    while((nelems @panic)) {
+        @($k,$v) = @: splice(@panic,0,2);
+        foreach my $k (@(ref($k) ?? < @$k !! $k)) {
+            foreach my $v (@(ref($v) ?? < @$v !! $v)) {
+                push @{%Panic{+$k} ||= \@()}, $v unless $k eq $v;
+            }
+        }
     }
-  }
 };
 
 =item * the function @langs = panic_languages(@accept_languages)
@@ -722,23 +722,23 @@ languages are "close" to each other.
 
 A useful construct you might consider using is:
 
-  @fallbacks = super_languages(@accept_languages);
-  push @fallbacks, panic_languages(
-    @accept_languages, @fallbacks,
-  );
+@fallbacks = super_languages(@accept_languages);
+push @fallbacks, panic_languages(
+@accept_languages, @fallbacks,
+);
 
 =cut
 
 sub panic_languages {
-  # When in panic or in doubt, run in circles, scream, and shout!
-  my(@out, %seen);
-  foreach my $t ( @_) {
-    next unless $t;
-    next if %seen{+$t}++; # so we don't return it or hit it again
-    # push @out, super_languages($t); # nah, keep that separate
-    push @out, < @{ %Panic{?lc $t} || next };
-  }
-  return grep { !%seen{+$_}++ }, @(  < @out, 'en');
+    # When in panic or in doubt, run in circles, scream, and shout!
+    my(@out, %seen);
+    foreach my $t ( @_) {
+        next unless $t;
+        next if %seen{+$t}++; # so we don't return it or hit it again
+        # push @out, super_languages($t); # nah, keep that separate
+        push @out, < @{ %Panic{?lc $t} || next };
+    }
+    return grep { !%seen{+$_}++ }, @(  < @out, 'en');
 }
 
 #---------------------------------------------------------------------------
@@ -753,15 +753,15 @@ The original list, plus these insertions, is returned.
 
 In other words, it takes this:
 
-  pt-br de-DE en-US fr pt-br-janeiro
+pt-br de-DE en-US fr pt-br-janeiro
 
 and returns this:
 
-  pt-br pt de-DE de en-US en fr pt-br-janeiro
+pt-br pt de-DE de en-US en fr pt-br-janeiro
 
 This function is most useful in the idiom
 
-  implicate_supers( I18N::LangTags::Detect::detect() );
+implicate_supers( I18N::LangTags::Detect::detect() );
 
 (See L<I18N::LangTags::Detect>.)
 
@@ -778,11 +778,11 @@ of all given tags, minus any tags that already appear in the input list.
 
 In other words, it takes this:
 
-  pt-br de-DE en-US fr pt-br-janeiro
+pt-br de-DE en-US fr pt-br-janeiro
 
 and returns this:
 
-  pt-br de-DE en-US fr pt-br-janeiro pt de en
+pt-br de-DE en-US fr pt-br-janeiro pt de en
 
 The reason this function has "_strictly" in its name is that when
 you're processing an Accept-Language list according to the RFCs, if
@@ -793,28 +793,28 @@ as far as I'm concerned) you'd use implicate_supers.
 =cut
 
 sub implicate_supers {
-  my @languages = grep { is_language_tag($_) }, @_;
-  my %seen_encoded;
-  foreach my $lang ( @languages) {
-    %seen_encoded{+I18N::LangTags::encode_language_tag($lang) } = 1
-  }
-
-  my(@output_languages);
-  foreach my $lang ( @languages) {
-    push @output_languages, $lang;
-    foreach my $s (  I18N::LangTags::super_languages($lang) ) {
-      # Note that super_languages returns the longest first.
-      last if %seen_encoded{?I18N::LangTags::encode_language_tag($s) };
-      push @output_languages, $s;
+    my @languages = grep { is_language_tag($_) }, @_;
+    my %seen_encoded;
+    foreach my $lang ( @languages) {
+        %seen_encoded{+I18N::LangTags::encode_language_tag($lang) } = 1
     }
-  }
-  return uniq( < @output_languages );
+
+    my(@output_languages);
+    foreach my $lang ( @languages) {
+        push @output_languages, $lang;
+        foreach my $s (  I18N::LangTags::super_languages($lang) ) {
+            # Note that super_languages returns the longest first.
+            last if %seen_encoded{?I18N::LangTags::encode_language_tag($s) };
+            push @output_languages, $s;
+        }
+    }
+    return uniq( < @output_languages );
 
 }
 
 sub implicate_supers_strictly {
-  my @tags = grep { is_language_tag($_) }, @_;
-  return uniq( < @_,   < @+: map { super_languages($_) }, @_ );
+    my @tags = grep { is_language_tag($_) }, @_;
+    return uniq( < @_,   < @+: map { super_languages($_) }, @_ );
 }
 
 

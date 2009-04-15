@@ -20,17 +20,17 @@ sub e ($x, $y) { Pod::Simple::DumpAsXML->_duo($x, $y) }
 
 print $^STDOUT, "# Simple tests for head1 - head4...\n";
 is( Pod::Simple::XMLOutStream->_out("\n=head1 Chacha\n\n"),
-    '<Document><head1>Chacha</head1></Document>'
-);
+                             '<Document><head1>Chacha</head1></Document>'
+                             );
 is( Pod::Simple::XMLOutStream->_out("\n=head2 Chacha\n\n"),
-    '<Document><head2>Chacha</head2></Document>'
-);
+                             '<Document><head2>Chacha</head2></Document>'
+                             );
 is( Pod::Simple::XMLOutStream->_out("\n=head3 Chacha\n\n"),
-    '<Document><head3>Chacha</head3></Document>'
-);
+                             '<Document><head3>Chacha</head3></Document>'
+                             );
 is( Pod::Simple::XMLOutStream->_out("\n=head4 Chacha\n\n"),
-    '<Document><head4>Chacha</head4></Document>'
-);
+                             '<Document><head4>Chacha</head4></Document>'
+                             );
 
 print $^STDOUT, "# Testing whitespace equivalence...\n";
 
@@ -41,17 +41,17 @@ is( <e "\n=head1 Chacha\n\n", "\n=head1\tChacha      \n\n");
 
 
 is( Pod::Simple::XMLOutStream->_out("=head1     Chachacha"),
-    '<Document><head1>Chachacha</head1></Document>'
-);
+                             '<Document><head1>Chachacha</head1></Document>'
+                             );
 
 
 print $^STDOUT, "# Testing whitespace variance ...\n";
 is( Pod::Simple::XMLOutStream->_out("=head1     Cha cha cha   \n"),
-    '<Document><head1>Cha cha cha</head1></Document>'
-);
+                             '<Document><head1>Cha cha cha</head1></Document>'
+                             );
 is( Pod::Simple::XMLOutStream->_out("=head1     Cha   cha\tcha   \n"),
-    '<Document><head1>Cha cha cha</head1></Document>'
-);
+                             '<Document><head1>Cha cha cha</head1></Document>'
+                             );
 
 
 
@@ -59,20 +59,20 @@ is( Pod::Simple::XMLOutStream->_out("=head1     Cha   cha\tcha   \n"),
 print $^STDOUT, "# Testing head2, head3, head4 more...\n";
 
 is( Pod::Simple::XMLOutStream->_out("=head2     Cha   cha\tcha   \n"),
-    '<Document><head2>Cha cha cha</head2></Document>'
-);
+                             '<Document><head2>Cha cha cha</head2></Document>'
+                             );
 is( Pod::Simple::XMLOutStream->_out("=head3     Cha   cha\tcha   \n"),
-    '<Document><head3>Cha cha cha</head3></Document>'
-);
+                             '<Document><head3>Cha cha cha</head3></Document>'
+                             );
 is( Pod::Simple::XMLOutStream->_out("=head4     Cha   cha\tcha   \n"),
-    '<Document><head4>Cha cha cha</head4></Document>'
-);
+                             '<Document><head4>Cha cha cha</head4></Document>'
+                             );
 
 print $^STDOUT, "# Testing entity expansion...\n";
 
 is( Pod::Simple::XMLOutStream->_out("=head4 fooE<64>bar!\n"),
-    Pod::Simple::XMLOutStream->_out("\n=head4  foo\@bar!\n\n"),
-);
+                             Pod::Simple::XMLOutStream->_out("\n=head4  foo\@bar!\n\n"),
+                             );
 
 # TODO: a mode so that DumpAsXML can ask for all contiguous string
 #  sequences to be fused?

@@ -31,15 +31,15 @@ SKIP: do {
     $$fake_out = '';
     try {
         pod2usage(\%( verbose => 0, exit => 'noexit', 
-                    output => $fake_out_fh, input => $file ));
+                      output => $fake_out_fh, input => $file ));
     };
     like( $^EVAL_ERROR->message, qr/^Can't open $file/, 
           'File not found without -pathlist' );
 
     try {
         pod2usage(\%( verbose => 0, exit => 'noexit',
-                    output => $fake_out_fh, input => $file, 
-                    pathlist => $path ));
+                      output => $fake_out_fh, input => $file, 
+                          pathlist => $path ));
     };
     is( $$fake_out, $vbl_0, '-pathlist parameter' );
 };
@@ -53,7 +53,7 @@ SKIP: do { # Test exit status from pod2usage()
         "exit    => $exit",
         "output  => q\{$dev_null\}",
         "input   => q\{$^PROGRAM_NAME\}",
-    ));
+        ));
     my $cq = (($^OS_NAME eq 'MSWin32'
                || $^OS_NAME eq 'NetWare'
                || $^OS_NAME eq 'VMS') ?? '"'

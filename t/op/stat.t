@@ -31,7 +31,7 @@ my $Is_Dosish  = $Is_Dos || $Is_OS2 || $Is_MSWin32 || $Is_NetWare || $Is_Cygwin;
 my $Is_UFS     = $Is_Darwin && (@() = `df -t ufs . 2>/dev/null`) == 2;
 
 my@($DEV, $INO, $MODE, $NLINK, $UID, $GID, $RDEV, $SIZE,
-   $ATIME, $MTIME, $CTIME, $BLKSIZE, $BLOCKS) = @( <0..12);
+    $ATIME, $MTIME, $CTIME, $BLKSIZE, $BLOCKS) = @( <0..12);
 
 my $Curdir = File::Spec->curdir;
 
@@ -51,17 +51,17 @@ my@($nlink, $mtime, $ctime) =  @(stat($foo))[[@($NLINK, $MTIME, $CTIME)]];
 #nlink should if link support configured in Perl.
 SKIP: do {
     skip "No link count - Hard link support not built in.", 1
-	unless config_value('d_link');
+        unless config_value('d_link');
 
     is($nlink, 1, 'nlink on regular file');
 };
 
 SKIP: do {
-  skip "mtime and ctime not reliable", 2
-    if $Is_MSWin32 or $Is_NetWare or $Is_Cygwin or $Is_Dos or $Is_MacOS or $Is_Darwin;
+    skip "mtime and ctime not reliable", 2
+        if $Is_MSWin32 or $Is_NetWare or $Is_Cygwin or $Is_Dos or $Is_MacOS or $Is_Darwin;
 
-  ok( $mtime,           'mtime' );
-  is( $mtime, $ctime,   'mtime == ctime' );
+    ok( $mtime,           'mtime' );
+    is( $mtime, $ctime,   'mtime == ctime' );
 };
 
 
@@ -86,29 +86,29 @@ SKIP: do {
 
     my@($nlink, $mtime, $ctime) =  @(stat($tmpfile))[[@($NLINK, $MTIME, $CTIME)]];
 
-    SKIP: do {
+  SKIP: do {
         skip "No link count", 1 if config_value('dont_use_nlink');
         skip "Cygwin9X fakes hard links by copying", 1
-          if config_value('myuname') =~ m/^cygwin_(?:9\d|me)\b/i;
+            if config_value('myuname') =~ m/^cygwin_(?:9\d|me)\b/i;
 
         is($nlink, 2,     'Link count on hard linked file' );
     };
 
-    SKIP: do {
+  SKIP: do {
         my $cwd = File::Spec->rel2abs($Curdir);
         skip "Solaris tmpfs has different mtime/ctime link semantics", 2
-                                     if $Is_Solaris and $cwd =~ m#^/tmp# and
-                                        $mtime && $mtime == $ctime;
+            if $Is_Solaris and $cwd =~ m#^/tmp# and
+            $mtime && $mtime == $ctime;
         skip "AFS has different mtime/ctime link semantics", 2
-                                     if $cwd =~ m#$(config_value('afsroot'))/#;
+            if $cwd =~ m#$(config_value('afsroot'))/#;
         skip "AmigaOS has different mtime/ctime link semantics", 2
-                                     if $Is_Amiga;
+            if $Is_Amiga;
         # Win32 could pass $mtime test but as FAT and NTFS have
         # no ctime concept $ctime is ALWAYS == $mtime
         # expect netware to be the same ...
         skip "No ctime concept on this OS", 2
-                                     if $Is_MSWin32 || 
-                                        ($Is_Darwin && $Is_UFS);
+            if $Is_MSWin32 || 
+            ($Is_Darwin && $Is_UFS);
 
         if( !ok($mtime, 'hard link mtime') ||
             !isnt($mtime, $ctime, 'hard link ctime != mtime') ) {
@@ -153,14 +153,14 @@ ok( chmod(0000, $tmpfile),     'chmod 0000' );
 SKIP: do {
     skip "-r, -w and -x have different meanings on VMS", 3 if $Is_VMS;
 
-    SKIP: do {
+  SKIP: do {
         # Going to try to switch away from root.  Might not work.
         my $olduid = $^UID;
         try { $^UID = 1; };
         skip "Can't test -r or -w meaningfully if you're superuser", 2
-          if $^UID == 0;
+            if $^UID == 0;
 
-        SKIP: do {
+      SKIP: do {
             skip "Can't test -r meaningfully?", 1 if $Is_Dos || $Is_Cygwin;
             ok(!-r $tmpfile,    "   -r");
         };
@@ -182,7 +182,7 @@ ok(-w $tmpfile,     '   -w');
 
 SKIP: do {
     skip "-x simply determines if a file ends in an executable suffix", 1
-      if $Is_Dosish || $Is_MacOS;
+        if $Is_Dosish || $Is_MacOS;
 
     ok(-x $tmpfile,     '   -x');
 };
@@ -214,11 +214,11 @@ ok(! -e $tmpfile_link,  '   -e on unlinked file');
 
 SKIP: do {
     skip "No character, socket or block special files", 6
-      if $Is_MSWin32 || $Is_NetWare || $Is_Dos;
+        if $Is_MSWin32 || $Is_NetWare || $Is_Dos;
     skip "/dev isn't available to test against", 6
-      unless -d '/dev' && -r '/dev' && -x '/dev';
+        unless -d '/dev' && -r '/dev' && -x '/dev';
     skip "Skipping: unexpected ls output in MP-RAS", 6
-      if $Is_MPRAS;
+        if $Is_MPRAS;
 
     # VMS problem:  If GNV or other UNIX like tool is installed, then
     # sometimes Perl will find /bin/ls, and will try to run it.
@@ -228,7 +228,7 @@ SKIP: do {
     # be run instead.  So do not do this until we can teach Perl
     # when to use BASH on VMS.
     skip "ls command not available to Perl in OpenVMS right now.", 6
-      if $Is_VMS;
+        if $Is_VMS;
 
     my $LS  = config_value('d_readlink') ?? "ls -lL" !! "ls -l";
     my $CMD = "$LS /dev 2>/dev/null";
@@ -266,25 +266,25 @@ SKIP: do {
     }
 
     my $try = sub {
-	my @c1 = @( eval qq[\$DEV =~ m/^@_[0].*/mg] );
-	my @c2 = eval qq[grep \{ @_[1] "/dev/\$_" \}, \@DEV];
-	my $c1 = nelems @c1;
-	my $c2 = nelems @c2;
-	is($c1, $c2, "ls and @_[1] agreeing on /dev ($c1 $c2)");
+            my @c1 = @( eval qq[\$DEV =~ m/^@_[0].*/mg] );
+            my @c2 = eval qq[grep \{ @_[1] "/dev/\$_" \}, \@DEV];
+            my $c1 = nelems @c1;
+            my $c2 = nelems @c2;
+            is($c1, $c2, "ls and @_[1] agreeing on /dev ($c1 $c2)");
+        };
+
+  SKIP: do {
+        skip("DG/UX ls -L broken", 3) if $Is_DGUX;
+
+        $try->('b', '-b');
+        $try->('c', '-c');
+        $try->('s', '-S');
+
     };
 
-SKIP: do {
-    skip("DG/UX ls -L broken", 3) if $Is_DGUX;
-
-    $try->('b', '-b');
-    $try->('c', '-c');
-    $try->('s', '-S');
-
-};
-
-ok(! -b $Curdir,    '!-b cwd');
-ok(! -c $Curdir,    '!-c cwd');
-ok(! -S $Curdir,    '!-S cwd');
+    ok(! -b $Curdir,    '!-b cwd');
+    ok(! -c $Curdir,    '!-c cwd');
+    ok(! -S $Curdir,    '!-S cwd');
 
 };
 
@@ -325,12 +325,12 @@ SKIP: do {
 
     my $TTY = $Is_Rhapsody ?? "/dev/ttyp0" !! "/dev/tty";
 
-    SKIP: do {
+  SKIP: do {
         skip "Test uses unixisms", 2 if $Is_MSWin32 || $Is_NetWare;
         skip "No TTY to test -t with", 2 unless -e $TTY;
 
         open(my $tty_fh, "<", $TTY) ||
-          warn "Can't open $TTY--run t/TEST outside of make.\n";
+            warn "Can't open $TTY--run t/TEST outside of make.\n";
         ok(-t $tty_fh,  '-t');
         ok(-c $tty_fh,  'tty is -c');
         close($tty_fh);
@@ -355,8 +355,8 @@ ok(  -T $statfile,    '-T');
 ok(! -B $statfile,    '!-B');
 
 SKIP: do {
-     skip("DG/UX", 1) if $Is_DGUX;
-ok(-B $Perl,      '-B');
+    skip("DG/UX", 1) if $Is_DGUX;
+    ok(-B $Perl,      '-B');
 };
 
 ok(! -T $Perl,    '!-T');
@@ -427,7 +427,7 @@ try { lstat _ };
 is( "$^EVAL_ERROR", "", "lstat _ ok after lstat" );
 try { -l _ };
 is( "$^EVAL_ERROR", "", "-l _ ok after lstat" );
-  
+
 SKIP: do {
     skip "No lstat", 2 unless config_value('d_lstat');
 
@@ -482,7 +482,7 @@ SKIP: do {
 
     # And now for the ambigious bareword case
     ok(open($dir, "<", "TEST"), 'Can open "TEST" dir')
-	|| diag "Can't open 'TEST':  $^OS_ERROR";
+        || diag "Can't open 'TEST':  $^OS_ERROR";
     my $size = @(stat($dir))[7];
     ok(defined $size, "stat() on bareword works");
     is($size, -s "TEST", "size returned by stat of bareword is for the file");
@@ -501,26 +501,26 @@ do {
     close $f;
     unlink $tmpfile;
 
-    #PVIO's hold dirhandle information, so let's test them too.
+  #PVIO's hold dirhandle information, so let's test them too.
 
-    SKIP: do {
+  SKIP: do {
         skip "No dirfd()", 9 unless config_value('d_dirfd') || config_value('d_dir_dd_fd');
         ok(opendir(my $dir, "."), 'Can open "." dir') || diag "Can't open '.':  $^OS_ERROR";
         ok(stat($dir), "stat() on *DIR\{IO\} works");
-	ok(-d _ , "The special file handle _ is set correctly"); 
+        ok(-d _ , "The special file handle _ is set correctly"); 
         ok(-d -r $dir , "chained -x's on *DIR\{IO\}");
 
-	# And now for the ambigious bareword case
-	ok(open($dir, "<", "TEST"), 'Can open "TEST" dir')
-	    || diag "Can't open 'TEST':  $^OS_ERROR";
-	my $size = @(stat($dir))[7];
-	ok(defined $size, "stat() on *THINGY\{IO\} works");
-	is($size, -s "TEST",
-	   "size returned by stat of *THINGY\{IO\} is for the file");
-	ok(-f _, "ambiguous *THINGY\{IO\} uses file handle, not dir handle");
-	ok(-f $dir);
-	closedir $dir or die $^OS_ERROR;
-	close $dir or die $^OS_ERROR;
+        # And now for the ambigious bareword case
+        ok(open($dir, "<", "TEST"), 'Can open "TEST" dir')
+            || diag "Can't open 'TEST':  $^OS_ERROR";
+        my $size = @(stat($dir))[7];
+        ok(defined $size, "stat() on *THINGY\{IO\} works");
+        is($size, -s "TEST",
+           "size returned by stat of *THINGY\{IO\} is for the file");
+        ok(-f _, "ambiguous *THINGY\{IO\} uses file handle, not dir handle");
+        ok(-f $dir);
+        closedir $dir or die $^OS_ERROR;
+        close $dir or die $^OS_ERROR;
     };
 };
 

@@ -6,7 +6,7 @@ use Getopt::Long < qw(:config no_ignore_case);
 my $want_version="2.24";
 die("Getopt::Long version $want_version required--this is only version ".
     $Getopt::Long::VERSION)
-  unless $Getopt::Long::VERSION +>= $want_version;
+    unless $Getopt::Long::VERSION +>= $want_version;
 
 plan tests => 10;
 

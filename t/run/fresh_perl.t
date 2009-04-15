@@ -33,7 +33,7 @@ foreach my $prog ( @prgs) {
 
     my $switch;
     if ($raw_prog =~ s/^\s*(-\w.*)\n//){
-	$switch = $1;
+        $switch = $1;
     }
 
     my@($prog,?$expected) =  split(m/\nEXPECT\n/, $raw_prog);
@@ -41,10 +41,10 @@ foreach my $prog ( @prgs) {
     $expected = '' unless defined $expected;
 
     if ($prog =~ m/^\# SKIP: (.+)/m) {
-	if (eval $1) {
-	    ok(1, "Skip: $1");
-	    next;
-	}
+        if (eval $1) {
+            ok(1, "Skip: $1");
+            next;
+        }
     }
 
     $expected =~ s/\n+$//;

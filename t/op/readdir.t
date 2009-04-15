@@ -8,7 +8,7 @@ print $^STDOUT, "1..11\n";
 for my $i (1..2000) {
     my $op_dh;
     opendir($op_dh, "op") or die "can't opendir: $^OS_ERROR";
-    # should auto-closedir() here
+# should auto-closedir() here
 }
 
 my $op_dh;
@@ -25,7 +25,7 @@ my @($min, $max) = @($expect - 10, $expect + 10);
 if ((nelems @D) +> $min && (nelems @D) +< $max) { print $^STDOUT, "ok 2\n"; }
 else {
     printf $^STDOUT, "not ok 2 # counting op/*.t, expect $min < \%d < $max files\n",
-      scalar nelems @D;
+        scalar nelems @D;
 }
 
 our @R = sort @D;

@@ -20,14 +20,14 @@ print $^STDOUT, "# Pod::Simple version $Pod::Simple::VERSION\n";
 sub e     ($x, $y) { Pod::Simple::XMLOutStream->_duo(\&nowhine, $x, $y) }
 
 sub nowhine {
-#  $_[0]->{'no_whining'} = 1;
-  @_[0]->accept_targets("*");
+    #  $_[0]->{'no_whining'} = 1;
+    @_[0]->accept_targets("*");
 }
 
 is( <e(
-"=begin :foo\n\n=begin :bar\n\nZaz\n\n",
-"=begin :foo\n\n=begin :bar\n\nZaz\n\n=end :bar\n\n=end :foo\n\n",
-));
+    "=begin :foo\n\n=begin :bar\n\nZaz\n\n",
+    "=begin :foo\n\n=begin :bar\n\nZaz\n\n=end :bar\n\n=end :foo\n\n",
+    ));
 
 
 print $^STDOUT, "# Ending ", __FILE__, "\n";

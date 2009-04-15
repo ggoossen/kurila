@@ -34,100 +34,100 @@ sub new { return bless \%(), ref(@_[0]) || @_[0] }
 use File::Spec::Functions < qw(catfile);
 
 sub parse_from_file {
-  my $self = shift;
-  my@($file, $outfh) =  @_;
+    my $self = shift;
+    my@($file, $outfh) =  @_;
 
-  my $render = $self->{?'__nroffer'} || die "no nroffer set!?";
-  
-  # turn the switches into CLIs
-  my $switches = join ' ', map { qq{"--$_=$self->{?$_}"} }, grep { !m/^_/s },
+    my $render = $self->{?'__nroffer'} || die "no nroffer set!?";
+
+    # turn the switches into CLIs
+    my $switches = join ' ', map { qq{"--$_=$self->{?$_}"} }, grep { !m/^_/s },
         keys %$self
-  ;
+    ;
 
-  my $pod2man =
-    catfile(
+        my $pod2man =
+        catfile(
       ($self->{?'__bindir'}  || die "no bindir set?!"  ),
       ($self->{?'__pod2man'} || die "no pod2man set?!" ),
-    )
-  ;
-  unless(-e $pod2man) {
-    # This is rarely needed, I think.
-    $pod2man = $self->{?'__pod2man'} || die "no pod2man set?!";
-    die "Can't find a pod2man?! (". $self->{?'__pod2man'} .")\nAborting"
-      unless -e $pod2man;
-  }
-
-  my $command = "$pod2man $switches --lax $file | $render -man";
-         # no temp file, just a pipe!
-
-  # Thanks to Brendan O'Dea for contributing the following block
-  if('Pod::Perldoc::IS_Linux' and -t $^STDOUT
-    and my @($cols) = `stty -a` =~ m/\bcolumns\s+(\d+)/
-  ) {
-    my $c = $cols * 39 / 40;
-    $cols = $c +> $cols - 2 ?? $c !! $cols -2;
-    $command .= ' -rLL=' . (int $c) . 'n' if $cols +> 80;
-  }
-
-  if('Pod::Perldoc::IS_Cygwin') {
-    $command .= ' -c';
-  }
-
-  # I hear persistent reports that adding a -c switch to $render
-  # solves many people's problems.  But I also hear that some mans
-  # don't have a -c switch, so that unconditionally adding it here
-  # would presumably be a Bad Thing   -- sburke@cpan.org
-
-  $command .= " | col -x" if 'Pod::Perldoc::IS_HPUX';
-  
-  defined(&Pod::Perldoc::DEBUG)
-   and Pod::Perldoc::DEBUG()
-   and print $^STDOUT, "About to run $command\n";
-  ;
-  
-  my $rslt = `$command`;
-
-  my $err;
-
-  if( $self->{?'__filter_nroff'} ) {
-    defined(&Pod::Perldoc::DEBUG)
-     and &Pod::Perldoc::DEBUG()
-     and print $^STDOUT, "filter_nroff is set, so filtering...\n";
-    $rslt = $self->___Do_filter_nroff($rslt);
-  } else {
-    defined(&Pod::Perldoc::DEBUG)
-     and Pod::Perldoc::DEBUG()
-     and print $^STDOUT, "filter_nroff isn't set, so not filtering.\n";
-  }
-
-  if (($err = $^CHILD_ERROR)) {
-    defined(&Pod::Perldoc::DEBUG)
-     and Pod::Perldoc::DEBUG()
-     and print $^STDOUT, "Nonzero exit ($^CHILD_ERROR) while running $command.\n",
-               "Falling back to Pod::Perldoc::ToPod\n ",
+      )
     ;
-    # A desperate fallthru:
-    require Pod::Perldoc::ToPod;
-    return  Pod::Perldoc::ToPod->new->parse_from_file(< @_);
-    
-  } else {
-    print $outfh, $rslt
-     or die "Can't print to %$self{?__output_file}: $^OS_ERROR";
-  }
-  
-  return;
+        unless(-e $pod2man) {
+        # This is rarely needed, I think.
+        $pod2man = $self->{?'__pod2man'} || die "no pod2man set?!";
+        die "Can't find a pod2man?! (". $self->{?'__pod2man'} .")\nAborting"
+            unless -e $pod2man;
+    }
+
+    my $command = "$pod2man $switches --lax $file | $render -man";
+    # no temp file, just a pipe!
+
+    # Thanks to Brendan O'Dea for contributing the following block
+    if('Pod::Perldoc::IS_Linux' and -t $^STDOUT
+        and my @($cols) = `stty -a` =~ m/\bcolumns\s+(\d+)/
+    ) {
+            my $c = $cols * 39 / 40;
+            $cols = $c +> $cols - 2 ?? $c !! $cols -2;
+            $command .= ' -rLL=' . (int $c) . 'n' if $cols +> 80;
+        }
+
+    if('Pod::Perldoc::IS_Cygwin') {
+        $command .= ' -c';
+    }
+
+    # I hear persistent reports that adding a -c switch to $render
+    # solves many people's problems.  But I also hear that some mans
+    # don't have a -c switch, so that unconditionally adding it here
+    # would presumably be a Bad Thing   -- sburke@cpan.org
+
+    $command .= " | col -x" if 'Pod::Perldoc::IS_HPUX';
+
+    defined(&Pod::Perldoc::DEBUG)
+        and Pod::Perldoc::DEBUG()
+        and print $^STDOUT, "About to run $command\n";
+        ;
+
+    my $rslt = `$command`;
+
+    my $err;
+
+    if( $self->{?'__filter_nroff'} ) {
+        defined(&Pod::Perldoc::DEBUG)
+            and &Pod::Perldoc::DEBUG()
+            and print $^STDOUT, "filter_nroff is set, so filtering...\n";
+        $rslt = $self->___Do_filter_nroff($rslt);
+    } else {
+        defined(&Pod::Perldoc::DEBUG)
+            and Pod::Perldoc::DEBUG()
+            and print $^STDOUT, "filter_nroff isn't set, so not filtering.\n";
+    }
+
+    if (($err = $^CHILD_ERROR)) {
+        defined(&Pod::Perldoc::DEBUG)
+            and Pod::Perldoc::DEBUG()
+            and print $^STDOUT, "Nonzero exit ($^CHILD_ERROR) while running $command.\n",
+            "Falling back to Pod::Perldoc::ToPod\n ",
+        ;
+            # A desperate fallthru:
+            require Pod::Perldoc::ToPod;
+        return  Pod::Perldoc::ToPod->new->parse_from_file(< @_);
+
+    } else {
+        print $outfh, $rslt
+            or die "Can't print to %$self{?__output_file}: $^OS_ERROR";
+    }
+
+    return;
 }
 
 
 sub ___Do_filter_nroff {
-  my $self = shift;
-  my @data = split m/\n{2,}/, shift;
-  
-  shift @data while (nelems @data) and @data[0] !~ m/\S/; # Go to header
-  shift @data if (nelems @data) and @data[0] =~ m/Contributed\s+Perl/; # Skip header
-  pop @data if (nelems @data) and @data[-1] =~ m/^\w/; # Skip footer, like
-				# 28/Jan/99 perl 5.005, patch 53 1
-  join "\n\n", @data;
+    my $self = shift;
+    my @data = split m/\n{2,}/, shift;
+
+    shift @data while (nelems @data) and @data[0] !~ m/\S/; # Go to header
+    shift @data if (nelems @data) and @data[0] =~ m/Contributed\s+Perl/; # Skip header
+    pop @data if (nelems @data) and @data[-1] =~ m/^\w/; # Skip footer, like
+    # 28/Jan/99 perl 5.005, patch 53 1
+    join "\n\n", @data;
 }
 
 1;

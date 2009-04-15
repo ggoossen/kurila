@@ -31,7 +31,7 @@ my@($out, $err) =  Test::Simple::Catch::caught();
 local env::var('HARNESS_ACTIVE' ) = 0;
 
 
-package main;
+    package main;
 
 require Test::More;
 Test::More->import(tests => 1);

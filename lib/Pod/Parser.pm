@@ -20,53 +20,53 @@ Pod::Parser - base class for creating POD filters and translators
 
 =head1 SYNOPSIS
 
-    use Pod::Parser;
+use Pod::Parser;
 
-    package MyParser;
-    @ISA = qw(Pod::Parser);
+package MyParser;
+@ISA = qw(Pod::Parser);
 
-    sub command { 
-        my ($parser, $command, $paragraph, $line_num) = @_;
-        ## Interpret the command and its text; sample actions might be:
-        if ($command eq 'head1') { ... }
-        elsif ($command eq 'head2') { ... }
-        ## ... other commands and their actions
-        my $out_fh = $parser->output_handle();
-        my $expansion = $parser->interpolate($paragraph, $line_num);
-        print $out_fh $expansion;
-    }
+sub command { 
+my ($parser, $command, $paragraph, $line_num) = @_;
+## Interpret the command and its text; sample actions might be:
+if ($command eq 'head1') { ... }
+elsif ($command eq 'head2') { ... }
+## ... other commands and their actions
+my $out_fh = $parser->output_handle();
+my $expansion = $parser->interpolate($paragraph, $line_num);
+print $out_fh $expansion;
+}
 
-    sub verbatim { 
-        my ($parser, $paragraph, $line_num) = @_;
-        ## Format verbatim paragraph; sample actions might be:
-        my $out_fh = $parser->output_handle();
-        print $out_fh $paragraph;
-    }
+sub verbatim { 
+my ($parser, $paragraph, $line_num) = @_;
+## Format verbatim paragraph; sample actions might be:
+my $out_fh = $parser->output_handle();
+print $out_fh $paragraph;
+}
 
-    sub textblock { 
-        my ($parser, $paragraph, $line_num) = @_;
-        ## Translate/Format this block of text; sample actions might be:
-        my $out_fh = $parser->output_handle();
-        my $expansion = $parser->interpolate($paragraph, $line_num);
-        print $out_fh $expansion;
-    }
+sub textblock { 
+my ($parser, $paragraph, $line_num) = @_;
+## Translate/Format this block of text; sample actions might be:
+my $out_fh = $parser->output_handle();
+my $expansion = $parser->interpolate($paragraph, $line_num);
+print $out_fh $expansion;
+}
 
-    sub interior_sequence { 
-        my ($parser, $seq_command, $seq_argument) = @_;
-        ## Expand an interior sequence; sample actions might be:
-        return "*$seq_argument*"     if ($seq_command eq 'B');
-        return "`$seq_argument'"     if ($seq_command eq 'C');
-        return "_${seq_argument}_'"  if ($seq_command eq 'I');
-        ## ... other sequence commands and their resulting text
-    }
+sub interior_sequence { 
+my ($parser, $seq_command, $seq_argument) = @_;
+## Expand an interior sequence; sample actions might be:
+return "*$seq_argument*"     if ($seq_command eq 'B');
+return "`$seq_argument'"     if ($seq_command eq 'C');
+return "_${seq_argument}_'"  if ($seq_command eq 'I');
+## ... other sequence commands and their resulting text
+}
 
-    package main;
+package main;
 
-    ## Create a parser object and have it parse file whose name was
-    ## given on the command-line (use STDIN if no files were given).
-    $parser = new MyParser();
-    $parser->parse_from_filehandle($^STDIN)  if (@ARGV == 0);
-    for (@ARGV) { $parser->parse_from_file($_); }
+## Create a parser object and have it parse file whose name was
+## given on the command-line (use STDIN if no files were given).
+$parser = new MyParser();
+$parser->parse_from_filehandle($^STDIN)  if (@ARGV == 0);
+for (@ARGV) { $parser->parse_from_file($_); }
 
 =head1 REQUIRES
 
@@ -221,7 +221,7 @@ want to override. These methods are as follows:
 
 =head1 B<command()>
 
-            $parser->command($cmd,$text,$line_num,$pod_para);
+$parser->command($cmd,$text,$line_num,$pod_para);
 
 This method should be overridden by subclasses to take the appropriate
 action when a POD command paragraph (denoted by a line beginning with
@@ -267,7 +267,7 @@ sub command($self, $cmd, $text, $line_num, $pod_para) {
 
 =head1 B<verbatim()>
 
-            $parser->verbatim($text,$line_num,$pod_para);
+$parser->verbatim($text,$line_num,$pod_para);
 
 This method may be overridden by subclasses to take the appropriate
 action when a block of verbatim text is encountered. It is passed the
@@ -305,7 +305,7 @@ sub verbatim($self, $text, $line_num, $pod_para) {
 
 =head1 B<textblock()>
 
-            $parser->textblock($text,$line_num,$pod_para);
+$parser->textblock($text,$line_num,$pod_para);
 
 This method may be overridden by subclasses to take the appropriate
 action when a normal block of POD text is encountered (although the base
@@ -350,7 +350,7 @@ sub textblock($self, $text, $line_num, $pod_para) {
 
 =head1 B<interior_sequence()>
 
-            $parser->interior_sequence($seq_cmd,$seq_arg,$pod_seq);
+$parser->interior_sequence($seq_cmd,$seq_arg,$pod_seq);
 
 This method should be overridden by subclasses to take the appropriate
 action when an interior sequence is encountered. An interior sequence is
@@ -395,16 +395,16 @@ be overridden, but it may be useful for subclasses to take advantage of them.
 
 =head1 B<new()>
 
-            my $parser = Pod::Parser->new();
+my $parser = Pod::Parser->new();
 
 This is the constructor for B<Pod::Parser> and its subclasses. You
 I<do not> need to override this method! It is capable of constructing
 subclass objects as well as base class objects, provided you use
 any of the following constructor invocation styles:
 
-    my $parser1 = MyParser->new();
-    my $parser2 = new MyParser();
-    my $parser3 = $parser2->new();
+my $parser1 = MyParser->new();
+my $parser2 = new MyParser();
+my $parser3 = $parser2->new();
 
 where C<MyParser> is some subclass of B<Pod::Parser>.
 
@@ -420,8 +420,8 @@ reference). No other arguments are required, but if desired, an
 associative array (or hash-table) my be passed to the B<new()>
 constructor, as in:
 
-    my $parser1 = MyParser->new( MYDATA => $value1, MOREDATA => $value2 );
-    my $parser2 = new MyParser( myflag => 1 );
+my $parser1 = MyParser->new( MYDATA => $value1, MOREDATA => $value2 );
+my $parser2 = new MyParser( myflag => 1 );
 
 All arguments passed to the B<new()> constructor will be treated as
 key/value pairs in a hash-table. The newly constructed object will be
@@ -449,7 +449,7 @@ sub new {
 
 =head1 B<initialize()>
 
-            $parser->initialize();
+$parser->initialize();
 
 This method performs any necessary object initialization. It takes no
 arguments (other than the object instance of course, which is typically
@@ -459,15 +459,15 @@ method then they I<must> be sure to invoke C<$self-E<gt>SUPER::initialize()>.
 =cut
 
 sub initialize {
-    #my $self = shift;
-    #return;
+#my $self = shift;
+#return;
 }
 
 ##---------------------------------------------------------------------------
 
 =head1 B<begin_pod()>
 
-            $parser->begin_pod();
+$parser->begin_pod();
 
 This method is invoked at the beginning of processing for each POD
 document that is encountered in the input. Subclasses should override
@@ -476,15 +476,15 @@ this method to perform any per-document initialization.
 =cut
 
 sub begin_pod {
-    #my $self = shift;
-    #return;
+#my $self = shift;
+#return;
 }
 
 ##---------------------------------------------------------------------------
 
 =head1 B<begin_input()>
 
-            $parser->begin_input();
+$parser->begin_input();
 
 This method is invoked by B<parse_from_filehandle()> immediately I<before>
 processing input from a filehandle. The base class implementation does
@@ -499,15 +499,15 @@ initializations once per document, then you should use B<begin_pod()>.
 =cut
 
 sub begin_input {
-    #my $self = shift;
-    #return;
+#my $self = shift;
+#return;
 }
 
 ##---------------------------------------------------------------------------
 
 =head1 B<end_input()>
 
-            $parser->end_input();
+$parser->end_input();
 
 This method is invoked by B<parse_from_filehandle()> immediately I<after>
 processing input from a filehandle. The base class implementation does
@@ -522,15 +522,15 @@ cleanup actions once per document, then you should use B<end_pod()>.
 =cut
 
 sub end_input {
-    #my $self = shift;
-    #return;
+#my $self = shift;
+#return;
 }
 
 ##---------------------------------------------------------------------------
 
 =head1 B<end_pod()>
 
-            $parser->end_pod();
+$parser->end_pod();
 
 This method is invoked at the end of processing for each POD document
 that is encountered in the input. Subclasses should override this method
@@ -539,15 +539,15 @@ to perform any per-document finalization.
 =cut
 
 sub end_pod {
-    #my $self = shift;
-    #return;
+#my $self = shift;
+#return;
 }
 
 ##---------------------------------------------------------------------------
 
 =head1 B<preprocess_line()>
 
-          $textline = $parser->preprocess_line($text, $line_num);
+$textline = $parser->preprocess_line($text, $line_num);
 
 This method should be overridden by subclasses that wish to perform
 any kind of preprocessing for each I<line> of input (I<before> it has
@@ -577,7 +577,7 @@ sub preprocess_line($self, $text, $line_num) {
 
 =head1 B<preprocess_paragraph()>
 
-            $textblock = $parser->preprocess_paragraph($text, $line_num);
+$textblock = $parser->preprocess_paragraph($text, $line_num);
 
 This method should be overridden by subclasses that wish to perform any
 kind of preprocessing for each block (paragraph) of POD documentation
@@ -627,9 +627,9 @@ their functionality.
 
 =head1 B<parse_text()>
 
-            $ptree1 = $parser->parse_text($text, $line_num);
-            $ptree2 = $parser->parse_text({%opts}, $text, $line_num);
-            $ptree3 = $parser->parse_text(\%opts, $text, $line_num);
+$ptree1 = $parser->parse_text($text, $line_num);
+$ptree2 = $parser->parse_text({%opts}, $text, $line_num);
+$ptree3 = $parser->parse_text(\%opts, $text, $line_num);
 
 This method is useful if you need to perform your own interpolation 
 of interior sequences and can't rely upon B<interpolate> to expand
@@ -662,11 +662,11 @@ expanded result.
 
 If a subroutine reference was given, it is invoked as:
 
-  &$code_ref( $parser, $sequence )
+&$code_ref( $parser, $sequence )
 
 and if a method-name was given, it is invoked as:
 
-  $parser->method_name( $sequence )
+$parser->method_name( $sequence )
 
 where C<$parser> is a reference to the parser object, and C<$sequence>
 is a reference to the interior-sequence object.
@@ -687,11 +687,11 @@ the specified callback routine.]
 
 If a subroutine reference was given, it is invoked as:
 
-  &$code_ref( $parser, $text, $ptree_node )
+&$code_ref( $parser, $text, $ptree_node )
 
 and if a method-name was given, it is invoked as:
 
-  $parser->method_name( $text, $ptree_node )
+$parser->method_name( $text, $ptree_node )
 
 where C<$parser> is a reference to the parser object, C<$text> is the
 text-string encountered, and C<$ptree_node> is a reference to the current
@@ -706,11 +706,11 @@ object) and return the result instead of the parse-tree object.
 
 If a subroutine reference was given, it is invoked as:
 
-  &$code_ref( $parser, $ptree )
+&$code_ref( $parser, $ptree )
 
 and if a method-name was given, it is invoked as:
 
-  $parser->method_name( $ptree )
+$parser->method_name( $ptree )
 
 where C<$parser> is a reference to the parser object, and C<$ptree>
 is a reference to the parse-tree object.
@@ -743,10 +743,10 @@ sub parse_text {
         ## more than just the sequence object, we also need to pass the
         ## sequence name and text.
         $xseq_sub = sub {
-            my @($self, $iseq) =  @_;
-            my $args = join("", $iseq->parse_tree->children);
-            return  $self->interior_sequence( $iseq->name, $args, $iseq);
-        };
+                my @($self, $iseq) =  @_;
+                my $args = join("", $iseq->parse_tree->children);
+                return  $self->interior_sequence( $iseq->name, $args, $iseq);
+            };
     }
     ref $xseq_sub    or  $xseq_sub   = sub { shift()->?$expand_seq(< @_) };
     ref $xtext_sub   or  $xtext_sub  = sub { shift()->?$expand_text(< @_) };
@@ -779,10 +779,10 @@ sub parse_text {
             ($ldelim = $ldelim_orig) =~ s/\s+$//;
             ($rdelim = $ldelim) =~ s/</>/g;
             $seq = Pod::InteriorSequence->new(
-                       name   => $cmd,
-                       ldelim => $ldelim_orig,  rdelim => $rdelim,
-                       file   => $file,    line   => $line
-                   );
+                name   => $cmd,
+                ldelim => $ldelim_orig,  rdelim => $rdelim,
+                file   => $file,    line   => $line
+                );
             ((nelems @seq_stack) +> 1)  and  $seq->nested(@seq_stack[-1]);
             push @seq_stack, $seq;
         }
@@ -791,7 +791,7 @@ sub parse_text {
             ## Make sure we match the right kind of closing delimiter
             my @($seq_end, $post_seq) = @("", "");
             if ( ($ldelim eq '<'   and  m/\A(.*?)(>)/s)
-                 or  m/\A(.*?)(\s+$rdelim)/s )
+                or  m/\A(.*?)(\s+$rdelim)/s )
             {
                 ## Found end-of-sequence, capture the interior and the
                 ## closing the delimiter, and put the rest back on the
@@ -813,7 +813,7 @@ sub parse_text {
                 pop @seq_stack;
                 ## Append result to its parent in current parse tree
                 @seq_stack[-1]->append($expand_seq ?? &$xseq_sub($self,$seq)
-                                                   !! $seq);
+                    !! $seq);
                 ## Remember the current cmd-name and left-delimiter
                 if((nelems @seq_stack) +> 1) {
                     $cmd = @seq_stack[-1]->name;
@@ -838,18 +838,18 @@ sub parse_text {
     ## Handle unterminated sequences
     my $errorsub = ((nelems @seq_stack) +> 1) ?? $self->errorsub() !! undef;
     while ((nelems @seq_stack) +> 1) {
-       @($cmd, $file, $line) = @( $seq->name, < $seq->file_line);
-       $ldelim  = $seq->ldelim;
-       ($rdelim = $ldelim) =~ s/</>/g;
-       $rdelim  =~ s/^(\S+)(\s*)$/$2$1/;
-       pop @seq_stack;
-       my $errmsg = "*** ERROR: unterminated $($cmd)$($ldelim)...$($rdelim)".
-                    " at line $line in file $file\n";
-       (ref $errorsub) and &{$errorsub}($errmsg)
-           or (defined $errorsub) and $self->?$errorsub($errmsg)
-               or  warn($errmsg);
-       @seq_stack[-1]->append($expand_seq ?? < &$xseq_sub($self,$seq) !! $seq);
-       $seq = @seq_stack[-1];
+        @($cmd, $file, $line) = @( $seq->name, < $seq->file_line);
+        $ldelim  = $seq->ldelim;
+        ($rdelim = $ldelim) =~ s/</>/g;
+        $rdelim  =~ s/^(\S+)(\s*)$/$2$1/;
+        pop @seq_stack;
+        my $errmsg = "*** ERROR: unterminated $($cmd)$($ldelim)...$($rdelim)".
+            " at line $line in file $file\n";
+        (ref $errorsub) and &{$errorsub}($errmsg)
+            or (defined $errorsub) and $self->?$errorsub($errmsg)
+            or  warn($errmsg);
+        @seq_stack[-1]->append($expand_seq ?? < &$xseq_sub($self,$seq) !! $seq);
+        $seq = @seq_stack[-1];
     }
 
     ## Return the resulting parse-tree
@@ -861,7 +861,7 @@ sub parse_text {
 
 =head1 B<interpolate()>
 
-            $textblock = $parser->interpolate($text, $line_num);
+$textblock = $parser->interpolate($text, $line_num);
 
 This method translates all text (including any embedded interior sequences)
 in the given text string C<$text> and returns the interpolated result. The
@@ -887,7 +887,7 @@ sub interpolate($self, $text, ?$line_num) {
 
 =head1 B<parse_paragraph()>
 
-            $parser->parse_paragraph($text, $line_num);
+$parser->parse_paragraph($text, $line_num);
 
 This method takes the text of a POD paragraph to be processed, along
 with its corresponding line number, and invokes the appropriate method
@@ -935,9 +935,9 @@ sub parse_paragraph($self, $text, $line_num) {
     ## If we havent already, perform any desired preprocessing and
     ## then re-check the "cutting" state
     unless ($wantNonPods) {
-       $text = $self->preprocess_paragraph($text, $line_num);
-       return 1  unless ((defined $text) and (length $text));
-       return 1  if (%$self{?_CUTTING});
+        $text = $self->preprocess_paragraph($text, $line_num);
+        return 1  unless ((defined $text) and (length $text));
+        return 1  if (%$self{?_CUTTING});
     }
 
     ## Look for one of the three types of paragraphs
@@ -953,18 +953,18 @@ sub parse_paragraph($self, $text, $line_num) {
         ## If this is a "cut" directive then we dont need to do anything
         ## except return to "cutting" mode.
         if ($cmd eq 'cut') {
-           %$self{+_CUTTING} = 1;
-           return  unless %myOpts{?'process_cut_cmd'};
+            %$self{+_CUTTING} = 1;
+            return  unless %myOpts{?'process_cut_cmd'};
         }
     }
     ## Save the attributes indicating how the command was specified.
     $pod_para = Pod::Paragraph->new(
-          name      => $cmd,
-          text      => $text,
-          prefix    => $pfx,
-          separator => $sep,
-          file      => %$self{?_INFILE},
-          line      => $line_num);
+        name      => $cmd,
+        text      => $text,
+        prefix    => $pfx,
+        separator => $sep,
+        file      => %$self{?_INFILE},
+        line      => $line_num);
     # ## Invoke appropriate callbacks
     # if (exists $$self{_CALLBACKS}) {
     #    ## Look through the callback list, invoke callbacks,
@@ -991,7 +991,7 @@ sub parse_paragraph($self, $text, $line_num) {
 
 =head1 B<parse_from_filehandle()>
 
-            $parser->parse_from_filehandle($in_fh,$out_fh);
+$parser->parse_from_filehandle($in_fh,$out_fh);
 
 This method takes an input filehandle (which is assumed to already be
 opened for reading) and reads the entire input stream looking for blocks
@@ -1062,17 +1062,17 @@ sub parse_from_filehandle {
         ## See if this line is blank and ends the current paragraph.
         ## If it isnt, then keep iterating until it is.
         next unless (($textline =~ m/^([^\S\r\n]*)[\r\n]*$/)
-                                     && (length $paragraph));
+                     && (length $paragraph));
 
         ## Issue a warning about any non-empty blank lines
         if (length($1) +> 0 and %myOpts{?'warnings'} and ! %$self{?_CUTTING}) {
             my $errorsub = $self->errorsub();
             my $file = $self->input_file();
             my $errmsg = "*** WARNING: line containing nothing but whitespace".
-                         " in paragraph at line $nlines in file $file\n";
+                " in paragraph at line $nlines in file $file\n";
             (ref $errorsub) and &{$errorsub}($errmsg)
                 or (defined $errorsub) and $self->?$errorsub($errmsg)
-                    or  warn($errmsg);
+                or  warn($errmsg);
         }
 
         ## Now process the paragraph
@@ -1082,7 +1082,7 @@ sub parse_from_filehandle {
     }
     ## Dont forget about the last paragraph in the file
     if (length $paragraph) {
-       parse_paragraph($self, $paragraph, ($nlines - $plines) + 1)
+        parse_paragraph($self, $paragraph, ($nlines - $plines) + 1)
     }
 
     ## Now pop the input stream off the top of the input stack.
@@ -1093,7 +1093,7 @@ sub parse_from_filehandle {
 
 =head1 B<parse_from_file()>
 
-            $parser->parse_from_file($filename,$outfile);
+$parser->parse_from_file($filename,$outfile);
 
 This method takes a filename and does the following:
 
@@ -1162,7 +1162,7 @@ sub parse_from_file {
         ## We have a filename, open it for reading
         %$self{+_INFILE} = $infile;
         open($in_fh, "<", "$infile")  or
-             die "Can't open $infile for reading: $^OS_ERROR\n";
+            die "Can't open $infile for reading: $^OS_ERROR\n";
         $close_input = 1;
     }
 
@@ -1179,11 +1179,11 @@ sub parse_from_file {
             die "Output to $1 reference not supported!\n";
         }
         elsif (ref($outfile) eq 'SCALAR') {
-#           # NOTE: IO::String isn't a part of the perl distribution,
-#           #       so probably we shouldn't support this case...
-#           require IO::String;
-#           $$self{_OUTFILE} = "$outfile";
-#           $out_fh = IO::String->new($outfile);
+            #           # NOTE: IO::String isn't a part of the perl distribution,
+            #           #       so probably we shouldn't support this case...
+            #           require IO::String;
+            #           $$self{_OUTFILE} = "$outfile";
+            #           $out_fh = IO::String->new($outfile);
             die "Output to SCALAR reference not supported!\n";
         }
         else {
@@ -1216,7 +1216,7 @@ sub parse_from_file {
         %$self{+_OUTFILE} = $outfile;
         (-d $outfile) and die "$outfile is a directory, not POD input!\n";
         open($out_fh, ">", "$outfile")  or
-             die "Can't open $outfile for writing: $^OS_ERROR\n";
+            die "Can't open $outfile for writing: $^OS_ERROR\n";
         $close_output = 1;
     }
 
@@ -1244,20 +1244,20 @@ instance data fields:
 
 =head1 B<errorsub()>
 
-            $parser->errorsub("method_name");
-            $parser->errorsub(\&warn_user);
-            $parser->errorsub(sub { print STDERR, @_ });
+$parser->errorsub("method_name");
+$parser->errorsub(\&warn_user);
+$parser->errorsub(sub { print STDERR, @_ });
 
 Specifies the method or subroutine to use when printing error messages
 about POD syntax. The supplied method/subroutine I<must> return TRUE upon
 successful printing of the message. If C<undef> is given, then the B<warn>
 builtin is used to issue error messages (this is the default behavior).
 
-            my $errorsub = $parser->errorsub()
-            my $errmsg = "This is an error message!\n"
-            (ref $errorsub) and &{$errorsub}($errmsg)
-                or (defined $errorsub) and $parser->$errorsub($errmsg)
-                    or  warn($errmsg);
+my $errorsub = $parser->errorsub()
+my $errmsg = "This is an error message!\n"
+(ref $errorsub) and &{$errorsub}($errmsg)
+or (defined $errorsub) and $parser->$errorsub($errmsg)
+or  warn($errmsg);
 
 Returns a method name, or else a reference to the user-supplied subroutine
 used to print error messages. Returns C<undef> if the B<warn> builtin
@@ -1266,20 +1266,20 @@ is used to issue error messages (this is the default behavior).
 =cut
 
 sub errorsub {
-   return ((nelems @_) +> 1) ??  @(@_[0]->{+_ERRORSUB} = @_[1]) !! @_[0]->{?_ERRORSUB};
+    return ((nelems @_) +> 1) ??  @(@_[0]->{+_ERRORSUB} = @_[1]) !! @_[0]->{?_ERRORSUB};
 }
 
 ##---------------------------------------------------------------------------
 
 =head1 B<cutting()>
 
-            $boolean = $parser->cutting();
+$boolean = $parser->cutting();
 
 Returns the current C<cutting> state: a boolean-valued scalar which
 evaluates to true if text from the input file is currently being "cut"
 (meaning it is I<not> considered part of the POD document).
 
-            $parser->cutting($boolean);
+$parser->cutting($boolean);
 
 Sets the current C<cutting> state to the given value and returns the
 result.
@@ -1287,7 +1287,7 @@ result.
 =cut
 
 sub cutting {
-   return ((nelems @_) +> 1) ??  @(@_[0]->{+_CUTTING} = @_[1]) !! @_[0]->{?_CUTTING};
+    return ((nelems @_) +> 1) ??  @(@_[0]->{+_CUTTING} = @_[1]) !! @_[0]->{?_CUTTING};
 }
 
 ##---------------------------------------------------------------------------
@@ -1299,31 +1299,31 @@ sub cutting {
 When invoked with no additional arguments, B<parseopts> returns a hashtable
 of all the current parsing options.
 
-            ## See if we are parsing non-POD sections as well as POD ones
-            my %opts = $parser->parseopts();
-            $opts{'want_nonPODs}' and print "want_nonPODs\n";
+## See if we are parsing non-POD sections as well as POD ones
+my %opts = $parser->parseopts();
+$opts{'want_nonPODs}' and print "want_nonPODs\n";
 
 When invoked using a single string, B<parseopts> treats the string as the
 name of a parse-option and returns its corresponding value if it exists
 (returns C<undef> if it doesn't).
 
-            ## Did we ask to see '=cut' paragraphs?
-            my $want_cut = $parser->parseopts('process_cut_cmd');
-            $want_cut and print "process_cut_cmd\n";
+## Did we ask to see '=cut' paragraphs?
+my $want_cut = $parser->parseopts('process_cut_cmd');
+$want_cut and print "process_cut_cmd\n";
 
 When invoked with multiple arguments, B<parseopts> treats them as
 key/value pairs and the specified parse-option names are set to the
 given values. Any unspecified parse-options are unaffected.
 
-            ## Set them back to the default
-            $parser->parseopts(warnings => 0);
+## Set them back to the default
+$parser->parseopts(warnings => 0);
 
 When passed a single hash-ref, B<parseopts> uses that hash to completely
 reset the existing parse-options, all previous parse-option values
 are lost.
 
-            ## Reset all options to default 
-            $parser->parseopts( { } );
+## Reset all options to default 
+$parser->parseopts( { } );
 
 See L<"PARSING OPTIONS"> for more information on the name and meaning of each
 parse-option currently recognized.
@@ -1345,56 +1345,56 @@ sub parseopts {
 
 =head1 B<output_file()>
 
-            $fname = $parser->output_file();
+$fname = $parser->output_file();
 
 Returns the name of the output file being written.
 
 =cut
 
 sub output_file {
-   return @_[0]->{?_OUTFILE};
+    return @_[0]->{?_OUTFILE};
 }
 
 ##---------------------------------------------------------------------------
 
 =head1 B<output_handle()>
 
-            $fhandle = $parser->output_handle();
+$fhandle = $parser->output_handle();
 
 Returns the output filehandle object.
 
 =cut
 
 sub output_handle {
-   return @_[0]->{?_OUTPUT};
+    return @_[0]->{?_OUTPUT};
 }
 
 ##---------------------------------------------------------------------------
 
 =head1 B<input_file()>
 
-            $fname = $parser->input_file();
+$fname = $parser->input_file();
 
 Returns the name of the input file being read.
 
 =cut
 
 sub input_file {
-   return @_[0]->{?_INFILE};
+    return @_[0]->{?_INFILE};
 }
 
 ##---------------------------------------------------------------------------
 
 =head1 B<input_handle()>
 
-            $fhandle = $parser->input_handle();
+$fhandle = $parser->input_handle();
 
 Returns the current input filehandle object.
 
 =cut
 
 sub input_handle {
-   return @_[0]->{?_INPUT};
+    return @_[0]->{?_INPUT};
 }
 
 ##---------------------------------------------------------------------------
@@ -1403,7 +1403,7 @@ sub input_handle {
 
 =head1 B<input_streams()>
 
-            $listref = $parser->input_streams();
+$listref = $parser->input_streams();
 
 Returns a reference to an array which corresponds to the stack of all
 the input streams that are currently in the middle of being parsed.
@@ -1429,7 +1429,7 @@ being processed.
 =cut
 
 sub input_streams {
-   return @_[0]->{?_INPUT_STREAMS};
+    return @_[0]->{?_INPUT_STREAMS};
 }
 
 ##---------------------------------------------------------------------------
@@ -1438,7 +1438,7 @@ sub input_streams {
 
 =head1 B<top_stream()>
 
-            $hashref = $parser->top_stream();
+$hashref = $parser->top_stream();
 
 Returns a reference to the hash-table that represents the element
 that is currently at the top (end) of the input stream stack
@@ -1453,7 +1453,7 @@ to obtain the name and line number of the current input file.
 =cut
 
 sub top_stream {
-   return @_[0]->{?_TOP_STREAM} || undef;
+    return @_[0]->{?_TOP_STREAM} || undef;
 }
 
 #############################################################################
@@ -1479,7 +1479,7 @@ prefix of "_" and match the regular expression C</^_\w+$/>.
 
 =head1 B<_push_input_stream()>
 
-            $hashref = $parser->_push_input_stream($in_fh,$out_fh);
+$hashref = $parser->_push_input_stream($in_fh,$out_fh);
 
 This method will push the given input stream on the input stack and
 perform any necessary beginning-of-document or beginning-of-file
@@ -1520,11 +1520,11 @@ sub _push_input_stream($self, $in_fh, $out_fh) {
     %$self{+_INFILE}  = '(unknown)'  unless (defined  %$self{?_INFILE});
     %$self{+_INPUT}   = $in_fh;
     my $input_top     = %$self{+_TOP_STREAM}
-                      = Pod::InputSource->new(
-                            name        => %$self{?_INFILE},
-                            handle      => $in_fh,
-                            was_cutting => %$self{_CUTTING}
-);
+        = Pod::InputSource->new(
+        name        => %$self{?_INFILE},
+        handle      => $in_fh,
+        was_cutting => %$self{_CUTTING}
+        );
     my $input_stack = %$self{?_INPUT_STREAMS};
     push(@$input_stack, $input_top);
 
@@ -1541,7 +1541,7 @@ sub _push_input_stream($self, $in_fh, $out_fh) {
 
 =head1 B<_pop_input_stream()>
 
-            $hashref = $parser->_pop_input_stream();
+$hashref = $parser->_pop_input_stream();
 
 This takes no arguments. It will perform any necessary end-of-file or
 end-of-document processing and then pop the current input stream from
@@ -1569,12 +1569,12 @@ sub _pop_input_stream($self) {
     ## Dont forget to reset the input indicators
     my $input_top = undef;
     if ((nelems @$input_stack) +> 0) {
-       $input_top = %$self{+_TOP_STREAM} = @$input_stack[-1];
-       %$self{+_INFILE}  = $input_top->name();
-       %$self{+_INPUT}   = $input_top->handle();
+        $input_top = %$self{+_TOP_STREAM} = @$input_stack[-1];
+        %$self{+_INFILE}  = $input_top->name();
+        %$self{+_INPUT}   = $input_top->handle();
     } else {
-       delete %$self{_TOP_STREAM};
-       delete %$self{_INPUT_STREAMS};
+        delete %$self{_TOP_STREAM};
+        delete %$self{_INPUT_STREAMS};
     }
 
     return  $input_top;
@@ -1633,91 +1633,91 @@ invocation of B<parse_text>. Let's assume the desired option-set is
 given by the hash C<%options>. Then we might do something like the
 following:
 
-    package MyPodParserTree;
+package MyPodParserTree;
 
-    @ISA = qw( Pod::Parser );
+@ISA = qw( Pod::Parser );
 
-    ...
+...
 
-    sub begin_pod {
-        my $self = shift;
-        $self->{'paragraphs'} = [];  ## initialize paragraph list
-    }
+sub begin_pod {
+my $self = shift;
+$self->{'paragraphs'} = [];  ## initialize paragraph list
+}
 
-    sub command { 
-        my ($parser, $command, $paragraph, $line_num, $pod_para) = @_;
-        my $ptree = $parser->parse_text({%options}, $paragraph, ...);
-        $pod_para->parse_tree( $ptree );
-        push @{ $self->{'paragraphs'} }, $pod_para;
-    }
+sub command { 
+my ($parser, $command, $paragraph, $line_num, $pod_para) = @_;
+my $ptree = $parser->parse_text({%options}, $paragraph, ...);
+$pod_para->parse_tree( $ptree );
+push @{ $self->{'paragraphs'} }, $pod_para;
+}
 
-    sub verbatim { 
-        my ($parser, $paragraph, $line_num, $pod_para) = @_;
-        push @{ $self->{'paragraphs'} }, $pod_para;
-    }
+sub verbatim { 
+my ($parser, $paragraph, $line_num, $pod_para) = @_;
+push @{ $self->{'paragraphs'} }, $pod_para;
+}
 
-    sub textblock { 
-        my ($parser, $paragraph, $line_num, $pod_para) = @_;
-        my $ptree = $parser->parse_text({%options}, $paragraph, ...);
-        $pod_para->parse_tree( $ptree );
-        push @{ $self->{'paragraphs'} }, $pod_para;
-    }
+sub textblock { 
+my ($parser, $paragraph, $line_num, $pod_para) = @_;
+my $ptree = $parser->parse_text({%options}, $paragraph, ...);
+$pod_para->parse_tree( $ptree );
+push @{ $self->{'paragraphs'} }, $pod_para;
+}
 
-    ...
+...
 
-    package main;
-    ...
-    my $parser = new MyPodParserTree(...);
-    $parser->parse_from_file(...);
-    my $paragraphs_ref = $parser->{'paragraphs'};
+package main;
+...
+my $parser = new MyPodParserTree(...);
+$parser->parse_from_file(...);
+my $paragraphs_ref = $parser->{'paragraphs'};
 
 Of course, in this module-author's humble opinion, I'd be more inclined to
 use the existing B<Pod::ParseTree> object than a simple array. That way
 everything in it, paragraphs and sequences, all respond to the same core
 interface for all parse-tree nodes. The result would look something like:
 
-    package MyPodParserTree2;
+package MyPodParserTree2;
 
-    ...
+...
 
-    sub begin_pod {
-        my $self = shift;
-        $self->{'ptree'} = new Pod::ParseTree;  ## initialize parse-tree
-    }
+sub begin_pod {
+my $self = shift;
+$self->{'ptree'} = new Pod::ParseTree;  ## initialize parse-tree
+}
 
-    sub parse_tree {
-        ## convenience method to get/set the parse-tree for the entire POD
-        (@_ > 1)  and  $_[0]->{'ptree'} = $_[1];
-        return $_[0]->{'ptree'};
-    }
+sub parse_tree {
+## convenience method to get/set the parse-tree for the entire POD
+(@_ > 1)  and  $_[0]->{'ptree'} = $_[1];
+return $_[0]->{'ptree'};
+}
 
-    sub command { 
-        my ($parser, $command, $paragraph, $line_num, $pod_para) = @_;
-        my $ptree = $parser->parse_text({<<options>>}, $paragraph, ...);
-        $pod_para->parse_tree( $ptree );
-        $parser->parse_tree()->append( $pod_para );
-    }
+sub command { 
+my ($parser, $command, $paragraph, $line_num, $pod_para) = @_;
+my $ptree = $parser->parse_text({<<options>>}, $paragraph, ...);
+$pod_para->parse_tree( $ptree );
+$parser->parse_tree()->append( $pod_para );
+}
 
-    sub verbatim { 
-        my ($parser, $paragraph, $line_num, $pod_para) = @_;
-        $parser->parse_tree()->append( $pod_para );
-    }
+sub verbatim { 
+my ($parser, $paragraph, $line_num, $pod_para) = @_;
+$parser->parse_tree()->append( $pod_para );
+}
 
-    sub textblock { 
-        my ($parser, $paragraph, $line_num, $pod_para) = @_;
-        my $ptree = $parser->parse_text({<<options>>}, $paragraph, ...);
-        $pod_para->parse_tree( $ptree );
-        $parser->parse_tree()->append( $pod_para );
-    }
+sub textblock { 
+my ($parser, $paragraph, $line_num, $pod_para) = @_;
+my $ptree = $parser->parse_text({<<options>>}, $paragraph, ...);
+$pod_para->parse_tree( $ptree );
+$parser->parse_tree()->append( $pod_para );
+}
 
-    ...
+...
 
-    package main;
-    ...
-    my $parser = new MyPodParserTree2(...);
-    $parser->parse_from_file(...);
-    my $ptree = $parser->parse_tree;
-    ...
+package main;
+...
+my $parser = new MyPodParserTree2(...);
+$parser->parse_from_file(...);
+my $ptree = $parser->parse_tree;
+...
 
 Now you have the entire POD document as one great big parse-tree. You
 can even use the B<-expand_seq> option to B<parse_text> to insert

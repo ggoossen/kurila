@@ -20,44 +20,44 @@ Pod::Select, podselect() - extract selected sections of POD from input
 
 =head1 SYNOPSIS
 
-    use Pod::Select;
+use Pod::Select;
 
-    ## Select all the POD sections for each file in @filelist
-    ## and print the result on standard output.
-    podselect(@filelist);
+## Select all the POD sections for each file in @filelist
+## and print the result on standard output.
+podselect(@filelist);
 
-    ## Same as above, but write to tmp.out
-    podselect({-output => "tmp.out"}, @filelist):
+## Same as above, but write to tmp.out
+podselect({-output => "tmp.out"}, @filelist):
 
-    ## Select from the given filelist, only those POD sections that are
-    ## within a 1st level section named any of: NAME, SYNOPSIS, OPTIONS.
-    podselect({-sections => ["NAME|SYNOPSIS", "OPTIONS"]}, @filelist):
+## Select from the given filelist, only those POD sections that are
+## within a 1st level section named any of: NAME, SYNOPSIS, OPTIONS.
+podselect({-sections => ["NAME|SYNOPSIS", "OPTIONS"]}, @filelist):
 
-    ## Select the "DESCRIPTION" section of the PODs from STDIN and write
-    ## the result to STDERR.
-    podselect({-output => ">&STDERR", -sections => ["DESCRIPTION"]}, $^STDIN);
+## Select the "DESCRIPTION" section of the PODs from STDIN and write
+## the result to STDERR.
+podselect({-output => ">&STDERR", -sections => ["DESCRIPTION"]}, $^STDIN);
 
 or
 
-    use Pod::Select;
+use Pod::Select;
 
-    ## Create a parser object for selecting POD sections from the input
-    $parser = new Pod::Select();
+## Create a parser object for selecting POD sections from the input
+$parser = new Pod::Select();
 
-    ## Select all the POD sections for each file in @filelist
-    ## and print the result to tmp.out.
-    $parser->parse_from_file("<&STDIN", "tmp.out");
+## Select all the POD sections for each file in @filelist
+## and print the result to tmp.out.
+$parser->parse_from_file("<&STDIN", "tmp.out");
 
-    ## Select from the given filelist, only those POD sections that are
-    ## within a 1st level section named any of: NAME, SYNOPSIS, OPTIONS.
-    $parser->select("NAME|SYNOPSIS", "OPTIONS");
-    for (@filelist) { $parser->parse_from_file($_); }
+## Select from the given filelist, only those POD sections that are
+## within a 1st level section named any of: NAME, SYNOPSIS, OPTIONS.
+$parser->select("NAME|SYNOPSIS", "OPTIONS");
+for (@filelist) { $parser->parse_from_file($_); }
 
-    ## Select the "DESCRIPTION" and "SEE ALSO" sections of the PODs from
-    ## STDIN and write the result to STDERR.
-    $parser->select("DESCRIPTION");
-    $parser->add_selection("SEE ALSO");
-    $parser->parse_from_filehandle($^STDIN, $^STDERR);
+## Select the "DESCRIPTION" and "SEE ALSO" sections of the PODs from
+## STDIN and write the result to STDERR.
+$parser->select("DESCRIPTION");
+$parser->add_selection("SEE ALSO");
+$parser->parse_from_filehandle($^STDIN, $^STDERR);
 
 =head1 REQUIRES
 
@@ -174,7 +174,7 @@ The formal syntax of a range specification is:
 Where each the item inside square brackets (the ".." followed by the
 end-range-regex) is optional. Each "range-regex" is of the form:
 
-    =cmd-expr text-expr
+=cmd-expr text-expr
 
 Where I<cmd-expr> is intended to match the name of one or more POD
 commands, and I<text-expr> is intended to match the paragraph text for
@@ -284,8 +284,8 @@ sub _init_headings {
 
 =head1 B<curr_headings()>
 
-            ($head1, $head2, $head3, ...) = $parser->curr_headings();
-            $head1 = $parser->curr_headings(1);
+($head1, $head2, $head3, ...) = $parser->curr_headings();
+$head1 = $parser->curr_headings(1);
 
 This method returns a list of the currently active section headings and
 subheadings in the document being parsed. The list of headings returned
@@ -309,7 +309,7 @@ sub curr_headings {
 
 =head1 B<select()>
 
-            $parser->select($section_spec1,$section_spec2,...);
+$parser->select($section_spec1,$section_spec2,...);
 
 This method is used to select the particular sections and subsections of
 POD documentation that are to be printed and/or processed. The existing
@@ -337,7 +337,7 @@ sub select {
     my @sections = @_;
     local $_ = undef;
 
-### NEED TO DISCERN A SECTION-SPEC FROM A RANGE-SPEC (look for m{^/.+/$}?)
+    ### NEED TO DISCERN A SECTION-SPEC FROM A RANGE-SPEC (look for m{^/.+/$}?)
 
     ##---------------------------------------------------------------------
     ## The following is a blatant hack for backward compatibility, and for
@@ -358,7 +358,7 @@ sub select {
         return;
     }
     %$self{+_SELECTED_SECTIONS} = \@()
-        unless ($add  &&  exists %$self{_SELECTED_SECTIONS});
+    unless ($add  &&  exists %$self{_SELECTED_SECTIONS});
     my $selected_sections = %$self{?_SELECTED_SECTIONS};
 
     ## Compile each spec
@@ -377,7 +377,7 @@ sub select {
 
 =head1 B<add_selection()>
 
-            $parser->add_selection($section_spec1,$section_spec2,...);
+$parser->add_selection($section_spec1,$section_spec2,...);
 
 This method is used to add to the currently selected sections and
 subsections of POD documentation that are to be printed and/or
@@ -401,7 +401,7 @@ sub add_selection {
 
 =head1 B<clear_selections()>
 
-            $parser->clear_selections();
+$parser->clear_selections();
 
 This method takes no arguments, it has the exact same effect as invoking
 <select()> with no arguments.
@@ -417,7 +417,7 @@ sub clear_selections {
 
 =head1 B<match_section()>
 
-            $boolean = $parser->match_section($heading1,$heading2,...);
+$boolean = $parser->match_section($heading1,$heading2,...);
 
 Returns a value of true if the given section and subsection heading
 titles match any of the currently selected section specifications in
@@ -439,7 +439,7 @@ sub match_section {
 
     ## Return true if no restrictions were explicitly specified
     my $selections = (exists %$self{_SELECTED_SECTIONS})
-                       ??  %$self{?_SELECTED_SECTIONS}  !!  undef;
+        ??  %$self{?_SELECTED_SECTIONS}  !!  undef;
     return  1  unless ((defined $selections) && ((nelems @{$selections}) +> 0));
 
     ## Default any unspecified sections to the current one
@@ -462,7 +462,7 @@ sub match_section {
             $regex   = $section_spec->[$i];
             $negated = ($regex =~ s/^\!//);
             $match  ^&^= ($negated ?? (@headings[$i] !~ m/$regex/)
-                                 !! (@headings[$i] =~ m/$regex/));
+                          !! (@headings[$i] =~ m/$regex/));
             last unless ($match);
         }
         return  1  if ($match);
@@ -474,7 +474,7 @@ sub match_section {
 
 =head1 B<is_selected()>
 
-            $boolean = $parser->is_selected($paragraph);
+$boolean = $parser->is_selected($paragraph);
 
 This method is used to determine if the block of text given in
 C<$paragraph> falls within the currently selected set of POD sections
@@ -526,7 +526,7 @@ implicit first argument.
 
 =head1 B<podselect()>
 
-            podselect(\%options,@filelist);
+podselect(\%options,@filelist);
 
 B<podselect> will print the raw (untranslated) POD paragraphs of all
 POD sections in the given input files specified by C<@filelist>
@@ -580,7 +580,7 @@ sub podselect(@argv) {
     local $_ = undef;
     for ( @argv) {
         if (ref($_)) {
-        next unless (ref($_) eq 'HASH');
+            next unless (ref($_) eq 'HASH');
             %opts = %(< %defaults, < %{$_});
 
             ##-------------------------------------------------------------
@@ -590,12 +590,12 @@ sub podselect(@argv) {
             ## to be uppercase keywords)
             ##-------------------------------------------------------------
             %opts = %: < @+: map {
-                my @($key, $val) = @(lc $_, %opts{?$_});
-                $key =~ s/^(?=\w)/-/;
-                $key =~ m/^-se[cl]/  and  $key  = '-sections';
-                #! $key eq '-range'    and  $key .= 's';
-                @($key => $val);
-            }, keys %opts;
+                        my @($key, $val) = @(lc $_, %opts{?$_});
+                        $key =~ s/^(?=\w)/-/;
+                        $key =~ m/^-se[cl]/  and  $key  = '-sections';
+                        #! $key eq '-range'    and  $key .= 's';
+                        @($key => $val);
+                    }, keys %opts;
 
             ## Process the options
             (exists %opts{'-output'})  and  $output = %opts{?'-output'};
@@ -605,10 +605,10 @@ sub podselect(@argv) {
                 if ( (defined %opts{?'-sections'})
                      && ((ref %opts{?'-sections'}) eq 'ARRAY') );
 
-            #! ## Select the desired paragraph ranges
-            #! $pod_parser->select(@{ $opts{'-ranges'} })
-            #!     if ( (defined $opts{'-ranges'})
-            #!          && ((ref $opts{'-ranges'}) eq 'ARRAY') );
+        #! ## Select the desired paragraph ranges
+        #! $pod_parser->select(@{ $opts{'-ranges'} })
+        #!     if ( (defined $opts{'-ranges'})
+        #!          && ((ref $opts{'-ranges'}) eq 'ARRAY') );
         }
         else {
             $pod_parser->parse_from_file($_, $output);
@@ -641,7 +641,7 @@ prefix of "_" and match the regular expression C</^_\w+$/>.
 
 =head1 B<_compile_section_spec()>
 
-            $listref = $parser->_compile_section_spec($section_spec);
+$listref = $parser->_compile_section_spec($section_spec);
 
 This function (note it is a function and I<not> a method) takes a
 section specification (as described in L<"SECTION SPECIFICATIONS">)
@@ -669,7 +669,7 @@ sub _compile_section_spec($section_spec) {
     ## Set default regex for ommitted levels
     for my $i (0 .. $MAX_HEADING_LEVEL -1) {
         @regexs[+$i]  = '.*'  unless ((defined @regexs[?$i])
-                                     && (length @regexs[$i]));
+                                      && (length @regexs[$i]));
     }
     ## Modify the regexs as needed and validate their syntax
     my $bad_regexs = 0;

@@ -1,12 +1,12 @@
 BEGIN {
     unless ("A" eq pack('U', 0x41)) {
-	print $^STDOUT, "1..0 # Unicode::Collate " .
-	    "cannot stringify a Unicode code point\n";
-	exit 0;
+        print $^STDOUT, "1..0 # Unicode::Collate " .
+            "cannot stringify a Unicode code point\n";
+        exit 0;
     }
     if (env::var('PERL_CORE')) {
-	chdir('t') if -d 't';
-	$^INCLUDE_PATH = @( $^OS_NAME eq 'MacOS' ?? < qw(::lib) !! < qw(../lib) );
+        chdir('t') if -d 't';
+        $^INCLUDE_PATH = @( $^OS_NAME eq 'MacOS' ?? < qw(::lib) !! < qw(../lib) );
     }
 }
 
@@ -22,11 +22,11 @@ ok(1);
 
 # a standard collator (3.1.1)
 my $Collator = Unicode::Collate->new(
-  level => 1,
-  table => 'keys.txt',
-  normalization => undef,
+    level => 1,
+    table => 'keys.txt',
+    normalization => undef,
 
-  entry => <<'ENTRIES',
+    entry => <<'ENTRIES',
 326E  ; [.1831.0020.0006.326E][.188D.0020.0006.326E] # c.h.s. GA
 326F  ; [.1833.0020.0006.326F][.188D.0020.0006.326F] # c.h.s. NA
 3270  ; [.1834.0020.0006.3270][.188D.0020.0006.3270] # c.h.s. DA
@@ -42,15 +42,15 @@ my $Collator = Unicode::Collate->new(
 327A  ; [.1842.0020.0006.327A][.188D.0020.0006.327A] # c.h.s. PA
 327B  ; [.1843.0020.0006.327B][.188D.0020.0006.327B] # c.h.s. HA
 ENTRIES
-);
+    );
 
 my $hangul = Unicode::Collate->new(
-  level => 1,
-  table => 'keys.txt',
-  normalization => undef,
-  hangul_terminator => 16,
+    level => 1,
+    table => 'keys.txt',
+    normalization => undef,
+    hangul_terminator => 16,
 
-  entry => <<'ENTRIES',
+    entry => <<'ENTRIES',
 326E  ; [.1831.0020.0006.326E][.188D.0020.0006.326E] # c.h.s. GA
 326F  ; [.1833.0020.0006.326F][.188D.0020.0006.326F] # c.h.s. NA
 3270  ; [.1834.0020.0006.3270][.188D.0020.0006.3270] # c.h.s. DA
@@ -66,7 +66,7 @@ my $hangul = Unicode::Collate->new(
 327A  ; [.1842.0020.0006.327A][.188D.0020.0006.327A] # c.h.s. PA
 327B  ; [.1843.0020.0006.327B][.188D.0020.0006.327B] # c.h.s. HA
 ENTRIES
-);
+    );
 
 ok(ref $hangul, "Unicode::Collate");
 
@@ -123,12 +123,12 @@ ok($hangul  ->eq("\x{1100}\x{1161}\x{11A8}", "\x{AC01}"));
 #########################
 
 my $hangcirc = Unicode::Collate->new(
-  level => 1,
-  table => 'keys.txt',
-  normalization => undef,
-  hangul_terminator => 16,
+    level => 1,
+    table => 'keys.txt',
+    normalization => undef,
+    hangul_terminator => 16,
 
-  entry => <<'ENTRIES',
+    entry => <<'ENTRIES',
 326E  ; [.1831.0020.0006.326E][.188D.0020.0006.326E][.10.0.0.0] # c.h.s. GA
 326F  ; [.1833.0020.0006.326F][.188D.0020.0006.326F][.10.0.0.0] # c.h.s. NA
 3270  ; [.1834.0020.0006.3270][.188D.0020.0006.3270][.10.0.0.0] # c.h.s. DA
@@ -144,7 +144,7 @@ my $hangcirc = Unicode::Collate->new(
 327A  ; [.1842.0020.0006.327A][.188D.0020.0006.327A][.10.0.0.0] # c.h.s. PA
 327B  ; [.1843.0020.0006.327B][.188D.0020.0006.327B][.10.0.0.0] # c.h.s. HA
 ENTRIES
-);
+    );
 
 # LV vs Circled Syl(LV): /GA/ vs /(GA)/
 ok($Collator->eq("\x{1100}\x{1161}", "\x{326E}"));
@@ -172,16 +172,16 @@ ok($hangcirc->eq("\x{1100}\x{1161}\x{4E00}", "\x{326E}\x{4E00}"));
 # weights of these contractions may be non-sense.
 
 my $hangcont = Unicode::Collate->new(
-  level => 1,
-  table => 'keys.txt',
-  normalization => undef,
-  hangul_terminator => 16,
+    level => 1,
+    table => 'keys.txt',
+    normalization => undef,
+    hangul_terminator => 16,
 
-  entry => <<'ENTRIES',
+    entry => <<'ENTRIES',
 1100 1161 ; [.1831.0020.0002.1100][.188D.0020.0002.1161] # KIYEOK+A
 1161 11A8 ; [.188D.0020.0002.1161][.18CF.0020.0002.11A8] # A+KIYEOK
 ENTRIES
-);
+    );
 
 # cont<LV> vs Syl(LV): /<GA>/ vs /[GA]/
 ok($Collator->eq("\x{1100}\x{1161}", "\x{AC00}"));

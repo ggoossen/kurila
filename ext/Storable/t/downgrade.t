@@ -21,25 +21,25 @@ require utf8;
 our (@RESTRICT_TESTS, %R_HASH, %U_HASH, $UTF8_CROAK, $RESTRICTED_CROAK);
 
 @RESTRICT_TESTS = @('Locked hash', 'Locked hash placeholder',
-                   'Locked keys', 'Locked keys placeholder',
-                  );
+                    'Locked keys', 'Locked keys placeholder',
+    );
 %R_HASH = %(perl => 'rules');
 
 do {
-  # This is cheating. "\xdf" in Latin 1 is beta S, so will match \w if it
-  # is stored in utf8, not bytes.
-  # "\xdf" is y diaresis in EBCDIC (except for cp875, but so far no-one seems
-  # to use that) which has exactly the same properties for \w
-  # So the tests happen to pass.
-  use utf8;
-  my $utf8 = "Schlo\x{df}";
+    # This is cheating. "\xdf" in Latin 1 is beta S, so will match \w if it
+    # is stored in utf8, not bytes.
+    # "\xdf" is y diaresis in EBCDIC (except for cp875, but so far no-one seems
+    # to use that) which has exactly the same properties for \w
+    # So the tests happen to pass.
+    use utf8;
+    my $utf8 = "Schlo\x{df}";
 
-  # \xe5 is V in EBCDIC. That doesn't have the same properties w.r.t. \w as
-  # an a circumflex, so we need to be explicit.
+    # \xe5 is V in EBCDIC. That doesn't have the same properties w.r.t. \w as
+    # an a circumflex, so we need to be explicit.
 
-  my $a_circumflex = "\x[e5]"; # a byte.
-  %U_HASH = %(< @+: map { @: $_, $_}, @( 'castle', "ch$($a_circumflex)teau", $utf8, chr 0x57CE));
-  plan tests => 162;
+    my $a_circumflex = "\x[e5]"; # a byte.
+    %U_HASH = %(< @+: map { @: $_, $_}, @( 'castle', "ch$($a_circumflex)teau", $utf8, chr 0x57CE));
+    plan tests => 162;
 };
 
 $UTF8_CROAK = "/^Cannot retrieve UTF8 data in non-UTF8 perl/";
@@ -47,131 +47,131 @@ $RESTRICTED_CROAK = "/^Cannot retrieve restricted hash/";
 
 my %tests;
 do {
-  local $^INPUT_RECORD_SEPARATOR = "\n\nend\n";
-  while ( ~< *DATA) {
-    next unless m/\S/s;
-    unless (m/begin ([0-7]{3}) ([^\n]*)\n(.*)$/s) {
-      s/\n.*//s;
-      warn "Dodgy data in section starting '$_'";
-      next;
+    local $^INPUT_RECORD_SEPARATOR = "\n\nend\n";
+    while ( ~< *DATA) {
+        next unless m/\S/s;
+        unless (m/begin ([0-7]{3}) ([^\n]*)\n(.*)$/s) {
+            s/\n.*//s;
+            warn "Dodgy data in section starting '$_'";
+            next;
+        }
+        next unless oct $1 == ord 'A'; # Skip ASCII on EBCDIC, and vice versa
+        my $data = unpack 'u', $3;
+        %tests{+$2} = $data;
     }
-    next unless oct $1 == ord 'A'; # Skip ASCII on EBCDIC, and vice versa
-    my $data = unpack 'u', $3;
-    %tests{+$2} = $data;
-  }
 };
 
 # use Data::Dumper; $Data::Dumper::Useqq = 1; print Dumper \%tests;
 sub thaw_hash($name, $expected) {
-  my $hash = try {thaw %tests{?$name}};
-  is ($^EVAL_ERROR, '', "Thawed $name without error?");
-  isa_ok ($hash, 'HASH');
-  ok (defined $hash && eq_hash($hash, $expected),
-      "And it is the hash we expected?");
-  is_deeply($hash, $expected);
-  $hash;
+    my $hash = try {thaw %tests{?$name}};
+    is ($^EVAL_ERROR, '', "Thawed $name without error?");
+    isa_ok ($hash, 'HASH');
+    ok (defined $hash && eq_hash($hash, $expected),
+        "And it is the hash we expected?");
+    is_deeply($hash, $expected);
+    $hash;
 }
 
 sub thaw_scalar($name, $expected, ?$bug) {
-  my $scalar = try {thaw %tests{?$name}};
-  is ($^EVAL_ERROR, '', "Thawed $name without error?");
-  isa_ok ($scalar, 'SCALAR', "Thawed $name?");
-  is ($$scalar, $expected, "And it is the data we expected?");
-  $scalar;
+    my $scalar = try {thaw %tests{?$name}};
+    is ($^EVAL_ERROR, '', "Thawed $name without error?");
+    isa_ok ($scalar, 'SCALAR', "Thawed $name?");
+    is ($$scalar, $expected, "And it is the data we expected?");
+    $scalar;
 }
 
 sub thaw_fail($name, $expected) {
-  my $thing = try {thaw %tests{?$name}};
-  is ($thing, undef, "Thawed $name failed as expected?");
-  like ($^EVAL_ERROR->{?description}, $expected, "Error as predicted?");
+    my $thing = try {thaw %tests{?$name}};
+    is ($thing, undef, "Thawed $name failed as expected?");
+    like ($^EVAL_ERROR->{?description}, $expected, "Error as predicted?");
 }
 
 sub test_locked_hash {
-  my $hash = shift;
-  my @keys = keys %$hash;
-  my @($key, $value) =@( each %$hash);
-  try {$hash->{+$key} = 'x' . $value};
-  like( $^EVAL_ERROR->{?description}, "/^Modification of a read-only value attempted/",
-        'trying to change a locked key' );
-  is ($hash->{?$key}, $value, "hash should not change?");
-  try {$hash->{+use} = 'perl'};
-  like( $^EVAL_ERROR->{?description}, "/^Attempt to access disallowed key 'use' in a restricted hash/",
-        'trying to add another key' );
-  ok (eq_array(\keys %$hash, \@keys), "Still the same keys?");
+    my $hash = shift;
+    my @keys = keys %$hash;
+    my @($key, $value) =@( each %$hash);
+    try {$hash->{+$key} = 'x' . $value};
+    like( $^EVAL_ERROR->{?description}, "/^Modification of a read-only value attempted/",
+          'trying to change a locked key' );
+    is ($hash->{?$key}, $value, "hash should not change?");
+    try {$hash->{+use} = 'perl'};
+    like( $^EVAL_ERROR->{?description}, "/^Attempt to access disallowed key 'use' in a restricted hash/",
+          'trying to add another key' );
+    ok (eq_array(\keys %$hash, \@keys), "Still the same keys?");
 }
 
 sub test_restricted_hash {
-  my $hash = shift;
-  my @keys = keys %$hash;
-  my @($key, $value) =@( each %$hash);
-  try {$hash->{+$key} = 'x' . $value};
-  is( $^EVAL_ERROR, '',
+    my $hash = shift;
+    my @keys = keys %$hash;
+    my @($key, $value) =@( each %$hash);
+    try {$hash->{+$key} = 'x' . $value};
+    is( $^EVAL_ERROR, '',
         'trying to change a restricted key' );
-  is ($hash->{?$key}, 'x' . $value, "hash should change");
-  try {$hash->{+use} = 'perl'};
-  like( $^EVAL_ERROR->{?description}, "/^Attempt to access disallowed key 'use' in a restricted hash/",
-        'trying to add another key' );
-  ok (eq_array(\keys %$hash, \@keys), "Still the same keys?");
+    is ($hash->{?$key}, 'x' . $value, "hash should change");
+    try {$hash->{+use} = 'perl'};
+    like( $^EVAL_ERROR->{?description}, "/^Attempt to access disallowed key 'use' in a restricted hash/",
+          'trying to add another key' );
+    ok (eq_array(\keys %$hash, \@keys), "Still the same keys?");
 }
 
 sub test_placeholder {
-  my $hash = shift;
-  try {$hash->{+rules} = 42};
-  is ($^EVAL_ERROR, '', 'No errors');
-  is ($hash->{?rules}, 42, "New value added");
+    my $hash = shift;
+    try {$hash->{+rules} = 42};
+    is ($^EVAL_ERROR, '', 'No errors');
+    is ($hash->{?rules}, 42, "New value added");
 }
 
 sub test_newkey {
-  my $hash = shift;
-  try {$hash->{+nms} = "http://nms-cgi.sourceforge.net/"};
-  is ($^EVAL_ERROR, '', 'No errors');
-  is ($hash->{?nms}, "http://nms-cgi.sourceforge.net/", "New value added");
+    my $hash = shift;
+    try {$hash->{+nms} = "http://nms-cgi.sourceforge.net/"};
+    is ($^EVAL_ERROR, '', 'No errors');
+    is ($hash->{?nms}, "http://nms-cgi.sourceforge.net/", "New value added");
 }
 
 # $Storable::DEBUGME = 1;
 thaw_hash ('Hash with utf8 flag but no utf8 keys', \%R_HASH);
 
 if (eval "use Hash::Util; 1") {
-  print $^STDOUT, "# We have Hash::Util, so test that the restricted hashes in <DATA> are valid\n";
-  for my $downgrade (@(0, 1, undef, "cheese")) {
-    local $TODO = 1;
-    $Storable::downgrade_restricted = $downgrade;
-    my $hash = thaw_hash ('Locked hash', \%R_HASH);
-    test_locked_hash ($hash);
-    $hash = thaw_hash ('Locked hash placeholder', \%R_HASH);
-    test_locked_hash ($hash);
-    test_placeholder ($hash);
+    print $^STDOUT, "# We have Hash::Util, so test that the restricted hashes in <DATA> are valid\n";
+    for my $downgrade (@(0, 1, undef, "cheese")) {
+        local $TODO = 1;
+        $Storable::downgrade_restricted = $downgrade;
+        my $hash = thaw_hash ('Locked hash', \%R_HASH);
+        test_locked_hash ($hash);
+        $hash = thaw_hash ('Locked hash placeholder', \%R_HASH);
+        test_locked_hash ($hash);
+        test_placeholder ($hash);
 
-    $hash = thaw_hash ('Locked keys', \%R_HASH);
-    test_restricted_hash ($hash);
-    $hash = thaw_hash ('Locked keys placeholder', \%R_HASH);
-    test_restricted_hash ($hash);
-    test_placeholder ($hash);
-  }
+        $hash = thaw_hash ('Locked keys', \%R_HASH);
+        test_restricted_hash ($hash);
+        $hash = thaw_hash ('Locked keys placeholder', \%R_HASH);
+        test_restricted_hash ($hash);
+        test_placeholder ($hash);
+    }
 } else {
-  print $^STDOUT, "# We don't have Hash::Util, so test that the restricted hashes downgrade\n";
-  my $hash = thaw_hash ('Locked hash', \%R_HASH);
-  test_newkey ($hash);
-  $hash = thaw_hash ('Locked hash placeholder', \%R_HASH);
-  test_newkey ($hash);
-  $hash = thaw_hash ('Locked keys', \%R_HASH);
-  test_newkey ($hash);
-  $hash = thaw_hash ('Locked keys placeholder', \%R_HASH);
-  test_newkey ($hash);
-  local $Storable::downgrade_restricted = 0;
-  thaw_fail ('Locked hash', $RESTRICTED_CROAK);
-  thaw_fail ('Locked hash placeholder', $RESTRICTED_CROAK);
-  thaw_fail ('Locked keys', $RESTRICTED_CROAK);
-  thaw_fail ('Locked keys placeholder', $RESTRICTED_CROAK);
+    print $^STDOUT, "# We don't have Hash::Util, so test that the restricted hashes downgrade\n";
+    my $hash = thaw_hash ('Locked hash', \%R_HASH);
+    test_newkey ($hash);
+    $hash = thaw_hash ('Locked hash placeholder', \%R_HASH);
+    test_newkey ($hash);
+    $hash = thaw_hash ('Locked keys', \%R_HASH);
+    test_newkey ($hash);
+    $hash = thaw_hash ('Locked keys placeholder', \%R_HASH);
+    test_newkey ($hash);
+    local $Storable::downgrade_restricted = 0;
+    thaw_fail ('Locked hash', $RESTRICTED_CROAK);
+    thaw_fail ('Locked hash placeholder', $RESTRICTED_CROAK);
+    thaw_fail ('Locked keys', $RESTRICTED_CROAK);
+    thaw_fail ('Locked keys placeholder', $RESTRICTED_CROAK);
 }
 
 do {
-  use utf8;
-  print $^STDOUT, "# We have utf8 scalars, so test that the utf8 scalars in <DATA> are valid\n";
-  thaw_scalar ('Short 8 bit utf8 data', "\x{DF}", 1);
-  thaw_scalar ('Long 8 bit utf8 data', "\x{DF}" x 256, 1);
-  thaw_scalar ('Short 24 bit utf8 data', chr 0xC0FFEE);
-  thaw_scalar ('Long 24 bit utf8 data', chr (0xC0FFEE) x 256);
+    use utf8;
+    print $^STDOUT, "# We have utf8 scalars, so test that the utf8 scalars in <DATA> are valid\n";
+    thaw_scalar ('Short 8 bit utf8 data', "\x{DF}", 1);
+    thaw_scalar ('Long 8 bit utf8 data', "\x{DF}" x 256, 1);
+    thaw_scalar ('Short 24 bit utf8 data', chr 0xC0FFEE);
+    thaw_scalar ('Long 24 bit utf8 data', chr (0xC0FFEE) x 256);
 };
 
 print $^STDOUT, "# We have utf8 hashes, so test that the utf8 hashes in <DATA> are valid\n";

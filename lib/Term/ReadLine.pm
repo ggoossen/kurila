@@ -5,16 +5,16 @@ If no real package is found, substitutes stubs instead of basic functions.
 
 =head1 SYNOPSIS
 
-  use Term::ReadLine;
-  my $term = new Term::ReadLine 'Simple Perl calc';
-  my $prompt = "Enter your arithmetic expression: ";
-  my $OUT = $term->OUT || $^STDOUT;
-  while ( defined ($_ = $term->readline($prompt)) ) {
-    my $res = eval($_);
-    warn $@ if $@;
-    print $OUT $res, "\n" unless $@;
-    $term->addhistory($_) if /\S/;
-  }
+use Term::ReadLine;
+my $term = new Term::ReadLine 'Simple Perl calc';
+my $prompt = "Enter your arithmetic expression: ";
+my $OUT = $term->OUT || $^STDOUT;
+while ( defined ($_ = $term->readline($prompt)) ) {
+my $res = eval($_);
+warn $@ if $@;
+print $OUT $res, "\n" unless $@;
+$term->addhistory($_) if /\S/;
+}
 
 =head1 DESCRIPTION
 
@@ -26,11 +26,11 @@ CPAN (under the C<Term::ReadLine::*> namespace).
 
 All the supported functions should be called as methods, i.e., either as 
 
-  $term = new Term::ReadLine 'name';
+$term = new Term::ReadLine 'name';
 
 or as 
 
-  $term->addhistory('row');
+$term->addhistory('row');
 
 where $term is a return value of Term::ReadLine-E<gt>new().
 
@@ -150,8 +150,8 @@ be C<o=0> or C<ornaments=0>.  The head should be as described above, say
 If the variable is not set, or if the head of space-separated list is
 empty, the best available package is loaded.
 
-  export "PERL_RL=Perl o=0"	# Use Perl ReadLine without ornaments
-  export "PERL_RL= o=0"		# Use best available ReadLine without ornaments
+export "PERL_RL=Perl o=0"	# Use Perl ReadLine without ornaments
+export "PERL_RL= o=0"		# Use best available ReadLine without ornaments
 
 (Note that processing of C<PERL_RL> for ornaments is in the discretion of the 
 particular used C<Term::ReadLine::*> package).
@@ -161,14 +161,14 @@ particular used C<Term::ReadLine::*> package).
 It seems that using Term::ReadLine from Emacs minibuffer doesn't work
 quite right and one will get an error message like
 
-    Cannot open /dev/tty for read at ...
+Cannot open /dev/tty for read at ...
 
 One possible workaround for this is to explicitly open /dev/tty like this
 
-    open (FH, "/dev/tty" )
-      or eval 'sub Term::ReadLine::findConsole { ("&STDIN", "&STDERR") }';
-    die $@ if $@;
-    close (FH);
+open (FH, "/dev/tty" )
+or eval 'sub Term::ReadLine::findConsole { ("&STDIN", "&STDERR") }';
+die $@ if $@;
+close (FH);
 
 or you can try using the 4-argument form of Term::ReadLine->new().
 
@@ -186,23 +186,23 @@ sub PERL_UNICODE_STDIN () { 0x0001 }
 
 sub ReadLine {'Term::ReadLine::Stub'}
 sub readline {
-  my $self = shift;
-  my @($in,$out,$str) =  @$self;
-  my $prompt = shift;
-  print $out, @rl_term_set[0], $prompt, @rl_term_set[1], @rl_term_set[2]; 
-  $self->register_Tk 
-     if not $Term::ReadLine::registered and $Term::ReadLine::toloop
-	and defined &Tk::DoOneEvent;
-  #$str = scalar <$in>;
-  $str = $self->get_line;
-  $str =~ s/^\s*\Q$prompt\E// if ($^OS_NAME eq 'MacOS');
-  utf8::upgrade($str)
-      if ($^UNICODE ^&^ PERL_UNICODE_STDIN || defined $^ENCODING) &&
-         utf8::valid($str);
-  print $out, @rl_term_set[3]; 
-  # bug in 5.000: chomping empty string creats length -1:
-  chomp $str if defined $str;
-  $str;
+    my $self = shift;
+    my @($in,$out,$str) =  @$self;
+    my $prompt = shift;
+    print $out, @rl_term_set[0], $prompt, @rl_term_set[1], @rl_term_set[2]; 
+    $self->register_Tk 
+        if not $Term::ReadLine::registered and $Term::ReadLine::toloop
+        and defined &Tk::DoOneEvent;
+    #$str = scalar <$in>;
+    $str = $self->get_line;
+    $str =~ s/^\s*\Q$prompt\E// if ($^OS_NAME eq 'MacOS');
+    utf8::upgrade($str)
+        if ($^UNICODE ^&^ PERL_UNICODE_STDIN || defined $^ENCODING) &&
+        utf8::valid($str);
+    print $out, @rl_term_set[3]; 
+    # bug in 5.000: chomping empty string creats length -1:
+    chomp $str if defined $str;
+    $str;
 }
 sub addhistory {}
 
@@ -213,65 +213,65 @@ sub findConsole {
     if ($^OS_NAME eq 'MacOS') {
         $console = "Dev:Console";
     } elsif (-e "/dev/tty") {
-	$console = "/dev/tty";
+        $console = "/dev/tty";
     } elsif (-e "con" or $^OS_NAME eq 'MSWin32') {
-       $console = 'CONIN$';
-       $consoleOUT = 'CONOUT$';
+        $console = 'CONIN$';
+        $consoleOUT = 'CONOUT$';
     } else {
-	$console = "sys\$command";
+        $console = "sys\$command";
     }
 
     if (($^OS_NAME eq 'amigaos') || ($^OS_NAME eq 'beos') || ($^OS_NAME eq 'epoc')) {
-	$console = undef;
+        $console = undef;
     }
     elsif ($^OS_NAME eq 'os2') {
-      if ($DB::emacs) {
-	$console = undef;
-      } else {
-	$console = "/dev/con";
-      }
+        if ($DB::emacs) {
+            $console = undef;
+        } else {
+            $console = "/dev/con";
+        }
     }
 
     $consoleOUT = $console unless defined $consoleOUT;
     $console = "&STDIN" unless defined $console;
     if (!defined $consoleOUT) {
-      $consoleOUT = defined fileno($^STDERR) && $^OS_NAME ne 'MSWin32' ?? "&STDERR" !! "&STDOUT";
+        $consoleOUT = defined fileno($^STDERR) && $^OS_NAME ne 'MSWin32' ?? "&STDERR" !! "&STDOUT";
     }
     return @($console,$consoleOUT);
 }
 
 sub new {
-  die "method new called with wrong number of arguments" 
-    unless (nelems @_)==2 or (nelems @_)==4;
-  my ($FIN, $FOUT, $ret);
-  if ((nelems @_)==2) {
-    my@($console, $consoleOUT) =  @_[0]->findConsole;
+    die "method new called with wrong number of arguments" 
+        unless (nelems @_)==2 or (nelems @_)==4;
+    my ($FIN, $FOUT, $ret);
+    if ((nelems @_)==2) {
+        my@($console, $consoleOUT) =  @_[0]->findConsole;
 
 
-    # the Windows CONIN$ needs GENERIC_WRITE mode to allow
-    # a SetConsoleMode() if we end up using Term::ReadKey
-    open my $fin, ((  $^OS_NAME eq 'MSWin32' && $console eq 'CONIN$' ) ?? "+<" !! "<"), "$console";
-    open my $fout, ">","$consoleOUT";
+        # the Windows CONIN$ needs GENERIC_WRITE mode to allow
+        # a SetConsoleMode() if we end up using Term::ReadKey
+        open my $fin, ((  $^OS_NAME eq 'MSWin32' && $console eq 'CONIN$' ) ?? "+<" !! "<"), "$console";
+        open my $fout, ">","$consoleOUT";
 
-    iohandle::output_autoflush($fout, 1);
-    $ret = bless \@(\*$fin, \*$fout);
-  } else {			# Filehandles supplied
-    $FIN = @_[2]; $FOUT = @_[3];
-    iohandle::output_autoflush($FOUT, 1);
-    $ret = bless \@($FIN, $FOUT);
-  }
-  if ($ret->Features->{?ornaments} 
-      and not (env::var('PERL_RL') and env::var('PERL_RL') =~ m/\bo\w*=0/)) {
-    local $Term::ReadLine::termcap_nowarn = 1;
-    $ret->ornaments(1);
-  }
-  return $ret;
+        iohandle::output_autoflush($fout, 1);
+        $ret = bless \@(\*$fin, \*$fout);
+    } else {			# Filehandles supplied
+        $FIN = @_[2]; $FOUT = @_[3];
+        iohandle::output_autoflush($FOUT, 1);
+        $ret = bless \@($FIN, $FOUT);
+    }
+    if ($ret->Features->{?ornaments} 
+        and not (env::var('PERL_RL') and env::var('PERL_RL') =~ m/\bo\w*=0/)) {
+        local $Term::ReadLine::termcap_nowarn = 1;
+        $ret->ornaments(1);
+    }
+    return $ret;
 }
 
 sub newTTY($self, $in, $out) {
-  $self->[0] = $in;
-  $self->[1] = $out;
-  iohandle::output_autoflush($out, 1);
+    $self->[0] = $in;
+    $self->[1] = $out;
+    iohandle::output_autoflush($out, 1);
 }
 
 sub IN { shift->[0] }
@@ -283,10 +283,10 @@ my %features = %(tkRunning => 1, ornaments => 1, 'newTTY' => 1);
 sub Features { \%features }
 
 sub get_line {
-  my $self = shift;
-  my $in = $self->IN;
-  local ($^INPUT_RECORD_SEPARATOR) = "\n";
-  return scalar ~< $in;
+    my $self = shift;
+    my $in = $self->IN;
+                       local ($^INPUT_RECORD_SEPARATOR) = "\n";
+    return scalar ~< $in;
 }
 
 package Term::ReadLine;		# So late to allow the above code be defined?
@@ -295,17 +295,17 @@ our $VERSION = '1.03';
 
 my @($which) = defined env::var('PERL_RL') ?? split m/\s+/, env::var('PERL_RL') !! @(undef);
 if ($which) {
-  if ($which =~ m/\bgnu\b/i){
-    eval "use Term::ReadLine::Gnu;";
-  } elsif ($which =~ m/\bperl\b/i) {
-    eval "use Term::ReadLine::Perl;";
-  } else {
-    eval "use Term::ReadLine::$which;";
-  }
+    if ($which =~ m/\bgnu\b/i){
+        eval "use Term::ReadLine::Gnu;";
+    } elsif ($which =~ m/\bperl\b/i) {
+        eval "use Term::ReadLine::Perl;";
+    } else {
+        eval "use Term::ReadLine::$which;";
+    }
 } elsif (defined $which and $which ne '') {	# Defined but false
-  # Do nothing fancy
+# Do nothing fancy
 } else {
-  eval "use Term::ReadLine::Gnu; 1" or eval "use Term::ReadLine::Perl; 1";
+    eval "use Term::ReadLine::Gnu; 1" or eval "use Term::ReadLine::Perl; 1";
 }
 
 #require FileHandle;
@@ -314,13 +314,13 @@ if ($which) {
 # in debugger).
 our @ISA;
 if (defined &Term::ReadLine::Gnu::readline) {
-  @ISA = qw(Term::ReadLine::Gnu Term::ReadLine::Stub);
+    @ISA = qw(Term::ReadLine::Gnu Term::ReadLine::Stub);
 } elsif (defined &Term::ReadLine::Perl::readline) {
-  @ISA = qw(Term::ReadLine::Perl Term::ReadLine::Stub);
+    @ISA = qw(Term::ReadLine::Perl Term::ReadLine::Stub);
 } elsif (defined $which && defined &{*{Symbol::fetch_glob("Term::ReadLine::$which\::readline")}}) {
-  @ISA = @( "Term::ReadLine::$which" );
+    @ISA = @( "Term::ReadLine::$which" );
 } else {
-  @ISA = qw(Term::ReadLine::Stub);
+    @ISA = qw(Term::ReadLine::Stub);
 }
 
 package Term::ReadLine::TermCap;
@@ -333,27 +333,27 @@ our $rl_term_set = ',,,';
 
 our $terminal;
 sub LoadTermCap {
-  return if defined $terminal;
-  
-  require Term::Cap;
-  $terminal = Term::Cap->Tgetent(\%(OSPEED => 9600)); # Avoid warning.
+    return if defined $terminal;
+
+    require Term::Cap;
+    $terminal = Term::Cap->Tgetent(\%(OSPEED => 9600)); # Avoid warning.
 }
 
 sub ornaments {
-  shift;
-  return $rl_term_set unless (nelems @_);
-  $rl_term_set = shift;
-  $rl_term_set ||= ',,,';
-  $rl_term_set = 'us,ue,md,me' if $rl_term_set eq '1';
-  my @ts = split m/,/, $rl_term_set, 4;
-  try { LoadTermCap };
-  unless (defined $terminal) {
-    warn("Cannot find termcap: $^EVAL_ERROR\n") unless $Term::ReadLine::termcap_nowarn;
-    $rl_term_set = ',,,';
-    return;
-  }
-  @rl_term_set = map {$_ ?? $terminal->Tputs($_,1) || '' !! ''}, @ts;
-  return $rl_term_set;
+    shift;
+    return $rl_term_set unless (nelems @_);
+    $rl_term_set = shift;
+    $rl_term_set ||= ',,,';
+    $rl_term_set = 'us,ue,md,me' if $rl_term_set eq '1';
+    my @ts = split m/,/, $rl_term_set, 4;
+    try { LoadTermCap };
+    unless (defined $terminal) {
+        warn("Cannot find termcap: $^EVAL_ERROR\n") unless $Term::ReadLine::termcap_nowarn;
+        $rl_term_set = ',,,';
+        return;
+    }
+    @rl_term_set = map {$_ ?? $terminal->Tputs($_,1) || '' !! ''}, @ts;
+    return $rl_term_set;
 }
 
 
@@ -366,35 +366,35 @@ our($giveup);
 sub handle {$giveup = 1; $count_handle++}
 
 sub Tk_loop {
-  # Tk->tkwait('variable',\$giveup);	# needs Widget
-  $count_DoOne++, Tk::DoOneEvent(0) until $giveup;
-  $count_loop++;
-  $giveup = 0;
+    # Tk->tkwait('variable',\$giveup);	# needs Widget
+    $count_DoOne++, Tk::DoOneEvent(0) until $giveup;
+    $count_loop++;
+    $giveup = 0;
 }
 
 sub register_Tk {
-  my $self = shift;
-  $Term::ReadLine::registered++ 
-    or Tk->fileevent( <$self->IN,'readable',\&handle);
+    my $self = shift;
+    $Term::ReadLine::registered++ 
+        or Tk->fileevent( <$self->IN,'readable',\&handle);
 }
 
 sub tkRunning {
-  $Term::ReadLine::toloop = @_[1] if (nelems @_) +> 1;
-  $Term::ReadLine::toloop;
+    $Term::ReadLine::toloop = @_[1] if (nelems @_) +> 1;
+    $Term::ReadLine::toloop;
 }
 
 sub get_c {
-  my $self = shift;
-  $self->Tk_loop if $Term::ReadLine::toloop && defined &Tk::DoOneEvent;
-  return getc $self->IN;
+    my $self = shift;
+    $self->Tk_loop if $Term::ReadLine::toloop && defined &Tk::DoOneEvent;
+    return getc $self->IN;
 }
 
 sub get_line {
-  my $self = shift;
-  $self->Tk_loop if $Term::ReadLine::toloop && defined &Tk::DoOneEvent;
-  my $in = $self->IN;
-  local ($^INPUT_RECORD_SEPARATOR) = "\n";
-  return scalar ~< $in;
+    my $self = shift;
+    $self->Tk_loop if $Term::ReadLine::toloop && defined &Tk::DoOneEvent;
+    my $in = $self->IN;
+                       local ($^INPUT_RECORD_SEPARATOR) = "\n";
+    return scalar ~< $in;
 }
 
 1;

@@ -10,8 +10,8 @@ $VERSION = '0.01';
 
 foreach my $type (qw(static dynamic nonxs)) {
     foreach (split m/\s+/, config_value($type . '_ext')) {
-	s!/!::!g;
-	%Extensions{+$_} = $type;
+        s!/!::!g;
+        %Extensions{+$_} = $type;
     }
 }
 

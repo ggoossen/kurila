@@ -6,14 +6,14 @@ sub foo1 {
     $_ = shift(@_);
     $a = 0;
     until ($a++) {
-	next if $_ eq 1;
-	next if $_ eq 2;
-	next if $_ eq 3;
-	next if $_ eq 4;
-	return 20;
+        next if $_ eq 1;
+        next if $_ eq 2;
+        next if $_ eq 3;
+        next if $_ eq 4;
+        return 20;
     }
     continue {
-	return $_;
+        return $_;
     }
 }
 
@@ -27,13 +27,13 @@ print $^STDOUT, foo1(5) == 20 ?? "ok 6\n" !! "not ok 6\n";
 sub foo2 {
     $_ = shift(@_);
     do {
-	last if $_ == 1;
-	last if $_ == 2;
-	last if $_ == 3;
-	last if $_ == 4;
+        last if $_ == 1;
+        last if $_ == 2;
+        last if $_ == 3;
+        last if $_ == 4;
     }
     continue {
-	return 20;
+        return 20;
     };
     return $_;
 }
@@ -48,19 +48,19 @@ print $^STDOUT, foo2(5) == 20 ?? "ok 12\n" !! "not ok 12\n";
 sub foo3 {
     $_ = shift(@_);
     if (m/^1/) {
-	return 1;
+        return 1;
     }
     elsif (m/^2/) {
-	return 2;
+        return 2;
     }
     elsif (m/^3/) {
-	return 3;
+        return 3;
     }
     elsif (m/^4/) {
-	return 4;
+        return 4;
     }
     else {
-	return 20;
+        return 20;
     }
     return 40;
 }

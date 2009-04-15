@@ -65,7 +65,7 @@ is( $from_pid1, 'first process',    'message from first process' );
 
 $kill_cnt = kill $killsig, $pid1;
 is( $kill_cnt, 1,   'first process killed' ) ||
-  print $^STDOUT, "# errno == $^OS_ERROR\n";
+    print $^STDOUT, "# errno == $^OS_ERROR\n";
 
 # get message from second process and kill second process and reader process
 chomp($from_pid2 = scalar( ~< $fh2));
@@ -73,7 +73,7 @@ is( $from_pid2, 'second process',   'message from second process' );
 
 $kill_cnt = kill $killsig, $pid2, $pid3;
 is( $kill_cnt, 2,   'killing procs 2 & 3' ) ||
-  print $^STDOUT, "# errno == $^OS_ERROR\n";
+    print $^STDOUT, "# errno == $^OS_ERROR\n";
 
 
 # send one expected line of text to child process and then wait for it

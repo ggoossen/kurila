@@ -23,7 +23,7 @@ while ( ~< $desc_fh) {
         $ind++;
         @(@name[+$ind], $desc, @rest[+$ind]) = split m/\t+/, $_, 3;
         @(@type[+$ind], @code[+$ind], ?@args[+$ind], ?@longj[+$ind])
-          = split m/[,\s]\s*/, $desc, 4;
+            = split m/[,\s]\s*/, $desc, 4;
     } else {
         my @($type, @< @lists)= split m/\s*\t+\s*/, $_;
         die "No list? $type" if !nelems @lists;
@@ -32,11 +32,11 @@ while ( ~< $desc_fh) {
             $special ||= "";
             foreach my $name (split m/,/,$names) {
                 my $real= $name eq 'resume'
-                        ?? "resume_$type"
-                        !! "$($type)_$name";
+                    ?? "resume_$type"
+                    !! "$($type)_$name";
                 my @suffix;
                 if (!$special) {
-                   @suffix=@("");
+                    @suffix=@("");
                 } elsif ($special=~m/\d/) {
                     @suffix=1..$special;
                 } elsif ($special eq 'FAIL') {
@@ -52,7 +52,7 @@ while ( ~< $desc_fh) {
                 }
             }
         }
-        
+
     }
 }
 # use fixed width to keep the diffs between regcomp.pl recompiles
@@ -88,15 +88,15 @@ EOP
 ;
 
 
-for my $ind (1 .. $lastregop) {
-  my $oind = $ind - 1;
-  printf $out, "#define\t\%*s\t\%d\t/* \%#04x \%s */\n",
-    -$width, @name[$ind], $ind-1, $ind-1, @rest[$ind];
-}
+    for my $ind (1 .. $lastregop) {
+        my $oind = $ind - 1;
+        printf $out, "#define\t\%*s\t\%d\t/* \%#04x \%s */\n",
+            -$width, @name[$ind], $ind-1, $ind-1, @rest[$ind];
+    }
 print $out, "\t/* ------------ States ------------- */\n";
 for my $ind ($lastregop+1 .. $tot) {
-  printf $out, "#define\t\%*s\t(REGNODE_MAX + \%d)\t/* \%s */\n",
-    -$width, @name[$ind], $ind - $lastregop, @rest[$ind];
+    printf $out, "#define\t\%*s\t(REGNODE_MAX + \%d)\t/* \%s */\n",
+        -$width, @name[$ind], $ind - $lastregop, @rest[$ind];
 }
 
 print $out, <<EOP;
@@ -111,10 +111,10 @@ EOP
 
 $ind = 0;
 while (++$ind +<= $tot) {
-  printf $out, "\t\%*s\t/* \%*s */\n",
-             -1-$twidth, "@type[$ind],", -$width, @name[$ind];
-  print $out, "\t/* ------------ States ------------- */\n"
-    if $ind == $lastregop and $lastregop != $tot;
+    printf $out, "\t\%*s\t/* \%*s */\n",
+        -1-$twidth, "@type[$ind],", -$width, @name[$ind];
+    print $out, "\t/* ------------ States ------------- */\n"
+        if $ind == $lastregop and $lastregop != $tot;
 }
 
 print $out, <<EOP;
@@ -129,11 +129,11 @@ EOP
 
 $ind = 0;
 while (++$ind +<= $lastregop) {
-  my $size = 0;
-  $size = "EXTRA_SIZE(struct regnode_@args[$ind])" if @args[$ind];
-  
-  printf $out, "\t\%*s\t/* \%*s */\n",
-	-37, "$size,",-$rwidth,@name[$ind];
+    my $size = 0;
+    $size = "EXTRA_SIZE(struct regnode_@args[$ind])" if @args[$ind];
+
+    printf $out, "\t\%*s\t/* \%*s */\n",
+        -37, "$size,",-$rwidth,@name[$ind];
 }
 
 print $out, <<EOP;
@@ -146,10 +146,10 @@ EOP
 
 $ind = 0;
 while (++$ind +<= $lastregop) {
-  my $size = @longj[$ind] || 0;
+    my $size = @longj[$ind] || 0;
 
-  printf $out, "\t\%d,\t/* \%*s */\n",
-	$size, -$rwidth, @name[$ind]
+    printf $out, "\t\%d,\t/* \%*s */\n",
+        $size, -$rwidth, @name[$ind]
 }
 
 print $out, <<EOP;
@@ -169,16 +169,16 @@ $ind = 0;
 my $ofs = 1;
 my $sym = "";
 while (++$ind +<= $tot) {
-  my $size = @longj[?$ind] || 0;
+    my $size = @longj[?$ind] || 0;
 
-  printf $out, "\t\%*s\t/* $sym\%#04x */\n",
-	-3-$width,qq("@name[$ind]",), $ind - $ofs;
-  if ($ind == $lastregop and $lastregop != $tot) {
-    print $out, "\t/* ------------ States ------------- */\n";
-    $ofs = $lastregop;
-    $sym = 'REGNODE_MAX +';
-  }
-    
+    printf $out, "\t\%*s\t/* $sym\%#04x */\n",
+        -3-$width,qq("@name[$ind]",), $ind - $ofs;
+    if ($ind == $lastregop and $lastregop != $tot) {
+        print $out, "\t/* ------------ States ------------- */\n";
+        $ofs = $lastregop;
+        $sym = 'REGNODE_MAX +';
+    }
+
 }
 
 print $out, <<EOP;
@@ -199,13 +199,13 @@ my $val = 0;
 my %reverse;
 while (~< $fh) {
     if (m/#define\s+(RXf_\w+)\s+(0x[A-F\d]+)/i) {
-	my $newval = eval $2;
-	if($val ^&^ $newval) {
-	    die sprintf "Both $1 and %reverse{$newval} use \%08X", $newval;
-	}
+        my $newval = eval $2;
+        if($val ^&^ $newval) {
+            die sprintf "Both $1 and %reverse{$newval} use \%08X", $newval;
+        }
         $val^|^=$newval;
         %rxfv{+$1}= $newval;
-	%reverse{+$newval} = $1;
+        %reverse{+$newval} = $1;
     }
 }    
 my %vrxf= %: < reverse @: < %rxfv ;
@@ -216,7 +216,7 @@ for (0..31) {
     printf $out, qq(\t\%-20s/* 0x\%08x */\n), 
         qq("$n",),2**$_;
 }  
- 
+
 print $out, <<EOP;
 \};
 #endif /* DOINIT */

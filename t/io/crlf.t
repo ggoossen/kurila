@@ -25,21 +25,21 @@ if ('PerlIO::Layer'->find( 'perlio')) {
     do { local $^INPUT_RECORD_SEPARATOR = undef; $text = ~< *$foo };
     is(count_chars($text, "\015\012"), 2000);
 
-    SKIP:
+  SKIP:
     do {
-	skip("miniperl can't rely on loading PerlIO::scalar")
-	if env::var('PERL_CORE_MINITEST');
-	skip("no PerlIO::scalar") unless config_value("extensions") =~ m!\bPerlIO/scalar\b!;
-	require PerlIO::scalar;
-	my $fcontents = join "", map {"$_\015\012"}, 10..100000;
-	open my $fh, "<:crlf", \$fcontents;
-	local $^INPUT_RECORD_SEPARATOR = "xxx";
-	local $_ = ~< $fh;
-	my $pos = tell $fh; # pos must be behind "xxx", before "\nxxy\n"
-	seek $fh, $pos, 0;
-	$^INPUT_RECORD_SEPARATOR = "\n";
-	my $s = ( ~< $fh ) . ~< $fh;
-	ok($s eq "\nxxy\n");
+        skip("miniperl can't rely on loading PerlIO::scalar")
+            if env::var('PERL_CORE_MINITEST');
+        skip("no PerlIO::scalar") unless config_value("extensions") =~ m!\bPerlIO/scalar\b!;
+        require PerlIO::scalar;
+        my $fcontents = join "", map {"$_\015\012"}, 10..100000;
+        open my $fh, "<:crlf", \$fcontents;
+        local $^INPUT_RECORD_SEPARATOR = "xxx";
+        local $_ = ~< $fh;
+        my $pos = tell $fh; # pos must be behind "xxx", before "\nxxy\n"
+        seek $fh, $pos, 0;
+        $^INPUT_RECORD_SEPARATOR = "\n";
+        my $s = ( ~< $fh ) . ~< $fh;
+        ok($s eq "\nxxy\n");
     };
 
     ok(close($foo));
@@ -51,22 +51,22 @@ if ('PerlIO::Layer'->find( 'perlio')) {
     # in between (this should not matter: CRLF layers still should
     # not accumulate).
     for my $utf8 (@('', ':utf8')) {
-	for my $binmode (1..2) {
-	    open(my $foo_fh, ">", "$file");
-	    # require PerlIO; print PerlIO::get_layers($foo), "\n";
-	    binmode($foo_fh, "$utf8:crlf") for 1..$binmode;
-	    # require PerlIO; print PerlIO::get_layers($foo), "\n";
-	    print $foo_fh, "Hello\n";
-	    close $foo_fh;
-	    open($foo_fh, "<", "$file");
-	    binmode($foo_fh);
-	    my $foo = scalar ~< *$foo_fh;
-	    close $foo_fh;
-	    print $^STDOUT, join(" ", @( "#", < map { sprintf('%02x', $_) }, @( unpack("C*", $foo)))),
-	    "\n";
-	    ok($foo =~ m/\x0d\x0a$/);
-	    ok($foo !~ m/\x0d\x0d/);
-	}
+        for my $binmode (1..2) {
+            open(my $foo_fh, ">", "$file");
+            # require PerlIO; print PerlIO::get_layers($foo), "\n";
+            binmode($foo_fh, "$utf8:crlf") for 1..$binmode;
+            # require PerlIO; print PerlIO::get_layers($foo), "\n";
+            print $foo_fh, "Hello\n";
+            close $foo_fh;
+            open($foo_fh, "<", "$file");
+            binmode($foo_fh);
+            my $foo = scalar ~< *$foo_fh;
+            close $foo_fh;
+            print $^STDOUT, join(" ", @( "#", < map { sprintf('%02x', $_) }, @( unpack("C*", $foo)))),
+                "\n";
+            ok($foo =~ m/\x0d\x0a$/);
+            ok($foo !~ m/\x0d\x0d/);
+        }
     }
 }
 else {

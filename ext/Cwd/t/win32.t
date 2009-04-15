@@ -5,9 +5,9 @@ use lib File::Spec->catdir('t', 'lib');
 use Test::More;
 
 if( $^OS_NAME eq 'MSWin32' ) {
-  plan tests => 3;
+    plan tests => 3;
 } else {
-  plan skip_all => 'this is not win32';
+    plan skip_all => 'this is not win32';
 }
 
 use Cwd;
@@ -18,8 +18,8 @@ like $cdir, qr{^C:}i;
 
 my $ddir = getdcwd('D:');
 if (defined $ddir) {
-  like $ddir, qr{^D:}i;
+    like $ddir, qr{^D:}i;
 } else {
-  # May not have a D: drive mounted
-  ok 1;
+    # May not have a D: drive mounted
+    ok 1;
 }

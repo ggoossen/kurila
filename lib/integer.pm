@@ -8,9 +8,9 @@ integer - Perl pragma to use integer arithmetic instead of floating point
 
 =head1 SYNOPSIS
 
-    use integer;
-    $x = 10/3;
-    # $x is now 3, not 3.33333333333333333
+use integer;
+$x = 10/3;
+# $x is now 3, not 3.33333333333333333
 
 =head1 DESCRIPTION
 
@@ -32,13 +32,13 @@ operands and results is restricted to that of familiar two's complement
 integers, i.e., -(2**31) .. (2**31-1) on 32-bit architectures, and
 -(2**63) .. (2**63-1) on 64-bit architectures.  For example, this code
 
-    use integer;
-    $x = 5.8;
-    $y = 2.5;
-    $z = 2.7;
-    $a = 2**31 - 1;  # Largest positive integer on 32-bit machines
-    $, = ", ";
-    print $x, -$x, $x + $y, $x - $y, $x / $y, $x * $y, $y == $z, $a, $a + 1;
+use integer;
+$x = 5.8;
+$y = 2.5;
+$z = 2.7;
+$a = 2**31 - 1;  # Largest positive integer on 32-bit machines
+$, = ", ";
+print $x, -$x, $x + $y, $x - $y, $x / $y, $x * $y, $y == $z, $a, $a + 1;
 
 will print:  5.8, -5, 7, 3, 2, 10, 1, 2147483647, -2147483648
 
@@ -48,9 +48,9 @@ largest positive integer to the largest negative one.   Also, arguments
 passed to functions and the values returned by them are B<not> affected
 by C<use integer;>.  E.g.,
 
-    srand(1.5);
-    $, = ", ";
-    print sin(.5), cos(.5), atan2(1,2), sqrt(2), rand(10);
+srand(1.5);
+$, = ", ";
+print sin(.5), cos(.5), atan2(1,2), sqrt(2), rand(10);
 
 will give the same result with or without C<use integer;>  The power
 operator C<**> is also not affected, so that 2 ** .5 is always the
@@ -71,10 +71,10 @@ operations may not be preserved.  One common source of trouble is the
 modulus of negative numbers, which Perl does one way, but your hardware
 may do another.
 
-    % perl -le 'print (4 % -3)'
-    -2
-    % perl -Minteger -le 'print (4 % -3)'
-    1
+% perl -le 'print (4 % -3)'
+-2
+% perl -Minteger -le 'print (4 % -3)'
+1
 
 See L<perlmodlib/"Pragmatic Modules">, L<perlop/"Integer Arithmetic">
 

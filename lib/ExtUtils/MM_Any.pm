@@ -24,14 +24,14 @@ ExtUtils::MM_Any - Platform-agnostic MM methods
 
 =head1 SYNOPSIS
 
-  FOR INTERNAL USE ONLY!
+FOR INTERNAL USE ONLY!
 
-  package ExtUtils::MM_SomeOS;
+package ExtUtils::MM_SomeOS;
 
-  # Temporarily, you have to subclass both.  Put MM_Any first.
-  require ExtUtils::MM_Any;
-  require ExtUtils::MM_Unix;
-  @ISA = qw(ExtUtils::MM_Any ExtUtils::Unix);
+# Temporarily, you have to subclass both.  Put MM_Any first.
+require ExtUtils::MM_Any;
+require ExtUtils::MM_Unix;
+@ISA = qw(ExtUtils::MM_Any ExtUtils::Unix);
 
 =head1 DESCRIPTION
 
@@ -60,7 +60,7 @@ These are methods which help writing cross-platform code.
 
 =head3 os_flavor  I<Abstract>
 
-    my @os_flavor = $mm->os_flavor;
+my @os_flavor = $mm->os_flavor;
 
 @os_flavor is the style of operating system this is, usually
 corresponding to the MM_*.pm file we're using.  
@@ -70,12 +70,12 @@ Windows, VMS, OS/2, etc...) and the rest are sub families.
 
 Some examples:
 
-    Cygwin98       ('Unix',  'Cygwin', 'Cygwin9x')
-    Windows NT     ('Win32', 'WinNT')
-    Win98          ('Win32', 'Win9x')
-    Linux          ('Unix',  'Linux')
-    MacOS X        ('Unix',  'Darwin', 'MacOS', 'MacOS X')
-    OS/2           ('OS/2')
+Cygwin98       ('Unix',  'Cygwin', 'Cygwin9x')
+Windows NT     ('Win32', 'WinNT')
+Win98          ('Win32', 'Win9x')
+Linux          ('Unix',  'Linux')
+MacOS X        ('Unix',  'Darwin', 'MacOS', 'MacOS X')
+OS/2           ('OS/2')
 
 This is used to write code for styles of operating system.  
 See os_flavor_is() for use.
@@ -83,19 +83,19 @@ See os_flavor_is() for use.
 
 =head3 os_flavor_is
 
-    my $is_this_flavor = $mm->os_flavor_is($this_flavor);
-    my $is_this_flavor = $mm->os_flavor_is(@one_of_these_flavors);
+my $is_this_flavor = $mm->os_flavor_is($this_flavor);
+my $is_this_flavor = $mm->os_flavor_is(@one_of_these_flavors);
 
 Checks to see if the current operating system is one of the given flavors.
 
 This is useful for code like:
 
-    if( $mm->os_flavor_is('Unix') ) {
-        $out = `foo 2>&1`;
-    }
-    else {
-        $out = `foo`;
-    }
+if( $mm->os_flavor_is('Unix') ) {
+$out = `foo 2>&1`;
+}
+else {
+$out = `foo`;
+}
 
 =cut
 
@@ -108,7 +108,7 @@ sub os_flavor_is {
 
 =head3 split_command
 
-    my @cmds = $MM->split_command($cmd, @args);
+my @cmds = $MM->split_command($cmd, @args);
 
 Most OS have a maximum command length they can execute at once.  Large
 modules can easily generate commands well past that limit.  Its
@@ -127,7 +127,7 @@ Pairs of arguments will always be preserved in a single command, this
 is a heuristic for things like pm_to_blib and pod2man which work on
 pairs of arguments.  This makes things like this safe:
 
-    $self->split_command($cmd, %pod2man);
+$self->split_command($cmd, %pod2man);
 
 
 =cut
@@ -174,7 +174,7 @@ sub split_command($self, $cmd, @< @args) {
 
 sub _expand_macros($self, $cmd) {
 
-    $cmd =~ s{\$\((\w+)\)}{$(
+        $cmd =~ s{\$\((\w+)\)}{$(
         defined $self->{?$1} ?? $self->{?$1} !! "\$($1)"
     )};
     return $cmd;
@@ -183,9 +183,9 @@ sub _expand_macros($self, $cmd) {
 
 =head3 echo
 
-    my @commands = $MM->echo($text);
-    my @commands = $MM->echo($text, $file);
-    my @commands = $MM->echo($text, $file, $appending);
+my @commands = $MM->echo($text);
+my @commands = $MM->echo($text, $file);
+my @commands = $MM->echo($text, $file, $appending);
 
 Generates a set of @commands which print the $text to a $file.
 
@@ -200,7 +200,7 @@ sub echo($self, $text, $file, ?$appending) {
     $appending ||= 0;
 
     my @cmds = map { '$(NOECHO) $(ECHO) '.$self->quote_literal($_) }, 
-               split m/\n/, $text;
+        split m/\n/, $text;
     if( $file ) {
         my $redirect = $appending ?? '>>' !! '>';
         @cmds[0] .= " $redirect $file";
@@ -213,14 +213,14 @@ sub echo($self, $text, $file, ?$appending) {
 
 =head3 wraplist
 
-  my $args = $mm->wraplist(@list);
+my $args = $mm->wraplist(@list);
 
 Takes an array of items and turns them into a well-formatted list of
 arguments.  In most cases this is simply something like:
 
-    FOO \
-    BAR \
-    BAZ
+FOO \
+BAR \
+BAZ
 
 =cut
 
@@ -232,7 +232,7 @@ sub wraplist {
 
 =head3 maketext_filter
 
-    my $filter_make_text = $mm->maketext_filter($make_text);
+my $filter_make_text = $mm->maketext_filter($make_text);
 
 The text of the Makefile is run through this method before writing to
 disk.  It allows systems a chance to make portability fixes to the
@@ -250,12 +250,12 @@ sub maketext_filter { return @_[1] }
 
 =head3 cd  I<Abstract>
 
-  my $subdir_cmd = $MM->cd($subdir, @cmds);
+my $subdir_cmd = $MM->cd($subdir, @cmds);
 
 This will generate a make fragment which runs the @cmds in the given
 $dir.  The rough equivalent to this, except cross platform.
 
-  cd $subdir && $cmd
+cd $subdir && $cmd
 
 Currently $dir can only go down one level.  "foo" is fine.  "foo/bar" is
 not.  "../foo" is right out.
@@ -263,18 +263,18 @@ not.  "../foo" is right out.
 The resulting $subdir_cmd has no leading tab nor trailing newline.  This
 makes it easier to embed in a make string.  For example.
 
-      my $make = sprintf <<'CODE', $subdir_cmd;
-  foo :
-      $(ECHO) what
-      %s
-      $(ECHO) mouche
-  CODE
+my $make = sprintf <<'CODE', $subdir_cmd;
+foo :
+$(ECHO) what
+%s
+$(ECHO) mouche
+CODE
 
 
 =head3 oneliner  I<Abstract>
 
-  my $oneliner = $MM->oneliner($perl_code);
-  my $oneliner = $MM->oneliner($perl_code, \@switches);
+my $oneliner = $MM->oneliner($perl_code);
+my $oneliner = $MM->oneliner($perl_code, \@switches);
 
 This will generate a perl one-liner safe for the particular platform
 you're on based on the given $perl_code and @switches (a -e is
@@ -286,24 +286,24 @@ $(PERLRUN) will be used as perl.
 Any newlines in $perl_code will be escaped.  Leading and trailing
 newlines will be stripped.  Makes this idiom much easier:
 
-    my $code = $MM->oneliner(<<'CODE', [...switches...]);
+my $code = $MM->oneliner(<<'CODE', [...switches...]);
 some code here
 another line here
 CODE
 
 Usage might be something like:
 
-    # an echo emulation
-    $oneliner = $MM->oneliner('print "Foo\n"');
-    $make = '$oneliner > somefile';
+# an echo emulation
+$oneliner = $MM->oneliner('print "Foo\n"');
+$make = '$oneliner > somefile';
 
 All dollar signs must be doubled in the $perl_code if you expect them
 to be interpreted normally, otherwise it will be considered a make
 macro.  Also remember to quote make macros else it might be used as a
 bareword.  For example:
 
-    # Assign the value of the $(VERSION_FROM) make macro to $vf.
-    $oneliner = $MM->oneliner('$$vf = "$(VERSION_FROM)"');
+# Assign the value of the $(VERSION_FROM) make macro to $vf.
+$oneliner = $MM->oneliner('$$vf = "$(VERSION_FROM)"');
 
 Its currently very simple and may be expanded sometime in the figure
 to include more flexible code and switches.
@@ -311,7 +311,7 @@ to include more flexible code and switches.
 
 =head3 quote_literal  I<Abstract>
 
-    my $safe_text = $MM->quote_literal($text);
+my $safe_text = $MM->quote_literal($text);
 
 This will quote $text so it is interpreted literally in the shell.
 
@@ -321,14 +321,14 @@ put single-quotes around the whole thing.
 
 =head3 escape_newlines  I<Abstract>
 
-    my $escaped_text = $MM->escape_newlines($text);
+my $escaped_text = $MM->escape_newlines($text);
 
 Shell escapes newlines in $text.
 
 
 =head3 max_exec_len  I<Abstract>
 
-    my $max_exec_len = $MM->max_exec_len;
+my $max_exec_len = $MM->max_exec_len;
 
 Calculates the maximum command size the OS can exec.  Effectively,
 this is the max size of a shell command line.
@@ -339,7 +339,7 @@ $self->{_MAX_EXEC_LEN} is set by this method, but only for testing purposes.
 
 =head3 make
 
-    my $make = $MM->make;
+my $make = $MM->make;
 
 Returns the make variant we're generating the Makefile for.  This attempts
 to do some normalization on the information from %Config or the user.
@@ -385,7 +385,7 @@ MAKE_EXT
 
 =head3 blibdirs_target
 
-    my $make_frag = $mm->blibdirs_target;
+my $make_frag = $mm->blibdirs_target;
 
 Creates the blibdirs target which creates all the directories we use
 in blib/.
@@ -446,19 +446,19 @@ clean :: clean_subdirs
     # INST_LIB = ../../lib rather than actually installing the files.
     # So a "make clean" in an ext/ directory would blow away lib.
     # Until the core is adjusted let's leave this out.
-#     push @dirs, qw($(INST_ARCHLIB) $(INST_LIB)
-#                    $(INST_BIN) $(INST_SCRIPT)
-#                    $(INST_MAN1DIR) $(INST_MAN3DIR)
-#                    $(INST_LIBDIR) $(INST_ARCHLIBDIR) $(INST_AUTODIR) 
-#                    $(INST_STATIC) $(INST_DYNAMIC) $(INST_BOOT)
-#                 );
-                  
+    #     push @dirs, qw($(INST_ARCHLIB) $(INST_LIB)
+    #                    $(INST_BIN) $(INST_SCRIPT)
+    #                    $(INST_MAN1DIR) $(INST_MAN3DIR)
+    #                    $(INST_LIBDIR) $(INST_ARCHLIBDIR) $(INST_AUTODIR) 
+    #                    $(INST_STATIC) $(INST_DYNAMIC) $(INST_BOOT)
+    #                 );
+
 
     if( %attribs{?FILES} ) {
         # Use @dirs because we don't know what's in here.
         push @dirs, ref %attribs{?FILES}                ??
-                        < @{%attribs{?FILES}}             !! <
-                        split m/\s+/, %attribs{?FILES}   ;
+            < @{%attribs{?FILES}}             !! <
+            split m/\s+/, %attribs{?FILES}   ;
     }
 
     push(@files, < qw[$(MAKE_APERL_FILE) 
@@ -501,7 +501,7 @@ MAKE
 
 =head3 clean_subdirs_target
 
-  my $make_frag = $MM->clean_subdirs_target;
+my $make_frag = $MM->clean_subdirs_target;
 
 Returns the clean_subdirs target.  This is used by the clean target to
 call clean on any subdirectories which contain Makefiles.
@@ -534,7 +534,7 @@ CODE
 
 =head3 dir_target
 
-    my $make_frag = $mm->dir_target(@directories);
+my $make_frag = $mm->dir_target(@directories);
 
 Generates targets to create the specified directories and set its
 permission to 0755.
@@ -545,7 +545,7 @@ too well (the modified time changes too often) dir_target() creates a
 For portability purposes you should use the $(DIRFILESEP) macro rather
 than a '/' to seperate the directory from the file.
 
-    yourdirectory$(DIRFILESEP).exists
+yourdirectory$(DIRFILESEP).exists
 
 =cut
 
@@ -607,10 +607,10 @@ sub dist_test {
     my $mpl_args = join " ", map { qq["$_"] }, @ARGV;
 
     my $test = $self->cd('$(DISTVNAME)',
-                         '$(ABSPERLRUN) Makefile.PL '.$mpl_args,
-                         '$(MAKE) $(PASTHRU)',
-                         '$(MAKE) test $(PASTHRU)'
-                        );
+        '$(ABSPERLRUN) Makefile.PL '.$mpl_args,
+        '$(MAKE) $(PASTHRU)',
+        '$(MAKE) test $(PASTHRU)'
+        );
 
     return sprintf <<'MAKE_FRAG', $test;
 disttest : distdir
@@ -629,7 +629,7 @@ Defines the dynamic target.
 =cut
 
 sub dynamic {
-# --- Dynamic Loading Sections ---
+    # --- Dynamic Loading Sections ---
 
     my@($self) =@( shift);
     '
@@ -641,7 +641,7 @@ dynamic :: $(FIRST_MAKEFILE) $(INST_DYNAMIC) $(INST_BOOT)
 
 =head3 makemakerdflt_target
 
-  my $make_frag = $mm->makemakerdflt_target
+my $make_frag = $mm->makemakerdflt_target
 
 Returns a make fragment with the makemakerdeflt_target specified.
 This target is the first target in the Makefile, is the default target
@@ -661,7 +661,7 @@ MAKE_FRAG
 
 =head3 manifypods_target
 
-  my $manifypods_target = $self->manifypods_target;
+my $manifypods_target = $self->manifypods_target;
 
 Generates the manifypods target.  This target generates man pages from
 all POD files in MAN1PODS and MAN3PODS.
@@ -701,7 +701,7 @@ CMD
 
 =head3 metafile_target
 
-    my $target = $mm->metafile_target;
+my $target = $mm->metafile_target;
 
 Generate the metafile target.
 
@@ -736,9 +736,9 @@ MAKE_FRAG
         license      => $self->{?LICENSE},
         author       => $author_value,
         generated_by => 
-                "ExtUtils::MakeMaker version $ExtUtils::MakeMaker::VERSION",
+        "ExtUtils::MakeMaker version $ExtUtils::MakeMaker::VERSION",
         distribution_type => $self->{?PM} ?? 'module' !! 'script',
-    );
+        );
 
     my $meta = "--- #YAML:1.0\n";
 
@@ -773,7 +773,7 @@ MAKE_FRAG
 
 =head3 distmeta_target
 
-    my $make_frag = $mm->distmeta_target;
+my $make_frag = $mm->distmeta_target;
 
 Generates the distmeta target to add META.yml to the MANIFEST in the
 distdir.
@@ -813,7 +813,7 @@ sub realclean($self, %< %attribs) {
     # Special exception for the perl core where INST_* is not in blib.
     # This cleans up the files built from the ext/ directory (all XS).
     if( $self->{?PERL_CORE} ) {
-	push @dirs, < qw($(INST_AUTODIR) $(INST_ARCHAUTODIR));
+        push @dirs, < qw($(INST_AUTODIR) $(INST_ARCHAUTODIR));
         push @files, < values %{$self->{PM}};
     }
 
@@ -835,9 +835,9 @@ sub realclean($self, %< %attribs) {
     do { my@(%d) =@( %( < @+: map { @($_ => 1) }, @dirs ));   @dirs  = keys %d; };
 
     my $rm_cmd  = join "\n\t", map { "$_" }, 
-                    $self->split_command('- $(RM_F)',  < @files);
+        $self->split_command('- $(RM_F)',  < @files);
     my $rmf_cmd = join "\n\t", map { "$_" }, 
-                    $self->split_command('- $(RM_RF)', < @dirs);
+        $self->split_command('- $(RM_RF)', < @dirs);
 
     my $m = sprintf <<'MAKE', $rm_cmd, $rmf_cmd;
 # Delete temporary files (via clean) and also delete dist files
@@ -854,7 +854,7 @@ MAKE
 
 =head3 realclean_subdirs_target
 
-  my $make_frag = $MM->realclean_subdirs_target;
+my $make_frag = $MM->realclean_subdirs_target;
 
 Returns the realclean_subdirs target.  This is used by the realclean
 target to call realclean on any subdirectories which contain Makefiles.
@@ -890,7 +890,7 @@ RCLEAN
 
 =head3 signature_target
 
-    my $target = $mm->signature_target;
+my $target = $mm->signature_target;
 
 Generate the signature target.
 
@@ -911,7 +911,7 @@ MAKE_FRAG
 
 =head3 distsignature_target
 
-    my $make_frag = $mm->distsignature_target;
+my $make_frag = $mm->distsignature_target;
 
 Generates the distsignature target to add SIGNATURE to the MANIFEST in the
 distdir.
@@ -946,7 +946,7 @@ MAKE
 
 =head3 special_targets
 
-  my $make_frag = $mm->special_targets
+my $make_frag = $mm->special_targets
 
 Returns a make fragment containing any targets which have special
 meaning to make.  For example, .SUFFIXES and .PHONY.
@@ -979,7 +979,7 @@ Methods which help initialize the MakeMaker object and macros.
 
 =head3 init_ABSTRACT
 
-    $mm->init_ABSTRACT
+$mm->init_ABSTRACT
 
 =cut
 
@@ -988,20 +988,20 @@ sub init_ABSTRACT {
 
     if( $self->{?ABSTRACT_FROM} and $self->{?ABSTRACT} ) {
         warn "Both ABSTRACT_FROM and ABSTRACT are set.  ".
-             "Ignoring ABSTRACT_FROM.\n";
+            "Ignoring ABSTRACT_FROM.\n";
         return;
     }
 
     if ($self->{?ABSTRACT_FROM}){
         $self->{+ABSTRACT} = $self->parse_abstract($self->{ABSTRACT_FROM}) or
-            warn "WARNING: Setting ABSTRACT via file ".
-                 "'$self->{?ABSTRACT_FROM}' failed\n";
+        warn "WARNING: Setting ABSTRACT via file ".
+            "'$self->{?ABSTRACT_FROM}' failed\n";
     }
 }
 
 =head3 init_INST
 
-    $mm->init_INST;
+$mm->init_INST;
 
 Called by init_main.  Sets up all INST_* variables except those related
 to XS code.  Those are handled in init_xs.
@@ -1018,27 +1018,27 @@ sub init_INST {
     # perl has been built and installed. Setting INST_LIB allows
     # you to build directly into, say $Config{privlibexp}.
     unless ($self->{?INST_LIB}){
-	if ($self->{?PERL_CORE}) {
+        if ($self->{?PERL_CORE}) {
             if (defined $Cross::platform) {
                 $self->{+INST_LIB} = $self->{+INST_ARCHLIB} = 
-                  $self->catdir($self->{?PERL_LIB},"..","xlib",
-                                     $Cross::platform);
+                $self->catdir($self->{?PERL_LIB},"..","xlib",
+                    $Cross::platform);
             }
             else {
                 $self->{+INST_LIB} = $self->{+INST_ARCHLIB} = $self->{?PERL_LIB};
             }
-	} else {
-	    $self->{+INST_LIB} = $self->catdir($Curdir,"blib","lib");
-	}
+        } else {
+            $self->{+INST_LIB} = $self->catdir($Curdir,"blib","lib");
+        }
     }
 
     my @parentdir = split(m/::/, $self->{?PARENT_NAME});
     $self->{+INST_LIBDIR}      = $self->catdir('$(INST_LIB)',     < @parentdir);
     $self->{+INST_ARCHLIBDIR}  = $self->catdir('$(INST_ARCHLIB)', < @parentdir);
     $self->{+INST_AUTODIR}     = $self->catdir('$(INST_LIB)', 'auto', 
-                                              '$(FULLEXT)');
+    '$(FULLEXT)');
     $self->{+INST_ARCHAUTODIR} = $self->catdir('$(INST_ARCHLIB)', 'auto',
-                                              '$(FULLEXT)');
+    '$(FULLEXT)');
 
     $self->{+INST_SCRIPT}  ||= $self->catdir($Curdir,'blib','script');
 
@@ -1051,7 +1051,7 @@ sub init_INST {
 
 =head3 init_INSTALL
 
-    $mm->init_INSTALL;
+$mm->init_INSTALL;
 
 Called by init_main.  Sets up all INSTALL_* variables (except
 INSTALLDIRS) and *PREFIX.
@@ -1076,7 +1076,7 @@ sub init_INSTALL {
 
 =head3 init_INSTALL_from_PREFIX
 
-  $mm->init_INSTALL_from_PREFIX;
+$mm->init_INSTALL_from_PREFIX;
 
 =cut
 
@@ -1091,7 +1091,7 @@ sub init_INSTALL_from_PREFIX {
         my $k = 'installsiteman'.$num.'dir';
 
         $self->{+uc $k} ||= uc "\$(installman$($num)dir)"
-          unless %Config{?$k};
+        unless %Config{?$k};
     }
 
     foreach my $num (@(1, 3)) {
@@ -1099,30 +1099,30 @@ sub init_INSTALL_from_PREFIX {
 
         unless( %Config{?$k} ) {
             $self->{+uc $k}  ||= %Config{?usevendorprefix}
-                              ?? uc "\$(installman$($num)dir)"
-                              !! '';
+                ?? uc "\$(installman$($num)dir)"
+            !! '';
         }
     }
 
     $self->{+INSTALLSITEBIN} ||= '$(INSTALLBIN)'
-      unless %Config{?installsitebin};
+    unless %Config{?installsitebin};
     $self->{+INSTALLSITESCRIPT} ||= '$(INSTALLSCRIPT)'
-      unless %Config{?installsitescript};
+    unless %Config{?installsitescript};
 
     unless( %Config{?installvendorbin} ) {
         $self->{+INSTALLVENDORBIN} ||= %Config{?usevendorprefix} 
-                                    ?? %Config{?installbin}
-                                    !! '';
+            ?? %Config{?installbin}
+        !! '';
     }
     unless( %Config{?installvendorscript} ) {
         $self->{+INSTALLVENDORSCRIPT} ||= %Config{?usevendorprefix}
-                                       ?? %Config{?installscript}
-                                       !! '';
+            ?? %Config{?installscript}
+        !! '';
     }
 
 
     my $iprefix = %Config{?installprefixexp} || %Config{?installprefix} || 
-                  %Config{?prefixexp}        || %Config{?prefix} || '';
+        %Config{?prefixexp}        || %Config{?prefix} || '';
     my $vprefix = %Config{?usevendorprefix}  ?? %Config{?vendorprefixexp} !! '';
     my $sprefix = %Config{?siteprefixexp}    || '';
 
@@ -1133,8 +1133,8 @@ sub init_INSTALL_from_PREFIX {
     $self->{+PREFIX}       ||= '';
 
     if( $self->{?PREFIX} ) { 
-        %{$self}{[qw(PERLPREFIX SITEPREFIX VENDORPREFIX)]} =
-          @('$(PREFIX)') x 3;
+            %{$self}{[qw(PERLPREFIX SITEPREFIX VENDORPREFIX)]} =
+        @('$(PREFIX)') x 3;
     }
     else {
         $self->{+PERLPREFIX}   ||= $iprefix;
@@ -1162,88 +1162,88 @@ sub init_INSTALL_from_PREFIX {
     # read man pages.
     for my $num (@(1, 3)) {
         $self->{+'INSTALLMAN'.$num.'DIR'} ||= 'none'
-          unless %Config{?'installman'.$num.'dir'};
+        unless %Config{?'installman'.$num.'dir'};
     }
 
     my %bin_layouts = 
-    %(
-        bin         => \%( s => $iprefix,
-                         t => 'perl',
-                         d => 'bin' ),
-        vendorbin   => \%( s => $vprefix,
-                         t => 'vendor',
-                         d => 'bin' ),
-        sitebin     => \%( s => $sprefix,
-                         t => 'site',
-                         d => 'bin' ),
-        script      => \%( s => $iprefix,
-                         t => 'perl',
-                         d => 'bin' ),
-        vendorscript=> \%( s => $vprefix,
-                         t => 'vendor',
-                         d => 'bin' ),
-        sitescript  => \%( s => $sprefix,
-                         t => 'site',
-                         d => 'bin' ),
-    );
-    
-    my %man_layouts =
-    %(
-        man1dir         => \%( s => $iprefix,
-                             t => 'perl',
-                             d => 'man/man1',
-                             style => $manstyle, ),
-        siteman1dir     => \%( s => $sprefix,
-                             t => 'site',
-                             d => 'man/man1',
-                             style => $manstyle, ),
-        vendorman1dir   => \%( s => $vprefix,
-                             t => 'vendor',
-                             d => 'man/man1',
-                             style => $manstyle, ),
+        %(
+            bin         => \%( s => $iprefix,
+                    t => 'perl',
+                        d => 'bin' ),
+                vendorbin   => \%( s => $vprefix,
+                    t => 'vendor',
+                        d => 'bin' ),
+                sitebin     => \%( s => $sprefix,
+                    t => 'site',
+                        d => 'bin' ),
+                script      => \%( s => $iprefix,
+                    t => 'perl',
+                        d => 'bin' ),
+                vendorscript=> \%( s => $vprefix,
+                    t => 'vendor',
+                        d => 'bin' ),
+                sitescript  => \%( s => $sprefix,
+                    t => 'site',
+                        d => 'bin' ),
+        );
 
-        man3dir         => \%( s => $iprefix,
-                             t => 'perl',
-                             d => 'man/man3',
-                             style => $manstyle, ),
-        siteman3dir     => \%( s => $sprefix,
-                             t => 'site',
-                             d => 'man/man3',
-                             style => $manstyle, ),
-        vendorman3dir   => \%( s => $vprefix,
-                             t => 'vendor',
-                             d => 'man/man3',
-                             style => $manstyle, ),
-    );
+    my %man_layouts =
+        %(
+            man1dir         => \%( s => $iprefix,
+                    t => 'perl',
+                        d => 'man/man1',
+                        style => $manstyle, ),
+                siteman1dir     => \%( s => $sprefix,
+                    t => 'site',
+                        d => 'man/man1',
+                        style => $manstyle, ),
+                vendorman1dir   => \%( s => $vprefix,
+                    t => 'vendor',
+                        d => 'man/man1',
+                        style => $manstyle, ),
+
+                man3dir         => \%( s => $iprefix,
+                    t => 'perl',
+                        d => 'man/man3',
+                        style => $manstyle, ),
+                siteman3dir     => \%( s => $sprefix,
+                    t => 'site',
+                        d => 'man/man3',
+                        style => $manstyle, ),
+                vendorman3dir   => \%( s => $vprefix,
+                    t => 'vendor',
+                        d => 'man/man3',
+                        style => $manstyle, ),
+        );
 
     my %lib_layouts =
-    %(
-        privlib     => \%( s => $iprefix,
-                         t => 'perl',
-                         d => '',
-                         style => $libstyle, ),
-        vendorlib   => \%( s => $vprefix,
-                         t => 'vendor',
-                         d => '',
-                         style => $libstyle, ),
-        sitelib     => \%( s => $sprefix,
-                         t => 'site',
-                         d => 'site_perl',
-                         style => $libstyle, ),
-        
-        archlib     => \%( s => $iprefix,
-                         t => 'perl',
-                         d => "$version/$arch",
-                         style => $libstyle ),
-        vendorarch  => \%( s => $vprefix,
-                         t => 'vendor',
-                         d => "$version/$arch",
-                         style => $libstyle ),
-        sitearch    => \%( s => $sprefix,
-                         t => 'site',
-                         d => "site_perl/$version/$arch",
-                         style => $libstyle ),
-    );
+        %(
+            privlib     => \%( s => $iprefix,
+                    t => 'perl',
+                        d => '',
+                        style => $libstyle, ),
+                vendorlib   => \%( s => $vprefix,
+                    t => 'vendor',
+                        d => '',
+                        style => $libstyle, ),
+                sitelib     => \%( s => $sprefix,
+                    t => 'site',
+                        d => 'site_perl',
+                        style => $libstyle, ),
+
+                archlib     => \%( s => $iprefix,
+                    t => 'perl',
+                        d => "$version/$arch",
+                        style => $libstyle ),
+                vendorarch  => \%( s => $vprefix,
+                    t => 'vendor',
+                        d => "$version/$arch",
+                        style => $libstyle ),
+                sitearch    => \%( s => $sprefix,
+                    t => 'site',
+                        d => "site_perl/$version/$arch",
+                        style => $libstyle ),
+        );
 
 
     # Special case for LIB.
@@ -1253,7 +1253,7 @@ sub init_INSTALL_from_PREFIX {
 
             if( $var =~ m/arch/ ) {
                 $self->{+$Installvar} ||= 
-                  $self->catdir($self->{?LIB}, %Config{archname});
+                $self->catdir($self->{?LIB}, %Config{archname});
             }
             else {
                 $self->{+$Installvar} ||= $self->{?LIB};
@@ -1262,9 +1262,9 @@ sub init_INSTALL_from_PREFIX {
     }
 
     my %type2prefix = %( perl    => 'PERLPREFIX',
-                        site    => 'SITEPREFIX',
-                        vendor  => 'VENDORPREFIX'
-                      );
+            site    => 'SITEPREFIX',
+                vendor  => 'VENDORPREFIX'
+        );
 
     my %layouts = %(< %bin_layouts, < %man_layouts, < %lib_layouts);
     while( my @(?$var, ?$layout) = @: each(%layouts) ) {
@@ -1281,7 +1281,7 @@ sub init_INSTALL_from_PREFIX {
         $self->prefixify($installvar, $s, $r, $d);
 
         print $^STDERR, "  $Installvar == $self->{?$Installvar}\n" 
-          if $Verbose +>= 2;
+            if $Verbose +>= 2;
     }
 
     # Generate these if they weren't figured out.
@@ -1294,23 +1294,23 @@ sub init_INSTALL_from_PREFIX {
 
 =head3 init_from_INSTALL_BASE
 
-    $mm->init_from_INSTALL_BASE
+$mm->init_from_INSTALL_BASE
 
 =cut
 
 my %map = %(
-           lib      => \qw(lib perl5),
-           arch     => \@('lib', 'perl5', %Config{?archname}),
-           bin      => \qw(bin),
-           man1dir  => \qw(man man1),
-           man3dir  => \qw(man man3),
-          );
+        lib      => \qw(lib perl5),
+            arch     => \@('lib', 'perl5', %Config{?archname}),
+            bin      => \qw(bin),
+            man1dir  => \qw(man man1),
+            man3dir  => \qw(man man3),
+    );
 %map{+script} = %map{?bin};
 
 sub init_INSTALL_from_INSTALL_BASE {
     my $self = shift;
- 
-    %{$self}{[qw(PREFIX VENDORPREFIX SITEPREFIX PERLPREFIX)]} = @:
+
+        %{$self}{[qw(PREFIX VENDORPREFIX SITEPREFIX PERLPREFIX)]} = @:
                                                          '$(INSTALL_BASE)';
 
     my %install;
@@ -1320,7 +1320,7 @@ sub init_INSTALL_from_INSTALL_BASE {
             my $key = "INSTALL".$dir.$uc_thing;
 
             %install{+$key} ||= 
-              $self->catdir('$(INSTALL_BASE)', < @{%map{$thing}});
+            $self->catdir('$(INSTALL_BASE)', < @{%map{$thing}});
         }
     }
 
@@ -1338,7 +1338,7 @@ sub init_INSTALL_from_INSTALL_BASE {
 
 =head3 init_VERSION  I<Abstract>
 
-    $mm->init_VERSION
+$mm->init_VERSION
 
 Initialize macros representing versions of MakeMaker and other tools
 
@@ -1347,7 +1347,7 @@ MAKEMAKER: path to the MakeMaker module.
 MM_VERSION: ExtUtils::MakeMaker Version
 
 MM_REVISION: ExtUtils::MakeMaker version control revision (for backwards 
-             compat)
+compat)
 
 VERSION: version of your module
 
@@ -1379,7 +1379,7 @@ sub init_VERSION {
         $self->{+VERSION} = $self->parse_version($self->{VERSION_FROM});
         if( $self->{?VERSION} eq 'undef' ) {
             warn("WARNING: Setting VERSION via file ".
-                 "'$self->{?VERSION_FROM}' failed\n");
+                "'$self->{?VERSION_FROM}' failed\n");
         }
     }
 
@@ -1415,7 +1415,7 @@ sub init_VERSION {
 
 =head3 init_others  I<Abstract>
 
-    $MM->init_others();
+$MM->init_others();
 
 Initializes the macro definitions used by tools_other() and places them
 in the $MM object.
@@ -1425,36 +1425,36 @@ WriteMakefile() documented in ExtUtils::MakeMaker.
 
 Defines at least these macros.
 
-  Macro             Description
+Macro             Description
 
-  NOOP              Do nothing
-  NOECHO            Tell make not to display the command itself
+NOOP              Do nothing
+NOECHO            Tell make not to display the command itself
 
-  MAKEFILE
-  FIRST_MAKEFILE
-  MAKEFILE_OLD
-  MAKE_APERL_FILE   File used by MAKE_APERL
+MAKEFILE
+FIRST_MAKEFILE
+MAKEFILE_OLD
+MAKE_APERL_FILE   File used by MAKE_APERL
 
-  SHELL             Program used to run shell commands
+SHELL             Program used to run shell commands
 
-  ECHO              Print text adding a newline on the end
-  RM_F              Remove a file 
-  RM_RF             Remove a directory          
-  TOUCH             Update a file's timestamp   
-  TEST_F            Test for a file's existence 
-  CP                Copy a file                 
-  MV                Move a file                 
-  CHMOD             Change permissions on a     
-                    file
+ECHO              Print text adding a newline on the end
+RM_F              Remove a file 
+RM_RF             Remove a directory          
+TOUCH             Update a file's timestamp   
+TEST_F            Test for a file's existence 
+CP                Copy a file                 
+MV                Move a file                 
+CHMOD             Change permissions on a     
+file
 
-  UMASK_NULL        Nullify umask
-  DEV_NULL          Suppress all command output
+UMASK_NULL        Nullify umask
+DEV_NULL          Suppress all command output
 
 
 =head3 init_DIRFILESEP  I<Abstract>
 
-  $MM->init_DIRFILESEP;
-  my $dirfilesep = $MM->{DIRFILESEP};
+$MM->init_DIRFILESEP;
+my $dirfilesep = $MM->{DIRFILESEP};
 
 Initializes the DIRFILESEP macro which is the seperator between the
 directory and filename in a filepath.  ie. / on Unix, \ on Win32 and
@@ -1462,8 +1462,8 @@ nothing on VMS.
 
 For example:
 
-    # instead of $(INST_ARCHAUTODIR)/extralibs.ld
-    $(INST_ARCHAUTODIR)$(DIRFILESEP)extralibs.ld
+# instead of $(INST_ARCHAUTODIR)/extralibs.ld
+$(INST_ARCHAUTODIR)$(DIRFILESEP)extralibs.ld
 
 Something of a hack but it prevents a lot of code duplication between
 MM_* variants.
@@ -1474,7 +1474,7 @@ directories and filenames (for example:  VOLUME:[dir1.dir2]file on VMS).
 
 =head3 init_linker  I<Abstract>
 
-    $mm->init_linker;
+$mm->init_linker;
 
 Initialize macros which have to do with linking.
 
@@ -1494,7 +1494,7 @@ Some OSes do not need these in which case leave it blank.
 
 =head3 init_platform
 
-    $mm->init_platform
+$mm->init_platform
 
 Initialize any macros which are for platform specific use only.
 
@@ -1510,7 +1510,7 @@ sub init_platform {
 
 =head3 init_MAKE
 
-    $mm->init_MAKE
+$mm->init_MAKE
 
 Initialize MAKE from either a MAKE environment variable or $Config{make}.
 
@@ -1555,7 +1555,7 @@ END_OF_TARGET
 
 =head3 POD2MAN_macro
 
-  my $pod2man_macro = $self->POD2MAN_macro
+my $pod2man_macro = $self->POD2MAN_macro
 
 Returns a definition for the POD2MAN macro.  This is a program
 which emulates the pod2man utility.  You can add more switches to the
@@ -1563,15 +1563,15 @@ command by simply appending them on the macro.
 
 Typical usage:
 
-    $(POD2MAN) --section=3 --perm_rw=$(PERM_RW) podfile1 man_page1 ...
+$(POD2MAN) --section=3 --perm_rw=$(PERM_RW) podfile1 man_page1 ...
 
 =cut
 
 sub POD2MAN_macro {
     my $self = shift;
 
-# Need the trailing '--' so perl stops gobbling arguments and - happens
-# to be an alternative end of line seperator on VMS so we quote it
+    # Need the trailing '--' so perl stops gobbling arguments and - happens
+    # to be an alternative end of line seperator on VMS so we quote it
     return <<'END_OF_DEF';
 POD2MAN_EXE = $(PERLRUN) "-MExtUtils::Command::MM" -e pod2man "--"
 POD2MAN = $(POD2MAN_EXE)
@@ -1581,7 +1581,7 @@ END_OF_DEF
 
 =head3 test_via_harness
 
-  my $command = $mm->test_via_harness($perl, $tests);
+my $command = $mm->test_via_harness($perl, $tests);
 
 Returns a $command line which runs the given set of $tests with
 Test::Harness and the given $perl.
@@ -1593,12 +1593,12 @@ Used on the t/*.t files.
 sub test_via_harness($self, $perl, $tests) {
 
     return qq{\t$perl "-MExtUtils::Command::MM" }.
-           qq{"-e" "test_harness(\$(TEST_VERBOSE), '\$(INST_LIB)', '\$(INST_ARCHLIB)')" $tests\n};
+        qq{"-e" "test_harness(\$(TEST_VERBOSE), '\$(INST_LIB)', '\$(INST_ARCHLIB)')" $tests\n};
 }
 
 =head3 test_via_script
 
-  my $command = $mm->test_via_script($perl, $script);
+my $command = $mm->test_via_script($perl, $script);
 
 Returns a $command line which just runs a single test without
 Test::Harness.  No checks are done on the results, they're just
@@ -1642,7 +1642,7 @@ Methods I can't really figure out where they should go yet.
 
 =head3 find_tests
 
-  my $test = $mm->find_tests;
+my $test = $mm->find_tests;
 
 Returns a string suitable for feeding to the shell to return all
 tests in t/*.t.
@@ -1657,7 +1657,7 @@ sub find_tests {
 
 =head3 extra_clean_files
 
-    my @files_to_clean = $MM->extra_clean_files;
+my @files_to_clean = $MM->extra_clean_files;
 
 Returns a list of OS specific files to be removed in the clean target in
 addition to the usual set.
@@ -1672,7 +1672,7 @@ sub extra_clean_files {
 
 =head3 installvars
 
-    my @installvars = $mm->installvars;
+my @installvars = $mm->installvars;
 
 A list of all the INSTALL* variables without the INSTALL prefix.  Useful
 for iteration or building related variable sets.
@@ -1692,7 +1692,7 @@ sub installvars {
 
 =head3 libscan
 
-  my $wanted = $self->libscan($path);
+my $wanted = $self->libscan($path);
 
 Takes a path to a file or dir and returns an empty string if we don't
 want to include this file in the library.  Otherwise it returns the
@@ -1706,7 +1706,7 @@ installation.
 sub libscan($self,$path) {
     my@($dirs,$file) =  ($self->splitpath($path))[[1..2]];
     return '' if grep { m/^(?:RCS|CVS|SCCS|\.svn|_darcs)$/ }, @( < 
-                     $self->splitdir($dirs), $file);
+                                                                 $self->splitdir($dirs), $file);
 
     return $path;
 }
@@ -1714,7 +1714,7 @@ sub libscan($self,$path) {
 
 =head3 platform_constants
 
-    my $make_frag = $mm->platform_constants
+my $make_frag = $mm->platform_constants
 
 Returns a make fragment defining all the macros initialized in
 init_platform() rather than put them in constants().

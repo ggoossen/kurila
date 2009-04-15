@@ -5,10 +5,10 @@ require './test.pl';
 plan(95);
 
 our ($bar, $foo, $baz, $FOO, $BAR, $BAZ, @ary, @ref,
-     @a, @b, @c, @d, $ref, $object, @foo, @bar, @baz,
-     $refref, $x, %whatever, @spring, %spring2,
-     $subref, $subrefref, $anonhash, $anonhash2, $object2, $THIS,
-     @ARGS, $string);
+    @a, @b, @c, @d, $ref, $object, @foo, @bar, @baz,
+    $refref, $x, %whatever, @spring, %spring2,
+    $subref, $subrefref, $anonhash, $anonhash2, $object2, $THIS,
+    @ARGS, $string);
 
 # Test real references.
 
@@ -133,10 +133,10 @@ main::is (ref $object2,	'MYHASH');
 &mymethod($object,"argument");
 
 sub mymethod {
-    local($THIS) = shift;
+                      local($THIS) = shift;
     local @ARGS = @_;
     die 'Got a "' . ref($THIS). '" instead of a MYHASH'
-	unless ref $THIS eq 'MYHASH';
+        unless ref $THIS eq 'MYHASH';
     main::is (@ARGS[0], "argument");
     main::is ($THIS->{?FOO}, 'BAR');
 }
@@ -165,7 +165,7 @@ our @ISA = @('BASEOBJ');
 
 $main::object = bless \%(FOO => 'foo', BAR => 'bar');
 
-package main;
+    package main;
 
 # Test arrow-style method invocation.
 
@@ -207,19 +207,19 @@ do {
     my $test = curr_test();
     my $i = 0;
     local $^DIE_HOOK = sub {
-	my $m = shift;
-	if ($i++ +> 4) {
-	    print $^STDOUT, "# infinite recursion, bailing\nnot ok $test\n";
-	    exit 1;
-        }
-	like ($m->{?description}, qr/^Modification of a read-only/);
-    };
-    package C;
+            my $m = shift;
+            if ($i++ +> 4) {
+                print $^STDOUT, "# infinite recursion, bailing\nnot ok $test\n";
+                exit 1;
+            }
+            like ($m->{?description}, qr/^Modification of a read-only/);
+        };
+        package C;
     sub new { bless \%(), shift }
     sub DESTROY { @_[0] = 'foo' }
     do {
-	print $^STDOUT, "# should generate an error...\n";
-	my $c = C->new;
+        print $^STDOUT, "# should generate an error...\n";
+        my $c = C->new;
     };
     print $^STDOUT, "# good, didn't recurse\n";
 };
@@ -230,8 +230,8 @@ do {
     @a[+1] = "good";
     my $got;
     for (@a) {
-	$got .= ${\$_};
-	$got .= ';';
+        $got .= ${\$_};
+        $got .= ';';
     }
     is ($got, ";good;");
 };
@@ -248,27 +248,27 @@ is ($a, 2);
 
 
 foreach my $lexical (@('', 'my $a; ')) {
-  my $expect = "pass\n";
-  my $result = runperl (switches => \@('-wl'), stderr => 1,
-    prog => $lexical . 'BEGIN {$a = \q{pass}}; $a = $$a; print $^STDOUT, $a');
+    my $expect = "pass\n";
+    my $result = runperl (switches => \@('-wl'), stderr => 1,
+        prog => $lexical . 'BEGIN {$a = \q{pass}}; $a = $$a; print $^STDOUT, $a');
 
-  is ($^CHILD_ERROR, 0);
-  is ($result, $expect);
+    is ($^CHILD_ERROR, 0);
+    is ($result, $expect);
 }
 
 $test = curr_test();
 sub x::DESTROY {print $^STDOUT, "ok ", $test + shift->[0], "\n"}
 do { my $a1 = bless \@(3),"x";
-  my $a2 = bless \@(2),"x";
-  do { my $a3 = bless \@(1),"x";
-    my $a4 = bless \@(0),"x";
-    567;
-  };
+    my $a2 = bless \@(2),"x";
+    do { my $a3 = bless \@(1),"x";
+        my $a4 = bless \@(0),"x";
+        567;
+    };
 };
 curr_test($test+4);
 
 is (runperl (switches=> \@('-l'),
-	     prog=> 'print $^STDOUT, 1; print $^STDOUT, qq-*$^INPUT_RECORD_SEPARATOR*-;print $^STDOUT, 1;'),
+    prog=> 'print $^STDOUT, 1; print $^STDOUT, qq-*$^INPUT_RECORD_SEPARATOR*-;print $^STDOUT, 1;'),
     "1\n*\n*\n1\n");
 
 # bug #22719
@@ -282,7 +282,7 @@ is ($^CHILD_ERROR, 0, 'coredump on typeglob = (SvRV && !SvROK)');
 is (runperl(
     prog => 'use Symbol;my $x=bless \gensym,"t"; print $^STDOUT, $_;*$$x=$x',
     stderr => 1
-), '', 'freeing self-referential typeglob');
+    ), '', 'freeing self-referential typeglob');
 
 TODO: do {
     my $name1 = "\0Chalk";
@@ -295,59 +295,59 @@ TODO: do {
     ${*{Symbol::fetch_glob($name1)}} = "Yummy";
     is (${*{Symbol::fetch_glob($name1)}}, "Yummy", 'Accessing via the correct name works');
     is (${*{Symbol::fetch_glob($name2)}}, undef,
-	'Accessing via a different NUL-containing name gives nothing');
+        'Accessing via a different NUL-containing name gives nothing');
     # defined uses a different code path
     ok (defined ${*{Symbol::fetch_glob($name1)}}, 'defined via the correct name works');
     ok (!defined ${*{Symbol::fetch_glob($name2)}},
-	'defined via a different NUL-containing name gives nothing');
+        'defined via a different NUL-containing name gives nothing');
 
     is (*{Symbol::fetch_glob($name1)}->[+0], undef, 'Nothing before we start (arrays)');
     is (*{Symbol::fetch_glob($name2)}->[+0], undef, 'Nothing before we start');
     *{Symbol::fetch_glob($name1)}->[0] = "Yummy";
     is (*{Symbol::fetch_glob($name1)}->[0], "Yummy", 'Accessing via the correct name works');
     is (*{Symbol::fetch_glob($name2)}->[0], undef,
-	'Accessing via a different NUL-containing name gives nothing');
+        'Accessing via a different NUL-containing name gives nothing');
     ok (defined *{Symbol::fetch_glob($name1)}->[0], 'defined via the correct name works');
     ok (!defined*{Symbol::fetch_glob($name2)}->[0],
-	'defined via a different NUL-containing name gives nothing');
+        'defined via a different NUL-containing name gives nothing');
 
     my @(_, $one) =  @{*{Symbol::fetch_glob($name1)}}[[@(2,3)]];
     my @(_, $two) =  @{*{Symbol::fetch_glob($name2)}}[[@(2,3)]];
     is ($one, undef, 'Nothing before we start (array slices)');
     is ($two, undef, 'Nothing before we start');
-     @{*{Symbol::fetch_glob($name1)}}[[@(2,3)]] = @("Very", "Yummy");
+    @{*{Symbol::fetch_glob($name1)}}[[@(2,3)]] = @("Very", "Yummy");
     @(_, $one) =  @{*{Symbol::fetch_glob($name1)}}[[@(2,3)]];
     @(_, $two) =  @{*{Symbol::fetch_glob($name2)}}[[@(2,3)]];
     is ($one, "Yummy", 'Accessing via the correct name works');
     is ($two, undef,
-	'Accessing via a different NUL-containing name gives nothing');
+        'Accessing via a different NUL-containing name gives nothing');
     ok (defined $one, 'defined via the correct name works');
     ok (!defined $two,
-	'defined via a different NUL-containing name gives nothing');
+        'defined via a different NUL-containing name gives nothing');
 
     is (*{Symbol::fetch_glob($name1)}->{?PWOF}, undef, 'Nothing before we start (hashes)');
     is (*{Symbol::fetch_glob($name2)}->{?PWOF}, undef, 'Nothing before we start');
     *{Symbol::fetch_glob($name1)}->{+PWOF} = "Yummy";
     is (*{Symbol::fetch_glob($name1)}->{?PWOF}, "Yummy", 'Accessing via the correct name works');
     is (*{Symbol::fetch_glob($name2)}->{?PWOF}, undef,
-	'Accessing via a different NUL-containing name gives nothing');
+        'Accessing via a different NUL-containing name gives nothing');
     ok (defined *{Symbol::fetch_glob($name1)}->{?PWOF}, 'defined via the correct name works');
     ok (!defined *{Symbol::fetch_glob($name2)}->{?PWOF},
-	'defined via a different NUL-containing name gives nothing');
+        'defined via a different NUL-containing name gives nothing');
 
     my @(_, $one) =  %{*{Symbol::fetch_glob($name1)}}{[@('SNIF', 'BEEYOOP')]};
     my @(_, $two) =  %{*{Symbol::fetch_glob($name2)}}{[@('SNIF', 'BEEYOOP')]};
     is ($one, undef, 'Nothing before we start (hash slices)');
     is ($two, undef, 'Nothing before we start');
-     %{*{Symbol::fetch_glob($name1)}}{[@('SNIF', 'BEEYOOP')]} = @("Very", "Yummy");
+        %{*{Symbol::fetch_glob($name1)}}{[@('SNIF', 'BEEYOOP')]} = @("Very", "Yummy");
     @(_, $one) =  %{*{Symbol::fetch_glob($name1)}}{[@('SNIF', 'BEEYOOP')]};
     @(_, $two) =  %{*{Symbol::fetch_glob($name2)}}{[@('SNIF', 'BEEYOOP')]};
     is ($one, "Yummy", 'Accessing via the correct name works');
     is ($two, undef,
-	'Accessing via a different NUL-containing name gives nothing');
+        'Accessing via a different NUL-containing name gives nothing');
     ok (defined $one, 'defined via the correct name works');
     ok (!defined $two,
-	'defined via a different NUL-containing name gives nothing');
+        'defined via a different NUL-containing name gives nothing');
 
     $name1 = "Left"; $name2 = "Left\0Right";
     our $glob1;
@@ -364,9 +364,9 @@ TODO: do {
 # test dereferencing errors
 do {
     foreach my $ref (@($^STDOUT)) {
-	dies_like(sub { @$ref }, qr/Not an ARRAY reference/, "Array dereference");
-	dies_like(sub { %$ref }, qr/Expected a HASH ref but got a IO ref/, "Hash dereference");
-	dies_like(sub { &$ref( < @_ ) }, qr/Not a CODE reference/, "Code dereference");
+        dies_like(sub { @$ref }, qr/Not an ARRAY reference/, "Array dereference");
+        dies_like(sub { %$ref }, qr/Expected a HASH ref but got a IO ref/, "Hash dereference");
+        dies_like(sub { &$ref( < @_ ) }, qr/Not a CODE reference/, "Code dereference");
     }
 
     $ref = $^STDOUT;
@@ -384,7 +384,7 @@ curr_test($test + 3);
 my $test1 = $test + 1;
 my $test2 = $test + 2;
 
-package FINALE;
+    package FINALE;
 
 our ($ref3, $ref1);
 

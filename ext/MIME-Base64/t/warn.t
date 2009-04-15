@@ -3,12 +3,12 @@
 
 BEGIN {
     try {
-	require warnings;
+        require warnings;
     };
     if ($^EVAL_ERROR) {
-	print $^STDOUT, "1..0\n";
-	print $^STDOUT, $^EVAL_ERROR;
-	exit;
+        print $^STDOUT, "1..0\n";
+        print $^STDOUT, $^EVAL_ERROR;
+        exit;
     }
 }
 

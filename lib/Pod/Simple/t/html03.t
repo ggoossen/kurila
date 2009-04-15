@@ -8,9 +8,9 @@ BEGIN { plan tests => 7 };
 use Pod::Simple::HTML;
 
 sub x ($x) { Pod::Simple::HTML->_out(
-  #sub{  $_[0]->bare_output(1)  },
-  "=pod\n\n$x",
-) }
+        #sub{  $_[0]->bare_output(1)  },
+        "=pod\n\n$x",
+    ) }
 
 
 # make sure empty file => empty output

@@ -10,7 +10,7 @@ File::Spec::Unix - File::Spec for Unix, base for other File::Spec modules
 
 =head1 SYNOPSIS
 
- require File::Spec::Unix; # Done automatically by File::Spec
+require File::Spec::Unix; # Done automatically by File::Spec
 
 =head1 DESCRIPTION
 
@@ -27,7 +27,7 @@ override specific methods.
 No physical check on the filesystem, but a logical cleanup of a
 path. On UNIX eliminates successive slashes and successive "/.".
 
-    $cpath = File::Spec->canonpath( $path ) ;
+$cpath = File::Spec->canonpath( $path ) ;
 
 Note that this does *not* collapse F<x/../y> sections into F<y>.  This
 is by design.  If F</foo> on your system is a symlink to F</bar/baz>,
@@ -40,7 +40,7 @@ actually traverse the filesystem cleaning up paths like this.
 
 sub canonpath($self,?$path) {
     return unless defined $path;
-    
+
     # Handle POSIX-style node names beginning with double slash (qnx, nto)
     # (POSIX says: "a pathname that begins with two successive slashes
     # may be interpreted in an implementation-defined manner, although
@@ -48,7 +48,7 @@ sub canonpath($self,?$path) {
     my $node = '';
     my $double_slashes_special = $^OS_NAME eq 'qnx' || $^OS_NAME eq 'nto';
     if ( $double_slashes_special && $path =~ s{^(//[^/]+)(?:/|\z)}{/}s ) {
-      $node = $1;
+        $node = $1;
     }
     # This used to be
     # $path =~ s|/+|/|g unless ($^O eq 'cygwin');
@@ -126,8 +126,8 @@ Returns a string representation of the first writable directory from
 the following list or the current directory if none from the list are
 writable:
 
-    $ENV{TMPDIR}
-    /tmp
+$ENV{TMPDIR}
+/tmp
 
 Since perl 5.8.0, if running under taint mode, and if $ENV{TMPDIR}
 is tainted, it is not used.
@@ -140,9 +140,9 @@ sub _tmpdir {
     my $self = shift;
     my @dirlist = @_;
     foreach ( @dirlist) {
-	next unless defined && -d && -w _;
-	$tmpdir = $_;
-	last;
+        next unless defined && -d && -w _;
+        $tmpdir = $_;
+        last;
     }
     $tmpdir = $self->curdir unless defined $tmpdir;
     $tmpdir = defined $tmpdir && $self->canonpath($tmpdir);
@@ -223,8 +223,8 @@ sub join {
 
 =item splitpath
 
-    ($volume,$directories,$file) = File::Spec->splitpath( $path );
-    ($volume,$directories,$file) = File::Spec->splitpath( $path, $no_file );
+($volume,$directories,$file) = File::Spec->splitpath( $path );
+($volume,$directories,$file) = File::Spec->splitpath( $path, $no_file );
 
 Splits a path into volume, directory, and filename portions. On systems
 with no concept of volume, returns '' for volume. 
@@ -262,7 +262,7 @@ sub splitpath($self,$path, ?$nofile) {
 
 The opposite of L</catdir()>.
 
-    @dirs = File::Spec->splitdir( $directories );
+@dirs = File::Spec->splitdir( $directories );
 
 $directories must be only the directory portion of the path on systems 
 that have the concept of a volume or that have path syntax that differentiates
@@ -274,11 +274,11 @@ on some OSs.
 
 On Unix,
 
-    File::Spec->splitdir( "/a/b//c/" );
+File::Spec->splitdir( "/a/b//c/" );
 
 Yields:
 
-    ( '', 'a', 'b', '', 'c', '' )
+( '', 'a', 'b', '', 'c', '' )
 
 =cut
 
@@ -299,15 +299,15 @@ inserted if needed (though if the directory portion doesn't start with
 sub catpath($self,$volume,$directory,$file) {
 
     if ( $directory ne ''                && 
-         $file ne ''                     && 
-         substr( $directory, -1 ) ne '/' && 
-         substr( $file, 0, 1 ) ne '/' 
+        $file ne ''                     && 
+        substr( $directory, -1 ) ne '/' && 
+        substr( $file, 0, 1 ) ne '/' 
     ) {
-        $directory .= "/$file" ;
-    }
-    else {
-        $directory .= $file ;
-    }
+            $directory .= "/$file" ;
+        }
+        else {
+            $directory .= $file ;
+        }
 
     return $directory ;
 }
@@ -317,8 +317,8 @@ sub catpath($self,$volume,$directory,$file) {
 Takes a destination path and an optional base path returns a relative path
 from the base path to the destination path:
 
-    $rel_path = File::Spec->abs2rel( $path ) ;
-    $rel_path = File::Spec->abs2rel( $path, $base ) ;
+$rel_path = File::Spec->abs2rel( $path ) ;
+$rel_path = File::Spec->abs2rel( $path, $base ) ;
 
 If $base is not present or '', then L<cwd()|Cwd> is used. If $base is
 relative, then it is converted to absolute form using
@@ -346,11 +346,11 @@ sub abs2rel($self,$path,?$base) {
     @($path, $base) =  map { $self->canonpath($_) }, @( $path, $base);
 
     if (grep { $self->file_name_is_absolute($_) }, @( $path, $base)) {
-	@($path, $base) =  map { $self->rel2abs($_) }, @( $path, $base);
+        @($path, $base) =  map { $self->rel2abs($_) }, @( $path, $base);
     }
     else {
-	# save a couple of cwd()s if both paths are relative
-	@($path, $base) =  map { $self->catdir('/', $_) }, @( $path, $base);
+        # save a couple of cwd()s if both paths are relative
+        @($path, $base) =  map { $self->catdir('/', $_) }, @( $path, $base);
     }
 
     my @($path_volume, ...) =  $self->splitpath($path, 1);
@@ -366,7 +366,7 @@ sub abs2rel($self,$path,?$base) {
     # strictly speaking has no directory portion.  Treat it as if it
     # had the root directory for that volume.
     if (!length($base_directories) and $self->file_name_is_absolute($base)) {
-      $base_directories = $self->rootdir;
+        $base_directories = $self->rootdir;
     }
 
     # Now, remove all leading components that are the same
@@ -374,15 +374,15 @@ sub abs2rel($self,$path,?$base) {
     my @basechunks = $self->splitdir( $base_directories );
 
     if ($base_directories eq $self->rootdir) {
-      shift @pathchunks;
-      return $self->canonpath( $self->catpath('', $self->catdir( < @pathchunks ), '') );
+        shift @pathchunks;
+        return $self->canonpath( $self->catpath('', $self->catdir( < @pathchunks ), '') );
     }
 
     while (@pathchunks && @basechunks
-             && $self->_same(@pathchunks[0], @basechunks[0])) {
-        shift @pathchunks ;
-        shift @basechunks ;
-    }
+    && $self->_same(@pathchunks[0], @basechunks[0])) {
+            shift @pathchunks ;
+            shift @basechunks ;
+        }
     return $self->curdir unless @pathchunks || @basechunks;
 
     # $base now contains the directories the resulting relative path 
@@ -392,15 +392,15 @@ sub abs2rel($self,$path,?$base) {
 }
 
 sub _same {
-  @_[1] eq @_[2];
+    @_[1] eq @_[2];
 }
 
 =item rel2abs()
 
 Converts a relative path to an absolute path. 
 
-    $abs_path = File::Spec->rel2abs( $path ) ;
-    $abs_path = File::Spec->rel2abs( $path, $base ) ;
+$abs_path = File::Spec->rel2abs( $path ) ;
+$abs_path = File::Spec->rel2abs( $path, $base ) ;
 
 If $base is not present or '', then L<cwd()|Cwd> is used. If $base is
 relative, then it is converted to absolute form using
@@ -427,7 +427,7 @@ sub rel2abs($self,$path,?$base) {
     if ( ! $self->file_name_is_absolute( $path ) ) {
         # Figure out the effective $base and clean it up.
         if ( !defined( $base ) || $base eq '' ) {
-	    $base = $self->_cwd();
+            $base = $self->_cwd();
         }
         elsif ( ! $self->file_name_is_absolute( $base ) ) {
             $base = $self->rel2abs( $base ) ;
@@ -484,19 +484,19 @@ sub _collapse($fs, $path) {
             length @collapsed[-1]       and   # and its not the rootdir
             @collapsed[-1] ne $updir    and   # nor another updir
             @collapsed[-1] ne $curdir         # nor the curdir
-          ) 
-        {                                     # then
-            pop @collapsed;                   # collapse
-        }
-        else {                                # else
-            push @collapsed, $dir;            # just hang onto it
-        }
+        ) 
+            {                                     # then
+                pop @collapsed;                   # collapse
+            }
+            else {                                # else
+                push @collapsed, $dir;            # just hang onto it
+            }
     }
 
     return $fs->catpath($vol, <
-                        $fs->catdir(< @collapsed),
-                        $file
-                       );
+        $fs->catdir(< @collapsed),
+        $file
+        );
 }
 
 

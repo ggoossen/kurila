@@ -11,63 +11,63 @@ push @MANIFEST, 'lib/Config.pod', 'lib/Errno.pm', 'lib/lib.pm',
     'lib/DynaLoader.pm', 'lib/XSLoader.pm';
 
 for ( @MANIFEST) {
-     my $filename;
-     next unless s|^lib/|| or m|^ext/|;
-     my @($origfilename) = @($filename) = @: m|^(\S+)|;
-     $filename =~ s|^[^/]+/|| if $filename =~ s|^ext/||;
-     next unless $filename =~ m!\.p(m|od)$!;
-     my $mod;
-     unless (open ($mod, "<", "../lib/$filename")) {
-	unless (open ($mod, "<", "../$origfilename")) {
-	    warn "Couldn't open ../$origfilename: $^OS_ERROR";
-	    next;
-	}
-	$filename = $origfilename;
-     }
+    my $filename;
+    next unless s|^lib/|| or m|^ext/|;
+    my @($origfilename) = @($filename) = @: m|^(\S+)|;
+    $filename =~ s|^[^/]+/|| if $filename =~ s|^ext/||;
+    next unless $filename =~ m!\.p(m|od)$!;
+    my $mod;
+    unless (open ($mod, "<", "../lib/$filename")) {
+        unless (open ($mod, "<", "../$origfilename")) {
+            warn "Couldn't open ../$origfilename: $^OS_ERROR";
+            next;
+        }
+        $filename = $origfilename;
+    }
 
 
-     my ($name, $thing);
-     my $foundit=0;
-     do {
-	 local $^INPUT_RECORD_SEPARATOR ="";
-	 while ( ~< *$mod) {
-	     next unless m/^=head1 NAME/;
-	     $foundit++;
-	     last;
-	 }
-     };
-     unless ($foundit) {
-	 warn "$filename missing =head1 NAME (okay if there is respective .pod)\n";
-	 next;
-     }
-     my $title = ~< *$mod;
-     chomp($title);
-     close $mod;
+    my ($name, $thing);
+    my $foundit=0;
+    do {
+        local $^INPUT_RECORD_SEPARATOR ="";
+        while ( ~< *$mod) {
+            next unless m/^=head1 NAME/;
+            $foundit++;
+            last;
+        }
+    };
+    unless ($foundit) {
+        warn "$filename missing =head1 NAME (okay if there is respective .pod)\n";
+        next;
+    }
+    my $title = ~< *$mod;
+    chomp($title);
+    close $mod;
 
-     my $perlname = $filename;
-     $perlname =~ s!^.*\b(ext|lib)/!!;
-     $perlname =~ s!\.p(m|od)$!!;
-     $perlname =~ s!\b(\w+)/\1\b!$1!;
-     $perlname =~ s![/-]!::!g;
+    my $perlname = $filename;
+    $perlname =~ s!^.*\b(ext|lib)/!!;
+    $perlname =~ s!\.p(m|od)$!!;
+    $perlname =~ s!\b(\w+)/\1\b!$1!;
+    $perlname =~ s![/-]!::!g;
 
-     @($name, $thing) =  split m/ --? /, $title, 2;
+    @($name, $thing) =  split m/ --? /, $title, 2;
 
-     unless ($name and $thing) {
-	 warn "$filename missing name\n"  unless $name;
-	 warn "$filename missing thing\n" unless $thing;
-	 next;
-     }
+    unless ($name and $thing) {
+        warn "$filename missing name\n"  unless $name;
+        warn "$filename missing thing\n" unless $thing;
+        next;
+    }
 
 
-     $thing =~ s/^perl pragma to //i;
-     $thing = ucfirst($thing);
-     $title = "=item $perlname\n\n$thing\n\n";
+    $thing =~ s/^perl pragma to //i;
+    $thing = ucfirst($thing);
+    $title = "=item $perlname\n\n$thing\n\n";
 
-     if ($filename =~ m/[A-Z]/) {
-          push @mod, $title;
-     } else {
-          push @pragma, $title;
-     }
+    if ($filename =~ m/[A-Z]/) {
+        push @mod, $title;
+    } else {
+        push @pragma, $title;
+    }
 }
 
 print $out, <<'EOF';

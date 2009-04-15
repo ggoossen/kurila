@@ -36,14 +36,14 @@ sub to_bytes {
 }
 
 do {
-  use charnames ':full';
+    use charnames ':full';
 
-  ok to_bytes("\N{CYRILLIC SMALL LETTER BE}") eq $encoded_be;
+    ok to_bytes("\N{CYRILLIC SMALL LETTER BE}") eq $encoded_be;
 
-  use charnames < qw(cyrillic greek :short);
+    use charnames < qw(cyrillic greek :short);
 
-  ok to_bytes("\N{be},\N{alpha},\N{hebrew:bet}")
-    eq "$encoded_be,$encoded_alpha,$encoded_bet";
+    ok to_bytes("\N{be},\N{alpha},\N{hebrew:bet}")
+       eq "$encoded_be,$encoded_alpha,$encoded_bet";
 };
 
 do {
@@ -57,8 +57,8 @@ do {
 };
 
 do {
-   use charnames < qw(:full);
-   use utf8;
+    use charnames < qw(:full);
+    use utf8;
 
     my $x = "\x{221b}";
     my $named = "\N{CUBE ROOT}";
@@ -67,25 +67,25 @@ do {
 };
 
 do {
-   use charnames < qw(:full);
-   use utf8;
-   ok "\x{100}\N{CENT SIGN}" eq "\x{100}"."\N{CENT SIGN}";
+    use charnames < qw(:full);
+    use utf8;
+    ok "\x{100}\N{CENT SIGN}" eq "\x{100}"."\N{CENT SIGN}";
 };
 
 do {
-  use charnames ':full';
+    use charnames ':full';
 
-  ok to_bytes("\N{DESERET SMALL LETTER ENG}") eq $encoded_deseng;
+    ok to_bytes("\N{DESERET SMALL LETTER ENG}") eq $encoded_deseng;
 };
 
 do {
-  # 20001114.001
+    # 20001114.001
 
-  no utf8; # naked Latin-1
+    no utf8; # naked Latin-1
 
-  use charnames ':full';
-  my $text = "\N{LATIN CAPITAL LETTER A WITH DIAERESIS}";
-  ok $text eq "\x{c4}" && utf8::ord($text) == 0xc4;
+    use charnames ':full';
+    my $text = "\N{LATIN CAPITAL LETTER A WITH DIAERESIS}";
+    ok $text eq "\x{c4}" && utf8::ord($text) == 0xc4;
 };
 
 do {
@@ -118,15 +118,15 @@ ok "\N{NULL}" eq "\c@";
 
 if ($^OS_NAME eq 'MacOS')
 {
-	ok "\N{CARRIAGE RETURN (CR)}" eq "\n";
-	ok "\N{CARRIAGE RETURN}" eq "\n";
-	ok "\N{CR}" eq "\n";
+    ok "\N{CARRIAGE RETURN (CR)}" eq "\n";
+    ok "\N{CARRIAGE RETURN}" eq "\n";
+    ok "\N{CR}" eq "\n";
 }
 else
 {
-	ok "\N{LINE FEED (LF)}" eq "\n";
-	ok "\N{LINE FEED}" eq "\n";
-	ok "\N{LF}" eq "\n";
+    ok "\N{LINE FEED (LF)}" eq "\n";
+    ok "\N{LINE FEED}" eq "\n";
+    ok "\N{LF}" eq "\n";
 }
 
 my $nel = ord("A") == 193 ?? qr/^(?:\x15|\x25)$/ !! qr/^\x85$/;
@@ -181,7 +181,7 @@ END { if ($tmpfile) { 1 while unlink $tmpfile; } }
 my @prgs;
 do {   local $^INPUT_RECORD_SEPARATOR = undef;
     @prgs = split "\n########\n", ~< *DATA;
-    };
+};
 
 for ( @prgs) {
     my @($code, $exp, ...) = @(( <split m/\nEXPECT\n/), '$');
@@ -191,42 +191,42 @@ for ( @prgs) {
     print $tmp, $prog, "\n";
     close $tmp or die "Could not close $tmpfile: $^OS_ERROR";
     if ($fil) {
-	$fil .= "\n";
-	open my $ali, ">", "$alifile" or die "Could not open $alifile: $^OS_ERROR";
-	print $ali, $fil;
-	close $ali or die "Could not close $alifile: $^OS_ERROR";
-	}
+        $fil .= "\n";
+        open my $ali, ">", "$alifile" or die "Could not open $alifile: $^OS_ERROR";
+        print $ali, $fil;
+        close $ali or die "Could not close $alifile: $^OS_ERROR";
+    }
     my $res = runperl( progfile => $tmpfile,
-                       stderr => 1 );
+        stderr => 1 );
     my $status = $^CHILD_ERROR;
     $res =~ s/[\r\n]+$//;
     $res =~ s/tmp\d+/-/g;			# fake $prog from STDIN
     $res =~ s/\n%[A-Z]+-[SIWEF]-.*$//		# clip off DCL status msg
-	if $^OS_NAME eq "VMS";
+        if $^OS_NAME eq "VMS";
     $exp =~ s/[\r\n]+$//;
     if ($^OS_NAME eq "MacOS") {
-	$exp =~ s{(\./)?abc\.pm}{:abc.pm}g;
-	$exp =~ s{./abc}        {:abc}g;
-	}
+        $exp =~ s{(\./)?abc\.pm}{:abc.pm}g;
+        $exp =~ s{./abc}        {:abc}g;
+    }
     my $pfx = ($res =~ s/^PREFIX\n//);
     my $rexp = qr{^$exp};
     if ($res =~ s/^SKIPPED\n//) {
-	print $^STDOUT, "$res\n";
-	}
+        print $^STDOUT, "$res\n";
+    }
     elsif (($pfx and $res !~ m/^\Q$exp/) or
-	  (!$pfx and $res !~ $rexp)) {
+        (!$pfx and $res !~ $rexp)) {
         print $^STDERR,
-	    "PROG:\n$prog\n",
-	    "FILE:\n$fil",
-	    "EXPECTED:\n$exp\n",
-	    "GOT:\n$res\n";
+            "PROG:\n$prog\n",
+            "FILE:\n$fil",
+            "EXPECTED:\n$exp\n",
+            "GOT:\n$res\n";
         print $^STDOUT, "not ";
-	}
+    }
     ok 1;
     1 while unlink $tmpfile;
     $fil or next;
     1 while unlink $alifile;
-    }
+}
 
 # [perl #30409] charnames.pm clobbers default variable
 $_ = 'foobar';
@@ -242,8 +242,8 @@ ok $_ eq 'foobar';
 my $names = do "unicore/Name.pl";
 ok defined $names;
 do { # as on ASCII or UTF-8 machines
-  my $non_ascii = $names =~ s/[^\0-\177]//g;
-  ok not $non_ascii;
+    my $non_ascii = $names =~ s/[^\0-\177]//g;
+    ok not $non_ascii;
 };
 
 # Verify that charnames propagate to eval("")

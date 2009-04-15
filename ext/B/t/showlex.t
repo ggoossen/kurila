@@ -33,14 +33,14 @@ my ($out);	# output, option-flag
 sub padrep {
     my @($varname,$newlex) =  @_;
     return ($newlex)
-	?? 'PVNV \(0x[0-9a-fA-F]+\) "\'.$varname.'" = '
-	!! "PVNV \\\(0x[0-9a-fA-F]+\\\) \\$varname\n";
+        ?? 'PVNV \(0x[0-9a-fA-F]+\) "\'.$varname.'" = '
+        !! "PVNV \\\(0x[0-9a-fA-F]+\\\) \\$varname\n";
 }
 
 for my $newlex (@('', '-newlex')) {
 
     $out = runperl ( switches => \@("-MO=Showlex,$newlex"),
-		     prog => 'my ($a,$b)', stderr => 1 );
+        prog => 'my ($a,$b)', stderr => 1 );
     $na = padrep('$a',$newlex);
     $nb = padrep('$b',$newlex);
     like ($out, qr/4: $na/ms, 'found $a in "my ($a,$b)"');
@@ -48,58 +48,58 @@ for my $newlex (@('', '-newlex')) {
 
     print $^STDOUT, $out if $verbose;
 
-SKIP: do {
-    skip "no perlio in this build", 5
-    unless Config::config_value("useperlio");
+  SKIP: do {
+        skip "no perlio in this build", 5
+            unless Config::config_value("useperlio");
 
-    our $buf = 'arb startval';
-    my $ak = B::Showlex::walk_output (\$buf);
+        our $buf = 'arb startval';
+        my $ak = B::Showlex::walk_output (\$buf);
 
-    my $walker = B::Showlex::compile( $newlex, sub{my($foo,$bar); 1} );
-    $walker->();
-    $na = padrep('$foo',$newlex);
-    $nb = padrep('$bar',$newlex);
-    like ($buf, qr/$($start_index+1): $na/ms,
-       'found $foo in "sub { my ($foo,$bar) }"');
-    like ($buf, qr/$($start_index+2): $nb/ms, 'found $bar in "sub { my ($foo,$bar) }"');
+        my $walker = B::Showlex::compile( $newlex, sub{my($foo,$bar); 1} );
+        $walker->();
+        $na = padrep('$foo',$newlex);
+        $nb = padrep('$bar',$newlex);
+        like ($buf, qr/$($start_index+1): $na/ms,
+              'found $foo in "sub { my ($foo,$bar) }"');
+        like ($buf, qr/$($start_index+2): $nb/ms, 'found $bar in "sub { my ($foo,$bar) }"');
 
-    print $^STDOUT, $buf if $verbose;
+        print $^STDOUT, $buf if $verbose;
 
-    $ak = B::Showlex::walk_output (\$buf);
+        $ak = B::Showlex::walk_output (\$buf);
 
-    my $src = 'sub { my ($scalar,@arr,%hash); 1 }';
-    my $sub = eval $src; die if $^EVAL_ERROR;
-    $walker = B::Showlex::compile($sub);
-    $walker->();
-    $na = padrep('$scalar',$newlex);
-    $nb = padrep('@arr',$newlex);
-    $nc = padrep('%hash',$newlex);
-    like ($buf, qr/$($start_index+1): $na/ms, 'found $scalar in "'. $src .'"');
-    like ($buf, qr/$($start_index+2): $nb/ms, 'found @arr    in "'. $src .'"');
-    like ($buf, qr/$($start_index+3): $nc/ms, 'found %hash   in "'. $src .'"');
+        my $src = 'sub { my ($scalar,@arr,%hash); 1 }';
+        my $sub = eval $src; die if $^EVAL_ERROR;
+        $walker = B::Showlex::compile($sub);
+        $walker->();
+        $na = padrep('$scalar',$newlex);
+        $nb = padrep('@arr',$newlex);
+        $nc = padrep('%hash',$newlex);
+        like ($buf, qr/$($start_index+1): $na/ms, 'found $scalar in "'. $src .'"');
+        like ($buf, qr/$($start_index+2): $nb/ms, 'found @arr    in "'. $src .'"');
+        like ($buf, qr/$($start_index+3): $nc/ms, 'found %hash   in "'. $src .'"');
 
-    print $^STDOUT, $buf if $verbose;
+        print $^STDOUT, $buf if $verbose;
 
-    # fibonacci function under test
-    my $asub = sub {
-	my @($self,%< %props)= @_;
-	my $total;
-	do { # inner block vars
-	    my @(@fib)=@(@(1,2));
-	    for my $i (2..9) {
-		@fib[$i] = @fib[$i-2] + @fib[$i-1];
-	    }
-	    for my $i(0..10) {
-		$total += $i;
-	    }
-	};
+        # fibonacci function under test
+        my $asub = sub {
+                my @($self,%< %props)= @_;
+                my $total;
+                do { # inner block vars
+                    my @(@fib)=@(@(1,2));
+                    for my $i (2..9) {
+                        @fib[$i] = @fib[$i-2] + @fib[$i-1];
+                    }
+                    for my $i(0..10) {
+                        $total += $i;
+                    }
+                };
+            };
+        $walker = B::Showlex::compile($asub, $newlex, "-nosp");
+        $walker->();
+        print $^STDOUT, $buf if $verbose;
+
+        $walker = B::Concise::compile($asub, '-exec');
+        $walker->();
+
     };
-    $walker = B::Showlex::compile($asub, $newlex, "-nosp");
-    $walker->();
-    print $^STDOUT, $buf if $verbose;
-
-    $walker = B::Concise::compile($asub, '-exec');
-    $walker->();
-
-};
 }

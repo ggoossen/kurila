@@ -70,20 +70,20 @@ is(getComposite(0xAC00, 0x11A8), 0xAC01);
 is(getComposite(0xADF8, 0x11AF), 0xAE00);
 
 sub uprops {
-  my $uv = shift;
-  my $r = "";
-     $r .= isExclusion($uv)   ?? 'X' !! 'x';
-     $r .= isSingleton($uv)   ?? 'S' !! 's';
-     $r .= isNonStDecomp($uv) ?? 'N' !! 'n'; # Non-Starter Decomposition
-     $r .= isComp_Ex($uv)     ?? 'F' !! 'f'; # Full exclusion (X + S + N)
-     $r .= isComp2nd($uv)     ?? 'B' !! 'b'; # B = M = Y
-     $r .= isNFD_NO($uv)      ?? 'D' !! 'd';
-     $r .= isNFC_MAYBE($uv)   ?? 'M' !! 'm'; # Maybe
-     $r .= isNFC_NO($uv)      ?? 'C' !! 'c';
-     $r .= isNFKD_NO($uv)     ?? 'K' !! 'k';
-     $r .= isNFKC_MAYBE($uv)  ?? 'Y' !! 'y'; # maYbe
-     $r .= isNFKC_NO($uv)     ?? 'G' !! 'g';
-  return $r;
+    my $uv = shift;
+    my $r = "";
+    $r .= isExclusion($uv)   ?? 'X' !! 'x';
+    $r .= isSingleton($uv)   ?? 'S' !! 's';
+    $r .= isNonStDecomp($uv) ?? 'N' !! 'n'; # Non-Starter Decomposition
+    $r .= isComp_Ex($uv)     ?? 'F' !! 'f'; # Full exclusion (X + S + N)
+    $r .= isComp2nd($uv)     ?? 'B' !! 'b'; # B = M = Y
+    $r .= isNFD_NO($uv)      ?? 'D' !! 'd';
+    $r .= isNFC_MAYBE($uv)   ?? 'M' !! 'm'; # Maybe
+    $r .= isNFC_NO($uv)      ?? 'C' !! 'c';
+    $r .= isNFKD_NO($uv)     ?? 'K' !! 'k';
+    $r .= isNFKC_MAYBE($uv)  ?? 'Y' !! 'y'; # maYbe
+    $r .= isNFKC_NO($uv)     ?? 'G' !! 'g';
+    return $r;
 }
 
 is(uprops(0x0000), 'xsnfbdmckyg'); # NULL
@@ -126,9 +126,9 @@ is($sDec, "\x{FA19}");
 is(reorder(""), "");
 is(reorder("A"), "A");
 is(reorder(hexU("0041 0300 0315 0313 031b 0061")),
-	   hexU("0041 031b 0300 0313 0315 0061"));
+   hexU("0041 031b 0300 0313 0315 0061"));
 is(reorder(hexU("00C1 0300 0315 0313 031b 0061 309A 3099")),
-	   hexU("00C1 031b 0300 0313 0315 0061 309A 3099"));
+   hexU("00C1 031b 0300 0313 0315 0061 309A 3099"));
 
 # don't modify the source
 my $sReord = "\x{3000}\x{300}\x{31b}";
@@ -213,7 +213,7 @@ is(normalize('C', $2), "ABC");
 
 is(normalize('NFC', $1), "012");
 is(normalize('NFC', $2), "ABC");
- # s/^NF// in normalize() must not prevent using $1, $&, etc.
+# s/^NF// in normalize() must not prevent using $1, $&, etc.
 
 # a string with initial zero should be treated like a number
 

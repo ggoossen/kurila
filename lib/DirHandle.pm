@@ -7,14 +7,14 @@ DirHandle - supply object methods for directory handles
 
 =head1 SYNOPSIS
 
-    use DirHandle;
-    $d = new DirHandle ".";
-    if (defined $d) {
-        while (defined($_ = $d->read)) { something($_); }
-        $d->rewind;
-        while (defined($_ = $d->read)) { something_else($_); }
-        undef $d;
-    }
+use DirHandle;
+$d = new DirHandle ".";
+if (defined $d) {
+while (defined($_ = $d->read)) { something($_); }
+$d->rewind;
+while (defined($_ = $d->read)) { something_else($_); }
+undef $d;
+}
 
 =head1 DESCRIPTION
 
@@ -47,8 +47,8 @@ sub new {
     my $class = shift;
     my $dh = gensym;
     if ((nelems @_)) {
-	DirHandle::open($dh, @_[0])
-	    or return undef;
+        DirHandle::open($dh, @_[0])
+            or return undef;
     }
     bless $dh, $class;
 }

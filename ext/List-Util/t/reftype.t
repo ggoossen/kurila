@@ -17,20 +17,20 @@ my @test = @(
  \@( REF    => \(\$t),	'REF ref'	),
  \@( GLOB   => gensym,	'GLOB ref'	),
  \@( CODE   => sub {},	'CODE ref'	),
-# \@( IO => *STDIN{IO} ) the internal sv_reftype returns UNKNOWN
-);
+    # \@( IO => *STDIN{IO} ) the internal sv_reftype returns UNKNOWN
+    );
 
 foreach my $test (@test) {
-  my@($type,$what, $n) =  @$test;
+    my@($type,$what, $n) =  @$test;
 
-  is( reftype($what), $type, $n);
-  next unless ref($what);
+    is( reftype($what), $type, $n);
+    next unless ref($what);
 
-  bless $what, "ABC";
-  is( reftype($what), $type, $n);
+    bless $what, "ABC";
+    is( reftype($what), $type, $n);
 
-  bless $what, "0";
-  is( reftype($what), $type, $n);
+    bless $what, "0";
+    is( reftype($what), $type, $n);
 }
 
 package MyTie;

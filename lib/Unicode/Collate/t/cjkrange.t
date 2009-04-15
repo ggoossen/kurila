@@ -8,9 +8,9 @@ use Unicode::Collate;
 ok(1);
 
 my $Collator = Unicode::Collate->new(
-  table => 'keys.txt',
-  normalization => undef,
-);
+    table => 'keys.txt',
+    normalization => undef,
+    );
 
 # U+9FA6..U+9FBB are CJK UI since Unicode 4.1.0.
 # U+3400 is CJK UI ExtA, then greater than any CJK UI.

@@ -33,7 +33,7 @@ my ($error, $list, $file, $message);
 my $tmp_base = catdir(
     curdir(),
     sprintf( 'test-%x-%x-%x', time, $^PID, rand(99999) ),
-);
+    );
 
 # invent some names
 my @dir = @(
@@ -41,7 +41,7 @@ my @dir = @(
     catdir($tmp_base, < qw(a c)),
     catdir($tmp_base, < qw(z b)),
     catdir($tmp_base, < qw(z c)),
-);
+    );
 
 # create them
 my @created = mkpath(< @dir);
@@ -66,8 +66,8 @@ SKIP: do {
     # rather than foo/bar/..    
     skip "updir() canonicalises path on this platform", 2
         if $dir2 eq $tmp_base
-            or $^OS_NAME eq 'cygwin';
-        
+        or $^OS_NAME eq 'cygwin';
+
     @created = mkpath($dir2, \%(mask => 0700));
     is(scalar(nelems @created), 1, "make directory with trailing parent segment");
     is(@created[0], $dir, "made parent");
@@ -116,12 +116,12 @@ $dir  = catdir($tmp_base, 'a');
 $dir2 = catdir($tmp_base, 'z');
 
 rmtree( $dir, $dir2,
-    \%(
-        error     => \$error,
-        result    => \$list,
-        keep_root => 1,
-    )
-);
+        \%(
+            error     => \$error,
+                result    => \$list,
+                keep_root => 1,
+        )
+        );
 
 is(scalar(nelems @$error), 0, "no errors unlinking a and z");
 is(scalar(nelems @$list),  4, "list contains 4 elements")
@@ -263,7 +263,7 @@ SKIP: do {
     skip 'Test::Output not available', 14
         unless $has_Test_Output;
 
-    SKIP: do {
+  SKIP: do {
         $dir = catdir('EXTRA', '3');
         skip "extra scenarios not set up, see eg/setup-extra-tests", 3
             unless -e $dir;
@@ -273,7 +273,7 @@ SKIP: do {
             sub {rmtree($dir, \%(verbose => 0))},
             qr{\Acannot make child directory read-write-exec for [^:]+: .* at \S+ line \d+},
             q(rmtree can't chdir into root dir)
-        );
+            );
 
         $dir = catdir('EXTRA', '3');
         stderr_like( 
@@ -283,7 +283,7 @@ cannot make child directory read-write-exec for [^:]+: .* at \1 line \2
 cannot make child directory read-write-exec for [^:]+: .* at \1 line \2
 cannot remove directory for [^:]+: .* at \1 line \2},
             'rmtree with file owned by root'
-        );
+            );
 
         stderr_like( 
             sub {rmtree('EXTRA', \%())},
@@ -299,7 +299,7 @@ cannot make child directory read-write-exec for [^:]+: .* at \1 line \2
 cannot remove directory for [^:]+: .* at \1 line \2
 cannot restore permissions to \d+ for [^:]+: .* at \1 line \2},
             'rmtree with insufficient privileges'
-        );
+            );
     };
 
     my $base = catdir($tmp_base,'output');
@@ -310,13 +310,13 @@ cannot restore permissions to \d+ for [^:]+: .* at \1 line \2},
         sub { rmtree( undef, 1 ) },
         qr/\ANo root path\(s\) specified\b/,
         "rmtree of nothing carps sensibly"
-    );
+        );
 
     stderr_like(
         sub { rmtree( '', 1 ) },
         qr/\ANo root path\(s\) specified\b/,
         "rmtree of empty dir carps sensibly"
-    );
+        );
 
     stderr_is( sub { mkpath() }, '', "mkpath no args does not carp" );
     stderr_is( sub { rmtree() }, '', "rmtree no args does not carp" );
@@ -325,33 +325,33 @@ cannot restore permissions to \d+ for [^:]+: .* at \1 line \2},
         sub {@created = mkpath($dir, 1)},
         "mkdir $base\nmkdir $dir\n",
         'mkpath verbose (old style 1)'
-    );
+        );
 
     stdout_is(
         sub {@created = mkpath(\@($dir2), 1)},
         "mkdir $dir2\n",
         'mkpath verbose (old style 2)'
-    );
+        );
 
     stdout_is(
         sub {$count = rmtree(\@($dir, $dir2), 1, 1)},
         "rmdir $dir\nrmdir $dir2\n",
         'rmtree verbose (old style)'
-    );
+        );
 
     stdout_is(
         sub {@created = mkpath($dir, \%(verbose => 1, mask => 0750))},
         "mkdir $dir\n",
         'mkpath verbose (new style 1)'
-    );
+        );
 
     stdout_is(
         sub {@created = mkpath($dir2, 1, 0771)},
         "mkdir $dir2\n",
         'mkpath verbose (new style 2)'
-    );
+        );
 
-    SKIP: do {
+  SKIP: do {
         $file = catdir($dir2, "file");
         skip "Cannot create $file", 2 unless open my $out, ">", " $file";
         print $out, "test file, safe to delete\n", scalar(localtime), "\n";
@@ -363,7 +363,7 @@ cannot restore permissions to \d+ for [^:]+: .* at \1 line \2},
             sub {$count = rmtree($dir, $dir2, \%(verbose => 1, safe => 1))},
             "rmdir $dir\nunlink $file\nrmdir $dir2\n",
             'rmtree safe verbose (new style)'
-        );
+            );
     };
 };
 

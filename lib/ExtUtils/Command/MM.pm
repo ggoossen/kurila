@@ -18,7 +18,7 @@ ExtUtils::Command::MM - Commands for the MM's to use in Makefiles
 
 =head1 SYNOPSIS
 
-  perl "-MExtUtils::Command::MM" -e "function" "--" arguments...
+perl "-MExtUtils::Command::MM" -e "function" "--" arguments...
 
 
 =head1 DESCRIPTION
@@ -34,7 +34,7 @@ Any $(FOO) used in the examples are make variables, not Perl.
 
 =item B<test_harness>
 
-  test_harness($verbose, @test_libs);
+test_harness($verbose, @test_libs);
 
 Runs the tests on @ARGV via Test::Harness passing through the $verbose
 flag.  Any @test_libs will be unshifted onto the test's $^INCLUDE_PATH.
@@ -63,24 +63,24 @@ sub test_harness {
 
 =item B<pod2man>
 
-  pod2man( '--option=value',
-           $podfile1 => $manpage1,
-           $podfile2 => $manpage2,
-           ...
-         );
+pod2man( '--option=value',
+$podfile1 => $manpage1,
+$podfile2 => $manpage2,
+...
+);
 
-  # or args on @ARGV
+# or args on @ARGV
 
 pod2man() is a function performing most of the duties of the pod2man
 program.  Its arguments are exactly the same as pod2man as of 5.8.0
 with the addition of:
 
-    --perm_rw   octal permission to set the resulting manpage to
+--perm_rw   octal permission to set the resulting manpage to
 
 And the removal of:
 
-    --verbose/-v
-    --help/-h
+--verbose/-v
+--help/-h
 
 If no arguments are given to pod2man it will read from @ARGV.
 
@@ -97,11 +97,11 @@ sub pod2man {
     my %options = %( () );
     Getopt::Long::config ('bundling_override');
     Getopt::Long::GetOptions (\%options, 
-                'section|s=s', 'release|r=s', 'center|c=s',
-                'date|d=s', 'fixed=s', 'fixedbold=s', 'fixeditalic=s',
-                'fixedbolditalic=s', 'official|o', 'quotes|q=s', 'lax|l',
-                'name|n=s', 'perm_rw:i'
-    );
+                              'section|s=s', 'release|r=s', 'center|c=s',
+                              'date|d=s', 'fixed=s', 'fixedbold=s', 'fixeditalic=s',
+                              'fixedbolditalic=s', 'official|o', 'quotes|q=s', 'lax|l',
+                              'name|n=s', 'perm_rw:i'
+                              );
 
     # If there's no files, don't bother going further.
     return 0 unless (nelems @ARGV);
@@ -126,11 +126,11 @@ sub pod2man {
 
         my $parser = Pod::Man->new(< %options);
         $parser->parse_from_file($pod, $man)
-          or do { warn("Could not install $man\n");  next };
+            or do { warn("Could not install $man\n");  next };
 
         if (length %options{?perm_rw}) {
             chmod(oct(%options{?perm_rw}), $man)
-              or do { warn("chmod %options{?perm_rw} $man: $^OS_ERROR\n"); next };
+                or do { warn("chmod %options{?perm_rw} $man: $^OS_ERROR\n"); next };
         }
     } while (nelems @ARGV);
 
@@ -140,7 +140,7 @@ sub pod2man {
 
 =item B<warn_if_old_packlist>
 
-  perl "-MExtUtils::Command::MM" -e warn_if_old_packlist <somefile>
+perl "-MExtUtils::Command::MM" -e warn_if_old_packlist <somefile>
 
 Displays a warning that an old packlist file was found.  Reads the
 filename from @ARGV.
@@ -162,12 +162,12 @@ PACKLIST_WARNING
 
 =item B<perllocal_install>
 
-    perl "-MExtUtils::Command::MM" -e perllocal_install 
-        <type> <module name> <key> <value> ...
+perl "-MExtUtils::Command::MM" -e perllocal_install 
+<type> <module name> <key> <value> ...
 
-    # VMS only, key|value pairs come on STDIN
-    perl "-MExtUtils::Command::MM" -e perllocal_install
-        <type> <module name> < <key>|<value> ...
+# VMS only, key|value pairs come on STDIN
+perl "-MExtUtils::Command::MM" -e perllocal_install
+<type> <module name> < <key>|<value> ...
 
 Prints a fragment of POD suitable for appending to perllocal.pod.
 Arguments are read from @ARGV.
@@ -178,11 +178,11 @@ Arguments are read from @ARGV.
 
 Key/value pairs are extra information about the module.  Fields include:
 
-    installed into      which directory your module was out into
-    LINKTYPE            dynamic or static linking
-    VERSION             module version number
-    EXE_FILES           any executables installed in a space seperated 
-                        list
+installed into      which directory your module was out into
+LINKTYPE            dynamic or static linking
+VERSION             module version number
+EXE_FILES           any executables installed in a space seperated 
+list
 
 =cut
 
@@ -192,7 +192,7 @@ sub perllocal_install {
     # VMS feeds args as a piped file on STDIN since it usually can't
     # fit all the args on a single command line.
     my @mod_info = @( $Is_VMS ?? < split m/\|/, ~< $^STDIN
-                           !! < @ARGV );
+                      !! < @ARGV );
 
     my $pod;
     $pod = sprintf <<POD, scalar localtime;
@@ -223,7 +223,7 @@ POD
 
 =item B<uninstall>
 
-    perl "-MExtUtils::Command::MM" -e uninstall <packlist>
+perl "-MExtUtils::Command::MM" -e uninstall <packlist>
 
 A wrapper around ExtUtils::Install::uninstall().  Warns that
 uninstallation is deprecated and doesn't actually perform the

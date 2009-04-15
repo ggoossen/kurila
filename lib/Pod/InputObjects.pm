@@ -13,76 +13,76 @@ package Pod::InputObjects;
 our ($VERSION);
 $VERSION = 1.30;  ## Current version of this package
 
-#############################################################################
+    #############################################################################
 
-=head1 NAME
+    =head1 NAME
 
-Pod::InputObjects - objects representing POD input paragraphs, commands, etc.
+    Pod::InputObjects - objects representing POD input paragraphs, commands, etc.
 
-=head1 SYNOPSIS
+    =head1 SYNOPSIS
 
     use Pod::InputObjects;
 
-=head1 REQUIRES
+    =head1 REQUIRES
 
-perl5.004, Carp
+    perl5.004, Carp
 
-=head1 EXPORTS
+    =head1 EXPORTS
 
-Nothing.
+    Nothing.
 
-=head1 DESCRIPTION
+    =head1 DESCRIPTION
 
-This module defines some basic input objects used by B<Pod::Parser> when
-reading and parsing POD text from an input source. The following objects
-are defined:
+    This module defines some basic input objects used by B<Pod::Parser> when
+    reading and parsing POD text from an input source. The following objects
+    are defined:
 
-=over 4
+    =over 4
 
-=begin __PRIVATE__
+    =begin __PRIVATE__
 
-=item package B<Pod::InputSource>
+    =item package B<Pod::InputSource>
 
-An object corresponding to a source of POD input text. It is mostly a
-wrapper around a filehandle or C<IO::Handle>-type object (or anything
-that implements the C<getline()> method) which keeps track of some
-additional information relevant to the parsing of PODs.
+    An object corresponding to a source of POD input text. It is mostly a
+    wrapper around a filehandle or C<IO::Handle>-type object (or anything
+    that implements the C<getline()> method) which keeps track of some
+    additional information relevant to the parsing of PODs.
 
-=end __PRIVATE__
+    =end __PRIVATE__
 
-=item package B<Pod::Paragraph>
+    =item package B<Pod::Paragraph>
 
-An object corresponding to a paragraph of POD input text. It may be a
-plain paragraph, a verbatim paragraph, or a command paragraph (see
-L<perlpod>).
+    An object corresponding to a paragraph of POD input text. It may be a
+    plain paragraph, a verbatim paragraph, or a command paragraph (see
+    L<perlpod>).
 
-=item package B<Pod::InteriorSequence>
+    =item package B<Pod::InteriorSequence>
 
-An object corresponding to an interior sequence command from the POD
-input text (see L<perlpod>).
+    An object corresponding to an interior sequence command from the POD
+    input text (see L<perlpod>).
 
-=item package B<Pod::ParseTree>
+    =item package B<Pod::ParseTree>
 
-An object corresponding to a tree of parsed POD text. Each "node" in
-a parse-tree (or I<ptree>) is either a text-string or a reference to
-a B<Pod::InteriorSequence> object. The nodes appear in the parse-tree
-in the order in which they were parsed from left-to-right.
+    An object corresponding to a tree of parsed POD text. Each "node" in
+    a parse-tree (or I<ptree>) is either a text-string or a reference to
+    a B<Pod::InteriorSequence> object. The nodes appear in the parse-tree
+    in the order in which they were parsed from left-to-right.
 
-=back
+    =back
 
-Each of these input objects are described in further detail in the
-sections which follow.
+    Each of these input objects are described in further detail in the
+    sections which follow.
 
-=cut
+    =cut
 
-#############################################################################
+    #############################################################################
 
-#use diagnostics;
-#use Carp;
+    #use diagnostics;
+    #use Carp;
 
-#############################################################################
+    #############################################################################
 
-package Pod::InputSource;
+    package Pod::InputSource;
 
 ##---------------------------------------------------------------------------
 
@@ -109,12 +109,12 @@ methods/attributes:
 
 =head2 B<new()>
 
-        my $pod_input1 = Pod::InputSource->new(handle => $filehandle);
-        my $pod_input2 = new Pod::InputSource(handle => $filehandle,
-                                              name   => $name);
-        my $pod_input3 = new Pod::InputSource(handle => $^STDIN);
-        my $pod_input4 = Pod::InputSource->new(handle => $^STDIN,
-                                               name => "(STDIN)");
+my $pod_input1 = Pod::InputSource->new(handle => $filehandle);
+my $pod_input2 = new Pod::InputSource(handle => $filehandle,
+name   => $name);
+my $pod_input3 = new Pod::InputSource(handle => $^STDIN);
+my $pod_input4 = Pod::InputSource->new(handle => $^STDIN,
+name => "(STDIN)");
 
 This is a class method that constructs a C<Pod::InputSource> object and
 returns a reference to the new input source object. It takes one or more
@@ -137,9 +137,9 @@ sub new {
     ## certain values by specifying them *before* the arguments passed.
     ## If they are in the argument list, they will override the defaults.
     my $self = \%( name        => '(unknown)',
-                 handle      => undef,
-                 was_cutting => 0,
-                 < @_ );
+            handle      => undef,
+                was_cutting => 0,
+                < @_ );
 
     ## Bless ourselves into the desired class and perform any initialization
     bless $self, $class;
@@ -152,8 +152,8 @@ sub new {
 
 =head2 B<name()>
 
-        my $filename = $pod_input->name();
-        $pod_input->name($new_filename_to_use);
+my $filename = $pod_input->name();
+$pod_input->name($new_filename_to_use);
 
 This method gets/sets the name of the input source (usually a filename).
 If no argument is given, it returns a string containing the name of
@@ -165,8 +165,8 @@ contents of the given argument.
 =cut
 
 sub name {
-   ((nelems @_) +> 1)  and  @_[0]->{+'name'} = @_[1];
-   return @_[0]->{?'name'};
+    ((nelems @_) +> 1)  and  @_[0]->{+'name'} = @_[1];
+    return @_[0]->{?'name'};
 }
 
 ## allow 'filename' as an alias for 'name'
@@ -178,7 +178,7 @@ sub name {
 
 =head2 B<handle()>
 
-        my $handle = $pod_input->handle();
+my $handle = $pod_input->handle();
 
 Returns a reference to the handle object from which input is read (the
 one used to contructed this input source object).
@@ -188,7 +188,7 @@ one used to contructed this input source object).
 =cut
 
 sub handle {
-   return @_[0]->{?'handle'};
+    return @_[0]->{?'handle'};
 }
 
 ##---------------------------------------------------------------------------
@@ -197,7 +197,7 @@ sub handle {
 
 =head2 B<was_cutting()>
 
-        print "Yes.\n" if ($pod_input->was_cutting());
+print "Yes.\n" if ($pod_input->was_cutting());
 
 The value of the C<cutting> state (that the B<cutting()> method would
 have returned) immediately before any input was read from this input
@@ -209,8 +209,8 @@ state is restored to this value.
 =cut
 
 sub was_cutting {
-   ((nelems @_) +> 1)  and  @_[0]->{+was_cutting} = @_[1];
-   return @_[0]->{?was_cutting};
+    ((nelems @_) +> 1)  and  @_[0]->{+was_cutting} = @_[1];
+    return @_[0]->{?was_cutting};
 }
 
 ##---------------------------------------------------------------------------
@@ -232,16 +232,16 @@ It has the following methods/attributes:
 
 =head2 Pod::Paragraph-E<gt>B<new()>
 
-        my $pod_para1 = Pod::Paragraph->new(text => $text);
-        my $pod_para2 = Pod::Paragraph->new(name => $cmd,
-                                            text => $text);
-        my $pod_para3 = new Pod::Paragraph(text => $text);
-        my $pod_para4 = new Pod::Paragraph(name => $cmd,
-                                           text => $text);
-        my $pod_para5 = Pod::Paragraph->new(name => $cmd,
-                                            text => $text,
-                                            file => $filename,
-                                            line => $line_number);
+my $pod_para1 = Pod::Paragraph->new(text => $text);
+my $pod_para2 = Pod::Paragraph->new(name => $cmd,
+text => $text);
+my $pod_para3 = new Pod::Paragraph(text => $text);
+my $pod_para4 = new Pod::Paragraph(name => $cmd,
+text => $text);
+my $pod_para5 = Pod::Paragraph->new(name => $cmd,
+text => $text,
+file => $filename,
+line => $line_number);
 
 This is a class method that constructs a C<Pod::Paragraph> object and
 returns a reference to the new paragraph object. It may be given one or
@@ -265,15 +265,15 @@ sub new {
     ## certain values by specifying them *before* the arguments passed.
     ## If they are in the argument list, they will override the defaults.
     my $self = \%(
-          name       => undef,
-          text       => ((nelems @_) == 1) ?? shift !! undef,
-          file       => '<unknown-file>',
-          line       => 0,
-          prefix     => '=',
-          separator  => ' ',
-          ptree => \@(),
-          < @_
-    );
+            name       => undef,
+                text       => ((nelems @_) == 1) ?? shift !! undef,
+                file       => '<unknown-file>',
+                line       => 0,
+                prefix     => '=',
+                separator  => ' ',
+                ptree => \@(),
+                < @_
+        );
 
     ## Bless ourselves into the desired class and perform any initialization
     bless $self, $class;
@@ -284,7 +284,7 @@ sub new {
 
 =head2 $pod_para-E<gt>B<cmd_name()>
 
-        my $para_cmd = $pod_para->cmd_name();
+my $para_cmd = $pod_para->cmd_name();
 
 If this paragraph is a command paragraph, then this method will return 
 the name of the command (I<without> any leading C<=> prefix).
@@ -292,8 +292,8 @@ the name of the command (I<without> any leading C<=> prefix).
 =cut
 
 sub cmd_name {
-   ((nelems @_) +> 1)  and  @_[0]->{+'name'} = @_[1];
-   return @_[0]->{?'name'};
+    ((nelems @_) +> 1)  and  @_[0]->{+'name'} = @_[1];
+    return @_[0]->{?'name'};
 }
 
 ## let name() be an alias for cmd_name()
@@ -303,22 +303,22 @@ sub cmd_name {
 
 =head2 $pod_para-E<gt>B<text()>
 
-        my $para_text = $pod_para->text();
+my $para_text = $pod_para->text();
 
 This method will return the corresponding text of the paragraph.
 
 =cut
 
 sub text {
-   ((nelems @_) +> 1)  and  @_[0]->{+'text'} = @_[1];
-   return @_[0]->{?'text'};
+    ((nelems @_) +> 1)  and  @_[0]->{+'text'} = @_[1];
+    return @_[0]->{?'text'};
 }       
 
 ##---------------------------------------------------------------------------
 
 =head2 $pod_para-E<gt>B<raw_text()>
 
-        my $raw_pod_para = $pod_para->raw_text();
+my $raw_pod_para = $pod_para->raw_text();
 
 This method will return the I<raw> text of the POD paragraph, exactly
 as it appeared in the input.
@@ -326,16 +326,16 @@ as it appeared in the input.
 =cut
 
 sub raw_text {
-   return @_[0]->{?'text'}  unless (defined @_[0]->{?'name'});
-   return @_[0]->{?'prefix'} . @_[0]->{?'name'} . 
-          @_[0]->{?'separator'} . @_[0]->{?'text'};
+    return @_[0]->{?'text'}  unless (defined @_[0]->{?'name'});
+    return @_[0]->{?'prefix'} . @_[0]->{?'name'} . 
+        @_[0]->{?'separator'} . @_[0]->{?'text'};
 }
 
 ##---------------------------------------------------------------------------
 
 =head2 $pod_para-E<gt>B<cmd_prefix()>
 
-        my $prefix = $pod_para->cmd_prefix();
+my $prefix = $pod_para->cmd_prefix();
 
 If this paragraph is a command paragraph, then this method will return 
 the prefix used to denote the command (which should be the string "="
@@ -344,14 +344,14 @@ or "==").
 =cut
 
 sub cmd_prefix {
-   return @_[0]->{?'prefix'};
+    return @_[0]->{?'prefix'};
 }
 
 ##---------------------------------------------------------------------------
 
 =head2 $pod_para-E<gt>B<cmd_separator()>
 
-        my $separator = $pod_para->cmd_separator();
+my $separator = $pod_para->cmd_separator();
 
 If this paragraph is a command paragraph, then this method will return
 the text used to separate the command name from the rest of the
@@ -360,24 +360,24 @@ paragraph (if any).
 =cut
 
 sub cmd_separator {
-   return @_[0]->{?'separator'};
+    return @_[0]->{?'separator'};
 }
 
 ##---------------------------------------------------------------------------
 
 =head2 $pod_para-E<gt>B<parse_tree()>
 
-        my $ptree = $pod_parser->parse_text( $pod_para->text() );
-        $pod_para->parse_tree( $ptree );
-        $ptree = $pod_para->parse_tree();
+my $ptree = $pod_parser->parse_text( $pod_para->text() );
+$pod_para->parse_tree( $ptree );
+$ptree = $pod_para->parse_tree();
 
 This method will get/set the corresponding parse-tree of the paragraph's text.
 
 =cut
 
 sub parse_tree {
-   ((nelems @_) +> 1)  and  @_[0]->{+'ptree'} = @_[1];
-   return @_[0]->{?'ptree'};
+    ((nelems @_) +> 1)  and  @_[0]->{+'ptree'} = @_[1];
+    return @_[0]->{?'ptree'};
 }       
 
 ## let ptree() be an alias for parse_tree()
@@ -387,8 +387,8 @@ sub parse_tree {
 
 =head2 $pod_para-E<gt>B<file_line()>
 
-        my ($filename, $line_number) = $pod_para->file_line();
-        my $position = $pod_para->file_line();
+my ($filename, $line_number) = $pod_para->file_line();
+my $position = $pod_para->file_line();
 
 Returns the current filename and line number for the paragraph
 object.  If called in a list context, it returns a list of two
@@ -399,9 +399,9 @@ by a colon (':'), followed by the line number.
 =cut
 
 sub file_line {
-   my @loc = @(@_[0]->{?'file'} || '<unknown-file>',
-              @_[0]->{?'line'} || 0);
-   return @loc;
+    my @loc = @(@_[0]->{?'file'} || '<unknown-file>',
+               @_[0]->{?'line'} || 0);
+    return @loc;
 }
 
 ##---------------------------------------------------------------------------
@@ -423,17 +423,17 @@ It has the following methods/attributes:
 
 =head2 Pod::InteriorSequence-E<gt>B<new()>
 
-        my $pod_seq1 = Pod::InteriorSequence->new(name => $cmd
-                                                  ldelim => $delimiter);
-        my $pod_seq2 = new Pod::InteriorSequence(name => $cmd,
-                                                 ldelim => $delimiter);
-        my $pod_seq3 = new Pod::InteriorSequence(name => $cmd,
-                                                 ldelim => $delimiter,
-                                                 file => $filename,
-                                                 line => $line_number);
+my $pod_seq1 = Pod::InteriorSequence->new(name => $cmd
+ldelim => $delimiter);
+my $pod_seq2 = new Pod::InteriorSequence(name => $cmd,
+ldelim => $delimiter);
+my $pod_seq3 = new Pod::InteriorSequence(name => $cmd,
+ldelim => $delimiter,
+file => $filename,
+line => $line_number);
 
-        my $pod_seq4 = new Pod::InteriorSequence(name => $cmd, $ptree);
-        my $pod_seq5 = new Pod::InteriorSequence($cmd, $ptree);
+my $pod_seq4 = new Pod::InteriorSequence(name => $cmd, $ptree);
+my $pod_seq5 = new Pod::InteriorSequence($cmd, $ptree);
 
 This is a class method that constructs a C<Pod::InteriorSequence> object
 and returns a reference to the new interior sequence object. It should
@@ -456,14 +456,14 @@ sub new {
 
     ## See if first argument has no keyword
     if ((((nelems @_) +<= 2) or ((nelems @_) % 2)) and @_[0] !~ m/^-\w/) {
-       ## Yup - need an implicit 'name' before first parameter
-       unshift @_, 'name';
+        ## Yup - need an implicit 'name' before first parameter
+        unshift @_, 'name';
     }
 
     ## See if odd number of args
     if (((nelems @_) % 2) != 0) {
-       ## Yup - need an implicit 'ptree' before the last parameter
-       splice @_, ((nelems @_)-1), 0, 'ptree';
+        ## Yup - need an implicit 'ptree' before the last parameter
+        splice @_, ((nelems @_)-1), 0, 'ptree';
     }
 
     ## Any remaining arguments are treated as initial values for the
@@ -471,13 +471,13 @@ sub new {
     ## certain values by specifying them *before* the arguments passed.
     ## If they are in the argument list, they will override the defaults.
     my $self = \%(
-          name       => ((nelems @_) == 1) ?? @_[0] !! undef,
-          file       => '<unknown-file>',
-          line       => 0,
-          ldelim     => '<',
-          rdelim     => '>',
-          < @_
-    );
+            name       => ((nelems @_) == 1) ?? @_[0] !! undef,
+                file       => '<unknown-file>',
+                line       => 0,
+                ldelim     => '<',
+                rdelim     => '>',
+                < @_
+        );
 
     ## Initialize contents if they havent been already
     my $ptree = $self->{?'ptree'} || Pod::ParseTree->new();
@@ -497,15 +497,15 @@ sub new {
 
 =head2 $pod_seq-E<gt>B<cmd_name()>
 
-        my $seq_cmd = $pod_seq->cmd_name();
+my $seq_cmd = $pod_seq->cmd_name();
 
 The name of the interior sequence command.
 
 =cut
 
 sub cmd_name {
-   ((nelems @_) +> 1)  and  @_[0]->{+'name'} = @_[1];
-   return @_[0]->{?'name'};
+    ((nelems @_) +> 1)  and  @_[0]->{+'name'} = @_[1];
+    return @_[0]->{?'name'};
 }
 
 ## let name() be an alias for cmd_name()
@@ -517,36 +517,36 @@ sub cmd_name {
 ## children that are interior-sequences to be $self
 
 sub _set_child2parent_links($self, @< @children) {
-   ## Make sure any sequences know who their parent is
-   for ( @children) {
-      next  unless (ref  and  ref ne 'SCALAR');
-      if (UNIVERSAL::isa($_, 'Pod::InteriorSequence') or
-          UNIVERSAL::can($_, 'nested'))
-      {
-          $_->nested($self);
-      }
-   }
+    ## Make sure any sequences know who their parent is
+    for ( @children) {
+        next  unless (ref  and  ref ne 'SCALAR');
+        if (UNIVERSAL::isa($_, 'Pod::InteriorSequence') or
+            UNIVERSAL::can($_, 'nested'))
+        {
+            $_->nested($self);
+        }
+    }
 }
 
 ## Private subroutine to unset child->parent links
 
 sub _unset_child2parent_links {
-   my $self = shift;
-   $self->{+'parent_sequence'} = undef;
-   my $ptree = $self->{?'ptree'};
-   for ( @$ptree) {
-      next  unless (ref  and  ref ne 'SCALAR');
-      $_->_unset_child2parent_links()
-          if UNIVERSAL::isa($_, 'Pod::InteriorSequence');
-   }
+    my $self = shift;
+    $self->{+'parent_sequence'} = undef;
+    my $ptree = $self->{?'ptree'};
+    for ( @$ptree) {
+        next  unless (ref  and  ref ne 'SCALAR');
+        $_->_unset_child2parent_links()
+            if UNIVERSAL::isa($_, 'Pod::InteriorSequence');
+    }
 }
 
 ##---------------------------------------------------------------------------
 
 =head2 $pod_seq-E<gt>B<prepend()>
 
-        $pod_seq->prepend($text);
-        $pod_seq1->prepend($pod_seq2);
+$pod_seq->prepend($text);
+$pod_seq1->prepend($pod_seq2);
 
 Prepends the given string or parse-tree or sequence object to the parse-tree
 of this interior sequence.
@@ -554,18 +554,18 @@ of this interior sequence.
 =cut
 
 sub prepend {
-   my $self  = shift;
-   $self->{?'ptree'}->prepend(< @_);
-   _set_child2parent_links($self, < @_);
-   return $self;
+    my $self  = shift;
+    $self->{?'ptree'}->prepend(< @_);
+    _set_child2parent_links($self, < @_);
+    return $self;
 }       
 
 ##---------------------------------------------------------------------------
 
 =head2 $pod_seq-E<gt>B<append()>
 
-        $pod_seq->append($text);
-        $pod_seq1->append($pod_seq2);
+$pod_seq->append($text);
+$pod_seq1->append($pod_seq2);
 
 Appends the given string or parse-tree or sequence object to the parse-tree
 of this interior sequence.
@@ -573,17 +573,17 @@ of this interior sequence.
 =cut
 
 sub append {
-   my $self = shift;
-   $self->{?'ptree'}->append(< @_);
-   _set_child2parent_links($self, < @_);
-   return $self;
+    my $self = shift;
+    $self->{?'ptree'}->append(< @_);
+    _set_child2parent_links($self, < @_);
+    return $self;
 }       
 
 ##---------------------------------------------------------------------------
 
 =head2 $pod_seq-E<gt>B<nested()>
 
-        $outer_seq = $pod_seq->nested || print "not nested";
+$outer_seq = $pod_seq->nested || print "not nested";
 
 If this interior sequence is nested inside of another interior
 sequence, then the outer/parent sequence that contains it is
@@ -592,16 +592,16 @@ returned. Otherwise C<undef> is returned.
 =cut
 
 sub nested {
-   my $self = shift;
-  ((nelems @_) == 1)  and  $self->{+'parent_sequence'} = shift;
-   return  $self->{?'parent_sequence'} || undef;
+    my $self = shift;
+    ((nelems @_) == 1)  and  $self->{+'parent_sequence'} = shift;
+    return  $self->{?'parent_sequence'} || undef;
 }
 
 ##---------------------------------------------------------------------------
 
 =head2 $pod_seq-E<gt>B<raw_text()>
 
-        my $seq_raw_text = $pod_seq->raw_text();
+my $seq_raw_text = $pod_seq->raw_text();
 
 This method will return the I<raw> text of the POD interior sequence,
 exactly as it appeared in the input.
@@ -609,20 +609,20 @@ exactly as it appeared in the input.
 =cut
 
 sub raw_text {
-   my $self = shift;
-   my $text = $self->{?'name'} . $self->{?'ldelim'};
-   for (  $self->{'ptree'}->children ) {
-      $text .= (ref $_) ?? $_->raw_text !! $_;
-   }
-   $text .= $self->{?'rdelim'};
-   return $text;
+    my $self = shift;
+    my $text = $self->{?'name'} . $self->{?'ldelim'};
+    for (  $self->{'ptree'}->children ) {
+        $text .= (ref $_) ?? $_->raw_text !! $_;
+    }
+    $text .= $self->{?'rdelim'};
+    return $text;
 }
 
 ##---------------------------------------------------------------------------
 
 =head2 $pod_seq-E<gt>B<left_delimiter()>
 
-        my $ldelim = $pod_seq->left_delimiter();
+my $ldelim = $pod_seq->left_delimiter();
 
 The leftmost delimiter beginning the argument text to the interior
 sequence (should be "<").
@@ -630,8 +630,8 @@ sequence (should be "<").
 =cut
 
 sub left_delimiter {
-   ((nelems @_) +> 1)  and  @_[0]->{+'ldelim'} = @_[1];
-   return @_[0]->{?'ldelim'};
+    ((nelems @_) +> 1)  and  @_[0]->{+'ldelim'} = @_[1];
+    return @_[0]->{?'ldelim'};
 }
 
 ## let ldelim() be an alias for left_delimiter()
@@ -647,8 +647,8 @@ sequence (should be ">").
 =cut
 
 sub right_delimiter {
-   ((nelems @_) +> 1)  and  @_[0]->{+'rdelim'} = @_[1];
-   return @_[0]->{?'rdelim'};
+    ((nelems @_) +> 1)  and  @_[0]->{+'rdelim'} = @_[1];
+    return @_[0]->{?'rdelim'};
 }
 
 ## let rdelim() be an alias for right_delimiter()
@@ -658,9 +658,9 @@ sub right_delimiter {
 
 =head2 $pod_seq-E<gt>B<parse_tree()>
 
-        my $ptree = $pod_parser->parse_text($paragraph_text);
-        $pod_seq->parse_tree( $ptree );
-        $ptree = $pod_seq->parse_tree();
+my $ptree = $pod_parser->parse_text($paragraph_text);
+$pod_seq->parse_tree( $ptree );
+$ptree = $pod_seq->parse_tree();
 
 This method will get/set the corresponding parse-tree of the interior
 sequence's text.
@@ -668,8 +668,8 @@ sequence's text.
 =cut
 
 sub parse_tree {
-   ((nelems @_) +> 1)  and  @_[0]->{+'ptree'} = @_[1];
-   return @_[0]->{?'ptree'};
+    ((nelems @_) +> 1)  and  @_[0]->{+'ptree'} = @_[1];
+    return @_[0]->{?'ptree'};
 }       
 
 ## let ptree() be an alias for parse_tree()
@@ -679,8 +679,8 @@ sub parse_tree {
 
 =head2 $pod_seq-E<gt>B<file_line()>
 
-        my ($filename, $line_number) = $pod_seq->file_line();
-        my $position = $pod_seq->file_line();
+my ($filename, $line_number) = $pod_seq->file_line();
+my $position = $pod_seq->file_line();
 
 Returns the current filename and line number for the interior sequence
 object.  If called in a list context, it returns a list of two
@@ -691,9 +691,9 @@ by a colon (':'), followed by the line number.
 =cut
 
 sub file_line {
-   my @loc = @(@_[0]->{?'file'}  || '<unknown-file>',
-              @_[0]->{?'line'}  || 0);
-   return @loc;
+    my @loc = @(@_[0]->{?'file'}  || '<unknown-file>',
+               @_[0]->{?'line'}  || 0);
+    return @loc;
 }
 
 ##---------------------------------------------------------------------------
@@ -708,10 +708,10 @@ I<interior-sequence storage will not be reclaimed upon destruction!>
 =cut
 
 sub DESTROY {
-   ## We need to get rid of all child->parent pointers throughout the
-   ## tree so their reference counts will go to zero and they can be
-   ## garbage-collected
-   _unset_child2parent_links(< @_);
+    ## We need to get rid of all child->parent pointers throughout the
+    ## tree so their reference counts will go to zero and they can be
+    ## garbage-collected
+    _unset_child2parent_links(< @_);
 }
 
 ##---------------------------------------------------------------------------
@@ -737,10 +737,10 @@ itself contain a parse-tree (since interior sequences may be nested).
 
 =head2 Pod::ParseTree-E<gt>B<new()>
 
-        my $ptree1 = Pod::ParseTree->new;
-        my $ptree2 = new Pod::ParseTree;
-        my $ptree4 = Pod::ParseTree->new($array_ref);
-        my $ptree3 = new Pod::ParseTree($array_ref);
+my $ptree1 = Pod::ParseTree->new;
+my $ptree2 = new Pod::ParseTree;
+my $ptree4 = Pod::ParseTree->new($array_ref);
+my $ptree3 = new Pod::ParseTree($array_ref);
 
 This is a class method that constructs a C<Pod::Parse_tree> object and
 returns a reference to the new parse-tree. If a single-argument is given,
@@ -765,9 +765,9 @@ sub new {
 
 =head2 $ptree-E<gt>B<top()>
 
-        my $top_node = $ptree->top();
-        $ptree->top( $top_node );
-        $ptree->top( @children );
+my $top_node = $ptree->top();
+$ptree->top( $top_node );
+$ptree->top( @children );
 
 This method gets/sets the top node of the parse-tree. If no arguments are
 given, it returns the topmost node in the tree (the root), which is also
@@ -779,11 +779,11 @@ children for the top node.
 =cut
 
 sub top {
-   my $self = shift;
-   if ((nelems @_) +> 0) {
-      @{ $self } = @( ((nelems @_) == 1  and  ref @_[0]) ?? ${ nelems @_ } !! < @_ );
-   }
-   return $self;
+    my $self = shift;
+    if ((nelems @_) +> 0) {
+        @{ $self } = @( ((nelems @_) == 1  and  ref @_[0]) ?? ${ nelems @_ } !! < @_ );
+    }
+    return $self;
 }
 
 ## let parse_tree() & ptree() be aliases for the 'top' method
@@ -803,11 +803,11 @@ children for the top node.
 =cut
 
 sub children {
-   my $self = shift;
-   if ((nelems @_) +> 0) {
-      @{ $self } = @( ((nelems @_) == 1  and  ref @_[0]) ?? ${ nelems @_ } !! < @_ );
-   }
-   return @{ $self };
+    my $self = shift;
+    if ((nelems @_) +> 0) {
+        @{ $self } = @( ((nelems @_) == 1  and  ref @_[0]) ?? ${ nelems @_ } !! < @_ );
+    }
+    return @{ $self };
 }
 
 ##---------------------------------------------------------------------------
@@ -823,16 +823,16 @@ the current one.
 =cut
 
 sub prepend {
-   my $self = shift;
-   for ( @_) {
-      next  unless length;
-      if ((nelems @$self)  and  !(ref @$self[0])  and  !(ref $_)) {
-         @$self[0] = $_ . @$self[0];
-      }
-      else {
-         unshift @$self, $_;
-      }
-   }
+    my $self = shift;
+    for ( @_) {
+        next  unless length;
+        if ((nelems @$self)  and  !(ref @$self[0])  and  !(ref $_)) {
+            @$self[0] = $_ . @$self[0];
+        }
+        else {
+            unshift @$self, $_;
+        }
+    }
 }
 
 ##---------------------------------------------------------------------------
@@ -848,27 +848,27 @@ the current one.
 =cut
 
 sub append {
-   my $self = shift;
-   my $can_append = (nelems @$self) && !(ref @$self[-1]);
-   for ( @_) {
-      if (ref) {
-         push @$self, $_;
-      }
-      elsif(!length) {
-         next;
-      }
-      elsif ($can_append) {
-         @$self[-1] .= $_;
-      }
-      else {
-         push @$self, $_;
-      }
-   }
+    my $self = shift;
+    my $can_append = (nelems @$self) && !(ref @$self[-1]);
+    for ( @_) {
+        if (ref) {
+            push @$self, $_;
+        }
+        elsif(!length) {
+            next;
+        }
+        elsif ($can_append) {
+            @$self[-1] .= $_;
+        }
+        else {
+            push @$self, $_;
+        }
+    }
 }
 
 =head2 $ptree-E<gt>B<raw_text()>
 
-        my $ptree_raw_text = $ptree->raw_text();
+my $ptree_raw_text = $ptree->raw_text();
 
 This method will return the I<raw> text of the POD parse-tree
 exactly as it appeared in the input.
@@ -876,12 +876,12 @@ exactly as it appeared in the input.
 =cut
 
 sub raw_text {
-   my $self = shift;
-   my $text = "";
-   for (  @$self ) {
-      $text .= (ref $_) ?? $_->raw_text !! $_;
-   }
-   return $text;
+    my $self = shift;
+    my $text = "";
+    for (  @$self ) {
+        $text .= (ref $_) ?? $_->raw_text !! $_;
+    }
+    return $text;
 }
 
 ##---------------------------------------------------------------------------
@@ -889,16 +889,16 @@ sub raw_text {
 ## Private routines to set/unset child->parent links
 
 sub _unset_child2parent_links {
-   my $self = shift;
-   for ( @$self) {
-       next  unless (defined and  ref  and  ref ne 'SCALAR');
-       $_->_unset_child2parent_links()
-           if UNIVERSAL::isa($_, 'Pod::InteriorSequence');
-   }
+    my $self = shift;
+    for ( @$self) {
+        next  unless (defined and  ref  and  ref ne 'SCALAR');
+        $_->_unset_child2parent_links()
+            if UNIVERSAL::isa($_, 'Pod::InteriorSequence');
+    }
 }
 
 sub _set_child2parent_links {
-    ## nothing to do, Pod::ParseTrees cant have parent pointers
+## nothing to do, Pod::ParseTrees cant have parent pointers
 }
 
 =head2 Pod::ParseTree::B<DESTROY()>
@@ -911,10 +911,10 @@ otherwise I<parse-tree storage will not be reclaimed upon destruction!>
 =cut
 
 sub DESTROY {
-   ## We need to get rid of all child->parent pointers throughout the
-   ## tree so their reference counts will go to zero and they can be
-   ## garbage-collected
-   _unset_child2parent_links(< @_);
+    ## We need to get rid of all child->parent pointers throughout the
+    ## tree so their reference counts will go to zero and they can be
+    ## garbage-collected
+    _unset_child2parent_links(< @_);
 }
 
 #############################################################################

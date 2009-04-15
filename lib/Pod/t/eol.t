@@ -38,8 +38,8 @@ my $in;
 open($pod, "<", "$^PID.pod") or die "$^PID.pod: $^OS_ERROR";
 open($in, ">",  "$^PID.in")  or die "$^PID.in: $^OS_ERROR";
 while ( ~< $pod) {
-  s/[\r\n]+/\r/g;
-  print $in, $_;
+    s/[\r\n]+/\r/g;
+    print $in, $_;
 }
 close($pod);
 close($in);
@@ -51,8 +51,8 @@ pod2html("--title=eol", "--infile=$^PID.in", "--outfile=$^PID.o1");
 open($pod, "<", "$^PID.pod") or die "$^PID.pod: $^OS_ERROR";
 open($in, ">",  "$^PID.in")  or die "$^PID.in: $^OS_ERROR";
 while ( ~< $pod) {
-  s/[\r\n]+/\n/g;
-  print $in, $_;
+    s/[\r\n]+/\n/g;
+    print $in, $_;
 }
 close($pod);
 close($in);
@@ -64,8 +64,8 @@ pod2html("--title=eol", "--infile=$^PID.in", "--outfile=$^PID.o2");
 open($pod, "<", "$^PID.pod") or die "$^PID.pod: $^OS_ERROR";
 open($in, ">",  "$^PID.in")  or die "$^PID.in: $^OS_ERROR";
 while ( ~< $pod) {
-  s/[\r\n]+/\r\n/g;
-  print $in, $_;
+    s/[\r\n]+/\r\n/g;
+    print $in, $_;
 }
 close($pod);
 close($in);
@@ -91,6 +91,6 @@ ok($cksum2 == $cksum3, "LF vs CRLF");
 close $in;
 
 END {
-  1 while unlink("$^PID.pod", "$^PID.in", "$^PID.o1", "$^PID.o2", "$^PID.o3",
-                 "pod2htmd.x~~", "pod2htmi.x~~");
+        1 while unlink("$^PID.pod", "$^PID.in", "$^PID.o1", "$^PID.o2", "$^PID.o3",
+    "pod2htmd.x~~", "pod2htmi.x~~");
 }

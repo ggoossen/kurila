@@ -19,28 +19,28 @@ my @valid_errors = @(qr/^Invalid type '\w'/);
 my $ByteOrder = 'unknown';
 my $maybe_not_avail = '(?:hto[bl]e|[bl]etoh)';
 if ($no_endianness) {
-  push @valid_errors, qr/^Invalid type '[<>]'/;
+    push @valid_errors, qr/^Invalid type '[<>]'/;
 } elsif (config_value("byteorder") =~ m/^1234(?:5678)?$/) {
-  $ByteOrder = 'little';
-  $maybe_not_avail = '(?:htobe|betoh)';
+    $ByteOrder = 'little';
+    $maybe_not_avail = '(?:htobe|betoh)';
 }
 elsif (config_value("byteorder") =~ m/^(?:8765)?4321$/) {
-  $ByteOrder = 'big';
-  $maybe_not_avail = '(?:htole|letoh)';
+    $ByteOrder = 'big';
+    $maybe_not_avail = '(?:htole|letoh)';
 }
 else {
-  push @valid_errors, qr/^Can't (?:un)?pack (?:big|little)-endian .*? on this platform/;
+    push @valid_errors, qr/^Can't (?:un)?pack (?:big|little)-endian .*? on this platform/;
 }
 
 if ($no_signedness) {
-  push @valid_errors, qr/^'!' allowed only after types sSiIlLxX in (?:un)?pack/;
+    push @valid_errors, qr/^'!' allowed only after types sSiIlLxX in (?:un)?pack/;
 }
 
 for my $size (@( 16, 32, 64) ) {
-  if (defined config_value("u$($size)size")
+    if (defined config_value("u$($size)size")
         and (config_value("u$($size)size")||0) != ($size >> 3)) {
-    push @valid_errors, qr/^Perl_my_$maybe_not_avail$size\(\) not available/;
-  }
+        push @valid_errors, qr/^Perl_my_$maybe_not_avail$size\(\) not available/;
+    }
 }
 
 my $IsTwosComplement = pack('i', -1) eq "\x[FF]" x config_value("intsize");
@@ -48,34 +48,34 @@ info "\$IsTwosComplement = $IsTwosComplement";
 
 sub is_valid_error
 {
-  my $err = shift;
-  $err = $err && $err->message;
-  for my $e ( @valid_errors) {
-    $err =~ $e and return 1;
-  }
+    my $err = shift;
+    $err = $err && $err->message;
+    for my $e ( @valid_errors) {
+        $err =~ $e and return 1;
+    }
 
-  return 0;
+    return 0;
 }
 
 sub encode_list {
-  my @result = @+: map { _qq($_) }, @_;
-  if ((nelems @result) == 1) {
-    return @result;
-  }
-  return '(' . join (', ', @result) . ')';
+    my @result = @+: map { _qq($_) }, @_;
+    if ((nelems @result) == 1) {
+        return @result;
+    }
+    return '(' . join (', ', @result) . ')';
 }
 
 
 sub list_eq($l, $r) {
-  return 0 unless (nelems @$l) == nelems @$r;
-  for my $i (0..(nelems @$l) -1) {
-    if (defined $l->[$i]) {
-      return 0 unless defined ($r->[$i]) && $l->[$i] eq $r->[$i];
-    } else {
-      return 0 if defined $r->[$i]
+    return 0 unless (nelems @$l) == nelems @$r;
+    for my $i (0..(nelems @$l) -1) {
+        if (defined $l->[$i]) {
+            return 0 unless defined ($r->[$i]) && $l->[$i] eq $r->[$i];
+        } else {
+            return 0 if defined $r->[$i]
+        }
     }
-  }
-  return 1;
+    return 1;
 }
 
 ##############################################################################
@@ -88,7 +88,7 @@ do {
     # Need the expression in here to force ary[5] to be numeric.  This avoids
     # test2 failing because ary2 goes str->numeric->str and ary doesn't.
     my @ary = @(1,-100,127,128,32767,987.654321098 / 100.0,12345,123456,
-               "abcdef");
+        "abcdef");
     my $foo = pack($format,< @ary);
     my @ary2 = @( unpack($format,$foo) );
 
@@ -132,23 +132,23 @@ do {
 };
 
 do {
-  my $x;
-  is( ($x = unpack("I",pack("I", 0xFFFFFFFF))), 0xFFFFFFFF );
+    my $x;
+    is( ($x = unpack("I",pack("I", 0xFFFFFFFF))), 0xFFFFFFFF );
 
-  is(length(pack('l', 0)), 4, "pack 'l' is 4 bytes");
-  use bytes;
-  use utf8;
-  require bytes;
-  is(bytes::length(pack('l', 0)), 4, "pack 'l' independent of 'use utf8'");
+    is(length(pack('l', 0)), 4, "pack 'l' is 4 bytes");
+    use bytes;
+    use utf8;
+    require bytes;
+    is(bytes::length(pack('l', 0)), 4, "pack 'l' independent of 'use utf8'");
 };
 
 do {
     # check 'w'
     my @x = @(5,130,256,560,32000,3097152,268435455,1073741844, 2**33,
-             '4503599627365785','23728385234614992549757750638446');
+        '4503599627365785','23728385234614992549757750638446');
     my $x = pack('w*', < @x);
     my $y = pack 'H*', '0581028200843081fa0081bd8440ffffff7f8480808014A0808'.
-                       '0800087ffffffffffdb19caefe8e1eeeea0c2e1e3e8ede1ee6e';
+        '0800087ffffffffffdb19caefe8e1eeeea0c2e1e3e8ede1ee6e';
 
     is($x, $y);
 
@@ -201,144 +201,144 @@ do {
 
 
 do {
-  info "test exceptions";
-  my $x;
-  dies_like( sub { $x = unpack 'w', pack 'C*', 0xff, 0xff},
-             qr/^Unterminated compressed integer/);
+    info "test exceptions";
+    my $x;
+    dies_like( sub { $x = unpack 'w', pack 'C*', 0xff, 0xff},
+               qr/^Unterminated compressed integer/);
 
-  dies_like( sub { $x = unpack 'w', pack 'C*', 0xff, 0xff, 0xff, 0xff},
-             qr/^Unterminated compressed integer/);
+    dies_like( sub { $x = unpack 'w', pack 'C*', 0xff, 0xff, 0xff, 0xff},
+               qr/^Unterminated compressed integer/);
 
-  dies_like( sub { $x = unpack 'w', pack 'C*', 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-             qr/^Unterminated compressed integer/);
+    dies_like( sub { $x = unpack 'w', pack 'C*', 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+               qr/^Unterminated compressed integer/);
 
-  dies_like( sub { $x = pack 'w', -1 },
-             qr/^Cannot compress negative numbers/);
+    dies_like( sub { $x = pack 'w', -1 },
+               qr/^Cannot compress negative numbers/);
 
-  dies_like( sub { $x = pack 'w', '1'x(1 + length ^~^0) . 'e0' },
-             qr/^Can only compress unsigned integers/);
+    dies_like( sub { $x = pack 'w', '1'x(1 + length ^~^0) . 'e0' },
+               qr/^Can only compress unsigned integers/);
 
-  # Check that the warning behaviour on the modifiers !, < and > is as we
-  # expect it for this perl.
-  my $can_endian = $no_endianness ?? '' !! 'sSiIlLqQjJfFdDpP';
-  my $can_shriek = 'sSiIlL';
-  $can_shriek .= 'nNvV' unless $no_signedness;
-  # h and H can't do either, so act as sanity checks in blead
-  foreach my $base (split '', 'hHsSiIlLqQjJfFdDpPnNvV') {
-    foreach my $mod (@('', '<', '>', '!', '<!', '>!', '!<', '!>')) {
-    SKIP: do {
-	# Avoid void context warnings.
-	my $a = try {pack "$base$mod"};
-	skip "pack can't $base", 1 if $^EVAL_ERROR and $^EVAL_ERROR->{?description} =~ m/^Invalid type '\w'/;
-	# Which error you get when 2 would be possible seems to be emergent
-	# behaviour of pack's format parser.
+    # Check that the warning behaviour on the modifiers !, < and > is as we
+    # expect it for this perl.
+    my $can_endian = $no_endianness ?? '' !! 'sSiIlLqQjJfFdDpP';
+    my $can_shriek = 'sSiIlL';
+    $can_shriek .= 'nNvV' unless $no_signedness;
+    # h and H can't do either, so act as sanity checks in blead
+    foreach my $base (split '', 'hHsSiIlLqQjJfFdDpPnNvV') {
+        foreach my $mod (@('', '<', '>', '!', '<!', '>!', '!<', '!>')) {
+          SKIP: do {
+                # Avoid void context warnings.
+                my $a = try {pack "$base$mod"};
+                skip "pack can't $base", 1 if $^EVAL_ERROR and $^EVAL_ERROR->{?description} =~ m/^Invalid type '\w'/;
+                # Which error you get when 2 would be possible seems to be emergent
+                # behaviour of pack's format parser.
 
-	my $fails_shriek = $mod =~ m/!/ && index ($can_shriek, $base) == -1;
-	my $fails_endian = $mod =~ m/[<>]/ && index ($can_endian, $base) == -1;
-	my $shriek_first = $mod =~ m/^!/;
+                my $fails_shriek = $mod =~ m/!/ && index ($can_shriek, $base) == -1;
+                my $fails_endian = $mod =~ m/[<>]/ && index ($can_endian, $base) == -1;
+                my $shriek_first = $mod =~ m/^!/;
 
-	if ($no_endianness and ($mod eq '<!' or $mod eq '>!')) {
-	  # The ! isn't seem as part of $base. Instead it's seen as a modifier
-	  # on > or <
-	  $fails_shriek = 1;
-	  undef $fails_endian;
-	} elsif ($fails_shriek and $fails_endian) {
-	  if ($shriek_first) {
-	    undef $fails_endian;
-	  }
-	}
+                if ($no_endianness and ($mod eq '<!' or $mod eq '>!')) {
+                    # The ! isn't seem as part of $base. Instead it's seen as a modifier
+                    # on > or <
+                    $fails_shriek = 1;
+                    undef $fails_endian;
+                } elsif ($fails_shriek and $fails_endian) {
+                    if ($shriek_first) {
+                        undef $fails_endian;
+                    }
+                }
 
-	if ($fails_endian) {
-	  if ($no_endianness) {
-	    # < and > are seen as pattern letters, not modifiers
-	    like ($^EVAL_ERROR->{?description}, qr/^Invalid type '[<>]'/, "pack can't $base$mod");
-	  } else {
-	    like ($^EVAL_ERROR->{?description}, qr/^'[<>]' allowed only after types/,
-		  "pack can't $base$mod");
-	  }
-	} elsif ($fails_shriek) {
-	  like ($^EVAL_ERROR->{?description}, qr/^'!' allowed only after types/,
-		"pack can't $base$mod");
-	} else {
-	  is ($^EVAL_ERROR, '', "pack can $base$mod");
-	}
-      };
-    }
-  }
-
- SKIP: do {
-    skip $no_endianness, 2*3 + 2*8 if $no_endianness;
-    for my $mod (qw( ! < > )) {
-      dies_like(sub { $x = pack "a$mod", 42 },
-                qr/^'$mod' allowed only after types \S+ in pack/);
-
-      dies_like(sub { $x = unpack "a$mod", 'x'x8 },
-                qr/^'$mod' allowed only after types \S+ in unpack/);
+                if ($fails_endian) {
+                    if ($no_endianness) {
+                        # < and > are seen as pattern letters, not modifiers
+                        like ($^EVAL_ERROR->{?description}, qr/^Invalid type '[<>]'/, "pack can't $base$mod");
+                    } else {
+                        like ($^EVAL_ERROR->{?description}, qr/^'[<>]' allowed only after types/,
+                              "pack can't $base$mod");
+                    }
+                } elsif ($fails_shriek) {
+                    like ($^EVAL_ERROR->{?description}, qr/^'!' allowed only after types/,
+                          "pack can't $base$mod");
+                } else {
+                    is ($^EVAL_ERROR, '', "pack can $base$mod");
+                }
+            };
+        }
     }
 
-    for my $mod (qw( <> >< !<> !>< <!> >!< <>! ><! )) {
-      dies_like(sub { $x = pack "sI$($mod)s", 42, 47, 11 },
-                qr/^Can't use both '<' and '>' after type 'I' in pack/);
+  SKIP: do {
+        skip $no_endianness, 2*3 + 2*8 if $no_endianness;
+        for my $mod (qw( ! < > )) {
+            dies_like(sub { $x = pack "a$mod", 42 },
+                      qr/^'$mod' allowed only after types \S+ in pack/);
 
-      dies_like(sub { $x = unpack "sI$($mod)s", 'x'x16 },
-                qr/^Can't use both '<' and '>' after type 'I' in unpack/);
-    }
-  };
+            dies_like(sub { $x = unpack "a$mod", 'x'x8 },
+                      qr/^'$mod' allowed only after types \S+ in unpack/);
+        }
 
- SKIP: do {
-    # Is this a stupid thing to do on VMS, VOS and other unusual platforms?
+        for my $mod (qw( <> >< !<> !>< <!> >!< <>! ><! )) {
+            dies_like(sub { $x = pack "sI$($mod)s", 42, 47, 11 },
+                      qr/^Can't use both '<' and '>' after type 'I' in pack/);
 
-    skip("-- the IEEE infinity model is unavailable in this configuration.", 1)
-       if ($^OS_NAME eq 'VMS') && !defined(config_value("useieee"));
+            dies_like(sub { $x = unpack "sI$($mod)s", 'x'x16 },
+                      qr/^Can't use both '<' and '>' after type 'I' in unpack/);
+        }
+    };
 
-    skip("-- $^OS_NAME has serious fp indigestion on w-packed infinities", 1)
-       if (
-	   ($^OS_NAME eq 'mpeix')
-	   ||
-	   ($^OS_NAME eq 'ultrix')
-	   ||
-	   ($^OS_NAME =~ m/^svr4/ && -f "/etc/issue" && -f "/etc/.relid") # NCR MP-RAS
-	   );
+  SKIP: do {
+        # Is this a stupid thing to do on VMS, VOS and other unusual platforms?
 
-    my $inf = eval '2**1000000';
+        skip("-- the IEEE infinity model is unavailable in this configuration.", 1)
+            if ($^OS_NAME eq 'VMS') && !defined(config_value("useieee"));
 
-    skip("Couldn't generate infinity - got error '$^EVAL_ERROR'", 1)
-      unless defined $inf and $inf == $inf / 2 and $inf + 1 == $inf;
+        skip("-- $^OS_NAME has serious fp indigestion on w-packed infinities", 1)
+            if (
+    ($^OS_NAME eq 'mpeix')
+    ||
+    ($^OS_NAME eq 'ultrix')
+    ||
+    ($^OS_NAME =~ m/^svr4/ && -f "/etc/issue" && -f "/etc/.relid") # NCR MP-RAS
+    );
 
-    local our $TODO = undef;
-    $TODO = "VOS needs a fix for posix-1022 to pass this test."
-      if ($^OS_NAME eq 'vos');
+        my $inf = eval '2**1000000';
 
-    dies_like( sub { $x = pack 'w', $inf },
-               qr/^Cannot compress integer/, "Cannot compress integer");
-  };
+        skip("Couldn't generate infinity - got error '$^EVAL_ERROR'", 1)
+            unless defined $inf and $inf == $inf / 2 and $inf + 1 == $inf;
 
- SKIP: do {
+        local our $TODO = undef;
+        $TODO = "VOS needs a fix for posix-1022 to pass this test."
+            if ($^OS_NAME eq 'vos');
 
-    skip("-- the full range of an IEEE double may not be available in this configuration.", 3)
-       if ($^OS_NAME eq 'VMS') && !defined(config_value("useieee"));
+        dies_like( sub { $x = pack 'w', $inf },
+                   qr/^Cannot compress integer/, "Cannot compress integer");
+    };
 
-    skip("-- $^OS_NAME does not like 2**1023", 3)
-       if (($^OS_NAME eq 'ultrix'));
+  SKIP: do {
 
-    # This should be about the biggest thing possible on an IEEE double
-    my $big = eval '2**1023';
+        skip("-- the full range of an IEEE double may not be available in this configuration.", 3)
+            if ($^OS_NAME eq 'VMS') && !defined(config_value("useieee"));
 
-    skip("Couldn't generate 2**1023 - got error '$^EVAL_ERROR'", 3)
-      unless defined $big and $big != $big / 2;
+        skip("-- $^OS_NAME does not like 2**1023", 3)
+            if (($^OS_NAME eq 'ultrix'));
 
-    try { $x = pack 'w', $big };
-    is ($^EVAL_ERROR, '', "Should be able to pack 'w', $big # 2**1023");
+        # This should be about the biggest thing possible on an IEEE double
+        my $big = eval '2**1023';
 
-    my $y = try {unpack 'w', $x};
-    is ($^EVAL_ERROR, '',
-	"Should be able to unpack 'w' the result of pack 'w', $big # 2**1023");
+        skip("Couldn't generate 2**1023 - got error '$^EVAL_ERROR'", 3)
+            unless defined $big and $big != $big / 2;
 
-    # I'm getting about 1e-16 on FreeBSD
-    my $quotient = int (100 * ($y - $big) / $big);
-    ok($quotient +< 2 && $quotient +> -2,
-       "Round trip pack, unpack 'w' of $big is within 1\% ($quotient\%)");
-  };
+        try { $x = pack 'w', $big };
+        is ($^EVAL_ERROR, '', "Should be able to pack 'w', $big # 2**1023");
+
+        my $y = try {unpack 'w', $x};
+        is ($^EVAL_ERROR, '',
+            "Should be able to unpack 'w' the result of pack 'w', $big # 2**1023");
+
+        # I'm getting about 1e-16 on FreeBSD
+        my $quotient = int (100 * ($y - $big) / $big);
+        ok($quotient +< 2 && $quotient +> -2,
+           "Round trip pack, unpack 'w' of $big is within 1\% ($quotient\%)");
+    };
 
 };
 
@@ -347,39 +347,39 @@ info "test the 'p' template";
 # literals
 is(unpack("p",pack("p","foo")), "foo");
 SKIP: do {
-  skip $no_endianness, 2 if $no_endianness;
-  is(unpack("p<",pack("p<","foo")), "foo");
-  is(unpack("p>",pack("p>","foo")), "foo");
+    skip $no_endianness, 2 if $no_endianness;
+    is(unpack("p<",pack("p<","foo")), "foo");
+    is(unpack("p>",pack("p>","foo")), "foo");
 };
 # scalars
 is(unpack("p",pack("p",239)), 239);
 SKIP: do {
-  skip $no_endianness, 2 if $no_endianness;
-  is(unpack("p<",pack("p<",239)), 239);
-  is(unpack("p>",pack("p>",239)), 239);
+    skip $no_endianness, 2 if $no_endianness;
+    is(unpack("p<",pack("p<",239)), 239);
+    is(unpack("p>",pack("p>",239)), 239);
 };
 
 # temps
 sub foo { my $a = "a"; return $a . $a++ . $a++ }
 do {
-  use warnings < qw(NONFATAL all);;
-  my $warning;
-  do {
-      local $^WARN_HOOK = sub {
-          $warning = @_[0]->message;
-      };
-      my $junk = pack("p", &foo( < @_ ));
-  };
+    use warnings < qw(NONFATAL all);;
+    my $warning;
+    do {
+        local $^WARN_HOOK = sub {
+                $warning = @_[0]->message;
+            };
+        my $junk = pack("p", &foo( < @_ ));
+    };
 
-  like($warning, qr/temporary val/);
+    like($warning, qr/temporary val/);
 };
 
 # undef should give null pointer
 like(pack("p", undef), qr/^\0+$/);
 SKIP: do {
-  skip $no_endianness, 2 if $no_endianness;
-  like(pack("p<", undef), qr/^\0+$/);
-  like(pack("p>", undef), qr/^\0+$/);
+    skip $no_endianness, 2 if $no_endianness;
+    like(pack("p<", undef), qr/^\0+$/);
+    like(pack("p>", undef), qr/^\0+$/);
 };
 
 # Check for optimizer bug (e.g.  Digital Unix GEM cc with -O4 on DU V4.0B gives
@@ -390,29 +390,29 @@ is((unpack("i",pack("i",-1))), -1);
 info "test the pack lengths of s S i I l L n N v V + modifiers";
 
 my @lengths = @( <
-  qw(s 2 S 2 i -4 I -4 l 4 L 4 n 2 N 4 v 2 V 4 n! 2 N! 4 v! 2 V! 4),
-  's!'  => config_value("shortsize"), 'S!'  => config_value("shortsize"),
-  'i!'  => config_value("intsize"),   'I!'  => config_value("intsize"),
-  'l!'  => config_value("longsize"),  'L!'  => config_value("longsize"),
-);
+                 qw(s 2 S 2 i -4 I -4 l 4 L 4 n 2 N 4 v 2 V 4 n! 2 N! 4 v! 2 V! 4),
+                 's!'  => config_value("shortsize"), 'S!'  => config_value("shortsize"),
+                 'i!'  => config_value("intsize"),   'I!'  => config_value("intsize"),
+                 'l!'  => config_value("longsize"),  'L!'  => config_value("longsize"),
+    );
 
 while (my @(?$base, ?$expect) =@( splice @lengths, 0, 2)) {
-  my @formats = @($base);
-  $base =~ m/^[nv]/i or push @formats, "$base>", "$base<";
-  for my $format ( @formats) {
-  SKIP: do {
-      skip $no_endianness, 1 if $no_endianness && $format =~ m/[<>]/;
-      skip $no_signedness, 1 if $no_signedness && $format =~ m/[nNvV]!/;
-      my $len = length(pack($format, 0));
-      if ($expect +> 0) {
-	is($expect, $len, "format '$format'");
-      } else {
-	$expect = -$expect;
-	ok ($len +>= $expect, "format '$format'") ||
-	  diag "format '$format' has length $len, expected >= $expect";
-      }
-    };
-  }
+    my @formats = @($base);
+    $base =~ m/^[nv]/i or push @formats, "$base>", "$base<";
+    for my $format ( @formats) {
+      SKIP: do {
+            skip $no_endianness, 1 if $no_endianness && $format =~ m/[<>]/;
+            skip $no_signedness, 1 if $no_signedness && $format =~ m/[nNvV]!/;
+            my $len = length(pack($format, 0));
+            if ($expect +> 0) {
+                is($expect, $len, "format '$format'");
+            } else {
+                $expect = -$expect;
+                ok ($len +>= $expect, "format '$format'") ||
+                    diag "format '$format' has length $len, expected >= $expect";
+            }
+        };
+    }
 }
 
 
@@ -424,11 +424,11 @@ foreach my $base ( @templates) {
     my @tmpl = @($base);
     $base =~ m/^[cwnv]/i or push @tmpl, "$base>", "$base<";
     foreach my $t ( @tmpl) {
-        SKIP: do {
+      SKIP: do {
             my @t = @( try { unpack("$t*", pack("$t*", 12, 34)) } );
 
             skip "cannot pack '$t' on this perl", 4
-              if is_valid_error($^EVAL_ERROR);
+                if is_valid_error($^EVAL_ERROR);
 
             is( $^EVAL_ERROR, '', "Template $t works");
             is(scalar nelems @t, 2);
@@ -474,8 +474,8 @@ EOUU
 
     is(unpack('u', $uu), $in);
 
-# This is identical to the above except that backquotes have been
-# changed to spaces
+    # This is identical to the above except that backquotes have been
+    # changed to spaces
 
     $uu = <<'EOUU';
 M'XL("%C<Q#4" TI!4%4 \RHM+E%(S,LOR4@M4@A(+<I1*"U-SD])+>(" &1F
@@ -491,18 +491,18 @@ EOUU
 
 foreach (@(
 \@('p', 'A*',  "foo\0bar\0 ", "foo\0bar\0 "),
-\@('p', 'A11', "foo\0bar\0 ", "foo\0bar\0   "),
-\@('u', 'A*',  "foo\0bar \0", "foo\0bar"),
-\@('u', 'A8',  "foo\0bar \0", "foo\0bar"),
-\@('p', 'a*',  "foo\0bar\0 ", "foo\0bar\0 "),
-\@('p', 'a11', "foo\0bar\0 ", "foo\0bar\0 \0\0"),
-\@('u', 'a*',  "foo\0bar \0", "foo\0bar \0"),
-\@('u', 'a8',  "foo\0bar \0", "foo\0bar "),
-\@('p', 'Z*',  "foo\0bar\0 ", "foo\0bar\0 \0"),
-\@('p', 'Z11', "foo\0bar\0 ", "foo\0bar\0 \0\0"),
-\@('p', 'Z3',  "foo",         "fo\0"),
-\@('u', 'Z*',  "foo\0bar \0", "foo"),
-\@('u', 'Z8',  "foo\0bar \0", "foo"),)
+    \@('p', 'A11', "foo\0bar\0 ", "foo\0bar\0   "),
+    \@('u', 'A*',  "foo\0bar \0", "foo\0bar"),
+    \@('u', 'A8',  "foo\0bar \0", "foo\0bar"),
+    \@('p', 'a*',  "foo\0bar\0 ", "foo\0bar\0 "),
+    \@('p', 'a11', "foo\0bar\0 ", "foo\0bar\0 \0\0"),
+    \@('u', 'a*',  "foo\0bar \0", "foo\0bar \0"),
+    \@('u', 'a8',  "foo\0bar \0", "foo\0bar "),
+    \@('p', 'Z*',  "foo\0bar\0 ", "foo\0bar\0 \0"),
+    \@('p', 'Z11', "foo\0bar\0 ", "foo\0bar\0 \0\0"),
+    \@('p', 'Z3',  "foo",         "fo\0"),
+    \@('u', 'Z*',  "foo\0bar \0", "foo"),
+    \@('u', 'Z8',  "foo\0bar \0", "foo"),)
 )
 {
     my @($what, $template, $in, $out) =  @$_;
@@ -510,7 +510,7 @@ foreach (@(
     unless (is($got, $out)) {
         my $un = $what eq 'u' ?? 'un' !! '';
         info "$($un)pack ('$template', "._qq($in).') gave '._qq($out).
-            ' not '._qq($got);
+             ' not '._qq($got);
     }
 }
 
@@ -524,114 +524,114 @@ ok(length(pack("i!", 0)) +<= length(pack("l!", 0)));
 is(length(pack("i!", 0)), length(pack("i", 0)));
 
 sub numbers {
-  my $base = shift;
-  my @formats = @($base);
-  $base =~ m/^[silqjfdp]/i and push @formats, "$base>", "$base<";
-  for my $format ( @formats) {
-    numbers_with_total ($format, undef, < @_);
-  }
+    my $base = shift;
+    my @formats = @($base);
+    $base =~ m/^[silqjfdp]/i and push @formats, "$base>", "$base<";
+    for my $format ( @formats) {
+        numbers_with_total ($format, undef, < @_);
+    }
 }
 
 sub numbers_with_total {
-  my $format = shift;
-  my $total = shift;
-  if (!defined $total) {
-    foreach ( @_) {
-      $total += $_;
+    my $format = shift;
+    my $total = shift;
+    if (!defined $total) {
+        foreach ( @_) {
+            $total += $_;
+        }
     }
-  }
-  info "numbers test for $format";
-  foreach ( @_) {
-    SKIP: do {
-        my $out = try {unpack($format, pack($format, $_))};
-        skip "cannot pack '$format' on this perl", 2
-          if is_valid_error($^EVAL_ERROR);
-
-        is($^EVAL_ERROR, '', "no error $format $_");
-        is($out, $_, "unpack pack $format $_");
-    };
-  }
-
-  my $skip_if_longer_than = ^~^0; # "Infinity"
-  if (^~^0 - 1 == ^~^0) {
-    # If we're running with -DNO_PERLPRESERVE_IVUV and NVs don't preserve all
-    # UVs (in which case ~0 is NV, ~0-1 will be the same NV) then we can't
-    # correctly in perl calculate UV totals for long checksums, as pp_unpack
-    # is using UV maths, and we've only got NVs.
-    $skip_if_longer_than = config_value("nv_preserves_uv_bits");
-  }
-
-  foreach (@('', 1, 2, 3, 15, 16, 17, 31, 32, 33, 53, 54, 63, 64, 65)) {
-    SKIP: do {
-      my $sum = try {unpack "\%$_$format*", pack "$format*", < @_};
-      skip "cannot pack '$format' on this perl", 3
-        if is_valid_error($^EVAL_ERROR);
-
-      is($^EVAL_ERROR, '', "no error");
-      ok(defined $sum, "sum bits $_, format $format defined");
-
-      my $len = $_; # Copy, so that we can reassign ''
-      $len = 16 unless length $len;
-
+    info "numbers test for $format";
+    foreach ( @_) {
       SKIP: do {
-        skip "cannot test checksums over $skip_if_longer_than bits", 1
-          if $len +> $skip_if_longer_than;
+            my $out = try {unpack($format, pack($format, $_))};
+            skip "cannot pack '$format' on this perl", 2
+                if is_valid_error($^EVAL_ERROR);
 
-        # Our problem with testing this portably is that the checksum code in
-        # pp_unpack is able to cast signed to unsigned, and do modulo 2**n
-        # arithmetic in unsigned ints, which perl has no operators to do.
-        # (use integer; does signed ints, which won't wrap on UTS, which is just
-        # fine with ANSI, but not with most people's assumptions.
-        # This is why we need to supply the totals for 'Q' as there's no way in
-        # perl to calculate them, short of unpack '%0Q' (is that documented?)
-        # ** returns NVs; make sure it's IV.
-        my $max = 1 + 2 * (int (2 ** ($len-1))-1); # The max possible checksum
-        my $max_p1 = $max + 1;
-        my ($max_is_integer, $max_p1_is_integer);
-        $max_p1_is_integer = 1 unless $max_p1 + 1 == $max_p1;
-        $max_is_integer = 1 if $max - 1 +< ^~^0;
+            is($^EVAL_ERROR, '', "no error $format $_");
+            is($out, $_, "unpack pack $format $_");
+        };
+    }
 
-        my $calc_sum;
-        if (ref $total) {
-            $calc_sum = &$total($len);
-        } else {
-            $calc_sum = $total;
-            # Shift into range by some multiple of the total
-            my $mult = $max_p1 ?? int ($total / $max_p1) !! undef;
-            # Need this to make sure that -1 + (~0+1) is ~0 (ie still integer)
-            $calc_sum = $total - $mult;
-            $calc_sum -= $mult * $max;
-            if ($calc_sum +< 0) {
-                $calc_sum += 1;
-                $calc_sum += $max;
-            }
-        }
-        if ($calc_sum == $calc_sum - 1 && $calc_sum == $max_p1) {
-            # we're into floating point (either by getting out of the range of
-            # UV arithmetic, or because we're doing a floating point checksum)
-            # and our calculation of the checksum has become rounded up to
-            # max_checksum + 1
-            $calc_sum = 0;
-        }
+    my $skip_if_longer_than = ^~^0; # "Infinity"
+    if (^~^0 - 1 == ^~^0) {
+        # If we're running with -DNO_PERLPRESERVE_IVUV and NVs don't preserve all
+        # UVs (in which case ~0 is NV, ~0-1 will be the same NV) then we can't
+        # correctly in perl calculate UV totals for long checksums, as pp_unpack
+        # is using UV maths, and we've only got NVs.
+        $skip_if_longer_than = config_value("nv_preserves_uv_bits");
+    }
 
-        if ($calc_sum == $sum) { # HAS to be ==, not eq (so no is()).
-            pass ("unpack '\%$_$format' gave $sum");
-        } else {
-            my $delta = 1.000001;
-            if ($format =~ s/[dDfF]//g
-                && ($calc_sum +<= $sum * $delta && $calc_sum +>= $sum / $delta)) {
-                pass ("unpack '\%$_$format' gave $sum, expected $calc_sum");
-            } else {
-                my $text = ref $total ?? &$total($len) !! $total;
-                fail;
-                info "For list (" . join (", ", @_) . ") (total $text)"
-                    . " packed with $format unpack '\%$_$format' gave $sum,"
-                    . " expected $calc_sum";
-            }
-        }
-      };
-    };
-  }
+    foreach (@('', 1, 2, 3, 15, 16, 17, 31, 32, 33, 53, 54, 63, 64, 65)) {
+      SKIP: do {
+            my $sum = try {unpack "\%$_$format*", pack "$format*", < @_};
+            skip "cannot pack '$format' on this perl", 3
+                if is_valid_error($^EVAL_ERROR);
+
+            is($^EVAL_ERROR, '', "no error");
+            ok(defined $sum, "sum bits $_, format $format defined");
+
+            my $len = $_; # Copy, so that we can reassign ''
+            $len = 16 unless length $len;
+
+          SKIP: do {
+                skip "cannot test checksums over $skip_if_longer_than bits", 1
+                    if $len +> $skip_if_longer_than;
+
+                # Our problem with testing this portably is that the checksum code in
+                # pp_unpack is able to cast signed to unsigned, and do modulo 2**n
+                # arithmetic in unsigned ints, which perl has no operators to do.
+                # (use integer; does signed ints, which won't wrap on UTS, which is just
+                # fine with ANSI, but not with most people's assumptions.
+                # This is why we need to supply the totals for 'Q' as there's no way in
+                # perl to calculate them, short of unpack '%0Q' (is that documented?)
+                # ** returns NVs; make sure it's IV.
+                my $max = 1 + 2 * (int (2 ** ($len-1))-1); # The max possible checksum
+                my $max_p1 = $max + 1;
+                my ($max_is_integer, $max_p1_is_integer);
+                $max_p1_is_integer = 1 unless $max_p1 + 1 == $max_p1;
+                $max_is_integer = 1 if $max - 1 +< ^~^0;
+
+                my $calc_sum;
+                if (ref $total) {
+                    $calc_sum = &$total($len);
+                } else {
+                    $calc_sum = $total;
+                    # Shift into range by some multiple of the total
+                    my $mult = $max_p1 ?? int ($total / $max_p1) !! undef;
+                    # Need this to make sure that -1 + (~0+1) is ~0 (ie still integer)
+                    $calc_sum = $total - $mult;
+                    $calc_sum -= $mult * $max;
+                    if ($calc_sum +< 0) {
+                        $calc_sum += 1;
+                        $calc_sum += $max;
+                    }
+                }
+                if ($calc_sum == $calc_sum - 1 && $calc_sum == $max_p1) {
+                    # we're into floating point (either by getting out of the range of
+                    # UV arithmetic, or because we're doing a floating point checksum)
+                    # and our calculation of the checksum has become rounded up to
+                    # max_checksum + 1
+                    $calc_sum = 0;
+                }
+
+                if ($calc_sum == $sum) { # HAS to be ==, not eq (so no is()).
+                    pass ("unpack '\%$_$format' gave $sum");
+                } else {
+                    my $delta = 1.000001;
+                    if ($format =~ s/[dDfF]//g
+                        && ($calc_sum +<= $sum * $delta && $calc_sum +>= $sum / $delta)) {
+                        pass ("unpack '\%$_$format' gave $sum, expected $calc_sum");
+                    } else {
+                        my $text = ref $total ?? &$total($len) !! $total;
+                        fail;
+                        info "For list (" . join (", ", @_) . ") (total $text)"
+                             . " packed with $format unpack '\%$_$format' gave $sum,"
+                             . " expected $calc_sum";
+                    }
+                }
+            };
+        };
+    }
 }
 
 numbers ('c', -128, -1, 0, 1, 127);
@@ -670,11 +670,11 @@ numbers_with_total ('q', -1,
 # 65 bits. (long double is 128 bits on sparc, so they certainly can)
 # or where rounding is down not up on binary conversion (crays)
 numbers_with_total ('Q', sub {
-                      my $len = shift;
-                      $len = 65 if $len +> 65; # unmasked total is 2**65-1 here
-                      my $total = 1 + 2 * (int (2**($len - 1)) - 1);
-                      return 0 if $total == $total - 1; # Overflowed integers
-                      return $total; # NVs still accurate to nearest integer
+                        my $len = shift;
+                        $len = 65 if $len +> 65; # unmasked total is 2**65-1 here
+                        my $total = 1 + 2 * (int (2**($len - 1)) - 1);
+                        return 0 if $total == $total - 1; # Overflowed integers
+                        return $total; # NVs still accurate to nearest integer
                     },
                     0, 1,9223372036854775807, 9223372036854775808,
                     18446744073709551615);
@@ -687,47 +687,47 @@ is(pack("N", 0xdeadbeef), "\x[deadbeef]");
 is(pack("V", 0xdeadbeef), "\x[efbeadde]");
 
 SKIP: do {
-  skip $no_signedness, 4 if $no_signedness;
-  is(pack("n!", 0xdead), "\x[dead]");
-  is(pack("v!", 0xdead), "\x[adde]");
-  is(pack("N!", 0xdeadbeef), "\x[deadbeef]");
-  is(pack("V!", 0xdeadbeef), "\x[efbeadde]");
+    skip $no_signedness, 4 if $no_signedness;
+    is(pack("n!", 0xdead), "\x[dead]");
+    is(pack("v!", 0xdead), "\x[adde]");
+    is(pack("N!", 0xdeadbeef), "\x[deadbeef]");
+    is(pack("V!", 0xdeadbeef), "\x[efbeadde]");
 };
 
 info "test big-/little-endian conversion";
 
 sub byteorder
 {
-  my $format = shift;
-  info "byteorder test for $format";
-  for my $value ( @_) {
-    SKIP: do {
-      my ($nat,$be,$le);
-      try { @($nat, $be, $le) = map { pack $format.$_, $value }, @( '', '>', '<') };
-      skip "cannot pack '$format' on this perl", 5
-        if is_valid_error($^EVAL_ERROR);
-
-      do {
-        use warnings < qw(NONFATAL utf8);
-        info "[$value][$nat][$be][$le][$^EVAL_ERROR]";
-      };
-
+    my $format = shift;
+    info "byteorder test for $format";
+    for my $value ( @_) {
       SKIP: do {
-        skip "cannot compare native byteorder with big-/little-endian", 1
-            if $ByteOrder eq 'unknown';
+            my ($nat,$be,$le);
+            try { @($nat, $be, $le) = map { pack $format.$_, $value }, @( '', '>', '<') };
+            skip "cannot pack '$format' on this perl", 5
+                if is_valid_error($^EVAL_ERROR);
 
-        is($nat, $ByteOrder eq 'big' ?? $be !! $le);
-      };
-      is($be, (join '', reverse( split m//, $le)));
-      my @x = @( try { unpack "$format$format>$format<", $nat.$be.$le } );
+            do {
+                use warnings < qw(NONFATAL utf8);
+                info "[$value][$nat][$be][$le][$^EVAL_ERROR]";
+            };
 
-      info "[$value][", join('][', @x), "][$^EVAL_ERROR]";
+          SKIP: do {
+                skip "cannot compare native byteorder with big-/little-endian", 1
+                    if $ByteOrder eq 'unknown';
 
-      is($^EVAL_ERROR, '');
-      is(@x[0], @x[1]);
-      is(@x[0], @x[2]);
-    };
-  }
+                is($nat, $ByteOrder eq 'big' ?? $be !! $le);
+            };
+            is($be, (join '', reverse( split m//, $le)));
+            my @x = @( try { unpack "$format$format>$format<", $nat.$be.$le } );
+
+            info "[$value][", join('][', @x), "][$^EVAL_ERROR]";
+
+            is($^EVAL_ERROR, '');
+            is(@x[0], @x[1]);
+            is(@x[0], @x[2]);
+        };
+    }
 }
 
 byteorder('s', -32768, -1, 0, 1, 32767);
@@ -754,155 +754,155 @@ byteorder('D', -(2**34), -1, 0, 1, 2**34);
 info "test negative numbers";
 
 SKIP: do {
-  skip "platform is not using two's complement for negative integers", 120
-    unless $IsTwosComplement;
+    skip "platform is not using two's complement for negative integers", 120
+        unless $IsTwosComplement;
 
-  for my $format (qw(s i l j s! i! l! q)) {
-    SKIP: do {
-      my ($nat,$be,$le);
-      try { @($nat,$be,$le) = map { pack $format.$_, -1 }, @( '', '>', '<') };
-      skip "cannot pack '$format' on this perl", 15
-        if is_valid_error($^EVAL_ERROR);
+    for my $format (qw(s i l j s! i! l! q)) {
+      SKIP: do {
+            my ($nat,$be,$le);
+            try { @($nat,$be,$le) = map { pack $format.$_, -1 }, @( '', '>', '<') };
+            skip "cannot pack '$format' on this perl", 15
+                if is_valid_error($^EVAL_ERROR);
 
-      my $len = length $nat;
-      is($_, "\x[FF]"x$len) for @( $nat, $be, $le);
+            my $len = length $nat;
+            is($_, "\x[FF]"x$len) for @( $nat, $be, $le);
 
-      my(@val,@ref);
-      if ($len +>= 8) {
-        @val = @(-2, -81985529216486896, -9223372036854775808);
-        @ref = @("\x[FFFFFFFFFFFFFFFE]",
-                "\x[FEDCBA9876543210]",
-                "\x[8000000000000000]");
-      }
-      elsif ($len +>= 4) {
-        @val = @(-2, -19088744, -2147483648);
-        @ref = @("\x[FFFFFFFE]",
-                "\x[FEDCBA98]",
-                "\x[80000000]");
-      }
-      else {
-        @val = @(-2, -292, -32768);
-        @ref = @("\x[FFFE]",
-                "\x[FEDC]",
-                "\x[8000]");
-      }
-      for my $x ( @ref) {
-        if ($len +> length $x) {
-          $x = $x . "\x[FF]" x ($len - length $x);
-        }
-      }
+            my(@val,@ref);
+            if ($len +>= 8) {
+                @val = @(-2, -81985529216486896, -9223372036854775808);
+                @ref = @("\x[FFFFFFFFFFFFFFFE]",
+                         "\x[FEDCBA9876543210]",
+                         "\x[8000000000000000]");
+            }
+            elsif ($len +>= 4) {
+                @val = @(-2, -19088744, -2147483648);
+                @ref = @("\x[FFFFFFFE]",
+                         "\x[FEDCBA98]",
+                         "\x[80000000]");
+            }
+            else {
+                @val = @(-2, -292, -32768);
+                @ref = @("\x[FFFE]",
+                         "\x[FEDC]",
+                         "\x[8000]");
+            }
+            for my $x ( @ref) {
+                if ($len +> length $x) {
+                    $x = $x . "\x[FF]" x ($len - length $x);
+                }
+            }
 
-      for my $i (0 .. (nelems @val)-1) {
-        my @($nat,$be,$le) = try { map { pack $format.$_, @val[$i] }, @( '', '>', '<') };
-        is($^EVAL_ERROR, '');
+            for my $i (0 .. (nelems @val)-1) {
+                my @($nat,$be,$le) = try { map { pack $format.$_, @val[$i] }, @( '', '>', '<') };
+                is($^EVAL_ERROR, '');
 
-        SKIP: do {
-          skip "cannot compare native byteorder with big-/little-endian", 1
-              if $ByteOrder eq 'unknown';
+              SKIP: do {
+                    skip "cannot compare native byteorder with big-/little-endian", 1
+                        if $ByteOrder eq 'unknown';
 
-          is($nat, $ByteOrder eq 'big' ?? $be !! $le);
+                    is($nat, $ByteOrder eq 'big' ?? $be !! $le);
+                };
+
+                is($be, @ref[$i]);
+                is($be, (join '', reverse( split m//, $le)));
+            }
         };
-
-        is($be, @ref[$i]);
-        is($be, (join '', reverse( split m//, $le)));
-      }
-    };
-  }
+    }
 };
 
 do {
-  # /
+    # /
 
-  my ($x, $y, $z);
-  try { ($x) = unpack '/a*','hello' };
-  like($^EVAL_ERROR->{?description}, qr!'/' must follow a numeric type!);
-  undef $x;
-  try { $x = unpack '/a*','hello' };
-  like($^EVAL_ERROR->{?description}, qr!'/' must follow a numeric type!);
+    my ($x, $y, $z);
+    try { ($x) = unpack '/a*','hello' };
+    like($^EVAL_ERROR->{?description}, qr!'/' must follow a numeric type!);
+    undef $x;
+    try { $x = unpack '/a*','hello' };
+    like($^EVAL_ERROR->{?description}, qr!'/' must follow a numeric type!);
 
-  undef $x;
-  try { @($z,$x,$y) =@( unpack 'a3/A C/a* C/Z', "003ok \003yes\004z\000abc") };
-  is($^EVAL_ERROR, '');
-  is($z, 'ok');
-  is($x, 'yes');
-  is($y, 'z');
-  undef $z;
-  try { $z = unpack 'a3/A C/a* C/Z', "003ok \003yes\004z\000abc" };
-  is($^EVAL_ERROR, '');
-  is($z, 'ok');
+    undef $x;
+    try { @($z,$x,$y) =@( unpack 'a3/A C/a* C/Z', "003ok \003yes\004z\000abc") };
+    is($^EVAL_ERROR, '');
+    is($z, 'ok');
+    is($x, 'yes');
+    is($y, 'z');
+    undef $z;
+    try { $z = unpack 'a3/A C/a* C/Z', "003ok \003yes\004z\000abc" };
+    is($^EVAL_ERROR, '');
+    is($z, 'ok');
 
 
-  undef $x;
-  try { ($x) = pack '/a*','hello' };
-  like($^EVAL_ERROR->{?description},  qr!Invalid type '/'!);
-  undef $x;
-  try { $x = pack '/a*','hello' };
-  like($^EVAL_ERROR->{?description},  qr!Invalid type '/'!);
+    undef $x;
+    try { ($x) = pack '/a*','hello' };
+    like($^EVAL_ERROR->{?description},  qr!Invalid type '/'!);
+    undef $x;
+    try { $x = pack '/a*','hello' };
+    like($^EVAL_ERROR->{?description},  qr!Invalid type '/'!);
 
-  $z = pack 'n/a* N/Z* w/A*','string','hi there ','etc';
-  my $expect = "\000\006string\0\0\0\012hi there \000\003etc";
-  is($z, $expect);
+    $z = pack 'n/a* N/Z* w/A*','string','hi there ','etc';
+    my $expect = "\000\006string\0\0\0\012hi there \000\003etc";
+    is($z, $expect);
 
-  undef $x;
-  $expect = 'hello world';
-  try { ($x) = unpack ("w/a", chr (11) . "hello world!")};
-  is($x, $expect);
-  is($^EVAL_ERROR, '');
+    undef $x;
+    $expect = 'hello world';
+    try { ($x) = unpack ("w/a", chr (11) . "hello world!")};
+    is($x, $expect);
+    is($^EVAL_ERROR, '');
 
-  undef $x;
-  # Doing this in scalar context used to fail.
-  try { $x = unpack ("w/a", chr (11) . "hello world!")};
-  is($^EVAL_ERROR, '');
-  is($x, $expect);
+    undef $x;
+    # Doing this in scalar context used to fail.
+    try { $x = unpack ("w/a", chr (11) . "hello world!")};
+    is($^EVAL_ERROR, '');
+    is($x, $expect);
 
-  foreach (@(
+    foreach (@(
            \@('a/a*/a*', '212ab345678901234567','ab3456789012'),
            \@('a/a*/a*', '3012ab345678901234567', 'ab3456789012'),
            \@('a/a*/b*', '212ab', '100001100100'),)
-  )
-  {
-    my @($pat, $in, $expect) =  @$_;
-    undef $x;
-    try { ($x) = unpack $pat, $in };
-    is($^EVAL_ERROR, '');
-    is($x, $expect) ||
-      diag sprintf "list unpack ('$pat', '$in') gave \%s, expected '$expect'", <
-             encode_list ($x);
+    )
+    {
+        my @($pat, $in, $expect) =  @$_;
+        undef $x;
+        try { ($x) = unpack $pat, $in };
+        is($^EVAL_ERROR, '');
+        is($x, $expect) ||
+            diag sprintf "list unpack ('$pat', '$in') gave \%s, expected '$expect'", <
+                 encode_list ($x);
 
-    undef $x;
-    try { $x = unpack $pat, $in };
-    is($^EVAL_ERROR, '');
-    is($x, $expect) ||
-      diag sprintf "scalar unpack ('$pat', '$in') gave \%s, expected '$expect'", <
-             encode_list ($x);
-  }
+        undef $x;
+        try { $x = unpack $pat, $in };
+        is($^EVAL_ERROR, '');
+        is($x, $expect) ||
+            diag sprintf "scalar unpack ('$pat', '$in') gave \%s, expected '$expect'", <
+                 encode_list ($x);
+    }
 
-  # / with #
+    # / with #
 
-  my $pattern = <<'EOU';
+    my $pattern = <<'EOU';
  a3/A			# Count in ASCII
  C/a*			# Count in a C char
  C/Z			# Count in a C char but skip after \0
 EOU
 
-  $x = $y = $z =undef;
-  try { @($z,$x,$y) =@( unpack $pattern, "003ok \003yes\004z\000abc") };
-  is($^EVAL_ERROR, '');
-  is($z, 'ok');
-  is($x, 'yes');
-  is($y, 'z');
-  undef $x;
-  try { $z = unpack $pattern, "003ok \003yes\004z\000abc" };
-  is($^EVAL_ERROR, '');
-  is($z, 'ok');
+    $x = $y = $z =undef;
+    try { @($z,$x,$y) =@( unpack $pattern, "003ok \003yes\004z\000abc") };
+    is($^EVAL_ERROR, '');
+    is($z, 'ok');
+    is($x, 'yes');
+    is($y, 'z');
+    undef $x;
+    try { $z = unpack $pattern, "003ok \003yes\004z\000abc" };
+    is($^EVAL_ERROR, '');
+    is($z, 'ok');
 
-  $pattern = <<'EOP';
+    $pattern = <<'EOP';
   n/a*			# Count as network short
   w/A*			# Count a  BER integer
 EOP
-  $expect = "\000\006string\003etc";
-  $z = pack $pattern,'string','etc';
-  is($z, $expect);
+    $expect = "\000\006string\003etc";
+    $z = pack $pattern,'string','etc';
+    is($z, $expect);
 };
 
 
@@ -913,24 +913,24 @@ SKIP: do {
 };
 
 do {
-use utf8;
+    use utf8;
 
-isnt("\x{1}\x{14}\x{12c}\x{fa0}", sprintf "\%vd", pack("C0U*",1,20,300,4000));
+    isnt("\x{1}\x{14}\x{12c}\x{fa0}", sprintf "\%vd", pack("C0U*",1,20,300,4000));
 
-my $rslt = "199 162";
-is(join(" ", @( unpack("C*", "\x{1e2}"))), $rslt);
+    my $rslt = "199 162";
+    is(join(" ", @( unpack("C*", "\x{1e2}"))), $rslt);
 
-# does pack U create Unicode?
-is(pack('U', 0x300), "\x{300}");
+    # does pack U create Unicode?
+    is(pack('U', 0x300), "\x{300}");
 
-# does unpack U deref Unicode?
-is(@(unpack('U', "\x{300}"))[0], 0x300);
+    # does unpack U deref Unicode?
+    is(@(unpack('U', "\x{300}"))[0], 0x300);
 
-# is unpack U the reverse of pack U for Unicode string?
-is("$(join ' ', @: unpack('U*', pack('U*', 100, 200, 300)))", "100 200 300");
+    # is unpack U the reverse of pack U for Unicode string?
+    is("$(join ' ', @: unpack('U*', pack('U*', 100, 200, 300)))", "100 200 300");
 
-# is unpack U the reverse of pack U for byte string?
-is("$(join ' ', @: unpack('U*', pack('U*', 100, 200)))", "100 200");
+    # is unpack U the reverse of pack U for byte string?
+    is("$(join ' ', @: unpack('U*', pack('U*', 100, 200)))", "100 200");
 };
 
 SKIP: do {
@@ -943,7 +943,7 @@ SKIP: do {
 
     # does unpack U0U on byte data warn?
     do {
-	use warnings < qw(NONFATAL all);;
+        use warnings < qw(NONFATAL all);;
 
         my $bad = pack("U0C", 255);
         local $^WARN_HOOK = sub { $^EVAL_ERROR = @_[0]; };
@@ -953,42 +953,42 @@ SKIP: do {
 };
 
 do {
-  my $p = pack 'i*', -2147483648, ^~^0, 0, 1, 2147483647;
-  my (@a);
-  # bug - % had to be at the start of the pattern, no leading whitespace or
-  # comments. %i! didn't work at all.
-  foreach my $pat (@('%32i*', ' %32i*', "# Muhahahaha\n\%32i*", '%32i*  ',
-                   '%32i!*', ' %32i!*', "\n#\n#\n\r \t\f\%32i!*", '%32i!*#')) {
-    @a = @( unpack $pat, $p );
-    is(@a[0], 0xFFFFFFFF) || diag "$pat";
-    @a = @( scalar unpack $pat, $p );
-    is(@a[0], 0xFFFFFFFF) || diag "$pat";
-  }
+    my $p = pack 'i*', -2147483648, ^~^0, 0, 1, 2147483647;
+    my (@a);
+    # bug - % had to be at the start of the pattern, no leading whitespace or
+    # comments. %i! didn't work at all.
+    foreach my $pat (@('%32i*', ' %32i*', "# Muhahahaha\n\%32i*", '%32i*  ',
+                       '%32i!*', ' %32i!*', "\n#\n#\n\r \t\f\%32i!*", '%32i!*#')) {
+        @a = @( unpack $pat, $p );
+        is(@a[0], 0xFFFFFFFF) || diag "$pat";
+        @a = @( scalar unpack $pat, $p );
+        is(@a[0], 0xFFFFFFFF) || diag "$pat";
+    }
 
 
-  $p = pack 'I*', 42, 12;
-  # Multiline patterns in scalar context failed.
-  foreach my $pat (@('I', <<EOPOEMSNIPPET, 'I#I', 'I # I', 'I # !!!')) {
+    $p = pack 'I*', 42, 12;
+    # Multiline patterns in scalar context failed.
+    foreach my $pat (@('I', <<EOPOEMSNIPPET, 'I#I', 'I # I', 'I # !!!')) {
 # On the Ning Nang Nong
 # Where the Cows go Bong!
 # And the Monkeys all say Boo!
 I
 EOPOEMSNIPPET
-    @a = @( unpack $pat, $p );
-    is(scalar nelems @a, 1);
-    is(@a[0], 42);
-    @a = @( scalar unpack $pat, $p );
-    is(scalar nelems @a, 1);
-    is(@a[0], 42);
-  }
+        @a = @( unpack $pat, $p );
+        is(scalar nelems @a, 1);
+        is(@a[0], 42);
+        @a = @( scalar unpack $pat, $p );
+        is(scalar nelems @a, 1);
+        is(@a[0], 42);
+    }
 
-  # shorts (of all flavours) didn't calculate checksums > 32 bits with floating
-  # point, so a pathologically long pattern would wrap at 32 bits.
-  my $pat = "\x[ffff]"x65538; # Start with it long, to save any copying.
-  foreach (@(4,3,2,1,0)) {
-    my $len = 65534 + $_;
-    is(unpack ("\%33n$len", $pat), 65535 * $len);
-  }
+    # shorts (of all flavours) didn't calculate checksums > 32 bits with floating
+    # point, so a pathologically long pattern would wrap at 32 bits.
+    my $pat = "\x[ffff]"x65538; # Start with it long, to save any copying.
+    foreach (@(4,3,2,1,0)) {
+        my $len = 65534 + $_;
+        is(unpack ("\%33n$len", $pat), 65535 * $len);
+    }
 };
 
 
@@ -1004,13 +1004,13 @@ foreach (@(
          \@('a*@4a', 'Perl rules', '!', 'Perl!'),)
 )
 {
-  my @($template, @< @in) =  @$_;
-  my $out = pop @in;
-  my $got = try {pack $template, < @in};
-  is($^EVAL_ERROR, '');
-  is($out, $got) ||
-    diag sprintf "pack ('$template', \%s) gave \%s expected \%s",
-           < encode_list (< @in), < encode_list ($got), < encode_list ($out);
+    my @($template, @< @in) =  @$_;
+    my $out = pop @in;
+    my $got = try {pack $template, < @in};
+    is($^EVAL_ERROR, '');
+    is($out, $got) ||
+        diag sprintf "pack ('$template', \%s) gave \%s expected \%s",
+             < encode_list (< @in), < encode_list ($got), < encode_list ($out);
 }
 
 # unpack x X @
@@ -1024,19 +1024,19 @@ foreach (@(
          \@('a*@1a3', "steam", "steam", "tea"),)
 )
 {
-  my @($template, $in, @< @out) =  @$_;
-  my @got = @( try {unpack $template, $in} );
-  is($^EVAL_ERROR, '');
-  ok (list_eq (\@got, \@out)) ||
-    diag sprintf "list unpack ('$template', \%s) gave \%s expected \%s", <
-           _qq($in), < encode_list (< @got), < encode_list (< @out);
+    my @($template, $in, @< @out) =  @$_;
+    my @got = @( try {unpack $template, $in} );
+    is($^EVAL_ERROR, '');
+    ok (list_eq (\@got, \@out)) ||
+        diag sprintf "list unpack ('$template', \%s) gave \%s expected \%s", <
+             _qq($in), < encode_list (< @got), < encode_list (< @out);
 
-  my $got = try {unpack $template, $in};
-  is($^EVAL_ERROR, '');
-  (nelems @out) ?? is( $got, @out[0] ) # 1 or more items; should get first
-       !! ok( !defined $got ) # 0 items; should get undef
-    or diag printf "scalar unpack ('$template', \%s) gave \%s expected \%s", <
-              _qq($in), < encode_list ($got), < encode_list (@out[0]);
+    my $got = try {unpack $template, $in};
+    is($^EVAL_ERROR, '');
+    (nelems @out) ?? is( $got, @out[0] ) # 1 or more items; should get first
+        !! ok( !defined $got ) # 0 items; should get undef
+        or diag printf "scalar unpack ('$template', \%s) gave \%s expected \%s", <
+                _qq($in), < encode_list ($got), < encode_list (@out[0]);
 }
 
 do {
@@ -1058,77 +1058,77 @@ do {
 };
 
 SKIP: do {
-  info "group modifiers";
+    info "group modifiers";
 
-  skip $no_endianness, 3 * 2 + 3 * 2 + 1 if $no_endianness;
+    skip $no_endianness, 3 * 2 + 3 * 2 + 1 if $no_endianness;
 
-  for my $t (qw{ (s<)< (sl>s)> (s(l(sl)<l)s)< }) {
-    info "testing pattern '$t'";
-    try { ($_) = unpack($t, 'x'x18); };
-    is($^EVAL_ERROR, '');
-    try { $_ = pack($t, (0)x6); };
-    is($^EVAL_ERROR, '');
-  }
+    for my $t (qw{ (s<)< (sl>s)> (s(l(sl)<l)s)< }) {
+        info "testing pattern '$t'";
+        try { ($_) = unpack($t, 'x'x18); };
+        is($^EVAL_ERROR, '');
+        try { $_ = pack($t, (0)x6); };
+        is($^EVAL_ERROR, '');
+    }
 
-  for my $t (qw{ (s<)> (sl>s)< (s(l(sl)<l)s)> }) {
-    info "testing pattern '$t'";
-    try { @($_) = @: unpack($t, 'x'x18); };
-    like($^EVAL_ERROR->{?description}, qr/Can't use '[<>]' in a group with different byte-order in unpack/);
-    try { $_ = pack($t, (0)x6); };
-    like($^EVAL_ERROR->{?description}, qr/Can't use '[<>]' in a group with different byte-order in pack/);
-  }
+    for my $t (qw{ (s<)> (sl>s)< (s(l(sl)<l)s)> }) {
+        info "testing pattern '$t'";
+        try { @($_) = @: unpack($t, 'x'x18); };
+        like($^EVAL_ERROR->{?description}, qr/Can't use '[<>]' in a group with different byte-order in unpack/);
+        try { $_ = pack($t, (0)x6); };
+        like($^EVAL_ERROR->{?description}, qr/Can't use '[<>]' in a group with different byte-order in pack/);
+    }
 
-  is(pack('L<L>', (0x12345678)x2),
-     pack('(((L1)1)<)(((L)1)1)>1', (0x12345678)x2));
+    is(pack('L<L>', (0x12345678)x2),
+       pack('(((L1)1)<)(((L)1)1)>1', (0x12345678)x2));
 };
 
 do {
-  no utf8;
+    no utf8;
 
-  sub compress_template {
-    my $t = shift;
-    for my $mod (qw( < > )) {
-      $t =~ s/((?:(?:[SILQJFDP]!?$mod|[^SILQJFDP\W]!?)(?:\d+|\*|\[(?:[^]]+)\])?\/?)\{2,\})/$( do {
-              my $x = $1; $x =~ s!$mod!!g ?? "($x)$mod" !! $x })/ig;
+    sub compress_template {
+        my $t = shift;
+        for my $mod (qw( < > )) {
+            $t =~ s/((?:(?:[SILQJFDP]!?$mod|[^SILQJFDP\W]!?)(?:\d+|\*|\[(?:[^]]+)\])?\/?)\{2,\})/$( do {
+                my $x = $1; $x =~ s!$mod!!g ?? "($x)$mod" !! $x })/ig;
+        }
+        return $t;
     }
-    return $t;
-  }
 
-  my %templates = %(
-    's<'                  => \@(-42),
-    's<c2x![S]S<'         => \@(-42, -11, 12, 4711),
-    '(i<j<[s]l<)3'        => \@(-11, -22, -33, 1000000, 1100, 2201, 3302,
-                              -1000000, 32767, -32768, 1, -123456789 ),
-    '(I!<4(J<2L<)3)5'     => \(1 .. 65),
-    'q<Q<'                => \@(-50000000005, 60000000006),
-    'f<F<d<'              => \@(3.14159, 111.11, 2222.22),
-    'D<cCD<'              => \@(1e42, -128, 255, 1e-42),
-    'n/a*'                => \@('/usr/bin/perl'),
-    'C/a*S</A*L</Z*I</a*' => \qw(Just another Perl hacker),
-  );
+    my %templates = %(
+            's<'                  => \@(-42),
+                's<c2x![S]S<'         => \@(-42, -11, 12, 4711),
+                '(i<j<[s]l<)3'        => \@(-11, -22, -33, 1000000, 1100, 2201, 3302,
+                                            -1000000, 32767, -32768, 1, -123456789 ),
+                '(I!<4(J<2L<)3)5'     => \(1 .. 65),
+                'q<Q<'                => \@(-50000000005, 60000000006),
+                'f<F<d<'              => \@(3.14159, 111.11, 2222.22),
+                'D<cCD<'              => \@(1e42, -128, 255, 1e-42),
+                'n/a*'                => \@('/usr/bin/perl'),
+                'C/a*S</A*L</Z*I</a*' => \qw(Just another Perl hacker),
+        );
 
-  for my $tle (sort keys %templates) {
-    my @d = @{%templates{?$tle}};
-    my $tbe = $tle;
-    $tbe =~ s/</>/g;
-    for my $t (@($tbe, $tle)) {
-      my $c = compress_template($t);
-      info "'$t' -> '$c'";
-      SKIP: do {
-        my $p1 = try { pack $t, < @d };
-        skip "cannot pack '$t' on this perl", 5 if is_valid_error($^EVAL_ERROR);
-        my $p2 = try { pack $c, < @d };
-        is($^EVAL_ERROR, '');
-        is($p1, $p2);
-        s!(/[aAZ])\*!$1!g for @( $t, $c);
-        my @u1 = @( try { unpack $t, $p1 } );
-        is($^EVAL_ERROR, '');
-        my @u2 = @( try { unpack $c, $p2 } );
-        is($^EVAL_ERROR, '');
-        is(join('!', @u1), join('!', @u2));
-      };
+    for my $tle (sort keys %templates) {
+        my @d = @{%templates{?$tle}};
+        my $tbe = $tle;
+        $tbe =~ s/</>/g;
+        for my $t (@($tbe, $tle)) {
+            my $c = compress_template($t);
+            info "'$t' -> '$c'";
+          SKIP: do {
+                my $p1 = try { pack $t, < @d };
+                skip "cannot pack '$t' on this perl", 5 if is_valid_error($^EVAL_ERROR);
+                my $p2 = try { pack $c, < @d };
+                is($^EVAL_ERROR, '');
+                is($p1, $p2);
+                s!(/[aAZ])\*!$1!g for @( $t, $c);
+                my @u1 = @( try { unpack $t, $p1 } );
+                is($^EVAL_ERROR, '');
+                my @u2 = @( try { unpack $c, $p2 } );
+                is($^EVAL_ERROR, '');
+                is(join('!', @u1), join('!', @u2));
+            };
+        }
     }
-  }
 };
 
 do {
@@ -1195,184 +1195,184 @@ do {   # Grouping constructs
 };
 
 do {  # more on grouping (W.Laun)
-  # @ absolute within ()-group
-  my $badc = pack( '(a)*', unpack( '(@1a @0a @2)*', 'abcd' ) );
-  is( $badc, 'badc' );
-  my @b = @( 1, 2, 3 );
-  my $buf = pack( '(@1c)((@2C)@3c)', < @b );
-  is( $buf, "\0\1\0\0\2\3" );
-  my @a = @( unpack( '(@1c)((@2c)@3c)', $buf ) );
-  is( "$(join ' ',@a)", "$(join ' ',@b)" );
+    # @ absolute within ()-group
+    my $badc = pack( '(a)*', unpack( '(@1a @0a @2)*', 'abcd' ) );
+    is( $badc, 'badc' );
+    my @b = @( 1, 2, 3 );
+    my $buf = pack( '(@1c)((@2C)@3c)', < @b );
+    is( $buf, "\0\1\0\0\2\3" );
+    my @a = @( unpack( '(@1c)((@2c)@3c)', $buf ) );
+    is( "$(join ' ',@a)", "$(join ' ',@b)" );
 
-  # various unpack count/code scenarios
-  my @Env = @( a => 'AAA', b => 'BBB' );
-  my $env = pack( 'S(S/A*S/A*)*', (nelems @Env)/2, < @Env );
+    # various unpack count/code scenarios
+    my @Env = @( a => 'AAA', b => 'BBB' );
+    my $env = pack( 'S(S/A*S/A*)*', (nelems @Env)/2, < @Env );
 
-  # unpack full length - ok
-  my @pup = @( unpack( 'S/(S/A* S/A*)', $env ) );
-  is( "$(join ' ',@pup)", "$(join ' ',@Env)" );
+    # unpack full length - ok
+    my @pup = @( unpack( 'S/(S/A* S/A*)', $env ) );
+    is( "$(join ' ',@pup)", "$(join ' ',@Env)" );
 
-  # warn when count/code goes beyond end of string
-  # \0002 \0001 a \0003 AAA \0001 b \0003 BBB
-  #     2     4 5     7  10    1213
-  try { @pup = @( unpack( 'S/(S/A* S/A*)', substr( $env, 0, 13 ) ) ) };
-  like( $^EVAL_ERROR->{?description}, qr{length/code after end of string} );
+    # warn when count/code goes beyond end of string
+    # \0002 \0001 a \0003 AAA \0001 b \0003 BBB
+    #     2     4 5     7  10    1213
+    try { @pup = @( unpack( 'S/(S/A* S/A*)', substr( $env, 0, 13 ) ) ) };
+    like( $^EVAL_ERROR->{?description}, qr{length/code after end of string} );
 
-  # postfix repeat count
-  $env = pack( '(S/A* S/A*)' . (nelems @Env)/2, < @Env );
+    # postfix repeat count
+    $env = pack( '(S/A* S/A*)' . (nelems @Env)/2, < @Env );
 
-  # warn when count/code goes beyond end of string
-  # \0001 a \0003 AAA \0001  b \0003 BBB
-  #     2 3c    5   8    10 11    13  16
-  try { @pup = @( unpack( '(S/A* S/A*)' . (nelems @Env)/2, substr( $env, 0, 11 ) ) ) };
-  like( $^EVAL_ERROR->{?description}, qr{length/code after end of string} );
+    # warn when count/code goes beyond end of string
+    # \0001 a \0003 AAA \0001  b \0003 BBB
+    #     2 3c    5   8    10 11    13  16
+    try { @pup = @( unpack( '(S/A* S/A*)' . (nelems @Env)/2, substr( $env, 0, 11 ) ) ) };
+    like( $^EVAL_ERROR->{?description}, qr{length/code after end of string} );
 
-  # catch stack overflow/segfault
-  try { $_ = pack( ('(' x 105) . 'A' . (')' x 105) ); };
-  like( $^EVAL_ERROR->{?description}, qr{Too deeply nested \(\)-groups} );
+    # catch stack overflow/segfault
+    try { $_ = pack( ('(' x 105) . 'A' . (')' x 105) ); };
+    like( $^EVAL_ERROR->{?description}, qr{Too deeply nested \(\)-groups} );
 };
 
 do { # syntax checks (W.Laun)
-  use warnings < qw(NONFATAL all);;
-  my @warning;
-  local $^WARN_HOOK = sub {
-      push( @warning, @_[0]->{?description} );
-  };
-  try { my $s = pack( 'Ax![4c]A', < 1..5 ); };
-  like( $^EVAL_ERROR->{?description}, qr{Malformed integer in \[\]} );
+    use warnings < qw(NONFATAL all);;
+    my @warning;
+    local $^WARN_HOOK = sub {
+            push( @warning, @_[0]->{?description} );
+        };
+    try { my $s = pack( 'Ax![4c]A', < 1..5 ); };
+    like( $^EVAL_ERROR->{?description}, qr{Malformed integer in \[\]} );
 
-  try { my $buf = pack( '(c/*a*)', 'AAA', 'BB' ); };
-  like( $^EVAL_ERROR->{?description}, qr{'/' does not take a repeat count} );
+    try { my $buf = pack( '(c/*a*)', 'AAA', 'BB' ); };
+    like( $^EVAL_ERROR->{?description}, qr{'/' does not take a repeat count} );
 
-  try { my @inf = @( unpack( 'c/1a', "\x[03]AAA\x[02]BB" ) ); };
-  like( $^EVAL_ERROR->{?description}, qr{'/' does not take a repeat count} );
+    try { my @inf = @( unpack( 'c/1a', "\x[03]AAA\x[02]BB" ) ); };
+    like( $^EVAL_ERROR->{?description}, qr{'/' does not take a repeat count} );
 
-  try { my @inf = @( unpack( 'c/*a', "\x[03]AAA\x[02]BB" ) ); };
-  like( $^EVAL_ERROR->{?description}, qr{'/' does not take a repeat count} );
+    try { my @inf = @( unpack( 'c/*a', "\x[03]AAA\x[02]BB" ) ); };
+    like( $^EVAL_ERROR->{?description}, qr{'/' does not take a repeat count} );
 
-  # white space where possible
-  my @Env = @( a => 'AAA', b => 'BBB' );
-  my $env = pack( ' S ( S / A*   S / A* )* ', (nelems @Env)/2, < @Env );
-  my @pup = @( unpack( ' S / ( S / A*   S / A* ) ', $env ) );
-  is( "$(join ' ',@pup)", "$(join ' ',@Env)" );
+    # white space where possible
+    my @Env = @( a => 'AAA', b => 'BBB' );
+    my $env = pack( ' S ( S / A*   S / A* )* ', (nelems @Env)/2, < @Env );
+    my @pup = @( unpack( ' S / ( S / A*   S / A* ) ', $env ) );
+    is( "$(join ' ',@pup)", "$(join ' ',@Env)" );
 
-  # white space in 4 wrong places
-  for my $temp (@(  'A ![4]', 'A [4]', 'A *', 'A 4') ){
-      try { my $s = pack( $temp, 'B' ); };
-      like( $^EVAL_ERROR->{?description}, qr{Invalid type } );
-  }
+    # white space in 4 wrong places
+    for my $temp (@(  'A ![4]', 'A [4]', 'A *', 'A 4') ){
+        try { my $s = pack( $temp, 'B' ); };
+        like( $^EVAL_ERROR->{?description}, qr{Invalid type } );
+    }
 
-  # warning for commas
-  @warning = @( () );
-  my $x = pack( 'I,A', 4, 'X' );
-  like( @warning[0], qr{Invalid type ','} );
-
-  # comma warning only once
-  @warning = @( () );
-  $x = pack( 'C(C,C)C,C', < 65..71  );
-  like( scalar nelems @warning, 1 );
-
-  # forbidden code in []
-  try { my $x = pack( 'A[@4]', 'XXXX' ); };
-  like( $^EVAL_ERROR->{?description}, qr{Within \[\]-length '\@' not allowed} );
-
-  # @ repeat default 1
-  my $s = pack( 'AA@A', 'A', 'B', 'C' );
-  my @c = @( unpack( 'AA@A', $s ) );
-  is( $s, 'AC' );
-  is( "$(join ' ',@c)", "A C C" );
-
-  # no unpack code after /
-  try { my @a = @( unpack( "C/", "\3" ) ); };
-  like( $^EVAL_ERROR->{?description}, qr{Code missing after '/'} );
-
- SKIP: do {
-    skip $no_endianness, 6 if $no_endianness;
-
-    # modifier warnings
+    # warning for commas
     @warning = @( () );
-    $x = pack "I>>s!!", 47, 11;
-    ($x) = unpack "I<<l!>!>", 'x'x20;
-    is(scalar nelems @warning, 5);
-    like(@warning[0], qr/Duplicate modifier '>' after 'I' in pack/);
-    like(@warning[1], qr/Duplicate modifier '!' after 's' in pack/);
-    like(@warning[2], qr/Duplicate modifier '<' after 'I' in unpack/);
-    like(@warning[3], qr/Duplicate modifier '!' after 'l' in unpack/);
-    like(@warning[4], qr/Duplicate modifier '>' after 'l' in unpack/);
-  };
+    my $x = pack( 'I,A', 4, 'X' );
+    like( @warning[0], qr{Invalid type ','} );
+
+    # comma warning only once
+    @warning = @( () );
+    $x = pack( 'C(C,C)C,C', < 65..71  );
+    like( scalar nelems @warning, 1 );
+
+    # forbidden code in []
+    try { my $x = pack( 'A[@4]', 'XXXX' ); };
+    like( $^EVAL_ERROR->{?description}, qr{Within \[\]-length '\@' not allowed} );
+
+    # @ repeat default 1
+    my $s = pack( 'AA@A', 'A', 'B', 'C' );
+    my @c = @( unpack( 'AA@A', $s ) );
+    is( $s, 'AC' );
+    is( "$(join ' ',@c)", "A C C" );
+
+    # no unpack code after /
+    try { my @a = @( unpack( "C/", "\3" ) ); };
+    like( $^EVAL_ERROR->{?description}, qr{Code missing after '/'} );
+
+  SKIP: do {
+        skip $no_endianness, 6 if $no_endianness;
+
+        # modifier warnings
+        @warning = @( () );
+        $x = pack "I>>s!!", 47, 11;
+        ($x) = unpack "I<<l!>!>", 'x'x20;
+        is(scalar nelems @warning, 5);
+        like(@warning[0], qr/Duplicate modifier '>' after 'I' in pack/);
+        like(@warning[1], qr/Duplicate modifier '!' after 's' in pack/);
+        like(@warning[2], qr/Duplicate modifier '<' after 'I' in unpack/);
+        like(@warning[3], qr/Duplicate modifier '!' after 'l' in unpack/);
+        like(@warning[4], qr/Duplicate modifier '>' after 'l' in unpack/);
+    };
 };
 
 do {  # Repeat count [SUBEXPR]
-   my @codes = qw( x A Z a c C W B b H h s v n S i I l V N L p P f F d
+    my @codes = qw( x A Z a c C W B b H h s v n S i I l V N L p P f F d
 		   s! S! i! I! l! L! j J);
-   my $G;
-   if (try { pack 'q', 1 } ) {
-     push @codes, < qw(q Q);
-   } else {
-     push @codes, < qw(s S);	# Keep the count the same
-   }
-   if (try { pack 'D', 1 } ) {
-     push @codes, 'D';
-   } else {
-     push @codes, 'd';	# Keep the count the same
-   }
+    my $G;
+    if (try { pack 'q', 1 } ) {
+        push @codes, < qw(q Q);
+    } else {
+        push @codes, < qw(s S);	# Keep the count the same
+    }
+    if (try { pack 'D', 1 } ) {
+        push @codes, 'D';
+    } else {
+        push @codes, 'd';	# Keep the count the same
+    }
 
-   push @codes, < @+: map { m/^[silqjfdp]/i ?? @("$_<", "$_>") !! @() }, @codes;
+    push @codes, < @+: map { m/^[silqjfdp]/i ?? @("$_<", "$_>") !! @() }, @codes;
 
-   my %val;
-   %val{[ @codes]} =  map { 
-                            my %( 1 => $v, ...) =
-                              %( $( m/ [Xx] /x )=> undef,
-                                 $( m/ [AZa] /x )=> 'something',
-                                 $( m/ C     /x )=> 214,
-                                 $( m/ W     /x )=> 188,
-                                 $( m/ c     /x )=> 114,
-                                 $( m/ [Bb]  /x )=> '101',
-                                 $( m/ [Hh]  /x )=> 'b8',
-                                 $( m/ [svnSiIlVNLqQjJ]  /x )=> 10111,
-                                 $( m/ [FfDd]  /x )=> 1.36514538e67,
-                                 $( m/ [pP]  /x )=> "try this buffer",
-                             );
-                            $v;
-			 }, @codes;
-   my @end = @(0x12345678, 0x23456781, 0x35465768, 0x15263748);
-   my $end = "N4";
+    my %val;
+        %val{[ @codes]} =  map { 
+        my %( 1 => $v, ...) =
+        %( $( m/ [Xx] /x )=> undef,
+            $( m/ [AZa] /x )=> 'something',
+                $( m/ C     /x )=> 214,
+                $( m/ W     /x )=> 188,
+                $( m/ c     /x )=> 114,
+                $( m/ [Bb]  /x )=> '101',
+                $( m/ [Hh]  /x )=> 'b8',
+                $( m/ [svnSiIlVNLqQjJ]  /x )=> 10111,
+                $( m/ [FfDd]  /x )=> 1.36514538e67,
+                $( m/ [pP]  /x )=> "try this buffer",
+        );
+        $v;
+    }, @codes;
+    my @end = @(0x12345678, 0x23456781, 0x35465768, 0x15263748);
+    my $end = "N4";
 
-   for my $type ( @codes) {
-     my @list = @( %val{?$type} );
-     @list = @( () ) unless defined @list[0];
-     for my $count (@('', '3', '[11]')) {
-       my $c = 1;
-       $c = $1 if $count =~ m/(\d+)/;
-       my @list1 = @list;
-       @list1 = @list1 x $c unless $type =~ m/[XxAaZBbHhP]/;
-       for my $groupend (@('', ')2', ')[8]')) {
-	   my $groupbegin = ($groupend ?? '(' !! '');
-	   $c = 1;
-	   $c = $1 if $groupend =~ m/(\d+)/;
-	   my @list2 = @list1 x $c ;
+    for my $type ( @codes) {
+        my @list = @( %val{?$type} );
+        @list = @( () ) unless defined @list[0];
+        for my $count (@('', '3', '[11]')) {
+            my $c = 1;
+            $c = $1 if $count =~ m/(\d+)/;
+            my @list1 = @list;
+            @list1 = @list1 x $c unless $type =~ m/[XxAaZBbHhP]/;
+            for my $groupend (@('', ')2', ')[8]')) {
+                my $groupbegin = ($groupend ?? '(' !! '');
+                $c = 1;
+                $c = $1 if $groupend =~ m/(\d+)/;
+                my @list2 = @list1 x $c ;
 
-           SKIP: do {
-	     my $junk1 = "$groupbegin $type$count $groupend";
-             info "junk1=$junk1";
-	     my $p = try { pack $junk1, < @list2 };
-             skip "cannot pack '$type' on this perl", 12
-               if is_valid_error($^EVAL_ERROR);
-	     die "pack $junk1 failed: $($^EVAL_ERROR->message)" if $^EVAL_ERROR;
+              SKIP: do {
+                    my $junk1 = "$groupbegin $type$count $groupend";
+                    info "junk1=$junk1";
+                    my $p = try { pack $junk1, < @list2 };
+                    skip "cannot pack '$type' on this perl", 12
+                        if is_valid_error($^EVAL_ERROR);
+                    die "pack $junk1 failed: $($^EVAL_ERROR->message)" if $^EVAL_ERROR;
 
-	     my $half = int( (length $p)/2 );
-	     for my $move (@('', "X$half", "X!$half", 'x1', 'x!8', "x$half")) {
-	       my $junk = "$junk1 $move";
-	       info "junk='$junk', end='$end' list=($(join ', ', @list2))";
-	       $p = pack "$junk $end", < @list2, < @end;
-	       my @l = @( unpack "x[$junk] $end", $p );
-	       is(scalar nelems @l, scalar nelems @end);
-	       is("$(join ' ',@l)", "$(join ' ',@end)", "skipping x[$junk]");
-	     }
-           };
-       }
-     }
-   }
+                    my $half = int( (length $p)/2 );
+                    for my $move (@('', "X$half", "X!$half", 'x1', 'x!8', "x$half")) {
+                        my $junk = "$junk1 $move";
+                        info "junk='$junk', end='$end' list=($(join ', ', @list2))";
+                        $p = pack "$junk $end", < @list2, < @end;
+                        my @l = @( unpack "x[$junk] $end", $p );
+                        is(scalar nelems @l, scalar nelems @end);
+                        is("$(join ' ',@l)", "$(join ' ',@end)", "skipping x[$junk]");
+                    }
+                };
+            }
+        }
+    }
 };
 
 # / is recognized after spaces in scalar context
@@ -1381,46 +1381,46 @@ is(scalar unpack('A /A Z20', pack 'A/A* Z20', 'bcde', 'xxxxx'), 'bcde');
 is(scalar unpack('A /A /A Z20', '3004bcde'), 'bcde');
 
 do { # X! and x!
-  my $t = 'C[3]  x!8 C[2]';
-  my @a =0x73..0x77;
-  my $p = pack($t, < @a);
-  is($p, "\x[737475]\0\0\0\0\0\x[7677]");
-  my @b = @( unpack $t, $p );
-  is(scalar nelems @b, scalar nelems @a);
-  is("$(join ' ',@b)", "$(join ' ',@a)", 'x!8');
-  $t = 'x[5] C[6] X!8 C[2]';
-  @a =0x73..0x7a;
-  $p = pack($t, < @a);
-  is($p, "\0\0\0\0\0\x[737475797a]");
-  @b = @( unpack $t, $p );
-  @a = @( <0x73..0x75, 0x79, 0x7a, 0x79, 0x7a);
-  is(scalar nelems @b, scalar nelems @a);
-  is("$(join ' ',@b)", "$(join ' ',@a)");
+    my $t = 'C[3]  x!8 C[2]';
+    my @a =0x73..0x77;
+    my $p = pack($t, < @a);
+    is($p, "\x[737475]\0\0\0\0\0\x[7677]");
+    my @b = @( unpack $t, $p );
+    is(scalar nelems @b, scalar nelems @a);
+    is("$(join ' ',@b)", "$(join ' ',@a)", 'x!8');
+    $t = 'x[5] C[6] X!8 C[2]';
+    @a =0x73..0x7a;
+    $p = pack($t, < @a);
+    is($p, "\0\0\0\0\0\x[737475797a]");
+    @b = @( unpack $t, $p );
+    @a = @( <0x73..0x75, 0x79, 0x7a, 0x79, 0x7a);
+    is(scalar nelems @b, scalar nelems @a);
+    is("$(join ' ',@b)", "$(join ' ',@a)");
 };
 
 do { # struct {char c1; double d; char cc[2];}
-  my $t = 'C x![d] d C[2]';
-  my @a = @(173, 1.283476517e-45, 42, 215);
-  my $p = pack $t, < @a;
-  ok( length $p);
-  my @b = @( unpack "$t X[$t] $t", $p );	# Extract, step back, extract again
-  is(scalar nelems @b, 2 * scalar nelems @a);
-  $b = "$(join ' ',@b)";
-  $b =~ s/(?:17000+|16999+)\d+(e-45) /17$1 /gi; # stringification is gamble
-  is($b, "$(join ' ',@a) $(join ' ',@a)");
+    my $t = 'C x![d] d C[2]';
+    my @a = @(173, 1.283476517e-45, 42, 215);
+    my $p = pack $t, < @a;
+    ok( length $p);
+    my @b = @( unpack "$t X[$t] $t", $p );	# Extract, step back, extract again
+    is(scalar nelems @b, 2 * scalar nelems @a);
+    $b = "$(join ' ',@b)";
+    $b =~ s/(?:17000+|16999+)\d+(e-45) /17$1 /gi; # stringification is gamble
+    is($b, "$(join ' ',@a) $(join ' ',@a)");
 
-  use warnings < qw(NONFATAL all);;
-  my $warning;
-  local $^WARN_HOOK = sub {
-      $warning = @_[0];
-  };
-  @b = @( unpack "x[C] x[$t] X[$t] X[C] $t", "$p\0" );
+    use warnings < qw(NONFATAL all);;
+    my $warning;
+    local $^WARN_HOOK = sub {
+            $warning = @_[0];
+        };
+    @b = @( unpack "x[C] x[$t] X[$t] X[C] $t", "$p\0" );
 
-  is($warning, undef);
-  is(scalar nelems @b, scalar nelems @a);
-  $b = "$(join ' ',@b)";
-  $b =~ s/(?:17000+|16999+)\d+(e-45) /17$1 /gi; # stringification is gamble
-  is($b, "$(join ' ',@a)");
+    is($warning, undef);
+    is(scalar nelems @b, scalar nelems @a);
+    $b = "$(join ' ',@b)";
+    $b =~ s/(?:17000+|16999+)\d+(e-45) /17$1 /gi; # stringification is gamble
+    is($b, "$(join ' ',@a)");
 };
 
 is(length(pack("j", 0)), config_value("ivsize"));
@@ -1445,46 +1445,46 @@ my %cant_checksum = %( < @+: map { @: $_=> 1 }, qw(A Z u w) );
 # not a b B h H
 foreach my $template (qw(A Z c C s S i I l L n N v V q Q j J f d F D u U w)) {
   SKIP: do {
-    my $packed = try {pack "$($template)4", 1, 4, 9, 16};
-    if ($^EVAL_ERROR) {
-      die unless $^EVAL_ERROR->{?description} =~ m/Invalid type '$template'/;
-      skip ("$template not supported on this perl",
-            %cant_checksum{?$template} ?? 4 !! 8);
-    }
-    my @unpack4 = @( unpack "$($template)4", $packed );
-    my @unpack = @( unpack "$($template)*", $packed );
-    my @unpack1 = @( unpack "$($template)", $packed );
-    my @unpack1s = @( scalar unpack "$($template)", $packed );
-    my @unpack4s = @( scalar unpack "$($template)4", $packed );
-    my @unpacks = @( scalar unpack "$($template)*", $packed );
+        my $packed = try {pack "$($template)4", 1, 4, 9, 16};
+        if ($^EVAL_ERROR) {
+            die unless $^EVAL_ERROR->{?description} =~ m/Invalid type '$template'/;
+            skip ("$template not supported on this perl",
+                  %cant_checksum{?$template} ?? 4 !! 8);
+        }
+        my @unpack4 = @( unpack "$($template)4", $packed );
+        my @unpack = @( unpack "$($template)*", $packed );
+        my @unpack1 = @( unpack "$($template)", $packed );
+        my @unpack1s = @( scalar unpack "$($template)", $packed );
+        my @unpack4s = @( scalar unpack "$($template)4", $packed );
+        my @unpacks = @( scalar unpack "$($template)*", $packed );
 
-    my @tests = @( \@("$($template)4 vs $($template)*", \@unpack4, \@unpack),
-                  \@("scalar $($template) $($template)", \@unpack1s, \@unpack1),
-                  \@("scalar $($template)4 vs $($template)", \@unpack4s, \@unpack1),
-                  \@("scalar $($template)* vs $($template)", \@unpacks, \@unpack1),
-                );
+        my @tests = @( \@("$($template)4 vs $($template)*", \@unpack4, \@unpack),
+                       \@("scalar $($template) $($template)", \@unpack1s, \@unpack1),
+                       \@("scalar $($template)4 vs $($template)", \@unpack4s, \@unpack1),
+                       \@("scalar $($template)* vs $($template)", \@unpacks, \@unpack1),
+            );
 
-    unless (%cant_checksum{?$template}) {
-      my @unpack4_c = @( unpack "\%$($template)4", $packed );
-      my @unpack_c = @( unpack "\%$($template)*", $packed );
-      my @unpack1_c = @( unpack "\%$($template)", $packed );
-      my @unpack1s_c = @( scalar unpack "\%$($template)", $packed );
-      my @unpack4s_c = @( scalar unpack "\%$($template)4", $packed );
-      my @unpacks_c = @( scalar unpack "\%$($template)*", $packed );
+        unless (%cant_checksum{?$template}) {
+            my @unpack4_c = @( unpack "\%$($template)4", $packed );
+            my @unpack_c = @( unpack "\%$($template)*", $packed );
+            my @unpack1_c = @( unpack "\%$($template)", $packed );
+            my @unpack1s_c = @( scalar unpack "\%$($template)", $packed );
+            my @unpack4s_c = @( scalar unpack "\%$($template)4", $packed );
+            my @unpacks_c = @( scalar unpack "\%$($template)*", $packed );
 
-      push @tests,
-        ( \@("\% $($template)4 vs $($template)*", \@unpack4_c, \@unpack_c),
-          \@("\% scalar $($template) $($template)", \@unpack1s_c, \@unpack1_c),
-          \@("\% scalar $($template)4 vs $($template)*", \@unpack4s_c, \@unpack_c),
-          \@("\% scalar $($template)* vs $($template)*", \@unpacks_c, \@unpack_c),
-        );
-    }
-    foreach my $test ( @tests) {
-      ok (list_eq ($test->[1], $test->[2]), $test->[0]) ||
-        diag sprintf "unpack gave \%s expected \%s", <
-          encode_list (< @{$test->[1]}), < encode_list (< @{$test->[2]});
-    }
-  };
+            push @tests,
+                ( \@("\% $($template)4 vs $($template)*", \@unpack4_c, \@unpack_c),
+                  \@("\% scalar $($template) $($template)", \@unpack1s_c, \@unpack1_c),
+                  \@("\% scalar $($template)4 vs $($template)*", \@unpack4s_c, \@unpack_c),
+                  \@("\% scalar $($template)* vs $($template)*", \@unpacks_c, \@unpack_c),
+                  );
+        }
+        foreach my $test ( @tests) {
+            ok (list_eq ($test->[1], $test->[2]), $test->[0]) ||
+                diag sprintf "unpack gave \%s expected \%s", <
+                     encode_list (< @{$test->[1]}), < encode_list (< @{$test->[2]});
+        }
+    };
 }
 
 ok(pack('u2', 'AA'), "[perl #8026]"); # used to hang and eat RAM in perl 5.7.2
@@ -1504,8 +1504,8 @@ do {
     use warnings < qw(NONFATAL all);;
     my $warning;
     local $^WARN_HOOK = sub {
-        $warning = @_[0]->message;
-    };
+            $warning = @_[0]->message;
+        };
     my $out = pack("u99", "foo" x 99);
     like($warning, qr/Field too wide in 'u' format in pack/,
          "Warn about too wide uuencode");
@@ -1522,9 +1522,9 @@ do {
 
     # verify that the checksum is not overflowed with C0
     if (ord('A') == 193) {
-	is(unpack("C0\%128U", "/bcd"), unpack("U0\%128U", "abcd"), "checksum not overflowed");
+        is(unpack("C0\%128U", "/bcd"), unpack("U0\%128U", "abcd"), "checksum not overflowed");
     } else {
-	is(unpack("C0\%128U", "abcd"), unpack("U0\%128U", "abcd"), "checksum not overflowed");
+        is(unpack("C0\%128U", "abcd"), unpack("U0\%128U", "abcd"), "checksum not overflowed");
     }
 };
 
@@ -1564,56 +1564,56 @@ do {
         #  how many chars it should progress,
         #  (optional) expected result of pack]
         %(a5 => \@("\x[f8f9fafbfc]", 5),
-         A5 => \@("\x[f8f9fafbfc]", 5),
-         Z5 => \@("\x[f8f9fafbfc]", 5, "\x[f8f9fafb00fd]"),
-         b21 => \@("000111111001111101011", 3, "\x[f8f91afb]"),
-         B21 => \@("111110001111100111111", 3, "\x[f8f9f8fb]"),
-         H5 => \@("f8f9f", 3, "\x[f8f9f0fb]"),
-         h5 => \@("8f9fa", 3, "\x[f8f90afb]"),
-         "s<"  => \@(-1544, 2),
-         "s>"  => \@(-1799, 2),
-         "S<"  => \@(0xf9f8, 2),
-         "S>"  => \@(0xf8f9, 2),
-         "l<"  => \@(-67438088, 4),
-         "l>"  => \@(-117835013, 4),
-         "L>"  => \@(0xf8f9fafb, 4),
-         "L<"  => \@(0xfbfaf9f8, 4),
-         n     => \@(0xf8f9, 2),
-         N     => \@(0xf8f9fafb, 4),
-         v     => \@(63992, 2),
-         V     => \@(0xfbfaf9f8, 4),
-         c     => \@(-8, 1),
-         # (invalid unicode) U0U   => \@(0xf8, 1),
-         w     => \@("8715569050387726213", 9),
-         q     => \@("-283686952306184", 8),
-         Q     => \@("18446460386757245432", 8),
-         );
+            A5 => \@("\x[f8f9fafbfc]", 5),
+                Z5 => \@("\x[f8f9fafbfc]", 5, "\x[f8f9fafb00fd]"),
+                b21 => \@("000111111001111101011", 3, "\x[f8f91afb]"),
+                B21 => \@("111110001111100111111", 3, "\x[f8f9f8fb]"),
+                H5 => \@("f8f9f", 3, "\x[f8f9f0fb]"),
+                h5 => \@("8f9fa", 3, "\x[f8f90afb]"),
+                "s<"  => \@(-1544, 2),
+                "s>"  => \@(-1799, 2),
+                "S<"  => \@(0xf9f8, 2),
+                "S>"  => \@(0xf8f9, 2),
+                "l<"  => \@(-67438088, 4),
+                "l>"  => \@(-117835013, 4),
+                "L>"  => \@(0xf8f9fafb, 4),
+                "L<"  => \@(0xfbfaf9f8, 4),
+                n     => \@(0xf8f9, 2),
+                N     => \@(0xf8f9fafb, 4),
+                v     => \@(63992, 2),
+                V     => \@(0xfbfaf9f8, 4),
+                c     => \@(-8, 1),
+                # (invalid unicode) U0U   => \@(0xf8, 1),
+                w     => \@("8715569050387726213", 9),
+                q     => \@("-283686952306184", 8),
+                Q     => \@("18446460386757245432", 8),
+        );
 
     for my $string (@($down, $up)) {
         for my $format (sort {lc($a) cmp lc($b) || $a cmp $b }, keys %expect) {
           SKIP: do {
-              my $expect = %expect{?$format};
-              # unpack upgraded and downgraded string
-              my @result = @( try { unpack("$format C0 W", $string) } );
-              skip "cannot pack/unpack '$format C0 W' on this perl", 5 if
-                  $^EVAL_ERROR && is_valid_error($^EVAL_ERROR);
-              is $^EVAL_ERROR, '', "no errors";
-              is((nelems @result), 2, "Two results from unpack $format C0 W");
+                my $expect = %expect{?$format};
+                # unpack upgraded and downgraded string
+                my @result = @( try { unpack("$format C0 W", $string) } );
+                skip "cannot pack/unpack '$format C0 W' on this perl", 5 if
+                    $^EVAL_ERROR && is_valid_error($^EVAL_ERROR);
+                is $^EVAL_ERROR, '', "no errors";
+                is((nelems @result), 2, "Two results from unpack $format C0 W");
 
-              # pack to downgraded
-              my $new = pack("$format C0 W", < @result);
-              is(length($new), $expect->[1]+1,
-                 "pack $format C0 W should give $expect->[1]+1 chars");
-              is($new, $expect->[?2] || substr($string, 0, length $new),
-                 "pack $format C0 W returns expected value");
+                # pack to downgraded
+                my $new = pack("$format C0 W", < @result);
+                is(length($new), $expect->[1]+1,
+                   "pack $format C0 W should give $expect->[1]+1 chars");
+                is($new, $expect->[?2] || substr($string, 0, length $new),
+                   "pack $format C0 W returns expected value");
 
-              # pack to upgraded
-              $new = pack("a0 $format C0 W", utf8::chr(256), < @result);
-              is(length($new), $expect->[1]+1,
-                 "pack a0 $format C0 W should give $expect->[1]+1 chars");
-              is($new, $expect->[?2] || substr($string, 0, length $new),
-                 "pack a0 $format C0 W returns expected value");
-          };
+                # pack to upgraded
+                $new = pack("a0 $format C0 W", utf8::chr(256), < @result);
+                is(length($new), $expect->[1]+1,
+                   "pack a0 $format C0 W should give $expect->[1]+1 chars");
+                is($new, $expect->[?2] || substr($string, 0, length $new),
+                   "pack a0 $format C0 W returns expected value");
+            };
         }
     }
 };
@@ -1622,32 +1622,32 @@ do {
     # use utf8 neutrality, numbers
     for (@( ( < map { \@($_, -2.68) }, qw(s S i I l L j J f d F D q Q
                                    s! S! i! I! l! L! n! N! v! V!)),
-          \@('C', 253), \@('u', "\x[f8f9fafbfcfdfeff0506]"),
-          \@('U', 0x300), \@('a3', "abc"), \@('a0', ''),
-          \@('A3', "abc"), \@('Z3', "ghi"))
-        ) {
+            \@('C', 253), \@('u', "\x[f8f9fafbfcfdfeff0506]"),
+            \@('U', 0x300), \@('a3', "abc"), \@('a0', ''),
+            \@('A3', "abc"), \@('Z3', "ghi"))
+    ) {
       SKIP: do {
-          my @($format, $val) =  @$_;
-          no utf8;
-          my $down = try { pack($format, $val) };
-          skip "cannot pack/unpack $format on this perl", 9 if
-              $^EVAL_ERROR && is_valid_error($^EVAL_ERROR);
-          use utf8;
-          my $up = pack("$format", $val);
-          is($down, $up, "$format generated strings are equal though");
-          no utf8;
-          my @down_expanded = @( unpack("$format W", $down . chr(0x66)) );
-          is((nelems @down_expanded), 2, "Expand to two values");
-          is(@down_expanded[1], 0x66,
-             "unpack $format left us at the expected position");
-          use utf8;
-          my @up_expanded   = @( unpack("$format W", $up   . chr(0x66)) );
-          is((nelems @up_expanded), 2, "Expand to two values");
-          is(@up_expanded[1], 0x66,
-             "unpack $format left us at the expected position");
-          is(@down_expanded[0], @up_expanded[0], "$format unpack was neutral");
-          is(pack($format, @down_expanded[0]), $down, "Pack $format undoes unpack $format");
-      };
+            my @($format, $val) =  @$_;
+            no utf8;
+            my $down = try { pack($format, $val) };
+            skip "cannot pack/unpack $format on this perl", 9 if
+                $^EVAL_ERROR && is_valid_error($^EVAL_ERROR);
+            use utf8;
+            my $up = pack("$format", $val);
+            is($down, $up, "$format generated strings are equal though");
+            no utf8;
+            my @down_expanded = @( unpack("$format W", $down . chr(0x66)) );
+            is((nelems @down_expanded), 2, "Expand to two values");
+            is(@down_expanded[1], 0x66,
+               "unpack $format left us at the expected position");
+            use utf8;
+            my @up_expanded   = @( unpack("$format W", $up   . chr(0x66)) );
+            is((nelems @up_expanded), 2, "Expand to two values");
+            is(@up_expanded[1], 0x66,
+               "unpack $format left us at the expected position");
+            is(@down_expanded[0], @up_expanded[0], "$format unpack was neutral");
+            is(pack($format, @down_expanded[0]), $down, "Pack $format undoes unpack $format");
+        };
     }
 };
 

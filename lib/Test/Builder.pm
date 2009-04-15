@@ -20,17 +20,17 @@ Test::Builder - Backend for building test libraries
 
 =head1 SYNOPSIS
 
-  package My::Test::Module;
-  use base 'Test::Builder::Module';
+package My::Test::Module;
+use base 'Test::Builder::Module';
 
-  my $CLASS = __PACKAGE__;
+my $CLASS = __PACKAGE__;
 
-  sub ok {
-      my($test, $name) = @_;
-      my $tb = $CLASS->builder;
+sub ok {
+my($test, $name) = @_;
+my $tb = $CLASS->builder;
 
-      $tb->ok($test, $name);
-  }
+$tb->ok($test, $name);
+}
 
 
 =head1 DESCRIPTION
@@ -46,7 +46,7 @@ work together>.
 
 =item B<new>
 
-  my $Test = Test::Builder->new;
+my $Test = Test::Builder->new;
 
 Returns a Test::Builder object representing the current state of the
 test.
@@ -72,7 +72,7 @@ sub new {
 
 =item B<create>
 
-  my $Test = Test::Builder->create;
+my $Test = Test::Builder->create;
 
 Ok, so there can be more than one Test::Builder object and this is how
 you get it.  You might use this instead of C<new()> if you're testing
@@ -95,7 +95,7 @@ sub create {
 
 =item B<reset>
 
-  $Test->reset;
+$Test->reset;
 
 Reinitializes the Test::Builder singleton to its original state.
 Mostly useful for tests run in persistent environments where the same
@@ -147,9 +147,9 @@ are.  You usually only want to call one of these methods.
 
 =item B<plan>
 
-  $Test->plan('no_plan');
-  $Test->plan( skip_all => $reason );
-  $Test->plan( tests => $num_tests );
+$Test->plan('no_plan');
+$Test->plan( skip_all => $reason );
+$Test->plan( tests => $num_tests );
 
 A convenient way to set up your tests.  Call this and Test::Builder
 will print the appropriate headers and take the appropriate actions.
@@ -194,8 +194,8 @@ sub plan($self, $cmd, ?$arg) {
 
 =item B<expected_tests>
 
-    my $max = $Test->expected_tests;
-    $Test->expected_tests($max);
+my $max = $Test->expected_tests;
+$Test->expected_tests($max);
 
 Gets/sets the # of tests we expect this test to run and prints out
 the appropriate headers.
@@ -208,7 +208,7 @@ sub expected_tests {
 
     if( (nelems @_) ) {
         die("Number of tests must be a positive integer.  You gave it '$max'")
-          unless $max =~ m/^\+?\d+$/ and $max +> 0;
+            unless $max =~ m/^\+?\d+$/ and $max +> 0;
 
         $self->{+Expected_Tests} = $max;
         $self->{+Have_Plan}      = 1;
@@ -221,7 +221,7 @@ sub expected_tests {
 
 =item B<no_plan>
 
-  $Test->no_plan;
+$Test->no_plan;
 
 Declares that this test will run an indeterminate # of tests.
 
@@ -236,7 +236,7 @@ sub no_plan {
 
 =item B<has_plan>
 
-  $plan = $Test->has_plan
+$plan = $Test->has_plan
 
 Find out whether a plan has been defined. $plan is either C<undef> (no plan has been set), C<no_plan> (indeterminate # of tests) or an integer (the number of expected tests).
 
@@ -253,8 +253,8 @@ sub has_plan {
 
 =item B<skip_all>
 
-  $Test->skip_all;
-  $Test->skip_all($reason);
+$Test->skip_all;
+$Test->skip_all($reason);
 
 Skips all the tests, using the given $reason.  Exits immediately with 0.
 
@@ -275,8 +275,8 @@ sub skip_all($self, $reason) {
 
 =item B<exported_to>
 
-  my $pack = $Test->exported_to;
-  $Test->exported_to($pack);
+my $pack = $Test->exported_to;
+$Test->exported_to($pack);
 
 Tells Test::Builder what package you exported your functions to.
 
@@ -308,7 +308,7 @@ $name is always optional.
 
 =item B<ok>
 
-  $Test->ok($test, $name);
+$Test->ok($test, $name);
 
 Your basic test.  Pass if $test is true, fail if $test is false.  Just
 like Test::Simple's ok().
@@ -332,7 +332,7 @@ sub ok($self, $test, ?$name) {
 ERR
 
     my $todo = $self->todo();
-    
+
     # Capture the value of $TODO for the rest of this ok() call
     # so it can more easily be found by other routines.
     local $self->{+TODO} = $todo;
@@ -342,10 +342,10 @@ ERR
 
     unless( $test ) {
         $out .= "not ";
-         %$result{[@('ok', 'actual_ok') ]} = @( ( $todo ?? 1 !! 0 ), 0 );
+            %$result{[@('ok', 'actual_ok') ]} = @( ( $todo ?? 1 !! 0 ), 0 );
     }
     else { 
-        %$result{[@('ok', 'actual_ok') ]} = @( 1, $test );
+            %$result{[@('ok', 'actual_ok') ]} = @( 1, $test );
     }
 
     $out .= "ok";
@@ -379,7 +379,7 @@ ERR
         my $msg = $todo ?? "Failed (TODO)" !! "Failed";
         $self->_print_diag("\n") if env::var('HARNESS_ACTIVE');
 
-    my@(_, $file, $line, ...) =  $self->caller;
+        my@(_, $file, $line, ...) =  $self->caller;
         if( defined $name ) {
             $self->diag(qq[  $msg test '$name'\n]);
             $self->diag(qq[  at $file line $line.\n]);
@@ -410,14 +410,14 @@ sub _is_dualvar($self, $val) {
 
 =item B<is_eq>
 
-  $Test->is_eq($got, $expected, $name);
+$Test->is_eq($got, $expected, $name);
 
 Like Test::More's is().  Checks if $got eq $expected.  This is the
 string version.
 
 =item B<is_num>
 
-  $Test->is_num($got, $expected, $name);
+$Test->is_num($got, $expected, $name);
 
 Like Test::More's is().  Checks if $got == $expected.  This is the
 numeric version.
@@ -474,14 +474,14 @@ DIAGNOSTIC
 
 =item B<isnt_eq>
 
-  $Test->isnt_eq($got, $dont_expect, $name);
+$Test->isnt_eq($got, $dont_expect, $name);
 
 Like Test::More's isnt().  Checks if $got ne $dont_expect.  This is
 the string version.
 
 =item B<isnt_num>
 
-  $Test->isnt_num($got, $dont_expect, $name);
+$Test->isnt_num($got, $dont_expect, $name);
 
 Like Test::More's isnt().  Checks if $got ne $dont_expect.  This is
 the numeric version.
@@ -529,8 +529,8 @@ sub isnt_num($self, $got, $dont_expect, $name) {
 
 =item B<like>
 
-  $Test->like($this, qr/$regex/, $name);
-  $Test->like($this, '/$regex/', $name);
+$Test->like($this, qr/$regex/, $name);
+$Test->like($this, '/$regex/', $name);
 
 Like Test::More's like().  Checks if $this matches the given $regex.
 
@@ -538,8 +538,8 @@ You'll want to avoid qr// if you want your tests to work before 5.005.
 
 =item B<unlike>
 
-  $Test->unlike($this, qr/$regex/, $name);
-  $Test->unlike($this, '/$regex/', $name);
+$Test->unlike($this, qr/$regex/, $name);
+$Test->unlike($this, '/$regex/', $name);
 
 Like Test::More's unlike().  Checks if $this B<does not match> the
 given $regex.
@@ -561,23 +561,23 @@ sub unlike($self, $this, $regex, ?$name) {
 
 =item B<cmp_ok>
 
-  $Test->cmp_ok($this, $type, $that, $name);
+$Test->cmp_ok($this, $type, $that, $name);
 
 Works just like Test::More's cmp_ok().
 
-    $Test->cmp_ok($big_num, '!=', $other_big_num);
+$Test->cmp_ok($big_num, '!=', $other_big_num);
 
 =cut
 
 
 my %numeric_cmps = %( < @+: map { @($_, 1) }, 
- @(                       ("<",  "<=", ">",  ">=", "==", "!=", "<=>")) );
+        @(                       ("<",  "<=", ">",  ">=", "==", "!=", "<=>")) );
 
 sub cmp_ok($self, $got, $type, $expect, ?$name) {
 
     my $test;
     do {
-        local($^EVAL_ERROR,$^OS_ERROR);  # isolate eval
+                          local($^EVAL_ERROR,$^OS_ERROR);  # isolate eval
 
         my $code = $self->_caller_context;
 
@@ -603,10 +603,10 @@ $code" . "\$got $type \$expect;";
 }
 
 sub _cmp_diag($self, $got, $type, $expect) {
-    
+
     $got    = dump::view($got);
     $expect = dump::view($expect);
-    
+
     local $Level = $Level + 1;
     return $self->diag(sprintf <<DIAGNOSTIC, $got, $type, $expect);
     \%s
@@ -638,7 +638,7 @@ These are methods which are used in the course of writing a test but are not the
 
 =item B<BAIL_OUT>
 
-    $Test->BAIL_OUT($reason);
+$Test->BAIL_OUT($reason);
 
 Indicates to the Test::Harness that things are going so badly all
 testing should terminate.  This includes running any additional test
@@ -665,8 +665,8 @@ BAIL_OUT() used to be BAILOUT()
 
 =item B<skip>
 
-    $Test->skip;
-    $Test->skip($why);
+$Test->skip;
+$Test->skip($why);
 
 Skips the current test, reporting $why.
 
@@ -681,12 +681,12 @@ sub skip($self, $why) {
     $self->{+Curr_Test}++;
 
     $self->{Test_Results}->[+$self->{?Curr_Test}-1] = &share(\%(
-        'ok'      => 1,
-        actual_ok => 1,
-        name      => '',
-        type      => 'skip',
-        reason    => $why,
-    ));
+                                                                 'ok'      => 1,
+                                                                     actual_ok => 1,
+                                                                     name      => '',
+                                                                     type      => 'skip',
+                                                                     reason    => $why,
+                                                             ));
 
     my $out = "ok";
     $out   .= " $self->{?Curr_Test}" if $self->use_numbers;
@@ -702,13 +702,13 @@ sub skip($self, $why) {
 
 =item B<todo_skip>
 
-  $Test->todo_skip;
-  $Test->todo_skip($why);
+$Test->todo_skip;
+$Test->todo_skip($why);
 
 Like skip(), only it will declare the test as failing and TODO.  Similar
 to
 
-    print "not ok $tnum # TODO $why\n";
+print "not ok $tnum # TODO $why\n";
 
 =cut
 
@@ -721,12 +721,12 @@ sub todo_skip($self, $why) {
     $self->{+Curr_Test}++;
 
     $self->{Test_Results}->[+$self->{?Curr_Test}-1] = &share(\%(
-        'ok'      => 1,
-        actual_ok => 0,
-        name      => '',
-        type      => 'todo_skip',
-        reason    => $why,
-    ));
+                                                                 'ok'      => 1,
+                                                                     actual_ok => 0,
+                                                                     name      => '',
+                                                                     type      => 'todo_skip',
+                                                                     reason    => $why,
+                                                             ));
 
     my $out = "not ok";
     $out   .= " $self->{?Curr_Test}" if $self->use_numbers;
@@ -742,8 +742,8 @@ sub todo_skip($self, $why) {
 
 =item B<skip_rest>
 
-  $Test->skip_rest;
-  $Test->skip_rest($reason);
+$Test->skip_rest;
+$Test->skip_rest($reason);
 
 Like skip(), only it skips all the rest of the tests you plan to run
 and terminates the test.
@@ -764,8 +764,8 @@ These methods are useful when writing your own test methods.
 
 =item B<maybe_regex>
 
-  $Test->maybe_regex(qr/$regex/);
-  $Test->maybe_regex('/$regex/');
+$Test->maybe_regex(qr/$regex/);
+$Test->maybe_regex('/$regex/');
 
 Convenience method for building testing functions that take regular
 expressions as arguments, but need to work before perl 5.005.
@@ -779,13 +779,13 @@ regular expression, or undef if it's argument is not recognised.
 For example, a version of like(), sans the useful diagnostic messages,
 could be written as:
 
-  sub laconic_like {
-      my ($self, $this, $regex, $name) = @_;
-      my $usable_regex = $self->maybe_regex($regex);
-      die "expecting regex, found '$regex'\n"
-          unless $usable_regex;
-      $self->ok($this =~ m/$usable_regex/, $name);
-  }
+sub laconic_like {
+my ($self, $this, $regex, $name) = @_;
+my $usable_regex = $self->maybe_regex($regex);
+die "expecting regex, found '$regex'\n"
+unless $usable_regex;
+$self->ok($this =~ m/$usable_regex/, $name);
+}
 
 =cut
 
@@ -804,11 +804,11 @@ sub maybe_regex($self, $regex) {
     }
     # Check for '/foo/' or 'm,foo,'
     elsif( @(?$re, ?$opts)        = @($regex =~ m{^ /(.*)/ (\w*) $ }sx)           or
-           @(?_, ?$re, ?$opts) = @: $regex =~ m,^ m([^\w\s]) (.+) \1 (\w*) $,sx
-         )
-    {
-        $usable_regex = length $opts ?? "(?$opts)$re" !! $re;
-    }
+        @(?_, ?$re, ?$opts) = @: $regex =~ m,^ m([^\w\s]) (.+) \1 (\w*) $,sx
+    )
+        {
+            $usable_regex = length $opts ?? "(?$opts)$re" !! $re;
+        }
 
     return $usable_regex;
 }
@@ -816,7 +816,7 @@ sub maybe_regex($self, $regex) {
 
 sub _is_qr {
     my $regex = shift;
-    
+
     # is_regexp() checks for regexes in a robust manner, say if they're
     # blessed.
     return re::is_regexp($regex) if defined &re::is_regexp;
@@ -866,7 +866,7 @@ DIAGNOSTIC
 
 =item B<_try>
 
-    my $return_from_code          = $Test->try(sub { code });
+my $return_from_code          = $Test->try(sub { code });
 
 Works like eval BLOCK except it ensures it has no effect on the rest of the test (ie. $@ is not set) nor is effected by outside interference (ie. $SIG{__DIE__}) and works around some quirks in older Perls.
 
@@ -875,11 +875,11 @@ It is suggested you use this in place of eval BLOCK.
 =cut
 
 sub _try($self, $code) {
-    
+
     local $^OS_ERROR = undef;               # eval can mess up $!
     local $^EVAL_ERROR = undef;               # don't set $@ in the test
     my $return = try { $code->() };
-    
+
     return $return;
 }
 
@@ -888,7 +888,7 @@ sub _try($self, $code) {
 
 =item B<is_fh>
 
-    my $is_fh = $Test->is_fh($thing);
+my $is_fh = $Test->is_fh($thing);
 
 Determines if the given $thing can be used as a filehandle.
 
@@ -903,8 +903,8 @@ sub is_fh {
     return 1 if ref \$maybe_fh eq 'GLOB'; # its a glob
 
     return try { $maybe_fh->isa("IO::Handle") } ||
-           # 5.5.4's tied() and can() doesn't like getting undef
-           try { (tied($maybe_fh) || '')->can('TIEHANDLE') };
+        # 5.5.4's tied() and can() doesn't like getting undef
+        try { (tied($maybe_fh) || '')->can('TIEHANDLE') };
 }
 
 
@@ -918,7 +918,7 @@ sub is_fh {
 
 =item B<level>
 
-    $Test->level($how_high);
+$Test->level($how_high);
 
 How far up the call stack should $Test look when reporting where the
 test failed.
@@ -928,12 +928,12 @@ Defaults to 1.
 Setting L<$Test::Builder::Level> overrides.  This is typically useful
 localized:
 
-    sub my_ok {
-        my $test = shift;
+sub my_ok {
+my $test = shift;
 
-        local $Test::Builder::Level = $Test::Builder::Level + 1;
-        $TB->ok($test);
-    }
+local $Test::Builder::Level = $Test::Builder::Level + 1;
+$TB->ok($test);
+}
 
 To be polite to other functions wrapping your own you usually want to increment C<$Level> rather than set it to a constant.
 
@@ -950,19 +950,19 @@ sub level($self, ?$level) {
 
 =item B<use_numbers>
 
-    $Test->use_numbers($on_or_off);
+$Test->use_numbers($on_or_off);
 
 Whether or not the test should output numbers.  That is, this if true:
 
-  ok 1
-  ok 2
-  ok 3
+ok 1
+ok 2
+ok 3
 
 or this if false
 
-  ok
-  ok
-  ok
+ok
+ok
+ok
 
 Most useful when you can't depend on the test output order, such as
 when threads or forking is involved.
@@ -982,14 +982,14 @@ sub use_numbers($self, ?$use_nums) {
 
 =item B<no_diag>
 
-    $Test->no_diag($no_diag);
+$Test->no_diag($no_diag);
 
 If set true no diagnostics will be printed.  This includes calls to
 diag().
 
 =item B<no_ending>
 
-    $Test->no_ending($no_ending);
+$Test->no_ending($no_ending);
 
 Normally, Test::Builder does some extra diagnostics when the test
 ends.  It also changes the exit code as described below.
@@ -998,7 +998,7 @@ If this is true, none of that will be done.
 
 =item B<no_header>
 
-    $Test->no_header($no_header);
+$Test->no_header($no_header);
 
 If set to true, no "1..N" header will be printed.
 
@@ -1008,13 +1008,13 @@ foreach my $attribute (qw(No_Header No_Ending No_Diag)) {
     my $method = lc $attribute;
 
     my $code = sub {
-        my@($self, ?$no) =  @_;
+            my@($self, ?$no) =  @_;
 
-        if( defined $no ) {
-            $self->{+$attribute} = $no;
-        }
-        return $self->{?$attribute};
-    };
+            if( defined $no ) {
+                $self->{+$attribute} = $no;
+            }
+            return $self->{?$attribute};
+        };
 
     *{Symbol::fetch_glob(__PACKAGE__.'::'.$method)} = $code;
 }
@@ -1033,7 +1033,7 @@ Test::Builder's default output settings will not be affected.
 
 =item B<diag>
 
-    $Test->diag(@msgs);
+$Test->diag(@msgs);
 
 Prints out the given @msgs.  Like C<print>, arguments are simply
 appended together.
@@ -1050,7 +1050,7 @@ We encourage using this rather than calling print directly.
 Returns false.  Why?  Because diag() is often used in conjunction with
 a failing test (C<ok() || diag()>) it "passes through" the failure.
 
-    return ok(...) || diag(...);
+return ok(...) || diag(...);
 
 =for blame transfer
 Mark Fowler <mark@twoshortplanks.com>
@@ -1083,7 +1083,7 @@ sub diag($self, @< @msgs) {
 
 =item B<info>
 
-    $Test->info(@msgs);
+$Test->info(@msgs);
 
 Prints out the given @msgs.  Like C<print>, arguments are simply
 appended together.
@@ -1117,7 +1117,7 @@ sub info($self, @< @msgs) {
 
 =item B<_print>
 
-    $Test->_print(@msgs);
+$Test->_print(@msgs);
 
 Prints to the output() filehandle.
 
@@ -1150,7 +1150,7 @@ sub _print($self, @< @msgs) {
 
 =item B<_print_diag>
 
-    $Test->_print_diag(@msg);
+$Test->_print_diag(@msg);
 
 Like _print, but prints to the current diagnostic filehandle.
 
@@ -1168,8 +1168,8 @@ sub _print_diag {
 
 =item B<output>
 
-    $Test->output($fh);
-    $Test->output($file);
+$Test->output($fh);
+$Test->output($file);
 
 Where normal "ok/not ok" test output should go.
 
@@ -1177,8 +1177,8 @@ Defaults to STDOUT.
 
 =item B<failure_output>
 
-    $Test->failure_output($fh);
-    $Test->failure_output($file);
+$Test->failure_output($fh);
+$Test->failure_output($file);
 
 Where diagnostic output on test failures and diag() should go.
 
@@ -1186,8 +1186,8 @@ Defaults to STDERR.
 
 =item B<todo_output>
 
-    $Test->todo_output($fh);
-    $Test->todo_output($file);
+$Test->todo_output($fh);
+$Test->todo_output($file);
 
 Where diagnostics about todo test failures and diag() should go.
 
@@ -1266,9 +1266,9 @@ sub _dup_stdhandles {
 my $Opened_Testhandles = 0;
 sub _open_testhandles {
     my $self = shift;
-    
+
     return if $Opened_Testhandles;
-    
+
     # We dup STDOUT and STDERR so people can change them in their
     # test suites while still getting normal test output.
     open($Testout, ">&", $^STDOUT) or die "Can't dup STDOUT:  $^OS_ERROR";
@@ -1279,13 +1279,13 @@ sub _open_testhandles {
 
 
 sub _copy_io_layers($self, $src, $dest) {
-    
+
     $self->_try(sub {
-        require PerlIO;
-        my @layers = PerlIO::get_layers($src);
-        
-        binmode $dest, join " ", map { ":$_" }, @layers if (nelems @layers);
-    });
+            require PerlIO;
+            my @layers = PerlIO::get_layers($src);
+
+            binmode $dest, join " ", map { ":$_" }, @layers if (nelems @layers);
+        });
 }
 
 sub _plan_check {
@@ -1306,8 +1306,8 @@ sub _plan_check {
 
 =item B<current_test>
 
-    my $curr_test = $Test->current_test;
-    $Test->current_test($num);
+my $curr_test = $Test->current_test;
+$Test->current_test($num);
 
 Gets/sets the current test number we're on.  You usually shouldn't
 have to set this.
@@ -1334,12 +1334,12 @@ sub current_test($self ?= $num) {
             my $start = (nelems @$test_results) ?? (nelems @$test_results) !! 0;
             for ($start..$num-1) {
                 $test_results->[+$_] = &share(\%(
-                    'ok'      => 1, 
-                    actual_ok => undef, 
-                    reason    => 'incrementing test number', 
-                    type      => 'unknown', 
-                    name      => undef 
-                ));
+                                                  'ok'      => 1, 
+                                                      actual_ok => undef, 
+                                                      reason    => 'incrementing test number', 
+                                                      type      => 'unknown', 
+                                                      name      => undef 
+                                              ));
             }
         }
         # If backward, wipe history.  Its their funeral.
@@ -1353,7 +1353,7 @@ sub current_test($self ?= $num) {
 
 =item B<summary>
 
-    my @tests = $Test->summary;
+my @tests = $Test->summary;
 
 A simple summary of the tests so far.  True for pass, false for fail.
 This is a logical pass/fail, so todos are passes.
@@ -1370,17 +1370,17 @@ sub summary {
 
 =item B<details>
 
-    my @tests = $Test->details;
+my @tests = $Test->details;
 
 Like summary(), but with a lot more detail.
 
-    $tests[$test_num - 1] = 
-            { 'ok'       => is the test considered a pass?
-              actual_ok  => did it literally say 'ok'?
-              name       => name of the test (if any)
-              type       => type of test (if any, see below).
-              reason     => reason for the above (if any)
-            };
+$tests[$test_num - 1] = 
+{ 'ok'       => is the test considered a pass?
+actual_ok  => did it literally say 'ok'?
+name       => name of the test (if any)
+type       => type of test (if any, see below).
+reason     => reason for the above (if any)
+};
 
 'ok' is true if Test::Harness will consider the test to be a pass.
 
@@ -1393,10 +1393,10 @@ tests.
 'type' indicates if it was a special test.  Normal tests have a type
 of ''.  Type can be one of the following:
 
-    skip        see skip()
-    todo        see todo()
-    todo_skip   see todo_skip()
-    unknown     see below
+skip        see skip()
+todo        see todo()
+todo_skip   see todo_skip()
+unknown     see below
 
 Sometimes the Test::Builder test counter is incremented without it
 printing any test output, for example, when current_test() is changed.
@@ -1407,13 +1407,13 @@ They are considered ok, but the name and actual_ok is left undef.
 For example "not ok 23 - hole count # TODO insufficient donuts" would
 result in this structure:
 
-    $tests[22] =    # 23 - 1, since arrays start from 0.
-      { ok        => 1,   # logically, the test passed since it's todo
-        actual_ok => 0,   # in absolute terms, it failed
-        name      => 'hole count',
-        type      => 'todo',
-        reason    => 'insufficient donuts'
-      };
+$tests[22] =    # 23 - 1, since arrays start from 0.
+{ ok        => 1,   # logically, the test passed since it's todo
+actual_ok => 0,   # in absolute terms, it failed
+name      => 'hole count',
+type      => 'todo',
+reason    => 'insufficient donuts'
+};
 
 =cut
 
@@ -1424,8 +1424,8 @@ sub details {
 
 =item B<todo>
 
-    my $todo_reason = $Test->todo;
-    my $todo_reason = $Test->todo($pack);
+my $todo_reason = $Test->todo;
+my $todo_reason = $Test->todo($pack);
 
 todo() looks for a $TODO variable in your tests.  If set, all tests
 will be considered 'todo' (see Test::More and Test::Harness for
@@ -1451,14 +1451,14 @@ sub todo($self, ?$package) {
     return 0 unless $package;
 
     return defined ${*{Symbol::fetch_glob($package.'::TODO')}} ?? ${*{Symbol::fetch_glob($package.'::TODO')}}
-                                     !! 0;
+        !! 0;
 }
 
 =item B<caller>
 
-    my $package = $Test->caller;
-    my($pack, $file, $line) = $Test->caller;
-    my($pack, $file, $line) = $Test->caller($height);
+my $package = $Test->caller;
+my($pack, $file, $line) = $Test->caller;
+my($pack, $file, $line) = $Test->caller($height);
 
 Like the normal caller(), except it reports according to your level().
 
@@ -1483,7 +1483,7 @@ sub caller($self, ?$height) {
 
 =item B<_sanity_check>
 
-  $self->_sanity_check();
+$self->_sanity_check();
 
 Runs a bunch of end of test sanity checks to make sure reality came
 through ok.  If anything is wrong it will die with a fairly friendly
@@ -1497,14 +1497,14 @@ sub _sanity_check {
 
     $self->_whoa($self->{?Curr_Test} +< 0,  'Says here you ran a negative number of tests!');
     $self->_whoa((!$self->{?Have_Plan} and $self->{?Curr_Test}),
-          'Somehow your tests ran without a plan!');
+        'Somehow your tests ran without a plan!');
     $self->_whoa($self->{?Curr_Test} != nelems @{ $self->{?Test_Results} },
-          'Somehow you got a different number of results than tests ran!');
+        'Somehow you got a different number of results than tests ran!');
 }
 
 =item B<_whoa>
 
-  $self->_whoa($check, $description);
+$self->_whoa($check, $description);
 
 A sanity check, similar to assert().  If the $check is true, something
 has gone horribly wrong.  It will die with the given $description and
@@ -1524,7 +1524,7 @@ WHOA
 
 =item B<_my_exit>
 
-  _my_exit($exit_num);
+_my_exit($exit_num);
 
 Perl seems to have some trouble with exiting inside an END block.  5.005_03
 and 5.6.1 both seem to do odd things.  Instead, this function edits $?
@@ -1557,7 +1557,7 @@ sub _ending {
     if( $self->{?Original_Pid} != $^PID ) {
         return;
     }
-    
+
     # Exit if plan() was never called.  This is so "require Test::Simple" 
     # doesn't puke.
     if( !$self->{?Have_Plan} ) {
@@ -1584,7 +1584,7 @@ sub _ending {
         my $empty_result = &share(\%());
         for my $idx ( 0..$self->{?Expected_Tests}-1 ) {
             $test_results->[+$idx] = $empty_result
-              unless defined $test_results->[?$idx];
+                unless defined $test_results->[?$idx];
         }
 
         my $num_failed = nelems( grep { !$_->{?'ok'} },
@@ -1668,9 +1668,9 @@ considered a failure and will exit with 255.
 
 So the exit codes are...
 
-    0                   all tests successful
-    255                 test died or all passed but wrong # of tests run
-    any other number    how many failed (including missing or extras)
+0                   all tests successful
+255                 test died or all passed but wrong # of tests run
+any other number    how many failed (including missing or extras)
 
 If you fail more than 254 tests, it will be reported as 254.
 
@@ -1704,7 +1704,7 @@ E<lt>schwern@pobox.comE<gt>
 =head1 COPYRIGHT
 
 Copyright 2002, 2004 by chromatic E<lt>chromatic@wgz.orgE<gt> and
-                        Michael G Schwern E<lt>schwern@pobox.comE<gt>.
+Michael G Schwern E<lt>schwern@pobox.comE<gt>.
 
 This program is free software; you can redistribute it and/or 
 modify it under the same terms as Perl itself.

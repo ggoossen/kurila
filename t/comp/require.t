@@ -132,38 +132,38 @@ do {
     my $pmc_older = ++$i;
     my $pmc_dies = ++$i;
     if ($ccflags =~ m/(?:^|\s)-DPERL_DISABLE_PMC\b/) {
-	print $^STDOUT, "# .pmc files are ignored, so test that\n";
-	write_file_not_thing('krunch.pmc', '.pmc', $pmc_older);
-	write_file('urkkk.pm', qq(print \$^STDOUT, "ok $simple\n"));
-	write_file('whap.pmc', qq(die "This is not an expected error"));
+        print $^STDOUT, "# .pmc files are ignored, so test that\n";
+        write_file_not_thing('krunch.pmc', '.pmc', $pmc_older);
+        write_file('urkkk.pm', qq(print \$^STDOUT, "ok $simple\n"));
+        write_file('whap.pmc', qq(die "This is not an expected error"));
 
-	print $^STDOUT, "# Sleeping for 2 seconds before creating some more files\n";
-	sleep 2;
+        print $^STDOUT, "# Sleeping for 2 seconds before creating some more files\n";
+        sleep 2;
 
-	write_file('krunch.pm', qq(print \$^STDOUT, "ok $pmc_older\n"));
-	write_file_not_thing('urkkk.pmc', '.pmc', $simple);
-	write_file('whap.pm', qq(die "This is an expected error"));
+        write_file('krunch.pm', qq(print \$^STDOUT, "ok $pmc_older\n"));
+        write_file_not_thing('urkkk.pmc', '.pmc', $simple);
+        write_file('whap.pm', qq(die "This is an expected error"));
     } else {
-	print $^STDOUT, "# .pmc files should be loaded, so test that\n";
-	write_file('krunch.pmc', qq(print \$^STDOUT, "ok $pmc_older\n";));
-	write_file_not_thing('urkkk.pm', '.pm', $simple);
-	write_file('whap.pmc', qq(die "This is an expected error"));
+        print $^STDOUT, "# .pmc files should be loaded, so test that\n";
+        write_file('krunch.pmc', qq(print \$^STDOUT, "ok $pmc_older\n";));
+        write_file_not_thing('urkkk.pm', '.pm', $simple);
+        write_file('whap.pmc', qq(die "This is an expected error"));
 
-	print $^STDOUT, "# Sleeping for 2 seconds before creating some more files\n";
-	sleep 2;
+        print $^STDOUT, "# Sleeping for 2 seconds before creating some more files\n";
+        sleep 2;
 
-	write_file_not_thing('krunch.pm', '.pm', $pmc_older);
-	write_file('urkkk.pmc', qq(print \$^STDOUT, "ok $simple\n";));
-	write_file_not_thing('whap.pm', '.pm', $pmc_dies);
+        write_file_not_thing('krunch.pm', '.pm', $pmc_older);
+        write_file('urkkk.pmc', qq(print \$^STDOUT, "ok $simple\n";));
+        write_file_not_thing('whap.pm', '.pm', $pmc_dies);
     }
     require urkkk;
     require krunch;
     try {CORE::require whap; 1} and die;
 
     if ($^EVAL_ERROR->message =~ m/^This is an expected error/) {
-	print $^STDOUT, "ok $pmc_dies\n";
+        print $^STDOUT, "ok $pmc_dies\n";
     } else {
-	print $^STDOUT, "not ok $pmc_dies\n";
+        print $^STDOUT, "not ok $pmc_dies\n";
     }
 };
 
@@ -190,7 +190,7 @@ $i++; do_require(qq($($utf8)print \$^STDOUT, "ok $i\n"; 1;\n));
 
 END {
     foreach my $file ( @fjles_to_delete) {
-	1 while unlink $file;
+        1 while unlink $file;
     }
 }
 

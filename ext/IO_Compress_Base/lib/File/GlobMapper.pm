@@ -7,10 +7,10 @@ our ($CSH_GLOB);
 
 BEGIN
 {
-        require File::Glob; File::Glob->import( < qw(:glob)) ;
-        $CSH_GLOB = File::Glob::GLOB_CSH() ;
-        #*globber = \&File::Glob::bsd_glob;
-        *globber = \&File::Glob::csh_glob;
+    require File::Glob; File::Glob->import( < qw(:glob)) ;
+    $CSH_GLOB = File::Glob::GLOB_CSH() ;
+    #*globber = \&File::Glob::bsd_glob;
+    *globber = \&File::Glob::csh_glob;
 }
 
 our ($Error);
@@ -26,13 +26,13 @@ $metachars = '.*?[](){}';
 $matchMetaRE = '[' . quotemeta($metachars) . ']';
 
 %mapping = %(
-                '*' => '([^/]*)',
-                '?' => '([^/])',
-                '.' => '\.',
-                '[' => '([',
-                '(' => '(',
-                ')' => ')',
-           );
+        '*' => '([^/]*)',
+            '?' => '([^/])',
+            '.' => '\.',
+            '[' => '([',
+            '(' => '(',
+            ')' => ')',
+    );
 
 %wildCount = %( < @+: map { @: $_ => 1 }, qw/ * ? . { ( [ / );           
 
@@ -59,14 +59,14 @@ sub new
     $outputGlob =~ s/\s*\>\s*$//;
 
     my %object =
-            %(   InputGlob   => $inputGlob,
-                OutputGlob  => $outputGlob,
+        %(   InputGlob   => $inputGlob,
+            OutputGlob  => $outputGlob,
                 GlobFlags   => $flags,
                 Braces      => 0,
                 WildCount   => 0,
                 Pairs       => \@(),
                 Sigil       => '#',
-            );
+        );
 
     my $self = bless \%object, ref($class) || $class ;
 
@@ -75,7 +75,7 @@ sub new
 
     $self->_parseOutputGlob()
         or return undef ;
-    
+
     my @inputFiles = globber($self->{?InputGlob}, $flags) ;
 
     if (GLOB_ERROR)
@@ -138,7 +138,7 @@ sub _parseBit
         { 
             return _unmatched "("
                 if $depth ;
-            
+
             $out .= '|';
         }
         elsif ($2 eq '(')
@@ -275,17 +275,17 @@ sub _parseOutputGlob
     if ($self->{?GlobFlags} ^&^ GLOB_TILDE)
     #if (1)
     {
-        $string =~ s{
+            $string =~ s{
               ^ ~             # find a leading tilde
               (               # save this in $1
                   [^/]        # a non-slash character
                         *     # repeated 0 or more times (0 means me)
               )
             }{$(
-              $1
-                  ?? (getpwnam($1))[[7]]
-                  !! ( $(env::var('HOME')) || $(env::var('LOGDIR')) )
-            )}x;
+            $1
+            ?? (getpwnam($1))[[7]]
+            !! ( $(env::var('HOME')) || $(env::var('LOGDIR')) )
+        )}x;
 
     }
 

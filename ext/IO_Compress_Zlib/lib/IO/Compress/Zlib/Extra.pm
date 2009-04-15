@@ -1,6 +1,6 @@
 package IO::Compress::Zlib::Extra;
 
- 
+
 use warnings;
 use bytes;
 
@@ -76,15 +76,15 @@ sub parseRawExtra
         $offset += GZIP_FEXTRA_SUBFIELD_ID_SIZE;
 
         my $subLen =  unpack("v", substr($data, $offset,
-                                            GZIP_FEXTRA_SUBFIELD_LEN_SIZE));
+            GZIP_FEXTRA_SUBFIELD_LEN_SIZE));
         $offset += GZIP_FEXTRA_SUBFIELD_LEN_SIZE ;
 
         return ExtraFieldError("Truncated in FEXTRA Body Section")
             if $offset + $subLen +> $XLEN ;
 
         my $bad = validateExtraFieldPair( \@($id, 
-                                           substr($data, $offset, $subLen)), 
-                                           $strict, $gzipMode );
+                                             substr($data, $offset, $subLen)), 
+                                          $strict, $gzipMode );
         return $bad if $bad ;
         push @$extraRef, \@($id => substr($data, $offset, $subLen))
             if defined $extraRef;;
@@ -92,7 +92,7 @@ sub parseRawExtra
         $offset += $subLen ;
     }
 
-        
+
     return undef ;
 }
 
@@ -131,7 +131,7 @@ sub parseExtraField
     #                     $id2 => $data2,
     #                     ...
     #                   }
-    
+
     if ( ! ref $dataRef ) {
 
         return undef
@@ -164,7 +164,7 @@ sub parseExtraField
             my $ix = 0;
             while ($ix +<= length(nelems @$data) -1) {
                 my $bad = validateExtraFieldPair(\@($data->[$ix],
-                                                  $data->[$ix+1]), 
+                                                    $data->[$ix+1]), 
                                                  $strict, $gzipMode) ;
                 return $bad if $bad ;
 

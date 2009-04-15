@@ -93,7 +93,7 @@ sub bulk_process {
     open my $fh, "<", $Manifest or die "Could not open '$Manifest':$^OS_ERROR";
 
     print $^STDOUT, "Reading $Manifest\n"
-            if $opts->{?'v'};
+        if $opts->{?'v'};
 
     my $count = 0;
     my $lines = 0;
@@ -141,7 +141,7 @@ sub bulk_process {
         }
     }
     print $^STDOUT, "Found $count files to process out of $lines in '$Manifest'\n"
-            if $opts->{?'v'};
+        if $opts->{?'v'};
 }
 
 sub usage {
@@ -170,11 +170,11 @@ Options:
 
 sub vms_check_name {
 
-# Packed files tend to have multiple dots, which the CRTL may or may not handle
-# properly, so convert to native format.  And depending on how the archive was
-# unpacked, foo.bar.baz may be foo_bar.baz or foo.bar_baz.  N.B. This checks for
-# existence, so is not suitable as-is to generate ODS-2-safe names in preparation
-# for file creation.
+    # Packed files tend to have multiple dots, which the CRTL may or may not handle
+    # properly, so convert to native format.  And depending on how the archive was
+    # unpacked, foo.bar.baz may be foo_bar.baz or foo.bar_baz.  N.B. This checks for
+    # existence, so is not suitable as-is to generate ODS-2-safe names in preparation
+    # for file creation.
 
     my $file = shift;
 

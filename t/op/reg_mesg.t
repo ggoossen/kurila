@@ -20,7 +20,7 @@ our %Config;
 my $inf_m1 = (%Config{?reg_infty} || 32767) - 1;
 my $inf_p1 = $inf_m1 + 2;
 my @death =
-@(
+    @(
  'm/[[=foo=]]/' => 'POSIX syntax [= =] is reserved for future extensions in regex; marked by {#} in m/[[=foo=]{#}]/',
 
  'm/(?<= .*)/' =>  'Variable length lookbehind not implemented in regex m/(?<= .*)/',
@@ -80,13 +80,13 @@ my @death =
  'm/[[=barf=]]/' => 'POSIX syntax [= =] is reserved for future extensions in regex; marked by {#} in m/[[=barf=]{#}]/',
 
  'm/[[.barf.]]/' => 'POSIX syntax [. .] is reserved for future extensions in regex; marked by {#} in m/[[.barf.]{#}]/',
-  
+
  'm/[z-a]/' => 'Invalid [] range "z-a" in regex; marked by {#} in m/[z-a{#}]/',
 
  'm/\p/' => 'Empty \p{} in regex; marked by {#} in m/\p{#}/',
 
  'm/\P{}/' => 'Empty \P{} in regex; marked by {#} in m/\P{{#}}/',
-);
+    );
 
 ##
 ## Key-value pairs of code/error of code that should have non-fatal warnings.
@@ -103,7 +103,7 @@ my @warning = @(
     'm/[a-\pM]/' => 'False [] range "a-\pM" in regex; marked by {#} in m/[a-\pM{#}]/',
     'm/[\pM-x]/' => '\p{...} only supported with unicode in regex; marked by {#} in m/[\pM{#}-x]/',
     "m'\\y'"     => 'Unrecognized escape \y passed through in regex; marked by {#} in m/\y{#}/',
-);
+    );
 
 my $total = ((nelems @death) + nelems @warning)/2;
 
@@ -129,13 +129,13 @@ while ((nelems @death))
     $_ = "x";
     eval $regex;
     if (not $^EVAL_ERROR) {
-	print $^STDOUT, "# oops, $regex didn't die\nnot ok $count\n";
-	next;
+        print $^STDOUT, "# oops, $regex didn't die\nnot ok $count\n";
+        next;
     }
     $result =~ s/{\#}/$marker1/;
     $result =~ s/{\#}/$marker2/;
     if ($^EVAL_ERROR->description !~ m/^\Q$result\E$/) {
-	print $^STDOUT, "# For $regex, expected:\n#  $result\n# Got:\n#  $($^EVAL_ERROR && $^EVAL_ERROR->message)\n#\nnot ";
+        print $^STDOUT, "# For $regex, expected:\n#  $result\n# Got:\n#  $($^EVAL_ERROR && $^EVAL_ERROR->message)\n#\nnot ";
     }
     print $^STDOUT, "ok $count - $regex\n";
 }
@@ -156,20 +156,20 @@ while ((nelems @warning))
 
     if ($^EVAL_ERROR)
     {
-	print $^STDOUT, "# oops, $regex died with:\n#\t$^EVAL_ERROR#\nnot ok $count\n";
-	next;
+        print $^STDOUT, "# oops, $regex died with:\n#\t$^EVAL_ERROR#\nnot ok $count\n";
+        next;
     }
 
     if (not $warning)
     {
-	print $^STDOUT, "# oops, $regex didn't generate a warning\nnot ok $count\n";
-	next;
+        print $^STDOUT, "# oops, $regex didn't generate a warning\nnot ok $count\n";
+        next;
     }
     $result =~ s/{\#}/$marker1/;
     $result =~ s/{\#}/$marker2/;
     if ($warning->description !~ m/^\Q$result\E$/)
     {
-	print $^STDOUT, <<"EOM";
+        print $^STDOUT, <<"EOM";
 # For $regex, expected:
 #   $result
 # Got:
@@ -177,7 +177,7 @@ while ((nelems @warning))
 #
 not ok $count
 EOM
-	next;
+        next;
     }
     print $^STDOUT, "ok $count - $regex\n";
 }

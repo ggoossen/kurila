@@ -8,9 +8,9 @@ IO::Seekable - supply seek based methods for I/O objects
 
 =head1 SYNOPSIS
 
-    use IO::Seekable;
-    package IO::Something;
-    @ISA = qw(IO::Seekable);
+use IO::Seekable;
+package IO::Something;
+@ISA = qw(IO::Seekable);
 
 =head1 DESCRIPTION
 

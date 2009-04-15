@@ -29,16 +29,16 @@ print $^STDOUT, "# oldeuid = $oldeuid, euid = $^EUID\n";
 
 SKIP: do {
     if (!config_value("d_seteuid")) {
-	skip('no seteuid');
+        skip('no seteuid');
     } 
     elsif (config_value("config_args") =~m/Dmksymlinks/) {
-	skip('we cannot chmod symlinks');
+        skip('we cannot chmod symlinks');
     }
     elsif ($bad_chmod) {
-	skip( $bad_chmod );
+        skip( $bad_chmod );
     }
     else {
-	ok( !-w 'TEST' );
+        ok( !-w 'TEST' );
     }
 };
 
@@ -54,9 +54,9 @@ ok( -r 'op' );
 # (unless we have unpacked the source code as uid 1...)
 SKIP: do {
     if (config_value("d_seteuid")) {
-	ok( -w 'op' );
+        ok( -w 'op' );
     } else {
-	skip('no seteuid');
+        skip('no seteuid');
     }
 };
 

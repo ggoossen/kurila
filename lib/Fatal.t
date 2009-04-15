@@ -1,9 +1,9 @@
 #!./perl -w
 
 BEGIN {
-   chdir 't' if -d 't';
-   $^INCLUDE_PATH = @( '../lib' );
-   print $^STDOUT, "1..8\n";
+    chdir 't' if -d 't';
+    $^INCLUDE_PATH = @( '../lib' );
+    print $^STDOUT, "1..8\n";
 }
 
 use Fatal < qw(open close);

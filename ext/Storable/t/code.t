@@ -32,23 +32,23 @@ local *FOO;
 
 @obj =
     @(\@(\&code,                   # code reference
-      sub { 6*7 },
-      $blessed_code,            # blessed code reference
-      \&Another::Package::foo,  # code in another package
-      sub ($x, $y) { 0 },         # prototypes
-      sub { print $^STDOUT, "test\n" },
-      \&Test::ok,               # large scalar
-     ),
+         sub { 6*7 },
+         $blessed_code,            # blessed code reference
+         \&Another::Package::foo,  # code in another package
+         sub ($x, $y) { 0 },         # prototypes
+         sub { print $^STDOUT, "test\n" },
+         \&Test::ok,               # large scalar
+      ),
 
-     \%("a" => sub { "srt" }, "b" => \&code),
+      \%("a" => sub { "srt" }, "b" => \&code),
 
-     sub { ord("a")-ord("7") },
+      sub { ord("a")-ord("7") },
 
-     \&code,
+      \&code,
 
-     \&dclone,                 # XS function
+      \&dclone,                 # XS function
 
-     sub { open my $foo, "/" },
+      sub { open my $foo, "/" },
     );
 
 $Storable::Deparse = 1;
@@ -132,10 +132,10 @@ do {
     local $Storable::Eval = 0;
 
     for my $i (0 .. 1) {
-	$freezed = freeze @obj[$i];
-	$^EVAL_ERROR = "";
-	try { $thawed  = thaw $freezed };
-	ok($^EVAL_ERROR, qr/Can\'t eval/);
+        $freezed = freeze @obj[$i];
+        $^EVAL_ERROR = "";
+        try { $thawed  = thaw $freezed };
+        ok($^EVAL_ERROR, qr/Can\'t eval/);
     }
 };
 
@@ -143,9 +143,9 @@ do {
 
     local $Storable::Deparse = 0;
     for my $i (0 .. 1) {
-	$^EVAL_ERROR = "";
-	try { $freezed = freeze @obj[$i] };
-	ok($^EVAL_ERROR, qr/Can\'t store CODE items/);
+        $^EVAL_ERROR = "";
+        try { $freezed = freeze @obj[$i] };
+        ok($^EVAL_ERROR, qr/Can\'t store CODE items/);
     }
 };
 
@@ -153,11 +153,11 @@ do {
     local $Storable::Eval = 0;
     local $Storable::forgive_me = 1;
     for my $i (0 .. 4) {
-	$freezed = freeze @obj[0]->[$i];
-	$^EVAL_ERROR = "";
-	try { $thawed  = thaw $freezed };
-	ok($^EVAL_ERROR, "");
-	ok($$thawed, qr/^sub/);
+        $freezed = freeze @obj[0]->[$i];
+        $^EVAL_ERROR = "";
+        try { $thawed  = thaw $freezed };
+        ok($^EVAL_ERROR, "");
+        ok($$thawed, qr/^sub/);
     }
 };
 
@@ -169,7 +169,7 @@ do {
 
     open(my $saverr, ">&", $^STDERR);
     open($^STDERR, ">", $devnull) or
-	( print $saverr, "Unable to redirect STDERR: $^OS_ERROR\n" and exit(1) );
+        ( print $saverr, "Unable to redirect STDERR: $^OS_ERROR\n" and exit(1) );
 
     try { $freezed = freeze @obj[0]->[0] };
 
@@ -195,20 +195,20 @@ do {
     ok($^EVAL_ERROR, qr/(trapped|Code sub)/);
 
     if (0) {
-	# Disable or fix this test if the internal representation of Storable
-	# changes.
-	skip("no malicious storable file check", 1);
+        # Disable or fix this test if the internal representation of Storable
+        # changes.
+        skip("no malicious storable file check", 1);
     } else {
-	# Construct malicious storable code
-	$freezed = nfreeze @obj[0]->[0];
-	my $bad_code = ';open FOO, "/badfile"';
-	# 5th byte is (short) length of scalar
-	my $len = ord(substr($freezed, 4, 1));
-	substr($freezed, 4, 1, chr($len+length($bad_code)));
-	substr($freezed, -1, 0, $bad_code);
-	$^EVAL_ERROR = "";
-	try { $thawed = thaw $freezed };
-	ok($^EVAL_ERROR, qr/(trapped|Code sub)/);
+        # Construct malicious storable code
+        $freezed = nfreeze @obj[0]->[0];
+        my $bad_code = ';open FOO, "/badfile"';
+        # 5th byte is (short) length of scalar
+        my $len = ord(substr($freezed, 4, 1));
+        substr($freezed, 4, 1, chr($len+length($bad_code)));
+        substr($freezed, -1, 0, $bad_code);
+        $^EVAL_ERROR = "";
+        try { $thawed = thaw $freezed };
+        ok($^EVAL_ERROR, qr/(trapped|Code sub)/);
     }
 };
 
@@ -227,15 +227,15 @@ do {
 
 do {
     do {
-	package MySafe;
-	sub new { bless \%(), shift }
-	sub reval {
-	    my $source = @_[1];
-	    # Here you can apply some nifty regexpes to ensure the
-	    # safeness of the source code.
-	    my $coderef = eval $source;
-	    $coderef;
-	}
+        package MySafe;
+        sub new { bless \%(), shift }
+        sub reval {
+            my $source = @_[1];
+            # Here you can apply some nifty regexpes to ensure the
+            # safeness of the source code.
+            my $coderef = eval $source;
+            $coderef;
+        }
     };
 
     my $safe = MySafe->new();
@@ -248,11 +248,11 @@ do {
     if ($^EVAL_ERROR ne "") {
         ok(0) for @( ( <1..5));
     } else {
-	ok($thawed->[0]->(), "JAPH");
-	ok($thawed->[1]->(), 42);
-	ok($thawed->[2]->(), "blessed");
-	ok($thawed->[3]->(), "Another::Package");
-	ok(prototype($thawed->[4]), prototype(@obj[0]->[4]));
+        ok($thawed->[0]->(), "JAPH");
+        ok($thawed->[1]->(), 42);
+        ok($thawed->[2]->(), "blessed");
+        ok($thawed->[3]->(), "Another::Package");
+        ok(prototype($thawed->[4]), prototype(@obj[0]->[4]));
     }
 };
 
@@ -268,18 +268,18 @@ do {
     local $Storable::Eval     = 1;
 
     for my $sub (@($short_sub, $long_sub)) {
-	my $res;
+        my $res;
 
-	$res = thaw < freeze \@($sub, $sub);
-	ok(int($res->[0]), int($res->[1]));
+        $res = thaw < freeze \@($sub, $sub);
+        ok(int($res->[0]), int($res->[1]));
 
-	$res = thaw < freeze \@($sclr, $sub, $sub, $sclr);
-	ok(int($res->[0]), int($res->[3]));
-	ok(int($res->[1]), int($res->[2]));
+        $res = thaw < freeze \@($sclr, $sub, $sub, $sclr);
+        ok(int($res->[0]), int($res->[3]));
+        ok(int($res->[1]), int($res->[2]));
 
-	$res = thaw < freeze \@($sub, $sub, $sclr, $sclr);
-	ok(int($res->[0]), int($res->[1]));
-	ok(int($res->[2]), int($res->[3]));
+        $res = thaw < freeze \@($sub, $sub, $sclr, $sclr);
+        ok(int($res->[0]), int($res->[1]));
+        ok(int($res->[2]), int($res->[3]));
     }
 
 };

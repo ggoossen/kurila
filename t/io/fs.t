@@ -30,7 +30,7 @@ my $accurate_timestamps =
       $^OS_NAME eq 'mint'    || $^OS_NAME eq 'cygwin'  ||
       $^OS_NAME eq 'amigaos' || $wd =~ m#$(config_value('afsroot'))/# ||
       $Is_MacOS
-     );
+      );
 
 if (defined &Win32::IsWinNT && Win32::IsWinNT()) {
     if (Win32::FsType() eq 'NTFS') {
@@ -98,25 +98,25 @@ SKIP: do {
     $a_mode = @(stat('a'))[2];
 
     @($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
-     $blksize,$blocks) = @: stat('c');
+      $blksize,$blocks) = @: stat('c');
 
-    SKIP: do {
+  SKIP: do {
         skip "no nlink", 1 if config_value('dont_use_nlink');
 
         is($nlink, 3, "link count of triply-linked file");
     };
 
-    SKIP: do {
+  SKIP: do {
         skip "hard links not that hard in $^OS_NAME", 1 if $^OS_NAME eq 'amigaos';
-	skip "no mode checks", 1 if $skip_mode_checks;
+        skip "no mode checks", 1 if $skip_mode_checks;
 
-#      if ($^O eq 'cygwin') { # new files on cygwin get rwx instead of rw-
-#          is($mode & 0777, 0777, "mode of triply-linked file");
-#      } else {
-            is(sprintf('0%o', $mode ^&^ 0777), 
-               sprintf('0%o', $a_mode ^&^ 0777), 
-               "mode of triply-linked file");
-#      }
+        #      if ($^O eq 'cygwin') { # new files on cygwin get rwx instead of rw-
+        #          is($mode & 0777, 0777, "mode of triply-linked file");
+        #      } else {
+        is(sprintf('0%o', $mode ^&^ 0777), 
+           sprintf('0%o', $a_mode ^&^ 0777), 
+           "mode of triply-linked file");
+    #      }
     };
 };
 
@@ -128,10 +128,10 @@ SKIP: do {
     skip("no link", 7) unless $has_link;
 
     @($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
-     $blksize,$blocks) = @: stat('c');
+      $blksize,$blocks) = @: stat('c');
 
-    SKIP: do {
-	skip "no mode checks", 1 if $skip_mode_checks;
+  SKIP: do {
+        skip "no mode checks", 1 if $skip_mode_checks;
 
         is($mode ^&^ 0777, $newmode, "chmod going through");
     };
@@ -143,19 +143,19 @@ SKIP: do {
     is(chmod($newmode,'c','x'), 2, "chmod two files");
 
     @($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
-     $blksize,$blocks) = @: stat('c');
+      $blksize,$blocks) = @: stat('c');
 
-    SKIP: do {
-	skip "no mode checks", 1 if $skip_mode_checks;
+  SKIP: do {
+        skip "no mode checks", 1 if $skip_mode_checks;
 
         is($mode ^&^ 0777, $newmode, "chmod going through to c");
     };
 
     @($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
-     $blksize,$blocks) = @: stat('x');
+      $blksize,$blocks) = @: stat('x');
 
-    SKIP: do {
-	skip "no mode checks", 1 if $skip_mode_checks;
+  SKIP: do {
+        skip "no mode checks", 1 if $skip_mode_checks;
 
         is($mode ^&^ 0777, $newmode, "chmod going through to x");
     };
@@ -163,12 +163,12 @@ SKIP: do {
     is(unlink('b','x'), 2, "unlink two files");
 
     @(?$dev,?$ino,?$mode,?$nlink,?$uid,?$gid,?$rdev,?$size,?$atime,?$mtime,?$ctime,
-     ?$blksize,?$blocks) = @: stat('b');
+      ?$blksize,?$blocks) = @: stat('b');
 
     is($ino, undef, "ino of removed file b should be undef");
 
     @(?$dev,?$ino,?$mode,?$nlink,?$uid,?$gid,?$rdev,?$size,?$atime,?$mtime,?$ctime,
-     ?$blksize,?$blocks) = @: stat('x');
+      ?$blksize,?$blocks) = @: stat('x');
 
     is($ino, undef, "ino of removed file x should be undef");
 };
@@ -178,13 +178,13 @@ SKIP: do {
     ok(open(my $fh, "<", "a"), "open a");
     is(chmod(0, $fh), 1, "fchmod");
     $mode = @(stat "a")[2];
-    SKIP: do {
+  SKIP: do {
         skip "no mode checks", 1 if $skip_mode_checks;
         is($mode ^&^ 0777, 0, "perm reset");
     };
     is(chmod($newmode, "a"), 1, "fchmod");
     $mode = @(stat $fh)[2];
-    SKIP: do { 
+  SKIP: do { 
         skip "no mode checks", 1 if $skip_mode_checks;
         is($mode ^&^ 0777, $newmode, "perm restored");
     };
@@ -213,7 +213,7 @@ SKIP: do {
 is(rename('a','b'), 1, "rename a b");
 
 @(?$dev,?$ino,?$mode,?$nlink,?$uid,?$gid,?$rdev,?$size,?$atime,?$mtime,?$ctime,
- ?$blksize,?$blocks) = @: stat('a');
+  ?$blksize,?$blocks) = @: stat('a');
 
 is($ino, undef, "ino of renamed file a should be undef");
 
@@ -241,55 +241,55 @@ SKIP: do {
 
 sub check_utime_result {
     @($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
-     $blksize,$blocks) = @: stat('b');
+      $blksize,$blocks) = @: stat('b');
 
- SKIP: do {
-	skip "bogus inode num", 1 if ($^OS_NAME eq 'MSWin32') || ($^OS_NAME eq 'NetWare');
+  SKIP: do {
+        skip "bogus inode num", 1 if ($^OS_NAME eq 'MSWin32') || ($^OS_NAME eq 'NetWare');
 
-	ok($ino,    'non-zero inode num');
+        ok($ino,    'non-zero inode num');
     };
 
- SKIP: do {
-	skip "filesystem atime/mtime granularity too low", 2
-	    unless $accurate_timestamps;
+  SKIP: do {
+        skip "filesystem atime/mtime granularity too low", 2
+            unless $accurate_timestamps;
 
-	print $^STDOUT, "# atime - $atime  mtime - $mtime  delta - $delta\n";
-	if($atime == 500000000 && $mtime == 500000000 + $delta) {
-	    pass('atime');
-	    pass('mtime');
-	}
-	else {
-	    if ($^OS_NAME =~ m/\blinux\b/i) {
-		print $^STDOUT, "# Maybe stat() cannot get the correct atime, ".
-		    "as happens via NFS on linux?\n";
-		$foo = (utime 400000000,500000000 + 2*$delta,'b');
-		my @($new_atime, $new_mtime) =  @(stat('b'))[[8..9]];
-		print $^STDOUT, "# newatime - $new_atime  nemtime - $new_mtime\n";
-		if ($new_atime == $atime && $new_mtime - $mtime == $delta) {
-		    pass("atime - accounted for possible NFS/glibc2.2 bug on linux");
-		    pass("mtime - accounted for possible NFS/glibc2.2 bug on linux");
-		}
-		else {
-		    fail("atime - $atime/$new_atime $mtime/$new_mtime");
-		    fail("mtime - $atime/$new_atime $mtime/$new_mtime");
-		}
-	    }
-	    elsif ($^OS_NAME eq 'VMS') {
-		# why is this 1 second off?
-		is( $atime, 500000001,          'atime' );
-		is( $mtime, 500000000 + $delta, 'mtime' );
-	    }
-	    elsif ($^OS_NAME eq 'beos') {
-            SKIP: do {
-		    skip "atime not updated", 1;
-		};
-		is($mtime, 500000001, 'mtime');
-	    }
-	    else {
-		fail("atime");
-		fail("mtime");
-	    }
-	}
+        print $^STDOUT, "# atime - $atime  mtime - $mtime  delta - $delta\n";
+        if($atime == 500000000 && $mtime == 500000000 + $delta) {
+            pass('atime');
+            pass('mtime');
+        }
+        else {
+            if ($^OS_NAME =~ m/\blinux\b/i) {
+                print $^STDOUT, "# Maybe stat() cannot get the correct atime, ".
+                    "as happens via NFS on linux?\n";
+                $foo = (utime 400000000,500000000 + 2*$delta,'b');
+                my @($new_atime, $new_mtime) =  @(stat('b'))[[8..9]];
+                print $^STDOUT, "# newatime - $new_atime  nemtime - $new_mtime\n";
+                if ($new_atime == $atime && $new_mtime - $mtime == $delta) {
+                    pass("atime - accounted for possible NFS/glibc2.2 bug on linux");
+                    pass("mtime - accounted for possible NFS/glibc2.2 bug on linux");
+                }
+                else {
+                    fail("atime - $atime/$new_atime $mtime/$new_mtime");
+                    fail("mtime - $atime/$new_atime $mtime/$new_mtime");
+                }
+            }
+            elsif ($^OS_NAME eq 'VMS') {
+                # why is this 1 second off?
+                is( $atime, 500000001,          'atime' );
+                is( $mtime, 500000000 + $delta, 'mtime' );
+            }
+            elsif ($^OS_NAME eq 'beos') {
+              SKIP: do {
+                    skip "atime not updated", 1;
+                };
+                is($mtime, 500000001, 'mtime');
+            }
+            else {
+                fail("atime");
+                fail("mtime");
+            }
+        }
     };
 }
 
@@ -303,7 +303,7 @@ SKIP: do {
 is(unlink('b'), 1, "unlink b");
 
 @(?$dev,?$ino,?$mode,?$nlink,?$uid,?$gid,?$rdev,?$size,?$atime,?$mtime,?$ctime,
-    ?$blksize,?$blocks) = @: stat('b');
+  ?$blksize,?$blocks) = @: stat('b');
 is($ino, undef, "ino of unlinked file b should be undef");
 unlink 'c';
 
@@ -315,9 +315,9 @@ chdir $wd || die "Can't cd back to $wd";
 
 SKIP: do {
     skip "Win32/Netware specific test", 2
-      unless ($^OS_NAME eq 'MSWin32') || ($^OS_NAME eq 'NetWare');
+        unless ($^OS_NAME eq 'MSWin32') || ($^OS_NAME eq 'NetWare');
     skip "No symbolic links found to test with", 2
-      unless  `ls -l perl 2>nul` =~ m/^l.*->/;
+        unless  `ls -l perl 2>nul` =~ m/^l.*->/;
 
     system("cp TEST TEST$^PID");
     # we have to copy because e.g. GNU grep gets huffy if we have
@@ -339,7 +339,7 @@ close($iofscom);
 # as per UNIX FAQ.
 
 SKIP: do {
-# Check truncating a closed file.
+    # Check truncating a closed file.
     try { truncate "Iofs.tmp", 5; };
 
     skip("no truncate - $^EVAL_ERROR", 8) if $^EVAL_ERROR;
@@ -350,68 +350,68 @@ SKIP: do {
 
     ok(-z "Iofs.tmp",    "truncation to zero bytes");
 
-#these steps are necessary to check if file is really truncated
-#On Win95, $fh is updated, but file properties aren't
+    #these steps are necessary to check if file is really truncated
+    #On Win95, $fh is updated, but file properties aren't
     open($fh, ">", "Iofs.tmp") or die "Can't create Iofs.tmp";
     print $fh, "x\n" x 200;
     close $fh;
 
-# Check truncating an open file.
+    # Check truncating an open file.
     open($fh, ">>", "Iofs.tmp") or die "Can't open Iofs.tmp for appending";
 
     binmode $fh;
     iohandle::output_autoflush($fh, 1);
 
     do {
-	print $fh, "x\n" x 200;
-	ok(truncate($fh, 200), "fh resize to 200");
+        print $fh, "x\n" x 200;
+        ok(truncate($fh, 200), "fh resize to 200");
     };
 
     if ($needs_fh_reopen) {
-	close ($fh); open ($fh, ">>", "Iofs.tmp") or die "Can't reopen Iofs.tmp";
+        close ($fh); open ($fh, ">>", "Iofs.tmp") or die "Can't reopen Iofs.tmp";
     }
 
-    SKIP: do {
+  SKIP: do {
         if ($^OS_NAME eq 'vos') {
-	    skip ("# TODO - hit VOS bug posix-973 - cannot resize an open file below the current file pos.", 5);
-	}
+            skip ("# TODO - hit VOS bug posix-973 - cannot resize an open file below the current file pos.", 5);
+        }
 
-	is(-s "Iofs.tmp", 200, "fh resize to 200 working (filename check)");
+        is(-s "Iofs.tmp", 200, "fh resize to 200 working (filename check)");
 
-	ok(truncate($fh, 0), "fh resize to zero");
+        ok(truncate($fh, 0), "fh resize to zero");
 
-	if ($needs_fh_reopen) {
-	    close ($fh); open ($fh, ">>", "Iofs.tmp") or die "Can't reopen Iofs.tmp";
-	}
+        if ($needs_fh_reopen) {
+            close ($fh); open ($fh, ">>", "Iofs.tmp") or die "Can't reopen Iofs.tmp";
+        }
 
-	ok(-z "Iofs.tmp", "fh resize to zero working (filename check)");
+        ok(-z "Iofs.tmp", "fh resize to zero working (filename check)");
 
-	close $fh;
+        close $fh;
 
-	open($fh, ">>", "Iofs.tmp") or die "Can't open Iofs.tmp for appending";
+        open($fh, ">>", "Iofs.tmp") or die "Can't open Iofs.tmp for appending";
 
-	binmode $fh;
-	iohandle::output_autoflush($fh, 1);
+        binmode $fh;
+        iohandle::output_autoflush($fh, 1);
 
-	do {
-	    print $fh, "x\n" x 200;
-	    ok(truncate($fh, 100), "fh resize by IO slot");
-	};
+        do {
+            print $fh, "x\n" x 200;
+            ok(truncate($fh, 100), "fh resize by IO slot");
+        };
 
-	if ($needs_fh_reopen) {
-	    close ($fh); open ($fh, ">>", "Iofs.tmp") or die "Can't reopen Iofs.tmp";
-	}
+        if ($needs_fh_reopen) {
+            close ($fh); open ($fh, ">>", "Iofs.tmp") or die "Can't reopen Iofs.tmp";
+        }
 
-	is(-s "Iofs.tmp", 100, "fh resize by IO slot working");
+        is(-s "Iofs.tmp", 100, "fh resize by IO slot working");
 
-	close $fh;
+        close $fh;
     };
 };
 
 # check if rename() can be used to just change case of filename
 SKIP: do {
     skip "Works in Cygwin only if check_case is set to relaxed", 1
-      if (env::var('CYGWIN') && (env::var('CYGWIN') =~ m/check_case:(?:adjust|strict)/));
+        if (env::var('CYGWIN') && (env::var('CYGWIN') =~ m/check_case:(?:adjust|strict)/));
 
     chdir './tmp';
     open($fh, ">",'x') || die "Can't create x";
@@ -430,7 +430,7 @@ if ($^OS_NAME eq 'VMS') {
     # must have delete access to rename a directory
     `set file tmp.dir/protection=o:d`;
     ok(rename('tmp.dir', 'tmp1.dir'), "rename on directories") ||
-      print $^STDOUT, "# errno: $^OS_ERROR\n";
+        print $^STDOUT, "# errno: $^OS_ERROR\n";
 }
 else {
     ok(rename('tmp', 'tmp1'), "rename on directories");

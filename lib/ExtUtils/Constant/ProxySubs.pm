@@ -1,8 +1,8 @@
 package ExtUtils::Constant::ProxySubs;
 
 our ($VERSION, @ISA, %type_to_struct, %type_from_struct, %type_to_sv
-	,    %type_to_C_value, %type_is_a_problem, %type_num_args
-	,    %type_temporary);
+    ,    %type_to_C_value, %type_is_a_problem, %type_num_args
+    ,    %type_temporary);
 require ExtUtils::Constant::XS;
 use ExtUtils::Constant::Utils < qw(C_stringify);
 use ExtUtils::Constant::XS < qw(%XS_TypeSet);
@@ -12,51 +12,51 @@ $VERSION = '0.06';
 
 %type_to_struct =
     %(
-     IV => '{const char *name; I32 namelen; IV value;}',
-     NV => '{const char *name; I32 namelen; NV value;}',
-     UV => '{const char *name; I32 namelen; UV value;}',
-     PV => '{const char *name; I32 namelen; const char *value;}',
-     PVN => '{const char *name; I32 namelen; const char *value; STRLEN len;}',
-     YES => '{const char *name; I32 namelen;}',
-     NO => '{const char *name; I32 namelen;}',
-     UNDEF => '{const char *name; I32 namelen;}',
-     '' => '{const char *name; I32 namelen;} ',
-     );
+        IV => '{const char *name; I32 namelen; IV value;}',
+            NV => '{const char *name; I32 namelen; NV value;}',
+            UV => '{const char *name; I32 namelen; UV value;}',
+            PV => '{const char *name; I32 namelen; const char *value;}',
+            PVN => '{const char *name; I32 namelen; const char *value; STRLEN len;}',
+            YES => '{const char *name; I32 namelen;}',
+            NO => '{const char *name; I32 namelen;}',
+            UNDEF => '{const char *name; I32 namelen;}',
+            '' => '{const char *name; I32 namelen;} ',
+    );
 
 %type_from_struct =
     %(
-     IV => sub { @( @_[0] . '->value' ) },
-     NV => sub { @( @_[0] . '->value' ) },
-     UV => sub { @( @_[0] . '->value' ) },
-     PV => sub { @( @_[0] . '->value' ) },
-     PVN => sub { @( @_[0] . '->value', @_[0] . '->len' ) },
-     YES => sub {},
-     NO => sub {},
-     UNDEF => sub {},
-     '' => sub {},
+        IV => sub { @( @_[0] . '->value' ) },
+            NV => sub { @( @_[0] . '->value' ) },
+            UV => sub { @( @_[0] . '->value' ) },
+            PV => sub { @( @_[0] . '->value' ) },
+            PVN => sub { @( @_[0] . '->value', @_[0] . '->len' ) },
+            YES => sub {},
+            NO => sub {},
+            UNDEF => sub {},
+            '' => sub {},
     );
 
 %type_to_sv = 
     %(
-     IV => sub { "newSViv(@_[0])" },
-     NV => sub { "newSVnv(@_[0])" },
-     UV => sub { "newSVuv(@_[0])" },
-     PV => sub { "newSVpv(@_[0], 0)" },
-     PVN => sub { "newSVpvn(@_[0], @_[1])" },
-     YES => sub { '&PL_sv_yes' },
-     NO => sub { '&PL_sv_no' },
-     UNDEF => sub { '&PL_sv_undef' },
-     '' => sub { '&PL_sv_yes' },
-     SV => sub {"SvREFCNT_inc(@_[0])"},
-     );
+        IV => sub { "newSViv(@_[0])" },
+            NV => sub { "newSVnv(@_[0])" },
+            UV => sub { "newSVuv(@_[0])" },
+            PV => sub { "newSVpv(@_[0], 0)" },
+            PVN => sub { "newSVpvn(@_[0], @_[1])" },
+            YES => sub { '&PL_sv_yes' },
+            NO => sub { '&PL_sv_no' },
+            UNDEF => sub { '&PL_sv_undef' },
+            '' => sub { '&PL_sv_yes' },
+            SV => sub {"SvREFCNT_inc(@_[0])"},
+    );
 
 %type_to_C_value = 
     %(
-     YES => sub {},
-     NO => sub {},
-     UNDEF => sub {},
-     '' => sub {},
-     );
+        YES => sub {},
+            NO => sub {},
+            UNDEF => sub {},
+            '' => sub {},
+    );
 
 sub type_to_C_value {
     my @($self, $type) =  @_;
@@ -68,21 +68,21 @@ sub type_to_C_value {
 # SvREFCNT_inc
 %type_is_a_problem =
     %(
-     # The documentation says *mortal SV*, but we now need a non-mortal copy.
-     SV => 1,
-     );
+        # The documentation says *mortal SV*, but we now need a non-mortal copy.
+        SV => 1,
+    );
 
 %type_temporary =
     %(
-     SV => \@('SV *'),
-     PV => \@('const char *'),
-     PVN => \@('const char *', 'STRLEN'),
-     );
+        SV => \@('SV *'),
+            PV => \@('const char *'),
+            PVN => \@('const char *', 'STRLEN'),
+    );
 %type_temporary{+$_} = \@($_) foreach qw(IV UV NV);
-     
+
 while (my @(?$type, ?$value) =@( each %XS_TypeSet)) {
     %type_num_args{+$type}
-	= defined $value ?? ref $value ?? scalar nelems @$value !! 1 !! 0;
+    = defined $value ?? ref $value ?? scalar nelems @$value !! 1 !! 0;
 }
 %type_num_args{+''} = 0;
 
@@ -90,30 +90,30 @@ sub partition_names($self, $default_type, @< @items) {
     my (%found, @notfound, @trouble);
 
     while (my $item = shift @items) {
-	my $default = delete $item->{default};
-	if ($default) {
-	    # If we find a default value, convert it into a regular item and
-	    # append it to the queue of items to process
-	    my $default_item = \%(< %$item);
-	    $default_item->{+invert_macro} = 1;
-	    $default_item->{+pre} = delete $item->{def_pre};
-	    $default_item->{+post} = delete $item->{def_post};
-	    $default_item->{+type} = shift @$default;
-	    $default_item->{+value} = $default;
-	    push @items, $default_item;
-	} else {
-	    # It can be "not found" unless it's the default (invert the macro)
-	    # or the "macro" is an empty string (ie no macro)
-	    push @notfound, $item unless $item->{?invert_macro}
-		or !$self->macro_to_ifdef( $self->macro_from_item($item));
-	}
+        my $default = delete $item->{default};
+        if ($default) {
+            # If we find a default value, convert it into a regular item and
+            # append it to the queue of items to process
+            my $default_item = \%(< %$item);
+            $default_item->{+invert_macro} = 1;
+            $default_item->{+pre} = delete $item->{def_pre};
+            $default_item->{+post} = delete $item->{def_post};
+            $default_item->{+type} = shift @$default;
+            $default_item->{+value} = $default;
+            push @items, $default_item;
+        } else {
+            # It can be "not found" unless it's the default (invert the macro)
+            # or the "macro" is an empty string (ie no macro)
+            push @notfound, $item unless $item->{?invert_macro}
+                or !$self->macro_to_ifdef( $self->macro_from_item($item));
+        }
 
-	if ($item->{?pre} or $item->{?post} or $item->{?not_constant}
-	    or %type_is_a_problem{?$item->{?type}}) {
-	    push @trouble, $item;
-	} else {
-	    push @{%found{+$item->{?type}}}, $item;
-	}
+        if ($item->{?pre} or $item->{?post} or $item->{?not_constant}
+            or %type_is_a_problem{?$item->{?type}}) {
+            push @trouble, $item;
+        } else {
+            push @{%found{+$item->{?type}}}, $item;
+        }
     }
     # use Data::Dumper; print Dumper \%found;
     return @(\%found, \@notfound, \@trouble);
@@ -122,10 +122,10 @@ sub partition_names($self, $default_type, @< @items) {
 sub boottime_iterator($self, $type, $iterator, $hash, $subname) {
     my $extractor = %type_from_struct{?$type};
     die "Can't find extractor code for type $type"
-	unless defined $extractor;
+        unless defined $extractor;
     my $generator = %type_to_sv{?$type};
     die "Can't find generator code for type $type"
-	unless defined $generator;
+        unless defined $generator;
 
     my $athx = $self->C_constant_prefix_param();
 
@@ -155,7 +155,7 @@ sub WriteConstants {
     my $ARGS = \%(< @_);
 
     my @($c_fh, $xs_fh, $c_subname, $xs_subname, $default_type, $package)
-	=  %{$ARGS}{[qw(C_FH XS_FH C_SUBNAME XS_SUBNAME DEFAULT_TYPE NAME)]};
+        =  %{$ARGS}{[qw(C_FH XS_FH C_SUBNAME XS_SUBNAME DEFAULT_TYPE NAME)]};
 
     my $options = $ARGS->{?PROXYSUBS};
     $options = \%() unless ref $options;
@@ -173,15 +173,15 @@ sub WriteConstants {
     my $items = \%();
 
     my @items = $self->normalise_items (\%(disable_utf8_duplication => 1),
-					$default_type, $what, $items,
-					< @{$ARGS->{NAMES}});
+        $default_type, $what, $items,
+        < @{$ARGS->{NAMES}});
 
     # Partition the values by type. Also include any defaults in here
     # Everything that doesn't have a default needs alternative code for
     # "I'm missing"
     # And everything that has pre or post code ends up in a private block
     my @($found, $notfound, $trouble)
-	=  $self->partition_names($default_type, < @items);
+        =  $self->partition_names($default_type, < @items);
 
     my $pthx = $self->C_constant_prefix_param_defintion();
     my $athx = $self->C_constant_prefix_param();
@@ -284,53 +284,53 @@ EOBOOT
     my %iterator;
 
     $found->{+''}
-        = \ map {\%(< %$_, type=>'', invert_macro => 1)}, @$notfound;
+    = \ map {\%(< %$_, type=>'', invert_macro => 1)}, @$notfound;
 
     foreach my $type (sort keys %$found) {
-	my $struct = %type_to_struct{?$type};
-	my $type_to_value = $self->type_to_C_value($type);
-	my $number_of_args = %type_num_args{?$type};
-	die "Can't find structure definition for type $type"
-	    unless defined $struct;
+        my $struct = %type_to_struct{?$type};
+        my $type_to_value = $self->type_to_C_value($type);
+        my $number_of_args = %type_num_args{?$type};
+        die "Can't find structure definition for type $type"
+            unless defined $struct;
 
-	my $struct_type = $type ?? lc($type) . '_s' !! 'notfound_s';
-	print $c_fh, "struct $struct_type $struct;\n";
+        my $struct_type = $type ?? lc($type) . '_s' !! 'notfound_s';
+        print $c_fh, "struct $struct_type $struct;\n";
 
-	my $array_name = 'values_for_' . ($type ?? lc $type !! 'notfound');
-	print $xs_fh, <<"EOBOOT";
+        my $array_name = 'values_for_' . ($type ?? lc $type !! 'notfound');
+        print $xs_fh, <<"EOBOOT";
 
     static const struct $struct_type $array_name\[] =
       \{
 EOBOOT
 
 
-	foreach my $item ( @{$found->{$type}}) {
+        foreach my $item ( @{$found->{$type}}) {
             my @($name, $namelen, $value, $macro)
-                 =  $self->name_len_value_macro($item);
+                =  $self->name_len_value_macro($item);
 
-	    my $ifdef = $self->macro_to_ifdef($macro);
-	    if (!$ifdef && $item->{?invert_macro}) {
-		carp("Attempting to supply a default for '$name' which has no conditional macro");
-		next;
-	    }
-	    print $xs_fh, $ifdef;
-	    if ($item->{?invert_macro}) {
-		print $xs_fh,
-		    "        /* This is the default value: */\n" if $type;
-		print $xs_fh, "#else\n";
-	    }
-	    print $xs_fh, "        \{ ", join (', ', @( "\"$name\"", $namelen, 
-                                              < &$type_to_value($value))), " \},\n",
-						 $self->macro_to_endif($macro);
-	}
+            my $ifdef = $self->macro_to_ifdef($macro);
+            if (!$ifdef && $item->{?invert_macro}) {
+                carp("Attempting to supply a default for '$name' which has no conditional macro");
+                next;
+            }
+            print $xs_fh, $ifdef;
+            if ($item->{?invert_macro}) {
+                print $xs_fh,
+                    "        /* This is the default value: */\n" if $type;
+                print $xs_fh, "#else\n";
+            }
+            print $xs_fh, "        \{ ", join (', ', @( "\"$name\"", $namelen, 
+                                                        < &$type_to_value($value))), " \},\n",
+                $self->macro_to_endif($macro);
+        }
 
 
-    # Terminate the list with a NULL
-	print $xs_fh, "        \{ NULL, 0", (", 0" x $number_of_args), " \} \};\n";
+        # Terminate the list with a NULL
+        print $xs_fh, "        \{ NULL, 0", (", 0" x $number_of_args), " \} \};\n";
 
-	%iterator{+$type} = "value_for_" . ($type ?? lc $type !! 'notfound');
+        %iterator{+$type} = "value_for_" . ($type ?? lc $type !! 'notfound');
 
-	print $xs_fh, <<"EOBOOT";
+        print $xs_fh, <<"EOBOOT";
 	const struct $struct_type *%iterator{?$type} = $array_name;
 EOBOOT
     }
@@ -345,9 +345,9 @@ EOBOOT
 
     my $add_symbol_subname = $c_subname . '_add_symbol';
     foreach my $type (sort keys %$found) {
-	print $xs_fh, $self->boottime_iterator($type, %iterator{?$type}, 
-					      'symbol_table',
-					      $add_symbol_subname);
+        print $xs_fh, $self->boottime_iterator($type, %iterator{?$type}, 
+            'symbol_table',
+            $add_symbol_subname);
     }
 
     print $xs_fh, <<"EOBOOT";
@@ -398,44 +398,44 @@ EOBOOT
 
     foreach my $item ( @$trouble) {
         my @($name, $namelen, $value, $macro)
-	    =  $self->name_len_value_macro($item);
+            =  $self->name_len_value_macro($item);
         my $ifdef = $self->macro_to_ifdef($macro);
         my $type = $item->{?type};
-	my $type_to_value = $self->type_to_C_value($type);
+        my $type_to_value = $self->type_to_C_value($type);
 
         print $xs_fh, $ifdef;
-	if ($item->{?invert_macro}) {
-	    print $xs_fh,
-		 "        /* This is the default value: */\n" if $type;
-	    print $xs_fh, "#else\n";
-	}
-	my $generator = %type_to_sv{?$type};
-	die "Can't find generator code for type $type"
-	    unless defined $generator;
+        if ($item->{?invert_macro}) {
+            print $xs_fh,
+                "        /* This is the default value: */\n" if $type;
+            print $xs_fh, "#else\n";
+        }
+        my $generator = %type_to_sv{?$type};
+        die "Can't find generator code for type $type"
+            unless defined $generator;
 
-	print $xs_fh, "        \{\n";
-	# We need to use a temporary value because some really troublesome
-	# items use C pre processor directives in their values, and in turn
-	# these don't fit nicely in the macro-ised generator functions
-	my $counter = 0;
-	printf $xs_fh, "            \%s temp\%d;\n", $_, $counter++
-	    foreach  @{%type_temporary{$type}};
+        print $xs_fh, "        \{\n";
+        # We need to use a temporary value because some really troublesome
+        # items use C pre processor directives in their values, and in turn
+        # these don't fit nicely in the macro-ised generator functions
+        my $counter = 0;
+        printf $xs_fh, "            \%s temp\%d;\n", $_, $counter++
+            foreach  @{%type_temporary{$type}};
 
-	print $xs_fh, "            $item->{?pre}\n" if $item->{?pre};
+        print $xs_fh, "            $item->{?pre}\n" if $item->{?pre};
 
-	# And because the code in pre might be both declarations and
-	# statements, we can't declare and assign to the temporaries in one.
-	$counter = 0;
-	printf $xs_fh, "            temp\%d = \%s;\n", $counter++, $_
-	    foreach  &$type_to_value($value);
+        # And because the code in pre might be both declarations and
+        # statements, we can't declare and assign to the temporaries in one.
+        $counter = 0;
+        printf $xs_fh, "            temp\%d = \%s;\n", $counter++, $_
+            foreach  &$type_to_value($value);
 
-	my @tempvarnames = map {sprintf 'temp%d', $_}, 0 .. $counter - 1;
-	printf $xs_fh, <<"EOBOOT", $name, &$generator(<@tempvarnames);
+        my @tempvarnames = map {sprintf 'temp%d', $_}, 0 .. $counter - 1;
+        printf $xs_fh, <<"EOBOOT", $name, &$generator(<@tempvarnames);
 	    $($c_subname)_add_symbol($athx symbol_table, "\%s",
 				    $namelen, \%s);
 EOBOOT
-	print $xs_fh, "        $item->{?post}\n" if $item->{?post};
-	print $xs_fh, "        \}\n";
+        print $xs_fh, "        $item->{?post}\n" if $item->{?post};
+        print $xs_fh, "        \}\n";
 
         print $xs_fh, $self->macro_to_endif($macro);
     }

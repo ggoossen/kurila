@@ -34,7 +34,7 @@ is( $r, "Foo.pm" );
 require Foo::Bar;
 is( $r, join($dirsep, @( "Foo", "Bar.pm")) );
 
-require 'Foo';
+                        require 'Foo';
 is( $r, "Foo" );
 
 eval "use Foo";
@@ -54,20 +54,20 @@ do {
     $r = 11;
     BEGIN { *CORE::GLOBAL::readline = sub (_) { ++$r }; }
     is( ($: ~< *FH)	, 12 );
-if (0) {
-    is( ($: ~< $fh)	, 13 );
-    my $pad_fh;
-    is( ($: ~< $pad_fh)	, 14 );
+    if (0) {
+        is( ($: ~< $fh)	, 13 );
+        my $pad_fh;
+        is( ($: ~< $pad_fh)	, 14 );
 
-    # Non-global readline() override
-    BEGIN { *Rgs::readline = sub (_) { --$r }; }
-    do {
-        package Rgs;
-        ::is( (~< *FH)	, 13 );
-        ::is( (~< $fh)	, 12 );
-        ::is( (~< $pad_fh)	, 11 );
-    };
-}
+        # Non-global readline() override
+        BEGIN { *Rgs::readline = sub (_) { --$r }; }
+        do {
+            package Rgs;
+            ::is( (~< *FH)	, 13 );
+            ::is( (~< $fh)	, 12 );
+            ::is( (~< $pad_fh)	, 11 );
+        };
+    }
 };
 
 # Global readpipe() override
@@ -87,8 +87,8 @@ do {
 # by the indirect object notation
 do {
     local $^WARN_HOOK = sub {
-	main::like( @_[0]->message, qr/^ok overriden/ );
-    };
+            main::like( @_[0]->message, qr/^ok overriden/ );
+        };
     BEGIN { *OverridenWarn::warn = sub { CORE::warn "$(join ' ',@_) overriden"; }; }
     package OverridenWarn;
     sub foo { "ok" }
@@ -106,7 +106,7 @@ do {
 do {
     local &{*CORE::GLOBAL::require};
     *CORE::GLOBAL::require = sub {
-        CORE::require(@_[0]);
-    }        ;
+            CORE::require(@_[0]);
+        }        ;
     require Text::ParseWords;
 };

@@ -15,7 +15,7 @@ ExtUtils::MM_Win95 - method to customize MakeMaker for Win9X
 
 =head1 SYNOPSIS
 
-  You should not be using this module directly.
+You should not be using this module directly.
 
 =head1 DESCRIPTION
 

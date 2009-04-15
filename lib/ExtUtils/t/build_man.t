@@ -36,7 +36,7 @@ END {
 }
 
 ok( chdir 'Big-Dummy', "chdir'd to Big-Dummy" ) ||
-  diag("chdir failed: $^OS_ERROR");
+    diag("chdir failed: $^OS_ERROR");
 
 my $stdout;
 close $^STDOUT;
@@ -48,7 +48,7 @@ do {
     my $mm = WriteMakefile(
         NAME            => 'Big::Dummy',
         VERSION_FROM    => 'lib/Big/Dummy.pm',
-    );
+        );
 
     ok( %{ $mm->{MAN3PODS} } );
 };
@@ -58,7 +58,7 @@ do {
         NAME            => 'Big::Dummy',
         VERSION_FROM    => 'lib/Big/Dummy.pm',
         INSTALLMAN3DIR  => 'none'
-    );
+        );
 
     ok( !%{ $mm->{MAN3PODS} } );
 };
@@ -69,7 +69,7 @@ do {
         NAME            => 'Big::Dummy',
         VERSION_FROM    => 'lib/Big/Dummy.pm',
         MAN3PODS        => \%()
-    );
+        );
 
     is_deeply( $mm->{MAN3PODS}, \%( ) );
 };
@@ -80,7 +80,7 @@ do {
         NAME            => 'Big::Dummy',
         VERSION_FROM    => 'lib/Big/Dummy.pm',
         MAN3PODS        => \%( "Foo.pm" => "Foo.1" )
-    );
+        );
 
     is_deeply( $mm->{MAN3PODS}, \%( "Foo.pm" => "Foo.1" ) );
 };

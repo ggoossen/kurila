@@ -28,7 +28,7 @@ END {
 }
 
 ok( chdir('Big-Dummy'), "chdir'd to Big-Dummy" ) ||
-  diag("chdir failed: $^OS_ERROR");
+    diag("chdir failed: $^OS_ERROR");
 
 my $mpl_out = run(qq{$perl Makefile.PL FIRST_MAKEFILE=jakefile});
 cmp_ok( $^CHILD_ERROR, '==', 0, 'Makefile.PL exited with zero' ) || diag $mpl_out;

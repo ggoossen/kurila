@@ -6,9 +6,9 @@ blib - Use MakeMaker's uninstalled version of a package
 
 =head1 SYNOPSIS
 
- perl -Mblib script [args...]
+perl -Mblib script [args...]
 
- perl -Mblib=dir script [args...]
+perl -Mblib=dir script [args...]
 
 =head1 DESCRIPTION
 
@@ -20,9 +20,9 @@ arbitrary scripts against an uninstalled version of a package.
 
 However it is possible to : 
 
- use blib; 
- or 
- use blib '..';
+use blib; 
+or 
+use blib '..';
 
 etc. if you really must.
 
@@ -45,53 +45,53 @@ $Verbose = 0;
 
 sub import
 {
- my $package = shift;
- my $dir;
- if ($^OS_NAME eq "MSWin32" && -f "Win32.xs") {
-     # We don't use getcwd() on Windows because it will internally
-     # call Win32::GetCwd(), which will get the Win32 module loaded.
-     # That means that it would not be possible to run `make test`
-     # for the Win32 module because blib.pm would always load the
-     # installed version before $^INCLUDE_PATH gets updated with the blib path.
-     chomp($dir = `cd`);
- }
- else {
-     $dir = getcwd;
- }
- if ($^OS_NAME eq 'VMS') { ($dir = VMS::Filespec::unixify($dir)) =~ s-/\z--; }
- if ((nelems @_))
-  {
-   $dir = shift;
-   $dir =~ s/blib\z//;
-   $dir =~ s,/+\z,,;
-   $dir = File::Spec->curdir unless ($dir);
-   die "$dir is not a directory\n" unless (-d $dir);
-  }
- my $i = 5;
- my($blib, $blib_lib, $blib_arch);
- while ($i--)
-  {
-   $blib = File::Spec->catdir($dir, "blib");
-   $blib_lib = File::Spec->catdir($blib, "lib");
+    my $package = shift;
+    my $dir;
+    if ($^OS_NAME eq "MSWin32" && -f "Win32.xs") {
+        # We don't use getcwd() on Windows because it will internally
+        # call Win32::GetCwd(), which will get the Win32 module loaded.
+        # That means that it would not be possible to run `make test`
+        # for the Win32 module because blib.pm would always load the
+        # installed version before $^INCLUDE_PATH gets updated with the blib path.
+        chomp($dir = `cd`);
+    }
+    else {
+        $dir = getcwd;
+    }
+    if ($^OS_NAME eq 'VMS') { ($dir = VMS::Filespec::unixify($dir)) =~ s-/\z--; }
+    if ((nelems @_))
+    {
+        $dir = shift;
+        $dir =~ s/blib\z//;
+        $dir =~ s,/+\z,,;
+        $dir = File::Spec->curdir unless ($dir);
+        die "$dir is not a directory\n" unless (-d $dir);
+    }
+    my $i = 5;
+    my($blib, $blib_lib, $blib_arch);
+    while ($i--)
+    {
+        $blib = File::Spec->catdir($dir, "blib");
+        $blib_lib = File::Spec->catdir($blib, "lib");
 
-   if ($^OS_NAME eq 'MacOS')
-    {
-     $blib_arch = File::Spec->catdir($blib_lib, $MacPerl::Architecture);
-    }
-   else
-    {
-     $blib_arch = File::Spec->catdir($blib, "arch");
-    }
+        if ($^OS_NAME eq 'MacOS')
+        {
+            $blib_arch = File::Spec->catdir($blib_lib, $MacPerl::Architecture);
+        }
+        else
+        {
+            $blib_arch = File::Spec->catdir($blib, "arch");
+        }
 
-   if (-d $blib && -d $blib_arch && -d $blib_lib)
-    {
-     unshift($^INCLUDE_PATH,$blib_arch,$blib_lib);
-     warn "Using $blib\n" if $Verbose;
-     return;
+        if (-d $blib && -d $blib_arch && -d $blib_lib)
+        {
+            unshift($^INCLUDE_PATH,$blib_arch,$blib_lib);
+            warn "Using $blib\n" if $Verbose;
+            return;
+        }
+        $dir = File::Spec->catdir($dir, File::Spec->updir);
     }
-   $dir = File::Spec->catdir($dir, File::Spec->updir);
-  }
- die "Cannot find blib even in $dir\n";
+    die "Cannot find blib even in $dir\n";
 }
 
 1;

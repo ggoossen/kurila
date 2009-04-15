@@ -1,12 +1,12 @@
 BEGIN {
     unless ("A" eq pack('U', 0x41)) {
-	print $^STDOUT, "1..0 # Unicode::Collate " .
-	    "cannot stringify a Unicode code point\n";
-	exit 0;
+        print $^STDOUT, "1..0 # Unicode::Collate " .
+            "cannot stringify a Unicode code point\n";
+        exit 0;
     }
     if (env::var('PERL_CORE')) {
-	chdir('t') if -d 't';
-	$^INCLUDE_PATH = @( $^OS_NAME eq 'MacOS' ?? < qw(::lib) !! < qw(../lib) );
+        chdir('t') if -d 't';
+        $^INCLUDE_PATH = @( $^OS_NAME eq 'MacOS' ?? < qw(::lib) !! < qw(../lib) );
     }
 }
 
@@ -19,16 +19,16 @@ use Unicode::Collate;
 ok(1);
 
 my $trad = Unicode::Collate->new(
-  table => 'keys.txt',
-  normalization => undef,
-  ignoreName => qr/HANGUL|HIRAGANA|KATAKANA|BOPOMOFO/,
-  level => 3,
-  entry => << 'ENTRIES',
+    table => 'keys.txt',
+    normalization => undef,
+    ignoreName => qr/HANGUL|HIRAGANA|KATAKANA|BOPOMOFO/,
+    level => 3,
+    entry => << 'ENTRIES',
  0063 0068 ; [.0A3F.0020.0002.0063] \% "ch" in traditional Spanish
  0043 0068 ; [.0A3F.0020.0007.0043] # "Ch" in traditional Spanish
  0043 0048 ; [.0A3F.0020.0008.0043] # "CH" in traditional Spanish
 ENTRIES
-);
+    );
 # 0063  ; [.0A3D.0020.0002.0063] # LATIN SMALL LETTER C
 # 0064  ; [.0A49.0020.0002.0064] # LATIN SMALL LETTER D
 
@@ -37,12 +37,12 @@ ENTRIES
 is(
   join(':', $trad->sort( < qw/ acha aca ada acia acka / ) ),
   join(':',              qw/ aca acia acka acha ada / ),
-);
+  );
 
 is(
   join(':', $trad->sort( < qw/ ACHA ACA ADA ACIA ACKA / ) ),
   join(':',              qw/ ACA ACIA ACKA ACHA ADA / ),
-);
+  );
 
 ##### 4..7
 
@@ -90,12 +90,12 @@ ok($trad->eq($katakana, $hiragana));
 # a L3-ignorable is treated as a completely ignorable.
 
 my $L3ignorable = Unicode::Collate->new(
-  alternate => 'Non-ignorable',
-  level => 3,
-  table => undef,
-  normalization => undef,
-  UCA_Version => 9,
-  entry => <<'ENTRIES',
+    alternate => 'Non-ignorable',
+    level => 3,
+    table => undef,
+    normalization => undef,
+    UCA_Version => 9,
+    entry => <<'ENTRIES',
 0000  ; [.0000.0000.0000.0000] # [0000] NULL (in 6429)
 0001  ; [.0000.0000.0000.0000] # [0001] START OF HEADING (in 6429)
 0591  ; [.0000.0000.0000.0591] # HEBREW ACCENT ETNAHTA
@@ -110,7 +110,7 @@ my $L3ignorable = Unicode::Collate->new(
 1D1BB ; [*098A.0020.0002.1D1B9][.0000.0000.0000.1D165] # M.S. MINIMA
 1D1BC ; [*098B.0020.0002.1D1BA][.0000.0000.0000.1D165] # M.S. MINIMA BLACK
 ENTRIES
-);
+    );
 
 is($L3ignorable->cmp("\cA", "!"), -1);
 is($L3ignorable->cmp("\x{591}", "!"), -1);
@@ -128,17 +128,17 @@ ok($L3ignorable->eq("\x{1D1BC}", "\x{1D1BA}\x{1D165}"));
 ##### 32..41
 
 my $c = Unicode::Collate->new(
-  table => 'keys.txt',
-  normalization => undef,
-  level => 1,
-  UCA_Version => 14,
-  entry => << 'ENTRIES',
+    table => 'keys.txt',
+    normalization => undef,
+    level => 1,
+    UCA_Version => 14,
+    entry => << 'ENTRIES',
 034F  ; [.0000.0000.0000.034F] # COMBINING GRAPHEME JOINER
 0063 0068 ; [.0A3F.0020.0002.0063] \% "ch" in traditional Spanish
 0043 0068 ; [.0A3F.0020.0007.0043] # "Ch" in traditional Spanish
 0043 0048 ; [.0A3F.0020.0008.0043] # "CH" in traditional Spanish
 ENTRIES
-);
+    );
 # 0063  ; [.0A3D.0020.0002.0063] # LATIN SMALL LETTER C
 # 0064  ; [.0A49.0020.0002.0064] # LATIN SMALL LETTER D
 

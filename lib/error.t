@@ -12,9 +12,9 @@ do {
     is $err->{?description}, "my message";
     is $err->description, "my message", "message function";
     is $err->stacktrace, " at filetest.t line 33 character 11.\n",
-      "stacktrace function";
+       "stacktrace function";
     is $err->message, "my message at filetest.t line 33 character 11.\n",
-      "message function";
+       "message function";
 };
 
 # a bit more complex one, with stack trace.
@@ -38,8 +38,8 @@ MSG
 do {
     my ($line1, $line2);
     try { $line1 = __LINE__;
-           $line2 = __LINE__; die "foobar";
-       };
+        $line2 = __LINE__; die "foobar";
+    };
     is defined $^EVAL_ERROR, 1, '$@ is set';
     is ref $^EVAL_ERROR, "error", '$@ is an error object';
     is $^EVAL_ERROR->{?description}, "foobar";

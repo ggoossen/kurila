@@ -59,49 +59,49 @@ SKIP: do {
     ok(! $sigset->ismember(1),  'POSIX::SigSet->delset' );
     ok(  $sigset->ismember(3),  'POSIX::SigSet->ismember' );
 
-    SKIP: do {
+  SKIP: do {
         skip("no kill() support on Mac OS", 4) if $Is_MacOS;
 
         my $sigint_called = 0;
 
-	my $mask   = POSIX::SigSet->new( &SIGINT( < @_ ));
-	my $action = POSIX::SigAction->new( \&main::SigHUP, $mask, 0);
-	sigaction(&SIGHUP( < @_ ), $action);
-	signals::handler('INT') = \&SigINT;
+        my $mask   = POSIX::SigSet->new( &SIGINT( < @_ ));
+        my $action = POSIX::SigAction->new( \&main::SigHUP, $mask, 0);
+        sigaction(&SIGHUP( < @_ ), $action);
+        signals::handler('INT') = \&SigINT;
 
-	# At least OpenBSD/i386 3.3 is okay, as is NetBSD 1.5.
-	# But not NetBSD 1.6 & 1.6.1: the test makes perl crash.
-	# So the kill() must not be done with this config in order to
-	# finish the test.
-	# For others (darwin & freebsd), let the test fail without crashing.
-	my $todo = $^OS_NAME eq 'netbsd' && config_value('osvers')=~m/^1\.6/;
-	my $why_todo = "# TODO $^OS_NAME config_value('osvers') seems to lose blocked signals";
-	if (!$todo) { 
-	  kill 'HUP', $^PID; 
-	} else {
-	  print $^STDOUT, "not ok 9 - sigaction SIGHUP ",$why_todo,"\n";
-	  print $^STDOUT, "not ok 10 - sig mask delayed SIGINT ",$why_todo,"\n";
-	}
-	sleep 1;
+        # At least OpenBSD/i386 3.3 is okay, as is NetBSD 1.5.
+        # But not NetBSD 1.6 & 1.6.1: the test makes perl crash.
+        # So the kill() must not be done with this config in order to
+        # finish the test.
+        # For others (darwin & freebsd), let the test fail without crashing.
+        my $todo = $^OS_NAME eq 'netbsd' && config_value('osvers')=~m/^1\.6/;
+        my $why_todo = "# TODO $^OS_NAME config_value('osvers') seems to lose blocked signals";
+        if (!$todo) { 
+            kill 'HUP', $^PID; 
+        } else {
+            print $^STDOUT, "not ok 9 - sigaction SIGHUP ",$why_todo,"\n";
+            print $^STDOUT, "not ok 10 - sig mask delayed SIGINT ",$why_todo,"\n";
+        }
+        sleep 1;
 
-	$todo = 1 if ($^OS_NAME eq 'freebsd')
-		  || ($^OS_NAME eq 'darwin' && config_value('osvers') +<= v6.6);
-	printf $^STDOUT, "\%s 11 - masked SIGINT received \%s\n",
-	    $sigint_called ?? "ok" !! "not ok",
-	    $todo ?? $why_todo !! '';
+        $todo = 1 if ($^OS_NAME eq 'freebsd')
+            || ($^OS_NAME eq 'darwin' && config_value('osvers') +<= v6.6);
+        printf $^STDOUT, "\%s 11 - masked SIGINT received \%s\n",
+            $sigint_called ?? "ok" !! "not ok",
+            $todo ?? $why_todo !! '';
 
-	print $^STDOUT, "ok 12 - signal masks successful\n";
-	
-	sub SigHUP {
-	    print $^STDOUT, "ok 9 - sigaction SIGHUP\n";
-	    kill 'INT', $^PID;
-	    sleep 2;
-	    print $^STDOUT, "ok 10 - sig mask delayed SIGINT\n";
-	}
+        print $^STDOUT, "ok 12 - signal masks successful\n";
+
+        sub SigHUP {
+            print $^STDOUT, "ok 9 - sigaction SIGHUP\n";
+            kill 'INT', $^PID;
+            sleep 2;
+            print $^STDOUT, "ok 10 - sig mask delayed SIGINT\n";
+        }
 
         sub SigINT {
             $sigint_called++;
-	}
+        }
 
         # The order of the above tests is very important, so
         # we use literal prints and hard coded numbers.
@@ -181,9 +181,9 @@ my $lc = &POSIX::setlocale(&POSIX::LC_TIME( < @_ ), 'C') if config_value('d_setl
 try_strftime("Wed Feb 28 00:00:00 1996 059", 0,0,0, 28,1,96);
 SKIP: do {
     skip("VC++ 8 and Vista's CRTs regard 60 seconds as an invalid parameter", 1)
-	if ($Is_W32 and ((config_value("cc") eq 'cl' and
-	                 config_value("ccversion") =~ m/^(\d+)/ and $1 +>= 14) or
-	                 (Win32::GetOSVersion())[1] +>= 6));
+        if ($Is_W32 and ((config_value("cc") eq 'cl' and
+                          config_value("ccversion") =~ m/^(\d+)/ and $1 +>= 14) or
+                         (Win32::GetOSVersion())[1] +>= 6));
 
     try_strftime("Thu Feb 29 00:00:60 1996 060", 60,0,-24, 30,1,96);
 };
@@ -198,23 +198,23 @@ try_strftime("Fri Mar 31 00:00:00 2000 091", 0,0,0, 31,2,100);
 
 do {
     for my $test (@(0, 1)) {
-	$^OS_ERROR = 0;
-	# POSIX::errno is autoloaded. 
-	# Autoloading requires many system calls.
-	# errno() looks at $! to generate its result.
-	# Autoloading should not munge the value.
-	my $foo  = $^OS_ERROR;
-	my $errno = POSIX::errno();
+        $^OS_ERROR = 0;
+        # POSIX::errno is autoloaded. 
+        # Autoloading requires many system calls.
+        # errno() looks at $! to generate its result.
+        # Autoloading should not munge the value.
+        my $foo  = $^OS_ERROR;
+        my $errno = POSIX::errno();
 
         # Force numeric context.
-	is( $errno + 0, $foo + 0,     'autoloading and errno() mix' );
+        is( $errno + 0, $foo + 0,     'autoloading and errno() mix' );
     }
 };
 
 SKIP: do {
-  skip("no kill() support on Mac OS", 1) if $Is_MacOS;
-  is (eval "kill 0", 0, "check we have CORE::kill")
-    or print $^STDOUT, "\$\@ is " . _qq($^EVAL_ERROR) . "\n";
+    skip("no kill() support on Mac OS", 1) if $Is_MacOS;
+    is (eval "kill 0", 0, "check we have CORE::kill")
+        or print $^STDOUT, "\$\@ is " . _qq($^EVAL_ERROR) . "\n";
 };
 
 # Check that we can import the POSIX kill routine
@@ -269,18 +269,18 @@ dies_like( sub { POSIX::isprint(\@()) }, qr/reference as string/,   'isalpha []'
 
 try {  POSIX->import("S_ISBLK"); my $x = S_ISBLK };
 unlike( $^EVAL_ERROR, qr/Can't use string .* as a symbol ref/, "Can import autoloaded constants" );
- 
+
 # Check that output is not flushed by _exit. This test should be last
 # in the file, and is not counted in the total number of tests.
 if ($^OS_NAME eq 'vos') {
- print $^STDOUT, "# TODO - hit VOS bug posix-885 - _exit flushes output buffers.\n";
+    print $^STDOUT, "# TODO - hit VOS bug posix-885 - _exit flushes output buffers.\n";
 } else {
- $^OUTPUT_AUTOFLUSH = 0;
- # The following line assumes buffered output, which may be not true:
- print $^STDOUT, '@#!*$@(!@#$' unless ($Is_MacOS || $Is_OS2 || $Is_UWin || $Is_OS390 ||
-                            $Is_VMS ||
-			    (defined env::var('PERLIO') &&
-			     env::var('PERLIO') eq 'unix' &&
-			     Config::config_value("useperlio")));
- _exit(0);
+    $^OUTPUT_AUTOFLUSH = 0;
+    # The following line assumes buffered output, which may be not true:
+    print $^STDOUT, '@#!*$@(!@#$' unless ($Is_MacOS || $Is_OS2 || $Is_UWin || $Is_OS390 ||
+                                          $Is_VMS ||
+                                          (defined env::var('PERLIO') &&
+                                           env::var('PERLIO') eq 'unix' &&
+                                           Config::config_value("useperlio")));
+    _exit(0);
 }

@@ -7,36 +7,36 @@ print $^STDOUT, "1..71\n";
 my $test = 1;
 
 sub test($act, $string, $value) {
-  my $result;
-  if ($act eq 'oct') {
-    $result = oct $string;
-  } elsif ($act eq 'hex') {
-    $result = hex $string;
-  } else {
-    die "Unknown action 'act'";
-  }
-  if ($value == $result) {
-    if ($^OS_NAME eq 'VMS' && length $string +> 256) {
-      $string = '';
+    my $result;
+    if ($act eq 'oct') {
+        $result = oct $string;
+    } elsif ($act eq 'hex') {
+        $result = hex $string;
     } else {
-      $string = "\"$string\"";
+        die "Unknown action 'act'";
     }
-    print $^STDOUT, "ok $test # $act $string\n";
-  } else {
-    my ($valstr, $resstr);
-    if ($act eq 'hex' or $string =~ m/x/) {
-      $valstr = sprintf "0x\%X", $value;
-      $resstr = sprintf "0x\%X", $result;
-    } elsif ($string =~ m/b/) {
-      $valstr = sprintf "0b\%b", $value;
-      $resstr = sprintf "0b\%b", $result;
+    if ($value == $result) {
+        if ($^OS_NAME eq 'VMS' && length $string +> 256) {
+            $string = '';
+        } else {
+            $string = "\"$string\"";
+        }
+        print $^STDOUT, "ok $test # $act $string\n";
     } else {
-      $valstr = sprintf "0\%o", $value;
-      $resstr = sprintf "0\%o", $result;
+        my ($valstr, $resstr);
+        if ($act eq 'hex' or $string =~ m/x/) {
+            $valstr = sprintf "0x\%X", $value;
+            $resstr = sprintf "0x\%X", $result;
+        } elsif ($string =~ m/b/) {
+            $valstr = sprintf "0b\%b", $value;
+            $resstr = sprintf "0b\%b", $result;
+        } else {
+            $valstr = sprintf "0\%o", $value;
+            $resstr = sprintf "0\%o", $result;
+        }
+        print $^STDOUT, "not ok $test # $act \"$string\" gives \"$result\" ($resstr), not $value ($valstr)\n";
     }
-    print $^STDOUT, "not ok $test # $act \"$string\" gives \"$result\" ($resstr), not $value ($valstr)\n";
-  }
-  $test++;
+    $test++;
 }
 
 test ('oct', '0b1_0101', 0b101_01);

@@ -10,7 +10,7 @@ plan tests => 1 + 3 * nelems @constants;
 use_ok('I18N::Langinfo', 'langinfo', < @constants);
 
 for my $constant ( @constants) {
-    SKIP: do {
+  SKIP: do {
         my $string = try { langinfo(eval "$constant()") };
         is( $^EVAL_ERROR && $^EVAL_ERROR->message, '', "calling langinfo() with $constant" );
         skip "returned string was empty, skipping next two tests", 2 unless $string;
@@ -37,35 +37,35 @@ exit(0);
 
 my %want =
     %(
-     ABDAY_1	=> "Sun",
-     DAY_1	=> "Sunday",
-     ABMON_1	=> "Jan",
-     MON_1	=> "January",
-     RADIXCHAR	=> ".",
-     AM_STR	=> qr{^(?:am|a\.m\.)$}i,
-     THOUSEP	=> "",
-     D_T_FMT	=> qr{^\%a \%b \%[de] \%H:\%M:\%S \%Y$},
-     D_FMT	=> qr{^\%m/\%d/\%y$},
-     T_FMT	=> qr{^\%H:\%M:\%S$},
-     );
+        ABDAY_1	=> "Sun",
+            DAY_1	=> "Sunday",
+            ABMON_1	=> "Jan",
+            MON_1	=> "January",
+            RADIXCHAR	=> ".",
+            AM_STR	=> qr{^(?:am|a\.m\.)$}i,
+            THOUSEP	=> "",
+            D_T_FMT	=> qr{^\%a \%b \%[de] \%H:\%M:\%S \%Y$},
+            D_FMT	=> qr{^\%m/\%d/\%y$},
+            T_FMT	=> qr{^\%H:\%M:\%S$},
+    );
 
-    
+
 my @want = sort keys %want;
 
 print $^STDOUT, "1..", scalar nelems @want, "\n";
-    
+
 for my $i (1..nelems @want) {
     my $try = @want[$i-1];
     try { I18N::Langinfo->import($try) };
     unless ($^EVAL_ERROR) {
-	my $got = langinfo( <&$try( < @_ ));
-	if (ref %want{?$try} && $got =~ %want{?$try} || $got eq %want{?$try}) {
-	    print $^STDOUT, qq[ok $i - $try is "$got"\n];
-	} else {
-	    print $^STDOUT, qq[not ok $i - $try is "$got" not "%want{?$try}"\n];
-	}
+        my $got = langinfo( <&$try( < @_ ));
+        if (ref %want{?$try} && $got =~ %want{?$try} || $got eq %want{?$try}) {
+            print $^STDOUT, qq[ok $i - $try is "$got"\n];
+        } else {
+            print $^STDOUT, qq[not ok $i - $try is "$got" not "%want{?$try}"\n];
+        }
     } else {
-	print $^STDOUT, qq[ok $i - Skip: $try not defined\n];
+        print $^STDOUT, qq[ok $i - Skip: $try not defined\n];
     }
 }
 

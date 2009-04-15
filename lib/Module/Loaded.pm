@@ -3,10 +3,10 @@ package Module::Loaded;
 use Carp < qw[carp];
 
 BEGIN { use base 'Exporter';
-        our (@EXPORT, $VERSION);
-        
-        $VERSION = '0.01';
-        @EXPORT  = qw[mark_as_loaded mark_as_unloaded is_loaded];
+    our (@EXPORT, $VERSION);
+
+    $VERSION = '0.01';
+    @EXPORT  = qw[mark_as_loaded mark_as_unloaded is_loaded];
 }
 
 =head1 NAME 
@@ -15,15 +15,15 @@ Module::Loaded - mark modules as loaded or unloaded
 
 =head1 SYNOPSIS
 
-    use Module::Loaded;
-    
-    $bool = mark_as_loaded('Foo');   # Foo.pm is now marked as loaded
-    $loc  = is_loaded('Foo');        # location of Foo.pm set to the 
-                                     # loaders location
-    eval "require 'Foo'";            # is now a no-op
+use Module::Loaded;
 
-    $bool = mark_as_unloaded('Foo'); # Foo.pm no longer marked as loaded
-    eval "require 'Foo'";            # Will try to find Foo.pm in $^INCLUDE_PATH
+$bool = mark_as_loaded('Foo');   # Foo.pm is now marked as loaded
+$loc  = is_loaded('Foo');        # location of Foo.pm set to the 
+# loaders location
+eval "require 'Foo'";            # is now a no-op
+
+$bool = mark_as_unloaded('Foo'); # Foo.pm no longer marked as loaded
+eval "require 'Foo'";            # Will try to find Foo.pm in $^INCLUDE_PATH
 
 =head1 DESCRIPTION
 
@@ -49,15 +49,15 @@ this and tell you from where the C<PACKAGE> has been loaded already.
 sub mark_as_loaded ($pm) {
     my $file    = __PACKAGE__->_pm_to_file( $pm ) or return;
     my $who     = @(caller)[1];
-    
+
     my $where   = is_loaded( $pm );
     if ( defined $where ) {
         carp "'$pm' already marked as loaded ('$where')";
-    
+
     } else {
         $^INCLUDED{+$file} = $who;
     }
-    
+
     return 1;
 }
 
@@ -80,7 +80,7 @@ sub mark_as_unloaded ($pm) {
     } else {
         delete $^INCLUDED{ $file };
     }
-    
+
     return 1;
 }
 
@@ -98,7 +98,7 @@ sub is_loaded ($pm) {
     my $file    = __PACKAGE__->_pm_to_file( $pm ) or return;
 
     return $^INCLUDED{?$file} if exists $^INCLUDED{$file};
-    
+
     return;
 }
 
@@ -106,10 +106,10 @@ sub is_loaded ($pm) {
 sub _pm_to_file {
     my $pkg = shift;
     my $pm  = shift or return;
-    
+
     my $file = join '/', split '::', $pm;
     $file .= '.pm';
-    
+
     return $file;
 }    
 

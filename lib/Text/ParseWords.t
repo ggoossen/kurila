@@ -11,12 +11,12 @@ is(@words[1], 'bar quiz');
 is(@words[2], 'zoo');
 
 do {
-  # Gonna get some undefined things back
-  no warnings 'uninitialized' ;
+    # Gonna get some undefined things back
+    no warnings 'uninitialized' ;
 
-  # Test quotewords() with other parameters and null last field
-  @words = quotewords(':+', 1, 'foo:::"bar:foo":zoo zoo:');
-  is(join(";", @words), qq(foo;"bar:foo";zoo zoo;));
+    # Test quotewords() with other parameters and null last field
+    @words = quotewords(':+', 1, 'foo:::"bar:foo":zoo zoo:');
+    is(join(";", @words), qq(foo;"bar:foo";zoo zoo;));
 };
 
 # Test $keep eq 'delimiters' and last field zero
@@ -59,23 +59,23 @@ is((nelems @words), 0);
 is((nelems @words), 0);
 
 do {
-  # Gonna get some more undefined things back
-  no warnings 'uninitialized' ;
+    # Gonna get some more undefined things back
+    no warnings 'uninitialized' ;
 
-  @words = nested_quotewords('s+', 0, $string);
-  is((nelems @words), 0);
+    @words = nested_quotewords('s+', 0, $string);
+    is((nelems @words), 0);
 
-  # Now test empty fields
-  $result = join('|',parse_line(':', 0, 'foo::0:"":::'));
-  is($result, 'foo||0||||');
+    # Now test empty fields
+    $result = join('|',parse_line(':', 0, 'foo::0:"":::'));
+    is($result, 'foo||0||||');
 
-  # Test for 0 in quotes without $keep
-  $result = join('|',parse_line(':', 0, ':"0":'));
-  is($result, '|0|');
+    # Test for 0 in quotes without $keep
+    $result = join('|',parse_line(':', 0, ':"0":'));
+    is($result, '|0|');
 
-  # Test for \001 in quoted string
-  $result = join('|',parse_line(':', 0, ':"' . "\001" . '":'));
-  is($result, "|\1|");
+    # Test for \001 in quoted string
+    $result = join('|',parse_line(':', 0, ':"' . "\001" . '":'));
+    is($result, "|\1|");
 
 };
 

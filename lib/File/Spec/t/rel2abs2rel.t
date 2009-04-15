@@ -7,13 +7,13 @@ use File::Spec;
 use lib File::Spec->catdir('t', 'lib');
 
 use Test::More (-x $^EXECUTABLE_NAME
-		?? (tests => 5)
-		!! (skip_all => "Can't find an executable file")
-	       );
+                ?? (tests => 5)
+                !! (skip_all => "Can't find an executable file")
+                );
 
 BEGIN {                                # Set up a tiny script file
     open(my $f, ">", "rel2abs2rel$^PID.pl")
-      or die "Can't open rel2abs2rel$^PID.pl file for script -- $^OS_ERROR\n";
+        or die "Can't open rel2abs2rel$^PID.pl file for script -- $^OS_ERROR\n";
     print $f, qq(print \$^STDOUT, "ok\\n"\n);
     close($f);
 }
@@ -29,7 +29,7 @@ use Config;
 sub safe_rel {
     my@($perl) =@( shift);
     $perl = File::Spec->catfile(File::Spec->curdir, $perl) unless
-      File::Spec->file_name_is_absolute($perl);
+        File::Spec->file_name_is_absolute($perl);
 
     return $perl;
 }

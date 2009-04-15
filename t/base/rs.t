@@ -98,43 +98,43 @@ close $testfile;
 
 # Now for the tricky bit--full record reading
 if ($^OS_NAME eq 'VMS') {
-  # Create a temp file. We jump through these hoops 'cause CREATE really
-  # doesn't like our methods for some reason.
-  open my $fdlfile, ">", "./foo.fdl";
-  print $fdlfile, "RECORD\n FORMAT VARIABLE\n";
-  close $fdlfile;
-  open my $createfile, ">", "./foo.com";
-  print $createfile, '$ DEFINE/USER SYS$INPUT NL:', "\n";
-  print $createfile, '$ DEFINE/USER SYS$OUTPUT NL:', "\n";
-  print $createfile, '$ OPEN YOW []FOO.BAR/WRITE', "\n";
-  print $createfile, '$ CLOSE YOW', "\n";
-  print $createfile, "\$EXIT\n";
-  close $createfile;
-  ($throwaway = `\@\[\]foo`), "\n";
-  open(my $tempfile, ">", "./foo.bar") or print $^STDOUT, "# open failed $^OS_ERROR $^EXTENDED_OS_ERROR\n";
-  print $tempfile, "foo\nfoobar\nbaz\n";
-  close $tempfile;
+    # Create a temp file. We jump through these hoops 'cause CREATE really
+    # doesn't like our methods for some reason.
+    open my $fdlfile, ">", "./foo.fdl";
+    print $fdlfile, "RECORD\n FORMAT VARIABLE\n";
+    close $fdlfile;
+    open my $createfile, ">", "./foo.com";
+    print $createfile, '$ DEFINE/USER SYS$INPUT NL:', "\n";
+    print $createfile, '$ DEFINE/USER SYS$OUTPUT NL:', "\n";
+    print $createfile, '$ OPEN YOW []FOO.BAR/WRITE', "\n";
+    print $createfile, '$ CLOSE YOW', "\n";
+    print $createfile, "\$EXIT\n";
+    close $createfile;
+    ($throwaway = `\@\[\]foo`), "\n";
+    open(my $tempfile, ">", "./foo.bar") or print $^STDOUT, "# open failed $^OS_ERROR $^EXTENDED_OS_ERROR\n";
+    print $tempfile, "foo\nfoobar\nbaz\n";
+    close $tempfile;
 
-  open $testfile, "<", "./foo.bar";
-  $^INPUT_RECORD_SEPARATOR = \10;
-  $bar = ~< $testfile;
-  if ($bar eq "foo\n") {print $^STDOUT, "ok 12\n";} else {print $^STDOUT, "not ok 12\n";}
-  $bar = ~< $testfile;
-  if ($bar eq "foobar\n") {print $^STDOUT, "ok 13\n";} else {print $^STDOUT, "not ok 13\n";}
-  # can we do a short read?
-  $^INPUT_RECORD_SEPARATOR = \2;
-  $bar = ~< $testfile;
-  if ($bar eq "ba") {print $^STDOUT, "ok 14\n";} else {print $^STDOUT, "not ok 14\n";}
-  # do we get the rest of the record?
-  $bar = ~< $testfile;
-  if ($bar eq "z\n") {print $^STDOUT, "ok 15\n";} else {print $^STDOUT, "not ok 15\n";}
+    open $testfile, "<", "./foo.bar";
+    $^INPUT_RECORD_SEPARATOR = \10;
+    $bar = ~< $testfile;
+    if ($bar eq "foo\n") {print $^STDOUT, "ok 12\n";} else {print $^STDOUT, "not ok 12\n";}
+    $bar = ~< $testfile;
+    if ($bar eq "foobar\n") {print $^STDOUT, "ok 13\n";} else {print $^STDOUT, "not ok 13\n";}
+    # can we do a short read?
+    $^INPUT_RECORD_SEPARATOR = \2;
+    $bar = ~< $testfile;
+    if ($bar eq "ba") {print $^STDOUT, "ok 14\n";} else {print $^STDOUT, "not ok 14\n";}
+    # do we get the rest of the record?
+    $bar = ~< $testfile;
+    if ($bar eq "z\n") {print $^STDOUT, "ok 15\n";} else {print $^STDOUT, "not ok 15\n";}
 
-  close $testfile;
-  1 while unlink < qw(foo.bar foo.com foo.fdl);
+    close $testfile;
+    1 while unlink < qw(foo.bar foo.com foo.fdl);
 } else {
-  # Nobody else does this at the moment (well, maybe OS/390, but they can
-  # put their own tests in) so we just punt
-  foreach my $test (12..15) {print $^STDOUT, "ok $test # skipped on non-VMS system\n"};
+    # Nobody else does this at the moment (well, maybe OS/390, but they can
+    # put their own tests in) so we just punt
+    foreach my $test (12..15) {print $^STDOUT, "ok $test # skipped on non-VMS system\n"};
 }
 
 $^INPUT_RECORD_SEPARATOR = "\n";
@@ -143,12 +143,12 @@ $^INPUT_RECORD_SEPARATOR = "\n";
 do {
     if (open our $T, "<", "./foo") {
         my $line = ~< $T;
-	print $^STDOUT, "# $line\n";
-	length($line) == 40 or print $^STDOUT, "not ";
+        print $^STDOUT, "# $line\n";
+        length($line) == 40 or print $^STDOUT, "not ";
         close $T or print $^STDOUT, "not ";
     }
     else {
-	print $^STDOUT, "not ";
+        print $^STDOUT, "not ";
     }
     print $^STDOUT, "ok 16\n";
 };
@@ -156,12 +156,12 @@ do {
 do {
     if (open my $T, "<", "./foo") {
         my $line = ~< $T;
-	print $^STDOUT, "# $line\n";
-	length($line) == 40 or print $^STDOUT, "not ";
+        print $^STDOUT, "# $line\n";
+        length($line) == 40 or print $^STDOUT, "not ";
         close $T or print $^STDOUT, "not ";
     }
     else {
-	print $^STDOUT, "not ";
+        print $^STDOUT, "not ";
     }
     print $^STDOUT, "ok 17\n";
 };

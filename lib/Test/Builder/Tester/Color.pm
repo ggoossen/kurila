@@ -9,9 +9,9 @@ Test::Builder::Tester::Color - turn on colour in Test::Builder::Tester
 
 =head1 SYNOPSIS
 
-   When running a test script
+When running a test script
 
-     perl -MTest::Builder::Tester::Color test.t
+perl -MTest::Builder::Tester::Color test.t
 
 =head1 DESCRIPTION
 

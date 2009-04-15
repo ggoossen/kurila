@@ -34,16 +34,16 @@ my $c = chr(0x100);
 do {
     use bytes;
     if (ord('A') == 193) { # EBCDIC?
-	is(ord($c), 0x8c, "ord under use bytes looks at the 1st byte");
+        is(ord($c), 0x8c, "ord under use bytes looks at the 1st byte");
     } else {
-	is(ord($c), 0xc4, "ord under use bytes looks at the 1st byte");
+        is(ord($c), 0xc4, "ord under use bytes looks at the 1st byte");
     }
     is(length($c), 2, "length under use bytes looks at bytes");
     is(bytes::length($c), 2, "bytes::length under use bytes looks at bytes");
     if (ord('A') == 193) { # EBCDIC?
-	is(bytes::ord($c), 0x8c, "bytes::ord under use bytes looks at the 1st byte");
+        is(bytes::ord($c), 0x8c, "bytes::ord under use bytes looks at the 1st byte");
     } else {
-	is(bytes::ord($c), 0xc4, "bytes::ord under use bytes looks at the 1st byte");
+        is(bytes::ord($c), 0xc4, "bytes::ord under use bytes looks at the 1st byte");
     }
     # In z/OS \x41,\x8c are the codepoints corresponding to \x80,\xc4 respectively under ASCII platform
     if (ord('A') == 193) { # EBCDIC?
@@ -57,11 +57,11 @@ do {
         is(bytes::index($c, "\x80"), 1, "bytes::index under use bytes looks at bytes");
         is(bytes::rindex($c, "\xc4"), 0, "bytes::rindex under use bytes looks at bytes");
     }
-    
+
 };
 
 do {
     fresh_perl_like ('use bytes; bytes::moo()',
-		     qr/Undefined subroutine &bytes::moo/, \%(stderr=>1),
-		    "Check Carp is loaded for AUTOLOADing errors")
+                     qr/Undefined subroutine &bytes::moo/, \%(stderr=>1),
+                     "Check Carp is loaded for AUTOLOADing errors")
 };

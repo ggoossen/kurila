@@ -56,12 +56,12 @@ Term::Cap - Perl termcap interface
 
 =head1 SYNOPSIS
 
-    require Term::Cap;
-    $terminal = Tgetent Term::Cap { TERM => undef, OSPEED => $ospeed };
-    $terminal->Trequire(qw/ce ku kd/);
-    $terminal->Tgoto('cm', $col, $row, $FH);
-    $terminal->Tputs('dl', $count, $FH);
-    $terminal->Tpad($string, $count, $FH);
+require Term::Cap;
+$terminal = Tgetent Term::Cap { TERM => undef, OSPEED => $ospeed };
+$terminal->Trequire(qw/ce ku kd/);
+$terminal->Tgoto('cm', $col, $row, $FH);
+$terminal->Tputs('dl', $count, $FH);
+$terminal->Tpad($string, $count, $FH);
 
 =head1 DESCRIPTION
 
@@ -79,7 +79,7 @@ The output strings for B<Tputs> are cached for counts of 1 for performance.
 B<Tgoto> and B<Tpad> do not cache.  C<$self-E<gt>{_xx}> is the raw termcap
 data and C<$self-E<gt>{xx}> is the cached version.
 
-    print $terminal->Tpad($self->{_xx}, 1);
+print $terminal->Tpad($self->{_xx}, 1);
 
 B<Tgoto>, B<Tputs>, and B<Tpad> return the string and will also
 output the string to $FH if specified.
@@ -105,14 +105,14 @@ sub termcap_path
 
     # $TERMCAP, if it's a filespec
     push( @termcap_path, env::var('TERMCAP') )
-      if (
+        if (
         ( defined env::var('TERMCAP') )
         && (
             ( $^OS_NAME eq 'os2' || $^OS_NAME eq 'MSWin32' || $^OS_NAME eq 'dos' )
             ?? env::var('TERMCAP') =~ m/^[a-z]:[\\\/]/is
             !! env::var('TERMCAP') =~ m/^\//s
-        )
-      );
+            )
+        );
     if ( env::var('TERMPATH') )
     {
 
@@ -193,7 +193,7 @@ sub Tgetent($class, $self)
     bless $self, $class;
 
     my ( $term, $cap, $search, $max, $tmp_term, $TERMCAP );
-    local ( $termpat, $state, $first, $entry );    # used inside eval
+                            local ( $termpat, $state, $first, $entry );    # used inside eval
     local $_ = undef;
 
     # Compute PADDING factor from OSPEED (to be used by Tpad)
@@ -212,7 +212,7 @@ sub Tgetent($class, $self)
         my @pad = @(
             0,    200, 133.3, 90.9, 74.3, 66.7, 50, 33.3,
             16.7, 8.3, 5.5,   4.1,  2,    1,    .5, .2
-        );
+            );
         $self->{+PADDING} = @pad[ $self->{?OSPEED} ];
     }
     else
@@ -222,21 +222,21 @@ sub Tgetent($class, $self)
 
     unless ( $self->{?TERM} )
     {
-       if ( env::var('TERM') )
-       {
-         $self->{+TERM} =  env::var('TERM') ;
-       }
-       else
-       {
-          if ( $^OS_NAME eq 'Win32' )
-          {
-             $self->{+TERM} =  'dumb';
-          }
-          else
-          {
-             die "TERM not set";
-          }
-       }
+        if ( env::var('TERM') )
+        {
+            $self->{+TERM} =  env::var('TERM') ;
+        }
+        else
+        {
+            if ( $^OS_NAME eq 'Win32' )
+            {
+                $self->{+TERM} =  'dumb';
+            }
+            else
+            {
+                die "TERM not set";
+            }
+        }
     }
 
     $term = $self->{?TERM};    # $term is the term type we are looking for
@@ -284,11 +284,11 @@ sub Tgetent($class, $self)
             }
             else
             {
-               # this is getting desperate now
-               if ( $self->{?TERM} eq 'dumb' )
-               {
-                  $entry = 'dumb|80-column dumb tty::am::co#80::bl=^G:cr=^M:do=^J:sf=^J:';
-               }
+                # this is getting desperate now
+                if ( $self->{?TERM} eq 'dumb' )
+                {
+                    $entry = 'dumb|80-column dumb tty::am::co#80::bl=^G:cr=^M:do=^J:sf=^J:';
+                }
             }
         }
     }
@@ -296,8 +296,8 @@ sub Tgetent($class, $self)
     die "Can't find a valid termcap file" unless (nelems @termcap_path) || $entry;
 
     $state = 1;    # 0 == finished
-                   # 1 == next file
-                   # 2 == search again
+    # 1 == next file
+    # 2 == search again
 
     $first = 0;    # first entry (keeps term name)
 
@@ -308,7 +308,7 @@ sub Tgetent($class, $self)
 
         # ok, we're starting with $TERMCAP
         $first++;    # we're the first entry
-                     # do we need to continue?
+        # do we need to continue?
         if ( $entry =~ s/:tc=([^:]+):/:/ )
         {
             $tmp_term = $1;
@@ -349,7 +349,7 @@ sub Tgetent($class, $self)
 
             # get the next TERMCAP
             $TERMCAP = shift @termcap_path
-              || die "failed termcap lookup on $tmp_term";
+                || die "failed termcap lookup on $tmp_term";
         }
         else
         {
@@ -377,7 +377,7 @@ sub Tgetent($class, $self)
     $entry =~ s/:+\s*:+/:/g;    # cleanup $entry
     $entry =~ s/:+/:/g;         # cleanup $entry
     $self->{+TERMCAP} = $entry;  # save it
-                                # print STDERR "DEBUG: $entry = ", $entry, "\n";
+    # print STDERR "DEBUG: $entry = ", $entry, "\n";
 
     # Precompile $entry into the object
     $entry =~ s/^[^:]*://;
@@ -387,19 +387,19 @@ sub Tgetent($class, $self)
         {
             $self->{+'_' . $field } = 1 unless defined $self->{?'_' . $1 };
 
-            # print STDERR "DEBUG: flag $1\n";
+        # print STDERR "DEBUG: flag $1\n";
         }
         elsif ( defined $field && $field =~ m/^(\w\w)\@/ )
         {
             $self->{+'_' . $1 } = "";
 
-            # print STDERR "DEBUG: unset $1\n";
+        # print STDERR "DEBUG: unset $1\n";
         }
         elsif ( defined $field && $field =~ m/^(\w\w)#(.*)/ )
         {
             $self->{+'_' . $1 } = $2 unless defined $self->{?'_' . $1 };
 
-            # print STDERR "DEBUG: numeric $1 = $2\n";
+        # print STDERR "DEBUG: numeric $1 = $2\n";
         }
         elsif ( defined $field && $field =~ m/^(\w\w)=(.*)/ )
         {
@@ -422,7 +422,7 @@ sub Tgetent($class, $self)
             $self->{+'_' . $cap } = $_;
         }
 
-        # else { warn "junk in $term ignored: $field"; }
+    # else { warn "junk in $term ignored: $field"; }
     }
     $self->{+'_pc'} = "\0" unless defined $self->{?'_pc'};
     $self->{+'_bc'} = "\b" unless defined $self->{?'_bc'};
@@ -517,14 +517,14 @@ sub Tputs( $self, $cap, $cnt, $FH)
     $cnt = 0 unless $cnt;
 
     if ($cnt +> 1) {
-	$string = Tpad($self, $self->{?'_' . $cap}, $cnt);
+        $string = Tpad($self, $self->{?'_' . $cap}, $cnt);
     } else {
-	# cache result because Tpad can be slow
-	unless (exists $self->{$cap}) {
-	    $self->{+$cap} = exists $self->{"_$cap"} ??
-		Tpad($self, $self->{?"_$cap"}, 1) !! undef;
-	}
-	$string = $self->{?$cap};
+        # cache result because Tpad can be slow
+        unless (exists $self->{$cap}) {
+            $self->{+$cap} = exists $self->{"_$cap"} ??
+            Tpad($self, $self->{?"_$cap"}, 1) !! undef;
+        }
+        $string = $self->{?$cap};
     }
     print $FH, $string if $FH;
     $string;
@@ -564,20 +564,20 @@ printed.
 Substitutions are made with $col and $row in the output string with the
 following sprintf() line formats:
 
- %%   output `%'
- %d   output value as in printf %d
- %2   output value as in printf %2d
- %3   output value as in printf %3d
- %.   output value as in printf %c
- %+x  add x to value, then do %.
+%%   output `%'
+%d   output value as in printf %d
+%2   output value as in printf %2d
+%3   output value as in printf %3d
+%.   output value as in printf %c
+%+x  add x to value, then do %.
 
- %>xy if value > x then add y, no output
- %r   reverse order of two parameters, no output
- %i   increment by one, no output
- %B   BCD (16*(value/10)) + (value%10), no output
+%>xy if value > x then add y, no output
+%r   reverse order of two parameters, no output
+%i   increment by one, no output
+%B   BCD (16*(value/10)) + (value%10), no output
 
- %n   exclusive-or all parameters with 0140 (Datamedia 2500)
- %D   Reverse coding (value - 2*(value%16)), no output (Delta Data)
+%n   exclusive-or all parameters with 0140 (Datamedia 2500)
+%D   Reverse coding (value - 2*(value%16)), no output (Delta Data)
 
 The output string will be returned.
 
@@ -593,56 +593,56 @@ sub Tgoto( $self, $cap, $code, $tmp, $FH)
     my $cnt    = $code;
 
     while ($string =~ m/^([^%]*)%(.)(.*)/) {
-	$result .= $1;
-	$code = $2;
-	$string = $3;
-	if ($code eq 'd') {
-	    $result .= sprintf("\%d",shift(@tmp));
-	}
-	elsif ($code eq '.') {
-	    $tmp = shift(@tmp);
-	    if ($tmp == 0 || $tmp == 4 || $tmp == 10) {
-		if ($online) {
-		    ++$tmp, ($after .= $self->{?'_up'}) if $self->{?'_up'};
-		}
-		else {
-		    ++$tmp, ($after .= $self->{?'_bc'});
-		}
-	    }
-	    $result .= sprintf("\%c",$tmp);
-	    $online = !$online;
-	}
-	elsif ($code eq '+') {
-	    $result .= sprintf("\%c",shift(@tmp)+ord($string));
-	    $string = substr($string,1,99);
-	    $online = !$online;
-	}
-	elsif ($code eq 'r') {
-	    @($code,$tmp) =  @tmp;
-	    @tmp = @($tmp,$code);
-	    $online = !$online;
-	}
-	elsif ($code eq '>') {
-	    @($code,$tmp,$string) = unpack@("CCa99",$string);
-	    if (@tmp[0] +> $code) {
-		@tmp[0] += $tmp;
-	    }
-	}
-	elsif ($code eq '2') {
-	    $result .= sprintf("\%02d",shift(@tmp));
-	    $online = !$online;
-	}
-	elsif ($code eq '3') {
-	    $result .= sprintf("\%03d",shift(@tmp));
-	    $online = !$online;
-	}
-	elsif ($code eq 'i') {
-	    @($code,$tmp) =  @tmp;
-	    @tmp = @($code+1,$tmp+1);
-	}
-	else {
-	    return "OOPS";
-	}
+        $result .= $1;
+        $code = $2;
+        $string = $3;
+        if ($code eq 'd') {
+            $result .= sprintf("\%d",shift(@tmp));
+        }
+        elsif ($code eq '.') {
+            $tmp = shift(@tmp);
+            if ($tmp == 0 || $tmp == 4 || $tmp == 10) {
+                if ($online) {
+                    ++$tmp, ($after .= $self->{?'_up'}) if $self->{?'_up'};
+                }
+                else {
+                    ++$tmp, ($after .= $self->{?'_bc'});
+                }
+            }
+            $result .= sprintf("\%c",$tmp);
+            $online = !$online;
+        }
+        elsif ($code eq '+') {
+            $result .= sprintf("\%c",shift(@tmp)+ord($string));
+            $string = substr($string,1,99);
+            $online = !$online;
+        }
+        elsif ($code eq 'r') {
+            @($code,$tmp) =  @tmp;
+            @tmp = @($tmp,$code);
+            $online = !$online;
+        }
+        elsif ($code eq '>') {
+            @($code,$tmp,$string) = unpack@("CCa99",$string);
+            if (@tmp[0] +> $code) {
+                @tmp[0] += $tmp;
+            }
+        }
+        elsif ($code eq '2') {
+            $result .= sprintf("\%02d",shift(@tmp));
+            $online = !$online;
+        }
+        elsif ($code eq '3') {
+            $result .= sprintf("\%03d",shift(@tmp));
+            $online = !$online;
+        }
+        elsif ($code eq 'i') {
+            @($code,$tmp) =  @tmp;
+            @tmp = @($code+1,$tmp+1);
+        }
+        else {
+            return "OOPS";
+        }
     }
     $string = Tpad( $self, $result . $string . $after, $cnt );
     print $FH, $string if $FH;
@@ -665,7 +665,7 @@ sub Trequire
     foreach my $cap ( @_)
     {
         push( @undefined, $cap )
-          unless defined $self->{?'_' . $cap } && $self->{?'_' . $cap };
+            unless defined $self->{?'_' . $cap } && $self->{?'_' . $cap };
     }
     die "Terminal does not support: ($(join ' ',@undefined))" if (nelems @undefined);
 }
@@ -674,32 +674,32 @@ sub Trequire
 
 =head1 EXAMPLES
 
-    use Term::Cap;
+use Term::Cap;
 
-    # Get terminal output speed
-    require POSIX;
-    my $termios = new POSIX::Termios;
-    $termios->getattr;
-    my $ospeed = $termios->getospeed;
+# Get terminal output speed
+require POSIX;
+my $termios = new POSIX::Termios;
+$termios->getattr;
+my $ospeed = $termios->getospeed;
 
-    # Old-style ioctl code to get ospeed:
-    #     require 'ioctl.pl';
-    #     ioctl(TTY,$TIOCGETP,$sgtty);
-    #     ($ispeed,$ospeed) = unpack('cc',$sgtty);
+# Old-style ioctl code to get ospeed:
+#     require 'ioctl.pl';
+#     ioctl(TTY,$TIOCGETP,$sgtty);
+#     ($ispeed,$ospeed) = unpack('cc',$sgtty);
 
-    # allocate and initialize a terminal structure
-    $terminal = Tgetent Term::Cap { TERM => undef, OSPEED => $ospeed };
+# allocate and initialize a terminal structure
+$terminal = Tgetent Term::Cap { TERM => undef, OSPEED => $ospeed };
 
-    # require certain capabilities to be available
-    $terminal->Trequire(qw/ce ku kd/);
+# require certain capabilities to be available
+$terminal->Trequire(qw/ce ku kd/);
 
-    # Output Routines, if $FH is undefined these just return the string
+# Output Routines, if $FH is undefined these just return the string
 
-    # Tgoto does the % expansion stuff with the given args
-    $terminal->Tgoto('cm', $col, $row, $FH);
+# Tgoto does the % expansion stuff with the given args
+$terminal->Tgoto('cm', $col, $row, $FH);
 
-    # Tputs doesn't do any % expansion.
-    $terminal->Tputs('dl', $count = 1, $FH);
+# Tputs doesn't do any % expansion.
+$terminal->Tputs('dl', $count = 1, $FH);
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -12,9 +12,9 @@ use File::Spec;
 #require ExtUtils::Liblist;
 
 our (@ISA, @EXPORT, $VERSION
-	,    @Extensions, $Verbose, $lib_ext
-	,    $opt_o, $opt_s, 
-	,    );
+    ,    @Extensions, $Verbose, $lib_ext
+    ,    $opt_o, $opt_s, 
+    ,    );
 
 
 $VERSION = '1.26_01';
@@ -36,10 +36,10 @@ sub is_cmd { $^PROGRAM_NAME eq '-e' }
 sub my_return {
     my $val = shift;
     if(is_cmd) {
-	print $^STDOUT, $val;
+        print $^STDOUT, $val;
     }
     else {
-	return $val;
+        return $val;
     }
 }
 
@@ -50,21 +50,21 @@ sub xsinit {
     my $xsinit_proto = "pTHX";
 
     if ((nelems @_)) {
-       @mods = @$mods if $mods;
+        @mods = @$mods if $mods;
     }
     else {
-       getopts('o:s:');
-       $file = $opt_o if defined $opt_o;
-       $std  = $opt_s  if defined $opt_s;
-       @mods = @ARGV;
+        getopts('o:s:');
+        $file = $opt_o if defined $opt_o;
+        $std  = $opt_s  if defined $opt_s;
+        @mods = @ARGV;
     }
     $std = 1 unless scalar nelems @mods;
 
     if ($file eq "STDOUT") {
-	$fh = $^STDOUT;
+        $fh = $^STDOUT;
     }
     else {
-	$fh = IO::File->new("$file", ">");
+        $fh = IO::File->new("$file", ">");
     }
 
     push(@mods, < static_ext()) if defined $std;
@@ -96,8 +96,8 @@ sub xsi_protos(@exts) {
         my($mname, $cname);
         ($mname = $pname) =~ s!/!::!g;
         ($cname = $pname) =~ s!/!__!g;
-	my@($ccode) = "EXTERN_C void boot_$($cname) ($boot_proto);\n";
-	next if %seen{+$ccode}++;
+        my@($ccode) = "EXTERN_C void boot_$($cname) ($boot_proto);\n";
+        next if %seen{+$ccode}++;
         push(@retval, $ccode);
     }
     return join '', @retval;
@@ -130,10 +130,10 @@ sub xsi_body(@exts) {
 
 sub static_ext {
     unless (scalar nelems @Extensions) {
-      my $static_ext = config_value("static_ext");
-      $static_ext =~ s/^\s+//;
-      @Extensions = sort split m/\s+/, $static_ext;
-	unshift @Extensions, < qw(DynaLoader);
+        my $static_ext = config_value("static_ext");
+        $static_ext =~ s/^\s+//;
+        @Extensions = sort split m/\s+/, $static_ext;
+        unshift @Extensions, < qw(DynaLoader);
     }
     @Extensions;
 }
@@ -168,18 +168,18 @@ sub ldopts {
     my(@mods,@link_args,@argv);
     my($dllib,$config_libs,@potential_libs,@path);
     if (scalar nelems @_) {
-       @link_args = @$link_args if $link_args;
-       @mods = @$mods if $mods;
+        @link_args = @$link_args if $link_args;
+        @mods = @$mods if $mods;
     }
     else {
-       @argv = @ARGV;
-       #hmm
-       while($_ = shift @argv) {
-	   m/^-std$/  && do { $std = 1; next; };
-	   m/^--$/    && do { @link_args = @argv; last; };
-	   m/^-I(.*)/ && do { $path = $1 || shift @argv; next; };
-	   push(@mods, $_); 
-       }
+        @argv = @ARGV;
+        #hmm
+        while($_ = shift @argv) {
+            m/^-std$/  && do { $std = 1; next; };
+            m/^--$/    && do { @link_args = @argv; last; };
+            m/^-I(.*)/ && do { $path = $1 || shift @argv; next; };
+            push(@mods, $_); 
+        }
     }
     $std = 1 unless scalar nelems @link_args;
     my $sep = config_value("path_sep") || ':';
@@ -188,7 +188,7 @@ sub ldopts {
     push(@potential_libs, < @link_args)    if scalar nelems @link_args;
     # makemaker includes std libs on windows by default
     if ($^OS_NAME ne 'MSWin32' and defined($std)) {
-	push(@potential_libs, config_value("perllibs"));
+        push(@potential_libs, config_value("perllibs"));
     }
 
     push(@mods, < static_ext()) if $std;
@@ -196,45 +196,45 @@ sub ldopts {
     my(@ns,$root,$sub,$extra,$archive,@archives);
     print $^STDERR, "Searching ($(join ' ',@path)) for archives\n" if $Verbose;
     foreach my $mod ( @mods) {
-	@ns = split(m/::|\/|\\/, $mod);
-	$sub = @ns[-1];
-	$root = File::Spec->catdir(< @ns);
-	
-	print $^STDERR, "searching for '$($sub)$($lib_ext)'\n" if $Verbose;
-	foreach ( @path) {
-	    next unless -e ($archive = File::Spec->catdir($_,"auto",$root,"$sub$lib_ext"));
-	    push @archives, $archive;
-	    if(-e ($extra = File::Spec->catdir($_,"auto",$root,"extralibs.ld"))) {
-		if(open(my $fh, "<", $extra)) {
-		    my@($libs) = ~< *$fh; chomp $libs;
-		    push @potential_libs, < split m/\s+/, $libs;
-		}
-		else {  
-		    warn "Couldn't open '$extra'"; 
-		}
-	    }
-	    last;
-	}
+        @ns = split(m/::|\/|\\/, $mod);
+        $sub = @ns[-1];
+        $root = File::Spec->catdir(< @ns);
+
+        print $^STDERR, "searching for '$($sub)$($lib_ext)'\n" if $Verbose;
+        foreach ( @path) {
+            next unless -e ($archive = File::Spec->catdir($_,"auto",$root,"$sub$lib_ext"));
+            push @archives, $archive;
+            if(-e ($extra = File::Spec->catdir($_,"auto",$root,"extralibs.ld"))) {
+                if(open(my $fh, "<", $extra)) {
+                    my@($libs) = ~< *$fh; chomp $libs;
+                    push @potential_libs, < split m/\s+/, $libs;
+                }
+                else {  
+                    warn "Couldn't open '$extra'"; 
+                }
+            }
+            last;
+        }
     }
     #print STDERR "\@potential_libs = @potential_libs\n";
 
     my $libperl;
     if ($^OS_NAME eq 'MSWin32') {
-	$libperl = config_value("libperl");
+        $libperl = config_value("libperl");
     }
     elsif ($^OS_NAME eq 'os390' && config_value("usedl")) {
-	# Nothing for OS/390 (z/OS) dynamic.
+    # Nothing for OS/390 (z/OS) dynamic.
     } else {
-	$libperl = (grep( {m/^-l\w*perl\w*$/ }, @link_args))[?0]
-	    || (config_value("libperl") =~ m/^lib(\w+)(\Q$lib_ext\E|\.\Q$(config_value("dlext"))\E)$/
-		?? "-l$1" !! '')
-		|| "-lperl";
+        $libperl = (grep( {m/^-l\w*perl\w*$/ }, @link_args))[?0]
+            || (config_value("libperl") =~ m/^lib(\w+)(\Q$lib_ext\E|\.\Q$(config_value("dlext"))\E)$/
+                ?? "-l$1" !! '')
+            || "-lperl";
     }
 
     my $lpath = File::Spec->catdir(config_value("archlibexp"), 'CORE');
     $lpath = qq["$lpath"] if $^OS_NAME eq 'MSWin32';
     my @($extralibs, $bsloadlibs, $ldloadlibs, $ld_run_path, ...) = 
-	MM->ext(join ' ', @( "-L$lpath", $libperl, < @potential_libs));
+        MM->ext(join ' ', @( "-L$lpath", $libperl, < @potential_libs));
 
     my $ld_or_bs = $bsloadlibs || $ldloadlibs;
     print $^STDERR, "bs: $bsloadlibs ** ld: $ldloadlibs" if $Verbose;
@@ -264,15 +264,15 @@ sub perl_inc {
 }
 
 sub ccopts {
-   ccflags . perl_inc;
+    ccflags . perl_inc;
 }
 
 sub canon($as, @< @ext) {
     foreach( @ext) {
-       # might be X::Y or lib/auto/X/Y/Y.a
-       next if s!::!/!g;
-       s:^(lib|ext)/(auto/)?::;
-       s:/\w+\.\w+$::;
+        # might be X::Y or lib/auto/X/Y/Y.a
+        next if s!::!/!g;
+        s:^(lib|ext)/(auto/)?::;
+        s:/\w+\.\w+$::;
     }
     map( {s:/:$as: }, @ext) if ($as ne '/');
     @ext;

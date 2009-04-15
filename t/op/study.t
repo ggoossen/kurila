@@ -8,7 +8,7 @@ sub ok($ok, ?$name) {
 
     # You have to do it this way or VMS will get confused.
     printf $^STDOUT, "\%s $test\%s\n", $ok   ?? 'ok' !! 'not ok',
-                           $name ?? " - $name" !! '';
+        $name ?? " - $name" !! '';
 
     printf $^STDOUT, "# Failed test at line \%d\n", @(caller($Ok_Level))[2] unless $ok;
 
@@ -27,7 +27,7 @@ use signals;
 my $have_alarm = config_value('d_alarm');
 sub alarm_ok($test) {
     local signals::handler("ALRM") = sub { die "timeout\n" };
-    
+
     my $match;
     try { 
         alarm(2) if $have_alarm;

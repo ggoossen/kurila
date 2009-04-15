@@ -36,14 +36,14 @@ sub __find_relocations
     my %paths;
     for my $raw_key (keys config_keys) {
         my $raw_val = config_value($raw_key);
-	my $exp_key = $raw_key . "exp";
-	next unless defined config_value($exp_key);
-	next unless $raw_val =~ m!\.\.\./!;
-	%paths{+config_value($exp_key)}++;
+        my $exp_key = $raw_key . "exp";
+        next unless defined config_value($exp_key);
+        next unless $raw_val =~ m!\.\.\./!;
+        %paths{+config_value($exp_key)}++;
     }
     # Longest prefixes go first in the alternatives
     my $alternations = join "|", map {quotemeta $_},
-    sort {length $b <+> length $a}, keys %paths;
+        sort {length $b <+> length $a}, keys %paths;
     qr/^($alternations)/o;
 }
 
@@ -52,8 +52,8 @@ sub new($class, ?$packfile)
     $class = ref($class) || $class;
 
     my $self = \%( packfile => $packfile,
-                   data => %(),
-               );
+            data => %(),
+        );
     bless($self, $class);
 
     $self->read($packfile) if (defined($packfile) && -f $packfile);
@@ -73,17 +73,17 @@ sub read($self, ?$packfile)
     $self->{data} = %();
     my ($line);
     while (defined($line = ~< $fh))
-      {
+    {
         chomp $line;
         my $key = $line;
         my $data;
         if ($key =~ m/^(.*?)( \w+=.*)$/)
-          {
+        {
             $key = $1;
             $data = \%( < @+: map { split('=', $_) }, split(' ', $2));
 
             if (config_value("userelocatableinc") && $data->{?relocate_as})
-              {
+            {
                 require File::Spec;
                 require Cwd;
                 my @($vol, $dir) =  File::Spec->splitpath($packfile);
@@ -98,7 +98,7 @@ sub read($self, ?$packfile)
 }
 
 sub write($self, ?$packfile)
-  {
+{
     if (defined($packfile)) { $self->{packfile} = $packfile; }
     else { $packfile = $self->{packfile}; }
     die("No packlist filename specified") if (! defined($packfile));
@@ -117,7 +117,7 @@ sub write($self, ?$packfile)
                     my @(_, $packfile_prefix) = File::Spec->splitpath($packfile);
 
                     my $relocate_as
-                      = File::Spec->abs2rel($key, $packfile_prefix);
+                        = File::Spec->abs2rel($key, $packfile_prefix);
 
                     if (!ref $data) {
                         $data = \%();
@@ -138,7 +138,7 @@ sub write($self, ?$packfile)
 }
 
 sub validate($self, ?$remove)
-  {
+{
     my @missing;
     foreach my $key (sort(keys($self->{data}))) {
         if (! -e $key) {
@@ -150,7 +150,7 @@ sub validate($self, ?$remove)
 }
 
 sub packlist_file($self)
-  {
+{
     return @($self->{?packfile});
 }
 

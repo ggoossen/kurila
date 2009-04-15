@@ -11,9 +11,9 @@ my $delta = 0.4;
 
 # Some timing ballast
 sub fib {
-  my $n = shift;
-  return $n if $n +< 2;
-  fib($n-1) + fib($n-2);
+    my $n = shift;
+    return $n if $n +< 2;
+    fib($n-1) + fib($n-2);
 }
 $ballast = 15;
 
@@ -71,11 +71,11 @@ print $^STDOUT, "# $in_onesec iterations\n";
 ok ($in_onesec +> 0, "iters returned positive iterations");
 
 do {
-  my $difference = $in_onesec - $estimate;
-  my $actual = abs ($difference / $in_onesec);
-  ok ($actual +< $delta, "is $in_onesec within $delta of estimate ($estimate)");
-  print $^STDOUT, "# $in_onesec is between " . ($delta / 2) .
-    " and $delta of estimate. Not that safe.\n" if $actual +> $delta/2;
+    my $difference = $in_onesec - $estimate;
+    my $actual = abs ($difference / $in_onesec);
+    ok ($actual +< $delta, "is $in_onesec within $delta of estimate ($estimate)");
+    print $^STDOUT, "# $in_onesec is between " . ($delta / 2) .
+        " and $delta of estimate. Not that safe.\n" if $actual +> $delta/2;
 };
 
 # I found that the eval'ed version was 3 times faster than the coderef.
@@ -203,7 +203,7 @@ do {
 $foo = $bar = $baz = 0;
 $out = "";
 $got = do_with_out({ timethese($iterations, \%( Foo => sub {++$foo}, Bar => '++$main::bar',
-                                Baz => sub {++$baz} )) });
+                                   Baz => sub {++$baz} )) });
 is(ref ($got), 'HASH', "timethese should return a hashref");
 isa_ok($got->{?Foo}, 'Benchmark', "Foo value");
 isa_ok($got->{?Bar}, 'Benchmark', "Bar value");
@@ -226,7 +226,7 @@ like ($got, $Default_Pattern, 'should find default format somewhere');
 
 
 my $code_to_test =  \%( Foo => sub {$foo+=fib($ballast-2)},
-                      Bar => sub {$bar+=fib($ballast)});
+        Bar => sub {$bar+=fib($ballast)});
 # Keep these for later.
 my $results;
 do {
@@ -256,84 +256,84 @@ my $graph_dissassembly =
     \n[ \t]*(\w+)[ \t]+([0-9.]+(?:/s)?)[ \t]+(-?\d+%)[ \t]+(-+)[ \t]*$!xm;
 
 sub check_graph_consistency(	$ratetext, $slowc, $fastc,
-        $slowr, $slowratet, $slowslow, $slowfastt,
-        $fastr, $fastratet, $fastslowt, $fastfast) {
-    my $all_passed = 1;
-    $all_passed
-      ^&^= is ($slowc, $slowr, "left col tag should be top row tag");
-    $all_passed
-      ^&^= is ($fastc, $fastr, "right col tag should be bottom row tag");
-    $all_passed ^&^=
-      like ($slowslow, qr/^-+/, "should be dash for comparing slow with slow");
-    $all_passed
-      ^&^= is ($slowslow, $fastfast, "slow v slow should be same as fast v fast");
-    my $slowrate = $slowratet;
-    my $fastrate = $fastratet;
-    my ($slow_is_rate, $fast_is_rate);
-    unless ($slow_is_rate = $slowrate =~ s!/s!!) {
-        # Slow is expressed as iters per second.
-        $slowrate = 1/$slowrate if $slowrate;
-    }
-    unless ($fast_is_rate = $fastrate =~ s!/s!!) {
-        # Fast is expressed as iters per second.
-        $fastrate = 1/$fastrate if $fastrate;
-    }
-    if ($ratetext =~ m/rate/i) {
+$slowr, $slowratet, $slowslow, $slowfastt,
+    $fastr, $fastratet, $fastslowt, $fastfast) {
+        my $all_passed = 1;
         $all_passed
-          ^&^= ok ($slow_is_rate, "slow should be expressed as a rate");
+            ^&^= is ($slowc, $slowr, "left col tag should be top row tag");
         $all_passed
-          ^&^= ok ($fast_is_rate, "fast should be expressed as a rate");
-    } else {
+            ^&^= is ($fastc, $fastr, "right col tag should be bottom row tag");
         $all_passed ^&^=
-          ok (!$slow_is_rate, "slow should be expressed as a iters per second");
-        $all_passed ^&^=
-          ok (!$fast_is_rate, "fast should be expressed as a iters per second");
-    }
+            like ($slowslow, qr/^-+/, "should be dash for comparing slow with slow");
+        $all_passed
+            ^&^= is ($slowslow, $fastfast, "slow v slow should be same as fast v fast");
+        my $slowrate = $slowratet;
+        my $fastrate = $fastratet;
+        my ($slow_is_rate, $fast_is_rate);
+        unless ($slow_is_rate = $slowrate =~ s!/s!!) {
+            # Slow is expressed as iters per second.
+            $slowrate = 1/$slowrate if $slowrate;
+        }
+        unless ($fast_is_rate = $fastrate =~ s!/s!!) {
+            # Fast is expressed as iters per second.
+            $fastrate = 1/$fastrate if $fastrate;
+        }
+        if ($ratetext =~ m/rate/i) {
+            $all_passed
+                ^&^= ok ($slow_is_rate, "slow should be expressed as a rate");
+            $all_passed
+                ^&^= ok ($fast_is_rate, "fast should be expressed as a rate");
+        } else {
+            $all_passed ^&^=
+                ok (!$slow_is_rate, "slow should be expressed as a iters per second");
+            $all_passed ^&^=
+                ok (!$fast_is_rate, "fast should be expressed as a iters per second");
+        }
 
-    (my $slowfast = $slowfastt) =~ s!%!!;
-    (my $fastslow = $fastslowt) =~ s!%!!;
-    if ($slowrate +< $fastrate) {
-        pass ("slow rate is less than fast rate");
-        unless (ok ($slowfast +<= 0 && $slowfast +>= -100,
-                    "slowfast should be less than or equal to zero, and >= -100")) {
-          print $^STDERR, "# slowfast $slowfast\n";
-          $all_passed = 0;
+        (my $slowfast = $slowfastt) =~ s!%!!;
+        (my $fastslow = $fastslowt) =~ s!%!!;
+        if ($slowrate +< $fastrate) {
+            pass ("slow rate is less than fast rate");
+            unless (ok ($slowfast +<= 0 && $slowfast +>= -100,
+                        "slowfast should be less than or equal to zero, and >= -100")) {
+                print $^STDERR, "# slowfast $slowfast\n";
+                $all_passed = 0;
+            }
+            unless (ok ($fastslow +> 0, "fastslow should be > 0")) {
+                print $^STDERR, "# fastslow $fastslow\n";
+                $all_passed = 0;
+            }
+        } else {
+            $all_passed
+                ^&^= is ($slowrate, $fastrate,
+                         "slow rate isn't less than fast rate, so should be the same");
+            # In OpenBSD the $slowfast is sometimes a really, really, really
+            # small number less than zero, and this gets stringified as -0.
+            $all_passed
+                ^&^= like ($slowfast, qr/^-?0$/, "slowfast should be zero");
+            $all_passed
+                ^&^= like ($fastslow, qr/^-?0$/, "fastslow should be zero");
         }
-        unless (ok ($fastslow +> 0, "fastslow should be > 0")) {
-          print $^STDERR, "# fastslow $fastslow\n";
-          $all_passed = 0;
-        }
-    } else {
-        $all_passed
-          ^&^= is ($slowrate, $fastrate,
-                 "slow rate isn't less than fast rate, so should be the same");
-	# In OpenBSD the $slowfast is sometimes a really, really, really
-	# small number less than zero, and this gets stringified as -0.
-        $all_passed
-          ^&^= like ($slowfast, qr/^-?0$/, "slowfast should be zero");
-        $all_passed
-          ^&^= like ($fastslow, qr/^-?0$/, "fastslow should be zero");
+        return $all_passed;
     }
-    return $all_passed;
-}
 
 sub check_graph_vs_output($chart, $got) {
     my @(	$ratetext, $slowc, $fastc,
-        $slowr, $slowratet, $slowslow, $slowfastt,
-        $fastr, $fastratet, $fastslowt, $fastfast)
+          $slowr, $slowratet, $slowslow, $slowfastt,
+          $fastr, $fastratet, $fastslowt, $fastfast)
         = @: $got =~ $graph_dissassembly;
     my $all_passed
-      = check_graph_consistency (        $ratetext, $slowc, $fastc,
-                                 $slowr, $slowratet, $slowslow, $slowfastt,
-                                 $fastr, $fastratet, $fastslowt, $fastfast);
+        = check_graph_consistency (        $ratetext, $slowc, $fastc,
+                                           $slowr, $slowratet, $slowslow, $slowfastt,
+                                           $fastr, $fastratet, $fastslowt, $fastfast);
     $all_passed
-      &&= is_deeply ($chart, \@(\@('', $ratetext, $slowc, $fastc),
-                             \@($slowr, $slowratet, $slowslow, $slowfastt),
-                             \@($fastr, $fastratet, $fastslowt, $fastfast)),
-                    "check the chart layout matches the formatted output");
+        &&= is_deeply ($chart, \@(\@('', $ratetext, $slowc, $fastc),
+                                  \@($slowr, $slowratet, $slowslow, $slowfastt),
+                                  \@($fastr, $fastratet, $fastslowt, $fastfast)),
+                       "check the chart layout matches the formatted output");
     unless ($all_passed) {
-      print $^STDERR, "# Something went wrong there. I got this chart:\n";
-      print $^STDERR, "# $_\n" foreach split m/\n/, $got;
+        print $^STDERR, "# Something went wrong there. I got this chart:\n";
+        print $^STDERR, "# $_\n" foreach split m/\n/, $got;
     }
 }
 
@@ -378,7 +378,7 @@ do {
     $got =~ s/\(warning:[^\)]+\)//gs;
 
     unlike ($got, qr/running\W+a\W+b.*?for at least 0\.1 CPU second/s,
-          'should not have title');
+            'should not have title');
     # Remove the title
     $got =~ s/.*\.\.\.//s;
     unlike ($got, $Default_Pattern, 'should not find default format somewhere');
@@ -397,7 +397,7 @@ do {
     # Remove any warnings about having too few iterations.
     $got =~ s/\(warning:[^\)]+\)//gs;
     like ($got, qr/timing 10 iterations of\s+Bar\W+Foo\W*?\.\.\./s,
-      'check title');
+          'check title');
     # Remove the title
     $got =~ s/.*\.\.\.//s;
     like ($got, $Nop_Pattern, 'specify format as nop');
@@ -517,17 +517,17 @@ do {   # Check usage error messages
     my @takes_no_args =qw(clearallcache disablecache enablecache);
 
     my %cmpthese = %('forgot {}' => 'cmpthese( 42, foo => sub { 1 } )',
-                     'not result' => 'cmpthese(42)',
-                     'array ref'  => 'cmpthese( 42, \@( foo => sub { 1 } ) )',
-                    );
+            'not result' => 'cmpthese(42)',
+                'array ref'  => 'cmpthese( 42, \@( foo => sub { 1 } ) )',
+        );
     while( my@(?$name, ?$code) =@( each %cmpthese) ) {
         eval $code;
         is( $^EVAL_ERROR->{?description}, %usage{?cmpthese}, "cmpthese usage: $name" );
     }
 
     my %timethese = %('forgot {}'  => 'timethese( 42, foo => sub { 1 } )',
-                       'array ref'  => 'timethese( 42, \@( foo => sub { 1 } ) )',
-                      );
+            'array ref'  => 'timethese( 42, \@( foo => sub { 1 } ) )',
+        );
 
     while( my@(?$name, ?$code) =@( each %timethese) ) {
         eval $code;

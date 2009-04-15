@@ -14,8 +14,8 @@ ExtUtils::MM_AIX - AIX specific subclass of ExtUtils::MM_Unix
 
 =head1 SYNOPSIS
 
-  Don't use this module directly.
-  Use ExtUtils::MM and let it choose.
+Don't use this module directly.
+Use ExtUtils::MM and let it choose.
 
 =head1 DESCRIPTION
 
@@ -55,8 +55,8 @@ static :: $self->{?BASEEXT}.exp
 $self->{?BASEEXT}.exp: Makefile.PL
 ",q|	$(PERLRUN) -e 'use ExtUtils::Mksymlists; \
 	Mksymlists("NAME" => "|,$self->{?NAME},'", "DL_FUNCS" => ', <
-	neatvalue($funcs), ', "FUNCLIST" => ', < neatvalue($funclist),
-	', "DL_VARS" => ', < neatvalue($vars), q|);'
+        neatvalue($funcs), ', "FUNCLIST" => ', < neatvalue($funclist),
+        ', "DL_VARS" => ', < neatvalue($vars), q|);'
 |);
 
     join('', @m);

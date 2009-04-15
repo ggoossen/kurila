@@ -63,18 +63,18 @@ sub _daygm {
     # lexical variables and sub calls, for speed
     return @_[3] + (
         %Cheat{+pack( 'ss', < @_[[@( 4, 5) ]] ) } ||= do {
-            my $month = ( @_[4] + 10 ) % 12;
-            my $year  = @_[5] + 1900 - $month / 10;
+        my $month = ( @_[4] + 10 ) % 12;
+        my $year  = @_[5] + 1900 - $month / 10;
 
-            ( ( 365 * $year )
-              + ( $year / 4 )
-              - ( $year / 100 )
-              + ( $year / 400 )
-              + ( ( ( $month * 306 ) + 5 ) / 10 )
-            )
+        ( ( 365 * $year )
+          + ( $year / 4 )
+          - ( $year / 100 )
+          + ( $year / 400 )
+          + ( ( ( $month * 306 ) + 5 ) / 10 )
+          )
             - $Epoc;
-        }
-    );
+    }
+        );
 }
 
 sub _timegm {
@@ -104,7 +104,7 @@ sub timegm( $sec, $min, $hour, $mday, $month, $year, ...) {
             if $month +> 11
             or $month +< 0;
 
-	my $md = @MonthDays[$month];
+        my $md = @MonthDays[$month];
         ++$md
             if $month == 1 && _is_leap_year( $year + 1900 );
 
@@ -120,17 +120,17 @@ sub timegm( $sec, $min, $hour, $mday, $month, $year, ...) {
         my $msg = '';
         $msg .= "Day too big - $days > $MaxDay\n" if $days +> $MaxDay;
 
-	$year += 1900;
+        $year += 1900;
         $msg .=  "Cannot handle date ($sec, $min, $hour, $mday, $month, $year)";
 
-	die $msg;
+        die $msg;
     }
 
     return $sec
-           + $SecOff
-           + ( SECS_PER_MINUTE * $min )
-           + ( SECS_PER_HOUR * $hour )
-           + ( SECS_PER_DAY * $days );
+        + $SecOff
+        + ( SECS_PER_MINUTE * $min )
+        + ( SECS_PER_HOUR * $hour )
+        + ( SECS_PER_DAY * $days );
 }
 
 sub _is_leap_year {
@@ -163,10 +163,10 @@ sub timelocal {
     # the _second_ hour after a DST change where the local time moves
     # backward.
     if ( ! $dst_off &&
-         ( ( $ref_t - SECS_PER_HOUR ) - _timegm( localtime( $loc_t - SECS_PER_HOUR ) ) +< 0 )
-       ) {
-        return $loc_t - SECS_PER_HOUR;
-    }
+        ( ( $ref_t - SECS_PER_HOUR ) - _timegm( localtime( $loc_t - SECS_PER_HOUR ) ) +< 0 )
+    ) {
+            return $loc_t - SECS_PER_HOUR;
+        }
 
     # Adjust for DST change
     $loc_t += $dst_off;

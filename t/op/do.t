@@ -7,8 +7,8 @@ sub ok($ok, ?$name) {
 
     # You have to do it this way or VMS will get confused.
     printf $^STDOUT, "\%s \%d\%s\n", $ok ?? "ok" !! "not ok", 
-                        $test,
-                        defined $name ?? " - $name" !! '';
+        $test,
+        defined $name ?? " - $name" !! '';
 
     printf $^STDOUT, "# Failed test at line \%d\n", (caller)[[2]] unless $ok;
 

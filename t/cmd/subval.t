@@ -56,10 +56,10 @@ sub fib($arg) {
     my($foo);
     $level++;
     if ($arg +<= 2) {
-	$foo = 1;
+        $foo = 1;
     }
     else {
-	$foo = &fib($arg-1) + &fib($arg-2);
+        $foo = &fib($arg-1) + &fib($arg-2);
     }
     $level--;
     $foo;
@@ -72,10 +72,10 @@ our $foo;
 for my $i (1..10) {
     $foo = $i + 12;
     if (&fib($i) == @good[$i]) {
-	print $^STDOUT, "ok $foo\n";
+        print $^STDOUT, "ok $foo\n";
     }
     else {
-	print $^STDOUT, "not ok $foo\n";
+        print $^STDOUT, "not ok $foo\n";
     }
 }
 
@@ -88,8 +88,8 @@ print $^STDOUT, join(':',&ary1( < @_ )) eq '1:2:3' ?? "ok 24\n" !! "not ok 24\n"
 
 sub ary2 {
     do {
-	return  @(1,2,3);
-	(3,2,1);
+        return  @(1,2,3);
+        (3,2,1);
     };
     0;
 }
@@ -106,7 +106,7 @@ sub somesub($num,$P,$F,$L) {
 
 &somesub(27, 'main', __FILE__, __LINE__);
 
-package foo;
+    package foo;
 &main::somesub(28, 'foo', __FILE__, __LINE__);
 
 

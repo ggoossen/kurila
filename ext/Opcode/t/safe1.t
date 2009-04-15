@@ -5,10 +5,10 @@ use Config;
 print $^STDOUT, "1..0\n# TODO for changes pckage system";
 exit;
 
-# Tests Todo:
-#	'main' as root
+    # Tests Todo:
+    #	'main' as root
 
-package test;	# test from somewhere other than main
+    package test;	# test from somewhere other than main
 
 our ($bar);
 
@@ -30,33 +30,33 @@ $cpt = Safe->new() or die;
 $cpt = Safe->new( "My::Root") or die;
 
 foreach(1..3) {
-	our $foo = 42;
+    our $foo = 42;
 
-	$cpt->share( <qw($foo));
+    $cpt->share( <qw($foo));
 
-	print $^STDOUT, ${*{$cpt->varglob('foo')}}       == 42 ?? "ok $t\n" !! "not ok $t\n"; $t++;
+    print $^STDOUT, ${*{$cpt->varglob('foo')}}       == 42 ?? "ok $t\n" !! "not ok $t\n"; $t++;
 
-	${*{$cpt->varglob('foo')}} = 9;
+    ${*{$cpt->varglob('foo')}} = 9;
 
-	print $^STDOUT, $foo == 9	?? "ok $t\n" !! "not ok $t\n"; $t++;
+    print $^STDOUT, $foo == 9	?? "ok $t\n" !! "not ok $t\n"; $t++;
 
-	print $^STDOUT, $cpt->reval('$foo')       == 9	?? "ok $t\n" !! "not ok $t\n"; $t++;
-	# check 'main' has been changed:
-	print $^STDOUT, $cpt->reval('$::foo')     == 9	?? "ok $t\n" !! "not ok $t\n"; $t++;
-	print $^STDOUT, $cpt->reval('$main::foo') == 9	?? "ok $t\n" !! "not ok $t\n"; $t++;
-	# check we can't see our test package:
-	print $^STDOUT, $cpt->reval('$test::foo')     	?? "not ok $t\n" !! "ok $t\n"; $t++;
-	print $^STDOUT, $cpt->reval('${*{Symbol::fetch_glob("test::foo")}}')		?? "not ok $t\n" !! "ok $t\n"; $t++;
+    print $^STDOUT, $cpt->reval('$foo')       == 9	?? "ok $t\n" !! "not ok $t\n"; $t++;
+    # check 'main' has been changed:
+    print $^STDOUT, $cpt->reval('$::foo')     == 9	?? "ok $t\n" !! "not ok $t\n"; $t++;
+    print $^STDOUT, $cpt->reval('$main::foo') == 9	?? "ok $t\n" !! "not ok $t\n"; $t++;
+    # check we can't see our test package:
+    print $^STDOUT, $cpt->reval('$test::foo')     	?? "not ok $t\n" !! "ok $t\n"; $t++;
+    print $^STDOUT, $cpt->reval('${*{Symbol::fetch_glob("test::foo")}}')		?? "not ok $t\n" !! "ok $t\n"; $t++;
 
-	$cpt->erase;	# erase the compartment, e.g., delete all variables
+    $cpt->erase;	# erase the compartment, e.g., delete all variables
 
-	print $^STDOUT, $cpt->reval('$foo') ?? "not ok $t\n" !! "ok $t\n"; $t++;
+    print $^STDOUT, $cpt->reval('$foo') ?? "not ok $t\n" !! "ok $t\n"; $t++;
 
-	# Note that we *must* use $cpt->varglob here because if we used
-	# $Root::foo etc we would still see the original values!
-	# This seems to be because the compiler has created an extra ref.
+    # Note that we *must* use $cpt->varglob here because if we used
+    # $Root::foo etc we would still see the original values!
+    # This seems to be because the compiler has created an extra ref.
 
-	print $^STDOUT, ${*{$cpt->varglob('foo')}} ?? "not ok $t\n" !! "ok $t\n"; $t++;
+    print $^STDOUT, ${*{$cpt->varglob('foo')}} ?? "not ok $t\n" !! "ok $t\n"; $t++;
 }
 
 print $^STDOUT, "ok $last_test\n";

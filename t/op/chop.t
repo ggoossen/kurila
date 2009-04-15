@@ -106,17 +106,17 @@ is ($_, "ab\n");
 do {
     use utf8;
 
-$_ = "abc\x{1234}";
-chop;
-is ($_, "abc", "Go Unicode");
+    $_ = "abc\x{1234}";
+    chop;
+    is ($_, "abc", "Go Unicode");
 
-$_ = "abc\x{1234}d";
-chop;
-is ($_, "abc\x{1234}");
+    $_ = "abc\x{1234}d";
+    chop;
+    is ($_, "abc\x{1234}");
 
-$_ = "\x{1234}\x{2345}";
-chop;
-is ($_, "\x{1234}");
+    $_ = "\x{1234}\x{2345}";
+    chop;
+    is ($_, "\x{1234}");
 
 };
 
@@ -135,27 +135,27 @@ $^INPUT_RECORD_SEPARATOR = "\n";
 %chop = %("One" => "On", "Two\n" => "Two", "" => "");
 
 foreach (keys %chomp) {
-  my $key = $_;
-  try {chomp $_};
-  if ($^EVAL_ERROR) {
-    my $err = $^EVAL_ERROR;
-    $err =~ s/\n$//s;
-    fail ("\$\@ = \"$err\"");
-  } else {
-    is ($_, %chomp{?$key}, "chomp hash key");
-  }
+    my $key = $_;
+    try {chomp $_};
+    if ($^EVAL_ERROR) {
+        my $err = $^EVAL_ERROR;
+        $err =~ s/\n$//s;
+        fail ("\$\@ = \"$err\"");
+    } else {
+        is ($_, %chomp{?$key}, "chomp hash key");
+    }
 }
 
 foreach (keys %chop) {
-  my $key = $_;
-  try {chop $_};
-  if ($^EVAL_ERROR) {
-    my $err = $^EVAL_ERROR;
-    $err =~ s/\n$//s;
-    fail ("\$\@ = \"$err\"");
-  } else {
-    is ($_, %chop{?$key}, "chop hash key");
-  }
+    my $key = $_;
+    try {chop $_};
+    if ($^EVAL_ERROR) {
+        my $err = $^EVAL_ERROR;
+        $err =~ s/\n$//s;
+        fail ("\$\@ = \"$err\"");
+    } else {
+        is ($_, %chop{?$key}, "chop hash key");
+    }
 }
 
 # chop and chomp can't be lvalues

@@ -36,41 +36,41 @@ Hash::Util - A selection of general-utility hash subroutines
 
 =head1 SYNOPSIS
 
-  # Restricted hashes
+# Restricted hashes
 
-  use Hash::Util qw(
-                     hash_seed all_keys
-                     lock_keys unlock_keys
-                     lock_value unlock_value
-                     lock_hash unlock_hash
-                     lock_keys_plus hash_locked
-                     hidden_keys legal_keys
-                   );
+use Hash::Util qw(
+hash_seed all_keys
+lock_keys unlock_keys
+lock_value unlock_value
+lock_hash unlock_hash
+lock_keys_plus hash_locked
+hidden_keys legal_keys
+);
 
-  %hash = (foo => 42, bar => 23);
-  # Ways to restrict a hash
-  lock_keys(%hash);
-  lock_keys(%hash, @keyset);
-  lock_keys_plus(%hash, @additional_keys);
+%hash = (foo => 42, bar => 23);
+# Ways to restrict a hash
+lock_keys(%hash);
+lock_keys(%hash, @keyset);
+lock_keys_plus(%hash, @additional_keys);
 
-  # Ways to inspect the properties of a restricted hash
-  my @legal = legal_keys(%hash);
-  my @hidden = hidden_keys(%hash);
-  my $ref = all_keys(%hash,@keys,@hidden);
-  my $is_locked = hash_locked(%hash);
+# Ways to inspect the properties of a restricted hash
+my @legal = legal_keys(%hash);
+my @hidden = hidden_keys(%hash);
+my $ref = all_keys(%hash,@keys,@hidden);
+my $is_locked = hash_locked(%hash);
 
-  # Remove restrictions on the hash
-  unlock_keys(%hash);
+# Remove restrictions on the hash
+unlock_keys(%hash);
 
-  # Lock individual values in a hash
-  lock_value  (%hash, 'foo');
-  unlock_value(%hash, 'foo');
+# Lock individual values in a hash
+lock_value  (%hash, 'foo');
+unlock_value(%hash, 'foo');
 
-  # Ways to change the restrictions on both keys and values
-  lock_hash  (%hash);
-  unlock_hash(%hash);
+# Ways to change the restrictions on both keys and values
+lock_hash  (%hash);
+unlock_hash(%hash);
 
-  my $hashes_are_randomised = hash_seed() != 0;
+my $hashes_are_randomised = hash_seed() != 0;
 
 =head1 DESCRIPTION
 
@@ -98,8 +98,8 @@ This is intended to largely replace the deprecated pseudo-hashes.
 
 =item B<unlock_keys>
 
-  lock_keys(%hash);
-  lock_keys(%hash, @keys);
+lock_keys(%hash);
+lock_keys(%hash, @keys);
 
 Restricts the given %hash's set of keys to @keys.  If @keys is not
 given it restricts it to its current keyset.  No more keys can be
@@ -109,7 +109,7 @@ the hash from being bless()ed while it is in a locked state. Any attempt
 to do so will raise an exception. Of course you can still bless()
 the hash before you call lock_keys() so this shouldn't be a problem.
 
-  unlock_keys(%hash);
+unlock_keys(%hash);
 
 Removes the restriction on the %hash's keyset.
 
@@ -127,7 +127,7 @@ sub lock_ref_keys($hash, @< @keys) {
         my %original_keys = %( < @+: map { @($_ => 1) }, keys %$hash );
         foreach my $k (keys %original_keys) {
             die "Hash has key '$k' which is not in the new key set"
-              unless %keys{?$k};
+                unless %keys{?$k};
         }
 
         foreach my $k ( @keys) {
@@ -158,13 +158,13 @@ sub unlock_keys { unlock_ref_keys(< @_) }
 
 =item B<lock_keys_plus>
 
-  lock_keys_plus(%hash,@additional_keys)
+lock_keys_plus(%hash,@additional_keys)
 
 Similar to C<lock_keys()>, with the difference being that the optional key list
 specifies keys that may or may not be already in the hash. Essentially this is
 an easier way to say
 
-  lock_keys(%hash,@additional_keys,keys %hash);
+lock_keys(%hash,@additional_keys,keys %hash);
 
 Returns a reference to %hash
 
@@ -192,8 +192,8 @@ sub lock_keys_plus { lock_ref_keys_plus(< @_) }
 
 =item B<unlock_value>
 
-  lock_value  (%hash, $key);
-  unlock_value(%hash, $key);
+lock_value  (%hash, $key);
+unlock_value(%hash, $key);
 
 Locks and unlocks the value for an individual key of a hash.  The value of a
 locked key cannot be changed.
@@ -210,7 +210,7 @@ sub lock_ref_value($hash, $key) {
     # Marking a value in the hash as RO is useful, regardless
     # of the status of the hash itself.
     warn "Cannot usefully lock values in an unlocked hash"
-      if !Internals::HvRESTRICTED(%$hash) && warnings::enabled;
+        if !Internals::HvRESTRICTED(%$hash) && warnings::enabled;
     Internals::SvREADONLY($hash->{?$key}, 1);
     return $hash
 }
@@ -228,12 +228,12 @@ sub unlock_value { unlock_ref_value(< @_) }
 
 =item B<unlock_hash>
 
-    lock_hash(%hash);
+lock_hash(%hash);
 
 lock_hash() locks an entire hash, making all keys and values read-only.
 No value can be changed, no keys can be added or deleted.
 
-    unlock_hash(%hash);
+unlock_hash(%hash);
 
 unlock_hash() does the opposite of lock_hash().  All keys and values
 are made writable.  All values can be changed and keys can be added
@@ -274,7 +274,7 @@ sub unlock_hash { unlock_hashref(< @_) }
 
 =item B<unlock_hash_recurse>
 
-    lock_hash_recurse(%hash);
+lock_hash_recurse(%hash);
 
 lock_hash() locks an entire hash and any hashes it references recursively,
 making all keys and values read-only. No value can be changed, no keys can
@@ -284,7 +284,7 @@ B<Only> recurses into hashes that are referenced by another hash. Thus a
 Hash of Hashes (HoH) will all be restricted, but a Hash of Arrays of Hashes
 (HoAoH) will only have the top hash restricted.
 
-    unlock_hash_recurse(%hash);
+unlock_hash_recurse(%hash);
 
 unlock_hash_recurse() does the opposite of lock_hash_recurse().  All keys and
 values are made writable.  All values can be changed and keys can be added
@@ -326,7 +326,7 @@ sub unlock_hash_recurse($hashref) { unlock_hashref_recurse($hashref) }
 
 =item B<hash_unlocked>
 
-  hash_unlocked(%hash) and print "Hash is unlocked!\n";
+hash_unlocked(%hash) and print "Hash is unlocked!\n";
 
 Returns true if the hash and its keys are unlocked.
 
@@ -351,7 +351,7 @@ sub hidden_keys($hashref){ hidden_ref_keys($hashref) }
 
 =item B<legal_keys>
 
-  my @keys = legal_keys(%hash);
+my @keys = legal_keys(%hash);
 
 Returns the list of the keys that are legal in a restricted hash.
 In the case of an unrestricted hash this is identical to calling
@@ -359,7 +359,7 @@ keys(%hash).
 
 =item B<hidden_keys>
 
-  my @keys = hidden_keys(%hash);
+my @keys = hidden_keys(%hash);
 
 Returns the list of the keys that are legal in a restricted hash but
 do not have a value associated to them. Thus if 'foo' is a
@@ -375,7 +375,7 @@ case it will return an empty list.
 
 =item B<all_keys>
 
-  all_keys(%hash,@keys,@hidden);
+all_keys(%hash,@keys,@hidden);
 
 Populates the arrays @keys with the all the keys that would pass
 an C<exists> tests, and populates @hidden with the remaining legal
@@ -385,11 +385,11 @@ Returns a reference to the hash.
 
 In the case of an unrestricted hash this will be equivalent to
 
-  $ref = do {
-      @keys = keys %hash;
-      @hidden = ();
-      \%hash
-  };
+$ref = do {
+@keys = keys %hash;
+@hidden = ();
+\%hash
+};
 
 B<NOTE> this is an experimental feature that is heavily dependent
 on the current implementation of restricted hashes. Should the
@@ -399,7 +399,7 @@ unrestricted hash.
 
 =item B<hash_seed>
 
-    my $hash_seed = hash_seed();
+my $hash_seed = hash_seed();
 
 hash_seed() returns the seed number used to randomise hash ordering.
 Zero means the "traditional" random hash ordering, non-zero means the
@@ -419,10 +419,10 @@ sub hash_seed () {
 
 =item B<hv_store>
 
-  my $sv = 0;
-  hv_store(%hash,$key,$sv) or die "Failed to alias!";
-  $hash{$key} = 1;
-  print $sv; # prints 1
+my $sv = 0;
+hv_store(%hash,$key,$sv) or die "Failed to alias!";
+$hash{$key} = 1;
+print $sv; # prints 1
 
 Stores an alias to a variable in a hash instead of copying the value.
 
@@ -469,7 +469,7 @@ and additionally are not prototyped.
 Note that the trapping of the restricted operations is not atomic:
 for example
 
-    try { %hash = (illegal_key => 1) }
+try { %hash = (illegal_key => 1) }
 
 leaves the C<%hash> empty rather than with its original contents.
 

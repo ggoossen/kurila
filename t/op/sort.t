@@ -111,30 +111,30 @@ try { @b = sort \&twoface, @(4,1,3,2) }; die if $^EVAL_ERROR;
 cmp_ok("$(join ' ',@b)",'eq','1 2 3 4','redefine sort sub inside the sort sub');
 
 do {
-  my $sortsub = \&Backwards;
-  my $sortglobr = \*Backwards;
-  @b = sort $sortsub, @(4,1,3,2);
-  cmp_ok("$(join ' ',@b)",'eq','4 3 2 1','sortname 1');
-  @b = sort $sortglobr, @(4,1,3,2);
-  cmp_ok("$(join ' ',@b)",'eq','4 3 2 1','sortname 4');
+    my $sortsub = \&Backwards;
+    my $sortglobr = \*Backwards;
+    @b = sort $sortsub, @(4,1,3,2);
+    cmp_ok("$(join ' ',@b)",'eq','4 3 2 1','sortname 1');
+    @b = sort $sortglobr, @(4,1,3,2);
+    cmp_ok("$(join ' ',@b)",'eq','4 3 2 1','sortname 4');
 };
 
 our ($sortsub, $sortglob, $sortglobr);
 do {
-  local $sortsub = \&Backwards;
-  local $sortglobr = \*Backwards;
-  @b = sort $sortsub, @(4,1,3,2);
-  cmp_ok("$(join ' ',@b)",'eq','4 3 2 1','sortname local 1');
-  @b = sort $sortglobr, @(4,1,3,2);
-  cmp_ok("$(join ' ',@b)",'eq','4 3 2 1','sortname local 4');
+    local $sortsub = \&Backwards;
+    local $sortglobr = \*Backwards;
+    @b = sort $sortsub, @(4,1,3,2);
+    cmp_ok("$(join ' ',@b)",'eq','4 3 2 1','sortname local 1');
+    @b = sort $sortglobr, @(4,1,3,2);
+    cmp_ok("$(join ' ',@b)",'eq','4 3 2 1','sortname local 4');
 };
 
 ## exercise sort builtins... ($a <=> $b already tested)
 @a = @( 5, 19, 1996, 255, 90 );
 @b = sort {
-    my $dummy;		# force blockness
-    return $b <+> $a
-}, @a;
+        my $dummy;		# force blockness
+        return $b <+> $a
+    }, @a;
 cmp_ok("$(join ' ',@b)",'eq','1996 255 90 19 5','force blockness');
 
 $x = join('', sort { $a cmp $b }, @harry);
@@ -168,8 +168,8 @@ do {
 $x = join('', sort { $a <+> $b }, @( 3, 1, 2));
 cmp_ok($x,'eq','123',q(optimized-away comparison block doesn't take any other arguments away with it));
 
-# test sorting in non-main package
-package Foo;
+    # test sorting in non-main package
+    package Foo;
 @a = @( 5, 19, 1996, 255, 90 );
 @b = sort { $b <+> $a }, @a;
 main::cmp_ok("$(join ' ',@b)",'eq','1996 255 90 19 5','not in main:: 1');
@@ -186,10 +186,10 @@ do {
 do {
     my@($def, $init) = @(0, 0);
     @b = sort {
-	$def = 1 if defined $Bar::a;
-	Bar::reenter() unless $init++;
-	$a <+> $b
-    }, qw/4 3 1 2/;
+            $def = 1 if defined $Bar::a;
+            Bar::reenter() unless $init++;
+            $a <+> $b
+        }, qw/4 3 1 2/;
     main::cmp_ok("$(join ' ',@b)",'eq','1 2 3 4','reenter 1');
 
     main::ok(!$def,'reenter 2');
@@ -247,11 +247,11 @@ do {
 # test that optimized {$b cmp $a} and {$b <=> $a} remain stable
 # (new in 5.9) without overloading
 do { no warnings;
-my @input = qw/5first 6first 5second 6second/;
-@b = sort { $b <+> $a }, @input;
-is "$(join ' ',@b)" , "6first 6second 5first 5second", "optimized \{$b <=> $a\} without overloading" ;
-@input =sort {$b <+> $a}, @input;
-is "$(join ' ',@input)" , "6first 6second 5first 5second","inline optimized \{$b <=> $a\} without overloading" ;
+    my @input = qw/5first 6first 5second 6second/;
+    @b = sort { $b <+> $a }, @input;
+    is "$(join ' ',@b)" , "6first 6second 5first 5second", "optimized \{$b <=> $a\} without overloading" ;
+    @input =sort {$b <+> $a}, @input;
+    is "$(join ' ',@input)" , "6first 6second 5first 5second","inline optimized \{$b <=> $a\} without overloading" ;
 };;
 
 my @output;
@@ -260,14 +260,14 @@ do {
     my $failed = 0;
 
     sub rec {
-	my $n = shift;
-	if (!defined($n)) {  # No arg means we're being called by sort()
-	    return 1;
-	}
-	if ($n+<5) { rec($n+1); }
-	else { @(...) =  sort \&rec, @(1,2); }
+        my $n = shift;
+        if (!defined($n)) {  # No arg means we're being called by sort()
+            return 1;
+        }
+        if ($n+<5) { rec($n+1); }
+        else { @(...) =  sort \&rec, @(1,2); }
 
-	$failed = 1 if !defined $n;
+        $failed = 1 if !defined $n;
     }
 
     rec(1);
@@ -285,9 +285,9 @@ do {
     package OtherPack;
     no warnings 'once';
     sub foo {
-	$answer = "something was unexpectedly defined or undefined" if
-	defined($a) || defined($b) || !defined($main::a) || !defined($main::b);
-	$main::a <+> $main::b;
+        $answer = "something was unexpectedly defined or undefined" if
+            defined($a) || defined($b) || !defined($main::a) || !defined($main::b);
+        $main::a <+> $main::b;
     }
 };
 
@@ -299,17 +299,17 @@ main::cmp_ok($answer,'eq','good','sort subr called from other package');
 
 $answer = "good";
 my @list = sort { A::min(< @$a) <+> A::min(< @$b) },
- @(  \@(3, 1, 5), \@(2, 4), \@(0));
+    @(  \@(3, 1, 5), \@(2, 4), \@(0));
 
 main::cmp_ok($answer,'eq','good','bug 36430');
 
-package A;
+    package A;
 sub min {
-  my @list = sort {
-    $answer = '$a and/or $b are not defined ' if !defined($a) || !defined($b);
-    $a <+> $b;
-  }, @_;
-  @list[0];
+    my @list = sort {
+            $answer = '$a and/or $b are not defined ' if !defined($a) || !defined($b);
+            $a <+> $b;
+        }, @_;
+    @list[0];
 }
 
 # Sorting shouldn't increase the refcount of a sub

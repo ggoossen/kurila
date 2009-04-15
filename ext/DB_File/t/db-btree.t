@@ -3,15 +3,15 @@
 use warnings;
 
 use Config;
- 
+
 BEGIN
 {
     if ($^OS_NAME eq 'darwin'
-	&& ( <split(m/\./, config_value("osvers")))[[0]] +< 7 # Mac OS X 10.3 == Darwin 7
-	&& config_value("db_version_major") == 1
-	&& config_value("db_version_minor") == 0
-	&& config_value("db_version_patch") == 0) {
-	warn <<EOM;
+        && ( <split(m/\./, config_value("osvers")))[[0]] +< 7 # Mac OS X 10.3 == Darwin 7
+        && config_value("db_version_major") == 1
+        && config_value("db_version_minor") == 0
+        && config_value("db_version_patch") == 0) {
+        warn <<EOM;
 #
 # This test is known to crash in Mac OS X versions 10.2 (or earlier)
 # because of the buggy Berkeley DB version included with the OS.
@@ -51,16 +51,16 @@ do {
     {
         my $class = shift ;
         my $filename = shift ;
-	my $fh = gensym ;
-	open ($fh, ">", "$filename") || die "Cannot open $filename: $^OS_ERROR" ;
-	my $real_stdout = $^STDOUT;
-	return bless \@($fh, $real_stdout ) ;
+        my $fh = gensym ;
+        open ($fh, ">", "$filename") || die "Cannot open $filename: $^OS_ERROR" ;
+        my $real_stdout = $^STDOUT;
+        return bless \@($fh, $real_stdout ) ;
 
     }
     sub DESTROY
     {
         my $self = shift ;
-	close $self->[0] ;
+        close $self->[0] ;
     }
 };
 
@@ -94,7 +94,7 @@ sub normalise
 
 my $db185mode =  ($DB_File::db_version == 1 && ! $DB_File::db_185_compat) ;
 my $null_keys_allowed = ($DB_File::db_ver +< 2.004010 
-				|| $DB_File::db_ver +>= 3.1 );
+                         || $DB_File::db_ver +>= 3.1 );
 
 my $Dfile = "dbbtree.tmp";
 unlink $Dfile;
@@ -143,7 +143,7 @@ do {
     my %noMode = %( < @+: map { @: $_, 1 }, qw( amigaos MSWin32 NetWare cygwin ) ) ;
 
     ok( ($mode ^&^ 0777) == (($^OS_NAME eq 'os2' || $^OS_NAME eq 'MacOS') ?? 0666 !! 0640)
-          || %noMode{?$^OS_NAME} );
+        || %noMode{?$^OS_NAME} );
 
     my ($i);
     %h->iterate( sub { $i++ } );
@@ -215,7 +215,7 @@ my @values = %h->values;
 ok( ((nelems @keys)-1) == 29 && ((nelems @values)-1) == 29) ;
 
 my $i = 0 ;
-%h->iterate(
+    %h->iterate(
     sub {
         my @($key, $value) = @_;
         if ($key eq @keys[$i] && $value eq @values[$i] && $key eq lc($value)) {
@@ -246,7 +246,7 @@ if ($null_keys_allowed) {
     $result = ( %h->FETCH('') eq 'bar' );
 }
 else
-  { $result = 1 }
+{ $result = 1 }
 ok( $result) ;
 
 # check cache overflow and numeric keys and contents
@@ -258,16 +258,16 @@ ok( $ok);
 my @($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,
      $blksize,$blocks) = @: stat($Dfile);
 ok( $size +> 0 );
- 
+
 # Now check all the non-tie specific stuff
 
 
 # Check R_NOOVERWRITE flag will make put fail when attempting to overwrite
 # an existing record.
- 
+
 my $status = %h->put( 'x', 'newvalue', R_NOOVERWRITE) ;
 ok( $status == 1 );
- 
+
 # check that the value of the key 'x' has not been changed by the 
 # previous test
 ok( %h->FETCH('x') eq 'X' );
@@ -366,7 +366,7 @@ ok( $key eq 'replace key' );
 ok( $value eq 'replace value' );
 $status = %h->get('y', $value) ;
 ok( 1) ; # hard-wire to always pass. the previous test ($status == 1)
-	    # only worked because of a bug in 1.85/6
+# only worked because of a bug in 1.85/6
 
 # use seq to walk forwards through a file 
 
@@ -392,7 +392,7 @@ $ok = 1 ;
 while (($status = %h->seq($key, $value, R_PREV)) == 0)
 {
     ($ok = 0), last if ($previous cmp $key) == -1 ;
-    #print "key = [$key] value = [$value]\n" ;
+#print "key = [$key] value = [$value]\n" ;
 }
 
 ok( $status == 1 );
@@ -455,10 +455,10 @@ my @smith = %hh->get_dup('Smith') ;
 ok( "$(join ' ',@smith)" eq "John" );
 
 do {
-my @wall = %hh->get_dup('Wall') ;
-my %wall ;
- %wall{[ @wall]} =  @wall ;
-ok( ((nelems @wall) == 4 && %wall{?'Larry'} && %wall{?'Stone'} && %wall{?'Brick'}) );
+    my @wall = %hh->get_dup('Wall') ;
+    my %wall ;
+        %wall{[ @wall]} =  @wall ;
+    ok( ((nelems @wall) == 4 && %wall{?'Larry'} && %wall{?'Stone'} && %wall{?'Brick'}) );
 };
 
 # hash
@@ -470,7 +470,7 @@ ok( nkeys %smith == 1 && %smith{?'John'}) ;
 
 my %wall = %( < %hh->get_dup('Wall', 1) ) ;
 ok( nkeys %wall == 3 && %wall{?'Larry'} == 1 && %wall{?'Stone'} == 1 
-		&& %wall{?'Brick'} == 2);
+    && %wall{?'Brick'} == 2);
 
 undef %hh ;
 unlink $Dfile;
@@ -482,11 +482,11 @@ my $Dfile1 = "btree1";
 
 ok( %h = DB_File->new( $Dfile1, O_RDWR^|^O_CREAT, 0640, $DB_BTREE ) );
 foreach (1 .. 10)
-  { %h->put( $_ => $_ * 100 ) }
+{ %h->put( $_ => $_ * 100 ) }
 
 # check that there are 10 elements in the hash
 $i = 0 ;
-%h->iterate(
+    %h->iterate(
     sub {
         my @($key, $value) = @_;
         $i++;

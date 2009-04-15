@@ -8,46 +8,46 @@ Tie::Hash, Tie::StdHash, Tie::ExtraHash - base class definitions for tied hashes
 
 =head1 SYNOPSIS
 
-    package NewHash;
-    require Tie::Hash;
+package NewHash;
+require Tie::Hash;
 
-    @ISA = qw(Tie::Hash);
+@ISA = qw(Tie::Hash);
 
-    sub DELETE { ... }		# Provides needed method
-    sub CLEAR { ... }		# Overrides inherited method
-
-
-    package NewStdHash;
-    require Tie::Hash;
-
-    @ISA = qw(Tie::StdHash);
-
-    # All methods provided by default, define only those needing overrides
-    # Accessors access the storage in %{$_[0]};
-    # TIEHASH should return a reference to the actual storage
-    sub DELETE { ... }
-
-    package NewExtraHash;
-    require Tie::Hash;
-
-    @ISA = qw(Tie::ExtraHash);
-
-    # All methods provided by default, define only those needing overrides
-    # Accessors access the storage in %{$_[0][0]};
-    # TIEHASH should return an array reference with the first element being
-    # the reference to the actual storage 
-    sub DELETE { 
-      $_[0][1]->('del', $_[0][0], $_[1]); # Call the report writer
-      delete $_[0][0]->{$_[1]};		  #  $_[0]->SUPER::DELETE($_[1])
-    }
+sub DELETE { ... }		# Provides needed method
+sub CLEAR { ... }		# Overrides inherited method
 
 
-    package main;
+package NewStdHash;
+require Tie::Hash;
 
-    tie %new_hash, 'NewHash';
-    tie %new_std_hash, 'NewStdHash';
-    tie %new_extra_hash, 'NewExtraHash',
-	sub {warn "Doing \U$_[1]\E of $_[2].\n"};
+@ISA = qw(Tie::StdHash);
+
+# All methods provided by default, define only those needing overrides
+# Accessors access the storage in %{$_[0]};
+# TIEHASH should return a reference to the actual storage
+sub DELETE { ... }
+
+package NewExtraHash;
+require Tie::Hash;
+
+@ISA = qw(Tie::ExtraHash);
+
+# All methods provided by default, define only those needing overrides
+# Accessors access the storage in %{$_[0][0]};
+# TIEHASH should return an array reference with the first element being
+# the reference to the actual storage 
+sub DELETE { 
+$_[0][1]->('del', $_[0][0], $_[1]); # Call the report writer
+delete $_[0][0]->{$_[1]};		  #  $_[0]->SUPER::DELETE($_[1])
+}
+
+
+package main;
+
+tie %new_hash, 'NewHash';
+tie %new_std_hash, 'NewStdHash';
+tie %new_extra_hash, 'NewExtraHash',
+sub {warn "Doing \U$_[1]\E of $_[2].\n"};
 
 =head1 DESCRIPTION
 
@@ -121,18 +121,18 @@ hash is in the hash referenced by C<tied(%tiedhash)>.  Thus overwritten
 C<TIEHASH> method should return a hash reference, and the remaining methods
 should operate on the hash referenced by the first argument:
 
-  package ReportHash;
-  our @ISA = 'Tie::StdHash';
+package ReportHash;
+our @ISA = 'Tie::StdHash';
 
-  sub TIEHASH  {
-    my $storage = bless {}, shift;
-    warn "New ReportHash created, stored in $storage.\n";
-    $storage
-  }
-  sub STORE    {
-    warn "Storing data with key $_[1] at $_[0].\n";
-    $_[0]{$_[1]} = $_[2]
-  }
+sub TIEHASH  {
+my $storage = bless {}, shift;
+warn "New ReportHash created, stored in $storage.\n";
+$storage
+}
+sub STORE    {
+warn "Storing data with key $_[1] at $_[0].\n";
+$_[0]{$_[1]} = $_[2]
+}
 
 
 =head1 Inheriting from B<Tie::ExtraHash>
@@ -143,19 +143,19 @@ C<TIEHASH> method should return an array reference with the first
 element being a hash reference, and the remaining methods should operate on the
 hash C<< %{ $_[0]->[0] } >>:
 
-  package ReportHash;
-  our @ISA = 'Tie::ExtraHash';
+package ReportHash;
+our @ISA = 'Tie::ExtraHash';
 
-  sub TIEHASH  {
-    my $class = shift;
-    my $storage = bless [{}, @_], $class;
-    warn "New ReportHash created, stored in $storage.\n";
-    $storage;
-  }
-  sub STORE    {
-    warn "Storing data with key $_[1] at $_[0].\n";
-    $_[0][0]{$_[1]} = $_[2]
-  }
+sub TIEHASH  {
+my $class = shift;
+my $storage = bless [{}, @_], $class;
+warn "New ReportHash created, stored in $storage.\n";
+$storage;
+}
+sub STORE    {
+warn "Storing data with key $_[1] at $_[0].\n";
+$_[0][0]{$_[1]} = $_[2]
+}
 
 The default C<TIEHASH> method stores "extra" arguments to tie() starting
 from offset 1 in the array referenced by C<tied(%tiedhash)>; this is the
@@ -197,11 +197,11 @@ sub new {
 sub TIEHASH {
     my $pkg = shift;
     if (defined &{Symbol::fetch_glob("$($pkg)::new")}) {
-	warnings::warnif("WARNING: calling $($pkg)->new since $($pkg)->TIEHASH is missing");
-	$pkg->new(< @_);
+        warnings::warnif("WARNING: calling $($pkg)->new since $($pkg)->TIEHASH is missing");
+        $pkg->new(< @_);
     }
     else {
-	die "$pkg doesn't define a TIEHASH method";
+        die "$pkg doesn't define a TIEHASH method";
     }
 }
 
@@ -216,11 +216,11 @@ sub CLEAR {
     my @keys;
 
     while (defined $key) {
-	push @keys, $key;
-	$key = $self->NEXTKEY(< @_, $key);
+        push @keys, $key;
+        $key = $self->NEXTKEY(< @_, $key);
     }
     foreach my $key ( @keys) {
-	$self->DELETE(< @_, $key);
+        $self->DELETE(< @_, $key);
     }
 }
 

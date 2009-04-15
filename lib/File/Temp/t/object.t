@@ -14,11 +14,11 @@ my (@files, @dirs, @still_there);
 # And a test for files that should still be around
 # These are tidied up
 END {
-  foreach ( @still_there) {
-    ok( -f $_, "Check $_ exists" );
-    ok( unlink( $_ ), "Unlinked $_" );
-    ok( !(-f $_), "$_ no longer there");
-  }
+    foreach ( @still_there) {
+        ok( -f $_, "Check $_ exists" );
+        ok( unlink( $_ ), "Unlinked $_" );
+        ok( !(-f $_), "$_ no longer there");
+    }
 }
 
 # Loop over an array hoping that the files dont exist
@@ -64,9 +64,9 @@ ok( !-f $qfname, "temp file now gone");
 my $template = 'tmpdirXXXXXX';
 print $^STDOUT, "# Template: $template\n";
 my $tempdir = File::Temp::tempdir( $template ,
-				   DIR => File::Spec->curdir,
-				   CLEANUP => 1,
-				 );
+                                   DIR => File::Spec->curdir,
+                                   CLEANUP => 1,
+                                   );
 
 print $^STDOUT, "# TEMPDIR: $tempdir\n";
 
@@ -75,8 +75,8 @@ push(@dirs, $tempdir);
 
 # Create file in the temp dir
 $fh = File::Temp->new(
-		     DIR => $tempdir,
-		     SUFFIX => '.dat',);
+    DIR => $tempdir,
+    SUFFIX => '.dat',);
 
 ok( $fh->unlink_on_destroy, "should unlink");
 print $^STDOUT, "# TEMPFILE: Created \$fh\n";
@@ -95,8 +95,8 @@ push(@files, $fh->filename);
 # and another (with template)
 
 $fh = File::Temp->new( TEMPLATE => 'helloXXXXXXX',
-		      DIR => $tempdir,
-		      SUFFIX => '.dat',);
+    DIR => $tempdir,
+    SUFFIX => '.dat',);
 
 print $^STDOUT, "# TEMPFILE: Created \$fh\n";
 

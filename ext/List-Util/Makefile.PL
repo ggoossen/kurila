@@ -4,9 +4,9 @@ WriteMakefile(
     VERSION_FROM    => "lib/List/Util.pm",
     NAME            => "List::Util",
     DEFINE          => "-DPERL_EXT",
-);
+    );
 
-package MY;
+    package MY;
 
 # We go through the ListUtil.c trickery to foil platforms
 # that have the feature combination of
@@ -20,7 +20,7 @@ package MY;
 BEGIN {
     use Config;
     unless (defined config_value("usedl")) {
-	eval <<'__EOMM__';
+        eval <<'__EOMM__';
 sub xs_c {
     my($self) = shift;
     return '' unless $self->needs_linking();

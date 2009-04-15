@@ -19,7 +19,7 @@ is( $pkg_ref, $exp_ref, '%Pod::Functions::Type exported' );
 is( $pkg_ref, $exp_ref, '%Pod::Functions::Flavor exported' );
 
 @( $pkg_ref, $exp_ref ) = @( \%Pod::Functions::Type_Description, 
-                           \%Type_Description );
+                             \%Type_Description );
 is( $pkg_ref, $exp_ref, '%Pod::Functions::Type_Description exported' );
 
 @( $pkg_ref, $exp_ref ) = @( \@Pod::Functions::Type_Order, \@Type_Order );
@@ -45,15 +45,15 @@ my $pod_functions = File::Spec->catfile(
     $path, File::Spec->updir, 'Functions.pm' );
 
 SKIP: do {
-	my $test_out = do { local $^INPUT_RECORD_SEPARATOR = undef; ~< *DATA }; 
-	
-	skip( "Can't fork '$^EXECUTABLE_NAME': $^OS_ERROR", 1) 
-	    unless open my $fh, "-|", qq[$^EXECUTABLE_NAME "-I../lib" $pod_functions];
-	my $fake_out = do { local $^INPUT_RECORD_SEPARATOR = undef; ~< $fh };
-	skip( "Pipe error: $^OS_ERROR", 1)
-	    unless close $fh;
+    my $test_out = do { local $^INPUT_RECORD_SEPARATOR = undef; ~< *DATA }; 
 
-	is( $fake_out, $test_out, 'run as plain program' );
+    skip( "Can't fork '$^EXECUTABLE_NAME': $^OS_ERROR", 1) 
+        unless open my $fh, "-|", qq[$^EXECUTABLE_NAME "-I../lib" $pod_functions];
+    my $fake_out = do { local $^INPUT_RECORD_SEPARATOR = undef; ~< $fh };
+    skip( "Pipe error: $^OS_ERROR", 1)
+        unless close $fh;
+
+    is( $fake_out, $test_out, 'run as plain program' );
 };
 
 =head1 NAME

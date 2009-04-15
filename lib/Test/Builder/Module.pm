@@ -14,20 +14,20 @@ Test::Builder::Module - Base class for test modules
 
 =head1 SYNOPSIS
 
-  # Emulates Test::Simple
-  package Your::Module;
+# Emulates Test::Simple
+package Your::Module;
 
-  my $CLASS = __PACKAGE__;
+my $CLASS = __PACKAGE__;
 
-  use base 'Test::Builder::Module';
-  @EXPORT = qw(ok);
+use base 'Test::Builder::Module';
+@EXPORT = qw(ok);
 
-  sub ok ($;$) {
-      my $tb = $CLASS->builder;
-      return $tb->ok(@_);
-  }
-  
-  1;
+sub ok ($;$) {
+my $tb = $CLASS->builder;
+return $tb->ok(@_);
+}
+
+1;
 
 
 =head1 DESCRIPTION
@@ -57,7 +57,7 @@ All arguments passed to import() are passed onto
 C<< Your::Module->builder->plan() >> with the exception of 
 C<import =>[qw(things to import)]>.
 
-    use Your::Module import => [qw(this that)], tests => 23;
+use Your::Module import => [qw(this that)], tests => 23;
 
 says to import the functions this() and that() as well as set the plan
 to be 23 tests.
@@ -72,7 +72,7 @@ import_extra().
 
 sub import {
     my@($class) =@( shift);
-    
+
     # Don't run all this when loading ourself.
     return 1 if $class eq 'Test::Builder::Module';
 
@@ -122,7 +122,7 @@ sub _strip_imports {
 
 =head3 import_extra
 
-    Your::Module->import_extra(\@import_args);
+Your::Module->import_extra(\@import_args);
 
 import_extra() is called by import().  It provides an opportunity for you
 to add behaviors to your module based on its import list.
@@ -147,7 +147,7 @@ Test::Builder object.
 
 =head3 builder
 
-  my $builder = Your::Class->builder;
+my $builder = Your::Class->builder;
 
 This method returns the Test::Builder object associated with Your::Class.
 It is not a constructor so you can call it as often as you like.
@@ -159,11 +159,11 @@ recommended.
 The object returned by builder() may change at runtime so you should
 call builder() inside each function rather than store it in a global.
 
-  sub ok {
-      my $builder = Your::Class->builder;
+sub ok {
+my $builder = Your::Class->builder;
 
-      return $builder->ok(@_);
-  }
+return $builder->ok(@_);
+}
 
 
 =cut

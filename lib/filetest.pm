@@ -8,12 +8,12 @@ filetest - Perl pragma to control the filetest permission operators
 
 =head1 SYNOPSIS
 
-    $can_perhaps_read = -r "file";	# use the mode bits
-    {
-        use filetest 'access';		# intuit harder
-        $can_really_read = -r "file";
-    }
-    $can_perhaps_read = -r "file";	# use the mode bits again
+$can_perhaps_read = -r "file";	# use the mode bits
+{
+use filetest 'access';		# intuit harder
+$can_really_read = -r "file";
+}
+$can_perhaps_read = -r "file";	# use the mode bits again
 
 =head1 DESCRIPTION
 
@@ -74,16 +74,16 @@ outcome of the following two tests is different.  The first has the stat
 bits of C</etc/passwd> in C<_>, and in the second case this still
 contains the bits of C</etc>.
 
- { -d '/etc';
-   -w '/etc/passwd';
-   print -f _ ? 'Yes' : 'No';   # Yes
- }
+{ -d '/etc';
+-w '/etc/passwd';
+print -f _ ? 'Yes' : 'No';   # Yes
+}
 
- { use filetest 'access';
-   -d '/etc';
-   -w '/etc/passwd';
-   print -f _ ? 'Yes' : 'No';   # No
- }
+{ use filetest 'access';
+-d '/etc';
+-w '/etc/passwd';
+print -f _ ? 'Yes' : 'No';   # No
+}
 
 Of course, unless your OS does not implement access(), in which case the
 pragma is simply ignored.  Best not to use C<_> at all in a file where
@@ -100,17 +100,17 @@ $filetest::hint_bits = 0x00400000; # HINT_FILETEST_ACCESS
 
 sub import {
     if ( @_[?1] eq 'access' ) {
-	$^HINT_BITS ^|^= $filetest::hint_bits;
+        $^HINT_BITS ^|^= $filetest::hint_bits;
     } else {
-	die "filetest: the only implemented subpragma is 'access'.\n";
+        die "filetest: the only implemented subpragma is 'access'.\n";
     }
 }
 
 sub unimport {
     if ( @_[?1] eq 'access' ) {
-	$^HINT_BITS ^&^= ^~^$filetest::hint_bits;
+        $^HINT_BITS ^&^= ^~^$filetest::hint_bits;
     } else {
-	die "filetest: the only implemented subpragma is 'access'.\n";
+        die "filetest: the only implemented subpragma is 'access'.\n";
     }
 }
 

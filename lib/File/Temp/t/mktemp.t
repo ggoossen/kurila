@@ -49,13 +49,13 @@ is($string, $line);
 # Simply waiting 3 seconds seems to be enough for the system to update
 
 if ($^OS_NAME eq 'MSWin32') {
-  sleep 3;
+    sleep 3;
 }
 my $status = unlink0($fh, $template);
 if ($status) {
-  ok( $status );
+    ok( $status );
 } else {
-  skip("Skip test failed probably due to \$TMPDIR being on NFS",1);
+    skip("Skip test failed probably due to \$TMPDIR being on NFS",1);
 }
 
 # MKSTEMPS
@@ -76,9 +76,9 @@ ok( (-e $fname) );
 $status = unlink0($fh, $fname);
 
 if ($status) {
-  ok($status);
+    ok($status);
 } else {
-  skip("Skip test failed probably due to cwd being on NFS",1)
+    skip("Skip test failed probably due to cwd being on NFS",1)
 }
 
 # MKDTEMP

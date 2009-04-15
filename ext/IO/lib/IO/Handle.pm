@@ -6,26 +6,26 @@ IO::Handle - supply object methods for I/O handles
 
 =head1 SYNOPSIS
 
-    use IO::Handle;
+use IO::Handle;
 
-    $io = new IO::Handle;
-    if ($io->fdopen(fileno(STDIN),"r")) {
-        print $io->getline;
-        $io->close;
-    }
+$io = new IO::Handle;
+if ($io->fdopen(fileno(STDIN),"r")) {
+print $io->getline;
+$io->close;
+}
 
-    $io = new IO::Handle;
-    if ($io->fdopen(fileno(STDOUT),"w")) {
-        $io->print("Some text\n");
-    }
+$io = new IO::Handle;
+if ($io->fdopen(fileno(STDOUT),"w")) {
+$io->print("Some text\n");
+}
 
-    # setvbuf is not available by default on Perls 5.8.0 and later.
-    use IO::Handle '_IOLBF';
-    $io->setvbuf($buffer_var, _IOLBF, 1024);
+# setvbuf is not available by default on Perls 5.8.0 and later.
+use IO::Handle '_IOLBF';
+$io->setvbuf($buffer_var, _IOLBF, 1024);
 
-    undef $io;       # automatically closes the file if it's open
+undef $io;       # automatically closes the file if it's open
 
-    autoflush STDOUT 1;
+autoflush STDOUT 1;
 
 =head1 DESCRIPTION
 
@@ -61,17 +61,17 @@ See L<perlfunc> for complete descriptions of each of the following
 supported C<IO::Handle> methods, which are just front ends for the
 corresponding built-in functions:
 
-    $io->close
-    $io->eof
-    $io->fileno
-    $io->getc
-    $io->read ( BUF, LEN, [OFFSET] )
-    $io->print ( ARGS )
-    $io->printf ( FMT, [ARGS] )
-    $io->stat
-    $io->sysread ( BUF, LEN, [OFFSET] )
-    $io->syswrite ( BUF, [LEN, [OFFSET]] )
-    $io->truncate ( LEN )
+$io->close
+$io->eof
+$io->fileno
+$io->getc
+$io->read ( BUF, LEN, [OFFSET] )
+$io->print ( ARGS )
+$io->printf ( FMT, [ARGS] )
+$io->stat
+$io->sysread ( BUF, LEN, [OFFSET] )
+$io->syswrite ( BUF, [LEN, [OFFSET]] )
+$io->truncate ( LEN )
 
 See L<perlvar> for complete descriptions of each of the following
 supported C<IO::Handle> methods.  All of them return the previous
@@ -80,15 +80,15 @@ given will set the value.  If no argument is given the previous value
 is unchanged (except for $io->autoflush will actually turn ON
 autoflush by default).
 
-    $io->autoflush ( [BOOL] )                         $|
-    $io->input_line_number( [NUM])                    $.
+$io->autoflush ( [BOOL] )                         $|
+$io->input_line_number( [NUM])                    $.
 
 The following methods are not supported on a per-filehandle basis.
 
-    IO::Handle->output_field_separator( [STR] )       $,
-    IO::Handle->output_record_separator( [STR] )      $\
+IO::Handle->output_field_separator( [STR] )       $,
+IO::Handle->output_record_separator( [STR] )      $\
 
-    IO::Handle->input_record_separator( [STR] )       $/
+IO::Handle->input_record_separator( [STR] )       $/
 
 Furthermore, for doing normal I/O you might need these:
 
@@ -294,7 +294,7 @@ sub new_from_fd {
     my $io = gensym;
     shift;
     IO::Handle::fdopen($io, < @_)
-	or return undef;
+        or return undef;
     bless $io, $class;
 }
 
@@ -304,10 +304,10 @@ sub new_from_fd {
 
 sub _open_mode_string($mode) {
     $mode =~ m/^\+?(<|>>?)$/
-      or $mode =~ s/^r(\+?)$/$1</
-      or $mode =~ s/^w(\+?)$/$1>/
-      or $mode =~ s/^a(\+?)$/$1>>/
-      or die "IO::Handle: bad open mode: $mode";
+        or $mode =~ s/^r(\+?)$/$1</
+        or $mode =~ s/^w(\+?)$/$1>/
+        or $mode =~ s/^a(\+?)$/$1>>/
+        or die "IO::Handle: bad open mode: $mode";
     $mode;
 }
 
@@ -317,12 +317,12 @@ sub fdopen {
 
     my $fdmode = '&';
     if (!ref($fd) && $fd =~ m#^\d+$#) {
-	# It's an FD number; prefix with "=".
-	$fdmode .= "=";
+        # It's an FD number; prefix with "=".
+        $fdmode .= "=";
     }
 
     open($io, _open_mode_string($mode) . $fdmode, $fd)
-	?? $io !! undef;
+        ?? $io !! undef;
 }
 
 sub close {
@@ -402,7 +402,7 @@ sub sysread {
 
 sub write {
     (nelems @_) +>= 2 && (nelems @_) +<= 4 or die 'usage: $io->write(BUF [, LEN [, OFFSET]])';
-    local($^OUTPUT_RECORD_SEPARATOR) = "";
+                      local($^OUTPUT_RECORD_SEPARATOR) = "";
     @_[+2] = length(@_[1]) unless defined @_[?2];
     print  @_[0]  ,substr(@_[1], @_[?3] || 0, @_[2]);
 }
@@ -410,9 +410,9 @@ sub write {
 sub syswrite {
     (nelems @_) +>= 2 && (nelems @_) +<= 4 or die 'usage: $io->syswrite(BUF [, LEN [, OFFSET]])';
     if (defined(@_[?2])) {
-	syswrite(@_[0], @_[1], @_[2], @_[?3] || 0);
+        syswrite(@_[0], @_[1], @_[2], @_[?3] || 0);
     } else {
-	syswrite(@_[0], @_[1]);
+        syswrite(@_[0], @_[1]);
     }
 }
 
@@ -434,7 +434,7 @@ sub autoflush {
 
 sub output_field_separator {
     warn "output_field_separator is not supported on a per-handle basis"
-	if ref(@_[0]);
+        if ref(@_[0]);
     my $prev = $^OUTPUT_FIELD_SEPARATOR;
     $^OUTPUT_FIELD_SEPARATOR = @_[1] if (nelems @_) +> 1;
     $prev;
@@ -442,7 +442,7 @@ sub output_field_separator {
 
 sub output_record_separator {
     warn "output_record_separator is not supported on a per-handle basis"
-	if ref(@_[0]);
+        if ref(@_[0]);
     my $prev = $^OUTPUT_RECORD_SEPARATOR;
     $^OUTPUT_RECORD_SEPARATOR = @_[1] if (nelems @_) +> 1;
     $prev;
@@ -450,7 +450,7 @@ sub output_record_separator {
 
 sub input_record_separator {
     warn "input_record_separator is not supported on a per-handle basis"
-	if ref(@_[0]);
+        if ref(@_[0]);
     my $prev = $^INPUT_RECORD_SEPARATOR;
     $^INPUT_RECORD_SEPARATOR = @_[1] if (nelems @_) +> 1;
     $prev;
@@ -487,7 +487,7 @@ sub ioctl {
 sub constant {
     my $name = shift;
     (($name =~ m/^(SEEK_(SET|CUR|END)|_IO[FLN]BF)$/) && defined &{*{Symbol::fetch_glob($name)}})
-	?? &{*{Symbol::fetch_glob($name)}}() !! undef;
+        ?? &{*{Symbol::fetch_glob($name)}}() !! undef;
 }
 
 

@@ -9,7 +9,7 @@ ok 1;
 print $^STDOUT, "# Using I18N::LangTags::Detect v$I18N::LangTags::Detect::VERSION\n";
 
 print $^STDOUT, "# Make sure we can assign to ENV entries\n",
-      "# (Otherwise we can't run the subsequent tests)...\n";
+    "# (Otherwise we can't run the subsequent tests)...\n";
 env::var('MYORP'   ) = 'Zing';          is env::var('MYORP'), 'Zing';
 env::var('SWUZ'    ) = 'KLORTHO HOOBOY'; is env::var('SWUZ'), 'KLORTHO HOOBOY';
 
@@ -19,16 +19,16 @@ env::var('SWUZ') = undef;
 sub j { "[" . join(' ', map { "\"$_\"" }, @_) . "]" ;}
 
 sub show {
-  print $^STDOUT, "#  (Seeing \{", join(' ', map( {dump::view($_) }, @_)), "\} at line ", @(caller)[2], ")\n";
-  printenv();
-  return @_[0] || '';
+    print $^STDOUT, "#  (Seeing \{", join(' ', map( {dump::view($_) }, @_)), "\} at line ", @(caller)[2], ")\n";
+    printenv();
+    return @_[0] || '';
 }
 sub printenv {
-  print $^STDOUT, "# ENV:\n";
-  foreach my $k (sort { $a cmp $b }, env::keys()) {
-    my $p = env::var($k);  $p =~ s/\n/\n#/g;
-    print $^STDOUT, "#   [$k] = [$p]\n"; }
-  print $^STDOUT, "# [end of ENV]\n#\n";
+    print $^STDOUT, "# ENV:\n";
+    foreach my $k (sort { $a cmp $b }, env::keys()) {
+        my $p = env::var($k);  $p =~ s/\n/\n#/g;
+        print $^STDOUT, "#   [$k] = [$p]\n"; }
+    print $^STDOUT, "# [end of ENV]\n#\n";
 }
 
 env::var('IGNORE_WIN32_LOCALE' ) = 1; # a hack, just for testing's sake.

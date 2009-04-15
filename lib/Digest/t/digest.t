@@ -11,9 +11,9 @@ do {
     @ISA = qw(Digest::base);
 
     sub new {
-	my $class = shift;
-	my $d = shift || "ooo";
-	bless \%( d => $d ), $class;
+        my $class = shift;
+        my $d = shift || "ooo";
+        bless \%( d => $d ), $class;
     }
     sub add {}
     sub digest { shift->{?d} }

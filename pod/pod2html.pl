@@ -8,10 +8,10 @@ pod2html - convert .pod files to .html files
 
 =head1 SYNOPSIS
 
-    pod2html --help --htmlroot=<name> --infile=<name> --outfile=<name>
-             --podpath=<name>:...:<name> --podroot=<name>
-             --libpods=<name>:...:<name> --recurse --norecurse --verbose
-             --index --noindex --title=<name>
+pod2html --help --htmlroot=<name> --infile=<name> --outfile=<name>
+--podpath=<name>:...:<name> --podroot=<name>
+--libpods=<name>:...:<name> --recurse --norecurse --verbose
+--index --noindex --title=<name>
 
 =head1 DESCRIPTION
 
@@ -25,96 +25,96 @@ pod2html takes the following arguments:
 
 =item help
 
-  --help
+--help
 
 Displays the usage message.
 
 =item htmlroot
 
-  --htmlroot=name
+--htmlroot=name
 
 Sets the base URL for the HTML files.  When cross-references are made,
 the HTML root is prepended to the URL.
 
 =item infile
 
-  --infile=name
+--infile=name
 
 Specify the pod file to convert.  Input is taken from STDIN if no
 infile is specified.
 
 =item outfile
 
-  --outfile=name
+--outfile=name
 
 Specify the HTML file to create.  Output goes to STDOUT if no outfile
 is specified.
 
 =item podroot
 
-  --podroot=name
+--podroot=name
 
 Specify the base directory for finding library pods.
 
 =item podpath
 
-  --podpath=name:...:name
+--podpath=name:...:name
 
 Specify which subdirectories of the podroot contain pod files whose
 HTML converted forms can be linked-to in cross-references.
 
 =item libpods
 
-  --libpods=name:...:name
+--libpods=name:...:name
 
 List of page names (eg, "perlfunc") which contain linkable C<=item>s.
 
 =item netscape
 
-  --netscape
+--netscape
 
 Use Netscape HTML directives when applicable.
 
 =item nonetscape
 
-  --nonetscape
+--nonetscape
 
 Do not use Netscape HTML directives (default).
 
 =item index
 
-  --index
+--index
 
 Generate an index at the top of the HTML file (default behaviour).
 
 =item noindex
 
-  --noindex
+--noindex
 
 Do not generate an index at the top of the HTML file.
 
 
 =item recurse
 
-  --recurse
+--recurse
 
 Recurse into subdirectories specified in podpath (default behaviour).
 
 =item norecurse
 
-  --norecurse
+--norecurse
 
 Do not recurse into subdirectories specified in podpath.
 
 =item title
 
-  --title=title
+--title=title
 
 Specify the title of the resulting HTML file.
 
 =item verbose
 
-  --verbose
+--verbose
 
 Display progress messages.
 

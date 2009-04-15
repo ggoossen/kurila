@@ -57,20 +57,20 @@ try {
 # check whether eval EXPR determines value of EXPR correctly
 
 do {
-  print $^STDOUT, "ok 17\n";
-  print $^STDOUT, "ok 18\n";
-  print $^STDOUT, "ok 19\n";
-  print $^STDOUT, "ok 20\n";
-  print $^STDOUT, "ok 21\n";
-  print $^STDOUT, "ok 22\n";
-  print $^STDOUT, "ok 23\n";
+    print $^STDOUT, "ok 17\n";
+    print $^STDOUT, "ok 18\n";
+    print $^STDOUT, "ok 19\n";
+    print $^STDOUT, "ok 20\n";
+    print $^STDOUT, "ok 21\n";
+    print $^STDOUT, "ok 22\n";
+    print $^STDOUT, "ok 23\n";
 };
 
 my $b = 'wrong';
 my $X = sub {
-   my $b = "right";
-   print $^STDOUT, eval('"$b"') eq $b ?? "ok 24\n" !! "not ok 24\n";
-};
+        my $b = "right";
+        print $^STDOUT, eval('"$b"') eq $b ?? "ok 24\n" !! "not ok 24\n";
+    };
 &$X();
 
 
@@ -124,19 +124,19 @@ do {
 
 # can recursive subroutine-call inside eval'' see its own lexicals?
 sub recurse {
-  my $l = shift;
-  if ($l +< $x) {
-     ++$l;
-     eval 'print $^STDOUT, "# level $l\n"; recurse($l);';
-     die if $^EVAL_ERROR;
-  }
-  else {
-    print $^STDOUT, "ok $l\n";
-  }
+    my $l = shift;
+    if ($l +< $x) {
+        ++$l;
+        eval 'print $^STDOUT, "# level $l\n"; recurse($l);';
+        die if $^EVAL_ERROR;
+    }
+    else {
+        print $^STDOUT, "ok $l\n";
+    }
 }
 do {
-  local $^WARN_HOOK = sub { die "not ok $x\n" if @_[0] =~ m/^Deep recurs/ };
-  recurse($x-5);
+    local $^WARN_HOOK = sub { die "not ok $x\n" if @_[0] =~ m/^Deep recurs/ };
+    recurse($x-5);
 };
 $x++;
 
@@ -156,8 +156,8 @@ $x++;
 $main::r = "ok $x\n";
 sub terminal { eval 'our $r; print $^STDOUT, $r' }
 do {
-   my $r = "not ok $x\n";
-   eval 'terminal($r)';
+    my $r = "not ok $x\n";
+    eval 'terminal($r)';
 };
 $x++;
 
@@ -171,10 +171,10 @@ do {
 # return from try {} should clear $^EVAL_ERROR correctly
 do {
     my $status = try {
-	try { die };
-	print $^STDOUT, "# eval \{ return \} test\n";
-	return; # removing this changes behavior
-    };
+            try { die };
+            print $^STDOUT, "# eval \{ return \} test\n";
+            return; # removing this changes behavior
+        };
     print $^STDOUT, "not " if $^EVAL_ERROR;
     print $^STDOUT, "ok $x\n";
     $x++;
@@ -198,14 +198,14 @@ print $^STDOUT, "ok 41\n";
 # Make sure that "my $$x" is forbidden
 # 20011224 MJD
 do {
-  eval q{my $$x};
-  print $^STDOUT, $^EVAL_ERROR ?? "ok 42\n" !! "not ok 42\n";
-  eval q{my @$x};
-  print $^STDOUT, $^EVAL_ERROR ?? "ok 43\n" !! "not ok 43\n";
-  eval q{my %$x};
-  print $^STDOUT, $^EVAL_ERROR ?? "ok 44\n" !! "not ok 44\n";
-  eval q{my $$$x};
-  print $^STDOUT, $^EVAL_ERROR ?? "ok 45\n" !! "not ok 45\n";
+    eval q{my $$x};
+    print $^STDOUT, $^EVAL_ERROR ?? "ok 42\n" !! "not ok 42\n";
+    eval q{my @$x};
+    print $^STDOUT, $^EVAL_ERROR ?? "ok 43\n" !! "not ok 43\n";
+    eval q{my %$x};
+    print $^STDOUT, $^EVAL_ERROR ?? "ok 44\n" !! "not ok 44\n";
+    eval q{my $$$x};
+    print $^STDOUT, $^EVAL_ERROR ?? "ok 45\n" !! "not ok 45\n";
 };
 
 # [ID 20020623.002] eval "" doesn't clear $^EVAL_ERROR
@@ -243,8 +243,8 @@ do { my $zzz = 2; fred2(50) };
 sub do_sort {
     my $zzz = 2;
     my @a = sort
-               { print $^STDOUT, eval('$zzz') == 2 ?? 'ok' !! 'not ok', " 51\n"; $a <+> $b },
- @(               2, 1);
+        { print $^STDOUT, eval('$zzz') == 2 ?? 'ok' !! 'not ok', " 51\n"; $a <+> $b },
+        @(               2, 1);
 }
 do_sort();
 
@@ -300,10 +300,10 @@ sub fred4 {
 
 # [perl #9728] used to dump core
 do {
-   my $eval = eval 'sub { eval q|sub { %S }| }';
-   $eval->(\%());
-   print $^STDOUT, "ok $test\n";
-   $test++;
+    my $eval = eval 'sub { eval q|sub { %S }| }';
+    $eval->(\%());
+    print $^STDOUT, "ok $test\n";
+    $test++;
 };
 
 # evals that appear in the DB package should see the lexical scope of the
@@ -337,38 +337,38 @@ our $NO_ENDING = 1;
 # [perl #19022] used to end up with shared hash warnings
 # The program should generate no output, so anything we see is on stderr
 my $got = runperl (prog => 'our %h; %h{+a}=1; foreach my $k (keys %h) {eval qq{\$k}}',
-		   stderr => 1);
+    stderr => 1);
 
 if ($got eq '') {
-  print $^STDOUT, "ok $test\n";
+    print $^STDOUT, "ok $test\n";
 } else {
-  print $^STDOUT, "not ok $test\n";
-  _diag ("# Got '$got'\n");
+    print $^STDOUT, "not ok $test\n";
+    _diag ("# Got '$got'\n");
 }
 $test++;
 
 # And a buggy way of fixing #19022 made this fail - $k became undef after the
 # eval for a build with copy on write
 do {
-  my %h;
-  %h{+a}=1;
-  foreach my $k (keys %h) {
-    if (defined $k and $k eq 'a') {
-      print $^STDOUT, "ok $test\n";
-    } else {
-      print $^STDOUT, "not $test # got ", _q ($k), "\n";
-    }
-    $test++;
+    my %h;
+    %h{+a}=1;
+    foreach my $k (keys %h) {
+        if (defined $k and $k eq 'a') {
+            print $^STDOUT, "ok $test\n";
+        } else {
+            print $^STDOUT, "not $test # got ", _q ($k), "\n";
+        }
+        $test++;
 
-    eval "\$k";
+        eval "\$k";
 
-    if (defined $k and $k eq 'a') {
-      print $^STDOUT, "ok $test\n";
-    } else {
-      print $^STDOUT, "not $test # got ", _q ($k), "\n";
+        if (defined $k and $k eq 'a') {
+            print $^STDOUT, "ok $test\n";
+        } else {
+            print $^STDOUT, "not $test # got ", _q ($k), "\n";
+        }
+        $test++;
     }
-    $test++;
-  }
 };
 
 sub Foo {} print $^STDOUT, Foo(try {});

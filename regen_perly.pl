@@ -111,8 +111,8 @@ my $endcore_done = 0;
 while ( ~< *$tmph_fh) {
     print $h_fh, "#ifdef PERL_CORE\n" if iohandle::input_line_number($tmph_fh) == 1;
     if (!$endcore_done and m/YYSTYPE_IS_DECLARED/) {
-	print $h_fh, "#endif /* PERL_CORE */\n";
-	$endcore_done = 1;
+        print $h_fh, "#endif /* PERL_CORE */\n";
+        $endcore_done = 1;
     }
     next if m/^#line \d+ ".*"/;
     print $h_fh, $_;
@@ -144,7 +144,7 @@ sub extract {
 	}\s*;				# end of last table
        )
     @xms
-	or die "Can't extract tables from $tmpc_file\n";
+        or die "Can't extract tables from $tmpc_file\n";
     $tablines = $1;
 
 
@@ -168,7 +168,7 @@ sub extract {
 	    YY_SYMBOL_PRINT
 	)
     @xms
-	or die "Can't extract actions from $tmpc_file\n";
+        or die "Can't extract actions from $tmpc_file\n";
     $actlines = $1;
 
     # C<#line 188 "perlytmp.c"> gets picked up by make depend, so remove them.
@@ -179,7 +179,7 @@ sub extract {
     # convert yyvsp[nnn] into ps[nnn].val
 
     $actlines =~ s/yyvsp\[(.*?)\]/ps[$1].val/g
-	or die "Can't convert value stack name\n";
+        or die "Can't convert value stack name\n";
 
     return @($actlines. "\n", $tablines. "\n");
 }
@@ -221,24 +221,24 @@ sub make_type_tab($y_file, $tablines) {
     my $default_token;
     open my $fh, '<', $y_file or die "Can't open $y_file: $^OS_ERROR\n";
     while ( ~< $fh) {
-	if (m/(\$\d+)\s*=/) {
-	    warn "$y_file:$(iohandle::input_line_number($fh)): dangerous assignment to $1: $_";
-	}
+        if (m/(\$\d+)\s*=/) {
+            warn "$y_file:$(iohandle::input_line_number($fh)): dangerous assignment to $1: $_";
+        }
 
-	if (m/__DEFAULT__/) {
-	    m{(\w+) \s* ; \s* /\* \s* __DEFAULT__}x
-		or die "$y_file: can't parse __DEFAULT__ line: $_";
-	    die "$y_file: duplicate __DEFAULT__ line: $_"
-		    if defined $default_token;
-	    $default_token = $1;
-	    next;
-	}
+        if (m/__DEFAULT__/) {
+            m{(\w+) \s* ; \s* /\* \s* __DEFAULT__}x
+                or die "$y_file: can't parse __DEFAULT__ line: $_";
+            die "$y_file: duplicate __DEFAULT__ line: $_"
+                if defined $default_token;
+            $default_token = $1;
+            next;
+        }
 
-	next unless m/^%(token|type)/;
-	s/^%(token|type)\s+<(\w+)>\s+//
-	    or die "$y_file: unparseable token/type line: $_";
-	%tokens{+$_} = $2 for split ' ', $_;
-	%types{+$2} = 1;
+        next unless m/^%(token|type)/;
+        s/^%(token|type)\s+<(\w+)>\s+//
+            or die "$y_file: unparseable token/type line: $_";
+        %tokens{+$_} = $2 for split ' ', $_;
+        %types{+$2} = 1;
     }
     die "$y_file: no __DEFAULT__ token defined\n" unless $default_token;
     %types{+$default_token} = 1;
@@ -248,36 +248,36 @@ sub make_type_tab($y_file, $tablines) {
 	    (.*?)
 	    ^};
 	    /xsm
-	or die "Can't extract yytname[] from table string\n";
+        or die "Can't extract yytname[] from table string\n";
     my $fields = $1;
-    $fields =~ s{"([^"]+)"}
+        $fields =~ s{"([^"]+)"}
 		{$( "toketype_" .
-		    (defined %tokens{?$1} ?? %tokens{?$1} !! $default_token)
-		)}g;
+        (defined %tokens{?$1} ?? %tokens{?$1} !! $default_token)
+    )}g;
     $fields =~ s/, \s* 0 \s* $//x
-	or die "make_type_tab: couldn't delete trailing ',0'\n";
+        or die "make_type_tab: couldn't delete trailing ',0'\n";
 
     return 
-	  "\ntypedef enum \{\n\t"
-	. join(", ", map { "toketype_$_" }, sort keys %types)
-	. "\n\} toketypes;\n\n"
-	. "/* type of each token/terminal */\n"
-	. "static const toketypes yy_type_tab[] =\n\{\n"
-	. $fields
-	. "\n\};\n";
+        "\ntypedef enum \{\n\t"
+        . join(", ", map { "toketype_$_" }, sort keys %types)
+        . "\n\} toketypes;\n\n"
+        . "/* type of each token/terminal */\n"
+        . "static const toketypes yy_type_tab[] =\n\{\n"
+        . $fields
+        . "\n\};\n";
 }
 
 
 sub my_system {
     system(< @_);
     if ($^CHILD_ERROR == -1) {
-	die "failed to execute command '$(join ' ',@_)': $^OS_ERROR\n";
+        die "failed to execute command '$(join ' ',@_)': $^OS_ERROR\n";
     }
     elsif ($^CHILD_ERROR ^&^ 127) {
-	die sprintf "command '$(join ' ',@_)' died with signal \%d\n",
-	    ($^CHILD_ERROR ^&^ 127);
+        die sprintf "command '$(join ' ',@_)' died with signal \%d\n",
+            ($^CHILD_ERROR ^&^ 127);
     }
     elsif ($^CHILD_ERROR >> 8) {
-	die sprintf "command '$(join ' ',@_)' exited with value \%d\n", $^CHILD_ERROR >> 8;
+        die sprintf "command '$(join ' ',@_)' exited with value \%d\n", $^CHILD_ERROR >> 8;
     }
 }

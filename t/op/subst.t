@@ -173,10 +173,10 @@ ok( $_ eq 'aabbcc  224466xxyyzz' );
 # code based on the recursive expansion of makefile variables
 
 my %MK = %(
-    AAAAA => '$(B)', B=>'$(C)', C => 'D',			# long->short
-    E     => '$(F)', F=>'p $(G) q', G => 'HHHHH',	# short->long
-    DIR => '$(UNDEFINEDNAME)/xxx',
-);
+        AAAAA => '$(B)', B=>'$(C)', C => 'D',			# long->short
+            E     => '$(F)', F=>'p $(G) q', G => 'HHHHH',	# short->long
+            DIR => '$(UNDEFINEDNAME)/xxx',
+    );
 sub var($var,$level) {
     return "\$($var)" unless exists %MK{$var};
     return exp_vars(%MK{?$var}, $level+1); # can recurse
@@ -311,25 +311,25 @@ SKIP: do {
     skip("EBCDIC", 3) if ord("A") == 193; 
 
     do {   
-	# Gregor Chrupala <gregor.chrupala@star-group.net>
-	use utf8;
-	$a = 'Espa&ntilde;a';
-	$a =~ s/&ntilde;/ñ/;
-	like($a, qr/ñ/, "use utf8 RHS");
+        # Gregor Chrupala <gregor.chrupala@star-group.net>
+        use utf8;
+        $a = 'Espa&ntilde;a';
+        $a =~ s/&ntilde;/ñ/;
+        like($a, qr/ñ/, "use utf8 RHS");
     };
 
     do {
-	use utf8;
-	$a = 'España España';
-	$a =~ s/ñ/&ntilde;/;
-	like($a, qr/ñ/, "use utf8 LHS");
+        use utf8;
+        $a = 'España España';
+        $a =~ s/ñ/&ntilde;/;
+        like($a, qr/ñ/, "use utf8 LHS");
     };
 
     do {
-	use utf8;
-	$a = 'España';
-	$a =~ s/ñ/ñ/;
-	like($a, qr/ñ/, "use utf8 LHS and RHS");
+        use utf8;
+        $a = 'España';
+        $a =~ s/ñ/ñ/;
+        like($a, qr/ñ/, "use utf8 LHS and RHS");
     };
 };
 

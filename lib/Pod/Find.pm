@@ -23,15 +23,15 @@ Pod::Find - find POD documents in directory trees
 
 =head1 SYNOPSIS
 
-  use Pod::Find qw(pod_find simplify_name);
-  my %pods = pod_find({ verbose => 1, inc => 1 });
-  foreach(keys %pods) {
-     print "found library POD `$pods{$_}' in $_\n";
-  }
+use Pod::Find qw(pod_find simplify_name);
+my %pods = pod_find({ verbose => 1, inc => 1 });
+foreach(keys %pods) {
+print "found library POD `$pods{$_}' in $_\n";
+}
 
-  print "podname=",simplify_name('a/b/c/mymodule.pod'),"\n";
+print "podname=",simplify_name('a/b/c/mymodule.pod'),"\n";
 
-  $location = pod_where( { inc => 1 }, "Pod::Find" );
+$location = pod_where( { inc => 1 }, "Pod::Find" );
 
 =head1 DESCRIPTION
 
@@ -39,7 +39,7 @@ B<Pod::Find> provides a set of functions to locate POD files.  Note that
 no function is exported by default to avoid pollution of your namespace,
 so be sure to specify them in the B<use> statement if you need them:
 
-  use Pod::Find qw(pod_find);
+use Pod::Find qw(pod_find);
 
 From this version on the typical SCM (software configuration management)
 files/directories like RCS, CVS, SCCS, .svn are ignored.
@@ -168,10 +168,10 @@ sub pod_find
 
         if ($^OS_NAME eq 'MacOS') {
             $SIMPLIFY_RX =
-              qq!^(?i:\:?site_perl\:|\:?pod\:(?=.*?\\.pod\\z))*!;
+                qq!^(?i:\:?site_perl\:|\:?pod\:(?=.*?\\.pod\\z))*!;
         } else {
             $SIMPLIFY_RX =
-              qq!^(?i:site(_perl)?/|\Q$(Config::config_value('archname'))\E/|\\d+\\.\\d+([_.]?\\d+)?/|pod/(?=.*?\\.pod\\z))*!;
+                qq!^(?i:site(_perl)?/|\Q$(Config::config_value('archname'))\E/|\\d+\\.\\d+([_.]?\\d+)?/|pod/(?=.*?\\.pod\\z))*!;
         }
     }
 
@@ -199,32 +199,32 @@ sub pod_find
         }
         my $root_rx = $^OS_NAME eq 'MacOS' ?? qq!^\Q$try\E! !! qq!^\Q$try\E/!;
         File::Find::find( sub {
-            my $item = $File::Find::name;
-            if(-d) {
-                if($item =~ m{/(?:RCS|CVS|SCCS|\.svn)$}) {
-                    $File::Find::prune = 1;
-                    return;
-                }
-                elsif(%dirs_visited{?$item}) {
-                    warn "Directory '$item' already seen, skipping.\n"
-                        if(%opts{?verbose});
-                    $File::Find::prune = 1;
-                    return;
-                }
-                else {
-                    %dirs_visited{+$item} = 1;
-                }
-                if(%opts{?perl} && m/^(\d+\.[\d_]+)\z/s && eval "$1" != $^PERL_VERSION) {
-                    $File::Find::prune = 1;
-                    warn "Perl $^PERL_VERSION version mismatch on $_, skipping.\n"
-                        if(%opts{?verbose});
-                }
-                return;
-            }
-            if($name = _check_and_extract_name($item, %opts{?verbose}, $root_rx)) {
-                _check_for_duplicates($item, $name, \%names, \%pods);
-            }
-        }, $try); # end of File::Find::find
+                              my $item = $File::Find::name;
+                              if(-d) {
+                                  if($item =~ m{/(?:RCS|CVS|SCCS|\.svn)$}) {
+                                      $File::Find::prune = 1;
+                                      return;
+                                  }
+                                  elsif(%dirs_visited{?$item}) {
+                                      warn "Directory '$item' already seen, skipping.\n"
+                                          if(%opts{?verbose});
+                                      $File::Find::prune = 1;
+                                      return;
+                                  }
+                                  else {
+                                      %dirs_visited{+$item} = 1;
+                                  }
+                                  if(%opts{?perl} && m/^(\d+\.[\d_]+)\z/s && eval "$1" != $^PERL_VERSION) {
+                                      $File::Find::prune = 1;
+                                      warn "Perl $^PERL_VERSION version mismatch on $_, skipping.\n"
+                                          if(%opts{?verbose});
+                                  }
+                                  return;
+                              }
+                              if($name = _check_and_extract_name($item, %opts{?verbose}, $root_rx)) {
+                                  _check_for_duplicates($item, $name, \%names, \%pods);
+                              }
+                          }, $try); # end of File::Find::find
     }
     chdir $pwd;
     %pods;
@@ -247,7 +247,7 @@ sub _check_and_extract_name($file, $verbose, $root_rx) {
     # check extension or executable flag
     # this involves testing the .bat extension on Win32!
     unless(-f $file && -T $file && ($file =~ m/\.(pod|pm|plx?)\z/i || -x $file )) {
-      return undef;
+        return undef;
     }
 
     return undef unless contains_pod($file,$verbose);
@@ -356,115 +356,115 @@ contain some pod documentation.
 
 sub pod_where {
 
-  # default options
-  my %options = %(
-         'inc' => 0,
-         'verbose' => 0,
-         'dirs' => \@( File::Spec->curdir ),
+    # default options
+    my %options = %(
+            'inc' => 0,
+                'verbose' => 0,
+                'dirs' => \@( File::Spec->curdir ),
         );
 
-  # Check for an options hash as first argument
-  if (defined @_[0] && ref(@_[0]) eq 'HASH') {
-    my $opt = shift;
+    # Check for an options hash as first argument
+    if (defined @_[0] && ref(@_[0]) eq 'HASH') {
+        my $opt = shift;
 
-    # Merge default options with supplied options
-    %options = %(< %options, < %$opt);
-  }
-
-  # Check usage
-  warn 'Usage: pod_where({options}, $pod)' unless (scalar(nelems @_));
-
-  # Read argument
-  my $pod = shift;
-
-  # Split on :: and then join the name together using File::Spec
-  my @parts = split (m/::/, $pod);
-
-  # Get full directory list
-  my @search_dirs = @{ %options{?'dirs'} };
-
-  if (%options{?'inc'}) {
-
-    require Config;
-
-    # Add $^INCLUDE_PATH
-    if ($^OS_NAME eq 'MacOS' && %options{?'inc'}) {
-        # tolerate '.', './some_dir' and '(../)+some_dir' on Mac OS
-        my @new_INC = $^INCLUDE_PATH;
-        for ( @new_INC) {
-            if ( $_ eq '.' ) {
-                $_ = ':';
-            } elsif ( $_ =~ s|^((?:\.\./)+)|$(':' x (length($1)/3))| ) {
-                $_ = ':'. $_;
-            } else {
-                $_ =~ s|^\./|:|;
-            }
-        }
-        push (@search_dirs, < @new_INC);
-    } elsif (%options{?'inc'}) {
-        push (@search_dirs, < $^INCLUDE_PATH);
+        # Merge default options with supplied options
+        %options = %(< %options, < %$opt);
     }
 
-    # Add location of pod documentation for perl man pages (eg perlfunc)
-    # This is a pod directory in the private install tree
-    #my $perlpoddir = File::Spec->catdir(Config::config_value('installprivlib'),
-    #					'pod');
-    #push (@search_dirs, $perlpoddir)
-    #  if -d $perlpoddir;
+    # Check usage
+    warn 'Usage: pod_where({options}, $pod)' unless (scalar(nelems @_));
 
-    # Add location of binaries such as pod2text
-    push (@search_dirs, Config::config_value('scriptdir'))
-      if -d Config::config_value('scriptdir');
-  }
+    # Read argument
+    my $pod = shift;
 
-  warn "Search path is: ".join(' ', @search_dirs)."\n"
+    # Split on :: and then join the name together using File::Spec
+    my @parts = split (m/::/, $pod);
+
+    # Get full directory list
+    my @search_dirs = @{ %options{?'dirs'} };
+
+    if (%options{?'inc'}) {
+
+        require Config;
+
+        # Add $^INCLUDE_PATH
+        if ($^OS_NAME eq 'MacOS' && %options{?'inc'}) {
+            # tolerate '.', './some_dir' and '(../)+some_dir' on Mac OS
+            my @new_INC = $^INCLUDE_PATH;
+            for ( @new_INC) {
+                if ( $_ eq '.' ) {
+                    $_ = ':';
+                } elsif ( $_ =~ s|^((?:\.\./)+)|$(':' x (length($1)/3))| ) {
+                    $_ = ':'. $_;
+                } else {
+                    $_ =~ s|^\./|:|;
+                }
+            }
+            push (@search_dirs, < @new_INC);
+        } elsif (%options{?'inc'}) {
+            push (@search_dirs, < $^INCLUDE_PATH);
+        }
+
+        # Add location of pod documentation for perl man pages (eg perlfunc)
+        # This is a pod directory in the private install tree
+        #my $perlpoddir = File::Spec->catdir(Config::config_value('installprivlib'),
+        #					'pod');
+        #push (@search_dirs, $perlpoddir)
+        #  if -d $perlpoddir;
+
+        # Add location of binaries such as pod2text
+        push (@search_dirs, Config::config_value('scriptdir'))
+            if -d Config::config_value('scriptdir');
+    }
+
+    warn "Search path is: ".join(' ', @search_dirs)."\n"
         if %options{?'verbose'};
 
   # Loop over directories
   Dir: foreach my $dir (  @search_dirs ) {
 
-    # Don't bother if can't find the directory
-    if (-d $dir) {
-      warn "Looking in directory $dir\n" 
-        if %options{'verbose'};
+        # Don't bother if can't find the directory
+        if (-d $dir) {
+            warn "Looking in directory $dir\n" 
+                if %options{'verbose'};
 
-      # Now concatenate this directory with the pod we are searching for
-      my $fullname = File::Spec->catfile($dir, < @parts);
-      warn "Filename is now $fullname\n"
-        if %options{'verbose'};
+            # Now concatenate this directory with the pod we are searching for
+            my $fullname = File::Spec->catfile($dir, < @parts);
+            warn "Filename is now $fullname\n"
+                if %options{'verbose'};
 
-      # Loop over possible extensions
-      foreach my $ext (@('', '.pod', '.pm', '.pl')) {
-        my $fullext = $fullname . $ext;
-        if (-f $fullext && 
-         contains_pod($fullext, %options{'verbose'}) ) {
-          warn "FOUND: $fullext\n" if %options{'verbose'};
-          return $fullext;
+            # Loop over possible extensions
+            foreach my $ext (@('', '.pod', '.pm', '.pl')) {
+                my $fullext = $fullname . $ext;
+                if (-f $fullext && 
+                    contains_pod($fullext, %options{'verbose'}) ) {
+                    warn "FOUND: $fullext\n" if %options{'verbose'};
+                    return $fullext;
+                }
+            }
+        } else {
+            warn "Directory $dir does not exist\n"
+                if %options{'verbose'};
+            next Dir;
         }
-      }
-    } else {
-      warn "Directory $dir does not exist\n"
-        if %options{'verbose'};
-      next Dir;
+        # for some strange reason the path on MacOS/darwin/cygwin is
+        # 'pods' not 'pod'
+        # this could be the case also for other systems that
+        # have a case-tolerant file system, but File::Spec
+        # does not recognize 'darwin' yet. And cygwin also has "pods",
+        # but is not case tolerant. Oh well...
+        if((File::Spec->case_tolerant || $^OS_NAME =~ m/macos|darwin|cygwin/i)
+            && -d File::Spec->catdir($dir,'pods')) {
+            $dir = File::Spec->catdir($dir,'pods');
+            redo Dir;
+        }
+        if(-d File::Spec->catdir($dir,'pod')) {
+            $dir = File::Spec->catdir($dir,'pod');
+            redo Dir;
+        }
     }
-    # for some strange reason the path on MacOS/darwin/cygwin is
-    # 'pods' not 'pod'
-    # this could be the case also for other systems that
-    # have a case-tolerant file system, but File::Spec
-    # does not recognize 'darwin' yet. And cygwin also has "pods",
-    # but is not case tolerant. Oh well...
-    if((File::Spec->case_tolerant || $^OS_NAME =~ m/macos|darwin|cygwin/i)
-     && -d File::Spec->catdir($dir,'pods')) {
-      $dir = File::Spec->catdir($dir,'pods');
-      redo Dir;
-    }
-    if(-d File::Spec->catdir($dir,'pod')) {
-      $dir = File::Spec->catdir($dir,'pod');
-      redo Dir;
-    }
-  }
-  # No match;
-  return undef;
+    # No match;
+    return undef;
 }
 
 =head2 C<contains_pod( $file , $verbose )>
@@ -475,27 +475,27 @@ information.
 =cut
 
 sub contains_pod {
-  my $file = shift;
-  my $verbose = 0;
-  $verbose = shift if (nelems @_);
+    my $file = shift;
+    my $verbose = 0;
+    $verbose = shift if (nelems @_);
 
-  # check for one line of POD
-  my $pod_fh;
-  unless(open($pod_fh, "<","$file")) {
-    warn "Error: $file is unreadable: $^OS_ERROR\n";
-    return undef;
-  }
-  
-  local $^INPUT_RECORD_SEPARATOR = undef;
-  my $pod = ~< $pod_fh;
-  close($pod_fh) || die "Error closing $file: $^OS_ERROR\n";
-  unless($pod =~ m/^=(head\d|pod|over|item)\b/m) {
-    warn "No POD in $file, skipping.\n"
-      if($verbose);
-    return 0;
-  }
+    # check for one line of POD
+    my $pod_fh;
+    unless(open($pod_fh, "<","$file")) {
+        warn "Error: $file is unreadable: $^OS_ERROR\n";
+        return undef;
+    }
 
-  return 1;
+    local $^INPUT_RECORD_SEPARATOR = undef;
+    my $pod = ~< $pod_fh;
+    close($pod_fh) || die "Error closing $file: $^OS_ERROR\n";
+    unless($pod =~ m/^=(head\d|pod|over|item)\b/m) {
+        warn "No POD in $file, skipping.\n"
+            if($verbose);
+        return 0;
+    }
+
+    return 1;
 }
 
 =head1 AUTHOR

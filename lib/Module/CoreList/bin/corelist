@@ -10,9 +10,9 @@ See L<Module::CoreList> for one.
 
 =head1 SYNOPSIS
 
-    corelist -v
-    corelist [-a|-d] <ModuleName> | /<ModuleRegex>/ [<ModuleVersion>] ...
-    corelist [-v <PerlVersion>] [ <ModuleName> | /<ModuleRegex>/ ] ...
+corelist -v
+corelist [-a|-d] <ModuleName> | /<ModuleRegex>/ [<ModuleVersion>] ...
+corelist [-v <PerlVersion>] [ <ModuleName> | /<ModuleRegex>/ ] ...
 
 =head1 OPTIONS
 
@@ -23,26 +23,26 @@ See L<Module::CoreList> for one.
 lists all versions of the given module (or the matching modules, in case you
 used a module regexp) in the perls Module::CoreList knows about.
 
-    corelist -a utf8
+corelist -a utf8
 
-    utf8 was first released with perl 5.006
-      5.006      undef
-      5.006001   undef
-      5.006002   undef
-      5.007003   1.00
-      5.008      1.00
-      5.008001   1.02
-      5.008002   1.02
-      5.008003   1.02
-      5.008004   1.03
-      5.008005   1.04
-      5.008006   1.04
-      5.008007   1.05
-      5.008008   1.06
-      5.009      1.02
-      5.009001   1.02
-      5.009002   1.04
-      5.009003   1.06
+utf8 was first released with perl 5.006
+5.006      undef
+5.006001   undef
+5.006002   undef
+5.007003   1.00
+5.008      1.00
+5.008001   1.02
+5.008002   1.02
+5.008003   1.02
+5.008004   1.03
+5.008005   1.04
+5.008006   1.04
+5.008007   1.05
+5.008008   1.06
+5.009      1.02
+5.009001   1.02
+5.009002   1.04
+5.009003   1.06
 
 =item -d
 
@@ -105,11 +105,11 @@ if(exists %Opts{v} ){
     }
 
     if ( !nelems @ARGV ) {
-	print $^STDOUT, "\nThe following modules were in perl v%Opts{?v} CORE\n";
-	print $^STDOUT, "$_ ", $version_hash->{?$_} || " ","\n"
-	for sort keys %$version_hash;
-	print $^STDOUT, "\n";
-	exit 0;
+        print $^STDOUT, "\nThe following modules were in perl v%Opts{?v} CORE\n";
+        print $^STDOUT, "$_ ", $version_hash->{?$_} || " ","\n"
+            for sort keys %$version_hash;
+        print $^STDOUT, "\n";
+        exit 0;
     }
 }
 
@@ -118,35 +118,35 @@ if ( !nelems @ARGV ) {
 }
 
 while ((nelems @ARGV)) {
-	my ($mod, $ver);
-	if (@ARGV[0] =~ m/=/) {
-	    @($mod, $ver) =  split m/=/, shift @ARGV;
-	} else {
-	    $mod = shift @ARGV;
-	    $ver = ((nelems @ARGV) && @ARGV[0] =~ m/^\d/) ?? shift @ARGV !! "";
-	}
+    my ($mod, $ver);
+    if (@ARGV[0] =~ m/=/) {
+        @($mod, $ver) =  split m/=/, shift @ARGV;
+    } else {
+        $mod = shift @ARGV;
+        $ver = ((nelems @ARGV) && @ARGV[0] =~ m/^\d/) ?? shift @ARGV !! "";
+    }
 
-	if ($mod !~ m|^/(.*)/([imosx]*)$|) { # not a regex
-	    module_version($mod,$ver);
-	} else {
-	    my $re;
-	    try { $re = $2 ?? qr/(?$2)($1)/ !! qr/$1/; }; # trap exceptions while building regex
-	    if ($^EVAL_ERROR) {
-		# regex errors are usually like 'Quantifier follow nothing in regex; marked by ...'
-		# then we drop text after ';' to shorten message
-		my $errmsg = $^EVAL_ERROR->{?description} =~ m/(.*);/ ?? $1 !! $^EVAL_ERROR;
-		warn "\n$mod  is a bad regex: $errmsg\n";
-		next;
-	    }
-	    my @mod = Module::CoreList->find_modules($re);
-	    if ((nelems @mod)) {
-		module_version($_, $ver) for  @mod;
-	    } else {
-		$ver ^|^= '';
-		print $^STDOUT, "\n$mod $ver has no match in CORE (or so I think)\n";
-	    }
+    if ($mod !~ m|^/(.*)/([imosx]*)$|) { # not a regex
+        module_version($mod,$ver);
+    } else {
+        my $re;
+        try { $re = $2 ?? qr/(?$2)($1)/ !! qr/$1/; }; # trap exceptions while building regex
+        if ($^EVAL_ERROR) {
+            # regex errors are usually like 'Quantifier follow nothing in regex; marked by ...'
+            # then we drop text after ';' to shorten message
+            my $errmsg = $^EVAL_ERROR->{?description} =~ m/(.*);/ ?? $1 !! $^EVAL_ERROR;
+            warn "\n$mod  is a bad regex: $errmsg\n";
+            next;
+        }
+        my @mod = Module::CoreList->find_modules($re);
+        if ((nelems @mod)) {
+            module_version($_, $ver) for  @mod;
+        } else {
+            $ver ^|^= '';
+            print $^STDOUT, "\n$mod $ver has no match in CORE (or so I think)\n";
+        }
 
-	}
+    }
 }
 
 exit();
@@ -155,17 +155,17 @@ sub module_version {
     my@($mod,$ver) =  @_;
 
     if ( %Opts{?v} ) {
-	my $version_hash = Module::CoreList->find_version(%Opts{v});
-	if ($version_hash) {
-	    print $^STDOUT, $mod, " ", $version_hash->{?$mod} || 'undef', "\n";
-	    return;
-	}
-	else { die "Shouldn't happen" }
+        my $version_hash = Module::CoreList->find_version(%Opts{v});
+        if ($version_hash) {
+            print $^STDOUT, $mod, " ", $version_hash->{?$mod} || 'undef', "\n";
+            return;
+        }
+        else { die "Shouldn't happen" }
     }
 
     my $ret = %Opts{?d}
-	?? Module::CoreList->first_release_by_date(< @_)
-	!! Module::CoreList->first_release(< @_);
+        ?? Module::CoreList->first_release_by_date(< @_)
+        !! Module::CoreList->first_release(< @_);
     my $msg = $mod;
     $msg .= " $ver" if $ver;
 
@@ -181,14 +181,14 @@ sub module_version {
 
     if(defined $ret and exists %Opts{a} and %Opts{?a}){
         for my $v(
-            sort keys %Module::CoreList::version ){
+        sort keys %Module::CoreList::version ){
 
-            printf $^STDOUT, "  \%-10s \%-10s\n",
-                $v,
-                %Module::CoreList::version{$v}->{?$mod}
+                printf $^STDOUT, "  \%-10s \%-10s\n",
+                    $v,
+                    %Module::CoreList::version{$v}->{?$mod}
                     || 'undef'
                     if exists %Module::CoreList::version{$v}->{$mod};
-        }
+            }
         print $^STDOUT, "\n";
     }
 }
@@ -196,8 +196,8 @@ sub module_version {
 sub numify_version {
     my $ver = shift;
     if ($ver =~ m/\..+\./) {
-	try { require version ; 1 }
-	    or die "You need to install version.pm to use dotted version numbers\n";
+        try { require version ; 1 }
+        or die "You need to install version.pm to use dotted version numbers\n";
         $ver = version->new($ver)->numify;
     }
     $ver += 0;

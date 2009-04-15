@@ -68,14 +68,14 @@ WriteMakefile(
     PM              => \%virtual_path, 
     PREREQ_PM       => \%(
         'Test::More' => 0,
-        'XSLoader'   => 0,
-        < @extra_prereqs,
+            'XSLoader'   => 0,
+            < @extra_prereqs,
     ),
     dist            => \%( COMPRESS => 'gzip -9f', SUFFIX => 'gz', ),
     clean           => \%( FILES => 'Sys-Syslog-*' ), 
     realclean       => \%( FILES => 'lib const-c.inc const-xs.inc macros.all PerlLog.h *.bak *.bin *.rc' ),
     < @extra_params
-);
+    );
 
 
 # find a default value for _PATH_LOG
@@ -114,44 +114,44 @@ if(try {require ExtUtils::Constant; 1}) {
     );
 
     my @facilities = @( <
-        # standard facilities
-        qw(
+                        # standard facilities
+                        qw(
             LOG_AUTH LOG_AUTHPRIV LOG_CRON LOG_DAEMON LOG_FTP LOG_KERN
             LOG_LOCAL0 LOG_LOCAL1 LOG_LOCAL2 LOG_LOCAL3 LOG_LOCAL4
             LOG_LOCAL5 LOG_LOCAL6 LOG_LOCAL7 LOG_LPR LOG_MAIL LOG_NEWS
             LOG_SYSLOG LOG_USER LOG_UUCP
         ),
-        # Mac OS X specific facilities
-        \%( name => "LOG_INSTALL",    type => "IV", default => \@( "IV", "LOG_USER"  ) ),
-        \%( name => "LOG_LAUNCHD",    type => "IV", default => \@( "IV", "LOG_DAEMON") ),
-        \%( name => "LOG_NETINFO",    type => "IV", default => \@( "IV", "LOG_DAEMON") ),
-        \%( name => "LOG_RAS",        type => "IV", default => \@( "IV", "LOG_AUTH"  ) ),
-        \%( name => "LOG_REMOTEAUTH", type => "IV", default => \@( "IV", "LOG_AUTH"  ) ),
-        # modern BSD specific facilities
-        \%( name => "LOG_CONSOLE",    type => "IV", default => \@( "IV", "LOG_USER"  ) ),
-        \%( name => "LOG_NTP",        type => "IV", default => \@( "IV", "LOG_DAEMON") ),
-        \%( name => "LOG_SECURITY",   type => "IV", default => \@( "IV", "LOG_AUTH"  ) ),
-        # IRIX specific facilities
-        \%( name => "LOG_AUDIT",      type => "IV", default => \@( "IV", "LOG_AUTH"  ) ),
-        \%( name => "LOG_LFMT",       type => "IV", default => \@( "IV", "LOG_USER"  ) ),
-    );
+                        # Mac OS X specific facilities
+                        \%( name => "LOG_INSTALL",    type => "IV", default => \@( "IV", "LOG_USER"  ) ),
+                        \%( name => "LOG_LAUNCHD",    type => "IV", default => \@( "IV", "LOG_DAEMON") ),
+                        \%( name => "LOG_NETINFO",    type => "IV", default => \@( "IV", "LOG_DAEMON") ),
+                        \%( name => "LOG_RAS",        type => "IV", default => \@( "IV", "LOG_AUTH"  ) ),
+                        \%( name => "LOG_REMOTEAUTH", type => "IV", default => \@( "IV", "LOG_AUTH"  ) ),
+                        # modern BSD specific facilities
+                        \%( name => "LOG_CONSOLE",    type => "IV", default => \@( "IV", "LOG_USER"  ) ),
+                        \%( name => "LOG_NTP",        type => "IV", default => \@( "IV", "LOG_DAEMON") ),
+                        \%( name => "LOG_SECURITY",   type => "IV", default => \@( "IV", "LOG_AUTH"  ) ),
+                        # IRIX specific facilities
+                        \%( name => "LOG_AUDIT",      type => "IV", default => \@( "IV", "LOG_AUTH"  ) ),
+                        \%( name => "LOG_LFMT",       type => "IV", default => \@( "IV", "LOG_USER"  ) ),
+        );
 
     my @options = qw(
         LOG_CONS LOG_PID LOG_NDELAY LOG_NOWAIT LOG_ODELAY LOG_PERROR 
     );
 
     my @others_macros = @( <
-        qw(LOG_FACMASK),
-        \%( name => "_PATH_LOG", type => "PV", default => \@( "PV", qq("$_PATH_LOG") ) ),
-        \%( name => "LOG_PRIMASK",     type => "IV", default => \@( "IV", 7) ),
-        \%( name => "LOG_NFACILITIES", type => "IV", default => \@( "IV", scalar nelems @facilities) ),
-    );
+                           qw(LOG_FACMASK),
+                           \%( name => "_PATH_LOG", type => "PV", default => \@( "PV", qq("$_PATH_LOG") ) ),
+                           \%( name => "LOG_PRIMASK",     type => "IV", default => \@( "IV", 7) ),
+                           \%( name => "LOG_NFACILITIES", type => "IV", default => \@( "IV", scalar nelems @facilities) ),
+        );
 
     ExtUtils::Constant::WriteConstants(
         PROXYSUBS => 1,
         NAME => 'Sys::Syslog',
         NAMES => \@( < @levels, < @facilities, < @options, < @others_macros ),
-    );
+        );
 
     my @names = map { ref $_ ?? $_->{?name} !! $_ }, @( < @levels, < @facilities, < @options);
     open(my $macros, ">", 'macros.all') or warn "warning: Can't write 'macros.all': $^OS_ERROR\n";

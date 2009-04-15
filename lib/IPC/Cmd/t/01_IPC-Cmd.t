@@ -23,7 +23,7 @@ my @Prefs = @(
     \@( $Have_IPC_Run, $Have_IPC_Open3 ), 
     \@( 0,             $Have_IPC_Open3 ), 
     \@( 0,             0 ) 
-);
+    );
 
 ### can_run tests
 do {
@@ -37,7 +37,7 @@ do {   ### list of commands and regexes matching output ###
         # command                                    # output regex
         \@( "$^EXECUTABLE_NAME -v",                                  qr/gerard\s+goossen/i, ),
         \@( \@($^EXECUTABLE_NAME, '-v'),                               qr/gerard\s+goossen/i, ),
-    );
+        );
 
     diag( "Running tests that print only to stdout" ) if $Verbose;
     ### for each configuarion
@@ -63,16 +63,16 @@ do {   ### list of commands and regexes matching output ###
                 my $ok = run( command => $cmd, buffer => \$buffer );
 
                 ok( $ok,        "Ran command succesfully" );
-                
-                SKIP: do {
+
+              SKIP: do {
                     skip "No buffers available", 1 
-                                unless $Class->can_capture_buffer;
-                    
+                        unless $Class->can_capture_buffer;
+
                     like( $buffer, $regex,  
-                                "   Buffer filled properly" );
+                          "   Buffer filled properly" );
                 };
             };
-                
+
             ### in list mode                
             do {   diag( "Running list mode" ) if $Verbose;
                 my @list = run( command => $cmd );
@@ -81,22 +81,22 @@ do {   ### list of commands and regexes matching output ###
 
                 my $list_length = $Class->can_capture_buffer ?? 5 !! 2;
                 is( scalar(nelems @list), $list_length,
-                                "   Output list has $list_length entries" );
+                    "   Output list has $list_length entries" );
 
-                SKIP: do {
+              SKIP: do {
                     skip "No buffers available", 6 
-                                unless $Class->can_capture_buffer;
-                    
+                        unless $Class->can_capture_buffer;
+
                     ### the last 3 entries from the RV, are they array refs?
                     isa_ok( @list[$_], 'ARRAY' ) for 2..4;
 
                     like( "$(join ' ',@{@list[2]})", $regex,
-                                "   Combined buffer holds output" );
+                          "   Combined buffer holds output" );
 
                     like( "$(join ' ',@{@list[3]})", qr/$regex/,
-                            "   Stdout buffer filled" );
+                          "   Stdout buffer filled" );
                     is( scalar( nelems @{@list[4]} ), 0,
-                                    "   Stderr buffer empty" );
+                        "   Stderr buffer empty" );
                 };
             };
         }
@@ -111,7 +111,7 @@ do {   ### list of commands and regexes matching output ###
         # command                                    # output regex
         \@( "$^EXECUTABLE_NAME -e'warn 42'",                          qr/^42 /, ),
         \@( \@($^EXECUTABLE_NAME, "-e'warn 42'"),                       qr/^42 /, ),
-    );
+        );
 
     diag( "Running tests that print only to stderr" ) if $Verbose;
     ### for each configuarion
@@ -138,13 +138,13 @@ do {   ### list of commands and regexes matching output ###
 
                 ok( $ok,        "Ran stderr command succesfully in scalar mode." );
 
-                SKIP: do {
-           # No buffers are expected if neither IPC::Run nor IPC::Open3 is used.
+              SKIP: do {
+                    # No buffers are expected if neither IPC::Run nor IPC::Open3 is used.
                     skip "No buffers available", 1
-                                unless $Class->can_capture_buffer;
+                        unless $Class->can_capture_buffer;
 
                     like( $buffer, $regex,
-                                "   Buffer filled properly from stderr" );
+                          "   Buffer filled properly from stderr" );
                 };
             };
 
@@ -156,23 +156,23 @@ do {   ### list of commands and regexes matching output ###
 
                 my $list_length = $Class->can_capture_buffer ?? 5 !! 2;
                 is( scalar(nelems @list), $list_length,
-                                "   Output list has $list_length entries" );
+                    "   Output list has $list_length entries" );
 
-                SKIP: do {
-           # No buffers are expected if neither IPC::Run nor IPC::Open3 is used.
+              SKIP: do {
+                    # No buffers are expected if neither IPC::Run nor IPC::Open3 is used.
                     skip "No buffers available", 6
-                                unless $Class->can_capture_buffer;
+                        unless $Class->can_capture_buffer;
 
                     ### the last 3 entries from the RV, are they array refs?
                     isa_ok( @list[$_], 'ARRAY' ) for 2..4;
 
                     like( join(' ',@{@list[2]}), $regex,
-                                "   Combined buffer holds output" );
+                          "   Combined buffer holds output" );
 
                     is( scalar( nelems @{@list[3]} ), 0,
-                                    "   Stdout buffer empty" );
+                        "   Stdout buffer empty" );
                     like( join(' ',@{@list[4]}), qr/$regex/,
-                            "   Stderr buffer filled" );
+                          "   Stderr buffer filled" );
                 };
             };
         }
